@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\inc\axl_lua_LuaState.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_st_StringTemplate.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_st_Lexer.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="axl_lua_LuaState.cpp">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_st_StringTemplate.cpp">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_st_Lexer.cpp">
+      <Filter>lua</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="lua">
+      <UniqueIdentifier>{2f97f8ff-f846-4eb0-bd7b-7f88de569c37}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="axl_st_Lexer.rl">
+      <Filter>lua</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

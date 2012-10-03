@@ -1,0 +1,69 @@
+//.............................................................................
+
+class
+{
+	CProperty* m_pProperty;
+}
+property_specifier
+	: EToken_Property property_block
+		{
+			$.m_pProperty = CreateProperty ($2.m_pGetter, $2.m_Setter);
+		}
+	;
+
+class CPropertyBlock
+{
+	CFunction* m_pGetter;
+	CFunctionOverload m_Setter;
+
+	CPropertyBlock ()
+	{
+		m_pGetter = NULL;
+	}
+}
+property_block
+	: '{' property_accessor_declaration <&$>+ '}'
+	;
+
+property_accessor_declaration <CPropertyBlock* $pBlock>
+	: type_specifier_modifier_list
+	  property_declarator
+	  declaration_terminator
+		{
+			bool Result = DeclarePropertyAccessor ($pBlock, &$1.m_TypeSpecifier, &$2.m_Declarator);
+			if (!Result)
+				return false;
+		}
+	| ';'
+	;
+
+class
+{
+	CDeclarator m_Declarator;
+}
+property_declarator
+	: pointer <&$.m_Declarator>* 
+	  property_accessor_kind $a
+	  formal_argument_suffix <&$.m_Declarator>
+		{
+			$.m_Declarator.m_PropertyAccessorKind = $a.m_PropertyAccessorKind;
+			$.m_Declarator.m_Pos = $a.m_FirstToken.m_Pos;
+		}
+	;
+
+class
+{
+	EPropertyAccessor m_PropertyAccessorKind;
+}
+property_accessor_kind
+	: EToken_Get
+		{
+			$.m_PropertyAccessorKind = EPropertyAccessor_Get;
+		}
+	| EToken_Set
+		{
+			$.m_PropertyAccessorKind = EPropertyAccessor_Set;
+		}
+	;
+
+//.............................................................................

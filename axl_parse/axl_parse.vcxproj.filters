@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="axl_err_ParseError.cpp">
+      <Filter>err</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\inc\axl_err_ParseError.h">
+      <Filter>err</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_llk_Parser.h">
+      <Filter>llk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_lex_Lexer.h">
+      <Filter>lex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_lex_RagelLexer.h">
+      <Filter>lex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_lex_Token.h">
+      <Filter>lex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_llk_Node.h">
+      <Filter>llk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_llk_Ast.h">
+      <Filter>llk</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="err">
+      <UniqueIdentifier>{a2c5f902-bf6b-4ef0-bf93-0b0780dcf33e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lex">
+      <UniqueIdentifier>{faa98d39-d2c3-4961-ba42-160edb835cc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="llk">
+      <UniqueIdentifier>{ea459731-7999-4ec7-a3ef-3fb89088bf2b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

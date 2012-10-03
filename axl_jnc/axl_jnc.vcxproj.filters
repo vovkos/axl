@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="parser">
+      <UniqueIdentifier>{cecb0680-70b9-4a91-95f1-dc1c4bb0c791}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="module">
+      <UniqueIdentifier>{333bbf2b-fc47-4023-babd-fef7e577d496}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="variable">
+      <UniqueIdentifier>{f13e4f98-48f5-4e07-8b22-9a3f3fd2b0e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="namespace">
+      <UniqueIdentifier>{dc6f8ed1-98f9-4cff-977a-bc7781449c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="controlflow">
+      <UniqueIdentifier>{b769ec07-8620-4410-b2c2-f74674116e2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="function">
+      <UniqueIdentifier>{3eab6f6e-a5e7-47b3-a9ba-cbda17ffd5b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="type">
+      <UniqueIdentifier>{77a33d01-d401-4111-b4a0-c0f25e6343b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\Inc\axl_jnc_Type.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_TypeMgr.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_ArrayType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_BitFieldType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_EnumType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_FunctionType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_StructType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_ClassType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_PropertyType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_NamespaceMgr.h">
+      <Filter>namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_Namespace.h">
+      <Filter>namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_BasicBlock.h">
+      <Filter>controlflow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_ControlFlowMgr.h">
+      <Filter>controlflow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_FunctionMgr.h">
+      <Filter>function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_Function.h">
+      <Filter>function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h">
+      <Filter>variable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h">
+      <Filter>variable</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_jnc_Lexer.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_jnc_Parser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_Module.h">
+      <Filter>module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_ModuleItem.h">
+      <Filter>module</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_jnc_Decl.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_Property.h">
+      <Filter>function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Attribute.h">
+      <Filter>module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Value.h">
+      <Filter>variable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_AttributeMgr.h">
+      <Filter>module</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="axl_jnc_Type.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_TypeMgr.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ArrayType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_EnumType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_FunctionType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_StructType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ClassType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Namespace.cpp">
+      <Filter>namespace</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_NamespaceMgr.cpp">
+      <Filter>namespace</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BasicBlock.cpp">
+      <Filter>controlflow</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ControlFlowMgr.cpp">
+      <Filter>controlflow</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Function.cpp">
+      <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_FunctionMgr.cpp">
+      <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_VariableMgr.cpp">
+      <Filter>variable</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ConstMgr.cpp">
+      <Filter>variable</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Lexer.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Module.cpp">
+      <Filter>module</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ModuleItem.cpp">
+      <Filter>module</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Decl.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_PropertyType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Property.cpp">
+      <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Attribute.cpp">
+      <Filter>module</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_AttributeMgr.cpp">
+      <Filter>module</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="axl_jnc_AttributeBlock.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_ClassSpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_CommonDeclaration.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_EnumSpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_NamespaceDeclaration.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_PropertySpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_StructSpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_Stmt.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_Decl.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_Expr.llk">
+      <Filter>parser</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="axl_jnc_Lexer.rl">
+      <Filter>parser</Filter>
+    </CustomBuild>
+    <CustomBuild Include="axl_jnc_Parser.llk">
+      <Filter>parser</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

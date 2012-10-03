@@ -1,0 +1,65 @@
+//.............................................................................
+
+start
+compound_statement
+	: '{' local_declaration* '}'
+	;
+
+noast
+statement
+	: compound_statement
+	| expression_statement
+	| if_statement
+	| switch_statement
+	| while_statement
+	| do_statement
+	| for_statement
+	| break_statement
+	| continue_statement
+	| return_statement
+	| ';'
+	;
+
+expression_statement
+	: expression ';'
+	;
+
+if_statement
+	: EToken_If '(' expression ')' statement (EToken_Else statement)?
+	;
+
+switch_statement
+	: EToken_Switch '(' expression ')' '{' switch_block_statement* '}'
+	;
+
+switch_block_statement
+	: EToken_Case constant_integer_expression ':'
+	| EToken_Default ':'
+	| statement
+	;
+
+while_statement
+	: EToken_While '(' expression ')' statement
+	;
+
+do_statement
+	: EToken_Do statement EToken_While '(' expression ')' ';'
+	;
+
+for_statement
+	: EToken_For '(' expression? ';' expression? ';' expression? ')' statement
+	;
+
+break_statement
+	: EToken_Break ';'
+	;
+
+continue_statement
+	: EToken_Continue ';'
+	;
+
+return_statement
+	: EToken_Return expression? ';'
+	;
+
+//.............................................................................

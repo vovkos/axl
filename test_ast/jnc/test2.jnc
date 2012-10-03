@@ -1,0 +1,211 @@
+//.............................................................................
+
+namespace jnc.io 
+{
+	enum EColor
+	{
+		Red,
+		Green,
+		Blue,
+	};
+
+	enumc EPublicColor
+	{
+		PublicRed,
+		PublicGreen,
+		PublicBlue,
+	};
+
+	typedef unsigned char uchar_t;
+	typedef unsigned short ushort_t;
+
+	int* p;
+
+	char a [20];
+
+	void
+	InitializeIo (int x);
+
+	void
+	InitializeIo (double f);
+
+	void
+	InitializeIo (
+		int a,
+		unsigned int b,
+		bigendian int c
+		);
+
+	bool const property MyProperty;
+
+	property
+	{
+		int
+		get ();
+
+		void
+		set (int i);
+
+		void
+		set (double d);
+
+		void 
+		set (void* p);
+	} OverloadedProperty;
+
+	property
+	{
+		double
+		get (unsigned int Index);
+
+		void
+		set (
+			unsigned int Index,
+			int Value
+			);
+
+		void
+		set (
+			unsigned int Index,
+			double Value
+			);
+	} IndexedProperty;
+
+	property
+	{
+		void*
+		get (unsigned int Index);
+	} IndexedReadOnlyProperty;
+
+	bool IsIoInitialized;	
+
+	[
+		Singleton,
+		Description = "IFile interface",
+		Integer = 10,
+	]
+	interface IFile
+	{
+		bool 
+		Open (
+			const char* pName, 
+			int Mode
+			);
+
+		void
+		Close ();
+
+		const bool property IsOpen;
+
+		unsigned long 
+		Read (
+			void* p,
+			unsigned long Size
+			);
+
+		unsigned long 
+		Write (
+			const void* p,
+			unsigned long Size
+			);
+	};
+
+	[
+		Description = "TPoint struct",
+		Integer = 20,	
+		Unique,
+	]
+	struct TPoint
+	{
+		int x;
+		int y;
+	};
+
+	interface ISocket
+	{
+		bool 
+		Connect (
+			unsigned long Ip,
+			unsigned short Port 
+			);
+
+		void
+		Disconnect ();
+
+		const bool property IsConnected;
+		
+		void
+		Reset ();
+
+		unsigned long 
+		Send (
+			const void* p,
+			unsigned long Size
+			);
+
+		unsigned long 
+		Recv (
+			void* p,
+			unsigned long Size
+			);
+	};
+
+	class CFile: IFile
+	{
+		typedef unsigned int THandle;
+	};
+
+	class CSocket: ISocket
+	{
+	};
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+namespace jnc.rtl
+{
+	typedef unsigned bigendian long ulong_t;
+
+	char* p2;
+
+	long* b [] [20];
+
+	void
+	InitializeRtl ();
+
+	bool IsRtlInitialized;	
+
+	interface IString
+	{
+	};
+
+	class CString: IString
+	{
+	};
+
+	interface IArray
+	{
+	};
+
+	class CArray: IArray
+	{
+	};
+
+	interface IList
+	{
+	};
+
+	class CList: IList
+	{
+	};
+}
+
+//.............................................................................
+
+namespace gdi
+{
+	const property int ScreenWidth;
+	const int property ScreenHeight;	
+}
+
+//.............................................................................

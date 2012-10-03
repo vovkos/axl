@@ -1,0 +1,75 @@
+//.............................................................................
+
+class
+{
+	CEnumType* m_pType;
+}
+enum_specifier
+	leave
+	{
+		if ($.m_pType->GetTypeKind () == EType_EnumC)
+		{
+			bool Result = m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumMembers ($.m_pType);
+			if (!Result)
+				return false;
+		}
+	}
+	: enum_kind EToken_Identifier 
+		{
+			rtl::CString Name = $2.m_Data.m_String;
+			rtl::CString QualifiedName = m_pModule->m_NamespaceMgr.CreateQualifiedName (Name);
+			$.m_pType = m_pModule->m_TypeMgr.GetEnumType ($1.m_Type, Name, QualifiedName);
+			
+			bool Result = Declare ($.m_pType, $1.m_FirstToken.m_Pos);
+			if (!Result)
+				return false;
+				
+		}	
+	  enum_block <$.m_pType>?
+	| enum_kind 
+		{
+			$.m_pType = m_pModule->m_TypeMgr.CreateUnnamedEnumType ($1.m_Type);
+			Declare ($.m_pType, $1.m_FirstToken.m_Pos);
+		}	
+	  enum_block <$.m_pType>
+	;
+
+class
+{
+	EType m_Type;
+}
+enum_kind
+	: EToken_Enum
+		{
+			$.m_Type = EType_Enum;
+		}
+	| EToken_EnumC
+		{
+			$.m_Type = EType_EnumC;
+		}
+	;
+
+enum_block <CEnumType* $pType>
+	: '{' enum_member_list <$pType> '}'
+	;
+
+enum_member_list <CEnumType* $pType>
+	: enum_member <$pType> (',' enum_member <$pType>)*
+	;
+
+enum_member <CEnumType* $pType>
+	: EToken_Identifier ('=' constant_integer_expression)?
+		{
+			CEnumMember* pMember = IsValidLocator ($3) ?
+				$pType->CreateMember ($1.m_Data.m_String, $3.m_Value) :
+				$pType->CreateMember ($1.m_Data.m_String);
+
+			if (!pMember)
+				return false;
+
+			pMember->m_Pos = $1.m_Pos;
+		}
+	| epsilon
+	;
+
+//.............................................................................

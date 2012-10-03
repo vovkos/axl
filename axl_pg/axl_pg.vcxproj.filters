@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="test">
+      <UniqueIdentifier>{d4a6fb2e-82cb-482e-9f50-56e5b403a016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pg">
+      <UniqueIdentifier>{d60edc52-116d-4abb-b90e-f3a4f3cc551b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pg_frames">
+      <UniqueIdentifier>{a5c60868-5fcc-42d0-8727-bd48b075d52e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestParser.h">
+      <Filter>test</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_ClassMgr.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_ProductionBuilder.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_Config.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_DefineMgr.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_Generator.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_Lexer.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_Module.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_Node.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_NodeMgr.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_Parser.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_pg_ParseTableBuilder.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="axl_pg_LaDfaBuilder.h">
+      <Filter>pg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="axl_pg.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_ProductionBuilder.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_ClassMgr.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_DefineMgr.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_Generator.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_Lexer.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_Module.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_Node.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_NodeMgr.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_Parser.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_pg_ParseTableBuilder.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="axl_pg_LaDfaBuilder.cpp">
+      <Filter>pg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestParser.llg">
+      <Filter>test</Filter>
+    </None>
+    <None Include="..\axl_pg_frames\axl_llk_ParserFrame.h.luaf">
+      <Filter>pg_frames</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="axl_pg_Lexer.rl">
+      <Filter>pg</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

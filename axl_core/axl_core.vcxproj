@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{546D7B48-99CF-450C-987C-4E4C5457A02F}</ProjectGuid>
+    <RootNamespace>axl_core</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>axl_core</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\lib\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\~tmp\$(ProjectName)_$(Platform)_$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\lib\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\~tmp\$(ProjectName)_$(Platform)_$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">axl</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Inc\axl_err_NtError.h" />
+    <ClInclude Include="..\Inc\axl_err_WinError.h" />
+    <ClInclude Include="..\Inc\axl_exe_Arg.h" />
+    <ClInclude Include="..\Inc\axl_exe_ArgPacker.h" />
+    <ClInclude Include="..\Inc\axl_io_ConnectionSock.h" />
+    <ClInclude Include="..\Inc\axl_io_DgramSock.h" />
+    <ClInclude Include="..\Inc\axl_io_File.h" />
+    <ClInclude Include="..\inc\axl_io_FilePathUtils.h" />
+    <ClInclude Include="..\Inc\axl_io_ListenerSock.h" />
+    <ClInclude Include="..\Inc\axl_io_Mapping.h" />
+    <ClInclude Include="..\Inc\axl_io_Pipe.h" />
+    <ClInclude Include="..\Inc\axl_io_Serial.h" />
+    <ClInclude Include="..\Inc\axl_io_SockAddr.h" />
+    <ClInclude Include="..\Inc\axl_mem_Alloc.h" />
+    <ClInclude Include="..\Inc\axl_mem_Block.h" />
+    <ClInclude Include="..\Inc\axl_mem_Factory.h" />
+    <ClInclude Include="..\Inc\axl_mem_HeapAlloc.h" />
+    <ClInclude Include="..\Inc\axl_mem_Malloc.h" />
+    <ClInclude Include="..\Inc\axl_mt_Event.h" />
+    <ClInclude Include="..\Inc\axl_mt_Lock.h" />
+    <ClInclude Include="..\Inc\axl_mt_Semaphore.h" />
+    <ClInclude Include="..\Inc\axl_mt_Thread.h" />
+    <ClInclude Include="..\Inc\axl_mt_Timer.h" />
+    <ClInclude Include="..\Inc\axl_obj_Class.h" />
+    <ClInclude Include="..\Inc\axl_obj_Ptr.h" />
+    <ClInclude Include="..\Inc\axl_obj_Root.h" />
+    <ClInclude Include="..\Inc\axl_ref_Clone.h" />
+    <ClInclude Include="..\Inc\axl_g_Def.h" />
+    <ClInclude Include="..\Inc\axl_g_Module.h" />
+    <ClInclude Include="..\Inc\axl_ref_Factory.h" />
+    <ClInclude Include="..\Inc\axl_ref_RtFactory.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Array.h" />
+    <ClInclude Include="..\inc\axl_rtl_ArrayList.h" />
+    <ClInclude Include="..\Inc\axl_rtl_BinTree.h" />
+    <ClInclude Include="..\Inc\axl_rtl_BitIdx.h" />
+    <ClInclude Include="..\Inc\axl_rtl_BitMap.h" />
+    <ClInclude Include="..\Inc\axl_rtl_BmhFind.h" />
+    <ClInclude Include="..\Inc\axl_rtl_BoxList.h" />
+    <ClInclude Include="..\Inc\axl_rtl_BuddyAllocMap.h" />
+    <ClInclude Include="..\inc\axl_rtl_CharLiteral.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Func.h" />
+    <ClInclude Include="..\Inc\axl_rtl_HashTable.h" />
+    <ClInclude Include="..\Inc\axl_rtl_InterlockedUpdatePeak.h" />
+    <ClInclude Include="..\Inc\axl_rtl_List.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Pack.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Packer.h" />
+    <ClInclude Include="..\Inc\axl_rtl_RbTree.h" />
+    <ClInclude Include="..\Inc\axl_rtl_SimpleSingleton.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Singleton.h" />
+    <ClInclude Include="..\Inc\axl_rtl_String.h" />
+    <ClInclude Include="..\Inc\axl_rtl_StringCache.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Unpacker.h" />
+    <ClInclude Include="..\Inc\axl_win_CriticalSection.h" />
+    <ClInclude Include="..\Inc\axl_win_Event.h" />
+    <ClInclude Include="..\Inc\axl_win_File.h" />
+    <ClInclude Include="..\Inc\axl_rtl_Handle.h" />
+    <ClInclude Include="..\Inc\axl_win_Handle.h" />
+    <ClInclude Include="..\Inc\axl_win_Iocp.h" />
+    <ClInclude Include="..\Inc\axl_win_Mapping.h" />
+    <ClInclude Include="..\Inc\axl_win_PerfCounter.h" />
+    <ClInclude Include="..\Inc\axl_win_Pipe.h" />
+    <ClInclude Include="..\Inc\axl_win_Semaphore.h" />
+    <ClInclude Include="..\Inc\axl_win_Serial.h" />
+    <ClInclude Include="..\Inc\axl_win_Sock.h" />
+    <ClInclude Include="..\Inc\axl_win_SystemInfo.h" />
+    <ClInclude Include="..\Inc\axl_win_Thread.h" />
+    <ClInclude Include="..\Inc\axl_win_Timer.h" />
+    <ClInclude Include="..\Inc\axl_win_WaitableHandle.h" />
+    <ClInclude Include="..\Inc\axl_win_Window.h" />
+    <ClInclude Include="..\Inc\axl_mt_InvSemaphore.h" />
+    <ClInclude Include="..\Inc\axl_io_MappedFile.h" />
+    <ClInclude Include="..\Inc\axl_exe_WorkerThread.h" />
+    <ClInclude Include="..\Inc\axl_exe_WorkerThreadPool.h" />
+    <ClInclude Include="..\Inc\axl_exe_WorkerWindow.h" />
+    <ClInclude Include="..\Inc\axl_ref_Buf.h" />
+    <ClInclude Include="..\Inc\axl_ref_Child.h" />
+    <ClInclude Include="..\Inc\axl_ref_Ptr.h" />
+    <ClInclude Include="..\Inc\axl_ref_RefCount.h" />
+    <ClInclude Include="..\Inc\axl_ref_WeakPtr.h" />
+    <ClInclude Include="..\Inc\axl_dbg_Trace.h" />
+    <ClInclude Include="..\Inc\axl_err_Error.h" />
+    <ClInclude Include="..\Inc\axl_err_ErrorMgr.h" />
+    <ClInclude Include="..\Inc\axl_exe_CallOnce.h" />
+    <ClInclude Include="..\Inc\axl_exe_Function.h" />
+    <ClInclude Include="..\Inc\axl_exe_InvokeDirect.h" />
+    <ClInclude Include="..\Inc\axl_exe_InvokeList.h" />
+    <ClInclude Include="..\Inc\axl_exe_ProxyFunction.h" />
+    <ClInclude Include="..\Inc\axl_exe_ScheduledFunction.h" />
+    <ClInclude Include="..\Inc\axl_exe_Scheduler.h" />
+    <ClInclude Include="..\Inc\axl_exe_Synchronizer.h" />
+    <ClInclude Include="..\Inc\axl_exe_Thunk.h" />
+    <ClInclude Include="..\Inc\axl_mem_Tracker.h" />
+    <ClInclude Include="..\Inc\axl_io_Transport.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="axl_err_NtError.cpp" />
+    <ClCompile Include="axl_err_WinError.cpp" />
+    <ClCompile Include="axl_exe_ArgPacker.cpp" />
+    <ClCompile Include="axl_io_ConnectionSock.cpp" />
+    <ClCompile Include="axl_io_DgramSock.cpp" />
+    <ClCompile Include="axl_io_FilePathUtils.cpp" />
+    <ClCompile Include="axl_io_ListenerSock.cpp" />
+    <ClCompile Include="axl_io_Pipe.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="axl_io_Serial.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="axl_mem_Alloc.cpp" />
+    <ClCompile Include="axl_mem_Tracker.cpp" />
+    <ClCompile Include="axl_g_Module.cpp" />
+    <ClCompile Include="axl_mt_Timer.cpp" />
+    <ClCompile Include="axl_rtl_BitMap.cpp" />
+    <ClCompile Include="axl_rtl_BmhFind.cpp" />
+    <ClCompile Include="axl_rtl_BuddyAllocMap.cpp" />
+    <ClCompile Include="axl_rtl_djb2.cpp" />
+    <ClCompile Include="axl_rtl_Packer.cpp" />
+    <ClCompile Include="axl_rtl_Unpacker.cpp" />
+    <ClCompile Include="axl_win_File.cpp" />
+    <ClCompile Include="axl_win_Iocp.cpp" />
+    <ClCompile Include="axl_win_Mapping.cpp" />
+    <ClCompile Include="axl_win_Pipe.cpp" />
+    <ClCompile Include="axl_win_Serial.cpp" />
+    <ClCompile Include="axl_win_Sock.cpp" />
+    <ClCompile Include="axl_win_Thread.cpp" />
+    <ClCompile Include="axl_win_Timer.cpp" />
+    <ClCompile Include="axl_win_WaitableHandle.cpp" />
+    <ClCompile Include="axl_io_MappedFile.cpp" />
+    <ClCompile Include="axl_exe_WorkerThread.cpp" />
+    <ClCompile Include="axl_exe_WorkerThreadPool.cpp" />
+    <ClCompile Include="axl_exe_WorkerWindow.cpp" />
+    <ClCompile Include="axl_err_Error.cpp" />
+    <ClCompile Include="axl_err_ErrorMgr.cpp" />
+    <ClCompile Include="axl_exe_InvokeList.cpp" />
+    <ClCompile Include="axl_exe_Scheduler.cpp" />
+    <ClCompile Include="axl_exe_Synchronizer.cpp" />
+    <ClCompile Include="axl_exe_Thunk.cpp" />
+    <ClCompile Include="axl_io_Transport.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</PrecompiledHeaderFile>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="axl_exe_InvokeDirect_x64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </MASM>
+    <MASM Include="axl_exe_InvokeDirect_x86.asm" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

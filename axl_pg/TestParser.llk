@@ -1,0 +1,23 @@
+//.............................................................................
+
+LL (2);
+
+global
+	: '*' resolver (EToken_Identifier $a { return $a.m_Data.m_String == "hui"; }) EToken_Identifier $b
+		{ 
+			printf ("A %s\n", $b.m_Data.m_String); 
+		}
+
+	| '*' EToken_Identifier $a '+'
+		{ 
+			printf ("C+ %s\n", $a.m_Data.m_String); 
+		}
+
+	| '*' EToken_Identifier $a
+		{ 
+			printf ("C %s\n", $a.m_Data.m_String); 
+		}
+
+	;
+
+//.............................................................................

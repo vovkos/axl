@@ -1,0 +1,117 @@
+import "axl_jnc_Decl.llk";
+import "axl_jnc_Expr.llk";
+import "axl_jnc_Stmt.llk";
+
+import "axl_jnc_AttributeBlock.llk";
+import "axl_jnc_NamespaceDeclaration.llk";
+import "axl_jnc_CommonDeclaration.llk";
+import "axl_jnc_EnumSpecifier.llk";
+import "axl_jnc_StructSpecifier.llk";
+import "axl_jnc_ClassSpecifier.llk";
+import "axl_jnc_PropertySpecifier.llk";
+
+//.............................................................................
+
+LL (2);
+
+start
+compilation_unit
+	: global_declaration*
+	;
+
+//.............................................................................
+
+ParserClassName = CParser;
+
+Includes
+{
+	#include "axl_jnc_Lexer.h"
+	#include "axl_jnc_Module.h"
+	#include "axl_jnc_Decl.h"
+	#include "axl_llk_Parser.h"
+}
+
+Members
+{
+	CModule* m_pModule;
+	size_t m_StructPackFactor;
+
+	CParser ()
+	{
+		m_pModule = NULL;
+		m_StructPackFactor = 8;
+	}
+
+	bool 
+	IsType (const CQualifiedIdentifier& Identifier);
+
+	CType*
+	FindType (const CQualifiedIdentifier& Identifier);
+
+	bool
+	Declare (
+		CDeclSpecifiers* pDeclSpecifiers,
+		CDeclarator* pDeclarator
+		);
+
+	bool
+	Declare (
+		CNamedType* pType,
+		const CToken::CPos& Pos
+		);
+
+	bool
+	DeclareStructMember (
+		CStructType* pStructType,
+		CTypeSpecifierModifiers* pTypeSpecifier,
+		CDeclarator* pDeclarator
+		);
+
+	bool
+	DeclareClassMember (
+		CClassType* pClassType,
+		CDeclSpecifiers* pDeclSpecifiers,
+		CDeclarator* pDeclarator
+		);
+
+	bool
+	DeclareFormalArg (
+		CDeclFormalArgSuffix* pArgSuffix,
+		CTypeSpecifierModifiers* pTypeSpecifier,
+		CDeclarator* pDeclarator,
+		CValue* pDefaultValue
+		);
+
+	bool
+	DeclarePropertyAccessor (
+		CPropertyBlock* pBlock,
+		CTypeSpecifierModifiers* pTypeSpecifier,
+		CDeclarator* pDeclarator
+		);
+
+	CProperty*
+	CreateProperty (
+		CFunction* pGetter,
+		const CFunctionOverload& Setter
+		);
+
+	void
+	SetSimplePropertyPos (
+		CProperty* pProperty,
+		const CToken::CPos& Pos
+		);
+} 
+
+OpenNamespace
+{.
+	namespace axl {
+	namespace jnc {
+.}
+
+CloseNamespace
+{.
+	} // namespace axl {
+	} // namespace jnc {
+.}
+
+//.............................................................................

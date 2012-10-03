@@ -1,0 +1,28 @@
+//.............................................................................
+
+attribute_block
+	enter
+	{
+		m_pModule->m_AttributeMgr.CreateAttributeSet ();
+	}
+	: '[' attribute_declarator_list ']'
+	;
+
+attribute_declarator_list 
+	: attribute_declarator (',' attribute_declarator)*
+	;
+
+attribute_declarator
+	: EToken_Identifier ('=' constant_expression)?
+		{
+			CValue* pValue = IsValidLocator ($3) ? $3.m_pValue : NULL;
+			CAttribute* pAttribute = m_pModule->m_AttributeMgr.CreateAttribute ($1.m_Data.m_String, pValue);
+			if (!pAttribute)
+				return false;
+
+			pAttribute->m_Pos = $1.m_Pos;
+		}
+	| epsilon
+	;
+
+//.............................................................................

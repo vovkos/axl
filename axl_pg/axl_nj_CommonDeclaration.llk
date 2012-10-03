@@ -1,0 +1,414 @@
+//.............................................................................
+
+common_declaration
+	: attribute_block?
+	  declaration_specifier_list $s
+	  init_declarator_list <&$s.m_DeclSpecifiers>?
+	  declaration_terminator
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
+	: init_declarator <$pDeclSpecifiers> (',' init_declarator <$pDeclSpecifiers>)*
+	;
+
+init_declarator <CDeclSpecifiers* $pDeclSpecifiers>
+	: declarator('=' initializer)?
+	{
+		bool Result = Declare ($pDeclSpecifiers, &$1.m_Declarator);
+		if (!Result)
+			return false;
+	}
+	;
+
+initializer
+	: expression
+	| '{' initializer_list ','? '}'
+	;
+
+initializer_list
+	: initializer (',' initializer)*
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+declaration_terminator
+	: ';'
+	| compound_statement_1st_pass
+	;
+
+compound_statement_1st_pass
+	: '{' statement_1st_pass* '}'
+	;
+
+noast
+statement_1st_pass
+	: compound_statement_1st_pass
+	| .
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CDeclSpecifiers m_DeclSpecifiers;
+}	
+declaration_specifier_list
+	: declaration_specifier <&$.m_DeclSpecifiers>+
+	;
+
+class
+{
+	CTypeSpecifierModifiers m_TypeSpecifier;
+}	
+type_specifier_modifier_list
+	: type_specifier_modifier <&$.m_TypeSpecifier>+
+	;
+
+declaration_specifier <CDeclSpecifiers* $pDeclSpecifiers>
+	: type_specifier_modifier <$pDeclSpecifiers>
+	| access_specifier <$pDeclSpecifiers>
+	| storage_class_specifier <$pDeclSpecifiers>
+	;
+
+noast
+type_specifier_modifier <CTypeSpecifierModifiers* $pTypeSpecifier>
+	: type_specifier <$pTypeSpecifier>
+	| type_modifier <$pTypeSpecifier>
+	;
+
+access_specifier <CAccessSpecifier* $pAccessSpecifier>
+	: EToken_Public
+		{
+			bool Result = $pAccessSpecifier->SetAccess (EAccess_Public);
+			if (!Result)
+				return false;
+		}
+	| EToken_Private 
+		{
+			bool Result = $pAccessSpecifier->SetAccess (EAccess_Private);
+			if (!Result)
+				return false;
+		}
+	;
+
+storage_class_specifier <CDeclSpecifiers* $pDeclSpecifiers>
+	: EToken_Static 
+		{
+			bool Result = $pDeclSpecifiers->SetStorageClass (EStorageClass_Static);
+			if (!Result)
+				return false;
+		}
+	| EToken_Typedef
+		{
+			bool Result = $pDeclSpecifiers->SetStorageClass (EStorageClass_Typedef);
+			if (!Result)
+				return false;
+		}
+	;
+type_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Const
+		{
+			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Const);
+			if (!Result)
+				return false;
+		}
+	| EToken_Property
+		{
+			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
+			if (!Result)
+				return false;
+		}
+	| EToken_Signed
+		{
+			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Signed);
+			if (!Result)
+				return false;
+		}
+	| EToken_Unsigned
+		{
+			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsigned);
+			if (!Result)
+				return false;
+		}
+	| EToken_BigEndian
+		{
+			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_BigEndian);
+			if (!Result)
+				return false;
+		}
+	| EToken_LittleEndian
+		{
+			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_LittleEndian);
+			if (!Result)
+				return false;
+		}
+	;
+
+type_specifier <CTypeSpecifier* $pTypeSpecifier>
+	: EToken_Void
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Void));
+			if (!Result)
+				return false;
+		}
+	| EToken_Bool
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Bool));
+			if (!Result)
+				return false;
+		}
+	| EToken_Int
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int));
+			if (!Result)
+				return false;
+		}
+	| EToken_Char
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Char));
+			if (!Result)
+				return false;
+		}
+	| EToken_Short
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Short));
+			if (!Result)
+				return false;
+		}
+	| EToken_Long
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Long));
+			if (!Result)
+				return false;
+		}
+	| EToken_Float
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Float));
+			if (!Result)
+				return false;
+		}
+	| EToken_Double
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Double));
+			if (!Result)
+				return false;
+		}
+	| EToken_Int8
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int8));
+			if (!Result)
+				return false;
+		}
+	| EToken_Int16
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int16));
+			if (!Result)
+				return false;
+		}
+	| EToken_Int32
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int32));
+			if (!Result)
+				return false;
+		}
+	| EToken_Int64
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int64));
+			if (!Result)
+				return false;
+		}
+	| EToken_WChar
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_WChar));
+			if (!Result)
+				return false;
+		}
+	| EToken_Variant
+		{
+			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Variant));
+			if (!Result)
+				return false;
+		}
+	| EToken_Auto
+		{
+			err::SetStringError (_T("'auto' type specifier is not yet supported"));
+			return false; 
+		}
+	| enum_specifier
+		{
+			bool Result = $pTypeSpecifier->SetType ($1.m_pType);
+			if (!Result)
+				return false;
+		}
+	| struct_specifier
+		{
+			bool Result = $pTypeSpecifier->SetType ($1.m_pType);
+			if (!Result)
+				return false;
+		}
+	| class_specifier
+		{
+			bool Result = $pTypeSpecifier->SetType ($1.m_pType);
+			if (!Result)
+				return false;
+		}
+	| property_specifier
+		{
+			bool Result = $pTypeSpecifier->SetProperty ($1.m_pProperty);
+			if (!Result)
+				return false;
+		}
+	| resolver (qualified_type_identifier_rslv)
+	  qualified_type_identifier $t
+		{
+			bool Result = $pTypeSpecifier->SetType ($t.m_pType);
+			if (!Result)
+				return false;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CDeclarator m_Declarator;
+}	
+declarator
+	: pointer <&$.m_Declarator>* 
+	  EToken_Identifier $id
+		{
+			$.m_Declarator.m_Pos = $id.m_Pos;
+			$.m_Declarator.m_Name = $id.m_Data.m_String;
+		}
+	  ('.' property_accessor_kind $p
+		{
+			$.m_Declarator.m_PropertyAccessorKind = $p.m_PropertyAccessorKind;
+		}
+	  )?
+	  declarator_suffix <&$.m_Declarator>*
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+pointer <CDeclarator* $pDeclarator>
+	local
+	{	
+		CDeclPointer* $pPointer;
+	}
+	: pointer_kind 
+		{
+			$pPointer = $pDeclarator->AddPointer ($1.m_Type);
+		}
+	  type_modifier <$pPointer>*
+	;
+
+class
+{
+	EType m_Type;
+}
+pointer_kind
+	: '*'
+		{
+			$.m_Type = EType_Pointer;
+		}
+	| '&'
+		{
+			$.m_Type = EType_Reference;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+declarator_suffix <CDeclarator* $pDeclarator>
+	: array_suffix <$pDeclarator>
+	| formal_argument_suffix <$pDeclarator>
+	;
+
+array_suffix <CDeclarator* $pDeclarator>
+	: '[' constant_integer_expression ']'
+		{
+			$pDeclarator->AddArraySuffix ($2.m_Value);
+		}
+	| '[' ']'
+		{
+			$pDeclarator->AddArraySuffix (0);
+		}
+	;
+
+formal_argument_suffix <CDeclarator* $pDeclarator>
+	local
+	{
+		CDeclFormalArgSuffix* $pArgSuffix;
+	}
+	enter
+	{
+		$pArgSuffix = $pDeclarator->AddFormalArgSuffix ();
+	}
+	: '(' formal_argument_list <$pArgSuffix> ')' 
+	| '(' formal_argument_vararg <$pArgSuffix> ')' 
+	| '(' ')' 
+	;	
+
+formal_argument_list <CDeclFormalArgSuffix* $pArgSuffix>
+	: formal_argument <$pArgSuffix> 
+	  (',' formal_argument <$pArgSuffix>)* 
+	  (',' formal_argument_vararg <$pArgSuffix>)?
+	;
+
+formal_argument <CDeclFormalArgSuffix* $pArgSuffix>
+	local
+	{
+		CValue* $pDefaultValue;
+	}
+	enter
+	{
+		$pDefaultValue = NULL;
+	}
+	: type_specifier_modifier_list $s
+	  declarator $d
+	  ('=' constant_expression
+		{
+			$pDefaultValue = NULL; // TODO: create default value
+		}
+	  )?
+		{
+			bool Result = DeclareFormalArg ($pArgSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, $pDefaultValue);
+			if (!Result)
+				return false;
+		}
+	;
+
+formal_argument_vararg <CDeclFormalArgSuffix* $pArgSuffix>
+	: EToken_Ellipsis
+		{
+			$pArgSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+qualified_type_identifier_rslv
+	: qualified_identifier
+		{
+			return IsType (&$1.m_Identifier);
+		}
+	;
+
+class
+{
+	CType* m_pType;
+}
+qualified_type_identifier
+	: qualified_identifier
+		{
+			m_pType = FindType (&$1.m_Identifier);
+		}
+	;
+
+//.............................................................................
