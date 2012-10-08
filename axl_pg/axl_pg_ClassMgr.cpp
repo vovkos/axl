@@ -15,6 +15,13 @@ CClass::Export (lua::CLuaState* pLuaState)
 		pLuaState->SetMemberString ("BaseClass", m_pBaseClass->m_Name);
 
 	pLuaState->SetMemberString ("Members", m_Members);
+
+	pLuaState->CreateTable (0, 3);
+	pLuaState->SetMemberString ("FilePath", m_SrcPos.m_FilePath);
+	pLuaState->SetMemberInteger ("Line", m_SrcPos.m_Line);
+	pLuaState->SetMemberInteger ("Col", m_SrcPos.m_Col);
+	pLuaState->SetMember ("SrcPos");
+
 }
 
 //.............................................................................

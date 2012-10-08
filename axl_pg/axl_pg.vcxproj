@@ -142,7 +142,7 @@ copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)\bin\gellp.exe</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\axl_pg_frames\axl_llk_ParserFrame.h.luaf" />
-    <None Include="TestParser.llg" />
+    <None Include="TestParser.llk" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

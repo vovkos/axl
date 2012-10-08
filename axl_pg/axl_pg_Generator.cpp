@@ -47,12 +47,16 @@ CGenerator::Generate (
 
 	m_Buffer.Reserve (Size);
 
+	rtl::CString TargetFilePath = io::GetFullFilePath (pFileName);
+
+	m_StringTemplate.m_LuaState.SetGlobalString ("TargetFilePath", TargetFilePath);
+
 	Result = m_StringTemplate.Process (&m_Buffer, pFrameFileName, p, Size);
 	if (!Result)
 		return false;
 
 	io::CFile TargetFile;
-	Result = TargetFile.Open (pFileName);
+	Result = TargetFile.Open (TargetFilePath);
 	if (!Result)
 		return false;
 

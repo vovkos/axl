@@ -17,6 +17,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axl_parse", "axl_parse\axl_parse.vcxproj", "{9D535022-2BFD-487D-913B-CC597373B74E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axl_jnc", "axl_jnc\axl_jnc.vcxproj", "{9C1B1CA5-07A5-4201-A69A-C2113915C0CB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1FB59FCE-BFE7-4EB4-89B1-63FE8AD820E3} = {1FB59FCE-BFE7-4EB4-89B1-63FE8AD820E3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

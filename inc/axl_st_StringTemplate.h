@@ -7,6 +7,7 @@
 #define _AXL_LUA_STRINGTEMPLATE_H
 
 #include "axl_lua_LuaState.h"
+#include "axl_lex_Token.h"
 
 namespace axl {
 namespace st {
@@ -16,21 +17,22 @@ namespace st {
 class CStringTemplate
 {
 protected:
-	struct TPassthroughContext
+	struct TEmitContext
 	{
+		CStringTemplate* m_pThis;
 		rtl::CString* m_pResult;
 		const tchar_t* m_pTemplate;
 	};
+
+protected:
+	lex::CLineCol m_LineCol;
 
 public:
 	lua::CLuaState m_LuaState;
 	
 public:
 	void
-	Reset ()
-	{
-		m_LuaState.Create ();
-	}
+	Reset ();
 
 	bool
 	Process (
@@ -49,6 +51,20 @@ protected:
 		size_t Length = -1
 		);
 
+	void
+	CountLineCol (
+		const tchar_t* p,
+		size_t Length = -1
+		);
+
+	static
+	int 
+	GetLine_lua (lua_State* pLuaState);
+
+	static
+	int 
+	GetCol_lua (lua_State* pLuaState);
+
 	static
 	int 
 	Emit_lua (lua_State* pLuaState);
@@ -56,6 +72,7 @@ protected:
 	static
 	int 
 	Passthrough_lua (lua_State* pLuaState);
+
 };
 
 //.............................................................................

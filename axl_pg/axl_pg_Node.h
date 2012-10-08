@@ -127,6 +127,13 @@ public:
 
 	bool
 	MarkFinal ();
+
+protected:
+	void
+	ExportSrcPos (
+		lua::CLuaState* pLuaState,
+		const lex::CLineCol& LineCol
+		);
 };
 
 //.............................................................................
@@ -157,6 +164,11 @@ public:
 	rtl::CString m_Local;
 	rtl::CString m_Enter;
 	rtl::CString m_Leave;
+
+	lex::CLineCol m_ArgLineCol;
+	lex::CLineCol m_LocalLineCol;
+	lex::CLineCol m_EnterLineCol;
+	lex::CLineCol m_LeaveLineCol;
 
 	rtl::CBoxListT <rtl::CString> m_ArgNameList;
 	rtl::CBoxListT <rtl::CString> m_LocalNameList;

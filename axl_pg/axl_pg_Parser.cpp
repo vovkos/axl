@@ -399,10 +399,10 @@ CParser::ClassSpecifier ()
 		NextToken ();
 	}
 
-	Result = UserCode ('{', &pClass->m_Members);
+	Result = UserCode ('{', &pClass->m_Members, &pClass->m_SrcPos);
 	if (!Result)
 		return NULL;
-
+	
 	pClass->m_Flags |= EClassFlag_IsDefined;
 	return pClass;
 }
@@ -415,6 +415,7 @@ CParser::DefineStatement ()
 		return false;
 
 	CDefine* pDefine = m_pModule->m_DefineMgr.GetDefine (pToken->m_Data.m_String);
+	pDefine->m_SrcPos.m_FilePath = m_FilePath;
 
 	NextToken ();
 
@@ -422,7 +423,7 @@ CParser::DefineStatement ()
 	switch (pToken->m_Token)
 	{
 	case '{':
-		return UserCode ('{', &pDefine->m_StringValue);
+		return UserCode ('{', &pDefine->m_StringValue, &pDefine->m_SrcPos);
 
 	case '=':
 		NextToken ();
@@ -433,17 +434,19 @@ CParser::DefineStatement ()
 		case EToken_Identifier:
 		case EToken_Literal:
 			pDefine->m_StringValue = pToken->m_Data.m_String;
+			pDefine->m_SrcPos = pToken->m_Pos;
 			NextToken ();
 			break;
 
 		case EToken_Integer:
 			pDefine->m_Kind = EDefine_Integer;
 			pDefine->m_IntegerValue = pToken->m_Data.m_Integer;
+			pDefine->m_SrcPos = pToken->m_Pos;
 			NextToken ();
 			break;
 
 		case '{':
-			return UserCode ('{', &pDefine->m_StringValue);
+			return UserCode ('{', &pDefine->m_StringValue, &pDefine->m_SrcPos);
 
 		default:
 			err::SetFormatStringError (_T("invalid define value for '%s'"), pDefine->m_Name);
@@ -490,7 +493,7 @@ CParser::CustomizeSymbol (CSymbolNode* pNode)
 	const CToken* pToken = GetToken ();
 	if (pToken->m_Token == '<')
 	{
-		Result = UserCode ('<', &pNode->m_Arg);
+		Result = UserCode ('<', &pNode->m_Arg, &pNode->m_ArgLineCol);
 		if (!Result)
 			return false;
 	}
@@ -500,19 +503,23 @@ CParser::CustomizeSymbol (CSymbolNode* pNode)
 		pToken = GetToken ();
 
 		rtl::CString* pString = NULL;
+		lex::CLineCol* pLineCol = NULL;
 
 		switch (pToken->m_Token)
 		{
 		case EToken_Local:
 			pString = &pNode->m_Local;
+			pLineCol = &pNode->m_LocalLineCol;
 			break;
 
 		case EToken_Enter:
 			pString = &pNode->m_Enter;
+			pLineCol = &pNode->m_EnterLineCol;
 			break;
 
 		case EToken_Leave:
 			pString = &pNode->m_Leave;
+			pLineCol = &pNode->m_LeaveLineCol;
 			break;
 		}
 
@@ -526,7 +533,7 @@ CParser::CustomizeSymbol (CSymbolNode* pNode)
 		}
 
 		NextToken ();
-		Result = UserCode ('{', pString);
+		Result = UserCode ('{', pString, pLineCol);
 		if (!Result)
 			return false;
 	}
@@ -1007,11 +1014,10 @@ CParser::Primary ()
 			CArgumentNode* pArgument = m_pModule->m_NodeMgr.CreateArgumentNode ();
 			CSequenceNode* pSequence = m_pModule->m_NodeMgr.CreateSequenceNode ();
 			
-			SetGrammarNodeSrcPos (pArgument, pToken->m_Pos);
 			SetGrammarNodeSrcPos (pSequence, pNode->m_SrcPos);
 
 			rtl::CString String;
-			Result = UserCode ('<', &String);
+			Result = UserCode ('<', &String, &pArgument->m_SrcPos);
 			if (!Result)
 				return NULL;
 
@@ -1031,9 +1037,8 @@ CParser::Primary ()
 
 	case '{':
 		pActionNode = m_pModule->m_NodeMgr.CreateActionNode ();
-		SetGrammarNodeSrcPos (pActionNode);
 
-		Result = UserCode ('{', &pActionNode->m_UserCode);
+		Result = UserCode ('{', &pActionNode->m_UserCode, &pActionNode->m_SrcPos);
 		if (!Result)
 			return NULL;
 
@@ -1162,7 +1167,23 @@ CParser::Resolver ()
 bool
 CParser::UserCode (
 	int OpenBracket,
-	rtl::CString* pString
+	rtl::CString* pString,
+	lex::CSrcPos* pSrcPos
+	)
+{
+	bool Result = UserCode (OpenBracket, pString, (lex::CLineCol*) pSrcPos);
+	if (!Result)
+		return false;
+
+	pSrcPos->m_FilePath = m_FilePath;
+	return true;
+}
+
+bool
+CParser::UserCode (
+	int OpenBracket,
+	rtl::CString* pString,
+	lex::CLineCol* pLineCol
 	)
 {
 	const CToken* pToken = ExpectToken (OpenBracket);
@@ -1207,6 +1228,7 @@ CParser::UserCode (
 	}
 
 	const char* pBegin = pToken->m_Pos.m_p + pToken->m_Pos.m_Length;
+	*pLineCol = pToken->m_Pos;
 
 	NextToken ();
 	

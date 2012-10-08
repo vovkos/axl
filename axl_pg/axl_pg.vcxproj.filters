@@ -93,11 +93,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TestParser.llg">
-      <Filter>test</Filter>
-    </None>
     <None Include="..\axl_pg_frames\axl_llk_ParserFrame.h.luaf">
       <Filter>pg_frames</Filter>
+    </None>
+    <None Include="TestParser.llk">
+      <Filter>test</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -58,12 +58,9 @@ enum_member_list <CEnumType* $pType>
 	;
 
 enum_member <CEnumType* $pType>
-	: EToken_Identifier ('=' constant_integer_expression)?
+	: EToken_Identifier ('=' expression_1st_pass)?
 		{
-			CEnumMember* pMember = IsValidLocator ($3) ?
-				$pType->CreateMember ($1.m_Data.m_String, $3.m_Value) :
-				$pType->CreateMember ($1.m_Data.m_String);
-
+			CEnumMember* pMember = $pType->CreateMember ($1.m_Data.m_String);
 			if (!pMember)
 				return false;
 

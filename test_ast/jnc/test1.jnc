@@ -4,9 +4,9 @@ namespace jnc.io
 {
 	enum EColor
 	{
-		Red,
-		Green,
-		Blue,
+		Red = 1,
+		Green = COLOR_GREEN,
+		Blue = RGB(0, 0, 255),
 	};
 
 	enumc EPublicColor
@@ -82,7 +82,7 @@ namespace jnc.io
 	[
 		Singleton,
 		Description = "IFile interface",
-		Integer = 10,
+		Integer = RGB (255, 128, 64),
 	]
 	interface IFile
 	{

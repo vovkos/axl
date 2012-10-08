@@ -1,5 +1,19 @@
 //.............................................................................
 
+expression_1st_pass
+	: primary_expression_1st_pass+
+	;
+
+primary_expression_1st_pass
+	: '{' primary_expression_1st_pass+ '}'
+	| '[' primary_expression_1st_pass+ ']'
+	| '(' primary_expression_1st_pass* ')'
+	| any
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+start
 expression
 	: logical_or_expression ('?' expression ':' expression)?
 	;

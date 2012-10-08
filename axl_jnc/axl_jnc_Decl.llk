@@ -18,7 +18,12 @@ local_declaration
 
 pragma
 pragma_pack
-	: '#' EToken_Pack '(' (constant_integer_expression | EToken_Default) ')' ';'
+	: '#' EToken_Pack pack_value
+	;
+
+pack_value
+	: EToken_Integer
+	| EToken_Default
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -56,3 +61,4 @@ type_name
 	;
 
 //.............................................................................
+

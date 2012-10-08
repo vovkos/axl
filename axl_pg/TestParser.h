@@ -233,38 +233,50 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
+#line 6 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
 			 return (*GetTokenLocator (0)).m_Data.m_String == "hui"; ;
+#line 239 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
 			}
+
 			return true;
 		
 		case 1:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
+#line 7 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
 			 
 			printf ("A %s\n", (*GetTokenLocator (1)).m_Data.m_String); 
 		;
+#line 252 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
 			}
+
 			return true;
 		
 		case 2:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
+#line 12 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
 			 
 			printf ("C+ %s\n", (*GetTokenLocator (0)).m_Data.m_String); 
 		;
+#line 265 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
 			}
+
 			return true;
 		
 		case 3:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
+#line 17 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
 			 
 			printf ("C %s\n", (*GetTokenLocator (0)).m_Data.m_String); 
 		;
+#line 278 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
 			}
+
 			return true;
 		
 		default:

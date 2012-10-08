@@ -13,10 +13,9 @@ attribute_declarator_list
 	;
 
 attribute_declarator
-	: EToken_Identifier ('=' constant_expression)?
+	: EToken_Identifier ('=' expression_1st_pass)?
 		{
-			CValue* pValue = IsValidLocator ($3) ? $3.m_pValue : NULL;
-			CAttribute* pAttribute = m_pModule->m_AttributeMgr.CreateAttribute ($1.m_Data.m_String, pValue);
+			CAttribute* pAttribute = m_pModule->m_AttributeMgr.CreateAttribute ($1.m_Data.m_String, NULL);
 			if (!pAttribute)
 				return false;
 

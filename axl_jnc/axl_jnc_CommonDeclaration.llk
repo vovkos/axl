@@ -7,15 +7,13 @@ common_declaration
 	  declaration_terminator
 	;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 noast
 init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
 	: init_declarator <$pDeclSpecifiers> (',' init_declarator <$pDeclSpecifiers>)*
 	;
 
 init_declarator <CDeclSpecifiers* $pDeclSpecifiers>
-	: declarator('=' initializer)?
+	: declarator('=' expression_1st_pass)?
 		{
 			bool Result = Declare ($pDeclSpecifiers, &$1.m_Declarator);
 			if (!Result)
@@ -23,13 +21,21 @@ init_declarator <CDeclSpecifiers* $pDeclSpecifiers>
 		}
 	;
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+start
 initializer
 	: expression
-	| '{' initializer_list ','? '}'
+	| '{' initializer_list '}'
 	;
 
 initializer_list
-	: initializer (',' initializer)*
+	: initializer_list_entry (',' initializer_list_entry)*
+	;
+
+initializer_list_entry
+	: initializer
+	| epsilon
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -47,7 +53,7 @@ compound_statement_1st_pass
 noast
 statement_1st_pass
 	: compound_statement_1st_pass
-	| .
+	| any
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -331,9 +337,9 @@ declarator_suffix <CDeclarator* $pDeclarator>
 	;
 
 array_suffix <CDeclarator* $pDeclarator>
-	: '[' constant_integer_expression ']'
+	: '[' expression_1st_pass ']'
 		{
-			$pDeclarator->AddArraySuffix ($2.m_Value);
+			$pDeclarator->AddArraySuffix (0);
 		}
 	| '[' ']'
 		{
@@ -362,23 +368,10 @@ formal_argument_list <CDeclFormalArgSuffix* $pArgSuffix>
 	;
 
 formal_argument <CDeclFormalArgSuffix* $pArgSuffix>
-	local
-	{
-		CValue* $pDefaultValue;
-	}
-	enter
-	{
-		$pDefaultValue = NULL;
-	}
 	: type_specifier_modifier_list $s
-	  declarator $d
-	  ('=' constant_expression
+	  declarator $d ('=' expression_1st_pass $v)?
 		{
-			$pDefaultValue = NULL; // TODO: create default value
-		}
-	  )?
-		{
-			bool Result = DeclareFormalArg ($pArgSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, $pDefaultValue);
+			bool Result = DeclareFormalArg ($pArgSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL);
 			if (!Result)
 				return false;
 		}
@@ -394,7 +387,7 @@ formal_argument_vararg <CDeclFormalArgSuffix* $pArgSuffix>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 qualified_type_identifier_rslv
-	: EToken_Identifier
+	: qualified_identifier
 		{
 			return IsType ($1.m_Identifier);
 		}
@@ -405,7 +398,7 @@ class
 	CType* m_pType;
 }
 qualified_type_identifier
-	: EToken_Identifier
+	: qualified_identifier
 		{
 			$.m_pType = FindType ($1.m_Identifier);
 		}

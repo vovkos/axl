@@ -7,6 +7,13 @@ namespace st {
 
 //.............................................................................
 
+void
+CStringTemplate::Reset ()
+{
+	m_LuaState.Create ();
+	m_LineCol.Clear ();
+}
+
 bool
 CStringTemplate::Process (
 	rtl::CString* pResult,
@@ -36,12 +43,15 @@ CStringTemplate::Process (
 	if (!Result)
 		return false;
 			
-	TPassthroughContext PassthroughContext;
-	PassthroughContext.m_pResult = pResult;
-	PassthroughContext.m_pTemplate = pTemplate;
+	TEmitContext EmitContext;
+	EmitContext.m_pThis = this;
+	EmitContext.m_pResult = pResult;
+	EmitContext.m_pTemplate = pTemplate;
 
-	m_LuaState.RegisterFunction ("emit", Emit_lua, (intptr_t) pResult);
-	m_LuaState.RegisterFunction ("passthrough", Passthrough_lua, (intptr_t) &PassthroughContext);
+	m_LuaState.RegisterFunction ("GetLine", GetLine_lua, (intptr_t) this);
+	m_LuaState.RegisterFunction ("GetCol", GetCol_lua, (intptr_t) this);
+	m_LuaState.RegisterFunction ("Emit", Emit_lua, (intptr_t) &EmitContext);
+	m_LuaState.RegisterFunction ("Passthrough", Passthrough_lua, (intptr_t) &EmitContext);
 
 	Result = m_LuaState.PCall (0, 0);
 	if (!Result)
@@ -154,7 +164,7 @@ CStringTemplate::ExtractLuaSource (
 		}
 
 		if (pToken->m_Pos.m_Offset > Offset)
-			pLuaSource->AppendFormat ("passthrough (%d, %d);", Offset, pToken->m_Pos.m_Offset - Offset);
+			pLuaSource->AppendFormat ("Passthrough (%d, %d);", Offset, pToken->m_Pos.m_Offset - Offset);
 
 		if (pToken->m_Token == EToken_Eof)
 			return true;
@@ -167,7 +177,7 @@ CStringTemplate::ExtractLuaSource (
 		switch (pToken->m_Token)
 		{
 		case EToken_Data:
-			pLuaSource->AppendFormat ("emit (%s);", pToken->m_Data.m_String);
+			pLuaSource->AppendFormat ("Emit (%s);", pToken->m_Data.m_String);
 			Pos = pToken->m_Pos;
 			Lexer.NextToken ();
 			break;
@@ -186,7 +196,7 @@ CStringTemplate::ExtractLuaSource (
 			if (!Result)
 				return false;
 
-			pLuaSource->Append ("emit (");
+			pLuaSource->Append ("Emit (");
 			pLuaSource->Append (pTemplate + Offset, Pos.m_Offset - Offset);
 			pLuaSource->Append (");");
 			break;
@@ -200,20 +210,72 @@ CStringTemplate::ExtractLuaSource (
 	}
 }
 
+void
+CStringTemplate::CountLineCol (
+	const tchar_t* p,
+	size_t Length
+	)
+{
+	if (!p)
+		return;
+
+	if (Length == -1)
+		Length = _tcslen (p);
+
+	const tchar_t* pEnd = p + Length;
+	const tchar_t* pLine = p;
+
+	for (; p < pEnd; p++)
+		if (*p == '\n')
+		{
+			m_LineCol.m_Line++;
+			pLine = p + 1;
+		}
+
+	m_LineCol.m_Col = p - pLine;
+}
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+int 
+CStringTemplate::GetLine_lua (lua_State* pLuaState)
+{
+	lua::CLuaState LuaState = pLuaState;
+
+	CStringTemplate* pThis = (CStringTemplate*) LuaState.GetContext ();
+
+	LuaState.PushInteger (pThis->m_LineCol.m_Line);
+
+	LuaState.Detach ();
+	return 1;
+}
+
+int 
+CStringTemplate::GetCol_lua (lua_State* pLuaState)
+{
+	lua::CLuaState LuaState = pLuaState;
+
+	CStringTemplate* pThis = (CStringTemplate*) LuaState.GetContext ();
+
+	LuaState.PushInteger (pThis->m_LineCol.m_Col);
+
+	LuaState.Detach ();
+	return 1;
+}
 
 int 
 CStringTemplate::Emit_lua (lua_State* pLuaState)
 {
 	lua::CLuaState LuaState = pLuaState;
 
-	rtl::CString* pResult = (rtl::CString*) LuaState.GetContext ();
+	TEmitContext* pContext = (TEmitContext*) LuaState.GetContext ();
 
 	size_t Count = lua_gettop (pLuaState);
 	for (size_t i = 1; i <= Count; i++)
 	{
 		const char* p = LuaState.GetString (i);
-		pResult->Append (p);
+		pContext->m_pResult->Append (p);
+		pContext->m_pThis->CountLineCol (p);
 	}
 
 	LuaState.Detach ();
@@ -225,12 +287,15 @@ CStringTemplate::Passthrough_lua (lua_State* pLuaState)
 {
 	lua::CLuaState LuaState = pLuaState;
 
-	TPassthroughContext* pContext = (TPassthroughContext*) LuaState.GetContext ();
+	TEmitContext* pContext = (TEmitContext*) LuaState.GetContext ();
 
 	size_t Offset = LuaState.GetInteger (1);
 	size_t Length = LuaState.GetInteger (2);
 
-	pContext->m_pResult->Append (pContext->m_pTemplate + Offset, Length);
+	const tchar_t* p = pContext->m_pTemplate + Offset;
+
+	pContext->m_pResult->Append (p, Length);
+	pContext->m_pThis->CountLineCol (p, Length);
 
 	LuaState.Detach ();
 	return 0;

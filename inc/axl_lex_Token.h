@@ -74,6 +74,14 @@ public:
 	{
 		m_FilePath = FilePath;
 	}
+
+	CSrcPos&
+	operator = (const CLineCol& LineCol)
+	{
+		m_Line = LineCol.m_Line;
+		m_Col = LineCol.m_Col;
+		return *this;
+	}
 };
 
 //.............................................................................

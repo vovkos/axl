@@ -21,6 +21,7 @@ class CDefine: public rtl::TListLink
 {
 public:
 	EDefine m_Kind;
+	lex::CSrcPos m_SrcPos;
 	rtl::CString m_Name;
 	rtl::CString m_StringValue;
 	int m_IntegerValue;

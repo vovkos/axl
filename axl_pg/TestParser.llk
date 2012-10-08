@@ -1,6 +1,6 @@
 //.............................................................................
 
-LL (2);
+LL (3);
 
 global
 	: '*' resolver (EToken_Identifier $a { return $a.m_Data.m_String == "hui"; }) EToken_Identifier $b

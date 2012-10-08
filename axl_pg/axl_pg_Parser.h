@@ -118,7 +118,15 @@ protected:
 	bool
 	UserCode (
 		int OpenBracket,
-		rtl::CString* pString
+		rtl::CString* pString,
+		lex::CSrcPos* pSrcPos
+		);
+
+	bool
+	UserCode (
+		int OpenBracket,
+		rtl::CString* pString,
+		lex::CLineCol* pLineCol
 		);
 
 	bool 

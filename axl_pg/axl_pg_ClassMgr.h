@@ -27,6 +27,8 @@ class CClass: public rtl::TListLink
 public:
 	int m_Flags;
 
+	lex::CSrcPos m_SrcPos;
+
 	CClass* m_pBaseClass;
 
 	rtl::CString m_Name;

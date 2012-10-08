@@ -66,6 +66,17 @@ CGrammarNode::MarkFinal ()
 	return true;
 }
 
+void
+CGrammarNode::ExportSrcPos (
+	lua::CLuaState* pLuaState,
+	const lex::CLineCol& LineCol
+	)
+{
+	pLuaState->SetMemberString ("FilePath", m_SrcPos.m_FilePath);
+	pLuaState->SetMemberInteger ("Line", LineCol.m_Line);
+	pLuaState->SetMemberInteger ("Col", LineCol.m_Col);
+}
+
 //.............................................................................
 
 CSymbolNode::CSymbolNode ()
@@ -167,22 +178,38 @@ CSymbolNode::Export (lua::CLuaState* pLuaState)
 	pLuaState->SetMemberString ("Name", m_Name);
 	pLuaState->SetMemberBoolean ("IsCustom", !m_Arg.IsEmpty () || !m_Local.IsEmpty ());
 
+	pLuaState->CreateTable (0, 3);
+	ExportSrcPos (pLuaState, m_SrcPos);
+	pLuaState->SetMember ("SrcPos");
+
 	if (m_Flags & ESymbolNodeFlag_IsNoAst)
 		pLuaState->SetMemberBoolean ("IsNoAst", true);
 	else if (m_pClass)
 		pLuaState->SetMemberString ("Class", m_pClass->m_Name);
 
 	if (!m_Arg.IsEmpty ())
+	{
 		pLuaState->SetMemberString ("Arg", m_Arg);
+		pLuaState->SetMemberInteger ("ArgLine", m_ArgLineCol.m_Line);
+	}
 
 	if (!m_Local.IsEmpty ())
+	{
 		pLuaState->SetMemberString ("Local", m_Local);
+		pLuaState->SetMemberInteger ("LocalLine", m_LocalLineCol.m_Line);
+	}
 
 	if (!m_Enter.IsEmpty ())
+	{
 		pLuaState->SetMemberString ("Enter", m_Enter);
+		pLuaState->SetMemberInteger ("EnterLine", m_EnterLineCol.m_Line);
+	}
 
 	if (!m_Leave.IsEmpty ())
+	{
 		pLuaState->SetMemberString ("Leave", m_Leave);
+		pLuaState->SetMemberInteger ("LeaveLine", m_LeaveLineCol.m_Line);
+	}
 
 	pLuaState->CreateTable (m_ArgNameList.GetCount ());
 
@@ -308,6 +335,10 @@ CActionNode::Export (lua::CLuaState* pLuaState)
 	pLuaState->SetMember ("ProductionSymbol");
 
 	pLuaState->SetMemberString ("UserCode", m_UserCode);
+
+	pLuaState->CreateTable (0, 3);
+	ExportSrcPos (pLuaState, m_SrcPos);
+	pLuaState->SetMember ("SrcPos");
 }
 
 //.............................................................................
@@ -369,6 +400,10 @@ CArgumentNode::Export (lua::CLuaState* pLuaState)
 		pLuaState->SetArrayElementString (i, *It);
 
 	pLuaState->SetMember ("ValueTable");
+
+	pLuaState->CreateTable (0, 3);
+	ExportSrcPos (pLuaState, m_SrcPos);
+	pLuaState->SetMember ("SrcPos");
 }
 
 //.............................................................................
