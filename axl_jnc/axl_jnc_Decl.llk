@@ -4,7 +4,7 @@ global_declaration
 	: namespace_declaration
 	| using_declaration 
 	| common_declaration
-	| compound_statement_1st_pass
+	| compound_statement_pass1
 	| ';'
 	;
 
@@ -18,28 +18,39 @@ local_declaration
 
 pragma
 pragma_pack
-	: '#' EToken_Pack pack_value
+	: '#' EToken_Pack pack_pack_argument
+	;
+
+pack_pack_argument
+	: pack_value
+	| '(' pack_value ')'
 	;
 
 pack_value
 	: EToken_Integer
+		{
+			m_StructPackFactor = $1.m_Data.m_Integer;
+		}
 	| EToken_Default
+		{
+			m_StructPackFactor = m_DefaultStructPackFactor;
+		}
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class
 {
-	CQualifiedIdentifier m_Identifier;
+	CQualifiedName m_Name;
 }
-qualified_identifier
+qualified_name
 	: EToken_Identifier             
 		{  
-			$.m_Identifier.m_First = $1.m_Data.m_String; 
+			$.m_Name.m_First = $1.m_Data.m_String; 
 		}
 	  ('.' EToken_Identifier $id2
 		{ 
-			$.m_Identifier.m_List.InsertTail ($id2.m_Data.m_String);
+			$.m_Name.m_List.InsertTail ($id2.m_Data.m_String);
 		}
 	  )*
 	; 
@@ -58,6 +69,16 @@ type_name
 	: type_specifier_modifier_list
 	  pointer <&$Declarator>* 
 	  declarator_suffix <&$Declarator>*
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+generic_formal_argument_list
+	: '<' EToken_Identifier (',' EToken_Identifier)* '>'
+	;
+
+generic_actual_argument_list
+	: '<' type_name (',' type_name)* '>'
 	;
 
 //.............................................................................

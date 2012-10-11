@@ -56,6 +56,10 @@ enum EType
 	EType_Interface,      // I
 	EType_Property,       // Y
 
+	// import type (resolved after linkage or instantiation of generic)
+
+	EType_Import,         // Z
+
 	EType__Count,
 	EType__BasicTypeCount = EType_Variant + 1,
 

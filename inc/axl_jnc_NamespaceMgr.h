@@ -56,13 +56,13 @@ public:
 	CGlobalNamespace*
 	OpenNamespace (
 		const CToken::CPos& Pos,
-		const rtl::CString& Identifier
+		const rtl::CString& Name
 		);
 
 	CGlobalNamespace*
 	OpenNamespace (
 		const CToken::CPos& Pos,
-		const CQualifiedIdentifier& Identifier
+		const CQualifiedName& Name
 		);
 
 	void

@@ -10,13 +10,14 @@ namespace axl {
 namespace jnc {
 
 class CType;
+class CDerivedType;
 class CNamespace;
 class CEnumType;
 class CEnumMember;
 
 //.............................................................................
 
-class CQualifiedIdentifier
+class CQualifiedName
 {
 public:
 	rtl::CString m_First;
@@ -89,6 +90,41 @@ public:
 	}
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+CModuleItem*
+UnAliasItem (CModuleItem* pItem);
+
+//.............................................................................
+
+class CImport: public rtl::TListLink
+{
+protected:
+	friend class CNamespace;
+
+	rtl::CString m_Name;
+	CDerivedType* m_pType;
+
+	rtl::CStdListT <CImport> m_ImportList; 
+	rtl::CHashTableMapT <const tchar_t*, CImport*, rtl::CHashString, rtl::CCmpString> m_ImportMap; 
+
+public:
+	rtl::CString
+	GetName ()
+	{
+		return m_Name;
+	}
+
+	CDerivedType** 
+	GetType ()
+	{
+		return &m_pType;
+	}
+
+	CImport* 
+	Goto (const CQualifiedName& Name);
+};
+
 //.............................................................................
 
 class CNamespace: public CName
@@ -99,16 +135,17 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CHashTableMapT <const tchar_t*, CModuleItem*, rtl::CHashString, rtl::CCmpString> m_ItemMap; 
 	rtl::CStdListT <CAlias> m_AliasList;
+	CImport m_Import;
 
 public:
 	rtl::CString
 	CreateQualifiedName (const tchar_t* pName);
 
 	CModuleItem*
-	FindItem (
-		const tchar_t* pName,
-		bool Traverse = false
-		);
+	FindItem (const tchar_t* pName);
+
+	CModuleItem*
+	FindItemTraverse (const CQualifiedName& Name);
 
 	template <typename T>
 	bool
@@ -130,6 +167,12 @@ public:
 		return m_ItemArray [Index];
 	}
 
+	CDerivedType**
+	GetImportType (const CQualifiedName& Name)
+	{
+		return m_Import.Goto (Name)->GetType ();
+	}
+
 	CAlias*
 	CreateAlias (
 		const rtl::CString& Name,
@@ -149,6 +192,11 @@ protected:
 		CName* pName
 		);
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+CNamespace*
+GetItemNamespace (CModuleItem* pItem);
 
 //.............................................................................
 

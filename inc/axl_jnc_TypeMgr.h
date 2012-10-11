@@ -122,6 +122,9 @@ public:
 		return GetClassType (TypeKind, rtl::CString (), rtl::CString ());
 	}
 
+	CDerivedType*
+	CreateImportType ();
+
 protected:
 	void
 	SetupAllBasicTypes ();

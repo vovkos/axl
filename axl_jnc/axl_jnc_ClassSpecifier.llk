@@ -5,7 +5,7 @@ class
 	CClassType* m_pType;
 }
 class_specifier
-	: class_kind EToken_Identifier
+	: class_kind EToken_Identifier generic_formal_argument_list?
 		{
 			rtl::CString Name = $2.m_Data.m_String;
 			rtl::CString QualifiedName = m_pModule->m_NamespaceMgr.CreateQualifiedName (Name);
@@ -41,7 +41,7 @@ class_kind
 	;
 
 inheritance_list
-	: ':' qualified_type_identifier (',' qualified_type_identifier)*
+	: ':' qualified_type_name (',' qualified_type_name)*
 	;
 
 class_block <CClassType* $pType>
@@ -53,7 +53,7 @@ class_member_declaration <CClassType* $pType>
 	  declaration_specifier_list $s
 	  class_member_declarator_list <&$s.m_DeclSpecifiers, $pType>? 
 	  declaration_terminator
-	| compound_statement_1st_pass
+	| compound_statement_pass1
 	| ';'
 	;
 
@@ -71,3 +71,4 @@ class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
 	;
 
 //.............................................................................
+

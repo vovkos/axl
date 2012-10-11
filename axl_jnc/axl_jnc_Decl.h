@@ -254,7 +254,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CDeclFormalArgSuffix: public CDeclSuffix
+class CDeclFunctionSuffix: public CDeclSuffix
 {
 protected:
 	friend class CDeclarator;
@@ -264,7 +264,7 @@ protected:
 	int m_FunctionTypeFlags;
 
 public:
-	CDeclFormalArgSuffix ()
+	CDeclFunctionSuffix ()
 	{
 		m_SuffixKind = EDeclSuffix_FormalArg;
 		m_FunctionTypeFlags = 0;
@@ -333,7 +333,7 @@ public:
 	CDeclArraySuffix*
 	AddArraySuffix (size_t ElementCount);
 
-	CDeclFormalArgSuffix*
+	CDeclFunctionSuffix*
 	AddFormalArgSuffix ();
 
 	CType*

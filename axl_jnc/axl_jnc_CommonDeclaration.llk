@@ -13,7 +13,7 @@ init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
 	;
 
 init_declarator <CDeclSpecifiers* $pDeclSpecifiers>
-	: declarator('=' expression_1st_pass)?
+	: declarator('=' expression_pass1)?
 		{
 			bool Result = Declare ($pDeclSpecifiers, &$1.m_Declarator);
 			if (!Result)
@@ -43,16 +43,16 @@ initializer_list_entry
 noast
 declaration_terminator
 	: ';'
-	| compound_statement_1st_pass
+	| compound_statement_pass1
 	;
 
-compound_statement_1st_pass
-	: '{' statement_1st_pass* '}'
+compound_statement_pass1
+	: '{' statement_pass1* '}'
 	;
 
 noast
-statement_1st_pass
-	: compound_statement_1st_pass
+statement_pass1
+	: compound_statement_pass1
 	| any
 	;
 
@@ -268,12 +268,34 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 			if (!Result)
 				return false;
 		}
-	| resolver (qualified_type_identifier_rslv)
-	  qualified_type_identifier $t
+	| resolver (qualified_type_name_rslv)
+	  qualified_type_name $t
+	  generic_actual_argument_list?
 		{
 			bool Result = $pTypeSpecifier->SetType ($t.m_pType);
 			if (!Result)
 				return false;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+qualified_type_name_rslv
+	: qualified_name
+		{
+			return FindType ($1.m_Name) != NULL;
+		}
+	;
+
+class
+{
+	CType* m_pType;
+}
+qualified_type_name
+	: qualified_name
+		{
+			$.m_pType = FindType ($1.m_Name);
+			ASSERT ($.m_pType);
 		}
 	;
 
@@ -290,6 +312,10 @@ declarator
 			$.m_Declarator.m_Pos = $id.m_Pos;
 			$.m_Declarator.m_Name = $id.m_Data.m_String;
 		}
+	  (generic_formal_argument_list
+		{
+		}
+	  ) ?
 	  ('.' property_accessor_kind $p
 		{
 			$.m_Declarator.m_PropertyAccessorKind = $p.m_PropertyAccessorKind;
@@ -333,11 +359,11 @@ pointer_kind
 noast
 declarator_suffix <CDeclarator* $pDeclarator>
 	: array_suffix <$pDeclarator>
-	| formal_argument_suffix <$pDeclarator>
+	| function_suffix <$pDeclarator>
 	;
 
 array_suffix <CDeclarator* $pDeclarator>
-	: '[' expression_1st_pass ']'
+	: '[' expression_pass1 ']'
 		{
 			$pDeclarator->AddArraySuffix (0);
 		}
@@ -347,60 +373,40 @@ array_suffix <CDeclarator* $pDeclarator>
 		}
 	;
 
-formal_argument_suffix <CDeclarator* $pDeclarator>
+function_suffix <CDeclarator* $pDeclarator>
 	local
 	{
-		CDeclFormalArgSuffix* $pArgSuffix;
+		CDeclFunctionSuffix* $pFunctionSuffix;
 	}
 	enter
 	{
-		$pArgSuffix = $pDeclarator->AddFormalArgSuffix ();
+		$pFunctionSuffix = $pDeclarator->AddFormalArgSuffix ();
 	}
-	: '(' formal_argument_list <$pArgSuffix> ')' 
-	| '(' formal_argument_vararg <$pArgSuffix> ')' 
+	: '(' function_formal_argument_list <$pFunctionSuffix> ')' 
+	| '(' function_formal_argument_vararg <$pFunctionSuffix> ')' 
 	| '(' ')' 
 	;	
 
-formal_argument_list <CDeclFormalArgSuffix* $pArgSuffix>
-	: formal_argument <$pArgSuffix> 
-	  (',' formal_argument <$pArgSuffix>)* 
-	  (',' formal_argument_vararg <$pArgSuffix>)?
+function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
+	: function_formal_argument <$pFunctionSuffix> 
+	  (',' function_formal_argument <$pFunctionSuffix>)* 
+	  (',' function_formal_argument_vararg <$pFunctionSuffix>)?
 	;
 
-formal_argument <CDeclFormalArgSuffix* $pArgSuffix>
+function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 	: type_specifier_modifier_list $s
-	  declarator $d ('=' expression_1st_pass $v)?
+	  declarator $d ('=' expression_pass1 $v)?
 		{
-			bool Result = DeclareFormalArg ($pArgSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL);
+			bool Result = DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL);
 			if (!Result)
 				return false;
 		}
 	;
 
-formal_argument_vararg <CDeclFormalArgSuffix* $pArgSuffix>
+function_formal_argument_vararg <CDeclFunctionSuffix* $pFunctionSuffix>
 	: EToken_Ellipsis
 		{
-			$pArgSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
-		}
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-qualified_type_identifier_rslv
-	: qualified_identifier
-		{
-			return IsType ($1.m_Identifier);
-		}
-	;
-
-class
-{
-	CType* m_pType;
-}
-qualified_type_identifier
-	: qualified_identifier
-		{
-			$.m_pType = FindType ($1.m_Identifier);
+			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
 		}
 	;
 

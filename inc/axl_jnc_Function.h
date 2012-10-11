@@ -20,7 +20,7 @@ class CFunctionFormalArg: public rtl::TListLink
 {
 protected:
 	friend class CFunctionMgr;
-	friend class CDeclFormalArgSuffix;
+	friend class CDeclFunctionSuffix;
 
 	rtl::CString m_Name;
 	CType* m_pType;

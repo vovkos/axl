@@ -33,20 +33,27 @@ Includes
 
 Members
 {
+	enum EStage
+	{
+		EStage_Pass1, // global declarations (before linkage)
+		EStage_Pass2, // statements and expressions (after linkage)
+	};
+
 	CModule* m_pModule;
 	size_t m_StructPackFactor;
+	size_t m_DefaultStructPackFactor;
+	EStage m_Stage;
 
 	CParser ()
 	{
 		m_pModule = NULL;
 		m_StructPackFactor = 8;
+		m_DefaultStructPackFactor = 8;
+		m_Stage = EStage_Pass1;
 	}
 
-	bool 
-	IsType (const CQualifiedIdentifier& Identifier);
-
 	CType*
-	FindType (const CQualifiedIdentifier& Identifier);
+	FindType (const CQualifiedName& Name);
 
 	bool
 	Declare (
@@ -76,7 +83,7 @@ Members
 
 	bool
 	DeclareFormalArg (
-		CDeclFormalArgSuffix* pArgSuffix,
+		CDeclFunctionSuffix* pArgSuffix,
 		CTypeSpecifierModifiers* pTypeSpecifier,
 		CDeclarator* pDeclarator,
 		CValue* pDefaultValue

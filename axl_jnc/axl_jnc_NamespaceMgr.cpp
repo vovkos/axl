@@ -37,14 +37,14 @@ CNamespaceMgr::CreateScope ()
 CGlobalNamespace*
 CNamespaceMgr::OpenNamespace (
 	const CToken::CPos& Pos,
-	const CQualifiedIdentifier& Identifier
+	const CQualifiedName& Name
 	)
 {
-	CNamespace* pNamespace = OpenNamespace (Pos, Identifier.m_First);
+	CNamespace* pNamespace = OpenNamespace (Pos, Name.m_First);
 	if (!pNamespace)
 		return NULL;
 
-	rtl::CBoxIteratorT <rtl::CString> It = Identifier.m_List.GetHead ();
+	rtl::CBoxIteratorT <rtl::CString> It = Name.m_List.GetHead ();
 	for (; It; It++)
 	{
 		pNamespace = OpenNamespace (Pos, *It);
@@ -58,15 +58,15 @@ CNamespaceMgr::OpenNamespace (
 CGlobalNamespace*
 CNamespaceMgr::OpenNamespace (
 	const CToken::CPos& Pos,
-	const rtl::CString& Identifier
+	const rtl::CString& Name
 	)
 {
 	CGlobalNamespace* pNamespace;
 
-	CModuleItem* pItem = m_pCurrentNamespace->FindItem (Identifier, false);
+	CModuleItem* pItem = m_pCurrentNamespace->FindItem (Name);
 	if (!pItem)
 	{
-		pNamespace = CreateNamespace (Identifier);
+		pNamespace = CreateNamespace (Name);
 		pNamespace->m_Pos = Pos;
 		m_pCurrentNamespace->AddItem (pNamespace);
 	}
@@ -74,7 +74,7 @@ CNamespaceMgr::OpenNamespace (
 	{
 		if (pItem->GetItemKind () != EModuleItem_Namespace)
 		{
-			err::SetFormatStringError (_T("'%s' exists and is not a namespace"), m_pCurrentNamespace->CreateQualifiedName (Identifier));
+			err::SetFormatStringError (_T("'%s' exists and is not a namespace"), m_pCurrentNamespace->CreateQualifiedName (Name));
 			return NULL;
 		}
 

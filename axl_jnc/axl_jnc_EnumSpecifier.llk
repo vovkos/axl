@@ -58,7 +58,7 @@ enum_member_list <CEnumType* $pType>
 	;
 
 enum_member <CEnumType* $pType>
-	: EToken_Identifier ('=' expression_1st_pass)?
+	: EToken_Identifier ('=' expression_pass1)?
 		{
 			CEnumMember* pMember = $pType->CreateMember ($1.m_Data.m_String);
 			if (!pMember)

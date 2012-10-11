@@ -126,7 +126,7 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 //.............................................................................
 
 CFunctionFormalArg*
-CDeclFormalArgSuffix::AddArg (
+CDeclFunctionSuffix::AddArg (
 	const rtl::CString& Name,
 	CType* pType,
 	CValue* pDefaultValue
@@ -160,10 +160,10 @@ CDeclarator::AddArraySuffix (size_t ElementCount)
 	return pArraySuffix;
 }
 
-CDeclFormalArgSuffix*
+CDeclFunctionSuffix*
 CDeclarator::AddFormalArgSuffix ()
 {
-	CDeclFormalArgSuffix* pFormalArgSuffix = AXL_MEM_NEW (CDeclFormalArgSuffix);
+	CDeclFunctionSuffix* pFormalArgSuffix = AXL_MEM_NEW (CDeclFunctionSuffix);
 	m_SuffixList.InsertTail (pFormalArgSuffix);
 	return pFormalArgSuffix;
 }
@@ -174,7 +174,7 @@ CDeclarator::GetArgList ()
 	rtl::CIteratorT <CDeclSuffix> Suffix = m_SuffixList.GetHead ();
 	if (Suffix && Suffix->GetSuffixKind () == EDeclSuffix_FormalArg)
 	{
-		CDeclFormalArgSuffix* pArgSuffix = (CDeclFormalArgSuffix*) *Suffix;
+		CDeclFunctionSuffix* pArgSuffix = (CDeclFunctionSuffix*) *Suffix;
 		return &pArgSuffix->m_ArgList;
 	}
 
@@ -256,7 +256,7 @@ CDeclarator::GetType (
 		else 
 		{
 			ASSERT (SuffixKind == EDeclSuffix_FormalArg);
-			CDeclFormalArgSuffix* pArgSuffix = (CDeclFormalArgSuffix*) *Suffix;
+			CDeclFunctionSuffix* pArgSuffix = (CDeclFunctionSuffix*) *Suffix;
 
 			int FunctionTypeFlags = pArgSuffix->GetFunctionTypeFlags ();
 

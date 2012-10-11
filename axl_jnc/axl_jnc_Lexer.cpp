@@ -1,5 +1,5 @@
 
-/* #line 1 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 1 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 #include "stdafx.h"
 #include "axl_jnc_Lexer.h"
 
@@ -821,7 +821,7 @@ static const int axl_jnc_error = -1;
 static const int axl_jnc_en_main = 6;
 
 
-/* #line 161 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 161 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 
 //.............................................................................
@@ -838,7 +838,7 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 169 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 169 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 }
 
 bool
@@ -930,7 +930,7 @@ _eof_trans:
 		switch ( *_acts++ )
 		{
 	case 0:
-/* #line 44 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 44 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{ NewLine (p + 1); }
 	break;
 	case 3:
@@ -938,371 +938,371 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 4:
-/* #line 58 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 58 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 1;}
 	break;
 	case 5:
-/* #line 59 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 59 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 2;}
 	break;
 	case 6:
-/* #line 60 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 60 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 3;}
 	break;
 	case 7:
-/* #line 61 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 61 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 4;}
 	break;
 	case 8:
-/* #line 63 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 63 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 5;}
 	break;
 	case 9:
-/* #line 64 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 64 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 6;}
 	break;
 	case 10:
-/* #line 65 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 65 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 7;}
 	break;
 	case 11:
-/* #line 66 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 66 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 8;}
 	break;
 	case 12:
-/* #line 67 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 67 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 9;}
 	break;
 	case 13:
-/* #line 69 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 69 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 10;}
 	break;
 	case 14:
-/* #line 70 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 70 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 11;}
 	break;
 	case 15:
-/* #line 72 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 72 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 13;}
 	break;
 	case 16:
-/* #line 73 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 73 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 14;}
 	break;
 	case 17:
-/* #line 74 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 74 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 15;}
 	break;
 	case 18:
-/* #line 75 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 75 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 16;}
 	break;
 	case 19:
-/* #line 76 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 76 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 17;}
 	break;
 	case 20:
-/* #line 77 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 77 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 18;}
 	break;
 	case 21:
-/* #line 78 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 78 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 19;}
 	break;
 	case 22:
-/* #line 79 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 79 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 20;}
 	break;
 	case 23:
-/* #line 80 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 80 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 21;}
 	break;
 	case 24:
-/* #line 82 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 82 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 22;}
 	break;
 	case 25:
-/* #line 84 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 84 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 23;}
 	break;
 	case 26:
-/* #line 85 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 85 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 24;}
 	break;
 	case 27:
-/* #line 86 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 86 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 25;}
 	break;
 	case 28:
-/* #line 87 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 87 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 26;}
 	break;
 	case 29:
-/* #line 89 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 89 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 27;}
 	break;
 	case 30:
-/* #line 90 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 90 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 28;}
 	break;
 	case 31:
-/* #line 93 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 93 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 30;}
 	break;
 	case 32:
-/* #line 94 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 94 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 31;}
 	break;
 	case 33:
-/* #line 95 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 95 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 32;}
 	break;
 	case 34:
-/* #line 96 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 96 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 33;}
 	break;
 	case 35:
-/* #line 97 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 97 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 34;}
 	break;
 	case 36:
-/* #line 98 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 98 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 35;}
 	break;
 	case 37:
-/* #line 99 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 99 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 36;}
 	break;
 	case 38:
-/* #line 100 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 100 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 37;}
 	break;
 	case 39:
-/* #line 102 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 102 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 38;}
 	break;
 	case 40:
-/* #line 103 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 103 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 39;}
 	break;
 	case 41:
-/* #line 105 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 105 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 40;}
 	break;
 	case 42:
-/* #line 106 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 106 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 41;}
 	break;
 	case 43:
-/* #line 107 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 107 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 42;}
 	break;
 	case 44:
-/* #line 108 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 108 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 43;}
 	break;
 	case 45:
-/* #line 110 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 110 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 45;}
 	break;
 	case 46:
-/* #line 111 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 111 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 46;}
 	break;
 	case 47:
-/* #line 112 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 112 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 47;}
 	break;
 	case 48:
-/* #line 113 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 113 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 48;}
 	break;
 	case 49:
-/* #line 114 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 114 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 49;}
 	break;
 	case 50:
-/* #line 115 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 115 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 50;}
 	break;
 	case 51:
-/* #line 117 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 117 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 51;}
 	break;
 	case 52:
-/* #line 118 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 118 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 52;}
 	break;
 	case 53:
-/* #line 146 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 146 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 74;}
 	break;
 	case 54:
-/* #line 147 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 147 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 75;}
 	break;
 	case 55:
-/* #line 148 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 148 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 76;}
 	break;
 	case 56:
-/* #line 157 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 157 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 82;}
 	break;
 	case 57:
-/* #line 122 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 122 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Eq); }}
 	break;
 	case 58:
-/* #line 123 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 123 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ne); }}
 	break;
 	case 59:
-/* #line 124 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 124 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Le); }}
 	break;
 	case 60:
-/* #line 125 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 125 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ge); }}
 	break;
 	case 61:
-/* #line 126 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 126 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_LogicalOr); }}
 	break;
 	case 62:
-/* #line 127 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 127 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_LogicalAnd); }}
 	break;
 	case 63:
-/* #line 128 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 128 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Inc); }}
 	break;
 	case 64:
-/* #line 129 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 129 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Dec); }}
 	break;
 	case 65:
-/* #line 132 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 132 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_MulAssign); }}
 	break;
 	case 66:
-/* #line 133 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 133 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_DivAssign); }}
 	break;
 	case 67:
-/* #line 134 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 134 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ModAssign); }}
 	break;
 	case 68:
-/* #line 135 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 135 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_AddAssign); }}
 	break;
 	case 69:
-/* #line 136 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 136 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_SubAssign); }}
 	break;
 	case 70:
-/* #line 137 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 137 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
 	break;
 	case 71:
-/* #line 138 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 138 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
 	break;
 	case 72:
-/* #line 139 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 139 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_AndAssign); }}
 	break;
 	case 73:
-/* #line 140 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 140 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_XorAssign); }}
 	break;
 	case 74:
-/* #line 141 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 141 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_OrAssign); }}
 	break;
 	case 75:
-/* #line 142 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 142 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ellipsis); }}
 	break;
 	case 76:
-/* #line 147 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 147 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 77:
-/* #line 148 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 148 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 78:
-/* #line 153 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 153 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 79:
-/* #line 155 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 155 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 80:
-/* #line 157 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 157 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 81:
-/* #line 71 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 71 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Int); }}
 	break;
 	case 82:
-/* #line 92 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 92 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Enum); }}
 	break;
 	case 83:
-/* #line 109 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 109 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Do); }}
 	break;
 	case 84:
-/* #line 130 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 130 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Shl); }}
 	break;
 	case 85:
-/* #line 131 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 131 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Shr); }}
 	break;
 	case 86:
-/* #line 146 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 146 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateStringToken (EToken_Identifier); }}
 	break;
 	case 87:
-/* #line 147 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 147 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 88:
-/* #line 148 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 148 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 89:
-/* #line 149 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 149 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateIntegerToken (10); }}
 	break;
 	case 90:
-/* #line 150 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 150 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateIntegerToken (16, 2); }}
 	break;
 	case 91:
-/* #line 152 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 152 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;}
 	break;
 	case 92:
-/* #line 155 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 155 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;}
 	break;
 	case 93:
-/* #line 157 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 157 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (ts [0]); }}
 	break;
 	case 94:
-/* #line 149 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 149 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
 	break;
 	case 95:
-/* #line 157 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 157 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
 	break;
 	case 96:
@@ -1500,7 +1500,7 @@ _again:
 
 	}
 
-/* #line 175 "D:/Projects.v/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 175 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 	bool Result = cs != axl_jnc_error;
 	if (!Result)

@@ -13,7 +13,7 @@ attribute_declarator_list
 	;
 
 attribute_declarator
-	: EToken_Identifier ('=' expression_1st_pass)?
+	: EToken_Identifier ('=' expression_pass1)?
 		{
 			CAttribute* pAttribute = m_pModule->m_AttributeMgr.CreateAttribute ($1.m_Data.m_String, NULL);
 			if (!pAttribute)

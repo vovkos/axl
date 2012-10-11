@@ -6,20 +6,32 @@ namespace jnc {
 
 //.............................................................................
 
-bool 
-CParser::IsType (const CQualifiedIdentifier& Identifier)
-{
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-
-	return false;
-}
-
 CType*
-CParser::FindType (const CQualifiedIdentifier& Identifier)
+CParser::FindType (const CQualifiedName& Name)
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	return NULL;
+	if (m_Stage == EStage_Pass1)
+	{
+		CDerivedType** ppType = pNamespace->GetImportType (Name);
+		CDerivedType* pType = *ppType;
+		
+		if (!pType)
+		{
+			pType = m_pModule->m_TypeMgr.CreateImportType ();
+			*ppType = pType;
+		}
+
+		return pType;
+	}
+
+	CModuleItem* pItem = pNamespace->FindItemTraverse (Name);
+	if (!pItem)
+		return NULL;
+
+	pItem = UnAliasItem (pItem);
+
+	return pItem->GetItemKind () == EModuleItem_Type ? (CType*) pItem : NULL;
 }
 
 bool
@@ -331,7 +343,7 @@ CParser::DeclareClassMember (
 
 bool
 CParser::DeclareFormalArg (
-	CDeclFormalArgSuffix* pArgSuffix,
+	CDeclFunctionSuffix* pArgSuffix,
 	CTypeSpecifierModifiers* pTypeSpecifier,
 	CDeclarator* pDeclarator,
 	CValue* pDefaultValue

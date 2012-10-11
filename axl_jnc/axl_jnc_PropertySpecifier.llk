@@ -44,7 +44,7 @@ class
 property_declarator
 	: pointer <&$.m_Declarator>* 
 	  property_accessor_kind $a
-	  formal_argument_suffix <&$.m_Declarator>
+	  function_suffix <&$.m_Declarator>
 		{
 			$.m_Declarator.m_PropertyAccessorKind = $a.m_PropertyAccessorKind;
 			$.m_Declarator.m_Pos = $a.m_FirstToken.m_Pos;

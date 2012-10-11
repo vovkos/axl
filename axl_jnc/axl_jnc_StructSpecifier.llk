@@ -5,7 +5,7 @@ class
 	CStructType* m_pType;
 }
 struct_specifier
-	: struct_kind EToken_Identifier 
+	: struct_kind EToken_Identifier generic_formal_argument_list?
 		{
 			rtl::CString Name = $2.m_Data.m_String;
 			rtl::CString QualifiedName = m_pModule->m_NamespaceMgr.CreateQualifiedName (Name);
@@ -49,7 +49,7 @@ struct_member_declaration <CStructType* $pType>
 	  type_specifier_modifier_list $s
 	  struct_member_declarator_list <&$s.m_TypeSpecifier, $pType>
 	  ';'
-	| compound_statement_1st_pass
+	| compound_statement_pass1
 	| ';'
 	;
 

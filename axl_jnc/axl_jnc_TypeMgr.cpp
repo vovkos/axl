@@ -365,6 +365,23 @@ CTypeMgr::GetClassType (
 	return pType;
 }
 
+CDerivedType*
+CTypeMgr::CreateImportType ()
+{
+	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
+	pType->m_pTypeMgr = this;
+	pType->m_TypeKind = EType_Import;
+	pType->m_Signature.Format ("Z{%x}", pType);
+
+	m_DerivedTypeList.InsertTail (pType);
+
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (pType->m_Signature);
+	ASSERT (!It->m_Value);
+
+	It->m_Value = pType;
+	return pType;
+}
+
 //.............................................................................
 
 } // namespace axl {

@@ -7,6 +7,52 @@ namespace jnc {
 
 //.............................................................................
 
+CModuleItem*
+UnAliasItem (CModuleItem* pItem)
+{
+	while (pItem->GetItemKind () == EModuleItem_Alias)
+	{
+		CAlias* pAlias = (CAlias*) pItem;
+		pItem = pAlias->GetTarget ();
+	}
+
+	return pItem;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+CNamespace*
+GetItemNamespace (CModuleItem* pItem)
+{
+	pItem = UnAliasItem (pItem);
+
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	if (ItemKind == EModuleItem_Namespace)
+		return (CGlobalNamespace*) pItem;
+
+	if (ItemKind != EModuleItem_Type)
+		return NULL;
+
+	CType* pType = (CType*) pItem;	
+	EType TypeKind = pType->GetTypeKind ();
+
+	switch (TypeKind)
+	{
+	case EType_Struct:
+	case EType_Union:
+		return ((CStructType*) pType);
+
+	case EType_Interface:
+	case EType_Class:
+		return ((CClassType*) pType);
+
+	default:
+		return NULL;
+	}
+}
+
+//.............................................................................
+
 rtl::CString 
 CName::GetQualifiedName ()
 {
@@ -19,6 +65,50 @@ CName::GetQualifiedName ()
 		m_QualifiedName = m_Name;
 
 	return m_QualifiedName;
+}
+
+//.............................................................................
+
+CImport*
+CImport::Goto (const CQualifiedName& Name)
+{
+	CImport* pImport;
+
+	// the root of qualified name
+
+	rtl::CHashTableMapIteratorT <const tchar_t*, CImport*> It = m_ImportMap.Goto (Name.m_First);
+	if (It->m_Value)
+	{
+		pImport = It->m_Value;
+	}
+	else
+	{
+		pImport = AXL_MEM_NEW (CImport);
+		pImport->m_Name = Name.m_First;
+		m_ImportList.InsertTail (pImport);
+		It->m_Value = pImport;
+	}
+
+	// now walk the qualified name
+
+	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
+	for (; NameIt; NameIt++)
+	{
+		It = m_ImportMap.Goto (*NameIt);
+		if (It->m_Value)
+		{
+			pImport = It->m_Value;
+		}
+		else
+		{
+			pImport = AXL_MEM_NEW (CImport);
+			pImport->m_Name = *NameIt;
+			m_ImportList.InsertTail (pImport);
+			It->m_Value = pImport;
+		}
+	}
+
+	return pImport;
 }
 
 //.............................................................................
@@ -43,29 +133,52 @@ CNamespace::CreateQualifiedName (const tchar_t* pName)
 }
 
 CModuleItem*
-CNamespace::FindItem (
-	const tchar_t* pName,
-	bool Traverse
-	)
+CNamespace::FindItem (const tchar_t* pName)
 {
 	rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = m_ItemMap.Find (pName); 
-	if (It)
-		return It->m_Value;
+	return It ? It->m_Value : NULL;
+}
 
-	if (!Traverse)
-		return NULL;
+CModuleItem*
+CNamespace::FindItemTraverse (const CQualifiedName& Name)
+{
+	// first find the root of qualified name
 
-	CNamespace* pNamespace = m_pParentNamespace;
+	CNamespace* pNamespace = this;
+	CModuleItem* pItem = NULL;
+
 	while (pNamespace)
 	{
-		It = pNamespace->m_ItemMap.Find (pName); 
+		rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = m_ItemMap.Find (Name.m_First); 
 		if (It)
-			return It->m_Value;
+		{
+			pItem = It->m_Value;
+			break;
+		}
 
 		pNamespace = pNamespace->m_pParentNamespace;
 	}
 
-	return NULL;
+	if (!pItem)
+		return NULL;
+
+	// now walk the qualified name
+
+	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
+	for (; NameIt; NameIt++)
+	{
+		pNamespace = GetItemNamespace (pItem);
+		if (!pNamespace)
+			return NULL;
+
+		rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
+		if (!It)
+			return NULL;
+
+		pItem = It->m_Value;
+	}
+
+	return pItem;
 }
 
 bool

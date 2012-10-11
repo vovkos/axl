@@ -1,5 +1,5 @@
 
-/* #line 1 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 1 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 #include "stdafx.h"
 #include "axl_st_Lexer.h"
 
@@ -79,7 +79,7 @@ static const int axl_lua_st_en_user_data = 5;
 static const int axl_lua_st_en_main = 0;
 
 
-/* #line 69 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 69 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 
 
 //.............................................................................
@@ -96,7 +96,7 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 77 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 77 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 }
 
 bool
@@ -188,55 +188,55 @@ _eof_trans:
 		switch ( *_acts++ )
 		{
 	case 0:
-/* #line 29 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 29 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{ NewLine (p + 1); }
 	break;
 	case 3:
-/* #line 41 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 41 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 4:
-/* #line 42 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 42 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 5:
-/* #line 43 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 43 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 6:
-/* #line 51 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 51 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 7:
-/* #line 52 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 52 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 8:
-/* #line 53 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 53 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 9:
-/* #line 61 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 61 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_OpenCode); }}
 	break;
 	case 10:
-/* #line 62 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 62 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_OpenData); }}
 	break;
 	case 11:
-/* #line 64 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 64 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 12:
-/* #line 65 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 65 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 13:
-/* #line 63 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 63 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p;p--;{ CreateStringToken (EToken_Data, 1); }}
 	break;
 	case 14:
-/* #line 65 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 65 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 	{te = p;p--;}
 	break;
 /* #line 192 "axl_st_Lexer.cpp" */
@@ -269,7 +269,7 @@ _again:
 
 	}
 
-/* #line 83 "D:/Projects.v/axl3/axl_lua/axl_st_Lexer.rl" */
+/* #line 83 "D:/Prj/Ninja/axl3/axl_lua/axl_st_Lexer.rl" */
 
 	bool Result = cs != axl_lua_st_error;
 	if (!Result)

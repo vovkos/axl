@@ -1,24 +1,20 @@
 //.............................................................................
 
 namespace_declaration
-	: EToken_Namespace qualified_identifier
+	: EToken_Namespace qualified_name
 		{ 
-			CNamespace* pNamespace = m_pModule->m_NamespaceMgr.OpenNamespace ($1.m_Pos, $2.m_Identifier);
+			CNamespace* pNamespace = m_pModule->m_NamespaceMgr.OpenNamespace ($1.m_Pos, $2.m_Name);
 			if (!pNamespace)
 				return false;
 		}
 	  '{' global_declaration* '}' 
 		{ 
-			m_pModule->m_NamespaceMgr.CloseNamespace ($2.m_Identifier.m_List.GetCount () + 1);
+			m_pModule->m_NamespaceMgr.CloseNamespace ($2.m_Name.m_List.GetCount () + 1);
 		}
 	;
 
 using_declaration
-	local
-	{
-		CQualifiedIdentifier $Identifier;
-	}
-	: EToken_Using qualified_identifier ';'
+	: EToken_Using qualified_name ';'
 	;
 
 //.............................................................................
