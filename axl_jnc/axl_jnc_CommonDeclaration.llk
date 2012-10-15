@@ -63,6 +63,14 @@ class
 	CDeclSpecifiers m_DeclSpecifiers;
 }	
 declaration_specifier_list
+	enter 
+	{
+		PushTypeSpecifier (&$.m_DeclSpecifiers);
+	}
+	leave
+	{
+		PopTypeSpecifier (&$.m_DeclSpecifiers);
+	}
 	: declaration_specifier <&$.m_DeclSpecifiers>+
 	;
 
@@ -71,6 +79,14 @@ class
 	CTypeSpecifierModifiers m_TypeSpecifier;
 }	
 type_specifier_modifier_list
+	enter 
+	{
+		PushTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	leave
+	{
+		PopTypeSpecifier (&$.m_TypeSpecifier);
+	}
 	: type_specifier_modifier <&$.m_TypeSpecifier>+
 	;
 
@@ -115,6 +131,7 @@ storage_class_specifier <CDeclSpecifiers* $pDeclSpecifiers>
 				return false;
 		}
 	;
+
 type_modifier <CTypeModifiers* $pTypeModifiers>
 	: EToken_Const
 		{
@@ -281,9 +298,13 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 qualified_type_name_rslv
-	: qualified_name
+	:	{
+			if (IsTypeSpecified ())
+				return false;
+		}
+	  qualified_name
 		{
-			return FindType ($1.m_Name) != NULL;
+			return m_Stage == EStage_Pass1 || FindType ($1.m_Name) != NULL;
 		}
 	;
 
@@ -307,15 +328,11 @@ class
 }	
 declarator
 	: pointer <&$.m_Declarator>* 
-	  EToken_Identifier $id
+	  EToken_Identifier $n
 		{
-			$.m_Declarator.m_Pos = $id.m_Pos;
-			$.m_Declarator.m_Name = $id.m_Data.m_String;
+			$.m_Declarator.m_Pos = $n.m_Pos;
+			$.m_Declarator.m_Name = $n.m_Data.m_String;
 		}
-	  (generic_formal_argument_list
-		{
-		}
-	  ) ?
 	  ('.' property_accessor_kind $p
 		{
 			$.m_Declarator.m_PropertyAccessorKind = $p.m_PropertyAccessorKind;

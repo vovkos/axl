@@ -14,22 +14,16 @@ enum_specifier
 				return false;
 		}
 	}
-	: enum_kind EToken_Identifier 
+	: enum_kind $k 
+	  EToken_Identifier $n?
 		{
-			rtl::CString Name = $2.m_Data.m_String;
-			rtl::CString QualifiedName = m_pModule->m_NamespaceMgr.CreateQualifiedName (Name);
-			$.m_pType = m_pModule->m_TypeMgr.GetEnumType ($1.m_Type, Name, QualifiedName);
-			
-			bool Result = Declare ($.m_pType, $1.m_FirstToken.m_Pos);
-			if (!Result)
+			$.m_pType = DeclareEnumType (
+				$k.m_Type,
+				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ()
+				);
+
+			if (!$.m_pType)
 				return false;
-				
-		}	
-	  enum_block <$.m_pType>?
-	| enum_kind 
-		{
-			$.m_pType = m_pModule->m_TypeMgr.CreateUnnamedEnumType ($1.m_Type);
-			Declare ($.m_pType, $1.m_FirstToken.m_Pos);
 		}	
 	  enum_block <$.m_pType>
 	;
@@ -50,7 +44,15 @@ enum_kind
 	;
 
 enum_block <CEnumType* $pType>
-	: '{' enum_member_list <$pType> '}'
+	: '{' 
+		{
+			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+		}
+	  enum_member_list <$pType> 
+	  '}'
+		{
+			m_pModule->m_NamespaceMgr.CloseNamespace ();	
+		}
 	;
 
 enum_member_list <CEnumType* $pType>

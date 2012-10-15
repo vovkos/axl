@@ -274,12 +274,52 @@ CModulePane::AddEnumTypeMembers (
 }
 
 void
+CModulePane::AddStructClassTypeMembers (
+	HTREEITEM hParent,
+	jnc::CStructClassType* pType
+	)
+{
+	rtl::CString ItemName;
+
+	size_t Count = pType->GetBaseTypeCount ();
+	if (Count)
+	{
+		HTREEITEM hInheritanceItem = m_TreeCtrl.InsertItem (_T("Inheritance"), hParent);
+
+		for (size_t i = 0; i < Count; i++)
+		{
+			jnc::CType* pBaseType = pType->GetBaseType (i);
+
+			ItemName = pBaseType->GetTypeString ();
+			HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hInheritanceItem);
+			m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pBaseType);
+		}
+	}
+
+	Count = pType->GetGenericArgumentCount ();
+	if (Count)
+	{
+		HTREEITEM hGenericItem = m_TreeCtrl.InsertItem (_T("Generic"), hParent);
+
+		for (size_t i = 0; i < Count; i++)
+		{
+			jnc::CImportType* pBaseType = pType->GetGenericArgument (i);
+
+			ItemName = pBaseType->GetTypeString ();
+			HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hGenericItem);
+			m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pBaseType);
+		}
+	}
+
+}
+
+void
 CModulePane::AddStructTypeMembers (
 	HTREEITEM hParent,
 	jnc::CStructType* pType
 	)
 {
-	rtl::CString ItemName;
+	AddStructClassTypeMembers (hParent, pType);
 
 	rtl::CIteratorT <jnc::CStructMember> Member = pType->GetFirstMember ();
 	for (; Member; Member++)
@@ -294,8 +334,8 @@ CModulePane::AddClassTypeMembers (
 	jnc::CClassType* pType
 	)
 {
-	rtl::CString ItemName;
-
+	AddStructClassTypeMembers (hParent, pType);
+	
 	size_t Count = pType->GetItemCount ();
 	for (size_t i = 0; i < Count; i++)
 	{

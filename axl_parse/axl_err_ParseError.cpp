@@ -26,7 +26,7 @@ CParseErrorProviderA::GetErrorDescription (const TError* pError)
 		Unpacker.Unpack (&Line);
 		Unpacker.Unpack (&Col);
 
-		String.Format("%s(%d)", pFilePath,  Line + 1);
+		String.Format("%s(%d,%d)", pFilePath, Line + 1, Col + 1);
 		}
 		break; 
 

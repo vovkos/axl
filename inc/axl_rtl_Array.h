@@ -500,6 +500,28 @@ public:
 		return true;
 	}
 
+	size_t
+	Find (T e)
+	{
+		size_t Count = GetCount ();
+		for (size_t i = 0; i < Count; i++)
+			if (m_p [i] == e)
+				return i;
+
+		return -1;
+	}
+
+	size_t
+	FindReverse (T e)
+	{
+		size_t Count = GetCount ();
+		for (intptr_t i = Count - 1; i >= 0; i--)
+			if (m_p [i] == e)
+				return i;
+
+		return -1;
+	}
+
 	T* 
 	GetBuffer ()
 	{ 

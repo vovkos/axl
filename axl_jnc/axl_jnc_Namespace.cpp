@@ -7,6 +7,26 @@ namespace jnc {
 
 //.............................................................................
 
+rtl::CString
+CQualifiedName::GetFullName () const
+{
+	if (m_List.IsEmpty ())
+		return m_First;
+
+	rtl::CString Name;	
+	rtl::CBoxIteratorT <rtl::CString> It = m_List.GetHead ();
+	for (; It; It++)
+	{
+		Name.Append (*It);
+		Name.Append ('.');
+	}
+
+	Name.Append (m_First);
+	return Name;
+}
+
+//.............................................................................
+
 CModuleItem*
 UnAliasItem (CModuleItem* pItem)
 {
@@ -65,50 +85,6 @@ CName::GetQualifiedName ()
 		m_QualifiedName = m_Name;
 
 	return m_QualifiedName;
-}
-
-//.............................................................................
-
-CImport*
-CImport::Goto (const CQualifiedName& Name)
-{
-	CImport* pImport;
-
-	// the root of qualified name
-
-	rtl::CHashTableMapIteratorT <const tchar_t*, CImport*> It = m_ImportMap.Goto (Name.m_First);
-	if (It->m_Value)
-	{
-		pImport = It->m_Value;
-	}
-	else
-	{
-		pImport = AXL_MEM_NEW (CImport);
-		pImport->m_Name = Name.m_First;
-		m_ImportList.InsertTail (pImport);
-		It->m_Value = pImport;
-	}
-
-	// now walk the qualified name
-
-	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
-	for (; NameIt; NameIt++)
-	{
-		It = m_ImportMap.Goto (*NameIt);
-		if (It->m_Value)
-		{
-			pImport = It->m_Value;
-		}
-		else
-		{
-			pImport = AXL_MEM_NEW (CImport);
-			pImport->m_Name = *NameIt;
-			m_ImportList.InsertTail (pImport);
-			It->m_Value = pImport;
-		}
-	}
-
-	return pImport;
 }
 
 //.............................................................................
@@ -215,13 +191,13 @@ CNamespace::ExposeEnumMembers (CEnumType* pType)
 			return false;
 	}
 
-	size_t Count = pType->GetBaseTypeCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CEnumType* pBaseType = pType->GetBaseType (i);
-		if (pBaseType->GetTypeKind () == EType_Enum) 
-			ExposeEnumMembers (pBaseType);
-	}
+	//size_t Count = pType->GetBaseTypeCount ();
+	//for (size_t i = 0; i < Count; i++)
+	//{
+	//	CEnumType* pBaseType = pType->GetBaseType (i);
+	//	if (pBaseType->GetTypeKind () == EType_Enum) 
+	//		ExposeEnumMembers (pBaseType);
+	//}
 	
 	return true;	
 }

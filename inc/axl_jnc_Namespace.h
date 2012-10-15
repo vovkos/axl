@@ -22,6 +22,19 @@ class CQualifiedName
 public:
 	rtl::CString m_First;
 	rtl::CBoxListT <rtl::CString> m_List;
+
+public:
+	CQualifiedName ()
+	{
+	}
+
+	CQualifiedName (const rtl::CString& Name)
+	{
+		m_First = Name;
+	}	
+
+	rtl::CString
+	GetFullName () const;
 };
 
 //.............................................................................
@@ -97,36 +110,6 @@ UnAliasItem (CModuleItem* pItem);
 
 //.............................................................................
 
-class CImport: public rtl::TListLink
-{
-protected:
-	friend class CNamespace;
-
-	rtl::CString m_Name;
-	CDerivedType* m_pType;
-
-	rtl::CStdListT <CImport> m_ImportList; 
-	rtl::CHashTableMapT <const tchar_t*, CImport*, rtl::CHashString, rtl::CCmpString> m_ImportMap; 
-
-public:
-	rtl::CString
-	GetName ()
-	{
-		return m_Name;
-	}
-
-	CDerivedType** 
-	GetType ()
-	{
-		return &m_pType;
-	}
-
-	CImport* 
-	Goto (const CQualifiedName& Name);
-};
-
-//.............................................................................
-
 class CNamespace: public CName
 {
 protected:
@@ -135,7 +118,6 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CHashTableMapT <const tchar_t*, CModuleItem*, rtl::CHashString, rtl::CCmpString> m_ItemMap; 
 	rtl::CStdListT <CAlias> m_AliasList;
-	CImport m_Import;
 
 public:
 	rtl::CString
@@ -165,12 +147,6 @@ public:
 	{
 		ASSERT (Index < m_ItemArray.GetCount ());
 		return m_ItemArray [Index];
-	}
-
-	CDerivedType**
-	GetImportType (const CQualifiedName& Name)
-	{
-		return m_Import.Goto (Name)->GetType ();
 	}
 
 	CAlias*

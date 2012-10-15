@@ -45,7 +45,6 @@ protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
-	rtl::CArrayT <CEnumType*> m_BaseTypeArray;
 	rtl::CStdListT <CEnumMember> m_MemberList;
 	intptr_t m_CurrentValue;
 
@@ -54,19 +53,6 @@ public:
 	{
 		m_TypeKind = EType_Enum;
 		m_CurrentValue = 0;
-	}
-
-	size_t 
-	GetBaseTypeCount ()
-	{
-		return m_BaseTypeArray.GetCount ();
-	}
-
-	CEnumType*
-	GetBaseType (size_t Index)
-	{
-		ASSERT (Index < m_BaseTypeArray.GetCount ());
-		return  m_BaseTypeArray [Index];
 	}
 
 	CEnumMember*

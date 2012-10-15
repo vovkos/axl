@@ -44,13 +44,13 @@ class
 	CQualifiedName m_Name;
 }
 qualified_name
-	: EToken_Identifier             
+	: EToken_Identifier       
 		{  
 			$.m_Name.m_First = $1.m_Data.m_String; 
 		}
-	  ('.' EToken_Identifier $id2
+	  ('.' EToken_Identifier $n2
 		{ 
-			$.m_Name.m_List.InsertTail ($id2.m_Data.m_String);
+			$.m_Name.m_List.InsertTail ($n2.m_Data.m_String);
 		}
 	  )*
 	; 
@@ -60,7 +60,7 @@ qualified_name
 class
 {
 	CType* m_pType;
-}
+} 
 type_name
 	local
 	{	
@@ -69,12 +69,25 @@ type_name
 	: type_specifier_modifier_list
 	  pointer <&$Declarator>* 
 	  declarator_suffix <&$Declarator>*
+		{
+			$.m_pType = $Declarator.GetType (&$1.m_TypeSpecifier, &m_pModule->m_TypeMgr);
+		}
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-generic_formal_argument_list
-	: '<' EToken_Identifier (',' EToken_Identifier)* '>'
+generic_formal_argument_list <CStructClassType* $pType>
+	: '<' generic_formal_argument <$pType> (',' generic_formal_argument <$pType>)* '>'
+	;
+
+generic_formal_argument <CStructClassType* $pType>
+	: EToken_Identifier
+		{						
+			CImportType* pArgumentType = m_pModule->m_TypeMgr.GetImportType ($1.m_Data.m_String, $pType);
+			bool Result = $pType->AddGenericArgument (pArgumentType);
+			if (!Result)
+				return false;
+		}
 	;
 
 generic_actual_argument_list

@@ -103,6 +103,9 @@
     <ClInclude Include="..\inc\axl_jnc_AttributeMgr.h">
       <Filter>module</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_ImportType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />

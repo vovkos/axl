@@ -6,9 +6,52 @@
 
 #include "axl_jnc_Type.h"
 #include "axl_jnc_Namespace.h"
+#include "axl_jnc_ImportType.h"
 
 namespace axl {
 namespace jnc {
+
+//.............................................................................
+
+class CStructClassType: public CNamedType
+{
+protected:
+	rtl::CArrayT <CType*> m_BaseTypeArray;
+	rtl::CArrayT <CImportType*> m_GenericArgumentArray;
+
+public:
+	size_t 
+	GetBaseTypeCount ()
+	{
+		return m_BaseTypeArray.GetCount ();
+	}
+
+	CType*
+	GetBaseType (size_t Index)
+	{
+		ASSERT (Index < m_BaseTypeArray.GetCount ());
+		return m_BaseTypeArray [Index];
+	}
+
+	bool
+	AddBaseType (CType* pType); 
+
+	size_t 
+	GetGenericArgumentCount ()
+	{
+		return m_GenericArgumentArray.GetCount ();
+	}
+
+	CImportType*
+	GetGenericArgument (size_t Index)
+	{
+		ASSERT (Index < m_GenericArgumentArray.GetCount ());
+		return m_GenericArgumentArray [Index];
+	}
+
+	bool
+	AddGenericArgument (CImportType* pType);
+};
 
 //.............................................................................
 
@@ -46,13 +89,12 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CStructType: public CNamedType
+class CStructType: public CStructClassType
 {
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
-	rtl::CArrayT <CStructType*> m_BaseTypeArray;
 	rtl::CStdListT <CStructMember> m_MemberList;
 
 public:

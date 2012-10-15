@@ -85,6 +85,7 @@
     <ClInclude Include="..\Inc\axl_jnc_FunctionMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_FunctionType.h" />
     <ClInclude Include="..\Inc\axl_jnc_ClassType.h" />
+    <ClInclude Include="..\inc\axl_jnc_ImportType.h" />
     <ClInclude Include="..\Inc\axl_jnc_Module.h" />
     <ClInclude Include="..\inc\axl_jnc_ModuleItem.h" />
     <ClInclude Include="..\Inc\axl_jnc_Namespace.h" />

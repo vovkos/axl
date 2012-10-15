@@ -58,6 +58,12 @@ protected:
 		HTREEITEM hParent,
 		jnc::CEnumMember* pMember
 		);
+	
+	void
+	AddStructClassTypeMembers (
+		HTREEITEM hParent,
+		jnc::CStructClassType* pType
+		);
 
 	void
 	AddStructMember (
@@ -79,7 +85,7 @@ protected:
 		);
 
 	void
-	CModulePane::AddFunction (
+	AddFunction (
 		HTREEITEM hParent,
 		const rtl::CString& Name,
 		jnc::CFunctionOverload* pFunction

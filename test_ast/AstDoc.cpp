@@ -84,7 +84,13 @@ CAstDoc::Parse ()
 		if (!Result)
 		{
 			rtl::CString Text = err::GetError ()->GetDescription ();
-			pMainFrame->m_OutputPane.Trace (_T("%s(%d): %s\n"), m_strPathName, pToken->m_Pos.m_Line, Text);
+			pMainFrame->m_OutputPane.Trace (
+				_T("%s(%d,%d): %s\n"), 
+				m_strPathName, 
+				pToken->m_Pos.m_Line + 1, 
+				pToken->m_Pos.m_Col + 1, 
+				Text
+				);
 			return false;
 		}
 

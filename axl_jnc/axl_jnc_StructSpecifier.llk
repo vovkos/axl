@@ -5,23 +5,19 @@ class
 	CStructType* m_pType;
 }
 struct_specifier
-	: struct_kind EToken_Identifier generic_formal_argument_list?
+	: struct_kind $k 
+	  EToken_Identifier $n?
 		{
-			rtl::CString Name = $2.m_Data.m_String;
-			rtl::CString QualifiedName = m_pModule->m_NamespaceMgr.CreateQualifiedName (Name);
-			$.m_pType = m_pModule->m_TypeMgr.GetStructType ($1.m_Type, Name, QualifiedName);
-			
-			bool Result = Declare ($.m_pType, $1.m_FirstToken.m_Pos);
-			if (!Result)
+			$.m_pType = DeclareStructType (
+				$k.m_Type,
+				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ()
+				);
+
+			if (!$.m_pType)
 				return false;
 		}
-		(inheritance_list? struct_block <$.m_pType>)?
-	| struct_kind 
-		{
-			$.m_pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ($1.m_Type);
-			Declare ($.m_pType, $1.m_FirstToken.m_Pos);
-		}	
-	  inheritance_list? 
+	  generic_formal_argument_list <$.m_pType>?
+	  inheritance_list <$.m_pType>?
 	  struct_block <$.m_pType>
 	;
 
@@ -41,7 +37,15 @@ struct_kind
 	;
 
 struct_block <CStructType* $pType>
-	: '{' struct_member_declaration <$pType>* '}'
+	: '{' 
+		{
+			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+		}
+	  struct_member_declaration <$pType>* 
+	  '}'
+		{
+			m_pModule->m_NamespaceMgr.CloseNamespace ();
+		}
 	;
 
 struct_member_declaration <CStructType* $pType>

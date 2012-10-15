@@ -20,14 +20,14 @@ CEnumType::FindMember (
 	if (!Traverse)
 		return NULL;
 
-	size_t Count = m_BaseTypeArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CEnumType* pBaseType = m_BaseTypeArray [i];
-		CEnumMember* pMember = pBaseType->FindMember (pName, true);
-		if (pMember)
-			return pMember;
-	}
+	//size_t Count = m_BaseTypeArray.GetCount ();
+	//for (size_t i = 0; i < Count; i++)
+	//{
+	//	CEnumType* pBaseType = m_BaseTypeArray [i];
+	//	CEnumMember* pMember = pBaseType->FindMember (pName, true);
+	//	if (pMember)
+	//		return pMember;
+	//}
 
 	return NULL;
 }

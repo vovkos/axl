@@ -44,6 +44,8 @@ Members
 	size_t m_DefaultStructPackFactor;
 	EStage m_Stage;
 
+	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
+
 	CParser ()
 	{
 		m_pModule = NULL;
@@ -55,16 +57,43 @@ Members
 	CType*
 	FindType (const CQualifiedName& Name);
 
+	void
+	PushTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
+	{
+		m_TypeSpecifierStack.Append (pTypeSpecifier);
+	}
+
+	void
+	PopTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
+	{
+		m_TypeSpecifierStack.Pop ();
+	}
+
+	bool
+	IsTypeSpecified ();
+
 	bool
 	Declare (
 		CDeclSpecifiers* pDeclSpecifiers,
 		CDeclarator* pDeclarator
 		);
 
-	bool
-	Declare (
-		CNamedType* pType,
-		const CToken::CPos& Pos
+	CClassType*
+	DeclareClassType (
+		EType TypeKind,
+		rtl::CString& Name
+		);
+
+	CStructType*
+	DeclareStructType (
+		EType TypeKind,
+		rtl::CString& Name
+		);
+
+	CEnumType*
+	DeclareEnumType (
+		EType TypeKind,
+		rtl::CString& Name
 		);
 
 	bool

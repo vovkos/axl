@@ -293,7 +293,10 @@ CTypeMgr::GetEnumType (
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_pTypeMgr = this;
+
 	m_EnumTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
 	return pType;
 }
 
@@ -327,7 +330,10 @@ CTypeMgr::GetStructType (
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_pTypeMgr = this;
+
 	m_StructTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
 	return pType;
 }
 
@@ -361,24 +367,34 @@ CTypeMgr::GetClassType (
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_pTypeMgr = this;
+
 	m_ClassTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
 	return pType;
 }
 
-CDerivedType*
-CTypeMgr::CreateImportType ()
+CImportType*
+CTypeMgr::GetImportType (
+	const CQualifiedName& Name,
+	CNamespace* pAnchorNamespace
+	)
 {
-	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
+	rtl::CStringA Signature;
+	Signature.Format (_T("Z%s.%s"), pAnchorNamespace->GetQualifiedName (), Name.GetFullName ());
+	
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CImportType*) It->m_Value;
+
+	CImportType* pType = AXL_MEM_NEW (CImportType);
+	pType->m_Name = Name;
+	pType->m_pAnchorNamespace = pAnchorNamespace;
 	pType->m_pTypeMgr = this;
-	pType->m_TypeKind = EType_Import;
-	pType->m_Signature.Format ("Z{%x}", pType);
 
-	m_DerivedTypeList.InsertTail (pType);
-
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (pType->m_Signature);
-	ASSERT (!It->m_Value);
-
+	m_ImportTypeList.InsertTail (pType);
 	It->m_Value = pType;
+
 	return pType;
 }
 

@@ -10,6 +10,7 @@
 #include "axl_jnc_Namespace.h"
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
+#include "axl_jnc_ImportType.h"
 
 namespace axl {
 namespace jnc {
@@ -141,13 +142,12 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CClassType: public CNamedType
+class CClassType: public CStructClassType
 {
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
-	rtl::CArrayT <CType*> m_BaseTypeArray; // structs, interfaces or classes
 	rtl::CStdListT <CClassFieldMember> m_FieldMemberList;
 	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
 	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;

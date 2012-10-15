@@ -32,6 +32,7 @@ protected:
 	rtl::CStdListT <CEnumType> m_EnumTypeList;
 	rtl::CStdListT <CStructType> m_StructTypeList;
 	rtl::CStdListT <CClassType> m_ClassTypeList;
+	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CHashTableMapT <const char*, CType*, rtl::CHashString, rtl::CCmpString> m_TypeMap;
 	
@@ -122,8 +123,11 @@ public:
 		return GetClassType (TypeKind, rtl::CString (), rtl::CString ());
 	}
 
-	CDerivedType*
-	CreateImportType ();
+	CImportType*
+	GetImportType (	
+		const CQualifiedName& Name,
+		CNamespace* pAnchorNamespace
+		);
 
 protected:
 	void

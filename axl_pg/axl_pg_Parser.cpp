@@ -583,9 +583,22 @@ CParser::ProcessFormalArgList (CSymbolNode* pNode)
 
 	for (;;)
 	{
-		pToken = Lexer.ExpectToken (EToken_Identifier);
-		if (!pToken)
+		pToken = Lexer.GetToken ();
+		
+		if (!pToken->m_Token)
+			break;
+
+		if (pToken->m_Token == EToken_Error)
+		{
+			err::SetError (pToken->m_Data.m_Error);
 			return false;
+		}
+
+		if (pToken->m_Token != EToken_Identifier)
+		{
+			Lexer.NextToken ();
+			continue;
+		}
 
 		rtl::CString Name = pToken->m_Data.m_String;
 

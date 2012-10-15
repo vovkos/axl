@@ -81,6 +81,13 @@ enum EType
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum ETypeFlag
+{
+	ETypeFlag_IsIncomplete = 0x01,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum ETypeModifier
 {
 	ETypeModifier_Const             = 0x0001,
@@ -139,6 +146,7 @@ protected:
 	CTypeMgr* m_pTypeMgr;
 
 	EType m_TypeKind;
+	ulong_t m_Flags;
 	size_t m_Size; // not really necessary for most types, but it's nice to have it in plain text
 
 	rtl::CStringA m_Signature;

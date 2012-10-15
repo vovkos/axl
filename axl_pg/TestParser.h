@@ -69,6 +69,25 @@ public:
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 	
+	class CSymbolNode_global: public CSymbolNode
+	{
+	public:
+			
+		struct
+		{
+#line 5 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
+			std::list <int>* p;
+#line 81 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
+		} m_Arg;	
+			
+		CSymbolNode_global ()
+		{
+			m_Flags = axl::llk::ESymbolNodeFlag_IsNamed;
+			m_Index = ESymbol_global;
+			
+		}
+	};
+		
 	
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -188,6 +207,13 @@ public:
 		switch (Index)
 		{
 		
+		case ESymbol_global:
+			pNode = AXL_MEM_NEW (CSymbolNode_global);
+			
+			pNode->m_pAst = AXL_MEM_NEW (CAst);
+			
+			break;
+			
 		
 		default:
 			pNode = CreateStdSymbolNode (Index);
@@ -231,50 +257,50 @@ public:
 		
 		case 0:
 			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CSymbolNode_global* __pSymbol = (CSymbolNode_global*) GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
-#line 6 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
+#line 6 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
 			 return (*GetTokenLocator (0)).m_Data.m_String == "hui"; ;
-#line 239 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
+#line 265 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
 			}
 
 			return true;
 		
 		case 1:
 			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CSymbolNode_global* __pSymbol = (CSymbolNode_global*) GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
-#line 7 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
+#line 7 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
 			 
 			printf ("A %s\n", (*GetTokenLocator (1)).m_Data.m_String); 
 		;
-#line 252 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
+#line 278 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
 			}
 
 			return true;
 		
 		case 2:
 			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CSymbolNode_global* __pSymbol = (CSymbolNode_global*) GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
-#line 12 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
+#line 12 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
 			 
 			printf ("C+ %s\n", (*GetTokenLocator (0)).m_Data.m_String); 
 		;
-#line 265 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
+#line 291 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
 			}
 
 			return true;
 		
 		case 3:
 			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CSymbolNode_global* __pSymbol = (CSymbolNode_global*) GetSymbolTop ();
 			CAst* __pAst = __pSymbol->m_pAst;
-#line 17 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.llg"
+#line 17 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
 			 
 			printf ("C %s\n", (*GetTokenLocator (0)).m_Data.m_String); 
 		;
-#line 278 "D:\\Projects.v\\AXL3\\axl_pg\\TestParser.h"
+#line 304 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
 			}
 
 			return true;

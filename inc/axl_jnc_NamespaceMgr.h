@@ -17,8 +17,8 @@ protected:
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
-	rtl::CArrayT <CGlobalNamespace*> m_NamespaceStack;
-	CGlobalNamespace* m_pCurrentNamespace;
+	rtl::CArrayT <CNamespace*> m_NamespaceStack;
+	CNamespace* m_pCurrentNamespace;
 
 public:
 	CNamespaceMgr ()
@@ -35,7 +35,7 @@ public:
 		return &m_GlobalNamespace;
 	}
 	
-	CGlobalNamespace* 
+	CNamespace* 
 	GetCurrentNamespace ()
 	{
 		return m_pCurrentNamespace;
@@ -64,6 +64,9 @@ public:
 		const CToken::CPos& Pos,
 		const CQualifiedName& Name
 		);
+
+	void
+	OpenNamespace (CNamespace* pNamespace);
 
 	void
 	CloseNamespace (size_t Count = 1);

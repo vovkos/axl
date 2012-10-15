@@ -40,7 +40,7 @@ CNamespaceMgr::OpenNamespace (
 	const CQualifiedName& Name
 	)
 {
-	CNamespace* pNamespace = OpenNamespace (Pos, Name.m_First);
+	CGlobalNamespace* pNamespace = OpenNamespace (Pos, Name.m_First);
 	if (!pNamespace)
 		return NULL;
 
@@ -52,7 +52,8 @@ CNamespaceMgr::OpenNamespace (
 			return NULL;
 	}
 	
-	return m_pCurrentNamespace;
+	ASSERT (m_pCurrentNamespace == pNamespace);
+	return pNamespace;
 }
 
 CGlobalNamespace*
@@ -84,6 +85,18 @@ CNamespaceMgr::OpenNamespace (
 	m_NamespaceStack.Append (pNamespace);
 	m_pCurrentNamespace = pNamespace;
 	return pNamespace;
+}
+
+void
+CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
+{
+	if (!pNamespace->m_pParentNamespace)
+		pNamespace->m_pParentNamespace = m_pCurrentNamespace;
+	else
+		ASSERT (pNamespace->m_pParentNamespace == m_pCurrentNamespace);
+
+	m_NamespaceStack.Append (pNamespace);
+	m_pCurrentNamespace = pNamespace;
 }
 
 void

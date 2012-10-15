@@ -66,6 +66,7 @@ CType::CType ()
 	m_pTypeMgr = NULL;
 	m_ItemKind = EModuleItem_Type;
 	m_TypeKind = EType_Void;
+	m_Flags = 0;
 	m_Size = 0;
 }
 
@@ -158,6 +159,10 @@ CType::GetTypeString ()
 
 	case EType_Interface:
 		m_TypeString.Format (_T("interface %s"), ((CNamedType*) this)->GetQualifiedName ());
+		break;
+
+	case EType_Import:
+		m_TypeString = ((CImportType*) this)->GetName ().GetFullName ();
 		break;
 
 	case EType_Property:

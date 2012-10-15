@@ -84,7 +84,7 @@ namespace jnc.io
 		Description = "IFile interface",
 		Integer = RGB (255, 128, 64),
 	]
-	interface IFile
+	interface IFile 
 	{
 		bool 
 		Open (
@@ -115,10 +115,11 @@ namespace jnc.io
 		Integer = 20,	
 		Unique,
 	]
-	struct TPoint
+	struct TPointT <T>
 	{
-		int x;
-		int y;
+		T x;
+		T y;
+		T z;
 	};
 
 	interface ISocket
@@ -183,19 +184,46 @@ namespace jnc.rtl
 	{
 	};
 
-	interface IArray
+	interface IArrayT <T>
+	{
+		const bool property IsEmpty;
+
+		const int property Count;
+
+		void
+		Append ();
+
+		void
+		Insert ();
+
+		void
+		Delete ();
+	};
+
+	class CArrayT <T>: IArrayT <T>
 	{
 	};
 
-	class CArray: IArray
+	interface IListT <T>
 	{
+		const bool property IsEmpty;
+
+		const int property Count;
+
+		void
+		Insert ();
+
+		void
+		InsertHead ();
+
+		void
+		InsertTail ();
+
+		void
+		Delete ();
 	};
 
-	interface IList
-	{
-	};
-
-	class CList: IList
+	class CListT <T>: IListT <T>
 	{
 	};
 }

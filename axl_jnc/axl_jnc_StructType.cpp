@@ -7,6 +7,34 @@ namespace jnc {
 
 //.............................................................................
 
+bool
+CStructClassType::AddBaseType (CType* pType)
+{
+	if (m_BaseTypeArray.Find (pType) != -1)
+	{
+		err::SetFormatStringError (_T("'%s' is already a base type"), pType->GetTypeString ());
+		return false;
+	}
+
+	m_BaseTypeArray.Append (pType);
+	return true;
+}
+
+bool
+CStructClassType::AddGenericArgument (CImportType* pType)
+{
+	if (m_GenericArgumentArray.Find (pType) != -1)
+	{
+		err::SetFormatStringError (_T("multiple generic argument names '%s'"), pType->GetTypeString ());
+		return false;
+	}
+
+	m_GenericArgumentArray.Append (pType);
+	return true;
+}
+
+//.............................................................................
+
 CStructMember*
 CStructType::FindMember (
 	const tchar_t* pName,
@@ -23,8 +51,19 @@ CStructType::FindMember (
 	size_t Count = m_BaseTypeArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CStructType* pBaseType = m_BaseTypeArray [i];
-		CStructMember* pMember = pBaseType->FindMember (pName, true);
+		CType* pBaseType = m_BaseTypeArray [i];
+		EType TypeKind = pBaseType->GetTypeKind ();
+
+		CStructMember* pMember = NULL;
+
+		switch (TypeKind)
+		{
+		case EType_Struct:
+		case EType_Union:
+			pMember = ((CStructType*) pBaseType)->FindMember (pName, true);
+			break;
+		}
+
 		if (pMember)
 			return pMember;
 	}

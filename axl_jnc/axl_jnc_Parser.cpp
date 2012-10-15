@@ -6,24 +6,25 @@ namespace jnc {
 
 //.............................................................................
 
+bool
+CParser::IsTypeSpecified ()
+{
+	if (m_TypeSpecifierStack.IsEmpty ())
+		return false;
+
+	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
+	return 
+		pTypeSpecifier->GetType () != NULL ||
+		pTypeSpecifier->GetProperty () != NULL;
+}
+
 CType*
 CParser::FindType (const CQualifiedName& Name)
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
 	if (m_Stage == EStage_Pass1)
-	{
-		CDerivedType** ppType = pNamespace->GetImportType (Name);
-		CDerivedType* pType = *ppType;
-		
-		if (!pType)
-		{
-			pType = m_pModule->m_TypeMgr.CreateImportType ();
-			*ppType = pType;
-		}
-
-		return pType;
-	}
+		return m_pModule->m_TypeMgr.GetImportType (Name, pNamespace);
 
 	CModuleItem* pItem = pNamespace->FindItemTraverse (Name);
 	if (!pItem)
@@ -34,29 +35,72 @@ CParser::FindType (const CQualifiedName& Name)
 	return pItem->GetItemKind () == EModuleItem_Type ? (CType*) pItem : NULL;
 }
 
-bool
-CParser::Declare (
-	CNamedType* pType,
-	const CToken::CPos& Pos
+CClassType*
+CParser::DeclareClassType (
+	EType TypeKind,
+	rtl::CString& Name
 	)
 {
-	m_pModule->m_AttributeMgr.AssignAttributeSet (pType);
-	pType->m_Pos = Pos;
+	bool Result;
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	if (!pType->IsNamed ())
-		return true;
-	
-	CModuleItem* pOldItem = pNamespace->FindItem (pType->GetName ());
-	if (pOldItem)
-	{
-		// TODO: some checks
+	CClassType* pType = NULL;
 
-		return true;
-	}
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedClassType (TypeKind);
+
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	pType = m_pModule->m_TypeMgr.GetClassType (TypeKind, Name, QualifiedName);
+
+	Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
 	
-	pNamespace->AddItem (pType);
-	return true;
+	return pType;
+}
+
+CStructType*
+CParser::DeclareStructType (
+	EType TypeKind,
+	rtl::CString& Name
+	)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CStructType* pType = NULL;
+
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedStructType (TypeKind);
+
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	pType = m_pModule->m_TypeMgr.GetStructType (TypeKind, Name, QualifiedName);
+
+	Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
+	
+	return pType;
+}
+
+CEnumType*
+CParser::DeclareEnumType (
+	EType TypeKind,
+	rtl::CString& Name
+	)
+{
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedEnumType (TypeKind);
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	CEnumType* pType = m_pModule->m_TypeMgr.GetEnumType (TypeKind, Name, QualifiedName);
+
+	bool Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
+
+	return pType;
 }
 
 void
