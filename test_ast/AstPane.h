@@ -8,10 +8,11 @@ class CAstPane : public CDockablePane
 {
 protected:
 	CTreeCtrl m_TreeCtrl;
+	ref::CBufT <jnc::CParser::CAst> m_Ast;
 
 public:
 	bool
-	Build (jnc::CParser::CAst* pAstRoot);
+	Build (ref::CBufT <jnc::CParser::CAst> Ast);
 
 	void
 	Clear ();
@@ -20,7 +21,7 @@ protected:
 	HTREEITEM 
 	AddAst (
 		HTREEITEM hParent,
-		jnc::CParser::CAst* pAst
+		jnc::CParser::CAstNode* pAstNode
 		);
 
 protected:

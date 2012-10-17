@@ -7,6 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
+CTypeMgr::CTypeMgr ()
+{
+	m_pModule = NULL;
+	SetupAllBasicTypes ();
+}
+
 void
 CTypeMgr::Clear ()
 {
@@ -61,6 +67,35 @@ CTypeMgr::SetupBasicType (
 	pType->m_Signature = pSignature;
 
 	m_TypeMap.Goto (pSignature)->m_Value = pType;
+}
+
+bool
+CTypeMgr::ResolveImports ()
+{
+	rtl::CIteratorT <CImportType> ImportType = m_ImportTypeList.GetHead ();
+	for (; ImportType; ImportType++)
+	{
+		CImportType* pImportType = *ImportType;
+		CModuleItem* pItem = pImportType->m_pAnchorNamespace->FindItemTraverse (pImportType->m_Name);
+		if (!pItem)
+		{
+			err::SetFormatStringError (_T("unresolved import '%s'"), pImportType->m_Name.GetFullName ());
+			return false;
+		}
+
+		pItem = UnAliasItem (pItem);
+		
+		EModuleItem ItemKind = pItem->GetItemKind ();
+		if (ItemKind != EModuleItem_Type)
+		{
+			err::SetFormatStringError (_T("'%s' is not a type"), pImportType->m_Name.GetFullName ());
+			return false;
+		}
+
+		pImportType->m_pExternType = (CType*) pItem;
+	}
+
+	return true;
 }
 
 CType* 

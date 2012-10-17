@@ -64,7 +64,7 @@ struct_member_declarator_list <CTypeSpecifierModifiers* $pTypeSpecifier, CStruct
 struct_member_declarator <CTypeSpecifierModifiers* $pTypeSpecifier, CStructType* $pType>
 	: declarator (':' struct_member_bit_field)? ('=' initializer)?
 		{
-			bool Result = DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator);
+			bool Result = DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator) != NULL;
 			if (!Result)
 				return false;
 		}

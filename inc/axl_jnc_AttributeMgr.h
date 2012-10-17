@@ -14,13 +14,16 @@ namespace jnc {
 class CAttributeMgr: public rtl::TListLink
 {
 protected:
-	rtl::CStdListT <CAttributeSet> m_AttributeSetList;
+	friend class CModule;
+	CModule* m_pModule;
 
+	rtl::CStdListT <CAttributeSet> m_AttributeSetList;
 	CAttributeSet* m_pCurrentAttributeSet;
 
 public:
 	CAttributeMgr ()
 	{
+		m_pModule = NULL;
 		m_pCurrentAttributeSet = NULL;
 	}
 

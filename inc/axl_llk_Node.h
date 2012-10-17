@@ -89,14 +89,14 @@ enum ESymbolNodeFlag
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <class TAst>
+template <class TAstNode>
 class CSymbolNodeT: public CNode
 {
 public:
-	typedef TAst CAst;
+	typedef TAstNode CAstNode;
 
 public:
-	CAst* m_pAst;
+	CAstNode* m_pAstNode;
 
 	rtl::CStdListT <CNode> m_LocatorList;
 	rtl::CArrayT <CNode*> m_LocatorArray;
@@ -105,14 +105,14 @@ public:
 	CSymbolNodeT ()
 	{
 		m_Kind = ENode_Symbol;
-		m_pAst = NULL;
+		m_pAstNode = NULL;
 	}
 
 	virtual
 	~CSymbolNodeT ()
 	{
-		if (m_pAst && !(m_Flags & ESymbolNodeFlag_KeepAst))
-			AXL_MEM_DELETE (m_pAst);
+		if (m_pAstNode && !(m_Flags & ESymbolNodeFlag_KeepAst))
+			AXL_MEM_DELETE (m_pAstNode);
 	}
 };
 

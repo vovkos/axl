@@ -10,6 +10,7 @@
 #include "axl_jnc_FunctionMgr.h"
 #include "axl_jnc_VariableMgr.h"
 #include "axl_jnc_ConstMgr.h"
+#include "axl_jnc_ControlFlowMgr.h"
 
 namespace axl {
 namespace jnc {
@@ -19,17 +20,18 @@ namespace jnc {
 class CModule
 {
 public:
+	rtl::CString m_FilePath;
+
 	CAttributeMgr m_AttributeMgr;
 	CTypeMgr m_TypeMgr;
 	CNamespaceMgr m_NamespaceMgr;
 	CFunctionMgr m_FunctionMgr;
 	CVariableMgr m_VariableMgr;
 	CConstMgr m_ConstMgr;
+	CControlFlowMgr m_ControlFlowMgr;
 
 public:
-	CModule ()
-	{
-	}
+	CModule ();
 
 	void
 	Clear ();

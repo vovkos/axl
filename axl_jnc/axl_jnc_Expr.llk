@@ -1,14 +1,22 @@
 //.............................................................................
 
+class
+{
+	rtl::CBoxListT <CToken> m_TokenList;
+}
 expression_pass1
-	: primary_expression_pass1+
+	: primary_expression_pass1 <&$.m_TokenList>+
 	;
 
-primary_expression_pass1
-	: '{' primary_expression_pass1+ '}'
-	| '[' primary_expression_pass1+ ']'
-	| '(' primary_expression_pass1* ')'
+noast
+primary_expression_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	: '{' primary_expression_pass1 <$pTokenList>+ '}'
+	| '[' primary_expression_pass1 <$pTokenList>+ ']'
+	| '(' primary_expression_pass1 <$pTokenList>* ')'
 	| any
+		{
+			$pTokenList->InsertTail ($1);
+		}
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -166,7 +174,7 @@ call_operator
 	; 
 
 primary_expression
-	: EToken_Identifier generic_actual_argument_list?
+	: EToken_Identifier
 	| EToken_Integer
 	| EToken_Fp
 	| EToken_Literal

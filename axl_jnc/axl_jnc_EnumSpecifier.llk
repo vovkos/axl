@@ -7,7 +7,8 @@ class
 enum_specifier
 	leave
 	{
-		if ($.m_pType->GetTypeKind () == EType_EnumC)
+		if ($.m_pType->GetTypeKind () == EType_EnumC ||
+			$.m_pType->GetName ().IsEmpty ())
 		{
 			bool Result = m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumMembers ($.m_pType);
 			if (!Result)
@@ -60,13 +61,16 @@ enum_member_list <CEnumType* $pType>
 	;
 
 enum_member <CEnumType* $pType>
-	: EToken_Identifier ('=' expression_pass1)?
+	: EToken_Identifier ('=' expression_pass1 $e)?
 		{
 			CEnumMember* pMember = $pType->CreateMember ($1.m_Data.m_String);
 			if (!pMember)
 				return false;
 
 			pMember->m_Pos = $1.m_Pos;
+			
+			if (IsValidLocator ($e)) 
+				pMember->SetExpression (&$e.m_TokenList);
 		}
 	| epsilon
 	;

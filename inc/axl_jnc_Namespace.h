@@ -110,16 +110,38 @@ UnAliasItem (CModuleItem* pItem);
 
 //.............................................................................
 
+enum ENamespace
+{
+	ENamespace_Global = 0,
+	ENamespace_NamedType,
+	ENamespace_Scope,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CNamespace: public CName
 {
 protected:
 	friend class CNamespaceMgr;
+
+	ENamespace m_NamespaceKind;
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CHashTableMapT <const tchar_t*, CModuleItem*, rtl::CHashString, rtl::CCmpString> m_ItemMap; 
 	rtl::CStdListT <CAlias> m_AliasList;
 
 public:
+	CNamespace ()
+	{
+		m_NamespaceKind = ENamespace_Global;
+	}
+
+	ENamespace 
+	GetNamespaceKind ()
+	{
+		return m_NamespaceKind;
+	}
+
 	rtl::CString
 	CreateQualifiedName (const tchar_t* pName);
 
@@ -184,8 +206,10 @@ class CScope:
 protected:
 	friend class CNamespaceMgr;
 
-	void* m_pBegin;
-	void* m_pEnd;
+	CToken::CPos m_PosEnd;
+
+	void* m_pCodeBegin;
+	void* m_pCodeEnd;
 
 	// local variable list for debugger
 
@@ -193,6 +217,15 @@ public:
 	CScope ()
 	{
 		m_ItemKind = EModuleItem_Scope;
+		m_NamespaceKind = ENamespace_Scope;
+		m_pCodeBegin = NULL;
+		m_pCodeEnd = NULL;
+	}
+
+	CToken::CPos 
+	GetPosEnd ()
+	{
+		return m_PosEnd;
 	}
 };
 
@@ -210,6 +243,7 @@ public:
 	CGlobalNamespace ()
 	{
 		m_ItemKind = EModuleItem_Namespace;
+		m_NamespaceKind = ENamespace_Global;
 	}
 };
 

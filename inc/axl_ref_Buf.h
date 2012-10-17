@@ -134,6 +134,13 @@ public:
 		m_p = NULL;
 	}
 
+	T* 
+	Create (size_t Size = sizeof (T))
+	{
+		Release ();
+		return AllocateBuffer (Size, NULL);
+	}
+
 	bool
 	Copy (const CBufT& Src)
 	{
@@ -156,19 +163,19 @@ public:
 	bool
 	Copy (const T& Src)
 	{
-		return m_p == &Src ? true : GetBuffer (TGetSize () (Src), &Src) != NULL;
+		return m_p == &Src ? true : AllocateBuffer (TGetSize () (Src), &Src) != NULL;
 	}
 
 	T* 
 	GetBuffer ()
 	{
-		return GetBuffer (m_p ? TGetSize () (*m_p) : sizeof (T), m_p);
+		return AllocateBuffer (m_p ? TGetSize () (*m_p) : sizeof (T), m_p);
 	}
 
 	T* 
 	GetBuffer (size_t Size, bool SaveContents = false)
 	{
-		return GetBuffer (Size, SaveContents ? m_p : NULL);
+		return AllocateBuffer (Size, SaveContents ? m_p : NULL);
 	}
 
 	bool 
@@ -185,7 +192,7 @@ protected:
 	}
 
 	T* 
-	GetBuffer (
+	AllocateBuffer (
 		size_t Size,
 		const T* pSrc
 		)

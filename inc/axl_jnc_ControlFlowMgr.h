@@ -14,7 +14,35 @@ namespace jnc {
 class CControlFlowMgr
 {
 protected:
-	rtl::CStdListT <CBasicBlock> m_BasicBlockList;
+	friend class CModule;
+	CModule* m_pModule;
+
+	rtl::CStdListT <CBasicBlock> m_BlockList;
+	CBasicBlock* m_pCurrentBlock;
+
+public:
+	CControlFlowMgr ()
+	{
+		m_pModule = NULL;
+	}
+
+	void
+	Clear ();
+
+	CBasicBlock* 
+	CreateBlock ();
+
+	CBasicBlock* 
+	GetCurrentBlock ()
+	{
+		return m_pCurrentBlock;
+	}
+
+	void
+	SetCurrentBlock (
+		CBasicBlock* pBlock,
+		int Flags = 0
+		);
 };
 
 //.............................................................................

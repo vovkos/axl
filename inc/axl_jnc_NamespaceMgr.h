@@ -14,17 +14,18 @@ namespace jnc {
 class CNamespaceMgr
 {
 protected:
+	friend class CModule;
+	CModule* m_pModule;
+
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
 	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 	CNamespace* m_pCurrentNamespace;
+	CScope* m_pCurrentScope;
 
 public:
-	CNamespaceMgr ()
-	{
-		m_pCurrentNamespace = &m_GlobalNamespace;
-	}
+	CNamespaceMgr ();
 
 	void
 	Clear ();
@@ -50,9 +51,6 @@ public:
 	CGlobalNamespace*
 	CreateNamespace (const rtl::CString& Name);
 
-	CScope*
-	CreateScope ();
-
 	CGlobalNamespace*
 	OpenNamespace (
 		const CToken::CPos& Pos,
@@ -70,6 +68,12 @@ public:
 
 	void
 	CloseNamespace (size_t Count = 1);
+
+	CScope*
+	OpenScope (const CToken::CPos& Pos);
+
+	void
+	CloseScope (const CToken::CPos& Pos);
 };
 
 //.............................................................................

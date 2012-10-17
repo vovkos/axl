@@ -10,21 +10,51 @@
 namespace axl {
 namespace jnc {
 
-class CModule;
-
 //.............................................................................
 
 class CFunctionMgr
 {
 protected:
+	friend class CModule;
+	CModule* m_pModule;
+
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
 	rtl::CStdListT <CGlobalProperty> m_GlobalPropertyList;
 
 public:
+	CFunctionMgr ()
+	{
+		m_pModule = NULL;
+	}
+
 	void
 	Clear ();
+
+	rtl::CIteratorT <CFunction>
+	GetFirstFunction ()
+	{
+		return m_FunctionList.GetHead ();
+	}
+
+	rtl::CIteratorT <CProperty>
+	GetFirstProperty ()
+	{
+		return m_PropertyList.GetHead ();
+	}
+
+	rtl::CIteratorT <CGlobalFunction>
+	GetFirstGlobalFunction ()
+	{
+		return m_GlobalFunctionList.GetHead ();
+	}
+
+	rtl::CIteratorT <CGlobalProperty>
+	GetFirstGlobalProperty ()
+	{
+		return m_GlobalPropertyList.GetHead ();
+	}
 
 	CFunction*
 	CreateFunction (
@@ -68,6 +98,9 @@ public:
 		const rtl::CString& Name,
 		CProperty* pProperty
 		);
+
+	bool
+	CompileFunctions ();
 };
 
 //.............................................................................

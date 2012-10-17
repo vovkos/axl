@@ -1,239 +1,29 @@
-//.............................................................................
-
-namespace jnc.io 
-{
-	enum EColor
-	{
-		Red = 1,
-		Green = COLOR_GREEN,
-		Blue = RGB(0, 0, 255),
-	};
-
-	enumc EPublicColor
-	{
-		PublicRed,
-		PublicGreen,
-		PublicBlue,
-	};
-
-	typedef unsigned char uchar_t;
-	typedef unsigned short ushort_t;
-
-	int* p;
-
-	char a [20];
-
-	void
-	InitializeIo (int x);
-
-	void
-	InitializeIo (double f);
-
-	void
-	InitializeIo (
-		int a,
-		unsigned int b,
-		bigendian int c
-		);
-
-	bool const property MyProperty;
-
-	property
-	{
-		int
-		get ();
-
-		void
-		set (int i);
-
-		void
-		set (double d);
-
-		void 
-		set (void* p);
-	} OverloadedProperty;
-
-	property
-	{
-		double
-		get (unsigned int Index);
-
-		void
-		set (
-			unsigned int Index,
-			int Value
-			);
-
-		void
-		set (
-			unsigned int Index,
-			double Value
-			);
-	} IndexedProperty;
-
-	property
-	{
-		void*
-		get (unsigned int Index);
-	} IndexedReadOnlyProperty;
-
-	bool IsIoInitialized;	
-
-	[
-		Singleton,
-		Description = "IFile interface",
-		Integer = RGB (255, 128, 64),
-	]
-	interface IFile 
-	{
-		bool 
-		Open (
-			const char* pName, 
-			int Mode
-			);
-
-		void
-		Close ();
-
-		const bool property IsOpen;
-
-		unsigned long 
-		Read (
-			void* p,
-			unsigned long Size
-			);
-
-		unsigned long 
-		Write (
-			const void* p,
-			unsigned long Size
-			);
-	};
-
-	[
-		Description = "TPoint struct",
-		Integer = 20,	
-		Unique,
-	]
-	struct TPointT <T>
-	{
-		T x;
-		T y;
-		T z;
-	};
-
-	interface ISocket
-	{
-		bool 
-		Connect (
-			unsigned long Ip,
-			unsigned short Port 
-			);
-
-		void
-		Disconnect ();
-
-		const bool property IsConnected;
-		
-		void
-		Reset ();
-
-		unsigned long 
-		Send (
-			const void* p,
-			unsigned long Size
-			);
-
-		unsigned long 
-		Recv (
-			void* p,
-			unsigned long Size
-			);
-	};
-
-	class CFile: IFile
-	{
-		typedef unsigned int THandle;
-	};
-
-	class CSocket: ISocket
-	{
-	};
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-namespace jnc.rtl
-{
-	typedef unsigned bigendian long ulong_t;
-
-	char* p2;
-
-	long* b [] [20];
-
-	void
-	InitializeRtl ();
-
-	bool IsRtlInitialized;	
-
-	interface IString
-	{
-	};
-
-	class CString: IString
-	{
-	};
-
-	interface IArrayT <T>
-	{
-		const bool property IsEmpty;
-
-		const int property Count;
-
-		void
-		Append ();
-
-		void
-		Insert ();
-
-		void
-		Delete ();
-	};
-
-	class CArrayT <T>: IArrayT <T>
-	{
-	};
-
-	interface IListT <T>
-	{
-		const bool property IsEmpty;
-
-		const int property Count;
-
-		void
-		Insert ();
-
-		void
-		InsertHead ();
-
-		void
-		InsertTail ();
-
-		void
-		Delete ();
-	};
-
-	class CListT <T>: IListT <T>
-	{
-	};
-}
+typedef unsigned int8  uint8_t,  uchar_t,  byte_t;
+typedef unsigned int16 uint16_t, ushort_t, word_t;
+typedef unsigned int32 uint32_t, ulong_t,  dword_t;
+typedef unsigned int64 uint64_t, qword_t;
 
 //.............................................................................
 
-namespace gdi
+enum EColor
 {
-	const property int ScreenWidth;
-	const int property ScreenHeight;	
+	Red   = 1, 
+	Green = 2,
+	Blue  
+};
+
+void
+test (
+	int a,
+	int b
+	)
+{
+	int i, j, k, l, m;
+
+	if (i < j)
+		m = i * j + k / l;
+	else
+		m = i % j - k << l;
 }
 
 //.............................................................................

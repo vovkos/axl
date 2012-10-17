@@ -34,45 +34,47 @@
 IMPLEMENT_DYNCREATE(CAstDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CAstDoc, CDocument)
-	ON_COMMAND(ID_FILE_PARSE, OnFileParse)
+	ON_COMMAND(ID_FILE_COMPILE, OnFileCompile) 
 END_MESSAGE_MAP()
-
 
 // CAstDoc construction/destruction
 
 CAstDoc::CAstDoc()
 {
-	m_Parser.m_pModule = &m_Module;
 }
 
 CAstDoc::~CAstDoc()
 {
 }
 
-void CAstDoc::OnFileParse()
+void CAstDoc::OnFileCompile()
 {
-	Parse ();
+	Compile ();
 }
 
 bool
-CAstDoc::Parse ()
+CAstDoc::Compile ()
 {
 	bool Result;
 
 	CMainFrame* pMainFrame = GetMainFrame ();
 
 	pMainFrame->m_OutputPane.Trace (_T("Parsing...\n"));
-	pMainFrame->m_AstPane.Clear ();
+	pMainFrame->m_GlobalAstPane.Clear ();
+	pMainFrame->m_FunctionAstPane.Clear ();
 	pMainFrame->m_ModulePane.Clear ();
 
 	m_Module.Clear ();
+	m_Module.m_FilePath = GetPathName ();
 
 	GetView ()->GetWindowText (m_SourceText);
 
 	jnc::CLexer Lexer;
 	Lexer.Create ((const tchar_t*) m_strPathName, m_SourceText, m_SourceText.GetLength ());
 
-	m_Parser.Create (jnc::CParser::StartSymbol, true);
+	jnc::CParser Parser;
+	Parser.m_pModule = &m_Module;
+	Parser.Create (jnc::CParser::StartSymbol, true);
 
 	for (;;)
 	{
@@ -80,7 +82,7 @@ CAstDoc::Parse ()
 		if (pToken->m_Token == jnc::EToken_Eof)
 			break;
 
-		Result = m_Parser.ParseToken (pToken);
+		Result = Parser.ParseToken (pToken);
 		if (!Result)
 		{
 			rtl::CString Text = err::GetError ()->GetDescription ();
@@ -94,12 +96,26 @@ CAstDoc::Parse ()
 			return false;
 		}
 
-
 		Lexer.NextToken ();
 	}
 
-	jnc::CParser::CAst* pAst = m_Parser.GetAstRoot ();
-	pMainFrame->m_AstPane.Build (pAst);
+	pMainFrame->m_OutputPane.Trace (_T("Resolving imports...\n"));
+	Result = m_Module.m_TypeMgr.ResolveImports ();
+	if (!Result)
+	{
+		rtl::CString Text = err::GetError ()->GetDescription ();
+		pMainFrame->m_OutputPane.Trace (_T("%s\n"), Text);
+	}
+
+	pMainFrame->m_OutputPane.Trace (_T("Compiling functions...\n"));
+	Result = m_Module.m_FunctionMgr.CompileFunctions ();
+	if (!Result)
+	{
+		rtl::CString Text = err::GetError ()->GetDescription ();
+		pMainFrame->m_OutputPane.Trace (_T("%s\n"), Text);
+	}
+	
+	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
 	pMainFrame->m_ModulePane.Build (&m_Module);
 	pMainFrame->m_OutputPane.Trace (_T("Done.\n"));
 	return true;
@@ -136,7 +152,7 @@ BOOL CAstDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 	m_strPathName = lpszPathName;
 
-	Parse ();
+	Compile ();
 
 	SetModifiedFlag(FALSE);
 	return TRUE;

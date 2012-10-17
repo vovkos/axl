@@ -54,3 +54,4 @@ extern "C" {
 #include "axl_rtl_StringCache.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_lex_RagelLexer.h"
+#include "axl_dbg_Trace.h"

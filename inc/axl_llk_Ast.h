@@ -14,7 +14,7 @@ namespace llk {
 //.............................................................................
 
 template <class TToken>
-class CAstT: public rtl::TListLink
+class CAstNodeT: public rtl::TListLink
 {
 public:
 	typedef TToken CToken;
@@ -28,19 +28,59 @@ public:
 	// later create a wrapper for ast tree 
 	// we don't really need tree fields and listlink until we plan to keep ast nodes
 
-	CAstT* m_pParent;
-	rtl::CArrayT <CAstT*> m_Children;
+	CAstNodeT* m_pParent;
+	rtl::CArrayT <CAstNodeT*> m_Children;
 
 public:
-	CAstT ()
+	CAstNodeT ()
 	{
 		m_Kind = -1;
 		m_pParent = NULL;
 	}
 
 	virtual
-	~CAstT () // could be subclassed
+	~CAstNodeT () // could be subclassed
 	{
+	}
+};
+
+//.............................................................................
+
+template <class TAstNode>
+class CAstT
+{
+public:
+	typedef TAstNode CAstNode;
+
+protected:
+	rtl::CStdListT <CAstNode> m_List;
+	CAstNode* m_pRoot;
+
+public:
+	CAstT ()
+	{
+		m_pRoot = NULL;
+	}
+
+	CAstNode*
+	GetRoot ()
+	{
+		return m_pRoot;
+	}
+
+	void
+	Clear ()
+	{
+		m_List.Clear ();
+		m_pRoot = NULL;
+	}
+
+	void
+	Add (CAstNode* pAstNode)
+	{
+		m_List.InsertTail (pAstNode);
+		if (!m_pRoot)
+			m_pRoot = pAstNode;
 	}
 };
 

@@ -1,8 +1,68 @@
 //.............................................................................
 
+class
+{
+	rtl::CBoxListT <CToken> m_TokenList;
+}
+function_body_pass1
+	: compound_statement_pass1 <&$.m_TokenList>
+	;
+
+noast
+compound_statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	: '{' $l
+		{
+			$pTokenList->InsertTail ($l);
+		}
+	  statement_pass1 <$pTokenList>* 
+	  '}' $r
+		{
+			$pTokenList->InsertTail ($r);
+		}
+	;
+
+noast
+statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	: compound_statement_pass1 <$pTokenList>
+	| any
+		{
+			$pTokenList->InsertTail ($1);
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CFunctionBody
+{
+	CBasicBlock* m_pBlock;
+	CScope* m_pScope;
+}
 start
+function_body
+	enter
+	{
+		$.m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock ();
+	}
+	: compound_statement
+		{
+			$.m_pScope = $1.m_pScope;
+		}
+	;
+
+class
+{
+	CScope* m_pScope;
+}
 compound_statement
-	: '{' local_declaration* '}'
+	: '{' $l
+		{
+			$.m_pScope = m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
+		}
+	  local_declaration* 
+	  '}' $r
+		{
+			m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
+		}
 	;
 
 noast

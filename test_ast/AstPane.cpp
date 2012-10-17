@@ -39,28 +39,29 @@ void CAstPane::OnSize(UINT nType, int cx, int cy)
 }
 
 bool
-CAstPane::Build (jnc::CParser::CAst* pAstRoot)
+CAstPane::Build (ref::CBufT <jnc::CParser::CAst> Ast)
 {
 	Clear ();
-	AddAst (NULL, pAstRoot);
+	m_Ast = Ast;
+	AddAst (NULL, Ast->GetRoot ());
 	return true;
 }
 
 HTREEITEM 
 CAstPane::AddAst (
 	HTREEITEM hParent,
-	jnc::CParser::CAst* pAst
+	jnc::CParser::CAstNode* pAstNode
 	)
 {
-	const tchar_t* pSymbolName = jnc::CParser::GetSymbolName (pAst->m_Kind);
+	const tchar_t* pSymbolName = jnc::CParser::GetSymbolName (pAstNode->m_Kind);
 	
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (pSymbolName, hParent);
-	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pAst);
+	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pAstNode);
 
-	size_t Count = pAst->m_Children.GetCount ();
+	size_t Count = pAstNode->m_Children.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		jnc::CParser::CAst* pChild = pAst->m_Children [i];
+		jnc::CParser::CAstNode* pChild = pAstNode->m_Children [i];
 		AddAst (hItem, pChild);
 	}
 
@@ -72,6 +73,7 @@ void
 CAstPane::Clear ()
 {
 	m_TreeCtrl.DeleteAllItems ();
+	m_Ast.Release ();
 }
 
 void 
@@ -81,13 +83,13 @@ CAstPane::OnDblClk(NMHDR* pNMHDR, LRESULT* pResult)
 	if (!hItem)
 		return;
 
-	jnc::CParser::CAst* pAst = (jnc::CParser::CAst*) m_TreeCtrl.GetItemData (hItem);
+	jnc::CParser::CAstNode* pAstNode = (jnc::CParser::CAstNode*) m_TreeCtrl.GetItemData (hItem);
 
 	CEditView* pView = GetMainFrame ()->GetDocument ()->GetView ();
 
 	pView->GetEditCtrl ().SetSel (
-		(int) pAst->m_FirstToken.m_Pos.m_Offset, 
-		(int) pAst->m_LastToken.m_Pos.m_Offset + pAst->m_LastToken.m_Pos.m_Length
+		(int) pAstNode->m_FirstToken.m_Pos.m_Offset, 
+		(int) pAstNode->m_LastToken.m_Pos.m_Offset + pAstNode->m_LastToken.m_Pos.m_Length
 		);
 
 	*pResult = 0;
@@ -97,12 +99,12 @@ void
 CAstPane::OnGetInfoTip(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMTVGETINFOTIP* pInfoTip = (NMTVGETINFOTIP*) pNMHDR;
-	jnc::CParser::CAst* pAst = (jnc::CParser::CAst*) pInfoTip->lParam;
+	jnc::CParser::CAstNode* pAstNode = (jnc::CParser::CAstNode*) pInfoTip->lParam;
 
 	CString NodeText (
-		pAst->m_FirstToken.m_Pos.m_p, 
-		pAst->m_LastToken.m_Pos.m_p + pAst->m_LastToken.m_Pos.m_Length - 
-		pAst->m_FirstToken.m_Pos.m_p
+		pAstNode->m_FirstToken.m_Pos.m_p, 
+		pAstNode->m_LastToken.m_Pos.m_p + pAstNode->m_LastToken.m_Pos.m_Length - 
+		pAstNode->m_FirstToken.m_Pos.m_p
 		); 
 
 	size_t CopyLength = NodeText.GetLength ();

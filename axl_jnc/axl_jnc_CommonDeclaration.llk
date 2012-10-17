@@ -1,23 +1,42 @@
 //.............................................................................
 
 common_declaration
+	local
+	{
+		CModuleItem* $pLastDeclaredItem;
+	}
+	enter
+	{
+		$pLastDeclaredItem = NULL;
+	}
 	: attribute_block?
 	  declaration_specifier_list $s
-	  init_declarator_list <&$s.m_DeclSpecifiers>?
-	  declaration_terminator
+	  init_declarator_list <&$s.m_DeclSpecifiers, &$pLastDeclaredItem>?
+	  declaration_terminator_2 <$pLastDeclaredItem>
 	;
 
 noast
-init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
-	: init_declarator <$pDeclSpecifiers> (',' init_declarator <$pDeclSpecifiers>)*
+init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CModuleItem** $ppLastDeclaredItem>
+	: init_declarator <$pDeclSpecifiers, $ppLastDeclaredItem> 
+	  (
+		',' 
+		init_declarator <$pDeclSpecifiers, $ppLastDeclaredItem>
+	  )*
 	;
 
-init_declarator <CDeclSpecifiers* $pDeclSpecifiers>
-	: declarator('=' expression_pass1)?
+init_declarator <CDeclSpecifiers* $pDeclSpecifiers, CModuleItem** $ppLastDeclaredItem>
+	: declarator('=' expression_pass1 $i)?
 		{
-			bool Result = Declare ($pDeclSpecifiers, &$1.m_Declarator);
-			if (!Result)
+			CModuleItem* pItem = Declare (
+				$pDeclSpecifiers, 
+				&$1.m_Declarator,
+				IsValidLocator ($i) ? &$i.m_TokenList : NULL
+				);
+
+			if (!pItem)
 				return false;
+
+			*$ppLastDeclaredItem = pItem;
 		}
 	;
 
@@ -41,19 +60,20 @@ initializer_list_entry
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 noast
-declaration_terminator
+declaration_terminator_2 <CModuleItem* $pLastDeclaredItem>
 	: ';'
-	| compound_statement_pass1
-	;
-
-compound_statement_pass1
-	: '{' statement_pass1* '}'
+	| function_body_pass1
+		{
+			bool Result = SetFunctionBody ($pLastDeclaredItem, &$1.m_TokenList);
+			if (!Result)
+				return false;
+		}
 	;
 
 noast
-statement_pass1
-	: compound_statement_pass1
-	| any
+declaration_terminator
+	: ';'
+	| function_body_pass1
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -297,6 +317,7 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+noast
 qualified_type_name_rslv
 	:	{
 			if (IsTypeSpecified ())
@@ -315,9 +336,19 @@ class
 qualified_type_name
 	: qualified_name
 		{
-			$.m_pType = FindType ($1.m_Name);
-			ASSERT ($.m_pType);
+			CType* pType = FindType ($1.m_Name);
+			if (!pType)
+			{
+				err::SetFormatStringError (_T("'%s' is not a type"), $1.m_Name.GetFullName ());
+				return false;
+			}
+
+			$.m_pType = pType;
 		}
+	;
+
+generic_actual_argument_list
+	: '<' type_name (',' type_name)* '>'
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -414,7 +445,7 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 	: type_specifier_modifier_list $s
 	  declarator $d ('=' expression_pass1 $v)?
 		{
-			bool Result = DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL);
+			bool Result = DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL) != NULL;
 			if (!Result)
 				return false;
 		}

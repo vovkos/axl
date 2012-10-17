@@ -23,9 +23,10 @@ class CParserT
 public:
 	typedef TToken CToken;
 	typedef typename TToken::EToken EToken;
-	typedef CAstT <CToken> CAst;
+	typedef CAstNodeT <CToken> CAstNode;
+	typedef CAstT <CAstNode> CAst;
 	typedef CTokenNodeT <CToken> CTokenNode;
-	typedef CSymbolNodeT <CAst> CSymbolNode;
+	typedef CSymbolNodeT <CAstNode> CSymbolNode;
 	typedef CLaDfaNodeT <CToken> CLaDfaNode;
 
 protected:
@@ -60,8 +61,7 @@ protected:
 
 protected:
 	rtl::CStdListT <CNode> m_NodeList;
-	rtl::CStdListT <CAst> m_AstList;
-	CAst* m_pAstRoot;
+	ref::CBufT <CAst> m_Ast;
 
 	rtl::CArrayT <CNode*> m_PredictionStack;
 	rtl::CArrayT <CSymbolNode*> m_SymbolStack;
@@ -78,7 +78,6 @@ public:
 	{
 		m_Flags = 0;
 		m_PragmaLevel = 0;
-		m_pAstRoot = NULL;
 	}
 
 	bool
@@ -89,33 +88,30 @@ public:
 	{
 		Clear ();
 
-		PushPrediction (T::SymbolFirst + Symbol);
-		m_Flags = 0;
-
 		if (IsBuildingAst)
 			m_Flags |= EFlag_IsBuildingAst;
 
+		PushPrediction (T::SymbolFirst + Symbol);
 		return true;
 	}
 
-	CAst* 
-	GetAstRoot ()
+	ref::CBufT <CAst> 
+	GetAst ()
 	{
-		return m_pAstRoot;
+		return m_Ast;
 	}
 
 	void
 	Clear ()
 	{
 		m_NodeList.Clear ();
-		m_AstList.Clear ();
 		m_PredictionStack.Clear ();
 		m_SymbolStack.Clear ();
 		m_ResolverStack.Clear ();
 		m_TokenList.Clear ();
+		m_Ast.Release ();
 		m_Flags = 0;
 		m_PragmaLevel = 0;
-		m_pAstRoot = NULL;
 	}
 
 	bool
@@ -299,8 +295,8 @@ protected:
 
 			ASSERT (GetSymbolTop () == pNode);
 
-			if (pNode->m_pAst)
-				pNode->m_pAst->m_LastToken = m_LastMatchedToken;
+			if (pNode->m_pAstNode)
+				pNode->m_pAstNode->m_LastToken = m_LastMatchedToken;
 
 			pNode->m_Flags |= ENodeFlag_IsMatched;
 
@@ -324,10 +320,10 @@ protected:
 
 		if (pNode->m_Flags & ESymbolNodeFlag_IsNamed)
 		{
-			if (pNode->m_pAst)
+			if (pNode->m_pAstNode)
 			{
-				pNode->m_pAst->m_FirstToken = *pToken;
-				pNode->m_pAst->m_LastToken = *pToken;
+				pNode->m_pAstNode->m_FirstToken = *pToken;
+				pNode->m_pAstNode->m_LastToken = *pToken;
 
 				m_LastMatchedToken = *pToken;
 			}
@@ -576,9 +572,12 @@ protected:
 		{
 			size_t Index = MasterIndex - T::SymbolFirst;
 			CSymbolNode* pSymbolNode = ((T*) this)->CreateSymbolNode (Index);
-			if (pSymbolNode->m_pAst && (m_Flags & EFlag_IsBuildingAst))
+			if (pSymbolNode->m_pAstNode && (m_Flags & EFlag_IsBuildingAst))
 			{
-				m_AstList.InsertTail (pSymbolNode->m_pAst);
+				if (!m_Ast)
+					m_Ast.Create ();
+
+				m_Ast->Add (pSymbolNode->m_pAstNode);
 				pSymbolNode->m_Flags |= ESymbolNodeFlag_KeepAst;
 			}
 
@@ -689,14 +688,15 @@ protected:
 	// symbol stack
 
 	void
-	DumpSymbolStack ()
+	TraceSymbolStack ()
 	{
 		intptr_t Count = m_SymbolStack.GetCount ();
 
+		TRACE ("SYMBOL STACK (%d symbols):\n", Count);
 		for (intptr_t i = 0; i < Count; i++)
 		{
 			CNode* pNode = m_SymbolStack [i];
-			printf ("%s\n", ((T*) this)->GetSymbolName (pNode->m_Index));
+			TRACE ("%s\n", ((T*) this)->GetSymbolName (pNode->m_Index));
 		}
 	}
 
@@ -706,22 +706,22 @@ protected:
 		return m_SymbolStack.GetCount ();
 	}
 
-	CAst*
+	CAstNode*
 	GetAst (size_t Index)
 	{
 		size_t Count = m_SymbolStack.GetCount ();
-		return Index < Count ? m_SymbolStack [Count - Index - 1]->m_pAst : NULL;
+		return Index < Count ? m_SymbolStack [Count - Index - 1]->m_pAstNode : NULL;
 	}
 
-	CAst*
+	CAstNode*
 	GetAstTop ()
 	{
 		size_t Count = m_SymbolStack.GetCount ();
 		for (intptr_t i = Count - 1; i >= 0; i--)
 		{
 			CSymbolNode* pNode = m_SymbolStack [i];
-			if (pNode->m_pAst)
-				return pNode->m_pAst;
+			if (pNode->m_pAstNode)
+				return pNode->m_pAstNode;
 		}
 
 		return NULL;
@@ -737,17 +737,13 @@ protected:
 	void
 	PushSymbol (CSymbolNode* pNode)
 	{
-		if ((m_Flags & EFlag_IsBuildingAst) && pNode->m_pAst)
+		if ((m_Flags & EFlag_IsBuildingAst) && pNode->m_pAstNode)
 		{
-			CAst* pAstTop = GetAstTop ();
+			CAstNode* pAstTop = GetAstTop ();
 			if (pAstTop)
 			{
-				pNode->m_pAst->m_pParent = pAstTop;
-				pAstTop->m_Children.Append (pNode->m_pAst);
-			}
-			else
-			{
-				m_pAstRoot = pNode->m_pAst;
+				pNode->m_pAstNode->m_pParent = pAstTop;
+				pAstTop->m_Children.Append (pNode->m_pAstNode);
 			}
 		}
 
@@ -823,11 +819,11 @@ protected:
 		return pNode;
 	}
 
-	CAst* 
+	CAstNode* 
 	GetAstLocator (size_t Index)
 	{
 		CNode* pNode = GetLocator (Index);
-		return pNode && pNode->m_Kind == ENode_Symbol ? ((CSymbolNode*) pNode)->m_pAst : NULL;
+		return pNode && pNode->m_Kind == ENode_Symbol ? ((CSymbolNode*) pNode)->m_pAstNode : NULL;
 	}
 
 	const CToken* 
@@ -838,7 +834,7 @@ protected:
 	}
 
 	bool
-	IsValidLocator (CAst& Ast)
+	IsValidLocator (CAstNode& Ast)
 	{
 		return &Ast != NULL;
 	}

@@ -64,7 +64,7 @@ class_member_declaration <CClassType* $pType>
 	  declaration_specifier_list $s
 	  class_member_declarator_list <&$s.m_DeclSpecifiers, $pType>? 
 	  declaration_terminator
-	| compound_statement_pass1
+	| function_body_pass1
 	| ';'
 	;
 
@@ -75,7 +75,7 @@ class_member_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pT
 class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
 	: declarator (':' struct_member_bit_field)? ('=' initializer)?
 		{
-			bool Result = DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator);
+			bool Result = DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator) != NULL;
 			if (!Result)
 				return false;
 		}

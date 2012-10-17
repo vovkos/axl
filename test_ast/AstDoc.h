@@ -23,7 +23,6 @@ class CAstDoc : public CDocument
 protected:
 	CString m_SourceText;
 	jnc::CModule m_Module;
-	jnc::CParser m_Parser;
 
 protected: // create from serialization only
 	CAstDoc();
@@ -40,7 +39,7 @@ public:
 // Operations
 public:
 	bool
-	Parse ();
+	Compile ();
 
 // Overrides
 public:
@@ -62,12 +61,17 @@ public:
 
 
 protected:
+	bool
+	CompileEnumMembers ();
+
+	bool
+	CompileInitializers ();
 
 // Generated message map functions
 protected:
 	DECLARE_MESSAGE_MAP()
 
-	afx_msg void OnFileParse();
+	afx_msg void OnFileCompile();
 
 #ifdef SHARED_HANDLERS
 	// Helper function that sets search content for a Search Handler

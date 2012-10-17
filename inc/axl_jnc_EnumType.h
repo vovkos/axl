@@ -23,6 +23,8 @@ protected:
 
 	intptr_t m_Value;
 
+	rtl::CBoxListT <CToken> m_Expression;
+
 public:
 	CEnumMember ()
 	{
@@ -34,6 +36,30 @@ public:
 	GetValue ()
 	{
 		return m_Value;
+	}
+
+	bool
+	HasExpression ()
+	{
+		return !m_Expression.IsEmpty ();
+	}
+
+	void
+	SetExpression (rtl::CBoxListT <CToken>* pTokenList)
+	{
+		m_Expression.TakeOver (pTokenList);
+	}
+
+	rtl::CBoxIteratorT <CToken>
+	GetExpressionFirstToken ()
+	{
+		return m_Expression.GetHead ();
+	}
+
+	rtl::CBoxIteratorT <CToken>
+	GetExpressionLastToken ()
+	{
+		return m_Expression.GetTail ();
 	}
 };
 

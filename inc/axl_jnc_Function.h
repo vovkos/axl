@@ -7,6 +7,7 @@
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Namespace.h"
+#include "axl_llk_Ast.h"
 
 namespace axl {
 namespace jnc {
@@ -62,10 +63,12 @@ protected:
 	friend class CFunctionMgr;
 
 	CFunctionType* m_pType;
-	CBasicBlock* m_pBlock;
-	void* m_pfn;
-
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
+	rtl::CBoxListT <CToken> m_Body;
+
+	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > m_Ast;
+	CBasicBlock* m_pBlock;
+	CScope* m_pScope;
 
 public:
 	CFunction ()
@@ -73,7 +76,7 @@ public:
 		m_ItemKind = EModuleItem_Function;
 		m_pType = NULL;
 		m_pBlock = NULL;
-		m_pfn = NULL;
+		m_pScope = NULL;
 	}
 
 	CFunctionType* 
@@ -96,6 +99,48 @@ public:
 
 	rtl::CString
 	CreateArgString ();
+
+	bool
+	HasBody ()
+	{
+		return !m_Body.IsEmpty ();
+	}
+
+	void
+	SetBody (rtl::CBoxListT <CToken>* pTokenList)
+	{
+		m_Body.TakeOver (pTokenList);
+	}
+
+	rtl::CBoxIteratorT <CToken>
+	GetBodyFirstToken ()
+	{
+		return m_Body.GetHead ();
+	}
+
+	rtl::CBoxIteratorT <CToken>
+	GetBodyLastToken ()
+	{
+		return m_Body.GetTail ();
+	}
+
+	CScope*
+	GetScope ()
+	{
+		return m_pScope;
+	}
+
+	CBasicBlock*
+	GetBlock ()
+	{
+		return m_pBlock;
+	}
+
+	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > 
+	GetAst ()
+	{
+		return m_Ast;
+	}
 };
 
 //.............................................................................

@@ -368,7 +368,7 @@ CModulePane::AddAlias (
 			);
 
 		hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-		m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pTarget);
+		m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pAlias);
 		break;
 
 	case jnc::EModuleItem_EnumMember:
@@ -502,19 +502,115 @@ CModulePane::AddGlobalProperty (
 }
 
 rtl::CString
+GetNamespaceTip (jnc::CGlobalNamespace* pNamespace)
+{
+	return rtl::CString::Format_s (_T("namespace %s"), pNamespace->GetQualifiedName ());
+}
+
+rtl::CString
+GetVariableTip (jnc::CVariable* pVariable)
+{
+	jnc::CType* pType = pVariable->GetType ();
+	pType = UnImportType (pType);
+	
+	return rtl::CString::Format_s (
+		_T("%s %s (%d bytes)"), 
+		pType->GetTypeString (), 
+		pVariable->GetQualifiedName (),
+		pType->GetSize ()
+		);
+}
+
+rtl::CString
+GetFunctionTip (jnc::CFunction* pFunction)
+{
+	jnc::CFunctionType* pType = pFunction->GetType ();
+
+	rtl::CString TipText;
+	TipText.Format (
+		_T("%s %s"), 
+		pType->GetReturnType ()->GetTypeString (),
+		pFunction->CreateArgString ()
+		);
+
+	jnc::CScope* pScope = pFunction->GetScope ();
+	if (!pScope)
+		return TipText;
+
+	jnc::CToken::CPos Pos = pScope->GetPos ();
+	jnc::CToken::CPos PosEnd = pScope->GetPosEnd ();
+	
+	TipText.Append (_T("\n"));
+	TipText.Append (
+		Pos.m_p, 
+		PosEnd.m_p - Pos.m_p + PosEnd.m_Length
+		); 
+
+	return TipText;
+}
+
+rtl::CString
+GetGlobalFunctionTip (jnc::CGlobalFunction* pFunction)
+{
+	return rtl::CString::Format_s (
+		_T("%s (%d overloads)"), 
+		pFunction->GetQualifiedName (),
+		pFunction->GetOverloadCount ()
+		);
+}
+
+rtl::CString
+GetStructMemberTip (jnc::CStructMember* pMember)
+{
+	jnc::CType* pType = pMember->GetType ();
+	pType = UnImportType (pType);
+	
+	return rtl::CString::Format_s (
+		_T("%s %s.%s (%d bytes)"), 
+		pType->GetTypeString (), 
+		pMember->GetParentNamespace ()->GetQualifiedName (),
+		pMember->GetName (),
+		pType->GetSize ()
+		);
+}
+
+rtl::CString
+GetEnumMemberTip (jnc::CEnumMember* pMember)
+{
+	rtl::CString TipText = pMember->GetName ();
+	
+	if (!pMember->HasExpression ())
+		return TipText;
+
+	rtl::CBoxIteratorT <jnc::CToken> First = pMember->GetExpressionFirstToken ();
+	rtl::CBoxIteratorT <jnc::CToken> Last = pMember->GetExpressionLastToken ();
+
+	TipText.Append (_T(" = "));
+	TipText.Append (
+		First->m_Pos.m_p, 
+		Last->m_Pos.m_p - First->m_Pos.m_p + Last->m_Pos.m_Length
+		); 
+
+	return TipText;
+}
+
+rtl::CString
 CModulePane::GetItemTip (jnc::CModuleItem* pItem)
 {
 	jnc::EModuleItem ItemKind = pItem->GetItemKind ();
 	switch (ItemKind)
 	{
 	case jnc::EModuleItem_Namespace:
-		return ((jnc::CNamespace*) pItem)->GetQualifiedName ();
+		return GetNamespaceTip ((jnc::CGlobalNamespace*) pItem);
 
 	case jnc::EModuleItem_Variable:
-		return ((jnc::CVariable*) pItem)->GetQualifiedName ();
+		return GetVariableTip ((jnc::CVariable*) pItem);
+
+	case jnc::EModuleItem_Function:
+		return GetFunctionTip ((jnc::CFunction*) pItem);
 
 	case jnc::EModuleItem_GlobalFunction:
-		return ((jnc::CGlobalFunction*) pItem)->GetQualifiedName ();
+		return GetGlobalFunctionTip ((jnc::CGlobalFunction*) pItem);
 
 	case jnc::EModuleItem_Type:
 		return ((jnc::CType*) pItem)->GetTypeString ();
@@ -522,13 +618,19 @@ CModulePane::GetItemTip (jnc::CModuleItem* pItem)
 	case jnc::EModuleItem_Alias:
 		return ((jnc::CAlias*) pItem)->GetQualifiedName ();
 
+	case jnc::EModuleItem_StructMember:
+		return GetStructMemberTip ((jnc::CStructMember*) pItem);
+
+	case jnc::EModuleItem_EnumMember:
+		return GetEnumMemberTip ((jnc::CEnumMember*) pItem);
+
 	default:		
 		return rtl::CString::Format_s (_T("item %x of kind %d"), pItem, ItemKind);
 	}
 }
 
 void 
-CModulePane::OnDblClk(NMHDR* pNMHDR, LRESULT* pResult)
+CModulePane::OnDblClk (NMHDR* pNMHDR, LRESULT* pResult)
 {
 	HTREEITEM hItem = m_TreeCtrl.GetSelectedItem ();
 	if (!hItem)
@@ -545,6 +647,12 @@ CModulePane::OnDblClk(NMHDR* pNMHDR, LRESULT* pResult)
 	
 	pView->GetEditCtrl ().SetSel (Offset1, Offset1);
 	pView->GetEditCtrl ().SetSel (Offset1, Offset2);
+
+	if (pItem->GetItemKind () == jnc::EModuleItem_Function)
+	{
+		jnc::CFunction* pFunction = (jnc::CFunction*) pItem;
+		GetMainFrame ()->m_FunctionAstPane.Build (pFunction->GetAst ());
+	}
 
 	*pResult = 0;
 }

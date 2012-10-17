@@ -49,9 +49,17 @@ public:
 class CVariableMgr
 {
 protected:
+	friend class CModule;
+	CModule* m_pModule;
+
 	rtl::CStdListT <CVariable> m_VariableList;
 
 public:
+	CVariableMgr ()
+	{
+		m_pModule = NULL;
+	}
+
 	void
 	Clear ();
 

@@ -62,7 +62,11 @@ CStorageClassSpecifier::SetStorageClass (EStorageClass StorageClass)
 {
 	if (m_StorageClass)
 	{
-		err::SetStringError (_T("more than one storage class specifiers"));
+		err::SetFormatStringError (
+			_T("more than one storage class specifiers ('%s' and '%s')"), 
+			GetStorageClassString (m_StorageClass),
+			GetStorageClassString (StorageClass)
+			);
 		return false;
 	}
 
@@ -75,7 +79,11 @@ CAccessSpecifier::SetAccess (EAccess Access)
 {
 	if (m_Access)
 	{
-		err::SetStringError (_T("more than one access specifiers"));
+		err::SetFormatStringError (
+			_T("more than one access specifiers ('%s' and '%s')"), 
+			GetAccessString (m_Access),
+			GetAccessString (Access)
+			);
 		return false;
 	}
 
@@ -88,7 +96,12 @@ CTypeSpecifier::SetType (CType* pType)
 {
 	if (m_pType)
 	{
-		err::SetStringError (_T("more than one type specified"));
+		err::SetFormatStringError (
+			_T("more than one type specifiers ('%s' and '%s')"), 
+			m_pType->GetTypeString (),
+			pType->GetTypeString ()
+			);
+
 		return false;
 	}
 
@@ -99,14 +112,11 @@ CTypeSpecifier::SetType (CType* pType)
 bool
 CTypeSpecifier::SetProperty (CProperty* pProperty)
 {
-	if (m_pType || m_pProperty)
-	{
-		err::SetStringError (_T("more than one type specified"));
+	bool Result = SetType (pProperty->GetType ());
+	if (!Result)
 		return false;
-	}
 
 	m_pProperty = pProperty;
-	m_pType = pProperty->GetType ();
 	return true;
 }
 

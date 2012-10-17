@@ -22,6 +22,8 @@ class CModule;
 class CTypeMgr
 {
 protected:
+	friend class CModule;
+	CModule* m_pModule;
 	CType m_BasicTypeArray [EType_Variant + 1];
 
 	rtl::CStdListT <CDerivedType> m_DerivedTypeList;
@@ -37,13 +39,13 @@ protected:
 	rtl::CHashTableMapT <const char*, CType*, rtl::CHashString, rtl::CCmpString> m_TypeMap;
 	
 public:
-	CTypeMgr ()
-	{
-		SetupAllBasicTypes ();
-	}
+	CTypeMgr ();
 
 	void
 	Clear ();
+
+	bool
+	ResolveImports ();
 
 	CType* 
 	GetBasicType (EType Type);

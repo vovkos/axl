@@ -265,6 +265,11 @@ class CNamedType:
 	public CNamespace,
 	public rtl::TListLink
 {
+public:
+	CNamedType ()
+	{
+		m_NamespaceKind = ENamespace_NamedType;
+	}
 };
 
 //.............................................................................

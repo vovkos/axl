@@ -100,7 +100,8 @@ CNamespace::Clear ()
 rtl::CString
 CNamespace::CreateQualifiedName (const tchar_t* pName)
 {
-	ASSERT (IsNamed ());
+	if (!IsNamed ())
+		return pName;
 
 	rtl::CString QualifiedName = GetQualifiedName ();
 	QualifiedName.Append (_T('.'));
@@ -125,7 +126,7 @@ CNamespace::FindItemTraverse (const CQualifiedName& Name)
 
 	while (pNamespace)
 	{
-		rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = m_ItemMap.Find (Name.m_First); 
+		rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
 		if (It)
 		{
 			pItem = It->m_Value;
@@ -181,8 +182,6 @@ CNamespace::AddItem (
 bool
 CNamespace::ExposeEnumMembers (CEnumType* pType)
 {
-	ASSERT (pType->GetTypeKind () == EType_EnumC);
-
 	rtl::CIteratorT <CEnumMember> Member = pType->GetFirstMember ();
 	for (; Member; Member++)
 	{
@@ -191,14 +190,6 @@ CNamespace::ExposeEnumMembers (CEnumType* pType)
 			return false;
 	}
 
-	//size_t Count = pType->GetBaseTypeCount ();
-	//for (size_t i = 0; i < Count; i++)
-	//{
-	//	CEnumType* pBaseType = pType->GetBaseType (i);
-	//	if (pBaseType->GetTypeKind () == EType_Enum) 
-	//		ExposeEnumMembers (pBaseType);
-	//}
-	
 	return true;	
 }
 

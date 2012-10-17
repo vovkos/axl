@@ -14,8 +14,15 @@ namespace jnc {
 class CConstMgr
 {
 protected:
+	friend class CModule;
+	CModule* m_pModule;
 
 public:
+	CConstMgr ()
+	{
+		m_pModule = NULL;
+	}
+
 	void
 	Clear ()
 	{

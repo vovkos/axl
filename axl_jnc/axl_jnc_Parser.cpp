@@ -21,6 +21,8 @@ CParser::IsTypeSpecified ()
 CType*
 CParser::FindType (const CQualifiedName& Name)
 {
+	TraceSymbolStack ();
+
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
 	if (m_Stage == EStage_Pass1)
@@ -103,31 +105,11 @@ CParser::DeclareEnumType (
 	return pType;
 }
 
-void
-CParser::SetSimplePropertyPos (
-	CProperty* pProperty,
-	const CToken::CPos& Pos
-	)
-{
-	CFunction* pGetter = pProperty->GetGetter ();
-	pGetter->m_Pos = Pos;
-
-	CFunctionOverload* pSetter = pProperty->GetSetter ();
-	if (pSetter)
-	{
-		size_t Count = pSetter->GetOverloadCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CFunction* pSetterOverload = pSetter->GetFunction (i);
-			pSetterOverload->m_Pos = Pos;
-		}
-	}
-}
-
-bool
+CModuleItem*
 CParser::Declare (
 	CDeclSpecifiers* pDeclSpecifiers,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	bool Result;
@@ -136,12 +118,12 @@ CParser::Declare (
 	if (PropertyAccessorKind)
 	{
 		err::SetFormatStringError (_T("cannot declare '%s' property accessor"), GetPropertyAccessorString (PropertyAccessorKind));
-		return false;
+		return NULL;
 	}
 
 	CType* pType = pDeclarator->GetType (pDeclSpecifiers, &m_pModule->m_TypeMgr);
 	if (!pType)
-		return false;
+		return NULL;
 
 	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
 	EType TypeKind = pType->GetTypeKind ();
@@ -157,10 +139,10 @@ CParser::Declare (
 			if (pOldItem->GetItemKind () != EModuleItem_Alias || ((CAlias*) pOldItem)->GetTarget () != pType)
 			{	
 				err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-				return false;
+				return NULL;
 			}
 
-			return true;
+			return pOldItem;
 		}
 
 		pNewItem = pNamespace->CreateAlias (Name, pType);
@@ -174,7 +156,7 @@ CParser::Declare (
 			if (pOldItem->GetItemKind () != EModuleItem_GlobalFunction)
 			{	
 				err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-				return false;
+				return NULL;
 			}
 
 			CGlobalFunction* pGlobalFunction = (CGlobalFunction*) pOldItem;
@@ -185,7 +167,7 @@ CParser::Declare (
 
 			Result = pGlobalFunction->AddOverload (pOverload);
 			if (!Result)
-				return false;
+				return NULL;
 		}
 		else 
 		{
@@ -199,7 +181,7 @@ CParser::Declare (
 
 			Result = pNamespace->AddItem (pGlobalFunction);
 			if (!Result)
-				return false;
+				return NULL;
 		}
 
 		pNewItem = pOverload;
@@ -209,7 +191,7 @@ CParser::Declare (
 		if (pOldItem)
 		{	
 			err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-			return false;
+			return NULL;
 		}
 
 		CProperty* pProperty = pDeclSpecifiers->GetProperty ();
@@ -222,7 +204,7 @@ CParser::Declare (
 		CGlobalProperty* pGlobalProperty = m_pModule->m_FunctionMgr.CreateGlobalProperty (Name, pProperty);
 		Result = pNamespace->AddItem (pGlobalProperty);
 		if (!Result)
-			return false;
+			return NULL;
 
 		pGlobalProperty->m_Pos = pDeclarator->m_Pos;
 		pNewItem = pProperty;
@@ -232,26 +214,26 @@ CParser::Declare (
 		if (pOldItem)
 		{	
 			err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-			return false;
+			return NULL;
 		}
 
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType);
 		Result = pNamespace->AddItem (pVariable);
 		if (!Result)
-			return false;
+			return NULL;
 
 		pNewItem = pVariable;
 	}
 
 	if (!pNewItem)
-		return false;
+		return NULL;
 
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pNewItem);
 	pNewItem->m_Pos = pDeclarator->m_Pos;
-	return true;
+	return pNewItem;
 }
 
-bool
+CStructMember*
 CParser::DeclareStructMember (
 	CStructType* pStructType,
 	CTypeSpecifierModifiers* pTypeSpecifier,
@@ -260,7 +242,7 @@ CParser::DeclareStructMember (
 {
 	CType* pType = pDeclarator->GetType (pTypeSpecifier, &m_pModule->m_TypeMgr);
 	if (!pType)
-		return false;
+		return NULL;
 
 	EType TypeKind = pType->GetTypeKind ();
 	if (TypeKind == EType_Function ||
@@ -269,7 +251,7 @@ CParser::DeclareStructMember (
 		)
 	{
 		err::SetFormatStringError (_T("'%s' is illegal type for struct member"), pType->GetTypeString ());
-		return false;
+		return NULL;
 	}
 
 	rtl::CString Name = pDeclarator->GetName ();
@@ -278,7 +260,7 @@ CParser::DeclareStructMember (
 	if (pOldMember)
 	{
 		err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-		return false;
+		return NULL;
 	}
 
 	CStructMember* pNewMember = pStructType->CreateMember (Name, pType, 0);
@@ -286,10 +268,10 @@ CParser::DeclareStructMember (
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pNewMember);
 	pNewMember->m_Pos = pDeclarator->m_Pos;
 
-	return true;
+	return pNewMember;
 }
 
-bool
+CModuleItem*
 CParser::DeclareClassMember (
 	CClassType* pClassType,
 	CDeclSpecifiers* pDeclSpecifiers,
@@ -300,7 +282,7 @@ CParser::DeclareClassMember (
 
 	CType* pType = pDeclarator->GetType (pDeclSpecifiers, &m_pModule->m_TypeMgr);
 	if (!pType)
-		return false;
+		return NULL;
 
 	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
 	EType TypeKind = pType->GetTypeKind ();
@@ -315,10 +297,10 @@ CParser::DeclareClassMember (
 			if (pOldItem->GetItemKind () != EModuleItem_Alias || ((CAlias*) pOldItem)->GetTarget () != pType)
 			{	
 				err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-				return false;
+				return NULL;
 			}
 
-			return true;
+			return pOldItem;
 		}
 
 		pNewItem = pClassType->CreateAlias (Name, pType);
@@ -337,13 +319,13 @@ CParser::DeclareClassMember (
 				((CClassMember*) pOldItem)->GetMemberKind () != EClassMember_Method)
 			{	
 				err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-				return false;
+				return NULL;
 			}
 
 			CClassMethodMember* pMethodMember = (CClassMethodMember*) pOldItem;
 			Result = pMethodMember->GetFunction ()->AddOverload (pFunction);
 			if (!Result)
-				return false;
+				return NULL;
 		}
 
 		pNewItem = pFunction;
@@ -353,7 +335,7 @@ CParser::DeclareClassMember (
 		if (pOldItem)
 		{	
 			err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-			return false;
+			return NULL;
 		}
 
 		CProperty* pProperty = pDeclSpecifiers->GetProperty ();
@@ -371,21 +353,21 @@ CParser::DeclareClassMember (
 		if (pOldItem)
 		{	
 			err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-			return false;
+			return NULL;
 		}
 
 		pNewItem = pClassType->CreateFieldMember (Name, pType, 0);
 	}
 
 	if (!pNewItem)
-		return false;
+		return NULL;
 
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pNewItem);
 	pNewItem->m_Pos = pDeclarator->m_Pos;
-	return true;
+	return pNewItem;
 }
 
-bool
+CFunctionFormalArg*
 CParser::DeclareFormalArg (
 	CDeclFunctionSuffix* pArgSuffix,
 	CTypeSpecifierModifiers* pTypeSpecifier,
@@ -395,18 +377,18 @@ CParser::DeclareFormalArg (
 {
 	CType* pType = pDeclarator->GetType (pTypeSpecifier, &m_pModule->m_TypeMgr);
 	if (!pType)
-		return false;
+		return NULL;
 
 	if (pDeclarator->GetPropertyAccessorKind ())
 	{
 		err::SetFormatStringError (_T("illegal property accessor in formal argument declaration"));
-		return false;
+		return NULL;
 	}
 
-	return pArgSuffix->AddArg (pDeclarator->GetName (), pType, pDefaultValue) != NULL;
+	return pArgSuffix->AddArg (pDeclarator->GetName (), pType, pDefaultValue);
 }
 
-bool
+CFunction*
 CParser::DeclarePropertyAccessor (
 	CPropertyBlock* pBlock,
 	CTypeSpecifierModifiers* pTypeSpecifier,
@@ -415,12 +397,12 @@ CParser::DeclarePropertyAccessor (
 {
 	CType* pType = pDeclarator->GetType (pTypeSpecifier, &m_pModule->m_TypeMgr);
 	if (!pType)
-		return false;
+		return NULL;
 
 	if (pType->GetTypeKind () != EType_Function)
 	{
 		err::SetFormatStringError (_T("illegal property accessor type '%s'"), pType->GetTypeString ());
-		return false;
+		return NULL;
 	}
 
 	CFunction* pAccessor = m_pModule->m_FunctionMgr.CreateFunction (
@@ -429,7 +411,7 @@ CParser::DeclarePropertyAccessor (
 		);
 
 	if (!pAccessor)
-		return false;
+		return NULL;
 
 	bool Result;
 
@@ -440,7 +422,7 @@ CParser::DeclarePropertyAccessor (
 		if (pBlock->m_pGetter)
 		{
 			err::SetFormatStringError (_T("multiple property getters specified"));
-			return false;		
+			return NULL;		
 		}
 
 		pBlock->m_pGetter = pAccessor;
@@ -449,7 +431,7 @@ CParser::DeclarePropertyAccessor (
 	case EPropertyAccessor_Set:
 		Result =  pBlock->m_Setter.AddOverload (pAccessor);
 		if (!Result)
-			return false;
+			return NULL;
 	
 		break;
 
@@ -459,7 +441,7 @@ CParser::DeclarePropertyAccessor (
 
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
 	pAccessor->m_Pos = pDeclarator->m_Pos;
-	return true;
+	return pAccessor;
 }
 
 CProperty*
@@ -487,6 +469,45 @@ CParser::CreateProperty (
 
 	CPropertyType* pType = m_pModule->m_TypeMgr.GetPropertyType (pGetter->GetType (), SetterType);
 	return m_pModule->m_FunctionMgr.CreateProperty (pType, pGetter, Setter);
+}
+
+void
+CParser::SetSimplePropertyPos (
+	CProperty* pProperty,
+	const CToken::CPos& Pos
+	)
+{
+	CFunction* pGetter = pProperty->GetGetter ();
+	pGetter->m_Pos = Pos;
+
+	CFunctionOverload* pSetter = pProperty->GetSetter ();
+	if (pSetter)
+	{
+		size_t Count = pSetter->GetOverloadCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CFunction* pSetterOverload = pSetter->GetFunction (i);
+			pSetterOverload->m_Pos = Pos;
+		}
+	}
+}
+
+bool
+CParser::SetFunctionBody (
+	CModuleItem* pItem,
+	rtl::CBoxListT <CToken>* pBody
+	)
+{
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	if (ItemKind != EModuleItem_Function)
+	{
+		err::SetFormatStringError (_T("'%s' cannot have a function body"), CModuleItem::GetItemKindString (ItemKind));
+		return false;
+	}
+
+	CFunction* pFunction = (CFunction*) pItem;
+	pFunction->SetBody (pBody);
+	return true;
 }
 
 //.............................................................................

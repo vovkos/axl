@@ -72,10 +72,11 @@ Members
 	bool
 	IsTypeSpecified ();
 
-	bool
+	CModuleItem*
 	Declare (
 		CDeclSpecifiers* pDeclSpecifiers,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		rtl::CBoxListT <CToken>* pInitializer
 		);
 
 	CClassType*
@@ -96,21 +97,21 @@ Members
 		rtl::CString& Name
 		);
 
-	bool
+	CStructMember*
 	DeclareStructMember (
 		CStructType* pStructType,
 		CTypeSpecifierModifiers* pTypeSpecifier,
 		CDeclarator* pDeclarator
 		);
 
-	bool
+	CModuleItem*
 	DeclareClassMember (
 		CClassType* pClassType,
 		CDeclSpecifiers* pDeclSpecifiers,
 		CDeclarator* pDeclarator
 		);
 
-	bool
+	CFunctionFormalArg*
 	DeclareFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
 		CTypeSpecifierModifiers* pTypeSpecifier,
@@ -118,7 +119,7 @@ Members
 		CValue* pDefaultValue
 		);
 
-	bool
+	CFunction*
 	DeclarePropertyAccessor (
 		CPropertyBlock* pBlock,
 		CTypeSpecifierModifiers* pTypeSpecifier,
@@ -135,6 +136,12 @@ Members
 	SetSimplePropertyPos (
 		CProperty* pProperty,
 		const CToken::CPos& Pos
+		);
+
+	bool
+	SetFunctionBody (
+		CModuleItem* pItem,
+		rtl::CBoxListT <CToken>* pBody
 		);
 } 
 

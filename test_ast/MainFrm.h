@@ -51,7 +51,8 @@ public:  // control bar embedded members
 	CMFCRibbonApplicationButton m_MainButton;
 	CMFCToolBarImages m_PanelImages;
 	CMFCRibbonStatusBar  m_wndStatusBar;
-	CAstPane m_AstPane;
+	CAstPane m_GlobalAstPane;
+	CAstPane m_FunctionAstPane;
 	CModulePane m_ModulePane;
 	COutputPane m_OutputPane;
 

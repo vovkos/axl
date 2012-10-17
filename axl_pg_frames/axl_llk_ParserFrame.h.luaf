@@ -17,29 +17,29 @@ $Includes
 		PragmaNestingLimit = 1
 	end
 
-	AstVariableName    = "__pAst"
-	SymbolVariableName = "__pSymbol"
+	AstNodeVariableName = "__pAstNode"
+	SymbolVariableName  = "__pSymbol"
 
-	ClassCount         = #ClassTable
-	TokenCount         = #TokenTable
-	SymbolCount        = #SymbolTable
-	SequenceCount      = #SequenceTable
-	ActionCount        = #ActionTable
-	ArgumentCount      = #ArgumentTable
-	BeaconCount        = #BeaconTable
-	DispatcherCount    = #DispatcherTable
-	LaDfaCount         = #LaDfaTable
+	ClassCount      = #ClassTable
+	TokenCount      = #TokenTable
+	SymbolCount     = #SymbolTable
+	SequenceCount   = #SequenceTable
+	ActionCount     = #ActionTable
+	ArgumentCount   = #ArgumentTable
+	BeaconCount     = #BeaconTable
+	DispatcherCount = #DispatcherTable
+	LaDfaCount      = #LaDfaTable
 
-	TotalCount         = TokenCount + SymbolCount + SequenceCount + ActionCount + ArgumentCount + BeaconCount + LaDfaCount
+	TotalCount      = TokenCount + SymbolCount + SequenceCount + ActionCount + ArgumentCount + BeaconCount + LaDfaCount
 
-	TokenEnd           = TokenCount
-	NamedSymbolEnd     = TokenEnd + NamedSymbolCount
-	SymbolEnd          = TokenEnd + SymbolCount
-	SequenceEnd        = SymbolEnd + SequenceCount
-	ActionEnd          = SequenceEnd + ActionCount
-	ArgumentEnd        = ActionEnd + ArgumentCount
-	BeaconEnd          = ArgumentEnd + BeaconCount
-	LaDfaEnd           = BeaconEnd + LaDfaCount
+	TokenEnd        = TokenCount
+	NamedSymbolEnd  = TokenEnd + NamedSymbolCount
+	SymbolEnd       = TokenEnd + SymbolCount
+	SequenceEnd     = SymbolEnd + SequenceCount
+	ActionEnd       = SequenceEnd + ActionCount
+	ArgumentEnd     = ActionEnd + ArgumentCount
+	BeaconEnd       = ArgumentEnd + BeaconCount
+	LaDfaEnd        = BeaconEnd + LaDfaCount
 
 	-------------------------------------------------------------------------------
 
@@ -97,9 +97,9 @@ $Includes
 		SymbolName
 		)
 		if Symbol.Class then
-			return string.format ("%s* %s = (%s*) %s->m_pAst;", Symbol.Class, AstName, Symbol.Class, SymbolName)
+			return string.format ("%s* %s = (%s*) %s->m_pAstNode;", Symbol.Class, AstName, Symbol.Class, SymbolName)
 		else
-			return string.format ("CAst* %s = %s->m_pAst;", AstName, SymbolName)
+			return string.format ("CAstNode* %s = %s->m_pAstNode;", AstName, SymbolName)
 		end
 	end
 
@@ -209,7 +209,7 @@ public:
 		if Class.BaseClass then 
 			BaseClass = Class.BaseClass
 		else
-			BaseClass = "CAst"
+			BaseClass = "CAstNode"
 		end
 	}
 	class $(Class.Name): public $BaseClass
@@ -401,9 +401,9 @@ public:
 		case ESymbol_$(Symbol.Name):
 			pNode = AXL_MEM_NEW (CSymbolNode_$(Symbol.Name));
 			%{	if Symbol.Class then }
-			pNode->m_pAst = AXL_MEM_NEW ($(Symbol.Class));
+			pNode->m_pAstNode = AXL_MEM_NEW ($(Symbol.Class));
 			%{ elseif not Symbol.IsNoAst then }
-			pNode->m_pAst = AXL_MEM_NEW (CAst);
+			pNode->m_pAstNode = AXL_MEM_NEW (CAstNode);
 			%{ end }
 			break;
 			%{ elseif Symbol.Enter or Symbol.Leave or Symbol.Class or Symbol.IsNoAst then }
@@ -417,20 +417,20 @@ public:
 			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_HasLeave;
 				%{ end 
 					if Symbol.Class then }
-			pNode->m_pAst = AXL_MEM_NEW ($(Symbol.Class));
+			pNode->m_pAstNode = AXL_MEM_NEW ($(Symbol.Class));
 				%{ elseif not Symbol.IsNoAst then }
-			pNode->m_pAst = AXL_MEM_NEW (CAst);
+			pNode->m_pAstNode = AXL_MEM_NEW (CAstNode);
 				%{ end }
 			break;
 			%{ end }
 		%{ end }
 		default:
 			pNode = CreateStdSymbolNode (Index);
-			pNode->m_pAst = AXL_MEM_NEW (CAst);
+			pNode->m_pAstNode = AXL_MEM_NEW (CAstNode);
 		};
 
-		if (pNode->m_pAst)
-			pNode->m_pAst->m_Kind = (int) Index;
+		if (pNode->m_pAstNode)
+			pNode->m_pAstNode->m_Kind = (int) Index;
 
 		return pNode;
 	}
@@ -468,9 +468,9 @@ public:
 		case $(i - 1):
 			{
 			$(GetSymbolDeclaration (ProductionSymbol, SymbolVariableName, "GetSymbolTop ()"))
-			$(GetAstDeclaration (ProductionSymbol, AstVariableName, SymbolVariableName))
+			$(GetAstDeclaration (ProductionSymbol, AstNodeVariableName, SymbolVariableName))
 #line $(GetPpLine (Action.SrcPos.FilePath, Action.SrcPos.Line))
-			$(ProcessActionUserCode (Action.UserCode, Action.Dispatcher, SymbolVariableName, AstVariableName));
+			$(ProcessActionUserCode (Action.UserCode, Action.Dispatcher, SymbolVariableName, AstNodeVariableName));
 #line $(GetPpLineDefault ())
 			}
 
@@ -501,10 +501,10 @@ public:
 			{
 			$(GetSymbolDeclaration (TargetSymbol, "__pTarget", "pSymbol"))
 			$(GetSymbolDeclaration (ProductionSymbol, SymbolVariableName, "GetSymbolTop ()"))
-			$(GetAstDeclaration (ProductionSymbol, AstVariableName, SymbolVariableName))
+			$(GetAstDeclaration (ProductionSymbol, AstNodeVariableName, SymbolVariableName))
 			%{ for j = 1, #ValueTable do
 				ArgumentName = TargetSymbol.ArgNameTable [j]
-				ArgumentValue = ProcessActionUserCode (ValueTable [j], Argument.Dispatcher, SymbolVariableName, AstVariableName)
+				ArgumentValue = ProcessActionUserCode (ValueTable [j], Argument.Dispatcher, SymbolVariableName, AstNodeVariableName)
 				}
 #line $(GetPpLine (Argument.SrcPos.FilePath, Argument.SrcPos.Line))
 			__pTarget->m_Arg.$ArgumentName = $ArgumentValue;
@@ -530,9 +530,9 @@ public:
 		case ESymbol_$(Symbol.Name):
 			{
 				$(GetSymbolDeclaration (Symbol, SymbolVariableName, "GetSymbolTop ()"))
-				$(GetAstDeclaration (Symbol, AstVariableName, SymbolVariableName))
+				$(GetAstDeclaration (Symbol, AstNodeVariableName, SymbolVariableName))
 #line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.EnterLine))
-				$(ProcessActionUserCode (Symbol.Enter, nil, SymbolVariableName, AstVariableName));
+				$(ProcessActionUserCode (Symbol.Enter, nil, SymbolVariableName, AstNodeVariableName));
 #line $(GetPpLineDefault ())
 			}
 			return true;
@@ -555,9 +555,9 @@ public:
 		case ESymbol_$(Symbol.Name):
 			{
 				$(GetSymbolDeclaration (Symbol, SymbolVariableName, "GetSymbolTop ()"))
-				$(GetAstDeclaration (Symbol, AstVariableName, SymbolVariableName))
+				$(GetAstDeclaration (Symbol, AstNodeVariableName, SymbolVariableName))
 #line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.LeaveLine))
-				$(ProcessActionUserCode (Symbol.Leave, nil, SymbolVariableName, AstVariableName));
+				$(ProcessActionUserCode (Symbol.Leave, nil, SymbolVariableName, AstNodeVariableName));
 #line $(GetPpLineDefault ())
 			}
 			return true;

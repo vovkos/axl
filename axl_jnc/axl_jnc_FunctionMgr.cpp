@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_FunctionMgr.h"
+#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -10,7 +11,9 @@ void
 CFunctionMgr::Clear ()
 {
 	m_FunctionList.Clear ();
+	m_PropertyList.Clear ();
 	m_GlobalFunctionList.Clear ();
+	m_GlobalPropertyList.Clear ();
 }
 
 CFunction*
@@ -126,6 +129,47 @@ CFunctionMgr::CreateGlobalProperty (
 	pGlobalProperty->m_pProperty = pProperty;
 	m_GlobalPropertyList.InsertTail (pGlobalProperty);
 	return pGlobalProperty;
+}
+
+bool
+CFunctionMgr::CompileFunctions ()
+{
+	bool Result;
+
+	rtl::CIteratorT <jnc::CFunction> Function = m_FunctionList.GetHead ();
+	for (; Function; Function++)
+	{
+		jnc::CFunction* pFunction = *Function;
+
+		if (!pFunction->HasBody ())
+			continue;
+
+		jnc::CParser Parser;
+		Parser.m_Stage = jnc::CParser::EStage_Pass2;
+		Parser.m_pModule = m_pModule;
+		Parser.Create (jnc::ESymbol_function_body, true); 
+		
+		rtl::CBoxIteratorT <jnc::CToken> Token = pFunction->GetBodyFirstToken ();
+		for (; Token; Token++)
+		{
+			Result = Parser.ParseToken (&*Token);
+			if (!Result)
+			{
+				err::PushSrcPosError (m_pModule->m_FilePath, Token->m_Pos.m_Line, Token->m_Pos.m_Col);
+				return false;
+			}
+		}
+
+		pFunction->m_Ast = Parser.GetAst ();
+		jnc::CParser::CAstNode* pAstNode = pFunction->m_Ast->GetRoot ();
+
+		ASSERT (pAstNode->m_Kind == jnc::ESymbol_function_body);
+		jnc::CParser::CFunctionBody* pBody = (jnc::CParser::CFunctionBody*) pAstNode;
+		pFunction->m_pBlock = pBody->m_pBlock;
+		pFunction->m_pScope = pBody->m_pScope;
+	}
+
+	return true;
 }
 
 //.............................................................................

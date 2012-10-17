@@ -4,7 +4,7 @@ global_declaration
 	: namespace_declaration
 	| using_declaration 
 	| common_declaration
-	| compound_statement_pass1
+	| function_body_pass1
 	| ';'
 	;
 
@@ -88,10 +88,6 @@ generic_formal_argument <CStructClassType* $pType>
 			if (!Result)
 				return false;
 		}
-	;
-
-generic_actual_argument_list
-	: '<' type_name (',' type_name)* '>'
 	;
 
 //.............................................................................
