@@ -18,6 +18,7 @@
 #include <new>
 #include <typeinfo>
 
+#include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,6 +52,7 @@ extern "C" {
 #include "axl_lex_RagelLexer.h"
 #include "axl_io_MappedFile.h"
 #include "axl_st_StringTemplate.h"
+#include "axl_rtl_StringHashTable.h"
 #include "axl_rtl_ArrayList.h"
 #include "axl_rtl_BitMap.h"
 #include "axl_io_FilePathUtils.h"

@@ -74,6 +74,35 @@ CFunctionType::CreateTypeString (
 	return String;
 }
 
+llvm::FunctionType* 
+CFunctionType::GetLlvmType ()
+{
+	if (m_Flags & ETypeFlag_IsLlvmReady)
+		return (llvm::FunctionType*) m_pLlvmType;
+
+	size_t ArgCount = m_ArgTypeArray.GetCount ();
+
+	rtl::CArrayT <llvm::Type*> LlvmArgTypeArray;
+	LlvmArgTypeArray.SetCount (ArgCount);
+
+	for (size_t i = 0; i < ArgCount; i++)
+	{
+		CType* pType = m_ArgTypeArray [i];
+		llvm::Type* pLlvmType = pType->GetLlvmType ();
+		LlvmArgTypeArray [i] = pLlvmType;
+	}
+
+	llvm::FunctionType* pLlvmType = llvm::FunctionType::get (
+		m_pReturnType->GetLlvmType (),
+		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, ArgCount),
+		false
+		);
+	
+	m_pLlvmType = pLlvmType;
+	m_Flags |= ETypeFlag_IsLlvmReady;
+	return pLlvmType;
+}
+
 //.............................................................................
 
 bool

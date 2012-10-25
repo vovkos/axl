@@ -41,7 +41,7 @@ protected:
 	rtl::CArrayT <CArgumentNode*> m_ArgumentArray;
 	rtl::CArrayT <CBeaconNode*> m_BeaconArray;
 	rtl::CArrayT <CBeaconNode*> m_BeaconDeleteArray;
-	rtl::CHashTableMapT <const tchar_t*, CBeaconNode*, rtl::CHashString, rtl::CCmpString> m_BeaconMap;
+	rtl::CStringHashTableMapT <CBeaconNode*> m_BeaconMap;
 
 public:
 	CProductionBuilder (CNodeMgr* pNodeMgr);

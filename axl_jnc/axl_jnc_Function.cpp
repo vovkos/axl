@@ -1,10 +1,20 @@
 #include "stdafx.h"
 #include "axl_jnc_Function.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
+
+CFunction::CFunction ()
+{
+	m_ItemKind = EModuleItem_Function;
+	m_pType = NULL;
+	m_pBlock = NULL;
+	m_pScope = NULL;
+	m_pLlvmFunction = NULL;
+}
 
 rtl::CString
 CFunction::CreateArgString ()
@@ -34,6 +44,26 @@ CFunction::CreateArgString ()
 		String.Append (_T(", ...)"));
 
 	return String;
+}
+
+llvm::Function* 
+CFunction::GetLlvmFunction ()
+{
+	if (m_pLlvmFunction)
+		return m_pLlvmFunction;
+
+	rtl::CString Name;
+	Name.Format (_T("function_%x"), this);
+
+	llvm::FunctionType* pLlvmType = m_pType->GetLlvmType ();
+	m_pLlvmFunction = llvm::Function::Create (
+		pLlvmType, 
+		llvm::Function::ExternalLinkage, 
+		(const tchar_t*) Name, 
+		m_pModule->GetLlvmModule ()
+		);
+
+	return m_pLlvmFunction;
 }
 
 //.............................................................................

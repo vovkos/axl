@@ -26,7 +26,7 @@ CMappedViewMgr::Find (
 
 	// ok, now try to find existing view using the view map...
 
-	CViewMap::CIterator It = m_ViewMap.FindEx <rtl::CLessOrEqualT <size_t> > (Begin);
+	CViewMap::CIterator It = m_ViewMap.FindEx <rtl::CLeT <size_t> > (Begin);
 	if (!It)
 		return NULL;
 

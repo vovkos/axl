@@ -1,10 +1,17 @@
 #include "stdafx.h"
 #include "axl_jnc_AttributeMgr.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
+
+CAttributeMgr::CAttributeMgr (CModule* pModule)
+{
+	m_pModule = pModule;
+	m_pCurrentAttributeSet = NULL;
+}
 
 void
 CAttributeMgr::AssignAttributeSet (CModuleItem* pItem)

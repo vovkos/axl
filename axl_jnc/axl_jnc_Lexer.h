@@ -21,6 +21,7 @@ enum EToken
 	EToken_Namespace,
 	EToken_Using,
 	EToken_Pack,
+	EToken_Endian,
 	EToken_Typedef,
 	EToken_Static,
 	EToken_Const,
@@ -69,6 +70,7 @@ enum EToken
 	EToken_Default,
 	EToken_True,
 	EToken_False,
+	EToken_Null,
 	EToken_Eq,
 	EToken_Ne,
 	EToken_Le,
@@ -104,6 +106,8 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Import,       "import")
 	AXL_PRS_TOKEN_NAME (EToken_Namespace,    "namespace")
 	AXL_PRS_TOKEN_NAME (EToken_Using,        "using")
+	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
+	AXL_PRS_TOKEN_NAME (EToken_Endian,       "endian")
 	AXL_PRS_TOKEN_NAME (EToken_Typedef,      "typedef")
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
@@ -132,7 +136,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_EnumC,        "enumc")
 	AXL_PRS_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_PRS_TOKEN_NAME (EToken_Union,        "union")
-	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
 	AXL_PRS_TOKEN_NAME (EToken_Class,        "class")
 	AXL_PRS_TOKEN_NAME (EToken_Interface,    "interface")
 	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
@@ -151,6 +154,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Default,      "default")
 	AXL_PRS_TOKEN_NAME (EToken_True,         "true")
 	AXL_PRS_TOKEN_NAME (EToken_False,        "false")
+	AXL_PRS_TOKEN_NAME (EToken_Null,         "null")
 	AXL_PRS_TOKEN_NAME (EToken_Eq,           "==")
 	AXL_PRS_TOKEN_NAME (EToken_Ne,           "!=")
 	AXL_PRS_TOKEN_NAME (EToken_Le,           "<=")
@@ -213,7 +217,7 @@ protected:
 		)
 	{
 		CToken* pToken = CreateToken (EToken_Integer);
-		pToken->m_Data.m_Integer = strtol (ts + Left, NULL, Radix);
+		pToken->m_Data.m_UInt64 = _strtoui64 (ts + Left, NULL, Radix);
 		return pToken;
 	}
 

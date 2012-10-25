@@ -63,6 +63,7 @@ protected:
 	friend class CFunctionMgr;
 
 	CFunctionType* m_pType;
+	rtl::CString m_Tag;
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
 
@@ -70,15 +71,20 @@ protected:
 	CBasicBlock* m_pBlock;
 	CScope* m_pScope;
 
+	llvm::Function* m_pLlvmFunction;
+
 public:
-	CFunction ()
+	CFunction ();
+
+	rtl::CString 
+	GetTag ()
 	{
-		m_ItemKind = EModuleItem_Function;
-		m_pType = NULL;
-		m_pBlock = NULL;
-		m_pScope = NULL;
+		return m_Tag;
 	}
 
+	llvm::Function* 
+	GetLlvmFunction ();
+	
 	CFunctionType* 
 	GetType ()
 	{

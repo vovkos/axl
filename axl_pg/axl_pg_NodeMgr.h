@@ -20,7 +20,7 @@ protected:
 	friend class CParseTableBuilder;
 
 	rtl::CHashTableMapT <int, CSymbolNode*, rtl::CHashIdT <int>, rtl::CCmpT <int> > m_TokenMap;
-	rtl::CHashTableMapT <const tchar_t*, CSymbolNode*, rtl::CHashString, rtl::CCmpString> m_SymbolMap;
+	rtl::CStringHashTableMapT <CSymbolNode*> m_SymbolMap;
 
 	CGrammarNode m_EpsilonNode;
 	CSymbolNode m_EofTokenNode;

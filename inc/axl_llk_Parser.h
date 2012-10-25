@@ -71,13 +71,11 @@ protected:
 	CToken m_LastMatchedToken;
 
 	int m_Flags;
-	int m_PragmaLevel;
 
 public:
 	CParserT ()
 	{
 		m_Flags = 0;
-		m_PragmaLevel = 0;
 	}
 
 	bool
@@ -111,7 +109,6 @@ public:
 		m_TokenList.Clear ();
 		m_Ast.Release ();
 		m_Flags = 0;
-		m_PragmaLevel = 0;
 	}
 
 	bool
@@ -119,30 +116,24 @@ public:
 	{
 		size_t* pParseTable = ((T*) this)->GetParseTable ();
 		size_t TokenIndex = ((T*) this)->GetTokenIndex (pToken->m_Token);
+		ASSERT (TokenIndex < T::TokenCount);
+
+		// first check for pragma productions out of band
+
+		if (T::StartPragmaSymbol != -1)
+		{
+			size_t ProductionIndex = pParseTable [T::StartPragmaSymbol * T::TokenCount + TokenIndex];
+			if (ProductionIndex != -1 && ProductionIndex != 0)
+				PushPrediction (ProductionIndex);
+		}
 
 		CToken Token = *pToken;
-		ASSERT (TokenIndex < T::TokenCount);
 
 		m_Flags &= ~(EFlag_IsTokenMatch | EFlag_IsTokenSaved);
 
 		for (;;)
 		{
 			EMatchResult MatchResult;
-
-			// first check for pragma productions out of band
-
-			if (T::StartPragmaSymbol != -1 && m_PragmaLevel < T::PragmaNestingLimit)
-			{
-				size_t ProductionIndex = pParseTable [T::StartPragmaSymbol * T::TokenCount + TokenIndex];
-				if (ProductionIndex != -1 && ProductionIndex != 0)
-				{
-					CNode* pPragma = PushPrediction (ProductionIndex);
-					ASSERT (pPragma && pPragma->m_Kind == ENode_Symbol);
-
-					pPragma->m_Flags |= ESymbolNodeFlag_IsPragma;
-					m_PragmaLevel++;
-				}
-			}
 
 			CNode* pNode = GetPredictionTop ();
 			if (!pNode)
@@ -306,9 +297,6 @@ protected:
 				if (!Result)
 					return EMatchResult_Fail;
 			}
-
-			if (pNode->m_Flags & ESymbolNodeFlag_IsPragma)
-				m_PragmaLevel--;
 
 			PopSymbol ();
 			PopPrediction ();
@@ -497,9 +485,6 @@ protected:
 
 				// do NOT call OnLeave () during resolver unwinding
 				// cause OnLeave () assumes parsing of the symbol is complete
-
-				if (pNode->m_Flags & ESymbolNodeFlag_IsPragma)
-					m_PragmaLevel--;
 
 				PopSymbol ();
 			}

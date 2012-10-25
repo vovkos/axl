@@ -50,7 +50,7 @@ protected:
 	CModuleItem* m_pParentItem;
 
 	rtl::CStdListT <CAttribute> m_AttributeList;
-	rtl::CHashTableMapT <const tchar_t*, CAttribute*, rtl::CHashString, rtl::CCmpString> m_AttributeMap; 
+	rtl::CStringHashTableMapT <CAttribute*> m_AttributeMap; 
 
 public:
 	CAttributeSet ()

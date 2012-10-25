@@ -104,6 +104,15 @@
     <ClInclude Include="ModulePane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DasmPane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LlvmIrPane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_ast.cpp">
@@ -125,6 +134,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ModulePane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DasmPane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LlvmIrPane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

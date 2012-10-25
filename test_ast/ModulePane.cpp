@@ -644,7 +644,7 @@ CModulePane::OnDblClk (NMHDR* pNMHDR, LRESULT* pResult)
 
 	int Offset1 = pView->GetEditCtrl ().LineIndex (pItem->GetPos ().m_Line);
 	int Offset2 = pView->GetEditCtrl ().LineIndex (pItem->GetPos ().m_Line + 1);
-	
+
 	pView->GetEditCtrl ().SetSel (Offset1, Offset1);
 	pView->GetEditCtrl ().SetSel (Offset1, Offset2);
 

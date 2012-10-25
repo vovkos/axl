@@ -59,6 +59,7 @@ main := |*
 'namespace'    { CreateToken (EToken_Namespace); };
 'using'        { CreateToken (EToken_Using); };
 'pack'         { CreateToken (EToken_Pack); };
+'endian'       { CreateToken (EToken_Endian); };
 
 'typedef'      { CreateToken (EToken_Typedef); };
 'static'       { CreateToken (EToken_Static); };
@@ -116,6 +117,7 @@ main := |*
 
 'true'         { CreateToken (EToken_True); };
 'false'        { CreateToken (EToken_False); };
+'null'         { CreateToken (EToken_Null); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

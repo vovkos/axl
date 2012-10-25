@@ -19,7 +19,20 @@ protected:
 	rtl::CArrayT <CType*> m_BaseTypeArray;
 	rtl::CArrayT <CImportType*> m_GenericArgumentArray;
 
+	size_t m_PackFactor;
+
 public:
+	CStructClassType ()
+	{
+		m_PackFactor = 8;
+	}
+
+	size_t 
+	GetPackFactor ()
+	{
+		return m_PackFactor;
+	}
+
 	size_t 
 	GetBaseTypeCount ()
 	{
@@ -103,6 +116,9 @@ public:
 		m_TypeKind = EType_Struct;
 	}
 
+	llvm::StructType* 
+	GetLlvmType ();
+
 	CStructMember*
 	FindMember (
 		const tchar_t* pName,
@@ -112,8 +128,7 @@ public:
 	CStructMember*
 	CreateMember (
 		const rtl::CString& Name,
-		CType* pType,
-		size_t PackFactor = 8
+		CType* pType
 		);
 
 	rtl::CIteratorT <CStructMember>

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_Value.h"
 
 namespace axl {
 namespace jnc {
@@ -18,16 +18,21 @@ protected:
 	CModule* m_pModule;
 
 public:
-	CConstMgr ()
+	CConstMgr (CModule* pModule)
 	{
-		m_pModule = NULL;
+		m_pModule = pModule;
+	}
+
+	CModule* 
+	GetModule ()
+	{
+		return m_pModule;
 	}
 
 	void
 	Clear ()
 	{
 	}
-
 };
 
 //.............................................................................

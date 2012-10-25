@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_ClassType.h"
-#include "axl_jnc_TypeMgr.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -51,16 +51,15 @@ CClassType::FindMember (
 CClassFieldMember*
 CClassType::CreateFieldMember (
 	const rtl::CString& Name,
-	CType* pType,
-	size_t PackFactor
+	CType* pType
 	)
 {
 	if (!m_pFieldBlockType)
-		m_pFieldBlockType = m_pTypeMgr->CreateUnnamedStructType (EType_Struct);
+		m_pFieldBlockType = m_pModule->m_TypeMgr.CreateUnnamedStructType (EType_Struct, m_PackFactor);
 
 	CClassFieldMember* pMember = AXL_MEM_NEW (CClassFieldMember);
 	pMember->m_Name = Name;
-	pMember->m_pField = m_pFieldBlockType->CreateMember (Name, pType, PackFactor);
+	pMember->m_pField = m_pFieldBlockType->CreateMember (Name, pType);
 	m_FieldMemberList.InsertTail (pMember);
 
 	bool Result = AddItem (pMember);
@@ -104,6 +103,19 @@ CClassType::CreatePropertyMember (
 		return NULL;
 
 	return pMember;
+}
+
+llvm::StructType* 
+CClassType::GetLlvmType ()
+{
+	if (m_Flags & ETypeFlag_IsLlvmReady)
+		return (llvm::StructType*) m_pLlvmType;
+
+	llvm::StructType* pLlvmType = NULL;
+	
+	m_pLlvmType = pLlvmType;
+	m_Flags |= ETypeFlag_IsLlvmReady;
+	return pLlvmType;
 }
 
 //.............................................................................

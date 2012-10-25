@@ -509,39 +509,27 @@ public:
 	}
 
 	bool 
+	operator == (const CStringT& String) const
+	{ 
+		return Cmp (String) == 0; 
+	}
+
+	bool 
 	operator == (const C* p) const
 	{ 
 		return Cmp (p) == 0; 
 	}
 
 	bool 
+	operator != (const CStringT& String) const
+	{ 
+		return Cmp (String) != 0; 
+	}
+
+	bool 
 	operator != (const C* p) const
 	{ 
 		return Cmp (p) != 0; 
-	}
-
-	bool 
-	operator < (const C* p) const
-	{ 
-		return Cmp (p) < 0; 
-	}
-
-	bool 
-	operator > (const C* p) const
-	{ 
-		return Cmp (p) > 0; 
-	}
-
-	bool 
-	operator <= (const C* p) const
-	{ 
-		return Cmp (p) <= 0; 
-	}
-
-	bool 
-	operator >= (const C* p) const
-	{ 
-		return Cmp (p) >= 0; 
 	}
 
 	CStringT& 
@@ -615,15 +603,15 @@ public:
 	}
 
 	CStringT 
-	operator + (const C* p) const
+	operator + (const CStringT& String) const
 	{ 
 		CStringT Result = *this;
-		Result.Append (p);
+		Result.Append (String);
 		return Result; 
 	}
 
 	CStringT 
-	operator + (const C2* p) const
+	operator + (const C* p) const
 	{ 
 		CStringT Result = *this;
 		Result.Append (p);
@@ -635,6 +623,14 @@ public:
 	{ 
 		CStringT Result = *this;
 		Result.Append (String);
+		return Result; 
+	}
+
+	CStringT 
+	operator + (const C2* p) const
+	{ 
+		CStringT Result = *this;
+		Result.Append (p);
 		return Result; 
 	}
 
@@ -692,6 +688,21 @@ public:
 		) const
 	{
 		return Cmp (0, p, Length);
+	}
+
+	int 
+	Cmp (
+		int Flags,
+		const CStringT& String
+		) const
+	{ 
+		return CDetails::Cmp (m_p, GetLength (), String, String.GetLength (), Flags);
+	}
+
+	int 
+	Cmp (const CStringT& String) const
+	{
+		return Cmp (0, String);
 	}
 
 	size_t 
@@ -1169,7 +1180,7 @@ protected:
 		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
 		NewHdr->m_Length = 0;
 		NewHdr->m_MaxLength = (Size - sizeof (CHdr)) / sizeof (C) - 1;
-		NewHdr->SetFree (Kind == ref::EBuf_Stack ? (mem::FFree) -1 : NULL);
+		NewHdr->SetFree (Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1);
 
 		if (pOldHdr)
 			pOldHdr->Release ();

@@ -59,13 +59,15 @@ CAstDoc::Compile ()
 
 	CMainFrame* pMainFrame = GetMainFrame ();
 
-	pMainFrame->m_OutputPane.Trace (_T("Parsing...\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Parsing...\n"));
 	pMainFrame->m_GlobalAstPane.Clear ();
 	pMainFrame->m_FunctionAstPane.Clear ();
 	pMainFrame->m_ModulePane.Clear ();
+	pMainFrame->m_LlvmIrPane.Clear ();
+	pMainFrame->m_DasmPane.Clear ();
 
-	m_Module.Clear ();
-	m_Module.m_FilePath = GetPathName ();
+	m_Module.Create ((const tchar_t*) GetPathName ());
+	jnc::CSetCurrentThreadModule ScopeModule (&m_Module);
 
 	GetView ()->GetWindowText (m_SourceText);
 
@@ -73,7 +75,6 @@ CAstDoc::Compile ()
 	Lexer.Create ((const tchar_t*) m_strPathName, m_SourceText, m_SourceText.GetLength ());
 
 	jnc::CParser Parser;
-	Parser.m_pModule = &m_Module;
 	Parser.Create (jnc::CParser::StartSymbol, true);
 
 	for (;;)
@@ -86,7 +87,7 @@ CAstDoc::Compile ()
 		if (!Result)
 		{
 			rtl::CString Text = err::GetError ()->GetDescription ();
-			pMainFrame->m_OutputPane.Trace (
+			pMainFrame->m_OutputPane.m_LogCtrl.Trace (
 				_T("%s(%d,%d): %s\n"), 
 				m_strPathName, 
 				pToken->m_Pos.m_Line + 1, 
@@ -99,25 +100,27 @@ CAstDoc::Compile ()
 		Lexer.NextToken ();
 	}
 
-	pMainFrame->m_OutputPane.Trace (_T("Resolving imports...\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Resolving imports...\n"));
 	Result = m_Module.m_TypeMgr.ResolveImports ();
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
 	}
 
-	pMainFrame->m_OutputPane.Trace (_T("Compiling functions...\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
 	Result = m_Module.m_FunctionMgr.CompileFunctions ();
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
 	}
 	
 	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
 	pMainFrame->m_ModulePane.Build (&m_Module);
-	pMainFrame->m_OutputPane.Trace (_T("Done.\n"));
+	pMainFrame->m_LlvmIrPane.Build (&m_Module);
+	pMainFrame->m_DasmPane.Build (&m_Module);
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done.\n"));
 	return true;
 }
 

@@ -15,8 +15,18 @@
 
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" string functions
+#define _SCL_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" iterators
+
 #include <new>
 #include <typeinfo>
+
+// http://connect.microsoft.com/VisualStudio/feedback/details/621653/including-stdint-after-intsafe-generates-warnings
+// warning C4005: 'INT8_MIN' : macro redefinition
+#pragma warning (disable : 4005)
+#include <stdint.h>
+#include <intsafe.h>
+#pragma warning (default : 4005)
 
 inline
 void 
@@ -95,14 +105,70 @@ extern "C" {
 #pragma comment (lib, "lua.lib")
 #endif
 
+#define _CRT_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" string functions
+
 // AXL
 
 #include "axl_io_MappedFile.h"
 #include "axl_st_StringTemplate.h"
 #include "axl_rtl_ArrayList.h"
 #include "axl_rtl_BitMap.h"
+#include "axl_rtl_StringHashTable.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_lex_RagelLexer.h"
 #include "axl_err_ParseError.h"
 
 using namespace axl;
+
+// LLVM
+
+// warning C4146: unary minus operator applied to unsigned type, result still unsigned
+// warning C4355: 'this' : used in base member initializer list
+// warning C4800: 'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
+
+#pragma warning (disable: 4146)
+#pragma warning (disable: 4355)
+#pragma warning (disable: 4800) 
+
+#undef min
+#undef max
+
+#include "llvm/DerivedTypes.h"
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+#include "llvm/PassManager.h"
+#include "llvm/Support/IRBuilder.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Analysis/Verifier.h"
+#include "llvm/Analysis/Passes.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/GenericValue.h"
+#include "llvm/ExecutionEngine/JIT.h"
+#include "llvm/Target/TargetData.h"
+
+#pragma comment (lib, "LLVMSupport.lib")
+#pragma comment (lib, "LLVMCore.lib")
+#pragma comment (lib, "LLVMAnalysis.lib")
+#pragma comment (lib, "LLVMSelectionDAG.lib")
+#pragma comment (lib, "LLVMTransformUtils.lib")
+#pragma comment (lib, "LLVMScalarOpts.lib")
+#pragma comment (lib, "LLVMInstCombine.lib")
+#pragma comment (lib, "LLVMExecutionEngine.lib")
+#pragma comment (lib, "LLVMJIT.lib")
+#pragma comment (lib, "LLVMCodeGen.lib")
+#pragma comment (lib, "LLVMTarget.lib")
+#pragma comment (lib, "LLVMMC.lib")
+#pragma comment (lib, "LLVMX86AsmPrinter.lib")
+#pragma comment (lib, "LLVMX86CodeGen.lib")
+#pragma comment (lib, "LLVMX86Desc.lib")
+#pragma comment (lib, "LLVMX86Info.lib")
+#pragma comment (lib, "LLVMX86Utils.lib")
+
+#include <minmax.h>
+
+#pragma warning (default: 4146)
+#pragma warning (default: 4355)
+#pragma warning (default: 4800)

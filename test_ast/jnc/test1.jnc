@@ -1,7 +1,19 @@
 typedef unsigned int8  uint8_t,  uchar_t,  byte_t;
+
+#pack: 1
+
+#endian: bigendian
 typedef unsigned int16 uint16_t, ushort_t, word_t;
+#endian: default
+
 typedef unsigned int32 uint32_t, ulong_t,  dword_t;
 typedef unsigned int64 uint64_t, qword_t;
+typedef bigendian int16 beint16_t;
+typedef bigendian int32 beint32_t;
+typedef bigendian int64 beint64_t;
+typedef bigendian unsigned int16 beuint16_t, beushort_t, beword_t;
+typedef bigendian unsigned int32 beuint32_t, beulong_t,  bedword_t;
+typedef bigendian unsigned int64 beuint64_t, beqword_t;
 
 //.............................................................................
 
@@ -12,18 +24,18 @@ enum EColor
 	Blue  
 };
 
-void
-test (
-	int a,
-	int b
-	)
+int
+test ()
 {
-	int i, j, k, l, m;
+	int i;
+	int j;
+	int k;
 
-	if (i < j)
-		m = i * j + k / l;
-	else
-		m = i % j - k << l;
+	i = 10;
+	j = 20;
+	k = 30;
+
+	return (1 + 2) * (4 + 5);
 }
 
 //.............................................................................

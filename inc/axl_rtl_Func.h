@@ -115,16 +115,221 @@ public:
 
 //.............................................................................
 
+// arithmetic functors (sometimes it's necessary to redefine TArg to "const T&")
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CMinusT
+{
+public:
+	T
+	operator () (TArg a) const
+	{ 
+		return -a; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CNotT
+{
+public:
+	T
+	operator () (TArg a) const
+	{ 
+		return ~a; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CAddT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a + b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CSubT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a - b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CMulT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a * b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CDivT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a / b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CModT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a % b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CShlT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a << b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CShrT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a >> b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CAndT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a & b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class CXorT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a ^ b; 
+	}
+};
+
+template <
+	typename T,
+	typename TArg = T
+	>
+class COrT
+{
+public:
+	T
+	operator () (
+		TArg a,
+		TArg b
+		) const
+	{ 
+		return a | b; 
+	}
+};
+
+//.............................................................................
+
 // relational functors
 
-template <typename T>
-class CEqualT
+template <
+	typename T,
+	typename TArg = T
+	>
+class CEqT
 {
 public:
 	bool 
 	operator () (
-		const T& a, 
-		const T& b
+		TArg a, 
+		TArg b
 		) const
 	{ 
 		return a == b; 
@@ -133,14 +338,17 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-class CNotEqualT
+template <
+	typename T,
+	typename TArg = T
+	>
+class CNeT
 {
 public:
 	bool 
 	operator () (
-		const T& a, 
-		const T& b
+		TArg a, 
+		TArg b
 		) const
 	{ 
 		return a != b; 
@@ -149,14 +357,17 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-class CLessT
+template <
+	typename T,
+	typename TArg = T
+	>
+class CLtT
 {
 public:
 	bool 
 	operator () (
-		const T& a, 
-		const T& b
+		TArg a, 
+		TArg b
 		) const
 	{ 
 		return a < b; 
@@ -165,14 +376,17 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-class CGreaterT
+template <
+	typename T,
+	typename TArg = T
+	>
+class CGtT
 {
 public:
 	bool 
 	operator () (
-		const T& a, 
-		const T& b
+		TArg a, 
+		TArg b
 		) const
 	{ 
 		return a > b; 
@@ -181,14 +395,17 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-class CLessOrEqualT
+template <
+	typename T,
+	typename TArg = T
+	>
+class CLeT
 {
 public:
 	bool 
 	operator () (
-		const T& a, 
-		const T& b
+		TArg a, 
+		TArg b
 		) const
 	{ 
 		return a <= b; 
@@ -197,14 +414,17 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-class CGreaterOrEqualT
+template <
+	typename T,
+	typename TArg = T
+	>
+class CGeT
 {
 public:
 	bool 
 	operator () (
-		const T& a, 
-		const T& b
+		TArg a, 
+		TArg b
 		) const
 	{ 
 		return a >= b; 
@@ -335,7 +555,7 @@ typedef CCmpStringIT <tchar_t> CCmpStringI;
 // hash functors
 
 size_t
-djb2(
+djb2 (
 	const void* _p,
 	size_t Size
 	);

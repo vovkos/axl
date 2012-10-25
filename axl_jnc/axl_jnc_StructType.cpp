@@ -74,8 +74,7 @@ CStructType::FindMember (
 CStructMember*
 CStructType::CreateMember (
 	const rtl::CString& Name,
-	CType* pType,
-	size_t PackFactor
+	CType* pType
 	)
 {
 	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
@@ -89,6 +88,19 @@ CStructType::CreateMember (
 		return NULL;
 
 	return pMember;
+}
+
+llvm::StructType* 
+CStructType::GetLlvmType ()
+{
+	if (m_Flags & ETypeFlag_IsLlvmReady)
+		return (llvm::StructType*) m_pLlvmType;
+
+	llvm::StructType* pLlvmType = NULL;
+	
+	m_pLlvmType = pLlvmType;
+	m_Flags |= ETypeFlag_IsLlvmReady;
+	return pLlvmType;
 }
 
 //.............................................................................

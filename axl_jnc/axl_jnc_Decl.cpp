@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_Decl.h"
 #include "axl_jnc_TypeMgr.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -192,11 +193,11 @@ CDeclarator::GetArgList ()
 }
 
 CType*
-CDeclarator::GetType (
-	CTypeSpecifierModifiers* pTypeSpecifier,
-	CTypeMgr* pTypeMgr
-	)
+CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 {
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
 	CType* pType = pTypeSpecifier->GetType ();
 	int Modifiers = pTypeSpecifier->GetTypeModifiers ();
 
@@ -208,7 +209,7 @@ CDeclarator::GetType (
 			Modifiers & ETypeModifier_LittleEndian
 			)
 		{
-			pType = pTypeMgr->GetBasicType (EType_Int);
+			pType = pModule->m_TypeMgr.GetBasicType (EType_Int);
 		}
 		else
 		{
@@ -219,7 +220,7 @@ CDeclarator::GetType (
 
 	if (Modifiers)
 	{
-		pType = pType->GetTypeMod (Modifiers);
+		pType = pType->ModifyType (Modifiers);
 		if (!pType)
 			return NULL;
 	}
@@ -245,7 +246,7 @@ CDeclarator::GetType (
 
 		if (Modifiers)
 		{
-			pType = pType->GetTypeMod (Modifiers);
+			pType = pType->ModifyType (Modifiers);
 			if (!pType)
 				return NULL;
 		}
@@ -273,7 +274,7 @@ CDeclarator::GetType (
 			size_t Count = pArgSuffix->GetArgCount ();
 			if (!Count)
 			{
-				pType = pTypeMgr->GetFunctionType (pType, NULL, 0, FunctionTypeFlags);
+				pType = pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, FunctionTypeFlags);
 			}		
 			else
 			{
@@ -284,7 +285,7 @@ CDeclarator::GetType (
 				for (size_t i = 0; Arg; Arg++, i++)
 					ArgTypeArray [i] = Arg->GetType ();
 
-				pType = pTypeMgr->GetFunctionType (pType, ArgTypeArray, Count, FunctionTypeFlags);
+				pType = pModule->m_TypeMgr.GetFunctionType (pType, ArgTypeArray, Count, FunctionTypeFlags);
 			}
 		}
 	}

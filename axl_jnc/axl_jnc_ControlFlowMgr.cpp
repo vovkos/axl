@@ -1,10 +1,17 @@
 #include "stdafx.h"
 #include "axl_jnc_ControlFlowMgr.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
+
+CControlFlowMgr::CControlFlowMgr (CModule* pModule):
+	m_LlvmBuilder (llvm::getGlobalContext())
+{
+	m_pModule = pModule;
+}
 
 void
 CControlFlowMgr::Clear ()
@@ -14,10 +21,26 @@ CControlFlowMgr::Clear ()
 }
 
 CBasicBlock* 
-CControlFlowMgr::CreateBlock ()
+CControlFlowMgr::CreateBlock (
+	const rtl::CString& Name,
+	bool IsCurrent
+	)
 {
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+
 	CBasicBlock* pBlock = AXL_MEM_NEW (CBasicBlock);
+	pBlock->m_Name = Name;
+	pBlock->m_pLlvmBlock = llvm::BasicBlock::Create (
+		llvm::getGlobalContext (), 
+		(const tchar_t*) Name,
+		pFunction ? pFunction->GetLlvmFunction () : NULL
+		);
+
 	m_BlockList.InsertTail (pBlock);
+
+	if (IsCurrent)
+		SetCurrentBlock (pBlock, 0);
+
 	return pBlock;
 }
 
@@ -28,6 +51,7 @@ CControlFlowMgr::SetCurrentBlock (
 	)
 {
 	m_pCurrentBlock = pBlock;
+	m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
 }
 
 //.............................................................................

@@ -337,10 +337,7 @@ public:
 	AddFormalArgSuffix ();
 
 	CType*
-	GetType (
-		CTypeSpecifierModifiers* pTypeSpecifier,
-		CTypeMgr* pTypeMgr
-		);
+	GetType (CTypeSpecifierModifiers* pTypeSpecifier);
 
 	rtl::CStdListT <CFunctionFormalArg>*
 	GetArgList ();

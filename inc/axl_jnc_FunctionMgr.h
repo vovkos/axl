@@ -18,15 +18,26 @@ protected:
 	friend class CModule;
 	CModule* m_pModule;
 
+	CFunction* m_pCurrentFunction;
+
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
 	rtl::CStdListT <CGlobalProperty> m_GlobalPropertyList;
 
 public:
-	CFunctionMgr ()
+	CFunctionMgr (CModule* pModule);
+
+	CModule* 
+	GetModule ()
 	{
-		m_pModule = NULL;
+		return m_pModule;
+	}
+
+	CFunction*
+	GetCurrentFunction ()
+	{
+		return m_pCurrentFunction;
 	}
 
 	void
@@ -58,6 +69,7 @@ public:
 
 	CFunction*
 	CreateFunction (
+		const rtl::CString& Tag,
 		CFunctionType* pType,
 		rtl::CStdListT <CFunctionFormalArg>* pArgList
 		);
@@ -77,12 +89,6 @@ public:
 		const rtl::CString& Name,
 		CFunctionType* pType,
 		rtl::CStdListT <CFunctionFormalArg>* pArgList
-		);
-
-	CGlobalFunction*
-	CreateGlobalFunction (
-		const rtl::CString& Name,
-		CFunction* pFunction
 		);
 
 	CGlobalProperty*

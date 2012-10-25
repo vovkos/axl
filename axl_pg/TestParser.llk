@@ -2,22 +2,29 @@
 
 LL (3);
 
-global <std::list <int>* $p>
-	: '*' resolver (EToken_Identifier $a { return $a.m_Data.m_String == "hui"; }) EToken_Identifier $b
-		{ 
-			printf ("A %s\n", $b.m_Data.m_String); 
-		}
+unary_expr
+	: unary_operator* postfix_expr
+	;
 
-	| '*' EToken_Identifier $a '+'
-		{ 
-			printf ("C+ %s\n", $a.m_Data.m_String); 
-		}
+unary_operator
+	: '-'
+	| '~'
+	| resolver (cast_operator_rslv)
+	  '(' EToken_Identifier ')'
+	;
 
-	| '*' EToken_Identifier $a
-		{ 
-			printf ("C %s\n", $a.m_Data.m_String); 
-		}
+cast_operator_rslv
+	: '(' EToken_Identifier ')'
+	;
 
+postfix_expr
+	: primary_expr
+	;
+
+primary_expr
+	: EToken_Identifier
+	| EToken_Integer
+	| '(' unary_expr ')'
 	;
 
 //.............................................................................

@@ -64,9 +64,7 @@ declaration_terminator_2 <CModuleItem* $pLastDeclaredItem>
 	: ';'
 	| function_body_pass1
 		{
-			bool Result = SetFunctionBody ($pLastDeclaredItem, &$1.m_TokenList);
-			if (!Result)
-				return false;
+			return SetFunctionBody ($pLastDeclaredItem, &$1.m_TokenList);
 		}
 	;
 
@@ -125,156 +123,108 @@ type_specifier_modifier <CTypeSpecifierModifiers* $pTypeSpecifier>
 access_specifier <CAccessSpecifier* $pAccessSpecifier>
 	: EToken_Public
 		{
-			bool Result = $pAccessSpecifier->SetAccess (EAccess_Public);
-			if (!Result)
-				return false;
+			return $pAccessSpecifier->SetAccess (EAccess_Public);
 		}
 	| EToken_Private 
 		{
-			bool Result = $pAccessSpecifier->SetAccess (EAccess_Private);
-			if (!Result)
-				return false;
+			return $pAccessSpecifier->SetAccess (EAccess_Private);
 		}
 	;
 
 storage_class_specifier <CDeclSpecifiers* $pDeclSpecifiers>
 	: EToken_Static 
 		{
-			bool Result = $pDeclSpecifiers->SetStorageClass (EStorageClass_Static);
-			if (!Result)
-				return false;
+			return $pDeclSpecifiers->SetStorageClass (EStorageClass_Static);
 		}
 	| EToken_Typedef
 		{
-			bool Result = $pDeclSpecifiers->SetStorageClass (EStorageClass_Typedef);
-			if (!Result)
-				return false;
+			return $pDeclSpecifiers->SetStorageClass (EStorageClass_Typedef);
 		}
 	;
 
 type_modifier <CTypeModifiers* $pTypeModifiers>
 	: EToken_Const
 		{
-			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Const);
-			if (!Result)
-				return false;
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Const);
 		}
 	| EToken_Property
 		{
-			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
-			if (!Result)
-				return false;
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
 		}
 	| EToken_Signed
 		{
-			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Signed);
-			if (!Result)
-				return false;
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Signed);
 		}
 	| EToken_Unsigned
 		{
-			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsigned);
-			if (!Result)
-				return false;
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsigned);
 		}
 	| EToken_BigEndian
 		{
-			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_BigEndian);
-			if (!Result)
-				return false;
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_BigEndian);
 		}
 	| EToken_LittleEndian
 		{
-			bool Result = $pTypeModifiers->SetTypeModifier (ETypeModifier_LittleEndian);
-			if (!Result)
-				return false;
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_LittleEndian);
 		}
 	;
 
 type_specifier <CTypeSpecifier* $pTypeSpecifier>
 	: EToken_Void
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Void));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Void));
 		}
 	| EToken_Bool
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Bool));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Bool));
 		}
 	| EToken_Int
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int));
 		}
 	| EToken_Char
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Char));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Char));
 		}
 	| EToken_Short
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Short));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Short));
 		}
 	| EToken_Long
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Long));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Long));
 		}
 	| EToken_Float
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Float));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Float));
 		}
 	| EToken_Double
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Double));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Double));
 		}
 	| EToken_Int8
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int8));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int8));
 		}
 	| EToken_Int16
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int16));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Int16));
 		}
 	| EToken_Int32
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int32));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int32));
 		}
 	| EToken_Int64
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int64));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int64_be : EType_Int64));
 		}
 	| EToken_WChar
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_WChar));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_WChar));
 		}
 	| EToken_Variant
 		{
-			bool Result = $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Variant));
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Variant));
 		}
 	| EToken_Auto
 		{
@@ -283,35 +233,25 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 		}
 	| enum_specifier
 		{
-			bool Result = $pTypeSpecifier->SetType ($1.m_pType);
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
 	| struct_specifier
 		{
-			bool Result = $pTypeSpecifier->SetType ($1.m_pType);
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
 	| class_specifier
 		{
-			bool Result = $pTypeSpecifier->SetType ($1.m_pType);
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
 	| property_specifier
 		{
-			bool Result = $pTypeSpecifier->SetProperty ($1.m_pProperty);
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetProperty ($1.m_pProperty);
 		}
 	| resolver (qualified_type_name_rslv)
 	  qualified_type_name $t
 	  generic_actual_argument_list?
 		{
-			bool Result = $pTypeSpecifier->SetType ($t.m_pType);
-			if (!Result)
-				return false;
+			return $pTypeSpecifier->SetType ($t.m_pType);
 		}
 	;
 
@@ -382,23 +322,23 @@ pointer <CDeclarator* $pDeclarator>
 	}
 	: pointer_kind 
 		{
-			$pPointer = $pDeclarator->AddPointer ($1.m_Type);
+			$pPointer = $pDeclarator->AddPointer ($1.m_TypeKind);
 		}
 	  type_modifier <$pPointer>*
 	;
 
 class
 {
-	EType m_Type;
+	EType m_TypeKind;
 }
 pointer_kind
 	: '*'
 		{
-			$.m_Type = EType_Pointer;
+			$.m_TypeKind = EType_Pointer;
 		}
 	| '&'
 		{
-			$.m_Type = EType_Reference;
+			$.m_TypeKind = EType_Reference;
 		}
 	;
 
@@ -445,9 +385,7 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 	: type_specifier_modifier_list $s
 	  declarator $d ('=' expression_pass1 $v)?
 		{
-			bool Result = DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL) != NULL;
-			if (!Result)
-				return false;
+			return DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL) != NULL;
 		}
 	;
 
@@ -455,6 +393,24 @@ function_formal_argument_vararg <CDeclFunctionSuffix* $pFunctionSuffix>
 	: EToken_Ellipsis
 		{
 			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+pragma
+pragma_endian
+	: '#' EToken_Endian ':' pragma_endian_value
+	;
+
+pragma_endian_value
+	: (EToken_LittleEndian | EToken_Default)
+		{
+			m_Endianness = EEndianness_LittleEndian;
+		}
+	| EToken_BigEndian
+		{
+			m_Endianness = EEndianness_BigEndian;
 		}
 	;
 

@@ -85,6 +85,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_GlobalAstPane.Create ("Global AST", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_GLOBALASTPANE, Style | CBRS_LEFT);
 	m_FunctionAstPane.Create ("Function AST", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_FUNCTIONASTPANE, Style | CBRS_LEFT);
 	m_ModulePane.Create ("Module", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_MODULEPANE, Style | CBRS_LEFT);
+	m_LlvmIrPane.Create ("LLVM IR", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_LLVMIRPANE, Style | CBRS_LEFT);
+	m_DasmPane.Create ("Disassembly", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_DASMPANE, Style | CBRS_LEFT);
 	m_OutputPane.Create ("Output", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_OUTPUTPANE, Style | CBRS_LEFT);
 
 	EnableDocking(CBRS_ALIGN_ANY);
@@ -92,6 +94,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane (&m_GlobalAstPane, AFX_IDW_DOCKBAR_LEFT);
 	DockPane (&m_ModulePane, AFX_IDW_DOCKBAR_RIGHT);
 	m_FunctionAstPane.DockToWindow (&m_GlobalAstPane, CBRS_ALIGN_BOTTOM);
+	m_LlvmIrPane.DockToWindow (&m_ModulePane, CBRS_ALIGN_BOTTOM);
+	m_DasmPane.AttachToTabWnd (&m_LlvmIrPane, DM_SHOW, FALSE);
 
 	return 0;
 }
@@ -225,7 +229,7 @@ void CMainFrame::OnFilePrint()
 
 void CMainFrame::OnClearOutput()
 {
-	m_OutputPane.Clear ();
+	m_OutputPane.m_LogCtrl.Clear ();
 
 }
 

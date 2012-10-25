@@ -24,7 +24,8 @@ class CTypeMgr
 protected:
 	friend class CModule;
 	CModule* m_pModule;
-	CType m_BasicTypeArray [EType_Variant + 1];
+
+	CType m_BasicTypeArray [EType__BasicTypeCount];
 
 	rtl::CStdListT <CDerivedType> m_DerivedTypeList;
 	rtl::CStdListT <CArrayType> m_ArrayTypeList;
@@ -36,10 +37,16 @@ protected:
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
-	rtl::CHashTableMapT <const char*, CType*, rtl::CHashString, rtl::CCmpString> m_TypeMap;
+	rtl::CStringHashTableMapT <CType*> m_TypeMap;
 	
 public:
-	CTypeMgr ();
+	CTypeMgr (CModule* pModule);
+
+	CModule* 
+	GetModule ()
+	{
+		return m_pModule;
+	}
 
 	void
 	Clear ();
@@ -48,7 +55,41 @@ public:
 	ResolveImports ();
 
 	CType* 
-	GetBasicType (EType Type);
+	GetBasicType (EType TypeKind)
+	{
+		ASSERT (TypeKind < EType__BasicTypeCount);
+		return &m_BasicTypeArray [TypeKind];
+	}
+
+	CType*
+	GetInt32Type (int32_t Integer)
+	{
+		return GetBasicType (GetInt32TypeKind (Integer));
+	}
+
+	CType*
+	GetUInt32Type (
+		uint32_t Integer,
+		bool ForceUnsigned
+		)
+	{
+		return GetBasicType (GetUInt32TypeKind (Integer, ForceUnsigned));
+	}
+
+	CType*
+	GetInt64Type (int64_t Integer)
+	{
+		return GetBasicType (GetInt64TypeKind (Integer));
+	}
+
+	CType*
+	GetUInt64Type (
+		uint64_t Integer,
+		bool ForceUnsigned
+		)
+	{
+		return GetBasicType (GetUInt64TypeKind (Integer, ForceUnsigned));
+	}
 
 	CDerivedType* 
 	GetConstType (CType* pBaseType);
@@ -64,6 +105,28 @@ public:
 		CType* pBaseType,
 		size_t ElementCount
 		);
+
+	CArrayType* 
+	GetLiteralTypeA (size_t Length)
+	{
+		return GetArrayType (&m_BasicTypeArray [EType_Char], Length + 1);
+	}
+
+	CArrayType* 
+	GetLiteralTypeW (size_t Length)
+	{
+		return GetArrayType (&m_BasicTypeArray [EType_WChar], Length + 1);
+	}
+
+	CArrayType* 
+	GetLiteralType (size_t Length)
+	{
+#ifdef _UNICODE
+		return GetLiteralTypeW (Length);
+#else
+		return GetLiteralTypeA (Length);
+#endif
+	}
 
 	CBitFieldType* 
 	GetBitFieldType (
@@ -103,13 +166,17 @@ public:
 	GetStructType (
 		EType TypeKind,
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
+		const rtl::CString& QualifiedName,
+		size_t PackFactor
 		);
 
 	CStructType* 
-	CreateUnnamedStructType (EType TypeKind)
+	CreateUnnamedStructType (
+		EType TypeKind,
+		size_t PackFactor
+		)
 	{
-		return GetStructType (TypeKind, rtl::CString (), rtl::CString ());
+		return GetStructType (TypeKind, rtl::CString (), rtl::CString (), PackFactor);
 	}
 
 	CClassType* 
@@ -137,7 +204,7 @@ protected:
 
 	void
 	SetupBasicType (
-		EType Type,
+		EType TypeKind,
 		size_t Size,
 		const char* pSignature
 		);

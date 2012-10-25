@@ -7,9 +7,6 @@
     <Filter Include="module">
       <UniqueIdentifier>{333bbf2b-fc47-4023-babd-fef7e577d496}</UniqueIdentifier>
     </Filter>
-    <Filter Include="variable">
-      <UniqueIdentifier>{f13e4f98-48f5-4e07-8b22-9a3f3fd2b0e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="namespace">
       <UniqueIdentifier>{dc6f8ed1-98f9-4cff-977a-bc7781449c80}</UniqueIdentifier>
     </Filter>
@@ -21,6 +18,12 @@
     </Filter>
     <Filter Include="type">
       <UniqueIdentifier>{77a33d01-d401-4111-b4a0-c0f25e6343b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="value">
+      <UniqueIdentifier>{f13e4f98-48f5-4e07-8b22-9a3f3fd2b0e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="operator">
+      <UniqueIdentifier>{bffc36e1-a985-4dd3-a46a-2f5d5d241e03}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -71,10 +74,10 @@
       <Filter>function</Filter>
     </ClInclude>
     <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h">
-      <Filter>variable</Filter>
+      <Filter>value</Filter>
     </ClInclude>
     <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h">
-      <Filter>variable</Filter>
+      <Filter>value</Filter>
     </ClInclude>
     <ClInclude Include="axl_jnc_Lexer.h">
       <Filter>parser</Filter>
@@ -98,13 +101,28 @@
       <Filter>module</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Value.h">
-      <Filter>variable</Filter>
+      <Filter>value</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_AttributeMgr.h">
       <Filter>module</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_ImportType.h">
       <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_OperatorMgr.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinaryOperator.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnaryOperator.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_MoveOperator.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Variable.h">
+      <Filter>value</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -149,10 +167,10 @@
       <Filter>function</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_VariableMgr.cpp">
-      <Filter>variable</Filter>
+      <Filter>value</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_ConstMgr.cpp">
-      <Filter>variable</Filter>
+      <Filter>value</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_Lexer.cpp">
       <Filter>parser</Filter>
@@ -180,6 +198,24 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_AttributeMgr.cpp">
       <Filter>module</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Value.cpp">
+      <Filter>value</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_OperatorMgr.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinaryOperator.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnaryOperator.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_MoveOperator.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Variable.cpp">
+      <Filter>value</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

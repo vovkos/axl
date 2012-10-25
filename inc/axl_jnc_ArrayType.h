@@ -25,6 +25,9 @@ public:
 		m_ElementCount = 0;
 	}
 
+	llvm::ArrayType* 
+	GetLlvmType ();
+
 	size_t
 	GetElementCount ()
 	{

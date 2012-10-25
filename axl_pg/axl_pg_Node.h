@@ -172,8 +172,8 @@ public:
 
 	rtl::CBoxListT <rtl::CString> m_ArgNameList;
 	rtl::CBoxListT <rtl::CString> m_LocalNameList;
-	rtl::CHashTableT <const tchar_t*, rtl::CHashString, rtl::CCmpString> m_ArgNameSet;
-	rtl::CHashTableT <const tchar_t*, rtl::CHashString, rtl::CCmpString> m_LocalNameSet;
+	rtl::CStringHashTable m_ArgNameSet;
+	rtl::CStringHashTable m_LocalNameSet;
 
 public:
 	CSymbolNode ();

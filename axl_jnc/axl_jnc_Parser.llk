@@ -39,20 +39,21 @@ Members
 		EStage_Pass2, // statements and expressions (after linkage)
 	};
 
+	enum EEndianness
+	{
+		EEndianness_LittleEndian,
+		EEndianness_BigEndian,
+	};
+
 	CModule* m_pModule;
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;
+	EEndianness m_Endianness;
 	EStage m_Stage;
 
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
 
-	CParser ()
-	{
-		m_pModule = NULL;
-		m_StructPackFactor = 8;
-		m_DefaultStructPackFactor = 8;
-		m_Stage = EStage_Pass1;
-	}
+	CParser ();
 
 	CType*
 	FindType (const CQualifiedName& Name);
@@ -88,7 +89,8 @@ Members
 	CStructType*
 	DeclareStructType (
 		EType TypeKind,
-		rtl::CString& Name
+		rtl::CString& Name,
+		size_t PackFactor
 		);
 
 	CEnumType*
@@ -142,6 +144,15 @@ Members
 	SetFunctionBody (
 		CModuleItem* pItem,
 		rtl::CBoxListT <CToken>* pBody
+		);
+
+	bool
+	ReturnStmt (const CValue& Value);
+
+	bool
+	LookupIdentifier (
+		const rtl::CString& Name,
+		CValue* pValue
 		);
 } 
 

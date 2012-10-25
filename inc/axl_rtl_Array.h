@@ -159,8 +159,8 @@ AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (int32_t);
 AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (uint32_t);
 AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (int64_t);
 AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (uint64_t);
-AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (int);
-AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (uint_t);
+//AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (int);
+//AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (uint_t);
 AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (float);
 AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (double);
 AXL_RTL_ARRAY_SPECIALIZE_SIMPLE_TYPE (wchar_t);
@@ -673,7 +673,7 @@ protected:
 		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
 		NewHdr->m_Count = 0;
 		NewHdr->m_MaxCount = (Size - sizeof (CHdr)) / sizeof (T);
-		NewHdr->SetFree (Kind == ref::EBuf_Stack ? (mem::FFree) -1 : NULL);
+		NewHdr->SetFree (Kind == ref::EBuf_Static ? NULL :(mem::FFree) -1);
 
 		if (pOldHdr)
 			pOldHdr->Release ();

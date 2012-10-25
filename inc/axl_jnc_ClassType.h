@@ -161,6 +161,9 @@ public:
 	{
 		m_TypeKind = EType_Class;
 	}
+	
+	llvm::StructType* 
+	GetLlvmType ();
 
 	CStructType* 
 	GetFieldBlockType ()
@@ -177,8 +180,7 @@ public:
 	CClassFieldMember*
 	CreateFieldMember (
 		const rtl::CString& Name,
-		CType* pType,
-		size_t PackFactor = 8
+		CType* pType
 		);
 
 	CClassMethodMember*

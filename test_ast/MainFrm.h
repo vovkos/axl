@@ -17,6 +17,8 @@
 #include "Resource.h"
 #include "AstPane.h"
 #include "ModulePane.h"
+#include "LlvmIrPane.h"
+#include "DasmPane.h"
 #include "OutputPane.h"
 
 class CAstDoc;
@@ -54,6 +56,8 @@ public:  // control bar embedded members
 	CAstPane m_GlobalAstPane;
 	CAstPane m_FunctionAstPane;
 	CModulePane m_ModulePane;
+	CLlvmIrPane m_LlvmIrPane;
+	CDasmPane m_DasmPane;
 	COutputPane m_OutputPane;
 
 	CAstDoc* GetDocument ()

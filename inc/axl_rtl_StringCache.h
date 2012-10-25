@@ -8,7 +8,7 @@
 
 #include "axl_rtl_String.h"
 #include "axl_rtl_BoxList.h"
-#include "axl_rtl_HashTable.h"
+#include "axl_rtl_StringHashTable.h"
 
 namespace axl {
 namespace rtl {
@@ -20,7 +20,7 @@ class CStringCacheT
 {
 protected:
 	rtl::CBoxListT <rtl::CStringT <C> > m_SymbolList;
-	rtl::CHashTableT <const C*, rtl::CHashStringT <C>, rtl::CCmpStringT <C> > m_SymbolMap;
+	rtl::CStringHashTableT <C> m_SymbolMap;
 	
 public:
 	const C*

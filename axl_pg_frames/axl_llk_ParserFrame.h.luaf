@@ -13,10 +13,6 @@ $Includes
 		ParserClassName = "CParser"
 	end
 
-	if PragmaNestingLimit == nil then
-		PragmaNestingLimit = 1
-	end
-
 	AstNodeVariableName = "__pAstNode"
 	SymbolVariableName  = "__pSymbol"
 
@@ -165,7 +161,6 @@ public:
 	enum
 	{
 		Lookahead          = $Lookahead,
-		PragmaNestingLimit = $PragmaNestingLimit,
 
 		StartSymbol        = $StartSymbol,
 		StartPragmaSymbol  = $StartPragmaSymbol,

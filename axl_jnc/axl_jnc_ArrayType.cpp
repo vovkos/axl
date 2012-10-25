@@ -41,6 +41,18 @@ CArrayType::CreateTypeString (
 	return String;
 }
 
+llvm::ArrayType* 
+CArrayType::GetLlvmType ()
+{
+	if (m_Flags & ETypeFlag_IsLlvmReady)
+		return (llvm::ArrayType*) m_pLlvmType;
+
+	llvm::ArrayType* pLlvmType = NULL;
+	
+	m_pLlvmType = pLlvmType;
+	m_Flags |= ETypeFlag_IsLlvmReady;
+	return pLlvmType;
+}
 
 //.............................................................................
 

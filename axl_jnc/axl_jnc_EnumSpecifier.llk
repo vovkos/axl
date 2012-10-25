@@ -10,16 +10,14 @@ enum_specifier
 		if ($.m_pType->GetTypeKind () == EType_EnumC ||
 			$.m_pType->GetName ().IsEmpty ())
 		{
-			bool Result = m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumMembers ($.m_pType);
-			if (!Result)
-				return false;
+			return m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumMembers ($.m_pType);
 		}
 	}
 	: enum_kind $k 
 	  EToken_Identifier $n?
 		{
 			$.m_pType = DeclareEnumType (
-				$k.m_Type,
+				$k.m_TypeKind,
 				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ()
 				);
 
@@ -31,16 +29,16 @@ enum_specifier
 
 class
 {
-	EType m_Type;
+	EType m_TypeKind;
 }
 enum_kind
 	: EToken_Enum
 		{
-			$.m_Type = EType_Enum;
+			$.m_TypeKind = EType_Enum;
 		}
 	| EToken_EnumC
 		{
-			$.m_Type = EType_EnumC;
+			$.m_TypeKind = EType_EnumC;
 		}
 	;
 

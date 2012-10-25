@@ -20,17 +20,31 @@ protected:
 	rtl::CStdListT <CBasicBlock> m_BlockList;
 	CBasicBlock* m_pCurrentBlock;
 
+	llvm::IRBuilder <> m_LlvmBuilder;
+
 public:
-	CControlFlowMgr ()
+	CControlFlowMgr (CModule* pModule);
+
+	CModule* 
+	GetModule ()
 	{
-		m_pModule = NULL;
+		return m_pModule;
+	}
+
+	llvm::IRBuilder <>*
+	GetLlvmBuilder ()
+	{
+		return &m_LlvmBuilder;
 	}
 
 	void
 	Clear ();
 
 	CBasicBlock* 
-	CreateBlock ();
+	CreateBlock (
+		const rtl::CString& Name,
+		bool IsCurrent
+		);
 
 	CBasicBlock* 
 	GetCurrentBlock ()

@@ -20,24 +20,33 @@ enum EType
 	// simple types
 
 	EType_Void,           // v
+	EType_Variant,        // z
 	EType_Bool,           // a
+	
+	// little-endian integers
+	
 	EType_Int8,           // b
 	EType_Int8_u,         // c
 	EType_Int16,          // d
 	EType_Int16_u,        // e
-	EType_Int16_be,       // f
-	EType_Int16_ube,      // g
-	EType_Int32,          // h
-	EType_Int32_u,        // i
-	EType_Int32_be,       // j
-	EType_Int32_ube,      // k
-	EType_Int64,          // l
-	EType_Int64_u,        // m
+	EType_Int32,          // f
+	EType_Int32_u,        // g
+	EType_Int64,          // h
+	EType_Int64_u,        // i
+
+	// big-endian integers
+
+	EType_Int16_be,       // j
+	EType_Int16_beu,      // k
+	EType_Int32_be,       // l
+	EType_Int32_beu,      // m
 	EType_Int64_be,       // n
-	EType_Int64_ube,      // o
+	EType_Int64_beu,      // o
+
+	// floating point 
+
 	EType_Float,          // p
 	EType_Double,         // q
-	EType_Variant,        // z
 
 	// derived types
 
@@ -61,7 +70,7 @@ enum EType
 	EType_Import,         // Z
 
 	EType__Count,
-	EType__BasicTypeCount = EType_Variant + 1,
+	EType__BasicTypeCount = EType_Double + 1,
 
 	// aliases
 
@@ -84,26 +93,29 @@ enum EType
 enum ETypeFlag
 {
 	ETypeFlag_IsIncomplete = 0x01,
+	ETypeFlag_IsLlvmReady  = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ETypeModifier
 {
-	ETypeModifier_Const             = 0x0001,
-	ETypeModifier_Property          = 0x0002,
-	ETypeModifier_Signed            = 0x0004,
-	ETypeModifier_Unsigned          = 0x0008,
-	ETypeModifier_BigEndian         = 0x0010,
-	ETypeModifier_LittleEndian      = 0x0020,
-	ETypeModifier_Reference         = 0x0100,
-	ETypeModifier_Pointer           = 0x0200,	
-	ETypeModifier_RemoveConst       = 0x0400,
-	ETypeModifier_RemoveReference   = 0x0800,
-	ETypeModifier_RemovePointer     = 0x1000,
-	ETypeModifier_GetProperty       = 0x2000,
-	ETypeModifier_ArrayToPointer    = 0x4000,
-	ETypeModifier_EnumToInt         = 0x8000,
+	ETypeModifier_Const             = 0x00001,
+	ETypeModifier_Property          = 0x00002,
+	ETypeModifier_Signed            = 0x00004,
+	ETypeModifier_Unsigned          = 0x00008,
+	ETypeModifier_BigEndian         = 0x00010,
+	ETypeModifier_LittleEndian      = 0x00020,
+	ETypeModifier_Reference         = 0x00100,
+	ETypeModifier_Pointer           = 0x00200,	
+	ETypeModifier_RemoveConst       = 0x00400,
+	ETypeModifier_RemoveReference   = 0x00800,
+	ETypeModifier_RemovePointer     = 0x01000,
+	ETypeModifier_GetProperty       = 0x02000,
+	ETypeModifier_ArrayToPointer    = 0x04000,
+	ETypeModifier_EnumToInt         = 0x08000,
+
+	ETypeModifier_Recursive         = 0x10000, // keep modifying until type deosne
 };
 
 const tchar_t*
@@ -111,30 +123,23 @@ GetTypeModifierString (ETypeModifier Modifier);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-/*
+EType
+GetInt32TypeKind (int32_t Integer);
 
-enum ETypeMod 
-{
-	ETypeMod_Reference       = 0x00000001,
-	ETypeMod_Dereference     = 0x00000002,
-	ETypeMod_FullDereference = 0x00000004,
+EType
+GetUInt32TypeKind (
+	uint32_t Integer,
+	bool ForceUnsigned
+	);
 
-	ETypeMod_Addr            = 0x00000010,
-	ETypeMod_Indir           = 0x00000020,
-	ETypeMod_FullIndir       = 0x00000040,
+EType
+GetInt64TypeKind (int64_t Integer);
 
-	ETypeMod_GetProperty     = 0x00000100,
-	ETypeMod_ArrayToPointer  = 0x00000200,
-
-	ETypeMod_Const           = 0x00001000,
-	ETypeMod_Unconst         = 0x00002000,
-
-	ETypeMod_Move            = ETypeMod_FullDereference,
-	ETypeMod_MoveRef         = ETypeMod_FullDereference,
-	ETypeMod_Operator        = ETypeMod_FullDereference | ETypeMod_ArrayToPointer,
-};
-
-*/
+EType
+GetUInt64TypeKind (
+	uint64_t Integer,
+	bool ForceUnsigned
+	);
 
 //.............................................................................
 
@@ -143,8 +148,6 @@ class CType: public CModuleItem
 protected:
 	friend class CTypeMgr;
 
-	CTypeMgr* m_pTypeMgr;
-
 	EType m_TypeKind;
 	ulong_t m_Flags;
 	size_t m_Size; // not really necessary for most types, but it's nice to have it in plain text
@@ -152,14 +155,13 @@ protected:
 	rtl::CStringA m_Signature;
 	rtl::CString m_TypeString;
 
+	llvm::Type* m_pLlvmType;
+
 public:
 	CType ();
 
-	CTypeMgr* 
-	GetTypeMgr ()
-	{
-		return m_pTypeMgr;
-	}
+	llvm::Type* 
+	GetLlvmType ();
 
 	EType
 	GetTypeKind ()
@@ -185,10 +187,16 @@ public:
 	rtl::CString 
 	GetTypeString ();
 
+	int
+	Cmp (CType* pType)
+	{
+		return m_Signature.Cmp (pType->m_Signature);
+	}
+
 	bool 
 	IsIntegerType ()
 	{
-		return m_TypeKind >= EType_Int8 && m_TypeKind <= EType_Int64_ube;
+		return m_TypeKind >= EType_Int8 && m_TypeKind <= EType_Int64_beu;
 	}
 
 	bool 
@@ -231,7 +239,7 @@ public:
 	GetArrayType (size_t ElementCount);
 
 	CType* 
-	GetTypeMod (int Modifiers);
+	ModifyType (int Modifiers);
 };
 
 //.............................................................................

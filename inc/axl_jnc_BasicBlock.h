@@ -12,7 +12,28 @@ namespace jnc {
 class CBasicBlock: public rtl::TListLink
 {
 protected:
+	friend class CControlFlowMgr;
 
+	rtl::CString m_Name;
+	llvm::BasicBlock* m_pLlvmBlock;
+
+public:
+	CBasicBlock ()
+	{
+		m_pLlvmBlock = NULL;
+	}
+
+	rtl::CString 
+	GetName ()
+	{
+		return m_Name;
+	}
+
+	llvm::BasicBlock*
+	GetLlvmBlock ()
+	{
+		return m_pLlvmBlock;
+	}
 };
 
 //.............................................................................

@@ -328,7 +328,7 @@ CProductionBuilder::FindVariable (
 	
 	if (BeaconIndex >= BeaconCount)
 	{
-		err::SetFormatStringError (_T("locator '$%d' is out of range ($1..$%d)"), BeaconIndex + 1, BeaconCount + 1);
+		err::SetFormatStringError (_T("locator '$%d' is out of range ($1..$%d)"), BeaconIndex + 1, BeaconCount);
 		return EVariable_Undefined;
 	}
 

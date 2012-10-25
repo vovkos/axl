@@ -9,7 +9,7 @@ class_specifier
 	  EToken_Identifier $n?
 		{
 			$.m_pType = DeclareClassType (
-				$k.m_Type,
+				$k.m_TypeKind,
 				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ()
 				);
 
@@ -23,16 +23,16 @@ class_specifier
 
 class
 {
-	EType m_Type;
+	EType m_TypeKind;
 }
 class_kind
 	: EToken_Interface
 		{
-			$.m_Type = EType_Interface;
+			$.m_TypeKind = EType_Interface;
 		}
 	| EToken_Class
 		{
-			$.m_Type = EType_Class;
+			$.m_TypeKind = EType_Class;
 		}
 	;
 
@@ -75,9 +75,7 @@ class_member_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pT
 class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
 	: declarator (':' struct_member_bit_field)? ('=' initializer)?
 		{
-			bool Result = DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator) != NULL;
-			if (!Result)
-				return false;
+			return DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator) != NULL;
 		}
 	;
 

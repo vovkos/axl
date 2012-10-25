@@ -30,9 +30,7 @@ property_accessor_declaration <CPropertyBlock* $pBlock>
 	  property_declarator
 	  declaration_terminator
 		{
-			bool Result = DeclarePropertyAccessor ($pBlock, &$1.m_TypeSpecifier, &$2.m_Declarator) != NULL;
-			if (!Result)
-				return false;
+			return DeclarePropertyAccessor ($pBlock, &$1.m_TypeSpecifier, &$2.m_Declarator) != NULL;
 		}
 	| ';'
 	;

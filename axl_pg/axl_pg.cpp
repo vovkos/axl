@@ -130,7 +130,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if (!Module.m_ImportList.IsEmpty ()) 
 	{
-		rtl::CHashTableT <const tchar_t*, rtl::CHashString, rtl::CCmpString> FilePathSet;
+		rtl::CStringHashTable FilePathSet;
 		FilePathSet.Goto (SrcFilePath);
 
 		rtl::CBoxIteratorT <rtl::CString> Import = Module.m_ImportList.GetHead ();

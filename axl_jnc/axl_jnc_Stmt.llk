@@ -5,11 +5,11 @@ class
 	rtl::CBoxListT <CToken> m_TokenList;
 }
 function_body_pass1
-	: compound_statement_pass1 <&$.m_TokenList>
+	: compound_stmt_pass1 <&$.m_TokenList>
 	;
 
 noast
-compound_statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+compound_stmt_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 	: '{' $l
 		{
 			$pTokenList->InsertTail ($l);
@@ -23,7 +23,7 @@ compound_statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 
 noast
 statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	: compound_statement_pass1 <$pTokenList>
+	: compound_stmt_pass1 <$pTokenList>
 	| any
 		{
 			$pTokenList->InsertTail ($1);
@@ -32,28 +32,12 @@ statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CFunctionBody
+class CCompoundStmt
 {
-	CBasicBlock* m_pBlock;
 	CScope* m_pScope;
 }
 start
-function_body
-	enter
-	{
-		$.m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock ();
-	}
-	: compound_statement
-		{
-			$.m_pScope = $1.m_pScope;
-		}
-	;
-
-class
-{
-	CScope* m_pScope;
-}
-compound_statement
+compound_stmt
 	: '{' $l
 		{
 			$.m_pScope = m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
@@ -67,59 +51,62 @@ compound_statement
 
 noast
 statement
-	: compound_statement
-	| expression_statement
-	| if_statement
-	| switch_statement
-	| while_statement
-	| do_statement
-	| for_statement
-	| break_statement
-	| continue_statement
-	| return_statement
+	: compound_stmt
+	| expression_stmt
+	| if_stmt
+	| switch_stmt
+	| while_stmt
+	| do_stmt
+	| for_stmt
+	| break_stmt
+	| continue_stmt
+	| return_stmt
 	| ';'
 	;
 
-expression_statement
+expression_stmt
 	: expression ';'
 	;
 
-if_statement
+if_stmt
 	: EToken_If '(' expression ')' statement (EToken_Else statement)?
 	;
 
-switch_statement
-	: EToken_Switch '(' expression ')' '{' switch_block_statement* '}'
+switch_stmt
+	: EToken_Switch '(' expression ')' '{' switch_block_stmt* '}'
 	;
 
-switch_block_statement
-	: EToken_Case constant_integer_expression ':'
+switch_block_stmt
+	: EToken_Case constant_integer_expr ':'
 	| EToken_Default ':'
 	| statement
 	;
 
-while_statement
+while_stmt
 	: EToken_While '(' expression ')' statement
 	;
 
-do_statement
+do_stmt
 	: EToken_Do statement EToken_While '(' expression ')' ';'
 	;
 
-for_statement
+for_stmt
 	: EToken_For '(' expression? ';' expression? ';' expression? ')' statement
 	;
 
-break_statement
-	: EToken_Break ';'
+break_stmt
+	: EToken_Break constant_integer_expr $e? ';'
 	;
 
-continue_statement
-	: EToken_Continue ';'
+continue_stmt 
+	: EToken_Continue constant_integer_expr $e? ';'
 	;
 
-return_statement
-	: EToken_Return expression? ';'
+return_stmt
+	: EToken_Return expression $e? ';'
+		{
+			return ReturnStmt (IsValidLocator ($e) ? $e.m_Value : CValue ());
+		}
 	;
 
 //.............................................................................

@@ -1,10 +1,18 @@
 #include "stdafx.h"
 #include "axl_jnc_ModuleItem.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
+
+CModuleItem::CModuleItem ()
+{
+	m_ItemKind = EModuleItem_Undefined;
+	m_pModule = NULL;
+	m_pAttributeSet = NULL;
+}
 
 const tchar_t*
 CModuleItem::GetItemKindString (EModuleItem ItemKind)

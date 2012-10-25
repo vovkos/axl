@@ -39,7 +39,7 @@ class CDefineMgr
 {
 protected:
 	rtl::CStdListT <CDefine> m_DefineList;
-	rtl::CHashTableMapT <const tchar_t*, CDefine*, rtl::CHashString, rtl::CCmpString> m_DefineMap;
+	rtl::CStringHashTableMapT <CDefine*> m_DefineMap;
 
 public:
 	bool

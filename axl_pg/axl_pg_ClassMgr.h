@@ -49,7 +49,7 @@ class CClassMgr
 {
 protected:
 	rtl::CStdListT <CClass> m_ClassList;
-	rtl::CHashTableMapT <const tchar_t*, CClass*, rtl::CHashString, rtl::CCmpString> m_ClassMap; 
+	rtl::CStringHashTableMapT <CClass*> m_ClassMap; 
 
 public:
 	bool

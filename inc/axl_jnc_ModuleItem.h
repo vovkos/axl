@@ -11,6 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
+class CModule;
 class CAttributeSet;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -43,20 +44,23 @@ protected:
 	friend class CAttributeMgr;
 
 	EModuleItem m_ItemKind;
+	CModule* m_pModule;
 	CToken::CPos m_Pos;
 	CAttributeSet* m_pAttributeSet;
 
 public:
-	CModuleItem ()
-	{
-		m_ItemKind = EModuleItem_Undefined;
-		m_pAttributeSet = NULL;
-	}
+	CModuleItem ();
 
 	EModuleItem 
 	GetItemKind ()
 	{	
 		return m_ItemKind;
+	}
+
+	CModule*
+	GetModule ()
+	{
+		return m_pModule;
 	}
 
 	const CToken::CPos&

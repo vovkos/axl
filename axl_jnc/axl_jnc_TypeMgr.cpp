@@ -7,9 +7,9 @@ namespace jnc {
 
 //.............................................................................
 
-CTypeMgr::CTypeMgr ()
+CTypeMgr::CTypeMgr (CModule* pModule)
 {
-	m_pModule = NULL;
+	m_pModule = pModule;
 	SetupAllBasicTypes ();
 }
 
@@ -31,38 +31,38 @@ void
 CTypeMgr::SetupAllBasicTypes ()
 {
 	SetupBasicType (EType_Void,      0, "v");
+	SetupBasicType (EType_Variant,   sizeof (TFatPointer), "z");
 	SetupBasicType (EType_Bool,      1, "a");
 	SetupBasicType (EType_Int8,      1, "b");
 	SetupBasicType (EType_Int8_u,    1, "c");
 	SetupBasicType (EType_Int16,     2, "d");
 	SetupBasicType (EType_Int16_u,   2, "e");
-	SetupBasicType (EType_Int16_be,  2, "f");
-	SetupBasicType (EType_Int16_ube, 2, "g");
-	SetupBasicType (EType_Int32,     4, "h");
-	SetupBasicType (EType_Int32_u,   4, "i");
-	SetupBasicType (EType_Int32_be,  4, "j");
-	SetupBasicType (EType_Int32_ube, 4, "k");
-	SetupBasicType (EType_Int64,     8, "l");
-	SetupBasicType (EType_Int64_u,   8, "m");
+	SetupBasicType (EType_Int32,     4, "f");
+	SetupBasicType (EType_Int32_u,   4, "g");
+	SetupBasicType (EType_Int64,     8, "h");
+	SetupBasicType (EType_Int64_u,   8, "i");
+	SetupBasicType (EType_Int16_be,  2, "j");
+	SetupBasicType (EType_Int16_beu, 2, "k");
+	SetupBasicType (EType_Int32_be,  4, "l");
+	SetupBasicType (EType_Int32_beu, 4, "m");
 	SetupBasicType (EType_Int64_be,  8, "n");
-	SetupBasicType (EType_Int64_ube, 8, "o");
+	SetupBasicType (EType_Int64_beu, 8, "o");
 	SetupBasicType (EType_Float,     4, "p");
 	SetupBasicType (EType_Double,    8, "q");
-	SetupBasicType (EType_Variant,   sizeof (TFatPointer), "z");
 }
 
 void
 CTypeMgr::SetupBasicType (
-	EType Type,
+	EType TypeKind,
 	size_t Size,
 	const char* pSignature
 	)
 {
-	ASSERT (Type >= EType_Void && Type <= EType_Variant);
+	ASSERT (TypeKind < EType__BasicTypeCount);
 		
-	CType* pType = &m_BasicTypeArray [Type];
-	pType->m_pTypeMgr = this;
-	pType->m_TypeKind = Type;
+	CType* pType = &m_BasicTypeArray [TypeKind];
+	pType->m_pModule = m_pModule;
+	pType->m_TypeKind = TypeKind;
 	pType->m_Size = Size;
 	pType->m_Signature = pSignature;
 
@@ -98,13 +98,6 @@ CTypeMgr::ResolveImports ()
 	return true;
 }
 
-CType* 
-CTypeMgr::GetBasicType (EType Type)
-{
-	ASSERT (Type >= EType_Void && Type <= EType_Variant);
-	return &m_BasicTypeArray [Type];
-}
-
 CDerivedType* 
 CTypeMgr::GetConstType (CType* pBaseType)
 {
@@ -119,7 +112,7 @@ CTypeMgr::GetConstType (CType* pBaseType)
 		return (CDerivedType*) It->m_Value;
 
 	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Const;
 	pType->m_Size = pBaseType->GetSize ();
 	pType->m_Signature = Signature;
@@ -142,7 +135,7 @@ CTypeMgr::GetPointerType (CType* pBaseType)
 		return (CDerivedType*) It->m_Value;
 
 	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Pointer;
 	pType->m_Size = sizeof (TFatPointer);
 	pType->m_Signature = Signature;
@@ -177,7 +170,7 @@ CTypeMgr::GetReferenceType (CType* pBaseType)
 		return (CDerivedType*) It->m_Value;
 
 	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Reference;
 	pType->m_Size = sizeof (TFatPointer);
 	pType->m_Signature = Signature;
@@ -202,7 +195,7 @@ CTypeMgr::GetArrayType (
 		return (CArrayType*) It->m_Value;
 
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Array;
 	pType->m_Size = pBaseType->GetSize () * ElementCount;
 	pType->m_Signature = Signature;
@@ -229,7 +222,7 @@ CTypeMgr::GetBitFieldType (
 		return (CBitFieldType*) It->m_Value;
 
 	CBitFieldType* pType = AXL_MEM_NEW (CBitFieldType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_BitField;
 	pType->m_Size = pBaseType->GetSize ();
 	pType->m_Signature = Signature;
@@ -258,7 +251,7 @@ CTypeMgr::GetFunctionType (
 		return (CFunctionType*) It->m_Value;
 
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Function;
 	pType->m_Size = sizeof (TFatPointer);
 	pType->m_Signature = Signature;
@@ -285,7 +278,7 @@ CTypeMgr::GetPropertyType (
 		return (CPropertyType*) It->m_Value;
 
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Property;
 	pType->m_Size = sizeof (TFatPointer);
 	pType->m_Signature = Signature;
@@ -310,8 +303,9 @@ CTypeMgr::GetEnumType (
 	if (Name.IsEmpty ())
 	{
 		CEnumType* pType = AXL_MEM_NEW (CEnumType);
+		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
-		pType->m_pTypeMgr = this;
+		pType->m_pModule = m_pModule;
 		m_EnumTypeList.InsertTail (pType);
 		return pType;
 	}
@@ -324,10 +318,11 @@ CTypeMgr::GetEnumType (
 		return (CEnumType*) It->m_Value;
 
 	CEnumType* pType = AXL_MEM_NEW (CEnumType);
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 
 	m_EnumTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -339,7 +334,8 @@ CStructType*
 CTypeMgr::GetStructType (
 	EType TypeKind,
 	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
+	const rtl::CString& QualifiedName,
+	size_t PackFactor
 	)
 {
 	ASSERT (TypeKind == EType_Struct || TypeKind == EType_Union);
@@ -347,8 +343,9 @@ CTypeMgr::GetStructType (
 	if (Name.IsEmpty ())
 	{
 		CStructType* pType = AXL_MEM_NEW (CStructType);
+		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
-		pType->m_pTypeMgr = this;
+		pType->m_pModule = m_pModule;
 		m_StructTypeList.InsertTail (pType);
 		return pType;
 	}
@@ -360,11 +357,13 @@ CTypeMgr::GetStructType (
 	if (It->m_Value)
 		return (CStructType*) It->m_Value;
 
-	CStructType* pType = AXL_MEM_NEW (CStructType);
+	CStructType* pType = AXL_MEM_NEW (CStructType);	
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
+	pType->m_PackFactor = PackFactor;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 
 	m_StructTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -384,8 +383,9 @@ CTypeMgr::GetClassType (
 	if (Name.IsEmpty ())
 	{
 		CClassType* pType = AXL_MEM_NEW (CClassType);
+		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
-		pType->m_pTypeMgr = this;
+		pType->m_pModule = m_pModule;
 		m_ClassTypeList.InsertTail (pType);
 		return pType;
 	}
@@ -398,10 +398,11 @@ CTypeMgr::GetClassType (
 		return (CClassType*) It->m_Value;
 
 	CClassType* pType = AXL_MEM_NEW (CClassType);
+	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 
 	m_ClassTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -423,9 +424,10 @@ CTypeMgr::GetImportType (
 		return (CImportType*) It->m_Value;
 
 	CImportType* pType = AXL_MEM_NEW (CImportType);
+	pType->m_pModule = m_pModule;
 	pType->m_Name = Name;
 	pType->m_pAnchorNamespace = pAnchorNamespace;
-	pType->m_pTypeMgr = this;
+	pType->m_pModule = m_pModule;
 
 	m_ImportTypeList.InsertTail (pType);
 	It->m_Value = pType;

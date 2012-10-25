@@ -52,13 +52,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\inc</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Develop\LLVM\llvm-3.1.vc10\lib\bin\x86.mt.dbg;C:\Develop\Lua\lib;C:\Develop\HtmLayout\lib;C:\Develop\ANTLR\libantlrc_3_4\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -124,6 +125,9 @@
   <ItemGroup>
     <ClInclude Include="AstDoc.h" />
     <ClInclude Include="AstPane.h" />
+    <ClInclude Include="DasmPane.h" />
+    <ClInclude Include="LlvmIrPane.h" />
+    <ClInclude Include="LogCtrl.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ModulePane.h" />
     <ClInclude Include="OutputPane.h" />
@@ -135,6 +139,9 @@
   <ItemGroup>
     <ClCompile Include="AstDoc.cpp" />
     <ClCompile Include="AstPane.cpp" />
+    <ClCompile Include="DasmPane.cpp" />
+    <ClCompile Include="LlvmIrPane.cpp" />
+    <ClCompile Include="LogCtrl.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ModulePane.cpp" />
     <ClCompile Include="OutputPane.cpp" />

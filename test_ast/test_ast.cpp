@@ -71,6 +71,7 @@ CAstApp theApp;
 
 BOOL CAstApp::InitInstance()
 {
+//	_crtBreakAlloc = 401;
 	atexit (&clear_type_info_cache);
 
 	err::CParseErrorProvider::Register ();

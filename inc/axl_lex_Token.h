@@ -94,7 +94,11 @@ public:
 	union
 	{
 		int m_Integer;
-		__int64 m_Int64;
+		int32_t m_Int32;
+		uint32_t m_UInt32;
+		int64_t m_Int64;
+		uint64_t m_UInt64;
+		float m_Float;
 		double m_Double;
 	};
 

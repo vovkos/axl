@@ -4,45 +4,10 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
-#include "axl_jnc_Namespace.h"
+#include "axl_jnc_Variable.h"
 
 namespace axl {
 namespace jnc {
-
-//.............................................................................
-
-class CVariable:
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
-{
-protected:
-	friend class CVariableMgr;
-
-	CType* m_pType;
-	void* m_p;
-
-public:
-	CVariable ()
-	{
-		m_ItemKind = EModuleItem_Variable;
-		m_pType = NULL;
-		m_p = NULL;
-	}
-
-	CType* 
-	GetType ()
-	{
-		return m_pType;
-	}
-
-	void* 
-	GetData ()
-	{
-		return m_p;
-	}	
-};
 
 //.............................................................................
 
@@ -55,9 +20,12 @@ protected:
 	rtl::CStdListT <CVariable> m_VariableList;
 
 public:
-	CVariableMgr ()
+	CVariableMgr (CModule* pModule);
+
+	CModule* 
+	GetModule ()
 	{
-		m_pModule = NULL;
+		return m_pModule;
 	}
 
 	void

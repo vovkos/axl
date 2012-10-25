@@ -32,6 +32,9 @@ protected:
 public:
 	CFunctionType ();
 
+	llvm::FunctionType* 
+	GetLlvmType ();
+
 	int 
 	GetFlags ()
 	{

@@ -5,14 +5,14 @@ class
 	rtl::CBoxListT <CToken> m_TokenList;
 }
 expression_pass1
-	: primary_expression_pass1 <&$.m_TokenList>+
+	: primary_expr_pass1 <&$.m_TokenList>+
 	;
 
 noast
-primary_expression_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	: '{' primary_expression_pass1 <$pTokenList>+ '}'
-	| '[' primary_expression_pass1 <$pTokenList>+ ']'
-	| '(' primary_expression_pass1 <$pTokenList>* ')'
+primary_expr_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	: '{' primary_expr_pass1 <$pTokenList>+ '}'
+	| '[' primary_expr_pass1 <$pTokenList>+ ']'
+	| '(' primary_expr_pass1 <$pTokenList>* ')'
 	| any
 		{
 			$pTokenList->InsertTail ($1);
@@ -21,19 +21,28 @@ primary_expression_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+class
+{
+	CValue m_Value;	
+}
 start
 expression
-	: logical_or_expression ('?' expression ':' expression)?
+	: conditional_expr <&$.m_Value>
 	;
 
 class
 {
-	CValue* m_pValue;
+	CValue m_Value;	
 }
-constant_expression
-	: expression
+start
+constant_expr
+	: conditional_expr <&$.m_Value>
 		{
-			$.m_pValue = NULL;
+			if ($.m_Value.GetValueKind () != EValue_Const)
+			{
+				err::SetFormatStringError (_T("not a constant expression"));
+				return false;
+			}
 		}
 	;
 
@@ -41,144 +50,498 @@ class
 {
 	intptr_t m_Value;
 }
-constant_integer_expression
+start
+constant_integer_expr
 	: expression
 		{
 			$.m_Value = 10;
 		}
 	;
 
-logical_or_expression
-	: logical_and_expression (EToken_LogicalOr logical_and_expression)*
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+conditional_expr <CValue* $pValue>
+local
+{
+	CValue $TrueValue;
+	CValue $FalseValue;
+}
+	: logical_or_expr <$pValue> 
+	  (
+		'?' conditional_expr <&$TrueValue> ':' conditional_expr <&$FalseValue>
+			{
+				return m_pModule->m_OperatorMgr.ConditionalOperator ($pValue, $TrueValue, $FalseValue);
+			}
+	  )?
 	;
 
-logical_and_expression
-	: inclusive_or_expression (EToken_LogicalAnd inclusive_or_expression)*
+logical_or_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: logical_and_expr <$pValue> 
+	  (
+		EToken_LogicalOr logical_and_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogicalAnd, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
-inclusive_or_expression
-	: exclusive_or_expression ('|' exclusive_or_expression)*
+logical_and_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: inclusive_or_expr <$pValue> 
+	  (
+		EToken_LogicalAnd inclusive_or_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogicalOr, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
-exclusive_or_expression
-	: and_expression ('^' and_expression)*
+inclusive_or_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: exclusive_or_expr <$pValue> 
+	  (
+		'|' exclusive_or_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseOr, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
-and_expression
-	: equality_expression ('&' equality_expression)*
+exclusive_or_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: and_expr <$pValue> 
+	  (
+		'^' and_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseXor, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
-equality_expression
-	: relational_expression (equality_operator relational_expression)*
+and_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: equality_expr <$pValue> 
+	  (
+		'&' equality_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseAnd, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
+equality_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: relational_expr <$pValue> 
+	  (
+		equality_operator $o relational_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
+			}
+	  )*
+	;
+
+class
+{
+	EBinOp m_OpKind;
+}
 equality_operator
 	: EToken_Eq
+		{
+			$.m_OpKind = EBinOp_Eq;
+		}
 	| EToken_Ne
+		{
+			$.m_OpKind = EBinOp_Ne;
+		}
 	;
 
-relational_expression
-	: shift_expression (relational_operator shift_expression)*
+relational_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: shift_expr <$pValue> 
+	  (
+		relational_operator $o shift_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
+class
+{
+	EBinOp m_OpKind;
+}
 relational_operator
 	: '<'
+		{
+			$.m_OpKind = EBinOp_Lt;
+		}
 	| '>'
+		{
+			$.m_OpKind = EBinOp_Gt;
+		}
 	| EToken_Le
+		{
+			$.m_OpKind = EBinOp_Le;
+		}
 	| EToken_Ge
+		{
+			$.m_OpKind = EBinOp_Ge;
+		}
 	;
 
-shift_expression
-	: additive_expression (shift_operator additive_expression)*
+shift_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: additive_expr <$pValue> 
+	  (
+		shift_operator $o additive_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
+class
+{
+	EBinOp m_OpKind;
+}
 shift_operator
 	: EToken_Shl
+		{
+			$.m_OpKind = EBinOp_Shl;
+		}
 	| EToken_Shr
+		{
+			$.m_OpKind = EBinOp_Shr;
+		}
 	;
 
-additive_expression
-	: multiplicative_expression (additivie_operator multiplicative_expression)*
+additive_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: multiplicative_expr <$pValue> 
+	  (
+		additivie_operator $o multiplicative_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
+class
+{
+	EBinOp m_OpKind;
+}
 additivie_operator
 	: '+'
+		{
+			$.m_OpKind = EBinOp_Add;
+		}
 	| '-'
+		{
+			$.m_OpKind = EBinOp_Sub;
+		}
 	;
 
-multiplicative_expression
-	: unary_expression (multiplicative_operator unary_expression)*
+multiplicative_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue2;
+}
+	: unary_expr <$pValue> 
+	  (
+		multiplicative_operator $o unary_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
+class
+{
+	EBinOp m_OpKind;
+}
 multiplicative_operator
 	: '*'
+		{
+			$.m_OpKind = EBinOp_Mul;
+		}
 	| '/'
+		{
+			$.m_OpKind = EBinOp_Div;
+		}
 	| '%'
+		{
+			$.m_OpKind = EBinOp_Mod;
+		}
 	;
 
-unary_expression
-	: unary_operator* postfix_expression (assignment_operator expression)?
+unary_expr <CValue* $pValue>
+local
+{
+	CValue $RValue;
+}
+	: unary_operator* postfix_expr <$pValue> 
+	  (
+		assignment_operator $o conditional_expr <&$RValue>
+			{
+				return m_pModule->m_OperatorMgr.MoveOperator (*$pValue, $RValue, $o.m_OpKind);
+			}
+	  )?
 	;
 
+class
+{
+	EUnOp m_OpKind;
+	CType* m_pCastType;
+}
 unary_operator
 	: '&'
+		{
+			$.m_OpKind = EUnOp_Addr;
+		}
 	| '*'
+		{
+			$.m_OpKind = EUnOp_Indir;
+		}
 	| '+'
+		{
+			$.m_OpKind = EUnOp_None;
+		}
 	| '-'
+		{
+			$.m_OpKind = EUnOp_Minus;
+		}
 	| '~'
+		{
+			$.m_OpKind = EUnOp_BitwiseNot;
+		}
 	| '!'
+		{
+			$.m_OpKind = EUnOp_LogicalNot;
+		}
 	| EToken_Inc
+		{
+			$.m_OpKind = EUnOp_Inc;
+		}
 	| EToken_Dec
-	| EToken_SizeOf
-	| EToken_TypeOf
-	| '(' type_name ')'
+		{
+			$.m_OpKind = EUnOp_Dec;
+		}
+	| resolver (cast_operator_rslv)
+	  '(' type_name $t ')'
+		{
+			$.m_OpKind = EUnOp_Cast;
+			$.m_pCastType = $t.m_pType;
+		}
 	;
 
+// since '(' at 'unary_operator' is a conflict against epsilon production we need a resolver
+// otherwise epsilon production always loses
+
+cast_operator_rslv
+local
+{
+	CTypeSpecifierModifiers $TypeSpecifier;
+}
+	: '(' type_specifier_modifier <&$TypeSpecifier>
+	;
+
+class
+{
+	EBinOp m_OpKind;
+}
 assignment_operator
 	: '='
+		{
+			$.m_OpKind = EBinOp_None;
+		}
 	| EToken_AddAssign
-	| EToken_AddAssign
+		{
+			$.m_OpKind = EBinOp_Add;
+		}
+	| EToken_SubAssign
+		{
+			$.m_OpKind = EBinOp_Sub;
+		}
 	| EToken_MulAssign
+		{
+			$.m_OpKind = EBinOp_Mul;
+		}
 	| EToken_DivAssign
+		{
+			$.m_OpKind = EBinOp_Div;
+		}
 	| EToken_ModAssign
+		{
+			$.m_OpKind = EBinOp_Mod;
+		}
 	| EToken_ShlAssign
+		{
+			$.m_OpKind = EBinOp_Shl;
+		}
 	| EToken_ShrAssign
+		{
+			$.m_OpKind = EBinOp_Shr;
+		}
 	| EToken_AndAssign
+		{
+			$.m_OpKind = EBinOp_BitwiseAnd;
+		}
 	| EToken_XorAssign
+		{
+			$.m_OpKind = EBinOp_BitwiseXor;
+		}
 	| EToken_OrAssign
+		{
+			$.m_OpKind = EBinOp_BitwiseOr;
+		}
 	;
 
-postfix_expression
-	: primary_expression postfix_operator*
+postfix_expr <CValue* $pValue>
+	: primary_expr <$pValue>
+	  postfix_operator <$pValue>*
 	;
 
-postfix_operator
-	: member_operator
-	| index_operator
-	| call_operator
+postfix_operator <CValue* $pValue>
+	: member_operator <$pValue>
+	| index_operator <$pValue>
+	| call_operator <$pValue>
 	| EToken_Inc
+		{
+			return m_pModule->m_OperatorMgr.PostfixIncOperator ($pValue);
+		}
 	| EToken_Dec
+		{
+			return m_pModule->m_OperatorMgr.PostfixDecOperator ($pValue);
+		}
 	;
 
-member_operator
+member_operator <CValue* $pValue>
 	: '.' EToken_Identifier
+		{
+			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $2.m_Data.m_String);
+		}
 	; 
 
-index_operator
+index_operator <CValue* $pValue>
+local
+{
+	CValue $IndexValue;
+}
 	: '[' expression ']'
+		{
+			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, $pValue, $IndexValue);
+		}
 	; 
 
-call_operator
-	: '(' expression (',' expression)* ')'
+call_operator <CValue* $pValue>
+local
+{
+	CValue $Arg;
+	rtl::CBoxListT <CValue> $ArgList;
+}
+leave 
+{
+	return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$ArgList);
+}
+	: '(' 
+	  conditional_expr <&$Arg> 
+		{
+			$ArgList.InsertTail ($Arg);
+		}
+	  (
+		',' 
+		conditional_expr <&$Arg> 
+			{
+				$ArgList.InsertTail ($Arg);
+			}
+	  )* 
+	  ')'
+		
 	| '(' ')'
 	; 
 
-primary_expression
+primary_expr <CValue* $pValue>
+local
+{
+	CValue $OpValue;
+}
 	: EToken_Identifier
+		{
+			return LookupIdentifier ($1.m_Data.m_String, $pValue);
+		}
 	| EToken_Integer
+		{
+			$pValue->SetConstUInt64 ($1.m_Data.m_UInt64);
+		}
 	| EToken_Fp
+		{
+			$pValue->SetConstDouble ($1.m_Data.m_Double);
+		}
 	| EToken_Literal
-	| '(' expression ')'
+		{
+			$pValue->SetLiteral ($1.m_Data.m_String);
+		}
+	| EToken_True
+		{
+			$pValue->SetConstBool (true);
+		}
+	| EToken_False
+		{
+			$pValue->SetConstBool (false);
+		}
+	| EToken_Null
+		{
+			$pValue->SetNull ();
+		}
+	| EToken_SizeOf type_name_or_expr <&$OpValue>
+		{
+			$pValue->SetConstUInt32 ($OpValue.GetType ()->GetSize ());
+		}
+	| EToken_TypeOf type_name_or_expr <&$OpValue>
+		{
+			$pValue->SetType ($OpValue.GetType ());
+		}
+	| '(' conditional_expr <$pValue> ')'
+	;
+
+type_name_or_expr <CValue* $pValue>
+	: type_name 
+		{
+			$pValue->SetType ($1.m_pType);
+		}
+	| '(' type_name ')'
+		{
+			$pValue->SetType ($2.m_pType);
+		}
+	| primary_expr <$pValue>
 	;
 
 //.............................................................................

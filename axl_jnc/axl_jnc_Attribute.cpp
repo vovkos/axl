@@ -20,6 +20,7 @@ CAttributeSet::CreateAttribute (
 	}
 
 	CAttribute* pAttribute = AXL_MEM_NEW (CAttribute);
+//	pAttribute->m_pModule = m_pModule;
 	pAttribute->m_Name = Name;
 	pAttribute->m_pValue = pValue;
 	m_AttributeList.InsertTail (pAttribute);

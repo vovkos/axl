@@ -16,29 +16,6 @@ local_declaration
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-pragma
-pragma_pack
-	: '#' EToken_Pack pack_pack_argument
-	;
-
-pack_pack_argument
-	: pack_value
-	| '(' pack_value ')'
-	;
-
-pack_value
-	: EToken_Integer
-		{
-			m_StructPackFactor = $1.m_Data.m_Integer;
-		}
-	| EToken_Default
-		{
-			m_StructPackFactor = m_DefaultStructPackFactor;
-		}
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class
 {
 	CQualifiedName m_Name;
@@ -70,7 +47,7 @@ type_name
 	  pointer <&$Declarator>* 
 	  declarator_suffix <&$Declarator>*
 		{
-			$.m_pType = $Declarator.GetType (&$1.m_TypeSpecifier, &m_pModule->m_TypeMgr);
+			$.m_pType = $Declarator.GetType (&$1.m_TypeSpecifier);
 		}
 	;
 
@@ -84,11 +61,8 @@ generic_formal_argument <CStructClassType* $pType>
 	: EToken_Identifier
 		{						
 			CImportType* pArgumentType = m_pModule->m_TypeMgr.GetImportType ($1.m_Data.m_String, $pType);
-			bool Result = $pType->AddGenericArgument (pArgumentType);
-			if (!Result)
-				return false;
+			return $pType->AddGenericArgument (pArgumentType);
 		}
 	;
 
 //.............................................................................
-

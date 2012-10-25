@@ -120,6 +120,7 @@
     <ClInclude Include="..\Inc\axl_rtl_BoxList.h" />
     <ClInclude Include="..\Inc\axl_rtl_BuddyAllocMap.h" />
     <ClInclude Include="..\inc\axl_rtl_CharLiteral.h" />
+    <ClInclude Include="..\inc\axl_rtl_Endianness.h" />
     <ClInclude Include="..\Inc\axl_rtl_Func.h" />
     <ClInclude Include="..\Inc\axl_rtl_HashTable.h" />
     <ClInclude Include="..\Inc\axl_rtl_InterlockedUpdatePeak.h" />
@@ -131,6 +132,7 @@
     <ClInclude Include="..\Inc\axl_rtl_Singleton.h" />
     <ClInclude Include="..\Inc\axl_rtl_String.h" />
     <ClInclude Include="..\Inc\axl_rtl_StringCache.h" />
+    <ClInclude Include="..\inc\axl_rtl_StringHashTable.h" />
     <ClInclude Include="..\Inc\axl_rtl_Unpacker.h" />
     <ClInclude Include="..\Inc\axl_win_CriticalSection.h" />
     <ClInclude Include="..\Inc\axl_win_Event.h" />

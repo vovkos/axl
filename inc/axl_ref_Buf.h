@@ -17,12 +17,14 @@ namespace ref {
 
 // ref-counted buffer for variable-sized objects 
 // could be also used for fixed-sized object as single-writer multiple reader accessor
-// can use external buffer (static or allocated on stack)
+// can use external buffer (e.g. static or allocated on stack)
 
 enum EBuf
 {
-	EBuf_Static,
-	EBuf_Stack
+	EBuf_Private, // buffer is stack-allocated or an object field, cannot be shared
+	EBuf_Static,  // buffer is static or global, can be shared
+	EBuf_Stack = EBuf_Private, 
+	EBuf_Field = EBuf_Private, 
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -178,6 +180,29 @@ public:
 		return AllocateBuffer (Size, SaveContents ? m_p : NULL);
 	}
 
+	void
+	SetBuffer (
+		EBuf Kind,
+		void* p,
+		size_t Size
+		)
+	{
+		ASSERT (Size >= sizeof (T) + sizeof (CHdr));
+
+		CHdr* pOldHdr = GetHdr ();
+		
+		CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
+		NewHdr->m_BufferSize = Size;
+		NewHdr->SetFree (Kind == EBuf_Static ? NULL : (mem::FFree) -1);
+		m_p = (T*) (NewHdr + 1);
+		NewHdr.Detach ();
+
+		new (m_p) T;
+
+		if (pOldHdr)
+			pOldHdr->Release ();
+	}
+
 	bool 
 	EnsureExclusive ()
 	{ 
@@ -239,29 +264,6 @@ protected:
 			pOldHdr->Release ();
 
 		return m_p;
-	}
-
-	void
-	SetBuffer (
-		EBuf Kind,
-		void* p,
-		size_t Size
-		)
-	{
-		ASSERT (Size >= sizeof (T) + sizeof (CHdr));
-
-		CHdr* pOldHdr = GetHdr ();
-		
-		CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
-		NewHdr->m_BufferSize = Size;
-		NewHdr->SetFree (Kind == EBuf_Stack ? (mem::FFree) -1 : NULL);
-		m_p = (T*) (NewHdr + 1);
-		NewHdr.Detach ();
-
-		new (m_p) T;
-
-		if (pOldHdr)
-			pOldHdr->Release ();
 	}
 
 	static

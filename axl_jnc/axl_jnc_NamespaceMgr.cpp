@@ -7,9 +7,9 @@ namespace jnc {
 
 //.............................................................................
 
-CNamespaceMgr::CNamespaceMgr ()
+CNamespaceMgr::CNamespaceMgr (CModule* pModule)
 {
-	m_pModule = NULL;
+	m_pModule = pModule;
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
 }
@@ -29,8 +29,9 @@ CGlobalNamespace*
 CNamespaceMgr::CreateNamespace (const rtl::CString& Name)
 {
 	CGlobalNamespace* pNamespace = AXL_MEM_NEW (CGlobalNamespace);
-	m_NamespaceList.InsertTail (pNamespace);
+	pNamespace->m_pModule = m_pModule;
 	pNamespace->m_Name = Name;
+	m_NamespaceList.InsertTail (pNamespace);
 	return pNamespace;
 }
 
@@ -126,6 +127,7 @@ CScope*
 CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 {
 	CScope* pScope = AXL_MEM_NEW (CScope);
+	pScope->m_pModule = m_pModule;
 	pScope->m_Pos = Pos;
 	m_ScopeList.InsertTail (pScope);
 	m_NamespaceStack.Append (pScope);

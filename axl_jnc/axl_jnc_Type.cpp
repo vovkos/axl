@@ -1,9 +1,76 @@
 #include "stdafx.h"
 #include "axl_jnc_Type.h"
-#include "axl_jnc_TypeMgr.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
+
+//.............................................................................
+
+EType
+GetInt32TypeKind (int32_t Integer)
+{
+	return
+		Integer >= INT8_MIN && Integer <= INT8_MAX ? EType_Int8 :
+		(uint32_t) Integer <= UINT8_MAX ? EType_Int8_u :
+		Integer >= INT16_MIN && Integer <= INT16_MAX ? EType_Int16 : 
+		(uint32_t) Integer <= UINT16_MAX ? EType_Int16_u : 
+		Integer >= INT32_MIN && Integer <= INT32_MAX ? EType_Int32 : EType_Int32_u;
+}
+
+EType
+GetUInt32TypeKind (
+	uint32_t Integer,
+	bool ForceUnsigned
+	)
+{
+	if (ForceUnsigned)
+		return
+			Integer <= UINT8_MAX ? EType_Int8_u :
+			Integer <= UINT16_MAX ? EType_Int16_u : EType_Int32_u;
+	else
+		return 
+			Integer <= INT8_MAX ? EType_Int8 :
+			Integer <= UINT8_MAX ? EType_Int8_u :
+			Integer <= INT16_MAX ? EType_Int16 : 
+			Integer <= UINT16_MAX ? EType_Int16_u : 
+			Integer <= INT32_MAX ? EType_Int32 : EType_Int32_u;
+}
+
+EType
+GetInt64TypeKind (int64_t Integer)
+{
+	return
+		Integer >= INT8_MIN && Integer <= INT8_MAX ? EType_Int8 :
+		(uint64_t) Integer <= UINT8_MAX ? EType_Int8_u :
+		Integer >= INT16_MIN && Integer <= INT16_MAX ? EType_Int16 : 
+		(uint64_t) Integer <= UINT16_MAX ? EType_Int16_u : 
+		Integer >= INT32_MIN && Integer <= INT32_MAX ? EType_Int32 : 
+		(uint64_t) Integer <= UINT32_MAX ? EType_Int32_u : 
+		Integer >= INT64_MIN && Integer <= INT64_MAX ? EType_Int64 : EType_Int64_u;
+}
+
+EType
+GetUInt64TypeKind (
+	uint64_t Integer,
+	bool ForceUnsigned
+	)
+{
+	if (ForceUnsigned)
+		return
+			Integer <= UINT8_MAX ? EType_Int8_u :
+			Integer <= UINT16_MAX ? EType_Int16_u : 
+			Integer <= UINT32_MAX ? EType_Int32_u : EType_Int64_u;
+	else
+		return 
+			Integer <= INT8_MAX ? EType_Int8 :
+			Integer <= UINT8_MAX ? EType_Int8_u :
+			Integer <= INT16_MAX ? EType_Int16 : 
+			Integer <= UINT16_MAX ? EType_Int16_u : 
+			Integer <= INT32_MAX ? EType_Int32 : 
+			Integer <= UINT32_MAX ? EType_Int32_u : 
+			Integer <= INT64_MAX ? EType_Int64 : EType_Int64_u;
+}
 
 //.............................................................................
 
@@ -63,11 +130,106 @@ GetTypeModifierString (ETypeModifier Modifier)
 
 CType::CType ()
 {
-	m_pTypeMgr = NULL;
 	m_ItemKind = EModuleItem_Type;
 	m_TypeKind = EType_Void;
 	m_Flags = 0;
 	m_Size = 0;
+	m_pLlvmType = NULL;
+}
+
+llvm::Type* 
+CType::GetLlvmType ()
+{
+	if (m_Flags & ETypeFlag_IsLlvmReady)
+		return m_pLlvmType;
+
+	llvm::Type* pLlvmType = NULL;
+
+	switch (m_TypeKind)
+	{
+	case EType_Void:
+		pLlvmType = llvm::Type::getVoidTy (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Bool:
+	case EType_Int8:
+	case EType_Int8_u:
+		pLlvmType = llvm::Type::getInt8Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Int16:
+	case EType_Int16_u:
+	case EType_Int16_be:
+	case EType_Int16_beu:
+		pLlvmType = llvm::Type::getInt16Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Int32:
+	case EType_Int32_u:
+	case EType_Int32_be:
+	case EType_Int32_beu:
+		pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Int64:
+	case EType_Int64_u:
+	case EType_Int64_be:
+	case EType_Int64_beu:
+		pLlvmType = llvm::Type::getInt64Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Float:
+		pLlvmType = llvm::Type::getFloatTy (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Double:
+		pLlvmType = llvm::Type::getDoubleTy (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Variant:
+		break;
+	
+	case EType_Const:
+		pLlvmType = ((CDerivedType*) this)->GetBaseType ()->GetLlvmType ();
+		break;
+	
+	case EType_Pointer:
+	case EType_Reference:
+		break;
+	
+	case EType_Array:
+		return ((CArrayType*) this)->GetLlvmType ();
+	
+	case EType_BitField:
+		pLlvmType = ((CDerivedType*) this)->GetBaseType ()->GetLlvmType ();
+		break;
+	
+	case EType_Function:
+		return ((CFunctionType*) this)->GetLlvmType ();
+
+	case EType_Event:
+		break;
+	
+	case EType_Enum:
+	case EType_EnumC:
+		pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Struct:
+	case EType_Union:
+		return ((CStructType*) this)->GetLlvmType ();
+	
+	case EType_Class:
+	case EType_Interface:
+		return ((CClassType*) this)->GetLlvmType ();
+	
+	case EType_Property:
+		break;
+	}
+
+	m_pLlvmType = pLlvmType; // could be NULL
+	m_Flags |= ETypeFlag_IsLlvmReady;
+	return pLlvmType;
 }
 
 size_t
@@ -86,24 +248,24 @@ CType::GetTypeString ()
 	BasicTypeNameTable [EType__BasicTypeCount] = 
 	{
 		_T("void"),
+		_T("variant"),
 		_T("bool"),
 		_T("int8"),
 		_T("unsigned int8"),
 		_T("int16"),
 		_T("unsigned int16"),
-		_T("bigendian int16"),
-		_T("unsigned bigendian int16"),
 		_T("int32"),
 		_T("unsigned int32"),
-		_T("bigendian int32"),
-		_T("unsigned bigendian int32"),
 		_T("int64"),
 		_T("unsigned int64"),
+		_T("bigendian int16"),
+		_T("unsigned bigendian int16"),
+		_T("bigendian int32"),
+		_T("unsigned bigendian int32"),
 		_T("bigendian int64"),
 		_T("unsigned bigendian int64"),
 		_T("float"),
 		_T("double"),
-		_T("variant"),
 	};
 
 	if (m_TypeKind < EType__BasicTypeCount)
@@ -221,25 +383,25 @@ CType::IsReferenceType ()
 CDerivedType* 
 CType::GetConstType ()
 {
-	return m_pTypeMgr->GetConstType (this);
+	return m_pModule->m_TypeMgr.GetConstType (this);
 }
 
 CDerivedType* 
 CType::GetPointerType ()
 {
-	return m_pTypeMgr->GetPointerType (this);
+	return m_pModule->m_TypeMgr.GetPointerType (this);
 }
 
 CDerivedType* 
 CType::GetReferenceType ()
 {
-	return m_pTypeMgr->GetReferenceType (this);
+	return m_pModule->m_TypeMgr.GetReferenceType (this);
 }
 
 CArrayType* 
 CType::GetArrayType (size_t ElementCount)
 {
-	return m_pTypeMgr->GetArrayType (this, ElementCount);
+	return m_pModule->m_TypeMgr.GetArrayType (this, ElementCount);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -282,24 +444,25 @@ GetSignedTypeKind (EType TypeKind)
 	static EType ResultTypeTable [] = 
 	{
 		EType_Void,           // EType_Void
+		EType_Variant,        // EType_Variant
 		EType_Bool,           // EType_Bool
 		EType_Int8,           // EType_Int8,           
 		EType_Int8,           // EType_Int8_u,         
 		EType_Int16,          // EType_Int16,          
 		EType_Int16,          // EType_Int16_u,        
-		EType_Int16_be,       // EType_Int16_be,       
-		EType_Int16_be,       // EType_Int16_ube,      
 		EType_Int32,          // EType_Int32,          
 		EType_Int32,          // EType_Int32_u,        
-		EType_Int32_be,       // EType_Int32_be,       
-		EType_Int32_be,       // EType_Int32_ube,      
 		EType_Int64,          // EType_Int64,          
 		EType_Int64,          // EType_Int64_u,        
+		EType_Int16_be,       // EType_Int16_be,       
+		EType_Int16_be,       // EType_Int16_beu,      
+		EType_Int32_be,       // EType_Int32_be,       
+		EType_Int32_be,       // EType_Int32_beu,      
 		EType_Int64_be,       // EType_Int64_be,       
-		EType_Int64_be,       // EType_Int64_ube,      
+		EType_Int64_be,       // EType_Int64_beu,      
 	};
 
-	ASSERT (TypeKind <= EType_Int64_ube);
+	ASSERT (TypeKind <= EType_Int64_beu);
 	return ResultTypeTable [TypeKind];
 }
 
@@ -310,24 +473,25 @@ GetUnsignedTypeKind (EType TypeKind)
 	static EType ResultTypeTable [] = 
 	{
 		EType_Void,           // EType_Void
+		EType_Variant,        // EType_Variant
 		EType_Bool,           // EType_Bool
 		EType_Int8_u,         // EType_Int8,           
 		EType_Int8_u,         // EType_Int8_u,         
 		EType_Int16_u,        // EType_Int16,          
 		EType_Int16_u,        // EType_Int16_u,        
-		EType_Int16_ube,      // EType_Int16_be,       
-		EType_Int16_ube,      // EType_Int16_ube,      
 		EType_Int32_u,        // EType_Int32,          
 		EType_Int32_u,        // EType_Int32_u,        
-		EType_Int32_ube,      // EType_Int32_be,       
-		EType_Int32_ube,      // EType_Int32_ube,      
 		EType_Int64_u,        // EType_Int64,          
 		EType_Int64_u,        // EType_Int64_u,        
-		EType_Int64_ube,      // EType_Int64_be,       
-		EType_Int64_ube,      // EType_Int64_ube,      
+		EType_Int16_beu,      // EType_Int16_be,       
+		EType_Int16_beu,      // EType_Int16_beu,      
+		EType_Int32_beu,      // EType_Int32_be,       
+		EType_Int32_beu,      // EType_Int32_beu,      
+		EType_Int64_beu,      // EType_Int64_be,       
+		EType_Int64_beu,      // EType_Int64_beu,      
 	};
 
-	ASSERT (TypeKind <= EType_Int64_ube);
+	ASSERT (TypeKind <= EType_Int64_beu);
 	return ResultTypeTable [TypeKind];
 }
 
@@ -338,24 +502,25 @@ GetBigEndianTypeKind (EType TypeKind)
 	static EType ResultTypeTable [] = 
 	{
 		EType_Void,           // EType_Void
+		EType_Variant,        // EType_Variant
 		EType_Bool,           // EType_Bool
 		EType_Int8,           // EType_Int8,           
 		EType_Int8_u,         // EType_Int8_u,         
 		EType_Int16_be,       // EType_Int16,          
-		EType_Int16_ube,      // EType_Int16_u,        
-		EType_Int16_be,       // EType_Int16_be,       
-		EType_Int16_ube,      // EType_Int16_ube,      
+		EType_Int16_beu,      // EType_Int16_u,        
 		EType_Int32_be,       // EType_Int32,          
-		EType_Int32_ube,      // EType_Int32_u,        
-		EType_Int32_be,       // EType_Int32_be,       
-		EType_Int32_ube,      // EType_Int32_ube,      
+		EType_Int32_beu,      // EType_Int32_u,        
 		EType_Int64_be,       // EType_Int64,          
-		EType_Int64_ube,      // EType_Int64_u,        
+		EType_Int64_beu,      // EType_Int64_u,        
+		EType_Int16_be,       // EType_Int16_be,       
+		EType_Int16_beu,      // EType_Int16_beu,      
+		EType_Int32_be,       // EType_Int32_be,       
+		EType_Int32_beu,      // EType_Int32_beu,      
 		EType_Int64_be,       // EType_Int64_be,       
-		EType_Int64_ube,      // EType_Int64_ube,      
+		EType_Int64_beu,      // EType_Int64_beu,      
 	};
 
-	ASSERT (TypeKind <= EType_Int64_ube);
+	ASSERT (TypeKind <= EType_Int64_beu);
 	return ResultTypeTable [TypeKind];
 }
 
@@ -366,91 +531,100 @@ GetLittleEndianTypeKind (EType TypeKind)
 	static EType ResultTypeTable [] = 
 	{
 		EType_Void,           // EType_Void
+		EType_Variant,        // EType_Variant
 		EType_Bool,           // EType_Bool
 		EType_Int8,           // EType_Int8,           
 		EType_Int8_u,         // EType_Int8_u,         
 		EType_Int16,          // EType_Int16,          
 		EType_Int16_u,        // EType_Int16_u,        
-		EType_Int16,          // EType_Int16_be,       
-		EType_Int16_u,        // EType_Int16_ube,      
 		EType_Int32,          // EType_Int32,          
 		EType_Int32_u,        // EType_Int32_u,        
-		EType_Int32,          // EType_Int32_be,       
-		EType_Int32_u,        // EType_Int32_ube,      
 		EType_Int64,          // EType_Int64,          
 		EType_Int64_u,        // EType_Int64_u,        
+		EType_Int16,          // EType_Int16_be,       
+		EType_Int16_u,        // EType_Int16_beu,      
+		EType_Int32,          // EType_Int32_be,       
+		EType_Int32_u,        // EType_Int32_beu,      
 		EType_Int64,          // EType_Int64_be,       
-		EType_Int64_u,        // EType_Int64_ube,      
+		EType_Int64_u,        // EType_Int64_beu,      
 	};
 
-	ASSERT (TypeKind <= EType_Int64_ube);
+	ASSERT (TypeKind <= EType_Int64_beu);
 	return ResultTypeTable [TypeKind];
 }
 
 CType* 
-CType::GetTypeMod (int Modifiers)
+CType::ModifyType (int Modifiers)
 {
 	CType* pType = this;
 
-	if (Modifiers & ETypeModifier_Signed)
+	for (;;)
 	{
-		if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
-			return false;
+		CType* pOldType = pType;
 
-		EType ModTypeKind = GetSignedTypeKind (pType->m_TypeKind);
-		pType = m_pTypeMgr->GetBasicType (ModTypeKind);
-	}
+		if (Modifiers & ETypeModifier_Signed)
+		{
+			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
+				return NULL;
 
-	if (Modifiers & ETypeModifier_Unsigned)
-	{
-		if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
-			return false;
+			EType ModTypeKind = GetSignedTypeKind (pType->m_TypeKind);
+			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+		}
 
-		EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
-		pType = m_pTypeMgr->GetBasicType (ModTypeKind);
-	}
+		if (Modifiers & ETypeModifier_Unsigned)
+		{
+			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
+				return NULL;
 
-	if (Modifiers & ETypeModifier_BigEndian)
-	{
-		if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
-			return false;
+			EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
+			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+		}
 
-		EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
-		pType = m_pTypeMgr->GetBasicType (ModTypeKind);
-	}
+		if (Modifiers & ETypeModifier_BigEndian)
+		{
+			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
+				return NULL;
 
-	if (Modifiers & ETypeModifier_LittleEndian)
-	{
-		if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
-			return false;
+			EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
+			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+		}
 
-		EType ModTypeKind = GetLittleEndianTypeKind (pType->m_TypeKind);
-		pType = m_pTypeMgr->GetBasicType (ModTypeKind);
-	}
+		if (Modifiers & ETypeModifier_LittleEndian)
+		{
+			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
+				return NULL;
 
-	if (Modifiers & ETypeModifier_Pointer)
-	{
-		pType = m_pTypeMgr->GetPointerType (pType);
-	}
+			EType ModTypeKind = GetLittleEndianTypeKind (pType->m_TypeKind);
+			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+		}
 
-	if (Modifiers & ETypeModifier_Reference)
-	{
-		pType = m_pTypeMgr->GetReferenceType (pType);
-		if (!pType)
-			return NULL;
-	}
+		if (Modifiers & ETypeModifier_Pointer)
+		{
+			pType = m_pModule->m_TypeMgr.GetPointerType (pType);
+		}
 
-	if (Modifiers & ETypeModifier_Property)
-	{
-		CFunctionType* pGetterType = m_pTypeMgr->GetFunctionType (pType, NULL, 0, 0);
-		CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
-			m_pTypeMgr->GetFunctionType (m_pTypeMgr->GetBasicType (EType_Void), &pType, 1, 0) : 
-			NULL;
-		pType = m_pTypeMgr->GetPropertyType (pGetterType, pSetterType);
-	}
-	else if (Modifiers & ETypeModifier_Const)
-	{
-		pType = m_pTypeMgr->GetConstType (pType);
+		if (Modifiers & ETypeModifier_Reference)
+		{
+			pType = m_pModule->m_TypeMgr.GetReferenceType (pType);
+			if (!pType)
+				return NULL;
+		}
+
+		if (Modifiers & ETypeModifier_Property)
+		{
+			CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
+			CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
+				m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetBasicType (EType_Void), &pType, 1, 0) : 
+				NULL;
+			pType = m_pModule->m_TypeMgr.GetPropertyType (pGetterType, pSetterType);
+		}
+		else if (Modifiers & ETypeModifier_Const)
+		{
+			pType = m_pModule->m_TypeMgr.GetConstType (pType);
+		}
+
+		if (!(Modifiers & ETypeModifier_Recursive) || pOldType == pType)
+			break;
 	}
 
 	return pType;

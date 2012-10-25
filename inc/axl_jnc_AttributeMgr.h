@@ -21,10 +21,12 @@ protected:
 	CAttributeSet* m_pCurrentAttributeSet;
 
 public:
-	CAttributeMgr ()
+	CAttributeMgr (CModule* pModule);
+
+	CModule* 
+	GetModule ()
 	{
-		m_pModule = NULL;
-		m_pCurrentAttributeSet = NULL;
+		return m_pModule;
 	}
 
 	CAttributeSet*

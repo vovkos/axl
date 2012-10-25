@@ -1,11 +1,18 @@
 #include "stdafx.h"
 #include "axl_jnc_FunctionMgr.h"
+#include "axl_jnc_Module.h"
 #include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
+
+CFunctionMgr::CFunctionMgr (CModule* pModule)
+{
+	m_pModule = pModule;
+	m_pCurrentFunction = NULL;
+}
 
 void
 CFunctionMgr::Clear ()
@@ -18,12 +25,15 @@ CFunctionMgr::Clear ()
 
 CFunction*
 CFunctionMgr::CreateFunction (
+	const rtl::CString& Tag,
 	CFunctionType* pType,
 	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
 	CFunction* pFunction = AXL_MEM_NEW (CFunction);
+	pFunction->m_pModule = m_pModule;
 	pFunction->m_pType = pType;
+	pFunction->m_Tag = Tag;
 	
 	if (pArgList)
 	{
@@ -55,6 +65,7 @@ CFunctionMgr::CreateProperty (
 	)
 {
 	CProperty* pProperty = AXL_MEM_NEW (CProperty);
+	pProperty->m_pModule = m_pModule;
 	pProperty->m_pType = pType;
 	pProperty->m_pGetter = pGetter;
 	pProperty->m_Setter = Setter;
@@ -67,7 +78,7 @@ CFunctionMgr::CreateProperty (CPropertyType* pPropertyType)
 {
 	CFunctionTypeOverload* pSetterType = pPropertyType->GetSetterType ();
 
-	CFunction* pGetter = CreateFunction (pPropertyType->GetGetterType (), NULL);
+	CFunction* pGetter = CreateFunction (_T("getter"), pPropertyType->GetGetterType (), NULL);
 			
 	CFunctionOverload Setter;
 
@@ -75,7 +86,7 @@ CFunctionMgr::CreateProperty (CPropertyType* pPropertyType)
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunctionType* pSetterTypeOverload = pSetterType->GetType (i);
-		CFunction* pSetterOverload = CreateFunction (pSetterTypeOverload, NULL);
+		CFunction* pSetterOverload = CreateFunction (_T("setter"), pSetterTypeOverload, NULL);
 		Setter.AddOverload (pSetterOverload);
 	}
 
@@ -89,16 +100,7 @@ CFunctionMgr::CreateGlobalFunction (
 	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
-	CFunction* pFunction = CreateFunction (pType, pArgList);
-	return CreateGlobalFunction (Name, pFunction);
-}
-
-CGlobalFunction*
-CFunctionMgr::CreateGlobalFunction (
-	const rtl::CString& Name,
-	CFunction* pFunction
-	)
-{
+	CFunction* pFunction = CreateFunction (Name, pType, pArgList);
 	CGlobalFunction* pGlobalFunction = AXL_MEM_NEW (CGlobalFunction);
 	pGlobalFunction->m_Name = Name;
 	pGlobalFunction->m_pFunction = pFunction;
@@ -136,6 +138,8 @@ CFunctionMgr::CompileFunctions ()
 {
 	bool Result;
 
+	CSetCurrentThreadModule ScopeModule (m_pModule);
+
 	rtl::CIteratorT <jnc::CFunction> Function = m_FunctionList.GetHead ();
 	for (; Function; Function++)
 	{
@@ -144,18 +148,21 @@ CFunctionMgr::CompileFunctions ()
 		if (!pFunction->HasBody ())
 			continue;
 
+		m_pCurrentFunction = pFunction;
+		pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"), true);
+
 		jnc::CParser Parser;
 		Parser.m_Stage = jnc::CParser::EStage_Pass2;
 		Parser.m_pModule = m_pModule;
-		Parser.Create (jnc::ESymbol_function_body, true); 
-		
+		Parser.Create (jnc::ESymbol_compound_stmt, true); 
+			
 		rtl::CBoxIteratorT <jnc::CToken> Token = pFunction->GetBodyFirstToken ();
 		for (; Token; Token++)
 		{
 			Result = Parser.ParseToken (&*Token);
 			if (!Result)
 			{
-				err::PushSrcPosError (m_pModule->m_FilePath, Token->m_Pos.m_Line, Token->m_Pos.m_Col);
+				err::PushSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
 				return false;
 			}
 		}
@@ -163,9 +170,8 @@ CFunctionMgr::CompileFunctions ()
 		pFunction->m_Ast = Parser.GetAst ();
 		jnc::CParser::CAstNode* pAstNode = pFunction->m_Ast->GetRoot ();
 
-		ASSERT (pAstNode->m_Kind == jnc::ESymbol_function_body);
-		jnc::CParser::CFunctionBody* pBody = (jnc::CParser::CFunctionBody*) pAstNode;
-		pFunction->m_pBlock = pBody->m_pBlock;
+		ASSERT (pAstNode->m_Kind == jnc::ESymbol_compound_stmt);
+		jnc::CParser::CCompoundStmt* pBody = (jnc::CParser::CCompoundStmt*) pAstNode;
 		pFunction->m_pScope = pBody->m_pScope;
 	}
 

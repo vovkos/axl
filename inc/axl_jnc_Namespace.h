@@ -127,7 +127,7 @@ protected:
 	ENamespace m_NamespaceKind;
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
-	rtl::CHashTableMapT <const tchar_t*, CModuleItem*, rtl::CHashString, rtl::CCmpString> m_ItemMap; 
+	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
 	rtl::CStdListT <CAlias> m_AliasList;
 
 public:
