@@ -17,27 +17,21 @@ inline
 uint16_t
 SwapEndianness16 (uint16_t Value)
 {
-	uint16_t Lo = Value & 0x00ff;
-	uint16_t Hi = (Value & 0xff00) >> 8;
-	return (Lo << 8) | Hi;
+	return _byteswap_ushort (Value);
 }
 
 inline 
 uint32_t
 SwapEndianness32 (uint32_t Value)
 {
-	uint32_t Lo = SwapEndianness16 ((uint16_t) (Value & 0x0000ffff));
-	uint32_t Hi = SwapEndianness16 ((uint16_t) ((Value & 0xffff0000) >> 16));
-	return (Lo << 16) | Hi;
+	return _byteswap_ulong (Value);
 }
 
 inline 
 uint64_t
 SwapEndianness64 (uint64_t Value)
 {
-	uint64_t Lo = SwapEndianness32 ((uint32_t) (Value & 0x00000000ffffffff));
-	uint64_t Hi = SwapEndianness32 ((uint32_t) ((Value & 0xffffffff00000000) >> 32));
-	return (Lo << 32) | Hi;
+	return _byteswap_uint64 (Value);
 }
 
 //.............................................................................

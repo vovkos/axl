@@ -18,6 +18,7 @@ protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CVariable> m_VariableList;
+	size_t m_TempVariableCounter;
 
 public:
 	CVariableMgr (CModule* pModule);
@@ -36,6 +37,9 @@ public:
 		const rtl::CString& Name,
 		CType* pType
 		);
+
+	CVariable*
+	CreateTempVariable (CType* pType);
 };
 
 //.............................................................................

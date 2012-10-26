@@ -79,25 +79,14 @@ protected:
 
 	// move operators
 
-	CMove_8 m_Move_8;
-	CMove_16 m_Move_16;
-	CMove_32 m_Move_32;
-	CMove_64 m_Move_64;	
+	CMove_cpy m_Move_cpy;
+	CMove_int_trunc m_Move_int_trunc;
+	CMove_int_ext m_Move_int_ext;
+	CMove_int_ext_u m_Move_int_ext_u;
+
 	CMove_i16_swp m_Move_i16_swp;
 	CMove_i32_swp m_Move_i32_swp;
 	CMove_i64_swp m_Move_i64_swp;
-	CMove_i8_16 m_Move_i8_16;
-	CMove_i8u_16 m_Move_i8u_16;
-	CMove_i8_32 m_Move_i8_32;
-	CMove_i8u_32 m_Move_i8u_32;
-	CMove_i8_64 m_Move_i8_64;
-	CMove_i8u_64 m_Move_i8u_64;
-	CMove_i16_32 m_Move_i16_32;
-	CMove_i16u_32 m_Move_i16u_32;
-	CMove_i16_64 m_Move_i16_64;
-	CMove_i16u_64 m_Move_i16u_64;
-	CMove_i32_64 m_Move_i32_64;
-	CMove_i32u_64 m_Move_i32u_64;
 	CMove_i32_f32 m_Move_i32_f32;
 	CMove_i32u_f32 m_Move_i32u_f32;
 	CMove_i32_f64 m_Move_i32_f64;
@@ -106,6 +95,9 @@ protected:
 	CMove_i64u_f32 m_Move_i64u_f32;
 	CMove_i64_f64 m_Move_i64_f64;
 	CMove_i64u_f64 m_Move_i64u_f64;
+
+	CMove_f32_f64 m_Move_f32_f64;
+	CMove_f64_f32 m_Move_f64_f32;
 	CMove_f32_i32 m_Move_f32_i32;
 	CMove_f32_i64 m_Move_f32_i64;
 	CMove_f64_i32 m_Move_f64_i32;
@@ -312,7 +304,7 @@ public:
 	MoveOperator (
 		const CValue& SrcValue,
 		const CValue& DstValue,
-		EBinOp Op
+		EBinOp OpKind
 		);
 
 	// cast operators

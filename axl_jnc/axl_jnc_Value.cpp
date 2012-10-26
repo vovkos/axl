@@ -53,9 +53,13 @@ CValue::SetType (CType* pType)
 void
 CValue::SetVariable (CVariable* pVariable)
 {
-	m_ValueKind = EValue_GlobalProperty;
+	m_ValueKind = EValue_Variable;
 	m_pType = pVariable->GetType ();
 	m_pVariable = pVariable;
+
+	EVariable VariableKind = pVariable->GetVariableKind ();
+	if (VariableKind == EVariable_Local)
+		m_pLlvmValue = pVariable->GetLlvmAlloca ();
 }
 
 void

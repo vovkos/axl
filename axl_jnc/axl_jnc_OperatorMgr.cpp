@@ -96,41 +96,37 @@ COperatorMgr::AddStdBinaryOperators ()
 void
 COperatorMgr::AddStdMoveOperators ()
 {
-	// simple copies
+	// integer copies
 
-	for (size_t i = EType_Int8; i <= EType_Int64_u; i++)
-	for (size_t j = EType_Int8; j <= EType_Int8_u; j++)
-		AddMoveOperator ((EType) i, (EType) j, &m_Move_8);
+	AddMoveOperator (EType_Int8, EType_Int8, &m_Move_cpy);
+	AddMoveOperator (EType_Int8, EType_Int8_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int8_u, EType_Int8, &m_Move_cpy);
+	AddMoveOperator (EType_Int8_u, EType_Int8_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int16, EType_Int16, &m_Move_cpy);
+	AddMoveOperator (EType_Int16, EType_Int16_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int16_u, EType_Int16, &m_Move_cpy);
+	AddMoveOperator (EType_Int16_u, EType_Int16_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int32, EType_Int32, &m_Move_cpy);
+	AddMoveOperator (EType_Int32, EType_Int32_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int32_u, EType_Int32, &m_Move_cpy);
+	AddMoveOperator (EType_Int32_u, EType_Int32_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int64, EType_Int64, &m_Move_cpy);
+	AddMoveOperator (EType_Int64, EType_Int64_u, &m_Move_cpy);
+	AddMoveOperator (EType_Int64_u, EType_Int64, &m_Move_cpy);
+	AddMoveOperator (EType_Int64_u, EType_Int64_u, &m_Move_cpy);
 
-	for (size_t i = EType_Int16; i <= EType_Int64_u; i++)
-	for (size_t j = EType_Int16; j <= EType_Int16_u; j++)
-		AddMoveOperator ((EType) i, (EType) j, &m_Move_16);
-
-	for (size_t i = EType_Int32; i <= EType_Int64_u; i++)
-	for (size_t j = EType_Int32; j <= EType_Int32_u; j++)
-		AddMoveOperator ((EType) i, (EType) j, &m_Move_32);
-
-	for (size_t i = EType_Int64; i <= EType_Int64_u; i++)
-	for (size_t j = EType_Int64; j <= EType_Int64_u; j++)
-		AddMoveOperator ((EType) i, (EType) j, &m_Move_64);
-
-	AddMoveOperator (EType_Int16_be, EType_Int16_be, &m_Move_16);
-	AddMoveOperator (EType_Int16_be, EType_Int16_beu, &m_Move_16);
-	AddMoveOperator (EType_Int16_beu, EType_Int16_be, &m_Move_16);
-	AddMoveOperator (EType_Int16_beu, EType_Int16_beu, &m_Move_16);
-
-	AddMoveOperator (EType_Int32_be, EType_Int32_be, &m_Move_32);
-	AddMoveOperator (EType_Int32_be, EType_Int32_beu, &m_Move_32);
-	AddMoveOperator (EType_Int32_beu, EType_Int32_be, &m_Move_32);
-	AddMoveOperator (EType_Int32_beu, EType_Int32_beu, &m_Move_32);
-
-	AddMoveOperator (EType_Int64_be, EType_Int64_be, &m_Move_64);
-	AddMoveOperator (EType_Int64_be, EType_Int64_beu, &m_Move_64);
-	AddMoveOperator (EType_Int64_beu, EType_Int64_be, &m_Move_64);
-	AddMoveOperator (EType_Int64_beu, EType_Int64_beu, &m_Move_64);
-
-	AddMoveOperator (EType_Float, EType_Float, &m_Move_32);
-	AddMoveOperator (EType_Double, EType_Double, &m_Move_32);
+	AddMoveOperator (EType_Int16_be, EType_Int16_be, &m_Move_cpy);
+	AddMoveOperator (EType_Int16_be, EType_Int16_beu, &m_Move_cpy);
+	AddMoveOperator (EType_Int16_beu, EType_Int16_be, &m_Move_cpy);
+	AddMoveOperator (EType_Int16_beu, EType_Int16_beu, &m_Move_cpy);
+	AddMoveOperator (EType_Int32_be, EType_Int32_be, &m_Move_cpy);
+	AddMoveOperator (EType_Int32_be, EType_Int32_beu, &m_Move_cpy);
+	AddMoveOperator (EType_Int32_beu, EType_Int32_be, &m_Move_cpy);
+	AddMoveOperator (EType_Int32_beu, EType_Int32_beu, &m_Move_cpy);
+	AddMoveOperator (EType_Int64_be, EType_Int64_be, &m_Move_cpy);
+	AddMoveOperator (EType_Int64_be, EType_Int64_beu, &m_Move_cpy);
+	AddMoveOperator (EType_Int64_beu, EType_Int64_be, &m_Move_cpy);
+	AddMoveOperator (EType_Int64_beu, EType_Int64_beu, &m_Move_cpy);
 
 	// endianness swaps
 
@@ -161,21 +157,43 @@ COperatorMgr::AddStdMoveOperators ()
 	AddMoveOperator (EType_Int64_beu, EType_Int64, &m_Move_i64_swp);
 	AddMoveOperator (EType_Int64_beu, EType_Int64_u, &m_Move_i64_swp);
 
+	// integer truncations
+
+	AddMoveOperator (EType_Int16, EType_Int8, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int16, EType_Int8_u, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int32, EType_Int8, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int32, EType_Int8_u, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int32, EType_Int16, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int32, EType_Int16_u, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int64, EType_Int8, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int64, EType_Int8_u, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int64, EType_Int16, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int64, EType_Int16_u, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int64, EType_Int32, &m_Move_int_trunc);
+	AddMoveOperator (EType_Int64, EType_Int32_u, &m_Move_int_trunc);
+
 	// integer extensions
 
-	AddMoveOperator (EType_Int8, EType_Int16, &m_Move_i8_16);
-	AddMoveOperator (EType_Int8, EType_Int32, &m_Move_i8_32);
-	AddMoveOperator (EType_Int8, EType_Int64, &m_Move_i8_64);
-	AddMoveOperator (EType_Int8_u, EType_Int16, &m_Move_i8u_16);
-	AddMoveOperator (EType_Int8_u, EType_Int32, &m_Move_i8u_32);
-	AddMoveOperator (EType_Int8_u, EType_Int64, &m_Move_i8u_64);
-	AddMoveOperator (EType_Int16, EType_Int32, &m_Move_i16_32);
-	AddMoveOperator (EType_Int16, EType_Int64, &m_Move_i16_64);
-	AddMoveOperator (EType_Int16_u, EType_Int32, &m_Move_i16u_32);
-	AddMoveOperator (EType_Int16_u, EType_Int64, &m_Move_i16u_64);
-	AddMoveOperator (EType_Int32, EType_Int64, &m_Move_i32_64);
-	AddMoveOperator (EType_Int32_u, EType_Int64, &m_Move_i32u_64);
-	
+	AddMoveOperator (EType_Int8, EType_Int16, &m_Move_int_ext);
+	AddMoveOperator (EType_Int8, EType_Int32, &m_Move_int_ext);
+	AddMoveOperator (EType_Int8, EType_Int64, &m_Move_int_ext);
+	AddMoveOperator (EType_Int8_u, EType_Int16, &m_Move_int_ext_u);
+	AddMoveOperator (EType_Int8_u, EType_Int32, &m_Move_int_ext_u);
+	AddMoveOperator (EType_Int8_u, EType_Int64, &m_Move_int_ext_u);
+	AddMoveOperator (EType_Int16, EType_Int32, &m_Move_int_ext);
+	AddMoveOperator (EType_Int16, EType_Int64, &m_Move_int_ext);
+	AddMoveOperator (EType_Int16_u, EType_Int32, &m_Move_int_ext_u);
+	AddMoveOperator (EType_Int16_u, EType_Int64, &m_Move_int_ext_u);
+	AddMoveOperator (EType_Int32, EType_Int64, &m_Move_int_ext);
+	AddMoveOperator (EType_Int32_u, EType_Int64, &m_Move_int_ext_u);
+
+	// floating extensions & truncations
+
+	AddMoveOperator (EType_Float, EType_Float, &m_Move_cpy);
+	AddMoveOperator (EType_Double, EType_Double, &m_Move_cpy);
+	AddMoveOperator (EType_Float, EType_Double, &m_Move_f32_f64);
+	AddMoveOperator (EType_Double, EType_Float, &m_Move_f64_f32);
+
 	// integer to floating point
 
 	AddMoveOperator (EType_Int32, EType_Float, &m_Move_i32_f32);
@@ -426,10 +444,16 @@ bool
 COperatorMgr::MoveOperator (
 	const CValue& SrcValue,
 	const CValue& DstValue,
-	EBinOp Op
+	EBinOp OpKind
 	)
 {
-	return true;
+	if (OpKind == EBinOp_None)
+		return MoveOperator (SrcValue, DstValue);
+
+	CValue RValue;
+	return 
+		BinaryOperator (OpKind, DstValue, SrcValue, &RValue) &&
+		MoveOperator (RValue, DstValue);
 }
 
 bool
@@ -449,7 +473,9 @@ COperatorMgr::CastOperator (
 	}
 	else
 	{
-		return true;
+		CVariable* pTemp = m_pModule->m_VariableMgr.CreateTempVariable (pType);
+		pResultValue->SetVariable (pTemp);
+		return MoveOperator (OpValue, *pResultValue);
 	}
 }
 

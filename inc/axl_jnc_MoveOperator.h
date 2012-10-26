@@ -35,6 +35,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		) = 0;
@@ -123,6 +124,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		);
@@ -130,12 +132,10 @@ public:
 
 //.............................................................................
 
-// simple moves
-
-class CMove_8: public IMoveOperatorLo
+class CMove_cpy: public IMoveOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_8, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CMove_cpy, IMoveOperatorLo)
 
 public:
 	virtual
@@ -143,29 +143,23 @@ public:
 	ConstMove (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		*(int8_t*) DstValue.GetConstData () = *(int8_t*) SrcValue.GetConstData ();
-		return true;
-	}
+		);
 
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_16: public IMoveOperatorLo
+class CMove_int_trunc: public IMoveOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_16, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CMove_int_trunc, IMoveOperatorLo)
 
 public:
 	virtual
@@ -173,29 +167,23 @@ public:
 	ConstMove (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		*(int16_t*) DstValue.GetConstData () = *(int16_t*) SrcValue.GetConstData ();
-		return true;
-	}
+		);
 
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_32: public IMoveOperatorLo
+class CMove_int_ext: public IMoveOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext, IMoveOperatorLo)
 
 public:
 	virtual
@@ -203,29 +191,23 @@ public:
 	ConstMove (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		*(int32_t*) DstValue.GetConstData () = *(int32_t*) SrcValue.GetConstData ();
-		return true;
-	}
+		);
 
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_64: public IMoveOperatorLo
+class CMove_int_ext_u: public IMoveOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext_u, IMoveOperatorLo)
 
 public:
 	virtual
@@ -233,21 +215,15 @@ public:
 	ConstMove (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(int64_t*) SrcValue.GetConstData ();
-		return true;
-	}
+		);
 
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		);
 };
 
 //.............................................................................
@@ -274,6 +250,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -304,6 +281,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -334,6 +312,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -344,12 +323,10 @@ public:
 
 //.............................................................................
 
-// int8 extensions
-
-class CMove_i8_16: public IMoveOperatorLo
+class CMove_f32_f64: public IMoveOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i8_16, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext_u, IMoveOperatorLo)
 
 public:
 	virtual
@@ -359,27 +336,25 @@ public:
 		const CValue& DstValue
 		)
 	{
-		*(int16_t*) DstValue.GetConstData () = *(int8_t*) SrcValue.GetConstData ();
+		*(double*) DstValue.GetConstData () = *(float*) SrcValue.GetConstData ();
 		return true;
 	}
 
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i8u_16: public IMoveOperatorLo
+class CMove_f64_f32: public IMoveOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i8u_16, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext_u, IMoveOperatorLo)
 
 public:
 	virtual
@@ -389,323 +364,17 @@ public:
 		const CValue& DstValue
 		)
 	{
-		*(int16_t*) DstValue.GetConstData () = *(uint8_t*) SrcValue.GetConstData ();
+		*(float*) DstValue.GetConstData () = (float) *(double*) SrcValue.GetConstData ();
 		return true;
 	}
 
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i8_32: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i8_32, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int32_t*) DstValue.GetConstData () = *(int8_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i8u_32: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i8u_32, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int32_t*) DstValue.GetConstData () = *(uint8_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i8_64: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i8_64, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(int8_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i8u_64: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i8u_64, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(uint8_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//.............................................................................
-
-// int16 extensions
-
-class CMove_i16_32: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i16_32, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int32_t*) DstValue.GetConstData () = *(int16_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i16u_32: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i16u_32, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int32_t*) DstValue.GetConstData () = *(uint16_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i16_64: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i16_64, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(int16_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i16u_64: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i16u_64, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(uint16_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//.............................................................................
-
-// int32 extensions
-
-class CMove_i32_64: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32_64, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(int32_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_i32u_64: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32u_64, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = *(uint32_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		);
 };
 
 //.............................................................................
@@ -732,6 +401,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -762,6 +432,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -792,6 +463,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -822,6 +494,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -854,6 +527,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -884,6 +558,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -914,6 +589,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -944,6 +620,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -976,6 +653,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -1006,6 +684,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -1038,6 +717,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -1068,6 +748,7 @@ public:
 	virtual
 	bool
 	LlvmMove (
+		CModule* pModule,
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)

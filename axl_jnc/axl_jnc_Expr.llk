@@ -311,7 +311,7 @@ local
 	  (
 		assignment_operator $o conditional_expr <&$RValue>
 			{
-				return m_pModule->m_OperatorMgr.MoveOperator (*$pValue, $RValue, $o.m_OpKind);
+				return m_pModule->m_OperatorMgr.MoveOperator ($RValue, *$pValue, $o.m_OpKind);
 			}
 	  )?
 	;

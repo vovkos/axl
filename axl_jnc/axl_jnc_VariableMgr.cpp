@@ -10,12 +10,14 @@ namespace jnc {
 CVariableMgr::CVariableMgr (CModule* pModule)
 {
 	m_pModule = pModule;
+	m_TempVariableCounter = 0;
 }
 
 void
 CVariableMgr::Clear ()
 {
 	m_VariableList.Clear ();
+	m_TempVariableCounter = 0;
 }
 
 CVariable*
@@ -34,10 +36,25 @@ CVariableMgr::CreateVariable (
 	{
 		llvm::Type* pLlvmType = pType->GetLlvmType ();
 		pVariable->m_VariableKind = EVariable_Local;
-		pVariable->m_pLlvmAlloca = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAlloca (pLlvmType);
+		pVariable->m_pLlvmAlloca = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAlloca (
+			pLlvmType, 
+			0, 
+			(const tchar_t*) Name
+			);
 	}
 
 	return pVariable;
+}
+
+CVariable*
+CVariableMgr::CreateTempVariable (CType* pType)
+{
+	ASSERT (m_pModule->m_FunctionMgr.GetCurrentFunction ());
+
+	rtl::CString Name;
+	Name.Format (_T("_tmp%d"), m_TempVariableCounter++);
+
+	return CreateVariable (Name, pType);
 }
 
 //.............................................................................

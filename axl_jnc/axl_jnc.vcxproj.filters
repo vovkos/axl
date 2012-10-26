@@ -25,6 +25,9 @@
     <Filter Include="operator">
       <UniqueIdentifier>{bffc36e1-a985-4dd3-a46a-2f5d5d241e03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="variable">
+      <UniqueIdentifier>{6565a98e-5234-43be-9e2b-65fba747d143}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -73,9 +76,6 @@
     <ClInclude Include="..\Inc\axl_jnc_Function.h">
       <Filter>function</Filter>
     </ClInclude>
-    <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h">
-      <Filter>value</Filter>
-    </ClInclude>
     <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h">
       <Filter>value</Filter>
     </ClInclude>
@@ -122,7 +122,10 @@
       <Filter>operator</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Variable.h">
-      <Filter>value</Filter>
+      <Filter>variable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h">
+      <Filter>variable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -165,9 +168,6 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_FunctionMgr.cpp">
       <Filter>function</Filter>
-    </ClCompile>
-    <ClCompile Include="axl_jnc_VariableMgr.cpp">
-      <Filter>value</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_ConstMgr.cpp">
       <Filter>value</Filter>
@@ -215,7 +215,10 @@
       <Filter>operator</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_Variable.cpp">
-      <Filter>value</Filter>
+      <Filter>variable</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_VariableMgr.cpp">
+      <Filter>variable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

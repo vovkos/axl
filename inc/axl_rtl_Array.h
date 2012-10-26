@@ -478,24 +478,24 @@ public:
 			return false;
 		}
 
-		T* pTmp = (T*) AXL_MEM_ALLOC (Count * sizeof (T));
-		if (!pTmp)
+		T* pTemp = (T*) AXL_MEM_ALLOC (Count * sizeof (T));
+		if (!pTemp)
 			return false;
 
 		T* pDst = m_p + IndexDst;
 		T* pSrc = m_p + IndexSrc;
 
-		CDetails::ConstructCopy (pTmp, pSrc, Count);
+		CDetails::ConstructCopy (pTemp, pSrc, Count);
 
 		if (IndexSrc < IndexDst)
 			CDetails::Copy (pSrc, pSrc + Count, IndexDst - IndexSrc);
 		else
 			CDetails::Copy (pDst + Count, pDst, IndexSrc - IndexDst);
 
-		CDetails::Copy (pDst, pTmp, Count);
+		CDetails::Copy (pDst, pTemp, Count);
 
-		CDetails::Destruct (pTmp, Count);
-		AXL_MEM_FREE (pTmp);
+		CDetails::Destruct (pTemp, Count);
+		AXL_MEM_FREE (pTemp);
 
 		return true;
 	}

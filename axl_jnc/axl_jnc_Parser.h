@@ -4455,7 +4455,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 #line 313 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-				return m_pModule->m_OperatorMgr.MoveOperator (*__pSymbol->m_Arg.pValue, __pSymbol->m_Local.RValue, (*(_cls13*) GetAstLocator (0)).m_OpKind);
+				return m_pModule->m_OperatorMgr.MoveOperator (__pSymbol->m_Local.RValue, *__pSymbol->m_Arg.pValue, (*(_cls13*) GetAstLocator (0)).m_OpKind);
 			;
 #line 4461 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}

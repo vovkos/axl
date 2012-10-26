@@ -65,9 +65,9 @@ protected:
 		CVariable* m_pVariable;
 		CGlobalFunction* m_pGlobalFunction;
 		CGlobalProperty* m_pGlobalProperty;
-
-		mutable llvm::Value* m_pLlvmValue;
 	};
+
+	mutable llvm::Value* m_pLlvmValue;
 
 public:
 	CValue ();
