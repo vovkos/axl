@@ -58,6 +58,7 @@ public:
 	virtual
 	bool
 	LlvmOperator (
+		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue	
@@ -178,13 +179,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
+		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
 		llvm::Instruction* pLlvmValue = T::LlvmOpInt (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmValue (pLlvmValue, EType_Int32);
+		pResultValue->SetLlvmRegister (pLlvmValue, EType_Int32);
 		return true;
 	}
 };
@@ -214,13 +216,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
+		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
 		llvm::Instruction* pLlvmValue = T::LlvmOpInt (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmValue (pLlvmValue, EType_Int64);
+		pResultValue->SetLlvmRegister (pLlvmValue, EType_Int64);
 		return true;
 	}
 };
@@ -250,13 +253,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
+		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
 		llvm::Instruction* pLlvmValue = T::LlvmOpFp (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmValue (pLlvmValue, EType_Float);
+		pResultValue->SetLlvmRegister (pLlvmValue, EType_Float);
 		return true;
 	}
 };
@@ -286,13 +290,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
+		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
 		llvm::Instruction* pLlvmValue = T::LlvmOpFp (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmValue (pLlvmValue, EType_Double);
+		pResultValue->SetLlvmRegister (pLlvmValue, EType_Double);
 		return true;
 	}
 };

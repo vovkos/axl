@@ -48,6 +48,18 @@ public:
 		return m_pCurrentNamespace;
 	}
 
+	void
+	SetCurrentNamespace (CNamespace* pNamespace)
+	{
+		m_pCurrentNamespace = pNamespace ? pNamespace : &m_GlobalNamespace;
+	}
+
+	void
+	SetGlobalNamespace ()
+	{
+		m_pCurrentNamespace = &m_GlobalNamespace;
+	}
+
 	rtl::CString
 	CreateQualifiedName (const tchar_t* pName)
 	{

@@ -72,7 +72,7 @@ CUnaryOperator::Operator (
 	EValue OpValueKind = OpValue.GetValueKind ();
 	return OpValueKind == EValue_Const ?
 		m_pOperatorLo->ConstOperator (OpValue, pReturnValue) :
-		m_pOperatorLo->LlvmOperator (OpValue, pReturnValue);
+		m_pOperatorLo->LlvmOperator (pModule, OpValue, pReturnValue);
 }
 
 bool
@@ -118,7 +118,7 @@ CUnaryOperatorOverload::FindOperator (CType* pOpType)
 	ASSERT (pModule);
 
 	CUnaryOperator* pBestOperator = NULL;
-	ECanMove BestCanMove = ECanMove_None;
+	ECast BestCastKind = ECast_Explicit;
 	size_t BestCastPrice = -1;
 
 	rtl::CIteratorT <CUnaryOperator> Operator = m_List.GetHead ();
@@ -127,17 +127,17 @@ CUnaryOperatorOverload::FindOperator (CType* pOpType)
 		CUnaryOperator* pOperator = *Operator;
 		
 		CType* pCastOpType = pOperator->GetOpType ();
-		CMoveOperator* pMoveOperator = pModule->m_OperatorMgr.FindMoveOperator (pOpType, pCastOpType);
+		CCastOperator* pMoveOperator = pModule->m_OperatorMgr.FindCastOperator (pOpType, pCastOpType);
 		if (!pMoveOperator)
 			continue;
 
+		ECast CastKind = pMoveOperator->GetCastKind ();
 		size_t CastPrice = pMoveOperator->GetPrice ();
-		ECanMove CanMove = pMoveOperator->GetCanMove ();
 
-		if (!pBestOperator || BestCanMove < CanMove || BestCastPrice > CastPrice)
+		if (!pBestOperator || CastKind < BestCastKind || CastPrice < BestCastPrice)
 		{
 			pBestOperator = pOperator;
-			BestCanMove = CanMove;
+			BestCastKind = CastKind;
 			BestCastPrice = CastPrice;
 		}
 	}

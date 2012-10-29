@@ -89,7 +89,7 @@
     <ClInclude Include="..\inc\axl_jnc_ImportType.h" />
     <ClInclude Include="..\Inc\axl_jnc_Module.h" />
     <ClInclude Include="..\inc\axl_jnc_ModuleItem.h" />
-    <ClInclude Include="..\inc\axl_jnc_MoveOperator.h" />
+    <ClInclude Include="..\inc\axl_jnc_CastOperator.h" />
     <ClInclude Include="..\Inc\axl_jnc_Namespace.h" />
     <ClInclude Include="..\Inc\axl_jnc_NamespaceMgr.h" />
     <ClInclude Include="..\inc\axl_jnc_OperatorMgr.h" />
@@ -124,7 +124,7 @@
     <ClCompile Include="axl_jnc_Lexer.cpp" />
     <ClCompile Include="axl_jnc_Module.cpp" />
     <ClCompile Include="axl_jnc_ModuleItem.cpp" />
-    <ClCompile Include="axl_jnc_MoveOperator.cpp" />
+    <ClCompile Include="axl_jnc_CastOperator.cpp" />
     <ClCompile Include="axl_jnc_Namespace.cpp" />
     <ClCompile Include="axl_jnc_NamespaceMgr.cpp" />
     <ClCompile Include="axl_jnc_OperatorMgr.cpp" />

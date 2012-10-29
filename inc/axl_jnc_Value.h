@@ -20,12 +20,11 @@ enum EValue
 	EValue_Void = 0,
 	EValue_Null,
 	EValue_Type,
+	EValue_Const,
 	EValue_Variable,
+	EValue_LlvmRegister,
 	EValue_GlobalFunction,
 	EValue_GlobalProperty,
-	EValue_Const,
-	EValue_Llvm,
-	EValue_Global,
 	EValue_Cmp,
 	EValue_BoolNot,
 	EValue_BoolAnd,
@@ -77,6 +76,11 @@ public:
 	{
 		*this = Value;
 	}
+
+	CValue (
+		CType* pType,
+		const void* p = NULL
+		);
 
 	EValue 
 	GetValueKind () const
@@ -232,16 +236,15 @@ public:
 	}
 
 	void
-	SetLlvmValue (
+	SetLlvmRegister (
 		llvm::Value* pValue,
 		CType* pType
 		);
 
 	void
-	SetLlvmValue (
+	SetLlvmRegister (
 		llvm::Value* pValue,
-		EType TypeKind,
-		CModule* pModule = NULL // if NULL will use module TLS 
+		EType TypeKind
 		);
 };
 

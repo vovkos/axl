@@ -130,8 +130,7 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	pScope->m_pModule = m_pModule;
 	pScope->m_Pos = Pos;
 	m_ScopeList.InsertTail (pScope);
-	m_NamespaceStack.Append (pScope);
-	m_pCurrentNamespace = pScope;
+	OpenNamespace (pScope);
 	m_pCurrentScope = pScope;
 	return pScope;
 }

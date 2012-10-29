@@ -27,11 +27,10 @@ enum EColor
 int
 test ()
 {
-	int i;
-	int j;
-	int k;
+	uint8_t x;
 
-	i = j;
+	beulong_t y;
+	y = x;
 
 //	return (1 + 2) * (4 + 5);
 }

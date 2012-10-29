@@ -10,6 +10,8 @@ namespace jnc {
 CFunction::CFunction ()
 {
 	m_ItemKind = EModuleItem_Function;
+	m_FunctionKind = EFunction_Global;
+	m_pOverload = NULL;
 	m_pType = NULL;
 	m_pBlock = NULL;
 	m_pScope = NULL;
@@ -82,6 +84,8 @@ CFunctionOverload::FindOverload (
 bool
 CFunctionOverload::AddOverload (CFunction* pFunction)
 {
+	pFunction->m_pOverload = this;
+
 	if (!m_pFunction)
 	{
 		m_pFunction = pFunction;

@@ -21,10 +21,10 @@ COperatorMgr::Clear ()
 	for (size_t i = 0; i < EBinOp__Count; i++)
 		m_BinaryOperatorTable [i].Clear ();
 
-	memset (m_BasicMoveOperatorTable, 0, sizeof (m_BasicMoveOperatorTable));
-	m_MoveOperatorMap.Clear ();
-	m_MoveOperatorList.Clear ();
-	m_SuperMoveList.Clear ();
+	memset (m_BasicCastOperatorTable, 0, sizeof (m_BasicCastOperatorTable));
+	m_CastOperatorMap.Clear ();
+	m_CastOperatorList.Clear ();
+	m_SuperCastList.Clear ();
 }
 
 void
@@ -98,119 +98,119 @@ COperatorMgr::AddStdMoveOperators ()
 {
 	// integer copies
 
-	AddMoveOperator (EType_Int8, EType_Int8, &m_Move_cpy);
-	AddMoveOperator (EType_Int8, EType_Int8_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int8_u, EType_Int8, &m_Move_cpy);
-	AddMoveOperator (EType_Int8_u, EType_Int8_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int16, EType_Int16, &m_Move_cpy);
-	AddMoveOperator (EType_Int16, EType_Int16_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int16_u, EType_Int16, &m_Move_cpy);
-	AddMoveOperator (EType_Int16_u, EType_Int16_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int32, EType_Int32, &m_Move_cpy);
-	AddMoveOperator (EType_Int32, EType_Int32_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int32_u, EType_Int32, &m_Move_cpy);
-	AddMoveOperator (EType_Int32_u, EType_Int32_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int64, EType_Int64, &m_Move_cpy);
-	AddMoveOperator (EType_Int64, EType_Int64_u, &m_Move_cpy);
-	AddMoveOperator (EType_Int64_u, EType_Int64, &m_Move_cpy);
-	AddMoveOperator (EType_Int64_u, EType_Int64_u, &m_Move_cpy);
+	AddCastOperator (EType_Int8, EType_Int8, &m_Cast_cpy);
+	AddCastOperator (EType_Int8, EType_Int8_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int8_u, EType_Int8, &m_Cast_cpy);
+	AddCastOperator (EType_Int8_u, EType_Int8_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int16, EType_Int16, &m_Cast_cpy);
+	AddCastOperator (EType_Int16, EType_Int16_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int16_u, EType_Int16, &m_Cast_cpy);
+	AddCastOperator (EType_Int16_u, EType_Int16_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int32, EType_Int32, &m_Cast_cpy);
+	AddCastOperator (EType_Int32, EType_Int32_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int32_u, EType_Int32, &m_Cast_cpy);
+	AddCastOperator (EType_Int32_u, EType_Int32_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int64, EType_Int64, &m_Cast_cpy);
+	AddCastOperator (EType_Int64, EType_Int64_u, &m_Cast_cpy);
+	AddCastOperator (EType_Int64_u, EType_Int64, &m_Cast_cpy);
+	AddCastOperator (EType_Int64_u, EType_Int64_u, &m_Cast_cpy);
 
-	AddMoveOperator (EType_Int16_be, EType_Int16_be, &m_Move_cpy);
-	AddMoveOperator (EType_Int16_be, EType_Int16_beu, &m_Move_cpy);
-	AddMoveOperator (EType_Int16_beu, EType_Int16_be, &m_Move_cpy);
-	AddMoveOperator (EType_Int16_beu, EType_Int16_beu, &m_Move_cpy);
-	AddMoveOperator (EType_Int32_be, EType_Int32_be, &m_Move_cpy);
-	AddMoveOperator (EType_Int32_be, EType_Int32_beu, &m_Move_cpy);
-	AddMoveOperator (EType_Int32_beu, EType_Int32_be, &m_Move_cpy);
-	AddMoveOperator (EType_Int32_beu, EType_Int32_beu, &m_Move_cpy);
-	AddMoveOperator (EType_Int64_be, EType_Int64_be, &m_Move_cpy);
-	AddMoveOperator (EType_Int64_be, EType_Int64_beu, &m_Move_cpy);
-	AddMoveOperator (EType_Int64_beu, EType_Int64_be, &m_Move_cpy);
-	AddMoveOperator (EType_Int64_beu, EType_Int64_beu, &m_Move_cpy);
+	AddCastOperator (EType_Int16_be, EType_Int16_be, &m_Cast_cpy);
+	AddCastOperator (EType_Int16_be, EType_Int16_beu, &m_Cast_cpy);
+	AddCastOperator (EType_Int16_beu, EType_Int16_be, &m_Cast_cpy);
+	AddCastOperator (EType_Int16_beu, EType_Int16_beu, &m_Cast_cpy);
+	AddCastOperator (EType_Int32_be, EType_Int32_be, &m_Cast_cpy);
+	AddCastOperator (EType_Int32_be, EType_Int32_beu, &m_Cast_cpy);
+	AddCastOperator (EType_Int32_beu, EType_Int32_be, &m_Cast_cpy);
+	AddCastOperator (EType_Int32_beu, EType_Int32_beu, &m_Cast_cpy);
+	AddCastOperator (EType_Int64_be, EType_Int64_be, &m_Cast_cpy);
+	AddCastOperator (EType_Int64_be, EType_Int64_beu, &m_Cast_cpy);
+	AddCastOperator (EType_Int64_beu, EType_Int64_be, &m_Cast_cpy);
+	AddCastOperator (EType_Int64_beu, EType_Int64_beu, &m_Cast_cpy);
 
 	// endianness swaps
 
-	AddMoveOperator (EType_Int16, EType_Int16_be, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16, EType_Int16_beu, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16_u, EType_Int16_be, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16_u, EType_Int16_beu, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16_be, EType_Int16, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16_be, EType_Int16_u, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16_beu, EType_Int16, &m_Move_i16_swp);
-	AddMoveOperator (EType_Int16_beu, EType_Int16_u, &m_Move_i16_swp);
+	AddCastOperator (EType_Int16, EType_Int16_be, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16, EType_Int16_beu, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16_u, EType_Int16_be, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16_u, EType_Int16_beu, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16_be, EType_Int16, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16_be, EType_Int16_u, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16_beu, EType_Int16, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16_beu, EType_Int16_u, &m_Cast_i16_swp);
 
-	AddMoveOperator (EType_Int32, EType_Int32_be, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32, EType_Int32_beu, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32_u, EType_Int32_be, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32_u, EType_Int32_beu, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32_be, EType_Int32, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32_be, EType_Int32_u, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32_beu, EType_Int32, &m_Move_i32_swp);
-	AddMoveOperator (EType_Int32_beu, EType_Int32_u, &m_Move_i32_swp);
+	AddCastOperator (EType_Int32, EType_Int32_be, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32, EType_Int32_beu, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32_u, EType_Int32_be, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32_u, EType_Int32_beu, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32_be, EType_Int32, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32_be, EType_Int32_u, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32_beu, EType_Int32, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32_beu, EType_Int32_u, &m_Cast_i32_swp);
 
-	AddMoveOperator (EType_Int64, EType_Int64_be, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64, EType_Int64_beu, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64_u, EType_Int64_be, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64_u, EType_Int64_beu, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64_be, EType_Int64, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64_be, EType_Int64_u, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64_beu, EType_Int64, &m_Move_i64_swp);
-	AddMoveOperator (EType_Int64_beu, EType_Int64_u, &m_Move_i64_swp);
+	AddCastOperator (EType_Int64, EType_Int64_be, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64, EType_Int64_beu, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64_u, EType_Int64_be, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64_u, EType_Int64_beu, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64_be, EType_Int64, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64_be, EType_Int64_u, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64_beu, EType_Int64, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64_beu, EType_Int64_u, &m_Cast_i64_swp);
 
 	// integer truncations
 
-	AddMoveOperator (EType_Int16, EType_Int8, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int16, EType_Int8_u, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int32, EType_Int8, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int32, EType_Int8_u, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int32, EType_Int16, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int32, EType_Int16_u, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int64, EType_Int8, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int64, EType_Int8_u, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int64, EType_Int16, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int64, EType_Int16_u, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int64, EType_Int32, &m_Move_int_trunc);
-	AddMoveOperator (EType_Int64, EType_Int32_u, &m_Move_int_trunc);
+	AddCastOperator (EType_Int16, EType_Int8, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int16, EType_Int8_u, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int32, EType_Int8, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int32, EType_Int8_u, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int32, EType_Int16, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int32, EType_Int16_u, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int64, EType_Int8, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int64, EType_Int8_u, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int64, EType_Int16, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int64, EType_Int16_u, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int64, EType_Int32, &m_Cast_int_trunc);
+	AddCastOperator (EType_Int64, EType_Int32_u, &m_Cast_int_trunc);
 
 	// integer extensions
 
-	AddMoveOperator (EType_Int8, EType_Int16, &m_Move_int_ext);
-	AddMoveOperator (EType_Int8, EType_Int32, &m_Move_int_ext);
-	AddMoveOperator (EType_Int8, EType_Int64, &m_Move_int_ext);
-	AddMoveOperator (EType_Int8_u, EType_Int16, &m_Move_int_ext_u);
-	AddMoveOperator (EType_Int8_u, EType_Int32, &m_Move_int_ext_u);
-	AddMoveOperator (EType_Int8_u, EType_Int64, &m_Move_int_ext_u);
-	AddMoveOperator (EType_Int16, EType_Int32, &m_Move_int_ext);
-	AddMoveOperator (EType_Int16, EType_Int64, &m_Move_int_ext);
-	AddMoveOperator (EType_Int16_u, EType_Int32, &m_Move_int_ext_u);
-	AddMoveOperator (EType_Int16_u, EType_Int64, &m_Move_int_ext_u);
-	AddMoveOperator (EType_Int32, EType_Int64, &m_Move_int_ext);
-	AddMoveOperator (EType_Int32_u, EType_Int64, &m_Move_int_ext_u);
+	AddCastOperator (EType_Int8, EType_Int16, &m_Cast_int_ext);
+	AddCastOperator (EType_Int8, EType_Int32, &m_Cast_int_ext);
+	AddCastOperator (EType_Int8, EType_Int64, &m_Cast_int_ext);
+	AddCastOperator (EType_Int8_u, EType_Int16, &m_Cast_int_ext_u);
+	AddCastOperator (EType_Int8_u, EType_Int32, &m_Cast_int_ext_u);
+	AddCastOperator (EType_Int8_u, EType_Int64, &m_Cast_int_ext_u);
+	AddCastOperator (EType_Int16, EType_Int32, &m_Cast_int_ext);
+	AddCastOperator (EType_Int16, EType_Int64, &m_Cast_int_ext);
+	AddCastOperator (EType_Int16_u, EType_Int32, &m_Cast_int_ext_u);
+	AddCastOperator (EType_Int16_u, EType_Int64, &m_Cast_int_ext_u);
+	AddCastOperator (EType_Int32, EType_Int64, &m_Cast_int_ext);
+	AddCastOperator (EType_Int32_u, EType_Int64, &m_Cast_int_ext_u);
 
 	// floating extensions & truncations
 
-	AddMoveOperator (EType_Float, EType_Float, &m_Move_cpy);
-	AddMoveOperator (EType_Double, EType_Double, &m_Move_cpy);
-	AddMoveOperator (EType_Float, EType_Double, &m_Move_f32_f64);
-	AddMoveOperator (EType_Double, EType_Float, &m_Move_f64_f32);
+	AddCastOperator (EType_Float, EType_Float, &m_Cast_cpy);
+	AddCastOperator (EType_Double, EType_Double, &m_Cast_cpy);
+	AddCastOperator (EType_Float, EType_Double, &m_Cast_f32_f64);
+	AddCastOperator (EType_Double, EType_Float, &m_Cast_f64_f32);
 
 	// integer to floating point
 
-	AddMoveOperator (EType_Int32, EType_Float, &m_Move_i32_f32);
-	AddMoveOperator (EType_Int32_u, EType_Float, &m_Move_i32u_f32);
-	AddMoveOperator (EType_Int32, EType_Double, &m_Move_i32_f64);
-	AddMoveOperator (EType_Int32_u, EType_Double, &m_Move_i32u_f64);
-	AddMoveOperator (EType_Int64, EType_Float, &m_Move_i64_f32);
-	AddMoveOperator (EType_Int64_u, EType_Float, &m_Move_i64u_f32);
-	AddMoveOperator (EType_Int64, EType_Double, &m_Move_i64_f64);
-	AddMoveOperator (EType_Int64_u, EType_Double, &m_Move_i64u_f64);
+	AddCastOperator (EType_Int32, EType_Float, &m_Cast_i32_f32);
+	AddCastOperator (EType_Int32_u, EType_Float, &m_Cast_i32u_f32);
+	AddCastOperator (EType_Int32, EType_Double, &m_Cast_i32_f64);
+	AddCastOperator (EType_Int32_u, EType_Double, &m_Cast_i32u_f64);
+	AddCastOperator (EType_Int64, EType_Float, &m_Cast_i64_f32);
+	AddCastOperator (EType_Int64_u, EType_Float, &m_Cast_i64u_f32);
+	AddCastOperator (EType_Int64, EType_Double, &m_Cast_i64_f64);
+	AddCastOperator (EType_Int64_u, EType_Double, &m_Cast_i64u_f64);
 
 	// floating point to integer
 
-	AddMoveOperator (EType_Float, EType_Int32, &m_Move_f32_i32);
-	AddMoveOperator (EType_Double, EType_Int32, &m_Move_f64_i32);
-	AddMoveOperator (EType_Float, EType_Int64, &m_Move_f32_i64);
-	AddMoveOperator (EType_Double, EType_Int64, &m_Move_f64_i64);
+	AddCastOperator (EType_Float, EType_Int32, &m_Cast_f32_i32);
+	AddCastOperator (EType_Double, EType_Int32, &m_Cast_f64_i32);
+	AddCastOperator (EType_Float, EType_Int64, &m_Cast_f32_i64);
+	AddCastOperator (EType_Double, EType_Int64, &m_Cast_f64_i64);
 
 	// build super moves for basic types (floyd-warshall)
 	
@@ -218,21 +218,22 @@ COperatorMgr::AddStdMoveOperators ()
 	for (size_t i = 0; i < EType__BasicTypeCount; i++)
 	for (size_t j = 0; j < EType__BasicTypeCount; j++)
 	{
-		CMoveOperator* pOperatorIK = m_BasicMoveOperatorTable [i] [k];
-		CMoveOperator* pOperatorKJ = m_BasicMoveOperatorTable [k] [j];
+		CCastOperator* pOperatorIK = m_BasicCastOperatorTable [i] [k];
+		CCastOperator* pOperatorKJ = m_BasicCastOperatorTable [k] [j];
 		if (!pOperatorIK || !pOperatorKJ)
 			continue;
 
-		CMoveOperator* pOperatorIJ = m_BasicMoveOperatorTable [i] [j];
-		if (pOperatorIJ && pOperatorIJ->m_Price < pOperatorIK->m_Price + pOperatorKJ->m_Price)
+		CCastOperator* pOperatorIJ = m_BasicCastOperatorTable [i] [j];
+		if (pOperatorIJ && pOperatorIJ->m_Price <= pOperatorIK->m_Price + pOperatorKJ->m_Price)
 			continue;
 
-		CSuperMove* pSuperMove = AXL_MEM_NEW (CSuperMove);
-		pSuperMove->m_pFirst = pOperatorIK;
-		pSuperMove->m_pSecond = pOperatorKJ;
-		m_SuperMoveList.InsertTail (pSuperMove);
+		CSuperCast* pSuperCast = AXL_MEM_NEW (CSuperCast);
+		pSuperCast->m_pIntermediateType = m_pModule->m_TypeMgr.GetBasicType ((EType) k);
+		pSuperCast->m_pFirst = pOperatorIK->m_pOperatorLo;
+		pSuperCast->m_pSecond = pOperatorKJ->m_pOperatorLo;
+		m_SuperCastList.InsertTail (pSuperCast);
 
-		pOperatorIJ = AddMoveOperator ((EType) i, (EType) j, pSuperMove);
+		pOperatorIJ = AddCastOperator ((EType) i, (EType) j, pSuperCast);
 		pOperatorIJ->m_Price = pOperatorIK->m_Price + pOperatorKJ->m_Price;
 	}
 }
@@ -351,64 +352,77 @@ COperatorMgr::BinaryOperator (
 	return true;
 }
 
-CMoveOperator*
-COperatorMgr::FindMoveOperator (
+CCastOperator*
+COperatorMgr::FindCastOperator (
 	CType* pSrcType,
 	CType* pDstType
 	)
 {
 	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CMoveOperator*> It = m_MoveOperatorMap.Find (Signature);
+	rtl::CHashTableMapIteratorT <const tchar_t*, CCastOperator*> It = m_CastOperatorMap.Find (Signature);
 	if (It)
 		return It->m_Value;
 
 	return NULL;
 }
 
-CMoveOperator*
-COperatorMgr::AddMoveOperator (
+CCastOperator*
+COperatorMgr::AddCastOperator (
 	CType* pSrcType,
 	CType* pDstType,
-	IMoveOperatorLo* pOperatorLo
+	ICastOperatorLo* pOperatorLo
 	)
 {
 	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CMoveOperator*> It = m_MoveOperatorMap.Goto (Signature);
+	rtl::CHashTableMapIteratorT <const tchar_t*, CCastOperator*> It = m_CastOperatorMap.Goto (Signature);
 	if (It->m_Value)
 	{
-		CMoveOperator* pOperator = It->m_Value;
+		CCastOperator* pOperator = It->m_Value;
 		
 		ASSERT (pOperator->m_Signature == Signature);
 		pOperator->m_pOperatorLo = pOperatorLo;
 		return pOperator;
 	}
 
-	CMoveOperator* pOperator = AXL_MEM_NEW (CMoveOperator);
+	CCastOperator* pOperator = AXL_MEM_NEW (CCastOperator);
 	pOperator->m_Signature = Signature;
 	pOperator->m_pSrcType = pSrcType;
 	pOperator->m_pDstType = pDstType;
 	pOperator->m_pOperatorLo = pOperatorLo;
-	m_MoveOperatorList.InsertTail (pOperator);
+	m_CastOperatorList.InsertTail (pOperator);
 	It->m_Value = pOperator;
 
 	EType DstTypeKind = pDstType->GetTypeKind ();
 	EType SrcTypeKind = pSrcType->GetTypeKind ();
 	if (DstTypeKind < EType__BasicTypeCount && SrcTypeKind < EType__BasicTypeCount)
-		m_BasicMoveOperatorTable [SrcTypeKind] [DstTypeKind] = pOperator;
+		m_BasicCastOperatorTable [SrcTypeKind] [DstTypeKind] = pOperator;
 
 	return pOperator;
 }
 
-CMoveOperator*
-COperatorMgr::AddMoveOperator (
+CCastOperator*
+COperatorMgr::AddCastOperator (
 	EType SrcTypeKind,
 	EType DstTypeKind,
-	IMoveOperatorLo* pOperatorLo
+	ICastOperatorLo* pOperatorLo
 	)
 {
 	CType* pSrcType = m_pModule->m_TypeMgr.GetBasicType (SrcTypeKind);
 	CType* pDstType = m_pModule->m_TypeMgr.GetBasicType (DstTypeKind);
-	return AddMoveOperator (pSrcType, pDstType, pOperatorLo);
+	return AddCastOperator (pSrcType, pDstType, pOperatorLo);
+}
+
+llvm::Value*
+COperatorMgr::LoadValue (const CValue& Value)
+{
+	EValue ValueKind = Value.GetValueKind ();
+	ASSERT (ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
+
+	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
+	if (ValueKind == EValue_Variable)
+		pLlvmValue = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLoad (pLlvmValue);
+
+	return pLlvmValue;
 }
 
 bool
@@ -417,27 +431,37 @@ COperatorMgr::MoveOperator (
 	const CValue& DstValue
 	)
 {
+	EValue SrcValueKind = SrcValue.GetValueKind ();
+	EValue DstValueKind = DstValue.GetValueKind ();
+
+	CType* pSrcType = SrcValue.GetType ();
+	CType* pDstType = DstValue.GetType ();
+
 	// TODO: take care of properties
 
 	// TODO: take care of references
 
 	// TODO: take care of const modifiers
 
-	CType* pSrcType = SrcValue.GetType ();
-	CType* pDstType = DstValue.GetType ();
+	llvm::Value* pLlvmSrcValue = NULL;
+	llvm::Value* pLlvmDstValue = DstValue.GetLlvmValue ();
 
-	CMoveOperator* pOperator = FindMoveOperator (pSrcType, pDstType);	
-	if (!pOperator)
+	if (pSrcType->Cmp (pDstType) == 0)
 	{
-		err::SetFormatStringError (
-			_T("cannot convert from '%s' to '%s'"),
-			pSrcType->GetTypeString (),
-			pDstType->GetTypeString ()
-			);
-		return false;
+		llvm::Value* pLlvmSrcValue = LoadValue (SrcValue);
 	}
-	
-	return pOperator->Move (SrcValue, DstValue);
+	else
+	{
+		CValue CastValue;
+		bool Result = CastOperator (SrcValue, DstValue.GetType (), &CastValue);
+		if (!Result)
+			return false;
+
+		pLlvmSrcValue = CastValue.GetLlvmValue ();
+	}
+
+	m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateStore (pLlvmSrcValue, pLlvmDstValue);
+	return true;
 }
 
 bool
@@ -463,20 +487,18 @@ COperatorMgr::CastOperator (
 	CValue* pResultValue
 	)
 {
-	EValue OpValueKind = OpValue.GetValueKind ();
+	CCastOperator* pOperator = FindCastOperator (OpValue.GetType (), pType);	
+	if (!pOperator)
+	{
+		err::SetFormatStringError (
+			_T("cannot convert from '%s' to '%s'"),
+			OpValue.GetType (),
+			pType->GetTypeString ()
+			);
+		return false;
+	}
 	
-	if (OpValueKind == EValue_Const)
-	{
-		return 
-			pResultValue->CreateConst (pType) &&
-			MoveOperator (OpValue, *pResultValue);
-	}
-	else
-	{
-		CVariable* pTemp = m_pModule->m_VariableMgr.CreateTempVariable (pType);
-		pResultValue->SetVariable (pTemp);
-		return MoveOperator (OpValue, *pResultValue);
-	}
+	return pOperator->Cast (OpValue, pType, pResultValue);
 }
 
 bool

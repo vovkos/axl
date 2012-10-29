@@ -113,6 +113,13 @@ public:
 	{
 		return &m_Function;
 	}
+
+	static
+	CClassMethodMember* 
+	FromFunction (CFunctionOverload* pFunction)
+	{
+		return CONTAINING_RECORD (pFunction, CClassMethodMember, m_Function);
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

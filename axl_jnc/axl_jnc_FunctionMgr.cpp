@@ -104,6 +104,7 @@ CFunctionMgr::CreateGlobalFunction (
 	CGlobalFunction* pGlobalFunction = AXL_MEM_NEW (CGlobalFunction);
 	pGlobalFunction->m_Name = Name;
 	pGlobalFunction->m_pFunction = pFunction;
+	pFunction->m_pOverload = pGlobalFunction;
 	m_GlobalFunctionList.InsertTail (pGlobalFunction);
 	return pGlobalFunction;
 }
@@ -148,6 +149,24 @@ CFunctionMgr::CompileFunctions ()
 		if (!pFunction->HasBody ())
 			continue;
 
+		CNamespace* pNamespace = NULL;
+
+		EFunction FunctionKind = pFunction->GetFunctionKind ();
+		switch (FunctionKind)
+		{
+		case EFunction_Global:
+			{
+			CGlobalFunction* pGlobalFunction = (CGlobalFunction*) pFunction->GetOverload ();
+			pNamespace = pGlobalFunction->GetParentNamespace ();
+			break;
+			}
+
+		default:
+			ASSERT (false);
+		}
+
+		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
+
 		m_pCurrentFunction = pFunction;
 		pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"), true);
 
@@ -174,6 +193,8 @@ CFunctionMgr::CompileFunctions ()
 		jnc::CParser::CCompoundStmt* pBody = (jnc::CParser::CCompoundStmt*) pAstNode;
 		pFunction->m_pScope = pBody->m_pScope;
 	}
+
+	m_pModule->m_NamespaceMgr.SetGlobalNamespace (); // just in case
 
 	return true;
 }

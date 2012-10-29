@@ -12,57 +12,57 @@ namespace jnc {
 
 //.............................................................................
 
-enum ECanMove
+enum ECast
 {
-	ECanMove_None = 0,
-	ECanMove_Explicit,
-	ECanMove_Implicit,
+	ECast_Implicit,
+	ECast_Explicit,
 };
 
 //.............................................................................
 
 [uuid ("2f7742e5-396e-4444-bbc6-56eb475403bf")]
-struct IMoveOperatorLo: obj::IRoot
+struct ICastOperatorLo: obj::IRoot
 {	
 public:
 	virtual
 	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
+	ConstCast (
+		const CValue& SrcValue, // EValue_Const
+		const CValue& DstValue  // EValue_Const
 		) = 0;
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
+		const CValue& Value, // EValue_Variable or EValue_LlvmRegister
+		CType* pType,
+		CValue* pResultValue // EValue_Variable or EValue_LlvmRegister
 		) = 0;
 };
 
 //.............................................................................
 
-class CMoveOperator: public rtl::TListLink
+class CCastOperator: public rtl::TListLink
 {
 protected:
 	friend class COperatorMgr;
 
-	ECanMove m_CanMove;
+	ECast m_CastKind;
 	size_t m_Price;
 
 	rtl::CStringA m_Signature;
 	CType* m_pSrcType;
 	CType* m_pDstType;
-	IMoveOperatorLo* m_pOperatorLo;
+	ICastOperatorLo* m_pOperatorLo;
 
 public:
-	CMoveOperator ();
+	CCastOperator ();
 
-	ECanMove
-	GetCanMove ()
+	ECast
+	GetCastKind ()
 	{
-		return m_CanMove;
+		return m_CastKind;
 	}
 
 	size_t
@@ -84,145 +84,153 @@ public:
 	}
 
 	bool
-	Move (
-		const CValue& SrcValue,
-		const CValue& DstValue
+	Cast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
 		);
 };
 
 //.............................................................................
 
-// superposition of moves
+// superposition of 2 casts
 
-class CSuperMove: 
-	public IMoveOperatorLo,
+class CSuperCast: 
+	public ICastOperatorLo,
 	public rtl::TListLink
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CSuperMove, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CSuperCast, ICastOperatorLo)
 
 protected:
 	friend class COperatorMgr;
 
-	CMoveOperator* m_pFirst;
-	CMoveOperator* m_pSecond;
+	CType* m_pIntermediateType;
+
+	ICastOperatorLo* m_pFirst;
+	ICastOperatorLo* m_pSecond;
 
 public:
-	CSuperMove ()
-	{
-		m_pFirst = NULL;
-		m_pSecond = NULL;
-	}
+	CSuperCast ();
 
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		);
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
 		);
 };
 
 //.............................................................................
 
-class CMove_cpy: public IMoveOperatorLo
+// simple copy
+
+class CCast_cpy: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_cpy, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_cpy, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		);
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// integer extensions and truncations
+
+class CCast_int_trunc: public ICastOperatorLo
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_trunc, ICastOperatorLo)
+
+public:
+	virtual
+	bool
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
 		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_int_trunc: public IMoveOperatorLo
+class CCast_int_ext: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_int_trunc, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		);
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
 		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_int_ext: public IMoveOperatorLo
+class CCast_int_ext_u: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		);
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_int_ext_u: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext_u, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
 		);
 };
 
@@ -230,15 +238,15 @@ public:
 
 // swap endianness
 
-class CMove_i16_swp: public IMoveOperatorLo
+class CCast_i16_swp: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i16_swp, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i16_swp, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -249,27 +257,25 @@ public:
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i32_swp: public IMoveOperatorLo
+class CCast_i32_swp: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32_swp, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32_swp, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -280,27 +286,25 @@ public:
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i64_swp: public IMoveOperatorLo
+class CCast_i64_swp: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i64_swp, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64_swp, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -311,55 +315,25 @@ public:
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................
 
-class CMove_f32_f64: public IMoveOperatorLo
+class CCast_f64_f32: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext_u, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(double*) DstValue.GetConstData () = *(float*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CMove_f64_f32: public IMoveOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_int_ext_u, IMoveOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -370,10 +344,87 @@ public:
 
 	virtual
 	bool
-	LlvmMove (
+	LlvmCast (
 		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_f32_f64: public ICastOperatorLo
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperatorLo)
+
+public:
+	virtual
+	bool
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
+		)
+	{
+		*(double*) DstValue.GetConstData () = *(float*) SrcValue.GetConstData ();
+		return true;
+	}
+
+	virtual
+	bool
+	LlvmCast (
+		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// int <-> floating point
+
+class CCast_int_fp: public ICastOperatorLo
+{
+public:
+	virtual
+	bool
+	LlvmCast (
+		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_uint_fp: public ICastOperatorLo
+{
+public:
+	virtual
+	bool
+	LlvmCast (
+		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_fp_int: public ICastOperatorLo
+{
+public:
+	virtual
+	bool
+	LlvmCast (
+		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
 		);
 };
 
@@ -381,15 +432,15 @@ public:
 
 // int32 -> floating point
 
-class CMove_i32_f32: public IMoveOperatorLo
+class CCast_i32_f32: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32_f32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32_f32, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -397,30 +448,19 @@ public:
 		*(float*) DstValue.GetConstData () = (float) *(int32_t*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i32u_f32: public IMoveOperatorLo
+class CCast_i32u_f32: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32u_f32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f32, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -428,30 +468,19 @@ public:
 		*(float*) DstValue.GetConstData () = (float) *(uint32_t*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i32_f64: public IMoveOperatorLo
+class CCast_i32_f64: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32_f64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32_f64, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -459,46 +488,24 @@ public:
 		*(double*) DstValue.GetConstData () = *(int32_t*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i32u_f64: public IMoveOperatorLo
+class CCast_i32u_f64: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i32u_f64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f64, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
 	{
 		*(double*) DstValue.GetConstData () = *(uint32_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
 		return true;
 	}
 };
@@ -507,15 +514,15 @@ public:
 
 // int64 -> floating point
 
-class CMove_i64_f32: public IMoveOperatorLo
+class CCast_i64_f32: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i64_f32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64_f32, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -523,30 +530,19 @@ public:
 		*(float*) DstValue.GetConstData () = (float) *(int64_t*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i64u_f32: public IMoveOperatorLo
+class CCast_i64u_f32: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i64u_f32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f32, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -554,30 +550,19 @@ public:
 		*(float*) DstValue.GetConstData () = (float) *(uint64_t*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i64_f64: public IMoveOperatorLo
+class CCast_i64_f64: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i64_f64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64_f64, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -585,46 +570,24 @@ public:
 		*(double*) DstValue.GetConstData () = (double) *(int64_t*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_i64u_f64: public IMoveOperatorLo
+class CCast_i64u_f64: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_i64u_f64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f64, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
 	{
 		*(double*) DstValue.GetConstData () = (double) *(uint64_t*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
 		return true;
 	}
 };
@@ -633,15 +596,15 @@ public:
 
 // float -> int 
 
-class CMove_f32_i32: public IMoveOperatorLo
+class CCast_f32_i32: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_f32_i32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i32, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -649,46 +612,24 @@ public:
 		*(int32_t*) DstValue.GetConstData () = (int32_t) *(float*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_f32_i64: public IMoveOperatorLo
+class CCast_f32_i64: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_f32_i64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i64, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
 	{
 		*(int64_t*) DstValue.GetConstData () = (int64_t) *(float*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
 		return true;
 	}
 };
@@ -697,15 +638,15 @@ public:
 
 // double -> int 
 
-class CMove_f64_i32: public IMoveOperatorLo
+class CCast_f64_i32: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_f64_i32, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f64_i32, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
@@ -713,46 +654,24 @@ public:
 		*(int32_t*) DstValue.GetConstData () = (int32_t) *(double*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		return true;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMove_f64_i64: public IMoveOperatorLo
+class CCast_f64_i64: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CMove_f64_i64, IMoveOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f64_i64, ICastOperatorLo)
 
 public:
 	virtual
 	bool
-	ConstMove (
+	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		)
 	{
 		*(int64_t*) DstValue.GetConstData () = (int64_t) *(double*) SrcValue.GetConstData ();
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmMove (
-		CModule* pModule,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
 		return true;
 	}
 };

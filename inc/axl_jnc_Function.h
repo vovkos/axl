@@ -14,6 +14,19 @@ namespace jnc {
 
 class CBasicBlock;
 class CValue;
+class CFunctionOverload;
+
+//.............................................................................
+
+enum EFunction
+{
+	EFunction_Global,
+	EFunction_Method,
+	EFunction_Constructor,
+	EFunction_Destructor,
+	EFunction_PropertyGetter,
+	EFunction_PropertySetter,
+};
 
 //.............................................................................
 
@@ -61,8 +74,11 @@ class CFunction:
 {
 protected:
 	friend class CFunctionMgr;
+	friend class CFunctionOverload;
 
+	EFunction m_FunctionKind;
 	CFunctionType* m_pType;
+	CFunctionOverload* m_pOverload;
 	rtl::CString m_Tag;
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
@@ -85,11 +101,23 @@ public:
 	llvm::Function* 
 	GetLlvmFunction ();
 	
+	EFunction
+	GetFunctionKind ()
+	{
+		return m_FunctionKind;
+	}
+
 	CFunctionType* 
 	GetType ()
 	{
 		return m_pType;
 	}
+
+	CFunctionOverload*
+	GetOverload ()
+	{
+		return m_pOverload;
+	};
 
 	size_t 
 	GetArgCount ()

@@ -115,7 +115,7 @@ CBinaryOperator::Operator (
 	
 	return OpValueKind1 == EValue_Const && OpValueKind2 == EValue_Const ?
 		m_pOperatorLo->ConstOperator (OpValue1, OpValue2, pReturnValue) :
-		m_pOperatorLo->LlvmOperator (OpValue1, OpValue2, pReturnValue);
+		m_pOperatorLo->LlvmOperator (pModule, OpValue1, OpValue2, pReturnValue);
 }
 
 bool
@@ -168,7 +168,7 @@ CBinaryOperatorOverload::FindOperator (
 	ASSERT (pModule);
 
 	CBinaryOperator* pBestOperator = NULL;
-	ECanMove BestCanMove = ECanMove_None;
+	ECast BestCastKind = ECast_Explicit;
 	size_t BestCastPrice = -1;
 
 	rtl::CIteratorT <CBinaryOperator> Operator = m_List.GetHead ();
@@ -177,22 +177,22 @@ CBinaryOperatorOverload::FindOperator (
 		CBinaryOperator* pOperator = *Operator;
 		
 		CType* pCastOpType1 = pOperator->GetOpType1 ();
-		CMoveOperator* pMoveOperator1 = pModule->m_OperatorMgr.FindMoveOperator (pOpType1, pCastOpType1);
+		CCastOperator* pMoveOperator1 = pModule->m_OperatorMgr.FindCastOperator (pOpType1, pCastOpType1);
 		if (!pMoveOperator1)
 			continue;
 
 		CType* pCastOpType2 = pOperator->GetOpType2 ();
-		CMoveOperator* pMoveOperator2 = pModule->m_OperatorMgr.FindMoveOperator (pOpType2, pCastOpType2);
+		CCastOperator* pMoveOperator2 = pModule->m_OperatorMgr.FindCastOperator (pOpType2, pCastOpType2);
 		if (!pMoveOperator2)
 			continue;
 
+		ECast CastKind = max (pMoveOperator1->GetCastKind (), pMoveOperator2->GetCastKind ());
 		size_t CastPrice = pMoveOperator1->GetPrice () + pMoveOperator2->GetPrice ();
-		ECanMove CanMove = max (pMoveOperator1->GetCanMove (), pMoveOperator2->GetCanMove ());
 
-		if (!pBestOperator || BestCanMove < CanMove || BestCastPrice > CastPrice)
+		if (!pBestOperator || CastKind < BestCastKind || CastPrice < BestCastPrice)
 		{
 			pBestOperator = pOperator;
-			BestCanMove = CanMove;
+			BestCastKind = CastKind;
 			BestCastPrice = CastPrice;
 		}
 	}

@@ -53,7 +53,6 @@ CVariableMgr::CreateTempVariable (CType* pType)
 
 	rtl::CString Name;
 	Name.Format (_T("_tmp%d"), m_TempVariableCounter++);
-
 	return CreateVariable (Name, pType);
 }
 

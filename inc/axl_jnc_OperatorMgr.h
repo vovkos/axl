@@ -6,7 +6,7 @@
 
 #include "axl_jnc_UnaryOperator.h"
 #include "axl_jnc_BinaryOperator.h"
-#include "axl_jnc_MoveOperator.h"
+#include "axl_jnc_CastOperator.h"
 
 namespace axl {
 namespace jnc {
@@ -77,40 +77,41 @@ protected:
 	//CRelOp_Gt m_RelOp_Gt;
 	//CRelOp_Ge m_RelOp_Ge;
 
-	// move operators
+	// cast operators
 
-	CMove_cpy m_Move_cpy;
-	CMove_int_trunc m_Move_int_trunc;
-	CMove_int_ext m_Move_int_ext;
-	CMove_int_ext_u m_Move_int_ext_u;
+	CCast_cpy m_Cast_cpy;
 
-	CMove_i16_swp m_Move_i16_swp;
-	CMove_i32_swp m_Move_i32_swp;
-	CMove_i64_swp m_Move_i64_swp;
-	CMove_i32_f32 m_Move_i32_f32;
-	CMove_i32u_f32 m_Move_i32u_f32;
-	CMove_i32_f64 m_Move_i32_f64;
-	CMove_i32u_f64 m_Move_i32u_f64;
-	CMove_i64_f32 m_Move_i64_f32;
-	CMove_i64u_f32 m_Move_i64u_f32;
-	CMove_i64_f64 m_Move_i64_f64;
-	CMove_i64u_f64 m_Move_i64u_f64;
+	CCast_int_trunc m_Cast_int_trunc;
+	CCast_int_ext m_Cast_int_ext;
+	CCast_int_ext_u m_Cast_int_ext_u;
 
-	CMove_f32_f64 m_Move_f32_f64;
-	CMove_f64_f32 m_Move_f64_f32;
-	CMove_f32_i32 m_Move_f32_i32;
-	CMove_f32_i64 m_Move_f32_i64;
-	CMove_f64_i32 m_Move_f64_i32;
-	CMove_f64_i64 m_Move_f64_i64;
+	CCast_i16_swp m_Cast_i16_swp;
+	CCast_i32_swp m_Cast_i32_swp;
+	CCast_i64_swp m_Cast_i64_swp;
+	CCast_i32_f32 m_Cast_i32_f32;
+	CCast_i32u_f32 m_Cast_i32u_f32;
+	CCast_i32_f64 m_Cast_i32_f64;
+	CCast_i32u_f64 m_Cast_i32u_f64;
+	CCast_i64_f32 m_Cast_i64_f32;
+	CCast_i64u_f32 m_Cast_i64u_f32;
+	CCast_i64_f64 m_Cast_i64_f64;
+	CCast_i64u_f64 m_Cast_i64u_f64;
+
+	CCast_f32_f64 m_Cast_f32_f64;
+	CCast_f64_f32 m_Cast_f64_f32;
+	CCast_f32_i32 m_Cast_f32_i32;
+	CCast_f32_i64 m_Cast_f32_i64;
+	CCast_f64_i32 m_Cast_f64_i32;
+	CCast_f64_i64 m_Cast_f64_i64;
 
 	// tables
 
 	CUnaryOperatorOverload m_UnaryOperatorTable [EUnOp__Count];
-	CBinaryOperatorOverload m_BinaryOperatorTable [EBinOp__Count];	
-	CMoveOperator* m_BasicMoveOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
-	rtl::CStringHashTableMapT <CMoveOperator*> m_MoveOperatorMap;
-	rtl::CStdListT <CMoveOperator> m_MoveOperatorList;
-	rtl::CStdListT <CSuperMove> m_SuperMoveList;
+	CBinaryOperatorOverload m_BinaryOperatorTable [EBinOp__Count];		
+	CCastOperator* m_BasicCastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
+	rtl::CStringHashTableMapT <CCastOperator*> m_CastOperatorMap;
+	rtl::CStdListT <CCastOperator> m_CastOperatorList;
+	rtl::CStdListT <CSuperCast> m_SuperCastList;
 	
 public:
 	COperatorMgr (CModule* pModule);
@@ -262,36 +263,39 @@ public:
 		const CValue& OpValue2
 		);
 
-	// move operators
+	// move & cast operators
 
-	ECanMove
-	CanMove (
-		CType* pSrcType,
-		CType* pDstType
-		)
-	{
-		CMoveOperator* pMoveOperator = FindMoveOperator (pSrcType, pDstType);
-		return pMoveOperator ? pMoveOperator->GetCanMove () : ECanMove_None;
-	}
-
-	CMoveOperator*
-	FindMoveOperator (
+	CCastOperator*
+	FindCastOperator (
 		CType* pSrcType,
 		CType* pDstType
 		);
 
-	CMoveOperator*
-	AddMoveOperator (
+	CCastOperator*
+	AddCastOperator (
 		CType* pSrcType,
 		CType* pDstType,
-		IMoveOperatorLo* pOperatorLo
+		ICastOperatorLo* pOperatorLo
 		);
 
-	CMoveOperator*
-	AddMoveOperator (
+	CCastOperator*
+	AddCastOperator (
 		EType SrcTypeKind,
 		EType DstTypeKind,
-		IMoveOperatorLo* pOperatorLo
+		ICastOperatorLo* pOperatorLo
+		);
+
+	bool
+	CastOperator (
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+	bool
+	CastOperator (
+		CValue* pValue,
+		CType* pType
 		);
 
 	bool
@@ -305,21 +309,6 @@ public:
 		const CValue& SrcValue,
 		const CValue& DstValue,
 		EBinOp OpKind
-		);
-
-	// cast operators
-
-	bool
-	CastOperator (
-		const CValue& OpValue,
-		CType* pType,
-		CValue* pResultValue
-		);
-
-	bool
-	CastOperator (
-		CValue* pValue,
-		CType* pType
 		);
 
 	// misc operators
@@ -355,6 +344,11 @@ public:
 
 	bool
 	PostfixDecOperator (CValue* pValue);
+
+	// useful helper
+
+	llvm::Value*
+	LoadValue (const CValue& Value);
 
 protected:
 	void

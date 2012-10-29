@@ -17,6 +17,17 @@ CValue::CValue ()
 	m_Const.SetBuffer (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer));
 }
 
+CValue::CValue (
+	CType* pType,
+	const void* p
+	):
+	m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+{
+	m_pLlvmValue = NULL;
+
+	CreateConst (pType, p);
+}
+
 llvm::Value*
 CValue::GetLlvmValue () const
 {
@@ -56,10 +67,7 @@ CValue::SetVariable (CVariable* pVariable)
 	m_ValueKind = EValue_Variable;
 	m_pType = pVariable->GetType ();
 	m_pVariable = pVariable;
-
-	EVariable VariableKind = pVariable->GetVariableKind ();
-	if (VariableKind == EVariable_Local)
-		m_pLlvmValue = pVariable->GetLlvmAlloca ();
+	m_pLlvmValue = pVariable->GetLlvmValue ();
 }
 
 void
@@ -213,31 +221,27 @@ CValue::SetLiteralW (
 }
 
 void
-CValue::SetLlvmValue (
+CValue::SetLlvmRegister (
 	llvm::Value* pValue,
 	CType* pType
 	)
 {
-	m_ValueKind = EValue_Llvm;
+	m_ValueKind = EValue_LlvmRegister;
 	m_pType = pType;
 	m_pLlvmValue = pValue;
 }
 
 void
-CValue::SetLlvmValue (
+CValue::SetLlvmRegister (
 	llvm::Value* pValue,
-	EType TypeKind,
-	CModule* pModule
+	EType TypeKind
 	)
 {
-	if (!pModule)
-	{
-		pModule = GetCurrentThreadModule ();
-		ASSERT (pModule);
-	}
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
 
 	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
-	SetLlvmValue (pValue, pType);
+	SetLlvmRegister (pValue, pType);
 }
 
 //.............................................................................

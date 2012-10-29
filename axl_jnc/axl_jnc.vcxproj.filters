@@ -118,14 +118,14 @@
     <ClInclude Include="..\inc\axl_jnc_UnaryOperator.h">
       <Filter>operator</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_MoveOperator.h">
-      <Filter>operator</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Variable.h">
       <Filter>variable</Filter>
     </ClInclude>
     <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h">
       <Filter>variable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOperator.h">
+      <Filter>operator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -211,14 +211,14 @@
     <ClCompile Include="axl_jnc_UnaryOperator.cpp">
       <Filter>operator</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_MoveOperator.cpp">
-      <Filter>operator</Filter>
-    </ClCompile>
     <ClCompile Include="axl_jnc_Variable.cpp">
       <Filter>variable</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_VariableMgr.cpp">
       <Filter>variable</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOperator.cpp">
+      <Filter>operator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

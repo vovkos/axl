@@ -32,10 +32,18 @@ protected:
 
 	EVariable m_VariableKind;
 	CType* m_pType;
-	llvm::AllocaInst* m_pLlvmAlloca;
+
+	union
+	{
+		llvm::Value* m_pLlvmValue;
+		llvm::GlobalVariable* m_pLlvmGlobalVariable;
+		llvm::AllocaInst* m_pLlvmAlloca;
+	};
 
 public:
 	CVariable ();
+
+	~CVariable ();
 
 	EVariable
 	GetVariableKind ()
@@ -49,10 +57,10 @@ public:
 		return m_pType;
 	}
 
-	llvm::AllocaInst* 
-	GetLlvmAlloca ()
+	llvm::Value* 
+	GetLlvmValue ()
 	{
-		return m_pLlvmAlloca;
+		return m_pLlvmValue;
 	}
 };
 
