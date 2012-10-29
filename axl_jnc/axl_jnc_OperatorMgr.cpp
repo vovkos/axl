@@ -416,7 +416,7 @@ llvm::Value*
 COperatorMgr::LoadValue (const CValue& Value)
 {
 	EValue ValueKind = Value.GetValueKind ();
-	ASSERT (ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
+	ASSERT (ValueKind == EValue_Const || ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
 
 	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
 	if (ValueKind == EValue_Variable)

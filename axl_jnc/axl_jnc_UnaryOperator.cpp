@@ -175,5 +175,36 @@ CUnaryOperatorOverload::AddOperator (
 
 //.............................................................................
 
+llvm::Value*
+CUnOp_Minus::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateNeg (pOpValue);
+}
+
+llvm::Value*
+CUnOp_Minus::LlvmOpFp (
+	CModule* pModule,
+	llvm::Value* pOpValue
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFNeg (pOpValue);
+}
+
+//.............................................................................
+
+llvm::Value*
+CUnOp_BitwiseNot::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateNot (pOpValue);
+}
+
+//.............................................................................
+
 } // namespace axl {
 } // namespace jnc {

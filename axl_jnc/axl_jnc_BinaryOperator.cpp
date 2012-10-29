@@ -233,6 +233,193 @@ CBinaryOperatorOverload::AddOperator (
 }
 
 //.............................................................................
+	
+llvm::Value*
+CBinOp_Add::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAdd (pOpValue1, pOpValue2);
+}
+
+	
+llvm::Value*
+CBinOp_Add::LlvmOpFp (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFAdd (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_Sub::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSub (pOpValue1, pOpValue2);
+}
+
+	
+llvm::Value*
+CBinOp_Sub::LlvmOpFp (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFSub (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+	
+llvm::Value*
+CBinOp_Mul::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateMul (pOpValue1, pOpValue2);
+}
+
+	
+llvm::Value*
+CBinOp_Mul::LlvmOpFp (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFMul (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_Div::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSDiv (pOpValue1, pOpValue2);
+}
+	
+llvm::Value*
+CBinOp_Div::LlvmOpFp (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFDiv (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_Mod::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSRem (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+	
+llvm::Value*
+CBinOp_DivU::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateUDiv (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_ModU::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateURem (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_Shl::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_Shr::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_BitwiseAnd::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_BitwiseOr::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
+
+llvm::Value*
+CBinOp_BitwiseXor::LlvmOpInt (
+	CModule* pModule,
+	llvm::Value* pOpValue1,
+	llvm::Value* pOpValue2
+	)
+{
+	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateXor (pOpValue1, pOpValue2);
+}
+
+//.............................................................................
 
 } // namespace axl {
 } // namespace jnc {

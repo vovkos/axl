@@ -163,8 +163,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpInt (OpValue.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Int32);
+		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
 		return true;
 	}
 };
@@ -198,8 +199,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpInt (OpValue.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Int64);
+		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
 		return true;
 	}
 };
@@ -233,8 +235,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpFp (OpValue.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Float);
+		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
 		return true;
 	}
 };
@@ -268,8 +271,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpFp (OpValue.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Double);
+		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}
 };
@@ -308,18 +312,18 @@ public:
 	}
 
 	static
-	llvm::Instruction*
-	LlvmOpInt (llvm::Value* pOpValue)
-	{
-		return llvm::BinaryOperator::CreateNeg (pOpValue);
-	}
+	llvm::Value*
+	LlvmOpInt (
+		CModule* pModule,
+		llvm::Value* pOpValue
+		);
 
 	static
-	llvm::Instruction*
-	LlvmOpFp (llvm::Value* pOpValue)
-	{
-		return llvm::BinaryOperator::CreateFNeg (pOpValue);
-	}
+	llvm::Value*
+	LlvmOpFp (
+		CModule* pModule,
+		llvm::Value* pOpValue
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -342,11 +346,11 @@ public:
 	}
 
 	static
-	llvm::Instruction*
-	LlvmOpInt (llvm::Value* pOpValue)
-	{
-		return llvm::BinaryOperator::CreateNot (pOpValue);
-	}
+	llvm::Value*
+	LlvmOpInt (
+		CModule* pModule,
+		llvm::Value* pOpValue
+		);
 };
 
 //.............................................................................

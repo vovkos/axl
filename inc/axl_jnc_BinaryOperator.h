@@ -185,8 +185,10 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpInt (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Int32);
+		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
 		return true;
 	}
 };
@@ -222,8 +224,10 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpInt (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Int64);
+		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
 		return true;
 	}
 };
@@ -259,8 +263,10 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpFp (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Float);
+		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
 		return true;
 	}
 };
@@ -296,8 +302,10 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Instruction* pLlvmValue = T::LlvmOpFp (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmValue, EType_Double);
+		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}
 };
@@ -354,24 +362,20 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateAdd (pOpValue1, pOpValue2);
-	}
+		);
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpFp (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateFAdd (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -426,24 +430,20 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateSub (pOpValue1, pOpValue2);
-	}
+		);
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpFp (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateFSub (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -498,24 +498,20 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateMul (pOpValue1, pOpValue2);
-	}
+		);
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpFp (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateFMul (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -570,24 +566,20 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateSDiv (pOpValue1, pOpValue2);
-	}
+		);
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpFp (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateFDiv (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -622,14 +614,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateSRem (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -664,14 +654,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateUDiv (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -706,14 +694,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateURem (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -748,14 +734,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateShl (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -790,14 +774,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateLShr (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -832,14 +814,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateAnd (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -874,14 +854,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateOr (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................
@@ -916,14 +894,12 @@ public:
 	}
 
 	static
-	llvm::Instruction*
+	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		)
-	{
-		return llvm::BinaryOperator::CreateXor (pOpValue1, pOpValue2);
-	}
+		);
 };
 
 //.............................................................................

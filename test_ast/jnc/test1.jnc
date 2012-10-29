@@ -27,9 +27,10 @@ enum EColor
 int
 test ()
 {
-	int x, y, z;
+	int x;
+	int y;
 
-	x = y; 
+	x = y + 1;
 
 //	return (1 + 2) * (4 + 5);
 }
