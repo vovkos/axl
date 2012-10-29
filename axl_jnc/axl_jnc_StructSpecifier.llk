@@ -90,10 +90,20 @@ struct_member_declarator_list <CTypeSpecifierModifiers* $pTypeSpecifier, CStruct
 	;
 
 struct_member_declarator <CTypeSpecifierModifiers* $pTypeSpecifier, CStructType* $pType>
-	: declarator (':' struct_member_bit_field)? ('=' initializer)?
+local
+{
+	CStructMember* $pMember;
+}
+	: declarator (':' struct_member_bit_field)?
 		{
-			return DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator) != NULL;
+			$pMember = DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator);
+			if (!$pMember)
+				return false;
 		}
+	  ('=' initializer <.$pMember->GetType ().> 
+		{
+		}
+	  )?
 	;
 
 struct_member_bit_field

@@ -59,6 +59,14 @@ enum_member_list <CEnumType* $pType>
 	;
 
 enum_member <CEnumType* $pType>
+enter 
+{
+	TRACE ("enter: enum_member for '%s'", $pType->GetName ());
+}
+leave
+{
+	TRACE ("leave: enum_member for '%s'", $pType->GetName ());
+}
 	: EToken_Identifier ('=' expression_pass1 $e)?
 		{
 			CEnumMember* pMember = $pType->CreateMember ($1.m_Data.m_String);

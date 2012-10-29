@@ -29,7 +29,7 @@ test ()
 {
 	int x, y, z;
 
-//	x = y; 
+	x = y; 
 
 //	return (1 + 2) * (4 + 5);
 }

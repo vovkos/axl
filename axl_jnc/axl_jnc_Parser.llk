@@ -76,8 +76,7 @@ Members
 	CModuleItem*
 	Declare (
 		CDeclSpecifiers* pDeclSpecifiers,
-		CDeclarator* pDeclarator,
-		rtl::CBoxListT <CToken>* pInitializer
+		CDeclarator* pDeclarator
 		);
 
 	CClassType*
@@ -118,7 +117,7 @@ Members
 		CDeclFunctionSuffix* pArgSuffix,
 		CTypeSpecifierModifiers* pTypeSpecifier,
 		CDeclarator* pDeclarator,
-		CValue* pDefaultValue
+		const CValue& DefaultValue
 		);
 
 	CFunction*

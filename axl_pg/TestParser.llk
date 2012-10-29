@@ -2,40 +2,13 @@
 
 LL (3);
 
-Members
-{
-	size_t m_Stage;
-};
-
-program
-	: statement*
+expression_pass1
+	: primary_expr_pass1+
 	;
 
-statement
-	: EToken_Identifier 
-		{
-			m_Stage = $1.m_Data.m_String == "hui" ? 1 : 2;			
-		}
-	  '=' initializer ';'
-	;
-
-initializer
-gate
-{
-	return m_Stage == 1;
-}
-enter
-{
-}
-	: EToken_Integer
-		{
-			printf ("actual expression");
-		}
+primary_expr_pass1
+	: '(' primary_expr_pass1* ')'
 	| any
-		{
-			printf ("any");
-		}
 	;
-	
 
 //.............................................................................

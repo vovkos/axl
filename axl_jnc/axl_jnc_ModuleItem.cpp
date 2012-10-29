@@ -7,15 +7,8 @@ namespace jnc {
 
 //.............................................................................
 
-CModuleItem::CModuleItem ()
-{
-	m_ItemKind = EModuleItem_Undefined;
-	m_pModule = NULL;
-	m_pAttributeSet = NULL;
-}
-
 const tchar_t*
-CModuleItem::GetItemKindString (EModuleItem ItemKind)
+GetModuleItemKindString (EModuleItem ItemKind)
 {
 	switch (ItemKind)
 	{
@@ -46,6 +39,15 @@ CModuleItem::GetItemKindString (EModuleItem ItemKind)
 	default:
 		return _T("<undefined>");
 	}
+}
+
+//.............................................................................
+
+CModuleItem::CModuleItem ()
+{
+	m_ItemKind = EModuleItem_Undefined;
+	m_pModule = NULL;
+	m_pAttributeSet = NULL;
 }
 
 //.............................................................................

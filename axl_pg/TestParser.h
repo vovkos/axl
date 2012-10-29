@@ -14,9 +14,8 @@
 
 enum ESymbol
 {
-	ESymbol_program = 0, 
-	ESymbol_statement = 1, 
-	ESymbol_initializer = 2, 
+	ESymbol_expression_pass1 = 0, 
+	ESymbol_primary_expr_pass1 = 1, 
 	
 };
 
@@ -35,33 +34,33 @@ public:
 		EofToken           = 0,
 		AnyToken           = 1,
 
-		TokenCount         = 6,
-		SymbolCount        = 5,
+		TokenCount         = 4,
+		SymbolCount        = 4,
 		SequenceCount      = 4,
-		ActionCount        = 4,
+		ActionCount        = 0,
 		ArgumentCount      = 0,
-		BeaconCount        = 1,
+		BeaconCount        = 0,
 		LaDfaCount         = 0,
 
-		TotalCount         = 20,
+		TotalCount         = 12,
 
-		NamedSymbolCount   = 3,
+		NamedSymbolCount   = 2,
 
 		TokenFirst         = 0,
-		TokenEnd           = 6,
-		SymbolFirst        = 6,
-		NamedSymbolEnd     = 9,
-		SymbolEnd          = 11,
-		SequenceFirst      = 11,
-		SequenceEnd        = 15,
-		ActionFirst        = 15,
-		ActionEnd          = 19,
-		ArgumentFirst      = 19,
-		ArgumentEnd        = 19,
-		BeaconFirst        = 19,
-		BeaconEnd          = 20,
-		LaDfaFirst         = 20,
-		LaDfaEnd           = 20,
+		TokenEnd           = 4,
+		SymbolFirst        = 4,
+		NamedSymbolEnd     = 6,
+		SymbolEnd          = 8,
+		SequenceFirst      = 8,
+		SequenceEnd        = 12,
+		ActionFirst        = 12,
+		ActionEnd          = 12,
+		ArgumentFirst      = 12,
+		ArgumentEnd        = 12,
+		BeaconFirst        = 12,
+		BeaconEnd          = 12,
+		LaDfaFirst         = 12,
+		LaDfaEnd           = 12,
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -73,13 +72,10 @@ public:
 	
 	
 	
-	
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 	
 	
-	size_t m_Stage;
-
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -90,11 +86,10 @@ public:
 		static
 		size_t _ParseTable [] = 
 		{
-			0, -1, -1, -1, 11, -1, 
-			-1, -1, -1, -1, 12, -1, 
-			-1, 14, 14, 14, 14, 10, 
-			0, -1, -1, -1, 11, -1, 
-			-1, -1, -1, -1, -1, 13, 
+			-1, 8, 8, 8, 
+			-1, 1, 11, 1, 
+			0, 9, 9, 9, 
+			-1, 10, 10, 0, 
 			
 			-1
 		};
@@ -109,10 +104,10 @@ public:
 		static
 		size_t _SequenceTable [] = 
 		{
-			9, 7,  -1,
-			3, 8, 2, 15, 19,  -1,
-			17, 5,  -1,
-			18, 1,  -1,
+			6, 5,  -1,
+			6, 5,  -1,
+			7, 5,  -1,
+			3, 7, 2,  -1,
 			
 			-1
 		};
@@ -120,7 +115,7 @@ public:
 		static
 		size_t _SequenceIndexTable [] = 
 		{
-			0, 3, 9, 12, 
+			0, 3, 6, 9, 
 			-1
 		};
 
@@ -138,17 +133,11 @@ public:
 			return EofToken;
 
 		
-		case '=':
+		case '(':
 			return 2;
 		
-		case ';':
+		case ')':
 			return 3;
-		
-		case EToken_Identifier:
-			return 4;
-		
-		case EToken_Integer:
-			return 5;
 		
 		default:
 			return AnyToken;
@@ -164,10 +153,8 @@ public:
 		{
 			0,  // eof
 			0,  // any token
-			'=', 
-			';', 
-			EToken_Identifier, 
-			EToken_Integer, 
+			'(', 
+			')', 
 			
 			0
 		};
@@ -183,9 +170,8 @@ public:
 		static
 		const tchar_t* _SymbolNameTable [NamedSymbolCount] = 
 		{
-			_T("program"),
-			_T("statement"),
-			_T("initializer"),
+			_T("expression_pass1"),
+			_T("primary_expr_pass1"),
 			
 		};
 
@@ -201,7 +187,6 @@ public:
 
 		switch (Index)
 		{
-		
 		
 		
 		
@@ -224,8 +209,6 @@ public:
 		size_t _BeaconTable [] [2] = 
 		{
 			
-			{ 0, 4 },
-			
 			{ 0 }
 		};
 
@@ -238,56 +221,6 @@ public:
 	{
 		switch (Index)
 		{
-		
-		case 0:
-			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
-			CAst* __pAst = __pSymbol->m_pAst;
-#line 16 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
-			
-			m_Stage = (*GetTokenLocator (0)).m_Data.m_String == "hui" ? 1 : 2;			
-		;
-#line 251 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
-			}
-
-			return true;
-		
-		case 1:
-			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
-			CAst* __pAst = __pSymbol->m_pAst;
-#line 23 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
-			return m_Stage == 1;
-#line 262 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
-			}
-
-			return true;
-		
-		case 2:
-			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
-			CAst* __pAst = __pSymbol->m_pAst;
-#line 25 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
-			
-			printf ("actual expression");
-		;
-#line 275 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
-			}
-
-			return true;
-		
-		case 3:
-			{
-			CSymbolNode* __pSymbol = GetSymbolTop ();
-			CAst* __pAst = __pSymbol->m_pAst;
-#line 29 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
-			
-			printf ("any");
-		;
-#line 288 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
-			}
-
-			return true;
 		
 		default:
 			ASSERT (false);
@@ -317,7 +250,6 @@ public:
 		
 		
 		
-		
 		default:
 			return true;
 		}
@@ -328,7 +260,6 @@ public:
 	{
 		switch (Index)
 		{
-		
 		
 		
 		

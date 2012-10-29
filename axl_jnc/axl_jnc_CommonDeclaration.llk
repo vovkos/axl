@@ -1,70 +1,93 @@
 //.............................................................................
 
 common_declaration
-	local
-	{
-		CModuleItem* $pLastDeclaredItem;
-	}
-	enter
-	{
-		$pLastDeclaredItem = NULL;
-	}
 	: attribute_block?
 	  declaration_specifier_list $s
-	  init_declarator_list <&$s.m_DeclSpecifiers, &$pLastDeclaredItem>?
-	  declaration_terminator_2 <$pLastDeclaredItem>
+	  (init_declarator_list $d <&$s.m_DeclSpecifiers>)?
+	  declaration_terminator_2 <IsValidLocator ($d) ? $d.m_pItem : NULL>
 	;
 
-noast
-init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CModuleItem** $ppLastDeclaredItem>
-	: init_declarator <$pDeclSpecifiers, $ppLastDeclaredItem> 
-	  (
-		',' 
-		init_declarator <$pDeclSpecifiers, $ppLastDeclaredItem>
+class
+{
+	CModuleItem* m_pItem;
+}
+init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
+	: init_declarator $d1 <$pDeclSpecifiers> 
+		{
+			$.m_pItem = $d1.m_pItem;
+		}
+	  (',' init_declarator $d2 <$pDeclSpecifiers> 
+		{
+			$.m_pItem = $d2.m_pItem;
+		}
 	  )*
 	;
 
-init_declarator <CDeclSpecifiers* $pDeclSpecifiers, CModuleItem** $ppLastDeclaredItem>
-	: declarator ('=' expression_pass1 $i)?
+class
+{
+	CModuleItem* m_pItem;
+}
+init_declarator <CDeclSpecifiers* $pDeclSpecifiers>
+	: declarator 
 		{
-			CModuleItem* pItem = Declare (
-				$pDeclSpecifiers, 
-				&$1.m_Declarator,
-				IsValidLocator ($i) ? &$i.m_TokenList : NULL
-				);
-
-			if (!pItem)
+			$.m_pItem = Declare ($pDeclSpecifiers, &$1.m_Declarator);
+			if (!$.m_pItem)
 				return false;
-
-			*$ppLastDeclaredItem = pItem;
 		}
+	  ('=' 
+		{
+			if ($.m_pItem->GetItemKind () != EModuleItem_Variable)
+			{
+				err::SetFormatStringError (_T("cannot apply initializer to '%s'"), $.m_pItem->GetItemKindString ());
+				return false;
+			}
+		}
+	  initializer $i <.((CVariable*) $.m_pItem)->GetType ().> 
+		{
+			if (m_Stage == EStage_Pass2)
+				return m_pModule->m_OperatorMgr.MoveOperator ($i.m_Value, (CVariable*) $.m_pItem);
+		}
+	  )?
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-start
-initializer
-	: expression
-	| '{' initializer_list '}'
+class
+{
+	CValue m_Value;
+	rtl::CBoxListT <CToken> m_TokenList;
+}
+initializer <CType* $pType>
+	: resolver ({ return m_Stage == EStage_Pass1 }) expression_pass1 $e
+		{
+			$.m_TokenList.TakeOver (&$e.m_TokenList);
+		}
+	| expression
+		{
+			$.m_Value = $1.m_Value;
+		}
+	| '{' initializer_list <$pType> '}'
+		{
+		}
 	;
 
-initializer_list
-	: initializer_list_entry (',' initializer_list_entry)*
+initializer_list <CType* $pType>
+	: initializer_list_entry <$pType> (',' initializer_list_entry <$pType>)*
 	;
 
-initializer_list_entry
-	: initializer
+initializer_list_entry <CType* $pType>
+	: initializer <$pType>
 	| epsilon
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 noast
-declaration_terminator_2 <CModuleItem* $pLastDeclaredItem>
+declaration_terminator_2 <CModuleItem* $pItem>
 	: ';'
 	| function_body_pass1
 		{
-			return SetFunctionBody ($pLastDeclaredItem, &$1.m_TokenList);
+			return SetFunctionBody ($pItem, &$1.m_TokenList);
 		}
 	;
 
@@ -385,7 +408,7 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 	: type_specifier_modifier_list $s
 	  declarator $d ('=' expression_pass1 $v)?
 		{
-			return DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, NULL) != NULL;
+			return DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, CValue ()) != NULL;
 		}
 	;
 

@@ -37,6 +37,11 @@ enum EModuleItem
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+const tchar_t*
+GetModuleItemKindString (EModuleItem ItemKind);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CModuleItem
 {
 protected:
@@ -75,14 +80,10 @@ public:
 		return m_pAttributeSet;
 	}
 
-	static
-	const tchar_t*
-	GetItemKindString (EModuleItem ItemKind);
-
 	const tchar_t*
 	GetItemKindString ()
 	{
-		return GetItemKindString (m_ItemKind);
+		return GetModuleItemKindString (m_ItemKind);
 	}
 };
 

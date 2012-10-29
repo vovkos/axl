@@ -113,10 +113,11 @@ CParseTableBuilder::AddAnyTokenProductionToParseTable (
 
 	// skip EOF and ANYTOKEN
 
-	CNode** pp = *m_pParseTable + pSymbol->m_Index * TokenCount + 2; 
-	for (size_t i = 2; i < TokenCount; i++, pp++)
-		if (!*pp)
-			*pp = pProduction;
+	for (size_t i = 2; i < TokenCount; i++)
+	{
+		CSymbolNode* pToken = m_pNodeMgr->m_TokenArray [i];
+		AddParseTableEntry (pSymbol, pToken, pProduction);
+	}
 }
 
 size_t

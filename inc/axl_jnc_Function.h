@@ -7,13 +7,13 @@
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Namespace.h"
+#include "axl_jnc_Value.h"
 #include "axl_llk_Ast.h"
 
 namespace axl {
 namespace jnc {
 
 class CBasicBlock;
-class CValue;
 class CFunctionOverload;
 
 //.............................................................................
@@ -38,13 +38,12 @@ protected:
 
 	rtl::CString m_Name;
 	CType* m_pType;
-	CValue* m_pDefaultValue;
+	CValue m_DefaultValue;
 
 public:
 	CFunctionFormalArg ()
 	{
 		m_pType = NULL;
-		m_pDefaultValue = NULL;
 	}
 
 	rtl::CString 
@@ -59,10 +58,10 @@ public:
 		return m_pType;
 	}
 
-	CValue* 
+	const CValue&
 	GetDefaultValue ()
 	{
-		return m_pDefaultValue;
+		return m_DefaultValue;
 	}
 };
 

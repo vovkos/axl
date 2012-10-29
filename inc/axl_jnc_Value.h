@@ -82,6 +82,21 @@ public:
 		const void* p = NULL
 		);
 
+	CValue (CVariable* pVariable)
+	{
+		SetVariable (pVariable);
+	}
+
+	CValue (CGlobalFunction* pGlobalFunction)
+	{
+		SetGlobalFunction (pGlobalFunction);
+	}
+
+	CValue (CGlobalProperty* pGlobalProperty)
+	{
+		SetGlobalProperty (pGlobalProperty);
+	}
+
 	EValue 
 	GetValueKind () const
 	{

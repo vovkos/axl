@@ -40,7 +40,7 @@ public:
 
 enum ELaDfaStateFlag
 {
-	ELaDfaStateFlag_HasTokenMatch = 1,
+	ELaDfaStateFlag_IgnoreAnyToken = 1,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -76,7 +76,8 @@ public:
 		return 
 			m_ActiveThreadList.IsEmpty () &&
 			m_ResolverThreadList.IsEmpty () &&
-			m_CompleteThreadList.IsEmpty ();
+			m_CompleteThreadList.IsEmpty () &&
+			m_EpsilonThreadList.IsEmpty ();
 	}
 
 	bool
@@ -84,6 +85,9 @@ public:
 
 	CLaDfaThread*
 	CreateThread (CLaDfaThread* pSrc = NULL);
+
+	CNode* 
+	GetResolvedProduction ();
 
 	CNode* 
 	GetDefaultProduction ();

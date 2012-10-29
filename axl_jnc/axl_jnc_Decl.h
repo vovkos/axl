@@ -292,7 +292,7 @@ public:
 	AddArg (
 		const rtl::CString& Name,
 		CType* pType,
-		CValue* pDefaultValue
+		const CValue& DefaultValue
 		);
 };
 

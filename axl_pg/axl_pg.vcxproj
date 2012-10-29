@@ -65,7 +65,7 @@
       <Command>if exist $(SolutionDir)bin goto bin_exist
 md $(SolutionDir)bin
 :bin_exist
-copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)\bin\gellp.exe</Command>
+copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)\bin\till.exe</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>copying $(TargetName)$(TargetExt)...</Message>

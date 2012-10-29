@@ -76,11 +76,34 @@ CLaDfaState::CalcResolved ()
 }
 
 CNode* 
+CLaDfaState::GetResolvedProduction ()
+{
+	CLaDfaThread* pActiveThread = *m_ActiveThreadList.GetHead ();
+	CLaDfaThread* pCompleteThread = *m_CompleteThreadList.GetHead ();
+	CLaDfaThread* pEpsilonThread = *m_EpsilonThreadList.GetHead ();
+
+	if (m_Flags & ELaDfaStateFlag_IgnoreAnyToken)
+		return 
+			pActiveThread && pActiveThread->m_Match != ELaDfaThreadMatch_AnyToken ? pActiveThread->m_pProduction :
+			pCompleteThread && pCompleteThread->m_Match != ELaDfaThreadMatch_AnyToken ? pCompleteThread->m_pProduction :
+			pEpsilonThread ? pEpsilonThread->m_pProduction : NULL;
+	else
+		return
+			pActiveThread ? pActiveThread->m_pProduction :
+			pCompleteThread ? pCompleteThread->m_pProduction :
+			pEpsilonThread ? pEpsilonThread->m_pProduction : NULL;
+
+}
+
+CNode* 
 CLaDfaState::GetDefaultProduction ()
 {
+	CLaDfaThread* pCompleteThread = *m_CompleteThreadList.GetHead ();
+	CLaDfaThread* pEpsilonThread = *m_EpsilonThreadList.GetHead ();
+
 	return 
-		!m_CompleteThreadList.IsEmpty () ? m_CompleteThreadList.GetHead ()->m_pProduction :
-		!m_EpsilonThreadList.IsEmpty () ? m_EpsilonThreadList.GetHead ()->m_pProduction : 
+		pCompleteThread ? pCompleteThread->m_pProduction :
+		pEpsilonThread ? pEpsilonThread->m_pProduction :
 		m_pFromState ? m_pFromState->GetDefaultProduction () : NULL;
 }
 
@@ -123,6 +146,8 @@ CLaDfaBuilder::Build (
 	
 		if (pProduction->m_Kind != ENode_Epsilon)
 			pThread->m_Stack.Append (pProduction);
+		else
+			pState0->m_Flags |= ELaDfaStateFlag_IgnoreAnyToken;
 	}
 
 	CLaDfaState* pState1 = Transition (pState0, pConflict->m_pToken);
@@ -210,10 +235,7 @@ CLaDfaBuilder::Build (
 		if (pState->IsResolved ())
 		{
 			pState->m_pDfaNode->m_Flags |= ELaDfaNodeFlag_IsLeaf;
-			pState->m_pDfaNode->m_pProduction = 
-				!pState->m_ActiveThreadList.IsEmpty () ? pState->m_ActiveThreadList.GetHead ()->m_pProduction :
-				!pState->m_CompleteThreadList.IsEmpty () ? pState->m_CompleteThreadList.GetHead ()->m_pProduction :
-				!pState->m_EpsilonThreadList.IsEmpty () ? pState->m_EpsilonThreadList.GetHead ()->m_pProduction : NULL;
+			pState->m_pDfaNode->m_pProduction = pState->GetResolvedProduction ();
 
 			if (!pState->m_pDfaNode->m_pProduction && 
 				pState->m_pDfaNode->m_pResolverUplink)
@@ -348,6 +370,7 @@ CLaDfaBuilder::Transition (
 	CLaDfaState* pNewState = CreateState ();
 	pNewState->m_pToken = pToken;
 	pNewState->m_pFromState = pState;
+	pNewState->m_Flags = pState->m_Flags;
 
 	rtl::CIteratorT <CLaDfaThread> Thread = pState->m_ActiveThreadList.GetHead ();
 	for (; Thread; Thread++)
@@ -361,7 +384,7 @@ CLaDfaBuilder::Transition (
 	{
 		CLaDfaThread* pThread = *Thread++;
 
-		if (pThread->m_Match == ELaDfaThreadMatch_AnyToken && (pNewState->m_Flags & ELaDfaStateFlag_HasTokenMatch)) 
+		if (pThread->m_Match == ELaDfaThreadMatch_AnyToken && (pNewState->m_Flags & ELaDfaStateFlag_IgnoreAnyToken)) 
 		{
 			pNewState->m_ActiveThreadList.Delete (pThread); // delete anytoken thread in favor of concrete token
 		}
@@ -384,7 +407,7 @@ CLaDfaBuilder::Transition (
 
 	pNewState->m_pDfaNode = m_pNodeMgr->CreateLaDfaNode ();
 	pNewState->m_pDfaNode->m_pToken = pToken;
-	pNewState->CalcResolved  ();
+	pNewState->CalcResolved ();
 
 	pState->m_pDfaNode->m_TransitionArray.Append (pNewState->m_pDfaNode);
 	pState->m_TransitionArray.Append (pNewState);
@@ -434,7 +457,7 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 
 			pThread->m_Stack.Pop ();
 			pThread->m_Match = ELaDfaThreadMatch_Token;
-			pThread->m_pState->m_Flags |= ELaDfaStateFlag_HasTokenMatch;
+			pThread->m_pState->m_Flags |= ELaDfaStateFlag_IgnoreAnyToken;
 			break;
 
 		case ENode_Symbol:
@@ -463,6 +486,8 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 
 			if (pProduction->m_Kind != ENode_Epsilon)
 				pThread->m_Stack.Append (pProduction);
+			else
+				pThread->m_pState->m_Flags |= ELaDfaStateFlag_IgnoreAnyToken;			
 
 			break;
 

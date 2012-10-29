@@ -118,8 +118,7 @@ CParser::DeclareEnumType (
 CModuleItem*
 CParser::Declare (
 	CDeclSpecifiers* pDeclSpecifiers,
-	CDeclarator* pDeclarator,
-	rtl::CBoxListT <CToken>* pInitializer
+	CDeclarator* pDeclarator
 	)
 {
 	bool Result;
@@ -381,7 +380,7 @@ CParser::DeclareFormalArg (
 	CDeclFunctionSuffix* pArgSuffix,
 	CTypeSpecifierModifiers* pTypeSpecifier,
 	CDeclarator* pDeclarator,
-	CValue* pDefaultValue
+	const CValue& DefaultValue
 	)
 {
 	CType* pType = pDeclarator->GetType (pTypeSpecifier);
@@ -394,7 +393,7 @@ CParser::DeclareFormalArg (
 		return NULL;
 	}
 
-	return pArgSuffix->AddArg (pDeclarator->GetName (), pType, pDefaultValue);
+	return pArgSuffix->AddArg (pDeclarator->GetName (), pType, DefaultValue);
 }
 
 CFunction*
@@ -516,7 +515,7 @@ CParser::SetFunctionBody (
 	EModuleItem ItemKind = pItem->GetItemKind ();
 	if (ItemKind != EModuleItem_Function)
 	{
-		err::SetFormatStringError (_T("'%s' cannot have a function body"), CModuleItem::GetItemKindString (ItemKind));
+		err::SetFormatStringError (_T("'%s' cannot have a function body"), pItem->GetItemKindString ());
 		return false;
 	}
 
@@ -540,7 +539,6 @@ CParser::LookupIdentifier (
 	}
 
 	EModuleItem ItemKind = pItem->GetItemKind ();
-
 	switch (ItemKind)
 	{
 	case EModuleItem_Type:

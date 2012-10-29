@@ -146,7 +146,7 @@
   <ItemGroup>
     <CustomBuild Include="axl_jnc_Parser.llk">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\gellp %(FullPath) /F..\axl_pg_frames /o %(Filename).h /f axl_llk_ParserFrame.h.luaf</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\till %(FullPath) /F..\axl_pg_frames /o %(Filename).h /f axl_llk_ParserFrame.h.luaf</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">axl_jnc_Decl.llk;axl_jnc_Expr.llk;axl_jnc_Stmt.llk;axl_jnc_AttributeBlock.llk;axl_jnc_NamespaceDeclaration.llk;axl_jnc_CommonDeclaration.llk;axl_jnc_EnumSpecifier.llk;axl_jnc_StructSpecifier.llk;axl_jnc_ClassSpecifier.llk;axl_jnc_PropertySpecifier.llk;%(AdditionalInputs)</AdditionalInputs>

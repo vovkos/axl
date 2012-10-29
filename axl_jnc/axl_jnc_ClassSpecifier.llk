@@ -73,10 +73,28 @@ class_member_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pT
 	;
 
 class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
-	: declarator (':' struct_member_bit_field)? ('=' initializer)?
+local
+{
+	CModuleItem* $pMember;
+}
+	: declarator (':' struct_member_bit_field)? 
 		{
-			return DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator) != NULL;
+			$pMember = DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator);
+			if (!$pMember)
+				return false;
 		}
+	  ('=' 
+		{
+			if ($pMember->GetItemKind () != EModuleItem_ClassMember)
+			{
+				err::SetFormatStringError (_T("cannot apply initializer to '%s'"), $pMember->GetItemKindString ());
+				return false;
+			}			
+		}
+	  initializer <.((CClassFieldMember*) $pMember)->GetField ()->GetType ().>
+		{
+		}
+	  )?
 	;
 
 //.............................................................................
