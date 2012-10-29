@@ -25,7 +25,7 @@ init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CModuleItem** $ppLastDe
 	;
 
 init_declarator <CDeclSpecifiers* $pDeclSpecifiers, CModuleItem** $ppLastDeclaredItem>
-	: declarator('=' expression_pass1 $i)?
+	: declarator ('=' expression_pass1 $i)?
 		{
 			CModuleItem* pItem = Declare (
 				$pDeclSpecifiers, 

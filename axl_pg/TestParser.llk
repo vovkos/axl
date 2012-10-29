@@ -2,29 +2,40 @@
 
 LL (3);
 
-unary_expr
-	: unary_operator* postfix_expr
+Members
+{
+	size_t m_Stage;
+};
+
+program
+	: statement*
 	;
 
-unary_operator
-	: '-'
-	| '~'
-	| resolver (cast_operator_rslv)
-	  '(' EToken_Identifier ')'
+statement
+	: EToken_Identifier 
+		{
+			m_Stage = $1.m_Data.m_String == "hui" ? 1 : 2;			
+		}
+	  '=' initializer ';'
 	;
 
-cast_operator_rslv
-	: '(' EToken_Identifier ')'
+initializer
+gate
+{
+	return m_Stage == 1;
+}
+enter
+{
+}
+	: EToken_Integer
+		{
+			printf ("actual expression");
+		}
+	| any
+		{
+			printf ("any");
+		}
 	;
-
-postfix_expr
-	: primary_expr
-	;
-
-primary_expr
-	: EToken_Identifier
-	| EToken_Integer
-	| '(' unary_expr ')'
-	;
+	
 
 //.............................................................................

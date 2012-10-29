@@ -27,10 +27,9 @@ enum EColor
 int
 test ()
 {
-	uint8_t x;
+	int x, y, z;
 
-	beulong_t y;
-	y = x;
+//	x = y; 
 
 //	return (1 + 2) * (4 + 5);
 }

@@ -448,7 +448,7 @@ COperatorMgr::MoveOperator (
 
 	if (pSrcType->Cmp (pDstType) == 0)
 	{
-		llvm::Value* pLlvmSrcValue = LoadValue (SrcValue);
+		pLlvmSrcValue = LoadValue (SrcValue);
 	}
 	else
 	{

@@ -14,11 +14,9 @@
 
 enum ESymbol
 {
-	ESymbol_unary_expr = 0, 
-	ESymbol_unary_operator = 1, 
-	ESymbol_postfix_expr = 2, 
-	ESymbol_cast_operator_rslv = 3, 
-	ESymbol_primary_expr = 4, 
+	ESymbol_program = 0, 
+	ESymbol_statement = 1, 
+	ESymbol_initializer = 2, 
 	
 };
 
@@ -37,33 +35,33 @@ public:
 		EofToken           = 0,
 		AnyToken           = 1,
 
-		TokenCount         = 8,
-		SymbolCount        = 7,
-		SequenceCount      = 5,
-		ActionCount        = 0,
+		TokenCount         = 6,
+		SymbolCount        = 5,
+		SequenceCount      = 4,
+		ActionCount        = 4,
 		ArgumentCount      = 0,
-		BeaconCount        = 0,
-		LaDfaCount         = 1,
+		BeaconCount        = 1,
+		LaDfaCount         = 0,
 
-		TotalCount         = 21,
+		TotalCount         = 20,
 
-		NamedSymbolCount   = 5,
+		NamedSymbolCount   = 3,
 
 		TokenFirst         = 0,
-		TokenEnd           = 8,
-		SymbolFirst        = 8,
-		NamedSymbolEnd     = 13,
-		SymbolEnd          = 15,
-		SequenceFirst      = 15,
-		SequenceEnd        = 20,
-		ActionFirst        = 20,
-		ActionEnd          = 20,
-		ArgumentFirst      = 20,
-		ArgumentEnd        = 20,
-		BeaconFirst        = 20,
+		TokenEnd           = 6,
+		SymbolFirst        = 6,
+		NamedSymbolEnd     = 9,
+		SymbolEnd          = 11,
+		SequenceFirst      = 11,
+		SequenceEnd        = 15,
+		ActionFirst        = 15,
+		ActionEnd          = 19,
+		ArgumentFirst      = 19,
+		ArgumentEnd        = 19,
+		BeaconFirst        = 19,
 		BeaconEnd          = 20,
 		LaDfaFirst         = 20,
-		LaDfaEnd           = 21,
+		LaDfaEnd           = 20,
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -76,12 +74,12 @@ public:
 	
 	
 	
-	
-	
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 	
 	
+	size_t m_Stage;
+
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -92,13 +90,11 @@ public:
 		static
 		size_t _ParseTable [] = 
 		{
-			-1, -1, 16, 16, 16, -1, 16, 16, 
-			-1, -1, 2, 3, 14, -1, -1, -1, 
-			-1, -1, -1, -1, 12, -1, 12, 12, 
-			-1, -1, -1, -1, 18, -1, -1, -1, 
-			-1, -1, -1, -1, 19, -1, 6, 7, 
-			-1, -1, 15, 15, 20, -1, 0, 0, 
-			-1, -1, -1, -1, 17, -1, -1, -1, 
+			0, -1, -1, -1, 11, -1, 
+			-1, -1, -1, -1, 12, -1, 
+			-1, 14, 14, 14, 14, 10, 
+			0, -1, -1, -1, 11, -1, 
+			-1, -1, -1, -1, -1, 13, 
 			
 			-1
 		};
@@ -113,11 +109,10 @@ public:
 		static
 		size_t _SequenceTable [] = 
 		{
-			13, 9,  -1,
-			10, 13,  -1,
-			5, 6, 4,  -1,
-			5, 6, 4,  -1,
-			5, 8, 4,  -1,
+			9, 7,  -1,
+			3, 8, 2, 15, 19,  -1,
+			17, 5,  -1,
+			18, 1,  -1,
 			
 			-1
 		};
@@ -125,7 +120,7 @@ public:
 		static
 		size_t _SequenceIndexTable [] = 
 		{
-			0, 3, 6, 10, 14, 
+			0, 3, 9, 12, 
 			-1
 		};
 
@@ -143,23 +138,17 @@ public:
 			return EofToken;
 
 		
-		case '-':
+		case '=':
 			return 2;
 		
-		case '~':
+		case ';':
 			return 3;
 		
-		case '(':
+		case EToken_Identifier:
 			return 4;
 		
-		case ')':
-			return 5;
-		
-		case EToken_Identifier:
-			return 6;
-		
 		case EToken_Integer:
-			return 7;
+			return 5;
 		
 		default:
 			return AnyToken;
@@ -175,10 +164,8 @@ public:
 		{
 			0,  // eof
 			0,  // any token
-			'-', 
-			'~', 
-			'(', 
-			')', 
+			'=', 
+			';', 
 			EToken_Identifier, 
 			EToken_Integer, 
 			
@@ -196,11 +183,9 @@ public:
 		static
 		const tchar_t* _SymbolNameTable [NamedSymbolCount] = 
 		{
-			_T("unary_expr"),
-			_T("unary_operator"),
-			_T("postfix_expr"),
-			_T("cast_operator_rslv"),
-			_T("primary_expr"),
+			_T("program"),
+			_T("statement"),
+			_T("initializer"),
 			
 		};
 
@@ -216,8 +201,6 @@ public:
 
 		switch (Index)
 		{
-		
-		
 		
 		
 		
@@ -241,6 +224,8 @@ public:
 		size_t _BeaconTable [] [2] = 
 		{
 			
+			{ 0, 4 },
+			
 			{ 0 }
 		};
 
@@ -253,6 +238,56 @@ public:
 	{
 		switch (Index)
 		{
+		
+		case 0:
+			{
+			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CAst* __pAst = __pSymbol->m_pAst;
+#line 16 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
+			
+			m_Stage = (*GetTokenLocator (0)).m_Data.m_String == "hui" ? 1 : 2;			
+		;
+#line 251 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
+			}
+
+			return true;
+		
+		case 1:
+			{
+			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CAst* __pAst = __pSymbol->m_pAst;
+#line 23 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
+			return m_Stage == 1;
+#line 262 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
+			}
+
+			return true;
+		
+		case 2:
+			{
+			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CAst* __pAst = __pSymbol->m_pAst;
+#line 25 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
+			
+			printf ("actual expression");
+		;
+#line 275 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
+			}
+
+			return true;
+		
+		case 3:
+			{
+			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CAst* __pAst = __pSymbol->m_pAst;
+#line 29 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
+			
+			printf ("any");
+		;
+#line 288 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
+			}
+
+			return true;
 		
 		default:
 			ASSERT (false);
@@ -283,8 +318,6 @@ public:
 		
 		
 		
-		
-		
 		default:
 			return true;
 		}
@@ -295,8 +328,6 @@ public:
 	{
 		switch (Index)
 		{
-		
-		
 		
 		
 		
@@ -315,27 +346,6 @@ public:
 	{
 		switch (Index)
 		{
-		
-		case 0:
-			
-			switch (LookaheadToken)
-			{
-			
-			case '(':
-					
-				pTransition->m_ProductionIndex = 15;
-				pTransition->m_ResolverIndex = 11;
-				pTransition->m_ResolverElseIndex = 0;
-						
-				return ELaDfaResult_Resolver;
-					
-			
-			default:
-									
-				return ELaDfaResult_Fail;
-					
-			}
-			
 		
 		default:
 			return ELaDfaResult_Fail;
