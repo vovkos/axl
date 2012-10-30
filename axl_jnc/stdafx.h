@@ -74,6 +74,7 @@ extern "C" {
 #include "llvm/DerivedTypes.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
+#include "llvm/Intrinsics.h"
 #include "llvm/PassManager.h"
 #include "llvm/Support/IRBuilder.h"
 #include "llvm/Support/TargetSelect.h"

@@ -225,166 +225,41 @@ CCast_int_ext_u::LlvmCast (
 //.............................................................................
 
 bool
-CCast_i16_swp::LlvmCast (
-	CModule* pModule,
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
+CCast_int_swp::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
 	)
 {
-	// y = (x & 0x00ff) << 8 | (x & 0xff00) >> 8
+	size_t SrcSize = SrcValue.GetType ()->GetSize ();
+	size_t DstSize = SrcValue.GetType ()->GetSize ();
 
-	llvm::Type* pLlvmType = pModule->m_TypeMgr.GetBasicType (EType_Int16)->GetLlvmType ();
+	ASSERT (SrcSize == DstSize);
 
-	const uint64_t Mask1 = 0x00ff;
-	const uint64_t Mask2 = 0xff00;
-	const uint64_t BitCount = 8;
+	char* pSrc = (char*) SrcValue.GetConstData ();
+	char* pDst = (char*) DstValue.GetConstData ();
 
-	llvm::Value* pLlvmMaskValue1 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (16, Mask1, false));
-	llvm::Value* pLlvmMaskValue2 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (16, Mask2, false));
-	llvm::Value* pLlvmBitCountValue = llvm::ConstantInt::get (pLlvmType, llvm::APInt (16, BitCount, false));
-
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-
-	llvm::Value* pLlvmByte1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue1);
-	pLlvmByte1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte1, pLlvmBitCountValue);
-
-	llvm::Value* pLlvmByte2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue2);
-	pLlvmByte2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte2, pLlvmBitCountValue);
-
-	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte1, pLlvmByte2);
-	pResultValue->SetLlvmRegister (pLlvmResult, pType);
+	rtl::SwapByteOrder (pDst, pSrc, SrcSize);
 	return true;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 bool
-CCast_i32_swp::LlvmCast (
+CCast_int_swp::LlvmCast (
 	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	// y = (x & 0x000000ff) << 24 | (x & 0x0000ff00) << 8 | (x & 0x00ff0000) >> 8 | (x & 0xff000000) >> 24
-
-	llvm::Type* pLlvmType = pModule->m_TypeMgr.GetBasicType (EType_Int32)->GetLlvmType ();
-
-	const uint64_t Mask1 = 0x000000ff;
-	const uint64_t Mask2 = 0x0000ff00;
-	const uint64_t Mask3 = 0x00ff0000;
-	const uint64_t Mask4 = 0xff000000;
-	const uint64_t BitCount1 = 8;
-	const uint64_t BitCount2 = 24;
-
-	llvm::Value* pLlvmMaskValue1 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (32, Mask1, false));
-	llvm::Value* pLlvmMaskValue2 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (32, Mask2, false));
-	llvm::Value* pLlvmMaskValue3 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (32, Mask3, false));
-	llvm::Value* pLlvmMaskValue4 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (32, Mask4, false));
-	llvm::Value* pLlvmBitCountValue1 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (32, BitCount1, false));
-	llvm::Value* pLlvmBitCountValue2 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (32, BitCount2, false));
-
+	llvm::Type* pLlvmType = pType->GetLlvmType ();
 	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
 
-	llvm::Value* pLlvmByte1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue1);
-	pLlvmByte1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte1, pLlvmBitCountValue2);
+	llvm::Function* pLlvmSwap = llvm::Intrinsic::getDeclaration (
+		pModule->GetLlvmModule (),
+		llvm::Intrinsic::bswap,
+		llvm::ArrayRef <llvm::Type*> (pLlvmType)
+		);
 
-	llvm::Value* pLlvmByte2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue2);
-	pLlvmByte2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte2, pLlvmBitCountValue1);
-
-	llvm::Value* pLlvmWord1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte1, pLlvmByte2);
-
-	llvm::Value* pLlvmByte3 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue3);
-	pLlvmByte3 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte3, pLlvmBitCountValue1);
-
-	llvm::Value* pLlvmByte4 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue4);
-	pLlvmByte4 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte4, pLlvmBitCountValue2);
-
-	llvm::Value* pLlvmWord2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte3, pLlvmByte4);
-
-	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmWord1, pLlvmWord2);
-	pResultValue->SetLlvmRegister (pLlvmResult, pType);
-	return true;
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-bool
-CCast_i64_swp::LlvmCast (
-	CModule* pModule,
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	// same as above, just longer ;)
-
-	llvm::Type* pLlvmType = pModule->m_TypeMgr.GetBasicType (EType_Int64)->GetLlvmType ();
-
-	const uint64_t Mask1 = 0x00000000000000ff;
-	const uint64_t Mask2 = 0x000000000000ff00;
-	const uint64_t Mask3 = 0x0000000000ff0000;
-	const uint64_t Mask4 = 0x00000000ff000000;
-	const uint64_t Mask5 = 0x000000ff00000000;
-	const uint64_t Mask6 = 0x0000ff0000000000;
-	const uint64_t Mask7 = 0x00ff000000000000;
-	const uint64_t Mask8 = 0xff00000000000000;
-	const uint64_t BitCount1 = 8;
-	const uint64_t BitCount2 = 24;
-	const uint64_t BitCount3 = 40;
-	const uint64_t BitCount4 = 56;
-
-	llvm::Value* pLlvmMaskValue1 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask1, false));
-	llvm::Value* pLlvmMaskValue2 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask2, false));
-	llvm::Value* pLlvmMaskValue3 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask3, false));
-	llvm::Value* pLlvmMaskValue4 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask4, false));
-	llvm::Value* pLlvmMaskValue5 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask5, false));
-	llvm::Value* pLlvmMaskValue6 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask6, false));
-	llvm::Value* pLlvmMaskValue7 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask7, false));
-	llvm::Value* pLlvmMaskValue8 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, Mask8, false));
-	llvm::Value* pLlvmBitCountValue1 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, BitCount1, false));
-	llvm::Value* pLlvmBitCountValue2 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, BitCount2, false));
-	llvm::Value* pLlvmBitCountValue3 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, BitCount3, false));
-	llvm::Value* pLlvmBitCountValue4 = llvm::ConstantInt::get (pLlvmType, llvm::APInt (64, BitCount4, false));
-
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-
-	llvm::Value* pLlvmByte1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue1);
-	pLlvmByte1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte1, pLlvmBitCountValue4);
-
-	llvm::Value* pLlvmByte2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue2);
-	pLlvmByte2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte2, pLlvmBitCountValue3);
-
-	llvm::Value* pLlvmWord1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte1, pLlvmByte2);
-
-	llvm::Value* pLlvmByte3 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue3);
-	pLlvmByte3 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte3, pLlvmBitCountValue2);
-
-	llvm::Value* pLlvmByte4 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue4);
-	pLlvmByte4 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateShl (pLlvmByte4, pLlvmBitCountValue1);
-
-	llvm::Value* pLlvmWord2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte3, pLlvmByte4);
-	llvm::Value* pLlvmDWord1 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmWord1, pLlvmWord2);
-
-	llvm::Value* pLlvmByte5 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue5);
-	pLlvmByte5 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte5, pLlvmBitCountValue1);
-
-	llvm::Value* pLlvmByte6 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue6);
-	pLlvmByte6 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte6, pLlvmBitCountValue2);
-
-	llvm::Value* pLlvmWord3 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte5, pLlvmByte6);
-
-	llvm::Value* pLlvmByte7 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue7);
-	pLlvmByte7 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte7, pLlvmBitCountValue3);
-
-	llvm::Value* pLlvmByte8 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAnd (pLlvmValue, pLlvmMaskValue8);
-	pLlvmByte8 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLShr (pLlvmByte8, pLlvmBitCountValue4);
-
-	llvm::Value* pLlvmWord4 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmByte7, pLlvmByte8);
-	llvm::Value* pLlvmDWord2 = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmWord3, pLlvmWord4);
-
-	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateOr (pLlvmDWord1, pLlvmDWord2);
+	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (pLlvmSwap, pLlvmValue);
 	pResultValue->SetLlvmRegister (pLlvmResult, pType);
 	return true;
 }

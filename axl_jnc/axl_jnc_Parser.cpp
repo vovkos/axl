@@ -30,8 +30,6 @@ CParser::IsTypeSpecified ()
 CType*
 CParser::FindType (const CQualifiedName& Name)
 {
-	TraceSymbolStack ();
-
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
 	if (m_Stage == EStage_Pass1)

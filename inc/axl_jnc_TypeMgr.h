@@ -38,6 +38,7 @@ protected:
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
+	llvm::StructType* m_pLlvmFatPointerType;
 	
 public:
 	CTypeMgr (CModule* pModule);
@@ -197,6 +198,9 @@ public:
 		const CQualifiedName& Name,
 		CNamespace* pAnchorNamespace
 		);
+
+	llvm::StructType*
+	GetLlvmFatPointerType ();
 
 protected:
 	void

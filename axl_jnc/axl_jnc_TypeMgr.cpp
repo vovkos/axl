@@ -10,6 +10,7 @@ namespace jnc {
 CTypeMgr::CTypeMgr (CModule* pModule)
 {
 	m_pModule = pModule;
+	m_pLlvmFatPointerType = NULL;
 	SetupAllBasicTypes ();
 }
 
@@ -433,6 +434,26 @@ CTypeMgr::GetImportType (
 	It->m_Value = pType;
 
 	return pType;
+}
+
+llvm::StructType*
+CTypeMgr::GetLlvmFatPointerType ()
+{
+	if (m_pLlvmFatPointerType)
+		return m_pLlvmFatPointerType;
+
+	llvm::PointerType* pLlvmInt8PtrType = llvm::Type::getInt8PtrTy (llvm::getGlobalContext ());
+
+	m_pLlvmFatPointerType = llvm::StructType::create (
+		".jnc.TFatPointer", 
+		pLlvmInt8PtrType,
+		pLlvmInt8PtrType,
+		pLlvmInt8PtrType,
+		pLlvmInt8PtrType,
+		NULL
+		);
+	
+	return m_pLlvmFatPointerType;
 }
 
 //.............................................................................

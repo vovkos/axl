@@ -265,5 +265,15 @@ public:
 
 //.............................................................................
 
+struct TFatPointer
+{
+	void* m_p;
+	void* m_pParent;
+	CType* m_pType;
+	CType* m_pParentType;
+};
+
+//.............................................................................
+
 } // namespace axl {
 } // namespace jnc {

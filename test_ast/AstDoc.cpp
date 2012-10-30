@@ -49,6 +49,7 @@ CAstDoc::~CAstDoc()
 
 void CAstDoc::OnFileCompile()
 {
+	DoFileSave ();
 	Compile ();
 }
 

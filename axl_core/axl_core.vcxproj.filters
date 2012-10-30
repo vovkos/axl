@@ -319,7 +319,7 @@
     <ClInclude Include="..\inc\axl_rtl_StringHashTable.h">
       <Filter>rtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_rtl_Endianness.h">
+    <ClInclude Include="..\inc\axl_rtl_SwapByteOrder.h">
       <Filter>rtl</Filter>
     </ClInclude>
   </ItemGroup>

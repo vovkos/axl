@@ -84,10 +84,7 @@ protected:
 	CCast_int_trunc m_Cast_int_trunc;
 	CCast_int_ext m_Cast_int_ext;
 	CCast_int_ext_u m_Cast_int_ext_u;
-
-	CCast_i16_swp m_Cast_i16_swp;
-	CCast_i32_swp m_Cast_i32_swp;
-	CCast_i64_swp m_Cast_i64_swp;
+	CCast_int_swp m_Cast_int_swp;
 	CCast_i32_f32 m_Cast_i32_f32;
 	CCast_i32u_f32 m_Cast_i32u_f32;
 	CCast_i32_f64 m_Cast_i32_f64;

@@ -130,32 +130,32 @@ COperatorMgr::AddStdMoveOperators ()
 
 	// endianness swaps
 
-	AddCastOperator (EType_Int16, EType_Int16_be, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16, EType_Int16_beu, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16_u, EType_Int16_be, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16_u, EType_Int16_beu, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16_be, EType_Int16, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16_be, EType_Int16_u, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16_beu, EType_Int16, &m_Cast_i16_swp);
-	AddCastOperator (EType_Int16_beu, EType_Int16_u, &m_Cast_i16_swp);
+	AddCastOperator (EType_Int16, EType_Int16_be, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16, EType_Int16_beu, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16_u, EType_Int16_be, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16_u, EType_Int16_beu, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16_be, EType_Int16, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16_be, EType_Int16_u, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16_beu, EType_Int16, &m_Cast_int_swp);
+	AddCastOperator (EType_Int16_beu, EType_Int16_u, &m_Cast_int_swp);
 
-	AddCastOperator (EType_Int32, EType_Int32_be, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32, EType_Int32_beu, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32_u, EType_Int32_be, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32_u, EType_Int32_beu, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32_be, EType_Int32, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32_be, EType_Int32_u, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32_beu, EType_Int32, &m_Cast_i32_swp);
-	AddCastOperator (EType_Int32_beu, EType_Int32_u, &m_Cast_i32_swp);
+	AddCastOperator (EType_Int32, EType_Int32_be, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32, EType_Int32_beu, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32_u, EType_Int32_be, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32_u, EType_Int32_beu, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32_be, EType_Int32, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32_be, EType_Int32_u, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32_beu, EType_Int32, &m_Cast_int_swp);
+	AddCastOperator (EType_Int32_beu, EType_Int32_u, &m_Cast_int_swp);
 
-	AddCastOperator (EType_Int64, EType_Int64_be, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64, EType_Int64_beu, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64_u, EType_Int64_be, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64_u, EType_Int64_beu, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64_be, EType_Int64, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64_be, EType_Int64_u, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64_beu, EType_Int64, &m_Cast_i64_swp);
-	AddCastOperator (EType_Int64_beu, EType_Int64_u, &m_Cast_i64_swp);
+	AddCastOperator (EType_Int64, EType_Int64_be, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64, EType_Int64_beu, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64_u, EType_Int64_be, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64_u, EType_Int64_beu, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64_be, EType_Int64, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64_be, EType_Int64_u, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64_beu, EType_Int64, &m_Cast_int_swp);
+	AddCastOperator (EType_Int64_beu, EType_Int64_u, &m_Cast_int_swp);
 
 	// integer truncations
 

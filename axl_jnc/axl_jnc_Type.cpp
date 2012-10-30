@@ -195,6 +195,7 @@ CType::GetLlvmType ()
 	
 	case EType_Pointer:
 	case EType_Reference:
+		pLlvmType = m_pModule->m_TypeMgr.GetLlvmFatPointerType ();
 		break;
 	
 	case EType_Array:

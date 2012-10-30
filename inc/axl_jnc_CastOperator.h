@@ -5,7 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Value.h"
-#include "axl_rtl_Endianness.h"
+#include "axl_rtl_SwapByteOrder.h"
 
 namespace axl {
 namespace jnc {
@@ -159,7 +159,7 @@ public:
 
 //.............................................................................
 
-// integer extensions and truncations
+// integer extensions, truncations & byte order swap
 
 class CCast_int_trunc: public ICastOperatorLo
 {
@@ -234,43 +234,12 @@ public:
 		);
 };
 
-//.............................................................................
-
-// swap endianness
-
-class CCast_i16_swp: public ICastOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i16_swp, ICastOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int16_t*) DstValue.GetConstData () = rtl::SwapEndianness16 (*(int16_t*) SrcValue.GetConstData ());
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmCast (
-		CModule* pModule,
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_i32_swp: public ICastOperatorLo
+class CCast_int_swp: public ICastOperatorLo
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i32_swp, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_swp, ICastOperatorLo)
 
 public:
 	virtual
@@ -278,40 +247,7 @@ public:
 	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		*(int32_t*) DstValue.GetConstData () = rtl::SwapEndianness32 (*(int32_t*) SrcValue.GetConstData ());
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmCast (
-		CModule* pModule,
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
 		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CCast_i64_swp: public ICastOperatorLo
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i64_swp, ICastOperatorLo)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		)
-	{
-		*(int64_t*) DstValue.GetConstData () = rtl::SwapEndianness64 (*(int64_t*) SrcValue.GetConstData ());
-		return true;
-	}
 
 	virtual
 	bool

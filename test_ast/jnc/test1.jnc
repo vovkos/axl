@@ -1,11 +1,5 @@
 typedef unsigned int8  uint8_t,  uchar_t,  byte_t;
-
-#pack: 1
-
-#endian: bigendian
 typedef unsigned int16 uint16_t, ushort_t, word_t;
-#endian: default
-
 typedef unsigned int32 uint32_t, ulong_t,  dword_t;
 typedef unsigned int64 uint64_t, qword_t;
 typedef bigendian int16 beint16_t;
@@ -24,15 +18,11 @@ enum EColor
 	Blue  
 };
 
-int
+void
 test ()
 {
-	int x;
-	int y;
-
-	x = y + 1;
-
-//	return (1 + 2) * (4 + 5);
+	int x, y;
+	x = -y;
 }
 
 //.............................................................................
