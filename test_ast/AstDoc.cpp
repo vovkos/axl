@@ -35,12 +35,14 @@ IMPLEMENT_DYNCREATE(CAstDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CAstDoc, CDocument)
 	ON_COMMAND(ID_FILE_COMPILE, OnFileCompile) 
+	ON_COMMAND(ID_FILE_RUN, OnFileRun) 
 END_MESSAGE_MAP()
 
 // CAstDoc construction/destruction
 
 CAstDoc::CAstDoc()
 {
+	m_pLlvmExecutionEngine = NULL;
 }
 
 CAstDoc::~CAstDoc()
@@ -49,16 +51,47 @@ CAstDoc::~CAstDoc()
 
 void CAstDoc::OnFileCompile()
 {
-	DoFileSave ();
 	Compile ();
+}
+
+void CAstDoc::OnFileRun ()
+{
+	Run ();
 }
 
 bool
 CAstDoc::Compile ()
 {
+	DoFileSave ();
+
 	bool Result;
 
 	CMainFrame* pMainFrame = GetMainFrame ();
+
+	if (m_pLlvmExecutionEngine)
+	{
+		delete m_pLlvmExecutionEngine;
+		m_pLlvmExecutionEngine = NULL;
+	}	
+
+	CString FilePath = GetPathName ();
+	m_Module.Create ((const tchar_t*) FilePath);
+	
+	llvm::Module* pLlvmModule = new llvm::Module ((const tchar_t*) FilePath, llvm::getGlobalContext ());
+	m_Module.m_pLlvmModule = pLlvmModule;
+
+	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
+	std::string ErrorString;
+	EngineBuilder.setErrorStr (&ErrorString);
+
+	m_pLlvmExecutionEngine = EngineBuilder.create ();
+	if (!m_pLlvmExecutionEngine)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Error creating a JITter (%s)\n"), ErrorString.c_str ());
+		return false;
+	}
+
+	jnc::CSetCurrentThreadModule ScopeModule (&m_Module);
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Parsing...\n"));
 	pMainFrame->m_GlobalAstPane.Clear ();
@@ -66,9 +99,6 @@ CAstDoc::Compile ()
 	pMainFrame->m_ModulePane.Clear ();
 	pMainFrame->m_LlvmIrPane.Clear ();
 	pMainFrame->m_DasmPane.Clear ();
-
-	m_Module.Create ((const tchar_t*) GetPathName ());
-	jnc::CSetCurrentThreadModule ScopeModule (&m_Module);
 
 	GetView ()->GetWindowText (m_SourceText);
 
@@ -122,6 +152,51 @@ CAstDoc::Compile ()
 	pMainFrame->m_LlvmIrPane.Build (&m_Module);
 	pMainFrame->m_DasmPane.Build (&m_Module);
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done.\n"));
+	return true;
+}
+
+bool
+CAstDoc::Run ()
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+
+	if (IsModified ())
+	{
+		bool Result = Compile ();
+		if (!Result)
+			return false;
+	}
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Finding 'main'...\n"));
+	
+	jnc::CModuleItem* pMainItem = m_Module.m_NamespaceMgr.GetGlobalNamespace ()->FindItem (_T("main"));
+	if (!pMainItem)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("'main' not found\n"));
+		return false;
+	}
+
+	if (pMainItem->GetItemKind () != jnc::EModuleItem_GlobalFunction)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("'main' is not a function\n"));
+		return false;
+	}
+
+	jnc::CGlobalFunction* pMainFunction = (jnc::CGlobalFunction*) pMainItem;
+	jnc::CFunction* pFunction = pMainFunction->GetFunction ();
+	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
+	
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting...\n"));
+
+	typedef int (*FMain) ();
+	FMain pfnMain = (FMain) m_pLlvmExecutionEngine->getPointerToFunction (pLlvmFunction);
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Running...\n"));
+
+	int Result = pfnMain ();
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done (retval = %d).\n"), Result);
+
 	return true;
 }
 

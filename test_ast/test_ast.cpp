@@ -74,6 +74,7 @@ BOOL CAstApp::InitInstance()
 //	_crtBreakAlloc = 401;
 	atexit (&clear_type_info_cache);
 
+	llvm::InitializeNativeTarget ();
 	err::CParseErrorProvider::Register ();
 
 	// InitCommonControlsEx() is required on Windows XP if an application

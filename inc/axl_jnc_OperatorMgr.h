@@ -29,6 +29,12 @@ protected:
 	CUnOpT_i32 <CUnOp_BitwiseNot> m_UnOp_BitwiseNot_i32;
 	CUnOpT_i64 <CUnOp_BitwiseNot> m_UnOp_BitwiseNot_i64;
 
+	CUnaryOperator m_AddrOperator;
+	CUnaryOperator m_IndirOperator;
+
+	CUnOp_addr m_UnOp_addr;
+	CUnOp_indir m_UnOp_indir;
+
 	// binary operators
 
 	CBinOpT_i32 <CBinOp_Add> m_BinOp_Add_i32;
@@ -131,11 +137,7 @@ public:
 	FindUnaryOperator (
 		EUnOp OpKind,
 		CType* pOpType
-		)
-	{
-		ASSERT (OpKind > 0 && OpKind < EUnOp__Count);
-		return m_UnaryOperatorTable [OpKind].FindOperator (pOpType);
-	}
+		);
 
 	CUnaryOperator*
 	AddUnaryOperator (

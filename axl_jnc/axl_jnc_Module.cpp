@@ -36,9 +36,7 @@ CModule::Clear ()
 	m_ConstMgr.Clear ();
 	m_ControlFlowMgr.Clear ();
 	m_OperatorMgr.Clear ();
-
-	if (m_pLlvmModule)
-		AXL_MEM_DELETE (m_pLlvmModule);
+	m_pLlvmModule = NULL;
 }
 
 bool

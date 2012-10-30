@@ -23,6 +23,7 @@ class CAstDoc : public CDocument
 protected:
 	CString m_SourceText;
 	jnc::CModule m_Module;
+	llvm::ExecutionEngine* m_pLlvmExecutionEngine;
 
 protected: // create from serialization only
 	CAstDoc();
@@ -40,6 +41,9 @@ public:
 public:
 	bool
 	Compile ();
+
+	bool
+	Run ();
 
 // Overrides
 public:
@@ -72,6 +76,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	afx_msg void OnFileCompile();
+	afx_msg void OnFileRun();
 
 #ifdef SHARED_HANDLERS
 	// Helper function that sets search content for a Search Handler

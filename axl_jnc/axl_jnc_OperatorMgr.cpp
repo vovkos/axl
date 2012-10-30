@@ -45,6 +45,9 @@ COperatorMgr::AddStdUnaryOperators ()
 
 	AddUnaryOperator (EUnOp_BitwiseNot, EType_Int32, &m_UnOp_BitwiseNot_i32);
 	AddUnaryOperator (EUnOp_BitwiseNot, EType_Int64, &m_UnOp_BitwiseNot_i64);
+	
+	m_AddrOperator.m_pOperatorLo = &m_UnOp_addr;
+	m_IndirOperator.m_pOperatorLo = &m_UnOp_indir;
 }
 
 void
@@ -237,6 +240,30 @@ COperatorMgr::AddStdMoveOperators ()
 		pOperatorIJ->m_Price = pOperatorIK->m_Price + pOperatorKJ->m_Price;
 	}
 }
+
+CUnaryOperator*
+COperatorMgr::FindUnaryOperator (
+	EUnOp OpKind,
+	CType* pOpType
+	)
+{
+	ASSERT (OpKind > 0 && OpKind < EUnOp__Count);
+	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind].FindOperator (pOpType);
+	if (pOperator)
+		return pOperator;
+
+	switch (OpKind)
+	{
+	case EUnOp_Addr:
+		return &m_AddrOperator;
+
+	case EUnOp_Indir:
+		return &m_IndirOperator;
+	}
+
+	return NULL;
+}
+
 
 CUnaryOperator*
 COperatorMgr::AddUnaryOperator (
@@ -487,6 +514,12 @@ COperatorMgr::CastOperator (
 	CValue* pResultValue
 	)
 {
+	if (pType->Cmp (OpValue.GetType ()) == 0)
+	{
+		*pResultValue = OpValue;
+		return true;
+	}
+
 	CCastOperator* pOperator = FindCastOperator (OpValue.GetType (), pType);	
 	if (!pOperator)
 	{

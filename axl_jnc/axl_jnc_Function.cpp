@@ -62,7 +62,7 @@ CFunction::GetLlvmFunction ()
 		pLlvmType, 
 		llvm::Function::ExternalLinkage, 
 		(const tchar_t*) Name, 
-		m_pModule->GetLlvmModule ()
+		m_pModule->m_pLlvmModule
 		);
 
 	return m_pLlvmFunction;

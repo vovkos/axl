@@ -203,5 +203,84 @@ CUnOp_BitwiseNot::LlvmOpInt (
 
 //.............................................................................
 
+bool
+CUnOp_addr::ConstOperator (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("cannot apply unary '&' to a constant"));
+	return false;
+}
+
+bool
+CUnOp_addr::LlvmOperator (
+	CModule* pModule,
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	CType* pType = OpValue.GetType ();
+	pType = pType->ModifyType (ETypeModifier_Pointer);
+
+	EValue OpKind = OpValue.GetValueKind ();
+	if (OpKind != EValue_Variable)
+	{
+		err::SetFormatStringError (_T("unary '&' can only be applied to variables"));
+		return false;
+	}
+
+	CVariable* pVariable = OpValue.GetVariable ();
+	llvm::Value* pLlvmValue = pVariable->GetLlvmValue ();
+	llvm::Value* pLlvmTypeValue = NULL;
+
+	llvm::Function* pLlvmCreateFatPointer = NULL;
+	
+	llvm::Value* ArgArray [] =
+	{
+		pLlvmValue,
+		pLlvmValue,
+		pLlvmTypeValue,
+		pLlvmTypeValue,
+	};
+
+	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (
+		pLlvmCreateFatPointer, 
+		llvm::ArrayRef <llvm::Value*> (ArgArray, 4)
+		);
+
+	pResultValue->SetLlvmRegister (pLlvmResult, pType);	
+	return false;
+}
+
+//.............................................................................
+
+bool
+CUnOp_indir::ConstOperator (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("cannot apply unary '*' to a constant"));
+	return false;
+}
+
+bool
+CUnOp_indir::LlvmOperator (
+	CModule* pModule,
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	CType* pType = OpValue.GetType ();
+	pType = pType->ModifyType (ETypeModifier_RemovePointer);
+	pType = pType->ModifyType (ETypeModifier_Reference);
+
+	err::SetFormatStringError (_T("unary '*' not implemented yet"));
+	return false;
+}
+
+//.............................................................................
+
 } // namespace axl {
 } // namespace jnc {

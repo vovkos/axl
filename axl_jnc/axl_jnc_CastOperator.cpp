@@ -254,7 +254,7 @@ CCast_int_swp::LlvmCast (
 	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
 
 	llvm::Function* pLlvmSwap = llvm::Intrinsic::getDeclaration (
-		pModule->GetLlvmModule (),
+		pModule->m_pLlvmModule,
 		llvm::Intrinsic::bswap,
 		llvm::ArrayRef <llvm::Type*> (pLlvmType)
 		);

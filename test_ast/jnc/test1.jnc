@@ -18,11 +18,12 @@ enum EColor
 	Blue  
 };
 
-void
-test ()
-{
-	int x, y;
-	x = -(double) y;
+int
+main ()
+{	
+	int x = 10;
+	int y = 20;
+	return x * y;
 }
 
 //.............................................................................

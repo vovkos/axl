@@ -58,6 +58,7 @@ class CUnaryOperator: public rtl::TListLink
 {
 protected:
 	friend class CUnaryOperatorOverload;
+	friend class COperatorMgr;
 
 	EUnOp m_OpKind;
 	CType* m_pReturnType;
@@ -275,6 +276,55 @@ public:
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}
+};
+
+//.............................................................................
+
+class CUnOp_addr: public IUnaryOperatorLo
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CUnOp_addr, IUnaryOperatorLo)
+
+public:
+	virtual
+	bool
+	ConstOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	virtual
+	bool
+	LlvmOperator (
+		CModule* pModule,
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+};
+
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CUnOp_indir: public IUnaryOperatorLo
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CUnOp_indir, IUnaryOperatorLo)
+
+public:
+	virtual
+	bool
+	ConstOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	virtual
+	bool
+	LlvmOperator (
+		CModule* pModule,
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................

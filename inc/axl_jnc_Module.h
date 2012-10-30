@@ -22,9 +22,10 @@ class CModule
 {
 protected:
 	rtl::CString m_FilePath;
-	llvm::Module* m_pLlvmModule;
 
 public:
+	llvm::Module* m_pLlvmModule;
+
 	CTypeMgr m_TypeMgr;
 	CAttributeMgr m_AttributeMgr;
 	CNamespaceMgr m_NamespaceMgr;
@@ -46,12 +47,6 @@ public:
 	GetFilePath ()
 	{
 		return m_FilePath;
-	}
-
-	llvm::Module*
-	GetLlvmModule ()
-	{
-		return m_pLlvmModule;
 	}
 
 	void

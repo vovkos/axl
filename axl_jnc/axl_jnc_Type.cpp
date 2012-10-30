@@ -599,6 +599,24 @@ CType::ModifyType (int Modifiers)
 			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
 		}
 
+		if (Modifiers & ETypeModifier_RemoveConst)
+		{
+			if (pType->m_TypeKind == EType_Const)
+				pType = ((CDerivedType*) pType)->GetBaseType ();
+		}
+
+		if (Modifiers & ETypeModifier_RemoveReference)
+		{
+			if (pType->m_TypeKind == EType_Reference)
+				pType = ((CDerivedType*) pType)->GetBaseType ();
+		}
+
+		if (Modifiers & ETypeModifier_RemovePointer)
+		{
+			if (pType->m_TypeKind == EType_Pointer)
+				pType = ((CDerivedType*) pType)->GetBaseType ();
+		}
+
 		if (Modifiers & ETypeModifier_Pointer)
 		{
 			pType = m_pModule->m_TypeMgr.GetPointerType (pType);
