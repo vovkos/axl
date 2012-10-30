@@ -18,12 +18,20 @@ enum EColor
 	Blue  
 };
 
+void
+printf ();
+
+void
+MsgBox ();
+
 int
 main ()
 {	
+	printf ();
+	MsgBox ();
 	int x = 10;
 	int y = 20;
-	return x * y;
+	return x + y;
 }
 
 //.............................................................................

@@ -54,14 +54,11 @@ CFunction::GetLlvmFunction ()
 	if (m_pLlvmFunction)
 		return m_pLlvmFunction;
 
-	rtl::CString Name;
-	Name.Format (_T("function_%x"), this);
-
 	llvm::FunctionType* pLlvmType = m_pType->GetLlvmType ();
 	m_pLlvmFunction = llvm::Function::Create (
 		pLlvmType, 
 		llvm::Function::ExternalLinkage, 
-		(const tchar_t*) Name, 
+		(const tchar_t*) m_Tag, 
 		m_pModule->m_pLlvmModule
 		);
 

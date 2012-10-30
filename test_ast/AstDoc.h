@@ -71,6 +71,18 @@ protected:
 	bool
 	CompileInitializers ();
 
+	bool
+	ExportStdLib ();
+
+	bool
+	ExportStdLibFunction (
+		const tchar_t* pName,
+		void* pfn
+		);
+
+	jnc::CFunction* 
+	FindGlobalFunction (const tchar_t* pName);
+
 // Generated message map functions
 protected:
 	DECLARE_MESSAGE_MAP()

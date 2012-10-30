@@ -551,6 +551,14 @@ CParser::LookupIdentifier (
 		pValue->SetConstInt32 (((CEnumMember*) pItem)->GetValue ());
 		break;
 
+	case EModuleItem_GlobalFunction:
+		pValue->SetGlobalFunction ((CGlobalFunction*) pItem);
+		break;
+
+	case EModuleItem_GlobalProperty:
+		pValue->SetGlobalProperty ((CGlobalProperty*) pItem);
+		break;
+
 	default:
 		err::SetFormatStringError (_T("%s '%s' cannot be used as expression"), pItem->GetItemKindString (), Name);
 		return false;

@@ -334,6 +334,13 @@ public:
 
 	bool
 	CallOperator (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList,
+		CValue* pResultValue
+		);
+
+	bool
+	CallOperator (
 		CValue* pValue,
 		rtl::CBoxListT <CValue>* pArgList
 		);

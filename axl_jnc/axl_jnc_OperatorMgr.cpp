@@ -307,11 +307,9 @@ COperatorMgr::UnaryOperator (
 	CValue* pValue
 	)
 {
-	bool Result;
-
 	CValue ResultValue;
 
-	Result = UnaryOperator (OpKind, *pValue, &ResultValue);
+	bool Result = UnaryOperator (OpKind, *pValue, &ResultValue);
 	if (!Result)
 		return false;
 
@@ -367,11 +365,9 @@ COperatorMgr::BinaryOperator (
 	const CValue& OpValue2
 	)
 {
-	bool Result;
-
 	CValue ResultValue;
 
-	Result = BinaryOperator (OpKind, *pValue, OpValue2, &ResultValue);
+	bool Result = BinaryOperator (OpKind, *pValue, OpValue2, &ResultValue);
 	if (!Result)
 		return false;
 
@@ -540,11 +536,9 @@ COperatorMgr::CastOperator (
 	CType* pType
 	)
 {
-	bool Result;
-
 	CValue ResultValue;
 
-	Result = CastOperator (*pValue, pType, &ResultValue);
+	bool Result = CastOperator (*pValue, pType, &ResultValue);
 	if (!Result)
 		return false;
 
@@ -564,10 +558,55 @@ COperatorMgr::ConditionalOperator (
 
 bool
 COperatorMgr::MemberOperator (
+	const CValue& OpValue,
+	const tchar_t* pName,
+	CValue* pResultValue
+	)
+{
+	return true;
+}
+
+bool
+COperatorMgr::MemberOperator (
 	CValue* pValue,
 	const tchar_t* pName
 	)
 {
+	CValue ResultValue;
+
+	bool Result = MemberOperator (*pValue, pName, &ResultValue);
+	if (!Result)
+		return false;
+
+	*pValue = ResultValue;
+	return true;
+}
+
+bool
+COperatorMgr::CallOperator (
+	const CValue& OpValue,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	EValue ValueKind = OpValue.GetValueKind ();
+	if (ValueKind != EValue_GlobalFunction)
+	{
+		err::SetFormatStringError (_T("cannot call %s"), OpValue.GetValueKindString ());
+		return false;
+	}
+
+	CGlobalFunction* pGlobalFunction = OpValue.GetGlobalFunction ();
+
+	// TODO: find overload based on arg list
+	CFunction* pFunction = pGlobalFunction->GetFunction ();
+	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
+	
+	// TODO: pass arguments
+	llvm::Instruction* pLlvmCall = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (pLlvmFunction);
+		
+	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
+	pResultValue->SetLlvmRegister (pLlvmCall, pReturnType);
 	return true;
 }
 
@@ -577,6 +616,13 @@ COperatorMgr::CallOperator (
 	rtl::CBoxListT <CValue>* pArgList
 	)
 {
+	CValue ResultValue;
+
+	bool Result = CallOperator (*pValue, pArgList, &ResultValue);
+	if (!Result)
+		return false;
+
+	*pValue = ResultValue;
 	return true;
 }
 

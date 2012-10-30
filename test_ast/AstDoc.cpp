@@ -146,7 +146,9 @@ CAstDoc::Compile ()
 		rtl::CString Text = err::GetError ()->GetDescription ();
 		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
 	}
-	
+
+	ExportStdLib ();
+
 	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
 	pMainFrame->m_ModulePane.Build (&m_Module);
 	pMainFrame->m_LlvmIrPane.Build (&m_Module);
@@ -169,21 +171,13 @@ CAstDoc::Run ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Finding 'main'...\n"));
 	
-	jnc::CModuleItem* pMainItem = m_Module.m_NamespaceMgr.GetGlobalNamespace ()->FindItem (_T("main"));
-	if (!pMainItem)
+	jnc::CFunction* pFunction = FindGlobalFunction (_T("main"));
+	if (!pFunction)
 	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("'main' not found\n"));
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("'main' is not found or not a function\n"));
 		return false;
 	}
-
-	if (pMainItem->GetItemKind () != jnc::EModuleItem_GlobalFunction)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("'main' is not a function\n"));
-		return false;
-	}
-
-	jnc::CGlobalFunction* pMainFunction = (jnc::CGlobalFunction*) pMainItem;
-	jnc::CFunction* pFunction = pMainFunction->GetFunction ();
+		
 	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
 	
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting...\n"));
@@ -197,6 +191,57 @@ CAstDoc::Run ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done (retval = %d).\n"), Result);
 
+	return true;
+}
+
+void
+StdLib_printf ()
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf ()\n"));
+}
+
+void
+StdLib_MsgBox ()
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("MsgBox ()\n"));
+}
+
+jnc::CFunction* 
+CAstDoc::FindGlobalFunction (const tchar_t* pName)
+{
+	jnc::CModuleItem* pItem = m_Module.m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
+	if (!pItem)
+		return NULL;
+
+	if (pItem->GetItemKind () != jnc::EModuleItem_GlobalFunction)
+		return NULL;
+
+	jnc::CGlobalFunction* pFunction = (jnc::CGlobalFunction*) pItem;
+	return pFunction->GetFunction ();
+}
+
+bool
+CAstDoc::ExportStdLib ()
+{
+	ExportStdLibFunction (_T("printf"), StdLib_printf);
+	ExportStdLibFunction (_T("MsgBox"), StdLib_MsgBox);
+	return true;
+}
+
+bool
+CAstDoc::ExportStdLibFunction (
+	const tchar_t* pName,
+	void* pfn
+	)
+{
+	jnc::CFunction* pFunction = FindGlobalFunction (pName);
+	if (!pFunction)
+		return false;
+
+	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
+	m_pLlvmExecutionEngine->addGlobalMapping (pLlvmFunction, pfn);
 	return true;
 }
 

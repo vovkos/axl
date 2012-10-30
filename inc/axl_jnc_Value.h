@@ -33,6 +33,11 @@ enum EValue
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+const tchar_t*
+GetValueKindString (EValue ValueKind);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CValue
 {
 protected:
@@ -101,6 +106,12 @@ public:
 	GetValueKind () const
 	{
 		return m_ValueKind;
+	}
+
+	const tchar_t*
+	GetValueKindString () const
+	{
+		return jnc::GetValueKindString (m_ValueKind);
 	}
 
 	CType* 

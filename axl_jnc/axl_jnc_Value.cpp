@@ -7,6 +7,54 @@ namespace jnc {
 
 //.............................................................................
 
+const tchar_t*
+GetValueKindString (EValue ValueKind)
+{
+	switch (ValueKind)
+	{
+	case EValue_Void:
+		return _T("void");
+
+	case EValue_Null:	
+		return _T("null");
+
+	case EValue_Type:
+		return _T("type");
+
+	case EValue_Const:
+		return _T("const");
+
+	case EValue_Variable:
+		return _T("variable");
+
+	case EValue_LlvmRegister:
+		return _T("llvm-register");
+
+	case EValue_GlobalFunction:
+		return _T("global-function");
+
+	case EValue_GlobalProperty:
+		return _T("global-property");
+
+	case EValue_Cmp:
+		return _T("cmp");
+
+	case EValue_BoolNot:
+		return _T("bool-not");
+
+	case EValue_BoolAnd:
+		return _T("bool-and");
+
+	case EValue_BoolOr:
+		return _T("bool-or");
+
+	default:
+		return _T("<undefined>");
+	}
+}
+
+//.............................................................................
+
 CValue::CValue ()
 {
 	m_ValueKind = EValue_Void;

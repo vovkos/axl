@@ -62,6 +62,12 @@ public:
 		return m_ItemKind;
 	}
 
+	const tchar_t*
+	GetItemKindString ()
+	{
+		return GetModuleItemKindString (m_ItemKind);
+	}
+
 	CModule*
 	GetModule ()
 	{
@@ -78,12 +84,6 @@ public:
 	GetAttributeSet ()
 	{
 		return m_pAttributeSet;
-	}
-
-	const tchar_t*
-	GetItemKindString ()
-	{
-		return GetModuleItemKindString (m_ItemKind);
 	}
 };
 
