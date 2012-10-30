@@ -33,9 +33,6 @@ GetUnOpString (EUnOp OpKind)
 	case EUnOp_Dec:
 		return _T("--");
 
-	case EUnOp_Cast:
-		return _T("cast-operator");
-
 	default:
 		return _T("undefined-unary-operator");
 	};

@@ -22,7 +22,6 @@ enum EUnOp
 	EUnOp_LogicalNot,
 	EUnOp_Inc,
 	EUnOp_Dec,
-	EUnOp_Cast,
 	EUnOp__Count,
 };
 

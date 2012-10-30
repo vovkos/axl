@@ -275,9 +275,9 @@ local
 {
 	CValue $OpValue2;
 }
-	: unary_expr <$pValue> 
+	: assignment_expr <$pValue> 
 	  (
-		multiplicative_operator $o unary_expr <&$OpValue2>
+		multiplicative_operator $o assignment_expr <&$OpValue2>
 			{
 				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
 			}
@@ -303,75 +303,18 @@ multiplicative_operator
 		}
 	;
 
-unary_expr <CValue* $pValue>
+assignment_expr <CValue* $pValue>
 local
 {
 	CValue $RValue;
 }
-	: unary_operator* postfix_expr <$pValue> 
+	: unary_expr <$pValue> 
 	  (
 		assignment_operator $o conditional_expr <&$RValue>
 			{
 				return m_pModule->m_OperatorMgr.MoveOperator ($RValue, *$pValue, $o.m_OpKind);
 			}
 	  )?
-	;
-
-class
-{
-	EUnOp m_OpKind;
-	CType* m_pCastType;
-}
-unary_operator
-	: '&'
-		{
-			$.m_OpKind = EUnOp_Addr;
-		}
-	| '*'
-		{
-			$.m_OpKind = EUnOp_Indir;
-		}
-	| '+'
-		{
-			$.m_OpKind = EUnOp_None;
-		}
-	| '-'
-		{
-			$.m_OpKind = EUnOp_Minus;
-		}
-	| '~'
-		{
-			$.m_OpKind = EUnOp_BitwiseNot;
-		}
-	| '!'
-		{
-			$.m_OpKind = EUnOp_LogicalNot;
-		}
-	| EToken_Inc
-		{
-			$.m_OpKind = EUnOp_Inc;
-		}
-	| EToken_Dec
-		{
-			$.m_OpKind = EUnOp_Dec;
-		}
-	| resolver (cast_operator_rslv)
-	  '(' type_name $t ')'
-		{
-			$.m_OpKind = EUnOp_Cast;
-			$.m_pCastType = $t.m_pType;
-		}
-	;
-
-// since '(' at 'unary_operator' is a conflict against epsilon production we need a resolver
-// otherwise epsilon production always loses
-
-cast_operator_rslv
-local
-{
-	CTypeSpecifierModifiers $TypeSpecifier;
-}
-	: '(' type_specifier_modifier <&$TypeSpecifier>
 	;
 
 class
@@ -423,6 +366,55 @@ assignment_operator
 		{
 			$.m_OpKind = EBinOp_BitwiseOr;
 		}
+	;
+
+unary_expr <CValue* $pValue>
+	: postfix_expr <$pValue> 
+	| '&' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, $pValue);
+		}
+	| '*' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, $pValue);
+		}
+	| '+' unary_expr <$pValue> 
+	| '-' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Minus, $pValue);
+		}
+	| '~' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_BitwiseNot, $pValue);
+		}
+	| '!' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_LogicalNot, $pValue);
+		}
+	| EToken_Inc unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Inc, $pValue);
+		}
+	| EToken_Dec unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Dec, $pValue);
+		}
+	| resolver (cast_operator_rslv) 
+	  '(' type_name $t ')' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.CastOperator ($pValue, $t.m_pType);
+		}
+	;
+
+// since '(' at 'unary_operator' is a conflict against epsilon production we need a resolver
+// otherwise epsilon production always loses
+
+cast_operator_rslv
+local
+{
+	CTypeSpecifierModifiers $TypeSpecifier;
+}
+	: '(' type_specifier_modifier <&$TypeSpecifier>
 	;
 
 postfix_expr <CValue* $pValue>
