@@ -40,7 +40,8 @@ public:
 
 enum ELaDfaStateFlag
 {
-	ELaDfaStateFlag_IgnoreAnyToken = 1,
+	ELaDfaStateFlag_TokenMatch        = 1,
+	ELaDfaStateFlag_EpsilonProduction = 2, 
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -68,6 +69,12 @@ public:
 	IsResolved ()
 	{
 		return (m_pDfaNode->m_Flags & ELaDfaNodeFlag_IsResolved) != 0;
+	}
+
+	bool
+	IsAnyTokenIgnored ()
+	{
+		return (m_Flags & ELaDfaStateFlag_TokenMatch) || (m_Flags & ELaDfaStateFlag_EpsilonProduction);
 	}
 
 	bool

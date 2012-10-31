@@ -82,7 +82,7 @@ CLaDfaState::GetResolvedProduction ()
 	CLaDfaThread* pCompleteThread = *m_CompleteThreadList.GetHead ();
 	CLaDfaThread* pEpsilonThread = *m_EpsilonThreadList.GetHead ();
 
-	if (m_Flags & ELaDfaStateFlag_IgnoreAnyToken)
+	if (IsAnyTokenIgnored ())
 		return 
 			pActiveThread && pActiveThread->m_Match != ELaDfaThreadMatch_AnyToken ? pActiveThread->m_pProduction :
 			pCompleteThread && pCompleteThread->m_Match != ELaDfaThreadMatch_AnyToken ? pCompleteThread->m_pProduction :
@@ -147,7 +147,7 @@ CLaDfaBuilder::Build (
 		if (pProduction->m_Kind != ENode_Epsilon)
 			pThread->m_Stack.Append (pProduction);
 		else
-			pState0->m_Flags |= ELaDfaStateFlag_IgnoreAnyToken;
+			pState0->m_Flags |= ELaDfaStateFlag_EpsilonProduction;
 	}
 
 	CLaDfaState* pState1 = Transition (pState0, pConflict->m_pToken);
@@ -370,7 +370,7 @@ CLaDfaBuilder::Transition (
 	CLaDfaState* pNewState = CreateState ();
 	pNewState->m_pToken = pToken;
 	pNewState->m_pFromState = pState;
-	pNewState->m_Flags = pState->m_Flags;
+	pNewState->m_Flags = pState->m_Flags & ELaDfaStateFlag_EpsilonProduction; // propagate epsilon
 
 	rtl::CIteratorT <CLaDfaThread> Thread = pState->m_ActiveThreadList.GetHead ();
 	for (; Thread; Thread++)
@@ -384,7 +384,7 @@ CLaDfaBuilder::Transition (
 	{
 		CLaDfaThread* pThread = *Thread++;
 
-		if (pThread->m_Match == ELaDfaThreadMatch_AnyToken && (pNewState->m_Flags & ELaDfaStateFlag_IgnoreAnyToken)) 
+		if (pThread->m_Match == ELaDfaThreadMatch_AnyToken && pNewState->IsAnyTokenIgnored ()) 
 		{
 			pNewState->m_ActiveThreadList.Delete (pThread); // delete anytoken thread in favor of concrete token
 		}
@@ -442,7 +442,7 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 
 			ASSERT (pNode->m_MasterIndex);
 
-			if (pNode->m_Flags & ESymbolNodeFlag_IsAnyToken)
+			if ((pNode->m_Flags & ESymbolNodeFlag_IsAnyToken) && pToken->m_MasterIndex != 0) // EOF does not match ANY
 			{
 				pThread->m_Stack.Pop ();
 				pThread->m_Match = ELaDfaThreadMatch_AnyToken;
@@ -457,7 +457,7 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 
 			pThread->m_Stack.Pop ();
 			pThread->m_Match = ELaDfaThreadMatch_Token;
-			pThread->m_pState->m_Flags |= ELaDfaStateFlag_IgnoreAnyToken;
+			pThread->m_pState->m_Flags |= ELaDfaStateFlag_TokenMatch;
 			break;
 
 		case ENode_Symbol:
@@ -487,7 +487,7 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 			if (pProduction->m_Kind != ENode_Epsilon)
 				pThread->m_Stack.Append (pProduction);
 			else
-				pThread->m_pState->m_Flags |= ELaDfaStateFlag_IgnoreAnyToken;			
+				pThread->m_pState->m_Flags |= ELaDfaStateFlag_EpsilonProduction;
 
 			break;
 

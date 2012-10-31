@@ -1,66 +1,16 @@
 //.............................................................................
 
-LL (3);
+LL (2);
 
-global
-	: declaration*
+start
+array_suffix
+	: '[' any+ ']'
+	| '[' ']'
 	;
 
-declaration
-	: type_specifier_modifier+ EToken_Identifier ';'
-		{
-			printf ("declare %s\n", $2.m_Data.m_String);
-		}
+start
+test
+	: EToken_Integer
 	;
 
-type_specifier_modifier
-	: EToken_CHAR
-	| resolver (type_identifier_rslv) qualified_identifier
-	;
-
-qualified_identifier
-	: EToken_Identifier ('.' EToken_Identifier)*
-	;
-
-type_identifier_rslv
-	: qualified_identifier
-		{
-			printf ("type_qual_identifier_rslv");
-			return false;
-		}
-	;
-	
 //.............................................................................
-
-
-/*
-
-global
-	: resolver (EToken_Identifier $a { return $a.m_Data.m_String == "hui"; }) EToken_Identifier $b
-		{ 
-			printf ("A %s\n", $b.m_Data.m_String); 
-		}
-
-	| resolver (EToken_Identifier $a { return $a.m_Data.m_String == "govno"; }) EToken_Identifier $b
-		{ 
-			printf ("B %s\n", $b.m_Data.m_String); 
-		}
-
-	| EToken_Identifier $a '+'
-		{ 
-			printf ("C+ %s\n", $a.m_Data.m_String); 
-		}
-
-	| EToken_Identifier $a '-'
-		{ 
-			printf ("C- %s\n", $a.m_Data.m_String); 
-		}
-
-	| EToken_Identifier $a
-		{ 
-			printf ("C %s\n", $a.m_Data.m_String); 
-		}
-
-	;
-
-*/

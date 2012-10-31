@@ -15,6 +15,7 @@
 enum ESymbol
 {
 	ESymbol_array_suffix = 0, 
+	ESymbol_test = 1, 
 	
 };
 
@@ -26,40 +27,39 @@ public:
 	enum
 	{
 		Lookahead          = 2,
-		PragmaNestingLimit = 1,
 
 		StartSymbol        = 0,
 		StartPragmaSymbol  = -1,
 		EofToken           = 0,
 		AnyToken           = 1,
 
-		TokenCount         = 4,
-		SymbolCount        = 2,
+		TokenCount         = 5,
+		SymbolCount        = 3,
 		SequenceCount      = 3,
 		ActionCount        = 0,
 		ArgumentCount      = 0,
 		BeaconCount        = 0,
 		LaDfaCount         = 2,
 
-		TotalCount         = 11,
+		TotalCount         = 13,
 
-		NamedSymbolCount   = 1,
+		NamedSymbolCount   = 2,
 
 		TokenFirst         = 0,
-		TokenEnd           = 4,
-		SymbolFirst        = 4,
-		NamedSymbolEnd     = 5,
-		SymbolEnd          = 6,
-		SequenceFirst      = 6,
-		SequenceEnd        = 9,
-		ActionFirst        = 9,
-		ActionEnd          = 9,
-		ArgumentFirst      = 9,
-		ArgumentEnd        = 9,
-		BeaconFirst        = 9,
-		BeaconEnd          = 9,
-		LaDfaFirst         = 9,
-		LaDfaEnd           = 11,
+		TokenEnd           = 5,
+		SymbolFirst        = 5,
+		NamedSymbolEnd     = 7,
+		SymbolEnd          = 8,
+		SequenceFirst      = 8,
+		SequenceEnd        = 11,
+		ActionFirst        = 11,
+		ActionEnd          = 11,
+		ArgumentFirst      = 11,
+		ArgumentEnd        = 11,
+		BeaconFirst        = 11,
+		BeaconEnd          = 11,
+		LaDfaFirst         = 11,
+		LaDfaEnd           = 13,
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -68,6 +68,7 @@ public:
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+	
 	
 	
 
@@ -84,8 +85,9 @@ public:
 		static
 		size_t _ParseTable [] = 
 		{
-			-1, -1, 9, -1, 
-			-1, 6, 6, 0, 
+			-1, -1, 11, -1, -1, 
+			-1, -1, -1, -1, 4, 
+			-1, 8, 8, 0, 8, 
 			
 			-1
 		};
@@ -100,8 +102,8 @@ public:
 		static
 		size_t _SequenceTable [] = 
 		{
-			5, 1,  -1,
-			3, 5, 1, 2,  -1,
+			7, 1,  -1,
+			3, 7, 1, 2,  -1,
 			3, 2,  -1,
 			
 			-1
@@ -134,6 +136,9 @@ public:
 		case ']':
 			return 3;
 		
+		case EToken_Integer:
+			return 4;
+		
 		default:
 			return AnyToken;
 		}
@@ -150,6 +155,7 @@ public:
 			0,  // any token
 			'[', 
 			']', 
+			EToken_Integer, 
 			
 			0
 		};
@@ -166,6 +172,7 @@ public:
 		const tchar_t* _SymbolNameTable [NamedSymbolCount] = 
 		{
 			_T("array_suffix"),
+			_T("test"),
 			
 		};
 
@@ -183,13 +190,14 @@ public:
 		{
 		
 		
+		
 		default:
 			pNode = CreateStdSymbolNode (Index);
-			pNode->m_pAst = AXL_MEM_NEW (CAst);
+			pNode->m_pAstNode = AXL_MEM_NEW (CAstNode);
 		};
 
-		if (pNode->m_pAst)
-			pNode->m_pAst->m_Kind = (int) Index;
+		if (pNode->m_pAstNode)
+			pNode->m_pAstNode->m_Kind = (int) Index;
 
 		return pNode;
 	}
@@ -242,6 +250,7 @@ public:
 		{
 		
 		
+		
 		default:
 			return true;
 		}
@@ -252,6 +261,7 @@ public:
 	{
 		switch (Index)
 		{
+		
 		
 		
 		default:
@@ -276,7 +286,7 @@ public:
 			
 			case '[':
 					
-				pTransition->m_ProductionIndex = 10;
+				pTransition->m_ProductionIndex = 12;
 				return ELaDfaResult_Production;
 					
 			
@@ -294,19 +304,25 @@ public:
 			
 			case '\01':
 					
-				pTransition->m_ProductionIndex = 7;
+				pTransition->m_ProductionIndex = 9;
 				return ELaDfaResult_Production;
 					
 			
 			case '[':
 					
-				pTransition->m_ProductionIndex = 7;
+				pTransition->m_ProductionIndex = 9;
 				return ELaDfaResult_Production;
 					
 			
 			case ']':
 					
-				pTransition->m_ProductionIndex = 8;
+				pTransition->m_ProductionIndex = 10;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Integer:
+					
+				pTransition->m_ProductionIndex = 9;
 				return ELaDfaResult_Production;
 					
 			

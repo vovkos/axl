@@ -2234,10 +2234,10 @@ public:
 			-1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 309, 0, 0, 309, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 			-1, -1, 0, 0, 0, 0, 0, 0, 0, 311, 0, 311, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 			-1, -1, -1, -1, -1, 313, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, 316, 0, 316, 316, 0, 316, 316, 0, 316, 0, 316, 0, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 
-			-1, 317, 317, 317, 317, 317, 317, 317, 0, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 
-			-1, 319, 319, 319, 319, 319, 319, 319, 319, 319, 0, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 
-			-1, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 0, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 
+			-1, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 316, 
+			-1, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 
+			-1, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 319, 
+			-1, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 321, 
 			-1, -1, 0, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, 328, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 			-1, -1, 0, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 330, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 			-1, -1, 0, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 0, 332, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
@@ -2253,7 +2253,7 @@ public:
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 384, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 			-1, -1, 0, 387, 0, 0, 0, 0, 0, 387, 0, 387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 387, 387, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 			-1, -1, -1, -1, -1, 396, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, 413, 413, 413, 413, 413, 413, 413, 0, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 
+			-1, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 413, 
 			-1, -1, 417, -1, -1, -1, -1, 417, 0, 417, -1, 417, -1, -1, -1, -1, -1, 417, 417, 417, 417, -1, -1, -1, 417, 417, -1, 417, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, -1, 417, -1, -1, 417, 417, 417, 417, 417, 417, -1, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, -1, -1, 417, 417, 417, 417, -1, 417, 417, -1, -1, 
 			-1, -1, 0, -1, -1, -1, -1, 0, 0, 0, -1, 0, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, 0, 0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 420, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0, -1, -1, 
 			-1, -1, 422, -1, -1, -1, -1, 422, 0, -1, -1, 422, -1, -1, -1, -1, -1, 422, 422, 422, 422, -1, -1, -1, 422, 422, -1, 422, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 422, 422, 422, 422, 422, 422, 422, 422, 422, 422, 422, -1, 422, 422, 422, 422, 422, 422, 422, 422, 422, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
@@ -8878,7 +8878,49 @@ public:
 			switch (LookaheadToken)
 			{
 			
+			case '\01':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case ';':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '.':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '<':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case ',':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '>':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
 			case '{':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '}':
 					
 				pTransition->m_ProductionIndex = 508;
 				return ELaDfaResult_Production;
@@ -8897,6 +8939,582 @@ public:
 					
 			
 			case '(':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case ')':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '?':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case ':':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '|':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '^':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '&':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '+':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '-':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '*':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '/':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '%':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '=':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '~':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '!':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case '#':
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Identifier:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_LogicalOr:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_LogicalAnd:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Eq:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Ne:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Le:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Ge:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Shl:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Shr:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_AddAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_SubAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_MulAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_DivAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_ModAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_ShlAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_ShrAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_AndAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_XorAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_OrAssign:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Inc:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Dec:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Integer:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Fp:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Literal:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_True:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_False:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Null:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_SizeOf:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_TypeOf:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_If:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Else:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Switch:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Case:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Default:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_While:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Do:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_For:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Break:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Continue:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Return:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Namespace:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Using:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Public:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Private:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Static:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Typedef:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Const:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Volatile:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Signed:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Unsigned:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_LittleEndian:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_BigEndian:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Safe:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Unsafe:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Property:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Void:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Bool:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Int:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Char:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Short:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Long:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Float:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Double:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Int8:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Int16:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Int32:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Int64:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_WChar:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Variant:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Auto:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Ellipsis:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Endian:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Enum:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_EnumC:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Struct:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Union:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Pack:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Interface:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Class:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Get:
+					
+				pTransition->m_ProductionIndex = 508;
+				return ELaDfaResult_Production;
+					
+			
+			case EToken_Set:
 					
 				pTransition->m_ProductionIndex = 508;
 				return ELaDfaResult_Production;

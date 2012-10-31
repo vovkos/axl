@@ -115,7 +115,7 @@
     <None Include="expr.txt" />
     <CustomBuild Include="TestParser.llk">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\gellp %(FullPath) /F..\axl_pg_frames /oTestParser.h /faxl_llk_ParserFrame.h.luaf</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\till %(FullPath) /F..\axl_pg_frames /oTestParser.h /faxl_llk_ParserFrame.h.luaf</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
     </CustomBuild>
