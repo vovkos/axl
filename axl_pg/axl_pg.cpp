@@ -12,8 +12,8 @@ void
 PrintUsage ()
 {
 	printf (
-		"gellp -- generator of LL (k) parsers\n"
-		"usage: gellp <grammar_file> [options]\n"
+		"till -- tibbo LL (k) parser generator\n"
+		"usage: till <grammar_file> [options]\n"
 		"    -?, -h, -H        print this usage and exit\n"
 		"    -o <output_file>  generate <output_file> (multiple allowed)\n"
 		"    -O <output_dir>   set output directory to <output_dir>\n"

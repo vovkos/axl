@@ -7,7 +7,7 @@ class
 enum_specifier
 	leave
 	{
-		if ($.m_pType->GetTypeKind () == EType_EnumC ||
+		if ($.m_pType->GetTypeKind () == EType_Enum_c ||
 			$.m_pType->GetName ().IsEmpty ())
 		{
 			return m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumMembers ($.m_pType);
@@ -38,7 +38,7 @@ enum_kind
 		}
 	| EToken_EnumC
 		{
-			$.m_TypeKind = EType_EnumC;
+			$.m_TypeKind = EType_Enum_c;
 		}
 	;
 

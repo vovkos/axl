@@ -48,7 +48,7 @@ CFunctionMgr::CreateFunction (
 		{
 			CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
 			pArg->m_Name.Format (_T("a%d"), i + 1);
-			pArg->m_pType = pType->GetArg (i);
+			pArg->m_pType = pType->GetArgType (i);
 			pFunction->m_ArgList.InsertTail (pArg);
 		}
 	}

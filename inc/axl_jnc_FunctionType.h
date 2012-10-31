@@ -54,7 +54,7 @@ public:
 	}
 
 	CType* 
-	GetArg (size_t Index)
+	GetArgType (size_t Index)
 	{
 		ASSERT (Index < m_ArgTypeArray.GetCount ());
 		return m_ArgTypeArray [Index];

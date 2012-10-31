@@ -24,28 +24,31 @@ enum EToken
 	EToken_Endian,
 	EToken_Typedef,
 	EToken_Static,
-	EToken_Const,
 	EToken_Public,
 	EToken_Private,
-	EToken_Void,
-	EToken_Bool,
-	EToken_Int,
-	EToken_Char,
-	EToken_Short,
-	EToken_Long,
+	EToken_Const,
+	EToken_Volatile,
 	EToken_Signed,
 	EToken_Unsigned,
-	EToken_BigEndian,
 	EToken_LittleEndian,
-	EToken_Float,
-	EToken_Double,
-	EToken_WChar,
+	EToken_BigEndian,
+	EToken_Safe,
+	EToken_Unsafe,
+	EToken_Auto,
+	EToken_Void,
+	EToken_Variant,
+	EToken_Bool,
 	EToken_Int8,
 	EToken_Int16,
 	EToken_Int32,
 	EToken_Int64,
-	EToken_Variant,
-	EToken_Auto,
+	EToken_Float,
+	EToken_Double,
+	EToken_Int,
+	EToken_Char,
+	EToken_Short,
+	EToken_Long,
+	EToken_WChar,
 	EToken_Enum,
 	EToken_EnumC,
 	EToken_Struct,
@@ -110,28 +113,31 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Endian,       "endian")
 	AXL_PRS_TOKEN_NAME (EToken_Typedef,      "typedef")
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
-	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
 	AXL_PRS_TOKEN_NAME (EToken_Public,       "public")
 	AXL_PRS_TOKEN_NAME (EToken_Private,      "private")
+	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
+	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
+	AXL_PRS_TOKEN_NAME (EToken_Signed,       "signed")
+	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
+	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
+	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
+	AXL_PRS_TOKEN_NAME (EToken_Safe,          "safe")
+	AXL_PRS_TOKEN_NAME (EToken_Unsafe,        "unsafe")
+	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")
+	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")
 	AXL_PRS_TOKEN_NAME (EToken_Bool,         "bool")
+	AXL_PRS_TOKEN_NAME (EToken_Int8,         "int8")
+	AXL_PRS_TOKEN_NAME (EToken_Int16,        "int16")
+	AXL_PRS_TOKEN_NAME (EToken_Int32,        "int32")
+	AXL_PRS_TOKEN_NAME (EToken_Int64,        "int64")
+	AXL_PRS_TOKEN_NAME (EToken_Float,        "float")
+	AXL_PRS_TOKEN_NAME (EToken_Double,       "double")
 	AXL_PRS_TOKEN_NAME (EToken_Int,          "int")
 	AXL_PRS_TOKEN_NAME (EToken_Char,         "char")
 	AXL_PRS_TOKEN_NAME (EToken_Short,        "short")
 	AXL_PRS_TOKEN_NAME (EToken_Long,         "long")
-	AXL_PRS_TOKEN_NAME (EToken_Signed,       "signed")
-	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
-	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
-	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
-	AXL_PRS_TOKEN_NAME (EToken_Float,        "float")
-	AXL_PRS_TOKEN_NAME (EToken_Double,       "double")
 	AXL_PRS_TOKEN_NAME (EToken_WChar,        "wchar_t")
-	AXL_PRS_TOKEN_NAME (EToken_Int8,         "__int8")
-	AXL_PRS_TOKEN_NAME (EToken_Int16,        "__int16")
-	AXL_PRS_TOKEN_NAME (EToken_Int32,        "__int32")
-	AXL_PRS_TOKEN_NAME (EToken_Int64,        "__int64")
-	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")
-	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Enum,         "enum")
 	AXL_PRS_TOKEN_NAME (EToken_EnumC,        "enumc")
 	AXL_PRS_TOKEN_NAME (EToken_Struct,       "struct")

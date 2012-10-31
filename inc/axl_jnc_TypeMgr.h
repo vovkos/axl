@@ -93,13 +93,10 @@ public:
 	}
 
 	CDerivedType* 
-	GetConstType (CType* pBaseType);
-
-	CDerivedType* 
-	GetPointerType (CType* pBaseType);
-
-	CDerivedType* 
-	GetReferenceType (CType* pBaseType);
+	GetDerivedType (
+		CType* pBaseType,
+		EType TypeKind
+		);
 
 	CArrayType* 
 	GetArrayType (

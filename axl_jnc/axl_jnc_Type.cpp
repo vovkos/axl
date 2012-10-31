@@ -82,8 +82,8 @@ GetTypeModifierString (ETypeModifier Modifier)
 	case ETypeModifier_Const:
 		return _T("const");
 
-	case ETypeModifier_Property:
-		return _T("property");
+	case ETypeModifier_Volatile:
+		return _T("volatile");
 
 	case ETypeModifier_Signed:
 		return _T("signed");
@@ -91,17 +91,26 @@ GetTypeModifierString (ETypeModifier Modifier)
 	case ETypeModifier_Unsigned:
 		return _T("unsigned");
 
+	case ETypeModifier_LittleEndian:
+		return _T("littleendian");
+
 	case ETypeModifier_BigEndian:
 		return _T("bigendian");
 
-	case ETypeModifier_LittleEndian:
-		return _T("littleendian");
+	case ETypeModifier_Safe:
+		return _T("safe");
+
+	case ETypeModifier_Unsafe:
+		return _T("unsafe");
 
 	case ETypeModifier_Reference:
 		return _T("reference");
 
 	case ETypeModifier_Pointer:
 		return _T("pointer");
+
+	case ETypeModifier_Property:
+		return _T("property");
 
 	case ETypeModifier_RemoveConst:
 		return _T("remove-const");
@@ -197,7 +206,12 @@ CType::GetLlvmType ()
 	case EType_Reference:
 		pLlvmType = m_pModule->m_TypeMgr.GetLlvmFatPointerType ();
 		break;
-	
+
+	case EType_Pointer_c:
+	case EType_Reference_c:
+		pLlvmType = llvm::PointerType::get (((CDerivedType*) this)->GetBaseType ()->GetLlvmType (), 0);
+		break;
+
 	case EType_Array:
 		return ((CArrayType*) this)->GetLlvmType ();
 	
@@ -212,7 +226,7 @@ CType::GetLlvmType ()
 		break;
 	
 	case EType_Enum:
-	case EType_EnumC:
+	case EType_Enum_c:
 		pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
 		break;
 	
@@ -279,12 +293,24 @@ CType::GetTypeString ()
 		m_TypeString.Format (_T("const %s"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
 		break;
 
+	case EType_Volatile:
+		m_TypeString.Format (_T("volatile %s"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
+		break;
+
 	case EType_Pointer:
-		m_TypeString.Format (_T("%s*"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
+		m_TypeString.Format (_T("%s* safe"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
+		break;
+
+	case EType_Pointer_c:
+		m_TypeString.Format (_T("%s* unsafe"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
 		break;
 
 	case EType_Reference:
-		m_TypeString.Format (_T("%s&"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
+		m_TypeString.Format (_T("%s& safe"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
+		break;
+
+	case EType_Reference_c:
+		m_TypeString.Format (_T("%s& unsafe"), ((CDerivedType*) this)->GetBaseType ()->GetTypeString ());
 		break;
 
 	case EType_Array:
@@ -304,7 +330,7 @@ CType::GetTypeString ()
 		m_TypeString.Format (_T("enum %s"), ((CNamedType*) this)->GetQualifiedName ());
 		break;
 
-	case EType_EnumC:
+	case EType_Enum_c:
 		m_TypeString.Format (_T("enumc %s"), ((CNamedType*) this)->GetQualifiedName ());
 		break;
 
@@ -382,21 +408,9 @@ CType::IsReferenceType ()
 }
 
 CDerivedType* 
-CType::GetConstType ()
+CType::GetDerivedType (EType TypeKind)
 {
-	return m_pModule->m_TypeMgr.GetConstType (this);
-}
-
-CDerivedType* 
-CType::GetPointerType ()
-{
-	return m_pModule->m_TypeMgr.GetPointerType (this);
-}
-
-CDerivedType* 
-CType::GetReferenceType ()
-{
-	return m_pModule->m_TypeMgr.GetReferenceType (this);
+	return m_pModule->m_TypeMgr.GetDerivedType (this, TypeKind);
 }
 
 CArrayType* 
@@ -408,19 +422,22 @@ CType::GetArrayType (size_t ElementCount)
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 static
+inline
 bool
-CheckIntegerModifier (
-	CType* pType,
+VerifyModifier (
+	bool TypeKindCheck,
+	const tchar_t* pTypeKindString,
 	int Modifiers,
 	ETypeModifier Modifier,
 	ETypeModifier AntiModifier
 	)
 {
-	if (!pType->IsIntegerType ())
+	if (!TypeKindCheck)
 	{
 		err::SetFormatStringError (
-			_T("type modifier '%s' can only be applied to integer type"),
-			GetTypeModifierString (Modifier)
+			_T("type modifier '%s' can only be applied to %s type"),
+			GetTypeModifierString (Modifier),
+			pTypeKindString
 			);
 		return false;
 	}
@@ -436,6 +453,52 @@ CheckIntegerModifier (
 	}
 
 	return true;
+}
+
+static
+inline
+bool
+VerifyIntegerModifier (
+	CType* pType,
+	int Modifiers,
+	ETypeModifier Modifier,
+	ETypeModifier AntiModifier
+	)
+{
+	return VerifyModifier (pType->IsIntegerType (), _T("integer"), Modifiers, Modifier, AntiModifier);
+}
+
+static
+inline
+bool
+VerifyPointerModifier (
+	CType* pType,
+	int Modifiers,
+	ETypeModifier Modifier,
+	ETypeModifier AntiModifier
+	)
+{
+	return VerifyModifier (pType->IsPointerType (), _T("pointer"), Modifiers, Modifier, AntiModifier);
+}
+
+static
+inline
+EType
+GetFatTypeKind (EType TypeKind)
+{
+	return 
+		TypeKind == EType_Pointer_c ? EType_Pointer :
+		TypeKind == EType_Reference_c ? EType_Reference : TypeKind;
+}
+
+static
+inline
+EType
+GetThinTypeKind (EType TypeKind)
+{
+	return 
+		TypeKind == EType_Pointer ? EType_Pointer_c :
+		TypeKind == EType_Reference ? EType_Reference_c : TypeKind;
 }
 
 static
@@ -498,35 +561,6 @@ GetUnsignedTypeKind (EType TypeKind)
 
 static
 EType
-GetBigEndianTypeKind (EType TypeKind)
-{
-	static EType ResultTypeTable [] = 
-	{
-		EType_Void,           // EType_Void
-		EType_Variant,        // EType_Variant
-		EType_Bool,           // EType_Bool
-		EType_Int8,           // EType_Int8,           
-		EType_Int8_u,         // EType_Int8_u,         
-		EType_Int16_be,       // EType_Int16,          
-		EType_Int16_beu,      // EType_Int16_u,        
-		EType_Int32_be,       // EType_Int32,          
-		EType_Int32_beu,      // EType_Int32_u,        
-		EType_Int64_be,       // EType_Int64,          
-		EType_Int64_beu,      // EType_Int64_u,        
-		EType_Int16_be,       // EType_Int16_be,       
-		EType_Int16_beu,      // EType_Int16_beu,      
-		EType_Int32_be,       // EType_Int32_be,       
-		EType_Int32_beu,      // EType_Int32_beu,      
-		EType_Int64_be,       // EType_Int64_be,       
-		EType_Int64_beu,      // EType_Int64_beu,      
-	};
-
-	ASSERT (TypeKind <= EType_Int64_beu);
-	return ResultTypeTable [TypeKind];
-}
-
-static
-EType
 GetLittleEndianTypeKind (EType TypeKind)
 {
 	static EType ResultTypeTable [] = 
@@ -554,96 +588,148 @@ GetLittleEndianTypeKind (EType TypeKind)
 	return ResultTypeTable [TypeKind];
 }
 
+static
+EType
+GetBigEndianTypeKind (EType TypeKind)
+{
+	static EType ResultTypeTable [] = 
+	{
+		EType_Void,           // EType_Void
+		EType_Variant,        // EType_Variant
+		EType_Bool,           // EType_Bool
+		EType_Int8,           // EType_Int8,           
+		EType_Int8_u,         // EType_Int8_u,         
+		EType_Int16_be,       // EType_Int16,          
+		EType_Int16_beu,      // EType_Int16_u,        
+		EType_Int32_be,       // EType_Int32,          
+		EType_Int32_beu,      // EType_Int32_u,        
+		EType_Int64_be,       // EType_Int64,          
+		EType_Int64_beu,      // EType_Int64_u,        
+		EType_Int16_be,       // EType_Int16_be,       
+		EType_Int16_beu,      // EType_Int16_beu,      
+		EType_Int32_be,       // EType_Int32_be,       
+		EType_Int32_beu,      // EType_Int32_beu,      
+		EType_Int64_be,       // EType_Int64_be,       
+		EType_Int64_beu,      // EType_Int64_beu,      
+	};
+
+	ASSERT (TypeKind <= EType_Int64_beu);
+	return ResultTypeTable [TypeKind];
+}
+
 CType* 
-CType::ModifyType (int Modifiers)
+CType::GetModifiedType (int Modifiers)
 {
 	CType* pType = this;
 
-	for (;;)
+	if (Modifiers & ETypeModifier_Signed)
 	{
-		CType* pOldType = pType;
+		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
+			return NULL;
 
-		if (Modifiers & ETypeModifier_Signed)
-		{
-			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
-				return NULL;
+		EType ModTypeKind = GetSignedTypeKind (pType->m_TypeKind);
+		pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+	}
 
-			EType ModTypeKind = GetSignedTypeKind (pType->m_TypeKind);
-			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
-		}
+	if (Modifiers & ETypeModifier_Unsigned)
+	{
+		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
+			return NULL;
 
-		if (Modifiers & ETypeModifier_Unsigned)
-		{
-			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
-				return NULL;
+		EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
+		pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+	}
 
-			EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
-			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
-		}
+	if (Modifiers & ETypeModifier_LittleEndian)
+	{
+		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
+			return NULL;
 
-		if (Modifiers & ETypeModifier_BigEndian)
-		{
-			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
-				return NULL;
+		EType ModTypeKind = GetLittleEndianTypeKind (pType->m_TypeKind);
+		pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+	}
 
-			EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
-			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
-		}
+	if (Modifiers & ETypeModifier_BigEndian)
+	{
+		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
+			return NULL;
 
-		if (Modifiers & ETypeModifier_LittleEndian)
-		{
-			if (!CheckIntegerModifier (pType, Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
-				return NULL;
+		EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
+		pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+	}
 
-			EType ModTypeKind = GetLittleEndianTypeKind (pType->m_TypeKind);
-			pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
-		}
+	if (Modifiers & ETypeModifier_Pointer)
+	{
+		pType = m_pModule->m_TypeMgr.GetDerivedType (pType, EType_Pointer);
+	}
 
-		if (Modifiers & ETypeModifier_RemoveConst)
-		{
-			if (pType->m_TypeKind == EType_Const)
-				pType = ((CDerivedType*) pType)->GetBaseType ();
-		}
+	if (Modifiers & ETypeModifier_Reference)
+	{
+		pType = m_pModule->m_TypeMgr.GetDerivedType (pType, EType_Reference);
+		if (!pType)
+			return NULL;
+	}
 
-		if (Modifiers & ETypeModifier_RemoveReference)
-		{
-			if (pType->m_TypeKind == EType_Reference)
-				pType = ((CDerivedType*) pType)->GetBaseType ();
-		}
+	if (Modifiers & ETypeModifier_Safe)
+	{
+		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe))
+			return NULL;
 
-		if (Modifiers & ETypeModifier_RemovePointer)
-		{
-			if (pType->m_TypeKind == EType_Pointer)
-				pType = ((CDerivedType*) pType)->GetBaseType ();
-		}
+		EType ModTypeKind = GetFatTypeKind (pType->m_TypeKind);
+		CDerivedType* pPointerType = (CDerivedType*) pType;
+		pType = m_pModule->m_TypeMgr.GetDerivedType (pPointerType->GetBaseType (), ModTypeKind);
+	}
 
-		if (Modifiers & ETypeModifier_Pointer)
-		{
-			pType = m_pModule->m_TypeMgr.GetPointerType (pType);
-		}
+	if (Modifiers & ETypeModifier_Unsafe)
+	{
+		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Unsafe, ETypeModifier_Safe))
+			return NULL;
 
-		if (Modifiers & ETypeModifier_Reference)
-		{
-			pType = m_pModule->m_TypeMgr.GetReferenceType (pType);
-			if (!pType)
-				return NULL;
-		}
+		EType ModTypeKind = GetThinTypeKind (pType->m_TypeKind);
+		CDerivedType* pPointerType = (CDerivedType*) pType;
+		pType = m_pModule->m_TypeMgr.GetDerivedType (pPointerType->GetBaseType (), ModTypeKind);
+	}
 
-		if (Modifiers & ETypeModifier_Property)
-		{
-			CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
-			CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
-				m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetBasicType (EType_Void), &pType, 1, 0) : 
-				NULL;
-			pType = m_pModule->m_TypeMgr.GetPropertyType (pGetterType, pSetterType);
-		}
-		else if (Modifiers & ETypeModifier_Const)
-		{
-			pType = m_pModule->m_TypeMgr.GetConstType (pType);
-		}
+	if (Modifiers & ETypeModifier_RemoveConst)
+	{
+		if (pType->m_TypeKind == EType_Const)
+			pType = ((CDerivedType*) pType)->GetBaseType ();
+	}
 
-		if (!(Modifiers & ETypeModifier_Recursive) || pOldType == pType)
-			break;
+	if (Modifiers & ETypeModifier_RemoveVolatile)
+	{
+		if (pType->m_TypeKind == EType_Volatile)
+			pType = ((CDerivedType*) pType)->GetBaseType ();
+	}
+
+	if (Modifiers & ETypeModifier_RemoveReference)
+	{
+		if (pType->m_TypeKind == EType_Reference || pType->m_TypeKind == EType_Reference_c)
+			pType = ((CDerivedType*) pType)->GetBaseType ();
+	}
+
+	if (Modifiers & ETypeModifier_RemovePointer)
+	{
+		if (pType->m_TypeKind == EType_Pointer || pType->m_TypeKind == EType_Pointer_c)
+			pType = ((CDerivedType*) pType)->GetBaseType ();
+	}
+
+	if (Modifiers & ETypeModifier_Volatile)
+	{
+		pType = m_pModule->m_TypeMgr.GetDerivedType (pType, EType_Volatile);
+	}
+
+	if (Modifiers & ETypeModifier_Property)
+	{
+		CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
+		CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
+			m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetBasicType (EType_Void), &pType, 1, 0) : 
+			NULL;
+		pType = m_pModule->m_TypeMgr.GetPropertyType (pGetterType, pSetterType);
+	}
+	else if (Modifiers & ETypeModifier_Const)
+	{
+		pType = m_pModule->m_TypeMgr.GetDerivedType (pType, EType_Const);
 	}
 
 	return pType;

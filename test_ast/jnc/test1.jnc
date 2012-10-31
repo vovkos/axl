@@ -8,6 +8,8 @@ typedef bigendian int64 beint64_t;
 typedef bigendian unsigned int16 beuint16_t, beushort_t, beword_t;
 typedef bigendian unsigned int32 beuint32_t, beulong_t,  bedword_t;
 typedef bigendian unsigned int64 beuint64_t, beqword_t;
+typedef const char* unsafe pchar_t;
+typedef const char* pchar2_t;
 
 //.............................................................................
 
@@ -18,20 +20,26 @@ enum EColor
 	Blue  
 };
 
-void
-printf ();
-
-void
-MsgBox ();
-
 int
 main ()
 {	
-	printf ();
-	MsgBox ();
+//	char s [10];
+	char* unsafe p;
+
+	printf (p);	
+	MsgBox (100, 200);
 	int x = 10;
 	int y = 20;
 	return x + y;
 }
+
+void
+printf (char* unsafe pFormat);
+
+void
+MsgBox (
+	int a,
+	int b
+	);
 
 //.............................................................................

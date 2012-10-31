@@ -51,14 +51,17 @@ enum EType
 	// derived types
 
 	EType_Const,          // C
+	EType_Volatile,       // V
 	EType_Pointer,        // P
+	EType_Pointer_c,      // O
 	EType_Reference,      // R
+	EType_Reference_c,    // H
 	EType_Array,          // A
 	EType_BitField,       // B
 	EType_Function,       // F
 	EType_Event,          // V
 	EType_Enum,           // E
-	EType_EnumC,          // N
+	EType_Enum_c,          // N
 	EType_Struct,         // S
 	EType_Union,          // U
 	EType_Class,          // X
@@ -101,21 +104,23 @@ enum ETypeFlag
 enum ETypeModifier
 {
 	ETypeModifier_Const             = 0x00001,
-	ETypeModifier_Property          = 0x00002,
+	ETypeModifier_Volatile          = 0x00002,
 	ETypeModifier_Signed            = 0x00004,
 	ETypeModifier_Unsigned          = 0x00008,
 	ETypeModifier_BigEndian         = 0x00010,
 	ETypeModifier_LittleEndian      = 0x00020,
+	ETypeModifier_Safe              = 0x00040,
+	ETypeModifier_Unsafe            = 0x00080,	
 	ETypeModifier_Reference         = 0x00100,
 	ETypeModifier_Pointer           = 0x00200,	
-	ETypeModifier_RemoveConst       = 0x00400,
-	ETypeModifier_RemoveReference   = 0x00800,
-	ETypeModifier_RemovePointer     = 0x01000,
-	ETypeModifier_GetProperty       = 0x02000,
-	ETypeModifier_ArrayToPointer    = 0x04000,
-	ETypeModifier_EnumToInt         = 0x08000,
-
-	ETypeModifier_Recursive         = 0x10000, // keep modifying until type deosne
+	ETypeModifier_Property          = 0x00400,
+	ETypeModifier_RemoveConst       = 0x00800,
+	ETypeModifier_RemoveVolatile    = 0x01000,
+	ETypeModifier_RemoveReference   = 0x02000,
+	ETypeModifier_RemovePointer     = 0x04000,
+	ETypeModifier_GetProperty       = 0x08000,
+	ETypeModifier_ArrayToPointer    = 0x10000,
+	ETypeModifier_EnumToInt         = 0x20000,
 };
 
 const tchar_t*
@@ -198,7 +203,7 @@ public:
 	{
 		return m_TypeKind >= EType_Int8 && m_TypeKind <= EType_Int64_beu;
 	}
-
+	
 	bool 
 	IsSignedType ()
 	{
@@ -209,6 +214,12 @@ public:
 	IsNumericType ()
 	{
 		return m_TypeKind >= EType_Bool && m_TypeKind <= EType_Double;
+	}
+
+	bool 
+	IsPointerType ()
+	{
+		return m_TypeKind >= EType_Pointer && m_TypeKind <= EType_Reference_c;
 	}
 
 	bool 
@@ -227,19 +238,13 @@ public:
 	IsCharPointerType (CType* pType);
 
 	CDerivedType* 
-	GetConstType ();
-
-	CDerivedType* 
-	GetPointerType ();
-
-	CDerivedType* 
-	GetReferenceType ();
+	GetDerivedType (EType TypeKind);
 
 	CArrayType* 
 	GetArrayType (size_t ElementCount);
 
 	CType* 
-	ModifyType (int Modifiers);
+	GetModifiedType (int Modifiers);
 };
 
 //.............................................................................

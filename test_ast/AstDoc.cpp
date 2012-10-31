@@ -195,17 +195,20 @@ CAstDoc::Run ()
 }
 
 void
-StdLib_printf ()
+StdLib_printf (const char* pFormat)
 {
 	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf ()\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf (%s)\n"), pFormat);
 }
 
 void
-StdLib_MsgBox ()
+StdLib_MsgBox (
+	int a,
+	int b
+	)
 {
 	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("MsgBox ()\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("MsgBox (%d, %d)\n"), a, b);
 }
 
 jnc::CFunction* 

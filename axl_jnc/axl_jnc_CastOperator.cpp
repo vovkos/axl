@@ -166,8 +166,6 @@ CCast_int_ext::ConstCast (
 		memset (pDst, 0, DstSize);
 
 	memcpy (pDst, pSrc, SrcSize);
-
-	*(int16_t*) DstValue.GetConstData () = *(int8_t*) SrcValue.GetConstData ();
 	return true;
 }
 
@@ -203,8 +201,6 @@ CCast_int_ext_u::ConstCast (
 
 	memset (pDst, 0, DstSize);
 	memcpy (pDst, pSrc, SrcSize);
-
-	*(int16_t*) DstValue.GetConstData () = *(int8_t*) SrcValue.GetConstData ();
 	return true;
 }
 

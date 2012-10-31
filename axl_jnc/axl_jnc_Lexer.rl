@@ -63,32 +63,34 @@ main := |*
 
 'typedef'      { CreateToken (EToken_Typedef); };
 'static'       { CreateToken (EToken_Static); };
-'const'        { CreateToken (EToken_Const); };
+
 'public'       { CreateToken (EToken_Public); };
 'private'      { CreateToken (EToken_Private); };
 
-'void'         { CreateToken (EToken_Void); };
-'bool'         { CreateToken (EToken_Bool); };
-'int'          { CreateToken (EToken_Int); };
-'char'         { CreateToken (EToken_Char); };
-'short'        { CreateToken (EToken_Short); };
-'long'         { CreateToken (EToken_Long); };
+'const'        { CreateToken (EToken_Const); };
+'volatile'     { CreateToken (EToken_Volatile); };
 'signed'       { CreateToken (EToken_Signed); };
 'unsigned'     { CreateToken (EToken_Unsigned); };
-'bigendian'    { CreateToken (EToken_BigEndian); };
 'littleendian' { CreateToken (EToken_LittleEndian); };
-'float'        { CreateToken (EToken_Float); };
-'double'       { CreateToken (EToken_Double); };
+'bigendian'    { CreateToken (EToken_BigEndian); };
+'safe'         { CreateToken (EToken_Safe); };
+'unsafe'       { CreateToken (EToken_Unsafe); };
 
-'wchar_t'      { CreateToken (EToken_WChar); };
-
+'auto'         { CreateToken (EToken_Auto); };
+'void'         { CreateToken (EToken_Void); };
+'variant'      { CreateToken (EToken_Variant); };
+'bool'         { CreateToken (EToken_Bool); };
 'int8'         { CreateToken (EToken_Int8); };
 'int16'        { CreateToken (EToken_Int16); };
 'int32'        { CreateToken (EToken_Int32); };
 'int64'        { CreateToken (EToken_Int64); };
-
-'variant'      { CreateToken (EToken_Variant); };
-'auto'         { CreateToken (EToken_Auto); };
+'float'        { CreateToken (EToken_Float); };
+'double'       { CreateToken (EToken_Double); };
+'int'          { CreateToken (EToken_Int); };
+'char'         { CreateToken (EToken_Char); };
+'short'        { CreateToken (EToken_Short); };
+'long'         { CreateToken (EToken_Long); };
+'wchar_t'      { CreateToken (EToken_WChar); };
 
 'enum'         { CreateToken (EToken_Enum); };
 'enumc'        { CreateToken (EToken_EnumC); };

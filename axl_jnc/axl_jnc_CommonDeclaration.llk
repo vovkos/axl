@@ -170,9 +170,9 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Const);
 		}
-	| EToken_Property
+	| EToken_Volatile
 		{
-			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Volatile);
 		}
 	| EToken_Signed
 		{
@@ -182,13 +182,25 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsigned);
 		}
+	| EToken_LittleEndian
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_LittleEndian);
+		}
 	| EToken_BigEndian
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_BigEndian);
 		}
-	| EToken_LittleEndian
+	| EToken_Safe
 		{
-			return $pTypeModifiers->SetTypeModifier (ETypeModifier_LittleEndian);
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Safe);
+		}
+	| EToken_Unsafe
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsafe);
+		}
+	| EToken_Property
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
 		}
 	;
 

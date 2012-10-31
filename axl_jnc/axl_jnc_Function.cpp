@@ -68,10 +68,7 @@ CFunction::GetLlvmFunction ()
 //.............................................................................
 
 CFunction*
-CFunctionOverload::FindOverload (
-	CType** ppArgType,
-	size_t ArgCount
-	) const
+CFunctionOverload::FindOverload (rtl::CBoxListT <CValue>* pArgList) const
 {
 	// TODO: implement 
 

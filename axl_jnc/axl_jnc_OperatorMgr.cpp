@@ -521,7 +521,7 @@ COperatorMgr::CastOperator (
 	{
 		err::SetFormatStringError (
 			_T("cannot convert from '%s' to '%s'"),
-			OpValue.GetType (),
+			OpValue.GetType ()->GetTypeString (),
 			pType->GetTypeString ()
 			);
 		return false;
@@ -589,6 +589,8 @@ COperatorMgr::CallOperator (
 	CValue* pResultValue
 	)
 {
+	bool Result;
+
 	EValue ValueKind = OpValue.GetValueKind ();
 	if (ValueKind != EValue_GlobalFunction)
 	{
@@ -599,11 +601,41 @@ COperatorMgr::CallOperator (
 	CGlobalFunction* pGlobalFunction = OpValue.GetGlobalFunction ();
 
 	// TODO: find overload based on arg list
+
 	CFunction* pFunction = pGlobalFunction->GetFunction ();
+	CFunctionType* pFunctionType = pFunction->GetType ();
 	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
 	
-	// TODO: pass arguments
-	llvm::Instruction* pLlvmCall = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (pLlvmFunction);
+	size_t FormalArgCount = pFunctionType->GetArgCount ();
+	size_t ActualArgCount = pArgList->GetCount ();
+
+	if (FormalArgCount != ActualArgCount)
+	{
+		err::SetFormatStringError (_T("function '%s' takes %d arguments; %d passed"), pGlobalFunction->GetName (), FormalArgCount, ActualArgCount);
+		return false;
+	}
+
+	char LlvmArgBuffer [256];
+	rtl::CArrayT <llvm::Value*> LlvmArgArray (ref::EBuf_Stack, LlvmArgBuffer, sizeof (LlvmArgBuffer));
+	
+	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
+	for (size_t i = 0; Arg; Arg++, i++)
+	{
+		CType* pFormalArgType = pFunctionType->GetArgType (i);
+		CValue ArgCast;
+
+		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		if (!Result)
+			return false;
+
+		llvm::Value* pLlvmArg = LoadValue (ArgCast);
+		LlvmArgArray.Append (pLlvmArg);
+	}
+
+	llvm::Instruction* pLlvmCall = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (
+		pLlvmFunction,
+		llvm::ArrayRef <llvm::Value*> (LlvmArgArray, LlvmArgArray.GetCount ())
+		);
 		
 	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
 	pResultValue->SetLlvmRegister (pLlvmCall, pReturnType);

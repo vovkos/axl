@@ -221,7 +221,7 @@ CUnOp_addr::LlvmOperator (
 	)
 {
 	CType* pType = OpValue.GetType ();
-	pType = pType->ModifyType (ETypeModifier_Pointer);
+	pType = pType->GetModifiedType (ETypeModifier_Pointer);
 
 	EValue OpKind = OpValue.GetValueKind ();
 	if (OpKind != EValue_Variable)
@@ -273,8 +273,8 @@ CUnOp_indir::LlvmOperator (
 	)
 {
 	CType* pType = OpValue.GetType ();
-	pType = pType->ModifyType (ETypeModifier_RemovePointer);
-	pType = pType->ModifyType (ETypeModifier_Reference);
+	pType = pType->GetModifiedType (ETypeModifier_RemovePointer);
+	pType = pType->GetModifiedType (ETypeModifier_Reference);
 
 	err::SetFormatStringError (_T("unary '*' not implemented yet"));
 	return false;

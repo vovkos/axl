@@ -220,12 +220,9 @@ public:
 
 	bool
 	AddOverload (CFunction* pFunction);
-
+	
 	CFunction*
-	FindOverload (
-		CType** ppArgType,
-		size_t ArgCount
-		) const;
+	FindOverload (rtl::CBoxListT <CValue>* pArgList) const;
 };
 
 //.............................................................................

@@ -193,7 +193,7 @@ CModulePane::AddType (
 	switch (TypeKind)
 	{
 	case jnc::EType_Enum:
-	case jnc::EType_EnumC:
+	case jnc::EType_Enum_c:
 		AddEnumTypeMembers (hItem, (jnc::CEnumType*) pType);
 		break;
 

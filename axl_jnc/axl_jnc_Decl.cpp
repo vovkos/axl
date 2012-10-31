@@ -220,7 +220,7 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 
 	if (Modifiers)
 	{
-		pType = pType->ModifyType (Modifiers);
+		pType = pType->GetModifiedType (Modifiers);
 		if (!pType)
 			return NULL;
 	}
@@ -233,20 +233,25 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 
 		if (TypeKind == EType_Pointer)
 		{
-			pType = pType->GetPointerType ();
+			if (Modifiers & ETypeModifier_Unsafe)
+				TypeKind = EType_Pointer_c;
 		}
 		else 
 		{
 			ASSERT (TypeKind == EType_Reference);
-			pType = pType->GetReferenceType ();
+
+			if (Modifiers & ETypeModifier_Unsafe)
+				TypeKind = EType_Reference_c;
 		};
 
+		pType = pType->GetDerivedType (TypeKind);
 		if (!pType)
 			return NULL;
 
+		Modifiers &= ~ETypeModifier_Unsafe;
 		if (Modifiers)
 		{
-			pType = pType->ModifyType (Modifiers);
+			pType = pType->GetModifiedType (Modifiers);
 			if (!pType)
 				return NULL;
 		}

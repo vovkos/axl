@@ -99,71 +99,82 @@ CTypeMgr::ResolveImports ()
 	return true;
 }
 
-CDerivedType* 
-CTypeMgr::GetConstType (CType* pBaseType)
-{
-	if (pBaseType->m_TypeKind == EType_Const)
-		return (CDerivedType*) pBaseType;
-
-	rtl::CStringA Signature = "C";
-	Signature += pBaseType->GetSignature ();
-
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CDerivedType*) It->m_Value;
-
-	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
-	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = EType_Const;
-	pType->m_Size = pBaseType->GetSize ();
-	pType->m_Signature = Signature;
-	pType->m_pBaseType = pBaseType;
-
-	m_DerivedTypeList.InsertTail (pType);
-	It->m_Value = pType;
-	
-	return pType;
-}
-
-CDerivedType* 
-CTypeMgr::GetPointerType (CType* pBaseType)
-{
-	rtl::CStringA Signature = "P";
-	Signature += pBaseType->GetSignature ();
-
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CDerivedType*) It->m_Value;
-
-	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
-	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = EType_Pointer;
-	pType->m_Size = sizeof (TFatPointer);
-	pType->m_Signature = Signature;
-	pType->m_pBaseType = pBaseType;
-
-	m_DerivedTypeList.InsertTail (pType);
-	It->m_Value = pType;
-	
-	return pType;
-}
-
-CDerivedType* 
-CTypeMgr::GetReferenceType (CType* pBaseType)
+bool
+VerifyReferenceType (CType* pBaseType)
 {
 	if (pBaseType->IsReferenceType ())
 	{
 		err::SetFormatStringError (_T("reference to reference is illegal"));
-		return NULL;
+		return false;
 	}
 	
 	if (pBaseType->IsPropertyType ())
 	{
 		err::SetFormatStringError (_T("reference to property is illegal"));
+		return false;
+	}
+
+	return true;
+}
+
+CDerivedType* 
+CTypeMgr::GetDerivedType (
+	CType* pBaseType,
+	EType TypeKind
+	)
+{
+	rtl::CStringA Signature;
+	size_t Size;
+
+	switch (TypeKind)
+	{
+	case EType_Const:
+		if (pBaseType->m_TypeKind == EType_Const)
+			return (CDerivedType*) pBaseType;
+
+		Signature = 'C';
+		Size = pBaseType->GetSize ();
+		break;
+
+	case EType_Volatile:
+		if (pBaseType->m_TypeKind == EType_Volatile)
+			return (CDerivedType*) pBaseType;
+
+		Signature = 'V';
+		Size = pBaseType->GetSize ();
+		break;
+
+	case EType_Pointer:
+		Signature = 'P';
+		Size = sizeof (TFatPointer);
+		break;
+
+	case EType_Pointer_c:
+		Signature = 'O';
+		Size = sizeof (void*);
+		break;
+
+	case EType_Reference:
+		if (!VerifyReferenceType (pBaseType))
+			return NULL;
+
+		Signature = 'R';
+		Size = sizeof (TFatPointer);
+		break;
+
+	case EType_Reference_c:
+		if (!VerifyReferenceType (pBaseType))
+			return NULL;
+
+		Signature = 'H';
+		Size = sizeof (void*);
+		break;
+
+	default:
+		ASSERT (false);
 		return NULL;
 	}
 
-	rtl::CStringA Signature = "R";
 	Signature += pBaseType->GetSignature ();
 
 	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
@@ -172,8 +183,8 @@ CTypeMgr::GetReferenceType (CType* pBaseType)
 
 	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
 	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = EType_Reference;
-	pType->m_Size = sizeof (TFatPointer);
+	pType->m_TypeKind = TypeKind;
+	pType->m_Size = Size;
 	pType->m_Signature = Signature;
 	pType->m_pBaseType = pBaseType;
 
@@ -299,7 +310,7 @@ CTypeMgr::GetEnumType (
 	const rtl::CString& QualifiedName
 	)
 {
-	ASSERT (TypeKind == EType_Enum || TypeKind == EType_EnumC);
+	ASSERT (TypeKind == EType_Enum || TypeKind == EType_Enum_c);
 
 	if (Name.IsEmpty ())
 	{

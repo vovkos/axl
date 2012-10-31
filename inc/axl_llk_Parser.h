@@ -71,7 +71,7 @@ protected:
 	CToken m_LastMatchedToken;
 
 	int m_Flags;
-
+	
 public:
 	CParserT ()
 	{
