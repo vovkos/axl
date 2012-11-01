@@ -15,7 +15,6 @@ primary_expr_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 	| '(' primary_expr_pass1 <$pTokenList>* ')'
 	| any
 		{
-			TRACE ("primary_expr_pass1 ('%s')\n", $1.GetText ());
 			$pTokenList->InsertTail ($1);
 		}
 	;

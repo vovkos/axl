@@ -180,19 +180,23 @@ public:
 		return AllocateBuffer (Size, SaveContents ? m_p : NULL);
 	}
 
-	void
+	bool
 	SetBuffer (
 		EBuf Kind,
 		void* p,
 		size_t Size
 		)
 	{
-		ASSERT (Size >= sizeof (T) + sizeof (CHdr));
+		if (Size < sizeof (T) + sizeof (CHdr))
+		{
+			err::SetError (err::EStatus_BufferTooSmall);
+			return false;
+		}
 
 		CHdr* pOldHdr = GetHdr ();
 		
 		CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
-		NewHdr->m_BufferSize = Size;
+		NewHdr->m_BufferSize = Size - sizeof (CHdr);
 		NewHdr->SetFree (Kind == EBuf_Static ? NULL : (mem::FFree) -1);
 		m_p = (T*) (NewHdr + 1);
 		NewHdr.Detach ();
@@ -201,6 +205,8 @@ public:
 
 		if (pOldHdr)
 			pOldHdr->Release ();
+
+		return true;
 	}
 
 	bool 

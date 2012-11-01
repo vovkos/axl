@@ -342,5 +342,49 @@ CCast_fp_int::LlvmCast (
 
 //.............................................................................
 
+bool
+CCast_arr_ptr_c::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	const CValue& SavedSrcValue = pModule->m_ConstMgr.SaveValue (SrcValue);
+	*(void**) DstValue.GetConstData () = SavedSrcValue.GetConstData ();
+	return true;
+}
+
+bool
+CCast_arr_ptr_c::LlvmCast (
+	CModule* pModule,
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CValue Index;
+	Index.SetConstInt32 (0);
+	
+	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
+	llvm::Value* pLlvmIndex = Index.GetLlvmValue ();
+
+	llvm::Value* LlvmIndexArray [] =
+	{
+		pLlvmIndex,
+		pLlvmIndex,
+	};
+
+	llvm::Value* pLlvmGep = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateGEP (
+		pLlvmValue, 
+		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
+		);
+	pResultValue->SetLlvmRegister (pLlvmGep, pType);
+	return true;
+}
+
+//.............................................................................
+
 } // namespace axl {
 } // namespace jnc {

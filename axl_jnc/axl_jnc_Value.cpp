@@ -6,6 +6,23 @@ namespace axl {
 namespace jnc {
 
 //.............................................................................
+	
+class CLlvmPodConst: public llvm::ConstantDataSequential 
+{
+public:
+	static
+	llvm::Constant*
+	Get (
+		CType* pType,
+		const void* p
+		)
+	{
+		llvm::Type* pLlvmType = pType->GetLlvmType ();
+		return getImpl (llvm::StringRef ((char*) p, pType->GetSize ()), pLlvmType);
+	}
+};
+
+//.............................................................................
 
 const tchar_t*
 GetValueKindString (EValue ValueKind)
@@ -88,17 +105,67 @@ CValue::GetLlvmValue () const
 	ASSERT (m_ValueKind == EValue_Const);
 	ASSERT (m_pType);
 
-	if (m_pType->IsIntegerType ())
+	int64_t Integer;
+	double Double;
+	llvm::Constant* pConstant = NULL;
+
+	EType TypeKind = m_pType->GetTypeKind ();
+	switch (TypeKind)
 	{
-		const void* p2 = m_ConstBuffer;
-		int64_t* p = (int64_t*) GetConstData ();
-		int64_t Integer = *(int64_t*) GetConstData ();
-		m_pLlvmValue = llvm::ConstantInt::get (
+	case EType_Int8:
+	case EType_Int8_u:
+	case EType_Int16:
+	case EType_Int16_u:
+	case EType_Int32:
+	case EType_Int32_u:
+	case EType_Int64:
+	case EType_Int64_u:
+		Integer = *(int64_t*) GetConstData ();
+		pConstant = llvm::ConstantInt::get (
 			m_pType->GetLlvmType (),
 			llvm::APInt (m_pType->GetSize () * 8, Integer, m_pType->IsSignedType ())
 			);
+		break;
+
+	case EType_Float:
+		Double = *(float*) GetConstData ();
+		pConstant = llvm::ConstantFP::get (m_pType->GetLlvmType (), Double);
+		break;
+
+	case EType_Double:
+		Double = *(double*) GetConstData ();
+		pConstant = llvm::ConstantFP::get (m_pType->GetLlvmType (), Double);
+		break;
+
+	case EType_Array:
+		pConstant = CLlvmPodConst::Get (m_pType, GetConstData ());
+		break;
+
+	case EType_Struct:
+	case EType_Union:
+		pConstant = CLlvmPodConst::Get (m_pType, GetConstData ());
+		break;
+
+	case EType_Pointer_c:
+		Integer = *(int64_t*) GetConstData ();
+
+		pConstant = llvm::ConstantInt::get (
+			m_pType->GetModule ()->m_TypeMgr.GetBasicType (EType_Int_pu)->GetLlvmType (),
+			llvm::APInt (sizeof (void*) * 8, Integer, false)
+			);
+
+		pConstant = llvm::ConstantExpr::getIntToPtr (
+			pConstant, 
+			m_pType->GetLlvmType ()
+			);
+
+		break;
+
+	default:
+		ASSERT (false);
 	}
 
+	m_pLlvmValue = pConstant;
 	return m_pLlvmValue;
 }
 

@@ -386,9 +386,9 @@ declarator_suffix <CDeclarator* $pDeclarator>
 	;
 
 array_suffix <CDeclarator* $pDeclarator>
-	: '[' expression_pass1 ']'
+	: '[' EToken_Integer ']'
 		{
-			$pDeclarator->AddArraySuffix (0);
+			$pDeclarator->AddArraySuffix ($2.m_Data.m_Integer);
 		}
 	| '[' ']'
 		{
@@ -406,14 +406,12 @@ function_suffix <CDeclarator* $pDeclarator>
 		$pFunctionSuffix = $pDeclarator->AddFormalArgSuffix ();
 	}
 	: '(' function_formal_argument_list <$pFunctionSuffix> ')' 
-	| '(' function_formal_argument_vararg <$pFunctionSuffix> ')' 
 	| '(' ')' 
 	;	
 
 function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
 	: function_formal_argument <$pFunctionSuffix> 
-	  (',' function_formal_argument <$pFunctionSuffix>)* 
-	  (',' function_formal_argument_vararg <$pFunctionSuffix>)?
+	  (',' function_formal_argument <$pFunctionSuffix>)*
 	;
 
 function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
@@ -422,10 +420,7 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 		{
 			return DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, CValue ()) != NULL;
 		}
-	;
-
-function_formal_argument_vararg <CDeclFunctionSuffix* $pFunctionSuffix>
-	: EToken_Ellipsis
+	| EToken_Ellipsis
 		{
 			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
 		}

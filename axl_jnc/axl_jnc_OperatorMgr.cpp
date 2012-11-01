@@ -30,7 +30,7 @@ COperatorMgr::Clear ()
 void
 COperatorMgr::AddStdOperators ()
 {
-	AddStdMoveOperators ();
+	AddStdCastOperators ();
 	AddStdUnaryOperators ();
 	AddStdBinaryOperators ();
 }
@@ -97,7 +97,7 @@ COperatorMgr::AddStdBinaryOperators ()
 }
 
 void
-COperatorMgr::AddStdMoveOperators ()
+COperatorMgr::AddStdCastOperators ()
 {
 	// integer copies
 
@@ -239,6 +239,8 @@ COperatorMgr::AddStdMoveOperators ()
 		pOperatorIJ = AddCastOperator ((EType) i, (EType) j, pSuperCast);
 		pOperatorIJ->m_Price = pOperatorIK->m_Price + pOperatorKJ->m_Price;
 	}
+
+	m_ArrayToPointerCastOperator.m_pOperatorLo = &m_Cast_arr_ptr_c;
 }
 
 CUnaryOperator*
@@ -381,6 +383,14 @@ COperatorMgr::FindCastOperator (
 	CType* pDstType
 	)
 {
+	// TODO: do proper special cases of casting
+
+	EType SrcTypeKind = pSrcType->GetTypeKind ();
+	EType DstTypeKind = pDstType->GetTypeKind ();
+	
+	if (SrcTypeKind == EType_Array && DstTypeKind == EType_Pointer_c)
+		return &m_ArrayToPointerCastOperator;
+
 	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
 	rtl::CHashTableMapIteratorT <const tchar_t*, CCastOperator*> It = m_CastOperatorMap.Find (Signature);
 	if (It)
@@ -609,7 +619,9 @@ COperatorMgr::CallOperator (
 	size_t FormalArgCount = pFunctionType->GetArgCount ();
 	size_t ActualArgCount = pArgList->GetCount ();
 
-	if (FormalArgCount != ActualArgCount)
+	bool IsVarArg = pFunctionType->IsVarArg ();
+	if (IsVarArg && ActualArgCount < FormalArgCount ||
+		!IsVarArg && ActualArgCount != FormalArgCount)
 	{
 		err::SetFormatStringError (_T("function '%s' takes %d arguments; %d passed"), pGlobalFunction->GetName (), FormalArgCount, ActualArgCount);
 		return false;
@@ -619,7 +631,7 @@ COperatorMgr::CallOperator (
 	rtl::CArrayT <llvm::Value*> LlvmArgArray (ref::EBuf_Stack, LlvmArgBuffer, sizeof (LlvmArgBuffer));
 	
 	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
-	for (size_t i = 0; Arg; Arg++, i++)
+	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
 	{
 		CType* pFormalArgType = pFunctionType->GetArgType (i);
 		CValue ArgCast;
@@ -629,6 +641,14 @@ COperatorMgr::CallOperator (
 			return false;
 
 		llvm::Value* pLlvmArg = LoadValue (ArgCast);
+		LlvmArgArray.Append (pLlvmArg);
+	}
+
+	// vararg
+
+	for (; Arg; Arg++)
+	{
+		llvm::Value* pLlvmArg = LoadValue (*Arg);
 		LlvmArgArray.Append (pLlvmArg);
 	}
 

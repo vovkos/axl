@@ -195,10 +195,15 @@ CAstDoc::Run ()
 }
 
 void
-StdLib_printf (const char* pFormat)
+StdLib_printf (
+	const char* pFormat,
+	...
+	)
 {
+	rtl::CString String;
+	String.FormatV (pFormat, va_start_e (pFormat));
 	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf (%s)\n"), pFormat);
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf (%s)\n"), String);
 }
 
 void

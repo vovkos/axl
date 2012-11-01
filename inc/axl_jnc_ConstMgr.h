@@ -17,6 +17,8 @@ protected:
 	friend class CModule;
 	CModule* m_pModule;
 
+	rtl::CBoxListT <CValue> m_ConstList;
+
 public:
 	CConstMgr (CModule* pModule)
 	{
@@ -32,6 +34,13 @@ public:
 	void
 	Clear ()
 	{
+	}
+
+	const CValue& 
+	SaveValue (const CValue& Value)
+	{
+		rtl::CBoxIteratorT <CValue> It = m_ConstList.InsertTail (Value);
+		return *It;
 	}
 };
 

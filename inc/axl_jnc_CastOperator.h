@@ -614,5 +614,30 @@ public:
 
 //.............................................................................
 
+class CCast_arr_ptr_c: public ICastOperatorLo
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr_c, ICastOperatorLo)
+
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		CModule* pModule,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 } // namespace axl {
 } // namespace jnc {

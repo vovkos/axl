@@ -77,18 +77,30 @@ enum EType
 
 	// aliases
 
-	EType_Int    = EType_Int32,
-	EType_Char   = EType_Int8,
-	EType_UChar  = EType_Int8_u,
-	EType_Byte   = EType_Int8_u,
-	EType_WChar  = EType_Int16,
-	EType_Short  = EType_Int16,
-	EType_UShort = EType_Int16_u,
-	EType_Word   = EType_Int16_u,
-	EType_Long   = EType_Int32,
-	EType_ULong  = EType_Int32_u,
-	EType_DWord  = EType_Int32_u,
-	EType_QWord  = EType_Int64_u,
+#ifdef _WIN64
+	EType_Int_p    = EType_Int64,
+	EType_Int_pu   = EType_Int64_u,
+	EType_Int_pbe  = EType_Int64_be,
+	EType_Int_pbeu = EType_Int64_beu,
+#else
+	EType_Int_p    = EType_Int32,
+	EType_Int_pu   = EType_Int32_u,
+	EType_Int_pbe  = EType_Int32_be,
+	EType_Int_pbeu = EType_Int32_beu,
+#endif
+
+	EType_Int      = EType_Int32,
+	EType_Char     = EType_Int8,
+	EType_UChar    = EType_Int8_u,
+	EType_Byte     = EType_Int8_u,
+	EType_WChar    = EType_Int16,
+	EType_Short    = EType_Int16,
+	EType_UShort   = EType_Int16_u,
+	EType_Word     = EType_Int16_u,
+	EType_Long     = EType_Int32,
+	EType_ULong    = EType_Int32_u,
+	EType_DWord    = EType_Int32_u,
+	EType_QWord    = EType_Int64_u,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -203,7 +215,13 @@ public:
 	{
 		return m_TypeKind >= EType_Int8 && m_TypeKind <= EType_Int64_beu;
 	}
-	
+
+	bool 
+	IsFpType ()
+	{
+		return m_TypeKind == EType_Float || m_TypeKind == EType_Double;
+	}
+
 	bool 
 	IsSignedType ()
 	{

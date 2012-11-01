@@ -107,6 +107,9 @@ protected:
 	CCast_f64_i32 m_Cast_f64_i32;
 	CCast_f64_i64 m_Cast_f64_i64;
 
+	CCast_arr_ptr_c m_Cast_arr_ptr_c;
+	CCastOperator m_ArrayToPointerCastOperator;
+
 	// tables
 
 	CUnaryOperatorOverload m_UnaryOperatorTable [EUnOp__Count];
@@ -364,7 +367,7 @@ protected:
 	AddStdBinaryOperators ();
 
 	void
-	AddStdMoveOperators ();
+	AddStdCastOperators ();
 };
 
 //.............................................................................

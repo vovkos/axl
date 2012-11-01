@@ -95,7 +95,7 @@ CFunctionType::GetLlvmType ()
 	llvm::FunctionType* pLlvmType = llvm::FunctionType::get (
 		m_pReturnType->GetLlvmType (),
 		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, ArgCount),
-		false
+		IsVarArg ()
 		);
 	
 	m_pLlvmType = pLlvmType;

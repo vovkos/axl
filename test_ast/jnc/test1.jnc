@@ -13,20 +13,10 @@ typedef const char* pchar2_t;
 
 //.............................................................................
 
-enum EColor
-{
-	Red   = 1, 
-	Green = 2,
-	Blue  
-};
-
 int
 main ()
 {	
-//	char s [10];
-	char* unsafe p;
-
-	printf (p);	
+	printf ("suka takaia %d %d", 15, 20);
 	MsgBox (100, 200);
 	int x = 10;
 	int y = 20;
@@ -34,7 +24,10 @@ main ()
 }
 
 void
-printf (char* unsafe pFormat);
+printf (
+	char* unsafe pFormat,
+	...
+	);
 
 void
 MsgBox (
