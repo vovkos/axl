@@ -54,6 +54,7 @@ extern "C" {
 #include "axl_rtl_ArrayList.h"
 #include "axl_rtl_BitMap.h"
 #include "axl_rtl_StringHashTable.h"
+#include "axl_rtl_EscapeEncoding.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_lex_RagelLexer.h"
 #include "axl_dbg_Trace.h"

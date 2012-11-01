@@ -113,6 +113,7 @@
     <ClInclude Include="..\Inc\axl_ref_RtFactory.h" />
     <ClInclude Include="..\Inc\axl_rtl_Array.h" />
     <ClInclude Include="..\inc\axl_rtl_ArrayList.h" />
+    <ClInclude Include="..\inc\axl_rtl_EscapeEncoding.h" />
     <ClInclude Include="..\Inc\axl_rtl_BinTree.h" />
     <ClInclude Include="..\Inc\axl_rtl_BitIdx.h" />
     <ClInclude Include="..\Inc\axl_rtl_BitMap.h" />
@@ -120,6 +121,7 @@
     <ClInclude Include="..\Inc\axl_rtl_BoxList.h" />
     <ClInclude Include="..\Inc\axl_rtl_BuddyAllocMap.h" />
     <ClInclude Include="..\inc\axl_rtl_CharLiteral.h" />
+    <ClInclude Include="..\inc\axl_rtl_HexEncode.h" />
     <ClInclude Include="..\inc\axl_rtl_SwapByteOrder.h" />
     <ClInclude Include="..\Inc\axl_rtl_Func.h" />
     <ClInclude Include="..\Inc\axl_rtl_HashTable.h" />
@@ -199,6 +201,9 @@
     <ClCompile Include="axl_rtl_BmhFind.cpp" />
     <ClCompile Include="axl_rtl_BuddyAllocMap.cpp" />
     <ClCompile Include="axl_rtl_djb2.cpp" />
+    <ClCompile Include="axl_rtl_HexEncode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="axl_rtl_Packer.cpp" />
     <ClCompile Include="axl_rtl_Unpacker.cpp" />
     <ClCompile Include="axl_win_File.cpp" />

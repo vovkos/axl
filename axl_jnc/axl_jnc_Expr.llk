@@ -497,9 +497,9 @@ local
 		{
 			$pValue->SetConstDouble ($1.m_Data.m_Double);
 		}
-	| EToken_Literal
+	| literal 
 		{
-			$pValue->SetLiteral ($1.m_Data.m_String);
+			$pValue->SetLiteral (rtl::CEscapeEncoding::Decode ($1.m_String));
 		}
 	| EToken_True
 		{
@@ -522,6 +522,22 @@ local
 			$pValue->SetType ($OpValue.GetType ());
 		}
 	| '(' conditional_expr <$pValue> ')'
+	;
+
+class
+{
+	rtl::CString m_String;
+}
+literal
+	: EToken_Literal 
+		{
+			$.m_String = $1.m_Data.m_String;
+		}
+	  (EToken_Literal 
+		{
+			$.m_String.Append ($2.m_Data.m_String);
+		}
+	  )*
 	;
 
 type_name_or_expr <CValue* $pValue>

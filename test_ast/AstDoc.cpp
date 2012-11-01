@@ -206,14 +206,10 @@ StdLib_printf (
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf (%s)\n"), String);
 }
 
-void
-StdLib_MsgBox (
-	int a,
-	int b
-	)
+int
+StdLib_ReadInteger ()
 {
-	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("MsgBox (%d, %d)\n"), a, b);
+	return 10;
 }
 
 jnc::CFunction* 
@@ -234,7 +230,7 @@ bool
 CAstDoc::ExportStdLib ()
 {
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
-	ExportStdLibFunction (_T("MsgBox"), StdLib_MsgBox);
+	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
 	return true;
 }
 

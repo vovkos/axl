@@ -209,6 +209,28 @@ struct CStringDetailsT <char>
 	{ 
 		return wcstombs (pDst, pSrc, Length); 
 	}
+
+	static 
+	long 
+	StrToLong (
+		const char* p,
+		char** ppEnd = NULL,
+		int Radix = 10
+		)
+	{
+		return strtol (p, ppEnd, Radix);
+	}
+
+	static 
+	ulong_t 
+	StrToULong (
+		const char* p,
+		char** ppEnd = NULL,
+		int Radix = 10
+		)
+	{
+		return strtoul (p, ppEnd, Radix);
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -394,6 +416,28 @@ struct CStringDetailsT <wchar_t>
 		)
 	{ 
 		return mbstowcs (pDst, pSrc, Length); 
+	}
+
+	static 
+	long 
+	StrToLong (
+		const wchar_t* p,
+		wchar_t** ppEnd = NULL,
+		int Radix = 10
+		)
+	{
+		return wcstol (p, ppEnd, Radix);
+	}
+
+	static 
+	ulong_t 
+	StrToULong (
+		const wchar_t* p,
+		wchar_t** ppEnd = NULL,
+		int Radix = 10
+		)
+	{
+		return wcstoul (p, ppEnd, Radix);
 	}
 };
 

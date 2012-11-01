@@ -16,23 +16,27 @@ typedef const char* pchar2_t;
 int
 main ()
 {	
-	printf ("suka takaia %d %d", 15, 20);
-	MsgBox (100, 200);
-	int x = 10;
-	int y = 20;
+	printf (
+		"suka\r\n"
+		"\tgovno\r\n"
+		"\ti \"muravei\" bla"
+		);
+
+	int x = 'A';
+	int y = 'B';
+
+	printf ("x = %d y = %d", x, y);
+
 	return x + y;
 }
+
+int 
+ReadInteger ();
 
 void
 printf (
 	char* unsafe pFormat,
 	...
-	);
-
-void
-MsgBox (
-	int a,
-	int b
 	);
 
 //.............................................................................
