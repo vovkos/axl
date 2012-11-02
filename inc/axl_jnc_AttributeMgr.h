@@ -21,7 +21,7 @@ protected:
 	CAttributeSet* m_pCurrentAttributeSet;
 
 public:
-	CAttributeMgr (CModule* pModule);
+	CAttributeMgr ();
 
 	CModule* 
 	GetModule ()

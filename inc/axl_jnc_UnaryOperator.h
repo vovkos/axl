@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "axl_jnc_Value.h"
 #include "axl_rtl_StringHashTable.h"
+#include "axl_jnc_CastOperator.h"
 
 namespace axl {
 namespace jnc {
@@ -30,12 +30,47 @@ enum EUnOp
 const tchar_t*
 GetUnOpString (EUnOp Op);
 
+//.............................................................................
+
+struct TUnaryOperatorTypeInfo
+{
+	CType* m_pReturnType;
+	CType* m_pOpType;
+
+	ECast m_CastKind;
+};
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 [uuid ("5def51c9-959f-4170-a032-892ac4f7e622")]
-struct IUnaryOperatorLo: obj::IRoot
+struct IUnaryOperator: obj::IRoot
 {	
+protected:
+	CModule* m_pModule;
+	EUnOp m_OpKind;
+
 public:
+	IUnaryOperator ();
+
+	CModule*
+	GetModule ()
+	{
+		return m_pModule;
+	}
+
+	EUnOp 
+	GetOpKind ()
+	{
+		return m_OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		) = 0;
+
 	virtual
 	bool
 	ConstOperator (
@@ -46,54 +81,9 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		) = 0;
-};
-
-//.............................................................................
-
-class CUnaryOperator: public rtl::TListLink
-{
-protected:
-	friend class CUnaryOperatorOverload;
-	friend class COperatorMgr;
-
-	EUnOp m_OpKind;
-	CType* m_pReturnType;
-	CType* m_pOpType;
-	IUnaryOperatorLo* m_pOperatorLo;
-
-public:
-	CUnaryOperator ();
-
-	EUnOp 
-	GetOpKind ()
-	{
-		return m_OpKind;
-	}
-
-	CType* 
-	GetReturnType () 
-	{
-		return m_pReturnType;
-	}
-
-	CType* 
-	GetOpType ()
-	{
-		return m_pOpType;
-	}
-
-	bool
-	Operator (
-		const CValue& OpValue,
-		CValue* pReturnValue		
-		);
-
-	bool
-	Operator (CValue* pValue);
 };
 
 //.............................................................................
@@ -103,46 +93,68 @@ class CUnaryOperatorOverload
 protected:
 	friend class COperatorMgr;
 
-	EUnOp m_OpKind;
-	rtl::CStdListT <CUnaryOperator> m_List;
-	rtl::CStringHashTableMapAT <CUnaryOperator*> m_DirectMap;
-	rtl::CStringHashTableMapAT <CUnaryOperator*> m_ImplicitMap;
+	rtl::CStringHashTableMapAT <IUnaryOperator*> m_DirectMap;
+	rtl::CStringHashTableMapAT <IUnaryOperator*> m_ImplicitMap;
 
 public:
-	CUnaryOperatorOverload ()
-	{
-		m_OpKind = EUnOp_None;
-	}
-
-	EUnOp 
-	GetOpKind ()
-	{
-		return m_OpKind;
-	}
-
 	void
 	Clear ();
 
-	CUnaryOperator*
-	FindOperator (CType* pOpType);
-
-	CUnaryOperator*
-	AddOperator (
-		CType* pReturnType,
+	IUnaryOperator*
+	GetOperator (
 		CType* pOpType,
-		IUnaryOperatorLo* pOperatorLo
+		TUnaryOperatorTypeInfo* pTypeInfo
+		);
+
+	IUnaryOperator*
+	AddOperator (
+		CType* pOpType,
+		IUnaryOperator* pOperator
 		);
 };
 
 //.............................................................................
 
+bool
+GetArithmeticUnaryOperatorTypeInfo (
+	CModule* pModule,
+	CType* pType,
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	);
+
+bool
+GetArithmeticUnaryOperatorTypeInfo (
+	CModule* pModule,
+	EType TypeKind,
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	);
+
+//.............................................................................
+
 template <typename T>
-class CUnOpT_i32: public IUnaryOperatorLo
+class CUnOpT_i32: public IUnaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOpT_i32, IUnaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CUnOpT_i32, IUnaryOperator)
 
 public:
+	CUnOpT_i32 ()
+	{
+		m_OpKind = (EUnOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticUnaryOperatorTypeInfo (m_pModule, EType_Int32, pOpType, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -158,13 +170,12 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue);
+		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
 		return true;
 	}
@@ -173,12 +184,27 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CUnOpT_i64: public IUnaryOperatorLo
+class CUnOpT_i64: public IUnaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOpT_i64, IUnaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CUnOpT_i64, IUnaryOperator)
 
 public:
+	CUnOpT_i64 ()
+	{
+		m_OpKind = (EUnOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticUnaryOperatorTypeInfo (m_pModule, EType_Int64, pOpType, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -194,13 +220,12 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue);
+		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
 		return true;
 	}
@@ -209,12 +234,27 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CUnOpT_f32: public IUnaryOperatorLo
+class CUnOpT_f32: public IUnaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOpT_f32, IUnaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CUnOpT_f32, IUnaryOperator)
 
 public:
+	CUnOpT_f32 ()
+	{
+		m_OpKind = (EUnOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticUnaryOperatorTypeInfo (m_pModule, EType_Float, pOpType, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -230,13 +270,12 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue);
+		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
 		return true;
 	}
@@ -245,12 +284,27 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CUnOpT_f64: public IUnaryOperatorLo
+class CUnOpT_f64: public IUnaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOpT_f64, IUnaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CUnOpT_f64, IUnaryOperator)
 
 public:
+	CUnOpT_f64 ()
+	{
+		m_OpKind = (EUnOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticUnaryOperatorTypeInfo (m_pModule, EType_Double, pOpType, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -266,26 +320,32 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue);
+		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}
 };
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUnOp_addr: public IUnaryOperatorLo
+class CUnOp_addr: public IUnaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOp_addr, IUnaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CUnOp_addr, IUnaryOperator)
 
 public:
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		);
+
 	virtual
 	bool
 	ConstOperator (
@@ -296,21 +356,26 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 };
 
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUnOp_indir: public IUnaryOperatorLo
+class CUnOp_indir: public IUnaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOp_indir, IUnaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CUnOp_indir, IUnaryOperator)
 
 public:
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		);
+
 	virtual
 	bool
 	ConstOperator (
@@ -321,7 +386,6 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
@@ -332,6 +396,11 @@ public:
 class CUnOp_Minus
 {
 public:
+	enum
+	{
+		OpKind = EUnOp_Minus
+	};
+
 	static
 	long
 	ConstOpInt32 (long OpValue)
@@ -380,6 +449,11 @@ public:
 class CUnOp_BitwiseNot
 {
 public:
+	enum
+	{
+		OpKind = EUnOp_BitwiseNot
+	};
+
 	static
 	long
 	ConstOpInt32 (long OpValue)

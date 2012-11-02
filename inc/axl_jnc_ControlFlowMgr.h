@@ -23,7 +23,7 @@ protected:
 	llvm::IRBuilder <> m_LlvmBuilder;
 
 public:
-	CControlFlowMgr (CModule* pModule);
+	CControlFlowMgr ();
 
 	CModule* 
 	GetModule ()

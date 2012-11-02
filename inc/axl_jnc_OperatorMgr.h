@@ -29,9 +29,6 @@ protected:
 	CUnOpT_i32 <CUnOp_BitwiseNot> m_UnOp_BitwiseNot_i32;
 	CUnOpT_i64 <CUnOp_BitwiseNot> m_UnOp_BitwiseNot_i64;
 
-	CUnaryOperator m_AddrOperator;
-	CUnaryOperator m_IndirOperator;
-
 	CUnOp_addr m_UnOp_addr;
 	CUnOp_indir m_UnOp_indir;
 
@@ -108,19 +105,19 @@ protected:
 	CCast_f64_i64 m_Cast_f64_i64;
 
 	CCast_arr_ptr_c m_Cast_arr_ptr_c;
-	CCastOperator m_ArrayToPointerCastOperator;
 
 	// tables
 
 	CUnaryOperatorOverload m_UnaryOperatorTable [EUnOp__Count];
 	CBinaryOperatorOverload m_BinaryOperatorTable [EBinOp__Count];		
-	CCastOperator* m_BasicCastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
-	rtl::CStringHashTableMapT <CCastOperator*> m_CastOperatorMap;
-	rtl::CStdListT <CCastOperator> m_CastOperatorList;
+	ICastOperator* m_BasicCastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
+
+	rtl::CStringHashTableMapT <ICastOperator*> m_CastOperatorMap;
+	rtl::CBoxListT <rtl::CString> m_CastSignatureCache;
 	rtl::CStdListT <CSuperCast> m_SuperCastList;
 	
 public:
-	COperatorMgr (CModule* pModule);
+	COperatorMgr ();
 
 	CModule* 
 	GetModule ()
@@ -136,51 +133,30 @@ public:
 
 	// unary operators
 
-	CUnaryOperator*
-	FindUnaryOperator (
+	IUnaryOperator*
+	GetUnaryOperator (
 		EUnOp OpKind,
-		CType* pOpType
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
 		);
 
-	CUnaryOperator*
+	IUnaryOperator*
 	AddUnaryOperator (
 		EUnOp OpKind,
-		CType* pReturnType,
 		CType* pOpType,
-		IUnaryOperatorLo* pOperatorLo
+		IUnaryOperator* pOperator
 		)
 	{
 		ASSERT (OpKind > 0 && OpKind < EUnOp__Count);
-		return m_UnaryOperatorTable [OpKind].AddOperator (pReturnType, pOpType, pOperatorLo);
+		return m_UnaryOperatorTable [OpKind].AddOperator (pOpType, pOperator);
 	}
 
-	CUnaryOperator*
+	IUnaryOperator*
 	AddUnaryOperator (
 		EUnOp OpKind,
-		EType ReturnTypeKind,
 		EType OpTypeKind,
-		IUnaryOperatorLo* pOperatorLo
+		IUnaryOperator* pOperator
 		);
-
-	CUnaryOperator*
-	AddUnaryOperator (
-		EUnOp OpKind,
-		CType* pType,
-		IUnaryOperatorLo* pOperatorLo
-		)
-	{
-		return AddUnaryOperator (OpKind, pType, pType, pOperatorLo);
-	}
-
-	CUnaryOperator*
-	AddUnaryOperator (
-		EUnOp OpKind,
-		EType TypeKind,
-		IUnaryOperatorLo* pOperatorLo
-		)
-	{
-		return AddUnaryOperator (OpKind, TypeKind, TypeKind, pOperatorLo);
-	}
 
 	bool
 	UnaryOperator (
@@ -197,57 +173,56 @@ public:
 
 	// binary operators
 
-	CBinaryOperator*
-	FindBinaryOperator (
+	IBinaryOperator*
+	GetBinaryOperator (
 		EBinOp OpKind,
-		CType* pOpType1,
-		CType* pOpType2
-		)
-	{
-		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
-		return m_BinaryOperatorTable [OpKind].FindOperator (pOpType1, pOpType2);
-	}
-
-	CBinaryOperator*
-	AddBinaryOperator (
-		EBinOp OpKind,
-		CType* pReturnType,
 		CType* pOpType1,
 		CType* pOpType2,
-		IBinaryOperatorLo* pOperatorLo
+		TBinaryOperatorTypeInfo* pTypeInfo
 		)
 	{
 		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
-		return m_BinaryOperatorTable [OpKind].AddOperator (pReturnType, pOpType1, pOpType2, pOperatorLo);
+		return m_BinaryOperatorTable [OpKind].GetOperator (pOpType1, pOpType2, pTypeInfo);
 	}
 
-	CBinaryOperator*
+	IBinaryOperator*
 	AddBinaryOperator (
 		EBinOp OpKind,
-		EType ReturnTypeKind,
+		CType* pOpType1,
+		CType* pOpType2,
+		IBinaryOperator* pOperator
+		)
+	{
+		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
+		return m_BinaryOperatorTable [OpKind].AddOperator (pOpType1, pOpType2, pOperator);
+	}
+
+	IBinaryOperator*
+	AddBinaryOperator (
+		EBinOp OpKind,
 		EType OpTypeKind1,
 		EType OpTypeKind2,
-		IBinaryOperatorLo* pOperatorLo
+		IBinaryOperator* pOperator
 		);
 
-	CBinaryOperator*
+	IBinaryOperator*
 	AddBinaryOperator (
 		EBinOp OpKind,
 		CType* pType,
-		IBinaryOperatorLo* pOperatorLo
+		IBinaryOperator* pOperator
 		)
 	{
-		return AddBinaryOperator (OpKind, pType, pType, pType, pOperatorLo);
+		return AddBinaryOperator (OpKind, pType, pType, pOperator);
 	}
 
-	CBinaryOperator*
+	IBinaryOperator*
 	AddBinaryOperator (
 		EBinOp OpKind,
 		EType TypeKind,
-		IBinaryOperatorLo* pOperatorLo
+		IBinaryOperator* pOperator
 		)
 	{
-		return AddBinaryOperator (OpKind, TypeKind, TypeKind, TypeKind, pOperatorLo);
+		return AddBinaryOperator (OpKind, TypeKind, TypeKind, pOperator);
 	}
 
 	bool
@@ -267,24 +242,30 @@ public:
 
 	// move & cast operators
 
-	CCastOperator*
+	ICastOperator*
 	FindCastOperator (
 		CType* pSrcType,
 		CType* pDstType
 		);
 
-	CCastOperator*
+	ICastOperator*
 	AddCastOperator (
 		CType* pSrcType,
 		CType* pDstType,
-		ICastOperatorLo* pOperatorLo
+		ICastOperator* pOperator
 		);
 
-	CCastOperator*
+	ICastOperator*
 	AddCastOperator (
 		EType SrcTypeKind,
 		EType DstTypeKind,
-		ICastOperatorLo* pOperatorLo
+		ICastOperator* pOperator
+		);
+
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
 		);
 
 	bool

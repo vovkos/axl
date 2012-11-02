@@ -7,9 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-CNamespaceMgr::CNamespaceMgr (CModule* pModule)
+CNamespaceMgr::CNamespaceMgr ()
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
 }

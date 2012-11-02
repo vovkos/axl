@@ -7,9 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-CAttributeMgr::CAttributeMgr (CModule* pModule)
+CAttributeMgr::CAttributeMgr ()
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_pCurrentAttributeSet = NULL;
 }
 

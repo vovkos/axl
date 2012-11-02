@@ -6,25 +6,6 @@ namespace jnc {
 
 //.............................................................................
 
-// warning C4355: 'this' : used in base member initializer list
-
-#pragma warning (disable: 4355)
-
-CModule::CModule ():
-	m_TypeMgr (this),
-	m_AttributeMgr (this),
-	m_NamespaceMgr (this),
-	m_FunctionMgr (this),
-	m_VariableMgr (this),
-	m_ConstMgr (this),
-	m_ControlFlowMgr (this),
-	m_OperatorMgr (this)
-{
-	m_pLlvmModule = NULL;
-}
-
-#pragma warning (default: 4355)
-
 void
 CModule::Clear ()
 {

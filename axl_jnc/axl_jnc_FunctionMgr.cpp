@@ -8,9 +8,11 @@ namespace jnc {
 
 //.............................................................................
 
-CFunctionMgr::CFunctionMgr (CModule* pModule)
+CFunctionMgr::CFunctionMgr ()
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_pCurrentFunction = NULL;
 }
 

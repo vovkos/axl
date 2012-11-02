@@ -47,7 +47,7 @@ CPackerSeq::PackV (
 size_t
 CPackerSeq::AppendFormat (const char* pFormat)
 {
- 	const char* pF = pFormat;
+	const char* pF = pFormat;
 	
 	for (; *pF; pF++)
 	{

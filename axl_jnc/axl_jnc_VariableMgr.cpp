@@ -7,9 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-CVariableMgr::CVariableMgr (CModule* pModule)
+CVariableMgr::CVariableMgr ()
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_TempVariableCounter = 0;
 }
 

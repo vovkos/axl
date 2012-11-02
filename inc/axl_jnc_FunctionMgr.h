@@ -26,7 +26,7 @@ protected:
 	rtl::CStdListT <CGlobalProperty> m_GlobalPropertyList;
 
 public:
-	CFunctionMgr (CModule* pModule);
+	CFunctionMgr ();
 
 	CModule* 
 	GetModule ()

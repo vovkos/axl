@@ -18,7 +18,75 @@ namespace jnc {
 
 //.............................................................................
 
-class CModule
+class CModule;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+AXL_SELECT_ANY
+DWORD g_ModuleTls = TlsAlloc ();
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+CModule*
+GetCurrentThreadModule ()
+{
+	return (CModule*) TlsGetValue (g_ModuleTls);
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+CModule*
+SetCurrentThreadModule (CModule* pModule)
+{
+	CModule* pPrevModule = GetCurrentThreadModule ();
+	TlsSetValue (g_ModuleTls, pModule);
+	return pPrevModule;
+}
+
+//.............................................................................
+
+class CSetCurrentThreadModule
+{
+protected:
+	CModule* m_pPrevModule;
+
+public:
+	CSetCurrentThreadModule (CModule* pModule)
+	{
+		m_pPrevModule = SetCurrentThreadModule (pModule);
+	}
+
+	~CSetCurrentThreadModule ()
+	{
+		SetCurrentThreadModule (m_pPrevModule);
+	}
+};
+
+//.............................................................................
+
+class CPreModule
+{
+protected:
+	CModule* m_pPrevModule;
+
+protected:
+	CPreModule ()
+	{
+		m_pPrevModule = SetCurrentThreadModule ((CModule*) this);
+	}
+
+	void
+	RestorePrevModule ()
+	{
+		SetCurrentThreadModule (m_pPrevModule);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CModule: public CPreModule
 {
 protected:
 	rtl::CString m_FilePath;
@@ -36,7 +104,10 @@ public:
 	COperatorMgr m_OperatorMgr;
 	
 public:
-	CModule ();
+	CModule ()
+	{
+		m_pLlvmModule = NULL;
+	}
 
 	~CModule ()
 	{
@@ -54,44 +125,6 @@ public:
 
 	bool
 	Create (const rtl::CString& FilePath);
-};
-
-//.............................................................................
-
-AXL_SELECT_ANY
-DWORD g_ModuleTls = TlsAlloc ();
-
-inline
-CModule*
-GetCurrentThreadModule ()
-{
-	return (CModule*) TlsGetValue (g_ModuleTls);
-}
-
-inline
-CModule*
-SetCurrentThreadModule (CModule* pModule)
-{
-	CModule* pPrevModule = GetCurrentThreadModule ();
-	TlsSetValue (g_ModuleTls, pModule);
-	return pPrevModule;
-}
-
-class CSetCurrentThreadModule
-{
-protected:
-	CModule* m_pPrevModule;
-
-public:
-	CSetCurrentThreadModule (CModule* pModule)
-	{
-		m_pPrevModule = SetCurrentThreadModule (pModule);
-	}
-
-	~CSetCurrentThreadModule ()
-	{
-		SetCurrentThreadModule (m_pPrevModule);
-	}
 };
 
 //.............................................................................

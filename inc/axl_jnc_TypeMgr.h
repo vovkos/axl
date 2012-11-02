@@ -41,7 +41,7 @@ protected:
 	llvm::StructType* m_pLlvmFatPointerType;
 	
 public:
-	CTypeMgr (CModule* pModule);
+	CTypeMgr ();
 
 	CModule* 
 	GetModule ()

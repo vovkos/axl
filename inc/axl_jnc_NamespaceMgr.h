@@ -25,7 +25,7 @@ protected:
 	CScope* m_pCurrentScope;
 
 public:
-	CNamespaceMgr (CModule* pModule);
+	CNamespaceMgr ();
 
 	CModule* 
 	GetModule ()

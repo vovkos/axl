@@ -7,9 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-CTypeMgr::CTypeMgr (CModule* pModule)
+CTypeMgr::CTypeMgr ()
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_pLlvmFatPointerType = NULL;
 	SetupAllBasicTypes ();
 }

@@ -7,35 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
-CCastOperator::CCastOperator ()
+ICastOperator::ICastOperator()
 {
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_Price = 1;
-	m_CastKind = ECast_Implicit;
-	m_pOperatorLo = NULL;
-	m_pDstType = NULL;
-	m_pSrcType = NULL;
-}
-
-bool
-CCastOperator::Cast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	EValue ValueKind = Value.GetValueKind ();
-	if (ValueKind == EValue_Const)
-	{
-		return 
-			pResultValue->CreateConst (pType) &&
-			m_pOperatorLo->ConstCast (Value, *pResultValue);
-	}
-
-	ASSERT (ValueKind == EValue_Const || ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
-	return m_pOperatorLo->LlvmCast (pModule, Value, pType, pResultValue);
 }
 
 //.............................................................................
@@ -45,6 +22,18 @@ CSuperCast::CSuperCast ()
 	m_pIntermediateType = NULL;
 	m_pFirst = NULL;
 	m_pSecond = NULL;
+}
+
+ECast
+CSuperCast::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	ECast FirstCastKind = m_pFirst->GetCastKind (pSrcType, m_pIntermediateType);
+	ECast SecondCastKind = m_pSecond->GetCastKind (m_pIntermediateType, pDstType);
+	 
+	return FirstCastKind && SecondCastKind ? max (FirstCastKind,SecondCastKind) : ECast_None;
 }
 
 bool
@@ -64,7 +53,6 @@ CSuperCast::ConstCast (
 
 bool
 CSuperCast::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -72,8 +60,8 @@ CSuperCast::LlvmCast (
 {
 	CValue TempValue;
 	return 
-		m_pFirst->LlvmCast (pModule, Value, m_pIntermediateType, &TempValue) &&
-		m_pSecond->LlvmCast (pModule, TempValue, pType, pResultValue);
+		m_pFirst->LlvmCast (Value, m_pIntermediateType, &TempValue) &&
+		m_pSecond->LlvmCast (TempValue, pType, pResultValue);
 }
 
 //.............................................................................
@@ -95,7 +83,6 @@ CCast_cpy::ConstCast (
 
 bool
 CCast_cpy::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -107,8 +94,8 @@ CCast_cpy::LlvmCast (
 		return true;
 	}
 
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmTrunc = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateBitCast (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmTrunc = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateBitCast (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmTrunc, pType);
 	return true;
 }
@@ -132,14 +119,13 @@ CCast_int_trunc::ConstCast (
 
 bool
 CCast_int_trunc::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmTrunc = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateTrunc (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmTrunc = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateTrunc (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmTrunc, pType);
 	return true;
 }
@@ -171,14 +157,13 @@ CCast_int_ext::ConstCast (
 
 bool
 CCast_int_ext::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSExt (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSExt (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -206,14 +191,13 @@ CCast_int_ext_u::ConstCast (
 
 bool
 CCast_int_ext_u::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateZExt (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateZExt (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -240,22 +224,21 @@ CCast_int_swp::ConstCast (
 
 bool
 CCast_int_swp::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
 	llvm::Type* pLlvmType = pType->GetLlvmType ();
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
 
 	llvm::Function* pLlvmSwap = llvm::Intrinsic::getDeclaration (
-		pModule->m_pLlvmModule,
+		m_pModule->m_pLlvmModule,
 		llvm::Intrinsic::bswap,
 		llvm::ArrayRef <llvm::Type*> (pLlvmType)
 		);
 
-	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (pLlvmSwap, pLlvmValue);
+	llvm::Value* pLlvmResult = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (pLlvmSwap, pLlvmValue);
 	pResultValue->SetLlvmRegister (pLlvmResult, pType);
 	return true;
 }
@@ -264,14 +247,13 @@ CCast_int_swp::LlvmCast (
 
 bool
 CCast_f64_f32::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFPTrunc (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFPTrunc (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -280,14 +262,13 @@ CCast_f64_f32::LlvmCast (
 
 bool
 CCast_f32_f64::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFPExt (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFPExt (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -296,14 +277,13 @@ CCast_f32_f64::LlvmCast (
 
 bool
 CCast_int_fp::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSIToFP (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateSIToFP (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -312,14 +292,13 @@ CCast_int_fp::LlvmCast (
 
 bool
 CCast_uint_fp::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateUIToFP (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateUIToFP (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -328,14 +307,13 @@ CCast_uint_fp::LlvmCast (
 
 bool
 CCast_fp_int::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmValue = pModule->m_OperatorMgr.LoadValue (Value);
-	llvm::Value* pLlvmExt = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFPToSI (pLlvmValue, pType->GetLlvmType ());
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmExt = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFPToSI (pLlvmValue, pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
 	return true;
 }
@@ -351,14 +329,13 @@ CCast_arr_ptr_c::ConstCast (
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
-	const CValue& SavedSrcValue = pModule->m_ConstMgr.SaveValue (SrcValue);
+	const CValue& SavedSrcValue = m_pModule->m_ConstMgr.SaveValue (SrcValue);
 	*(void**) DstValue.GetConstData () = SavedSrcValue.GetConstData ();
 	return true;
 }
 
 bool
 CCast_arr_ptr_c::LlvmCast (
-	CModule* pModule,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -376,7 +353,7 @@ CCast_arr_ptr_c::LlvmCast (
 		pLlvmIndex,
 	};
 
-	llvm::Value* pLlvmGep = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateGEP (
+	llvm::Value* pLlvmGep = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateGEP (
 		pLlvmValue, 
 		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
 		);

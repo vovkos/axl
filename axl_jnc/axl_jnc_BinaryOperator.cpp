@@ -76,64 +76,12 @@ GetBinOpString (EBinOp OpKind)
 
 //.............................................................................
 
-CBinaryOperator::CBinaryOperator ()
+IBinaryOperator::IBinaryOperator()
 {
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_OpKind = EBinOp_None;
-	m_pOperatorLo = NULL;
-	m_pOpType1 = NULL;
-	m_pOpType2 = NULL;
-	m_pReturnType = NULL;
-}
-
-bool
-CBinaryOperator::Operator (
-	const CValue& OpValueOrig1,
-	const CValue& OpValueOrig2,
-	CValue* pReturnValue
-	)
-{
-	bool Result;
-
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pOpType1 = OpValueOrig1.GetType ();
-	CType* pOpType2 = OpValueOrig2.GetType ();
-
-	CValue OpValue1;
-	CValue OpValue2;
-
-	Result = 
-		pModule->m_OperatorMgr.CastOperator (OpValueOrig1, m_pOpType1, &OpValue1) &&
-		pModule->m_OperatorMgr.CastOperator (OpValueOrig2, m_pOpType2, &OpValue2);
-
-	if (!Result)
-		return false;
-	
-	EValue OpValueKind1 = OpValue1.GetValueKind ();
-	EValue OpValueKind2 = OpValue2.GetValueKind ();
-	
-	return OpValueKind1 == EValue_Const && OpValueKind2 == EValue_Const ?
-		m_pOperatorLo->ConstOperator (OpValue1, OpValue2, pReturnValue) :
-		m_pOperatorLo->LlvmOperator (pModule, OpValue1, OpValue2, pReturnValue);
-}
-
-bool
-CBinaryOperator::Operator (
-	CValue* pValue,
-	const CValue& OpValue2
-	)
-{
-	bool Result;
-
-	CValue ResultValue;
-
-	Result = Operator (*pValue, OpValue2, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
 }
 
 //.............................................................................
@@ -141,95 +89,120 @@ CBinaryOperator::Operator (
 void
 CBinaryOperatorOverload::Clear ()
 {
-	m_List.Clear ();
 	m_SignatureCache.Clear ();
 	m_DirectMap.Clear ();
 	m_ImplicitMap.Clear ();
 }
 
-CBinaryOperator*
-CBinaryOperatorOverload::FindOperator (
+IBinaryOperator*
+CBinaryOperatorOverload::GetOperator (
 	CType* pOpType1,
-	CType* pOpType2
+	CType* pOpType2,
+	TBinaryOperatorTypeInfo* pTypeInfo
 	)
 {
-	rtl::CStringA Signature = pOpType1->GetSignature () + pOpType2->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CBinaryOperator*> It = m_DirectMap.Find (Signature);
-	if (It)
-		return It->m_Value;
+	bool Result;
 
-	It = m_ImplicitMap.Find (Signature);
+	rtl::CStringA Signature = pOpType1->GetSignature () + pOpType2->GetSignature ();
+	rtl::CHashTableMapIteratorT <const tchar_t*, IBinaryOperator*> It = m_DirectMap.Find (Signature);
+	if (!It)
+		It = m_ImplicitMap.Find (Signature);
+	
 	if (It)
-		return It->m_Value;
+	{
+		IBinaryOperator* pOperator = It->m_Value;
+		if (!pOperator)
+			return NULL;
+
+		Result = pOperator->GetTypeInfo (pOpType1, pOpType2, pTypeInfo);
+		ASSERT (Result);
+		return pOperator;
+	}
 
 	// ok, we need to enumerate all overloads
 
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
+	IBinaryOperator* pBestOperator = NULL;
+	TBinaryOperatorTypeInfo BestTypeInfo;
 
-	CBinaryOperator* pBestOperator = NULL;
-	ECast BestCastKind = ECast_Explicit;
-	size_t BestCastPrice = -1;
-
-	rtl::CIteratorT <CBinaryOperator> Operator = m_List.GetHead ();
-	for (; Operator; Operator++)
+	for (It = m_DirectMap.GetHead (); It; It++)
 	{
-		CBinaryOperator* pOperator = *Operator;
+		IBinaryOperator* pOperator = It->m_Value;
 		
-		CType* pCastOpType1 = pOperator->GetOpType1 ();
-		CCastOperator* pMoveOperator1 = pModule->m_OperatorMgr.FindCastOperator (pOpType1, pCastOpType1);
-		if (!pMoveOperator1)
+		TBinaryOperatorTypeInfo TypeInfo;
+		bool Result = pOperator->GetTypeInfo (pOpType1, pOpType2, &TypeInfo);
+		if (!Result)
 			continue;
 
-		CType* pCastOpType2 = pOperator->GetOpType2 ();
-		CCastOperator* pMoveOperator2 = pModule->m_OperatorMgr.FindCastOperator (pOpType2, pCastOpType2);
-		if (!pMoveOperator2)
-			continue;
-
-		ECast CastKind = max (pMoveOperator1->GetCastKind (), pMoveOperator2->GetCastKind ());
-		size_t CastPrice = pMoveOperator1->GetPrice () + pMoveOperator2->GetPrice ();
-
-		if (!pBestOperator || CastKind < BestCastKind || CastPrice < BestCastPrice)
+		if (!pBestOperator || TypeInfo.m_CastKind < BestTypeInfo.m_CastKind)
 		{
 			pBestOperator = pOperator;
-			BestCastKind = CastKind;
-			BestCastPrice = CastPrice;
-		}
+			BestTypeInfo = TypeInfo;
+		}	
 	}
 
 	m_SignatureCache.InsertTail (Signature);
 	It = m_ImplicitMap.Goto (Signature); 
 	It->m_Value = pBestOperator;
+
+	if (pBestOperator)
+		*pTypeInfo = BestTypeInfo;
+
 	return pBestOperator;
 }
 
-CBinaryOperator*
+IBinaryOperator*
 CBinaryOperatorOverload::AddOperator (
-	CType* pReturnType,
 	CType* pOpType1,
 	CType* pOpType2,
-	IBinaryOperatorLo* pOperatorLo
+	IBinaryOperator* pOperator
 	)
 {
 	rtl::CStringA Signature = pOpType1->GetSignature () + pOpType2->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CBinaryOperator*> It = m_DirectMap.Goto (Signature);
-	if (It->m_Value)
-	{
-		CBinaryOperator* pOperator = It->m_Value;
-		pOperator->m_pOperatorLo = pOperatorLo;
-		return pOperator;
-	}
+	rtl::CHashTableMapIteratorT <const tchar_t*, IBinaryOperator*> It = m_DirectMap.Goto (Signature);
 
-	CBinaryOperator* pOperator = AXL_MEM_NEW (CBinaryOperator);
-	pOperator->m_OpKind = m_OpKind;
-	pOperator->m_pReturnType = pReturnType;
-	pOperator->m_pOpType1 = pOpType1;
-	pOperator->m_pOpType2 = pOpType2;
-	pOperator->m_pOperatorLo = pOperatorLo;
-	m_List.InsertTail (pOperator);
-	m_SignatureCache.InsertTail (Signature);
+	IBinaryOperator* pPrevOperator = It->m_Value;
+	if (!pPrevOperator)
+		m_SignatureCache.InsertTail (Signature);
+
 	It->m_Value = pOperator;
-	return pOperator;
+	return pPrevOperator;
+}
+
+//.............................................................................
+
+bool
+GetArithmeticBinaryOperatorTypeInfo (
+	CModule* pModule,
+	CType* pType,
+	CType* pOpType1,
+	CType* pOpType2,
+	TBinaryOperatorTypeInfo* pTypeInfo
+	)
+{
+	ECast CastKind1 = pModule->m_OperatorMgr.GetCastKind (pOpType1, pType);
+	ECast CastKind2 = pModule->m_OperatorMgr.GetCastKind (pOpType2, pType);
+
+	if (!CastKind1 || !CastKind2)
+		return false;
+
+	pTypeInfo->m_CastKind = min (CastKind1, CastKind2);
+	pTypeInfo->m_pOpType1 = pType;
+	pTypeInfo->m_pOpType2 = pType;
+	pTypeInfo->m_pReturnType = pType;
+	return true;
+}
+
+bool
+GetArithmeticBinaryOperatorTypeInfo (
+	CModule* pModule,
+	EType TypeKind,
+	CType* pOpType1,
+	CType* pOpType2,
+	TBinaryOperatorTypeInfo* pTypeInfo
+	)
+{
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
+	return GetArithmeticBinaryOperatorTypeInfo (pModule, pType, pOpType1, pOpType2, pTypeInfo);
 }
 
 //.............................................................................

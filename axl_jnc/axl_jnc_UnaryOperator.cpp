@@ -40,51 +40,12 @@ GetUnOpString (EUnOp OpKind)
 
 //.............................................................................
 
-CUnaryOperator::CUnaryOperator ()
+IUnaryOperator::IUnaryOperator ()
 {
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_OpKind = EUnOp_None;
-	m_pOperatorLo = NULL;
-	m_pOpType = NULL;
-	m_pReturnType = NULL;
-}
-
-bool
-CUnaryOperator::Operator (
-	const CValue& OpValueOrig,
-	CValue* pReturnValue
-	)
-{
-	bool Result;
-
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pOpType = OpValueOrig.GetType ();
-	CValue OpValue;
-
-	Result = pModule->m_OperatorMgr.CastOperator (OpValueOrig, m_pOpType, &OpValue);
-	if (!Result)
-		return false;
-	
-	EValue OpValueKind = OpValue.GetValueKind ();
-	return OpValueKind == EValue_Const ?
-		m_pOperatorLo->ConstOperator (OpValue, pReturnValue) :
-		m_pOperatorLo->LlvmOperator (pModule, OpValue, pReturnValue);
-}
-
-bool
-CUnaryOperator::Operator (CValue* pValue)
-{
-	bool Result;
-
-	CValue ResultValue;
-
-	Result = Operator (*pValue, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
 }
 
 //.............................................................................
@@ -92,82 +53,108 @@ CUnaryOperator::Operator (CValue* pValue)
 void
 CUnaryOperatorOverload::Clear ()
 {
-	m_List.Clear ();
 	m_DirectMap.Clear ();
 	m_ImplicitMap.Clear ();
 }
 
-CUnaryOperator*
-CUnaryOperatorOverload::FindOperator (CType* pOpType)
+IUnaryOperator*
+CUnaryOperatorOverload::GetOperator (
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	)
 {
-	rtl::CStringA Signature = pOpType->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CUnaryOperator*> It = m_DirectMap.Find (Signature);
-	if (It)
-		return It->m_Value;
+	bool Result;
 
-	It = m_ImplicitMap.Find (Signature);
+	rtl::CStringA Signature = pOpType->GetSignature ();
+	rtl::CHashTableMapIteratorT <const tchar_t*, IUnaryOperator*> It = m_DirectMap.Find (Signature);
+	if (!It)
+		It = m_ImplicitMap.Find (Signature);
+
 	if (It)
-		return It->m_Value;
+	{
+		IUnaryOperator* pOperator = It->m_Value;
+		if (!pOperator)
+			return NULL;
+
+		Result = pOperator->GetTypeInfo (pOpType, pTypeInfo);
+		ASSERT (Result);
+		return pOperator;
+	}
 
 	// ok, we need to enumerate all overloads
 
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
+	IUnaryOperator* pBestOperator = NULL;
+	TUnaryOperatorTypeInfo BestTypeInfo;
 
-	CUnaryOperator* pBestOperator = NULL;
-	ECast BestCastKind = ECast_Explicit;
-	size_t BestCastPrice = -1;
-
-	rtl::CIteratorT <CUnaryOperator> Operator = m_List.GetHead ();
-	for (; Operator; Operator++)
+	for (It = m_DirectMap.GetHead (); It; It++)
 	{
-		CUnaryOperator* pOperator = *Operator;
+		IUnaryOperator* pOperator = It->m_Value;
 		
-		CType* pCastOpType = pOperator->GetOpType ();
-		CCastOperator* pMoveOperator = pModule->m_OperatorMgr.FindCastOperator (pOpType, pCastOpType);
-		if (!pMoveOperator)
+		TUnaryOperatorTypeInfo TypeInfo;
+		bool Result = pOperator->GetTypeInfo (pOpType, &TypeInfo);
+		if (!Result)
 			continue;
 
-		ECast CastKind = pMoveOperator->GetCastKind ();
-		size_t CastPrice = pMoveOperator->GetPrice ();
-
-		if (!pBestOperator || CastKind < BestCastKind || CastPrice < BestCastPrice)
+		if (!pBestOperator || TypeInfo.m_CastKind < BestTypeInfo.m_CastKind)
 		{
 			pBestOperator = pOperator;
-			BestCastKind = CastKind;
-			BestCastPrice = CastPrice;
+			BestTypeInfo = TypeInfo;
 		}
 	}
 
 	It = m_ImplicitMap.Goto (Signature); 
 	It->m_Value = pBestOperator;
+
+	if (pBestOperator)
+		*pTypeInfo = BestTypeInfo;
+
 	return pBestOperator;
 }
 
-CUnaryOperator*
+IUnaryOperator*
 CUnaryOperatorOverload::AddOperator (
-	CType* pReturnType,
 	CType* pOpType,
-	IUnaryOperatorLo* pOperatorLo
+	IUnaryOperator* pOperator
 	)
 {
 	rtl::CStringA Signature = pOpType->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CUnaryOperator*> It = m_DirectMap.Goto (Signature);
-	if (It->m_Value)
-	{
-		CUnaryOperator* pOperator = It->m_Value;		
-		pOperator->m_pOperatorLo = pOperatorLo;
-		return pOperator;
-	}
+	rtl::CHashTableMapIteratorT <const tchar_t*, IUnaryOperator*> It = m_DirectMap.Goto (Signature);
 
-	CUnaryOperator* pOperator = AXL_MEM_NEW (CUnaryOperator);
-	pOperator->m_OpKind = m_OpKind;
-	pOperator->m_pReturnType = pReturnType;
-	pOperator->m_pOpType = pOpType;
-	pOperator->m_pOperatorLo = pOperatorLo;
-	m_List.InsertTail (pOperator);
+	IUnaryOperator* pPrevOperator = It->m_Value;
 	It->m_Value = pOperator;
-	return pOperator;
+	return pPrevOperator;
+}
+
+//.............................................................................
+
+bool
+GetArithmeticUnaryOperatorTypeInfo (
+	CModule* pModule,
+	CType* pType,
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	)
+{
+	ECast CastKind = pModule->m_OperatorMgr.GetCastKind (pOpType, pType);
+	if (!CastKind)
+		return false;
+
+	pTypeInfo->m_CastKind = CastKind;
+	pTypeInfo->m_pOpType = pType;
+	pTypeInfo->m_pReturnType = pType;
+	return true;
+}
+
+bool
+GetArithmeticUnaryOperatorTypeInfo (
+	CModule* pModule,
+	EType TypeKind,
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	)
+{
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
+	return GetArithmeticUnaryOperatorTypeInfo (pModule, pType, pOpType, pTypeInfo);
 }
 
 //.............................................................................
@@ -204,6 +191,20 @@ CUnOp_BitwiseNot::LlvmOpInt (
 //.............................................................................
 
 bool
+CUnOp_addr::GetTypeInfo (
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	)
+{
+	CType* pReturnType = pOpType->GetModifiedType (ETypeModifier_Pointer);
+
+	pTypeInfo->m_CastKind = ECast_Implicit;
+	pTypeInfo->m_pOpType = pOpType;
+	pTypeInfo->m_pReturnType = pReturnType;
+	return true;
+}
+
+bool
 CUnOp_addr::ConstOperator (
 	const CValue& OpValue,
 	CValue* pResultValue
@@ -215,7 +216,6 @@ CUnOp_addr::ConstOperator (
 
 bool
 CUnOp_addr::LlvmOperator (
-	CModule* pModule,
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
@@ -244,7 +244,7 @@ CUnOp_addr::LlvmOperator (
 		pLlvmTypeValue,
 	};
 
-	llvm::Value* pLlvmResult = pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (
+	llvm::Value* pLlvmResult = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (
 		pLlvmCreateFatPointer, 
 		llvm::ArrayRef <llvm::Value*> (ArgArray, 4)
 		);
@@ -254,6 +254,21 @@ CUnOp_addr::LlvmOperator (
 }
 
 //.............................................................................
+
+bool
+CUnOp_indir::GetTypeInfo (
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
+	)
+{
+	CType* pReturnType = pOpType->GetModifiedType (ETypeModifier_RemovePointer);
+	pReturnType = pReturnType->GetModifiedType (ETypeModifier_Reference);
+
+	pTypeInfo->m_CastKind = ECast_Implicit;
+	pTypeInfo->m_pOpType = pOpType;
+	pTypeInfo->m_pReturnType = pReturnType;
+	return true;
+}
 
 bool
 CUnOp_indir::ConstOperator (
@@ -267,7 +282,6 @@ CUnOp_indir::ConstOperator (
 
 bool
 CUnOp_indir::LlvmOperator (
-	CModule* pModule,
 	const CValue& OpValue,
 	CValue* pResultValue
 	)

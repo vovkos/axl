@@ -21,7 +21,7 @@ protected:
 	size_t m_TempVariableCounter;
 
 public:
-	CVariableMgr (CModule* pModule);
+	CVariableMgr ();
 
 	CModule* 
 	GetModule ()

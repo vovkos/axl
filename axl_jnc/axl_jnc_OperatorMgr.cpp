@@ -7,9 +7,10 @@ namespace jnc {
 
 //.............................................................................
 
-COperatorMgr::COperatorMgr (CModule* pModule)
+COperatorMgr::COperatorMgr ()
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
 }
 
 void
@@ -23,7 +24,6 @@ COperatorMgr::Clear ()
 
 	memset (m_BasicCastOperatorTable, 0, sizeof (m_BasicCastOperatorTable));
 	m_CastOperatorMap.Clear ();
-	m_CastOperatorList.Clear ();
 	m_SuperCastList.Clear ();
 }
 
@@ -45,9 +45,6 @@ COperatorMgr::AddStdUnaryOperators ()
 
 	AddUnaryOperator (EUnOp_BitwiseNot, EType_Int32, &m_UnOp_BitwiseNot_i32);
 	AddUnaryOperator (EUnOp_BitwiseNot, EType_Int64, &m_UnOp_BitwiseNot_i64);
-	
-	m_AddrOperator.m_pOperatorLo = &m_UnOp_addr;
-	m_IndirOperator.m_pOperatorLo = &m_UnOp_indir;
 }
 
 void
@@ -221,63 +218,68 @@ COperatorMgr::AddStdCastOperators ()
 	for (size_t i = 0; i < EType__BasicTypeCount; i++)
 	for (size_t j = 0; j < EType__BasicTypeCount; j++)
 	{
-		CCastOperator* pOperatorIK = m_BasicCastOperatorTable [i] [k];
-		CCastOperator* pOperatorKJ = m_BasicCastOperatorTable [k] [j];
+		ICastOperator* pOperatorIK = m_BasicCastOperatorTable [i] [k];
+		ICastOperator* pOperatorKJ = m_BasicCastOperatorTable [k] [j];
 		if (!pOperatorIK || !pOperatorKJ)
 			continue;
 
-		CCastOperator* pOperatorIJ = m_BasicCastOperatorTable [i] [j];
-		if (pOperatorIJ && pOperatorIJ->m_Price <= pOperatorIK->m_Price + pOperatorKJ->m_Price)
+		size_t SuperPrice = pOperatorIK->GetPrice () + pOperatorKJ->GetPrice ();
+
+		ICastOperator* pOperatorIJ = m_BasicCastOperatorTable [i] [j];
+		if (pOperatorIJ && pOperatorIJ->GetPrice () <= SuperPrice)
 			continue;
 
 		CSuperCast* pSuperCast = AXL_MEM_NEW (CSuperCast);
 		pSuperCast->m_pIntermediateType = m_pModule->m_TypeMgr.GetBasicType ((EType) k);
-		pSuperCast->m_pFirst = pOperatorIK->m_pOperatorLo;
-		pSuperCast->m_pSecond = pOperatorKJ->m_pOperatorLo;
+		pSuperCast->m_pFirst = pOperatorIK;
+		pSuperCast->m_pSecond = pOperatorKJ;
+		pSuperCast->m_Price = SuperPrice;
 		m_SuperCastList.InsertTail (pSuperCast);
 
 		pOperatorIJ = AddCastOperator ((EType) i, (EType) j, pSuperCast);
-		pOperatorIJ->m_Price = pOperatorIK->m_Price + pOperatorKJ->m_Price;
 	}
-
-	m_ArrayToPointerCastOperator.m_pOperatorLo = &m_Cast_arr_ptr_c;
 }
 
-CUnaryOperator*
-COperatorMgr::FindUnaryOperator (
+IUnaryOperator*
+COperatorMgr::GetUnaryOperator (
 	EUnOp OpKind,
-	CType* pOpType
+	CType* pOpType,
+	TUnaryOperatorTypeInfo* pTypeInfo
 	)
 {
 	ASSERT (OpKind > 0 && OpKind < EUnOp__Count);
-	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind].FindOperator (pOpType);
+	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind].GetOperator (pOpType, pTypeInfo);
 	if (pOperator)
 		return pOperator;
 
 	switch (OpKind)
 	{
 	case EUnOp_Addr:
-		return &m_AddrOperator;
+		pOperator = &m_UnOp_addr;
+		break;
 
 	case EUnOp_Indir:
-		return &m_IndirOperator;
+		pOperator = &m_UnOp_indir;
+		break;
 	}
 
-	return NULL;
+	if (!pOperator)
+		return NULL;
+
+	bool Result = pOperator->GetTypeInfo (pOpType, pTypeInfo);
+	return Result ? pOperator : NULL;
 }
 
 
-CUnaryOperator*
+IUnaryOperator*
 COperatorMgr::AddUnaryOperator (
 	EUnOp OpKind,
-	EType ReturnTypeKind,
 	EType OpTypeKind,
-	IUnaryOperatorLo* pOperatorLo
+	IUnaryOperator* pOperator
 	)
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetBasicType (ReturnTypeKind);
 	CType* pOpType = m_pModule->m_TypeMgr.GetBasicType (OpTypeKind);
-	return AddUnaryOperator (OpKind, pReturnType, pOpType, pOperatorLo);
+	return AddUnaryOperator (OpKind, pOpType, pOperator);
 }
 
 bool
@@ -289,7 +291,8 @@ COperatorMgr::UnaryOperator (
 {
 	CType* pOpType = OpValue.GetType ();
 
-	CUnaryOperator* pOperator = FindUnaryOperator (OpKind, pOpType);	
+	TUnaryOperatorTypeInfo TypeInfo;
+	IUnaryOperator* pOperator = GetUnaryOperator (OpKind, pOpType, &TypeInfo);	
 	if (!pOperator)
 	{
 		err::SetFormatStringError (
@@ -299,8 +302,16 @@ COperatorMgr::UnaryOperator (
 			);
 		return false;
 	}
+
+	CValue CastOpValue;
+	bool Result = CastOperator (OpValue, TypeInfo.m_pOpType, &CastOpValue);
+	if (!Result)
+		return false;
 	
-	return pOperator->Operator (OpValue, pResultValue);
+	EValue OpValueKind = CastOpValue.GetValueKind ();
+	return OpValueKind == EValue_Const ?
+		pOperator->ConstOperator (CastOpValue, pResultValue) :
+		pOperator->LlvmOperator (CastOpValue, pResultValue);
 }
 
 bool
@@ -319,19 +330,17 @@ COperatorMgr::UnaryOperator (
 	return true;
 }
 
-CBinaryOperator*
+IBinaryOperator*
 COperatorMgr::AddBinaryOperator (
 	EBinOp OpKind,
-	EType ReturnTypeKind,
 	EType OpTypeKind1,
 	EType OpTypeKind2,
-	IBinaryOperatorLo* pOperatorLo
+	IBinaryOperator* pOperator
 	)
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetBasicType (ReturnTypeKind);
 	CType* pOpType1 = m_pModule->m_TypeMgr.GetBasicType (OpTypeKind1);
 	CType* pOpType2 = m_pModule->m_TypeMgr.GetBasicType (OpTypeKind2);
-	return AddBinaryOperator (OpKind, pReturnType, pOpType1, pOpType2, pOperatorLo);
+	return AddBinaryOperator (OpKind, pOpType1, pOpType2, pOperator);
 }
 
 bool
@@ -345,7 +354,8 @@ COperatorMgr::BinaryOperator (
 	CType* pOpType1 = OpValue1.GetType ();
 	CType* pOpType2 = OpValue2.GetType ();
 
-	CBinaryOperator* pOperator = FindBinaryOperator (OpKind, pOpType1, pOpType2);	
+	TBinaryOperatorTypeInfo TypeInfo;
+	IBinaryOperator* pOperator = GetBinaryOperator (OpKind, pOpType1, pOpType2, &TypeInfo);	
 	if (!pOperator)
 	{
 		err::SetFormatStringError (
@@ -357,7 +367,22 @@ COperatorMgr::BinaryOperator (
 		return false;
 	}
 	
-	return pOperator->Operator (OpValue1, OpValue2, pResultValue);
+	CValue CastOpValue1;
+	CValue CastOpValue2;
+
+	bool Result = 
+		CastOperator (OpValue1, TypeInfo.m_pOpType1, &CastOpValue1) &&
+		CastOperator (OpValue2, TypeInfo.m_pOpType2, &CastOpValue2);
+
+	if (!Result)
+		return false;
+	
+	EValue OpValueKind1 = CastOpValue1.GetValueKind ();
+	EValue OpValueKind2 = CastOpValue2.GetValueKind ();
+	
+	return OpValueKind1 == EValue_Const && OpValueKind2 == EValue_Const ?
+		pOperator->ConstOperator (OpValue1, OpValue2, pResultValue) :
+		pOperator->LlvmOperator (OpValue1, OpValue2, pResultValue);
 }
 
 bool
@@ -377,85 +402,122 @@ COperatorMgr::BinaryOperator (
 	return true;
 }
 
-CCastOperator*
+ICastOperator*
 COperatorMgr::FindCastOperator (
 	CType* pSrcType,
 	CType* pDstType
 	)
 {
+	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
+	rtl::CHashTableMapIteratorT <const tchar_t*, ICastOperator*> It = m_CastOperatorMap.Find (Signature);
+	if (It)
+		return It->m_Value;
+
 	// TODO: do proper special cases of casting
 
 	EType SrcTypeKind = pSrcType->GetTypeKind ();
 	EType DstTypeKind = pDstType->GetTypeKind ();
 	
 	if (SrcTypeKind == EType_Array && DstTypeKind == EType_Pointer_c)
-		return &m_ArrayToPointerCastOperator;
-
-	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CCastOperator*> It = m_CastOperatorMap.Find (Signature);
-	if (It)
-		return It->m_Value;
+		return &m_Cast_arr_ptr_c;
 
 	return NULL;
 }
 
-CCastOperator*
+ICastOperator*
 COperatorMgr::AddCastOperator (
 	CType* pSrcType,
 	CType* pDstType,
-	ICastOperatorLo* pOperatorLo
+	ICastOperator* pOperator
 	)
 {
 	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, CCastOperator*> It = m_CastOperatorMap.Goto (Signature);
-	if (It->m_Value)
-	{
-		CCastOperator* pOperator = It->m_Value;
-		
-		ASSERT (pOperator->m_Signature == Signature);
-		pOperator->m_pOperatorLo = pOperatorLo;
-		return pOperator;
-	}
+	rtl::CHashTableMapIteratorT <const tchar_t*, ICastOperator*> It = m_CastOperatorMap.Goto (Signature);
 
-	CCastOperator* pOperator = AXL_MEM_NEW (CCastOperator);
-	pOperator->m_Signature = Signature;
-	pOperator->m_pSrcType = pSrcType;
-	pOperator->m_pDstType = pDstType;
-	pOperator->m_pOperatorLo = pOperatorLo;
-	m_CastOperatorList.InsertTail (pOperator);
+	ICastOperator* pPrevOperator = It->m_Value;
+	if (!pPrevOperator)
+		m_CastSignatureCache.InsertTail (Signature);
+
 	It->m_Value = pOperator;
-
-	EType DstTypeKind = pDstType->GetTypeKind ();
-	EType SrcTypeKind = pSrcType->GetTypeKind ();
-	if (DstTypeKind < EType__BasicTypeCount && SrcTypeKind < EType__BasicTypeCount)
-		m_BasicCastOperatorTable [SrcTypeKind] [DstTypeKind] = pOperator;
-
-	return pOperator;
+	return pPrevOperator;
 }
 
-CCastOperator*
+ICastOperator*
 COperatorMgr::AddCastOperator (
 	EType SrcTypeKind,
 	EType DstTypeKind,
-	ICastOperatorLo* pOperatorLo
+	ICastOperator* pOperator
 	)
 {
 	CType* pSrcType = m_pModule->m_TypeMgr.GetBasicType (SrcTypeKind);
 	CType* pDstType = m_pModule->m_TypeMgr.GetBasicType (DstTypeKind);
-	return AddCastOperator (pSrcType, pDstType, pOperatorLo);
+	return AddCastOperator (pSrcType, pDstType, pOperator);
 }
 
-llvm::Value*
-COperatorMgr::LoadValue (const CValue& Value)
+ECast
+COperatorMgr::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
 {
-	EValue ValueKind = Value.GetValueKind ();
-	ASSERT (ValueKind == EValue_Const || ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
+	ICastOperator* pOperator = FindCastOperator (pSrcType, pDstType);
+	return pOperator ? pOperator->GetCastKind (pSrcType, pDstType) : ECast_None;
+}
 
-	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
-	if (ValueKind == EValue_Variable)
-		pLlvmValue = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLoad (pLlvmValue);
+bool
+COperatorMgr::CastOperator (
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	if (pType->Cmp (OpValue.GetType ()) == 0)
+	{
+		*pResultValue = OpValue;
+		return true;
+	}
 
-	return pLlvmValue;
+	ICastOperator* pOperator = FindCastOperator (OpValue.GetType (), pType);	
+	if (!pOperator)
+	{
+		err::SetFormatStringError (
+			_T("cannot convert from '%s' to '%s'"),
+			OpValue.GetType ()->GetTypeString (),
+			pType->GetTypeString ()
+			);
+		return false;
+	}
+	
+	EValue OpValueKind = OpValue.GetValueKind ();
+	if (OpValueKind == EValue_Const)
+	{
+		return 
+			pResultValue->CreateConst (pType) &&
+			pOperator->ConstCast (OpValue, *pResultValue);
+	}
+
+	ASSERT (
+		OpValueKind == EValue_Const || 
+		OpValueKind == EValue_Variable || 
+		OpValueKind == EValue_LlvmRegister);
+
+	return pOperator->LlvmCast (OpValue, pType, pResultValue);
+}
+
+bool
+COperatorMgr::CastOperator (
+	CValue* pValue,
+	CType* pType
+	)
+{
+	CValue ResultValue;
+
+	bool Result = CastOperator (*pValue, pType, &ResultValue);
+	if (!Result)
+		return false;
+
+	*pValue = ResultValue;
+	return true;
 }
 
 bool
@@ -511,49 +573,6 @@ COperatorMgr::MoveOperator (
 	return 
 		BinaryOperator (OpKind, DstValue, SrcValue, &RValue) &&
 		MoveOperator (RValue, DstValue);
-}
-
-bool
-COperatorMgr::CastOperator (
-	const CValue& OpValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	if (pType->Cmp (OpValue.GetType ()) == 0)
-	{
-		*pResultValue = OpValue;
-		return true;
-	}
-
-	CCastOperator* pOperator = FindCastOperator (OpValue.GetType (), pType);	
-	if (!pOperator)
-	{
-		err::SetFormatStringError (
-			_T("cannot convert from '%s' to '%s'"),
-			OpValue.GetType ()->GetTypeString (),
-			pType->GetTypeString ()
-			);
-		return false;
-	}
-	
-	return pOperator->Cast (OpValue, pType, pResultValue);
-}
-
-bool
-COperatorMgr::CastOperator (
-	CValue* pValue,
-	CType* pType
-	)
-{
-	CValue ResultValue;
-
-	bool Result = CastOperator (*pValue, pType, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
 }
 
 bool
@@ -688,6 +707,19 @@ bool
 COperatorMgr::PostfixDecOperator (CValue* pValue)
 {
 	return true;
+}
+
+llvm::Value*
+COperatorMgr::LoadValue (const CValue& Value)
+{
+	EValue ValueKind = Value.GetValueKind ();
+	ASSERT (ValueKind == EValue_Const || ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
+
+	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
+	if (ValueKind == EValue_Variable)
+		pLlvmValue = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLoad (pLlvmValue);
+
+	return pLlvmValue;
 }
 
 //.............................................................................

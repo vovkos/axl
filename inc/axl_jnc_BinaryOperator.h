@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "axl_jnc_Value.h"
+#include "axl_rtl_StringHashTable.h"
+#include "axl_jnc_CastOperator.h"
 
 namespace axl {
 namespace jnc {
@@ -41,12 +42,49 @@ enum EBinOp
 const tchar_t*
 GetBinOpString (EBinOp Op);
 
+//.............................................................................
+
+struct TBinaryOperatorTypeInfo
+{
+	CType* m_pReturnType;
+	CType* m_pOpType1;
+	CType* m_pOpType2;
+
+	ECast m_CastKind;
+};
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 [uuid ("e205fc7b-e75e-4cc6-88f7-336701c9645a")]
-struct IBinaryOperatorLo: obj::IRoot
+struct IBinaryOperator: obj::IRoot
 {	
+protected:
+	CModule* m_pModule;
+	EBinOp m_OpKind;
+
 public:
+	IBinaryOperator ();
+
+	CModule*
+	GetModule ()
+	{
+		return m_pModule;
+	}
+
+	EBinOp 
+	GetOpKind ()
+	{
+		return m_OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
+		) = 0;
+
 	virtual
 	bool
 	ConstOperator (
@@ -58,7 +96,6 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue	
@@ -67,102 +104,77 @@ public:
 
 //.............................................................................
 
-class CBinaryOperator: public rtl::TListLink
+class CBinaryOperatorOverload
 {
 protected:
-	friend class CBinaryOperatorOverload;
-
-	EBinOp m_OpKind;
-	CType* m_pReturnType;
-	CType* m_pOpType1;
-	CType* m_pOpType2;
-	IBinaryOperatorLo* m_pOperatorLo;
+	rtl::CBoxListT <rtl::CString> m_SignatureCache;
+	rtl::CStringHashTableMapAT <IBinaryOperator*> m_DirectMap;
+	rtl::CStringHashTableMapAT <IBinaryOperator*> m_ImplicitMap;
 
 public:
-	CBinaryOperator ();
+	void
+	Clear ();
 
-	EBinOp 
-	GetOpKind ()
-	{
-		return m_OpKind;
-	}
-
-	CType* 
-	GetReturnType () 
-	{
-		return m_pReturnType;
-	}
-
-	CType* 
-	GetOpType1 ()
-	{
-		return m_pOpType1;
-	}
-
-	CType* 
-	GetOpType2 ()
-	{
-		return m_pOpType2;
-	}
-
-	bool
-	Operator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pReturnValue		
+	IBinaryOperator*
+	GetOperator (
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
 		);
 
-	bool
-	Operator (
-		CValue* pValue,
-		const CValue& OpValue2
+	IBinaryOperator*
+	AddOperator (
+		CType* pOpType1,
+		CType* pOpType2,
+		IBinaryOperator* pOperator
 		);
 };
 
 //.............................................................................
 
-class CBinaryOperatorOverload
-{
-protected:
-	EBinOp m_OpKind;
-	rtl::CStdListT <CBinaryOperator> m_List;
-	rtl::CBoxListT <rtl::CString> m_SignatureCache;
-	rtl::CStringHashTableMapAT <CBinaryOperator*> m_DirectMap;
-	rtl::CStringHashTableMapAT <CBinaryOperator*> m_ImplicitMap;
+bool
+GetArithmeticBinaryOperatorTypeInfo (
+	CModule* pModule,
+	CType* pType,
+	CType* pOpType1,
+	CType* pOpType2,
+	TBinaryOperatorTypeInfo* pTypeInfo
+	);
 
-public:
-	CBinaryOperatorOverload ()
-	{
-		m_OpKind = EBinOp_None;
-	}
-
-	void
-	Clear ();
-
-	CBinaryOperator*
-	FindOperator (
-		CType* pOpType1,
-		CType* pOpType2
-		);
-
-	CBinaryOperator*
-	AddOperator (
-		CType* pReturnType,
-		CType* pOpType1,
-		CType* pOpType2,
-		IBinaryOperatorLo* pOperatorLo
-		);
-};
+bool
+GetArithmeticBinaryOperatorTypeInfo (
+	CModule* pModule,
+	EType TypeKind,
+	CType* pOpType1,
+	CType* pOpType2,
+	TBinaryOperatorTypeInfo* pTypeInfo
+	);
 
 //.............................................................................
 
 template <typename T>
-class CBinOpT_i32: public IBinaryOperatorLo
+class CBinOpT_i32: public IBinaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_i32, IBinaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CBinOpT_i32, IBinaryOperator)
 
 public:
+	CBinOpT_i32 ()
+	{
+		m_OpKind = (EBinOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Int32, pOpType1, pOpType2, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -179,15 +191,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
 		return true;
 	}
@@ -196,12 +207,28 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CBinOpT_i64: public IBinaryOperatorLo
+class CBinOpT_i64: public IBinaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_i64, IBinaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CBinOpT_i64, IBinaryOperator)
 
 public:
+	CBinOpT_i64 ()
+	{
+		m_OpKind = (EBinOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Int64, pOpType1, pOpType2, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -218,15 +245,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
 		return true;
 	}
@@ -235,12 +261,28 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CBinOpT_f32: public IBinaryOperatorLo
+class CBinOpT_f32: public IBinaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_f32, IBinaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CBinOpT_f32, IBinaryOperator)
 
 public:
+	CBinOpT_f32 ()
+	{
+		m_OpKind = (EBinOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Float, pOpType1, pOpType2, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -257,15 +299,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
 		return true;
 	}
@@ -274,12 +315,28 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CBinOpT_f64: public IBinaryOperatorLo
+class CBinOpT_f64: public IBinaryOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_f64, IBinaryOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CBinOpT_f64, IBinaryOperator)
 
 public:
+	CBinOpT_f64 ()
+	{
+		m_OpKind = (EBinOp) T::OpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Double, pOpType1, pOpType2, pTypeInfo);
+	}
+
 	virtual
 	bool
 	ConstOperator (
@@ -296,15 +353,14 @@ public:
 	virtual
 	bool
 	LlvmOperator (
-		CModule* pModule,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
+		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}
@@ -385,7 +441,7 @@ class CBinOp_Sub
 public:
 	enum
 	{
-		 OpKind = EBinOp_Add
+		 OpKind = EBinOp_Sub
 	};
 
 public:

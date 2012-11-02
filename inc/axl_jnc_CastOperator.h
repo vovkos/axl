@@ -14,6 +14,7 @@ namespace jnc {
 
 enum ECast
 {
+	ECast_None,
 	ECast_Implicit,
 	ECast_Explicit,
 };
@@ -21,9 +22,37 @@ enum ECast
 //.............................................................................
 
 [uuid ("2f7742e5-396e-4444-bbc6-56eb475403bf")]
-struct ICastOperatorLo: obj::IRoot
+struct ICastOperator: obj::IRoot
 {	
+protected:
+	CModule* m_pModule;
+	size_t m_Price;
+
 public:
+	ICastOperator ();
+
+	CModule*
+	GetModule ()
+	{
+		return m_pModule;
+	}
+
+	size_t
+	GetPrice ()
+	{
+		return m_Price;
+	}
+
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Implicit;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -34,7 +63,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value, // EValue_Variable or EValue_LlvmRegister
 		CType* pType,
 		CValue* pResultValue // EValue_Variable or EValue_LlvmRegister
@@ -43,75 +71,32 @@ public:
 
 //.............................................................................
 
-class CCastOperator: public rtl::TListLink
-{
-protected:
-	friend class COperatorMgr;
-
-	ECast m_CastKind;
-	size_t m_Price;
-
-	rtl::CStringA m_Signature;
-	CType* m_pSrcType;
-	CType* m_pDstType;
-	ICastOperatorLo* m_pOperatorLo;
-
-public:
-	CCastOperator ();
-
-	ECast
-	GetCastKind ()
-	{
-		return m_CastKind;
-	}
-
-	size_t
-	GetPrice ()
-	{
-		return m_Price;
-	}
-
-	CType* 
-	GetSrcType () 
-	{
-		return m_pSrcType;
-	}
-
-	CType* 
-	GetDstType ()
-	{
-		return m_pDstType;
-	}
-
-	bool
-	Cast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
 // superposition of 2 casts
 
 class CSuperCast: 
-	public ICastOperatorLo,
+	public ICastOperator,
 	public rtl::TListLink
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CSuperCast, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CSuperCast, ICastOperator)
 
 protected:
 	friend class COperatorMgr;
 
 	CType* m_pIntermediateType;
 
-	ICastOperatorLo* m_pFirst;
-	ICastOperatorLo* m_pSecond;
+	ICastOperator* m_pFirst;
+	ICastOperator* m_pSecond;
 
 public:
 	CSuperCast ();
+
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
 
 	virtual
 	bool
@@ -123,7 +108,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -134,10 +118,10 @@ public:
 
 // simple copy
 
-class CCast_cpy: public ICastOperatorLo
+class CCast_cpy: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_cpy, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_cpy, ICastOperator)
 
 public:
 	virtual
@@ -150,7 +134,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -161,10 +144,10 @@ public:
 
 // integer extensions, truncations & byte order swap
 
-class CCast_int_trunc: public ICastOperatorLo
+class CCast_int_trunc: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_trunc, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_trunc, ICastOperator)
 
 public:
 	virtual
@@ -177,7 +160,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -186,10 +168,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_int_ext: public ICastOperatorLo
+class CCast_int_ext: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext, ICastOperator)
 
 public:
 	virtual
@@ -202,7 +184,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -211,10 +192,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_int_ext_u: public ICastOperatorLo
+class CCast_int_ext_u: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperator)
 
 public:
 	virtual
@@ -227,7 +208,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -236,10 +216,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_int_swp: public ICastOperatorLo
+class CCast_int_swp: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_swp, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_swp, ICastOperator)
 
 public:
 	virtual
@@ -252,7 +232,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -261,10 +240,10 @@ public:
 
 //.............................................................................
 
-class CCast_f64_f32: public ICastOperatorLo
+class CCast_f64_f32: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperator)
 
 public:
 	virtual
@@ -281,7 +260,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -290,10 +268,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_f32_f64: public ICastOperatorLo
+class CCast_f32_f64: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperator)
 
 public:
 	virtual
@@ -310,7 +288,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -321,13 +298,12 @@ public:
 
 // int <-> floating point
 
-class CCast_int_fp: public ICastOperatorLo
+class CCast_int_fp: public ICastOperator
 {
 public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -336,13 +312,12 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_uint_fp: public ICastOperatorLo
+class CCast_uint_fp: public ICastOperator
 {
 public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -351,13 +326,12 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_fp_int: public ICastOperatorLo
+class CCast_fp_int: public ICastOperator
 {
 public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -371,7 +345,7 @@ public:
 class CCast_i32_f32: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i32_f32, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32_f32, ICastOperator)
 
 public:
 	virtual
@@ -391,7 +365,7 @@ public:
 class CCast_i32u_f32: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f32, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f32, ICastOperator)
 
 public:
 	virtual
@@ -411,7 +385,7 @@ public:
 class CCast_i32_f64: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i32_f64, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32_f64, ICastOperator)
 
 public:
 	virtual
@@ -431,7 +405,7 @@ public:
 class CCast_i32u_f64: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f64, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f64, ICastOperator)
 
 public:
 	virtual
@@ -453,7 +427,7 @@ public:
 class CCast_i64_f32: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i64_f32, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64_f32, ICastOperator)
 
 public:
 	virtual
@@ -473,7 +447,7 @@ public:
 class CCast_i64u_f32: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f32, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f32, ICastOperator)
 
 public:
 	virtual
@@ -493,7 +467,7 @@ public:
 class CCast_i64_f64: public CCast_int_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i64_f64, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64_f64, ICastOperator)
 
 public:
 	virtual
@@ -513,7 +487,7 @@ public:
 class CCast_i64u_f64: public CCast_uint_fp
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f64, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f64, ICastOperator)
 
 public:
 	virtual
@@ -535,7 +509,7 @@ public:
 class CCast_f32_i32: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i32, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i32, ICastOperator)
 
 public:
 	virtual
@@ -555,7 +529,7 @@ public:
 class CCast_f32_i64: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i64, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i64, ICastOperator)
 
 public:
 	virtual
@@ -577,7 +551,7 @@ public:
 class CCast_f64_i32: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_f64_i32, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f64_i32, ICastOperator)
 
 public:
 	virtual
@@ -597,7 +571,7 @@ public:
 class CCast_f64_i64: public CCast_fp_int
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_f64_i64, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_f64_i64, ICastOperator)
 
 public:
 	virtual
@@ -614,10 +588,10 @@ public:
 
 //.............................................................................
 
-class CCast_arr_ptr_c: public ICastOperatorLo
+class CCast_arr_ptr_c: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr_c, ICastOperatorLo)
+	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr_c, ICastOperator)
 
 public:
 	virtual
@@ -630,7 +604,6 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		CModule* pModule,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue

@@ -7,10 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-CControlFlowMgr::CControlFlowMgr (CModule* pModule):
+CControlFlowMgr::CControlFlowMgr ():
 	m_LlvmBuilder (llvm::getGlobalContext())
 {
-	m_pModule = pModule;
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
 }
 
 void

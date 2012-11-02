@@ -20,10 +20,7 @@ protected:
 	rtl::CBoxListT <CValue> m_ConstList;
 
 public:
-	CConstMgr (CModule* pModule)
-	{
-		m_pModule = pModule;
-	}
+	CConstMgr ();
 
 	CModule* 
 	GetModule ()
