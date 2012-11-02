@@ -322,10 +322,10 @@
     <ClInclude Include="..\inc\axl_rtl_SwapByteOrder.h">
       <Filter>rtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_rtl_HexEncode.h">
+    <ClInclude Include="..\inc\axl_rtl_EscapeEncoding.h">
       <Filter>rtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_rtl_EscapeEncoding.h">
+    <ClInclude Include="..\inc\axl_rtl_HexEncoding.h">
       <Filter>rtl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -447,9 +447,6 @@
     </ClCompile>
     <ClCompile Include="axl_io_FilePathUtils.cpp">
       <Filter>io</Filter>
-    </ClCompile>
-    <ClCompile Include="axl_rtl_HexEncode.cpp">
-      <Filter>rtl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

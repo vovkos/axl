@@ -204,7 +204,7 @@ protected:
 		)
 	{
 		CToken* pToken = CreateToken (Token);
-		pToken->m_Data.m_String.Copy (ts + Left, pToken->m_Pos.m_Length - (Left + Right));
+		pToken->m_Data.m_String = rtl::CEscapeEncodingA::Decode (ts + Left, pToken->m_Pos.m_Length - (Left + Right));
 		return pToken;
 	}
 

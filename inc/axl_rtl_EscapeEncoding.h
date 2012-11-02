@@ -4,28 +4,12 @@
 
 #pragma once
 
-#define _AXL_RTL_ESCAPEENCODE_H
+#define _AXL_RTL_ESCAPEENCODING_H
 
-#include "axl_rtl_String.h"
-#include "axl_rtl_Array.h"
+#include "axl_rtl_HexEncoding.h"
 
 namespace axl {
 namespace rtl {
-
-//.............................................................................
-
-inline
-char
-GetHexChar (
-	uchar_t x,
-	bool IsUpperCase = false
-	)
-{
-	static char _HexCharArrayLowerCase [17] = "0123456789abcdef";
-	static char _HexCharArrayUpperCase [17] = "0123456789ABCDEF";
-	
-	return IsUpperCase ? _HexCharArrayUpperCase [x & 0xf] : _HexCharArrayLowerCase [x & 0xf];
-}
 
 //.............................................................................
 
@@ -108,7 +92,7 @@ public:
 		size_t Length = -1
 		)
 	{
-		CStringA String;
+		CString String;
 
 		if (Length == -1)
 			Length = CStringDetails::GetLength (p);
@@ -129,11 +113,13 @@ public:
 			}
 			else if (!isprint (*p))
 			{
-				C EscapeSequence [4] = 
+				uchar_t x = (uchar_t) *p;
+
+				C EscapeSequence [8] = 
 				{ 
 					'\\', 'x', 
-					GetHexChar ((uchar_t) (*p >> 8)), 
-					GetHexChar ((uchar_t) *p) 
+					CHexEncodingT <C>::GetHexChar (x >> 4), 
+					CHexEncodingT <C>::GetHexChar (x) 
 				};
 
 				String.Append (pBase, p - pBase);
@@ -175,14 +161,15 @@ public:
 			Length = CStringDetails::GetLength (p);
 
 		C HexCodeString [4] = { 0 };
-		C* pEnd;
+		C* pHexCodeEnd;
 		size_t HexCodeLen;
 		long HexCode;
 
 		C Replace;
 
+		const C* pEnd = p + Length;
 		const C* pBase = p;
-		for (size_t i = 0; i < Length; p++, i++)
+		for (; p < pEnd; p++)
 		{
 			switch (State)
 			{
@@ -222,8 +209,8 @@ public:
 				if (HexCodeLen < 2)
 					break;
 
-				HexCode = CStringDetails::StrToULong (HexCodeString, &pEnd, 16);
-				if (pEnd != &HexCodeString [HexCodeLen])
+				HexCode = CStringDetails::StrToULong (HexCodeString, &pHexCodeEnd, 16);
+				if (pHexCodeEnd != &HexCodeString [HexCodeLen])
 					HexCode = '?';
 
 				String.Append ((C) HexCode);

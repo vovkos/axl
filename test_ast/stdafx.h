@@ -119,6 +119,8 @@ extern "C" {
 #include "axl_lex_RagelLexer.h"
 #include "axl_err_ParseError.h"
 
+#include "axl_rtl_HexEncoding.h"
+
 using namespace axl;
 
 // LLVM

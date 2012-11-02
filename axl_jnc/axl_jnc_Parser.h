@@ -4963,7 +4963,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 #line 501 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			__pSymbol->m_Arg.pValue->SetLiteral (rtl::CEscapeEncoding::Decode ((*(_cls13*) GetAstLocator (0)).m_String));
+			__pSymbol->m_Arg.pValue->SetLiteral ((*(_cls13*) GetAstLocator (0)).m_String);
 		;
 #line 4969 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}

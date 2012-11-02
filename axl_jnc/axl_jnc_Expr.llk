@@ -499,7 +499,7 @@ local
 		}
 	| literal 
 		{
-			$pValue->SetLiteral (rtl::CEscapeEncoding::Decode ($1.m_String));
+			$pValue->SetLiteral ($1.m_String);
 		}
 	| EToken_True
 		{
