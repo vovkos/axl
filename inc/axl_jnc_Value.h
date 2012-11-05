@@ -212,22 +212,64 @@ public:
 	SetConstBool (bool Bool);
 
 	void
-	SetConstInt32 (int32_t Integer);
+	SetConstInt32 (
+		int32_t Integer,
+		CType* pType
+		)
+	{
+		CreateConst (pType, &Integer);
+	}
+
+	void
+	SetConstInt32 (
+		int32_t Integer,
+		EType TypeKind
+		);
+
+	void
+	SetConstInt32 (int32_t Integer)
+	{
+		SetConstInt32 (Integer, GetInt32TypeKind (Integer));
+	}
 
 	void
 	SetConstUInt32 (
 		uint32_t Integer,
 		bool ForceUnsigned = false
+		)
+	{
+		SetConstInt32 (Integer, GetUInt32TypeKind (Integer, ForceUnsigned));
+	}
+
+	void
+	SetConstInt64 (
+		int64_t Integer,
+		CType* pType
+		)
+	{
+		CreateConst (pType, &Integer);
+	}
+
+	void
+	SetConstInt64 (
+		int64_t Integer,
+		EType TypeKind
 		);
 
 	void
-	SetConstInt64 (int64_t Integer);
+	SetConstInt64 (int64_t Integer)
+	{
+		SetConstInt64 (Integer, GetInt64TypeKind (Integer));
+	}
 
 	void
 	SetConstUInt64 (
 		uint64_t Integer,
 		bool ForceUnsigned = false
-		);
+		)
+	{
+		SetConstInt64 (Integer, GetUInt64TypeKind (Integer, ForceUnsigned));
+	}
 
 	void
 	SetConstFloat (float Float);

@@ -40,7 +40,7 @@ enum EBinOp
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const tchar_t*
-GetBinOpString (EBinOp Op);
+GetBinOpString (EBinOp OpKind);
 
 //.............................................................................
 

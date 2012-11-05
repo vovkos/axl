@@ -19,12 +19,22 @@ protected:
 	rtl::CArrayT <CType*> m_BaseTypeArray;
 	rtl::CArrayT <CImportType*> m_GenericArgumentArray;
 
+	size_t m_ActualSize;
+	size_t m_AlignFactor;
 	size_t m_PackFactor;
 
 public:
 	CStructClassType ()
 	{
+		m_ActualSize = 0;
+		m_AlignFactor = 1;
 		m_PackFactor = 8;
+	}
+
+	size_t 
+	GetAlignFactor ()
+	{
+		return m_AlignFactor;
 	}
 
 	size_t 
@@ -78,14 +88,11 @@ protected:
 
 	CType* m_pType;
 	size_t m_Offset;
+	size_t m_Index;
+	size_t m_LlvmIndex;
 
 public:
-	CStructMember ()
-	{
-		m_ItemKind = EModuleItem_StructMember;
-		m_pType = NULL;
-		m_Offset = 0;
-	}
+	CStructMember ();
 
 	CType*
 	GetType ()
@@ -97,6 +104,18 @@ public:
 	GetOffset ()
 	{
 		return m_Offset;
+	}
+
+	size_t
+	GetIndex ()
+	{
+		return m_Index;
+	}
+
+	size_t
+	GetLlvmIndex ()
+	{
+		return m_LlvmIndex;
 	}
 };
 

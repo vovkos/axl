@@ -6,6 +6,7 @@
 
 #include "axl_rtl_StringHashTable.h"
 #include "axl_jnc_CastOperator.h"
+#include "axl_jnc_BinaryOperator.h"
 
 namespace axl {
 namespace jnc {
@@ -20,15 +21,17 @@ enum EUnOp
 	EUnOp_Addr,
 	EUnOp_Indir,
 	EUnOp_LogicalNot,
-	EUnOp_Inc,
-	EUnOp_Dec,
+	EUnOp_PreInc,
+	EUnOp_PreDec,
+	EUnOp_PostInc,
+	EUnOp_PostDec,
 	EUnOp__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const tchar_t*
-GetUnOpString (EUnOp Op);
+GetUnOpString (EUnOp OpKind);
 
 //.............................................................................
 
@@ -339,6 +342,11 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CUnOp_addr, IUnaryOperator)
 
 public:
+	CUnOp_addr ()
+	{
+		m_OpKind = EUnOp_Addr;
+	}
+
 	virtual
 	bool
 	GetTypeInfo (
@@ -369,6 +377,11 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CUnOp_indir, IUnaryOperator)
 
 public:
+	CUnOp_indir ()
+	{
+		m_OpKind = EUnOp_Indir;
+	}
+
 	virtual
 	bool
 	GetTypeInfo (
@@ -389,6 +402,61 @@ public:
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <EUnOp UnOpKind>
+class CUnOpT_inc: public IUnaryOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CUnOpT_inc, IUnaryOperator)
+
+public:
+	CUnOpT_inc ()
+	{
+		m_OpKind = UnOpKind;
+	}
+
+	virtual
+	bool
+	GetTypeInfo (
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		return GetArithmeticUnaryOperatorTypeInfo (m_pModule, pOpType, pOpType, pTypeInfo);
+	}
+
+	virtual
+	bool
+	ConstOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		err::SetFormatStringError (_T("cannot apply '%s' operator to a constant"), GetUnOpString (UnOpKind));
+		return false;
+	}
+
+	virtual
+	bool
+	LlvmOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		CValue One;
+		One.SetConstInt32 (1);
+		EBinOp BinOpKind = UnOpKind == EUnOp_PreInc || UnOpKind == EUnOp_PostInc ? EBinOp_Add : EBinOp_Sub;
+		
+		bool Result = m_pModule->m_OperatorMgr.MoveOperator (One, OpValue, BinOpKind);
+		if (!Result)
+			return false;
+
+		*pResultValue = OpValue;
+		return true;
+	}
 };
 
 //.............................................................................

@@ -203,13 +203,51 @@ StdLib_printf (
 	rtl::CString String;
 	String.FormatV (pFormat, va_start_e (pFormat));
 	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("printf (%s)\n"), String);
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s"), String);
+}
+
+int
+StdLib_StructTest (
+	void* p,
+	size_t Size
+	)
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+
+#pragma pack (push, 4)
+	struct TStruct
+	{
+		int8_t m_a;
+		int64_t m_b;
+		int8_t m_c;
+	};
+#pragma pack (pop)
+
+	TStruct* pStruct = (TStruct*) p;
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
+		"TStruct = { %d, %lld, %d }; Size = %d; sizeof (TStruct) = %d;\n", 
+		pStruct->m_a, pStruct->m_b, pStruct->m_c,
+		Size,
+		sizeof (TStruct)
+		);
+
+	return 0;
 }
 
 int
 StdLib_ReadInteger ()
 {
 	return 10;
+}
+
+bool
+CAstDoc::ExportStdLib ()
+{
+	ExportStdLibFunction (_T("printf"), StdLib_printf);
+	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
+	ExportStdLibFunction (_T("StructTest"), StdLib_StructTest);
+	return true;
 }
 
 jnc::CFunction* 
@@ -224,14 +262,6 @@ CAstDoc::FindGlobalFunction (const tchar_t* pName)
 
 	jnc::CGlobalFunction* pFunction = (jnc::CGlobalFunction*) pItem;
 	return pFunction->GetFunction ();
-}
-
-bool
-CAstDoc::ExportStdLib ()
-{
-	ExportStdLibFunction (_T("printf"), StdLib_printf);
-	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
-	return true;
 }
 
 bool

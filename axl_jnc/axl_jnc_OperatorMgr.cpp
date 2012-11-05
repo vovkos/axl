@@ -232,19 +232,6 @@ COperatorMgr::AddStdCastOperators ()
 	AddCastOperator (EType_Float, EType_Double, &m_Cast_f32_f64);
 	AddCastOperator (EType_Double, EType_Float, &m_Cast_f64_f32);
 
-	// integer to bool point
-
-	for (size_t i = EType_Int8; i < EType_Int64_u; i++)
-	{
-		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
-		AddCastOperator (EType_Bool, (EType) i, &m_Cast_bool_int);	
-	}
-
-	for (size_t i = EType_Int16_be; i < EType_Int64_beu; i++)
-	{
-		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
-	}
-
 	// integer to floating point
 
 	AddCastOperator (EType_Int32, EType_Float, &m_Cast_i32_f32);
@@ -289,6 +276,19 @@ COperatorMgr::AddStdCastOperators ()
 
 		pOperatorIJ = AddCastOperator ((EType) i, (EType) j, pSuperCast);
 	}
+
+	// integer to bool point (after building super moves!)
+
+	for (size_t i = EType_Int8; i < EType_Int64_u; i++)
+	{
+		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
+		AddCastOperator (EType_Bool, (EType) i, &m_Cast_bool_int);	
+	}
+
+	for (size_t i = EType_Int16_be; i < EType_Int64_beu; i++)
+	{
+		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
+	}
 }
 
 IUnaryOperator*
@@ -311,6 +311,22 @@ COperatorMgr::GetUnaryOperator (
 
 	case EUnOp_Indir:
 		pOperator = &m_UnOp_indir;
+		break;
+
+	case EUnOp_PreInc:
+		pOperator = &m_UnOp_preinc;
+		break;
+
+	case EUnOp_PreDec:
+		pOperator = &m_UnOp_predec;
+		break;
+
+	case EUnOp_PostInc:
+		pOperator = &m_UnOp_postinc;
+		break;
+
+	case EUnOp_PostDec:
+		pOperator = &m_UnOp_postdec;
 		break;
 	}
 
@@ -489,6 +505,12 @@ COperatorMgr::AddCastOperator (
 	if (!pPrevOperator)
 		m_CastSignatureCache.InsertTail (Signature);
 
+	EType SrcTypeKind = pSrcType->GetTypeKind ();
+	EType DstTypeKind = pDstType->GetTypeKind ();
+
+	if (SrcTypeKind < EType__BasicTypeCount && DstTypeKind < EType__BasicTypeCount)
+		m_BasicCastOperatorTable [SrcTypeKind] [DstTypeKind] = pOperator;
+
 	It->m_Value = pOperator;
 	return pPrevOperator;
 }
@@ -664,7 +686,23 @@ COperatorMgr::MemberOperator (
 	CValue* pResultValue
 	)
 {
-	return true;
+	CType* pType = OpValue.GetType ();
+	EType TypeKind = pType->GetTypeKind ();
+
+	switch (TypeKind)
+	{
+	case EType_Struct:
+	case EType_Union:
+		return StructMemberOperator (OpValue, (CStructType*) pType, pName, pResultValue);
+
+	case EType_Interface:
+	case EType_Class:
+		return ClassMemberOperator (OpValue, (CClassType*) pType, pName, pResultValue);
+
+	default:
+		err::SetFormatStringError (_T("member operator cannot be applied to '%s'"), pType->GetTypeString ());
+		return false;
+	}
 }
 
 bool
@@ -682,6 +720,77 @@ COperatorMgr::MemberOperator (
 	*pValue = ResultValue;
 	return true;
 }
+
+bool
+COperatorMgr::StructMemberOperator (
+	const CValue& OpValue,
+	CStructType* pType,
+	const tchar_t* pName,
+	CValue* pResultValue
+	)
+{
+	CStructMember* pMember = ((CStructType*) pType)->FindMember (pName);
+	if (!pMember)
+	{
+		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pType->GetTypeString ());
+		return false;
+	}
+
+	EValue OpValueKind = OpValue.GetValueKind ();
+	if (OpValueKind == EValue_Const)
+	{
+		pResultValue->CreateConst (
+			pMember->GetType (), 
+			(char*) OpValue.GetConstData () + pMember->GetOffset ()
+			);
+
+		return true;
+	}
+
+	CValue Zero;
+	Zero.SetConstInt32 (0, EType_Int32);
+
+	CValue Index;
+	Index.SetConstInt32 (pMember->GetLlvmIndex (), EType_Int32);
+
+	llvm::Value* pLlvmValue = OpValue.GetLlvmValue ();
+	llvm::Value* pLlvmZero = Zero.GetLlvmValue ();
+	llvm::Value* pLlvmIndex = Index.GetLlvmValue ();
+
+	llvm::Value* LlvmIndexArray [] =
+	{
+		pLlvmZero,
+		pLlvmIndex,
+	};
+
+	llvm::Value* pLlvmGep = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateGEP (
+		pLlvmValue, 
+		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
+		);
+
+	pResultValue->SetLlvmRegister (pLlvmGep, pMember->GetType ());
+	return true;
+}
+
+bool
+COperatorMgr::ClassMemberOperator (
+	const CValue& OpValue,
+	CClassType* pType,
+	const tchar_t* pName,
+	CValue* pResultValue
+	)
+{
+	CModuleItem* pClassMember = pType->FindMember (pName);
+	if (!pClassMember)
+	{
+		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pType->GetTypeString ());
+		return false;
+	}
+
+	err::SetFormatStringError (_T("class member operator is not implemented yet"));
+	return false;
+}
+
 
 bool
 COperatorMgr::CallOperator (
@@ -766,18 +875,6 @@ COperatorMgr::CallOperator (
 		return false;
 
 	*pValue = ResultValue;
-	return true;
-}
-
-bool
-COperatorMgr::PostfixIncOperator (CValue* pValue)
-{
-	return true;
-}
-
-bool
-COperatorMgr::PostfixDecOperator (CValue* pValue)
-{
 	return true;
 }
 

@@ -8,26 +8,30 @@ typedef bigendian int64 beint64_t;
 typedef bigendian unsigned int16 beuint16_t, beushort_t, beword_t;
 typedef bigendian unsigned int32 beuint32_t, beulong_t,  bedword_t;
 typedef bigendian unsigned int64 beuint64_t, beqword_t;
+
+typedef unsigned int32 size_t;
+
 typedef const char* unsafe pchar_t;
 typedef const char* pchar2_t;
+
+
 
 //.............................................................................
 
 int
 main ()
 {	
-	int i = 0;
-	while (i < 10)
+	TStruct s;
+	s.m_a = 10;
+	s.m_b = 20;
+	s.m_c = 30;
+
+	StructTest (&s, sizeof (TStruct));
+
+	size_t i;
+	for (i = 0; i < 10; i++)
 	{
 		printf ("i = %d\n", i);
-
-		if (i > 5)
-		{
-			printf ("breaking\n");
-			break;
-		}
-
-		i = i + 1;
 	}
 
 	return 1;
@@ -36,10 +40,23 @@ main ()
 int 
 ReadInteger ();
 
+int 
+StructTest (
+	TStruct* unsafe pStruct,
+	unsigned int32 Size
+	);
+
 void
 printf (
 	char* unsafe pFormat,
 	...
 	);
+
+struct pack (4) TStruct
+{
+	int8 m_a;
+	int64 m_b;
+	int8 m_c;
+};
 
 //.............................................................................

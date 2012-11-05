@@ -98,6 +98,15 @@ public:
 		EType TypeKind
 		);
 
+	CDerivedType* 
+	GetDerivedType (
+		EType BaseTypeKind,
+		EType TypeKind
+		)
+	{
+		return GetDerivedType (GetBasicType (BaseTypeKind), TypeKind);
+	}
+
 	CArrayType* 
 	GetArrayType (
 		CType* pBaseType,
@@ -105,15 +114,24 @@ public:
 		);
 
 	CArrayType* 
+	GetArrayType (
+		EType BaseTypeKind,
+		size_t ElementCount
+		)
+	{
+		return GetArrayType (GetBasicType (BaseTypeKind), ElementCount);
+	}
+
+	CArrayType* 
 	GetLiteralTypeA (size_t Length)
 	{
-		return GetArrayType (&m_BasicTypeArray [EType_Char], Length + 1);
+		return GetArrayType (EType_Char, Length + 1);
 	}
 
 	CArrayType* 
 	GetLiteralTypeW (size_t Length)
 	{
-		return GetArrayType (&m_BasicTypeArray [EType_WChar], Length + 1);
+		return GetArrayType (EType_WChar, Length + 1);
 	}
 
 	CArrayType* 
