@@ -12,7 +12,6 @@
 // AstDoc.h : interface of the CAstDoc class
 //
 
-
 #pragma once
 
 #include "..\axl_jnc\axl_jnc_Parser.h"
