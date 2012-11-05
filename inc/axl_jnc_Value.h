@@ -25,7 +25,6 @@ enum EValue
 	EValue_LlvmRegister,
 	EValue_GlobalFunction,
 	EValue_GlobalProperty,
-	EValue_Cmp,
 	EValue_BoolNot,
 	EValue_BoolAnd,
 	EValue_BoolOr,

@@ -22,7 +22,6 @@ CNamespaceMgr::Clear ()
 	m_GlobalNamespace.Clear ();
 	m_NamespaceList.Clear ();
 	m_ScopeList.Clear ();
-	m_NamespaceStack.Clear ();
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
 }
@@ -89,7 +88,6 @@ CNamespaceMgr::OpenNamespace (
 		pNamespace = (CGlobalNamespace*) pItem;
 	}
 
-	m_NamespaceStack.Append (pNamespace);
 	m_pCurrentNamespace = pNamespace;
 	return pNamespace;
 }
@@ -97,14 +95,11 @@ CNamespaceMgr::OpenNamespace (
 void
 CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
 {
-	ASSERT (!m_pCurrentScope);
-
 	if (!pNamespace->m_pParentNamespace)
 		pNamespace->m_pParentNamespace = m_pCurrentNamespace;
 	else
 		ASSERT (pNamespace->m_pParentNamespace == m_pCurrentNamespace);
 
-	m_NamespaceStack.Append (pNamespace);
 	m_pCurrentNamespace = pNamespace;
 }
 
@@ -113,24 +108,26 @@ CNamespaceMgr::CloseNamespace (size_t Count)
 {
 	ASSERT (!m_pCurrentScope);
 
-	size_t StackCount = m_NamespaceStack.GetCount ();
+	CNamespace* pNamespace = m_pCurrentNamespace;
 
-	if (Count < StackCount)
-		StackCount -= Count;
-	else
-		StackCount =  0;
+	for (size_t i = 0; pNamespace && i < Count; i++)
+		pNamespace = pNamespace->m_pParentNamespace;
 
-	m_NamespaceStack.SetCount (StackCount);
-
-	m_pCurrentNamespace = StackCount ? m_NamespaceStack [StackCount - 1] : &m_GlobalNamespace;
+	m_pCurrentNamespace = pNamespace ? pNamespace : &m_GlobalNamespace;
 }
 
 CScope*
-CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
+CNamespaceMgr::OpenScope (	
+	const CToken::CPos& Pos,
+	CBasicBlock* pBreakBlock,
+	CBasicBlock* pContinueBlock
+	)
 {
 	CScope* pScope = AXL_MEM_NEW (CScope);
 	pScope->m_pModule = m_pModule;
 	pScope->m_Pos = Pos;
+	pScope->m_pBreakBlock = pBreakBlock;
+	pScope->m_pContinueBlock = pContinueBlock;
 	m_ScopeList.InsertTail (pScope);
 	OpenNamespace (pScope);
 	m_pCurrentScope = pScope;
@@ -143,21 +140,49 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 	if (!m_pCurrentScope)
 		return;
 
-	ASSERT (
-		m_pCurrentScope == m_pCurrentNamespace &&
-		m_pCurrentScope == m_NamespaceStack.GetBack ()
-		);
-
+	ASSERT (m_pCurrentScope == m_pCurrentNamespace);
 	m_pCurrentScope->m_PosEnd = Pos;
 
-	size_t StackCount = m_NamespaceStack.GetCount ();
-	ASSERT (StackCount);
+	m_pCurrentNamespace = m_pCurrentScope->m_pParentNamespace;
+	ASSERT (m_pCurrentNamespace);
 
-	StackCount--;
-
-	m_NamespaceStack.SetCount (StackCount);
-	m_pCurrentNamespace = StackCount ? m_NamespaceStack [StackCount - 1] : &m_GlobalNamespace;
 	m_pCurrentScope = m_pCurrentNamespace->GetNamespaceKind () == ENamespace_Scope ? (CScope*) m_pCurrentNamespace : NULL;
+}
+
+CScope*
+CNamespaceMgr::FindBreakScope (size_t Level)
+{
+	size_t i = 0;
+	CScope* pScope = m_pCurrentScope;
+	for (; pScope; pScope = pScope->GetParentScope ())
+	{
+		if (pScope->GetBreakBlock ())
+		{
+			i++;
+			if (i >= Level)
+				break;
+		}
+	}
+
+	return pScope;
+}
+
+CScope*
+CNamespaceMgr::FindContinueScope (size_t Level)
+{
+	size_t i = 0;
+	CScope* pScope = m_pCurrentScope;
+	for (; pScope; pScope = pScope->GetParentScope ())
+	{
+		if (pScope->GetContinueBlock ())
+		{
+			i++;
+			if (i >= Level)
+				break;
+		}
+	}
+
+	return pScope;
 }
 
 //.............................................................................

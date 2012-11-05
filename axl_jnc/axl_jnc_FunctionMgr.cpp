@@ -170,7 +170,8 @@ CFunctionMgr::CompileFunctions ()
 		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
 
 		m_pCurrentFunction = pFunction;
-		pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"), true);
+		pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
 
 		jnc::CParser Parser;
 		Parser.m_Stage = jnc::CParser::EStage_Pass2;

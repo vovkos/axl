@@ -6,7 +6,7 @@
 
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_Namespace.h"
+#include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
 #include "axl_llk_Ast.h"
 

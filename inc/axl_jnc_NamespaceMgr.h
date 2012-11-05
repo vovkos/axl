@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Namespace.h"
+#include "axl_jnc_Scope.h"
 
 namespace axl {
 namespace jnc {
@@ -20,7 +21,6 @@ protected:
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
-	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
 
@@ -88,10 +88,20 @@ public:
 	CloseNamespace (size_t Count = 1);
 
 	CScope*
-	OpenScope (const CToken::CPos& Pos);
+	OpenScope (
+		const CToken::CPos& Pos,
+		CBasicBlock* pBreakBlock = NULL,
+		CBasicBlock* pContinueBlock = NULL
+		);
 
 	void
 	CloseScope (const CToken::CPos& Pos);
+
+	CScope*
+	FindBreakScope (size_t Level);
+
+	CScope*
+	FindContinueScope (size_t Level);
 };
 
 //.............................................................................

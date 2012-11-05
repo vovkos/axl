@@ -240,6 +240,8 @@ public:
 
 //.............................................................................
 
+// float extensions & truncations
+
 class CCast_f64_f32: public ICastOperator
 {
 public:
@@ -284,6 +286,56 @@ public:
 		*(double*) DstValue.GetConstData () = *(float*) SrcValue.GetConstData ();
 		return true;
 	}
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// int <-> bool
+
+class CCast_int_bool: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_int_bool, ICastOperator)
+
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_bool_int: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_bool_int, ICastOperator)
+
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
 
 	virtual
 	bool

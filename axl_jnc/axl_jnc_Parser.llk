@@ -146,9 +146,6 @@ Members
 		);
 
 	bool
-	ReturnStmt (const CValue& Value);
-
-	bool
 	LookupIdentifier (
 		const rtl::CString& Name,
 		CValue* pValue

@@ -276,6 +276,69 @@ CCast_f32_f64::LlvmCast (
 //.............................................................................
 
 bool
+CCast_int_bool::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	const char* p = (const char*) SrcValue.GetConstData ();
+	const char* pEnd = p + SrcValue.GetType ()->GetSize ();
+	
+	bool Bool = false;
+
+	for (; p < pEnd; p++)
+	{
+		if (*p)
+		{
+			Bool = true;
+			break;
+		}
+	}
+
+	*(bool*) DstValue.GetConstData () = Bool;
+	return true;
+}
+
+bool
+CCast_int_bool::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	llvm::Constant* pLlvmZero = llvm::ConstantInt::get (Value.GetType ()->GetLlvmType (), 0);
+	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (Value);
+	llvm::Value* pLlvmCmp = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateICmpNE (pLlvmValue, pLlvmZero);
+	pResultValue->SetLlvmRegister (pLlvmCmp, pType);
+	return true;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
+CCast_bool_int::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	err::SetFormatStringError (_T("CCast_bool_int::ConstCast NOT IMPLEMENTED"));
+	return false;
+}
+
+bool
+CCast_bool_int::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("CCast_bool_int::ConstCast NOT IMPLEMENTED"));
+	return false;
+}
+
+//.............................................................................
+
+bool
 CCast_int_fp::LlvmCast (
 	const CValue& Value,
 	CType* pType,

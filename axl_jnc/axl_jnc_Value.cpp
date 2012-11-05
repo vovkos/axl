@@ -53,9 +53,6 @@ GetValueKindString (EValue ValueKind)
 	case EValue_GlobalProperty:
 		return _T("global-property");
 
-	case EValue_Cmp:
-		return _T("cmp");
-
 	case EValue_BoolNot:
 		return _T("bool-not");
 

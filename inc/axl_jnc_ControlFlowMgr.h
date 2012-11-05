@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_BasicBlock.h"
+#include "axl_jnc_Value.h"
 
 namespace axl {
 namespace jnc {
@@ -41,10 +42,7 @@ public:
 	Clear ();
 
 	CBasicBlock* 
-	CreateBlock (
-		const rtl::CString& Name,
-		bool IsCurrent
-		);
+	CreateBlock (const rtl::CString& Name);
 
 	CBasicBlock* 
 	GetCurrentBlock ()
@@ -53,10 +51,35 @@ public:
 	}
 
 	void
-	SetCurrentBlock (
+	SetCurrentBlock (CBasicBlock* pBlock);
+
+	void
+	Jump (
 		CBasicBlock* pBlock,
-		int Flags = 0
+		CBasicBlock* pFollowBlock
 		);
+
+	bool
+	ConditionalJump (
+		const CValue& Value,
+		CBasicBlock* pThenBlock,
+		CBasicBlock* pElseBlock
+		);
+
+	void
+	Follow (CBasicBlock* pBlock)
+	{
+		Jump (pBlock, pBlock);
+	}
+
+	bool
+	Return (const CValue& Value);
+
+	bool
+	Break (size_t Level);
+
+	bool
+	Continue (size_t Level);
 };
 
 //.............................................................................

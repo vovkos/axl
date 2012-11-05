@@ -95,6 +95,7 @@
     <ClInclude Include="..\inc\axl_jnc_OperatorMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_Property.h" />
     <ClInclude Include="..\Inc\axl_jnc_PropertyType.h" />
+    <ClInclude Include="..\inc\axl_jnc_Scope.h" />
     <ClInclude Include="..\Inc\axl_jnc_StructType.h" />
     <ClInclude Include="..\Inc\axl_jnc_Type.h" />
     <ClInclude Include="..\Inc\axl_jnc_TypeMgr.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="axl_jnc_Parser.cpp" />
     <ClCompile Include="axl_jnc_Property.cpp" />
     <ClCompile Include="axl_jnc_PropertyType.cpp" />
+    <ClCompile Include="axl_jnc_Scope.cpp" />
     <ClCompile Include="axl_jnc_StructType.cpp" />
     <ClCompile Include="axl_jnc_Type.cpp" />
     <ClCompile Include="axl_jnc_TypeMgr.cpp" />

@@ -127,6 +127,9 @@
     <ClInclude Include="..\inc\axl_jnc_CastOperator.h">
       <Filter>operator</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Scope.h">
+      <Filter>namespace</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -219,6 +222,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_CastOperator.cpp">
       <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Scope.cpp">
+      <Filter>namespace</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

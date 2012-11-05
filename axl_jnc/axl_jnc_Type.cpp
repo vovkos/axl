@@ -161,6 +161,9 @@ CType::GetLlvmType ()
 		break;
 	
 	case EType_Bool:
+		pLlvmType = llvm::Type::getInt1Ty (llvm::getGlobalContext ());
+		break;
+
 	case EType_Int8:
 	case EType_Int8_u:
 		pLlvmType = llvm::Type::getInt8Ty (llvm::getGlobalContext ());

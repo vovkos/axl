@@ -53,13 +53,13 @@ protected:
 	CBinOpT_i64 <CBinOp_Div> m_BinOp_Div_i64;
 	CBinOpT_f32 <CBinOp_Div> m_BinOp_Div_f32;
 	CBinOpT_f64 <CBinOp_Div> m_BinOp_Div_f64;
-	CBinOpT_i32 <CBinOp_DivU> m_BinOp_Div_i32u;
-	CBinOpT_i64 <CBinOp_DivU> m_BinOp_Div_i64u;
+	CBinOpT_i32 <CBinOp_Div_u> m_BinOp_Div_i32u;
+	CBinOpT_i64 <CBinOp_Div_u> m_BinOp_Div_i64u;
 
 	CBinOpT_i32 <CBinOp_Mod> m_BinOp_Mod_i32;
 	CBinOpT_i64 <CBinOp_Mod> m_BinOp_Mod_i64;
-	CBinOpT_i32 <CBinOp_ModU> m_BinOp_Mod_i32u;
-	CBinOpT_i64 <CBinOp_ModU> m_BinOp_Mod_i64u;
+	CBinOpT_i32 <CBinOp_Mod_u> m_BinOp_Mod_i32u;
+	CBinOpT_i64 <CBinOp_Mod_u> m_BinOp_Mod_i64u;
 
 	CBinOpT_i32 <CBinOp_Shl> m_BinOp_Shl_i32;
 	CBinOpT_i64 <CBinOp_Shl> m_BinOp_Shl_i64;
@@ -73,12 +73,45 @@ protected:
 	CBinOpT_i32 <CBinOp_BitwiseXor> m_BinOp_BitwiseXor_i32;
 	CBinOpT_i64 <CBinOp_BitwiseXor> m_BinOp_BitwiseXor_i64;
 
-	//CRelOp_Eq m_RelOp_Eq;
-	//CRelOp_Ne m_RelOp_Ne;
-	//CRelOp_Lt m_RelOp_Lt;
-	//CRelOp_Le m_RelOp_Le;
-	//CRelOp_Gt m_RelOp_Gt;
-	//CRelOp_Ge m_RelOp_Ge;
+	// relational operators
+
+	CBinOpT_cmp_i32 <CBinOp_Eq> m_BinOp_Eq_i32;
+	CBinOpT_cmp_i64 <CBinOp_Eq> m_BinOp_Eq_i64;
+	CBinOpT_cmp_f32 <CBinOp_Eq> m_BinOp_Eq_f32;
+	CBinOpT_cmp_f64 <CBinOp_Eq> m_BinOp_Eq_f64;
+
+	CBinOpT_cmp_i32 <CBinOp_Ne> m_BinOp_Ne_i32;
+	CBinOpT_cmp_i64 <CBinOp_Ne> m_BinOp_Ne_i64;
+	CBinOpT_cmp_f32 <CBinOp_Ne> m_BinOp_Ne_f32;
+	CBinOpT_cmp_f64 <CBinOp_Ne> m_BinOp_Ne_f64;
+
+	CBinOpT_cmp_i32 <CBinOp_Lt> m_BinOp_Lt_i32;
+	CBinOpT_cmp_i64 <CBinOp_Lt> m_BinOp_Lt_i64;
+	CBinOpT_cmp_f32 <CBinOp_Lt> m_BinOp_Lt_f32;
+	CBinOpT_cmp_f64 <CBinOp_Lt> m_BinOp_Lt_f64;
+	CBinOpT_cmp_i32 <CBinOp_Lt_u> m_BinOp_Lt_i32u;
+	CBinOpT_cmp_i64 <CBinOp_Lt_u> m_BinOp_Lt_i64u;
+
+	CBinOpT_cmp_i32 <CBinOp_Le> m_BinOp_Le_i32;
+	CBinOpT_cmp_i64 <CBinOp_Le> m_BinOp_Le_i64;
+	CBinOpT_cmp_f32 <CBinOp_Le> m_BinOp_Le_f32;
+	CBinOpT_cmp_f64 <CBinOp_Le> m_BinOp_Le_f64;
+	CBinOpT_cmp_i32 <CBinOp_Le_u> m_BinOp_Le_i32u;
+	CBinOpT_cmp_i64 <CBinOp_Le_u> m_BinOp_Le_i64u;
+
+	CBinOpT_cmp_i32 <CBinOp_Gt> m_BinOp_Gt_i32;
+	CBinOpT_cmp_i64 <CBinOp_Gt> m_BinOp_Gt_i64;
+	CBinOpT_cmp_f32 <CBinOp_Gt> m_BinOp_Gt_f32;
+	CBinOpT_cmp_f64 <CBinOp_Gt> m_BinOp_Gt_f64;
+	CBinOpT_cmp_i32 <CBinOp_Gt_u> m_BinOp_Gt_i32u;
+	CBinOpT_cmp_i64 <CBinOp_Gt_u> m_BinOp_Gt_i64u;
+
+	CBinOpT_cmp_i32 <CBinOp_Ge> m_BinOp_Ge_i32;
+	CBinOpT_cmp_i64 <CBinOp_Ge> m_BinOp_Ge_i64;
+	CBinOpT_cmp_f32 <CBinOp_Ge> m_BinOp_Ge_f32;
+	CBinOpT_cmp_f64 <CBinOp_Ge> m_BinOp_Ge_f64;
+	CBinOpT_cmp_i32 <CBinOp_Ge_u> m_BinOp_Ge_i32u;
+	CBinOpT_cmp_i64 <CBinOp_Ge_u> m_BinOp_Ge_i64u;
 
 	// cast operators
 
@@ -88,6 +121,13 @@ protected:
 	CCast_int_ext m_Cast_int_ext;
 	CCast_int_ext_u m_Cast_int_ext_u;
 	CCast_int_swp m_Cast_int_swp;
+
+	CCast_f32_f64 m_Cast_f32_f64;
+	CCast_f64_f32 m_Cast_f64_f32;
+
+	CCast_int_bool m_Cast_int_bool;
+	CCast_bool_int m_Cast_bool_int;
+
 	CCast_i32_f32 m_Cast_i32_f32;
 	CCast_i32u_f32 m_Cast_i32u_f32;
 	CCast_i32_f64 m_Cast_i32_f64;
@@ -97,8 +137,6 @@ protected:
 	CCast_i64_f64 m_Cast_i64_f64;
 	CCast_i64u_f64 m_Cast_i64u_f64;
 
-	CCast_f32_f64 m_Cast_f32_f64;
-	CCast_f64_f32 m_Cast_f64_f32;
 	CCast_f32_i32 m_Cast_f32_i32;
 	CCast_f32_i64 m_Cast_f32_i64;
 	CCast_f64_i32 m_Cast_f64_i32;
@@ -279,6 +317,19 @@ public:
 	CastOperator (
 		CValue* pValue,
 		CType* pType
+		);
+
+	bool
+	CastOperator (
+		const CValue& OpValue,
+		EType TypeKind,
+		CValue* pResultValue
+		);
+
+	bool
+	CastOperator (
+		CValue* pValue,
+		EType TypeKind
 		);
 
 	bool

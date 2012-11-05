@@ -16,18 +16,21 @@ typedef const char* pchar2_t;
 int
 main ()
 {	
-	printf (
-		"suka\r\n"
-		"\tgovno\r\n"
-		"\ti \"muravei\" bla"
-		);
+	int i = 0;
+	while (i < 10)
+	{
+		printf ("i = %d\n", i);
 
-	int x = 'A';
-	int y = 'B';
+		if (i > 5)
+		{
+			printf ("breaking\n");
+			break;
+		}
 
-	printf ("x = %d y = %d", x, y);
+		i = i + 1;
+	}
 
-	return x + y;
+	return 1;
 }
 
 int 

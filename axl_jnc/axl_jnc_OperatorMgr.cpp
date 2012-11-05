@@ -91,6 +91,44 @@ COperatorMgr::AddStdBinaryOperators ()
 
 	AddBinaryOperator (EBinOp_BitwiseXor, EType_Int32, &m_BinOp_BitwiseXor_i32);
 	AddBinaryOperator (EBinOp_BitwiseXor, EType_Int64, &m_BinOp_BitwiseXor_i64);
+
+	AddBinaryOperator (EBinOp_Eq, EType_Int32, &m_BinOp_Eq_i32);
+	AddBinaryOperator (EBinOp_Eq, EType_Int64, &m_BinOp_Eq_i64);
+	AddBinaryOperator (EBinOp_Eq, EType_Float, &m_BinOp_Eq_f32);
+	AddBinaryOperator (EBinOp_Eq, EType_Double, &m_BinOp_Eq_f64);
+
+	AddBinaryOperator (EBinOp_Ne, EType_Int32, &m_BinOp_Ne_i32);
+	AddBinaryOperator (EBinOp_Ne, EType_Int64, &m_BinOp_Ne_i64);
+	AddBinaryOperator (EBinOp_Ne, EType_Float, &m_BinOp_Ne_f32);
+	AddBinaryOperator (EBinOp_Ne, EType_Double, &m_BinOp_Ne_f64);
+
+	AddBinaryOperator (EBinOp_Lt, EType_Int32, &m_BinOp_Lt_i32);
+	AddBinaryOperator (EBinOp_Lt, EType_Int64, &m_BinOp_Lt_i64);
+	AddBinaryOperator (EBinOp_Lt, EType_Float, &m_BinOp_Lt_f32);
+	AddBinaryOperator (EBinOp_Lt, EType_Double, &m_BinOp_Lt_f64);
+	AddBinaryOperator (EBinOp_Lt, EType_Int32_u, &m_BinOp_Lt_i32u);
+	AddBinaryOperator (EBinOp_Lt, EType_Int64_u, &m_BinOp_Lt_i64u);
+
+	AddBinaryOperator (EBinOp_Le, EType_Int32, &m_BinOp_Le_i32);
+	AddBinaryOperator (EBinOp_Le, EType_Int64, &m_BinOp_Le_i64);
+	AddBinaryOperator (EBinOp_Le, EType_Float, &m_BinOp_Le_f32);
+	AddBinaryOperator (EBinOp_Le, EType_Double, &m_BinOp_Le_f64);
+	AddBinaryOperator (EBinOp_Le, EType_Int32_u, &m_BinOp_Le_i32u);
+	AddBinaryOperator (EBinOp_Le, EType_Int64_u, &m_BinOp_Le_i64u);
+
+	AddBinaryOperator (EBinOp_Gt, EType_Int32, &m_BinOp_Gt_i32);
+	AddBinaryOperator (EBinOp_Gt, EType_Int64, &m_BinOp_Gt_i64);
+	AddBinaryOperator (EBinOp_Gt, EType_Float, &m_BinOp_Gt_f32);
+	AddBinaryOperator (EBinOp_Gt, EType_Double, &m_BinOp_Gt_f64);
+	AddBinaryOperator (EBinOp_Gt, EType_Int32_u, &m_BinOp_Gt_i32u);
+	AddBinaryOperator (EBinOp_Gt, EType_Int64_u, &m_BinOp_Gt_i64u);
+
+	AddBinaryOperator (EBinOp_Ge, EType_Int32, &m_BinOp_Ge_i32);
+	AddBinaryOperator (EBinOp_Ge, EType_Int64, &m_BinOp_Ge_i64);
+	AddBinaryOperator (EBinOp_Ge, EType_Float, &m_BinOp_Ge_f32);
+	AddBinaryOperator (EBinOp_Ge, EType_Double, &m_BinOp_Ge_f64);
+	AddBinaryOperator (EBinOp_Ge, EType_Int32_u, &m_BinOp_Ge_i32u);
+	AddBinaryOperator (EBinOp_Ge, EType_Int64_u, &m_BinOp_Ge_i64u);
 }
 
 void
@@ -193,6 +231,19 @@ COperatorMgr::AddStdCastOperators ()
 	AddCastOperator (EType_Double, EType_Double, &m_Cast_cpy);
 	AddCastOperator (EType_Float, EType_Double, &m_Cast_f32_f64);
 	AddCastOperator (EType_Double, EType_Float, &m_Cast_f64_f32);
+
+	// integer to bool point
+
+	for (size_t i = EType_Int8; i < EType_Int64_u; i++)
+	{
+		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
+		AddCastOperator (EType_Bool, (EType) i, &m_Cast_bool_int);	
+	}
+
+	for (size_t i = EType_Int16_be; i < EType_Int64_beu; i++)
+	{
+		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
+	}
 
 	// integer to floating point
 
@@ -381,8 +432,8 @@ COperatorMgr::BinaryOperator (
 	EValue OpValueKind2 = CastOpValue2.GetValueKind ();
 	
 	return OpValueKind1 == EValue_Const && OpValueKind2 == EValue_Const ?
-		pOperator->ConstOperator (OpValue1, OpValue2, pResultValue) :
-		pOperator->LlvmOperator (OpValue1, OpValue2, pResultValue);
+		pOperator->ConstOperator (CastOpValue1, CastOpValue2, pResultValue) :
+		pOperator->LlvmOperator (CastOpValue1, CastOpValue2, pResultValue);
 }
 
 bool
@@ -518,6 +569,27 @@ COperatorMgr::CastOperator (
 
 	*pValue = ResultValue;
 	return true;
+}
+
+bool
+COperatorMgr::CastOperator (
+	const CValue& OpValue,
+	EType TypeKind,
+	CValue* pResultValue
+	)
+{
+	CType* pType = m_pModule->m_TypeMgr.GetBasicType (TypeKind);
+	return CastOperator (OpValue, pType, pResultValue);
+}
+
+bool
+COperatorMgr::CastOperator (
+	CValue* pValue,
+	EType TypeKind
+	)
+{
+	CType* pType = m_pModule->m_TypeMgr.GetBasicType (TypeKind);
+	return CastOperator (pValue, pType);
 }
 
 bool

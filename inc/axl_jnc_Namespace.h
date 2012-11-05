@@ -198,39 +198,6 @@ GetItemNamespace (CModuleItem* pItem);
 
 //.............................................................................
 
-class CScope: 
-	public CModuleItem,
-	public CNamespace,
-	public rtl::TListLink
-{
-protected:
-	friend class CNamespaceMgr;
-
-	CToken::CPos m_PosEnd;
-
-	void* m_pCodeBegin;
-	void* m_pCodeEnd;
-
-	// local variable list for debugger
-
-public:
-	CScope ()
-	{
-		m_ItemKind = EModuleItem_Scope;
-		m_NamespaceKind = ENamespace_Scope;
-		m_pCodeBegin = NULL;
-		m_pCodeEnd = NULL;
-	}
-
-	CToken::CPos 
-	GetPosEnd ()
-	{
-		return m_PosEnd;
-	}
-};
-
-//.............................................................................
-
 class CGlobalNamespace: 
 	public CModuleItem,
 	public CNamespace,

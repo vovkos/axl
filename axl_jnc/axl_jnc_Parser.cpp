@@ -567,37 +567,6 @@ CParser::LookupIdentifier (
 	return true;
 }
 
-bool
-CParser::ReturnStmt (const CValue& Value)
-{
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	ASSERT (pFunction);
-
-	CFunctionType* pFunctionType = pFunction->GetType ();
-	CType* pReturnType = pFunctionType->GetReturnType ();
-
-	if (Value.GetValueKind () == EValue_Void)
-	{
-		if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
-		{
-			err::SetFormatStringError (_T("function '%s' must return a '%s' value"), pFunction->GetTag (), pReturnType->GetTypeString ());
-			return false;
-		}
-
-		m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateRetVoid ();
-		return true;
-	}
-
-	CValue ReturnValue;
-	bool Result = m_pModule->m_OperatorMgr.CastOperator (Value, pReturnType, &ReturnValue);
-	if (!Result)
-		return false;
-
-	llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (ReturnValue);
-	m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateRet (pLlvmValue);
-	return true;
-}
-
 //.............................................................................
 
 } // namespace axl {
