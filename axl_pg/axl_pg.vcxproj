@@ -39,7 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\~bin\$(SolutionName)_$(ProjectName)_$(Platform)_$(Configuration)\</OutDir>
+    <OutDir>..\..\~bin\$(ProjectName)_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>..\..\~tmp\$(ProjectName)_$(Platform)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
@@ -62,10 +62,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>if exist $(SolutionDir)bin goto bin_exist
-md $(SolutionDir)bin
+      <Command>if exist $(ProjectDir)\..\bin goto bin_exist
+md $(ProjectDir)\..\bin
 :bin_exist
-copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)\bin\till.exe</Command>
+copy $(OutDir)$(TargetName)$(TargetExt) $(ProjectDir)\..\bin\till.exe</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>copying $(TargetName)$(TargetExt)...</Message>

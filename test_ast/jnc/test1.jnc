@@ -21,7 +21,7 @@ main ()
 {	
 	int x = 1, y = 2;
 
-	int* p = &x;
+//	int* p = &x;
 //	y = *p;
 
 	printf ("x = %d, y = %d\n", x, y);
