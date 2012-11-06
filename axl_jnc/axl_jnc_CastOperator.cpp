@@ -46,7 +46,7 @@ CSuperCast::ConstCast (
 
 	CValue TempValue;
 	return 
-		TempValue.CreateConst (m_pIntermediateType);
+		TempValue.CreateConst (m_pIntermediateType) &&
 		m_pFirst->ConstCast (SrcValue, TempValue) &&
 		m_pSecond->ConstCast (TempValue, DstValue);
 }
@@ -404,16 +404,16 @@ CCast_arr_ptr_c::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	CValue Index;
-	Index.SetConstInt32 (0);
+	CValue Zero;
+	Zero.SetConstInt32 (0, EType_Int32);
 	
 	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
-	llvm::Value* pLlvmIndex = Index.GetLlvmValue ();
+	llvm::Value* pLlvmZero = Zero.GetLlvmValue ();
 
 	llvm::Value* LlvmIndexArray [] =
 	{
-		pLlvmIndex,
-		pLlvmIndex,
+		pLlvmZero,
+		pLlvmZero,
 	};
 
 	llvm::Value* pLlvmGep = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateGEP (

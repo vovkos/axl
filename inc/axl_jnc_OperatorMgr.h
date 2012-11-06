@@ -31,6 +31,11 @@ protected:
 
 	CUnOp_addr m_UnOp_addr;
 	CUnOp_indir m_UnOp_indir;
+	
+	CUnOpT_inc <EUnOp_PreInc> m_UnOp_preinc;
+	CUnOpT_inc <EUnOp_PreInc> m_UnOp_predec;
+	CUnOpT_inc <EUnOp_PostInc> m_UnOp_postinc;
+	CUnOpT_inc <EUnOp_PostInc> m_UnOp_postdec;
 
 	// binary operators
 
@@ -380,12 +385,6 @@ public:
 		rtl::CBoxListT <CValue>* pArgList
 		);
 
-	bool
-	PostfixIncOperator (CValue* pValue);
-
-	bool
-	PostfixDecOperator (CValue* pValue);
-
 	// useful helper
 
 	llvm::Value*
@@ -400,6 +399,22 @@ protected:
 
 	void
 	AddStdCastOperators ();
+
+	bool
+	StructMemberOperator (
+		const CValue& OpValue,
+		class CStructType* pType,
+		const tchar_t* pName,
+		CValue* pResultValue
+		);
+
+	bool
+	ClassMemberOperator (
+		const CValue& OpValue,
+		class CClassType* pType,
+		const tchar_t* pName,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................

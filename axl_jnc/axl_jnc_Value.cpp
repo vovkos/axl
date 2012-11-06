@@ -231,48 +231,28 @@ CValue::SetConstBool (bool Bool)
 }
 
 void
-CValue::SetConstInt32 (int32_t Integer)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pModule->m_TypeMgr.GetInt32Type (Integer);
-	CreateConst (pType, &Integer);
-}
-
-void
-CValue::SetConstUInt32 (
-	uint32_t Integer,
-	bool ForceUnsigned
+CValue::SetConstInt32 (
+	int32_t Integer,
+	EType TypeKind
 	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
-	CType* pType = pModule->m_TypeMgr.GetUInt32Type (Integer, ForceUnsigned);
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
 	CreateConst (pType, &Integer);
 }
 
 void
-CValue::SetConstInt64 (int64_t Integer)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pModule->m_TypeMgr.GetInt64Type (Integer);
-	CreateConst (pType, &Integer);
-}
-
-void
-CValue::SetConstUInt64 (
-	uint64_t Integer,
-	bool ForceUnsigned
+CValue::SetConstInt64 (
+	int64_t Integer,
+	EType TypeKind
 	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
-	CType* pType = pModule->m_TypeMgr.GetUInt64Type (Integer, ForceUnsigned);
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
 	CreateConst (pType, &Integer);
 }
 

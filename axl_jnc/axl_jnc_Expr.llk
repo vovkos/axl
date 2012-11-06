@@ -392,11 +392,11 @@ unary_expr <CValue* $pValue>
 		}
 	| EToken_Inc unary_expr <$pValue> 
 		{
-			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Inc, $pValue);
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreInc, $pValue);
 		}
 	| EToken_Dec unary_expr <$pValue> 
 		{
-			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Dec, $pValue);
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, $pValue);
 		}
 	| resolver (cast_operator_rslv) 
 	  '(' type_name $t ')' unary_expr <$pValue> 
@@ -422,36 +422,24 @@ postfix_expr <CValue* $pValue>
 	;
 
 postfix_operator <CValue* $pValue>
-	: member_operator <$pValue>
-	| index_operator <$pValue>
-	| call_operator <$pValue>
-	| EToken_Inc
-		{
-			return m_pModule->m_OperatorMgr.PostfixIncOperator ($pValue);
-		}
-	| EToken_Dec
-		{
-			return m_pModule->m_OperatorMgr.PostfixDecOperator ($pValue);
-		}
-	;
-
-member_operator <CValue* $pValue>
-	: '.' EToken_Identifier
+	: call_operator <$pValue>
+	| '.' EToken_Identifier
 		{
 			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $2.m_Data.m_String);
 		}
-	; 
-
-index_operator <CValue* $pValue>
-local
-{
-	CValue $IndexValue;
-}
-	: '[' expression ']'
+	| '[' expression ']'
 		{
-			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, $pValue, $IndexValue);
+			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, $pValue, $2.m_Value);
+		}	
+	| EToken_Inc
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostInc, $pValue);
 		}
-	; 
+	| EToken_Dec
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostDec, $pValue);
+		}
+	;
 
 call_operator <CValue* $pValue>
 local

@@ -27,11 +27,17 @@ GetUnOpString (EUnOp OpKind)
 	case EUnOp_LogicalNot:
 		return _T("!");
 
-	case EUnOp_Inc:
-		return _T("++");
+	case EUnOp_PreInc:
+		return _T("pre-increment");
 
-	case EUnOp_Dec:
-		return _T("--");
+	case EUnOp_PreDec:
+		return _T("pre-decrement");
+
+	case EUnOp_PostInc:
+		return _T("post-increment");
+
+	case EUnOp_PostDec:
+		return _T("post-decrement");
 
 	default:
 		return _T("undefined-unary-operator");
@@ -221,7 +227,7 @@ CUnOp_addr::LlvmOperator (
 	)
 {
 	CType* pType = OpValue.GetType ();
-	pType = pType->GetModifiedType (ETypeModifier_Pointer);
+	pType = pType->GetDerivedType (EType_Pointer_c);
 
 	EValue OpKind = OpValue.GetValueKind ();
 	if (OpKind != EValue_Variable)
@@ -232,6 +238,10 @@ CUnOp_addr::LlvmOperator (
 
 	CVariable* pVariable = OpValue.GetVariable ();
 	llvm::Value* pLlvmValue = pVariable->GetLlvmValue ();
+	pResultValue->SetLlvmRegister (pLlvmValue, pType);	
+	return true;
+/*
+
 	llvm::Value* pLlvmTypeValue = NULL;
 
 	llvm::Function* pLlvmCreateFatPointer = NULL;
@@ -250,7 +260,7 @@ CUnOp_addr::LlvmOperator (
 		);
 
 	pResultValue->SetLlvmRegister (pLlvmResult, pType);	
-	return false;
+	return false; */
 }
 
 //.............................................................................

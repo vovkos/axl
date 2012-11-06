@@ -243,6 +243,9 @@ CType::GetLlvmType ()
 	
 	case EType_Property:
 		break;
+
+	case EType_Import:
+		return ((CImportType*) this)->GetExternType ()->GetLlvmType ();
 	}
 
 	m_pLlvmType = pLlvmType; // could be NULL
@@ -253,7 +256,18 @@ CType::GetLlvmType ()
 size_t
 CType::GetAlignFactor ()
 {
-	return m_Size;
+	switch (m_TypeKind)
+	{
+	case EType_Struct:
+	case EType_Union:
+		return ((CStructType*) this)->GetAlignFactor ();
+
+	case EType_Import:
+		return ((CImportType*) this)->GetExternType ()->GetAlignFactor ();
+
+	default:
+		return m_Size;
+	};
 }
 
 rtl::CString 
