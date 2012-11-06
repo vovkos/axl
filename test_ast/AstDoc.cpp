@@ -275,6 +275,9 @@ CAstDoc::ExportStdLibFunction (
 		return false;
 
 	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
+	if (!pLlvmFunction)
+		return false;
+
 	m_pLlvmExecutionEngine->addGlobalMapping (pLlvmFunction, pfn);
 	return true;
 }

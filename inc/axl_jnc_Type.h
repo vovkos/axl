@@ -61,7 +61,7 @@ enum EType
 	EType_Function,       // F
 	EType_Event,          // V
 	EType_Enum,           // E
-	EType_Enum_c,          // N
+	EType_Enum_c,         // N
 	EType_Struct,         // S
 	EType_Union,          // U
 	EType_Class,          // X

@@ -14,49 +14,24 @@ typedef unsigned int32 size_t;
 typedef const char* unsafe pchar_t;
 typedef const char* pchar2_t;
 
-
-
 //.............................................................................
 
 int
 main ()
 {	
-	TStruct s;
-	s.m_a = 10;
-	s.m_b = 20;
-	s.m_c = 30;
+	int x = 1, y = 2;
 
-	StructTest (&s, sizeof (TStruct));
+	int* p = &x;
+//	y = *p;
 
-	size_t i;
-	for (i = 0; i < 10; i++)
-	{
-		printf ("i = %d\n", i);
-	}
-
+	printf ("x = %d, y = %d\n", x, y);
 	return 1;
 }
-
-int 
-ReadInteger ();
-
-int 
-StructTest (
-	TStruct* unsafe pStruct,
-	unsigned int32 Size
-	);
 
 void
 printf (
 	char* unsafe pFormat,
 	...
 	);
-
-struct pack (4) TStruct
-{
-	int8 m_a;
-	int64 m_b;
-	int8 m_c;
-};
 
 //.............................................................................

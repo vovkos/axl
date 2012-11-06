@@ -202,8 +202,7 @@ CUnOp_addr::GetTypeInfo (
 	TUnaryOperatorTypeInfo* pTypeInfo
 	)
 {
-	CType* pReturnType = pOpType->GetModifiedType (ETypeModifier_Pointer);
-
+	CType* pReturnType = pOpType->GetDerivedType (EType_Pointer);
 	pTypeInfo->m_CastKind = ECast_Implicit;
 	pTypeInfo->m_pOpType = pOpType;
 	pTypeInfo->m_pReturnType = pReturnType;
@@ -227,7 +226,7 @@ CUnOp_addr::LlvmOperator (
 	)
 {
 	CType* pType = OpValue.GetType ();
-	pType = pType->GetDerivedType (EType_Pointer_c);
+	pType = pType->GetDerivedType (EType_Pointer);
 
 	EValue OpKind = OpValue.GetValueKind ();
 	if (OpKind != EValue_Variable)
