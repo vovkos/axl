@@ -60,10 +60,15 @@ CControlFlowMgr::Jump (
 {
 	m_LlvmBuilder.CreateBr (pBlock->m_pLlvmBlock);
 
-	if (!pFollowBlock)
-		pFollowBlock = CreateBlock (_T("unreachable"));
+	bool IsUnreachable = pFollowBlock == NULL;
+
+	if (IsUnreachable) 
+		pFollowBlock = CreateBlock (_T("jmp_follow"));
 
 	SetCurrentBlock (pFollowBlock);
+
+	if (IsUnreachable)
+		m_LlvmBuilder.CreateUnreachable ();
 }
 
 bool
@@ -142,8 +147,9 @@ CControlFlowMgr::Return (const CValue& Value)
 		m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateRet (pLlvmValue);
 	}
 
-	CBasicBlock* pFollowBlock = CreateBlock (_T("unreachable"));
+	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));
 	SetCurrentBlock (pFollowBlock);
+	m_LlvmBuilder.CreateUnreachable ();
 	return true;
 }
 
