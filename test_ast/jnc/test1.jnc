@@ -19,7 +19,7 @@ typedef const char* pchar2_t;
 int
 main ()
 {	
-	int x = 1, y = 2;
+	int x = 1, y = 2;k
 
 //	int* p = &x;
 //	y = *p;
