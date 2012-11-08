@@ -171,7 +171,7 @@ CUnOp_Minus::LlvmOpInt (
 	llvm::Value* pOpValue
 	)
 {
-	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateNeg (pOpValue);
+	return pModule->m_LlvmBuilder.CreateNeg (pOpValue);
 }
 
 llvm::Value*
@@ -180,7 +180,7 @@ CUnOp_Minus::LlvmOpFp (
 	llvm::Value* pOpValue
 	)
 {
-	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateFNeg (pOpValue);
+	return pModule->m_LlvmBuilder.CreateFNeg (pOpValue);
 }
 
 //.............................................................................
@@ -191,7 +191,7 @@ CUnOp_BitwiseNot::LlvmOpInt (
 	llvm::Value* pOpValue
 	)
 {
-	return pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateNot (pOpValue);
+	return pModule->m_LlvmBuilder.CreateNot (pOpValue);
 }
 
 //.............................................................................
@@ -202,10 +202,21 @@ CUnOp_addr::GetTypeInfo (
 	TUnaryOperatorTypeInfo* pTypeInfo
 	)
 {
-	CType* pReturnType = pOpType->GetDerivedType (EType_Pointer);
+	if (!pOpType->IsReferenceType ())
+	{
+		err::SetFormatStringError (_T("can only apply unary '&' to a l-value"));
+		return false;
+	}
+
+	CType* pOriginalType = ((CPointerType*) pOpType)->GetBaseType ();
+	if (pOriginalType->IsReferenceType ())
+		return GetTypeInfo (pOriginalType, pTypeInfo);
+
 	pTypeInfo->m_CastKind = ECast_Implicit;
 	pTypeInfo->m_pOpType = pOpType;
-	pTypeInfo->m_pReturnType = pReturnType;
+	pTypeInfo->m_pReturnType = pOpType->GetTypeKind () == EType_Reference_u ? 
+		pOriginalType->GetPointerType (EType_Pointer_u) :
+		pOriginalType->GetPointerType (EType_Pointer);
 	return true;
 }
 
@@ -215,7 +226,7 @@ CUnOp_addr::ConstOperator (
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("cannot apply unary '&' to a constant"));
+	err::SetFormatStringError (_T("can only apply unary '&' to a l-value"));
 	return false;
 }
 
@@ -225,41 +236,22 @@ CUnOp_addr::LlvmOperator (
 	CValue* pResultValue
 	)
 {
-	CType* pType = OpValue.GetType ();
-	pType = pType->GetDerivedType (EType_Pointer);
-
-	EValue OpKind = OpValue.GetValueKind ();
-	if (OpKind != EValue_Variable)
+	CType* pOpType = OpValue.GetType ();
+	if (!pOpType->IsReferenceType ())
 	{
-		err::SetFormatStringError (_T("unary '&' can only be applied to variables"));
+		err::SetFormatStringError (_T("can only apply unary '&' to a l-value"));
 		return false;
 	}
 
-	CVariable* pVariable = OpValue.GetVariable ();
-	llvm::Value* pLlvmValue = pVariable->GetLlvmValue ();
-	pResultValue->SetLlvmRegister (pLlvmValue, pType);	
+	CType* pOriginalType = ((CPointerType*) pOpType)->GetBaseType ();
+	ASSERT (!pOriginalType->IsReferenceType ());
+
+	CType* pReturnType = pOpType->GetTypeKind () == EType_Reference_u ? 
+		pOriginalType->GetPointerType (EType_Pointer_u) :
+		pOriginalType->GetPointerType (EType_Pointer);
+
+	pResultValue->OverrideType (OpValue, pReturnType);
 	return true;
-/*
-
-	llvm::Value* pLlvmTypeValue = NULL;
-
-	llvm::Function* pLlvmCreateFatPointer = NULL;
-	
-	llvm::Value* ArgArray [] =
-	{
-		pLlvmValue,
-		pLlvmValue,
-		pLlvmTypeValue,
-		pLlvmTypeValue,
-	};
-
-	llvm::Value* pLlvmResult = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (
-		pLlvmCreateFatPointer, 
-		llvm::ArrayRef <llvm::Value*> (ArgArray, 4)
-		);
-
-	pResultValue->SetLlvmRegister (pLlvmResult, pType);	
-	return false; */
 }
 
 //.............................................................................
@@ -270,12 +262,25 @@ CUnOp_indir::GetTypeInfo (
 	TUnaryOperatorTypeInfo* pTypeInfo
 	)
 {
-	CType* pReturnType = pOpType->GetModifiedType (ETypeModifier_RemovePointer);
-	pReturnType = pReturnType->GetModifiedType (ETypeModifier_Reference);
+	while (pOpType->IsReferenceType ())
+		pOpType = ((CPointerType*) pOpType)->GetBaseType ();
+
+	if (!pOpType->IsPointerType ())
+	{
+		err::SetFormatStringError (_T("can only apply unary '*' to a pointer"));
+		return false;
+	}
+
+	CType* pOriginalType = ((CPointerType*) pOpType)->GetBaseType ();
+	if (pOriginalType->IsReferenceType ())
+		return GetTypeInfo (pOriginalType, pTypeInfo);
 
 	pTypeInfo->m_CastKind = ECast_Implicit;
 	pTypeInfo->m_pOpType = pOpType;
-	pTypeInfo->m_pReturnType = pReturnType;
+	pTypeInfo->m_pReturnType = pOpType->GetTypeKind () == EType_Pointer_u ? 
+		pOriginalType->GetPointerType (EType_Reference_u) :
+		pOriginalType->GetPointerType (EType_Reference);
+
 	return true;
 }
 
@@ -295,12 +300,22 @@ CUnOp_indir::LlvmOperator (
 	CValue* pResultValue
 	)
 {
-	CType* pType = OpValue.GetType ();
-	pType = pType->GetModifiedType (ETypeModifier_RemovePointer);
-	pType = pType->GetModifiedType (ETypeModifier_Reference);
+	CType* pOpType = OpValue.GetType ();
+	if (!pOpType->IsPointerType ())
+	{
+		err::SetFormatStringError (_T("can only apply unary '*' to a pointer"));
+		return false;
+	}
 
-	err::SetFormatStringError (_T("unary '*' not implemented yet"));
-	return false;
+	CType* pOriginalType = ((CPointerType*) pOpType)->GetBaseType ();
+	ASSERT (!pOriginalType->IsReferenceType ());
+
+	CType* pReturnType = pOpType->GetTypeKind () == EType_Pointer_u ? 
+		pOriginalType->GetPointerType (EType_Reference_u) :
+		pOriginalType->GetPointerType (EType_Reference);
+
+	pResultValue->OverrideType (OpValue, pReturnType);
+	return true;
 }
 
 //.............................................................................

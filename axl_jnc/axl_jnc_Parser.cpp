@@ -552,11 +552,11 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_GlobalFunction:
-		pValue->SetGlobalFunction ((CGlobalFunction*) pItem);
+		pValue->SetFunctionOverload ((CGlobalFunction*) pItem);
 		break;
 
 	case EModuleItem_GlobalProperty:
-		pValue->SetGlobalProperty ((CGlobalProperty*) pItem);
+		pValue->SetProperty (((CGlobalProperty*) pItem)->GetProperty ());
 		break;
 
 	default:

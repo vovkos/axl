@@ -15,13 +15,14 @@ CFunctionType::CFunctionType ()
 
 rtl::CStringA
 CFunctionType::CreateSignature (
+	EType TypeKind,
 	CType* pReturnType,
 	CType** ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CStringA String = "F(";
+	rtl::CStringA String = TypeKind == EType_Function ? "P(" : "Q(";
 	
 	String.Append (pReturnType->GetSignature ());
 	
@@ -31,23 +32,24 @@ CFunctionType::CreateSignature (
 		String.Append(pType->GetSignature ());
 	}
 
-	if (!(Flags & EFunctionTypeFlag_IsVarArg))
-		String.Append (")");
-	else
-		String.Append ("...)");
+	String.Append (
+		(Flags & EFunctionTypeFlag_IsVarArg) ? 
+		(Flags & EFunctionTypeFlag_IsUnsafeVarArg) ? ".-)" : ".)" : ")"
+		);
 
 	return String;
 }
 
 rtl::CString
 CFunctionType::CreateTypeString (
+	EType TypeKind,
 	CType* pReturnType,
 	CType** ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CString String = pReturnType->GetTypeString ();
+	rtl::CString String = TypeKind == EType_Function ? pReturnType->GetTypeString () : _T("event");
 
 	String.Append (_T(" ("));
 	
@@ -66,10 +68,13 @@ CFunctionType::CreateTypeString (
 
 	if (!(Flags & EFunctionTypeFlag_IsVarArg))
 		String.Append (_T(")"));
-	else if (ArgCount)
-		String.Append (_T(", ...)"));
-	else
-		String.Append (_T("...)"));
+	else 
+	{
+		if (ArgCount)
+			String.Append (_T(", "));
+
+		String.Append ((Flags & EFunctionTypeFlag_IsUnsafeVarArg) ? _T("unsafe ...)") : _T("safe ...)"));
+	}
 
 	return String;
 }
@@ -95,7 +100,7 @@ CFunctionType::GetLlvmType ()
 	llvm::FunctionType* pLlvmType = llvm::FunctionType::get (
 		m_pReturnType->GetLlvmType (),
 		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, ArgCount),
-		IsVarArg ()
+		(m_Flags & EFunctionTypeFlag_IsVarArg) != 0
 		);
 	
 	m_pLlvmType = pLlvmType;

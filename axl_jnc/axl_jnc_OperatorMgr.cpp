@@ -337,6 +337,42 @@ COperatorMgr::GetUnaryOperator (
 	return Result ? pOperator : NULL;
 }
 
+bool // unqualify, get property, peel double reference
+COperatorMgr::PrepareOperand (
+	const CValue& OpValue,
+	CValue* pOpValue
+	)
+{
+	CValue Value = OpValue;
+
+	for (;;)
+	{
+		CType* pType = Value.GetType ();
+
+		EType TypeKind = Value.GetType ()->GetTypeKind ();
+		switch (TypeKind)
+		{			
+		case EType_Qualifier:
+			pType = ((CQualifierType*) pType)->GetBaseType ();
+			Value.OverrideType (pType);
+			break;
+
+		case EType_Reference:
+		case EType_Reference_u:
+		case EType_Reference_d:
+			pType = ((CPointerType*) pType)->GetBaseType ();
+			break;
+
+		case EType_Property:
+			break;
+		}
+
+		break;
+	}
+
+	*pOpValue = Value;
+	return true;
+}
 
 IUnaryOperator*
 COperatorMgr::AddUnaryOperator (
@@ -470,25 +506,85 @@ COperatorMgr::BinaryOperator (
 }
 
 ICastOperator*
-COperatorMgr::FindCastOperator (
+COperatorMgr::GetCastOperator (
 	CType* pSrcType,
 	CType* pDstType
 	)
 {
+	if (pSrcType->Cmp (pDstType) == 0)
+		return &m_Cast_cpy;
+
+	EType SrcTypeKind = pSrcType->GetTypeKind ();
+	EType DstTypeKind = pDstType->GetTypeKind ();
+
+	switch (SrcTypeKind)
+	{
+	case EType_Reference:
+	case EType_Reference_u:
+		return GetReferenceCastOperator ((CPointerType*) pSrcType, pDstType);
+
+	case EType_Pointer:
+		return GetPointerCastOperator ((CPointerType*) pSrcType, pDstType);
+
+	case EType_Property:
+		return GetPropertyCastOperator ((CPropertyType*) pSrcType, pDstType);
+	}
+
 	rtl::CStringA Signature = pSrcType->GetSignature () + pDstType->GetSignature ();
 	rtl::CHashTableMapIteratorT <const tchar_t*, ICastOperator*> It = m_CastOperatorMap.Find (Signature);
 	if (It)
 		return It->m_Value;
 
-	// TODO: do proper special cases of casting
-
-	EType SrcTypeKind = pSrcType->GetTypeKind ();
-	EType DstTypeKind = pDstType->GetTypeKind ();
-	
-	if (SrcTypeKind == EType_Array && DstTypeKind == EType_Pointer_c)
-		return &m_Cast_arr_ptr_c;
-
 	return NULL;
+}
+
+ICastOperator*
+COperatorMgr::GetReferenceCastOperator (
+	CPointerType* pSrcType,
+	CType* pDstType
+	)
+{
+	CType* pSrcBaseType = pSrcType->GetBaseType ();
+
+	if (pSrcBaseType->GetTypeKind () == EType_Array && pDstType->GetTypeKind () == EType_Pointer_u)
+	{
+		CArrayType* pArrayType = (CArrayType*) pSrcBaseType;
+		CPointerType* pPointerType = (CPointerType*) pDstType;
+
+		ECast CastKind = GetCastKind (pArrayType->GetBaseType (), pPointerType->GetBaseType ());
+		return CastKind ? &m_Cast_arr_ptr_c : NULL;
+	}
+
+	ECast CastKind = GetCastKind (pSrcBaseType, pDstType);
+	return CastKind ? &m_Cast_load : NULL;
+}
+
+ICastOperator*
+COperatorMgr::GetPointerCastOperator (
+	CPointerType* pSrcType,
+	CType* pDstType
+	)
+{
+	if (!pDstType->IsPointerType ())
+		return NULL;
+
+	if (pSrcType->GetTypeKind () == EType_Pointer_u && pDstType->GetTypeKind () == EType_Pointer)
+		return NULL;
+
+	#pragma AXL_TODO ("also check that we do not cast non-POD structs")
+	
+	return &m_Cast_ptr;
+}
+
+ICastOperator*
+COperatorMgr::GetPropertyCastOperator (
+	CPropertyType* pSrcType,
+	CType* pDstType
+	)
+{
+	CType* pReturnType = pSrcType->GetGetterType ()->GetReturnType ();
+	ECast CastKind = GetCastKind (pReturnType, pDstType);
+	return CastKind ? &m_Cast_getp : NULL;
 }
 
 ICastOperator*
@@ -533,7 +629,7 @@ COperatorMgr::GetCastKind (
 	CType* pDstType
 	)
 {
-	ICastOperator* pOperator = FindCastOperator (pSrcType, pDstType);
+	ICastOperator* pOperator = GetCastOperator (pSrcType, pDstType);
 	return pOperator ? pOperator->GetCastKind (pSrcType, pDstType) : ECast_None;
 }
 
@@ -544,13 +640,7 @@ COperatorMgr::CastOperator (
 	CValue* pResultValue
 	)
 {
-	if (pType->Cmp (OpValue.GetType ()) == 0)
-	{
-		*pResultValue = OpValue;
-		return true;
-	}
-
-	ICastOperator* pOperator = FindCastOperator (OpValue.GetType (), pType);	
+	ICastOperator* pOperator = GetCastOperator (OpValue.GetType (), pType);	
 	if (!pOperator)
 	{
 		err::SetFormatStringError (
@@ -620,37 +710,111 @@ COperatorMgr::MoveOperator (
 	const CValue& DstValue
 	)
 {
-	EValue SrcValueKind = SrcValue.GetValueKind ();
-	EValue DstValueKind = DstValue.GetValueKind ();
-
-	CType* pSrcType = SrcValue.GetType ();
 	CType* pDstType = DstValue.GetType ();
+	EType DstTypeKind = pDstType->GetTypeKind ();
 
-	// TODO: take care of properties
-
-	// TODO: take care of references
-
-	// TODO: take care of const modifiers
-
-	llvm::Value* pLlvmSrcValue = NULL;
-	llvm::Value* pLlvmDstValue = DstValue.GetLlvmValue ();
-
-	if (pSrcType->Cmp (pDstType) == 0)
+	switch (DstTypeKind)
 	{
-		pLlvmSrcValue = LoadValue (SrcValue);
+	case EType_Reference:
+	case EType_Reference_u:
+		return ReferenceMoveOperator (SrcValue, DstValue, (CPointerType*) pDstType);
+
+	case EType_Property:
+		return PropertyMoveOperator (SrcValue, DstValue.GetProperty ());
+
+	default:
+		err::SetFormatStringError (_T("left operand must be l-value"));
+		return false;
 	}
-	else
+}
+
+bool
+COperatorMgr::ReferenceMoveOperator (
+	const CValue& SrcValue,
+	const CValue& DstValue,
+	CPointerType* pDstType
+	)
+{
+	EType DstTypeKind = pDstType->GetTypeKind ();
+	ASSERT (DstTypeKind == EType_Reference || DstTypeKind == EType_Reference_u);
+
+	CType* pTargetType = pDstType->GetBaseType ();
+	EType TargetTypeKind = pTargetType->GetTypeKind ();
+
+	CValue CastValue;
+
+	switch (TargetTypeKind)
 	{
-		CValue CastValue;
-		bool Result = CastOperator (SrcValue, DstValue.GetType (), &CastValue);
-		if (!Result)
-			return false;
-
-		pLlvmSrcValue = CastValue.GetLlvmValue ();
+	case EType_Reference:
+	case EType_Reference_u:
+	case EType_Reference_d:
+		return 
+			CastOperator (DstValue, pTargetType, &CastValue) &&
+			MoveOperator (SrcValue, CastValue);
 	}
+	
+	bool Result = CastOperator (SrcValue, pTargetType, &CastValue);
+	if (!Result)
+		return false;
 
-	m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateStore (pLlvmSrcValue, pLlvmDstValue);
+	if ((TargetTypeKind == EType_Pointer || TargetTypeKind == EType_Pointer_d) && 
+		CastValue.GetValueKind () == EValue_Variable)
+		return VariableToFatPointerMoveOperator (CastValue.GetVariable (), DstValue);
+
+	m_pModule->m_LlvmBuilder.CreateStore (
+		CastValue.GetLlvmValue (), 
+		DstValue.GetLlvmValue ()
+		);
+
 	return true;
+}
+
+bool
+COperatorMgr::VariableToFatPointerMoveOperator (
+	CVariable* pVariable,
+	const CValue& DstValue
+	)
+{
+	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Int8, EType_Pointer_u);
+	
+	llvm::Value* pLlvmVariable = m_pModule->m_LlvmBuilder.CreateBitCast (
+		pVariable->GetLlvmValue (),
+		pCharPointerType->GetLlvmType ()
+		);
+	
+	CType* pType = pVariable->GetType ();
+	llvm::Value* pLlvmTypePtr = CValue (pCharPointerType, &pType).GetLlvmValue ();
+
+	llvm::Value* pLlvmFatPointer = llvm::UndefValue::get (m_pModule->m_TypeMgr.GetLlvmFatPointerType ());
+
+	pLlvmFatPointer = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPointer, pLlvmVariable, 0);
+	pLlvmFatPointer = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPointer, pLlvmTypePtr, 1);
+	pLlvmFatPointer = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPointer, pLlvmVariable, 2);
+	pLlvmFatPointer = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPointer, pLlvmTypePtr, 3);
+
+	m_pModule->m_LlvmBuilder.CreateStore (
+		pLlvmFatPointer, 
+		DstValue.GetLlvmValue ()
+		);
+
+	return true;
+}
+
+bool
+COperatorMgr::PropertyMoveOperator (
+	const CValue& SrcValue,
+	CProperty* pProperty
+	)
+{
+	CFunctionOverload* pSetter = pProperty->GetSetter ();
+	if (!pSetter)
+	{
+		err::SetFormatStringError (_T("cannot move to a read-only property"));
+		return false;
+	}
+
+	err::SetFormatStringError (_T("setting properies not implemented yet"));
+	return false;
 }
 
 bool
@@ -687,6 +851,13 @@ COperatorMgr::MemberOperator (
 	)
 {
 	CType* pType = OpValue.GetType ();
+
+	if (pType->IsReferenceType ())
+		pType = ((CPointerType*) pType)->GetBaseType ();
+
+	if (pType->IsPointerType () || pType->IsReferenceType ())
+		pType = ((CPointerType*) pType)->GetBaseType ();
+
 	EType TypeKind = pType->GetTypeKind ();
 
 	switch (TypeKind)
@@ -747,29 +918,38 @@ COperatorMgr::StructMemberOperator (
 		return true;
 	}
 
-	CValue Zero;
-	Zero.SetConstInt32 (0, EType_Int32);
-
-	CValue Index;
-	Index.SetConstInt32 (pMember->GetLlvmIndex (), EType_Int32);
-
-	llvm::Value* pLlvmValue = OpValue.GetLlvmValue ();
-	llvm::Value* pLlvmZero = Zero.GetLlvmValue ();
-	llvm::Value* pLlvmIndex = Index.GetLlvmValue ();
-
-	llvm::Value* LlvmIndexArray [] =
+	if (!OpValue.GetType ()->IsReferenceType ())
 	{
-		pLlvmZero,
-		pLlvmIndex,
-	};
+		llvm::Value* pLlvmMember = m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue.GetLlvmValue (), pMember->GetLlvmIndex ());
+		pResultValue->SetLlvmRegister (pLlvmMember, pMember->GetType ());
+		return true;
+	}
+	else
+	{
+		CValue Zero;
+		Zero.SetConstInt32 (0, EType_Int32);
 
-	llvm::Value* pLlvmGep = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateGEP (
-		pLlvmValue, 
-		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
-		);
+		CValue Index;
+		Index.SetConstInt32 (pMember->GetLlvmIndex (), EType_Int32);
 
-	pResultValue->SetLlvmRegister (pLlvmGep, pMember->GetType ());
-	return true;
+		llvm::Value* pLlvmValue = OpValue.GetLlvmValue ();
+		llvm::Value* pLlvmZero = Zero.GetLlvmValue ();
+		llvm::Value* pLlvmIndex = Index.GetLlvmValue ();
+
+		llvm::Value* LlvmIndexArray [] =
+		{
+			pLlvmZero,
+			pLlvmIndex,
+		};
+
+		llvm::Value* pLlvmGep = m_pModule->m_LlvmBuilder.CreateGEP (
+			pLlvmValue, 
+			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
+			);
+
+		pResultValue->SetLlvmRegister (pLlvmGep, pMember->GetType ()->GetPointerType (EType_Reference_u));
+		return true;
+	}
 }
 
 bool
@@ -791,6 +971,24 @@ COperatorMgr::ClassMemberOperator (
 	return false;
 }
 
+CType*
+GetVarArgType (
+	CType* pType,
+	bool IsUnsafeVarArg
+	)
+{
+	EType TypeKind = pType->GetTypeKind ();
+
+	switch (TypeKind)
+	{
+	case EType_Reference:
+	case EType_Reference_u:
+		return ((CPointerType*) pType)->GetBaseType ();
+
+	default:
+		return pType;
+	}
+}
 
 bool
 COperatorMgr::CallOperator (
@@ -801,29 +999,38 @@ COperatorMgr::CallOperator (
 {
 	bool Result;
 
+	CFunction* pFunction;
+
 	EValue ValueKind = OpValue.GetValueKind ();
-	if (ValueKind != EValue_GlobalFunction)
+	switch (ValueKind)
 	{
+	case EValue_Function:
+		pFunction = OpValue.GetFunction ();
+		break;
+
+	case EValue_FunctionOverload:
+		// TODO: find overload based on arg list
+		pFunction = OpValue.GetFunctionOverload ()->GetFunction ();
+		break;
+
+	default:
 		err::SetFormatStringError (_T("cannot call %s"), OpValue.GetValueKindString ());
 		return false;
 	}
 
-	CGlobalFunction* pGlobalFunction = OpValue.GetGlobalFunction ();
-
-	// TODO: find overload based on arg list
-
-	CFunction* pFunction = pGlobalFunction->GetFunction ();
 	CFunctionType* pFunctionType = pFunction->GetType ();
 	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
 	
 	size_t FormalArgCount = pFunctionType->GetArgCount ();
 	size_t ActualArgCount = pArgList->GetCount ();
 
-	bool IsVarArg = pFunctionType->IsVarArg ();
+	bool IsVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsVarArg) != 0;
+	bool IsUnsafeVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsUnsafeVarArg) != 0;
+
 	if (IsVarArg && ActualArgCount < FormalArgCount ||
 		!IsVarArg && ActualArgCount != FormalArgCount)
 	{
-		err::SetFormatStringError (_T("function '%s' takes %d arguments; %d passed"), pGlobalFunction->GetName (), FormalArgCount, ActualArgCount);
+		err::SetFormatStringError (_T("function '%s' takes %d arguments; %d passed"), pFunction->GetTag (), FormalArgCount, ActualArgCount);
 		return false;
 	}
 
@@ -834,25 +1041,30 @@ COperatorMgr::CallOperator (
 	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
 	{
 		CType* pFormalArgType = pFunctionType->GetArgType (i);
+		
 		CValue ArgCast;
-
 		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
 		if (!Result)
 			return false;
 
-		llvm::Value* pLlvmArg = LoadValue (ArgCast);
-		LlvmArgArray.Append (pLlvmArg);
+		LlvmArgArray.Append (ArgCast.GetLlvmValue ());
 	}
 
 	// vararg
 
 	for (; Arg; Arg++)
 	{
-		llvm::Value* pLlvmArg = LoadValue (*Arg);
-		LlvmArgArray.Append (pLlvmArg);
+		CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
+
+		CValue ArgCast;
+		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		if (!Result)
+			return false;
+
+		LlvmArgArray.Append (ArgCast.GetLlvmValue ());
 	}
 
-	llvm::Instruction* pLlvmCall = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateCall (
+	llvm::Instruction* pLlvmCall = m_pModule->m_LlvmBuilder.CreateCall (
 		pLlvmFunction,
 		llvm::ArrayRef <llvm::Value*> (LlvmArgArray, LlvmArgArray.GetCount ())
 		);
@@ -876,19 +1088,6 @@ COperatorMgr::CallOperator (
 
 	*pValue = ResultValue;
 	return true;
-}
-
-llvm::Value*
-COperatorMgr::LoadValue (const CValue& Value)
-{
-	EValue ValueKind = Value.GetValueKind ();
-	ASSERT (ValueKind == EValue_Const || ValueKind == EValue_Variable || ValueKind == EValue_LlvmRegister);
-
-	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
-	if (ValueKind == EValue_Variable)
-		pLlvmValue = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateLoad (pLlvmValue);
-
-	return pLlvmValue;
 }
 
 //.............................................................................

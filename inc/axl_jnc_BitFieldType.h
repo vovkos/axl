@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CBitFieldType: public CDerivedType
+class CBitFieldType: public CPointerType
 {
 protected:
 	friend class CTypeMgr;
@@ -48,7 +48,7 @@ public:
 		)
 	{ 
 		return rtl::CStringA::Format_s (
-			"B%s:%d:%d", 
+			"H%s:%d:%d", 
 			pBaseType->GetSignature (),
 			BitOffset,
 			BitOffset + BitCount

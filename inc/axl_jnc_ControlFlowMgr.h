@@ -21,8 +21,6 @@ protected:
 	rtl::CStdListT <CBasicBlock> m_BlockList;
 	CBasicBlock* m_pCurrentBlock;
 
-	llvm::IRBuilder <> m_LlvmBuilder;
-
 public:
 	CControlFlowMgr ();
 
@@ -30,12 +28,6 @@ public:
 	GetModule ()
 	{
 		return m_pModule;
-	}
-
-	llvm::IRBuilder <>*
-	GetLlvmBuilder ()
-	{
-		return &m_LlvmBuilder;
 	}
 
 	void

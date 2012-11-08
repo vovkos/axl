@@ -28,13 +28,13 @@ protected:
 	CType m_BasicTypeArray [EType__BasicTypeCount];
 
 	rtl::CStdListT <CDerivedType> m_DerivedTypeList;
-	rtl::CStdListT <CArrayType> m_ArrayTypeList;
 	rtl::CStdListT <CBitFieldType> m_BitFieldTypeList;
-	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
-	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CEnumType> m_EnumTypeList;
+	rtl::CStdListT <CArrayType> m_ArrayTypeList;
 	rtl::CStdListT <CStructType> m_StructTypeList;
 	rtl::CStdListT <CClassType> m_ClassTypeList;
+	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
+	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
@@ -92,19 +92,34 @@ public:
 		return GetBasicType (GetUInt64TypeKind (Integer, ForceUnsigned));
 	}
 
-	CDerivedType* 
-	GetDerivedType (
+	CType* 
+	GetQualifiedType (
+		CType* pBaseType,
+		int Flags
+		);
+
+	CType* 
+	GetQualifiedType (
+		EType TypeKind,
+		int Flags
+		)
+	{
+		return GetQualifiedType (GetBasicType (TypeKind), Flags);
+	}
+
+	CPointerType* 
+	GetPointerType (
 		CType* pBaseType,
 		EType TypeKind
 		);
 
-	CDerivedType* 
-	GetDerivedType (
+	CPointerType* 
+	GetPointerType (
 		EType BaseTypeKind,
 		EType TypeKind
 		)
 	{
-		return GetDerivedType (GetBasicType (BaseTypeKind), TypeKind);
+		return GetPointerType (GetBasicType (BaseTypeKind), TypeKind);
 	}
 
 	CArrayType* 

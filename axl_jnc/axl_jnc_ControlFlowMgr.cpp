@@ -7,8 +7,7 @@ namespace jnc {
 
 //.............................................................................
 
-CControlFlowMgr::CControlFlowMgr ():
-	m_LlvmBuilder (llvm::getGlobalContext())
+CControlFlowMgr::CControlFlowMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
@@ -40,7 +39,7 @@ void
 CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 {
 	m_pCurrentBlock = pBlock;
-	m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
+	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
 
 	if (pBlock->m_pFunction)
 		return;
@@ -58,7 +57,7 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
-	m_LlvmBuilder.CreateBr (pBlock->m_pLlvmBlock);
+	m_pModule->m_LlvmBuilder.CreateBr (pBlock->m_pLlvmBlock);
 
 	bool IsUnreachable = pFollowBlock == NULL;
 
@@ -68,7 +67,7 @@ CControlFlowMgr::Jump (
 	SetCurrentBlock (pFollowBlock);
 
 	if (IsUnreachable)
-		m_LlvmBuilder.CreateUnreachable ();
+		m_pModule->m_LlvmBuilder.CreateUnreachable ();
 }
 
 bool
@@ -83,8 +82,12 @@ CControlFlowMgr::ConditionalJump (
 	if (!Result)
 		return false;
 
-	llvm::Value* pLlvmBool = m_pModule->m_OperatorMgr.LoadValue (BoolValue);
-	m_LlvmBuilder.CreateCondBr (pLlvmBool, pThenBlock->m_pLlvmBlock, pElseBlock->m_pLlvmBlock);
+	m_pModule->m_LlvmBuilder.CreateCondBr (
+		BoolValue.GetLlvmValue (), 
+		pThenBlock->GetLlvmBlock (), 
+		pElseBlock->GetLlvmBlock ()
+		);
+
 	SetCurrentBlock (pThenBlock);
 	return true;
 }
@@ -134,7 +137,7 @@ CControlFlowMgr::Return (const CValue& Value)
 			return false;
 		}
 
-		m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateRetVoid ();
+		m_pModule->m_LlvmBuilder.CreateRetVoid ();
 	}
 	else
 	{
@@ -143,13 +146,12 @@ CControlFlowMgr::Return (const CValue& Value)
 		if (!Result)
 			return false;
 
-		llvm::Value* pLlvmValue = m_pModule->m_OperatorMgr.LoadValue (ReturnValue);
-		m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateRet (pLlvmValue);
+		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue.GetLlvmValue ());
 	}
 
 	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));
 	SetCurrentBlock (pFollowBlock);
-	m_LlvmBuilder.CreateUnreachable ();
+	m_pModule->m_LlvmBuilder.CreateUnreachable ();
 	return true;
 }
 

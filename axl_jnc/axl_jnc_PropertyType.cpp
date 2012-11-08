@@ -19,7 +19,7 @@ CPropertyType::CreateSignature (
 	const CFunctionTypeOverload& SetterType
 	)
 {
-	rtl::CStringA String = "P{";
+	rtl::CStringA String = "R{";
 	
 	String.Append (pGetterType->GetSignature ());
 	

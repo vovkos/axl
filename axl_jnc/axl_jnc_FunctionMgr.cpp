@@ -189,12 +189,16 @@ CFunctionMgr::CompileFunctions ()
 			}
 		}
 
+		// llvm::verifyFunction (pFunction->GetLlvmFunction (), llvm::PrintMessageAction);
+
 		pFunction->m_Ast = Parser.GetAst ();
 		jnc::CParser::CAstNode* pAstNode = pFunction->m_Ast->GetRoot ();
 
 		ASSERT (pAstNode->m_Kind == jnc::ESymbol_compound_stmt);
 		jnc::CParser::CCompoundStmt* pBody = (jnc::CParser::CCompoundStmt*) pAstNode;
 		pFunction->m_pScope = pBody->m_pScope;
+
+
 	}
 
 	m_pModule->m_NamespaceMgr.SetGlobalNamespace (); // just in case

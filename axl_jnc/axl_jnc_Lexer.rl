@@ -55,7 +55,6 @@ main := |*
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-'import'       { CreateToken (EToken_Import); };
 'namespace'    { CreateToken (EToken_Namespace); };
 'using'        { CreateToken (EToken_Using); };
 'pack'         { CreateToken (EToken_Pack); };
@@ -75,10 +74,11 @@ main := |*
 'bigendian'    { CreateToken (EToken_BigEndian); };
 'safe'         { CreateToken (EToken_Safe); };
 'unsafe'       { CreateToken (EToken_Unsafe); };
+'dynamic'      { CreateToken (EToken_Dynamic); };
+'nonull'       { CreateToken (EToken_NoNull); };
 
 'auto'         { CreateToken (EToken_Auto); };
 'void'         { CreateToken (EToken_Void); };
-'variant'      { CreateToken (EToken_Variant); };
 'bool'         { CreateToken (EToken_Bool); };
 'int8'         { CreateToken (EToken_Int8); };
 'int16'        { CreateToken (EToken_Int16); };
@@ -104,6 +104,8 @@ main := |*
 
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
+'dynasizeof'   { CreateToken (EToken_DynaSizeOf); };
+'dynatypeof'   { CreateToken (EToken_DynaTypeOf); };
 
 'if'           { CreateToken (EToken_If); };
 'else'         { CreateToken (EToken_Else); };

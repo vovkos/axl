@@ -16,22 +16,38 @@ typedef const char* pchar2_t;
 
 //.............................................................................
 
+struct TPoint
+{
+	int m_x;
+	int m_y;
+	int m_z;
+};
+
 int
 main ()
 {	
-	int x = 1, y = 2;
+	TPoint Point;
+	Point.m_x = 10;
+	Point.m_y = 20;
+	Point.m_z = 30;
+/*
+	int32 x, y, z;
 
-//	int* p = &x;
-//	y = *p;
+	int32* safe p1 = &x; 
+	int32* safe p2 = p1; 
+//	int32* unsafe p2 = &x; 
+//	int32* dynamic p3 = &x; 
 
-	printf ("x = %d, y = %d\n", x, y);
+	y = *p1;
+	y = *p2;
+*/
 	return 1;
 }
 
 void
 printf (
 	char* unsafe pFormat,
-	...
+	unsafe ...
 	);
 
 //.............................................................................

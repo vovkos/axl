@@ -93,6 +93,7 @@ protected:
 
 public:
 	llvm::Module* m_pLlvmModule;
+	llvm::IRBuilder <> m_LlvmBuilder;
 
 	CTypeMgr m_TypeMgr;
 	CAttributeMgr m_AttributeMgr;
@@ -104,7 +105,8 @@ public:
 	COperatorMgr m_OperatorMgr;
 	
 public:
-	CModule ()
+	CModule ():
+		m_LlvmBuilder (llvm::getGlobalContext())
 	{
 		m_pLlvmModule = NULL;
 	}

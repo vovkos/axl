@@ -9,8 +9,6 @@
 namespace axl {
 namespace jnc {
 
-class CType;
-class CDerivedType;
 class CNamespace;
 class CEnumType;
 class CEnumMember;

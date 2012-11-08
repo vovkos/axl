@@ -44,14 +44,17 @@ GetValueKindString (EValue ValueKind)
 	case EValue_Variable:
 		return _T("variable");
 
+	case EValue_Function:
+		return _T("function");
+
+	case EValue_FunctionOverload:
+		return _T("function-overload");
+
+	case EValue_Property:
+		return _T("property");
+
 	case EValue_LlvmRegister:
 		return _T("llvm-register");
-
-	case EValue_GlobalFunction:
-		return _T("global-function");
-
-	case EValue_GlobalProperty:
-		return _T("global-property");
 
 	case EValue_BoolNot:
 		return _T("bool-not");
@@ -96,10 +99,9 @@ CValue::GetLlvmValue () const
 	if (m_pLlvmValue)
 		return m_pLlvmValue;
 
-	if (m_ValueKind == EValue_Void)
+	if (m_ValueKind != EValue_Const)
 		return NULL;
 
-	ASSERT (m_ValueKind == EValue_Const);
 	ASSERT (m_pType);
 
 	int64_t Integer;
@@ -143,7 +145,7 @@ CValue::GetLlvmValue () const
 		pConstant = CLlvmPodConst::Get (m_pType, GetConstData ());
 		break;
 
-	case EType_Pointer_c:
+	case EType_Pointer_u:
 		Integer = *(int64_t*) GetConstData ();
 
 		pConstant = llvm::ConstantInt::get (
@@ -177,25 +179,33 @@ void
 CValue::SetVariable (CVariable* pVariable)
 {
 	m_ValueKind = EValue_Variable;
-	m_pType = pVariable->GetType ();
+	m_pType = pVariable->GetType ()->GetPointerType (EType_Reference);
 	m_pVariable = pVariable;
 	m_pLlvmValue = pVariable->GetLlvmValue ();
 }
 
 void
-CValue::SetGlobalFunction (CGlobalFunction* pFunction)
+CValue::SetFunction (CFunction* pFunction)
 {
-	m_ValueKind = EValue_GlobalFunction;
-	m_pType = pFunction->GetOverloadCount () == 1 ? pFunction->GetFunction ()->GetType () : NULL;
-	m_pGlobalFunction = pFunction;
+	m_ValueKind = EValue_Function;
+	m_pType = pFunction->GetType ();
+	m_pFunction = pFunction;
 }
 
 void
-CValue::SetGlobalProperty (CGlobalProperty* pProperty)
+CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
 {
-	m_ValueKind = EValue_GlobalProperty;
-	m_pType = pProperty->GetProperty ()->GetType ();
-	m_pGlobalProperty = pProperty;
+	m_ValueKind = EValue_Function;
+	m_pType = pFunctionOverload->GetOverloadCount () == 1 ? pFunctionOverload->GetFunction ()->GetType () : NULL;
+	m_pFunctionOverload = pFunctionOverload;
+}
+
+void
+CValue::SetProperty (CProperty* pProperty)
+{
+	m_ValueKind = EValue_Property;
+	m_pType = pProperty->GetType ();
+	m_pProperty = pProperty;
 }
 
 bool

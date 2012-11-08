@@ -11,6 +11,8 @@
 namespace axl {
 namespace jnc {
 
+class CPropertyType;
+
 //.............................................................................
 
 class COperatorMgr
@@ -121,6 +123,10 @@ protected:
 	// cast operators
 
 	CCast_cpy m_Cast_cpy;
+	CCast_load m_Cast_load;
+	CCast_getp m_Cast_getp;
+	CCast_ptr m_Cast_ptr;
+	CCast_arr_ptr_c m_Cast_arr_ptr_c;
 
 	CCast_int_trunc m_Cast_int_trunc;
 	CCast_int_ext m_Cast_int_ext;
@@ -147,8 +153,6 @@ protected:
 	CCast_f64_i32 m_Cast_f64_i32;
 	CCast_f64_i64 m_Cast_f64_i64;
 
-	CCast_arr_ptr_c m_Cast_arr_ptr_c;
-
 	// tables
 
 	CUnaryOperatorOverload m_UnaryOperatorTable [EUnOp__Count];
@@ -173,6 +177,12 @@ public:
 
 	void
 	AddStdOperators ();
+
+	bool // unqualify, get property, peel double references
+	PrepareOperand (
+		const CValue& OpValue,
+		CValue* pOpValue
+		);
 
 	// unary operators
 
@@ -286,7 +296,7 @@ public:
 	// move & cast operators
 
 	ICastOperator*
-	FindCastOperator (
+	GetCastOperator (
 		CType* pSrcType,
 		CType* pDstType
 		);
@@ -336,7 +346,7 @@ public:
 		CValue* pValue,
 		EType TypeKind
 		);
-
+	
 	bool
 	MoveOperator (
 		const CValue& SrcValue,
@@ -385,11 +395,6 @@ public:
 		rtl::CBoxListT <CValue>* pArgList
 		);
 
-	// useful helper
-
-	llvm::Value*
-	LoadValue (const CValue& Value);
-
 protected:
 	void
 	AddStdUnaryOperators ();
@@ -399,6 +404,43 @@ protected:
 
 	void
 	AddStdCastOperators ();
+
+	ICastOperator*
+	GetReferenceCastOperator (
+		CPointerType* pSrcType,
+		CType* pDstType
+		);
+
+	ICastOperator*
+	GetPointerCastOperator (
+		CPointerType* pSrcType,
+		CType* pDstType
+		);
+
+	ICastOperator*
+	GetPropertyCastOperator (
+		CPropertyType* pSrcType,
+		CType* pDstType
+		);
+
+	bool
+	VariableToFatPointerMoveOperator (
+		CVariable* pVariable,
+		const CValue& DstValue
+		);
+
+	bool
+	ReferenceMoveOperator (
+		const CValue& SrcValue,
+		const CValue& DstValue,
+		CPointerType* pDstType
+		);
+
+	bool
+	PropertyMoveOperator (
+		const CValue& SrcValue,
+		CProperty* pProperty
+		);
 
 	bool
 	StructMemberOperator (

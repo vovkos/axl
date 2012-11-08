@@ -142,6 +142,84 @@ public:
 
 //.............................................................................
 
+// load from a reference
+
+class CCast_load: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_load, ICastOperator)
+
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// get property
+
+class CCast_getp: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_getp, ICastOperator)
+
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// get property
+
+class CCast_ptr: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_ptr, ICastOperator)
+
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 // integer extensions, truncations & byte order swap
 
 class CCast_int_trunc: public ICastOperator

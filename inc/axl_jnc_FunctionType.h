@@ -13,7 +13,8 @@ namespace jnc {
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_IsVarArg = 1,
+	EFunctionTypeFlag_IsVarArg       = 0x100,
+	EFunctionTypeFlag_IsUnsafeVarArg = 0x200,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -27,19 +28,12 @@ protected:
 
 	CType* m_pReturnType;
 	rtl::CArrayT <CType*> m_ArgTypeArray;
-	int m_Flags;
 
 public:
 	CFunctionType ();
 
 	llvm::FunctionType* 
 	GetLlvmType ();
-
-	int 
-	GetFlags ()
-	{
-		return m_Flags;
-	}
 
 	CType*
 	GetReturnType ()
@@ -60,15 +54,10 @@ public:
 		return m_ArgTypeArray [Index];
 	}
 
-	bool
-	IsVarArg ()
-	{
-		return (m_Flags & EFunctionTypeFlag_IsVarArg) != 0;
-	}
-
 	static
 	rtl::CStringA
 	CreateSignature (
+		EType TypeKind,
 		CType* pReturnType,
 		CType** ppArgType,
 		size_t ArgCount,
@@ -78,6 +67,7 @@ public:
 	static
 	rtl::CString
 	CreateTypeString (
+		EType TypeKind,
 		CType* pReturnType,
 		CType** ppArgType,
 		size_t ArgCount,
@@ -87,7 +77,7 @@ public:
 	rtl::CString
 	CreateTypeString ()
 	{
-		return CreateTypeString (m_pReturnType, m_ArgTypeArray, m_ArgTypeArray.GetCount (), m_Flags);
+		return CreateTypeString (m_TypeKind, m_pReturnType, m_ArgTypeArray, m_ArgTypeArray.GetCount (), m_Flags);
 	}
 };
 

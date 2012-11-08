@@ -17,7 +17,6 @@ enum EToken
 	EToken_Integer,
 	EToken_Fp,
 	EToken_Literal,
-	EToken_Import,
 	EToken_Namespace,
 	EToken_Using,
 	EToken_Pack,
@@ -34,9 +33,10 @@ enum EToken
 	EToken_BigEndian,
 	EToken_Safe,
 	EToken_Unsafe,
+	EToken_Dynamic,
+	EToken_NoNull,
 	EToken_Auto,
 	EToken_Void,
-	EToken_Variant,
 	EToken_Bool,
 	EToken_Int8,
 	EToken_Int16,
@@ -60,6 +60,8 @@ enum EToken
 	EToken_Set,
 	EToken_SizeOf,
 	EToken_TypeOf,
+	EToken_DynaSizeOf,
+	EToken_DynaTypeOf,
 	EToken_If,
 	EToken_Else,
 	EToken_For,
@@ -106,7 +108,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Integer,      "integer-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Fp,           "floating-point-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Literal,      "string-literal")
-	AXL_PRS_TOKEN_NAME (EToken_Import,       "import")
 	AXL_PRS_TOKEN_NAME (EToken_Namespace,    "namespace")
 	AXL_PRS_TOKEN_NAME (EToken_Using,        "using")
 	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
@@ -121,11 +122,12 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
-	AXL_PRS_TOKEN_NAME (EToken_Safe,          "safe")
-	AXL_PRS_TOKEN_NAME (EToken_Unsafe,        "unsafe")
+	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
+	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
+	AXL_PRS_TOKEN_NAME (EToken_Dynamic,      "dynamic")
+	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
 	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")
-	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")
 	AXL_PRS_TOKEN_NAME (EToken_Bool,         "bool")
 	AXL_PRS_TOKEN_NAME (EToken_Int8,         "int8")
 	AXL_PRS_TOKEN_NAME (EToken_Int16,        "int16")
@@ -147,6 +149,8 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
+	AXL_PRS_TOKEN_NAME (EToken_DynaSizeOf,   "dynasizeof")
+	AXL_PRS_TOKEN_NAME (EToken_DynaTypeOf,   "dynatypeof")
 	AXL_PRS_TOKEN_NAME (EToken_If,           "if")
 	AXL_PRS_TOKEN_NAME (EToken_Else,         "else")
 	AXL_PRS_TOKEN_NAME (EToken_For,          "for")
