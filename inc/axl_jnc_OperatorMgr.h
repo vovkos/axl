@@ -11,7 +11,9 @@
 namespace axl {
 namespace jnc {
 
-class CPropertyType;
+class CArrayType;
+class CStructType;
+class CClassType;
 
 //.............................................................................
 
@@ -123,10 +125,6 @@ protected:
 	// cast operators
 
 	CCast_cpy m_Cast_cpy;
-	CCast_load m_Cast_load;
-	CCast_getp m_Cast_getp;
-	CCast_ptr m_Cast_ptr;
-	CCast_arr_ptr_c m_Cast_arr_ptr_c;
 
 	CCast_int_trunc m_Cast_int_trunc;
 	CCast_int_ext m_Cast_int_ext;
@@ -178,20 +176,7 @@ public:
 	void
 	AddStdOperators ();
 
-	bool // unqualify, get property, peel double references
-	PrepareOperand (
-		const CValue& OpValue,
-		CValue* pOpValue
-		);
-
 	// unary operators
-
-	IUnaryOperator*
-	GetUnaryOperator (
-		EUnOp OpKind,
-		CType* pOpType,
-		TUnaryOperatorTypeInfo* pTypeInfo
-		);
 
 	IUnaryOperator*
 	AddUnaryOperator (
@@ -225,18 +210,6 @@ public:
 		);
 
 	// binary operators
-
-	IBinaryOperator*
-	GetBinaryOperator (
-		EBinOp OpKind,
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
-		return m_BinaryOperatorTable [OpKind].GetOperator (pOpType1, pOpType2, pTypeInfo);
-	}
 
 	IBinaryOperator*
 	AddBinaryOperator (
@@ -294,12 +267,6 @@ public:
 		);
 
 	// move & cast operators
-
-	ICastOperator*
-	GetCastOperator (
-		CType* pSrcType,
-		CType* pDstType
-		);
 
 	ICastOperator*
 	AddCastOperator (
@@ -383,6 +350,19 @@ public:
 		);
 
 	bool
+	PointerToMemberOperator (
+		const CValue& OpValue,
+		const tchar_t* pName,
+		CValue* pResultValue
+		);
+
+	bool
+	PointerToMemberOperator (
+		CValue* pValue,
+		const tchar_t* pName
+		);
+
+	bool
 	CallOperator (
 		const CValue& OpValue,
 		rtl::CBoxListT <CValue>* pArgList,
@@ -405,47 +385,106 @@ protected:
 	void
 	AddStdCastOperators ();
 
+	IUnaryOperator*
+	GetUnaryOperator (
+		EUnOp OpKind,
+		CType* pOpType,
+		TUnaryOperatorTypeInfo* pTypeInfo
+		);
+
+	IBinaryOperator*
+	GetBinaryOperator (
+		EBinOp OpKind,
+		CType* pOpType1,
+		CType* pOpType2,
+		TBinaryOperatorTypeInfo* pTypeInfo
+		)
+	{
+		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
+		return m_BinaryOperatorTable [OpKind].GetOperator (pOpType1, pOpType2, pTypeInfo);
+	}
+
 	ICastOperator*
-	GetReferenceCastOperator (
-		CPointerType* pSrcType,
+	GetCastOperator (
+		CType* pSrcType,
 		CType* pDstType
 		);
 
-	ICastOperator*
-	GetPointerCastOperator (
-		CPointerType* pSrcType,
-		CType* pDstType
+	// prepare is: unqualify, get property, peel double references
+
+	CType* 
+	PrepareOperandType (CType* pOpType);
+
+	bool 
+	PrepareOperand (
+		const CValue& OpValue,
+		CValue* pOpValue
 		);
 
-	ICastOperator*
-	GetPropertyCastOperator (
-		CPropertyType* pSrcType,
-		CType* pDstType
+	bool 
+	PrepareOperand (CValue* pOpValue);
+
+	// load & store operators
+
+	bool
+	LoadReferenceOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
 		);
 
 	bool
-	VariableToFatPointerMoveOperator (
-		CVariable* pVariable,
+	LoadReferenceOperator (CValue* pValue);
+
+	bool
+	StoreReferenceOperator (
+		const CValue& SrcValue,
 		const CValue& DstValue
 		);
 
 	bool
-	ReferenceMoveOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue,
-		CPointerType* pDstType
+	GetPropertyOperator (
+		CProperty* pProperty,
+		CValue* pResultValue
 		);
 
 	bool
-	PropertyMoveOperator (
-		const CValue& SrcValue,
+	SetPropertyOperator (
+		const CValue& OpValue,
 		CProperty* pProperty
 		);
+
+	// special cast operators
+
+	bool
+	CastPointerOperator (
+		const CValue& OpValue,
+		CPointerType* pSrcType,
+		CPointerType* pDstType,
+		CValue* pResultValue
+		);
+
+	bool
+	CastArrayReferenceToPointerOperator (
+		const CValue& OpValue,
+		CArrayType* pArrayType,
+		CPointerType* pPointerType,
+		CValue* pResultValue
+		);
+
+	bool
+	CastArrayToPointerOperator (
+		const CValue& OpValue,
+		CArrayType* pArrayType,
+		CPointerType* pPointerType,
+		CValue* pResultValue
+		);
+
+	// member operators
 
 	bool
 	StructMemberOperator (
 		const CValue& OpValue,
-		class CStructType* pType,
+		CStructType* pStructType,
 		const tchar_t* pName,
 		CValue* pResultValue
 		);
@@ -453,9 +492,46 @@ protected:
 	bool
 	ClassMemberOperator (
 		const CValue& OpValue,
-		class CClassType* pType,
+		CClassType* pClassType,
 		const tchar_t* pName,
 		CValue* pResultValue
+		);
+
+	// llvm helpers
+
+	llvm::Value*
+	CreateLlvmGep (
+		llvm::Value* pLlvmPtr,
+		llvm::Value* pLlvmIndex0,
+		llvm::Value* pLlvmIndex1
+		);
+
+	llvm::Value*
+	CreateLlvmGep (
+		llvm::Value* pLlvmPtr,
+		intptr_t Index0,
+		intptr_t Index1
+		);
+
+	llvm::Value*
+	CreateLlvmFatPointer (
+		llvm::Value* pLlvmPtr,
+		CType* pType,
+		llvm::Value* pLlvmParentPtr,
+		CType* pParentType
+		);
+
+	llvm::Value*
+	ModifyLlvmFatPointer (
+		llvm::Value* pLlvmFatPtr,
+		llvm::Value* pLlvmPtr,
+		CType* pType
+		);
+
+	llvm::Value*
+	ModifyLlvmFatPointer (
+		llvm::Value* pLlvmFatPtr,
+		llvm::Value* pLlvmPtr
 		);
 };
 

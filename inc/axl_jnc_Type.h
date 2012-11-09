@@ -252,7 +252,7 @@ public:
 	int
 	Cmp (CType* pType)
 	{
-		return m_Signature.Cmp (pType->m_Signature);
+		return pType != this ? m_Signature.Cmp (pType->m_Signature) : 0;
 	}
 
 	bool 
@@ -290,11 +290,26 @@ public:
 	{
 		return m_TypeKind >= EType_Pointer && m_TypeKind <= EType_Pointer_d;
 	}
+	
+	bool
+	IsFatPointerType ()
+	{
+		return m_TypeKind == EType_Pointer || m_TypeKind == EType_Pointer_d;
+	}
+
+	bool
+	IsDoubleReferenceType ();
 
 	bool
 	IsReferenceType ()
 	{
 		return m_TypeKind >= EType_Reference && m_TypeKind <= EType_Reference_d;
+	}
+
+	bool
+	IsFatReferenceType ()
+	{
+		return m_TypeKind == EType_Reference || m_TypeKind == EType_Reference_d;
 	}
 
 	bool 

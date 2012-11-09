@@ -233,6 +233,13 @@ public:
 	SetVariable (CVariable* pVariable);
 
 	void
+	SetVariable (
+		CVariable* pVariable,
+		llvm::Value* pLlvmValue,
+		CType* pType
+		);
+
+	void
 	SetFunction (CFunction* pFunction);
 
 	void

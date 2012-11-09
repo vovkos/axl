@@ -131,10 +131,11 @@ main := |*
 '>='           { CreateToken (EToken_Ge); };	
 '||'           { CreateToken (EToken_LogicalOr); };
 '&&'           { CreateToken (EToken_LogicalAnd); };	
-'++'           { CreateToken (EToken_Inc); };
-'--'           { CreateToken (EToken_Dec); };
 '<<'           { CreateToken (EToken_Shl); };
 '>>'           { CreateToken (EToken_Shr); };
+'++'           { CreateToken (EToken_Inc); };
+'--'           { CreateToken (EToken_Dec); };
+'->'           { CreateToken (EToken_Ptr); };	
 '*='           { CreateToken (EToken_MulAssign); };
 '/='           { CreateToken (EToken_DivAssign); };
 '%='           { CreateToken (EToken_ModAssign); };
@@ -145,6 +146,7 @@ main := |*
 '&='           { CreateToken (EToken_AndAssign); };
 '^='           { CreateToken (EToken_XorAssign); };
 '|='           { CreateToken (EToken_OrAssign); };	
+':='           { CreateToken (EToken_RefAssign); };	
 '...'          { CreateToken (EToken_Ellipsis); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

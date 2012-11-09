@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CBitFieldType: public CPointerType
+class CBitFieldType: public CDerivedType
 {
 protected:
 	friend class CTypeMgr;

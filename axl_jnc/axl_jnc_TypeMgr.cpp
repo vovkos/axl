@@ -12,7 +12,7 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_pLlvmFatPointerType = NULL;
+	m_pLlvmFatPtrType = NULL;
 	SetupAllBasicTypes ();
 }
 
@@ -485,12 +485,12 @@ CTypeMgr::GetImportType (
 llvm::StructType*
 CTypeMgr::GetLlvmFatPointerType ()
 {
-	if (m_pLlvmFatPointerType)
-		return m_pLlvmFatPointerType;
+	if (m_pLlvmFatPtrType)
+		return m_pLlvmFatPtrType;
 
 	llvm::PointerType* pLlvmInt8PtrType = llvm::Type::getInt8PtrTy (llvm::getGlobalContext ());
 
-	m_pLlvmFatPointerType = llvm::StructType::create (
+	m_pLlvmFatPtrType = llvm::StructType::create (
 		"fat_ptr", 
 		pLlvmInt8PtrType,
 		pLlvmInt8PtrType,
@@ -499,7 +499,7 @@ CTypeMgr::GetLlvmFatPointerType ()
 		NULL
 		);
 	
-	return m_pLlvmFatPointerType;
+	return m_pLlvmFatPtrType;
 }
 
 //.............................................................................

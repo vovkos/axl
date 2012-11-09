@@ -56,17 +56,24 @@ public:
 	virtual
 	bool
 	ConstCast (
-		const CValue& SrcValue, // EValue_Const
-		const CValue& DstValue  // EValue_Const
+		const CValue& SrcValue,
+		const CValue& DstValue
 		) = 0;
 
 	virtual
 	bool
 	LlvmCast (
-		const CValue& Value, // EValue_Variable or EValue_LlvmRegister
+		const CValue& Value,
 		CType* pType,
-		CValue* pResultValue // EValue_Variable or EValue_LlvmRegister
+		CValue* pResultValue
 		) = 0;
+
+	bool
+	Cast (
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................
@@ -122,84 +129,6 @@ class CCast_cpy: public ICastOperator
 {
 public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_cpy, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
-// load from a reference
-
-class CCast_load: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_load, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
-// get property
-
-class CCast_getp: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_getp, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
-// get property
-
-class CCast_ptr: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_ptr, ICastOperator)
 
 public:
 	virtual
@@ -714,30 +643,6 @@ public:
 		*(int64_t*) DstValue.GetConstData () = (int64_t) *(double*) SrcValue.GetConstData ();
 		return true;
 	}
-};
-
-//.............................................................................
-
-class CCast_arr_ptr_c: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr_c, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
 };
 
 //.............................................................................

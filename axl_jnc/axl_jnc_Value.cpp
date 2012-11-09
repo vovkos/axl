@@ -176,12 +176,22 @@ CValue::SetType (CType* pType)
 }
 
 void
-CValue::SetVariable (CVariable* pVariable)
+CValue::SetVariable (
+	CVariable* pVariable,
+	llvm::Value* pLlvmValue,
+	CType* pType
+	)
 {
 	m_ValueKind = EValue_Variable;
-	m_pType = pVariable->GetType ()->GetPointerType (EType_Reference);
+	m_pType = pType->GetPointerType (EType_Reference);
 	m_pVariable = pVariable;
-	m_pLlvmValue = pVariable->GetLlvmValue ();
+	m_pLlvmValue = pLlvmValue;
+}
+
+void
+CValue::SetVariable (CVariable* pVariable)
+{
+	return SetVariable (pVariable, pVariable->GetLlvmValue (), pVariable->GetType ());
 }
 
 void
@@ -195,7 +205,7 @@ CValue::SetFunction (CFunction* pFunction)
 void
 CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
 {
-	m_ValueKind = EValue_Function;
+	m_ValueKind = EValue_FunctionOverload;
 	m_pType = pFunctionOverload->GetOverloadCount () == 1 ? pFunctionOverload->GetFunction ()->GetType () : NULL;
 	m_pFunctionOverload = pFunctionOverload;
 }

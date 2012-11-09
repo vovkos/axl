@@ -19,18 +19,34 @@ typedef const char* pchar2_t;
 struct TPoint
 {
 	int m_x;
-	int m_y;
-	int m_z;
+	short m_y;
+	char m_z;
 };
 
 int
 main ()
 {	
+	int i;
+	for (i = 0; i < 10; i++)
+	{
+		printf ("hui govno i muravei %d\n", i);
+	}
+
 	TPoint Point;
 	Point.m_x = 10;
 	Point.m_y = 20;
 	Point.m_z = 30;
-/*
+
+	printf ("Point { %d, %d, %d }\n", Point.m_x, Point.m_y, Point.m_z);
+
+	TPoint* pPoint = &Point;
+
+	pPoint->m_x = 40;
+	pPoint->m_y = 50;
+	pPoint->m_z = 60;
+
+	printf ("Point { %d, %d, %d }\n", Point.m_x, Point.m_y, Point.m_z);
+
 	int32 x, y, z;
 
 	int32* safe p1 = &x; 
@@ -40,7 +56,7 @@ main ()
 
 	y = *p1;
 	y = *p2;
-*/
+
 	return 1;
 }
 

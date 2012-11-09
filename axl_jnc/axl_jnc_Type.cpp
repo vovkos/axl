@@ -380,6 +380,12 @@ CType::GetTypeString ()
 	return m_TypeString;
 }
 
+bool
+CType::IsDoubleReferenceType ()
+{
+	return IsReferenceType () && ((CPointerType*) this)->GetBaseType ()->IsReferenceType ();
+}
+
 bool 
 CType::IsAutoSizeArrayType ()
 {

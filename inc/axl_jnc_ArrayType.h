@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CArrayType: public CPointerType
+class CArrayType: public CDerivedType
 {
 protected:
 	friend class CTypeMgr;

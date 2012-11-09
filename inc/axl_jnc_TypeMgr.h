@@ -38,7 +38,7 @@ protected:
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
-	llvm::StructType* m_pLlvmFatPointerType;
+	llvm::StructType* m_pLlvmFatPtrType;
 	
 public:
 	CTypeMgr ();

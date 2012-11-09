@@ -100,6 +100,18 @@ public:
 		const CValue& OpValue2,
 		CValue* pResultValue	
 		) = 0;
+
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		)
+	{
+		return OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind () == EValue_Const ? 
+			ConstOperator (OpValue1, OpValue2, pResultValue) : 
+			LlvmOperator (OpValue1, OpValue2, pResultValue);
+	}
 };
 
 //.............................................................................

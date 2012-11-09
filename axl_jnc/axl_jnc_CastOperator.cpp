@@ -15,6 +15,24 @@ ICastOperator::ICastOperator()
 	m_Price = 1;
 }
 
+bool
+ICastOperator::Cast (
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	EValue OpValueKind = OpValue.GetValueKind ();
+	if (OpValueKind == EValue_Const)
+	{
+		return 
+			pResultValue->CreateConst (pType) &&
+			ConstCast (OpValue, *pResultValue);
+	}
+
+	return LlvmCast (OpValue, pType, pResultValue);
+}
+
 //.............................................................................
 
 CSuperCast::CSuperCast ()
@@ -105,125 +123,6 @@ CCast_cpy::LlvmCast (
 
 	llvm::Value* pLlvmTrunc = m_pModule->m_LlvmBuilder.CreateBitCast (Value.GetLlvmValue (), pLlvmToType);
 	pResultValue->SetLlvmRegister (pLlvmTrunc, pType);
-	return true;
-}
-
-//.............................................................................
-
-bool
-CCast_load::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("cannot load a constant"));
-	return false;
-}
-
-bool
-CCast_load::LlvmCast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	ASSERT (Value.GetType ()->IsReferenceType ());
-	CPointerType* pValueType = (CPointerType*) Value.GetType ();	
-	CType* pTargetType = pValueType->GetBaseType ();
-
-	EType TypeKind = pValueType->GetTypeKind ();
-	if (TypeKind == EType_Reference_d)
-	{
-		err::SetFormatStringError (_T("loading from a dynamic reference is not supported yet"));
-		return false;
-	}
-
-	llvm::Value* pLlvmPtr;
-
-	if (TypeKind == EType_Reference_u)
-	{
-		pLlvmPtr = Value.GetLlvmValue ();
-	}
-	else if (Value.GetValueKind () == EValue_Variable)
-	{
-		pLlvmPtr = Value.GetLlvmValue ();
-	}
-	else
-	{		
-		llvm::Value* pLlvmPtrInt8 = m_pModule->m_LlvmBuilder.CreateExtractValue (Value.GetLlvmValue (), 0);
-		llvm::Type* pLlvmPtrType = pTargetType->GetPointerType (EType_Pointer_u)->GetLlvmType ();
-		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtrInt8, pLlvmPtrType);
-
-		#pragma AXL_TODO ("check pointer range")
-	}
-
-	llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (pLlvmPtr);	
-
-	CValue LoadValue;
-	LoadValue.SetLlvmRegister (pLlvmLoad, pTargetType);
-	return m_pModule->m_OperatorMgr.CastOperator (LoadValue, pType, pResultValue);
-}
-
-//.............................................................................
-
-bool
-CCast_getp::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("cannot get a property of a constant"));
-	return false;
-}
-
-bool
-CCast_getp::LlvmCast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	err::SetFormatStringError (_T("get property is not implemented yet"));
-	return false;
-}
-
-//.............................................................................
-
-bool
-CCast_ptr::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("constant pointer casts are not implemented yet"));
-	return false;
-}
-
-bool
-CCast_ptr::LlvmCast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	CType* pValueType = Value.GetType ();
-	ASSERT (pValueType->IsPointerType ());
-
-	CType* pTargetType = ((CPointerType*) pValueType)->GetBaseType ();
-
-	if (pValueType->GetTypeKind () == EType_Pointer)
-	{
-		if (Value.GetValueKind () == EValue_Variable)
-		{
-			ASSERT (pTargetType->Cmp (Value.GetVariable ()->GetType ()) == 0);
-		}
-		else
-		{
-			#pragma AXL_TODO ("check pointer data range and actual target type")
-		}
-	}
-
-	pResultValue->OverrideType (Value, pType);
 	return true;
 }
 
@@ -495,49 +394,6 @@ CCast_fp_int::LlvmCast (
 {
 	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateFPToSI (Value.GetLlvmValue (), pType->GetLlvmType ());
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
-	return true;
-}
-
-//.............................................................................
-
-bool
-CCast_arr_ptr_c::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	const CValue& SavedSrcValue = m_pModule->m_ConstMgr.SaveValue (SrcValue);
-	*(void**) DstValue.GetConstData () = SavedSrcValue.GetConstData ();
-	return true;
-}
-
-bool
-CCast_arr_ptr_c::LlvmCast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	CValue Zero;
-	Zero.SetConstInt32 (0, EType_Int32);
-	
-	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
-	llvm::Value* pLlvmZero = Zero.GetLlvmValue ();
-
-	llvm::Value* LlvmIndexArray [] =
-	{
-		pLlvmZero,
-		pLlvmZero,
-	};
-
-	llvm::Value* pLlvmGep = m_pModule->m_LlvmBuilder.CreateGEP (
-		pLlvmValue, 
-		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
-		);
-	pResultValue->SetLlvmRegister (pLlvmGep, pType);
 	return true;
 }
 
