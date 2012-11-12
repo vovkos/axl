@@ -189,9 +189,12 @@ CType::GetLlvmType ()
 	
 	case EType_Pointer:
 	case EType_Reference:
+		pLlvmType = m_pModule->m_TypeMgr.GetLlvmTriplePointerType ();
+		break;
+
 	case EType_Pointer_d:
 	case EType_Reference_d:
-		pLlvmType = m_pModule->m_TypeMgr.GetLlvmFatPointerType ();
+		pLlvmType = m_pModule->m_TypeMgr.GetLlvmDoublePointerType ();
 		break;
 
 	case EType_Pointer_u:

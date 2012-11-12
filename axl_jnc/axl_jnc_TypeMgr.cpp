@@ -12,7 +12,9 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_pLlvmFatPtrType = NULL;
+	m_pLlvmDoublePtrType = NULL;
+	m_pLlvmTriplePtrType = NULL;
+
 	SetupAllBasicTypes ();
 }
 
@@ -34,7 +36,7 @@ void
 CTypeMgr::SetupAllBasicTypes ()
 {
 	SetupBasicType (EType_Void,      0, "a");
-	SetupBasicType (EType_Variant,   sizeof (TFatPointer), "b");
+	SetupBasicType (EType_Variant,   -1, "b"); // not yet
 	SetupBasicType (EType_Bool,      1, "c");
 	SetupBasicType (EType_Int8,      1, "d");
 	SetupBasicType (EType_Int8_u,    1, "e");
@@ -177,7 +179,7 @@ CTypeMgr::GetPointerType (
 	{
 	case EType_Pointer:
 		Signature = 'B';
-		Size = sizeof (TFatPointer);
+		Size = sizeof (TSafePointer);
 		break;
 
 	case EType_Pointer_u:
@@ -187,12 +189,12 @@ CTypeMgr::GetPointerType (
 
 	case EType_Pointer_d:
 		Signature = 'D';
-		Size = sizeof (TFatPointer);
+		Size = sizeof (TDynamicPointer);
 		break;
 
 	case EType_Reference:
 		Signature = 'E';
-		Size = sizeof (TFatPointer);
+		Size = sizeof (TSafePointer);
 		break;
 
 	case EType_Reference_u:
@@ -202,7 +204,7 @@ CTypeMgr::GetPointerType (
 
 	case EType_Reference_d:
 		Signature = 'G';
-		Size = sizeof (TFatPointer);
+		Size = sizeof (TDynamicPointer);
 		break;
 
 	default:
@@ -419,7 +421,7 @@ CTypeMgr::GetFunctionType (
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Function;
-	pType->m_Size = sizeof (TFatPointer);
+	pType->m_Size = sizeof (TFunctionPointer);
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
 	pType->m_ArgTypeArray.Copy (ppArgType, ArgCount);
@@ -446,7 +448,7 @@ CTypeMgr::GetPropertyType (
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Property;
-	pType->m_Size = sizeof (TFatPointer);
+	pType->m_Size = sizeof (TFunctionPointer) + SetterType.GetOverloadCount () * sizeof (void*);
 	pType->m_Signature = Signature;
 	pType->m_pGetterType = pGetterType;
 	pType->m_SetterType = SetterType;
@@ -483,23 +485,40 @@ CTypeMgr::GetImportType (
 }
 
 llvm::StructType*
-CTypeMgr::GetLlvmFatPointerType ()
+CTypeMgr::GetLlvmDoublePointerType ()
 {
-	if (m_pLlvmFatPtrType)
-		return m_pLlvmFatPtrType;
+	if (m_pLlvmDoublePtrType)
+		return m_pLlvmDoublePtrType;
 
-	llvm::PointerType* pLlvmInt8PtrType = llvm::Type::getInt8PtrTy (llvm::getGlobalContext ());
+	llvm::Type* pLlvmInt8PtrType = GetBasicType (EType_Int8)->GetPointerType (EType_Pointer_u)->GetLlvmType ();
 
-	m_pLlvmFatPtrType = llvm::StructType::create (
-		"fat_ptr", 
+	m_pLlvmDoublePtrType = llvm::StructType::create (
+		"double_ptr", 
 		pLlvmInt8PtrType,
+		pLlvmInt8PtrType,
+		NULL
+		);
+	
+	return m_pLlvmDoublePtrType;
+}
+
+llvm::StructType*
+CTypeMgr::GetLlvmTriplePointerType ()
+{
+	if (m_pLlvmTriplePtrType)
+		return m_pLlvmTriplePtrType;
+
+	llvm::Type* pLlvmInt8PtrType = GetBasicType (EType_Int8)->GetPointerType (EType_Pointer_u)->GetLlvmType ();
+
+	m_pLlvmTriplePtrType = llvm::StructType::create (
+		"triple_ptr", 
 		pLlvmInt8PtrType,
 		pLlvmInt8PtrType,
 		pLlvmInt8PtrType,
 		NULL
 		);
 	
-	return m_pLlvmFatPtrType;
+	return m_pLlvmTriplePtrType;
 }
 
 //.............................................................................

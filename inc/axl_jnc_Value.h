@@ -13,6 +13,7 @@ class CVariable;
 class CFunction;
 class CFunctionOverload;
 class CProperty;
+class CClassType;
 
 //.............................................................................
 	
@@ -363,14 +364,51 @@ public:
 
 //.............................................................................
 
-// *safe, &safe, *dynamic, &dynamic
+// header of class instance
 
-struct TFatPointer
+struct TObject
+{
+	class CClassType* m_pType;
+
+	// followed by TInterface of the object
+};
+
+// header of interface instance
+
+struct TInterface
+{
+	TObject* m_pObject; // for GC tracing & QueryInterface
+	void** m_pMethodTable; 
+
+	// followed by parents, then by interface data fields
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// *safe, &safe
+
+struct TSafePointer
 {
 	void* m_p;
-	void* m_pParent;
+	void* m_pRegionBegin;
+	void* m_pRegionEnd;
+};
+
+// *dynamic, &dynamic
+
+struct TDynamicPointer
+{
+	void* m_p;
 	CType* m_pType;
-	CType* m_pParentType;
+};
+
+// structure backing up function pointer declared like
+// typedef void FMethod ();
+
+struct TFunctionPointer
+{
+	void* m_pfn;
+	TInterface* m_pInterface;
 };
 
 //.............................................................................

@@ -514,22 +514,20 @@ protected:
 		);
 
 	llvm::Value*
-	CreateLlvmFatPointer (
+	CreateLlvmSafePointer (
 		llvm::Value* pLlvmPtr,
-		CType* pType,
 		llvm::Value* pLlvmParentPtr,
 		CType* pParentType
 		);
 
 	llvm::Value*
-	ModifyLlvmFatPointer (
-		llvm::Value* pLlvmFatPtr,
+	CreateLlvmDynamicPointer (
 		llvm::Value* pLlvmPtr,
 		CType* pType
 		);
 
 	llvm::Value*
-	ModifyLlvmFatPointer (
+	ModifyLlvmSafePointer (
 		llvm::Value* pLlvmFatPtr,
 		llvm::Value* pLlvmPtr
 		);

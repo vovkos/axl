@@ -38,7 +38,9 @@ protected:
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
-	llvm::StructType* m_pLlvmFatPtrType;
+
+	llvm::StructType* m_pLlvmDoublePtrType;
+	llvm::StructType* m_pLlvmTriplePtrType;
 	
 public:
 	CTypeMgr ();
@@ -229,8 +231,13 @@ public:
 		CNamespace* pAnchorNamespace
 		);
 
+	// llvm pointer structures
+
 	llvm::StructType*
-	GetLlvmFatPointerType ();
+	GetLlvmDoublePointerType ();
+
+	llvm::StructType*
+	GetLlvmTriplePointerType ();
 
 protected:
 	void

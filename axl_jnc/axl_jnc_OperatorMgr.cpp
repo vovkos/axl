@@ -927,7 +927,7 @@ COperatorMgr::StructMemberOperator (
 		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pStructType->GetPointerType (EType_Pointer_u)->GetLlvmType ());
 
 		llvm::Value* pLlvmGep = CreateLlvmGep (pLlvmPtr, 0, pMember->GetLlvmIndex ());
-		pLlvmFatPtr = ModifyLlvmFatPointer (pLlvmFatPtr, pLlvmGep, pMember->GetType ());
+		pLlvmFatPtr = ModifyLlvmSafePointer (pLlvmFatPtr, pLlvmGep);
 		
 		CType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
 		pResultValue->SetLlvmRegister (pLlvmFatPtr, pResultType);
@@ -1266,9 +1266,8 @@ COperatorMgr::StoreReferenceOperator (
 	if (pTargetType->IsFatPointerType () && CastValue.GetValueKind () == EValue_Variable)
 	{
 		CVariable* pVariable = CastValue.GetVariable ();
-		pLlvmValue = CreateLlvmFatPointer (
+		pLlvmValue = CreateLlvmSafePointer (
 			pLlvmValue, 
-			((CPointerType*) pTargetType)->GetBaseType (), 
 			pVariable->GetLlvmValue (), 
 			pVariable->GetType ()
 			);
@@ -1362,34 +1361,33 @@ COperatorMgr::CreateLlvmGep (
 }
 
 llvm::Value*
-COperatorMgr::CreateLlvmFatPointer (
+COperatorMgr::CreateLlvmSafePointer (
 	llvm::Value* pLlvmPtr,
-	CType* pType,
 	llvm::Value* pLlvmParentPtr,
 	CType* pParentType
 	)
 {
 	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Int8, EType_Pointer_u);
 	
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType ());
-	pLlvmParentPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmParentPtr, pCharPointerType->GetLlvmType ());
-	
-	llvm::Value* pLlvmTypePtr = CValue (pCharPointerType, &pType).GetLlvmValue ();
-	llvm::Value* pLlvmParentTypePtr = CValue (pCharPointerType, &pParentType).GetLlvmValue ();
+	CValue ParentSize;
+	ParentSize.SetConstUInt32 (pParentType->GetSize ());
 
-	llvm::Value* pLlvmFatPtr = llvm::UndefValue::get (m_pModule->m_TypeMgr.GetLlvmFatPointerType ());
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType ());
+
+	llvm::Value* pLlvmRegionBeginPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmParentPtr, pCharPointerType->GetLlvmType ());
+	llvm::Value* pLlvmRegionEndPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmRegionBeginPtr, ParentSize.GetLlvmValue ());
+		
+	llvm::Value* pLlvmFatPtr = llvm::UndefValue::get (m_pModule->m_TypeMgr.GetLlvmTriplePointerType ());
 
 	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0);
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmTypePtr, 1);
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmParentPtr, 2);
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmParentTypePtr, 3);
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmRegionBeginPtr, 1);
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmRegionEndPtr, 2);
 
 	return pLlvmFatPtr;
 }
 
 llvm::Value*
-COperatorMgr::ModifyLlvmFatPointer (
-	llvm::Value* pLlvmFatPtr,
+COperatorMgr::CreateLlvmDynamicPointer (
 	llvm::Value* pLlvmPtr,
 	CType* pType
 	)
@@ -1397,7 +1395,10 @@ COperatorMgr::ModifyLlvmFatPointer (
 	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Int8, EType_Pointer_u);
 	
 	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType ());
+
 	llvm::Value* pLlvmTypePtr = CValue (pCharPointerType, &pType).GetLlvmValue ();
+
+	llvm::Value* pLlvmFatPtr = llvm::UndefValue::get (m_pModule->m_TypeMgr.GetLlvmDoublePointerType ());
 
 	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0);
 	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmTypePtr, 1);
@@ -1406,7 +1407,7 @@ COperatorMgr::ModifyLlvmFatPointer (
 }
 
 llvm::Value*
-COperatorMgr::ModifyLlvmFatPointer (
+COperatorMgr::ModifyLlvmSafePointer (
 	llvm::Value* pLlvmFatPtr,
 	llvm::Value* pLlvmPtr
 	)
