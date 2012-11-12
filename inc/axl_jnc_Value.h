@@ -115,6 +115,9 @@ public:
 		SetProperty (pProperty);
 	}
 
+	void
+	Clear ();
+
 	EValue 
 	GetValueKind () const
 	{
@@ -199,6 +202,13 @@ public:
 	llvm::Value*
 	GetLlvmValue () const;
 
+	static
+	llvm::Constant*
+	GetLlvmConst (
+		CType* pType,
+		const void* p
+		);
+
 	void
 	OverrideType (CType* pType)
 	{
@@ -218,14 +228,11 @@ public:
 	void
 	SetVoid ()
 	{
-		m_ValueKind = EValue_Void;
+		Clear ();
 	}
 
 	void
-	SetNull ()
-	{
-		m_ValueKind = EValue_Null;
-	}
+	SetNull ();
 
 	void
 	SetType (CType* pType);
@@ -255,8 +262,17 @@ public:
 		const void* p = NULL
 		);
 
+	bool
+	CreateConst (
+		EType Type,
+		const void* p = NULL
+		);
+
 	void
-	SetConstBool (bool Bool);
+	SetConstBool (bool Bool)
+	{
+		CreateConst (EType_Bool, &Bool);
+	}
 
 	void
 	SetConstInt32 (
@@ -271,7 +287,10 @@ public:
 	SetConstInt32 (
 		int32_t Integer,
 		EType TypeKind
-		);
+		)
+	{
+		CreateConst (TypeKind, &Integer);
+	}
 
 	void
 	SetConstInt32 (int32_t Integer)
@@ -301,7 +320,10 @@ public:
 	SetConstInt64 (
 		int64_t Integer,
 		EType TypeKind
-		);
+		)
+	{
+		CreateConst (TypeKind, &Integer);
+	}
 
 	void
 	SetConstInt64 (int64_t Integer)
@@ -319,10 +341,22 @@ public:
 	}
 
 	void
-	SetConstFloat (float Float);
+	SetConstSizeT (size_t Size)
+	{
+		CreateConst (EType_SizeT, &Size);
+	}
 
 	void
-	SetConstDouble (double Double);
+	SetConstFloat (float Float)
+	{
+		CreateConst (EType_Float, &Float);
+	}
+
+	void
+	SetConstDouble (double Double)
+	{
+		CreateConst (EType_Double, &Double);
+	}
 
 	void
 	SetLiteralA (

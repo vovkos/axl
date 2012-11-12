@@ -187,11 +187,28 @@ CAstDoc::Run ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Running...\n"));
 
-	int Result = pfnMain ();
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done (retval = %d).\n"), Result);
+	try
+	{
+		int Result = pfnMain ();
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done (retval = %d).\n"), Result);
+	}
+	catch (err::CError Error)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("ERROR: %s\n"), Error.GetDescription ());
+	}
 
 	return true;
+}
+
+void
+StdLib_OnInvalidSafePtr (jnc::TSafePointer Pointer)
+{
+	throw err::CError (
+		_T("INVALID SAFE POINTER { %x; %x:%x }"), 
+		Pointer.m_p, 
+		Pointer.m_pRegionBegin, 
+		Pointer.m_pRegionEnd 
+		);
 }
 
 void
@@ -200,10 +217,8 @@ StdLib_printf (
 	...
 	)
 {
-	rtl::CString String;
-	String.FormatV (pFormat, va_start_e (pFormat));
 	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s"), String);
+	pMainFrame->m_OutputPane.m_LogCtrl.TraceV (pFormat, va_start_e (pFormat));
 }
 
 int
@@ -244,6 +259,11 @@ StdLib_ReadInteger ()
 bool
 CAstDoc::ExportStdLib ()
 {
+	m_pLlvmExecutionEngine->addGlobalMapping (
+		m_Module.m_FunctionMgr.GetOnInvalidSafePtr ()->GetLlvmFunction (), 
+		StdLib_OnInvalidSafePtr
+		);
+
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
 	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
 	ExportStdLibFunction (_T("StructTest"), StdLib_StructTest);

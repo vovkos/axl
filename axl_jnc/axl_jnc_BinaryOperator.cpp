@@ -230,7 +230,7 @@ CBinOp_Add::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateAdd (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateAdd (pOpValue1, pOpValue2, "add_i");
 }
 
 	
@@ -241,7 +241,7 @@ CBinOp_Add::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFAdd (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFAdd (pOpValue1, pOpValue2, "add_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -253,7 +253,7 @@ CBinOp_Sub::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateSub (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateSub (pOpValue1, pOpValue2, "sub_i");
 }
 
 	
@@ -264,7 +264,7 @@ CBinOp_Sub::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFSub (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFSub (pOpValue1, pOpValue2, "sub_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -276,7 +276,7 @@ CBinOp_Mul::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateMul (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateMul (pOpValue1, pOpValue2, "mul_i");
 }
 	
 llvm::Value*
@@ -286,7 +286,7 @@ CBinOp_Mul::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFMul (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFMul (pOpValue1, pOpValue2, "mul_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -298,7 +298,7 @@ CBinOp_Div::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateSDiv (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateSDiv (pOpValue1, pOpValue2, "div_i");
 }
 
 	
@@ -309,7 +309,7 @@ CBinOp_Div::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFDiv (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFDiv (pOpValue1, pOpValue2, "div_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -321,7 +321,7 @@ CBinOp_Div_u::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateUDiv (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateUDiv (pOpValue1, pOpValue2, "div_u");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -333,7 +333,7 @@ CBinOp_Mod::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateSRem (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateSRem (pOpValue1, pOpValue2, "mod");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -345,7 +345,7 @@ CBinOp_Mod_u::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateURem (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateURem (pOpValue1, pOpValue2, "mod_u");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -357,7 +357,7 @@ CBinOp_Shl::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateShl (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateShl (pOpValue1, pOpValue2, "shl");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -369,7 +369,7 @@ CBinOp_Shr::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateLShr (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateLShr (pOpValue1, pOpValue2, "shr");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -381,7 +381,7 @@ CBinOp_BitwiseAnd::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateAnd (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateAnd (pOpValue1, pOpValue2, "and");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -393,7 +393,7 @@ CBinOp_BitwiseOr::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateOr (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateOr (pOpValue1, pOpValue2, "or");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -405,7 +405,7 @@ CBinOp_BitwiseXor::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateXor (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateXor (pOpValue1, pOpValue2, "xor");
 }
 
 //.............................................................................
@@ -417,7 +417,7 @@ CBinOp_Eq::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpEQ (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpEQ (pOpValue1, pOpValue2, "eq_i");
 }
 
 llvm::Value*
@@ -427,7 +427,7 @@ CBinOp_Eq::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOEQ (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFCmpOEQ (pOpValue1, pOpValue2, "eq_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -439,7 +439,7 @@ CBinOp_Ne::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpNE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpNE (pOpValue1, pOpValue2, "ne_u");
 }
 
 llvm::Value*
@@ -449,7 +449,7 @@ CBinOp_Ne::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpONE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFCmpONE (pOpValue1, pOpValue2, "ne_f");
 }
 	
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -461,7 +461,7 @@ CBinOp_Lt::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSLT (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpSLT (pOpValue1, pOpValue2, "lt_i");
 }
 
 llvm::Value*
@@ -471,7 +471,7 @@ CBinOp_Lt::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOLT (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFCmpOLT (pOpValue1, pOpValue2, "lt_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -483,7 +483,7 @@ CBinOp_Lt_u::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpULT (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpULT (pOpValue1, pOpValue2, "lt_u");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -495,7 +495,7 @@ CBinOp_Le::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSLE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpSLE (pOpValue1, pOpValue2, "le_i");
 }
 
 llvm::Value*
@@ -505,7 +505,7 @@ CBinOp_Le::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOLE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFCmpOLE (pOpValue1, pOpValue2, "le_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -517,7 +517,7 @@ CBinOp_Le_u::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpULE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpULE (pOpValue1, pOpValue2, "le_u");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -529,7 +529,7 @@ CBinOp_Gt::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSGT (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpSGT (pOpValue1, pOpValue2, "gt_i");
 }
 
 llvm::Value*
@@ -539,7 +539,7 @@ CBinOp_Gt::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOGT (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFCmpOGT (pOpValue1, pOpValue2, "gt_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -551,7 +551,7 @@ CBinOp_Gt_u::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpUGT (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpUGT (pOpValue1, pOpValue2, "gt_u");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -563,7 +563,7 @@ CBinOp_Ge::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSGE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpSGE (pOpValue1, pOpValue2, "ge_i");
 }
 
 llvm::Value*
@@ -573,7 +573,7 @@ CBinOp_Ge::LlvmOpFp (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOGE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateFCmpOGE (pOpValue1, pOpValue2, "ge_f");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -585,7 +585,7 @@ CBinOp_Ge_u::LlvmOpInt (
 	llvm::Value* pOpValue2
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpUGE (pOpValue1, pOpValue2);
+	return pModule->m_LlvmBuilder.CreateICmpUGE (pOpValue1, pOpValue2, "ge_u");
 }
 
 //.............................................................................

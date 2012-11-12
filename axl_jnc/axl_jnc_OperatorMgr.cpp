@@ -281,14 +281,17 @@ COperatorMgr::AddStdCastOperators ()
 
 	for (size_t i = EType_Int8; i < EType_Int64_u; i++)
 	{
-		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
+		AddCastOperator ((EType) i, EType_Bool, &m_Cast_num_bool);	
 		AddCastOperator (EType_Bool, (EType) i, &m_Cast_bool_int);	
 	}
 
 	for (size_t i = EType_Int16_be; i < EType_Int64_beu; i++)
 	{
-		AddCastOperator ((EType) i, EType_Bool, &m_Cast_int_bool);	
+		AddCastOperator ((EType) i, EType_Bool, &m_Cast_num_bool);	
 	}
+
+	AddCastOperator (EType_Float, EType_Bool, &m_Cast_num_bool);	
+	AddCastOperator (EType_Double, EType_Bool, &m_Cast_num_bool);	
 }
 
 IUnaryOperator*
@@ -429,6 +432,54 @@ COperatorMgr::BinaryOperator (
 	
 	CType* pOpType1 = OpValue1.GetType ();
 	CType* pOpType2 = OpValue2.GetType ();
+
+	// temporary implementation of pointer arithmetics -- just for testing
+
+	if (pOpType1->IsReferenceType () && ((CPointerType*) pOpType1)->GetBaseType ()->IsPointerType ())
+	{
+		Result = LoadReferenceOperator (&OpValue1);
+		if (!Result)
+			return false;
+
+		pOpType1 = OpValue1.GetType ();
+
+		if (pOpType2->IsReferenceType ())
+		{
+			Result = LoadReferenceOperator (&OpValue2);
+			if (!Result)
+				return false;
+
+			pOpType2 = OpValue2.GetType ();
+		}
+
+		if (pOpType2->IsIntegerType ())
+		{
+			if (pOpType1->GetTypeKind () == EType_Pointer)
+			{
+				CValue Size;
+				Size.SetConstSizeT (((CPointerType*) pOpType1)->GetBaseType ()->GetSize ());
+
+				if (OpKind == EBinOp_Sub)
+					UnaryOperator (EUnOp_Minus, &Size);
+
+				Result = BinaryOperator (EBinOp_Mul, &OpValue2, Size);
+				if (!Result)
+					return false;
+
+				llvm::Value* pPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1.GetLlvmValue (), 0, "sp_ptr");
+				pPtr = m_pModule->m_LlvmBuilder.CreateGEP (pPtr, OpValue2.GetLlvmValue (), "sp_ptr_inc");
+				llvm::Value* pSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (OpValue1.GetLlvmValue (), pPtr, 0, "sp_ptr");
+				pResultValue->SetLlvmRegister (pSafePtr, pOpType1);
+			}
+			else 
+			{
+				err::SetFormatStringError ("not yet");
+				return false;
+			}
+			
+			return true;
+		}
+	}
 
 	TBinaryOperatorTypeInfo TypeInfo;
 	IBinaryOperator* pOperator = GetBinaryOperator (OpKind, pOpType1, pOpType2, &TypeInfo);	
@@ -591,13 +642,28 @@ COperatorMgr::CastOperator (
 		}
 	}
 
-	if (pOpType->GetTypeKind () == EType_Array && pType->IsPointerType ())
-		return CastArrayToPointerOperator (
-			OpValue, 
-			(CArrayType*) pOpType,
-			(CPointerType*) pType,
-			pResultValue
-			);
+	if (pType->IsPointerType ())
+	{
+		if (OpValue.GetValueKind () == EValue_Null) 
+			return pResultValue->CreateConst (
+				pType, 
+				NULL
+				);
+		else if (pOpType->IsPointerType ())
+			return CastPointerOperator (
+				OpValue, 
+				(CPointerType*) pOpType,
+				(CPointerType*) pType,
+				pResultValue
+				);
+		else if (pOpType->GetTypeKind () == EType_Array)
+			return CastArrayToPointerOperator (
+				OpValue, 
+				(CArrayType*) pOpType,
+				(CPointerType*) pType,
+				pResultValue
+				);
+	}
 
 	ICastOperator* pOperator = GetCastOperator (pOpType, pType);	
 	if (!pOperator)
@@ -900,7 +966,7 @@ COperatorMgr::StructMemberOperator (
 
 	if (!pOpType->IsReferenceType ())
 	{
-		llvm::Value* pLlvmMember = m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue.GetLlvmValue (), pMember->GetLlvmIndex ());
+		llvm::Value* pLlvmMember = m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue.GetLlvmValue (), pMember->GetLlvmIndex (), "member");
 		pResultValue->SetLlvmRegister (pLlvmMember, pMember->GetType ());
 		return true;
 	}
@@ -923,8 +989,8 @@ COperatorMgr::StructMemberOperator (
 	else
 	{
 		llvm::Value* pLlvmFatPtr = OpValue.GetLlvmValue ();		
-		llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmFatPtr, 0);
-		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pStructType->GetPointerType (EType_Pointer_u)->GetLlvmType ());
+		llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmFatPtr, 0, "sf_ptr");
+		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pStructType->GetPointerType (EType_Pointer_u)->GetLlvmType (), "sf_ptr_cast");
 
 		llvm::Value* pLlvmGep = CreateLlvmGep (pLlvmPtr, 0, pMember->GetLlvmIndex ());
 		pLlvmFatPtr = ModifyLlvmSafePointer (pLlvmFatPtr, pLlvmGep);
@@ -1050,13 +1116,27 @@ COperatorMgr::CallOperator (
 		LlvmArgArray.Append (ArgCast.GetLlvmValue ());
 	}
 
-	llvm::Instruction* pLlvmCall = m_pModule->m_LlvmBuilder.CreateCall (
-		pLlvmFunction,
-		llvm::ArrayRef <llvm::Value*> (LlvmArgArray, LlvmArgArray.GetCount ())
-		);
-		
 	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
-	pResultValue->SetLlvmRegister (pLlvmCall, pReturnType);
+	if (pReturnType->GetTypeKind () != EType_Void)
+	{
+		llvm::Instruction* pLlvmCall = m_pModule->m_LlvmBuilder.CreateCall (
+			pLlvmFunction,
+			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, LlvmArgArray.GetCount ()),
+			"call"
+			);
+		
+		pResultValue->SetLlvmRegister (pLlvmCall, pReturnType);
+	}
+	else
+	{
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pLlvmFunction,
+			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, LlvmArgArray.GetCount ())
+			);
+		
+		pResultValue->SetVoid ();
+	}
+
 	return true;
 }
 
@@ -1196,24 +1276,29 @@ COperatorMgr::LoadReferenceOperator (
 
 	CType* pTargetType = pType->GetBaseType ();
 
-	#pragma AXL_TODO ("check for volatile qualifier")
+	bool IsVolatile = false;
+	if (pTargetType->GetTypeKind () == EType_Qualifier)
+	{
+		IsVolatile = (pTargetType->GetFlags () & ETypeQualifier_Volatile) != 0;
+		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
+	}
 
 	llvm::Value* pLlvmValue = OpValue.GetLlvmValue ();
 
 	if (TypeKind == EType_Reference_u || OpValue.GetValueKind () == EValue_Variable)
 	{
-		llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (pLlvmValue);	
+		llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (pLlvmValue, IsVolatile, "loa");
 		pResultValue->SetLlvmRegister (pLlvmLoad, pTargetType);
 		return true;
 	}
 
-	#pragma AXL_TODO ("check fat pointer range")
+	CheckLlvmSafePointer (pLlvmValue, pTargetType->GetSize ());
 
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmValue, 0);
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmValue, 0, "sf_ptr");
+
 	llvm::Type* pLlvmPtrType = pTargetType->GetPointerType (EType_Pointer_u)->GetLlvmType ();
-
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType);
-	llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (pLlvmPtr);	
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType, "sf_ptr_cast");
+	llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (pLlvmPtr, IsVolatile, "loa");
 	
 	pResultValue->SetLlvmRegister (pLlvmLoad, pTargetType);
 	return true;
@@ -1255,19 +1340,27 @@ COperatorMgr::StoreReferenceOperator (
 		pDstType = (CPointerType*) pTargetType;
 		pTargetType = pDstType->GetBaseType ();
 	}
+
+	bool IsVolatile = false;
+	if (pTargetType->GetTypeKind () == EType_Qualifier)
+	{
+		IsVolatile = (pTargetType->GetFlags () & ETypeQualifier_Volatile) != 0;
+		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
+	}
 	
 	CValue CastValue;
 	Result = CastOperator (SrcValue, pTargetType, &CastValue);
 	if (!Result)
 		return false;
 
-	llvm::Value* pLlvmValue = CastValue.GetLlvmValue ();
+	llvm::Value* pLlvmSrcValue = CastValue.GetLlvmValue ();
+	llvm::Value* pLlvmDstValue = DstValue.GetLlvmValue ();
 
 	if (pTargetType->IsFatPointerType () && CastValue.GetValueKind () == EValue_Variable)
 	{
 		CVariable* pVariable = CastValue.GetVariable ();
-		pLlvmValue = CreateLlvmSafePointer (
-			pLlvmValue, 
+		pLlvmSrcValue = CreateLlvmSafePointer (
+			pLlvmSrcValue, 
 			pVariable->GetLlvmValue (), 
 			pVariable->GetType ()
 			);
@@ -1276,15 +1369,17 @@ COperatorMgr::StoreReferenceOperator (
 	EType DstTypeKind = pDstType->GetTypeKind ();	
 	if (DstTypeKind == EType_Reference_u || DstValue.GetValueKind () == EValue_Variable)
 	{
-		m_pModule->m_LlvmBuilder.CreateStore (pLlvmValue, DstValue.GetLlvmValue ());
+		m_pModule->m_LlvmBuilder.CreateStore (pLlvmSrcValue, pLlvmDstValue, IsVolatile);
 		return true;
 	}
 
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue.GetLlvmValue (), 0);
+	CheckLlvmSafePointer (pLlvmDstValue, pTargetType->GetSize ());
+
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmDstValue, 0, "sf_ptr");
 	llvm::Type* pLlvmPtrType = pTargetType->GetPointerType (EType_Pointer_u)->GetLlvmType ();
 
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType);
-	m_pModule->m_LlvmBuilder.CreateStore (pLlvmValue, pLlvmPtr);
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType, "sf_ptr_cast");
+	m_pModule->m_LlvmBuilder.CreateStore (pLlvmSrcValue, pLlvmPtr, IsVolatile);
 	return true;
 }
 
@@ -1330,7 +1425,7 @@ COperatorMgr::CreateLlvmGep (
 	}
 		
 	if (!pLlvmIndex1)
-		return m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, pLlvmIndex0);
+		return m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, pLlvmIndex0, "gep");
 
 	llvm::Value* LlvmIndexArray [] =
 	{
@@ -1340,7 +1435,8 @@ COperatorMgr::CreateLlvmGep (
 
 	return m_pModule->m_LlvmBuilder.CreateGEP (
 		pLlvmPtr, 
-		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
+		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2), 
+		"gep"
 		);
 }
 
@@ -1367,23 +1463,25 @@ COperatorMgr::CreateLlvmSafePointer (
 	CType* pParentType
 	)
 {
-	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Int8, EType_Pointer_u);
-	
+	// specialize CallOperator () for effiency
+
+	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
+
 	CValue ParentSize;
-	ParentSize.SetConstUInt32 (pParentType->GetSize ());
+	ParentSize.SetConstSizeT (pParentType->GetSize ());
 
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType ());
+	llvm::Value* LlvmArgArray [3];
+	LlvmArgArray [0] = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "sp_ptr_cast");
+	LlvmArgArray [1] = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmParentPtr, pCharPointerType->GetLlvmType (), "sp_beg_cast");
+	LlvmArgArray [2] = ParentSize.GetLlvmValue ();
 
-	llvm::Value* pLlvmRegionBeginPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmParentPtr, pCharPointerType->GetLlvmType ());
-	llvm::Value* pLlvmRegionEndPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmRegionBeginPtr, ParentSize.GetLlvmValue ());
-		
-	llvm::Value* pLlvmFatPtr = llvm::UndefValue::get (m_pModule->m_TypeMgr.GetLlvmTriplePointerType ());
+	CFunction* pCreateSafePointer = m_pModule->m_FunctionMgr.GetCreateSafePtr ();
 
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0);
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmRegionBeginPtr, 1);
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmRegionEndPtr, 2);
-
-	return pLlvmFatPtr;
+	return m_pModule->m_LlvmBuilder.CreateCall (
+		pCreateSafePointer->GetLlvmFunction (),
+		llvm::ArrayRef <llvm::Value*> (LlvmArgArray, countof (LlvmArgArray)), 
+		"sptr"
+		);
 }
 
 llvm::Value*
@@ -1392,32 +1490,50 @@ COperatorMgr::CreateLlvmDynamicPointer (
 	CType* pType
 	)
 {
-	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Int8, EType_Pointer_u);
+	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
 	
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType ());
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "dp_ptr_cast");
 
 	llvm::Value* pLlvmTypePtr = CValue (pCharPointerType, &pType).GetLlvmValue ();
 
-	llvm::Value* pLlvmFatPtr = llvm::UndefValue::get (m_pModule->m_TypeMgr.GetLlvmDoublePointerType ());
+	llvm::Value* pLlvmFatPtr = m_pModule->m_TypeMgr.GetDoublePointerStructType ()->GetLlvmUndefValue ();
 
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0);
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmTypePtr, 1);
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0, "dp_m_ptr");
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmTypePtr, 1, "dp_m_type");
 
 	return pLlvmFatPtr;
 }
 
 llvm::Value*
 COperatorMgr::ModifyLlvmSafePointer (
-	llvm::Value* pLlvmFatPtr,
+	llvm::Value* pLlvmSafePtr,
 	llvm::Value* pLlvmPtr
 	)
 {
-	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Int8, EType_Pointer_u);
+	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
 	
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType ());
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0);
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "sp_ptr_cast");
+	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmPtr, 0, "sp_ptr");
 
-	return pLlvmFatPtr;
+	return pLlvmSafePtr;
+}
+
+void
+COperatorMgr::CheckLlvmSafePointer (
+	llvm::Value* pLlvmSafePtr,
+	size_t Size
+	)
+{
+	CValue SizeValue;
+	SizeValue.SetConstSizeT (Size);
+
+	CFunction* pCheckSafePointer = m_pModule->m_FunctionMgr.GetCheckSafePtr ();
+
+	m_pModule->m_LlvmBuilder.CreateCall2 (
+		pCheckSafePointer->GetLlvmFunction (),
+		pLlvmSafePtr,
+		SizeValue.GetLlvmValue ()
+		);
 }
 
 //.............................................................................

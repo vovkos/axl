@@ -305,12 +305,12 @@ public:
 
 //.............................................................................
 
-// int <-> bool
+// numeric -> bool (common for both integer & fp)
 
-class CCast_int_bool: public ICastOperator
+class CCast_num_bool: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_bool, ICastOperator)
+	AXL_OBJ_SIMPLE_CLASS (CCast_num_bool, ICastOperator)
 
 public:
 	virtual
@@ -330,6 +330,8 @@ public:
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// bool -> int
 
 class CCast_bool_int: public ICastOperator
 {

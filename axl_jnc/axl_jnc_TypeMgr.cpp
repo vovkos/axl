@@ -12,8 +12,8 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_pLlvmDoublePtrType = NULL;
-	m_pLlvmTriplePtrType = NULL;
+	m_pDoublePtrStructType = NULL;
+	m_pTriplePtrStructType = NULL;
 
 	SetupAllBasicTypes ();
 }
@@ -30,6 +30,9 @@ CTypeMgr::Clear ()
 	m_ClassTypeList.Clear ();
 	m_PropertyTypeList.Clear ();
 	m_TypeMap.Clear ();
+
+	m_pDoublePtrStructType = NULL;
+	m_pTriplePtrStructType = NULL;
 }
 
 void
@@ -168,8 +171,8 @@ CTypeMgr::GetQualifiedType (
 
 CPointerType* 
 CTypeMgr::GetPointerType (
-	CType* pBaseType,
-	EType TypeKind
+	EType TypeKind,
+	CType* pBaseType
 	)
 {
 	rtl::CStringA Signature;
@@ -365,6 +368,37 @@ CTypeMgr::GetStructType (
 	return pType;
 }
 
+CStructType*
+CTypeMgr::GetDoublePointerStructType ()
+{
+	if (m_pDoublePtrStructType)
+		return m_pDoublePtrStructType;
+
+	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
+
+	m_pDoublePtrStructType = GetStructType (EType_Struct, "ptr2", "jnc.ptr2");
+	m_pDoublePtrStructType->CreateMember ("m_ptr1", pInt8PtrType);
+	m_pDoublePtrStructType->CreateMember ("m_ptr2", pInt8PtrType);
+
+	return m_pDoublePtrStructType;
+}
+
+CStructType*
+CTypeMgr::GetTriplePointerStructType ()
+{
+	if (m_pTriplePtrStructType)
+		return m_pTriplePtrStructType;
+
+	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
+
+	m_pTriplePtrStructType = GetStructType (EType_Struct, "ptr3", "jnc.ptr3");
+	m_pTriplePtrStructType->CreateMember ("m_ptr1", pInt8PtrType);
+	m_pTriplePtrStructType->CreateMember ("m_ptr2", pInt8PtrType);
+	m_pTriplePtrStructType->CreateMember ("m_ptr3", pInt8PtrType);
+
+	return m_pTriplePtrStructType;
+}
+
 CClassType* 
 CTypeMgr::GetClassType (
 	EType TypeKind,
@@ -482,43 +516,6 @@ CTypeMgr::GetImportType (
 	It->m_Value = pType;
 
 	return pType;
-}
-
-llvm::StructType*
-CTypeMgr::GetLlvmDoublePointerType ()
-{
-	if (m_pLlvmDoublePtrType)
-		return m_pLlvmDoublePtrType;
-
-	llvm::Type* pLlvmInt8PtrType = GetBasicType (EType_Int8)->GetPointerType (EType_Pointer_u)->GetLlvmType ();
-
-	m_pLlvmDoublePtrType = llvm::StructType::create (
-		"double_ptr", 
-		pLlvmInt8PtrType,
-		pLlvmInt8PtrType,
-		NULL
-		);
-	
-	return m_pLlvmDoublePtrType;
-}
-
-llvm::StructType*
-CTypeMgr::GetLlvmTriplePointerType ()
-{
-	if (m_pLlvmTriplePtrType)
-		return m_pLlvmTriplePtrType;
-
-	llvm::Type* pLlvmInt8PtrType = GetBasicType (EType_Int8)->GetPointerType (EType_Pointer_u)->GetLlvmType ();
-
-	m_pLlvmTriplePtrType = llvm::StructType::create (
-		"triple_ptr", 
-		pLlvmInt8PtrType,
-		pLlvmInt8PtrType,
-		pLlvmInt8PtrType,
-		NULL
-		);
-	
-	return m_pLlvmTriplePtrType;
 }
 
 //.............................................................................

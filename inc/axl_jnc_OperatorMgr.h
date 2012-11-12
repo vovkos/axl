@@ -134,7 +134,7 @@ protected:
 	CCast_f32_f64 m_Cast_f32_f64;
 	CCast_f64_f32 m_Cast_f64_f32;
 
-	CCast_int_bool m_Cast_int_bool;
+	CCast_num_bool m_Cast_num_bool;
 	CCast_bool_int m_Cast_bool_int;
 
 	CCast_i32_f32 m_Cast_i32_f32;
@@ -528,8 +528,14 @@ protected:
 
 	llvm::Value*
 	ModifyLlvmSafePointer (
-		llvm::Value* pLlvmFatPtr,
+		llvm::Value* pLlvmSafePtr,
 		llvm::Value* pLlvmPtr
+		);
+
+	void
+	CheckLlvmSafePointer (
+		llvm::Value* pLlvmSafePtr,
+		size_t Size
 		);
 };
 

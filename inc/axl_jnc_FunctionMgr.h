@@ -18,12 +18,18 @@ protected:
 	friend class CModule;
 	CModule* m_pModule;
 
-	CFunction* m_pCurrentFunction;
-
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
 	rtl::CStdListT <CGlobalProperty> m_GlobalPropertyList;
+
+	CFunction* m_pCurrentFunction;
+
+	CFunction* m_pCreateSafePtr;
+	CFunction* m_pCheckSafePtr;
+	CFunction* m_pOnInvalidSafePtr;
+	CFunction* m_pLoadDynamicPtr;
+	CFunction* m_pStoreDynamicPtr;
 
 public:
 	CFunctionMgr ();
@@ -71,7 +77,7 @@ public:
 	CreateFunction (
 		const rtl::CString& Tag,
 		CFunctionType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList
+		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
 		);
 
 	CProperty*
@@ -107,6 +113,49 @@ public:
 
 	bool
 	CompileFunctions ();
+
+	// LLVM code support functions
+
+	// jnc.ptr3 
+	// jnc.CreateSafePtr (
+	//		int8* p1,
+	//		int8* pRegionBegin,
+	//		int8* pRegionEnd
+	//		);
+
+	CFunction*
+	GetCreateSafePtr();
+
+	// void 
+	// jnc.CheckSafePtr (
+	//		jnc.ptr3 p,
+	//		size_t Size
+	//		);
+
+	CFunction*
+	GetCheckSafePtr ();
+
+	// void
+	// jnc.OnInvalidSafePtr (int8* unsafe pSrc);
+
+	CFunction*
+	GetOnInvalidSafePtr ();
+
+	// jnc.ptr3 
+	// jnc.LoadDynamicPtr (jnc.ptr2);
+
+	CFunction*
+	GetLoadDynamicPtr ();
+
+	// void
+	// jnc.StoreDynamicPtr (
+	//		int8* unsafe pSrc
+	//		int8* unsafe pSrcType
+	//		jnc.ptr2 pDst,
+	//		);
+
+	CFunction*
+	GetStoreDynamicPtr ();
 };
 
 //.............................................................................

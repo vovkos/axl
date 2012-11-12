@@ -110,6 +110,7 @@ enum EType
 	EType_Int_pbeu = EType_Int32_beu,
 #endif
 
+	EType_SizeT    = EType_Int_pu,
 	EType_Int      = EType_Int32,
 	EType_Char     = EType_Int8,
 	EType_UChar    = EType_Int8_u,
@@ -204,6 +205,12 @@ public:
 	
 	llvm::Type* 
 	GetLlvmType ();
+
+	llvm::UndefValue*
+	GetLlvmUndefValue ()
+	{
+		return llvm::UndefValue::get (GetLlvmType ());
+	}
 
 	EType
 	GetTypeKind ()

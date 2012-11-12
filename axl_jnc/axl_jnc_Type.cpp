@@ -189,12 +189,12 @@ CType::GetLlvmType ()
 	
 	case EType_Pointer:
 	case EType_Reference:
-		pLlvmType = m_pModule->m_TypeMgr.GetLlvmTriplePointerType ();
+		pLlvmType = m_pModule->m_TypeMgr.GetTriplePointerStructType ()->GetLlvmType ();
 		break;
 
 	case EType_Pointer_d:
 	case EType_Reference_d:
-		pLlvmType = m_pModule->m_TypeMgr.GetLlvmDoublePointerType ();
+		pLlvmType = m_pModule->m_TypeMgr.GetDoublePointerStructType ()->GetLlvmType ();
 		break;
 
 	case EType_Pointer_u:
@@ -416,7 +416,7 @@ CType::IsCharPointerType (CType* pType)
 CPointerType* 
 CType::GetPointerType (EType TypeKind)
 {
-	return m_pModule->m_TypeMgr.GetPointerType (this, TypeKind);
+	return m_pModule->m_TypeMgr.GetPointerType (TypeKind, this);
 }
 
 CArrayType* 
@@ -628,7 +628,7 @@ CType::GetModifiedType (int Modifiers)
 
 		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
 		CPointerType* pPointerType = (CPointerType*) pType;
-		pType = m_pModule->m_TypeMgr.GetPointerType (pPointerType->GetBaseType (), ModTypeKind);
+		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
 	}
 
 	if (Modifiers & ETypeModifier_Dynamic)
@@ -638,7 +638,7 @@ CType::GetModifiedType (int Modifiers)
 
 		EType ModTypeKind = GetDynamicPointerTypeKind (pType->m_TypeKind);
 		CPointerType* pPointerType = (CPointerType*) pType;
-		pType = m_pModule->m_TypeMgr.GetPointerType (pPointerType->GetBaseType (), ModTypeKind);
+		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
 	}
 
 	if (Modifiers & ETypeModifier_NoNull)

@@ -102,6 +102,7 @@ main := |*
 'get'          { CreateToken (EToken_Get); };
 'set'          { CreateToken (EToken_Set); };
 
+'new'          { CreateToken (EToken_New); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
 'dynasizeof'   { CreateToken (EToken_DynaSizeOf); };
@@ -190,7 +191,6 @@ CLexer::Exec ()
 
 	return Result;
 }
-
 
 //.............................................................................
 

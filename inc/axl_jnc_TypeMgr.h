@@ -39,8 +39,8 @@ protected:
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
 
-	llvm::StructType* m_pLlvmDoublePtrType;
-	llvm::StructType* m_pLlvmTriplePtrType;
+	CStructType* m_pDoublePtrStructType;
+	CStructType* m_pTriplePtrStructType;
 	
 public:
 	CTypeMgr ();
@@ -111,17 +111,17 @@ public:
 
 	CPointerType* 
 	GetPointerType (
-		CType* pBaseType,
-		EType TypeKind
+		EType TypeKind,
+		CType* pBaseType
 		);
 
 	CPointerType* 
 	GetPointerType (
-		EType BaseTypeKind,
-		EType TypeKind
+		EType TypeKind,
+		EType BaseTypeKind
 		)
 	{
-		return GetPointerType (GetBasicType (BaseTypeKind), TypeKind);
+		return GetPointerType (TypeKind, GetBasicType (BaseTypeKind));
 	}
 
 	CArrayType* 
@@ -173,7 +173,7 @@ public:
 		CType* pReturnType,
 		CType** ppArgType,
 		size_t ArgCount,
-		int Flags
+		int Flags = 0
 		);
 
 	CPropertyType* 
@@ -200,17 +200,23 @@ public:
 		EType TypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		size_t PackFactor
+		size_t PackFactor = 8
 		);
 
 	CStructType* 
 	CreateUnnamedStructType (
 		EType TypeKind,
-		size_t PackFactor
+		size_t PackFactor = 8
 		)
 	{
 		return GetStructType (TypeKind, rtl::CString (), rtl::CString (), PackFactor);
 	}
+
+	CStructType* 
+	GetDoublePointerStructType ();
+
+	CStructType* 
+	GetTriplePointerStructType ();
 
 	CClassType* 
 	GetClassType (
@@ -230,14 +236,6 @@ public:
 		const CQualifiedName& Name,
 		CNamespace* pAnchorNamespace
 		);
-
-	// llvm pointer structures
-
-	llvm::StructType*
-	GetLlvmDoublePointerType ();
-
-	llvm::StructType*
-	GetLlvmTriplePointerType ();
 
 protected:
 	void

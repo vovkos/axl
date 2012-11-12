@@ -58,6 +58,7 @@ enum EToken
 	EToken_Property,
 	EToken_Get,
 	EToken_Set,
+	EToken_New,
 	EToken_SizeOf,
 	EToken_TypeOf,
 	EToken_DynaSizeOf,
@@ -149,6 +150,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Class,        "class")
 	AXL_PRS_TOKEN_NAME (EToken_Interface,    "interface")
 	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
+	AXL_PRS_TOKEN_NAME (EToken_New,          "new")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
 	AXL_PRS_TOKEN_NAME (EToken_DynaSizeOf,   "dynasizeof")
