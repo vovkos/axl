@@ -535,7 +535,8 @@ protected:
 	void
 	CheckLlvmSafePointer (
 		llvm::Value* pLlvmSafePtr,
-		size_t Size
+		size_t Size,
+		int Access
 		);
 };
 

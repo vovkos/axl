@@ -69,6 +69,8 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 				m_LogCtrl.Trace (_T("%s\r\n"), String.c_str ());
 			}
 		}
+
+		m_LogCtrl.Trace (_T("\r\n"));
 	}
 
 	return true;

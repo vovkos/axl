@@ -1292,7 +1292,7 @@ COperatorMgr::LoadReferenceOperator (
 		return true;
 	}
 
-	CheckLlvmSafePointer (pLlvmValue, pTargetType->GetSize ());
+	CheckLlvmSafePointer (pLlvmValue, pTargetType->GetSize (), ESafePointerAccess_Read);
 
 	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmValue, 0, "sf_ptr");
 
@@ -1373,7 +1373,7 @@ COperatorMgr::StoreReferenceOperator (
 		return true;
 	}
 
-	CheckLlvmSafePointer (pLlvmDstValue, pTargetType->GetSize ());
+	CheckLlvmSafePointer (pLlvmDstValue, pTargetType->GetSize (), ESafePointerAccess_Write);
 
 	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmDstValue, 0, "sf_ptr");
 	llvm::Type* pLlvmPtrType = pTargetType->GetPointerType (EType_Pointer_u)->GetLlvmType ();
@@ -1521,18 +1521,23 @@ COperatorMgr::ModifyLlvmSafePointer (
 void
 COperatorMgr::CheckLlvmSafePointer (
 	llvm::Value* pLlvmSafePtr,
-	size_t Size
+	size_t Size,
+	int Access
 	)
 {
 	CValue SizeValue;
 	SizeValue.SetConstSizeT (Size);
 
+	CValue AccessValue;
+	AccessValue.SetConstInt32 (Access, EType_Int);
+
 	CFunction* pCheckSafePointer = m_pModule->m_FunctionMgr.GetCheckSafePtr ();
 
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pCheckSafePointer->GetLlvmFunction (),
 		pLlvmSafePtr,
-		SizeValue.GetLlvmValue ()
+		SizeValue.GetLlvmValue (),
+		AccessValue.GetLlvmValue ()
 		);
 }
 

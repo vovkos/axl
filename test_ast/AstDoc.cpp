@@ -201,13 +201,17 @@ CAstDoc::Run ()
 }
 
 void
-StdLib_OnInvalidSafePtr (jnc::TSafePointer Pointer)
+StdLib_OnInvalidSafePtr (
+	jnc::TSafePointer Pointer,
+	int Access
+	)
 {
 	throw err::CError (
-		_T("INVALID SAFE POINTER { %x; %x:%x }"), 
+		_T("INVALID SAFE POINTER %s { %x; %x:%x }"), 
+		Access == jnc::ESafePointerAccess_Write ? "WRITE" : "READ",
 		Pointer.m_p, 
 		Pointer.m_pRegionBegin, 
-		Pointer.m_pRegionEnd 
+		Pointer.m_pRegionEnd
 		);
 }
 

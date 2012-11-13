@@ -445,6 +445,14 @@ struct TFunctionPointer
 	TInterface* m_pInterface;
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum ESafePointerAccess
+{
+	ESafePointerAccess_Read  = 0,
+	ESafePointerAccess_Write = 1,
+};
+
 //.............................................................................
 
 } // namespace axl {

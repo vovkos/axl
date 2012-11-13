@@ -298,7 +298,8 @@ CFunctionMgr::GetCreateSafePtr()
 // void 
 // jnc.CheckSafePtr (
 //		jnc.ptr3 p,
-//		size_t Size
+//		size_t Size,
+//		int Access
 //		);
 
 CFunction*
@@ -315,7 +316,8 @@ CFunctionMgr::GetCheckSafePtr ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetTriplePointerStructType (),
-		m_pModule->m_TypeMgr.GetBasicType (EType_SizeT)
+		m_pModule->m_TypeMgr.GetBasicType (EType_SizeT),
+		m_pModule->m_TypeMgr.GetBasicType (EType_Int)
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
@@ -331,6 +333,7 @@ CFunctionMgr::GetCheckSafePtr ()
 	
 	llvm::Value* pLlvmArg1 = LlvmArg++;
 	llvm::Value* pLlvmArg2 = LlvmArg++;
+	llvm::Value* pLlvmArg3 = LlvmArg++;
 
 	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 0, "sp_ptr");
 	llvm::Value* pLlvmRegionBegin = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 1, "sp_beg");
@@ -359,7 +362,7 @@ CFunctionMgr::GetCheckSafePtr ()
 	m_pModule->m_LlvmBuilder.CreateRetVoid ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
-	m_pModule->m_LlvmBuilder.CreateCall (GetOnInvalidSafePtr ()->GetLlvmFunction (), pLlvmArg1);
+	m_pModule->m_LlvmBuilder.CreateCall2 (GetOnInvalidSafePtr ()->GetLlvmFunction (), pLlvmArg1, pLlvmArg3);
 	m_pModule->m_LlvmBuilder.CreateRetVoid ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
@@ -370,7 +373,10 @@ CFunctionMgr::GetCheckSafePtr ()
 }
 
 // void
-// jnc.OnInvalidSafePtr (int8* unsafe pSrc);
+// jnc.OnInvalidSafePtr (
+//		int8* unsafe pSrc,
+//		int Access
+//		);
 
 CFunction*
 CFunctionMgr::GetOnInvalidSafePtr ()
@@ -379,9 +385,14 @@ CFunctionMgr::GetOnInvalidSafePtr ()
 		return m_pOnInvalidSafePtr;
 
 	CType* pReturnType = m_pModule->m_TypeMgr.GetBasicType (EType_Void);
-	CType* pArgType = m_pModule->m_TypeMgr.GetTriplePointerStructType ();
+	
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetTriplePointerStructType (),
+		m_pModule->m_TypeMgr.GetBasicType (EType_Int)
+	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, &pArgType, 1);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	m_pOnInvalidSafePtr = CreateFunction (_T("jnc.OnInvalidSafePtr"), pType);
 
 	return m_pOnInvalidSafePtr;

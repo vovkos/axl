@@ -129,14 +129,18 @@ public:
 	// void 
 	// jnc.CheckSafePtr (
 	//		jnc.ptr3 p,
-	//		size_t Size
+	//		size_t Size,
+	//		int Access
 	//		);
 
 	CFunction*
 	GetCheckSafePtr ();
 
 	// void
-	// jnc.OnInvalidSafePtr (int8* unsafe pSrc);
+	// jnc.OnInvalidSafePtr (
+	//		jnc.ptr3* unsafe pSrc,
+	//		int Access
+	//		);
 
 	CFunction*
 	GetOnInvalidSafePtr ();
