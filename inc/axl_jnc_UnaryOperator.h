@@ -95,7 +95,7 @@ class CUnaryOperatorOverload
 {
 protected:
 	friend class COperatorMgr;
-
+	rtl::CArrayT <IUnaryOperator*> m_OperatorArray;
 	rtl::CStringHashTableMapAT <IUnaryOperator*> m_DirectMap;
 	rtl::CStringHashTableMapAT <IUnaryOperator*> m_ImplicitMap;
 
@@ -108,6 +108,9 @@ public:
 		CType* pOpType,
 		TUnaryOperatorTypeInfo* pTypeInfo
 		);
+
+	void
+	AddOperator (IUnaryOperator* pOperator);
 
 	IUnaryOperator*
 	AddOperator (

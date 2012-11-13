@@ -108,6 +108,7 @@ class CBinaryOperatorOverload
 {
 protected:
 	rtl::CBoxListT <rtl::CString> m_SignatureCache;
+	rtl::CArrayT <IBinaryOperator*> m_OperatorArray;
 	rtl::CStringHashTableMapAT <IBinaryOperator*> m_DirectMap;
 	rtl::CStringHashTableMapAT <IBinaryOperator*> m_ImplicitMap;
 
@@ -121,6 +122,9 @@ public:
 		CType* pOpType2,
 		TBinaryOperatorTypeInfo* pTypeInfo
 		);
+
+	void
+	AddOperator (IBinaryOperator* pOperator);
 
 	IBinaryOperator*
 	AddOperator (

@@ -15,6 +15,7 @@ namespace jnc {
 enum ECast
 {
 	ECast_None,
+	ECast_Identitiy,
 	ECast_Implicit,
 	ECast_Explicit,
 };
