@@ -24,8 +24,9 @@ main ()
 //	int* p = &x; test
 //	y = *p;
 
-/*
-asdfasdf*/
+/*asdfasdfasdfa
+i;jkl;
+sdfas*/
 
 	printf ("x = %d, y = %d\n", x, y);
 	printf ("x = %d, y = %d\n", x, y);
