@@ -12,7 +12,9 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_pLlvmFatPointerType = NULL;
+	m_pDoublePtrStructType = NULL;
+	m_pTriplePtrStructType = NULL;
+
 	SetupAllBasicTypes ();
 }
 
@@ -28,30 +30,33 @@ CTypeMgr::Clear ()
 	m_ClassTypeList.Clear ();
 	m_PropertyTypeList.Clear ();
 	m_TypeMap.Clear ();
+
+	m_pDoublePtrStructType = NULL;
+	m_pTriplePtrStructType = NULL;
 }
 
 void
 CTypeMgr::SetupAllBasicTypes ()
 {
-	SetupBasicType (EType_Void,      0, "v");
-	SetupBasicType (EType_Variant,   sizeof (TFatPointer), "z");
-	SetupBasicType (EType_Bool,      1, "a");
-	SetupBasicType (EType_Int8,      1, "b");
-	SetupBasicType (EType_Int8_u,    1, "c");
-	SetupBasicType (EType_Int16,     2, "d");
-	SetupBasicType (EType_Int16_u,   2, "e");
-	SetupBasicType (EType_Int32,     4, "f");
-	SetupBasicType (EType_Int32_u,   4, "g");
-	SetupBasicType (EType_Int64,     8, "h");
-	SetupBasicType (EType_Int64_u,   8, "i");
-	SetupBasicType (EType_Int16_be,  2, "j");
-	SetupBasicType (EType_Int16_beu, 2, "k");
-	SetupBasicType (EType_Int32_be,  4, "l");
-	SetupBasicType (EType_Int32_beu, 4, "m");
-	SetupBasicType (EType_Int64_be,  8, "n");
-	SetupBasicType (EType_Int64_beu, 8, "o");
-	SetupBasicType (EType_Float,     4, "p");
-	SetupBasicType (EType_Double,    8, "q");
+	SetupBasicType (EType_Void,      0, "a");
+	SetupBasicType (EType_Variant,   -1, "b"); // not yet
+	SetupBasicType (EType_Bool,      1, "c");
+	SetupBasicType (EType_Int8,      1, "d");
+	SetupBasicType (EType_Int8_u,    1, "e");
+	SetupBasicType (EType_Int16,     2, "f");
+	SetupBasicType (EType_Int16_u,   2, "g");
+	SetupBasicType (EType_Int32,     4, "h");
+	SetupBasicType (EType_Int32_u,   4, "i");
+	SetupBasicType (EType_Int64,     8, "j");
+	SetupBasicType (EType_Int64_u,   8, "k");
+	SetupBasicType (EType_Int16_be,  2, "l");
+	SetupBasicType (EType_Int16_beu, 2, "m");
+	SetupBasicType (EType_Int32_be,  4, "n");
+	SetupBasicType (EType_Int32_beu, 4, "o");
+	SetupBasicType (EType_Int64_be,  8, "p");
+	SetupBasicType (EType_Int64_beu, 8, "q");
+	SetupBasicType (EType_Float,     4, "r");
+	SetupBasicType (EType_Double,    8, "s");
 }
 
 void
@@ -110,7 +115,7 @@ VerifyReferenceType (CType* pBaseType)
 		return false;
 	}
 	
-	if (pBaseType->IsPropertyType ())
+	if (pBaseType->GetTypeKind () == EType_Property)
 	{
 		err::SetFormatStringError (_T("reference to property is illegal"));
 		return false;
@@ -119,10 +124,55 @@ VerifyReferenceType (CType* pBaseType)
 	return true;
 }
 
-CDerivedType* 
-CTypeMgr::GetDerivedType (
+CType* 
+CTypeMgr::GetQualifiedType (
 	CType* pBaseType,
-	EType TypeKind
+	int Flags
+	)
+{
+	Flags &= ETypeQualifier__Mask;
+	if (!Flags)
+		return pBaseType;
+
+	if (pBaseType->GetTypeKind () == EType_Qualifier)
+	{
+		CQualifierType* pQualifierType = (CQualifierType*) pBaseType;
+
+		int BaseFlags = pQualifierType->GetFlags ();
+		BaseFlags &= ETypeQualifier__Mask;
+
+		if ((BaseFlags & Flags) == Flags)
+			return pBaseType;
+
+		Flags |= BaseFlags;
+		pBaseType = pQualifierType->GetBaseType ();
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format ("A%d%s", Flags, pBaseType->GetSignature ());
+
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CQualifierType*) It->m_Value;
+
+	CQualifierType* pType = AXL_MEM_NEW (CQualifierType);
+	pType->m_pModule = m_pModule;
+	pType->m_TypeKind = EType_Qualifier;
+	pType->m_Flags = Flags;
+	pType->m_Size = pBaseType->GetSize ();
+	pType->m_Signature = Signature;
+	pType->m_pBaseType = pBaseType;
+
+	m_DerivedTypeList.InsertTail (pType);
+	It->m_Value = pType;
+	
+	return pType;
+}
+
+CPointerType* 
+CTypeMgr::GetPointerType (
+	EType TypeKind,
+	CType* pBaseType
 	)
 {
 	rtl::CStringA Signature;
@@ -130,46 +180,34 @@ CTypeMgr::GetDerivedType (
 
 	switch (TypeKind)
 	{
-	case EType_Const:
-		if (pBaseType->m_TypeKind == EType_Const)
-			return (CDerivedType*) pBaseType;
-
-		Signature = 'C';
-		Size = pBaseType->GetSize ();
-		break;
-
-	case EType_Volatile:
-		if (pBaseType->m_TypeKind == EType_Volatile)
-			return (CDerivedType*) pBaseType;
-
-		Signature = 'V';
-		Size = pBaseType->GetSize ();
-		break;
-
 	case EType_Pointer:
-		Signature = 'P';
-		Size = sizeof (TFatPointer);
+		Signature = 'B';
+		Size = sizeof (TSafePointer);
 		break;
 
-	case EType_Pointer_c:
-		Signature = 'O';
+	case EType_Pointer_u:
+		Signature = 'C';
 		Size = sizeof (void*);
+		break;
+
+	case EType_Pointer_d:
+		Signature = 'D';
+		Size = sizeof (TDynamicPointer);
 		break;
 
 	case EType_Reference:
-		if (!VerifyReferenceType (pBaseType))
-			return NULL;
-
-		Signature = 'R';
-		Size = sizeof (TFatPointer);
+		Signature = 'E';
+		Size = sizeof (TSafePointer);
 		break;
 
-	case EType_Reference_c:
-		if (!VerifyReferenceType (pBaseType))
-			return NULL;
-
-		Signature = 'H';
+	case EType_Reference_u:
+		Signature = 'F';
 		Size = sizeof (void*);
+		break;
+
+	case EType_Reference_d:
+		Signature = 'G';
+		Size = sizeof (TDynamicPointer);
 		break;
 
 	default:
@@ -181,9 +219,9 @@ CTypeMgr::GetDerivedType (
 
 	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CDerivedType*) It->m_Value;
+		return (CPointerType*) It->m_Value;
 
-	CDerivedType* pType = AXL_MEM_NEW (CDerivedType);
+	CPointerType* pType = AXL_MEM_NEW (CPointerType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
 	pType->m_Size = Size;
@@ -191,32 +229,6 @@ CTypeMgr::GetDerivedType (
 	pType->m_pBaseType = pBaseType;
 
 	m_DerivedTypeList.InsertTail (pType);
-	It->m_Value = pType;
-	
-	return pType;
-}
-
-CArrayType* 
-CTypeMgr::GetArrayType (
-	CType* pBaseType,
-	size_t ElementCount
-	)
-{
-	rtl::CStringA Signature = CArrayType::CreateSignature (pBaseType, ElementCount);
-
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CArrayType*) It->m_Value;
-
-	CArrayType* pType = AXL_MEM_NEW (CArrayType);
-	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = EType_Array;
-	pType->m_Size = pBaseType->GetSize () * ElementCount;
-	pType->m_Signature = Signature;
-	pType->m_pBaseType = pBaseType;
-	pType->m_ElementCount = ElementCount;
-
-	m_ArrayTypeList.InsertTail (pType);
 	It->m_Value = pType;
 	
 	return pType;
@@ -250,15 +262,191 @@ CTypeMgr::GetBitFieldType (
 	return pType;
 }
 
+CEnumType* 
+CTypeMgr::GetEnumType (
+	EType TypeKind,
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName
+	)
+{
+	ASSERT (TypeKind == EType_Enum || TypeKind == EType_Enum_c);
+
+	if (Name.IsEmpty ())
+	{
+		CEnumType* pType = AXL_MEM_NEW (CEnumType);
+		pType->m_pModule = m_pModule;
+		pType->m_TypeKind = TypeKind;
+		pType->m_pModule = m_pModule;
+		m_EnumTypeList.InsertTail (pType);
+		return pType;
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format (_T("%c%s"), TypeKind == EType_Enum ? 'I' : 'J', QualifiedName);
+	
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CEnumType*) It->m_Value;
+
+	CEnumType* pType = AXL_MEM_NEW (CEnumType);
+	pType->m_pModule = m_pModule;
+	pType->m_TypeKind = TypeKind;
+	pType->m_Name = Name;
+	pType->m_QualifiedName = QualifiedName;
+	pType->m_pModule = m_pModule;
+
+	m_EnumTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
+	return pType;
+}
+
+CArrayType* 
+CTypeMgr::GetArrayType (
+	CType* pBaseType,
+	size_t ElementCount
+	)
+{
+	rtl::CStringA Signature = CArrayType::CreateSignature (pBaseType, ElementCount);
+
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CArrayType*) It->m_Value;
+
+	CArrayType* pType = AXL_MEM_NEW (CArrayType);
+	pType->m_pModule = m_pModule;
+	pType->m_TypeKind = EType_Array;
+	pType->m_Size = pBaseType->GetSize () * ElementCount;
+	pType->m_Signature = Signature;
+	pType->m_pBaseType = pBaseType;
+	pType->m_ElementCount = ElementCount;
+
+	m_ArrayTypeList.InsertTail (pType);
+	It->m_Value = pType;
+	
+	return pType;
+}
+
+CStructType* 
+CTypeMgr::GetStructType (
+	EType TypeKind,
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
+	size_t PackFactor
+	)
+{
+	ASSERT (TypeKind == EType_Struct || TypeKind == EType_Union);
+
+	if (Name.IsEmpty ())
+	{
+		CStructType* pType = AXL_MEM_NEW (CStructType);
+		pType->m_pModule = m_pModule;
+		pType->m_TypeKind = TypeKind;
+		pType->m_pModule = m_pModule;
+		m_StructTypeList.InsertTail (pType);
+		return pType;
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format (_T("%c%s"), TypeKind == EType_Struct ? 'L' : 'M', QualifiedName);
+	
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CStructType*) It->m_Value;
+
+	CStructType* pType = AXL_MEM_NEW (CStructType);	
+	pType->m_pModule = m_pModule;
+	pType->m_TypeKind = TypeKind;
+	pType->m_PackFactor = PackFactor;
+	pType->m_Name = Name;
+	pType->m_QualifiedName = QualifiedName;
+	pType->m_pModule = m_pModule;
+
+	m_StructTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
+	return pType;
+}
+
+CStructType*
+CTypeMgr::GetDoublePointerStructType ()
+{
+	if (m_pDoublePtrStructType)
+		return m_pDoublePtrStructType;
+
+	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
+
+	m_pDoublePtrStructType = GetStructType (EType_Struct, "ptr2", "jnc.ptr2");
+	m_pDoublePtrStructType->CreateMember ("m_ptr1", pInt8PtrType);
+	m_pDoublePtrStructType->CreateMember ("m_ptr2", pInt8PtrType);
+
+	return m_pDoublePtrStructType;
+}
+
+CStructType*
+CTypeMgr::GetTriplePointerStructType ()
+{
+	if (m_pTriplePtrStructType)
+		return m_pTriplePtrStructType;
+
+	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
+
+	m_pTriplePtrStructType = GetStructType (EType_Struct, "ptr3", "jnc.ptr3");
+	m_pTriplePtrStructType->CreateMember ("m_ptr1", pInt8PtrType);
+	m_pTriplePtrStructType->CreateMember ("m_ptr2", pInt8PtrType);
+	m_pTriplePtrStructType->CreateMember ("m_ptr3", pInt8PtrType);
+
+	return m_pTriplePtrStructType;
+}
+
+CClassType* 
+CTypeMgr::GetClassType (
+	EType TypeKind,
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName
+	)
+{
+	ASSERT (TypeKind == EType_Class || TypeKind == EType_Interface);
+
+	if (Name.IsEmpty ())
+	{
+		CClassType* pType = AXL_MEM_NEW (CClassType);
+		pType->m_pModule = m_pModule;
+		pType->m_TypeKind = TypeKind;
+		pType->m_pModule = m_pModule;
+		m_ClassTypeList.InsertTail (pType);
+		return pType;
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format (_T("%c%s"), TypeKind == EType_Interface ? 'N' : 'O', QualifiedName);
+	
+	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CClassType*) It->m_Value;
+
+	CClassType* pType = AXL_MEM_NEW (CClassType);
+	pType->m_pModule = m_pModule;
+	pType->m_TypeKind = TypeKind;
+	pType->m_Name = Name;
+	pType->m_QualifiedName = QualifiedName;
+	pType->m_pModule = m_pModule;
+
+	m_ClassTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
+	return pType;
+}
+
 CFunctionType* 
-CTypeMgr::GetFunctionType (
+CTypeMgr::GetFunctionType (	
 	CType* pReturnType,
 	CType** ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CStringA Signature = CFunctionType::CreateSignature (pReturnType, ppArgType, ArgCount, Flags);
+	rtl::CStringA Signature = CFunctionType::CreateSignature (EType_Function, pReturnType, ppArgType, ArgCount, Flags);
 	
 	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -267,7 +455,7 @@ CTypeMgr::GetFunctionType (
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Function;
-	pType->m_Size = sizeof (TFatPointer);
+	pType->m_Size = sizeof (TFunctionPointer);
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
 	pType->m_ArgTypeArray.Copy (ppArgType, ArgCount);
@@ -294,7 +482,7 @@ CTypeMgr::GetPropertyType (
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Property;
-	pType->m_Size = sizeof (TFatPointer);
+	pType->m_Size = sizeof (TFunctionPointer) + SetterType.GetOverloadCount () * sizeof (void*);
 	pType->m_Signature = Signature;
 	pType->m_pGetterType = pGetterType;
 	pType->m_SetterType = SetterType;
@@ -302,125 +490,6 @@ CTypeMgr::GetPropertyType (
 	m_PropertyTypeList.InsertTail (pType);
 	It->m_Value = pType;
 	
-	return pType;
-}
-
-CEnumType* 
-CTypeMgr::GetEnumType (
-	EType TypeKind,
-	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
-	)
-{
-	ASSERT (TypeKind == EType_Enum || TypeKind == EType_Enum_c);
-
-	if (Name.IsEmpty ())
-	{
-		CEnumType* pType = AXL_MEM_NEW (CEnumType);
-		pType->m_pModule = m_pModule;
-		pType->m_TypeKind = TypeKind;
-		pType->m_pModule = m_pModule;
-		m_EnumTypeList.InsertTail (pType);
-		return pType;
-	}
-
-	rtl::CStringA Signature;
-	Signature.Format (_T("%c%s"), TypeKind == EType_Enum ? 'E' : 'N', QualifiedName);
-	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CEnumType*) It->m_Value;
-
-	CEnumType* pType = AXL_MEM_NEW (CEnumType);
-	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = TypeKind;
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_pModule = m_pModule;
-
-	m_EnumTypeList.InsertTail (pType);
-	It->m_Value = pType;
-
-	return pType;
-}
-
-CStructType* 
-CTypeMgr::GetStructType (
-	EType TypeKind,
-	const rtl::CString& Name,
-	const rtl::CString& QualifiedName,
-	size_t PackFactor
-	)
-{
-	ASSERT (TypeKind == EType_Struct || TypeKind == EType_Union);
-
-	if (Name.IsEmpty ())
-	{
-		CStructType* pType = AXL_MEM_NEW (CStructType);
-		pType->m_pModule = m_pModule;
-		pType->m_TypeKind = TypeKind;
-		pType->m_pModule = m_pModule;
-		m_StructTypeList.InsertTail (pType);
-		return pType;
-	}
-
-	rtl::CStringA Signature;
-	Signature.Format (_T("%c%s"), TypeKind == EType_Struct ? 'S' : 'U', QualifiedName);
-	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CStructType*) It->m_Value;
-
-	CStructType* pType = AXL_MEM_NEW (CStructType);	
-	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = TypeKind;
-	pType->m_PackFactor = PackFactor;
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_pModule = m_pModule;
-
-	m_StructTypeList.InsertTail (pType);
-	It->m_Value = pType;
-
-	return pType;
-}
-
-CClassType* 
-CTypeMgr::GetClassType (
-	EType TypeKind,
-	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
-	)
-{
-	ASSERT (TypeKind == EType_Class || TypeKind == EType_Interface);
-
-	if (Name.IsEmpty ())
-	{
-		CClassType* pType = AXL_MEM_NEW (CClassType);
-		pType->m_pModule = m_pModule;
-		pType->m_TypeKind = TypeKind;
-		pType->m_pModule = m_pModule;
-		m_ClassTypeList.InsertTail (pType);
-		return pType;
-	}
-
-	rtl::CStringA Signature;
-	Signature.Format (_T("%c%s"), TypeKind == EType_Class ? 'C' : 'I', QualifiedName);
-	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CClassType*) It->m_Value;
-
-	CClassType* pType = AXL_MEM_NEW (CClassType);
-	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = TypeKind;
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_pModule = m_pModule;
-
-	m_ClassTypeList.InsertTail (pType);
-	It->m_Value = pType;
-
 	return pType;
 }
 
@@ -447,26 +516,6 @@ CTypeMgr::GetImportType (
 	It->m_Value = pType;
 
 	return pType;
-}
-
-llvm::StructType*
-CTypeMgr::GetLlvmFatPointerType ()
-{
-	if (m_pLlvmFatPointerType)
-		return m_pLlvmFatPointerType;
-
-	llvm::PointerType* pLlvmInt8PtrType = llvm::Type::getInt8PtrTy (llvm::getGlobalContext ());
-
-	m_pLlvmFatPointerType = llvm::StructType::create (
-		".jnc.TFatPointer", 
-		pLlvmInt8PtrType,
-		pLlvmInt8PtrType,
-		pLlvmInt8PtrType,
-		pLlvmInt8PtrType,
-		NULL
-		);
-	
-	return m_pLlvmFatPointerType;
 }
 
 //.............................................................................

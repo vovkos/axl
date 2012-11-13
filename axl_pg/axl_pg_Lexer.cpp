@@ -377,10 +377,6 @@ static const int axl_pg_en_main = 9;
 /* #line 126 "D:/Prj/Ninja/axl3/axl_pg/axl_pg_Lexer.rl" */
 
 
-
-/* #line 129 "D:/Prj/Ninja/axl3/axl_pg/axl_pg_Lexer.rl" */
-
-
 //.............................................................................
 
 void 
@@ -395,7 +391,7 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 137 "D:/Prj/Ninja/axl3/axl_pg/axl_pg_Lexer.rl" */
+/* #line 134 "D:/Prj/Ninja/axl3/axl_pg/axl_pg_Lexer.rl" */
 }
 
 bool
@@ -888,7 +884,7 @@ _again:
 
 	}
 
-/* #line 143 "D:/Prj/Ninja/axl3/axl_pg/axl_pg_Lexer.rl" */
+/* #line 140 "D:/Prj/Ninja/axl3/axl_pg/axl_pg_Lexer.rl" */
 
 	bool Result = cs != axl_pg_error;
 	if (!Result)

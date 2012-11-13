@@ -10,8 +10,10 @@ namespace axl {
 namespace jnc {
 
 class CVariable;
-class CGlobalFunction;
-class CGlobalProperty;
+class CFunction;
+class CFunctionOverload;
+class CProperty;
+class CClassType;
 
 //.............................................................................
 	
@@ -22,10 +24,10 @@ enum EValue
 	EValue_Type,
 	EValue_Const,
 	EValue_Variable,
-	EValue_VariableAddr,
+	EValue_Function,
+	EValue_FunctionOverload,
+	EValue_Property,	
 	EValue_LlvmRegister,
-	EValue_GlobalFunction,
-	EValue_GlobalProperty,	
 	EValue_BoolNot,
 	EValue_BoolAnd,
 	EValue_BoolOr,
@@ -67,8 +69,9 @@ protected:
 	union
 	{
 		CVariable* m_pVariable;
-		CGlobalFunction* m_pGlobalFunction;
-		CGlobalProperty* m_pGlobalProperty;
+		CFunction* m_pFunction;
+		CFunctionOverload* m_pFunctionOverload;
+		CProperty* m_pProperty;
 	};
 
 	mutable llvm::Value* m_pLlvmValue;
@@ -84,23 +87,36 @@ public:
 
 	CValue (
 		CType* pType,
-		const void* p = NULL
+		const void* p
 		);
+
+	CValue (CType* pType)
+	{
+		SetType (pType);
+	}
 
 	CValue (CVariable* pVariable)
 	{
 		SetVariable (pVariable);
 	}
 
-	CValue (CGlobalFunction* pGlobalFunction)
+	CValue (CFunction* pFunction)
 	{
-		SetGlobalFunction (pGlobalFunction);
+		SetFunction (pFunction);
 	}
 
-	CValue (CGlobalProperty* pGlobalProperty)
+	CValue (CFunctionOverload* pFunctionOverload)
 	{
-		SetGlobalProperty (pGlobalProperty);
+		SetFunctionOverload (pFunctionOverload);
 	}
+
+	CValue (CProperty* pProperty)
+	{
+		SetProperty (pProperty);
+	}
+
+	void
+	Clear ();
 
 	EValue 
 	GetValueKind () const
@@ -127,18 +143,25 @@ public:
 		return m_pVariable;
 	}
 
-	CGlobalFunction*
-	GetGlobalFunction () const
+	CFunction*
+	GetFunction () const
 	{
-		ASSERT (m_ValueKind == EValue_GlobalFunction);
-		return m_pGlobalFunction;
+		ASSERT (m_ValueKind == EValue_Function);
+		return m_pFunction;
 	}
 
-	CGlobalProperty*
-	GetGlobalProperty () const
+	CFunctionOverload*
+	GetFunctionOverload () const
 	{
-		ASSERT (m_ValueKind == EValue_GlobalProperty);
-		return m_pGlobalProperty;
+		ASSERT (m_ValueKind == EValue_FunctionOverload);
+		return m_pFunctionOverload;
+	}
+
+	CProperty*
+	GetProperty () const
+	{
+		ASSERT (m_ValueKind == EValue_Property);
+		return m_pProperty;
 	}
 
 	void*
@@ -179,17 +202,37 @@ public:
 	llvm::Value*
 	GetLlvmValue () const;
 
+	static
+	llvm::Constant*
+	GetLlvmConst (
+		CType* pType,
+		const void* p
+		);
+
 	void
-	SetVoid ()
+	OverrideType (CType* pType)
 	{
-		m_ValueKind = EValue_Void;
+		m_pType = pType;
 	}
 
 	void
-	SetNull ()
+	OverrideType (
+		const CValue& Value,
+		CType* pType
+		)
 	{
-		m_ValueKind = EValue_Null;
+		*this = Value;
+		m_pType = pType;
 	}
+
+	void
+	SetVoid ()
+	{
+		Clear ();
+	}
+
+	void
+	SetNull ();
 
 	void
 	SetType (CType* pType);
@@ -198,10 +241,20 @@ public:
 	SetVariable (CVariable* pVariable);
 
 	void
-	SetGlobalFunction (CGlobalFunction* pFunction);
+	SetVariable (
+		CVariable* pVariable,
+		llvm::Value* pLlvmValue,
+		CType* pType
+		);
 
 	void
-	SetGlobalProperty (CGlobalProperty* pProperty);
+	SetFunction (CFunction* pFunction);
+
+	void
+	SetFunctionOverload (CFunctionOverload* pFunctionOverload);
+
+	void
+	SetProperty (CProperty* pProperty);
 
 	bool
 	CreateConst (
@@ -209,8 +262,17 @@ public:
 		const void* p = NULL
 		);
 
+	bool
+	CreateConst (
+		EType Type,
+		const void* p = NULL
+		);
+
 	void
-	SetConstBool (bool Bool);
+	SetConstBool (bool Bool)
+	{
+		CreateConst (EType_Bool, &Bool);
+	}
 
 	void
 	SetConstInt32 (
@@ -225,7 +287,10 @@ public:
 	SetConstInt32 (
 		int32_t Integer,
 		EType TypeKind
-		);
+		)
+	{
+		CreateConst (TypeKind, &Integer);
+	}
 
 	void
 	SetConstInt32 (int32_t Integer)
@@ -255,7 +320,10 @@ public:
 	SetConstInt64 (
 		int64_t Integer,
 		EType TypeKind
-		);
+		)
+	{
+		CreateConst (TypeKind, &Integer);
+	}
 
 	void
 	SetConstInt64 (int64_t Integer)
@@ -273,10 +341,22 @@ public:
 	}
 
 	void
-	SetConstFloat (float Float);
+	SetConstSizeT (size_t Size)
+	{
+		CreateConst (EType_SizeT, &Size);
+	}
 
 	void
-	SetConstDouble (double Double);
+	SetConstFloat (float Float)
+	{
+		CreateConst (EType_Float, &Float);
+	}
+
+	void
+	SetConstDouble (double Double)
+	{
+		CreateConst (EType_Double, &Double);
+	}
 
 	void
 	SetLiteralA (
@@ -318,12 +398,59 @@ public:
 
 //.............................................................................
 
-struct TFatPointer
+// header of class instance
+
+struct TObject
+{
+	class CClassType* m_pType;
+
+	// followed by TInterface of the object
+};
+
+// header of interface instance
+
+struct TInterface
+{
+	TObject* m_pObject; // for GC tracing & QueryInterface
+	void** m_pMethodTable; 
+
+	// followed by parents, then by interface data fields
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// *safe, &safe
+
+struct TSafePointer
 {
 	void* m_p;
-	void* m_pParent;
+	void* m_pRegionBegin;
+	void* m_pRegionEnd;
+};
+
+// *dynamic, &dynamic
+
+struct TDynamicPointer
+{
+	void* m_p;
 	CType* m_pType;
-	CType* m_pParentType;
+};
+
+// structure backing up function pointer declared like
+// typedef void FMethod ();
+
+struct TFunctionPointer
+{
+	void* m_pfn;
+	TInterface* m_pInterface;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum ESafePointerAccess
+{
+	ESafePointerAccess_Read  = 0,
+	ESafePointerAccess_Write = 1,
 };
 
 //.............................................................................

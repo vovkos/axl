@@ -38,7 +38,7 @@ CVariableMgr::CreateVariable (
 	{
 		llvm::Type* pLlvmType = pType->GetLlvmType ();
 		pVariable->m_VariableKind = EVariable_Local;
-		pVariable->m_pLlvmAlloca = m_pModule->m_ControlFlowMgr.GetLlvmBuilder ()->CreateAlloca (
+		pVariable->m_pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (
 			pLlvmType, 
 			0, 
 			(const tchar_t*) Name

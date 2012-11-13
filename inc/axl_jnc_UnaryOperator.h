@@ -25,6 +25,7 @@ enum EUnOp
 	EUnOp_PreDec,
 	EUnOp_PostInc,
 	EUnOp_PostDec,
+	EUnOp_Ptr,
 	EUnOp__Count,
 };
 
@@ -87,6 +88,17 @@ public:
 		const CValue& OpValue,
 		CValue* pResultValue
 		) = 0;
+
+	bool
+	Operator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		return OpValue.GetValueKind () == EValue_Const ? 
+			ConstOperator (OpValue, pResultValue) : 
+			LlvmOperator (OpValue, pResultValue);
+	}
 };
 
 //.............................................................................
@@ -180,8 +192,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
 		return true;
 	}
@@ -230,8 +241,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
 		return true;
 	}
@@ -280,8 +290,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
 		return true;
 	}
@@ -330,8 +339,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pLlvmOpValue = m_pModule->m_OperatorMgr.LoadValue (OpValue);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}

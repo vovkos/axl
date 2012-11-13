@@ -51,7 +51,7 @@ public:
 		size_t ElementCount
 		)
 	{ 
-		return rtl::CStringA::Format_s ("A%d%s", ElementCount, pBaseType->GetSignature ()); 
+		return rtl::CStringA::Format_s ("K%d%s", ElementCount, pBaseType->GetSignature ()); 
 	}
 
 	static

@@ -51,7 +51,7 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 # user code machines
 #
 
-# 1st pass extracts user code from .llg file
+# 1st pass extracts user code from .llk file
 
 user_code := |*
 
@@ -123,9 +123,6 @@ any            { CreateToken (ts [0]); };
 
 *|;
 
-}%%
-
-%%{
 }%%
 
 //.............................................................................

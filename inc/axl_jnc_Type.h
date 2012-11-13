@@ -13,60 +13,81 @@ class CTypeMgr;
 class CDerivedType;
 class CArrayType;
 
+typedef CDerivedType CPointerType;
+typedef CDerivedType CQualifierType;
+
 //.............................................................................
 
 enum EType
 {
-	// simple types
+	// basic types:
 
-	EType_Void,           // v
-	EType_Variant,        // z
-	EType_Bool,           // a
+	EType_Void,           // a
+	EType_Variant,        // b
+	EType_Bool,           // c
 	
 	// little-endian integers
 	
-	EType_Int8,           // b
-	EType_Int8_u,         // c
-	EType_Int16,          // d
-	EType_Int16_u,        // e
-	EType_Int32,          // f
-	EType_Int32_u,        // g
-	EType_Int64,          // h
-	EType_Int64_u,        // i
+	EType_Int8,           // d
+	EType_Int8_u,         // e
+	EType_Int16,          // f
+	EType_Int16_u,        // g
+	EType_Int32,          // h
+	EType_Int32_u,        // i
+	EType_Int64,          // j
+	EType_Int64_u,        // k
 
 	// big-endian integers
 
-	EType_Int16_be,       // j
-	EType_Int16_beu,      // k
-	EType_Int32_be,       // l
-	EType_Int32_beu,      // m
-	EType_Int64_be,       // n
-	EType_Int64_beu,      // o
+	EType_Int16_be,       // l
+	EType_Int16_beu,      // m
+	EType_Int32_be,       // n
+	EType_Int32_beu,      // o
+	EType_Int64_be,       // p
+	EType_Int64_beu,      // q
 
 	// floating point 
 
-	EType_Float,          // p
-	EType_Double,         // q
+	EType_Float,          // r
+	EType_Double,         // s
 
-	// derived types
+	// derived types:
 
-	EType_Const,          // C
-	EType_Volatile,       // V
-	EType_Pointer,        // P
-	EType_Pointer_c,      // O
-	EType_Reference,      // R
-	EType_Reference_c,    // H
-	EType_Array,          // A
-	EType_BitField,       // B
-	EType_Function,       // F
-	EType_Event,          // V
-	EType_Enum,           // E
-	EType_Enum_c,         // N
-	EType_Struct,         // S
-	EType_Union,          // U
-	EType_Class,          // X
-	EType_Interface,      // I
-	EType_Property,       // Y
+	// qualifiers: const, volatile, nonull
+
+	EType_Qualifier,      // A 
+
+	// pointers
+
+	EType_Pointer,        // B
+	EType_Pointer_u,      // C
+	EType_Pointer_d,      // D
+
+	// references
+
+	EType_Reference,      // E
+	EType_Reference_u,    // F
+	EType_Reference_d,    // G
+
+	// integer derivatives
+
+	EType_BitField,       // H
+	EType_Enum,           // I
+	EType_Enum_c,         // J
+
+	// aggregates
+
+	EType_Array,          // K
+	EType_Struct,         // L
+	EType_Union,          // M
+	EType_Interface,      // N
+	EType_Class,          // O
+
+	// function types
+
+	EType_Function,       // P
+	EType_Event,          // Q
+	EType_Property,       // R
 
 	// import type (resolved after linkage or instantiation of generic)
 
@@ -89,6 +110,7 @@ enum EType
 	EType_Int_pbeu = EType_Int32_beu,
 #endif
 
+	EType_SizeT    = EType_Int_pu,
 	EType_Int      = EType_Int32,
 	EType_Char     = EType_Int8,
 	EType_UChar    = EType_Int8_u,
@@ -105,10 +127,21 @@ enum EType
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum ETypeQualifier
+{
+	ETypeQualifier_Const     = 0x01,
+	ETypeQualifier_Volatile  = 0x02,
+	ETypeQualifier_NoNull    = 0x04,
+
+	ETypeQualifier__Mask     = 0x07,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum ETypeFlag
 {
-	ETypeFlag_IsIncomplete = 0x01,
-	ETypeFlag_IsLlvmReady  = 0x02,
+	ETypeFlag_IsIncomplete = 0x10,
+	ETypeFlag_IsLlvmReady  = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -123,16 +156,9 @@ enum ETypeModifier
 	ETypeModifier_LittleEndian      = 0x00020,
 	ETypeModifier_Safe              = 0x00040,
 	ETypeModifier_Unsafe            = 0x00080,	
-	ETypeModifier_Reference         = 0x00100,
-	ETypeModifier_Pointer           = 0x00200,	
+	ETypeModifier_Dynamic           = 0x00100,
+	ETypeModifier_NoNull            = 0x00200,	
 	ETypeModifier_Property          = 0x00400,
-	ETypeModifier_RemoveConst       = 0x00800,
-	ETypeModifier_RemoveVolatile    = 0x01000,
-	ETypeModifier_RemoveReference   = 0x02000,
-	ETypeModifier_RemovePointer     = 0x04000,
-	ETypeModifier_GetProperty       = 0x08000,
-	ETypeModifier_ArrayToPointer    = 0x10000,
-	ETypeModifier_EnumToInt         = 0x20000,
 };
 
 const tchar_t*
@@ -166,8 +192,8 @@ protected:
 	friend class CTypeMgr;
 
 	EType m_TypeKind;
-	ulong_t m_Flags;
-	size_t m_Size; // not really necessary for most types, but it's nice to have it in plain text
+	size_t m_Size;
+	int m_Flags;
 
 	rtl::CStringA m_Signature;
 	rtl::CString m_TypeString;
@@ -176,9 +202,15 @@ protected:
 
 public:
 	CType ();
-
+	
 	llvm::Type* 
 	GetLlvmType ();
+
+	llvm::UndefValue*
+	GetLlvmUndefValue ()
+	{
+		return llvm::UndefValue::get (GetLlvmType ());
+	}
 
 	EType
 	GetTypeKind ()
@@ -186,10 +218,30 @@ public:
 		return m_TypeKind;
 	}
 
+	static
+	size_t
+	GetTypeKindOffset ()
+	{
+		return FIELD_OFFSET (CType, m_TypeKind);
+	}
+
 	size_t
 	GetSize ()
 	{
 		return m_Size;
+	}
+
+	static
+	size_t
+	GetSizeOffset ()
+	{
+		return FIELD_OFFSET (CType, m_Size);
+	}
+
+	int
+	GetFlags ()
+	{
+		return m_Flags;
 	}
 
 	size_t
@@ -207,7 +259,7 @@ public:
 	int
 	Cmp (CType* pType)
 	{
-		return m_Signature.Cmp (pType->m_Signature);
+		return pType != this ? m_Signature.Cmp (pType->m_Signature) : 0;
 	}
 
 	bool 
@@ -225,26 +277,47 @@ public:
 	bool 
 	IsSignedType ()
 	{
-		return IsIntegerType () && !(m_TypeKind & 1); // even types are signed
+		return IsIntegerType () && (m_TypeKind & 1) != 0; // odd types are signed
 	}
 
 	bool 
+	IsUnsignedType ()
+	{
+		return !IsSignedType ();
+	}
+
+	bool
 	IsNumericType ()
 	{
 		return m_TypeKind >= EType_Bool && m_TypeKind <= EType_Double;
 	}
 
-	bool 
+	bool
 	IsPointerType ()
 	{
-		return m_TypeKind >= EType_Pointer && m_TypeKind <= EType_Reference_c;
+		return m_TypeKind >= EType_Pointer && m_TypeKind <= EType_Pointer_d;
+	}
+	
+	bool
+	IsFatPointerType ()
+	{
+		return m_TypeKind == EType_Pointer || m_TypeKind == EType_Pointer_d;
 	}
 
-	bool 
-	IsPropertyType (); // property or const property
+	bool
+	IsDoubleReferenceType ();
 
-	bool 
-	IsReferenceType (); // reference or const reference
+	bool
+	IsReferenceType ()
+	{
+		return m_TypeKind >= EType_Reference && m_TypeKind <= EType_Reference_d;
+	}
+
+	bool
+	IsFatReferenceType ()
+	{
+		return m_TypeKind == EType_Reference || m_TypeKind == EType_Reference_d;
+	}
 
 	bool 
 	IsAutoSizeArrayType ();
@@ -255,8 +328,8 @@ public:
 	bool 
 	IsCharPointerType (CType* pType);
 
-	CDerivedType* 
-	GetDerivedType (EType TypeKind);
+	CPointerType* 
+	GetPointerType (EType TypeKind);
 
 	CArrayType* 
 	GetArrayType (size_t ElementCount);

@@ -427,6 +427,10 @@ postfix_operator <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $2.m_Data.m_String);
 		}
+	| EToken_Ptr EToken_Identifier
+		{
+			return m_pModule->m_OperatorMgr.PointerToMemberOperator ($pValue, $2.m_Data.m_String);
+		}
 	| '[' expression ']'
 		{
 			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, $pValue, $2.m_Value);

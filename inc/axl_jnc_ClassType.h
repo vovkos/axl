@@ -223,24 +223,5 @@ public:
 
 //.............................................................................
 
-struct TObject
-{
-	intptr_t m_Flags; 
-
-	// followed by field block
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct TInterface
-{
-	void* m_pMethodTable;
-	void* m_pFieldBlock;
-	TObject* m_pObject;
-	CType* m_pObjectType;
-};
-
-//.............................................................................
-
 } // namespace axl {
 } // namespace jnc {

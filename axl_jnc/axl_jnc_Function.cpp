@@ -22,7 +22,10 @@ rtl::CString
 CFunction::CreateArgString ()
 {
 	if (m_ArgList.IsEmpty ())
-		return m_pType->IsVarArg () ? _T("(...)") : _T("()");
+	return 
+		(m_pType->GetFlags () & EFunctionTypeFlag_IsVarArg) ? 
+		(m_pType->GetFlags () & EFunctionTypeFlag_IsUnsafeVarArg) ? 
+		_T("(unsafe ...)") : _T("(safe ...)") : _T("()");
 
 	rtl::CIteratorT <jnc::CFunctionFormalArg> Arg = m_ArgList.GetHead ();
 
@@ -40,10 +43,12 @@ CFunction::CreateArgString ()
 			Arg->GetName ()
 			);
 
-	if (!m_pType->IsVarArg ())
+	if (!(m_pType->GetFlags () & EFunctionTypeFlag_IsVarArg))
 		String.Append (_T(")"));
-	else 
-		String.Append (_T(", ...)"));
+	else if (m_pType->GetFlags () & EFunctionTypeFlag_IsUnsafeVarArg)
+		String.Append (_T(", unsafe ...)"));
+	else
+		String.Append (_T(", safe ...)"));
 
 	return String;
 }

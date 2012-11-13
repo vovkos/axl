@@ -48,7 +48,7 @@ public:
 		)
 	{ 
 		return rtl::CStringA::Format_s (
-			"B%s:%d:%d", 
+			"H%s:%d:%d", 
 			pBaseType->GetSignature (),
 			BitOffset,
 			BitOffset + BitCount

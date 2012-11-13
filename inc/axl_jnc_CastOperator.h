@@ -57,17 +57,24 @@ public:
 	virtual
 	bool
 	ConstCast (
-		const CValue& SrcValue, // EValue_Const
-		const CValue& DstValue  // EValue_Const
+		const CValue& SrcValue,
+		const CValue& DstValue
 		) = 0;
 
 	virtual
 	bool
 	LlvmCast (
-		const CValue& Value, // EValue_Variable or EValue_LlvmRegister
+		const CValue& Value,
 		CType* pType,
-		CValue* pResultValue // EValue_Variable or EValue_LlvmRegister
+		CValue* pResultValue
 		) = 0;
+
+	bool
+	Cast (
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................
@@ -299,12 +306,12 @@ public:
 
 //.............................................................................
 
-// int <-> bool
+// numeric -> bool (common for both integer & fp)
 
-class CCast_int_bool: public ICastOperator
+class CCast_num_bool: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_int_bool, ICastOperator)
+	AXL_OBJ_SIMPLE_CLASS (CCast_num_bool, ICastOperator)
 
 public:
 	virtual
@@ -324,6 +331,8 @@ public:
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// bool -> int
 
 class CCast_bool_int: public ICastOperator
 {
@@ -637,30 +646,6 @@ public:
 		*(int64_t*) DstValue.GetConstData () = (int64_t) *(double*) SrcValue.GetConstData ();
 		return true;
 	}
-};
-
-//.............................................................................
-
-class CCast_arr_ptr_c: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr_c, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
 };
 
 //.............................................................................

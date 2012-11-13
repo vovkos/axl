@@ -7,18 +7,49 @@ namespace jnc {
 
 //.............................................................................
 	
-class CLlvmPodConst: public llvm::ConstantDataSequential 
+class CLlvmPodArray: public llvm::ConstantDataSequential 
 {
 public:
 	static
 	llvm::Constant*
 	Get (
-		CType* pType,
+		CArrayType* pType,
 		const void* p
 		)
 	{
 		llvm::Type* pLlvmType = pType->GetLlvmType ();
 		return getImpl (llvm::StringRef ((char*) p, pType->GetSize ()), pLlvmType);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CLlvmPodStruct: public llvm::ConstantStruct
+{
+public:
+	static
+	llvm::Constant*
+	Get (
+		CStructType* pType,
+		const void* p
+		)
+	{
+		llvm::Type* pLlvmType = pType->GetLlvmType ();
+		
+		char Buffer [256];
+		rtl::CArrayT <llvm::Constant*> LlvmMemberArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+		rtl::CIteratorT <CStructMember> Member = pType->GetFirstMember ();
+		for (; Member; Member++)
+		{
+			CValue MemberConst (Member->GetType (), (char*) p + Member->GetOffset ());
+			LlvmMemberArray.Append ((llvm::Constant*) MemberConst.GetLlvmValue ());
+		}
+
+		return get (
+			(llvm::StructType*) pLlvmType, 
+			llvm::ArrayRef <llvm::Constant*> (LlvmMemberArray, LlvmMemberArray.GetCount ())
+			);
 	}
 };
 
@@ -44,14 +75,17 @@ GetValueKindString (EValue ValueKind)
 	case EValue_Variable:
 		return _T("variable");
 
+	case EValue_Function:
+		return _T("function");
+
+	case EValue_FunctionOverload:
+		return _T("function-overload");
+
+	case EValue_Property:
+		return _T("property");
+
 	case EValue_LlvmRegister:
 		return _T("llvm-register");
-
-	case EValue_GlobalFunction:
-		return _T("global-function");
-
-	case EValue_GlobalProperty:
-		return _T("global-property");
 
 	case EValue_BoolNot:
 		return _T("bool-not");
@@ -90,23 +124,39 @@ CValue::CValue (
 	CreateConst (pType, p);
 }
 
+void
+CValue::Clear ()
+{
+	m_ValueKind = EValue_Void;
+	m_pType = NULL;	
+	m_pLlvmValue = NULL;
+}
+
 llvm::Value*
 CValue::GetLlvmValue () const
 {
 	if (m_pLlvmValue)
 		return m_pLlvmValue;
 
-	if (m_ValueKind == EValue_Void)
+	if (m_ValueKind != EValue_Const)
 		return NULL;
 
-	ASSERT (m_ValueKind == EValue_Const);
 	ASSERT (m_pType);
+	m_pLlvmValue = GetLlvmConst (m_pType, GetConstData ());
+	return m_pLlvmValue;
+}
 
+llvm::Constant*
+CValue::GetLlvmConst (
+	CType* pType,
+	const void* p
+	)
+{
 	int64_t Integer;
 	double Double;
-	llvm::Constant* pConstant = NULL;
+	llvm::Constant* pLlvmConst = NULL;
 
-	EType TypeKind = m_pType->GetTypeKind ();
+	EType TypeKind = pType->GetTypeKind ();
 	switch (TypeKind)
 	{
 	case EType_Int8:
@@ -117,43 +167,47 @@ CValue::GetLlvmValue () const
 	case EType_Int32_u:
 	case EType_Int64:
 	case EType_Int64_u:
-		Integer = *(int64_t*) GetConstData ();
-		pConstant = llvm::ConstantInt::get (
-			m_pType->GetLlvmType (),
-			llvm::APInt (m_pType->GetSize () * 8, Integer, m_pType->IsSignedType ())
+		Integer = *(int64_t*) p;
+		pLlvmConst = llvm::ConstantInt::get (
+			pType->GetLlvmType (),
+			llvm::APInt (pType->GetSize () * 8, Integer, pType->IsSignedType ())
 			);
 		break;
 
 	case EType_Float:
-		Double = *(float*) GetConstData ();
-		pConstant = llvm::ConstantFP::get (m_pType->GetLlvmType (), Double);
+		Double = *(float*) p;
+		pLlvmConst = llvm::ConstantFP::get (pType->GetLlvmType (), Double);
 		break;
 
 	case EType_Double:
-		Double = *(double*) GetConstData ();
-		pConstant = llvm::ConstantFP::get (m_pType->GetLlvmType (), Double);
+		Double = *(double*) p;
+		pLlvmConst = llvm::ConstantFP::get (pType->GetLlvmType (), Double);
 		break;
 
 	case EType_Array:
-		pConstant = CLlvmPodConst::Get (m_pType, GetConstData ());
+		pLlvmConst = CLlvmPodArray::Get ((CArrayType*) pType, p);
 		break;
 
 	case EType_Struct:
-	case EType_Union:
-		pConstant = CLlvmPodConst::Get (m_pType, GetConstData ());
+		pLlvmConst = CLlvmPodStruct::Get ((CStructType*) pType, p);
 		break;
 
-	case EType_Pointer_c:
-		Integer = *(int64_t*) GetConstData ();
+	case EType_Pointer:
+	case EType_Reference:
+		pLlvmConst = CLlvmPodStruct::Get (pType->GetModule ()->m_TypeMgr.GetTriplePointerStructType (), p);
+		break;
 
-		pConstant = llvm::ConstantInt::get (
-			m_pType->GetModule ()->m_TypeMgr.GetBasicType (EType_Int_pu)->GetLlvmType (),
+	case EType_Pointer_u:
+		Integer = *(int64_t*) p;
+
+		pLlvmConst = llvm::ConstantInt::get (
+			pType->GetModule ()->m_TypeMgr.GetBasicType (EType_Int_pu)->GetLlvmType (),
 			llvm::APInt (sizeof (void*) * 8, Integer, false)
 			);
 
-		pConstant = llvm::ConstantExpr::getIntToPtr (
-			pConstant, 
-			m_pType->GetLlvmType ()
+		pLlvmConst = llvm::ConstantExpr::getIntToPtr (
+			pLlvmConst, 
+			pType->GetLlvmType ()
 			);
 
 		break;
@@ -162,8 +216,18 @@ CValue::GetLlvmValue () const
 		ASSERT (false);
 	}
 
-	m_pLlvmValue = pConstant;
-	return m_pLlvmValue;
+	return pLlvmConst;
+}
+
+void
+CValue::SetNull ()
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	Clear ();
+	m_ValueKind = EValue_Null;
+	m_pType = pModule->m_TypeMgr.GetBasicType (EType_Void)->GetPointerType (EType_Pointer);
 }
 
 void
@@ -174,28 +238,46 @@ CValue::SetType (CType* pType)
 }
 
 void
-CValue::SetVariable (CVariable* pVariable)
+CValue::SetVariable (
+	CVariable* pVariable,
+	llvm::Value* pLlvmValue,
+	CType* pType
+	)
 {
 	m_ValueKind = EValue_Variable;
-	m_pType = pVariable->GetType ();
+	m_pType = pType->GetPointerType (EType_Reference);
 	m_pVariable = pVariable;
-	m_pLlvmValue = pVariable->GetLlvmValue ();
+	m_pLlvmValue = pLlvmValue;
 }
 
 void
-CValue::SetGlobalFunction (CGlobalFunction* pFunction)
+CValue::SetVariable (CVariable* pVariable)
 {
-	m_ValueKind = EValue_GlobalFunction;
-	m_pType = pFunction->GetOverloadCount () == 1 ? pFunction->GetFunction ()->GetType () : NULL;
-	m_pGlobalFunction = pFunction;
+	return SetVariable (pVariable, pVariable->GetLlvmValue (), pVariable->GetType ());
 }
 
 void
-CValue::SetGlobalProperty (CGlobalProperty* pProperty)
+CValue::SetFunction (CFunction* pFunction)
 {
-	m_ValueKind = EValue_GlobalProperty;
-	m_pType = pProperty->GetProperty ()->GetType ();
-	m_pGlobalProperty = pProperty;
+	m_ValueKind = EValue_Function;
+	m_pType = pFunction->GetType ();
+	m_pFunction = pFunction;
+}
+
+void
+CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
+{
+	m_ValueKind = EValue_FunctionOverload;
+	m_pType = pFunctionOverload->GetOverloadCount () == 1 ? pFunctionOverload->GetFunction ()->GetType () : NULL;
+	m_pFunctionOverload = pFunctionOverload;
+}
+
+void
+CValue::SetProperty (CProperty* pProperty)
+{
+	m_ValueKind = EValue_Property;
+	m_pType = pProperty->GetType ();
+	m_pProperty = pProperty;
 }
 
 bool
@@ -216,64 +298,23 @@ CValue::CreateConst (
 
 	if (p)
 		memcpy (GetConstData (), p, Size);
+	else
+		memset (GetConstData (), 0, Size);
 
 	return true;	
 }
 
-void
-CValue::SetConstBool (bool Bool)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pModule->m_TypeMgr.GetBasicType (EType_Bool);
-	CreateConst (pType, &Bool);
-}
-
-void
-CValue::SetConstInt32 (
-	int32_t Integer,
-	EType TypeKind
+bool
+CValue::CreateConst (
+	EType TypeKind,
+	const void* p
 	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
 	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
-	CreateConst (pType, &Integer);
-}
-
-void
-CValue::SetConstInt64 (
-	int64_t Integer,
-	EType TypeKind
-	)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
-	CreateConst (pType, &Integer);
-}
-
-void
-CValue::SetConstFloat (float Float)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CreateConst (pModule->m_TypeMgr.GetBasicType (EType_Float));
-	*(float*) GetConstData () = Float;
-}
-
-void
-CValue::SetConstDouble (double Double)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CreateConst (pModule->m_TypeMgr.GetBasicType (EType_Double));
-	*(double*) GetConstData () = Double;
+	return CreateConst (pType, p);	
 }
 
 void

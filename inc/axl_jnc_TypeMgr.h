@@ -28,17 +28,19 @@ protected:
 	CType m_BasicTypeArray [EType__BasicTypeCount];
 
 	rtl::CStdListT <CDerivedType> m_DerivedTypeList;
-	rtl::CStdListT <CArrayType> m_ArrayTypeList;
 	rtl::CStdListT <CBitFieldType> m_BitFieldTypeList;
-	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
-	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CEnumType> m_EnumTypeList;
+	rtl::CStdListT <CArrayType> m_ArrayTypeList;
 	rtl::CStdListT <CStructType> m_StructTypeList;
 	rtl::CStdListT <CClassType> m_ClassTypeList;
+	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
+	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
-	llvm::StructType* m_pLlvmFatPointerType;
+
+	CStructType* m_pDoublePtrStructType;
+	CStructType* m_pTriplePtrStructType;
 	
 public:
 	CTypeMgr ();
@@ -92,19 +94,34 @@ public:
 		return GetBasicType (GetUInt64TypeKind (Integer, ForceUnsigned));
 	}
 
-	CDerivedType* 
-	GetDerivedType (
+	CType* 
+	GetQualifiedType (
 		CType* pBaseType,
-		EType TypeKind
+		int Flags
 		);
 
-	CDerivedType* 
-	GetDerivedType (
-		EType BaseTypeKind,
-		EType TypeKind
+	CType* 
+	GetQualifiedType (
+		EType TypeKind,
+		int Flags
 		)
 	{
-		return GetDerivedType (GetBasicType (BaseTypeKind), TypeKind);
+		return GetQualifiedType (GetBasicType (TypeKind), Flags);
+	}
+
+	CPointerType* 
+	GetPointerType (
+		EType TypeKind,
+		CType* pBaseType
+		);
+
+	CPointerType* 
+	GetPointerType (
+		EType TypeKind,
+		EType BaseTypeKind
+		)
+	{
+		return GetPointerType (TypeKind, GetBasicType (BaseTypeKind));
 	}
 
 	CArrayType* 
@@ -156,7 +173,7 @@ public:
 		CType* pReturnType,
 		CType** ppArgType,
 		size_t ArgCount,
-		int Flags
+		int Flags = 0
 		);
 
 	CPropertyType* 
@@ -183,17 +200,23 @@ public:
 		EType TypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		size_t PackFactor
+		size_t PackFactor = 8
 		);
 
 	CStructType* 
 	CreateUnnamedStructType (
 		EType TypeKind,
-		size_t PackFactor
+		size_t PackFactor = 8
 		)
 	{
 		return GetStructType (TypeKind, rtl::CString (), rtl::CString (), PackFactor);
 	}
+
+	CStructType* 
+	GetDoublePointerStructType ();
+
+	CStructType* 
+	GetTriplePointerStructType ();
 
 	CClassType* 
 	GetClassType (
@@ -213,9 +236,6 @@ public:
 		const CQualifiedName& Name,
 		CNamespace* pAnchorNamespace
 		);
-
-	llvm::StructType*
-	GetLlvmFatPointerType ();
 
 protected:
 	void

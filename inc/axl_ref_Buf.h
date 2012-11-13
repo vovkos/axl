@@ -149,11 +149,13 @@ public:
 		if (m_p == Src.m_p)
 			return true;
 
-		if (Src.GetHdr ()->GetFree () == (mem::FFree) -1)
-			return Copy (*Src);
-
 		if (Src.m_p)
+		{
+			if (Src.GetHdr ()->GetFree () == (mem::FFree) -1)
+				return Copy (*Src);
+
 			Src.GetHdr ()->AddRef ();
+		}
 
 		if (m_p)
 			GetHdr ()->Release ();

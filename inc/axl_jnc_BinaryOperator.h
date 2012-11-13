@@ -100,6 +100,18 @@ public:
 		const CValue& OpValue2,
 		CValue* pResultValue	
 		) = 0;
+
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		)
+	{
+		return OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind () == EValue_Const ? 
+			ConstOperator (OpValue1, OpValue2, pResultValue) : 
+			LlvmOperator (OpValue1, OpValue2, pResultValue);
+	}
 };
 
 //.............................................................................
@@ -250,9 +262,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
 		return true;
 	}
@@ -304,9 +314,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
 		return true;
 	}
@@ -358,9 +366,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
 		return true;
 	}
@@ -412,9 +418,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
 		return true;
 	}
@@ -466,9 +470,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
 		return true;
 	}
@@ -520,9 +522,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
 		return true;
 	}
@@ -574,9 +574,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
 		return true;
 	}
@@ -628,9 +626,7 @@ public:
 		CValue* pResultValue		
 		)
 	{
-		llvm::Value* pLlvmOpValue1 = m_pModule->m_OperatorMgr.LoadValue (OpValue1);
-		llvm::Value* pLlvmOpValue2 = m_pModule->m_OperatorMgr.LoadValue (OpValue2);
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, pLlvmOpValue1, pLlvmOpValue2);
+		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
 		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
 		return true;
 	}

@@ -198,6 +198,14 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsafe);
 		}
+	| EToken_Dynamic
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Dynamic);
+		}
+	| EToken_NoNull
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_NoNull);
+		}
 	| EToken_Property
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
@@ -256,10 +264,6 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 	| EToken_WChar
 		{
 			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_WChar));
-		}
-	| EToken_Variant
-		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Variant));
 		}
 	| EToken_Auto
 		{
@@ -420,9 +424,11 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 		{
 			return DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, CValue ()) != NULL;
 		}
-	| EToken_Ellipsis
+	| (EToken_Safe | EToken_Unsafe $u)? EToken_Ellipsis
 		{
 			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
+			if (IsValidLocator ($u))
+				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsUnsafeVarArg;
 		}
 	;
 

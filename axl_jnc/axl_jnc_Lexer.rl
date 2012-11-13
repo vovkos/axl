@@ -55,7 +55,6 @@ main := |*
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-'import'       { CreateToken (EToken_Import); };
 'namespace'    { CreateToken (EToken_Namespace); };
 'using'        { CreateToken (EToken_Using); };
 'pack'         { CreateToken (EToken_Pack); };
@@ -75,10 +74,11 @@ main := |*
 'bigendian'    { CreateToken (EToken_BigEndian); };
 'safe'         { CreateToken (EToken_Safe); };
 'unsafe'       { CreateToken (EToken_Unsafe); };
+'dynamic'      { CreateToken (EToken_Dynamic); };
+'nonull'       { CreateToken (EToken_NoNull); };
 
 'auto'         { CreateToken (EToken_Auto); };
 'void'         { CreateToken (EToken_Void); };
-'variant'      { CreateToken (EToken_Variant); };
 'bool'         { CreateToken (EToken_Bool); };
 'int8'         { CreateToken (EToken_Int8); };
 'int16'        { CreateToken (EToken_Int16); };
@@ -102,8 +102,11 @@ main := |*
 'get'          { CreateToken (EToken_Get); };
 'set'          { CreateToken (EToken_Set); };
 
+'new'          { CreateToken (EToken_New); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
+'dynasizeof'   { CreateToken (EToken_DynaSizeOf); };
+'dynatypeof'   { CreateToken (EToken_DynaTypeOf); };
 
 'if'           { CreateToken (EToken_If); };
 'else'         { CreateToken (EToken_Else); };
@@ -129,10 +132,11 @@ main := |*
 '>='           { CreateToken (EToken_Ge); };	
 '||'           { CreateToken (EToken_LogicalOr); };
 '&&'           { CreateToken (EToken_LogicalAnd); };	
-'++'           { CreateToken (EToken_Inc); };
-'--'           { CreateToken (EToken_Dec); };
 '<<'           { CreateToken (EToken_Shl); };
 '>>'           { CreateToken (EToken_Shr); };
+'++'           { CreateToken (EToken_Inc); };
+'--'           { CreateToken (EToken_Dec); };
+'->'           { CreateToken (EToken_Ptr); };	
 '*='           { CreateToken (EToken_MulAssign); };
 '/='           { CreateToken (EToken_DivAssign); };
 '%='           { CreateToken (EToken_ModAssign); };
@@ -143,6 +147,7 @@ main := |*
 '&='           { CreateToken (EToken_AndAssign); };
 '^='           { CreateToken (EToken_XorAssign); };
 '|='           { CreateToken (EToken_OrAssign); };	
+':='           { CreateToken (EToken_RefAssign); };	
 '...'          { CreateToken (EToken_Ellipsis); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -186,7 +191,6 @@ CLexer::Exec ()
 
 	return Result;
 }
-
 
 //.............................................................................
 

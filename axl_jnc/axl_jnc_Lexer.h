@@ -17,7 +17,6 @@ enum EToken
 	EToken_Integer,
 	EToken_Fp,
 	EToken_Literal,
-	EToken_Import,
 	EToken_Namespace,
 	EToken_Using,
 	EToken_Pack,
@@ -34,9 +33,10 @@ enum EToken
 	EToken_BigEndian,
 	EToken_Safe,
 	EToken_Unsafe,
+	EToken_Dynamic,
+	EToken_NoNull,
 	EToken_Auto,
 	EToken_Void,
-	EToken_Variant,
 	EToken_Bool,
 	EToken_Int8,
 	EToken_Int16,
@@ -58,8 +58,11 @@ enum EToken
 	EToken_Property,
 	EToken_Get,
 	EToken_Set,
+	EToken_New,
 	EToken_SizeOf,
 	EToken_TypeOf,
+	EToken_DynaSizeOf,
+	EToken_DynaTypeOf,
 	EToken_If,
 	EToken_Else,
 	EToken_For,
@@ -80,10 +83,11 @@ enum EToken
 	EToken_Ge,
 	EToken_LogicalOr,
 	EToken_LogicalAnd,
-	EToken_Inc,
-	EToken_Dec,
 	EToken_Shl,
 	EToken_Shr,
+	EToken_Inc,
+	EToken_Dec,
+	EToken_Ptr,
 	EToken_MulAssign,
 	EToken_DivAssign,
 	EToken_ModAssign,
@@ -94,6 +98,7 @@ enum EToken
 	EToken_AndAssign,
 	EToken_XorAssign,
 	EToken_OrAssign,
+	EToken_RefAssign,
 	EToken_Ellipsis,
 };
 
@@ -106,7 +111,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Integer,      "integer-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Fp,           "floating-point-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Literal,      "string-literal")
-	AXL_PRS_TOKEN_NAME (EToken_Import,       "import")
 	AXL_PRS_TOKEN_NAME (EToken_Namespace,    "namespace")
 	AXL_PRS_TOKEN_NAME (EToken_Using,        "using")
 	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
@@ -121,11 +125,12 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
-	AXL_PRS_TOKEN_NAME (EToken_Safe,          "safe")
-	AXL_PRS_TOKEN_NAME (EToken_Unsafe,        "unsafe")
+	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
+	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
+	AXL_PRS_TOKEN_NAME (EToken_Dynamic,      "dynamic")
+	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
 	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")
-	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")
 	AXL_PRS_TOKEN_NAME (EToken_Bool,         "bool")
 	AXL_PRS_TOKEN_NAME (EToken_Int8,         "int8")
 	AXL_PRS_TOKEN_NAME (EToken_Int16,        "int16")
@@ -145,8 +150,11 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Class,        "class")
 	AXL_PRS_TOKEN_NAME (EToken_Interface,    "interface")
 	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
+	AXL_PRS_TOKEN_NAME (EToken_New,          "new")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
+	AXL_PRS_TOKEN_NAME (EToken_DynaSizeOf,   "dynasizeof")
+	AXL_PRS_TOKEN_NAME (EToken_DynaTypeOf,   "dynatypeof")
 	AXL_PRS_TOKEN_NAME (EToken_If,           "if")
 	AXL_PRS_TOKEN_NAME (EToken_Else,         "else")
 	AXL_PRS_TOKEN_NAME (EToken_For,          "for")
@@ -167,10 +175,11 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Ge,           ">=")
 	AXL_PRS_TOKEN_NAME (EToken_LogicalOr,    "||")
 	AXL_PRS_TOKEN_NAME (EToken_LogicalAnd,   "&&")	
-	AXL_PRS_TOKEN_NAME (EToken_Inc,          "++")
-	AXL_PRS_TOKEN_NAME (EToken_Dec,          "--")
 	AXL_PRS_TOKEN_NAME (EToken_Shl,          "<<")
 	AXL_PRS_TOKEN_NAME (EToken_Shr,          ">>")
+	AXL_PRS_TOKEN_NAME (EToken_Inc,          "++")
+	AXL_PRS_TOKEN_NAME (EToken_Dec,          "--")
+	AXL_PRS_TOKEN_NAME (EToken_Ptr,          "->")
 	AXL_PRS_TOKEN_NAME (EToken_MulAssign,    "*=")
 	AXL_PRS_TOKEN_NAME (EToken_DivAssign,    "/=")
 	AXL_PRS_TOKEN_NAME (EToken_ModAssign,    "%=")
@@ -181,6 +190,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_AndAssign,    "&=")
 	AXL_PRS_TOKEN_NAME (EToken_XorAssign,    "^=")
 	AXL_PRS_TOKEN_NAME (EToken_OrAssign,     "|=")	
+	AXL_PRS_TOKEN_NAME (EToken_RefAssign,    ":=")	
 	AXL_PRS_TOKEN_NAME (EToken_Ellipsis,     "...")
 		
 AXL_PRS_END_TOKEN_NAME_MAP ();
