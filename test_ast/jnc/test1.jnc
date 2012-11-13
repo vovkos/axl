@@ -19,8 +19,8 @@ typedef const char* pchar2_t;
 struct TPoint
 {
 	int m_x;
-	short m_y;
-	char m_z;
+	int m_y;
+	int m_z;
 };
 
 int
@@ -28,23 +28,22 @@ main ()
 {	
 	TPoint Point;
 	TPoint* p = &Point;
-	p -= 1;
-
-	int z = p->m_x;
+	 
+	p += 1;
+	p->m_x = 5;
+	int zz = p->m_x;
 
 	printf ("SUCCESS!\n");
 
-//	int a = test (100, 20, 30);
-//	printf ("test returned %d\n", a);
+	int a = test (100, 20, 30);
+	printf ("test returned %d\n", a);
 
-/*
 	int i;
 	for (i = 0; i < 10; i++)
 	{
 		printf ("hui govno i muravei %d\n", i);
 	}
 
-	TPoint Point;
 	Point.m_x = 10;
 	Point.m_y = 20;
 	Point.m_z = 30;
@@ -69,12 +68,9 @@ main ()
 	y = *p1;
 	y = *p2;
 
-*/
-
-	return 1;
+	return 5;
 }
 
-/*
 int
 test (
 	int x, 
@@ -85,7 +81,6 @@ test (
 	printf ("test (%d, %d, %d)\n", x, y, z);
 	return x + y + z;
 }
-*/
 
 void
 printf (
