@@ -11,17 +11,42 @@ COperatorMgr::COperatorMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
+
+	m_UnaryOperatorTable [EUnOp_Minus]        = &m_UnOp_Minus;
+	m_UnaryOperatorTable [EUnOp_BitwiseNot]   = &m_UnOp_BitwiseNot;
+	m_UnaryOperatorTable [EUnOp_Addr]         = &m_UnOp_Addr;
+	m_UnaryOperatorTable [EUnOp_Indir]        = &m_UnOp_Indir;
+	m_UnaryOperatorTable [EUnOp_LogicalNot]   = NULL; // &m_UnOp_LogicalNot;
+	m_UnaryOperatorTable [EUnOp_PreInc]       = &m_UnOp_PreInc;
+	m_UnaryOperatorTable [EUnOp_PreDec]       = &m_UnOp_PreDec;
+	m_UnaryOperatorTable [EUnOp_PostInc]      = &m_UnOp_PostInc;
+	m_UnaryOperatorTable [EUnOp_PostDec]      = &m_UnOp_PostDec;
+	m_UnaryOperatorTable [EUnOp_Ptr]          = NULL; // &m_UnOp_Ptr;
+
+	m_BinaryOperatorTable [EBinOp_Add]        = &m_BinOp_Add;
+	m_BinaryOperatorTable [EBinOp_Sub]        = &m_BinOp_Sub;
+	m_BinaryOperatorTable [EBinOp_Mul]        = &m_BinOp_Mul;
+	m_BinaryOperatorTable [EBinOp_Div]        = &m_BinOp_Div;
+	m_BinaryOperatorTable [EBinOp_Mod]        = &m_BinOp_Mod;
+	m_BinaryOperatorTable [EBinOp_Shl]        = &m_BinOp_Shl;
+	m_BinaryOperatorTable [EBinOp_Shr]        = &m_BinOp_Shr;
+	m_BinaryOperatorTable [EBinOp_BitwiseAnd] = &m_BinOp_BitwiseAnd;
+	m_BinaryOperatorTable [EBinOp_BitwiseOr]  = &m_BinOp_BitwiseOr;
+	m_BinaryOperatorTable [EBinOp_BitwiseXor] = &m_BinOp_BitwiseXor;
+	m_BinaryOperatorTable [EBinOp_Eq]         = &m_BinOp_Eq;
+	m_BinaryOperatorTable [EBinOp_Ne]         = &m_BinOp_Ne;
+	m_BinaryOperatorTable [EBinOp_Lt]         = &m_BinOp_Lt;
+	m_BinaryOperatorTable [EBinOp_Le]         = &m_BinOp_Le;
+	m_BinaryOperatorTable [EBinOp_Gt]         = &m_BinOp_Gt;
+	m_BinaryOperatorTable [EBinOp_Ge]         = &m_BinOp_Ge;
+	m_BinaryOperatorTable [EBinOp_LogicalAnd] = NULL; // &m_BinOp_LogicalAnd;
+	m_BinaryOperatorTable [EBinOp_LogicalOr]  = NULL; // &m_BinOp_LogicalOr;
+	m_BinaryOperatorTable [EBinOp_Idx]        = NULL; // &m_BinOp_Idx;
 }
 
 void
 COperatorMgr::Clear ()
 {
-	for (size_t i = 0; i < EUnOp__Count; i++)
-		m_UnaryOperatorTable [i].Clear ();
-
-	for (size_t i = 0; i < EBinOp__Count; i++)
-		m_BinaryOperatorTable [i].Clear ();
-
 	memset (m_BasicCastOperatorTable, 0, sizeof (m_BasicCastOperatorTable));
 	m_CastOperatorMap.Clear ();
 	m_SuperCastList.Clear ();
@@ -31,104 +56,8 @@ void
 COperatorMgr::AddStdOperators ()
 {
 	AddStdCastOperators ();
-	AddStdUnaryOperators ();
-	AddStdBinaryOperators ();
-}
-
-void
-COperatorMgr::AddStdUnaryOperators ()
-{
-	AddUnaryOperator (EUnOp_Minus, EType_Int32, &m_UnOp_Minus_i32);
-	AddUnaryOperator (EUnOp_Minus, EType_Int64, &m_UnOp_Minus_i64);
-	AddUnaryOperator (EUnOp_Minus, EType_Float, &m_UnOp_Minus_f32);
-	AddUnaryOperator (EUnOp_Minus, EType_Double, &m_UnOp_Minus_f64);
-
-	AddUnaryOperator (EUnOp_BitwiseNot, EType_Int32, &m_UnOp_BitwiseNot_i32);
-	AddUnaryOperator (EUnOp_BitwiseNot, EType_Int64, &m_UnOp_BitwiseNot_i64);
-}
-
-void
-COperatorMgr::AddStdBinaryOperators ()
-{
-	AddBinaryOperator (EBinOp_Add, EType_Int32, &m_BinOp_Add_i32);
-	AddBinaryOperator (EBinOp_Add, EType_Int64, &m_BinOp_Add_i64);
-	AddBinaryOperator (EBinOp_Add, EType_Float, &m_BinOp_Add_f32);
-	AddBinaryOperator (EBinOp_Add, EType_Double, &m_BinOp_Add_f64);
-
-	AddBinaryOperator (EBinOp_Sub, EType_Int32, &m_BinOp_Sub_i32);
-	AddBinaryOperator (EBinOp_Sub, EType_Int64, &m_BinOp_Sub_i64);
-	AddBinaryOperator (EBinOp_Sub, EType_Float, &m_BinOp_Sub_f32);
-	AddBinaryOperator (EBinOp_Sub, EType_Double, &m_BinOp_Sub_f64);
-
-	AddBinaryOperator (EBinOp_Mul, EType_Int32, &m_BinOp_Mul_i32);
-	AddBinaryOperator (EBinOp_Mul, EType_Int64, &m_BinOp_Mul_i64);
-	AddBinaryOperator (EBinOp_Mul, EType_Float, &m_BinOp_Mul_f32);
-	AddBinaryOperator (EBinOp_Mul, EType_Double, &m_BinOp_Mul_f64);
-
-	AddBinaryOperator (EBinOp_Div, EType_Int32, &m_BinOp_Div_i32);
-	AddBinaryOperator (EBinOp_Div, EType_Int64, &m_BinOp_Div_i64);
-	AddBinaryOperator (EBinOp_Div, EType_Float, &m_BinOp_Div_f32);
-	AddBinaryOperator (EBinOp_Div, EType_Double, &m_BinOp_Div_f64);
-	AddBinaryOperator (EBinOp_Div, EType_Int32_u, &m_BinOp_Div_i32u);
-	AddBinaryOperator (EBinOp_Div, EType_Int64_u, &m_BinOp_Div_i64u);
-
-	AddBinaryOperator (EBinOp_Mod, EType_Int32, &m_BinOp_Mod_i32);
-	AddBinaryOperator (EBinOp_Mod, EType_Int64, &m_BinOp_Mod_i64);
-	AddBinaryOperator (EBinOp_Mod, EType_Int32_u, &m_BinOp_Mod_i32u);
-	AddBinaryOperator (EBinOp_Mod, EType_Int64_u, &m_BinOp_Mod_i64u);
-
-	AddBinaryOperator (EBinOp_Shl, EType_Int32, &m_BinOp_Shl_i32);
-	AddBinaryOperator (EBinOp_Shl, EType_Int64, &m_BinOp_Shl_i64);
-
-	AddBinaryOperator (EBinOp_Shr, EType_Int32, &m_BinOp_Shr_i32);
-	AddBinaryOperator (EBinOp_Shr, EType_Int64, &m_BinOp_Shr_i64);
-
-	AddBinaryOperator (EBinOp_BitwiseAnd, EType_Int32, &m_BinOp_BitwiseAnd_i32);
-	AddBinaryOperator (EBinOp_BitwiseAnd, EType_Int64, &m_BinOp_BitwiseAnd_i64);
-
-	AddBinaryOperator (EBinOp_BitwiseOr, EType_Int32, &m_BinOp_BitwiseOr_i32);
-	AddBinaryOperator (EBinOp_BitwiseOr, EType_Int64, &m_BinOp_BitwiseOr_i64);
-
-	AddBinaryOperator (EBinOp_BitwiseXor, EType_Int32, &m_BinOp_BitwiseXor_i32);
-	AddBinaryOperator (EBinOp_BitwiseXor, EType_Int64, &m_BinOp_BitwiseXor_i64);
-
-	AddBinaryOperator (EBinOp_Eq, EType_Int32, &m_BinOp_Eq_i32);
-	AddBinaryOperator (EBinOp_Eq, EType_Int64, &m_BinOp_Eq_i64);
-	AddBinaryOperator (EBinOp_Eq, EType_Float, &m_BinOp_Eq_f32);
-	AddBinaryOperator (EBinOp_Eq, EType_Double, &m_BinOp_Eq_f64);
-
-	AddBinaryOperator (EBinOp_Ne, EType_Int32, &m_BinOp_Ne_i32);
-	AddBinaryOperator (EBinOp_Ne, EType_Int64, &m_BinOp_Ne_i64);
-	AddBinaryOperator (EBinOp_Ne, EType_Float, &m_BinOp_Ne_f32);
-	AddBinaryOperator (EBinOp_Ne, EType_Double, &m_BinOp_Ne_f64);
-
-	AddBinaryOperator (EBinOp_Lt, EType_Int32, &m_BinOp_Lt_i32);
-	AddBinaryOperator (EBinOp_Lt, EType_Int64, &m_BinOp_Lt_i64);
-	AddBinaryOperator (EBinOp_Lt, EType_Float, &m_BinOp_Lt_f32);
-	AddBinaryOperator (EBinOp_Lt, EType_Double, &m_BinOp_Lt_f64);
-	AddBinaryOperator (EBinOp_Lt, EType_Int32_u, &m_BinOp_Lt_i32u);
-	AddBinaryOperator (EBinOp_Lt, EType_Int64_u, &m_BinOp_Lt_i64u);
-
-	AddBinaryOperator (EBinOp_Le, EType_Int32, &m_BinOp_Le_i32);
-	AddBinaryOperator (EBinOp_Le, EType_Int64, &m_BinOp_Le_i64);
-	AddBinaryOperator (EBinOp_Le, EType_Float, &m_BinOp_Le_f32);
-	AddBinaryOperator (EBinOp_Le, EType_Double, &m_BinOp_Le_f64);
-	AddBinaryOperator (EBinOp_Le, EType_Int32_u, &m_BinOp_Le_i32u);
-	AddBinaryOperator (EBinOp_Le, EType_Int64_u, &m_BinOp_Le_i64u);
-
-	AddBinaryOperator (EBinOp_Gt, EType_Int32, &m_BinOp_Gt_i32);
-	AddBinaryOperator (EBinOp_Gt, EType_Int64, &m_BinOp_Gt_i64);
-	AddBinaryOperator (EBinOp_Gt, EType_Float, &m_BinOp_Gt_f32);
-	AddBinaryOperator (EBinOp_Gt, EType_Double, &m_BinOp_Gt_f64);
-	AddBinaryOperator (EBinOp_Gt, EType_Int32_u, &m_BinOp_Gt_i32u);
-	AddBinaryOperator (EBinOp_Gt, EType_Int64_u, &m_BinOp_Gt_i64u);
-
-	AddBinaryOperator (EBinOp_Ge, EType_Int32, &m_BinOp_Ge_i32);
-	AddBinaryOperator (EBinOp_Ge, EType_Int64, &m_BinOp_Ge_i64);
-	AddBinaryOperator (EBinOp_Ge, EType_Float, &m_BinOp_Ge_f32);
-	AddBinaryOperator (EBinOp_Ge, EType_Double, &m_BinOp_Ge_f64);
-	AddBinaryOperator (EBinOp_Ge, EType_Int32_u, &m_BinOp_Ge_i32u);
-	AddBinaryOperator (EBinOp_Ge, EType_Int64_u, &m_BinOp_Ge_i64u);
+	//AddStdUnaryOperators ();
+	//AddStdBinaryOperators ();
 }
 
 void
@@ -294,63 +223,6 @@ COperatorMgr::AddStdCastOperators ()
 	AddCastOperator (EType_Double, EType_Bool, &m_Cast_num_bool);	
 }
 
-IUnaryOperator*
-COperatorMgr::GetUnaryOperator (
-	EUnOp OpKind,
-	CType* pOpType,
-	TUnaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	ASSERT (OpKind > 0 && OpKind < EUnOp__Count);
-	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind].GetOperator (pOpType, pTypeInfo);
-	if (pOperator)
-		return pOperator;
-
-	switch (OpKind)
-	{
-	case EUnOp_Addr:
-		pOperator = &m_UnOp_addr;
-		break;
-
-	case EUnOp_Indir:
-		pOperator = &m_UnOp_indir;
-		break;
-
-	case EUnOp_PreInc:
-		pOperator = &m_UnOp_preinc;
-		break;
-
-	case EUnOp_PreDec:
-		pOperator = &m_UnOp_predec;
-		break;
-
-	case EUnOp_PostInc:
-		pOperator = &m_UnOp_postinc;
-		break;
-
-	case EUnOp_PostDec:
-		pOperator = &m_UnOp_postdec;
-		break;
-	}
-
-	if (!pOperator)
-		return NULL;
-
-	bool Result = pOperator->GetTypeInfo (pOpType, pTypeInfo);
-	return Result ? pOperator : NULL;
-}
-
-IUnaryOperator*
-COperatorMgr::AddUnaryOperator (
-	EUnOp OpKind,
-	EType OpTypeKind,
-	IUnaryOperator* pOperator
-	)
-{
-	CType* pOpType = m_pModule->m_TypeMgr.GetBasicType (OpTypeKind);
-	return AddUnaryOperator (OpKind, pOpType, pOperator);
-}
-
 bool
 COperatorMgr::UnaryOperator (
 	EUnOp OpKind,
@@ -358,29 +230,19 @@ COperatorMgr::UnaryOperator (
 	CValue* pResultValue
 	)
 {
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
-	if (!Result)
-		return false;
-
-	CType* pOpType = OpValue.GetType ();
-
-	TUnaryOperatorTypeInfo TypeInfo;
-	IUnaryOperator* pOperator = GetUnaryOperator (OpKind, pOpType, &TypeInfo);	
+	ASSERT (OpKind >= 0 && OpKind < EUnOp__Count);
+	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];
+	
 	if (!pOperator)
 	{
-		err::SetFormatStringError (
-			_T("unary '%s' cannot be applied to '%s'"),
-			GetUnOpString (OpKind),
-			pOpType->GetTypeString ()
-			);
+		err::SetFormatStringError (_T("unary '%s' is not supported"), GetUnOpString (OpKind));
 		return false;
 	}
 
-	CValue CastOpValue;
+	CValue OpValue;
 	return 
-		CastOperator (OpValue, TypeInfo.m_pOpType, &CastOpValue) &&
-		pOperator->Operator (CastOpValue, pResultValue);
+		PrepareOperand (RawOpValue, &OpValue, pOperator->GetFlags ()) &&
+		pOperator->Operator (OpValue, pResultValue);
 }
 
 bool
@@ -399,19 +261,6 @@ COperatorMgr::UnaryOperator (
 	return true;
 }
 
-IBinaryOperator*
-COperatorMgr::AddBinaryOperator (
-	EBinOp OpKind,
-	EType OpTypeKind1,
-	EType OpTypeKind2,
-	IBinaryOperator* pOperator
-	)
-{
-	CType* pOpType1 = m_pModule->m_TypeMgr.GetBasicType (OpTypeKind1);
-	CType* pOpType2 = m_pModule->m_TypeMgr.GetBasicType (OpTypeKind2);
-	return AddBinaryOperator (OpKind, pOpType1, pOpType2, pOperator);
-}
-
 bool
 COperatorMgr::BinaryOperator (
 	EBinOp OpKind,
@@ -420,87 +269,22 @@ COperatorMgr::BinaryOperator (
 	CValue* pResultValue
 	)
 {
+	ASSERT (OpKind >= 0 && OpKind < EBinOp__Count);
+	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];
+	
+	if (!pOperator)
+	{
+		err::SetFormatStringError (_T("binary '%s' is not supported"), GetBinOpString (OpKind));
+		return false;
+	}
+
 	CValue OpValue1;
 	CValue OpValue2;
 
-	bool Result = 
-		PrepareOperand (RawOpValue1, &OpValue1) &&
-		PrepareOperand (RawOpValue2, &OpValue2);
-	
-	if (!Result)
-		return false;
-	
-	CType* pOpType1 = OpValue1.GetType ();
-	CType* pOpType2 = OpValue2.GetType ();
-
-	// temporary implementation of pointer arithmetics -- just for testing
-
-	if (pOpType1->IsReferenceType () && ((CPointerType*) pOpType1)->GetBaseType ()->IsPointerType ())
-	{
-		Result = LoadReferenceOperator (&OpValue1);
-		if (!Result)
-			return false;
-
-		pOpType1 = OpValue1.GetType ();
-
-		if (pOpType2->IsReferenceType ())
-		{
-			Result = LoadReferenceOperator (&OpValue2);
-			if (!Result)
-				return false;
-
-			pOpType2 = OpValue2.GetType ();
-		}
-
-		if (pOpType2->IsIntegerType ())
-		{
-			if (pOpType1->GetTypeKind () == EType_Pointer)
-			{
-				CValue Size;
-				Size.SetConstSizeT (((CPointerType*) pOpType1)->GetBaseType ()->GetSize ());
-
-				if (OpKind == EBinOp_Sub)
-					UnaryOperator (EUnOp_Minus, &Size);
-
-				Result = BinaryOperator (EBinOp_Mul, &OpValue2, Size);
-				if (!Result)
-					return false;
-
-				llvm::Value* pPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1.GetLlvmValue (), 0, "sp_ptr");
-				pPtr = m_pModule->m_LlvmBuilder.CreateGEP (pPtr, OpValue2.GetLlvmValue (), "sp_ptr_inc");
-				llvm::Value* pSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (OpValue1.GetLlvmValue (), pPtr, 0, "sp_ptr");
-				pResultValue->SetLlvmRegister (pSafePtr, pOpType1);
-			}
-			else 
-			{
-				err::SetFormatStringError ("not yet");
-				return false;
-			}
-			
-			return true;
-		}
-	}
-
-	TBinaryOperatorTypeInfo TypeInfo;
-	IBinaryOperator* pOperator = GetBinaryOperator (OpKind, pOpType1, pOpType2, &TypeInfo);	
-	if (!pOperator)
-	{
-		err::SetFormatStringError (
-			_T("binary '%s' cannot be applied to '%s' and '%s'"),
-			GetBinOpString (OpKind),
-			pOpType1->GetTypeString (),
-			pOpType2->GetTypeString ()
-			);
-		return false;
-	}
-	
-	CValue CastOpValue1;
-	CValue CastOpValue2;
-
 	return
-		CastOperator (OpValue1, TypeInfo.m_pOpType1, &CastOpValue1) &&
-		CastOperator (OpValue2, TypeInfo.m_pOpType2, &CastOpValue2) &&
-		pOperator->Operator (CastOpValue1, CastOpValue2, pResultValue);
+		PrepareOperand (RawOpValue1, &OpValue1, pOperator->GetFlags ()) &&
+		PrepareOperand (RawOpValue2, &OpValue2, pOperator->GetFlags ()) &&
+		pOperator->Operator (OpValue1, OpValue2, pResultValue);
 }
 
 bool
@@ -724,8 +508,16 @@ COperatorMgr::CastPointerOperator (
 	CValue* pResultValue
 	)
 {
+	if (pSrcType->GetTypeKind () == EType_Pointer &&
+		pDstType->GetTypeKind () == EType_Pointer_u)
+	{
+		llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue.GetLlvmValue (), 0, "sf_ptr");
+		pResultValue->SetLlvmRegister (pLlvmPtr, pDstType);
+		return true;
+	}
+
 	err::SetFormatStringError (_T("conversion of pointers is not implemented yet"));
-	return true;
+	return false;
 }
 
 bool
@@ -902,7 +694,7 @@ COperatorMgr::PointerToMemberOperator (
 	bool Result = PrepareOperand (RawOpValue, &OpValue);
 	if (!Result)
 		return false;
-
+/*
 	TUnaryOperatorTypeInfo TypeInfo;
 	IUnaryOperator* pOperator = GetUnaryOperator (EUnOp_Ptr, OpValue.GetType (), &TypeInfo);
 	if (pOperator)
@@ -916,6 +708,7 @@ COperatorMgr::PointerToMemberOperator (
 		if (!Result)
 			return false;
 	}
+*/
 
 	return MemberOperator (OpValue, pName, pResultValue);
 }
@@ -989,11 +782,11 @@ COperatorMgr::StructMemberOperator (
 	else
 	{
 		llvm::Value* pLlvmFatPtr = OpValue.GetLlvmValue ();		
-		llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmFatPtr, 0, "sf_ptr");
-		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pStructType->GetPointerType (EType_Pointer_u)->GetLlvmType (), "sf_ptr_cast");
+		llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmFatPtr, 0, "sp_ptr");
+		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pStructType->GetPointerType (EType_Pointer_u)->GetLlvmType (), "sp_ptr_cast");
 
 		llvm::Value* pLlvmGep = CreateLlvmGep (pLlvmPtr, 0, pMember->GetLlvmIndex ());
-		pLlvmFatPtr = ModifyLlvmSafePointer (pLlvmFatPtr, pLlvmGep);
+		pLlvmFatPtr = ModifyLlvmSafePtr (pLlvmFatPtr, pLlvmGep);
 		
 		CType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
 		pResultValue->SetLlvmRegister (pLlvmFatPtr, pResultType);
@@ -1157,7 +950,10 @@ COperatorMgr::CallOperator (
 }
 
 CType* 
-COperatorMgr::PrepareOperandType (CType* pOpType) 
+COperatorMgr::PrepareOperandType (
+	CType* pOpType,
+	int Flags
+	) 
 {
 	CType* pType = pOpType;
 	
@@ -1178,13 +974,19 @@ COperatorMgr::PrepareOperandType (CType* pOpType)
 			CType* pBaseType;
 
 			pBaseType = ((CPointerType*) pType)->GetBaseType ();
-			if (pBaseType->IsReferenceType ()) // double reference
+			if (pBaseType->IsReferenceType () || (Flags & EOpFlag_LoadReference)) // double reference
 				pType = pBaseType;
 
 			break;
 
 		case EType_Property:
 			pType = ((CPropertyType*) pType)->GetGetterType ()->GetReturnType ();
+			break;
+
+		case EType_Enum:
+			if (Flags & EOpFlag_EnumToInt)
+				pType = m_pModule->m_TypeMgr.GetBasicType (EType_Int);
+
 			break;
 		}
 
@@ -1196,7 +998,8 @@ COperatorMgr::PrepareOperandType (CType* pOpType)
 bool 
 COperatorMgr::PrepareOperand (
 	const CValue& OpValue,
-	CValue* pOpValue
+	CValue* pOpValue,
+	int Flags
 	) 
 {
 	bool Result;
@@ -1220,7 +1023,7 @@ COperatorMgr::PrepareOperand (
 			CType* pBaseType;
 
 			pBaseType = ((CPointerType*) pType)->GetBaseType ();
-			if (pBaseType->IsReferenceType ()) // double reference
+			if (pBaseType->IsReferenceType () || (Flags & EOpFlag_LoadReference)) // double reference
 			{
 				Result = LoadReferenceOperator (&Value);
 				if (!Result)
@@ -1235,6 +1038,12 @@ COperatorMgr::PrepareOperand (
 				return false;
 
 			break;
+
+		case EType_Enum:
+			if (Flags & EOpFlag_EnumToInt)
+				Value.OverrideType (EType_Int);
+
+			break;
 		}
 
 		if (Value.GetType () == pType)
@@ -1246,11 +1055,14 @@ COperatorMgr::PrepareOperand (
 }
 
 bool 
-COperatorMgr::PrepareOperand (CValue* pOpValue)
+COperatorMgr::PrepareOperand (
+	CValue* pOpValue,
+	int Flags
+	)
 {
 	CValue OpValue;
 
-	bool Result = PrepareOperand (*pOpValue, &OpValue);
+	bool Result = PrepareOperand (*pOpValue, &OpValue, Flags);
 	if (!Result)
 		return false;
 
@@ -1292,12 +1104,12 @@ COperatorMgr::LoadReferenceOperator (
 		return true;
 	}
 
-	CheckLlvmSafePointer (pLlvmValue, pTargetType->GetSize (), ESafePointerAccess_Read);
+	CheckLlvmSafePtrRange (pLlvmValue, pTargetType->GetSize (), ESafePtrError_Load);
 
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmValue, 0, "sf_ptr");
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmValue, 0, "sp_ptr");
 
 	llvm::Type* pLlvmPtrType = pTargetType->GetPointerType (EType_Pointer_u)->GetLlvmType ();
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType, "sf_ptr_cast");
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType, "sp_ptr_cast");
 	llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (pLlvmPtr, IsVolatile, "loa");
 	
 	pResultValue->SetLlvmRegister (pLlvmLoad, pTargetType);
@@ -1356,29 +1168,38 @@ COperatorMgr::StoreReferenceOperator (
 	llvm::Value* pLlvmSrcValue = CastValue.GetLlvmValue ();
 	llvm::Value* pLlvmDstValue = DstValue.GetLlvmValue ();
 
-	if (pTargetType->IsFatPointerType () && CastValue.GetValueKind () == EValue_Variable)
+	if (pTargetType->GetTypeKind () == EType_Pointer)
 	{
-		CVariable* pVariable = CastValue.GetVariable ();
-		pLlvmSrcValue = CreateLlvmSafePointer (
-			pLlvmSrcValue, 
-			pVariable->GetLlvmValue (), 
-			pVariable->GetType ()
-			);
+		if (CastValue.GetValueKind () == EValue_Variable)
+		{
+			CVariable* pVariable = CastValue.GetVariable ();
+			CScope* pScope = pVariable->GetScope ();
+
+			pLlvmSrcValue = CreateLlvmSafePtr (
+				pLlvmSrcValue, 
+				pVariable->GetLlvmValue (), 
+				pVariable->GetType (),
+				pScope ? pScope->GetLevel () : 0
+				);
+		}
+
+		Result = CheckLlvmSafePtrScope (pLlvmSrcValue, CastValue, DstValue);
+		if (!Result)
+			return false;
 	}
 
-	EType DstTypeKind = pDstType->GetTypeKind ();	
-	if (DstTypeKind == EType_Reference_u || DstValue.GetValueKind () == EValue_Variable)
+	if (pDstType->GetTypeKind () == EType_Reference_u || DstValue.GetValueKind () == EValue_Variable) // no need to do a range check
 	{
 		m_pModule->m_LlvmBuilder.CreateStore (pLlvmSrcValue, pLlvmDstValue, IsVolatile);
 		return true;
 	}
 
-	CheckLlvmSafePointer (pLlvmDstValue, pTargetType->GetSize (), ESafePointerAccess_Write);
-
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmDstValue, 0, "sf_ptr");
+	CheckLlvmSafePtrRange (pLlvmDstValue, pTargetType->GetSize (), ESafePtrError_Store); 
+	
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmDstValue, 0, "sp_ptr");
 	llvm::Type* pLlvmPtrType = pTargetType->GetPointerType (EType_Pointer_u)->GetLlvmType ();
 
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType, "sf_ptr_cast");
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pLlvmPtrType, "sp_ptr_cast");
 	m_pModule->m_LlvmBuilder.CreateStore (pLlvmSrcValue, pLlvmPtr, IsVolatile);
 	return true;
 }
@@ -1457,88 +1278,158 @@ COperatorMgr::CreateLlvmGep (
 }
 
 llvm::Value*
-COperatorMgr::CreateLlvmSafePointer (
+COperatorMgr::CreateLlvmSafePtr (
 	llvm::Value* pLlvmPtr,
 	llvm::Value* pLlvmParentPtr,
-	CType* pParentType
+	CType* pParentType,
+	size_t ScopeLevel
 	)
 {
 	// specialize CallOperator () for effiency
 
 	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
 
-	CValue ParentSize;
-	ParentSize.SetConstSizeT (pParentType->GetSize ());
+	CValue ParentSizeValue;
+	ParentSizeValue.SetConstSizeT (pParentType->GetSize ());
 
-	llvm::Value* LlvmArgArray [3];
-	LlvmArgArray [0] = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "sp_ptr_cast");
-	LlvmArgArray [1] = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmParentPtr, pCharPointerType->GetLlvmType (), "sp_beg_cast");
-	LlvmArgArray [2] = ParentSize.GetLlvmValue ();
+	CValue ScopeLevelValue;
+	ScopeLevelValue.SetConstSizeT (ScopeLevel);
 
-	CFunction* pCreateSafePointer = m_pModule->m_FunctionMgr.GetCreateSafePtr ();
+	llvm::Value* LlvmArgArray [4];
+	LlvmArgArray [0] = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "sptr_p_cast");
+	LlvmArgArray [1] = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmParentPtr, pCharPointerType->GetLlvmType (), "sptr_beg_cast");
+	LlvmArgArray [2] = ParentSizeValue.GetLlvmValue ();
+	LlvmArgArray [3] = ScopeLevelValue.GetLlvmValue ();
+
+	CFunction* pCreateSafePtr = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CreateSafePtr);
 
 	return m_pModule->m_LlvmBuilder.CreateCall (
-		pCreateSafePointer->GetLlvmFunction (),
+		pCreateSafePtr->GetLlvmFunction (),
 		llvm::ArrayRef <llvm::Value*> (LlvmArgArray, countof (LlvmArgArray)), 
 		"sptr"
 		);
 }
 
 llvm::Value*
-COperatorMgr::CreateLlvmDynamicPointer (
+COperatorMgr::CreateLlvmDynamicPtr (
 	llvm::Value* pLlvmPtr,
-	CType* pType
+	CType* pType,
+	size_t ScopeLevel
 	)
 {
 	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
 	
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "dp_ptr_cast");
+	CValue ScopeLevelValue;
+	ScopeLevelValue.SetConstSizeT (ScopeLevel);
+
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "dptr_p_cast");
 
 	llvm::Value* pLlvmTypePtr = CValue (pCharPointerType, &pType).GetLlvmValue ();
 
-	llvm::Value* pLlvmFatPtr = m_pModule->m_TypeMgr.GetDoublePointerStructType ()->GetLlvmUndefValue ();
+	llvm::Value* pLlvmFatPtr = m_pModule->m_TypeMgr.GetDynamicPtrStructType ()->GetLlvmUndefValue ();
 
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0, "dp_m_ptr");
-	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmTypePtr, 1, "dp_m_type");
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmPtr, 0, "dptr_p");
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, pLlvmTypePtr, 1, "dptr_type");
+	pLlvmFatPtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmFatPtr, ScopeLevelValue.GetLlvmValue (), 2, "dptr_scope");
 
 	return pLlvmFatPtr;
 }
 
 llvm::Value*
-COperatorMgr::ModifyLlvmSafePointer (
+COperatorMgr::ModifyLlvmSafePtr (
 	llvm::Value* pLlvmSafePtr,
 	llvm::Value* pLlvmPtr
 	)
 {
 	CType* pCharPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
 	
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "sp_ptr_cast");
-	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmPtr, 0, "sp_ptr");
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pCharPointerType->GetLlvmType (), "sptr_p_cast");
+	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmPtr, 0, "sptr");
 
 	return pLlvmSafePtr;
 }
 
 void
-COperatorMgr::CheckLlvmSafePointer (
+COperatorMgr::CheckLlvmSafePtrRange (
 	llvm::Value* pLlvmSafePtr,
 	size_t Size,
-	int Access
+	ESafePtrError Error
 	)
 {
 	CValue SizeValue;
 	SizeValue.SetConstSizeT (Size);
 
-	CValue AccessValue;
-	AccessValue.SetConstInt32 (Access, EType_Int);
+	CValue ErrorValue;
+	ErrorValue.SetConstInt32 (Error, EType_Int);
 
-	CFunction* pCheckSafePointer = m_pModule->m_FunctionMgr.GetCheckSafePtr ();
+	CFunction* pCheckSafePtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckSafePtrRange);
 
 	m_pModule->m_LlvmBuilder.CreateCall3 (
-		pCheckSafePointer->GetLlvmFunction (),
+		pCheckSafePtrRange->GetLlvmFunction (),
 		pLlvmSafePtr,
 		SizeValue.GetLlvmValue (),
-		AccessValue.GetLlvmValue ()
+		ErrorValue.GetLlvmValue ()
 		);
+}
+
+void
+COperatorMgr::CheckLlvmSafePtrScope (
+	llvm::Value* pLlvmSafePtr,
+	size_t ScopeLevel
+	)
+{
+	CValue ScopeLevelValue;
+	ScopeLevelValue.SetConstSizeT (ScopeLevel);
+
+	CFunction* pCheckSafePtrScope = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckSafePtrScope);
+
+	m_pModule->m_LlvmBuilder.CreateCall2 (
+		pCheckSafePtrScope->GetLlvmFunction (),
+		pLlvmSafePtr,
+		ScopeLevelValue.GetLlvmValue ()
+		);
+}
+
+bool
+COperatorMgr::CheckLlvmSafePtrScope (
+	llvm::Value* pLlvmSafePtr,
+	const CValue& SrcValue,
+	size_t DstScopeLevel
+	)
+{
+	if (SrcValue.GetValueKind () == EValue_Variable)
+	{
+		CScope* pSrcScope = SrcValue.GetVariable ()->GetScope ();
+		size_t SrcScopeLevel = pSrcScope ? pSrcScope->GetLevel () : 0;
+
+		if (SrcScopeLevel <= DstScopeLevel)
+			return true; // OK!
+
+		err::SetFormatStringError (_T("safe pointer/reference scope level mismatch"));
+		return false;
+	}
+
+	CheckLlvmSafePtrScope (pLlvmSafePtr, DstScopeLevel);
+	return true;
+}
+
+bool
+COperatorMgr::CheckLlvmSafePtrScope (
+	llvm::Value* pLlvmSafePtr,
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	if (DstValue.GetValueKind () == EValue_Variable)
+	{
+		CScope* pDstScope = DstValue.GetVariable ()->GetScope ();
+		size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
+
+		return CheckLlvmSafePtrScope (pLlvmSafePtr, SrcValue, DstScopeLevel);
+	}
+
+	CheckLlvmSafePtrScope (pLlvmSafePtr, 0);
+	return true;
 }
 
 //.............................................................................

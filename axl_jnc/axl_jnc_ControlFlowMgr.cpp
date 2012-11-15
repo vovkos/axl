@@ -144,9 +144,31 @@ CControlFlowMgr::Return (const CValue& Value)
 		CValue ReturnValue;
 		bool Result = m_pModule->m_OperatorMgr.CastOperator (Value, pReturnType, &ReturnValue);
 		if (!Result)
-			return false;
+			return false;		
 
-		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue.GetLlvmValue ());
+		llvm::Value* pLlvmValue = ReturnValue.GetLlvmValue ();
+
+		if (pReturnType->GetTypeKind () == EType_Pointer)
+		{
+			if (ReturnValue.GetValueKind () == EValue_Variable)
+			{
+				CVariable* pVariable = ReturnValue.GetVariable ();
+				CScope* pScope = pVariable->GetScope ();
+
+				pLlvmValue = m_pModule->m_OperatorMgr.CreateLlvmSafePtr (
+					pLlvmValue, 
+					pVariable->GetLlvmValue (), 
+					pVariable->GetType (),
+					pScope ? pScope->GetLevel () : 0
+					);
+			}
+
+			Result = m_pModule->m_OperatorMgr.CheckLlvmSafePtrScope (pLlvmValue, ReturnValue, 0);
+			if (!Result)
+				return false;
+		}
+
+		m_pModule->m_LlvmBuilder.CreateRet (pLlvmValue);
 	}
 
 	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));

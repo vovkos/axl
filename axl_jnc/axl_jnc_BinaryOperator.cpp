@@ -82,157 +82,36 @@ IBinaryOperator::IBinaryOperator()
 	ASSERT (m_pModule);
 
 	m_OpKind = EBinOp_None;
-}
-
-//.............................................................................
-
-void
-CBinaryOperatorOverload::Clear ()
-{
-	m_SignatureCache.Clear ();
-	m_DirectMap.Clear ();
-	m_ImplicitMap.Clear ();
-}
-
-IBinaryOperator*
-CBinaryOperatorOverload::GetOperator (
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	bool Result;
-
-	rtl::CStringA Signature = pOpType1->GetSignature () + pOpType2->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, IBinaryOperator*> It = m_DirectMap.Find (Signature);
-	if (!It)
-		It = m_ImplicitMap.Find (Signature);
-	
-	if (It)
-	{
-		IBinaryOperator* pOperator = It->m_Value;
-		if (!pOperator)
-			return NULL;
-
-		Result = pOperator->GetTypeInfo (pOpType1, pOpType2, pTypeInfo);
-		ASSERT (Result);
-		return pOperator;
-	}
-
-	// ok, we need to enumerate all overloads
-
-	IBinaryOperator* pBestOperator = NULL;
-	TBinaryOperatorTypeInfo BestTypeInfo;
-
-	for (It = m_DirectMap.GetHead (); It; It++)
-	{
-		IBinaryOperator* pOperator = It->m_Value;
-		
-		TBinaryOperatorTypeInfo TypeInfo;
-		bool Result = pOperator->GetTypeInfo (pOpType1, pOpType2, &TypeInfo);
-		if (!Result)
-			continue;
-
-		if (!pBestOperator || TypeInfo.m_CastKind < BestTypeInfo.m_CastKind)
-		{
-			pBestOperator = pOperator;
-			BestTypeInfo = TypeInfo;
-		}	
-	}
-
-	m_SignatureCache.InsertTail (Signature);
-	It = m_ImplicitMap.Goto (Signature); 
-	It->m_Value = pBestOperator;
-
-	if (pBestOperator)
-		*pTypeInfo = BestTypeInfo;
-
-	return pBestOperator;
-}
-
-IBinaryOperator*
-CBinaryOperatorOverload::AddOperator (
-	CType* pOpType1,
-	CType* pOpType2,
-	IBinaryOperator* pOperator
-	)
-{
-	rtl::CStringA Signature = pOpType1->GetSignature () + pOpType2->GetSignature ();
-	rtl::CHashTableMapIteratorT <const tchar_t*, IBinaryOperator*> It = m_DirectMap.Goto (Signature);
-
-	IBinaryOperator* pPrevOperator = It->m_Value;
-	if (!pPrevOperator)
-		m_SignatureCache.InsertTail (Signature);
-
-	It->m_Value = pOperator;
-	return pPrevOperator;
+	m_Flags = 0;
 }
 
 //.............................................................................
 
 bool
-GetStdBinaryOperatorTypeInfo (
-	CModule* pModule,
-	CType* pReturnType,
-	CType* pOpType,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
+CBinOp_Add::Operator (
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	ECast CastKind1 = pModule->m_OperatorMgr.GetCastKind (pOpType1, pOpType);
-	ECast CastKind2 = pModule->m_OperatorMgr.GetCastKind (pOpType2, pOpType);
-
-	if (!CastKind1 || !CastKind2)
-		return false;
-
-	pTypeInfo->m_CastKind = min (CastKind1, CastKind2);
-	pTypeInfo->m_pOpType1 = pOpType;
-	pTypeInfo->m_pOpType2 = pOpType;
-	pTypeInfo->m_pReturnType = pReturnType;
-	return true;
+	if (OpValue1.GetType ()->IsPointerType () && OpValue2.GetType ()->IsIntegerType ())
+		return PointerIncrementOperator (OpValue1, OpValue2, pResultValue);
+	else if (OpValue2.GetType ()->IsPointerType () && OpValue1.GetType ()->IsIntegerType ())
+		return PointerIncrementOperator (OpValue2, OpValue1, pResultValue);
+	else
+		return CBinaryArithmeticOperatorT <CBinOp_Add>::Operator (OpValue1, OpValue2, pResultValue);
 }
-
-bool
-GetStdBinaryOperatorTypeInfo (
-	CModule* pModule,
-	EType ReturnTypeKind,
-	EType OpTypeKind,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	CType* pReturnType = pModule->m_TypeMgr.GetBasicType (ReturnTypeKind);
-	CType* pOpType = pModule->m_TypeMgr.GetBasicType (OpTypeKind);
-	return GetStdBinaryOperatorTypeInfo (pModule, pReturnType, pOpType, pOpType1, pOpType2, pTypeInfo);
-}
-
-bool
-GetCmpBinaryOperatorTypeInfo (
-	CModule* pModule,
-	CType* pOpType,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	CType* pReturnType = pModule->m_TypeMgr.GetBasicType (EType_Bool);
-	return GetStdBinaryOperatorTypeInfo (pModule, pReturnType, pOpType, pOpType1, pOpType2, pTypeInfo);
-}
-
-//.............................................................................
 
 llvm::Value*
 CBinOp_Add::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateAdd (pOpValue1, pOpValue2, "add_i");
 }
-
 	
 llvm::Value*
 CBinOp_Add::LlvmOpFp (
@@ -244,13 +123,30 @@ CBinOp_Add::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFAdd (pOpValue1, pOpValue2, "add_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
+
+bool
+CBinOp_Sub::Operator (
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
+	)
+{
+	if (OpValue1.GetType ()->IsPointerType () && OpValue2.GetType ()->IsIntegerType ())
+		return PointerIncrementOperator (OpValue1, OpValue2, pResultValue);
+	else if (OpValue1.GetType ()->IsPointerType () && OpValue2.GetType ()->IsPointerType ())
+		return PointerDifferenceOperator (OpValue1, OpValue2, pResultValue);
+	else
+		return CBinaryArithmeticOperatorT <CBinOp_Sub>::Operator (OpValue1, OpValue2, pResultValue);
+
+}
 
 llvm::Value*
 CBinOp_Sub::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateSub (pOpValue1, pOpValue2, "sub_i");
@@ -267,13 +163,50 @@ CBinOp_Sub::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFSub (pOpValue1, pOpValue2, "sub_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-	
+bool
+CBinOp_Sub::PointerDifferenceOperator (
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2,
+	CValue* pResultValue
+	)
+{
+	ASSERT (RawOpValue1.GetType ()->IsPointerType ());
+
+	CType* pBaseType = ((CPointerType*) RawOpValue1.GetType ())->GetBaseType ()->GetUnqualifiedType ();
+	CPointerType* pPointerType = pBaseType->GetPointerType (EType_Pointer_u);
+
+	CValue OpValue1;
+	CValue OpValue2;
+
+	bool Result = 
+		m_pModule->m_OperatorMgr.CastOperator (RawOpValue1, pPointerType, &OpValue1) &&
+		m_pModule->m_OperatorMgr.CastOperator (RawOpValue2, pPointerType, &OpValue2);
+
+	if (!Result)
+		return false;
+
+	CType* pType = m_pModule->m_TypeMgr.GetBasicType (EType_SizeT);
+
+	CValue SizeValue;
+	SizeValue.SetConstSizeT (pBaseType->GetSize ());
+
+	llvm::Value* pLlvmOp1 = m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue1.GetLlvmValue (), pType->GetLlvmType (), "ptr1_i");
+	llvm::Value* pLlvmOp2 = m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue2.GetLlvmValue (), pType->GetLlvmType (), "ptr2_i");
+	llvm::Value* pLlvmDiff = m_pModule->m_LlvmBuilder.CreateSub (pLlvmOp1, pLlvmOp2, "ptr_diff_i");
+	pLlvmDiff = m_pModule->m_LlvmBuilder.CreateUDiv (pLlvmDiff, SizeValue.GetLlvmValue (), "ptr_diff");
+
+	pResultValue->SetLlvmRegister (pLlvmDiff, pType);
+	return true;
+}
+
+//.............................................................................
+
 llvm::Value*
 CBinOp_Mul::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateMul (pOpValue1, pOpValue2, "mul_i");
@@ -289,13 +222,14 @@ CBinOp_Mul::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFMul (pOpValue1, pOpValue2, "mul_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Div::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateSDiv (pOpValue1, pOpValue2, "div_i");
@@ -312,97 +246,79 @@ CBinOp_Div::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFDiv (pOpValue1, pOpValue2, "div_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-	
-llvm::Value*
-CBinOp_Div_u::LlvmOpInt (
-	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
-	)
-{
-	return pModule->m_LlvmBuilder.CreateUDiv (pOpValue1, pOpValue2, "div_u");
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Mod::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateSRem (pOpValue1, pOpValue2, "mod");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-llvm::Value*
-CBinOp_Mod_u::LlvmOpInt (
-	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
-	)
-{
-	return pModule->m_LlvmBuilder.CreateURem (pOpValue1, pOpValue2, "mod_u");
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Shl::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateShl (pOpValue1, pOpValue2, "shl");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Shr::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateLShr (pOpValue1, pOpValue2, "shr");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_BitwiseAnd::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateAnd (pOpValue1, pOpValue2, "and");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_BitwiseOr::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateOr (pOpValue1, pOpValue2, "or");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_BitwiseXor::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateXor (pOpValue1, pOpValue2, "xor");
@@ -414,7 +330,8 @@ llvm::Value*
 CBinOp_Eq::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
 	return pModule->m_LlvmBuilder.CreateICmpEQ (pOpValue1, pOpValue2, "eq_i");
@@ -430,16 +347,17 @@ CBinOp_Eq::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFCmpOEQ (pOpValue1, pOpValue2, "eq_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Ne::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpNE (pOpValue1, pOpValue2, "ne_u");
+	return pModule->m_LlvmBuilder.CreateICmpNE (pOpValue1, pOpValue2, "ne_i");
 }
 
 llvm::Value*
@@ -452,16 +370,19 @@ CBinOp_Ne::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFCmpONE (pOpValue1, pOpValue2, "ne_f");
 }
 	
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Lt::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSLT (pOpValue1, pOpValue2, "lt_i");
+	return IsUnsigned ? 
+		pModule->m_LlvmBuilder.CreateICmpULT (pOpValue1, pOpValue2, "lt_u") :
+		pModule->m_LlvmBuilder.CreateICmpSLT (pOpValue1, pOpValue2, "lt_i");
 }
 
 llvm::Value*
@@ -474,28 +395,19 @@ CBinOp_Lt::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFCmpOLT (pOpValue1, pOpValue2, "lt_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-llvm::Value*
-CBinOp_Lt_u::LlvmOpInt (
-	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
-	)
-{
-	return pModule->m_LlvmBuilder.CreateICmpULT (pOpValue1, pOpValue2, "lt_u");
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Le::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSLE (pOpValue1, pOpValue2, "le_i");
+	return IsUnsigned ? 
+		pModule->m_LlvmBuilder.CreateICmpULE (pOpValue1, pOpValue2, "le_u") :
+		pModule->m_LlvmBuilder.CreateICmpSLE (pOpValue1, pOpValue2, "le_i");
 }
 
 llvm::Value*
@@ -508,28 +420,19 @@ CBinOp_Le::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFCmpOLE (pOpValue1, pOpValue2, "le_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-llvm::Value*
-CBinOp_Le_u::LlvmOpInt (
-	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
-	)
-{
-	return pModule->m_LlvmBuilder.CreateICmpULE (pOpValue1, pOpValue2, "le_u");
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Gt::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSGT (pOpValue1, pOpValue2, "gt_i");
+	return IsUnsigned ? 
+		pModule->m_LlvmBuilder.CreateICmpUGT (pOpValue1, pOpValue2, "gt_u") :
+		pModule->m_LlvmBuilder.CreateICmpSGT (pOpValue1, pOpValue2, "gt_i");
 }
 
 llvm::Value*
@@ -542,28 +445,19 @@ CBinOp_Gt::LlvmOpFp (
 	return pModule->m_LlvmBuilder.CreateFCmpOGT (pOpValue1, pOpValue2, "gt_f");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-llvm::Value*
-CBinOp_Gt_u::LlvmOpInt (
-	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
-	)
-{
-	return pModule->m_LlvmBuilder.CreateICmpUGT (pOpValue1, pOpValue2, "gt_u");
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 llvm::Value*
 CBinOp_Ge::LlvmOpInt (
 	CModule* pModule,
 	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	llvm::Value* pOpValue2,
+	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpSGE (pOpValue1, pOpValue2, "ge_i");
+	return IsUnsigned ? 
+		pModule->m_LlvmBuilder.CreateICmpUGE (pOpValue1, pOpValue2, "ge_u") :
+		pModule->m_LlvmBuilder.CreateICmpSGE (pOpValue1, pOpValue2, "ge_i");
 }
 
 llvm::Value*
@@ -574,18 +468,6 @@ CBinOp_Ge::LlvmOpFp (
 	)
 {
 	return pModule->m_LlvmBuilder.CreateFCmpOGE (pOpValue1, pOpValue2, "ge_f");
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-llvm::Value*
-CBinOp_Ge_u::LlvmOpInt (
-	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
-	)
-{
-	return pModule->m_LlvmBuilder.CreateICmpUGE (pOpValue1, pOpValue2, "ge_u");
 }
 
 //.............................................................................

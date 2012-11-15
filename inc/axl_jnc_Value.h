@@ -216,13 +216,26 @@ public:
 	}
 
 	void
+	OverrideType (EType TypeKind);
+
+	void
 	OverrideType (
 		const CValue& Value,
 		CType* pType
 		)
 	{
 		*this = Value;
-		m_pType = pType;
+		OverrideType (pType);
+	}
+
+	void
+	OverrideType (
+		const CValue& Value,
+		EType TypeKind
+		)
+	{
+		*this = Value;
+		OverrideType (TypeKind);
 	}
 
 	void
@@ -403,6 +416,7 @@ public:
 struct TObject
 {
 	class CClassType* m_pType;
+	size_t m_ScopeLevel;
 
 	// followed by TInterface of the object
 };
@@ -421,25 +435,27 @@ struct TInterface
 
 // *safe, &safe
 
-struct TSafePointer
+struct TSafePtr
 {
 	void* m_p;
 	void* m_pRegionBegin;
 	void* m_pRegionEnd;
+	size_t m_ScopeLevel;
 };
 
 // *dynamic, &dynamic
 
-struct TDynamicPointer
+struct TDynamicPtr
 {
 	void* m_p;
 	CType* m_pType;
+	size_t m_ScopeLevel;
 };
 
 // structure backing up function pointer declared like
 // typedef void FMethod ();
 
-struct TFunctionPointer
+struct TFunctionPtr
 {
 	void* m_pfn;
 	TInterface* m_pInterface;
@@ -447,10 +463,11 @@ struct TFunctionPointer
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESafePointerAccess
+enum ESafePtrError
 {
-	ESafePointerAccess_Read  = 0,
-	ESafePointerAccess_Write = 1,
+	ESafePtrError_Load = 0,
+	ESafePtrError_Store,
+	ESafePtrError_ScopeMismatch,
 };
 
 //.............................................................................

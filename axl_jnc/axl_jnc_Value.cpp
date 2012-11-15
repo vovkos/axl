@@ -194,7 +194,7 @@ CValue::GetLlvmConst (
 
 	case EType_Pointer:
 	case EType_Reference:
-		pLlvmConst = CLlvmPodStruct::Get (pType->GetModule ()->m_TypeMgr.GetTriplePointerStructType (), p);
+		pLlvmConst = CLlvmPodStruct::Get (pType->GetModule ()->m_TypeMgr.GetSafePtrStructType (), p);
 		break;
 
 	case EType_Pointer_u:
@@ -217,6 +217,16 @@ CValue::GetLlvmConst (
 	}
 
 	return pLlvmConst;
+}
+
+void
+CValue::OverrideType (EType TypeKind)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
+	OverrideType (pType);
 }
 
 void

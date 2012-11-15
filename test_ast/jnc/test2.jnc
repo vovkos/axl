@@ -304,3 +304,107 @@ struct pack (4) TStruct
 };
 
 //.............................................................................
+
+typedef unsigned int8  uint8_t,  uchar_t,  byte_t;
+typedef unsigned int16 uint16_t, ushort_t, word_t;
+typedef unsigned int32 uint32_t, ulong_t,  dword_t;
+typedef unsigned int64 uint64_t, qword_t;
+typedef bigendian int16 beint16_t;
+typedef bigendian int32 beint32_t;
+typedef bigendian int64 beint64_t;
+typedef bigendian unsigned int16 beuint16_t, beushort_t, beword_t;
+typedef bigendian unsigned int32 beuint32_t, beulong_t,  bedword_t;
+typedef bigendian unsigned int64 beuint64_t, beqword_t;
+
+typedef unsigned int32 size_t;
+
+typedef const char* unsafe pchar_t;
+typedef const char* pchar2_t;
+
+//.............................................................................
+
+struct TPoint
+{
+	int m_x;
+	int m_y;
+	int m_z;
+};
+
+int
+main ()
+{	
+	TPoint Point;
+
+	int a = 1, b = 2, c = 3;
+
+	int* p1 = &Point.m_x;
+	int* p2 = &Point.m_y;
+
+	int x = p2 - p1;
+
+	printf ("diff = %d\n", x);
+
+
+/*	TPoint Point;
+	TPoint* p = &Point;
+	 
+//	p += 1;
+	p->m_x = 5;
+	int zz = p->m_x;
+
+	printf ("SUCCESS!\n");
+
+	int a = test (100, 20, 30);
+	printf ("test returned %d\n", a);
+
+	int i;
+	for (i = 0; i < 10; i++)
+	{
+		printf ("hui govno i muravei %d\n", i);
+	}
+
+	Point.m_x = 10;
+	Point.m_y = 20;
+	Point.m_z = 30;
+
+	printf ("Point { %d, %d, %d }\n", Point.m_x, Point.m_y, Point.m_z);
+
+	TPoint* pPoint = &Point;
+
+	pPoint->m_x = 40;
+	pPoint->m_y = 50;
+	pPoint->m_z = 60;
+
+	printf ("Point { %d, %d, %d }\n", Point.m_x, Point.m_y, Point.m_z);
+
+	int32 x, y, z;
+
+	int32* safe p1 = &x; 
+	int32* safe p2 = p1; 
+//	int32* unsafe p2 = &x; 
+//	int32* dynamic p3 = &x; 
+
+	y = *p1;
+	y = *p2;
+*/
+	return 5;
+}
+
+int
+test (
+	int x, 
+	int y,
+	int z
+	)
+{
+	printf ("test (%d, %d, %d)\n", x, y, z);
+	return x + y + z;
+}
+
+void
+printf (
+	char* unsafe pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

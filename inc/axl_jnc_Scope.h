@@ -21,6 +21,8 @@ class CScope:
 protected:
 	friend class CNamespaceMgr;
 
+	size_t m_Level;
+
 	CToken::CPos m_PosEnd;
 
 	void* m_pCodeBegin;
@@ -33,6 +35,12 @@ protected:
 
 public:
 	CScope ();
+
+	size_t
+	GetLevel ()
+	{
+		return m_Level;
+	}
 
 	CToken::CPos 
 	GetPosEnd ()

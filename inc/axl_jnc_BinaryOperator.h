@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "axl_rtl_StringHashTable.h"
-#include "axl_jnc_CastOperator.h"
+#include "axl_jnc_UnaryOperator.h"
 
 namespace axl {
 namespace jnc {
@@ -19,9 +18,9 @@ enum EBinOp
 	EBinOp_Sub,
 	EBinOp_Mul,
 	EBinOp_Div,
-	EBinOp_Mod,
+	EBinOp_Mod,	
 	EBinOp_Shl,
-	EBinOp_Shr,
+	EBinOp_Shr,	
 	EBinOp_BitwiseAnd,
 	EBinOp_BitwiseOr,
 	EBinOp_BitwiseXor,	
@@ -34,6 +33,7 @@ enum EBinOp
 	EBinOp_LogicalAnd,
 	EBinOp_LogicalOr,
 	EBinOp_Idx,
+
 	EBinOp__Count,
 };
 
@@ -44,23 +44,13 @@ GetBinOpString (EBinOp OpKind);
 
 //.............................................................................
 
-struct TBinaryOperatorTypeInfo
-{
-	CType* m_pReturnType;
-	CType* m_pOpType1;
-	CType* m_pOpType2;
-
-	ECast m_CastKind;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 [uuid ("e205fc7b-e75e-4cc6-88f7-336701c9645a")]
 struct IBinaryOperator: obj::IRoot
 {	
 protected:
 	CModule* m_pModule;
 	EBinOp m_OpKind;
+	int m_Flags;
 
 public:
 	IBinaryOperator ();
@@ -77,577 +67,363 @@ public:
 		return m_OpKind;
 	}
 
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		) = 0;
+	int
+	GetFlags ()
+	{
+		return m_Flags;
+	}
 
 	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue	
-		) = 0;
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue	
-		) = 0;
-
 	bool
 	Operator (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CValue* pResultValue
+		) = 0;
+
+	err::CError
+	SetOperatorError (		
+		CType* pOpType1,
+		CType* pOpType2
 		)
 	{
-		return OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind () == EValue_Const ? 
-			ConstOperator (OpValue1, OpValue2, pResultValue) : 
-			LlvmOperator (OpValue1, OpValue2, pResultValue);
+		return err::SetFormatStringError (
+			_T("binary '%s' cannot be applied to '%s' and '%s'"),
+			GetBinOpString (m_OpKind),
+			pOpType1->GetTypeString (),
+			pOpType2->GetTypeString ()
+			);
 	}
 };
 
 //.............................................................................
 
-class CBinaryOperatorOverload
+template <typename T>
+class CBinaryArithmeticOperatorT: public IBinaryOperator
+{
+public:
+	CBinaryArithmeticOperatorT ()
+	{
+		m_Flags = EOpFlag_LoadReference | EOpFlag_EnumToInt | EOpFlag_BoolToInt;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& RawOpValue1,
+		const CValue& RawOpValue2,
+		CValue* pResultValue
+		)
+	{
+		CType* pOpType1 = RawOpValue1.GetType ();
+		CType* pOpType2 = RawOpValue2.GetType ();
+		CType* pMaxOpType = pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2;
+
+		CType* pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
+		if (!pType)
+		{
+			SetOperatorError (pOpType1, pOpType2);
+			return false;
+		}
+
+		CValue OpValue1;
+		CValue OpValue2;
+
+		bool Result = 
+			m_pModule->m_OperatorMgr.CastOperator (RawOpValue1, pType, &OpValue1) &&
+			m_pModule->m_OperatorMgr.CastOperator (RawOpValue2, pType, &OpValue2);
+		
+		if (!Result)
+			return false;
+
+		if (OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind () == EValue_Const)
+		{
+			EType TypeKind = pType->GetTypeKind ();
+			switch (TypeKind)
+			{
+			case EType_Int32:
+			case EType_Int32_u:
+				pResultValue->SetConstInt32 (
+					T::ConstOpInt32 (
+						OpValue1.GetInt32 (), 
+						OpValue2.GetInt32 (), 
+						pType->IsUnsignedType ()
+						), 
+					pType
+					);
+				break;
+
+			case EType_Int64:
+			case EType_Int64_u:
+				pResultValue->SetConstInt32 (
+					T::ConstOpInt32 (
+						OpValue1.GetInt32 (), 
+						OpValue2.GetInt32 (), 
+						pType->IsUnsignedType ()
+						), 
+					pType
+					);
+				break;
+
+			case EType_Float:
+				pResultValue->SetConstFloat (T::ConstOpFp32 (OpValue1.GetFloat (), OpValue2.GetFloat ()));
+				break;
+
+			case EType_Double:
+				pResultValue->SetConstDouble (T::ConstOpFp64 (OpValue1.GetDouble (), OpValue2.GetDouble ()));
+				break;
+
+			default:
+				ASSERT (false);
+			}
+		}
+		else
+		{
+			EType TypeKind = pType->GetTypeKind ();
+			switch (TypeKind)
+			{
+			case EType_Int32:
+			case EType_Int32_u:
+			case EType_Int64:
+			case EType_Int64_u:
+				pResultValue->SetLlvmRegister (
+					T::LlvmOpInt (
+						m_pModule, 
+						OpValue1.GetLlvmValue (), 
+						OpValue2.GetLlvmValue (), 
+						pType->IsUnsignedType ()
+						), 
+					pType
+					);
+				break;
+
+			case EType_Float:
+			case EType_Double:
+				pResultValue->SetLlvmRegister (
+					T::LlvmOpFp (
+						m_pModule, 
+						OpValue1.GetLlvmValue (), 
+						OpValue2.GetLlvmValue ()
+						), 
+					pType
+					);
+				break;
+
+			default:
+				ASSERT (false);
+			}
+		}
+
+		return true;
+	}
+};
+
+//.............................................................................
+
+template <typename T>
+class CBinaryRelationalOperatorT: public IBinaryOperator
+{
+public:
+	CBinaryRelationalOperatorT ()
+	{
+		m_Flags = EOpFlag_LoadReference | EOpFlag_EnumToInt | EOpFlag_BoolToInt;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& RawOpValue1,
+		const CValue& RawOpValue2,
+		CValue* pResultValue
+		)
+	{
+		CType* pOpType1 = RawOpValue1.GetType ();
+		CType* pOpType2 = RawOpValue2.GetType ();
+		CType* pMaxOpType = pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2;
+
+		CType* pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
+		if (!pType)
+		{
+			err::SetFormatStringError (
+				_T("relational '%s' cannot be applied to '%s' and '%s'"),
+				GetBinOpString (m_OpKind),
+				pOpType1->GetTypeString (),
+				pOpType2->GetTypeString ()
+				);
+			return false;
+		}
+
+		CValue OpValue1;
+		CValue OpValue2;
+
+		bool Result = 
+			m_pModule->m_OperatorMgr.CastOperator (RawOpValue1, pType, &OpValue1) &&
+			m_pModule->m_OperatorMgr.CastOperator (RawOpValue2, pType, &OpValue2);
+		
+		if (!Result)
+			return false;
+
+		if (OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind () == EValue_Const)
+		{
+			EType TypeKind = pType->GetTypeKind ();
+			switch (TypeKind)
+			{
+			case EType_Int32:
+			case EType_Int32_u:
+				pResultValue->SetConstBool (
+					T::ConstOpInt32 (
+						OpValue1.GetInt32 (), 
+						OpValue2.GetInt32 (), 
+						pType->IsUnsignedType ()
+						)
+					);
+				break;
+
+			case EType_Int64:
+			case EType_Int64_u:
+				pResultValue->SetConstBool (
+					T::ConstOpInt32 (
+						OpValue1.GetInt32 (), 
+						OpValue2.GetInt32 (), 
+						pType->IsUnsignedType ()
+						)
+					);
+				break;
+
+			case EType_Float:
+				pResultValue->SetConstBool (T::ConstOpFp32 (OpValue1.GetFloat (), OpValue2.GetFloat ()));
+				break;
+
+			case EType_Double:
+				pResultValue->SetConstBool (T::ConstOpFp64 (OpValue1.GetDouble (), OpValue2.GetDouble ()));
+				break;
+
+			default:
+				ASSERT (false);
+			}
+		}
+		else
+		{
+			EType TypeKind = pType->GetTypeKind ();
+			switch (TypeKind)
+			{
+			case EType_Int32:
+			case EType_Int32_u:
+			case EType_Int64:
+			case EType_Int64_u:
+				pResultValue->SetLlvmRegister (
+					T::LlvmOpInt (
+						m_pModule, 
+						OpValue1.GetLlvmValue (), 
+						OpValue2.GetLlvmValue (), 
+						pType->IsUnsignedType ()
+						), 
+					EType_Bool
+					);
+				break;
+
+			case EType_Float:
+			case EType_Double:
+				pResultValue->SetLlvmRegister (
+					T::LlvmOpFp (
+						m_pModule, 
+						OpValue1.GetLlvmValue (), 
+						OpValue2.GetLlvmValue ()
+						), 
+					EType_Bool
+					);
+				break;
+
+			default:
+				ASSERT (false);
+			}
+		}
+
+		return true;
+	}
+};
+
+//.............................................................................
+
+template <typename T>
+class CBinOpT_AddSub: public CBinaryArithmeticOperatorT <T>
 {
 protected:
-	rtl::CBoxListT <rtl::CString> m_SignatureCache;
-	rtl::CArrayT <IBinaryOperator*> m_OperatorArray;
-	rtl::CStringHashTableMapAT <IBinaryOperator*> m_DirectMap;
-	rtl::CStringHashTableMapAT <IBinaryOperator*> m_ImplicitMap;
-
-public:
-	void
-	Clear ();
-
-	IBinaryOperator*
-	GetOperator (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		);
-
-	void
-	AddOperator (IBinaryOperator* pOperator);
-
-	IBinaryOperator*
-	AddOperator (
-		CType* pOpType1,
-		CType* pOpType2,
-		IBinaryOperator* pOperator
-		);
-};
-
-//.............................................................................
-
-bool
-GetStdBinaryOperatorTypeInfo (
-	CModule* pModule,
-	CType* pReturnType,
-	CType* pOpType,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	);
-
-bool
-GetStdBinaryOperatorTypeInfo (
-	CModule* pModule,
-	EType ReturnTypeKind,
-	EType OpTypeKind,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	);
-
-inline
-bool
-GetArithmeticBinaryOperatorTypeInfo (
-	CModule* pModule,
-	CType* pOpType,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	return GetStdBinaryOperatorTypeInfo (pModule, pOpType, pOpType, pOpType1, pOpType2, pTypeInfo);
-}
-
-inline
-bool
-GetArithmeticBinaryOperatorTypeInfo (
-	CModule* pModule,
-	EType OpTypeKind,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	return GetStdBinaryOperatorTypeInfo (pModule, OpTypeKind, OpTypeKind, pOpType1, pOpType2, pTypeInfo);
-}
-
-bool
-GetCmpBinaryOperatorTypeInfo (
-	CModule* pModule,
-	CType* pOpType,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	);
-
-inline
-bool
-GetCmpBinaryOperatorTypeInfo (
-	CModule* pModule,
-	EType OpTypeKind,
-	CType* pOpType1,
-	CType* pOpType2,
-	TBinaryOperatorTypeInfo* pTypeInfo
-	)
-{
-	return GetStdBinaryOperatorTypeInfo (pModule, EType_Bool, OpTypeKind, pOpType1, pOpType2, pTypeInfo);
-}
-
-//.............................................................................
-
-template <typename T>
-class CBinOpT_i32: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_i32, IBinaryOperator)
-
-public:
-	CBinOpT_i32 ()
+	CBinOpT_AddSub ()
 	{
-		m_OpKind = (EBinOp) T::OpKind;
+		m_Flags |= EOpFlag_ArrayToPointer;
 	}
 
-	virtual
 	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
+	PointerIncrementOperator (
+		const CValue& PointerValue,
+		const CValue& RawIncrementValue,
+		CValue* pResultValue
 		)
 	{
-		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Int32, pOpType1, pOpType2, pTypeInfo);
-	}
+		bool Result;
 
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		long Integer = T::ConstOpInt32 (OpValue1.GetInt32 (), OpValue2.GetInt32 ());
-		pResultValue->SetConstInt32 (Integer);
-		return true;
-	}
+		CValue IncrementValue = RawIncrementValue;
+		CValue SizeValue;
 
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int32);
-		return true;
-	}
-};
+		llvm::Value* pLlvmValue;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+		EType PointerTypeKind = PointerValue.GetType ()->GetTypeKind ();
+		switch (PointerTypeKind)
+		{
+		case EType_Pointer:
+			SizeValue.SetConstSizeT (((CPointerType*) PointerValue.GetType ())->GetBaseType ()->GetSize ());
+		
+			Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Mul, &IncrementValue, SizeValue);
+			if (!Result)
+				return false;
 
-template <typename T>
-class CBinOpT_i64: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_i64, IBinaryOperator)
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateExtractValue (PointerValue.GetLlvmValue (), 0, "sp_ptr");
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmValue, IncrementValue.GetLlvmValue (), "sp_ptr_inc");
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateInsertValue (PointerValue.GetLlvmValue (), pLlvmValue, 0, "sp_ptr");
+			break;
 
-public:
-	CBinOpT_i64 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
+		case EType_Pointer_u:
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateGEP (PointerValue.GetLlvmValue (), IncrementValue.GetLlvmValue (), "ptr_inc");
+			break;
 
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Int64, pOpType1, pOpType2, pTypeInfo);
-	}
+		default:
+			SetOperatorError (PointerValue.GetType (), IncrementValue.GetType ());
+			return false;
+		}
 
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		int64_t Integer = T::ConstOpInt64 (OpValue1.GetInt64 (), OpValue2.GetInt64 ());
-		pResultValue->SetConstInt64 (Integer);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Int64);
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CBinOpT_f32: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_f32, IBinaryOperator)
-
-public:
-	CBinOpT_f32 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
-
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Float, pOpType1, pOpType2, pTypeInfo);
-	}
-
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		float Float = T::ConstOpFp32 (OpValue1.GetFloat (), OpValue2.GetFloat ());
-		pResultValue->SetConstFloat (Float);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Float);
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CBinOpT_f64: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_f64, IBinaryOperator)
-
-public:
-	CBinOpT_f64 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
-
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetArithmeticBinaryOperatorTypeInfo (m_pModule, EType_Double, pOpType1, pOpType2, pTypeInfo);
-	}
-
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		double Double = T::ConstOpFp64 (OpValue1.GetDouble (), OpValue2.GetDouble ());
-		pResultValue->SetConstDouble (Double);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Double);
+		pResultValue->SetLlvmRegister (pLlvmValue, PointerValue.GetType ());
 		return true;
 	}
 };
 
 //.............................................................................
 
-template <typename T>
-class CBinOpT_cmp_i32: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_cmp_i32, IBinaryOperator)
-
-public:
-	CBinOpT_cmp_i32 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
-
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetCmpBinaryOperatorTypeInfo (m_pModule, EType_Int32, pOpType1, pOpType2, pTypeInfo);
-	}
-
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		bool Bool = T::ConstOpInt32 (OpValue1.GetInt32 (), OpValue2.GetInt32 ());
-		pResultValue->SetConstBool (Bool);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CBinOpT_cmp_i64: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_cmp_i64, IBinaryOperator)
-
-public:
-	CBinOpT_cmp_i64 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
-
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetCmpBinaryOperatorTypeInfo (m_pModule, EType_Int64, pOpType1, pOpType2, pTypeInfo);
-	}
-
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		bool Bool = T::ConstOpInt64 (OpValue1.GetInt64 (), OpValue2.GetInt64 ());
-		pResultValue->SetConstBool (Bool);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpInt (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CBinOpT_cmp_f32: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_cmp_f32, IBinaryOperator)
-
-public:
-	CBinOpT_cmp_f32 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
-
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetCmpBinaryOperatorTypeInfo (m_pModule, EType_Float, pOpType1, pOpType2, pTypeInfo);
-	}
-
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		bool Bool = T::ConstOpFp32 (OpValue1.GetFloat (), OpValue2.GetFloat ());
-		pResultValue->SetConstBool (Bool);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
-		return true;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CBinOpT_cmp_f64: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOpT_cmp_f64, IBinaryOperator)
-
-public:
-	CBinOpT_cmp_f64 ()
-	{
-		m_OpKind = (EBinOp) T::OpKind;
-	}
-
-	virtual
-	bool
-	GetTypeInfo (
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		return GetCmpBinaryOperatorTypeInfo (m_pModule, EType_Double, pOpType1, pOpType2, pTypeInfo);
-	}
-
-	virtual
-	bool
-	ConstOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		bool Bool = T::ConstOpFp64 (OpValue1.GetDouble (), OpValue2.GetDouble ());
-		pResultValue->SetConstBool (Bool);
-		return true;
-	}
-
-	virtual
-	bool
-	LlvmOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue		
-		)
-	{
-		llvm::Value* pLlvmResultValue = T::LlvmOpFp (m_pModule, OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue ());
-		pResultValue->SetLlvmRegister (pLlvmResultValue, EType_Bool);
-		return true;
-	}
-};
-
-//.............................................................................
-
-class CBinOp_Add
+class CBinOp_Add: public CBinOpT_AddSub <CBinOp_Add>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Add
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Add, IBinaryOperator)
 
 public:
+	CBinOp_Add ()
+	{
+		m_OpKind = EBinOp_Add;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 + OpValue2;
@@ -657,7 +433,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 + OpValue2;
@@ -688,7 +465,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -700,22 +478,33 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Sub
+class CBinOp_Sub: public CBinOpT_AddSub <CBinOp_Sub>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Sub
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Sub, IBinaryOperator)
 
 public:
+	CBinOp_Sub ()
+	{
+		m_OpKind = EBinOp_Sub;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 - OpValue2;
@@ -725,7 +514,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 - OpValue2;
@@ -756,7 +546,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -766,24 +557,35 @@ public:
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
 		);
+
+protected:
+	bool
+	PointerDifferenceOperator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Mul
+class CBinOp_Mul: public CBinaryArithmeticOperatorT <CBinOp_Mul>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Mul
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Mul, IBinaryOperator)
 
 public:
+	CBinOp_Mul ()
+	{
+		m_OpKind = EBinOp_Mul;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 * OpValue2;
@@ -793,7 +595,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 * OpValue2;
@@ -824,7 +627,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -836,35 +640,39 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Div
+class CBinOp_Div: public CBinaryArithmeticOperatorT <CBinOp_Div>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Div
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Div, IBinaryOperator)
 
 public:
+	CBinOp_Div ()
+	{
+		m_OpKind = EBinOp_Div;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
-		return OpValue1 / OpValue2;
+		return IsUnsigned ? (ulong_t) OpValue1 / (ulong_t) OpValue2 : OpValue1 / OpValue2;
 	}
 
 	static
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
-		return OpValue1 / OpValue2;
+		return IsUnsigned ? (uint64_t) OpValue1 / (uint64_t) OpValue2 : OpValue1 / OpValue2;
 	}
 
 	static
@@ -892,7 +700,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -904,75 +713,82 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Div_u
+template <typename T>
+class CBinOpT_IntegerOnly: public CBinaryArithmeticOperatorT <T>
 {	
 public:
-	enum
+	CBinOpT_IntegerOnly ()
 	{
-		 OpKind = EBinOp_Div
-	};
-
-public:
-	static
-	ulong_t
-	ConstOpInt32 (
-		ulong_t OpValue1,
-		ulong_t OpValue2
-		) 
-	{
-		return OpValue1 / OpValue2;
+		 m_Flags |= EOpFlag_IntegerOnly;
 	}
 
 	static
-	uint64_t
-	ConstOpInt64 (
-		uint64_t OpValue1,
-		uint64_t OpValue2
+	float
+	ConstOpFp32 (
+		float OpValue1,
+		float OpValue2
 		)
 	{
-		return OpValue1 / OpValue2;
+		return 0;
+	}
+
+	static
+	double
+	ConstOpFp64 (
+		double OpValue1,
+		double OpValue2
+		)
+	{
+		return 0;
 	}
 
 	static
 	llvm::Value*
-	LlvmOpInt (
+	LlvmOpFp (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
-		);
+		)
+	{
+		return NULL;
+	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Mod
+class CBinOp_Mod: public CBinOpT_IntegerOnly <CBinOp_Mod>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Mod
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Mod, IBinaryOperator)
 
 public:
+	CBinOp_Mod ()
+	{
+		m_OpKind = EBinOp_Mod;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
-		return OpValue1 % OpValue2;
+		return IsUnsigned ? (ulong_t) OpValue1 % (ulong_t) OpValue2 : OpValue1 % OpValue2;
 	}
 
 	static
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
-		return OpValue1 % OpValue2;
+		return IsUnsigned ? (uint64_t) OpValue1 % (uint64_t) OpValue2 : OpValue1 % OpValue2;
 	}
 
 	static
@@ -980,66 +796,30 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Mod_u
+class CBinOp_Shl: public CBinOpT_IntegerOnly <CBinOp_Shl>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Mod
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Shl, IBinaryOperator)
 
 public:
-	static
-	ulong_t
-	ConstOpInt32 (
-		ulong_t OpValue1,
-		ulong_t OpValue2
-		) 
+	CBinOp_Shl ()
 	{
-		return OpValue1 % OpValue2;
+		m_OpKind = EBinOp_Shl;
 	}
 
-	static
-	uint64_t
-	ConstOpInt64 (
-		uint64_t OpValue1,
-		uint64_t OpValue2
-		)
-	{
-		return OpValue1 % OpValue2;
-	}
-
-	static
-	llvm::Value*
-	LlvmOpInt (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinOp_Shl
-{	
-public:
-	enum
-	{
-		 OpKind = EBinOp_Shl
-	};
-
-public:
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 << OpValue2;
@@ -1049,7 +829,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 << OpValue2;
@@ -1060,26 +841,30 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Shr
+class CBinOp_Shr: public CBinOpT_IntegerOnly <CBinOp_Shr>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_Shr
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Shr, IBinaryOperator)
 
 public:
+	CBinOp_Shr ()
+	{
+		m_OpKind = EBinOp_Shr;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 >> OpValue2;
@@ -1089,7 +874,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 >> OpValue2;
@@ -1100,26 +886,30 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_BitwiseAnd
+class CBinOp_BitwiseAnd: public CBinOpT_IntegerOnly <CBinOp_BitwiseAnd>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_BitwiseAnd
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_BitwiseAnd, IBinaryOperator)
 
 public:
+	CBinOp_BitwiseAnd ()
+	{
+		m_OpKind = EBinOp_BitwiseAnd;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 & OpValue2;
@@ -1129,7 +919,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 & OpValue2;
@@ -1140,26 +931,30 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_BitwiseOr
+class CBinOp_BitwiseOr: public CBinOpT_IntegerOnly <CBinOp_BitwiseOr>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_BitwiseOr
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_BitwiseOr, IBinaryOperator)
 
 public:
+	CBinOp_BitwiseOr ()
+	{
+		m_OpKind = EBinOp_BitwiseOr;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 | OpValue2;
@@ -1169,7 +964,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 | OpValue2;
@@ -1180,26 +976,30 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CBinOp_BitwiseXor
+class CBinOp_BitwiseXor: public CBinOpT_IntegerOnly <CBinOp_BitwiseXor>
 {	
 public:
-	enum
-	{
-		 OpKind = EBinOp_BitwiseXor
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_BitwiseXor, IBinaryOperator)
 
 public:
+	CBinOp_BitwiseXor ()
+	{
+		m_OpKind = EBinOp_BitwiseXor;
+	}
+
 	static
 	long
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 ^ OpValue2;
@@ -1209,7 +1009,8 @@ public:
 	int64_t
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 ^ OpValue2;
@@ -1218,6 +1019,80 @@ public:
 	static
 	llvm::Value*
 	LlvmOpInt (
+		CModule* pModule,
+		llvm::Value* pOpValue1,
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
+		);
+};
+
+//.............................................................................
+
+class CBinOp_Eq: public CBinaryRelationalOperatorT <CBinOp_Eq>
+{	
+public:
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Eq, IBinaryOperator)
+
+public:
+	CBinOp_Eq ()
+	{
+		m_OpKind = EBinOp_Eq;
+	}
+
+	static
+	bool
+	ConstOpInt32 (
+		long OpValue1,
+		long OpValue2,
+		bool IsUnsigned
+		) 
+	{
+		return OpValue1 == OpValue2;
+	}
+
+	static
+	bool
+	ConstOpInt64 (
+		int64_t OpValue1,
+		int64_t OpValue2,
+		bool IsUnsigned
+		)
+	{
+		return OpValue1 == OpValue2;
+	}
+
+	static
+	bool
+	ConstOpFp32 (
+		float OpValue1,
+		float OpValue2
+		)
+	{
+		return OpValue1 == OpValue2;
+	}
+
+	static
+	bool
+	ConstOpFp64 (
+		double OpValue1,
+		double OpValue2
+		)
+	{
+		return OpValue1 == OpValue2;
+	}
+
+	static
+	llvm::Value*
+	LlvmOpInt (
+		CModule* pModule,
+		llvm::Value* pOpValue1,
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
+		);
+
+	static
+	llvm::Value*
+	LlvmOpFp (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2
@@ -1226,88 +1101,23 @@ public:
 
 //.............................................................................
 
-class CBinOp_Eq
+class CBinOp_Ne: public CBinaryRelationalOperatorT <CBinOp_Ne>
 {	
 public:
-	enum
-	{
-		OpKind = EBinOp_Eq
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Ne, IBinaryOperator)
 
 public:
+	CBinOp_Ne ()
+	{
+		m_OpKind = EBinOp_Ne;
+	}
+
 	static
 	bool
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
-		) 
-	{
-		return OpValue1 == OpValue2;
-	}
-
-	static
-	bool
-	ConstOpInt64 (
-		int64_t OpValue1,
-		int64_t OpValue2
-		)
-	{
-		return OpValue1 == OpValue2;
-	}
-
-	static
-	bool
-	ConstOpFp32 (
-		float OpValue1,
-		float OpValue2
-		)
-	{
-		return OpValue1 == OpValue2;
-	}
-
-	static
-	bool
-	ConstOpFp64 (
-		double OpValue1,
-		double OpValue2
-		)
-	{
-		return OpValue1 == OpValue2;
-	}
-
-	static
-	llvm::Value*
-	LlvmOpInt (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-
-	static
-	llvm::Value*
-	LlvmOpFp (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinOp_Ne
-{	
-public:
-	enum
-	{
-		OpKind = EBinOp_Ne
-	};
-
-public:
-	static
-	bool
-	ConstOpInt32 (
-		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
 		return OpValue1 != OpValue2;
@@ -1317,7 +1127,8 @@ public:
 	bool
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
 		return OpValue1 != OpValue2;
@@ -1348,7 +1159,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -1360,35 +1172,39 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Lt
+class CBinOp_Lt: public CBinaryRelationalOperatorT <CBinOp_Lt>
 {	
 public:
-	enum
-	{
-		OpKind = EBinOp_Lt
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Lt, IBinaryOperator)
 
 public:
+	CBinOp_Lt ()
+	{
+		m_OpKind = EBinOp_Lt;
+	}
+
 	static
 	bool
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
-		return OpValue1 < OpValue2;
+		return IsUnsigned ? (ulong_t) OpValue1 < (ulong_t) OpValue2 : OpValue1 < OpValue2;
 	}
 
 	static
 	bool
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
-		return OpValue1 < OpValue2;
+		return IsUnsigned ? (uint64_t) OpValue1 < (uint64_t) OpValue2 : OpValue1 < OpValue2;
 	}
 
 	static
@@ -1416,7 +1232,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -1428,75 +1245,39 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Lt_u
+class CBinOp_Le: public CBinaryRelationalOperatorT <CBinOp_Le>
 {	
 public:
-	enum
-	{
-		OpKind = EBinOp_Lt
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Le, IBinaryOperator)
 
 public:
-	static
-	bool
-	ConstOpInt32 (
-		ulong_t OpValue1,
-		ulong_t OpValue2
-		) 
+	CBinOp_Le ()
 	{
-		return OpValue1 < OpValue2;
+		m_OpKind = EBinOp_Le;
 	}
 
-	static
-	bool
-	ConstOpInt64 (
-		uint64_t OpValue1,
-		uint64_t OpValue2
-		)
-	{
-		return OpValue1 < OpValue2;
-	}
-
-	static
-	llvm::Value*
-	LlvmOpInt (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinOp_Le
-{	
-public:
-	enum
-	{
-		OpKind = EBinOp_Le
-	};
-
-public:
 	static
 	bool
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
-		return OpValue1 <= OpValue2;
+		return IsUnsigned ? (ulong_t) OpValue1 <= (ulong_t) OpValue2 : OpValue1 <= OpValue2;
 	}
 
 	static
 	bool
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
-		return OpValue1 <= OpValue2;
+		return IsUnsigned ? (uint64_t) OpValue1 <= (uint64_t) OpValue2 : OpValue1 <= OpValue2;
 	}
 
 	static
@@ -1524,7 +1305,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -1536,75 +1318,39 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Le_u
+class CBinOp_Gt: public CBinaryRelationalOperatorT <CBinOp_Gt>
 {	
 public:
-	enum
-	{
-		OpKind = EBinOp_Le
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Gt, IBinaryOperator)
 
 public:
-	static
-	bool
-	ConstOpInt32 (
-		ulong_t OpValue1,
-		ulong_t OpValue2
-		) 
+	CBinOp_Gt ()
 	{
-		return OpValue1 <= OpValue2;
+		m_OpKind = EBinOp_Gt;
 	}
 
-	static
-	bool
-	ConstOpInt64 (
-		uint64_t OpValue1,
-		uint64_t OpValue2
-		)
-	{
-		return OpValue1 <= OpValue2;
-	}
-
-	static
-	llvm::Value*
-	LlvmOpInt (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinOp_Gt
-{	
-public:
-	enum
-	{
-		OpKind = EBinOp_Gt
-	};
-
-public:
 	static
 	bool
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
-		return OpValue1 > OpValue2;
+		return IsUnsigned ? (ulong_t) OpValue1 > (ulong_t) OpValue2 : OpValue1 > OpValue2;
 	}
 
 	static
 	bool
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
-		return OpValue1 > OpValue2;
+		return IsUnsigned ? (uint64_t) OpValue1 > (uint64_t) OpValue2 : OpValue1 > OpValue2;
 	}
 
 	static
@@ -1632,7 +1378,8 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
@@ -1644,75 +1391,39 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CBinOp_Gt_u
+class CBinOp_Ge: public CBinaryRelationalOperatorT <CBinOp_Ge>
 {	
 public:
-	enum
-	{
-		OpKind = EBinOp_Gt
-	};
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Ge, IBinaryOperator)
 
 public:
-	static
-	bool
-	ConstOpInt32 (
-		ulong_t OpValue1,
-		ulong_t OpValue2
-		) 
+	CBinOp_Ge ()
 	{
-		return OpValue1 > OpValue2;
+		m_OpKind = EBinOp_Ge;
 	}
 
-	static
-	bool
-	ConstOpInt64 (
-		uint64_t OpValue1,
-		uint64_t OpValue2
-		)
-	{
-		return OpValue1 > OpValue2;
-	}
-
-	static
-	llvm::Value*
-	LlvmOpInt (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinOp_Ge
-{	
-public:
-	enum
-	{
-		OpKind = EBinOp_Ge
-	};
-
-public:
 	static
 	bool
 	ConstOpInt32 (
 		long OpValue1,
-		long OpValue2
+		long OpValue2,
+		bool IsUnsigned
 		) 
 	{
-		return OpValue1 >= OpValue2;
+		return IsUnsigned ? (ulong_t) OpValue1 >= (ulong_t) OpValue2 : OpValue1 >= OpValue2;
 	}
 
 	static
 	bool
 	ConstOpInt64 (
 		int64_t OpValue1,
-		int64_t OpValue2
+		int64_t OpValue2,
+		bool IsUnsigned
 		)
 	{
-		return OpValue1 >= OpValue2;
+		return IsUnsigned ? (uint64_t) OpValue1 >= (uint64_t) OpValue2 : OpValue1 >= OpValue2;
 	}
 
 	static
@@ -1740,52 +1451,13 @@ public:
 	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		llvm::Value* pOpValue2,
+		bool IsUnsigned
 		);
 
 	static
 	llvm::Value*
 	LlvmOpFp (
-		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinOp_Ge_u
-{	
-public:
-	enum
-	{
-		OpKind = EBinOp_Ge
-	};
-
-public:
-	static
-	bool
-	ConstOpInt32 (
-		ulong_t OpValue1,
-		ulong_t OpValue2
-		) 
-	{
-		return OpValue1 >= OpValue2;
-	}
-
-	static
-	bool
-	ConstOpInt64 (
-		uint64_t OpValue1,
-		uint64_t OpValue2
-		)
-	{
-		return OpValue1 >= OpValue2;
-	}
-
-	static
-	llvm::Value*
-	LlvmOpInt (
 		CModule* pModule,
 		llvm::Value* pOpValue1,
 		llvm::Value* pOpValue2

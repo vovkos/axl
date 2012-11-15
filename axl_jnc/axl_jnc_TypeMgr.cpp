@@ -12,8 +12,9 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_pDoublePtrStructType = NULL;
-	m_pTriplePtrStructType = NULL;
+	m_pSafePtrStructType = NULL;
+	m_pDynamicPtrStructType = NULL;
+	m_pFunctionPtrStructType = NULL;
 
 	SetupAllBasicTypes ();
 }
@@ -31,8 +32,9 @@ CTypeMgr::Clear ()
 	m_PropertyTypeList.Clear ();
 	m_TypeMap.Clear ();
 
-	m_pDoublePtrStructType = NULL;
-	m_pTriplePtrStructType = NULL;
+	m_pSafePtrStructType = NULL;
+	m_pDynamicPtrStructType = NULL;
+	m_pFunctionPtrStructType = NULL;
 }
 
 void
@@ -182,7 +184,7 @@ CTypeMgr::GetPointerType (
 	{
 	case EType_Pointer:
 		Signature = 'B';
-		Size = sizeof (TSafePointer);
+		Size = sizeof (TSafePtr);
 		break;
 
 	case EType_Pointer_u:
@@ -192,12 +194,12 @@ CTypeMgr::GetPointerType (
 
 	case EType_Pointer_d:
 		Signature = 'D';
-		Size = sizeof (TDynamicPointer);
+		Size = sizeof (TDynamicPtr);
 		break;
 
 	case EType_Reference:
 		Signature = 'E';
-		Size = sizeof (TSafePointer);
+		Size = sizeof (TSafePtr);
 		break;
 
 	case EType_Reference_u:
@@ -207,7 +209,7 @@ CTypeMgr::GetPointerType (
 
 	case EType_Reference_d:
 		Signature = 'G';
-		Size = sizeof (TDynamicPointer);
+		Size = sizeof (TDynamicPtr);
 		break;
 
 	default:
@@ -369,34 +371,51 @@ CTypeMgr::GetStructType (
 }
 
 CStructType*
-CTypeMgr::GetDoublePointerStructType ()
+CTypeMgr::GetSafePtrStructType ()
 {
-	if (m_pDoublePtrStructType)
-		return m_pDoublePtrStructType;
+	if (m_pSafePtrStructType)
+		return m_pSafePtrStructType;
 
 	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
 
-	m_pDoublePtrStructType = GetStructType (EType_Struct, "ptr2", "jnc.ptr2");
-	m_pDoublePtrStructType->CreateMember ("m_ptr1", pInt8PtrType);
-	m_pDoublePtrStructType->CreateMember ("m_ptr2", pInt8PtrType);
+	m_pSafePtrStructType = GetStructType (EType_Struct, "sptr", "jnc.sptr");
+	m_pSafePtrStructType->CreateMember ("m_p", pInt8PtrType);
+	m_pSafePtrStructType->CreateMember ("m_beg", pInt8PtrType);
+	m_pSafePtrStructType->CreateMember ("m_end", pInt8PtrType);
+	m_pSafePtrStructType->CreateMember ("m_scope", GetBasicType (EType_SizeT));
 
-	return m_pDoublePtrStructType;
+	return m_pSafePtrStructType;
 }
 
 CStructType*
-CTypeMgr::GetTriplePointerStructType ()
+CTypeMgr::GetDynamicPtrStructType ()
 {
-	if (m_pTriplePtrStructType)
-		return m_pTriplePtrStructType;
+	if (m_pDynamicPtrStructType)
+		return m_pDynamicPtrStructType;
 
 	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
 
-	m_pTriplePtrStructType = GetStructType (EType_Struct, "ptr3", "jnc.ptr3");
-	m_pTriplePtrStructType->CreateMember ("m_ptr1", pInt8PtrType);
-	m_pTriplePtrStructType->CreateMember ("m_ptr2", pInt8PtrType);
-	m_pTriplePtrStructType->CreateMember ("m_ptr3", pInt8PtrType);
+	m_pDynamicPtrStructType = GetStructType (EType_Struct, "dptr", "jnc.dptr");
+	m_pDynamicPtrStructType->CreateMember ("m_p", pInt8PtrType);
+	m_pDynamicPtrStructType->CreateMember ("m_type", pInt8PtrType);
+	m_pDynamicPtrStructType->CreateMember ("m_scope", GetBasicType (EType_SizeT));
 
-	return m_pTriplePtrStructType;
+	return m_pDynamicPtrStructType;
+}
+
+CStructType*
+CTypeMgr::GetFunctionPtrStructType ()
+{
+	if (m_pFunctionPtrStructType)
+		return m_pFunctionPtrStructType;
+
+	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
+
+	m_pFunctionPtrStructType = GetStructType (EType_Struct, "fptr", "jnc.fptr");
+	m_pFunctionPtrStructType->CreateMember ("m_pfn", pInt8PtrType);
+	m_pFunctionPtrStructType->CreateMember ("m_iface", pInt8PtrType);
+
+	return m_pFunctionPtrStructType;
 }
 
 CClassType* 
@@ -455,7 +474,7 @@ CTypeMgr::GetFunctionType (
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Function;
-	pType->m_Size = sizeof (TFunctionPointer);
+	pType->m_Size = sizeof (TFunctionPtr);
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
 	pType->m_ArgTypeArray.Copy (ppArgType, ArgCount);
@@ -482,7 +501,7 @@ CTypeMgr::GetPropertyType (
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Property;
-	pType->m_Size = sizeof (TFunctionPointer) + SetterType.GetOverloadCount () * sizeof (void*);
+	pType->m_Size = sizeof (TFunctionPtr) + SetterType.GetOverloadCount () * sizeof (void*);
 	pType->m_Signature = Signature;
 	pType->m_pGetterType = pGetterType;
 	pType->m_SetterType = SetterType;

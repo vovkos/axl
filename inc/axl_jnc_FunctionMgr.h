@@ -12,6 +12,62 @@ namespace jnc {
 
 //.............................................................................
 
+enum EStdFunc
+{
+	// jnc.sptr 
+	// jnc.CreateSafePtr (
+	//		int8* p,
+	//		int8* pRegionBegin,
+	//		size_t Size,
+	//		size_t ScopeLevel
+	//		);
+
+	EStdFunc_CreateSafePtr,
+
+	// void 
+	// jnc.CheckSafePtrRange (
+	//		jnc.sptr p,
+	//		size_t Size,
+	//		int Error
+	//		);
+
+	EStdFunc_CheckSafePtrRange,
+
+	// void 
+	// jnc.CheckSafePtrScope (
+	//		jnc.sptr p,
+	//		size_t ScopeLevel
+	//		);
+
+	EStdFunc_CheckSafePtrScope,
+
+	// void
+	// jnc.OnInvalidSafePtr (
+	//		jnc.sptr pSrc,
+	//		int Error
+	//		);
+
+	EStdFunc_OnInvalidSafePtr,
+
+	// jnc.sptr
+	// jnc.LoadDynamicPtr (jnc.dptr);
+
+	EStdFunc_LoadDynamicPtr,
+
+	// void
+	// jnc.StoreDynamicPtr (
+	//		int8* pSrc
+	//		int8* pSrcType
+	//		jnc.dptr pDst,
+	//		);
+
+	EStdFunc_StoreDynamicPtr,
+
+	EStdFunc__Count
+};
+
+//.............................................................................
+
 class CFunctionMgr
 {
 protected:
@@ -25,11 +81,7 @@ protected:
 
 	CFunction* m_pCurrentFunction;
 
-	CFunction* m_pCreateSafePtr;
-	CFunction* m_pCheckSafePtr;
-	CFunction* m_pOnInvalidSafePtr;
-	CFunction* m_pLoadDynamicPtr;
-	CFunction* m_pStoreDynamicPtr;
+	CFunction* m_StdFunctionArray [EStdFunc__Count];
 
 public:
 	CFunctionMgr ();
@@ -114,49 +166,26 @@ public:
 	bool
 	CompileFunctions ();
 
+	CFunction*
+	GetStdFunction (EStdFunc Func);
+
+protected:
 	// LLVM code support functions
 
-	// jnc.ptr3 
-	// jnc.CreateSafePtr (
-	//		int8* p1,
-	//		int8* pRegionBegin,
-	//		int8* pRegionEnd
-	//		);
+	CFunction*
+	GetCreateSafePtr ();
 
 	CFunction*
-	GetCreateSafePtr();
-
-	// void 
-	// jnc.CheckSafePtr (
-	//		jnc.ptr3 p,
-	//		size_t Size,
-	//		int Access
-	//		);
+	GetCheckSafePtrRange ();
 
 	CFunction*
-	GetCheckSafePtr ();
-
-	// void
-	// jnc.OnInvalidSafePtr (
-	//		jnc.ptr3* unsafe pSrc,
-	//		int Access
-	//		);
+	GetCheckSafePtrScope ();
 
 	CFunction*
 	GetOnInvalidSafePtr ();
 
-	// jnc.ptr3 
-	// jnc.LoadDynamicPtr (jnc.ptr2);
-
 	CFunction*
 	GetLoadDynamicPtr ();
-
-	// void
-	// jnc.StoreDynamicPtr (
-	//		int8* unsafe pSrc
-	//		int8* unsafe pSrcType
-	//		jnc.ptr2 pDst,
-	//		);
 
 	CFunction*
 	GetStoreDynamicPtr ();

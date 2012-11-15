@@ -25,102 +25,37 @@ protected:
 
 	// unary operators
 
-	CUnOpT_i32 <CUnOp_Minus> m_UnOp_Minus_i32;
-	CUnOpT_i64 <CUnOp_Minus> m_UnOp_Minus_i64;
-	CUnOpT_f32 <CUnOp_Minus> m_UnOp_Minus_f32;
-	CUnOpT_f64 <CUnOp_Minus> m_UnOp_Minus_f64;
-
-	CUnOpT_i32 <CUnOp_BitwiseNot> m_UnOp_BitwiseNot_i32;
-	CUnOpT_i64 <CUnOp_BitwiseNot> m_UnOp_BitwiseNot_i64;
-
-	CUnOp_addr m_UnOp_addr;
-	CUnOp_indir m_UnOp_indir;
+	CUnOp_Minus m_UnOp_Minus;
+	CUnOp_BitwiseNot m_UnOp_BitwiseNot;
+	CUnOp_Addr m_UnOp_Addr;
+	CUnOp_Indir m_UnOp_Indir;
 	
-	CUnOpT_inc <EUnOp_PreInc> m_UnOp_preinc;
-	CUnOpT_inc <EUnOp_PreInc> m_UnOp_predec;
-	CUnOpT_inc <EUnOp_PostInc> m_UnOp_postinc;
-	CUnOpT_inc <EUnOp_PostInc> m_UnOp_postdec;
+	CUnOpT_PreInc <EUnOp_PreInc> m_UnOp_PreInc;
+	CUnOpT_PreInc <EUnOp_PreDec> m_UnOp_PreDec;
+	CUnOpT_PostInc <EUnOp_PostInc> m_UnOp_PostInc;
+	CUnOpT_PostInc <EUnOp_PostDec> m_UnOp_PostDec;
 
 	// binary operators
 
-	CBinOpT_i32 <CBinOp_Add> m_BinOp_Add_i32;
-	CBinOpT_i64 <CBinOp_Add> m_BinOp_Add_i64;
-	CBinOpT_f32 <CBinOp_Add> m_BinOp_Add_f32;
-	CBinOpT_f64 <CBinOp_Add> m_BinOp_Add_f64;
-
-	CBinOpT_i32 <CBinOp_Sub> m_BinOp_Sub_i32;
-	CBinOpT_i64 <CBinOp_Sub> m_BinOp_Sub_i64;
-	CBinOpT_f32 <CBinOp_Sub> m_BinOp_Sub_f32;
-	CBinOpT_f64 <CBinOp_Sub> m_BinOp_Sub_f64;
-
-	CBinOpT_i32 <CBinOp_Mul> m_BinOp_Mul_i32;
-	CBinOpT_i64 <CBinOp_Mul> m_BinOp_Mul_i64;
-	CBinOpT_f32 <CBinOp_Mul> m_BinOp_Mul_f32;
-	CBinOpT_f64 <CBinOp_Mul> m_BinOp_Mul_f64;
-
-	CBinOpT_i32 <CBinOp_Div> m_BinOp_Div_i32;
-	CBinOpT_i64 <CBinOp_Div> m_BinOp_Div_i64;
-	CBinOpT_f32 <CBinOp_Div> m_BinOp_Div_f32;
-	CBinOpT_f64 <CBinOp_Div> m_BinOp_Div_f64;
-	CBinOpT_i32 <CBinOp_Div_u> m_BinOp_Div_i32u;
-	CBinOpT_i64 <CBinOp_Div_u> m_BinOp_Div_i64u;
-
-	CBinOpT_i32 <CBinOp_Mod> m_BinOp_Mod_i32;
-	CBinOpT_i64 <CBinOp_Mod> m_BinOp_Mod_i64;
-	CBinOpT_i32 <CBinOp_Mod_u> m_BinOp_Mod_i32u;
-	CBinOpT_i64 <CBinOp_Mod_u> m_BinOp_Mod_i64u;
-
-	CBinOpT_i32 <CBinOp_Shl> m_BinOp_Shl_i32;
-	CBinOpT_i64 <CBinOp_Shl> m_BinOp_Shl_i64;
-	CBinOpT_i32 <CBinOp_Shr> m_BinOp_Shr_i32;
-	CBinOpT_i64 <CBinOp_Shr> m_BinOp_Shr_i64;
-
-	CBinOpT_i32 <CBinOp_BitwiseAnd> m_BinOp_BitwiseAnd_i32;
-	CBinOpT_i64 <CBinOp_BitwiseAnd> m_BinOp_BitwiseAnd_i64;
-	CBinOpT_i32 <CBinOp_BitwiseOr> m_BinOp_BitwiseOr_i32;
-	CBinOpT_i64 <CBinOp_BitwiseOr> m_BinOp_BitwiseOr_i64;
-	CBinOpT_i32 <CBinOp_BitwiseXor> m_BinOp_BitwiseXor_i32;
-	CBinOpT_i64 <CBinOp_BitwiseXor> m_BinOp_BitwiseXor_i64;
+	CBinOp_Add m_BinOp_Add;
+	CBinOp_Sub m_BinOp_Sub;
+	CBinOp_Mul m_BinOp_Mul;
+	CBinOp_Div m_BinOp_Div;
+	CBinOp_Mod m_BinOp_Mod;
+	CBinOp_Shl m_BinOp_Shl;
+	CBinOp_Shr m_BinOp_Shr;
+	CBinOp_BitwiseAnd m_BinOp_BitwiseAnd;
+	CBinOp_BitwiseOr m_BinOp_BitwiseOr;
+	CBinOp_BitwiseXor m_BinOp_BitwiseXor;
 
 	// relational operators
 
-	CBinOpT_cmp_i32 <CBinOp_Eq> m_BinOp_Eq_i32;
-	CBinOpT_cmp_i64 <CBinOp_Eq> m_BinOp_Eq_i64;
-	CBinOpT_cmp_f32 <CBinOp_Eq> m_BinOp_Eq_f32;
-	CBinOpT_cmp_f64 <CBinOp_Eq> m_BinOp_Eq_f64;
-
-	CBinOpT_cmp_i32 <CBinOp_Ne> m_BinOp_Ne_i32;
-	CBinOpT_cmp_i64 <CBinOp_Ne> m_BinOp_Ne_i64;
-	CBinOpT_cmp_f32 <CBinOp_Ne> m_BinOp_Ne_f32;
-	CBinOpT_cmp_f64 <CBinOp_Ne> m_BinOp_Ne_f64;
-
-	CBinOpT_cmp_i32 <CBinOp_Lt> m_BinOp_Lt_i32;
-	CBinOpT_cmp_i64 <CBinOp_Lt> m_BinOp_Lt_i64;
-	CBinOpT_cmp_f32 <CBinOp_Lt> m_BinOp_Lt_f32;
-	CBinOpT_cmp_f64 <CBinOp_Lt> m_BinOp_Lt_f64;
-	CBinOpT_cmp_i32 <CBinOp_Lt_u> m_BinOp_Lt_i32u;
-	CBinOpT_cmp_i64 <CBinOp_Lt_u> m_BinOp_Lt_i64u;
-
-	CBinOpT_cmp_i32 <CBinOp_Le> m_BinOp_Le_i32;
-	CBinOpT_cmp_i64 <CBinOp_Le> m_BinOp_Le_i64;
-	CBinOpT_cmp_f32 <CBinOp_Le> m_BinOp_Le_f32;
-	CBinOpT_cmp_f64 <CBinOp_Le> m_BinOp_Le_f64;
-	CBinOpT_cmp_i32 <CBinOp_Le_u> m_BinOp_Le_i32u;
-	CBinOpT_cmp_i64 <CBinOp_Le_u> m_BinOp_Le_i64u;
-
-	CBinOpT_cmp_i32 <CBinOp_Gt> m_BinOp_Gt_i32;
-	CBinOpT_cmp_i64 <CBinOp_Gt> m_BinOp_Gt_i64;
-	CBinOpT_cmp_f32 <CBinOp_Gt> m_BinOp_Gt_f32;
-	CBinOpT_cmp_f64 <CBinOp_Gt> m_BinOp_Gt_f64;
-	CBinOpT_cmp_i32 <CBinOp_Gt_u> m_BinOp_Gt_i32u;
-	CBinOpT_cmp_i64 <CBinOp_Gt_u> m_BinOp_Gt_i64u;
-
-	CBinOpT_cmp_i32 <CBinOp_Ge> m_BinOp_Ge_i32;
-	CBinOpT_cmp_i64 <CBinOp_Ge> m_BinOp_Ge_i64;
-	CBinOpT_cmp_f32 <CBinOp_Ge> m_BinOp_Ge_f32;
-	CBinOpT_cmp_f64 <CBinOp_Ge> m_BinOp_Ge_f64;
-	CBinOpT_cmp_i32 <CBinOp_Ge_u> m_BinOp_Ge_i32u;
-	CBinOpT_cmp_i64 <CBinOp_Ge_u> m_BinOp_Ge_i64u;
+	CBinOp_Eq m_BinOp_Eq;
+	CBinOp_Ne m_BinOp_Ne;
+	CBinOp_Lt m_BinOp_Lt;
+	CBinOp_Le m_BinOp_Le;
+	CBinOp_Gt m_BinOp_Gt;
+	CBinOp_Ge m_BinOp_Ge;
 
 	// cast operators
 
@@ -153,8 +88,8 @@ protected:
 
 	// tables
 
-	CUnaryOperatorOverload m_UnaryOperatorTable [EUnOp__Count];
-	CBinaryOperatorOverload m_BinaryOperatorTable [EBinOp__Count];		
+	IUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
+	IBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
 	ICastOperator* m_BasicCastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
 
 	rtl::CStringHashTableMapT <ICastOperator*> m_CastOperatorMap;
@@ -176,25 +111,28 @@ public:
 	void
 	AddStdOperators ();
 
-	// unary operators
+	// prepare is: unqualify, get property, peel double references
 
-	IUnaryOperator*
-	AddUnaryOperator (
-		EUnOp OpKind,
+	CType* 
+	PrepareOperandType (
 		CType* pOpType,
-		IUnaryOperator* pOperator
-		)
-	{
-		ASSERT (OpKind > 0 && OpKind < EUnOp__Count);
-		return m_UnaryOperatorTable [OpKind].AddOperator (pOpType, pOperator);
-	}
-
-	IUnaryOperator*
-	AddUnaryOperator (
-		EUnOp OpKind,
-		EType OpTypeKind,
-		IUnaryOperator* pOperator
+		int Flags = 0
 		);
+
+	bool 
+	PrepareOperand (
+		const CValue& OpValue,
+		CValue* pOpValue,
+		int Flags = 0
+		);
+
+	bool 
+	PrepareOperand (
+		CValue* pOpValue,
+		int Flags = 0
+		);
+
+	// unary operators
 
 	bool
 	UnaryOperator (
@@ -210,46 +148,6 @@ public:
 		);
 
 	// binary operators
-
-	IBinaryOperator*
-	AddBinaryOperator (
-		EBinOp OpKind,
-		CType* pOpType1,
-		CType* pOpType2,
-		IBinaryOperator* pOperator
-		)
-	{
-		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
-		return m_BinaryOperatorTable [OpKind].AddOperator (pOpType1, pOpType2, pOperator);
-	}
-
-	IBinaryOperator*
-	AddBinaryOperator (
-		EBinOp OpKind,
-		EType OpTypeKind1,
-		EType OpTypeKind2,
-		IBinaryOperator* pOperator
-		);
-
-	IBinaryOperator*
-	AddBinaryOperator (
-		EBinOp OpKind,
-		CType* pType,
-		IBinaryOperator* pOperator
-		)
-	{
-		return AddBinaryOperator (OpKind, pType, pType, pOperator);
-	}
-
-	IBinaryOperator*
-	AddBinaryOperator (
-		EBinOp OpKind,
-		EType TypeKind,
-		IBinaryOperator* pOperator
-		)
-	{
-		return AddBinaryOperator (OpKind, TypeKind, TypeKind, pOperator);
-	}
 
 	bool
 	BinaryOperator (
@@ -375,54 +273,79 @@ public:
 		rtl::CBoxListT <CValue>* pArgList
 		);
 
-protected:
-	void
-	AddStdUnaryOperators ();
+	// public llvm helpers
 
-	void
-	AddStdBinaryOperators ();
-
-	void
-	AddStdCastOperators ();
-
-	IUnaryOperator*
-	GetUnaryOperator (
-		EUnOp OpKind,
-		CType* pOpType,
-		TUnaryOperatorTypeInfo* pTypeInfo
+	llvm::Value*
+	CreateLlvmGep (
+		llvm::Value* pLlvmPtr,
+		llvm::Value* pLlvmIndex0,
+		llvm::Value* pLlvmIndex1
 		);
 
-	IBinaryOperator*
-	GetBinaryOperator (
-		EBinOp OpKind,
-		CType* pOpType1,
-		CType* pOpType2,
-		TBinaryOperatorTypeInfo* pTypeInfo
-		)
-	{
-		ASSERT (OpKind > 0 && OpKind < EBinOp__Count);
-		return m_BinaryOperatorTable [OpKind].GetOperator (pOpType1, pOpType2, pTypeInfo);
-	}
+	llvm::Value*
+	CreateLlvmGep (
+		llvm::Value* pLlvmPtr,
+		intptr_t Index0,
+		intptr_t Index1
+		);
+
+	llvm::Value*
+	CreateLlvmSafePtr (
+		llvm::Value* pLlvmPtr,
+		llvm::Value* pLlvmParentPtr,
+		CType* pParentType,
+		size_t ScopeLevel
+		);
+
+	llvm::Value*
+	CreateLlvmDynamicPtr (
+		llvm::Value* pLlvmPtr,
+		CType* pType,
+		size_t ScopeLevel
+		);
+
+	llvm::Value*
+	ModifyLlvmSafePtr (
+		llvm::Value* pLlvmSafePtr,
+		llvm::Value* pLlvmPtr
+		);
+
+	void
+	CheckLlvmSafePtrRange (
+		llvm::Value* pLlvmSafePtr,
+		size_t Size,
+		ESafePtrError Error
+		);
+
+	void
+	CheckLlvmSafePtrScope (
+		llvm::Value* pLlvmSafePtr,
+		size_t ScopeLevel
+		);
+
+	bool
+	CheckLlvmSafePtrScope (
+		llvm::Value* pLlvmSafePtr,
+		const CValue& SrcValue,
+		size_t DstScopeLevel
+		);
+
+	bool
+	CheckLlvmSafePtrScope (
+		llvm::Value* pLlvmSafePtr,
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+protected:
+	void
+	AddStdCastOperators ();
 
 	ICastOperator*
 	GetCastOperator (
 		CType* pSrcType,
 		CType* pDstType
 		);
-
-	// prepare is: unqualify, get property, peel double references
-
-	CType* 
-	PrepareOperandType (CType* pOpType);
-
-	bool 
-	PrepareOperand (
-		const CValue& OpValue,
-		CValue* pOpValue
-		);
-
-	bool 
-	PrepareOperand (CValue* pOpValue);
 
 	// load & store operators
 
@@ -495,48 +418,6 @@ protected:
 		CClassType* pClassType,
 		const tchar_t* pName,
 		CValue* pResultValue
-		);
-
-	// llvm helpers
-
-	llvm::Value*
-	CreateLlvmGep (
-		llvm::Value* pLlvmPtr,
-		llvm::Value* pLlvmIndex0,
-		llvm::Value* pLlvmIndex1
-		);
-
-	llvm::Value*
-	CreateLlvmGep (
-		llvm::Value* pLlvmPtr,
-		intptr_t Index0,
-		intptr_t Index1
-		);
-
-	llvm::Value*
-	CreateLlvmSafePointer (
-		llvm::Value* pLlvmPtr,
-		llvm::Value* pLlvmParentPtr,
-		CType* pParentType
-		);
-
-	llvm::Value*
-	CreateLlvmDynamicPointer (
-		llvm::Value* pLlvmPtr,
-		CType* pType
-		);
-
-	llvm::Value*
-	ModifyLlvmSafePointer (
-		llvm::Value* pLlvmSafePtr,
-		llvm::Value* pLlvmPtr
-		);
-
-	void
-	CheckLlvmSafePointer (
-		llvm::Value* pLlvmSafePtr,
-		size_t Size,
-		int Access
 		);
 };
 

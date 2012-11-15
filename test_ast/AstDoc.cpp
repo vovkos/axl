@@ -202,16 +202,38 @@ CAstDoc::Run ()
 
 void
 StdLib_OnInvalidSafePtr (
-	jnc::TSafePointer Pointer,
-	int Access
+	jnc::TSafePtr Ptr,
+	int Error
 	)
 {
+	const tchar_t* pErrorString;
+
+	switch (Error)
+	{
+	case jnc::ESafePtrError_Load:
+		pErrorString = "READ";
+		break;
+
+	case jnc::ESafePtrError_Store:
+		pErrorString = "WRITE";
+		break;
+
+	case jnc::ESafePtrError_ScopeMismatch:
+		pErrorString = "SCOPE_MISMATCH";
+		break;
+
+	default:
+		ASSERT (false);
+		pErrorString = "<UNDEF>";
+	}
+	
 	throw err::CError (
-		_T("INVALID SAFE POINTER %s { %x; %x:%x }"), 
-		Access == jnc::ESafePointerAccess_Write ? "WRITE" : "READ",
-		Pointer.m_p, 
-		Pointer.m_pRegionBegin, 
-		Pointer.m_pRegionEnd
+		_T("INVALID SAFE POINTER ACCESS (%s) { p = %x; range = %x:%x; scope = %d }"), 
+		pErrorString,
+		Ptr.m_p, 
+		Ptr.m_pRegionBegin, 
+		Ptr.m_pRegionEnd,
+		Ptr.m_ScopeLevel
 		);
 }
 
@@ -264,7 +286,7 @@ bool
 CAstDoc::ExportStdLib ()
 {
 	m_pLlvmExecutionEngine->addGlobalMapping (
-		m_Module.m_FunctionMgr.GetOnInvalidSafePtr ()->GetLlvmFunction (), 
+		m_Module.m_FunctionMgr.GetStdFunction (jnc::EStdFunc_OnInvalidSafePtr)->GetLlvmFunction (), 
 		StdLib_OnInvalidSafePtr
 		);
 

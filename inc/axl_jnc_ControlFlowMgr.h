@@ -68,6 +68,12 @@ public:
 	Return (const CValue& Value);
 
 	bool
+	Return ()
+	{
+		return Return (CValue ());
+	}
+
+	bool
 	Break (size_t Level);
 
 	bool

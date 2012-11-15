@@ -10,6 +10,7 @@ CScope::CScope ()
 {
 	m_ItemKind = EModuleItem_Scope;
 	m_NamespaceKind = ENamespace_Scope;
+	m_Level = 1;
 	m_pCodeBegin = NULL;
 	m_pCodeEnd = NULL;
 	m_pBreakBlock = NULL;

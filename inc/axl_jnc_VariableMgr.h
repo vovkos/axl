@@ -34,12 +34,16 @@ public:
 
 	CVariable*
 	CreateVariable (
+		EVariable VariableKind,
 		const rtl::CString& Name,
 		CType* pType
 		);
 
 	CVariable*
-	CreateTempVariable (CType* pType);
+	CreateVariable (
+		const rtl::CString& Name,
+		CType* pType
+		);
 };
 
 //.............................................................................

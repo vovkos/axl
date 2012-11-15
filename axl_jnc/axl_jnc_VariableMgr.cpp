@@ -24,23 +24,41 @@ CVariableMgr::Clear ()
 
 CVariable*
 CVariableMgr::CreateVariable (
+	EVariable VariableKind,
 	const rtl::CString& Name,
 	CType* pType
 	)
 {
 	CVariable* pVariable = AXL_MEM_NEW (CVariable);
 	pVariable->m_pModule = m_pModule;
+	pVariable->m_VariableKind = VariableKind;
 	pVariable->m_Name = Name;
 	pVariable->m_pType = pType;
+	pVariable->m_pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	m_VariableList.InsertTail (pVariable);
 
 	if (m_pModule->m_FunctionMgr.GetCurrentFunction ())
 	{
-		llvm::Type* pLlvmType = pType->GetLlvmType ();
-		pVariable->m_VariableKind = EVariable_Local;
+		ASSERT (VariableKind == EVariable_Local || VariableKind == EVariable_Arg);
+
 		pVariable->m_pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (
-			pLlvmType, 
+			pType->GetLlvmType (), 
 			0, 
+			(const tchar_t*) Name
+			);
+	}
+	else
+	{
+		ASSERT (VariableKind == EVariable_Global);
+
+		CValue Initializer (pType, NULL);
+
+		pVariable->m_pLlvmGlobalVariable = new llvm::GlobalVariable (
+			*m_pModule->m_pLlvmModule,
+			pType->GetLlvmType (),
+			false,
+			llvm::GlobalVariable::ExternalLinkage,
+			(llvm::Constant*) Initializer.GetLlvmValue (),
 			(const tchar_t*) Name
 			);
 	}
@@ -49,13 +67,13 @@ CVariableMgr::CreateVariable (
 }
 
 CVariable*
-CVariableMgr::CreateTempVariable (CType* pType)
+CVariableMgr::CreateVariable (
+	const rtl::CString& Name,
+	CType* pType
+	)
 {
-	ASSERT (m_pModule->m_FunctionMgr.GetCurrentFunction ());
-
-	rtl::CString Name;
-	Name.Format (_T("_tmp%d"), m_TempVariableCounter++);
-	return CreateVariable (Name, pType);
+	EVariable VariableKind = m_pModule->m_FunctionMgr.GetCurrentFunction () ? EVariable_Local : EVariable_Global;
+	return CreateVariable (VariableKind, Name, pType);
 }
 
 //.............................................................................

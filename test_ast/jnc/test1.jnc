@@ -16,76 +16,38 @@ typedef const char* pchar2_t;
 
 //.............................................................................
 
-struct TPoint
-{
-	int m_x;
-	int m_y;
-	int m_z;
-};
-
-int
-main ()
-{	
-	TPoint Point;
-	TPoint* p = &Point;
-	 
-	p += 1;
-	p->m_x = 5;
-	int zz = p->m_x;
-
-	printf ("SUCCESS!\n");
-
-	int a = test (100, 20, 30);
-	printf ("test returned %d\n", a);
-
-	int i;
-	for (i = 0; i < 10; i++)
-	{
-		printf ("hui govno i muravei %d\n", i);
-	}
-
-	Point.m_x = 10;
-	Point.m_y = 20;
-	Point.m_z = 30;
-
-	printf ("Point { %d, %d, %d }\n", Point.m_x, Point.m_y, Point.m_z);
-
-	TPoint* pPoint = &Point;
-
-	pPoint->m_x = 40;
-	pPoint->m_y = 50;
-	pPoint->m_z = 60;
-
-	printf ("Point { %d, %d, %d }\n", Point.m_x, Point.m_y, Point.m_z);
-
-	int32 x, y, z;
-
-	int32* safe p1 = &x; 
-	int32* safe p2 = p1; 
-//	int32* unsafe p2 = &x; 
-//	int32* dynamic p3 = &x; 
-
-	y = *p1;
-	y = *p2;
-
-	return 5;
-}
-
-int
-test (
-	int x, 
-	int y,
-	int z
-	)
-{
-	printf ("test (%d, %d, %d)\n", x, y, z);
-	return x + y + z;
-}
-
 void
 printf (
 	char* unsafe pFormat,
 	unsafe ...
 	);
+
+//.............................................................................
+
+int g_n;
+int* g_p;
+
+int
+main ()
+{	
+	g_n = 10;
+
+	int* p = test ();
+	int x = *p;
+
+	printf ("*p = %d\n", x);
+	return 0;
+}
+
+int*
+test ()
+{
+	int x = 100;
+
+	int* p = &g_n;
+	g_p = p;
+
+	return p;
+}
 
 //.............................................................................

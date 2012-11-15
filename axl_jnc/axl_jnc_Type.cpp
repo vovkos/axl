@@ -189,12 +189,12 @@ CType::GetLlvmType ()
 	
 	case EType_Pointer:
 	case EType_Reference:
-		pLlvmType = m_pModule->m_TypeMgr.GetTriplePointerStructType ()->GetLlvmType ();
+		pLlvmType = m_pModule->m_TypeMgr.GetSafePtrStructType ()->GetLlvmType ();
 		break;
 
 	case EType_Pointer_d:
 	case EType_Reference_d:
-		pLlvmType = m_pModule->m_TypeMgr.GetDoublePointerStructType ()->GetLlvmType ();
+		pLlvmType = m_pModule->m_TypeMgr.GetDynamicPtrStructType ()->GetLlvmType ();
 		break;
 
 	case EType_Pointer_u:
@@ -668,6 +668,14 @@ CType::GetModifiedType (int Modifiers)
 	}
 
 	return pType;
+}
+
+CType*
+CType::GetUnqualifiedType ()
+{
+	return m_TypeKind == EType_Qualifier ? 
+		((CQualifierType*) this)->GetBaseType () : 
+		this;
 }
 
 //.............................................................................

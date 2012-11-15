@@ -10,6 +10,8 @@
 namespace axl {
 namespace jnc {
 
+class CScope;
+
 //.............................................................................
 
 enum EVariable
@@ -17,7 +19,6 @@ enum EVariable
 	EVariable_Global,
 	EVariable_Local,
 	EVariable_Arg,
-	EVariable_Temp
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -32,6 +33,7 @@ protected:
 
 	EVariable m_VariableKind;
 	CType* m_pType;
+	CScope* m_pScope;
 
 	union
 	{
@@ -55,6 +57,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	CScope*
+	GetScope ()
+	{
+		return m_pScope;
 	}
 
 	llvm::Value* 

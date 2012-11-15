@@ -299,24 +299,12 @@ public:
 	}
 	
 	bool
-	IsFatPointerType ()
-	{
-		return m_TypeKind == EType_Pointer || m_TypeKind == EType_Pointer_d;
-	}
-
-	bool
 	IsDoubleReferenceType ();
 
 	bool
 	IsReferenceType ()
 	{
 		return m_TypeKind >= EType_Reference && m_TypeKind <= EType_Reference_d;
-	}
-
-	bool
-	IsFatReferenceType ()
-	{
-		return m_TypeKind == EType_Reference || m_TypeKind == EType_Reference_d;
 	}
 
 	bool 
@@ -336,6 +324,9 @@ public:
 
 	CType* 
 	GetModifiedType (int Modifiers);
+
+	CType*
+	GetUnqualifiedType ();
 };
 
 //.............................................................................

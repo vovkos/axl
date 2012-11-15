@@ -48,6 +48,12 @@ public:
 		return m_pCurrentNamespace;
 	}
 
+	CScope* 
+	GetCurrentScope ()
+	{
+		return m_pCurrentScope;
+	}
+
 	void
 	SetCurrentNamespace (CNamespace* pNamespace)
 	{
