@@ -7,6 +7,21 @@ namespace jnc {
 
 //.............................................................................
 
+err::CError
+SetCastError (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	return err::SetFormatStringError (
+		_T("cannot convert from '%s' to '%s'"),
+		pSrcType->GetTypeString (),
+		pDstType->GetTypeString ()
+		);
+}
+
+//.............................................................................
+
 ICastOperator::ICastOperator()
 {
 	m_pModule = GetCurrentThreadModule ();
@@ -121,9 +136,84 @@ CCast_cpy::LlvmCast (
 		return true;
 	}
 
-	llvm::Value* pLlvmTrunc = m_pModule->m_LlvmBuilder.CreateBitCast (Value.GetLlvmValue (), pLlvmToType, "cast_cpy");
-	pResultValue->SetLlvmRegister (pLlvmTrunc, pType);
+	llvm::Value* pLlvmBitCast = m_pModule->m_LlvmBuilder.CreateBitCast (Value.GetLlvmValue (), pLlvmToType, "cast_cpy");
+	pResultValue->SetLlvmRegister (pLlvmBitCast, pType);
 	return true;
+}
+
+//.............................................................................
+
+ECast
+CCast_load::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	ASSERT (pSrcType->IsReferenceType ());
+	return m_pModule->m_OperatorMgr.GetCastKind (((CPointerType*) pSrcType)->GetBaseType (), pDstType);
+}
+
+bool
+CCast_load::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	err::SetFormatStringError (_T("can't load constant reference"));
+	return false;
+}
+
+bool
+CCast_load::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CValue TmpValue;
+	return 
+		m_pModule->m_OperatorMgr.LoadReferenceOperator (Value, &TmpValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (TmpValue, pType, pResultValue);
+}
+
+//.............................................................................
+
+// get property
+
+ECast
+CCast_getp::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	ASSERT (pSrcType->GetTypeKind () == EType_Property);
+	CFunctionType* pGetterType = ((CPropertyType*) pSrcType)->GetGetterType ();
+	return m_pModule->m_OperatorMgr.GetCastKind (pGetterType->GetReturnType (), pDstType);
+}
+
+bool
+CCast_getp::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	err::SetFormatStringError (_T("can't get constant property"));
+	return false;
+}
+
+bool
+CCast_getp::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (Value.GetValueKind () == EValue_Property);
+
+	CValue TmpValue;
+	return 
+		m_pModule->m_OperatorMgr.GetPropertyOperator (Value.GetProperty (), &TmpValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (TmpValue, pType, pResultValue);
 }
 
 //.............................................................................
@@ -296,66 +386,6 @@ CCast_f32_f64::LlvmCast (
 //.............................................................................
 
 bool
-CCast_num_bool::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	const char* p = (const char*) SrcValue.GetConstData ();
-	const char* pEnd = p + SrcValue.GetType ()->GetSize ();
-	
-	bool Bool = false;
-
-	for (; p < pEnd; p++)
-	{
-		if (*p)
-		{
-			Bool = true;
-			break;
-		}
-	}
-
-	*(bool*) DstValue.GetConstData () = Bool;
-	return true;
-}
-
-bool
-CCast_num_bool::LlvmCast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	CValue Zero (Value.GetType (), NULL);
-	return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, Value, Zero, pResultValue);
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-bool
-CCast_bool_int::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("CCast_bool_int::ConstCast NOT IMPLEMENTED"));
-	return false;
-}
-
-bool
-CCast_bool_int::LlvmCast (
-	const CValue& Value,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	err::SetFormatStringError (_T("CCast_bool_int::LlvmCast NOT IMPLEMENTED"));
-	return false;
-}
-
-//.............................................................................
-
-bool
 CCast_int_fp::LlvmCast (
 	const CValue& Value,
 	CType* pType,
@@ -392,6 +422,359 @@ CCast_fp_int::LlvmCast (
 {
 	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateFPToSI (Value.GetLlvmValue (), pType->GetLlvmType (), "cast_f_i");
 	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	return true;
+}
+
+//.............................................................................
+
+bool
+CCast_num_bool::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	const char* p = (const char*) SrcValue.GetConstData ();
+	const char* pEnd = p + SrcValue.GetType ()->GetSize ();
+	
+	bool Bool = false;
+
+	for (; p < pEnd; p++)
+	{
+		if (*p)
+		{
+			Bool = true;
+			break;
+		}
+	}
+
+	*(bool*) DstValue.GetConstData () = Bool;
+	return true;
+}
+
+bool
+CCast_num_bool::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CValue Zero (Value.GetType (), NULL);
+	return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, Value, Zero, pResultValue);
+}
+
+//.............................................................................
+
+void
+AssertPointerCastTypeValid (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	EType SrcTypeKind = pSrcType->GetTypeKind ();
+	EType DstTypeKind = pDstType->GetTypeKind ();
+
+	ASSERT (
+		SrcTypeKind == EType_Pointer && DstTypeKind == EType_Pointer ||
+		SrcTypeKind == EType_Pointer && DstTypeKind == EType_Pointer_u ||
+		SrcTypeKind == EType_Pointer_u && DstTypeKind == EType_Pointer_u
+		);
+}
+
+intptr_t
+GetPointerCastOffset (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	AssertPointerCastTypeValid (pSrcType, pDstType);
+		
+	CType* pSrcBaseType = ((CPointerType*) pSrcType)->GetBaseType ();
+	CType* pDstBaseType = ((CPointerType*) pDstType)->GetBaseType ();
+
+	if (pSrcBaseType->GetTypeKind () != EType_Struct ||
+		pDstBaseType->GetTypeKind () != EType_Struct)
+		return 0;
+
+	CStructType* pSrcStructType = (CStructType*) pSrcBaseType;
+	CStructType* pDstStructType = (CStructType*) pDstBaseType;
+
+	#pragma AXL_TODO ("implement struct inheritance check and offset calculation")
+
+	return 0;
+}
+
+//.............................................................................
+
+ECast
+CCast_ptr::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	AssertPointerCastTypeValid (pSrcType, pDstType);
+		
+	CType* pSrcBaseType = ((CPointerType*) pSrcType)->GetBaseType ();
+	CType* pDstBaseType = ((CPointerType*) pDstType)->GetBaseType ();
+
+	if (pDstType->GetTypeKind () == EType_Pointer)
+	{
+		return 
+			(pSrcBaseType->GetFlags () & ETypeFlag_IsPod) &&
+			(pDstBaseType->GetFlags () & ETypeFlag_IsPod) ? ECast_Lossy : ECast_None;
+	}
+	else
+	{
+		return ECast_Lossy;
+	}
+}
+
+bool
+CCast_ptr::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	AssertPointerCastTypeValid (SrcValue.GetType (), DstValue.GetType ());
+		
+	intptr_t Offset = GetPointerCastOffset (SrcValue.GetType (), DstValue.GetType ());
+
+	if (DstValue.GetType ()->GetTypeKind () == EType_Pointer_u)
+	{
+		*(char**) DstValue.GetConstData () = *(char**) SrcValue.GetConstData () + Offset;
+	}
+	else
+	{
+		TSafePtr Ptr = *(TSafePtr*) SrcValue.GetConstData ();
+		Ptr.m_p = (char*) Ptr.m_p + Offset;
+		*(TSafePtr*) DstValue.GetConstData () = Ptr;
+	}
+
+	return true;
+}
+
+bool
+CCast_ptr::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	AssertPointerCastTypeValid (Value.GetType (), pType);
+	
+	CPointerType* pPointerType = (CPointerType*) pType;
+	intptr_t Offset = GetPointerCastOffset (Value.GetType (), pType);
+
+	return 
+		pType->GetTypeKind () == EType_Pointer ? LlvmCast_ptr (Value, pPointerType, Offset, pResultValue) :
+		Value.GetType ()->GetTypeKind () == EType_Pointer_u ? LlvmCast_ptr_u (Value, pPointerType, Offset, pResultValue) :
+		LlvmCast_ptr_ptr_u (Value, pPointerType, Offset, pResultValue);
+}
+
+bool
+CCast_ptr::LlvmCast_ptr (
+	const CValue& Value,
+	CPointerType* pType,
+	size_t Offset,
+	CValue* pResultValue
+	)
+{
+	if (!Offset)
+	{
+		pResultValue->OverrideType (Value, pType);
+		return true;
+	}
+
+	CValue OffsetValue;
+	OffsetValue.SetConstSizeT (Offset, EType_Int_p);
+
+	llvm::Value* pLlvmSafePtr = Value.GetLlvmValue ();
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmSafePtr, 0, "sptr_p");
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, OffsetValue.GetLlvmValue (), "sptr_p_inc");		
+	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmPtr, 0, "sptr");
+
+	pResultValue->SetLlvmRegister (pLlvmSafePtr, pType);
+	return true;
+}
+
+bool
+CCast_ptr::LlvmCast_ptr_u (
+	const CValue& Value,
+	CPointerType* pType,
+	size_t Offset,
+	CValue* pResultValue
+	)
+{
+	llvm::Value* pLlvmPtr = Value.GetLlvmValue ();
+
+	if (Offset)
+	{
+		CValue OffsetValue;
+		OffsetValue.SetConstSizeT (Offset, EType_Int_p);
+
+		CType* pBytePtrType = m_pModule->m_TypeMgr.GetBytePtrType ();
+
+		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pBytePtrType->GetLlvmType (), "p_cast");
+		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, OffsetValue.GetLlvmValue (), "p_inc");
+	}
+
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pType->GetLlvmType (), "p_cast");
+	pResultValue->SetLlvmRegister (pLlvmPtr, pType);
+	return true;
+}
+
+bool
+CCast_ptr::LlvmCast_ptr_ptr_u (
+	const CValue& Value,
+	CPointerType* pType,
+	size_t Offset,
+	CValue* pResultValue
+	)
+{
+	llvm::Value* pLlvmSafePtr = Value.GetLlvmValue ();
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmSafePtr, 0, "p");
+
+	if (Offset)
+	{
+		CValue OffsetValue;
+		OffsetValue.SetConstSizeT (Offset, EType_Int_p);
+		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, OffsetValue.GetLlvmValue (), "p_inc");		
+	}
+
+	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pType->GetLlvmType (), "p_cast");
+	pResultValue->SetLlvmRegister (pLlvmPtr, pType);
+	return true;
+}
+
+//.............................................................................
+
+ECast
+CCast_arr::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	return ECast_Lossy;
+}
+
+bool
+CCast_arr::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	err::SetFormatStringError (_T("CCast_arr::ConstCast is not yet implemented"));
+	return false;
+}
+
+bool
+CCast_arr::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("CCast_arr::LlvmCast is not yet implemented"));
+	return false;
+}
+
+//.............................................................................
+
+ECast
+CCast_arr_ptr::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	CArrayType* pArrayType = pSrcType->IsReferenceType () ? 
+		(CArrayType*) ((CPointerType*) pSrcType)->GetBaseType () :
+		(CArrayType*) pSrcType;
+
+	CPointerType* pPointerType = (CPointerType*) pDstType;
+
+	ASSERT (pArrayType->GetTypeKind () == EType_Array);
+	ASSERT (pPointerType->IsPointerType ());
+
+	CType* pArrayBaseType = pArrayType->GetBaseType ();
+	CType* pPointerBaseType = pPointerType->GetBaseType ();
+
+	return 
+		pArrayBaseType->Cmp (pPointerBaseType) == 0 ? ECast_Lossless : 
+		(pArrayBaseType->GetFlags () & ETypeFlag_IsPod) &&
+		(pPointerBaseType->GetFlags () & ETypeFlag_IsPod) ? ECast_Lossy : ECast_None;
+}
+
+bool
+CCast_arr_ptr::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	ASSERT (SrcValue.GetType ()->GetTypeKind () == EType_Array);
+	ASSERT (DstValue.GetType ()->IsPointerType ());
+
+	const CValue& SavedSrcValue = m_pModule->m_ConstMgr.SaveValue (SrcValue);
+	void* p = SavedSrcValue.GetConstData ();
+
+	if (DstValue.GetType ()->GetTypeKind () == EType_Pointer_u)
+	{
+		*(void**) DstValue.GetConstData () = p;
+	}
+	else
+	{
+		TSafePtr* pPtr = (TSafePtr*) DstValue.GetConstData ();
+		pPtr->m_p = p;
+		pPtr->m_pRegionBegin = p;
+		pPtr->m_pRegionEnd = (char*) p + SrcValue.GetType ()->GetSize ();
+		pPtr->m_ScopeLevel = 0;
+	}
+
+	return true;
+}
+
+bool
+CCast_arr_ptr::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	if (!Value.GetType ()->IsReferenceType ())
+	{
+		SetCastError (Value.GetType (), pType);
+		return false;
+	}
+
+	if (Value.GetValueKind () == EValue_Variable)
+	{
+		pResultValue->SetVariable (Value.GetVariable (), Value.GetLlvmValue (), pType);
+		return true;
+	}
+
+	CArrayType* pArrayType = (CArrayType*) ((CPointerType*) Value.GetType ())->GetBaseType ();
+	CPointerType* pPointerType = (CPointerType*) pType;
+
+	ASSERT (pArrayType->GetTypeKind () == EType_Array);
+	ASSERT (pPointerType->IsPointerType ());
+
+	CValue Zero;
+	Zero.SetConstSizeT (0);
+
+	llvm::Value* LlvmIndexArray [] =
+	{
+		Zero.GetLlvmValue (),
+		Zero.GetLlvmValue (),
+	};
+
+	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (
+		pLlvmValue, 
+		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
+		);
+
+	if (pType->GetTypeKind () == EType_Pointer)
+		pLlvmPtr = m_pModule->m_OperatorMgr.CreateLlvmSafePtr (pLlvmPtr, pLlvmValue, pArrayType, 0);
+
+	pResultValue->SetLlvmRegister (pLlvmPtr, pType);
 	return true;
 }
 

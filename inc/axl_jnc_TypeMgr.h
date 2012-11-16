@@ -39,8 +39,8 @@ protected:
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
 
+	CPointerType* m_pBytePtrType;
 	CStructType* m_pSafePtrStructType;
-	CStructType* m_pDynamicPtrStructType;
 	CStructType* m_pFunctionPtrStructType;
 	
 public:
@@ -213,11 +213,11 @@ public:
 		return GetStructType (TypeKind, rtl::CString (), rtl::CString (), PackFactor);
 	}
 
-	CStructType* 
-	GetSafePtrStructType ();
+	CPointerType* 
+	GetBytePtrType ();
 
 	CStructType* 
-	GetDynamicPtrStructType ();
+	GetSafePtrStructType ();
 
 	CStructType* 
 	GetFunctionPtrStructType ();

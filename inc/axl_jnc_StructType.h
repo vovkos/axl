@@ -133,6 +133,7 @@ public:
 	CStructType ()
 	{
 		m_TypeKind = EType_Struct;
+		m_Flags = ETypeFlag_IsPod | ETypeFlag_IsIncomplete;
 	}
 
 	llvm::StructType* 

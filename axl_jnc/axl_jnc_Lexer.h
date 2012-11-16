@@ -33,10 +33,10 @@ enum EToken
 	EToken_BigEndian,
 	EToken_Safe,
 	EToken_Unsafe,
-	EToken_Dynamic,
 	EToken_NoNull,
 	EToken_Auto,
 	EToken_Void,
+	EToken_Variant,
 	EToken_Bool,
 	EToken_Int8,
 	EToken_Int16,
@@ -127,10 +127,10 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
 	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
 	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
-	AXL_PRS_TOKEN_NAME (EToken_Dynamic,      "dynamic")
 	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
 	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")
+	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")
 	AXL_PRS_TOKEN_NAME (EToken_Bool,         "bool")
 	AXL_PRS_TOKEN_NAME (EToken_Int8,         "int8")
 	AXL_PRS_TOKEN_NAME (EToken_Int16,        "int16")

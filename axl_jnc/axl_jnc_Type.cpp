@@ -103,9 +103,6 @@ GetTypeModifierString (ETypeModifier Modifier)
 	case ETypeModifier_Unsafe:
 		return _T("unsafe");
 		
-	case ETypeModifier_Dynamic:
-		return _T("dynamic");
-
 	case ETypeModifier_NoNull:
 		return _T("nonull");
 
@@ -190,11 +187,6 @@ CType::GetLlvmType ()
 	case EType_Pointer:
 	case EType_Reference:
 		pLlvmType = m_pModule->m_TypeMgr.GetSafePtrStructType ()->GetLlvmType ();
-		break;
-
-	case EType_Pointer_d:
-	case EType_Reference_d:
-		pLlvmType = m_pModule->m_TypeMgr.GetDynamicPtrStructType ()->GetLlvmType ();
 		break;
 
 	case EType_Pointer_u:
@@ -315,20 +307,12 @@ CType::GetTypeString ()
 		m_TypeString.Format (_T("%s* unsafe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
 		break;
 
-	case EType_Pointer_d:
-		m_TypeString.Format (_T("%s* dynamic"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
-		break;
-
 	case EType_Reference:
 		m_TypeString.Format (_T("%s& safe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
 		break;
 
 	case EType_Reference_u:
 		m_TypeString.Format (_T("%s& unsafe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
-		break;
-
-	case EType_Reference_d:
-		m_TypeString.Format (_T("%s& dynamic"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
 		break;
 
 	case EType_BitField:
@@ -478,8 +462,7 @@ VerifyPointerModifier (
 	CType* pType,
 	int Modifiers,
 	ETypeModifier Modifier,
-	ETypeModifier AntiModifier1,
-	ETypeModifier AntiModifier2
+	ETypeModifier AntiModifier
 	)
 {
 	if (!pType->IsPointerType () && !pType->IsReferenceType ())
@@ -491,9 +474,7 @@ VerifyPointerModifier (
 		return false;
 	}
 
-	return 
-		VerifyAntiModifier (Modifiers, Modifier, AntiModifier1) &&
-		VerifyAntiModifier (Modifiers, Modifier, AntiModifier2);
+	return VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
 }
 
 static
@@ -564,16 +545,6 @@ GetUnsafePointerTypeKind (EType TypeKind)
 		TypeKind == EType_Reference ? EType_Reference_u : TypeKind;
 }
 
-static
-inline
-EType
-GetDynamicPointerTypeKind (EType TypeKind)
-{
-	return 
-		TypeKind == EType_Pointer ? EType_Pointer_d :
-		TypeKind == EType_Reference ? EType_Reference_d : TypeKind;
-}
-
 CType* 
 CType::GetModifiedType (int Modifiers)
 {
@@ -615,7 +586,7 @@ CType::GetModifiedType (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Safe)
 	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe, ETypeModifier_Dynamic))
+		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe))
 			return NULL;
 
 		// do nothing
@@ -623,7 +594,7 @@ CType::GetModifiedType (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Unsafe)
 	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Unsafe, ETypeModifier_Safe, ETypeModifier_Dynamic))
+		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Unsafe, ETypeModifier_Safe))
 			return NULL;
 
 		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
@@ -631,19 +602,9 @@ CType::GetModifiedType (int Modifiers)
 		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
 	}
 
-	if (Modifiers & ETypeModifier_Dynamic)
-	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Dynamic, ETypeModifier_Safe, ETypeModifier_Unsafe))
-			return NULL;
-
-		EType ModTypeKind = GetDynamicPointerTypeKind (pType->m_TypeKind);
-		CPointerType* pPointerType = (CPointerType*) pType;
-		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
-	}
-
 	if (Modifiers & ETypeModifier_NoNull)
 	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_NoNull, (ETypeModifier) 0, (ETypeModifier) 0))
+		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_NoNull, (ETypeModifier) 0))
 			return NULL;
 
 		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_NoNull);

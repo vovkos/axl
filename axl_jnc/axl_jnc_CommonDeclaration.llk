@@ -198,10 +198,6 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsafe);
 		}
-	| EToken_Dynamic
-		{
-			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Dynamic);
-		}
 	| EToken_NoNull
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_NoNull);
@@ -216,6 +212,10 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 	: EToken_Void
 		{
 			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Void));
+		}
+	| EToken_Variant
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Variant));
 		}
 	| EToken_Bool
 		{

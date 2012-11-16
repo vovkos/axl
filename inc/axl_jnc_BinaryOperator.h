@@ -378,9 +378,9 @@ protected:
 			if (!Result)
 				return false;
 
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateExtractValue (PointerValue.GetLlvmValue (), 0, "sp_ptr");
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmValue, IncrementValue.GetLlvmValue (), "sp_ptr_inc");
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateInsertValue (PointerValue.GetLlvmValue (), pLlvmValue, 0, "sp_ptr");
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateExtractValue (PointerValue.GetLlvmValue (), 0, "sptr_ptr");
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmValue, IncrementValue.GetLlvmValue (), "sptr_ptr_inc");
+			pLlvmValue = m_pModule->m_LlvmBuilder.CreateInsertValue (PointerValue.GetLlvmValue (), pLlvmValue, 0, "sptr_ptr");
 			break;
 
 		case EType_Pointer_u:

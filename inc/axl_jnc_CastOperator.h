@@ -16,9 +16,17 @@ enum ECast
 {
 	ECast_None,
 	ECast_Identitiy,
-	ECast_Implicit,
-	ECast_Explicit,
+	ECast_Lossless,
+	ECast_Lossy,
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+err::CError
+SetCastError (
+	CType* pSrcType,
+	CType* pDstType
+	);
 
 //.............................................................................
 
@@ -49,10 +57,7 @@ public:
 	GetCastKind (
 		CType* pSrcType,
 		CType* pDstType
-		)
-	{
-		return ECast_Implicit;
-	}
+		) = 0;
 
 	virtual
 	bool
@@ -133,6 +138,82 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// load reference
+
+class CCast_load: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_load, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// get property
+
+class CCast_getp: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_getp, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -159,6 +240,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -182,6 +273,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -207,6 +308,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -230,6 +341,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_int_swp, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -256,6 +377,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_int_ext_u, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -285,6 +416,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -294,58 +435,6 @@ public:
 		*(double*) DstValue.GetConstData () = *(float*) SrcValue.GetConstData ();
 		return true;
 	}
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
-// numeric -> bool (common for both integer & fp)
-
-class CCast_num_bool: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_num_bool, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// bool -> int
-
-class CCast_bool_int: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_bool_int, ICastOperator)
-
-public:
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
 
 	virtual
 	bool
@@ -411,6 +500,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -430,6 +529,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f32, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -451,6 +560,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -470,6 +589,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_i32u_f64, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -493,6 +622,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -512,6 +651,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f32, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -533,6 +682,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -552,6 +711,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_i64u_f64, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -575,6 +744,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -594,6 +773,16 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_f32_i64, ICastOperator)
 
 public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
 	virtual
 	bool
 	ConstCast (
@@ -617,6 +806,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -637,6 +836,16 @@ public:
 
 public:
 	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossy;
+	}
+
+	virtual
 	bool
 	ConstCast (
 		const CValue& SrcValue,
@@ -650,5 +859,167 @@ public:
 
 //.............................................................................
 
+// numeric -> bool (common for both integer & fp)
+
+class CCast_num_bool: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_num_bool, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		)
+	{
+		return ECast_Lossless;
+	}
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// safe / unsafe ptr -> safe / unsafe ptr
+
+class CCast_ptr: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_ptr, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+protected:
+	bool
+	LlvmCast_ptr (
+		const CValue& Value,
+		CPointerType* pType,
+		size_t Offset,
+		CValue* pResultValue
+		);
+
+	bool
+	LlvmCast_ptr_u (
+		const CValue& Value,
+		CPointerType* pType,
+		size_t Offset,
+		CValue* pResultValue
+		);
+
+	bool
+	LlvmCast_ptr_ptr_u (
+		const CValue& Value,
+		CPointerType* pType,
+		size_t Offset,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// arr -> arr
+
+class CCast_arr: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_arr, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// arr -> safe / unsafe ptr
+
+class CCast_arr_ptr: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 } // namespace axl {
 } // namespace jnc {
+
+

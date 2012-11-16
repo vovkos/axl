@@ -23,6 +23,7 @@ public:
 	CBitFieldType ()
 	{
 		m_TypeKind = EType_BitField;
+		m_Flags = ETypeFlag_IsPod;
 		m_BitOffset = 0;
 		m_BitCount = 0;
 	}

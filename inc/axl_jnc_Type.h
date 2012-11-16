@@ -61,13 +61,11 @@ enum EType
 
 	EType_Pointer,        // B
 	EType_Pointer_u,      // C
-	EType_Pointer_d,      // D
 
 	// references
 
 	EType_Reference,      // E
 	EType_Reference_u,    // F
-	EType_Reference_d,    // G
 
 	// integer derivatives
 
@@ -140,8 +138,9 @@ enum ETypeQualifier
 
 enum ETypeFlag
 {
-	ETypeFlag_IsIncomplete = 0x10,
-	ETypeFlag_IsLlvmReady  = 0x20,
+	ETypeFlag_IsPod        = 0x10, // plain-old-data
+	ETypeFlag_IsIncomplete = 0x20,
+	ETypeFlag_IsLlvmReady  = 0x40,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -156,9 +155,8 @@ enum ETypeModifier
 	ETypeModifier_LittleEndian      = 0x00020,
 	ETypeModifier_Safe              = 0x00040,
 	ETypeModifier_Unsafe            = 0x00080,	
-	ETypeModifier_Dynamic           = 0x00100,
-	ETypeModifier_NoNull            = 0x00200,	
-	ETypeModifier_Property          = 0x00400,
+	ETypeModifier_NoNull            = 0x00100,	
+	ETypeModifier_Property          = 0x00200,
 };
 
 const tchar_t*
@@ -295,7 +293,7 @@ public:
 	bool
 	IsPointerType ()
 	{
-		return m_TypeKind >= EType_Pointer && m_TypeKind <= EType_Pointer_d;
+		return m_TypeKind == EType_Pointer || m_TypeKind == EType_Pointer_u;
 	}
 	
 	bool
@@ -304,7 +302,7 @@ public:
 	bool
 	IsReferenceType ()
 	{
-		return m_TypeKind >= EType_Reference && m_TypeKind <= EType_Reference_d;
+		return m_TypeKind == EType_Reference || m_TypeKind == EType_Reference_u;
 	}
 
 	bool 

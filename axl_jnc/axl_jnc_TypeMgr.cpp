@@ -12,8 +12,8 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
+	m_pBytePtrType = NULL;
 	m_pSafePtrStructType = NULL;
-	m_pDynamicPtrStructType = NULL;
 	m_pFunctionPtrStructType = NULL;
 
 	SetupAllBasicTypes ();
@@ -32,8 +32,8 @@ CTypeMgr::Clear ()
 	m_PropertyTypeList.Clear ();
 	m_TypeMap.Clear ();
 
+	m_pBytePtrType = NULL;
 	m_pSafePtrStructType = NULL;
-	m_pDynamicPtrStructType = NULL;
 	m_pFunctionPtrStructType = NULL;
 }
 
@@ -41,7 +41,7 @@ void
 CTypeMgr::SetupAllBasicTypes ()
 {
 	SetupBasicType (EType_Void,      0, "a");
-	SetupBasicType (EType_Variant,   -1, "b"); // not yet
+	SetupBasicType (EType_Variant,   sizeof (TVariant), "b");
 	SetupBasicType (EType_Bool,      1, "c");
 	SetupBasicType (EType_Int8,      1, "d");
 	SetupBasicType (EType_Int8_u,    1, "e");
@@ -73,6 +73,7 @@ CTypeMgr::SetupBasicType (
 	CType* pType = &m_BasicTypeArray [TypeKind];
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
+	pType->m_Flags = ETypeFlag_IsPod;
 	pType->m_Size = Size;
 	pType->m_Signature = pSignature;
 
@@ -179,6 +180,7 @@ CTypeMgr::GetPointerType (
 {
 	rtl::CStringA Signature;
 	size_t Size;
+	int Flags = 0;
 
 	switch (TypeKind)
 	{
@@ -190,11 +192,7 @@ CTypeMgr::GetPointerType (
 	case EType_Pointer_u:
 		Signature = 'C';
 		Size = sizeof (void*);
-		break;
-
-	case EType_Pointer_d:
-		Signature = 'D';
-		Size = sizeof (TDynamicPtr);
+		Flags = ETypeFlag_IsPod;
 		break;
 
 	case EType_Reference:
@@ -205,11 +203,7 @@ CTypeMgr::GetPointerType (
 	case EType_Reference_u:
 		Signature = 'F';
 		Size = sizeof (void*);
-		break;
-
-	case EType_Reference_d:
-		Signature = 'G';
-		Size = sizeof (TDynamicPtr);
+		Flags = ETypeFlag_IsPod;
 		break;
 
 	default:
@@ -293,6 +287,7 @@ CTypeMgr::GetEnumType (
 	CEnumType* pType = AXL_MEM_NEW (CEnumType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
+	pType->m_Flags = ETypeFlag_IsPod | ETypeFlag_IsIncomplete;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_pModule = m_pModule;
@@ -318,6 +313,7 @@ CTypeMgr::GetArrayType (
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Array;
+	pType->m_Flags = pBaseType->GetFlags () & ETypeFlag_IsPod;
 	pType->m_Size = pBaseType->GetSize () * ElementCount;
 	pType->m_Signature = Signature;
 	pType->m_pBaseType = pBaseType;
@@ -376,31 +372,13 @@ CTypeMgr::GetSafePtrStructType ()
 	if (m_pSafePtrStructType)
 		return m_pSafePtrStructType;
 
-	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
-
 	m_pSafePtrStructType = GetStructType (EType_Struct, "sptr", "jnc.sptr");
-	m_pSafePtrStructType->CreateMember ("m_p", pInt8PtrType);
-	m_pSafePtrStructType->CreateMember ("m_beg", pInt8PtrType);
-	m_pSafePtrStructType->CreateMember ("m_end", pInt8PtrType);
+	m_pSafePtrStructType->CreateMember ("m_p", GetBytePtrType ());
+	m_pSafePtrStructType->CreateMember ("m_beg", GetBytePtrType ());
+	m_pSafePtrStructType->CreateMember ("m_end", GetBytePtrType ());
 	m_pSafePtrStructType->CreateMember ("m_scope", GetBasicType (EType_SizeT));
 
 	return m_pSafePtrStructType;
-}
-
-CStructType*
-CTypeMgr::GetDynamicPtrStructType ()
-{
-	if (m_pDynamicPtrStructType)
-		return m_pDynamicPtrStructType;
-
-	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
-
-	m_pDynamicPtrStructType = GetStructType (EType_Struct, "dptr", "jnc.dptr");
-	m_pDynamicPtrStructType->CreateMember ("m_p", pInt8PtrType);
-	m_pDynamicPtrStructType->CreateMember ("m_type", pInt8PtrType);
-	m_pDynamicPtrStructType->CreateMember ("m_scope", GetBasicType (EType_SizeT));
-
-	return m_pDynamicPtrStructType;
 }
 
 CStructType*
@@ -409,13 +387,21 @@ CTypeMgr::GetFunctionPtrStructType ()
 	if (m_pFunctionPtrStructType)
 		return m_pFunctionPtrStructType;
 
-	CPointerType* pInt8PtrType = GetPointerType (EType_Pointer_u, EType_Int8);
-
 	m_pFunctionPtrStructType = GetStructType (EType_Struct, "fptr", "jnc.fptr");
-	m_pFunctionPtrStructType->CreateMember ("m_pfn", pInt8PtrType);
-	m_pFunctionPtrStructType->CreateMember ("m_iface", pInt8PtrType);
+	m_pFunctionPtrStructType->CreateMember ("m_pfn", GetBytePtrType ());
+	m_pFunctionPtrStructType->CreateMember ("m_iface", GetBytePtrType ());
 
 	return m_pFunctionPtrStructType;
+}
+
+CPointerType* 
+CTypeMgr::GetBytePtrType ()
+{
+	if (m_pBytePtrType)
+		return m_pBytePtrType;
+
+	m_pBytePtrType = GetPointerType (EType_Pointer_u, EType_Int8);
+	return m_pBytePtrType;
 }
 
 CClassType* 

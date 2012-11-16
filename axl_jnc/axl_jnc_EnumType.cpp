@@ -7,6 +7,13 @@ namespace jnc {
 
 //.............................................................................
 
+CEnumType::CEnumType ()
+{
+	m_TypeKind = EType_Enum;
+	m_Flags = ETypeFlag_IsPod | ETypeFlag_IsIncomplete;
+	m_CurrentValue = 0;
+}
+
 CEnumMember*
 CEnumType::FindMember (
 	const tchar_t* pName,

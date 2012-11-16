@@ -75,11 +75,7 @@ protected:
 	intptr_t m_CurrentValue;
 
 public:
-	CEnumType ()
-	{
-		m_TypeKind = EType_Enum;
-		m_CurrentValue = 0;
-	}
+	CEnumType ();
 
 	CEnumMember*
 	FindMember (

@@ -354,9 +354,12 @@ public:
 	}
 
 	void
-	SetConstSizeT (size_t Size)
+	SetConstSizeT (
+		size_t Size, 
+		EType TypeKind = EType_SizeT
+		)
 	{
-		CreateConst (EType_SizeT, &Size);
+		CreateConst (TypeKind, &Size);
 	}
 
 	void
@@ -431,7 +434,7 @@ struct TInterface
 	// followed by parents, then by interface data fields
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 // *safe, &safe
 
@@ -440,15 +443,6 @@ struct TSafePtr
 	void* m_p;
 	void* m_pRegionBegin;
 	void* m_pRegionEnd;
-	size_t m_ScopeLevel;
-};
-
-// *dynamic, &dynamic
-
-struct TDynamicPtr
-{
-	void* m_p;
-	CType* m_pType;
 	size_t m_ScopeLevel;
 };
 
@@ -468,6 +462,33 @@ enum ESafePtrError
 	ESafePtrError_Load = 0,
 	ESafePtrError_Store,
 	ESafePtrError_ScopeMismatch,
+};
+
+//.............................................................................
+
+struct TVariant
+{
+	CType* m_pType;
+
+	union
+	{
+		int8_t m_Int8;
+		uint8_t m_Int8_u;
+		int16_t m_Int16;
+		uint16_t m_Int16_u;
+		int32_t m_Int32;
+		uint32_t m_Int32_u;
+		int64_t m_Int64;
+		uint64_t m_Int64_u;
+
+		float m_Float;
+		double m_Double;
+
+		void* m_p;
+
+		TSafePtr m_SafePtr;
+		TFunctionPtr m_FunctionPtr;
+	};
 };
 
 //.............................................................................

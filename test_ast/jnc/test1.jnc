@@ -32,22 +32,21 @@ main ()
 {	
 	g_n = 10;
 
-	int* p = test ();
-	int x = *p;
+	printf ("!!! hui %d\n", g_n);
 
-	printf ("*p = %d\n", x);
+	char a [10];
+	char* p = a;
+
+	int i;
+	for (i = 0; i < 11; i++)
+	{
+		char x = *p;
+		printf ("%d - *p = %d\n", i, x);
+
+		p++;
+	}
+
 	return 0;
-}
-
-int*
-test ()
-{
-	int x = 100;
-
-	int* p = &g_n;
-	g_p = p;
-
-	return p;
 }
 
 //.............................................................................

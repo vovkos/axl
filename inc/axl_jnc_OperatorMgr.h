@@ -60,6 +60,8 @@ protected:
 	// cast operators
 
 	CCast_cpy m_Cast_cpy;
+	CCast_load m_Cast_load;
+	CCast_getp m_Cast_getp;
 
 	CCast_int_trunc m_Cast_int_trunc;
 	CCast_int_ext m_Cast_int_ext;
@@ -68,10 +70,7 @@ protected:
 
 	CCast_f32_f64 m_Cast_f32_f64;
 	CCast_f64_f32 m_Cast_f64_f32;
-
-	CCast_num_bool m_Cast_num_bool;
-	CCast_bool_int m_Cast_bool_int;
-
+	
 	CCast_i32_f32 m_Cast_i32_f32;
 	CCast_i32u_f32 m_Cast_i32u_f32;
 	CCast_i32_f64 m_Cast_i32_f64;
@@ -86,14 +85,18 @@ protected:
 	CCast_f64_i32 m_Cast_f64_i32;
 	CCast_f64_i64 m_Cast_f64_i64;
 
+	CCast_num_bool m_Cast_num_bool;
+
+	CCast_ptr m_Cast_ptr;
+	CCast_arr m_Cast_arr;
+	CCast_arr_ptr m_Cast_arr_ptr;
+
 	// tables
 
 	IUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
 	IBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
-	ICastOperator* m_BasicCastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
+	ICastOperator* m_CastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
 
-	rtl::CStringHashTableMapT <ICastOperator*> m_CastOperatorMap;
-	rtl::CBoxListT <rtl::CString> m_CastSignatureCache;
 	rtl::CStdListT <CSuperCast> m_SuperCastList;
 	
 public:
@@ -104,12 +107,6 @@ public:
 	{
 		return m_pModule;
 	}
-
-	void
-	Clear ();
-
-	void
-	AddStdOperators ();
 
 	// prepare is: unqualify, get property, peel double references
 
@@ -165,20 +162,6 @@ public:
 		);
 
 	// move & cast operators
-
-	ICastOperator*
-	AddCastOperator (
-		CType* pSrcType,
-		CType* pDstType,
-		ICastOperator* pOperator
-		);
-
-	ICastOperator*
-	AddCastOperator (
-		EType SrcTypeKind,
-		EType DstTypeKind,
-		ICastOperator* pOperator
-		);
 
 	ECast
 	GetCastKind (
@@ -273,6 +256,36 @@ public:
 		rtl::CBoxListT <CValue>* pArgList
 		);
 
+	// load & store operators
+
+	bool
+	LoadReferenceOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	LoadReferenceOperator (CValue* pValue);
+
+	bool
+	StoreReferenceOperator (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	bool
+	GetPropertyOperator (
+		CProperty* pProperty,
+		CValue* pResultValue
+		);
+
+	bool
+	SetPropertyOperator (
+		const CValue& OpValue,
+		CProperty* pProperty
+		);
+
+
 	// public llvm helpers
 
 	llvm::Value*
@@ -294,13 +307,6 @@ public:
 		llvm::Value* pLlvmPtr,
 		llvm::Value* pLlvmParentPtr,
 		CType* pParentType,
-		size_t ScopeLevel
-		);
-
-	llvm::Value*
-	CreateLlvmDynamicPtr (
-		llvm::Value* pLlvmPtr,
-		CType* pType,
 		size_t ScopeLevel
 		);
 
@@ -338,68 +344,10 @@ public:
 		);
 
 protected:
-	void
-	AddStdCastOperators ();
-
 	ICastOperator*
 	GetCastOperator (
 		CType* pSrcType,
 		CType* pDstType
-		);
-
-	// load & store operators
-
-	bool
-	LoadReferenceOperator (
-		const CValue& OpValue,
-		CValue* pResultValue
-		);
-
-	bool
-	LoadReferenceOperator (CValue* pValue);
-
-	bool
-	StoreReferenceOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	bool
-	GetPropertyOperator (
-		CProperty* pProperty,
-		CValue* pResultValue
-		);
-
-	bool
-	SetPropertyOperator (
-		const CValue& OpValue,
-		CProperty* pProperty
-		);
-
-	// special cast operators
-
-	bool
-	CastPointerOperator (
-		const CValue& OpValue,
-		CPointerType* pSrcType,
-		CPointerType* pDstType,
-		CValue* pResultValue
-		);
-
-	bool
-	CastArrayReferenceToPointerOperator (
-		const CValue& OpValue,
-		CArrayType* pArrayType,
-		CPointerType* pPointerType,
-		CValue* pResultValue
-		);
-
-	bool
-	CastArrayToPointerOperator (
-		const CValue& OpValue,
-		CArrayType* pArrayType,
-		CPointerType* pPointerType,
-		CValue* pResultValue
 		);
 
 	// member operators

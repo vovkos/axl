@@ -289,14 +289,12 @@ CFunctionMgr::GetCreateSafePtr ()
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 
-	CType* pInt8PtrType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8);
-
 	CType* pReturnType = m_pModule->m_TypeMgr.GetSafePtrStructType ();
 
 	CType* ArgTypeArray [] =
 	{
-		pInt8PtrType,
-		pInt8PtrType,	
+		m_pModule->m_TypeMgr.GetBytePtrType (),
+		m_pModule->m_TypeMgr.GetBytePtrType (),
 		m_pModule->m_TypeMgr.GetBasicType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetBasicType (EType_SizeT),
 	};
@@ -370,17 +368,17 @@ CFunctionMgr::GetCheckSafePtrRange ()
 	llvm::Value* pLlvmArg2 = LlvmArg++;
 	llvm::Value* pLlvmArg3 = LlvmArg++;
 
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 0, "sp_ptr");
-	llvm::Value* pLlvmRegionBegin = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 1, "sp_beg");
-	llvm::Value* pLlvmRegionEnd = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 2, "sp_end");
-	llvm::Value* pLlvmPtrEnd = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, pLlvmArg2, "sp_ptr_end");
+	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 0, "sptr_p");
+	llvm::Value* pLlvmRegionBegin = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 1, "sptr_beg");
+	llvm::Value* pLlvmRegionEnd = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 2, "sptr_end");
+	llvm::Value* pLlvmPtrEnd = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, pLlvmArg2, "sptr_p_end");
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
 	CBasicBlock* pCmp2Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp2"));
 	CBasicBlock* pCmp3Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp3"));
 	
-	CValue Null (m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, EType_Int8), NULL);
+	CValue Null (m_pModule->m_TypeMgr.GetBytePtrType (), NULL);
 
 	llvm::Value* pCmp = m_pModule->m_LlvmBuilder.CreateICmpEQ (pLlvmPtr, Null.GetLlvmValue (), "eq");
 	m_pModule->m_LlvmBuilder.CreateCondBr (pCmp, pFailBlock->GetLlvmBlock (), pCmp2Block->GetLlvmBlock ());
@@ -442,7 +440,7 @@ CFunctionMgr::GetCheckSafePtrScope ()
 	llvm::Value* pLlvmArg1 = LlvmArg++;
 	llvm::Value* pLlvmArg2 = LlvmArg++;
 
-	llvm::Value* pLlvmPtrScope = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 3, "sp_scope");
+	llvm::Value* pLlvmPtrScope = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 3, "sptr_scope");
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
