@@ -73,7 +73,7 @@ public:
 	CAttribute*
 	FindAttribute (const tchar_t* pName)
 	{
-		rtl::CHashTableMapIteratorT <const tchar_t*, CAttribute*> It = m_AttributeMap.Find (pName); 
+		rtl::CStringHashTableMapIteratorT <CAttribute*> It = m_AttributeMap.Find (pName); 
 		return It ? It->m_Value : NULL;
 	}
 

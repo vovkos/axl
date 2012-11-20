@@ -49,20 +49,6 @@ enum EStdFunc
 
 	EStdFunc_OnInvalidSafePtr,
 
-	// jnc.sptr
-	// jnc.LoadDynamicPtr (jnc.dptr);
-
-	EStdFunc_LoadDynamicPtr,
-
-	// void
-	// jnc.StoreDynamicPtr (
-	//		int8* pSrc
-	//		int8* pSrcType
-	//		jnc.dptr pDst,
-	//		);
-
-	EStdFunc_StoreDynamicPtr,
-
 	EStdFunc__Count
 };
 

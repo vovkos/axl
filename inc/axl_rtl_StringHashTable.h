@@ -57,6 +57,88 @@ class CStringHashTableMapWT: public CStringHashTableMapT <TValue, wchar_t>
 
 //.............................................................................
 
+template <
+	typename TValue,
+	typename C = tchar_t
+	>
+class CStringHashTableMapIteratorT: public CHashTableMapIteratorT <
+	const C*,
+	TValue
+	>
+{
+public:
+	CStringHashTableMapIteratorT ()
+	{ 
+	}
+
+	CStringHashTableMapIteratorT (const CStringHashTableMapIteratorT& Src)
+	{ 
+		m_p = Src.m_p; 
+	}
+
+	CStringHashTableMapIteratorT (const CIteratorT <CHashTableMapEntryT <const C*, TValue> >& Src)
+	{ 
+		m_p = Src.GetLink (); 
+	}
+
+	CStringHashTableMapIteratorT (CEntry* p)
+	{ 
+		operator = (p); 
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename TValue>
+class CStringHashTableMapIteratorAT: public CStringHashTableMapIteratorT <TValue, char>
+{
+public:
+	CStringHashTableMapIteratorAT ()
+	{ 
+	}
+
+	CStringHashTableMapIteratorAT (const CStringHashTableMapIteratorT& Src)
+	{ 
+		m_p = Src.m_p; 
+	}
+
+	CStringHashTableMapIteratorAT (const CIteratorT <CHashTableMapEntryT <const char*, TValue> >& Src)
+	{ 
+		m_p = Src.GetLink (); 
+	}
+
+	CStringHashTableMapIteratorAT (CEntry* p)
+	{ 
+		operator = (p); 
+	}
+};
+
+template <typename TValue>
+class CStringHashTableMapIteratorWT: public CStringHashTableMapIteratorT <TValue, wchar_t>
+{
+public:
+	CStringHashTableMapIteratorWT ()
+	{ 
+	}
+
+	CStringHashTableMapIteratorWT (const CStringHashTableMapIteratorT& Src)
+	{ 
+		m_p = Src.m_p; 
+	}
+
+	CStringHashTableMapIteratorWT (const CIteratorT <CHashTableMapEntryT <const wchar_t*, TValue> >& Src)
+	{ 
+		m_p = Src.GetLink (); 
+	}
+
+	CStringHashTableMapIteratorWT (CEntry* p)
+	{ 
+		operator = (p); 
+	}
+};
+
+//.............................................................................
+
 } // namespace rtl
 } // namespace axl
 

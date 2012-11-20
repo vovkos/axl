@@ -222,7 +222,7 @@ CProductionBuilder::AddBeacon (CBeaconNode* pBeacon)
 
 	if (!pBeacon->m_Label.IsEmpty ())
 	{
-		rtl::CHashTableMapIteratorT <const tchar_t*, CBeaconNode*> It = m_BeaconMap.Goto (pBeacon->m_Label);
+		rtl::CStringHashTableMapIteratorT <CBeaconNode*> It = m_BeaconMap.Goto (pBeacon->m_Label);
 		if (!It->m_Value)
 			It->m_Value = pBeacon;
 	}
@@ -345,7 +345,7 @@ CProductionBuilder::FindVariable (
 	CBeaconNode** ppBeacon
 	)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CBeaconNode*> It = m_BeaconMap.Find (pName);
+	rtl::CStringHashTableMapIteratorT <CBeaconNode*> It = m_BeaconMap.Find (pName);
 	if (It)
 	{
 		CBeaconNode* pBeacon = It->m_Value;

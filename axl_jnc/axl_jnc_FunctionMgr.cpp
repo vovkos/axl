@@ -191,8 +191,14 @@ CFunctionMgr::CompileFunctions ()
 		for (; Arg; Arg++, LlvmArg++)
 		{
 			CFunctionFormalArg* pArg = *Arg;
+			llvm::Value* pLlvmArg = LlvmArg;
+
 			CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (pArg->GetName (), pArg->GetType ());
-			m_pModule->m_LlvmBuilder.CreateStore (LlvmArg, pArgVariable->GetLlvmValue ());
+
+			CValue ArgValue (pLlvmArg, pArg->GetType ());
+			CValue ArgVariableValue (pArgVariable);
+
+			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, ArgVariableValue);
 			pNamespace->AddItem (pArgVariable);
 		}
 
@@ -257,14 +263,6 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = GetOnInvalidSafePtr ();
 		break;
 
-	case EStdFunc_LoadDynamicPtr:
-		pFunction = GetLoadDynamicPtr ();
-		break;
-
-	case EStdFunc_StoreDynamicPtr:
-		pFunction = GetStoreDynamicPtr ();
-		break;
-
 	default:
 		ASSERT (false);
 		pFunction = NULL;
@@ -310,20 +308,23 @@ CFunctionMgr::GetCreateSafePtr ()
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 	
-	llvm::Value* pLlvmArg1 = LlvmArg++;
-	llvm::Value* pLlvmArg2 = LlvmArg++;
-	llvm::Value* pLlvmArg3 = LlvmArg++;
-	llvm::Value* pLlvmArg4 = LlvmArg++;
-	llvm::Value* pLlvmEnd = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmArg2, pLlvmArg3, "sptr_end");
+	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
+	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
+	CValue ArgValue3 (LlvmArg++, ArgTypeArray [2]);
+	CValue ArgValue4 (LlvmArg++, ArgTypeArray [3]);
 
-	llvm::Value* pLlvmSafePtr = pReturnType->GetLlvmUndefValue ();
+	CValue EndValue;
+	m_pModule->m_LlvmBuilder.CreateGep (ArgValue2, ArgValue3, NULL, &EndValue);
+
+	CValue SafePtrValue (pReturnType->GetLlvmUndefValue (), pReturnType);
 	
-	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmArg1, 0, "sptr_p");
-	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmArg2, 1, "sptr_beg");
-	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmEnd, 2, "sptr_end");
-	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmArg4, 3, "sptr_scope");
+	rtl::CString s = pReturnType->GetTypeString ();
 
-	m_pModule->m_LlvmBuilder.CreateRet (pLlvmSafePtr);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, ArgValue1, 0, NULL, &SafePtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, ArgValue2, 1, NULL, &SafePtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, EndValue, 2, NULL, &SafePtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, ArgValue4, 3, pReturnType, &SafePtrValue);
+	m_pModule->m_LlvmBuilder.CreateRet (SafePtrValue);
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
 	m_pCurrentFunction = pPrevCurrentFunction;
@@ -364,41 +365,47 @@ CFunctionMgr::GetCheckSafePtrRange ()
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 	
-	llvm::Value* pLlvmArg1 = LlvmArg++;
-	llvm::Value* pLlvmArg2 = LlvmArg++;
-	llvm::Value* pLlvmArg3 = LlvmArg++;
+	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
+	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
+	CValue ArgValue3 (LlvmArg++, ArgTypeArray [2]);
 
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 0, "sptr_p");
-	llvm::Value* pLlvmRegionBegin = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 1, "sptr_beg");
-	llvm::Value* pLlvmRegionEnd = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 2, "sptr_end");
-	llvm::Value* pLlvmPtrEnd = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, pLlvmArg2, "sptr_p_end");
+	CValue PtrValue;
+	CValue PtrEndValue;
+	CValue RegionBeginValue;
+	CValue RegionEndValue;
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 1, NULL, &RegionBeginValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 2, NULL, &RegionEndValue);
+	m_pModule->m_LlvmBuilder.CreateGep (PtrValue, ArgValue2, NULL ,&PtrEndValue);
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
 	CBasicBlock* pCmp2Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp2"));
 	CBasicBlock* pCmp3Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp3"));
 	
-	CValue Null (m_pModule->m_TypeMgr.GetBytePtrType (), NULL);
+	CValue NullValue (m_pModule->m_TypeMgr.GetBytePtrType (), NULL);
 
-	llvm::Value* pCmp = m_pModule->m_LlvmBuilder.CreateICmpEQ (pLlvmPtr, Null.GetLlvmValue (), "eq");
-	m_pModule->m_LlvmBuilder.CreateCondBr (pCmp, pFailBlock->GetLlvmBlock (), pCmp2Block->GetLlvmBlock ());
+	CValue CmpValue;
+	m_pModule->m_LlvmBuilder.CreateEq_i (PtrValue, NullValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pCmp2Block);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pCmp2Block);
 
-	pCmp = m_pModule->m_LlvmBuilder.CreateICmpULT (pLlvmPtr, pLlvmRegionBegin, "lt");
-	m_pModule->m_LlvmBuilder.CreateCondBr (pCmp, pFailBlock->GetLlvmBlock (), pCmp3Block->GetLlvmBlock ());
+	m_pModule->m_LlvmBuilder.CreateLt_u (PtrValue, RegionBeginValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pCmp3Block);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pCmp3Block);
 
-	pCmp = m_pModule->m_LlvmBuilder.CreateICmpUGT (pLlvmPtrEnd, pLlvmRegionEnd, "gt");
-	m_pModule->m_LlvmBuilder.CreateCondBr (pCmp, pFailBlock->GetLlvmBlock (), pSuccessBlock->GetLlvmBlock ());
+	m_pModule->m_LlvmBuilder.CreateGt_u (PtrValue, RegionEndValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
 
-	m_pModule->m_LlvmBuilder.CreateRetVoid ();
+	m_pModule->m_LlvmBuilder.CreateRet ();
 
 	CFunction* pOnInvalidSafePtr = GetStdFunction (EStdFunc_OnInvalidSafePtr);
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
-	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidSafePtr->GetLlvmFunction (), pLlvmArg1, pLlvmArg3);
-	m_pModule->m_LlvmBuilder.CreateRetVoid ();
+	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidSafePtr, ArgValue1, ArgValue3, NULL, NULL);
+	m_pModule->m_LlvmBuilder.CreateRet ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
 	m_pCurrentFunction = pPrevCurrentFunction;
@@ -437,19 +444,22 @@ CFunctionMgr::GetCheckSafePtrScope ()
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 	
-	llvm::Value* pLlvmArg1 = LlvmArg++;
-	llvm::Value* pLlvmArg2 = LlvmArg++;
+	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
+	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
 
-	llvm::Value* pLlvmPtrScope = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmArg1, 3, "sptr_scope");
+	CValue ScopeValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 3, NULL, &ScopeValue);
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
 	
-	llvm::Value* pCmp = m_pModule->m_LlvmBuilder.CreateICmpULT (pLlvmArg2, pLlvmPtrScope, "lt");
-	m_pModule->m_LlvmBuilder.CreateCondBr (pCmp, pFailBlock->GetLlvmBlock (), pSuccessBlock->GetLlvmBlock ());
+	CValue CmpValue;
+
+	m_pModule->m_LlvmBuilder.CreateLt_u (ArgValue2, ScopeValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
 
-	m_pModule->m_LlvmBuilder.CreateRetVoid ();
+	m_pModule->m_LlvmBuilder.CreateRet ();
 
 	CFunction* pOnInvalidSafePtr = GetStdFunction (EStdFunc_OnInvalidSafePtr);
 
@@ -457,8 +467,8 @@ CFunctionMgr::GetCheckSafePtrScope ()
 	ErrorValue.SetConstInt32 (ESafePtrError_ScopeMismatch, EType_Int);
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
-	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidSafePtr->GetLlvmFunction (), pLlvmArg1, ErrorValue.GetLlvmValue ());
-	m_pModule->m_LlvmBuilder.CreateRetVoid ();
+	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidSafePtr, ArgValue1, ErrorValue, NULL, NULL);
+	m_pModule->m_LlvmBuilder.CreateRet ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
 	m_pCurrentFunction = pPrevCurrentFunction;
@@ -485,28 +495,6 @@ CFunctionMgr::GetOnInvalidSafePtr ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	return CreateFunction (_T("jnc.OnInvalidSafePtr"), pType);
-}
-
-// jnc.sptr 
-// jnc.LoadDynamicPtr (jnc.dptr);
-
-CFunction*
-CFunctionMgr::GetLoadDynamicPtr ()
-{
-	return NULL;
-}
-
-// void
-// jnc.StoreDynamicPtr (
-//		int8* pSrc
-//		int8* pSrcType
-//		jnc.dptr pDst,
-//		);
-
-CFunction*
-CFunctionMgr::GetStoreDynamicPtr ()
-{
-	return NULL;
 }
 
 //.............................................................................

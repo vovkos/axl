@@ -105,7 +105,7 @@ CNodeMgr::GetTokenNode (int Token)
 CSymbolNode*
 CNodeMgr::GetSymbolNode (const rtl::CString& Name)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CSymbolNode*> It = m_SymbolMap.Goto (Name);
+	rtl::CStringHashTableMapIteratorT <CSymbolNode*> It = m_SymbolMap.Goto (Name);
 	if (It->m_Value)
 		return It->m_Value;
 

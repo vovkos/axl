@@ -105,22 +105,26 @@ CBinOp_Add::Operator (
 llvm::Value*
 CBinOp_Add::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateAdd (pOpValue1, pOpValue2, "add_i");
+	return pModule->m_LlvmBuilder.CreateAdd_i (OpValue1, OpValue2, pResultType, pResultValue);
 }
 	
 llvm::Value*
 CBinOp_Add::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFAdd (pOpValue1, pOpValue2, "add_f");
+	return pModule->m_LlvmBuilder.CreateAdd_f (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -144,23 +148,27 @@ CBinOp_Sub::Operator (
 llvm::Value*
 CBinOp_Sub::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateSub (pOpValue1, pOpValue2, "sub_i");
+	return pModule->m_LlvmBuilder.CreateSub_i (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 	
 llvm::Value*
 CBinOp_Sub::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFSub (pOpValue1, pOpValue2, "sub_f");
+	return pModule->m_LlvmBuilder.CreateSub_f (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 bool
@@ -185,17 +193,19 @@ CBinOp_Sub::PointerDifferenceOperator (
 	if (!Result)
 		return false;
 
-	CType* pType = m_pModule->m_TypeMgr.GetBasicType (EType_SizeT);
+	CType* pType = m_pModule->m_TypeMgr.GetBasicType (EType_Int_p);
 
+	CValue CastValue1;
+	CValue CastValue2;
+	CValue DiffValue;
 	CValue SizeValue;
+
 	SizeValue.SetConstSizeT (pBaseType->GetSize ());
 
-	llvm::Value* pLlvmOp1 = m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue1.GetLlvmValue (), pType->GetLlvmType (), "ptr1_i");
-	llvm::Value* pLlvmOp2 = m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue2.GetLlvmValue (), pType->GetLlvmType (), "ptr2_i");
-	llvm::Value* pLlvmDiff = m_pModule->m_LlvmBuilder.CreateSub (pLlvmOp1, pLlvmOp2, "ptr_diff_i");
-	pLlvmDiff = m_pModule->m_LlvmBuilder.CreateUDiv (pLlvmDiff, SizeValue.GetLlvmValue (), "ptr_diff");
-
-	pResultValue->SetLlvmRegister (pLlvmDiff, pType);
+	m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue1, pType, &CastValue1);
+	m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue2, pType, &CastValue2);
+	m_pModule->m_LlvmBuilder.CreateSub_i (OpValue1, OpValue2, pType, &DiffValue);
+	m_pModule->m_LlvmBuilder.CreateDiv_i (DiffValue, SizeValue, pType, pResultValue);
 	return true;
 }
 
@@ -204,22 +214,26 @@ CBinOp_Sub::PointerDifferenceOperator (
 llvm::Value*
 CBinOp_Mul::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateMul (pOpValue1, pOpValue2, "mul_i");
+	return pModule->m_LlvmBuilder.CreateMul_i (OpValue1, OpValue2, pResultType, pResultValue);
 }
 	
 llvm::Value*
 CBinOp_Mul::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFMul (pOpValue1, pOpValue2, "mul_f");
+	return pModule->m_LlvmBuilder.CreateMul_f (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -227,23 +241,29 @@ CBinOp_Mul::LlvmOpFp (
 llvm::Value*
 CBinOp_Div::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateSDiv (pOpValue1, pOpValue2, "div_i");
+	return IsUnsigned ?
+		pModule->m_LlvmBuilder.CreateDiv_u (OpValue1, OpValue2, pResultType, pResultValue) :
+		pModule->m_LlvmBuilder.CreateDiv_i (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 	
 llvm::Value*
 CBinOp_Div::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFDiv (pOpValue1, pOpValue2, "div_f");
+	return pModule->m_LlvmBuilder.CreateDiv_f (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -251,12 +271,16 @@ CBinOp_Div::LlvmOpFp (
 llvm::Value*
 CBinOp_Mod::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateSRem (pOpValue1, pOpValue2, "mod");
+	return IsUnsigned ?
+		pModule->m_LlvmBuilder.CreateMod_u (OpValue1, OpValue2, pResultType, pResultValue) :
+		pModule->m_LlvmBuilder.CreateMod_i (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -264,12 +288,14 @@ CBinOp_Mod::LlvmOpInt (
 llvm::Value*
 CBinOp_Shl::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateShl (pOpValue1, pOpValue2, "shl");
+	return pModule->m_LlvmBuilder.CreateShl (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -277,12 +303,14 @@ CBinOp_Shl::LlvmOpInt (
 llvm::Value*
 CBinOp_Shr::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateLShr (pOpValue1, pOpValue2, "shr");
+	return pModule->m_LlvmBuilder.CreateShr (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -290,12 +318,14 @@ CBinOp_Shr::LlvmOpInt (
 llvm::Value*
 CBinOp_BitwiseAnd::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateAnd (pOpValue1, pOpValue2, "and");
+	return pModule->m_LlvmBuilder.CreateAnd (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -303,12 +333,14 @@ CBinOp_BitwiseAnd::LlvmOpInt (
 llvm::Value*
 CBinOp_BitwiseOr::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateOr (pOpValue1, pOpValue2, "or");
+	return pModule->m_LlvmBuilder.CreateOr (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -316,12 +348,14 @@ CBinOp_BitwiseOr::LlvmOpInt (
 llvm::Value*
 CBinOp_BitwiseXor::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CType* pResultType,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateXor (pOpValue1, pOpValue2, "xor");
+	return pModule->m_LlvmBuilder.CreateXor (OpValue1, OpValue2, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -329,22 +363,24 @@ CBinOp_BitwiseXor::LlvmOpInt (
 llvm::Value*
 CBinOp_Eq::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpEQ (pOpValue1, pOpValue2, "eq_i");
+	return pModule->m_LlvmBuilder.CreateEq_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
 CBinOp_Eq::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOEQ (pOpValue1, pOpValue2, "eq_f");
+	return pModule->m_LlvmBuilder.CreateEq_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -352,22 +388,24 @@ CBinOp_Eq::LlvmOpFp (
 llvm::Value*
 CBinOp_Ne::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
-	return pModule->m_LlvmBuilder.CreateICmpNE (pOpValue1, pOpValue2, "ne_i");
+	return pModule->m_LlvmBuilder.CreateNe_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
 CBinOp_Ne::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpONE (pOpValue1, pOpValue2, "ne_f");
+	return pModule->m_LlvmBuilder.CreateNe_f (OpValue1, OpValue2, pResultValue);
 }
 	
 //.............................................................................
@@ -375,24 +413,26 @@ CBinOp_Ne::LlvmOpFp (
 llvm::Value*
 CBinOp_Lt::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
 	return IsUnsigned ? 
-		pModule->m_LlvmBuilder.CreateICmpULT (pOpValue1, pOpValue2, "lt_u") :
-		pModule->m_LlvmBuilder.CreateICmpSLT (pOpValue1, pOpValue2, "lt_i");
+		pModule->m_LlvmBuilder.CreateLt_u (OpValue1, OpValue2, pResultValue) :
+		pModule->m_LlvmBuilder.CreateLt_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
 CBinOp_Lt::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOLT (pOpValue1, pOpValue2, "lt_f");
+	return pModule->m_LlvmBuilder.CreateLt_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -400,24 +440,26 @@ CBinOp_Lt::LlvmOpFp (
 llvm::Value*
 CBinOp_Le::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
 	return IsUnsigned ? 
-		pModule->m_LlvmBuilder.CreateICmpULE (pOpValue1, pOpValue2, "le_u") :
-		pModule->m_LlvmBuilder.CreateICmpSLE (pOpValue1, pOpValue2, "le_i");
+		pModule->m_LlvmBuilder.CreateLe_u (OpValue1, OpValue2, pResultValue) :
+		pModule->m_LlvmBuilder.CreateLe_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
 CBinOp_Le::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOLE (pOpValue1, pOpValue2, "le_f");
+	return pModule->m_LlvmBuilder.CreateLe_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -425,24 +467,26 @@ CBinOp_Le::LlvmOpFp (
 llvm::Value*
 CBinOp_Gt::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
 	return IsUnsigned ? 
-		pModule->m_LlvmBuilder.CreateICmpUGT (pOpValue1, pOpValue2, "gt_u") :
-		pModule->m_LlvmBuilder.CreateICmpSGT (pOpValue1, pOpValue2, "gt_i");
+		pModule->m_LlvmBuilder.CreateGt_u (OpValue1, OpValue2, pResultValue) :
+		pModule->m_LlvmBuilder.CreateGt_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
 CBinOp_Gt::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOGT (pOpValue1, pOpValue2, "gt_f");
+	return pModule->m_LlvmBuilder.CreateGt_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -450,24 +494,150 @@ CBinOp_Gt::LlvmOpFp (
 llvm::Value*
 CBinOp_Ge::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2,
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue,
 	bool IsUnsigned
 	)
 {
 	return IsUnsigned ? 
-		pModule->m_LlvmBuilder.CreateICmpUGE (pOpValue1, pOpValue2, "ge_u") :
-		pModule->m_LlvmBuilder.CreateICmpSGE (pOpValue1, pOpValue2, "ge_i");
+		pModule->m_LlvmBuilder.CreateGe_u (OpValue1, OpValue2, pResultValue) :
+		pModule->m_LlvmBuilder.CreateGe_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
 CBinOp_Ge::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue1,
-	llvm::Value* pOpValue2
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFCmpOGE (pOpValue1, pOpValue2, "ge_f");
+	return pModule->m_LlvmBuilder.CreateGe_f (OpValue1, OpValue2, pResultValue);
+}
+
+//.............................................................................
+
+bool
+CBinOp_Idx::Operator (
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	CValue OpValue1;
+	CValue OpValue2;
+
+	Result = m_pModule->m_OperatorMgr.CastOperator (RawOpValue2, EType_Int_p, &OpValue2);
+	if (!Result)
+		return false;
+
+	CType* pOpType1 = RawOpValue1.GetType ();
+	if (pOpType1->IsReferenceType ())
+	{
+		CType* pBaseType = ((CPointerType*) pOpType1)->GetBaseType ();
+
+		if (pBaseType->GetTypeKind () == EType_Array)
+			return ArrayIndexOperator (RawOpValue1, (CArrayType*) pBaseType, OpValue2, pResultValue);
+
+		Result = m_pModule->m_OperatorMgr.LoadReferenceOperator (RawOpValue1, &OpValue1);
+		if (!Result)
+			return false;
+
+		pOpType1 = OpValue1.GetType ();
+	}
+
+	EType TypeKind = pOpType1->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_Pointer:
+	case EType_Pointer_u:
+		return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Add, OpValue1, OpValue2, pResultValue);
+
+	case EType_Array:
+		return ArrayIndexOperator (OpValue1, (CArrayType*) pOpType1, OpValue2, pResultValue);
+
+	case EType_Property:
+		return PropertyIndexOperator (OpValue1, OpValue2, pResultValue);
+
+	default:
+		err::SetFormatStringError (_T("cannot index '%s'"), pOpType1->GetTypeString ());
+		return false;
+	}
+}
+
+bool
+CBinOp_Idx::ArrayIndexOperator (
+	const CValue& OpValue1,
+	CArrayType* pArrayType,
+	const CValue& OpValue2,
+	CValue* pResultValue
+	)
+{
+	CType* pElementType = pArrayType->GetBaseType ();
+
+	if (OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind ())
+	{
+		pResultValue->CreateConst (pElementType, (char*) OpValue1.GetConstData () + OpValue2.GetSizeT () * pElementType->GetSize ());
+		return true;
+	}
+
+	llvm::Value* pLlvmValue = OpValue1.GetLlvmValue ();
+
+	EType OpTypeKind1 = OpValue1.GetType ()->GetTypeKind ();
+	if (OpTypeKind1 == EType_Reference)
+	{
+		if (OpValue1.GetValueKind () == EValue_Variable)
+		{
+			CValue GepValue;
+			m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
+			pResultValue->SetVariable (OpValue1.GetVariable (), GepValue.GetLlvmValue (), pElementType);
+		}
+		else
+		{
+			CValue SizeValue;
+			SizeValue.SetConstSizeT (pElementType->GetSize ());
+		
+			CValue IncrementValue;
+			bool Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Mul, OpValue2, SizeValue, &IncrementValue);
+			if (!Result)
+				return false;
+
+			CType* pResultType = pElementType->GetPointerType (EType_Reference);
+
+			CValue PtrValue;
+			m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);
+			m_pModule->m_LlvmBuilder.CreateGep (PtrValue, IncrementValue, NULL, &PtrValue);
+			m_pModule->m_LlvmBuilder.CreateInsertValue (OpValue1, PtrValue, 0, pResultType, pResultValue);
+		}
+	}
+	else if (OpTypeKind1 == EType_Reference_u)
+	{
+		CType* pResultType = pElementType->GetPointerType (EType_Reference_u);
+		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, pResultType, pResultValue);
+	}
+	else 
+	{
+		ASSERT (OpTypeKind1 == EType_Array);
+
+		err::SetFormatStringError (_T("indexing register-based arrays is not supported yet"));
+		return false;
+	}
+
+	return true;
+}
+
+bool
+CBinOp_Idx::PropertyIndexOperator (
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("indexing of properties is not implemented yet"));
+	return false;
 }
 
 //.............................................................................

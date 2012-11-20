@@ -250,31 +250,15 @@ CParser::DeclareStructMember (
 	if (!pType)
 		return NULL;
 
-	EType TypeKind = pType->GetTypeKind ();
-	if (TypeKind == EType_Function ||
-		TypeKind == EType_Event ||
-		TypeKind == EType_Property
-		)
-	{
-		err::SetFormatStringError (_T("'%s' is illegal type for struct member"), pType->GetTypeString ());
-		return NULL;
-	}
-
 	rtl::CString Name = pDeclarator->GetName ();
-	CStructMember* pOldMember = pStructType->FindMember (Name);
-
-	if (pOldMember)
-	{
-		err::SetFormatStringError (_T("redefinition of '%s'"), Name);
+	CStructMember* pMember = pStructType->CreateMember (Name, pType);
+	if (!pMember)
 		return NULL;
-	}
 
-	CStructMember* pNewMember = pStructType->CreateMember (Name, pType);
+	m_pModule->m_AttributeMgr.AssignAttributeSet (pMember);
+	pMember->m_Pos = pDeclarator->m_Pos;
 
-	m_pModule->m_AttributeMgr.AssignAttributeSet (pNewMember);
-	pNewMember->m_Pos = pDeclarator->m_Pos;
-
-	return pNewMember;
+	return pMember;
 }
 
 CModuleItem*
@@ -284,8 +268,6 @@ CParser::DeclareClassMember (
 	CDeclarator* pDeclarator
 	)
 {
-	bool Result;
-
 	CType* pType = pDeclarator->GetType (pDeclSpecifiers);
 	if (!pType)
 		return NULL;
@@ -293,7 +275,7 @@ CParser::DeclareClassMember (
 	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
 	EType TypeKind = pType->GetTypeKind ();
 	rtl::CString Name = pDeclarator->GetName ();
-	CModuleItem* pOldItem = pClassType->FindMember (Name);
+	CModuleItem* pOldItem = pClassType->FindItem (Name);
 	CModuleItem* pNewItem = NULL;
 
 	if (StorageClass == EStorageClass_Typedef)
@@ -314,36 +296,14 @@ CParser::DeclareClassMember (
 	else if (TypeKind == EType_Function)
 	{
 		CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (Name, (CFunctionType*) pType, pDeclarator->GetArgList ());
-
-		if (!pOldItem)
-		{
-			pClassType->CreateMethodMember (Name, pFunction);
-		}
-		else
-		{		 
-			if (pOldItem->GetItemKind () != EModuleItem_ClassMember ||
-				((CClassMember*) pOldItem)->GetMemberKind () != EClassMember_Method)
-			{	
-				err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-				return NULL;
-			}
-
-			CClassMethodMember* pMethodMember = (CClassMethodMember*) pOldItem;
-			Result = pMethodMember->GetFunction ()->AddOverload (pFunction);
-			if (!Result)
-				return NULL;
-		}
+		CClassMethod* pMethod = pClassType->CreateMethod (Name, pFunction);
+		if (!pMethod)
+			return NULL;
 
 		pNewItem = pFunction;
 	}
 	else if (TypeKind == EType_Property)
 	{
-		if (pOldItem)
-		{	
-			err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-			return NULL;
-		}
-
 		CProperty* pProperty = pDeclSpecifiers->GetProperty ();
 		if (!pProperty)
 		{
@@ -351,17 +311,10 @@ CParser::DeclareClassMember (
 			SetSimplePropertyPos (pProperty, pDeclarator->m_Pos);
 		}
 
-		pClassType->CreatePropertyMember (Name, pProperty);
-		pNewItem = pProperty;
+		pNewItem = pClassType->CreatePropertyMember (Name, pProperty);
 	}
 	else
 	{
-		if (pOldItem)
-		{	
-			err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-			return NULL;
-		}
-
 		pNewItem = pClassType->CreateFieldMember (Name, pType);
 	}
 

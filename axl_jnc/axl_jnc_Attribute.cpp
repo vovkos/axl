@@ -12,7 +12,7 @@ CAttributeSet::CreateAttribute (
 	CValue* pValue
 	)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CAttribute*> It = m_AttributeMap.Goto (Name);
+	rtl::CStringHashTableMapIteratorT <CAttribute*> It = m_AttributeMap.Goto (Name);
 	if (It->m_Value)
 	{
 		err::SetFormatStringError (_T("redefinition of attribute '%s'"));

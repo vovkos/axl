@@ -5,10 +5,12 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
+#include "axl_jnc_Variable.h"
 
 namespace axl {
 namespace jnc {
 
+class CScope;
 class CVariable;
 class CFunction;
 class CFunctionOverload;
@@ -115,6 +117,31 @@ public:
 		SetProperty (pProperty);
 	}
 
+	CValue (
+		CVariable* pVariable,
+		llvm::Value* pLlvmValue,
+		CType* pType
+		)
+	{
+		SetVariable (pVariable, pLlvmValue, pType);
+	}
+
+	CValue (
+		llvm::Value* pLlvmValue,
+		CType* pType
+		)
+	{
+		SetLlvmRegister (pLlvmValue, pType);
+	}
+
+	CValue (
+		llvm::Value* pLlvmValue,
+		EType TypeKind
+		)
+	{
+		SetLlvmRegister (pLlvmValue, TypeKind);
+	}
+
 	void
 	Clear ();
 
@@ -134,6 +161,12 @@ public:
 	GetType () const
 	{
 		return m_pType;
+	}
+
+	CScope*
+	GetScope () const
+	{
+		return m_ValueKind == EValue_Variable ? m_pVariable->GetScope () : NULL;
 	}
 
 	CVariable*
@@ -183,6 +216,13 @@ public:
 	{
 		ASSERT (m_ValueKind == EValue_Const && m_pType->GetSize () >= sizeof (int64_t));
 		return *(int64_t*) GetConstData ();
+	}
+
+	size_t
+	GetSizeT () const
+	{
+		ASSERT (m_ValueKind == EValue_Const && m_pType->GetSize () >= sizeof (size_t));
+		return *(size_t*) GetConstData ();
 	}
 
 	float

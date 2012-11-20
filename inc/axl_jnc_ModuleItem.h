@@ -32,6 +32,7 @@ enum EModuleItem
 	EModuleItem_GlobalProperty,
 	EModuleItem_EnumMember,
 	EModuleItem_StructMember,
+	EModuleItem_UnionMember,
 	EModuleItem_ClassMember,
 };
 

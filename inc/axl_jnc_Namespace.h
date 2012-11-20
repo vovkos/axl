@@ -15,6 +15,15 @@ class CEnumMember;
 
 //.............................................................................
 
+inline
+err::CError
+SetRedefinitionError (const tchar_t* pName)
+{
+	return err::SetFormatStringError (_T("redefinition of '%s'"), pName);
+}
+
+//.............................................................................
+
 class CQualifiedName
 {
 public:
@@ -120,6 +129,7 @@ enum ENamespace
 class CNamespace: public CName
 {
 protected:
+	friend class CNamedType;
 	friend class CNamespaceMgr;
 
 	ENamespace m_NamespaceKind;

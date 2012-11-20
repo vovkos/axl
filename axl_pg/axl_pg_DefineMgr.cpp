@@ -9,7 +9,7 @@ namespace pg {
 CDefine*
 CDefineMgr::GetDefine (const rtl::CString& Name)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CDefine*> It = m_DefineMap.Goto (Name);
+	rtl::CStringHashTableMapIteratorT <CDefine*> It = m_DefineMap.Goto (Name);
 	if (It->m_Value)
 		return It->m_Value;
 

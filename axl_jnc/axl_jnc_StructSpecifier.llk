@@ -18,8 +18,8 @@ struct_specifier
 			if (!$.m_pType)
 				return false;
 		}
-	  generic_formal_argument_list <$.m_pType>?
-	  inheritance_list <$.m_pType>?
+	  generic_formal_argument_list?
+	  (':' type_name_list)?
 	  struct_block <$.m_pType>
 	;
 

@@ -86,7 +86,7 @@ public:
 	CClass*
 	FindClass (const tchar_t* pName)
 	{
-		rtl::CHashTableMapIteratorT <const tchar_t*, CClass*> It = m_ClassMap.Find (pName);
+		rtl::CStringHashTableMapIteratorT <CClass*> It = m_ClassMap.Find (pName);
 		return It ? It->m_Value : NULL;
 	}
 

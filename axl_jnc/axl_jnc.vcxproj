@@ -87,6 +87,7 @@
     <ClInclude Include="..\Inc\axl_jnc_FunctionType.h" />
     <ClInclude Include="..\Inc\axl_jnc_ClassType.h" />
     <ClInclude Include="..\inc\axl_jnc_ImportType.h" />
+    <ClInclude Include="..\inc\axl_jnc_LlvmBuilder.h" />
     <ClInclude Include="..\Inc\axl_jnc_Module.h" />
     <ClInclude Include="..\inc\axl_jnc_ModuleItem.h" />
     <ClInclude Include="..\inc\axl_jnc_CastOperator.h" />
@@ -100,6 +101,7 @@
     <ClInclude Include="..\Inc\axl_jnc_Type.h" />
     <ClInclude Include="..\Inc\axl_jnc_TypeMgr.h" />
     <ClInclude Include="..\inc\axl_jnc_UnaryOperator.h" />
+    <ClInclude Include="..\inc\axl_jnc_UnionType.h" />
     <ClInclude Include="..\inc\axl_jnc_Value.h" />
     <ClInclude Include="..\inc\axl_jnc_Variable.h" />
     <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h" />
@@ -123,6 +125,7 @@
     <ClCompile Include="axl_jnc_FunctionType.cpp" />
     <ClCompile Include="axl_jnc_ClassType.cpp" />
     <ClCompile Include="axl_jnc_Lexer.cpp" />
+    <ClCompile Include="axl_jnc_LlvmBuilder.cpp" />
     <ClCompile Include="axl_jnc_Module.cpp" />
     <ClCompile Include="axl_jnc_ModuleItem.cpp" />
     <ClCompile Include="axl_jnc_CastOperator.cpp" />
@@ -137,6 +140,7 @@
     <ClCompile Include="axl_jnc_Type.cpp" />
     <ClCompile Include="axl_jnc_TypeMgr.cpp" />
     <ClCompile Include="axl_jnc_UnaryOperator.cpp" />
+    <ClCompile Include="axl_jnc_UnionType.cpp" />
     <ClCompile Include="axl_jnc_Value.cpp" />
     <ClCompile Include="axl_jnc_Variable.cpp" />
     <ClCompile Include="axl_jnc_VariableMgr.cpp" />

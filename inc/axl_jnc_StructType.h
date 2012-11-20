@@ -11,20 +11,20 @@
 namespace axl {
 namespace jnc {
 
+class CStructType;
+
 //.............................................................................
 
-class CStructClassType: public CNamedType
+template <typename T>
+class CStructTypeT: public CNamedType
 {
 protected:
-	rtl::CArrayT <CType*> m_BaseTypeArray;
-	rtl::CArrayT <CImportType*> m_GenericArgumentArray;
-
 	size_t m_ActualSize;
 	size_t m_AlignFactor;
 	size_t m_PackFactor;
 
 public:
-	CStructClassType ()
+	CStructTypeT ()
 	{
 		m_ActualSize = 0;
 		m_AlignFactor = 1;
@@ -43,40 +43,78 @@ public:
 		return m_PackFactor;
 	}
 
-	size_t 
-	GetBaseTypeCount ()
+protected:
+	size_t
+	GetFieldOffset (size_t AlignFactor)
 	{
-		return m_BaseTypeArray.GetCount ();
+		size_t Offset = m_ActualSize;
+
+		if (AlignFactor > m_PackFactor)
+			AlignFactor = m_PackFactor;
+
+		size_t Mod = Offset % AlignFactor;
+		if (Mod)
+			Offset += AlignFactor - Mod;
+
+		return Offset;
 	}
 
-	CType*
-	GetBaseType (size_t Index)
+	size_t
+	SetSize (size_t Size)
 	{
-		ASSERT (Index < m_BaseTypeArray.GetCount ());
-		return m_BaseTypeArray [Index];
+		if (m_ActualSize >= Size)
+			return m_Size;
+
+		m_ActualSize = Size;
+		m_Size = Size;
+
+		size_t Mod = m_Size % m_AlignFactor;
+		if (Mod)
+			m_Size += m_AlignFactor - Mod;
+
+		return m_Size;
 	}
-
-	bool
-	AddBaseType (CType* pType); 
-
-	size_t 
-	GetGenericArgumentCount ()
-	{
-		return m_GenericArgumentArray.GetCount ();
-	}
-
-	CImportType*
-	GetGenericArgument (size_t Index)
-	{
-		ASSERT (Index < m_GenericArgumentArray.GetCount ());
-		return m_GenericArgumentArray [Index];
-	}
-
-	bool
-	AddGenericArgument (CImportType* pType);
 };
 
 //.............................................................................
+
+class CStructBaseType: public rtl::TListLink
+{
+protected:
+	friend class CStructType;
+
+	CStructType* m_pType;
+	size_t m_Offset;
+	size_t m_LlvmIndex;
+
+public:
+	CStructBaseType ()
+	{
+		m_pType = NULL;
+		m_Offset = 0;
+		m_LlvmIndex = -1;
+	}
+
+	CStructType*
+	GetType ()
+	{
+		return m_pType;
+	}
+
+	size_t 
+	GetOffset ()
+	{
+		return m_Offset;
+	}
+
+	size_t
+	GetLlvmIndex ()
+	{
+		return m_LlvmIndex;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CStructMember: 
 	public CModuleItem,
@@ -85,14 +123,25 @@ class CStructMember:
 {
 protected:
 	friend class CStructType;
-
+	
 	CType* m_pType;
 	size_t m_Offset;
-	size_t m_Index;
 	size_t m_LlvmIndex;
 
 public:
-	CStructMember ();
+	CStructMember ()
+	{
+		m_ItemKind = EModuleItem_StructMember;
+		m_pType = NULL;
+		m_Offset = 0;
+		m_LlvmIndex = -1;
+	}
+
+	CStructType*
+	GetParentType ()
+	{
+		return (CStructType*) (CNamedType*) m_pParentNamespace; // double cast cause CStructType is not defined yet
+	}
 
 	CType*
 	GetType ()
@@ -107,12 +156,6 @@ public:
 	}
 
 	size_t
-	GetIndex ()
-	{
-		return m_Index;
-	}
-
-	size_t
 	GetLlvmIndex ()
 	{
 		return m_LlvmIndex;
@@ -121,12 +164,14 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CStructType: public CStructClassType
+class CStructType: public CStructTypeT <CStructType>
 {
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
+	rtl::CStringHashTableMapAT <CStructBaseType*> m_BaseTypeMap;
+	rtl::CStdListT <CStructBaseType> m_BaseTypeList;
 	rtl::CStdListT <CStructMember> m_MemberList;
 
 public:
@@ -139,10 +184,33 @@ public:
 	llvm::StructType* 
 	GetLlvmType ();
 
+	rtl::CIteratorT <CStructBaseType>
+	GetFirstBaseType ()
+	{
+		return m_BaseTypeList.GetHead ();
+	}
+
+	bool
+	FindBaseType (
+		CStructType* pType,
+		size_t* pOffset,
+		rtl::CArrayT <size_t>* pLlvmIndexArray
+		);
+
+	CStructBaseType*
+	AddBaseType (CStructType* pType);
+
+	rtl::CIteratorT <CStructMember>
+	GetFirstMember ()
+	{
+		return m_MemberList.GetHead ();
+	}
+
 	CStructMember*
 	FindMember (
 		const tchar_t* pName,
-		bool Traverse = false
+		size_t* pOffset,
+		rtl::CArrayT <size_t>* pLlvmIndexArray
 		);
 
 	CStructMember*
@@ -150,12 +218,6 @@ public:
 		const rtl::CString& Name,
 		CType* pType
 		);
-
-	rtl::CIteratorT <CStructMember>
-	GetFirstMember ()
-	{
-		return m_MemberList.GetHead ();
-	}
 };
 
 //.............................................................................

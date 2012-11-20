@@ -15,28 +15,14 @@ CEnumType::CEnumType ()
 }
 
 CEnumMember*
-CEnumType::FindMember (
-	const tchar_t* pName,
-	bool Traverse
-	)
+CEnumType::FindMember (const tchar_t* pName)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = m_ItemMap.Find (pName); 
-	if (It)
-		return (CEnumMember*) It->m_Value;
-
-	if (!Traverse)
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName); 
+	if (!It)
 		return NULL;
 
-	//size_t Count = m_BaseTypeArray.GetCount ();
-	//for (size_t i = 0; i < Count; i++)
-	//{
-	//	CEnumType* pBaseType = m_BaseTypeArray [i];
-	//	CEnumMember* pMember = pBaseType->FindMember (pName, true);
-	//	if (pMember)
-	//		return pMember;
-	//}
-
-	return NULL;
+	CModuleItem* pItem = It->m_Value;
+	return pItem->GetItemKind () == EModuleItem_EnumMember ? (CEnumMember*) pItem : NULL;
 }
 
 CEnumMember*
@@ -45,17 +31,20 @@ CEnumType::CreateMember (
 	intptr_t Value
 	)
 {
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (Name); 
+	if (It->m_Value)
+	{
+		err::SetFormatStringError (_T("redefinition of member '%s' in '%s'"), Name, GetTypeString ());
+		return NULL;
+	}
+
 	CEnumMember* pMember = AXL_MEM_NEW (CEnumMember);
 	pMember->m_Name = Name;
 	pMember->m_Value = Value;
 	m_MemberList.InsertTail (pMember);
 	
 	m_CurrentValue = Value + 1;
-
-	bool Result = AddItem (pMember);
-	if (!Result)
-		return NULL;
-
+	It->m_Value = pMember;
 	return pMember;
 }
 

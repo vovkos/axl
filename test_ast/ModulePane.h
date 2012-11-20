@@ -58,13 +58,13 @@ protected:
 		HTREEITEM hParent,
 		jnc::CEnumMember* pMember
 		);
-	
+/*	
 	void
 	AddStructClassTypeMembers (
 		HTREEITEM hParent,
 		jnc::CStructClassType* pType
 		);
-
+*/
 	void
 	AddStructMember (
 		HTREEITEM hParent,

@@ -186,26 +186,24 @@ public:
 			case EType_Int32_u:
 			case EType_Int64:
 			case EType_Int64_u:
-				pResultValue->SetLlvmRegister (
-					T::LlvmOpInt (
-						m_pModule, 
-						OpValue1.GetLlvmValue (), 
-						OpValue2.GetLlvmValue (), 
-						pType->IsUnsignedType ()
-						), 
-					pType
+				T::LlvmOpInt (
+					m_pModule, 
+					OpValue1, 
+					OpValue2, 
+					pType,
+					pResultValue,
+					pType->IsUnsignedType ()
 					);
 				break;
 
 			case EType_Float:
 			case EType_Double:
-				pResultValue->SetLlvmRegister (
-					T::LlvmOpFp (
-						m_pModule, 
-						OpValue1.GetLlvmValue (), 
-						OpValue2.GetLlvmValue ()
-						), 
-					pType
+				T::LlvmOpFp (
+					m_pModule, 
+					OpValue1, 
+					OpValue2,
+					pType,
+					pResultValue
 					);
 				break;
 
@@ -311,26 +309,22 @@ public:
 			case EType_Int32_u:
 			case EType_Int64:
 			case EType_Int64_u:
-				pResultValue->SetLlvmRegister (
-					T::LlvmOpInt (
-						m_pModule, 
-						OpValue1.GetLlvmValue (), 
-						OpValue2.GetLlvmValue (), 
-						pType->IsUnsignedType ()
-						), 
-					EType_Bool
+				T::LlvmOpInt (
+					m_pModule, 
+					OpValue1, 
+					OpValue2, 
+					pResultValue,
+					pType->IsUnsignedType ()
 					);
 				break;
 
 			case EType_Float:
 			case EType_Double:
-				pResultValue->SetLlvmRegister (
-					T::LlvmOpFp (
-						m_pModule, 
-						OpValue1.GetLlvmValue (), 
-						OpValue2.GetLlvmValue ()
-						), 
-					EType_Bool
+				T::LlvmOpFp (
+					m_pModule, 
+					OpValue1, 
+					OpValue2,
+					pResultValue
 					);
 				break;
 
@@ -349,50 +343,44 @@ template <typename T>
 class CBinOpT_AddSub: public CBinaryArithmeticOperatorT <T>
 {
 protected:
-	CBinOpT_AddSub ()
-	{
-		m_Flags |= EOpFlag_ArrayToPointer;
-	}
-
 	bool
 	PointerIncrementOperator (
-		const CValue& PointerValue,
-		const CValue& RawIncrementValue,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
 		CValue* pResultValue
 		)
 	{
 		bool Result;
 
-		CValue IncrementValue = RawIncrementValue;
 		CValue SizeValue;
+		CValue IncrementValue;
+		CValue PtrValue;
 
-		llvm::Value* pLlvmValue;
-
-		EType PointerTypeKind = PointerValue.GetType ()->GetTypeKind ();
-		switch (PointerTypeKind)
+		CPointerType* pType = (CPointerType*) OpValue1.GetType ();
+		EType TypeKind = pType->GetTypeKind ();
+		switch (TypeKind)
 		{
 		case EType_Pointer:
-			SizeValue.SetConstSizeT (((CPointerType*) PointerValue.GetType ())->GetBaseType ()->GetSize ());
+			SizeValue.SetConstSizeT (pType->GetBaseType ()->GetSize ());
 		
-			Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Mul, &IncrementValue, SizeValue);
+			Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Mul, OpValue2, SizeValue, &IncrementValue);
 			if (!Result)
 				return false;
 
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateExtractValue (PointerValue.GetLlvmValue (), 0, "sptr_ptr");
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmValue, IncrementValue.GetLlvmValue (), "sptr_ptr_inc");
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateInsertValue (PointerValue.GetLlvmValue (), pLlvmValue, 0, "sptr_ptr");
+			m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);
+			m_pModule->m_LlvmBuilder.CreateGep (PtrValue, IncrementValue, NULL, &PtrValue);
+			m_pModule->m_LlvmBuilder.CreateInsertValue (OpValue1, PtrValue, 0, pType, pResultValue);
 			break;
 
 		case EType_Pointer_u:
-			pLlvmValue = m_pModule->m_LlvmBuilder.CreateGEP (PointerValue.GetLlvmValue (), IncrementValue.GetLlvmValue (), "ptr_inc");
+			m_pModule->m_LlvmBuilder.CreateGep (OpValue1, OpValue2, pType, pResultValue);
 			break;
 
 		default:
-			SetOperatorError (PointerValue.GetType (), IncrementValue.GetType ());
+			SetOperatorError (OpValue1.GetType (), OpValue2.GetType ());
 			return false;
 		}
 
-		pResultValue->SetLlvmRegister (pLlvmValue, PointerValue.GetType ());
 		return true;
 	}
 };
@@ -464,8 +452,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -473,8 +463,10 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 };
 
@@ -545,8 +537,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -554,8 +548,10 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 
 protected:
@@ -626,8 +622,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -635,8 +633,10 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 };
 
@@ -699,8 +699,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -708,8 +710,10 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 };
 
@@ -748,8 +752,10 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue
 		)
 	{
 		return NULL;
@@ -795,8 +801,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 };
@@ -840,8 +848,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 };
@@ -885,8 +895,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 };
@@ -930,8 +942,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 };
@@ -975,8 +989,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 };
@@ -1020,8 +1036,10 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CType* pResultType,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 };
@@ -1085,8 +1103,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -1094,8 +1113,9 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
 		);
 };
 
@@ -1158,8 +1178,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -1167,8 +1188,9 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
 		);
 };
 
@@ -1231,8 +1253,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -1240,8 +1263,9 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
 		);
 };
 
@@ -1304,8 +1328,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -1313,8 +1338,9 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
 		);
 };
 
@@ -1377,8 +1403,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -1386,8 +1413,9 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
 		);
 };
 
@@ -1450,8 +1478,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue,
 		bool IsUnsigned
 		);
 
@@ -1459,8 +1488,47 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue1,
-		llvm::Value* pOpValue2
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+class CBinOp_Idx: public IBinaryOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Ge, IBinaryOperator)
+
+public:
+	CBinOp_Idx ()
+	{
+		m_OpKind = EBinOp_Ge;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& RawOpValue1,
+		const CValue& RawOpValue2,
+		CValue* pResultValue
+		);
+
+protected:
+	bool
+	ArrayIndexOperator (
+		const CValue& RawOpValue1,
+		CArrayType* pArrayType,
+		const CValue& RawOpValue2,
+		CValue* pResultValue
+		);
+
+	bool
+	PropertyIndexOperator (
+		const CValue& RawOpValue1,
+		const CValue& RawOpValue2,
+		CValue* pResultValue
 		);
 };
 

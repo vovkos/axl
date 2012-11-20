@@ -10,6 +10,7 @@
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_EnumType.h"
 #include "axl_jnc_StructType.h"
+#include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
 
 namespace axl {
@@ -32,12 +33,13 @@ protected:
 	rtl::CStdListT <CEnumType> m_EnumTypeList;
 	rtl::CStdListT <CArrayType> m_ArrayTypeList;
 	rtl::CStdListT <CStructType> m_StructTypeList;
+	rtl::CStdListT <CUnionType> m_UnionTypeList;
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
-	rtl::CStringHashTableMapT <CType*> m_TypeMap;
+	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
 	CPointerType* m_pBytePtrType;
 	CStructType* m_pSafePtrStructType;

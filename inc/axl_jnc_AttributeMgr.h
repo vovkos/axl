@@ -9,6 +9,8 @@
 namespace axl {
 namespace jnc {
 
+class CModule;
+
 //.............................................................................
 
 class CAttributeMgr: public rtl::TListLink

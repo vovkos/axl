@@ -127,17 +127,13 @@ CCast_cpy::LlvmCast (
 		return true;
 	}
 
-	llvm::Type* pLlvmFromType = Value.GetType ()->GetLlvmType ();
-	llvm::Type* pLlvmToType = pType->GetLlvmType ();
-
-	if (pLlvmFromType == pLlvmToType)
+	if (Value.GetType ()->GetLlvmType () == pType->GetLlvmType ())
 	{
 		pResultValue->OverrideType (Value, pType);
 		return true;
 	}
 
-	llvm::Value* pLlvmBitCast = m_pModule->m_LlvmBuilder.CreateBitCast (Value.GetLlvmValue (), pLlvmToType, "cast_cpy");
-	pResultValue->SetLlvmRegister (pLlvmBitCast, pType);
+	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pType, pResultValue);
 	return true;
 }
 
@@ -240,8 +236,7 @@ CCast_int_trunc::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmTrunc = m_pModule->m_LlvmBuilder.CreateTrunc (Value.GetLlvmValue (), pType->GetLlvmType (), "trunc_i");
-	pResultValue->SetLlvmRegister (pLlvmTrunc, pType);
+	m_pModule->m_LlvmBuilder.CreateTrunc_i (Value, pType, pResultValue);
 	return true;
 }
 
@@ -277,8 +272,7 @@ CCast_int_ext::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateSExt (Value.GetLlvmValue (), pType->GetLlvmType (), "ext_i");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateExt_i (Value, pType, pResultValue);
 	return true;
 }
 
@@ -310,8 +304,7 @@ CCast_int_ext_u::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateZExt (Value.GetLlvmValue (), pType->GetLlvmType (), "ext_u");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateExt_u (Value, pType, pResultValue);
 	return true;
 }
 
@@ -350,8 +343,9 @@ CCast_int_swp::LlvmCast (
 		llvm::ArrayRef <llvm::Type*> (pLlvmType)
 		);
 
-	llvm::Value* pLlvmResult = m_pModule->m_LlvmBuilder.CreateCall (pLlvmSwap, Value.GetLlvmValue (), "bswap");
-	pResultValue->SetLlvmRegister (pLlvmResult, pType);
+	CValue SwapFunctionValue;
+	SwapFunctionValue.SetLlvmRegister (pLlvmSwap, NULL);
+	m_pModule->m_LlvmBuilder.CreateCall (SwapFunctionValue, Value, pType, pResultValue);
 	return true;
 }
 
@@ -364,8 +358,7 @@ CCast_f64_f32::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateFPTrunc (Value.GetLlvmValue (), pType->GetLlvmType (), "trunc_f");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateTrunc_f (Value, pType, pResultValue);
 	return true;
 }
 
@@ -378,8 +371,7 @@ CCast_f32_f64::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateFPExt (Value.GetLlvmValue (), pType->GetLlvmType (), "ext_f");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateExt_f (Value, pType, pResultValue);
 	return true;
 }
 
@@ -392,8 +384,7 @@ CCast_int_fp::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateSIToFP (Value.GetLlvmValue (), pType->GetLlvmType (), "cast_i_f");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateIntToFp (Value, pType, pResultValue);
 	return true;
 }
 
@@ -406,8 +397,7 @@ CCast_uint_fp::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateUIToFP (Value.GetLlvmValue (), pType->GetLlvmType (), "cast_u_f");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateIntToFp_u (Value, pType, pResultValue);
 	return true;
 }
 
@@ -420,8 +410,7 @@ CCast_fp_int::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmExt = m_pModule->m_LlvmBuilder.CreateFPToSI (Value.GetLlvmValue (), pType->GetLlvmType (), "cast_f_i");
-	pResultValue->SetLlvmRegister (pLlvmExt, pType);
+	m_pModule->m_LlvmBuilder.CreateFpToInt (Value, pType, pResultValue);
 	return true;
 }
 
@@ -587,12 +576,10 @@ CCast_ptr::LlvmCast_ptr (
 	CValue OffsetValue;
 	OffsetValue.SetConstSizeT (Offset, EType_Int_p);
 
-	llvm::Value* pLlvmSafePtr = Value.GetLlvmValue ();
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmSafePtr, 0, "sptr_p");
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, OffsetValue.GetLlvmValue (), "sptr_p_inc");		
-	pLlvmSafePtr = m_pModule->m_LlvmBuilder.CreateInsertValue (pLlvmSafePtr, pLlvmPtr, 0, "sptr");
-
-	pResultValue->SetLlvmRegister (pLlvmSafePtr, pType);
+	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);		
+	m_pModule->m_LlvmBuilder.CreateInsertValue (Value, PtrValue, 0, pType, pResultValue);
 	return true;
 }
 
@@ -604,21 +591,24 @@ CCast_ptr::LlvmCast_ptr_u (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmPtr = Value.GetLlvmValue ();
+	CValue PtrValue;
 
-	if (Offset)
+	if (!Offset)
+	{
+		PtrValue = Value;
+	}
+	else
 	{
 		CValue OffsetValue;
 		OffsetValue.SetConstSizeT (Offset, EType_Int_p);
 
 		CType* pBytePtrType = m_pModule->m_TypeMgr.GetBytePtrType ();
-
-		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pBytePtrType->GetLlvmType (), "p_cast");
-		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, OffsetValue.GetLlvmValue (), "p_inc");
+		
+		m_pModule->m_LlvmBuilder.CreateBitCast (Value, pBytePtrType, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);
 	}
 
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pType->GetLlvmType (), "p_cast");
-	pResultValue->SetLlvmRegister (pLlvmPtr, pType);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pType, pResultValue);
 	return true;
 }
 
@@ -630,18 +620,17 @@ CCast_ptr::LlvmCast_ptr_ptr_u (
 	CValue* pResultValue
 	)
 {
-	llvm::Value* pLlvmSafePtr = Value.GetLlvmValue ();
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateExtractValue (pLlvmSafePtr, 0, "p");
+	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
 
 	if (Offset)
 	{
 		CValue OffsetValue;
 		OffsetValue.SetConstSizeT (Offset, EType_Int_p);
-		pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (pLlvmPtr, OffsetValue.GetLlvmValue (), "p_inc");		
+		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);		
 	}
 
-	pLlvmPtr = m_pModule->m_LlvmBuilder.CreateBitCast (pLlvmPtr, pType->GetLlvmType (), "p_cast");
-	pResultValue->SetLlvmRegister (pLlvmPtr, pType);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pType, pResultValue);
 	return true;
 }
 
@@ -744,38 +733,24 @@ CCast_arr_ptr::LlvmCast (
 		return false;
 	}
 
-	if (Value.GetValueKind () == EValue_Variable)
+	EType TypeKind = pType->GetTypeKind ();
+	if (TypeKind == EType_Pointer && Value.GetValueKind () == EValue_Variable)
 	{
 		pResultValue->SetVariable (Value.GetVariable (), Value.GetLlvmValue (), pType);
 		return true;
 	}
 
 	CArrayType* pArrayType = (CArrayType*) ((CPointerType*) Value.GetType ())->GetBaseType ();
-	CPointerType* pPointerType = (CPointerType*) pType;
-
 	ASSERT (pArrayType->GetTypeKind () == EType_Array);
-	ASSERT (pPointerType->IsPointerType ());
 
-	CValue Zero;
-	Zero.SetConstSizeT (0);
-
-	llvm::Value* LlvmIndexArray [] =
+	if (TypeKind == EType_Pointer_u)
 	{
-		Zero.GetLlvmValue (),
-		Zero.GetLlvmValue (),
-	};
+		m_pModule->m_LlvmBuilder.CreateGep2 (Value, 0, 0, pType, pResultValue);
+		return true;
+	}
 
-	llvm::Value* pLlvmValue = Value.GetLlvmValue ();
-	llvm::Value* pLlvmPtr = m_pModule->m_LlvmBuilder.CreateGEP (
-		pLlvmValue, 
-		llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, 2)
-		);
-
-	if (pType->GetTypeKind () == EType_Pointer)
-		pLlvmPtr = m_pModule->m_OperatorMgr.CreateLlvmSafePtr (pLlvmPtr, pLlvmValue, pArrayType, 0);
-
-	pResultValue->SetLlvmRegister (pLlvmPtr, pType);
-	return true;
+	SetCastError (Value.GetType (), pType);
+	return false;
 }
 
 //.............................................................................

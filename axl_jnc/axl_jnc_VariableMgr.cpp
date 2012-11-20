@@ -40,12 +40,7 @@ CVariableMgr::CreateVariable (
 	if (m_pModule->m_FunctionMgr.GetCurrentFunction ())
 	{
 		ASSERT (VariableKind == EVariable_Local || VariableKind == EVariable_Arg);
-
-		pVariable->m_pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (
-			pType->GetLlvmType (), 
-			0, 
-			(const tchar_t*) Name
-			);
+		pVariable->m_pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name);
 	}
 	else
 	{

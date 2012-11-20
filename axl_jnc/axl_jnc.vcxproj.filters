@@ -130,6 +130,12 @@
     <ClInclude Include="..\inc\axl_jnc_Scope.h">
       <Filter>namespace</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnionType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_LlvmBuilder.h">
+      <Filter>module</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -225,6 +231,12 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_Scope.cpp">
       <Filter>namespace</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnionType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_LlvmBuilder.cpp">
+      <Filter>module</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

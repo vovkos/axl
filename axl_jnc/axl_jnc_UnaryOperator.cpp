@@ -107,19 +107,23 @@ IUnaryOperator::IUnaryOperator ()
 llvm::Value*
 CUnOp_Minus::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue
+	const CValue& OpValue,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateNeg (pOpValue);
+	return pModule->m_LlvmBuilder.CreateNeg_i (OpValue, pResultType, pResultValue);
 }
 
 llvm::Value*
 CUnOp_Minus::LlvmOpFp (
 	CModule* pModule,
-	llvm::Value* pOpValue
+	const CValue& OpValue,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateFNeg (pOpValue);
+	return pModule->m_LlvmBuilder.CreateNeg_f (OpValue, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -127,10 +131,12 @@ CUnOp_Minus::LlvmOpFp (
 llvm::Value*
 CUnOp_BitwiseNot::LlvmOpInt (
 	CModule* pModule,
-	llvm::Value* pOpValue
+	const CValue& OpValue,
+	CType* pResultType,
+	CValue* pResultValue
 	)
 {
-	return pModule->m_LlvmBuilder.CreateNot (pOpValue);
+	return pModule->m_LlvmBuilder.CreateNot (OpValue, pResultType, pResultValue);
 }
 
 //.............................................................................

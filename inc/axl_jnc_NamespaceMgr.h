@@ -10,6 +10,8 @@
 namespace axl {
 namespace jnc {
 
+class CModule;
+
 //.............................................................................
 
 class CNamespaceMgr

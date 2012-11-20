@@ -16,8 +16,8 @@ class_specifier
 			if (!$.m_pType)
 				return false;
 		}
-	  generic_formal_argument_list <$.m_pType>?
-	  inheritance_list <$.m_pType>?
+	  generic_formal_argument_list?
+	  (':' type_name_list)?
 	  class_block <$.m_pType>
 	;
 
@@ -33,17 +33,6 @@ class_kind
 	| EToken_Class
 		{
 			$.m_TypeKind = EType_Class;
-		}
-	;
-
-inheritance_list <CStructClassType* $pType>
-	: ':' base_class <$pType> (',' base_class <$pType>)*
-	;
-
-base_class <CStructClassType* $pType>
-	: type_name
-		{
-			return $pType->AddBaseType ($1.m_pType);
 		}
 	;
 
@@ -91,7 +80,7 @@ local
 				return false;
 			}			
 		}
-	  initializer <.((CClassFieldMember*) $pMember)->GetField ()->GetType ().>
+	  initializer <.((CClassFieldMember*) $pMember)->GetType ().>
 		{
 		}
 	  )?

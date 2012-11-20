@@ -58,13 +58,13 @@ GetItemNamespace (CModuleItem* pItem)
 
 	switch (TypeKind)
 	{
+	case EType_Enum:
+	case EType_Enum_c:
 	case EType_Struct:
 	case EType_Union:
-		return ((CStructType*) pType);
-
 	case EType_Interface:
 	case EType_Class:
-		return ((CClassType*) pType);
+		return ((CNamedType*) pType);
 
 	default:
 		return NULL;
@@ -112,7 +112,7 @@ CNamespace::CreateQualifiedName (const tchar_t* pName)
 CModuleItem*
 CNamespace::FindItem (const tchar_t* pName)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = m_ItemMap.Find (pName); 
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName); 
 	return It ? It->m_Value : NULL;
 }
 
@@ -126,7 +126,7 @@ CNamespace::FindItemTraverse (const CQualifiedName& Name)
 
 	while (pNamespace)
 	{
-		rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
+		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
 		if (It)
 		{
 			pItem = It->m_Value;
@@ -148,7 +148,7 @@ CNamespace::FindItemTraverse (const CQualifiedName& Name)
 		if (!pNamespace)
 			return NULL;
 
-		rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
+		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
 		if (!It)
 			return NULL;
 
@@ -166,10 +166,10 @@ CNamespace::AddItem (
 {
 	ASSERT (pName->m_pParentNamespace == NULL);
 
-	rtl::CHashTableMapIteratorT <const tchar_t*, CModuleItem*> It = m_ItemMap.Goto (pName->m_Name);
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (pName->m_Name);
 	if (It->m_Value)
 	{
-		err::SetFormatStringError (_T("redefinition of '%s'"), pName->m_Name);
+		SetRedefinitionError (pName->m_Name);
 		return false;
 	}
 

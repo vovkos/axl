@@ -29,7 +29,7 @@ CClass::Export (lua::CLuaState* pLuaState)
 CClass*
 CClassMgr::GetClass (const rtl::CString& Name)
 {
-	rtl::CHashTableMapIteratorT <const tchar_t*, CClass*> It = m_ClassMap.Goto (Name);
+	rtl::CStringHashTableMapIteratorT <CClass*> It = m_ClassMap.Goto (Name);
 	if (It->m_Value)
 		return It->m_Value;
 

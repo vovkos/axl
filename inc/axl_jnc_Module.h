@@ -12,6 +12,7 @@
 #include "axl_jnc_ConstMgr.h"
 #include "axl_jnc_ControlFlowMgr.h"
 #include "axl_jnc_OperatorMgr.h"
+#include "axl_jnc_LlvmBuilder.h"
 
 namespace axl {
 namespace jnc {
@@ -93,7 +94,6 @@ protected:
 
 public:
 	llvm::Module* m_pLlvmModule;
-	llvm::IRBuilder <> m_LlvmBuilder;
 
 	CTypeMgr m_TypeMgr;
 	CAttributeMgr m_AttributeMgr;
@@ -102,11 +102,11 @@ public:
 	CVariableMgr m_VariableMgr;
 	CConstMgr m_ConstMgr;
 	CControlFlowMgr m_ControlFlowMgr;
-	COperatorMgr m_OperatorMgr;
-	
+	COperatorMgr m_OperatorMgr;	
+	CLlvmBuilder m_LlvmBuilder;
+
 public:
-	CModule ():
-		m_LlvmBuilder (llvm::getGlobalContext())
+	CModule ()
 	{
 		m_pLlvmModule = NULL;
 	}

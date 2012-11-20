@@ -247,11 +247,11 @@ CModulePane::AddClassMember (
 	switch (MemberKind)
 	{
 	case jnc::EClassMember_Field:
-		AddStructMember (hParent, ((jnc::CClassFieldMember*) pMember)->GetField ());
+//		AddStructMember (hParent, ((jnc::CClassFieldMember*) pMember)->GetField ());
 		break;
 
 	case jnc::EClassMember_Method:
-		AddFunction (hParent, pMember->GetName (), ((jnc::CClassMethodMember*) pMember)->GetFunction ());
+//		AddFunction (hParent, pMember->GetName (), ((jnc::CClassMethodMember*) pMember)->GetFunction ());
 		break;
 
 	case jnc::EClassMember_Property:
@@ -272,7 +272,7 @@ CModulePane::AddEnumTypeMembers (
 	
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
-
+/*
 void
 CModulePane::AddStructClassTypeMembers (
 	HTREEITEM hParent,
@@ -312,14 +312,14 @@ CModulePane::AddStructClassTypeMembers (
 	}
 
 }
-
+*/
 void
 CModulePane::AddStructTypeMembers (
 	HTREEITEM hParent,
 	jnc::CStructType* pType
 	)
 {
-	AddStructClassTypeMembers (hParent, pType);
+//	AddStructClassTypeMembers (hParent, pType);
 
 	rtl::CIteratorT <jnc::CStructMember> Member = pType->GetFirstMember ();
 	for (; Member; Member++)
@@ -334,7 +334,7 @@ CModulePane::AddClassTypeMembers (
 	jnc::CClassType* pType
 	)
 {
-	AddStructClassTypeMembers (hParent, pType);
+//	AddStructClassTypeMembers (hParent, pType);
 	
 	size_t Count = pType->GetItemCount ();
 	for (size_t i = 0; i < Count; i++)

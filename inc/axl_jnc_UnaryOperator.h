@@ -40,7 +40,6 @@ enum EOpFlag
 	EOpFlag_LoadReference  = 0x02,
 	EOpFlag_EnumToInt      = 0x10,
 	EOpFlag_BoolToInt      = 0x20,
-	EOpFlag_ArrayToPointer = 0x40,
 };
 
 //.............................................................................
@@ -164,12 +163,12 @@ public:
 			case EType_Int32_u:
 			case EType_Int64:
 			case EType_Int64_u:
-				pResultValue->SetLlvmRegister (T::LlvmOpInt (m_pModule, OpValue.GetLlvmValue ()), pType);
+				T::LlvmOpInt (m_pModule, OpValue, pType, pResultValue);
 				break;
 
 			case EType_Float:
 			case EType_Double:
-				pResultValue->SetLlvmRegister (T::LlvmOpFp (m_pModule, OpValue.GetLlvmValue ()), pType);
+				T::LlvmOpFp (m_pModule, OpValue, pType, pResultValue);
 				break;
 
 			default:
@@ -226,14 +225,18 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue
+		const CValue& OpValue,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 
 	static
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue
+		const CValue& OpValue,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 };
 
@@ -266,7 +269,9 @@ public:
 	llvm::Value*
 	LlvmOpFp (
 		CModule* pModule,
-		llvm::Value* pOpValue
+		const CValue& OpValue,
+		CType* pResultType,
+		CValue* pResultValue
 		)
 	{
 		return NULL;
@@ -304,7 +309,9 @@ public:
 	llvm::Value*
 	LlvmOpInt (
 		CModule* pModule,
-		llvm::Value* pOpValue
+		const CValue& OpValue,
+		CType* pResultType,
+		CValue* pResultValue
 		);
 
 };

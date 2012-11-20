@@ -11,8 +11,10 @@
 namespace axl {
 namespace jnc {
 
+class CModule;
 class CArrayType;
 class CStructType;
+class CUnionType;
 class CClassType;
 
 //.............................................................................
@@ -35,7 +37,7 @@ protected:
 	CUnOpT_PostInc <EUnOp_PostInc> m_UnOp_PostInc;
 	CUnOpT_PostInc <EUnOp_PostDec> m_UnOp_PostDec;
 
-	// binary operators
+	// arithmetic binary operators
 
 	CBinOp_Add m_BinOp_Add;
 	CBinOp_Sub m_BinOp_Sub;
@@ -56,6 +58,10 @@ protected:
 	CBinOp_Le m_BinOp_Le;
 	CBinOp_Gt m_BinOp_Gt;
 	CBinOp_Ge m_BinOp_Ge;
+
+	// special binary operators
+
+	CBinOp_Idx m_BinOp_Idx;
 
 	// cast operators
 
@@ -285,64 +291,6 @@ public:
 		CProperty* pProperty
 		);
 
-
-	// public llvm helpers
-
-	llvm::Value*
-	CreateLlvmGep (
-		llvm::Value* pLlvmPtr,
-		llvm::Value* pLlvmIndex0,
-		llvm::Value* pLlvmIndex1
-		);
-
-	llvm::Value*
-	CreateLlvmGep (
-		llvm::Value* pLlvmPtr,
-		intptr_t Index0,
-		intptr_t Index1
-		);
-
-	llvm::Value*
-	CreateLlvmSafePtr (
-		llvm::Value* pLlvmPtr,
-		llvm::Value* pLlvmParentPtr,
-		CType* pParentType,
-		size_t ScopeLevel
-		);
-
-	llvm::Value*
-	ModifyLlvmSafePtr (
-		llvm::Value* pLlvmSafePtr,
-		llvm::Value* pLlvmPtr
-		);
-
-	void
-	CheckLlvmSafePtrRange (
-		llvm::Value* pLlvmSafePtr,
-		size_t Size,
-		ESafePtrError Error
-		);
-
-	void
-	CheckLlvmSafePtrScope (
-		llvm::Value* pLlvmSafePtr,
-		size_t ScopeLevel
-		);
-
-	bool
-	CheckLlvmSafePtrScope (
-		llvm::Value* pLlvmSafePtr,
-		const CValue& SrcValue,
-		size_t DstScopeLevel
-		);
-
-	bool
-	CheckLlvmSafePtrScope (
-		llvm::Value* pLlvmSafePtr,
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
 protected:
 	ICastOperator*
 	GetCastOperator (
@@ -356,6 +304,14 @@ protected:
 	StructMemberOperator (
 		const CValue& OpValue,
 		CStructType* pStructType,
+		const tchar_t* pName,
+		CValue* pResultValue
+		);
+
+	bool
+	UnionMemberOperator (
+		const CValue& OpValue,
+		CUnionType* pUnionType,
 		const tchar_t* pName,
 		CValue* pResultValue
 		);

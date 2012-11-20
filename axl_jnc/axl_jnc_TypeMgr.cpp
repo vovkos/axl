@@ -154,7 +154,7 @@ CTypeMgr::GetQualifiedType (
 	rtl::CStringA Signature;
 	Signature.Format ("A%d%s", Flags, pBaseType->GetSignature ());
 
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CQualifierType*) It->m_Value;
 
@@ -213,7 +213,7 @@ CTypeMgr::GetPointerType (
 
 	Signature += pBaseType->GetSignature ();
 
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CPointerType*) It->m_Value;
 
@@ -221,6 +221,7 @@ CTypeMgr::GetPointerType (
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
 	pType->m_Size = Size;
+	pType->m_Flags = Flags;
 	pType->m_Signature = Signature;
 	pType->m_pBaseType = pBaseType;
 
@@ -239,7 +240,7 @@ CTypeMgr::GetBitFieldType (
 {
 	rtl::CStringA Signature = CBitFieldType::CreateSignature (pBaseType, BitOffset, BitCount);
 
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CBitFieldType*) It->m_Value;
 
@@ -280,7 +281,7 @@ CTypeMgr::GetEnumType (
 	rtl::CStringA Signature;
 	Signature.Format (_T("%c%s"), TypeKind == EType_Enum ? 'I' : 'J', QualifiedName);
 	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CEnumType*) It->m_Value;
 
@@ -306,7 +307,7 @@ CTypeMgr::GetArrayType (
 {
 	rtl::CStringA Signature = CArrayType::CreateSignature (pBaseType, ElementCount);
 
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CArrayType*) It->m_Value;
 
@@ -348,7 +349,7 @@ CTypeMgr::GetStructType (
 	rtl::CStringA Signature;
 	Signature.Format (_T("%c%s"), TypeKind == EType_Struct ? 'L' : 'M', QualifiedName);
 	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CStructType*) It->m_Value;
 
@@ -426,7 +427,7 @@ CTypeMgr::GetClassType (
 	rtl::CStringA Signature;
 	Signature.Format (_T("%c%s"), TypeKind == EType_Interface ? 'N' : 'O', QualifiedName);
 	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CClassType*) It->m_Value;
 
@@ -453,7 +454,7 @@ CTypeMgr::GetFunctionType (
 {
 	rtl::CStringA Signature = CFunctionType::CreateSignature (EType_Function, pReturnType, ppArgType, ArgCount, Flags);
 	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CFunctionType*) It->m_Value;
 
@@ -480,7 +481,7 @@ CTypeMgr::GetPropertyType (
 {
 	rtl::CStringA Signature = CPropertyType::CreateSignature (pGetterType, SetterType);
 	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CPropertyType*) It->m_Value;
 
@@ -507,7 +508,7 @@ CTypeMgr::GetImportType (
 	rtl::CStringA Signature;
 	Signature.Format (_T("Z%s.%s"), pAnchorNamespace->GetQualifiedName (), Name.GetFullName ());
 	
-	rtl::CHashTableMapIteratorT <const char*, CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CImportType*) It->m_Value;
 
@@ -524,6 +525,23 @@ CTypeMgr::GetImportType (
 }
 
 //.............................................................................
+
+/*
+
+bool
+CStructType::AddGenericArgument (CImportType* pType)
+{
+	if (m_GenericArgumentArray.Find (pType) != -1)
+	{
+		err::SetFormatStringError (_T("multiple generic argument names '%s'"), pType->GetTypeString ());
+		return false;
+	}
+
+	m_GenericArgumentArray.Append (pType);
+	return true;
+}
+
+*/
 
 } // namespace axl {
 } // namespace jnc {

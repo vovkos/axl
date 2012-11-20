@@ -21,6 +21,7 @@ protected:
 	friend class CEnumType;
 	friend class CNamespace;
 
+	CEnumType* m_pParentType;
 	intptr_t m_Value;
 
 	rtl::CBoxListT <CToken> m_Expression;
@@ -30,6 +31,12 @@ public:
 	{
 		m_ItemKind = EModuleItem_EnumMember;
 		m_Value = 0;
+	}
+
+	CEnumType* 
+	GetParentType ()
+	{
+		return m_pParentType;
 	}
 
 	intptr_t
@@ -77,11 +84,14 @@ protected:
 public:
 	CEnumType ();
 
+	rtl::CIteratorT <CEnumMember>
+	GetFirstMember ()
+	{
+		return m_MemberList.GetHead ();
+	}
+
 	CEnumMember*
-	FindMember (
-		const tchar_t* pName,
-		bool Traverse = false
-		);
+	FindMember (const tchar_t* pName);
 
 	CEnumMember*
 	CreateMember (
@@ -93,12 +103,6 @@ public:
 	CreateMember (const rtl::CString& Name)
 	{
 		return CreateMember (Name, m_CurrentValue);
-	}
-
-	rtl::CIteratorT <CEnumMember>
-	GetFirstMember ()
-	{
-		return m_MemberList.GetHead ();
 	}
 };
 

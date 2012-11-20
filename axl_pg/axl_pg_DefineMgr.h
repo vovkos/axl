@@ -73,7 +73,7 @@ public:
 	CDefine*
 	FindDefine (const tchar_t* pName)
 	{
-		rtl::CHashTableMapIteratorT <const tchar_t*, CDefine*> It = m_DefineMap.Find (pName);
+		rtl::CStringHashTableMapIteratorT <CDefine*> It = m_DefineMap.Find (pName);
 		return It ? It->m_Value : NULL;
 	}
 };

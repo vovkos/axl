@@ -272,6 +272,7 @@ CValue::SetFunction (CFunction* pFunction)
 	m_ValueKind = EValue_Function;
 	m_pType = pFunction->GetType ();
 	m_pFunction = pFunction;
+	m_pLlvmValue = pFunction->GetLlvmFunction ();
 }
 
 void

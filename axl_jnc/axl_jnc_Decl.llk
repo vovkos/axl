@@ -51,18 +51,35 @@ type_name
 		}
 	;
 
+class
+{
+	rtl::CBoxListT <CType*> m_TypeList;
+}
+type_name_list
+	: type_name
+		{
+			$.m_TypeList.InsertTail ($1.m_pType);
+		}
+	  (',' type_name $t2
+		{
+			$.m_TypeList.InsertTail ($t2.m_pType);
+		}
+	  )*
+
+	;
+
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-generic_formal_argument_list <CStructClassType* $pType>
-	: '<' generic_formal_argument <$pType> (',' generic_formal_argument <$pType>)* '>'
+generic_formal_argument_list
+	: '<' EToken_Identifier (',' generic_formal_argument)* '>'
 	;
 
-generic_formal_argument <CStructClassType* $pType>
+generic_formal_argument
 	: EToken_Identifier
-		{						
+/*		{						
 			CImportType* pArgumentType = m_pModule->m_TypeMgr.GetImportType ($1.m_Data.m_String, $pType);
 			return $pType->AddGenericArgument (pArgumentType);
-		}
+		} */
 	;
-
 //.............................................................................

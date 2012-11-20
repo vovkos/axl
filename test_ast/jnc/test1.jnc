@@ -35,14 +35,18 @@ main ()
 	printf ("!!! hui %d\n", g_n);
 
 	char a [10];
-	char* p = a;
 
 	int i;
-	for (i = 0; i < 11; i++)
-	{
-		char x = *p;
-		printf ("%d - *p = %d\n", i, x);
+	for (i = 0; i < 10; i++)	
+		a [i] = i * 10;	
 
+	char* unsafe p2 = a;
+
+	char* p = a;
+	for (i = 0; i < 10; i++)
+	{	
+		char x = a [i];	
+		printf ("a [%d] = %d\n", i, *p);
 		p++;
 	}
 

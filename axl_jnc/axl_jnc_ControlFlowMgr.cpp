@@ -39,7 +39,7 @@ void
 CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 {
 	m_pCurrentBlock = pBlock;
-	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
+	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock);
 
 	if (pBlock->m_pFunction)
 		return;
@@ -57,7 +57,7 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateBr (pBlock->m_pLlvmBlock);
+	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
 
 	bool IsUnreachable = pFollowBlock == NULL;
 
@@ -82,12 +82,7 @@ CControlFlowMgr::ConditionalJump (
 	if (!Result)
 		return false;
 
-	m_pModule->m_LlvmBuilder.CreateCondBr (
-		BoolValue.GetLlvmValue (), 
-		pThenBlock->GetLlvmBlock (), 
-		pElseBlock->GetLlvmBlock ()
-		);
-
+	m_pModule->m_LlvmBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
 	SetCurrentBlock (pThenBlock);
 	return true;
 }
@@ -137,7 +132,7 @@ CControlFlowMgr::Return (const CValue& Value)
 			return false;
 		}
 
-		m_pModule->m_LlvmBuilder.CreateRetVoid ();
+		m_pModule->m_LlvmBuilder.CreateRet ();
 	}
 	else
 	{
@@ -146,29 +141,22 @@ CControlFlowMgr::Return (const CValue& Value)
 		if (!Result)
 			return false;		
 
-		llvm::Value* pLlvmValue = ReturnValue.GetLlvmValue ();
-
 		if (pReturnType->GetTypeKind () == EType_Pointer)
 		{
-			if (ReturnValue.GetValueKind () == EValue_Variable)
-			{
-				CVariable* pVariable = ReturnValue.GetVariable ();
-				CScope* pScope = pVariable->GetScope ();
-
-				pLlvmValue = m_pModule->m_OperatorMgr.CreateLlvmSafePtr (
-					pLlvmValue, 
-					pVariable->GetLlvmValue (), 
-					pVariable->GetType (),
-					pScope ? pScope->GetLevel () : 0
-					);
-			}
-
-			Result = m_pModule->m_OperatorMgr.CheckLlvmSafePtrScope (pLlvmValue, ReturnValue, 0);
+			Result = m_pModule->m_LlvmBuilder.CheckSafePtrScope (ReturnValue, NULL);
 			if (!Result)
 				return false;
+
+			if (ReturnValue.GetValueKind () == EValue_Variable)
+				m_pModule->m_LlvmBuilder.CreateSafePtr (
+					ReturnValue, 
+					ReturnValue.GetVariable (),
+					pReturnType,
+					&ReturnValue
+					);
 		}
 
-		m_pModule->m_LlvmBuilder.CreateRet (pLlvmValue);
+		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
 
 	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));

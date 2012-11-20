@@ -57,13 +57,10 @@ enum EType
 
 	EType_Qualifier,      // A 
 
-	// pointers
+	// pointers & references
 
 	EType_Pointer,        // B
 	EType_Pointer_u,      // C
-
-	// references
-
 	EType_Reference,      // E
 	EType_Reference_u,    // F
 
@@ -192,7 +189,7 @@ protected:
 	EType m_TypeKind;
 	size_t m_Size;
 	int m_Flags;
-
+		
 	rtl::CStringA m_Signature;
 	rtl::CString m_TypeString;
 
@@ -216,24 +213,10 @@ public:
 		return m_TypeKind;
 	}
 
-	static
-	size_t
-	GetTypeKindOffset ()
-	{
-		return FIELD_OFFSET (CType, m_TypeKind);
-	}
-
 	size_t
 	GetSize ()
 	{
 		return m_Size;
-	}
-
-	static
-	size_t
-	GetSizeOffset ()
-	{
-		return FIELD_OFFSET (CType, m_Size);
 	}
 
 	int
