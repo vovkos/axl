@@ -473,10 +473,6 @@ leave
 	; 
 
 primary_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue;
-}
 	: EToken_Identifier
 		{
 			return LookupIdentifier ($1.m_Data.m_String, $pValue);
@@ -505,13 +501,13 @@ local
 		{
 			$pValue->SetNull ();
 		}
-	| EToken_SizeOf type_name_or_expr <&$OpValue>
+	| EToken_SizeOf type_name_or_expr
 		{
-			$pValue->SetConstUInt32 ($OpValue.GetType ()->GetSize ());
+			$pValue->SetConstSizeT ($2.m_pType->GetSize ());
 		}
-	| EToken_TypeOf type_name_or_expr <&$OpValue>
+	| EToken_TypeOf type_name_or_expr
 		{
-			$pValue->SetType ($OpValue.GetType ());
+			$pValue->SetType ($2.m_pType);
 		}
 	| '(' conditional_expr <$pValue> ')'
 	;
@@ -532,16 +528,28 @@ literal
 	  )*
 	;
 
-type_name_or_expr <CValue* $pValue>
-	: type_name 
+class
+{
+	CType* m_pType;
+}
+type_name_or_expr
+local
+{
+	CValue $Value;
+}	: type_name 
 		{
-			$pValue->SetType ($1.m_pType);
+			$.m_pType = $1.m_pType;
 		}
 	| '(' type_name ')'
 		{
-			$pValue->SetType ($2.m_pType);
+			$.m_pType = $2.m_pType;
 		}
-	| primary_expr <$pValue>
+	| primary_expr <&$Value>
+		{
+			CType* pType = $Value.GetType ();
+			$.m_pType = pType->IsReferenceType () ? ((CPointerType*) pType)->GetBaseType () : pType;
+		}
 	;
 
 //.............................................................................
+ 

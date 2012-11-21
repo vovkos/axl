@@ -14,7 +14,11 @@
 
 enum ESymbol
 {
-	ESymbol_array_suffix = 0, 
+	ESymbol_program = 0, 
+	ESymbol_type_name_or_expr = 1, 
+	ESymbol_type_name = 2, 
+	ESymbol_primary_expr = 3, 
+	ESymbol_type_name_rslv = 4, 
 	
 };
 
@@ -33,33 +37,33 @@ public:
 		EofToken           = 0,
 		AnyToken           = 1,
 
-		TokenCount         = 4,
-		SymbolCount        = 2,
-		SequenceCount      = 3,
-		ActionCount        = 0,
+		TokenCount         = 6,
+		SymbolCount        = 6,
+		SequenceCount      = 4,
+		ActionCount        = 1,
 		ArgumentCount      = 0,
-		BeaconCount        = 0,
+		BeaconCount        = 1,
 		LaDfaCount         = 2,
 
-		TotalCount         = 11,
+		TotalCount         = 20,
 
-		NamedSymbolCount   = 1,
+		NamedSymbolCount   = 5,
 
 		TokenFirst         = 0,
-		TokenEnd           = 4,
-		SymbolFirst        = 4,
-		NamedSymbolEnd     = 5,
-		SymbolEnd          = 6,
-		SequenceFirst      = 6,
-		SequenceEnd        = 9,
-		ActionFirst        = 9,
-		ActionEnd          = 9,
-		ArgumentFirst      = 9,
-		ArgumentEnd        = 9,
-		BeaconFirst        = 9,
-		BeaconEnd          = 9,
-		LaDfaFirst         = 9,
-		LaDfaEnd           = 11,
+		TokenEnd           = 6,
+		SymbolFirst        = 6,
+		NamedSymbolEnd     = 11,
+		SymbolEnd          = 12,
+		SequenceFirst      = 12,
+		SequenceEnd        = 16,
+		ActionFirst        = 16,
+		ActionEnd          = 17,
+		ArgumentFirst      = 17,
+		ArgumentEnd        = 17,
+		BeaconFirst        = 17,
+		BeaconEnd          = 18,
+		LaDfaFirst         = 18,
+		LaDfaEnd           = 20,
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -68,6 +72,10 @@ public:
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+	
+	
+	
+	
 	
 	
 
@@ -84,8 +92,12 @@ public:
 		static
 		size_t _ParseTable [] = 
 		{
-			-1, -1, 9, -1, 
-			-1, 6, 6, 0, 
+			-1, -1, -1, -1, 12, -1, 
+			-1, -1, 18, -1, -1, 9, 
+			-1, -1, -1, -1, -1, 11, 
+			-1, -1, 14, -1, -1, 5, 
+			-1, -1, -1, -1, -1, 15, 
+			-1, -1, -1, -1, -1, 5, 
 			
 			-1
 		};
@@ -100,9 +112,10 @@ public:
 		static
 		size_t _SequenceTable [] = 
 		{
-			5, 1,  -1,
-			3, 5, 1, 2,  -1,
-			3, 2,  -1,
+			7, 4,  -1,
+			3, 8, 2,  -1,
+			3, 9, 2,  -1,
+			16, 17,  -1,
 			
 			-1
 		};
@@ -110,7 +123,7 @@ public:
 		static
 		size_t _SequenceIndexTable [] = 
 		{
-			0, 3, 8, 
+			0, 3, 7, 11, 
 			-1
 		};
 
@@ -128,11 +141,17 @@ public:
 			return EofToken;
 
 		
-		case '[':
+		case '(':
 			return 2;
 		
-		case ']':
+		case ')':
 			return 3;
+		
+		case EToken_SIZEOF:
+			return 4;
+		
+		case EToken_Identifier:
+			return 5;
 		
 		default:
 			return AnyToken;
@@ -148,8 +167,10 @@ public:
 		{
 			0,  // eof
 			0,  // any token
-			'[', 
-			']', 
+			'(', 
+			')', 
+			EToken_SIZEOF, 
+			EToken_Identifier, 
 			
 			0
 		};
@@ -165,7 +186,11 @@ public:
 		static
 		const tchar_t* _SymbolNameTable [NamedSymbolCount] = 
 		{
-			_T("array_suffix"),
+			_T("program"),
+			_T("type_name_or_expr"),
+			_T("type_name"),
+			_T("primary_expr"),
+			_T("type_name_rslv"),
 			
 		};
 
@@ -181,6 +206,10 @@ public:
 
 		switch (Index)
 		{
+		
+		
+		
+		
 		
 		
 		default:
@@ -202,6 +231,8 @@ public:
 		size_t _BeaconTable [] [2] = 
 		{
 			
+			{ 0, 5 },
+			
 			{ 0 }
 		};
 
@@ -214,6 +245,19 @@ public:
 	{
 		switch (Index)
 		{
+		
+		case 0:
+			{
+			CSymbolNode* __pSymbol = GetSymbolTop ();
+			CAst* __pAst = __pSymbol->m_pAst;
+#line 27 "D:/Prj/Ninja/axl3/axl_pg/TestParser.llk"
+			
+			return (*GetTokenLocator (0)).m_Data.m_String == "TStruct";
+		;
+#line 258 "D:/Prj/Ninja/axl3/axl_pg/TestParser.h"
+			}
+
+			return true;
 		
 		default:
 			ASSERT (false);
@@ -242,6 +286,10 @@ public:
 		{
 		
 		
+		
+		
+		
+		
 		default:
 			return true;
 		}
@@ -252,6 +300,10 @@ public:
 	{
 		switch (Index)
 		{
+		
+		
+		
+		
 		
 		
 		default:
@@ -274,9 +326,9 @@ public:
 			switch (LookaheadToken)
 			{
 			
-			case '[':
+			case '(':
 					
-				pTransition->m_ProductionIndex = 10;
+				pTransition->m_ProductionIndex = 19;
 				return ELaDfaResult_Production;
 					
 			
@@ -292,22 +344,19 @@ public:
 			switch (LookaheadToken)
 			{
 			
-			case '\01':
+			case '(':
 					
-				pTransition->m_ProductionIndex = 7;
+				pTransition->m_ProductionIndex = 9;
 				return ELaDfaResult_Production;
 					
 			
-			case '[':
+			case EToken_Identifier:
 					
-				pTransition->m_ProductionIndex = 7;
-				return ELaDfaResult_Production;
-					
-			
-			case ']':
-					
-				pTransition->m_ProductionIndex = 8;
-				return ELaDfaResult_Production;
+				pTransition->m_ProductionIndex = 13;
+				pTransition->m_ResolverIndex = 10;
+				pTransition->m_ResolverElseIndex = 9;
+						
+				return ELaDfaResult_Resolver;
 					
 			
 			default:

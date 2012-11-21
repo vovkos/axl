@@ -291,6 +291,9 @@ public:
 	SetType (CType* pType);
 
 	void
+	SetType (EType TypeKind);
+
+	void
 	SetVariable (CVariable* pVariable);
 
 	void

@@ -24,31 +24,23 @@ printf (
 
 //.............................................................................
 
-int g_n;
-int* g_p;
+struct TBase
+{
+	int m_a;
+	int m_b;
+};
+
+struct TDerived: TBase
+{
+	int m_c;
+	int m_d;
+};
 
 int
 main ()
-{	
-	g_n = 10;
-
-	printf ("!!! hui %d\n", g_n);
-
-	char a [10];
-
-	int i;
-	for (i = 0; i < 10; i++)	
-		a [i] = i * 10;	
-
-	char* unsafe p2 = a;
-
-	char* p = a;
-	for (i = 0; i < 10; i++)
-	{	
-		char x = a [i];	
-		printf ("a [%d] = %d\n", i, *p);
-		p++;
-	}
+{
+	TDerived t;
+	printf ("sizeof (TDerived) = %d\n", sizeof (t));
 
 	return 0;
 }

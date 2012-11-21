@@ -248,6 +248,16 @@ CValue::SetType (CType* pType)
 }
 
 void
+CValue::SetType (EType TypeKind)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
+	SetType (pType);
+}
+
+void
 CValue::SetVariable (
 	CVariable* pVariable,
 	llvm::Value* pLlvmValue,

@@ -2,9 +2,31 @@
 
 LL (2);
 
-array_suffix
-	: '[' any+ ']'
-	| '[' ']'
+program
+	: EToken_SIZEOF type_name_or_expr
+	;
+
+type_name_or_expr
+	: '(' type_name ')'
+	| primary_expr
+	;
+
+primary_expr
+	: EToken_Identifier
+	| '(' primary_expr ')'
+	;
+
+
+type_name
+	: resolver (type_name_rslv)
+	  EToken_Identifier
+	;
+
+type_name_rslv
+	: EToken_Identifier
+		{
+			return $1.m_Data.m_String == "TStruct";
+		}
 	;
 
 //.............................................................................

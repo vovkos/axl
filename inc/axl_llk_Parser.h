@@ -514,12 +514,18 @@ protected:
 			
 			if (!(pLaDfaNode->m_Flags & ELaDfaNodeFlag_HasChainedResolver))
 			{
+				// if no chained resolver, advance one token forward
+
 				rtl::CBoxListEntryT <CToken>* pEntry = m_TokenList.RemoveHeadEntry (); 
 				pLaDfaNode->m_DfaTokenList.InsertTailEntry (pEntry);
 			}
 		}
 		else
 		{
+			// add tokens from DFA for re-parse
+
+			m_TokenList.InsertListHead (&pLaDfaNode->m_DfaTokenList);
+
 			size_t ProductionIndex = pLaDfaNode->m_ResolverElseIndex;
 			PopPrediction ();
 			PushPrediction (ProductionIndex);

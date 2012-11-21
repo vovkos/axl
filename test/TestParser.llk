@@ -2,15 +2,37 @@
 
 LL (2);
 
-start
-array_suffix
-	: '[' any+ ']'
-	| '[' ']'
+program
+	: EToken_SIZEOF type_name_or_expr
 	;
 
-start
-test
-	: EToken_Integer
+type_name_or_expr
+	: '(' type_name ')'
+	| primary_expr
+	;
+
+primary_expr
+	: EToken_Identifier
+		{
+			printf ("primary_expr:EToken_Identifier\n");
+		}
+	| '(' primary_expr ')'
+	;
+
+
+type_name
+	: resolver (type_name_rslv)
+	  EToken_Identifier
+		{
+			printf ("type_name:EToken_Identifier\n");
+		}
+	;
+
+type_name_rslv
+	: EToken_Identifier
+		{
+			return $1.m_Data.m_String == "TStruct";
+		}
 	;
 
 //.............................................................................
