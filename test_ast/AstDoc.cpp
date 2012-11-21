@@ -255,20 +255,34 @@ StdLib_StructTest (
 {
 	CMainFrame* pMainFrame = GetMainFrame ();
 
-#pragma pack (push, 4)
-	struct TStruct
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("StructTest (%x, %d)\n", p, Size);
+	/*
+	struct TBase
 	{
-		int8_t m_a;
-		int64_t m_b;
-		int8_t m_c;
+		int m_a;
+		int m_b;
 	};
-#pragma pack (pop)
+
+	struct TStruct: TBase
+	{
+		int m_c;
+		int m_d;
+	};
+	*/
+
+	union TStruct
+	{
+		unsigned __int8 m_a;
+		unsigned __int16 m_b;
+		unsigned __int32 m_c;
+		unsigned __int64 m_d;
+	};
 
 	TStruct* pStruct = (TStruct*) p;
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
-		"TStruct = { %d, %lld, %d }; Size = %d; sizeof (TStruct) = %d;\n", 
-		pStruct->m_a, pStruct->m_b, pStruct->m_c,
+		"TStruct = { %x, %x, %x, %llx }; Size = %d; sizeof (TStruct) = %d;\n", 
+		pStruct->m_a, pStruct->m_b, pStruct->m_c, pStruct->m_d,
 		Size,
 		sizeof (TStruct)
 		);

@@ -42,7 +42,7 @@ CStructType::FindBaseType (
 	)
 {
 	rtl::CStringHashTableMapIteratorAT <CStructBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
-	if (It->m_Value)
+	if (It)
 	{
 		CStructBaseType* pBaseType = It->m_Value;
 		*pOffset = pBaseType->m_Offset;
@@ -80,7 +80,7 @@ CStructType::FindMember (
 	)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-	if (It->m_Value)
+	if (It)
 	{
 		CModuleItem* pItem = It->m_Value;
 		if (pItem->GetItemKind () != EModuleItem_StructMember)

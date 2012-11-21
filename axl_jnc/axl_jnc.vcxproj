@@ -173,6 +173,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp</Outputs>
     </CustomBuild>
     <None Include="axl_jnc_StructSpecifier.llk" />
+    <None Include="axl_jnc_UnionSpecifier.llk" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

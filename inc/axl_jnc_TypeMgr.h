@@ -45,6 +45,8 @@ protected:
 	CStructType* m_pSafePtrStructType;
 	CStructType* m_pFunctionPtrStructType;
 	
+	size_t m_UnnamedTypeIndex;
+
 public:
 	CTypeMgr ();
 
@@ -200,19 +202,27 @@ public:
 
 	CStructType* 
 	GetStructType (
-		EType TypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		size_t PackFactor = 8
 		);
 
 	CStructType* 
-	CreateUnnamedStructType (
-		EType TypeKind,
-		size_t PackFactor = 8
-		)
+	CreateUnnamedStructType (size_t PackFactor = 8)
 	{
-		return GetStructType (TypeKind, rtl::CString (), rtl::CString (), PackFactor);
+		return GetStructType (rtl::CString (), rtl::CString (), PackFactor);
+	}
+
+	CUnionType* 
+	GetUnionType (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName
+		);
+
+	CUnionType* 
+	CreateUnnamedUnionType ()
+	{
+		return GetUnionType (rtl::CString (), rtl::CString ());
 	}
 
 	CPointerType* 
@@ -228,13 +238,17 @@ public:
 	GetClassType (
 		EType TypeKind,
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
+		const rtl::CString& QualifiedName,
+		size_t PackFactor
 		);
 
 	CClassType* 
-	CreateUnnamedClassType (EType TypeKind)
+	CreateUnnamedClassType (
+		EType TypeKind,
+		size_t PackFactor = 8
+		)
 	{
-		return GetClassType (TypeKind, rtl::CString (), rtl::CString ());
+		return GetClassType (TypeKind, rtl::CString (), rtl::CString (), PackFactor);
 	}
 
 	CImportType*

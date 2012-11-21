@@ -5,37 +5,22 @@ class
 	CStructType* m_pType;
 }
 struct_specifier
-	: struct_kind $k 
+	: EToken_Struct
 	  struct_pack_factor $p?
 	  EToken_Identifier $n?
+	  generic_formal_argument_list $g?
+	  (':' type_name_list $i)?
 		{
 			$.m_pType = DeclareStructType (
-				$k.m_TypeKind,
 				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+				IsValidLocator ($i) ? &$i.m_TypeList : NULL,
 				IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
 				);
 
 			if (!$.m_pType)
 				return false;
 		}
-	  generic_formal_argument_list?
-	  (':' type_name_list)?
 	  struct_block <$.m_pType>
-	;
-
-class
-{
-	EType m_TypeKind;
-}
-struct_kind
-	: EToken_Struct
-		{
-			$.m_TypeKind = EType_Struct;
-		}
-	| EToken_Union
-		{
-			$.m_TypeKind = EType_Union;
-		}
 	;
 
 class
@@ -79,45 +64,24 @@ struct_block <CStructType* $pType>
 struct_member_declaration <CStructType* $pType>
 	: attribute_block?
 	  type_specifier_modifier_list $s
-	  struct_member_declarator_list <&$s.m_TypeSpecifier, $pType>
+	  struct_member_declarator_list <$pType, &$s.m_TypeSpecifier>
 	  ';'
-	| compound_stmt_pass1
 	| ';'
 	;
 
-struct_member_declarator_list <CTypeSpecifierModifiers* $pTypeSpecifier, CStructType* $pType>
-	: struct_member_declarator <$pTypeSpecifier, $pType> (',' struct_member_declarator <$pTypeSpecifier, $pType>)*
+struct_member_declarator_list <CStructType* $pType, CTypeSpecifierModifiers* $pTypeSpecifier>
+	: struct_member_declarator <$pType, $pTypeSpecifier> (',' struct_member_declarator <$pType, $pTypeSpecifier>)*
 	;
 
-struct_member_declarator <CTypeSpecifierModifiers* $pTypeSpecifier, CStructType* $pType>
-local
-{
-	CStructMember* $pMember;
-}
+struct_member_declarator <CStructType* $pType, CTypeSpecifierModifiers* $pTypeSpecifier>
 	: declarator (':' struct_member_bit_field)?
 		{
-			$pMember = DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator);
-			if (!$pMember)
-				return false;
+			return DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator) != NULL;
 		}
-	  ('=' initializer <.$pMember->GetType ().> 
-		{
-		}
-	  )?
 	;
 
 struct_member_bit_field
 	: constant_integer_expr
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-pragma
-pragma_pack
-	: '#' EToken_Pack ':' struct_pack_factor_value $v
-		{
-			m_StructPackFactor = $v.m_Value;
-		}
 	;
 
 //.............................................................................

@@ -13,8 +13,8 @@ namespace jnc {
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_IsVarArg       = 0x100,
-	EFunctionTypeFlag_IsUnsafeVarArg = 0x200,
+	EFunctionTypeFlag_IsVarArg       = 0x1000,
+	EFunctionTypeFlag_IsUnsafeVarArg = 0x2000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

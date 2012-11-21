@@ -17,8 +17,7 @@ CUnionType::CreateMember (
 	if (AlignFactor > m_AlignFactor)
 		m_AlignFactor = AlignFactor;
 
-	size_t Offset = GetFieldOffset (AlignFactor);
-	SetSize (Offset + pType->GetSize ());
+	SetSize (pType->GetSize ());
 
 	CUnionMember* pMember = AXL_MEM_NEW (CUnionMember);
 	pMember->m_Name = Name;

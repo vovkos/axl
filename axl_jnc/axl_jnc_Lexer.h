@@ -34,6 +34,9 @@ enum EToken
 	EToken_Safe,
 	EToken_Unsafe,
 	EToken_NoNull,
+	EToken_Strong,
+	EToken_Weak,
+	EToken_Bindable,
 	EToken_Auto,
 	EToken_Void,
 	EToken_Variant,
@@ -128,6 +131,9 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
 	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
 	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
+	AXL_PRS_TOKEN_NAME (EToken_Strong,       "strong")
+	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
+	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")
 	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")

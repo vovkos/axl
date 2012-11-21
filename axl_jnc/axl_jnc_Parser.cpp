@@ -32,85 +32,24 @@ CParser::FindType (const CQualifiedName& Name)
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	if (m_Stage == EStage_Pass1)
-		return m_pModule->m_TypeMgr.GetImportType (Name, pNamespace);
+	CModuleItem* pItem;
 
-	CModuleItem* pItem = pNamespace->FindItemTraverse (Name);
-	if (!pItem)
-		return NULL;
+	if (m_Stage == EStage_Pass1)
+	{
+		pItem = pNamespace->FindItem (Name.GetShortName ());
+		if (!pItem)
+			return m_pModule->m_TypeMgr.GetImportType (Name, pNamespace);				
+	}
+	else
+	{	
+		pItem = pNamespace->FindItemTraverse (Name);
+		if (!pItem)
+			return NULL;
+	}
 
 	pItem = UnAliasItem (pItem);
 
 	return pItem->GetItemKind () == EModuleItem_Type ? (CType*) pItem : NULL;
-}
-
-CClassType*
-CParser::DeclareClassType (
-	EType TypeKind,
-	rtl::CString& Name
-	)
-{
-	bool Result;
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CClassType* pType = NULL;
-
-	if (Name.IsEmpty ())
-		return m_pModule->m_TypeMgr.CreateUnnamedClassType (TypeKind);
-
-	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-	pType = m_pModule->m_TypeMgr.GetClassType (TypeKind, Name, QualifiedName);
-
-	Result = pNamespace->AddItem (pType);
-	if (!Result)
-		return NULL;
-	
-	return pType;
-}
-
-CStructType*
-CParser::DeclareStructType (
-	EType TypeKind,
-	rtl::CString& Name,
-	size_t PackFactor
-	)
-{
-	bool Result;
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CStructType* pType = NULL;
-
-	if (Name.IsEmpty ())
-		return m_pModule->m_TypeMgr.CreateUnnamedStructType (TypeKind, PackFactor);
-
-	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-	pType = m_pModule->m_TypeMgr.GetStructType (TypeKind, Name, QualifiedName, PackFactor);
-
-	Result = pNamespace->AddItem (pType);
-	if (!Result)
-		return NULL;
-	
-	return pType;
-}
-
-CEnumType*
-CParser::DeclareEnumType (
-	EType TypeKind,
-	rtl::CString& Name
-	)
-{
-	if (Name.IsEmpty ())
-		return m_pModule->m_TypeMgr.CreateUnnamedEnumType (TypeKind);
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-	CEnumType* pType = m_pModule->m_TypeMgr.GetEnumType (TypeKind, Name, QualifiedName);
-
-	bool Result = pNamespace->AddItem (pType);
-	if (!Result)
-		return NULL;
-
-	return pType;
 }
 
 CModuleItem*
@@ -239,6 +178,78 @@ CParser::Declare (
 	return pNewItem;
 }
 
+CEnumType*
+CParser::DeclareEnumType (
+	EType TypeKind,
+	rtl::CString& Name
+	)
+{
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedEnumType (TypeKind);
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	CEnumType* pType = m_pModule->m_TypeMgr.GetEnumType (TypeKind, Name, QualifiedName);
+
+	bool Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
+
+	return pType;
+}
+
+CStructType*
+CParser::DeclareStructType (
+	rtl::CString& Name,
+	rtl::CBoxListT <CType*>* pBaseTypeList,
+	size_t PackFactor
+	)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CStructType* pType = NULL;
+
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
+
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	pType = m_pModule->m_TypeMgr.GetStructType (Name, QualifiedName, PackFactor);
+
+	if (pBaseTypeList)
+	{
+		rtl::CBoxIteratorT <CType*> BaseType = pBaseTypeList->GetHead ();
+		for (; BaseType; BaseType++)
+		{
+			CType* pBaseType = *BaseType;
+			EType BaseTypeKind = pBaseType->GetTypeKind ();
+
+			switch (BaseTypeKind)
+			{
+			case EType_Struct:
+				Result = pType->AddBaseType ((CStructType*) pBaseType) != NULL;
+				if (!Result)
+					return false;
+				break;
+
+			case EType_Import:
+				err::SetFormatStringError (_T("'%s': imports in inheritance list are not supported yet"), pBaseType->GetTypeString ());
+				return false;
+
+			default:
+				err::SetFormatStringError (_T("'%s' cannot be inherited from '%s'"), pType->GetTypeString (), pBaseType->GetTypeString ());
+				return false;
+			}
+		}
+	}
+
+	Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
+	
+	return pType;
+}
+
 CStructMember*
 CParser::DeclareStructMember (
 	CStructType* pStructType,
@@ -259,6 +270,103 @@ CParser::DeclareStructMember (
 	pMember->m_Pos = pDeclarator->m_Pos;
 
 	return pMember;
+}
+
+CUnionType*
+CParser::DeclareUnionType (rtl::CString& Name)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CUnionType* pType = NULL;
+
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedUnionType ();
+
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	pType = m_pModule->m_TypeMgr.GetUnionType (Name, QualifiedName);
+
+	Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
+	
+	return pType;
+}
+
+CUnionMember*
+CParser::DeclareUnionMember (
+	CUnionType* pUnionType,
+	CTypeSpecifierModifiers* pTypeSpecifier,
+	CDeclarator* pDeclarator
+	)
+{
+	CType* pType = pDeclarator->GetType (pTypeSpecifier);
+	if (!pType)
+		return NULL;
+
+	rtl::CString Name = pDeclarator->GetName ();
+	CUnionMember* pMember = pUnionType->CreateMember (Name, pType);
+	if (!pMember)
+		return NULL;
+
+	m_pModule->m_AttributeMgr.AssignAttributeSet (pMember);
+	pMember->m_Pos = pDeclarator->m_Pos;
+
+	return pMember;
+}
+
+CClassType*
+CParser::DeclareClassType (
+	EType TypeKind,
+	rtl::CString& Name,
+	rtl::CBoxListT <CType*>* pBaseTypeList,
+	size_t PackFactor
+	)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CClassType* pType = NULL;
+
+	if (Name.IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateUnnamedClassType (TypeKind);
+
+	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+	pType = m_pModule->m_TypeMgr.GetClassType (TypeKind, Name, QualifiedName, PackFactor);
+
+	if (pBaseTypeList)
+	{
+		rtl::CBoxIteratorT <CType*> BaseType = pBaseTypeList->GetHead ();
+		for (; BaseType; BaseType++)
+		{
+			CType* pBaseType = *BaseType;
+			EType BaseTypeKind = pBaseType->GetTypeKind ();
+
+			switch (BaseTypeKind)
+			{
+			case EType_Class:
+			case EType_Interface:
+				Result = pType->AddBaseType ((CClassType*) pBaseType) != NULL;
+				if (!Result)
+					return false;
+				break;
+
+			case EType_Import:
+				err::SetFormatStringError (_T("'%s': imports in inheritance list are not supported yet"), pBaseType->GetTypeString ());
+				return false;
+
+			default:
+				err::SetFormatStringError (_T("'%s' cannot be inherited from '%s'"), pType->GetTypeString (), pBaseType->GetTypeString ());
+				return false;
+			}
+		}
+	}
+
+	Result = pNamespace->AddItem (pType);
+	if (!Result)
+		return NULL;
+	
+	return pType;
 }
 
 CModuleItem*

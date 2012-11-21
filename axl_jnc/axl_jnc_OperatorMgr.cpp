@@ -655,8 +655,51 @@ COperatorMgr::UnionMemberOperator (
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("union member operator is not implemented yet"));
-	return false;
+	CUnionMember* pMember = pUnionType->FindMember (pName);
+	if (!pMember)
+	{
+		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pUnionType->GetTypeString ());
+		return false;
+	}
+	
+	EValue OpValueKind = OpValue.GetValueKind ();
+	if (OpValueKind == EValue_Const)
+	{
+		pResultValue->CreateConst (pMember->GetType (), OpValue.GetConstData ());
+		return true;
+	}
+
+	CType* pOpType = OpValue.GetType ();
+
+	if (!pOpType->IsReferenceType ())
+	{
+		err::SetFormatStringError (_T("union member operator on registers is not implemented yet"));
+		return false;
+	}
+
+	if (pOpType->GetTypeKind () == EType_Reference_u)
+	{
+		CType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference_u);
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pResultType, pResultValue);
+		return true;
+	}
+	
+	ASSERT (pOpType->GetTypeKind () == EType_Reference);
+
+	if (OpValue.GetValueKind () == EValue_Variable)
+	{
+		CType* pCastType = pMember->GetType ()->GetPointerType (EType_Reference_u);
+		CValue CastValue;
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pCastType, &CastValue);
+		pResultValue->SetVariable (OpValue.GetVariable (), CastValue.GetLlvmValue (), pMember->GetType ());
+	}
+	else
+	{
+		CType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
+		pResultValue->OverrideType (OpValue, pResultType);
+	}
+
+	return true;
 }
 
 bool

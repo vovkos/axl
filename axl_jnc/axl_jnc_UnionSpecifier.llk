@@ -1,0 +1,54 @@
+//.............................................................................
+
+class
+{
+	CUnionType* m_pType;
+}
+union_specifier
+	: EToken_Union
+	  EToken_Identifier $n?
+		{
+			$.m_pType = DeclareUnionType (IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ());
+			if (!$.m_pType)
+				return false;
+		}
+	  generic_formal_argument_list?
+	  union_block <$.m_pType>
+	;
+
+union_block <CUnionType* $pType>
+	: '{' 
+		{
+			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+		}
+	  union_member_declaration <$pType>* 
+	  '}'
+		{
+			m_pModule->m_NamespaceMgr.CloseNamespace ();
+		}
+	;
+
+union_member_declaration <CUnionType* $pType>
+	: attribute_block?
+	  type_specifier_modifier_list $s
+	  union_member_declarator_list <$pType, &$s.m_TypeSpecifier>
+	  ';'
+	| ';'
+	;
+
+union_member_declarator_list <CUnionType* $pType, CTypeSpecifierModifiers* $pTypeSpecifier>
+	: union_member_declarator <$pType, $pTypeSpecifier> (',' union_member_declarator <$pType, $pTypeSpecifier>)*
+	;
+
+union_member_declarator <CUnionType* $pType, CTypeSpecifierModifiers* $pTypeSpecifier>
+	: declarator (':' union_member_bit_field)?
+		{
+			return DeclareUnionMember ($pType, $pTypeSpecifier, &$1.m_Declarator) != NULL;
+		}
+	;
+
+union_member_bit_field
+	: constant_integer_expr
+	;
+
+//.............................................................................

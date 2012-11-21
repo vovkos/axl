@@ -6,18 +6,21 @@ class
 }
 class_specifier
 	: class_kind $k 
+	  struct_pack_factor $p?
 	  EToken_Identifier $n?
+	  generic_formal_argument_list $g?
+	  (':' type_name_list $i)?
 		{
 			$.m_pType = DeclareClassType (
 				$k.m_TypeKind,
-				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ()
+				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+				IsValidLocator ($i) ? &$i.m_TypeList : NULL,
+				IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
 				);
 
 			if (!$.m_pType)
 				return false;
 		}
-	  generic_formal_argument_list?
-	  (':' type_name_list)?
 	  class_block <$.m_pType>
 	;
 

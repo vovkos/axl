@@ -270,6 +270,9 @@
     <None Include="axl_jnc_Expr.llk">
       <Filter>parser</Filter>
     </None>
+    <None Include="axl_jnc_UnionSpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="axl_jnc_Lexer.rl">

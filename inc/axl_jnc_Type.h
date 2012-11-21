@@ -127,33 +127,38 @@ enum ETypeQualifier
 	ETypeQualifier_Const     = 0x01,
 	ETypeQualifier_Volatile  = 0x02,
 	ETypeQualifier_NoNull    = 0x04,
+	ETypeQualifier_Weak      = 0x08,
+	ETypeQualifier_Bindable  = 0x10,
 
-	ETypeQualifier__Mask     = 0x07,
+	ETypeQualifier__Mask     = 0x1f,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ETypeFlag
 {
-	ETypeFlag_IsPod        = 0x10, // plain-old-data
-	ETypeFlag_IsIncomplete = 0x20,
-	ETypeFlag_IsLlvmReady  = 0x40,
+	ETypeFlag_IsPod          = 0x200, // plain-old-data
+	ETypeFlag_IsIncomplete   = 0x400,
+	ETypeFlag_IsLlvmReady    = 0x800,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ETypeModifier
 {
-	ETypeModifier_Const             = 0x00001,
-	ETypeModifier_Volatile          = 0x00002,
-	ETypeModifier_Signed            = 0x00004,
-	ETypeModifier_Unsigned          = 0x00008,
-	ETypeModifier_BigEndian         = 0x00010,
-	ETypeModifier_LittleEndian      = 0x00020,
-	ETypeModifier_Safe              = 0x00040,
-	ETypeModifier_Unsafe            = 0x00080,	
-	ETypeModifier_NoNull            = 0x00100,	
-	ETypeModifier_Property          = 0x00200,
+	ETypeModifier_Const        = 0x00001,
+	ETypeModifier_Volatile     = 0x00002,
+	ETypeModifier_Signed       = 0x00004,
+	ETypeModifier_Unsigned     = 0x00008,
+	ETypeModifier_BigEndian    = 0x00010,
+	ETypeModifier_LittleEndian = 0x00020,
+	ETypeModifier_Safe         = 0x00040,
+	ETypeModifier_Unsafe       = 0x00080,	
+	ETypeModifier_NoNull       = 0x00100,	
+	ETypeModifier_Strong       = 0x00200,
+	ETypeModifier_Weak         = 0x00400,	
+	ETypeModifier_Property     = 0x01000,
+	ETypeModifier_Bindable     = 0x02000,
 };
 
 const tchar_t*

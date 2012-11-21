@@ -75,6 +75,9 @@ main := |*
 'safe'         { CreateToken (EToken_Safe); };
 'unsafe'       { CreateToken (EToken_Unsafe); };
 'nonull'       { CreateToken (EToken_NoNull); };
+'strong'       { CreateToken (EToken_Strong); };
+'weak'         { CreateToken (EToken_Weak); };
+'bindable'     { CreateToken (EToken_Bindable); };
 
 'auto'         { CreateToken (EToken_Auto); };
 'void'         { CreateToken (EToken_Void); };

@@ -620,6 +620,12 @@ CCast_ptr::LlvmCast_ptr_ptr_u (
 	CValue* pResultValue
 	)
 {
+	if (Value.GetValueKind () == EValue_Variable)
+	{
+		m_pModule->m_LlvmBuilder.CreateBitCast (Value, pType, pResultValue);
+		return true;
+	}
+
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
 

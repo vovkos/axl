@@ -278,6 +278,10 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 		{
 			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
+	| union_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
 	| class_specifier
 		{
 			return $pTypeSpecifier->SetType ($1.m_pType);

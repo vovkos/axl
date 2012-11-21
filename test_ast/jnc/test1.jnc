@@ -24,25 +24,34 @@ printf (
 
 //.............................................................................
 
-struct TBase
+union TUnion
 {
-	int m_a;
-	int m_b;
-};
-
-struct TDerived: TBase
-{
-	int m_c;
-	int m_d;
+	unsigned int8 m_a;
+	unsigned int16 m_b;
+	unsigned int32 m_c;
+	unsigned int64 m_d;
 };
 
 int
 main ()
 {
-	TDerived t;
-	printf ("sizeof (TDerived) = %d\n", sizeof (t));
+	TUnion u;
+	u.m_d = -1;
+	u.m_c = 0;
+	u.m_b = -1;
+	u.m_a = 0;
+
+	StructTest (&u, sizeof (u));
 
 	return 0;
 }
+
+//.............................................................................
+
+void
+StructTest (
+	TUnion* unsafe p,
+	size_t Size
+	);
 
 //.............................................................................

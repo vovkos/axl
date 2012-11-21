@@ -7,6 +7,7 @@ import "axl_jnc_NamespaceDeclaration.llk";
 import "axl_jnc_CommonDeclaration.llk";
 import "axl_jnc_EnumSpecifier.llk";
 import "axl_jnc_StructSpecifier.llk";
+import "axl_jnc_UnionSpecifier.llk";
 import "axl_jnc_ClassSpecifier.llk";
 import "axl_jnc_PropertySpecifier.llk";
 
@@ -79,23 +80,17 @@ Members
 		CDeclarator* pDeclarator
 		);
 
-	CClassType*
-	DeclareClassType (
+	CEnumType*
+	DeclareEnumType (
 		EType TypeKind,
 		rtl::CString& Name
 		);
 
 	CStructType*
 	DeclareStructType (
-		EType TypeKind,
 		rtl::CString& Name,
+		rtl::CBoxListT <CType*>* pBaseTypeList,
 		size_t PackFactor
-		);
-
-	CEnumType*
-	DeclareEnumType (
-		EType TypeKind,
-		rtl::CString& Name
 		);
 
 	CStructMember*
@@ -103,6 +98,24 @@ Members
 		CStructType* pStructType,
 		CTypeSpecifierModifiers* pTypeSpecifier,
 		CDeclarator* pDeclarator
+		);
+
+	CUnionType*
+	DeclareUnionType (rtl::CString& Name);
+
+	CUnionMember*
+	DeclareUnionMember (
+		CUnionType* pStructType,
+		CTypeSpecifierModifiers* pTypeSpecifier,
+		CDeclarator* pDeclarator
+		);
+
+	CClassType*
+	DeclareClassType (
+		EType TypeKind,
+		rtl::CString& Name,
+		rtl::CBoxListT <CType*>* pBaseTypeList,
+		size_t PackFactor
 		);
 
 	CModuleItem*

@@ -15,6 +15,7 @@ CTypeMgr::CTypeMgr ()
 	m_pBytePtrType = NULL;
 	m_pSafePtrStructType = NULL;
 	m_pFunctionPtrStructType = NULL;
+	m_UnnamedTypeIndex = 0;
 
 	SetupAllBasicTypes ();
 }
@@ -35,6 +36,7 @@ CTypeMgr::Clear ()
 	m_pBytePtrType = NULL;
 	m_pSafePtrStructType = NULL;
 	m_pFunctionPtrStructType = NULL;
+	m_UnnamedTypeIndex = 0;
 }
 
 void
@@ -279,7 +281,7 @@ CTypeMgr::GetEnumType (
 	}
 
 	rtl::CStringA Signature;
-	Signature.Format (_T("%c%s"), TypeKind == EType_Enum ? 'I' : 'J', QualifiedName);
+	Signature.Format ("%c%s", TypeKind == EType_Enum ? 'I' : 'J', QualifiedName);
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -328,26 +330,23 @@ CTypeMgr::GetArrayType (
 
 CStructType* 
 CTypeMgr::GetStructType (
-	EType TypeKind,
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
 	size_t PackFactor
 	)
 {
-	ASSERT (TypeKind == EType_Struct || TypeKind == EType_Union);
-
 	if (Name.IsEmpty ())
 	{
 		CStructType* pType = AXL_MEM_NEW (CStructType);
 		pType->m_pModule = m_pModule;
-		pType->m_TypeKind = TypeKind;
-		pType->m_pModule = m_pModule;
+		pType->m_Signature.Format ("L%d", m_UnnamedTypeIndex++);
+		pType->m_PackFactor = PackFactor;
 		m_StructTypeList.InsertTail (pType);
 		return pType;
 	}
 
 	rtl::CStringA Signature;
-	Signature.Format (_T("%c%s"), TypeKind == EType_Struct ? 'L' : 'M', QualifiedName);
+	Signature.Format ("L%s", QualifiedName);
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -355,11 +354,10 @@ CTypeMgr::GetStructType (
 
 	CStructType* pType = AXL_MEM_NEW (CStructType);	
 	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = TypeKind;
-	pType->m_PackFactor = PackFactor;
+	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
-	pType->m_pModule = m_pModule;
+	pType->m_PackFactor = PackFactor;
 
 	m_StructTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -367,13 +365,46 @@ CTypeMgr::GetStructType (
 	return pType;
 }
 
+CUnionType* 
+CTypeMgr::GetUnionType (
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName
+	)
+{
+	if (Name.IsEmpty ())
+	{
+		CUnionType* pType = AXL_MEM_NEW (CUnionType);
+		pType->m_pModule = m_pModule;
+		pType->m_Signature.Format ("M%d", m_UnnamedTypeIndex++);
+		m_UnionTypeList.InsertTail (pType);
+		return pType;
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format ("M%s", QualifiedName);
+	
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CUnionType*) It->m_Value;
+
+	CUnionType* pType = AXL_MEM_NEW (CUnionType);	
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_Name = Name;
+	pType->m_QualifiedName = QualifiedName;
+	
+	m_UnionTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
+	return pType;
+}
 CStructType*
 CTypeMgr::GetSafePtrStructType ()
 {
 	if (m_pSafePtrStructType)
 		return m_pSafePtrStructType;
 
-	m_pSafePtrStructType = GetStructType (EType_Struct, "sptr", "jnc.sptr");
+	m_pSafePtrStructType = GetStructType ("sptr", "jnc.sptr");
 	m_pSafePtrStructType->CreateMember ("m_p", GetBytePtrType ());
 	m_pSafePtrStructType->CreateMember ("m_beg", GetBytePtrType ());
 	m_pSafePtrStructType->CreateMember ("m_end", GetBytePtrType ());
@@ -388,7 +419,7 @@ CTypeMgr::GetFunctionPtrStructType ()
 	if (m_pFunctionPtrStructType)
 		return m_pFunctionPtrStructType;
 
-	m_pFunctionPtrStructType = GetStructType (EType_Struct, "fptr", "jnc.fptr");
+	m_pFunctionPtrStructType = GetStructType ("fptr", "jnc.fptr");
 	m_pFunctionPtrStructType->CreateMember ("m_pfn", GetBytePtrType ());
 	m_pFunctionPtrStructType->CreateMember ("m_iface", GetBytePtrType ());
 
@@ -409,23 +440,27 @@ CClassType*
 CTypeMgr::GetClassType (
 	EType TypeKind,
 	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
+	const rtl::CString& QualifiedName,
+	size_t PackFactor
 	)
 {
 	ASSERT (TypeKind == EType_Class || TypeKind == EType_Interface);
+
+	char SignatureChar = TypeKind == EType_Interface ? 'N' : 'O';
 
 	if (Name.IsEmpty ())
 	{
 		CClassType* pType = AXL_MEM_NEW (CClassType);
 		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
-		pType->m_pModule = m_pModule;
+		pType->m_Signature.Format ("%c%d", SignatureChar, m_UnnamedTypeIndex++);
+		pType->m_PackFactor = PackFactor;
 		m_ClassTypeList.InsertTail (pType);
 		return pType;
 	}
 
 	rtl::CStringA Signature;
-	Signature.Format (_T("%c%s"), TypeKind == EType_Interface ? 'N' : 'O', QualifiedName);
+	Signature.Format ("%c%s", SignatureChar, QualifiedName);
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -434,9 +469,10 @@ CTypeMgr::GetClassType (
 	CClassType* pType = AXL_MEM_NEW (CClassType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
+	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
-	pType->m_pModule = m_pModule;
+	pType->m_PackFactor = PackFactor;
 
 	m_ClassTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -506,7 +542,7 @@ CTypeMgr::GetImportType (
 	)
 {
 	rtl::CStringA Signature;
-	Signature.Format (_T("Z%s.%s"), pAnchorNamespace->GetQualifiedName (), Name.GetFullName ());
+	Signature.Format ("Z%s.%s", pAnchorNamespace->GetQualifiedName (), Name.GetFullName ());
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)

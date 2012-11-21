@@ -106,8 +106,17 @@ GetTypeModifierString (ETypeModifier Modifier)
 	case ETypeModifier_NoNull:
 		return _T("nonull");
 
+	case ETypeModifier_Strong:
+		return _T("strong");
+
+	case ETypeModifier_Weak:
+		return _T("weak");
+
 	case ETypeModifier_Property:
 		return _T("property");
+
+	case ETypeModifier_Bindable:
+		return _T("bindable");
 
 	default:
 		return _T("undefined-type-modifier");
@@ -213,9 +222,11 @@ CType::GetLlvmType ()
 		break;
 	
 	case EType_Struct:
-	case EType_Union:
 		return ((CStructType*) this)->GetLlvmType ();
-	
+
+	case EType_Union:
+		return ((CUnionType*) this)->GetLlvmType ();
+
 	case EType_Class:
 	case EType_Interface:
 		return ((CClassType*) this)->GetLlvmType ();
@@ -609,7 +620,35 @@ CType::GetModifiedType (int Modifiers)
 
 		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_NoNull);
 	}
+/*
+	if (Modifiers & ETypeModifier_Strong)
+	{
+		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Strong, ETypeModifier_Weak))
+			return NULL;
 
+		// do nothing
+	}
+
+	if (Modifiers & ETypeModifier_Weak)
+	{
+		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
+			return NULL;
+
+		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
+		CPointerType* pPointerType = (CPointerType*) pType;
+		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
+	}
+
+	if (Modifiers & ETypeModifier_Bindable)
+	{
+		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
+			return NULL;
+
+		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
+		CPointerType* pPointerType = (CPointerType*) pType;
+		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
+	}
+*/
 	if (Modifiers & ETypeModifier_Volatile)
 	{
 		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Volatile);

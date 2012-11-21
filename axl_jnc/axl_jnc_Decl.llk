@@ -82,4 +82,15 @@ generic_formal_argument
 			return $pType->AddGenericArgument (pArgumentType);
 		} */
 	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+pragma
+pragma_pack
+	: '#' EToken_Pack ':' struct_pack_factor_value $v
+		{
+			m_StructPackFactor = $v.m_Value;
+		}
+	;
+
 //.............................................................................

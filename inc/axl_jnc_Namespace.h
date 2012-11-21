@@ -40,6 +40,18 @@ public:
 		m_First = Name;
 	}	
 
+	bool
+	IsSimple () const
+	{
+		return m_List.IsEmpty ();
+	}
+
+	rtl::CString
+	GetShortName () const
+	{
+		return !m_List.IsEmpty () ? *m_List.GetTail () : m_First;
+	}
+
 	rtl::CString
 	GetFullName () const;
 };
