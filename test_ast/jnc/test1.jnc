@@ -24,34 +24,52 @@ printf (
 
 //.............................................................................
 
+struct TStruct
+{
+	int32 m_a:8;
+	int32 m_b:8;
+	int32 m_c:8;
+	int32 m_d:8;
+};
+
 union TUnion
 {
-	unsigned int8 m_a;
-	unsigned int16 m_b;
-	unsigned int32 m_c;
-	unsigned int64 m_d;
+	TStruct m_Struct;
+	unsigned bigendian int32 m_Value;
 };
 
 int
 main ()
 {
 	TUnion u;
-	u.m_d = -1;
-	u.m_c = 0;
-	u.m_b = -1;
-	u.m_a = 0;
+	u.m_Value = 0x01020380;
 
-	StructTest (&u, sizeof (u));
+	int a = u.m_Struct.m_a;
+	int b = u.m_Struct.m_b;
+	int c = u.m_Struct.m_c;
+	int d = u.m_Struct.m_d;
+
+	printf ("%x, { %x %x %x %x } %x\n", 
+		u.m_Value, 
+		u.m_Struct.m_a, 
+		u.m_Struct.m_b, 
+		u.m_Struct.m_c, 
+		u.m_Struct.m_d,
+		
+		u.m_Struct.m_b + u.m_Struct.m_c
+		);
 
 	return 0;
 }
 
 //.............................................................................
 
+/*
 void
 StructTest (
-	TUnion* unsafe p,
+	TStruct* unsafe p,
 	size_t Size
 	);
+*/
 
 //.............................................................................

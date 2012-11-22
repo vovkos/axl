@@ -130,7 +130,29 @@ CStructType::CreateMember (
 	if (AlignFactor > m_AlignFactor)
 		m_AlignFactor = AlignFactor;
 
-	size_t Offset = GetFieldOffset (AlignFactor);
+	size_t Offset;
+
+	if (pType->GetTypeKind () != EType_BitField)
+	{
+		Offset = GetFieldOffset (AlignFactor);
+		SetSize (Offset + pType->GetSize ());
+	}
+	else
+	{
+		CBitFieldType* pBitFieldType = (CBitFieldType*) pType;
+		if (pBitFieldType->GetBitOffset ()) // we use the last member's offset
+		{
+			ASSERT (!m_MemberList.IsEmpty ());
+			Offset = m_MemberList.GetTail ()->m_Offset;
+		}
+		else // new slot
+		{
+			Offset = GetFieldOffset (AlignFactor);
+			SetSize (Offset + pType->GetSize ());
+		}
+
+		m_pLastBitFieldType = pBitFieldType;
+	}
 
 	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
 	pMember->m_Name = Name;
@@ -142,7 +164,6 @@ CStructType::CreateMember (
 	if (!Result)
 		return NULL;
 
-	SetSize (Offset + pType->GetSize ());
 
 	return pMember;
 }
@@ -191,9 +212,17 @@ CStructType::GetLlvmType ()
 			LlvmIndex++;
 		}
 
-		LlvmMemberTypeArray.Append (pMember->m_pType->GetLlvmType ());
-		Offset = pMember->m_Offset + pMember->m_pType->GetSize ();
-		pMember->m_LlvmIndex = LlvmIndex++;
+		if (pMember->m_pType->GetTypeKind () == EType_BitField &&
+			((CBitFieldType*) pMember->m_pType)->GetBitOffset () != 0)
+		{
+			pMember->m_LlvmIndex = LlvmIndex - 1;
+		}
+		else
+		{
+			pMember->m_LlvmIndex = LlvmIndex++;
+			LlvmMemberTypeArray.Append (pMember->m_pType->GetLlvmType ());
+			Offset = pMember->m_Offset + pMember->m_pType->GetSize ();
+		}
 	}
 
 	ASSERT (Offset == m_ActualSize);

@@ -7,6 +7,7 @@
 #include "axl_jnc_Type.h"
 #include "axl_jnc_Namespace.h"
 #include "axl_jnc_ImportType.h"
+#include "axl_jnc_BitFieldType.h"
 
 namespace axl {
 namespace jnc {
@@ -23,12 +24,15 @@ protected:
 	size_t m_AlignFactor;
 	size_t m_PackFactor;
 
+	CBitFieldType* m_pLastBitFieldType;
+
 public:
 	CStructTypeT ()
 	{
 		m_ActualSize = 0;
 		m_AlignFactor = 1;
 		m_PackFactor = 8;
+		m_pLastBitFieldType = NULL;
 	}
 
 	size_t 
@@ -43,7 +47,6 @@ public:
 		return m_PackFactor;
 	}
 
-protected:
 	size_t
 	GetFieldOffset (size_t AlignFactor)
 	{
@@ -59,6 +62,23 @@ protected:
 		return Offset;
 	}
 
+	size_t 
+	GetBitFieldBitOffset (
+		CType* pType,
+		size_t BitCount
+		)
+	{
+		if (!m_pLastBitFieldType || m_pLastBitFieldType->GetBaseType ()->Cmp (pType) != 0)
+			return 0;
+
+		size_t LastBitOffset = 
+			m_pLastBitFieldType->GetBitOffset () + 
+			m_pLastBitFieldType->GetBitCount ();
+
+		return LastBitOffset + BitCount <= pType->GetSize () * 8 ? LastBitOffset : 0;
+	}
+
+protected:
 	size_t
 	SetSize (size_t Size)
 	{
@@ -178,7 +198,7 @@ public:
 	CStructType ()
 	{
 		m_TypeKind = EType_Struct;
-		m_Flags = ETypeFlag_IsPod | ETypeFlag_IsIncomplete;
+		m_Flags = ETypeFlag_IsPod;
 	}
 
 	llvm::StructType* 

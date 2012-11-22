@@ -198,8 +198,11 @@ CModulePane::AddType (
 		break;
 
 	case jnc::EType_Struct:
-	case jnc::EType_Union:
 		AddStructTypeMembers (hItem, (jnc::CStructType*) pType);
+		break;
+
+	case jnc::EType_Union:
+		AddUnionTypeMembers (hItem, (jnc::CUnionType*) pType);
 		break;
 
 	case jnc::EType_Class:
@@ -223,6 +226,23 @@ void
 CModulePane::AddStructMember (
 	HTREEITEM hParent,
 	jnc::CStructMember* pMember
+	)
+{
+	rtl::CString ItemName;
+	ItemName.Format (
+		_T("%s %s"), 
+		pMember->GetType ()->GetTypeString (),
+		pMember->GetName ()
+		);
+
+	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
+	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pMember);
+}
+
+void
+CModulePane::AddUnionMember (
+	HTREEITEM hParent,
+	jnc::CUnionMember* pMember
 	)
 {
 	rtl::CString ItemName;
@@ -327,6 +347,22 @@ CModulePane::AddStructTypeMembers (
 
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
+
+void
+CModulePane::AddUnionTypeMembers (
+	HTREEITEM hParent,
+	jnc::CUnionType* pType
+	)
+{
+//	AddStructClassTypeMembers (hParent, pType);
+
+	rtl::CIteratorT <jnc::CUnionMember> Member = pType->GetFirstMember ();
+	for (; Member; Member++)
+		AddUnionMember (hParent, *Member);
+
+	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
+}
+
 
 void
 CModulePane::AddClassTypeMembers (
@@ -505,6 +541,18 @@ rtl::CString
 GetNamespaceTip (jnc::CGlobalNamespace* pNamespace)
 {
 	return rtl::CString::Format_s (_T("namespace %s"), pNamespace->GetQualifiedName ());
+}
+
+inline
+jnc::CType* 
+UnImportType (jnc::CType* pType)
+{
+	if (pType->GetTypeKind () != jnc::EType_Import)
+		return pType;
+
+	jnc::CImportType* pImportType = (jnc::CImportType*) pType;
+	jnc::CType* pExternType = pImportType->GetExternType ();
+	return pExternType ? pExternType : pType;
 }
 
 rtl::CString

@@ -57,7 +57,7 @@ public:
 	CUnionType ()
 	{
 		m_TypeKind = EType_Union;
-		m_Flags = ETypeFlag_IsPod | ETypeFlag_IsIncomplete;
+		m_Flags = ETypeFlag_IsPod;
 	}
 
 	llvm::StructType* 

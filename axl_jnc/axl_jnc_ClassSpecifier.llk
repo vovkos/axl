@@ -69,11 +69,14 @@ local
 {
 	CModuleItem* $pMember;
 }
-	: declarator (':' struct_member_bit_field)? 
+	: declarator (':' constant_integer_expr $bf)? 
 		{
-			$pMember = DeclareClassMember ($pType, $pDeclSpecifiers, &$1.m_Declarator);
-			if (!$pMember)
-				return false;
+			return DeclareClassMember (
+				$pType, 
+				$pDeclSpecifiers, 
+				&$1.m_Declarator,
+				IsValidLocator ($bf) ? $bf.m_Value : -1
+				) != NULL;
 		}
 	  ('=' 
 		{

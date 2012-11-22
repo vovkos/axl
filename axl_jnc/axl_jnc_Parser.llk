@@ -97,7 +97,8 @@ Members
 	DeclareStructMember (
 		CStructType* pStructType,
 		CTypeSpecifierModifiers* pTypeSpecifier,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		size_t BitCount
 		);
 
 	CUnionType*
@@ -107,7 +108,8 @@ Members
 	DeclareUnionMember (
 		CUnionType* pStructType,
 		CTypeSpecifierModifiers* pTypeSpecifier,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		size_t BitCount
 		);
 
 	CClassType*
@@ -122,7 +124,8 @@ Members
 	DeclareClassMember (
 		CClassType* pClassType,
 		CDeclSpecifiers* pDeclSpecifiers,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		size_t BitCount
 		);
 
 	CFunctionFormalArg*

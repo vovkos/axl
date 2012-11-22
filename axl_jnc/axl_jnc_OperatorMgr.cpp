@@ -328,7 +328,17 @@ COperatorMgr::GetCastOperator (
 			TypeKind == EType_Array ? (ICastOperator*) &m_Cast_arr :
 			pType->IsPointerType () ? (ICastOperator*) &m_Cast_arr_ptr : NULL;
 
+	case EType_BitField:
+		pBaseType = ((CBitFieldType*) pOpType)->GetBaseType ();
+		return GetCastOperator (pBaseType, pType) ? &m_Cast_getbf : NULL;
+
 	default:
+		if (TypeKind == EType_BitField)
+		{
+			pBaseType = ((CBitFieldType*) pType)->GetBaseType ();
+			return GetCastOperator (pOpType, pBaseType) ? &m_Cast_setbf : NULL;
+		}
+
 		return OpTypeKind < EType__BasicTypeCount && TypeKind < EType__BasicTypeCount ?
 			m_CastOperatorTable [OpTypeKind] [TypeKind] : NULL;
 	}
@@ -733,7 +743,10 @@ GetVarArgType (
 	{
 	case EType_Reference:
 	case EType_Reference_u:
-		return ((CPointerType*) pType)->GetBaseType ();
+		return GetVarArgType (((CPointerType*) pType)->GetBaseType (), IsUnsafeVarArg);
+
+	case EType_BitField:
+		return ((CBitFieldType*) pType)->GetBaseType ();
 
 	default:
 		return pType;
@@ -884,6 +897,12 @@ COperatorMgr::PrepareOperandType (
 
 			break;
 
+		case EType_BitField:
+			if (Flags & EOpFlag_BitFieldToInt)
+				pType = ((CBitFieldType*) pType)->GetBaseType ();
+
+			break;
+
 		case EType_Bool:
 			if (Flags & EOpFlag_BoolToInt)
 				pType = m_pModule->m_TypeMgr.GetBasicType (EType_Int);
@@ -942,6 +961,16 @@ COperatorMgr::PrepareOperand (
 		case EType_Enum:
 			if (Flags & EOpFlag_EnumToInt)
 				Value.OverrideType (EType_Int);
+
+			break;
+
+		case EType_BitField:
+			if (Flags & EOpFlag_BitFieldToInt)
+			{
+				Result = CastOperator (&Value, ((CBitFieldType*) pType)->GetBaseType ());
+				if (!Result)
+					return false;
+			}
 
 			break;
 
@@ -1067,8 +1096,12 @@ COperatorMgr::StoreReferenceOperator (
 	if (!Result)
 		return false;
 
-	if (pTargetType->GetTypeKind () == EType_Pointer)
+	bool IsRangeChecked = false;
+
+	EType TargetTypeKind = pTargetType->GetTypeKind ();
+	switch (TargetTypeKind)
 	{
+	case EType_Pointer:
 		Result = m_pModule->m_LlvmBuilder.CheckSafePtrScope (SrcValue, DstValue.GetScope ());
 		if (!Result)
 			return false;
@@ -1080,6 +1113,16 @@ COperatorMgr::StoreReferenceOperator (
 				pTargetType,
 				&SrcValue
 				);
+
+		break;
+
+	case EType_BitField:
+		Result = MergeBitField (&SrcValue, DstValue);
+		if (!Result)
+			return false;
+
+		IsRangeChecked = true;
+		break;
 	}
 
 	if (pDstType->GetTypeKind () == EType_Reference_u || DstValue.GetValueKind () == EValue_Variable) // no need to do a range check
@@ -1090,14 +1133,74 @@ COperatorMgr::StoreReferenceOperator (
 
 	ASSERT (pDstType->GetTypeKind () == EType_Reference);
 
-	Result = m_pModule->m_LlvmBuilder.CheckSafePtrRange (DstValue, pTargetType->GetSize (), ESafePtrError_Store); 
-	if (!Result)
-		return false;
+	if (!IsRangeChecked) // don't check twice
+	{
+		Result = m_pModule->m_LlvmBuilder.CheckSafePtrRange (DstValue, pTargetType->GetSize (), ESafePtrError_Store); 
+		if (!Result)
+			return false;
+	}
 	
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 0, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateBitCast (DstValue, pTargetType->GetPointerType (EType_Pointer_u), &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (SrcValue, PtrValue, IsVolatile);
+	return true;
+}
+
+bool
+COperatorMgr::MergeBitField (
+	const CValue& RawSrcValue,
+	const CValue& RawDstValue,
+	CValue* pResultValue
+	)
+{
+	ASSERT (RawSrcValue.GetType ()->GetTypeKind () == EType_BitField);
+	ASSERT (RawDstValue.GetType ()->IsReferenceType ());
+
+	CBitFieldType* pSrcType = (CBitFieldType*) RawSrcValue.GetType ();
+	CType* pBaseType = pSrcType->GetBaseType ();
+	size_t BitOffset = pSrcType->GetBitOffset ();
+	size_t BitCount = pSrcType->GetBitCount ();
+
+	CValue MaskValue;
+
+	if (pSrcType->GetSize () <= 4)
+	{
+		uint32_t Mask = ~((((uint32_t) 1 << BitCount) - 1) << BitOffset);	
+		MaskValue.SetConstInt32 (Mask, EType_Int32_u);
+	}
+	else
+	{
+		uint64_t Mask = ~((((uint64_t) 1 << BitCount) - 1) << BitOffset);	
+		MaskValue.SetConstInt64 (Mask, EType_Int64_u);
+	}
+
+	CValue DstValue;
+	bool Result = LoadReferenceOperator (RawDstValue, &DstValue);
+	if (!Result)
+		return false;
+
+	DstValue.OverrideType (pBaseType);
+
+	CValue SrcValue (RawSrcValue, pBaseType);
+	return 
+		BinaryOperator (EBinOp_BitwiseAnd, &DstValue, MaskValue) &&
+		BinaryOperator (EBinOp_BitwiseOr, SrcValue, DstValue, pResultValue);
+}
+
+bool
+COperatorMgr::MergeBitField (
+	CValue* pValue,
+	const CValue& DstValue
+	)
+{
+	CValue ResultValue;
+
+	bool Result = MergeBitField (*pValue, DstValue, &ResultValue);
+	if (!Result)
+		return false;
+
+	*pValue = ResultValue;
 	return true;
 }
 

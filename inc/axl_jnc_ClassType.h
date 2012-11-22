@@ -261,7 +261,6 @@ public:
 	CClassType ()
 	{
 		m_TypeKind = EType_Class;
-		m_Flags = ETypeFlag_IsIncomplete;
 	}
 	
 	llvm::StructType* 

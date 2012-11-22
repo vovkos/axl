@@ -53,8 +53,18 @@ class
 start
 constant_integer_expr
 	: expression
-		{
-			$.m_Value = 10;
+		{						
+			if ($1.m_Value.GetValueKind () != EValue_Const || !$1.m_Value.GetType ()->IsIntegerType ())
+			{
+				err::SetFormatStringError (_T("not a constant integer expression"));
+				return false;
+			}
+
+			bool Result = m_pModule->m_OperatorMgr.CastOperator (&$1.m_Value, EType_Int32);
+			if (!Result)
+				return false;
+
+			$.m_Value = $1.m_Value.GetInt32 ();
 		}
 	;
 
@@ -467,11 +477,11 @@ leave
 				$ArgList.InsertTail ($Arg);
 			}
 	  )* 
-	  ')'
-		
+	  ')'		
+
 	| '(' ')'
 	; 
-
+ 
 primary_expr <CValue* $pValue>
 	: EToken_Identifier
 		{

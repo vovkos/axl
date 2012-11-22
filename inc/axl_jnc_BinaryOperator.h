@@ -104,7 +104,7 @@ class CBinaryArithmeticOperatorT: public IBinaryOperator
 public:
 	CBinaryArithmeticOperatorT ()
 	{
-		m_Flags = EOpFlag_LoadReference | EOpFlag_EnumToInt | EOpFlag_BoolToInt;
+		m_Flags = EOpFlag_Arithmetic;
 	}
 
 	virtual
@@ -224,7 +224,7 @@ class CBinaryRelationalOperatorT: public IBinaryOperator
 public:
 	CBinaryRelationalOperatorT ()
 	{
-		m_Flags = EOpFlag_LoadReference | EOpFlag_EnumToInt | EOpFlag_BoolToInt;
+		m_Flags = EOpFlag_Arithmetic;
 	}
 
 	virtual

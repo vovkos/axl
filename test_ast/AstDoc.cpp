@@ -270,18 +270,25 @@ StdLib_StructTest (
 	};
 	*/
 
-	union TStruct
+	struct TStruct
 	{
-		unsigned __int8 m_a;
-		unsigned __int16 m_b;
-		unsigned __int32 m_c;
-		unsigned __int64 m_d;
+		unsigned __int16 m_a:1;
+		unsigned __int16 m_b:2;
+		unsigned __int16 m_c:5;
+		unsigned __int16 m_d:7;
+	};
+
+	union TUnion
+	{
+		TStruct m_s;
+		unsigned __int16 m_i;
 	};
 
 	TStruct* pStruct = (TStruct*) p;
+	TUnion* pUnion = (TUnion*) p;
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
-		"TStruct = { %x, %x, %x, %llx }; Size = %d; sizeof (TStruct) = %d;\n", 
+		"TStruct = { %x, %x, %x, %x }; Size = %d; sizeof (TStruct) = %d;\n", 
 		pStruct->m_a, pStruct->m_b, pStruct->m_c, pStruct->m_d,
 		Size,
 		sizeof (TStruct)

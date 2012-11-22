@@ -19,19 +19,19 @@ union_specifier
 union_block <CUnionType* $pType>
 	: '{' 
 		{
-			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+			// m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
 		}
 	  union_member_declaration <$pType>* 
 	  '}'
 		{
-			m_pModule->m_NamespaceMgr.CloseNamespace ();
+			// m_pModule->m_NamespaceMgr.CloseNamespace ();
 		}
 	;
 
 union_member_declaration <CUnionType* $pType>
 	: attribute_block?
 	  type_specifier_modifier_list $s
-	  union_member_declarator_list <$pType, &$s.m_TypeSpecifier>
+	  union_member_declarator_list <$pType, &$s.m_TypeSpecifier>?
 	  ';'
 	| ';'
 	;
@@ -41,14 +41,15 @@ union_member_declarator_list <CUnionType* $pType, CTypeSpecifierModifiers* $pTyp
 	;
 
 union_member_declarator <CUnionType* $pType, CTypeSpecifierModifiers* $pTypeSpecifier>
-	: declarator (':' union_member_bit_field)?
+	: declarator (':' constant_integer_expr $bf)?
 		{
-			return DeclareUnionMember ($pType, $pTypeSpecifier, &$1.m_Declarator) != NULL;
+			return DeclareUnionMember (
+				$pType, 
+				$pTypeSpecifier, 
+				&$1.m_Declarator,
+				IsValidLocator ($bf) ? $bf.m_Value : -1
+				) != NULL;
 		}
-	;
-
-union_member_bit_field
-	: constant_integer_expr
 	;
 
 //.............................................................................

@@ -90,8 +90,11 @@ protected:
 	CCast_f32_i64 m_Cast_f32_i64;
 	CCast_f64_i32 m_Cast_f64_i32;
 	CCast_f64_i64 m_Cast_f64_i64;
-
+	
 	CCast_num_bool m_Cast_num_bool;
+
+	CCast_getbf m_Cast_getbf;
+	CCast_setbf m_Cast_setbf;
 
 	CCast_ptr m_Cast_ptr;
 	CCast_arr m_Cast_arr;
@@ -322,6 +325,19 @@ protected:
 		CClassType* pClassType,
 		const tchar_t* pName,
 		CValue* pResultValue
+		);
+
+	bool
+	MergeBitField (
+		const CValue& SrcValue,
+		const CValue& DstValue,
+		CValue* pResultValue
+		);
+
+	bool
+	MergeBitField (
+		CValue* pValue,
+		const CValue& DstValue
 		);
 };
 

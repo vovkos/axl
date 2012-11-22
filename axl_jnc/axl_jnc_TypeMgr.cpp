@@ -240,6 +240,13 @@ CTypeMgr::GetBitFieldType (
 	size_t BitCount
 	)
 {
+	EType TypeKind = pBaseType->GetTypeKind ();
+	if (TypeKind < EType_Int8 || TypeKind > EType_Int64_u)
+	{
+		err::SetFormatStringError (_T("bit field can only be used with little-endian integer types"));
+		return NULL;
+	}
+
 	rtl::CStringA Signature = CBitFieldType::CreateSignature (pBaseType, BitOffset, BitCount);
 
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
@@ -290,7 +297,6 @@ CTypeMgr::GetEnumType (
 	CEnumType* pType = AXL_MEM_NEW (CEnumType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
-	pType->m_Flags = ETypeFlag_IsPod | ETypeFlag_IsIncomplete;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_pModule = m_pModule;

@@ -88,6 +88,29 @@ public:
 	}
 
 	CValue (
+		const CValue& Value,
+		CType* pType
+		):
+		m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+	{
+		OverrideType (Value, pType);
+	}
+
+	CValue (
+		const CValue& Value,
+		EType TypeKind
+		):
+		m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+	{
+		OverrideType (Value, TypeKind);
+	}
+
+	CValue (
+		int64_t Value,
+		EType TypeKind = EType_Int32
+		);
+
+	CValue (
 		CType* pType,
 		const void* p
 		);
@@ -461,7 +484,7 @@ public:
 
 struct TObject
 {
-	class CClassType* m_pType;
+	class CClassType* m_pType; // for GC tracing & QueryInterface
 	size_t m_ScopeLevel;
 
 	// followed by TInterface of the object

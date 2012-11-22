@@ -453,6 +453,96 @@ CCast_num_bool::LlvmCast (
 
 //.............................................................................
 
+ECast
+CCast_getbf::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	CType* pSrcBaseType = ((CBitFieldType*) pSrcType)->GetBaseType ();
+	return m_pModule->m_OperatorMgr.GetCastKind (pSrcBaseType, pDstType);
+}
+
+bool
+CCast_getbf::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	CType* pDstType = DstValue.GetType ();
+		
+	CValue TmpValue;
+	
+	bool Result = SrcValue.GetType ()->GetSize () <= 4 ? 
+		CastImpl <uint32_t, EType_Int32_u> (SrcValue, pDstType, &TmpValue) : 
+		CastImpl <uint64_t, EType_Int64_u> (SrcValue, pDstType, &TmpValue);
+
+	if (!Result)
+		return false;
+
+	memcpy (DstValue.GetConstData (), TmpValue.GetConstData (), pDstType->GetSize ());
+	return true;
+}
+
+bool
+CCast_getbf::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	return Value.GetType ()->GetSize () <= 4 ? 
+		CastImpl <uint32_t, EType_Int32_u> (Value, pType, pResultValue) : 
+		CastImpl <uint64_t, EType_Int64_u> (Value, pType, pResultValue);
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+ECast
+CCast_setbf::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	CType* pDstBaseType = ((CBitFieldType*) pDstType)->GetBaseType ();
+	return m_pModule->m_OperatorMgr.GetCastKind (pSrcType, pDstBaseType);
+}
+
+bool
+CCast_setbf::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	CBitFieldType* pDstType = (CBitFieldType*) DstValue.GetType ();
+		
+	CValue TmpValue;
+	
+	bool Result = SrcValue.GetType ()->GetSize () <= 4 ? 
+		CastImpl <uint32_t, EType_Int32_u> (SrcValue, pDstType, &TmpValue) : 
+		CastImpl <uint64_t, EType_Int64_u> (SrcValue, pDstType, &TmpValue);
+
+	if (!Result)
+		return false;
+
+	memcpy (DstValue.GetConstData (), TmpValue.GetConstData (), pDstType->GetSize ());
+	return true;
+}
+
+bool
+CCast_setbf::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	return Value.GetType ()->GetSize () <= 4 ? 
+		CastImpl <uint32_t, EType_Int32_u> (Value, (CBitFieldType*) pType, pResultValue) : 
+		CastImpl <uint64_t, EType_Int64_u> (Value, (CBitFieldType*) pType, pResultValue);
+}
+
+//.............................................................................
+
 void
 AssertPointerCastTypeValid (
 	CType* pSrcType,

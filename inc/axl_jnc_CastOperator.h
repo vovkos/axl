@@ -895,6 +895,157 @@ public:
 
 //.............................................................................
 
+// bitfield <-> int
+
+class CBitFieldType;
+
+class CCast_getbf: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_getbf, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+protected:
+	template <
+		typename T,
+		EType TypeKind
+		>
+	bool
+	CastImpl (
+		const CValue& RawValue,
+		CType* pDstType,
+		CValue* pResultValue
+		)
+	{
+		bool Result;
+
+		CBitFieldType* pSrcType = (CBitFieldType*) RawValue.GetType ();
+		CType* pSrcBaseType = pSrcType->GetBaseType ();
+		size_t BitOffset = pSrcType->GetBitOffset ();
+		size_t BitCount = pSrcType->GetBitCount ();
+
+		T Mask = ((T) 1 << BitCount) - 1;
+
+		CValue Value (RawValue, pSrcBaseType);
+		CValue MaskValue (Mask, TypeKind);
+		CValue OffsetValue (BitOffset, TypeKind);
+
+		Result = 
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Shr, &Value, OffsetValue) &&
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseAnd, &Value, MaskValue);
+
+		if (!Result)
+			return false;
+
+		if (pSrcBaseType->IsSignedType ()) // extend with sign bit
+		{
+			T SignBit = (T) 1 << (BitCount - 1);
+
+			CValue SignBitValue (SignBit, TypeKind);
+			CValue OneValue (1, TypeKind);
+
+			CValue SignExtValue;
+			Result = 
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseAnd, &SignBitValue, Value) &&
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Sub, SignBitValue, OneValue, &SignExtValue) &&
+				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_BitwiseNot, &SignExtValue) &&
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseOr, &Value, SignExtValue);
+
+			if (!Result)
+				return false;
+		}
+
+		return m_pModule->m_OperatorMgr.CastOperator (Value, pDstType, pResultValue);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_setbf: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_setbf, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+protected:
+	template <
+		typename T,
+		EType TypeKind
+		>
+	bool
+	CastImpl (
+		const CValue& RawValue,
+		CBitFieldType* pDstType,
+		CValue* pResultValue
+		)
+	{
+		CType* pDstBaseType = pDstType->GetBaseType ();
+		size_t BitOffset = pDstType->GetBitOffset ();
+		size_t BitCount = pDstType->GetBitCount ();
+
+		CValue Value;
+
+		bool Result = m_pModule->m_OperatorMgr.CastOperator (RawValue, pDstBaseType, &Value);
+		if (!Result)
+			return false;
+
+		T Mask = (((T) 1 << BitCount) - 1) << BitOffset;
+
+		CValue MaskValue (Mask, TypeKind);
+		CValue OffsetValue (BitOffset, TypeKind);
+
+		return 
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Shl, &Value, OffsetValue) &&
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseAnd, Value, MaskValue, pResultValue);
+	}
+};
+
+//.............................................................................
+
 // safe / unsafe ptr -> safe / unsafe ptr
 
 class CCast_ptr: public ICastOperator

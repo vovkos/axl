@@ -39,7 +39,9 @@ enum EOpFlag
 	EOpFlag_IntegerOnly    = 0x01,
 	EOpFlag_LoadReference  = 0x02,
 	EOpFlag_EnumToInt      = 0x10,
-	EOpFlag_BoolToInt      = 0x20,
+	EOpFlag_BitFieldToInt  = 0x20,
+	EOpFlag_BoolToInt      = 0x40,
+	EOpFlag_Arithmetic     = EOpFlag_LoadReference | EOpFlag_EnumToInt | EOpFlag_BitFieldToInt | EOpFlag_BoolToInt
 };
 
 //.............................................................................
@@ -105,7 +107,7 @@ class CUnaryArithmeticOperatorT: public IUnaryOperator
 public:
 	CUnaryArithmeticOperatorT ()
 	{
-		m_Flags = EOpFlag_LoadReference | EOpFlag_EnumToInt | EOpFlag_BoolToInt;
+		m_Flags = EOpFlag_Arithmetic;
 	}
 
 	virtual

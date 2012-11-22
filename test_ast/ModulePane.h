@@ -72,6 +72,12 @@ protected:
 		);
 
 	void
+	AddUnionMember (
+		HTREEITEM hParent,
+		jnc::CUnionMember* pMember
+		);
+
+	void
 	AddClassMember (
 		HTREEITEM hParent,
 		jnc::CClassMember* pMember
@@ -120,6 +126,12 @@ protected:
 	CModulePane::AddStructTypeMembers (
 		HTREEITEM hParent,
 		jnc::CStructType* pType
+		);
+
+	void
+	CModulePane::AddUnionTypeMembers (
+		HTREEITEM hParent,
+		jnc::CUnionType* pType
 		);
 
 	void

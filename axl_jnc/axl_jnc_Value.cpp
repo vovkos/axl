@@ -124,6 +124,19 @@ CValue::CValue (
 	CreateConst (pType, p);
 }
 
+CValue::CValue (
+	int64_t Value,
+	EType TypeKind
+	):
+	m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+{	
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	CType* pType = pModule->m_TypeMgr.GetBasicType (TypeKind);
+	CreateConst (pType, &Value);
+}
+
 void
 CValue::Clear ()
 {
@@ -167,6 +180,12 @@ CValue::GetLlvmConst (
 	case EType_Int32_u:
 	case EType_Int64:
 	case EType_Int64_u:
+	case EType_Int16_be:
+	case EType_Int16_beu:
+	case EType_Int32_be:
+	case EType_Int32_beu:
+	case EType_Int64_be:
+	case EType_Int64_beu:
 		Integer = *(int64_t*) p;
 		pLlvmConst = llvm::ConstantInt::get (
 			pType->GetLlvmType (),

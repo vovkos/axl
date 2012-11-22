@@ -52,19 +52,19 @@ struct_pack_factor_value
 struct_block <CStructType* $pType>
 	: '{' 
 		{
-			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+			// m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
 		}
 	  struct_member_declaration <$pType>* 
 	  '}'
 		{
-			m_pModule->m_NamespaceMgr.CloseNamespace ();
+			// m_pModule->m_NamespaceMgr.CloseNamespace ();
 		}
 	;
 
 struct_member_declaration <CStructType* $pType>
 	: attribute_block?
 	  type_specifier_modifier_list $s
-	  struct_member_declarator_list <$pType, &$s.m_TypeSpecifier>
+	  struct_member_declarator_list <$pType, &$s.m_TypeSpecifier>?
 	  ';'
 	| ';'
 	;
@@ -74,14 +74,15 @@ struct_member_declarator_list <CStructType* $pType, CTypeSpecifierModifiers* $pT
 	;
 
 struct_member_declarator <CStructType* $pType, CTypeSpecifierModifiers* $pTypeSpecifier>
-	: declarator (':' struct_member_bit_field)?
+	: declarator (':' constant_integer_expr $bf)?
 		{
-			return DeclareStructMember ($pType, $pTypeSpecifier, &$1.m_Declarator) != NULL;
+			return DeclareStructMember (
+				$pType, 
+				$pTypeSpecifier, 
+				&$1.m_Declarator,
+				IsValidLocator ($bf) ? $bf.m_Value : -1
+				) != NULL;
 		}
-	;
-
-struct_member_bit_field
-	: constant_integer_expr
 	;
 
 //.............................................................................

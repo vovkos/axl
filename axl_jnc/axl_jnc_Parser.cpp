@@ -254,12 +254,21 @@ CStructMember*
 CParser::DeclareStructMember (
 	CStructType* pStructType,
 	CTypeSpecifierModifiers* pTypeSpecifier,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	size_t BitCount
 	)
 {
 	CType* pType = pDeclarator->GetType (pTypeSpecifier);
 	if (!pType)
 		return NULL;
+
+	if (BitCount != -1)
+	{
+		size_t BitOffset = pStructType->GetBitFieldBitOffset (pType, BitCount);
+		pType = m_pModule->m_TypeMgr.GetBitFieldType (pType, BitOffset, BitCount);
+		if (!pType)
+			return NULL;
+	}
 
 	rtl::CString Name = pDeclarator->GetName ();
 	CStructMember* pMember = pStructType->CreateMember (Name, pType);
@@ -297,12 +306,20 @@ CUnionMember*
 CParser::DeclareUnionMember (
 	CUnionType* pUnionType,
 	CTypeSpecifierModifiers* pTypeSpecifier,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	size_t BitCount
 	)
 {
 	CType* pType = pDeclarator->GetType (pTypeSpecifier);
 	if (!pType)
 		return NULL;
+
+	if (BitCount != -1)
+	{
+		pType = m_pModule->m_TypeMgr.GetBitFieldType (pType, 0, BitCount);
+		if (!pType)
+			return NULL;
+	}
 
 	rtl::CString Name = pDeclarator->GetName ();
 	CUnionMember* pMember = pUnionType->CreateMember (Name, pType);
@@ -373,12 +390,21 @@ CModuleItem*
 CParser::DeclareClassMember (
 	CClassType* pClassType,
 	CDeclSpecifiers* pDeclSpecifiers,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	size_t BitCount
 	)
 {
 	CType* pType = pDeclarator->GetType (pDeclSpecifiers);
 	if (!pType)
 		return NULL;
+
+	if (BitCount != -1)
+	{
+		size_t BitOffset = pClassType->GetBitFieldBitOffset (pType, BitCount);
+		pType = m_pModule->m_TypeMgr.GetBitFieldType (pType, BitOffset, BitCount);
+		if (!pType)
+			return NULL;
+	}
 
 	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
 	EType TypeKind = pType->GetTypeKind ();

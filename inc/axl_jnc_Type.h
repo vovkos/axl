@@ -137,9 +137,9 @@ enum ETypeQualifier
 
 enum ETypeFlag
 {
-	ETypeFlag_IsPod          = 0x200, // plain-old-data
-	ETypeFlag_IsIncomplete   = 0x400,
-	ETypeFlag_IsLlvmReady    = 0x800,
+	ETypeFlag_IsLlvmReady    = 0x0100,
+	ETypeFlag_IsPod          = 0x0200, // plain-old-data
+	ETypeFlag_IsImport       = 0x0800, // is or references an import type
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -33,7 +33,8 @@ CLlvmBuilder::CreateGep (
 	llvm::Value* pInst;
 	pInst = m_LlvmBuilder.CreateGEP (
 			Value.GetLlvmValue (), 
-			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount)
+			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
+			"gep"
 			);
 
 	pResultValue->SetLlvmRegister (pInst, pResultType);
@@ -63,7 +64,8 @@ CLlvmBuilder::CreateGep (
 	llvm::Value* pInst;
 	pInst = m_LlvmBuilder.CreateGEP (
 			Value.GetLlvmValue (), 
-			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount)
+			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
+			"gep"
 			);
 
 	pResultValue->SetLlvmRegister (pInst, pResultType);

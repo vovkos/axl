@@ -51,19 +51,5 @@ public:
 
 //.............................................................................
 
-inline
-CType* 
-UnImportType (CType* pType)
-{
-	if (pType->GetTypeKind () != EType_Import)
-		return pType;
-
-	CImportType* pImportType = (CImportType*) pType;
-	CType* pExternType = pImportType->GetExternType ();
-	return pExternType ? pExternType : pType;
-}
-
-//.............................................................................
-
 } // namespace axl {
 } // namespace jnc {
