@@ -45,8 +45,13 @@ CStructType::FindBaseType (
 	if (It)
 	{
 		CStructBaseType* pBaseType = It->m_Value;
-		*pOffset = pBaseType->m_Offset;
-		pLlvmIndexArray->Copy (&pBaseType->m_LlvmIndex, 1);
+
+		if (pOffset)
+			*pOffset = pBaseType->m_Offset;
+
+		if (pLlvmIndexArray)
+			pLlvmIndexArray->Copy (&pBaseType->m_LlvmIndex, 1);
+		
 		return true;
 	}
 
@@ -60,11 +65,16 @@ CStructType::FindBaseType (
 		bool Result = BaseType->m_pType->FindBaseType (pType, &Offset, &LlvmIndexArray);
 		if (Result)
 		{
-			*pOffset = BaseType->m_Offset + Offset;
+			if (pOffset)
+				*pOffset = BaseType->m_Offset + Offset;
 
-			pLlvmIndexArray->Clear ();
-			pLlvmIndexArray->Append (BaseType->m_LlvmIndex);
-			pLlvmIndexArray->Append (LlvmIndexArray);			
+			if (pLlvmIndexArray)
+			{
+				pLlvmIndexArray->Clear ();
+				pLlvmIndexArray->Append (BaseType->m_LlvmIndex);
+				pLlvmIndexArray->Append (LlvmIndexArray);
+			}
+
 			return true;
 		}
 	}

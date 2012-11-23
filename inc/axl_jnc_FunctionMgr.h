@@ -169,12 +169,6 @@ protected:
 
 	CFunction*
 	GetOnInvalidSafePtr ();
-
-	CFunction*
-	GetLoadDynamicPtr ();
-
-	CFunction*
-	GetStoreDynamicPtr ();
 };
 
 //.............................................................................

@@ -280,11 +280,12 @@ void
 CValue::SetVariable (
 	CVariable* pVariable,
 	llvm::Value* pLlvmValue,
-	CType* pType
+	CType* pType,
+	bool MakeReference
 	)
 {
 	m_ValueKind = EValue_Variable;
-	m_pType = pType->GetPointerType (EType_Reference);
+	m_pType = MakeReference ? pType->GetPointerType (EType_Reference) : pType;
 	m_pVariable = pVariable;
 	m_pLlvmValue = pLlvmValue;
 }

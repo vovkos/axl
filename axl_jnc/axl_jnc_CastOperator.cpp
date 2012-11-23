@@ -577,9 +577,10 @@ GetPointerCastOffset (
 	CStructType* pSrcStructType = (CStructType*) pSrcBaseType;
 	CStructType* pDstStructType = (CStructType*) pDstBaseType;
 
-	#pragma AXL_TODO ("implement struct inheritance check and offset calculation")
-
-	return 0;
+	size_t Offset;
+	return 
+		pSrcStructType->FindBaseType (pDstStructType, &Offset, NULL) ? Offset :
+		pDstStructType->FindBaseType (pSrcStructType, &Offset, NULL) ? -(intptr_t) Offset : 0;
 }
 
 //.............................................................................
@@ -667,9 +668,23 @@ CCast_ptr::LlvmCast_ptr (
 	OffsetValue.SetConstSizeT (Offset, EType_Int_p);
 
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);		
-	m_pModule->m_LlvmBuilder.CreateInsertValue (Value, PtrValue, 0, pType, pResultValue);
+
+	if (Value.GetValueKind () == EValue_Variable)
+	{
+		CPointerType* pUnsafePointerType = pType->GetBaseType ()->GetPointerType (EType_Pointer_u);
+
+ 		m_pModule->m_LlvmBuilder.CreateBitCast (Value, m_pModule->m_TypeMgr.GetBytePtrType (), &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pUnsafePointerType, &PtrValue);
+		pResultValue->SetVariable (Value.GetVariable (), PtrValue.GetLlvmValue (), pType, false);
+	}
+	else
+	{
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);		
+		m_pModule->m_LlvmBuilder.CreateInsertValue (Value, PtrValue, 0, pType, pResultValue);
+	}
+
 	return true;
 }
 

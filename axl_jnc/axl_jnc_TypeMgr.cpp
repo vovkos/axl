@@ -14,6 +14,7 @@ CTypeMgr::CTypeMgr ()
 
 	m_pBytePtrType = NULL;
 	m_pSafePtrStructType = NULL;
+	m_pSafePtrStructType2 = NULL;
 	m_pFunctionPtrStructType = NULL;
 	m_UnnamedTypeIndex = 0;
 
@@ -35,6 +36,7 @@ CTypeMgr::Clear ()
 
 	m_pBytePtrType = NULL;
 	m_pSafePtrStructType = NULL;
+	m_pSafePtrStructType2 = NULL;
 	m_pFunctionPtrStructType = NULL;
 	m_UnnamedTypeIndex = 0;
 }
@@ -404,6 +406,7 @@ CTypeMgr::GetUnionType (
 
 	return pType;
 }
+
 CStructType*
 CTypeMgr::GetSafePtrStructType ()
 {
@@ -417,6 +420,23 @@ CTypeMgr::GetSafePtrStructType ()
 	m_pSafePtrStructType->CreateMember ("m_scope", GetBasicType (EType_SizeT));
 
 	return m_pSafePtrStructType;
+}
+
+CStructType*
+CTypeMgr::GetSafePtrStructType2 ()
+{
+	if (m_pSafePtrStructType2)
+		return m_pSafePtrStructType2;
+
+	CType* pWordPtr = GetBasicType (EType_Byte)->GetPointerType (EType_Pointer_u);
+
+	m_pSafePtrStructType2 = GetStructType ("swptr", "jnc.swptr");
+	m_pSafePtrStructType2->CreateMember ("m_p", pWordPtr);
+	m_pSafePtrStructType2->CreateMember ("m_beg", pWordPtr);
+	m_pSafePtrStructType2->CreateMember ("m_end", pWordPtr);
+	m_pSafePtrStructType2->CreateMember ("m_scope", GetBasicType (EType_SizeT));
+
+	return m_pSafePtrStructType2;
 }
 
 CStructType*

@@ -143,7 +143,8 @@ public:
 	CValue (
 		CVariable* pVariable,
 		llvm::Value* pLlvmValue,
-		CType* pType
+		CType* pType,
+		bool MakeReference = true
 		)
 	{
 		SetVariable (pVariable, pLlvmValue, pType);
@@ -323,7 +324,8 @@ public:
 	SetVariable (
 		CVariable* pVariable,
 		llvm::Value* pLlvmValue,
-		CType* pType
+		CType* pType,
+		bool MakeReference = true
 		);
 
 	void

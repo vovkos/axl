@@ -42,7 +42,9 @@ protected:
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
 	CPointerType* m_pBytePtrType;
+
 	CStructType* m_pSafePtrStructType;
+	CStructType* m_pSafePtrStructType2;
 	CStructType* m_pFunctionPtrStructType;
 	
 	size_t m_UnnamedTypeIndex;
@@ -230,6 +232,9 @@ public:
 
 	CStructType* 
 	GetSafePtrStructType ();
+
+	CStructType* 
+	GetSafePtrStructType2 ();
 
 	CStructType* 
 	GetFunctionPtrStructType ();

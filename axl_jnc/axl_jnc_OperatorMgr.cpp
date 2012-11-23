@@ -1142,7 +1142,7 @@ COperatorMgr::StoreReferenceOperator (
 	
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (DstValue, pTargetType->GetPointerType (EType_Pointer_u), &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pTargetType->GetPointerType (EType_Pointer_u), &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (SrcValue, PtrValue, IsVolatile);
 	return true;
 }

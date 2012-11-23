@@ -184,6 +184,9 @@ GetUInt64TypeKind (
 	bool ForceUnsigned
 	);
 
+rtl::CString 
+GetLlvmTypeString (llvm::Type* pLlvmType);
+
 //.............................................................................
 
 class CType: public CModuleItem
@@ -197,6 +200,7 @@ protected:
 		
 	rtl::CStringA m_Signature;
 	rtl::CString m_TypeString;
+	rtl::CString m_LlvmTypeString;
 
 	llvm::Type* m_pLlvmType;
 
@@ -241,6 +245,12 @@ public:
 
 	rtl::CString 
 	GetTypeString ();
+
+	rtl::CString 
+	GetLlvmTypeString ()
+	{
+		return jnc::GetLlvmTypeString (GetLlvmType ());
+	}
 
 	int
 	Cmp (CType* pType)

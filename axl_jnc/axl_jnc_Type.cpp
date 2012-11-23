@@ -74,6 +74,17 @@ GetUInt64TypeKind (
 
 //.............................................................................
 
+rtl::CString 
+GetLlvmTypeString (llvm::Type* pLlvmType)
+{
+	std::string s;
+	llvm::raw_string_ostream Stream (s);
+	pLlvmType->print (Stream);
+	return Stream.str ().c_str ();
+}
+
+//.............................................................................
+
 const tchar_t*
 GetTypeModifierString (ETypeModifier Modifier)
 {

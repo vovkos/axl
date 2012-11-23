@@ -369,16 +369,6 @@ CFunctionMgr::GetCheckSafePtrRange ()
 	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
 	CValue ArgValue3 (LlvmArg++, ArgTypeArray [2]);
 
-	CValue PtrValue;
-	CValue PtrEndValue;
-	CValue RegionBeginValue;
-	CValue RegionEndValue;
-
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 1, NULL, &RegionBeginValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 2, NULL, &RegionEndValue);
-	m_pModule->m_LlvmBuilder.CreateGep (PtrValue, ArgValue2, NULL ,&PtrEndValue);
-
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
 	CBasicBlock* pCmp2Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp2"));
@@ -386,25 +376,33 @@ CFunctionMgr::GetCheckSafePtrRange ()
 	
 	CValue NullValue (m_pModule->m_TypeMgr.GetBytePtrType (), NULL);
 
+	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 0, NULL, &PtrValue);
+
 	CValue CmpValue;
 	m_pModule->m_LlvmBuilder.CreateEq_i (PtrValue, NullValue, &CmpValue);
-	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pCmp2Block);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pCmp2Block);	
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pCmp2Block);
 
+	CValue RegionBeginValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 1, NULL, &RegionBeginValue);
 	m_pModule->m_LlvmBuilder.CreateLt_u (PtrValue, RegionBeginValue, &CmpValue);
-	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pCmp3Block);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pCmp3Block);	
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pCmp3Block);
 
-	m_pModule->m_LlvmBuilder.CreateGt_u (PtrValue, RegionEndValue, &CmpValue);
+	CValue PtrEndValue;
+	CValue RegionEndValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue1, 2, NULL, &RegionEndValue);
+	m_pModule->m_LlvmBuilder.CreateGep (PtrValue, ArgValue2, NULL ,&PtrEndValue);
+	m_pModule->m_LlvmBuilder.CreateGt_u (PtrEndValue, RegionEndValue, &CmpValue);
 	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pSuccessBlock);
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
-
-	m_pModule->m_LlvmBuilder.CreateRet ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
 
 	CFunction* pOnInvalidSafePtr = GetStdFunction (EStdFunc_OnInvalidSafePtr);
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
 	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidSafePtr, ArgValue1, ArgValue3, NULL, NULL);
+	m_pModule->m_LlvmBuilder.CreateBr (pSuccessBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
+
 	m_pModule->m_LlvmBuilder.CreateRet ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
@@ -457,17 +455,16 @@ CFunctionMgr::GetCheckSafePtrScope ()
 
 	m_pModule->m_LlvmBuilder.CreateLt_u (ArgValue2, ScopeValue, &CmpValue);
 	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pSuccessBlock);
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
-
-	m_pModule->m_LlvmBuilder.CreateRet ();
-
-	CFunction* pOnInvalidSafePtr = GetStdFunction (EStdFunc_OnInvalidSafePtr);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
 
 	CValue ErrorValue;
 	ErrorValue.SetConstInt32 (ESafePtrError_ScopeMismatch, EType_Int);
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
+	CFunction* pOnInvalidSafePtr = GetStdFunction (EStdFunc_OnInvalidSafePtr);
 	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidSafePtr, ArgValue1, ErrorValue, NULL, NULL);
+	m_pModule->m_LlvmBuilder.CreateBr (pSuccessBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
+
 	m_pModule->m_LlvmBuilder.CreateRet ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
