@@ -7,15 +7,14 @@
 #include "axl_jnc_UnaryOperator.h"
 #include "axl_jnc_BinaryOperator.h"
 #include "axl_jnc_CastOperator.h"
+#include "axl_jnc_StructType.h"
+#include "axl_jnc_UnionType.h"
+#include "axl_jnc_ClassType.h"
 
 namespace axl {
 namespace jnc {
 
 class CModule;
-class CArrayType;
-class CStructType;
-class CUnionType;
-class CClassType;
 
 //.............................................................................
 
@@ -100,11 +99,13 @@ protected:
 	CCast_arr m_Cast_arr;
 	CCast_arr_ptr m_Cast_arr_ptr;
 
+	CCast_class m_Cast_class;
+
 	// tables
 
 	IUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
 	IBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
-	ICastOperator* m_CastOperatorTable [EType__BasicTypeCount] [EType__BasicTypeCount];
+	ICastOperator* m_CastOperatorTable [EType__PrimitiveTypeCount] [EType__PrimitiveTypeCount];
 
 	rtl::CStdListT <CSuperCast> m_SuperCastList;
 	
@@ -220,6 +221,18 @@ public:
 	// misc operators
 
 	bool
+	StackNewOperator (
+		CType* pType,
+		CValue* pResultValue
+		);
+
+	bool
+	HeapNewOperator (
+		CType* pType,
+		CValue* pResultValue
+		);
+
+	bool
 	ConditionalOperator (
 		CValue* pOpValue,
 		const CValue& TrueValue,
@@ -324,6 +337,34 @@ protected:
 		const CValue& OpValue,
 		CClassType* pClassType,
 		const tchar_t* pName,
+		CValue* pResultValue
+		);
+
+	bool
+	ClassFieldMemberOperator (
+		const CValue& OpValue,
+		CClassType* pClassType,
+		CClassFieldMember* pMember,
+		size_t BaseTypeOffset,
+		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
+		CValue* pResultValue
+		);
+
+	bool
+	ClassMethodMemberOperator (
+		const CValue& OpValue,
+		CClassType* pClassType,
+		CClassMethodMember* pMember,
+		size_t BaseTypeMethodTableIndex,
+		CValue* pResultValue
+		);
+
+	bool
+	ClassPropertyMemberOperator (
+		const CValue& OpValue,
+		CClassType* pClassType,
+		CClassPropertyMember* pMember,
+		size_t BaseTypeMethodTableIndex,
 		CValue* pResultValue
 		);
 

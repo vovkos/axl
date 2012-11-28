@@ -34,13 +34,7 @@ protected:
 	EVariable m_VariableKind;
 	CType* m_pType;
 	CScope* m_pScope;
-
-	union
-	{
-		llvm::Value* m_pLlvmValue;
-		llvm::GlobalVariable* m_pLlvmGlobalVariable;
-		llvm::AllocaInst* m_pLlvmAlloca;
-	};
+	llvm::Value* m_pLlvmValue;
 
 public:
 	CVariable ();

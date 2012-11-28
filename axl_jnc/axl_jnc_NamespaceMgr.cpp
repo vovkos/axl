@@ -157,7 +157,7 @@ CNamespaceMgr::FindBreakScope (size_t Level)
 	CScope* pScope = m_pCurrentScope;
 	for (; pScope; pScope = pScope->GetParentScope ())
 	{
-		if (pScope->GetBreakBlock ())
+		if (pScope->m_pBreakBlock)
 		{
 			i++;
 			if (i >= Level)
@@ -175,7 +175,7 @@ CNamespaceMgr::FindContinueScope (size_t Level)
 	CScope* pScope = m_pCurrentScope;
 	for (; pScope; pScope = pScope->GetParentScope ())
 	{
-		if (pScope->GetContinueBlock ())
+		if (pScope->m_pContinueBlock)
 		{
 			i++;
 			if (i >= Level)

@@ -82,7 +82,7 @@ CFunctionType::CreateTypeString (
 llvm::FunctionType* 
 CFunctionType::GetLlvmType ()
 {
-	if (m_Flags & ETypeFlag_IsLlvmReady)
+	if (m_pLlvmType)
 		return (llvm::FunctionType*) m_pLlvmType;
 
 	size_t ArgCount = m_ArgTypeArray.GetCount ();
@@ -104,7 +104,6 @@ CFunctionType::GetLlvmType ()
 		);
 	
 	m_pLlvmType = pLlvmType;
-	m_Flags |= ETypeFlag_IsLlvmReady;
 	return pLlvmType;
 }
 

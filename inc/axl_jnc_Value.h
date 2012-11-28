@@ -37,6 +37,13 @@ enum EValue
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum EValueFlag
+{
+	EValueFlag_IsVariableOffset = 1
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 const tchar_t*
 GetValueKindString (EValue ValueKind);
 
@@ -65,6 +72,8 @@ protected:
 protected:
 	EValue m_ValueKind;
 	CType* m_pType;	
+	int m_Flags;
+
 	CConstBuf m_Const;
 	uchar_t m_ConstBuffer [CConstBuf::MinBufSize + 8];
 
@@ -79,29 +88,32 @@ protected:
 	mutable llvm::Value* m_pLlvmValue;
 
 public:
-	CValue ();
-
-	CValue (const CValue& Value):
-		m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+	CValue ()
 	{
+		Init ();
+	}
+
+	CValue (const CValue& Value)
+	{
+		Init ();
 		*this = Value;
 	}
 
 	CValue (
 		const CValue& Value,
 		CType* pType
-		):
-		m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+		)
 	{
+		Init ();
 		OverrideType (Value, pType);
 	}
 
 	CValue (
 		const CValue& Value,
 		EType TypeKind
-		):
-		m_Const (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer))
+		)
 	{
+		Init ();
 		OverrideType (Value, TypeKind);
 	}
 
@@ -117,37 +129,32 @@ public:
 
 	CValue (CType* pType)
 	{
+		Init ();
 		SetType (pType);
 	}
 
 	CValue (CVariable* pVariable)
 	{
+		Init ();
 		SetVariable (pVariable);
 	}
 
 	CValue (CFunction* pFunction)
 	{
+		Init ();
 		SetFunction (pFunction);
 	}
 
 	CValue (CFunctionOverload* pFunctionOverload)
 	{
+		Init ();
 		SetFunctionOverload (pFunctionOverload);
 	}
 
 	CValue (CProperty* pProperty)
 	{
+		Init ();
 		SetProperty (pProperty);
-	}
-
-	CValue (
-		CVariable* pVariable,
-		llvm::Value* pLlvmValue,
-		CType* pType,
-		bool MakeReference = true
-		)
-	{
-		SetVariable (pVariable, pLlvmValue, pType);
 	}
 
 	CValue (
@@ -155,6 +162,7 @@ public:
 		CType* pType
 		)
 	{
+		Init ();
 		SetLlvmRegister (pLlvmValue, pType);
 	}
 
@@ -163,18 +171,16 @@ public:
 		EType TypeKind
 		)
 	{
+		Init ();
 		SetLlvmRegister (pLlvmValue, TypeKind);
 	}
-
-	void
-	Clear ();
 
 	EValue 
 	GetValueKind () const
 	{
 		return m_ValueKind;
 	}
-
+	
 	const tchar_t*
 	GetValueKindString () const
 	{
@@ -185,6 +191,12 @@ public:
 	GetType () const
 	{
 		return m_pType;
+	}
+
+	int 
+	GetFlags () const
+	{
+		return m_Flags;
 	}
 
 	CScope*
@@ -305,7 +317,7 @@ public:
 	void
 	SetVoid ()
 	{
-		Clear ();
+		m_ValueKind = EValue_Void;
 	}
 
 	void
@@ -325,7 +337,8 @@ public:
 		CVariable* pVariable,
 		llvm::Value* pLlvmValue,
 		CType* pType,
-		bool MakeReference = true
+		bool MakeReference,
+		bool IsOffset
 		);
 
 	void
@@ -478,40 +491,61 @@ public:
 		llvm::Value* pValue,
 		EType TypeKind
 		);
+
+protected:
+	void
+	Init ();
 };
 
 //.............................................................................
 
+enum EObjectFlag
+{
+	EObjectFlag_IsStack      = 1,
+	EObjectFlag_IsDestructed = 2, // used during weak to strong conversion 
+};
+
 // header of class instance
 
-struct TObject
+struct TObjectHdr
 {
+	intptr_t m_Flags;
 	class CClassType* m_pType; // for GC tracing & QueryInterface
-	size_t m_ScopeLevel;
 
-	// followed by TInterface of the object
+	// followed by TInterface of object
 };
 
 // header of interface instance
 
-struct TInterface
+struct TInterfaceHdr
 {
-	TObject* m_pObject; // for GC tracing & QueryInterface
+	TObjectHdr* m_pObject; // for GC tracing & QueryInterface
 	void** m_pMethodTable; 
 
 	// followed by parents, then by interface data fields
+};
+
+struct TInterface
+{
+	TInterfaceHdr* m_p;
+	size_t m_ScopeLevel;
 };
 
 //.............................................................................
 
 // *safe, &safe
 
-struct TSafePtr
+struct TSafePtrValidator
 {
-	void* m_p;
 	void* m_pRegionBegin;
 	void* m_pRegionEnd;
 	size_t m_ScopeLevel;
+};
+
+struct TSafePtr
+{
+	void* m_p;
+	TSafePtrValidator m_Validator;
 };
 
 // structure backing up function pointer declared like
@@ -521,15 +555,6 @@ struct TFunctionPtr
 {
 	void* m_pfn;
 	TInterface* m_pInterface;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum ESafePtrError
-{
-	ESafePtrError_Load = 0,
-	ESafePtrError_Store,
-	ESafePtrError_ScopeMismatch,
 };
 
 //.............................................................................
@@ -557,6 +582,16 @@ struct TVariant
 		TSafePtr m_SafePtr;
 		TFunctionPtr m_FunctionPtr;
 	};
+};
+
+//.............................................................................
+
+enum ERuntimeError
+{
+	ERuntimeError_ScopeMismatch,
+	ERuntimeError_LoadOutOfRange,
+	ERuntimeError_StoreOutOfRange,
+	ERuntimeError_NullInterface,
 };
 
 //.............................................................................

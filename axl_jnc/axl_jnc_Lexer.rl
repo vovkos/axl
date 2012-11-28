@@ -106,6 +106,8 @@ main := |*
 'set'          { CreateToken (EToken_Set); };
 
 'new'          { CreateToken (EToken_New); };
+'stack'        { CreateToken (EToken_Stack); };
+'heap'         { CreateToken (EToken_Heap); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
 'dynasizeof'   { CreateToken (EToken_DynaSizeOf); };

@@ -6,6 +6,8 @@
 
 #include "axl_jnc_Value.h"
 #include "axl_jnc_BasicBlock.h"
+#include "axl_jnc_PointerType.h"
+#include "axl_jnc_Scope.h"
 
 namespace axl {
 namespace jnc {
@@ -72,15 +74,46 @@ public:
 		return m_LlvmBuilder.CreateRet (Value.GetLlvmValue ());
 	}
 
+	llvm::PHINode*
+	CreatePhi (
+		const CValue* pValueArray,
+		CBasicBlock** pBlockArray,
+		size_t Count
+		);
+
+	llvm::PHINode*
+	CreatePhi (
+		const CValue& Value1,
+		CBasicBlock* pBlock1,
+		const CValue& Value2,
+		CBasicBlock* pBlock2,
+		CValue* pResultValue
+		);
+
 	// memory access
 
 	llvm::AllocaInst*
 	CreateAlloca (
-		CType* pType, 
-		const tchar_t* pName
+		llvm::Type* pLlvmType, 
+		const tchar_t* pName, 
+		CType* pResultType,
+		CValue* pResultValue
 		)
 	{
-		return m_LlvmBuilder.CreateAlloca (pType->GetLlvmType (), 0, pName);
+		llvm::AllocaInst* pInst = m_LlvmBuilder.CreateAlloca (pLlvmType, 0, pName);
+		pResultValue->SetLlvmRegister (pInst, pResultType);
+		return pInst;
+	}
+
+	llvm::AllocaInst*
+	CreateAlloca (
+		CType* pType, 
+		const tchar_t* pName,
+		CType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		return CreateAlloca (pType->GetLlvmType (), pName, pResultType, pResultValue);
 	}
 
 	llvm::LoadInst*
@@ -621,11 +654,11 @@ public:
 	CreateLe_i (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuLeValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateICmpSLE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_i");
-		pResuLeValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -633,11 +666,11 @@ public:
 	CreateLe_u (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuLeValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateICmpULE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_u");
-		pResuLeValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -645,11 +678,11 @@ public:
 	CreateLe_f (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuLeValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateFCmpOLE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_f");
-		pResuLeValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -657,11 +690,11 @@ public:
 	CreateGt_i (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuGtValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateICmpSGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_i");
-		pResuGtValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -669,11 +702,11 @@ public:
 	CreateGt_u (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuGtValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateICmpUGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_u");
-		pResuGtValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -681,11 +714,11 @@ public:
 	CreateGt_f (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuGtValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateFCmpOGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_f");
-		pResuGtValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -693,11 +726,11 @@ public:
 	CreateGe_i (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuGeValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateICmpSGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_i");
-		pResuGeValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -705,11 +738,11 @@ public:
 	CreateGe_u (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuGeValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateICmpUGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_u");
-		pResuGeValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -717,11 +750,11 @@ public:
 	CreateGe_f (
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResuGeValue
+		CValue* pResultValue
 		)
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateFCmpOGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_f");
-		pResuGeValue->SetLlvmRegister (pInst, EType_Bool);
+		pResultValue->SetLlvmRegister (pInst, EType_Bool);
 		return pInst;
 	}
 
@@ -730,11 +763,23 @@ public:
 	llvm::Value*
 	CreateBitCast (
 		const CValue& OpValue,
+		llvm::Type* pLlvmType,
+		CValue* pResultValue
+		)
+	{
+		llvm::Value* pInst = m_LlvmBuilder.CreateBitCast (OpValue.GetLlvmValue (), pLlvmType, "bitcast");
+		pResultValue->SetLlvmRegister (pInst, NULL);
+		return pInst;
+	}
+
+	llvm::Value*
+	CreateBitCast (
+		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmBuilder.CreateBitCast (OpValue.GetLlvmValue (), pType->GetLlvmType (), "cast");
+		llvm::Value* pInst = m_LlvmBuilder.CreateBitCast (OpValue.GetLlvmValue (), pType->GetLlvmType (), "bitcast");
 		pResultValue->SetLlvmRegister (pInst, pType);
 		return pInst;
 	}
@@ -919,27 +964,188 @@ public:
 		return CreateCall (CalleeValue, ArgArray, countof (ArgArray), pResultType, pResultValue);
 	}
 
+	llvm::CallInst*
+	CreateCall4 (
+		const CValue& CalleeValue,
+		const CValue& ArgValue1,
+		const CValue& ArgValue2,
+		const CValue& ArgValue3,
+		const CValue& ArgValue4,
+		CType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		CValue ArgArray [] =
+		{
+			ArgValue1,
+			ArgValue2,
+			ArgValue3,
+			ArgValue4,
+		};
+
+		return CreateCall (CalleeValue, ArgArray, countof (ArgArray), pResultType, pResultValue);
+	}
+
 	// safe pointer operations
 
 	llvm::Value*
 	CreateSafePtr (
 		const CValue& PtrValue,
-		CVariable* pVariable,
-		CType* pResultType,
+		const CValue& RegionBeginValue,
+		size_t Size,
+		const CValue& ScopeLevelValue,
+		CPointerType* pResultType,
 		CValue* pResultValue
 		);
 
+	llvm::Value*
+	CreateSafePtr (
+		const CValue& PtrValue,
+		const CValue& RegionBeginValue,
+		size_t Size,
+		CScope* pScope,
+		CPointerType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		size_t ScopeLevel = pScope ? pScope->GetLevel () : 0;
+		return CreateSafePtr (
+			PtrValue,
+			RegionBeginValue,
+			Size,
+			CValue (ScopeLevel, EType_SizeT),
+			pResultType,
+			pResultValue
+			);
+	}
+
+	llvm::Value*
+	CreateSafePtr (
+		const CValue& PtrValue,
+		CVariable* pVariable,
+		CPointerType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		return CreateSafePtr (
+			PtrValue,
+			CValue (pVariable->GetLlvmValue (), NULL),
+			pVariable->GetType ()->GetSize (),
+			pVariable->GetScope (),
+			pResultType,
+			pResultValue
+			);
+	}
+
+	llvm::Value*
+	ModifySafePtr (
+		const CValue& SafePtrValue,
+		const CValue& PtrValue,
+		CPointerType* pResultType,
+		CValue* pResultValue
+		);
+
+	llvm::Value*
+	CreateSafePtrValidator (
+		const CValue& RegionBeginValue,
+		size_t Size,
+		const CValue& ScopeLevelValue,
+		CValue* pResultValue
+		);
+
+	llvm::Value*
+	CreateSafePtrValidator (
+		const CValue& RegionBeginValue,
+		size_t Size,
+		CScope* pScope,
+		CValue* pResultValue
+		)
+	{
+		size_t ScopeLevel = pScope ? pScope->GetLevel () : 0;
+		return CreateSafePtrValidator (
+			RegionBeginValue,
+			Size,
+			CValue (ScopeLevel, EType_SizeT),
+			pResultValue
+			);
+	}
+
+	llvm::Value*
+	CreateSafePtrValidator (
+		CVariable* pVariable,
+		CValue* pResultValue
+		)
+	{
+		return CreateSafePtrValidator (
+			CValue (pVariable->GetLlvmValue (), NULL),
+			pVariable->GetType ()->GetSize (),
+			pVariable->GetScope (),
+			pResultValue
+			);
+	}
+
 	bool
 	CheckSafePtrRange (
-		const CValue& SafePtrValue,
+		const CValue& PtrValue,
 		size_t Size,
-		ESafePtrError Error
+		const CValue& ValidatorValue,
+		ERuntimeError Error
 		);
 
 	bool
 	CheckSafePtrScope (
-		const CValue& SrcValue,
+		const CValue& Value,
 		CScope* pDstScope
+		);
+
+	// interface operations
+
+	llvm::Value*
+	CreateInterface (
+		const CValue& PtrValue,
+		const CValue& ScopeLevelValue,
+		CClassType* pResultType,
+		CValue* pResultValue
+		);
+
+	llvm::Value*
+	CreateInterface (
+		const CValue& PtrValue,
+		CScope* pScope,
+		CClassType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		size_t ScopeLevel = pScope ? pScope->GetLevel () : 0;
+		return CreateInterface (
+			PtrValue,
+			CValue (ScopeLevel, EType_SizeT),
+			pResultType,
+			pResultValue
+			);
+	}
+
+	bool
+	CheckInterfaceNull (const CValue& Value);
+
+	bool
+	CheckInterfaceScope (
+		const CValue& Value,
+		CScope* pDstScope
+		);
+
+	bool
+	DynamicCastInterface (
+		const CValue& Value,
+		CClassType* pResultType,
+		CValue* pResultValue
+		);
+
+	bool
+	InitializeObject (
+		const CValue& Value,
+		CClassType* pType,
+		int Flags
 		);
 };
 

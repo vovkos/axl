@@ -14,20 +14,20 @@ namespace jnc {
 
 enum EStdFunc
 {
-	// jnc.sptr 
-	// jnc.CreateSafePtr (
-	//		int8* p,
+	// jnc.sptrv
+	// jnc.CreateSafePtrValidator (
 	//		int8* pRegionBegin,
 	//		size_t Size,
 	//		size_t ScopeLevel
 	//		);
 
-	EStdFunc_CreateSafePtr,
+	EStdFunc_CreateSafePtrValidator,
 
 	// void 
 	// jnc.CheckSafePtrRange (
-	//		jnc.sptr p,
+	//		int8* p,
 	//		size_t Size,
+	//		jnc.sptrv Validator,
 	//		int Error
 	//		);
 
@@ -35,19 +35,69 @@ enum EStdFunc
 
 	// void 
 	// jnc.CheckSafePtrScope (
-	//		jnc.sptr p,
-	//		size_t ScopeLevel
+	//		int8* p,
+	//		jnc.sptrv Validator,
+	//		size_t DstScopeLevel
 	//		);
 
 	EStdFunc_CheckSafePtrScope,
 
 	// void
 	// jnc.OnInvalidSafePtr (
-	//		jnc.sptr pSrc,
+	//		int8* p,
+	//		jnc.sptrv Validator,
 	//		int Error
 	//		);
 
 	EStdFunc_OnInvalidSafePtr,
+
+	// void 
+	// jnc.CheckInterfaceNull (
+	//		int8* p,
+	//		size_t ScopeLevel
+	//		);
+
+	EStdFunc_CheckInterfaceNull,
+
+	// void 
+	// jnc.CheckInterfaceScope (
+	//		int8* p,
+	//		size_t ScopeLevel,
+	//		size_t DstScopeLevel
+	//		);
+
+	EStdFunc_CheckInterfaceScope,
+
+	// void
+	// jnc.OnInvalidInterface (
+	//		int8* p,
+	//		size_t ScopeLevel,
+	//		int Error
+	//		);
+
+	EStdFunc_OnInvalidInterface,
+
+	// int8*
+	// jnc.DynamicCastInterface (
+	//		int8* p,
+	//		int8* pType
+	//		);
+
+	EStdFunc_DynamicCastInterface,
+
+	// int8*
+	// jnc.InitializeObject (
+	//		int8* p,
+	//		int8* pType,
+	//		int Flags
+	//		);
+
+	EStdFunc_InitializeObject,
+
+	// int8*
+	// jnc.HeapAllocate (int8* pType);
+
+	EStdFunc_HeapAllocate,
 
 	EStdFunc__Count
 };
@@ -159,7 +209,7 @@ protected:
 	// LLVM code support functions
 
 	CFunction*
-	GetCreateSafePtr ();
+	GetCreateSafePtrValidator ();
 
 	CFunction*
 	GetCheckSafePtrRange ();
@@ -169,6 +219,24 @@ protected:
 
 	CFunction*
 	GetOnInvalidSafePtr ();
+
+	CFunction*
+	GetCheckInterfaceNull ();
+
+	CFunction*
+	GetCheckInterfaceScope ();
+
+	CFunction*
+	GetOnInvalidInterface ();
+
+	CFunction*
+	GetDynamicCastInterface ();
+
+	CFunction*
+	GetInitializeObject ();
+
+	CFunction*
+	GetHeapAllocate ();
 };
 
 //.............................................................................

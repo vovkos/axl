@@ -559,10 +559,12 @@ AssertPointerCastTypeValid (
 		);
 }
 
-intptr_t
+void
 GetPointerCastOffset (
 	CType* pSrcType,
-	CType* pDstType
+	CType* pDstType,
+	intptr_t* pOffset,
+	rtl::CArrayT <size_t>* pLlvmIndexArray
 	)
 {
 	AssertPointerCastTypeValid (pSrcType, pDstType);
@@ -572,14 +574,18 @@ GetPointerCastOffset (
 
 	if (pSrcBaseType->GetTypeKind () != EType_Struct ||
 		pDstBaseType->GetTypeKind () != EType_Struct)
-		return 0;
+	{
+		*pOffset = 0;
+		return;
+	}
 
 	CStructType* pSrcStructType = (CStructType*) pSrcBaseType;
 	CStructType* pDstStructType = (CStructType*) pDstBaseType;
 
 	size_t Offset;
-	return 
-		pSrcStructType->FindBaseType (pDstStructType, &Offset, NULL) ? Offset :
+	
+	*pOffset = 
+		pSrcStructType->FindBaseType (pDstStructType, &Offset, pLlvmIndexArray) ? Offset :
 		pDstStructType->FindBaseType (pSrcStructType, &Offset, NULL) ? -(intptr_t) Offset : 0;
 }
 
@@ -616,8 +622,9 @@ CCast_ptr::ConstCast (
 {
 	AssertPointerCastTypeValid (SrcValue.GetType (), DstValue.GetType ());
 		
-	intptr_t Offset = GetPointerCastOffset (SrcValue.GetType (), DstValue.GetType ());
-
+	intptr_t Offset;
+	GetPointerCastOffset (SrcValue.GetType (), DstValue.GetType (), &Offset, NULL);
+	
 	if (DstValue.GetType ()->GetTypeKind () == EType_Pointer_u)
 	{
 		*(char**) DstValue.GetConstData () = *(char**) SrcValue.GetConstData () + Offset;
@@ -642,106 +649,94 @@ CCast_ptr::LlvmCast (
 	AssertPointerCastTypeValid (Value.GetType (), pType);
 	
 	CPointerType* pPointerType = (CPointerType*) pType;
-	intptr_t Offset = GetPointerCastOffset (Value.GetType (), pType);
 
-	return 
-		pType->GetTypeKind () == EType_Pointer ? LlvmCast_ptr (Value, pPointerType, Offset, pResultValue) :
-		Value.GetType ()->GetTypeKind () == EType_Pointer_u ? LlvmCast_ptr_u (Value, pPointerType, Offset, pResultValue) :
-		LlvmCast_ptr_ptr_u (Value, pPointerType, Offset, pResultValue);
+	intptr_t Offset;
+
+	char Buffer [256];
+	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	GetPointerCastOffset (Value.GetType (), pType, &Offset, &LlvmIndexArray);
+	
+	return Value.GetType ()->GetTypeKind () == EType_Pointer_u ? 
+		LlvmCast_ptr_u (Value, Offset, &LlvmIndexArray, pPointerType, pResultValue) :
+		LlvmCast_ptr (Value, Offset, &LlvmIndexArray, pPointerType, pResultValue);
 }
 
 bool
 CCast_ptr::LlvmCast_ptr (
 	const CValue& Value,
-	CPointerType* pType,
-	size_t Offset,
+	intptr_t Offset,
+	rtl::CArrayT <size_t>* pLlvmIndexArray,
+	CPointerType* pPointerType,
 	CValue* pResultValue
 	)
 {
-	if (!Offset)
-	{
-		pResultValue->OverrideType (Value, pType);
-		return true;
-	}
-
-	CValue OffsetValue;
-	OffsetValue.SetConstSizeT (Offset, EType_Int_p);
+	if (Value.GetValueKind () == EValue_Variable)
+		return LlvmCast_ptr_u (Value, Offset, pLlvmIndexArray, pPointerType, pResultValue);
 
 	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
 
-	if (Value.GetValueKind () == EValue_Variable)
-	{
-		CPointerType* pUnsafePointerType = pType->GetBaseType ()->GetPointerType (EType_Pointer_u);
+	if (pPointerType->GetTypeKind () == EType_Pointer_u)
+		return LlvmCast_ptr_u (PtrValue, Offset, pLlvmIndexArray, pPointerType, pResultValue);
 
- 		m_pModule->m_LlvmBuilder.CreateBitCast (Value, m_pModule->m_TypeMgr.GetBytePtrType (), &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pUnsafePointerType, &PtrValue);
-		pResultValue->SetVariable (Value.GetVariable (), PtrValue.GetLlvmValue (), pType, false);
-	}
-	else
-	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);		
-		m_pModule->m_LlvmBuilder.CreateInsertValue (Value, PtrValue, 0, pType, pResultValue);
-	}
+	ASSERT (pPointerType->GetTypeKind () == EType_Pointer);
 
+	CValue ValidatorValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ValidatorValue);
+
+	LlvmCast_ptr_u (PtrValue, Offset, pLlvmIndexArray, pPointerType, &PtrValue);
+
+	CValue SafePtrValue = pPointerType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, PtrValue, 0, NULL, &SafePtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, ValidatorValue, 1, pPointerType, pResultValue);
 	return true;
 }
 
 bool
 CCast_ptr::LlvmCast_ptr_u (
 	const CValue& Value,
-	CPointerType* pType,
-	size_t Offset,
+	intptr_t Offset,
+	rtl::CArrayT <size_t>* pLlvmIndexArray,
+	CPointerType* pPointerType,
 	CValue* pResultValue
 	)
 {
-	CValue PtrValue;
+	CValue PtrValue = Value;
 
-	if (!Offset)
+	if (!pLlvmIndexArray->IsEmpty ())
 	{
-		PtrValue = Value;
+		pLlvmIndexArray->Insert (0, 0);
+		m_pModule->m_LlvmBuilder.CreateGep (
+			PtrValue, 
+			*pLlvmIndexArray,
+			pLlvmIndexArray->GetCount (),
+			NULL, 
+			&PtrValue
+			);
 	}
-	else
+	else if (Offset)
 	{
-		CValue OffsetValue;
-		OffsetValue.SetConstSizeT (Offset, EType_Int_p);
-
-		CType* pBytePtrType = m_pModule->m_TypeMgr.GetBytePtrType ();
-		
-		m_pModule->m_LlvmBuilder.CreateBitCast (Value, pBytePtrType, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, Offset, NULL, &PtrValue);
 	}
 
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pType, pResultValue);
-	return true;
-}
+	// make sure type is unsafe pointer (cause we cakk LlvmCast_ptr_u from LlvmCast_ptr also)
 
-bool
-CCast_ptr::LlvmCast_ptr_ptr_u (
-	const CValue& Value,
-	CPointerType* pType,
-	size_t Offset,
-	CValue* pResultValue
-	)
-{
+	pPointerType = pPointerType->GetBaseType ()->GetPointerType (EType_Pointer_u);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPointerType, &PtrValue);
+
 	if (Value.GetValueKind () == EValue_Variable)
-	{
-		m_pModule->m_LlvmBuilder.CreateBitCast (Value, pType, pResultValue);
-		return true;
-	}
+		pResultValue->SetVariable (
+			Value.GetVariable (), 
+			PtrValue.GetLlvmValue (), 
+			pPointerType, 
+			false,
+			(Value.GetFlags () & EValueFlag_IsVariableOffset) != 0 || Offset < 0
+			);
+	else
+		*pResultValue = PtrValue;
 
-	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
-
-	if (Offset)
-	{
-		CValue OffsetValue;
-		OffsetValue.SetConstSizeT (Offset, EType_Int_p);
-		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, OffsetValue, NULL, &PtrValue);		
-	}
-
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pType, pResultValue);
 	return true;
 }
 
@@ -823,9 +818,9 @@ CCast_arr_ptr::ConstCast (
 	{
 		TSafePtr* pPtr = (TSafePtr*) DstValue.GetConstData ();
 		pPtr->m_p = p;
-		pPtr->m_pRegionBegin = p;
-		pPtr->m_pRegionEnd = (char*) p + SrcValue.GetType ()->GetSize ();
-		pPtr->m_ScopeLevel = 0;
+		pPtr->m_Validator.m_pRegionBegin = p;
+		pPtr->m_Validator.m_pRegionEnd = (char*) p + SrcValue.GetType ()->GetSize ();
+		pPtr->m_Validator.m_ScopeLevel = 0;
 	}
 
 	return true;
@@ -847,7 +842,13 @@ CCast_arr_ptr::LlvmCast (
 	EType TypeKind = pType->GetTypeKind ();
 	if (TypeKind == EType_Pointer && Value.GetValueKind () == EValue_Variable)
 	{
-		pResultValue->SetVariable (Value.GetVariable (), Value.GetLlvmValue (), pType);
+		pResultValue->SetVariable (
+			Value.GetVariable (), 
+			Value.GetLlvmValue (), 
+			pType, 
+			true, 
+			(Value.GetFlags () & EValueFlag_IsVariableOffset) != 0
+			);
 		return true;
 	}
 
@@ -862,6 +863,101 @@ CCast_arr_ptr::LlvmCast (
 
 	SetCastError (Value.GetType (), pType);
 	return false;
+}
+
+//.............................................................................
+
+ECast
+CCast_class::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	CClassType* pSrcClassType = (CClassType*) pSrcType;
+	CClassType* pDstClassType = (CClassType*) pDstType;
+
+	ASSERT (pSrcClassType->IsClassType ());
+	ASSERT (pDstClassType->IsClassType ());
+
+	return pSrcClassType->FindBaseType (pDstClassType) ? ECast_Lossless : ECast_Lossy;
+}
+
+bool
+CCast_class::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	CClassType* pSrcClassType = (CClassType*) SrcValue.GetType ();
+	CClassType* pDstClassType = (CClassType*) DstValue.GetType ();
+
+	ASSERT (pSrcClassType->IsClassType ());
+	ASSERT (pDstClassType->IsClassType ());
+
+	err::SetFormatStringError (_T("CCast_class::ConstCast is not yet implemented"));
+	return false;
+}
+
+bool
+CCast_class::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CClassType* pSrcClassType = (CClassType*) Value.GetType ();
+	CClassType* pDstClassType = (CClassType*) pType;
+
+	ASSERT (pSrcClassType->IsClassType ());
+	ASSERT (pDstClassType->IsClassType ());
+
+	size_t Offset;
+
+	char Buffer [256];
+	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	bool Result = pSrcClassType->FindBaseType (
+		pDstClassType, 
+		&Offset, 
+		&LlvmIndexArray
+		);
+
+	if (!Result)
+		return m_pModule->m_LlvmBuilder.DynamicCastInterface (Value, pDstClassType, pResultValue);
+
+	CValue PtrValue;
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ScopeLevelValue);
+
+	CValue SrcNullValue (llvm::Constant::getNullValue (pSrcClassType->GetLlvmInterfacePtrType ()), NULL);
+	CValue DstNullValue (llvm::Constant::getNullValue (pDstClassType->GetLlvmInterfacePtrType ()), NULL);
+
+	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_phi"));
+	CBasicBlock* pNoNullBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_nonull"));
+
+	CValue CmpValue;
+	m_pModule->m_LlvmBuilder.CreateEq_i (PtrValue, SrcNullValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pPhiBlock, pNoNullBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pNoNullBlock);
+	
+	LlvmIndexArray.Insert (0, 0);
+	m_pModule->m_LlvmBuilder.CreateGep (
+		PtrValue, 
+		LlvmIndexArray,
+		LlvmIndexArray.GetCount (),
+		NULL, 
+		&PtrValue
+		);		
+
+	m_pModule->m_LlvmBuilder.CreateBr (pPhiBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPhiBlock);
+
+	CValue PhiValue;
+	m_pModule->m_LlvmBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, &PhiValue);
+	m_pModule->m_LlvmBuilder.CreateInterface (PhiValue, ScopeLevelValue, pDstClassType, pResultValue);
+	return true;
 }
 
 //.............................................................................

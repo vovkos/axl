@@ -30,6 +30,10 @@ expression
 	: conditional_expr <&$.m_Value>
 	;
 
+expression_list
+	: expression (',' expression)*
+	;
+
 class
 {
 	CValue m_Value;	
@@ -413,6 +417,12 @@ unary_expr <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.CastOperator ($pValue, $t.m_pType);
 		}
+	| (EToken_Stack $s | EToken_Heap | epsilon) EToken_New type_name $t
+		{
+			return IsValidLocator ($s) ? 
+				m_pModule->m_OperatorMgr.StackNewOperator ($t.m_pType, $pValue) : 
+				m_pModule->m_OperatorMgr.HeapNewOperator ($t.m_pType, $pValue);
+		}
 	;
 
 // since '(' at 'unary_operator' is a conflict against epsilon production we need a resolver
@@ -481,7 +491,8 @@ leave
 
 	| '(' ')'
 	; 
- 
+
+
 primary_expr <CValue* $pValue>
 	: EToken_Identifier
 		{

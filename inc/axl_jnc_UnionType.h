@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_StructType.h"
+#include "axl_jnc_StructTypeRoot.h"
 
 namespace axl {
 namespace jnc {
@@ -22,12 +22,16 @@ protected:
 	friend class CUnionType;
 	
 	CType* m_pType;
+	CType* m_pBitFieldBaseType;
+	size_t m_BitCount;
 
 public:
 	CUnionMember ()
 	{
 		m_ItemKind = EModuleItem_UnionMember;
 		m_pType = NULL;
+		m_pBitFieldBaseType = NULL;
+		m_BitCount = 0;
 	}
 
 	CUnionType*
@@ -45,7 +49,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUnionType: public CStructTypeT <CUnionType>
+class CUnionType: public CStructTypeRoot
 {
 protected:
 	friend class CTypeMgr;
@@ -79,8 +83,12 @@ public:
 	CUnionMember*
 	CreateMember (
 		const rtl::CString& Name,
-		CType* pType
+		CType* pType,
+		size_t BitCount = 0
 		);
+
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

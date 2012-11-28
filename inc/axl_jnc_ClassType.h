@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_StructType.h"
+#include "axl_jnc_StructTypeRoot.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Namespace.h"
@@ -23,15 +23,17 @@ protected:
 	friend class CClassType;
 
 	CClassType* m_pType;
-	size_t m_FieldOffset;
+	size_t m_Offset;
+	size_t m_LlvmIndex;
 	size_t m_MethodTableIndex;
 
 public:
 	CClassBaseType ()
 	{
 		m_pType = NULL;
-		m_FieldOffset = 0;
-		m_MethodTableIndex = 0;
+		m_Offset = 0;
+		m_LlvmIndex = -1;
+		m_MethodTableIndex = -1;
 	}
 
 	CClassType*
@@ -41,9 +43,15 @@ public:
 	}
 
 	size_t 
-	GetFieldOffset ()
+	GetOffset ()
 	{
-		return m_FieldOffset;
+		return m_Offset;
+	}
+
+	size_t
+	GetLlvmIndex ()
+	{
+		return m_LlvmIndex;
 	}
 
 	size_t 
@@ -105,6 +113,12 @@ public:
 	{
 		return m_Storage;
 	}
+
+	CClassType*
+	GetParentType ()
+	{
+		return (CClassType*) (CNamedType*) m_pParentNamespace; // double cast cause CStructType is not defined yet
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -115,6 +129,8 @@ protected:
 	friend class CClassType;
 
 	CType* m_pType;
+	CType* m_pBitFieldBaseType;
+	size_t m_BitCount;
 	size_t m_Offset;
 	size_t m_LlvmIndex;
 
@@ -123,6 +139,8 @@ public:
 	{
 		m_MemberKind = EClassMember_Field;
 		m_pType = NULL;
+		m_pBitFieldBaseType = NULL;
+		m_BitCount = 0;
 		m_Offset = 0;
 		m_LlvmIndex = -1;
 	}
@@ -240,7 +258,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CClassType: public CStructTypeT <CClassType>
+class CClassType: public CStructTypeRoot
 {
 protected:
 	friend class CTypeMgr;
@@ -252,19 +270,49 @@ protected:
 	rtl::CStdListT <CClassFieldMember> m_FieldMemberList;
 	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
 	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;
-
-	rtl::CArrayT <CFunction*> m_MethodTable;
+	
+	rtl::CArrayT <void*> m_MethodTable;
 
 	void* m_pStaticFieldBlock;
+
+	llvm::StructType* m_pLlvmInterfaceType;
+	llvm::StructType* m_pLlvmClassType;
 
 public:
 	CClassType ()
 	{
 		m_TypeKind = EType_Class;
+		m_pStaticFieldBlock = NULL;
+		m_pLlvmInterfaceType = NULL;
 	}
-	
-	llvm::StructType* 
+
+	size_t 
+	GetClassSize ()
+	{
+		ASSERT (m_TypeKind == EType_Class);
+		return sizeof (TObjectHdr) + m_FieldAlignedSize;
+	}
+
+	llvm::Type* 
 	GetLlvmType ();
+
+	llvm::StructType*
+	GetLlvmInterfaceType ();
+
+	llvm::StructType*
+	GetLlvmClassType ();
+
+	llvm::PointerType*
+	GetLlvmInterfacePtrType ()
+	{
+		return llvm::PointerType::get (GetLlvmInterfaceType (), 0);
+	}
+
+	llvm::PointerType*
+	GetLlvmClassPtrType ()
+	{
+		return llvm::PointerType::get (GetLlvmClassType (), 0);
+	}
 
 	size_t
 	GetMethodCount ()
@@ -272,7 +320,7 @@ public:
 		return m_MethodTable.GetCount ();
 	}
 
-	CFunction**
+	void**
 	GetMethodTable ()
 	{
 		return m_MethodTable;
@@ -290,12 +338,13 @@ public:
 		return m_BaseTypeList.GetHead ();
 	}
 
-	CClassBaseType*
-	FindBaseType (CClassType* pType)
-	{
-		rtl::CStringHashTableMapIteratorAT <CClassBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
-		return It ? It->m_Value : NULL;
-	}
+	bool
+	FindBaseType (
+		CClassType* pType,
+		size_t* pOffset = NULL,
+		rtl::CArrayT <size_t>* pLlvmIndexArray = NULL,
+		size_t* pMethodTableIndex = NULL
+		);
 
 	CClassBaseType*
 	AddBaseType (CClassType* pType);
@@ -318,10 +367,19 @@ public:
 		return m_PropertyMemberList.GetHead ();
 	}
 
+	CClassMember*
+	FindMember (
+		const tchar_t* pName,
+		size_t* pBaseTypeOffset,
+		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
+		size_t* pBaseTypeMethodTableIndex
+		);
+
 	CClassFieldMember*
 	CreateFieldMember (
 		const rtl::CString& Name,
-		CType* pType
+		CType* pType,
+		size_t BitCount = 0
 		);
 
 	CClassMethod*
@@ -336,40 +394,21 @@ public:
 		CProperty* pProperty
 		);
 	
+	bool
+	CalcLayout ();
+
+	bool
+	InitializeObject (
+		TObjectHdr* pObject,
+		int Flags
+		);
+
 protected:
-	CClassBaseType*
-	CreateBaseTypeImpl (
-		CClassType* pType,
-		size_t FieldOffset,
-		size_t MethodTableIndex
-		);
-
-	CClassFieldMember*
-	CreateFieldMemberImpl (
-		const rtl::CString& Name,
-		CType* pType,
-		size_t Offset
-		);
-
-	CClassMethod*
-	CreateMethodImpl (
-		const rtl::CString& Name,
-		CFunction* pFunction,
-		size_t MethodTableIndex
-		);
-
-	CClassMethod*
-	CreateMethodImpl (
-		CClassMethodMember* pMember,
-		CFunction* pFunction,
-		size_t MethodTableIndex
-		);
-
-	CClassPropertyMember*
-	CreatePropertyMemberImpl (
-		const rtl::CString& Name,
-		CProperty* pProperty,
-		size_t MethodTableIndex
+	bool
+	InitializeInterface (
+		TInterfaceHdr* pInterface,
+		TObjectHdr* pObject,
+		void** pMethodTable
 		);
 };
 

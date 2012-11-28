@@ -88,7 +88,7 @@ GetArithmeticOperatorResultTypeKind (CType* pOpType)
 		return NULL;
 	}
 
-	return pOpType->GetModule ()->m_TypeMgr.GetBasicType (TypeKind);
+	return pOpType->GetModule ()->m_TypeMgr.GetPrimitiveType (TypeKind);
 }
 
 //.............................................................................

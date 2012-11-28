@@ -21,7 +21,6 @@ protected:
 	friend class CEnumType;
 	friend class CNamespace;
 
-	CEnumType* m_pParentType;
 	intptr_t m_Value;
 
 	rtl::CBoxListT <CToken> m_Expression;
@@ -33,10 +32,10 @@ public:
 		m_Value = 0;
 	}
 
-	CEnumType* 
+	CEnumType*
 	GetParentType ()
 	{
-		return m_pParentType;
+		return (CEnumType*) (CNamedType*) m_pParentNamespace; // double cast cause CEnumType is not defined yet
 	}
 
 	intptr_t

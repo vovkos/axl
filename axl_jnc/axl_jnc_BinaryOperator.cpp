@@ -193,7 +193,7 @@ CBinOp_Sub::PointerDifferenceOperator (
 	if (!Result)
 		return false;
 
-	CType* pType = m_pModule->m_TypeMgr.GetBasicType (EType_Int_p);
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 
 	CValue CastValue1;
 	CValue CastValue2;
@@ -593,7 +593,13 @@ CBinOp_Idx::ArrayIndexOperator (
 		{
 			CValue GepValue;
 			m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
-			pResultValue->SetVariable (OpValue1.GetVariable (), GepValue.GetLlvmValue (), pElementType);
+			pResultValue->SetVariable (
+				OpValue1.GetVariable (), 
+				GepValue.GetLlvmValue (), 
+				pElementType,
+				true,
+				true
+				);
 		}
 		else
 		{

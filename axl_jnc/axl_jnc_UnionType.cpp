@@ -10,18 +10,15 @@ namespace jnc {
 CUnionMember*
 CUnionType::CreateMember (
 	const rtl::CString& Name,
-	CType* pType
+	CType* pType,
+	size_t BitCount
 	)
 {
-	size_t AlignFactor = pType->GetAlignFactor ();
-	if (AlignFactor > m_AlignFactor)
-		m_AlignFactor = AlignFactor;
-
-	SetSize (pType->GetSize ());
-
 	CUnionMember* pMember = AXL_MEM_NEW (CUnionMember);
 	pMember->m_Name = Name;
 	pMember->m_pType = pType;
+	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
+	pMember->m_BitCount = BitCount;
 	m_MemberList.InsertTail (pMember);
 
 	bool Result = AddItem (pMember);
@@ -31,43 +28,48 @@ CUnionType::CreateMember (
 	return pMember;
 }
 
+bool
+CUnionType::CalcLayout ()
+{
+	ResetLayout ();
+
+	CType* pLargestMemberType = NULL;
+
+	rtl::CIteratorT <CUnionMember> Member = m_MemberList.GetHead ();
+	for (; Member; Member++)
+	{
+		CUnionMember* pMember = *Member;
+
+		if (pMember->m_BitCount)
+		{
+			pMember->m_pType = m_pModule->m_TypeMgr.GetBitFieldType (pMember->m_pBitFieldBaseType, 0, pMember->m_BitCount);
+			if (!pMember->m_pType)
+				return false;
+		}
+
+		if (!pLargestMemberType || pMember->m_pType->GetSize () > pLargestMemberType->GetSize ())
+			pLargestMemberType = pMember->m_pType;
+	}
+
+	ASSERT (pLargestMemberType);
+
+	m_LlvmFieldTypeArray.Append (pLargestMemberType->GetLlvmType ());
+	SetFieldActualSize (pLargestMemberType->GetSize ());
+
+	if (m_FieldAlignedSize > m_FieldActualSize)
+		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
+
+	m_Size = m_FieldAlignedSize;
+	return true;
+}
+
 llvm::StructType* 
 CUnionType::GetLlvmType ()
 {
-	if (m_Flags & ETypeFlag_IsLlvmReady)
-		return (llvm::StructType*) m_pLlvmType;
-
-	rtl::CIteratorT <CUnionMember> Member = m_MemberList.GetHead ();
-
-	CType* pLargestMemberType = Member->GetType ();
-
-	for (Member++; Member; Member++)
-	{
-		CType* pMemberType = Member->GetType ();
-		if (pMemberType->GetSize () > pLargestMemberType->GetSize ())
-			pLargestMemberType = pMemberType;
-	}
-
-	llvm::Type* LlvmMemberTypeArray [2] = { pLargestMemberType->GetLlvmType () };
-	size_t LlvmMemberCount = 1;
-
-	if (m_Size > m_ActualSize) // insert padding
-	{
-		CArrayType* pPaddingArrayType = m_pModule->m_TypeMgr.GetArrayType (EType_Int8_u, m_Size - m_ActualSize);
-		LlvmMemberTypeArray [1] = pPaddingArrayType->GetLlvmType ();
-		LlvmMemberCount = 2;
-	}
+	if (!m_pLlvmType)
+		m_pLlvmType = GetLlvmStructType (GetQualifiedName ());
 	
-	llvm::StructType* pLlvmType = llvm::StructType::create (
-		llvm::getGlobalContext (),
-		llvm::ArrayRef<llvm::Type*> (LlvmMemberTypeArray, LlvmMemberCount),
-		(const tchar_t*) GetQualifiedName (), 
-		true
-		);
-
-	m_pLlvmType = pLlvmType;
-	m_Flags |= ETypeFlag_IsLlvmReady;
-	return pLlvmType;
+	return (llvm::StructType*) m_pLlvmType;
 }
 
 //.............................................................................

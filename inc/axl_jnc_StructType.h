@@ -4,97 +4,10 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
-#include "axl_jnc_Namespace.h"
-#include "axl_jnc_ImportType.h"
-#include "axl_jnc_BitFieldType.h"
+#include "axl_jnc_StructTypeRoot.h"
 
 namespace axl {
 namespace jnc {
-
-class CStructType;
-
-//.............................................................................
-
-template <typename T>
-class CStructTypeT: public CNamedType
-{
-protected:
-	size_t m_ActualSize;
-	size_t m_AlignFactor;
-	size_t m_PackFactor;
-
-	CBitFieldType* m_pLastBitFieldType;
-
-public:
-	CStructTypeT ()
-	{
-		m_ActualSize = 0;
-		m_AlignFactor = 1;
-		m_PackFactor = 8;
-		m_pLastBitFieldType = NULL;
-	}
-
-	size_t 
-	GetAlignFactor ()
-	{
-		return m_AlignFactor;
-	}
-
-	size_t 
-	GetPackFactor ()
-	{
-		return m_PackFactor;
-	}
-
-	size_t
-	GetFieldOffset (size_t AlignFactor)
-	{
-		size_t Offset = m_ActualSize;
-
-		if (AlignFactor > m_PackFactor)
-			AlignFactor = m_PackFactor;
-
-		size_t Mod = Offset % AlignFactor;
-		if (Mod)
-			Offset += AlignFactor - Mod;
-
-		return Offset;
-	}
-
-	size_t 
-	GetBitFieldBitOffset (
-		CType* pType,
-		size_t BitCount
-		)
-	{
-		if (!m_pLastBitFieldType || m_pLastBitFieldType->GetBaseType ()->Cmp (pType) != 0)
-			return 0;
-
-		size_t LastBitOffset = 
-			m_pLastBitFieldType->GetBitOffset () + 
-			m_pLastBitFieldType->GetBitCount ();
-
-		return LastBitOffset + BitCount <= pType->GetSize () * 8 ? LastBitOffset : 0;
-	}
-
-protected:
-	size_t
-	SetSize (size_t Size)
-	{
-		if (m_ActualSize >= Size)
-			return m_Size;
-
-		m_ActualSize = Size;
-		m_Size = Size;
-
-		size_t Mod = m_Size % m_AlignFactor;
-		if (Mod)
-			m_Size += m_AlignFactor - Mod;
-
-		return m_Size;
-	}
-};
 
 //.............................................................................
 
@@ -145,6 +58,8 @@ protected:
 	friend class CStructType;
 	
 	CType* m_pType;
+	CType* m_pBitFieldBaseType;
+	size_t m_BitCount;
 	size_t m_Offset;
 	size_t m_LlvmIndex;
 
@@ -153,6 +68,8 @@ public:
 	{
 		m_ItemKind = EModuleItem_StructMember;
 		m_pType = NULL;
+		m_pBitFieldBaseType = NULL;
+		m_BitCount = 0;
 		m_Offset = 0;
 		m_LlvmIndex = -1;
 	}
@@ -184,7 +101,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CStructType: public CStructTypeT <CStructType>
+class CStructType: public CStructTypeRoot
 {
 protected:
 	friend class CTypeMgr;
@@ -213,8 +130,8 @@ public:
 	bool
 	FindBaseType (
 		CStructType* pType,
-		size_t* pOffset,
-		rtl::CArrayT <size_t>* pLlvmIndexArray
+		size_t* pOffset = NULL,
+		rtl::CArrayT <size_t>* pLlvmIndexArray = NULL
 		);
 
 	CStructBaseType*
@@ -229,15 +146,19 @@ public:
 	CStructMember*
 	FindMember (
 		const tchar_t* pName,
-		size_t* pOffset,
-		rtl::CArrayT <size_t>* pLlvmIndexArray
+		size_t* pBaseTypeOffset,
+		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray
 		);
 
 	CStructMember*
 	CreateMember (
 		const rtl::CString& Name,
-		CType* pType
+		CType* pType,
+		size_t BitCount = 0
 		);
+
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

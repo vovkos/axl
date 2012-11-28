@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
+#include "axl_jnc_PointerType.h"
 #include "axl_jnc_ArrayType.h"
 #include "axl_jnc_BitFieldType.h"
 #include "axl_jnc_FunctionType.h"
@@ -20,15 +21,30 @@ class CModule;
 
 //.............................................................................
 
+enum EStdType
+{
+	EStdType_BytePtr,
+	EStdType_SafePtr,
+	EStdType_SafePtrValidator,
+	EStdType_InterfacePtr,
+	EStdType_FunctionPtr,
+	EStdType_ObjectHdr,
+	EStdType__Count,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CTypeMgr
 {
 protected:
 	friend class CModule;
 	CModule* m_pModule;
 
-	CType m_BasicTypeArray [EType__BasicTypeCount];
+	CType m_PrimitiveTypeArray [EType__PrimitiveTypeCount];
+	CType* m_StdTypeArray [EStdType__Count];
 
-	rtl::CStdListT <CDerivedType> m_DerivedTypeList;
+	rtl::CStdListT <CQualifierType> m_QualifierTypeList;
+	rtl::CStdListT <CPointerType> m_PointerTypeList;
 	rtl::CStdListT <CBitFieldType> m_BitFieldTypeList;
 	rtl::CStdListT <CEnumType> m_EnumTypeList;
 	rtl::CStdListT <CArrayType> m_ArrayTypeList;
@@ -41,12 +57,6 @@ protected:
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
-	CPointerType* m_pBytePtrType;
-
-	CStructType* m_pSafePtrStructType;
-	CStructType* m_pSafePtrStructType2;
-	CStructType* m_pFunctionPtrStructType;
-	
 	size_t m_UnnamedTypeIndex;
 
 public:
@@ -65,16 +75,19 @@ public:
 	ResolveImports ();
 
 	CType* 
-	GetBasicType (EType TypeKind)
+	GetPrimitiveType (EType TypeKind)
 	{
-		ASSERT (TypeKind < EType__BasicTypeCount);
-		return &m_BasicTypeArray [TypeKind];
+		ASSERT (TypeKind < EType__PrimitiveTypeCount);
+		return &m_PrimitiveTypeArray [TypeKind];
 	}
+
+	CType*
+	GetStdType (EStdType StdType);
 
 	CType*
 	GetInt32Type (int32_t Integer)
 	{
-		return GetBasicType (GetInt32TypeKind (Integer));
+		return GetPrimitiveType (GetInt32TypeKind (Integer));
 	}
 
 	CType*
@@ -83,13 +96,13 @@ public:
 		bool ForceUnsigned
 		)
 	{
-		return GetBasicType (GetUInt32TypeKind (Integer, ForceUnsigned));
+		return GetPrimitiveType (GetUInt32TypeKind (Integer, ForceUnsigned));
 	}
 
 	CType*
 	GetInt64Type (int64_t Integer)
 	{
-		return GetBasicType (GetInt64TypeKind (Integer));
+		return GetPrimitiveType (GetInt64TypeKind (Integer));
 	}
 
 	CType*
@@ -98,7 +111,7 @@ public:
 		bool ForceUnsigned
 		)
 	{
-		return GetBasicType (GetUInt64TypeKind (Integer, ForceUnsigned));
+		return GetPrimitiveType (GetUInt64TypeKind (Integer, ForceUnsigned));
 	}
 
 	CType* 
@@ -113,7 +126,7 @@ public:
 		int Flags
 		)
 	{
-		return GetQualifiedType (GetBasicType (TypeKind), Flags);
+		return GetQualifiedType (GetPrimitiveType (TypeKind), Flags);
 	}
 
 	CPointerType* 
@@ -128,7 +141,7 @@ public:
 		EType BaseTypeKind
 		)
 	{
-		return GetPointerType (TypeKind, GetBasicType (BaseTypeKind));
+		return GetPointerType (TypeKind, GetPrimitiveType (BaseTypeKind));
 	}
 
 	CArrayType* 
@@ -143,7 +156,7 @@ public:
 		size_t ElementCount
 		)
 	{
-		return GetArrayType (GetBasicType (BaseTypeKind), ElementCount);
+		return GetArrayType (GetPrimitiveType (BaseTypeKind), ElementCount);
 	}
 
 	CArrayType* 
@@ -227,18 +240,6 @@ public:
 		return GetUnionType (rtl::CString (), rtl::CString ());
 	}
 
-	CPointerType* 
-	GetBytePtrType ();
-
-	CStructType* 
-	GetSafePtrStructType ();
-
-	CStructType* 
-	GetSafePtrStructType2 ();
-
-	CStructType* 
-	GetFunctionPtrStructType ();
-
 	CClassType* 
 	GetClassType (
 		EType TypeKind,
@@ -264,14 +265,29 @@ public:
 
 protected:
 	void
-	SetupAllBasicTypes ();
+	SetupAllPrimitiveTypes ();
 
 	void
-	SetupBasicType (
+	SetupPrimitiveType (
 		EType TypeKind,
 		size_t Size,
 		const char* pSignature
 		);
+
+	CStructType* 
+	CreateSafePtrType ();
+
+	CStructType* 
+	CreateSafePtrValidatorType ();
+
+	CStructType* 
+	CreateInterfacePtrType ();
+
+	CStructType*
+	CreateFunctionPtrType ();
+
+	CStructType*
+	CreateObjectHdrType ();
 };
 
 //.............................................................................

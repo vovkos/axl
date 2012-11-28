@@ -28,6 +28,7 @@ protected:
 	void* m_pCodeBegin;
 	void* m_pCodeEnd;
 
+public:
 	CBasicBlock* m_pBreakBlock;
 	CBasicBlock* m_pContinueBlock;
 
@@ -46,18 +47,6 @@ public:
 	GetPosEnd ()
 	{
 		return m_PosEnd;
-	}
-
-	CBasicBlock* 
-	GetBreakBlock ()
-	{
-		return m_pBreakBlock;
-	}
-
-	CBasicBlock* 
-	GetContinueBlock ()
-	{
-		return m_pContinueBlock;
 	}
 
 	CScope*

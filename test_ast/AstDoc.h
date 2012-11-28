@@ -79,6 +79,12 @@ protected:
 		void* pfn
 		);
 
+	bool
+	ExportStdLibFunction (
+		jnc::EStdFunc FuncKind,
+		void* pfn
+		);
+
 	jnc::CFunction* 
 	FindGlobalFunction (const tchar_t* pName);
 

@@ -169,9 +169,9 @@ COperatorMgr::COperatorMgr ()
 
 	// build super moves for basic types (floyd-warshall)
 
-	for (size_t k = 0; k < EType__BasicTypeCount; k++)
-	for (size_t i = 0; i < EType__BasicTypeCount; i++)
-	for (size_t j = 0; j < EType__BasicTypeCount; j++)
+	for (size_t k = 0; k < EType__PrimitiveTypeCount; k++)
+	for (size_t i = 0; i < EType__PrimitiveTypeCount; i++)
+	for (size_t j = 0; j < EType__PrimitiveTypeCount; j++)
 	{
 		ICastOperator* pOperatorIK = m_CastOperatorTable [i] [k];
 		ICastOperator* pOperatorKJ = m_CastOperatorTable [k] [j];
@@ -185,7 +185,7 @@ COperatorMgr::COperatorMgr ()
 			continue;
 
 		CSuperCast* pSuperCast = AXL_MEM_NEW (CSuperCast);
-		pSuperCast->m_pIntermediateType = m_pModule->m_TypeMgr.GetBasicType ((EType) k);
+		pSuperCast->m_pIntermediateType = m_pModule->m_TypeMgr.GetPrimitiveType ((EType) k);
 		pSuperCast->m_pFirst = pOperatorIK;
 		pSuperCast->m_pSecond = pOperatorKJ;
 		pSuperCast->m_Price = SuperPrice;
@@ -332,6 +332,10 @@ COperatorMgr::GetCastOperator (
 		pBaseType = ((CBitFieldType*) pOpType)->GetBaseType ();
 		return GetCastOperator (pBaseType, pType) ? &m_Cast_getbf : NULL;
 
+	case EType_Interface:
+	case EType_Class:
+		return pType->IsClassType () ? &m_Cast_class : NULL;
+
 	default:
 		if (TypeKind == EType_BitField)
 		{
@@ -339,7 +343,7 @@ COperatorMgr::GetCastOperator (
 			return GetCastOperator (pOpType, pBaseType) ? &m_Cast_setbf : NULL;
 		}
 
-		return OpTypeKind < EType__BasicTypeCount && TypeKind < EType__BasicTypeCount ?
+		return OpTypeKind < EType__PrimitiveTypeCount && TypeKind < EType__PrimitiveTypeCount ?
 			m_CastOperatorTable [OpTypeKind] [TypeKind] : NULL;
 	}
 }
@@ -403,7 +407,7 @@ COperatorMgr::CastOperator (
 	CValue* pResultValue
 	)
 {
-	CType* pType = m_pModule->m_TypeMgr.GetBasicType (TypeKind);
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 	return CastOperator (OpValue, pType, pResultValue);
 }
 
@@ -413,7 +417,7 @@ COperatorMgr::CastOperator (
 	EType TypeKind
 	)
 {
-	CType* pType = m_pModule->m_TypeMgr.GetBasicType (TypeKind);
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 	return CastOperator (pValue, pType);
 }
 
@@ -480,19 +484,16 @@ COperatorMgr::MemberOperator (
 		return false;
 
 	CType* pType = OpValue.GetType ();
-
 	if (pType->IsReferenceType ())
+		pType = ((CPointerType*) pType)->GetBaseType ();
+
+	if (pType->IsPointerType ())
 	{
 		pType = ((CPointerType*) pType)->GetBaseType ();
 
-		if (pType->IsPointerType ())
-		{
-			pType = ((CPointerType*) pType)->GetBaseType ();
-
-			Result = UnaryOperator (EUnOp_Indir, &OpValue);
-			if (!Result)
-				return false;
-		}
+		Result = UnaryOperator (EUnOp_Indir, &OpValue);
+		if (!Result)
+			return false;
 	}
 
 	EType TypeKind = pType->GetTypeKind ();
@@ -507,7 +508,9 @@ COperatorMgr::MemberOperator (
 
 	case EType_Interface:
 	case EType_Class:
-		return ClassMemberOperator (OpValue, (CClassType*) pType, pName, pResultValue);
+		return 
+			PrepareOperand (&OpValue, EOpFlag_LoadReference) &&
+			ClassMemberOperator (OpValue, (CClassType*) pType, pName, pResultValue);
 
 	default:
 		err::SetFormatStringError (_T("member operator cannot be applied to '%s'"), pType->GetTypeString ());
@@ -596,6 +599,8 @@ COperatorMgr::StructMemberOperator (
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pStructType->GetTypeString ());
 		return false;
 	}
+
+	LlvmIndexArray.Append (pMember->GetLlvmIndex ());
 	
 	EValue OpValueKind = OpValue.GetValueKind ();
 	if (OpValueKind == EValue_Const)
@@ -636,22 +641,31 @@ COperatorMgr::StructMemberOperator (
 
 	if (OpValue.GetValueKind () == EValue_Variable)
 	{
-		CValue GepValue;
-		m_pModule->m_LlvmBuilder.CreateGep (OpValue, LlvmIndexArray, LlvmIndexArray.GetCount (), NULL, &GepValue);
-		pResultValue->SetVariable (OpValue.GetVariable (), GepValue.GetLlvmValue (), pMember->GetType ());
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateGep (OpValue, LlvmIndexArray, LlvmIndexArray.GetCount (), NULL, &PtrValue);
+		
+		pResultValue->SetVariable (
+			OpValue.GetVariable (), 
+			PtrValue.GetLlvmValue (), 
+			pMember->GetType (),
+			true,
+			(OpValue.GetFlags () & EValueFlag_IsVariableOffset) != 0
+			);
 	}
 	else
 	{
 		CValue PtrValue;
-		CValue GepValue;
+		CValue ValidatorValue;
 
 		CType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
 
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pStructType->GetPointerType (EType_Pointer_u), &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
 		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, LlvmIndexArray, LlvmIndexArray.GetCount (), NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetBytePtrType (), &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (OpValue, PtrValue, 0, pResultType, pResultValue);
+
+		CValue SafePtrValue = pResultType->GetUndefValue ();
+		m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, PtrValue, 0, NULL, &SafePtrValue);
+		m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, ValidatorValue, 1, pResultType, pResultValue);
 	}
 
 	return true;
@@ -701,7 +715,13 @@ COperatorMgr::UnionMemberOperator (
 		CType* pCastType = pMember->GetType ()->GetPointerType (EType_Reference_u);
 		CValue CastValue;
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pCastType, &CastValue);
-		pResultValue->SetVariable (OpValue.GetVariable (), CastValue.GetLlvmValue (), pMember->GetType ());
+		pResultValue->SetVariable (
+			OpValue.GetVariable (), 
+			CastValue.GetLlvmValue (), 
+			pMember->GetType (),
+			true,
+			(OpValue.GetFlags () & EValueFlag_IsVariableOffset) != 0
+			);
 	}
 	else
 	{
@@ -720,14 +740,249 @@ COperatorMgr::ClassMemberOperator (
 	CValue* pResultValue
 	)
 {
-	CModuleItem* pClassMember = pClassType->FindItem (pName);
-	if (!pClassMember)
+	size_t BaseTypeOffset;
+	size_t BaseTypeMethodTableIndex;
+
+	char Buffer [256];
+	rtl::CArrayT <size_t> LlvmBaseTypeIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	CClassMember* pMember = pClassType->FindMember (
+		pName, 
+		&BaseTypeOffset, 
+		&LlvmBaseTypeIndexArray,
+		&BaseTypeMethodTableIndex
+		);
+	
+	if (!pMember)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pClassType->GetTypeString ());
 		return false;
 	}
 
-	err::SetFormatStringError (_T("class member operator is not implemented yet"));
+	CClassType* pParentType = pMember->GetParentType ();
+	if (pParentType->GetTypeKind () != EType_Interface)
+	{
+		err::SetFormatStringError (
+			_T("'%s' is only accessible from methods of '%s' or its descendants"), 
+			pMember->GetQualifiedName (), 
+			pParentType->GetTypeString ()
+			);
+
+		return false;
+	}
+
+	bool Result = m_pModule->m_LlvmBuilder.CheckInterfaceNull (OpValue);
+	if (!Result)
+		return false;
+
+	EClassMember MemberKind = pMember->GetMemberKind ();
+	switch (MemberKind)
+	{
+	case EClassMember_Field:
+		return ClassFieldMemberOperator (
+			OpValue, 
+			pClassType, 
+			(CClassFieldMember*) pMember, 
+			BaseTypeOffset,
+			&LlvmBaseTypeIndexArray,
+			pResultValue
+			);
+		
+	case EClassMember_Method:
+		return ClassMethodMemberOperator (
+			OpValue, 
+			pClassType, 
+			(CClassMethodMember*) pMember, 
+			BaseTypeMethodTableIndex,
+			pResultValue
+			);
+
+	case EClassMember_Property:
+		return ClassPropertyMemberOperator (
+			OpValue, 
+			pClassType, 
+			(CClassPropertyMember*) pMember, 
+			BaseTypeMethodTableIndex,
+			pResultValue
+			);
+
+	default:
+		err::SetFormatStringError (_T("invalid interface member kind"));
+		return false;
+	}
+}
+
+bool
+COperatorMgr::ClassFieldMemberOperator (
+	const CValue& OpValue,
+	CClassType* pClassType,
+	CClassFieldMember* pMember,
+	size_t BaseTypeOffset,
+	rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
+	CValue* pResultValue
+	)
+{
+	pLlvmBaseTypeIndexArray->Insert (0, 0);
+	pLlvmBaseTypeIndexArray->Append (pMember->GetLlvmIndex ());
+
+	CValue PtrValue;
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ScopeLevelValue);
+
+	rtl::CString s1 = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
+	size_t c = pLlvmBaseTypeIndexArray->GetCount ();
+
+	m_pModule->m_LlvmBuilder.CreateGep (
+		PtrValue, 
+		*pLlvmBaseTypeIndexArray, 
+		pLlvmBaseTypeIndexArray->GetCount (), 
+		NULL,
+		&PtrValue
+		);
+
+	rtl::CString s2 = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
+
+	CPointerType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
+
+	m_pModule->m_LlvmBuilder.CreateSafePtr (
+		PtrValue, 
+		PtrValue, 
+		pMember->GetType ()->GetSize (),
+		ScopeLevelValue,
+		pResultType, 
+		pResultValue
+		);
+
+	return true;
+}
+
+bool
+COperatorMgr::ClassMethodMemberOperator (
+	const CValue& OpValue,
+	CClassType* pClassType,
+	CClassMethodMember* pMember,
+	size_t BaseTypeMethodTableIndex,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("COperatorMgr::ClassMethodMemberOperator not implemented yet"));
+	return false;
+}
+
+bool
+COperatorMgr::ClassPropertyMemberOperator (
+	const CValue& OpValue,
+	CClassType* pClassType,
+	CClassPropertyMember* pMember,
+	size_t BaseTypeMethodTableIndex,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("COperatorMgr::ClassPropertyMemberOperator not implemented yet"));
+	return false;
+}
+
+bool
+COperatorMgr::StackNewOperator (
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	if (!pScope)
+	{
+		err::SetFormatStringError (_T("'stack new' operator could not be called at global scope"));
+		return false;
+	}
+
+	if (pType->GetTypeKind () == EType_Class)
+	{
+		CClassType* pClassType = (CClassType*) pType;
+
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetLlvmClassType (), _T("new"), NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, EObjectFlag_IsStack);
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 0, 2, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateInterface (
+			PtrValue, 
+			pScope,
+			pClassType,
+			pResultValue
+			);			
+	}
+	else
+	{
+		CPointerType* pResultType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer, pType);
+
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateAlloca (pType, _T("new"), NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
+
+		m_pModule->m_LlvmBuilder.CreateSafePtr (
+			PtrValue, 
+			PtrValue, 
+			pType->GetSize (),
+			pScope,
+			pResultType,
+			pResultValue
+			);			
+	}
+
+	return true;
+}
+
+bool
+COperatorMgr::HeapNewOperator (
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CValue TypeValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &pType);
+
+	CFunction* pHeapAllocate = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAllocate);
+
+	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pHeapAllocate,
+		TypeValue,
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+		&PtrValue
+		);
+
+	if (pType->GetTypeKind () == EType_Class)
+	{
+		CClassType* pClassType = (CClassType*) pType;
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pClassType->GetLlvmClassPtrType (), &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 0, 2, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateInterface (
+			PtrValue, 
+			NULL,
+			pClassType,
+			pResultValue
+			);			
+	}
+	else
+	{
+		CPointerType* pPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, pType);
+		CPointerType* pResultType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer, pType);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPointerType, &PtrValue);
+
+		m_pModule->m_LlvmBuilder.CreateSafePtr (
+			PtrValue, 
+			PtrValue, 
+			pType->GetSize (),
+			NULL,
+			pResultType,
+			pResultValue
+			);			
+	}
+
+	return true;
+
+	err::SetFormatStringError (_T("heap new operator not implemented yet"));
 	return false;
 }
 
@@ -830,12 +1085,11 @@ COperatorMgr::CallOperator (
 		ArgArray.Append (ArgCast);
 	}
 
-	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
 	m_pModule->m_LlvmBuilder.CreateCall (
 		pFunction, 
 		ArgArray,
 		ArgArray.GetCount (),
-		pReturnType, 
+		pFunction->GetType ()->GetReturnType (), 
 		pResultValue
 		);
 
@@ -882,7 +1136,9 @@ COperatorMgr::PrepareOperandType (
 			CType* pBaseType;
 
 			pBaseType = ((CPointerType*) pType)->GetBaseType ();
-			if (pBaseType->IsReferenceType () || (Flags & EOpFlag_LoadReference)) // double reference
+			if (pBaseType->IsReferenceType () || 
+				pBaseType->IsClassType () ||
+				(Flags & EOpFlag_LoadReference)) 
 				pType = pBaseType;
 
 			break;
@@ -893,7 +1149,7 @@ COperatorMgr::PrepareOperandType (
 
 		case EType_Enum:
 			if (Flags & EOpFlag_EnumToInt)
-				pType = m_pModule->m_TypeMgr.GetBasicType (EType_Int);
+				pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 
 			break;
 
@@ -905,7 +1161,7 @@ COperatorMgr::PrepareOperandType (
 
 		case EType_Bool:
 			if (Flags & EOpFlag_BoolToInt)
-				pType = m_pModule->m_TypeMgr.GetBasicType (EType_Int);
+				pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 
 			break;
 		}
@@ -925,7 +1181,6 @@ COperatorMgr::PrepareOperand (
 	bool Result;
 
 	CValue Value = OpValue;
-
 	for (;;)
 	{
 		CType* pType = Value.GetType ();
@@ -942,7 +1197,9 @@ COperatorMgr::PrepareOperand (
 			CType* pBaseType;
 
 			pBaseType = ((CPointerType*) pType)->GetBaseType ();
-			if (pBaseType->IsReferenceType () || (Flags & EOpFlag_LoadReference)) // double reference
+			if (pBaseType->IsReferenceType () || 
+				pBaseType->IsClassType () || 
+				(Flags & EOpFlag_LoadReference))
 			{
 				Result = LoadReferenceOperator (&Value);
 				if (!Result)
@@ -1028,21 +1285,37 @@ COperatorMgr::LoadReferenceOperator (
 		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
 	}
 
-	if (TypeKind == EType_Reference_u || OpValue.GetValueKind () == EValue_Variable)
+	if (TypeKind == EType_Reference_u)
 	{
-		llvm::Value* pLlvmLoad = m_pModule->m_LlvmBuilder.CreateLoad (OpValue, pTargetType, pResultValue, IsVolatile);
+		// no need to do a range check
+		m_pModule->m_LlvmBuilder.CreateLoad (OpValue, pTargetType, pResultValue, IsVolatile);
 		return true;
 	}
 
 	ASSERT (TypeKind == EType_Reference);
 
-	bool Result = m_pModule->m_LlvmBuilder.CheckSafePtrRange (OpValue, pTargetType->GetSize (), ESafePtrError_Load);
-	if (!Result)
-		return false;
-
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pTargetType->GetPointerType (EType_Pointer_u), &PtrValue);
+	CValue ValidatorValue;
+
+	if (OpValue.GetValueKind () == EValue_Variable)
+	{
+		if (!(OpValue.GetFlags () & EValueFlag_IsVariableOffset))
+		{
+			// no need to do a range check
+			m_pModule->m_LlvmBuilder.CreateLoad (OpValue, pTargetType, pResultValue, IsVolatile);
+			return true;
+		}
+
+		PtrValue = OpValue;
+		m_pModule->m_LlvmBuilder.CreateSafePtrValidator (OpValue.GetVariable (), &ValidatorValue);
+	}
+	else
+	{
+		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
+	}
+
+	m_pModule->m_LlvmBuilder.CheckSafePtrRange (PtrValue, pTargetType->GetSize (), ValidatorValue, ERuntimeError_LoadOutOfRange);
 	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pTargetType, pResultValue, IsVolatile);
 	return true;
 }
@@ -1110,7 +1383,7 @@ COperatorMgr::StoreReferenceOperator (
 			m_pModule->m_LlvmBuilder.CreateSafePtr (
 				SrcValue, 
 				SrcValue.GetVariable (),
-				pTargetType,
+				(CPointerType*) pTargetType,
 				&SrcValue
 				);
 
@@ -1121,28 +1394,43 @@ COperatorMgr::StoreReferenceOperator (
 		if (!Result)
 			return false;
 
-		IsRangeChecked = true;
+		IsRangeChecked = true; // mergebitfield checks ptr range
 		break;
 	}
 
-	if (pDstType->GetTypeKind () == EType_Reference_u || DstValue.GetValueKind () == EValue_Variable) // no need to do a range check
+	if (pDstType->GetTypeKind () == EType_Reference_u)
 	{
+		// no need to do a range check
 		m_pModule->m_LlvmBuilder.CreateStore (SrcValue, DstValue, IsVolatile);
 		return true;
 	}
 
 	ASSERT (pDstType->GetTypeKind () == EType_Reference);
 
-	if (!IsRangeChecked) // don't check twice
-	{
-		Result = m_pModule->m_LlvmBuilder.CheckSafePtrRange (DstValue, pTargetType->GetSize (), ESafePtrError_Store); 
-		if (!Result)
-			return false;
-	}
-	
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pTargetType->GetPointerType (EType_Pointer_u), &PtrValue);
+	CValue ValidatorValue;
+
+	if (DstValue.GetValueKind () == EValue_Variable)
+	{
+		if (!(DstValue.GetFlags () & EValueFlag_IsVariableOffset)) 
+		{
+			// no need to do a range check
+			m_pModule->m_LlvmBuilder.CreateStore (SrcValue, DstValue, IsVolatile);
+			return true;
+		}
+
+		PtrValue = DstValue;
+		m_pModule->m_LlvmBuilder.CreateSafePtrValidator (DstValue.GetVariable (), &ValidatorValue);
+	}
+	else
+	{
+		m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 1, NULL, &ValidatorValue);
+	}
+
+	if (!IsRangeChecked) // don't check twice
+		m_pModule->m_LlvmBuilder.CheckSafePtrRange (PtrValue, pTargetType->GetSize (), ValidatorValue, ERuntimeError_StoreOutOfRange); 
+	
 	m_pModule->m_LlvmBuilder.CreateStore (SrcValue, PtrValue, IsVolatile);
 	return true;
 }

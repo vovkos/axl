@@ -7,33 +7,6 @@ namespace jnc {
 
 //.............................................................................
 
-CStructBaseType*
-CStructType::AddBaseType (CStructType* pType)
-{
-	size_t AlignFactor = pType->GetAlignFactor ();
-	if (AlignFactor > m_AlignFactor)
-		m_AlignFactor = AlignFactor;
-
-	size_t Offset = GetFieldOffset (AlignFactor);
-
-	rtl::CStringHashTableMapIteratorAT <CStructBaseType*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
-	if (It->m_Value)
-	{
-		err::SetFormatStringError (_T("'%s' is already a base type"), pType->GetTypeString ());
-		return NULL;
-	}
-
-	CStructBaseType* pBaseType = AXL_MEM_NEW (CStructBaseType);
-	pBaseType->m_pType = pType;
-	pBaseType->m_Offset = Offset;
-	m_BaseTypeList.InsertTail (pBaseType);
-	It->m_Value = pBaseType;
-
-	SetSize (Offset + pType->GetSize ());
-
-	return pBaseType;
-}
-
 bool
 CStructType::FindBaseType (
 	CStructType* pType,
@@ -82,41 +55,62 @@ CStructType::FindBaseType (
 	return false;
 }
 
+CStructBaseType*
+CStructType::AddBaseType (CStructType* pType)
+{
+	rtl::CStringHashTableMapIteratorAT <CStructBaseType*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
+	if (It->m_Value)
+	{
+		err::SetFormatStringError (_T("'%s' is already a base type"), pType->GetTypeString ());
+		return NULL;
+	}
+
+	CStructBaseType* pBaseType = AXL_MEM_NEW (CStructBaseType);
+	pBaseType->m_pType = pType;
+	m_BaseTypeList.InsertTail (pBaseType);
+	It->m_Value = pBaseType;
+	return pBaseType;
+}
+
 CStructMember*
 CStructType::FindMember (
 	const tchar_t* pName,
-	size_t* pOffset,
-	rtl::CArrayT <size_t>* pLlvmIndexArray
+	size_t* pBaseTypeOffset,
+	rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray
 	)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
 	if (It)
 	{
 		CModuleItem* pItem = It->m_Value;
-		if (pItem->GetItemKind () != EModuleItem_StructMember)
-			return NULL;
-
-		CStructMember* pMember = (CStructMember*) pItem;
-		*pOffset = pMember->m_Offset;
-		pLlvmIndexArray->Copy (&pMember->m_LlvmIndex, 1);
-		return pMember;
+		return pItem->GetItemKind () == EModuleItem_StructMember ? (CStructMember*) pItem : NULL;
 	}
 
 	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	rtl::CArrayT <size_t> LlvmBaseTypeIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
 	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		size_t Offset;
-		CStructMember* pMember = BaseType->m_pType->FindMember (pName, &Offset, &LlvmIndexArray);
+		size_t BaseTypeOffset;
+		CStructMember* pMember = BaseType->m_pType->FindMember (
+			pName, 
+			&BaseTypeOffset, 
+			&LlvmBaseTypeIndexArray
+			);
+
 		if (pMember)
 		{
-			*pOffset = BaseType->m_Offset + Offset;
+			if (pBaseTypeOffset)
+				*pBaseTypeOffset = BaseType->m_Offset + BaseTypeOffset;
 
-			pLlvmIndexArray->Clear ();
-			pLlvmIndexArray->Append (BaseType->m_LlvmIndex);
-			pLlvmIndexArray->Append (LlvmIndexArray);	
+			if (pLlvmBaseTypeIndexArray)
+			{
+				pLlvmBaseTypeIndexArray->Clear ();
+				pLlvmBaseTypeIndexArray->Append (BaseType->m_LlvmIndex);
+				pLlvmBaseTypeIndexArray->Append (LlvmBaseTypeIndexArray);
+			}
+
 			return pMember;
 		}
 	}
@@ -127,86 +121,44 @@ CStructType::FindMember (
 CStructMember*
 CStructType::CreateMember (
 	const rtl::CString& Name,
-	CType* pType
+	CType* pType,
+	size_t BitCount
 	)
 {
-	if (!(pType->GetFlags () & ETypeFlag_IsPod))
-	{
-		err::SetFormatStringError (_T("'%s' is illegal struct member type (POD only allowed)"), pType->GetTypeString ());
-		return NULL;
-	}
-
-	size_t AlignFactor = pType->GetAlignFactor ();
-	if (AlignFactor > m_AlignFactor)
-		m_AlignFactor = AlignFactor;
-
-	size_t Offset;
-
-	if (pType->GetTypeKind () != EType_BitField)
-	{
-		Offset = GetFieldOffset (AlignFactor);
-		SetSize (Offset + pType->GetSize ());
-	}
-	else
-	{
-		CBitFieldType* pBitFieldType = (CBitFieldType*) pType;
-		if (pBitFieldType->GetBitOffset ()) // we use the last member's offset
-		{
-			ASSERT (!m_MemberList.IsEmpty ());
-			Offset = m_MemberList.GetTail ()->m_Offset;
-		}
-		else // new slot
-		{
-			Offset = GetFieldOffset (AlignFactor);
-			SetSize (Offset + pType->GetSize ());
-		}
-
-		m_pLastBitFieldType = pBitFieldType;
-	}
-
 	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
 	pMember->m_Name = Name;
 	pMember->m_pType = pType;
-	pMember->m_Offset = Offset;
+	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
+	pMember->m_BitCount = BitCount;
 	m_MemberList.InsertTail (pMember);
 
 	bool Result = AddItem (pMember);
 	if (!Result)
 		return NULL;
 
-
 	return pMember;
 }
 
-llvm::StructType* 
-CStructType::GetLlvmType ()
+bool
+CStructType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_IsLlvmReady)
-		return (llvm::StructType*) m_pLlvmType;
-	
-	char Buffer [256];
-	rtl::CArrayT <llvm::Type*> LlvmMemberTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	LlvmMemberTypeArray.Reserve (m_BaseTypeList.GetCount () + m_MemberList.GetCount ()); // could be more, if padding members are inserted
-	
-	size_t Offset = 0;
-	size_t LlvmIndex = 0;
+	bool Result;
+
+	ResetLayout ();
 
 	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
 		CStructBaseType* pBaseType = *BaseType;
 
-		if (pBaseType->m_Offset > Offset) // insert padding
-		{
-			CArrayType* pPaddingArrayType = m_pModule->m_TypeMgr.GetArrayType (EType_Int8_u, pBaseType->m_Offset - Offset);
-			LlvmMemberTypeArray.Append (pPaddingArrayType->GetLlvmType ());
-			Offset = pBaseType->m_Offset;
-			LlvmIndex++;
-		}
+		Result = LayoutField (
+			pBaseType->m_pType,
+			&pBaseType->m_Offset,
+			&pBaseType->m_LlvmIndex
+			);
 
-		LlvmMemberTypeArray.Append (pBaseType->m_pType->GetLlvmType ());
-		Offset = pBaseType->m_Offset + pBaseType->m_pType->GetSize ();
-		pBaseType->m_LlvmIndex = LlvmIndex++;
+		if (!Result)
+			return false;
 	}
 
 	rtl::CIteratorT <CStructMember> Member = m_MemberList.GetHead ();
@@ -214,45 +166,38 @@ CStructType::GetLlvmType ()
 	{
 		CStructMember* pMember = *Member;
 
-		if (pMember->m_Offset > Offset) // insert padding
-		{
-			CArrayType* pPaddingArrayType = m_pModule->m_TypeMgr.GetArrayType (EType_Int8_u, pMember->m_Offset - Offset);
-			LlvmMemberTypeArray.Append (pPaddingArrayType->GetLlvmType ());
-			Offset = pMember->m_Offset;
-			LlvmIndex++;
-		}
+		Result = pMember->m_BitCount ? 
+			LayoutBitField (
+				pMember->m_pBitFieldBaseType,
+				pMember->m_BitCount,
+				&pMember->m_pType,
+				&pMember->m_Offset,
+				&pMember->m_LlvmIndex
+				) :
+			LayoutField (
+				pMember->m_pType,
+				&pMember->m_Offset,
+				&pMember->m_LlvmIndex
+				);
 
-		if (pMember->m_pType->GetTypeKind () == EType_BitField &&
-			((CBitFieldType*) pMember->m_pType)->GetBitOffset () != 0)
-		{
-			pMember->m_LlvmIndex = LlvmIndex - 1;
-		}
-		else
-		{
-			pMember->m_LlvmIndex = LlvmIndex++;
-			LlvmMemberTypeArray.Append (pMember->m_pType->GetLlvmType ());
-			Offset = pMember->m_Offset + pMember->m_pType->GetSize ();
-		}
+			if (!Result)
+				return false;
 	}
 
-	ASSERT (Offset == m_ActualSize);
+	if (m_FieldAlignedSize > m_FieldActualSize)
+		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
 
-	if (m_Size > m_ActualSize) // insert padding
-	{
-		CArrayType* pPaddingArrayType = m_pModule->m_TypeMgr.GetArrayType (EType_Int8_u, m_Size - m_ActualSize);
-		LlvmMemberTypeArray.Append (pPaddingArrayType->GetLlvmType ());
-	}
+	m_Size = m_FieldAlignedSize;
+	return true;
+}
 
-	llvm::StructType* pLlvmType = llvm::StructType::create (
-		llvm::getGlobalContext (),
-		llvm::ArrayRef<llvm::Type*> (LlvmMemberTypeArray, LlvmMemberTypeArray.GetCount ()),
-		(const tchar_t*) GetQualifiedName (), 
-		true
-		);
-
-	m_pLlvmType = pLlvmType;
-	m_Flags |= ETypeFlag_IsLlvmReady;
-	return pLlvmType;
+llvm::StructType* 
+CStructType::GetLlvmType ()
+{
+	if (!m_pLlvmType)
+		m_pLlvmType = GetLlvmStructType (GetQualifiedName ());
+	
+	return (llvm::StructType*) m_pLlvmType;
 }
 
 //.............................................................................

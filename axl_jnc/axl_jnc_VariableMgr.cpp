@@ -40,20 +40,22 @@ CVariableMgr::CreateVariable (
 	if (m_pModule->m_FunctionMgr.GetCurrentFunction ())
 	{
 		ASSERT (VariableKind == EVariable_Local || VariableKind == EVariable_Arg);
-		pVariable->m_pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name);
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
+
+		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
 	}
 	else
 	{
 		ASSERT (VariableKind == EVariable_Global);
 
-		CValue Initializer (pType, NULL);
-
-		pVariable->m_pLlvmGlobalVariable = new llvm::GlobalVariable (
+		pVariable->m_pLlvmValue = new llvm::GlobalVariable (
 			*m_pModule->m_pLlvmModule,
 			pType->GetLlvmType (),
 			false,
 			llvm::GlobalVariable::ExternalLinkage,
-			(llvm::Constant*) Initializer.GetLlvmValue (),
+			(llvm::Constant*) pType->GetLlvmZeroValue (),
 			(const tchar_t*) Name
 			);
 	}

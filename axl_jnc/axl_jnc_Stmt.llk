@@ -163,6 +163,7 @@ enter
 for_stmt
 local
 {
+	CScope* $pScope;
 	CBasicBlock* $pConditionBlock;
 	CBasicBlock* $pBodyBlock;
 	CBasicBlock* $pLoopBlock;
@@ -176,7 +177,10 @@ enter
 	$pLoopBlock = $pBodyBlock;
 }
 	: EToken_For '(' 
-	  expression? ';' 		
+		{
+			$pScope = m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+		}	  
+	  (declaration_list | expression_list)? ';'
 	  (
 			{
 				$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_condition"));
@@ -193,14 +197,19 @@ enter
 				$pLoopBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_loop"));
 				m_pModule->m_ControlFlowMgr.SetCurrentBlock ($pLoopBlock);
 			}
-		expression $i
+		expression_list
 			{
 				m_pModule->m_ControlFlowMgr.Jump ($pConditionBlock, $pBodyBlock);
 			}
 	  )?
-	  ')' $a
-	  loop_stmt <&$a.m_Pos, $pFollowBlock, $pConditionBlock>
+	  ')'
 		{
+			$pScope->m_pBreakBlock = $pFollowBlock;
+			$pScope->m_pContinueBlock = $pConditionBlock;
+		}
+	  statement $s
+		{
+			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pLoopBlock, $pFollowBlock);
 		}		 
 	;
@@ -208,11 +217,9 @@ enter
 loop_stmt <const CToken::CPos* $pPos, CBasicBlock* $pBreakBlock, CBasicBlock* $pContinueBlock>
 	: 
 		{			
-			m_pModule->m_NamespaceMgr.OpenScope (*$pPos, $pBreakBlock, $pContinueBlock);
 		}
-	 statement
+	 
 		{
-			m_pModule->m_NamespaceMgr.CloseScope ($1.m_LastToken.m_Pos);
 		}
 	;
 

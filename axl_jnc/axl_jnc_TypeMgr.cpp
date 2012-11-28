@@ -12,19 +12,17 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_pBytePtrType = NULL;
-	m_pSafePtrStructType = NULL;
-	m_pSafePtrStructType2 = NULL;
-	m_pFunctionPtrStructType = NULL;
-	m_UnnamedTypeIndex = 0;
+	SetupAllPrimitiveTypes ();
 
-	SetupAllBasicTypes ();
+	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
+	m_UnnamedTypeIndex = 0;
 }
 
 void
 CTypeMgr::Clear ()
 {
-	m_DerivedTypeList.Clear ();
+	m_QualifierTypeList.Clear ();
+	m_PointerTypeList.Clear ();
 	m_ArrayTypeList.Clear ();
 	m_BitFieldTypeList.Clear ();
 	m_FunctionTypeList.Clear ();
@@ -34,59 +32,162 @@ CTypeMgr::Clear ()
 	m_PropertyTypeList.Clear ();
 	m_TypeMap.Clear ();
 
-	m_pBytePtrType = NULL;
-	m_pSafePtrStructType = NULL;
-	m_pSafePtrStructType2 = NULL;
-	m_pFunctionPtrStructType = NULL;
+	SetupAllPrimitiveTypes ();
+
+	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
 	m_UnnamedTypeIndex = 0;
 }
 
 void
-CTypeMgr::SetupAllBasicTypes ()
+CTypeMgr::SetupAllPrimitiveTypes ()
 {
-	SetupBasicType (EType_Void,      0, "a");
-	SetupBasicType (EType_Variant,   sizeof (TVariant), "b");
-	SetupBasicType (EType_Bool,      1, "c");
-	SetupBasicType (EType_Int8,      1, "d");
-	SetupBasicType (EType_Int8_u,    1, "e");
-	SetupBasicType (EType_Int16,     2, "f");
-	SetupBasicType (EType_Int16_u,   2, "g");
-	SetupBasicType (EType_Int32,     4, "h");
-	SetupBasicType (EType_Int32_u,   4, "i");
-	SetupBasicType (EType_Int64,     8, "j");
-	SetupBasicType (EType_Int64_u,   8, "k");
-	SetupBasicType (EType_Int16_be,  2, "l");
-	SetupBasicType (EType_Int16_beu, 2, "m");
-	SetupBasicType (EType_Int32_be,  4, "n");
-	SetupBasicType (EType_Int32_beu, 4, "o");
-	SetupBasicType (EType_Int64_be,  8, "p");
-	SetupBasicType (EType_Int64_beu, 8, "q");
-	SetupBasicType (EType_Float,     4, "r");
-	SetupBasicType (EType_Double,    8, "s");
+	SetupPrimitiveType (EType_Void,      0, "a");
+	SetupPrimitiveType (EType_Variant,   sizeof (TVariant), "b");
+	SetupPrimitiveType (EType_Bool,      1, "c");
+	SetupPrimitiveType (EType_Int8,      1, "d");
+	SetupPrimitiveType (EType_Int8_u,    1, "e");
+	SetupPrimitiveType (EType_Int16,     2, "f");
+	SetupPrimitiveType (EType_Int16_u,   2, "g");
+	SetupPrimitiveType (EType_Int32,     4, "h");
+	SetupPrimitiveType (EType_Int32_u,   4, "i");
+	SetupPrimitiveType (EType_Int64,     8, "j");
+	SetupPrimitiveType (EType_Int64_u,   8, "k");
+	SetupPrimitiveType (EType_Int16_be,  2, "l");
+	SetupPrimitiveType (EType_Int16_beu, 2, "m");
+	SetupPrimitiveType (EType_Int32_be,  4, "n");
+	SetupPrimitiveType (EType_Int32_beu, 4, "o");
+	SetupPrimitiveType (EType_Int64_be,  8, "p");
+	SetupPrimitiveType (EType_Int64_beu, 8, "q");
+	SetupPrimitiveType (EType_Float,     4, "r");
+	SetupPrimitiveType (EType_Double,    8, "s");
 }
 
 void
-CTypeMgr::SetupBasicType (
+CTypeMgr::SetupPrimitiveType (
 	EType TypeKind,
 	size_t Size,
 	const char* pSignature
 	)
 {
-	ASSERT (TypeKind < EType__BasicTypeCount);
+	ASSERT (TypeKind < EType__PrimitiveTypeCount);
 		
-	CType* pType = &m_BasicTypeArray [TypeKind];
+	CType* pType = &m_PrimitiveTypeArray [TypeKind];
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
 	pType->m_Flags = ETypeFlag_IsPod;
 	pType->m_Size = Size;
 	pType->m_Signature = pSignature;
 
+	memset (pType->m_PointerTypeArray, 0, sizeof (pType->m_PointerTypeArray));
+
 	m_TypeMap.Goto (pSignature)->m_Value = pType;
+}
+
+CType* 
+CTypeMgr::GetStdType (EStdType StdType)
+{
+	ASSERT (StdType >= 0 && StdType < EStdType__Count);
+	if (m_StdTypeArray [StdType])
+		return m_StdTypeArray [StdType];
+
+	CType* pType;
+
+	switch (StdType)
+	{
+	case EStdType_BytePtr:
+		pType = GetPointerType (EType_Pointer_u, EType_Int8);
+		break;
+
+	case EStdType_SafePtr:
+		pType = CreateSafePtrType ();
+		break;
+
+	case EStdType_SafePtrValidator:
+		pType = CreateSafePtrValidatorType ();
+		break;
+
+	case EStdType_InterfacePtr:
+		pType = CreateInterfacePtrType ();
+		break;
+
+	case EStdType_FunctionPtr:
+		pType = CreateFunctionPtrType ();
+		break;
+
+	case EStdType_ObjectHdr:
+		pType = CreateObjectHdrType ();
+		break;
+
+	default:
+		ASSERT (false);
+		return NULL;
+	}
+
+	m_StdTypeArray [StdType] = pType;
+	return pType;
+}
+
+CStructType* 
+CTypeMgr::CreateSafePtrType ()
+{
+	CStructType* pType = GetStructType ("sptr", "jnc.sptr");
+	pType->CreateMember ("m_p", GetStdType (EStdType_BytePtr));
+	pType->CreateMember ("m_Validator", GetStdType (EStdType_SafePtrValidator));
+	bool Result = pType->CalcLayout ();
+	ASSERT (Result);
+	return pType;
+}
+
+CStructType* 
+CTypeMgr::CreateSafePtrValidatorType ()
+{
+	CStructType* pType = GetStructType ("sptrv", "jnc.sptrv");
+	pType->CreateMember ("m_pRegionBegin", GetStdType (EStdType_BytePtr));
+	pType->CreateMember ("m_pRegionEnd", GetStdType (EStdType_BytePtr));
+	pType->CreateMember ("m_ScopeLevel", GetPrimitiveType (EType_SizeT));
+	bool Result = pType->CalcLayout ();
+	ASSERT (Result);
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateInterfacePtrType ()
+{
+	CStructType* pType = GetStructType ("iface", "jnc.iface");
+	pType->CreateMember ("m_p", GetStdType (EStdType_BytePtr));
+	pType->CreateMember ("m_ScopeLevel", GetPrimitiveType (EType_SizeT));
+	bool Result = pType->CalcLayout ();
+	ASSERT (Result);
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateFunctionPtrType ()
+{
+	CStructType* pType = GetStructType ("fptr", "jnc.fptr");
+	pType->CreateMember ("m_pfn", GetStdType (EStdType_BytePtr));
+	pType->CreateMember ("m_pInterface", GetStdType (EStdType_BytePtr));
+	bool Result = pType->CalcLayout ();
+	ASSERT (Result);
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateObjectHdrType ()
+{
+	CStructType* pType = GetStructType ("obj", "jnc.obj");
+	pType->CreateMember ("m_pType", GetStdType (EStdType_BytePtr));
+	pType->CreateMember ("m_ScopeLevel", GetPrimitiveType (EType_SizeT));
+	bool Result = pType->CalcLayout ();
+	ASSERT (Result);
+	return pType;
 }
 
 bool
 CTypeMgr::ResolveImports ()
 {
+	bool Result;
+
 	rtl::CIteratorT <CImportType> ImportType = m_ImportTypeList.GetHead ();
 	for (; ImportType; ImportType++)
 	{
@@ -110,22 +211,30 @@ CTypeMgr::ResolveImports ()
 		pImportType->m_pExternType = (CType*) pItem;
 	}
 
-	return true;
-}
+	// re-layout all structs, unions, interfaces and classes
 
-bool
-VerifyReferenceType (CType* pBaseType)
-{
-	if (pBaseType->IsReferenceType ())
+	rtl::CIteratorT <CStructType> StructType = m_StructTypeList.GetHead ();
+	for (; StructType; StructType++)
 	{
-		err::SetFormatStringError (_T("reference to reference is illegal"));
-		return false;
+		Result = StructType->CalcLayout ();
+		if (!Result)
+			return false;
 	}
-	
-	if (pBaseType->GetTypeKind () == EType_Property)
+
+	rtl::CIteratorT <CUnionType> UnionType = m_UnionTypeList.GetHead ();
+	for (; UnionType; UnionType++)
 	{
-		err::SetFormatStringError (_T("reference to property is illegal"));
-		return false;
+		Result = UnionType->CalcLayout ();
+		if (!Result)
+			return false;
+	}
+
+	rtl::CIteratorT <CClassType> ClassType = m_ClassTypeList.GetHead ();
+	for (; ClassType; ClassType++)
+	{
+		Result = ClassType->CalcLayout ();
+		if (!Result)
+			return false;
 	}
 
 	return true;
@@ -170,7 +279,7 @@ CTypeMgr::GetQualifiedType (
 	pType->m_Signature = Signature;
 	pType->m_pBaseType = pBaseType;
 
-	m_DerivedTypeList.InsertTail (pType);
+	m_QualifierTypeList.InsertTail (pType);
 	It->m_Value = pType;
 	
 	return pType;
@@ -182,6 +291,12 @@ CTypeMgr::GetPointerType (
 	CType* pBaseType
 	)
 {
+	size_t Index = TypeKind - EType_Pointer;
+	ASSERT (Index < 4);
+
+	if (pBaseType->m_PointerTypeArray [Index])
+		return pBaseType->m_PointerTypeArray [Index];
+
 	rtl::CStringA Signature;
 	size_t Size;
 	int Flags = 0;
@@ -219,7 +334,10 @@ CTypeMgr::GetPointerType (
 
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
+	{
+		ASSERT (false);
 		return (CPointerType*) It->m_Value;
+	}
 
 	CPointerType* pType = AXL_MEM_NEW (CPointerType);
 	pType->m_pModule = m_pModule;
@@ -229,8 +347,9 @@ CTypeMgr::GetPointerType (
 	pType->m_Signature = Signature;
 	pType->m_pBaseType = pBaseType;
 
-	m_DerivedTypeList.InsertTail (pType);
+	m_PointerTypeList.InsertTail (pType);
 	It->m_Value = pType;
+	pBaseType->m_PointerTypeArray [Index] = pType;
 	
 	return pType;
 }
@@ -407,61 +526,6 @@ CTypeMgr::GetUnionType (
 	return pType;
 }
 
-CStructType*
-CTypeMgr::GetSafePtrStructType ()
-{
-	if (m_pSafePtrStructType)
-		return m_pSafePtrStructType;
-
-	m_pSafePtrStructType = GetStructType ("sptr", "jnc.sptr");
-	m_pSafePtrStructType->CreateMember ("m_p", GetBytePtrType ());
-	m_pSafePtrStructType->CreateMember ("m_beg", GetBytePtrType ());
-	m_pSafePtrStructType->CreateMember ("m_end", GetBytePtrType ());
-	m_pSafePtrStructType->CreateMember ("m_scope", GetBasicType (EType_SizeT));
-
-	return m_pSafePtrStructType;
-}
-
-CStructType*
-CTypeMgr::GetSafePtrStructType2 ()
-{
-	if (m_pSafePtrStructType2)
-		return m_pSafePtrStructType2;
-
-	CType* pWordPtr = GetBasicType (EType_Byte)->GetPointerType (EType_Pointer_u);
-
-	m_pSafePtrStructType2 = GetStructType ("swptr", "jnc.swptr");
-	m_pSafePtrStructType2->CreateMember ("m_p", pWordPtr);
-	m_pSafePtrStructType2->CreateMember ("m_beg", pWordPtr);
-	m_pSafePtrStructType2->CreateMember ("m_end", pWordPtr);
-	m_pSafePtrStructType2->CreateMember ("m_scope", GetBasicType (EType_SizeT));
-
-	return m_pSafePtrStructType2;
-}
-
-CStructType*
-CTypeMgr::GetFunctionPtrStructType ()
-{
-	if (m_pFunctionPtrStructType)
-		return m_pFunctionPtrStructType;
-
-	m_pFunctionPtrStructType = GetStructType ("fptr", "jnc.fptr");
-	m_pFunctionPtrStructType->CreateMember ("m_pfn", GetBytePtrType ());
-	m_pFunctionPtrStructType->CreateMember ("m_iface", GetBytePtrType ());
-
-	return m_pFunctionPtrStructType;
-}
-
-CPointerType* 
-CTypeMgr::GetBytePtrType ()
-{
-	if (m_pBytePtrType)
-		return m_pBytePtrType;
-
-	m_pBytePtrType = GetPointerType (EType_Pointer_u, EType_Int8);
-	return m_pBytePtrType;
-}
-
 CClassType* 
 CTypeMgr::GetClassType (
 	EType TypeKind,
@@ -495,11 +559,12 @@ CTypeMgr::GetClassType (
 	CClassType* pType = AXL_MEM_NEW (CClassType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
+	pType->m_Size = sizeof (TInterface);
 	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_PackFactor = PackFactor;
-
+	
 	m_ClassTypeList.InsertTail (pType);
 	It->m_Value = pType;
 

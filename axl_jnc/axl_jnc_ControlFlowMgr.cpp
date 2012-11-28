@@ -97,7 +97,7 @@ CControlFlowMgr::Break (size_t Level)
 		return false;
 	}
 
-	m_pModule->m_ControlFlowMgr.Jump (pScope->GetBreakBlock (), NULL);
+	m_pModule->m_ControlFlowMgr.Jump (pScope->m_pBreakBlock, NULL);
 	return true;
 }
 
@@ -111,7 +111,7 @@ CControlFlowMgr::Continue (size_t Level)
 		return false;
 	}
 
-	m_pModule->m_ControlFlowMgr.Jump (pScope->GetContinueBlock (), NULL);
+	m_pModule->m_ControlFlowMgr.Jump (pScope->m_pContinueBlock, NULL);
 	return true;
 }
 
@@ -151,7 +151,7 @@ CControlFlowMgr::Return (const CValue& Value)
 				m_pModule->m_LlvmBuilder.CreateSafePtr (
 					ReturnValue, 
 					ReturnValue.GetVariable (),
-					pReturnType,
+					(CPointerType*) pReturnType,
 					&ReturnValue
 					);
 		}

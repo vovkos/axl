@@ -1080,24 +1080,18 @@ protected:
 	bool
 	LlvmCast_ptr (
 		const CValue& Value,
-		CPointerType* pType,
-		size_t Offset,
+		intptr_t Offset,
+		rtl::CArrayT <size_t>* pLlvmIndexArray,
+		CPointerType* pPointerType,
 		CValue* pResultValue
 		);
 
 	bool
 	LlvmCast_ptr_u (
 		const CValue& Value,
-		CPointerType* pType,
-		size_t Offset,
-		CValue* pResultValue
-		);
-
-	bool
-	LlvmCast_ptr_ptr_u (
-		const CValue& Value,
-		CPointerType* pType,
-		size_t Offset,
+		intptr_t Offset,
+		rtl::CArrayT <size_t>* pLlvmIndexArray,
+		CPointerType* pPointerType,
 		CValue* pResultValue
 		);
 };
@@ -1143,6 +1137,39 @@ class CCast_arr_ptr: public ICastOperator
 {
 public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_arr_ptr, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// arr -> safe / unsafe ptr
+
+class CCast_class: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_class, ICastOperator)
 
 public:
 	virtual

@@ -136,6 +136,12 @@
     <ClInclude Include="..\inc\axl_jnc_LlvmBuilder.h">
       <Filter>module</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_PointerType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_StructTypeRoot.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -237,6 +243,12 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_LlvmBuilder.cpp">
       <Filter>module</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_PointerType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_StructTypeRoot.cpp">
+      <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

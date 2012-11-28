@@ -11,9 +11,10 @@ namespace jnc {
 
 class CTypeMgr;
 class CDerivedType;
+class CPointerType;
 class CArrayType;
+class CValue;
 
-typedef CDerivedType CPointerType;
 typedef CDerivedType CQualifierType;
 
 //.............................................................................
@@ -89,7 +90,7 @@ enum EType
 	EType_Import,         // Z
 
 	EType__Count,
-	EType__BasicTypeCount = EType_Double + 1,
+	EType__PrimitiveTypeCount = EType_Double + 1,
 
 	// aliases
 
@@ -137,9 +138,8 @@ enum ETypeQualifier
 
 enum ETypeFlag
 {
-	ETypeFlag_IsLlvmReady    = 0x0100,
-	ETypeFlag_IsPod          = 0x0200, // plain-old-data
-	ETypeFlag_IsImport       = 0x0800, // is or references an import type
+	ETypeFlag_IsPod          = 0x0100, // plain-old-data
+	ETypeFlag_IsImport       = 0x0200, // is or references an import type
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -204,18 +204,11 @@ protected:
 
 	llvm::Type* m_pLlvmType;
 
+	CPointerType* m_PointerTypeArray [4];
+
 public:
 	CType ();
 	
-	llvm::Type* 
-	GetLlvmType ();
-
-	llvm::UndefValue*
-	GetLlvmUndefValue ()
-	{
-		return llvm::UndefValue::get (GetLlvmType ());
-	}
-
 	EType
 	GetTypeKind ()
 	{
@@ -251,6 +244,27 @@ public:
 	{
 		return jnc::GetLlvmTypeString (GetLlvmType ());
 	}
+
+	llvm::Type* 
+	GetLlvmType ();
+
+	llvm::UndefValue*
+	GetLlvmUndefValue ()
+	{
+		return llvm::UndefValue::get (GetLlvmType ());
+	}
+
+	llvm::Constant*
+	GetLlvmZeroValue ()
+	{
+		return llvm::Constant::getNullValue (GetLlvmType ());
+	}
+
+	CValue 
+	GetUndefValue ();
+
+	CValue 
+	GetZeroValue ();
 
 	int
 	Cmp (CType* pType)
@@ -295,12 +309,15 @@ public:
 	}
 	
 	bool
-	IsDoubleReferenceType ();
-
-	bool
 	IsReferenceType ()
 	{
 		return m_TypeKind == EType_Reference || m_TypeKind == EType_Reference_u;
+	}
+
+	bool
+	IsClassType ()
+	{
+		return m_TypeKind == EType_Interface || m_TypeKind == EType_Class;
 	}
 
 	bool 

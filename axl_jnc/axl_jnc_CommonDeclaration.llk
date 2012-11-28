@@ -1,26 +1,31 @@
 //.............................................................................
 
 common_declaration
-	: attribute_block?
-	  declaration_specifier_list $s
-	  (init_declarator_list $d <&$s.m_DeclSpecifiers>)?
-	  declaration_terminator_2 <IsValidLocator ($d) ? $d.m_pItem : NULL>
+	: declaration_list declaration_terminator_2 <$1.m_pLastItem>
 	;
 
 class
 {
-	CModuleItem* m_pItem;
+	CModuleItem* m_pLastItem;
 }
-init_declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
-	: init_declarator $d1 <$pDeclSpecifiers> 
-		{
-			$.m_pItem = $d1.m_pItem;
-		}
-	  (',' init_declarator $d2 <$pDeclSpecifiers> 
-		{
-			$.m_pItem = $d2.m_pItem;
-		}
-	  )*
+declaration_list
+enter
+{
+	$.m_pLastItem = NULL;
+}
+	: attribute_block?
+	  declaration_specifier_list $s
+	  (
+		init_declarator $d1 <&$s.m_DeclSpecifiers> 
+			{
+				$.m_pLastItem = $d1.m_pItem;
+			}
+		  (',' init_declarator $d2 <&$s.m_DeclSpecifiers> 
+			{
+				$.m_pLastItem = $d2.m_pItem;
+			}
+		  )*
+	  )?		
 	;
 
 class
@@ -211,59 +216,59 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 type_specifier <CTypeSpecifier* $pTypeSpecifier>
 	: EToken_Void
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Void));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
 		}
 	| EToken_Variant
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Variant));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Variant));
 		}
 	| EToken_Bool
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Bool));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool));
 		}
 	| EToken_Int
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int));
 		}
 	| EToken_Char
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Char));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char));
 		}
 	| EToken_Short
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Short));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Short));
 		}
 	| EToken_Long
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Long));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Long));
 		}
 	| EToken_Float
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Float));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Float));
 		}
 	| EToken_Double
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Double));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double));
 		}
 	| EToken_Int8
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_Int8));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8));
 		}
 	| EToken_Int16
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Int16));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Int16));
 		}
 	| EToken_Int32
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int32));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int32));
 		}
 	| EToken_Int64
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (m_Endianness == EEndianness_BigEndian ? EType_Int64_be : EType_Int64));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int64_be : EType_Int64));
 		}
 	| EToken_WChar
 		{
-			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetBasicType (EType_WChar));
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_WChar));
 		}
 	| EToken_Auto
 		{

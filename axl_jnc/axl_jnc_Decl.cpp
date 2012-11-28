@@ -209,7 +209,7 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 			Modifiers & ETypeModifier_LittleEndian
 			)
 		{
-			pType = pModule->m_TypeMgr.GetBasicType (EType_Int);
+			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 		}
 		else
 		{

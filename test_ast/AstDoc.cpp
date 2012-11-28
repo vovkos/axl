@@ -202,7 +202,8 @@ CAstDoc::Run ()
 
 void
 StdLib_OnInvalidSafePtr (
-	jnc::TSafePtr Ptr,
+	void* p,
+	jnc::TSafePtrValidator Validator,
 	int Error
 	)
 {
@@ -210,15 +211,15 @@ StdLib_OnInvalidSafePtr (
 
 	switch (Error)
 	{
-	case jnc::ESafePtrError_Load:
+	case jnc::ERuntimeError_LoadOutOfRange:
 		pErrorString = "READ";
 		break;
 
-	case jnc::ESafePtrError_Store:
+	case jnc::ERuntimeError_StoreOutOfRange:
 		pErrorString = "WRITE";
 		break;
 
-	case jnc::ESafePtrError_ScopeMismatch:
+	case jnc::ERuntimeError_ScopeMismatch:
 		pErrorString = "SCOPE_MISMATCH";
 		break;
 
@@ -230,11 +231,96 @@ StdLib_OnInvalidSafePtr (
 	throw err::CError (
 		_T("INVALID SAFE POINTER ACCESS (%s) { p = %x; range = %x:%x; scope = %d }"), 
 		pErrorString,
-		Ptr.m_p, 
-		Ptr.m_pRegionBegin, 
-		Ptr.m_pRegionEnd,
-		Ptr.m_ScopeLevel
+		p, 
+		Validator.m_pRegionBegin, 
+		Validator.m_pRegionEnd,
+		Validator.m_ScopeLevel
 		);
+}
+
+void
+StdLib_OnInvalidInterface (
+	jnc::TInterface* p,
+	size_t ScopeLevel,
+	int Error
+	)
+{
+	const tchar_t* pErrorString;
+
+	switch (Error)
+	{
+	case jnc::ERuntimeError_NullInterface:
+		pErrorString = "NULL_INTERFACE";
+		break;
+
+	case jnc::ERuntimeError_ScopeMismatch:
+		pErrorString = "SCOPE_MISMATCH";
+		break;
+
+	default:
+		ASSERT (false);
+		pErrorString = "<UNDEF>";
+	}
+	
+	throw err::CError (
+		_T("INVALID INTERFACE ACCESS (%s) { p = %x; scope = %d }"), 
+		pErrorString,
+		p, 
+		ScopeLevel
+		);
+}
+
+jnc::TInterfaceHdr* 
+StdLib_DynamicCastInterface (
+	jnc::TInterfaceHdr* p,
+	jnc::CClassType* pType
+	)
+{
+	if (!p)
+		return NULL;
+
+	if (p->m_pObject->m_pType->Cmp (pType) == 0)
+		return p;
+	
+	size_t Offset = 0;
+	bool Result = p->m_pObject->m_pType->FindBaseType (pType, &Offset);
+	if (!Result)
+		return NULL;
+	
+	jnc::TInterfaceHdr* p2 = (jnc::TInterfaceHdr*) ((uchar_t*) (p->m_pObject + 1) + Offset);
+	ASSERT (p2->m_pObject == p->m_pObject);
+
+	return p2;
+}
+
+void*
+StdLib_HeapAllocate (jnc::CType* pType)
+{
+	void* p;
+
+	if (pType->GetTypeKind () == jnc::EType_Class)
+	{
+		jnc::CClassType* pClassType = (jnc::CClassType*) pType;
+		p = malloc (pClassType->GetClassSize ());
+		pClassType->InitializeObject ((jnc::TObjectHdr*) p, 0);
+	}
+	else
+	{
+		p = malloc (pType->GetSize ());
+		memset (p, 0, pType->GetSize ());
+	}
+
+	return p;
+}
+
+void
+StdLib_InitializeObject (
+	jnc::TObjectHdr* pObject,
+	jnc::CClassType* pType,
+	int Flags
+	)
+{
+	pType->InitializeObject (pObject, Flags);
 }
 
 void
@@ -306,10 +392,11 @@ StdLib_ReadInteger ()
 bool
 CAstDoc::ExportStdLib ()
 {
-	m_pLlvmExecutionEngine->addGlobalMapping (
-		m_Module.m_FunctionMgr.GetStdFunction (jnc::EStdFunc_OnInvalidSafePtr)->GetLlvmFunction (), 
-		StdLib_OnInvalidSafePtr
-		);
+	ExportStdLibFunction (jnc::EStdFunc_OnInvalidSafePtr, StdLib_OnInvalidSafePtr);
+	ExportStdLibFunction (jnc::EStdFunc_OnInvalidInterface, StdLib_OnInvalidInterface);
+	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
+	ExportStdLibFunction (jnc::EStdFunc_InitializeObject, StdLib_InitializeObject);
+	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
 	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
@@ -346,6 +433,20 @@ CAstDoc::ExportStdLibFunction (
 		return false;
 
 	m_pLlvmExecutionEngine->addGlobalMapping (pLlvmFunction, pfn);
+	return true;
+}
+
+bool
+CAstDoc::ExportStdLibFunction (
+	jnc::EStdFunc FuncKind,
+	void* pfn
+	)
+{
+	jnc::CFunction* pFunction = m_Module.m_FunctionMgr.GetStdFunction (FuncKind);
+	if (!pFunction)
+		return false;
+
+	m_pLlvmExecutionEngine->addGlobalMapping (pFunction->GetLlvmFunction (), pfn);
 	return true;
 }
 

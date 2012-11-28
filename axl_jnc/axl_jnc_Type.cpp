@@ -143,12 +143,27 @@ CType::CType ()
 	m_Flags = 0;
 	m_Size = 0;
 	m_pLlvmType = NULL;
+	memset (m_PointerTypeArray, 0, sizeof (m_PointerTypeArray));
+}
+
+CValue 
+CType::GetUndefValue ()
+{
+	llvm::Value* pLlvmValue = GetLlvmUndefValue ();
+	return CValue (pLlvmValue, this);
+}
+
+CValue 
+CType::GetZeroValue ()
+{
+	llvm::Value* pLlvmValue = GetLlvmZeroValue ();
+	return CValue (pLlvmValue, this);
 }
 
 llvm::Type* 
 CType::GetLlvmType ()
 {
-	if (m_Flags & ETypeFlag_IsLlvmReady)
+	if (m_pLlvmType)
 		return m_pLlvmType;
 
 	llvm::Type* pLlvmType = NULL;
@@ -201,18 +216,14 @@ CType::GetLlvmType ()
 		break;
 	
 	case EType_Qualifier:
-		pLlvmType = ((CPointerType*) this)->GetBaseType ()->GetLlvmType ();
+		pLlvmType = ((CQualifierType*) this)->GetBaseType ()->GetLlvmType ();
 		break;
 	
 	case EType_Pointer:
-	case EType_Reference:
-		pLlvmType = m_pModule->m_TypeMgr.GetSafePtrStructType ()->GetLlvmType ();
-		break;
-
 	case EType_Pointer_u:
+	case EType_Reference:
 	case EType_Reference_u:
-		pLlvmType = llvm::PointerType::get (((CPointerType*) this)->GetBaseType ()->GetLlvmType (), 0);
-		break;
+		return ((CPointerType*) this)->GetLlvmType ();
 
 	case EType_Array:
 		return ((CArrayType*) this)->GetLlvmType ();
@@ -247,10 +258,12 @@ CType::GetLlvmType ()
 
 	case EType_Import:
 		return ((CImportType*) this)->GetExternType ()->GetLlvmType ();
+
+	default:
+		ASSERT (false);
 	}
 
-	m_pLlvmType = pLlvmType; // could be NULL
-	m_Flags |= ETypeFlag_IsLlvmReady;
+	m_pLlvmType = pLlvmType;
 	return pLlvmType;
 }
 
@@ -262,6 +275,10 @@ CType::GetAlignFactor ()
 	case EType_Struct:
 	case EType_Union:
 		return ((CStructType*) this)->GetAlignFactor ();
+
+	case EType_Class:
+	case EType_Interface:
+		return ((CClassType*) this)->GetAlignFactor ();
 
 	case EType_Import:
 		return ((CImportType*) this)->GetExternType ()->GetAlignFactor ();
@@ -278,7 +295,7 @@ CType::GetTypeString ()
 		return m_TypeString;
 
 	static const tchar_t*
-	BasicTypeNameTable [EType__BasicTypeCount] = 
+	PrimitiveTypeNameTable [EType__PrimitiveTypeCount] = 
 	{
 		_T("void"),
 		_T("variant"),
@@ -301,9 +318,9 @@ CType::GetTypeString ()
 		_T("double"),
 	};
 
-	if (m_TypeKind < EType__BasicTypeCount)
+	if (m_TypeKind < EType__PrimitiveTypeCount)
 	{
-		m_TypeString = BasicTypeNameTable [m_TypeKind];
+		m_TypeString = PrimitiveTypeNameTable [m_TypeKind];
 	}
 	else switch (m_TypeKind)
 	{	
@@ -387,12 +404,6 @@ CType::GetTypeString ()
 	}
 
 	return m_TypeString;
-}
-
-bool
-CType::IsDoubleReferenceType ()
-{
-	return IsReferenceType () && ((CPointerType*) this)->GetBaseType ()->IsReferenceType ();
 }
 
 bool 
@@ -586,7 +597,7 @@ CType::GetModifiedType (int Modifiers)
 			return NULL;
 
 		EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
-		pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
 	}
 
 	if (Modifiers & ETypeModifier_LittleEndian)
@@ -603,7 +614,7 @@ CType::GetModifiedType (int Modifiers)
 			return NULL;
 
 		EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
-		pType = m_pModule->m_TypeMgr.GetBasicType (ModTypeKind);
+		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
 	}
 
 	if (Modifiers & ETypeModifier_Safe)
@@ -669,7 +680,7 @@ CType::GetModifiedType (int Modifiers)
 	{
 		CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
 		CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
-			m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetBasicType (EType_Void), &pType, 1, 0) : 
+			m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void), &pType, 1, 0) : 
 			NULL;
 		pType = m_pModule->m_TypeMgr.GetPropertyType (pGetterType, pSetterType);
 	}

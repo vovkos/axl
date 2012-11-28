@@ -382,11 +382,11 @@ public:
 		CValue* pResultValue
 		)
 	{
-		CValue One;
-		One.SetConstInt32 (1);
+		CValue OneValue;
+		OneValue.SetConstInt32 (1);
 		EBinOp BinOpKind = UnOpKind == EUnOp_PreInc ? EBinOp_Add : EBinOp_Sub;
 		
-		bool Result = m_pModule->m_OperatorMgr.MoveOperator (One, OpValue, BinOpKind);
+		bool Result = m_pModule->m_OperatorMgr.MoveOperator (OneValue, OpValue, BinOpKind);
 		if (!Result)
 			return false;
 
@@ -416,15 +416,22 @@ public:
 		CValue* pResultValue
 		)
 	{
-		CValue One;
-		One.SetConstInt32 (1);
-		EBinOp BinOpKind = UnOpKind == EUnOp_PostInc ? EBinOp_Add : EBinOp_Sub;
-		
-		bool Result = m_pModule->m_OperatorMgr.MoveOperator (One, OpValue, BinOpKind);
+		bool Result;
+
+		CValue OldValue;
+		Result = m_pModule->m_OperatorMgr.PrepareOperand (OpValue, &OldValue, EOpFlag_LoadReference);
 		if (!Result)
 			return false;
 
-		*pResultValue = OpValue;
+		CValue OneValue;
+		OneValue.SetConstInt32 (1);
+		EBinOp BinOpKind = UnOpKind == EUnOp_PostInc ? EBinOp_Add : EBinOp_Sub;
+		
+		Result = m_pModule->m_OperatorMgr.MoveOperator (OneValue, OpValue, BinOpKind);
+		if (!Result)
+			return false;
+
+		*pResultValue = OldValue;
 		return true;
 	}
 };

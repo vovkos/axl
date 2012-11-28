@@ -15,13 +15,13 @@
       <Filter>llk</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_lex_Lexer.h">
-      <Filter>lex</Filter>
+      <Filter>llk\lex</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_lex_RagelLexer.h">
-      <Filter>lex</Filter>
+      <Filter>llk\lex</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_lex_Token.h">
-      <Filter>lex</Filter>
+      <Filter>llk\lex</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_llk_Node.h">
       <Filter>llk</Filter>
@@ -34,11 +34,11 @@
     <Filter Include="err">
       <UniqueIdentifier>{a2c5f902-bf6b-4ef0-bf93-0b0780dcf33e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lex">
-      <UniqueIdentifier>{faa98d39-d2c3-4961-ba42-160edb835cc6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="llk">
       <UniqueIdentifier>{ea459731-7999-4ec7-a3ef-3fb89088bf2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="llk\lex">
+      <UniqueIdentifier>{faa98d39-d2c3-4961-ba42-160edb835cc6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
