@@ -136,23 +136,6 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 
 //.............................................................................
 
-CFunctionFormalArg*
-CDeclFunctionSuffix::AddArg (
-	const rtl::CString& Name,
-	CType* pType,
-	const CValue& DefaultValue
-	)
-{
-	CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
-	pArg->m_Name = Name;
-	pArg->m_pType = pType;
-	pArg->m_DefaultValue = DefaultValue;
-	m_ArgList.InsertTail (pArg);
-	return pArg;
-}
-
-//.............................................................................
-
 CDeclPointer*
 CDeclarator::AddPointer (EType TypeKind)
 {

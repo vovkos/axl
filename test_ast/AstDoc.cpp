@@ -137,6 +137,16 @@ CAstDoc::Compile ()
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
 		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		return false;
+	}
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Allocating globals...\n"));
+	Result = m_Module.m_VariableMgr.AllocateGlobalVariables ();
+	if (!Result)
+	{
+		rtl::CString Text = err::GetError ()->GetDescription ();
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		return false;
 	}
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
@@ -145,9 +155,20 @@ CAstDoc::Compile ()
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
 		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		return false;
 	}
 
 	ExportStdLib ();
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting functions...\n"));
+
+	Result = m_Module.m_FunctionMgr.JitFunctions (m_pLlvmExecutionEngine);
+	if (!Result)
+	{
+		rtl::CString Text = err::GetError ()->GetDescription ();
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		return false;
+	}
 
 	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
 	pMainFrame->m_ModulePane.Build (&m_Module);
@@ -160,17 +181,19 @@ CAstDoc::Compile ()
 bool
 CAstDoc::Run ()
 {
+	bool Result;
+
 	CMainFrame* pMainFrame = GetMainFrame ();
 
 	if (IsModified ())
 	{
-		bool Result = Compile ();
+		Result = Compile ();
 		if (!Result)
 			return false;
 	}
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Finding 'main'...\n"));
-	
+
 	jnc::CFunction* pFunction = FindGlobalFunction (_T("main"));
 	if (!pFunction)
 	{
@@ -178,14 +201,11 @@ CAstDoc::Run ()
 		return false;
 	}
 		
-	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
-	
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting...\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Running...\n"));
 
 	typedef int (*FMain) ();
-	FMain pfnMain = (FMain) m_pLlvmExecutionEngine->getPointerToFunction (pLlvmFunction);
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Running...\n"));
+	FMain pfnMain = (FMain) pFunction->GetFunctionPointer ();
+	ASSERT (pfnMain);
 
 	try
 	{
@@ -241,7 +261,6 @@ StdLib_OnInvalidSafePtr (
 void
 StdLib_OnInvalidInterface (
 	jnc::TInterface* p,
-	size_t ScopeLevel,
 	int Error
 	)
 {
@@ -263,10 +282,9 @@ StdLib_OnInvalidInterface (
 	}
 	
 	throw err::CError (
-		_T("INVALID INTERFACE ACCESS (%s) { p = %x; scope = %d }"), 
+		_T("INVALID INTERFACE ACCESS (%s) { p = %x }"), 
 		pErrorString,
-		p, 
-		ScopeLevel
+		p
 		);
 }
 
@@ -301,8 +319,7 @@ StdLib_HeapAllocate (jnc::CType* pType)
 	if (pType->GetTypeKind () == jnc::EType_Class)
 	{
 		jnc::CClassType* pClassType = (jnc::CClassType*) pType;
-		p = malloc (pClassType->GetClassSize ());
-		pClassType->InitializeObject ((jnc::TObjectHdr*) p, 0);
+		p = malloc (pClassType->GetClassStructType ()->GetSize ());
 	}
 	else
 	{
@@ -311,16 +328,6 @@ StdLib_HeapAllocate (jnc::CType* pType)
 	}
 
 	return p;
-}
-
-void
-StdLib_InitializeObject (
-	jnc::TObjectHdr* pObject,
-	jnc::CClassType* pType,
-	int Flags
-	)
-{
-	pType->InitializeObject (pObject, Flags);
 }
 
 void
@@ -395,7 +402,6 @@ CAstDoc::ExportStdLib ()
 	ExportStdLibFunction (jnc::EStdFunc_OnInvalidSafePtr, StdLib_OnInvalidSafePtr);
 	ExportStdLibFunction (jnc::EStdFunc_OnInvalidInterface, StdLib_OnInvalidInterface);
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
-	ExportStdLibFunction (jnc::EStdFunc_InitializeObject, StdLib_InitializeObject);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
 	ExportStdLibFunction (_T("printf"), StdLib_printf);

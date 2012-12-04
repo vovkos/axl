@@ -17,7 +17,7 @@ rtl::CStringA
 CFunctionType::CreateSignature (
 	EType TypeKind,
 	CType* pReturnType,
-	CType** ppArgType,
+	CType* const* ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
@@ -44,7 +44,7 @@ rtl::CString
 CFunctionType::CreateTypeString (
 	EType TypeKind,
 	CType* pReturnType,
-	CType** ppArgType,
+	CType* const* ppArgType,
 	size_t ArgCount,
 	int Flags
 	)

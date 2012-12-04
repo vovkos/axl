@@ -79,6 +79,7 @@
     <ClInclude Include="..\Inc\axl_jnc_BasicBlock.h" />
     <ClInclude Include="..\inc\axl_jnc_BinaryOperator.h" />
     <ClInclude Include="..\Inc\axl_jnc_BitFieldType.h" />
+    <ClInclude Include="..\inc\axl_jnc_Closure.h" />
     <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_ControlFlowMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_EnumType.h" />
@@ -99,7 +100,6 @@
     <ClInclude Include="..\inc\axl_jnc_PointerType.h" />
     <ClInclude Include="..\inc\axl_jnc_Scope.h" />
     <ClInclude Include="..\Inc\axl_jnc_StructType.h" />
-    <ClInclude Include="..\inc\axl_jnc_StructTypeRoot.h" />
     <ClInclude Include="..\Inc\axl_jnc_Type.h" />
     <ClInclude Include="..\Inc\axl_jnc_TypeMgr.h" />
     <ClInclude Include="..\inc\axl_jnc_UnaryOperator.h" />
@@ -118,6 +118,7 @@
     <ClCompile Include="axl_jnc_AttributeMgr.cpp" />
     <ClCompile Include="axl_jnc_BasicBlock.cpp" />
     <ClCompile Include="axl_jnc_BinaryOperator.cpp" />
+    <ClCompile Include="axl_jnc_Closure.cpp" />
     <ClCompile Include="axl_jnc_ConstMgr.cpp" />
     <ClCompile Include="axl_jnc_ControlFlowMgr.cpp" />
     <ClCompile Include="axl_jnc_Decl.cpp" />
@@ -140,7 +141,6 @@
     <ClCompile Include="axl_jnc_PointerType.cpp" />
     <ClCompile Include="axl_jnc_Scope.cpp" />
     <ClCompile Include="axl_jnc_StructType.cpp" />
-    <ClCompile Include="axl_jnc_StructTypeRoot.cpp" />
     <ClCompile Include="axl_jnc_Type.cpp" />
     <ClCompile Include="axl_jnc_TypeMgr.cpp" />
     <ClCompile Include="axl_jnc_UnaryOperator.cpp" />

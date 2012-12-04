@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_OperatorMgr.h"
+#include "axl_jnc_Closure.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -606,8 +607,8 @@ COperatorMgr::StructMemberOperator (
 	if (OpValueKind == EValue_Const)
 	{
 		pResultValue->CreateConst (
-			pMember->GetType (), 
-			(char*) OpValue.GetConstData () + Offset
+			(char*) OpValue.GetConstData () + Offset,
+			pMember->GetType () 
 			);
 
 		return true;
@@ -689,7 +690,7 @@ COperatorMgr::UnionMemberOperator (
 	EValue OpValueKind = OpValue.GetValueKind ();
 	if (OpValueKind == EValue_Const)
 	{
-		pResultValue->CreateConst (pMember->GetType (), OpValue.GetConstData ());
+		pResultValue->CreateConst (OpValue.GetConstData (), pMember->GetType ());
 		return true;
 	}
 
@@ -741,7 +742,7 @@ COperatorMgr::ClassMemberOperator (
 	)
 {
 	size_t BaseTypeOffset;
-	size_t BaseTypeMethodTableIndex;
+	size_t BaseTypeVTableIndex;
 
 	char Buffer [256];
 	rtl::CArrayT <size_t> LlvmBaseTypeIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
@@ -750,7 +751,7 @@ COperatorMgr::ClassMemberOperator (
 		pName, 
 		&BaseTypeOffset, 
 		&LlvmBaseTypeIndexArray,
-		&BaseTypeMethodTableIndex
+		&BaseTypeVTableIndex
 		);
 	
 	if (!pMember)
@@ -759,15 +760,9 @@ COperatorMgr::ClassMemberOperator (
 		return false;
 	}
 
-	CClassType* pParentType = pMember->GetParentType ();
-	if (pParentType->GetTypeKind () != EType_Interface)
+	if (pMember->GetAccess () != EAccess_Public)
 	{
-		err::SetFormatStringError (
-			_T("'%s' is only accessible from methods of '%s' or its descendants"), 
-			pMember->GetQualifiedName (), 
-			pParentType->GetTypeString ()
-			);
-
+		err::SetFormatStringError (_T("'%s' is not accessible"), pMember->GetQualifiedName ());
 		return false;
 	}
 
@@ -793,7 +788,7 @@ COperatorMgr::ClassMemberOperator (
 			OpValue, 
 			pClassType, 
 			(CClassMethodMember*) pMember, 
-			BaseTypeMethodTableIndex,
+			BaseTypeVTableIndex,
 			pResultValue
 			);
 
@@ -802,7 +797,7 @@ COperatorMgr::ClassMemberOperator (
 			OpValue, 
 			pClassType, 
 			(CClassPropertyMember*) pMember, 
-			BaseTypeMethodTableIndex,
+			BaseTypeVTableIndex,
 			pResultValue
 			);
 
@@ -830,9 +825,6 @@ COperatorMgr::ClassFieldMemberOperator (
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ScopeLevelValue);
 
-	rtl::CString s1 = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
-	size_t c = pLlvmBaseTypeIndexArray->GetCount ();
-
 	m_pModule->m_LlvmBuilder.CreateGep (
 		PtrValue, 
 		*pLlvmBaseTypeIndexArray, 
@@ -840,8 +832,6 @@ COperatorMgr::ClassFieldMemberOperator (
 		NULL,
 		&PtrValue
 		);
-
-	rtl::CString s2 = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
 
 	CPointerType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
 
@@ -862,12 +852,56 @@ COperatorMgr::ClassMethodMemberOperator (
 	const CValue& OpValue,
 	CClassType* pClassType,
 	CClassMethodMember* pMember,
-	size_t BaseTypeMethodTableIndex,
+	size_t BaseTypeVTableIndex,
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("COperatorMgr::ClassMethodMemberOperator not implemented yet"));
-	return false;
+	CFunction* pFunction = pMember->GetFunction ();
+
+	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+
+	size_t IndexArray [] = 
+	{
+		0, // class.iface*
+		0, // class.iface.hdr*
+		0, // class.vtbl**
+	};
+
+	m_pModule->m_LlvmBuilder.CreateGep (
+		PtrValue, 
+		IndexArray, 
+		countof (IndexArray),
+		NULL, 
+		&PtrValue
+		);
+
+	// class.vtbl*
+
+	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
+
+	// pfn*
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (
+		PtrValue, 
+		BaseTypeVTableIndex + pFunction->GetVTableIndex (),
+		NULL, 
+		&PtrValue
+		);
+
+	// pfn
+
+	m_pModule->m_LlvmBuilder.CreateLoad (
+		PtrValue, 
+		NULL,
+		&PtrValue
+		);
+
+	pResultValue->SetLlvmValue (PtrValue.GetLlvmValue (), pFunction->GetType ());
+
+	CClosure* pClosure = pResultValue->CreateClosure ();
+	pClosure->CreateArg (0, OpValue);
+	return true;
 }
 
 bool
@@ -875,12 +909,15 @@ COperatorMgr::ClassPropertyMemberOperator (
 	const CValue& OpValue,
 	CClassType* pClassType,
 	CClassPropertyMember* pMember,
-	size_t BaseTypeMethodTableIndex,
+	size_t BaseTypeVTableIndex,
 	CValue* pResultValue
 	)
 {
 	err::SetFormatStringError (_T("COperatorMgr::ClassPropertyMemberOperator not implemented yet"));
-	return false;
+
+	CClosure* pClosure = pResultValue->CreateClosure ();
+	pClosure->CreateArg (0, OpValue);
+	return true;
 }
 
 bool
@@ -901,9 +938,13 @@ COperatorMgr::StackNewOperator (
 		CClassType* pClassType = (CClassType*) pType;
 
 		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetLlvmClassType (), _T("new"), NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, EObjectFlag_IsStack);
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 0, 2, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetClassStructType (), _T("new"), NULL, &PtrValue);
+		
+		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, EObjectFlag_IsStack);
+		if (!Result)
+			return false;
+
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, NULL, &PtrValue);
 		m_pModule->m_LlvmBuilder.CreateInterface (
 			PtrValue, 
 			pScope,
@@ -938,7 +979,7 @@ COperatorMgr::HeapNewOperator (
 	CValue* pResultValue
 	)
 {
-	CValue TypeValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &pType);
+	CValue TypeValue (&pType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
 	CFunction* pHeapAllocate = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAllocate);
 
@@ -954,8 +995,15 @@ COperatorMgr::HeapNewOperator (
 	{
 		CClassType* pClassType = (CClassType*) pType;
 
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pClassType->GetLlvmClassPtrType (), &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 0, 2, NULL, &PtrValue);
+		CPointerType* pPointerType = pClassType->GetClassStructType ()->GetPointerType (EType_Pointer_u);
+		
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPointerType, &PtrValue);
+
+		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, 0);
+		if (!Result)
+			return false;
+
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, NULL, &PtrValue);
 		m_pModule->m_LlvmBuilder.CreateInterface (
 			PtrValue, 
 			NULL,
@@ -1020,28 +1068,24 @@ COperatorMgr::CallOperator (
 	if (!Result)
 		return false;
 
-	CFunction* pFunction;
-
-	EValue ValueKind = OpValue.GetValueKind ();
-	switch (ValueKind)
+	if (OpValue.GetType ()->GetTypeKind () != EType_Function)
 	{
-	case EValue_Function:
-		pFunction = OpValue.GetFunction ();
-		break;
-
-	case EValue_FunctionOverload:
-		// TODO: find overload based on arg list
-		pFunction = OpValue.GetFunctionOverload ()->GetFunction ();
-		break;
-
-	default:
-		err::SetFormatStringError (_T("cannot call %s"), OpValue.GetValueKindString ());
+		err::SetFormatStringError (_T("cannot call '%s'"), OpValue.GetType ()->GetTypeString ());
 		return false;
 	}
 
-	CFunctionType* pFunctionType = pFunction->GetType ();
+	CClosure* pClosure = OpValue.GetClosure ();
+	if (pClosure)
+	{
+		Result = pClosure->Apply (pArgList);
+		if (!Result)
+			return false;
+	}
 
-	size_t FormalArgCount = pFunctionType->GetArgCount ();
+	CFunctionType* pFunctionType = (CFunctionType*) OpValue.GetType ();
+	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
+
+	size_t FormalArgCount = ArgTypeArray.GetCount ();
 	size_t ActualArgCount = pArgList->GetCount ();
 
 	bool IsVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsVarArg) != 0;
@@ -1050,7 +1094,12 @@ COperatorMgr::CallOperator (
 	if (IsVarArg && ActualArgCount < FormalArgCount ||
 		!IsVarArg && ActualArgCount != FormalArgCount)
 	{
-		err::SetFormatStringError (_T("function '%s' takes %d arguments; %d passed"), pFunction->GetTag (), FormalArgCount, ActualArgCount);
+		err::SetFormatStringError (
+			_T("'%s' takes %d arguments; %d passed"), 
+			pFunctionType->GetTypeString (), 
+			FormalArgCount, 
+			ActualArgCount
+			);
 		return false;
 	}
 
@@ -1061,7 +1110,7 @@ COperatorMgr::CallOperator (
 	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
 	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
 	{
-		CType* pFormalArgType = pFunctionType->GetArgType (i);
+		CType* pFormalArgType = ArgTypeArray [i];
 		
 		CValue ArgCast;
 		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
@@ -1086,10 +1135,10 @@ COperatorMgr::CallOperator (
 	}
 
 	m_pModule->m_LlvmBuilder.CreateCall (
-		pFunction, 
+		OpValue, 
 		ArgArray,
 		ArgArray.GetCount (),
-		pFunction->GetType ()->GetReturnType (), 
+		pFunctionType->GetReturnType (), 
 		pResultValue
 		);
 
@@ -1389,6 +1438,14 @@ COperatorMgr::StoreReferenceOperator (
 
 		break;
 
+	case EType_Class:
+	case EType_Interface:
+		Result = m_pModule->m_LlvmBuilder.CheckInterfaceScope (SrcValue, DstValue.GetScope ());
+		if (!Result)
+			return false;
+
+		break;
+
 	case EType_BitField:
 		Result = MergeBitField (&SrcValue, DstValue);
 		if (!Result)
@@ -1498,8 +1555,9 @@ COperatorMgr::GetPropertyOperator (
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("getting property is not implemented yet"));
-	return false;
+	CFunction* pFunction = pProperty->GetGetter ();
+	rtl::CBoxListT <CValue> ArgList;
+	return CallOperator (pFunction, &ArgList, pResultValue);
 }
 
 bool
@@ -1515,8 +1573,12 @@ COperatorMgr::SetPropertyOperator (
 		return false;
 	}
 
-	err::SetFormatStringError (_T("setting properies not implemented yet"));
-	return false;
+	CFunction* pFunction = pSetter->GetFunction ();
+	rtl::CBoxListT <CValue> ArgList;
+	ArgList.InsertTail (SrcValue);
+
+	CValue ReturnValue;
+	return CallOperator (pFunction, &ArgList, &ReturnValue);
 }
 
 //.............................................................................

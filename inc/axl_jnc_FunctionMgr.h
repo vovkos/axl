@@ -71,7 +71,6 @@ enum EStdFunc
 	// void
 	// jnc.OnInvalidInterface (
 	//		int8* p,
-	//		size_t ScopeLevel,
 	//		int Error
 	//		);
 
@@ -84,15 +83,6 @@ enum EStdFunc
 	//		);
 
 	EStdFunc_DynamicCastInterface,
-
-	// int8*
-	// jnc.InitializeObject (
-	//		int8* p,
-	//		int8* pType,
-	//		int Flags
-	//		);
-
-	EStdFunc_InitializeObject,
 
 	// int8*
 	// jnc.HeapAllocate (int8* pType);
@@ -163,11 +153,19 @@ public:
 
 	CFunction*
 	CreateFunction (
+		EFunction FunctionKind,
 		const rtl::CString& Tag,
 		CFunctionType* pType,
 		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
 		);
 
+	CFunction*
+	CreateGlobalFunction (
+		const rtl::CString& Name,
+		CFunctionType* pType,
+		rtl::CStdListT <CFunctionFormalArg>* pArgList
+		);
+	
 	CProperty*
 	CreateProperty (
 		CPropertyType* pType,
@@ -177,13 +175,6 @@ public:
 
 	CProperty*
 	CreateProperty (CPropertyType* pType);
-
-	CGlobalFunction*
-	CreateGlobalFunction (
-		const rtl::CString& Name,
-		CFunctionType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList
-		);
 
 	CGlobalProperty*
 	CreateGlobalProperty (
@@ -202,41 +193,60 @@ public:
 	bool
 	CompileFunctions ();
 
+	bool
+	JitFunctions (llvm::ExecutionEngine* pExecutionEngine);
+
 	CFunction*
 	GetStdFunction (EStdFunc Func);
 
+	CFunction*
+	CreateClassInitializer (CClassType* pType);
+
 protected:
+
 	// LLVM code support functions
 
 	CFunction*
-	GetCreateSafePtrValidator ();
+	CreateCreateSafePtrValidator ();
 
 	CFunction*
-	GetCheckSafePtrRange ();
+	CreateCheckSafePtrRange ();
 
 	CFunction*
-	GetCheckSafePtrScope ();
+	CreateCheckSafePtrScope ();
 
 	CFunction*
-	GetOnInvalidSafePtr ();
+	CreateOnInvalidSafePtr ();
 
 	CFunction*
-	GetCheckInterfaceNull ();
+	CreateCheckInterfaceNull ();
 
 	CFunction*
-	GetCheckInterfaceScope ();
+	CreateCheckInterfaceScope ();
 
 	CFunction*
-	GetOnInvalidInterface ();
+	CreateOnInvalidInterface ();
 
 	CFunction*
-	GetDynamicCastInterface ();
+	CreateDynamicCastInterface ();
 
 	CFunction*
-	GetInitializeObject ();
+	CreateHeapAllocate ();
 
-	CFunction*
-	GetHeapAllocate ();
+	bool
+	InitializeInterface (
+		CClassType* pType,
+		const CValue& ObjectPtrValue,
+		const CValue& IfacePtrValue,
+		const CValue& VTablePtrValue
+		);
+
+	bool
+	CreateThisValue (
+		const CValue& ArgValue,
+		CClassType* pResultType,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................

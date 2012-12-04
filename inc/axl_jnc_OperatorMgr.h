@@ -355,7 +355,7 @@ protected:
 		const CValue& OpValue,
 		CClassType* pClassType,
 		CClassMethodMember* pMember,
-		size_t BaseTypeMethodTableIndex,
+		size_t BaseTypeVTableIndex,
 		CValue* pResultValue
 		);
 
@@ -364,7 +364,7 @@ protected:
 		const CValue& OpValue,
 		CClassType* pClassType,
 		CClassPropertyMember* pMember,
-		size_t BaseTypeMethodTableIndex,
+		size_t BaseTypeVTableIndex,
 		CValue* pResultValue
 		);
 

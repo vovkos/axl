@@ -203,6 +203,12 @@ public:
 		m_p = NULL;
 	}
 
+	CArrayT (T e)
+	{ 
+		m_p = NULL;
+		Copy (&e, 1);
+	}
+
 	CArrayT (const CArrayT& Src)
 	{   
 		m_p = NULL;
@@ -355,6 +361,12 @@ public:
 
 		CDetails::Copy (m_p, p, Count);
 		return true;
+	}
+
+	bool 
+	Copy (T e)
+	{
+		return Copy (&e, 1);
 	}
 
 	T* 

@@ -51,6 +51,8 @@ Members
 	size_t m_DefaultStructPackFactor;
 	EEndianness m_Endianness;
 	EStage m_Stage;
+	CValue m_ThisValue;
+	CClassType* m_pThisType;
 
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
 
@@ -166,6 +168,9 @@ Members
 		const rtl::CString& Name,
 		CValue* pValue
 		);
+
+	bool
+	SetThis (CValue* pValue);
 } 
 
 OpenNamespace

@@ -131,5 +131,18 @@ public:
 
 //.............................................................................
 
+inline
+void 
+LlvmFatalErrorHandler (
+	void* pContext,
+	const std::string& ErrorString
+	)
+{
+	throw err::CError (ErrorString.c_str ());
+}
+
+//.............................................................................
+
+
 } // namespace axl {
 } // namespace jnc {

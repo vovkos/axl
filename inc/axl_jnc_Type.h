@@ -140,6 +140,8 @@ enum ETypeFlag
 {
 	ETypeFlag_IsPod          = 0x0100, // plain-old-data
 	ETypeFlag_IsImport       = 0x0200, // is or references an import type
+	ETypeFlag_IsLayoutReady  = 0x0400,
+	ETypeFlag_IsLayoutCalc   = 0x0800,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -199,6 +201,7 @@ protected:
 	int m_Flags;
 		
 	rtl::CStringA m_Signature;
+	rtl::CString m_Tag;
 	rtl::CString m_TypeString;
 	rtl::CString m_LlvmTypeString;
 
@@ -234,6 +237,12 @@ public:
 	GetSignature ()
 	{
 		return m_Signature;
+	}
+
+	rtl::CString
+	GetTag ()
+	{
+		return m_Tag;
 	}
 
 	rtl::CString 
@@ -329,6 +338,17 @@ public:
 	bool 
 	IsCharPointerType (CType* pType);
 
+	bool
+	HasLayout ()
+	{
+		return 
+			m_TypeKind == EType_Struct || m_TypeKind == EType_Union ||
+			m_TypeKind == EType_Interface || m_TypeKind == EType_Class;
+	}
+
+	bool 
+	CalcLayout ();
+
 	CPointerType* 
 	GetPointerType (EType TypeKind);
 
@@ -340,6 +360,13 @@ public:
 
 	CType*
 	GetUnqualifiedType ();
+
+protected:
+	bool 
+	PreCalcLayout ();
+
+	void
+	PostCalcLayout ();
 };
 
 //.............................................................................

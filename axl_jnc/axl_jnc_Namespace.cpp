@@ -119,21 +119,33 @@ CNamespace::FindItem (const tchar_t* pName)
 CModuleItem*
 CNamespace::FindItemTraverse (const CQualifiedName& Name)
 {
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It;
+
 	// first find the root of qualified name
 
 	CNamespace* pNamespace = this;
 	CModuleItem* pItem = NULL;
 
-	while (pNamespace)
+	It = pNamespace->m_ItemMap.Find (Name.m_First); 
+	if (It)
 	{
-		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
-		if (It)
+		pNamespace = this;
+		pItem = It->m_Value;
+	}
+	else
+	{
+		pNamespace = m_pParentNamespace;
+		while (pNamespace)
 		{
-			pItem = It->m_Value;
-			break;
-		}
+			It = pNamespace->m_ItemMap.Find (Name.m_First); 
+			if (It)
+			{
+				pItem = It->m_Value;
+				break;
+			}
 
-		pNamespace = pNamespace->m_pParentNamespace;
+			pNamespace = pNamespace->m_pParentNamespace;
+		}
 	}
 
 	if (!pItem)
@@ -148,7 +160,7 @@ CNamespace::FindItemTraverse (const CQualifiedName& Name)
 		if (!pNamespace)
 			return NULL;
 
-		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = pNamespace->m_ItemMap.Find (Name.m_First); 
+		It = pNamespace->m_ItemMap.Find (Name.m_First); 
 		if (!It)
 			return NULL;
 

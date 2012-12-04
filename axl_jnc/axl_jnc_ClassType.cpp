@@ -7,12 +7,24 @@ namespace jnc {
 
 //.............................................................................
 
+CClassType::CClassType ()
+{
+	m_TypeKind = EType_Class;
+	m_PackFactor = 8;
+	m_pInitializer = NULL;
+	m_pFinalizer = NULL;
+	m_pPointerStructType = NULL;
+	m_pInterfaceStructType = NULL;
+	m_pClassStructType = NULL;
+	m_pVTableStructType = NULL;
+}
+
 bool
 CClassType::FindBaseType (
 	CClassType* pType,
 	size_t* pOffset,
 	rtl::CArrayT <size_t>* pLlvmIndexArray,
-	size_t* pMethodTableIndex
+	size_t* pVTableIndex
 	)
 {
 	rtl::CStringHashTableMapIteratorAT <CClassBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
@@ -21,13 +33,13 @@ CClassType::FindBaseType (
 		CClassBaseType* pBaseType = It->m_Value;
 
 		if (pOffset)
-			*pOffset = pBaseType->m_Offset;
+			*pOffset = pBaseType->GetOffset ();
 
 		if (pLlvmIndexArray)
-			pLlvmIndexArray->Copy (&pBaseType->m_LlvmIndex, 1);
+			pLlvmIndexArray->Copy (pBaseType->GetLlvmIndex ());
 
-		if (pMethodTableIndex)
-			*pMethodTableIndex = pBaseType->m_MethodTableIndex;
+		if (pVTableIndex)
+			*pVTableIndex = pBaseType->m_VTableIndex;
 
 		return true;
 	}
@@ -39,21 +51,21 @@ CClassType::FindBaseType (
 	for (; BaseType; BaseType++)
 	{
 		size_t Offset;
-		size_t MethodTableIndex;
+		size_t VTableIndex;
 
-		bool Result = BaseType->m_pType->FindBaseType (pType, &Offset, &LlvmIndexArray, &MethodTableIndex);
+		bool Result = BaseType->m_pType->FindBaseType (pType, &Offset, &LlvmIndexArray, &VTableIndex);
 		if (Result)
 		{
 			if (pOffset)
-				*pOffset = BaseType->m_Offset + Offset;
+				*pOffset = BaseType->GetOffset () + Offset;
 
-			if (pMethodTableIndex)
-				*pMethodTableIndex = BaseType->m_MethodTableIndex + MethodTableIndex;
+			if (pVTableIndex)
+				*pVTableIndex = BaseType->m_VTableIndex + VTableIndex;
 
 			if (pLlvmIndexArray)
 			{
 				pLlvmIndexArray->Clear ();
-				pLlvmIndexArray->Append (BaseType->m_LlvmIndex);
+				pLlvmIndexArray->Append (BaseType->GetLlvmIndex ());
 				pLlvmIndexArray->Append (LlvmIndexArray);
 			}
 
@@ -86,14 +98,26 @@ CClassType::FindMember (
 	const tchar_t* pName,
 	size_t* pBaseTypeOffset,
 	rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
-	size_t* pBaseTypeMethodTableIndex
+	size_t* pBaseTypeVTableIndex
 	)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
 	if (It)
 	{
 		CModuleItem* pItem = It->m_Value;
-		return pItem->GetItemKind () == EModuleItem_ClassMember ? (CClassMember*) pItem : NULL;
+		if (pItem->GetItemKind () != EModuleItem_ClassMember)
+			return NULL;
+
+		if (pBaseTypeOffset)
+			*pBaseTypeOffset = 0;
+
+		if (pLlvmBaseTypeIndexArray)
+			pLlvmBaseTypeIndexArray->Clear ();
+
+		if (pBaseTypeVTableIndex)
+			*pBaseTypeVTableIndex = 0;
+
+		return (CClassMember*) pItem;
 	}
 
 	char Buffer [256];
@@ -103,27 +127,27 @@ CClassType::FindMember (
 	for (; BaseType; BaseType++)
 	{
 		size_t BaseTypeOffset;
-		size_t BaseTypeMethodTableIndex;
+		size_t BaseTypeVTableIndex;
 
 		CClassMember* pMember = BaseType->m_pType->FindMember (
 			pName, 
 			&BaseTypeOffset, 
 			&LlvmBaseTypeIndexArray,
-			&BaseTypeMethodTableIndex
+			&BaseTypeVTableIndex
 			);
 
 		if (pMember)
 		{
 			if (pBaseTypeOffset)
-				*pBaseTypeOffset = BaseType->m_Offset + BaseTypeOffset;
+				*pBaseTypeOffset = BaseType->GetOffset () + BaseTypeOffset;
 
-			if (pBaseTypeMethodTableIndex)
-				*pBaseTypeMethodTableIndex = BaseType->m_MethodTableIndex + BaseTypeMethodTableIndex;
+			if (pBaseTypeVTableIndex)
+				*pBaseTypeVTableIndex = BaseType->m_VTableIndex + BaseTypeVTableIndex;
 
 			if (pLlvmBaseTypeIndexArray)
 			{
 				pLlvmBaseTypeIndexArray->Clear ();
-				pLlvmBaseTypeIndexArray->Append (BaseType->m_LlvmIndex);
+				pLlvmBaseTypeIndexArray->Append (BaseType->GetLlvmIndex ());
 				pLlvmBaseTypeIndexArray->Append (LlvmBaseTypeIndexArray);	
 			}
 
@@ -155,10 +179,11 @@ CClassType::CreateFieldMember (
 	return pMember;
 }
 
-CClassMethod*
-CClassType::CreateMethod (
+CFunction*
+CClassType::CreateMethodMember (
 	const rtl::CString& Name,
-	CFunction* pFunction
+	CFunctionType* pType,
+	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
 	CClassMethodMember* pMethodMember = NULL;
@@ -168,7 +193,9 @@ CClassType::CreateMethod (
 	{
 		pMethodMember = AXL_MEM_NEW (CClassMethodMember);
 		pMethodMember->m_Name = Name;
+		pMethodMember->m_pParentNamespace = this;
 		m_MethodMemberList.InsertTail (pMethodMember);
+		It->m_Value = pMethodMember;
 	}
 	else
 	{
@@ -189,17 +216,31 @@ CClassType::CreateMethod (
 
 	ASSERT (pMethodMember);
 
-	size_t MethodTableIndex = m_MethodTable.GetCount ();
-	m_MethodTable.SetCount (MethodTableIndex + 1);
+	// adjust type
 
-	CClassMethod* pMethod = AXL_MEM_NEW (CClassMethod);
-	pMethod->m_pMethodMember = pMethodMember;
-	pMethod->m_pFunction = pFunction;
-	pMethod->m_MethodTableIndex = MethodTableIndex;
-	
-	pMethodMember->m_OverloadList.InsertTail (pMethod);
+	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, this);
+		
+	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (
+		pType->GetReturnType (),
+		ArgTypeArray,
+		pType->GetFlags ()
+		);
 
-	return pMethod;
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (
+		EFunction_Method,
+		pMethodMember->GetQualifiedName (),
+		pFullType,
+		pArgList
+		);
+
+	pFunction->m_pClosureType = pType;
+
+	bool Result = pMethodMember->AddOverload (pFunction);
+	if (!Result)
+		return NULL;
+
+	return pFunction;
 }
 
 CClassPropertyMember*
@@ -209,13 +250,13 @@ CClassType::CreatePropertyMember (
 	)
 {
 	size_t SetterCount = pProperty->GetSetter ()->GetOverloadCount ();
-	size_t MethodTableIndex = m_MethodTable.GetCount ();
-	m_MethodTable.SetCount (MethodTableIndex + 1 + SetterCount);
+	size_t VTableIndex = m_VTable.GetCount ();
+	m_VTable.SetCount (VTableIndex + 1 + SetterCount);
 
 	CClassPropertyMember* pMember = AXL_MEM_NEW (CClassPropertyMember);
 	pMember->m_Name = Name;
 	pMember->m_pProperty = pProperty;
-	pMember->m_MethodTableIndex = MethodTableIndex;
+	pMember->m_VTableIndex = VTableIndex;
 	m_PropertyMemberList.InsertTail (pMember);
 
 	bool Result = AddItem (pMember);
@@ -228,164 +269,201 @@ CClassType::CreatePropertyMember (
 bool
 CClassType::CalcLayout ()
 {
-	bool Result;
+	if (m_Flags & ETypeFlag_IsLayoutReady)
+		return true;
 
-	size_t Offset;
-	size_t LlvmIndex;
+	bool Result = PreCalcLayout ();
+	if (!Result)
+		return false;
 
-	ResetLayout ();
+	m_pVTableStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pVTableStructType->m_Tag.Format (_T("%s.vtbl"), m_Tag);
 
-	// layout as EType_Interface 
+	m_pInterfaceHdrStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+	m_pInterfaceHdrStructType->m_Tag.Format (_T("%s.iface.hdr"), m_Tag);
+	m_pInterfaceHdrStructType->CreateMember (m_pVTableStructType->GetPointerType (EType_Pointer_u));
+	m_pInterfaceHdrStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr)->GetPointerType (EType_Pointer_u));
 
-	CType* pObjectHdrType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr);
-	LayoutField (pObjectHdrType->GetPointerType (EType_Pointer_u), &Offset, &LlvmIndex); // TObject* m_pObject;
-	LayoutField (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &Offset, &LlvmIndex); // void** m_pMethodTable;
+	m_pInterfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+	m_pInterfaceStructType->m_Tag.Format (_T("%s.iface"), m_Tag);
+	m_pInterfaceStructType->AddBaseType (m_pInterfaceHdrStructType);
 
-	size_t MethodCount = 0;
+	m_pPointerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pPointerStructType->m_Tag.Format (_T("%s.ptr"), m_Tag);
+	m_pPointerStructType->CreateMember (GetInterfaceStructType ()->GetPointerType (EType_Pointer_u));
+	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_pPointerStructType->CalcLayout ();
 
 	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		CClassBaseType* pBaseType = *BaseType;
+		CClassType* pBaseClassType = BaseType->m_pType;
 
-		Result = LayoutField (
-			pBaseType->m_pType->GetLlvmInterfaceType (),
-			pBaseType->m_pType->GetFieldActualSize (),
-			pBaseType->m_pType->GetAlignFactor (),
-			&pBaseType->m_Offset,
-			&pBaseType->m_LlvmIndex
-			);
-
+		Result = pBaseClassType->CalcLayout ();
 		if (!Result)
 			return false;
+				
+		BaseType->m_pStructBaseType = m_pInterfaceStructType->AddBaseType (pBaseClassType->GetInterfaceStructType ());
+		BaseType->m_VTableIndex = m_VTable.GetCount ();
 
-		pBaseType->m_MethodTableIndex = MethodCount;
-		MethodCount += pBaseType->m_pType->m_MethodTable.GetCount ();
+		m_VTable.Append (pBaseClassType->m_VTable);
+
+		rtl::CIteratorT <CStructMember> VTableMember = pBaseClassType->GetVTableStructType ()->GetFirstMember ();
+		for (; VTableMember; VTableMember++)		
+			m_pVTableStructType->CreateMember (VTableMember->GetType ());
 	}
 
-	rtl::CIteratorT <CClassFieldMember> Member = m_FieldMemberList.GetHead ();
-	for (; Member; Member++)
-	{
-		CClassFieldMember* pMember = *Member;
+	rtl::CIteratorT <CClassFieldMember> FieldMember = m_FieldMemberList.GetHead ();
+	for (; FieldMember; FieldMember++)
+		FieldMember->m_pStructMember = m_pInterfaceStructType->CreateMember (FieldMember->m_pType, FieldMember->m_BitCount);
 
-		Result = pMember->m_BitCount ? 
-			LayoutBitField (
-				pMember->m_pBitFieldBaseType,
-				pMember->m_BitCount,
-				&pMember->m_pType,
-				&pMember->m_Offset,
-				&pMember->m_LlvmIndex
-				) :
-			LayoutField (
-				pMember->m_pType,
-				&pMember->m_Offset,
-				&pMember->m_LlvmIndex
+	rtl::CIteratorT <CClassMethodMember> MethodMember = m_MethodMemberList.GetHead ();
+	for (; MethodMember; MethodMember++)
+	{
+		size_t Count = MethodMember->GetOverloadCount ();
+		
+		for (size_t i = 0; i < Count; i++)
+		{
+			CFunction* pFunction = MethodMember->GetFunction (i);
+			
+			size_t BaseTypeVTableIndex;
+			CFunction* pOverridenFunction = FindOverridenMethodMember (
+				MethodMember->m_Name,
+				pFunction->GetClosureType (),
+				&BaseTypeVTableIndex
 				);
 
-			if (!Result)
-				return false;
+			if (pOverridenFunction)
+			{
+				size_t VTableIndex = BaseTypeVTableIndex + pOverridenFunction->GetVTableIndex ();
+				pFunction->m_pType = pOverridenFunction->m_pType;
+				pFunction->m_VTableIndex = VTableIndex;
+				pFunction->m_pOriginClassType = pOverridenFunction->m_pOriginClassType;
+				m_VTable [pFunction->m_VTableIndex] = pFunction;
+			}
+			else
+			{
+				pFunction->m_VTableIndex = m_VTable.GetCount ();
+				pFunction->m_pOriginClassType = this;
+				m_VTable.Append (pFunction);
+				m_pVTableStructType->CreateMember (pFunction->GetType ()->GetPointerType (EType_Pointer_u));
+			}
+		}
 	}
 
-	if (m_FieldAlignedSize > m_FieldActualSize)
-		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
+	m_pVTableStructType->CalcLayout ();
+	m_pInterfaceStructType->CalcLayout ();
+
+	if (m_TypeKind == EType_Class)
+	{
+		m_pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+		m_pClassStructType->m_Tag.Format (_T("%s.class"), m_Tag);
+		m_pClassStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
+		m_pClassStructType->CreateMember (m_pInterfaceStructType);
+		m_pClassStructType->CalcLayout ();
+	}
+
+	PostCalcLayout ();
 
 	return true;
 }
 
-llvm::Type* 
-CClassType::GetLlvmType ()
+bool
+CClassType::GetVTablePtrValue (CValue* pValue)
 {
-	if (m_pLlvmType)
-		return m_pLlvmType;
-
-	llvm::StructType* pLlvmInterfaceType = GetLlvmInterfaceType ();
-
-	llvm::Type* LlvmTypeArray [] =
+	if (!m_VTablePtrValue.IsEmpty ())
 	{
-		llvm::PointerType::get (pLlvmInterfaceType, 0),                   // TInterfaceHdr*
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)->GetLlvmType (),  // size_t m_Scope;
-	};
+		*pValue = m_VTablePtrValue;
+		return true;
+	}
 
-	m_pLlvmType = llvm::StructType::get (
-		llvm::getGlobalContext (), 
-		llvm::ArrayRef <llvm::Type*> (LlvmTypeArray, countof (LlvmTypeArray)),
-		true
+	char Buffer [256];
+	rtl::CArrayT <llvm::Constant*> LlvmVTable (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	size_t Count = m_VTable.GetCount ();
+	LlvmVTable.SetCount (Count);
+
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = m_VTable [i];
+		if (!pFunction->HasBody ())
+		{
+			err::SetFormatStringError (
+				_T("cannot instantiate abstact '%s': '%s' has no body"), 
+				GetTypeString (),
+				pFunction->GetTag ()
+				);
+			return false;
+		}
+
+		LlvmVTable [i] = pFunction->GetLlvmFunction ();
+	}
+
+	llvm::Constant* pLlvmVTableConstant = llvm::ConstantStruct::get (
+		(llvm::StructType*) m_pVTableStructType->GetLlvmType (),
+		llvm::ArrayRef <llvm::Constant*> (LlvmVTable, Count)
 		);
 
-	return m_pLlvmType;
-}
-
-llvm::StructType*
-CClassType::GetLlvmInterfaceType ()
-{
-	if (m_pLlvmInterfaceType)
-		return m_pLlvmInterfaceType;
-	
-	m_pLlvmInterfaceType = GetLlvmStructType (GetQualifiedName ());
-	return m_pLlvmInterfaceType;
-}
-
-llvm::StructType*
-CClassType::GetLlvmClassType ()
-{
-	if (m_pLlvmClassType)
-		return m_pLlvmClassType;
-
-	llvm::StructType* pLlvmInterfaceType = GetLlvmInterfaceType ();
-
-	llvm::Type* LlvmTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)->GetLlvmType (),    // intptr_t m_Flags;
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetLlvmType (), // CClassType* m_pClass;
-		pLlvmInterfaceType,
-	};
-
-	m_pLlvmClassType = llvm::StructType::get (
-		llvm::getGlobalContext (), 
-		llvm::ArrayRef <llvm::Type*> (LlvmTypeArray, countof (LlvmTypeArray)),
-		true
-		);
-
-	return m_pLlvmClassType;
-}
-
-bool
-CClassType::InitializeObject (
-	TObjectHdr* pObject,
-	int Flags
-	)
-{
-	ASSERT (m_TypeKind == EType_Class);
-
-	memset (pObject, 0, GetClassSize ());
-
-	pObject->m_pType = this;
-	pObject->m_Flags = Flags;
-	InitializeInterface ((TInterfaceHdr*) (pObject + 1), pObject, m_MethodTable);
-	return true;
-}
-
-bool
-CClassType::InitializeInterface (
-	TInterfaceHdr* pInterface,
-	TObjectHdr* pObject,
-	void** pMethodTable
-	)
-{
-	pInterface->m_pObject = pObject;
-	pInterface->m_pMethodTable = pMethodTable;
-
-	rtl::CIteratorT <jnc::CClassBaseType> BaseType = GetFirstBaseType ();
-	for (; BaseType; BaseType++)
-	{		
-		BaseType->m_pType->InitializeInterface (
-			(TInterfaceHdr*) ((uchar_t*) pInterface + BaseType->m_Offset),
-			pObject,
-			pMethodTable + BaseType->m_MethodTableIndex
+	rtl::CString VariableTag;
+	VariableTag.Format (_T("%s.vtbl"), GetQualifiedName ());
+	llvm::GlobalVariable* pLlvmVTableVariable = new llvm::GlobalVariable (
+			*m_pModule->m_pLlvmModule,
+			m_pVTableStructType->GetLlvmType (),
+			false,
+			llvm::GlobalVariable::ExternalLinkage,
+			pLlvmVTableConstant,
+			(const tchar_t*) VariableTag
 			);
+
+	m_VTablePtrValue.SetLlvmValue (
+		pLlvmVTableVariable, 
+		m_pVTableStructType->GetPointerType (EType_Pointer_u),
+		EValue_Const
+		);
+
+	*pValue = m_VTablePtrValue;
+	return true;
+}
+
+CFunction* 
+CClassType::GetInitializer ()
+{
+	if (m_pInitializer)
+		return m_pInitializer;
+
+	m_pInitializer = m_pModule->m_FunctionMgr.CreateClassInitializer (this);
+	return m_pInitializer;
+}
+
+CFunction*
+CClassType::FindOverridenMethodMember (
+	const rtl::CString& Name,
+	CFunctionType* pClosureType,
+	size_t* pBaseTypeVTableIndex
+	)
+{
+	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		size_t BaseTypeVTableIndex;
+		CClassMember* pMember = BaseType->m_pType->FindMember (Name, NULL, NULL, &BaseTypeVTableIndex);
+		if (!pMember || pMember->m_MemberKind != EClassMember_Method)
+			continue;
+
+		CClassMethodMember* pMethodMember = (CClassMethodMember*) pMember;
+		size_t Count = pMethodMember->GetOverloadCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CFunction* pFunction = pMethodMember->GetFunction (i);
+			if (pFunction->GetClosureType ()->Cmp (pClosureType) == 0)
+			{
+				*pBaseTypeVTableIndex = BaseType->m_VTableIndex + BaseTypeVTableIndex;
+				return pFunction;
+			}
+		}
 	}
 
-	return true;
+	return NULL;
 }
 
 //.............................................................................

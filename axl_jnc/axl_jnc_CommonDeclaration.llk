@@ -1,7 +1,7 @@
 //.............................................................................
 
 common_declaration
-	: declaration_list declaration_terminator_2 <$1.m_pLastItem>
+	: declaration_list declaration_terminator <$1.m_pLastItem>
 	;
 
 class
@@ -88,18 +88,12 @@ initializer_list_entry <CType* $pType>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 noast
-declaration_terminator_2 <CModuleItem* $pItem>
+declaration_terminator <CModuleItem* $pItem>
 	: ';'
 	| function_body_pass1
 		{
 			return SetFunctionBody ($pItem, &$1.m_TokenList);
 		}
-	;
-
-noast
-declaration_terminator
-	: ';'
-	| function_body_pass1
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

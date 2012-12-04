@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_ClassType.h"
 
 namespace axl {
 namespace jnc {
@@ -10,12 +11,17 @@ namespace jnc {
 CFunction::CFunction ()
 {
 	m_ItemKind = EModuleItem_Function;
-	m_FunctionKind = EFunction_Global;
+	m_FunctionKind = EFunction_Undefined;
 	m_pOverload = NULL;
+	m_VTableIndex = -1;
+	m_pOriginClassType = NULL;
 	m_pType = NULL;
+	m_pClosureType = NULL;
+	m_pProperty = NULL;
 	m_pBlock = NULL;
 	m_pScope = NULL;
 	m_pLlvmFunction = NULL;
+	m_pfn = NULL;
 }
 
 rtl::CString
@@ -68,6 +74,20 @@ CFunction::GetLlvmFunction ()
 		);
 
 	return m_pLlvmFunction;
+}
+
+CGlobalFunction* 
+CFunction::GetGlobalFunction ()
+{
+	ASSERT (m_FunctionKind == EFunction_Global);
+	return (CGlobalFunction*) m_pOverload;
+}
+
+CClassMethodMember* 
+CFunction::GetClassMethodMember ()
+{
+	ASSERT (m_FunctionKind == EFunction_Method);
+	return (CClassMethodMember*) m_pOverload;
 }
 
 //.............................................................................

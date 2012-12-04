@@ -11,15 +11,13 @@ CVariableMgr::CVariableMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
-
-	m_TempVariableCounter = 0;
 }
 
 void
 CVariableMgr::Clear ()
 {
-	m_VariableList.Clear ();
-	m_TempVariableCounter = 0;
+	m_LocalVariableList.Clear ();
+	m_GlobalVariableList.Clear ();
 }
 
 CVariable*
@@ -35,7 +33,6 @@ CVariableMgr::CreateVariable (
 	pVariable->m_Name = Name;
 	pVariable->m_pType = pType;
 	pVariable->m_pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	m_VariableList.InsertTail (pVariable);
 
 	if (m_pModule->m_FunctionMgr.GetCurrentFunction ())
 	{
@@ -45,19 +42,12 @@ CVariableMgr::CreateVariable (
 		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
 
 		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
+		m_LocalVariableList.InsertTail (pVariable);
 	}
 	else
 	{
 		ASSERT (VariableKind == EVariable_Global);
-
-		pVariable->m_pLlvmValue = new llvm::GlobalVariable (
-			*m_pModule->m_pLlvmModule,
-			pType->GetLlvmType (),
-			false,
-			llvm::GlobalVariable::ExternalLinkage,
-			(llvm::Constant*) pType->GetLlvmZeroValue (),
-			(const tchar_t*) Name
-			);
+		m_GlobalVariableList.InsertTail (pVariable);
 	}
 
 	return pVariable;
@@ -71,6 +61,27 @@ CVariableMgr::CreateVariable (
 {
 	EVariable VariableKind = m_pModule->m_FunctionMgr.GetCurrentFunction () ? EVariable_Local : EVariable_Global;
 	return CreateVariable (VariableKind, Name, pType);
+}
+
+bool
+CVariableMgr::AllocateGlobalVariables ()
+{
+	rtl::CIteratorT <CVariable> Variable = m_GlobalVariableList.GetHead ();
+	for (; Variable; Variable++)
+	{
+		CVariable* pVariable = *Variable;
+
+		pVariable->m_pLlvmValue = new llvm::GlobalVariable (
+			*m_pModule->m_pLlvmModule,
+			pVariable->m_pType->GetLlvmType (),
+			false,
+			llvm::GlobalVariable::ExternalLinkage,
+			(llvm::Constant*) pVariable->m_pType->GetLlvmZeroValue (),
+			(const tchar_t*) pVariable->GetQualifiedName ()
+			);
+	}
+
+	return true;
 }
 
 //.............................................................................

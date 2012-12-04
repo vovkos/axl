@@ -41,7 +41,7 @@ CLlvmBuilder::CreatePhi (
 	llvm::PHINode* pPhiNode = m_LlvmBuilder.CreatePHI (Value1.GetLlvmValue ()->getType (), 2,  "phi");
 	pPhiNode->addIncoming (Value1.GetLlvmValue (), pBlock1->GetLlvmBlock ());
 	pPhiNode->addIncoming (Value2.GetLlvmValue (), pBlock2->GetLlvmBlock ());
-	pResultValue->SetLlvmRegister (pPhiNode, Value1.GetType ());
+	pResultValue->SetLlvmValue (pPhiNode, Value1.GetType ());
 	return pPhiNode;
 }
 
@@ -68,7 +68,7 @@ CLlvmBuilder::CreateGep (
 			"gep"
 			);
 
-	pResultValue->SetLlvmRegister (pInst, pResultType);
+	pResultValue->SetLlvmValue (pInst, pResultType);
 	return pInst;
 }
 
@@ -99,7 +99,7 @@ CLlvmBuilder::CreateGep (
 			"gep"
 			);
 
-	pResultValue->SetLlvmRegister (pInst, pResultType);
+	pResultValue->SetLlvmValue (pInst, pResultType);
 	return pInst;
 }
 
@@ -121,6 +121,8 @@ CLlvmBuilder::CreateCall (
 
 	llvm::CallInst* pInst;
 
+	rtl::CString s = GetLlvmTypeString (CalleeValue.GetLlvmValue ()->getType ());
+
 	if (pResultType && pResultType->GetTypeKind () != EType_Void)
 	{
 		pInst = m_LlvmBuilder.CreateCall (
@@ -129,7 +131,7 @@ CLlvmBuilder::CreateCall (
 			"call"
 			);
 
-		pResultValue->SetLlvmRegister (pInst, pResultType);
+		pResultValue->SetLlvmValue (pInst, pResultType);
 	}
 	else
 	{
@@ -352,7 +354,7 @@ CLlvmBuilder::DynamicCastInterface (
 	
 	CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
-	CValue TypeValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &pResultType);
+	CValue TypeValue (&pResultType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
 	CFunction* pDynamicCastInterface = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastInterface);
 	
@@ -364,7 +366,7 @@ CLlvmBuilder::DynamicCastInterface (
 		&PtrValue
 		);
 
-	CreateBitCast (PtrValue, pResultType->GetLlvmInterfacePtrType (), &PtrValue);
+	CreateBitCast (PtrValue, pResultType->GetInterfaceStructType()->GetPointerType (EType_Pointer_u), &PtrValue);
 
 	CreateInterface (PtrValue, ScopeLevelValue, pResultType, pResultValue);
 	return true;
@@ -377,18 +379,15 @@ CLlvmBuilder::InitializeObject (
 	int Flags
 	)
 {
-	CValue PtrValue;
-	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-
-	CValue TypeValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &pType);
 	CValue FlagsValue (Flags, EType_Int);
 
-	CFunction* pInializeObject = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_InitializeObject);
+	CFunction* pInializeObject = pType->GetInitializer ();
+	if (!pInializeObject)
+		return false;
 
-	m_pModule->m_LlvmBuilder.CreateCall3 (
+	m_pModule->m_LlvmBuilder.CreateCall2 (
 		pInializeObject,
-		PtrValue,
-		TypeValue,
+		Value,
 		FlagsValue,
 		NULL,
 		NULL

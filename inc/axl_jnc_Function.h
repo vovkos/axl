@@ -15,11 +15,16 @@ namespace jnc {
 
 class CBasicBlock;
 class CFunctionOverload;
+class CGlobalFunction;
+class CClassType;
+class CClassMethodMember;
+class CProperty;
 
 //.............................................................................
 
 enum EFunction
 {
+	EFunction_Undefined,
 	EFunction_Global,
 	EFunction_Method,
 	EFunction_Constructor,
@@ -34,7 +39,8 @@ class CFunctionFormalArg: public rtl::TListLink
 {
 protected:
 	friend class CFunctionMgr;
-	friend class CDeclFunctionSuffix;
+	friend class CParser;
+	friend class CClassType;
 
 	rtl::CString m_Name;
 	CType* m_pType;
@@ -74,10 +80,16 @@ class CFunction:
 protected:
 	friend class CFunctionMgr;
 	friend class CFunctionOverload;
+	friend class CClassType;
 
 	EFunction m_FunctionKind;
 	CFunctionType* m_pType;
+	CFunctionType* m_pClosureType;
 	CFunctionOverload* m_pOverload;
+	CProperty* m_pProperty;
+	CClassType* m_pOriginClassType;
+	size_t m_VTableIndex;
+
 	rtl::CString m_Tag;
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
@@ -87,6 +99,7 @@ protected:
 	CScope* m_pScope;
 
 	llvm::Function* m_pLlvmFunction;
+	void* m_pfn;
 
 public:
 	CFunction ();
@@ -100,6 +113,12 @@ public:
 	llvm::Function* 
 	GetLlvmFunction ();
 	
+	void*
+	GetFunctionPointer ()
+	{
+		return m_pfn;
+	}
+
 	EFunction
 	GetFunctionKind ()
 	{
@@ -112,11 +131,35 @@ public:
 		return m_pType;
 	}
 
-	CFunctionOverload*
-	GetOverload ()
+	CFunctionType* 
+	GetClosureType ()
 	{
-		return m_pOverload;
-	};
+		return m_pClosureType;
+	}
+
+	CClassType* 
+	GetOriginClassType ()
+	{
+		return m_pOriginClassType;
+	}
+
+	CClassMethodMember* 
+	GetClassMethodMember ();
+
+	CProperty* 
+	GetProperty ()
+	{
+		return m_pProperty;
+	}
+
+	size_t
+	GetVTableIndex ()
+	{
+		return m_VTableIndex;
+	}
+
+	CGlobalFunction* 
+	GetGlobalFunction ();
 
 	size_t 
 	GetArgCount ()

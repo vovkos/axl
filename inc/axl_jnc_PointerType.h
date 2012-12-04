@@ -18,11 +18,16 @@ class CPointerType: public CDerivedType
 protected:
 	friend class CTypeMgr;
 
+	CStructType* m_pPointerStructType;
+
 public:
 	CPointerType ()
 	{
 		m_TypeKind = EType_Pointer;
 	}
+
+	CStructType* 
+	GetPointerStructType ();
 
 	llvm::Type* 
 	GetLlvmType ();

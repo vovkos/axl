@@ -287,13 +287,6 @@ public:
 	{
 		return m_FunctionTypeFlags;
 	}
-
-	CFunctionFormalArg*
-	AddArg (
-		const rtl::CString& Name,
-		CType* pType,
-		const CValue& DefaultValue
-		);
 };
 
 //.............................................................................

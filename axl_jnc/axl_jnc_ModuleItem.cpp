@@ -21,20 +21,38 @@ GetModuleItemKindString (EModuleItem ItemKind)
 	case EModuleItem_Alias:
 		return _T("alias");
 
+	case EModuleItem_Type:
+		return _T("type");
+
+	case EModuleItem_Const:
+		return _T("const");
+
 	case EModuleItem_Variable:
 		return _T("variable");
 
 	case EModuleItem_Function:
 		return _T("function");
 
+	case EModuleItem_Property:
+		return _T("property");
+
 	case EModuleItem_GlobalFunction:
 		return _T("global-function");
 
-	case EModuleItem_Type:
-		return _T("type");
+	case EModuleItem_GlobalProperty:
+		return _T("global-property");
 
-	case EModuleItem_Const:
-		return _T("const");
+	case EModuleItem_EnumMember:
+		return _T("enum-member");
+
+	case EModuleItem_StructMember:
+		return _T("struct-member");
+
+	case EModuleItem_UnionMember:
+		return _T("union-member");
+
+	case EModuleItem_ClassMember:
+		return _T("class-member");
 
 	default:
 		return _T("<undefined>");

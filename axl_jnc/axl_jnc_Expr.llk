@@ -498,6 +498,10 @@ primary_expr <CValue* $pValue>
 		{
 			return LookupIdentifier ($1.m_Data.m_String, $pValue);
 		}
+	| EToken_This
+		{
+			return SetThis ($pValue);
+		}
 	| EToken_Integer
 		{
 			$pValue->SetConstUInt64 ($1.m_Data.m_UInt64);

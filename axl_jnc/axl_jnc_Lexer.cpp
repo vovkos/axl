@@ -16,18 +16,18 @@ namespace jnc {
 /* #line 2 "axl_jnc_Lexer.cpp" */
 static const char _axl_jnc_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
-	3, 1, 70, 1, 71, 1, 72, 1, 
-	73, 1, 74, 1, 75, 1, 76, 1, 
-	77, 1, 78, 1, 79, 1, 80, 1, 
-	81, 1, 82, 1, 83, 1, 84, 1, 
-	85, 1, 86, 1, 87, 1, 88, 1, 
-	89, 1, 90, 1, 91, 1, 92, 1, 
-	93, 1, 95, 1, 96, 1, 97, 1, 
-	98, 1, 99, 1, 100, 1, 101, 1, 
-	102, 1, 103, 1, 104, 1, 105, 1, 
-	106, 1, 107, 1, 108, 1, 109, 1, 
-	110, 1, 111, 2, 0, 91, 2, 0, 
-	92, 2, 0, 94, 2, 3, 4, 2, 
+	3, 1, 73, 1, 74, 1, 75, 1, 
+	76, 1, 77, 1, 78, 1, 79, 1, 
+	80, 1, 81, 1, 82, 1, 83, 1, 
+	84, 1, 85, 1, 86, 1, 87, 1, 
+	88, 1, 89, 1, 90, 1, 91, 1, 
+	92, 1, 93, 1, 94, 1, 95, 1, 
+	96, 1, 98, 1, 99, 1, 100, 1, 
+	101, 1, 102, 1, 103, 1, 104, 1, 
+	105, 1, 106, 1, 107, 1, 108, 1, 
+	109, 1, 110, 1, 111, 1, 112, 1, 
+	113, 1, 114, 2, 0, 94, 2, 0, 
+	95, 2, 0, 97, 2, 3, 4, 2, 
 	3, 5, 2, 3, 6, 2, 3, 7, 
 	2, 3, 8, 2, 3, 9, 2, 3, 
 	10, 2, 3, 11, 2, 3, 12, 2, 
@@ -52,7 +52,8 @@ static const char _axl_jnc_actions[] = {
 	3, 61, 2, 3, 62, 2, 3, 63, 
 	2, 3, 64, 2, 3, 65, 2, 3, 
 	66, 2, 3, 67, 2, 3, 68, 2, 
-	3, 69
+	3, 69, 2, 3, 70, 2, 3, 71, 
+	2, 3, 72
 };
 
 static const short _axl_jnc_key_offsets[] = {
@@ -78,16 +79,17 @@ static const short _axl_jnc_key_offsets[] = {
 	1101, 1111, 1119, 1127, 1136, 1144, 1152, 1160, 
 	1168, 1176, 1184, 1192, 1200, 1208, 1216, 1224, 
 	1232, 1240, 1248, 1256, 1264, 1272, 1280, 1293, 
-	1301, 1309, 1317, 1325, 1333, 1341, 1350, 1358, 
-	1366, 1374, 1382, 1390, 1398, 1407, 1416, 1424, 
-	1432, 1440, 1449, 1457, 1465, 1473, 1481, 1489, 
-	1497, 1505, 1513, 1522, 1530, 1538, 1546, 1554, 
-	1563, 1571, 1579, 1587, 1596, 1605, 1613, 1621, 
-	1630, 1638, 1646, 1654, 1662, 1670, 1678, 1686, 
-	1694, 1702, 1711, 1719, 1727, 1735, 1743, 1751, 
-	1760, 1768, 1776, 1784, 1792, 1800, 1808, 1818, 
-	1826, 1834, 1842, 1849, 1857, 1865, 1873, 1881, 
-	1889, 1897
+	1301, 1309, 1318, 1326, 1334, 1342, 1350, 1358, 
+	1366, 1375, 1383, 1391, 1399, 1407, 1415, 1423, 
+	1432, 1441, 1449, 1457, 1465, 1474, 1482, 1490, 
+	1498, 1506, 1514, 1522, 1530, 1538, 1548, 1556, 
+	1564, 1572, 1580, 1588, 1596, 1605, 1613, 1621, 
+	1629, 1638, 1647, 1655, 1663, 1672, 1680, 1688, 
+	1696, 1704, 1712, 1720, 1728, 1736, 1744, 1754, 
+	1762, 1770, 1778, 1786, 1794, 1802, 1810, 1818, 
+	1826, 1834, 1843, 1851, 1859, 1867, 1875, 1883, 
+	1891, 1901, 1909, 1917, 1925, 1932, 1940, 1948, 
+	1956, 1964, 1972, 1980
 };
 
 static const char _axl_jnc_trans_keys[] = {
@@ -254,81 +256,91 @@ static const char _axl_jnc_trans_keys[] = {
 	95, 97, 101, 104, 105, 116, 119, 48, 
 	57, 65, 90, 98, 122, 95, 102, 48, 
 	57, 65, 90, 97, 122, 95, 101, 48, 
-	57, 65, 90, 97, 122, 95, 116, 48, 
-	57, 65, 90, 97, 122, 95, 111, 48, 
-	57, 65, 90, 97, 122, 95, 114, 48, 
-	57, 65, 90, 97, 122, 95, 116, 48, 
-	57, 65, 90, 97, 122, 95, 103, 122, 
-	48, 57, 65, 90, 97, 121, 95, 110, 
+	57, 65, 90, 97, 122, 95, 97, 116, 
+	48, 57, 65, 90, 98, 122, 95, 108, 
 	48, 57, 65, 90, 97, 122, 95, 101, 
 	48, 57, 65, 90, 97, 122, 95, 100, 
-	48, 57, 65, 90, 97, 122, 95, 101, 
 	48, 57, 65, 90, 97, 122, 95, 111, 
-	48, 57, 65, 90, 97, 122, 95, 102, 
-	48, 57, 65, 90, 97, 122, 95, 97, 
-	114, 48, 57, 65, 90, 98, 122, 95, 
-	99, 116, 48, 57, 65, 90, 97, 122, 
-	95, 107, 48, 57, 65, 90, 97, 122, 
-	95, 105, 48, 57, 65, 90, 97, 122, 
-	95, 99, 48, 57, 65, 90, 97, 122, 
-	95, 111, 117, 48, 57, 65, 90, 97, 
-	122, 95, 110, 48, 57, 65, 90, 97, 
-	122, 95, 103, 48, 57, 65, 90, 97, 
-	122, 95, 99, 48, 57, 65, 90, 97, 
-	122, 95, 116, 48, 57, 65, 90, 97, 
-	122, 95, 105, 48, 57, 65, 90, 97, 
-	122, 95, 116, 48, 57, 65, 90, 97, 
-	122, 95, 99, 48, 57, 65, 90, 97, 
-	122, 95, 104, 48, 57, 65, 90, 97, 
-	122, 95, 114, 121, 48, 57, 65, 90, 
-	97, 122, 95, 117, 48, 57, 65, 90, 
-	97, 122, 95, 101, 48, 57, 65, 90, 
-	97, 122, 95, 112, 48, 57, 65, 90, 
-	97, 122, 95, 101, 48, 57, 65, 90, 
-	97, 122, 95, 100, 111, 48, 57, 65, 
-	90, 97, 122, 95, 101, 48, 57, 65, 
-	90, 97, 122, 95, 102, 48, 57, 65, 
-	90, 97, 122, 95, 102, 48, 57, 65, 
-	90, 97, 122, 95, 110, 115, 48, 57, 
-	65, 90, 97, 122, 95, 105, 115, 48, 
-	57, 65, 90, 97, 122, 95, 111, 48, 
-	57, 65, 90, 97, 122, 95, 110, 48, 
-	57, 65, 90, 97, 122, 95, 97, 105, 
-	48, 57, 65, 90, 98, 122, 95, 102, 
-	48, 57, 65, 90, 97, 122, 95, 101, 
+	48, 57, 65, 90, 97, 122, 95, 114, 
+	48, 57, 65, 90, 97, 122, 95, 116, 
 	48, 57, 65, 90, 97, 122, 95, 103, 
-	48, 57, 65, 90, 97, 122, 95, 110, 
-	48, 57, 65, 90, 97, 122, 95, 101, 
-	48, 57, 65, 90, 97, 122, 95, 100, 
-	48, 57, 65, 90, 97, 122, 95, 105, 
-	48, 57, 65, 90, 97, 122, 95, 110, 
-	48, 57, 65, 90, 97, 122, 95, 103, 
-	48, 57, 65, 90, 97, 122, 95, 97, 
-	111, 48, 57, 65, 90, 98, 122, 95, 
-	114, 48, 57, 65, 90, 97, 122, 95, 
-	105, 48, 57, 65, 90, 97, 122, 95, 
-	97, 48, 57, 65, 90, 98, 122, 95, 
+	122, 48, 57, 65, 90, 97, 121, 95, 
 	110, 48, 57, 65, 90, 97, 122, 95, 
-	116, 48, 57, 65, 90, 97, 122, 95, 
-	105, 108, 48, 57, 65, 90, 97, 122, 
-	95, 100, 48, 57, 65, 90, 97, 122, 
-	95, 97, 48, 57, 65, 90, 98, 122, 
-	95, 116, 48, 57, 65, 90, 97, 122, 
-	95, 105, 48, 57, 65, 90, 97, 122, 
-	95, 108, 48, 57, 65, 90, 97, 122, 
-	95, 101, 48, 57, 65, 90, 97, 122, 
-	95, 99, 101, 104, 48, 57, 65, 90, 
-	97, 122, 95, 104, 48, 57, 65, 90, 
-	97, 122, 95, 97, 48, 57, 65, 90, 
-	98, 122, 95, 114, 48, 57, 65, 90, 
-	97, 122, 95, 48, 57, 65, 90, 97, 
-	122, 95, 116, 48, 57, 65, 90, 97, 
-	122, 95, 97, 48, 57, 65, 90, 98, 
+	101, 48, 57, 65, 90, 97, 122, 95, 
+	100, 48, 57, 65, 90, 97, 122, 95, 
+	101, 48, 57, 65, 90, 97, 122, 95, 
+	111, 48, 57, 65, 90, 97, 122, 95, 
+	102, 48, 57, 65, 90, 97, 122, 95, 
+	97, 114, 48, 57, 65, 90, 98, 122, 
+	95, 99, 116, 48, 57, 65, 90, 97, 
 	122, 95, 107, 48, 57, 65, 90, 97, 
 	122, 95, 105, 48, 57, 65, 90, 97, 
-	122, 95, 108, 48, 57, 65, 90, 97, 
-	122, 95, 101, 48, 57, 65, 90, 97, 
-	122, 61, 124, 0
+	122, 95, 99, 48, 57, 65, 90, 97, 
+	122, 95, 111, 117, 48, 57, 65, 90, 
+	97, 122, 95, 110, 48, 57, 65, 90, 
+	97, 122, 95, 103, 48, 57, 65, 90, 
+	97, 122, 95, 99, 48, 57, 65, 90, 
+	97, 122, 95, 116, 48, 57, 65, 90, 
+	97, 122, 95, 105, 48, 57, 65, 90, 
+	97, 122, 95, 116, 48, 57, 65, 90, 
+	97, 122, 95, 99, 48, 57, 65, 90, 
+	97, 122, 95, 104, 48, 57, 65, 90, 
+	97, 122, 95, 104, 114, 121, 48, 57, 
+	65, 90, 97, 122, 95, 105, 48, 57, 
+	65, 90, 97, 122, 95, 115, 48, 57, 
+	65, 90, 97, 122, 95, 117, 48, 57, 
+	65, 90, 97, 122, 95, 101, 48, 57, 
+	65, 90, 97, 122, 95, 112, 48, 57, 
+	65, 90, 97, 122, 95, 101, 48, 57, 
+	65, 90, 97, 122, 95, 100, 111, 48, 
+	57, 65, 90, 97, 122, 95, 101, 48, 
+	57, 65, 90, 97, 122, 95, 102, 48, 
+	57, 65, 90, 97, 122, 95, 102, 48, 
+	57, 65, 90, 97, 122, 95, 110, 115, 
+	48, 57, 65, 90, 97, 122, 95, 105, 
+	115, 48, 57, 65, 90, 97, 122, 95, 
+	111, 48, 57, 65, 90, 97, 122, 95, 
+	110, 48, 57, 65, 90, 97, 122, 95, 
+	97, 105, 48, 57, 65, 90, 98, 122, 
+	95, 102, 48, 57, 65, 90, 97, 122, 
+	95, 101, 48, 57, 65, 90, 97, 122, 
+	95, 103, 48, 57, 65, 90, 97, 122, 
+	95, 110, 48, 57, 65, 90, 97, 122, 
+	95, 101, 48, 57, 65, 90, 97, 122, 
+	95, 100, 48, 57, 65, 90, 97, 122, 
+	95, 105, 48, 57, 65, 90, 97, 122, 
+	95, 110, 48, 57, 65, 90, 97, 122, 
+	95, 103, 48, 57, 65, 90, 97, 122, 
+	95, 97, 105, 111, 48, 57, 65, 90, 
+	98, 122, 95, 114, 48, 57, 65, 90, 
+	97, 122, 95, 105, 48, 57, 65, 90, 
+	97, 122, 95, 97, 48, 57, 65, 90, 
+	98, 122, 95, 110, 48, 57, 65, 90, 
+	97, 122, 95, 116, 48, 57, 65, 90, 
+	97, 122, 95, 114, 48, 57, 65, 90, 
+	97, 122, 95, 116, 48, 57, 65, 90, 
+	97, 122, 95, 117, 48, 57, 65, 90, 
+	97, 122, 95, 97, 48, 57, 65, 90, 
+	98, 122, 95, 108, 48, 57, 65, 90, 
+	97, 122, 95, 105, 108, 48, 57, 65, 
+	90, 97, 122, 95, 100, 48, 57, 65, 
+	90, 97, 122, 95, 97, 48, 57, 65, 
+	90, 98, 122, 95, 116, 48, 57, 65, 
+	90, 97, 122, 95, 105, 48, 57, 65, 
+	90, 97, 122, 95, 108, 48, 57, 65, 
+	90, 97, 122, 95, 101, 48, 57, 65, 
+	90, 97, 122, 95, 99, 101, 104, 48, 
+	57, 65, 90, 97, 122, 95, 104, 48, 
+	57, 65, 90, 97, 122, 95, 97, 48, 
+	57, 65, 90, 98, 122, 95, 114, 48, 
+	57, 65, 90, 97, 122, 95, 48, 57, 
+	65, 90, 97, 122, 95, 116, 48, 57, 
+	65, 90, 97, 122, 95, 97, 48, 57, 
+	65, 90, 98, 122, 95, 107, 48, 57, 
+	65, 90, 97, 122, 95, 105, 48, 57, 
+	65, 90, 97, 122, 95, 108, 48, 57, 
+	65, 90, 97, 122, 95, 101, 48, 57, 
+	65, 90, 97, 122, 61, 124, 0
 };
 
 static const char _axl_jnc_single_lengths[] = {
@@ -354,16 +366,17 @@ static const char _axl_jnc_single_lengths[] = {
 	4, 2, 2, 3, 2, 2, 2, 2, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
 	2, 2, 2, 2, 2, 2, 7, 2, 
-	2, 2, 2, 2, 2, 3, 2, 2, 
-	2, 2, 2, 2, 3, 3, 2, 2, 
 	2, 3, 2, 2, 2, 2, 2, 2, 
-	2, 2, 3, 2, 2, 2, 2, 3, 
-	2, 2, 2, 3, 3, 2, 2, 3, 
-	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 3, 2, 2, 2, 2, 2, 3, 
+	3, 2, 2, 2, 2, 2, 2, 3, 
+	3, 2, 2, 2, 3, 2, 2, 2, 
+	2, 2, 2, 2, 2, 4, 2, 2, 
+	2, 2, 2, 2, 3, 2, 2, 2, 
+	3, 3, 2, 2, 3, 2, 2, 2, 
 	2, 2, 2, 2, 2, 2, 4, 2, 
-	2, 2, 1, 2, 2, 2, 2, 2, 
-	2, 2
+	2, 2, 2, 2, 2, 2, 2, 2, 
+	2, 3, 2, 2, 2, 2, 2, 2, 
+	4, 2, 2, 2, 1, 2, 2, 2, 
+	2, 2, 2, 2
 };
 
 static const char _axl_jnc_range_lengths[] = {
@@ -398,7 +411,8 @@ static const char _axl_jnc_range_lengths[] = {
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
-	3, 0
+	3, 3, 3, 3, 3, 3, 3, 3, 
+	3, 3, 3, 0
 };
 
 static const short _axl_jnc_index_offsets[] = {
@@ -424,16 +438,17 @@ static const short _axl_jnc_index_offsets[] = {
 	879, 887, 893, 899, 906, 912, 918, 924, 
 	930, 936, 942, 948, 954, 960, 966, 972, 
 	978, 984, 990, 996, 1002, 1008, 1014, 1025, 
-	1031, 1037, 1043, 1049, 1055, 1061, 1068, 1074, 
-	1080, 1086, 1092, 1098, 1104, 1111, 1118, 1124, 
-	1130, 1136, 1143, 1149, 1155, 1161, 1167, 1173, 
-	1179, 1185, 1191, 1198, 1204, 1210, 1216, 1222, 
-	1229, 1235, 1241, 1247, 1254, 1261, 1267, 1273, 
-	1280, 1286, 1292, 1298, 1304, 1310, 1316, 1322, 
-	1328, 1334, 1341, 1347, 1353, 1359, 1365, 1371, 
-	1378, 1384, 1390, 1396, 1402, 1408, 1414, 1422, 
-	1428, 1434, 1440, 1445, 1451, 1457, 1463, 1469, 
-	1475, 1481
+	1031, 1037, 1044, 1050, 1056, 1062, 1068, 1074, 
+	1080, 1087, 1093, 1099, 1105, 1111, 1117, 1123, 
+	1130, 1137, 1143, 1149, 1155, 1162, 1168, 1174, 
+	1180, 1186, 1192, 1198, 1204, 1210, 1218, 1224, 
+	1230, 1236, 1242, 1248, 1254, 1261, 1267, 1273, 
+	1279, 1286, 1293, 1299, 1305, 1312, 1318, 1324, 
+	1330, 1336, 1342, 1348, 1354, 1360, 1366, 1374, 
+	1380, 1386, 1392, 1398, 1404, 1410, 1416, 1422, 
+	1428, 1434, 1441, 1447, 1453, 1459, 1465, 1471, 
+	1477, 1485, 1491, 1497, 1503, 1508, 1514, 1520, 
+	1526, 1532, 1538, 1544
 };
 
 static const short _axl_jnc_indicies[] = {
@@ -566,74 +581,82 @@ static const short _axl_jnc_indicies[] = {
 	36, 260, 36, 36, 36, 89, 36, 261, 
 	262, 263, 264, 265, 266, 36, 36, 36, 
 	89, 36, 267, 36, 36, 36, 89, 36, 
-	268, 36, 36, 36, 89, 36, 269, 36, 
-	36, 36, 89, 36, 270, 36, 36, 36, 
-	89, 36, 271, 36, 36, 36, 89, 36, 
-	272, 36, 36, 36, 89, 36, 273, 274, 
+	268, 36, 36, 36, 89, 36, 269, 270, 
+	36, 36, 36, 89, 36, 271, 36, 36, 
+	36, 89, 36, 272, 36, 36, 36, 89, 
+	36, 273, 36, 36, 36, 89, 36, 274, 
 	36, 36, 36, 89, 36, 275, 36, 36, 
 	36, 89, 36, 276, 36, 36, 36, 89, 
-	36, 277, 36, 36, 36, 89, 36, 278, 
-	36, 36, 36, 89, 36, 279, 36, 36, 
-	36, 89, 36, 280, 36, 36, 36, 89, 
-	36, 281, 282, 36, 36, 36, 89, 36, 
-	283, 284, 36, 36, 36, 89, 36, 285, 
-	36, 36, 36, 89, 36, 286, 36, 36, 
-	36, 89, 36, 287, 36, 36, 36, 89, 
-	36, 288, 289, 36, 36, 36, 89, 36, 
+	36, 277, 278, 36, 36, 36, 89, 36, 
+	279, 36, 36, 36, 89, 36, 280, 36, 
+	36, 36, 89, 36, 281, 36, 36, 36, 
+	89, 36, 282, 36, 36, 36, 89, 36, 
+	283, 36, 36, 36, 89, 36, 284, 36, 
+	36, 36, 89, 36, 285, 286, 36, 36, 
+	36, 89, 36, 287, 288, 36, 36, 36, 
+	89, 36, 289, 36, 36, 36, 89, 36, 
 	290, 36, 36, 36, 89, 36, 291, 36, 
-	36, 36, 89, 36, 292, 36, 36, 36, 
-	89, 36, 293, 36, 36, 36, 89, 36, 
-	294, 36, 36, 36, 89, 36, 295, 36, 
-	36, 36, 89, 36, 296, 36, 36, 36, 
-	89, 36, 297, 36, 36, 36, 89, 36, 
-	298, 299, 36, 36, 36, 89, 36, 300, 
+	36, 36, 89, 36, 292, 293, 36, 36, 
+	36, 89, 36, 294, 36, 36, 36, 89, 
+	36, 295, 36, 36, 36, 89, 36, 296, 
+	36, 36, 36, 89, 36, 297, 36, 36, 
+	36, 89, 36, 298, 36, 36, 36, 89, 
+	36, 299, 36, 36, 36, 89, 36, 300, 
 	36, 36, 36, 89, 36, 301, 36, 36, 
-	36, 89, 36, 302, 36, 36, 36, 89, 
-	36, 303, 36, 36, 36, 89, 36, 304, 
-	305, 36, 36, 36, 89, 36, 306, 36, 
-	36, 36, 89, 36, 307, 36, 36, 36, 
-	89, 36, 308, 36, 36, 36, 89, 36, 
-	309, 310, 36, 36, 36, 89, 36, 311, 
+	36, 89, 36, 302, 303, 304, 36, 36, 
+	36, 89, 36, 305, 36, 36, 36, 89, 
+	36, 306, 36, 36, 36, 89, 36, 307, 
+	36, 36, 36, 89, 36, 308, 36, 36, 
+	36, 89, 36, 309, 36, 36, 36, 89, 
+	36, 310, 36, 36, 36, 89, 36, 311, 
 	312, 36, 36, 36, 89, 36, 313, 36, 
 	36, 36, 89, 36, 314, 36, 36, 36, 
-	89, 36, 315, 316, 36, 36, 36, 89, 
-	36, 317, 36, 36, 36, 89, 36, 318, 
-	36, 36, 36, 89, 36, 319, 36, 36, 
-	36, 89, 36, 320, 36, 36, 36, 89, 
-	36, 321, 36, 36, 36, 89, 36, 322, 
-	36, 36, 36, 89, 36, 323, 36, 36, 
-	36, 89, 36, 324, 36, 36, 36, 89, 
-	36, 325, 36, 36, 36, 89, 36, 326, 
-	327, 36, 36, 36, 89, 36, 328, 36, 
-	36, 36, 89, 36, 329, 36, 36, 36, 
-	89, 36, 330, 36, 36, 36, 89, 36, 
-	331, 36, 36, 36, 89, 36, 332, 36, 
-	36, 36, 89, 36, 333, 334, 36, 36, 
-	36, 89, 36, 335, 36, 36, 36, 89, 
-	36, 336, 36, 36, 36, 89, 36, 337, 
-	36, 36, 36, 89, 36, 338, 36, 36, 
-	36, 89, 36, 339, 36, 36, 36, 89, 
-	36, 340, 36, 36, 36, 89, 36, 341, 
-	342, 343, 36, 36, 36, 89, 36, 344, 
+	89, 36, 315, 36, 36, 36, 89, 36, 
+	316, 317, 36, 36, 36, 89, 36, 318, 
+	319, 36, 36, 36, 89, 36, 320, 36, 
+	36, 36, 89, 36, 321, 36, 36, 36, 
+	89, 36, 322, 323, 36, 36, 36, 89, 
+	36, 324, 36, 36, 36, 89, 36, 325, 
+	36, 36, 36, 89, 36, 326, 36, 36, 
+	36, 89, 36, 327, 36, 36, 36, 89, 
+	36, 328, 36, 36, 36, 89, 36, 329, 
+	36, 36, 36, 89, 36, 330, 36, 36, 
+	36, 89, 36, 331, 36, 36, 36, 89, 
+	36, 332, 36, 36, 36, 89, 36, 333, 
+	334, 335, 36, 36, 36, 89, 36, 336, 
+	36, 36, 36, 89, 36, 337, 36, 36, 
+	36, 89, 36, 338, 36, 36, 36, 89, 
+	36, 339, 36, 36, 36, 89, 36, 340, 
+	36, 36, 36, 89, 36, 341, 36, 36, 
+	36, 89, 36, 342, 36, 36, 36, 89, 
+	36, 343, 36, 36, 36, 89, 36, 344, 
 	36, 36, 36, 89, 36, 345, 36, 36, 
-	36, 89, 36, 346, 36, 36, 36, 89, 
-	347, 36, 36, 36, 89, 36, 348, 36, 
-	36, 36, 89, 36, 349, 36, 36, 36, 
-	89, 36, 350, 36, 36, 36, 89, 36, 
-	351, 36, 36, 36, 89, 36, 352, 36, 
-	36, 36, 89, 36, 353, 36, 36, 36, 
-	89, 354, 355, 58, 0
+	36, 89, 36, 346, 347, 36, 36, 36, 
+	89, 36, 348, 36, 36, 36, 89, 36, 
+	349, 36, 36, 36, 89, 36, 350, 36, 
+	36, 36, 89, 36, 351, 36, 36, 36, 
+	89, 36, 352, 36, 36, 36, 89, 36, 
+	353, 36, 36, 36, 89, 36, 354, 355, 
+	356, 36, 36, 36, 89, 36, 357, 36, 
+	36, 36, 89, 36, 358, 36, 36, 36, 
+	89, 36, 359, 36, 36, 36, 89, 360, 
+	36, 36, 36, 89, 36, 361, 36, 36, 
+	36, 89, 36, 362, 36, 36, 36, 89, 
+	36, 363, 36, 36, 36, 89, 36, 364, 
+	36, 36, 36, 89, 36, 365, 36, 36, 
+	36, 89, 36, 366, 36, 36, 36, 89, 
+	367, 368, 58, 0
 };
 
-static const unsigned char _axl_jnc_trans_targs[] = {
+static const short _axl_jnc_trans_targs[] = {
 	6, 0, 6, 6, 10, 1, 6, 6, 
 	14, 6, 6, 3, 3, 4, 6, 6, 
 	23, 6, 7, 6, 8, 9, 11, 12, 
 	13, 15, 16, 17, 18, 19, 21, 22, 
 	24, 25, 27, 28, 30, 31, 32, 35, 
 	53, 68, 91, 100, 108, 110, 113, 124, 
-	137, 152, 169, 174, 202, 211, 225, 238, 
-	249, 6, 6, 6, 6, 6, 6, 6, 
+	137, 152, 169, 174, 205, 216, 230, 248, 
+	259, 6, 6, 6, 6, 6, 6, 6, 
 	6, 6, 6, 6, 6, 6, 6, 2, 
 	20, 6, 6, 6, 5, 6, 6, 26, 
 	6, 6, 6, 6, 6, 29, 6, 6, 
@@ -658,67 +681,71 @@ static const unsigned char _axl_jnc_trans_targs[] = {
 	149, 30, 151, 30, 153, 155, 165, 154, 
 	30, 156, 160, 157, 158, 159, 30, 161, 
 	162, 163, 164, 30, 166, 167, 168, 30, 
-	170, 171, 172, 173, 30, 175, 177, 178, 
-	181, 188, 198, 176, 30, 30, 179, 180, 
-	30, 182, 185, 183, 184, 30, 186, 187, 
-	30, 189, 193, 190, 191, 30, 192, 30, 
-	194, 196, 195, 30, 197, 30, 199, 200, 
-	201, 30, 203, 205, 204, 30, 206, 207, 
-	208, 210, 209, 30, 30, 212, 222, 213, 
-	215, 214, 30, 216, 218, 217, 30, 219, 
-	220, 221, 30, 223, 224, 30, 226, 231, 
-	227, 228, 229, 230, 30, 232, 233, 30, 
-	234, 235, 236, 237, 30, 239, 244, 246, 
-	240, 241, 242, 243, 30, 245, 30, 247, 
-	248, 30, 6, 6
+	170, 171, 172, 173, 30, 175, 177, 181, 
+	184, 191, 201, 176, 30, 178, 30, 179, 
+	180, 30, 182, 183, 30, 185, 188, 186, 
+	187, 30, 189, 190, 30, 192, 196, 193, 
+	194, 30, 195, 30, 197, 199, 198, 30, 
+	200, 30, 202, 203, 204, 30, 206, 208, 
+	210, 207, 30, 209, 30, 211, 212, 213, 
+	215, 214, 30, 30, 217, 227, 218, 220, 
+	219, 30, 221, 223, 222, 30, 224, 225, 
+	226, 30, 228, 229, 30, 231, 236, 241, 
+	232, 233, 234, 235, 30, 237, 238, 239, 
+	240, 30, 242, 243, 30, 244, 245, 246, 
+	247, 30, 249, 254, 256, 250, 251, 252, 
+	253, 30, 255, 30, 257, 258, 30, 6, 
+	6
 };
 
 static const short _axl_jnc_trans_actions[] = {
-	89, 0, 94, 53, 292, 0, 91, 51, 
-	289, 87, 49, 0, 1, 0, 55, 85, 
-	0, 57, 0, 97, 0, 295, 0, 0, 
-	295, 0, 0, 0, 7, 7, 7, 0, 
-	0, 0, 0, 0, 286, 0, 0, 0, 
+	89, 0, 94, 53, 301, 0, 91, 51, 
+	298, 87, 49, 0, 1, 0, 55, 85, 
+	0, 57, 0, 97, 0, 304, 0, 0, 
+	304, 0, 0, 0, 7, 7, 7, 0, 
+	0, 0, 0, 0, 295, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 81, 83, 11, 73, 31, 19, 41, 
 	71, 27, 21, 33, 23, 35, 25, 0, 
 	0, 29, 79, 75, 0, 77, 47, 0, 
 	13, 65, 37, 9, 15, 0, 67, 39, 
-	43, 69, 0, 0, 160, 0, 0, 0, 
+	43, 69, 0, 0, 169, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 139, 
-	0, 0, 0, 0, 157, 0, 169, 0, 
-	0, 259, 0, 0, 0, 0, 0, 271, 
-	0, 190, 0, 0, 211, 0, 0, 0, 
-	124, 0, 0, 0, 262, 0, 0, 0, 
-	0, 0, 0, 0, 274, 63, 0, 0, 
-	0, 187, 0, 0, 0, 0, 0, 0, 
-	0, 0, 241, 0, 0, 0, 0, 244, 
-	0, 0, 0, 250, 0, 0, 0, 0, 
-	109, 0, 61, 202, 0, 0, 0, 0, 
-	0, 280, 0, 0, 184, 253, 0, 220, 
-	0, 0, 232, 247, 0, 0, 59, 0, 
-	0, 0, 172, 0, 175, 178, 181, 0, 
-	0, 0, 0, 214, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 136, 
+	0, 0, 0, 0, 157, 0, 178, 0, 
+	0, 268, 0, 0, 0, 0, 0, 280, 
+	0, 199, 0, 0, 220, 0, 0, 0, 
+	124, 0, 0, 0, 271, 0, 0, 0, 
+	0, 0, 0, 0, 283, 63, 0, 0, 
 	0, 196, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 100, 226, 0, 0, 
-	0, 148, 0, 283, 0, 0, 0, 0, 
+	0, 0, 250, 0, 0, 0, 0, 253, 
+	0, 0, 0, 259, 0, 0, 0, 0, 
+	109, 0, 61, 211, 0, 0, 0, 0, 
+	0, 289, 0, 0, 193, 262, 0, 229, 
+	0, 0, 241, 256, 0, 0, 59, 0, 
+	0, 0, 181, 0, 184, 187, 190, 0, 
+	0, 0, 0, 223, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 136, 
+	0, 205, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 100, 235, 0, 0, 
+	0, 148, 0, 292, 0, 0, 0, 0, 
 	106, 0, 0, 0, 0, 0, 121, 0, 
-	0, 0, 0, 217, 0, 0, 0, 118, 
-	0, 0, 0, 0, 265, 0, 0, 0, 
-	0, 0, 0, 0, 142, 223, 0, 0, 
-	193, 0, 0, 0, 0, 130, 0, 0, 
-	235, 0, 0, 0, 0, 229, 0, 115, 
-	0, 0, 0, 151, 0, 205, 0, 0, 
-	0, 268, 0, 0, 0, 277, 0, 0, 
-	0, 0, 0, 112, 238, 0, 0, 0, 
-	0, 0, 208, 0, 0, 0, 145, 0, 
-	0, 0, 133, 0, 0, 103, 0, 0, 
-	0, 0, 0, 0, 166, 0, 0, 163, 
-	0, 0, 0, 0, 127, 0, 0, 0, 
-	0, 0, 0, 0, 199, 0, 154, 0, 
-	0, 256, 45, 17
+	0, 0, 0, 226, 0, 0, 0, 118, 
+	0, 0, 0, 0, 274, 0, 0, 0, 
+	0, 0, 0, 0, 142, 0, 232, 0, 
+	0, 163, 0, 0, 202, 0, 0, 0, 
+	0, 130, 0, 0, 244, 0, 0, 0, 
+	0, 238, 0, 115, 0, 0, 0, 151, 
+	0, 214, 0, 0, 0, 277, 0, 0, 
+	0, 0, 166, 0, 286, 0, 0, 0, 
+	0, 0, 112, 247, 0, 0, 0, 0, 
+	0, 217, 0, 0, 0, 145, 0, 0, 
+	0, 133, 0, 0, 103, 0, 0, 0, 
+	0, 0, 0, 0, 175, 0, 0, 0, 
+	0, 160, 0, 0, 172, 0, 0, 0, 
+	0, 127, 0, 0, 0, 0, 0, 0, 
+	0, 208, 0, 154, 0, 0, 265, 45, 
+	17
 };
 
 static const short _axl_jnc_to_state_actions[] = {
@@ -753,7 +780,8 @@ static const short _axl_jnc_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0
 };
 
 static const short _axl_jnc_from_state_actions[] = {
@@ -788,7 +816,8 @@ static const short _axl_jnc_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0
 };
 
 static const short _axl_jnc_eof_trans[] = {
@@ -823,7 +852,8 @@ static const short _axl_jnc_eof_trans[] = {
 	90, 90, 90, 90, 90, 90, 90, 90, 
 	90, 90, 90, 90, 90, 90, 90, 90, 
 	90, 90, 90, 90, 90, 90, 90, 90, 
-	90, 59
+	90, 90, 90, 90, 90, 90, 90, 90, 
+	90, 90, 90, 59
 };
 
 static const int axl_jnc_start = 6;
@@ -833,7 +863,7 @@ static const int axl_jnc_error = -1;
 static const int axl_jnc_en_main = 6;
 
 
-/* #line 175 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 178 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 
 //.............................................................................
@@ -842,7 +872,7 @@ void
 CLexer::Init ()
 {
 	
-/* #line 820 "axl_jnc_Lexer.cpp" */
+/* #line 850 "axl_jnc_Lexer.cpp" */
 	{
 	cs = axl_jnc_start;
 	ts = 0;
@@ -850,14 +880,14 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 183 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 186 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 }
 
 bool
 CLexer::Exec ()
 {
 	
-/* #line 826 "axl_jnc_Lexer.cpp" */
+/* #line 856 "axl_jnc_Lexer.cpp" */
 	{
 	int _klen;
 	unsigned int _trans;
@@ -876,7 +906,7 @@ _resume:
 /* #line 1 "NONE" */
 	{ts = p;}
 	break;
-/* #line 843 "axl_jnc_Lexer.cpp" */
+/* #line 873 "axl_jnc_Lexer.cpp" */
 		}
 	}
 
@@ -1031,15 +1061,15 @@ _eof_trans:
 	{act = 20;}
 	break;
 	case 24:
-/* #line 82 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 81 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 21;}
 	break;
 	case 25:
-/* #line 83 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 82 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 22;}
 	break;
 	case 26:
-/* #line 84 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 83 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 23;}
 	break;
 	case 27:
@@ -1071,32 +1101,32 @@ _eof_trans:
 	{act = 30;}
 	break;
 	case 34:
+/* #line 92 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 31;}
+	break;
+	case 35:
 /* #line 93 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 32;}
 	break;
-	case 35:
+	case 36:
 /* #line 94 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 33;}
-	break;
-	case 36:
-/* #line 95 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 34;}
 	break;
 	case 37:
 /* #line 96 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 35;}
 	break;
 	case 38:
-/* #line 99 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 37;}
+/* #line 97 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 36;}
 	break;
 	case 39:
-/* #line 100 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 38;}
+/* #line 98 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 37;}
 	break;
 	case 40:
-/* #line 101 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 39;}
+/* #line 99 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 38;}
 	break;
 	case 41:
 /* #line 102 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
@@ -1119,15 +1149,15 @@ _eof_trans:
 	{act = 44;}
 	break;
 	case 46:
-/* #line 108 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 107 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 45;}
 	break;
 	case 47:
-/* #line 109 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 108 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 46;}
 	break;
 	case 48:
-/* #line 110 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 109 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 47;}
 	break;
 	case 49:
@@ -1147,15 +1177,15 @@ _eof_trans:
 	{act = 51;}
 	break;
 	case 53:
-/* #line 116 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 115 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 52;}
 	break;
 	case 54:
-/* #line 117 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 116 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 53;}
 	break;
 	case 55:
-/* #line 118 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 117 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 54;}
 	break;
 	case 56:
@@ -1163,16 +1193,16 @@ _eof_trans:
 	{act = 55;}
 	break;
 	case 57:
+/* #line 120 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 56;}
+	break;
+	case 58:
 /* #line 121 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 57;}
 	break;
-	case 58:
+	case 59:
 /* #line 122 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 58;}
-	break;
-	case 59:
-/* #line 123 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 59;}
 	break;
 	case 60:
 /* #line 124 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
@@ -1187,198 +1217,210 @@ _eof_trans:
 	{act = 62;}
 	break;
 	case 63:
-/* #line 128 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 127 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 63;}
 	break;
 	case 64:
-/* #line 129 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 128 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 64;}
 	break;
 	case 65:
-/* #line 130 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 129 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 65;}
 	break;
 	case 66:
-/* #line 160 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 89;}
+/* #line 131 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 66;}
 	break;
 	case 67:
-/* #line 161 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 90;}
+/* #line 132 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 67;}
 	break;
 	case 68:
-/* #line 162 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 91;}
+/* #line 133 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 68;}
 	break;
 	case 69:
-/* #line 171 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 97;}
+/* #line 163 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 92;}
 	break;
 	case 70:
-/* #line 134 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Eq); }}
+/* #line 164 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 93;}
 	break;
 	case 71:
-/* #line 135 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ne); }}
+/* #line 165 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 94;}
 	break;
 	case 72:
-/* #line 136 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Le); }}
+/* #line 174 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 100;}
 	break;
 	case 73:
 /* #line 137 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ge); }}
+	{te = p+1;{ CreateToken (EToken_Eq); }}
 	break;
 	case 74:
 /* #line 138 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_LogicalOr); }}
+	{te = p+1;{ CreateToken (EToken_Ne); }}
 	break;
 	case 75:
 /* #line 139 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_LogicalAnd); }}
+	{te = p+1;{ CreateToken (EToken_Le); }}
 	break;
 	case 76:
-/* #line 142 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Inc); }}
+/* #line 140 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Ge); }}
 	break;
 	case 77:
-/* #line 143 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Dec); }}
+/* #line 141 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_LogicalOr); }}
 	break;
 	case 78:
-/* #line 144 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ptr); }}
+/* #line 142 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_LogicalAnd); }}
 	break;
 	case 79:
 /* #line 145 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_MulAssign); }}
+	{te = p+1;{ CreateToken (EToken_Inc); }}
 	break;
 	case 80:
 /* #line 146 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_DivAssign); }}
+	{te = p+1;{ CreateToken (EToken_Dec); }}
 	break;
 	case 81:
 /* #line 147 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ModAssign); }}
+	{te = p+1;{ CreateToken (EToken_Ptr); }}
 	break;
 	case 82:
 /* #line 148 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AddAssign); }}
+	{te = p+1;{ CreateToken (EToken_MulAssign); }}
 	break;
 	case 83:
 /* #line 149 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_SubAssign); }}
+	{te = p+1;{ CreateToken (EToken_DivAssign); }}
 	break;
 	case 84:
 /* #line 150 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
+	{te = p+1;{ CreateToken (EToken_ModAssign); }}
 	break;
 	case 85:
 /* #line 151 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
+	{te = p+1;{ CreateToken (EToken_AddAssign); }}
 	break;
 	case 86:
 /* #line 152 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AndAssign); }}
+	{te = p+1;{ CreateToken (EToken_SubAssign); }}
 	break;
 	case 87:
 /* #line 153 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_XorAssign); }}
+	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
 	break;
 	case 88:
 /* #line 154 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_OrAssign); }}
+	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
 	break;
 	case 89:
 /* #line 155 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_RefAssign); }}
+	{te = p+1;{ CreateToken (EToken_AndAssign); }}
 	break;
 	case 90:
 /* #line 156 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ellipsis); }}
+	{te = p+1;{ CreateToken (EToken_XorAssign); }}
 	break;
 	case 91:
-/* #line 161 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateCharToken (EToken_Integer); }}
+/* #line 157 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_OrAssign); }}
 	break;
 	case 92:
-/* #line 162 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateStringToken (EToken_Literal, 1, 1); }}
+/* #line 158 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_RefAssign); }}
 	break;
 	case 93:
-/* #line 167 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;}
+/* #line 159 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Ellipsis); }}
 	break;
 	case 94:
-/* #line 169 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;}
+/* #line 164 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 95:
-/* #line 171 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (ts [0]); }}
+/* #line 165 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 96:
-/* #line 92 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Int); }}
+/* #line 170 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;}
 	break;
 	case 97:
-/* #line 98 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Enum); }}
+/* #line 172 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;}
 	break;
 	case 98:
-/* #line 120 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Do); }}
+/* #line 174 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 99:
-/* #line 140 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Shl); }}
+/* #line 95 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Int); }}
 	break;
 	case 100:
-/* #line 141 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Shr); }}
+/* #line 101 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Enum); }}
 	break;
 	case 101:
-/* #line 160 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateStringToken (EToken_Identifier); }}
+/* #line 123 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Do); }}
 	break;
 	case 102:
-/* #line 161 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateCharToken (EToken_Integer); }}
+/* #line 143 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Shl); }}
 	break;
 	case 103:
-/* #line 162 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateStringToken (EToken_Literal, 1, 1); }}
+/* #line 144 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Shr); }}
 	break;
 	case 104:
 /* #line 163 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateIntegerToken (10); }}
+	{te = p;p--;{ CreateStringToken (EToken_Identifier); }}
 	break;
 	case 105:
 /* #line 164 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateIntegerToken (16, 2); }}
+	{te = p;p--;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 106:
-/* #line 166 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;}
+/* #line 165 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 107:
+/* #line 166 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateIntegerToken (10); }}
+	break;
+	case 108:
+/* #line 167 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateIntegerToken (16, 2); }}
+	break;
+	case 109:
 /* #line 169 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;}
 	break;
-	case 108:
-/* #line 171 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (ts [0]); }}
-	break;
-	case 109:
-/* #line 163 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
-	break;
 	case 110:
-/* #line 171 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
+/* #line 172 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;}
 	break;
 	case 111:
+/* #line 174 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (ts [0]); }}
+	break;
+	case 112:
+/* #line 166 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
+	break;
+	case 113:
+/* #line 174 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
+	break;
+	case 114:
 /* #line 1 "NONE" */
 	{	switch( act ) {
 	case 1:
@@ -1442,147 +1484,156 @@ _eof_trans:
 	{{p = ((te))-1;} CreateToken (EToken_Bindable); }
 	break;
 	case 21:
-	{{p = ((te))-1;} CreateToken (EToken_Auto); }
+	{{p = ((te))-1;} CreateToken (EToken_Virtual); }
 	break;
 	case 22:
-	{{p = ((te))-1;} CreateToken (EToken_Void); }
+	{{p = ((te))-1;} CreateToken (EToken_Sealed); }
 	break;
 	case 23:
-	{{p = ((te))-1;} CreateToken (EToken_Variant); }
+	{{p = ((te))-1;} CreateToken (EToken_This); }
 	break;
 	case 24:
-	{{p = ((te))-1;} CreateToken (EToken_Bool); }
+	{{p = ((te))-1;} CreateToken (EToken_Auto); }
 	break;
 	case 25:
-	{{p = ((te))-1;} CreateToken (EToken_Int8); }
+	{{p = ((te))-1;} CreateToken (EToken_Void); }
 	break;
 	case 26:
-	{{p = ((te))-1;} CreateToken (EToken_Int16); }
+	{{p = ((te))-1;} CreateToken (EToken_Variant); }
 	break;
 	case 27:
-	{{p = ((te))-1;} CreateToken (EToken_Int32); }
+	{{p = ((te))-1;} CreateToken (EToken_Bool); }
 	break;
 	case 28:
-	{{p = ((te))-1;} CreateToken (EToken_Int64); }
+	{{p = ((te))-1;} CreateToken (EToken_Int8); }
 	break;
 	case 29:
-	{{p = ((te))-1;} CreateToken (EToken_Float); }
+	{{p = ((te))-1;} CreateToken (EToken_Int16); }
 	break;
 	case 30:
-	{{p = ((te))-1;} CreateToken (EToken_Double); }
+	{{p = ((te))-1;} CreateToken (EToken_Int32); }
+	break;
+	case 31:
+	{{p = ((te))-1;} CreateToken (EToken_Int64); }
 	break;
 	case 32:
-	{{p = ((te))-1;} CreateToken (EToken_Char); }
+	{{p = ((te))-1;} CreateToken (EToken_Float); }
 	break;
 	case 33:
-	{{p = ((te))-1;} CreateToken (EToken_Short); }
-	break;
-	case 34:
-	{{p = ((te))-1;} CreateToken (EToken_Long); }
+	{{p = ((te))-1;} CreateToken (EToken_Double); }
 	break;
 	case 35:
-	{{p = ((te))-1;} CreateToken (EToken_WChar); }
+	{{p = ((te))-1;} CreateToken (EToken_Char); }
+	break;
+	case 36:
+	{{p = ((te))-1;} CreateToken (EToken_Short); }
 	break;
 	case 37:
-	{{p = ((te))-1;} CreateToken (EToken_EnumC); }
+	{{p = ((te))-1;} CreateToken (EToken_Long); }
 	break;
 	case 38:
-	{{p = ((te))-1;} CreateToken (EToken_Struct); }
-	break;
-	case 39:
-	{{p = ((te))-1;} CreateToken (EToken_Union); }
+	{{p = ((te))-1;} CreateToken (EToken_WChar); }
 	break;
 	case 40:
-	{{p = ((te))-1;} CreateToken (EToken_Class); }
+	{{p = ((te))-1;} CreateToken (EToken_EnumC); }
 	break;
 	case 41:
-	{{p = ((te))-1;} CreateToken (EToken_Interface); }
+	{{p = ((te))-1;} CreateToken (EToken_Struct); }
 	break;
 	case 42:
-	{{p = ((te))-1;} CreateToken (EToken_Property); }
+	{{p = ((te))-1;} CreateToken (EToken_Union); }
 	break;
 	case 43:
-	{{p = ((te))-1;} CreateToken (EToken_Get); }
+	{{p = ((te))-1;} CreateToken (EToken_Class); }
 	break;
 	case 44:
-	{{p = ((te))-1;} CreateToken (EToken_Set); }
+	{{p = ((te))-1;} CreateToken (EToken_Interface); }
 	break;
 	case 45:
-	{{p = ((te))-1;} CreateToken (EToken_New); }
+	{{p = ((te))-1;} CreateToken (EToken_Property); }
 	break;
 	case 46:
-	{{p = ((te))-1;} CreateToken (EToken_Stack); }
+	{{p = ((te))-1;} CreateToken (EToken_Get); }
 	break;
 	case 47:
-	{{p = ((te))-1;} CreateToken (EToken_Heap); }
+	{{p = ((te))-1;} CreateToken (EToken_Set); }
 	break;
 	case 48:
-	{{p = ((te))-1;} CreateToken (EToken_SizeOf); }
+	{{p = ((te))-1;} CreateToken (EToken_New); }
 	break;
 	case 49:
-	{{p = ((te))-1;} CreateToken (EToken_TypeOf); }
+	{{p = ((te))-1;} CreateToken (EToken_Stack); }
 	break;
 	case 50:
-	{{p = ((te))-1;} CreateToken (EToken_DynaSizeOf); }
+	{{p = ((te))-1;} CreateToken (EToken_Heap); }
 	break;
 	case 51:
-	{{p = ((te))-1;} CreateToken (EToken_DynaTypeOf); }
+	{{p = ((te))-1;} CreateToken (EToken_SizeOf); }
 	break;
 	case 52:
-	{{p = ((te))-1;} CreateToken (EToken_If); }
+	{{p = ((te))-1;} CreateToken (EToken_TypeOf); }
 	break;
 	case 53:
-	{{p = ((te))-1;} CreateToken (EToken_Else); }
+	{{p = ((te))-1;} CreateToken (EToken_DynaSizeOf); }
 	break;
 	case 54:
-	{{p = ((te))-1;} CreateToken (EToken_For); }
+	{{p = ((te))-1;} CreateToken (EToken_DynaTypeOf); }
 	break;
 	case 55:
-	{{p = ((te))-1;} CreateToken (EToken_While); }
+	{{p = ((te))-1;} CreateToken (EToken_If); }
+	break;
+	case 56:
+	{{p = ((te))-1;} CreateToken (EToken_Else); }
 	break;
 	case 57:
-	{{p = ((te))-1;} CreateToken (EToken_Break); }
+	{{p = ((te))-1;} CreateToken (EToken_For); }
 	break;
 	case 58:
-	{{p = ((te))-1;} CreateToken (EToken_Continue); }
-	break;
-	case 59:
-	{{p = ((te))-1;} CreateToken (EToken_Return); }
+	{{p = ((te))-1;} CreateToken (EToken_While); }
 	break;
 	case 60:
-	{{p = ((te))-1;} CreateToken (EToken_Switch); }
+	{{p = ((te))-1;} CreateToken (EToken_Break); }
 	break;
 	case 61:
-	{{p = ((te))-1;} CreateToken (EToken_Case); }
+	{{p = ((te))-1;} CreateToken (EToken_Continue); }
 	break;
 	case 62:
-	{{p = ((te))-1;} CreateToken (EToken_Default); }
+	{{p = ((te))-1;} CreateToken (EToken_Return); }
 	break;
 	case 63:
-	{{p = ((te))-1;} CreateToken (EToken_True); }
+	{{p = ((te))-1;} CreateToken (EToken_Switch); }
 	break;
 	case 64:
-	{{p = ((te))-1;} CreateToken (EToken_False); }
+	{{p = ((te))-1;} CreateToken (EToken_Case); }
 	break;
 	case 65:
+	{{p = ((te))-1;} CreateToken (EToken_Default); }
+	break;
+	case 66:
+	{{p = ((te))-1;} CreateToken (EToken_True); }
+	break;
+	case 67:
+	{{p = ((te))-1;} CreateToken (EToken_False); }
+	break;
+	case 68:
 	{{p = ((te))-1;} CreateToken (EToken_Null); }
 	break;
-	case 89:
+	case 92:
 	{{p = ((te))-1;} CreateStringToken (EToken_Identifier); }
 	break;
-	case 90:
+	case 93:
 	{{p = ((te))-1;} CreateCharToken (EToken_Integer); }
 	break;
-	case 91:
+	case 94:
 	{{p = ((te))-1;} CreateStringToken (EToken_Literal, 1, 1); }
 	break;
-	case 97:
+	case 100:
 	{{p = ((te))-1;} CreateToken (ts [0]); }
 	break;
 	}
 	}
 	break;
-/* #line 1438 "axl_jnc_Lexer.cpp" */
+/* #line 1486 "axl_jnc_Lexer.cpp" */
 		}
 	}
 
@@ -1595,7 +1646,7 @@ _again:
 /* #line 1 "NONE" */
 	{ts = 0;}
 	break;
-/* #line 1449 "axl_jnc_Lexer.cpp" */
+/* #line 1497 "axl_jnc_Lexer.cpp" */
 		}
 	}
 
@@ -1612,7 +1663,7 @@ _again:
 
 	}
 
-/* #line 189 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 192 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 	bool Result = cs != axl_jnc_error;
 	if (!Result)

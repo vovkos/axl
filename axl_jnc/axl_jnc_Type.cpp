@@ -160,6 +160,48 @@ CType::GetZeroValue ()
 	return CValue (pLlvmValue, this);
 }
 
+bool 
+CType::CalcLayout ()
+{
+	switch (m_TypeKind)
+	{
+	case EType_Struct:
+		return ((CStructType*) this)->CalcLayout ();
+
+	case EType_Union:
+		return ((CUnionType*) this)->CalcLayout ();
+
+	case EType_Interface:
+	case EType_Class:
+		return ((CClassType*) this)->CalcLayout ();
+
+	default:
+		return true;
+	};
+}
+
+bool
+CType::PreCalcLayout ()
+{
+	ASSERT (!(m_Flags & ETypeFlag_IsLayoutReady));
+
+	if (m_Flags & ETypeFlag_IsLayoutCalc)
+	{
+		err::SetFormatStringError (_T("can't calculate layout of '%s' due to type recursion"), GetTypeString ());
+		return false;
+	}
+
+	m_Flags |= ETypeFlag_IsLayoutCalc;
+	return true;
+}
+
+void
+CType::PostCalcLayout ()
+{
+	m_Flags &= ~ETypeFlag_IsLayoutCalc;
+	m_Flags |= ETypeFlag_IsLayoutReady;
+}
+
 llvm::Type* 
 CType::GetLlvmType ()
 {
@@ -247,11 +289,13 @@ CType::GetLlvmType ()
 		return ((CStructType*) this)->GetLlvmType ();
 
 	case EType_Union:
-		return ((CUnionType*) this)->GetLlvmType ();
+		pLlvmType = ((CUnionType*) this)->GetStructType ()->GetLlvmType ();
+		break;
 
 	case EType_Class:
 	case EType_Interface:
-		return ((CClassType*) this)->GetLlvmType ();
+		pLlvmType = ((CClassType*) this)->GetPointerStructType ()->GetLlvmType ();
+		break;
 	
 	case EType_Property:
 		break;
@@ -396,7 +440,7 @@ CType::GetTypeString ()
 		break;
 
 	case EType_Import:
-		m_TypeString = ((CImportType*) this)->GetName ().GetFullName ();
+		m_TypeString.Format (_T("import %s"), ((CImportType*) this)->GetName ().GetFullName ());
 		break;
 
 	default:
@@ -678,9 +722,9 @@ CType::GetModifiedType (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Property)
 	{
-		CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
+		CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, rtl::CArrayT <CType*> (), 0);
 		CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
-			m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void), &pType, 1, 0) : 
+			m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void), pType, 0) : 
 			NULL;
 		pType = m_pModule->m_TypeMgr.GetPropertyType (pGetterType, pSetterType);
 	}

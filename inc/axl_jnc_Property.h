@@ -19,6 +19,7 @@ protected:
 	friend class CFunctionMgr;
 
 	CPropertyType* m_pType;
+	CPropertyType* m_pClosureType;
 	CFunction* m_pGetter;
 	CFunctionOverload m_Setter;
 
@@ -26,6 +27,8 @@ public:
 	CProperty ()
 	{
 		m_ItemKind = EModuleItem_Property;
+		m_pType = NULL;
+		m_pClosureType = NULL;
 		m_pGetter = NULL;
 	}
 
@@ -33,6 +36,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	CPropertyType* 
+	GetClosureType ()
+	{
+		return m_pClosureType;
 	}
 
 	CFunction* 

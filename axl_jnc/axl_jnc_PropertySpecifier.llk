@@ -5,9 +5,10 @@ class
 	CProperty* m_pProperty;
 }
 property_specifier
-	: EToken_Property property_block
+	: EToken_Property 
+	  property_block $b
 		{
-			$.m_pProperty = CreateProperty ($2.m_pGetter, $2.m_Setter);
+			$.m_pProperty = CreateProperty ($b.m_pGetter, $b.m_Setter);
 		}
 	;
 
@@ -25,13 +26,18 @@ property_block
 	: '{' property_accessor_declaration <&$>+ '}'
 	;
 
+class
+{
+	CFunction* m_pAccessessor;
+}
 property_accessor_declaration <CPropertyBlock* $pBlock>
 	: type_specifier_modifier_list
-	  property_declarator
-	  declaration_terminator
+	  property_declarator $d
 		{
-			return DeclarePropertyAccessor ($pBlock, &$1.m_TypeSpecifier, &$2.m_Declarator) != NULL;
+			$.m_pAccessessor = DeclarePropertyAccessor ($pBlock, &$1.m_TypeSpecifier, &$2.m_Declarator);
+			return $.m_pAccessessor != NULL;
 		}
+	  declaration_terminator <$.m_pAccessessor>
 	| ';'
 	;
 

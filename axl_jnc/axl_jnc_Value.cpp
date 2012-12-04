@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_Value.h"
+#include "axl_jnc_Closure.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -42,7 +43,7 @@ public:
 		rtl::CIteratorT <CStructMember> Member = pType->GetFirstMember ();
 		for (; Member; Member++)
 		{
-			CValue MemberConst (Member->GetType (), (char*) p + Member->GetOffset ());
+			CValue MemberConst ((char*) p + Member->GetOffset (), Member->GetType ());
 			LlvmMemberArray.Append ((llvm::Constant*) MemberConst.GetLlvmValue ());
 		}
 
@@ -104,12 +105,12 @@ GetValueKindString (EValue ValueKind)
 //.............................................................................
 
 CValue::CValue (
-	CType* pType,
-	const void* p
+	const void* p,
+	CType* pType
 	)
 {
 	Init ();
-	CreateConst (pType, p);
+	CreateConst (p, pType);
 }
 
 CValue::CValue (
@@ -123,7 +124,7 @@ CValue::CValue (
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 
 	Init ();
-	CreateConst (pType, &Value);
+	CreateConst (&Value, pType);
 }
 
 void
@@ -208,12 +209,12 @@ CValue::GetLlvmConst (
 
 	case EType_Pointer:
 	case EType_Reference:
-		pLlvmConst = CLlvmPodStruct::Get ((CStructType*) pModule->m_TypeMgr.GetStdType (EStdType_SafePtr), p);
+		pLlvmConst = CLlvmPodStruct::Get (((CPointerType*) pType)->GetPointerStructType (), p);
 		break;
 
 	case EType_Interface:
 	case EType_Class:
-		pLlvmConst = CLlvmPodStruct::Get ((CStructType*) pModule->m_TypeMgr.GetStdType (EStdType_InterfacePtr), p);
+		pLlvmConst = CLlvmPodStruct::Get (((CClassType*) pType)->GetPointerStructType (), p);
 		break;
 
 	case EType_Pointer_u:
@@ -236,6 +237,17 @@ CValue::GetLlvmConst (
 	}
 
 	return pLlvmConst;
+}
+
+CClosure*
+CValue::CreateClosure ()
+{
+	if (!m_Closure)
+		m_Closure = AXL_REF_NEW (CClosure);
+	else
+		m_Closure->Clear ();
+
+	return m_Closure;
 }
 
 void
@@ -310,8 +322,14 @@ void
 CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
 {
 	m_ValueKind = EValue_FunctionOverload;
-	m_pType = pFunctionOverload->GetOverloadCount () == 1 ? pFunctionOverload->GetFunction ()->GetType () : NULL;
 	m_pFunctionOverload = pFunctionOverload;
+
+	if (pFunctionOverload->GetOverloadCount () == 1)
+	{
+		CFunction* pFunction = pFunctionOverload->GetFunction ();
+		m_pType = pFunction->GetType ();
+		m_pLlvmValue = pFunction->GetLlvmFunction ();
+	}
 }
 
 void
@@ -324,8 +342,8 @@ CValue::SetProperty (CProperty* pProperty)
 
 bool
 CValue::CreateConst (
-	CType* pType,
-	const void* p
+	const void* p,
+	CType* pType
 	)
 {
 	size_t Size = pType->GetSize ();
@@ -348,15 +366,15 @@ CValue::CreateConst (
 
 bool
 CValue::CreateConst (
-	EType TypeKind,
-	const void* p
+	const void* p,
+	EType TypeKind
 	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	return CreateConst (pType, p);	
+	return CreateConst (p, pType);	
 }
 
 void
@@ -371,10 +389,8 @@ CValue::SetLiteralA (
 	if (Length == -1)
 		Length = p ? strlen (p) : 0;
 
-	CreateConst (pModule->m_TypeMgr.GetLiteralTypeA (Length));
-	char* pDst = (char*) GetConstData ();
-	memcpy (pDst, p, Length * sizeof (char));
-	pDst [Length] = 0;
+	CreateConst (p, pModule->m_TypeMgr.GetLiteralTypeA (Length));
+	((char*) GetConstData ()) [Length] = 0;
 }
 
 void
@@ -389,34 +405,34 @@ CValue::SetLiteralW (
 	if (Length == -1)
 		Length = p ? wcslen (p) : 0;
 
-	CreateConst (pModule->m_TypeMgr.GetLiteralTypeW (Length));
-	wchar_t* pDst = (wchar_t*) GetConstData ();
-	memcpy (pDst, p, Length * sizeof (wchar_t));
-	pDst [Length] = 0;
+	CreateConst (p, pModule->m_TypeMgr.GetLiteralTypeW (Length));
+	((wchar_t*) GetConstData ()) [Length] = 0;
 }
 
 void
-CValue::SetLlvmRegister (
+CValue::SetLlvmValue (
 	llvm::Value* pValue,
-	CType* pType
+	CType* pType,
+	EValue ValueKind
 	)
 {
-	m_ValueKind = EValue_LlvmRegister;
+	m_ValueKind = ValueKind;
 	m_pType = pType;
 	m_pLlvmValue = pValue;
 }
 
 void
-CValue::SetLlvmRegister (
+CValue::SetLlvmValue (
 	llvm::Value* pValue,
-	EType TypeKind
+	EType TypeKind,
+	EValue ValueKind
 	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	SetLlvmRegister (pValue, pType);
+	SetLlvmValue (pValue, pType, ValueKind);
 }
 
 //.............................................................................

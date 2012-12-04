@@ -16,6 +16,7 @@ class CFunction;
 class CFunctionOverload;
 class CProperty;
 class CClassType;
+class CClosure;
 
 //.............................................................................
 	
@@ -87,6 +88,8 @@ protected:
 
 	mutable llvm::Value* m_pLlvmValue;
 
+	ref::CPtrT <CClosure> m_Closure;
+
 public:
 	CValue ()
 	{
@@ -123,8 +126,8 @@ public:
 		);
 
 	CValue (
-		CType* pType,
-		const void* p
+		const void* p,
+		CType* pType
 		);
 
 	CValue (CType* pType)
@@ -163,7 +166,7 @@ public:
 		)
 	{
 		Init ();
-		SetLlvmRegister (pLlvmValue, pType);
+		SetLlvmValue (pLlvmValue, pType);
 	}
 
 	CValue (
@@ -172,7 +175,7 @@ public:
 		)
 	{
 		Init ();
-		SetLlvmRegister (pLlvmValue, TypeKind);
+		SetLlvmValue (pLlvmValue, TypeKind);
 	}
 
 	EValue 
@@ -185,6 +188,12 @@ public:
 	GetValueKindString () const
 	{
 		return jnc::GetValueKindString (m_ValueKind);
+	}
+
+	bool
+	IsEmpty () const
+	{
+		return m_ValueKind == EValue_Void;
 	}
 
 	CType* 
@@ -285,6 +294,15 @@ public:
 		const void* p
 		);
 
+	CClosure*
+	GetClosure () const
+	{
+		return m_Closure;
+	}
+
+	CClosure*
+	CreateClosure ();
+
 	void
 	OverrideType (CType* pType)
 	{
@@ -352,20 +370,20 @@ public:
 
 	bool
 	CreateConst (
-		CType* pType,
-		const void* p = NULL
+		const void* p,
+		CType* pType
 		);
 
 	bool
 	CreateConst (
-		EType Type,
-		const void* p = NULL
+		const void* p,
+		EType Type
 		);
 
 	void
 	SetConstBool (bool Bool)
 	{
-		CreateConst (EType_Bool, &Bool);
+		CreateConst (&Bool, EType_Bool);
 	}
 
 	void
@@ -374,7 +392,7 @@ public:
 		CType* pType
 		)
 	{
-		CreateConst (pType, &Integer);
+		CreateConst (&Integer, pType);
 	}
 
 	void
@@ -383,7 +401,7 @@ public:
 		EType TypeKind
 		)
 	{
-		CreateConst (TypeKind, &Integer);
+		CreateConst (&Integer, TypeKind);
 	}
 
 	void
@@ -407,7 +425,7 @@ public:
 		CType* pType
 		)
 	{
-		CreateConst (pType, &Integer);
+		CreateConst (&Integer, pType);
 	}
 
 	void
@@ -416,7 +434,7 @@ public:
 		EType TypeKind
 		)
 	{
-		CreateConst (TypeKind, &Integer);
+		CreateConst (&Integer, TypeKind);
 	}
 
 	void
@@ -440,19 +458,19 @@ public:
 		EType TypeKind = EType_SizeT
 		)
 	{
-		CreateConst (TypeKind, &Size);
+		CreateConst (&Size, TypeKind);
 	}
 
 	void
 	SetConstFloat (float Float)
 	{
-		CreateConst (EType_Float, &Float);
+		CreateConst (&Float, EType_Float);
 	}
 
 	void
 	SetConstDouble (double Double)
 	{
-		CreateConst (EType_Double, &Double);
+		CreateConst (&Double, EType_Double);
 	}
 
 	void
@@ -481,15 +499,17 @@ public:
 	}
 
 	void
-	SetLlvmRegister (
+	SetLlvmValue (		
 		llvm::Value* pValue,
-		CType* pType
+		CType* pType,
+		EValue ValueKind = EValue_LlvmRegister
 		);
 
 	void
-	SetLlvmRegister (
+	SetLlvmValue (
 		llvm::Value* pValue,
-		EType TypeKind
+		EType TypeKind,
+		EValue ValueKind = EValue_LlvmRegister
 		);
 
 protected:
@@ -519,8 +539,8 @@ struct TObjectHdr
 
 struct TInterfaceHdr
 {
+	void** m_pVTable; 
 	TObjectHdr* m_pObject; // for GC tracing & QueryInterface
-	void** m_pMethodTable; 
 
 	// followed by parents, then by interface data fields
 };
@@ -554,7 +574,7 @@ struct TSafePtr
 struct TFunctionPtr
 {
 	void* m_pfn;
-	TInterface* m_pInterface;
+	TInterface* m_pInterface; // NULL, interface of object or interface of closure object
 };
 
 //.............................................................................

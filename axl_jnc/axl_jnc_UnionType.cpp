@@ -31,7 +31,12 @@ CUnionType::CreateMember (
 bool
 CUnionType::CalcLayout ()
 {
-	ResetLayout ();
+	if (m_Flags & ETypeFlag_IsLayoutReady)
+		return true;
+
+	bool Result = PreCalcLayout ();
+	if (!Result)
+		return false;
 
 	CType* pLargestMemberType = NULL;
 
@@ -39,6 +44,10 @@ CUnionType::CalcLayout ()
 	for (; Member; Member++)
 	{
 		CUnionMember* pMember = *Member;
+
+		Result = pMember->m_pType->CalcLayout ();
+		if (!Result)
+			return false;
 
 		if (pMember->m_BitCount)
 		{
@@ -53,23 +62,15 @@ CUnionType::CalcLayout ()
 
 	ASSERT (pLargestMemberType);
 
-	m_LlvmFieldTypeArray.Append (pLargestMemberType->GetLlvmType ());
-	SetFieldActualSize (pLargestMemberType->GetSize ());
+	m_pStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pStructType->m_Tag.Format (_T("%s.struct"), m_Tag);
+	m_pStructType->CreateMember (pLargestMemberType);
+	Result = m_pStructType->CalcLayout ();
+	if (!Result)
+		return false;
 
-	if (m_FieldAlignedSize > m_FieldActualSize)
-		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
-
-	m_Size = m_FieldAlignedSize;
+	PostCalcLayout ();
 	return true;
-}
-
-llvm::StructType* 
-CUnionType::GetLlvmType ()
-{
-	if (!m_pLlvmType)
-		m_pLlvmType = GetLlvmStructType (GetQualifiedName ());
-	
-	return (llvm::StructType*) m_pLlvmType;
 }
 
 //.............................................................................

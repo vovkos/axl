@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_StructTypeRoot.h"
+#include "axl_jnc_StructType.h"
 
 namespace axl {
 namespace jnc {
@@ -49,7 +49,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUnionType: public CStructTypeRoot
+class CUnionType: public CNamedType
 {
 protected:
 	friend class CTypeMgr;
@@ -57,15 +57,22 @@ protected:
 
 	rtl::CStdListT <CUnionMember> m_MemberList;
 
+	CStructType* m_pStructType;
+
 public:
 	CUnionType ()
 	{
 		m_TypeKind = EType_Union;
 		m_Flags = ETypeFlag_IsPod;
+		m_pStructType = NULL;
 	}
 
-	llvm::StructType* 
-	GetLlvmType ();
+	CStructType*
+	GetStructType ()
+	{
+		ASSERT (m_pStructType);
+		return m_pStructType;
+	}
 
 	rtl::CIteratorT <CUnionMember>
 	GetFirstMember ()

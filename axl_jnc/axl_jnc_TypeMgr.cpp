@@ -15,7 +15,7 @@ CTypeMgr::CTypeMgr ()
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
-	m_UnnamedTypeIndex = 0;
+	m_UnnamedTypeCounter = 0;
 }
 
 void
@@ -35,7 +35,7 @@ CTypeMgr::Clear ()
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
-	m_UnnamedTypeIndex = 0;
+	m_UnnamedTypeCounter = 0;
 }
 
 void
@@ -98,20 +98,8 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = GetPointerType (EType_Pointer_u, EType_Int8);
 		break;
 
-	case EStdType_SafePtr:
-		pType = CreateSafePtrType ();
-		break;
-
 	case EStdType_SafePtrValidator:
 		pType = CreateSafePtrValidatorType ();
-		break;
-
-	case EStdType_InterfacePtr:
-		pType = CreateInterfacePtrType ();
-		break;
-
-	case EStdType_FunctionPtr:
-		pType = CreateFunctionPtrType ();
 		break;
 
 	case EStdType_ObjectHdr:
@@ -128,45 +116,13 @@ CTypeMgr::GetStdType (EStdType StdType)
 }
 
 CStructType* 
-CTypeMgr::CreateSafePtrType ()
-{
-	CStructType* pType = GetStructType ("sptr", "jnc.sptr");
-	pType->CreateMember ("m_p", GetStdType (EStdType_BytePtr));
-	pType->CreateMember ("m_Validator", GetStdType (EStdType_SafePtrValidator));
-	bool Result = pType->CalcLayout ();
-	ASSERT (Result);
-	return pType;
-}
-
-CStructType* 
 CTypeMgr::CreateSafePtrValidatorType ()
 {
-	CStructType* pType = GetStructType ("sptrv", "jnc.sptrv");
-	pType->CreateMember ("m_pRegionBegin", GetStdType (EStdType_BytePtr));
-	pType->CreateMember ("m_pRegionEnd", GetStdType (EStdType_BytePtr));
-	pType->CreateMember ("m_ScopeLevel", GetPrimitiveType (EType_SizeT));
-	bool Result = pType->CalcLayout ();
-	ASSERT (Result);
-	return pType;
-}
-
-CStructType*
-CTypeMgr::CreateInterfacePtrType ()
-{
-	CStructType* pType = GetStructType ("iface", "jnc.iface");
-	pType->CreateMember ("m_p", GetStdType (EStdType_BytePtr));
-	pType->CreateMember ("m_ScopeLevel", GetPrimitiveType (EType_SizeT));
-	bool Result = pType->CalcLayout ();
-	ASSERT (Result);
-	return pType;
-}
-
-CStructType*
-CTypeMgr::CreateFunctionPtrType ()
-{
-	CStructType* pType = GetStructType ("fptr", "jnc.fptr");
-	pType->CreateMember ("m_pfn", GetStdType (EStdType_BytePtr));
-	pType->CreateMember ("m_pInterface", GetStdType (EStdType_BytePtr));
+	CStructType* pType = CreateUnnamedStructType ();
+	pType->m_Tag = _T("sptrv");
+	pType->CreateMember (GetStdType (EStdType_BytePtr));
+	pType->CreateMember (GetStdType (EStdType_BytePtr));
+	pType->CreateMember (GetPrimitiveType (EType_SizeT));
 	bool Result = pType->CalcLayout ();
 	ASSERT (Result);
 	return pType;
@@ -175,9 +131,10 @@ CTypeMgr::CreateFunctionPtrType ()
 CStructType*
 CTypeMgr::CreateObjectHdrType ()
 {
-	CStructType* pType = GetStructType ("obj", "jnc.obj");
-	pType->CreateMember ("m_pType", GetStdType (EStdType_BytePtr));
-	pType->CreateMember ("m_ScopeLevel", GetPrimitiveType (EType_SizeT));
+	CStructType* pType = CreateUnnamedStructType ();
+	pType->m_Tag = _T("objhdr");
+	pType->CreateMember (GetPrimitiveType (EType_Int_p));
+	pType->CreateMember (GetStdType (EStdType_BytePtr));
 	bool Result = pType->CalcLayout ();
 	ASSERT (Result);
 	return pType;
@@ -211,7 +168,7 @@ CTypeMgr::ResolveImports ()
 		pImportType->m_pExternType = (CType*) pItem;
 	}
 
-	// re-layout all structs, unions, interfaces and classes
+	// calculate layout for all the structs, unions, interfaces and classes
 
 	rtl::CIteratorT <CStructType> StructType = m_StructTypeList.GetHead ();
 	for (; StructType; StructType++)
@@ -398,9 +355,13 @@ CTypeMgr::GetEnumType (
 {
 	ASSERT (TypeKind == EType_Enum || TypeKind == EType_Enum_c);
 
+	char SignatureChar = TypeKind == EType_Enum ? 'I' : 'J';
+
 	if (Name.IsEmpty ())
 	{
 		CEnumType* pType = AXL_MEM_NEW (CEnumType);
+		pType->m_Tag.Format (_T("_unnamed_enum_%d"), m_UnnamedTypeCounter);
+		pType->m_Signature.Format ("%c%s", m_UnnamedTypeCounter++);
 		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
 		pType->m_pModule = m_pModule;
@@ -409,7 +370,7 @@ CTypeMgr::GetEnumType (
 	}
 
 	rtl::CStringA Signature;
-	Signature.Format ("%c%s", TypeKind == EType_Enum ? 'I' : 'J', QualifiedName);
+	Signature.Format ("%c%s", SignatureChar, QualifiedName);
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -420,6 +381,7 @@ CTypeMgr::GetEnumType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
+	pType->m_Tag = QualifiedName;
 	pType->m_pModule = m_pModule;
 
 	m_EnumTypeList.InsertTail (pType);
@@ -466,7 +428,8 @@ CTypeMgr::GetStructType (
 	{
 		CStructType* pType = AXL_MEM_NEW (CStructType);
 		pType->m_pModule = m_pModule;
-		pType->m_Signature.Format ("L%d", m_UnnamedTypeIndex++);
+		pType->m_Tag.Format (_T("_unnamed_struct_%d"), m_UnnamedTypeCounter);
+		pType->m_Signature.Format ("L%d", m_UnnamedTypeCounter++);
 		pType->m_PackFactor = PackFactor;
 		m_StructTypeList.InsertTail (pType);
 		return pType;
@@ -484,6 +447,7 @@ CTypeMgr::GetStructType (
 	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
+	pType->m_Tag = QualifiedName;
 	pType->m_PackFactor = PackFactor;
 
 	m_StructTypeList.InsertTail (pType);
@@ -502,7 +466,8 @@ CTypeMgr::GetUnionType (
 	{
 		CUnionType* pType = AXL_MEM_NEW (CUnionType);
 		pType->m_pModule = m_pModule;
-		pType->m_Signature.Format ("M%d", m_UnnamedTypeIndex++);
+		pType->m_Tag.Format (_T("_unnamed_union_%d"), m_UnnamedTypeCounter);
+		pType->m_Signature.Format ("M%d", m_UnnamedTypeCounter++);
 		m_UnionTypeList.InsertTail (pType);
 		return pType;
 	}
@@ -519,6 +484,7 @@ CTypeMgr::GetUnionType (
 	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
+	pType->m_Tag = QualifiedName;
 	
 	m_UnionTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -543,7 +509,9 @@ CTypeMgr::GetClassType (
 		CClassType* pType = AXL_MEM_NEW (CClassType);
 		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
-		pType->m_Signature.Format ("%c%d", SignatureChar, m_UnnamedTypeIndex++);
+		pType->m_Size = sizeof (TInterface);
+		pType->m_Tag.Format (_T("_unnamed_class_%d"), m_UnnamedTypeCounter);
+		pType->m_Signature.Format ("%c%d", SignatureChar, m_UnnamedTypeCounter++);
 		pType->m_PackFactor = PackFactor;
 		m_ClassTypeList.InsertTail (pType);
 		return pType;
@@ -563,6 +531,7 @@ CTypeMgr::GetClassType (
 	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
+	pType->m_Tag = QualifiedName;
 	pType->m_PackFactor = PackFactor;
 	
 	m_ClassTypeList.InsertTail (pType);
@@ -574,12 +543,17 @@ CTypeMgr::GetClassType (
 CFunctionType* 
 CTypeMgr::GetFunctionType (	
 	CType* pReturnType,
-	CType** ppArgType,
-	size_t ArgCount,
+	const rtl::CArrayT <CType*>& ArgTypeArray,
 	int Flags
 	)
 {
-	rtl::CStringA Signature = CFunctionType::CreateSignature (EType_Function, pReturnType, ppArgType, ArgCount, Flags);
+	rtl::CStringA Signature = CFunctionType::CreateSignature (
+		EType_Function, 
+		pReturnType, 
+		ArgTypeArray, 
+		ArgTypeArray.GetCount (), 
+		Flags
+		);
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -591,7 +565,7 @@ CTypeMgr::GetFunctionType (
 	pType->m_Size = sizeof (TFunctionPtr);
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
-	pType->m_ArgTypeArray.Copy (ppArgType, ArgCount);
+	pType->m_ArgTypeArray = ArgTypeArray;
 	pType->m_Flags = Flags;
 
 	m_FunctionTypeList.InsertTail (pType);
@@ -652,23 +626,6 @@ CTypeMgr::GetImportType (
 }
 
 //.............................................................................
-
-/*
-
-bool
-CStructType::AddGenericArgument (CImportType* pType)
-{
-	if (m_GenericArgumentArray.Find (pType) != -1)
-	{
-		err::SetFormatStringError (_T("multiple generic argument names '%s'"), pType->GetTypeString ());
-		return false;
-	}
-
-	m_GenericArgumentArray.Append (pType);
-	return true;
-}
-
-*/
 
 } // namespace axl {
 } // namespace jnc {

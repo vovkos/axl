@@ -17,8 +17,8 @@ protected:
 	friend class CModule;
 	CModule* m_pModule;
 
-	rtl::CStdListT <CVariable> m_VariableList;
-	size_t m_TempVariableCounter;
+	rtl::CStdListT <CVariable> m_GlobalVariableList;
+	rtl::CStdListT <CVariable> m_LocalVariableList;
 
 public:
 	CVariableMgr ();
@@ -44,6 +44,9 @@ public:
 		const rtl::CString& Name,
 		CType* pType
 		);
+
+	bool
+	AllocateGlobalVariables ();
 };
 
 //.............................................................................

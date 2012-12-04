@@ -4,16 +4,17 @@
 
 #pragma once
 
-#include "axl_jnc_StructTypeRoot.h"
-#include "axl_jnc_FunctionType.h"
+#include "axl_jnc_StructType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_Namespace.h"
 #include "axl_jnc_Function.h"
-#include "axl_jnc_Property.h"
-#include "axl_jnc_ImportType.h"
+#include "axl_jnc_Decl.h"
 
 namespace axl {
 namespace jnc {
+
+class CFunctionMgr;
+
+
 
 //.............................................................................
 
@@ -23,17 +24,15 @@ protected:
 	friend class CClassType;
 
 	CClassType* m_pType;
-	size_t m_Offset;
-	size_t m_LlvmIndex;
-	size_t m_MethodTableIndex;
+	CStructBaseType* m_pStructBaseType;
+	size_t m_VTableIndex;
 
 public:
 	CClassBaseType ()
 	{
 		m_pType = NULL;
-		m_Offset = 0;
-		m_LlvmIndex = -1;
-		m_MethodTableIndex = -1;
+		m_pStructBaseType = NULL;
+		m_VTableIndex = -1;
 	}
 
 	CClassType*
@@ -45,19 +44,21 @@ public:
 	size_t 
 	GetOffset ()
 	{
-		return m_Offset;
+		ASSERT (m_pStructBaseType);
+		return m_pStructBaseType->GetOffset ();
 	}
 
 	size_t
 	GetLlvmIndex ()
 	{
-		return m_LlvmIndex;
+		ASSERT (m_pStructBaseType);
+		return m_pStructBaseType->GetLlvmIndex ();
 	}
 
 	size_t 
-	GetMethodTableIndex ()
+	GetVTableIndex ()
 	{
-		return m_MethodTableIndex;
+		return m_VTableIndex;
 	}
 };
 
@@ -95,6 +96,7 @@ protected:
 
 	EClassMember m_MemberKind;
 	EClassMemberStorage m_Storage;
+	EAccess m_Access;
 
 public:
 	CClassMember ()
@@ -102,6 +104,7 @@ public:
 		m_ItemKind = EModuleItem_ClassMember;
 		m_MemberKind = EClassMember_Undefined;
 		m_Storage = EClassMemberStorage_Undefined;
+		m_Access = EAccess_Public;
 	}
 
 	EClassMember GetMemberKind ()
@@ -112,6 +115,11 @@ public:
 	EClassMemberStorage GetStorage ()
 	{
 		return m_Storage;
+	}
+
+	EAccess GetAccess ()
+	{
+		return m_Access;
 	}
 
 	CClassType*
@@ -131,8 +139,8 @@ protected:
 	CType* m_pType;
 	CType* m_pBitFieldBaseType;
 	size_t m_BitCount;
-	size_t m_Offset;
-	size_t m_LlvmIndex;
+
+	CStructMember* m_pStructMember;
 
 public:
 	CClassFieldMember ()
@@ -141,8 +149,8 @@ public:
 		m_pType = NULL;
 		m_pBitFieldBaseType = NULL;
 		m_BitCount = 0;
-		m_Offset = 0;
-		m_LlvmIndex = -1;
+
+		m_pStructMember = NULL;
 	}
 
 	CType*
@@ -154,74 +162,31 @@ public:
 	size_t
 	GetOffset ()
 	{
-		return m_Offset;
+		ASSERT (m_pStructMember);
+		return m_pStructMember->GetOffset ();
 	}
 
 	size_t
 	GetLlvmIndex ()
 	{
-		return m_LlvmIndex;
+		ASSERT (m_pStructMember);
+		return m_pStructMember->GetLlvmIndex ();
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CClassMethodMember;
-
-class CClassMethod: public rtl::TListLink
+class CClassMethodMember: 
+	public CClassMember,
+	public CFunctionOverload
 {
 protected:
 	friend class CClassType;
-
-	CClassMethodMember* m_pMethodMember;
-	CFunction* m_pFunction;
-	size_t m_MethodTableIndex;
-
-public:
-	CClassMethod ()
-	{
-		m_pFunction = NULL;
-		m_MethodTableIndex = -1;
-	}
-
-	CClassMethodMember*
-	GetMethodMember ()
-	{
-		return m_pMethodMember;
-	}
-
-	CFunction*
-	GetFunction ()
-	{
-		return m_pFunction;
-	}
-
-	size_t
-	GetMethodTableIndex ()
-	{
-		return m_MethodTableIndex;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CClassMethodMember: public CClassMember
-{
-protected:
-	friend class CClassType;
-
-	rtl::CStdListT <CClassMethod> m_OverloadList;
 
 public:
 	CClassMethodMember ()
 	{
 		m_MemberKind = EClassMember_Method;
-	}
-
-	rtl::CIteratorT <CClassMethod>
-	GetFirstOverload ()
-	{
-		return m_OverloadList.GetHead ();
 	}
 };
 
@@ -233,14 +198,14 @@ protected:
 	friend class CClassType;
 
 	CProperty* m_pProperty;
-	size_t m_MethodTableIndex;
+	size_t m_VTableIndex;
 
 public:
 	CClassPropertyMember ()
 	{
 		m_MemberKind = EClassMember_Property;
 		m_pProperty = NULL;
-		m_MethodTableIndex = -1;
+		m_VTableIndex = -1;
 	}
 
 	CProperty*
@@ -250,19 +215,21 @@ public:
 	}
 
 	size_t
-	GetMethodTableIndex ()
+	GetVTableIndex ()
 	{
-		return m_MethodTableIndex;
+		return m_VTableIndex;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CClassType: public CStructTypeRoot
+class CClassType: public CNamedType
 {
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
+
+	size_t m_PackFactor;
 
 	rtl::CStringHashTableMapAT <CClassBaseType*> m_BaseTypeMap;
 	rtl::CStdListT <CClassBaseType> m_BaseTypeList;
@@ -270,60 +237,96 @@ protected:
 	rtl::CStdListT <CClassFieldMember> m_FieldMemberList;
 	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
 	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;
-	
-	rtl::CArrayT <void*> m_MethodTable;
 
-	void* m_pStaticFieldBlock;
+	CFunction* m_pInitializer;
+	CFunction* m_pFinalizer;
+	CFunctionOverload m_Constructor;
 
-	llvm::StructType* m_pLlvmInterfaceType;
-	llvm::StructType* m_pLlvmClassType;
+	rtl::CArrayT <CFunction*> m_VTable;
+
+	CStructType* m_pPointerStructType;
+	CStructType* m_pInterfaceHdrStructType;
+	CStructType* m_pInterfaceStructType;
+	CStructType* m_pClassStructType;
+	CStructType* m_pVTableStructType;
+
+	CValue m_VTablePtrValue;
 
 public:
-	CClassType ()
+	CClassType ();
+
+	size_t
+	GetPackFactor ()
 	{
-		m_TypeKind = EType_Class;
-		m_pStaticFieldBlock = NULL;
-		m_pLlvmInterfaceType = NULL;
+		return m_PackFactor;
+	}
+
+	llvm::StructType* 
+	GetLlvmType ();
+
+	CStructType* 
+	GetPointerStructType ()
+	{
+		ASSERT (m_pPointerStructType);
+		return m_pPointerStructType;
+	}
+
+	CStructType* 
+	GetInterfaceHdrStructType ()
+	{
+		ASSERT (m_pInterfaceHdrStructType);
+		return m_pInterfaceHdrStructType;
+	}
+
+	CStructType* 
+	GetInterfaceStructType ()
+	{
+		ASSERT (m_pInterfaceStructType);
+		return m_pInterfaceStructType;
+	}
+
+	CStructType* 
+	GetClassStructType ()
+	{
+		ASSERT (m_pClassStructType);
+		return m_pClassStructType;
+	}
+
+	CStructType* 
+	GetVTableStructType ()
+	{
+		ASSERT (m_pVTableStructType);
+		return m_pVTableStructType;
 	}
 
 	size_t 
-	GetClassSize ()
+	GetVTableSize ()
 	{
-		ASSERT (m_TypeKind == EType_Class);
-		return sizeof (TObjectHdr) + m_FieldAlignedSize;
+		return m_VTable.GetCount ();
 	}
 
-	llvm::Type* 
-	GetLlvmType ();
-
-	llvm::StructType*
-	GetLlvmInterfaceType ();
-
-	llvm::StructType*
-	GetLlvmClassType ();
-
-	llvm::PointerType*
-	GetLlvmInterfacePtrType ()
+	CFunction** 
+	GetVTable ()
 	{
-		return llvm::PointerType::get (GetLlvmInterfaceType (), 0);
+		return m_VTable;
 	}
 
-	llvm::PointerType*
-	GetLlvmClassPtrType ()
+	bool
+	GetVTablePtrValue (CValue* pValue);
+
+	CFunction* 
+	GetInitializer ();
+
+	CFunction* 
+	GetFinalizer ()
 	{
-		return llvm::PointerType::get (GetLlvmClassType (), 0);
+		return m_pFinalizer;
 	}
 
-	size_t
-	GetMethodCount ()
+	CFunctionOverload*
+	GetConstructor ()
 	{
-		return m_MethodTable.GetCount ();
-	}
-
-	void**
-	GetMethodTable ()
-	{
-		return m_MethodTable;
+		return &m_Constructor;
 	}
 
 	size_t 
@@ -343,7 +346,7 @@ public:
 		CClassType* pType,
 		size_t* pOffset = NULL,
 		rtl::CArrayT <size_t>* pLlvmIndexArray = NULL,
-		size_t* pMethodTableIndex = NULL
+		size_t* pVTableIndex = NULL
 		);
 
 	CClassBaseType*
@@ -372,7 +375,7 @@ public:
 		const tchar_t* pName,
 		size_t* pBaseTypeOffset,
 		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
-		size_t* pBaseTypeMethodTableIndex
+		size_t* pBaseTypeVTableIndex
 		);
 
 	CClassFieldMember*
@@ -382,10 +385,11 @@ public:
 		size_t BitCount = 0
 		);
 
-	CClassMethod*
-	CreateMethod (
+	CFunction*
+	CreateMethodMember (
 		const rtl::CString& Name,
-		CFunction* pFunction
+		CFunctionType* pType,
+		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
 		);
 
 	CClassPropertyMember*
@@ -397,18 +401,12 @@ public:
 	bool
 	CalcLayout ();
 
-	bool
-	InitializeObject (
-		TObjectHdr* pObject,
-		int Flags
-		);
-
 protected:
-	bool
-	InitializeInterface (
-		TInterfaceHdr* pInterface,
-		TObjectHdr* pObject,
-		void** pMethodTable
+	CFunction*
+	FindOverridenMethodMember (
+		const rtl::CString& Name,
+		CFunctionType* pClosureType,
+		size_t* pBaseTypeVTableIndex
 		);
 };
 

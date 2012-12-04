@@ -41,7 +41,7 @@ ICastOperator::Cast (
 	if (OpValueKind == EValue_Const)
 	{
 		return 
-			pResultValue->CreateConst (pType) &&
+			pResultValue->CreateConst (NULL, pType) &&
 			ConstCast (OpValue, *pResultValue);
 	}
 
@@ -79,7 +79,7 @@ CSuperCast::ConstCast (
 
 	CValue TempValue;
 	return 
-		TempValue.CreateConst (m_pIntermediateType) &&
+		TempValue.CreateConst (NULL, m_pIntermediateType) &&
 		m_pFirst->ConstCast (SrcValue, TempValue) &&
 		m_pSecond->ConstCast (TempValue, DstValue);
 }
@@ -344,7 +344,7 @@ CCast_int_swp::LlvmCast (
 		);
 
 	CValue SwapFunctionValue;
-	SwapFunctionValue.SetLlvmRegister (pLlvmSwap, NULL);
+	SwapFunctionValue.SetLlvmValue (pLlvmSwap, NULL);
 	m_pModule->m_LlvmBuilder.CreateCall (SwapFunctionValue, Value, pType, pResultValue);
 	return true;
 }
@@ -930,8 +930,8 @@ CCast_class::LlvmCast (
 	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ScopeLevelValue);
 
-	CValue SrcNullValue (llvm::Constant::getNullValue (pSrcClassType->GetLlvmInterfacePtrType ()), NULL);
-	CValue DstNullValue (llvm::Constant::getNullValue (pDstClassType->GetLlvmInterfacePtrType ()), NULL);
+	CValue SrcNullValue = pSrcClassType->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u)->GetZeroValue ();
+	CValue DstNullValue = pDstClassType->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u)->GetZeroValue ();
 
 	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_phi"));

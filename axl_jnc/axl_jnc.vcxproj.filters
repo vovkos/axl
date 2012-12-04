@@ -139,8 +139,8 @@
     <ClInclude Include="..\inc\axl_jnc_PointerType.h">
       <Filter>type</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_StructTypeRoot.h">
-      <Filter>type</Filter>
+    <ClInclude Include="..\inc\axl_jnc_Closure.h">
+      <Filter>value</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -247,8 +247,8 @@
     <ClCompile Include="axl_jnc_PointerType.cpp">
       <Filter>type</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_StructTypeRoot.cpp">
-      <Filter>type</Filter>
+    <ClCompile Include="axl_jnc_Closure.cpp">
+      <Filter>value</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_StructTypeRoot.h"
+#include "axl_jnc_BitFieldType.h"
 
 namespace axl {
 namespace jnc {
@@ -101,25 +101,56 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CStructType: public CStructTypeRoot
+class CStructType: public CNamedType
 {
 protected:
 	friend class CTypeMgr;
-	friend class CParser;
+	friend class CUnionType;
+	friend class CClassType;
+	friend class CPointerType;
+
+	size_t m_AlignFactor;
+	size_t m_PackFactor;
+	size_t m_FieldActualSize;
+	size_t m_FieldAlignedSize;
 
 	rtl::CStringHashTableMapAT <CStructBaseType*> m_BaseTypeMap;
 	rtl::CStdListT <CStructBaseType> m_BaseTypeList;
 	rtl::CStdListT <CStructMember> m_MemberList;
 
+	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
+	CBitFieldType* m_pLastBitFieldType;
+	size_t m_LastBitFieldOffset;
+
 public:
-	CStructType ()
-	{
-		m_TypeKind = EType_Struct;
-		m_Flags = ETypeFlag_IsPod;
-	}
+	CStructType ();
 
 	llvm::StructType* 
 	GetLlvmType ();
+
+	size_t 
+	GetAlignFactor ()
+	{
+		return m_AlignFactor;
+	}
+
+	size_t 
+	GetPackFactor ()
+	{
+		return m_PackFactor;
+	}
+
+	size_t 
+	GetFieldActualSize ()
+	{
+		return m_FieldActualSize;
+	}
+
+	size_t 
+	GetFieldAlignedSize ()
+	{
+		return m_FieldAlignedSize;
+	}
 
 	rtl::CIteratorT <CStructBaseType>
 	GetFirstBaseType ()
@@ -157,8 +188,64 @@ public:
 		size_t BitCount = 0
 		);
 
+	CStructMember*
+	CreateMember (
+		CType* pType,
+		size_t BitCount = 0
+		)
+	{
+		return CreateMember (rtl::CString (), pType, BitCount);
+	}
+
 	bool
 	CalcLayout ();
+
+protected:
+	void
+	ResetLayout ();
+
+	bool
+	LayoutField (
+		llvm::Type* pLlvmType,
+		size_t Size,
+		size_t AlignFactor,
+		size_t* pOffset,
+		size_t* pLlvmIndex
+		);
+
+	bool
+	LayoutField (
+		CType* pType,
+		size_t* pOffset,
+		size_t* pLlvmIndex
+		)
+	{
+		return LayoutField (pType->GetLlvmType (), pType->GetSize (), pType->GetAlignFactor (), pOffset, pLlvmIndex);
+	}
+
+	bool
+	LayoutBitField (
+		CType* pBaseType,
+		size_t BitCount,
+		CType** ppType,
+		size_t* pOffset,
+		size_t* pLlvmIndex
+		);
+
+	size_t
+	GetFieldOffset (size_t AlignFactor);
+
+	size_t 
+	GetBitFieldBitOffset (
+		CType* pType,
+		size_t BitCount
+		);
+
+	size_t
+	SetFieldActualSize (size_t Size);
+
+	CArrayType*
+	InsertPadding (size_t Size);
 };
 
 //.............................................................................

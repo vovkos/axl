@@ -359,7 +359,7 @@ public:
 
 		pLink->m_pNext = pBeforeLink;
 		pLink->m_pPrev = pPrev;
-		Before->m_pPrev = pLink;
+		pBeforeLink->m_pPrev = pLink;
 
 		if (pPrev)
 			pPrev->m_pNext = pLink;
@@ -386,7 +386,7 @@ public:
 
 		pLink->m_pPrev = pAfterLink;
 		pLink->m_pNext = pNext;
-		After->m_pNext = pLink;
+		pAfterLink->m_pNext = pLink;
 
 		if (pNext)
 			pNext->m_pPrev = pLink;

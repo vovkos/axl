@@ -30,39 +30,147 @@ struct TPoint
 	int m_y;
 };
 
+int* g_p;
+
+property 
+{
+	int 
+	get ()
+	{
+		printf ("GlobalProp::get ()\n");
+		return 10;
+	}
+
+	void
+	set (int x)
+	{
+		printf ("GlobalProp::set (%d)\n", x);
+		return;
+	}
+} GlobalProp;	
+
+/*
+int 
+GlobalProp2.get ()
+{
+	printf ("GlobalProp::get ()\n");
+	return 20;
+}
+
+int property GlobalProp2;
+*/
+
+/*
+
 interface IFoo
 {
 	int m_a;
+
+	int property FooProp;
+
+	int
+	FooTest (
+		int x,
+		int y
+		);
 };
 
 interface IBar
 {
 	int m_b;
+
+	int property BarProp;
+
+	int
+	BarTest (
+		int x,
+		int y
+		);
 };
 
 class CTest: 
-	IFoo, 
+	IFoo,
 	IBar
 {
 	int m_c;
 	int m_d;	
+
+	int
+	FooTest (
+		int x,
+		int y
+		)
+	{
+		printf ("CTest { %d; %d; %d; %d; }.FooTest (%d, %d);\n", m_a, m_b, m_c, m_d, x, y);
+		return 0;
+	}
+
+	int
+	BarTest (
+		int x,
+		int y
+		)
+	{
+		printf ("CTest { %d; %d; %d; %d; }.BarTest (%d, %d);\n", m_a, m_b, m_c, m_d, x, y);
+		return 0;
+	}
+
+	int 
+	FooProp.get ()
+	{
+		printf ("CTest.FooProp::get ()\n");
+		return m_a;
+	}
+
+	void
+	FooProp.set (int x)
+	{
+		printf ("CTest.FooProp::set (%d)\n", x);
+		m_a = x;
+		return;
+	}
+
+	int 
+	BarProp.get ()
+	{
+		printf ("CTest.BarProp::get ()\n");
+		return m_b;
+	}
+
+	void
+	BarProp.set (int x)
+	{
+		printf ("CTest.BarProp::set (%d)\n", x);
+		m_b = x;
+		return;
+	}
 };
+
+*/
 
 int
 main ()
 {
-	IFoo Foo;
-	IBar Bar;
+	int x = GlobalProp;
+	printf ("getprop returned %d\n", x);
 
-	{
-		CTest t = new CTest;
-		printf ("p = %x, scope = %d\n", t);
+/*
+	CTest t = stack new CTest;
+	t.m_a = 100;
+	t.m_b = 200;
+	t.m_c = 300;
+	t.m_d = 400;
+	t.FooTest (10, 20);
+	t.BarTest (30, 40);
 
-		Foo = t;
-		Bar = t;
+	IFoo f = t;
+	f.m_a = 101;
+	f.FooTest (50, 60);
 
-	}
-
+	IBar b = t;
+	b.m_b = 201;
+	b.BarTest (70, 80);
+*/
 	return 0;
 }
 

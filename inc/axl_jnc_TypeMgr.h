@@ -13,6 +13,7 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_ImportType.h"
 
 namespace axl {
 namespace jnc {
@@ -24,10 +25,7 @@ class CModule;
 enum EStdType
 {
 	EStdType_BytePtr,
-	EStdType_SafePtr,
 	EStdType_SafePtrValidator,
-	EStdType_InterfacePtr,
-	EStdType_FunctionPtr,
 	EStdType_ObjectHdr,
 	EStdType__Count,
 };
@@ -57,7 +55,7 @@ protected:
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
-	size_t m_UnnamedTypeIndex;
+	size_t m_UnnamedTypeCounter;
 
 public:
 	CTypeMgr ();
@@ -73,6 +71,9 @@ public:
 
 	bool
 	ResolveImports ();
+
+	bool
+	BuildMethodTables ();
 
 	CType* 
 	GetPrimitiveType (EType TypeKind)
@@ -191,10 +192,20 @@ public:
 	CFunctionType* 
 	GetFunctionType (
 		CType* pReturnType,
-		CType** ppArgType,
-		size_t ArgCount,
+		const rtl::CArrayT <CType*>& ArgTypeArray,
 		int Flags = 0
 		);
+
+	CFunctionType* 
+	CTypeMgr::GetFunctionType (	
+		CType* pReturnType,
+		CType* const* ppArgType,
+		size_t ArgCount,
+		int Flags = 0
+		)
+	{
+		return GetFunctionType (pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
+	}
 
 	CPropertyType* 
 	GetPropertyType (
@@ -275,16 +286,7 @@ protected:
 		);
 
 	CStructType* 
-	CreateSafePtrType ();
-
-	CStructType* 
 	CreateSafePtrValidatorType ();
-
-	CStructType* 
-	CreateInterfacePtrType ();
-
-	CStructType*
-	CreateFunctionPtrType ();
 
 	CStructType*
 	CreateObjectHdrType ();

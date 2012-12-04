@@ -41,17 +41,10 @@ public:
 		return m_pReturnType;
 	}
 
-	size_t 
-	GetArgCount ()
+	rtl::CArrayT <CType*>
+	GetArgTypeArray ()
 	{
-		return m_ArgTypeArray.GetCount ();
-	}
-
-	CType* 
-	GetArgType (size_t Index)
-	{
-		ASSERT (Index < m_ArgTypeArray.GetCount ());
-		return m_ArgTypeArray [Index];
+		return m_ArgTypeArray;
 	}
 
 	static
@@ -59,7 +52,7 @@ public:
 	CreateSignature (
 		EType TypeKind,
 		CType* pReturnType,
-		CType** ppArgType,
+		CType* const* ppArgType,
 		size_t ArgCount,
 		int Flags
 		);
@@ -69,7 +62,7 @@ public:
 	CreateTypeString (
 		EType TypeKind,
 		CType* pReturnType,
-		CType** ppArgType,
+		CType* const* ppArgType,
 		size_t ArgCount,
 		int Flags
 		);

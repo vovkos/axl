@@ -580,7 +580,8 @@ CBinOp_Idx::ArrayIndexOperator (
 
 	if (OpValue1.GetValueKind () == EValue_Const && OpValue2.GetValueKind ())
 	{
-		pResultValue->CreateConst (pElementType, (char*) OpValue1.GetConstData () + OpValue2.GetSizeT () * pElementType->GetSize ());
+		void* p = (char*) OpValue1.GetConstData () + OpValue2.GetSizeT () * pElementType->GetSize ();
+		pResultValue->CreateConst (p, pElementType);
 		return true;
 	}
 

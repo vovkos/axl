@@ -33,12 +33,14 @@ CFunctionMgr::Clear ()
 
 CFunction*
 CFunctionMgr::CreateFunction (
+	EFunction FunctionKind,
 	const rtl::CString& Tag,
 	CFunctionType* pType,
 	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
 	CFunction* pFunction = AXL_MEM_NEW (CFunction);
+	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pModule = m_pModule;
 	pFunction->m_pType = pType;
 	pFunction->m_Tag = Tag;
@@ -51,17 +53,34 @@ CFunctionMgr::CreateFunction (
 	{
 		// create default argument names
 
-		size_t Count = pType->GetArgCount ();
+		rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
+		size_t Count = ArgTypeArray.GetCount ();
 		for (size_t i = 0; i < Count; i++)
 		{
 			CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
 			pArg->m_Name.Format (_T("a%d"), i + 1);
-			pArg->m_pType = pType->GetArgType (i);
+			pArg->m_pType = ArgTypeArray [i];
 			pFunction->m_ArgList.InsertTail (pArg);
 		}
 	}
 
 	m_FunctionList.InsertTail (pFunction);
+	return pFunction;
+}
+
+CFunction*
+CFunctionMgr::CreateGlobalFunction (
+	const rtl::CString& Name,
+	CFunctionType* pType,
+	rtl::CStdListT <CFunctionFormalArg>* pArgList
+	)
+{
+	CGlobalFunction* pGlobalFunction = AXL_MEM_NEW (CGlobalFunction);
+	pGlobalFunction->m_Name = Name;
+	m_GlobalFunctionList.InsertTail (pGlobalFunction);
+
+	CFunction* pFunction = CreateFunction (EFunction_Global, pGlobalFunction->m_Name, pType, pArgList);
+	pGlobalFunction->AddOverload (pFunction);
 	return pFunction;
 }
 
@@ -86,7 +105,7 @@ CFunctionMgr::CreateProperty (CPropertyType* pPropertyType)
 {
 	CFunctionTypeOverload* pSetterType = pPropertyType->GetSetterType ();
 
-	CFunction* pGetter = CreateFunction (_T("getter"), pPropertyType->GetGetterType ());
+	CFunction* pGetter = CreateFunction (EFunction_PropertyGetter, _T("getter"), pPropertyType->GetGetterType ());
 			
 	CFunctionOverload Setter;
 
@@ -94,27 +113,11 @@ CFunctionMgr::CreateProperty (CPropertyType* pPropertyType)
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunctionType* pSetterTypeOverload = pSetterType->GetType (i);
-		CFunction* pSetterOverload = CreateFunction (_T("setter"), pSetterTypeOverload);
+		CFunction* pSetterOverload = CreateFunction (EFunction_PropertySetter, _T("setter"), pSetterTypeOverload);
 		Setter.AddOverload (pSetterOverload);
 	}
 
 	return CreateProperty (pPropertyType, pGetter, Setter);
-}
-
-CGlobalFunction*
-CFunctionMgr::CreateGlobalFunction (
-	const rtl::CString& Name,
-	CFunctionType* pType,
-	rtl::CStdListT <CFunctionFormalArg>* pArgList
-	)
-{
-	CFunction* pFunction = CreateFunction (Name, pType, pArgList);
-	CGlobalFunction* pGlobalFunction = AXL_MEM_NEW (CGlobalFunction);
-	pGlobalFunction->m_Name = Name;
-	pGlobalFunction->m_pFunction = pFunction;
-	pFunction->m_pOverload = pGlobalFunction;
-	m_GlobalFunctionList.InsertTail (pGlobalFunction);
-	return pGlobalFunction;
 }
 
 CGlobalProperty*
@@ -148,6 +151,7 @@ CFunctionMgr::CompileFunctions ()
 	bool Result;
 
 	CSetCurrentThreadModule ScopeModule (m_pModule);
+	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 
 	rtl::CIteratorT <jnc::CFunction> Function = m_FunctionList.GetHead ();
 	for (; Function; Function++)
@@ -160,16 +164,28 @@ CFunctionMgr::CompileFunctions ()
 		// set namespace
 
 		CNamespace* pNamespace = NULL;
+		CProperty* pProperty = NULL;
+		CClassType* pThisType = NULL;
+		CClassType* pOriginType = NULL;
 
 		EFunction FunctionKind = pFunction->GetFunctionKind ();
 		switch (FunctionKind)
 		{
 		case EFunction_Global:
-			{
-			CGlobalFunction* pGlobalFunction = (CGlobalFunction*) pFunction->GetOverload ();
-			pNamespace = pGlobalFunction->GetParentNamespace ();
+			pNamespace = pFunction->GetGlobalFunction ()->GetParentNamespace ();
 			break;
-			}
+
+		case EFunction_Method:
+			pNamespace = pFunction->GetClassMethodMember()->GetParentNamespace ();
+			pThisType = pFunction->GetClassMethodMember()->GetParentType ();
+			pOriginType = pFunction->GetOriginClassType ();
+			break;
+
+		case EFunction_PropertyGetter:
+		case EFunction_PropertySetter:
+			pProperty = pFunction->GetProperty ();
+			pNamespace = m_pModule->m_NamespaceMgr.GetGlobalNamespace ();
+			break;
 
 		default:
 			ASSERT (false);
@@ -177,17 +193,30 @@ CFunctionMgr::CompileFunctions ()
 
 		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
 
-		// create entry block
+		// create entry block and scope
 
 		m_pCurrentFunction = pFunction;
 		pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
 		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+		CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (pFunction->GetBodyFirstToken ()->m_Pos);
 
 		// store arguments
 
-		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetFirstArg ();
 		llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
+		CValue ThisValue;
+		if (FunctionKind == EFunction_Method)
+		{
+			llvm::Value* pLlvmArg = LlvmArg;
+			CValue ArgValue (pLlvmArg, pOriginType);			
+			Result = CreateThisValue (ArgValue, pThisType, &ThisValue);
+			if (!Result)
+				return false;
+
+			LlvmArg++;
+		}
+
+		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetFirstArg ();
 		for (; Arg; Arg++, LlvmArg++)
 		{
 			CFunctionFormalArg* pArg = *Arg;
@@ -199,7 +228,7 @@ CFunctionMgr::CompileFunctions ()
 			CValue ArgVariableValue (pArgVariable);
 
 			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, ArgVariableValue);
-			pNamespace->AddItem (pArgVariable);
+			pScope->AddItem (pArgVariable);
 		}
 
 		// parse body
@@ -207,6 +236,8 @@ CFunctionMgr::CompileFunctions ()
 		jnc::CParser Parser;
 		Parser.m_Stage = jnc::CParser::EStage_Pass2;
 		Parser.m_pModule = m_pModule;
+		Parser.m_ThisValue = ThisValue;
+		Parser.m_pThisType = pThisType;
 		Parser.Create (jnc::ESymbol_compound_stmt, true); 
 			
 		rtl::CBoxIteratorT <jnc::CToken> Token = pFunction->GetBodyFirstToken ();
@@ -220,17 +251,63 @@ CFunctionMgr::CompileFunctions ()
 			}
 		}
 
-		// llvm::verifyFunction (pFunction->GetLlvmFunction (), llvm::PrintMessageAction);
+		m_pModule->m_NamespaceMgr.CloseScope (pFunction->GetBodyLastToken ()->m_Pos);
 
 		pFunction->m_Ast = Parser.GetAst ();
-		jnc::CParser::CAstNode* pAstNode = pFunction->m_Ast->GetRoot ();
+		pFunction->m_pScope = pScope;
 
-		ASSERT (pAstNode->m_Kind == jnc::ESymbol_compound_stmt);
-		jnc::CParser::CCompoundStmt* pBody = (jnc::CParser::CCompoundStmt*) pAstNode;
-		pFunction->m_pScope = pBody->m_pScope;
+		try 
+		{
+			llvm::verifyFunction (*pFunction->GetLlvmFunction (), llvm::ReturnStatusAction);
+		}
+		catch (err::CError Error)
+		{
+			err::SetFormatStringError (
+				_T("LLVM verification fail for '%s': %s"), 
+				pFunction->GetTag (),
+				Error->GetDescription ()
+				);
+
+			return false;
+		}
 	}
 
 	m_pModule->m_NamespaceMgr.SetGlobalNamespace (); // just in case
+
+	return true;
+}
+
+bool
+CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
+{
+	CSetCurrentThreadModule ScopeModule (m_pModule);
+	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
+
+	rtl::CIteratorT <jnc::CFunction> Function = m_FunctionList.GetHead ();
+	for (; Function; Function++)
+	{
+		jnc::CFunction* pFunction = *Function;
+
+		if (!pFunction->HasBody ())
+			continue;
+
+		try 
+		{
+			pFunction->m_pfn = pExecutionEngine->getPointerToFunction (pFunction->GetLlvmFunction ());
+		}
+		catch (err::CError Error)
+		{
+			err::SetFormatStringError (
+				_T("LLVM jitting fail for '%s': %s"), 
+				pFunction->GetTag (),
+				Error->GetDescription ()
+				);
+
+			return false;
+		}
+
+		ASSERT (pFunction->m_pfn);
+	}
 
 	return true;
 }
@@ -248,43 +325,39 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 	switch (Func)
 	{
 	case EStdFunc_CreateSafePtrValidator:
-		pFunction = GetCreateSafePtrValidator ();
+		pFunction = CreateCreateSafePtrValidator ();
 		break;
 
 	case EStdFunc_CheckSafePtrRange:
-		pFunction = GetCheckSafePtrRange ();
+		pFunction = CreateCheckSafePtrRange ();
 		break;
 
 	case EStdFunc_CheckSafePtrScope:
-		pFunction = GetCheckSafePtrScope ();
+		pFunction = CreateCheckSafePtrScope ();
 		break;
 
 	case EStdFunc_OnInvalidSafePtr:
-		pFunction = GetOnInvalidSafePtr ();
+		pFunction = CreateOnInvalidSafePtr ();
 		break;
 
 	case EStdFunc_CheckInterfaceNull:
-		pFunction = GetCheckInterfaceNull ();
+		pFunction = CreateCheckInterfaceNull ();
 		break;
 
 	case EStdFunc_CheckInterfaceScope:
-		pFunction = GetCheckInterfaceScope ();
+		pFunction = CreateCheckInterfaceScope ();
 		break;
 
 	case EStdFunc_OnInvalidInterface:
-		pFunction = GetOnInvalidInterface ();
+		pFunction = CreateOnInvalidInterface ();
 		break;
 
 	case EStdFunc_DynamicCastInterface:
-		pFunction = GetDynamicCastInterface ();
-		break;
-
-	case EStdFunc_InitializeObject:
-		pFunction = GetInitializeObject ();
+		pFunction = CreateDynamicCastInterface ();
 		break;
 
 	case EStdFunc_HeapAllocate:
-		pFunction = GetHeapAllocate ();
+		pFunction = CreateHeapAllocate ();
 		break;
 
 	default:
@@ -304,7 +377,7 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 //		);
 
 CFunction*
-CFunctionMgr::GetCreateSafePtrValidator ()
+CFunctionMgr::CreateCreateSafePtrValidator ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -319,7 +392,7 @@ CFunctionMgr::GetCreateSafePtrValidator ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray), 0);
-	CFunction* pFunction = CreateFunction (_T("jnc.CreateSafePtrValidator"), pType);
+	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CreateSafePtrValidator"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -360,7 +433,7 @@ CFunctionMgr::GetCreateSafePtrValidator ()
 //		);
 
 CFunction*
-CFunctionMgr::GetCheckSafePtrRange ()
+CFunctionMgr::CreateCheckSafePtrRange ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -376,7 +449,7 @@ CFunctionMgr::GetCheckSafePtrRange ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (_T("jnc.CheckSafePtrRange"), pType);
+	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckSafePtrRange"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -396,7 +469,7 @@ CFunctionMgr::GetCheckSafePtrRange ()
 	CBasicBlock* pCmp2Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp2"));
 	CBasicBlock* pCmp3Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_cmp3"));
 	
-	CValue NullValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), NULL);
+	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CValue CmpValue;
 	m_pModule->m_LlvmBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
@@ -438,7 +511,7 @@ CFunctionMgr::GetCheckSafePtrRange ()
 //		);
 
 CFunction*
-CFunctionMgr::GetCheckSafePtrScope ()
+CFunctionMgr::CreateCheckSafePtrScope ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -453,7 +526,7 @@ CFunctionMgr::GetCheckSafePtrScope ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (_T("jnc.CheckSafePtrScope"), pType);
+	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckSafePtrScope"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -500,7 +573,7 @@ CFunctionMgr::GetCheckSafePtrScope ()
 //		);
 
 CFunction*
-CFunctionMgr::GetOnInvalidSafePtr ()
+CFunctionMgr::CreateOnInvalidSafePtr ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	
@@ -512,14 +585,14 @@ CFunctionMgr::GetOnInvalidSafePtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (_T("jnc.OnInvalidSafePtr"), pType);
+	return CreateFunction (EFunction_Global, _T("jnc.OnInvalidSafePtr"), pType);
 }
 
 // void 
 // jnc.CheckInterfaceNull (int8* p);
 
 CFunction*
-CFunctionMgr::GetCheckInterfaceNull ()
+CFunctionMgr::CreateCheckInterfaceNull ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -532,7 +605,7 @@ CFunctionMgr::GetCheckInterfaceNull ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (_T("jnc.CheckInterfaceNull"), pType);
+	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckInterfaceNull"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -547,17 +620,16 @@ CFunctionMgr::GetCheckInterfaceNull ()
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_success"));
 	
-	CValue NullValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), NULL);
+	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CValue CmpValue;
 	m_pModule->m_LlvmBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
 	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pFailBlock, pSuccessBlock);	
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
 
-	CValue ScopeLevelValue ((int64_t) 0, EType_SizeT);
 	CValue ErrorValue (ERuntimeError_NullInterface, EType_Int);
 	CFunction* pOnInvalidInterface = GetStdFunction (EStdFunc_OnInvalidInterface);
-	m_pModule->m_LlvmBuilder.CreateCall3 (pOnInvalidInterface, ArgValue1, ScopeLevelValue, ErrorValue, NULL, NULL);
+	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidInterface, ArgValue1, ErrorValue, NULL, NULL);
 	m_pModule->m_LlvmBuilder.CreateBr (pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
 
@@ -577,7 +649,7 @@ CFunctionMgr::GetCheckInterfaceNull ()
 //		);
 
 CFunction*
-CFunctionMgr::GetCheckInterfaceScope ()
+CFunctionMgr::CreateCheckInterfaceScope ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -592,7 +664,7 @@ CFunctionMgr::GetCheckInterfaceScope ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (_T("jnc.CheckInterfaceScope"), pType);
+	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckInterfaceScope"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -610,7 +682,7 @@ CFunctionMgr::GetCheckInterfaceScope ()
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_success"));
 	CBasicBlock* pCmp2Block = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_cmp2"));
 	
-	CValue NullValue (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), NULL);
+	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CValue CmpValue;
 	m_pModule->m_LlvmBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
@@ -622,8 +694,8 @@ CFunctionMgr::GetCheckInterfaceScope ()
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFailBlock);
 
 	CValue ErrorValue (ERuntimeError_ScopeMismatch, EType_Int);
-	CFunction* pOnInvalidSafePtr = GetStdFunction (EStdFunc_OnInvalidSafePtr);
-	m_pModule->m_LlvmBuilder.CreateCall3 (pOnInvalidSafePtr, ArgValue1, ArgValue2, ErrorValue, NULL, NULL);
+	CFunction* pOnInvalidInterface = GetStdFunction (EStdFunc_OnInvalidInterface);
+	m_pModule->m_LlvmBuilder.CreateCall2 (pOnInvalidInterface, ArgValue1, ErrorValue, NULL, NULL);
 	m_pModule->m_LlvmBuilder.CreateBr (pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSuccessBlock);
 
@@ -638,24 +710,22 @@ CFunctionMgr::GetCheckInterfaceScope ()
 // void
 // jnc.OnInvalidInterface (
 //		int8* p,
-//		size_t ScopeLevel,
 //		int Error
 //		);
 
 CFunction*
-CFunctionMgr::GetOnInvalidInterface ()
+CFunctionMgr::CreateOnInvalidInterface ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int)
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (_T("jnc.OnInvalidInterface"), pType);
+	return CreateFunction (EFunction_Global, _T("jnc.OnInvalidInterface"), pType);
 }
 
 // int8*
@@ -665,7 +735,7 @@ CFunctionMgr::GetOnInvalidInterface ()
 //		);
 
 CFunction*
-CFunctionMgr::GetDynamicCastInterface ()
+CFunctionMgr::CreateDynamicCastInterface ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 	
@@ -676,37 +746,14 @@ CFunctionMgr::GetDynamicCastInterface ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (_T("jnc.DynamicCastInterface"), pType);
-}
-
-// int8*
-// jnc.InitializeClass (
-//		int8* p,
-//		int8* pType
-//		int Flags
-//		);
-
-CFunction*
-CFunctionMgr::GetInitializeObject ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-	
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (_T("jnc.InitializeObject"), pType);
+	return CreateFunction (EFunction_Global, _T("jnc.DynamicCastInterface"), pType);
 }
 
 // int8*
 // jnc.HeapAllocate (int8* pType);
 
 CFunction*
-CFunctionMgr::GetHeapAllocate ()
+CFunctionMgr::CreateHeapAllocate ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 	
@@ -716,10 +763,160 @@ CFunctionMgr::GetHeapAllocate ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (_T("jnc.HeapAllocate"), pType);
+	return CreateFunction (EFunction_Global, _T("jnc.HeapAllocate"), pType);
+}
+
+CFunction* 
+CFunctionMgr::CreateClassInitializer (CClassType* pClassType)
+{
+	CValue VTablePtrValue;
+	bool Result = pClassType->GetVTablePtrValue (&VTablePtrValue);
+	if (!Result)
+		return NULL;
+
+	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
+	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		pClassType->GetClassStructType ()->GetPointerType (EType_Pointer_u),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int)
+	};
+
+	rtl::CString Tag;
+	Tag = pClassType->GetQualifiedName ();
+	Tag.Append (_T(".$init"));
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction (EFunction_Global, Tag, pType);
+
+	m_pCurrentFunction = pFunction;
+
+	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+	
+	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
+	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
+
+	CValue TypeValue (&pClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+	CValue ObjectPtrValue;
+	CValue IfacePtrValue;
+	CValue PtrValue;
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 0, NULL, &ObjectPtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 1, NULL, &IfacePtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ArgValue2, PtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 1, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (TypeValue, PtrValue);
+
+	InitializeInterface (pClassType, ObjectPtrValue, IfacePtrValue, VTablePtrValue);
+
+	m_pModule->m_LlvmBuilder.CreateRet ();
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
+	m_pCurrentFunction = pPrevCurrentFunction;
+
+	return pFunction;
+}
+
+bool
+CFunctionMgr::InitializeInterface (
+	CClassType* pClassType,
+	const CValue& ObjectPtrValue,
+	const CValue& IfacePtrValue,
+	const CValue& VTablePtrValue
+	)
+{
+	CValue IfaceHdrPtrValue;
+	CValue PtrValue;
+
+	// TInterfaceHdr
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &PtrValue);
+
+	rtl::CString s0 = GetLlvmTypeString (IfacePtrValue.GetLlvmValue ()->getType ());
+	rtl::CString s1 = GetLlvmTypeString (IfaceHdrPtrValue.GetLlvmValue ()->getType ());
+	rtl::CString s2 = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
+	rtl::CString s3 = GetLlvmTypeString (VTablePtrValue.GetLlvmValue ()->getType ());
+
+	m_pModule->m_LlvmBuilder.CreateStore (VTablePtrValue, PtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 1, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ObjectPtrValue, PtrValue);
+
+	// base types
+
+	rtl::CIteratorT <CClassBaseType> BaseType = pClassType->GetFirstBaseType ();
+	for (; BaseType; BaseType++)
+	{
+		CClassType* pBaseClassType = BaseType->GetType ();
+		CValue BaseClassPtrValue;
+		CValue BaseClassVTablePtrValue;
+
+		CPointerType* pBaseClassVTablePtrType = pBaseClassType->GetVTableStructType ()->GetPointerType (EType_Pointer_u);
+
+		m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, BaseType->GetLlvmIndex (), NULL, &BaseClassPtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (VTablePtrValue, BaseType->GetVTableIndex (), NULL, &BaseClassVTablePtrValue);
+		m_pModule->m_LlvmBuilder.CreateBitCast (BaseClassVTablePtrValue, pBaseClassVTablePtrType, &BaseClassVTablePtrValue);
+
+		InitializeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
+	}
+	
+	return true;
+}
+
+bool
+CFunctionMgr::CreateThisValue (
+	const CValue& ArgValue,
+	CClassType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CClassType* pSrcType = (CClassType*) ArgValue.GetType ();
+	ASSERT (pSrcType->IsClassType ());
+
+	CValue PtrValue;
+	CValue ScopeLevelValue;
+
+	CPointerType* pSrcPointerType = pSrcType->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u);
+	CPointerType* pDstPointerType = pResultType->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u);
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue, 0, pSrcPointerType, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue, 1, NULL, &ScopeLevelValue);
+
+	bool Result = m_pModule->m_OperatorMgr.CastOperator (&PtrValue, pDstPointerType);
+	if (!Result)
+		return false;
+
+	CValue ZeroValue ((int64_t) 0, EType_SizeT);
+	CValue OneValue (1, EType_SizeT);
+
+	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("this_phi"));
+	CBasicBlock* pNoNullBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("this_scope_new"));
+
+	CValue CmpValue;
+	m_pModule->m_LlvmBuilder.CreateEq_i (ScopeLevelValue, ZeroValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pPhiBlock, pNoNullBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pNoNullBlock);
+	m_pModule->m_LlvmBuilder.CreateBr (pPhiBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPhiBlock);
+
+	CValue PhiValue;
+	CValue ThisValue;
+	m_pModule->m_LlvmBuilder.CreatePhi (OneValue, pNoNullBlock, ZeroValue, pCmpBlock, &PhiValue);
+	m_pModule->m_LlvmBuilder.CreateInterface (PtrValue, PhiValue, pResultType, pResultValue);
+	return true;
 }
 
 //.............................................................................
 
 } // namespace axl {
 } // namespace jnc {
+

@@ -54,39 +54,52 @@ class_block <CClassType* $pType>
 class_member_declaration <CClassType* $pType>
 	: attribute_block?
 	  declaration_specifier_list $s
-	  class_member_declarator_list <&$s.m_DeclSpecifiers, $pType>? 
-	  declaration_terminator
+	  class_member_declarator_list $d <&$s.m_DeclSpecifiers, $pType> ? 
+	  declaration_terminator <$d.m_pLastMember>
 	| function_body_pass1
 	| ';'
 	;
 
+class
+{
+	CModuleItem* m_pLastMember;
+}
 class_member_declarator_list <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
-	: class_member_declarator <$pDeclSpecifiers, $pType> (',' class_member_declarator <$pDeclSpecifiers, $pType>)*
+	: class_member_declarator <$pDeclSpecifiers, $pType> 
+		{
+			$.m_pLastMember = $1.m_pMember;
+		}
+	  (',' class_member_declarator $d2 <$pDeclSpecifiers, $pType>
+		{
+			$.m_pLastMember = $d2.m_pMember;
+		}
+	  )*
 	;
 
-class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
-local
+class
 {
-	CModuleItem* $pMember;
+	CModuleItem* m_pMember;
 }
+class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
 	: declarator (':' constant_integer_expr $bf)? 
 		{
-			return DeclareClassMember (
+			$.m_pMember = DeclareClassMember (
 				$pType, 
 				$pDeclSpecifiers, 
 				&$1.m_Declarator,
-				IsValidLocator ($bf) ? $bf.m_Value : -1
-				) != NULL;
+				IsValidLocator ($bf) ? $bf.m_Value : 0
+				);
+			return $.m_pMember != NULL;
 		}
 	  ('=' 
 		{
-			if ($pMember->GetItemKind () != EModuleItem_ClassMember)
+			if ($.m_pMember->GetItemKind () != EModuleItem_ClassMember)
 			{
-				err::SetFormatStringError (_T("cannot apply initializer to '%s'"), $pMember->GetItemKindString ());
+				err::SetFormatStringError (_T("cannot apply initializer to '%s'"), $.m_pMember->GetItemKindString ());
 				return false;
 			}			
 		}
-	  initializer <.((CClassFieldMember*) $pMember)->GetType ().>
+	  initializer <.((CClassFieldMember*) $.m_pMember)->GetType ().>
 		{
 		}
 	  )?
