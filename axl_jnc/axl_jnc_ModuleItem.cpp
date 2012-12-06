@@ -39,9 +39,6 @@ GetModuleItemKindString (EModuleItem ItemKind)
 	case EModuleItem_GlobalFunction:
 		return _T("global-function");
 
-	case EModuleItem_GlobalProperty:
-		return _T("global-property");
-
 	case EModuleItem_EnumMember:
 		return _T("enum-member");
 

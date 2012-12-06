@@ -308,7 +308,7 @@ COperatorMgr::GetCastOperator (
 	switch (OpTypeKind)
 	{
 	case EType_Property:
-		pBaseType = ((CPropertyType*) pOpType)->GetGetterType ()->GetReturnType ();
+		pBaseType = ((CPropertyType*) pOpType)->GetGetter ()->GetType ()->GetReturnType ();
 		return GetCastOperator (pBaseType, pType) ? &m_Cast_getp : NULL;
 
 	case EType_Reference:
@@ -435,7 +435,7 @@ COperatorMgr::MoveOperator (
 
 	CType* pDstType = DstValue.GetType ();
 	if (pDstType->GetTypeKind () == EType_Property)
-		return SetPropertyOperator (OpValue, DstValue.GetProperty ());
+		return SetPropertyOperator (OpValue, DstValue);
 
 	if (!pDstType->IsReferenceType ())
 	{
@@ -882,9 +882,12 @@ COperatorMgr::ClassMethodMemberOperator (
 
 	// pfn*
 
+	ASSERT (pFunction->GetFunctionKind () == EFunction_Method);
+	size_t VTableIndex = ((CFunction*) pFunction)->GetVTableIndex ();
+
 	m_pModule->m_LlvmBuilder.CreateGep2 (
 		PtrValue, 
-		BaseTypeVTableIndex + pFunction->GetVTableIndex (),
+		BaseTypeVTableIndex + VTableIndex,
 		NULL, 
 		&PtrValue
 		);
@@ -1193,7 +1196,7 @@ COperatorMgr::PrepareOperandType (
 			break;
 
 		case EType_Property:
-			pType = ((CPropertyType*) pType)->GetGetterType ()->GetReturnType ();
+			pType = ((CPropertyType*) pType)->GetGetter ()->GetType ()->GetReturnType ();
 			break;
 
 		case EType_Enum:
@@ -1258,7 +1261,7 @@ COperatorMgr::PrepareOperand (
 			break;
 
 		case EType_Property:
-			Result = GetPropertyOperator (Value.GetProperty (), &Value);
+			Result = GetPropertyOperator (Value, &Value);
 			if (!Result)
 				return false;
 
@@ -1551,11 +1554,12 @@ COperatorMgr::MergeBitField (
 
 bool
 COperatorMgr::GetPropertyOperator (
-	CProperty* pProperty,
+	const CValue& OpValue,
+	CPropertyType* pPropertyType,
 	CValue* pResultValue
 	)
 {
-	CFunction* pFunction = pProperty->GetGetter ();
+	CFunction* pFunction = pPropertyType->GetGetter ();
 	rtl::CBoxListT <CValue> ArgList;
 	return CallOperator (pFunction, &ArgList, pResultValue);
 }
@@ -1563,10 +1567,11 @@ COperatorMgr::GetPropertyOperator (
 bool
 COperatorMgr::SetPropertyOperator (
 	const CValue& SrcValue,
-	CProperty* pProperty
+	const CValue& DstValue,
+	CPropertyType* pPropertyType
 	)
 {
-	CFunctionOverload* pSetter = pProperty->GetSetter ();
+	CFunctionOverload* pSetter = pPropertyType->GetSetter ();
 	if (!pSetter)
 	{
 		err::SetFormatStringError (_T("cannot move to a read-only property"));

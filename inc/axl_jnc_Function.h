@@ -5,7 +5,6 @@
 #pragma once
 
 #include "axl_jnc_FunctionType.h"
-#include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
 #include "axl_llk_Ast.h"
@@ -14,23 +13,28 @@ namespace axl {
 namespace jnc {
 
 class CBasicBlock;
-class CFunctionOverload;
-class CGlobalFunction;
 class CClassType;
+class CVTableType;
 class CClassMethodMember;
-class CProperty;
 
 //.............................................................................
 
 enum EFunction
 {
-	EFunction_Undefined,
+	EFunction_Undefined = 0,
 	EFunction_Global,
 	EFunction_Method,
 	EFunction_Constructor,
 	EFunction_Destructor,
-	EFunction_PropertyGetter,
-	EFunction_PropertySetter,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum EPropertyAccessor
+{
+	EPropertyAccessor_Undefined = 0,
+	EPropertyAccessor_Get,
+	EPropertyAccessor_Set,
 };
 
 //.............................................................................
@@ -38,7 +42,6 @@ enum EFunction
 class CFunctionFormalArg: public rtl::TListLink
 {
 protected:
-	friend class CFunctionMgr;
 	friend class CParser;
 	friend class CClassType;
 
@@ -79,18 +82,26 @@ class CFunction:
 {
 protected:
 	friend class CFunctionMgr;
-	friend class CFunctionOverload;
 	friend class CClassType;
+	friend class CVTableType;
+	friend class CPropertyType;
+	friend class CParser;
 
 	EFunction m_FunctionKind;
+	EPropertyAccessor m_PropertyAccessorKind;
+	
 	CFunctionType* m_pType;
 	CFunctionType* m_pClosureType;
-	CFunctionOverload* m_pOverload;
-	CProperty* m_pProperty;
-	CClassType* m_pOriginClassType;
+	CNamespace* m_pNamespace;
+
+	CNamespace* m_pAnchorNamespace;
+	CQualifiedName m_Name;
+	rtl::CString m_Tag;
+
+	CClassType* m_pClassType;
+	CVTableType* m_pVTableType;
 	size_t m_VTableIndex;
 
-	rtl::CString m_Tag;
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
 
@@ -98,26 +109,12 @@ protected:
 	CBasicBlock* m_pBlock;
 	CScope* m_pScope;
 
+	CFunction* m_pExternFunction;
 	llvm::Function* m_pLlvmFunction;
 	void* m_pfn;
 
 public:
 	CFunction ();
-
-	rtl::CString 
-	GetTag ()
-	{
-		return m_Tag;
-	}
-
-	llvm::Function* 
-	GetLlvmFunction ();
-	
-	void*
-	GetFunctionPointer ()
-	{
-		return m_pfn;
-	}
 
 	EFunction
 	GetFunctionKind ()
@@ -125,6 +122,24 @@ public:
 		return m_FunctionKind;
 	}
 
+	EPropertyAccessor
+	GetPropertyAccessorKind ()
+	{
+		return m_PropertyAccessorKind;
+	}
+
+	const CQualifiedName&
+	GetQualifiedName ()
+	{
+		return m_Name;
+	}
+
+	rtl::CString 
+	GetTag ()
+	{
+		return m_Tag;
+	}
+	
 	CFunctionType* 
 	GetType ()
 	{
@@ -137,19 +152,25 @@ public:
 		return m_pClosureType;
 	}
 
-	CClassType* 
-	GetOriginClassType ()
+	CNamespace* 
+	GetNamespace ()
 	{
-		return m_pOriginClassType;
+		return m_pNamespace;
 	}
 
-	CClassMethodMember* 
-	GetClassMethodMember ();
-
-	CProperty* 
-	GetProperty ()
+	CClassType* 
+	GetClassType ()
 	{
-		return m_pProperty;
+		return m_pClassType;
+	}
+
+	CClassType* 
+	GetOriginClassType ();
+
+	CVTableType* 
+	GetVTableType ()
+	{
+		return m_pVTableType;
 	}
 
 	size_t
@@ -157,9 +178,6 @@ public:
 	{
 		return m_VTableIndex;
 	}
-
-	CGlobalFunction* 
-	GetGlobalFunction ();
 
 	size_t 
 	GetArgCount ()
@@ -210,6 +228,21 @@ public:
 	GetBlock ()
 	{
 		return m_pBlock;
+	}
+
+	CFunction*
+	GetExternFunction ()
+	{
+		return m_pExternFunction;
+	}
+
+	llvm::Function* 
+	GetLlvmFunction ();
+	
+	void*
+	GetFunctionPointer ()
+	{
+		return m_pfn;
 	}
 
 	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > 
@@ -266,6 +299,12 @@ public:
 	
 	CFunction*
 	FindOverload (rtl::CBoxListT <CValue>* pArgList) const;
+
+	CFunction*
+	FindOverload (
+		CFunctionType* pType,
+		bool IsClosure = false
+		) const;
 };
 
 //.............................................................................

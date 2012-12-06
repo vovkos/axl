@@ -22,127 +22,188 @@ void
 CFunctionMgr::Clear ()
 {
 	m_FunctionList.Clear ();
-	m_PropertyList.Clear ();
 	m_GlobalFunctionList.Clear ();
-	m_GlobalPropertyList.Clear ();
-
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
-
 	m_pCurrentFunction = NULL;
 }
 
 CFunction*
+CFunctionMgr::CreateAnonimousFunction (CFunctionType* pType)
+{
+	CFunction* pFunction = AXL_MEM_NEW (CFunction);
+	pFunction->m_pModule = m_pModule;
+	pFunction->m_pType = pType;
+	m_FunctionList.InsertTail (pFunction);
+	return pFunction;
+}
+
+CFunction*
+CFunctionMgr::CreatePropertyAccessorFunction (
+	EPropertyAccessor AccessorKind,
+	CFunctionType* pType,
+	rtl::CStdListT <CFunctionFormalArg>* pArgList
+	)
+{
+	CFunction* pFunction = CreateAnonimousFunction (pType);
+	pFunction->m_Tag = GetPropertyAccessorString (AccessorKind);
+	pFunction->m_PropertyAccessorKind = AccessorKind;
+
+	if (pArgList)
+		pFunction->m_ArgList.TakeOver (pArgList);
+
+	return pFunction;
+}
+
+CFunction*
 CFunctionMgr::CreateFunction (
-	EFunction FunctionKind,
-	const rtl::CString& Tag,
+	CNamespace* pNamespace,
+	const CQualifiedName& Name,
 	CFunctionType* pType,
 	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
 	CFunction* pFunction = AXL_MEM_NEW (CFunction);
-	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pModule = m_pModule;
 	pFunction->m_pType = pType;
-	pFunction->m_Tag = Tag;
-	
-	if (pArgList)
-	{
-		pFunction->m_ArgList.TakeOver (pArgList);
-	}
-	else
-	{
-		// create default argument names
+	pFunction->m_pAnchorNamespace = pNamespace;
+	pFunction->m_Name = Name;
+	pFunction->m_Tag = pNamespace->CreateQualifiedName (Name);
 
-		rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
-		size_t Count = ArgTypeArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
-			pArg->m_Name.Format (_T("a%d"), i + 1);
-			pArg->m_pType = ArgTypeArray [i];
-			pFunction->m_ArgList.InsertTail (pArg);
-		}
-	}
+	if (Name.IsSimple ())
+		pFunction->m_pNamespace = pNamespace;
+
+	if (pArgList)
+		pFunction->m_ArgList.TakeOver (pArgList);
 
 	m_FunctionList.InsertTail (pFunction);
 	return pFunction;
 }
 
 CFunction*
+CFunctionMgr::CreateInternalFunction (
+	const rtl::CString& Name,
+	CFunctionType* pType
+	)
+{
+	CFunction* pFunction = CreateAnonimousFunction (pType);
+	pFunction->m_FunctionKind = EFunction_Global;
+	pFunction->m_Tag = Name;
+	return pFunction;
+}
+
+CGlobalFunction*
 CFunctionMgr::CreateGlobalFunction (
 	const rtl::CString& Name,
-	CFunctionType* pType,
-	rtl::CStdListT <CFunctionFormalArg>* pArgList
+	CFunction* pFunction
 	)
 {
 	CGlobalFunction* pGlobalFunction = AXL_MEM_NEW (CGlobalFunction);
 	pGlobalFunction->m_Name = Name;
 	m_GlobalFunctionList.InsertTail (pGlobalFunction);
 
-	CFunction* pFunction = CreateFunction (EFunction_Global, pGlobalFunction->m_Name, pType, pArgList);
+	pFunction->m_FunctionKind = EFunction_Global;
 	pGlobalFunction->AddOverload (pFunction);
-	return pFunction;
+	return pGlobalFunction;
 }
 
-CProperty*
-CFunctionMgr::CreateProperty (
-	CPropertyType* pType,
-	CFunction* pGetter,
-	const CFunctionOverload& Setter
-	)
+bool
+CFunctionMgr::ResolveOrphanFunction (CFunction* pFunction)
 {
-	CProperty* pProperty = AXL_MEM_NEW (CProperty);
-	pProperty->m_pModule = m_pModule;
-	pProperty->m_pType = pType;
-	pProperty->m_pGetter = pGetter;
-	pProperty->m_Setter = Setter;
-	m_PropertyList.InsertTail (pProperty);
-	return pProperty;
-}
+	ASSERT (pFunction->m_FunctionKind == EFunction_Undefined);
 
-CProperty*
-CFunctionMgr::CreateProperty (CPropertyType* pPropertyType)
-{
-	CFunctionTypeOverload* pSetterType = pPropertyType->GetSetterType ();
-
-	CFunction* pGetter = CreateFunction (EFunction_PropertyGetter, _T("getter"), pPropertyType->GetGetterType ());
-			
-	CFunctionOverload Setter;
-
-	size_t Count = pSetterType->GetOverloadCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunctionType* pSetterTypeOverload = pSetterType->GetType (i);
-		CFunction* pSetterOverload = CreateFunction (EFunction_PropertySetter, _T("setter"), pSetterTypeOverload);
-		Setter.AddOverload (pSetterOverload);
+	if (pFunction->m_pAnchorNamespace->GetNamespaceKind () == ENamespace_Class) 
+	{		
+		// should have been resolved during class layout
+		err::SetFormatStringError (_T("unresolved orphan class member '%s'"), pFunction->m_Tag);
+		return false;
 	}
 
-	return CreateProperty (pPropertyType, pGetter, Setter);
-}
+	CModuleItem* pItem = pFunction->m_pAnchorNamespace->FindItemTraverse (pFunction->m_Name, true);
+	if (!pItem)
+	{
+		err::SetFormatStringError (_T("unresolved orphan function '%s'"), pFunction->m_Tag);
+		return false;
+	}
 
-CGlobalProperty*
-CFunctionMgr::CreateGlobalProperty (
-	const rtl::CString& Name,
-	CPropertyType* pType,
-	CFunction* pGetter,
-	const CFunctionOverload& Setter
-	)
-{
-	CProperty* pProperty = CreateProperty (pType, pGetter, Setter);
-	return CreateGlobalProperty (Name, pProperty);
-}
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	CFunction* pExternFunction = NULL;
 
-CGlobalProperty*
-CFunctionMgr::CreateGlobalProperty (
-	const rtl::CString& Name,
-	CProperty* pProperty
-	)
-{
-	CGlobalProperty* pGlobalProperty = AXL_MEM_NEW (CGlobalProperty);
-	pGlobalProperty->m_Name = Name;
-	pGlobalProperty->m_pProperty = pProperty;
-	m_GlobalPropertyList.InsertTail (pGlobalProperty);
-	return pGlobalProperty;
+	if (pFunction->m_PropertyAccessorKind)
+	{
+		CPropertyType* pPropertyType = NULL;
+
+		switch (ItemKind)
+		{
+		case EModuleItem_Property:
+			pPropertyType = (CPropertyType*) pItem;
+			pFunction->m_FunctionKind = EFunction_Global;
+			pFunction->m_pNamespace = pPropertyType->GetParentNamespace ();
+			break;
+
+		case EModuleItem_ClassMember:			
+			CClassMember* pMember = (CClassMember*) pItem;
+			EClassMember MemberKind = pMember->GetMemberKind ();
+			
+			if (MemberKind == EClassMember_Property)
+			{
+				pPropertyType = ((CClassPropertyMember*) pItem)->GetType ();
+				pFunction->m_FunctionKind = EFunction_Method;
+				pFunction->m_pNamespace = pMember->GetParentType ();
+			}
+		};			
+
+		if (pPropertyType)
+			pExternFunction = pFunction->m_PropertyAccessorKind == EPropertyAccessor_Set ? 
+				pPropertyType->GetSetter ()->FindOverload (pFunction->GetType ()) :
+				pPropertyType->GetGetter ()->GetType ()->Cmp (pFunction->GetType ()) == 0 ?
+				pPropertyType->GetGetter () : NULL;
+	}
+	else
+	{
+		CFunctionOverload* pFunctionOverload = NULL;
+		CGlobalFunction* pGlobalFunction;
+
+		switch (ItemKind)
+		{
+		case EModuleItem_GlobalFunction:
+			pGlobalFunction = (CGlobalFunction*) pItem;
+			pFunctionOverload = pGlobalFunction;
+			pFunction->m_FunctionKind = EFunction_Global;
+			pFunction->m_pNamespace = pGlobalFunction->GetParentNamespace ();
+			break;
+
+		case EModuleItem_ClassMember:			
+			CClassMember* pMember = (CClassMember*) pItem;
+			EClassMember MemberKind = pMember->GetMemberKind ();
+
+			if (MemberKind == EClassMember_Method ||
+				MemberKind == EClassMember_Constructor ||
+				MemberKind == EClassMember_Destructor)
+			{
+				pFunctionOverload = (CClassMethodMember*) pMember;
+				pFunction->m_FunctionKind = EFunction_Method;
+				pFunction->m_pNamespace = pMember->GetParentType ();
+			}
+		};			
+
+		if (pFunctionOverload)
+			pExternFunction = pFunctionOverload->FindOverload (pFunction->GetType ());
+	}
+
+	if (!pExternFunction)
+	{
+		err::SetFormatStringError (_T("type mismatch resolving orphan function '%s'"), pFunction->m_Tag);
+		return false;
+	}
+
+	if (pExternFunction->HasBody ())
+	{
+		err::SetFormatStringError (_T("'%s' already has body"), pExternFunction->m_Tag);
+		return false;
+	}
+
+	pExternFunction->m_pExternFunction = pFunction;
+	return true;
 }
 
 bool
@@ -163,28 +224,31 @@ CFunctionMgr::CompileFunctions ()
 
 		// set namespace
 
-		CNamespace* pNamespace = NULL;
-		CProperty* pProperty = NULL;
 		CClassType* pThisType = NULL;
 		CClassType* pOriginType = NULL;
 
 		EFunction FunctionKind = pFunction->GetFunctionKind ();
+		if (FunctionKind == EFunction_Undefined)
+		{
+			Result = ResolveOrphanFunction (pFunction);
+			if (!Result)
+				return false;
+
+			FunctionKind = pFunction->GetFunctionKind ();
+		}
+
+		CNamespace* pNamespace = pFunction->GetNamespace ();
+
 		switch (FunctionKind)
 		{
 		case EFunction_Global:
-			pNamespace = pFunction->GetGlobalFunction ()->GetParentNamespace ();
 			break;
 
 		case EFunction_Method:
-			pNamespace = pFunction->GetClassMethodMember()->GetParentNamespace ();
-			pThisType = pFunction->GetClassMethodMember()->GetParentType ();
+		case EFunction_Constructor:
+		case EFunction_Destructor:
+			pThisType = pFunction->GetClassType ();
 			pOriginType = pFunction->GetOriginClassType ();
-			break;
-
-		case EFunction_PropertyGetter:
-		case EFunction_PropertySetter:
-			pProperty = pFunction->GetProperty ();
-			pNamespace = m_pModule->m_NamespaceMgr.GetGlobalNamespace ();
 			break;
 
 		default:
@@ -392,7 +456,7 @@ CFunctionMgr::CreateCreateSafePtrValidator ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray), 0);
-	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CreateSafePtrValidator"), pType);
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CreateSafePtrValidator"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -449,7 +513,7 @@ CFunctionMgr::CreateCheckSafePtrRange ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckSafePtrRange"), pType);
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckSafePtrRange"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -526,7 +590,7 @@ CFunctionMgr::CreateCheckSafePtrScope ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckSafePtrScope"), pType);
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckSafePtrScope"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -585,7 +649,7 @@ CFunctionMgr::CreateOnInvalidSafePtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (EFunction_Global, _T("jnc.OnInvalidSafePtr"), pType);
+	return CreateInternalFunction (_T("jnc.OnInvalidSafePtr"), pType);
 }
 
 // void 
@@ -605,7 +669,7 @@ CFunctionMgr::CreateCheckInterfaceNull ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckInterfaceNull"), pType);
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckInterfaceNull"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -664,7 +728,7 @@ CFunctionMgr::CreateCheckInterfaceScope ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (EFunction_Global, _T("jnc.CheckInterfaceScope"), pType);
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckInterfaceScope"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -725,7 +789,7 @@ CFunctionMgr::CreateOnInvalidInterface ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (EFunction_Global, _T("jnc.OnInvalidInterface"), pType);
+	return CreateInternalFunction (_T("jnc.OnInvalidInterface"), pType);
 }
 
 // int8*
@@ -746,7 +810,7 @@ CFunctionMgr::CreateDynamicCastInterface ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (EFunction_Global, _T("jnc.DynamicCastInterface"), pType);
+	return CreateInternalFunction (_T("jnc.DynamicCastInterface"), pType);
 }
 
 // int8*
@@ -763,7 +827,7 @@ CFunctionMgr::CreateHeapAllocate ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction (EFunction_Global, _T("jnc.HeapAllocate"), pType);
+	return CreateInternalFunction (_T("jnc.HeapAllocate"), pType);
 }
 
 CFunction* 
@@ -790,7 +854,7 @@ CFunctionMgr::CreateClassInitializer (CClassType* pClassType)
 	Tag.Append (_T(".$init"));
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction (EFunction_Global, Tag, pType);
+	CFunction* pFunction = CreateInternalFunction (Tag, pType);
 
 	m_pCurrentFunction = pFunction;
 

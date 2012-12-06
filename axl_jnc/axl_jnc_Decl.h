@@ -6,7 +6,6 @@
 
 #include "axl_jnc_Type.h"
 #include "axl_jnc_Function.h"
-#include "axl_jnc_Property.h"
 
 namespace axl {
 namespace jnc {
@@ -27,15 +26,6 @@ enum EAccess
 	EAccess_Undefined = 0,
 	EAccess_Public,
 	EAccess_Private,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum EPropertyAccessor
-{
-	EPropertyAccessor_Undefined = 0,
-	EPropertyAccessor_Get,
-	EPropertyAccessor_Set,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -101,13 +91,11 @@ class CTypeSpecifier
 {
 protected:
 	CType* m_pType;
-	CProperty* m_pProperty;
 
 public:
 	CTypeSpecifier ()
 	{
 		m_pType = NULL;
-		m_pProperty = NULL;
 	}
 
 	CType* 
@@ -116,17 +104,8 @@ public:
 		return m_pType;
 	}
 
-	CProperty*
-	GetProperty ()
-	{
-		return m_pProperty;
-	}
-
 	bool
 	SetType (CType* pType);
-
-	bool
-	SetProperty (CProperty* pProperty);
 };
 
 //.............................................................................
@@ -297,10 +276,11 @@ protected:
 	friend class CParser;
 
 	CToken::CPos m_Pos;
+	CQualifiedName m_Name;
+	EPropertyAccessor m_PropertyAccessorKind;
+
 	rtl::CStdListT <CDeclPointer> m_PointerList;
 	rtl::CStdListT <CDeclSuffix> m_SuffixList;
-	rtl::CString m_Name;
-	EPropertyAccessor m_PropertyAccessorKind;
 
 public:
 	CDeclarator ()
@@ -308,10 +288,16 @@ public:
 		m_PropertyAccessorKind = EPropertyAccessor_Undefined;
 	}
 
-	const rtl::CString
+	bool
+	IsSimple ()
+	{
+		return !m_PropertyAccessorKind && m_Name.IsSimple ();
+	}
+
+	const CQualifiedName*
 	GetName ()
 	{
-		return m_Name;
+		return &m_Name;
 	}
 
 	EPropertyAccessor 
@@ -319,6 +305,12 @@ public:
 	{
 		return m_PropertyAccessorKind;
 	}
+
+	bool
+	AddName (const rtl::CString Name);
+
+	bool
+	AddPropertyAccessorKind (EPropertyAccessor AccessorKind);
 
 	CDeclPointer*
 	AddPointer (EType TypeKind);

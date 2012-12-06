@@ -40,22 +40,6 @@ GetAccessString (EAccess Access)
 	};
 }
 
-const tchar_t*
-GetPropertyAccessorString (EPropertyAccessor PropertyAccessor)
-{
-	switch (PropertyAccessor)
-	{
-	case EPropertyAccessor_Get:
-		return _T("get");
-
-	case EPropertyAccessor_Set:
-		return _T("set");
-
-	default:
-		return _T("undefined-property-accessor");
-	};
-}
-
 //.............................................................................
 
 bool
@@ -111,17 +95,6 @@ CTypeSpecifier::SetType (CType* pType)
 }
 
 bool
-CTypeSpecifier::SetProperty (CProperty* pProperty)
-{
-	bool Result = SetType (pProperty->GetType ());
-	if (!Result)
-		return false;
-
-	m_pProperty = pProperty;
-	return true;
-}
-
-bool
 CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 {
 	if (m_TypeModifiers & Modifier)
@@ -135,6 +108,36 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 }
 
 //.............................................................................
+
+bool
+CDeclarator::AddName (const rtl::CString Name)
+{
+	ASSERT (!Name.IsEmpty ());
+
+	if (m_PropertyAccessorKind)
+	{
+		err::SetFormatStringError (_T("cannot further qualify '%s' accessor"), GetPropertyAccessorString (m_PropertyAccessorKind));
+		return false;
+	}
+
+	m_Name.m_List.InsertTail (Name);
+	return true;
+}
+
+bool
+CDeclarator::AddPropertyAccessorKind (EPropertyAccessor AccessorKind)
+{
+	ASSERT (AccessorKind);
+
+	if (m_PropertyAccessorKind)
+	{
+		err::SetFormatStringError (_T("cannot further qualify '%s' accessor"), GetPropertyAccessorString (m_PropertyAccessorKind));
+		return false;
+	}
+
+	m_PropertyAccessorKind = AccessorKind;
+	return true;
+}
 
 CDeclPointer*
 CDeclarator::AddPointer (EType TypeKind)

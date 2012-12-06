@@ -82,8 +82,10 @@ enum EType
 	// function types
 
 	EType_Function,       // P
-	EType_Event,          // Q
+	EType_Function_p,     // Q
 	EType_Property,       // R
+	EType_Property_p,     // S
+	EType_Event,          // T
 
 	// import type (resolved after linkage or instantiation of generic)
 
@@ -400,11 +402,6 @@ class CNamedType:
 	public CNamespace,
 	public rtl::TListLink
 {
-public:
-	CNamedType ()
-	{
-		m_NamespaceKind = ENamespace_NamedType;
-	}
 };
 
 //.............................................................................

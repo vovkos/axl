@@ -83,10 +83,10 @@ class
 class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
 	: declarator (':' constant_integer_expr $bf)? 
 		{
-			$.m_pMember = DeclareClassMember (
-				$pType, 
+			$.m_pMember = Declare (
 				$pDeclSpecifiers, 
 				&$1.m_Declarator,
+				$pType, 
 				IsValidLocator ($bf) ? $bf.m_Value : 0
 				);
 			return $.m_pMember != NULL;

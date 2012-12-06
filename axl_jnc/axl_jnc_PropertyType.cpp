@@ -8,26 +8,34 @@ namespace jnc {
 
 CPropertyType::CPropertyType ()
 {
+	m_ItemKind = EModuleItem_Property; // not just type 
 	m_TypeKind = EType_Property;
-	m_pGetterType = NULL;
-	m_SetterType = NULL;
+	m_pGetter = NULL;
+	m_pPointerType = NULL;
+	m_pVTableStructType = NULL;	
+	m_ParentVTableIndex = -1;
+}
+
+CClassType* 
+CPropertyType::GetParentClassType ()
+{
+	return m_pParentNamespace->GetNamespaceKind () == ENamespace_Class ? 
+		(CClassType*) m_pParentNamespace : 
+		NULL;
 }
 
 rtl::CStringA
-CPropertyType::CreateSignature (
-	CFunctionType* pGetterType,
-	const CFunctionTypeOverload& SetterType
-	)
+CPropertyType::CreateSignature ()
 {
 	rtl::CStringA String = "R{";
 	
-	String.Append (pGetterType->GetSignature ());
+	String.Append (m_pGetter->GetType ()->GetSignature ());
 	
-	size_t Count = SetterType.GetOverloadCount ();
+	size_t Count = m_Setter.GetOverloadCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CFunctionType* pType = SetterType.GetType (i);
-		String.Append(pType->GetSignature ());
+		CFunction* pSetter = m_Setter.GetFunction (i);
+		String.Append(pSetter->GetType ()->GetSignature ());
 	}
 
 	String.Append ("}");
@@ -35,18 +43,43 @@ CPropertyType::CreateSignature (
 }
 
 rtl::CString
-CPropertyType::CreateTypeString (
-	CFunctionType* pGetterType,
-	const CFunctionTypeOverload& SetterType
-	)
+CPropertyType::CreateTypeString ()
 {
+	ASSERT (m_pGetter);
+
 	rtl::CString String;
 	String.Format (
-		SetterType.IsEmpty () ? _T("%s const property") : _T("%s property"), 
-		pGetterType->GetReturnType ()->GetTypeString ()
+		m_Setter.IsEmpty () ? _T("%s const property") : _T("%s property"), 
+		m_pGetter->GetType ()->GetReturnType ()->GetTypeString ()
 		);
 
 	return String;
+}
+
+void
+CPropertyType::TagAccessors ()
+{
+	ASSERT (!m_Name.IsEmpty ());
+
+	rtl::CString Tag = GetQualifiedName ();
+
+	m_pGetter->m_Tag = Tag;
+	m_pGetter->m_Tag += _T(".get");
+
+	Tag += _T(".set");
+
+	size_t Count = m_Setter.GetOverloadCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = m_Setter.GetFunction (i);
+		pFunction->m_Tag = Tag;
+	}
+}
+
+bool
+CPropertyType::CalcLayout ()
+{
+	return true;
 }
 
 //.............................................................................

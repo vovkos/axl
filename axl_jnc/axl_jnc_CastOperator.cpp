@@ -183,7 +183,7 @@ CCast_getp::GetCastKind (
 	)
 {
 	ASSERT (pSrcType->GetTypeKind () == EType_Property);
-	CFunctionType* pGetterType = ((CPropertyType*) pSrcType)->GetGetterType ();
+	CFunctionType* pGetterType = ((CPropertyType*) pSrcType)->GetGetter ()->GetType ();
 	return m_pModule->m_OperatorMgr.GetCastKind (pGetterType->GetReturnType (), pDstType);
 }
 
@@ -208,7 +208,7 @@ CCast_getp::LlvmCast (
 
 	CValue TmpValue;
 	return 
-		m_pModule->m_OperatorMgr.GetPropertyOperator (Value.GetProperty (), &TmpValue) &&
+		m_pModule->m_OperatorMgr.GetPropertyOperator (Value, &TmpValue) &&
 		m_pModule->m_OperatorMgr.CastOperator (TmpValue, pType, pResultValue);
 }
 

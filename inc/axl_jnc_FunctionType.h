@@ -9,12 +9,15 @@
 namespace axl {
 namespace jnc {
 
+class CStructType;
+class CFunctionPointerType;
+
 //.............................................................................
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_IsVarArg       = 0x10000,
-	EFunctionTypeFlag_IsUnsafeVarArg = 0x20000,
+	EFunctionTypeFlag_IsVarArg       = 0x010000,
+	EFunctionTypeFlag_IsUnsafeVarArg = 0x020000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -28,6 +31,7 @@ protected:
 
 	CType* m_pReturnType;
 	rtl::CArrayT <CType*> m_ArgTypeArray;
+	CFunctionPointerType* m_pPointerType;
 
 public:
 	CFunctionType ();
@@ -45,6 +49,12 @@ public:
 	GetArgTypeArray ()
 	{
 		return m_ArgTypeArray;
+	}
+
+	CFunctionPointerType* 
+	GetPointerType ()
+	{
+		return m_pPointerType;
 	}
 
 	static
@@ -123,6 +133,36 @@ public:
 			Overload == 0 ? m_pType : 
 			Overload <= m_OverloadArray.GetCount () ? m_OverloadArray [Overload - 1] : NULL;
 	}
+};
+
+//.............................................................................
+
+class CFunctionPointerType:
+	public CType,
+	public rtl::TListLink
+{
+protected:
+	CFunctionType* m_pFunctionType;
+	CStructType* m_pPointerStructType;
+
+public:
+	CFunctionPointerType ();
+
+	CFunctionType* 
+	GetFunctionType ()
+	{
+		return m_pFunctionType;
+	}
+
+	CStructType* 
+	GetPointerStructType ()
+	{
+		ASSERT (m_pPointerStructType);
+		return m_pPointerStructType;
+	}
+
+	CPointerType*
+	GetRawPointerType ();
 };
 
 //.............................................................................

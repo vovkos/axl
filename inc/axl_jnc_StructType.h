@@ -168,6 +168,9 @@ public:
 	CStructBaseType*
 	AddBaseType (CStructType* pType);
 
+	CModuleItem*
+	FindItemWithBaseTypeList (const tchar_t* pName);
+
 	rtl::CIteratorT <CStructMember>
 	GetFirstMember ()
 	{

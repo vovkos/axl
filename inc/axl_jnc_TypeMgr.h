@@ -50,7 +50,9 @@ protected:
 	rtl::CStdListT <CUnionType> m_UnionTypeList;
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
+	rtl::CStdListT <CFunctionPointerType> m_FunctionPointerTypeList;
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
+	rtl::CStdListT <CPropertyPointerType> m_PropertyPointerTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
@@ -208,9 +210,12 @@ public:
 	}
 
 	CPropertyType* 
-	GetPropertyType (
-		CFunctionType* pGetterType,
-		const CFunctionTypeOverload& SetterType
+	CreatePropertyType ();
+
+	CPropertyType* 
+	CreatePropertyType (
+		CType* pReturnType,
+		bool IsReadOnly
 		);
 
 	CEnumType* 

@@ -46,6 +46,15 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 	for (; Function; Function++)
 	{
 		m_LogCtrl.Trace (_T("@%s ()\r\n"), Function->GetTag ());
+		if (!Function->HasBody ())
+		{
+			jnc::CFunction* pExternFunction = Function->GetExternFunction ();
+			if (pExternFunction)
+				m_LogCtrl.Trace (_T("  ->%s\r\n"), pExternFunction->GetTag ());
+
+			m_LogCtrl.Trace (_T("\r\n"));
+			continue;
+		}
 
 		llvm::Function* pLlvmFunction = Function->GetLlvmFunction ();
 		llvm::Function::BasicBlockListType& BlockList = pLlvmFunction->getBasicBlockList ();

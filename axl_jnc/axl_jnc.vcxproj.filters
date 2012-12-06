@@ -94,9 +94,6 @@
     <ClInclude Include="axl_jnc_Decl.h">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\Inc\axl_jnc_Property.h">
-      <Filter>function</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Attribute.h">
       <Filter>module</Filter>
     </ClInclude>
@@ -141,6 +138,9 @@
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Closure.h">
       <Filter>value</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_VTableType.h">
+      <Filter>type</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -205,9 +205,6 @@
     <ClCompile Include="axl_jnc_PropertyType.cpp">
       <Filter>type</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_Property.cpp">
-      <Filter>function</Filter>
-    </ClCompile>
     <ClCompile Include="axl_jnc_Attribute.cpp">
       <Filter>module</Filter>
     </ClCompile>
@@ -249,6 +246,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_Closure.cpp">
       <Filter>value</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_VTableType.cpp">
+      <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

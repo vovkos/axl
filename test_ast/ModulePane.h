@@ -58,24 +58,32 @@ protected:
 		HTREEITEM hParent,
 		jnc::CEnumMember* pMember
 		);
-/*	
+
 	void
-	AddStructClassTypeMembers (
+	AddValue (
 		HTREEITEM hParent,
-		jnc::CStructClassType* pType
+		const tchar_t* pName,
+		jnc::CType* pType,
+		jnc::CModuleItem* pItem
 		);
-*/
+
 	void
 	AddStructMember (
 		HTREEITEM hParent,
 		jnc::CStructMember* pMember
-		);
+		)
+	{
+		AddValue (hParent, pMember->GetName (), pMember->GetType (), pMember);
+	}
 
 	void
 	AddUnionMember (
 		HTREEITEM hParent,
 		jnc::CUnionMember* pMember
-		);
+		)
+	{
+		AddValue (hParent, pMember->GetName (), pMember->GetType (), pMember);
+	}
 
 	void
 	AddClassMember (
@@ -100,20 +108,13 @@ protected:
 	void
 	AddProperty (
 		HTREEITEM hParent,
-		const rtl::CString& Name,
-		jnc::CProperty* pProperty
+		jnc::CPropertyType* pType
 		);
 
 	void
 	AddGlobalFunction (
 		HTREEITEM hParent,
 		jnc::CGlobalFunction* pFunction
-		);
-
-	void
-	AddGlobalProperty (
-		HTREEITEM hParent,
-		jnc::CGlobalProperty* pProperty
 		);
 
 	void

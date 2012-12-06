@@ -297,15 +297,23 @@ public:
 
 	bool
 	GetPropertyOperator (
-		CProperty* pProperty,
+		const CValue& OpValue,
 		CValue* pResultValue
-		);
+		)
+	{
+		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Property);
+		return GetPropertyOperator (OpValue, (CPropertyType*) OpValue.GetType (), pResultValue);
+	}
 
 	bool
 	SetPropertyOperator (
-		const CValue& OpValue,
-		CProperty* pProperty
-		);
+		const CValue& SrcValue,
+		const CValue& DstValue
+		)
+	{
+		ASSERT (DstValue.GetType ()->GetTypeKind () == EType_Property);
+		return SetPropertyOperator (SrcValue, DstValue, (CPropertyType*) DstValue.GetType ());
+	}
 
 protected:
 	ICastOperator*
@@ -366,6 +374,20 @@ protected:
 		CClassPropertyMember* pMember,
 		size_t BaseTypeVTableIndex,
 		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyOperator (
+		const CValue& OpValue,
+		CPropertyType* pPropertyType,
+		CValue* pResultValue
+		);
+
+	bool
+	SetPropertyOperator (
+		const CValue& SrcValue,
+		const CValue& DstValue,
+		CPropertyType* pPropertyType
 		);
 
 	bool

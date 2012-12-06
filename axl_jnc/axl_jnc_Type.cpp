@@ -722,11 +722,7 @@ CType::GetModifiedType (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Property)
 	{
-		CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, rtl::CArrayT <CType*> (), 0);
-		CFunctionType* pSetterType = !(Modifiers & ETypeModifier_Const) ? 
-			m_pModule->m_TypeMgr.GetFunctionType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void), pType, 0) : 
-			NULL;
-		pType = m_pModule->m_TypeMgr.GetPropertyType (pGetterType, pSetterType);
+		pType = m_pModule->m_TypeMgr.CreatePropertyType (pType, (Modifiers & ETypeModifier_Const) != 0);
 	}
 	else if (Modifiers & ETypeModifier_Const)
 	{

@@ -4,17 +4,13 @@
 
 #pragma once
 
-#include "axl_jnc_StructType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_Function.h"
 #include "axl_jnc_Decl.h"
 
 namespace axl {
 namespace jnc {
 
 class CFunctionMgr;
-
-
 
 //.............................................................................
 
@@ -83,6 +79,14 @@ enum EClassMemberStorage
 	EClassMemberStorage_Static,
 	EClassMemberStorage_Dynamic,
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t*
+GetClassMemberKindString (EClassMember MemberKind);
+
+const tchar_t*
+GetClassMemberStorageString (EClassMemberStorage Storage);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -197,33 +201,25 @@ class CClassPropertyMember: public CClassMember
 protected:
 	friend class CClassType;
 
-	CProperty* m_pProperty;
-	size_t m_VTableIndex;
+	CPropertyType* m_pType;
 
 public:
 	CClassPropertyMember ()
 	{
 		m_MemberKind = EClassMember_Property;
-		m_pProperty = NULL;
-		m_VTableIndex = -1;
+		m_pType = NULL;
 	}
 
-	CProperty*
-	GetProperty ()
+	CPropertyType*
+	GetType ()
 	{
-		return m_pProperty;
-	}
-
-	size_t
-	GetVTableIndex ()
-	{
-		return m_VTableIndex;
+		return m_pType;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CClassType: public CNamedType
+class CClassType: public CVTableType
 {
 protected:
 	friend class CTypeMgr;
@@ -233,7 +229,6 @@ protected:
 
 	rtl::CStringHashTableMapAT <CClassBaseType*> m_BaseTypeMap;
 	rtl::CStdListT <CClassBaseType> m_BaseTypeList;
-
 	rtl::CStdListT <CClassFieldMember> m_FieldMemberList;
 	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
 	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;
@@ -242,15 +237,12 @@ protected:
 	CFunction* m_pFinalizer;
 	CFunctionOverload m_Constructor;
 
-	rtl::CArrayT <CFunction*> m_VTable;
+	rtl::CArrayT <CFunction*> m_MethodFunctionArray;
 
 	CStructType* m_pPointerStructType;
 	CStructType* m_pInterfaceHdrStructType;
 	CStructType* m_pInterfaceStructType;
 	CStructType* m_pClassStructType;
-	CStructType* m_pVTableStructType;
-
-	CValue m_VTablePtrValue;
 
 public:
 	CClassType ();
@@ -292,28 +284,6 @@ public:
 		return m_pClassStructType;
 	}
 
-	CStructType* 
-	GetVTableStructType ()
-	{
-		ASSERT (m_pVTableStructType);
-		return m_pVTableStructType;
-	}
-
-	size_t 
-	GetVTableSize ()
-	{
-		return m_VTable.GetCount ();
-	}
-
-	CFunction** 
-	GetVTable ()
-	{
-		return m_VTable;
-	}
-
-	bool
-	GetVTablePtrValue (CValue* pValue);
-
 	CFunction* 
 	GetInitializer ();
 
@@ -352,6 +322,9 @@ public:
 	CClassBaseType*
 	AddBaseType (CClassType* pType);
 
+	CModuleItem*
+	FindItemWithBaseTypeList (const tchar_t* pName);
+
 	rtl::CIteratorT <CClassFieldMember>
 	GetFirstFieldMember ()
 	{
@@ -369,14 +342,17 @@ public:
 	{
 		return m_PropertyMemberList.GetHead ();
 	}
-
+	
 	CClassMember*
 	FindMember (
 		const tchar_t* pName,
 		size_t* pBaseTypeOffset,
 		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
 		size_t* pBaseTypeVTableIndex
-		);
+		)
+	{
+		return FindMemberImpl (false, pName, pBaseTypeOffset, pLlvmBaseTypeIndexArray, pBaseTypeVTableIndex);
+	}
 
 	CClassFieldMember*
 	CreateFieldMember (
@@ -385,26 +361,41 @@ public:
 		size_t BitCount = 0
 		);
 
-	CFunction*
+	CClassMethodMember*
 	CreateMethodMember (
 		const rtl::CString& Name,
-		CFunctionType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
+		CFunction* pFunction
 		);
+
+	void
+	AddMethodFunction (CFunction* pFunction);
 
 	CClassPropertyMember*
 	CreatePropertyMember (
 		const rtl::CString& Name,
-		CProperty* pProperty
+		CPropertyType* pProperty
 		);
-	
+
 	bool
 	CalcLayout ();
 
 protected:
+	CClassMember*
+	FindMemberImpl (
+		bool ExcludeThis,
+		const tchar_t* pName,
+		size_t* pBaseTypeOffset,
+		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
+		size_t* pBaseTypeVTableIndex
+		);
+
+	bool
+	LayoutFunction (CFunction* pFunction);
+
 	CFunction*
 	FindOverridenMethodMember (
-		const rtl::CString& Name,
+		const tchar_t* pName,
+		EPropertyAccessor PropertyAccessorKind,
 		CFunctionType* pClosureType,
 		size_t* pBaseTypeVTableIndex
 		);

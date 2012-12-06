@@ -4,23 +4,28 @@
 
 #pragma once
 
-#include "axl_jnc_FunctionType.h"
-#include "axl_jnc_Namespace.h"
+#include "axl_jnc_VTableType.h"
 
 namespace axl {
 namespace jnc {
 
+class CClassType;
+class CPropertyPointerType;
+
 //.............................................................................
 
-class CPropertyType: 
-	public CType,
-	public rtl::TListLink
+class CPropertyType: public CVTableType
 {
 protected:
 	friend class CTypeMgr;
+	friend class CClassType;
+	friend class CParser;
 
-	CFunctionType* m_pGetterType;
-	CFunctionTypeOverload m_SetterType;
+	CFunction* m_pGetter;
+	CFunctionOverload m_Setter;
+	CPropertyPointerType* m_pPointerType;
+
+	size_t m_ParentVTableIndex;
 
 public:
 	CPropertyType ();
@@ -28,39 +33,73 @@ public:
 	bool
 	IsReadOnly ()
 	{
-		return m_SetterType.IsEmpty ();
+		return m_Setter.IsEmpty ();
 	}
 
-	CFunctionType*
-	GetGetterType ()
+	CFunction*
+	GetGetter ()
 	{
-		return m_pGetterType;
+		return m_pGetter;
 	}
 
-	CFunctionTypeOverload*
-	GetSetterType ()
+	CFunctionOverload*
+	GetSetter ()
 	{
-		return &m_SetterType;
+		return &m_Setter;
+	}
+	
+	CClassType* 
+	GetParentClassType ();
+
+	size_t 
+	GetParentVTableIndex ()
+	{
+		return m_ParentVTableIndex;
 	}
 
-	static
+	CPropertyPointerType* 
+	GetPointerType ()
+	{
+		return m_pPointerType;
+	}
+
 	rtl::CStringA
-	CreateSignature (
-		CFunctionType* pGetterType,
-		const CFunctionTypeOverload& SetterType
-		);
-
-	static
-	rtl::CString
-	CreateTypeString (
-		CFunctionType* pGetterType,
-		const CFunctionTypeOverload& SetterType
-		);
+	CreateSignature ();
 
 	rtl::CString
-	CreateTypeString ()
+	CreateTypeString ();
+
+	void
+	TagAccessors ();
+
+	bool
+	CalcLayout ();
+};
+
+//.............................................................................
+
+class CPropertyPointerType:
+	public CType,
+	public rtl::TListLink
+{
+protected:
+	CPropertyType* m_pPropertyType;
+	CStructType* m_pPointerStructType;
+
+public:
+	CPropertyPointerType ();
+
+	CPropertyType* 
+	GetPropertyType ()
 	{
-		return CreateTypeString (m_pGetterType, m_SetterType);
+		return m_pPropertyType;
+	}
+
+	CStructType* 
+	GetPointerStructType ()
+	{
+		ASSERT (m_pPointerStructType);
+		return m_pPointerStructType;
 	}
 };
 

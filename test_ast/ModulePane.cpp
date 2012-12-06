@@ -152,8 +152,8 @@ CModulePane::AddItem (
 		AddGlobalFunction (hParent, (jnc::CGlobalFunction*) pItem);
 		break;
 
-	case jnc::EModuleItem_GlobalProperty:
-		AddGlobalProperty (hParent, (jnc::CGlobalProperty*) pItem);
+	case jnc::EModuleItem_Property:
+		AddProperty (hParent, (jnc::CPropertyType*) pItem);
 		break;
 
 	case jnc::EModuleItem_EnumMember:
@@ -223,37 +223,22 @@ CModulePane::AddEnumMember (
 }
 
 void
-CModulePane::AddStructMember (
+CModulePane::AddValue (
 	HTREEITEM hParent,
-	jnc::CStructMember* pMember
+	const tchar_t* pName,
+	jnc::CType* pType,
+	jnc::CModuleItem* pItem
 	)
 {
 	rtl::CString ItemName;
 	ItemName.Format (
 		_T("%s %s"), 
-		pMember->GetType ()->GetTypeString (),
-		pMember->GetName ()
+		pType->GetTypeString (),
+		pName
 		);
 
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pMember);
-}
-
-void
-CModulePane::AddUnionMember (
-	HTREEITEM hParent,
-	jnc::CUnionMember* pMember
-	)
-{
-	rtl::CString ItemName;
-	ItemName.Format (
-		_T("%s %s"), 
-		pMember->GetType ()->GetTypeString (),
-		pMember->GetName ()
-		);
-
-	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pMember);
+	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pItem);
 }
 
 void
@@ -267,15 +252,15 @@ CModulePane::AddClassMember (
 	switch (MemberKind)
 	{
 	case jnc::EClassMember_Field:
-//		AddStructMember (hParent, ((jnc::CClassFieldMember*) pMember)->GetField ());
+		AddValue(hParent, pMember->GetName (), ((jnc::CClassFieldMember*) pMember)->GetType (), pMember);
 		break;
 
 	case jnc::EClassMember_Method:
-//		AddFunction (hParent, pMember->GetName (), ((jnc::CClassMethodMember*) pMember)->GetFunction ());
+		AddFunction (hParent, pMember->GetName (), ((jnc::CClassMethodMember*) pMember));
 		break;
 
 	case jnc::EClassMember_Property:
-		AddProperty (hParent, pMember->GetName (), ((jnc::CClassPropertyMember*) pMember)->GetProperty ());
+		AddProperty (hParent, ((jnc::CClassPropertyMember*) pMember)->GetType ());
 		break;
 	}
 }
@@ -494,22 +479,17 @@ CModulePane::AddFunction (
 void
 CModulePane::AddProperty (
 	HTREEITEM hParent,
-	const rtl::CString& Name,
-	jnc::CProperty* pProperty
+	jnc::CPropertyType* pType
 	)
 {
 	rtl::CString ItemName;
-	ItemName.Format (
-		_T("%s %s"), 
-		pProperty->GetType ()->GetTypeString (),
-		Name
-		);
+	ItemName = pType->GetTypeString ();
 
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pProperty);
+	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pType);
 	
-	jnc::CFunction* pGetter = pProperty->GetGetter ();
-	jnc::CFunctionOverload* pSetter = pProperty->GetSetter ();
+	jnc::CFunction* pGetter = pType->GetGetter ();
+	jnc::CFunctionOverload* pSetter = pType->GetSetter ();
 
 	AddFunction (hItem, _T("get"), pGetter);
 	
@@ -526,15 +506,6 @@ CModulePane::AddGlobalFunction (
 	)
 {
 	AddFunction (hParent, pFunction->GetName (), pFunction);
-}
-
-void
-CModulePane::AddGlobalProperty (
-	HTREEITEM hParent,
-	jnc::CGlobalProperty* pProperty
-	)
-{
-	AddProperty (hParent, pProperty->GetName (), pProperty->GetProperty ());
 }
 
 rtl::CString

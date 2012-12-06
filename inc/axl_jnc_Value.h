@@ -14,8 +14,8 @@ class CScope;
 class CVariable;
 class CFunction;
 class CFunctionOverload;
-class CProperty;
 class CClassType;
+class CPropertyType;
 class CClosure;
 
 //.............................................................................
@@ -83,7 +83,6 @@ protected:
 		CVariable* m_pVariable;
 		CFunction* m_pFunction;
 		CFunctionOverload* m_pFunctionOverload;
-		CProperty* m_pProperty;
 	};
 
 	mutable llvm::Value* m_pLlvmValue;
@@ -152,12 +151,6 @@ public:
 	{
 		Init ();
 		SetFunctionOverload (pFunctionOverload);
-	}
-
-	CValue (CProperty* pProperty)
-	{
-		Init ();
-		SetProperty (pProperty);
 	}
 
 	CValue (
@@ -233,13 +226,6 @@ public:
 	{
 		ASSERT (m_ValueKind == EValue_FunctionOverload);
 		return m_pFunctionOverload;
-	}
-
-	CProperty*
-	GetProperty () const
-	{
-		ASSERT (m_ValueKind == EValue_Property);
-		return m_pProperty;
 	}
 
 	void*
@@ -360,13 +346,13 @@ public:
 		);
 
 	void
+	SetProperty (CPropertyType* pPropertyType);
+
+	void
 	SetFunction (CFunction* pFunction);
 
 	void
 	SetFunctionOverload (CFunctionOverload* pFunctionOverload);
-
-	void
-	SetProperty (CProperty* pProperty);
 
 	bool
 	CreateConst (

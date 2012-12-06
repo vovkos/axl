@@ -29,7 +29,6 @@ enum EModuleItem
 	EModuleItem_Function,
 	EModuleItem_Property,
 	EModuleItem_GlobalFunction,
-	EModuleItem_GlobalProperty,
 	EModuleItem_EnumMember,
 	EModuleItem_StructMember,
 	EModuleItem_UnionMember,

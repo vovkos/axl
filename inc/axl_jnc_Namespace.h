@@ -40,6 +40,36 @@ public:
 		m_First = Name;
 	}	
 
+	CQualifiedName (const tchar_t* pName)
+	{
+		m_First = pName;
+	}	
+
+	CQualifiedName (const CQualifiedName& Name)
+	{
+		Copy (Name);
+	}	
+
+	CQualifiedName&
+	operator = (const CQualifiedName& Name)
+	{
+		Copy (Name);
+		return *this;
+	}	
+
+	void
+	Clear ()
+	{
+		m_First.Clear ();
+		m_List.Clear ();
+	}
+
+	bool
+	IsEmpty () const
+	{
+		return m_First.IsEmpty ();
+	}
+
 	bool
 	IsSimple () const
 	{
@@ -54,6 +84,12 @@ public:
 
 	rtl::CString
 	GetFullName () const;
+
+	void
+	Copy (const CQualifiedName& Name);
+
+	void
+	TakeOver (CQualifiedName* pName);
 };
 
 //.............................................................................
@@ -132,8 +168,10 @@ UnAliasItem (CModuleItem* pItem);
 enum ENamespace
 {
 	ENamespace_Global = 0,
-	ENamespace_NamedType,
 	ENamespace_Scope,
+	ENamespace_Enum,
+	ENamespace_Struct,
+	ENamespace_Class,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -162,14 +200,38 @@ public:
 		return m_NamespaceKind;
 	}
 
+	bool
+	IsNamedType ()
+	{
+		return m_NamespaceKind >= ENamespace_Enum && m_NamespaceKind <= ENamespace_Class;
+	}
+
 	rtl::CString
 	CreateQualifiedName (const tchar_t* pName);
+
+	rtl::CString
+	CreateQualifiedName (const rtl::CString& Name)
+	{
+		return CreateQualifiedName ((const tchar_t*) Name);
+	}
+
+	rtl::CString
+	CreateQualifiedName (const CQualifiedName& Name)
+	{
+		return CreateQualifiedName (Name.GetFullName ());
+	}
 
 	CModuleItem*
 	FindItem (const tchar_t* pName);
 
 	CModuleItem*
-	FindItemTraverse (const CQualifiedName& Name);
+	FindItemTraverse (const tchar_t* pName);
+
+	CModuleItem*
+	FindItemTraverse (
+		const CQualifiedName& Name,
+		bool IsStrict
+		);
 
 	template <typename T>
 	bool

@@ -79,7 +79,9 @@ Members
 	CModuleItem*
 	Declare (
 		CDeclSpecifiers* pDeclSpecifiers,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		CClassType* pClassType = NULL,
+		size_t BitCount = 0
 		);
 
 	CEnumType*
@@ -122,14 +124,6 @@ Members
 		size_t PackFactor
 		);
 
-	CModuleItem*
-	DeclareClassMember (
-		CClassType* pClassType,
-		CDeclSpecifiers* pDeclSpecifiers,
-		CDeclarator* pDeclarator,
-		size_t BitCount
-		);
-
 	CFunctionFormalArg*
 	DeclareFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
@@ -140,21 +134,9 @@ Members
 
 	CFunction*
 	DeclarePropertyAccessor (
-		CPropertyBlock* pBlock,
+		CPropertyType* pType,
 		CTypeSpecifierModifiers* pTypeSpecifier,
 		CDeclarator* pDeclarator
-		);
-
-	CProperty*
-	CreateProperty (
-		CFunction* pGetter,
-		const CFunctionOverload& Setter
-		);
-
-	void
-	SetSimplePropertyPos (
-		CProperty* pProperty,
-		const CToken::CPos& Pos
 		);
 
 	bool

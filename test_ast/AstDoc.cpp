@@ -158,9 +158,13 @@ CAstDoc::Compile ()
 		return false;
 	}
 
-	ExportStdLib ();
+	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
+	pMainFrame->m_ModulePane.Build (&m_Module);
+	pMainFrame->m_LlvmIrPane.Build (&m_Module);
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting functions...\n"));
+
+	ExportStdLib ();
 
 	Result = m_Module.m_FunctionMgr.JitFunctions (m_pLlvmExecutionEngine);
 	if (!Result)
@@ -170,9 +174,6 @@ CAstDoc::Compile ()
 		return false;
 	}
 
-	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
-	pMainFrame->m_ModulePane.Build (&m_Module);
-	pMainFrame->m_LlvmIrPane.Build (&m_Module);
 	pMainFrame->m_DasmPane.Build (&m_Module);
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done.\n"));
 	return true;

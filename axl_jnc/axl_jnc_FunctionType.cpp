@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -10,7 +11,7 @@ CFunctionType::CFunctionType ()
 {
 	m_TypeKind = EType_Function;
 	m_pReturnType = NULL;
-	m_Flags = 0;
+	m_pPointerType = NULL;
 }
 
 rtl::CStringA
@@ -122,6 +123,20 @@ CFunctionTypeOverload::AddOverload (CFunctionType* pType)
 
 	m_OverloadArray.Append (pType);
 	return true;
+}
+
+//.............................................................................
+
+CFunctionPointerType::CFunctionPointerType ()
+{
+	m_pFunctionType = NULL;
+	m_pPointerStructType = NULL;
+}
+
+CPointerType*
+CFunctionPointerType::GetRawPointerType ()
+{
+	return m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, m_pFunctionType);
 }
 
 //.............................................................................

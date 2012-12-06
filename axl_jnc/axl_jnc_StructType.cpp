@@ -10,6 +10,7 @@ namespace jnc {
 CStructType::CStructType ()
 {
 	m_TypeKind = EType_Struct;
+	m_NamespaceKind = ENamespace_Struct;
 	m_Flags = ETypeFlag_IsPod;
 	m_AlignFactor = 1;
 	m_PackFactor = 8;
@@ -82,6 +83,31 @@ CStructType::AddBaseType (CStructType* pType)
 	m_BaseTypeList.InsertTail (pBaseType);
 	It->m_Value = pBaseType;
 	return pBaseType;
+}
+
+CModuleItem*
+CStructType::FindItemWithBaseTypeList (const tchar_t* pName)
+{
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
+	if (It)
+		return It->m_Value;
+
+	if (m_Name == pName)
+		return this;
+
+	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		CStructType* pStructType = BaseType->m_pType;
+		if (pStructType->m_Name == pName)
+			return pStructType;
+
+		CModuleItem* pItem = pStructType->FindItemWithBaseTypeList (pName);
+		if (pItem)
+			return pItem;
+	}
+
+	return NULL;
 }
 
 CStructMember*

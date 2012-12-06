@@ -5,7 +5,6 @@
 #pragma once
 
 #include "axl_jnc_Function.h"
-#include "axl_jnc_Property.h"
 
 namespace axl {
 namespace jnc {
@@ -101,10 +100,8 @@ protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CFunction> m_FunctionList;
-	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
-	rtl::CStdListT <CGlobalProperty> m_GlobalPropertyList;
-
+	
 	CFunction* m_pCurrentFunction;
 
 	CFunction* m_StdFunctionArray [EStdFunc__Count];
@@ -133,63 +130,36 @@ public:
 		return m_FunctionList.GetHead ();
 	}
 
-	rtl::CIteratorT <CProperty>
-	GetFirstProperty ()
-	{
-		return m_PropertyList.GetHead ();
-	}
-
 	rtl::CIteratorT <CGlobalFunction>
 	GetFirstGlobalFunction ()
 	{
 		return m_GlobalFunctionList.GetHead ();
 	}
 
-	rtl::CIteratorT <CGlobalProperty>
-	GetFirstGlobalProperty ()
-	{
-		return m_GlobalPropertyList.GetHead ();
-	}
+	CFunction*
+	CreateAnonimousFunction (CFunctionType* pType);
 
 	CFunction*
 	CreateFunction (
-		EFunction FunctionKind,
-		const rtl::CString& Tag,
+		CNamespace* pNamespace,
+		const CQualifiedName& Name,
 		CFunctionType* pType,
 		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
 		);
 
 	CFunction*
+	CreatePropertyAccessorFunction (
+		EPropertyAccessor AccessorKind,
+		CFunctionType* pType,
+		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
+		);
+
+	CGlobalFunction*
 	CreateGlobalFunction (
 		const rtl::CString& Name,
-		CFunctionType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList
+		CFunction* pFunction
 		);
 	
-	CProperty*
-	CreateProperty (
-		CPropertyType* pType,
-		CFunction* pGetter,
-		const CFunctionOverload& Setter
-		);
-
-	CProperty*
-	CreateProperty (CPropertyType* pType);
-
-	CGlobalProperty*
-	CreateGlobalProperty (
-		const rtl::CString& Name,
-		CPropertyType* pType,
-		CFunction* pGetter,
-		const CFunctionOverload& Setter
-		);
-
-	CGlobalProperty*
-	CreateGlobalProperty (
-		const rtl::CString& Name,
-		CProperty* pProperty
-		);
-
 	bool
 	CompileFunctions ();
 
@@ -203,6 +173,14 @@ public:
 	CreateClassInitializer (CClassType* pType);
 
 protected:
+	bool
+	ResolveOrphanFunction (CFunction* pFunction);
+
+	CFunction*
+	CreateInternalFunction (
+		const rtl::CString& Name,
+		CFunctionType* pType
+		);
 
 	// LLVM code support functions
 
@@ -253,3 +231,4 @@ protected:
 
 } // namespace axl {
 } // namespace jnc {
+

@@ -2,42 +2,32 @@
 
 class
 {
-	CProperty* m_pProperty;
+	CPropertyType* m_pType;
 }
 property_specifier
 	: EToken_Property 
-	  property_block $b
 		{
-			$.m_pProperty = CreateProperty ($b.m_pGetter, $b.m_Setter);
+			$.m_pType = m_pModule->m_TypeMgr.CreatePropertyType ();
 		}
+	  property_block $b <$.m_pType>
 	;
 
-class CPropertyBlock
-{
-	CFunction* m_pGetter;
-	CFunctionOverload m_Setter;
-
-	CPropertyBlock ()
-	{
-		m_pGetter = NULL;
-	}
-}
-property_block
-	: '{' property_accessor_declaration <&$>+ '}'
+property_block <CPropertyType* $pType>
+	: '{' property_accessor_declaration <$pType>+ '}'
 	;
 
 class
 {
-	CFunction* m_pAccessessor;
+	CFunction* m_pAccessor;
 }
-property_accessor_declaration <CPropertyBlock* $pBlock>
+property_accessor_declaration <CPropertyType* $pType>
 	: type_specifier_modifier_list
 	  property_declarator $d
 		{
-			$.m_pAccessessor = DeclarePropertyAccessor ($pBlock, &$1.m_TypeSpecifier, &$2.m_Declarator);
-			return $.m_pAccessessor != NULL;
+			$.m_pAccessor = DeclarePropertyAccessor ($pType, &$1.m_TypeSpecifier, &$2.m_Declarator);
+			return $.m_pAccessor != NULL;
 		}
-	  declaration_terminator <$.m_pAccessessor>
+	  declaration_terminator <$.m_pAccessor>
 	| ';'
 	;
 

@@ -333,11 +333,10 @@ CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
 }
 
 void
-CValue::SetProperty (CProperty* pProperty)
+CValue::SetProperty (CPropertyType* pPropertyType)
 {
 	m_ValueKind = EValue_Property;
-	m_pType = pProperty->GetType ();
-	m_pProperty = pProperty;
+	m_pType = pPropertyType;
 }
 
 bool

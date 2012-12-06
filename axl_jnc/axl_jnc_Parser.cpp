@@ -23,9 +23,7 @@ CParser::IsTypeSpecified ()
 		return false;
 
 	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
-	return 
-		pTypeSpecifier->GetType () != NULL ||
-		pTypeSpecifier->GetProperty () != NULL;
+	return pTypeSpecifier->GetType () != NULL;
 }
 
 CType*
@@ -43,7 +41,7 @@ CParser::FindType (const CQualifiedName& Name)
 	}
 	else
 	{	
-		pItem = pNamespace->FindItemTraverse (Name);
+		pItem = pNamespace->FindItemTraverse (Name, false);
 		if (!pItem)
 			return NULL;
 	}
@@ -56,7 +54,9 @@ CParser::FindType (const CQualifiedName& Name)
 CModuleItem*
 CParser::Declare (
 	CDeclSpecifiers* pDeclSpecifiers,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	CClassType* pClassType,
+	size_t BitCount
 	)
 {
 	bool Result;
@@ -67,15 +67,21 @@ CParser::Declare (
 
 	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
 	EType TypeKind = pType->GetTypeKind ();
-	rtl::CString Name = pDeclarator->GetName ();
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CModuleItem* pOldItem = pNamespace->FindItem (Name);
-	CModuleItem* pNewItem = NULL;
 
-	EPropertyAccessor PropertyAccessorKind = pDeclarator->GetPropertyAccessorKind ();
-	if (PropertyAccessorKind && TypeKind != EType_Function)
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	rtl::CString Name;
+
+	CModuleItem* pOldItem = NULL;
+	CModuleItem* pNewItem = NULL;
+	
+	if (pDeclarator->IsSimple ())
 	{
-		err::SetFormatStringError (_T("'%s' accessor must be a function"), GetPropertyAccessorString (PropertyAccessorKind));
+		Name = pDeclarator->GetName ()->GetShortName ();
+		pOldItem = pNamespace->FindItem (Name);
+	}
+	else if (TypeKind != EType_Function || StorageClass == EStorageClass_Typedef)
+	{
+		err::SetFormatStringError (_T("qualified declarators are only allowed for functions"));
 		return NULL;
 	}
 
@@ -96,9 +102,42 @@ CParser::Declare (
 	}
 	else if (TypeKind == EType_Function)
 	{
-		CFunction* pFunction;
+		CFunctionType* pFunctionType = (CFunctionType*) pType;
+		CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (
+			pNamespace,
+			*pDeclarator->GetName (),
+			pFunctionType, 
+			pDeclarator->GetArgList ()
+			);
 
-		if (pOldItem)
+		EPropertyAccessor AccessorKind = pDeclarator->GetPropertyAccessorKind ();
+		if (AccessorKind)
+		{
+			pFunction->m_PropertyAccessorKind = AccessorKind;
+			pFunction->m_Tag.AppendFormat (_T(".%s"), GetPropertyAccessorString (AccessorKind));
+		}
+
+		if (pClassType)
+		{
+			if (!pDeclarator->GetName ()->IsSimple ())
+			{
+				err::SetFormatStringError (_T("invalid class method member name '%s'"), pFunction->GetTag ());
+				return NULL;
+			}
+
+			if (!pDeclarator->GetPropertyAccessorKind ())
+			{
+				Result = pClassType->CreateMethodMember (Name, pFunction) != NULL;
+				if (!Result)
+					return NULL;
+			}
+			else 
+			{
+				pClassType->AddMethodFunction (pFunction);
+			}
+
+		}
+		else if (pOldItem)
 		{
 			if (pOldItem->GetItemKind () != EModuleItem_GlobalFunction)
 			{	
@@ -107,29 +146,18 @@ CParser::Declare (
 			}
 
 			CGlobalFunction* pGlobalFunction = (CGlobalFunction*) pOldItem;
-			
-			pFunction = m_pModule->m_FunctionMgr.CreateFunction (
-				EFunction_Global,
-				pGlobalFunction->GetQualifiedName (),
-				(CFunctionType*) pType, 
-				pDeclarator->GetArgList ()
-				); 
-
-			Result = pGlobalFunction->AddOverload (pFunction);
-			if (!Result)
-				return NULL;
+			pFunction = pGlobalFunction->FindOverload (pFunctionType);
+			if (!pFunction)
+			{
+				Result = pGlobalFunction->AddOverload (pFunction);
+				if (!Result)
+					return NULL;
+			}
 		}
-		else 
+		else if (pDeclarator->IsSimple ())
 		{
-			pFunction = m_pModule->m_FunctionMgr.CreateGlobalFunction (				
-				Name,
-				(CFunctionType*) pType, 
-				pDeclarator->GetArgList ()
-				);
-
-			Result = pNamespace->AddItem (pFunction->GetGlobalFunction ());
-			if (!Result)
-				return NULL;
+			CGlobalFunction* pGlobalFunction = m_pModule->m_FunctionMgr.CreateGlobalFunction (Name, pFunction);
+			pNamespace->AddItem (pGlobalFunction);
 		}
 
 		pNewItem = pFunction;
@@ -142,19 +170,18 @@ CParser::Declare (
 			return NULL;
 		}
 
-		CProperty* pProperty = pDeclSpecifiers->GetProperty ();
-		if (!pProperty)
+		CPropertyType* pPropertyType = (CPropertyType*) pType;
+
+		if (pClassType)
 		{
-			pProperty = m_pModule->m_FunctionMgr.CreateProperty ((CPropertyType*) pType);
-			SetSimplePropertyPos (pProperty, pDeclarator->m_Pos);
+			pNewItem = pClassType->CreatePropertyMember (Name, pPropertyType);
 		}
-
-		CGlobalProperty* pGlobalProperty = m_pModule->m_FunctionMgr.CreateGlobalProperty (Name, pProperty);
-		Result = pNamespace->AddItem (pGlobalProperty);
-		if (!Result)
-			return NULL;
-
-		pNewItem = pProperty;
+		else
+		{
+			pPropertyType->m_Name = Name;
+			pNamespace->AddItem (pPropertyType);
+			pNewItem = pPropertyType;
+		}
 	}
 	else
 	{
@@ -164,12 +191,16 @@ CParser::Declare (
 			return NULL;
 		}
 
-		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType);
-		Result = pNamespace->AddItem (pVariable);
-		if (!Result)
-			return NULL;
-
-		pNewItem = pVariable;
+		if (pClassType)
+		{
+			pNewItem = pClassType->CreateFieldMember (Name, pType, BitCount);
+		}
+		else
+		{
+			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType);
+			pNamespace->AddItem (pVariable);
+			pNewItem = pVariable;
+		}
 	}
 
 	if (!pNewItem)
@@ -264,7 +295,13 @@ CParser::DeclareStructMember (
 	if (!pType)
 		return NULL;
 
-	rtl::CString Name = pDeclarator->GetName ();
+	if (!pDeclarator->IsSimple ())
+	{
+		err::SetFormatStringError (_T("qualified declarators for a struct member"));
+		return NULL;
+	}
+
+	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	CStructMember* pMember = pStructType->CreateMember (Name, pType, BitCount);
 	if (!pMember)
 		return NULL;
@@ -315,7 +352,13 @@ CParser::DeclareUnionMember (
 			return NULL;
 	}
 
-	rtl::CString Name = pDeclarator->GetName ();
+	if (!pDeclarator->IsSimple ())
+	{
+		err::SetFormatStringError (_T("qualified declarator for union member"));
+		return NULL;
+	}
+
+	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	CUnionMember* pMember = pUnionType->CreateMember (Name, pType);
 	if (!pMember)
 		return NULL;
@@ -380,79 +423,6 @@ CParser::DeclareClassType (
 	return pType;
 }
 
-CModuleItem*
-CParser::DeclareClassMember (
-	CClassType* pClassType,
-	CDeclSpecifiers* pDeclSpecifiers,
-	CDeclarator* pDeclarator,
-	size_t BitCount
-	)
-{
-	CType* pType = pDeclarator->GetType (pDeclSpecifiers);
-	if (!pType)
-		return NULL;
-
-	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
-	EType TypeKind = pType->GetTypeKind ();
-	rtl::CString Name = pDeclarator->GetName ();
-	CModuleItem* pOldItem = pClassType->FindItem (Name);
-	CModuleItem* pNewItem = NULL;
-
-	if (StorageClass == EStorageClass_Typedef)
-	{
-		if (pOldItem)
-		{
-			if (pOldItem->GetItemKind () != EModuleItem_Alias || ((CAlias*) pOldItem)->GetTarget () != pType)
-			{	
-				err::SetFormatStringError (_T("redefinition of '%s'"), Name);
-				return NULL;
-			}
-
-			return pOldItem;
-		}
-
-		pNewItem = pClassType->CreateAlias (Name, pType);
-	}
-	else if (TypeKind == EType_Function)
-	{
-		CFunctionType* pFunctionType = (CFunctionType*) pType;
-		rtl::CStdListT <CFunctionFormalArg>* pArgList = pDeclarator->GetArgList ();
-
-		CFunction* pMethod = pClassType->CreateMethodMember (
-			Name, 
-			pFunctionType, 
-			pArgList
-			);
-
-		if (!pMethod)
-			return NULL;
-
-		pNewItem = pMethod;
-	}
-	else if (TypeKind == EType_Property)
-	{
-		CProperty* pProperty = pDeclSpecifiers->GetProperty ();
-		if (!pProperty)
-		{
-			pProperty = m_pModule->m_FunctionMgr.CreateProperty ((CPropertyType*) pType);
-			SetSimplePropertyPos (pProperty, pDeclarator->m_Pos);
-		}
-
-		pNewItem = pClassType->CreatePropertyMember (Name, pProperty);
-	}
-	else
-	{
-		pNewItem = pClassType->CreateFieldMember (Name, pType, BitCount);
-	}
-
-	if (!pNewItem)
-		return NULL;
-
-	m_pModule->m_AttributeMgr.AssignAttributeSet (pNewItem);
-	pNewItem->m_Pos = pDeclarator->m_Pos;
-	return pNewItem;
-}
-
 CFunctionFormalArg*
 CParser::DeclareFormalArg (
 	CDeclFunctionSuffix* pArgSuffix,
@@ -465,14 +435,14 @@ CParser::DeclareFormalArg (
 	if (!pType)
 		return NULL;
 
-	if (pDeclarator->GetPropertyAccessorKind ())
+	if (!pDeclarator->IsSimple ())
 	{
-		err::SetFormatStringError (_T("illegal property accessor in formal argument declaration"));
+		err::SetFormatStringError (_T("qualified declarator for formal argument"));
 		return NULL;
 	}
 
 	CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
-	pArg->m_Name = pDeclarator->GetName ();
+	pArg->m_Name = pDeclarator->GetName ()->GetShortName ();
 	pArg->m_pType = pType;
 	pArg->m_DefaultValue = DefaultValue;
 	pArgSuffix->m_ArgList.InsertTail (pArg);
@@ -482,7 +452,7 @@ CParser::DeclareFormalArg (
 
 CFunction*
 CParser::DeclarePropertyAccessor (
-	CPropertyBlock* pBlock,
+	CPropertyType* pPropertyType,
 	CTypeSpecifierModifiers* pTypeSpecifier,
 	CDeclarator* pDeclarator
 	)
@@ -499,37 +469,29 @@ CParser::DeclarePropertyAccessor (
 		return NULL;
 	}
 
-	CFunction* pAccessor = NULL; 
-
+	CFunctionType* pFunctionType = (CFunctionType*) pType;
 	EPropertyAccessor PropertyAccessorKind = pDeclarator->GetPropertyAccessorKind ();
+	
+	CFunction* pAccessor = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (
+		PropertyAccessorKind, 
+		pFunctionType, 
+		pDeclarator->GetArgList ()
+		);
+
 	switch (PropertyAccessorKind)
 	{
 	case EPropertyAccessor_Get:
-		if (pBlock->m_pGetter)
+		if (pPropertyType->m_pGetter)
 		{
 			err::SetFormatStringError (_T("multiple property getters specified"));
 			return NULL;		
 		}
 
-		pAccessor = m_pModule->m_FunctionMgr.CreateFunction (
-			EFunction_PropertyGetter, 
-			_T("getter"),
-			(CFunctionType*) pType, 
-			pDeclarator->GetArgList ()
-			);
-
-		pBlock->m_pGetter = pAccessor;
+		pPropertyType->m_pGetter = pAccessor;
 		break;
 
 	case EPropertyAccessor_Set:
-		pAccessor = m_pModule->m_FunctionMgr.CreateFunction (
-			EFunction_PropertySetter, 
-			_T("setter"),
-			(CFunctionType*) pType, 
-			pDeclarator->GetArgList ()
-			);
-
-		Result =  pBlock->m_Setter.AddOverload (pAccessor);
+		Result = pPropertyType->m_Setter.AddOverload (pAccessor);
 		if (!Result)
 			return NULL;
 
@@ -542,54 +504,6 @@ CParser::DeclarePropertyAccessor (
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
 	pAccessor->m_Pos = pDeclarator->m_Pos;
 	return pAccessor;
-}
-
-CProperty*
-CParser::CreateProperty (
-	CFunction* pGetter,
-	const CFunctionOverload& Setter
-	)
-{
-	if (!pGetter)
-	{
-		err::SetFormatStringError (_T("property has no getter"));
-		return NULL;
-	}
-	
-	CFunctionTypeOverload SetterType;
-
-	size_t Count = Setter.GetOverloadCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pSetter = Setter.GetFunction (i);
-		bool Result = SetterType.AddOverload (pSetter->GetType ());
-		if (!Result)
-			return NULL;
-	}
-
-	CPropertyType* pType = m_pModule->m_TypeMgr.GetPropertyType (pGetter->GetType (), SetterType);
-	return m_pModule->m_FunctionMgr.CreateProperty (pType, pGetter, Setter);
-}
-
-void
-CParser::SetSimplePropertyPos (
-	CProperty* pProperty,
-	const CToken::CPos& Pos
-	)
-{
-	CFunction* pGetter = pProperty->GetGetter ();
-	pGetter->m_Pos = Pos;
-
-	CFunctionOverload* pSetter = pProperty->GetSetter ();
-	if (pSetter)
-	{
-		size_t Count = pSetter->GetOverloadCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CFunction* pSetterOverload = pSetter->GetFunction (i);
-			pSetterOverload->m_Pos = Pos;
-		}
-	}
 }
 
 bool
@@ -606,6 +520,12 @@ CParser::SetFunctionBody (
 	}
 
 	CFunction* pFunction = (CFunction*) pItem;
+	if (pFunction->HasBody ())
+	{
+		err::SetFormatStringError (_T("'%s' already has a body"), pFunction->GetTag ());
+		return false;
+	}
+
 	pFunction->SetBody (pBody);
 	return true;
 }
@@ -619,17 +539,11 @@ CParser::LookupIdentifier (
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
 	
-	if (m_pThisType)
-		pItem = m_pThisType->FindMember (Name, NULL, NULL, NULL);
-	
+	pItem = pNamespace->FindItemTraverse (Name);
 	if (!pItem)
 	{
-		pItem = pNamespace->FindItemTraverse (Name);
-		if (!pItem)
-		{
-			err::SetFormatStringError (_T("undeclared identifier '%s'"), Name);
-			return false;
-		}
+		err::SetFormatStringError (_T("undeclared identifier '%s'"), Name);
+		return false;
 	}
 
 	EModuleItem ItemKind = pItem->GetItemKind ();
@@ -645,10 +559,6 @@ CParser::LookupIdentifier (
 
 	case EModuleItem_GlobalFunction:
 		pValue->SetFunctionOverload ((CGlobalFunction*) pItem);
-		break;
-
-	case EModuleItem_GlobalProperty:
-		pValue->SetProperty (((CGlobalProperty*) pItem)->GetProperty ());
 		break;
 
 	case EModuleItem_EnumMember:

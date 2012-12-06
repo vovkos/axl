@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "axl_jnc_Namespace.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_StructType.h"
+#include "axl_jnc_ClassType.h"
 
 namespace axl {
 namespace jnc {
@@ -13,16 +15,34 @@ CQualifiedName::GetFullName () const
 	if (m_List.IsEmpty ())
 		return m_First;
 
-	rtl::CString Name;	
+	rtl::CString Name = m_First;	
 	rtl::CBoxIteratorT <rtl::CString> It = m_List.GetHead ();
 	for (; It; It++)
 	{
-		Name.Append (*It);
 		Name.Append ('.');
+		Name.Append (*It);
 	}
 
-	Name.Append (m_First);
 	return Name;
+}
+
+void
+CQualifiedName::Copy (const CQualifiedName& Name)
+{
+	m_First = Name.m_First;
+	m_List.Clear ();
+
+	rtl::CBoxIteratorT <rtl::CString> It = Name.m_List.GetHead ();
+	for (; It; It++)
+		m_List.InsertTail (*It);
+}
+
+void
+CQualifiedName::TakeOver (CQualifiedName* pName)
+{
+	m_First = pName->m_First;
+	m_List.TakeOver (&pName->m_List);
+	pName->Clear ();
 }
 
 //.............................................................................
@@ -117,55 +137,68 @@ CNamespace::FindItem (const tchar_t* pName)
 }
 
 CModuleItem*
-CNamespace::FindItemTraverse (const CQualifiedName& Name)
+CNamespace::FindItemTraverse (const tchar_t* pName)
 {
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It;
-
-	// first find the root of qualified name
-
-	CNamespace* pNamespace = this;
-	CModuleItem* pItem = NULL;
-
-	It = pNamespace->m_ItemMap.Find (Name.m_First); 
-	if (It)
+	for (CNamespace* pNamespace = this; pNamespace; pNamespace = pNamespace->m_pParentNamespace)
 	{
-		pNamespace = this;
-		pItem = It->m_Value;
-	}
-	else
-	{
-		pNamespace = m_pParentNamespace;
-		while (pNamespace)
+		CModuleItem* pItem;
+
+		switch (pNamespace->m_NamespaceKind)
 		{
-			It = pNamespace->m_ItemMap.Find (Name.m_First); 
-			if (It)
-			{
-				pItem = It->m_Value;
-				break;
-			}
+		case ENamespace_Struct:
+			pItem = ((CStructType*) pNamespace)->FindItemWithBaseTypeList (pName);
+			break;
 
-			pNamespace = pNamespace->m_pParentNamespace;
+		case ENamespace_Class:
+			pItem = ((CClassType*) pNamespace)->FindItemWithBaseTypeList (pName);
+			break;
+
+		default:
+			pItem = pNamespace->FindItem (pName);
 		}
+			
+		if (pItem)
+			return pItem;
 	}
 
+	return NULL;
+}
+
+CModuleItem*
+CNamespace::FindItemTraverse (
+	const CQualifiedName& Name,
+	bool IsStrict
+	)
+{
+	CModuleItem* pItem = FindItemTraverse (Name.m_First);
 	if (!pItem)
 		return NULL;
 
-	// now walk the qualified name
-
 	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
-	for (; NameIt; NameIt++)
-	{
-		pNamespace = GetItemNamespace (pItem);
-		if (!pNamespace)
-			return NULL;
 
-		It = pNamespace->m_ItemMap.Find (Name.m_First); 
-		if (!It)
-			return NULL;
+	if (IsStrict) // direct members only
+		for (; NameIt; NameIt++)
+		{
+			CNamespace* pNamespace = GetItemNamespace (pItem);
+			if (!pNamespace)
+				return NULL;
 
-		pItem = It->m_Value;
-	}
+			pItem = pNamespace->FindItem (*NameIt);
+			if (!pItem)
+				return NULL;
+		}
+	else
+		for (; NameIt; NameIt++)
+		{
+			CNamespace* pNamespace = GetItemNamespace (pItem);
+			if (!pNamespace)
+				return NULL;
+
+			pItem = pNamespace->FindItemTraverse (*NameIt);
+			if (!pItem)
+				return NULL;
+		}
+
 
 	return pItem;
 }

@@ -16,20 +16,24 @@ local_declaration
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class
-{
-	CQualifiedName m_Name;
-}
-qualified_name
+qualified_name_impl <CQualifiedName* $pName>
 	: EToken_Identifier       
 		{  
-			$.m_Name.m_First = $1.m_Data.m_String; 
+			$pName->m_First = $1.m_Data.m_String; 
 		}
 	  ('.' EToken_Identifier $n2
 		{ 
-			$.m_Name.m_List.InsertTail ($n2.m_Data.m_String);
+			$pName->m_List.InsertTail ($n2.m_Data.m_String);
 		}
 	  )*
+	; 
+
+class
+{
+	CQualifiedName m_Name
+}
+qualified_name
+	: qualified_name_impl <&$.m_Name>
 	; 
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -67,7 +71,6 @@ type_name_list
 	  )*
 
 	;
-
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

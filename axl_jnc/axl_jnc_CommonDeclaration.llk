@@ -287,7 +287,7 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 		}
 	| property_specifier
 		{
-			return $pTypeSpecifier->SetProperty ($1.m_pProperty);
+			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
 	| resolver (qualified_type_name_rslv)
 	  qualified_type_name $t
@@ -341,17 +341,35 @@ class
 }	
 declarator
 	: pointer <&$.m_Declarator>* 
-	  EToken_Identifier $n
+	  EToken_Identifier $i1
 		{
-			$.m_Declarator.m_Pos = $n.m_Pos;
-			$.m_Declarator.m_Name = $n.m_Data.m_String;
+			$.m_Declarator.m_Pos = $i1.m_Pos;
+			$.m_Declarator.m_Name.m_First = $i1.m_Data.m_String;
 		}
-	  ('.' property_accessor_kind $p
+	  ('.' declarator_qualifier $q
 		{
-			$.m_Declarator.m_PropertyAccessorKind = $p.m_PropertyAccessorKind;
+			return !$q.m_Identifier.IsEmpty () ? 
+				$.m_Declarator.AddName ($q.m_Identifier) :
+				$.m_Declarator.AddPropertyAccessorKind ($q.m_PropertyAccessorKind);
 		}
-	  )?
+	  )*
 	  declarator_suffix <&$.m_Declarator>*
+	;
+
+class
+{
+	rtl::CString m_Identifier;
+	EPropertyAccessor m_PropertyAccessorKind;
+}
+declarator_qualifier
+	: EToken_Identifier
+		{
+			$.m_Identifier = $1.m_Data.m_String;
+		}
+	| property_accessor_kind
+		{
+			$.m_PropertyAccessorKind = $1.m_PropertyAccessorKind;
+		}
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

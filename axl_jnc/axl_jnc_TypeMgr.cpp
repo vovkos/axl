@@ -149,7 +149,7 @@ CTypeMgr::ResolveImports ()
 	for (; ImportType; ImportType++)
 	{
 		CImportType* pImportType = *ImportType;
-		CModuleItem* pItem = pImportType->m_pAnchorNamespace->FindItemTraverse (pImportType->m_Name);
+		CModuleItem* pItem = pImportType->m_pAnchorNamespace->FindItemTraverse (pImportType->m_Name, false);
 		if (!pItem)
 		{
 			err::SetFormatStringError (_T("unresolved import '%s'"), pImportType->m_Name.GetFullName ());
@@ -168,7 +168,15 @@ CTypeMgr::ResolveImports ()
 		pImportType->m_pExternType = (CType*) pItem;
 	}
 
-	// calculate layout for all the structs, unions, interfaces and classes
+	// calculate layout for all the properties, structs, unions, interfaces and classes
+
+	rtl::CIteratorT <CPropertyType> PropertyType = m_PropertyTypeList.GetHead ();
+	for (; PropertyType; PropertyType++)
+	{
+		Result = PropertyType->CalcLayout ();
+		if (!Result)
+			return false;
+	}
 
 	rtl::CIteratorT <CStructType> StructType = m_StructTypeList.GetHead ();
 	for (; StructType; StructType++)
@@ -561,8 +569,6 @@ CTypeMgr::GetFunctionType (
 
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = EType_Function;
-	pType->m_Size = sizeof (TFunctionPtr);
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
 	pType->m_ArgTypeArray = ArgTypeArray;
@@ -575,28 +581,38 @@ CTypeMgr::GetFunctionType (
 }
 
 CPropertyType* 
-CTypeMgr::GetPropertyType (
-	CFunctionType* pGetterType,
-	const CFunctionTypeOverload& SetterType
+CTypeMgr::CreatePropertyType (
+	CType* pReturnType,
+	bool IsReadOnly
 	)
 {
-	rtl::CStringA Signature = CPropertyType::CreateSignature (pGetterType, SetterType);
-	
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-		return (CPropertyType*) It->m_Value;
+	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
+	pType->m_pModule = m_pModule;
+	m_PropertyTypeList.InsertTail (pType);
 
+	CFunctionType* pGetterType = GetFunctionType (pReturnType, rtl::CArrayT <CType*> (), 0);
+	CFunction* pGetter = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (EPropertyAccessor_Get, pGetterType);
+	pType->m_pGetter = pGetter;
+
+	if (!IsReadOnly)
+	{
+		CFunctionType* pSetterType = GetFunctionType (GetPrimitiveType (EType_Void), pReturnType, 0);
+		CFunction* pSetter = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (EPropertyAccessor_Set, pSetterType);
+		pType->m_Setter.AddOverload (pSetter);
+	}
+
+	pType->CreateSignature ();
+	return pType;
+}
+
+CPropertyType* 
+CTypeMgr::CreatePropertyType ()
+{
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = EType_Property;
-	pType->m_Size = sizeof (TFunctionPtr) + SetterType.GetOverloadCount () * sizeof (void*);
-	pType->m_Signature = Signature;
-	pType->m_pGetterType = pGetterType;
-	pType->m_SetterType = SetterType;
-
+	pType->m_Signature.Format ("R%d", m_UnnamedTypeCounter++);
 	m_PropertyTypeList.InsertTail (pType);
-	It->m_Value = pType;
-	
 	return pType;
 }
 
