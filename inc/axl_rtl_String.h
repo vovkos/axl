@@ -1151,6 +1151,36 @@ public:
 		return m_p ? SetLength (GetLength (), true) : true; 
 	}
 
+	bool
+	SetBuffer (
+		ref::EBuf Kind,
+		void* p,
+		size_t Size
+		)
+	{
+		if (Size < sizeof (CHdr) + sizeof (C))
+		{
+			err::SetError (err::EStatus_BufferTooSmall);
+			return false;
+		}
+
+		CHdr* pOldHdr = GetHdr ();
+		
+		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
+		NewHdr->m_Length = 0;
+		NewHdr->m_MaxLength = (Size - sizeof (CHdr)) / sizeof (C) - 1;
+		NewHdr->SetFree (Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1);
+
+		if (pOldHdr)
+			pOldHdr->Release ();
+
+		m_p = (T*) (NewHdr + 1);
+		m_p [0] = 0;
+
+		NewHdr.Detach ();
+		return true;
+	}
+
 protected:
 	CHdr*
 	GetHdr () const
@@ -1208,31 +1238,6 @@ protected:
 
 		NewHdr.Detach ();
 		return true;
-	}
-
-	void
-	SetBuffer (
-		ref::EBuf Kind,
-		void* p,
-		size_t Size
-		)
-	{
-		ASSERT (Size >= sizeof (CHdr) + sizeof (C));
-
-		CHdr* pOldHdr = GetHdr ();
-		
-		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
-		NewHdr->m_Length = 0;
-		NewHdr->m_MaxLength = (Size - sizeof (CHdr)) / sizeof (C) - 1;
-		NewHdr->SetFree (Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1);
-
-		if (pOldHdr)
-			pOldHdr->Release ();
-
-		m_p = (T*) (NewHdr + 1);
-		m_p [0] = 0;
-
-		NewHdr.Detach ();
 	}
 };
 

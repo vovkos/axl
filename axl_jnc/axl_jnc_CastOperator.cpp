@@ -559,12 +559,11 @@ AssertPointerCastTypeValid (
 		);
 }
 
-void
+intptr_t
 GetPointerCastOffset (
 	CType* pSrcType,
 	CType* pDstType,
-	intptr_t* pOffset,
-	rtl::CArrayT <size_t>* pLlvmIndexArray
+	CStructBaseTypeCoord* pCoord
 	)
 {
 	AssertPointerCastTypeValid (pSrcType, pDstType);
@@ -575,18 +574,20 @@ GetPointerCastOffset (
 	if (pSrcBaseType->GetTypeKind () != EType_Struct ||
 		pDstBaseType->GetTypeKind () != EType_Struct)
 	{
-		*pOffset = 0;
-		return;
+		return 0;
 	}
 
 	CStructType* pSrcStructType = (CStructType*) pSrcBaseType;
 	CStructType* pDstStructType = (CStructType*) pDstBaseType;
 
-	size_t Offset;
-	
-	*pOffset = 
-		pSrcStructType->FindBaseType (pDstStructType, &Offset, pLlvmIndexArray) ? Offset :
-		pDstStructType->FindBaseType (pSrcStructType, &Offset, NULL) ? -(intptr_t) Offset : 0;
+	if (pSrcStructType->FindBaseType (pDstStructType, pCoord))
+		return pCoord->m_Offset;
+
+	CStructBaseTypeCoord Coord;
+	if (pDstStructType->FindBaseType (pSrcStructType, &Coord))
+		return -(intptr_t) Coord.m_Offset;
+
+	return 0;
 }
 
 //.............................................................................
@@ -622,8 +623,8 @@ CCast_ptr::ConstCast (
 {
 	AssertPointerCastTypeValid (SrcValue.GetType (), DstValue.GetType ());
 		
-	intptr_t Offset;
-	GetPointerCastOffset (SrcValue.GetType (), DstValue.GetType (), &Offset, NULL);
+	CStructBaseTypeCoord Coord;
+	intptr_t Offset = GetPointerCastOffset (SrcValue.GetType (), DstValue.GetType (), &Coord);
 	
 	if (DstValue.GetType ()->GetTypeKind () == EType_Pointer_u)
 	{
@@ -650,16 +651,12 @@ CCast_ptr::LlvmCast (
 	
 	CPointerType* pPointerType = (CPointerType*) pType;
 
-	intptr_t Offset;
-
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	GetPointerCastOffset (Value.GetType (), pType, &Offset, &LlvmIndexArray);
+	CStructBaseTypeCoord Coord;
+	intptr_t Offset = GetPointerCastOffset (Value.GetType (), pType, &Coord);
 	
 	return Value.GetType ()->GetTypeKind () == EType_Pointer_u ? 
-		LlvmCast_ptr_u (Value, Offset, &LlvmIndexArray, pPointerType, pResultValue) :
-		LlvmCast_ptr (Value, Offset, &LlvmIndexArray, pPointerType, pResultValue);
+		LlvmCast_ptr_u (Value, Offset, &Coord.m_LlvmIndexArray, pPointerType, pResultValue) :
+		LlvmCast_ptr (Value, Offset, &Coord.m_LlvmIndexArray, pPointerType, pResultValue);
 }
 
 bool
@@ -911,17 +908,8 @@ CCast_class::LlvmCast (
 	ASSERT (pSrcClassType->IsClassType ());
 	ASSERT (pDstClassType->IsClassType ());
 
-	size_t Offset;
-
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	bool Result = pSrcClassType->FindBaseType (
-		pDstClassType, 
-		&Offset, 
-		&LlvmIndexArray
-		);
-
+	CClassBaseTypeCoord Coord;
+	bool Result = pSrcClassType->FindBaseType (pDstClassType, &Coord);
 	if (!Result)
 		return m_pModule->m_LlvmBuilder.DynamicCastInterface (Value, pDstClassType, pResultValue);
 
@@ -942,11 +930,11 @@ CCast_class::LlvmCast (
 	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pPhiBlock, pNoNullBlock);
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pNoNullBlock);
 	
-	LlvmIndexArray.Insert (0, 0);
+	Coord.m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
 	m_pModule->m_LlvmBuilder.CreateGep (
 		PtrValue, 
-		LlvmIndexArray,
-		LlvmIndexArray.GetCount (),
+		Coord.m_FieldCoord.m_LlvmIndexArray,
+		Coord.m_FieldCoord.m_LlvmIndexArray.GetCount (),
 		NULL, 
 		&PtrValue
 		);		

@@ -189,7 +189,7 @@ public:
 		size_t Size
 		)
 	{
-		if (Size < sizeof (T) + sizeof (CHdr))
+		if (Size < sizeof (CHdr) + sizeof (T))
 		{
 			err::SetError (err::EStatus_BufferTooSmall);
 			return false;

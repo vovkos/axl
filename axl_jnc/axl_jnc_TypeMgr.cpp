@@ -170,14 +170,6 @@ CTypeMgr::ResolveImports ()
 
 	// calculate layout for all the properties, structs, unions, interfaces and classes
 
-	rtl::CIteratorT <CPropertyType> PropertyType = m_PropertyTypeList.GetHead ();
-	for (; PropertyType; PropertyType++)
-	{
-		Result = PropertyType->CalcLayout ();
-		if (!Result)
-			return false;
-	}
-
 	rtl::CIteratorT <CStructType> StructType = m_StructTypeList.GetHead ();
 	for (; StructType; StructType++)
 	{
@@ -198,6 +190,14 @@ CTypeMgr::ResolveImports ()
 	for (; ClassType; ClassType++)
 	{
 		Result = ClassType->CalcLayout ();
+		if (!Result)
+			return false;
+	}
+
+	rtl::CIteratorT <CPropertyType> PropertyType = m_PropertyTypeList.GetHead ();
+	for (; PropertyType; PropertyType++)
+	{
+		Result = PropertyType->CalcLayout ();
 		if (!Result)
 			return false;
 	}

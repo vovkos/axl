@@ -75,6 +75,8 @@ CVTableType::GetVTablePtrValue (CValue* pValue)
 void
 CVTableType::AddFunctionToVTable (CFunction* pFunction)
 {
+	ASSERT (!pFunction->m_pVTableType && pFunction->m_VTableIndex == -1);
+
 	pFunction->m_VTableIndex = m_VTable.GetCount ();
 	pFunction->m_pVTableType = this;
 	m_VTable.Append (pFunction);
@@ -84,7 +86,7 @@ CVTableType::AddFunctionToVTable (CFunction* pFunction)
 }
 
 void
-CVTableType::Append (CVTableType* pType)
+CVTableType::AppendVTableType (CVTableType* pType)
 {
 	m_VTable.Append (pType->m_VTable);
 		

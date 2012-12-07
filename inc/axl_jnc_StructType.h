@@ -49,6 +49,40 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+class CStructBaseTypeCoord
+{
+protected:
+	friend class CStructType;
+
+	char m_Buffer [256];
+
+public:
+	size_t m_Offset;
+	rtl::CArrayT <size_t> m_LlvmIndexArray;
+
+public:
+	CStructBaseTypeCoord ()
+	{
+		Init ();
+	}
+
+	CStructBaseTypeCoord (const CStructBaseTypeCoord& Coord)
+	{
+		Init ();
+		*this = Coord;
+	}
+
+protected:
+	void
+	Init ()
+	{
+		m_Offset = 0;
+		m_LlvmIndexArray.SetBuffer (ref::EBuf_Field, m_Buffer, sizeof (m_Buffer));
+	}
+};
+
+//.............................................................................
+
 class CStructMember: 
 	public CModuleItem,
 	public CName,
@@ -99,7 +133,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 class CStructType: public CNamedType
 {
@@ -161,9 +195,11 @@ public:
 	bool
 	FindBaseType (
 		CStructType* pType,
-		size_t* pOffset = NULL,
-		rtl::CArrayT <size_t>* pLlvmIndexArray = NULL
-		);
+		CStructBaseTypeCoord* pCoord = NULL
+		)
+	{
+		return FindBaseTypeImpl (pType, pCoord, 0);
+	}
 
 	CStructBaseType*
 	AddBaseType (CStructType* pType);
@@ -180,9 +216,11 @@ public:
 	CStructMember*
 	FindMember (
 		const tchar_t* pName,
-		size_t* pBaseTypeOffset,
-		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray
-		);
+		CStructBaseTypeCoord* pBaseTypeCoord = NULL
+		)
+	{
+		return FindMemberImpl (pName, pBaseTypeCoord, 0);
+	}
 
 	CStructMember*
 	CreateMember (
@@ -204,6 +242,20 @@ public:
 	CalcLayout ();
 
 protected:
+	bool
+	FindBaseTypeImpl (
+		CStructType* pType,
+		CStructBaseTypeCoord* pCoord,
+		size_t Level
+		);
+
+	CStructMember*
+	FindMemberImpl (
+		const tchar_t* pName,
+		CStructBaseTypeCoord* pBaseTypeCoord,
+		size_t BaseTypeLevel
+		);
+
 	void
 	ResetLayout ();
 

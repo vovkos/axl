@@ -21,44 +21,38 @@ CStructType::CStructType ()
 }
 
 bool
-CStructType::FindBaseType (
+CStructType::FindBaseTypeImpl (
 	CStructType* pType,
-	size_t* pOffset,
-	rtl::CArrayT <size_t>* pLlvmIndexArray
+	CStructBaseTypeCoord* pCoord,
+	size_t Level
 	)
 {
 	rtl::CStringHashTableMapIteratorAT <CStructBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
 	if (It)
 	{
-		CStructBaseType* pBaseType = It->m_Value;
-
-		if (pOffset)
-			*pOffset = pBaseType->m_Offset;
-
-		if (pLlvmIndexArray)
-			pLlvmIndexArray->Copy (&pBaseType->m_LlvmIndex, 1);
+		if (pCoord)
+		{
+			CStructBaseType* pBaseType = It->m_Value;
+			pCoord->m_Offset = pBaseType->m_Offset;
+			pCoord->m_LlvmIndexArray.SetCount (Level + 1);
+			pCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
+		}
 		
 		return true;
 	}
 
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
 	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		size_t Offset;
-		bool Result = BaseType->m_pType->FindBaseType (pType, &Offset, &LlvmIndexArray);
+		CStructBaseType* pBaseType = *BaseType;
+
+		bool Result = pBaseType->m_pType->FindBaseTypeImpl (pType, pCoord, Level + 1);
 		if (Result)
 		{
-			if (pOffset)
-				*pOffset = BaseType->m_Offset + Offset;
-
-			if (pLlvmIndexArray)
+			if (pCoord)
 			{
-				pLlvmIndexArray->Clear ();
-				pLlvmIndexArray->Append (BaseType->m_LlvmIndex);
-				pLlvmIndexArray->Append (LlvmIndexArray);
+				pCoord->m_Offset += pBaseType->m_Offset;
+				pCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
 			}
 
 			return true;
@@ -111,10 +105,10 @@ CStructType::FindItemWithBaseTypeList (const tchar_t* pName)
 }
 
 CStructMember*
-CStructType::FindMember (
+CStructType::FindMemberImpl (
 	const tchar_t* pName,
-	size_t* pBaseTypeOffset,
-	rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray
+	CStructBaseTypeCoord* pBaseTypeCoord,
+	size_t Level
 	)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
@@ -124,38 +118,23 @@ CStructType::FindMember (
 		if (pItem->GetItemKind () != EModuleItem_StructMember)
 			return NULL;
 
-		if (pBaseTypeOffset)
-			*pBaseTypeOffset = 0;
-
-		if (pLlvmBaseTypeIndexArray)
-			pLlvmBaseTypeIndexArray->Clear ();
+		if (pBaseTypeCoord && Level)
+			pBaseTypeCoord->m_LlvmIndexArray.SetCount (Level);
 
 		return (CStructMember*) pItem;
 	}
 
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmBaseTypeIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
 	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		size_t BaseTypeOffset;
-		CStructMember* pMember = BaseType->m_pType->FindMember (
-			pName, 
-			&BaseTypeOffset, 
-			&LlvmBaseTypeIndexArray
-			);
-
+		CStructBaseType* pBaseType = *BaseType;
+		CStructMember* pMember = pBaseType->m_pType->FindMemberImpl (pName, pBaseTypeCoord, Level + 1);
 		if (pMember)
 		{
-			if (pBaseTypeOffset)
-				*pBaseTypeOffset = BaseType->m_Offset + BaseTypeOffset;
-
-			if (pLlvmBaseTypeIndexArray)
+			if (pBaseTypeCoord)
 			{
-				pLlvmBaseTypeIndexArray->Clear ();
-				pLlvmBaseTypeIndexArray->Append (BaseType->m_LlvmIndex);
-				pLlvmBaseTypeIndexArray->Append (LlvmBaseTypeIndexArray);
+				pBaseTypeCoord->m_Offset += pBaseType->m_Offset;
+				pBaseTypeCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
 			}
 
 			return pMember;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_PropertyType.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -13,15 +14,8 @@ CPropertyType::CPropertyType ()
 	m_pGetter = NULL;
 	m_pPointerType = NULL;
 	m_pVTableStructType = NULL;	
+	m_pParentClassType = NULL;
 	m_ParentVTableIndex = -1;
-}
-
-CClassType* 
-CPropertyType::GetParentClassType ()
-{
-	return m_pParentNamespace->GetNamespaceKind () == ENamespace_Class ? 
-		(CClassType*) m_pParentNamespace : 
-		NULL;
 }
 
 rtl::CStringA
@@ -79,6 +73,13 @@ CPropertyType::TagAccessors ()
 bool
 CPropertyType::CalcLayout ()
 {
+	if (m_Flags & ETypeFlag_IsLayoutReady)
+		return true;
+
+	bool Result = PreCalcLayout ();
+	if (!Result)
+		return false;
+
 	CreateVTableStructType ();
 
 	AddFunctionToVTable (m_pGetter);
@@ -90,7 +91,13 @@ CPropertyType::CalcLayout ()
 		AddFunctionToVTable (pSetter);
 	}
 
-	return m_pVTableStructType->CalcLayout ();
+	Result = m_pVTableStructType->CalcLayout ();
+	if (!Result)
+		return false;
+
+	PostCalcLayout ();
+
+	return true;
 }
 
 //.............................................................................

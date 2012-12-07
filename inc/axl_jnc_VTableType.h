@@ -55,11 +55,8 @@ protected:
 	void
 	AddFunctionToVTable (CFunction* pFunction);
 
-	bool
-	CalcLayout ();
-
-	void 
-	Append (CVTableType* pType);
+	void
+	AppendVTableType (CVTableType* pType);
 };
 
 //.............................................................................

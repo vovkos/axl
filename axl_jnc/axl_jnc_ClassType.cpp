@@ -48,53 +48,41 @@ CClassType::CClassType ()
 }
 
 bool
-CClassType::FindBaseType (
+CClassType::FindBaseTypeImpl (
 	CClassType* pType,
-	size_t* pOffset,
-	rtl::CArrayT <size_t>* pLlvmIndexArray,
-	size_t* pVTableIndex
+	CClassBaseTypeCoord* pCoord,
+	size_t Level
 	)
 {
 	rtl::CStringHashTableMapIteratorAT <CClassBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
 	if (It)
 	{
-		CClassBaseType* pBaseType = It->m_Value;
+		if (pCoord)
+		{
+			CClassBaseType* pBaseType = It->m_Value;
 
-		if (pOffset)
-			*pOffset = pBaseType->GetOffset ();
-
-		if (pLlvmIndexArray)
-			pLlvmIndexArray->Copy (pBaseType->GetLlvmIndex ());
-
-		if (pVTableIndex)
-			*pVTableIndex = pBaseType->m_VTableIndex;
+			pCoord->m_FieldCoord.m_LlvmIndexArray.SetCount (Level + 1);
+			pCoord->m_FieldCoord.m_Offset = pBaseType->m_pFieldBaseType->GetOffset ();
+			pCoord->m_FieldCoord.m_LlvmIndexArray [Level] = pBaseType->m_pFieldBaseType->GetLlvmIndex ();
+			pCoord->m_VTableIndex = pBaseType->m_VTableIndex;
+		}
 
 		return true;
 	}
 
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
 	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		size_t Offset;
-		size_t VTableIndex;
+		CClassBaseType* pBaseType = *BaseType;
 
-		bool Result = BaseType->m_pType->FindBaseType (pType, &Offset, &LlvmIndexArray, &VTableIndex);
+		bool Result = pBaseType->m_pType->FindBaseType (pType, pCoord);
 		if (Result)
 		{
-			if (pOffset)
-				*pOffset = BaseType->GetOffset () + Offset;
-
-			if (pVTableIndex)
-				*pVTableIndex = BaseType->m_VTableIndex + VTableIndex;
-
-			if (pLlvmIndexArray)
+			if (pCoord)
 			{
-				pLlvmIndexArray->Clear ();
-				pLlvmIndexArray->Append (BaseType->GetLlvmIndex ());
-				pLlvmIndexArray->Append (LlvmIndexArray);
+				pCoord->m_FieldCoord.m_Offset += pBaseType->m_pFieldBaseType->GetOffset ();
+				pCoord->m_FieldCoord.m_LlvmIndexArray [Level] = pBaseType->m_pFieldBaseType->GetLlvmIndex ();
+				pCoord->m_VTableIndex += pBaseType->m_VTableIndex;
 			}
 
 			return true;
@@ -148,14 +136,13 @@ CClassType::FindItemWithBaseTypeList (const tchar_t* pName)
 
 CClassMember*
 CClassType::FindMemberImpl (
-	bool ExcludeThis,
+	bool IncludeThis,
 	const tchar_t* pName,
-	size_t* pBaseTypeOffset,
-	rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
-	size_t* pBaseTypeVTableIndex
+	CClassBaseTypeCoord* pBaseTypeCoord,
+	size_t Level
 	)
 {
-	if (!ExcludeThis)
+	if (IncludeThis)
 	{
 		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
 		if (It)
@@ -163,49 +150,26 @@ CClassType::FindMemberImpl (
 			CModuleItem* pItem = It->m_Value;
 			if (pItem->GetItemKind () != EModuleItem_ClassMember)
 				return NULL;
-
-			if (pBaseTypeOffset)
-				*pBaseTypeOffset = 0;
-
-			if (pLlvmBaseTypeIndexArray)
-				pLlvmBaseTypeIndexArray->Clear ();
-
-			if (pBaseTypeVTableIndex)
-				*pBaseTypeVTableIndex = 0;
+			
+			if (pBaseTypeCoord && Level)
+				pBaseTypeCoord->m_FieldCoord.m_LlvmIndexArray.SetCount (Level);
 
 			return (CClassMember*) pItem;
 		}
 	}
-
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmBaseTypeIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
+	
 	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		size_t BaseTypeOffset;
-		size_t BaseTypeVTableIndex;
-
-		CClassMember* pMember = BaseType->m_pType->FindMember (
-			pName, 
-			&BaseTypeOffset, 
-			&LlvmBaseTypeIndexArray,
-			&BaseTypeVTableIndex
-			);
-
+		CClassBaseType* pBaseType = *BaseType;
+		CClassMember* pMember = pBaseType->m_pType->FindMemberImpl (true, pName, pBaseTypeCoord, Level + 1);
 		if (pMember)
 		{
-			if (pBaseTypeOffset)
-				*pBaseTypeOffset = BaseType->GetOffset () + BaseTypeOffset;
-
-			if (pBaseTypeVTableIndex)
-				*pBaseTypeVTableIndex = BaseType->m_VTableIndex + BaseTypeVTableIndex;
-
-			if (pLlvmBaseTypeIndexArray)
+			if (pBaseTypeCoord)
 			{
-				pLlvmBaseTypeIndexArray->Clear ();
-				pLlvmBaseTypeIndexArray->Append (BaseType->GetLlvmIndex ());
-				pLlvmBaseTypeIndexArray->Append (LlvmBaseTypeIndexArray);	
+				pBaseTypeCoord->m_FieldCoord.m_Offset += pBaseType->m_pFieldBaseType->GetOffset ();
+				pBaseTypeCoord->m_FieldCoord.m_LlvmIndexArray [Level] = pBaseType->m_pFieldBaseType->GetLlvmIndex ();
+				pBaseTypeCoord->m_VTableIndex += pBaseType->m_VTableIndex;
 			}
 
 			return pMember;
@@ -313,9 +277,18 @@ CClassType::CreatePropertyMember (
 	if (!Result)
 		return NULL;
 
+	pType->m_pParentClassType = this;
 	pType->m_pParentNamespace = this;
 	pType->m_Name = Name;
 	pType->TagAccessors ();
+
+	AddMethodFunction (pType->GetGetter ());
+
+	CFunctionOverload* pSetter = pType->GetSetter ();
+	size_t Count = pSetter->GetOverloadCount ();
+	for (size_t i = 0; i < Count; i++)
+		AddMethodFunction (pSetter->GetFunction (i));
+
 	return pMember;
 }
 
@@ -357,10 +330,10 @@ CClassType::CalcLayout ()
 		if (!Result)
 			return false;
 				
-		BaseType->m_pStructBaseType = m_pInterfaceStructType->AddBaseType (pBaseClassType->GetInterfaceStructType ());
+		BaseType->m_pFieldBaseType = m_pInterfaceStructType->AddBaseType (pBaseClassType->GetInterfaceStructType ());
 		BaseType->m_VTableIndex = m_VTable.GetCount ();
 
-		CVTableType::Append (pBaseClassType);
+		AppendVTableType (pBaseClassType);
 	}
 
 	// lay out properties
@@ -376,7 +349,7 @@ CClassType::CalcLayout ()
 
 		pPropertyType->m_ParentVTableIndex = m_VTable.GetCount ();
 
-		CVTableType::Append (pPropertyType);
+		AppendVTableType (pPropertyType);
 	}
 
 	// lay out methods
@@ -385,6 +358,12 @@ CClassType::CalcLayout ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunction* pFunction = m_MethodFunctionArray [i];
+		if (pFunction->m_VTableIndex != -1) // already layed out
+		{
+			ASSERT (pFunction->m_PropertyAccessorKind && pFunction->m_Name.IsEmpty ());
+			continue;
+		}
+		
 		Result = LayoutFunction (pFunction);
 		if (!Result)
 			return false;
@@ -427,16 +406,15 @@ CClassType::LayoutFunction (CFunction* pFunction)
 		return true;
 	}
 
-	CFunction* pOverridenFunction = NULL;
-	size_t BaseTypeVTableIndex = -1;
-
+	CClassBaseTypeCoord BaseTypeCoord;
 	CClassMember* pMember = FindMemberImpl (
-		!pFunction->m_PropertyAccessorKind, // exclude 'this' if its not an accessor
+		pFunction->m_PropertyAccessorKind != 0, // include 'this' only for property accessors
 		pFunction->m_Name.GetShortName (),
-		NULL,
-		NULL,
-		&BaseTypeVTableIndex
+		&BaseTypeCoord,
+		0
 		);
+
+	CFunction* pOverridenFunction = NULL;
 
 	CFunctionType* pClosureType = pFunction->GetClosureType ();
 
@@ -474,11 +452,16 @@ CClassType::LayoutFunction (CFunction* pFunction)
 		}
 	}
 
-	size_t VTableIndex = BaseTypeVTableIndex + pOverridenFunction->GetVTableIndex ();
 	pFunction->m_pType = pOverridenFunction->m_pType;
-	pFunction->m_VTableIndex = VTableIndex;
 	pFunction->m_pVTableType = pOverridenFunction->m_pVTableType;
-	m_VTable [pFunction->m_VTableIndex] = pFunction;
+	pFunction->m_VTableIndex = pOverridenFunction->m_VTableIndex;
+	pFunction->m_VTableIndexDelta = BaseTypeCoord.m_VTableIndex;
+
+	size_t VTableIndex = BaseTypeCoord.m_VTableIndex + pOverridenFunction->m_VTableIndex;
+	size_t VTableCount = m_VTable.GetCount ();
+
+	ASSERT (VTableIndex < m_VTable.GetCount ());
+	m_VTable [VTableIndex] = pFunction;
 	return true;
 }
 

@@ -664,21 +664,18 @@ public:
 		return m_p ? SetCount (GetCount ()) : true; 
 	}
 
-protected:
-	CHdr*
-	GetHdr () const
-	{
-		return m_p ? (CHdr*) m_p - 1 : NULL;
-	}
-
-	void
+	bool
 	SetBuffer (
 		ref::EBuf Kind,
 		void* p,
 		size_t Size
 		)
 	{
-		ASSERT (Size >= sizeof (CHdr) + sizeof (T));
+		if (Size < sizeof (CHdr) + sizeof (T))
+		{
+			err::SetError (err::EStatus_BufferTooSmall);
+			return false;
+		}
 
 		CHdr* pOldHdr = GetHdr ();
 		
@@ -693,6 +690,14 @@ protected:
 		m_p = (T*) (NewHdr + 1);
 
 		NewHdr.Detach ();
+		return true;
+	}
+
+protected:
+	CHdr*
+	GetHdr () const
+	{
+		return m_p ? (CHdr*) m_p - 1 : NULL;
 	}
 };
 

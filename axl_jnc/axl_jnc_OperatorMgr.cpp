@@ -589,25 +589,22 @@ COperatorMgr::StructMemberOperator (
 	CValue* pResultValue
 	)
 {
-	size_t Offset;
-
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	CStructMember* pMember = pStructType->FindMember (pName, &Offset, &LlvmIndexArray);
+	CStructBaseTypeCoord Coord;
+	CStructMember* pMember = pStructType->FindMember (pName, &Coord);
 	if (!pMember)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pStructType->GetTypeString ());
 		return false;
 	}
 
-	LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+	Coord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+	Coord.m_Offset += pMember->GetOffset ();
 	
 	EValue OpValueKind = OpValue.GetValueKind ();
 	if (OpValueKind == EValue_Const)
 	{
 		pResultValue->CreateConst (
-			(char*) OpValue.GetConstData () + Offset,
+			(char*) OpValue.GetConstData () + Coord.m_Offset,
 			pMember->GetType () 
 			);
 
@@ -620,8 +617,8 @@ COperatorMgr::StructMemberOperator (
 	{
 		m_pModule->m_LlvmBuilder.CreateExtractValue (
 			OpValue, 
-			LlvmIndexArray, 
-			LlvmIndexArray.GetCount (),
+			Coord.m_LlvmIndexArray, 
+			Coord.m_LlvmIndexArray.GetCount (),
 			pMember->GetType (),
 			pResultValue
 			);
@@ -629,12 +626,19 @@ COperatorMgr::StructMemberOperator (
 		return true;
 	}
 
-	LlvmIndexArray.Insert (0, 0);
+	Coord.m_LlvmIndexArray.Insert (0, 0);
 
 	if (pOpType->GetTypeKind () == EType_Reference_u)
 	{
 		CType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference_u);
-		m_pModule->m_LlvmBuilder.CreateGep (OpValue, LlvmIndexArray, LlvmIndexArray.GetCount (), pResultType, pResultValue);
+		m_pModule->m_LlvmBuilder.CreateGep (
+			OpValue, 
+			Coord.m_LlvmIndexArray, 
+			Coord.m_LlvmIndexArray.GetCount (), 
+			pResultType, 
+			pResultValue
+			);
+
 		return true;
 	}
 	
@@ -643,7 +647,13 @@ COperatorMgr::StructMemberOperator (
 	if (OpValue.GetValueKind () == EValue_Variable)
 	{
 		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateGep (OpValue, LlvmIndexArray, LlvmIndexArray.GetCount (), NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep (
+			OpValue, 
+			Coord.m_LlvmIndexArray, 
+			Coord.m_LlvmIndexArray.GetCount (), 
+			NULL, 
+			&PtrValue
+			);
 		
 		pResultValue->SetVariable (
 			OpValue.GetVariable (), 
@@ -662,7 +672,13 @@ COperatorMgr::StructMemberOperator (
 
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
-		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, LlvmIndexArray, LlvmIndexArray.GetCount (), NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep (
+			PtrValue, 
+			Coord.m_LlvmIndexArray, 
+			Coord.m_LlvmIndexArray.GetCount (), 
+			NULL, 
+			&PtrValue
+			);
 
 		CValue SafePtrValue = pResultType->GetUndefValue ();
 		m_pModule->m_LlvmBuilder.CreateInsertValue (SafePtrValue, PtrValue, 0, NULL, &SafePtrValue);
@@ -741,19 +757,8 @@ COperatorMgr::ClassMemberOperator (
 	CValue* pResultValue
 	)
 {
-	size_t BaseTypeOffset;
-	size_t BaseTypeVTableIndex;
-
-	char Buffer [256];
-	rtl::CArrayT <size_t> LlvmBaseTypeIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	CClassMember* pMember = pClassType->FindMember (
-		pName, 
-		&BaseTypeOffset, 
-		&LlvmBaseTypeIndexArray,
-		&BaseTypeVTableIndex
-		);
-	
+	CClassBaseTypeCoord Coord;
+	CClassMember* pMember = pClassType->FindMember (pName, &Coord);	
 	if (!pMember)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pClassType->GetTypeString ());
@@ -778,8 +783,7 @@ COperatorMgr::ClassMemberOperator (
 			OpValue, 
 			pClassType, 
 			(CClassFieldMember*) pMember, 
-			BaseTypeOffset,
-			&LlvmBaseTypeIndexArray,
+			&Coord,
 			pResultValue
 			);
 		
@@ -788,7 +792,7 @@ COperatorMgr::ClassMemberOperator (
 			OpValue, 
 			pClassType, 
 			(CClassMethodMember*) pMember, 
-			BaseTypeVTableIndex,
+			&Coord,
 			pResultValue
 			);
 
@@ -797,7 +801,7 @@ COperatorMgr::ClassMemberOperator (
 			OpValue, 
 			pClassType, 
 			(CClassPropertyMember*) pMember, 
-			BaseTypeVTableIndex,
+			&Coord,
 			pResultValue
 			);
 
@@ -812,26 +816,30 @@ COperatorMgr::ClassFieldMemberOperator (
 	const CValue& OpValue,
 	CClassType* pClassType,
 	CClassFieldMember* pMember,
-	size_t BaseTypeOffset,
-	rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
+	CClassBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
 {
-	pLlvmBaseTypeIndexArray->Insert (0, 0);
-	pLlvmBaseTypeIndexArray->Append (pMember->GetLlvmIndex ());
-
 	CValue PtrValue;
 	CValue ScopeLevelValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ScopeLevelValue);
 
+	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
+	pCoord->m_FieldCoord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+
+	size_t* p = pCoord->m_FieldCoord.m_LlvmIndexArray;
+	size_t Count = pCoord->m_FieldCoord.m_LlvmIndexArray.GetCount ();
+
 	m_pModule->m_LlvmBuilder.CreateGep (
 		PtrValue, 
-		*pLlvmBaseTypeIndexArray, 
-		pLlvmBaseTypeIndexArray->GetCount (), 
+		pCoord->m_FieldCoord.m_LlvmIndexArray, 
+		pCoord->m_FieldCoord.m_LlvmIndexArray.GetCount (), 
 		NULL,
 		&PtrValue
 		);
+
+	rtl::CString s = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
 
 	CPointerType* pResultType = pMember->GetType ()->GetPointerType (EType_Reference);
 
@@ -848,16 +856,12 @@ COperatorMgr::ClassFieldMemberOperator (
 }
 
 bool
-COperatorMgr::ClassMethodMemberOperator (
+COperatorMgr::GetClassVTable (
 	const CValue& OpValue,
 	CClassType* pClassType,
-	CClassMethodMember* pMember,
-	size_t BaseTypeVTableIndex,
 	CValue* pResultValue
 	)
 {
-	CFunction* pFunction = pMember->GetFunction ();
-
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 
@@ -878,16 +882,38 @@ COperatorMgr::ClassMethodMemberOperator (
 
 	// class.vtbl*
 
-	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
+	CPointerType* pResultType = pClassType->GetVTableStructType ()->GetPointerType (EType_Pointer_u);
+	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pResultType, pResultValue);
+	return true;
+}
+
+bool
+COperatorMgr::ClassMethodMemberOperator (
+	const CValue& OpValue,
+	CClassType* pClassType,
+	CClassMethodMember* pMember,
+	CClassBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	// class.vtbl*
+
+	CValue PtrValue;
+	GetClassVTable (OpValue, pClassType, &PtrValue);
+
+	CFunction* pFunction = pMember->GetFunction ();
 
 	// pfn*
 
 	ASSERT (pFunction->GetFunctionKind () == EFunction_Method);
-	size_t VTableIndex = ((CFunction*) pFunction)->GetVTableIndex ();
+	size_t VTableIndex = 
+		pCoord->m_VTableIndex + 
+		pFunction->GetVTableIndex () + 
+		pFunction->GetVTableIndexDelta ();
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (
 		PtrValue, 
-		BaseTypeVTableIndex + VTableIndex,
+		VTableIndex,
 		NULL, 
 		&PtrValue
 		);
@@ -912,11 +938,34 @@ COperatorMgr::ClassPropertyMemberOperator (
 	const CValue& OpValue,
 	CClassType* pClassType,
 	CClassPropertyMember* pMember,
-	size_t BaseTypeVTableIndex,
+	CClassBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("COperatorMgr::ClassPropertyMemberOperator not implemented yet"));
+	// class.vtbl*
+
+	CValue PtrValue;
+	GetClassVTable (OpValue, pClassType, &PtrValue);
+
+	// property.vtbl*
+
+	CPropertyType* pPropertyType = pMember->GetType ();
+	size_t VTableIndex = pCoord->m_VTableIndex + pPropertyType->GetParentVTableIndex ();
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (
+		PtrValue, 
+		VTableIndex,
+		NULL,
+		&PtrValue
+		);
+
+	m_pModule->m_LlvmBuilder.CreateBitCast (
+		PtrValue, 
+		pPropertyType->GetVTableStructType ()->GetPointerType (EType_Pointer_u),
+		&PtrValue
+		);
+
+	pResultValue->OverrideType (PtrValue, pPropertyType);
 
 	CClosure* pClosure = pResultValue->CreateClosure ();
 	pClosure->CreateArg (0, OpValue);
@@ -1066,6 +1115,10 @@ COperatorMgr::CallOperator (
 	CValue* pResultValue
 	)
 {
+	rtl::CBoxListT <CValue> EmptyArgList;
+	if (!pArgList)
+		pArgList = &EmptyArgList;
+
 	CValue OpValue;
 	bool Result = PrepareOperand (RawOpValue, &OpValue);
 	if (!Result)
@@ -1078,7 +1131,7 @@ COperatorMgr::CallOperator (
 	}
 
 	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure && pArgList)
+	if (pClosure)
 	{
 		Result = pClosure->Apply (pArgList);
 		if (!Result)
@@ -1089,7 +1142,7 @@ COperatorMgr::CallOperator (
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 
 	size_t FormalArgCount = ArgTypeArray.GetCount ();
-	size_t ActualArgCount = pArgList ? pArgList->GetCount () : 0;
+	size_t ActualArgCount = pArgList->GetCount ();
 
 	bool IsVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsVarArg) != 0;
 	bool IsUnsafeVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsUnsafeVarArg) != 0;
@@ -1109,36 +1162,33 @@ COperatorMgr::CallOperator (
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
-	if (ActualArgCount)
-	{
-		ArgArray.Reserve (ActualArgCount);
+	ArgArray.Reserve (ActualArgCount);
 	
-		rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
-		for (size_t i = 0; i < FormalArgCount; Arg++, i++)
-		{
-			CType* pFormalArgType = ArgTypeArray [i];
+	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
+	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
+	{
+		CType* pFormalArgType = ArgTypeArray [i];
 		
-			CValue ArgCast;
-			Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
-			if (!Result)
-				return false;
+		CValue ArgCast;
+		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		if (!Result)
+			return false;
 
-			ArgArray.Append (ArgCast);
-		}
+		ArgArray.Append (ArgCast);
+	}
 
-		// vararg
+	// vararg
 
-		for (; Arg; Arg++)
-		{
-			CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
+	for (; Arg; Arg++)
+	{
+		CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
 
-			CValue ArgCast;
-			Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
-			if (!Result)
-				return false;
+		CValue ArgCast;
+		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		if (!Result)
+			return false;
 
-			ArgArray.Append (ArgCast);
-		}
+		ArgArray.Append (ArgCast);
 	}
 
 	m_pModule->m_LlvmBuilder.CreateCall (
@@ -1563,29 +1613,29 @@ COperatorMgr::GetPropertyOperator (
 	CValue* pResultValue
 	)
 {
-	bool Result;
+	CFunction* pFunction = pPropertyType->GetGetter ();
+	ASSERT (pFunction->GetVTableType () == pPropertyType);
 
-	CValue GetterValue;
-
-	CFunction* pGetter = pPropertyType->GetGetter ();
-	ASSERT (pGetter->GetVTableType () == pPropertyType);
+	CValue FunctionValue;
 
 	if (OpValue.GetValueKind () == EValue_Property)
 	{
-		GetterValue = pPropertyType->GetGetter ();
+		FunctionValue = pFunction;
 	}
 	else
 	{
-		CValue VTablePtrValue;
-		Result = pPropertyType->GetVTablePtrValue (&VTablePtrValue);
-		if (!Result)
-			return false;
+		// pfn*
 
-		// get the first member of the vtable
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue, pFunction->GetVTableIndex (), NULL, &PtrValue);
+
+		// pfn
+
+		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType (), &FunctionValue);
 	}
 
-	GetterValue.SetClosure (OpValue.GetClosure ());
-	return CallOperator (GetterValue, NULL, pResultValue);
+	FunctionValue.SetClosure (OpValue.GetClosure ());
+	return CallOperator (FunctionValue, NULL, pResultValue);
 }
 
 bool
@@ -1595,19 +1645,48 @@ COperatorMgr::SetPropertyOperator (
 	CPropertyType* pPropertyType
 	)
 {
-	CFunctionOverload* pSetter = pPropertyType->GetSetter ();
-	if (!pSetter)
+	if (pPropertyType->IsReadOnly ())
 	{
-		err::SetFormatStringError (_T("cannot move to a read-only property"));
+		err::SetFormatStringError (_T("cannot assign to a read-only property"));
 		return false;
 	}
 
-	CFunction* pFunction = pSetter->GetFunction ();
 	rtl::CBoxListT <CValue> ArgList;
 	ArgList.InsertTail (SrcValue);
 
+	CFunctionOverload* pSetter = pPropertyType->GetSetter ();
+	CFunction* pFunction = pSetter->FindOverload (&ArgList);
+	if (!pFunction)
+	{
+		err::SetFormatStringError (
+			_T("none of the %d property setters accepts '%s'"), 
+			pSetter->GetOverloadCount (),
+			SrcValue.GetType ()->GetTypeString ()
+			);
+		return false;
+	}
+
+	CValue FunctionValue;
+	if (DstValue.GetValueKind () == EValue_Property)
+	{
+		FunctionValue = pFunction;
+	}
+	else
+	{
+		// pfn*
+
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (DstValue, pFunction->GetVTableIndex (), NULL, &PtrValue);
+
+		// pfn
+
+		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType (), &FunctionValue);
+	}
+
+	FunctionValue.SetClosure (DstValue.GetClosure ());
+
 	CValue ReturnValue;
-	return CallOperator (pFunction, &ArgList, &ReturnValue);
+	return CallOperator (FunctionValue, &ArgList, &ReturnValue);
 }
 
 //.............................................................................

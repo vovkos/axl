@@ -923,11 +923,25 @@ CFunctionMgr::InitializeInterface (
 		CValue BaseClassPtrValue;
 		CValue BaseClassVTablePtrValue;
 
-		CPointerType* pBaseClassVTablePtrType = pBaseClassType->GetVTableStructType ()->GetPointerType (EType_Pointer_u);
+		m_pModule->m_LlvmBuilder.CreateGep2 (
+			IfacePtrValue, 
+			BaseType->GetFieldBaseType ()->GetLlvmIndex (), 
+			NULL, 
+			&BaseClassPtrValue
+			);
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, BaseType->GetLlvmIndex (), NULL, &BaseClassPtrValue);
-		m_pModule->m_LlvmBuilder.CreateGep2 (VTablePtrValue, BaseType->GetVTableIndex (), NULL, &BaseClassVTablePtrValue);
-		m_pModule->m_LlvmBuilder.CreateBitCast (BaseClassVTablePtrValue, pBaseClassVTablePtrType, &BaseClassVTablePtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (
+			VTablePtrValue, 
+			BaseType->GetVTableIndex (), 
+			NULL, 
+			&BaseClassVTablePtrValue
+			);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (
+			BaseClassVTablePtrValue, 
+			pBaseClassType->GetVTableStructType ()->GetPointerType (EType_Pointer_u),
+			&BaseClassVTablePtrValue
+			);
 
 		InitializeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
 	}

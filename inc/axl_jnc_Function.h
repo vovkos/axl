@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_StructType.h"
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
 #include "axl_llk_Ast.h"
@@ -101,6 +102,7 @@ protected:
 	CClassType* m_pClassType;
 	CVTableType* m_pVTableType;
 	size_t m_VTableIndex;
+	size_t m_VTableIndexDelta; // delta between vtable type and class type
 
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
@@ -177,6 +179,12 @@ public:
 	GetVTableIndex ()
 	{
 		return m_VTableIndex;
+	}
+
+	size_t
+	GetVTableIndexDelta ()
+	{
+		return m_VTableIndexDelta;
 	}
 
 	size_t 

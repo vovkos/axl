@@ -25,6 +25,7 @@ protected:
 	CFunctionOverload m_Setter;
 	CPropertyPointerType* m_pPointerType;
 
+	CClassType* m_pParentClassType;
 	size_t m_ParentVTableIndex;
 
 public:
@@ -49,9 +50,12 @@ public:
 	}
 	
 	CClassType* 
-	GetParentClassType ();
+	GetParentClassType ()
+	{
+		return m_pParentClassType;
+	}
 
-	size_t 
+	size_t
 	GetParentVTableIndex ()
 	{
 		return m_ParentVTableIndex;

@@ -360,8 +360,14 @@ protected:
 		const CValue& OpValue,
 		CClassType* pClassType,
 		CClassFieldMember* pMember,
-		size_t BaseTypeOffset,
-		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
+		CClassBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetClassVTable (
+		const CValue& OpValue,
+		CClassType* pClassType,
 		CValue* pResultValue
 		);
 
@@ -370,7 +376,7 @@ protected:
 		const CValue& OpValue,
 		CClassType* pClassType,
 		CClassMethodMember* pMember,
-		size_t BaseTypeVTableIndex,
+		CClassBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 
@@ -379,7 +385,7 @@ protected:
 		const CValue& OpValue,
 		CClassType* pClassType,
 		CClassPropertyMember* pMember,
-		size_t BaseTypeVTableIndex,
+		CClassBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 

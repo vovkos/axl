@@ -20,14 +20,14 @@ protected:
 	friend class CClassType;
 
 	CClassType* m_pType;
-	CStructBaseType* m_pStructBaseType;
+	CStructBaseType* m_pFieldBaseType;
 	size_t m_VTableIndex;
 
 public:
 	CClassBaseType ()
 	{
 		m_pType = NULL;
-		m_pStructBaseType = NULL;
+		m_pFieldBaseType = NULL;
 		m_VTableIndex = -1;
 	}
 
@@ -37,24 +37,30 @@ public:
 		return m_pType;
 	}
 
-	size_t 
-	GetOffset ()
+	CStructBaseType* 
+	GetFieldBaseType ()
 	{
-		ASSERT (m_pStructBaseType);
-		return m_pStructBaseType->GetOffset ();
+		return m_pFieldBaseType;
 	}
 
 	size_t
-	GetLlvmIndex ()
-	{
-		ASSERT (m_pStructBaseType);
-		return m_pStructBaseType->GetLlvmIndex ();
-	}
-
-	size_t 
 	GetVTableIndex ()
 	{
 		return m_VTableIndex;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CClassBaseTypeCoord
+{
+public:
+	CStructBaseTypeCoord m_FieldCoord;
+	size_t m_VTableIndex;
+
+	CClassBaseTypeCoord ()
+	{
+		m_VTableIndex = 0;
 	}
 };
 
@@ -314,10 +320,11 @@ public:
 	bool
 	FindBaseType (
 		CClassType* pType,
-		size_t* pOffset = NULL,
-		rtl::CArrayT <size_t>* pLlvmIndexArray = NULL,
-		size_t* pVTableIndex = NULL
-		);
+		CClassBaseTypeCoord* pCoord = NULL
+		)
+	{
+		return FindBaseTypeImpl (pType, pCoord, 0);
+	}
 
 	CClassBaseType*
 	AddBaseType (CClassType* pType);
@@ -346,12 +353,10 @@ public:
 	CClassMember*
 	FindMember (
 		const tchar_t* pName,
-		size_t* pBaseTypeOffset,
-		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
-		size_t* pBaseTypeVTableIndex
+		CClassBaseTypeCoord* pBaseTypeCoord = NULL
 		)
 	{
-		return FindMemberImpl (false, pName, pBaseTypeOffset, pLlvmBaseTypeIndexArray, pBaseTypeVTableIndex);
+		return FindMemberImpl (true, pName, pBaseTypeCoord, 0);
 	}
 
 	CClassFieldMember*
@@ -380,13 +385,19 @@ public:
 	CalcLayout ();
 
 protected:
+	bool
+	FindBaseTypeImpl (
+		CClassType* pType,
+		CClassBaseTypeCoord* pCoord,
+		size_t Level
+		);
+
 	CClassMember*
 	FindMemberImpl (
-		bool ExcludeThis,
+		bool IncludeThis,
 		const tchar_t* pName,
-		size_t* pBaseTypeOffset,
-		rtl::CArrayT <size_t>* pLlvmBaseTypeIndexArray,
-		size_t* pBaseTypeVTableIndex
+		CClassBaseTypeCoord* pBaseTypeCoord,
+		size_t Level
 		);
 
 	bool

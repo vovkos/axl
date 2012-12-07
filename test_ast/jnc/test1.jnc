@@ -48,6 +48,7 @@ interface IFoo
 		);
 };
 
+
 class CTest: IFoo
 {
 	int m_c;
@@ -102,6 +103,7 @@ main ()
 	printf ("GlobalProp returned %d\n", x);
 	GlobalProp = 30;
 
+
 	CTest t = stack new CTest;
 
 	t.m_a = 100;
@@ -110,8 +112,8 @@ main ()
 	t.m_d = 400;
 
 	x = t.FooProp;
-//	printf ("t.FooProp returned %d\n", x);
-//	t.FooProp = -100;
+	printf ("t.FooProp returned %d\n", x);
+	t.FooProp = -100;
 
 	t.FooTest (10, 20);
 /*	t.BarTest (30, 40); 

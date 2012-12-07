@@ -557,6 +557,10 @@ CParser::LookupIdentifier (
 		pValue->SetVariable ((CVariable*) pItem);
 		break;
 
+	case EModuleItem_Property:
+		pValue->SetProperty ((CPropertyType*) pItem);
+		break;
+
 	case EModuleItem_GlobalFunction:
 		pValue->SetFunctionOverload ((CGlobalFunction*) pItem);
 		break;
