@@ -329,8 +329,7 @@ CClassType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	m_pVTableStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pVTableStructType->m_Tag.Format (_T("%s.vtbl"), m_Tag);
+	CreateVTableStructType ();
 
 	m_pInterfaceHdrStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 	m_pInterfaceHdrStructType->m_Tag.Format (_T("%s.iface.hdr"), m_Tag);
@@ -361,11 +360,7 @@ CClassType::CalcLayout ()
 		BaseType->m_pStructBaseType = m_pInterfaceStructType->AddBaseType (pBaseClassType->GetInterfaceStructType ());
 		BaseType->m_VTableIndex = m_VTable.GetCount ();
 
-		m_VTable.Append (pBaseClassType->m_VTable);
-
-		rtl::CIteratorT <CStructMember> VTableMember = pBaseClassType->GetVTableStructType ()->GetFirstMember ();
-		for (; VTableMember; VTableMember++)		
-			m_pVTableStructType->CreateMember (VTableMember->GetType ());
+		CVTableType::Append (pBaseClassType);
 	}
 
 	// lay out properties
@@ -381,11 +376,7 @@ CClassType::CalcLayout ()
 
 		pPropertyType->m_ParentVTableIndex = m_VTable.GetCount ();
 
-		m_VTable.Append (pPropertyType->m_VTable);
-
-		rtl::CIteratorT <CStructMember> VTableMember = pPropertyType->GetVTableStructType ()->GetFirstMember ();
-		for (; VTableMember; VTableMember++)		
-			m_pVTableStructType->CreateMember (VTableMember->GetType ());
+		CVTableType::Append (pPropertyType);
 	}
 
 	// lay out methods
@@ -399,7 +390,9 @@ CClassType::CalcLayout ()
 			return false;
 	}
 
-	m_pVTableStructType->CalcLayout ();
+	Result = m_pVTableStructType->CalcLayout ();
+	if (!Result)
+		return false;
 
 	// lay out fields
 

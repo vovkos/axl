@@ -39,13 +39,27 @@ public:
 	}
 
 	CStructType* 
-	GetVTableStructType ();
+	GetVTableStructType ()
+	{
+		ASSERT (m_pVTableStructType);
+		return m_pVTableStructType;
+	}
 
 	bool
 	GetVTablePtrValue (CValue* pValue);
 
+protected:
+	CStructType*
+	CreateVTableStructType ();
+
 	void
 	AddFunctionToVTable (CFunction* pFunction);
+
+	bool
+	CalcLayout ();
+
+	void 
+	Append (CVTableType* pType);
 };
 
 //.............................................................................

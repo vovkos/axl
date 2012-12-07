@@ -204,7 +204,7 @@ CCast_getp::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (Value.GetValueKind () == EValue_Property);
+	ASSERT (Value.GetType ()->GetTypeKind () == EType_Property);
 
 	CValue TmpValue;
 	return 

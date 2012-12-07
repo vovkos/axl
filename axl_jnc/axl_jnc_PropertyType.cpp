@@ -79,7 +79,18 @@ CPropertyType::TagAccessors ()
 bool
 CPropertyType::CalcLayout ()
 {
-	return true;
+	CreateVTableStructType ();
+
+	AddFunctionToVTable (m_pGetter);
+
+	size_t Count = m_Setter.GetOverloadCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pSetter = m_Setter.GetFunction (i);
+		AddFunctionToVTable (pSetter);
+	}
+
+	return m_pVTableStructType->CalcLayout ();
 }
 
 //.............................................................................

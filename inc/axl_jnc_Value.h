@@ -286,6 +286,9 @@ public:
 		return m_Closure;
 	}
 
+	void
+	SetClosure (CClosure* pClosure);
+
 	CClosure*
 	CreateClosure ();
 

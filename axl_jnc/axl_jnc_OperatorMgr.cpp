@@ -1078,7 +1078,7 @@ COperatorMgr::CallOperator (
 	}
 
 	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure)
+	if (pClosure && pArgList)
 	{
 		Result = pClosure->Apply (pArgList);
 		if (!Result)
@@ -1089,7 +1089,7 @@ COperatorMgr::CallOperator (
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 
 	size_t FormalArgCount = ArgTypeArray.GetCount ();
-	size_t ActualArgCount = pArgList->GetCount ();
+	size_t ActualArgCount = pArgList ? pArgList->GetCount () : 0;
 
 	bool IsVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsVarArg) != 0;
 	bool IsUnsafeVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_IsUnsafeVarArg) != 0;
@@ -1108,33 +1108,37 @@ COperatorMgr::CallOperator (
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgArray.Reserve (pArgList->GetCount ());
+
+	if (ActualArgCount)
+	{
+		ArgArray.Reserve (ActualArgCount);
 	
-	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
-	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
-	{
-		CType* pFormalArgType = ArgTypeArray [i];
+		rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
+		for (size_t i = 0; i < FormalArgCount; Arg++, i++)
+		{
+			CType* pFormalArgType = ArgTypeArray [i];
 		
-		CValue ArgCast;
-		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
-		if (!Result)
-			return false;
+			CValue ArgCast;
+			Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+			if (!Result)
+				return false;
 
-		ArgArray.Append (ArgCast);
-	}
+			ArgArray.Append (ArgCast);
+		}
 
-	// vararg
+		// vararg
 
-	for (; Arg; Arg++)
-	{
-		CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
+		for (; Arg; Arg++)
+		{
+			CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
 
-		CValue ArgCast;
-		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
-		if (!Result)
-			return false;
+			CValue ArgCast;
+			Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+			if (!Result)
+				return false;
 
-		ArgArray.Append (ArgCast);
+			ArgArray.Append (ArgCast);
+		}
 	}
 
 	m_pModule->m_LlvmBuilder.CreateCall (
@@ -1559,9 +1563,29 @@ COperatorMgr::GetPropertyOperator (
 	CValue* pResultValue
 	)
 {
-	CFunction* pFunction = pPropertyType->GetGetter ();
-	rtl::CBoxListT <CValue> ArgList;
-	return CallOperator (pFunction, &ArgList, pResultValue);
+	bool Result;
+
+	CValue GetterValue;
+
+	CFunction* pGetter = pPropertyType->GetGetter ();
+	ASSERT (pGetter->GetVTableType () == pPropertyType);
+
+	if (OpValue.GetValueKind () == EValue_Property)
+	{
+		GetterValue = pPropertyType->GetGetter ();
+	}
+	else
+	{
+		CValue VTablePtrValue;
+		Result = pPropertyType->GetVTablePtrValue (&VTablePtrValue);
+		if (!Result)
+			return false;
+
+		// get the first member of the vtable
+	}
+
+	GetterValue.SetClosure (OpValue.GetClosure ());
+	return CallOperator (GetterValue, NULL, pResultValue);
 }
 
 bool

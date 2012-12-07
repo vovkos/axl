@@ -333,6 +333,13 @@ protected:
 		);
 
 	bool
+	VTableIndexOperatorImpl ( 
+		const CValue& ValuePtr,
+		size_t Index,
+		CValue* pResultValue
+		);
+
+	bool
 	UnionMemberOperator (
 		const CValue& OpValue,
 		CUnionType* pUnionType,

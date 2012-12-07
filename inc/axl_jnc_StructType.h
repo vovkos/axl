@@ -108,6 +108,7 @@ protected:
 	friend class CUnionType;
 	friend class CClassType;
 	friend class CPointerType;
+	friend class CVTableType;
 
 	size_t m_AlignFactor;
 	size_t m_PackFactor;
@@ -117,7 +118,6 @@ protected:
 	rtl::CStringHashTableMapAT <CStructBaseType*> m_BaseTypeMap;
 	rtl::CStdListT <CStructBaseType> m_BaseTypeList;
 	rtl::CStdListT <CStructMember> m_MemberList;
-
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
 	size_t m_LastBitFieldOffset;

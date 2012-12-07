@@ -242,12 +242,14 @@ CValue::GetLlvmConst (
 CClosure*
 CValue::CreateClosure ()
 {
-	if (!m_Closure)
-		m_Closure = AXL_REF_NEW (CClosure);
-	else
-		m_Closure->Clear ();
-
+	m_Closure = AXL_REF_NEW (CClosure);
 	return m_Closure;
+}
+
+void
+CValue::SetClosure (CClosure* pClosure)
+{
+	m_Closure = pClosure;
 }
 
 void

@@ -7,12 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-CStructType* 
-CVTableType::GetVTableStructType ()
+CStructType*
+CVTableType::CreateVTableStructType ()
 {
-	if (m_pVTableStructType)
-		return m_pVTableStructType;
-
+	m_pVTableStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pVTableStructType->m_Tag.Format (_T("%s.vtbl"), m_Tag);
 	return m_pVTableStructType;
 }
 
@@ -82,6 +81,16 @@ CVTableType::AddFunctionToVTable (CFunction* pFunction)
 
 	CPointerType* pPointerType = m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, pFunction->GetType ());
 	m_pVTableStructType->CreateMember (pPointerType);
+}
+
+void
+CVTableType::Append (CVTableType* pType)
+{
+	m_VTable.Append (pType->m_VTable);
+		
+	rtl::CIteratorT <CStructMember> VTableMember = pType->m_pVTableStructType->GetFirstMember ();
+	for (; VTableMember; VTableMember++)		
+		m_pVTableStructType->CreateMember (VTableMember->GetType ());
 }
 
 //.............................................................................
