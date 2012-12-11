@@ -74,17 +74,32 @@ constant_integer_expr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-conditional_expr <CValue* $pValue>
-local
+class CConditionalExpr
 {
-	CValue $TrueValue;
-	CValue $FalseValue;
+	CValue m_TrueValue;
+	CValue m_FalseValue;
+	CBasicBlock* m_pThenBlock;
+	CBasicBlock* m_pElseBlock;
+	CBasicBlock* m_pPhiBlock;
 }
+conditional_expr <CValue* $pValue>
 	: logical_or_expr <$pValue> 
 	  (
-		'?' conditional_expr <&$TrueValue> ':' conditional_expr <&$FalseValue>
+		{
+			$.m_pThenBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("cond_then"));
+			$.m_pElseBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("cond_else"));
+			$.m_pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("cond_phi"));			
+			m_pModule->m_ControlFlowMgr.ConditionalJump (*$pValue, $.m_pThenBlock, $.m_pElseBlock);
+		}
+		'?' 
+		conditional_expr <&$.m_TrueValue> 
 			{
-				return m_pModule->m_OperatorMgr.ConditionalOperator ($pValue, $TrueValue, $FalseValue);
+				$.m_pThenBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock ($.m_pElseBlock); // might have changed				
+			}
+		':' 
+		conditional_expr <&$.m_FalseValue>
+			{
+				FinalizeConditionalExpr (&$, $pValue);
 			}
 	  )?
 	;

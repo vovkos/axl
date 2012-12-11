@@ -168,6 +168,12 @@ Members2
 	FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt);
 
 	bool
+	FinalizeConditionalExpr (
+		CConditionalExpr* pConditionalExpr,
+		CValue* pResultValue
+		);
+
+	bool
 	SetFunctionBody (
 		CModuleItem* pItem,
 		rtl::CBoxListT <CToken>* pBody

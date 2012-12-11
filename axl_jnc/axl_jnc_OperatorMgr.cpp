@@ -538,16 +538,6 @@ COperatorMgr::RefMovePropertyPointerOperator (
 }
 
 bool
-COperatorMgr::ConditionalOperator (
-	CValue* pOpValue,
-	const CValue& TrueValue,
-	const CValue& FalseValue
-	)
-{
-	return true;
-}
-
-bool
 COperatorMgr::MemberOperator (
 	const CValue& RawOpValue,
 	const tchar_t* pName,

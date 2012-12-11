@@ -203,11 +203,9 @@ enter
 	  EToken_While '(' expression $e ')' 
 		{
 			return m_pModule->m_ControlFlowMgr.ConditionalJump ($e.m_Value, $pBodyBlock, $pFollowBlock);
+			m_pModule->m_ControlFlowMgr.SetCurrentBlock ($pFollowBlock);
 		}			  
 	  ';'
-		{	
-			m_pModule->m_ControlFlowMgr.SetCurrentBlock ($pFollowBlock);
-		}
 	;
 
 for_stmt

@@ -78,7 +78,7 @@ public:
 
 	bool
 	Break (size_t Level);
-
+	 
 	bool
 	Continue (size_t Level);
 };

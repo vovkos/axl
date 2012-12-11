@@ -81,15 +81,16 @@ CControlFlowMgr::Jump (
 	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
 	pBlock->m_Flags |= EBasicBlockFlag_IsJumped;
 
-	bool IsUnreachable = pFollowBlock == NULL;
-
-	if (IsUnreachable) 
+	if (pFollowBlock)
+	{
+		SetCurrentBlock (pFollowBlock);
+	}
+	else
+	{
 		pFollowBlock = CreateBlock (_T("jmp_follow"));
-
-	SetCurrentBlock (pFollowBlock);
-
-	if (IsUnreachable)
+		SetCurrentBlock (pFollowBlock);
 		MarkUnreachable (pFollowBlock);
+	}
 }
 
 bool

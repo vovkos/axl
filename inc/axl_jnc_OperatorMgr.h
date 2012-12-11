@@ -241,13 +241,6 @@ public:
 		);
 
 	bool
-	ConditionalOperator (
-		CValue* pOpValue,
-		const CValue& TrueValue,
-		const CValue& FalseValue
-		);
-
-	bool
 	MemberOperator (
 		const CValue& OpValue,
 		const tchar_t* pName,

@@ -591,6 +591,50 @@ CParser::FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt)
 }
 
 bool
+CParser::FinalizeConditionalExpr (
+	CConditionalExpr* pConditionalExpr,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	CValue TrueValue = pConditionalExpr->m_TrueValue;
+	CValue FalseValue = pConditionalExpr->m_FalseValue;
+
+	CType* pType;
+	CType* pTrueType = TrueValue.GetType ();
+	CType* pFalseType = FalseValue.GetType ();
+
+	if (!pTrueType->IsNumericType () && !pFalseType->IsNumericType ())
+	{
+		pType = pTrueType;
+	}
+	else
+	{
+		CType* pMaxOpType = pTrueType->GetTypeKind () > pFalseType->GetTypeKind () ? pTrueType : pFalseType;
+		pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
+	}
+
+	Result = m_pModule->m_OperatorMgr.CastOperator (&FalseValue, pType);
+	if (!Result)
+		return false;
+
+	CBasicBlock* pElseBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
+
+	m_pModule->m_ControlFlowMgr.Jump (pConditionalExpr->m_pPhiBlock, pConditionalExpr->m_pThenBlock);	
+
+	Result = m_pModule->m_OperatorMgr.CastOperator (&TrueValue, pType);
+	if (!Result)
+		return false;
+
+	CBasicBlock* pThenBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
+
+	m_pModule->m_ControlFlowMgr.Follow (pConditionalExpr->m_pPhiBlock);
+	m_pModule->m_LlvmBuilder.CreatePhi (TrueValue, pThenBlock, FalseValue, pElseBlock, pResultValue);
+	return true;
+}
+
+bool
 CParser::SetFunctionBody (
 	CModuleItem* pItem,
 	rtl::CBoxListT <CToken>* pBody

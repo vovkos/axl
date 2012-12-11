@@ -165,11 +165,20 @@ typedef int property PTest;
 int property GlobalProp;
 
 
+int 
+foo (int x)
+{
+	return x < 5 ? 100 : 200;
+}
+
 
 int
 main ()
 {
-	printf ("main yo\n");
+	int x = 2;
+	int y = foo (x);
+	printf ("x = %d, y = %d\n", x, y);
+
 
 /*	int x = 1;
 	switch (x)
@@ -190,13 +199,6 @@ main ()
 		printf ("kusty\n");
 		break;
 	} */
-
-	int x = 1;
-
-	if (x)
-		printf ("hui\n");
-	else
-		printf ("govno\n");
 
 
 //	PTest ppr;
