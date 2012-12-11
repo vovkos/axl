@@ -439,17 +439,21 @@ COperatorMgr::MoveOperator (
 	if (!Result)
 		return false;
 
-	CType* pDstType = DstValue.GetType ();
-	if (pDstType->GetTypeKind () == EType_Property)
+	EType DstTypeKind = DstValue.GetType ()->GetTypeKind ();
+	switch (DstTypeKind)
+	{
+	case EType_Property:
+	case EType_PropertyPointer:
 		return SetPropertyOperator (OpValue, DstValue);
 
-	if (!pDstType->IsReferenceType ())
-	{
+	case EType_Reference:
+	case EType_Reference_u:
+		return StoreReferenceOperator (OpValue, DstValue);
+
+	default:
 		err::SetFormatStringError (_T("left operand must be l-value"));
 		return false;
 	}
-
-	return StoreReferenceOperator (OpValue, DstValue);
 }
 
 bool
@@ -470,11 +474,66 @@ COperatorMgr::BinOpMoveOperator (
 
 bool
 COperatorMgr::RefMoveOperator (
-	const CValue& RawOpValue,
+	const CValue& OpValue,
 	const CValue& DstValue
 	)
 {
-	err::SetFormatStringError (_T("ref-assign is not yet implemented"));
+	CType* pDstType = DstValue.GetType ();
+	if (!pDstType->IsReferenceType ())
+	{
+		err::SetFormatStringError (_T("left operand must be a reference to l-value"));
+		return false;
+	}
+
+	CType* pBaseType = ((CPointerType*) pDstType)->GetBaseType ();
+	EType BaseTypeKind = pBaseType->GetTypeKind ();
+	switch (BaseTypeKind)
+	{
+	case EType_Reference:
+	case EType_Reference_u:
+		return RefMoveReferenceOperator (OpValue, DstValue, (CPointerType*) pBaseType);
+
+	case EType_PropertyPointer:
+		return RefMovePropertyPointerOperator (OpValue, DstValue, (CPropertyPointerType*) pBaseType);
+
+	default:
+		err::SetFormatStringError (_T("left operand must be a reference to l-value"));
+		return false;
+	}
+}
+
+bool
+COperatorMgr::RefMoveReferenceOperator (
+	const CValue& RawOpValue,
+	const CValue& RawDstValue,
+	CPointerType* pReferenceType
+	)
+{
+	CValue OpValue = RawOpValue;
+	CValue DstValue = RawDstValue;
+
+	EType OuterReferenceTypeKind = DstValue.GetType ()->GetTypeKind ();
+	EType InnerReferenceTypeKind = pReferenceType->GetTypeKind ();
+	EType PointerTypeKind = InnerReferenceTypeKind == EType_Reference ? EType_Pointer : EType_Pointer_u;
+	CType* pBaseType = pReferenceType->GetBaseType ();
+	CType* pPointerType = pBaseType->GetPointerType (PointerTypeKind);
+	CType* pOverrideType = pPointerType->GetPointerType (OuterReferenceTypeKind);
+
+	DstValue.OverrideType (pOverrideType);
+
+	return 
+		UnaryOperator (EUnOp_Addr, &OpValue) &&
+		MoveOperator (OpValue, DstValue);
+}
+
+bool
+COperatorMgr::RefMovePropertyPointerOperator (
+	const CValue& RawOpValue,
+	const CValue& RawDstValue,
+	CPropertyPointerType* pPropertyPointerType
+	)
+{
+	err::SetFormatStringError (_T("ref-assign to a property pointer is not implemented yet"));
 	return false;
 }
 
