@@ -35,20 +35,39 @@ CControlFlowMgr::CreateBlock (const rtl::CString& Name)
 	return pBlock;
 }
 
-void
+CBasicBlock*
 CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 {
+	if (m_pCurrentBlock == pBlock)
+		return pBlock;
+
+	CBasicBlock* pPrevCurrentBlock = m_pCurrentBlock;
+
 	m_pCurrentBlock = pBlock;
 	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock);
 
 	if (pBlock->m_pFunction)
-		return;
+		return pPrevCurrentBlock;
 	
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
 
 	pFunction->GetLlvmFunction ()->getBasicBlockList ().push_back (pBlock->m_pLlvmBlock);
 	pBlock->m_pFunction = pFunction;
+	return pPrevCurrentBlock;
+}
+
+void
+CControlFlowMgr::MarkUnreachable (CBasicBlock* pBlock)
+{
+	if (pBlock->m_Flags & EBasicBlockFlag_IsUnreachable)
+		return;
+
+	pBlock->m_Flags |= EBasicBlockFlag_IsUnreachable;
+
+	CBasicBlock* pPrevCurrentBlock = SetCurrentBlock (pBlock);
+	m_pModule->m_LlvmBuilder.CreateUnreachable ();
+	SetCurrentBlock (pPrevCurrentBlock);
 }
 
 void
@@ -57,7 +76,10 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
+	m_pCurrentBlock->m_JumpArray.Append (pBlock);
+
 	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
+	pBlock->m_Flags |= EBasicBlockFlag_IsJumped;
 
 	bool IsUnreachable = pFollowBlock == NULL;
 
@@ -67,7 +89,7 @@ CControlFlowMgr::Jump (
 	SetCurrentBlock (pFollowBlock);
 
 	if (IsUnreachable)
-		m_pModule->m_LlvmBuilder.CreateUnreachable ();
+		MarkUnreachable (pFollowBlock);
 }
 
 bool
@@ -81,6 +103,12 @@ CControlFlowMgr::ConditionalJump (
 	bool Result = m_pModule->m_OperatorMgr.CastOperator (Value, EType_Bool, &BoolValue);
 	if (!Result)
 		return false;
+
+	m_pCurrentBlock->m_JumpArray.Append (pThenBlock);
+	m_pCurrentBlock->m_JumpArray.Append (pElseBlock);
+
+	pThenBlock->m_Flags |= EBasicBlockFlag_IsJumped;
+	pElseBlock->m_Flags |= EBasicBlockFlag_IsJumped;
 
 	m_pModule->m_LlvmBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
 	SetCurrentBlock (pThenBlock);
@@ -97,7 +125,7 @@ CControlFlowMgr::Break (size_t Level)
 		return false;
 	}
 
-	m_pModule->m_ControlFlowMgr.Jump (pScope->m_pBreakBlock, NULL);
+	Jump (pScope->m_pBreakBlock, NULL);
 	return true;
 }
 
@@ -111,7 +139,7 @@ CControlFlowMgr::Continue (size_t Level)
 		return false;
 	}
 
-	m_pModule->m_ControlFlowMgr.Jump (pScope->m_pContinueBlock, NULL);
+	Jump (pScope->m_pContinueBlock, NULL);
 	return true;
 }
 
@@ -159,9 +187,12 @@ CControlFlowMgr::Return (const CValue& Value)
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
 
+	m_pCurrentBlock->m_Flags |= EBasicBlockFlag_IsHasReturnReady;
+	m_pCurrentBlock->m_HasReturn = EHasReturn_All;
+
 	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));
 	SetCurrentBlock (pFollowBlock);
-	m_pModule->m_LlvmBuilder.CreateUnreachable ();
+	MarkUnreachable (pFollowBlock);
 	return true;
 }
 

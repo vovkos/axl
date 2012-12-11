@@ -11,6 +11,26 @@ class CFunction;
 
 //.............................................................................
 
+enum EHasReturn
+{
+	EHasReturn_Undefined,
+	EHasReturn_None,
+	EHasReturn_Some,
+	EHasReturn_All,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum EBasicBlockFlag
+{
+	EBasicBlockFlag_IsHasReturnReady = 1,
+	EBasicBlockFlag_IsHasReturnCalc  = 2,
+	EBasicBlockFlag_IsUnreachable    = 4,
+	EBasicBlockFlag_IsJumped         = 8,
+};		
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CBasicBlock: public rtl::TListLink
 {
 protected:
@@ -20,11 +40,21 @@ protected:
 	CFunction* m_pFunction;
 	llvm::BasicBlock* m_pLlvmBlock;
 
+	rtl::CArrayT <CBasicBlock*> m_JumpArray;
+
+	EHasReturn m_HasReturn;
+	int m_Flags;
+
 public:
-	CBasicBlock ()
+	CBasicBlock ();
+
+	EHasReturn
+	HasReturn ();
+	
+	int 
+	GetFlags ()
 	{
-		m_pLlvmBlock = NULL;
-		m_pFunction = NULL;
+		return m_Flags;
 	}
 
 	rtl::CString 

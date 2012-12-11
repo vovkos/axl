@@ -214,10 +214,10 @@ CFunctionMgr::CompileFunctions ()
 	CSetCurrentThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 
-	rtl::CIteratorT <jnc::CFunction> Function = m_FunctionList.GetHead ();
+	rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
 	for (; Function; Function++)
 	{
-		jnc::CFunction* pFunction = *Function;
+		CFunction* pFunction = *Function;
 
 		if (!pFunction->HasBody ())
 			continue;
@@ -297,14 +297,14 @@ CFunctionMgr::CompileFunctions ()
 
 		// parse body
 
-		jnc::CParser Parser;
-		Parser.m_Stage = jnc::CParser::EStage_Pass2;
+		CParser Parser;
+		Parser.m_Stage = CParser::EStage_Pass2;
 		Parser.m_pModule = m_pModule;
 		Parser.m_ThisValue = ThisValue;
 		Parser.m_pThisType = pThisType;
-		Parser.Create (jnc::ESymbol_compound_stmt, true); 
+		Parser.Create (ESymbol_compound_stmt, true); 
 			
-		rtl::CBoxIteratorT <jnc::CToken> Token = pFunction->GetBodyFirstToken ();
+		rtl::CBoxIteratorT <CToken> Token = pFunction->GetBodyFirstToken ();
 		for (; Token; Token++)
 		{
 			Result = Parser.ParseToken (&*Token);
@@ -315,10 +315,46 @@ CFunctionMgr::CompileFunctions ()
 			}
 		}
 
-		m_pModule->m_NamespaceMgr.CloseScope (pFunction->GetBodyLastToken ()->m_Pos);
-
 		pFunction->m_Ast = Parser.GetAst ();
 		pFunction->m_pScope = pScope;
+
+		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
+		EHasReturn HasReturn = pFunction->HasReturn ();
+
+		switch (HasReturn)
+		{
+		case EHasReturn_None:
+			if (pReturnType->GetTypeKind () != EType_Void)
+			{
+				err::SetFormatStringError (
+					_T("function '%s' must return '%s' value"),
+					pFunction->m_Tag,
+					pReturnType->GetTypeString ()
+					);
+				return false;
+			}
+
+			m_pModule->m_ControlFlowMgr.Return ();
+			break;
+
+		case EHasReturn_Some:
+			if (pReturnType->GetTypeKind () != EType_Void)
+			{
+				err::SetFormatStringError (
+					_T("not all control paths in function '%s' return a value"),
+					pFunction->m_Tag
+					);
+				return false;
+			}
+
+			m_pModule->m_ControlFlowMgr.Return ();
+			break;
+
+		case EHasReturn_All:
+			break;
+		}
+
+		m_pModule->m_NamespaceMgr.CloseScope (pFunction->GetBodyLastToken ()->m_Pos);
 
 		try 
 		{
@@ -347,10 +383,10 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	CSetCurrentThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 
-	rtl::CIteratorT <jnc::CFunction> Function = m_FunctionList.GetHead ();
+	rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
 	for (; Function; Function++)
 	{
-		jnc::CFunction* pFunction = *Function;
+		CFunction* pFunction = *Function;
 
 		if (!pFunction->HasBody ())
 			continue;

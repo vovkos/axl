@@ -42,8 +42,8 @@ public:
 		return m_pCurrentBlock;
 	}
 
-	void
-	SetCurrentBlock (CBasicBlock* pBlock);
+	CBasicBlock* 
+	SetCurrentBlock (CBasicBlock* pBlock); // returns prev
 
 	void
 	Jump (
@@ -57,6 +57,9 @@ public:
 		CBasicBlock* pThenBlock,
 		CBasicBlock* pElseBlock
 		);
+
+	void
+	MarkUnreachable (CBasicBlock* pBlock);
 
 	void
 	Follow (CBasicBlock* pBlock)

@@ -16,6 +16,16 @@ typedef unsigned int32 size_t;
 typedef const char* unsafe pchar_t;
 typedef const char* pchar2_t;
 
+int
+foo ()
+{
+	int x;
+	if (x < 0)
+		return 0;
+	else 
+		return 1;
+}
+
 //.............................................................................
 
 void
@@ -191,7 +201,7 @@ main ()
 
 	int x = 1;
 	int& rx;
-	rx := x;
+//	rx := x;
 
 //	PTest ppr;
 //	ppr := GlobalProp;

@@ -6,6 +6,7 @@
 
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_StructType.h"
+#include "axl_jnc_BasicBlock.h"
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
 #include "axl_llk_Ast.h"
@@ -13,7 +14,6 @@
 namespace axl {
 namespace jnc {
 
-class CBasicBlock;
 class CClassType;
 class CVTableType;
 class CClassMethodMember;
@@ -206,6 +206,12 @@ public:
 	HasBody ()
 	{
 		return !m_Body.IsEmpty ();
+	}
+
+	EHasReturn
+	HasReturn ()
+	{
+		return m_pBlock ? m_pBlock->HasReturn () : EHasReturn_Undefined;
 	}
 
 	void

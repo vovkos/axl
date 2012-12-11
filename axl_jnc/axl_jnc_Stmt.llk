@@ -119,7 +119,7 @@ switch_stmt
 			
 			CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_body"));
 			m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBodyBlock);
-			m_pModule->m_LlvmBuilder.CreateUnreachable ();
+			m_pModule->m_ControlFlowMgr.MarkUnreachable (pBodyBlock);
 		}
 	  '{' $a
 		{
@@ -261,7 +261,10 @@ enter
 		{
 			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pLoopBlock, $pFollowBlock);
-		}		 
+
+			if (!($pFollowBlock->GetFlags () & EBasicBlockFlag_IsJumped))
+				m_pModule->m_ControlFlowMgr.MarkUnreachable ($pFollowBlock);
+		}
 	;
 
 break_stmt
