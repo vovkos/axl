@@ -454,8 +454,8 @@ CCast_num_bool::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	CValue Zero (Value.GetType (), NULL);
-	return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, Value, Zero, pResultValue);
+	CValue ZeroValue = Value.GetType ()->GetZeroValue ();
+	return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, Value, ZeroValue, pResultValue);
 }
 
 //.............................................................................

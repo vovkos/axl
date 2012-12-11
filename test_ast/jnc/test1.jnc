@@ -164,6 +164,8 @@ typedef int property PTest;
 
 int property GlobalProp;
 
+
+
 int
 main ()
 {
@@ -191,26 +193,18 @@ main ()
 
 	int x = 1;
 
-	int& unsafe rx;
-	rx := x;
+	if (x)
+		printf ("hui\n");
+	else
+		printf ("govno\n");
 
-	printf ("x = %d, rx = %d\n", x, rx);
-
-	x = 3;
-
-	printf ("x = %d, rx = %d\n", x, rx);
-
-	rx = 15;
-
-	printf ("x = %d, rx = %d\n", x, rx);
-	
 
 //	PTest ppr;
 //	ppr := GlobalProp;
 
-	x = GlobalProp;
-	printf ("GlobalProp returned %d\n", x);
-	GlobalProp = 30;
+//	x = GlobalProp;
+//	printf ("GlobalProp returned %d\n", x);
+//	GlobalProp = 30;
 
 //	PTest pprValue;
 
