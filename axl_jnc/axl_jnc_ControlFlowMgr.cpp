@@ -188,7 +188,7 @@ CControlFlowMgr::Return (const CValue& Value)
 	}
 
 	m_pCurrentBlock->m_Flags |= EBasicBlockFlag_IsHasReturnReady;
-	m_pCurrentBlock->m_HasReturn = EHasReturn_All;
+	m_pCurrentBlock->m_HasReturn = EHasReturn_Explicit;
 
 	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));
 	SetCurrentBlock (pFollowBlock);

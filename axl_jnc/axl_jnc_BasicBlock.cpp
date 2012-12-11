@@ -26,12 +26,12 @@ CBasicBlock::HasReturn ()
 	if (m_Flags & EBasicBlockFlag_IsHasReturnCalc)
 		return EHasReturn_Undefined;
 
-	static EHasReturn HasReturnTable [4] [4] = 
+	static EHasReturn HasReturnTable [5] [5] = 
 	{
-		{ EHasReturn_Undefined, EHasReturn_None, EHasReturn_Some, EHasReturn_All  },
-		{ EHasReturn_Undefined, EHasReturn_None, EHasReturn_Some, EHasReturn_Some },
-		{ EHasReturn_Undefined, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
-		{ EHasReturn_Undefined, EHasReturn_Some, EHasReturn_Some, EHasReturn_All  },
+		{ EHasReturn_Undefined, EHasReturn_None, EHasReturn_Some, EHasReturn_All,  EHasReturn_All  },
+		{ EHasReturn_Undefined, EHasReturn_None, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
+		{ EHasReturn_Undefined, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
+		{ EHasReturn_Undefined, EHasReturn_Some, EHasReturn_Some, EHasReturn_All,  EHasReturn_All  },
 	};
 	
 	size_t Count = m_JumpArray.GetCount ();
@@ -40,6 +40,9 @@ CBasicBlock::HasReturn ()
 		CBasicBlock* pBlock = m_JumpArray [i];
 		EHasReturn HasReturn = pBlock->HasReturn ();
 		
+		ASSERT (m_HasReturn >= 0 && m_HasReturn < 5);
+		ASSERT (HasReturn >= 0 && HasReturn < 5);
+
 		m_HasReturn = HasReturnTable [m_HasReturn] [HasReturn];
 	}
 

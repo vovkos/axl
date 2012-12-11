@@ -318,40 +318,38 @@ CFunctionMgr::CompileFunctions ()
 		pFunction->m_Ast = Parser.GetAst ();
 		pFunction->m_pScope = pScope;
 
-		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
-		EHasReturn HasReturn = pFunction->HasReturn ();
+		// ensure return
 
-		switch (HasReturn)
+		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
+
+		if (pReturnType->GetTypeKind () != EType_Void)
 		{
-		case EHasReturn_None:
-			if (pReturnType->GetTypeKind () != EType_Void)
+			EHasReturn HasReturn = pFunction->HasReturn ();
+
+			switch (HasReturn)
 			{
+			case EHasReturn_None:
 				err::SetFormatStringError (
 					_T("function '%s' must return '%s' value"),
 					pFunction->m_Tag,
 					pReturnType->GetTypeString ()
 					);
 				return false;
-			}
 
-			m_pModule->m_ControlFlowMgr.Return ();
-			break;
-
-		case EHasReturn_Some:
-			if (pReturnType->GetTypeKind () != EType_Void)
-			{
+			case EHasReturn_Some:
 				err::SetFormatStringError (
 					_T("not all control paths in function '%s' return a value"),
 					pFunction->m_Tag
 					);
 				return false;
+
+			case EHasReturn_All:
+				m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
 			}
-
+		}
+		else if (m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->HasReturn () != EHasReturn_Explicit)
+		{
 			m_pModule->m_ControlFlowMgr.Return ();
-			break;
-
-		case EHasReturn_All:
-			break;
 		}
 
 		m_pModule->m_NamespaceMgr.CloseScope (pFunction->GetBodyLastToken ()->m_Pos);

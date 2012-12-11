@@ -17,16 +17,17 @@ enum EHasReturn
 	EHasReturn_None,
 	EHasReturn_Some,
 	EHasReturn_All,
+	EHasReturn_Explicit,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum EBasicBlockFlag
 {
-	EBasicBlockFlag_IsHasReturnReady = 1,
-	EBasicBlockFlag_IsHasReturnCalc  = 2,
-	EBasicBlockFlag_IsUnreachable    = 4,
-	EBasicBlockFlag_IsJumped         = 8,
+	EBasicBlockFlag_IsHasReturnReady  = 0x01,
+	EBasicBlockFlag_IsHasReturnCalc   = 0x02,
+	EBasicBlockFlag_IsUnreachable     = 0x10,
+	EBasicBlockFlag_IsJumped          = 0x20,
 };		
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
