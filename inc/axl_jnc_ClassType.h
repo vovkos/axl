@@ -402,14 +402,6 @@ protected:
 
 	bool
 	LayoutFunction (CFunction* pFunction);
-
-	CFunction*
-	FindOverridenMethodMember (
-		const tchar_t* pName,
-		EPropertyAccessor PropertyAccessorKind,
-		CFunctionType* pClosureType,
-		size_t* pBaseTypeVTableIndex
-		);
 };
 
 //.............................................................................

@@ -46,6 +46,13 @@ Members
 		EEndianness_BigEndian,
 	};
 
+	enum EAssign
+	{
+		EAssign_Normal,
+		EAssign_BinOp,
+		EAssign_Ref
+	};
+
 	CModule* m_pModule;
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;
@@ -55,7 +62,10 @@ Members
 	CClassType* m_pThisType;
 
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
+}
 
+Members2
+{
 	CParser ();
 
 	CType*
@@ -138,6 +148,24 @@ Members
 		CTypeSpecifierModifiers* pTypeSpecifier,
 		CDeclarator* pDeclarator
 		);
+
+	bool
+	SwitchCaseLabel (
+		CSwitchStmt* pSwitchStmt,
+		intptr_t Value,
+		const CToken::CPos& ClosePos,
+		const CToken::CPos& OpenPos
+		);
+
+	bool
+	SwitchDefaultLabel (
+		CSwitchStmt* pSwitchStmt,
+		const CToken::CPos& ClosePos,
+		const CToken::CPos& OpenPos
+		);
+
+	bool
+	FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt);
 
 	bool
 	SetFunctionBody (

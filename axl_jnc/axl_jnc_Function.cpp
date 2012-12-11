@@ -32,7 +32,7 @@ CFunction::CFunction ()
 	m_FunctionKind = EFunction_Undefined;
 	m_PropertyAccessorKind = EPropertyAccessor_Undefined;
 	m_pType = NULL;
-	m_pClosureType = NULL;
+	m_pShortType = NULL;
 	m_pClassType = NULL;
 	m_pVTableType = NULL;
 	m_VTableIndex = -1;
@@ -133,19 +133,19 @@ CFunctionOverload::FindOverload (rtl::CBoxListT <CValue>* pArgList) const
 CFunction*
 CFunctionOverload::FindOverload (
 	CFunctionType* pType,
-	bool IsClosure
+	bool IsShortType
 	) const
 {
-	if (IsClosure)
+	if (IsShortType)
 	{
-		if (pType->Cmp (m_pFunction->GetClosureType ()) == 0)
+		if (pType->Cmp (m_pFunction->GetShortType ()) == 0)
 			return m_pFunction;
 
 		size_t Count = m_OverloadArray.GetCount ();
 		for (size_t i = 0; i < Count; i++)
 		{
 			CFunction* pFunction = GetFunction (i);
-			if (pType->Cmp (pFunction->GetClosureType ()) == 0)
+			if (pType->Cmp (pFunction->GetShortType ()) == 0)
 				return pFunction;
 		}
 	}

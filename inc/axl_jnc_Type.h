@@ -23,73 +23,73 @@ enum EType
 {
 	// basic types:
 
-	EType_Void,           // a
-	EType_Variant,        // b
-	EType_Bool,           // c
+	EType_Void,               // a
+	EType_Variant,            // b
+	EType_Bool,               // c
 	
 	// little-endian integers
 	
-	EType_Int8,           // d
-	EType_Int8_u,         // e
-	EType_Int16,          // f
-	EType_Int16_u,        // g
-	EType_Int32,          // h
-	EType_Int32_u,        // i
-	EType_Int64,          // j
-	EType_Int64_u,        // k
+	EType_Int8,               // d
+	EType_Int8_u,             // e
+	EType_Int16,              // f
+	EType_Int16_u,            // g
+	EType_Int32,              // h
+	EType_Int32_u,            // i
+	EType_Int64,              // j
+	EType_Int64_u,            // k
 
 	// big-endian integers
 
-	EType_Int16_be,       // l
-	EType_Int16_beu,      // m
-	EType_Int32_be,       // n
-	EType_Int32_beu,      // o
-	EType_Int64_be,       // p
-	EType_Int64_beu,      // q
+	EType_Int16_be,           // l
+	EType_Int16_beu,          // m
+	EType_Int32_be,           // n
+	EType_Int32_beu,          // o
+	EType_Int64_be,           // p
+	EType_Int64_beu,          // q
 
 	// floating point 
 
-	EType_Float,          // r
-	EType_Double,         // s
+	EType_Float,              // r
+	EType_Double,             // s
 
 	// derived types:
 
 	// qualifiers: const, volatile, nonull
 
-	EType_Qualifier,      // A 
+	EType_Qualifier,          // A 
 
 	// pointers & references
 
-	EType_Pointer,        // B
-	EType_Pointer_u,      // C
-	EType_Reference,      // E
-	EType_Reference_u,    // F
+	EType_Pointer,            // B
+	EType_Pointer_u,          // C
+	EType_Reference,          // E
+	EType_Reference_u,        // F
 
 	// integer derivatives
 
-	EType_BitField,       // H
-	EType_Enum,           // I
-	EType_Enum_c,         // J
+	EType_BitField,           // H
+	EType_Enum,               // I
+	EType_Enum_c,             // J
 
 	// aggregates
 
-	EType_Array,          // K
-	EType_Struct,         // L
-	EType_Union,          // M
-	EType_Interface,      // N
-	EType_Class,          // O
+	EType_Array,              // K
+	EType_Struct,             // L
+	EType_Union,              // M
+	EType_Interface,          // N
+	EType_Class,              // O
 
 	// function types
 
-	EType_Function,       // P
-	EType_Function_p,     // Q
-	EType_Property,       // R
-	EType_Property_p,     // S
-	EType_Event,          // T
+	EType_Function,           // P
+	EType_FunctionPointer,    // Q
+	EType_Property,           // R
+	EType_PropertyPointer,    // S
+	EType_Event,              // T
 
 	// import type (resolved after linkage or instantiation of generic)
 
-	EType_Import,         // Z
+	EType_Import,             // Z
 
 	EType__Count,
 	EType__PrimitiveTypeCount = EType_Double + 1,
@@ -150,19 +150,34 @@ enum ETypeFlag
 
 enum ETypeModifier
 {
-	ETypeModifier_Const        = 0x00001,
-	ETypeModifier_Volatile     = 0x00002,
-	ETypeModifier_Signed       = 0x00004,
-	ETypeModifier_Unsigned     = 0x00008,
-	ETypeModifier_BigEndian    = 0x00010,
-	ETypeModifier_LittleEndian = 0x00020,
-	ETypeModifier_Safe         = 0x00040,
-	ETypeModifier_Unsafe       = 0x00080,	
-	ETypeModifier_NoNull       = 0x00100,	
-	ETypeModifier_Strong       = 0x00200,
-	ETypeModifier_Weak         = 0x00400,	
-	ETypeModifier_Property     = 0x01000,
-	ETypeModifier_Bindable     = 0x02000,
+	ETypeModifier_Const         = 0x000001,
+	ETypeModifier_Volatile      = 0x000002,
+	ETypeModifier_QualifierMask = 0x000003,
+	
+	ETypeModifier_Signed        = 0x000004,
+	ETypeModifier_Unsigned      = 0x000008,
+	ETypeModifier_BigEndian     = 0x000010,
+	ETypeModifier_LittleEndian  = 0x000020,
+	ETypeModifier_IntegerMask   = 0x00003c,
+
+	ETypeModifier_Safe          = 0x000100,
+	ETypeModifier_Unsafe        = 0x000200,	
+	ETypeModifier_NoNull        = 0x000400,	
+	ETypeModifier_PointerMask   = 0x000700,	
+
+	ETypeModifier_Cdecl         = 0x001000,
+	ETypeModifier_Stdcall       = 0x002000,
+	ETypeModifier_Virtual       = 0x004000,
+	ETypeModifier_NoVirtual     = 0x008000,
+	ETypeModifier_FunctionMask  = 0x00f000,	
+
+	ETypeModifier_Property      = 0x010000,
+	ETypeModifier_Bindable      = 0x020000,
+	ETypeModifier_PropertyMask  = 0x030000,	
+
+	ETypeModifier_Strong        = 0x040000,
+	ETypeModifier_Weak          = 0x080000,	
+	ETypeModifier_InterfaceMask = 0x0c0000,	
 };
 
 const tchar_t*
@@ -203,13 +218,15 @@ protected:
 	int m_Flags;
 		
 	rtl::CStringA m_Signature;
-	rtl::CString m_Tag;
 	rtl::CString m_TypeString;
 	rtl::CString m_LlvmTypeString;
 
 	llvm::Type* m_pLlvmType;
 
 	CPointerType* m_PointerTypeArray [4];
+
+public:
+	rtl::CString m_Tag;
 
 public:
 	CType ();
@@ -331,14 +348,17 @@ public:
 		return m_TypeKind == EType_Interface || m_TypeKind == EType_Class;
 	}
 
+	bool
+	IsFunctionPointerType ();
+
 	bool 
 	IsAutoSizeArrayType ();
 
 	bool 
 	IsCharArrayType ();
 
-	bool 
-	IsCharPointerType (CType* pType);
+	bool
+	IsConstType ();
 
 	bool
 	HasLayout ()
@@ -369,6 +389,24 @@ protected:
 
 	void
 	PostCalcLayout ();
+
+	CType* 
+	ApplyQualifierModifiers (int Modifiers);
+
+	CType* 
+	ApplyIntegerModifiers (int Modifiers);
+
+	CType* 
+	ApplyPointerModifiers (int Modifiers);
+
+	CType* 
+	ApplyFunctionModifiers (int Modifiers);
+
+	CType* 
+	ApplyPropertyModifiers (int Modifiers);
+	
+	CType* 
+	ApplyInterfaceModifiers (int Modifiers);
 };
 
 //.............................................................................

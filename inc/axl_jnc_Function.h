@@ -92,7 +92,7 @@ protected:
 	EPropertyAccessor m_PropertyAccessorKind;
 	
 	CFunctionType* m_pType;
-	CFunctionType* m_pClosureType;
+	CFunctionType* m_pShortType;
 	CNamespace* m_pNamespace;
 
 	CNamespace* m_pAnchorNamespace;
@@ -149,9 +149,9 @@ public:
 	}
 
 	CFunctionType* 
-	GetClosureType ()
+	GetShortType ()
 	{
-		return m_pClosureType;
+		return m_pShortType;
 	}
 
 	CNamespace* 
@@ -311,7 +311,7 @@ public:
 	CFunction*
 	FindOverload (
 		CFunctionType* pType,
-		bool IsClosure = false
+		bool IsShortType = false
 		) const;
 };
 

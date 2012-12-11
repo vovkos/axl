@@ -12,7 +12,7 @@ CPropertyType::CPropertyType ()
 	m_ItemKind = EModuleItem_Property; // not just type 
 	m_TypeKind = EType_Property;
 	m_pGetter = NULL;
-	m_pPointerType = NULL;
+	m_pPropertyPointerType = NULL;
 	m_pVTableStructType = NULL;	
 	m_pParentClassType = NULL;
 	m_ParentVTableIndex = -1;
@@ -98,6 +98,47 @@ CPropertyType::CalcLayout ()
 	PostCalcLayout ();
 
 	return true;
+}
+
+CPropertyPointerType* 
+CPropertyType::GetPropertyPointerType ()
+{
+	return m_pModule->m_TypeMgr.GetPropertyPointerType (this);
+}
+
+//.............................................................................
+
+CPropertyPointerType::CPropertyPointerType ()
+{
+	m_TypeKind = EType_PropertyPointer;
+	m_Size = sizeof (TPropertyPtr);
+	m_pPropertyType = NULL;
+	m_pMemberPropertyType = NULL;
+	m_pPointerStructType = NULL;
+}
+
+CPropertyType* 
+CPropertyPointerType::GetMemberPropertyType ()
+{
+	if (m_pMemberPropertyType)
+		return m_pMemberPropertyType;
+
+	return m_pMemberPropertyType;
+}
+
+CStructType* 
+CPropertyPointerType::GetPointerStructType ()
+{
+	if (m_pPointerStructType)
+		return m_pPointerStructType;
+
+	m_pPointerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pPointerStructType->m_Tag.Format (_T("pprop"));
+	m_pPointerStructType->CreateMember (m_pPropertyType->GetVTableStructType ()->GetPointerType (EType_Pointer_u));
+	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface));
+	m_pPointerStructType->CalcLayout ();
+
+	return m_pPointerStructType;
 }
 
 //.............................................................................

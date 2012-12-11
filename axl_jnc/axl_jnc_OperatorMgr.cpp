@@ -322,7 +322,13 @@ COperatorMgr::GetCastOperator (
 		return pType->IsPointerType () ? &m_Cast_ptr : NULL;
 
 	case EType_Pointer_u:
-		return TypeKind == EType_Pointer_u ? &m_Cast_ptr : NULL;
+		return 
+			pOpType->IsFunctionPointerType () ? 
+			TypeKind == EType_FunctionPointer || pType->IsFunctionPointerType () ? (ICastOperator*) &m_Cast_fn : NULL :
+			TypeKind == EType_Pointer_u ? (ICastOperator*) &m_Cast_ptr : NULL;
+
+	case EType_FunctionPointer:
+		return TypeKind == EType_FunctionPointer ? &m_Cast_fn :  NULL;
 
 	case EType_Array:
 		return 
@@ -447,7 +453,7 @@ COperatorMgr::MoveOperator (
 }
 
 bool
-COperatorMgr::MoveOperator (
+COperatorMgr::BinOpMoveOperator (
 	const CValue& SrcValue,
 	const CValue& DstValue,
 	EBinOp OpKind
@@ -460,6 +466,16 @@ COperatorMgr::MoveOperator (
 	return 
 		BinaryOperator (OpKind, DstValue, SrcValue, &RValue) &&
 		MoveOperator (RValue, DstValue);
+}
+
+bool
+COperatorMgr::RefMoveOperator (
+	const CValue& RawOpValue,
+	const CValue& DstValue
+	)
+{
+	err::SetFormatStringError (_T("ref-assign is not yet implemented"));
+	return false;
 }
 
 bool
@@ -771,7 +787,7 @@ COperatorMgr::ClassMemberOperator (
 		return false;
 	}
 
-	bool Result = m_pModule->m_LlvmBuilder.CheckInterfaceNull (OpValue);
+	bool Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue, ERuntimeError_NullInterface);
 	if (!Result)
 		return false;
 
@@ -1038,8 +1054,8 @@ COperatorMgr::HeapNewOperator (
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateCall (
 		pHeapAllocate,
+		pHeapAllocate->GetType (),
 		TypeValue,
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		&PtrValue
 		);
 
@@ -1120,15 +1136,32 @@ COperatorMgr::CallOperator (
 		pArgList = &EmptyArgList;
 
 	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_LoadReference);
 	if (!Result)
 		return false;
 
-	if (OpValue.GetType ()->GetTypeKind () != EType_Function)
+	CFunctionType* pFunctionType = NULL;
+
+	CType* pOpType = OpValue.GetType ();
+	if (pOpType->IsFunctionPointerType ())
 	{
-		err::SetFormatStringError (_T("cannot call '%s'"), OpValue.GetType ()->GetTypeString ());
+		pFunctionType = (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType ();
+	}
+	else if (pOpType->GetTypeKind () == EType_FunctionPointer)
+	{
+		Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue, ERuntimeError_NullFunction);
+		if (!Result)
+			return false;
+
+		pFunctionType = ((CFunctionPointerType*) pOpType)->GetFunctionType ();
+	}
+	else
+	{
+		err::SetFormatStringError (_T("cannot call '%s'"), pOpType->GetTypeString ());
 		return false;
 	}
+
+	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 
 	CClosure* pClosure = OpValue.GetClosure ();
 	if (pClosure)
@@ -1137,9 +1170,6 @@ COperatorMgr::CallOperator (
 		if (!Result)
 			return false;
 	}
-
-	CFunctionType* pFunctionType = (CFunctionType*) OpValue.GetType ();
-	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 
 	size_t FormalArgCount = ArgTypeArray.GetCount ();
 	size_t ActualArgCount = pArgList->GetCount ();
@@ -1191,11 +1221,80 @@ COperatorMgr::CallOperator (
 		ArgArray.Append (ArgCast);
 	}
 
+	return Call (OpValue, pFunctionType, ArgArray, ArgArray.GetCount (), pResultValue);
+}
+
+bool
+COperatorMgr::Call (
+	const CValue& OpValue,
+	CFunctionType* pFunctionType,
+	const CValue* pArgArray,
+	size_t ArgCount,
+	CValue* pResultValue
+	)
+{
+	if (OpValue.GetType ()->IsFunctionPointerType ())
+	{
+		m_pModule->m_LlvmBuilder.CreateCall (
+			OpValue,
+			pFunctionType,
+			pArgArray,
+			ArgCount,
+			pResultValue
+			);
+
+		return true;
+	}
+
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_FunctionPointer);
+
+	CValue FunctionPtrValue;
+	CValue CallConvValue;
+	CValue StdcallValue (ECallConv_Stdcall, EType_Int_p);
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &FunctionPtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &CallConvValue);
+
+	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("callconv_phi"));
+	CBasicBlock* pCdeclBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("callconv_cdecl"));
+	CBasicBlock* pStdcallBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("callconv_stdcall"));
+
+	CValue CmpValue;
+	m_pModule->m_LlvmBuilder.CreateEq_i (CallConvValue, StdcallValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pStdcallBlock, pCdeclBlock);
+	
+	CValue CdeclReturnValue;
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pCdeclBlock);
 	m_pModule->m_LlvmBuilder.CreateCall (
-		OpValue, 
-		ArgArray,
-		ArgArray.GetCount (),
-		pFunctionType->GetReturnType (), 
+		FunctionPtrValue,
+		ECallConv_Cdecl,
+		pArgArray,
+		ArgCount,
+		pFunctionType->GetReturnType (),
+		&CdeclReturnValue
+		);
+	m_pModule->m_LlvmBuilder.CreateBr (pPhiBlock);
+
+	CValue StdcallReturnValue;
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pStdcallBlock);
+	m_pModule->m_LlvmBuilder.CreateCall (
+		FunctionPtrValue,
+		ECallConv_Stdcall,
+		pArgArray,
+		ArgCount,
+		pFunctionType->GetReturnType (),
+		&StdcallReturnValue
+		);
+	m_pModule->m_LlvmBuilder.CreateBr (pPhiBlock);
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPhiBlock);
+
+	m_pModule->m_LlvmBuilder.CreatePhi (
+		CdeclReturnValue, 
+		pCdeclBlock, 
+		StdcallReturnValue, 
+		pStdcallBlock, 
 		pResultValue
 		);
 

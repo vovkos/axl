@@ -7,23 +7,59 @@ namespace jnc {
 
 //.............................................................................
 
+const tchar_t*
+GetCallingConventionString (ECallConv CallingConvention)
+{
+	switch (CallingConvention)
+	{	
+	case ECallConv_Default:
+		return _T("default-calling-convention");
+
+	case ECallConv_Cdecl:
+		return _T("cdecl");
+
+	case ECallConv_Stdcall:
+		return _T("stdcall");
+
+	default:
+		return _T("undefined-calling-convention");
+	}
+}
+
+//.............................................................................
+
 CFunctionType::CFunctionType ()
 {
 	m_TypeKind = EType_Function;
 	m_pReturnType = NULL;
-	m_pPointerType = NULL;
+	m_pFunctionPointerType = NULL;
+	m_pDefCallConvFunctionType = NULL;
+	m_CallingConvention = ECallConv_Default;
 }
 
 rtl::CStringA
 CFunctionType::CreateSignature (
-	EType TypeKind,
+	ECallConv CallingConvention,
 	CType* pReturnType,
 	CType* const* ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CStringA String = TypeKind == EType_Function ? "P(" : "Q(";
+	rtl::CStringA String = "P";
+
+	switch (CallingConvention)
+	{
+	case ECallConv_Cdecl:
+		String += "C";
+		break;
+
+	case ECallConv_Stdcall:
+		String += "S";
+		break;
+	}
+
+	String += "(";
 	
 	String.Append (pReturnType->GetSignature ());
 	
@@ -43,14 +79,20 @@ CFunctionType::CreateSignature (
 
 rtl::CString
 CFunctionType::CreateTypeString (
-	EType TypeKind,
+	ECallConv CallingConvention,
 	CType* pReturnType,
 	CType* const* ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CString String = TypeKind == EType_Function ? pReturnType->GetTypeString () : _T("event");
+	rtl::CString String = pReturnType->GetTypeString ();
+
+	if (CallingConvention)
+	{
+		String += ' ';
+		String += GetCallingConventionString (CallingConvention);
+	}
 
 	String.Append (_T(" ("));
 	
@@ -108,6 +150,22 @@ CFunctionType::GetLlvmType ()
 	return pLlvmType;
 }
 
+CFunctionPointerType* 
+CFunctionType::GetFunctionPointerType ()
+{
+	return m_pModule->m_TypeMgr.GetFunctionPointerType (this);
+}
+
+CFunctionType*
+CFunctionType::GetDefCallConvFunctionType ()
+{
+	if (m_pDefCallConvFunctionType)
+		return m_pDefCallConvFunctionType;
+
+	m_pDefCallConvFunctionType = m_pModule->m_TypeMgr.GetFunctionType (m_pReturnType, m_ArgTypeArray, m_Flags);
+	return m_pDefCallConvFunctionType;
+}
+
 //.............................................................................
 
 bool
@@ -129,14 +187,46 @@ CFunctionTypeOverload::AddOverload (CFunctionType* pType)
 
 CFunctionPointerType::CFunctionPointerType ()
 {
+	m_TypeKind = EType_FunctionPointer;
+	m_Size = sizeof (TFunctionPtr);
 	m_pFunctionType = NULL;
+	m_pMemberFunctionType = NULL;
 	m_pPointerStructType = NULL;
 }
 
-CPointerType*
-CFunctionPointerType::GetRawPointerType ()
+CFunctionType* 
+CFunctionPointerType::GetMemberFunctionType ()
 {
-	return m_pModule->m_TypeMgr.GetPointerType (EType_Pointer_u, m_pFunctionType);
+	if (m_pMemberFunctionType)
+		return m_pMemberFunctionType;
+
+	rtl::CArrayT <CType*> ArgTypeArray = m_pFunctionType->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface));
+
+	m_pMemberFunctionType = m_pModule->m_TypeMgr.GetFunctionType (
+		m_pFunctionType->GetCallingConvention (),
+		m_pFunctionType->GetReturnType (),
+		ArgTypeArray,
+		m_pFunctionType->GetFlags ()
+		);
+
+	return m_pMemberFunctionType;
+}
+
+CStructType* 
+CFunctionPointerType::GetPointerStructType ()
+{
+	if (m_pPointerStructType)
+		return m_pPointerStructType;
+
+	m_pPointerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pPointerStructType->m_Tag.Format (_T("pfn"));
+	m_pPointerStructType->CreateMember (m_pFunctionType->GetPointerType (EType_Pointer_u));
+	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface));
+	m_pPointerStructType->CalcLayout ();
+
+	return m_pPointerStructType;
 }
 
 //.............................................................................

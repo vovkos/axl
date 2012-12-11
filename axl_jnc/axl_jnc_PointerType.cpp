@@ -41,7 +41,7 @@ CPointerType::GetPointerStructType ()
 		return m_pPointerStructType;
 
 	m_pPointerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pPointerStructType->m_Tag = GetTypeString ();
+	m_pPointerStructType->m_Tag.Format (_T("ptr %s"), GetTypeString ());
 	m_pPointerStructType->CreateMember (m_pBaseType->GetPointerType (EType_Pointer_u));
 	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_SafePtrValidator));
 	m_pPointerStructType->CalcLayout ();

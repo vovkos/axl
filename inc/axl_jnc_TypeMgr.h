@@ -27,6 +27,7 @@ enum EStdType
 	EStdType_BytePtr,
 	EStdType_SafePtrValidator,
 	EStdType_ObjectHdr,
+	EStdType_AbstractInterface,
 	EStdType__Count,
 };
 
@@ -147,6 +148,12 @@ public:
 		return GetPointerType (TypeKind, GetPrimitiveType (BaseTypeKind));
 	}
 
+	CFunctionPointerType* 
+	GetFunctionPointerType (CFunctionType* pFunctionType);
+
+	CPropertyPointerType* 
+	GetPropertyPointerType (CPropertyType* pPropertyType);
+
 	CArrayType* 
 	GetArrayType (
 		CType* pBaseType,
@@ -193,11 +200,34 @@ public:
 
 	CFunctionType* 
 	GetFunctionType (
+		ECallConv CallConv,
 		CType* pReturnType,
 		const rtl::CArrayT <CType*>& ArgTypeArray,
 		int Flags = 0
 		);
+	
+	CFunctionType* 
+	CTypeMgr::GetFunctionType (	
+		ECallConv CallConv,
+		CType* pReturnType,
+		CType* const* ppArgType,
+		size_t ArgCount,
+		int Flags = 0
+		)
+	{
+		return GetFunctionType (CallConv, pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
+	}
 
+	CFunctionType* 
+	GetFunctionType (
+		CType* pReturnType,
+		const rtl::CArrayT <CType*>& ArgTypeArray,
+		int Flags = 0
+		)
+	{
+		return GetFunctionType (ECallConv_Default, pReturnType, ArgTypeArray, Flags);
+	}
+	
 	CFunctionType* 
 	CTypeMgr::GetFunctionType (	
 		CType* pReturnType,
@@ -206,8 +236,9 @@ public:
 		int Flags = 0
 		)
 	{
-		return GetFunctionType (pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
+		return GetFunctionType (ECallConv_Default, pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
 	}
+
 
 	CPropertyType* 
 	CreatePropertyType ();
@@ -295,6 +326,9 @@ protected:
 
 	CStructType*
 	CreateObjectHdrType ();
+
+	CStructType*
+	CreateAbstractInterfaceType ();
 };
 
 //.............................................................................

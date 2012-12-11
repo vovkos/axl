@@ -38,7 +38,9 @@ enum EToken
 	EToken_Weak,
 	EToken_Bindable,
 	EToken_Virtual,
-	EToken_Sealed,
+	EToken_NoVirtual,
+	EToken_Cdecl,
+	EToken_Stdcall,
 	EToken_This,
 	EToken_Auto,
 	EToken_Void,
@@ -140,7 +142,9 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
-	AXL_PRS_TOKEN_NAME (EToken_Sealed,       "sealed")
+	AXL_PRS_TOKEN_NAME (EToken_NoVirtual,    "novirtual")
+	AXL_PRS_TOKEN_NAME (EToken_Cdecl,        "cdecl")
+	AXL_PRS_TOKEN_NAME (EToken_Stdcall,      "stdcall")
 	AXL_PRS_TOKEN_NAME (EToken_This,         "this")
 	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")

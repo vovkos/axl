@@ -14,6 +14,35 @@ CLlvmBuilder::CLlvmBuilder ():
 	ASSERT (m_pModule);
 }
 
+llvm::SwitchInst*
+CLlvmBuilder::CreateSwitch (
+	const CValue& Value,
+	CBasicBlock* pDefaultBlock,
+	rtl::CHashTableMapIteratorT <intptr_t, CBasicBlock*> FirstCase,
+	size_t CaseCount
+	)
+{
+	CType* pType = Value.GetType ();
+	ASSERT (pType->IsIntegerType ());
+
+	llvm::SwitchInst* pInst = m_LlvmBuilder.CreateSwitch (
+		Value.GetLlvmValue (), 
+		pDefaultBlock->GetLlvmBlock (), 
+		CaseCount
+		);
+
+	rtl::CHashTableMapIteratorT <intptr_t, CBasicBlock*> Case = FirstCase;
+	for (; Case; Case++)
+	{
+		CValue ConstValue (Case->m_Key, pType);
+		CBasicBlock* pBlock = Case->m_Value;
+
+		pInst->addCase ((llvm::ConstantInt*) ConstValue.GetLlvmValue (), pBlock->GetLlvmBlock ());
+	}
+
+	return pInst;
+}
+
 llvm::PHINode*
 CLlvmBuilder::CreatePhi (
 	const CValue* pValueArray,
@@ -106,9 +135,10 @@ CLlvmBuilder::CreateGep (
 llvm::CallInst*
 CLlvmBuilder::CreateCall (
 	const CValue& CalleeValue,
+	ECallConv CallingConvention,
 	const CValue* pArgArray,
 	size_t ArgCount,
-	CType* pResultType,
+	CType* pResultType, 
 	CValue* pResultValue
 	)
 {
@@ -144,6 +174,7 @@ CLlvmBuilder::CreateCall (
 			pResultValue->SetVoid ();
 	}
 
+	pInst->setCallingConv (GetLlvmCallingConvention (CallingConvention));
 	return pInst;
 }
 
@@ -203,10 +234,10 @@ CLlvmBuilder::CreateSafePtrValidator (
 
 	return CreateCall3 (
 		pCreateValidator,
+		pCreateValidator->GetType (),
 		RegionBeginValue, 
 		SizeValue,
 		ScopeLevelValue,
-		pCreateValidator->GetType ()->GetReturnType (),
 		pResultValue
 		);
 }
@@ -229,11 +260,11 @@ CLlvmBuilder::CheckSafePtrRange (
 
 	CreateCall4 (
 		pCheckSafePtrRange,
+		pCheckSafePtrRange->GetType (),
 		PtrValue,
 		SizeValue,
 		ValidatorValue,
 		ErrorValue,
-		NULL,
 		NULL
 		);
 
@@ -274,10 +305,10 @@ CLlvmBuilder::CheckSafePtrScope (
 	
 	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pCheckFunction,
+		pCheckFunction->GetType (),
 		PtrValue,
 		ValidatorValue,
 		DstScopeLevelValue,
-		NULL,
 		NULL
 		);
 
@@ -298,14 +329,24 @@ CLlvmBuilder::CreateInterface (
 }
 
 bool
-CLlvmBuilder::CheckInterfaceNull (const CValue& Value)
+CLlvmBuilder::CheckNullPtr (
+	const CValue& Value,
+	ERuntimeError Error
+	)
 {
 	CValue PtrValue;
 	CreateExtractValue (Value, 0, NULL, &PtrValue);
 	CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceNull);	
-	m_pModule->m_LlvmBuilder.CreateCall (pCheckFunction, PtrValue, NULL, NULL);
+	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);	
+	m_pModule->m_LlvmBuilder.CreateCall2 (
+		pCheckFunction, 
+		pCheckFunction->GetType (), 
+		PtrValue, 
+		CValue (Error, EType_Int),
+		NULL
+		);
+
 	return true;
 }
 
@@ -329,10 +370,10 @@ CLlvmBuilder::CheckInterfaceScope (
 	
 	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pCheckFunction,
+		pCheckFunction->GetType (),
 		PtrValue,
 		ScopeLevelValue,
 		DstScopeLevelValue,
-		NULL,
 		NULL
 		);
 
@@ -360,9 +401,9 @@ CLlvmBuilder::DynamicCastInterface (
 	
 	m_pModule->m_LlvmBuilder.CreateCall2 (
 		pDynamicCastInterface,
+		pDynamicCastInterface->GetType (),
 		PtrValue,
 		TypeValue,
-		pDynamicCastInterface->GetType ()->GetReturnType (),
 		&PtrValue
 		);
 
@@ -387,13 +428,30 @@ CLlvmBuilder::InitializeObject (
 
 	m_pModule->m_LlvmBuilder.CreateCall2 (
 		pInializeObject,
+		pInializeObject->GetType (),
 		Value,
 		FlagsValue,
-		NULL,
 		NULL
 		);
 
 	return true;
+}
+
+llvm::Value*
+CLlvmBuilder::CreateFunctionPointer (
+	const CValue& PtrValue,
+	ECallConv CallingConvention,
+	const CValue& InterfaceValue,
+	CFunctionPointerType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CValue CallConvValue (CallingConvention, EType_Int_p);
+
+	CValue FunctionPtrValue = pResultType->GetUndefValue ();
+	CreateInsertValue (FunctionPtrValue, PtrValue, 0, NULL, &FunctionPtrValue);
+	CreateInsertValue (FunctionPtrValue, CallConvValue, 1, NULL, &FunctionPtrValue);
+	return CreateInsertValue (FunctionPtrValue, InterfaceValue, 2, pResultType, pResultValue);
 }
 
 //.............................................................................

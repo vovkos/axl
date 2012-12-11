@@ -13,6 +13,23 @@ namespace jnc {
 
 enum EStdFunc
 {
+	// void
+	// jnc.OnRuntimeError (
+	//		int Error,
+	//		int8* pCodeAddr,
+	//		int8* pDataAddr
+	//		);
+
+	EStdFunc_OnRuntimeError,
+
+	// void 
+	// jnc.CheckNullPtr (
+	//		int8* p,
+	//		int Error
+	//		);
+
+	EStdFunc_CheckNullPtr,
+
 	// jnc.sptrv
 	// jnc.CreateSafePtrValidator (
 	//		int8* pRegionBegin,
@@ -41,23 +58,6 @@ enum EStdFunc
 
 	EStdFunc_CheckSafePtrScope,
 
-	// void
-	// jnc.OnInvalidSafePtr (
-	//		int8* p,
-	//		jnc.sptrv Validator,
-	//		int Error
-	//		);
-
-	EStdFunc_OnInvalidSafePtr,
-
-	// void 
-	// jnc.CheckInterfaceNull (
-	//		int8* p,
-	//		size_t ScopeLevel
-	//		);
-
-	EStdFunc_CheckInterfaceNull,
-
 	// void 
 	// jnc.CheckInterfaceScope (
 	//		int8* p,
@@ -66,14 +66,6 @@ enum EStdFunc
 	//		);
 
 	EStdFunc_CheckInterfaceScope,
-
-	// void
-	// jnc.OnInvalidInterface (
-	//		int8* p,
-	//		int Error
-	//		);
-
-	EStdFunc_OnInvalidInterface,
 
 	// int8*
 	// jnc.DynamicCastInterface (
@@ -185,6 +177,12 @@ protected:
 	// LLVM code support functions
 
 	CFunction*
+	CreateOnRuntimeError ();
+
+	CFunction*
+	CreateCheckNullPtr ();
+
+	CFunction*
 	CreateCreateSafePtrValidator ();
 
 	CFunction*
@@ -194,16 +192,7 @@ protected:
 	CreateCheckSafePtrScope ();
 
 	CFunction*
-	CreateOnInvalidSafePtr ();
-
-	CFunction*
-	CreateCheckInterfaceNull ();
-
-	CFunction*
 	CreateCheckInterfaceScope ();
-
-	CFunction*
-	CreateOnInvalidInterface ();
 
 	CFunction*
 	CreateDynamicCastInterface ();
@@ -225,6 +214,21 @@ protected:
 		CClassType* pResultType,
 		CValue* pResultValue
 		);
+
+	bool
+	RuntimeError (
+		const CValue& ErrorValue,
+		const CValue& DataAddrValue
+		);
+
+	bool
+	RuntimeError (
+		ERuntimeError Error,
+		const CValue& DataAddrValue
+		)
+	{
+		return RuntimeError (CValue (Error, EType_Int), DataAddrValue);
+	}
 };
 
 //.............................................................................

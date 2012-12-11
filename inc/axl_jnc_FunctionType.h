@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_StructType.h"
 
 namespace axl {
 namespace jnc {
@@ -22,6 +22,27 @@ enum EFunctionTypeFlag
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum ECallConv
+{
+	ECallConv_Default = 0,
+	ECallConv_Cdecl,
+	ECallConv_Stdcall,
+};
+
+const tchar_t*
+GetCallingConventionString (ECallConv CallingConvention);
+
+inline
+llvm::CallingConv::ID
+GetLlvmCallingConvention (ECallConv CallingConvention)
+{
+	return CallingConvention == ECallConv_Stdcall ?
+		llvm::CallingConv::X86_StdCall : 
+		llvm::CallingConv::C;
+}
+
+//.............................................................................
+
 class CFunctionType: 
 	public CType,
 	public rtl::TListLink
@@ -31,7 +52,9 @@ protected:
 
 	CType* m_pReturnType;
 	rtl::CArrayT <CType*> m_ArgTypeArray;
-	CFunctionPointerType* m_pPointerType;
+	CFunctionPointerType* m_pFunctionPointerType;
+	CFunctionType* m_pDefCallConvFunctionType;
+	ECallConv m_CallingConvention;
 
 public:
 	CFunctionType ();
@@ -39,6 +62,18 @@ public:
 	llvm::FunctionType* 
 	GetLlvmType ();
 
+	llvm::CallingConv::ID
+	GetLlvmCallingConvention ()
+	{
+		return jnc::GetLlvmCallingConvention (m_CallingConvention);
+	}
+
+	ECallConv 
+	GetCallingConvention ()
+	{
+		return m_CallingConvention;
+	}
+	
 	CType*
 	GetReturnType ()
 	{
@@ -52,15 +87,15 @@ public:
 	}
 
 	CFunctionPointerType* 
-	GetPointerType ()
-	{
-		return m_pPointerType;
-	}
+	GetFunctionPointerType ();
+
+	CFunctionType*
+	GetDefCallConvFunctionType ();
 
 	static
 	rtl::CStringA
 	CreateSignature (
-		EType TypeKind,
+		ECallConv CallingConvention,
 		CType* pReturnType,
 		CType* const* ppArgType,
 		size_t ArgCount,
@@ -70,7 +105,7 @@ public:
 	static
 	rtl::CString
 	CreateTypeString (
-		EType TypeKind,
+		ECallConv CallingConvention,
 		CType* pReturnType,
 		CType* const* ppArgType,
 		size_t ArgCount,
@@ -80,7 +115,13 @@ public:
 	rtl::CString
 	CreateTypeString ()
 	{
-		return CreateTypeString (m_TypeKind, m_pReturnType, m_ArgTypeArray, m_ArgTypeArray.GetCount (), m_Flags);
+		return CreateTypeString (
+			m_CallingConvention, 
+			m_pReturnType, 
+			m_ArgTypeArray, 
+			m_ArgTypeArray.GetCount (), 
+			m_Flags
+			);
 	}
 };
 
@@ -142,11 +183,20 @@ class CFunctionPointerType:
 	public rtl::TListLink
 {
 protected:
+	friend class CTypeMgr;
+
 	CFunctionType* m_pFunctionType;
+	CFunctionType* m_pMemberFunctionType; // with additional abstract interface argument
 	CStructType* m_pPointerStructType;
 
 public:
 	CFunctionPointerType ();
+
+	llvm::StructType* 
+	GetLlvmType ()
+	{
+		return GetPointerStructType ()->GetLlvmType ();
+	}
 
 	CFunctionType* 
 	GetFunctionType ()
@@ -154,15 +204,11 @@ public:
 		return m_pFunctionType;
 	}
 
-	CStructType* 
-	GetPointerStructType ()
-	{
-		ASSERT (m_pPointerStructType);
-		return m_pPointerStructType;
-	}
+	CFunctionType* 
+	GetMemberFunctionType ();
 
-	CPointerType*
-	GetRawPointerType ();
+	CStructType* 
+	GetPointerStructType ();
 };
 
 //.............................................................................

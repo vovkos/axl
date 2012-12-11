@@ -79,7 +79,9 @@ main := |*
 'weak'         { CreateToken (EToken_Weak); };
 'bindable'     { CreateToken (EToken_Bindable); };
 'virtual'      { CreateToken (EToken_Virtual); };
-'sealed'       { CreateToken (EToken_Sealed); };
+'novirtual'    { CreateToken (EToken_NoVirtual); };
+'cdecl'        { CreateToken (EToken_Cdecl); };
+'stdcall'      { CreateToken (EToken_Stdcall); };
 'this'         { CreateToken (EToken_This); };
 
 'auto'         { CreateToken (EToken_Auto); };

@@ -345,7 +345,14 @@ CCast_int_swp::LlvmCast (
 
 	CValue SwapFunctionValue;
 	SwapFunctionValue.SetLlvmValue (pLlvmSwap, NULL);
-	m_pModule->m_LlvmBuilder.CreateCall (SwapFunctionValue, Value, pType, pResultValue);
+	m_pModule->m_LlvmBuilder.CreateCall (
+		SwapFunctionValue, 
+		ECallConv_Default,
+		&Value, 1,
+		pType, 
+		pResultValue
+		);
+
 	return true;
 }
 
@@ -590,7 +597,7 @@ GetPointerCastOffset (
 	return 0;
 }
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 ECast
 CCast_ptr::GetCastKind (
@@ -735,6 +742,116 @@ CCast_ptr::LlvmCast_ptr_u (
 		*pResultValue = PtrValue;
 
 	return true;
+}
+
+//.............................................................................
+
+void
+AssertFunctionPointerCastTypeValid (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	EType SrcTypeKind = pSrcType->GetTypeKind ();
+	EType DstTypeKind = pDstType->GetTypeKind ();
+
+	ASSERT (
+		SrcTypeKind == EType_FunctionPointer && DstTypeKind == EType_FunctionPointer ||
+		pSrcType->IsFunctionPointerType () && pDstType->IsFunctionPointerType () ||
+		pSrcType->IsFunctionPointerType () && DstTypeKind == EType_FunctionPointer
+		);
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+ECast
+CCast_fn::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	AssertFunctionPointerCastTypeValid (pSrcType, pDstType);
+	return ECast_Lossy;
+}
+
+bool
+CCast_fn::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	AssertFunctionPointerCastTypeValid (SrcValue.GetType (), DstValue.GetType ());
+	
+	err::SetFormatStringError (_T("CCast_fn::ConstCast is not yet implemented"));
+	return false;
+}
+
+bool
+CCast_fn::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CType* pOpType = Value.GetType ();
+	AssertFunctionPointerCastTypeValid (pOpType, pType);
+
+	if (!pOpType->IsFunctionPointerType () || pType->GetTypeKind () != EType_FunctionPointer)
+	{
+		SetCastError (Value.GetType (), pType);
+		return false;
+	}
+
+	CFunctionType* pFunctionType = (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType ();
+	CFunctionPointerType* pFunctionPointerType = (CFunctionPointerType*) pType;
+
+	if (pFunctionPointerType->GetFunctionType ()->Cmp (pFunctionType->GetDefCallConvFunctionType ()) != 0)
+	{
+		SetCastError (Value.GetType (), pType);
+		return false;
+	}
+	
+	m_pModule->m_LlvmBuilder.CreateFunctionPointer (
+		Value,
+		pFunctionType->GetCallingConvention (),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
+		pFunctionPointerType, 
+		pResultValue
+		);
+
+	return true;
+}
+
+//.............................................................................
+
+ECast
+CCast_prop::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	return ECast_Lossy;
+}
+
+bool
+CCast_prop::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	err::SetFormatStringError (_T("CCast_prop::ConstCast is not yet implemented"));
+	return false;
+}
+
+bool
+CCast_prop::LlvmCast (
+	const CValue& Value,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("CCast_prop::LlvmCast is not yet implemented"));
+	return false;
 }
 
 //.............................................................................

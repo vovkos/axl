@@ -10,6 +10,8 @@
 namespace axl {
 namespace jnc {
 
+class CFunctionPointerType;
+
 //.............................................................................
 
 enum ECast
@@ -1092,6 +1094,76 @@ protected:
 		intptr_t Offset,
 		rtl::CArrayT <size_t>* pLlvmIndexArray,
 		CPointerType* pPointerType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+class CCast_fn: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_fn, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+protected:
+	bool
+	LlvmCast_ptr (
+		const CValue& Value,
+		CFunctionPointerType* pPointerType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+class CCast_prop: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_prop, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		const CValue& Value,
+		CType* pType,
 		CValue* pResultValue
 		);
 };

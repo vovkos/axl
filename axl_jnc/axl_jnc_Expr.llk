@@ -325,21 +325,48 @@ local
 	  (
 		assignment_operator $o conditional_expr <&$RValue>
 			{
-				return m_pModule->m_OperatorMgr.MoveOperator ($RValue, *$pValue, $o.m_OpKind);
+				switch ($o.m_AssignKind)
+				{
+				case EAssign_Normal:
+					return m_pModule->m_OperatorMgr.MoveOperator ($RValue, *$pValue);
+
+				case EAssign_BinOp:
+					return m_pModule->m_OperatorMgr.BinOpMoveOperator ($RValue, *$pValue, $o.m_OpKind);
+
+				case EAssign_Ref:
+					return m_pModule->m_OperatorMgr.RefMoveOperator ($RValue, *$pValue);
+				}
 			}
 	  )?
 	;
 
 class
 {
+	EAssign m_AssignKind;
 	EBinOp m_OpKind;
 }
 assignment_operator
 	: '='
 		{
+			$.m_AssignKind = EAssign_Normal;
+		}
+	| binop_assignment_operator
+		{
+			$.m_AssignKind = EAssign_BinOp;
 			$.m_OpKind = EBinOp_None;
 		}
-	| EToken_AddAssign
+	| EToken_RefAssign
+		{
+			$.m_AssignKind = EAssign_Ref;
+		}
+	;
+
+class
+{
+	EBinOp m_OpKind;
+}
+binop_assignment_operator
+	: EToken_AddAssign
 		{
 			$.m_OpKind = EBinOp_Add;
 		}

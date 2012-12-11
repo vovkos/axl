@@ -87,6 +87,20 @@ CParser::Declare (
 
 	if (StorageClass == EStorageClass_Typedef)
 	{
+		if (pType->GetTypeKind () == EType_Function)
+		{
+			CFunctionType* pFunctionType = (CFunctionType*) pType;
+			if (pFunctionType->GetCallingConvention ())
+				pType = pFunctionType->GetPointerType (EType_Pointer_u);
+			else
+				pType = pFunctionType->GetFunctionPointerType ();
+		}
+		else if (pType->GetTypeKind () == EType_Property)
+		{
+			CPropertyType* pPropertyType = (CPropertyType*) pType;
+			pType = pPropertyType->GetPropertyPointerType ();
+		}
+
 		if (pOldItem)
 		{
 			if (pOldItem->GetItemKind () != EModuleItem_Alias || ((CAlias*) pOldItem)->GetTarget () != pType)
@@ -504,6 +518,76 @@ CParser::DeclarePropertyAccessor (
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
 	pAccessor->m_Pos = pDeclarator->m_Pos;
 	return pAccessor;
+}
+
+bool
+CParser::SwitchCaseLabel (
+	CSwitchStmt* pSwitchStmt,
+	intptr_t Value,
+	const CToken::CPos& ClosePos,
+	const CToken::CPos& OpenPos
+	)
+{
+	rtl::CHashTableMapIteratorT <intptr_t, CBasicBlock*> It = pSwitchStmt->m_CaseMap.Goto (Value);
+	if (It->m_Value)
+	{
+		err::SetFormatStringError (_T("redefinition of label (%d) of switch statement"), Value);
+		return false;
+	}
+
+	m_pModule->m_NamespaceMgr.CloseScope (ClosePos);
+
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_case"));
+	m_pModule->m_ControlFlowMgr.Follow (pBlock);
+	It->m_Value = pBlock;
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (OpenPos);
+	pScope->m_pBreakBlock = pSwitchStmt->m_pFollowBlock;
+	return true;
+}
+
+bool
+CParser::SwitchDefaultLabel (
+	CSwitchStmt* pSwitchStmt,
+	const CToken::CPos& ClosePos,
+	const CToken::CPos& OpenPos
+	)
+{
+	if (pSwitchStmt->m_pDefaultBlock)
+	{
+		err::SetFormatStringError (_T("redefinition of 'default' label of switch statement"));
+		return false;
+	}
+
+	m_pModule->m_NamespaceMgr.CloseScope (ClosePos);
+
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_default"));
+	m_pModule->m_ControlFlowMgr.Follow (pBlock);
+	pSwitchStmt->m_pDefaultBlock = pBlock;
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (OpenPos);
+	pScope->m_pBreakBlock = pSwitchStmt->m_pFollowBlock;
+	return true;
+}
+
+bool
+CParser::FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt)
+{
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSwitchStmt->m_pSwitchBlock);
+
+	CBasicBlock* pDefaultBlock = pSwitchStmt->m_pDefaultBlock ? 
+		pSwitchStmt->m_pDefaultBlock : 
+		pSwitchStmt->m_pFollowBlock;
+
+	m_pModule->m_LlvmBuilder.CreateSwitch (
+		pSwitchStmt->m_Value, 
+		pDefaultBlock,
+		pSwitchStmt->m_CaseMap.GetHead (),
+		pSwitchStmt->m_CaseMap.GetCount ()
+		);
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSwitchStmt->m_pFollowBlock);
+	return true;
 }
 
 bool

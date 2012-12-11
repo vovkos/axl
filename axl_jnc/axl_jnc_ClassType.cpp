@@ -256,8 +256,8 @@ CClassType::AddMethodFunction (CFunction* pFunction)
 
 	pFunction->m_FunctionKind = EFunction_Method;
 	pFunction->m_pClassType = this;
-	pFunction->m_pClosureType = pType;
 	pFunction->m_pType = pFullType;
+	pFunction->m_pShortType = pType;
 
 	m_MethodFunctionArray.Append (pFunction);
 }
@@ -416,7 +416,7 @@ CClassType::LayoutFunction (CFunction* pFunction)
 
 	CFunction* pOverridenFunction = NULL;
 
-	CFunctionType* pClosureType = pFunction->GetClosureType ();
+	CFunctionType* pShortType = pFunction->GetShortType ();
 
 	if (pFunction->m_PropertyAccessorKind)
 	{
@@ -426,8 +426,8 @@ CClassType::LayoutFunction (CFunction* pFunction)
 			CPropertyType* pPropertyType = pPropertyMember->GetType ();
 
 			pOverridenFunction = pFunction->m_PropertyAccessorKind == EPropertyAccessor_Set ? 
-				pPropertyType->GetSetter ()->FindOverload (pClosureType, true) : 
-				pPropertyType->GetGetter ()->GetClosureType ()->Cmp (pClosureType) == 0 ? pPropertyType->GetGetter () : 
+				pPropertyType->GetSetter ()->FindOverload (pShortType, true) : 
+				pPropertyType->GetGetter ()->GetShortType ()->Cmp (pShortType) == 0 ? pPropertyType->GetGetter () : 
 				NULL;
 		}
 
@@ -442,7 +442,7 @@ CClassType::LayoutFunction (CFunction* pFunction)
 		if (pMember && pMember->GetMemberKind () == EClassMember_Method)
 		{
 			CClassMethodMember* pMethodMember = (CClassMethodMember*) pMember;
-			pOverridenFunction = pMethodMember->FindOverload (pFunction->GetClosureType (), true);
+			pOverridenFunction = pMethodMember->FindOverload (pFunction->GetShortType (), true);
 		}
 
 		if (!pOverridenFunction)

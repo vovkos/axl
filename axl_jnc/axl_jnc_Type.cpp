@@ -271,13 +271,22 @@ CType::GetLlvmType ()
 		return ((CArrayType*) this)->GetLlvmType ();
 	
 	case EType_BitField:
-		pLlvmType = ((CPointerType*) this)->GetBaseType ()->GetLlvmType ();
+		pLlvmType = ((CBitFieldType*) this)->GetBaseType ()->GetLlvmType ();
 		break;
 	
 	case EType_Function:
 		return ((CFunctionType*) this)->GetLlvmType ();
 
+	case EType_FunctionPointer:
+		pLlvmType = ((CFunctionPointerType*) this)->GetLlvmType ();
+		break;
+
+	case EType_PropertyPointer:
+		pLlvmType = ((CPropertyPointerType*) this)->GetLlvmType ();
+		break;
+
 	case EType_Event:
+		ASSERT (false); // not yet
 		break;
 	
 	case EType_Enum:
@@ -295,9 +304,6 @@ CType::GetLlvmType ()
 	case EType_Class:
 	case EType_Interface:
 		pLlvmType = ((CClassType*) this)->GetPointerStructType ()->GetLlvmType ();
-		break;
-	
-	case EType_Property:
 		break;
 
 	case EType_Import:
@@ -435,8 +441,16 @@ CType::GetTypeString ()
 		m_TypeString = ((CFunctionType*) this)->CreateTypeString ();
 		break;
 
+	case EType_FunctionPointer:
+		m_TypeString = ((CFunctionPointerType*) this)->GetFunctionType ()->CreateTypeString ();
+		break;
+
 	case EType_Property:
 		m_TypeString = ((CPropertyType*) this)->CreateTypeString ();
+		break;
+
+	case EType_PropertyPointer:
+		m_TypeString = ((CPropertyPointerType*) this)->GetPropertyType ()->CreateTypeString ();
 		break;
 
 	case EType_Import:
@@ -466,18 +480,26 @@ CType::IsCharArrayType ()
 		((CArrayType*) this)->GetBaseType ()->GetTypeKind () == EType_Char;
 }
 
-bool 
-CType::IsCharPointerType (CType* pType)
-{
-	return 
-		m_TypeKind == EType_Pointer &&
-		((CPointerType*) this)->GetBaseType ()->GetTypeKind () == EType_Char;
-}
-
 CPointerType* 
 CType::GetPointerType (EType TypeKind)
 {
 	return m_pModule->m_TypeMgr.GetPointerType (TypeKind, this);
+}
+
+bool
+CType::IsFunctionPointerType ()
+{
+	return 
+		(m_TypeKind == EType_Pointer_u &&
+		((CPointerType*) this)->GetBaseType ()->GetTypeKind () == EType_Function);
+}
+
+bool
+CType::IsConstType ()
+{
+	return 
+		(m_TypeKind == EType_Qualifier &&
+		((CQualifierType*) this)->GetFlags () & ETypeQualifier_Const);
 }
 
 CArrayType* 
@@ -487,6 +509,27 @@ CType::GetArrayType (size_t ElementCount)
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+static
+inline
+bool
+VerifyModifierTypeKind (
+	ETypeModifier Modifier,
+	bool IsTypeKind,
+	const tchar_t* pTypeKindString
+	)
+{
+	if (!IsTypeKind)
+	{
+		err::SetFormatStringError (
+			_T("type modifier '%s' can only be applied to %s"),
+			GetTypeModifierString (Modifier)
+			);
+		return false;
+	}
+
+	return true;
+}
 
 static
 inline
@@ -510,6 +553,8 @@ VerifyAntiModifier (
 	return true;
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 static
 inline
 bool
@@ -520,16 +565,9 @@ VerifyIntegerModifier (
 	ETypeModifier AntiModifier
 	)
 {
-	if (!pType->IsIntegerType ())
-	{
-		err::SetFormatStringError (
-			_T("type modifier '%s' can only be applied to integer type"),
-			GetTypeModifierString (Modifier)
-			);
-		return false;
-	}
-
-	return VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
+	return 
+		VerifyModifierTypeKind (Modifier, pType->IsIntegerType (), _T("integer type")) &&
+		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
 }
 
 static
@@ -542,17 +580,42 @@ VerifyPointerModifier (
 	ETypeModifier AntiModifier
 	)
 {
-	if (!pType->IsPointerType () && !pType->IsReferenceType ())
-	{
-		err::SetFormatStringError (
-			_T("type modifier '%s' can only be applied to pointer or reference type"),
-			GetTypeModifierString (Modifier)
-			);
-		return false;
-	}
-
-	return VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
+	return 
+		VerifyModifierTypeKind (Modifier, pType->IsPointerType () || pType->IsReferenceType (), _T("pointer or reference type")) &&
+		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
 }
+
+static
+inline
+bool
+VerifyInterfaceModifier (
+	CType* pType,
+	int Modifiers,
+	ETypeModifier Modifier,
+	ETypeModifier AntiModifier
+	)
+{
+	return 
+		VerifyModifierTypeKind (Modifier, pType->IsClassType (), _T("interface or class type")) &&
+		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
+}
+
+static
+inline
+bool
+VerifyFunctionModifier (
+	CType* pType,
+	int Modifiers,
+	ETypeModifier Modifier,
+	ETypeModifier AntiModifier
+	)
+{
+	return 
+		VerifyModifierTypeKind (Modifier, pType->GetTypeKind () == EType_Function, _T("function type")) &&
+		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 static
 EType
@@ -627,6 +690,46 @@ CType::GetModifiedType (int Modifiers)
 {
 	CType* pType = this;
 
+	if (Modifiers & ETypeModifier_QualifierMask)
+		pType = ApplyQualifierModifiers (Modifiers);
+
+	if (Modifiers & ETypeModifier_IntegerMask)
+		pType = ApplyIntegerModifiers (Modifiers);
+
+	if (Modifiers & ETypeModifier_PointerMask)
+		pType = ApplyPointerModifiers (Modifiers);
+
+	if (Modifiers & ETypeModifier_FunctionMask)
+		pType = ApplyFunctionModifiers (Modifiers);
+
+	if (Modifiers & ETypeModifier_PropertyMask)
+		pType = ApplyPropertyModifiers (Modifiers);
+
+	if (Modifiers & ETypeModifier_InterfaceMask)
+		pType = ApplyInterfaceModifiers (Modifiers);
+
+	return pType;
+}
+
+CType* 
+CType::ApplyQualifierModifiers (int Modifiers)
+{
+	CType* pType = this;
+
+	if (Modifiers & ETypeModifier_Const)
+		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Const);
+
+	if (Modifiers & ETypeModifier_Volatile)
+		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Volatile);
+
+	return pType;
+}
+
+CType* 
+CType::ApplyIntegerModifiers (int Modifiers)
+{
+	CType* pType = this;
+
 	if (Modifiers & ETypeModifier_Signed)
 	{
 		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
@@ -661,6 +764,14 @@ CType::GetModifiedType (int Modifiers)
 		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
 	}
 
+	return pType;
+}
+
+CType* 
+CType::ApplyPointerModifiers (int Modifiers)
+{
+	CType* pType = this;
+
 	if (Modifiers & ETypeModifier_Safe)
 	{
 		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe))
@@ -686,7 +797,77 @@ CType::GetModifiedType (int Modifiers)
 
 		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_NoNull);
 	}
-/*
+
+	return pType;
+}
+
+CType* 
+CType::ApplyFunctionModifiers (int Modifiers)
+{
+	CType* pType = this;
+
+	if (Modifiers & ETypeModifier_Cdecl)
+	{
+		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_Cdecl, ETypeModifier_Stdcall))
+			return NULL;
+
+		pType = m_pModule->m_TypeMgr.GetFunctionType (
+			ECallConv_Cdecl, 
+			((CFunctionType*) pType)->GetReturnType (),
+			((CFunctionType*) pType)->GetArgTypeArray (),
+			((CFunctionType*) pType)->GetFlags ()
+			);
+	}
+
+	if (Modifiers & ETypeModifier_Stdcall)
+	{
+		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_Stdcall, ETypeModifier_Cdecl))
+			return NULL;
+
+		pType = m_pModule->m_TypeMgr.GetFunctionType (
+			ECallConv_Stdcall, 
+			((CFunctionType*) pType)->GetReturnType (),
+			((CFunctionType*) pType)->GetArgTypeArray (),
+			((CFunctionType*) pType)->GetFlags ()
+			);
+	}
+
+	if (Modifiers & ETypeModifier_Virtual)
+	{
+		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_Virtual, ETypeModifier_NoVirtual))
+			return NULL;
+	}
+
+	if (Modifiers & ETypeModifier_NoVirtual)
+	{
+		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_NoVirtual, ETypeModifier_Virtual))
+			return NULL;
+	}
+
+	return pType;
+}
+
+CType* 
+CType::ApplyPropertyModifiers (int Modifiers)
+{
+	CType* pType = this;
+
+	if (Modifiers & ETypeModifier_Property)
+	{
+		bool IsReadOnly = pType->IsConstType () || (Modifiers & ETypeModifier_Const) != 0;
+		bool IsBindable = (Modifiers & ETypeModifier_Bindable) != 0;
+
+		pType = m_pModule->m_TypeMgr.CreatePropertyType (pType->GetUnqualifiedType (), IsReadOnly);
+	}
+
+	return pType;
+}
+
+CType* 
+CType::ApplyInterfaceModifiers (int Modifiers)
+{
+	CType* pType = this;
+
 	if (Modifiers & ETypeModifier_Strong)
 	{
 		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Strong, ETypeModifier_Weak))
@@ -700,33 +881,6 @@ CType::GetModifiedType (int Modifiers)
 		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
 			return NULL;
 
-		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
-		CPointerType* pPointerType = (CPointerType*) pType;
-		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
-	}
-
-	if (Modifiers & ETypeModifier_Bindable)
-	{
-		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
-			return NULL;
-
-		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
-		CPointerType* pPointerType = (CPointerType*) pType;
-		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
-	}
-*/
-	if (Modifiers & ETypeModifier_Volatile)
-	{
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Volatile);
-	}
-
-	if (Modifiers & ETypeModifier_Property)
-	{
-		pType = m_pModule->m_TypeMgr.CreatePropertyType (pType, (Modifiers & ETypeModifier_Const) != 0);
-	}
-	else if (Modifiers & ETypeModifier_Const)
-	{
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Const);
 	}
 
 	return pType;

@@ -81,7 +81,6 @@ protected:
 	union
 	{
 		CVariable* m_pVariable;
-		CFunction* m_pFunction;
 		CFunctionOverload* m_pFunctionOverload;
 	};
 
@@ -212,13 +211,6 @@ public:
 	{
 		ASSERT (m_ValueKind == EValue_Variable);
 		return m_pVariable;
-	}
-
-	CFunction*
-	GetFunction () const
-	{
-		ASSERT (m_ValueKind == EValue_Function);
-		return m_pFunction;
 	}
 
 	CFunctionOverload*
@@ -558,12 +550,22 @@ struct TSafePtr
 };
 
 // structure backing up function pointer declared like
-// typedef void FMethod ();
+// typedef void FTest ();
 
 struct TFunctionPtr
 {
 	void* m_pfn;
-	TInterface* m_pInterface; // NULL, interface of object or interface of closure object
+	intptr_t m_CallingConvention;
+	TInterface m_Interface; // NULL, interface of object or interface of closure object
+};
+
+// structure backing up property pointer declared like
+// typedef int property PTest;
+
+struct TPropertyPtr
+{
+	void** m_pVTable;
+	TInterface m_Interface; // NULL, interface of object or interface of closure object
 };
 
 //.............................................................................
@@ -601,6 +603,8 @@ enum ERuntimeError
 	ERuntimeError_LoadOutOfRange,
 	ERuntimeError_StoreOutOfRange,
 	ERuntimeError_NullInterface,
+	ERuntimeError_NullFunction,
+	ERuntimeError_NullProperty,
 };
 
 //.............................................................................

@@ -66,6 +66,10 @@ public:
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+	
+	
+
+	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 	
 
@@ -255,7 +259,7 @@ public:
 			
 			printf ("primary_expr:EToken_Identifier\n");
 		;
-#line 259 "D:/Prj/Ninja/axl3/test/TestParser.h"
+#line 263 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;
@@ -268,7 +272,7 @@ public:
 			
 			printf ("type_name:EToken_Identifier\n");
 		;
-#line 272 "D:/Prj/Ninja/axl3/test/TestParser.h"
+#line 276 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;
@@ -281,7 +285,7 @@ public:
 			
 			return (*GetTokenLocator (0)).m_Data.m_String == "TStruct";
 		;
-#line 285 "D:/Prj/Ninja/axl3/test/TestParser.h"
+#line 289 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;

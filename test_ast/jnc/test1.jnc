@@ -26,6 +26,70 @@ printf (
 
 //.............................................................................
 
+int
+cdecl
+CallConvTestA (
+	int a,
+	int b, 
+	int c
+	);
+
+int
+cdecl
+CallConvTestB (
+	int a,
+	int b, 
+	int c
+	);
+
+int
+stdcall
+CallConvTestC (
+	int a,
+	int b, 
+	int c
+	);
+
+int
+stdcall
+CallConvTestD (
+	int a,
+	int b, 
+	int c
+	);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef 
+int
+FTest (
+	int a,
+	int b, 
+	int c
+	);
+
+typedef 
+int
+cdecl
+FTest_cdecl (
+	int a,
+	int b, 
+	int c
+	);
+
+typedef 
+int
+stdcall
+FTest_stdcall (
+	int a,
+	int b, 
+	int c
+	);
+
+//.............................................................................
+
+/*
+
 struct TPoint
 {
 	int m_x;
@@ -80,6 +144,8 @@ class CTest: IFoo
 	}
 };
 
+*/
+
 int 
 GlobalProp.get ()
 {
@@ -94,16 +160,49 @@ GlobalProp.set (int x)
 	return;
 }
 
+typedef int property PTest;
+
 int property GlobalProp;
 
 int
 main ()
 {
-	int x = GlobalProp;
-	printf ("GlobalProp returned %d\n", x);
-	GlobalProp = 30;
+	printf ("main yo\n");
 
+/*	int x = 1;
+	switch (x)
+	{
+	case 1:
+		printf ("hui\n");
+		break;
 
+	case 2:
+		printf ("govno\n");
+		break;
+
+	case 3:
+		printf ("muravei\n");
+		break;
+	
+	default:
+		printf ("kusty\n");
+		break;
+	} */
+
+	int x = 1;
+	int& rx;
+	rx := x;
+
+//	PTest ppr;
+//	ppr := GlobalProp;
+
+//	int x = GlobalProp;
+//	printf ("GlobalProp returned %d\n", x);
+//	GlobalProp = 30;
+
+//	PTest pprValue;
+
+/*
 	CTest t = stack new CTest;
 
 	t.m_a = 100;
@@ -116,7 +215,7 @@ main ()
 	t.FooProp = -100;
 
 	t.FooTest (10, 20);
-/*	t.BarTest (30, 40); 
+	t.BarTest (30, 40); 
 
 	IFoo f = t;
 	f.m_a = 101;
@@ -131,12 +230,3 @@ main ()
 
 //.............................................................................
 
-/*
-void
-StructTest (
-	TStruct* unsafe p,
-	size_t Size
-	);
-*/
-
-//.............................................................................

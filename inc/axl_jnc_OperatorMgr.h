@@ -96,6 +96,8 @@ protected:
 	CCast_setbf m_Cast_setbf;
 
 	CCast_ptr m_Cast_ptr;
+	CCast_fn m_Cast_fn;
+	CCast_prop m_Cast_prop;
 	CCast_arr m_Cast_arr;
 	CCast_arr_ptr m_Cast_arr_ptr;
 
@@ -212,10 +214,16 @@ public:
 		);
 
 	bool
-	MoveOperator (
+	BinOpMoveOperator (
 		const CValue& SrcValue,
 		const CValue& DstValue,
 		EBinOp OpKind
+		);
+
+	bool
+	RefMoveOperator (
+		const CValue& SrcValue,
+		const CValue& DstValue
 		);
 
 	// misc operators
@@ -414,6 +422,15 @@ protected:
 	MergeBitField (
 		CValue* pValue,
 		const CValue& DstValue
+		);
+
+	bool
+	Call (
+		const CValue& OpValue,
+		CFunctionType* pFunctionType,
+		const CValue* pArgArray,
+		size_t ArgCount,
+		CValue* pResultValue
 		);
 };
 

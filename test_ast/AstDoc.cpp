@@ -222,10 +222,10 @@ CAstDoc::Run ()
 }
 
 void
-StdLib_OnInvalidSafePtr (
-	void* p,
-	jnc::TSafePtrValidator Validator,
-	int Error
+StdLib_OnRuntimeError (
+	int Error,
+	void* pCodeAddr,
+	void* pDataAddr
 	)
 {
 	const tchar_t* pErrorString;
@@ -233,48 +233,27 @@ StdLib_OnInvalidSafePtr (
 	switch (Error)
 	{
 	case jnc::ERuntimeError_LoadOutOfRange:
-		pErrorString = "READ";
+		pErrorString = "READ_OOR";
 		break;
 
 	case jnc::ERuntimeError_StoreOutOfRange:
-		pErrorString = "WRITE";
+		pErrorString = "WRITE_OOR";
 		break;
 
 	case jnc::ERuntimeError_ScopeMismatch:
 		pErrorString = "SCOPE_MISMATCH";
 		break;
 
-	default:
-		ASSERT (false);
-		pErrorString = "<UNDEF>";
-	}
-	
-	throw err::CError (
-		_T("INVALID SAFE POINTER ACCESS (%s) { p = %x; range = %x:%x; scope = %d }"), 
-		pErrorString,
-		p, 
-		Validator.m_pRegionBegin, 
-		Validator.m_pRegionEnd,
-		Validator.m_ScopeLevel
-		);
-}
-
-void
-StdLib_OnInvalidInterface (
-	jnc::TInterface* p,
-	int Error
-	)
-{
-	const tchar_t* pErrorString;
-
-	switch (Error)
-	{
 	case jnc::ERuntimeError_NullInterface:
 		pErrorString = "NULL_INTERFACE";
 		break;
 
-	case jnc::ERuntimeError_ScopeMismatch:
-		pErrorString = "SCOPE_MISMATCH";
+	case jnc::ERuntimeError_NullFunction:
+		pErrorString = "NULL_FUNCTION";
+		break;
+
+	case jnc::ERuntimeError_NullProperty:
+		pErrorString = "NULL_PROPERTY";
 		break;
 
 	default:
@@ -283,9 +262,10 @@ StdLib_OnInvalidInterface (
 	}
 	
 	throw err::CError (
-		_T("INVALID INTERFACE ACCESS (%s) { p = %x }"), 
+		_T("RUNTIME ERROR: %s (code %x accessing data %x)"), 
 		pErrorString,
-		p
+		pCodeAddr,
+		pDataAddr
 		);
 }
 
@@ -397,17 +377,73 @@ StdLib_ReadInteger ()
 	return 10;
 }
 
+int
+__cdecl
+StdLib_CallConvTestA (
+	int a,
+	int b, 
+	int c
+	)
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestA (%d, %d, %d)\n", a, b, c);
+	return 1000;
+}
+
+int
+__cdecl
+StdLib_CallConvTestB (
+	int a,
+	int b, 
+	int c
+	)
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestB (%d, %d, %d)\n", a, b, c);
+	return 2000;
+}
+
+int
+__stdcall
+StdLib_CallConvTestC (
+	int a,
+	int b, 
+	int c
+	)
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestC (%d, %d, %d)\n", a, b, c);
+	return 3000;
+}
+
+int
+__stdcall
+StdLib_CallConvTestD (
+	int a,
+	int b, 
+	int c
+	)
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestD (%d, %d, %d)\n", a, b, c);
+	return 4000;
+}
+
 bool
 CAstDoc::ExportStdLib ()
 {
-	ExportStdLibFunction (jnc::EStdFunc_OnInvalidSafePtr, StdLib_OnInvalidSafePtr);
-	ExportStdLibFunction (jnc::EStdFunc_OnInvalidInterface, StdLib_OnInvalidInterface);
+	ExportStdLibFunction (jnc::EStdFunc_OnRuntimeError, StdLib_OnRuntimeError);
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
 	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
 	ExportStdLibFunction (_T("StructTest"), StdLib_StructTest);
+	ExportStdLibFunction (_T("CallConvTestA"), StdLib_CallConvTestA);
+	ExportStdLibFunction (_T("CallConvTestB"), StdLib_CallConvTestB);
+	ExportStdLibFunction (_T("CallConvTestC"), StdLib_CallConvTestC);
+	ExportStdLibFunction (_T("CallConvTestD"), StdLib_CallConvTestD);
+
 	return true;
 }
 

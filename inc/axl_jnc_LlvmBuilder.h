@@ -7,6 +7,7 @@
 #include "axl_jnc_Value.h"
 #include "axl_jnc_BasicBlock.h"
 #include "axl_jnc_PointerType.h"
+#include "axl_jnc_FunctionType.h"
 #include "axl_jnc_Scope.h"
 
 namespace axl {
@@ -61,6 +62,14 @@ public:
 			pFalseBlock->GetLlvmBlock ()
 			);
 	}
+
+	llvm::SwitchInst*
+	CreateSwitch (
+		const CValue& Value,
+		CBasicBlock* pDefaultBlock,
+		rtl::CHashTableMapIteratorT <intptr_t, CBasicBlock*> FirstCase,
+		size_t CaseCount
+		);
 
 	llvm::ReturnInst*
 	CreateRet ()
@@ -886,6 +895,7 @@ public:
 	llvm::CallInst*
 	CreateCall (
 		const CValue& CalleeValue,
+		ECallConv CallConv,
 		const CValue* pArgArray,
 		size_t ArgCount,
 		CType* pResultType,
@@ -895,20 +905,39 @@ public:
 	llvm::CallInst*
 	CreateCall (
 		const CValue& CalleeValue,
-		const CValue& ArgValue,
-		CType* pResultType,
+		CFunctionType* pFunctionType,
+		const CValue* pArgArray,
+		size_t ArgCount,
 		CValue* pResultValue
 		)
 	{
-		return CreateCall (CalleeValue, &ArgValue, 1, pResultType, pResultValue);
+		return CreateCall (
+			CalleeValue, 
+			pFunctionType->GetCallingConvention (),
+			pArgArray,
+			ArgCount,
+			pFunctionType->GetReturnType (),
+			pResultValue
+			);
+	}
+
+	llvm::CallInst*
+	CreateCall (
+		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
+		const CValue& ArgValue,
+		CValue* pResultValue
+		)
+	{
+		return CreateCall (CalleeValue, pFunctionType, &ArgValue, 1, pResultValue);
 	}
 
 	llvm::CallInst*
 	CreateCall2 (
 		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
 		const CValue& ArgValue1,
 		const CValue& ArgValue2,
-		CType* pResultType,
 		CValue* pResultValue
 		)
 	{
@@ -918,16 +947,16 @@ public:
 			ArgValue2,
 		};
 
-		return CreateCall (CalleeValue, ArgArray, countof (ArgArray), pResultType, pResultValue);
+		return CreateCall (CalleeValue, pFunctionType, ArgArray, countof (ArgArray), pResultValue);
 	}
 
 	llvm::CallInst*
 	CreateCall3 (
 		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
 		const CValue& ArgValue1,
 		const CValue& ArgValue2,
 		const CValue& ArgValue3,
-		CType* pResultType,
 		CValue* pResultValue
 		)
 	{
@@ -938,17 +967,17 @@ public:
 			ArgValue3,
 		};
 
-		return CreateCall (CalleeValue, ArgArray, countof (ArgArray), pResultType, pResultValue);
+		return CreateCall (CalleeValue, pFunctionType, ArgArray, countof (ArgArray), pResultValue);
 	}
 
 	llvm::CallInst*
 	CreateCall4 (
 		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
 		const CValue& ArgValue1,
 		const CValue& ArgValue2,
 		const CValue& ArgValue3,
 		const CValue& ArgValue4,
-		CType* pResultType,
 		CValue* pResultValue
 		)
 	{
@@ -960,7 +989,7 @@ public:
 			ArgValue4,
 		};
 
-		return CreateCall (CalleeValue, ArgArray, countof (ArgArray), pResultType, pResultValue);
+		return CreateCall (CalleeValue, pFunctionType, ArgArray, countof (ArgArray), pResultValue);
 	}
 
 	// safe pointer operations
@@ -1075,6 +1104,14 @@ public:
 		CScope* pDstScope
 		);
 
+	// interface, function & property ptr
+
+	bool
+	CheckNullPtr (
+		const CValue& Value,
+		ERuntimeError Error
+		);
+
 	// interface operations
 
 	llvm::Value*
@@ -1103,9 +1140,6 @@ public:
 	}
 
 	bool
-	CheckInterfaceNull (const CValue& Value);
-
-	bool
 	CheckInterfaceScope (
 		const CValue& Value,
 		CScope* pDstScope
@@ -1123,6 +1157,17 @@ public:
 		const CValue& Value,
 		CClassType* pType,
 		int Flags
+		);
+
+	// function & property pointer operations
+
+	llvm::Value*
+	CreateFunctionPointer (
+		const CValue& PtrValue,
+		ECallConv CallingConvention,
+		const CValue& InterfaceValue,
+		CFunctionPointerType* pResultType,
+		CValue* pResultValue
 		);
 };
 

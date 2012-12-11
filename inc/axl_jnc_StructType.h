@@ -139,10 +139,6 @@ class CStructType: public CNamedType
 {
 protected:
 	friend class CTypeMgr;
-	friend class CUnionType;
-	friend class CClassType;
-	friend class CPointerType;
-	friend class CVTableType;
 
 	size_t m_AlignFactor;
 	size_t m_PackFactor;

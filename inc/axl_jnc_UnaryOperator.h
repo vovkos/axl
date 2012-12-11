@@ -386,7 +386,7 @@ public:
 		OneValue.SetConstInt32 (1);
 		EBinOp BinOpKind = UnOpKind == EUnOp_PreInc ? EBinOp_Add : EBinOp_Sub;
 		
-		bool Result = m_pModule->m_OperatorMgr.MoveOperator (OneValue, OpValue, BinOpKind);
+		bool Result = m_pModule->m_OperatorMgr.BinOpMoveOperator (OneValue, OpValue, BinOpKind);
 		if (!Result)
 			return false;
 
@@ -427,7 +427,7 @@ public:
 		OneValue.SetConstInt32 (1);
 		EBinOp BinOpKind = UnOpKind == EUnOp_PostInc ? EBinOp_Add : EBinOp_Sub;
 		
-		Result = m_pModule->m_OperatorMgr.MoveOperator (OneValue, OpValue, BinOpKind);
+		Result = m_pModule->m_OperatorMgr.BinOpMoveOperator (OneValue, OpValue, BinOpKind);
 		if (!Result)
 			return false;
 

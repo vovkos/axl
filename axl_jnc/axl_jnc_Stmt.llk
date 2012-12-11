@@ -98,13 +98,53 @@ enter
 		}
 	;
 
+class CSwitchStmt
+{
+	CValue m_Value;
+	CBasicBlock* m_pSwitchBlock;
+	CBasicBlock* m_pFollowBlock;
+	CBasicBlock* m_pDefaultBlock;
+	rtl::CHashTableMapT <intptr_t, CBasicBlock*, axl::rtl::CHashIdT <intptr_t> > m_CaseMap;
+}
 switch_stmt
-	: EToken_Switch '(' expression ')' '{' switch_block_stmt* '}'
+	: EToken_Switch '(' expression $e ')' 
+		{
+			bool Result = m_pModule->m_OperatorMgr.CastOperator ($e.m_Value, EType_Int, &$.m_Value);
+			if (!Result)
+				return false;
+
+			$.m_pSwitchBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+			$.m_pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_follow"));
+			$.m_pDefaultBlock = NULL;
+			
+			CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_body"));
+			m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBodyBlock);
+			m_pModule->m_LlvmBuilder.CreateUnreachable ();
+		}
+	  '{' $a
+		{
+			CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope ($a.m_Pos);
+			pScope->m_pBreakBlock = $.m_pFollowBlock;
+		}	   
+	  switch_block_stmt <&$>* 
+	  '}' $a2
+		{
+			m_pModule->m_NamespaceMgr.CloseScope ($a2.m_Pos);
+			m_pModule->m_ControlFlowMgr.Follow ($.m_pFollowBlock);
+
+			return FinalizeSwitchStmt (&$);
+		}
 	;
 
-switch_block_stmt
-	: EToken_Case constant_integer_expr ':'
-	| EToken_Default ':'
+switch_block_stmt <CSwitchStmt* $pSwitchStmt>
+	: EToken_Case constant_integer_expr $e ':' $a
+		{
+			return SwitchCaseLabel ($pSwitchStmt, $e.m_Value, $1.m_Pos, $a.m_Pos);
+		}
+	| EToken_Default ':' $a
+		{
+			return SwitchDefaultLabel ($pSwitchStmt, $1.m_Pos, $a.m_Pos);
+		}
 	| statement
 	;
 
@@ -124,10 +164,14 @@ enter
 }
 	: EToken_While '(' expression $e ')' $a
 		{
+			CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope ($a.m_Pos);
+			pScope->m_pBreakBlock = $pFollowBlock;
+			pScope->m_pContinueBlock = $pConditionBlock;
 			return m_pModule->m_ControlFlowMgr.ConditionalJump ($e.m_Value, $pBodyBlock, $pFollowBlock);
 		}		
-	  loop_stmt <&$a.m_Pos, $pFollowBlock, $pConditionBlock>
+	  statement $s
 		{
+			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pConditionBlock, $pFollowBlock);
 		}		
 	;
@@ -146,7 +190,13 @@ enter
 	$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_follow"));
 	m_pModule->m_ControlFlowMgr.Follow ($pBodyBlock);
 }
-	: EToken_Do $a loop_stmt <&$a.m_Pos, $pFollowBlock, $pConditionBlock>
+	: EToken_Do
+		{
+			CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+			pScope->m_pBreakBlock = $pFollowBlock;
+			pScope->m_pContinueBlock = $pConditionBlock;
+		}
+	  statement $s
 		{
 			m_pModule->m_ControlFlowMgr.Follow ($pConditionBlock);
 		}
@@ -212,15 +262,6 @@ enter
 			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pLoopBlock, $pFollowBlock);
 		}		 
-	;
-
-loop_stmt <const CToken::CPos* $pPos, CBasicBlock* $pBreakBlock, CBasicBlock* $pContinueBlock>
-	: 
-		{			
-		}
-	 
-		{
-		}
 	;
 
 break_stmt

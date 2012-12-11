@@ -204,6 +204,9 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 		}
 	}
 
+	int FunctionModifiers = Modifiers & ETypeModifier_FunctionMask;
+	Modifiers &= ~ETypeModifier_FunctionMask;
+
 	if (Modifiers)
 	{
 		pType = pType->GetModifiedType (Modifiers);
@@ -264,6 +267,13 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 				pType = pModule->m_TypeMgr.GetFunctionType (pType, ArgTypeArray, Count, FunctionTypeFlags);
 			}
 		}
+	}
+
+	if (FunctionModifiers)
+	{
+		pType = pType->GetModifiedType (FunctionModifiers);
+		if (!pType)
+			return NULL;
 	}
 
 	return pType;

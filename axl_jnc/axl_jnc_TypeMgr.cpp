@@ -106,6 +106,10 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateObjectHdrType ();
 		break;
 
+	case EStdType_AbstractInterface:
+		pType = CreateAbstractInterfaceType ();
+		break;
+
 	default:
 		ASSERT (false);
 		return NULL;
@@ -135,6 +139,18 @@ CTypeMgr::CreateObjectHdrType ()
 	pType->m_Tag = _T("objhdr");
 	pType->CreateMember (GetPrimitiveType (EType_Int_p));
 	pType->CreateMember (GetStdType (EStdType_BytePtr));
+	bool Result = pType->CalcLayout ();
+	ASSERT (Result);
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateAbstractInterfaceType ()
+{
+	CStructType* pType = CreateUnnamedStructType ();
+	pType->m_Tag = _T("iface");
+	pType->CreateMember (GetStdType (EStdType_BytePtr));
+	pType->CreateMember (GetPrimitiveType (EType_SizeT));
 	bool Result = pType->CalcLayout ();
 	ASSERT (Result);
 	return pType;
@@ -316,6 +332,56 @@ CTypeMgr::GetPointerType (
 	It->m_Value = pType;
 	pBaseType->m_PointerTypeArray [Index] = pType;
 	
+	return pType;
+}
+
+CFunctionPointerType* 
+CTypeMgr::GetFunctionPointerType (CFunctionType* pFunctionType)
+{
+	pFunctionType = pFunctionType->GetDefCallConvFunctionType (); // strip calling convention
+
+	rtl::CStringA Signature = 'Q';
+	Signature += pFunctionType->GetSignature ();
+
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+	{
+		ASSERT (false);
+		return (CFunctionPointerType*) It->m_Value;
+	}
+
+	CFunctionPointerType* pType = AXL_MEM_NEW (CFunctionPointerType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_pFunctionType = pFunctionType;
+
+	m_FunctionPointerTypeList.InsertTail (pType);
+	It->m_Value = pType;
+	pFunctionType->m_pFunctionPointerType = pType;
+	return pType;
+}
+
+CPropertyPointerType* 
+CTypeMgr::GetPropertyPointerType (CPropertyType* pPropertyType)
+{
+	rtl::CStringA Signature = 'S';
+	Signature += pPropertyType->GetSignature ();
+
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+	{
+		ASSERT (false);
+		return (CPropertyPointerType*) It->m_Value;
+	}
+
+	CPropertyPointerType* pType = AXL_MEM_NEW (CPropertyPointerType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_pPropertyType = pPropertyType;
+
+	m_PropertyPointerTypeList.InsertTail (pType);
+	It->m_Value = pType;
+	pPropertyType->m_pPropertyPointerType = pType;
 	return pType;
 }
 
@@ -550,13 +616,14 @@ CTypeMgr::GetClassType (
 
 CFunctionType* 
 CTypeMgr::GetFunctionType (	
+	ECallConv CallingConvention,
 	CType* pReturnType,
 	const rtl::CArrayT <CType*>& ArgTypeArray,
 	int Flags
 	)
 {
 	rtl::CStringA Signature = CFunctionType::CreateSignature (
-		EType_Function, 
+		CallingConvention, 
 		pReturnType, 
 		ArgTypeArray, 
 		ArgTypeArray.GetCount (), 
@@ -572,7 +639,11 @@ CTypeMgr::GetFunctionType (
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
 	pType->m_ArgTypeArray = ArgTypeArray;
+	pType->m_CallingConvention = CallingConvention;
 	pType->m_Flags = Flags;
+
+	if (!CallingConvention)
+		pType->m_pDefCallConvFunctionType = pType;
 
 	m_FunctionTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -590,13 +661,13 @@ CTypeMgr::CreatePropertyType (
 	pType->m_pModule = m_pModule;
 	m_PropertyTypeList.InsertTail (pType);
 
-	CFunctionType* pGetterType = GetFunctionType (pReturnType, rtl::CArrayT <CType*> (), 0);
+	CFunctionType* pGetterType = GetFunctionType (pReturnType, rtl::CArrayT <CType*> ());
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (EPropertyAccessor_Get, pGetterType);
 	pType->m_pGetter = pGetter;
 
 	if (!IsReadOnly)
 	{
-		CFunctionType* pSetterType = GetFunctionType (GetPrimitiveType (EType_Void), pReturnType, 0);
+		CFunctionType* pSetterType = GetFunctionType (GetPrimitiveType (EType_Void), pReturnType);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (EPropertyAccessor_Set, pSetterType);
 		pType->m_Setter.AddOverload (pSetter);
 	}

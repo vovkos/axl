@@ -23,7 +23,7 @@ protected:
 
 	CFunction* m_pGetter;
 	CFunctionOverload m_Setter;
-	CPropertyPointerType* m_pPointerType;
+	CPropertyPointerType* m_pPropertyPointerType;
 
 	CClassType* m_pParentClassType;
 	size_t m_ParentVTableIndex;
@@ -62,10 +62,7 @@ public:
 	}
 
 	CPropertyPointerType* 
-	GetPointerType ()
-	{
-		return m_pPointerType;
-	}
+	GetPropertyPointerType ();
 
 	rtl::CStringA
 	CreateSignature ();
@@ -87,11 +84,20 @@ class CPropertyPointerType:
 	public rtl::TListLink
 {
 protected:
+	friend class CTypeMgr;
+
 	CPropertyType* m_pPropertyType;
+	CPropertyType* m_pMemberPropertyType; // with additional abstract interface argument
 	CStructType* m_pPointerStructType;
 
 public:
 	CPropertyPointerType ();
+
+	llvm::StructType* 
+	GetLlvmType ()
+	{
+		return GetPointerStructType ()->GetLlvmType ();
+	}
 
 	CPropertyType* 
 	GetPropertyType ()
@@ -99,12 +105,11 @@ public:
 		return m_pPropertyType;
 	}
 
+	CPropertyType* 
+	GetMemberPropertyType ();
+
 	CStructType* 
-	GetPointerStructType ()
-	{
-		ASSERT (m_pPointerStructType);
-		return m_pPointerStructType;
-	}
+	GetPointerStructType ();
 };
 
 //.............................................................................

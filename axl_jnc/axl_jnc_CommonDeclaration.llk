@@ -164,7 +164,7 @@ storage_class_specifier <CDeclSpecifiers* $pDeclSpecifiers>
 		}
 	;
 
-type_modifier <CTypeModifiers* $pTypeModifiers>
+qualifier_modifier <CTypeModifiers* $pTypeModifiers>
 	: EToken_Const
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Const);
@@ -173,7 +173,10 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Volatile);
 		}
-	| EToken_Signed
+	;
+
+integer_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Signed
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Signed);
 		}
@@ -189,7 +192,10 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_BigEndian);
 		}
-	| EToken_Safe
+	;
+
+pointer_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Safe
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Safe);
 		}
@@ -201,10 +207,56 @@ type_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_NoNull);
 		}
-	| EToken_Property
+	;
+
+function_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Cdecl
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Cdecl);
+		}
+	| EToken_Stdcall
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Stdcall);
+		}
+	| EToken_Virtual
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Virtual);
+		}
+	| EToken_NoVirtual
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_NoVirtual);
+		}
+	;
+
+property_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Property
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
 		}
+	| EToken_Bindable
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Bindable);
+		}
+	;
+
+interface_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Strong
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Strong);
+		}
+	| EToken_Weak
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Weak);
+		}
+	;
+
+type_modifier <CTypeModifiers* $pTypeModifiers>
+	: qualifier_modifier <$pTypeModifiers>
+	| integer_modifier <$pTypeModifiers>
+	| pointer_modifier <$pTypeModifiers>
+	| function_modifier <$pTypeModifiers>
+	| property_modifier <$pTypeModifiers>
+	| interface_modifier <$pTypeModifiers>
 	;
 
 type_specifier <CTypeSpecifier* $pTypeSpecifier>
