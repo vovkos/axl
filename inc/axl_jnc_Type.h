@@ -349,6 +349,18 @@ public:
 	}
 
 	bool
+	IsPropertyType ()
+	{
+		return m_TypeKind == EType_Property || m_TypeKind == EType_PropertyPointer;
+	}
+
+	bool
+	IsFunctionType ()
+	{
+		return m_TypeKind == EType_Function || m_TypeKind == EType_FunctionPointer || IsFunctionPointerType ();
+	}
+
+	bool
 	IsFunctionPointerType ();
 
 	bool 

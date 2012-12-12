@@ -311,6 +311,10 @@ COperatorMgr::GetCastOperator (
 		pBaseType = ((CPropertyType*) pOpType)->GetGetter ()->GetType ()->GetReturnType ();
 		return GetCastOperator (pBaseType, pType) ? &m_Cast_getp : NULL;
 
+	case EType_PropertyPointer:
+		pBaseType = ((CPropertyPointerType*) pOpType)->GetPropertyType ()->GetGetter ()->GetType ()->GetReturnType ();
+		return GetCastOperator (pBaseType, pType) ? &m_Cast_getp : NULL;
+
 	case EType_Reference:
 	case EType_Reference_u:
 		pBaseType = ((CPointerType*) pOpType)->GetBaseType ();
@@ -374,8 +378,10 @@ COperatorMgr::CastOperator (
 	CValue* pResultValue
 	)
 {
+	int OpFlags = pType->GetTypeKind () == EType_PropertyPointer ? EOpFlag_KeepProperty : 0;
+
 	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	bool Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
 	if (!Result)
 		return false;
 
@@ -448,7 +454,7 @@ COperatorMgr::MoveOperator (
 
 	case EType_Reference:
 	case EType_Reference_u:
-		return StoreReferenceOperator (OpValue, DstValue);
+		return StoreReferenceOperator (OpValue, DstValue, false);
 
 	default:
 		err::SetFormatStringError (_T("left operand must be l-value"));
@@ -529,12 +535,51 @@ COperatorMgr::RefMoveReferenceOperator (
 bool
 COperatorMgr::RefMovePropertyPointerOperator (
 	const CValue& RawOpValue,
-	const CValue& RawDstValue,
+	const CValue& DstValue,
 	CPropertyPointerType* pPropertyPointerType
 	)
 {
-	err::SetFormatStringError (_T("ref-assign to a property pointer is not implemented yet"));
-	return false;
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_LoadReference | EOpFlag_KeepProperty);
+	if (!Result)
+		return false;
+
+	CType* pOpType = OpValue.GetType ();
+	EType OpTypeKind = pOpType->GetTypeKind ();
+	switch (OpTypeKind)
+	{
+	case EType_Property:
+		if (pPropertyPointerType->GetPropertyType ()->CmpAccessorTypes ((CPropertyType*) pOpType) != 0)
+		{
+			SetCastError (pOpType, pPropertyPointerType); 
+			return false;
+		}
+
+		Result = m_pModule->m_LlvmBuilder.CreatePropertyPointer (
+			OpValue,
+			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
+			pPropertyPointerType, 
+			&OpValue
+			);
+		
+		if (!Result)
+			return false;
+
+		return StoreReferenceOperator (OpValue, DstValue, true);
+
+	case EType_PropertyPointer:
+		if (pPropertyPointerType->Cmp (pOpType) != 0)
+		{
+			SetCastError (pOpType, pPropertyPointerType); 
+			return false;
+		}
+		
+		return StoreReferenceOperator (OpValue, DstValue, true);
+
+	default:
+		SetCastError (pOpType, pPropertyPointerType); 
+		return false;
+	}
 }
 
 bool
@@ -1398,7 +1443,13 @@ COperatorMgr::PrepareOperandType (
 			break;
 
 		case EType_Property:
-			pType = ((CPropertyType*) pType)->GetGetter ()->GetType ()->GetReturnType ();
+			if (!(Flags & EOpFlag_KeepProperty))
+				pType = ((CPropertyType*) pType)->GetGetter ()->GetType ()->GetReturnType ();
+			break;
+
+		case EType_PropertyPointer:
+			if (!(Flags & EOpFlag_KeepProperty))
+				pType = ((CPropertyPointerType*) pType)->GetPropertyType ()->GetGetter ()->GetType ()->GetReturnType ();
 			break;
 
 		case EType_Enum:
@@ -1463,9 +1514,13 @@ COperatorMgr::PrepareOperand (
 			break;
 
 		case EType_Property:
-			Result = GetPropertyOperator (Value, &Value);
-			if (!Result)
-				return false;
+		case EType_PropertyPointer:
+			if (!(Flags & EOpFlag_KeepProperty))
+			{
+				Result = GetPropertyOperator (Value, &Value);
+				if (!Result)
+					return false;
+			}
 
 			break;
 
@@ -1590,7 +1645,8 @@ COperatorMgr::LoadReferenceOperator (CValue* pValue)
 bool
 COperatorMgr::StoreReferenceOperator (
 	const CValue& RawSrcValue,
-	const CValue& RawDstValue
+	const CValue& RawDstValue,
+	bool KeepProperty
 	)
 {
 	bool Result;
@@ -1611,13 +1667,20 @@ COperatorMgr::StoreReferenceOperator (
 		pTargetType = pDstType->GetBaseType ();
 	}
 
+	if (!KeepProperty && pTargetType->GetTypeKind () == EType_PropertyPointer)
+	{
+		return 
+			LoadReferenceOperator (&DstValue) &&
+			SetPropertyOperator (RawSrcValue, DstValue);
+	} 
+
 	bool IsVolatile = false;
 	if (pTargetType->GetTypeKind () == EType_Qualifier)
 	{
 		IsVolatile = (pTargetType->GetFlags () & ETypeQualifier_Volatile) != 0;
 		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
 	}
-	
+
 	CValue SrcValue;
 	Result = CastOperator (RawSrcValue, pTargetType, &SrcValue);
 	if (!Result)
@@ -1646,6 +1709,20 @@ COperatorMgr::StoreReferenceOperator (
 	case EType_Class:
 	case EType_Interface:
 		Result = m_pModule->m_LlvmBuilder.CheckInterfaceScope (SrcValue, DstValue.GetScope ());
+		if (!Result)
+			return false;
+
+		break;
+
+	case EType_FunctionPointer:
+		Result = m_pModule->m_LlvmBuilder.CheckFunctionPointerScope (SrcValue, DstValue.GetScope ());
+		if (!Result)
+			return false;
+
+		break;
+
+	case EType_PropertyPointer:
+		Result = m_pModule->m_LlvmBuilder.CheckPropertyPointerScope (SrcValue, DstValue.GetScope ());
 		if (!Result)
 			return false;
 
@@ -1756,11 +1833,26 @@ COperatorMgr::MergeBitField (
 
 bool
 COperatorMgr::GetPropertyOperator (
-	const CValue& OpValue,
-	CPropertyType* pPropertyType,
+	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
+	CPropertyType* pPropertyType;
+	CValue OpValue;
+
+	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
+	{
+		CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) RawOpValue.GetType ();
+		pPropertyType = pPropertyPointerType->GetPropertyType ();
+		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 0, pPropertyType, &OpValue);
+	}
+	else
+	{
+		ASSERT (RawOpValue.GetType ()->GetTypeKind () == EType_Property);
+		pPropertyType = (CPropertyType*) OpValue.GetType ();
+		OpValue = RawOpValue;
+	}
+	
 	CFunction* pFunction = pPropertyType->GetGetter ();
 	ASSERT (pFunction->GetVTableType () == pPropertyType);
 
@@ -1772,6 +1864,8 @@ COperatorMgr::GetPropertyOperator (
 	}
 	else
 	{
+		rtl::CString s = GetLlvmTypeString (OpValue.GetLlvmValue ()->getType ());
+
 		// pfn*
 
 		CValue PtrValue;
@@ -1779,7 +1873,7 @@ COperatorMgr::GetPropertyOperator (
 
 		// pfn
 
-		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType (), &FunctionValue);
+		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType ()->GetPointerType (EType_Pointer_u), &FunctionValue);
 	}
 
 	FunctionValue.SetClosure (OpValue.GetClosure ());
@@ -1789,10 +1883,25 @@ COperatorMgr::GetPropertyOperator (
 bool
 COperatorMgr::SetPropertyOperator (
 	const CValue& SrcValue,
-	const CValue& DstValue,
-	CPropertyType* pPropertyType
+	const CValue& RawDstValue
 	)
 {
+	CPropertyType* pPropertyType;
+	CValue DstValue;
+
+	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
+	{
+		CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) RawDstValue.GetType ();
+		pPropertyType = pPropertyPointerType->GetPropertyType ();
+		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 0, pPropertyType, &DstValue);
+	}
+	else
+	{
+		ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_Property);
+		pPropertyType = (CPropertyType*) DstValue.GetType ();
+		DstValue = RawDstValue;
+	}
+
 	if (pPropertyType->IsReadOnly ())
 	{
 		err::SetFormatStringError (_T("cannot assign to a read-only property"));
@@ -1814,6 +1923,8 @@ COperatorMgr::SetPropertyOperator (
 		return false;
 	}
 
+	ASSERT (pFunction->GetVTableType () == pPropertyType);
+
 	CValue FunctionValue;
 	if (DstValue.GetValueKind () == EValue_Property)
 	{
@@ -1828,7 +1939,7 @@ COperatorMgr::SetPropertyOperator (
 
 		// pfn
 
-		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType (), &FunctionValue);
+		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType ()->GetPointerType (EType_Pointer_u), &FunctionValue);
 	}
 
 	FunctionValue.SetClosure (DstValue.GetClosure ());

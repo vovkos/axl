@@ -55,7 +55,8 @@ public:
 	ConditionalJump (
 		const CValue& Value,
 		CBasicBlock* pThenBlock,
-		CBasicBlock* pElseBlock
+		CBasicBlock* pElseBlock,
+		CBasicBlock* pFollowBlock = NULL // if NULL then follow with pThenBlock
 		);
 
 	void

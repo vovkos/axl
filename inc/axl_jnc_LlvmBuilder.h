@@ -8,6 +8,7 @@
 #include "axl_jnc_BasicBlock.h"
 #include "axl_jnc_PointerType.h"
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Scope.h"
 
 namespace axl {
@@ -1161,13 +1162,33 @@ public:
 
 	// function & property pointer operations
 
-	llvm::Value*
+	bool
 	CreateFunctionPointer (
 		const CValue& PtrValue,
 		ECallConv CallingConvention,
 		const CValue& InterfaceValue,
 		CFunctionPointerType* pResultType,
 		CValue* pResultValue
+		);
+
+	bool
+	CheckFunctionPointerScope (
+		const CValue& Value,
+		CScope* pDstScope
+		);
+
+	bool
+	CreatePropertyPointer (
+		const CValue& PtrValue,
+		const CValue& InterfaceValue,
+		CPropertyPointerType* pResultType,
+		CValue* pResultValue
+		);
+
+	bool
+	CheckPropertyPointerScope (
+		const CValue& Value,
+		CScope* pDstScope
 		);
 };
 

@@ -293,28 +293,21 @@ public:
 	bool
 	StoreReferenceOperator (
 		const CValue& SrcValue,
-		const CValue& DstValue
+		const CValue& DstValue,
+		bool KeepProperty
 		);
 
 	bool
 	GetPropertyOperator (
 		const CValue& OpValue,
 		CValue* pResultValue
-		)
-	{
-		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Property);
-		return GetPropertyOperator (OpValue, (CPropertyType*) OpValue.GetType (), pResultValue);
-	}
+		);
 
 	bool
 	SetPropertyOperator (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		)
-	{
-		ASSERT (DstValue.GetType ()->GetTypeKind () == EType_Property);
-		return SetPropertyOperator (SrcValue, DstValue, (CPropertyType*) DstValue.GetType ());
-	}
+		);
 
 protected:
 	ICastOperator*
@@ -402,20 +395,6 @@ protected:
 		CClassPropertyMember* pMember,
 		CClassBaseTypeCoord* pCoord,
 		CValue* pResultValue
-		);
-
-	bool
-	GetPropertyOperator (
-		const CValue& OpValue,
-		CPropertyType* pPropertyType,
-		CValue* pResultValue
-		);
-
-	bool
-	SetPropertyOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue,
-		CPropertyType* pPropertyType
 		);
 
 	bool

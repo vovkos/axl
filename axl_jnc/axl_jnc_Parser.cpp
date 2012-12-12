@@ -56,7 +56,8 @@ CParser::Declare (
 	CDeclSpecifiers* pDeclSpecifiers,
 	CDeclarator* pDeclarator,
 	CClassType* pClassType,
-	size_t BitCount
+	size_t BitCount,
+	bool HasInitializer
 	)
 {
 	bool Result;
@@ -98,6 +99,9 @@ CParser::Declare (
 		else if (pType->GetTypeKind () == EType_Property)
 		{
 			CPropertyType* pPropertyType = (CPropertyType*) pType;
+			pPropertyType->m_Name = Name;
+			pPropertyType->m_pParentNamespace = pNamespace;
+			pPropertyType->m_Tag = pPropertyType->GetQualifiedName ();
 			pType = pPropertyType->GetPropertyPointerType ();
 		}
 
@@ -118,7 +122,6 @@ CParser::Declare (
 	{
 		CFunctionType* pFunctionType = (CFunctionType*) pType;
 		CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (
-			pNamespace,
 			*pDeclarator->GetName (),
 			pFunctionType, 
 			pDeclarator->GetArgList ()
@@ -194,6 +197,9 @@ CParser::Declare (
 		{
 			pPropertyType->m_Name = Name;
 			pNamespace->AddItem (pPropertyType);
+			pPropertyType->m_Tag = pPropertyType->GetQualifiedName ();
+			pPropertyType->TagAccessors ();
+
 			pNewItem = pPropertyType;
 		}
 	}
@@ -211,7 +217,7 @@ CParser::Declare (
 		}
 		else
 		{
-			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType);
+			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType, HasInitializer);
 			pNamespace->AddItem (pVariable);
 			pNewItem = pVariable;
 		}
@@ -223,6 +229,63 @@ CParser::Declare (
 	m_pModule->m_AttributeMgr.AssignAttributeSet (pNewItem);
 	pNewItem->m_Pos = pDeclarator->m_Pos;
 	return pNewItem;
+}
+
+
+CFunction*
+CParser::DeclarePropertyAccessor (
+	CPropertyType* pPropertyType,
+	CTypeSpecifierModifiers* pTypeSpecifier,
+	CDeclarator* pDeclarator
+	)
+{
+	bool Result; 
+
+	CType* pType = pDeclarator->GetType (pTypeSpecifier);
+	if (!pType)
+		return NULL;
+
+	if (pType->GetTypeKind () != EType_Function)
+	{
+		err::SetFormatStringError (_T("illegal property accessor type '%s'"), pType->GetTypeString ());
+		return NULL;
+	}
+
+	CFunctionType* pFunctionType = (CFunctionType*) pType;
+	EPropertyAccessor PropertyAccessorKind = pDeclarator->GetPropertyAccessorKind ();
+	
+	CFunction* pAccessor = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (
+		PropertyAccessorKind, 
+		pFunctionType, 
+		pDeclarator->GetArgList ()
+		);
+
+	switch (PropertyAccessorKind)
+	{
+	case EPropertyAccessor_Get:
+		if (pPropertyType->m_pGetter)
+		{
+			err::SetFormatStringError (_T("multiple property getters specified"));
+			return NULL;		
+		}
+
+		pPropertyType->m_pGetter = pAccessor;
+		break;
+
+	case EPropertyAccessor_Set:
+		Result = pPropertyType->m_Setter.AddOverload (pAccessor);
+		if (!Result)
+			return NULL;
+
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
+	pAccessor->m_Pos = pDeclarator->m_Pos;
+	return pAccessor;
 }
 
 CEnumType*
@@ -462,62 +525,6 @@ CParser::DeclareFormalArg (
 	pArgSuffix->m_ArgList.InsertTail (pArg);
 
 	return pArg;
-}
-
-CFunction*
-CParser::DeclarePropertyAccessor (
-	CPropertyType* pPropertyType,
-	CTypeSpecifierModifiers* pTypeSpecifier,
-	CDeclarator* pDeclarator
-	)
-{
-	bool Result; 
-
-	CType* pType = pDeclarator->GetType (pTypeSpecifier);
-	if (!pType)
-		return NULL;
-
-	if (pType->GetTypeKind () != EType_Function)
-	{
-		err::SetFormatStringError (_T("illegal property accessor type '%s'"), pType->GetTypeString ());
-		return NULL;
-	}
-
-	CFunctionType* pFunctionType = (CFunctionType*) pType;
-	EPropertyAccessor PropertyAccessorKind = pDeclarator->GetPropertyAccessorKind ();
-	
-	CFunction* pAccessor = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (
-		PropertyAccessorKind, 
-		pFunctionType, 
-		pDeclarator->GetArgList ()
-		);
-
-	switch (PropertyAccessorKind)
-	{
-	case EPropertyAccessor_Get:
-		if (pPropertyType->m_pGetter)
-		{
-			err::SetFormatStringError (_T("multiple property getters specified"));
-			return NULL;		
-		}
-
-		pPropertyType->m_pGetter = pAccessor;
-		break;
-
-	case EPropertyAccessor_Set:
-		Result = pPropertyType->m_Setter.AddOverload (pAccessor);
-		if (!Result)
-			return NULL;
-
-		break;
-
-	default:
-		ASSERT (false);
-	}
-
-	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
-	pAccessor->m_Pos = pDeclarator->m_Pos;
-	return pAccessor;
 }
 
 bool

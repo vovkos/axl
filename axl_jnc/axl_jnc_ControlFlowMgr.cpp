@@ -97,7 +97,8 @@ bool
 CControlFlowMgr::ConditionalJump (
 	const CValue& Value,
 	CBasicBlock* pThenBlock,
-	CBasicBlock* pElseBlock
+	CBasicBlock* pElseBlock,
+	CBasicBlock* pFollowBlock
 	)
 {
 	CValue BoolValue;
@@ -112,7 +113,11 @@ CControlFlowMgr::ConditionalJump (
 	pElseBlock->m_Flags |= EBasicBlockFlag_IsJumped;
 
 	m_pModule->m_LlvmBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
-	SetCurrentBlock (pThenBlock);
+
+	if (!pFollowBlock)
+		pFollowBlock = pThenBlock;
+
+	SetCurrentBlock (pFollowBlock);
 	return true;
 }
 
@@ -191,9 +196,7 @@ CControlFlowMgr::Return (const CValue& Value)
 	m_pCurrentBlock->m_Flags |= EBasicBlockFlag_IsHasReturnReady;
 	m_pCurrentBlock->m_HasReturn = EHasReturn_Explicit;
 
-	CBasicBlock* pFollowBlock = CreateBlock (_T("ret_follow"));
-	SetCurrentBlock (pFollowBlock);
-	MarkUnreachable (pFollowBlock);
+	// TODO: create a special unreachable block to dump the rest of code
 	return true;
 }
 

@@ -38,6 +38,7 @@ enum EOpFlag
 {
 	EOpFlag_IntegerOnly    = 0x01,
 	EOpFlag_LoadReference  = 0x02,
+	EOpFlag_KeepProperty   = 0x04,
 	EOpFlag_EnumToInt      = 0x10,
 	EOpFlag_BitFieldToInt  = 0x20,
 	EOpFlag_BoolToInt      = 0x40,

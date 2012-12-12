@@ -145,10 +145,8 @@ CValue::GetLlvmValue () const
 	if (m_pLlvmValue)
 		return m_pLlvmValue;
 
-	if (m_ValueKind != EValue_Const)
-		return NULL;
+	ASSERT (m_ValueKind == EValue_Const);
 
-	ASSERT (m_pType);
 	m_pLlvmValue = GetLlvmConst (m_pType, GetConstData ());
 	return m_pLlvmValue;
 }

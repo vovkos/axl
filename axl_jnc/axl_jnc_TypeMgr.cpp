@@ -659,6 +659,7 @@ CTypeMgr::CreatePropertyType (
 {
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
+	pType->m_Signature.Format ("R%d", m_UnnamedTypeCounter++);
 	m_PropertyTypeList.InsertTail (pType);
 
 	CFunctionType* pGetterType = GetFunctionType (pReturnType, rtl::CArrayT <CType*> ());
@@ -672,7 +673,6 @@ CTypeMgr::CreatePropertyType (
 		pType->m_Setter.AddOverload (pSetter);
 	}
 
-	pType->CreateSignature ();
 	return pType;
 }
 
@@ -681,7 +681,6 @@ CTypeMgr::CreatePropertyType ()
 {
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
-	pType->m_TypeKind = EType_Property;
 	pType->m_Signature.Format ("R%d", m_UnnamedTypeCounter++);
 	m_PropertyTypeList.InsertTail (pType);
 	return pType;

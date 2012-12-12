@@ -19,21 +19,24 @@ CPropertyType::CPropertyType ()
 }
 
 rtl::CStringA
-CPropertyType::CreateSignature ()
+CPropertyType::GetAccessorSignature ()
 {
-	rtl::CStringA String = "R{";
+	if (!m_AccessorSignature.IsEmpty ())
+		return m_AccessorSignature;
+
+	m_AccessorSignature = "{";
 	
-	String.Append (m_pGetter->GetType ()->GetSignature ());
+	m_AccessorSignature.Append (m_pGetter->GetType ()->GetSignature ());
 	
 	size_t Count = m_Setter.GetOverloadCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunction* pSetter = m_Setter.GetFunction (i);
-		String.Append(pSetter->GetType ()->GetSignature ());
+		m_AccessorSignature.Append(pSetter->GetType ()->GetSignature ());
 	}
 
-	String.Append ("}");
-	return String;
+	m_AccessorSignature.Append ("}");
+	return m_AccessorSignature;
 }
 
 rtl::CString
@@ -43,8 +46,9 @@ CPropertyType::CreateTypeString ()
 
 	rtl::CString String;
 	String.Format (
-		m_Setter.IsEmpty () ? _T("%s const property") : _T("%s property"), 
-		m_pGetter->GetType ()->GetReturnType ()->GetTypeString ()
+		m_Setter.IsEmpty () ? _T("%s const property %s") : _T("%s property %s"), 
+		m_pGetter->GetType ()->GetReturnType ()->GetTypeString (),
+		GetQualifiedName ()
 		);
 
 	return String;

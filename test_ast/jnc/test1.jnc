@@ -88,15 +88,11 @@ FTest_stdcall (
 
 //.............................................................................
 
-/*
-
 struct TPoint
 {
 	int m_x;
 	int m_y;
 };
-
-int* g_p;
 
 interface IFoo
 {
@@ -111,7 +107,6 @@ interface IFoo
 		int y
 		);
 };
-
 
 class CTest: IFoo
 {
@@ -140,45 +135,49 @@ class CTest: IFoo
 	{
 		printf ("CTest.FooProp::set (%d)\n", x);
 		m_a = x;
-		return;
-	}
+	} 
 };
 
-*/
+/*
+
+int property GlobalPropA;
 
 int 
-GlobalProp.get ()
+GlobalPropA.get ()
 {
-	printf ("GlobalProp::get ()\n");
-	return 20;
+	printf ("GlobalPropA.get ()\n");
+	return 1;
 }
 
 void
-GlobalProp.set (int x)
+GlobalPropA.set (int x)
 {
-	printf ("GlobalProp::set (%d)\n", x);
-	return;
+	printf ("GlobalPropA.set (%d)\n", x);
 }
+
+property
+{
+	int 
+	get ()
+	{
+		printf ("GlobalPropC.get ()\n");
+		return 3;
+	}
+
+	void
+	set (int x)
+	{
+		printf ("GlobalPropC.set (%d)\n", x);
+	}
+} GlobalPropB;
 
 typedef int property PTest;
-
-int property GlobalProp;
-
-
-int 
-foo (int x)
-{
-	return x < 5 ? 100 : 200;
-}
-
+*/
 
 int
 main ()
 {
-	int x = 2;
-	int y = foo (x);
-	printf ("x = %d, y = %d\n", x, y);
-
+	int x = 5;
 
 /*	int x = 1;
 	switch (x)
@@ -200,15 +199,20 @@ main ()
 		break;
 	} */
 
+/*
+	PTest ppr;
 
-//	PTest ppr;
-//	ppr := GlobalProp;
+	ppr := GlobalPropA;
+	x = ppr;
+	printf ("ppr returned %d\n", x);
+	ppr = 10;
 
-//	x = GlobalProp;
-//	printf ("GlobalProp returned %d\n", x);
-//	GlobalProp = 30;
+	ppr := GlobalPropB;
+	x = ppr;
+	printf ("ppr returned %d\n", x);
+	ppr = 20;
 
-//	PTest pprValue;
+*/
 
 /*
 	CTest t = stack new CTest;

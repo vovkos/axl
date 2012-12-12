@@ -28,6 +28,8 @@ protected:
 	CClassType* m_pParentClassType;
 	size_t m_ParentVTableIndex;
 
+	rtl::CString m_AccessorSignature;
+
 public:
 	CPropertyType ();
 
@@ -61,11 +63,17 @@ public:
 		return m_ParentVTableIndex;
 	}
 
+	rtl::CStringA
+	GetAccessorSignature ();
+
+	int 
+	CmpAccessorTypes (CPropertyType* pPropertyType)
+	{
+		return GetAccessorSignature ().Cmp (pPropertyType->GetAccessorSignature ());
+	}
+
 	CPropertyPointerType* 
 	GetPropertyPointerType ();
-
-	rtl::CStringA
-	CreateSignature ();
 
 	rtl::CString
 	CreateTypeString ();

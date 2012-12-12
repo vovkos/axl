@@ -203,6 +203,12 @@ public:
 	CreateArgString ();
 
 	bool
+	IsDefined ()
+	{
+		return HasBody () || m_pExternFunction && m_pExternFunction->IsDefined ();
+	}
+
+	bool
 	HasBody ()
 	{
 		return !m_Body.IsEmpty ();

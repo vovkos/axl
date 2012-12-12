@@ -30,6 +30,14 @@ enum EStdFunc
 
 	EStdFunc_CheckNullPtr,
 
+	// void 
+	// jnc.CheckScopeLevel (
+	//		size_t SrcScopeLevel,
+	//		size_t DstScopeLevel
+	//		);
+
+	EStdFunc_CheckScopeLevel,
+
 	// jnc.sptrv
 	// jnc.CreateSafePtrValidator (
 	//		int8* pRegionBegin,
@@ -48,24 +56,6 @@ enum EStdFunc
 	//		);
 
 	EStdFunc_CheckSafePtrRange,
-
-	// void 
-	// jnc.CheckSafePtrScope (
-	//		int8* p,
-	//		jnc.sptrv Validator,
-	//		size_t DstScopeLevel
-	//		);
-
-	EStdFunc_CheckSafePtrScope,
-
-	// void 
-	// jnc.CheckInterfaceScope (
-	//		int8* p,
-	//		size_t ScopeLevel,
-	//		size_t DstScopeLevel
-	//		);
-
-	EStdFunc_CheckInterfaceScope,
 
 	// int8*
 	// jnc.DynamicCastInterface (
@@ -133,7 +123,6 @@ public:
 
 	CFunction*
 	CreateFunction (
-		CNamespace* pNamespace,
 		const CQualifiedName& Name,
 		CFunctionType* pType,
 		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
@@ -183,16 +172,13 @@ protected:
 	CreateCheckNullPtr ();
 
 	CFunction*
+	CreateCheckScopeLevel ();
+
+	CFunction*
 	CreateCreateSafePtrValidator ();
 
 	CFunction*
 	CreateCheckSafePtrRange ();
-
-	CFunction*
-	CreateCheckSafePtrScope ();
-
-	CFunction*
-	CreateCheckInterfaceScope ();
 
 	CFunction*
 	CreateDynamicCastInterface ();

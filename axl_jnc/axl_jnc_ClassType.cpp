@@ -280,6 +280,7 @@ CClassType::CreatePropertyMember (
 	pType->m_pParentClassType = this;
 	pType->m_pParentNamespace = this;
 	pType->m_Name = Name;
+	pType->m_Tag = pType->GetQualifiedName ();
 	pType->TagAccessors ();
 
 	AddMethodFunction (pType->GetGetter ());

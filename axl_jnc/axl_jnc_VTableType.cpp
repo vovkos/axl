@@ -33,7 +33,7 @@ CVTableType::GetVTablePtrValue (CValue* pValue)
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunction* pFunction = m_VTable [i];
-		if (!pFunction->HasBody ())
+		if (!pFunction->IsDefined ())
 		{
 			err::SetFormatStringError (
 				_T("cannot instantiate abstract '%s': '%s' has no body"), 

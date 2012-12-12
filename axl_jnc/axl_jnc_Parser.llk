@@ -91,7 +91,8 @@ Members2
 		CDeclSpecifiers* pDeclSpecifiers,
 		CDeclarator* pDeclarator,
 		CClassType* pClassType = NULL,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		bool HasInitializer = false
 		);
 
 	CEnumType*

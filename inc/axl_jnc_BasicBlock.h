@@ -58,6 +58,13 @@ public:
 		return m_Flags;
 	}
 
+	bool
+	IsTerminal ()
+	{
+		llvm::TerminatorInst* pInst = m_pLlvmBlock->getTerminator ();
+		return pInst && pInst->getOpcode () == llvm::Instruction::Ret;
+	}
+
 	rtl::CString 
 	GetName ()
 	{

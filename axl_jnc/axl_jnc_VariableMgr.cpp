@@ -24,7 +24,8 @@ CVariable*
 CVariableMgr::CreateVariable (
 	EVariable VariableKind,
 	const rtl::CString& Name,
-	CType* pType
+	CType* pType,
+	bool HasInitializer
 	)
 {
 	CVariable* pVariable = AXL_MEM_NEW (CVariable);
@@ -39,7 +40,9 @@ CVariableMgr::CreateVariable (
 		ASSERT (VariableKind == EVariable_Local || VariableKind == EVariable_Arg);
 		CValue PtrValue;
 		m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
+
+		if (!HasInitializer)
+			m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
 
 		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
 		m_LocalVariableList.InsertTail (pVariable);
@@ -56,11 +59,12 @@ CVariableMgr::CreateVariable (
 CVariable*
 CVariableMgr::CreateVariable (
 	const rtl::CString& Name,
-	CType* pType
+	CType* pType,
+	bool HasInitializer
 	)
 {
 	EVariable VariableKind = m_pModule->m_FunctionMgr.GetCurrentFunction () ? EVariable_Local : EVariable_Global;
-	return CreateVariable (VariableKind, Name, pType);
+	return CreateVariable (VariableKind, Name, pType, HasInitializer);
 }
 
 bool
