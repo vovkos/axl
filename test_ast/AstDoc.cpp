@@ -149,18 +149,23 @@ CAstDoc::Compile ()
 		return false;
 	}
 
+	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
+	pMainFrame->m_ModulePane.Build (&m_Module);
+
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
 	Result = m_Module.m_FunctionMgr.CompileFunctions ();
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
 		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
-		return false;
 	}
 
-	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
-	pMainFrame->m_ModulePane.Build (&m_Module);
+	// show compiled IM nevetheless
+
 	pMainFrame->m_LlvmIrPane.Build (&m_Module);
+
+	if (!Result)
+		return false;
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting functions...\n"));
 

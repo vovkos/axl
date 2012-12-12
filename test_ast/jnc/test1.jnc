@@ -63,43 +63,37 @@ CallConvTestD (
 typedef 
 int
 FTest (
-	int a,
-	int b, 
-	int c
+	int,
+	int, 
+	int
 	);
 
 typedef 
 int
 cdecl
 FTest_cdecl (
-	int a,
-	int b, 
-	int c
+	int,
+	int, 
+	int
 	);
 
 typedef 
 int
 stdcall
 FTest_stdcall (
-	int a,
-	int b, 
-	int c
+	int,
+	int, 
+	int
 	);
 
 //.............................................................................
-
-struct TPoint
-{
-	int m_x;
-	int m_y;
-};
 
 interface IFoo
 {
 	int m_a;
 	int m_b;
 
-	int property FooProp;
+//	int property FooProp;
 
 	int
 	FooTest (
@@ -122,7 +116,7 @@ class CTest: IFoo
 		printf ("CTest { %d; %d; %d; %d; }.FooTest (%d, %d);\n", m_a, m_b, m_c, m_d, x, y);
 		return 0;
 	}
-
+/*
 	int 
 	FooProp.get ()
 	{
@@ -135,7 +129,7 @@ class CTest: IFoo
 	{
 		printf ("CTest.FooProp::set (%d)\n", x);
 		m_a = x;
-	} 
+	} */
 };
 
 /*
@@ -173,6 +167,8 @@ property
 
 typedef int property PTest;
 */
+
+typedef int FFooTest (int, int);
 
 int
 main ()
@@ -214,13 +210,16 @@ main ()
 
 */
 
-/*
 	CTest t = stack new CTest;
-
 	t.m_a = 100;
 	t.m_b = 200;
 	t.m_c = 300;
 	t.m_d = 400;
+
+	t.FooTest (17, 31);
+	
+
+/*
 
 	x = t.FooProp;
 	printf ("t.FooProp returned %d\n", x);

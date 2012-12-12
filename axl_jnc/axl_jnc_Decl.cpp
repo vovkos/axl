@@ -179,7 +179,7 @@ CDeclarator::GetArgList ()
 }
 
 CType*
-CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
+CDeclarator::GetType_s (CTypeSpecifierModifiers* pTypeSpecifier)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
@@ -203,16 +203,25 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 			return NULL;
 		}
 	}
-
-	int FunctionModifiers = Modifiers & ETypeModifier_FunctionMask;
+	
 	Modifiers &= ~ETypeModifier_FunctionMask;
-
 	if (Modifiers)
 	{
 		pType = pType->GetModifiedType (Modifiers);
 		if (!pType)
 			return NULL;
 	}
+
+	return pType;
+}
+
+CType*
+CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	CType* pType = GetType_s (pTypeSpecifier);
 
 	rtl::CIteratorT <CDeclPointer> Pointer = m_PointerList.GetHead ();
 	for (; Pointer; Pointer++)
@@ -269,6 +278,7 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 		}
 	}
 
+	int FunctionModifiers = pTypeSpecifier->GetTypeModifiers () & ETypeModifier_FunctionMask;
 	if (FunctionModifiers)
 	{
 		pType = pType->GetModifiedType (FunctionModifiers);

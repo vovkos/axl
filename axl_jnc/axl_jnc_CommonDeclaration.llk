@@ -500,9 +500,14 @@ function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
 
 function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 	: type_specifier_modifier_list $s
-	  declarator $d ('=' expression_pass1 $v)?
+	  (declarator $d ('=' expression_pass1 $v)?)?
 		{
-			return DeclareFormalArg ($pFunctionSuffix, &$s.m_TypeSpecifier, &$d.m_Declarator, CValue ()) != NULL;
+			return DeclareFormalArg (
+				$pFunctionSuffix, 
+				&$s.m_TypeSpecifier, 
+				IsValidLocator ($d) ? &$d.m_Declarator : NULL, 
+				CValue ()
+				) != NULL;
 		}
 	| (EToken_Safe | EToken_Unsafe $u)? EToken_Ellipsis
 		{

@@ -321,6 +321,10 @@ public:
 	CDeclFunctionSuffix*
 	AddFormalArgSuffix ();
 
+	static
+	CType*
+	GetType_s (CTypeSpecifierModifiers* pTypeSpecifier);
+
 	CType*
 	GetType (CTypeSpecifierModifiers* pTypeSpecifier);
 

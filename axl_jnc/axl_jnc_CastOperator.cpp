@@ -1049,8 +1049,7 @@ CCast_class::LlvmCast (
 
 	CValue CmpValue;
 	m_pModule->m_LlvmBuilder.CreateEq_i (PtrValue, SrcNullValue, &CmpValue);
-	m_pModule->m_LlvmBuilder.CreateCondBr (CmpValue, pPhiBlock, pNoNullBlock);
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pNoNullBlock);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pPhiBlock, pNoNullBlock, pNoNullBlock);
 	
 	Coord.m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
 	m_pModule->m_LlvmBuilder.CreateGep (
@@ -1061,8 +1060,7 @@ CCast_class::LlvmCast (
 		&PtrValue
 		);		
 
-	m_pModule->m_LlvmBuilder.CreateBr (pPhiBlock);
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPhiBlock);
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
 
 	CValue PhiValue;
 	m_pModule->m_LlvmBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, &PhiValue);

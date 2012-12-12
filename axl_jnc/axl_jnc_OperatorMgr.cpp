@@ -1036,7 +1036,7 @@ COperatorMgr::ClassMethodMemberOperator (
 		&PtrValue
 		);
 
-	pResultValue->SetLlvmValue (PtrValue.GetLlvmValue (), pFunction->GetType ());
+	pResultValue->SetLlvmValue (PtrValue.GetLlvmValue (), pFunction->GetType ()->GetPointerType (EType_Pointer_u));
 
 	CClosure* pClosure = pResultValue->CreateClosure ();
 	pClosure->CreateArg (0, OpValue);

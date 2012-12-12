@@ -508,18 +508,30 @@ CParser::DeclareFormalArg (
 	const CValue& DefaultValue
 	)
 {
-	CType* pType = pDeclarator->GetType (pTypeSpecifier);
-	if (!pType)
-		return NULL;
+	CType* pType;
+	rtl::CString Name;
 
-	if (!pDeclarator->IsSimple ())
+	if (!pDeclarator)
 	{
-		err::SetFormatStringError (_T("qualified declarator for formal argument"));
-		return NULL;
+		pType = CDeclarator::GetType_s (pTypeSpecifier);
+	}
+	else
+	{
+		if (!pDeclarator->IsSimple ())
+		{
+			err::SetFormatStringError (_T("qualified declarator for formal argument"));
+			return NULL;
+		}
+
+		pType = pDeclarator->GetType (pTypeSpecifier);
+		if (!pType)
+			return NULL;
+
+		Name = pDeclarator->GetName ()->GetShortName ();
 	}
 
 	CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
-	pArg->m_Name = pDeclarator->GetName ()->GetShortName ();
+	pArg->m_Name = Name;
 	pArg->m_pType = pType;
 	pArg->m_DefaultValue = DefaultValue;
 	pArgSuffix->m_ArgList.InsertTail (pArg);
