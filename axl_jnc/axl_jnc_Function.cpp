@@ -36,7 +36,6 @@ CFunction::CFunction ()
 	m_pClassType = NULL;
 	m_pVTableType = NULL;
 	m_VTableIndex = -1;
-	m_VTableIndexDelta = 0;
 	m_pAnchorNamespace = NULL;
 	m_pNamespace = NULL;
 	m_pBlock = NULL;

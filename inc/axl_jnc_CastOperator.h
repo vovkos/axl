@@ -1127,14 +1127,6 @@ public:
 		CType* pType,
 		CValue* pResultValue
 		);
-
-protected:
-	bool
-	LlvmCast_ptr (
-		const CValue& Value,
-		CFunctionPointerType* pPointerType,
-		CValue* pResultValue
-		);
 };
 
 //.............................................................................

@@ -68,6 +68,18 @@ public:
 		m_ArgList.Clear ();
 	}
 
+	size_t
+	GetArgCount ()
+	{
+		return m_ArgList.GetCount ();
+	}
+
+	rtl::CIteratorT <CClosureArg>
+	GetFirstArg ()
+	{
+		return m_ArgList.GetHead ();
+	}
+
 	CClosureArg*
 	CreateArg (
 		size_t ArgIdx,

@@ -88,12 +88,14 @@ FTest_stdcall (
 
 //.............................................................................
 
+/*
+
 interface IFoo
 {
 	int m_a;
 	int m_b;
 
-//	int property FooProp;
+	int property FooProp;
 
 	int
 	FooTest (
@@ -116,7 +118,7 @@ class CTest: IFoo
 		printf ("CTest { %d; %d; %d; %d; }.FooTest (%d, %d);\n", m_a, m_b, m_c, m_d, x, y);
 		return 0;
 	}
-/*
+
 	int 
 	FooProp.get ()
 	{
@@ -129,8 +131,10 @@ class CTest: IFoo
 	{
 		printf ("CTest.FooProp::set (%d)\n", x);
 		m_a = x;
-	} */
+	}
 };
+
+*/
 
 /*
 
@@ -168,7 +172,77 @@ property
 typedef int property PTest;
 */
 
-typedef int FFooTest (int, int);
+typedef void FFooTest (int, int);
+
+interface IFoo
+{
+	int m_a;
+	
+	void 
+	FooTest (
+		int x,
+		int y
+		)
+	{
+		printf ("IFoo {%d}.FooTest (%d, %d)\n", m_a, x, y);
+	}
+};
+
+interface IBar
+{
+	int m_b;
+	
+	void 
+	BarTest (
+		int x,
+		int y
+		)
+	{
+		printf ("IBar {%d}.BarTest (%d, %d)\n", m_b, x, y);
+	}
+};
+
+class CTest: IFoo, IBar
+{
+	int m_c;
+
+	void 
+	FooTest (
+		int x,
+		int y
+		)
+	{
+		printf ("CTest {%d, %d, %d}.FooTest (%d, %d)\n", m_a, m_b, m_c, x, y);
+	}
+
+	void 
+	BarTest (
+		int x,
+		int y
+		)
+	{
+		printf ("CTest {%d, %d, %d}.BarTest (%d, %d)\n", m_a, m_b, m_c, x, y);
+	}
+};
+
+void
+foo (
+	int x,
+	int y
+	)
+{
+	printf ("foo (%d, %d)\n", x, y);
+}
+
+void
+stdcall
+bar (
+	int x,
+	int y
+	)
+{
+	printf ("bar (%d, %d)\n", x, y);
+}
 
 int
 main ()
@@ -210,14 +284,48 @@ main ()
 
 */
 
+	FFooTest pfn;
+
 	CTest t = stack new CTest;
 	t.m_a = 100;
 	t.m_b = 200;
-	t.m_c = 300;
-	t.m_d = 400;
+	t.m_c = 300;	
 
-	t.FooTest (17, 31);
-	
+	IFoo f = t;
+	IBar b = t;
+
+	printf ("direct calls to class\n");
+
+	t.FooTest (1, 2);
+	t.BarTest (3, 4); 
+
+	printf ("direct calls through interfaces\n");
+
+	f.FooTest (5, 6);
+	b.BarTest (7, 8); 
+
+	printf ("calls through pointers to class functions\n");
+
+	pfn = t.FooTest;
+	pfn (9, 10);
+
+	pfn = t.BarTest;
+	pfn (11, 12);
+
+	printf ("calls through pointers to interface functions\n");
+
+	pfn = f.FooTest;
+	pfn (13, 14);
+	pfn = b.BarTest;
+	pfn (15, 16);
+
+	printf ("calls through pointers to global functions\n");
+
+	pfn = foo;
+	pfn (17, 18);
+
+	pfn = bar;
+	pfn (19, 20);
 
 /*
 

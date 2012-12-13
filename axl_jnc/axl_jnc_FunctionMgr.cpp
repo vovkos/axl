@@ -845,12 +845,6 @@ CFunctionMgr::InitializeInterface (
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
 	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &PtrValue);
-
-	rtl::CString s0 = GetLlvmTypeString (IfacePtrValue.GetLlvmValue ()->getType ());
-	rtl::CString s1 = GetLlvmTypeString (IfaceHdrPtrValue.GetLlvmValue ()->getType ());
-	rtl::CString s2 = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
-	rtl::CString s3 = GetLlvmTypeString (VTablePtrValue.GetLlvmValue ()->getType ());
-
 	m_pModule->m_LlvmBuilder.CreateStore (VTablePtrValue, PtrValue);
 	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 1, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ObjectPtrValue, PtrValue);

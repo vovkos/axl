@@ -115,8 +115,7 @@ main := |*
 'heap'         { CreateToken (EToken_Heap); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
-'dynasizeof'   { CreateToken (EToken_DynaSizeOf); };
-'dynatypeof'   { CreateToken (EToken_DynaTypeOf); };
+'closure'      { CreateToken (EToken_Closure); };
 
 'if'           { CreateToken (EToken_If); };
 'else'         { CreateToken (EToken_Else); };

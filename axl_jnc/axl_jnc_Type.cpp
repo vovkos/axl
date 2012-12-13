@@ -487,7 +487,7 @@ CType::GetPointerType (EType TypeKind)
 }
 
 bool
-CType::IsFunctionPointerType ()
+CType::IsUnsafeFunctionPointerType ()
 {
 	return 
 		(m_TypeKind == EType_Pointer_u &&

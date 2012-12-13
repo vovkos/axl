@@ -23,13 +23,18 @@ CTypeMgr::Clear ()
 {
 	m_QualifierTypeList.Clear ();
 	m_PointerTypeList.Clear ();
-	m_ArrayTypeList.Clear ();
 	m_BitFieldTypeList.Clear ();
-	m_FunctionTypeList.Clear ();
 	m_EnumTypeList.Clear ();
+	m_ArrayTypeList.Clear ();
 	m_StructTypeList.Clear ();
+	m_UnionTypeList.Clear ();
 	m_ClassTypeList.Clear ();
+	m_FunctionTypeList.Clear ();
+	m_FunctionPointerTypeList.Clear ();
 	m_PropertyTypeList.Clear ();
+	m_PropertyPointerTypeList.Clear ();
+	m_ImportTypeList.Clear ();
+
 	m_TypeMap.Clear ();
 
 	SetupAllPrimitiveTypes ();

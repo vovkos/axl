@@ -88,7 +88,8 @@ public:
 	CreatePhi (
 		const CValue* pValueArray,
 		CBasicBlock** pBlockArray,
-		size_t Count
+		size_t Count,
+		CValue* pResultValue
 		);
 
 	llvm::PHINode*

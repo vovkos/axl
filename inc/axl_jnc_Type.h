@@ -357,11 +357,11 @@ public:
 	bool
 	IsFunctionType ()
 	{
-		return m_TypeKind == EType_Function || m_TypeKind == EType_FunctionPointer || IsFunctionPointerType ();
+		return m_TypeKind == EType_Function || m_TypeKind == EType_FunctionPointer || IsUnsafeFunctionPointerType ();
 	}
 
 	bool
-	IsFunctionPointerType ();
+	IsUnsafeFunctionPointerType ();
 
 	bool 
 	IsAutoSizeArrayType ();

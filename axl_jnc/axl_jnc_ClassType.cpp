@@ -456,11 +456,8 @@ CClassType::LayoutFunction (CFunction* pFunction)
 	pFunction->m_pType = pOverridenFunction->m_pType;
 	pFunction->m_pVTableType = pOverridenFunction->m_pVTableType;
 	pFunction->m_VTableIndex = pOverridenFunction->m_VTableIndex;
-	pFunction->m_VTableIndexDelta = BaseTypeCoord.m_VTableIndex;
 
 	size_t VTableIndex = BaseTypeCoord.m_VTableIndex + pOverridenFunction->m_VTableIndex;
-	size_t VTableCount = m_VTable.GetCount ();
-
 	ASSERT (VTableIndex < m_VTable.GetCount ());
 	m_VTable [VTableIndex] = pFunction;
 	return true;

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_CastOperator.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Closure.h"
 
 namespace axl {
 namespace jnc {
@@ -762,8 +763,8 @@ AssertFunctionPointerCastTypeValid (
 
 	ASSERT (
 		SrcTypeKind == EType_FunctionPointer && DstTypeKind == EType_FunctionPointer ||
-		pSrcType->IsFunctionPointerType () && pDstType->IsFunctionPointerType () ||
-		pSrcType->IsFunctionPointerType () && DstTypeKind == EType_FunctionPointer
+		pSrcType->IsUnsafeFunctionPointerType () && pDstType->IsUnsafeFunctionPointerType () ||
+		pSrcType->IsUnsafeFunctionPointerType () && DstTypeKind == EType_FunctionPointer
 		);
 }
 
@@ -793,37 +794,106 @@ CCast_fn::ConstCast (
 
 bool
 CCast_fn::LlvmCast (
-	const CValue& Value,
+	const CValue& RawValue,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
+	CValue Value = RawValue;
+
 	CType* pOpType = Value.GetType ();
 	AssertFunctionPointerCastTypeValid (pOpType, pType);
 
-	if (!pOpType->IsFunctionPointerType () || pType->GetTypeKind () != EType_FunctionPointer)
+	if (!pOpType->IsUnsafeFunctionPointerType () || pType->GetTypeKind () != EType_FunctionPointer)
 	{
 		SetCastError (Value.GetType (), pType);
 		return false;
 	}
 
-	CFunctionType* pFunctionType = (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType ();
 	CFunctionPointerType* pFunctionPointerType = (CFunctionPointerType*) pType;
-
-	if (pFunctionPointerType->GetFunctionType ()->Cmp (pFunctionType->GetDefCallConvFunctionType ()) != 0)
+	CFunctionType* pSrcFunctionType = (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType ();
+	CFunctionType* pDstFunctionType = pFunctionPointerType->GetFunctionType ();
+	
+	CClosure* pClosure = Value.GetClosure ();
+	if (!pClosure)
 	{
-		SetCastError (Value.GetType (), pType);
+		if (pDstFunctionType->Cmp (pSrcFunctionType->GetDefCallConvFunctionType ()) != 0)
+		{
+			SetCastError (pOpType, pType);
+			return false;
+		}
+	
+		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
+			Value,
+			pSrcFunctionType->GetCallingConvention (),
+			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
+			pFunctionPointerType, 
+			pResultValue
+			);
+
+		return true;	
+	}
+
+	rtl::CArrayT <CType*> ArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
+	rtl::CIteratorT <CClosureArg> ClosureArg = pClosure->GetFirstArg ();
+	CValue ClosureArgValue = ClosureArg->GetValue ();
+
+	if (Value.GetValueKind () != EValue_Function ||
+		Value.GetFunction ()->GetFunctionKind () != EFunction_Method ||
+		ClosureArg->GetArgIdx () != 0 || 
+		!ClosureArgValue.GetType ()->IsClassType () ||
+		ArgTypeArray.IsEmpty () ||
+		!ArgTypeArray [0]->IsClassType ())
+	{
+		err::SetFormatStringError (_T("complex closures are not supported yet"));
 		return false;
+	}
+
+	CFunction* pFunction = Value.GetFunction ();
+	if (pFunction->GetFunctionKind () == EFunction_Method)
+	{
+		bool Result = m_pModule->m_OperatorMgr.GetMethodFunction (pFunction, pClosure, &Value);
+		if (!Result)
+			return false;
+	}
+
+	CClassType* pClosureClassType = (CClassType*) ClosureArgValue.GetType ();
+	CClassType* pMethodClassType = (CClassType*) ArgTypeArray [0];
+
+	CValue PtrValue;
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 1, NULL, &ScopeLevelValue);
+
+	CClassBaseTypeCoord Coord;
+	pClosureClassType->FindBaseType (pMethodClassType, &Coord);
+	rtl::CArrayT <size_t> LlvmIndexArray = Coord.m_FieldCoord.m_LlvmIndexArray;
+
+	if (!LlvmIndexArray.IsEmpty ())
+	{
+		LlvmIndexArray.Insert (0, 0);
+	
+		m_pModule->m_LlvmBuilder.CreateGep (
+			PtrValue, 
+			LlvmIndexArray, 
+			LlvmIndexArray.GetCount (),
+			NULL, 
+			&PtrValue
+			);
 	}
 	
-	m_pModule->m_LlvmBuilder.CreateFunctionPointer (
-		Value,
-		pFunctionType->GetCallingConvention (),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
-		pFunctionPointerType, 
-		pResultValue
-		);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+	
+	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, NULL, &InterfaceValue);
 
+	CValue CallConvValue (pSrcFunctionType->GetCallingConvention (), EType_Int_p);
+	CValue FunctionPointerValue = pType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pDstFunctionType->GetPointerType (EType_Pointer_u), &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPointerValue, PtrValue, 0, NULL, &FunctionPointerValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPointerValue, CallConvValue, 1, NULL, &FunctionPointerValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPointerValue, InterfaceValue, 2, pType, pResultValue);
 	return true;
 }
 

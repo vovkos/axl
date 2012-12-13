@@ -102,7 +102,6 @@ protected:
 	CClassType* m_pClassType;
 	CVTableType* m_pVTableType;
 	size_t m_VTableIndex;
-	size_t m_VTableIndexDelta; // delta between vtable type and class type
 
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
@@ -179,12 +178,6 @@ public:
 	GetVTableIndex ()
 	{
 		return m_VTableIndex;
-	}
-
-	size_t
-	GetVTableIndexDelta ()
-	{
-		return m_VTableIndexDelta;
 	}
 
 	size_t 

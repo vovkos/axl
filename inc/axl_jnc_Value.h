@@ -81,6 +81,7 @@ protected:
 	union
 	{
 		CVariable* m_pVariable;
+		CFunction* m_pFunction;
 		CFunctionOverload* m_pFunctionOverload;
 	};
 
@@ -211,6 +212,13 @@ public:
 	{
 		ASSERT (m_ValueKind == EValue_Variable);
 		return m_pVariable;
+	}
+
+	CFunction* 
+	GetFunction () const
+	{
+		ASSERT (m_ValueKind == EValue_Function);
+		return m_pFunction;
 	}
 
 	CFunctionOverload*

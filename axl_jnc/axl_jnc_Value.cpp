@@ -314,21 +314,22 @@ CValue::SetFunction (CFunction* pFunction)
 {
 	m_ValueKind = EValue_Function;
 	m_pType = pFunction->GetType ()->GetPointerType (EType_Pointer_u);
+	m_pFunction = pFunction;
 	m_pLlvmValue = pFunction->GetLlvmFunction ();
 }
 
 void
 CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
 {
-	m_ValueKind = EValue_FunctionOverload;
-	m_pFunctionOverload = pFunctionOverload;
-
 	if (pFunctionOverload->GetOverloadCount () == 1)
 	{
-		CFunction* pFunction = pFunctionOverload->GetFunction ();
-		m_pType = pFunction->GetType ()->GetPointerType (EType_Pointer_u);
-		m_pLlvmValue = pFunction->GetLlvmFunction ();
+		SetFunction (pFunctionOverload->GetFunction ());
 	}
+	else
+	{
+		m_ValueKind = EValue_FunctionOverload;
+		m_pFunctionOverload = pFunctionOverload;
+	} 
 }
 
 void

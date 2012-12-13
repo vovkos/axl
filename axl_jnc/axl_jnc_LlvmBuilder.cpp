@@ -47,14 +47,22 @@ llvm::PHINode*
 CLlvmBuilder::CreatePhi (
 	const CValue* pValueArray,
 	CBasicBlock** pBlockArray,
-	size_t Count
+	size_t Count,
+	CValue* pResultValue
 	)
 {
+	if (pValueArray->IsEmpty ())
+	{
+		pResultValue->SetVoid ();
+		return NULL;
+	}
+
 	llvm::PHINode* pPhiNode = m_LlvmBuilder.CreatePHI (pValueArray->GetType ()->GetLlvmType (), Count, "phi");
 
 	for (size_t i = 0; i < Count; i++)
 		pPhiNode->addIncoming (pValueArray [i].GetLlvmValue (), pBlockArray [i]->GetLlvmBlock ());
 
+	pResultValue->SetLlvmValue (pPhiNode, pValueArray->GetType ());
 	return pPhiNode;
 }
 
@@ -67,6 +75,12 @@ CLlvmBuilder::CreatePhi (
 	CValue* pResultValue
 	)
 {
+	if (Value1.IsEmpty ())
+	{
+		pResultValue->SetVoid ();
+		return NULL;
+	}
+
 	llvm::PHINode* pPhiNode = m_LlvmBuilder.CreatePHI (Value1.GetLlvmValue ()->getType (), 2,  "phi");
 	pPhiNode->addIncoming (Value1.GetLlvmValue (), pBlock1->GetLlvmBlock ());
 	pPhiNode->addIncoming (Value2.GetLlvmValue (), pBlock2->GetLlvmBlock ());
@@ -150,8 +164,6 @@ CLlvmBuilder::CreateCall (
 		LlvmArgArray [i] = pArgArray [i].GetLlvmValue ();
 
 	llvm::CallInst* pInst;
-
-	rtl::CString s = GetLlvmTypeString (CalleeValue.GetLlvmValue ()->getType ());
 
 	if (pResultType && pResultType->GetTypeKind () != EType_Void)
 	{
@@ -457,9 +469,9 @@ CLlvmBuilder::CheckFunctionPointerScope (
 	CValue DstScopeLevelValue (DstScopeLevel, EType_SizeT);
 	CValue SrcScopeLevelValue;
 
-	size_t ScopeLevelIndexArray [2] = { 1, 1 };
+	size_t ScopeLevelIndexArray [2] = { 2, 1 };
 	CreateExtractValue (Value, ScopeLevelIndexArray, 2, NULL, &SrcScopeLevelValue);
-
+	
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
 	
 	m_pModule->m_LlvmBuilder.CreateCall2 (

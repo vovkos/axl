@@ -309,6 +309,13 @@ public:
 		const CValue& DstValue
 		);
 
+	bool
+	GetMethodFunction (
+		CFunction* pFunction,
+		CClosure* pClosure,
+		CValue* pResultValue
+		);
+
 protected:
 	ICastOperator*
 	GetCastOperator (
@@ -380,24 +387,6 @@ protected:
 		);
 
 	bool
-	ClassMethodMemberOperator (
-		const CValue& OpValue,
-		CClassType* pClassType,
-		CClassMethodMember* pMember,
-		CClassBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
-	ClassPropertyMemberOperator (
-		const CValue& OpValue,
-		CClassType* pClassType,
-		CClassPropertyMember* pMember,
-		CClassBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
 	MergeBitField (
 		const CValue& SrcValue,
 		const CValue& DstValue,
@@ -411,11 +400,10 @@ protected:
 		);
 
 	bool
-	Call (
+	CallImpl (
 		const CValue& OpValue,
 		CFunctionType* pFunctionType,
-		const CValue* pArgArray,
-		size_t ArgCount,
+		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
 		);
 };
