@@ -233,7 +233,6 @@ main ()
 	ppr = 20;
 */
 
-/*
 	CTest t = stack new CTest;
 	t.m_a = 100;
 	t.m_b = 200;
@@ -253,7 +252,7 @@ main ()
 	ppr = 1;
 	x = ppr;
 	printf ("ppr returned %d\n", x);
-*/	
+
 
 /*
 	printf ("calls through pointers to class property\n");

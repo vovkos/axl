@@ -276,18 +276,6 @@ public:
 	llvm::Type* 
 	GetLlvmType ();
 
-	llvm::UndefValue*
-	GetLlvmUndefValue ()
-	{
-		return llvm::UndefValue::get (GetLlvmType ());
-	}
-
-	llvm::Constant*
-	GetLlvmZeroValue ()
-	{
-		return llvm::Constant::getNullValue (GetLlvmType ());
-	}
-
 	CValue 
 	GetUndefValue ();
 

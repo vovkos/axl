@@ -157,13 +157,20 @@ CControlFlowMgr::Return (const CValue& Value)
 
 	CFunctionType* pFunctionType = pFunction->GetType ();
 	CType* pReturnType = pFunctionType->GetReturnType ();
-
+	
 	if (Value.GetValueKind () == EValue_Void)
 	{
 		if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
 		{
 			err::SetFormatStringError (_T("function '%s' must return a '%s' value"), pFunction->GetTag (), pReturnType->GetTypeString ());
 			return false;
+		}
+		
+		if (pFunction->GetScopeLevelVariable ())
+		{
+			CValue ScopeLevelValue;
+			m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
+			m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 		}
 
 		m_pModule->m_LlvmBuilder.CreateRet ();
@@ -188,6 +195,13 @@ CControlFlowMgr::Return (const CValue& Value)
 					(CPointerType*) pReturnType,
 					&ReturnValue
 					);
+		}
+
+		if (pFunction->GetScopeLevelVariable ())
+		{
+			CValue ScopeLevelValue;
+			m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
+			m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 		}
 
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);

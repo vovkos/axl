@@ -149,14 +149,14 @@ CType::CType ()
 CValue 
 CType::GetUndefValue ()
 {
-	llvm::Value* pLlvmValue = GetLlvmUndefValue ();
+	llvm::Value* pLlvmValue = llvm::UndefValue::get (GetLlvmType ());
 	return CValue (pLlvmValue, this);
 }
 
 CValue 
 CType::GetZeroValue ()
 {
-	llvm::Value* pLlvmValue = GetLlvmZeroValue ();
+	llvm::Value* pLlvmValue = llvm::Constant::getNullValue (GetLlvmType ());
 	return CValue (pLlvmValue, this);
 }
 

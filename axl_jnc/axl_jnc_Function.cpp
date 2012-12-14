@@ -40,6 +40,7 @@ CFunction::CFunction ()
 	m_pNamespace = NULL;
 	m_pBlock = NULL;
 	m_pScope = NULL;
+	m_pScopeLevelVariable = NULL;
 	m_pExternFunction = NULL;
 	m_pLlvmFunction = NULL;
 	m_pfn = NULL;

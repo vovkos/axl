@@ -20,6 +20,8 @@ protected:
 	rtl::CStdListT <CVariable> m_GlobalVariableList;
 	rtl::CStdListT <CVariable> m_LocalVariableList;
 
+	CVariable* m_pScopeLevelVariable;
+
 public:
 	CVariableMgr ();
 
@@ -49,6 +51,9 @@ public:
 
 	bool
 	AllocateGlobalVariables ();
+
+	CVariable*
+	GetScopeLevelVariable ();
 };
 
 //.............................................................................

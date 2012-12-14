@@ -18,7 +18,6 @@ enum EVariable
 {
 	EVariable_Global,
 	EVariable_Local,
-	EVariable_Arg,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

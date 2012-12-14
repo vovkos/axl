@@ -300,11 +300,22 @@ CFunctionMgr::CompileFunctions ()
 				);
 
 			CValue ArgValue (pLlvmArg, pArg->GetType ());
-			CValue ArgVariableValue (pArgVariable);
 
-			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, ArgVariableValue);
+			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
 			pScope->AddItem (pArgVariable);
 		}
+
+		// store scope level
+
+		pFunction->m_pScopeLevelVariable = m_pModule->m_VariableMgr.CreateVariable (
+			_T("ScopeLevel"), 
+			m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
+			true
+			);
+
+		CValue ScopeLevelValue;
+		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &ScopeLevelValue);
+		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pFunction->m_pScopeLevelVariable);
 
 		// parse body
 

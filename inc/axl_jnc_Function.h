@@ -109,6 +109,7 @@ protected:
 	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > m_Ast;
 	CBasicBlock* m_pBlock;
 	CScope* m_pScope;
+	CVariable* m_pScopeLevelVariable;
 
 	CFunction* m_pExternFunction;
 	llvm::Function* m_pLlvmFunction;
@@ -241,6 +242,12 @@ public:
 	GetBlock ()
 	{
 		return m_pBlock;
+	}
+
+	CVariable* 
+	GetScopeLevelVariable ()
+	{
+		return m_pScopeLevelVariable;
 	}
 
 	CFunction*

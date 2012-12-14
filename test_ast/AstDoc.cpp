@@ -83,6 +83,7 @@ CAstDoc::Compile ()
 	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
 	std::string ErrorString;
 	EngineBuilder.setErrorStr (&ErrorString);
+    EngineBuilder.setUseMCJIT(true);
 
 	m_pLlvmExecutionEngine = EngineBuilder.create ();
 	if (!m_pLlvmExecutionEngine)
