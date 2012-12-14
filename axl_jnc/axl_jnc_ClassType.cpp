@@ -277,6 +277,7 @@ CClassType::CreatePropertyMember (
 	if (!Result)
 		return NULL;
 
+	pType->m_PropertyKind = EProperty_Member;
 	pType->m_pParentClassType = this;
 	pType->m_pParentNamespace = this;
 	pType->m_Name = Name;
@@ -427,7 +428,7 @@ CClassType::LayoutFunction (CFunction* pFunction)
 			CPropertyType* pPropertyType = pPropertyMember->GetType ();
 
 			pOverridenFunction = pFunction->m_PropertyAccessorKind == EPropertyAccessor_Set ? 
-				pPropertyType->GetSetter ()->FindOverload (pShortType, true) : 
+				pPropertyType->GetSetter ()->FindShortOverload (pShortType) : 
 				pPropertyType->GetGetter ()->GetShortType ()->Cmp (pShortType) == 0 ? pPropertyType->GetGetter () : 
 				NULL;
 		}
@@ -443,7 +444,7 @@ CClassType::LayoutFunction (CFunction* pFunction)
 		if (pMember && pMember->GetMemberKind () == EClassMember_Method)
 		{
 			CClassMethodMember* pMethodMember = (CClassMethodMember*) pMember;
-			pOverridenFunction = pMethodMember->FindOverload (pFunction->GetShortType (), true);
+			pOverridenFunction = pMethodMember->FindShortOverload (pFunction->GetShortType ());
 		}
 
 		if (!pOverridenFunction)

@@ -99,9 +99,11 @@ CParser::Declare (
 		else if (pType->GetTypeKind () == EType_Property)
 		{
 			CPropertyType* pPropertyType = (CPropertyType*) pType;
+			pPropertyType->m_PropertyKind = EProperty_Pointer;
 			pPropertyType->m_Name = Name;
 			pPropertyType->m_pParentNamespace = pNamespace;
 			pPropertyType->m_Tag = pPropertyType->GetQualifiedName ();
+			pPropertyType->TagAccessors ();
 			pType = pPropertyType->GetPropertyPointerType ();
 		}
 
@@ -195,6 +197,7 @@ CParser::Declare (
 		}
 		else
 		{
+			pPropertyType->m_PropertyKind = EProperty_Global;
 			pPropertyType->m_Name = Name;
 			pNamespace->AddItem (pPropertyType);
 			pPropertyType->m_Tag = pPropertyType->GetQualifiedName ();

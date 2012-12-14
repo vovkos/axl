@@ -11,6 +11,7 @@ CPropertyType::CPropertyType ()
 {
 	m_ItemKind = EModuleItem_Property; // not just type 
 	m_TypeKind = EType_Property;
+	m_PropertyKind = EProperty_Undefined;
 	m_pGetter = NULL;
 	m_pPropertyPointerType = NULL;
 	m_pVTableStructType = NULL;	
@@ -37,6 +38,33 @@ CPropertyType::GetAccessorSignature ()
 
 	m_AccessorSignature.Append ("}");
 	return m_AccessorSignature;
+}
+
+rtl::CStringA
+CPropertyType::GetShortAccessorSignature ()
+{
+	if (!m_ShortAccessorSignature.IsEmpty ())
+		return m_ShortAccessorSignature;
+
+	if (m_PropertyKind != EProperty_Member)
+	{
+		m_ShortAccessorSignature = GetAccessorSignature ();
+		return m_ShortAccessorSignature;
+	}
+
+	m_ShortAccessorSignature = "{";
+
+	m_ShortAccessorSignature.Append (m_pGetter->GetShortType ()->GetSignature ());
+	
+	size_t Count = m_Setter.GetOverloadCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pSetter = m_Setter.GetFunction (i);
+		m_ShortAccessorSignature.Append(pSetter->GetShortType ()->GetSignature ());
+	}
+
+	m_ShortAccessorSignature.Append ("}");
+	return m_ShortAccessorSignature;
 }
 
 rtl::CString

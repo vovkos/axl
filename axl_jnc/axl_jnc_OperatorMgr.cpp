@@ -308,15 +308,24 @@ COperatorMgr::GetCastOperator (
 	switch (OpTypeKind)
 	{
 	case EType_Property:
+		if (TypeKind == EType_PropertyPointer)
+			return &m_Cast_prop;
+
 		pBaseType = ((CPropertyType*) pOpType)->GetGetter ()->GetType ()->GetReturnType ();
 		return GetCastOperator (pBaseType, pType) ? &m_Cast_getp : NULL;
 
 	case EType_PropertyPointer:
+		if (TypeKind == EType_PropertyPointer)
+			return &m_Cast_prop;
+
 		pBaseType = ((CPropertyPointerType*) pOpType)->GetPropertyType ()->GetGetter ()->GetType ()->GetReturnType ();
 		return GetCastOperator (pBaseType, pType) ? &m_Cast_getp : NULL;
 
 	case EType_Reference:
 	case EType_Reference_u:
+		if (TypeKind == EType_PropertyPointer)
+			return &m_Cast_prop;
+
 		pBaseType = ((CPointerType*) pOpType)->GetBaseType ();
 		return 
 			pBaseType->GetTypeKind () == EType_Array ? GetCastOperator (pBaseType, pType) : 
@@ -328,7 +337,7 @@ COperatorMgr::GetCastOperator (
 	case EType_Pointer_u:
 		return 
 			pOpType->IsUnsafeFunctionPointerType () ? 
-			TypeKind == EType_FunctionPointer || pType->IsUnsafeFunctionPointerType () ? (ICastOperator*) &m_Cast_fn : NULL :
+			TypeKind == EType_FunctionPointer ? (ICastOperator*) &m_Cast_fn : NULL :
 			TypeKind == EType_Pointer_u ? (ICastOperator*) &m_Cast_ptr : NULL;
 
 	case EType_FunctionPointer:
@@ -378,7 +387,7 @@ COperatorMgr::CastOperator (
 	CValue* pResultValue
 	)
 {
-	int OpFlags = pType->GetTypeKind () == EType_PropertyPointer ? EOpFlag_KeepProperty : 0;
+	int OpFlags = pType->IsPropertyType () ? EOpFlag_KeepProperty : 0;
 
 	CValue OpValue;
 	bool Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
@@ -540,46 +549,9 @@ COperatorMgr::RefMovePropertyPointerOperator (
 	)
 {
 	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_LoadReference | EOpFlag_KeepProperty);
-	if (!Result)
-		return false;
-
-	CType* pOpType = OpValue.GetType ();
-	EType OpTypeKind = pOpType->GetTypeKind ();
-	switch (OpTypeKind)
-	{
-	case EType_Property:
-		if (pPropertyPointerType->GetPropertyType ()->CmpAccessorTypes ((CPropertyType*) pOpType) != 0)
-		{
-			SetCastError (pOpType, pPropertyPointerType); 
-			return false;
-		}
-
-		Result = m_pModule->m_LlvmBuilder.CreatePropertyPointer (
-			OpValue,
-			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
-			pPropertyPointerType, 
-			&OpValue
-			);
-		
-		if (!Result)
-			return false;
-
-		return StoreReferenceOperator (OpValue, DstValue, true);
-
-	case EType_PropertyPointer:
-		if (pPropertyPointerType->Cmp (pOpType) != 0)
-		{
-			SetCastError (pOpType, pPropertyPointerType); 
-			return false;
-		}
-		
-		return StoreReferenceOperator (OpValue, DstValue, true);
-
-	default:
-		SetCastError (pOpType, pPropertyPointerType); 
-		return false;
-	}
+	return 
+		CastOperator (RawOpValue, pPropertyPointerType, &OpValue) &&
+		StoreReferenceOperator (OpValue, DstValue, true);
 }
 
 bool
@@ -1012,19 +984,12 @@ COperatorMgr::GetMethodFunction (
 	CVTableType* pVTableType = pFunction->GetVTableType ();
 	
 	if (pVTableType->GetTypeKind () == EType_Property)
-	{
 		VTableIndex += ((CPropertyType*) pVTableType)->GetParentVTableIndex ();
-	}
-	else
-	{
-		ASSERT (pVTableType->IsClassType ());
 
-		CClassBaseTypeCoord Coord;
-		pClassType->FindBaseType ((CClassType*) pVTableType, &Coord);
-		VTableIndex += Coord.m_VTableIndex;
-	}
-
-
+	CClassBaseTypeCoord Coord;
+	pClassType->FindBaseType (pFunction->GetVTableClassType (), &Coord);
+	VTableIndex += Coord.m_VTableIndex;
+	
 	// class.vtbl*
 
 	CValue PtrValue;
@@ -1051,26 +1016,37 @@ COperatorMgr::GetMethodFunction (
 	return true;
 }
 
-/*
-
 bool
-COperatorMgr::ClassPropertyMemberOperator (
-	const CValue& OpValue,
-	CClassType* pClassType,
-	CClassPropertyMember* pMember,
-	CClassBaseTypeCoord* pCoord,
+COperatorMgr::GetMemberProperty (
+	CPropertyType* pPropertyType,
+	CClosure* pClosure,
 	CValue* pResultValue
 	)
 {
+	ASSERT (pPropertyType->GetGetter ()->GetFunctionKind () == EFunction_Method && pClosure);
+	
+	rtl::CIteratorT <CClosureArg> ClosureArg = pClosure->GetFirstArg ();
+	CValue Value = ClosureArg->GetValue ();
+	if (ClosureArg->GetArgIdx () != 0 || !Value.GetType ()->IsClassType ())
+	{
+		err::SetFormatStringError (_T("non-static property requires an object pointer"));
+		return false;
+	}
+
+	size_t VTableIndex = pPropertyType->GetParentVTableIndex ();
+
+	CClassType* pClassType = (CClassType*) Value.GetType ();
+
+	CClassBaseTypeCoord Coord;
+	pClassType->FindBaseType (pPropertyType->GetParentClassType (), &Coord);
+	VTableIndex += Coord.m_VTableIndex;
+
 	// class.vtbl*
 
 	CValue PtrValue;
-	GetClassVTable (OpValue, pClassType, &PtrValue);
+	GetClassVTable (Value, pClassType, &PtrValue);
 
 	// property.vtbl*
-
-	CPropertyType* pPropertyType = pMember->GetType ();
-	size_t VTableIndex = pCoord->m_VTableIndex + pPropertyType->GetParentVTableIndex ();
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (
 		PtrValue, 
@@ -1086,13 +1062,8 @@ COperatorMgr::ClassPropertyMemberOperator (
 		);
 
 	pResultValue->OverrideType (PtrValue, pPropertyType);
-
-	CClosure* pClosure = pResultValue->CreateClosure ();
-	pClosure->CreateArg (0, OpValue);
 	return true;
 }
-
-*/
 
 bool
 COperatorMgr::StackNewOperator (
@@ -1328,7 +1299,7 @@ COperatorMgr::CallOperator (
 	pArgList->InsertHead (InterfaceValue);
 
 	CValue MethodReturnValue;
-	Result = CallImpl (OpValue, pFunctionPointerType->GetMemberFunctionType (), pArgList, &GlobalReturnValue);
+	Result = CallImpl (OpValue, pFunctionPointerType->GetMemberFunctionType (), pArgList, &MethodReturnValue);
 	if (!Result)
 		return false;
 
@@ -1447,26 +1418,26 @@ COperatorMgr::CallImpl (
 	m_pModule->m_LlvmBuilder.CreateEq_i (CallConvValue, StdcallValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pStdcallBlock, pCdeclBlock);
 	
-	CValue CdeclReturnValue;
+	CValue StdcallReturnValue;
 	m_pModule->m_LlvmBuilder.CreateCall (
 		FunctionPtrValue,
 		ECallConv_Stdcall,
 		ArgArray,
 		ArgArray.GetCount (),
 		pFunctionType->GetReturnType (),
-		&CdeclReturnValue
+		&StdcallReturnValue
 		);
 
 	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pCdeclBlock);
 
-	CValue StdcallReturnValue;
+	CValue CdeclReturnValue;
 	m_pModule->m_LlvmBuilder.CreateCall (
 		FunctionPtrValue,
 		ECallConv_Cdecl,
 		ArgArray,
 		ArgArray.GetCount (),
 		pFunctionType->GetReturnType (),
-		&StdcallReturnValue
+		&CdeclReturnValue
 		);
 
 	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
@@ -1926,17 +1897,19 @@ COperatorMgr::GetPropertyOperator (
 {
 	CPropertyType* pPropertyType;
 	CValue OpValue;
+	CValue InterfaceValue;
 
 	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
 	{
 		CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) RawOpValue.GetType ();
 		pPropertyType = pPropertyPointerType->GetPropertyType ();
 		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 0, pPropertyType, &OpValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface), &InterfaceValue);
 	}
 	else
 	{
 		ASSERT (RawOpValue.GetType ()->GetTypeKind () == EType_Property);
-		pPropertyType = (CPropertyType*) OpValue.GetType ();
+		pPropertyType = (CPropertyType*) RawOpValue.GetType ();
 		OpValue = RawOpValue;
 	}
 	
@@ -1961,6 +1934,17 @@ COperatorMgr::GetPropertyOperator (
 		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType ()->GetPointerType (EType_Pointer_u), &FunctionValue);
 	}
 
+	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
+	{
+		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
+			FunctionValue, 
+			pFunction->GetType ()->GetCallingConvention (),
+			InterfaceValue,
+			pFunction->GetType ()->GetFunctionPointerType (),
+			&FunctionValue
+			);
+	}
+
 	FunctionValue.SetClosure (OpValue.GetClosure ());
 	return CallOperator (FunctionValue, NULL, pResultValue);
 }
@@ -1973,17 +1957,19 @@ COperatorMgr::SetPropertyOperator (
 {
 	CPropertyType* pPropertyType;
 	CValue DstValue;
+	CValue InterfaceValue;
 
 	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
 	{
 		CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) RawDstValue.GetType ();
 		pPropertyType = pPropertyPointerType->GetPropertyType ();
 		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 0, pPropertyType, &DstValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface), &InterfaceValue);
 	}
 	else
 	{
 		ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_Property);
-		pPropertyType = (CPropertyType*) DstValue.GetType ();
+		pPropertyType = (CPropertyType*) RawDstValue.GetType ();
 		DstValue = RawDstValue;
 	}
 
@@ -2025,6 +2011,17 @@ COperatorMgr::SetPropertyOperator (
 		// pfn
 
 		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType ()->GetPointerType (EType_Pointer_u), &FunctionValue);
+	}
+
+	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
+	{
+		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
+			FunctionValue, 
+			pFunction->GetType ()->GetCallingConvention (),
+			InterfaceValue,
+			pFunction->GetType ()->GetFunctionPointerType (),
+			&FunctionValue
+			);
 	}
 
 	FunctionValue.SetClosure (DstValue.GetClosure ());

@@ -316,6 +316,13 @@ public:
 		CValue* pResultValue
 		);
 
+	bool
+	GetMemberProperty (
+		CPropertyType* pPropertyType,
+		CClosure* pClosure,
+		CValue* pResultValue
+		);
+
 protected:
 	ICastOperator*
 	GetCastOperator (

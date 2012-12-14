@@ -150,7 +150,7 @@ public:
 	CFunctionType* 
 	GetShortType ()
 	{
-		return m_pShortType;
+		return m_pShortType ? m_pShortType : m_pType;
 	}
 
 	CNamespace* 
@@ -165,14 +165,14 @@ public:
 		return m_pClassType;
 	}
 
-	CClassType* 
-	GetOriginClassType ();
-
 	CVTableType* 
 	GetVTableType ()
 	{
 		return m_pVTableType;
 	}
+
+	CClassType* 
+	GetVTableClassType ();
 
 	size_t
 	GetVTableIndex ()
@@ -314,10 +314,10 @@ public:
 	FindOverload (rtl::CBoxListT <CValue>* pArgList) const;
 
 	CFunction*
-	FindOverload (
-		CFunctionType* pType,
-		bool IsShortType = false
-		) const;
+	FindOverload (CFunctionType* pType) const;
+
+	CFunction*
+	FindShortOverload (CFunctionType* pType) const;
 };
 
 //.............................................................................

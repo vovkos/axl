@@ -46,7 +46,7 @@ CFunction::CFunction ()
 }
 
 CClassType* 
-CFunction::GetOriginClassType ()
+CFunction::GetVTableClassType ()
 {
 	EType TypeKind = m_pVTableType->GetTypeKind ();
 	switch (TypeKind)
@@ -130,36 +130,34 @@ CFunctionOverload::FindOverload (rtl::CBoxListT <CValue>* pArgList) const
 }
 
 CFunction*
-CFunctionOverload::FindOverload (
-	CFunctionType* pType,
-	bool IsShortType
-	) const
+CFunctionOverload::FindOverload (CFunctionType* pType) const
 {
-	if (IsShortType)
-	{
-		if (pType->Cmp (m_pFunction->GetShortType ()) == 0)
-			return m_pFunction;
+	if (pType->Cmp (m_pFunction->GetType ()) == 0)
+		return m_pFunction;
 
-		size_t Count = m_OverloadArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CFunction* pFunction = GetFunction (i);
-			if (pType->Cmp (pFunction->GetShortType ()) == 0)
-				return pFunction;
-		}
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = GetFunction (i);
+		if (pType->Cmp (pFunction->GetType ()) == 0)
+			return pFunction;
 	}
-	else
-	{
-		if (pType->Cmp (m_pFunction->GetType ()) == 0)
-			return m_pFunction;
 
-		size_t Count = m_OverloadArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CFunction* pFunction = GetFunction (i);
-			if (pType->Cmp (pFunction->GetType ()) == 0)
-				return pFunction;
-		}
+	return NULL;
+}
+
+CFunction*
+CFunctionOverload::FindShortOverload (CFunctionType* pType) const
+{
+	if (pType->Cmp (m_pFunction->GetShortType ()) == 0)
+		return m_pFunction;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = GetFunction (i);
+		if (pType->Cmp (pFunction->GetShortType ()) == 0)
+			return pFunction;
 	}
 
 	return NULL;

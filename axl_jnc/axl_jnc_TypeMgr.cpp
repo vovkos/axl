@@ -343,7 +343,12 @@ CTypeMgr::GetPointerType (
 CFunctionPointerType* 
 CTypeMgr::GetFunctionPointerType (CFunctionType* pFunctionType)
 {
-	pFunctionType = pFunctionType->GetDefCallConvFunctionType (); // strip calling convention
+	// strip calling convention
+
+	pFunctionType = pFunctionType->GetDefCallConvFunctionType ();
+
+	if (pFunctionType->m_pFunctionPointerType)
+		return pFunctionType->m_pFunctionPointerType;
 
 	rtl::CStringA Signature = 'Q';
 	Signature += pFunctionType->GetSignature ();

@@ -255,7 +255,7 @@ CFunctionMgr::CompileFunctions ()
 		case EFunction_Constructor:
 		case EFunction_Destructor:
 			pThisType = pFunction->GetClassType ();
-			pOriginType = pFunction->GetOriginClassType ();
+			pOriginType = pFunction->GetVTableClassType ();
 			break;
 
 		default:
