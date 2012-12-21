@@ -26,9 +26,31 @@ protected:
 	CModule* m_pModule;
 
 	llvm::IRBuilder <> m_LlvmBuilder;
+	uint_t m_CommentMdKind;
 
 public:
 	CLlvmBuilder ();
+
+	uint_t 
+	GetCommentMdKind ()
+	{
+		return m_CommentMdKind;
+	}
+
+	bool
+	CreateComment (
+		const char* pFormat,
+		...
+		)
+	{
+		return CreateCommentV (pFormat, va_start_e (pFormat));
+	}
+
+	bool
+	CreateCommentV (
+		const char* pFormat,
+		va_list va
+		);
 
 	// branches
 
@@ -1014,18 +1036,7 @@ public:
 		CScope* pScope,
 		CPointerType* pResultType,
 		CValue* pResultValue
-		)
-	{
-		size_t ScopeLevel = pScope ? pScope->GetLevel () : 0;
-		return CreateSafePtr (
-			PtrValue,
-			RegionBeginValue,
-			Size,
-			CValue (ScopeLevel, EType_SizeT),
-			pResultType,
-			pResultValue
-			);
-	}
+		);
 
 	llvm::Value*
 	CreateSafePtr (
@@ -1067,16 +1078,7 @@ public:
 		size_t Size,
 		CScope* pScope,
 		CValue* pResultValue
-		)
-	{
-		size_t ScopeLevel = pScope ? pScope->GetLevel () : 0;
-		return CreateSafePtrValidator (
-			RegionBeginValue,
-			Size,
-			CValue (ScopeLevel, EType_SizeT),
-			pResultValue
-			);
-	}
+		);
 
 	llvm::Value*
 	CreateSafePtrValidator (
@@ -1101,50 +1103,22 @@ public:
 		);
 
 	bool
-	CheckSafePtrScope (
-		const CValue& Value,
-		CScope* pDstScope
+	CheckSafePtrScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
 		);
 
 	// interface, function & property ptr
 
 	bool
-	CheckNullPtr (
-		const CValue& Value,
-		ERuntimeError Error
-		);
+	CheckNullPtr (const CValue& Value);
 
 	// interface operations
 
-	llvm::Value*
-	CreateInterface (
-		const CValue& PtrValue,
-		const CValue& ScopeLevelValue,
-		CClassType* pResultType,
-		CValue* pResultValue
-		);
-
-	llvm::Value*
-	CreateInterface (
-		const CValue& PtrValue,
-		CScope* pScope,
-		CClassType* pResultType,
-		CValue* pResultValue
-		)
-	{
-		size_t ScopeLevel = pScope ? pScope->GetLevel () : 0;
-		return CreateInterface (
-			PtrValue,
-			CValue (ScopeLevel, EType_SizeT),
-			pResultType,
-			pResultValue
-			);
-	}
-
 	bool
-	CheckInterfaceScope (
-		const CValue& Value,
-		CScope* pDstScope
+	CheckInterfaceScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
 		);
 
 	bool
@@ -1158,7 +1132,7 @@ public:
 	InitializeObject (
 		const CValue& Value,
 		CClassType* pType,
-		int Flags
+		CScope* pScope
 		);
 
 	// function & property pointer operations
@@ -1173,9 +1147,9 @@ public:
 		);
 
 	bool
-	CheckFunctionPointerScope (
-		const CValue& Value,
-		CScope* pDstScope
+	CheckFunctionPointerScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
 		);
 
 	bool
@@ -1187,9 +1161,15 @@ public:
 		);
 
 	bool
-	CheckPropertyPointerScope (
-		const CValue& Value,
-		CScope* pDstScope
+	CheckPropertyPointerScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	bool
+	GetDstScopeLevel (
+		const CValue& DstValue,
+		CValue* pDstScopeLevelValue
 		);
 };
 

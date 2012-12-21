@@ -107,14 +107,12 @@ CVariableMgr::GetScopeLevelVariable ()
 		true
 		);
 
-	CValue OneValue (1, pType);
-
 	m_pScopeLevelVariable->m_pLlvmValue = new llvm::GlobalVariable (
 		*m_pModule->m_pLlvmModule,
 		pType->GetLlvmType (),
 		false,
 		llvm::GlobalVariable::ExternalLinkage,
-		(llvm::Constant*) OneValue.GetLlvmValue (),
+		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
 		_T("jnc.ScopeLevel"),
 		NULL,
 		false // true // thread local -- currently JIT produces an error

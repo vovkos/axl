@@ -853,7 +853,7 @@ COperatorMgr::ClassMemberOperator (
 		return false;
 	}
 
-	bool Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue, ERuntimeError_NullInterface);
+	bool Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue);
 	if (!Result)
 		return false;
 
@@ -896,19 +896,31 @@ COperatorMgr::ClassFieldMemberOperator (
 	CValue* pResultValue
 	)
 {
-	CValue PtrValue;
-	CValue ScopeLevelValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ScopeLevelValue);
+	CValue ObjPtrValue;
+	
+	size_t ObjPtrIndexArray [] = 
+	{
+		0, // iface* 
+		0, // iface.hdr*
+		1, // TObjectHdr**
+	};
 
+	m_pModule->m_LlvmBuilder.CreateGep (OpValue, ObjPtrIndexArray, countof (ObjPtrIndexArray), NULL, &ObjPtrValue);  // TObjectHdr**
+	m_pModule->m_LlvmBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObjectHdr* 
+
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
+	m_pModule->m_LlvmBuilder.CreateLoad (ScopeLevelValue, NULL, &ScopeLevelValue); // size_t m_ScopeLevel
+	
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
 
 	size_t* p = pCoord->m_FieldCoord.m_LlvmIndexArray;
 	size_t Count = pCoord->m_FieldCoord.m_LlvmIndexArray.GetCount ();
 
+	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
-		PtrValue, 
+		OpValue, 
 		pCoord->m_FieldCoord.m_LlvmIndexArray, 
 		pCoord->m_FieldCoord.m_LlvmIndexArray.GetCount (), 
 		NULL,
@@ -936,9 +948,6 @@ COperatorMgr::GetClassVTable (
 	CValue* pResultValue
 	)
 {
-	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-
 	size_t IndexArray [] = 
 	{
 		0, // class.iface*
@@ -946,8 +955,9 @@ COperatorMgr::GetClassVTable (
 		0, // class.vtbl**
 	};
 
+	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
-		PtrValue, 
+		OpValue, 
 		IndexArray, 
 		countof (IndexArray),
 		NULL, 
@@ -1085,17 +1095,11 @@ COperatorMgr::StackNewOperator (
 		CValue PtrValue;
 		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetClassStructType (), _T("new"), NULL, &PtrValue);
 		
-		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, EObjectFlag_IsStack);
+		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, pScope);
 		if (!Result)
 			return false;
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateInterface (
-			PtrValue, 
-			pScope,
-			pClassType,
-			pResultValue
-			);			
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType, pResultValue);
 	}
 	else
 	{
@@ -1144,17 +1148,11 @@ COperatorMgr::HeapNewOperator (
 		
 		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPointerType, &PtrValue);
 
-		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, 0);
+		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, NULL);
 		if (!Result)
 			return false;
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateInterface (
-			PtrValue, 
-			NULL,
-			pClassType,
-			pResultValue
-			);			
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType, pResultValue);
 	}
 	else
 	{
@@ -1265,7 +1263,7 @@ COperatorMgr::CallOperator (
 		return false;
 	}
 	
-	Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue, ERuntimeError_NullFunction);
+	Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue);
 	if (!Result)
 		return false;
 
@@ -1295,7 +1293,7 @@ COperatorMgr::CallOperator (
 	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pMethodBlock);
 
 	CValue InterfaceValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface), &InterfaceValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &InterfaceValue);
 	pArgList->InsertHead (InterfaceValue);
 
 	CValue MethodReturnValue;
@@ -1312,6 +1310,39 @@ COperatorMgr::CallOperator (
 		MethodReturnValue, 
 		pMethodBlock, 
 		pResultValue
+		);
+
+	return true;
+}
+
+bool
+COperatorMgr::CalcScopeLevelValue (
+	CScope* pScope,
+	CValue* pScopeLevelValue
+	)
+{
+	if (!pScope)
+	{
+		pScopeLevelValue->SetConstSizeT (0);
+		return true;
+	}
+
+
+	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
+
+	CFunction* pCurrentFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pCurrentFunction && pCurrentFunction->GetScopeLevelVariable ());
+
+	CValue ScopeBaseLevelValue;
+	m_pModule->m_LlvmBuilder.CreateLoad (pCurrentFunction->GetScopeLevelVariable (), NULL, &ScopeBaseLevelValue);
+
+	CValue ScopeIncValue (pScope->GetLevel (), EType_SizeT);
+
+	m_pModule->m_LlvmBuilder.CreateAdd_i (
+		ScopeBaseLevelValue, 
+		ScopeIncValue, 
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
+		pScopeLevelValue
 		);
 
 	return true;
@@ -1358,7 +1389,10 @@ COperatorMgr::CallImpl (
 		CType* pFormalArgType = ArgTypeArray [i];
 		
 		CValue ArgCast;
-		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		Result = 
+			CastOperator (*Arg, pFormalArgType, &ArgCast) &&
+			PrepareOperand (&ArgCast, EOpFlag_VariableToSafePtr);
+
 		if (!Result)
 			return false;
 
@@ -1372,12 +1406,21 @@ COperatorMgr::CallImpl (
 		CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
 
 		CValue ArgCast;
-		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		Result = 
+			CastOperator (*Arg, pFormalArgType, &ArgCast) &&
+			PrepareOperand (&ArgCast, EOpFlag_VariableToSafePtr);
+
 		if (!Result)
 			return false;
 
 		ArgArray.Append (ArgCast);
 	}
+
+	CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
+
+	m_pModule->m_LlvmBuilder.CreateComment ("update scope level before call");
+	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 
 	// simple call
 
@@ -1571,6 +1614,16 @@ COperatorMgr::PrepareOperand (
 
 			break;
 
+		case EType_Pointer:
+			if (Value.GetValueKind () == EValue_Variable && (Flags & EOpFlag_VariableToSafePtr))
+				m_pModule->m_LlvmBuilder.CreateSafePtr (
+					Value, 
+					Value.GetVariable (),
+					(CPointerType*) pType,
+					&Value
+					);
+			break;
+
 		case EType_Property:
 		case EType_PropertyPointer:
 			if (!(Flags & EOpFlag_KeepProperty))
@@ -1750,7 +1803,7 @@ COperatorMgr::StoreReferenceOperator (
 	switch (TargetTypeKind)
 	{
 	case EType_Pointer:
-		Result = m_pModule->m_LlvmBuilder.CheckSafePtrScope (SrcValue, DstValue.GetScope ());
+		Result = m_pModule->m_LlvmBuilder.CheckSafePtrScopeLevel (SrcValue, DstValue);
 		if (!Result)
 			return false;
 
@@ -1766,21 +1819,21 @@ COperatorMgr::StoreReferenceOperator (
 
 	case EType_Class:
 	case EType_Interface:
-		Result = m_pModule->m_LlvmBuilder.CheckInterfaceScope (SrcValue, DstValue.GetScope ());
+		Result = m_pModule->m_LlvmBuilder.CheckInterfaceScopeLevel (SrcValue, DstValue);
 		if (!Result)
 			return false;
 
 		break;
 
 	case EType_FunctionPointer:
-		Result = m_pModule->m_LlvmBuilder.CheckFunctionPointerScope (SrcValue, DstValue.GetScope ());
+		Result = m_pModule->m_LlvmBuilder.CheckFunctionPointerScopeLevel (SrcValue, DstValue);
 		if (!Result)
 			return false;
 
 		break;
 
 	case EType_PropertyPointer:
-		Result = m_pModule->m_LlvmBuilder.CheckPropertyPointerScope (SrcValue, DstValue.GetScope ());
+		Result = m_pModule->m_LlvmBuilder.CheckPropertyPointerScopeLevel (SrcValue, DstValue);
 		if (!Result)
 			return false;
 
@@ -1901,10 +1954,12 @@ COperatorMgr::GetPropertyOperator (
 
 	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
 	{
+		m_pModule->m_LlvmBuilder.CheckNullPtr (RawOpValue);
+
 		CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) RawOpValue.GetType ();
 		pPropertyType = pPropertyPointerType->GetPropertyType ();
 		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 0, pPropertyType, &OpValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface), &InterfaceValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &InterfaceValue);
 	}
 	else
 	{
@@ -1964,7 +2019,7 @@ COperatorMgr::SetPropertyOperator (
 		CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) RawDstValue.GetType ();
 		pPropertyType = pPropertyPointerType->GetPropertyType ();
 		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 0, pPropertyType, &DstValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface), &InterfaceValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &InterfaceValue);
 	}
 	else
 	{

@@ -303,7 +303,7 @@ CType::GetLlvmType ()
 
 	case EType_Class:
 	case EType_Interface:
-		pLlvmType = ((CClassType*) this)->GetPointerStructType ()->GetLlvmType ();
+		pLlvmType = ((CClassType*) this)->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u)->GetLlvmType ();
 		break;
 
 	case EType_Import:

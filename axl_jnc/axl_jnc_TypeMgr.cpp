@@ -111,7 +111,7 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateObjectHdrType ();
 		break;
 
-	case EStdType_AbstractInterface:
+	case EStdType_AbstractInterfacePtr:
 		pType = CreateAbstractInterfaceType ();
 		break;
 
@@ -142,23 +142,24 @@ CTypeMgr::CreateObjectHdrType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("objhdr");
-	pType->CreateMember (GetPrimitiveType (EType_Int_p));
-	pType->CreateMember (GetStdType (EStdType_BytePtr));
+	pType->CreateMember (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
+	pType->CreateMember (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
 	bool Result = pType->CalcLayout ();
 	ASSERT (Result);
 	return pType;
 }
 
-CStructType*
+CPointerType*
 CTypeMgr::CreateAbstractInterfaceType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
-	pType->m_Tag = _T("iface");
-	pType->CreateMember (GetStdType (EStdType_BytePtr));
-	pType->CreateMember (GetPrimitiveType (EType_SizeT));
+	pType->m_Tag = _T("ifacehdr");
+	pType->CreateMember (GetStdType (EStdType_BytePtr)->GetPointerType (EType_Pointer_u));   // void** m_pVTable;
+	pType->CreateMember (GetStdType (EStdType_ObjectHdr)->GetPointerType (EType_Pointer_u)); // TObjectHdr* m_pObjectHdr;
 	bool Result = pType->CalcLayout ();
 	ASSERT (Result);
-	return pType;
+	
+	return pType->GetPointerType (EType_Pointer_u);
 }
 
 bool
@@ -593,7 +594,7 @@ CTypeMgr::GetClassType (
 		CClassType* pType = AXL_MEM_NEW (CClassType);
 		pType->m_pModule = m_pModule;
 		pType->m_TypeKind = TypeKind;
-		pType->m_Size = sizeof (TInterface);
+		pType->m_Size = sizeof (TInterfaceHdr*);
 		pType->m_Tag.Format (_T("_unnamed_class_%d"), m_UnnamedTypeCounter);
 		pType->m_Signature.Format ("%c%d", SignatureChar, m_UnnamedTypeCounter++);
 		pType->m_PackFactor = PackFactor;
@@ -611,7 +612,7 @@ CTypeMgr::GetClassType (
 	CClassType* pType = AXL_MEM_NEW (CClassType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
-	pType->m_Size = sizeof (TInterface);
+	pType->m_Size = sizeof (TInterfaceHdr*);
 	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;

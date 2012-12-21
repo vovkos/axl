@@ -8,10 +8,31 @@ namespace jnc {
 //.............................................................................
 
 CLlvmBuilder::CLlvmBuilder ():
-	m_LlvmBuilder (llvm::getGlobalContext())
+	m_LlvmBuilder (llvm::getGlobalContext ())
 {
+	m_CommentMdKind = llvm::getGlobalContext().getMDKindID ("jnc.comment");
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
+}
+
+bool
+CLlvmBuilder::CreateCommentV (
+	const char* pFormat,
+	va_list va
+	)
+{
+	if (m_LlvmBuilder.GetInsertBlock ()->getInstList ().empty ())
+		return false;
+
+	char Buffer [256];
+	rtl::CStringA String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.FormatV (pFormat, va);
+
+	llvm::Instruction* pInst = &m_LlvmBuilder.GetInsertBlock ()->getInstList ().back ();
+	llvm::MDString* pMdString = llvm::MDString::get (llvm::getGlobalContext (), String);	
+	llvm::MDNode* pMdNode = llvm::MDNode::get (llvm::getGlobalContext (), llvm::ArrayRef <llvm::Value*> ((llvm::Value**) &pMdString, 1));
+	pInst->setMetadata (m_CommentMdKind, pMdNode);
+	return true;
 }
 
 llvm::SwitchInst*
@@ -167,6 +188,8 @@ CLlvmBuilder::CreateCall (
 
 	if (pResultType && pResultType->GetTypeKind () != EType_Void)
 	{
+		rtl::CString s = GetLlvmTypeString (CalleeValue.GetLlvmValue ()->getType ());
+
 		pInst = m_LlvmBuilder.CreateCall (
 			CalleeValue.GetLlvmValue (), 
 			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount),
@@ -208,9 +231,33 @@ CLlvmBuilder::CreateSafePtr (
 		&ValidatorValue
 		);
 	
+	CreateComment ("create safe pointer");
+
 	CValue SafePtrValue = pResultType->GetUndefValue ();
 	CreateInsertValue (SafePtrValue, PtrValue, 0, NULL, &SafePtrValue);
 	return CreateInsertValue (SafePtrValue, ValidatorValue, 1, pResultType, pResultValue);
+}
+
+llvm::Value*
+CLlvmBuilder::CreateSafePtr (
+	const CValue& PtrValue,
+	const CValue& RegionBeginValue,
+	size_t Size,
+	CScope* pScope,
+	CPointerType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope);
+
+	return CreateSafePtr (
+		PtrValue,
+		RegionBeginValue,
+		Size,
+		ScopeLevelValue,
+		pResultType,
+		pResultValue
+		);
 }
 
 llvm::Value*
@@ -221,6 +268,8 @@ CLlvmBuilder::ModifySafePtr (
 	CValue* pResultValue
 	)
 {
+	CreateComment ("modify safe pointer");
+
 	CValue ValidatorValue;
 	CreateExtractValue (SrcSafePtrValue, 0, NULL, &ValidatorValue);
 	
@@ -237,18 +286,37 @@ CLlvmBuilder::CreateSafePtrValidator (
 	CValue* pResultValue
 	)
 {
+	CreateComment ("create safe pointer validator");
+
 	CValue SizeValue (Size, EType_SizeT);
 
 	CValue RegionBeginValue;
 	CreateBitCast (RawRegionBeginValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &RegionBeginValue);
-	
-	CFunction* pCreateValidator = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CreateSafePtrValidator);
 
-	return CreateCall3 (
-		pCreateValidator,
-		pCreateValidator->GetType (),
-		RegionBeginValue, 
-		SizeValue,
+	CValue RegionEndValue;
+	CreateGep (RegionBeginValue, SizeValue, NULL, &RegionEndValue);
+	
+	CType* pType = m_pModule->m_TypeMgr.GetStdType (EStdType_SafePtrValidator);
+
+	CValue ValidatorValue = pType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionBeginValue, 0, NULL, &ValidatorValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionEndValue, 1, NULL, &ValidatorValue);	
+	return m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, ScopeLevelValue, 2, pType, pResultValue);
+}
+
+llvm::Value*
+CLlvmBuilder::CreateSafePtrValidator (
+	const CValue& RegionBeginValue,
+	size_t Size,
+	CScope* pScope,
+	CValue* pResultValue
+	)
+{
+	CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope);
+
+	return CreateSafePtrValidator (
+		RegionBeginValue,
+		Size,
 		ScopeLevelValue,
 		pResultValue
 		);
@@ -262,6 +330,8 @@ CLlvmBuilder::CheckSafePtrRange (
 	ERuntimeError Error
 	)
 {
+	CreateComment ("check safe pointer range");
+
 	CValue SizeValue (Size, EType_SizeT);
 	CValue ErrorValue (Error, EType_Int);
 
@@ -284,36 +354,83 @@ CLlvmBuilder::CheckSafePtrRange (
 }
 
 bool
-CLlvmBuilder::CheckSafePtrScope (
-	const CValue& Value,
-	CScope* pDstScope
+CLlvmBuilder::GetDstScopeLevel (
+	const CValue& DstValue,
+	CValue* pDstScopeLevelValue
 	)
 {
-	size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
-
-	if (Value.GetValueKind () == EValue_Variable)
+	if (DstValue.GetValueKind () == EValue_Variable)
 	{
-		CScope* pSrcScope = Value.GetVariable ()->GetScope ();
-		size_t SrcScopeLevel = pSrcScope ? pSrcScope->GetLevel () : 0;
-
-		if (SrcScopeLevel > DstScopeLevel)
+		CScope* pScope = DstValue.GetVariable ()->GetScope ();
+		m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope, pDstScopeLevelValue);
+	}
+	else if (DstValue.GetType ()->GetTypeKind () == EType_Reference)
+	{
+		size_t ScopeLevelIndexArray [] = 
 		{
-			err::SetFormatStringError (_T("safe pointer/reference scope level mismatch"));
-			return false;
-		}
+			1, // TSafePtrValidator m_Validator
+			2, // size_t m_ScopeLvel
+		};
 
-		return true;
+		CreateExtractValue (DstValue, ScopeLevelIndexArray, countof (ScopeLevelIndexArray), m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), pDstScopeLevelValue);
+	}
+	else
+	{
+		pDstScopeLevelValue->SetConstSizeT (0);
 	}
 
-	CValue DstScopeLevelValue (DstScopeLevel, EType_SizeT);
+	return true;
+}
+
+bool
+CLlvmBuilder::CheckSafePtrScopeLevel (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
 	CValue SrcScopeLevelValue;
 
-	size_t ScopeLevelIndexArray [2] = { 1, 2 };
-	CreateExtractValue (Value, ScopeLevelIndexArray, 2, NULL, &SrcScopeLevelValue);
+	if (SrcValue.GetValueKind () == EValue_Variable)
+	{
+		CScope* pSrcScope = SrcValue.GetVariable ()->GetScope ();
+		size_t SrcScopeLevel = pSrcScope ? pSrcScope->GetLevel () : 0;
+
+		if (DstValue.GetValueKind () == EValue_Variable)  // can check at compile time
+		{
+			CScope* pDstScope = DstValue.GetVariable ()->GetScope ();
+
+			size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
+
+			if (SrcScopeLevel > DstScopeLevel)
+			{
+				err::SetFormatStringError (_T("safe pointer/reference scope level mismatch"));
+				return false;
+			}
+
+			return true;
+		}
+
+		SrcScopeLevelValue.SetConstSizeT (SrcScopeLevel);
+	}
+	else
+	{
+		size_t ScopeLevelIndexArray [] = 
+		{
+				1, // TSafePtrValidator m_Validator
+				2, // size_t m_ScopeLevel
+		};
+
+		CreateExtractValue (SrcValue, ScopeLevelIndexArray, countof (ScopeLevelIndexArray), NULL, &SrcScopeLevelValue);
+	}
+
+	CValue DstScopeLevelValue;
+	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
+
+	CreateComment ("check safe pointer scope level");
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
 	
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
 		SrcScopeLevelValue,
@@ -324,31 +441,43 @@ CLlvmBuilder::CheckSafePtrScope (
 	return true;
 }
 
-llvm::Value*
-CLlvmBuilder::CreateInterface (
-	const CValue& PtrValue,
-	const CValue& ScopeLevelValue,
-	CClassType* pResultType,
-	CValue* pResultValue
-	)
-{
-	CValue InterfaceValue = pResultType->GetUndefValue ();
-	CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
-	return CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, pResultType, pResultValue);
-}
-
 bool
-CLlvmBuilder::CheckNullPtr (
-	const CValue& Value,
-	ERuntimeError Error
-	)
+CLlvmBuilder::CheckNullPtr (const CValue& Value)
 {
+	CreateComment ("check null pointer");
+
 	CValue PtrValue;
-	CreateExtractValue (Value, 0, NULL, &PtrValue);
+	ERuntimeError Error;
+
+	CType* pType = Value.GetType ();
+	EType TypeKind = pType->GetTypeKind ();
+
+	switch (TypeKind)
+	{
+	case EType_Interface:
+	case EType_Class:
+		PtrValue = Value;
+		Error = ERuntimeError_NullInterface;
+		break;
+
+	case EType_FunctionPointer:
+		CreateExtractValue (Value, 0, NULL, &PtrValue);
+		Error = ERuntimeError_NullFunction;
+		break;
+
+	case EType_PropertyPointer:
+		CreateExtractValue (Value, 0, NULL, &PtrValue);
+		Error = ERuntimeError_NullProperty;
+		break;
+		
+	default:
+		ASSERT (false);
+	}
+
 	CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);	
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CreateCall2 (
 		pCheckFunction, 
 		pCheckFunction->GetType (), 
 		PtrValue, 
@@ -360,23 +489,25 @@ CLlvmBuilder::CheckNullPtr (
 }
 
 bool
-CLlvmBuilder::CheckInterfaceScope (
-	const CValue& Value,
-	CScope* pDstScope
+CLlvmBuilder::CheckInterfaceScopeLevel (
+	const CValue& SrcValue,
+	const CValue& DstValue
 	)
 {
-	size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
-	CValue DstScopeLevelValue (DstScopeLevel, EType_SizeT);
-	CValue SrcScopeLevelValue;
+	CValue DstScopeLevelValue;
+	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
 
-	CreateExtractValue (Value, 1, NULL, &SrcScopeLevelValue);
+	CreateComment ("check interface scope level");
 
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
-	
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CValue AbstractInterfaceValue;
+	CreateBitCast (SrcValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &AbstractInterfaceValue);
+
+	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
+
+	CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
-		SrcScopeLevelValue,
+		AbstractInterfaceValue,
 		DstScopeLevelValue,
 		NULL
 		);
@@ -391,19 +522,16 @@ CLlvmBuilder::DynamicCastInterface (
 	CValue* pResultValue
 	)
 {
-	CValue PtrValue;
-	CValue ScopeLevelValue;
+	CreateComment ("dynamic cast interface");
 
-	CreateExtractValue (Value, 0, NULL, &PtrValue);
-	CreateExtractValue (Value, 1, NULL, &ScopeLevelValue);
-	
-	CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+	CValue PtrValue;
+	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
 	CValue TypeValue (&pResultType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
 	CFunction* pDynamicCastInterface = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastInterface);
 	
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CreateCall2 (
 		pDynamicCastInterface,
 		pDynamicCastInterface->GetType (),
 		PtrValue,
@@ -411,9 +539,7 @@ CLlvmBuilder::DynamicCastInterface (
 		&PtrValue
 		);
 
-	CreateBitCast (PtrValue, pResultType->GetInterfaceStructType()->GetPointerType (EType_Pointer_u), &PtrValue);
-
-	CreateInterface (PtrValue, ScopeLevelValue, pResultType, pResultValue);
+	CreateBitCast (PtrValue, pResultType, &PtrValue);
 	return true;
 }
 
@@ -421,20 +547,20 @@ bool
 CLlvmBuilder::InitializeObject (
 	const CValue& Value,
 	CClassType* pType,
-	int Flags
+	CScope* pScope
 	)
 {
-	CValue FlagsValue (Flags, EType_Int);
+	CreateComment ("initialize object");
 
 	CFunction* pInializeObject = pType->GetInitializer ();
 	if (!pInializeObject)
 		return false;
 
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CreateCall2 (
 		pInializeObject,
 		pInializeObject->GetType (),
 		Value,
-		FlagsValue,
+		m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope),
 		NULL
 		);
 
@@ -450,6 +576,8 @@ CLlvmBuilder::CreateFunctionPointer (
 	CValue* pResultValue
 	)
 {
+	CreateComment ("create function pointer");
+
 	CValue CallConvValue (CallingConvention, EType_Int_p);
 
 	CValue FunctionPtrValue = pResultType->GetUndefValue ();
@@ -460,24 +588,25 @@ CLlvmBuilder::CreateFunctionPointer (
 }
 
 bool
-CLlvmBuilder::CheckFunctionPointerScope (
-	const CValue& Value,
-	CScope* pDstScope
+CLlvmBuilder::CheckFunctionPointerScopeLevel (
+	const CValue& SrcValue,
+	const CValue& DstValue
 	)
 {
-	size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
-	CValue DstScopeLevelValue (DstScopeLevel, EType_SizeT);
-	CValue SrcScopeLevelValue;
+	CValue DstScopeLevelValue;
+	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
 
-	size_t ScopeLevelIndexArray [2] = { 2, 1 };
-	CreateExtractValue (Value, ScopeLevelIndexArray, 2, NULL, &SrcScopeLevelValue);
+	CreateComment ("check funtion pointer scope");
+
+	CValue InterfaceValue;
+	CreateExtractValue (SrcValue, 1, NULL, &InterfaceValue);
 	
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
+	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
 	
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
-		SrcScopeLevelValue,
+		InterfaceValue,
 		DstScopeLevelValue,
 		NULL
 		);
@@ -493,6 +622,8 @@ CLlvmBuilder::CreatePropertyPointer (
 	CValue* pResultValue
 	)
 {
+	CreateComment ("create property pointer");
+
 	ASSERT (PtrValue.GetType ()->GetTypeKind () == EType_Property);
 	CPropertyType* pPropertyType = (CPropertyType*) PtrValue.GetType ();
 
@@ -527,27 +658,28 @@ CLlvmBuilder::CreatePropertyPointer (
 }
 
 bool
-CLlvmBuilder::CheckPropertyPointerScope (
-	const CValue& Value,
-	CScope* pDstScope
+CLlvmBuilder::CheckPropertyPointerScopeLevel (
+	const CValue& SrcValue,
+	const CValue& DstValue
 	)
 {
-	if (Value.GetValueKind () == EValue_Property) 
+	if (SrcValue.GetValueKind () == EValue_Property) 
 		return true;
 
-	size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
-	CValue DstScopeLevelValue (DstScopeLevel, EType_SizeT);
-	CValue SrcScopeLevelValue;
+	CValue DstScopeLevelValue;
+	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
 
-	size_t ScopeLevelIndexArray [2] = { 1, 1 };
-	CreateExtractValue (Value, ScopeLevelIndexArray, 2, NULL, &SrcScopeLevelValue);
+	CreateComment ("check property pointer scope");
 
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
+	CValue InterfaceValue;
+	CreateExtractValue (SrcValue, 1, NULL, &InterfaceValue);
+
+	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
 	
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
-		SrcScopeLevelValue,
+		InterfaceValue,
 		DstScopeLevelValue,
 		NULL
 		);

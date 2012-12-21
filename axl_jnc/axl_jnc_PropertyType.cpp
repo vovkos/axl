@@ -167,7 +167,7 @@ CPropertyPointerType::GetPointerStructType ()
 	m_pPointerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pPointerStructType->m_Tag.Format (_T("pprop"));
 	m_pPointerStructType->CreateMember (m_pPropertyType->GetVTableStructType ()->GetPointerType (EType_Pointer_u));
-	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface));
+	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr));
 	m_pPointerStructType->CalcLayout ();
 
 	return m_pPointerStructType;

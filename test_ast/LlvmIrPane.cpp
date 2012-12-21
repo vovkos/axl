@@ -42,6 +42,8 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 {
 	Clear ();
 
+	uint_t CommentMdKind = pModule->m_LlvmBuilder.GetCommentMdKind ();
+
 	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFirstFunction ();
 	for (; Function; Function++)
 	{
@@ -72,9 +74,21 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 				llvm::raw_string_ostream Stream (String);
 
 				llvm::Instruction* pInst = Inst;
+
+				llvm::MDNode* pMdComment = pInst->getMetadata (CommentMdKind);
+				if (pMdComment)
+					pInst->setMetadata (CommentMdKind, NULL); // remove before print
+
 				pInst->print (Stream);
 
 				m_LogCtrl.Trace (_T("%s\r\n"), String.c_str ());
+
+				if (pMdComment)
+				{
+					pInst->setMetadata (CommentMdKind, pMdComment); // restore
+					llvm::MDString* pMdString = (llvm::MDString*) pMdComment->getOperand (0);
+					m_LogCtrl.Trace (_T("\r\n; %s\r\n"), pMdString->getString ().data ());
+				}
 			}
 		}
 

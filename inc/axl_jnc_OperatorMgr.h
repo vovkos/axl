@@ -120,6 +120,20 @@ public:
 		return m_pModule;
 	}
 
+	bool
+	CalcScopeLevelValue (
+		CScope* pScope,
+		CValue* pScopeLevelValue
+		);
+
+	CValue 
+	CalcScopeLevelValue (CScope* pScope)
+	{
+		CValue ScopeLevelValue;
+		CalcScopeLevelValue (pScope, &ScopeLevelValue);
+		return ScopeLevelValue;
+	}
+
 	// prepare is: unqualify, get property, peel double references
 
 	CType* 
@@ -140,6 +154,9 @@ public:
 		CValue* pOpValue,
 		int Flags = 0
 		);
+	
+	bool
+	PrepareArgumentReturnValue (CValue* pValue);
 
 	// unary operators
 

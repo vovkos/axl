@@ -27,7 +27,7 @@ enum EStdType
 	EStdType_BytePtr,
 	EStdType_SafePtrValidator,
 	EStdType_ObjectHdr,
-	EStdType_AbstractInterface,
+	EStdType_AbstractInterfacePtr,
 	EStdType__Count,
 };
 
@@ -327,7 +327,7 @@ protected:
 	CStructType*
 	CreateObjectHdrType ();
 
-	CStructType*
+	CPointerType*
 	CreateAbstractInterfaceType ();
 };
 

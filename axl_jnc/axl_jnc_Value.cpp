@@ -210,12 +210,9 @@ CValue::GetLlvmConst (
 		pLlvmConst = CLlvmPodStruct::Get (((CPointerType*) pType)->GetPointerStructType (), p);
 		break;
 
+	case EType_Pointer_u:
 	case EType_Interface:
 	case EType_Class:
-		pLlvmConst = CLlvmPodStruct::Get (((CClassType*) pType)->GetPointerStructType (), p);
-		break;
-
-	case EType_Pointer_u:
 		Integer = *(int64_t*) p;
 
 		pLlvmConst = llvm::ConstantInt::get (

@@ -83,7 +83,7 @@ CAstDoc::Compile ()
 	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
 	std::string ErrorString;
 	EngineBuilder.setErrorStr (&ErrorString);
-    EngineBuilder.setUseMCJIT(true);
+	EngineBuilder.setUseMCJIT(true);
 
 	m_pLlvmExecutionEngine = EngineBuilder.create ();
 	if (!m_pLlvmExecutionEngine)
@@ -435,6 +435,19 @@ StdLib_CallConvTestD (
 	return 4000;
 }
 
+void
+StdLib_PointerCheck (jnc::TSafePtr Ptr)
+{
+	CMainFrame* pMainFrame = GetMainFrame ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
+		"PointerCheck (%p; range = %p:%p; scope = %d)\n", 
+		Ptr.m_p,
+		Ptr.m_Validator.m_pRegionBegin,
+		Ptr.m_Validator.m_pRegionEnd,
+		Ptr.m_Validator.m_ScopeLevel
+		);
+}
+
 bool
 CAstDoc::ExportStdLib ()
 {
@@ -449,6 +462,7 @@ CAstDoc::ExportStdLib ()
 	ExportStdLibFunction (_T("CallConvTestB"), StdLib_CallConvTestB);
 	ExportStdLibFunction (_T("CallConvTestC"), StdLib_CallConvTestC);
 	ExportStdLibFunction (_T("CallConvTestD"), StdLib_CallConvTestD);
+	ExportStdLibFunction (_T("PointerCheck"), StdLib_PointerCheck);
 
 	return true;
 }

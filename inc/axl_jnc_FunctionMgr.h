@@ -32,20 +32,11 @@ enum EStdFunc
 
 	// void 
 	// jnc.CheckScopeLevel (
-	//		size_t SrcScopeLevel,
+	//		size_t SrcScopeLevel
 	//		size_t DstScopeLevel
 	//		);
 
 	EStdFunc_CheckScopeLevel,
-
-	// jnc.sptrv
-	// jnc.CreateSafePtrValidator (
-	//		int8* pRegionBegin,
-	//		size_t Size,
-	//		size_t ScopeLevel
-	//		);
-
-	EStdFunc_CreateSafePtrValidator,
 
 	// void 
 	// jnc.CheckSafePtrRange (
@@ -56,6 +47,14 @@ enum EStdFunc
 	//		);
 
 	EStdFunc_CheckSafePtrRange,
+
+	// void 
+	// jnc.CheckInterfaceScopeLevel (
+	//		jnc.iface* p,
+	//		size_t DstScopeLevel
+	//		);
+
+	EStdFunc_CheckInterfaceScopeLevel,
 
 	// int8*
 	// jnc.DynamicCastInterface (
@@ -175,10 +174,10 @@ protected:
 	CreateCheckScopeLevel ();
 
 	CFunction*
-	CreateCreateSafePtrValidator ();
+	CreateCheckSafePtrRange ();
 
 	CFunction*
-	CreateCheckSafePtrRange ();
+	CreateCheckInterfaceScopeLevel ();
 
 	CFunction*
 	CreateDynamicCastInterface ();

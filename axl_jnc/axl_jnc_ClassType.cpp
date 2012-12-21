@@ -41,7 +41,6 @@ CClassType::CClassType ()
 	m_PackFactor = 8;
 	m_pInitializer = NULL;
 	m_pFinalizer = NULL;
-	m_pPointerStructType = NULL;
 	m_pInterfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pVTableStructType = NULL;
@@ -314,12 +313,6 @@ CClassType::CalcLayout ()
 	m_pInterfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 	m_pInterfaceStructType->m_Tag.Format (_T("%s.iface"), m_Tag);
 	m_pInterfaceStructType->AddBaseType (m_pInterfaceHdrStructType);
-
-	m_pPointerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pPointerStructType->m_Tag.Format (_T("%s.ptr"), m_Tag);
-	m_pPointerStructType->CreateMember (GetInterfaceStructType ()->GetPointerType (EType_Pointer_u));
-	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pPointerStructType->CalcLayout ();
 
 	// lay out base types
 

@@ -508,18 +508,12 @@ protected:
 
 //.............................................................................
 
-enum EObjectFlag
-{
-	EObjectFlag_IsStack      = 1,
-	EObjectFlag_IsDestructed = 2, // used during weak to strong conversion 
-};
-
 // header of class instance
 
 struct TObjectHdr
 {
-	intptr_t m_Flags;
-	class CClassType* m_pType; // for GC tracing & QueryInterface
+	class CClassType* m_pType; // for GC tracing & QueryInterface; after destruction is zeroed
+	size_t m_ScopeLevel;
 
 	// followed by TInterface of object
 };
@@ -532,12 +526,6 @@ struct TInterfaceHdr
 	TObjectHdr* m_pObject; // for GC tracing & QueryInterface
 
 	// followed by parents, then by interface data fields
-};
-
-struct TInterface
-{
-	TInterfaceHdr* m_p;
-	size_t m_ScopeLevel;
 };
 
 //.............................................................................
@@ -564,7 +552,7 @@ struct TFunctionPtr
 {
 	void* m_pfn;
 	intptr_t m_CallingConvention;
-	TInterface m_Interface; // NULL, interface of object or interface of closure object
+	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
 };
 
 // structure backing up property pointer declared like
@@ -573,7 +561,7 @@ struct TFunctionPtr
 struct TPropertyPtr
 {
 	void** m_pVTable;
-	TInterface m_Interface; // NULL, interface of object or interface of closure object
+	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
 };
 
 //.............................................................................

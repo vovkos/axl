@@ -82,6 +82,10 @@ public:
 	 
 	bool
 	Continue (size_t Level);
+
+protected:
+	void
+	RestoreScopeLevel (CFunction* pFunction);
 };
 
 //.............................................................................

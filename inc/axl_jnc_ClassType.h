@@ -245,7 +245,6 @@ protected:
 
 	rtl::CArrayT <CFunction*> m_MethodFunctionArray;
 
-	CStructType* m_pPointerStructType;
 	CStructType* m_pInterfaceHdrStructType;
 	CStructType* m_pInterfaceStructType;
 	CStructType* m_pClassStructType;
@@ -257,16 +256,6 @@ public:
 	GetPackFactor ()
 	{
 		return m_PackFactor;
-	}
-
-	llvm::StructType* 
-	GetLlvmType ();
-
-	CStructType* 
-	GetPointerStructType ()
-	{
-		ASSERT (m_pPointerStructType);
-		return m_pPointerStructType;
 	}
 
 	CStructType* 

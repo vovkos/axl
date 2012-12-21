@@ -149,6 +149,17 @@ CControlFlowMgr::Continue (size_t Level)
 	return true;
 }
 
+void
+CControlFlowMgr::RestoreScopeLevel (CFunction* pFunction)
+{
+	if (!pFunction->GetScopeLevelVariable ())
+		return;
+
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
+}
+
 bool
 CControlFlowMgr::Return (const CValue& Value)
 {
@@ -166,44 +177,20 @@ CControlFlowMgr::Return (const CValue& Value)
 			return false;
 		}
 		
-		if (pFunction->GetScopeLevelVariable ())
-		{
-			CValue ScopeLevelValue;
-			m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
-			m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
-		}
-
+		RestoreScopeLevel (pFunction);
 		m_pModule->m_LlvmBuilder.CreateRet ();
 	}
 	else
 	{
 		CValue ReturnValue;
-		bool Result = m_pModule->m_OperatorMgr.CastOperator (Value, pReturnType, &ReturnValue);
+		bool Result = 
+			m_pModule->m_OperatorMgr.CastOperator (Value, pReturnType, &ReturnValue) &&
+			m_pModule->m_OperatorMgr.PrepareOperand (&ReturnValue, EOpFlag_VariableToSafePtr);
+
 		if (!Result)
-			return false;		
-
-		if (pReturnType->GetTypeKind () == EType_Pointer)
-		{
-			Result = m_pModule->m_LlvmBuilder.CheckSafePtrScope (ReturnValue, NULL);
-			if (!Result)
-				return false;
-
-			if (ReturnValue.GetValueKind () == EValue_Variable)
-				m_pModule->m_LlvmBuilder.CreateSafePtr (
-					ReturnValue, 
-					ReturnValue.GetVariable (),
-					(CPointerType*) pReturnType,
-					&ReturnValue
-					);
-		}
-
-		if (pFunction->GetScopeLevelVariable ())
-		{
-			CValue ScopeLevelValue;
-			m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
-			m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
-		}
-
+			return false;
+		
+		RestoreScopeLevel (pFunction);
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
 

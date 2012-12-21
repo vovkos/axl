@@ -201,7 +201,7 @@ CFunctionPointerType::GetMemberFunctionType ()
 		return m_pMemberFunctionType;
 
 	rtl::CArrayT <CType*> ArgTypeArray = m_pFunctionType->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface));
+	ArgTypeArray.Insert (0, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr));
 
 	m_pMemberFunctionType = m_pModule->m_TypeMgr.GetFunctionType (
 		m_pFunctionType->GetCallingConvention (),
@@ -223,7 +223,7 @@ CFunctionPointerType::GetPointerStructType ()
 	m_pPointerStructType->m_Tag.Format (_T("pfn"));
 	m_pPointerStructType->CreateMember (m_pFunctionType->GetPointerType (EType_Pointer_u));
 	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
-	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface));
+	m_pPointerStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr));
 	m_pPointerStructType->CalcLayout ();
 
 	return m_pPointerStructType;

@@ -731,7 +731,7 @@ CCast_ptr::LlvmCast_ptr_u (
 		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, Offset, NULL, &PtrValue);
 	}
 
-	// make sure type is unsafe pointer (cause we cakk LlvmCast_ptr_u from LlvmCast_ptr also)
+	// make sure type is unsafe pointer (cause we call LlvmCast_ptr_u from LlvmCast_ptr also)
 
 	pPointerType = pPointerType->GetBaseType ()->GetPointerType (EType_Pointer_u);
 	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPointerType, &PtrValue);
@@ -806,7 +806,7 @@ CCast_fn::LlvmCast (
 		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
 			Value,
 			pSrcFunctionType->GetCallingConvention (),
-			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
+			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue (),
 			pFunctionPointerType, 
 			pResultValue
 			);
@@ -861,7 +861,7 @@ CCast_fn::LlvmCast (
 	
 	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 	
-	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetUndefValue ();
+	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetUndefValue ();
 	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
 	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, NULL, &InterfaceValue);
 
@@ -931,7 +931,7 @@ CCast_prop::LlvmCast (
 
 		m_pModule->m_LlvmBuilder.CreatePropertyPointer (
 			Value,
-			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetZeroValue (),
+			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue (),
 			pPropertyPointerType, 
 			pResultValue
 			);
@@ -990,7 +990,7 @@ CCast_prop::LlvmCast (
 	
 	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 	
-	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterface)->GetUndefValue ();
+	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetUndefValue ();
 	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
 	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, NULL, &InterfaceValue);
 
@@ -1177,25 +1177,22 @@ CCast_class::LlvmCast (
 	if (!Result)
 		return m_pModule->m_LlvmBuilder.DynamicCastInterface (Value, pDstClassType, pResultValue);
 
-	CValue PtrValue;
-	CValue ScopeLevelValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ScopeLevelValue);
-
-	CValue SrcNullValue = pSrcClassType->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u)->GetZeroValue ();
-	CValue DstNullValue = pDstClassType->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u)->GetZeroValue ();
+	CValue SrcNullValue = pSrcClassType->GetZeroValue ();
+	CValue DstNullValue = pDstClassType->GetZeroValue ();
 
 	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_phi"));
 	CBasicBlock* pNoNullBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_nonull"));
 
 	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateEq_i (PtrValue, SrcNullValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateEq_i (Value, SrcNullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pPhiBlock, pNoNullBlock, pNoNullBlock);
 	
 	Coord.m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
+
+	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
-		PtrValue, 
+		Value, 
 		Coord.m_FieldCoord.m_LlvmIndexArray,
 		Coord.m_FieldCoord.m_LlvmIndexArray.GetCount (),
 		NULL, 
@@ -1204,9 +1201,7 @@ CCast_class::LlvmCast (
 
 	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
 
-	CValue PhiValue;
-	m_pModule->m_LlvmBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, &PhiValue);
-	m_pModule->m_LlvmBuilder.CreateInterface (PhiValue, ScopeLevelValue, pDstClassType, pResultValue);
+	m_pModule->m_LlvmBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, pResultValue);
 	return true;
 }
 
