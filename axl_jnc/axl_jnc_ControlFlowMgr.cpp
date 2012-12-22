@@ -124,28 +124,36 @@ CControlFlowMgr::ConditionalJump (
 bool
 CControlFlowMgr::Break (size_t Level)
 {
-	CScope* pScope = m_pModule->m_NamespaceMgr.FindBreakScope (Level);
-	if (!pScope)
+	CScope* pTargetScope = m_pModule->m_NamespaceMgr.FindBreakScope (Level);
+	if (!pTargetScope)
 	{
 		err::SetFormatStringError (_T("illegal break"));
 		return false;
 	}
 
-	Jump (pScope->m_pBreakBlock, NULL);
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	for (; pScope && pScope != pTargetScope; pScope = pScope->GetParentScope ())
+		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
+
+	Jump (pTargetScope->m_pBreakBlock, NULL);
 	return true;
 }
 
 bool
 CControlFlowMgr::Continue (size_t Level)
 {
-	CScope* pScope = m_pModule->m_NamespaceMgr.FindBreakScope (Level);
-	if (!pScope)
+	CScope* pTargetScope = m_pModule->m_NamespaceMgr.FindBreakScope (Level);
+	if (!pTargetScope)
 	{
 		err::SetFormatStringError (_T("illegal continue"));
 		return false;
 	}
 
-	Jump (pScope->m_pContinueBlock, NULL);
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	for (; pScope && pScope != pTargetScope; pScope = pScope->GetParentScope ())
+		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
+
+	Jump (pTargetScope->m_pContinueBlock, NULL);
 	return true;
 }
 

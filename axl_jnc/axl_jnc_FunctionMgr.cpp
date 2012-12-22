@@ -252,10 +252,15 @@ CFunctionMgr::CompileFunctions ()
 			break;
 
 		case EFunction_Method:
+			pThisType = pFunction->GetClassType ();
+			pOriginType = pFunction->GetVTableClassType ();
+			break;
+
+		case EFunction_PreConstructor:
 		case EFunction_Constructor:
 		case EFunction_Destructor:
 			pThisType = pFunction->GetClassType ();
-			pOriginType = pFunction->GetVTableClassType ();
+			pOriginType = pThisType;
 			break;
 
 		default:
@@ -852,6 +857,10 @@ CFunctionMgr::CreateClassInitializer (CClassType* pClassType)
 	m_pModule->m_LlvmBuilder.CreateStore (ArgValue2, PtrValue);
 
 	InitializeInterface (pClassType, ObjectPtrValue, IfacePtrValue, VTablePtrValue);
+
+	CFunction* pPreConstructor = pClassType->GetPreConstructor ();
+	if (pPreConstructor)
+		m_pModule->m_LlvmBuilder.CreateCall (pPreConstructor, pPreConstructor->GetType (), IfacePtrValue, NULL);
 
 	m_pModule->m_ControlFlowMgr.Return ();
 

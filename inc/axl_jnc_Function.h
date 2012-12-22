@@ -25,6 +25,7 @@ enum EFunction
 	EFunction_Undefined = 0,
 	EFunction_Global,
 	EFunction_Method,
+	EFunction_PreConstructor,
 	EFunction_Constructor,
 	EFunction_Destructor,
 };

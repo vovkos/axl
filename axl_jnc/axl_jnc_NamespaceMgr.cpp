@@ -141,6 +141,8 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 	if (!m_pCurrentScope)
 		return;
 
+	m_pModule->m_OperatorMgr.ProcessDestructList (&m_pCurrentScope->m_DestructList);
+
 	ASSERT (m_pCurrentScope == m_pCurrentNamespace);
 	m_pCurrentScope->m_PosEnd = Pos;
 

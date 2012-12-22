@@ -1092,14 +1092,17 @@ COperatorMgr::StackNewOperator (
 	{
 		CClassType* pClassType = (CClassType*) pType;
 
-		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetClassStructType (), _T("new"), NULL, &PtrValue);
+		CValue ObjPtrValue;
+		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetClassStructType (), _T("new"), NULL, &ObjPtrValue);
 		
-		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, pScope);
+		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (ObjPtrValue, pClassType, pScope);
 		if (!Result)
 			return false;
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType, pResultValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType, pResultValue);
+
+		if (pClassType->GetDestructor ())
+			pScope->AddToDestructList (*pResultValue);
 	}
 	else
 	{
@@ -1172,9 +1175,25 @@ COperatorMgr::HeapNewOperator (
 	}
 
 	return true;
+}
 
-	err::SetFormatStringError (_T("heap new operator not implemented yet"));
-	return false;
+bool
+COperatorMgr::ProcessDestructList (rtl::CBoxListT <CValue>* pList)
+{
+	rtl::CBoxIteratorT <CValue> It = pList->GetHead ();
+	for (; It; It++)
+	{
+		CValue Value = *It;
+		CClassType* pType = (CClassType*) Value.GetType ();
+		ASSERT (pType->GetTypeKind () == EType_Class);
+
+		CFunction* pDestructor = pType->GetDestructor ();
+		ASSERT (pDestructor);
+
+		m_pModule->m_LlvmBuilder.CreateCall (pDestructor, pDestructor->GetType (), Value, NULL);		
+	}
+
+	return true;
 }
 
 CType*

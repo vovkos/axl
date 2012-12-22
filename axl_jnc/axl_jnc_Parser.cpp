@@ -520,15 +520,22 @@ CParser::DeclareClassPreConstructor (
 
 	CFunctionType* pType = (CFunctionType*) pDeclarator->GetType (&DeclSpecifiers);
 	ASSERT (pType && pType->GetTypeKind () == EType_Function); 
-
-	if (!pType->GetArgTypeArray ().IsEmpty ())
+	
+	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
+	if (!ArgTypeArray.IsEmpty ())
 	{
-		err::SetFormatStringError (_T("pre-constructor must have no argument"), pClassType->GetQualifiedName ());
+		err::SetFormatStringError (_T("pre-constructor must have no arguments"), pClassType->GetQualifiedName ());
 		return NULL;
 	}
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pType);
+	ArgTypeArray.Insert (0, pClassType);
+	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
+	
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_PreConstructor;
 	pFunction->m_Tag.Format (_T("%s.preconstruct"), pClassType->GetQualifiedName ());
+	pFunction->m_pShortType = pType;
+	pFunction->m_pClassType = pClassType;
 	pClassType->m_pPreConstructor = pFunction;
 	return pFunction;
 }
@@ -545,8 +552,15 @@ CParser::DeclareClassConstructor (
 	CFunctionType* pType = (CFunctionType*) pDeclarator->GetType (&DeclSpecifiers);
 	ASSERT (pType && pType->GetTypeKind () == EType_Function); 
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pType);
+	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, pClassType);
+	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_Constructor;
 	pFunction->m_Tag.Format (_T("%s.construct"), pClassType->GetQualifiedName ());
+	pFunction->m_pShortType = pType;
+	pFunction->m_pClassType = pClassType;
 
 	bool Result = pClassType->m_Constructor.AddOverload (pFunction);
 	if (!Result)
@@ -573,14 +587,21 @@ CParser::DeclareClassDestructor (
 	CFunctionType* pType = (CFunctionType*) pDeclarator->GetType (&DeclSpecifiers);
 	ASSERT (pType && pType->GetTypeKind () == EType_Function); 
 
-	if (!pType->GetArgTypeArray ().IsEmpty ())
+	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
+	if (!ArgTypeArray.IsEmpty ())
 	{
-		err::SetFormatStringError (_T("destructor must have no argument"));
+		err::SetFormatStringError (_T("destructor must have no arguments"));
 		return NULL;
 	}
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pType);
+	ArgTypeArray.Insert (0, pClassType);
+	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_Destructor;
 	pFunction->m_Tag.Format (_T("%s.destruct"), pClassType->GetQualifiedName ());
+	pFunction->m_pShortType = pType;
+	pFunction->m_pClassType = pClassType;
 	pClassType->m_pDestructor = pFunction;
 	return pFunction;
 }

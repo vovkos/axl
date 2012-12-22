@@ -37,18 +37,20 @@ main ()
 {
 	printf ("hui\n");
 
-	int x = 10;
-	int* p1;
-
+	for (int i = 0; i < 5; i++)
 	{
-		int y = 20;
-		int* p2;
+		printf ("i = %d\n", i);
+		CTest t1 = stack new CTest;
 
-		int** pp2 = &p1;
+		for (int j = 0; j < 5; j++)
+		{
+			printf ("j = %d\n", j);
+			CTest t2 = stack new CTest;
 
-		*pp2 = &x;
+			if (j > 2)
+				break 2;
+		}
 	}
-	
 
 	printf ("govno i muravei\n");
 	return 0;

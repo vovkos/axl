@@ -340,6 +340,9 @@ public:
 		CValue* pResultValue
 		);
 
+	bool
+	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
+
 protected:
 	ICastOperator*
 	GetCastOperator (

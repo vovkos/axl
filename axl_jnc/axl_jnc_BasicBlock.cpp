@@ -26,12 +26,14 @@ CBasicBlock::HasReturn ()
 	if (m_Flags & EBasicBlockFlag_IsHasReturnCalc)
 		return EHasReturn_Undefined;
 
+	m_Flags |= EBasicBlockFlag_IsHasReturnCalc;
+
 	static EHasReturn HasReturnTable [5] [5] = 
 	{
 		{ EHasReturn_Undefined, EHasReturn_None, EHasReturn_Some, EHasReturn_All,  EHasReturn_All  },
-		{ EHasReturn_Undefined, EHasReturn_None, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
-		{ EHasReturn_Undefined, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
-		{ EHasReturn_Undefined, EHasReturn_Some, EHasReturn_Some, EHasReturn_All,  EHasReturn_All  },
+		{ EHasReturn_None,      EHasReturn_None, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
+		{ EHasReturn_Some,      EHasReturn_Some, EHasReturn_Some, EHasReturn_Some, EHasReturn_Some },
+		{ EHasReturn_All,       EHasReturn_Some, EHasReturn_Some, EHasReturn_All,  EHasReturn_All  },
 	};
 	
 	size_t Count = m_JumpArray.GetCount ();
@@ -47,8 +49,9 @@ CBasicBlock::HasReturn ()
 	}
 
 	if (m_HasReturn == EHasReturn_Undefined)
-		m_HasReturn = EHasReturn_None;
+		m_HasReturn = EHasReturn_All; // assume the best
 
+	m_Flags &= ~EBasicBlockFlag_IsHasReturnCalc;
 	m_Flags |= EBasicBlockFlag_IsHasReturnReady;
 	return m_HasReturn;
 }

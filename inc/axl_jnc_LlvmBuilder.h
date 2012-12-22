@@ -957,6 +957,16 @@ public:
 	}
 
 	llvm::CallInst*
+	CreateCall (
+		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
+		CValue* pResultValue
+		)
+	{
+		return CreateCall (CalleeValue, pFunctionType, NULL, 0, pResultValue);
+	}
+
+	llvm::CallInst*
 	CreateCall2 (
 		const CValue& CalleeValue,
 		CFunctionType* pFunctionType,

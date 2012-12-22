@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Namespace.h"
+#include "axl_jnc_Value.h"
 
 namespace axl {
 namespace jnc {
@@ -27,6 +28,8 @@ protected:
 
 	void* m_pCodeBegin;
 	void* m_pCodeEnd;
+
+	rtl::CBoxListT <CValue> m_DestructList;
 
 public:
 	CBasicBlock* m_pBreakBlock;
@@ -54,6 +57,18 @@ public:
 	{
 		return m_pParentNamespace && m_pParentNamespace->GetNamespaceKind () == ENamespace_Scope ? 
 			(CScope*) m_pParentNamespace : NULL;
+	}
+
+	void
+	AddToDestructList (const CValue& Value)
+	{
+		m_DestructList.InsertTail (Value);
+	}
+
+	rtl::CBoxListT <CValue>*
+	GetDestructList ()
+	{
+		return &m_DestructList;
 	}
 };
 
