@@ -105,10 +105,10 @@ conditional_expr <CValue* $pValue>
 	;
 
 logical_or_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: logical_and_expr <$pValue> 
 	  (
 		EToken_LogicalOr logical_and_expr <&$OpValue2>
@@ -119,10 +119,10 @@ local
 	;
 
 logical_and_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: inclusive_or_expr <$pValue> 
 	  (
 		EToken_LogicalAnd inclusive_or_expr <&$OpValue2>
@@ -133,10 +133,10 @@ local
 	;
 
 inclusive_or_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: exclusive_or_expr <$pValue> 
 	  (
 		'|' exclusive_or_expr <&$OpValue2>
@@ -147,10 +147,10 @@ local
 	;
 
 exclusive_or_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: and_expr <$pValue> 
 	  (
 		'^' and_expr <&$OpValue2>
@@ -161,10 +161,10 @@ local
 	;
 
 and_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: equality_expr <$pValue> 
 	  (
 		'&' equality_expr <&$OpValue2>
@@ -175,10 +175,10 @@ local
 	;
 
 equality_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: relational_expr <$pValue> 
 	  (
 		equality_operator $o relational_expr <&$OpValue2>
@@ -204,10 +204,10 @@ equality_operator
 	;
 
 relational_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: shift_expr <$pValue> 
 	  (
 		relational_operator $o shift_expr <&$OpValue2>
@@ -241,10 +241,10 @@ relational_operator
 	;
 
 shift_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: additive_expr <$pValue> 
 	  (
 		shift_operator $o additive_expr <&$OpValue2>
@@ -270,10 +270,10 @@ shift_operator
 	;
 
 additive_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: multiplicative_expr <$pValue> 
 	  (
 		additivie_operator $o multiplicative_expr <&$OpValue2>
@@ -299,10 +299,10 @@ additivie_operator
 	;
 
 multiplicative_expr <CValue* $pValue>
-local
-{
-	CValue $OpValue2;
-}
+	local
+	{
+		CValue $OpValue2;
+	}
 	: assignment_expr <$pValue> 
 	  (
 		multiplicative_operator $o assignment_expr <&$OpValue2>
@@ -332,10 +332,10 @@ multiplicative_operator
 	;
 
 assignment_expr <CValue* $pValue>
-local
-{
-	CValue $RValue;
-}
+	local
+	{
+		CValue $RValue;
+	}
 	: unary_expr <$pValue> 
 	  (
 		assignment_operator $o conditional_expr <&$RValue>
@@ -471,10 +471,10 @@ unary_expr <CValue* $pValue>
 // otherwise epsilon production always loses
 
 cast_operator_rslv
-local
-{
-	CTypeSpecifierModifiers $TypeSpecifier;
-}
+	local
+	{
+		CTypeSpecifierModifiers $TypeSpecifier;
+	}
 	: '(' type_specifier_modifier <&$TypeSpecifier>
 	;
 
@@ -508,15 +508,15 @@ postfix_operator <CValue* $pValue>
 	;
 
 call_operator <CValue* $pValue>
-local
-{
-	CValue $Arg;
-	rtl::CBoxListT <CValue> $ArgList;
-}
-leave 
-{
-	return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$ArgList);
-}
+	local
+	{
+		CValue $Arg;
+		rtl::CBoxListT <CValue> $ArgList;
+	}
+	leave 
+	{
+		return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$ArgList);
+	}
 	: '(' 
 	  conditional_expr <&$Arg> 
 		{
@@ -600,10 +600,11 @@ class
 	CType* m_pType;
 }
 type_name_or_expr
-local
-{
-	CValue $Value;
-}	: type_name 
+	local
+	{
+		CValue $Value;
+	}	
+	: type_name 
 		{
 			$.m_pType = $1.m_pType;
 		}

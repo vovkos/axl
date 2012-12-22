@@ -22,6 +22,7 @@ CProductionBuilder::Build (
 	)
 {
 	bool Result;
+	size_t FormalArgCount;
 
 	switch (pProduction->m_Kind)
 	{
@@ -43,6 +44,15 @@ CProductionBuilder::Build (
 		CBeaconNode* pBeacon;
 		
 		pBeacon = (CBeaconNode*) pProduction;
+
+		FormalArgCount = pBeacon->m_pTarget->m_ArgNameList.GetCount ();		 
+		if (FormalArgCount)
+		{
+			err::SetFormatStringError (_T("'%s' takes %d arguments, passed none"), pBeacon->m_pTarget->m_Name, FormalArgCount);
+			err::PushSrcPosError (pBeacon->m_SrcPos);
+			return false;
+		}
+
 		pProduction = pBeacon->m_pTarget;
 		m_pNodeMgr->DeleteBeaconNode (pBeacon);
 		return pProduction;
@@ -232,7 +242,7 @@ CProductionBuilder::AddBeacon (CBeaconNode* pBeacon)
 		CSymbolNode* pNode = (CSymbolNode*) pBeacon->m_pTarget;
 		size_t FormalArgCount = pNode->m_ArgNameList.GetCount ();
 		size_t ActualArgCount = pBeacon->m_pArgument ? pBeacon->m_pArgument->m_ArgValueList.GetCount () : 0;
-
+		
 		if (FormalArgCount != ActualArgCount)
 		{
 			err::SetFormatStringError (_T("'%s' takes %d arguments, passed %d"), pNode->m_Name, FormalArgCount, ActualArgCount);

@@ -39,8 +39,9 @@ CClassType::CClassType ()
 	m_TypeKind = EType_Class;
 	m_NamespaceKind = ENamespace_Class;
 	m_PackFactor = 8;
+	m_pPreConstructor = NULL;
+	m_pDestructor = NULL;
 	m_pInitializer = NULL;
-	m_pFinalizer = NULL;
 	m_pInterfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pVTableStructType = NULL;

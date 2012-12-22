@@ -11,6 +11,27 @@ PointerCheck (int* p);
 
 //.............................................................................
 
+class CTest
+{
+	int m_x;
+	int m_y;
+
+	preconstruct ()
+	{
+		printf ("CTest.preconstruct ()\n");
+	}
+
+	this ()
+	{
+		printf ("CTest.this ()\n");
+	}
+
+	~this ()
+	{
+		printf ("CTest.~this ()\n");
+	}
+};
+
 int
 main ()
 {

@@ -135,6 +135,24 @@ Members2
 		size_t PackFactor
 		);
 
+	CFunction*
+	DeclareClassPreConstructor (
+		CClassType* pClassType,
+		CDeclarator* pDeclarator
+		);
+
+	CFunction*
+	DeclareClassConstructor (
+		CClassType* pClassType,
+		CDeclarator* pDeclarator
+		);
+
+	CFunction*
+	DeclareClassDestructor (
+		CClassType* pClassType,
+		CDeclarator* pDeclarator
+		);
+
 	CFunctionFormalArg*
 	DeclareFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,

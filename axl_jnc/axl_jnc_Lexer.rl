@@ -80,6 +80,7 @@ main := |*
 'bindable'     { CreateToken (EToken_Bindable); };
 'virtual'      { CreateToken (EToken_Virtual); };
 'novirtual'    { CreateToken (EToken_NoVirtual); };
+'preconstruct' { CreateToken (EToken_PreConstruct); };
 'cdecl'        { CreateToken (EToken_Cdecl); };
 'stdcall'      { CreateToken (EToken_Stdcall); };
 'this'         { CreateToken (EToken_This); };

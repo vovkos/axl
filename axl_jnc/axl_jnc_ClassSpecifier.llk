@@ -56,7 +56,9 @@ class_member_declaration <CClassType* $pType>
 	  declaration_specifier_list $s
 	  class_member_declarator_list $d <&$s.m_DeclSpecifiers, $pType> ? 
 	  declaration_terminator <$d.m_pLastMember>
-	| function_body_pass1
+	| class_preconstructor <$pType>
+	| class_constructor <$pType>
+	| class_destructor <$pType>
 	| ';'
 	;
 
@@ -104,5 +106,57 @@ class_member_declarator <CDeclSpecifiers* $pDeclSpecifiers, CClassType* $pType>
 		}
 	  )?
 	;
+
+class
+{
+	CFunction* m_pPreConstructor;
+} 
+class_preconstructor <CClassType* $ppppType>
+	local
+	{
+		CDeclarator $Declarator
+	}
+	: EToken_PreConstruct function_suffix <&$Declarator> 
+		{
+			$.m_pPreConstructor = DeclareClassPreConstructor ($ppppType, &$Declarator);
+			return $.m_pPreConstructor != NULL;
+		}
+	  declaration_terminator <$.m_pPreConstructor>
+	;
+
+class
+{
+	CFunction* m_pConstructor;
+} 
+class_constructor <CClassType* $pType>
+	local
+	{
+		CDeclarator $Declarator
+	}
+	: EToken_This function_suffix <&$Declarator> 
+		{
+			$.m_pConstructor = DeclareClassConstructor ($pType, &$Declarator);
+			return $.m_pConstructor != NULL;
+		}
+	  declaration_terminator <$.m_pConstructor>
+	;
+
+class
+{
+	CFunction* m_pDestructor;
+} 
+class_destructor <CClassType* $pType>
+	local
+	{
+		CDeclarator $Declarator
+	}
+	: '~' EToken_This function_suffix <&$Declarator> 
+		{
+			$.m_pDestructor = DeclareClassDestructor ($pType, &$Declarator);
+			return $.m_pDestructor != NULL;
+		}
+	  declaration_terminator <$.m_pDestructor>
+	;
+
 
 //.............................................................................

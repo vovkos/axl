@@ -131,6 +131,10 @@ public:
 		)
 	{
 		ASSERT (IsOpen ());
+
+		if (!pString)
+			pString = "";
+
 		if (Length != -1)
 			lua_pushlstring (m_h, pString, Length);
 		else

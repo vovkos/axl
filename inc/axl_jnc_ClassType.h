@@ -239,9 +239,11 @@ protected:
 	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
 	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;
 
-	CFunction* m_pInitializer;
-	CFunction* m_pFinalizer;
+	CFunction* m_pPreConstructor;
 	CFunctionOverload m_Constructor;
+	CFunction* m_pDestructor;
+
+	CFunction* m_pInitializer;
 
 	rtl::CArrayT <CFunction*> m_MethodFunctionArray;
 
@@ -278,14 +280,11 @@ public:
 		ASSERT (m_pClassStructType);
 		return m_pClassStructType;
 	}
-
+	
 	CFunction* 
-	GetInitializer ();
-
-	CFunction* 
-	GetFinalizer ()
+	GetPreConstructor ()
 	{
-		return m_pFinalizer;
+		return m_pPreConstructor;
 	}
 
 	CFunctionOverload*
@@ -293,6 +292,15 @@ public:
 	{
 		return &m_Constructor;
 	}
+
+	CFunction* 
+	GetDestructor ()
+	{
+		return m_pDestructor;
+	}
+
+	CFunction* 
+	GetInitializer ();
 
 	size_t 
 	GetBaseTypeCount ()
