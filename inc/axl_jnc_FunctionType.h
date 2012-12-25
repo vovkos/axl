@@ -55,6 +55,7 @@ protected:
 	CFunctionPointerType* m_pFunctionPointerType;
 	CFunctionType* m_pDefCallConvFunctionType;
 	ECallConv m_CallingConvention;
+	rtl::CStringA m_ArgSignature;
 
 public:
 	CFunctionType ();
@@ -86,11 +87,22 @@ public:
 		return m_ArgTypeArray;
 	}
 
+	rtl::CStringA
+	GetArgSignature ();
+
 	CFunctionPointerType* 
 	GetFunctionPointerType ();
 
 	CFunctionType*
 	GetDefCallConvFunctionType ();
+
+	static
+	rtl::CStringA
+	CreateArgSignature (
+		CType* const* ppArgType,
+		size_t ArgCount,
+		int Flags
+		);
 
 	static
 	rtl::CStringA

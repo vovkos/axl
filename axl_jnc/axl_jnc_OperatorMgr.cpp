@@ -380,6 +380,41 @@ COperatorMgr::GetCastKind (
 	return pOperator ? pOperator->GetCastKind (pOpType, pType) : ECast_None;
 }
 
+ECast
+COperatorMgr::GetCallCastKind (
+	CFunctionType* pFunctionType,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
+	size_t FormalArgCount = ArgTypeArray.GetCount ();
+	size_t ActualArgCount = pArgList->GetCount ();
+
+	if (FormalArgCount > ActualArgCount || 
+		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_IsVarArg))
+	{
+		return ECast_None;
+	}
+
+	ECast WorstCastKind = ECast_Identitiy;
+
+	rtl::CBoxIteratorT <CValue> ActualArg = pArgList->GetHead ();
+	for (size_t i = 0; i < FormalArgCount; i++, ActualArg++)
+	{
+		CType* pFormalArgType = ArgTypeArray [i];
+		CType* pActualArgType = ActualArg->GetType ();
+
+		ECast CastKind = GetCastKind (pActualArgType, pFormalArgType);
+		if (!CastKind)
+			return ECast_None;
+
+		if (CastKind < WorstCastKind)
+			WorstCastKind = CastKind;
+	}
+
+	return WorstCastKind;
+}
+
 bool
 COperatorMgr::CastOperator (
 	const CValue& RawOpValue,
@@ -1225,25 +1260,31 @@ COperatorMgr::CallOperator (
 	CValue* pResultValue
 	)
 {
+	bool Result;
+
 	rtl::CBoxListT <CValue> EmptyArgList;
 	if (!pArgList)
 		pArgList = &EmptyArgList;
 
 	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_LoadReference);
-	if (!Result)
-		return false;
 
-	CType* pOpType = OpValue.GetType ();
-
-	// choose overloaded function based on arglist
-
-	if (OpValue.GetValueKind () == EValue_FunctionOverload)
+	if (RawOpValue.GetValueKind () == EValue_FunctionOverload)
 	{
-		CFunctionOverload* pFunctionOverload = OpValue.GetFunctionOverload ();
-		CFunction* pFunction = pFunctionOverload->FindOverload (pArgList);
+		CFunctionOverload* pFunctionOverload = RawOpValue.GetFunctionOverload ();
+		CFunction* pFunction = pFunctionOverload->ChooseOverload (pArgList);
+		if (!pFunction)
+			return false;
+
 		OpValue.SetFunction (pFunction);
 	}
+	else
+	{
+		Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_LoadReference);
+		if (!Result)
+			return false;
+	}
+
+	CType* pOpType = OpValue.GetType ();
 
 	CClosure* pClosure = OpValue.GetClosure ();
 	if (pClosure)
@@ -2057,16 +2098,9 @@ COperatorMgr::SetPropertyOperator (
 	ArgList.InsertTail (SrcValue);
 
 	CFunctionOverload* pSetter = pPropertyType->GetSetter ();
-	CFunction* pFunction = pSetter->FindOverload (&ArgList);
+	CFunction* pFunction = pSetter->ChooseOverload (&ArgList);
 	if (!pFunction)
-	{
-		err::SetFormatStringError (
-			_T("none of the %d property setters accepts '%s'"), 
-			pSetter->GetOverloadCount (),
-			SrcValue.GetType ()->GetTypeString ()
-			);
 		return false;
-	}
 
 	ASSERT (pFunction->GetVTableType () == pPropertyType);
 

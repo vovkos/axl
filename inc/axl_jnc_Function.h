@@ -319,7 +319,7 @@ public:
 	AddOverload (CFunction* pFunction);
 	
 	CFunction*
-	FindOverload (rtl::CBoxListT <CValue>* pArgList) const;
+	ChooseOverload (rtl::CBoxListT <CValue>* pArgList) const;
 
 	CFunction*
 	FindOverload (CFunctionType* pType) const;

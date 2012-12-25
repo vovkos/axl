@@ -123,11 +123,44 @@ CFunction::GetLlvmFunction ()
 //.............................................................................
 
 CFunction*
-CFunctionOverload::FindOverload (rtl::CBoxListT <CValue>* pArgList) const
+CFunctionOverload::ChooseOverload (rtl::CBoxListT <CValue>* pArgList) const
 {
-	// TODO: implement 
+	ASSERT (m_pFunction);
 
-	return m_pFunction; 
+	CModule* pModule = m_pFunction->GetType ()->GetModule ();
+
+	ECast BestCastKind = pModule->m_OperatorMgr.GetCallCastKind (m_pFunction->GetType (), pArgList);
+	CFunction* pBestFunction = BestCastKind ? m_pFunction : NULL;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = m_OverloadArray [i];
+		ECast CastKind = pModule->m_OperatorMgr.GetCallCastKind (pFunction->GetType (), pArgList);
+
+		if (!CastKind)
+			continue;
+
+		if (CastKind == BestCastKind)
+		{
+			err::SetFormatStringError (_T("ambiguous call to overloaded function"));
+			return NULL;
+		}
+
+		if (CastKind > BestCastKind)
+		{
+			pBestFunction = pFunction;
+			BestCastKind = CastKind;
+		}
+	}
+
+	if (!pBestFunction)
+	{
+		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
+		return NULL;
+	}
+
+	return pBestFunction; 
 }
 
 CFunction*
@@ -139,7 +172,7 @@ CFunctionOverload::FindOverload (CFunctionType* pType) const
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CFunction* pFunction = GetFunction (i);
+		CFunction* pFunction = m_OverloadArray [i];
 		if (pType->Cmp (pFunction->GetType ()) == 0)
 			return pFunction;
 	}
@@ -156,7 +189,7 @@ CFunctionOverload::FindShortOverload (CFunctionType* pType) const
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CFunction* pFunction = GetFunction (i);
+		CFunction* pFunction = m_OverloadArray [i];
 		if (pType->Cmp (pFunction->GetShortType ()) == 0)
 			return pFunction;
 	}
@@ -173,10 +206,19 @@ CFunctionOverload::AddOverload (CFunction* pFunction)
 		return true;
 	}
 
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pExistingFunction = m_OverloadArray [i];
+		
+		if (pFunction->GetType ()->GetArgSignature ().Cmp (pExistingFunction->GetType ()->GetArgSignature ()) == 0)
+		{
+			err::SetFormatStringError (_T("illegal function overload: duplicate argument signature"));
+			return false;
+		}
+	}
+
 	m_OverloadArray.Append (pFunction);
-
-	// TODO: check that no overloads overlap
-
 	return true;
 }
 

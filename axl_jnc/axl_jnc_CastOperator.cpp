@@ -67,7 +67,7 @@ CSuperCast::GetCastKind (
 	ECast FirstCastKind = m_pFirst->GetCastKind (pSrcType, m_pIntermediateType);
 	ECast SecondCastKind = m_pSecond->GetCastKind (m_pIntermediateType, pDstType);
 	 
-	return FirstCastKind && SecondCastKind ? max (FirstCastKind,SecondCastKind) : ECast_None;
+	return min (FirstCastKind, SecondCastKind);
 }
 
 bool

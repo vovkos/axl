@@ -38,6 +38,38 @@ CFunctionType::CFunctionType ()
 }
 
 rtl::CStringA
+CFunctionType::GetArgSignature ()
+{
+	if (m_ArgSignature.IsEmpty ())
+		m_ArgSignature = CreateArgSignature (m_ArgTypeArray, m_ArgTypeArray.GetCount (), m_Flags);
+
+	return m_ArgSignature;
+}
+
+rtl::CStringA
+CFunctionType::CreateArgSignature (
+	CType* const* ppArgType,
+	size_t ArgCount,
+	int Flags
+	)
+{
+	rtl::CString String = "(";
+
+	for (size_t i = 0; i < ArgCount; i++)
+	{
+		CType* pType = ppArgType [i];
+		String.Append (pType->GetSignature ());
+	}
+
+	String.Append (
+		(Flags & EFunctionTypeFlag_IsVarArg) ? 
+		(Flags & EFunctionTypeFlag_IsUnsafeVarArg) ? ".-)" : ".)" : ")"
+		);
+	
+	return String;
+}
+
+rtl::CStringA
 CFunctionType::CreateSignature (
 	ECallConv CallingConvention,
 	CType* pReturnType,
@@ -46,6 +78,7 @@ CFunctionType::CreateSignature (
 	int Flags
 	)
 {
+
 	rtl::CStringA String = "P";
 
 	switch (CallingConvention)
@@ -59,20 +92,8 @@ CFunctionType::CreateSignature (
 		break;
 	}
 
-	String += "(";
-	
 	String.Append (pReturnType->GetSignature ());
-	
-	for (size_t i = 0; i < ArgCount; i++)
-	{
-		CType* pType = ppArgType [i];
-		String.Append(pType->GetSignature ());
-	}
-
-	String.Append (
-		(Flags & EFunctionTypeFlag_IsVarArg) ? 
-		(Flags & EFunctionTypeFlag_IsUnsafeVarArg) ? ".-)" : ".)" : ")"
-		);
+	String.Append (CreateArgSignature (ppArgType, ArgCount, Flags));
 
 	return String;
 }

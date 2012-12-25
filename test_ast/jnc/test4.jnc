@@ -11,39 +11,46 @@ PointerCheck (int* p);
 
 //.............................................................................
 
-void
-test ()
+class CTest
 {
-	printf ("test ()\n");
-}
+	int m_x;
+	int m_y;
 
-void 
-test (int a)
-{
-	printf ("test (int x = %d)\n", a);
-}
+	preconstruct ()
+	{
+		printf ("CTest.preconstruct ()\n");
+	}
 
-void 
-test (double a)
-{
-	printf ("test (double x = %f)\n", a);
-}
+	this ()
+	{
+		printf ("CTest.this ()\n");
+	}
 
-void 
-test (int x, int y)
-{
-	printf ("test (int x = %d, int y = %d)\n", x, y);
-}
+	~this ()
+	{
+		printf ("CTest.~this ()\n");
+	}
+};
 
 int
 main ()
 {
 	printf ("hui\n");
 
-	double x = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		printf ("i = %d\n", i);
+		CTest t1 = stack new CTest;
 
-	test (x);
+		for (int j = 0; j < 5; j++)
+		{
+			printf ("j = %d\n", j);
+			CTest t2 = stack new CTest;
 
+			if (j > 2)
+				break 2;
+		}
+	}
 
 	printf ("govno i muravei\n");
 	return 0;

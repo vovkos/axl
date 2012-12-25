@@ -123,40 +123,9 @@ CParser::Declare (
 	else if (TypeKind == EType_Function)
 	{
 		CFunctionType* pFunctionType = (CFunctionType*) pType;
-		CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (
-			*pDeclarator->GetName (),
-			pFunctionType, 
-			pDeclarator->GetArgList ()
-			);
-
-		EPropertyAccessor AccessorKind = pDeclarator->GetPropertyAccessorKind ();
-		if (AccessorKind)
-		{
-			pFunction->m_PropertyAccessorKind = AccessorKind;
-			pFunction->m_Tag.AppendFormat (_T(".%s"), GetPropertyAccessorString (AccessorKind));
-		}
-
-		if (pClassType)
-		{
-			if (!pDeclarator->GetName ()->IsSimple ())
-			{
-				err::SetFormatStringError (_T("invalid class method member name '%s'"), pFunction->GetTag ());
-				return NULL;
-			}
-
-			if (!pDeclarator->GetPropertyAccessorKind ())
-			{
-				Result = pClassType->CreateMethodMember (Name, pFunction) != NULL;
-				if (!Result)
-					return NULL;
-			}
-			else 
-			{
-				pClassType->AddMethodFunction (pFunction);
-			}
-
-		}
-		else if (pOldItem)
+		CFunction* pFunction;
+		
+		if (pOldItem)
 		{
 			if (pOldItem->GetItemKind () != EModuleItem_GlobalFunction)
 			{	
@@ -168,15 +137,59 @@ CParser::Declare (
 			pFunction = pGlobalFunction->FindOverload (pFunctionType);
 			if (!pFunction)
 			{
+				pFunction = m_pModule->m_FunctionMgr.CreateFunction (
+					*pDeclarator->GetName (),
+					pFunctionType, 
+					pDeclarator->GetArgList ()
+					);
+
+				pFunction->m_FunctionKind = EFunction_Global;
+
 				Result = pGlobalFunction->AddOverload (pFunction);
 				if (!Result)
 					return NULL;
 			}
 		}
-		else if (pDeclarator->IsSimple ())
+		else
 		{
-			CGlobalFunction* pGlobalFunction = m_pModule->m_FunctionMgr.CreateGlobalFunction (Name, pFunction);
-			pNamespace->AddItem (pGlobalFunction);
+			pFunction = m_pModule->m_FunctionMgr.CreateFunction (
+				*pDeclarator->GetName (),
+				pFunctionType, 
+				pDeclarator->GetArgList ()
+				);
+
+			EPropertyAccessor AccessorKind = pDeclarator->GetPropertyAccessorKind ();
+			if (AccessorKind)
+			{
+				pFunction->m_PropertyAccessorKind = AccessorKind;
+				pFunction->m_Tag.AppendFormat (_T(".%s"), GetPropertyAccessorString (AccessorKind));
+			}
+
+			if (pClassType)
+			{
+				if (!pDeclarator->GetName ()->IsSimple ())
+				{
+					err::SetFormatStringError (_T("invalid class method member name '%s'"), pFunction->GetTag ());
+					return NULL;
+				}
+
+				if (!pDeclarator->GetPropertyAccessorKind ())
+				{
+					Result = pClassType->CreateMethodMember (Name, pFunction) != NULL;
+					if (!Result)
+						return NULL;
+				}
+				else 
+				{
+					pClassType->AddMethodFunction (pFunction);
+				}
+
+			}
+			else if (pDeclarator->IsSimple ())
+			{
+				CGlobalFunction* pGlobalFunction = m_pModule->m_FunctionMgr.CreateGlobalFunction (Name, pFunction);
+				pNamespace->AddItem (pGlobalFunction);
+			}
 		}
 
 		pNewItem = pFunction;

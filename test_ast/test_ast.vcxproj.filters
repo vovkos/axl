@@ -76,6 +76,7 @@
     <None Include="jnc\test1.jnc" />
     <None Include="jnc\test2.jnc" />
     <None Include="jnc\test3.jnc" />
+    <None Include="jnc\test4.jnc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="test_ast.h">

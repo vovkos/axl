@@ -14,12 +14,14 @@ class CFunctionPointerType;
 
 //.............................................................................
 
+// ordered from the worst to the best
+
 enum ECast
 {
 	ECast_None,
-	ECast_Identitiy,
-	ECast_Lossless,
 	ECast_Lossy,
+	ECast_Lossless,
+	ECast_Identitiy,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -146,7 +148,7 @@ public:
 		CType* pDstType
 		)
 	{
-		return ECast_Lossless;
+		return pSrcType->Cmp (pDstType) == 0 ? ECast_Identitiy : ECast_Lossless;
 	}
 
 	virtual

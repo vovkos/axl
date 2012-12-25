@@ -198,6 +198,12 @@ public:
 		CType* pDstType
 		);
 
+	ECast
+	GetCallCastKind (
+		CFunctionType* pType,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
 	bool
 	CastOperator (
 		const CValue& OpValue,
@@ -342,7 +348,7 @@ public:
 
 	bool
 	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
-
+	
 protected:
 	ICastOperator*
 	GetCastOperator (
