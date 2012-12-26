@@ -28,6 +28,37 @@ enum ENode
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+inline
+const tchar_t*
+GetNodeKindString (ENode NodeKind)
+{
+	switch (NodeKind)
+	{
+	case ENode_Token:
+		return _T("token-node");
+
+	case ENode_Symbol:
+		return _T("symbol-node");
+
+	case ENode_Sequence:
+		return _T("sequence-node");
+
+	case ENode_Action:
+		return _T("action-node");
+
+	case ENode_Argument:
+		return _T("argument-node");
+
+	case ENode_LaDfa:
+		return _T("lookahead-dfa-node");
+
+	default:
+		return _T("undefined-node");
+	};
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum ENodeFlag
 {
 	ENodeFlag_IsLocator = 0x01, // used to locate AST / token from actions (applies to token & symbol nodes)
@@ -54,6 +85,12 @@ public:
 	virtual
 	~CNode ()
 	{
+	}
+
+	const tchar_t*
+	GetNodeKindString ()
+	{
+		return llk::GetNodeKindString (m_Kind);
 	}
 };
 

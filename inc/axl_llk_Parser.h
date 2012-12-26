@@ -408,8 +408,9 @@ protected:
 			m_TokenList.InsertListHead (&pNode->m_DfaTokenList);
 
 			PopPreResolver ();
-			PopPrediction ();
+			PopPrediction ();						
 			PushPrediction (ProductionIndex);
+
 			return EMatchResult_NextToken;
 		}
 
@@ -676,7 +677,7 @@ protected:
 		m_PredictionStack.SetCount (Count - 1);
 	}
 
-	// symbol stack
+	// debug
 
 	void
 	TraceSymbolStack ()
@@ -690,6 +691,33 @@ protected:
 			TRACE ("%s\n", ((T*) this)->GetSymbolName (pNode->m_Index));
 		}
 	}
+
+	void
+	TracePredictionStack ()
+	{
+		intptr_t Count = m_PredictionStack.GetCount ();
+
+		TRACE ("PREDICTION STACK (%d nodes):\n", Count);
+		for (intptr_t i = 0; i < Count; i++)
+		{
+			CNode* pNode = m_PredictionStack [i];
+			TRACE ("%s (%d)\n", GetNodeKindString (pNode->m_Kind), pNode->m_Index);
+		}
+	}
+
+	void
+	TraceTokenList ()
+	{
+		rtl::CBoxIteratorT <CToken> Token = m_TokenList.GetHead ();
+
+		TRACE ("TOKEN LIST (%d tokens):\n", m_TokenList.GetCount ());
+		for (; Token; Token++)
+		{
+			TRACE ("%s '%s'\n", Token->GetName (), Token->GetText ());
+		}
+	}
+
+	// symbol stack
 
 	size_t 
 	GetSymbolStackSize ()
@@ -785,7 +813,7 @@ protected:
 		}
 
 		CLaDfaNode* pNode = m_ResolverStack [Count - 1];
-		pNode->m_Flags |= ELaDfaNodeFlag_IsPreResolver;
+		pNode->m_Flags &= ~ELaDfaNodeFlag_IsPreResolver;
 
 		m_ResolverStack.SetCount (Count - 1);
 	}

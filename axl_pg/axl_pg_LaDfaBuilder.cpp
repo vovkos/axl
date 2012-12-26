@@ -143,7 +143,17 @@ CLaDfaBuilder::Build (
 		CNode* pProduction = pConflict->m_ProductionArray [i];
 		CLaDfaThread* pThread = pState0->CreateThread ();
 		pThread->m_pProduction = pProduction;
-	
+		
+		if (pProduction->m_Kind == ENode_Symbol)
+		{
+			CSymbolNode* pSymbolNode = (CSymbolNode*) pProduction;
+			if (pSymbolNode->m_pResolver)
+			{
+				ASSERT (pSymbolNode->m_ProductionArray.GetCount () == 1);
+				pThread->m_pProduction = pSymbolNode->m_ProductionArray [0]; // adjust root production
+			}
+		}
+
 		if (pProduction->m_Kind != ENode_Epsilon)
 			pThread->m_Stack.Append (pProduction);
 		else
@@ -231,27 +241,34 @@ CLaDfaBuilder::Build (
 			pDfaElse->m_pResolverUplink = pState->m_pDfaNode;
 			pState->m_pDfaNode = pDfaElse;
 		}
-		
+
+		ASSERT (!pState->m_pDfaNode->m_pResolver);
+
 		if (pState->IsResolved ())
 		{
 			pState->m_pDfaNode->m_Flags |= ELaDfaNodeFlag_IsLeaf;
 			pState->m_pDfaNode->m_pProduction = pState->GetResolvedProduction ();
 
-			if (!pState->m_pDfaNode->m_pProduction && 
-				pState->m_pDfaNode->m_pResolverUplink)
+			if (pState->m_pDfaNode->m_pResolverUplink)
 			{
-				// here we handle situation like
-				// sym: resolver ({1}) 'a' | resolver ({2}) 'a'
-				// we have a chain of 2 resolver with empty tail
-				// so we can safely eliminate the 2nd resolver
-
 				CLaDfaNode* pUplink = pState->m_pDfaNode->m_pResolverUplink;
-				pUplink->m_Flags |= ELaDfaNodeFlag_IsLeaf;
-				pUplink->m_pResolver = NULL;
-				pUplink->m_pResolverElse = NULL;
 
-				m_pNodeMgr->DeleteLaDfaNode (pState->m_pDfaNode);
-				pState->m_pDfaNode = pUplink;
+				if (!pState->m_pDfaNode->m_pProduction || 
+					pState->m_pDfaNode->m_pProduction == pUplink->m_pProduction)
+				{
+					// here we handle situation like
+					// 1) sym: resolver ({1}) 'a' | resolver ({2}) 'b' (we have a chain of 2 resolver with empty tail)
+					// or
+					// 2) both resolver 'then' and 'else' branch point to the same production (this happens when resolver applies not to the original conflict)
+					// in either case we we can safely eliminate the resolver {2}
+
+					pUplink->m_Flags |= ELaDfaNodeFlag_IsLeaf;
+					pUplink->m_pResolver = NULL;
+					pUplink->m_pResolverElse = NULL;
+
+					m_pNodeMgr->DeleteLaDfaNode (pState->m_pDfaNode);
+					pState->m_pDfaNode = pUplink;
+				}
 			}
 		}
 		else

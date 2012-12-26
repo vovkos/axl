@@ -40,7 +40,10 @@ main ()
 {
 	printf ("hui\n");
 
-	double x = 0;
+	double x;
+	int y;
+	
+	x = (char) y;
 
 	test (x);
 
