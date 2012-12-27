@@ -1450,6 +1450,7 @@ COperatorMgr::CallImpl (
 		
 		CValue ArgCast;
 		Result = 
+			CheckCastKind (Arg->GetType (), pFormalArgType) &&
 			CastOperator (*Arg, pFormalArgType, &ArgCast) &&
 			PrepareOperand (&ArgCast, EOpFlag_VariableToSafePtr);
 
@@ -1814,6 +1815,31 @@ COperatorMgr::LoadReferenceOperator (CValue* pValue)
 }
 
 bool
+COperatorMgr::CheckCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	ECast CastKind = GetCastKind (pSrcType, pDstType);
+	switch (CastKind)
+	{
+	case ECast_Lossy:
+		err::SetFormatStringError (
+			_T("conversion from '%s' to '%s' requires explicit cast"),
+			pSrcType->GetTypeString (),
+			pDstType->GetTypeString ()
+			);
+		return false;
+
+	case ECast_None:
+		SetCastError (pSrcType, pDstType);
+		return false;
+	}
+
+	return true;
+}
+
+bool
 COperatorMgr::StoreReferenceOperator (
 	const CValue& RawSrcValue,
 	const CValue& RawDstValue,
@@ -1851,6 +1877,10 @@ COperatorMgr::StoreReferenceOperator (
 		IsVolatile = (pTargetType->GetFlags () & ETypeQualifier_Volatile) != 0;
 		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
 	}
+
+	Result = CheckCastKind (RawSrcValue.GetType (), pTargetType);
+	if (!Result)
+		return false;
 
 	CValue SrcValue;
 	Result = CastOperator (RawSrcValue, pTargetType, &SrcValue);

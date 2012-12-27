@@ -30,23 +30,40 @@ test (double a)
 }
 
 void 
-test (int x, int y)
+test (char x, short y)
 {
 	printf ("test (int x = %d, int y = %d)\n", x, y);
 }
+
+property
+{
+	int 
+	get ()
+	{	
+		printf ("MyProp.get ()\n");
+	}
+
+	void
+	set (char x)
+	{	
+		printf ("MyProp.set (char x = %d)\n", x);
+	}
+
+	void
+	set (short x)
+	{	
+		printf ("MyProp.set (short x = %d)\n", x);
+	}
+} MyProp;
 
 int
 main ()
 {
 	printf ("hui\n");
 
-	double x;
-	int y;
-	
-	x = (char) y;
+	int x, y;
 
-	test (x);
-
+	MyProp = (long) x;
 
 	printf ("govno i muravei\n");
 	return 0;

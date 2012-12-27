@@ -198,6 +198,12 @@ public:
 		CType* pDstType
 		);
 
+	bool
+	CheckCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
 	ECast
 	GetCallCastKind (
 		CFunctionType* pType,
