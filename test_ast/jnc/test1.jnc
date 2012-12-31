@@ -1,3 +1,30 @@
+test ()
+{
+	printf ("test ()\n");
+}
+
+//.............................................................................
+
+property
+{
+	int 
+	get ()
+	{	
+		printf ("MyProp.get ()\n");
+	}
+
+	set (char x)
+	{	
+		printf ("MyProp.set (char x = %d)\n", x);
+	}
+
+	set (long x)
+	{	
+		printf ("MyProp.set (long x = %d)\n", x);
+	}
+
+} MyProp;
+
 //.............................................................................
 
 int
@@ -11,55 +38,30 @@ PointerCheck (int* p);
 
 //.............................................................................
 
-void
-test ()
-{
-	printf ("test ()\n");
-}
-
-void 
 test (int a)
 {
 	printf ("test (int x = %d)\n", a);
 }
 
-void 
 test (double a)
 {
 	printf ("test (double x = %f)\n", a);
 }
 
-void 
-test (char x, short y)
+test (
+	int x, 
+	int y
+	)
 {
 	printf ("test (int x = %d, int y = %d)\n", x, y);
 }
-
-property
-{
-	int 
-	get ()
-	{	
-		printf ("MyProp.get ()\n");
-	}
-
-	void
-	set (char x)
-	{	
-		printf ("MyProp.set (char x = %d)\n", x);
-	}
-
-	void
-	set (short x)
-	{	
-		printf ("MyProp.set (short x = %d)\n", x);
-	}
-} MyProp;
 
 int
 main ()
 {
 	printf ("hui\n");
+
+	test (10, 20);
 
 	int x, y;
 

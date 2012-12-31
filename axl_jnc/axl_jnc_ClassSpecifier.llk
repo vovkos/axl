@@ -59,7 +59,6 @@ class_member_declaration <CClassType* $pType>
 	| class_preconstructor <$pType>
 	| class_constructor <$pType>
 	| class_destructor <$pType>
-	| ';'
 	;
 
 class

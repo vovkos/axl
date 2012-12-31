@@ -142,6 +142,15 @@
     <ClInclude Include="..\inc\axl_jnc_VTableType.h">
       <Filter>type</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_EventType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_FunctionPointerType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_PropertyPointerType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -250,6 +259,15 @@
     <ClCompile Include="axl_jnc_VTableType.cpp">
       <Filter>type</Filter>
     </ClCompile>
+    <ClCompile Include="axl_jnc_EventType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_FunctionPointerType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_PropertyPointerType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="axl_jnc_AttributeBlock.llk">
@@ -258,13 +276,7 @@
     <None Include="axl_jnc_ClassSpecifier.llk">
       <Filter>parser</Filter>
     </None>
-    <None Include="axl_jnc_CommonDeclaration.llk">
-      <Filter>parser</Filter>
-    </None>
     <None Include="axl_jnc_EnumSpecifier.llk">
-      <Filter>parser</Filter>
-    </None>
-    <None Include="axl_jnc_NamespaceDeclaration.llk">
       <Filter>parser</Filter>
     </None>
     <None Include="axl_jnc_PropertySpecifier.llk">

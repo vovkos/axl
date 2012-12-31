@@ -22,8 +22,10 @@ CParser::IsTypeSpecified ()
 	if (m_TypeSpecifierStack.IsEmpty ())
 		return false;
 
-	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
-	return pTypeSpecifier->GetType () != NULL;
+	CTypeSpecifierModifiers* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
+	return 
+		pTypeSpecifier->GetType () != NULL ||
+		pTypeSpecifier->GetTypeModifiers () & (ETypeModifier_Signed | ETypeModifier_Unsigned | ETypeModifier_Event);
 }
 
 CType*
@@ -53,7 +55,7 @@ CParser::FindType (const CQualifiedName& Name)
 
 CModuleItem*
 CParser::Declare (
-	CDeclSpecifiers* pDeclSpecifiers,
+	CDeclSpecifiers* pDeclSpecifiers, // could be NULL
 	CDeclarator* pDeclarator,
 	CClassType* pClassType,
 	size_t BitCount,
@@ -66,7 +68,7 @@ CParser::Declare (
 	if (!pType)
 		return NULL;
 
-	EStorageClass StorageClass = pDeclSpecifiers->GetStorageClass ();
+	EStorageClass StorageClass = pDeclSpecifiers ? pDeclSpecifiers->GetStorageClass () : EStorageClass_Undefined;
 	EType TypeKind = pType->GetTypeKind ();
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();

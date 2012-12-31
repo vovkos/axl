@@ -9,6 +9,10 @@
 #include "axl_jnc_ArrayType.h"
 #include "axl_jnc_BitFieldType.h"
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_FunctionPointerType.h"
+#include "axl_jnc_EventType.h"
+#include "axl_jnc_PropertyType.h"
+#include "axl_jnc_PropertyPointerType.h"
 #include "axl_jnc_EnumType.h"
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
@@ -52,6 +56,7 @@ protected:
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
 	rtl::CStdListT <CFunctionPointerType> m_FunctionPointerTypeList;
+	rtl::CStdListT <CEventType> m_EventTypeList;
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CPropertyPointerType> m_PropertyPointerTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
@@ -150,6 +155,9 @@ public:
 
 	CFunctionPointerType* 
 	GetFunctionPointerType (CFunctionType* pFunctionType);
+
+	CEventType* 
+	GetEventType (CFunctionType* pFunctionType);
 
 	CPropertyPointerType* 
 	GetPropertyPointerType (CPropertyType* pPropertyType);

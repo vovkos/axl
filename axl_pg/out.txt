@@ -1,893 +1,385 @@
-LL (2)
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq1 common_declaration 
+	'*' -> 1
+  1 * 1/1/0/0 (a/r/c/e)
+	ACTIVE:   _seq1 
+	RESOLVER: common_declaration 
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq1 common_declaration 
+	'&' -> 1
+  1 * 1/1/0/0 (a/r/c/e)
+	ACTIVE:   _seq1 
+	RESOLVER: common_declaration 
+*** conflict at declaration:EToken_Identifier: 2 resolvers in chain at EToken_Identifier
+active: 1; complete: 0; epsilon: 0
+resolved = 1, uplink = 30bd3c, prod = _seq1: expr ';', uplink->prod = common_declaration
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq1 common_declaration 
+	EToken_Identifier -> 1
+  1 * 1/2/0/0 (a/r/c/e)
+	ACTIVE:   _seq1 
+	RESOLVER: common_declaration common_declaration 
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq2 <epsilon> 
+	EToken_Identifier -> 1
+  1 * 0/1/0/1 (a/r/c/e)
+	RESOLVER: _seq2 
+	EPSILON: <epsilon> 
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq8 <epsilon> 
+	EToken_Identifier -> 1
+  1 * 0/1/0/1 (a/r/c/e)
+	RESOLVER: _seq8 
+	EPSILON: <epsilon> 
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq11 <epsilon> 
+	'*' -> 1
+  1 * 1/0/0/1 (a/r/c/e)
+	ACTIVE:   _seq11 
+	EPSILON: <epsilon> 
+  0   2/0/0/0 (a/r/c/e)
+	ACTIVE:   _seq14 <epsilon> 
+	'&' -> 1
+  1 * 1/0/0/1 (a/r/c/e)
+	ACTIVE:   _seq14 
+	EPSILON: <epsilon> 
+LL (1)
 TOKENS
-  0/0  	\00
-  1/1  	';'
-  2/2  	'{'
-  3/3  	'}'
-  4/4  	'.'
-  5/5  	'('
-  6/6  	')'
-  7/7  	','
-  8/8  	'='
-  9/9  	':'
- 10/10 	'*'
- 11/11 	'&'
- 12/12 	'['
- 13/13 	']'
- 14/14 	EToken_Import
- 15/15 	EToken_Literal
- 16/16 	EToken_Namespace
- 17/17 	external_declaration
- 18/18 	EToken_Using
- 19/19 	EToken_Identifier
- 20/20 	EToken_Pack
- 21/21 	EToken_Default
- 22/22 	EToken_Static
- 23/23 	EToken_Typedef
- 24/24 	EToken_Const
- 25/25 	EToken_Void
- 26/26 	EToken_Bool
- 27/27 	EToken_Int
- 28/28 	EToken_Char
- 29/29 	EToken_Short
- 30/30 	EToken_Long
- 31/31 	EToken_Unsigned
- 32/32 	EToken_Float
- 33/33 	EToken_Double
- 34/34 	EToken_Int8
- 35/35 	EToken_Int16
- 36/36 	EToken_Int32
- 37/37 	EToken_Int64
- 38/38 	EToken_WChar
- 39/39 	EToken_Variant
- 40/40 	EToken_Auto
- 41/41 	EToken_Enum
- 42/42 	EToken_EnumC
- 43/43 	EToken_Struct
- 44/44 	EToken_Union
- 45/45 	EToken_Ellipsis
- 46/46 	EToken_Integer
-SYMBOLS
-  0/47 	compilation_unit
-	  -> _seq1: global_declaration _tmp1
-	  -> \00
-	  FIRST:  ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union <eps>
+  0/0   $
+	  FIRST:  (null)
+	  FOLLOW: (null)
+  1/1   <any>
+	  FIRST:  <any>
+	  FOLLOW: (null)
+  2/2   ';'
+	  FIRST:  ';'
 	  FOLLOW: (null) $
-	  CLASS:  DEFAULT
-  1/48 	global_declaration
-	  -> import_declaration
-	  -> namespace_declaration
-	  -> using_declaration
-	  -> pack_declaration
-	  -> common_declaration
-	  -> ';'
-	  FIRST:  ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  CLASS:  DEFAULT
-  2/49 	import_declaration
-	  -> _seq2: EToken_Import EToken_Literal ';'
-	  FIRST:  EToken_Import
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  CLASS:  DEFAULT
-  3/50 	namespace_declaration
-	  -> _seq3: EToken_Namespace qualified_name '{' _tmp3 '}'
-	  FIRST:  EToken_Namespace
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  CLASS:  DEFAULT
-  4/51 	using_declaration
-	  -> _seq5: EToken_Using EToken_Namespace qualified_name ';'
-	  FIRST:  EToken_Using
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  CLASS:  DEFAULT
-  5/52 	pack_declaration
-	  -> _seq9: EToken_Pack '(' _tmp5 ')' ';'
-	  FIRST:  EToken_Pack
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  CLASS:  DEFAULT
-  6/53 	common_declaration
-	  -> _seq10: declaration_specifier _tmp6 init_declarator_list ';'
-	  FIRST:  EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  CLASS:  DEFAULT
-  7/54 	qualified_name
-	  -> _seq8: EToken_Identifier _tmp4
+  3/3   '*'
+	  FIRST:  '*'
+	  FOLLOW: (null)
+  4/4   '&'
+	  FIRST:  '&'
+	  FOLLOW: (null)
+  5/5   '('
+	  FIRST:  '('
+	  FOLLOW: (null)
+  6/6   ')'
+	  FIRST:  ')'
+	  FOLLOW: (null)
+  7/7   '{'
+	  FIRST:  '{'
+	  FOLLOW: (null)
+  8/8   '}'
+	  FIRST:  '}'
+	  FOLLOW: (null) $
+  9/9   EToken_Int
+	  FIRST:  EToken_Int
+	  FOLLOW: (null)
+ 10/10  EToken_Float
+	  FIRST:  EToken_Float
+	  FOLLOW: (null)
+ 11/11  EToken_Identifier
 	  FIRST:  EToken_Identifier
-	  FOLLOW: ';' '{'
-	  CLASS:  DEFAULT
-  8/55 	constant_integer_expression
-	  -> EToken_Integer
+	  FOLLOW: (null)
+ 12/12  EToken_Integer
 	  FIRST:  EToken_Integer
-	  FOLLOW: ';' '}' ')' ',' ']'
-	  CLASS:  DEFAULT
-  9/56 	declaration_specifier
-	  -> storage_class_specifier
-	  -> type_specifier_modifier
-	  FIRST:  EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ',' '=' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 10/57 	init_declarator_list
-	  -> _seq33: init_declarator _tmp25
-	  FIRST:  '(' ',' '=' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';'
-	  CLASS:  DEFAULT
- 11/58 	storage_class_specifier
-	  -> EToken_Static
-	  -> EToken_Typedef
-	  FIRST:  EToken_Static EToken_Typedef
-	  FOLLOW: ';' '(' ',' '=' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 12/59 	type_specifier_modifier
-	  -> type_specifier
-	  -> type_modifier
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 13/60 	type_specifier
-	  -> EToken_Void
-	  -> EToken_Bool
+	  FOLLOW: (null)
+SYMBOLS
+  0/13  program
+	  FIRST:  ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: (null) $
+	  -> common_declaration
+  1/14  common_declaration
+	  FIRST:  ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: (null) $
+	  -> _seq3: _tmp2 _tmp3 declaration_terminator
+  2/15  declaration
+	  FIRST:  ';' '*' '&' '(' '{' EToken_Int EToken_Float EToken_Identifier EToken_Integer
+	  FOLLOW: (null)
+	  -> _seq1: expr ';'
+	  -> common_declaration
+  3/16  expr
+	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
+	  FOLLOW: ';' '*' '&' ')'
+	  -> _seq12: mul_expr _tmp12
+  4/17  type_specifier
+	  FIRST:  EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
 	  -> EToken_Int
-	  -> EToken_Char
-	  -> EToken_Short
-	  -> EToken_Long
-	  -> EToken_Unsigned
 	  -> EToken_Float
-	  -> EToken_Double
-	  -> EToken_Int8
-	  -> EToken_Int16
-	  -> EToken_Int32
-	  -> EToken_Int64
-	  -> EToken_WChar
-	  -> EToken_Variant
-	  -> EToken_Auto
-	  -> enum_specifier
-	  -> struct_specifier
-	  -> EToken_Identifier
-	  FIRST:  EToken_Identifier EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 14/61 	type_modifier
-	  -> EToken_Const
-	  FIRST:  EToken_Const
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 15/62 	enum_specifier
-	  -> _seq12: enum_kind EToken_Identifier _tmp11
-	  -> _seq13: enum_kind enum_block
-	  FIRST:  EToken_Enum EToken_EnumC
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 16/63 	struct_specifier
-	  -> _seq20: struct_kind EToken_Identifier _tmp17
-	  -> _seq21: struct_kind struct_block
-	  FIRST:  EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 17/64 	enum_kind
-	  -> EToken_Enum
-	  -> EToken_EnumC
-	  FIRST:  EToken_Enum EToken_EnumC
-	  FOLLOW: '{' EToken_Identifier
-	  CLASS:  DEFAULT
- 18/65 	enum_block
-	  -> _seq14: '{' enum_member_list '}'
-	  FIRST:  '{'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 19/66 	enum_member_list
-	  -> _seq17: enum_member _tmp14 _tmp15
-	  FIRST:  EToken_Identifier
-	  FOLLOW: '}'
-	  CLASS:  DEFAULT
- 20/67 	enum_member
-	  -> _seq19: EToken_Identifier _tmp16
-	  FIRST:  EToken_Identifier
-	  FOLLOW: '}' ','
-	  CLASS:  DEFAULT
- 21/68 	struct_kind
-	  -> EToken_Struct
-	  -> EToken_Union
-	  FIRST:  EToken_Struct EToken_Union
-	  FOLLOW: '{' EToken_Identifier
-	  CLASS:  DEFAULT
- 22/69 	struct_block
-	  -> _seq23: '{' _tmp20 '}'
-	  FIRST:  '{'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 23/70 	struct_member_declaration
-	  -> _seq24: type_specifier_modifier _tmp21 struct_member_declarator_list ';'
+	  -> _tmp5
+  5/18  declarator
+	  FIRST:  '*' '&' EToken_Identifier
+	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
+	  -> _tmp8
+  6/19  declaration_terminator
+	  FIRST:  ';' '{'
+	  FOLLOW: (null) $
 	  -> ';'
-	  FIRST:  ';' EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '}' EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 24/71 	struct_member_declarator_list
-	  -> _seq28: struct_member_declarator _tmp23
-	  FIRST:  '(' ',' ':' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';'
-	  CLASS:  DEFAULT
- 25/72 	struct_member_declarator
-	  -> _seq30: declarator _tmp24
-	  FIRST:  '(' ':' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';' ','
-	  CLASS:  DEFAULT
- 26/73 	declarator
-	  -> _seq37: _tmp27 _tmp28 _tmp29
-	  FIRST:  '(' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';' ')' ',' '=' ':'
-	  CLASS:  DEFAULT
- 27/74 	init_declarator
-	  -> _seq35: declarator _tmp26
-	  FIRST:  '(' '=' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';' ','
-	  CLASS:  DEFAULT
- 28/75 	initializer
-	  -> EToken_Integer
-	  -> _seq55: '{' initializer_list _tmp39 '}'
-	  FIRST:  '{' EToken_Integer
-	  FOLLOW: ';' '}' ','
-	  CLASS:  DEFAULT
- 29/76 	pointer
-	  -> _seq40: pointer_kind _tmp30
+	  -> _seq19: '{' '}'
+  7/20  pointer
 	  FIRST:  '*' '&'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier
-	  CLASS:  DEFAULT
- 30/77 	declarator_suffix
-	  -> _seq41: '[' constant_integer_expression ']'
-	  -> _seq42: '[' ']'
-	  -> _seq43: '(' formal_argument_list ')'
-	  -> _seq44: '(' ')'
-	  FIRST:  '(' '['
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '['
-	  CLASS:  DEFAULT
- 31/78 	pointer_kind
+	  FOLLOW: '*' '&' EToken_Identifier
 	  -> '*'
 	  -> '&'
-	  FIRST:  '*' '&'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Const
-	  CLASS:  DEFAULT
- 32/79 	formal_argument_list
-	  -> _seq47: formal_argument _tmp33 _tmp34
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ')'
-	  CLASS:  DEFAULT
- 33/80 	formal_argument
-	  -> _seq49: type_specifier_modifier _tmp35 declarator
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ')' ','
-	  CLASS:  DEFAULT
- 34/81 	initializer_list
-	  -> _seq58: initializer _tmp41
-	  FIRST:  '{' EToken_Integer
-	  FOLLOW: '}' ','
-	  CLASS:  DEFAULT
- 35/82 	_tmp1
-	  -> _seq1: global_declaration _tmp1
-	  -> \00
-	  FIRST:  ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union <eps>
-	  FOLLOW: (null) $
-	  CLASS:  DEFAULT
- 36/83 	_tmp3
-	  -> _seq4: external_declaration _tmp3
-	  -> \00
-	  FIRST:  external_declaration <eps>
-	  FOLLOW: '}'
-	  CLASS:  DEFAULT
- 37/84 	_tmp4
-	  -> _seq7: '.' EToken_Identifier _tmp4
-	  -> \00
-	  FIRST:  '.' <eps>
-	  FOLLOW: ';' '{'
-	  CLASS:  DEFAULT
- 38/85 	_tmp5
-	  -> constant_integer_expression
-	  -> EToken_Default
-	  FIRST:  EToken_Default EToken_Integer
-	  FOLLOW: ')'
-	  CLASS:  DEFAULT
- 39/86 	_tmp6
-	  -> _seq11: declaration_specifier _tmp6
-	  -> \00
-	  FIRST:  EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union <eps>
-	  FOLLOW: ';' '(' ',' '=' '*' '&' '[' EToken_Identifier
-	  CLASS:  DEFAULT
- 40/87 	_tmp11
-	  -> enum_block
-	  -> \00
-	  FIRST:  '{' <eps>
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 41/88 	_tmp14
-	  -> _seq16: ',' enum_member _tmp14
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: '}' ','
-	  CLASS:  DEFAULT
- 42/89 	_tmp15
-	  -> ','
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: '}'
-	  CLASS:  DEFAULT
- 43/90 	_tmp16
-	  -> _seq18: '=' constant_integer_expression
-	  -> \00
-	  FIRST:  '=' <eps>
-	  FOLLOW: '}' ','
-	  CLASS:  DEFAULT
- 44/91 	_tmp17
-	  -> struct_block
-	  -> \00
-	  FIRST:  '{' <eps>
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  CLASS:  DEFAULT
- 45/92 	_tmp20
-	  -> _seq22: struct_member_declaration _tmp20
-	  -> \00
-	  FIRST:  ';' EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union <eps>
-	  FOLLOW: '}'
-	  CLASS:  DEFAULT
- 46/93 	_tmp21
-	  -> _seq25: type_specifier_modifier _tmp21
-	  -> \00
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union <eps>
-	  FOLLOW: ';' '(' ',' ':' '*' '&' '[' EToken_Identifier
-	  CLASS:  DEFAULT
- 47/94 	_tmp23
-	  -> _seq27: ',' struct_member_declarator _tmp23
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: ';'
-	  CLASS:  DEFAULT
- 48/95 	_tmp24
-	  -> _seq29: ':' constant_integer_expression
-	  -> \00
-	  FIRST:  ':' <eps>
-	  FOLLOW: ';' ','
-	  CLASS:  DEFAULT
- 49/96 	_tmp25
-	  -> _seq32: ',' init_declarator _tmp25
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: ';'
-	  CLASS:  DEFAULT
- 50/97 	_tmp26
-	  -> _seq34: '=' initializer
-	  -> \00
-	  FIRST:  '=' <eps>
-	  FOLLOW: ';' ','
-	  CLASS:  DEFAULT
- 51/98 	_tmp27
-	  -> _seq36: pointer _tmp27
-	  -> \00
-	  FIRST:  '*' '&' <eps>
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '[' EToken_Identifier
-	  CLASS:  DEFAULT
- 52/99 	_tmp28
+  8/21  function_suffix
+	  FIRST:  '('
+	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
+	  -> _seq7: '(' _tmp10 ')'
+  9/22  formal_arg
+	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: '*' '&' ')' EToken_Int EToken_Float EToken_Identifier
+	  -> _seq9: _tmp11 declarator
+ 10/23  mul_expr
+	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
+	  FOLLOW: ';' '*' '&' ')'
+	  -> _seq15: primary_expr _tmp13
+ 11/24  primary_expr
+	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
+	  FOLLOW: ';' '*' '&' ')'
+	  -> EToken_Integer
 	  -> EToken_Identifier
-	  -> \00
-	  FIRST:  EToken_Identifier <eps>
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '['
-	  CLASS:  DEFAULT
- 53/100	_tmp29
-	  -> _seq38: declarator_suffix _tmp29
-	  -> \00
-	  FIRST:  '(' '[' <eps>
-	  FOLLOW: ';' ')' ',' '=' ':'
-	  CLASS:  DEFAULT
- 54/101	_tmp30
-	  -> _seq39: type_modifier _tmp30
-	  -> \00
-	  FIRST:  EToken_Const <eps>
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier
-	  CLASS:  DEFAULT
- 55/102	_tmp33
-	  -> _seq46: ',' formal_argument _tmp33
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: ')' ','
-	  CLASS:  DEFAULT
- 56/103	_tmp34
-	  -> _seq48: ',' EToken_Ellipsis
-	  -> \00
-	  FIRST:  ',' <eps>
+	  -> _seq16: '(' expr ')'
+	  -> _seq17: '*' expr
+	  -> _seq18: '&' expr
+ 12/25  _tmp2
+	  FIRST:  EToken_Int EToken_Float EToken_Identifier <eps>
+	  FOLLOW: ';' '*' '&' '{' EToken_Identifier
+	  -> _seq2: type_specifier _tmp2
+	  -> <epsilon>
+ 13/26  _tmp3
+	  FIRST:  '*' '&' EToken_Identifier <eps>
+	  FOLLOW: ';' '{'
+	  -> declarator
+	  -> <epsilon>
+ 14/27  _tmp5
+	  FIRST:  EToken_Identifier
+	  FOLLOW: ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
+	  RSLVR:  _act1
+	  -> EToken_Identifier
+ 15/28  _tmp6
+	  FIRST:  '*' '&' <eps>
+	  FOLLOW: EToken_Identifier
+	  -> _seq4: pointer _tmp6
+	  -> <epsilon>
+ 16/29  _tmp7
+	  FIRST:  '(' <eps>
+	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
+	  -> function_suffix
+	  -> <epsilon>
+ 17/30  _tmp8
+	  FIRST:  '*' '&' EToken_Identifier
+	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
+	  RSLVR:  _act2
+	  -> _seq5: _tmp6 EToken_Identifier _tmp7
+ 18/31  _tmp10
+	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier <eps>
 	  FOLLOW: ')'
-	  CLASS:  DEFAULT
- 57/104	_tmp35
-	  -> _seq50: type_specifier_modifier _tmp35
-	  -> \00
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union <eps>
-	  FOLLOW: '(' ')' ',' '*' '&' '[' EToken_Identifier
-	  CLASS:  DEFAULT
- 58/105	_tmp39
-	  -> ','
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: '}'
-	  CLASS:  DEFAULT
- 59/106	_tmp41
-	  -> _seq57: ',' initializer _tmp41
-	  -> \00
-	  FIRST:  ',' <eps>
-	  FOLLOW: '}' ','
-	  CLASS:  DEFAULT
+	  -> _seq6: formal_arg _tmp10
+	  -> <epsilon>
+ 19/32  _tmp11
+	  FIRST:  EToken_Int EToken_Float EToken_Identifier <eps>
+	  FOLLOW: '*' '&' EToken_Identifier
+	  -> _seq8: type_specifier _tmp11
+	  -> <epsilon>
+ 20/33  _tmp12
+	  FIRST:  '*' <eps>
+	  FOLLOW: ';' '*' '&' ')'
+	  -> _seq11: '*' mul_expr _tmp12
+	  -> <epsilon>
+ 21/34  _tmp13
+	  FIRST:  '&' <eps>
+	  FOLLOW: ';' '*' '&' ')'
+	  -> _seq14: '&' primary_expr _tmp13
+	  -> <epsilon>
 SEQUENCES
-  0/107	_seq1 
-	  compilation_unit -> global_declaration _tmp1
-	  FIRST:  ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
+  0/35 	_seq1
+	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
+	  FOLLOW: (null)
+	  expr ';'
+  1/36 	_seq2
+	  FIRST:  EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: ';' '*' '&' '{' EToken_Identifier
+	  type_specifier _tmp2
+  2/37 	_seq3
+	  FIRST:  ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
 	  FOLLOW: (null) $
-	  ACTION SLOTS: (null)
-  1/108	_seq2 
-	  import_declaration -> EToken_Import EToken_Literal ';'
-	  FIRST:  EToken_Import
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  ACTION SLOTS: (null)
-  2/109	_seq3 
-	  namespace_declaration -> EToken_Namespace qualified_name '{' _tmp3 '}'
-	  FIRST:  EToken_Namespace
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  ACTION SLOTS: (null)
-  3/110	_seq5 
-	  using_declaration -> EToken_Using EToken_Namespace qualified_name ';'
-	  FIRST:  EToken_Using
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  ACTION SLOTS: (null)
-  4/111	_seq8 
-	  qualified_name -> EToken_Identifier _tmp4
-	  FIRST:  EToken_Identifier
-	  FOLLOW: ';' '{'
-	  ACTION SLOTS: (null)
-  5/112	_seq9 
-	  pack_declaration -> EToken_Pack '(' _tmp5 ')' ';'
-	  FIRST:  EToken_Pack
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  ACTION SLOTS: (null)
-  6/113	_seq10 
-	  common_declaration -> declaration_specifier _tmp6 init_declarator_list ';'
-	  FIRST:  EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' EToken_Import EToken_Namespace EToken_Using EToken_Identifier EToken_Pack EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union $
-	  ACTION SLOTS: (null)
-  7/114	_seq12 
-	  enum_specifier -> enum_kind EToken_Identifier _tmp11
-	  FIRST:  EToken_Enum EToken_EnumC
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
-  8/115	_seq13 
-	  enum_specifier -> enum_kind enum_block
-	  FIRST:  EToken_Enum EToken_EnumC
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
-  9/116	_seq14 
-	  enum_block -> '{' enum_member_list '}'
-	  FIRST:  '{'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
- 10/117	_seq17 
-	  enum_member_list -> enum_member _tmp14 _tmp15
-	  FIRST:  EToken_Identifier
-	  FOLLOW: '}'
-	  ACTION SLOTS: (null)
- 11/118	_seq19 
-	  enum_member -> EToken_Identifier _tmp16
-	  FIRST:  EToken_Identifier
-	  FOLLOW: '}' ','
-	  ACTION SLOTS: (null)
- 12/119	_seq20 
-	  struct_specifier -> struct_kind EToken_Identifier _tmp17
-	  FIRST:  EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
- 13/120	_seq21 
-	  struct_specifier -> struct_kind struct_block
-	  FIRST:  EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
- 14/121	_seq23 
-	  struct_block -> '{' _tmp20 '}'
-	  FIRST:  '{'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
- 15/122	_seq24 
-	  struct_member_declaration -> type_specifier_modifier _tmp21 struct_member_declarator_list ';'
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '}' EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  ACTION SLOTS: (null)
- 16/123	_seq28 
-	  struct_member_declarator_list -> struct_member_declarator _tmp23
-	  FIRST:  '(' ',' ':' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';'
-	  ACTION SLOTS: (null)
- 17/124	_seq30 
-	  struct_member_declarator -> declarator _tmp24
-	  FIRST:  '(' ':' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';' ','
-	  ACTION SLOTS: (null)
- 18/125	_seq33 
-	  init_declarator_list -> init_declarator _tmp25
-	  FIRST:  '(' ',' '=' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';'
-	  ACTION SLOTS: (null)
- 19/126	_seq35 
-	  init_declarator -> declarator _tmp26
-	  FIRST:  '(' '=' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';' ','
-	  ACTION SLOTS: (null)
- 20/127	_seq37 
-	  declarator -> _tmp27 _tmp28 _tmp29
-	  FIRST:  '(' '*' '&' '[' EToken_Identifier <eps>
-	  FOLLOW: ';' ')' ',' '=' ':'
-	  ACTION SLOTS: (null)
- 21/128	_seq40 
-	  pointer -> pointer_kind _tmp30
+	  _tmp2 _tmp3 declaration_terminator
+  3/38 	_seq4
 	  FIRST:  '*' '&'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier
-	  ACTION SLOTS: (null)
- 22/129	_seq41 
-	  declarator_suffix -> '[' constant_integer_expression ']'
-	  FIRST:  '['
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '['
-	  ACTION SLOTS: (null)
- 23/130	_seq42 
-	  declarator_suffix -> '[' ']'
-	  FIRST:  '['
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '['
-	  ACTION SLOTS: (null)
- 24/131	_seq43 
-	  declarator_suffix -> '(' formal_argument_list ')'
-	  FIRST:  '('
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '['
-	  ACTION SLOTS: (null)
- 25/132	_seq44 
-	  declarator_suffix -> '(' ')'
-	  FIRST:  '('
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '['
-	  ACTION SLOTS: (null)
- 26/133	_seq47 
-	  formal_argument_list -> formal_argument _tmp33 _tmp34
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
+	  FOLLOW: EToken_Identifier
+	  pointer _tmp6
+  4/39 	_seq5
+	  FIRST:  '*' '&' EToken_Identifier
+	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
+	  _tmp6 EToken_Identifier _tmp7
+  5/40 	_seq6
+	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier
 	  FOLLOW: ')'
-	  ACTION SLOTS: (null)
- 27/134	_seq49 
-	  formal_argument -> type_specifier_modifier _tmp35 declarator
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ')' ','
-	  ACTION SLOTS: (null)
- 28/135	_seq55 
-	  initializer -> '{' initializer_list _tmp39 '}'
+	  formal_arg _tmp10
+  6/41 	_seq7
+	  FIRST:  '('
+	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
+	  '(' _tmp10 ')'
+  7/42 	_seq8
+	  FIRST:  EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: '*' '&' EToken_Identifier
+	  type_specifier _tmp11
+  8/43 	_seq9
+	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier
+	  FOLLOW: '*' '&' ')' EToken_Int EToken_Float EToken_Identifier
+	  _tmp11 declarator
+  9/44 	_seq11
+	  FIRST:  '*'
+	  FOLLOW: ';' '*' '&' ')'
+	  '*' mul_expr _tmp12
+ 10/45 	_seq12
+	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
+	  FOLLOW: ';' '*' '&' ')'
+	  mul_expr _tmp12
+ 11/46 	_seq14
+	  FIRST:  '&'
+	  FOLLOW: ';' '*' '&' ')'
+	  '&' primary_expr _tmp13
+ 12/47 	_seq15
+	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
+	  FOLLOW: ';' '*' '&' ')'
+	  primary_expr _tmp13
+ 13/48 	_seq16
+	  FIRST:  '('
+	  FOLLOW: ';' '*' '&' ')'
+	  '(' expr ')'
+ 14/49 	_seq17
+	  FIRST:  '*'
+	  FOLLOW: ';' '*' '&' ')'
+	  '*' expr
+ 15/50 	_seq18
+	  FIRST:  '&'
+	  FOLLOW: ';' '*' '&' ')'
+	  '&' expr
+ 16/51 	_seq19
 	  FIRST:  '{'
-	  FOLLOW: ';' '}' ','
-	  ACTION SLOTS: (null)
- 29/136	_seq58 
-	  initializer_list -> initializer _tmp41
-	  FIRST:  '{' EToken_Integer
-	  FOLLOW: '}' ','
-	  ACTION SLOTS: (null)
- 30/137	_seq4 TEMP
-	  _tmp3 -> external_declaration _tmp3
-	  FIRST:  external_declaration
-	  FOLLOW: '}'
-	  ACTION SLOTS: (null)
- 31/138	_seq7 TEMP
-	  _tmp4 -> '.' EToken_Identifier _tmp4
-	  FIRST:  '.'
-	  FOLLOW: ';' '{'
-	  ACTION SLOTS: (null)
- 32/139	_seq11 TEMP
-	  _tmp6 -> declaration_specifier _tmp6
-	  FIRST:  EToken_Identifier EToken_Static EToken_Typedef EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ',' '=' '*' '&' '[' EToken_Identifier
-	  ACTION SLOTS: (null)
- 33/140	_seq16 TEMP
-	  _tmp14 -> ',' enum_member _tmp14
-	  FIRST:  ','
-	  FOLLOW: '}' ','
-	  ACTION SLOTS: (null)
- 34/141	_seq18 TEMP
-	  _tmp16 -> '=' constant_integer_expression
-	  FIRST:  '='
-	  FOLLOW: '}' ','
-	  ACTION SLOTS: (null)
- 35/142	_seq22 TEMP
-	  _tmp20 -> struct_member_declaration _tmp20
-	  FIRST:  ';' EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: '}'
-	  ACTION SLOTS: (null)
- 36/143	_seq25 TEMP
-	  _tmp21 -> type_specifier_modifier _tmp21
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: ';' '(' ',' ':' '*' '&' '[' EToken_Identifier
-	  ACTION SLOTS: (null)
- 37/144	_seq27 TEMP
-	  _tmp23 -> ',' struct_member_declarator _tmp23
-	  FIRST:  ','
-	  FOLLOW: ';'
-	  ACTION SLOTS: (null)
- 38/145	_seq29 TEMP
-	  _tmp24 -> ':' constant_integer_expression
-	  FIRST:  ':'
-	  FOLLOW: ';' ','
-	  ACTION SLOTS: (null)
- 39/146	_seq32 TEMP
-	  _tmp25 -> ',' init_declarator _tmp25
-	  FIRST:  ','
-	  FOLLOW: ';'
-	  ACTION SLOTS: (null)
- 40/147	_seq34 TEMP
-	  _tmp26 -> '=' initializer
-	  FIRST:  '='
-	  FOLLOW: ';' ','
-	  ACTION SLOTS: (null)
- 41/148	_seq36 TEMP
-	  _tmp27 -> pointer _tmp27
-	  FIRST:  '*' '&'
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '[' EToken_Identifier
-	  ACTION SLOTS: (null)
- 42/149	_seq38 TEMP
-	  _tmp29 -> declarator_suffix _tmp29
-	  FIRST:  '(' '['
-	  FOLLOW: ';' ')' ',' '=' ':'
-	  ACTION SLOTS: (null)
- 43/150	_seq39 TEMP
-	  _tmp30 -> type_modifier _tmp30
-	  FIRST:  EToken_Const
-	  FOLLOW: ';' '(' ')' ',' '=' ':' '*' '&' '[' EToken_Identifier
-	  ACTION SLOTS: (null)
- 44/151	_seq46 TEMP
-	  _tmp33 -> ',' formal_argument _tmp33
-	  FIRST:  ','
-	  FOLLOW: ')' ','
-	  ACTION SLOTS: (null)
- 45/152	_seq48 TEMP
-	  _tmp34 -> ',' EToken_Ellipsis
-	  FIRST:  ','
-	  FOLLOW: ')'
-	  ACTION SLOTS: (null)
- 46/153	_seq50 TEMP
-	  _tmp35 -> type_specifier_modifier _tmp35
-	  FIRST:  EToken_Identifier EToken_Const EToken_Void EToken_Bool EToken_Int EToken_Char EToken_Short EToken_Long EToken_Unsigned EToken_Float EToken_Double EToken_Int8 EToken_Int16 EToken_Int32 EToken_Int64 EToken_WChar EToken_Variant EToken_Auto EToken_Enum EToken_EnumC EToken_Struct EToken_Union
-	  FOLLOW: '(' ')' ',' '*' '&' '[' EToken_Identifier
-	  ACTION SLOTS: (null)
- 47/154	_seq57 TEMP
-	  _tmp41 -> ',' initializer _tmp41
-	  FIRST:  ','
-	  FOLLOW: '}' ','
-	  ACTION SLOTS: (null)
-LOCATORS
+	  FOLLOW: (null) $
+	  '{' '}'
+BEACONS
+DISPATCHERS
 ACTIONS
+  0/52 	_act1
+	  SYMBOL:     type_specifier
+	  DISPATCHER: NONE
+	  {  return IsTypeName;  }
+  1/53 	_act2
+	  SYMBOL:     declarator
+	  DISPATCHER: NONE
+	  {  return false;  }
 ARGUMENTS
 CONFLICTS
- -1/-1 	@ enum_specifier : EToken_Enum
-	  POSSIBLE: _seq12 _seq13
+ -1/-1 	_cnf1
+	  on '*' in declaration
 	  DFA:      _dfa1
- -1/-1 	@ enum_specifier : EToken_EnumC
-	  POSSIBLE: _seq12 _seq13
-	  DFA:      _dfa5
- -1/-1 	@ struct_specifier : EToken_Struct
-	  POSSIBLE: _seq20 _seq21
-	  DFA:      _dfa9
- -1/-1 	@ struct_specifier : EToken_Union
-	  POSSIBLE: _seq20 _seq21
-	  DFA:      _dfa13
- -1/-1 	@ declarator_suffix : '['
-	  POSSIBLE: _seq41 _seq42
-	  DFA:      _dfa17
- -1/-1 	@ declarator_suffix : '('
-	  POSSIBLE: _seq43 _seq44
-	  DFA:      _dfa21
- -1/-1 	@ _tmp6 : EToken_Identifier
-	  POSSIBLE: _seq11 \00
-	  DFA:      _dfa46
- -1/-1 	@ _tmp14 : ','
-	  POSSIBLE: _seq16 \00
-	  DFA:      _dfa48
- -1/-1 	@ _tmp21 : EToken_Identifier
-	  POSSIBLE: _seq25 \00
-	  DFA:      _dfa50
- -1/-1 	@ _tmp33 : ','
-	  POSSIBLE: _seq46 \00
-	  DFA:      _dfa52
- -1/-1 	@ _tmp35 : EToken_Identifier
-	  POSSIBLE: _seq50 \00
-	  DFA:      _dfa54
- -1/-1 	@ _tmp41 : ','
-	  POSSIBLE: _seq57 \00
-	  DFA:      _dfa56
-RESOLVERS
+	  POSSIBLE:
+	  	-> _seq1: expr ';'
+	  	-> common_declaration
+ -1/-1 	_cnf2
+	  on '&' in declaration
+	  DFA:      _dfa4
+	  POSSIBLE:
+	  	-> _seq1: expr ';'
+	  	-> common_declaration
+ -1/-1 	_cnf3
+	  on EToken_Identifier in declaration
+	  DFA:      _dfa7
+	  POSSIBLE:
+	  	-> _seq1: expr ';'
+	  	-> common_declaration
+ -1/-1 	_cnf4
+	  on EToken_Identifier in _tmp2
+	  DFA:      _dfa11
+	  POSSIBLE:
+	  	-> _seq2: type_specifier _tmp2
+	  	-> <epsilon>
+ -1/-1 	_cnf5
+	  on EToken_Identifier in _tmp11
+	  DFA:      _dfa14
+	  POSSIBLE:
+	  	-> _seq8: type_specifier _tmp11
+	  	-> <epsilon>
+ -1/-1 	_cnf6
+	  on '*' in _tmp12
+	  DFA:      _seq11
+	  POSSIBLE:
+	  	-> _seq11: '*' mul_expr _tmp12
+	  	-> <epsilon>
+ -1/-1 	_cnf7
+	  on '&' in _tmp13
+	  DFA:      _seq14
+	  POSSIBLE:
+	  	-> _seq14: '&' primary_expr _tmp13
+	  	-> <epsilon>
 LOOKAHEAD DFA
-  0/155	_dfa1
-	EToken_Enum -> _dfa2
+  0/54 	_dfa1
+	  '*' -> _dfa2
 
-  1/156	_dfa2
-	'{' -> _dfa3
-	EToken_Identifier -> _dfa4
+ -1/-1 	_dfa2~
+	  if resolver (_act2) common_declaration
+	  else _dfa3
 
  -1/-1 	_dfa3*
-	. -> _seq13
+	  . -> _seq1: expr ';'
 
- -1/-1 	_dfa4*
-	. -> _seq12
+  1/55 	_dfa4
+	  '&' -> _dfa5
 
-  2/157	_dfa5
-	EToken_EnumC -> _dfa6
+ -1/-1 	_dfa5~
+	  if resolver (_act2) common_declaration
+	  else _dfa6
 
-  3/158	_dfa6
-	'{' -> _dfa7
-	EToken_Identifier -> _dfa8
+ -1/-1 	_dfa6*
+	  . -> _seq1: expr ';'
 
- -1/-1 	_dfa7*
-	. -> _seq13
+  2/56 	_dfa7
+	  EToken_Identifier -> _dfa8
 
- -1/-1 	_dfa8*
-	. -> _seq12
+ -1/-1 	_dfa8~
+	  if resolver (_act1) common_declaration
+	  else _dfa9
 
-  4/159	_dfa9
-	EToken_Struct -> _dfa10
+  3/57 	_dfa9~
+	  if resolver (_act2) common_declaration
+	  else _dfa10
 
-  5/160	_dfa10
-	'{' -> _dfa11
-	EToken_Identifier -> _dfa12
+ -1/-1 	_dfa10*
+	  . -> _seq1: expr ';'
 
- -1/-1 	_dfa11*
-	. -> _seq21
+  4/58 	_dfa11
+	  EToken_Identifier -> _dfa12
 
- -1/-1 	_dfa12*
-	. -> _seq20
+ -1/-1 	_dfa12~
+	  if resolver (_act1) _seq2: type_specifier _tmp2
+	  else _dfa13
 
-  6/161	_dfa13
-	EToken_Union -> _dfa14
+ -1/-1 	_dfa13*
+	  . -> <epsilon>
 
-  7/162	_dfa14
-	'{' -> _dfa15
-	EToken_Identifier -> _dfa16
+  5/59 	_dfa14
+	  EToken_Identifier -> _dfa15
 
- -1/-1 	_dfa15*
-	. -> _seq21
+ -1/-1 	_dfa15~
+	  if resolver (_act1) _seq8: type_specifier _tmp11
+	  else _dfa16
 
  -1/-1 	_dfa16*
-	. -> _seq20
+	  . -> <epsilon>
 
-  8/163	_dfa17
-	'[' -> _dfa18
+ -1/-1 	_dfa17*
+	  '*' -> _dfa18
 
-  9/164	_dfa18
-	']' -> _dfa19
-	EToken_Integer -> _dfa20
+ -1/-1 	_dfa18*
+	  . -> _seq11: '*' mul_expr _tmp12
 
  -1/-1 	_dfa19*
-	. -> _seq42
+	  '&' -> _dfa20
 
  -1/-1 	_dfa20*
-	. -> _seq41
-
- 10/165	_dfa21
-	'(' -> _dfa22
-
- 11/166	_dfa22
-	')' -> _dfa23
-	EToken_Identifier -> _dfa24
-	EToken_Const -> _dfa25
-	EToken_Void -> _dfa26
-	EToken_Bool -> _dfa27
-	EToken_Int -> _dfa28
-	EToken_Char -> _dfa29
-	EToken_Short -> _dfa30
-	EToken_Long -> _dfa31
-	EToken_Unsigned -> _dfa32
-	EToken_Float -> _dfa33
-	EToken_Double -> _dfa34
-	EToken_Int8 -> _dfa35
-	EToken_Int16 -> _dfa36
-	EToken_Int32 -> _dfa37
-	EToken_Int64 -> _dfa38
-	EToken_WChar -> _dfa39
-	EToken_Variant -> _dfa40
-	EToken_Auto -> _dfa41
-	EToken_Enum -> _dfa42
-	EToken_EnumC -> _dfa43
-	EToken_Struct -> _dfa44
-	EToken_Union -> _dfa45
-
- -1/-1 	_dfa23*
-	. -> _seq44
-
- -1/-1 	_dfa24*
-	. -> _seq43
-
- -1/-1 	_dfa25*
-	. -> _seq43
-
- -1/-1 	_dfa26*
-	. -> _seq43
-
- -1/-1 	_dfa27*
-	. -> _seq43
-
- -1/-1 	_dfa28*
-	. -> _seq43
-
- -1/-1 	_dfa29*
-	. -> _seq43
-
- -1/-1 	_dfa30*
-	. -> _seq43
-
- -1/-1 	_dfa31*
-	. -> _seq43
-
- -1/-1 	_dfa32*
-	. -> _seq43
-
- -1/-1 	_dfa33*
-	. -> _seq43
-
- -1/-1 	_dfa34*
-	. -> _seq43
-
- -1/-1 	_dfa35*
-	. -> _seq43
-
- -1/-1 	_dfa36*
-	. -> _seq43
-
- -1/-1 	_dfa37*
-	. -> _seq43
-
- -1/-1 	_dfa38*
-	. -> _seq43
-
- -1/-1 	_dfa39*
-	. -> _seq43
-
- -1/-1 	_dfa40*
-	. -> _seq43
-
- -1/-1 	_dfa41*
-	. -> _seq43
-
- -1/-1 	_dfa42*
-	. -> _seq43
-
- -1/-1 	_dfa43*
-	. -> _seq43
-
- -1/-1 	_dfa44*
-	. -> _seq43
-
- -1/-1 	_dfa45*
-	. -> _seq43
-
- 12/167	_dfa46
-	EToken_Identifier -> _dfa47
-
- -1/-1 	_dfa47*
-	. -> _seq11
-
- 13/168	_dfa48
-	',' -> _dfa49
-
- -1/-1 	_dfa49*
-	. -> _seq16
-
- 14/169	_dfa50
-	EToken_Identifier -> _dfa51
-
- -1/-1 	_dfa51*
-	. -> _seq25
-
- 15/170	_dfa52
-	',' -> _dfa53
-
- -1/-1 	_dfa53*
-	. -> _seq46
-
- 16/171	_dfa54
-	EToken_Identifier -> _dfa55
-
- -1/-1 	_dfa55*
-	. -> _seq50
-
- 17/172	_dfa56
-	',' -> _dfa57
-
- -1/-1 	_dfa57*
-	. -> _seq57
+	  . -> _seq14: '&' primary_expr _tmp13
 

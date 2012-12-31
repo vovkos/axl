@@ -221,7 +221,12 @@ CLaDfaBuilder::Build (
 		if (pState->m_CompleteThreadList.GetCount () > 1 || 
 			pState->m_EpsilonThreadList.GetCount () > 1)
 		{
-			err::SetFormatStringError (_T("ambiguous grammar: multiple productions complete with %s"), pState->m_pToken->m_Name);
+			err::SetFormatStringError (
+				_T("conflict at %s:%s: multiple productions complete with %s" ), 
+				pConflict->m_pSymbol->m_Name,
+				pConflict->m_pToken->m_Name,
+				pState->m_pToken->m_Name
+				);
 			err::PushSrcPosError (pConflict->m_pSymbol->m_SrcPos);
 			return NULL;
 		}

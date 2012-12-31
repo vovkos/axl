@@ -33,6 +33,7 @@ CTypeMgr::Clear ()
 	m_FunctionPointerTypeList.Clear ();
 	m_PropertyTypeList.Clear ();
 	m_PropertyPointerTypeList.Clear ();
+	m_EventTypeList.Clear ();
 	m_ImportTypeList.Clear ();
 
 	m_TypeMap.Clear ();
@@ -369,6 +370,37 @@ CTypeMgr::GetFunctionPointerType (CFunctionType* pFunctionType)
 	m_FunctionPointerTypeList.InsertTail (pType);
 	It->m_Value = pType;
 	pFunctionType->m_pFunctionPointerType = pType;
+	return pType;
+}
+
+CEventType* 
+CTypeMgr::GetEventType (CFunctionType* pFunctionType)
+{
+	// strip calling convention
+
+	pFunctionType = pFunctionType->GetDefCallConvFunctionType ();
+
+	if (pFunctionType->m_pEventType)
+		return pFunctionType->m_pEventType;
+
+	rtl::CStringA Signature = 'T';
+	Signature += pFunctionType->GetArgSignature ();
+
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+	{
+		ASSERT (false);
+		return (CEventType*) It->m_Value;
+	}
+
+	CEventType* pType = AXL_MEM_NEW (CEventType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_pFunctionPointerType = GetFunctionPointerType (pFunctionType);
+
+	m_EventTypeList.InsertTail (pType);
+	It->m_Value = pType;
+	pFunctionType->m_pEventType = pType;
 	return pType;
 }
 

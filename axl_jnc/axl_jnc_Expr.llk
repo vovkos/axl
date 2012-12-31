@@ -466,6 +466,7 @@ unary_expr <CValue* $pValue>
 				m_pModule->m_OperatorMgr.HeapNewOperator ($t.m_pType, $pValue);
 		}
 	;
+
 // since '(' at 'unary_operator' is a conflict against epsilon production we need a resolver
 // otherwise epsilon production always loses
 

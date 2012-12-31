@@ -197,6 +197,10 @@ CDeclarator::GetType_s (CTypeSpecifierModifiers* pTypeSpecifier)
 		{
 			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 		}
+		else if (Modifiers & ETypeModifier_Event)
+		{
+			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		}
 		else
 		{
 			err::SetFormatStringError (_T("no type specifier in declaration"));
@@ -221,7 +225,16 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
+	CTypeSpecifierModifiers VoidTypeSpecifier;
+	if (!pTypeSpecifier)
+	{
+		VoidTypeSpecifier.SetType (pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
+		pTypeSpecifier = &VoidTypeSpecifier;
+	}
+
 	CType* pType = GetType_s (pTypeSpecifier);
+	if (!pType)
+		return NULL;
 
 	rtl::CIteratorT <CDeclPointer> Pointer = m_PointerList.GetHead ();
 	for (; Pointer; Pointer++)

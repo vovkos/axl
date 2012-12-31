@@ -115,40 +115,5 @@ public:
 
 //.............................................................................
 
-class CPropertyPointerType:
-	public CType,
-	public rtl::TListLink
-{
-protected:
-	friend class CTypeMgr;
-
-	CPropertyType* m_pPropertyType;
-	CPropertyType* m_pMemberPropertyType; // with additional abstract interface argument
-	CStructType* m_pPointerStructType;
-
-public:
-	CPropertyPointerType ();
-
-	llvm::StructType* 
-	GetLlvmType ()
-	{
-		return GetPointerStructType ()->GetLlvmType ();
-	}
-
-	CPropertyType* 
-	GetPropertyType ()
-	{
-		return m_pPropertyType;
-	}
-
-	CPropertyType* 
-	GetMemberPropertyType ();
-
-	CStructType* 
-	GetPointerStructType ();
-};
-
-//.............................................................................
-
 } // namespace axl {
 } // namespace jnc {

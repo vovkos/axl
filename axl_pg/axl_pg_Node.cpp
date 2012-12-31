@@ -150,8 +150,8 @@ CSymbolNode::Trace ()
 
 	for (size_t i = 0; i < ChildrenCount; i++)
 	{
-		CNode* pChild = m_ProductionArray [i];
-		printf ("\t  -> %s\n", pChild->m_Name);
+		CNode* pChild = m_ProductionArray [i];		
+		printf ("\t  -> %s\n", pChild->GetProductionString ());
 	}
 }
 
@@ -267,7 +267,7 @@ void
 CSequenceNode::Trace ()
 {
 	CGrammarNode::Trace ();
-	printf ("\t  %s\n", NodeArrayToString (&m_Sequence));		
+	printf ("\t  %s\n", NodeArrayToString (&m_Sequence));
 }
 
 void
@@ -286,6 +286,12 @@ CSequenceNode::Export (lua::CLuaState* pLuaState)
 	}
 
 	pLuaState->SetMember ("Sequence");
+}
+
+rtl::CString 
+CSequenceNode::GetProductionString ()
+{
+	return rtl::CString::Format_s (_T("%s: %s"), m_Name, NodeArrayToString (&m_Sequence));
 }
 
 //.............................................................................
@@ -514,15 +520,20 @@ CConflictNode::Trace ()
 	printf (
 		"%s\n"
 		"\t  on %s in %s\n"
-		"\t  POSSIBLE: %s\n"
-		"\t  DFA:      %s\n",
+		"\t  DFA:      %s\n"
+		"\t  POSSIBLE:\n",
 		m_Name,
 		m_pToken->m_Name,
 		m_pSymbol->m_Name, 
-		NodeArrayToString (&m_ProductionArray),
 		m_pResultNode ? m_pResultNode->m_Name : "<none>"
 		);
 
+	size_t Count = m_ProductionArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CNode* pNode = m_ProductionArray [i];
+		printf ("\t  \t-> %s\n", pNode->GetProductionString ());
+	}
 }
 
 //.............................................................................
@@ -553,8 +564,8 @@ CLaDfaNode::Trace ()
 			"\t  if resolver (%s) %s\n"
 			"\t  else %s\n",
 			m_pResolver->m_Name,
-			m_pProduction->m_Name,
-			m_pResolverElse->m_Name
+			m_pProduction->GetProductionString (),
+			m_pResolverElse->GetProductionString ()
 			);
 	}
 	else
@@ -563,11 +574,13 @@ CLaDfaNode::Trace ()
 		for (size_t i = 0; i < Count; i++)
 		{
 			CLaDfaNode* pChild = m_TransitionArray [i];
-			printf ("\t  %s -> %s\n", pChild->m_pToken->m_Name, pChild->m_Name);
+			printf ("\t  %s -> %s\n", pChild->m_pToken->m_Name, pChild->GetProductionString ());
 		}
 
 		if (m_pProduction)
-			printf ("\t  . -> %s\n", m_pProduction->m_Name);
+		{
+			printf ("\t  . -> %s\n", m_pProduction->GetProductionString ());
+		}
 	}
 
 	printf ("\n");

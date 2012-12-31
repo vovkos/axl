@@ -82,6 +82,13 @@ public:
 	virtual
 	bool
 	MarkReachable ();
+
+	virtual 
+	rtl::CString 
+	GetProductionString ()
+	{
+		return m_Name;
+	}
 };
 
 //.............................................................................
@@ -221,6 +228,10 @@ public:
 	virtual 
 	void
 	Export (lua::CLuaState* pLuaState);
+
+	virtual 
+	rtl::CString 
+	GetProductionString ();
 };
 
 //.............................................................................

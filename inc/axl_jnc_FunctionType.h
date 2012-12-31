@@ -9,8 +9,8 @@
 namespace axl {
 namespace jnc {
 
-class CStructType;
 class CFunctionPointerType;
+class CEventType;
 
 //.............................................................................
 
@@ -52,10 +52,12 @@ protected:
 
 	CType* m_pReturnType;
 	rtl::CArrayT <CType*> m_ArgTypeArray;
-	CFunctionPointerType* m_pFunctionPointerType;
-	CFunctionType* m_pDefCallConvFunctionType;
 	ECallConv m_CallingConvention;
 	rtl::CStringA m_ArgSignature;
+
+	CFunctionType* m_pDefCallConvFunctionType;
+	CFunctionPointerType* m_pFunctionPointerType;
+	CEventType* m_pEventType;
 
 public:
 	CFunctionType ();
@@ -90,11 +92,14 @@ public:
 	rtl::CStringA
 	GetArgSignature ();
 
+	CFunctionType*
+	GetDefCallConvFunctionType ();
+
 	CFunctionPointerType* 
 	GetFunctionPointerType ();
 
-	CFunctionType*
-	GetDefCallConvFunctionType ();
+	CEventType*
+	GetEventType ();
 
 	static
 	rtl::CStringA
@@ -186,41 +191,6 @@ public:
 			Overload == 0 ? m_pType : 
 			Overload <= m_OverloadArray.GetCount () ? m_OverloadArray [Overload - 1] : NULL;
 	}
-};
-
-//.............................................................................
-
-class CFunctionPointerType:
-	public CType,
-	public rtl::TListLink
-{
-protected:
-	friend class CTypeMgr;
-
-	CFunctionType* m_pFunctionType;
-	CFunctionType* m_pMemberFunctionType; // with additional abstract interface argument
-	CStructType* m_pPointerStructType;
-
-public:
-	CFunctionPointerType ();
-
-	llvm::StructType* 
-	GetLlvmType ()
-	{
-		return GetPointerStructType ()->GetLlvmType ();
-	}
-
-	CFunctionType* 
-	GetFunctionType ()
-	{
-		return m_pFunctionType;
-	}
-
-	CFunctionType* 
-	GetMemberFunctionType ();
-
-	CStructType* 
-	GetPointerStructType ();
 };
 
 //.............................................................................

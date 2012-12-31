@@ -564,6 +564,21 @@ struct TPropertyPtr
 	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
 };
 
+// structures backing up event declared like
+// event OnFire ();
+
+struct TEventHandler
+{
+	TFunctionPtr m_FunctionPtr;
+	TEventHandler* m_pNext;
+	TEventHandler* m_pPrev;
+};
+
+struct TEvent
+{
+	TEventHandler* m_pFirstHandler;
+};
+
 //.............................................................................
 
 struct TVariant

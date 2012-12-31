@@ -148,7 +148,7 @@ public:
 				CLaDfaNode* pPreResolverNode = GetPreResolverTop ();
 				if (pPreResolverNode && pNode->m_Kind != ENode_LaDfa && !(m_Flags & EFlag_IsTokenSaved))
 				{
-					pPreResolverNode->m_ResolverTokenList.InsertTail (*pToken);
+					pPreResolverNode->m_ResolverTokenList.InsertTail (Token);
 					m_Flags |= EFlag_IsTokenSaved;
 				}
 				
@@ -250,6 +250,9 @@ protected:
 		{
 			if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
 			{
+				TraceSymbolStack ();
+				TracePredictionStack ();
+
 				int ExpectedToken = ((T*) this)->GetTokenFromIndex (pNode->m_Index);
 				err::SetExpectedTokenError (CToken::GetName (ExpectedToken), pToken->GetName ());
 			}
@@ -687,8 +690,13 @@ protected:
 		TRACE ("SYMBOL STACK (%d symbols):\n", Count);
 		for (intptr_t i = 0; i < Count; i++)
 		{
-			CNode* pNode = m_SymbolStack [i];
-			TRACE ("%s\n", ((T*) this)->GetSymbolName (pNode->m_Index));
+			CSymbolNode* pNode = m_SymbolStack [i];
+			TRACE ("%s", ((T*) this)->GetSymbolName (pNode->m_Index));
+
+			if (pNode->m_pAstNode)
+				TRACE (" (%d:%d)", pNode->m_pAstNode->m_FirstToken.m_Pos.m_Line + 1, pNode->m_pAstNode->m_FirstToken.m_Pos.m_Col + 1);
+
+			TRACE ("\n");
 		}
 	}
 

@@ -3,8 +3,6 @@ import "axl_jnc_Expr.llk";
 import "axl_jnc_Stmt.llk";
 
 import "axl_jnc_AttributeBlock.llk";
-import "axl_jnc_NamespaceDeclaration.llk";
-import "axl_jnc_CommonDeclaration.llk";
 import "axl_jnc_EnumSpecifier.llk";
 import "axl_jnc_StructSpecifier.llk";
 import "axl_jnc_UnionSpecifier.llk";
@@ -61,7 +59,7 @@ Members
 	CValue m_ThisValue;
 	CClassType* m_pThisType;
 
-	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
+	rtl::CArrayT <CTypeSpecifierModifiers*> m_TypeSpecifierStack;
 }
 
 Members2
@@ -72,13 +70,13 @@ Members2
 	FindType (const CQualifiedName& Name);
 
 	void
-	PushTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
+	PushTypeSpecifier (CTypeSpecifierModifiers* pTypeSpecifier)
 	{
 		m_TypeSpecifierStack.Append (pTypeSpecifier);
 	}
 
 	void
-	PopTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
+	PopTypeSpecifier (CTypeSpecifierModifiers* pTypeSpecifier)
 	{
 		m_TypeSpecifierStack.Pop ();
 	}

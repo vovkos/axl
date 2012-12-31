@@ -83,8 +83,10 @@
     <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_ControlFlowMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_EnumType.h" />
+    <ClInclude Include="..\inc\axl_jnc_EventType.h" />
     <ClInclude Include="..\Inc\axl_jnc_Function.h" />
     <ClInclude Include="..\Inc\axl_jnc_FunctionMgr.h" />
+    <ClInclude Include="..\inc\axl_jnc_FunctionPointerType.h" />
     <ClInclude Include="..\Inc\axl_jnc_FunctionType.h" />
     <ClInclude Include="..\Inc\axl_jnc_ClassType.h" />
     <ClInclude Include="..\inc\axl_jnc_ImportType.h" />
@@ -95,6 +97,7 @@
     <ClInclude Include="..\Inc\axl_jnc_Namespace.h" />
     <ClInclude Include="..\Inc\axl_jnc_NamespaceMgr.h" />
     <ClInclude Include="..\inc\axl_jnc_OperatorMgr.h" />
+    <ClInclude Include="..\inc\axl_jnc_PropertyPointerType.h" />
     <ClInclude Include="..\Inc\axl_jnc_PropertyType.h" />
     <ClInclude Include="..\inc\axl_jnc_PointerType.h" />
     <ClInclude Include="..\inc\axl_jnc_Scope.h" />
@@ -123,8 +126,10 @@
     <ClCompile Include="axl_jnc_ControlFlowMgr.cpp" />
     <ClCompile Include="axl_jnc_Decl.cpp" />
     <ClCompile Include="axl_jnc_EnumType.cpp" />
+    <ClCompile Include="axl_jnc_EventType.cpp" />
     <ClCompile Include="axl_jnc_Function.cpp" />
     <ClCompile Include="axl_jnc_FunctionMgr.cpp" />
+    <ClCompile Include="axl_jnc_FunctionPointerType.cpp" />
     <ClCompile Include="axl_jnc_FunctionType.cpp" />
     <ClCompile Include="axl_jnc_ClassType.cpp" />
     <ClCompile Include="axl_jnc_Lexer.cpp" />
@@ -136,6 +141,7 @@
     <ClCompile Include="axl_jnc_NamespaceMgr.cpp" />
     <ClCompile Include="axl_jnc_OperatorMgr.cpp" />
     <ClCompile Include="axl_jnc_Parser.cpp" />
+    <ClCompile Include="axl_jnc_PropertyPointerType.cpp" />
     <ClCompile Include="axl_jnc_PropertyType.cpp" />
     <ClCompile Include="axl_jnc_PointerType.cpp" />
     <ClCompile Include="axl_jnc_Scope.cpp" />
@@ -159,15 +165,13 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\till %(FullPath) /F..\axl_pg_frames /o %(Filename).h /f axl_llk_ParserFrame.h.luaf</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">axl_jnc_Decl.llk;axl_jnc_Expr.llk;axl_jnc_Stmt.llk;axl_jnc_AttributeBlock.llk;axl_jnc_NamespaceDeclaration.llk;axl_jnc_CommonDeclaration.llk;axl_jnc_EnumSpecifier.llk;axl_jnc_StructSpecifier.llk;axl_jnc_ClassSpecifier.llk;axl_jnc_PropertySpecifier.llk;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">axl_jnc_Decl.llk;axl_jnc_Expr.llk;axl_jnc_Stmt.llk;axl_jnc_AttributeBlock.llk;axl_jnc_EnumSpecifier.llk;axl_jnc_StructSpecifier.llk;axl_jnc_UnionSpecifier.llk;axl_jnc_ClassSpecifier.llk;axl_jnc_PropertySpecifier.llk;%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
     <None Include="axl_jnc_AttributeBlock.llk" />
     <None Include="axl_jnc_ClassSpecifier.llk" />
-    <None Include="axl_jnc_CommonDeclaration.llk" />
     <None Include="axl_jnc_Decl.llk" />
     <None Include="axl_jnc_EnumSpecifier.llk" />
     <None Include="axl_jnc_Expr.llk" />
-    <None Include="axl_jnc_NamespaceDeclaration.llk" />
     <None Include="axl_jnc_PropertySpecifier.llk" />
     <None Include="axl_jnc_Stmt.llk" />
     <CustomBuild Include="axl_jnc_Lexer.rl">

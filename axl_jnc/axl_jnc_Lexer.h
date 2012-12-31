@@ -42,6 +42,7 @@ enum EToken
 	EToken_PreConstruct,
 	EToken_Cdecl,
 	EToken_Stdcall,
+	EToken_Event,
 	EToken_This,
 	EToken_Auto,
 	EToken_Void,
@@ -143,6 +144,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
 	AXL_PRS_TOKEN_NAME (EToken_NoVirtual,    "novirtual")
+	AXL_PRS_TOKEN_NAME (EToken_Event,        "event")	
 	AXL_PRS_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
 	AXL_PRS_TOKEN_NAME (EToken_Cdecl,        "cdecl")
 	AXL_PRS_TOKEN_NAME (EToken_Stdcall,      "stdcall")

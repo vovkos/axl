@@ -1,20 +1,72 @@
 //.............................................................................
 
+// pragmas
+
+pragma
+pragma_pack
+	: '#' EToken_Pack ':' struct_pack_factor_value $v
+		{
+			m_StructPackFactor = $v.m_Value;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+pragma
+pragma_endian
+	: '#' EToken_Endian ':' pragma_endian_value
+	;
+
+pragma_endian_value
+	: (EToken_LittleEndian | EToken_Default)
+		{
+			m_Endianness = EEndianness_LittleEndian;
+		}
+	| EToken_BigEndian
+		{
+			m_Endianness = EEndianness_BigEndian;
+		}
+	;
+
+//.............................................................................
+
+// root declaration productions
+
 global_declaration
 	: namespace_declaration
 	| using_declaration 
-	| common_declaration
-	| function_body_pass1
-	| ';'
+	| item_declaration_no_specifier
+	| item_declaration_w_specifier
 	;
 
 local_declaration
 	: using_declaration 
-	| common_declaration
+	| item_declaration_w_specifier
 	| statement
 	;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
+
+// namespace & using declarations
+
+namespace_declaration
+	: EToken_Namespace qualified_name
+		{ 
+			CNamespace* pNamespace = m_pModule->m_NamespaceMgr.OpenNamespace ($1.m_Pos, $2.m_Name);
+			if (!pNamespace)
+				return false;
+		}
+	  '{' global_declaration* '}' 
+		{ 
+			m_pModule->m_NamespaceMgr.CloseNamespace ($2.m_Name.m_List.GetCount () + 1);
+		}
+	;
+
+using_declaration
+	: EToken_Using qualified_name ';'
+	;
+
+//.............................................................................
 
 qualified_name_impl <CQualifiedName* $pName>
 	: EToken_Identifier       
@@ -36,7 +88,556 @@ qualified_name
 	: qualified_name_impl <&$.m_Name>
 	; 
 
+//.............................................................................
+
+item_declaration_w_specifier
+	: declaration_specifier_list $s
+	  declarator_list $d <&$s.m_DeclSpecifiers>?
+	  declaration_terminator <$d.m_pLastItem>
+	;
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CDeclarator m_Declarator;
+	CModuleItem* m_pItem;
+}
+item_declaration_no_specifier
+	: resolver (item_declaration_no_specifier_rslv)
+	  declarator_name <&$.m_Declarator>
+	  declarator_suffix <&$.m_Declarator>*
+		{
+			$.m_pItem = Declare (NULL, &$.m_Declarator);
+			if (!$.m_pItem)
+				return false;
+		}
+	  declaration_terminator <$.m_pItem>
+	;
+
+item_declaration_no_specifier_rslv
+	local
+	{
+		CDeclarator $Declarator;
+	}
+	: declarator_name <&$Declarator> '(' // must be a function
+	;
+
+//.............................................................................
+
+class
+{
+	CModuleItem* m_pLastItem;
+}
+declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
+	: full_declarator $d1 <$pDeclSpecifiers> 
+		{
+			$.m_pLastItem = $d1.m_pItem;
+		}
+	  (',' full_declarator $d2 <$pDeclSpecifiers> 
+		{
+			$.m_pLastItem = $d2.m_pItem;
+		}
+	  )*
+	;
+
+class
+{
+	CModuleItem* m_pItem;
+}
+full_declarator <CDeclSpecifiers* $pDeclSpecifiers>
+	: declarator 
+	  ('=' 
+		{
+			$.m_pItem = Declare ($pDeclSpecifiers, &$1.m_Declarator, NULL, 0, true);
+			if (!$.m_pItem)
+				return false;
+
+			if ($.m_pItem->GetItemKind () != EModuleItem_Variable)
+			{
+				err::SetFormatStringError (_T("cannot apply initializer to '%s'"), $.m_pItem->GetItemKindString ());
+				return false;
+			}
+		}
+	  initializer $i <.((CVariable*) $.m_pItem)->GetType ().> 
+		{
+			if (m_Stage == EStage_Pass2)
+				return m_pModule->m_OperatorMgr.MoveOperator ($i.m_Value, (CVariable*) $.m_pItem);
+		}
+	  )?
+		{ 
+			if (!IsValidLocator ($i))
+			{
+				$.m_pItem = Declare ($pDeclSpecifiers, &$1.m_Declarator);
+				if (!$.m_pItem)
+					return false;
+			}
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CValue m_Value;
+	rtl::CBoxListT <CToken> m_TokenList;
+}
+initializer <CType* $pType>
+	: resolver ({ return m_Stage == EStage_Pass1 }) 
+	  expression_pass1 $e
+		{
+			$.m_TokenList.TakeOver (&$e.m_TokenList);
+		}
+	| expression
+		{
+			$.m_Value = $1.m_Value;
+		}
+	| '{' initializer_list <$pType> '}'
+		{
+		}
+	;
+
+initializer_list <CType* $pType>
+	: initializer_list_entry <$pType> (',' initializer_list_entry <$pType>)*
+	;
+
+initializer_list_entry <CType* $pType>
+	: initializer <$pType>
+	| epsilon
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+declaration_terminator <CModuleItem* $pItem>
+	: ';'
+	| function_body_pass1
+		{
+			return SetFunctionBody ($pItem, &$1.m_TokenList);
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CDeclSpecifiers m_DeclSpecifiers;
+}	
+declaration_specifier_list
+	enter 
+	{
+		PushTypeSpecifier (&$.m_DeclSpecifiers);
+	}
+	leave
+	{
+		PopTypeSpecifier (&$.m_DeclSpecifiers);
+	}
+	: declaration_specifier <&$.m_DeclSpecifiers>+
+	;
+
+class
+{
+	CTypeSpecifierModifiers m_TypeSpecifier;
+}	
+type_specifier_modifier_list
+	enter 
+	{
+		PushTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	leave
+	{
+		PopTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	: type_specifier_modifier <&$.m_TypeSpecifier>+
+	;
+
+declaration_specifier <CDeclSpecifiers* $pDeclSpecifiers>
+	: type_specifier_modifier <$pDeclSpecifiers>
+	| access_specifier <$pDeclSpecifiers>
+	| storage_class_specifier <$pDeclSpecifiers>
+	;
+
+noast
+type_specifier_modifier <CTypeSpecifierModifiers* $pTypeSpecifier>
+	: type_specifier <$pTypeSpecifier>
+	| type_modifier <$pTypeSpecifier>
+	;
+
+access_specifier <CAccessSpecifier* $pAccessSpecifier>
+	: EToken_Public
+		{
+			return $pAccessSpecifier->SetAccess (EAccess_Public);
+		}
+	| EToken_Private 
+		{
+			return $pAccessSpecifier->SetAccess (EAccess_Private);
+		}
+	;
+
+storage_class_specifier <CDeclSpecifiers* $pDeclSpecifiers>
+	: EToken_Static 
+		{
+			return $pDeclSpecifiers->SetStorageClass (EStorageClass_Static);
+		}
+	| EToken_Typedef
+		{
+			return $pDeclSpecifiers->SetStorageClass (EStorageClass_Typedef);
+		}
+	;
+
+qualifier_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Const
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Const);
+		}
+	| EToken_Volatile
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Volatile);
+		}
+	;
+
+integer_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Signed
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Signed);
+		}
+	| EToken_Unsigned
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsigned);
+		}
+	| EToken_LittleEndian
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_LittleEndian);
+		}
+	| EToken_BigEndian
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_BigEndian);
+		}
+	;
+
+pointer_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Safe
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Safe);
+		}
+	| EToken_Unsafe
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Unsafe);
+		}
+	| EToken_NoNull
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_NoNull);
+		}
+	;
+
+function_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Cdecl
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Cdecl);
+		}
+	| EToken_Stdcall
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Stdcall);
+		}
+	| EToken_Virtual
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Virtual);
+		}
+	| EToken_NoVirtual
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_NoVirtual);
+		}
+	| EToken_Event
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Event);
+		}
+	;
+
+property_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Property
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Property);
+		}
+	| EToken_Bindable
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Bindable);
+		}
+	;
+
+interface_modifier <CTypeModifiers* $pTypeModifiers>
+	: EToken_Strong
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Strong);
+		}
+	| EToken_Weak
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Weak);
+		}
+	;
+
+type_modifier <CTypeModifiers* $pTypeModifiers>
+	: qualifier_modifier <$pTypeModifiers>
+	| integer_modifier <$pTypeModifiers>
+	| pointer_modifier <$pTypeModifiers>
+	| function_modifier <$pTypeModifiers>
+	| property_modifier <$pTypeModifiers>
+	| interface_modifier <$pTypeModifiers>
+	;
+
+type_specifier <CTypeSpecifier* $pTypeSpecifier>
+	: EToken_Void
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
+		}
+	| EToken_Variant
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Variant));
+		}
+	| EToken_Bool
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool));
+		}
+	| EToken_Int
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int));
+		}
+	| EToken_Char
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char));
+		}
+	| EToken_Short
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Short));
+		}
+	| EToken_Long
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Long));
+		}
+	| EToken_Float
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Float));
+		}
+	| EToken_Double
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double));
+		}
+	| EToken_Int8
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8));
+		}
+	| EToken_Int16
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Int16));
+		}
+	| EToken_Int32
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int32));
+		}
+	| EToken_Int64
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int64_be : EType_Int64));
+		}
+	| EToken_WChar
+		{
+			return $pTypeSpecifier->SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_WChar));
+		}
+	| EToken_Auto
+		{
+			err::SetStringError (_T("'auto' type specifier is not yet supported"));
+			return false; 
+		}
+	| enum_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
+	| struct_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
+	| union_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
+	| class_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
+	| property_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
+	| resolver (qualified_type_name_rslv)
+	  qualified_type_name $t
+	  generic_actual_argument_list?
+		{
+			return $pTypeSpecifier->SetType ($t.m_pType);
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+qualified_type_name_rslv
+	:	{
+			if (IsTypeSpecified ())
+				return false;
+		}
+	  qualified_name
+		{
+			return m_Stage == EStage_Pass1 || FindType ($1.m_Name) != NULL;
+		}
+	;
+
+class
+{
+	CType* m_pType;
+}
+qualified_type_name
+	: qualified_name
+		{
+			CType* pType = FindType ($1.m_Name);
+			if (!pType)
+			{
+				err::SetFormatStringError (_T("'%s' is not a type"), $1.m_Name.GetFullName ());
+				return false;
+			}
+
+			$.m_pType = pType;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CDeclarator m_Declarator;
+}	
+declarator
+	: pointer <&$.m_Declarator>* 
+	  declarator_name <&$.m_Declarator>
+	  declarator_suffix <&$.m_Declarator>*
+	;
+
+declarator_name <CDeclarator* $pDeclarator>
+	: EToken_Identifier $i1
+		{
+			$pDeclarator->m_Pos = $i1.m_Pos;
+			$pDeclarator->m_Name.m_First = $i1.m_Data.m_String;
+		}
+	  ('.' declarator_qualifier $q
+		{
+			return !$q.m_Identifier.IsEmpty () ? 
+				$pDeclarator->AddName ($q.m_Identifier) :
+				$pDeclarator->AddPropertyAccessorKind ($q.m_PropertyAccessorKind);
+		}
+	  )*
+	;
+
+class
+{
+	rtl::CString m_Identifier;
+	EPropertyAccessor m_PropertyAccessorKind;
+}
+declarator_qualifier
+	: EToken_Identifier
+		{
+			$.m_Identifier = $1.m_Data.m_String;
+		}
+	| property_accessor_kind
+		{
+			$.m_PropertyAccessorKind = $1.m_PropertyAccessorKind;
+		}
+	| EToken_This
+	| '~' EToken_This
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+pointer <CDeclarator* $pDeclarator>
+	local
+	{	
+		CDeclPointer* $pPointer;
+	}
+	: pointer_kind 
+		{
+			$pPointer = $pDeclarator->AddPointer ($1.m_TypeKind);
+		}
+	  type_modifier <$pPointer>*
+	;
+
+class
+{
+	EType m_TypeKind;
+}
+pointer_kind
+	: '*'
+		{
+			$.m_TypeKind = EType_Pointer;
+		}
+	| '&'
+		{
+			$.m_TypeKind = EType_Reference;
+		}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+noast
+declarator_suffix <CDeclarator* $pDeclarator>
+	: array_suffix <$pDeclarator>
+	| function_suffix <$pDeclarator>
+	;
+
+array_suffix <CDeclarator* $pDeclarator>
+	: '[' EToken_Integer ']'
+		{
+			$pDeclarator->AddArraySuffix ($2.m_Data.m_Integer);
+		}
+	| '[' ']'
+		{
+			$pDeclarator->AddArraySuffix (0);
+		}
+	;
+
+function_suffix <CDeclarator* $pDeclarator>
+	local
+	{
+		CDeclFunctionSuffix* $pFunctionSuffix;
+	}
+	enter
+	{
+		$pFunctionSuffix = $pDeclarator->AddFormalArgSuffix ();
+	}
+	: '(' function_formal_argument_list <$pFunctionSuffix> ')' 
+	| '(' ')' 
+	;	
+
+function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
+	: function_formal_argument <$pFunctionSuffix> 
+	  (',' function_formal_argument <$pFunctionSuffix>)*
+	;
+
+function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
+	: type_specifier_modifier_list $s
+	  (declarator $d ('=' expression_pass1 $v)?)?
+		{
+			return DeclareFormalArg (
+				$pFunctionSuffix, 
+				&$s.m_TypeSpecifier, 
+				IsValidLocator ($d) ? &$d.m_Declarator : NULL, 
+				CValue ()
+				) != NULL;
+		}
+	| (EToken_Safe | EToken_Unsafe $u)? EToken_Ellipsis
+		{
+			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsVarArg;
+			if (IsValidLocator ($u))
+				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_IsUnsafeVarArg;
+		}
+	;
+
+//.............................................................................
 
 class
 {
@@ -86,14 +687,8 @@ generic_formal_argument
 		} */
 	;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-pragma
-pragma_pack
-	: '#' EToken_Pack ':' struct_pack_factor_value $v
-		{
-			m_StructPackFactor = $v.m_Value;
-		}
+generic_actual_argument_list
+	: '<' type_name (',' type_name)* '>'
 	;
 
 //.............................................................................

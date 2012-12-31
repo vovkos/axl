@@ -60,7 +60,6 @@ statement
 	| break_stmt
 	| continue_stmt
 	| return_stmt
-	| ';'
 	;
 
 expression_stmt
@@ -228,7 +227,7 @@ enter
 		{
 			$pScope = m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
 		}	  
-	  (declaration_list | expression_list)? ';'
+	  (declaration_specifier_list $s declarator_list <&$s.m_DeclSpecifiers> | expression_list) ';'
 	  (
 			{
 				$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_condition"));
@@ -249,8 +248,7 @@ enter
 			{
 				m_pModule->m_ControlFlowMgr.Jump ($pConditionBlock, $pBodyBlock);
 			}
-	  )?
-	  ')'
+	  )? ')'
 		{
 			$pScope->m_pBreakBlock = $pFollowBlock;
 			$pScope->m_pContinueBlock = $pConditionBlock;

@@ -21,10 +21,16 @@ class
 	CFunction* m_pAccessor;
 }
 property_accessor_declaration <CPropertyType* $pType>
-	: type_specifier_modifier_list
+	: type_specifier_modifier_list $t
 	  property_declarator $d
 		{
-			$.m_pAccessor = DeclarePropertyAccessor ($pType, &$1.m_TypeSpecifier, &$2.m_Declarator);
+			$.m_pAccessor = DeclarePropertyAccessor ($pType, &$t.m_TypeSpecifier, &$d.m_Declarator);
+			return $.m_pAccessor != NULL;
+		}
+	  declaration_terminator <$.m_pAccessor>
+	| property_set_accessor_declarator $d
+		{
+			$.m_pAccessor = DeclarePropertyAccessor ($pType, NULL, &$d.m_Declarator);
 			return $.m_pAccessor != NULL;
 		}
 	  declaration_terminator <$.m_pAccessor>
@@ -42,6 +48,19 @@ property_declarator
 		{
 			$.m_Declarator.m_PropertyAccessorKind = $a.m_PropertyAccessorKind;
 			$.m_Declarator.m_Pos = $a.m_FirstToken.m_Pos;
+		}
+	;
+
+class
+{
+	CDeclarator m_Declarator;
+}
+property_set_accessor_declarator
+	: EToken_Set
+	  function_suffix <&$.m_Declarator>
+		{
+			$.m_Declarator.m_PropertyAccessorKind = EPropertyAccessor_Set;
+			$.m_Declarator.m_Pos = $1.m_Pos;
 		}
 	;
 

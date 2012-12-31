@@ -844,6 +844,12 @@ CType::ApplyFunctionModifiers (int Modifiers)
 			return NULL;
 	}
 
+	if (Modifiers & ETypeModifier_Event)
+	{
+		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_NoVirtual, ETypeModifier_Virtual))
+			return NULL;
+	}
+
 	return pType;
 }
 

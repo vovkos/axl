@@ -169,15 +169,16 @@ enum ETypeModifier
 	ETypeModifier_Stdcall       = 0x002000,
 	ETypeModifier_Virtual       = 0x004000,
 	ETypeModifier_NoVirtual     = 0x008000,
-	ETypeModifier_FunctionMask  = 0x00f000,	
+	ETypeModifier_Event         = 0x010000,
+	ETypeModifier_FunctionMask  = 0x01f000,	
 
-	ETypeModifier_Property      = 0x010000,
-	ETypeModifier_Bindable      = 0x020000,
-	ETypeModifier_PropertyMask  = 0x030000,	
+	ETypeModifier_Property      = 0x100000,
+	ETypeModifier_Bindable      = 0x200000,
+	ETypeModifier_PropertyMask  = 0x300000,	
 
-	ETypeModifier_Strong        = 0x040000,
-	ETypeModifier_Weak          = 0x080000,	
-	ETypeModifier_InterfaceMask = 0x0c0000,	
+	ETypeModifier_Strong        = 0x400000,
+	ETypeModifier_Weak          = 0x800000,	
+	ETypeModifier_InterfaceMask = 0xc00000,	
 };
 
 const tchar_t*
