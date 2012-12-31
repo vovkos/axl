@@ -112,6 +112,7 @@ nl             ;
 'start'        { CreateToken (EToken_Start); };
 'pragma'       { CreateToken (EToken_Pragma); };
 'resolver'     { CreateToken (EToken_Resolver); };
+'priority'     { CreateToken (EToken_Priority); };
 'any'          { CreateToken (EToken_Any); };
 'epsilon'      { CreateToken (EToken_Epsilon); };
 lit_sq         { CreateCharToken (EToken_Integer); };

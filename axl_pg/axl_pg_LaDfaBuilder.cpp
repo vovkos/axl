@@ -12,6 +12,7 @@ CLaDfaThread::CLaDfaThread ()
 	m_pState = NULL;
 	m_pProduction = NULL;
 	m_pResolver = NULL;
+	m_ResolverPriority = 0;
 }
 
 //.............................................................................
@@ -119,6 +120,24 @@ CLaDfaBuilder::CLaDfaBuilder (
 	m_pParseTable = pParseTable;
 	m_LookeaheadLimit = LookeaheadLimit;
 	m_Lookeahead = 1;
+}
+
+static
+int
+__cdecl
+CmpResolverThreadPriority (
+	const void* p1,
+	const void* p2
+	)
+{
+	CLaDfaThread* pThread1 = *(CLaDfaThread**) p1;
+	CLaDfaThread* pThread2 = *(CLaDfaThread**) p2;
+
+	// sort from highest priority to lowest
+
+	return 
+		pThread1->m_ResolverPriority < pThread2->m_ResolverPriority ? 1 : 
+		pThread1->m_ResolverPriority > pThread2->m_ResolverPriority ? -1 : 0;
 }
 
 CNode*
@@ -231,20 +250,35 @@ CLaDfaBuilder::Build (
 			return NULL;
 		}
 
-		rtl::CIteratorT <CLaDfaThread> ResolverThread = pState->m_ResolverThreadList.GetHead ();
-		for (; ResolverThread; ResolverThread++) // chain all resolvers
+		if (!pState->m_ResolverThreadList.IsEmpty ()) // chain all resolvers
 		{
-			CLaDfaNode* pDfaElse = m_pNodeMgr->CreateLaDfaNode ();
-			pDfaElse->m_Flags = pState->m_pDfaNode->m_Flags;
-			pDfaElse->m_TransitionArray = pState->m_pDfaNode->m_TransitionArray;
+			size_t Count = pState->m_ResolverThreadList.GetCount ();
 
-			pState->m_pDfaNode->m_pResolver = ResolverThread->m_pResolver;
-			pState->m_pDfaNode->m_pProduction = ResolverThread->m_pProduction;
-			pState->m_pDfaNode->m_pResolverElse = pDfaElse;
-			pState->m_pDfaNode->m_TransitionArray.Clear ();
+			rtl::CArrayT <CLaDfaThread*> ResolverThreadArray;
+			ResolverThreadArray.SetCount (Count);
 
-			pDfaElse->m_pResolverUplink = pState->m_pDfaNode;
-			pState->m_pDfaNode = pDfaElse;
+			rtl::CIteratorT <CLaDfaThread> ResolverThread = pState->m_ResolverThreadList.GetHead ();
+			for (size_t i = 0; ResolverThread; ResolverThread++, i++) 
+				ResolverThreadArray [i] = *ResolverThread;
+
+			qsort (ResolverThreadArray, Count, sizeof (CLaDfaThread*), CmpResolverThreadPriority);
+
+			for (size_t i = 0; i < Count; i++)
+			{
+				CLaDfaThread* pResolverThread = ResolverThreadArray [i];
+
+				CLaDfaNode* pDfaElse = m_pNodeMgr->CreateLaDfaNode ();
+				pDfaElse->m_Flags = pState->m_pDfaNode->m_Flags;
+				pDfaElse->m_TransitionArray = pState->m_pDfaNode->m_TransitionArray;
+
+				pState->m_pDfaNode->m_pResolver = pResolverThread->m_pResolver;
+				pState->m_pDfaNode->m_pProduction = pResolverThread->m_pProduction;
+				pState->m_pDfaNode->m_pResolverElse = pDfaElse;
+				pState->m_pDfaNode->m_TransitionArray.Clear ();
+
+				pDfaElse->m_pResolverUplink = pState->m_pDfaNode;
+				pState->m_pDfaNode = pDfaElse;
+			}
 		}
 
 		ASSERT (!pState->m_pDfaNode->m_pResolver);
@@ -499,6 +533,7 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 			if (pSymbol->m_pResolver)
 			{
 				pThread->m_pResolver = pSymbol->m_pResolver;
+				pThread->m_ResolverPriority = pSymbol->m_ResolverPriority;
 				pThread->m_pState->m_ActiveThreadList.Remove (pThread);
 				pThread->m_pState->m_ResolverThreadList.InsertTail (pThread);
 				return;

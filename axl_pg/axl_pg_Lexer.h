@@ -29,6 +29,7 @@ enum EToken
 	EToken_Start,
 	EToken_Pragma,
 	EToken_Resolver,
+	EToken_Priority,
 	EToken_Any,
 	EToken_Epsilon,
 	EToken_OpenBrace,
@@ -58,6 +59,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Start,        "start")
 	AXL_PRS_TOKEN_NAME (EToken_Pragma,       "pragma")
 	AXL_PRS_TOKEN_NAME (EToken_Resolver,     "resolver")
+	AXL_PRS_TOKEN_NAME (EToken_Priority,     "priority")
 	AXL_PRS_TOKEN_NAME (EToken_Any,          "any")
 	AXL_PRS_TOKEN_NAME (EToken_Epsilon,      "epsilon")
 	AXL_PRS_TOKEN_NAME (EToken_OpenBrace,    "{.")

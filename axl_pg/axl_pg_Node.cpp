@@ -85,6 +85,7 @@ CSymbolNode::CSymbolNode ()
 	m_CharToken = 0;
 	m_pClass = NULL;
 	m_pResolver = NULL;
+	m_ResolverPriority = 0;
 }
 
 rtl::CString

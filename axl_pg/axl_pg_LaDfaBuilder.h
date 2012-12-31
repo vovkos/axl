@@ -29,6 +29,7 @@ public:
 	ELaDfaThreadMatch m_Match;
 	CLaDfaState* m_pState;
 	CGrammarNode* m_pResolver;
+	size_t m_ResolverPriority;
 	CNode* m_pProduction;
 	rtl::CArrayT <CNode*> m_Stack;
 

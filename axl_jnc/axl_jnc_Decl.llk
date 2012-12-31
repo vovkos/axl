@@ -35,8 +35,8 @@ pragma_endian_value
 global_declaration
 	: namespace_declaration
 	| using_declaration 
-	| item_declaration_no_specifier
 	| item_declaration_w_specifier
+	| item_declaration_no_specifier
 	;
 
 local_declaration
@@ -104,7 +104,7 @@ class
 	CModuleItem* m_pItem;
 }
 item_declaration_no_specifier
-	: resolver (item_declaration_no_specifier_rslv)
+	: resolver (item_declaration_no_specifier_rslv) priority (2) // set higher priority than type_specifier::qualified_name
 	  declarator_name <&$.m_Declarator>
 	  declarator_suffix <&$.m_Declarator>*
 		{
@@ -482,10 +482,15 @@ qualified_type_name_rslv
 			if (IsTypeSpecified ())
 				return false;
 		}
-	  qualified_name
+	  qualified_name $n
 		{
-			return m_Stage == EStage_Pass1 || FindType ($1.m_Name) != NULL;
+			return m_Stage == EStage_Pass1 || FindType ($n.m_Name) != NULL;
 		}
+	  ('(' 
+		{
+			return false;
+		}
+	  )?
 	;
 
 class

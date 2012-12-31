@@ -165,6 +165,7 @@ public:
 
 	CClass* m_pClass;
 	CGrammarNode* m_pResolver;
+	size_t m_ResolverPriority;
 	rtl::CArrayT <CGrammarNode*> m_ProductionArray;
 
 	rtl::CString m_Arg;

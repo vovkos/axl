@@ -197,14 +197,10 @@ CDeclarator::GetType_s (CTypeSpecifierModifiers* pTypeSpecifier)
 		{
 			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 		}
-		else if (Modifiers & ETypeModifier_Event)
+		else 
 		{
+			// assume void
 			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-		}
-		else
-		{
-			err::SetFormatStringError (_T("no type specifier in declaration"));
-			return NULL;
 		}
 	}
 	

@@ -1164,12 +1164,40 @@ CParser::Resolver ()
 
 	NextToken ();
 
+	size_t Priority = 0;
+
+	pToken = GetToken ();
+	if (pToken->m_Token == EToken_Priority)
+	{
+		NextToken ();
+
+		pToken = ExpectToken ('(');
+		if (!pToken)
+			return NULL;
+
+		NextToken ();
+
+		pToken = ExpectToken (EToken_Integer);
+		if (!pToken)
+			return NULL;
+
+		Priority = pToken->m_Data.m_Integer;
+		NextToken ();
+
+		pToken = ExpectToken (')');
+		if (!pToken)
+			return NULL;
+
+		NextToken ();
+	}
+	
 	CGrammarNode* pProduction = Sequence ();
 	if (!pProduction)
 		return NULL;
-	
+
 	CSymbolNode* pTemp = m_pModule->m_NodeMgr.CreateTempSymbolNode ();
 	pTemp->m_pResolver = pResolver;
+	pTemp->m_ResolverPriority = Priority;
 	pTemp->AddProduction (pProduction);
 
 	SetGrammarNodeSrcPos (pTemp, Pos);
