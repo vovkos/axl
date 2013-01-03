@@ -368,7 +368,7 @@ assignment_operator
 	| binop_assignment_operator
 		{
 			$.m_AssignKind = EAssign_BinOp;
-			$.m_OpKind = EBinOp_None;
+			$.m_OpKind = $1.m_OpKind;
 		}
 	| EToken_RefAssign
 		{

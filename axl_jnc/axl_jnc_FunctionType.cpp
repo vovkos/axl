@@ -100,23 +100,13 @@ CFunctionType::CreateSignature (
 }
 
 rtl::CString
-CFunctionType::CreateTypeString (
-	ECallConv CallingConvention,
-	CType* pReturnType,
+CFunctionType::CreateArgTypeString (
 	CType* const* ppArgType,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CString String = pReturnType->GetTypeString ();
-
-	if (CallingConvention)
-	{
-		String += ' ';
-		String += GetCallingConventionString (CallingConvention);
-	}
-
-	String.Append (_T(" ("));
+	rtl::CString String = _T("(");
 	
 	if (ArgCount)
 	{
@@ -141,6 +131,28 @@ CFunctionType::CreateTypeString (
 		String.Append ((Flags & EFunctionTypeFlag_IsUnsafeVarArg) ? _T("unsafe ...)") : _T("safe ...)"));
 	}
 
+	return String;
+}
+
+rtl::CString
+CFunctionType::CreateTypeString (
+	ECallConv CallingConvention,
+	CType* pReturnType,
+	CType* const* ppArgType,
+	size_t ArgCount,
+	int Flags
+	)
+{
+	rtl::CString String = pReturnType->GetTypeString ();
+
+	if (CallingConvention)
+	{
+		String += ' ';
+		String += GetCallingConventionString (CallingConvention);
+	}
+
+	String += ' ';
+	String += CreateArgTypeString (ppArgType, ArgCount, Flags);
 	return String;
 }
 

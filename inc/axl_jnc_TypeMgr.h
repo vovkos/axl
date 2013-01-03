@@ -32,6 +32,8 @@ enum EStdType
 	EStdType_SafePtrValidator,
 	EStdType_ObjectHdr,
 	EStdType_AbstractInterfacePtr,
+	EStdType_AbstractFunctionPtr,
+	EStdType_AbstractEvent,
 	EStdType__Count,
 };
 
@@ -337,6 +339,12 @@ protected:
 
 	CPointerType*
 	CreateAbstractInterfaceType ();
+
+	CFunctionPointerType*
+	CreateAbstractFunctionPointerType ();
+
+	CEventType*
+	CreateAbstractEventType ();
 };
 
 //.............................................................................

@@ -11,6 +11,18 @@ namespace jnc {
 
 //.............................................................................
 
+enum EEventOp
+{
+	EEventOp_SetHandler,
+	EEventOp_AddHandler,
+	EEventOp_RemoveHandler,
+};
+
+const tchar_t*
+GetEventOperatorKindString (EEventOp OperaotrKind);
+
+//.............................................................................
+
 class CEventType:
 	public CType,
 	public rtl::TListLink
@@ -48,6 +60,16 @@ public:
 
 	CStructType* 
 	GetHandlerStructType ();
+
+	static
+	rtl::CString
+	CreateTypeString (CFunctionType* pFunctionType);
+
+	rtl::CString
+	CreateTypeString ()
+	{
+		return CreateTypeString (GetFunctionType ());
+	}
 };
 
 //.............................................................................

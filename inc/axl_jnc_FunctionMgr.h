@@ -65,6 +65,17 @@ enum EStdFunc
 	EStdFunc_DynamicCastInterface,
 
 	// int8*
+	// jnc.EventOperator (
+	//		jnc.event* pEvent,
+	//		void* pfn,
+	//		int CallConv,
+	//		jnc.iface* pIface,
+	//		int OpKind
+	//		);
+
+	EStdFunc_EventOperator,
+
+	// int8*
 	// jnc.HeapAllocate (int8* pType);
 
 	EStdFunc_HeapAllocate,
@@ -181,6 +192,9 @@ protected:
 
 	CFunction*
 	CreateDynamicCastInterface ();
+
+	CFunction*
+	CreateEventOperator ();
 
 	CFunction*
 	CreateHeapAllocate ();

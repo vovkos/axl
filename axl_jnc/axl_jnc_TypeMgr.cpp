@@ -116,6 +116,14 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateAbstractInterfaceType ();
 		break;
 
+	case EStdType_AbstractFunctionPtr:
+		pType = CreateAbstractFunctionPointerType ();
+		break;
+
+	case EStdType_AbstractEvent:
+		pType = CreateAbstractEventType ();
+		break;
+
 	default:
 		ASSERT (false);
 		return NULL;
@@ -161,6 +169,20 @@ CTypeMgr::CreateAbstractInterfaceType ()
 	ASSERT (Result);
 	
 	return pType->GetPointerType (EType_Pointer_u);
+}
+
+CFunctionPointerType*
+CTypeMgr::CreateAbstractFunctionPointerType ()
+{
+	CFunctionType* pFunctionType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
+	return GetFunctionPointerType (pFunctionType);
+}
+
+CEventType*
+CTypeMgr::CreateAbstractEventType ()
+{
+	CFunctionType* pFunctionType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
+	return GetEventType (pFunctionType);
 }
 
 bool

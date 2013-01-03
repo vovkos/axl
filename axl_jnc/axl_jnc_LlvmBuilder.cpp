@@ -525,7 +525,7 @@ CLlvmBuilder::DynamicCastInterface (
 	CreateComment ("dynamic cast interface");
 
 	CValue PtrValue;
-	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &PtrValue);
 
 	CValue TypeValue (&pResultType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 

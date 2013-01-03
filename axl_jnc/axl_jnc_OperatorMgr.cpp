@@ -513,8 +513,32 @@ COperatorMgr::BinOpMoveOperator (
 	EBinOp OpKind
 	)
 {
-	if (OpKind == EBinOp_None)
-		return MoveOperator (SrcValue, DstValue);
+	CType* pTargetType = PrepareOperandType (DstValue.GetType (), EOpFlag_LoadReference);
+	EType TargetTypeKind = pTargetType->GetTypeKind ();
+
+	switch (TargetTypeKind)
+	{
+	case EType_Event:
+		switch (OpKind)
+		{
+		case EBinOp_Add:
+			return EventOperator (DstValue, SrcValue, EEventOp_AddHandler);
+
+		case EBinOp_Sub:
+			return EventOperator (DstValue, SrcValue, EEventOp_RemoveHandler);
+
+		default:
+			err::SetFormatStringError (_T("invalid operator for events"), GetBinOpString (OpKind));
+			return false;
+		}
+
+		break;
+
+	case EType_Interface:
+	case EType_Class:
+		#pragma AXL_TODO ("overloaded operators for interfaces & classes")
+		break;
+	}
 
 	CValue RValue;
 	return 
@@ -1314,65 +1338,17 @@ COperatorMgr::CallOperator (
 		return CallImpl (OpValue, pFunction->GetType (), pArgList, pResultValue);
 	}
 	
-	if (pOpType->IsUnsafeFunctionPointerType ())
+	if (pOpType->GetTypeKind () == EType_Event)
+		return CallEvent (OpValue, pArgList);
+	else if (pOpType->GetTypeKind () == EType_FunctionPointer)
+		return CallFunctionPtr (OpValue, pArgList, pResultValue);
+	else if (pOpType->IsUnsafeFunctionPointerType ())
 		return CallImpl (OpValue, (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType (), pArgList, pResultValue);
-
-	if (pOpType->GetTypeKind () != EType_FunctionPointer)
+	else 
 	{
 		err::SetFormatStringError (_T("cannot call '%s'"), pOpType->GetTypeString ());
 		return false;
 	}
-	
-	Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue);
-	if (!Result)
-		return false;
-
-	CFunctionPointerType* pFunctionPointerType = (CFunctionPointerType*) pOpType;
-	CFunctionType* pFunctionType = pFunctionPointerType->GetFunctionType ();
-	
-	size_t IndexArray [] = { 2, 0 };
-
-	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
-	CValue InterfacePtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, IndexArray, 2, NULL, &InterfacePtrValue);
-
-	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_phi"));
-	CBasicBlock* pGlobalBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_global"));
-	CBasicBlock* pMethodBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_method"));
-	
-	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateEq_i (InterfacePtrValue, NullValue, &CmpValue);
-	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pGlobalBlock, pMethodBlock);
-
-	CValue GlobalReturnValue;
-	Result = CallImpl (OpValue, pFunctionPointerType->GetFunctionType (), pArgList, &GlobalReturnValue);
-	if (!Result)
-		return false;
-
-	pGlobalBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pMethodBlock);
-
-	CValue InterfaceValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &InterfaceValue);
-	pArgList->InsertHead (InterfaceValue);
-
-	CValue MethodReturnValue;
-	Result = CallImpl (OpValue, pFunctionPointerType->GetMemberFunctionType (), pArgList, &MethodReturnValue);
-	if (!Result)
-		return false;
-
-	pMethodBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
-
-	m_pModule->m_LlvmBuilder.CreatePhi (
-		GlobalReturnValue, 
-		pGlobalBlock, 
-		MethodReturnValue, 
-		pMethodBlock, 
-		pResultValue
-		);
-
-	return true;
 }
 
 bool
@@ -1386,7 +1362,6 @@ COperatorMgr::CalcScopeLevelValue (
 		pScopeLevelValue->SetConstSizeT (0);
 		return true;
 	}
-
 
 	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
 
@@ -1409,11 +1384,10 @@ COperatorMgr::CalcScopeLevelValue (
 }
 
 bool
-COperatorMgr::CallImpl (
-	const CValue& OpValue,
+COperatorMgr::CastArgList (
 	CFunctionType* pFunctionType,
 	rtl::CBoxListT <CValue>* pArgList,
-	CValue* pResultValue
+	rtl::CArrayT <CValue>* pArgArray
 	)
 {
 	bool Result;
@@ -1438,10 +1412,8 @@ COperatorMgr::CallImpl (
 		return false;
 	}
 
-	char Buffer [256];
-	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	ArgArray.Reserve (ActualArgCount);
+	pArgArray->Clear ();
+	pArgArray->Reserve (ActualArgCount);
 	
 	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
 	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
@@ -1457,7 +1429,7 @@ COperatorMgr::CallImpl (
 		if (!Result)
 			return false;
 
-		ArgArray.Append (ArgCast);
+		pArgArray->Append (ArgCast);
 	}
 
 	// vararg
@@ -1474,8 +1446,129 @@ COperatorMgr::CallImpl (
 		if (!Result)
 			return false;
 
-		ArgArray.Append (ArgCast);
+		pArgArray->Append (ArgCast);
 	}
+
+	return true;
+}
+
+bool
+COperatorMgr::CallEvent (
+	const CValue& OpValue,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	CEventType* pEventType = (CEventType*) OpValue.GetType ();
+	ASSERT (pEventType->GetTypeKind () == EType_Event);
+	
+	CFunctionPointerType* pFunctionPointerType = pEventType->GetFunctionPointerType ();
+	CFunctionType* pFunctionType = pFunctionPointerType->GetFunctionType ();
+
+	CValue HandlerValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &HandlerValue);
+
+	CType* pHandlerPtrType = pEventType->GetHandlerStructType ()->GetPointerType (EType_Pointer_u);
+
+	CValue HandlerVariable;
+	m_pModule->m_LlvmBuilder.CreateAlloca (pHandlerPtrType, "event_handler", NULL, &HandlerVariable);
+	m_pModule->m_LlvmBuilder.CreateStore (HandlerValue, HandlerVariable);
+
+	CBasicBlock* pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("event_cond"));
+	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("event_loop"));
+	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("event_follow"));
+
+	m_pModule->m_ControlFlowMgr.Follow (pConditionBlock);
+
+	CValue CmpValue;
+	m_pModule->m_LlvmBuilder.CreateLoad (HandlerVariable, NULL, &HandlerValue);
+	m_pModule->m_LlvmBuilder.CreateEq_i (HandlerValue, pHandlerPtrType->GetZeroValue (), &CmpValue);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFollowBlock, pBodyBlock, pBodyBlock);
+
+	CValue FunctionPtrValue;
+	m_pModule->m_LlvmBuilder.CreateLoad (HandlerValue, NULL, &HandlerValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 0, pEventType->GetFunctionPointerType (), &FunctionPtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 1, NULL, &HandlerValue);
+	m_pModule->m_LlvmBuilder.CreateStore (HandlerValue, HandlerVariable);
+
+	CValue ResultValue;
+	CallFunctionPtr (FunctionPtrValue, pArgList, &ResultValue);
+
+	m_pModule->m_ControlFlowMgr.Jump (pConditionBlock, pFollowBlock);
+
+	return true;
+}
+
+bool
+COperatorMgr::CallFunctionPtr (
+	const CValue& OpValue,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	CFunctionPointerType* pFunctionPointerType = (CFunctionPointerType*) OpValue.GetType ();
+	ASSERT (pFunctionPointerType->GetTypeKind () == EType_FunctionPointer);
+
+	CFunctionType* pFunctionType = pFunctionPointerType->GetFunctionType ();
+
+	bool Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue);
+	if (!Result)
+		return false;
+	
+	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue ();
+	CValue InterfaceValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &InterfaceValue);
+
+	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_phi"));
+	CBasicBlock* pGlobalBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_global"));
+	CBasicBlock* pMethodBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_method"));
+	
+	CValue CmpValue;
+	m_pModule->m_LlvmBuilder.CreateEq_i (InterfaceValue, NullValue, &CmpValue);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pGlobalBlock, pMethodBlock);
+
+	CValue GlobalReturnValue;
+	Result = CallImpl (OpValue, pFunctionPointerType->GetFunctionType (), pArgList, &GlobalReturnValue);
+	if (!Result)
+		return false;
+
+	pGlobalBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pMethodBlock);
+
+	pArgList->InsertHead (InterfaceValue);
+
+	CValue MethodReturnValue;
+	Result = CallImpl (OpValue, pFunctionPointerType->GetMemberFunctionType (), pArgList, &MethodReturnValue);
+	if (!Result)
+		return false;
+
+	pMethodBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
+
+	m_pModule->m_LlvmBuilder.CreatePhi (
+		GlobalReturnValue, 
+		pGlobalBlock, 
+		MethodReturnValue, 
+		pMethodBlock, 
+		pResultValue
+		);
+
+	return true;
+}
+
+bool
+COperatorMgr::CallImpl (
+	const CValue& OpValue,
+	CFunctionType* pFunctionType,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	bool Result = CastArgList (pFunctionType, pArgList, &ArgArray);
+	if (!Result)
+		return false;
 
 	CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
@@ -1766,37 +1859,11 @@ COperatorMgr::LoadReferenceOperator (
 		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
 	}
 
-	if (TypeKind == EType_Reference_u)
-	{
-		// no need to do a range check
-		m_pModule->m_LlvmBuilder.CreateLoad (OpValue, pTargetType, pResultValue, IsVolatile);
-		return true;
-	}
-
-	ASSERT (TypeKind == EType_Reference);
-
 	CValue PtrValue;
-	CValue ValidatorValue;
+	bool Result = PrepareReference (OpValue, EPrepareReferenceFlag_Load, &PtrValue);
+	if (!Result)
+		return false;
 
-	if (OpValue.GetValueKind () == EValue_Variable)
-	{
-		if (!(OpValue.GetFlags () & EValueFlag_IsVariableOffset))
-		{
-			// no need to do a range check
-			m_pModule->m_LlvmBuilder.CreateLoad (OpValue, pTargetType, pResultValue, IsVolatile);
-			return true;
-		}
-
-		PtrValue = OpValue;
-		m_pModule->m_LlvmBuilder.CreateSafePtrValidator (OpValue.GetVariable (), &ValidatorValue);
-	}
-	else
-	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
-	}
-
-	m_pModule->m_LlvmBuilder.CheckSafePtrRange (PtrValue, pTargetType->GetSize (), ValidatorValue, ERuntimeError_LoadOutOfRange);
 	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pTargetType, pResultValue, IsVolatile);
 	return true;
 }
@@ -1840,6 +1907,49 @@ COperatorMgr::CheckCastKind (
 }
 
 bool
+COperatorMgr::PrepareReference (
+	const CValue& Value,
+	int Flags,
+	CValue* pPtrValue
+	)
+{
+	CType* pType = Value.GetType ();
+	if (pType->GetTypeKind () == EType_Reference_u)
+	{
+		// no need to do a range check
+		*pPtrValue = Value;
+		return true;
+	}
+
+	ASSERT (pType->GetTypeKind () == EType_Reference);
+
+	CValue ValidatorValue;
+	if (Value.GetValueKind () == EValue_Variable)
+	{
+		*pPtrValue = Value;
+
+		if (!(Value.GetFlags () & EValueFlag_IsVariableOffset) || (Flags & EPrepareReferenceFlag_NoRangeCheck))
+			return true;
+
+		m_pModule->m_LlvmBuilder.CreateSafePtrValidator (Value.GetVariable (), &ValidatorValue);
+	}
+	else
+	{
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, pPtrValue);
+
+		if (Flags & EPrepareReferenceFlag_NoRangeCheck)
+			return true;
+
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ValidatorValue);
+	}
+
+	ERuntimeError Error = (Flags & EPrepareReferenceFlag_Store) ? ERuntimeError_StoreOutOfRange : ERuntimeError_LoadOutOfRange;
+
+	CType* pTargetType = ((CPointerType*) pType)->GetBaseType ();
+	return m_pModule->m_LlvmBuilder.CheckSafePtrRange (*pPtrValue, pTargetType->GetSize (), ValidatorValue, Error);
+}
+
+bool
 COperatorMgr::StoreReferenceOperator (
 	const CValue& RawSrcValue,
 	const CValue& RawDstValue,
@@ -1878,6 +1988,9 @@ COperatorMgr::StoreReferenceOperator (
 		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
 	}
 
+	if (pTargetType->GetTypeKind () == EType_Event)
+		return EventOperator (DstValue, RawSrcValue, EEventOp_SetHandler);
+
 	Result = CheckCastKind (RawSrcValue.GetType (), pTargetType);
 	if (!Result)
 		return false;
@@ -1887,7 +2000,7 @@ COperatorMgr::StoreReferenceOperator (
 	if (!Result)
 		return false;
 
-	bool IsRangeChecked = false;
+	int PrepareReferenceFlags = EPrepareReferenceFlag_Store;
 
 	EType TargetTypeKind = pTargetType->GetTypeKind ();
 	switch (TargetTypeKind)
@@ -1934,44 +2047,88 @@ COperatorMgr::StoreReferenceOperator (
 		if (!Result)
 			return false;
 
-		IsRangeChecked = true; // mergebitfield checks ptr range
+		PrepareReferenceFlags |= EPrepareReferenceFlag_NoRangeCheck; // mergebitfield checks ptr range
 		break;
 	}
+	
+	CValue PtrValue;
+	Result = PrepareReference (DstValue, PrepareReferenceFlags, &PtrValue);
+	if (!Result)
+		return false;
 
-	if (pDstType->GetTypeKind () == EType_Reference_u)
+	m_pModule->m_LlvmBuilder.CreateStore (SrcValue, PtrValue, IsVolatile);
+	return true;
+}
+
+bool
+COperatorMgr::EventOperator (
+	const CValue& Event,
+	const CValue& RawHandler,
+	EEventOp OpKind
+	)
+{
+	CPointerType* pReferenceType = (CPointerType*) Event.GetType ();
+	ASSERT (pReferenceType->IsReferenceType ());
+
+	CType* pTargetType = pReferenceType->GetBaseType ();
+	
+	bool IsVolatile = false;
+	if (pTargetType->GetTypeKind () == EType_Qualifier)
 	{
-		// no need to do a range check
-		m_pModule->m_LlvmBuilder.CreateStore (SrcValue, DstValue, IsVolatile);
+		IsVolatile = (pTargetType->GetFlags () & ETypeQualifier_Volatile) != 0;
+		pTargetType = ((CDerivedType*) pTargetType)->GetBaseType ();
+	}
+
+	CEventType* pEventType = (CEventType*) pTargetType;
+	ASSERT (pEventType->GetTypeKind () == EType_Event);
+
+	CValue PtrValue;
+	bool Result = PrepareReference (Event, EPrepareReferenceFlag_Store, &PtrValue);
+	if (!Result)
+		return false;
+
+	if (RawHandler.GetValueKind () == EValue_Null)
+	{
+		if (OpKind == EEventOp_SetHandler)
+			m_pModule->m_LlvmBuilder.CreateStore (pEventType->GetZeroValue (), PtrValue, IsVolatile);
+
+		// else ignore += null or -= null;
 		return true;
 	}
 
-	ASSERT (pDstType->GetTypeKind () == EType_Reference);
+	CValue Handler;
+	Result = CastOperator (RawHandler, pEventType->GetFunctionPointerType (), &Handler);
+	if (!Result)
+		return false;
 
-	CValue PtrValue;
-	CValue ValidatorValue;
+	CValue FunctionPtr;
+	CValue CallConv;
+	CValue InterfacePtr;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 0, NULL, &FunctionPtr);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 1, NULL, &CallConv);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 2, NULL, &InterfacePtr);
+	m_pModule->m_LlvmBuilder.CreateBitCast (FunctionPtr, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &FunctionPtr);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractEvent)->GetPointerType (EType_Pointer_u), &PtrValue);
 
-	if (DstValue.GetValueKind () == EValue_Variable)
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_EventOperator);
+
+	CValue ArgArray [] = 
 	{
-		if (!(DstValue.GetFlags () & EValueFlag_IsVariableOffset)) 
-		{
-			// no need to do a range check
-			m_pModule->m_LlvmBuilder.CreateStore (SrcValue, DstValue, IsVolatile);
-			return true;
-		}
+		PtrValue,
+		FunctionPtr,
+		CallConv,
+		InterfacePtr,
+		CValue (OpKind, EType_Int)
+	};
 
-		PtrValue = DstValue;
-		m_pModule->m_LlvmBuilder.CreateSafePtrValidator (DstValue.GetVariable (), &ValidatorValue);
-	}
-	else
-	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 0, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (DstValue, 1, NULL, &ValidatorValue);
-	}
-
-	if (!IsRangeChecked) // don't check twice
-		m_pModule->m_LlvmBuilder.CheckSafePtrRange (PtrValue, pTargetType->GetSize (), ValidatorValue, ERuntimeError_StoreOutOfRange); 
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pFunction,
+		pFunction->GetType (),
+		ArgArray, 
+		countof (ArgArray),
+		NULL
+		);
 	
-	m_pModule->m_LlvmBuilder.CreateStore (SrcValue, PtrValue, IsVolatile);
 	return true;
 }
 

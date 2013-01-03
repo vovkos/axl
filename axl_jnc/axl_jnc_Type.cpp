@@ -286,7 +286,7 @@ CType::GetLlvmType ()
 		break;
 
 	case EType_Event:
-		ASSERT (false); // not yet
+		pLlvmType = ((CEventType*) this)->GetEventStructType ()->GetLlvmType ();
 		break;
 	
 	case EType_Enum:
@@ -437,8 +437,11 @@ CType::GetTypeString ()
 		break;
 
 	case EType_Function:
-	case EType_Event:
 		m_TypeString = ((CFunctionType*) this)->CreateTypeString ();
+		break;
+
+	case EType_Event:
+		m_TypeString = ((CEventType*) this)->CreateTypeString ();
 		break;
 
 	case EType_FunctionPointer:
@@ -556,68 +559,6 @@ VerifyAntiModifier (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 static
-inline
-bool
-VerifyIntegerModifier (
-	CType* pType,
-	int Modifiers,
-	ETypeModifier Modifier,
-	ETypeModifier AntiModifier
-	)
-{
-	return 
-		VerifyModifierTypeKind (Modifier, pType->IsIntegerType (), _T("integer type")) &&
-		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
-}
-
-static
-inline
-bool
-VerifyPointerModifier (
-	CType* pType,
-	int Modifiers,
-	ETypeModifier Modifier,
-	ETypeModifier AntiModifier
-	)
-{
-	return 
-		VerifyModifierTypeKind (Modifier, pType->IsPointerType () || pType->IsReferenceType (), _T("pointer or reference type")) &&
-		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
-}
-
-static
-inline
-bool
-VerifyInterfaceModifier (
-	CType* pType,
-	int Modifiers,
-	ETypeModifier Modifier,
-	ETypeModifier AntiModifier
-	)
-{
-	return 
-		VerifyModifierTypeKind (Modifier, pType->IsClassType (), _T("interface or class type")) &&
-		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
-}
-
-static
-inline
-bool
-VerifyFunctionModifier (
-	CType* pType,
-	int Modifiers,
-	ETypeModifier Modifier,
-	ETypeModifier AntiModifier
-	)
-{
-	return 
-		VerifyModifierTypeKind (Modifier, pType->GetTypeKind () == EType_Function, _T("function type")) &&
-		VerifyAntiModifier (Modifiers, Modifier, AntiModifier);
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-static
 EType
 GetUnsignedTypeKind (EType TypeKind)
 {
@@ -728,11 +669,15 @@ CType::ApplyQualifierModifiers (int Modifiers)
 CType* 
 CType::ApplyIntegerModifiers (int Modifiers)
 {
+	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_IntegerMask));
+	if (!VerifyModifierTypeKind (FirstModifier, IsIntegerType (), _T("integer type")))
+		return NULL;
+
 	CType* pType = this;
 
 	if (Modifiers & ETypeModifier_Signed)
 	{
-		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
 			return NULL;
 
 		// do nothing
@@ -740,7 +685,7 @@ CType::ApplyIntegerModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Unsigned)
 	{
-		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
 			return NULL;
 
 		EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
@@ -749,7 +694,7 @@ CType::ApplyIntegerModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_LittleEndian)
 	{
-		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
 			return NULL;
 
 		// do nothing
@@ -757,7 +702,7 @@ CType::ApplyIntegerModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_BigEndian)
 	{
-		if (!VerifyIntegerModifier (pType, Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
 			return NULL;
 
 		EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
@@ -770,11 +715,15 @@ CType::ApplyIntegerModifiers (int Modifiers)
 CType* 
 CType::ApplyPointerModifiers (int Modifiers)
 {
+	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_PointerMask));
+	if (!VerifyModifierTypeKind (FirstModifier, IsPointerType () || IsReferenceType (), _T("pointer or reference type")))
+		return NULL;
+
 	CType* pType = this;
 
 	if (Modifiers & ETypeModifier_Safe)
 	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe))
 			return NULL;
 
 		// do nothing
@@ -782,7 +731,7 @@ CType::ApplyPointerModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Unsafe)
 	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_Unsafe, ETypeModifier_Safe))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Unsafe, ETypeModifier_Safe))
 			return NULL;
 
 		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
@@ -792,9 +741,6 @@ CType::ApplyPointerModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_NoNull)
 	{
-		if (!VerifyPointerModifier (pType, Modifiers, ETypeModifier_NoNull, (ETypeModifier) 0))
-			return NULL;
-
 		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_NoNull);
 	}
 
@@ -804,11 +750,15 @@ CType::ApplyPointerModifiers (int Modifiers)
 CType* 
 CType::ApplyFunctionModifiers (int Modifiers)
 {
+	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_FunctionMask));
+	if (!VerifyModifierTypeKind (FirstModifier, m_TypeKind == EType_Function, _T("function type")))
+		return NULL;
+
 	CType* pType = this;
 
 	if (Modifiers & ETypeModifier_Cdecl)
 	{
-		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_Cdecl, ETypeModifier_Stdcall))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Cdecl, ETypeModifier_Stdcall))
 			return NULL;
 
 		pType = m_pModule->m_TypeMgr.GetFunctionType (
@@ -821,7 +771,7 @@ CType::ApplyFunctionModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Stdcall)
 	{
-		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_Stdcall, ETypeModifier_Cdecl))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Stdcall, ETypeModifier_Cdecl))
 			return NULL;
 
 		pType = m_pModule->m_TypeMgr.GetFunctionType (
@@ -834,20 +784,19 @@ CType::ApplyFunctionModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Virtual)
 	{
-		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_Virtual, ETypeModifier_NoVirtual))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Virtual, ETypeModifier_NoVirtual))
 			return NULL;
 	}
 
 	if (Modifiers & ETypeModifier_NoVirtual)
 	{
-		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_NoVirtual, ETypeModifier_Virtual))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_NoVirtual, ETypeModifier_Virtual))
 			return NULL;
 	}
 
 	if (Modifiers & ETypeModifier_Event)
 	{
-		if (!VerifyFunctionModifier (pType, Modifiers, ETypeModifier_NoVirtual, ETypeModifier_Virtual))
-			return NULL;
+		pType = m_pModule->m_TypeMgr.GetEventType ((CFunctionType*) pType);
 	}
 
 	return pType;
@@ -872,11 +821,15 @@ CType::ApplyPropertyModifiers (int Modifiers)
 CType* 
 CType::ApplyInterfaceModifiers (int Modifiers)
 {
+	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_InterfaceMask));
+	if (!VerifyModifierTypeKind (FirstModifier, IsClassType (), _T("interface or class type")))
+		return NULL;
+
 	CType* pType = this;
 
 	if (Modifiers & ETypeModifier_Strong)
 	{
-		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Strong, ETypeModifier_Weak))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Strong, ETypeModifier_Weak))
 			return NULL;
 
 		// do nothing
@@ -884,7 +837,7 @@ CType::ApplyInterfaceModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Weak)
 	{
-		if (!VerifyInterfaceModifier (pType, Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
+		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
 			return NULL;
 
 	}

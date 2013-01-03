@@ -10,6 +10,7 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_EventType.h"
 
 namespace axl {
 namespace jnc {
@@ -308,6 +309,13 @@ public:
 		rtl::CBoxListT <CValue>* pArgList
 		);
 
+	bool
+	EventOperator (
+		const CValue& Event,
+		const CValue& Handler,
+		EEventOp OpKind
+		);
+
 	// load & store operators
 
 	bool
@@ -356,6 +364,20 @@ public:
 	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
 	
 protected:
+	enum EPrepareReferenceFlag
+	{
+		EPrepareReferenceFlag_Load         = 1,
+		EPrepareReferenceFlag_Store        = 2,
+		EPrepareReferenceFlag_NoRangeCheck = 4
+	};
+
+	bool
+	PrepareReference (
+		const CValue& Value,
+		int Flags,
+		CValue* pPtrValue
+		);
+
 	ICastOperator*
 	GetCastOperator (
 		CType* pSrcType,
@@ -444,6 +466,26 @@ protected:
 		CFunctionType* pFunctionType,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
+		);
+
+	bool
+	CallEvent (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	CallFunctionPtr (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList,
+		CValue* pResultValue
+		);
+
+	bool
+	CastArgList (
+		CFunctionType* pFunctionType,
+		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CArrayT <CValue>* pArgArray
 		);
 };
 

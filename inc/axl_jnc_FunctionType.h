@@ -121,6 +121,24 @@ public:
 
 	static
 	rtl::CString
+	CreateArgTypeString (
+		CType* const* ppArgType,
+		size_t ArgCount,
+		int Flags
+		);
+
+	rtl::CString
+	CreateArgTypeString ()
+	{
+		return CreateArgTypeString (
+			m_ArgTypeArray, 
+			m_ArgTypeArray.GetCount (), 
+			m_Flags
+			);
+	}
+
+	static
+	rtl::CString
 	CreateTypeString (
 		ECallConv CallingConvention,
 		CType* pReturnType,

@@ -576,7 +576,8 @@ struct TEventHandler
 
 struct TEvent
 {
-	TEventHandler* m_pFirstHandler;
+	TEventHandler* m_pHead;
+	TEventHandler* m_pTail;
 };
 
 //.............................................................................

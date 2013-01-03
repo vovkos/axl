@@ -1,53 +1,16 @@
-test ()
-{
-	printf ("test ()\n");
-}
-
-//.............................................................................
-
-property
-{
-	int 
-	get ()
-	{	
-		printf ("MyProp.get ()\n");
-	}
-
-	set (char x)
-	{	
-		printf ("MyProp.set (char x = %d)\n", x);
-	}
-
-	set (long x)
-	{	
-		printf ("MyProp.set (long x = %d)\n", x);
-	}
-
-} MyProp;
-
-//.............................................................................
-
 int
 printf (
 	char* unsafe pFormat,
 	unsafe ...
 	);
 
+
+//.............................................................................
+
 void
 PointerCheck (int* p);
 
 //.............................................................................
-
-cdecl
-test (int a)
-{
-	printf ("test (int x = %d)\n", a);
-}
-
-test (double a)
-{
-	printf ("test (double x = %f)\n", a);
-}
 
 test (
 	int x, 
@@ -57,18 +20,43 @@ test (
 	printf ("test (int x = %d, int y = %d)\n", x, y);
 }
 
+test2 (
+	int x, 
+	int y
+	)
+{
+	printf ("test2 (int x = %d, int y = %d)\n", x, y);
+}
+
+//.............................................................................
+
 int
 main ()
 {
 	printf ("hui\n");
 
-	test (10, 20);
+	int x;		
 
-	int x, y;
+	event
+	OnMouseClick (
+		int x, 
+		int y
+		);
 
-	MyProp = (long) x;
+	OnMouseClick = test;
+	OnMouseClick += test2;
 
-	printf ("govno i muravei\n");
+	OnMouseClick (10, 20);
+
+	printf ("govno\n");
+
+	OnMouseClick -= test;
+
+	OnMouseClick (30, 40);
+
+	int y;		
+
+	printf ("i muravei\n");
 	return 0;
 }
 

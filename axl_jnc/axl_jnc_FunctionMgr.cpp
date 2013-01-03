@@ -476,6 +476,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateDynamicCastInterface ();
 		break;
 
+	case EStdFunc_EventOperator:
+		pFunction = CreateEventOperator ();
+		break;
+
 	case EStdFunc_HeapAllocate:
 		pFunction = CreateHeapAllocate ();
 		break;
@@ -763,25 +767,52 @@ CFunctionMgr::CreateCheckInterfaceScopeLevel ()
 	return pFunction;
 }
 
-// int8*
+// jnc.iface*
 // jnc.DynamicCastInterface (
-//		int8* p,
+//		jnc.iface* p,
 //		int8* pType
 //		);
 
 CFunction*
 CFunctionMgr::CreateDynamicCastInterface ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr);
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction (_T("jnc.DynamicCastInterface"), pType);
+}
+
+// int8*
+// jnc.EventOperator (
+//		jnc.event* pEvent,
+//		void* pfn,
+//		int CallConv,
+//		jnc.iface* pIface,
+//		int OpKind
+//		);
+
+CFunction*
+CFunctionMgr::CreateEventOperator ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractEvent)->GetPointerType (EType_Pointer_u),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (_T("jnc.EventOperator"), pType);
 }
 
 // int8*

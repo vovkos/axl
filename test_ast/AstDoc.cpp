@@ -298,6 +298,75 @@ StdLib_DynamicCastInterface (
 	return p2;
 }
 
+void
+StdLib_EventOperator (
+	jnc::TEvent* pEvent,
+	void* pfn,
+	jnc::ECallConv CallConv,
+	jnc::TInterfaceHdr* pIface,
+	jnc::EEventOp OpKind
+	)
+{
+	jnc::TEventHandler* pHandler;
+
+	switch (OpKind)
+	{
+	case jnc::EEventOp_SetHandler:
+		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
+		pHandler->m_FunctionPtr.m_pfn = pfn;
+		pHandler->m_FunctionPtr.m_CallingConvention = CallConv;
+		pHandler->m_FunctionPtr.m_pInterface = pIface;
+		pHandler->m_pPrev = NULL;
+		pHandler->m_pNext = NULL;
+
+		pEvent->m_pHead = pHandler;
+		pEvent->m_pTail = pHandler;
+		break;
+
+	case jnc::EEventOp_AddHandler:
+		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
+		pHandler->m_FunctionPtr.m_pfn = pfn;
+		pHandler->m_FunctionPtr.m_CallingConvention = CallConv;
+		pHandler->m_FunctionPtr.m_pInterface = pIface;
+		pHandler->m_pPrev = pEvent->m_pTail;
+		pHandler->m_pNext = NULL;
+
+		if (!pEvent->m_pHead)
+			pEvent->m_pHead = pHandler;
+
+		if (pEvent->m_pTail)
+			pEvent->m_pTail->m_pNext = pHandler;
+
+		pEvent->m_pTail = pHandler;
+		break;
+
+	case jnc::EEventOp_RemoveHandler:
+		pHandler = pEvent->m_pHead;
+		for (; pHandler; pHandler = pHandler->m_pNext)
+		{
+			if (pHandler->m_FunctionPtr.m_pfn == pfn)
+			{
+				if (pHandler->m_pPrev)
+					pHandler->m_pPrev->m_pNext = pHandler->m_pNext;
+
+				if (pHandler->m_pNext)
+					pHandler->m_pNext->m_pPrev = pHandler->m_pPrev;
+
+				if (pEvent->m_pHead == pHandler)
+					pEvent->m_pHead = pHandler->m_pNext;
+
+				if (pEvent->m_pTail == pHandler)
+					pEvent->m_pTail = pHandler->m_pPrev;
+			}
+		}
+
+		break;
+
+	default:
+		ASSERT (false);
+	}
+}
+
 void*
 StdLib_HeapAllocate (jnc::CType* pType)
 {
@@ -453,6 +522,7 @@ CAstDoc::ExportStdLib ()
 {
 	ExportStdLibFunction (jnc::EStdFunc_OnRuntimeError, StdLib_OnRuntimeError);
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
+	ExportStdLibFunction (jnc::EStdFunc_EventOperator, StdLib_EventOperator);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
