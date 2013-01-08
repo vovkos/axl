@@ -115,6 +115,7 @@ nl             ;
 'priority'     { CreateToken (EToken_Priority); };
 'any'          { CreateToken (EToken_Any); };
 'epsilon'      { CreateToken (EToken_Epsilon); };
+'nullable'     { CreateToken (EToken_Nullable); };
 lit_sq         { CreateCharToken (EToken_Integer); };
 lit_dq         { CreateStringToken (EToken_Literal, 1, 1); };
 id             { CreateStringToken (EToken_Identifier); };

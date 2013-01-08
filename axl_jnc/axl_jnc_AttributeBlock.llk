@@ -8,10 +8,12 @@ attribute_block
 	: '[' attribute_declarator_list ']'
 	;
 
+nullable
 attribute_declarator_list 
 	: attribute_declarator (',' attribute_declarator)*
 	;
 
+nullable
 attribute_declarator
 	: EToken_Identifier ('=' expression_pass1)?
 		{

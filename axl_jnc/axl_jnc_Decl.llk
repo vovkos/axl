@@ -93,7 +93,7 @@ qualified_name
 item_declaration_w_specifier
 	: declaration_specifier_list $s
 	  declarator_list $d <&$s.m_DeclSpecifiers>?
-	  declaration_terminator <$d.m_pLastItem>
+	  declaration_terminator <IsValidLocator ($d) ? $d.m_pLastItem : NULL>
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -197,10 +197,12 @@ initializer <CType* $pType>
 		}
 	;
 
+nullable
 initializer_list <CType* $pType>
 	: initializer_list_entry <$pType> (',' initializer_list_entry <$pType>)*
 	;
 
+nullable
 initializer_list_entry <CType* $pType>
 	: initializer <$pType>
 	| epsilon
@@ -293,6 +295,10 @@ qualifier_modifier <CTypeModifiers* $pTypeModifiers>
 	| EToken_Volatile
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Volatile);
+		}
+	| EToken_AutoEv
+		{
+			return $pTypeModifiers->SetTypeModifier (ETypeModifier_AutoEv);
 		}
 	;
 
@@ -463,6 +469,10 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
 	| property_specifier
+		{
+			return $pTypeSpecifier->SetType ($1.m_pType);
+		}
+	| autoev_specifier
 		{
 			return $pTypeSpecifier->SetType ($1.m_pType);
 		}

@@ -54,10 +54,12 @@ enum_block <CEnumType* $pType>
 		}
 	;
 
+nullable
 enum_member_list <CEnumType* $pType>
 	: enum_member <$pType> (',' enum_member <$pType>)*
 	;
 
+nullable
 enum_member <CEnumType* $pType>
 	: EToken_Identifier ('=' expression_pass1 $e)?
 		{

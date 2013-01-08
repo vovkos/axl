@@ -312,6 +312,18 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 			SymbolFlags |= ESymbolNodeFlag_IsStart;
 			break;
 
+		case EToken_Nullable:
+			if (SymbolFlags & ESymbolNodeFlag_IsNullable)
+			{
+				err::SetStringError (_T("multiple 'nullable' specifiers"));
+				return false;
+			}
+
+			NextToken ();
+
+			SymbolFlags |= ESymbolNodeFlag_IsNullable;
+			break;
+
 		case EToken_Identifier:
 			pNextToken = GetToken (1);
 			switch (pNextToken->m_Token)

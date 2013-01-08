@@ -1,0 +1,32 @@
+//.............................................................................
+
+class
+{
+	CClassType* m_pType;
+	CDeclarator m_Declarator;
+}
+autoev_specifier
+	: EToken_AutoEv
+	  EToken_Identifier $n?
+	  (function_suffix $a <&$.m_Declarator>)?
+	  (
+		resolver ({ return m_Stage == EStage_Pass1 }) 
+		function_body_pass1
+	  | autoev_block <$.m_pType> 
+	  )	  
+	;
+
+start
+autoev_block <CClassType* $pType>
+	: '{' autoev_stmt <$pType>* '}'
+	;
+	
+autoev_stmt <CClassType* $pType>
+	: expression ';'
+		{
+		}
+	| ';'
+	;
+
+//.............................................................................
+

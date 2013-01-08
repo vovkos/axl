@@ -132,8 +132,9 @@ enum ETypeQualifier
 	ETypeQualifier_NoNull    = 0x04,
 	ETypeQualifier_Weak      = 0x08,
 	ETypeQualifier_Bindable  = 0x10,
+	ETypeQualifier_AutoEv    = 0x20,
 
-	ETypeQualifier__Mask     = 0x1f,
+	ETypeQualifier__Mask     = 0x3f,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -152,13 +153,14 @@ enum ETypeModifier
 {
 	ETypeModifier_Const         = 0x000001,
 	ETypeModifier_Volatile      = 0x000002,
-	ETypeModifier_QualifierMask = 0x000003,
+	ETypeModifier_AutoEv        = 0x000004,
+	ETypeModifier_QualifierMask = 0x000007,
 	
-	ETypeModifier_Signed        = 0x000004,
-	ETypeModifier_Unsigned      = 0x000008,
-	ETypeModifier_BigEndian     = 0x000010,
-	ETypeModifier_LittleEndian  = 0x000020,
-	ETypeModifier_IntegerMask   = 0x00003c,
+	ETypeModifier_Signed        = 0x000010,
+	ETypeModifier_Unsigned      = 0x000020,
+	ETypeModifier_BigEndian     = 0x000040,
+	ETypeModifier_LittleEndian  = 0x000080,
+	ETypeModifier_IntegerMask   = 0x0000f0,
 
 	ETypeModifier_Safe          = 0x000100,
 	ETypeModifier_Unsafe        = 0x000200,	

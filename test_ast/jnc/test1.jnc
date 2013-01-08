@@ -30,12 +30,66 @@ test2 (
 
 //.............................................................................
 
+int g_Baud;
+int g_Parity;
+
+int g_Baud2;
+int g_Parity2;
+
+int bindable property PBaud;
+int bindable property PParity;
+
+int
+PBaud.get ()
+{
+	printf ("PBaud.get () = %d\n", g_Baud);
+	return g_Baud;
+}
+
+PBaud.set (int Value)
+{
+	printf ("PBaud.set (%d)\n", Value);
+	g_Baud = Value;
+}
+
+int
+PParity.get ()
+{
+	printf ("PParity.get () = %d\n", g_Parity);
+	return g_Parity;
+}
+
+PParity.set (int Value)
+{
+	printf ("PParity.set (%d)\n", Value);
+	g_Parity = Value;
+}
+
+//.............................................................................
+
+autoev ASerial
+{
+	g_Baud2 = PBaud * 10;
+	g_FlowControl2 = PFlowControl * 100;
+	g_DataSize2 = PDataSize * 1000;
+};
+
+struct TPoint
+{
+	int x;
+	int y;
+};
+
 int
 main ()
 {
-	printf ("hui\n");
+	// ASerial = stack new ASerial;
 
-	int x;		
+	PBaud = 10;
+
+	int x = PBaud;
+
+	printf ("hui\n");
 
 	event
 	OnMouseClick (

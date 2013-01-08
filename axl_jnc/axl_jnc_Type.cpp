@@ -96,6 +96,9 @@ GetTypeModifierString (ETypeModifier Modifier)
 	case ETypeModifier_Volatile:
 		return _T("volatile");
 
+	case ETypeModifier_AutoEv:
+		return _T("autoev");
+
 	case ETypeModifier_Signed:
 		return _T("signed");
 
@@ -663,6 +666,9 @@ CType::ApplyQualifierModifiers (int Modifiers)
 	if (Modifiers & ETypeModifier_Volatile)
 		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Volatile);
 
+	if (Modifiers & ETypeModifier_AutoEv)
+		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_AutoEv);
+
 	return pType;
 }
 
@@ -840,6 +846,7 @@ CType::ApplyInterfaceModifiers (int Modifiers)
 		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
 			return NULL;
 
+		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Weak);
 	}
 
 	return pType;

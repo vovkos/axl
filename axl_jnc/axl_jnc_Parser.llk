@@ -8,12 +8,14 @@ import "axl_jnc_StructSpecifier.llk";
 import "axl_jnc_UnionSpecifier.llk";
 import "axl_jnc_ClassSpecifier.llk";
 import "axl_jnc_PropertySpecifier.llk";
+import "axl_jnc_AutoEvSpecifier.llk";
 
 //.............................................................................
 
 LL (2);
 
 start
+nullable
 compilation_unit
 	: global_declaration*
 	;

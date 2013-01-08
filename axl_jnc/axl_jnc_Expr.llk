@@ -467,7 +467,7 @@ unary_expr <CValue* $pValue>
 		}
 	;
 
-// since '(' at 'unary_operator' is a conflict against epsilon production we need a resolver
+// since '(' at 'unary_expr' is a conflict against epsilon production we need a resolver
 // otherwise epsilon production always loses
 
 cast_operator_rslv

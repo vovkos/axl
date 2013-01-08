@@ -154,6 +154,7 @@ enum ESymbolNodeFlag
 	ESymbolNodeFlag_IsStart        = 0x1000,
 	ESymbolNodeFlag_IsNoAst        = 0x2000,
 	ESymbolNodeFlag_IsResolverUsed = 0x4000,
+	ESymbolNodeFlag_IsNullable     = 0x8000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

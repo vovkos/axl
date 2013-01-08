@@ -780,6 +780,12 @@ CParser::SetFunctionBody (
 	rtl::CBoxListT <CToken>* pBody
 	)
 {
+	if (!pItem)
+	{
+		err::SetFormatStringError (_T("declaration without declarator cannot have a function body"));
+		return false;
+	}
+
 	EModuleItem ItemKind = pItem->GetItemKind ();
 	if (ItemKind != EModuleItem_Function)
 	{
