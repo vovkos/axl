@@ -250,9 +250,6 @@ protected:
 		{
 			if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
 			{
-				TraceSymbolStack ();
-				TracePredictionStack ();
-
 				int ExpectedToken = ((T*) this)->GetTokenFromIndex (pNode->m_Index);
 				err::SetExpectedTokenError (CToken::GetName (ExpectedToken), pToken->GetName ());
 			}

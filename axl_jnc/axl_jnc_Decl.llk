@@ -492,15 +492,10 @@ qualified_type_name_rslv
 			if (IsTypeSpecified ())
 				return false;
 		}
-	  qualified_name $n
+	  qualified_name $n		
 		{
 			return m_Stage == EStage_Pass1 || FindType ($n.m_Name) != NULL;
 		}
-	  ('(' 
-		{
-			return false;
-		}
-	  )?
 	;
 
 class

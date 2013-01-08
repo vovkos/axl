@@ -168,6 +168,12 @@ Members2
 		CDeclarator* pDeclarator
 		);
 
+	CClassType*
+	DeclareAutoEvType (
+		rtl::CString& Name,
+		CDeclarator* pDeclarator
+		);
+
 	bool
 	SwitchCaseLabel (
 		CSwitchStmt* pSwitchStmt,

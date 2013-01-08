@@ -9,10 +9,23 @@ autoev_specifier
 	: EToken_AutoEv
 	  EToken_Identifier $n?
 	  (function_suffix $a <&$.m_Declarator>)?
+		{
+			$.m_pType = DeclareAutoEvType (
+				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+				&$.m_Declarator
+				);
+
+			if (!$.m_pType)
+				return false;
+		}
 	  (
 		resolver ({ return m_Stage == EStage_Pass1 }) 
 		function_body_pass1
+			{
+			}
 	  | autoev_block <$.m_pType> 
+			{
+			}
 	  )	  
 	;
 

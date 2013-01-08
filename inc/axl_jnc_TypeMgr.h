@@ -302,7 +302,7 @@ public:
 		EType TypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		size_t PackFactor
+		size_t PackFactor = 8
 		);
 
 	CClassType* 

@@ -1,3 +1,11 @@
+struct TPoint
+{
+	int x;
+	int y;
+};
+
+//.............................................................................
+
 int
 printf (
 	char* unsafe pFormat,
@@ -67,27 +75,19 @@ PParity.set (int Value)
 
 //.............................................................................
 
-autoev ASerial
+autoev ASerialRule
 {
 	g_Baud2 = PBaud * 10;
 	g_FlowControl2 = PFlowControl * 100;
 	g_DataSize2 = PDataSize * 1000;
 };
 
-struct TPoint
-{
-	int x;
-	int y;
-};
-
 int
 main ()
 {
-	// ASerial = stack new ASerial;
+	ASerialRule ppp = stack new ASerialRule;
 
-	PBaud = 10;
-
-	int x = PBaud;
+	int x = 10;
 
 	printf ("hui\n");
 

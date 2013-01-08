@@ -267,6 +267,12 @@ CParseTableBuilder::CalcFirstFollow ()
 				if (PropagateParentChild (pNode, pProduction))
 					HasChanged = true;
 			}
+
+			if (pNode->m_pResolver)
+			{
+				if (pNode->m_pResolver->m_FollowSet.Merge (pNode->m_FollowSet, rtl::EBitOp_Or))
+					HasChanged = true;			
+			}
 		}
 
 		Sequence = m_pNodeMgr->m_SequenceList.GetHead ();

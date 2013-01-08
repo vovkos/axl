@@ -339,10 +339,14 @@ CParser::DeclareStructType (
 	CStructType* pType = NULL;
 
 	if (Name.IsEmpty ())
-		return m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
-
-	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-	pType = m_pModule->m_TypeMgr.GetStructType (Name, QualifiedName, PackFactor);
+	{
+		pType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
+	}
+	else
+	{
+		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+		pType = m_pModule->m_TypeMgr.GetStructType (Name, QualifiedName, PackFactor);
+	}
 
 	if (pBaseTypeList)
 	{
@@ -371,9 +375,12 @@ CParser::DeclareStructType (
 		}
 	}
 
-	Result = pNamespace->AddItem (pType);
-	if (!Result)
-		return NULL;
+	if (!Name.IsEmpty ())
+	{
+		Result = pNamespace->AddItem (pType);
+		if (!Result)
+			return NULL;
+	}
 	
 	return pType;
 }
@@ -478,10 +485,14 @@ CParser::DeclareClassType (
 	CClassType* pType = NULL;
 
 	if (Name.IsEmpty ())
-		return m_pModule->m_TypeMgr.CreateUnnamedClassType (TypeKind);
-
-	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-	pType = m_pModule->m_TypeMgr.GetClassType (TypeKind, Name, QualifiedName, PackFactor);
+	{
+		pType = m_pModule->m_TypeMgr.CreateUnnamedClassType (TypeKind);
+	}
+	else
+	{
+		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+		pType = m_pModule->m_TypeMgr.GetClassType (TypeKind, Name, QualifiedName, PackFactor);
+	}
 
 	if (pBaseTypeList)
 	{
@@ -511,9 +522,12 @@ CParser::DeclareClassType (
 		}
 	}
 
-	Result = pNamespace->AddItem (pType);
-	if (!Result)
-		return NULL;
+	if (!Name.IsEmpty ())
+	{
+		Result = pNamespace->AddItem (pType);
+		if (!Result)
+			return NULL;
+	}
 	
 	return pType;
 }
@@ -619,6 +633,43 @@ CParser::DeclareClassDestructor (
 	pFunction->m_pClassType = pClassType;
 	pClassType->m_pDestructor = pFunction;
 	return pFunction;
+}
+
+CClassType*
+CParser::DeclareAutoEvType (
+	rtl::CString& Name,
+	CDeclarator* pDeclarator
+	)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CClassType* pType = NULL;
+
+	if (Name.IsEmpty ())
+	{
+		pType = m_pModule->m_TypeMgr.CreateUnnamedClassType (EType_Class);
+	}
+	else
+	{
+		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+		pType = m_pModule->m_TypeMgr.GetClassType (EType_Class, Name, QualifiedName);
+	}
+
+	if (!pDeclarator->m_SuffixList.IsEmpty ())
+	{
+		CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *pDeclarator->m_SuffixList.GetTail ();
+		ASSERT (pSuffix->GetSuffixKind () == EDeclSuffix_FormalArg);
+	}
+
+	if (!Name.IsEmpty ())
+	{
+		Result = pNamespace->AddItem (pType);
+		if (!Result)
+			return NULL;
+	}
+	
+	return pType;
 }
 
 CFunctionFormalArg*
