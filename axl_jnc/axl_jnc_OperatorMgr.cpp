@@ -1579,7 +1579,24 @@ COperatorMgr::ClosureOperator (
 	CValue* pResultValue
 	)
 {
-	pResultValue->SetVoid ();
+	*pResultValue = OpValue;
+	CClosure* pClosure = pResultValue->CreateClosure ();
+
+	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
+	for (size_t i = 0; Arg; Arg++, i++)
+	{
+		if (Arg->GetValueKind () == EValue_Void)
+			continue;
+
+		pClosure->CreateArg (i, *Arg);
+	}
+
+	if (pClosure->IsEmpty ())
+	{
+		err::SetFormatStringError (_T("empty closure"));
+		return false;
+	}
+
 	return true;
 }
 

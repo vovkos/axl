@@ -517,7 +517,7 @@ public:
 #line 518 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 	};
 	
-	class hhhhhhh: public CAstNode
+	class _cls27: public CAstNode
 	{
 	public:
 #line 589 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
@@ -4722,7 +4722,7 @@ public:
 			pNode = CreateStdSymbolNode (Index);
 			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_IsNamed;
 				
-			pNode->m_pAstNode = AXL_MEM_NEW (hhhhhhh);
+			pNode->m_pAstNode = AXL_MEM_NEW (_cls27);
 				
 			break;
 			
@@ -7208,7 +7208,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 #line 559 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			return m_pModule->m_OperatorMgr.CallOperator (__pSymbol->m_Arg.pValue, &(*(hhhhhhh*) GetAstLocator (0)).m_ArgList);
+			return m_pModule->m_OperatorMgr.CallOperator (__pSymbol->m_Arg.pValue, &(*(_cls27*) GetAstLocator (0)).m_ArgList);
 		;
 #line 7214 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -7221,7 +7221,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 #line 563 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			return m_pModule->m_OperatorMgr.ClosureOperator (__pSymbol->m_Arg.pValue, &(*(hhhhhhh*) GetAstLocator (0)).m_ArgList);
+			return m_pModule->m_OperatorMgr.ClosureOperator (__pSymbol->m_Arg.pValue, &(*(_cls27*) GetAstLocator (0)).m_ArgList);
 		;
 #line 7227 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -7296,7 +7296,7 @@ public:
 		case 146:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
-			hhhhhhh* __pAstNode = (hhhhhhh*) __pSymbol->m_pAstNode;
+			_cls27* __pAstNode = (_cls27*) __pSymbol->m_pAstNode;
 #line 595 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
 			(*__pAstNode).m_ArgList.InsertTail ((*(_cls15*) GetAstLocator (0)).m_Value);
@@ -7309,7 +7309,7 @@ public:
 		case 147:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
-			hhhhhhh* __pAstNode = (hhhhhhh*) __pSymbol->m_pAstNode;
+			_cls27* __pAstNode = (_cls27*) __pSymbol->m_pAstNode;
 #line 600 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
 				
@@ -7323,7 +7323,7 @@ public:
 		case 148:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
-			hhhhhhh* __pAstNode = (hhhhhhh*) __pSymbol->m_pAstNode;
+			_cls27* __pAstNode = (_cls27*) __pSymbol->m_pAstNode;
 #line 607 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
 			(*__pAstNode).m_ArgList.InsertTail (CValue ());
@@ -7336,7 +7336,7 @@ public:
 		case 149:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
-			hhhhhhh* __pAstNode = (hhhhhhh*) __pSymbol->m_pAstNode;
+			_cls27* __pAstNode = (_cls27*) __pSymbol->m_pAstNode;
 #line 612 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_ArgList.InsertTail ((*(_cls28*) GetAstLocator (0)).m_Value);

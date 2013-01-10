@@ -68,6 +68,12 @@ public:
 		m_ArgList.Clear ();
 	}
 
+	bool 
+	IsEmpty ()
+	{
+		return m_ArgList.IsEmpty ();
+	}
+
 	size_t
 	GetArgCount ()
 	{

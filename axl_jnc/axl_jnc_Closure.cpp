@@ -45,7 +45,7 @@ CClosure::Apply (rtl::CBoxListT <CValue>* pArgList)
 		{
 			if (!TargetArg)
 			{
-				err::SetFormatStringError (_T("closure call misses argument #%d"), TargetArgIdx);
+				err::SetFormatStringError (_T("closure call misses argument #%d"), TargetArgIdx + 1);
 				return false;
 			}
 
