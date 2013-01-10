@@ -21,6 +21,7 @@ protected:
 	CFunctionType* m_pFunctionType;
 	CFunctionType* m_pMemberFunctionType; // with additional abstract interface argument
 	CStructType* m_pPointerStructType;
+	CEventType* m_pEventType;
 
 public:
 	CFunctionPointerType ();
@@ -42,6 +43,9 @@ public:
 
 	CStructType* 
 	GetPointerStructType ();
+
+	CEventType* 
+	GetEventType ();
 };
 
 //.............................................................................

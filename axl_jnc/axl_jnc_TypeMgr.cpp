@@ -16,8 +16,6 @@ CTypeMgr::CTypeMgr ()
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
 	m_UnnamedTypeCounter = 0;
-
-	m_pSimpleFunctionType = NULL;
 }
 
 void
@@ -44,8 +42,6 @@ CTypeMgr::Clear ()
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
 	m_UnnamedTypeCounter = 0;
-
-	m_pSimpleFunctionType = NULL;
 }
 
 void
@@ -120,12 +116,16 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateAbstractInterfaceType ();
 		break;
 
-	case EStdType_AbstractFunctionPtr:
-		pType = CreateAbstractFunctionPointerType ();
+	case EStdType_SimpleFunction:
+		pType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
 		break;
 
-	case EStdType_AbstractEvent:
-		pType = CreateAbstractEventType ();
+	case EStdType_SimpleFunctionPtr:
+		pType = GetFunctionPointerType ((CFunctionType*) GetStdType (EStdType_SimpleFunction));
+		break;
+
+	case EStdType_SimpleEvent:
+		pType = GetEventType ((CFunctionPointerType*) GetStdType (EStdType_SimpleFunctionPtr));
 		break;
 
 	default:
@@ -173,20 +173,6 @@ CTypeMgr::CreateAbstractInterfaceType ()
 	ASSERT (Result);
 	
 	return pType->GetPointerType (EType_Pointer_u);
-}
-
-CFunctionPointerType*
-CTypeMgr::CreateAbstractFunctionPointerType ()
-{
-	CFunctionType* pFunctionType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
-	return GetFunctionPointerType (pFunctionType);
-}
-
-CEventType*
-CTypeMgr::CreateAbstractEventType ()
-{
-	CFunctionType* pFunctionType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
-	return GetEventType (pFunctionType);
 }
 
 bool
@@ -400,17 +386,13 @@ CTypeMgr::GetFunctionPointerType (CFunctionType* pFunctionType)
 }
 
 CEventType* 
-CTypeMgr::GetEventType (CFunctionType* pFunctionType)
+CTypeMgr::GetEventType (CFunctionPointerType* pFunctionPtrType)
 {
-	// strip calling convention
-
-	pFunctionType = pFunctionType->GetDefCallConvFunctionType ();
-
-	if (pFunctionType->m_pEventType)
-		return pFunctionType->m_pEventType;
+	if (pFunctionPtrType->m_pEventType)
+		return pFunctionPtrType->m_pEventType;
 
 	rtl::CStringA Signature = 'T';
-	Signature += pFunctionType->GetArgSignature ();
+	Signature += pFunctionPtrType->GetSignature ();
 
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
@@ -422,11 +404,11 @@ CTypeMgr::GetEventType (CFunctionType* pFunctionType)
 	CEventType* pType = AXL_MEM_NEW (CEventType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
-	pType->m_pFunctionPointerType = GetFunctionPointerType (pFunctionType);
+	pType->m_pFunctionPointerType = pFunctionPtrType;
 
 	m_EventTypeList.InsertTail (pType);
 	It->m_Value = pType;
-	pFunctionType->m_pEventType = pType;
+	pFunctionPtrType->m_pEventType = pType;
 	return pType;
 }
 
@@ -681,16 +663,6 @@ CTypeMgr::GetClassType (
 	It->m_Value = pType;
 
 	return pType;
-}
-
-CFunctionType* 
-CTypeMgr::GetSimpleFunctionType ()
-{
-	if (m_pSimpleFunctionType)
-		return m_pSimpleFunctionType;
-
-	m_pSimpleFunctionType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
-	return m_pSimpleFunctionType;
 }
 
 CFunctionType* 

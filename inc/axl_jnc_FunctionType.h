@@ -57,7 +57,6 @@ protected:
 
 	CFunctionType* m_pDefCallConvFunctionType;
 	CFunctionPointerType* m_pFunctionPointerType;
-	CEventType* m_pEventType;
 
 public:
 	CFunctionType ();

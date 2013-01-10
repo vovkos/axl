@@ -32,15 +32,21 @@ bindable property
 
 OnBaudChange ()
 {
-	printf ("Baud has changed to %d!\n", PBaud);
+	printf ("OnBaudChange (): Baud has changed to %d!\n", PBaud);
 }
 
+autoev ASerial
+{
+	printf ("autoev ASerial: Baud has changed to %d!\n", PBaud);
+};
+ 
 int
 main ()
 {
 	printf ("hui\n");
 	
 	onchange (PBaud) += OnBaudChange;
+	PBaud = 100;
 
 	printf ("i muravei\n");
 	return 0;

@@ -11,6 +11,8 @@ namespace jnc {
 
 class CClassType;
 class CPropertyPointerType;
+class CVariable;
+class CClassFieldMember;
 
 //.............................................................................
 
@@ -46,6 +48,12 @@ protected:
 
 	CClassType* m_pParentClassType;
 	size_t m_ParentVTableIndex;
+
+	union
+	{
+		CVariable* m_pEventVariable;            // global bindable properties
+		CClassFieldMember* m_pEventFieldMember; // member bindable properties
+	};
 
 	rtl::CString m_AccessorSignature;
 	rtl::CString m_ShortAccessorSignature;
@@ -109,6 +117,18 @@ public:
 
 	CPropertyPointerType* 
 	GetPropertyPointerType ();
+
+	CVariable* 
+	GetEventVariable ()
+	{
+		return m_pEventVariable;
+	}
+
+	CClassFieldMember* 
+	GetEventFieldMember ()
+	{
+		return m_pEventFieldMember;
+	}
 
 	rtl::CString
 	CreateTypeString ();

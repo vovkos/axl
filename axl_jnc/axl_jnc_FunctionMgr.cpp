@@ -885,7 +885,7 @@ CFunctionMgr::CreateEventOperator ()
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractEvent)->GetPointerType (EType_Pointer_u),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr),

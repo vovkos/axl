@@ -376,6 +376,15 @@ public:
 		size_t BitCount = 0
 		);
 
+	CClassFieldMember*
+	CreateFieldMember (
+		CType* pType,
+		size_t BitCount = 0
+		)
+	{
+		return CreateFieldMember (rtl::CString (), pType, BitCount);
+	}
+
 	CClassMethodMember*
 	CreateMethodMember (
 		const rtl::CString& Name,

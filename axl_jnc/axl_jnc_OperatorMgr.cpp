@@ -1577,13 +1577,30 @@ COperatorMgr::OnChangeOperator (
 	CValue* pResultValue
 	)
 {
-	if (!OpValue.GetType ()->IsBindablePropertyType ())
+	CType* pOpType = OpValue.GetType ();
+
+	if (!pOpType->IsBindablePropertyType ())
 	{
 		err::SetFormatStringError (_T("'onchange' can only be applied to bindable properties"));
 		return false;
 	}
 
-	pResultValue->SetVoid ();
+	EType OpTypeKind = pOpType->GetTypeKind ();
+	if (OpTypeKind != EType_Property)
+	{
+		err::SetFormatStringError (_T("'onchange' for property pointers is not implemented yet"));
+		return false;
+	}
+
+	CPropertyType* pPropertyType = (CPropertyType*) pOpType;
+	if (pPropertyType->GetParentClassType ())
+	{
+		err::SetFormatStringError (_T("'onchange' for member properties is not implemented yet"));
+		return false;
+	}
+
+	CVariable* pEventVariable = pPropertyType->GetEventVariable ();
+	pResultValue->SetVariable (pEventVariable);
 	return true;
 }
 
@@ -2029,7 +2046,7 @@ COperatorMgr::EventOperator (
 	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 1, NULL, &CallConv);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 2, NULL, &InterfacePtr);
 	m_pModule->m_LlvmBuilder.CreateBitCast (FunctionPtr, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &FunctionPtr);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractEvent)->GetPointerType (EType_Pointer_u), &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u), &PtrValue);
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_EventOperator);
 
@@ -2178,9 +2195,12 @@ COperatorMgr::SetPropertyOperator (
 	const CValue& RawDstValue
 	)
 {
+	bool Result;
+
 	CPropertyType* pPropertyType;
 	CValue DstValue;
 	CValue InterfaceValue;
+	CValue EventValue;
 
 	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPointer)
 	{
@@ -2194,6 +2214,12 @@ COperatorMgr::SetPropertyOperator (
 		ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_Property);
 		pPropertyType = (CPropertyType*) RawDstValue.GetType ();
 		DstValue = RawDstValue;
+
+		if (pPropertyType->GetFlags () & EPropertyTypeFlag_IsBindable)
+		{
+			CVariable* pEventVariable = pPropertyType->GetEventVariable ();
+			EventValue.SetVariable (pEventVariable);
+		}
 	}
 
 	if (pPropertyType->IsReadOnly ())
@@ -2243,7 +2269,19 @@ COperatorMgr::SetPropertyOperator (
 	FunctionValue.SetClosure (DstValue.GetClosure ());
 
 	CValue ReturnValue;
-	return CallOperator (FunctionValue, &ArgList, &ReturnValue);
+	Result = CallOperator (FunctionValue, &ArgList, &ReturnValue);
+	if (!Result)
+		return false;
+
+	if (!EventValue.IsEmpty ())
+	{
+		ArgList.Clear ();
+		Result = CallOperator (EventValue, &ArgList, &ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	return true;
 }
 
 //.............................................................................

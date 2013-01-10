@@ -205,15 +205,23 @@ CParser::Declare (
 		}
 
 		CPropertyType* pPropertyType = (CPropertyType*) pType;
+		CEventType* pEventType = (CEventType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent);
 
 		if (pClassType)
 		{
 			pNewItem = pClassType->CreatePropertyMember (Name, pPropertyType);
+
+			if (pPropertyType->GetFlags () & EPropertyTypeFlag_IsBindable)
+				pPropertyType->m_pEventFieldMember = pClassType->CreateFieldMember (pEventType);
 		}
 		else
 		{
 			pPropertyType->m_PropertyKind = EProperty_Global;
 			pPropertyType->m_Name = Name;
+
+			if (pPropertyType->GetFlags () & EPropertyTypeFlag_IsBindable)
+				pPropertyType->m_pEventVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pEventType, false);
+
 			pNamespace->AddItem (pPropertyType);
 			pPropertyType->m_Tag = pPropertyType->GetQualifiedName ();
 			pPropertyType->TagAccessors ();
@@ -248,7 +256,6 @@ CParser::Declare (
 	pNewItem->m_Pos = pDeclarator->m_Pos;
 	return pNewItem;
 }
-
 
 CFunction*
 CParser::DeclarePropertyAccessor (
@@ -715,7 +722,7 @@ CParser::PreAutoEvExpression ()
 {
 	ASSERT (m_pAutoEvType);
 
-	CFunctionType* pShortType = m_pModule->m_TypeMgr.GetSimpleFunctionType ();
+	CFunctionType* pShortType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunctionType* pFullType = m_pAutoEvType->GetSimpleMethodType ();
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);

@@ -32,8 +32,9 @@ enum EStdType
 	EStdType_SafePtrValidator,
 	EStdType_ObjectHdr,
 	EStdType_AbstractInterfacePtr,
-	EStdType_AbstractFunctionPtr,
-	EStdType_AbstractEvent,
+	EStdType_SimpleFunction,
+	EStdType_SimpleFunctionPtr,
+	EStdType_SimpleEvent,
 	EStdType__Count,
 };
 
@@ -63,8 +64,6 @@ protected:
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CPropertyPointerType> m_PropertyPointerTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
-
-	CFunctionType* m_pSimpleFunctionType;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
@@ -162,7 +161,13 @@ public:
 	GetFunctionPointerType (CFunctionType* pFunctionType);
 
 	CEventType* 
-	GetEventType (CFunctionType* pFunctionType);
+	GetEventType (CFunctionType* pFunctionType)
+	{
+		return GetEventType (GetFunctionPointerType (pFunctionType));
+	}
+
+	CEventType* 
+	GetEventType (CFunctionPointerType* pFunctionPtrType);
 
 	CPropertyPointerType* 
 	GetPropertyPointerType (CPropertyType* pPropertyType);
@@ -210,9 +215,6 @@ public:
 		size_t BitOffset,
 		size_t BitCount
 		);
-
-	CFunctionType* 
-	GetSimpleFunctionType ();
 
 	CFunctionType* 
 	GetFunctionType (
@@ -345,12 +347,6 @@ protected:
 
 	CPointerType*
 	CreateAbstractInterfaceType ();
-
-	CFunctionPointerType*
-	CreateAbstractFunctionPointerType ();
-
-	CEventType*
-	CreateAbstractEventType ();
 };
 
 //.............................................................................

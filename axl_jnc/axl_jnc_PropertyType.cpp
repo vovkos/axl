@@ -17,6 +17,8 @@ CPropertyType::CPropertyType ()
 	m_pVTableStructType = NULL;	
 	m_pParentClassType = NULL;
 	m_ParentVTableIndex = -1;
+	m_pEventVariable = NULL;
+	m_pEventFieldMember = NULL;
 }
 
 rtl::CStringA

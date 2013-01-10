@@ -34,7 +34,6 @@ CFunctionType::CFunctionType ()
 	m_pReturnType = NULL;
 	m_pDefCallConvFunctionType = NULL;
 	m_pFunctionPointerType = NULL;
-	m_pEventType = NULL;
 	m_CallingConvention = ECallConv_Default;
 }
 

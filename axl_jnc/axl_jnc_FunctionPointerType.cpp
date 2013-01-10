@@ -14,6 +14,7 @@ CFunctionPointerType::CFunctionPointerType ()
 	m_pFunctionType = NULL;
 	m_pMemberFunctionType = NULL;
 	m_pPointerStructType = NULL;
+	m_pEventType = NULL;
 }
 
 CFunctionType* 
@@ -49,6 +50,12 @@ CFunctionPointerType::GetPointerStructType ()
 	m_pPointerStructType->CalcLayout ();
 
 	return m_pPointerStructType;
+}
+
+CEventType* 
+CFunctionPointerType::GetEventType ()
+{
+	return m_pModule->m_TypeMgr.GetEventType (this);
 }
 
 //.............................................................................

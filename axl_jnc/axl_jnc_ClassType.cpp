@@ -221,9 +221,12 @@ CClassType::CreateFieldMember (
 	pMember->m_BitCount = BitCount;
 	m_FieldMemberList.InsertTail (pMember);
 
-	bool Result = AddItem (pMember);
-	if (!Result)
-		return NULL;
+	if (!Name.IsEmpty ())
+	{
+		bool Result = AddItem (pMember);
+		if (!Result)
+			return NULL;
+	}
 
 	return pMember;
 }
