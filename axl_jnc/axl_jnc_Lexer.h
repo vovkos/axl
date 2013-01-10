@@ -73,7 +73,6 @@ enum EToken
 	EToken_Heap,
 	EToken_SizeOf,
 	EToken_TypeOf,
-	EToken_Closure,
 	EToken_AutoEv,
 	EToken_OnChange,
 	EToken_If,
@@ -180,7 +179,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
-	AXL_PRS_TOKEN_NAME (EToken_Closure,      "closure")
 	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
 	AXL_PRS_TOKEN_NAME (EToken_OnChange,     "onchange")
 	AXL_PRS_TOKEN_NAME (EToken_If,           "if")

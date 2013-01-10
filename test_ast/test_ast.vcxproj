@@ -100,9 +100,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="jnc\test1.jnc" />
-    <None Include="jnc\test2.jnc" />
-    <None Include="jnc\test3.jnc" />
-    <None Include="jnc\test4.jnc" />
     <None Include="res\buttons.bmp" />
     <None Include="res\filelarge.bmp" />
     <None Include="res\filesmall.bmp" />

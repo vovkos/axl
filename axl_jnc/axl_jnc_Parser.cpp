@@ -13,7 +13,7 @@ CParser::CParser ()
 	m_DefaultStructPackFactor = 8;
 	m_Endianness = EEndianness_LittleEndian;
 	m_Stage = EStage_Pass1;
-	m_pThisType = NULL;
+	m_pAutoEvType = NULL;
 }
 
 bool
@@ -557,8 +557,7 @@ CParser::DeclareClassPreConstructor (
 		return NULL;
 	}
 
-	ArgTypeArray.Insert (0, pClassType);
-	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
+	CFunctionType* pFullType = pClassType->GetSimpleMethodType ();
 	
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
 	pFunction->m_FunctionKind = EFunction_PreConstructor;
@@ -623,8 +622,7 @@ CParser::DeclareClassDestructor (
 		return NULL;
 	}
 
-	ArgTypeArray.Insert (0, pClassType);
-	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
+	CFunctionType* pFullType = pClassType->GetSimpleMethodType ();
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
 	pFunction->m_FunctionKind = EFunction_Destructor;
@@ -633,43 +631,6 @@ CParser::DeclareClassDestructor (
 	pFunction->m_pClassType = pClassType;
 	pClassType->m_pDestructor = pFunction;
 	return pFunction;
-}
-
-CClassType*
-CParser::DeclareAutoEvType (
-	rtl::CString& Name,
-	CDeclarator* pDeclarator
-	)
-{
-	bool Result;
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CClassType* pType = NULL;
-
-	if (Name.IsEmpty ())
-	{
-		pType = m_pModule->m_TypeMgr.CreateUnnamedClassType (EType_Class);
-	}
-	else
-	{
-		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pType = m_pModule->m_TypeMgr.GetClassType (EType_Class, Name, QualifiedName);
-	}
-
-	if (!pDeclarator->m_SuffixList.IsEmpty ())
-	{
-		CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *pDeclarator->m_SuffixList.GetTail ();
-		ASSERT (pSuffix->GetSuffixKind () == EDeclSuffix_FormalArg);
-	}
-
-	if (!Name.IsEmpty ())
-	{
-		Result = pNamespace->AddItem (pType);
-		if (!Result)
-			return NULL;
-	}
-	
-	return pType;
 }
 
 CFunctionFormalArg*
@@ -709,6 +670,94 @@ CParser::DeclareFormalArg (
 	pArgSuffix->m_ArgList.InsertTail (pArg);
 
 	return pArg;
+}
+
+CClassType*
+CParser::DeclareAutoEvType (
+	rtl::CString& Name,
+	CDeclarator* pDeclarator
+	)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CClassType* pType = NULL;
+
+	if (Name.IsEmpty ())
+	{
+		pType = m_pModule->m_TypeMgr.CreateUnnamedClassType (EType_Class);
+	}
+	else
+	{
+		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+		pType = m_pModule->m_TypeMgr.GetClassType (EType_Class, Name, QualifiedName);
+	}
+
+	if (!pDeclarator->m_SuffixList.IsEmpty ())
+	{
+		CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *pDeclarator->m_SuffixList.GetTail ();
+		ASSERT (pSuffix->GetSuffixKind () == EDeclSuffix_FormalArg);
+	}
+
+	if (!Name.IsEmpty ())
+	{
+		Result = pNamespace->AddItem (pType);
+		if (!Result)
+			return NULL;
+	}
+
+	pType->m_Flags |= EClassTypeFlag_IsAutoEv;
+	return pType;
+}
+
+bool
+CParser::PreAutoEvExpression ()
+{
+	ASSERT (m_pAutoEvType);
+
+	CFunctionType* pShortType = m_pModule->m_TypeMgr.GetSimpleFunctionType ();
+	CFunctionType* pFullType = m_pAutoEvType->GetSimpleMethodType ();
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_Method;
+	pFunction->m_Tag.Format (_T("%s.expr"), m_pAutoEvType->GetQualifiedName ());
+	pFunction->m_pShortType = pShortType;
+	pFunction->m_pClassType = m_pAutoEvType;
+
+	CValue ThisValue;
+	bool Result = m_pModule->m_FunctionMgr.Prologue (pFunction, m_CurrentToken.m_Pos, &ThisValue);
+	if (!Result)
+		return false;
+
+	m_ThisValue = ThisValue;	
+	return true;
+}
+
+bool
+CParser::PostAutoEvExpression (const CValue& Value)
+{
+	ASSERT (m_pAutoEvType);
+
+	// attach to all bindable rvalues of Value in constructor;
+	// detach in destructor
+
+	rtl::CBoxIteratorT <CValue> Property = m_BindablePropertyList.GetHead ();
+	for (; Property; Property++)
+	{
+		rtl::CString s = Property->GetType ()->GetTypeString ();
+		TRACE ("bindable property %s\n", s);
+	}
+
+	TRACE ("--- %d total\n", m_BindablePropertyList.GetCount ());
+
+	m_BindablePropertyList.Clear ();
+
+	bool Result = m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
+	if (!Result)
+		return false;
+
+	m_ThisValue.SetVoid ();
+	return true;
 }
 
 bool
@@ -861,6 +910,8 @@ CParser::LookupIdentifier (
 	CValue* pValue
 	)
 {
+	bool Result;
+
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
 	
@@ -901,7 +952,11 @@ CParser::LookupIdentifier (
 			return false;
 		}
 
-		return m_pModule->m_OperatorMgr.MemberOperator (m_ThisValue, Name, pValue);
+		Result = m_pModule->m_OperatorMgr.MemberOperator (m_ThisValue, Name, pValue);
+		if (!Result)
+			return false;
+		
+		break;
 
 	default:
 		err::SetFormatStringError (_T("%s '%s' cannot be used as expression"), pItem->GetItemKindString (), Name);

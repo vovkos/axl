@@ -67,7 +67,10 @@ GetBinOpString (EBinOp OpKind)
 		return _T("||");
 
 	case EBinOp_Idx:
-		return _T("index-operator");
+		return _T("[]");
+
+	case EBinOp_At:
+		return _T("@");
 
 	default:
 		return _T("undefined-binary-operator");

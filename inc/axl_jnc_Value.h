@@ -288,7 +288,7 @@ public:
 
 	void
 	SetClosure (CClosure* pClosure);
-
+		
 	CClosure*
 	CreateClosure ();
 
@@ -322,10 +322,7 @@ public:
 	}
 
 	void
-	SetVoid ()
-	{
-		m_ValueKind = EValue_Void;
-	}
+	SetVoid ();
 
 	void
 	SetNull ();
@@ -555,15 +552,6 @@ struct TFunctionPtr
 	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
 };
 
-// structure backing up property pointer declared like
-// typedef int property PTest;
-
-struct TPropertyPtr
-{
-	void** m_pVTable;
-	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
-};
-
 // structures backing up event declared like
 // event OnFire ();
 
@@ -578,6 +566,21 @@ struct TEvent
 {
 	TEventHandler* m_pHead;
 	TEventHandler* m_pTail;
+};
+
+// structure backing up property pointer declared like
+// typedef int property PTest;
+
+struct TPropertyPtr
+{
+	void** m_pVTable;
+	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
+	TEvent* m_pEvent;
+};
+
+struct TBindablePropertyPtr: TPropertyPtr
+{
+	TEvent* m_pEvent;
 };
 
 //.............................................................................

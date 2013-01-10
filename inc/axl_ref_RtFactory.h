@@ -110,7 +110,10 @@ public:
 		}
 #else
 		CPtrT <void> 
-		operator () (size_t Extra = 0)
+		operator () (
+			obj::IClass* pClass,
+			size_t Extra = 0
+			)
 		{
 			size_t Size = pClass->GetSize () + Extra;
 			

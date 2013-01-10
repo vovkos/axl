@@ -19,6 +19,7 @@ COperatorMgr::COperatorMgr ()
 
 	// unary operators
 
+	m_UnaryOperatorTable [EUnOp_Plus]       = &m_UnOp_Plus;
 	m_UnaryOperatorTable [EUnOp_Minus]      = &m_UnOp_Minus;
 	m_UnaryOperatorTable [EUnOp_BitwiseNot] = &m_UnOp_BitwiseNot;
 	m_UnaryOperatorTable [EUnOp_Addr]       = &m_UnOp_Addr;
@@ -233,22 +234,6 @@ COperatorMgr::UnaryOperator (
 }
 
 bool
-COperatorMgr::UnaryOperator (
-	EUnOp OpKind,
-	CValue* pValue
-	)
-{
-	CValue ResultValue;
-
-	bool Result = UnaryOperator (OpKind, *pValue, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
-}
-
-bool
 COperatorMgr::BinaryOperator (
 	EBinOp OpKind,
 	const CValue& RawOpValue1,
@@ -272,23 +257,6 @@ COperatorMgr::BinaryOperator (
 		PrepareOperand (RawOpValue1, &OpValue1, pOperator->GetFlags ()) &&
 		PrepareOperand (RawOpValue2, &OpValue2, pOperator->GetFlags ()) &&
 		pOperator->Operator (OpValue1, OpValue2, pResultValue);
-}
-
-bool
-COperatorMgr::BinaryOperator (
-	EBinOp OpKind,
-	CValue* pValue,
-	const CValue& OpValue2
-	)
-{
-	CValue ResultValue;
-
-	bool Result = BinaryOperator (OpKind, *pValue, OpValue2, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
 }
 
 ICastOperator*
@@ -443,22 +411,6 @@ COperatorMgr::CastOperator (
 
 bool
 COperatorMgr::CastOperator (
-	CValue* pValue,
-	CType* pType
-	)
-{
-	CValue ResultValue;
-
-	bool Result = CastOperator (*pValue, pType, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
-}
-
-bool
-COperatorMgr::CastOperator (
 	const CValue& OpValue,
 	EType TypeKind,
 	CValue* pResultValue
@@ -466,16 +418,6 @@ COperatorMgr::CastOperator (
 {
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 	return CastOperator (OpValue, pType, pResultValue);
-}
-
-bool
-COperatorMgr::CastOperator (
-	CValue* pValue,
-	EType TypeKind
-	)
-{
-	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	return CastOperator (pValue, pType);
 }
 
 bool
@@ -661,22 +603,6 @@ COperatorMgr::MemberOperator (
 }
 
 bool
-COperatorMgr::MemberOperator (
-	CValue* pValue,
-	const tchar_t* pName
-	)
-{
-	CValue ResultValue;
-
-	bool Result = MemberOperator (*pValue, pName, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
-}
-
-bool
 COperatorMgr::PointerToMemberOperator (
 	const CValue& RawOpValue,
 	const tchar_t* pName,
@@ -704,22 +630,6 @@ COperatorMgr::PointerToMemberOperator (
 */
 
 	return MemberOperator (OpValue, pName, pResultValue);
-}
-
-bool
-COperatorMgr::PointerToMemberOperator (
-	CValue* pValue,
-	const tchar_t* pName
-	)
-{
-	CValue ResultValue;
-
-	bool Result = PointerToMemberOperator (*pValue, pName, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
 }
 
 bool
@@ -1651,18 +1561,29 @@ COperatorMgr::CallImpl (
 }
 
 bool
-COperatorMgr::CallOperator (
-	CValue* pValue,
-	rtl::CBoxListT <CValue>* pArgList
+COperatorMgr::ClosureOperator (
+	const CValue& OpValue,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
 	)
 {
-	CValue ResultValue;
+	pResultValue->SetVoid ();
+	return true;
+}
 
-	bool Result = CallOperator (*pValue, pArgList, &ResultValue);
-	if (!Result)
+bool
+COperatorMgr::OnChangeOperator (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	if (!OpValue.GetType ()->IsBindablePropertyType ())
+	{
+		err::SetFormatStringError (_T("'onchange' can only be applied to bindable properties"));
 		return false;
+	}
 
-	*pValue = ResultValue;
+	pResultValue->SetVoid ();
 	return true;
 }
 

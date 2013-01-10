@@ -215,22 +215,16 @@ public:
 		return m_pBlock ? m_pBlock->HasReturn () : EHasReturn_Undefined;
 	}
 
+	const rtl::CBoxListT <CToken>*
+	GetBody ()
+	{
+		return &m_Body;
+	}
+
 	void
 	SetBody (rtl::CBoxListT <CToken>* pTokenList)
 	{
 		m_Body.TakeOver (pTokenList);
-	}
-
-	rtl::CBoxIteratorT <CToken>
-	GetBodyFirstToken ()
-	{
-		return m_Body.GetHead ();
-	}
-
-	rtl::CBoxIteratorT <CToken>
-	GetBodyLastToken ()
-	{
-		return m_Body.GetTail ();
 	}
 
 	CScope*

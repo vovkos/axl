@@ -33,6 +33,7 @@ enum EBinOp
 	EBinOp_LogicalAnd,
 	EBinOp_LogicalOr,
 	EBinOp_Idx,
+	EBinOp_At,
 
 	EBinOp__Count,
 };

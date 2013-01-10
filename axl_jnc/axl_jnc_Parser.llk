@@ -59,9 +59,10 @@ Members
 	EEndianness m_Endianness;
 	EStage m_Stage;
 	CValue m_ThisValue;
-	CClassType* m_pThisType;
+	CClassType* m_pAutoEvType;
 
 	rtl::CArrayT <CTypeSpecifierModifiers*> m_TypeSpecifierStack;
+	rtl::CBoxListT <CValue> m_BindablePropertyList;
 }
 
 Members2
@@ -173,6 +174,12 @@ Members2
 		rtl::CString& Name,
 		CDeclarator* pDeclarator
 		);
+
+	bool
+	PreAutoEvExpression ();
+
+	bool
+	PostAutoEvExpression (const CValue& Value);
 
 	bool
 	SwitchCaseLabel (

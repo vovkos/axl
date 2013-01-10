@@ -73,9 +73,6 @@
     <None Include="res\Toolbar256.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="jnc\test2.jnc" />
-    <None Include="jnc\test3.jnc" />
-    <None Include="jnc\test4.jnc" />
     <None Include="jnc\test1.jnc" />
   </ItemGroup>
   <ItemGroup>

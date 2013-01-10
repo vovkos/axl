@@ -14,6 +14,13 @@ class CFunctionMgr;
 
 //.............................................................................
 
+enum EClassTypeFlag
+{
+	EClassTypeFlag_IsAutoEv = 0x010000,
+};
+
+//.............................................................................
+
 class CClassBaseType: public rtl::TListLink
 {
 protected:
@@ -239,10 +246,11 @@ protected:
 	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
 	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;
 
+	CFunctionType* m_pSimpleMethodType;
+
 	CFunction* m_pPreConstructor;
 	CFunctionOverload m_Constructor;
 	CFunction* m_pDestructor;
-
 	CFunction* m_pInitializer;
 
 	rtl::CArrayT <CFunction*> m_MethodFunctionArray;
@@ -250,6 +258,8 @@ protected:
 	CStructType* m_pInterfaceHdrStructType;
 	CStructType* m_pInterfaceStructType;
 	CStructType* m_pClassStructType;
+
+	rtl::CBoxListT <CToken> m_AutoEvBody;
 
 public:
 	CClassType ();
@@ -280,7 +290,10 @@ public:
 		ASSERT (m_pClassStructType);
 		return m_pClassStructType;
 	}
-	
+
+	CFunctionType* 
+	GetSimpleMethodType ();
+
 	CFunction* 
 	GetPreConstructor ()
 	{
@@ -377,6 +390,15 @@ public:
 		const rtl::CString& Name,
 		CPropertyType* pProperty
 		);
+
+	const rtl::CBoxListT <CToken>*
+	GetAutoEvBody ()
+	{
+		return &m_AutoEvBody;
+	}
+
+	void
+	SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList);
 
 	bool
 	CalcLayout ();

@@ -154,7 +154,10 @@ CAstDoc::Compile ()
 	pMainFrame->m_ModulePane.Build (&m_Module);
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
-	Result = m_Module.m_FunctionMgr.CompileFunctions ();
+	Result = 
+		m_Module.m_FunctionMgr.CompileGlobalAutoEv () &&
+		m_Module.m_FunctionMgr.CompileFunctions ();
+
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();

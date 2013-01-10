@@ -16,6 +16,8 @@ CTypeMgr::CTypeMgr ()
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
 	m_UnnamedTypeCounter = 0;
+
+	m_pSimpleFunctionType = NULL;
 }
 
 void
@@ -42,6 +44,8 @@ CTypeMgr::Clear ()
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
 	m_UnnamedTypeCounter = 0;
+
+	m_pSimpleFunctionType = NULL;
 }
 
 void
@@ -677,6 +681,16 @@ CTypeMgr::GetClassType (
 	It->m_Value = pType;
 
 	return pType;
+}
+
+CFunctionType* 
+CTypeMgr::GetSimpleFunctionType ()
+{
+	if (m_pSimpleFunctionType)
+		return m_pSimpleFunctionType;
+
+	m_pSimpleFunctionType = GetFunctionType (GetPrimitiveType (EType_Void), NULL, 0, 0);
+	return m_pSimpleFunctionType;
 }
 
 CFunctionType* 

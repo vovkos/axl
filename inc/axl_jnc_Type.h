@@ -131,10 +131,8 @@ enum ETypeQualifier
 	ETypeQualifier_Volatile  = 0x02,
 	ETypeQualifier_NoNull    = 0x04,
 	ETypeQualifier_Weak      = 0x08,
-	ETypeQualifier_Bindable  = 0x10,
-	ETypeQualifier_AutoEv    = 0x20,
 
-	ETypeQualifier__Mask     = 0x3f,
+	ETypeQualifier__Mask     = 0x0f,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -153,8 +151,7 @@ enum ETypeModifier
 {
 	ETypeModifier_Const         = 0x000001,
 	ETypeModifier_Volatile      = 0x000002,
-	ETypeModifier_AutoEv        = 0x000004,
-	ETypeModifier_QualifierMask = 0x000007,
+	ETypeModifier_QualifierMask = 0x000003,
 	
 	ETypeModifier_Signed        = 0x000010,
 	ETypeModifier_Unsigned      = 0x000020,
@@ -344,6 +341,9 @@ public:
 	{
 		return m_TypeKind == EType_Property || m_TypeKind == EType_PropertyPointer;
 	}
+
+	bool
+	IsBindablePropertyType ();
 
 	bool
 	IsFunctionType ()

@@ -69,6 +69,7 @@ protected:
 	
 	rtl::CBoxListT <CToken> m_TokenList;
 	CToken m_LastMatchedToken;
+	CToken m_CurrentToken;
 
 	int m_Flags;
 	
@@ -78,7 +79,7 @@ public:
 		m_Flags = 0;
 	}
 
-	bool
+	CSymbolNode*
 	Create (
 		int Symbol = T::StartSymbol,
 		bool IsBuildingAst = false
@@ -89,8 +90,7 @@ public:
 		if (IsBuildingAst)
 			m_Flags |= EFlag_IsBuildingAst;
 
-		PushPrediction (T::SymbolFirst + Symbol);
-		return true;
+		return (CSymbolNode*) PushPrediction (T::SymbolFirst + Symbol);
 	}
 
 	ref::CBufT <CAst> 
@@ -128,6 +128,7 @@ public:
 		}
 
 		CToken Token = *pToken;
+		m_CurrentToken = Token;
 
 		m_Flags &= ~(EFlag_IsTokenMatch | EFlag_IsTokenSaved);
 
@@ -199,6 +200,8 @@ public:
 				if (!Result)
 					return true; // no more tokens, we are done
 
+				m_CurrentToken = Token;
+
 				TokenIndex = ((T*) this)->GetTokenIndex (Token.m_Token);
 				ASSERT (TokenIndex < T::TokenCount);
 
@@ -209,6 +212,85 @@ public:
 				ASSERT (MatchResult == EMatchResult_Continue);
 			}
 		}
+	}
+
+	// debug
+
+	void
+	TraceSymbolStack ()
+	{
+		intptr_t Count = m_SymbolStack.GetCount ();
+
+		TRACE ("SYMBOL STACK (%d symbols):\n", Count);
+		for (intptr_t i = 0; i < Count; i++)
+		{
+			CSymbolNode* pNode = m_SymbolStack [i];
+			TRACE ("%s", ((T*) this)->GetSymbolName (pNode->m_Index));
+
+			if (pNode->m_pAstNode)
+				TRACE (" (%d:%d)", pNode->m_pAstNode->m_FirstToken.m_Pos.m_Line + 1, pNode->m_pAstNode->m_FirstToken.m_Pos.m_Col + 1);
+
+			TRACE ("\n");
+		}
+	}
+
+	void
+	TracePredictionStack ()
+	{
+		intptr_t Count = m_PredictionStack.GetCount ();
+
+		TRACE ("PREDICTION STACK (%d nodes):\n", Count);
+		for (intptr_t i = 0; i < Count; i++)
+		{
+			CNode* pNode = m_PredictionStack [i];
+			TRACE ("%s (%d)\n", GetNodeKindString (pNode->m_Kind), pNode->m_Index);
+		}
+	}
+
+	void
+	TraceTokenList ()
+	{
+		rtl::CBoxIteratorT <CToken> Token = m_TokenList.GetHead ();
+
+		TRACE ("TOKEN LIST (%d tokens):\n", m_TokenList.GetCount ());
+		for (; Token; Token++)
+		{
+			TRACE ("%s '%s'\n", Token->GetName (), Token->GetText ());
+		}
+	}
+
+	// public info
+
+	const CToken& 
+	GetLastMatchedToken ()
+	{
+		return m_LastMatchedToken;
+	}
+
+	const CToken& 
+	GetCurrentToken ()
+	{
+		return m_CurrentToken;
+	}
+
+	CNode*
+	GetPredictionTop ()
+	{
+		size_t Count = m_PredictionStack.GetCount ();
+		return Count ? m_PredictionStack [Count - 1] : NULL;
+	}
+
+	size_t 
+	GetSymbolStackSize ()
+	{
+		return m_SymbolStack.GetCount ();
+	}
+
+	CSymbolNode*
+	GetSymbolTop ()
+	{
+		size_t Count = m_SymbolStack.GetCount ();
+		return Count ? m_SymbolStack [Count - 1] : NULL;
 	}
 
 protected:
@@ -630,13 +712,6 @@ protected:
 	// prediction stack
 
 	CNode*
-	GetPredictionTop ()
-	{
-		size_t Count = m_PredictionStack.GetCount ();
-		return Count ? m_PredictionStack [Count - 1] : NULL;
-	}
-
-	CNode*
 	GetArgument ()
 	{
 		size_t Count = m_PredictionStack.GetCount ();
@@ -677,58 +752,7 @@ protected:
 		m_PredictionStack.SetCount (Count - 1);
 	}
 
-	// debug
-
-	void
-	TraceSymbolStack ()
-	{
-		intptr_t Count = m_SymbolStack.GetCount ();
-
-		TRACE ("SYMBOL STACK (%d symbols):\n", Count);
-		for (intptr_t i = 0; i < Count; i++)
-		{
-			CSymbolNode* pNode = m_SymbolStack [i];
-			TRACE ("%s", ((T*) this)->GetSymbolName (pNode->m_Index));
-
-			if (pNode->m_pAstNode)
-				TRACE (" (%d:%d)", pNode->m_pAstNode->m_FirstToken.m_Pos.m_Line + 1, pNode->m_pAstNode->m_FirstToken.m_Pos.m_Col + 1);
-
-			TRACE ("\n");
-		}
-	}
-
-	void
-	TracePredictionStack ()
-	{
-		intptr_t Count = m_PredictionStack.GetCount ();
-
-		TRACE ("PREDICTION STACK (%d nodes):\n", Count);
-		for (intptr_t i = 0; i < Count; i++)
-		{
-			CNode* pNode = m_PredictionStack [i];
-			TRACE ("%s (%d)\n", GetNodeKindString (pNode->m_Kind), pNode->m_Index);
-		}
-	}
-
-	void
-	TraceTokenList ()
-	{
-		rtl::CBoxIteratorT <CToken> Token = m_TokenList.GetHead ();
-
-		TRACE ("TOKEN LIST (%d tokens):\n", m_TokenList.GetCount ());
-		for (; Token; Token++)
-		{
-			TRACE ("%s '%s'\n", Token->GetName (), Token->GetText ());
-		}
-	}
-
 	// symbol stack
-
-	size_t 
-	GetSymbolStackSize ()
-	{
-		return m_SymbolStack.GetCount ();
-	}
 
 	CAstNode*
 	GetAst (size_t Index)
@@ -749,13 +773,6 @@ protected:
 		}
 
 		return NULL;
-	}
-
-	CSymbolNode*
-	GetSymbolTop ()
-	{
-		size_t Count = m_SymbolStack.GetCount ();
-		return Count ? m_SymbolStack [Count - 1] : NULL;
 	}
 
 	void

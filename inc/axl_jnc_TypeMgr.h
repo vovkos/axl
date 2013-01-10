@@ -43,6 +43,7 @@ class CTypeMgr
 {
 protected:
 	friend class CModule;
+
 	CModule* m_pModule;
 
 	CType m_PrimitiveTypeArray [EType__PrimitiveTypeCount];
@@ -62,6 +63,8 @@ protected:
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
 	rtl::CStdListT <CPropertyPointerType> m_PropertyPointerTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
+
+	CFunctionType* m_pSimpleFunctionType;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
@@ -207,6 +210,9 @@ public:
 		size_t BitOffset,
 		size_t BitCount
 		);
+
+	CFunctionType* 
+	GetSimpleFunctionType ();
 
 	CFunctionType* 
 	GetFunctionType (

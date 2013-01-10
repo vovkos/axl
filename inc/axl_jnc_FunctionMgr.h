@@ -89,11 +89,15 @@ class CFunctionMgr
 {
 protected:
 	friend class CModule;
+	friend class CClassType;
+
 	CModule* m_pModule;
 
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
 	
+	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
+
 	CFunction* m_pCurrentFunction;
 
 	CFunction* m_StdFunctionArray [EStdFunc__Count];
@@ -150,9 +154,22 @@ public:
 		const rtl::CString& Name,
 		CFunction* pFunction
 		);
-	
+
+	bool
+	CompileGlobalAutoEv ();
+
 	bool
 	CompileFunctions ();
+
+	bool
+	Prologue (
+		CFunction* pFunction,
+		const CToken::CPos& Pos,
+		CValue* pThisValue
+		);
+
+	bool
+	Epilogue (const CToken::CPos& Pos);
 
 	bool
 	JitFunctions (llvm::ExecutionEngine* pExecutionEngine);

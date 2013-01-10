@@ -24,6 +24,13 @@ enum EProperty
 
 //.............................................................................
 
+enum EPropertyTypeFlag
+{
+	EPropertyTypeFlag_IsBindable = 0x010000,
+};
+
+//.............................................................................
+
 class CPropertyType: public CVTableType
 {
 protected:

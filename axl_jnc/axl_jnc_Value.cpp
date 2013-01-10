@@ -258,6 +258,16 @@ CValue::OverrideType (EType TypeKind)
 }
 
 void
+CValue::SetVoid ()
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	m_ValueKind = EValue_Void;
+	m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+}
+
+void
 CValue::SetNull ()
 {
 	CModule* pModule = GetCurrentThreadModule ();

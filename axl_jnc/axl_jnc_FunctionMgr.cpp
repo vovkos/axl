@@ -214,6 +214,46 @@ CFunctionMgr::ResolveOrphanFunction (CFunction* pFunction)
 }
 
 bool
+CFunctionMgr::CompileGlobalAutoEv ()
+{
+	bool Result;
+
+	size_t Count = m_GlobalAutoEvTypeArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CClassType* pType = m_GlobalAutoEvTypeArray [i];
+
+		CNamespace* pNamespace = pType->GetParentNamespace ();
+		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
+
+		CParser Parser;
+		Parser.m_Stage = CParser::EStage_Pass2;
+		Parser.m_pModule = m_pModule;
+		// Parser.m_ThisValue = ThisValue; 
+		
+		Parser.Create (ESymbol_autoev_body, true); 
+		
+		CParser::CSymbolNode_autoev_body*  pSymbol = (CParser::CSymbolNode_autoev_body*) Parser.GetPredictionTop ();
+		pSymbol->m_Arg.pType = pType;
+			
+		rtl::CBoxIteratorT <CToken> Token = pType->GetAutoEvBody ()->GetHead ();
+		for (; Token; Token++)
+		{
+			Result = Parser.ParseToken (&*Token);
+			if (!Result)
+			{
+				err::PushSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
+				return false;
+			}
+		}
+	}
+
+	m_pModule->m_NamespaceMgr.SetGlobalNamespace (); // just in case
+
+	return true;
+}
+
+bool
 CFunctionMgr::CompileFunctions ()
 {
 	bool Result;
@@ -231,8 +271,10 @@ CFunctionMgr::CompileFunctions ()
 
 		// set namespace
 
-		CClassType* pThisType = NULL;
-		CClassType* pOriginType = NULL;
+		CNamespace* pNamespace = pFunction->GetNamespace ();
+		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
+
+		// resolve orphans
 
 		EFunction FunctionKind = pFunction->GetFunctionKind ();
 		if (FunctionKind == EFunction_Undefined)
@@ -244,83 +286,12 @@ CFunctionMgr::CompileFunctions ()
 			FunctionKind = pFunction->GetFunctionKind ();
 		}
 
-		CNamespace* pNamespace = pFunction->GetNamespace ();
-
-		switch (FunctionKind)
-		{
-		case EFunction_Global:
-			break;
-
-		case EFunction_Method:
-			pThisType = pFunction->GetClassType ();
-			pOriginType = pFunction->GetVTableClassType ();
-			break;
-
-		case EFunction_PreConstructor:
-		case EFunction_Constructor:
-		case EFunction_Destructor:
-			pThisType = pFunction->GetClassType ();
-			pOriginType = pThisType;
-			break;
-
-		default:
-			ASSERT (false);
-		}
-
-		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
-
-		// create entry block and scope
-
-		m_pCurrentFunction = pFunction;
-		pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
-		CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (pFunction->GetBodyFirstToken ()->m_Pos);
-
-		// store arguments
-
-		llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+		// prologue
 
 		CValue ThisValue;
-		if (FunctionKind == EFunction_Method)
-		{
-			llvm::Value* pLlvmArg = LlvmArg;
-			CValue ArgValue (pLlvmArg, pOriginType);			
-			Result = CreateThisValue (ArgValue, pThisType, &ThisValue);
-			if (!Result)
-				return false;
-
-			LlvmArg++;
-		}
-
-		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetFirstArg ();
-		for (; Arg; Arg++, LlvmArg++)
-		{
-			CFunctionFormalArg* pArg = *Arg;
-			llvm::Value* pLlvmArg = LlvmArg;
-
-			CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
-				pArg->GetName (), 
-				pArg->GetType (), 
-				true
-				);
-
-			CValue ArgValue (pLlvmArg, pArg->GetType ());
-
-			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
-			pScope->AddItem (pArgVariable);
-		}
-
-		// store scope level
-
-		pFunction->m_pScopeLevelVariable = m_pModule->m_VariableMgr.CreateVariable (
-			_T("ScopeLevel"), 
-			m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
-			true
-			);
-
-		CValue ScopeLevelValue;
-		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &ScopeLevelValue);
-		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pFunction->m_pScopeLevelVariable);
+		Result = Prologue (pFunction, pFunction->GetBody ()->GetHead ()->m_Pos, &ThisValue);
+		if (!Result)
+			return false;
 
 		// parse body
 
@@ -328,10 +299,9 @@ CFunctionMgr::CompileFunctions ()
 		Parser.m_Stage = CParser::EStage_Pass2;
 		Parser.m_pModule = m_pModule;
 		Parser.m_ThisValue = ThisValue;
-		Parser.m_pThisType = pThisType;
 		Parser.Create (ESymbol_compound_stmt, true); 
 			
-		rtl::CBoxIteratorT <CToken> Token = pFunction->GetBodyFirstToken ();
+		rtl::CBoxIteratorT <CToken> Token = pFunction->GetBody ()->GetHead ();
 		for (; Token; Token++)
 		{
 			Result = Parser.ParseToken (&*Token);
@@ -343,62 +313,173 @@ CFunctionMgr::CompileFunctions ()
 		}
 
 		pFunction->m_Ast = Parser.GetAst ();
-		pFunction->m_pScope = pScope;
 
-		// ensure return
+		// epilogue
 
-		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
-
-		if (pReturnType->GetTypeKind () != EType_Void)
-		{
-			EHasReturn HasReturn = pFunction->HasReturn ();
-
-			switch (HasReturn)
-			{
-			case EHasReturn_None:
-				err::SetFormatStringError (
-					_T("function '%s' must return a '%s' value"),
-					pFunction->m_Tag,
-					pReturnType->GetTypeString ()
-					);
-				return false;
-
-			case EHasReturn_Some:
-				err::SetFormatStringError (
-					_T("not all control paths in function '%s' return a value"),
-					pFunction->m_Tag
-					);
-				return false;
-			}
-
-			if (!m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->IsTerminal ())
-				m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
-		}
-		else if (!m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->IsTerminal ())
-		{
-			m_pModule->m_ControlFlowMgr.Return ();
-		}
-
-		m_pModule->m_NamespaceMgr.CloseScope (pFunction->GetBodyLastToken ()->m_Pos);
-
-		try 
-		{
-			llvm::verifyFunction (*pFunction->GetLlvmFunction (), llvm::ReturnStatusAction);
-		}
-		catch (err::CError Error)
-		{
-			err::SetFormatStringError (
-				_T("LLVM verification fail for '%s': %s"), 
-				pFunction->GetTag (),
-				Error->GetDescription ()
-				);
-
+		Result = Epilogue (pFunction->GetBody ()->GetTail ()->m_Pos);
+		if (!Result)
 			return false;
-		}
 	}
 
 	m_pModule->m_NamespaceMgr.SetGlobalNamespace (); // just in case
 
+	return true;
+}
+
+bool
+CFunctionMgr::Prologue (
+	CFunction* pFunction,
+	const CToken::CPos& Pos,
+	CValue* pThisValue
+	)
+{
+	bool Result;
+
+	m_pCurrentFunction = pFunction;
+
+	// get this-value for methods
+
+	CClassType* pThisType = NULL;
+	CClassType* pOriginType = NULL;
+
+	EFunction FunctionKind = pFunction->GetFunctionKind ();
+	switch (FunctionKind)
+	{
+	case EFunction_Global:
+		break;
+
+	case EFunction_Method:
+		pThisType = pFunction->GetClassType ();
+		pOriginType = pFunction->GetVTableClassType ();
+		if (!pOriginType)
+			pOriginType = pThisType;
+		break;
+
+	case EFunction_PreConstructor:
+	case EFunction_Constructor:
+	case EFunction_Destructor:
+		pThisType = pFunction->GetClassType ();
+		pOriginType = pThisType;
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	// create entry block and scope
+
+	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
+	pFunction->m_pScope = pScope;
+
+	// store arguments
+
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+
+	if (FunctionKind == EFunction_Method)
+	{
+		llvm::Value* pLlvmArg = LlvmArg;
+		CValue ArgValue (pLlvmArg, pOriginType);			
+		Result = CreateThisValue (ArgValue, pThisType, pThisValue);
+		if (!Result)
+			return false;
+
+		LlvmArg++;
+	}
+
+	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetFirstArg ();
+	for (; Arg; Arg++, LlvmArg++)
+	{
+		CFunctionFormalArg* pArg = *Arg;
+		llvm::Value* pLlvmArg = LlvmArg;
+
+		CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
+			pArg->GetName (), 
+			pArg->GetType (), 
+			true
+			);
+
+		CValue ArgValue (pLlvmArg, pArg->GetType ());
+
+		m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
+		pScope->AddItem (pArgVariable);
+	}
+
+	// store scope level
+
+	pFunction->m_pScopeLevelVariable = m_pModule->m_VariableMgr.CreateVariable (
+		_T("ScopeLevel"), 
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
+		true
+		);
+
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &ScopeLevelValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pFunction->m_pScopeLevelVariable);
+
+	return true;
+}
+
+bool
+CFunctionMgr::Epilogue (const CToken::CPos& Pos)
+{
+	ASSERT (m_pCurrentFunction);
+	CFunction* pFunction = m_pCurrentFunction;
+
+	// ensure return
+
+	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
+
+	if (pReturnType->GetTypeKind () != EType_Void)
+	{
+		EHasReturn HasReturn = pFunction->HasReturn ();
+
+		switch (HasReturn)
+		{
+		case EHasReturn_None:
+			err::SetFormatStringError (
+				_T("function '%s' must return a '%s' value"),
+				pFunction->m_Tag,
+				pReturnType->GetTypeString ()
+				);
+			return false;
+
+		case EHasReturn_Some:
+			err::SetFormatStringError (
+				_T("not all control paths in function '%s' return a value"),
+				pFunction->m_Tag
+				);
+			return false;
+		}
+
+		if (!m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->IsTerminal ())
+			m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+	}
+	else if (!m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->IsTerminal ())
+	{
+		m_pModule->m_ControlFlowMgr.Return ();
+	}
+
+	m_pModule->m_NamespaceMgr.CloseScope (Pos);
+
+	try 
+	{
+		llvm::verifyFunction (*pFunction->GetLlvmFunction (), llvm::ReturnStatusAction);
+	}
+	catch (err::CError Error)
+	{
+		err::SetFormatStringError (
+			_T("LLVM verification fail for '%s': %s"), 
+			pFunction->GetTag (),
+			Error->GetDescription ()
+			);
+
+		return false;
+	}
+
+	m_pCurrentFunction = NULL;
 	return true;
 }
 

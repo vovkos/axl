@@ -110,14 +110,14 @@ class
 {
 	CFunction* m_pPreConstructor;
 } 
-class_preconstructor <CClassType* $ppppType>
+class_preconstructor <CClassType* $pType>
 	local
 	{
 		CDeclarator $Declarator
 	}
 	: EToken_PreConstruct function_suffix <&$Declarator> 
 		{
-			$.m_pPreConstructor = DeclareClassPreConstructor ($ppppType, &$Declarator);
+			$.m_pPreConstructor = DeclareClassPreConstructor ($pType, &$Declarator);
 			return $.m_pPreConstructor != NULL;
 		}
 	  declaration_terminator <$.m_pPreConstructor>

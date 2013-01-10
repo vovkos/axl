@@ -14,6 +14,7 @@ namespace jnc {
 enum EUnOp
 {
 	EUnOp_None = 0,
+	EUnOp_Plus,
 	EUnOp_Minus,
 	EUnOp_BitwiseNot,
 	EUnOp_Addr,
@@ -181,6 +182,74 @@ public:
 		}
 
 		return true;
+	}
+};
+
+//.............................................................................
+
+class CUnOp_Plus: public CUnaryArithmeticOperatorT <CUnOp_Plus>
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CUnOp_Plus, IUnaryOperator)
+
+public:
+	CUnOp_Plus ()
+	{
+		m_OpKind = EUnOp_Plus;
+	}
+
+	static
+	long
+	ConstOpInt32 (long OpValue)
+	{
+		return +OpValue;
+	}
+
+	static
+	int64_t
+	ConstOpInt64 (int64_t OpValue)
+	{
+		return +OpValue;
+	}
+
+	static
+	float
+	ConstOpFp32 (float OpValue)
+	{
+		return +OpValue;
+	}
+
+	static
+	double
+	ConstOpFp64 (double OpValue)
+	{
+		return +OpValue;
+	}
+
+	static
+	llvm::Value*
+	LlvmOpInt (
+		CModule* pModule,
+		const CValue& OpValue,
+		CType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		*pResultValue = OpValue;
+		return pResultValue->GetLlvmValue ();
+	}
+
+	static
+	llvm::Value*
+	LlvmOpFp (
+		CModule* pModule,
+		const CValue& OpValue,
+		CType* pResultType,
+		CValue* pResultValue
+		)
+	{
+		*pResultValue = OpValue;
+		return pResultValue->GetLlvmValue ();
 	}
 };
 

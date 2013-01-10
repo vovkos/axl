@@ -49,6 +49,9 @@ CFunction::CFunction ()
 CClassType* 
 CFunction::GetVTableClassType ()
 {
+	if (!m_pVTableType)
+		return NULL;
+
 	EType TypeKind = m_pVTableType->GetTypeKind ();
 	switch (TypeKind)
 	{

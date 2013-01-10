@@ -27,6 +27,7 @@ protected:
 
 	// unary operators
 
+	CUnOp_Plus m_UnOp_Plus;
 	CUnOp_Minus m_UnOp_Minus;
 	CUnOp_BitwiseNot m_UnOp_BitwiseNot;
 	CUnOp_Addr m_UnOp_Addr;
@@ -172,7 +173,10 @@ public:
 	UnaryOperator (
 		EUnOp OpKind,
 		CValue* pValue
-		);
+		)
+	{
+		return UnaryOperator (OpKind, *pValue, pValue);
+	}
 
 	// binary operators
 
@@ -189,7 +193,10 @@ public:
 		EBinOp OpKind,
 		CValue* pValue,
 		const CValue& OpValue2
-		);
+		)
+	{
+		return BinaryOperator (OpKind, *pValue, OpValue2, pValue);
+	}
 
 	// move & cast operators
 
@@ -222,7 +229,10 @@ public:
 	CastOperator (
 		CValue* pValue,
 		CType* pType
-		);
+		)
+	{
+		return CastOperator (*pValue, pType, pValue);
+	}
 
 	bool
 	CastOperator (
@@ -235,7 +245,10 @@ public:
 	CastOperator (
 		CValue* pValue,
 		EType TypeKind
-		);
+		)
+	{
+		return CastOperator (*pValue, TypeKind, pValue);
+	}
 	
 	bool
 	MoveOperator (
@@ -281,7 +294,10 @@ public:
 	MemberOperator (
 		CValue* pValue,
 		const tchar_t* pName
-		);
+		)
+	{
+		return MemberOperator (*pValue, pName, pValue);
+	}
 
 	bool
 	PointerToMemberOperator (
@@ -294,7 +310,10 @@ public:
 	PointerToMemberOperator (
 		CValue* pValue,
 		const tchar_t* pName
-		);
+		)
+	{
+		return PointerToMemberOperator (*pValue, pName, pValue);
+	}
 
 	bool
 	CallOperator (
@@ -307,7 +326,38 @@ public:
 	CallOperator (
 		CValue* pValue,
 		rtl::CBoxListT <CValue>* pArgList
+		)
+	{
+		return CallOperator (*pValue, pArgList, pValue);
+	}
+
+	bool
+	ClosureOperator (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList,
+		CValue* pResultValue
 		);
+
+	bool
+	ClosureOperator (
+		CValue* pValue,
+		rtl::CBoxListT <CValue>* pArgList
+		)
+	{
+		return ClosureOperator (*pValue, pArgList, pValue);
+	}
+
+	bool
+	OnChangeOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	OnChangeOperator (CValue* pValue)
+	{
+		return OnChangeOperator (*pValue, pValue);
+	}
 
 	bool
 	EventOperator (

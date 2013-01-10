@@ -296,10 +296,6 @@ qualifier_modifier <CTypeModifiers* $pTypeModifiers>
 		{
 			return $pTypeModifiers->SetTypeModifier (ETypeModifier_Volatile);
 		}
-	| EToken_AutoEv
-		{
-			return $pTypeModifiers->SetTypeModifier (ETypeModifier_AutoEv);
-		}
 	;
 
 integer_modifier <CTypeModifiers* $pTypeModifiers>

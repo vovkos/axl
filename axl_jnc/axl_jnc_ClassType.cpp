@@ -45,6 +45,34 @@ CClassType::CClassType ()
 	m_pInterfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pVTableStructType = NULL;
+	m_pSimpleMethodType = NULL;
+}
+
+CFunctionType* 
+CClassType::GetSimpleMethodType ()
+{
+	if (m_pSimpleMethodType)
+		return m_pSimpleMethodType;
+
+	CType* ArgTypeArray [] =
+	{
+		this
+	};
+
+	m_pSimpleMethodType = m_pModule->m_TypeMgr.GetFunctionType (
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void),
+		ArgTypeArray,
+		countof (ArgTypeArray)
+		);
+
+	return m_pSimpleMethodType;
+}
+
+void
+CClassType::SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList)
+{
+	m_AutoEvBody.TakeOver (pTokenList);
+	m_pModule->m_FunctionMgr.m_GlobalAutoEvTypeArray.Append (this);
 }
 
 bool

@@ -1,0 +1,116 @@
+struct TPoint
+{
+	int x;
+	int y;
+};
+
+//.............................................................................
+
+int
+printf (
+	char* unsafe pFormat,
+	unsafe ...
+	);
+
+
+//.............................................................................
+
+void
+PointerCheck (int* p);
+
+//.............................................................................
+
+test (
+	int x, 
+	int y
+	)
+{
+	printf ("test (int x = %d, int y = %d)\n", x, y);
+}
+
+test2 (
+	int x, 
+	int y
+	)
+{
+	printf ("test2 (int x = %d, int y = %d)\n", x, y);
+}
+
+//.............................................................................
+
+int g_Baud;
+int g_Parity;
+
+int g_Baud2;
+int g_Parity2;
+
+int bindable property PBaud;
+int bindable property PParity;
+
+int
+PBaud.get ()
+{
+	printf ("PBaud.get () = %d\n", g_Baud);
+	return g_Baud;
+}
+
+PBaud.set (int Value)
+{
+	printf ("PBaud.set (%d)\n", Value);
+	g_Baud = Value;
+}
+
+int
+PParity.get ()
+{
+	printf ("PParity.get () = %d\n", g_Parity);
+	return g_Parity; 
+}
+
+PParity.set (int Value)
+{
+	printf ("PParity.set (%d)\n", Value);
+	g_Parity = Value;
+}
+
+//.............................................................................
+
+autoev ASerialRule
+{
+	g_Baud2 = PBaud * 10;
+	g_Parity2 = PParity * 100;
+};
+
+int
+main ()
+{
+	ASerialRule ppp = stack new ASerialRule;
+
+	int x = 10;
+
+	printf ("hui\n");
+
+	event
+	OnMouseClick (
+		int x, 
+		int y
+		);
+
+	OnMouseClick = test;
+	OnMouseClick += test2;
+
+	OnMouseClick (10, 20);
+
+	printf ("govno\n");
+
+	OnMouseClick -= test;
+
+	OnMouseClick (30, 40);
+
+	int y;		
+
+	printf ("i muravei\n");
+	return 0;
+}
+
+//.............................................................................

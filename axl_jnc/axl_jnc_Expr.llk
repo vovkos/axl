@@ -276,7 +276,7 @@ additive_expr <CValue* $pValue>
 	}
 	: multiplicative_expr <$pValue> 
 	  (
-		additivie_operator $o multiplicative_expr <&$OpValue2>
+		additive_operator $o multiplicative_expr <&$OpValue2>
 			{
 				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
 			}
@@ -287,7 +287,7 @@ class
 {
 	EBinOp m_OpKind;
 }
-additivie_operator
+additive_operator
 	: '+'
 		{
 			$.m_OpKind = EBinOp_Add;
@@ -303,9 +303,9 @@ multiplicative_expr <CValue* $pValue>
 	{
 		CValue $OpValue2;
 	}
-	: assignment_expr <$pValue> 
+	: at_expr <$pValue> 
 	  (
-		multiplicative_operator $o assignment_expr <&$OpValue2>
+		multiplicative_operator $o at_expr <&$OpValue2>
 			{
 				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
 			}
@@ -329,6 +329,20 @@ multiplicative_operator
 		{
 			$.m_OpKind = EBinOp_Mod;
 		}
+	;
+
+at_expr <CValue* $pValue>
+	local
+	{
+		CValue $OpValue2;
+	}
+	: assignment_expr <$pValue> 
+	  (
+		'@' $o assignment_expr <&$OpValue2>
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_At, $pValue, $OpValue2);
+			}
+	  )*
 	;
 
 assignment_expr <CValue* $pValue>
@@ -425,7 +439,16 @@ binop_assignment_operator
 
 unary_expr <CValue* $pValue>
 	: postfix_expr <$pValue> 
-	| '&' unary_expr <$pValue> 
+	| unary_operator_expr <$pValue> 
+	;
+
+unary_operator_expr <CValue* $pValue>
+	leave 
+	{
+		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
+			m_BindablePropertyList.InsertTail (*$pValue);
+	}
+	: '&' unary_expr <$pValue> 
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, $pValue);
 		}
@@ -434,6 +457,9 @@ unary_expr <CValue* $pValue>
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, $pValue);
 		}
 	| '+' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Plus, $pValue);
+		}
 	| '-' unary_expr <$pValue> 
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Minus, $pValue);
@@ -453,6 +479,18 @@ unary_expr <CValue* $pValue>
 	| EToken_Dec unary_expr <$pValue> 
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, $pValue);
+		}
+	| EToken_OnChange unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.OnChangeOperator ($pValue);
+		}
+	| EToken_SizeOf type_name_or_expr
+		{
+			$pValue->SetConstSizeT ($2.m_pType->GetSize ());
+		}
+	| EToken_TypeOf type_name_or_expr
+		{
+			$pValue->SetType ($2.m_pType);
 		}
 	| resolver (cast_operator_rslv) 
 	  '(' type_name $t ')' unary_expr <$pValue> 
@@ -478,13 +516,53 @@ cast_operator_rslv
 	: '(' type_specifier_modifier <&$TypeSpecifier>
 	;
 
+class
+{
+	CType* m_pType;
+}
+type_name_or_expr
+	local
+	{
+		CValue $Value;
+	}	
+	: type_name 
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| '(' type_name ')'
+		{
+			$.m_pType = $2.m_pType;
+		}
+	| unary_expr <&$Value>
+		{
+			CType* pType = $Value.GetType ();
+			$.m_pType = pType->IsReferenceType () ? ((CPointerType*) pType)->GetBaseType () : pType;
+		}
+	;
+
 postfix_expr <CValue* $pValue>
 	: primary_expr <$pValue>
 	  postfix_operator <$pValue>*
 	;
 
 postfix_operator <CValue* $pValue>
-	: call_operator <$pValue>
+	local
+	{
+		CValue $SchedulerValue;
+	}
+	leave 
+	{
+		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
+			m_BindablePropertyList.InsertTail (*$pValue);
+	}
+	: function_actual_argument_list
+		{
+			return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$1.m_ArgList);
+		}		
+	| '~' function_actual_argument_list
+		{
+			return m_pModule->m_OperatorMgr.ClosureOperator ($pValue, &$2.m_ArgList);
+		}		
 	| '.' EToken_Identifier
 		{
 			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $2.m_Data.m_String);
@@ -507,35 +585,33 @@ postfix_operator <CValue* $pValue>
 		}
 	;
 
-call_operator <CValue* $pValue>
-	local
-	{
-		CValue $Arg;
-		rtl::CBoxListT <CValue> $ArgList;
-	}
-	leave 
-	{
-		return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$ArgList);
-	}
+class
+{
+	rtl::CBoxListT <CValue> m_ArgList;
+}
+function_actual_argument_list
 	: '(' 
-	  conditional_expr <&$Arg> 
+	  expression $a1
 		{
-			$ArgList.InsertTail ($Arg);
+			$.m_ArgList.InsertTail ($a1.m_Value);
 		}
 	  (
 		',' 
-		conditional_expr <&$Arg> 
+		expression $a2
 			{
-				$ArgList.InsertTail ($Arg);
+				$.m_ArgList.InsertTail ($a2.m_Value);
 			}
 	  )* 
-	  ')'		
-
+	  ')'
 	| '(' ')'
 	; 
 
-
 primary_expr <CValue* $pValue>
+	leave 
+	{
+		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
+			m_BindablePropertyList.InsertTail (*$pValue);
+	}
 	: EToken_Identifier
 		{
 			return LookupIdentifier ($1.m_Data.m_String, $pValue);
@@ -568,14 +644,6 @@ primary_expr <CValue* $pValue>
 		{
 			$pValue->SetNull ();
 		}
-	| EToken_SizeOf type_name_or_expr
-		{
-			$pValue->SetConstSizeT ($2.m_pType->GetSize ());
-		}
-	| EToken_TypeOf type_name_or_expr
-		{
-			$pValue->SetType ($2.m_pType);
-		}
 	| '(' conditional_expr <$pValue> ')'
 	;
 
@@ -593,30 +661,6 @@ literal
 			$.m_String.Append ($2.m_Data.m_String);
 		}
 	  )*
-	;
-
-class
-{
-	CType* m_pType;
-}
-type_name_or_expr
-	local
-	{
-		CValue $Value;
-	}	
-	: type_name 
-		{
-			$.m_pType = $1.m_pType;
-		}
-	| '(' type_name ')'
-		{
-			$.m_pType = $2.m_pType;
-		}
-	| primary_expr <&$Value>
-		{
-			CType* pType = $Value.GetType ();
-			$.m_pType = pType->IsReferenceType () ? ((CPointerType*) pType)->GetBaseType () : pType;
-		}
 	;
 
 //.............................................................................

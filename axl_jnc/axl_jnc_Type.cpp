@@ -96,9 +96,6 @@ GetTypeModifierString (ETypeModifier Modifier)
 	case ETypeModifier_Volatile:
 		return _T("volatile");
 
-	case ETypeModifier_AutoEv:
-		return _T("autoev");
-
 	case ETypeModifier_Signed:
 		return _T("signed");
 
@@ -470,6 +467,14 @@ CType::GetTypeString ()
 	return m_TypeString;
 }
 
+bool
+CType::IsBindablePropertyType ()
+{
+	return 
+		m_TypeKind == EType_Property && (m_Flags & EPropertyTypeFlag_IsBindable) ||
+		m_TypeKind == EType_PropertyPointer && (((CPropertyPointerType*) this)->GetPropertyType ()->GetFlags () & EPropertyTypeFlag_IsBindable);
+}
+
 bool 
 CType::IsAutoSizeArrayType ()
 {
@@ -529,7 +534,8 @@ VerifyModifierTypeKind (
 	{
 		err::SetFormatStringError (
 			_T("type modifier '%s' can only be applied to %s"),
-			GetTypeModifierString (Modifier)
+			GetTypeModifierString (Modifier),
+			pTypeKindString
 			);
 		return false;
 	}
@@ -660,16 +666,15 @@ CType::ApplyQualifierModifiers (int Modifiers)
 {
 	CType* pType = this;
 
+	int Flags = 0;
+
 	if (Modifiers & ETypeModifier_Const)
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Const);
+		Flags |= ETypeQualifier_Const;
 
 	if (Modifiers & ETypeModifier_Volatile)
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Volatile);
+		Flags |= ETypeQualifier_Volatile;
 
-	if (Modifiers & ETypeModifier_AutoEv)
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_AutoEv);
-
-	return pType;
+	return pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, Flags);
 }
 
 CType* 
@@ -816,9 +821,17 @@ CType::ApplyPropertyModifiers (int Modifiers)
 	if (Modifiers & ETypeModifier_Property)
 	{
 		bool IsReadOnly = pType->IsConstType () || (Modifiers & ETypeModifier_Const) != 0;
-		bool IsBindable = (Modifiers & ETypeModifier_Bindable) != 0;
-
 		pType = m_pModule->m_TypeMgr.CreatePropertyType (pType->GetUnqualifiedType (), IsReadOnly);
+	}
+
+	if (Modifiers & ETypeModifier_Bindable)
+	{
+		if (!VerifyModifierTypeKind (ETypeModifier_Bindable, pType->m_TypeKind == EType_Property, _T("property type")))
+			return NULL;
+
+		CPropertyType* pPropertyType = (CPropertyType*) pType;
+		pPropertyType->m_Flags |= EPropertyTypeFlag_IsBindable;
+		pPropertyType->m_Size = sizeof (TEvent);
 	}
 
 	return pType;

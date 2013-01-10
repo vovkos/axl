@@ -20,23 +20,34 @@ autoev_specifier
 		}
 	  (
 		resolver ({ return m_Stage == EStage_Pass1 }) 
-		function_body_pass1
+		function_body_pass1 $b
 			{
+				$.m_pType->SetAutoEvBody (&$b.m_TokenList);
 			}
-	  | autoev_block <$.m_pType> 
-			{
-			}
+	  |	autoev_body <$.m_pType> 
 	  )	  
 	;
 
 start
-autoev_block <CClassType* $pType>
-	: '{' autoev_stmt <$pType>* '}'
+autoev_body <CClassType* $pType>
+	: 
+		{
+			m_pAutoEvType = $pType;
+		}
+	  '{' autoev_stmt <$pType>* '}'
+		{
+			m_pAutoEvType = NULL;
+		}
 	;
 	
 autoev_stmt <CClassType* $pType>
-	: expression ';'
+	: 
 		{
+			return PreAutoEvExpression ();
+		}
+	  expression ';'
+		{
+			return PostAutoEvExpression ($1.m_Value);
 		}
 	| ';'
 	;
