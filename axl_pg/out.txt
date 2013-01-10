@@ -1,48 +1,3 @@
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq1 common_declaration 
-	'*' -> 1
-  1 * 1/1/0/0 (a/r/c/e)
-	ACTIVE:   _seq1 
-	RESOLVER: common_declaration 
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq1 common_declaration 
-	'&' -> 1
-  1 * 1/1/0/0 (a/r/c/e)
-	ACTIVE:   _seq1 
-	RESOLVER: common_declaration 
-*** conflict at declaration:EToken_Identifier: 2 resolvers in chain at EToken_Identifier
-active: 1; complete: 0; epsilon: 0
-resolved = 1, uplink = 30bd3c, prod = _seq1: expr ';', uplink->prod = common_declaration
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq1 common_declaration 
-	EToken_Identifier -> 1
-  1 * 1/2/0/0 (a/r/c/e)
-	ACTIVE:   _seq1 
-	RESOLVER: common_declaration common_declaration 
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq2 <epsilon> 
-	EToken_Identifier -> 1
-  1 * 0/1/0/1 (a/r/c/e)
-	RESOLVER: _seq2 
-	EPSILON: <epsilon> 
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq8 <epsilon> 
-	EToken_Identifier -> 1
-  1 * 0/1/0/1 (a/r/c/e)
-	RESOLVER: _seq8 
-	EPSILON: <epsilon> 
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq11 <epsilon> 
-	'*' -> 1
-  1 * 1/0/0/1 (a/r/c/e)
-	ACTIVE:   _seq11 
-	EPSILON: <epsilon> 
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   _seq14 <epsilon> 
-	'&' -> 1
-  1 * 1/0/0/1 (a/r/c/e)
-	ACTIVE:   _seq14 
-	EPSILON: <epsilon> 
 LL (1)
 TOKENS
   0/0   $
@@ -51,335 +6,54 @@ TOKENS
   1/1   <any>
 	  FIRST:  <any>
 	  FOLLOW: (null)
-  2/2   ';'
-	  FIRST:  ';'
-	  FOLLOW: (null) $
-  3/3   '*'
-	  FIRST:  '*'
-	  FOLLOW: (null)
-  4/4   '&'
-	  FIRST:  '&'
-	  FOLLOW: (null)
-  5/5   '('
+  2/2   '('
 	  FIRST:  '('
 	  FOLLOW: (null)
-  6/6   ')'
+  3/3   ','
+	  FIRST:  ','
+	  FOLLOW: (null)
+  4/4   ':'
+	  FIRST:  ':'
+	  FOLLOW: (null)
+  5/5   ')'
 	  FIRST:  ')'
-	  FOLLOW: (null)
-  7/7   '{'
-	  FIRST:  '{'
-	  FOLLOW: (null)
-  8/8   '}'
-	  FIRST:  '}'
 	  FOLLOW: (null) $
-  9/9   EToken_Int
-	  FIRST:  EToken_Int
-	  FOLLOW: (null)
- 10/10  EToken_Float
-	  FIRST:  EToken_Float
-	  FOLLOW: (null)
- 11/11  EToken_Identifier
-	  FIRST:  EToken_Identifier
-	  FOLLOW: (null)
- 12/12  EToken_Integer
-	  FIRST:  EToken_Integer
-	  FOLLOW: (null)
 SYMBOLS
-  0/13  program
-	  FIRST:  ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: (null) $
-	  -> common_declaration
-  1/14  common_declaration
-	  FIRST:  ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: (null) $
-	  -> _seq3: _tmp2 _tmp3 declaration_terminator
-  2/15  declaration
-	  FIRST:  ';' '*' '&' '(' '{' EToken_Int EToken_Float EToken_Identifier EToken_Integer
-	  FOLLOW: (null)
-	  -> _seq1: expr ';'
-	  -> common_declaration
-  3/16  expr
-	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
-	  FOLLOW: ';' '*' '&' ')'
-	  -> _seq12: mul_expr _tmp12
-  4/17  type_specifier
-	  FIRST:  EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
-	  -> EToken_Int
-	  -> EToken_Float
-	  -> _tmp5
-  5/18  declarator
-	  FIRST:  '*' '&' EToken_Identifier
-	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
-	  -> _tmp8
-  6/19  declaration_terminator
-	  FIRST:  ';' '{'
-	  FOLLOW: (null) $
-	  -> ';'
-	  -> _seq19: '{' '}'
-  7/20  pointer
-	  FIRST:  '*' '&'
-	  FOLLOW: '*' '&' EToken_Identifier
-	  -> '*'
-	  -> '&'
-  8/21  function_suffix
+  0/6   function_actual_argument_list
 	  FIRST:  '('
-	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
-	  -> _seq7: '(' _tmp10 ')'
-  9/22  formal_arg
-	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: '*' '&' ')' EToken_Int EToken_Float EToken_Identifier
-	  -> _seq9: _tmp11 declarator
- 10/23  mul_expr
-	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
-	  FOLLOW: ';' '*' '&' ')'
-	  -> _seq15: primary_expr _tmp13
- 11/24  primary_expr
-	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
-	  FOLLOW: ';' '*' '&' ')'
-	  -> EToken_Integer
-	  -> EToken_Identifier
-	  -> _seq16: '(' expr ')'
-	  -> _seq17: '*' expr
-	  -> _seq18: '&' expr
- 12/25  _tmp2
-	  FIRST:  EToken_Int EToken_Float EToken_Identifier <eps>
-	  FOLLOW: ';' '*' '&' '{' EToken_Identifier
-	  -> _seq2: type_specifier _tmp2
-	  -> <epsilon>
- 13/26  _tmp3
-	  FIRST:  '*' '&' EToken_Identifier <eps>
-	  FOLLOW: ';' '{'
-	  -> declarator
-	  -> <epsilon>
- 14/27  _tmp5
-	  FIRST:  EToken_Identifier
-	  FOLLOW: ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
-	  RSLVR:  _act1
-	  -> EToken_Identifier
- 15/28  _tmp6
-	  FIRST:  '*' '&' <eps>
-	  FOLLOW: EToken_Identifier
-	  -> _seq4: pointer _tmp6
-	  -> <epsilon>
- 16/29  _tmp7
-	  FIRST:  '(' <eps>
-	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
-	  -> function_suffix
-	  -> <epsilon>
- 17/30  _tmp8
-	  FIRST:  '*' '&' EToken_Identifier
-	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
-	  RSLVR:  _act2
-	  -> _seq5: _tmp6 EToken_Identifier _tmp7
- 18/31  _tmp10
-	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier <eps>
+	  FOLLOW: (null) $
+	  CLASS:  hhhhhhh
+	  -> _seq4: '(' _bcn2(',') ':' _act1 _tmp1 ')'
+  1/7   _tmp1
+	  FIRST:  ',' <eps>
 	  FOLLOW: ')'
-	  -> _seq6: formal_arg _tmp10
-	  -> <epsilon>
- 19/32  _tmp11
-	  FIRST:  EToken_Int EToken_Float EToken_Identifier <eps>
-	  FOLLOW: '*' '&' EToken_Identifier
-	  -> _seq8: type_specifier _tmp11
-	  -> <epsilon>
- 20/33  _tmp12
-	  FIRST:  '*' <eps>
-	  FOLLOW: ';' '*' '&' ')'
-	  -> _seq11: '*' mul_expr _tmp12
-	  -> <epsilon>
- 21/34  _tmp13
-	  FIRST:  '&' <eps>
-	  FOLLOW: ';' '*' '&' ')'
-	  -> _seq14: '&' primary_expr _tmp13
+	  -> _seq3: _bcn2(',') ':' _act1 _tmp1
 	  -> <epsilon>
 SEQUENCES
-  0/35 	_seq1
-	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
-	  FOLLOW: (null)
-	  expr ';'
-  1/36 	_seq2
-	  FIRST:  EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: ';' '*' '&' '{' EToken_Identifier
-	  type_specifier _tmp2
-  2/37 	_seq3
-	  FIRST:  ';' '*' '&' '{' EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: (null) $
-	  _tmp2 _tmp3 declaration_terminator
-  3/38 	_seq4
-	  FIRST:  '*' '&'
-	  FOLLOW: EToken_Identifier
-	  pointer _tmp6
-  4/39 	_seq5
-	  FIRST:  '*' '&' EToken_Identifier
-	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
-	  _tmp6 EToken_Identifier _tmp7
-  5/40 	_seq6
-	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier
+  0/8  	_seq3
+	  FIRST:  ','
 	  FOLLOW: ')'
-	  formal_arg _tmp10
-  6/41 	_seq7
+	  _bcn2(',') ':' _act1 _tmp1
+  1/9  	_seq4
 	  FIRST:  '('
-	  FOLLOW: ';' '*' '&' ')' '{' EToken_Int EToken_Float EToken_Identifier
-	  '(' _tmp10 ')'
-  7/42 	_seq8
-	  FIRST:  EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: '*' '&' EToken_Identifier
-	  type_specifier _tmp11
-  8/43 	_seq9
-	  FIRST:  '*' '&' EToken_Int EToken_Float EToken_Identifier
-	  FOLLOW: '*' '&' ')' EToken_Int EToken_Float EToken_Identifier
-	  _tmp11 declarator
-  9/44 	_seq11
-	  FIRST:  '*'
-	  FOLLOW: ';' '*' '&' ')'
-	  '*' mul_expr _tmp12
- 10/45 	_seq12
-	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
-	  FOLLOW: ';' '*' '&' ')'
-	  mul_expr _tmp12
- 11/46 	_seq14
-	  FIRST:  '&'
-	  FOLLOW: ';' '*' '&' ')'
-	  '&' primary_expr _tmp13
- 12/47 	_seq15
-	  FIRST:  '*' '&' '(' EToken_Identifier EToken_Integer
-	  FOLLOW: ';' '*' '&' ')'
-	  primary_expr _tmp13
- 13/48 	_seq16
-	  FIRST:  '('
-	  FOLLOW: ';' '*' '&' ')'
-	  '(' expr ')'
- 14/49 	_seq17
-	  FIRST:  '*'
-	  FOLLOW: ';' '*' '&' ')'
-	  '*' expr
- 15/50 	_seq18
-	  FIRST:  '&'
-	  FOLLOW: ';' '*' '&' ')'
-	  '&' expr
- 16/51 	_seq19
-	  FIRST:  '{'
 	  FOLLOW: (null) $
-	  '{' '}'
+	  '(' _bcn2(',') ':' _act1 _tmp1 ')'
 BEACONS
+  0/11 	_bcn2(',')
+	  FIRST:  ','
+	  FOLLOW: ':'
+	  $0 => ','
 DISPATCHERS
+  0/-1 	_dsp1
+	  @ function_actual_argument_list
+	  _bcn2(',')
 ACTIONS
-  0/52 	_act1
-	  SYMBOL:     type_specifier
-	  DISPATCHER: NONE
-	  {  return IsTypeName;  }
-  1/53 	_act2
-	  SYMBOL:     declarator
-	  DISPATCHER: NONE
-	  {  return false;  }
+  0/10 	_act1
+	  SYMBOL:     function_actual_argument_list
+	  DISPATCHER: _dsp1
+	  { 
+				$.m_y = $0.m_Value;
+			 }
 ARGUMENTS
 CONFLICTS
- -1/-1 	_cnf1
-	  on '*' in declaration
-	  DFA:      _dfa1
-	  POSSIBLE:
-	  	-> _seq1: expr ';'
-	  	-> common_declaration
- -1/-1 	_cnf2
-	  on '&' in declaration
-	  DFA:      _dfa4
-	  POSSIBLE:
-	  	-> _seq1: expr ';'
-	  	-> common_declaration
- -1/-1 	_cnf3
-	  on EToken_Identifier in declaration
-	  DFA:      _dfa7
-	  POSSIBLE:
-	  	-> _seq1: expr ';'
-	  	-> common_declaration
- -1/-1 	_cnf4
-	  on EToken_Identifier in _tmp2
-	  DFA:      _dfa11
-	  POSSIBLE:
-	  	-> _seq2: type_specifier _tmp2
-	  	-> <epsilon>
- -1/-1 	_cnf5
-	  on EToken_Identifier in _tmp11
-	  DFA:      _dfa14
-	  POSSIBLE:
-	  	-> _seq8: type_specifier _tmp11
-	  	-> <epsilon>
- -1/-1 	_cnf6
-	  on '*' in _tmp12
-	  DFA:      _seq11
-	  POSSIBLE:
-	  	-> _seq11: '*' mul_expr _tmp12
-	  	-> <epsilon>
- -1/-1 	_cnf7
-	  on '&' in _tmp13
-	  DFA:      _seq14
-	  POSSIBLE:
-	  	-> _seq14: '&' primary_expr _tmp13
-	  	-> <epsilon>
 LOOKAHEAD DFA
-  0/54 	_dfa1
-	  '*' -> _dfa2
-
- -1/-1 	_dfa2~
-	  if resolver (_act2) common_declaration
-	  else _dfa3
-
- -1/-1 	_dfa3*
-	  . -> _seq1: expr ';'
-
-  1/55 	_dfa4
-	  '&' -> _dfa5
-
- -1/-1 	_dfa5~
-	  if resolver (_act2) common_declaration
-	  else _dfa6
-
- -1/-1 	_dfa6*
-	  . -> _seq1: expr ';'
-
-  2/56 	_dfa7
-	  EToken_Identifier -> _dfa8
-
- -1/-1 	_dfa8~
-	  if resolver (_act1) common_declaration
-	  else _dfa9
-
-  3/57 	_dfa9~
-	  if resolver (_act2) common_declaration
-	  else _dfa10
-
- -1/-1 	_dfa10*
-	  . -> _seq1: expr ';'
-
-  4/58 	_dfa11
-	  EToken_Identifier -> _dfa12
-
- -1/-1 	_dfa12~
-	  if resolver (_act1) _seq2: type_specifier _tmp2
-	  else _dfa13
-
- -1/-1 	_dfa13*
-	  . -> <epsilon>
-
-  5/59 	_dfa14
-	  EToken_Identifier -> _dfa15
-
- -1/-1 	_dfa15~
-	  if resolver (_act1) _seq8: type_specifier _tmp11
-	  else _dfa16
-
- -1/-1 	_dfa16*
-	  . -> <epsilon>
-
- -1/-1 	_dfa17*
-	  '*' -> _dfa18
-
- -1/-1 	_dfa18*
-	  . -> _seq11: '*' mul_expr _tmp12
-
- -1/-1 	_dfa19*
-	  '&' -> _dfa20
-
- -1/-1 	_dfa20*
-	  . -> _seq14: '&' primary_expr _tmp13
-

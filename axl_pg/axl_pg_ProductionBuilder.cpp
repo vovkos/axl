@@ -102,10 +102,14 @@ CProductionBuilder::ProcessAllUserCode ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CActionNode* pNode = m_ActionArray [i];
+		if (pNode->m_Flags & EUserNodeFlag_IsUserCodeProcessed)
+			continue;
+
 		Result = ProcessUserCode (pNode->m_SrcPos, &pNode->m_UserCode, pNode->m_pResolver);
 		if (!Result)
 			return false;
 
+		pNode->m_Flags |= EUserNodeFlag_IsUserCodeProcessed;
 		pNode->m_pDispatcher = m_pDispatcher;
 	}
 
@@ -113,6 +117,8 @@ CProductionBuilder::ProcessAllUserCode ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CArgumentNode* pNode = m_ArgumentArray [i];
+		if (pNode->m_Flags & EUserNodeFlag_IsUserCodeProcessed)
+			continue;
 
 		rtl::CBoxIteratorT <rtl::CString> It = pNode->m_ArgValueList.GetHead ();
 		for (; It; It++)
@@ -122,6 +128,7 @@ CProductionBuilder::ProcessAllUserCode ()
 				return false;
 		}
 
+		pNode->m_Flags |= EUserNodeFlag_IsUserCodeProcessed;
 		pNode->m_pDispatcher = m_pDispatcher;
 	}
 

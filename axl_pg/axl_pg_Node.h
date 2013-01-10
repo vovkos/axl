@@ -238,6 +238,13 @@ public:
 
 //.............................................................................
 
+enum EUserNodeFlag
+{
+	EUserNodeFlag_IsUserCodeProcessed = 0x010000, // prevent double processing in '+' quantifier
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CUserNode: public CGrammarNode
 {
 public:

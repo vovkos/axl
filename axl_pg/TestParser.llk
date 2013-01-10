@@ -2,64 +2,20 @@
 
 LL (2);
 
-program
-	: common_declaration
-	;
-
-declaration
-	: expr ';'
-	| common_declaration
-	;
-
-common_declaration
-	: type_specifier* declarator? declaration_terminator
-	;
-
-type_specifier
-	: EToken_Int
-	| EToken_Float
-	| resolver ({ return IsTypeName; })
-	  EToken_Identifier
-	;
-
-declarator	 
-	: resolver #1 ({ return false; })
-	  pointer* EToken_Identifier function_suffix?
-	;
-
-pointer
-	: '*'
-	| '&'
-	;
-
-function_suffix
-	: '(' formal_arg* ')'
-	;
-
-formal_arg
-	: type_specifier* declarator
-	;	
-
-expr
-	: mul_expr ('*' mul_expr)*
-	;
-
-mul_expr
-	: primary_expr ('&' primary_expr)*
-	;
-
-primary_expr
-	: EToken_Integer
-	| EToken_Identifier
-	| '(' expr ')'
-	| '*' expr
-	| '&' expr
-	;
-
-declaration_terminator
-	: ';'
-	| '{' '}'
-	;
+class hhhhhhh
+{
+	int m_x;
+	int m_y;
+}
+function_actual_argument_list
+	: '(' 
+	  (	',' $a2 ':'
+			{
+				$.m_y = $a2.m_Value;
+			}
+	  )+
+	  ')'
+	; 
 		
 //.............................................................................
  

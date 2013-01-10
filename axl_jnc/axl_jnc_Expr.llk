@@ -595,16 +595,40 @@ function_actual_argument_list
 		{
 			$.m_ArgList.InsertTail ($a1.m_Value);
 		}
-	  (
-		',' 
-		expression $a2
+	  (	','
+		function_actual_argument $a2
+			{
+				
+				$.m_ArgList.InsertTail ($a2.m_Value);
+			}
+	  )*
+	  ')'
+	| '(' 
+		{
+			$.m_ArgList.InsertTail (CValue ());
+		}
+	  (	','
+		function_actual_argument $a2
 			{
 				$.m_ArgList.InsertTail ($a2.m_Value);
 			}
-	  )* 
+	  )+
 	  ')'
 	| '(' ')'
 	; 
+
+class 
+{
+	CValue m_Value;
+}
+nullable
+function_actual_argument
+	: expression
+		{
+			$.m_Value = $1.m_Value;
+		}
+	| epsilon // allow skipping arguments
+	;
 
 primary_expr <CValue* $pValue>
 	leave 

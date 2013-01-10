@@ -9,46 +9,24 @@ printf (
 
 //.............................................................................
 
-int g_Baud;
-int g_Baud2;
-
-bindable property 
+foo (
+	int a,
+	int b,
+	int c, 
+	int d
+	)
 {
-	int
-	get ()
-	{
-		printf ("PBaud.get () = %d\n", g_Baud);
-		return g_Baud;
-	}
-
-	set (int Value)
-	{
-		printf ("PBaud.set (%d)\n", Value);
-		g_Baud = Value;
-	}
-} PBaud;
+	printf ("foo (%d, %d, %d, %d)\n", a, b, c, d);
+}
 
 //.............................................................................
-
-autoev ASerialRule
-{
-	printf ("autoev ASerial: Baud has changed to %d!\n", PBaud);
-	g_Baud2 = PBaud * 5;
-};
 
 int
 main ()
 {
 	printf ("hui\n");
 
-	{
-	ASerialRule SerialRule = stack new ASerialRule;
-	PBaud = 100;
-	}
-
-	PBaud = 200;
-
-	printf ("g_Baud2 = %d\n", g_Baud2);
+	foo ~(1, 2) (3, 4);
 
 	printf ("i muravei\n");
 	return 0;
