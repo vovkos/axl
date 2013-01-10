@@ -82,10 +82,13 @@ public:
 	 
 	bool
 	Continue (size_t Level);
-
+	
 protected:
 	void
 	RestoreScopeLevel (CFunction* pFunction);
+
+	void
+	ProcessDestructList (CScope* pTargetScope = NULL);
 };
 
 //.............................................................................

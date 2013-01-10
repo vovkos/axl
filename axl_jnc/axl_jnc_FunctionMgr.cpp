@@ -23,6 +23,7 @@ CFunctionMgr::Clear ()
 {
 	m_FunctionList.Clear ();
 	m_GlobalFunctionList.Clear ();
+	m_GlobalAutoEvTypeArray.Clear ();
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
 	m_pCurrentFunction = NULL;
 }

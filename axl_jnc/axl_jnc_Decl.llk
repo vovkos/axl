@@ -553,6 +553,7 @@ declarator_qualifier
 		{
 			$.m_PropertyAccessorKind = $1.m_PropertyAccessorKind;
 		}
+	| EToken_PreConstruct
 	| EToken_This
 	| '~' EToken_This
 	;

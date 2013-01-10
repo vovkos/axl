@@ -131,10 +131,7 @@ CControlFlowMgr::Break (size_t Level)
 		return false;
 	}
 
-	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	for (; pScope && pScope != pTargetScope; pScope = pScope->GetParentScope ())
-		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
-
+	ProcessDestructList (pTargetScope);
 	Jump (pTargetScope->m_pBreakBlock, NULL);
 	return true;
 }
@@ -149,12 +146,17 @@ CControlFlowMgr::Continue (size_t Level)
 		return false;
 	}
 
+	ProcessDestructList (pTargetScope);
+	Jump (pTargetScope->m_pContinueBlock, NULL);
+	return true;
+}
+
+void
+CControlFlowMgr::ProcessDestructList (CScope* pTargetScope)
+{
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	for (; pScope && pScope != pTargetScope; pScope = pScope->GetParentScope ())
 		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
-
-	Jump (pTargetScope->m_pContinueBlock, NULL);
-	return true;
 }
 
 void
@@ -185,6 +187,7 @@ CControlFlowMgr::Return (const CValue& Value)
 			return false;
 		}
 		
+		ProcessDestructList ();
 		RestoreScopeLevel (pFunction);
 		m_pModule->m_LlvmBuilder.CreateRet ();
 	}
@@ -198,6 +201,7 @@ CControlFlowMgr::Return (const CValue& Value)
 		if (!Result)
 			return false;
 		
+		ProcessDestructList ();
 		RestoreScopeLevel (pFunction);
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
