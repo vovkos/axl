@@ -492,6 +492,11 @@ qualified_type_name_rslv
 		{
 			return m_Stage == EStage_Pass1 || FindType ($n.m_Name) != NULL;
 		}
+	  ('(' // we need this check if we are already in declaration_specifier_list
+		{
+			return false;
+		}
+	  )?
 	;
 
 class
