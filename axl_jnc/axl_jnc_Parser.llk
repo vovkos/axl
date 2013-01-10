@@ -59,7 +59,12 @@ Members
 	EEndianness m_Endianness;
 	EStage m_Stage;
 	CValue m_ThisValue;
+
 	CClassType* m_pAutoEvType;
+	CBasicBlock* m_pAutoEvConstructorBlock;
+	CBasicBlock* m_pAutoEvDestructorBlock;
+	CValue m_AutoEvConstructorThisValue;
+	CValue m_AutoEvDestructorThisValue;
 
 	rtl::CArrayT <CTypeSpecifierModifiers*> m_TypeSpecifierStack;
 	rtl::CBoxListT <CValue> m_BindablePropertyList;
@@ -174,6 +179,12 @@ Members2
 		rtl::CString& Name,
 		CDeclarator* pDeclarator
 		);
+
+	bool
+	PreAutoEvBlock (CClassType* pAutoEvTyoe);
+
+	bool
+	PostAutoEvBlock ();
 
 	bool
 	PreAutoEvExpression ();

@@ -119,6 +119,7 @@ main := |*
 'typeof'       { CreateToken (EToken_TypeOf); };
 'autoev'       { CreateToken (EToken_AutoEv); };
 'onchange'     { CreateToken (EToken_OnChange); };
+'snapshot'     { CreateToken (EToken_Snapshot); };
 
 'if'           { CreateToken (EToken_If); };
 'else'         { CreateToken (EToken_Else); };

@@ -32,15 +32,15 @@ start
 autoev_body <CClassType* $pType>
 	: 
 		{
-			m_pAutoEvType = $pType;
+			return PreAutoEvBlock ($pType);
 		}
-	  '{' autoev_stmt <$pType>* '}'
+	  '{' autoev_stmt* '}'
 		{
-			m_pAutoEvType = NULL;
+			return PostAutoEvBlock ();
 		}
 	;
 	
-autoev_stmt <CClassType* $pType>
+autoev_stmt
 	: 
 		{
 			return PreAutoEvExpression ();

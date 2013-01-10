@@ -123,9 +123,13 @@ CNamespaceMgr::OpenScope (
 	CBasicBlock* pContinueBlock
 	)
 {
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pFunction);
+
 	CScope* pScope = AXL_MEM_NEW (CScope);
 	pScope->m_Level = m_pCurrentScope ? m_pCurrentScope->m_Level + 1 : 1;
 	pScope->m_pModule = m_pModule;
+	pScope->m_pFunction = pFunction;
 	pScope->m_Pos = Pos;
 	pScope->m_pBreakBlock = pBreakBlock;
 	pScope->m_pContinueBlock = pContinueBlock;

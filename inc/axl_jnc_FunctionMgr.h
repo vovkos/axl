@@ -90,6 +90,7 @@ class CFunctionMgr
 protected:
 	friend class CModule;
 	friend class CClassType;
+	friend class CParser;
 
 	CModule* m_pModule;
 

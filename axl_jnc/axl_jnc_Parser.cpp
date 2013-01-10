@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_Parser.h"
+#include "axl_jnc_Closure.h"
 
 namespace axl {
 namespace jnc {
@@ -545,12 +546,6 @@ CParser::DeclareClassPreConstructor (
 	CDeclarator* pDeclarator
 	)
 {
-	if (pClassType->m_pPreConstructor)
-	{
-		err::SetFormatStringError (_T("'%s' already has a pre-constructor"), pClassType->GetQualifiedName ());
-		return NULL;
-	}
-
 	CDeclSpecifiers DeclSpecifiers;
 	DeclSpecifiers.SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
 
@@ -564,15 +559,7 @@ CParser::DeclareClassPreConstructor (
 		return NULL;
 	}
 
-	CFunctionType* pFullType = pClassType->GetSimpleMethodType ();
-	
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
-	pFunction->m_FunctionKind = EFunction_PreConstructor;
-	pFunction->m_Tag.Format (_T("%s.preconstruct"), pClassType->GetQualifiedName ());
-	pFunction->m_pShortType = pType;
-	pFunction->m_pClassType = pClassType;
-	pClassType->m_pPreConstructor = pFunction;
-	return pFunction;
+	return pClassType->CreatePreConstructor ();
 }
 
 CFunction*
@@ -587,21 +574,7 @@ CParser::DeclareClassConstructor (
 	CFunctionType* pType = (CFunctionType*) pDeclarator->GetType (&DeclSpecifiers);
 	ASSERT (pType && pType->GetTypeKind () == EType_Function); 
 
-	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, pClassType);
-	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
-	pFunction->m_FunctionKind = EFunction_Constructor;
-	pFunction->m_Tag.Format (_T("%s.construct"), pClassType->GetQualifiedName ());
-	pFunction->m_pShortType = pType;
-	pFunction->m_pClassType = pClassType;
-
-	bool Result = pClassType->m_Constructor.AddOverload (pFunction);
-	if (!Result)
-		return NULL;
-
-	return pFunction;
+	return pClassType->CreateConstructor (pType);
 }
 
 CFunction*
@@ -610,12 +583,6 @@ CParser::DeclareClassDestructor (
 	CDeclarator* pDeclarator
 	)
 {
-	if (pClassType->m_pDestructor)
-	{
-		err::SetFormatStringError (_T("'%s' already has a destructor"), pClassType->GetQualifiedName ());
-		return NULL;
-	}
-
 	CDeclSpecifiers DeclSpecifiers;
 	DeclSpecifiers.SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
 
@@ -629,15 +596,7 @@ CParser::DeclareClassDestructor (
 		return NULL;
 	}
 
-	CFunctionType* pFullType = pClassType->GetSimpleMethodType ();
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
-	pFunction->m_FunctionKind = EFunction_Destructor;
-	pFunction->m_Tag.Format (_T("%s.destruct"), pClassType->GetQualifiedName ());
-	pFunction->m_pShortType = pType;
-	pFunction->m_pClassType = pClassType;
-	pClassType->m_pDestructor = pFunction;
-	return pFunction;
+	return pClassType->CreateDestructor ();
 }
 
 CFunctionFormalArg*
@@ -688,16 +647,16 @@ CParser::DeclareAutoEvType (
 	bool Result;
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CClassType* pType = NULL;
+	CClassType* pAutoEvType = NULL;
 
 	if (Name.IsEmpty ())
 	{
-		pType = m_pModule->m_TypeMgr.CreateUnnamedClassType (EType_Class);
+		pAutoEvType = m_pModule->m_TypeMgr.CreateUnnamedClassType (EType_Class);
 	}
 	else
 	{
 		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pType = m_pModule->m_TypeMgr.GetClassType (EType_Class, Name, QualifiedName);
+		pAutoEvType = m_pModule->m_TypeMgr.GetClassType (EType_Class, Name, QualifiedName);
 	}
 
 	if (!pDeclarator->m_SuffixList.IsEmpty ())
@@ -708,13 +667,77 @@ CParser::DeclareAutoEvType (
 
 	if (!Name.IsEmpty ())
 	{
-		Result = pNamespace->AddItem (pType);
+		Result = pNamespace->AddItem (pAutoEvType);
 		if (!Result)
 			return NULL;
 	}
 
-	pType->m_Flags |= EClassTypeFlag_IsAutoEv;
-	return pType;
+	pAutoEvType->m_Flags |= EClassTypeFlag_IsAutoEv;
+	pAutoEvType->CreatePreConstructor ();
+	pAutoEvType->CreateDestructor ();
+	return pAutoEvType;
+}
+
+bool
+CParser::PreAutoEvBlock (CClassType* pAutoEvType)
+{
+	bool Result;
+
+	Result = m_pModule->m_FunctionMgr.Prologue (
+		pAutoEvType->GetPreConstructor (), 
+		m_LastMatchedToken.m_Pos, 
+		&m_AutoEvConstructorThisValue
+		);
+
+	if (!Result)
+		return false;	
+
+	m_pAutoEvConstructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+
+	Result = m_pModule->m_FunctionMgr.Prologue (
+		pAutoEvType->GetDestructor (), 
+		m_LastMatchedToken.m_Pos, 
+		&m_AutoEvDestructorThisValue
+		);
+
+	if (!Result)
+		return false;	
+
+	m_pAutoEvDestructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+
+	
+	m_pAutoEvType = pAutoEvType;
+	return true;
+}
+
+bool
+CParser::PostAutoEvBlock ()
+{
+	bool Result;
+
+	ASSERT (m_pAutoEvType && m_pAutoEvConstructorBlock && m_pAutoEvDestructorBlock);
+
+	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetPreConstructor ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvConstructorBlock);
+
+	Result = m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
+	if (!Result)
+		return false;	
+
+	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetDestructor ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvDestructorBlock);
+
+	Result = m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
+	if (!Result)
+		return false;	
+
+	m_pAutoEvType = NULL;
+	m_pAutoEvConstructorBlock = NULL;
+	m_pAutoEvDestructorBlock = NULL;
+
+	m_AutoEvConstructorThisValue.SetVoid ();
+	m_AutoEvDestructorThisValue.SetVoid ();
+	return true;
 }
 
 bool
@@ -731,38 +754,69 @@ CParser::PreAutoEvExpression ()
 	pFunction->m_pShortType = pShortType;
 	pFunction->m_pClassType = m_pAutoEvType;
 
-	CValue ThisValue;
-	bool Result = m_pModule->m_FunctionMgr.Prologue (pFunction, m_CurrentToken.m_Pos, &ThisValue);
+	bool Result = m_pModule->m_FunctionMgr.Prologue (pFunction, m_CurrentToken.m_Pos, &m_ThisValue);
 	if (!Result)
 		return false;
 
-	m_ThisValue = ThisValue;	
 	return true;
 }
 
 bool
 CParser::PostAutoEvExpression (const CValue& Value)
 {
-	ASSERT (m_pAutoEvType);
+	ASSERT (m_pAutoEvType && m_pAutoEvConstructorBlock && m_pAutoEvDestructorBlock);
 
-	// attach to all bindable rvalues of Value in constructor;
-	// detach in destructor
-
-	rtl::CBoxIteratorT <CValue> Property = m_BindablePropertyList.GetHead ();
-	for (; Property; Property++)
-	{
-		rtl::CString s = Property->GetType ()->GetTypeString ();
-		TRACE ("bindable property %s\n", s);
-	}
-
-	TRACE ("--- %d total\n", m_BindablePropertyList.GetCount ());
-
-	m_BindablePropertyList.Clear ();
+	CValue HandlerValue = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 
 	bool Result = m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
 	if (!Result)
 		return false;
 
+	// add event handlers in constructor
+
+	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetPreConstructor ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvConstructorBlock);
+
+	CClosure* pClosure = HandlerValue.CreateClosure ();
+	pClosure->CreateArg (0, m_AutoEvConstructorThisValue);
+	
+	rtl::CBoxIteratorT <CValue> PropertyValue = m_BindablePropertyList.GetHead ();
+	for (; PropertyValue; PropertyValue++)
+	{
+		CValue EventValue;
+		Result = 
+			m_pModule->m_OperatorMgr.OnChangeOperator (*PropertyValue, &EventValue) &&
+			m_pModule->m_OperatorMgr.EventOperator (EventValue, HandlerValue, EEventOp_AddHandler);
+
+		if (!Result)
+			return false;
+	}
+
+	m_pAutoEvConstructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+
+	// remove event handlers in destructor
+
+	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetDestructor ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvDestructorBlock);
+
+	pClosure = HandlerValue.CreateClosure ();
+	pClosure->CreateArg (0, m_AutoEvDestructorThisValue);
+
+	PropertyValue = m_BindablePropertyList.GetHead ();
+	for (; PropertyValue; PropertyValue++)
+	{
+		CValue EventValue;
+		Result = 
+			m_pModule->m_OperatorMgr.OnChangeOperator (*PropertyValue, &EventValue) &&
+			m_pModule->m_OperatorMgr.EventOperator (EventValue, HandlerValue, EEventOp_RemoveHandler);
+
+		if (!Result)
+			return false;
+	}
+
+	m_pAutoEvDestructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+
+	m_BindablePropertyList.Clear ();
 	m_ThisValue.SetVoid ();
 	return true;
 }

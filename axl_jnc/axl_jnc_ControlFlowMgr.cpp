@@ -154,9 +154,15 @@ CControlFlowMgr::Continue (size_t Level)
 void
 CControlFlowMgr::ProcessDestructList (CScope* pTargetScope)
 {
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pFunction);
+
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	for (; pScope && pScope != pTargetScope; pScope = pScope->GetParentScope ())
+	while (pScope && pScope != pTargetScope && pScope->GetFunction () == pFunction)
+	{	
 		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
+		pScope = pScope->GetParentScope ();
+	}
 }
 
 void
@@ -166,6 +172,7 @@ CControlFlowMgr::RestoreScopeLevel (CFunction* pFunction)
 		return;
 
 	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateComment (_T("restore scope level before return"));
 	m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 }

@@ -962,6 +962,15 @@ COperatorMgr::GetMethodFunction (
 	CClassType* pClassType = (CClassType*) Value.GetType ();
 	CVTableType* pVTableType = pFunction->GetVTableType ();
 	
+	if (!pVTableType) // non-virtual method
+	{
+		pResultValue->SetLlvmValue (
+			pFunction->GetLlvmFunction (), 
+			pFunction->GetType ()->GetPointerType (EType_Pointer_u)
+			);
+		return true;
+	}
+
 	if (pVTableType->GetTypeKind () == EType_Property)
 		VTableIndex += ((CPropertyType*) pVTableType)->GetParentVTableIndex ();
 
@@ -991,7 +1000,10 @@ COperatorMgr::GetMethodFunction (
 		&PtrValue
 		);
 
-	pResultValue->SetLlvmValue (PtrValue.GetLlvmValue (), pFunction->GetType ()->GetPointerType (EType_Pointer_u));
+	pResultValue->SetLlvmValue (
+		PtrValue.GetLlvmValue (), 
+		pFunction->GetType ()->GetPointerType (EType_Pointer_u)
+		);
 	return true;
 }
 

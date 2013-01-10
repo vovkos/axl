@@ -8,7 +8,7 @@ printf (
 
 
 //.............................................................................
-/*
+
 int g_Baud;
 int g_Baud2;
 
@@ -33,20 +33,7 @@ bindable property
 autoev ASerialRule
 {
 	printf ("autoev ASerial: Baud has changed to %d!\n", PBaud);
-};
-*/
-
-class CTest
-{
-	preconstruct ()
-	{
-		printf ("CTest.preconstruct\n");
-	}
-
-	~this ()
-	{
-		printf ("CTest.~this\n");
-	}
+	g_Baud2 = PBaud * 5;
 };
 
 int
@@ -54,10 +41,14 @@ main ()
 {
 	printf ("hui\n");
 
-	stack new CTest;
+	{
+	ASerialRule SerialRule = stack new ASerialRule;
+	PBaud = 100;
+	}
 
-//	ASerialRule SerialRule = stack new ASerialRule;
-//	PBaud = 100;
+	PBaud = 200;
+
+	printf ("g_Baud2 = %d\n", g_Baud2);
 
 	printf ("i muravei\n");
 	return 0;

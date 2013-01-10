@@ -294,6 +294,9 @@ public:
 	CFunctionType* 
 	GetSimpleMethodType ();
 
+	CFunctionType* 
+	GetMethodType (CFunctionType* pShortType);
+
 	CFunction* 
 	GetPreConstructor ()
 	{
@@ -368,6 +371,15 @@ public:
 	{
 		return FindMemberImpl (true, pName, pBaseTypeCoord, 0);
 	}
+
+	CFunction*
+	CreatePreConstructor ();
+
+	CFunction*
+	CreateConstructor (CFunctionType* pType);
+
+	CFunction*
+	CreateDestructor ();
 
 	CClassFieldMember*
 	CreateFieldMember (

@@ -75,6 +75,7 @@ enum EToken
 	EToken_TypeOf,
 	EToken_AutoEv,
 	EToken_OnChange,
+	EToken_Snapshot,
 	EToken_If,
 	EToken_Else,
 	EToken_For,
@@ -181,6 +182,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
 	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
 	AXL_PRS_TOKEN_NAME (EToken_OnChange,     "onchange")
+	AXL_PRS_TOKEN_NAME (EToken_Snapshot,     "snapshot")
 	AXL_PRS_TOKEN_NAME (EToken_If,           "if")
 	AXL_PRS_TOKEN_NAME (EToken_Else,         "else")
 	AXL_PRS_TOKEN_NAME (EToken_For,          "for")

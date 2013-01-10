@@ -68,6 +68,19 @@ CClassType::GetSimpleMethodType ()
 	return m_pSimpleMethodType;
 }
 
+CFunctionType* 
+CClassType::GetMethodType (CFunctionType* pShortType)
+{
+	rtl::CArrayT <CType*> ArgTypeArray = pShortType->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, this);
+
+	return m_pModule->m_TypeMgr.GetFunctionType (
+		pShortType->GetReturnType (), 
+		ArgTypeArray, 
+		pShortType->GetFlags ()
+		);
+}
+
 void
 CClassType::SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList)
 {
@@ -207,6 +220,68 @@ CClassType::FindMemberImpl (
 	return NULL;
 }
 
+CFunction*
+CClassType::CreatePreConstructor ()
+{
+	if (m_pPreConstructor)
+	{
+		err::SetFormatStringError (_T("'%s' already has a pre-constructor"), m_Tag);
+		return NULL;
+	}
+
+	CFunctionType* pShortType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunctionType* pFullType = GetSimpleMethodType ();
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_PreConstructor;
+	pFunction->m_Tag.Format (_T("%s.preconstruct"), m_Tag);
+	pFunction->m_pShortType = pShortType;
+	pFunction->m_pClassType = this;
+	m_pPreConstructor = pFunction;
+
+	return pFunction;
+}
+
+CFunction*
+CClassType::CreateConstructor (CFunctionType* pType)
+{
+	CFunctionType* pFullType = GetMethodType (pType);
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_Constructor;
+	pFunction->m_Tag.Format (_T("%s.construct"), m_Tag);
+	pFunction->m_pShortType = pType;
+	pFunction->m_pClassType = this;
+
+	bool Result = m_Constructor.AddOverload (pFunction);
+	if (!Result)
+		return NULL;
+
+	return pFunction;
+}
+
+CFunction*
+CClassType::CreateDestructor ()
+{
+	if (m_pDestructor)
+	{
+		err::SetFormatStringError (_T("'%s' already has a destructor"), m_Tag);
+		return NULL;
+	}
+
+	CFunctionType* pShortType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunctionType* pFullType = GetSimpleMethodType ();
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	pFunction->m_FunctionKind = EFunction_Destructor;
+	pFunction->m_Tag.Format (_T("%s.destruct"), m_Tag);
+	pFunction->m_pShortType = pShortType;
+	pFunction->m_pClassType = this;
+	m_pDestructor = pFunction;
+
+	return pFunction;
+}
+
 CClassFieldMember*
 CClassType::CreateFieldMember (
 	const rtl::CString& Name,
@@ -279,16 +354,13 @@ CClassType::CreateMethodMember (
 void
 CClassType::AddMethodFunction (CFunction* pFunction)
 {
-	CFunctionType* pType = pFunction->GetType ();
-	
-	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, this);
-	CFunctionType* pFullType = m_pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray, pType->GetFlags ());
+	CFunctionType* pShortType = pFunction->GetType ();
+	CFunctionType* pFullType = GetMethodType (pShortType);
 
 	pFunction->m_FunctionKind = EFunction_Method;
 	pFunction->m_pClassType = this;
 	pFunction->m_pType = pFullType;
-	pFunction->m_pShortType = pType;
+	pFunction->m_pShortType = pShortType;
 
 	m_MethodFunctionArray.Append (pFunction);
 }

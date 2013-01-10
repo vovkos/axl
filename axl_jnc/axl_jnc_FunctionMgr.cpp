@@ -379,7 +379,7 @@ CFunctionMgr::Prologue (
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
-	if (FunctionKind == EFunction_Method)
+	if (pThisType)
 	{
 		llvm::Value* pLlvmArg = LlvmArg;
 		CValue ArgValue (pLlvmArg, pOriginType);			

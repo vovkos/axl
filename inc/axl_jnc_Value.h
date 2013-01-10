@@ -549,7 +549,7 @@ struct TFunctionPtr
 {
 	void* m_pfn;
 	intptr_t m_CallingConvention;
-	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
+	TInterfaceHdr* m_pInterface; // NULL, interface or closure
 };
 
 // structures backing up event declared like

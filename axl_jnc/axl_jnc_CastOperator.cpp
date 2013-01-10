@@ -781,6 +781,8 @@ CCast_fn::LlvmCast (
 {
 	ASSERT (RawValue.GetType ()->IsFunctionType () && pType->GetTypeKind () == EType_FunctionPointer);
 
+	bool Result;
+
 	CValue Value = RawValue;
 
 	CType* pOpType = Value.GetType ();
@@ -827,50 +829,31 @@ CCast_fn::LlvmCast (
 	}
 
 	CFunction* pFunction = Value.GetFunction ();
-	if (pFunction->GetFunctionKind () == EFunction_Method)
+	Result = m_pModule->m_OperatorMgr.GetMethodFunction (pFunction, pClosure, &Value);
+	if (!Result)
+		return false;
+
+	rtl::CArrayT <CType*> ArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
+	if (ArgTypeArray.IsEmpty ())
 	{
-		bool Result = m_pModule->m_OperatorMgr.GetMethodFunction (pFunction, pClosure, &Value);
-		if (!Result)
-			return false;
+		SetCastError (Value.GetType (), pType);
+		return false;
 	}
 
-	CClassType* pClosureClassType = (CClassType*) ClosureArgValue.GetType ();
-	CClassType* pMethodClassType = pFunction->GetVTableClassType ();
+	Result = m_pModule->m_OperatorMgr.CastOperator (&ClosureArgValue, ArgTypeArray [0]);
+	if (!Result)
+		return false;
 
-	CValue PtrValue;
-	CValue ScopeLevelValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 1, NULL, &ScopeLevelValue);
-
-	CClassBaseTypeCoord Coord;
-	pClosureClassType->FindBaseType (pMethodClassType, &Coord);
-	rtl::CArrayT <size_t> LlvmIndexArray = Coord.m_FieldCoord.m_LlvmIndexArray;
-
-	if (!LlvmIndexArray.IsEmpty ())
-	{
-		LlvmIndexArray.Insert (0, 0);
-	
-		m_pModule->m_LlvmBuilder.CreateGep (
-			PtrValue, 
-			LlvmIndexArray, 
-			LlvmIndexArray.GetCount (),
-			NULL, 
-			&PtrValue
-			);
-	}
-	
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-	
-	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetUndefValue ();
-	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, NULL, &InterfaceValue);
-
+	CValue PfnValue;
+	CValue IfaceValue;
 	CValue CallConvValue (pSrcFunctionType->GetCallingConvention (), EType_Int_p);
-	CValue FunctionPointerValue = pType->GetUndefValue ();
-	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pDstFunctionType->GetPointerType (EType_Pointer_u), &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPointerValue, PtrValue, 0, NULL, &FunctionPointerValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPointerValue, CallConvValue, 1, NULL, &FunctionPointerValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPointerValue, InterfaceValue, 2, pType, pResultValue);
+	CValue FunctionPtrValue = pType->GetUndefValue ();
+
+	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pDstFunctionType->GetPointerType (EType_Pointer_u), &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateBitCast (ClosureArgValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &IfaceValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, PfnValue, 0, NULL, &FunctionPtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, CallConvValue, 1, NULL, &FunctionPtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, IfaceValue, 2, pType, pResultValue);
 	return true;
 }
 

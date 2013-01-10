@@ -25,9 +25,7 @@ protected:
 	size_t m_Level;
 
 	CToken::CPos m_PosEnd;
-
-	void* m_pCodeBegin;
-	void* m_pCodeEnd;
+	CFunction* m_pFunction;
 
 	rtl::CBoxListT <CValue> m_DestructList;
 
@@ -50,6 +48,12 @@ public:
 	GetPosEnd ()
 	{
 		return m_PosEnd;
+	}
+
+	CFunction*
+	GetFunction ()
+	{
+		return m_pFunction;
 	}
 
 	CScope*
