@@ -303,13 +303,17 @@ COperatorMgr::GetCastOperator (
 		return pType->IsPointerType () ? &m_Cast_ptr : NULL;
 
 	case EType_Pointer_u:
+		// unsafe function pointer can be cast to safe function pointer or to unsafe function pointer
+		// unsafe pointer can be cast to unsafe pointer only
+
 		return 
 			pOpType->IsUnsafeFunctionPointerType () ? 
-			TypeKind == EType_FunctionPointer ? (ICastOperator*) &m_Cast_fn : NULL :
+			pType->IsFunctionType () ? (ICastOperator*) &m_Cast_fn : NULL :
 			TypeKind == EType_Pointer_u ? (ICastOperator*) &m_Cast_ptr : NULL;
 
+	case EType_Function:
 	case EType_FunctionPointer:
-		return TypeKind == EType_FunctionPointer ? &m_Cast_fn :  NULL;
+		return &m_Cast_fn;
 
 	case EType_Array:
 		return 
@@ -338,27 +342,44 @@ COperatorMgr::GetCastOperator (
 
 ECast
 COperatorMgr::GetCastKind (
-	CType* pOpType,
-	CType* pType
+	CType* pSrcType,
+	CType* pDstType
 	)
 {
-	pOpType = PrepareOperandType (pOpType);
-
-	ICastOperator* pOperator = GetCastOperator (pOpType, pType);
-	return pOperator ? pOperator->GetCastKind (pOpType, pType) : ECast_None;
+	pSrcType = PrepareOperandType (pSrcType);
+	ICastOperator* pOperator = GetCastOperator (pSrcType, pDstType);
+	return pOperator ? pOperator->GetCastKind (pSrcType, pDstType) : ECast_None;
 }
 
 ECast
-COperatorMgr::GetCallCastKind (
-	CFunctionType* pFunctionType,
-	rtl::CBoxListT <CValue>* pArgList
+COperatorMgr::GetCastKind (
+	const CValue& SrcValue,
+	CType* pDstType
 	)
 {
-	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
-	size_t FormalArgCount = ArgTypeArray.GetCount ();
-	size_t ActualArgCount = pArgList->GetCount ();
+	CType* pSrcType = SrcValue.GetType ();
+	CClosure* pClosure = SrcValue.GetClosure ();
+	if (pClosure)
+	{
+		pSrcType = pClosure->GetClosureType (pSrcType);
+		if (!pSrcType)
+			return ECast_None;
+	}
 
-	if (FormalArgCount > ActualArgCount || 
+	return GetCastKind (pSrcType, pDstType);
+}
+
+ECast
+COperatorMgr::GetArgCastKind (
+	CFunctionType* pFunctionType,
+	const rtl::CArrayT <CType*>& ActualArgTypeArray
+	)
+{
+	rtl::CArrayT <CType*> FormalArgTypeArray = pFunctionType->GetArgTypeArray ();
+	size_t FormalArgCount = FormalArgTypeArray.GetCount ();
+	size_t ActualArgCount = ActualArgTypeArray.GetCount ();
+
+	if (ActualArgCount < FormalArgCount || 
 		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_IsVarArg))
 	{
 		return ECast_None;
@@ -366,11 +387,10 @@ COperatorMgr::GetCallCastKind (
 
 	ECast WorstCastKind = ECast_Identitiy;
 
-	rtl::CBoxIteratorT <CValue> ActualArg = pArgList->GetHead ();
-	for (size_t i = 0; i < FormalArgCount; i++, ActualArg++)
+	for (size_t i = 0; i < FormalArgCount; i++)
 	{
-		CType* pFormalArgType = ArgTypeArray [i];
-		CType* pActualArgType = ActualArg->GetType ();
+		CType* pFormalArgType = FormalArgTypeArray [i];
+		CType* pActualArgType = ActualArgTypeArray [i];;
 
 		ECast CastKind = GetCastKind (pActualArgType, pFormalArgType);
 		if (!CastKind)
@@ -383,8 +403,48 @@ COperatorMgr::GetCallCastKind (
 	return WorstCastKind;
 }
 
+ECast
+COperatorMgr::GetArgCastKind (
+	CFunctionType* pFunctionType,
+	const rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	size_t ArgCount = pArgList->GetCount ();
+
+	char Buffer [256];
+	rtl::CArrayT <CType*> ArgTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgTypeArray.SetCount (ArgCount);
+
+	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
+	for (size_t i = 0; Arg; Arg++, i++)
+		ArgTypeArray [i] = Arg->GetType ();
+
+	return GetArgCastKind (pFunctionType, ArgTypeArray);
+}
+
+ECast
+COperatorMgr::GetFunctionCastKind (
+	CFunctionType* pSrcType,
+	CFunctionType* pDstType
+	)
+{
+	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgTypeArray ());
+	if (!ArgCastKind)
+		return ECast_None;
+
+	CType* pSrcReturnType = pSrcType->GetReturnType ();
+	CType* pDstReturnType = pDstType->GetReturnType ();
+	
+	if (pDstReturnType->GetTypeKind () == EType_Void)
+		return ArgCastKind;
+
+	ECast ReturnCastKind = GetCastKind (pSrcReturnType, pDstReturnType);
+	return min (ArgCastKind, ReturnCastKind);
+}
+
 bool
 COperatorMgr::CastOperator (
+	EAlloc AllocKind,
 	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -398,7 +458,6 @@ COperatorMgr::CastOperator (
 		return false;
 
 	CType* pOpType = OpValue.GetType ();
-
 	ICastOperator* pOperator = GetCastOperator (pOpType, pType);	
 	if (!pOperator)
 	{
@@ -406,18 +465,19 @@ COperatorMgr::CastOperator (
 		return false;
 	}
 
-	return pOperator->Cast (OpValue, pType, pResultValue);
+	return pOperator->Cast (AllocKind, OpValue, pType, pResultValue);
 }
 
 bool
 COperatorMgr::CastOperator (
+	EAlloc AllocKind,
 	const CValue& OpValue,
 	EType TypeKind,
 	CValue* pResultValue
 	)
 {
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	return CastOperator (OpValue, pType, pResultValue);
+	return CastOperator (AllocKind, OpValue, pType, pResultValue);
 }
 
 bool
@@ -826,6 +886,7 @@ COperatorMgr::ClassMemberOperator (
 	if (!Result)
 		return false;
 
+	CClosure* pClosure;
 	EClassMember MemberKind = pMember->GetMemberKind ();
 	switch (MemberKind)
 	{
@@ -840,10 +901,12 @@ COperatorMgr::ClassMemberOperator (
 		
 	case EClassMember_Method:
 		pResultValue->SetFunctionOverload ((CClassMethodMember*) pMember);
+		pClosure = pResultValue->CreateClosure (EClosure_Function);
 		break;
 
 	case EClassMember_Property:
 		pResultValue->SetProperty (((CClassPropertyMember*) pMember)->GetType ());
+		pClosure = pResultValue->CreateClosure (EClosure_Property);
 		break;
 
 	default:
@@ -851,8 +914,7 @@ COperatorMgr::ClassMemberOperator (
 		return false;
 	}
 
-	CClosure* pClosure = pResultValue->CreateClosure ();
-	pClosure->CreateArg (0, OpValue);
+	pClosure->GetArgList ()->InsertHead (OpValue);
 	return true;
 }
 
@@ -911,6 +973,77 @@ COperatorMgr::ClassFieldMemberOperator (
 }
 
 bool
+COperatorMgr::GetClassFieldMemberValue (
+	const CValue& ObjValue,
+	CClassFieldMember* pMember,
+	CValue* pValue
+	)
+{
+	CClassType* pClassType = (CClassType*) ObjValue.GetType ();
+	ASSERT (pClassType->IsClassType ());
+
+	CValue FieldValue;
+	CClassBaseTypeCoord ClosureCoord;
+
+	return 
+		ClassFieldMemberOperator (ObjValue, pClassType, pMember, &ClosureCoord, &FieldValue) && 
+		LoadReferenceOperator (FieldValue, pValue);
+}
+
+bool
+COperatorMgr::SetClassFieldMemberValue (
+	const CValue& ObjValue,
+	CClassFieldMember* pMember,
+	const CValue& Value
+	)
+{
+	CClassType* pClassType = (CClassType*) ObjValue.GetType ();
+	ASSERT (pClassType->IsClassType ());
+
+	CValue FieldValue;
+	CClassBaseTypeCoord ClosureCoord;
+
+	return 
+		ClassFieldMemberOperator (ObjValue, pClassType, pMember, &ClosureCoord, &FieldValue) && 
+		MoveOperator (Value, FieldValue);
+}
+
+bool
+COperatorMgr::NormalizeFunctionPointer (
+	const CValue& Value,
+	CValue* pResultValue
+	)
+{
+	CFunctionPointerType* pFunctionPtrType = (CFunctionPointerType*) Value.GetType ();
+	ASSERT (pFunctionPtrType->GetTypeKind () == EType_FunctionPointer);
+
+	CValue PfnValue;
+	CValue IfaceValue;
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, pFunctionPtrType->GetFunctionType ()->GetPointerType (EType_Pointer_u), &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &IfaceValue);
+
+	ref::CPtrT <CClosure> OldClosure = Value.GetClosure ();
+
+	*pResultValue = PfnValue;
+
+	CClosure* pClosure;
+
+	if (OldClosure)
+	{
+		pResultValue->SetClosure (OldClosure);
+		pClosure = OldClosure;
+	}
+	else
+	{
+		pClosure = pResultValue->CreateClosure (EClosure_Function);
+	}
+
+	pClosure->GetArgList ()->InsertHead (IfaceValue);
+	return true;
+}
+
+bool
 COperatorMgr::GetClassVTable (
 	const CValue& OpValue,
 	CClassType* pClassType,
@@ -949,9 +1082,8 @@ COperatorMgr::GetMethodFunction (
 {
 	ASSERT (pFunction->GetFunctionKind () == EFunction_Method && pClosure);
 	
-	rtl::CIteratorT <CClosureArg> ClosureArg = pClosure->GetFirstArg ();
-	CValue Value = ClosureArg->GetValue ();
-	if (ClosureArg->GetArgIdx () != 0 || !Value.GetType ()->IsClassType ())
+	CValue Value = *pClosure->GetArgList ()->GetHead ();
+	if (!Value.GetType ()->IsClassType ())
 	{
 		err::SetFormatStringError (_T("non-static method call requires an object pointer"));
 		return false;
@@ -1016,9 +1148,8 @@ COperatorMgr::GetMemberProperty (
 {
 	ASSERT (pPropertyType->GetGetter ()->GetFunctionKind () == EFunction_Method && pClosure);
 	
-	rtl::CIteratorT <CClosureArg> ClosureArg = pClosure->GetFirstArg ();
-	CValue Value = ClosureArg->GetValue ();
-	if (ClosureArg->GetArgIdx () != 0 || !Value.GetType ()->IsClassType ())
+	CValue Value = *pClosure->GetArgList ()->GetHead ();
+	if (!Value.GetType ()->IsClassType ())
 	{
 		err::SetFormatStringError (_T("non-static property requires an object pointer"));
 		return false;
@@ -1178,7 +1309,7 @@ COperatorMgr::ProcessDestructList (rtl::CBoxListT <CValue>* pList)
 }
 
 CType*
-GetVarArgType (
+COperatorMgr::GetVarArgType (
 	CType* pType,
 	bool IsUnsafeVarArg
 	)
@@ -1192,9 +1323,24 @@ GetVarArgType (
 		return GetVarArgType (((CPointerType*) pType)->GetBaseType (), IsUnsafeVarArg);
 
 	case EType_BitField:
-		return ((CBitFieldType*) pType)->GetBaseType ();
+		return GetVarArgType (((CBitFieldType*) pType)->GetBaseType (), IsUnsafeVarArg);
+
+	case EType_Enum:
+	case EType_Enum_c:
+		return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
+
+	case EType_Float:
+		return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
 
 	default:
+		if (pType->IsIntegerType ())
+		{
+			if (pType->GetSize () <= 4)
+				return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
+			else
+				return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64);
+		}
+
 		return pType;
 	}
 }
@@ -1213,7 +1359,6 @@ COperatorMgr::CallOperator (
 		pArgList = &EmptyArgList;
 
 	CValue OpValue;
-
 	if (RawOpValue.GetValueKind () == EValue_FunctionOverload)
 	{
 		CFunctionOverload* pFunctionOverload = RawOpValue.GetFunctionOverload ();
@@ -1229,8 +1374,6 @@ COperatorMgr::CallOperator (
 		if (!Result)
 			return false;
 	}
-
-	CType* pOpType = OpValue.GetType ();
 
 	CClosure* pClosure = OpValue.GetClosure ();
 	if (pClosure)
@@ -1260,9 +1403,12 @@ COperatorMgr::CallOperator (
 		return CallImpl (OpValue, pFunction->GetType (), pArgList, pResultValue);
 	}
 	
-	if (pOpType->GetTypeKind () == EType_Event)
+	CType* pOpType = OpValue.GetType ();
+	EType OpTypeKind = pOpType->GetTypeKind ();
+
+	if (OpTypeKind == EType_Event)
 		return CallEvent (OpValue, pArgList);
-	else if (pOpType->GetTypeKind () == EType_FunctionPointer)
+	else if (OpTypeKind == EType_FunctionPointer)
 		return CallFunctionPtr (OpValue, pArgList, pResultValue);
 	else if (pOpType->IsUnsafeFunctionPointerType ())
 		return CallImpl (OpValue, (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType (), pArgList, pResultValue);
@@ -1344,7 +1490,7 @@ COperatorMgr::CastArgList (
 		
 		CValue ArgCast;
 		Result = 
-			CheckCastKind (Arg->GetType (), pFormalArgType) &&
+			CheckCastKind (*Arg, pFormalArgType) &&
 			CastOperator (*Arg, pFormalArgType, &ArgCast) &&
 			PrepareOperand (&ArgCast, EOpFlag_VariableToSafePtr);
 
@@ -1436,50 +1582,18 @@ COperatorMgr::CallFunctionPtr (
 	if (!Result)
 		return false;
 	
-	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue ();
-	CValue InterfaceValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &InterfaceValue);
+	CValue PfnValue;
+	CValue IfaceValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pFunctionPointerType->GetFunctionType ()->GetPointerType (EType_Pointer_u), &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &IfaceValue);
+	pArgList->InsertHead (IfaceValue);
 
-	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_phi"));
-	CBasicBlock* pGlobalBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_global"));
-	CBasicBlock* pMethodBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("pfn_method"));
-	
-	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateEq_i (InterfaceValue, NullValue, &CmpValue);
-	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pGlobalBlock, pMethodBlock);
-
-	CValue GlobalReturnValue;
-	Result = CallImpl (OpValue, pFunctionPointerType->GetFunctionType (), pArgList, &GlobalReturnValue);
-	if (!Result)
-		return false;
-
-	pGlobalBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pMethodBlock);
-
-	pArgList->InsertHead (InterfaceValue);
-
-	CValue MethodReturnValue;
-	Result = CallImpl (OpValue, pFunctionPointerType->GetMemberFunctionType (), pArgList, &MethodReturnValue);
-	if (!Result)
-		return false;
-
-	pMethodBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
-
-	m_pModule->m_LlvmBuilder.CreatePhi (
-		GlobalReturnValue, 
-		pGlobalBlock, 
-		MethodReturnValue, 
-		pMethodBlock, 
-		pResultValue
-		);
-
-	return true;
+	return CallImpl (PfnValue, pFunctionPointerType->GetFunctionType (), pArgList, pResultValue);
 }
 
 bool
 COperatorMgr::CallImpl (
-	const CValue& OpValue,
+	const CValue& PfnValue,
 	CFunctionType* pFunctionType,
 	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
@@ -1498,74 +1612,11 @@ COperatorMgr::CallImpl (
 	m_pModule->m_LlvmBuilder.CreateComment ("update scope level before call");
 	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 
-	// simple call
-
-	if (OpValue.GetType ()->IsUnsafeFunctionPointerType ())
-	{
-		m_pModule->m_LlvmBuilder.CreateCall (
-			OpValue,
-			pFunctionType,
-			ArgArray,
-			ArgArray.GetCount (),
-			pResultValue
-			);
-
-		return true;
-	}
-
-	// switch between calling conventions
-	
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_FunctionPointer);
-	CFunctionPointerType* pFunctionPointerType = (CFunctionPointerType*) OpValue.GetType ();
-
-	CValue FunctionPtrValue;
-	CValue CallConvValue;
-	CValue StdcallValue (ECallConv_Stdcall, EType_Int_p);
-
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &FunctionPtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &CallConvValue);
-
-	if (pFunctionType != pFunctionPointerType->GetFunctionType ())
-		m_pModule->m_LlvmBuilder.CreateBitCast (FunctionPtrValue, pFunctionType->GetPointerType (EType_Pointer_u), &FunctionPtrValue);
-
-	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("callconv_phi"));
-	CBasicBlock* pCdeclBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("callconv_cdecl"));
-	CBasicBlock* pStdcallBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("callconv_stdcall"));
-
-	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateEq_i (CallConvValue, StdcallValue, &CmpValue);
-	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pStdcallBlock, pCdeclBlock);
-	
-	CValue StdcallReturnValue;
 	m_pModule->m_LlvmBuilder.CreateCall (
-		FunctionPtrValue,
-		ECallConv_Stdcall,
+		PfnValue,
+		pFunctionType,
 		ArgArray,
 		ArgArray.GetCount (),
-		pFunctionType->GetReturnType (),
-		&StdcallReturnValue
-		);
-
-	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pCdeclBlock);
-
-	CValue CdeclReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall (
-		FunctionPtrValue,
-		ECallConv_Cdecl,
-		ArgArray,
-		ArgArray.GetCount (),
-		pFunctionType->GetReturnType (),
-		&CdeclReturnValue
-		);
-
-	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
-
-	m_pModule->m_LlvmBuilder.CreatePhi (
-		CdeclReturnValue, 
-		pCdeclBlock, 
-		StdcallReturnValue, 
-		pStdcallBlock, 
 		pResultValue
 		);
 
@@ -1574,23 +1625,30 @@ COperatorMgr::CallImpl (
 
 bool
 COperatorMgr::ClosureOperator (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
 	)
 {
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_LoadReference);
+	if (!Result)
+		return false;
+
 	*pResultValue = OpValue;
-	CClosure* pClosure = pResultValue->CreateClosure ();
 
-	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
-	for (size_t i = 0; Arg; Arg++, i++)
+	CClosure* pClosure = pResultValue->GetClosure ();
+	if (!pClosure)
 	{
-		if (Arg->GetValueKind () == EValue_Void)
-			continue;
-
-		pClosure->CreateArg (i, *Arg);
+		pClosure = pResultValue->CreateClosure (EClosure_Function);
+	}
+	else if (pClosure->GetClosureKind () != EClosure_Function)
+	{
+		err::SetFormatStringError (_T("closure kind mismatch"));
+		return false;
 	}
 
+	pClosure->CombineClosure (pArgList);
 	if (pClosure->IsEmpty ())
 	{
 		err::SetFormatStringError (_T("empty closure"));
@@ -1602,12 +1660,16 @@ COperatorMgr::ClosureOperator (
 
 bool
 COperatorMgr::OnChangeOperator (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
-	CType* pOpType = OpValue.GetType ();
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepProperty);
+	if (!Result)
+		return false;
 
+	CType* pOpType = OpValue.GetType ();
 	if (!pOpType->IsBindablePropertyType ())
 	{
 		err::SetFormatStringError (_T("'onchange' can only be applied to bindable properties"));
@@ -1836,19 +1898,6 @@ COperatorMgr::LoadReferenceOperator (
 }
 
 bool
-COperatorMgr::LoadReferenceOperator (CValue* pValue)
-{
-	CValue ResultValue;
-
-	bool Result = LoadReferenceOperator (*pValue, &ResultValue);
-	if (!Result)
-		return false;
-
-	*pValue = ResultValue;
-	return true;
-}
-
-bool
 COperatorMgr::CheckCastKind (
 	CType* pSrcType,
 	CType* pDstType
@@ -1871,6 +1920,24 @@ COperatorMgr::CheckCastKind (
 	}
 
 	return true;
+}
+
+bool
+COperatorMgr::CheckCastKind (
+	const CValue& SrcValue,
+	CType* pDstType
+	)
+{
+	CType* pSrcType = SrcValue.GetType ();
+	CClosure* pClosure = SrcValue.GetClosure ();
+	if (pClosure)
+	{
+		pSrcType = pClosure->GetClosureType (pSrcType);
+		if (!pSrcType)
+			return false;
+	}
+
+	return CheckCastKind (pSrcType, pDstType);
 }
 
 bool
@@ -1958,12 +2025,12 @@ COperatorMgr::StoreReferenceOperator (
 	if (pTargetType->GetTypeKind () == EType_Event)
 		return EventOperator (DstValue, RawSrcValue, EEventOp_SetHandler);
 
-	Result = CheckCastKind (RawSrcValue.GetType (), pTargetType);
-	if (!Result)
-		return false;
-
 	CValue SrcValue;
-	Result = CastOperator (RawSrcValue, pTargetType, &SrcValue);
+
+	Result = 
+		CheckCastKind (RawSrcValue, pTargetType) &&
+		CastOperator (RawSrcValue, pTargetType, &SrcValue);
+
 	if (!Result)
 		return false;
 
@@ -2049,15 +2116,15 @@ COperatorMgr::EventOperator (
 	CEventType* pEventType = (CEventType*) pTargetType;
 	ASSERT (pEventType->GetTypeKind () == EType_Event);
 
-	CValue PtrValue;
-	bool Result = PrepareReference (Event, EPrepareReferenceFlag_Store, &PtrValue);
+	CValue EventPtrValue;
+	bool Result = PrepareReference (Event, EPrepareReferenceFlag_Store, &EventPtrValue);
 	if (!Result)
 		return false;
 
 	if (RawHandler.GetValueKind () == EValue_Null)
 	{
 		if (OpKind == EEventOp_SetHandler)
-			m_pModule->m_LlvmBuilder.CreateStore (pEventType->GetZeroValue (), PtrValue, IsVolatile);
+			m_pModule->m_LlvmBuilder.CreateStore (pEventType->GetZeroValue (), EventPtrValue, IsVolatile);
 
 		// else ignore += null or -= null;
 		return true;
@@ -2069,30 +2136,21 @@ COperatorMgr::EventOperator (
 		return false;
 
 	CValue FunctionPtr;
-	CValue CallConv;
 	CValue InterfacePtr;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 0, NULL, &FunctionPtr);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 1, NULL, &CallConv);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 2, NULL, &InterfacePtr);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (Handler, 1, NULL, &InterfacePtr);
 	m_pModule->m_LlvmBuilder.CreateBitCast (FunctionPtr, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &FunctionPtr);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u), &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateBitCast (EventPtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u), &EventPtrValue);
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_EventOperator);
 
-	CValue ArgArray [] = 
-	{
-		PtrValue,
-		FunctionPtr,
-		CallConv,
-		InterfacePtr,
-		CValue (OpKind, EType_Int)
-	};
-
-	m_pModule->m_LlvmBuilder.CreateCall (
+	m_pModule->m_LlvmBuilder.CreateCall4 (
 		pFunction,
 		pFunction->GetType (),
-		ArgArray, 
-		countof (ArgArray),
+		EventPtrValue,
+		FunctionPtr,
+		InterfacePtr,
+		CValue (OpKind, EType_Int),
 		NULL
 		);
 	
@@ -2207,7 +2265,6 @@ COperatorMgr::GetPropertyOperator (
 	{
 		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
 			FunctionValue, 
-			pFunction->GetType ()->GetCallingConvention (),
 			InterfaceValue,
 			pFunction->GetType ()->GetFunctionPointerType (),
 			&FunctionValue
@@ -2288,7 +2345,6 @@ COperatorMgr::SetPropertyOperator (
 	{
 		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
 			FunctionValue, 
-			pFunction->GetType ()->GetCallingConvention (),
 			InterfaceValue,
 			pFunction->GetType ()->GetFunctionPointerType (),
 			&FunctionValue

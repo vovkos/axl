@@ -9,6 +9,7 @@
 #include "axl_jnc_BasicBlock.h"
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
+#include "axl_jnc_Closure.h"
 #include "axl_llk_Ast.h"
 
 namespace axl {
@@ -88,6 +89,7 @@ protected:
 	friend class CVTableType;
 	friend class CPropertyType;
 	friend class CParser;
+	friend class CCast_fn;
 
 	EFunction m_FunctionKind;
 	EPropertyAccessor m_PropertyAccessorKind;

@@ -31,6 +31,7 @@ enum EStdType
 	EStdType_BytePtr,
 	EStdType_SafePtrValidator,
 	EStdType_ObjectHdr,
+	EStdType_AbstractInterfaceHdr,
 	EStdType_AbstractInterfacePtr,
 	EStdType_SimpleFunction,
 	EStdType_SimpleFunctionPtr,
@@ -225,7 +226,7 @@ public:
 		);
 	
 	CFunctionType* 
-	CTypeMgr::GetFunctionType (	
+	GetFunctionType (	
 		ECallConv CallConv,
 		CType* pReturnType,
 		CType* const* ppArgType,
@@ -247,7 +248,7 @@ public:
 	}
 	
 	CFunctionType* 
-	CTypeMgr::GetFunctionType (	
+	GetFunctionType (	
 		CType* pReturnType,
 		CType* const* ppArgType,
 		size_t ArgCount,
@@ -257,6 +258,8 @@ public:
 		return GetFunctionType (ECallConv_Default, pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
 	}
 
+	CFunctionType* 
+	GetAbstractMethodType (CFunctionType* pType);
 
 	CPropertyType* 
 	CreatePropertyType ();
@@ -345,8 +348,8 @@ protected:
 	CStructType*
 	CreateObjectHdrType ();
 
-	CPointerType*
-	CreateAbstractInterfaceType ();
+	CStructType*
+	CreateAbstractInterfaceHdrType ();
 };
 
 //.............................................................................

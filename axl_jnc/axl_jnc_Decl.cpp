@@ -216,7 +216,10 @@ CDeclarator::GetType_s (CTypeSpecifierModifiers* pTypeSpecifier)
 }
 
 CType*
-CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
+CDeclarator::GetType (
+	CTypeSpecifierModifiers* pTypeSpecifier,
+	int* pFunctionModifiers
+	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
@@ -228,10 +231,14 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 		pTypeSpecifier = &VoidTypeSpecifier;
 	}
 
+	// we need to postpone applying function modifiers until after processing decl suffixes
+
+	int FunctionModifiers = pTypeSpecifier->GetTypeModifiers () & ETypeModifier_FunctionMask;
+
 	CType* pType = GetType_s (pTypeSpecifier);
 	if (!pType)
 		return NULL;
-
+		
 	rtl::CIteratorT <CDeclPointer> Pointer = m_PointerList.GetHead ();
 	for (; Pointer; Pointer++)
 	{
@@ -241,6 +248,25 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 			return NULL;
 
 		int Modifiers = Pointer->GetTypeModifiers ();
+		
+		if (Modifiers & ETypeModifier_FunctionMask)
+		{
+			if (!FunctionModifiers)
+			{
+				FunctionModifiers = Modifiers & ~ETypeModifier_FunctionMask;
+				Modifiers &= ~ETypeModifier_FunctionMask;
+			}
+			else
+			{
+				ETypeModifier FirstModifier = GetFirstTypeModifier (FunctionModifiers);
+				err::SetFormatStringError (
+					_T("type modifier '%s' can only be applied to function type"),
+					GetTypeModifierString (FirstModifier)					
+					);
+				return NULL;
+			}
+		}
+
 		if (Modifiers)
 		{
 			pType = pType->GetModifiedType (Modifiers);
@@ -287,13 +313,15 @@ CDeclarator::GetType (CTypeSpecifierModifiers* pTypeSpecifier)
 		}
 	}
 
-	int FunctionModifiers = pTypeSpecifier->GetTypeModifiers () & ETypeModifier_FunctionMask;
 	if (FunctionModifiers)
 	{
 		pType = pType->GetModifiedType (FunctionModifiers);
 		if (!pType)
 			return NULL;
 	}
+
+	if (pFunctionModifiers)
+		*pFunctionModifiers = FunctionModifiers;
 
 	return pType;
 }

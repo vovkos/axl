@@ -9,63 +9,38 @@
 namespace axl {
 namespace jnc {
 
+class CFunctionType;
+class CFunctionPointerType;
+class CPropertyType;
+class CPropertyPointerType;
+
 //.............................................................................
 
-enum EClosureArgFlag
+enum EClosure
 {
-	EClosureArgFlag_WeakToStrong           = 1,
-	EClosureArgFlag_WeakToStrongFailIfNull = 2,
+	EClosure_Function,
+	EClosure_Property,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CClosureArg: public rtl::TListLink
-{
-protected:
-	friend class CClosure;
-
-	size_t m_ArgIdx;
-	CValue m_Value;
-	int m_Flags;
-
-public:
-	CClosureArg ()
-	{
-		m_ArgIdx = -1;
-		m_Flags = 0;
-	}
-
-	size_t
-	GetArgIdx ()
-	{
-		return m_ArgIdx;
-	}
-
-	CValue
-	GetValue ()
-	{
-		return m_Value;
-	}
-
-	int
-	GetFlags ()
-	{
-		return m_Flags;
-	}
-};
+const tchar_t* 
+GetClosureKindString (EClosure ClosureKind);
 
 //.............................................................................
 
 class CClosure: public ref::IRefCount
 {
 protected:
-	rtl::CStdListT <CClosureArg> m_ArgList;
+	friend class CValue;
+
+	EClosure m_ClosureKind;
+	rtl::CBoxListT <CValue> m_ArgList;
 
 public:
-	void
-	Clear ()
+	CClosure ()
 	{
-		m_ArgList.Clear ();
+		m_ClosureKind = EClosure_Function;
 	}
 
 	bool 
@@ -74,27 +49,41 @@ public:
 		return m_ArgList.IsEmpty ();
 	}
 
-	size_t
-	GetArgCount ()
+	bool
+	IsClassMemberClosure (CValue* pIfaceValue);
+
+	bool
+	IsSimpleClassMemberClosure (CValue* pIfaceValue)
 	{
-		return m_ArgList.GetCount ();
+		return m_ArgList.GetCount () == 1 && IsClassMemberClosure (pIfaceValue);
 	}
 
-	rtl::CIteratorT <CClosureArg>
-	GetFirstArg ()
+	EClosure
+	GetClosureKind ()
 	{
-		return m_ArgList.GetHead ();
+		return m_ClosureKind;
 	}
 
-	CClosureArg*
-	CreateArg (
-		size_t ArgIdx,
-		const CValue&  Value,
-		int Flags = 0
-		);
+	rtl::CBoxListT <CValue>*
+	GetArgList ()
+	{
+		return &m_ArgList;
+	}
+
+	void
+	CombineClosure (rtl::CBoxListT <CValue>* pArgList);
 
 	bool
 	Apply (rtl::CBoxListT <CValue>* pArgList);
+
+	CType*
+	GetClosureType (CType* pType);
+
+	CFunctionType*
+	GetFunctionClosureType (CFunctionType* pType);
+
+	CPropertyType*
+	GetPropertyClosureType (CPropertyType* pType);
 };
 
 //.............................................................................

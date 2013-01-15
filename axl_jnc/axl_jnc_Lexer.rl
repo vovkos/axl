@@ -120,6 +120,7 @@ main := |*
 'autoev'       { CreateToken (EToken_AutoEv); };
 'onchange'     { CreateToken (EToken_OnChange); };
 'snapshot'     { CreateToken (EToken_Snapshot); };
+'closure'      { CreateToken (EToken_Closure); };
 
 'if'           { CreateToken (EToken_If); };
 'else'         { CreateToken (EToken_Else); };

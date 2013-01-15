@@ -13,6 +13,8 @@ class CTypeMgr;
 class CDerivedType;
 class CPointerType;
 class CArrayType;
+class CFunctionType;
+class CPropertyType;
 class CValue;
 
 typedef CDerivedType CQualifierType;
@@ -123,7 +125,7 @@ enum EType
 	EType_QWord    = EType_Int64_u,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 enum ETypeQualifier
 {
@@ -137,6 +139,11 @@ enum ETypeQualifier
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+const tchar_t*
+GetTypeQualifierString (ETypeQualifier Qualifier);
+
+//.............................................................................
+
 enum ETypeFlag
 {
 	ETypeFlag_IsPod          = 0x0100, // plain-old-data
@@ -145,45 +152,56 @@ enum ETypeFlag
 	ETypeFlag_IsLayoutCalc   = 0x0800,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 enum ETypeModifier
 {
-	ETypeModifier_Const         = 0x000001,
-	ETypeModifier_Volatile      = 0x000002,
-	ETypeModifier_QualifierMask = 0x000003,
+	ETypeModifier_Const         = 0x00000001,
+	ETypeModifier_Volatile      = 0x00000002,
+	ETypeModifier_QualifierMask = 0x00000003,
 	
-	ETypeModifier_Signed        = 0x000010,
-	ETypeModifier_Unsigned      = 0x000020,
-	ETypeModifier_BigEndian     = 0x000040,
-	ETypeModifier_LittleEndian  = 0x000080,
-	ETypeModifier_IntegerMask   = 0x0000f0,
+	ETypeModifier_Signed        = 0x00000010,
+	ETypeModifier_Unsigned      = 0x00000020,
+	ETypeModifier_BigEndian     = 0x00000040,
+	ETypeModifier_LittleEndian  = 0x00000080,
+	ETypeModifier_IntegerMask   = 0x000000f0,
 
-	ETypeModifier_Safe          = 0x000100,
-	ETypeModifier_Unsafe        = 0x000200,	
-	ETypeModifier_NoNull        = 0x000400,	
-	ETypeModifier_PointerMask   = 0x000700,	
+	ETypeModifier_Safe          = 0x00000100,
+	ETypeModifier_Unsafe        = 0x00000200,	
+	ETypeModifier_NoNull        = 0x00000400,	
+	ETypeModifier_PointerMask   = 0x00000700,	
 
-	ETypeModifier_Cdecl         = 0x001000,
-	ETypeModifier_Stdcall       = 0x002000,
-	ETypeModifier_Virtual       = 0x004000,
-	ETypeModifier_NoVirtual     = 0x008000,
-	ETypeModifier_Event         = 0x010000,
-	ETypeModifier_FunctionMask  = 0x01f000,	
+	ETypeModifier_Cdecl         = 0x00001000,
+	ETypeModifier_Stdcall       = 0x00002000,
+	ETypeModifier_Virtual       = 0x00004000,
+	ETypeModifier_NoVirtual     = 0x00008000,
+	ETypeModifier_Event         = 0x00010000,
+	ETypeModifier_FunctionMask  = 0x0001f000,	
 
-	ETypeModifier_Property      = 0x100000,
-	ETypeModifier_Bindable      = 0x200000,
-	ETypeModifier_PropertyMask  = 0x300000,	
+	ETypeModifier_Property      = 0x00100000,
+	ETypeModifier_Bindable      = 0x00200000,
+	ETypeModifier_PropertyMask  = 0x00300000,	
 
-	ETypeModifier_Strong        = 0x400000,
-	ETypeModifier_Weak          = 0x800000,	
-	ETypeModifier_InterfaceMask = 0xc00000,	
+	ETypeModifier_Strong        = 0x00400000,
+	ETypeModifier_Weak          = 0x00800000,	
+	ETypeModifier_InterfaceMask = 0x00c00000,	
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+ETypeModifier
+GetFirstTypeModifier (int Modifiers)
+{
+	return (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers));
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const tchar_t*
 GetTypeModifierString (ETypeModifier Modifier);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 EType
 GetInt32TypeKind (int32_t Integer);
@@ -379,6 +397,12 @@ public:
 
 	CArrayType* 
 	GetArrayType (size_t ElementCount);
+
+	CFunctionType* 
+	GetFunctionType ();
+
+	CPropertyType* 
+	GetPropertyType ();
 
 	CType* 
 	GetModifiedType (int Modifiers);

@@ -68,11 +68,12 @@ public:
 	ConstCast (
 		const CValue& SrcValue,
 		const CValue& DstValue
-		) = 0;
+		);
 
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -80,6 +81,7 @@ public:
 
 	bool
 	Cast (
+		EAlloc AllocKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -125,6 +127,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -161,6 +164,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -186,14 +190,8 @@ public:
 
 	virtual
 	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -219,14 +217,8 @@ public:
 
 	virtual
 	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -263,6 +255,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -297,6 +290,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -331,6 +325,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -365,6 +360,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -405,6 +401,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -443,6 +440,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -459,6 +457,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -473,6 +472,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -487,6 +487,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -891,6 +892,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -926,6 +928,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -1010,6 +1013,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -1075,6 +1079,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -1096,68 +1101,6 @@ protected:
 		intptr_t Offset,
 		rtl::CArrayT <size_t>* pLlvmIndexArray,
 		CPointerType* pPointerType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
-class CCast_fn: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_fn, ICastOperator)
-
-public:
-	virtual
-	ECast
-	GetCastKind (
-		CType* pSrcType,
-		CType* pDstType
-		);
-
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
-class CCast_prop: public ICastOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_prop, ICastOperator)
-
-public:
-	virtual
-	ECast
-	GetCastKind (
-		CType* pSrcType,
-		CType* pDstType
-		);
-
-	virtual
-	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
-	LlvmCast (
-		const CValue& Value,
-		CType* pType,
 		CValue* pResultValue
 		);
 };
@@ -1189,6 +1132,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -1222,6 +1166,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue
@@ -1230,7 +1175,95 @@ public:
 
 //.............................................................................
 
-// arr -> safe / unsafe ptr
+// safe / unsafe fn pointer -> safe fn pointer
+
+class CCast_fn: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_fn, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EAlloc AllocKind,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+protected:
+	// case 1: no conversion required, no closure object needs to be created
+
+	bool
+	LlvmCast_case1 (
+		const CValue& PfnValue,
+		const CValue& IfaceValue,
+		CFunctionType* pSrcFunctionType,
+		CFunctionPointerType* pFunctionPtrType,
+		CValue* pResultValue
+		);
+
+	// case 2: conversion is required, but no closure object needs to be created
+
+	bool
+	LlvmCast_case2 (
+		CFunction* pFunction,
+		const CValue& IfaceValue,
+		CFunctionPointerType* pFunctionPtrType,
+		CValue* pResultValue
+		);
+
+	// case 3: closure object needs to be created (so conversion is required even if function signatures match)
+
+	bool
+	LlvmCast_case3 (
+		EAlloc AllocKind,
+		const CValue& PfnValue,
+		CClosure* pClosure,
+		CFunctionType* pSrcFunctionType,
+		CFunctionPointerType* pFunctionPtrType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// property / property pointer / variable reference -> property pointer
+
+class CCast_prop: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_prop, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		CType* pSrcType,
+		CType* pDstType
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EAlloc AllocKind,
+		const CValue& Value,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+// iface / class -> iface / class
 
 class CCast_class: public ICastOperator
 {
@@ -1247,14 +1280,8 @@ public:
 
 	virtual
 	bool
-	ConstCast (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	virtual
-	bool
 	LlvmCast (
+		EAlloc AllocKind,
 		const CValue& Value,
 		CType* pType,
 		CValue* pResultValue

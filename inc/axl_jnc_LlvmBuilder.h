@@ -1149,9 +1149,8 @@ public:
 
 	bool
 	CreateFunctionPointer (
-		const CValue& PtrValue,
-		ECallConv CallingConvention,
-		const CValue& InterfaceValue,
+		const CValue& PfnValue,
+		const CValue& IfaceValue,
 		CFunctionPointerType* pResultType,
 		CValue* pResultValue
 		);

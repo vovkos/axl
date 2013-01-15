@@ -326,7 +326,10 @@ public:
 	GetType_s (CTypeSpecifierModifiers* pTypeSpecifier);
 
 	CType*
-	GetType (CTypeSpecifierModifiers* pTypeSpecifier);
+	GetType (
+		CTypeSpecifierModifiers* pTypeSpecifier,
+		int* pFunctionModifiers = NULL
+		);
 
 	rtl::CStdListT <CFunctionFormalArg>*
 	GetArgList ();

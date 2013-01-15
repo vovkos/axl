@@ -23,6 +23,9 @@ class COperatorMgr
 {
 protected:
 	friend class CModule;
+	friend class CFunctionMgr;
+	friend class CCast_fn;
+
 	CModule* m_pModule;
 
 	// unary operators
@@ -206,6 +209,18 @@ public:
 		CType* pDstType
 		);
 
+	ECast
+	GetCastKind (
+		const CValue& SrcValue,
+		CType* pDstType
+		);
+
+	bool
+	CheckCastKind (
+		const CValue& SrcValue,
+		CType* pDstType
+		);
+
 	bool
 	CheckCastKind (
 		CType* pSrcType,
@@ -213,13 +228,26 @@ public:
 		);
 
 	ECast
-	GetCallCastKind (
-		CFunctionType* pType,
-		rtl::CBoxListT <CValue>* pArgList
+	GetArgCastKind (
+		CFunctionType* pFunctionType,
+		const rtl::CArrayT <CType*>& ArgTypeArray
+		);
+
+	ECast
+	GetArgCastKind (
+		CFunctionType* pFunctionType,
+		const rtl::CBoxListT <CValue>* pArgList
+		);
+
+	ECast
+	GetFunctionCastKind (
+		CFunctionType* pSrcType,
+		CFunctionType* pDstType
 		);
 
 	bool
 	CastOperator (
+		EAlloc AllocKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -227,15 +255,36 @@ public:
 
 	bool
 	CastOperator (
-		CValue* pValue,
-		CType* pType
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
 		)
 	{
-		return CastOperator (*pValue, pType, pValue);
+		return CastOperator (EAlloc_Undefined, OpValue, pType, pResultValue);
 	}
 
 	bool
 	CastOperator (
+		EAlloc AllocKind,
+		CValue* pValue,
+		CType* pType
+		)
+	{
+		return CastOperator (AllocKind, *pValue, pType, pValue);
+	}
+
+	bool
+	CastOperator (
+		CValue* pValue,
+		CType* pType
+		)
+	{
+		return CastOperator (EAlloc_Undefined, *pValue, pType, pValue);
+	}
+
+	bool
+	CastOperator (
+		EAlloc AllocKind,
 		const CValue& OpValue,
 		EType TypeKind,
 		CValue* pResultValue
@@ -243,13 +292,33 @@ public:
 
 	bool
 	CastOperator (
+		const CValue& OpValue,
+		EType TypeKind,
+		CValue* pResultValue
+		)
+	{
+		return CastOperator (EAlloc_Undefined, OpValue, TypeKind, pResultValue);
+	}
+
+	bool
+	CastOperator (
+		EAlloc AllocKind,
 		CValue* pValue,
 		EType TypeKind
 		)
 	{
-		return CastOperator (*pValue, TypeKind, pValue);
+		return CastOperator (AllocKind, *pValue, TypeKind, pValue);
 	}
-	
+
+	bool
+	CastOperator (
+		CValue* pValue,
+		EType TypeKind
+		)
+	{
+		return CastOperator (EAlloc_Undefined, *pValue, TypeKind, pValue);
+	}
+
 	bool
 	MoveOperator (
 		const CValue& SrcValue,
@@ -282,6 +351,18 @@ public:
 		CType* pType,
 		CValue* pResultValue
 		);
+
+	bool
+	NewOperator (
+		EAlloc AllocKind,
+		CType* pType,
+		CValue* pResultValue
+		)
+	{
+		return AllocKind == EAlloc_Stack ? 
+			StackNewOperator (pType, pResultValue) :
+			HeapNewOperator (pType, pResultValue);
+	}
 
 	bool
 	MemberOperator (
@@ -375,7 +456,10 @@ public:
 		);
 
 	bool
-	LoadReferenceOperator (CValue* pValue);
+	LoadReferenceOperator (CValue* pValue)
+	{
+		return LoadReferenceOperator (*pValue, pValue);
+	}
 
 	bool
 	StoreReferenceOperator (
@@ -409,6 +493,34 @@ public:
 		CClosure* pClosure,
 		CValue* pResultValue
 		);
+
+	bool
+	GetClassFieldMemberValue (
+		const CValue& ObjValue,
+		CClassFieldMember* pMember,
+		CValue* pValue
+		);
+
+	bool
+	SetClassFieldMemberValue (
+		const CValue& ObjValue,
+		CClassFieldMember* pMember,
+		const CValue& Value
+		);
+
+	// funcion pointer to unsafe pfn + closure
+
+	bool
+	NormalizeFunctionPointer (
+		const CValue& Value,
+		CValue* pResultValue
+		);
+
+	bool
+	NormalizeFunctionPointer (CValue* pValue)
+	{
+		return NormalizeFunctionPointer (*pValue, pValue);
+	}
 
 	bool
 	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
@@ -512,7 +624,7 @@ protected:
 
 	bool
 	CallImpl (
-		const CValue& OpValue,
+		const CValue& PfnValue,
 		CFunctionType* pFunctionType,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
@@ -536,6 +648,12 @@ protected:
 		CFunctionType* pFunctionType,
 		rtl::CBoxListT <CValue>* pArgList,
 		rtl::CArrayT <CValue>* pArgArray
+		);
+
+	CType*
+	GetVarArgType (
+		CType* pType,
+		bool IsUnsafeVarArg
 		);
 };
 

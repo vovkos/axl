@@ -21,14 +21,24 @@ foo (
 
 //.............................................................................
 
-typedef FFoo (int, int);
+typedef void cdecl FFoo (int, int, int, int);
+
+typedef FBar (int, int);
 
 int
 main ()
 {
 	printf ("hui\n");
 
-	foo ~(, 2,, 4) (1, 3);
+	FFoo pfnFoo = foo;
+	pfnFoo (1, 2, 3, 4);
+
+	FBar pfnBar = (stack FBar) pfnFoo ~(10, 20);
+	pfnBar (30, 40);
+
+//	FBar pfnBar = (stack FBar) foo ~(,, 30, 40);
+//	pfnBar (10, 20);
+
 
 	printf ("i muravei\n");
 	return 0;

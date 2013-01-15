@@ -86,6 +86,31 @@ GetLlvmTypeString (llvm::Type* pLlvmType)
 //.............................................................................
 
 const tchar_t*
+GetTypeQualifierString (ETypeQualifier Qualifier)
+{
+	switch (Qualifier)
+	{
+	case ETypeQualifier_Const:
+		return _T("const");
+
+	case ETypeQualifier_Volatile:
+		return _T("volatile");
+
+	case ETypeQualifier_NoNull:
+		return _T("nonull");
+
+	case ETypeQualifier_Weak:
+		return _T("weak");
+
+	default:
+		return _T("undefined-type-qualifier");
+	};
+}
+
+//.............................................................................
+
+
+const tchar_t*
 GetTypeModifierString (ETypeModifier Modifier)
 {
 	switch (Modifier)
@@ -116,6 +141,21 @@ GetTypeModifierString (ETypeModifier Modifier)
 		
 	case ETypeModifier_NoNull:
 		return _T("nonull");
+
+	case ETypeModifier_Cdecl:
+		return _T("cdecl");
+
+	case ETypeModifier_Stdcall:
+		return _T("stdcall");
+
+	case ETypeModifier_Virtual:
+		return _T("virtual");
+
+	case ETypeModifier_NoVirtual:
+		return _T("novirtual");
+
+	case ETypeModifier_Event:
+		return _T("event");
 
 	case ETypeModifier_Strong:
 		return _T("strong");
@@ -377,14 +417,11 @@ CType::GetTypeString ()
 	case EType_Qualifier:
 		m_TypeString = ((CQualifierType*) this)->GetBaseType ()->GetTypeString ();
 
-		if (m_Flags & ETypeQualifier_Const)
-			m_TypeString.Append (_T(" const"));
-
-		if (m_Flags & ETypeQualifier_Volatile)
-			m_TypeString.Append (_T(" volatile"));
-
-		if (m_Flags & ETypeQualifier_NoNull)
-			m_TypeString.Append (_T(" nonull"));
+		for (size_t i = 1; i <= ETypeQualifier__Mask; i <<= 1)
+		{
+			m_TypeString.Append (_T(' '));
+			m_TypeString.Append (GetTypeQualifierString ((ETypeQualifier) i));
+		}
 
 		break;
 
@@ -409,11 +446,11 @@ CType::GetTypeString ()
 		break;
 
 	case EType_Enum:
-		m_TypeString.Format (_T("enum %s"), ((CNamedType*) this)->GetQualifiedName ());
+		m_TypeString.Format (_T("enum %s"), ((CNamedType*) this)->GetTag ());
 		break;
 
 	case EType_Enum_c:
-		m_TypeString.Format (_T("enumc %s"), ((CNamedType*) this)->GetQualifiedName ());
+		m_TypeString.Format (_T("enumc %s"), ((CNamedType*) this)->GetTag ());
 		break;
 
 	case EType_Array:
@@ -421,19 +458,19 @@ CType::GetTypeString ()
 		break;
 
 	case EType_Struct:
-		m_TypeString.Format (_T("struct %s"), ((CNamedType*) this)->GetQualifiedName ());
+		m_TypeString.Format (_T("struct %s"), ((CNamedType*) this)->GetTag ());
 		break;
 
 	case EType_Union:
-		m_TypeString.Format (_T("union %s"), ((CNamedType*) this)->GetQualifiedName ());
+		m_TypeString.Format (_T("union %s"), ((CNamedType*) this)->GetTag ());
 		break;
 
 	case EType_Interface:
-		m_TypeString.Format (_T("interface %s"), ((CNamedType*) this)->GetQualifiedName ());
+		m_TypeString.Format (_T("interface %s"), ((CNamedType*) this)->GetTag ());
 		break;
 
 	case EType_Class:
-		m_TypeString.Format (_T("class %s"), ((CNamedType*) this)->GetQualifiedName ());
+		m_TypeString.Format (_T("class %s"), ((CNamedType*) this)->GetTag ());
 		break;
 
 	case EType_Function:
@@ -445,7 +482,7 @@ CType::GetTypeString ()
 		break;
 
 	case EType_FunctionPointer:
-		m_TypeString = ((CFunctionPointerType*) this)->GetFunctionType ()->CreateTypeString ();
+		m_TypeString.Format (_T("%s.pfn"), ((CFunctionPointerType*) this)->GetShortFunctionType ()->CreateTypeString ());
 		break;
 
 	case EType_Property:
@@ -517,6 +554,38 @@ CArrayType*
 CType::GetArrayType (size_t ElementCount)
 {
 	return m_pModule->m_TypeMgr.GetArrayType (this, ElementCount);
+}
+
+CFunctionType* 
+CType::GetFunctionType ()
+{
+	switch (m_TypeKind)
+	{
+	case EType_Function:
+		return (CFunctionType*) this;
+
+	case EType_FunctionPointer:
+		return ((CFunctionPointerType*) this)->GetShortFunctionType ();
+	
+	default:
+		return IsUnsafeFunctionPointerType () ? (CFunctionType*) ((CPointerType*) this)->GetBaseType () : NULL;
+	}
+}
+
+CPropertyType* 
+CType::GetPropertyType ()
+{
+	switch (m_TypeKind)
+	{
+	case EType_Property:
+		return (CPropertyType*) this;
+
+	case EType_PropertyPointer:
+		return ((CPropertyPointerType*) this)->GetPropertyType ();
+
+	default:
+		return NULL;
+	}
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -680,7 +749,7 @@ CType::ApplyQualifierModifiers (int Modifiers)
 CType* 
 CType::ApplyIntegerModifiers (int Modifiers)
 {
-	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_IntegerMask));
+	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_IntegerMask);
 	if (!VerifyModifierTypeKind (FirstModifier, IsIntegerType (), _T("integer type")))
 		return NULL;
 
@@ -726,7 +795,7 @@ CType::ApplyIntegerModifiers (int Modifiers)
 CType* 
 CType::ApplyPointerModifiers (int Modifiers)
 {
-	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_PointerMask));
+	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_PointerMask);
 	if (!VerifyModifierTypeKind (FirstModifier, IsPointerType () || IsReferenceType (), _T("pointer or reference type")))
 		return NULL;
 
@@ -761,7 +830,7 @@ CType::ApplyPointerModifiers (int Modifiers)
 CType* 
 CType::ApplyFunctionModifiers (int Modifiers)
 {
-	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_FunctionMask));
+	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_FunctionMask);
 	if (!VerifyModifierTypeKind (FirstModifier, m_TypeKind == EType_Function, _T("function type")))
 		return NULL;
 
@@ -840,7 +909,7 @@ CType::ApplyPropertyModifiers (int Modifiers)
 CType* 
 CType::ApplyInterfaceModifiers (int Modifiers)
 {
-	ETypeModifier FirstModifier = (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers & ETypeModifier_InterfaceMask));
+	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_InterfaceMask);
 	if (!VerifyModifierTypeKind (FirstModifier, IsClassType (), _T("interface or class type")))
 		return NULL;
 

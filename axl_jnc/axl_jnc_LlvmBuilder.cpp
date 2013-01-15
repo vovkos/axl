@@ -569,21 +569,22 @@ CLlvmBuilder::InitializeObject (
 
 bool
 CLlvmBuilder::CreateFunctionPointer (
-	const CValue& PtrValue,
-	ECallConv CallingConvention,
-	const CValue& InterfaceValue,
+	const CValue& RawPfnValue,
+	const CValue& RawIfaceValue,
 	CFunctionPointerType* pResultType,
 	CValue* pResultValue
 	)
 {
 	CreateComment ("create function pointer");
 
-	CValue CallConvValue (CallingConvention, EType_Int_p);
-
+	CValue PfnValue;
+	CValue IfaceValue;
 	CValue FunctionPtrValue = pResultType->GetUndefValue ();
-	CreateInsertValue (FunctionPtrValue, PtrValue, 0, NULL, &FunctionPtrValue);
-	CreateInsertValue (FunctionPtrValue, CallConvValue, 1, NULL, &FunctionPtrValue);
-	CreateInsertValue (FunctionPtrValue, InterfaceValue, 2, pResultType, pResultValue);
+
+	CreateBitCast (RawPfnValue, pResultType->GetFunctionType ()->GetPointerType (EType_Pointer_u), &PfnValue);
+	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &IfaceValue);
+	CreateInsertValue (FunctionPtrValue, PfnValue, 0, NULL, &FunctionPtrValue);
+	CreateInsertValue (FunctionPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;
 }
 

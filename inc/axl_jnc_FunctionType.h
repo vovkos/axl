@@ -24,9 +24,10 @@ enum EFunctionTypeFlag
 
 enum ECallConv
 {
-	ECallConv_Default = 0,
-	ECallConv_Cdecl,
+	ECallConv_Cdecl = 0,
 	ECallConv_Stdcall,
+
+	ECallConv_Default = ECallConv_Cdecl,
 };
 
 const tchar_t*
@@ -56,6 +57,7 @@ protected:
 	rtl::CStringA m_ArgSignature;
 
 	CFunctionType* m_pDefCallConvFunctionType;
+	CFunctionType* m_pAbstractMethodType;
 	CFunctionPointerType* m_pFunctionPointerType;
 
 public:
@@ -93,6 +95,9 @@ public:
 
 	CFunctionType*
 	GetDefCallConvFunctionType ();
+
+	CFunctionType*
+	GetAbstractMethodType ();
 
 	CFunctionPointerType* 
 	GetFunctionPointerType ();

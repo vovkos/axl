@@ -12,9 +12,6 @@ GetCallingConventionString (ECallConv CallingConvention)
 {
 	switch (CallingConvention)
 	{	
-	case ECallConv_Default:
-		return _T("default-calling-convention");
-
 	case ECallConv_Cdecl:
 		return _T("cdecl");
 
@@ -33,6 +30,7 @@ CFunctionType::CFunctionType ()
 	m_TypeKind = EType_Function;
 	m_pReturnType = NULL;
 	m_pDefCallConvFunctionType = NULL;
+	m_pAbstractMethodType = NULL;
 	m_pFunctionPointerType = NULL;
 	m_CallingConvention = ECallConv_Default;
 }
@@ -197,6 +195,12 @@ CFunctionPointerType*
 CFunctionType::GetFunctionPointerType ()
 {
 	return m_pModule->m_TypeMgr.GetFunctionPointerType (this);
+}
+
+CFunctionType*
+CFunctionType::GetAbstractMethodType ()
+{
+	return m_pModule->m_TypeMgr.GetAbstractMethodType (this);
 }
 
 CEventType* 

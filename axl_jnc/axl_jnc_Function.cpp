@@ -132,15 +132,14 @@ CFunctionOverload::ChooseOverload (rtl::CBoxListT <CValue>* pArgList) const
 
 	CModule* pModule = m_pFunction->GetType ()->GetModule ();
 
-	ECast BestCastKind = pModule->m_OperatorMgr.GetCallCastKind (m_pFunction->GetType (), pArgList);
+	ECast BestCastKind = pModule->m_OperatorMgr.GetArgCastKind (m_pFunction->GetType (), pArgList);
 	CFunction* pBestFunction = BestCastKind ? m_pFunction : NULL;
 
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunction* pFunction = m_OverloadArray [i];
-		ECast CastKind = pModule->m_OperatorMgr.GetCallCastKind (pFunction->GetType (), pArgList);
-
+		ECast CastKind = pModule->m_OperatorMgr.GetArgCastKind (pFunction->GetType (), pArgList);
 		if (!CastKind)
 			continue;
 

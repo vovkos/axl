@@ -112,8 +112,12 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateObjectHdrType ();
 		break;
 
+	case EStdType_AbstractInterfaceHdr:
+		pType = CreateAbstractInterfaceHdrType ();
+		break;
+
 	case EStdType_AbstractInterfacePtr:
-		pType = CreateAbstractInterfaceType ();
+		pType = GetStdType (EStdType_AbstractInterfaceHdr)->GetPointerType (EType_Pointer_u);
 		break;
 
 	case EStdType_SimpleFunction:
@@ -162,17 +166,16 @@ CTypeMgr::CreateObjectHdrType ()
 	return pType;
 }
 
-CPointerType*
-CTypeMgr::CreateAbstractInterfaceType ()
+CStructType*
+CTypeMgr::CreateAbstractInterfaceHdrType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("ifacehdr");
 	pType->CreateMember (GetStdType (EStdType_BytePtr)->GetPointerType (EType_Pointer_u));   // void** m_pVTable;
 	pType->CreateMember (GetStdType (EStdType_ObjectHdr)->GetPointerType (EType_Pointer_u)); // TObjectHdr* m_pObjectHdr;
 	bool Result = pType->CalcLayout ();
-	ASSERT (Result);
-	
-	return pType->GetPointerType (EType_Pointer_u);
+	ASSERT (Result);	
+	return pType;
 }
 
 bool
@@ -377,7 +380,8 @@ CTypeMgr::GetFunctionPointerType (CFunctionType* pFunctionType)
 	CFunctionPointerType* pType = AXL_MEM_NEW (CFunctionPointerType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
-	pType->m_pFunctionType = pFunctionType;
+	pType->m_pShortFunctionType = pFunctionType;
+	pType->m_pFunctionType = GetAbstractMethodType (pFunctionType);
 
 	m_FunctionPointerTypeList.InsertTail (pType);
 	It->m_Value = pType;
@@ -697,9 +701,27 @@ CTypeMgr::GetFunctionType (
 		pType->m_pDefCallConvFunctionType = pType;
 
 	m_FunctionTypeList.InsertTail (pType);
-	It->m_Value = pType;
-	
+	It->m_Value = pType;	
 	return pType;
+}
+
+CFunctionType* 
+CTypeMgr::GetAbstractMethodType (CFunctionType* pType)
+{
+	if (pType->m_pAbstractMethodType)
+		return pType->m_pAbstractMethodType;
+
+	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, GetStdType (EStdType_AbstractInterfacePtr));
+	
+	CFunctionType* pAbstractMethodType = GetFunctionType (
+		pType->m_pReturnType,
+		ArgTypeArray,
+		pType->m_Flags
+		);
+
+	pType->m_pAbstractMethodType = pAbstractMethodType;
+	return pAbstractMethodType;
 }
 
 CPropertyType* 

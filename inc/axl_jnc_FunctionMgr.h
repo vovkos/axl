@@ -68,7 +68,6 @@ enum EStdFunc
 	// jnc.EventOperator (
 	//		jnc.event* pEvent,
 	//		void* pfn,
-	//		int CallConv,
 	//		jnc.iface* pIface,
 	//		int OpKind
 	//		);
@@ -92,15 +91,32 @@ protected:
 	friend class CClassType;
 	friend class CParser;
 
+protected:
+	class CThunk: public rtl::TListLink
+	{
+	public:
+		rtl::CString m_Signature;
+		CFunction* m_pTargetFunction;
+		CFunctionType* m_pTargetFunctionType;
+		CFunctionPointerType* m_pFunctionPtrType;
+		CClassType* m_pClosureType;
+		rtl::CArrayT <size_t> m_ClosureMap;
+
+		CFunction* m_pThunkFunction;
+
+		CThunk ();
+	};
+
+protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
-	
 	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
+	rtl::CStringHashTableMapAT <CThunk*> m_ThunkMap;
+	rtl::CStdListT <CThunk> m_ThunkList;
 
 	CFunction* m_pCurrentFunction;
-
 	CFunction* m_StdFunctionArray [EStdFunc__Count];
 
 public:
@@ -134,7 +150,7 @@ public:
 	}
 
 	CFunction*
-	CreateAnonimousFunction (CFunctionType* pType);
+	CreateAnonymousFunction (CFunctionType* pType);
 
 	CFunction*
 	CreateFunction (
@@ -155,9 +171,6 @@ public:
 		const rtl::CString& Name,
 		CFunction* pFunction
 		);
-
-	bool
-	CompileGlobalAutoEv ();
 
 	bool
 	CompileFunctions ();
@@ -181,9 +194,40 @@ public:
 	CFunction*
 	CreateClassInitializer (CClassType* pType);
 
+	CFunction*
+	GetThunkFunction (
+		CFunctionType* pTargetFunctionType,
+		CFunction* pTargetFunction, // could be NULL
+		CClassType* pClosureType,   // could be NULL
+		const rtl::CArrayT <size_t>& ClosureMap,
+		CFunctionPointerType* pFunctionPtrType
+		);
+
+	CFunction*
+	GetThunkFunction (
+		CFunctionType* pTargetFunctionType,
+		CFunction* pTargetFunction, // could be NULL
+		CFunctionPointerType* pFunctionPtrType
+		)
+	{
+		return GetThunkFunction (
+			pTargetFunctionType, 
+			pTargetFunction, 
+			NULL, 
+			rtl::CArrayT <size_t> (), 
+			pFunctionPtrType
+			);
+	}
+
 protected:
 	bool
 	ResolveOrphanFunction (CFunction* pFunction);
+
+	bool
+	CompileDirectThunk (CThunk* pThunk);
+
+	bool
+	CompileClosureThunk (CThunk* pThunk);
 
 	CFunction*
 	CreateInternalFunction (

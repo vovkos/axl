@@ -33,6 +33,7 @@ ICastOperator::ICastOperator()
 
 bool
 ICastOperator::Cast (
+	EAlloc AllocKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -46,7 +47,23 @@ ICastOperator::Cast (
 			ConstCast (OpValue, *pResultValue);
 	}
 
-	return LlvmCast (OpValue, pType, pResultValue);
+	return LlvmCast (AllocKind, OpValue, pType, pResultValue);
+}
+
+bool
+ICastOperator::ConstCast (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	// fail by default; if const-cast is supported then override and implement
+
+	err::SetFormatStringError (
+		_T("cannot convert constant from '%s' to '%s'"),
+		SrcValue.GetType ()->GetTypeString (),
+		DstValue.GetType ()->GetTypeString ()
+		);
+	return false;
 }
 
 //.............................................................................
@@ -87,6 +104,7 @@ CSuperCast::ConstCast (
 
 bool
 CSuperCast::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -94,8 +112,8 @@ CSuperCast::LlvmCast (
 {
 	CValue TempValue;
 	return 
-		m_pFirst->LlvmCast (Value, m_pIntermediateType, &TempValue) &&
-		m_pSecond->LlvmCast (TempValue, pType, pResultValue);
+		m_pFirst->LlvmCast (AllocKind, Value, m_pIntermediateType, &TempValue) &&
+		m_pSecond->LlvmCast (AllocKind, TempValue, pType, pResultValue);
 }
 
 //.............................................................................
@@ -117,6 +135,7 @@ CCast_cpy::ConstCast (
 
 bool
 CCast_cpy::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -151,17 +170,8 @@ CCast_load::GetCastKind (
 }
 
 bool
-CCast_load::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("can't load constant reference"));
-	return false;
-}
-
-bool
 CCast_load::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -194,17 +204,8 @@ CCast_getp::GetCastKind (
 }
 
 bool
-CCast_getp::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("can't get constant property"));
-	return false;
-}
-
-bool
 CCast_getp::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -237,6 +238,7 @@ CCast_int_trunc::ConstCast (
 
 bool
 CCast_int_trunc::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -273,6 +275,7 @@ CCast_int_ext::ConstCast (
 
 bool
 CCast_int_ext::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -305,6 +308,7 @@ CCast_int_ext_u::ConstCast (
 
 bool
 CCast_int_ext_u::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -336,6 +340,7 @@ CCast_int_swp::ConstCast (
 
 bool
 CCast_int_swp::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -366,6 +371,7 @@ CCast_int_swp::LlvmCast (
 
 bool
 CCast_f64_f32::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -379,6 +385,7 @@ CCast_f64_f32::LlvmCast (
 
 bool
 CCast_f32_f64::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -392,6 +399,7 @@ CCast_f32_f64::LlvmCast (
 
 bool
 CCast_int_fp::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -405,6 +413,7 @@ CCast_int_fp::LlvmCast (
 
 bool
 CCast_uint_fp::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -418,6 +427,7 @@ CCast_uint_fp::LlvmCast (
 
 bool
 CCast_fp_int::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -455,6 +465,7 @@ CCast_num_bool::ConstCast (
 
 bool
 CCast_num_bool::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -499,6 +510,7 @@ CCast_getbf::ConstCast (
 
 bool
 CCast_getbf::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -544,6 +556,7 @@ CCast_setbf::ConstCast (
 
 bool
 CCast_setbf::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -655,6 +668,7 @@ CCast_ptr::ConstCast (
 
 bool
 CCast_ptr::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -753,240 +767,6 @@ CCast_ptr::LlvmCast_ptr_u (
 //.............................................................................
 
 ECast
-CCast_fn::GetCastKind (
-	CType* pSrcType,
-	CType* pDstType
-	)
-{
-	ASSERT (pSrcType->IsFunctionType () && pDstType->GetTypeKind () == EType_FunctionPointer);
-	return ECast_Lossy;
-}
-
-bool
-CCast_fn::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	err::SetFormatStringError (_T("CCast_fn::ConstCast is not implemented"));
-	return false;
-}
-
-bool
-CCast_fn::LlvmCast (
-	const CValue& RawValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	ASSERT (RawValue.GetType ()->IsFunctionType () && pType->GetTypeKind () == EType_FunctionPointer);
-
-	bool Result;
-
-	CValue Value = RawValue;
-
-	CType* pOpType = Value.GetType ();
-	if (!pOpType->IsUnsafeFunctionPointerType ())
-	{
-		SetCastError (Value.GetType (), pType);
-		return false;
-	}
-
-	CFunctionPointerType* pFunctionPointerType = (CFunctionPointerType*) pType;
-	CFunctionType* pSrcFunctionType = (CFunctionType*) ((CPointerType*) pOpType)->GetBaseType ();
-	CFunctionType* pDstFunctionType = pFunctionPointerType->GetFunctionType ();
-	
-	CClosure* pClosure = Value.GetClosure ();
-	if (!pClosure)
-	{
-		if (pDstFunctionType->Cmp (pSrcFunctionType->GetDefCallConvFunctionType ()) != 0)
-		{
-			SetCastError (pOpType, pType);
-			return false;
-		}
-	
-		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
-			Value,
-			pSrcFunctionType->GetCallingConvention (),
-			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue (),
-			pFunctionPointerType, 
-			pResultValue
-			);
-
-		return true;	
-	}
-
-	rtl::CIteratorT <CClosureArg> ClosureArg = pClosure->GetFirstArg ();
-	CValue ClosureArgValue = ClosureArg->GetValue ();
-
-	if (Value.GetValueKind () != EValue_Function ||
-		Value.GetFunction ()->GetFunctionKind () != EFunction_Method ||
-		ClosureArg->GetArgIdx () != 0 || 
-		!ClosureArgValue.GetType ()->IsClassType ())
-	{
-		err::SetFormatStringError (_T("complex closures are not supported yet"));
-		return false;
-	}
-
-	CFunction* pFunction = Value.GetFunction ();
-	Result = m_pModule->m_OperatorMgr.GetMethodFunction (pFunction, pClosure, &Value);
-	if (!Result)
-		return false;
-
-	rtl::CArrayT <CType*> ArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
-	if (ArgTypeArray.IsEmpty ())
-	{
-		SetCastError (Value.GetType (), pType);
-		return false;
-	}
-
-	Result = m_pModule->m_OperatorMgr.CastOperator (&ClosureArgValue, ArgTypeArray [0]);
-	if (!Result)
-		return false;
-
-	CValue PfnValue;
-	CValue IfaceValue;
-	CValue CallConvValue (pSrcFunctionType->GetCallingConvention (), EType_Int_p);
-	CValue FunctionPtrValue = pType->GetUndefValue ();
-
-	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pDstFunctionType->GetPointerType (EType_Pointer_u), &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (ClosureArgValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &IfaceValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, PfnValue, 0, NULL, &FunctionPtrValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, CallConvValue, 1, NULL, &FunctionPtrValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, IfaceValue, 2, pType, pResultValue);
-	return true;
-}
-
-//.............................................................................
-
-ECast
-CCast_prop::GetCastKind (
-	CType* pSrcType,
-	CType* pDstType
-	)
-{
-	ASSERT (pDstType->GetTypeKind () == EType_PropertyPointer);
-
-	return ECast_Lossy;
-}
-
-bool
-CCast_prop::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	ASSERT (DstValue.GetType ()->GetTypeKind () == EType_PropertyPointer);
-
-	err::SetFormatStringError (_T("CCast_prop::ConstCast is not implemented"));
-	return false;
-}
-
-bool
-CCast_prop::LlvmCast (
-	const CValue& RawValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	ASSERT (pType->GetTypeKind () == EType_PropertyPointer);
-	CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) pType;
-	CPropertyType* pDstPropertyType = pPropertyPointerType->GetPropertyType ();
-
-	CValue Value = RawValue;
-	if (Value.GetValueKind () != EValue_Property)
-	{
-		SetCastError (Value.GetType (), pType);
-		return false;
-	}
-
-	ASSERT (Value.GetType ()->GetTypeKind () == EType_Property);
-	CPropertyType* pSrcPropertyType = (CPropertyType*) Value.GetType ();
-
-	CClosure* pClosure = Value.GetClosure ();
-	if (!pClosure)
-	{
-		if (pDstPropertyType->CmpAccessorTypes (pSrcPropertyType) != 0)
-		{
-			SetCastError (pSrcPropertyType, pType);
-			return false;
-		}
-
-		m_pModule->m_LlvmBuilder.CreatePropertyPointer (
-			Value,
-			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue (),
-			pPropertyPointerType, 
-			pResultValue
-			);
-
-		return true;	
-	}
-
-	rtl::CIteratorT <CClosureArg> ClosureArg = pClosure->GetFirstArg ();
-	CValue ClosureArgValue = ClosureArg->GetValue ();
-
-	if (ClosureArg->GetArgIdx () != 0 || 
-		!ClosureArgValue.GetType ()->IsClassType ())
-	{
-		err::SetFormatStringError (_T("complex closures are not supported yet"));
-		return false;
-	}
-
-	if (pDstPropertyType->CmpShortAccessorTypes (pSrcPropertyType) != 0)
-	{
-		SetCastError (pSrcPropertyType, pType);
-		return false;
-	}
-
-	CFunction* pGetter = pSrcPropertyType->GetGetter ();
-	if (pGetter->GetFunctionKind () == EFunction_Method)
-	{
-		bool Result = m_pModule->m_OperatorMgr.GetMemberProperty (pSrcPropertyType, pClosure, &Value);
-		if (!Result)
-			return false;
-	}
-
-	CClassType* pClosureClassType = (CClassType*) ClosureArgValue.GetType ();
-	CClassType* pMethodClassType = pSrcPropertyType->GetParentClassType ();
-
-	CValue PtrValue;
-	CValue ScopeLevelValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 1, NULL, &ScopeLevelValue);
-
-	CClassBaseTypeCoord Coord;
-	pClosureClassType->FindBaseType (pMethodClassType, &Coord);
-	rtl::CArrayT <size_t> LlvmIndexArray = Coord.m_FieldCoord.m_LlvmIndexArray;
-
-	if (!LlvmIndexArray.IsEmpty ())
-	{
-		LlvmIndexArray.Insert (0, 0);
-	
-		m_pModule->m_LlvmBuilder.CreateGep (
-			PtrValue, 
-			LlvmIndexArray, 
-			LlvmIndexArray.GetCount (),
-			NULL, 
-			&PtrValue
-			);
-	}
-	
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-	
-	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetUndefValue ();
-	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, NULL, &InterfaceValue);
-
-	CValue PropertyPointerValue = pType->GetUndefValue ();
-	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pDstPropertyType->GetVTableStructType ()->GetPointerType (EType_Pointer_u), &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (PropertyPointerValue, PtrValue, 0, NULL, &PropertyPointerValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (PropertyPointerValue, InterfaceValue, 1, pType, pResultValue);
-	return true;
-}
-
-//.............................................................................
-
-ECast
 CCast_arr::GetCastKind (
 	CType* pSrcType,
 	CType* pDstType
@@ -1007,6 +787,7 @@ CCast_arr::ConstCast (
 
 bool
 CCast_arr::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -1072,6 +853,7 @@ CCast_arr_ptr::ConstCast (
 
 bool
 CCast_arr_ptr::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue
@@ -1112,6 +894,403 @@ CCast_arr_ptr::LlvmCast (
 //.............................................................................
 
 ECast
+CCast_fn::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	ASSERT (pSrcType->IsFunctionType () && pDstType->IsFunctionType ());
+
+	return 
+		pSrcType->GetTypeKind () == EType_FunctionPointer && pDstType->IsUnsafeFunctionPointerType () ? ECast_None :
+		ECast_Lossy;
+}
+
+bool
+CCast_fn::LlvmCast (
+	EAlloc AllocKind,
+	const CValue& RawOpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CValue OpValue = RawOpValue;
+	CType* pOpType = OpValue.GetType ();
+
+	ASSERT (pOpType->IsFunctionType () && pType->IsFunctionType ());
+
+	if (pType->IsUnsafeFunctionPointerType ())
+	{
+		if (!pOpType->IsUnsafeFunctionPointerType ())
+		{
+			err::SetFormatStringError (_T("safe function pointer cannot be cast to unsafe function pointer"));
+			return false;
+		}
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pType, pResultValue);
+		return true;
+	}
+
+	if (pOpType->GetTypeKind () == EType_FunctionPointer)
+	{
+		m_pModule->m_OperatorMgr.NormalizeFunctionPointer (&OpValue);
+		pOpType = OpValue.GetType ();
+	}
+
+	ASSERT (pOpType->IsUnsafeFunctionPointerType ());
+	ASSERT (pType->GetTypeKind () == EType_FunctionPointer);
+
+	CFunctionPointerType* pDstFunctionPtrType = (CFunctionPointerType*) pType;
+	CFunctionType* pSrcFunctionType = pOpType->GetFunctionType ();
+	CFunctionType* pSrcShortFunctionType = pSrcFunctionType;
+	CFunctionType* pDstShortFunctionType = pDstFunctionPtrType->GetShortFunctionType ();
+
+	CClosure* pClosure = OpValue.GetClosure ();
+	if (pClosure)
+		pSrcShortFunctionType = pClosure->GetFunctionClosureType (pSrcFunctionType);
+	
+	ECast CastKind = m_pModule->m_OperatorMgr.GetFunctionCastKind (
+		pSrcShortFunctionType,
+		pDstShortFunctionType
+		);
+
+	if (!CastKind)
+	{
+		SetCastError (pType, pType);
+		return false;
+	}
+
+	// case 1: no conversion required, no closure object needs to be created
+
+	CValue IfaceValue;
+
+	if (pSrcShortFunctionType->Cmp (pDstShortFunctionType) == 0 &&
+		pClosure && 
+		pClosure->IsSimpleClassMemberClosure (&IfaceValue))
+	{
+		return LlvmCast_case1 (
+			OpValue,
+			IfaceValue,
+			pSrcFunctionType,
+			pDstFunctionPtrType,
+			pResultValue
+			);
+	}
+
+	// case 2: conversion is required, but no closure object needs to be created
+
+	if (OpValue.GetValueKind () == EValue_Function)
+	{
+		CFunction* pFunction = OpValue.GetFunction ();
+
+		if (!pClosure) 			
+			return LlvmCast_case2 (
+				pFunction,
+				m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue (),
+				pDstFunctionPtrType,
+				pResultValue
+				);
+
+		if (pClosure->IsSimpleClassMemberClosure (&IfaceValue))
+			return LlvmCast_case2 (
+				pFunction,
+				IfaceValue,
+				pDstFunctionPtrType,
+				pResultValue
+				);
+	}
+
+	// case 3: closure object needs to be created (so conversion is required even if function signatures match)
+
+	// detach closure from OpValue
+
+	ref::CPtrT <CClosure> Closure = OpValue.GetClosure (); 
+	OpValue.SetClosure (NULL);
+
+	return LlvmCast_case3 (
+		AllocKind,
+		OpValue,
+		pClosure,
+		pSrcFunctionType,
+		pDstFunctionPtrType,
+		pResultValue
+		);
+}
+
+bool
+CCast_fn::LlvmCast_case1 (
+	const CValue& PfnValue,
+	const CValue& RawIfaceValue,
+	CFunctionType* pSrcFunctionType,
+	CFunctionPointerType* pFunctionPtrType,
+	CValue* pResultValue
+	)
+{
+	rtl::CArrayT <CType*> ArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
+	ASSERT (!ArgTypeArray.IsEmpty ());
+
+	CType* pIfaceArgType = ArgTypeArray [0];	
+	ASSERT (pIfaceArgType->IsClassType ());
+
+	CValue IfaceValue;
+	bool Result = m_pModule->m_OperatorMgr.CastOperator (IfaceValue, pIfaceArgType, &IfaceValue);
+	if (!Result)
+		return false;
+
+	m_pModule->m_LlvmBuilder.CreateFunctionPointer (PfnValue, IfaceValue, pFunctionPtrType, pResultValue);
+	return true;
+}
+
+bool
+CCast_fn::LlvmCast_case2 (
+	CFunction* pFunction,
+	const CValue& IfaceValue,
+	CFunctionPointerType* pFunctionPtrType,
+	CValue* pResultValue
+	)
+{
+	CFunction* pDstFunction = m_pModule->m_FunctionMgr.GetThunkFunction (
+		pFunction->GetType (), 
+		pFunction,
+		pFunctionPtrType
+		);
+
+	if (!pDstFunction)
+		return false;
+
+	m_pModule->m_LlvmBuilder.CreateFunctionPointer (pDstFunction, IfaceValue, pFunctionPtrType, pResultValue);
+	return true;
+}
+
+bool
+CCast_fn::LlvmCast_case3 (
+	EAlloc AllocKind,
+	const CValue& PfnValue,
+	CClosure* pClosure,
+	CFunctionType* pSrcFunctionType,
+	CFunctionPointerType* pFunctionPtrType,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	CClassType* pClosureType = m_pModule->m_TypeMgr.CreateUnnamedClassType (EType_Class);
+
+	CFunction* pFunction = NULL;
+	
+	if (PfnValue.GetValueKind () == EValue_Function)
+	{
+		pFunction = PfnValue.GetFunction ();
+	}
+	else 
+	{
+		ASSERT (PfnValue.GetType ()->IsUnsafeFunctionPointerType ());
+		pClosureType->CreateFieldMember (pSrcFunctionType->GetPointerType (EType_Pointer_u));
+	}
+
+	char Buffer [256];
+	rtl::CArrayT <size_t> ClosureMap (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	const rtl::CBoxListT <CValue>* pClosureArgList = NULL;
+	
+	if (pClosure)
+	{
+		pClosureArgList = pClosure->GetArgList ();
+		ClosureMap.Reserve (pClosureArgList->GetCount ());
+
+		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
+		rtl::CArrayT <CType*> SrcArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
+	
+		for (size_t i = 0; ClosureArg; ClosureArg++, i++)
+		{
+			if (ClosureArg->IsEmpty ())
+				continue;
+
+			ASSERT (i < SrcArgTypeArray.GetCount ());
+			ClosureMap.Append (i);
+			pClosureType->CreateFieldMember (SrcArgTypeArray [i]);
+		}
+	}
+
+	Result = pClosureType->CalcLayout ();
+	if (!Result)
+		return false;
+
+	CFunction* pDstFunction = m_pModule->m_FunctionMgr.GetThunkFunction (
+		pSrcFunctionType,
+		pFunction, 
+		pClosureType,
+		ClosureMap,
+		pFunctionPtrType
+		);
+
+	if (!pDstFunction)
+		return false;
+	
+	CValue ClosureValue;
+	Result = m_pModule->m_OperatorMgr.NewOperator (AllocKind, pClosureType, &ClosureValue);
+	if (!Result)
+		return false;
+
+	// save pfn & arguments in the closure
+
+	rtl::CIteratorT <CClassFieldMember> ClosureMember = pClosureType->GetFirstFieldMember ();	
+	if (!pFunction)
+	{
+		Result = m_pModule->m_OperatorMgr.SetClassFieldMemberValue (
+			ClosureValue, 
+			*ClosureMember, 
+			PfnValue
+			);
+
+		if (!Result)
+			return false;
+
+		ClosureMember++;
+	}
+
+	if (pClosure)
+	{
+		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
+		for (; ClosureArg; ClosureArg++)
+		{
+			if (ClosureArg->IsEmpty ())
+				continue;
+
+			ASSERT (ClosureMember);
+
+			Result = m_pModule->m_OperatorMgr.SetClassFieldMemberValue (
+				ClosureValue, 
+				*ClosureMember, 
+				*ClosureArg
+				);
+
+			if (!Result)
+				return false;
+
+			ClosureMember++;
+		}
+	}
+
+	m_pModule->m_LlvmBuilder.CreateFunctionPointer (pDstFunction, ClosureValue, pFunctionPtrType, pResultValue);
+	return true;
+}
+
+//.............................................................................
+
+ECast
+CCast_prop::GetCastKind (
+	CType* pSrcType,
+	CType* pDstType
+	)
+{
+	ASSERT (pDstType->GetTypeKind () == EType_PropertyPointer);
+
+	return ECast_Lossy;
+}
+
+bool
+CCast_prop::LlvmCast (
+	EAlloc AllocKind,
+	const CValue& RawValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (pType->GetTypeKind () == EType_PropertyPointer);
+	CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) pType;
+	CPropertyType* pDstPropertyType = pPropertyPointerType->GetPropertyType ();
+
+	CValue Value = RawValue;
+	if (Value.GetValueKind () != EValue_Property)
+	{
+		SetCastError (Value.GetType (), pType);
+		return false;
+	}
+
+	ASSERT (Value.GetType ()->GetTypeKind () == EType_Property);
+	CPropertyType* pSrcPropertyType = (CPropertyType*) Value.GetType ();
+
+	CClosure* pClosure = Value.GetClosure ();
+	if (!pClosure)
+	{
+		if (pDstPropertyType->CmpAccessorTypes (pSrcPropertyType) != 0)
+		{
+			SetCastError (pSrcPropertyType, pType);
+			return false;
+		}
+
+		m_pModule->m_LlvmBuilder.CreatePropertyPointer (
+			Value,
+			m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue (),
+			pPropertyPointerType, 
+			pResultValue
+			);
+
+		return true;	
+	}
+
+	CValue ClosureArgValue = *pClosure->GetArgList ()->GetHead ();
+	if (!ClosureArgValue.GetType ()->IsClassType ())
+	{
+		err::SetFormatStringError (_T("complex closures are not supported yet"));
+		return false;
+	}
+
+	if (pDstPropertyType->CmpShortAccessorTypes (pSrcPropertyType) != 0)
+	{
+		SetCastError (pSrcPropertyType, pType);
+		return false;
+	}
+
+	CFunction* pGetter = pSrcPropertyType->GetGetter ();
+	if (pGetter->GetFunctionKind () == EFunction_Method)
+	{
+		bool Result = m_pModule->m_OperatorMgr.GetMemberProperty (pSrcPropertyType, pClosure, &Value);
+		if (!Result)
+			return false;
+	}
+
+	CClassType* pClosureClassType = (CClassType*) ClosureArgValue.GetType ();
+	CClassType* pMethodClassType = pSrcPropertyType->GetParentClassType ();
+
+	CValue PtrValue;
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ClosureArgValue, 1, NULL, &ScopeLevelValue);
+
+	CClassBaseTypeCoord Coord;
+	pClosureClassType->FindBaseType (pMethodClassType, &Coord);
+
+	rtl::CArrayT <size_t> LlvmIndexArray = Coord.m_FieldCoord.m_LlvmIndexArray;
+	if (!LlvmIndexArray.IsEmpty ())
+	{
+		LlvmIndexArray.Insert (0, 0);
+	
+		m_pModule->m_LlvmBuilder.CreateGep (
+			PtrValue, 
+			LlvmIndexArray, 
+			LlvmIndexArray.GetCount (),
+			NULL, 
+			&PtrValue
+			);
+	}
+	
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+	
+	CValue InterfaceValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, PtrValue, 0, NULL, &InterfaceValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (InterfaceValue, ScopeLevelValue, 1, NULL, &InterfaceValue);
+
+	CValue PropertyPointerValue = pType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateBitCast (Value, pDstPropertyType->GetVTableStructType ()->GetPointerType (EType_Pointer_u), &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (PropertyPointerValue, PtrValue, 0, NULL, &PropertyPointerValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (PropertyPointerValue, InterfaceValue, 1, pType, pResultValue);
+	return true;
+}
+
+//.............................................................................
+
+ECast
 CCast_class::GetCastKind (
 	CType* pSrcType,
 	CType* pDstType
@@ -1127,23 +1306,8 @@ CCast_class::GetCastKind (
 }
 
 bool
-CCast_class::ConstCast (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	CClassType* pSrcClassType = (CClassType*) SrcValue.GetType ();
-	CClassType* pDstClassType = (CClassType*) DstValue.GetType ();
-
-	ASSERT (pSrcClassType->IsClassType ());
-	ASSERT (pDstClassType->IsClassType ());
-
-	err::SetFormatStringError (_T("CCast_class::ConstCast is not yet implemented"));
-	return false;
-}
-
-bool
 CCast_class::LlvmCast (
+	EAlloc AllocKind,
 	const CValue& Value,
 	CType* pType,
 	CValue* pResultValue

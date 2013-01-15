@@ -232,7 +232,7 @@ CClassType::CreatePreConstructor ()
 	CFunctionType* pShortType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunctionType* pFullType = GetSimpleMethodType ();
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonymousFunction (pFullType);
 	pFunction->m_FunctionKind = EFunction_PreConstructor;
 	pFunction->m_Tag.Format (_T("%s.preconstruct"), m_Tag);
 	pFunction->m_pShortType = pShortType;
@@ -247,7 +247,7 @@ CClassType::CreateConstructor (CFunctionType* pType)
 {
 	CFunctionType* pFullType = GetMethodType (pType);
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonymousFunction (pFullType);
 	pFunction->m_FunctionKind = EFunction_Constructor;
 	pFunction->m_Tag.Format (_T("%s.construct"), m_Tag);
 	pFunction->m_pShortType = pType;
@@ -272,7 +272,7 @@ CClassType::CreateDestructor ()
 	CFunctionType* pShortType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunctionType* pFullType = GetSimpleMethodType ();
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonymousFunction (pFullType);
 	pFunction->m_FunctionKind = EFunction_Destructor;
 	pFunction->m_Tag.Format (_T("%s.destruct"), m_Tag);
 	pFunction->m_pShortType = pShortType;

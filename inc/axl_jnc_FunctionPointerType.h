@@ -19,7 +19,7 @@ protected:
 	friend class CTypeMgr;
 
 	CFunctionType* m_pFunctionType;
-	CFunctionType* m_pMemberFunctionType; // with additional abstract interface argument
+	CFunctionType* m_pShortFunctionType;
 	CStructType* m_pPointerStructType;
 	CEventType* m_pEventType;
 
@@ -39,7 +39,10 @@ public:
 	}
 
 	CFunctionType* 
-	GetMemberFunctionType ();
+	GetShortFunctionType ()
+	{
+		return m_pShortFunctionType;
+	}
 
 	CStructType* 
 	GetPointerStructType ();

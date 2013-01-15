@@ -65,7 +65,9 @@ CParser::Declare (
 {
 	bool Result;
 
-	CType* pType = pDeclarator->GetType (pDeclSpecifiers);
+	int FunctionModifiers;
+
+	CType* pType = pDeclarator->GetType (pDeclSpecifiers, &FunctionModifiers);
 	if (!pType)
 		return NULL;
 
@@ -94,7 +96,7 @@ CParser::Declare (
 		if (pType->GetTypeKind () == EType_Function)
 		{
 			CFunctionType* pFunctionType = (CFunctionType*) pType;
-			if (pFunctionType->GetCallingConvention ())
+			if (FunctionModifiers & (ETypeModifier_Cdecl | ETypeModifier_Stdcall))
 				pType = pFunctionType->GetPointerType (EType_Pointer_u);
 			else
 				pType = pFunctionType->GetFunctionPointerType ();
@@ -704,8 +706,7 @@ CParser::PreAutoEvBlock (CClassType* pAutoEvType)
 		return false;	
 
 	m_pAutoEvDestructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
-	
+		
 	m_pAutoEvType = pAutoEvType;
 	return true;
 }
@@ -748,7 +749,7 @@ CParser::PreAutoEvExpression ()
 	CFunctionType* pShortType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunctionType* pFullType = m_pAutoEvType->GetSimpleMethodType ();
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonimousFunction (pFullType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateAnonymousFunction (pFullType);
 	pFunction->m_FunctionKind = EFunction_Method;
 	pFunction->m_Tag.Format (_T("%s.expr"), m_pAutoEvType->GetQualifiedName ());
 	pFunction->m_pShortType = pShortType;
@@ -777,8 +778,8 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetPreConstructor ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvConstructorBlock);
 
-	CClosure* pClosure = HandlerValue.CreateClosure ();
-	pClosure->CreateArg (0, m_AutoEvConstructorThisValue);
+	CClosure* pClosure = HandlerValue.CreateClosure (EClosure_Function);
+	pClosure->GetArgList ()->InsertHead (m_AutoEvConstructorThisValue);
 	
 	rtl::CBoxIteratorT <CValue> PropertyValue = m_BindablePropertyList.GetHead ();
 	for (; PropertyValue; PropertyValue++)
@@ -799,8 +800,8 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetDestructor ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvDestructorBlock);
 
-	pClosure = HandlerValue.CreateClosure ();
-	pClosure->CreateArg (0, m_AutoEvDestructorThisValue);
+	pClosure = HandlerValue.CreateClosure (EClosure_Function);
+	pClosure->GetArgList ()->InsertHead  (m_AutoEvDestructorThisValue);
 
 	PropertyValue = m_BindablePropertyList.GetHead ();
 	for (; PropertyValue; PropertyValue++)

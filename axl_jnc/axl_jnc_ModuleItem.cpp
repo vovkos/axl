@@ -52,7 +52,7 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		return _T("class-member");
 
 	default:
-		return _T("<undefined>");
+		return _T("undefined-module-item");
 	}
 }
 

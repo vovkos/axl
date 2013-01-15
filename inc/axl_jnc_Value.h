@@ -17,6 +17,7 @@ class CFunctionOverload;
 class CClassType;
 class CPropertyType;
 class CClosure;
+enum EClosure;
 
 //.............................................................................
 	
@@ -38,15 +39,33 @@ enum EValue
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum EValueFlag
+const tchar_t*
+GetValueKindString (EValue ValueKind);
+
+//.............................................................................
+
+enum EAlloc
 {
-	EValueFlag_IsVariableOffset = 1
+	EAlloc_Undefined = 0,
+	EAlloc_Heap,
+	EAlloc_Stack,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const tchar_t*
-GetValueKindString (EValue ValueKind);
+GetAllocKindString (EAlloc AllocKind);
+
+//.............................................................................
+
+enum EValueFlag
+{
+	// type qualifiers are propagated to value flags and then type is unqualified
+
+	EValueFlag_IsVariableOffset        = 0x0100,
+	EValueFlag_WeakToStrong            = 0x0200, // keep it weak in the closure but convert before the call
+	EValueFlag_WeakToStrongMustSucceed = 0x0400, // fail closure call if weak-to-strong fails
+};
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -87,6 +106,7 @@ protected:
 
 	mutable llvm::Value* m_pLlvmValue;
 
+	EAlloc m_ClosureAllocKind;
 	ref::CPtrT <CClosure> m_Closure;
 
 public:
@@ -128,12 +148,6 @@ public:
 		const void* p,
 		CType* pType
 		);
-
-	CValue (CType* pType)
-	{
-		Init ();
-		SetType (pType);
-	}
 
 	CValue (CVariable* pVariable)
 	{
@@ -290,7 +304,7 @@ public:
 	SetClosure (CClosure* pClosure);
 		
 	CClosure*
-	CreateClosure ();
+	CreateClosure (EClosure ClosureKind);
 
 	void
 	OverrideType (CType* pType)
@@ -320,6 +334,9 @@ public:
 		*this = Value;
 		OverrideType (TypeKind);
 	}
+
+	void
+	Clear ();
 
 	void
 	SetVoid ();
@@ -548,7 +565,6 @@ struct TSafePtr
 struct TFunctionPtr
 {
 	void* m_pfn;
-	intptr_t m_CallingConvention;
 	TInterfaceHdr* m_pInterface; // NULL, interface or closure
 };
 

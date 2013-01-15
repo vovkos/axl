@@ -30,8 +30,49 @@ expression
 	: conditional_expr <&$.m_Value>
 	;
 
+class 
+{
+	CValue m_Value;
+}
+nullable
+expression_or_empty
+	: conditional_expr <&$.m_Value>
+	| epsilon
+	;
+
+class
+{
+	rtl::CBoxListT <CValue> m_ValueList;
+}
 expression_list
-	: expression (',' expression)*
+	: expression 
+		{
+			$.m_ValueList.InsertTail ($1.m_Value);
+		}
+	  (	',' 
+		expression $e2
+			{
+				$.m_ValueList.InsertTail ($e2.m_Value);
+			}
+	  )*
+	;
+
+class
+{
+	rtl::CBoxListT <CValue> m_ValueList;
+}
+nullable
+expression_or_empty_list
+	: expression_or_empty
+		{
+			$.m_ValueList.InsertTail ($1.m_Value);
+		}
+	  (	',' 
+		expression_or_empty $e2
+			{
+				$.m_ValueList.InsertTail ($e2.m_Value);
+			}
+	  )*
 	;
 
 class
@@ -493,15 +534,30 @@ unary_operator_expr <CValue* $pValue>
 			$pValue->SetType ($2.m_pType);
 		}
 	| resolver (cast_operator_rslv) 
-	  '(' type_name $t ')' unary_expr <$pValue> 
+	  '(' allocation_specifier $a? type_name $t ')' unary_expr <$pValue> 
 		{
-			return m_pModule->m_OperatorMgr.CastOperator ($pValue, $t.m_pType);
+			EAlloc AllocKind = IsValidLocator ($a) ? $a.m_AllocKind : EAlloc_Undefined;
+			return m_pModule->m_OperatorMgr.CastOperator (AllocKind, $pValue, $t.m_pType);
 		}
-	| (EToken_Stack $s | EToken_Heap | epsilon) EToken_New type_name $t
+	| allocation_specifier $a? EToken_New type_name $t
 		{
-			return IsValidLocator ($s) ? 
-				m_pModule->m_OperatorMgr.StackNewOperator ($t.m_pType, $pValue) : 
-				m_pModule->m_OperatorMgr.HeapNewOperator ($t.m_pType, $pValue);
+			EAlloc AllocKind = IsValidLocator ($a) ? $a.m_AllocKind : EAlloc_Undefined;
+			return m_pModule->m_OperatorMgr.NewOperator (AllocKind, $t.m_pType, $pValue);
+		}
+	;
+
+class
+{
+	EAlloc m_AllocKind;
+}
+allocation_specifier
+	: EToken_Stack
+		{
+			$.m_AllocKind = EAlloc_Stack;
+		}
+	| EToken_Heap
+		{
+			$.m_AllocKind = EAlloc_Heap;
 		}
 	;
 
@@ -513,7 +569,7 @@ cast_operator_rslv
 	{
 		CTypeSpecifierModifiers $TypeSpecifier;
 	}
-	: '(' type_specifier_modifier <&$TypeSpecifier>
+	: '(' allocation_specifier? type_specifier_modifier <&$TypeSpecifier>
 	;
 
 class
@@ -546,24 +602,12 @@ postfix_expr <CValue* $pValue>
 	;
 
 postfix_operator <CValue* $pValue>
-	local
-	{
-		CValue $SchedulerValue;
-	}
 	leave 
 	{
 		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
 			m_BindablePropertyList.InsertTail (*$pValue);
 	}
-	: function_actual_argument_list
-		{
-			return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$1.m_ArgList);
-		}		
-	| '~' function_actual_argument_list
-		{
-			return m_pModule->m_OperatorMgr.ClosureOperator ($pValue, &$2.m_ArgList);
-		}		
-	| '.' EToken_Identifier
+	: '.' EToken_Identifier
 		{
 			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $2.m_Data.m_String);
 		}
@@ -571,6 +615,14 @@ postfix_operator <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.PointerToMemberOperator ($pValue, $2.m_Data.m_String);
 		}
+	| '(' expression_or_empty_list ')'
+		{
+			return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$2.m_ValueList);
+		}		
+	| '~' '(' expression_or_empty_list ')'
+		{
+			return m_pModule->m_OperatorMgr.ClosureOperator ($pValue, &$3.m_ValueList);
+		}		
 	| '[' expression ']'
 		{
 			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, $pValue, $2.m_Value);
@@ -583,51 +635,6 @@ postfix_operator <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostDec, $pValue);
 		}
-	;
-
-class
-{
-	rtl::CBoxListT <CValue> m_ArgList;
-}
-function_actual_argument_list
-	: '(' 
-	  expression $a1
-		{
-			$.m_ArgList.InsertTail ($a1.m_Value);
-		}
-	  (	','
-		function_actual_argument $a2
-			{
-				
-				$.m_ArgList.InsertTail ($a2.m_Value);
-			}
-	  )*
-	  ')'
-	| '(' 
-		{
-			$.m_ArgList.InsertTail (CValue ());
-		}
-	  (	','
-		function_actual_argument $a2
-			{
-				$.m_ArgList.InsertTail ($a2.m_Value);
-			}
-	  )+
-	  ')'
-	| '(' ')'
-	; 
-
-class 
-{
-	CValue m_Value;
-}
-nullable
-function_actual_argument
-	: expression
-		{
-			$.m_Value = $1.m_Value;
-		}
-	| epsilon // allow skipping arguments
 	;
 
 primary_expr <CValue* $pValue>

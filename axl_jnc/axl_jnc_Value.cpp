@@ -98,7 +98,7 @@ GetValueKindString (EValue ValueKind)
 		return _T("bool-or");
 
 	default:
-		return _T("<undefined>");
+		return _T("undefined-value");
 	}
 }
 
@@ -235,9 +235,10 @@ CValue::GetLlvmConst (
 }
 
 CClosure*
-CValue::CreateClosure ()
+CValue::CreateClosure (EClosure ClosureKind)
 {
 	m_Closure = AXL_REF_NEW (CClosure);
+	m_Closure->m_ClosureKind = ClosureKind;
 	return m_Closure;
 }
 
@@ -265,6 +266,7 @@ CValue::SetVoid ()
 
 	m_ValueKind = EValue_Void;
 	m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	m_Closure = NULL;
 }
 
 void
@@ -275,6 +277,7 @@ CValue::SetNull ()
 
 	m_ValueKind = EValue_Null;
 	m_pType = pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+	m_Closure = NULL;
 }
 
 void
@@ -282,6 +285,7 @@ CValue::SetType (CType* pType)
 {
 	m_ValueKind = EValue_Type;
 	m_pType = pType;
+	m_Closure = NULL;
 }
 
 void
@@ -308,6 +312,7 @@ CValue::SetVariable (
 	m_pVariable = pVariable;
 	m_pLlvmValue = pLlvmValue;
 	m_Flags = IsOffset ? EValueFlag_IsVariableOffset : 0;
+	m_Closure = NULL;
 }
 
 void
@@ -323,6 +328,7 @@ CValue::SetFunction (CFunction* pFunction)
 	m_pType = pFunction->GetType ()->GetPointerType (EType_Pointer_u);
 	m_pFunction = pFunction;
 	m_pLlvmValue = pFunction->GetLlvmFunction ();
+	m_Closure = NULL;
 }
 
 void
@@ -336,6 +342,7 @@ CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
 	{
 		m_ValueKind = EValue_FunctionOverload;
 		m_pFunctionOverload = pFunctionOverload;
+		m_Closure = NULL;
 	} 
 }
 
@@ -344,6 +351,7 @@ CValue::SetProperty (CPropertyType* pPropertyType)
 {
 	m_ValueKind = EValue_Property;
 	m_pType = pPropertyType;
+	m_Closure = NULL;
 }
 
 bool
@@ -425,6 +433,7 @@ CValue::SetLlvmValue (
 	m_ValueKind = ValueKind;
 	m_pType = pType;
 	m_pLlvmValue = pValue;
+	m_Closure = NULL;
 }
 
 void

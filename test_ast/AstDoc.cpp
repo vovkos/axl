@@ -154,10 +154,7 @@ CAstDoc::Compile ()
 	pMainFrame->m_ModulePane.Build (&m_Module);
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
-	Result = 
-		m_Module.m_FunctionMgr.CompileGlobalAutoEv () &&
-		m_Module.m_FunctionMgr.CompileFunctions ();
-
+	Result = m_Module.m_FunctionMgr.CompileFunctions ();
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
@@ -305,7 +302,6 @@ void
 StdLib_EventOperator (
 	jnc::TEvent* pEvent,
 	void* pfn,
-	jnc::ECallConv CallConv,
 	jnc::TInterfaceHdr* pIface,
 	jnc::EEventOp OpKind
 	)
@@ -317,7 +313,6 @@ StdLib_EventOperator (
 	case jnc::EEventOp_SetHandler:
 		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
-		pHandler->m_FunctionPtr.m_CallingConvention = CallConv;
 		pHandler->m_FunctionPtr.m_pInterface = pIface;
 		pHandler->m_pPrev = NULL;
 		pHandler->m_pNext = NULL;
@@ -329,7 +324,6 @@ StdLib_EventOperator (
 	case jnc::EEventOp_AddHandler:
 		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
-		pHandler->m_FunctionPtr.m_CallingConvention = CallConv;
 		pHandler->m_FunctionPtr.m_pInterface = pIface;
 		pHandler->m_pPrev = pEvent->m_pTail;
 		pHandler->m_pNext = NULL;
