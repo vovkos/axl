@@ -1033,7 +1033,7 @@ CCast_fn::LlvmCast_case1 (
 	ASSERT (pIfaceArgType->IsClassType ());
 
 	CValue IfaceValue;
-	bool Result = m_pModule->m_OperatorMgr.CastOperator (IfaceValue, pIfaceArgType, &IfaceValue);
+	bool Result = m_pModule->m_OperatorMgr.CastOperator (RawIfaceValue, pIfaceArgType, &IfaceValue);
 	if (!Result)
 		return false;
 

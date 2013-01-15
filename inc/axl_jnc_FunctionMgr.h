@@ -64,7 +64,7 @@ enum EStdFunc
 
 	EStdFunc_DynamicCastInterface,
 
-	// int8*
+	// void
 	// jnc.EventOperator (
 	//		jnc.event* pEvent,
 	//		void* pfn,
@@ -73,6 +73,11 @@ enum EStdFunc
 	//		);
 
 	EStdFunc_EventOperator,
+
+	// void
+	// jnc.FireSimpleEvent (jnc.event* pEvent);
+
+	EStdFunc_FireSimpleEvent,
 
 	// int8*
 	// jnc.HeapAllocate (int8* pType);
@@ -113,6 +118,7 @@ protected:
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
 	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
+	rtl::CArrayT <CPropertyType*> m_AutoPropertyArray;
 	rtl::CStringHashTableMapAT <CThunk*> m_ThunkMap;
 	rtl::CStdListT <CThunk> m_ThunkList;
 
@@ -229,6 +235,9 @@ protected:
 	bool
 	CompileClosureThunk (CThunk* pThunk);
 
+	bool
+	CompileAutoPropertyAccessors (CPropertyType* pType);
+
 	CFunction*
 	CreateInternalFunction (
 		const rtl::CString& Name,
@@ -257,6 +266,9 @@ protected:
 
 	CFunction*
 	CreateEventOperator ();
+
+	CFunction*
+	CreateFireSimpleEvent ();
 
 	CFunction*
 	CreateHeapAllocate ();

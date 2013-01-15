@@ -2360,10 +2360,18 @@ COperatorMgr::SetPropertyOperator (
 
 	if (!EventValue.IsEmpty ())
 	{
-		ArgList.Clear ();
-		Result = CallOperator (EventValue, &ArgList, &ReturnValue);
+		CValue EventPtrValue;
+		bool Result = PrepareReference (EventValue, EPrepareReferenceFlag_Store, &EventPtrValue);
 		if (!Result)
 			return false;
+
+		CFunction* pFireSimpleEvent = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_FireSimpleEvent);
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pFireSimpleEvent,
+			pFireSimpleEvent->GetType (),
+			EventPtrValue,
+			&ReturnValue
+			);
 	}
 
 	return true;

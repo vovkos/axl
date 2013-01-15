@@ -313,7 +313,7 @@ StdLib_EventOperator (
 	case jnc::EEventOp_SetHandler:
 		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
-		pHandler->m_FunctionPtr.m_pInterface = pIface;
+		pHandler->m_FunctionPtr.m_pIface = pIface;
 		pHandler->m_pPrev = NULL;
 		pHandler->m_pNext = NULL;
 
@@ -324,7 +324,7 @@ StdLib_EventOperator (
 	case jnc::EEventOp_AddHandler:
 		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
-		pHandler->m_FunctionPtr.m_pInterface = pIface;
+		pHandler->m_FunctionPtr.m_pIface = pIface;
 		pHandler->m_pPrev = pEvent->m_pTail;
 		pHandler->m_pNext = NULL;
 
@@ -341,7 +341,8 @@ StdLib_EventOperator (
 		pHandler = pEvent->m_pHead;
 		for (; pHandler; pHandler = pHandler->m_pNext)
 		{
-			if (pHandler->m_FunctionPtr.m_pfn == pfn)
+			if (pHandler->m_FunctionPtr.m_pfn == pfn &&
+				pHandler->m_FunctionPtr.m_pIface == pIface)
 			{
 				if (pHandler->m_pPrev)
 					pHandler->m_pPrev->m_pNext = pHandler->m_pNext;
@@ -361,6 +362,20 @@ StdLib_EventOperator (
 
 	default:
 		ASSERT (false);
+	}
+}
+
+void
+StdLib_FireSimpleEvent (jnc::TEvent* pEvent)
+{
+	typedef void (*FEventHandler) (jnc::TInterfaceHdr*);
+
+	jnc::TEventHandler* pHandler = pEvent->m_pHead;
+
+	for (; pHandler; pHandler = pHandler->m_pNext)
+	{
+		FEventHandler pfn = (FEventHandler) pHandler->m_FunctionPtr.m_pfn;
+		pfn (pHandler->m_FunctionPtr.m_pIface);
 	}
 }
 
@@ -520,6 +535,7 @@ CAstDoc::ExportStdLib ()
 	ExportStdLibFunction (jnc::EStdFunc_OnRuntimeError, StdLib_OnRuntimeError);
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
 	ExportStdLibFunction (jnc::EStdFunc_EventOperator, StdLib_EventOperator);
+	ExportStdLibFunction (jnc::EStdFunc_FireSimpleEvent, StdLib_FireSimpleEvent);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
 	ExportStdLibFunction (_T("printf"), StdLib_printf);

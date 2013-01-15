@@ -895,12 +895,26 @@ CType::ApplyPropertyModifiers (int Modifiers)
 
 	if (Modifiers & ETypeModifier_Bindable)
 	{
-		if (!VerifyModifierTypeKind (ETypeModifier_Bindable, pType->m_TypeKind == EType_Property, _T("property type")))
-			return NULL;
+		if (pType->m_TypeKind == EType_Property)
+		{
+			CPropertyType* pPropertyType = (CPropertyType*) pType;
+			pPropertyType->m_Flags |= EPropertyTypeFlag_IsBindable;
+			pPropertyType->m_Size = sizeof (TEvent);
+		}
+		else
+		{
+			bool IsReadOnly = pType->IsConstType () || (Modifiers & ETypeModifier_Const) != 0;
+			if (IsReadOnly)
+			{
+				err::SetFormatStringError (_T("bindable auto-property cannot be read-only"));
+				return NULL;
+			}
 
-		CPropertyType* pPropertyType = (CPropertyType*) pType;
-		pPropertyType->m_Flags |= EPropertyTypeFlag_IsBindable;
-		pPropertyType->m_Size = sizeof (TEvent);
+			CPropertyType* pPropertyType = m_pModule->m_TypeMgr.CreatePropertyType (pType->GetUnqualifiedType (), false);
+			pPropertyType->m_Flags |= EPropertyTypeFlag_IsBindable | EPropertyTypeFlag_IsAutoProperty;
+			pPropertyType->m_Size = pType->GetSize () + sizeof (TEvent);
+			pType = pPropertyType;
+		}
 	}
 
 	return pType;

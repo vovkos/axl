@@ -9,38 +9,31 @@ printf (
 
 //.............................................................................
 
-foo (
-	int a,
-	int b,
-	int c, 
-	int d
-	)
+bindable int Red;
+bindable int Green;
+bindable int Blue;
+
+autoev AutoEv
 {
-	printf ("foo (%d, %d, %d, %d)\n", a, b, c, d);
-}
+	printf ("Red = %02x\n", Red);
+	printf ("Green = %02x\n", Green);
+	printf ("Blue = %02x\n", Blue);
+
+	printf ("RGB (%02x %02x, %02x)\n", Red, Green, Blue);
+};
 
 //.............................................................................
-
-typedef void cdecl FFoo (int, int, int, int);
-
-typedef FBar (int, int);
 
 int
 main ()
 {
-	printf ("hui\n");
+	stack new AutoEv;
 
-	FFoo pfnFoo = foo;
-	pfnFoo (1, 2, 3, 4);
+	Red = 0xab;
+	Green = 0xcd;
+	Blue = 0xef;
 
-	FBar pfnBar = (stack FBar) pfnFoo ~(10, 20);
-	pfnBar (30, 40);
-
-//	FBar pfnBar = (stack FBar) foo ~(,, 30, 40);
-//	pfnBar (10, 20);
-
-
-	printf ("i muravei\n");
+	printf ("done\n");
 	return 0;
 }
 

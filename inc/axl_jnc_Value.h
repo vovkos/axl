@@ -565,7 +565,7 @@ struct TSafePtr
 struct TFunctionPtr
 {
 	void* m_pfn;
-	TInterfaceHdr* m_pInterface; // NULL, interface or closure
+	TInterfaceHdr* m_pIface; // NULL, interface or closure
 };
 
 // structures backing up event declared like

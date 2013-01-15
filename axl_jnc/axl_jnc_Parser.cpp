@@ -209,21 +209,29 @@ CParser::Declare (
 
 		CPropertyType* pPropertyType = (CPropertyType*) pType;
 		CEventType* pEventType = (CEventType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent);
+		CType* pReturnType = pPropertyType->GetGetter ()->GetType ()->GetReturnType ();
+		int Flags = pPropertyType->GetFlags ();
 
 		if (pClassType)
 		{
 			pNewItem = pClassType->CreatePropertyMember (Name, pPropertyType);
 
-			if (pPropertyType->GetFlags () & EPropertyTypeFlag_IsBindable)
+			if (Flags & EPropertyTypeFlag_IsBindable)
 				pPropertyType->m_pEventFieldMember = pClassType->CreateFieldMember (pEventType);
+
+			if (Flags & EPropertyTypeFlag_IsAutoProperty)
+				pPropertyType->m_pAutoFieldMember = pClassType->CreateFieldMember (pReturnType);
 		}
 		else
 		{
 			pPropertyType->m_PropertyKind = EProperty_Global;
 			pPropertyType->m_Name = Name;
 
-			if (pPropertyType->GetFlags () & EPropertyTypeFlag_IsBindable)
+			if (Flags & EPropertyTypeFlag_IsBindable)
 				pPropertyType->m_pEventVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pEventType, false);
+
+			if (Flags & EPropertyTypeFlag_IsAutoProperty)
+				pPropertyType->m_pAutoVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pReturnType, false);
 
 			pNamespace->AddItem (pPropertyType);
 			pPropertyType->m_Tag = pPropertyType->GetQualifiedName ();
@@ -231,6 +239,9 @@ CParser::Declare (
 
 			pNewItem = pPropertyType;
 		}
+
+		if (Flags & EPropertyTypeFlag_IsAutoProperty)
+			m_pModule->m_FunctionMgr.m_AutoPropertyArray.Append (pPropertyType);
 	}
 	else
 	{

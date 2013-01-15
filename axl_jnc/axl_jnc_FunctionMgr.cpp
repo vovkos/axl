@@ -35,6 +35,7 @@ CFunctionMgr::Clear ()
 	m_FunctionList.Clear ();
 	m_GlobalFunctionList.Clear ();
 	m_GlobalAutoEvTypeArray.Clear ();
+	m_AutoPropertyArray.Clear ();
 	m_ThunkMap.Clear ();
 	m_ThunkList.Clear ();
 
@@ -341,6 +342,17 @@ CFunctionMgr::CompileFunctions ()
 			CompileClosureThunk (*Thunk) :
 			CompileDirectThunk (*Thunk);
 
+		if (!Result)
+			return false;
+	}
+
+	// (4) auto-properties
+
+	Count = m_AutoPropertyArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CPropertyType* pPropertyType = m_AutoPropertyArray [i];
+		Result = CompileAutoPropertyAccessors (pPropertyType);
 		if (!Result)
 			return false;
 	}
@@ -722,6 +734,58 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 }
 
 bool
+CFunctionMgr::CompileAutoPropertyAccessors (CPropertyType* pType)
+{
+	ASSERT (pType->GetFlags () & EPropertyTypeFlag_IsAutoProperty);
+
+	CFunction* pGetter = pType->GetGetter ();
+	CFunction* pSetter = pType->GetSetter ()->GetFunction ();
+
+	if (pType->GetParentClassType ())
+	{
+		err::SetFormatStringError (_T("member auto-properties are not implemented yet"));
+		return false;
+	}
+
+	ASSERT (pType->m_pAutoVariable);
+
+	// save
+
+	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
+	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+
+	// getter
+
+	m_pCurrentFunction = pGetter;
+
+	pGetter->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pGetter->m_pBlock);
+	m_pModule->m_ControlFlowMgr.Return (pType->m_pAutoVariable);
+	
+	// setter
+
+	m_pCurrentFunction = pSetter;
+
+	pSetter->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSetter->m_pBlock);
+	
+	llvm::Function::arg_iterator LlvmArg = pSetter->GetLlvmFunction ()->arg_begin();
+	
+	CValue ArgValue1 (LlvmArg++, NULL);
+	m_pModule->m_LlvmBuilder.CreateStore (ArgValue1, pType->m_pAutoVariable);
+	m_pModule->m_ControlFlowMgr.Return ();
+
+	// restore
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
+	m_pCurrentFunction = pPrevCurrentFunction;
+
+	return true;
+}
+
+bool
 CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 {
 /*	err::SetFormatStringError (_T("cancel LLVM jitting for now"));
@@ -797,6 +861,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 
 	case EStdFunc_EventOperator:
 		pFunction = CreateEventOperator ();
+		break;
+
+	case EStdFunc_FireSimpleEvent:
+		pFunction = CreateFireSimpleEvent ();
 		break;
 
 	case EStdFunc_HeapAllocate:
@@ -1106,7 +1174,7 @@ CFunctionMgr::CreateDynamicCastInterface ()
 	return CreateInternalFunction (_T("jnc.DynamicCastInterface"), pType);
 }
 
-// int8*
+// void
 // jnc.EventOperator (
 //		jnc.event* pEvent,
 //		void* pfn,
@@ -1129,6 +1197,23 @@ CFunctionMgr::CreateEventOperator ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction (_T("jnc.EventOperator"), pType);
+}
+
+// void
+// jnc.FireSimpleEvent (jnc.event* pEvent);
+
+CFunction*
+CFunctionMgr::CreateFireSimpleEvent ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (_T("jnc.FireSimpleEventOperator"), pType);
 }
 
 // int8*

@@ -28,7 +28,8 @@ enum EProperty
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_IsBindable = 0x010000,
+	EPropertyTypeFlag_IsBindable     = 0x010000,
+	EPropertyTypeFlag_IsAutoProperty = 0x020000,
 };
 
 //.............................................................................
@@ -38,6 +39,7 @@ class CPropertyType: public CVTableType
 protected:
 	friend class CTypeMgr;
 	friend class CClassType;
+	friend class CFunctionMgr;
 	friend class CParser;
 
 	EProperty m_PropertyKind;
@@ -51,8 +53,17 @@ protected:
 
 	union
 	{
-		CVariable* m_pEventVariable;            // global bindable properties
-		CClassFieldMember* m_pEventFieldMember; // member bindable properties
+		struct 
+		{
+			CVariable* m_pEventVariable; // global bindable properties
+			CVariable* m_pAutoVariable;  // global bindable auto-properties
+		};
+
+		struct 
+		{
+			CClassFieldMember* m_pEventFieldMember; // member bindable properties
+			CClassFieldMember* m_pAutoFieldMember; // member bindable auto-properties
+		};
 	};
 
 	rtl::CString m_AccessorSignature;
