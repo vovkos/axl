@@ -167,6 +167,9 @@ Members2
 		const CValue& DefaultValue
 		);
 
+	CPropertyType*
+	DeclarePropertyType (rtl::CString& Name);
+
 	CFunction*
 	DeclarePropertyAccessor (
 		CPropertyType* pType,

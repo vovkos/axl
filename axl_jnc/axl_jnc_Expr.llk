@@ -416,14 +416,25 @@ class
 	EBinOp m_OpKind;
 }
 assignment_operator
-	: '='
+	: direct_assignment_operator
 		{
-			$.m_AssignKind = EAssign_Normal;
+			$.m_AssignKind = $1.m_AssignKind;
 		}
 	| binop_assignment_operator
 		{
 			$.m_AssignKind = EAssign_BinOp;
 			$.m_OpKind = $1.m_OpKind;
+		}
+	;
+
+class
+{
+	EAssign m_AssignKind;
+}
+direct_assignment_operator
+	: '='
+		{
+			$.m_AssignKind = EAssign_Normal;
 		}
 	| EToken_RefAssign
 		{
@@ -562,7 +573,7 @@ allocation_specifier
 	;
 
 // since '(' at 'unary_expr' is a conflict against epsilon production we need a resolver
-// otherwise epsilon production always loses
+// otherwise epsilon production (i.e. no more unary operators) always loses
 
 cast_operator_rslv
 	local

@@ -146,10 +146,11 @@ GetTypeQualifierString (ETypeQualifier Qualifier);
 
 enum ETypeFlag
 {
-	ETypeFlag_IsPod          = 0x0100, // plain-old-data
-	ETypeFlag_IsImport       = 0x0200, // is or references an import type
-	ETypeFlag_IsLayoutReady  = 0x0400,
-	ETypeFlag_IsLayoutCalc   = 0x0800,
+	ETypeFlag_IsNamed        = 0x0100,
+	ETypeFlag_IsPod          = 0x0200, // plain-old-data
+	ETypeFlag_IsImport       = 0x0400, // is or references an import type
+	ETypeFlag_IsLayoutReady  = 0x1000,
+	ETypeFlag_IsLayoutCalc   = 0x2000,
 };
 
 //.............................................................................
@@ -387,6 +388,15 @@ public:
 		return 
 			m_TypeKind == EType_Struct || m_TypeKind == EType_Union ||
 			m_TypeKind == EType_Interface || m_TypeKind == EType_Class;
+	}
+
+	bool
+	CanRefMove ()
+	{
+		return 
+			m_TypeKind == EType_Reference || 
+			m_TypeKind == EType_Reference_u ||
+			m_TypeKind == EType_PropertyPointer;
 	}
 
 	bool 

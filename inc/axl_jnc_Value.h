@@ -590,7 +590,7 @@ struct TEvent
 struct TPropertyPtr
 {
 	void** m_pVTable;
-	TInterfaceHdr* m_pInterface; // NULL, interface of object or interface of closure object
+	TInterfaceHdr* m_pIface; // NULL, interface or closure
 	TEvent* m_pEvent;
 };
 

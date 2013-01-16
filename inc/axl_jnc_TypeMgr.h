@@ -262,7 +262,16 @@ public:
 	GetAbstractMethodType (CFunctionType* pType);
 
 	CPropertyType* 
-	CreatePropertyType ();
+	CreatePropertyType (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName
+		);
+
+	CPropertyType* 
+	CreateUnnamedPropertyType ()
+	{
+		return CreatePropertyType (rtl::CString (), rtl::CString ());
+	}
 
 	CPropertyType* 
 	CreatePropertyType (

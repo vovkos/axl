@@ -271,62 +271,6 @@ CParser::Declare (
 	return pNewItem;
 }
 
-CFunction*
-CParser::DeclarePropertyAccessor (
-	CPropertyType* pPropertyType,
-	CTypeSpecifierModifiers* pTypeSpecifier,
-	CDeclarator* pDeclarator
-	)
-{
-	bool Result; 
-
-	CType* pType = pDeclarator->GetType (pTypeSpecifier);
-	if (!pType)
-		return NULL;
-
-	if (pType->GetTypeKind () != EType_Function)
-	{
-		err::SetFormatStringError (_T("illegal property accessor type '%s'"), pType->GetTypeString ());
-		return NULL;
-	}
-
-	CFunctionType* pFunctionType = (CFunctionType*) pType;
-	EPropertyAccessor PropertyAccessorKind = pDeclarator->GetPropertyAccessorKind ();
-	
-	CFunction* pAccessor = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (
-		PropertyAccessorKind, 
-		pFunctionType, 
-		pDeclarator->GetArgList ()
-		);
-
-	switch (PropertyAccessorKind)
-	{
-	case EPropertyAccessor_Get:
-		if (pPropertyType->m_pGetter)
-		{
-			err::SetFormatStringError (_T("multiple property getters specified"));
-			return NULL;		
-		}
-
-		pPropertyType->m_pGetter = pAccessor;
-		break;
-
-	case EPropertyAccessor_Set:
-		Result = pPropertyType->m_Setter.AddOverload (pAccessor);
-		if (!Result)
-			return NULL;
-
-		break;
-
-	default:
-		ASSERT (false);
-	}
-
-	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
-	pAccessor->m_Pos = pDeclarator->m_Pos;
-	return pAccessor;
-}
-
 CEnumType*
 CParser::DeclareEnumType (
 	EType TypeKind,
@@ -503,7 +447,7 @@ CParser::DeclareClassType (
 	bool Result;
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CClassType* pType = NULL;
+	CClassType* pType;
 
 	if (Name.IsEmpty ())
 	{
@@ -610,6 +554,89 @@ CParser::DeclareClassDestructor (
 	}
 
 	return pClassType->CreateDestructor ();
+}
+
+CPropertyType*
+CParser::DeclarePropertyType (rtl::CString& Name)
+{
+	CPropertyType* pType;
+	
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+
+	if (Name.IsEmpty ())
+	{
+		pType = m_pModule->m_TypeMgr.CreateUnnamedPropertyType ();
+	}
+	else
+	{
+		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
+		pType = m_pModule->m_TypeMgr.CreatePropertyType (Name, QualifiedName);
+	}
+
+	if (!Name.IsEmpty ())
+	{
+		bool Result = pNamespace->AddItem (pType);
+		if (!Result)
+			return NULL;
+	}
+
+	return pType;
+}
+
+CFunction*
+CParser::DeclarePropertyAccessor (
+	CPropertyType* pPropertyType,
+	CTypeSpecifierModifiers* pTypeSpecifier,
+	CDeclarator* pDeclarator
+	)
+{
+	bool Result; 
+
+	CType* pType = pDeclarator->GetType (pTypeSpecifier);
+	if (!pType)
+		return NULL;
+
+	if (pType->GetTypeKind () != EType_Function)
+	{
+		err::SetFormatStringError (_T("illegal property accessor type '%s'"), pType->GetTypeString ());
+		return NULL;
+	}
+
+	CFunctionType* pFunctionType = (CFunctionType*) pType;
+	EPropertyAccessor PropertyAccessorKind = pDeclarator->GetPropertyAccessorKind ();
+	
+	CFunction* pAccessor = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (
+		PropertyAccessorKind, 
+		pFunctionType, 
+		pDeclarator->GetArgList ()
+		);
+
+	switch (PropertyAccessorKind)
+	{
+	case EPropertyAccessor_Get:
+		if (pPropertyType->m_pGetter)
+		{
+			err::SetFormatStringError (_T("multiple property getters specified"));
+			return NULL;		
+		}
+
+		pPropertyType->m_pGetter = pAccessor;
+		break;
+
+	case EPropertyAccessor_Set:
+		Result = pPropertyType->m_Setter.AddOverload (pAccessor);
+		if (!Result)
+			return NULL;
+
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	m_pModule->m_AttributeMgr.AssignAttributeSet (pAccessor);
+	pAccessor->m_Pos = pDeclarator->m_Pos;
+	return pAccessor;
 }
 
 CFunctionFormalArg*

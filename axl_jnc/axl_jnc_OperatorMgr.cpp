@@ -242,8 +242,28 @@ COperatorMgr::BinaryOperator (
 	)
 {
 	ASSERT (OpKind >= 0 && OpKind < EBinOp__Count);
-	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];
+
+	if (OpKind == EBinOp_Idx)
+	{
+		// indexing on properties is actually creating a closure
+
+		CType* pType = RawOpValue1.GetType ();
+		pType = PrepareOperandType (pType, EOpFlag_LoadReference | EOpFlag_KeepProperty);		
+		if (pType->IsPropertyType ())
+		{
+			*pResultValue = RawOpValue1;
 	
+			CClosure* pClosure = pResultValue->GetClosure ();
+			if (!pClosure)
+				pClosure = pResultValue->CreateClosure (EClosure_Property);
+
+			ASSERT (pClosure->GetClosureKind () == EClosure_Property); 
+			pClosure->GetArgList ()->InsertTail (RawOpValue2);
+			return true;
+		}
+	}
+
+	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
 	if (!pOperator)
 	{
 		err::SetFormatStringError (_T("binary '%s' is not supported"), GetBinOpString (OpKind));
@@ -346,7 +366,8 @@ COperatorMgr::GetCastKind (
 	CType* pDstType
 	)
 {
-	pSrcType = PrepareOperandType (pSrcType);
+	int OpFlags = pDstType->IsPropertyType () ? EOpFlag_KeepProperty : 0;
+	pSrcType = PrepareOperandType (pSrcType, OpFlags);
 	ICastOperator* pOperator = GetCastOperator (pSrcType, pDstType);
 	return pOperator ? pOperator->GetCastKind (pSrcType, pDstType) : ECast_None;
 }
@@ -570,10 +591,10 @@ COperatorMgr::RefMoveOperator (
 		return RefMoveReferenceOperator (OpValue, DstValue, (CPointerType*) pBaseType);
 
 	case EType_PropertyPointer:
-		return RefMovePropertyPointerOperator (OpValue, DstValue, (CPropertyPointerType*) pBaseType);
+		return StoreReferenceOperator (OpValue, DstValue, true);
 
 	default:
-		err::SetFormatStringError (_T("left operand must be a reference to l-value"));
+		err::SetFormatStringError (_T("cannot ref-assign to '%s'"), pBaseType->GetTypeString ());
 		return false;
 	}
 }
@@ -600,19 +621,6 @@ COperatorMgr::RefMoveReferenceOperator (
 	return 
 		UnaryOperator (EUnOp_Addr, &OpValue) &&
 		MoveOperator (OpValue, DstValue);
-}
-
-bool
-COperatorMgr::RefMovePropertyPointerOperator (
-	const CValue& RawOpValue,
-	const CValue& DstValue,
-	CPropertyPointerType* pPropertyPointerType
-	)
-{
-	CValue OpValue;
-	return 
-		CastOperator (RawOpValue, pPropertyPointerType, &OpValue) &&
-		StoreReferenceOperator (OpValue, DstValue, true);
 }
 
 bool
@@ -1635,26 +1643,22 @@ COperatorMgr::ClosureOperator (
 	if (!Result)
 		return false;
 
-	*pResultValue = OpValue;
+	if (!OpValue.GetType ()->IsFunctionType ())
+	{
+		err::SetFormatStringError (_T("closure operator cannot be applied to '%s'"), OpValue.GetType ()->GetTypeString ());
+		return false;
+	}
 
+	*pResultValue = OpValue;
+	
 	CClosure* pClosure = pResultValue->GetClosure ();
 	if (!pClosure)
-	{
 		pClosure = pResultValue->CreateClosure (EClosure_Function);
-	}
-	else if (pClosure->GetClosureKind () != EClosure_Function)
-	{
-		err::SetFormatStringError (_T("closure kind mismatch"));
-		return false;
-	}
+
+	ASSERT (pClosure->GetClosureKind () == EClosure_Function); 
+	// cause property closure should have been eliminated in PrepareOperand ()
 
 	pClosure->CombineClosure (pArgList);
-	if (pClosure->IsEmpty ())
-	{
-		err::SetFormatStringError (_T("empty closure"));
-		return false;
-	}
-
 	return true;
 }
 
@@ -2314,8 +2318,13 @@ COperatorMgr::SetPropertyOperator (
 		return false;
 	}
 
+	CClosure* pClosure = DstValue.GetClosure ();
+
 	rtl::CBoxListT <CValue> ArgList;
 	ArgList.InsertTail (SrcValue);
+
+	if (pClosure)
+		pClosure->Apply (&ArgList);
 
 	CFunctionOverload* pSetter = pPropertyType->GetSetter ();
 	CFunction* pFunction = pSetter->ChooseOverload (&ArgList);
@@ -2350,8 +2359,6 @@ COperatorMgr::SetPropertyOperator (
 			&FunctionValue
 			);
 	}
-
-	FunctionValue.SetClosure (DstValue.GetClosure ());
 
 	CValue ReturnValue;
 	Result = CallOperator (FunctionValue, &ArgList, &ReturnValue);

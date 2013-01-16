@@ -143,11 +143,15 @@ declarator_list <CDeclSpecifiers* $pDeclSpecifiers>
 
 class
 {
-	CModuleItem* m_pItem;
+	union
+	{
+		CModuleItem* m_pItem;
+		CVariable* m_pVariable;
+	};
 }
 full_declarator <CDeclSpecifiers* $pDeclSpecifiers>
 	: declarator 
-	  ('=' 
+	  (direct_assignment_operator $o
 		{
 			$.m_pItem = Declare ($pDeclSpecifiers, &$1.m_Declarator, NULL, 0, true);
 			if (!$.m_pItem)
@@ -159,10 +163,18 @@ full_declarator <CDeclSpecifiers* $pDeclSpecifiers>
 				return false;
 			}
 		}
-	  initializer $i <.((CVariable*) $.m_pItem)->GetType ().> 
+	  initializer $i <.$.m_pVariable->GetType ().> 		
 		{
-			if (m_Stage == EStage_Pass2)
-				return m_pModule->m_OperatorMgr.MoveOperator ($i.m_Value, (CVariable*) $.m_pItem);
+			if ($.m_pVariable->GetType ()->CanRefMove ())
+				return m_pModule->m_OperatorMgr.RefMoveOperator ($i.m_Value, $.m_pVariable);
+
+			if ($o.m_AssignKind == EAssign_Ref)
+			{
+				err::SetFormatStringError (_T("cannot ref-assign to '%s'"), $.m_pVariable->GetType ()->GetTypeString ());
+				return false;
+			}
+			
+			return m_pModule->m_OperatorMgr.MoveOperator ($i.m_Value, $.m_pVariable);
 		}
 	  )?
 		{ 
@@ -210,7 +222,6 @@ initializer_list_entry <CType* $pType>
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-noast
 declaration_terminator <CModuleItem* $pItem>
 	: ';'
 	| function_body_pass1
@@ -464,9 +475,10 @@ type_specifier <CTypeSpecifier* $pTypeSpecifier>
 		{
 			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
-	| property_specifier
+	| resolver (property_specifier_rslv)
+	  property_specifier $t
 		{
-			return $pTypeSpecifier->SetType ($1.m_pType);
+			return $pTypeSpecifier->SetType ($t.m_pType);
 		}
 	| autoev_specifier
 		{

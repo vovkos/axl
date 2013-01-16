@@ -6,10 +6,20 @@ class
 }
 property_specifier
 	: EToken_Property 
+	  EToken_Identifier $n?
 		{
-			$.m_pType = m_pModule->m_TypeMgr.CreatePropertyType ();
-		}
+			$.m_pType = DeclarePropertyType (IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ());
+			if (!$.m_pType)
+				return false;
+		}	  
 	  property_block $b <$.m_pType>
+	;
+
+// since EToken_Property EToken_Identifier is a conflict against epsilon production we need a resolver
+// otherwise epsilon production (i.e. property modifier) always loses
+
+property_specifier_rslv 
+	: EToken_Property EToken_Identifier? '{'
 	;
 
 property_block <CPropertyType* $pType>

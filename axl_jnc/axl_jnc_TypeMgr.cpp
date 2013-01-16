@@ -508,6 +508,7 @@ CTypeMgr::GetEnumType (
 	CEnumType* pType = AXL_MEM_NEW (CEnumType);
 	pType->m_pModule = m_pModule;
 	pType->m_TypeKind = TypeKind;
+	pType->m_Flags |= ETypeFlag_IsNamed;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_Tag = QualifiedName;
@@ -574,6 +575,7 @@ CTypeMgr::GetStructType (
 	CStructType* pType = AXL_MEM_NEW (CStructType);	
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_Flags |= ETypeFlag_IsNamed;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_Tag = QualifiedName;
@@ -611,6 +613,7 @@ CTypeMgr::GetUnionType (
 	CUnionType* pType = AXL_MEM_NEW (CUnionType);	
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_Flags |= ETypeFlag_IsNamed;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_Tag = QualifiedName;
@@ -658,6 +661,7 @@ CTypeMgr::GetClassType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_Size = sizeof (TInterfaceHdr*);
 	pType->m_Signature = Signature;
+	pType->m_Flags |= ETypeFlag_IsNamed;
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_Tag = QualifiedName;
@@ -729,12 +733,8 @@ CTypeMgr::CreatePropertyType (
 	CType* pReturnType,
 	bool IsReadOnly
 	)
-{
-	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
-	pType->m_pModule = m_pModule;
-	pType->m_Signature.Format ("R%d", m_UnnamedTypeCounter++);
-	m_PropertyTypeList.InsertTail (pType);
-
+{	
+	CPropertyType* pType = CreateUnnamedPropertyType ();
 	CFunctionType* pGetterType = GetFunctionType (pReturnType, rtl::CArrayT <CType*> ());
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreatePropertyAccessorFunction (EPropertyAccessor_Get, pGetterType);
 	pType->m_pGetter = pGetter;
@@ -750,10 +750,25 @@ CTypeMgr::CreatePropertyType (
 }
 
 CPropertyType* 
-CTypeMgr::CreatePropertyType ()
+CTypeMgr::CreatePropertyType (
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName
+	)
 {
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
+	pType->m_Name = Name;
+	pType->m_QualifiedName = QualifiedName;
+	if (!QualifiedName.IsEmpty ())
+	{
+		pType->m_Flags |= ETypeFlag_IsNamed;
+		pType->m_Tag = QualifiedName;
+	}
+	else
+	{
+		pType->m_Tag.Format (_T("_unnamed_property_%d"), m_UnnamedTypeCounter);
+	}
+
 	pType->m_Signature.Format ("R%d", m_UnnamedTypeCounter++);
 	m_PropertyTypeList.InsertTail (pType);
 	return pType;

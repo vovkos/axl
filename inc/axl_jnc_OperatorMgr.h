@@ -425,7 +425,7 @@ public:
 		rtl::CBoxListT <CValue>* pArgList
 		)
 	{
-		return ClosureOperator (*pValue, pArgList, pValue);
+		return ClosureOperator (*pValue,  pArgList, pValue);
 	}
 
 	bool
@@ -551,13 +551,6 @@ protected:
 		const CValue& RawOpValue,
 		const CValue& RawDstValue,
 		CPointerType* pReferenceType
-		);
-
-	bool
-	RefMovePropertyPointerOperator (
-		const CValue& RawOpValue,
-		const CValue& RawDstValue,
-		CPropertyPointerType* pPropertyPointerType
 		);
 
 	// member operators

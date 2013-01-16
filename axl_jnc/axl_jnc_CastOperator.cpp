@@ -1196,7 +1196,8 @@ CCast_prop::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pType->GetTypeKind () == EType_PropertyPointer);
+	ASSERT (RawValue.GetType ()->IsPropertyType () && pType->GetTypeKind () == EType_PropertyPointer);
+
 	CPropertyPointerType* pPropertyPointerType = (CPropertyPointerType*) pType;
 	CPropertyType* pDstPropertyType = pPropertyPointerType->GetPropertyType ();
 
