@@ -40,7 +40,7 @@ public:
 		char Buffer [256];
 		rtl::CArrayT <llvm::Constant*> LlvmMemberArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
-		rtl::CIteratorT <CStructMember> Member = pType->GetFirstMember ();
+		rtl::CIteratorT <CStructMember> Member = pType->GetMemberList ().GetHead ();
 		for (; Member; Member++)
 		{
 			CValue MemberConst ((char*) p + Member->GetOffset (), Member->GetType ());
@@ -78,9 +78,6 @@ GetValueKindString (EValue ValueKind)
 
 	case EValue_Function:
 		return _T("function");
-
-	case EValue_FunctionOverload:
-		return _T("function-overload");
 
 	case EValue_Property:
 		return _T("property");
@@ -151,6 +148,22 @@ CValue::GetLlvmValue () const
 	return m_pLlvmValue;
 }
 
+llvm::Constant* 
+GetLlvmPtrConst (
+	CType* pType,
+	const void* p
+	)
+{
+	int64_t Integer = *(int64_t*) p;
+
+	llvm::Constant* pLlvmConst = llvm::ConstantInt::get (
+		pType->GetModule ()->m_TypeMgr.GetPrimitiveType (EType_Int_pu)->GetLlvmType (),
+		llvm::APInt (sizeof (void*) * 8, Integer, false)
+		);
+
+	return llvm::ConstantExpr::getIntToPtr (pLlvmConst, pType->GetLlvmType ());
+}
+
 llvm::Constant*
 CValue::GetLlvmConst (
 	CType* pType,
@@ -166,6 +179,7 @@ CValue::GetLlvmConst (
 	EType TypeKind = pType->GetTypeKind ();
 	switch (TypeKind)
 	{
+	case EType_Bool:
 	case EType_Int8:
 	case EType_Int8_u:
 	case EType_Int16:
@@ -205,26 +219,20 @@ CValue::GetLlvmConst (
 		pLlvmConst = CLlvmPodStruct::Get ((CStructType*) pType, p);
 		break;
 
-	case EType_Pointer:
-	case EType_Reference:
-		pLlvmConst = CLlvmPodStruct::Get (((CPointerType*) pType)->GetPointerStructType (), p);
+	case EType_DataPtr:
+	case EType_DataRef:
+		if (((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Normal)
+		{
+			pLlvmConst = CLlvmPodStruct::Get (((CDataPtrType*) pType)->GetDataPtrStructType (), p);
+		}
+		else // thin or unsafe
+		{
+			pLlvmConst = GetLlvmPtrConst (pType, p);
+		}
 		break;
 
-	case EType_Pointer_u:
-	case EType_Interface:
-	case EType_Class:
-		Integer = *(int64_t*) p;
-
-		pLlvmConst = llvm::ConstantInt::get (
-			pModule->m_TypeMgr.GetPrimitiveType (EType_Int_pu)->GetLlvmType (),
-			llvm::APInt (sizeof (void*) * 8, Integer, false)
-			);
-
-		pLlvmConst = llvm::ConstantExpr::getIntToPtr (
-			pLlvmConst, 
-			pType->GetLlvmType ()
-			);
-
+	case EType_ClassPtr:
+		pLlvmConst = GetLlvmPtrConst (pType, p);
 		break;
 
 	default:
@@ -308,10 +316,10 @@ CValue::SetVariable (
 	)
 {
 	m_ValueKind = EValue_Variable;
-	m_pType = MakeReference ? pType->GetPointerType (EType_Reference) : pType;
+	m_pType = MakeReference ? pType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin) : pType;
 	m_pVariable = pVariable;
 	m_pLlvmValue = pLlvmValue;
-	m_Flags = IsOffset ? EValueFlag_IsVariableOffset : 0;
+	m_Flags = IsOffset ? EValueFlag_VariableOffset : 0;
 	m_Closure = NULL;
 }
 
@@ -325,32 +333,18 @@ void
 CValue::SetFunction (CFunction* pFunction)
 {
 	m_ValueKind = EValue_Function;
-	m_pType = pFunction->GetType ()->GetPointerType (EType_Pointer_u);
+	m_pType = !pFunction->IsOverloaded () ? pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin) : NULL;
 	m_pFunction = pFunction;
-	m_pLlvmValue = pFunction->GetLlvmFunction ();
+	m_pLlvmValue = pFunction->GetLlvmFunction (); //////////////// probably need to remove
 	m_Closure = NULL;
 }
 
 void
-CValue::SetFunctionOverload (CFunctionOverload* pFunctionOverload)
-{
-	if (pFunctionOverload->GetOverloadCount () == 1)
-	{
-		SetFunction (pFunctionOverload->GetFunction ());
-	}
-	else
-	{
-		m_ValueKind = EValue_FunctionOverload;
-		m_pFunctionOverload = pFunctionOverload;
-		m_Closure = NULL;
-	} 
-}
-
-void
-CValue::SetProperty (CPropertyType* pPropertyType)
+CValue::SetProperty (CProperty* pProperty)
 {
 	m_ValueKind = EValue_Property;
-	m_pType = pPropertyType;
+	m_pType = pProperty->GetType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
+	m_pProperty = pProperty;
 	m_Closure = NULL;
 }
 
@@ -452,5 +446,5 @@ CValue::SetLlvmValue (
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

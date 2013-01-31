@@ -11,41 +11,64 @@ namespace jnc {
 
 enum EToken
 {
+	// common tokens
+
 	EToken_Eof = 0,
 	EToken_Error = -1,
 	EToken_Identifier = 256,
 	EToken_Integer,
 	EToken_Fp,
 	EToken_Literal,
+
+	// global declarations & pragmas
+
 	EToken_Namespace,
 	EToken_Using,
 	EToken_Pack,
 	EToken_Endian,
+
+	// storage specifiers
+
 	EToken_Typedef,
 	EToken_Static,
+	EToken_Virtual,
+	EToken_NoVirtual,
+
+	// access specifiers
+
 	EToken_Public,
-	EToken_Private,
-	EToken_Const,
-	EToken_Volatile,
+	EToken_PublicRead,
+	EToken_Protected,
+
+	// type modifiers
+
 	EToken_Signed,
 	EToken_Unsigned,
 	EToken_LittleEndian,
 	EToken_BigEndian,
+	EToken_Const,
+	EToken_Volatile,
 	EToken_Safe,
 	EToken_Unsafe,
 	EToken_NoNull,
 	EToken_Strong,
 	EToken_Weak,
-	EToken_Bindable,
-	EToken_Virtual,
-	EToken_NoVirtual,
-	EToken_PreConstruct,
 	EToken_Cdecl,
 	EToken_Stdcall,
+	EToken_Function,
+	EToken_Property,
 	EToken_Event,
-	EToken_This,
+	EToken_Bindable,
+	EToken_AutoGet,
+	EToken_Indexed,
+	EToken_Closure,
+	EToken_Thin,
+
+	// type specifiers
+
 	EToken_Auto,
 	EToken_Void,
+	EToken_Object,
 	EToken_Variant,
 	EToken_Bool,
 	EToken_Int8,
@@ -59,24 +82,30 @@ enum EToken
 	EToken_Short,
 	EToken_Long,
 	EToken_WChar,
+
+	// named type specifiers
+
 	EToken_Enum,
 	EToken_EnumC,
 	EToken_Struct,
 	EToken_Union,
 	EToken_Class,
 	EToken_Interface,
-	EToken_Property,
+	EToken_AutoEv,
+
+	// special members
+
 	EToken_Get,
 	EToken_Set,
-	EToken_New,
-	EToken_Stack,
-	EToken_Heap,
-	EToken_SizeOf,
-	EToken_TypeOf,
-	EToken_AutoEv,
+	EToken_This,
+	EToken_PreConstruct,
+	EToken_Operator,
+	EToken_Postfix,
+	EToken_PropValue,
 	EToken_OnChange,
-	EToken_Snapshot,
-	EToken_Closure,
+
+	// statements
+
 	EToken_If,
 	EToken_Else,
 	EToken_For,
@@ -88,72 +117,113 @@ enum EToken
 	EToken_Switch,
 	EToken_Case,
 	EToken_Default,
+
+	// constants
+
 	EToken_True,
 	EToken_False,
 	EToken_Null,
+
+	// keyword operators
+
+	EToken_New,
+	EToken_Stack,
+	EToken_Heap,
+	EToken_SizeOf,
+	EToken_TypeOf,
+	EToken_Snapshot,
+	EToken_Dynamic,
+
+	// symbol tokens
+
+	EToken_Inc,
+	EToken_Dec,
+	EToken_Ptr,
+	EToken_Shl,
+	EToken_Shr,
 	EToken_Eq,
 	EToken_Ne,
 	EToken_Le,
 	EToken_Ge,
-	EToken_LogicalOr,
-	EToken_LogicalAnd,
-	EToken_Shl,
-	EToken_Shr,
-	EToken_Inc,
-	EToken_Dec,
-	EToken_Ptr,
+	EToken_AddAssign,
+	EToken_SubAssign,
 	EToken_MulAssign,
 	EToken_DivAssign,
 	EToken_ModAssign,
-	EToken_AddAssign,
-	EToken_SubAssign,
 	EToken_ShlAssign,
 	EToken_ShrAssign,
 	EToken_AndAssign,
 	EToken_XorAssign,
 	EToken_OrAssign,
-	EToken_RefAssign,
+	EToken_AtAssign,
+	EToken_ClassAssign,
+	EToken_LogAnd,
+	EToken_LogOr,
 	EToken_Ellipsis,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
+
+	// common tokens
+
 	AXL_PRS_TOKEN_NAME (EToken_Eof,          "eof")
 	AXL_PRS_TOKEN_NAME (EToken_Error,        "error")
 	AXL_PRS_TOKEN_NAME (EToken_Identifier,   "identifier")
 	AXL_PRS_TOKEN_NAME (EToken_Integer,      "integer-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Fp,           "floating-point-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Literal,      "string-literal")
+
+	// global declarations & pragmas
+
 	AXL_PRS_TOKEN_NAME (EToken_Namespace,    "namespace")
 	AXL_PRS_TOKEN_NAME (EToken_Using,        "using")
 	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
 	AXL_PRS_TOKEN_NAME (EToken_Endian,       "endian")
+
+	// storage specifiers
+
 	AXL_PRS_TOKEN_NAME (EToken_Typedef,      "typedef")
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
+	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
+	AXL_PRS_TOKEN_NAME (EToken_NoVirtual,    "novirtual")
+
+	// access specifiers
+
 	AXL_PRS_TOKEN_NAME (EToken_Public,       "public")
-	AXL_PRS_TOKEN_NAME (EToken_Private,      "private")
-	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
-	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
+	AXL_PRS_TOKEN_NAME (EToken_PublicRead,   "publicread")
+	AXL_PRS_TOKEN_NAME (EToken_Protected,    "protected")
+
+	// type modifiers
+
 	AXL_PRS_TOKEN_NAME (EToken_Signed,       "signed")
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
+	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
+	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
 	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
 	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
 	AXL_PRS_TOKEN_NAME (EToken_Strong,       "strong")
 	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
-	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
-	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
-	AXL_PRS_TOKEN_NAME (EToken_NoVirtual,    "novirtual")
-	AXL_PRS_TOKEN_NAME (EToken_Event,        "event")	
-	AXL_PRS_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
 	AXL_PRS_TOKEN_NAME (EToken_Cdecl,        "cdecl")
 	AXL_PRS_TOKEN_NAME (EToken_Stdcall,      "stdcall")
-	AXL_PRS_TOKEN_NAME (EToken_This,         "this")
+	AXL_PRS_TOKEN_NAME (EToken_Function,     "function")
+	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
+	AXL_PRS_TOKEN_NAME (EToken_Event,        "event")	
+	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
+	AXL_PRS_TOKEN_NAME (EToken_AutoGet,      "autoget")
+	AXL_PRS_TOKEN_NAME (EToken_Indexed,      "indexed")
+	AXL_PRS_TOKEN_NAME (EToken_Closure,      "closure")
+	AXL_PRS_TOKEN_NAME (EToken_Thin,         "thin")
+
+	// type specifiers
+
 	AXL_PRS_TOKEN_NAME (EToken_Auto,         "auto")
 	AXL_PRS_TOKEN_NAME (EToken_Void,         "void")
+	AXL_PRS_TOKEN_NAME (EToken_Object,       "object")
 	AXL_PRS_TOKEN_NAME (EToken_Variant,      "variant")
 	AXL_PRS_TOKEN_NAME (EToken_Bool,         "bool")
 	AXL_PRS_TOKEN_NAME (EToken_Int8,         "int8")
@@ -167,24 +237,30 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Short,        "short")
 	AXL_PRS_TOKEN_NAME (EToken_Long,         "long")
 	AXL_PRS_TOKEN_NAME (EToken_WChar,        "wchar_t")
+
+	// named type specifiers
+
 	AXL_PRS_TOKEN_NAME (EToken_Enum,         "enum")
 	AXL_PRS_TOKEN_NAME (EToken_EnumC,        "enumc")
 	AXL_PRS_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_PRS_TOKEN_NAME (EToken_Union,        "union")
 	AXL_PRS_TOKEN_NAME (EToken_Class,        "class")
 	AXL_PRS_TOKEN_NAME (EToken_Interface,    "interface")
-	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
+	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
+
+	// special members
+
 	AXL_PRS_TOKEN_NAME (EToken_Get,          "get")
 	AXL_PRS_TOKEN_NAME (EToken_Set,          "set")
-	AXL_PRS_TOKEN_NAME (EToken_New,          "new")
-	AXL_PRS_TOKEN_NAME (EToken_Stack,        "stack")
-	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
-	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
-	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
-	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
+	AXL_PRS_TOKEN_NAME (EToken_This,         "this")
+	AXL_PRS_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
+	AXL_PRS_TOKEN_NAME (EToken_Operator,     "operator")
+	AXL_PRS_TOKEN_NAME (EToken_Postfix,      "postfix")
+	AXL_PRS_TOKEN_NAME (EToken_PropValue,    "propvalue")
 	AXL_PRS_TOKEN_NAME (EToken_OnChange,     "onchange")
-	AXL_PRS_TOKEN_NAME (EToken_Snapshot,     "snapshot")
-	AXL_PRS_TOKEN_NAME (EToken_Closure,      "closure")
+
+	// statements
+
 	AXL_PRS_TOKEN_NAME (EToken_If,           "if")
 	AXL_PRS_TOKEN_NAME (EToken_Else,         "else")
 	AXL_PRS_TOKEN_NAME (EToken_For,          "for")
@@ -196,34 +272,51 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Switch,       "switch")
 	AXL_PRS_TOKEN_NAME (EToken_Case,         "case")
 	AXL_PRS_TOKEN_NAME (EToken_Default,      "default")
+
+	// constants
+
 	AXL_PRS_TOKEN_NAME (EToken_True,         "true")
 	AXL_PRS_TOKEN_NAME (EToken_False,        "false")
 	AXL_PRS_TOKEN_NAME (EToken_Null,         "null")
+
+	// keyword operators
+
+	AXL_PRS_TOKEN_NAME (EToken_New,          "new")
+	AXL_PRS_TOKEN_NAME (EToken_Stack,        "stack")
+	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
+	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
+	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
+	AXL_PRS_TOKEN_NAME (EToken_Snapshot,     "snapshot")
+	AXL_PRS_TOKEN_NAME (EToken_Dynamic,      "dynamic")
+
+	// symbol tokens
+
+	AXL_PRS_TOKEN_NAME (EToken_Inc,          "++")
+	AXL_PRS_TOKEN_NAME (EToken_Dec,          "--")
+	AXL_PRS_TOKEN_NAME (EToken_Ptr,          "->")
+	AXL_PRS_TOKEN_NAME (EToken_Shl,          "<<")
+	AXL_PRS_TOKEN_NAME (EToken_Shr,          ">>")
 	AXL_PRS_TOKEN_NAME (EToken_Eq,           "==")
 	AXL_PRS_TOKEN_NAME (EToken_Ne,           "!=")
 	AXL_PRS_TOKEN_NAME (EToken_Le,           "<=")
 	AXL_PRS_TOKEN_NAME (EToken_Ge,           ">=")
-	AXL_PRS_TOKEN_NAME (EToken_LogicalOr,    "||")
-	AXL_PRS_TOKEN_NAME (EToken_LogicalAnd,   "&&")	
-	AXL_PRS_TOKEN_NAME (EToken_Shl,          "<<")
-	AXL_PRS_TOKEN_NAME (EToken_Shr,          ">>")
-	AXL_PRS_TOKEN_NAME (EToken_Inc,          "++")
-	AXL_PRS_TOKEN_NAME (EToken_Dec,          "--")
-	AXL_PRS_TOKEN_NAME (EToken_Ptr,          "->")
+	AXL_PRS_TOKEN_NAME (EToken_AddAssign,    "+=")
+	AXL_PRS_TOKEN_NAME (EToken_SubAssign,    "-=")
 	AXL_PRS_TOKEN_NAME (EToken_MulAssign,    "*=")
 	AXL_PRS_TOKEN_NAME (EToken_DivAssign,    "/=")
 	AXL_PRS_TOKEN_NAME (EToken_ModAssign,    "%=")
-	AXL_PRS_TOKEN_NAME (EToken_AddAssign,    "+=")
-	AXL_PRS_TOKEN_NAME (EToken_SubAssign,    "-=")
 	AXL_PRS_TOKEN_NAME (EToken_ShlAssign,    "<<=")
 	AXL_PRS_TOKEN_NAME (EToken_ShrAssign,    ">>=")
 	AXL_PRS_TOKEN_NAME (EToken_AndAssign,    "&=")
 	AXL_PRS_TOKEN_NAME (EToken_XorAssign,    "^=")
 	AXL_PRS_TOKEN_NAME (EToken_OrAssign,     "|=")	
-	AXL_PRS_TOKEN_NAME (EToken_RefAssign,    ":=")	
+	AXL_PRS_TOKEN_NAME (EToken_AtAssign,     "@=")	
+	AXL_PRS_TOKEN_NAME (EToken_ClassAssign,  ":=")	
+	AXL_PRS_TOKEN_NAME (EToken_LogAnd,       "&&")	
+	AXL_PRS_TOKEN_NAME (EToken_LogOr,        "||")
 	AXL_PRS_TOKEN_NAME (EToken_Ellipsis,     "...")
-		
-AXL_PRS_END_TOKEN_NAME_MAP ();
+	
+AXL_PRS_END_TOKEN_NAME_MAP ();	
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -294,5 +387,5 @@ protected:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

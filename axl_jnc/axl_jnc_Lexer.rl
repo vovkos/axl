@@ -55,16 +55,31 @@ main := |*
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+# global declarations & pragmas
+
 'namespace'    { CreateToken (EToken_Namespace); };
 'using'        { CreateToken (EToken_Using); };
 'pack'         { CreateToken (EToken_Pack); };
 'endian'       { CreateToken (EToken_Endian); };
 
+# storage specifiers
+
 'typedef'      { CreateToken (EToken_Typedef); };
 'static'       { CreateToken (EToken_Static); };
+'virtual'      { CreateToken (EToken_Virtual); };
+'novirtual'    { CreateToken (EToken_NoVirtual); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# access specifiers
 
 'public'       { CreateToken (EToken_Public); };
-'private'      { CreateToken (EToken_Private); };
+'publicread'   { CreateToken (EToken_PublicRead); };
+'protected'    { CreateToken (EToken_Protected); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# type modifiers
 
 'const'        { CreateToken (EToken_Const); };
 'volatile'     { CreateToken (EToken_Volatile); };
@@ -77,17 +92,24 @@ main := |*
 'nonull'       { CreateToken (EToken_NoNull); };
 'strong'       { CreateToken (EToken_Strong); };
 'weak'         { CreateToken (EToken_Weak); };
-'bindable'     { CreateToken (EToken_Bindable); };
-'preconstruct' { CreateToken (EToken_PreConstruct); };
 'cdecl'        { CreateToken (EToken_Cdecl); };
 'stdcall'      { CreateToken (EToken_Stdcall); };
-'virtual'      { CreateToken (EToken_Virtual); };
-'novirtual'    { CreateToken (EToken_NoVirtual); };
+'function'     { CreateToken (EToken_Function); };
+'property'     { CreateToken (EToken_Property); };
 'event'        { CreateToken (EToken_Event); };
-'this'         { CreateToken (EToken_This); };
+'bindable'     { CreateToken (EToken_Bindable); };
+'autoget'      { CreateToken (EToken_AutoGet); };
+'indexed'      { CreateToken (EToken_Indexed); };
+'closure'      { CreateToken (EToken_Closure); };
+'thin'         { CreateToken (EToken_Thin); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# type specifiers
 
 'auto'         { CreateToken (EToken_Auto); };
 'void'         { CreateToken (EToken_Void); };
+'object'       { CreateToken (EToken_Object); };
 'variant'      { CreateToken (EToken_Variant); };
 'bool'         { CreateToken (EToken_Bool); };
 'int8'         { CreateToken (EToken_Int8); };
@@ -102,25 +124,46 @@ main := |*
 'long'         { CreateToken (EToken_Long); };
 'wchar_t'      { CreateToken (EToken_WChar); };
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# named type specifiers
+
 'enum'         { CreateToken (EToken_Enum); };
 'enumc'        { CreateToken (EToken_EnumC); };
 'struct'       { CreateToken (EToken_Struct); };
 'union'        { CreateToken (EToken_Union); };
 'class'        { CreateToken (EToken_Class); };
 'interface'    { CreateToken (EToken_Interface); };
-'property'     { CreateToken (EToken_Property); };
+'autoev'       { CreateToken (EToken_AutoEv); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# special members
+
 'get'          { CreateToken (EToken_Get); };
 'set'          { CreateToken (EToken_Set); };
+'this'         { CreateToken (EToken_This); };
+'preconstruct' { CreateToken (EToken_PreConstruct); };
+'operator'     { CreateToken (EToken_Operator); };
+'postfix'      { CreateToken (EToken_Postfix); };
+'propvalue'    { CreateToken (EToken_PropValue); };
+'onchange'     { CreateToken (EToken_OnChange); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# operators
 
 'new'          { CreateToken (EToken_New); };
 'stack'        { CreateToken (EToken_Stack); };
 'heap'         { CreateToken (EToken_Heap); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
-'autoev'       { CreateToken (EToken_AutoEv); };
-'onchange'     { CreateToken (EToken_OnChange); };
 'snapshot'     { CreateToken (EToken_Snapshot); };
-'closure'      { CreateToken (EToken_Closure); };
+'dynamic'      { CreateToken (EToken_Dynamic); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# statements
 
 'if'           { CreateToken (EToken_If); };
 'else'         { CreateToken (EToken_Else); };
@@ -134,23 +177,27 @@ main := |*
 'case'         { CreateToken (EToken_Case); };
 'default'      { CreateToken (EToken_Default); };
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# constants
+
 'true'         { CreateToken (EToken_True); };
 'false'        { CreateToken (EToken_False); };
 'null'         { CreateToken (EToken_Null); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+# symbol tokens
+
+'++'           { CreateToken (EToken_Inc); };
+'--'           { CreateToken (EToken_Dec); };
+'->'           { CreateToken (EToken_Ptr); };	
+'<<'           { CreateToken (EToken_Shl); };
+'>>'           { CreateToken (EToken_Shr); };
 '=='           { CreateToken (EToken_Eq); };
 '!='           { CreateToken (EToken_Ne); };
 '<='           { CreateToken (EToken_Le); };
 '>='           { CreateToken (EToken_Ge); };	
-'||'           { CreateToken (EToken_LogicalOr); };
-'&&'           { CreateToken (EToken_LogicalAnd); };	
-'<<'           { CreateToken (EToken_Shl); };
-'>>'           { CreateToken (EToken_Shr); };
-'++'           { CreateToken (EToken_Inc); };
-'--'           { CreateToken (EToken_Dec); };
-'->'           { CreateToken (EToken_Ptr); };	
 '*='           { CreateToken (EToken_MulAssign); };
 '/='           { CreateToken (EToken_DivAssign); };
 '%='           { CreateToken (EToken_ModAssign); };
@@ -161,10 +208,15 @@ main := |*
 '&='           { CreateToken (EToken_AndAssign); };
 '^='           { CreateToken (EToken_XorAssign); };
 '|='           { CreateToken (EToken_OrAssign); };	
-':='           { CreateToken (EToken_RefAssign); };	
+'@='           { CreateToken (EToken_AtAssign); };	
+':='           { CreateToken (EToken_ClassAssign); };	
+'&&'           { CreateToken (EToken_LogAnd); };	
+'||'           { CreateToken (EToken_LogOr); };
 '...'          { CreateToken (EToken_Ellipsis); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# common tokens
 
 id             { CreateStringToken (EToken_Identifier); };
 lit_sq         { CreateCharToken (EToken_Integer); };
@@ -208,5 +260,5 @@ CLexer::Exec ()
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

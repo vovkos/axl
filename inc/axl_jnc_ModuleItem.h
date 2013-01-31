@@ -9,17 +9,14 @@
 namespace axl {
 namespace jnc {
 
-//.............................................................................
-
 class CModule;
-class CAttributeSet;
+class CAttributeBlock;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 enum EModuleItem
 {
-	EModuleItem_Undefined,
-
+	EModuleItem_Undefined = 0,
 	EModuleItem_Namespace,	
 	EModuleItem_Scope,	
 	EModuleItem_Alias,
@@ -28,11 +25,9 @@ enum EModuleItem
 	EModuleItem_Variable,
 	EModuleItem_Function,
 	EModuleItem_Property,
-	EModuleItem_GlobalFunction,
 	EModuleItem_EnumMember,
 	EModuleItem_StructMember,
 	EModuleItem_UnionMember,
-	EModuleItem_ClassMember,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -40,38 +35,67 @@ enum EModuleItem
 const tchar_t*
 GetModuleItemKindString (EModuleItem ItemKind);
 
+//.............................................................................
+
+enum EStorage
+{
+	EStorage_Undefined = 0,
+	EStorage_Static,
+	EStorage_Typedef,
+	EStorage_Virtual,
+	EStorage_NoVirtual,
+};
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CModuleItem
+const tchar_t*
+GetStorageKindString (EStorage StorageKind);
+
+//.............................................................................
+
+enum EAccess
+{
+	EAccess_Undefined = 0,
+	EAccess_Public,
+	EAccess_PublicRead,
+	EAccess_Protected,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t*
+GetAccessKindString (EAccess AccessKind);
+
+//.............................................................................
+
+class CModuleItemDecl
 {
 protected:
 	friend class CParser;
-	friend class CAttributeMgr;
 
-	EModuleItem m_ItemKind;
-	CModule* m_pModule;
+	EStorage m_StorageKind;
+	EAccess m_AccessKind;
 	CToken::CPos m_Pos;
-	CAttributeSet* m_pAttributeSet;
+	CAttributeBlock* m_pAttributeBlock;
 
 public:
-	CModuleItem ();
-
-	EModuleItem 
-	GetItemKind ()
-	{	
-		return m_ItemKind;
+	CModuleItemDecl ()
+	{
+		m_StorageKind = EStorage_Undefined;
+		m_AccessKind = EAccess_Undefined;
+		m_pAttributeBlock = NULL;
 	}
 
-	const tchar_t*
-	GetItemKindString ()
+	EStorage
+	GetStorageKind ()
 	{
-		return GetModuleItemKindString (m_ItemKind);
+		return m_StorageKind;
 	}
 
-	CModule*
-	GetModule ()
+	EAccess
+	GetAccessKind ()
 	{
-		return m_pModule;
+		return m_AccessKind;
 	}
 
 	const CToken::CPos&
@@ -80,14 +104,104 @@ public:
 		return m_Pos;
 	}
 
-	CAttributeSet* 
-	GetAttributeSet ()
+	CAttributeBlock* 
+	GetAttributeBlock ()
 	{
-		return m_pAttributeSet;
+		return m_pAttributeBlock;
 	}
 };
 
 //.............................................................................
 
-} // namespace axl {
+class CModuleItemName
+{
+protected:
+	friend class CNamespace;
+
+	rtl::CString m_Name;
+	rtl::CString m_QualifiedName;
+
+public:
+	bool
+	IsNamed ()
+	{
+		return !m_Name.IsEmpty ();
+	}
+
+	rtl::CString
+	GetName ()
+	{
+		return m_Name;
+	}
+
+	rtl::CString 
+	GetQualifiedName ()
+	{
+		return m_QualifiedName;
+	}
+};
+
+//.............................................................................
+
+class CModuleItem: public rtl::TListLink
+{
+protected:
+	CModule* m_pModule;
+	EModuleItem m_ItemKind;
+	CModuleItemDecl* m_pItemDecl;
+
+public:
+	rtl::CString m_Tag;
+
+public:
+	CModuleItem ()
+	{
+		m_pModule = NULL;
+		m_ItemKind = EModuleItem_Undefined;
+		m_pItemDecl = NULL;
+	}
+
+	CModule*
+	GetModule ()
+	{
+		return m_pModule;
+	}
+
+	EModuleItem 
+	GetItemKind ()
+	{	
+		return m_ItemKind;
+	}
+
+	CModuleItemDecl*
+	GetItemDecl ()
+	{
+		return m_pItemDecl;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CDeclModuleItem:
+	public CModuleItem,
+	public CModuleItemDecl
+{
+public:
+	CDeclModuleItem ()
+	{
+		m_pItemDecl = this;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CNamedModuleItem:
+	public CDeclModuleItem,
+	public CModuleItemName
+{
+};
+
+//.............................................................................
+
 } // namespace jnc {
+} // namespace axl {

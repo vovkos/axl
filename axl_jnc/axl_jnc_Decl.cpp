@@ -1,85 +1,113 @@
 #include "stdafx.h"
 #include "axl_jnc_Decl.h"
-#include "axl_jnc_TypeMgr.h"
+#include "axl_jnc_DeclTypeCalc.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
-
-//.............................................................................
-
-const tchar_t*
-GetStorageClassString (EStorageClass StorageClass)
-{
-	switch (StorageClass)
-	{
-	case EStorageClass_Static:
-		return _T("static");
-
-	case EStorageClass_Typedef:
-		return _T("typedef");
-
-	default:
-		return _T("undefined-storage-class");
-	};
-}
-
-const tchar_t*
-GetAccessString (EAccess Access)
-{
-	switch (Access)
-	{
-	case EAccess_Public:
-		return _T("public");
-
-	case EAccess_Private:
-		return _T("private");
-
-	default:
-		return _T("undefined-access");
-	};
-}
-
+	
 //.............................................................................
 
 bool
-CStorageClassSpecifier::SetStorageClass (EStorageClass StorageClass)
+CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 {
-	if (m_StorageClass)
+	static
+	int 
+	AntiModifierTable [32] = 
+	{		
+		ETypeModifierMask_Sign,       //  0 -- ETypeModifier_Signed        = 0x00000001,		
+		ETypeModifierMask_Sign,       //  1 -- ETypeModifier_Unsigned      = 0x00000002,		
+		ETypeModifierMask_Endian,     //  2 -- ETypeModifier_LittleEndian  = 0x00000004,		
+		ETypeModifierMask_Endian,     //  3 -- ETypeModifier_BigEndian     = 0x00000008,		
+		0,                            //  4 -- ETypeModifier_Const         = 0x00000010,		
+		0,                            //  5 -- ETypeModifier_Volatile      = 0x00000020,		
+		ETypeModifierMask_Safety,     //  6 -- ETypeModifier_Safe          = 0x00000040,	
+		ETypeModifierMask_Safety |    //  7 -- ETypeModifier_Unsafe        = 0x00000080,
+		ETypeModifierMask_Strength | 
+		ETypeModifierMask_Closure,		
+		0,                            //  8 -- ETypeModifier_NoNull        = 0x00000100,		
+		ETypeModifierMask_Strength |  //  9 -- ETypeModifier_Strong        = 0x00000200,
+		ETypeModifier_Thin |
+		ETypeModifier_Unsafe,		
+		ETypeModifierMask_Strength |  // 10 -- ETypeModifier_Weak          = 0x00000400,
+		ETypeModifier_Thin |
+		ETypeModifier_Unsafe,		
+		ETypeModifierMask_CallConv,   // 11 -- ETypeModifier_Cdecl         = 0x00000800,		
+		ETypeModifierMask_CallConv,   // 12 -- ETypeModifier_Stdcall       = 0x00001000,		
+		ETypeModifier_Property |      // 13 -- ETypeModifier_Function      = 0x00002000,
+		ETypeModifier_Event,		
+		ETypeModifier_Function |      // 14 -- ETypeModifier_Property      = 0x00004000,
+		ETypeModifier_Event,				
+		ETypeModifier_Function |      // 15 -- ETypeModifier_Event         = 0x00008000,
+		ETypeModifier_Property,		
+		0,                            // 16 -- ETypeModifier_Bindable      = 0x00010000,		
+		ETypeModifier_Indexed,        // 17 -- ETypeModifier_AutoGet       = 0x00020000,		
+		ETypeModifier_AutoGet,        // 18 -- ETypeModifier_Indexed       = 0x00040000,		
+		ETypeModifierMask_Closure |   // 19 -- ETypeModifier_Closure       = 0x00080000,
+		ETypeModifier_Unsafe,		
+		ETypeModifierMask_Closure |   // 20 -- ETypeModifier_Thin          = 0x00100000,
+		ETypeModifierMask_Strength |        
+		ETypeModifier_Unsafe,
+	};
+
+	if (m_TypeModifiers & Modifier)
 	{
-		err::SetFormatStringError (
-			_T("more than one storage class specifiers ('%s' and '%s')"), 
-			GetStorageClassString (m_StorageClass),
-			GetStorageClassString (StorageClass)
-			);
+		err::SetFormatStringError (_T("type modifier '%s' used more than once"), GetTypeModifierString (Modifier));
 		return false;
 	}
 
-	m_StorageClass = StorageClass;
+	size_t i = rtl::GetLoBitIdx32 (Modifier);
+	ASSERT (i < 32);
+
+	if (m_TypeModifiers & AntiModifierTable [i])
+	{
+		ETypeModifier Modifier2 = GetFirstTypeModifier (m_TypeModifiers);
+		err::SetFormatStringError (
+			_T("type modifiers '%s' and '%s' cannot be used together"),
+			GetTypeModifierString (Modifier2),
+			GetTypeModifierString (Modifier)
+			);
+
+		return false;
+	}
+
+	m_TypeModifiers |= Modifier;
 	return true;
 }
 
 bool
-CAccessSpecifier::SetAccess (EAccess Access)
+CTypeModifiers::CheckAntiTypeModifiers (int ModifierMask)
 {
-	if (m_Access)
-	{
-		err::SetFormatStringError (
-			_T("more than one access specifiers ('%s' and '%s')"), 
-			GetAccessString (m_Access),
-			GetAccessString (Access)
-			);
-		return false;
-	}
+	int Modifiers = m_TypeModifiers;
 
-	m_Access = Access;
-	return true;
+	Modifiers &= ModifierMask;
+	if (!Modifiers)
+		return true;
+
+	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers);
+	Modifiers &= ~FirstModifier;
+	if (!Modifiers)
+		return true;
+
+	// more than one
+
+	ETypeModifier SecondModifier = GetFirstTypeModifier (Modifiers);
+	err::SetFormatStringError (
+		_T("type modifiers '%s' and '%s' cannot be used together"),
+		GetTypeModifierString (FirstModifier),
+		GetTypeModifierString (SecondModifier)
+		);
+
+	return false;
 }
+
+
+//.............................................................................
 
 bool
 CTypeSpecifier::SetType (CType* pType)
 {
-	if (m_pType)
+	if (m_pType || (m_TypeModifiers & ETypeModifier_Event))
 	{
 		err::SetFormatStringError (
 			_T("more than one type specifiers ('%s' and '%s')"), 
@@ -90,62 +118,166 @@ CTypeSpecifier::SetType (CType* pType)
 		return false;
 	}
 
-	m_pType = pType;
-	return true;
-}
-
-bool
-CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
-{
-	if (m_TypeModifiers & Modifier)
+	int TypeKind = pType->GetTypeKind ();
+	if (TypeKind == EType_Import)
 	{
-		err::SetFormatStringError (_T("type modifier '%s' used more than once"), GetTypeModifierString (Modifier));
-		return false;
+		err::SetFormatStringError (_T("import types are not supported yet"));
+		return NULL;
 	}
 
-	m_TypeModifiers |= Modifier;
+	// eat left 'const' modifier for classes 
+	// since class to class ptr conversion is implicit,
+	// there is a conflict in where to apply 'const' modifier, e.g.
+	// const CMyClass x; <-- is it a const class ptr or const variable?
+
+	if (m_TypeModifiers & ETypeModifier_Const)
+	{
+		if (TypeKind == EType_Class)
+		{
+			EClassPtrType PtrTypeKind = GetClassPtrTypeKindFromModifiers (m_TypeModifiers);
+			pType = ((CClassType*) pType)->GetClassPtrType (EClassPtrType_Normal, EPtrTypeFlag_Const);
+			m_TypeModifiers &= ~ETypeModifier_Const;
+		}
+		else if (TypeKind == EType_ClassPtr)
+		{
+			CClassPtrType* pPtrType = (CClassPtrType*) pType;
+			pType = pPtrType->GetClassType ()->GetClassPtrType (
+				pPtrType->GetPtrTypeKind (),
+				pPtrType->GetFlags () | EPtrTypeFlag_Const
+				);
+			m_TypeModifiers &= ~ETypeModifier_Const;
+		}
+	}
+
+	m_pType = pType;
 	return true;
 }
 
 //.............................................................................
 
-bool
-CDeclarator::AddName (const rtl::CString Name)
+rtl::CArrayT <CType*>
+CDeclFunctionSuffix::GetArgTypeArray ()
 {
-	ASSERT (!Name.IsEmpty ());
+	rtl::CArrayT <CType*> ArgTypeArray;
+	ArgTypeArray.SetCount (m_ArgList.GetCount ());
 
-	if (m_PropertyAccessorKind)
+	rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
+	for (size_t i = 0; Arg; Arg++, i++)
+		ArgTypeArray [i] = Arg->GetType ();
+
+	return ArgTypeArray;
+}
+
+//.............................................................................
+
+CDeclarator::CDeclarator ()
+{
+	m_DeclaratorKind = EDeclarator_Undefined;
+	m_FunctionKind = EFunction_Undefined;
+	m_pType = NULL;
+	m_BitCount = 0;
+}
+
+bool
+CDeclarator::SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	if (!pTypeSpecifier)
 	{
-		err::SetFormatStringError (_T("cannot further qualify '%s' accessor"), GetPropertyAccessorString (m_PropertyAccessorKind));
-		return false;
+		m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		return true;
 	}
 
-	m_Name.m_List.InsertTail (Name);
+	m_pType = pTypeSpecifier->GetType ();
+	m_TypeModifiers = pTypeSpecifier->GetTypeModifiers ();
+	
+	if (!m_pType)
+	{
+		m_pType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
+			pModule->m_TypeMgr.GetPrimitiveType (EType_Int) : 
+			pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	}
+	
 	return true;
 }
 
 bool
-CDeclarator::AddPropertyAccessorKind (EPropertyAccessor AccessorKind)
+CDeclarator::AddName (rtl::CString Name)
 {
-	ASSERT (AccessorKind);
-
-	if (m_PropertyAccessorKind)
+	if (m_FunctionKind && m_FunctionKind != EFunction_Named)
 	{
-		err::SetFormatStringError (_T("cannot further qualify '%s' accessor"), GetPropertyAccessorString (m_PropertyAccessorKind));
+		err::SetFormatStringError (_T("cannot further qualify '%s' declarator"), GetFunctionKindString (m_FunctionKind));
 		return false;
 	}
 
-	m_PropertyAccessorKind = AccessorKind;
+	m_FunctionKind = EFunction_Named;
+
+	if (m_Name.m_First.IsEmpty ())
+	{
+		m_DeclaratorKind = EDeclarator_SimpleName;
+		m_Name.m_First = Name;
+	}
+	else
+	{
+		m_DeclaratorKind = EDeclarator_QualifiedName;
+		m_Name.m_List.InsertTail (Name);
+	}
+
 	return true;
 }
 
-CDeclPointer*
-CDeclarator::AddPointer (EType TypeKind)
+bool
+CDeclarator::AddUnnamedMethod (EFunction FunctionKind)
 {
-	CDeclPointer* pPointer = AXL_MEM_NEW (CDeclPointer);
-	pPointer->m_TypeKind = TypeKind;
-	m_PointerList.InsertTail (pPointer);
-	return pPointer;
+	if (m_FunctionKind && m_FunctionKind != EFunction_Named)
+	{
+		err::SetFormatStringError (_T("cannot further qualify '%s' declarator"), GetFunctionKindString (m_FunctionKind));
+		return false;
+	}
+
+	m_FunctionKind = FunctionKind;
+	m_DeclaratorKind = m_Name.IsEmpty () ? EDeclarator_UnnamedMethod : EDeclarator_QualifiedName;
+	return true;
+}
+
+bool
+CDeclarator::AddCastOperator (CType* pType)
+{
+	err::SetFormatStringError (_T("overloaded cast operators not implemented yet"));
+	return false;
+}
+
+bool
+CDeclarator::AddOperator (
+	EUnOp UnOpKind,
+	EBinOp BinOpKind
+	)
+{
+	err::SetFormatStringError (_T("overloaded unary & binary operators not implemented yet"));
+	return false;
+}
+
+bool
+CDeclarator::SetPropValue ()
+{
+	if (m_DeclaratorKind)
+	{
+		err::SetFormatStringError (_T("cannot create qualified 'propvalue' declarator"));
+		return false;
+	}
+
+	m_DeclaratorKind = EDeclarator_PropValue;
+	return true;
+}
+
+bool
+CDeclarator::AddPointer ()
+{
+	m_PointerArray.Append (m_TypeModifiers);
+	m_TypeModifiers = 0;
+	return true;
 }
 
 CDeclArraySuffix*
@@ -158,175 +290,52 @@ CDeclarator::AddArraySuffix (size_t ElementCount)
 }
 
 CDeclFunctionSuffix*
-CDeclarator::AddFormalArgSuffix ()
+CDeclarator::AddFunctionSuffix ()
 {
-	CDeclFunctionSuffix* pFormalArgSuffix = AXL_MEM_NEW (CDeclFunctionSuffix);
-	m_SuffixList.InsertTail (pFormalArgSuffix);
-	return pFormalArgSuffix;
+	CDeclFunctionSuffix* pFunctionSuffix = AXL_MEM_NEW (CDeclFunctionSuffix);
+	m_SuffixList.InsertTail (pFunctionSuffix);
+	return pFunctionSuffix;
+}
+
+bool
+CDeclarator::AddBitFieldSuffix (size_t BitCount)
+{
+	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PointerArray.IsEmpty ())
+	{
+		err::SetFormatStringError (_T("bit field can only be applied to integer type"));
+		return false;
+	}
+
+	m_BitCount = BitCount;
+	return true;
+}
+
+CType*
+CDeclarator::GetType (int* pDataPtrTypeFlags)
+{
+	CDeclTypeCalc TypeCalc;
+	return TypeCalc.GetType (
+		m_pType, 
+		m_TypeModifiers, 
+		m_PointerArray, 
+		m_PointerArray.GetCount (), 
+		m_SuffixList.GetTail (),
+		pDataPtrTypeFlags
+		);
 }
 
 rtl::CStdListT <CFunctionFormalArg>*
 CDeclarator::GetArgList ()
 {
 	rtl::CIteratorT <CDeclSuffix> Suffix = m_SuffixList.GetHead ();
-	if (Suffix && Suffix->GetSuffixKind () == EDeclSuffix_FormalArg)
-	{
-		CDeclFunctionSuffix* pArgSuffix = (CDeclFunctionSuffix*) *Suffix;
-		return &pArgSuffix->m_ArgList;
-	}
-
-	return NULL;
-}
-
-CType*
-CDeclarator::GetType_s (CTypeSpecifierModifiers* pTypeSpecifier)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pTypeSpecifier->GetType ();
-	int Modifiers = pTypeSpecifier->GetTypeModifiers ();
-
-	if (!pType)
-	{
-		if (Modifiers & ETypeModifier_Signed |
-			Modifiers & ETypeModifier_Unsigned |
-			Modifiers & ETypeModifier_BigEndian |
-			Modifiers & ETypeModifier_LittleEndian
-			)
-		{
-			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
-		}
-		else 
-		{
-			// assume void
-			pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-		}
-	}
-	
-	Modifiers &= ~ETypeModifier_FunctionMask;
-	if (Modifiers)
-	{
-		pType = pType->GetModifiedType (Modifiers);
-		if (!pType)
-			return NULL;
-	}
-
-	return pType;
-}
-
-CType*
-CDeclarator::GetType (
-	CTypeSpecifierModifiers* pTypeSpecifier,
-	int* pFunctionModifiers
-	)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CTypeSpecifierModifiers VoidTypeSpecifier;
-	if (!pTypeSpecifier)
-	{
-		VoidTypeSpecifier.SetType (pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
-		pTypeSpecifier = &VoidTypeSpecifier;
-	}
-
-	// we need to postpone applying function modifiers until after processing decl suffixes
-
-	int FunctionModifiers = pTypeSpecifier->GetTypeModifiers () & ETypeModifier_FunctionMask;
-
-	CType* pType = GetType_s (pTypeSpecifier);
-	if (!pType)
+	if (!Suffix || Suffix->GetSuffixKind () != EDeclSuffix_Function)
 		return NULL;
-		
-	rtl::CIteratorT <CDeclPointer> Pointer = m_PointerList.GetHead ();
-	for (; Pointer; Pointer++)
-	{
-		EType TypeKind = Pointer->GetTypeKind ();
-		pType = pType->GetPointerType (TypeKind);
-		if (!pType)
-			return NULL;
 
-		int Modifiers = Pointer->GetTypeModifiers ();
-		
-		if (Modifiers & ETypeModifier_FunctionMask)
-		{
-			if (!FunctionModifiers)
-			{
-				FunctionModifiers = Modifiers & ~ETypeModifier_FunctionMask;
-				Modifiers &= ~ETypeModifier_FunctionMask;
-			}
-			else
-			{
-				ETypeModifier FirstModifier = GetFirstTypeModifier (FunctionModifiers);
-				err::SetFormatStringError (
-					_T("type modifier '%s' can only be applied to function type"),
-					GetTypeModifierString (FirstModifier)					
-					);
-				return NULL;
-			}
-		}
-
-		if (Modifiers)
-		{
-			pType = pType->GetModifiedType (Modifiers);
-			if (!pType)
-				return NULL;
-		}
-	}
-
-	rtl::CIteratorT <CDeclSuffix> Suffix = m_SuffixList.GetTail ();
-	for (; Suffix; Suffix--)
-	{
-		EDeclSuffix SuffixKind = Suffix->GetSuffixKind ();
-
-		if (SuffixKind == EDeclSuffix_Array)
-		{
-			CDeclArraySuffix* pArraySuffix = (CDeclArraySuffix*) *Suffix;
-			pType = pType->GetArrayType (pArraySuffix->m_ElementCount);
-			if (!pType)
-				return NULL;
-		}
-		else 
-		{
-			ASSERT (SuffixKind == EDeclSuffix_FormalArg);
-			CDeclFunctionSuffix* pArgSuffix = (CDeclFunctionSuffix*) *Suffix;
-
-			int FunctionTypeFlags = pArgSuffix->GetFunctionTypeFlags ();
-
-			size_t Count = pArgSuffix->GetArgCount ();
-			if (!Count)
-			{
-				pType = pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, FunctionTypeFlags);
-			}		
-			else
-			{
-				rtl::CArrayT <CType*> ArgTypeArray;
-				ArgTypeArray.SetCount (Count);
-
-				rtl::CIteratorT <CFunctionFormalArg> Arg = pArgSuffix->GetFirstArg ();
-				for (size_t i = 0; Arg; Arg++, i++)
-					ArgTypeArray [i] = Arg->GetType ();
-
-				pType = pModule->m_TypeMgr.GetFunctionType (pType, ArgTypeArray, Count, FunctionTypeFlags);
-			}
-		}
-	}
-
-	if (FunctionModifiers)
-	{
-		pType = pType->GetModifiedType (FunctionModifiers);
-		if (!pType)
-			return NULL;
-	}
-
-	if (pFunctionModifiers)
-		*pFunctionModifiers = FunctionModifiers;
-
-	return pType;
+	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *Suffix;
+	return &pSuffix->m_ArgList;
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

@@ -10,9 +10,9 @@ namespace jnc {
 CEnumType::CEnumType ()
 {
 	m_TypeKind = EType_Enum;
-	m_NamespaceKind = ENamespace_Enum;
-	m_Flags = ETypeFlag_IsPod;
+	m_Flags = ETypeFlag_Pod;
 	m_CurrentValue = 0;
+	m_Size = sizeof (int32_t);
 }
 
 CEnumMember*
@@ -41,6 +41,7 @@ CEnumType::CreateMember (
 
 	CEnumMember* pMember = AXL_MEM_NEW (CEnumMember);
 	pMember->m_Name = Name;
+	pMember->m_pParentEnumType = this;
 	pMember->m_Value = Value;
 	m_MemberList.InsertTail (pMember);
 	
@@ -51,5 +52,5 @@ CEnumType::CreateMember (
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

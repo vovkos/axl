@@ -11,21 +11,22 @@ namespace jnc {
 
 //.............................................................................
 
-class CBitFieldType: public CDerivedType
+class CBitFieldType: public CType
 {
 protected:
 	friend class CTypeMgr;
 
+	CType* m_pBaseType;
 	size_t m_BitOffset;
 	size_t m_BitCount;
 
 public:
-	CBitFieldType ()
+	CBitFieldType ();
+
+	CType*
+	GetBaseType ()
 	{
-		m_TypeKind = EType_BitField;
-		m_Flags = ETypeFlag_IsPod;
-		m_BitOffset = 0;
-		m_BitCount = 0;
+		return m_pBaseType;
 	}
 
 	size_t
@@ -49,37 +50,27 @@ public:
 		)
 	{ 
 		return rtl::CStringA::Format_s (
-			"H%s:%d:%d", 
+			"B%s:%d:%d", 
 			pBaseType->GetSignature (),
 			BitOffset,
 			BitOffset + BitCount
 			); 
 	}
 
-	static
-	rtl::CString
-	CreateTypeString (
-		CType* pBaseType,
-		size_t BitOffset,
-		size_t BitCount
-		)
-	{ 
-		return rtl::CStringA::Format_s (
-			"%s:%d:%d",
-			pBaseType->GetTypeString (),
-			BitOffset,
-			BitOffset + BitCount
-			); 
-	}
+protected:
+	virtual 
+	void
+	PrepareTypeString ();
 
-	rtl::CString
-	CreateTypeString ()
-	{ 
-		return CreateTypeString (m_pBaseType, m_BitOffset, m_BitCount);
+	virtual 
+	void
+	PrepareLlvmType ()
+	{
+		m_pLlvmType = m_pBaseType->GetLlvmType ();
 	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

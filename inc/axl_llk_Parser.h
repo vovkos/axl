@@ -32,9 +32,9 @@ public:
 protected:
 	enum EFlag
 	{
-		EFlag_IsBuildingAst = 1,
-		EFlag_IsTokenMatch  = 2,
-		EFlag_IsTokenSaved  = 4,
+		EFlag_BuildingAst = 1,
+		EFlag_TokenMatch  = 2,
+		EFlag_TokenSaved  = 4,
 	};
 
 	enum EMatchResult
@@ -88,7 +88,7 @@ public:
 		Clear ();
 
 		if (IsBuildingAst)
-			m_Flags |= EFlag_IsBuildingAst;
+			m_Flags |= EFlag_BuildingAst;
 
 		return (CSymbolNode*) PushPrediction (T::SymbolFirst + Symbol);
 	}
@@ -130,7 +130,7 @@ public:
 		CToken Token = *pToken;
 		m_CurrentToken = Token;
 
-		m_Flags &= ~(EFlag_IsTokenMatch | EFlag_IsTokenSaved);
+		m_Flags &= ~(EFlag_TokenMatch | EFlag_TokenSaved);
 
 		for (;;)
 		{
@@ -147,10 +147,10 @@ public:
 				// at the same time we want to prevent saving them twice due to re-submission from lookahead dfa
 
 				CLaDfaNode* pPreResolverNode = GetPreResolverTop ();
-				if (pPreResolverNode && pNode->m_Kind != ENode_LaDfa && !(m_Flags & EFlag_IsTokenSaved))
+				if (pPreResolverNode && pNode->m_Kind != ENode_LaDfa && !(m_Flags & EFlag_TokenSaved))
 				{
 					pPreResolverNode->m_ResolverTokenList.InsertTail (Token);
-					m_Flags |= EFlag_IsTokenSaved;
+					m_Flags |= EFlag_TokenSaved;
 				}
 				
 				switch (pNode->m_Kind)
@@ -172,7 +172,7 @@ public:
 					break;
 
 				case ENode_Argument:
-					ASSERT (pNode->m_Flags & ENodeFlag_IsMatched); // was handled during matching ENode_Symbol
+					ASSERT (pNode->m_Flags & ENodeFlag_Matched); // was handled during matching ENode_Symbol
 					PopPrediction (); 
 					MatchResult = EMatchResult_Continue;
 					break;
@@ -205,7 +205,7 @@ public:
 				TokenIndex = ((T*) this)->GetTokenIndex (Token.m_Token);
 				ASSERT (TokenIndex < T::TokenCount);
 
-				m_Flags &= ~(EFlag_IsTokenMatch | EFlag_IsTokenSaved);
+				m_Flags &= ~(EFlag_TokenMatch | EFlag_TokenSaved);
 			}
 			else
 			{
@@ -309,7 +309,7 @@ protected:
 	EMatchResult 
 	MatchEmptyPredictionStack (const CToken* pToken)
 	{
-		if ((m_Flags & EFlag_IsTokenMatch) || pToken->m_Token == T::EofToken)
+		if ((m_Flags & EFlag_TokenMatch) || pToken->m_Token == T::EofToken)
 			return EMatchResult_NextToken;
 
 		if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
@@ -325,7 +325,7 @@ protected:
 		size_t TokenIndex
 		)
 	{
-		if (m_Flags & EFlag_IsTokenMatch)
+		if (m_Flags & EFlag_TokenMatch)
 			return EMatchResult_NextToken;
 
 		if (pNode->m_Index != T::AnyToken && pNode->m_Index != TokenIndex)
@@ -339,14 +339,14 @@ protected:
 			return EMatchResult_Fail;
 		}
 
-		if (pNode->m_Flags & ENodeFlag_IsLocator)
+		if (pNode->m_Flags & ENodeFlag_Locator)
 		{
 			pNode->m_Token = *pToken;
-			pNode->m_Flags |= ENodeFlag_IsMatched;
+			pNode->m_Flags |= ENodeFlag_Matched;
 		}
 
 		m_LastMatchedToken = *pToken;
-		m_Flags |= EFlag_IsTokenMatch;
+		m_Flags |= EFlag_TokenMatch;
 
 		PopPrediction ();
 		return EMatchResult_Continue;
@@ -362,7 +362,7 @@ protected:
 	{
 		bool Result;
 
-		if (pNode->m_Flags & ESymbolNodeFlag_IsStacked)
+		if (pNode->m_Flags & ESymbolNodeFlag_Stacked)
 		{
 			CSymbolNode* pTop = GetSymbolTop ();
 
@@ -371,7 +371,7 @@ protected:
 			if (pNode->m_pAstNode)
 				pNode->m_pAstNode->m_LastToken = m_LastMatchedToken;
 
-			pNode->m_Flags |= ENodeFlag_IsMatched;
+			pNode->m_Flags |= ENodeFlag_Matched;
 
 			if (pNode->m_Flags & ESymbolNodeFlag_HasLeave)
 			{
@@ -385,10 +385,10 @@ protected:
 			return EMatchResult_Continue;
 		}
 
-		if (m_Flags & EFlag_IsTokenMatch)
+		if (m_Flags & EFlag_TokenMatch)
 			return EMatchResult_NextToken;
 
-		if (pNode->m_Flags & ESymbolNodeFlag_IsNamed)
+		if (pNode->m_Flags & ESymbolNodeFlag_Named)
 		{
 			if (pNode->m_pAstNode)
 			{
@@ -402,7 +402,7 @@ protected:
 			if (pArgument)
 			{
 				((T*) this)->Argument (pArgument->m_Index, pNode);
-				pArgument->m_Flags |= ENodeFlag_IsMatched;
+				pArgument->m_Flags |= ENodeFlag_Matched;
 			}
 
 			PushSymbol (pNode);
@@ -430,7 +430,7 @@ protected:
 
 		ASSERT (ProductionIndex < T::TotalCount);
 
-		if (!(pNode->m_Flags & ESymbolNodeFlag_IsNamed))
+		if (!(pNode->m_Flags & ESymbolNodeFlag_Named))
 			PopPrediction ();
 
 		PushPrediction (ProductionIndex);
@@ -443,7 +443,7 @@ protected:
 		const CToken* pToken
 		)
 	{
-		if (m_Flags & EFlag_IsTokenMatch)
+		if (m_Flags & EFlag_TokenMatch)
 			return EMatchResult_NextToken;
 
 		size_t* p = ((T*) this)->GetSequence (pNode->m_Index);
@@ -475,7 +475,7 @@ protected:
 		const CToken* pToken
 		)
 	{
-		if (pNode->m_Flags & ELaDfaNodeFlag_IsPreResolver) 
+		if (pNode->m_Flags & ELaDfaNodeFlag_PreResolver) 
 		{
 			ASSERT (GetPreResolverTop () == pNode);
 
@@ -554,7 +554,7 @@ protected:
 	{
 		CLaDfaNode* pLaDfaNode = GetPreResolverTop ();
 		ASSERT (pLaDfaNode); 
-		ASSERT (pLaDfaNode->m_Flags & ELaDfaNodeFlag_IsPreResolver);
+		ASSERT (pLaDfaNode->m_Flags & ELaDfaNodeFlag_PreResolver);
 
 		// keep popping prediction stack until pre-resolver dfa node 
 
@@ -562,7 +562,7 @@ protected:
 		{
 			CNode* pNode = GetPredictionTop ();
 
-			if (pNode->m_Kind == ENode_Symbol && (pNode->m_Flags & ESymbolNodeFlag_IsStacked))
+			if (pNode->m_Kind == ENode_Symbol && (pNode->m_Flags & ESymbolNodeFlag_Stacked))
 			{
 				ASSERT (GetSymbolTop () == pNode);
 
@@ -593,7 +593,7 @@ protected:
 			// still in lookahead DFA after rollback...
 
 			pLaDfaNode->m_Index = pLaDfaNode->m_ResolverElseIndex - T::LaDfaFirst;
-			pLaDfaNode->m_Flags &= ~ELaDfaNodeFlag_IsPreResolver;
+			pLaDfaNode->m_Flags &= ~ELaDfaNodeFlag_PreResolver;
 			
 			if (!(pLaDfaNode->m_Flags & ELaDfaNodeFlag_HasChainedResolver))
 			{
@@ -625,7 +625,7 @@ protected:
 	{
 		CSymbolNode* pNode = AXL_MEM_NEW (CSymbolNode);
 		pNode->m_Kind = ENode_Symbol;
-		pNode->m_Flags |= ESymbolNodeFlag_IsNamed;
+		pNode->m_Flags |= ESymbolNodeFlag_Named;
 		pNode->m_Index = Index;
 		return pNode;
 	}
@@ -646,7 +646,7 @@ protected:
 		{
 			size_t Index = MasterIndex - T::SymbolFirst;
 			CSymbolNode* pSymbolNode = ((T*) this)->CreateSymbolNode (Index);
-			if (pSymbolNode->m_pAstNode && (m_Flags & EFlag_IsBuildingAst))
+			if (pSymbolNode->m_pAstNode && (m_Flags & EFlag_BuildingAst))
 			{
 				if (!m_Ast)
 					m_Ast.Create ();
@@ -689,7 +689,7 @@ protected:
 			pNode = CreateNode (TargetIndex);
 			ASSERT (pNode->m_Kind == ENode_Token || pNode->m_Kind == ENode_Symbol);
 
-			pNode->m_Flags |= ENodeFlag_IsLocator;
+			pNode->m_Flags |= ENodeFlag_Locator;
 
 			CSymbolNode* pSymbolNode = GetSymbolTop ();
 			ASSERT (pSymbolNode);
@@ -729,7 +729,7 @@ protected:
 			return NULL;
 
 		CNode* pNode = CreateNode (MasterIndex);
-		if (!(pNode->m_Flags & ENodeFlag_IsLocator))
+		if (!(pNode->m_Flags & ENodeFlag_Locator))
 			m_NodeList.InsertTail (pNode);
 		m_PredictionStack.Append (pNode);
 		return pNode;
@@ -746,7 +746,7 @@ protected:
 		}
 
 		CNode* pNode = m_PredictionStack [Count - 1];
-		if (!(pNode->m_Flags & ENodeFlag_IsLocator))
+		if (!(pNode->m_Flags & ENodeFlag_Locator))
 			m_NodeList.Delete (pNode);
 
 		m_PredictionStack.SetCount (Count - 1);
@@ -778,7 +778,7 @@ protected:
 	void
 	PushSymbol (CSymbolNode* pNode)
 	{
-		if ((m_Flags & EFlag_IsBuildingAst) && pNode->m_pAstNode)
+		if ((m_Flags & EFlag_BuildingAst) && pNode->m_pAstNode)
 		{
 			CAstNode* pAstTop = GetAstTop ();
 			if (pAstTop)
@@ -789,7 +789,7 @@ protected:
 		}
 
 		m_SymbolStack.Append (pNode);
-		pNode->m_Flags |= ESymbolNodeFlag_IsStacked;
+		pNode->m_Flags |= ESymbolNodeFlag_Stacked;
 	}
 
 	void
@@ -803,7 +803,7 @@ protected:
 		}
 
 		CSymbolNode* pNode = m_SymbolStack [Count - 1];
-		pNode->m_Flags |= ESymbolNodeFlag_IsStacked;
+		pNode->m_Flags |= ESymbolNodeFlag_Stacked;
 
 		m_SymbolStack.SetCount (Count - 1);
 	}
@@ -821,7 +821,7 @@ protected:
 	PushPreResolver (CLaDfaNode* pNode)
 	{
 		m_ResolverStack.Append (pNode);
-		pNode->m_Flags |= ELaDfaNodeFlag_IsPreResolver;
+		pNode->m_Flags |= ELaDfaNodeFlag_PreResolver;
 	}
 
 	void
@@ -835,7 +835,7 @@ protected:
 		}
 
 		CLaDfaNode* pNode = m_ResolverStack [Count - 1];
-		pNode->m_Flags &= ~ELaDfaNodeFlag_IsPreResolver;
+		pNode->m_Flags &= ~ELaDfaNodeFlag_PreResolver;
 
 		m_ResolverStack.SetCount (Count - 1);
 	}
@@ -854,7 +854,7 @@ protected:
 			return NULL;
 
 		CNode* pNode = pSymbolNode->m_LocatorArray [Index];
-		if (!pNode || !(pNode->m_Flags & ENodeFlag_IsMatched))
+		if (!pNode || !(pNode->m_Flags & ENodeFlag_Matched))
 			return NULL;
 
 		return pNode;

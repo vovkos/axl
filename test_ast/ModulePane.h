@@ -68,6 +68,30 @@ protected:
 		);
 
 	void
+	AddFunction (
+		HTREEITEM hParent,
+		jnc::CFunction* pFunction
+		);
+
+	void
+	AddProperty (
+		HTREEITEM hParent,
+		jnc::CProperty* pProperty
+		);
+
+	void
+	AddEnumTypeMembers (
+		HTREEITEM hParent,
+		jnc::CEnumType* pType
+		);
+
+	void
+	AddStructTypeMembers (
+		HTREEITEM hParent,
+		jnc::CStructType* pType
+		);
+
+	void
 	AddStructMember (
 		HTREEITEM hParent,
 		jnc::CStructMember* pMember
@@ -75,6 +99,12 @@ protected:
 	{
 		AddValue (hParent, pMember->GetName (), pMember->GetType (), pMember);
 	}
+
+	void
+	AddUnionTypeMembers (
+		HTREEITEM hParent,
+		jnc::CUnionType* pType
+		);
 
 	void
 	AddUnionMember (
@@ -86,59 +116,15 @@ protected:
 	}
 
 	void
-	AddClassMember (
-		HTREEITEM hParent,
-		jnc::CClassMember* pMember
-		);
-
-	void
-	AddFunction (
-		HTREEITEM hParent,
-		const rtl::CString& Name,
-		jnc::CFunction* pFunction
-		);
-
-	void
-	AddFunction (
-		HTREEITEM hParent,
-		const rtl::CString& Name,
-		jnc::CFunctionOverload* pFunction
-		);
-
-	void
-	AddProperty (
-		HTREEITEM hParent,
-		jnc::CPropertyType* pType
-		);
-
-	void
-	AddGlobalFunction (
-		HTREEITEM hParent,
-		jnc::CGlobalFunction* pFunction
-		);
-
-	void
-	AddEnumTypeMembers (
-		HTREEITEM hParent,
-		jnc::CEnumType* pType
-		);
-
-	void
-	CModulePane::AddStructTypeMembers (
-		HTREEITEM hParent,
-		jnc::CStructType* pType
-		);
-
-	void
-	CModulePane::AddUnionTypeMembers (
-		HTREEITEM hParent,
-		jnc::CUnionType* pType
-		);
-
-	void
-	CModulePane::AddClassTypeMembers (
+	AddClassTypeMembers (
 		HTREEITEM hParent,
 		jnc::CClassType* pType
+		);
+
+	void
+	AddPropertyTypeMembers (
+		HTREEITEM hParent,
+		jnc::CPropertyType* pType
 		);
 
 	rtl::CString

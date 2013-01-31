@@ -34,7 +34,7 @@ CClassMgr::GetClass (const rtl::CString& Name)
 		return It->m_Value;
 
 	CClass* pClass = AXL_MEM_NEW (CClass);
-	pClass->m_Flags |= EClassFlag_IsNamed;
+	pClass->m_Flags |= EClassFlag_Named;
 	pClass->m_Name = Name;
 	m_ClassList.InsertTail (pClass);
 	It->m_Value = pClass;
@@ -53,7 +53,7 @@ CClassMgr::CreateUnnamedClass ()
 void
 CClassMgr::DeleteClass (CClass* pClass)
 {
-	if (pClass->m_Flags & EClassFlag_IsNamed)
+	if (pClass->m_Flags & EClassFlag_Named)
 		m_ClassMap.DeleteByKey (pClass->m_Name);
 
 	m_ClassList.Delete (pClass);		
@@ -67,7 +67,7 @@ CClassMgr::Verify ()
 	{
 		CClass* pClass = *Class;
 
-		if ((pClass->m_Flags & EClassFlag_IsUsed) && !(pClass->m_Flags & EClassFlag_IsDefined))
+		if ((pClass->m_Flags & EClassFlag_Used) && !(pClass->m_Flags & EClassFlag_Defined))
 		{
 			err::SetFormatStringError (_T("class '%s' is not defined"), pClass->m_Name);
 			return false;
@@ -84,7 +84,7 @@ CClassMgr::DeleteUnusedClasses ()
 	while (Class)
 	{
 		CClass* pClass = *Class++;
-		if (!(pClass->m_Flags & EClassFlag_IsUsed))
+		if (!(pClass->m_Flags & EClassFlag_Used))
 			DeleteClass (pClass);
 	}
 }
@@ -96,7 +96,7 @@ CClassMgr::DeleteUnreachableClasses ()
 	while (Class)
 	{
 		CClass* pClass = *Class++;
-		if (!(pClass->m_Flags & EClassFlag_IsReachable))
+		if (!(pClass->m_Flags & EClassFlag_Reachable))
 			DeleteClass (pClass);
 	}
 }

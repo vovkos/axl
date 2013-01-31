@@ -57,7 +57,7 @@ public:
 	void
 	SetupV (
 		IScheduler* pScheduler,
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn,
 		va_list va
 		)
@@ -73,13 +73,13 @@ public:
 		va_list va
 		)
 	{
-		SetupV (pScheduler, ECallingConvention_Cdecl, pfn, va);
+		SetupV (pScheduler, ECallConv_Cdecl, pfn, va);
 	}
 
 	void
 	Setup (
 		IScheduler* pScheduler,
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn,
 		...
 		)

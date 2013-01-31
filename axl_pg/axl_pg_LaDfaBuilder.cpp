@@ -51,7 +51,7 @@ CLaDfaState::CalcResolved ()
 
 	if (m_ActiveThreadList.IsEmpty ())
 	{
-		m_pDfaNode->m_Flags |= ELaDfaNodeFlag_IsResolved;
+		m_pDfaNode->m_Flags |= ELaDfaNodeFlag_Resolved;
 		return true;
 	}
 
@@ -72,7 +72,7 @@ CLaDfaState::CalcResolved ()
 			return false;
 	}
 
-	m_pDfaNode->m_Flags |= ELaDfaNodeFlag_IsResolved;
+	m_pDfaNode->m_Flags |= ELaDfaNodeFlag_Resolved;
 	return true;
 }
 
@@ -214,11 +214,27 @@ CLaDfaBuilder::Build (
 
 		if (!StateArray.IsEmpty ())
 		{
+			size_t Count = StateArray.GetCount ();
+			CLaDfaState* pState = StateArray [0];
+			rtl::CBoxListT <rtl::CString> TokenNameList;
+
+			for (; pState != pState0; pState = pState->m_pFromState)
+				TokenNameList.InsertHead (pState->m_pToken->m_Name);
+
+			rtl::CString TokenSeqString;
+			rtl::CBoxIteratorT <rtl::CString> TokenName = TokenNameList.GetHead ();
+			for (; TokenName; TokenName++)
+			{
+				TokenSeqString.Append (*TokenName);
+				TokenSeqString.Append (' ');
+			}
+
 			err::SetFormatStringError (
-				_T("conflict at %s:%s could not be resolved with %d token lookahead"),
+				_T("conflict at %s:%s could not be resolved with %d token lookahead; e.g. %s"),
 				pConflict->m_pSymbol->m_Name,
 				pConflict->m_pToken->m_Name,
-				m_LookeaheadLimit
+				m_LookeaheadLimit,
+				TokenSeqString
 				);
 
 			err::PushSrcPosError (pConflict->m_pSymbol->m_SrcPos);
@@ -285,7 +301,7 @@ CLaDfaBuilder::Build (
 
 		if (pState->IsResolved ())
 		{
-			pState->m_pDfaNode->m_Flags |= ELaDfaNodeFlag_IsLeaf;
+			pState->m_pDfaNode->m_Flags |= ELaDfaNodeFlag_Leaf;
 			pState->m_pDfaNode->m_pProduction = pState->GetResolvedProduction ();
 
 			if (pState->m_pDfaNode->m_pResolverUplink)
@@ -301,7 +317,7 @@ CLaDfaBuilder::Build (
 					// 2) both resolver 'then' and 'else' branch point to the same production (this happens when resolver applies not to the original conflict)
 					// in either case we we can safely eliminate the resolver {2}
 
-					pUplink->m_Flags |= ELaDfaNodeFlag_IsLeaf;
+					pUplink->m_Flags |= ELaDfaNodeFlag_Leaf;
 					pUplink->m_pResolver = NULL;
 					pUplink->m_pResolverElse = NULL;
 
@@ -316,15 +332,15 @@ CLaDfaBuilder::Build (
 		}
 	}
 
-	if (pConfig->m_Flags & EConfigFlag_IsVerbose)
+	if (pConfig->m_Flags & EConfigFlag_Verbose)
 		Trace ();
 
 	if (pState1->m_ResolverThreadList.IsEmpty () &&
-		(pState1->m_pDfaNode->m_Flags & ELaDfaNodeFlag_IsLeaf))
+		(pState1->m_pDfaNode->m_Flags & ELaDfaNodeFlag_Leaf))
 	{
 		// can happen on active-vs-complete-vs-epsion conflicts
 
-		pState0->m_pDfaNode->m_Flags |= ELaDfaNodeFlag_IsLeaf; // don't index state0
+		pState0->m_pDfaNode->m_Flags |= ELaDfaNodeFlag_Leaf; // don't index state0
 		return pState1->m_pDfaNode->m_pProduction; 
 	}
 
@@ -498,7 +514,7 @@ CLaDfaBuilder::ProcessThread (CLaDfaThread* pThread)
 
 			ASSERT (pNode->m_MasterIndex);
 
-			if ((pNode->m_Flags & ESymbolNodeFlag_IsAnyToken) && pToken->m_MasterIndex != 0) // EOF does not match ANY
+			if ((pNode->m_Flags & ESymbolNodeFlag_AnyToken) && pToken->m_MasterIndex != 0) // EOF does not match ANY
 			{
 				pThread->m_Stack.Pop ();
 				pThread->m_Match = ELaDfaThreadMatch_AnyToken;

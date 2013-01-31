@@ -49,18 +49,18 @@ public:
 
 protected:
 	void* m_pfn;
-	ECallingConvention m_Convention;
+	ECallConv m_Convention;
 	ref::CPtrT <CArgBlock> m_Context;
 
 public:
 	CFunctionT ()
 	{
 		m_pfn = NULL;
-		m_Convention = ECallingConvention_Cdecl;
+		m_Convention = ECallConv_Cdecl;
 	}
 
 	CFunctionT (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn,
 		...
 		)
@@ -78,7 +78,7 @@ public:
 
 	void
 	SetupV (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn,
 		va_list va
 		)
@@ -94,12 +94,12 @@ public:
 		va_list va
 		)
 	{
-		SetupV (ECallingConvention_Cdecl, pfn, va);
+		SetupV (ECallConv_Cdecl, pfn, va);
 	}
 
 	void
 	Setup (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn,
 		...
 		)

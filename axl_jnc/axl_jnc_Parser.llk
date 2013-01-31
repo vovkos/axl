@@ -2,13 +2,9 @@ import "axl_jnc_Decl.llk";
 import "axl_jnc_Expr.llk";
 import "axl_jnc_Stmt.llk";
 
-import "axl_jnc_AttributeBlock.llk";
-import "axl_jnc_EnumSpecifier.llk";
-import "axl_jnc_StructSpecifier.llk";
-import "axl_jnc_UnionSpecifier.llk";
-import "axl_jnc_ClassSpecifier.llk";
-import "axl_jnc_PropertySpecifier.llk";
-import "axl_jnc_AutoEvSpecifier.llk";
+import "axl_jnc_DeclarationSpecifier.llk";
+import "axl_jnc_Declarator.llk";
+import "axl_jnc_NamedTypeSpecifier.llk";
 
 //.............................................................................
 
@@ -50,23 +46,29 @@ Members
 	{
 		EAssign_Normal,
 		EAssign_BinOp,
-		EAssign_Ref
 	};
 
 	CModule* m_pModule;
+	EStage m_Stage;
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;
 	EEndianness m_Endianness;
-	EStage m_Stage;
+	EStorage m_StorageKind;
+	EStorage m_DefaultMethodStorageKind;
+	EAccess m_AccessKind;
+	EAccess m_DefaultAccessKind;
+	CAttributeBlock* m_pAttributeBlock;
 	CValue m_ThisValue;
-
+	 
 	CClassType* m_pAutoEvType;
 	CBasicBlock* m_pAutoEvConstructorBlock;
 	CBasicBlock* m_pAutoEvDestructorBlock;
 	CValue m_AutoEvConstructorThisValue;
 	CValue m_AutoEvDestructorThisValue;
 
-	rtl::CArrayT <CTypeSpecifierModifiers*> m_TypeSpecifierStack;
+	CModuleItem* m_pLastDeclaredItem;
+
+	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
 	rtl::CBoxListT <CValue> m_BindablePropertyList;
 }
 
@@ -77,14 +79,20 @@ Members2
 	CType*
 	FindType (const CQualifiedName& Name);
 
+	bool
+	SetStorageKind (EStorage StorageKind);
+
+	bool
+	SetAccessKind (EAccess AccessKind);
+
 	void
-	PushTypeSpecifier (CTypeSpecifierModifiers* pTypeSpecifier)
+	PushTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 	{
 		m_TypeSpecifierStack.Append (pTypeSpecifier);
 	}
 
 	void
-	PopTypeSpecifier (CTypeSpecifierModifiers* pTypeSpecifier)
+	PopTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 	{
 		m_TypeSpecifierStack.Pop ();
 	}
@@ -92,96 +100,99 @@ Members2
 	bool
 	IsTypeSpecified ();
 
-	CModuleItem*
+	bool
+	IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier);
+
+	void
+	AssignDeclarationAttributes (
+		CModuleItem* pItem,
+		const CToken::CPos& Pos
+		);
+
+	bool
 	Declare (
-		CDeclSpecifiers* pDeclSpecifiers,
 		CDeclarator* pDeclarator,
-		CClassType* pClassType = NULL,
-		size_t BitCount = 0,
 		bool HasInitializer = false
 		);
-
-	CEnumType*
-	DeclareEnumType (
-		EType TypeKind,
-		rtl::CString& Name
+		
+	bool
+	DeclareTypedef (
+		CType* pType,
+		CDeclarator* pDeclarator
 		);
 
-	CStructType*
-	DeclareStructType (
-		rtl::CString& Name,
-		rtl::CBoxListT <CType*>* pBaseTypeList,
-		size_t PackFactor
+	bool
+	DeclareFunction (
+		CFunctionType* pType,
+		CDeclarator* pDeclarator
 		);
 
-	CStructMember*
-	DeclareStructMember (
-		CStructType* pStructType,
-		CTypeSpecifierModifiers* pTypeSpecifier,
+	bool
+	AddNamedFunction (CFunction* pFunction);
+
+	bool
+	DeclareProperty (
+		CPropertyType* pType,
+		CDeclarator* pDeclarator
+		);
+
+	bool
+	DeclareData (
+		CType* pType,
 		CDeclarator* pDeclarator,
-		size_t BitCount
-		);
-
-	CUnionType*
-	DeclareUnionType (rtl::CString& Name);
-
-	CUnionMember*
-	DeclareUnionMember (
-		CUnionType* pStructType,
-		CTypeSpecifierModifiers* pTypeSpecifier,
-		CDeclarator* pDeclarator,
-		size_t BitCount
-		);
-
-	CClassType*
-	DeclareClassType (
-		EType TypeKind,
-		rtl::CString& Name,
-		rtl::CBoxListT <CType*>* pBaseTypeList,
-		size_t PackFactor
-		);
-
-	CFunction*
-	DeclareClassPreConstructor (
-		CClassType* pClassType,
-		CDeclarator* pDeclarator
-		);
-
-	CFunction*
-	DeclareClassConstructor (
-		CClassType* pClassType,
-		CDeclarator* pDeclarator
-		);
-
-	CFunction*
-	DeclareClassDestructor (
-		CClassType* pClassType,
-		CDeclarator* pDeclarator
+		bool HasInitializer
 		);
 
 	CFunctionFormalArg*
-	DeclareFormalArg (
+	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
-		CTypeSpecifierModifiers* pTypeSpecifier,
+		CTypeSpecifier* pTypeSpecifier,
 		CDeclarator* pDeclarator,
 		const CValue& DefaultValue
 		);
 
-	CPropertyType*
-	DeclarePropertyType (rtl::CString& Name);
-
-	CFunction*
-	DeclarePropertyAccessor (
-		CPropertyType* pType,
-		CTypeSpecifierModifiers* pTypeSpecifier,
-		CDeclarator* pDeclarator
+	CEnumType*
+	CreateEnumType (
+		const rtl::CString& Name,
+		int Flags
 		);
+
+	CStructType*
+	CreateStructType (
+		const rtl::CString& Name,
+		rtl::CBoxListT <CType*>* pBaseTypeList,
+		size_t PackFactor
+		);
+
+	CUnionType*
+	CreateUnionType (const rtl::CString& Name);
 
 	CClassType*
-	DeclareAutoEvType (
-		rtl::CString& Name,
-		CDeclarator* pDeclarator
+	CreateClassType (
+		const rtl::CString& Name,
+		rtl::CBoxListT <CType*>* pBaseTypeList,
+		size_t PackFactor,
+		int Flags
 		);
+
+	CProperty*
+	CreatePropertyImpl (
+		const rtl::CString& Name,
+		const CToken::CPos& Pos,
+		size_t PackFactor
+		);
+
+	CProperty*
+	CreateProperty (
+		const rtl::CString& Name,
+		size_t PackFactor
+		)
+	{
+		return CreatePropertyImpl (Name, m_LastMatchedToken.m_Pos, PackFactor);
+	}
+
+	CClassType*
+	CreateAutoEvType (CDeclarator* pDeclarator);
 
 	bool
 	PreAutoEvBlock (CClassType* pAutoEvTyoe);
@@ -220,10 +231,7 @@ Members2
 		);
 
 	bool
-	SetFunctionBody (
-		CModuleItem* pItem,
-		rtl::CBoxListT <CToken>* pBody
-		);
+	SetFunctionBody (rtl::CBoxListT <CToken>* pBody);
 
 	bool
 	LookupIdentifier (
@@ -233,6 +241,9 @@ Members2
 
 	bool
 	SetThis (CValue* pValue);
+
+	void
+	SetStorageAccessDefaults ();
 } 
 
 OpenNamespace
@@ -243,8 +254,8 @@ OpenNamespace
 
 CloseNamespace
 {.
-	} // namespace axl {
 	} // namespace jnc {
+	} // namespace axl {
 .}
 
 //.............................................................................

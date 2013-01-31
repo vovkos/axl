@@ -6,18 +6,30 @@ namespace axl {
 namespace jnc {
 
 //.............................................................................
+	
+CStructMember::CStructMember ()
+{
+	m_ItemKind = EModuleItem_StructMember;
+	m_pType = NULL;
+	m_pBitFieldBaseType = NULL;
+	m_BitCount = 0;
+	m_Offset = 0;
+	m_LlvmIndex = -1;
+}
+
+//.............................................................................
 
 CStructType::CStructType ()
 {
 	m_TypeKind = EType_Struct;
-	m_NamespaceKind = ENamespace_Struct;
-	m_Flags = ETypeFlag_IsPod;
+	m_Flags = ETypeFlag_Pod;
 	m_AlignFactor = 1;
 	m_PackFactor = 8;
 	m_FieldActualSize = 0;
 	m_FieldAlignedSize = 0;
 	m_pLastBitFieldType = NULL;
 	m_LastBitFieldOffset = 0;
+	m_pFieldParent = NULL;
 }
 
 bool
@@ -118,7 +130,7 @@ CStructType::FindMemberImpl (
 		if (pItem->GetItemKind () != EModuleItem_StructMember)
 			return NULL;
 
-		if (pBaseTypeCoord && Level)
+		if (pBaseTypeCoord)
 			pBaseTypeCoord->m_LlvmIndexArray.SetCount (Level);
 
 		return (CStructMember*) pItem;
@@ -152,26 +164,58 @@ CStructType::CreateMember (
 	)
 {
 	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
+	pMember->m_StorageKind = m_StorageKind;
+	pMember->m_pParentStructType = this;
 	pMember->m_Name = Name;
 	pMember->m_pType = pType;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
 	m_MemberList.InsertTail (pMember);
 
-	if (Name.IsEmpty ())
-		return pMember;
+	if (!(pType->GetFlags () & ETypeFlag_Pod))
+		m_Flags &= ~ETypeFlag_Pod;
 
-	bool Result = AddItem (pMember);
-	if (!Result)
-		return NULL;
+	if (!Name.IsEmpty ())
+	{
+		bool Result = AddItem (pMember);
+		if (!Result)
+			return NULL;
+	}
 
 	return pMember;
 }
 
 bool
+CStructType::Append (CStructType* pType)
+{
+	bool Result;
+
+	rtl::CIteratorT <CStructBaseType> BaseType = pType->m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		Result = AddBaseType (BaseType->m_pType) != NULL;
+		if (!Result)
+			return false;
+	}
+
+	rtl::CIteratorT <CStructMember> Member = pType->m_MemberList.GetHead ();
+	for (; Member; Member++)
+	{
+		Result = Member->m_BitCount ? 
+			CreateMember (Member->m_Name, Member->m_pBitFieldBaseType, Member->m_BitCount) != NULL:
+			CreateMember (Member->m_Name, Member->m_pType) != NULL;
+
+		if (!Result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
 CStructType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_IsLayoutReady)
+	if (m_Flags & ETypeFlag_LayoutReady)
 		return true;
 
 	bool Result = PreCalcLayout ();
@@ -222,14 +266,15 @@ CStructType::CalcLayout ()
 				&pMember->m_LlvmIndex
 				);
 
-			if (!Result)
-				return false;
+		if (!Result)
+			return false;
 	}
 
 	if (m_FieldAlignedSize > m_FieldActualSize)
 		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
 
-	GetLlvmType ()->setBody (
+	llvm::StructType* pLlvmStructType = (llvm::StructType*) GetLlvmType ();
+	pLlvmStructType->setBody (
 		llvm::ArrayRef<llvm::Type*> (m_LlvmFieldTypeArray, m_LlvmFieldTypeArray.GetCount ()),
 		true
 		);
@@ -240,16 +285,6 @@ CStructType::CalcLayout ()
 	return true;
 }
 
-llvm::StructType* 
-CStructType::GetLlvmType ()
-{
-	if (m_pLlvmType)
-		return (llvm::StructType*) m_pLlvmType;
-	
-	m_pLlvmType = llvm::StructType::create (llvm::getGlobalContext (), (const tchar_t*) m_Tag);
-	return (llvm::StructType*) m_pLlvmType;
-}
-
 void
 CStructType::ResetLayout ()
 {
@@ -258,7 +293,7 @@ CStructType::ResetLayout ()
 	m_LlvmFieldTypeArray.Clear ();
 	m_pLastBitFieldType = NULL;
 	m_LastBitFieldOffset = 0;
-	m_Flags &= ~ETypeFlag_IsLayoutReady;
+	m_Flags &= ~ETypeFlag_LayoutReady;
 }
 
 bool
@@ -387,6 +422,6 @@ CStructType::InsertPadding (size_t Size)
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
 

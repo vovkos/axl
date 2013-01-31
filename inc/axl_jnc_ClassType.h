@@ -4,19 +4,25 @@
 
 #pragma once
 
-#include "axl_jnc_PropertyType.h"
-#include "axl_jnc_Decl.h"
+#include "axl_jnc_StructType.h"
+#include "axl_jnc_Function.h"
+#include "axl_jnc_Property.h"
 
 namespace axl {
 namespace jnc {
 
-class CFunctionMgr;
+class CClassPtrType;
+class CClassPtrTypeTuple;
+
+enum EClassPtrType;
 
 //.............................................................................
 
 enum EClassTypeFlag
 {
-	EClassTypeFlag_IsAutoEv = 0x010000,
+	EClassTypeFlag_StdObject = 0x010000, // EStdType_Object 
+	EClassTypeFlag_Interface = 0x020000,
+	EClassTypeFlag_AutoEv    = 0x040000,
 };
 
 //.............................................................................
@@ -73,209 +79,59 @@ public:
 
 //............................................................................
 
-enum EClassMember
-{
-	EClassMember_Undefined,
-
-	EClassMember_Field,
-	EClassMember_Method,
-	EClassMember_Property,
-	EClassMember_Constructor,
-	EClassMember_Destructor,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum EClassMemberStorage
-{
-	EClassMemberStorage_Undefined,
-	EClassMemberStorage_Static,
-	EClassMemberStorage_Dynamic,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t*
-GetClassMemberKindString (EClassMember MemberKind);
-
-const tchar_t*
-GetClassMemberStorageString (EClassMemberStorage Storage);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CClassMember: 
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
-{
-protected:
-	friend class CClassType;
-
-	EClassMember m_MemberKind;
-	EClassMemberStorage m_Storage;
-	EAccess m_Access;
-
-public:
-	CClassMember ()
-	{
-		m_ItemKind = EModuleItem_ClassMember;
-		m_MemberKind = EClassMember_Undefined;
-		m_Storage = EClassMemberStorage_Undefined;
-		m_Access = EAccess_Public;
-	}
-
-	EClassMember GetMemberKind ()
-	{
-		return m_MemberKind;
-	}
-
-	EClassMemberStorage GetStorage ()
-	{
-		return m_Storage;
-	}
-
-	EAccess GetAccess ()
-	{
-		return m_Access;
-	}
-
-	CClassType*
-	GetParentType ()
-	{
-		return (CClassType*) (CNamedType*) m_pParentNamespace; // double cast cause CStructType is not defined yet
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CClassFieldMember: public CClassMember
-{
-protected:
-	friend class CClassType;
-
-	CType* m_pType;
-	CType* m_pBitFieldBaseType;
-	size_t m_BitCount;
-
-	CStructMember* m_pStructMember;
-
-public:
-	CClassFieldMember ()
-	{
-		m_MemberKind = EClassMember_Field;
-		m_pType = NULL;
-		m_pBitFieldBaseType = NULL;
-		m_BitCount = 0;
-
-		m_pStructMember = NULL;
-	}
-
-	CType*
-	GetType ()
-	{
-		return m_pType;
-	}
-
-	size_t
-	GetOffset ()
-	{
-		ASSERT (m_pStructMember);
-		return m_pStructMember->GetOffset ();
-	}
-
-	size_t
-	GetLlvmIndex ()
-	{
-		ASSERT (m_pStructMember);
-		return m_pStructMember->GetLlvmIndex ();
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CClassMethodMember: 
-	public CClassMember,
-	public CFunctionOverload
-{
-protected:
-	friend class CClassType;
-
-public:
-	CClassMethodMember ()
-	{
-		m_MemberKind = EClassMember_Method;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CClassPropertyMember: public CClassMember
-{
-protected:
-	friend class CClassType;
-
-	CPropertyType* m_pType;
-
-public:
-	CClassPropertyMember ()
-	{
-		m_MemberKind = EClassMember_Property;
-		m_pType = NULL;
-	}
-
-	CPropertyType*
-	GetType ()
-	{
-		return m_pType;
-	}
-};
-
-//.............................................................................
-
-class CClassType: public CVTableType
+class CClassType: public CNamedType
 {
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
+	friend class CProperty;
 
-	size_t m_PackFactor;
-
-	rtl::CStringHashTableMapAT <CClassBaseType*> m_BaseTypeMap;
-	rtl::CStdListT <CClassBaseType> m_BaseTypeList;
-	rtl::CStdListT <CClassFieldMember> m_FieldMemberList;
-	rtl::CStdListT <CClassMethodMember> m_MethodMemberList;
-	rtl::CStdListT <CClassPropertyMember> m_PropertyMemberList;
-
-	CFunctionType* m_pSimpleMethodType;
-
-	CFunction* m_pPreConstructor;
-	CFunctionOverload m_Constructor;
-	CFunction* m_pDestructor;
-	CFunction* m_pInitializer;
-
-	rtl::CArrayT <CFunction*> m_MethodFunctionArray;
-
-	CStructType* m_pInterfaceHdrStructType;
 	CStructType* m_pInterfaceStructType;
 	CStructType* m_pClassStructType;
 
+	// construction / destruction
+
+	CFunction* m_pPreConstructor;
+	CFunction* m_pConstructor;
+	CFunction* m_pStaticConstructor;
+	CFunction* m_pDestructor;
+	CFunction* m_pInitializer;
+
+	// operators
+
+	rtl::CArrayT <CFunction*> m_UnOpOverloadArray;
+	rtl::CArrayT <CFunction*> m_BinOpOverloadArray;
+
+	// base types
+
+	rtl::CStringHashTableMapAT <CClassBaseType*> m_BaseTypeMap;
+	rtl::CStdListT <CClassBaseType> m_BaseTypeList;
+
+	// fields
+
+	size_t m_PackFactor;
+	CStructType* m_pFieldStructType;
+	CStructMember* m_pFieldMember;
+	CStructType* m_pStaticFieldStructType;
+	CVariable* m_pStaticDataVariable;
+
+	// vtable
+
+	rtl::CArrayT <CFunction*> m_VirtualMethodArray;
+	rtl::CArrayT <CProperty*> m_VirtualPropertyArray;
+
+	CStructType* m_pVTableStructType;
+	rtl::CArrayT <CFunction*> m_VTable;
+	CValue m_VTablePtrValue;
+
+	// autoev
+
 	rtl::CBoxListT <CToken> m_AutoEvBody;
+
+	CClassPtrTypeTuple* m_pClassPtrTypeTuple;
 
 public:
 	CClassType ();
-
-	size_t
-	GetPackFactor ()
-	{
-		return m_PackFactor;
-	}
-
-	CStructType* 
-	GetInterfaceHdrStructType ()
-	{
-		ASSERT (m_pInterfaceHdrStructType);
-		return m_pInterfaceHdrStructType;
-	}
 
 	CStructType* 
 	GetInterfaceStructType ()
@@ -291,11 +147,11 @@ public:
 		return m_pClassStructType;
 	}
 
-	CFunctionType* 
-	GetSimpleMethodType ();
-
-	CFunctionType* 
-	GetMethodType (CFunctionType* pShortType);
+	CClassPtrType* 
+	GetClassPtrType (
+		EClassPtrType PtrTypeKind = (EClassPtrType) 0,
+		int Flags = 0
+		);
 
 	CFunction* 
 	GetPreConstructor ()
@@ -303,10 +159,16 @@ public:
 		return m_pPreConstructor;
 	}
 
-	CFunctionOverload*
+	CFunction* 
 	GetConstructor ()
 	{
-		return &m_Constructor;
+		return m_pConstructor;
+	}
+
+	CFunction* 
+	GetStaticConstructor ()
+	{
+		return m_pStaticConstructor;
 	}
 
 	CFunction* 
@@ -318,16 +180,10 @@ public:
 	CFunction* 
 	GetInitializer ();
 
-	size_t 
-	GetBaseTypeCount ()
+	rtl::CConstListT <CClassBaseType>
+	GetBaseTypeList ()
 	{
-		return m_BaseTypeList.GetCount ();
-	}
-
-	rtl::CIteratorT <CClassBaseType>
-	GetFirstBaseType ()
-	{
-		return m_BaseTypeList.GetHead ();
+		return m_BaseTypeList;
 	}
 
 	bool
@@ -344,26 +200,8 @@ public:
 
 	CModuleItem*
 	FindItemWithBaseTypeList (const tchar_t* pName);
-
-	rtl::CIteratorT <CClassFieldMember>
-	GetFirstFieldMember ()
-	{
-		return m_FieldMemberList.GetHead ();
-	}
-
-	rtl::CIteratorT <CClassMethodMember>
-	GetFirstMethodMember ()
-	{
-		return m_MethodMemberList.GetHead ();
-	}
-
-	rtl::CIteratorT <CClassPropertyMember>
-	GetFirstPropertyMember ()
-	{
-		return m_PropertyMemberList.GetHead ();
-	}
 	
-	CClassMember*
+	CModuleItem*
 	FindMember (
 		const tchar_t* pName,
 		CClassBaseTypeCoord* pBaseTypeCoord = NULL
@@ -372,45 +210,75 @@ public:
 		return FindMemberImpl (true, pName, pBaseTypeCoord, 0);
 	}
 
-	CFunction*
-	CreatePreConstructor ();
+	size_t
+	GetPackFactor ()
+	{
+		return m_PackFactor;
+	}
 
-	CFunction*
-	CreateConstructor (CFunctionType* pType);
+	CStructType* 
+	GetFieldStructType ()
+	{
+		return m_pFieldStructType;
+	}
 
-	CFunction*
-	CreateDestructor ();
+	CStructType* 
+	GetStaticFieldStructType ()
+	{
+		return m_pStaticFieldStructType;
+	}
 
-	CClassFieldMember*
+	CVariable* 
+	GetStaticDataVariable ()
+	{
+		return m_pStaticDataVariable;
+	}
+
+	CStructMember*
 	CreateFieldMember (
+		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0
 		);
 
-	CClassFieldMember*
+	CStructMember*
 	CreateFieldMember (
+		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0
 		)
 	{
-		return CreateFieldMember (rtl::CString (), pType, BitCount);
+		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount);
+	}
+	
+	CFunctionType* 
+	GetMethodMemberType (CFunctionType* pShortType);
+
+	CPropertyType* 
+	GetPropertyMemberType (CPropertyType* pShortType);
+
+	bool
+	AddMethodMember (CFunction* pFunction);
+
+	bool
+	AddPropertyMember (CProperty* pProperty);
+
+	rtl::CArrayT <CFunction*>
+	GetVTable ()
+	{
+		return m_VTable;
 	}
 
-	CClassMethodMember*
-	CreateMethodMember (
-		const rtl::CString& Name,
-		CFunction* pFunction
-		);
+	CStructType* 
+	GetVTableStructType ()
+	{
+		ASSERT (m_pVTableStructType);
+		return m_pVTableStructType;
+	}
 
-	void
-	AddMethodFunction (CFunction* pFunction);
-
-	CClassPropertyMember*
-	CreatePropertyMember (
-		const rtl::CString& Name,
-		CPropertyType* pProperty
-		);
+	bool
+	GetVTablePtrValue (CValue* pValue);
 
 	const rtl::CBoxListT <CToken>*
 	GetAutoEvBody ()
@@ -421,10 +289,25 @@ public:
 	void
 	SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList);
 
+	virtual
 	bool
 	CalcLayout ();
 
 protected:
+	virtual 
+	void
+	PrepareTypeString ()
+	{
+		m_TypeString.Format ((m_Flags & EClassTypeFlag_Interface) ? _T("interface %s") : _T("class %s"), m_Tag);
+	}
+
+	virtual 
+	void
+	PrepareLlvmType ()
+	{
+		ASSERT (false);
+	}
+
 	bool
 	FindBaseTypeImpl (
 		CClassType* pType,
@@ -432,7 +315,7 @@ protected:
 		size_t Level
 		);
 
-	CClassMember*
+	CModuleItem*
 	FindMemberImpl (
 		bool IncludeThis,
 		const tchar_t* pName,
@@ -441,10 +324,10 @@ protected:
 		);
 
 	bool
-	LayoutFunction (CFunction* pFunction);
+	LayoutNamedVirtualFunction (CFunction* pFunction);
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

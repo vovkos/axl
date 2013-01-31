@@ -53,7 +53,7 @@ GetNodeKindString (ENode NodeKind)
 		return _T("lookahead-dfa-node");
 
 	default:
-		return _T("undefined-node");
+		return _T("undefined-node-kind");
 	};
 }
 
@@ -61,8 +61,8 @@ GetNodeKindString (ENode NodeKind)
 
 enum ENodeFlag
 {
-	ENodeFlag_IsLocator = 0x01, // used to locate AST / token from actions (applies to token & symbol nodes)
-	ENodeFlag_IsMatched = 0x02, // applies to token & symbol & argument nodes
+	ENodeFlag_Locator = 0x01, // used to locate AST / token from actions (applies to token & symbol nodes)
+	ENodeFlag_Matched = 0x02, // applies to token & symbol & argument nodes
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -116,9 +116,9 @@ public:
 
 enum ESymbolNodeFlag
 {
-	ESymbolNodeFlag_IsStacked = 0x0010,
-	ESymbolNodeFlag_IsNamed   = 0x0020,
-	ESymbolNodeFlag_IsPragma  = 0x0040,
+	ESymbolNodeFlag_Stacked = 0x0010,
+	ESymbolNodeFlag_Named   = 0x0020,
+	ESymbolNodeFlag_Pragma  = 0x0040,
 	ESymbolNodeFlag_HasEnter  = 0x0100,
 	ESymbolNodeFlag_HasLeave  = 0x0200,
 	ESymbolNodeFlag_KeepAst   = 0x0400,
@@ -157,7 +157,7 @@ public:
 
 enum ELaDfaNodeFlag
 {
-	ELaDfaNodeFlag_IsPreResolver      = 0x0010,
+	ELaDfaNodeFlag_PreResolver      = 0x0010,
 	ELaDfaNodeFlag_HasChainedResolver = 0x0020,
 };
 

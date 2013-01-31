@@ -170,7 +170,7 @@ CLlvmBuilder::CreateGep (
 llvm::CallInst*
 CLlvmBuilder::CreateCall (
 	const CValue& CalleeValue,
-	ECallConv CallingConvention,
+	ECallConv CallConv,
 	const CValue* pArgArray,
 	size_t ArgCount,
 	CType* pResultType, 
@@ -209,22 +209,22 @@ CLlvmBuilder::CreateCall (
 			pResultValue->SetVoid ();
 	}
 
-	pInst->setCallingConv (GetLlvmCallingConvention (CallingConvention));
+	pInst->setCallingConv (GetLlvmCallConv (CallConv));
 	return pInst;
 }
 
 llvm::Value*
-CLlvmBuilder::CreateSafePtr (
+CLlvmBuilder::CreateDataPtr (
 	const CValue& PtrValue,
 	const CValue& RegionBeginValue,
 	size_t Size,
 	const CValue& ScopeLevelValue,
-	CPointerType* pResultType,
+	CDataPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
 	CValue ValidatorValue;
-	CreateSafePtrValidator (
+	CreateDataPtrValidator (
 		RegionBeginValue,
 		Size,
 		ScopeLevelValue,
@@ -233,24 +233,24 @@ CLlvmBuilder::CreateSafePtr (
 	
 	CreateComment ("create safe pointer");
 
-	CValue SafePtrValue = pResultType->GetUndefValue ();
-	CreateInsertValue (SafePtrValue, PtrValue, 0, NULL, &SafePtrValue);
-	return CreateInsertValue (SafePtrValue, ValidatorValue, 1, pResultType, pResultValue);
+	CValue DataPtrValue = pResultType->GetUndefValue ();
+	CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
+	return CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
 }
 
 llvm::Value*
-CLlvmBuilder::CreateSafePtr (
+CLlvmBuilder::CreateDataPtr (
 	const CValue& PtrValue,
 	const CValue& RegionBeginValue,
 	size_t Size,
 	CScope* pScope,
-	CPointerType* pResultType,
+	CDataPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
 	CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope);
 
-	return CreateSafePtr (
+	return CreateDataPtr (
 		PtrValue,
 		RegionBeginValue,
 		Size,
@@ -261,25 +261,25 @@ CLlvmBuilder::CreateSafePtr (
 }
 
 llvm::Value*
-CLlvmBuilder::ModifySafePtr (
-	const CValue& SrcSafePtrValue,
+CLlvmBuilder::ModifyDataPtr (
+	const CValue& SrcDataPtrValue,
 	const CValue& PtrValue,
-	CPointerType* pResultType,
+	CDataPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
 	CreateComment ("modify safe pointer");
 
 	CValue ValidatorValue;
-	CreateExtractValue (SrcSafePtrValue, 0, NULL, &ValidatorValue);
+	CreateExtractValue (SrcDataPtrValue, 0, NULL, &ValidatorValue);
 	
-	CValue SafePtrValue = pResultType->GetUndefValue ();
-	CreateInsertValue (SafePtrValue, PtrValue, 0, NULL, &SafePtrValue);
-	return CreateInsertValue (SafePtrValue, ValidatorValue, 1, pResultType, pResultValue);
+	CValue DataPtrValue = pResultType->GetUndefValue ();
+	CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
+	return CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
 }
 
 llvm::Value*
-CLlvmBuilder::CreateSafePtrValidator (
+CLlvmBuilder::CreateDataPtrValidator (
 	const CValue& RawRegionBeginValue,
 	size_t Size,
 	const CValue& ScopeLevelValue,
@@ -296,7 +296,7 @@ CLlvmBuilder::CreateSafePtrValidator (
 	CValue RegionEndValue;
 	CreateGep (RegionBeginValue, SizeValue, NULL, &RegionEndValue);
 	
-	CType* pType = m_pModule->m_TypeMgr.GetStdType (EStdType_SafePtrValidator);
+	CType* pType = m_pModule->m_TypeMgr.GetStdType (EStdType_DataPtrValidator);
 
 	CValue ValidatorValue = pType->GetUndefValue ();
 	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionBeginValue, 0, NULL, &ValidatorValue);
@@ -305,7 +305,7 @@ CLlvmBuilder::CreateSafePtrValidator (
 }
 
 llvm::Value*
-CLlvmBuilder::CreateSafePtrValidator (
+CLlvmBuilder::CreateDataPtrValidator (
 	const CValue& RegionBeginValue,
 	size_t Size,
 	CScope* pScope,
@@ -314,7 +314,7 @@ CLlvmBuilder::CreateSafePtrValidator (
 {
 	CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope);
 
-	return CreateSafePtrValidator (
+	return CreateDataPtrValidator (
 		RegionBeginValue,
 		Size,
 		ScopeLevelValue,
@@ -323,7 +323,7 @@ CLlvmBuilder::CreateSafePtrValidator (
 }
 
 bool
-CLlvmBuilder::CheckSafePtrRange (
+CLlvmBuilder::CheckDataPtrRange (
 	const CValue& RawPtrValue,
 	size_t Size,
 	const CValue& ValidatorValue,
@@ -338,11 +338,11 @@ CLlvmBuilder::CheckSafePtrRange (
 	CValue PtrValue;
 	CreateBitCast (RawPtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
-	CFunction* pCheckSafePtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckSafePtrRange);
+	CFunction* pCheckDataPtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckDataPtrRange);
 
 	CreateCall4 (
-		pCheckSafePtrRange,
-		pCheckSafePtrRange->GetType (),
+		pCheckDataPtrRange,
+		pCheckDataPtrRange->GetType (),
 		PtrValue,
 		SizeValue,
 		ValidatorValue,
@@ -364,11 +364,11 @@ CLlvmBuilder::GetDstScopeLevel (
 		CScope* pScope = DstValue.GetVariable ()->GetScope ();
 		m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope, pDstScopeLevelValue);
 	}
-	else if (DstValue.GetType ()->GetTypeKind () == EType_Reference)
+	else if (DstValue.GetType ()->GetTypeKind () == EType_DataRef)
 	{
 		size_t ScopeLevelIndexArray [] = 
 		{
-			1, // TSafePtrValidator m_Validator
+			1, // TDataPtrValidator m_Validator
 			2, // size_t m_ScopeLvel
 		};
 
@@ -383,7 +383,7 @@ CLlvmBuilder::GetDstScopeLevel (
 }
 
 bool
-CLlvmBuilder::CheckSafePtrScopeLevel (
+CLlvmBuilder::CheckDataPtrScopeLevel (
 	const CValue& SrcValue,
 	const CValue& DstValue
 	)
@@ -416,7 +416,7 @@ CLlvmBuilder::CheckSafePtrScopeLevel (
 	{
 		size_t ScopeLevelIndexArray [] = 
 		{
-				1, // TSafePtrValidator m_Validator
+				1, // TDataPtrValidator m_Validator
 				2, // size_t m_ScopeLevel
 		};
 
@@ -454,18 +454,17 @@ CLlvmBuilder::CheckNullPtr (const CValue& Value)
 
 	switch (TypeKind)
 	{
-	case EType_Interface:
-	case EType_Class:
+	case EType_ClassPtr:
 		PtrValue = Value;
 		Error = ERuntimeError_NullInterface;
 		break;
 
-	case EType_FunctionPointer:
+	case EType_FunctionPtr:
 		CreateExtractValue (Value, 0, NULL, &PtrValue);
 		Error = ERuntimeError_NullFunction;
 		break;
 
-	case EType_PropertyPointer:
+	case EType_PropertyPtr:
 		CreateExtractValue (Value, 0, NULL, &PtrValue);
 		Error = ERuntimeError_NullProperty;
 		break;
@@ -500,7 +499,7 @@ CLlvmBuilder::CheckInterfaceScopeLevel (
 	CreateComment ("check interface scope level");
 
 	CValue AbstractInterfaceValue;
-	CreateBitCast (SrcValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &AbstractInterfaceValue);
+	CreateBitCast (SrcValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &AbstractInterfaceValue);
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
 
@@ -525,7 +524,7 @@ CLlvmBuilder::DynamicCastInterface (
 	CreateComment ("dynamic cast interface");
 
 	CValue PtrValue;
-	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &PtrValue);
+	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
 
 	CValue TypeValue (&pResultType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
@@ -571,7 +570,7 @@ bool
 CLlvmBuilder::CreateFunctionPointer (
 	const CValue& RawPfnValue,
 	const CValue& RawIfaceValue,
-	CFunctionPointerType* pResultType,
+	CFunctionPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
@@ -581,8 +580,8 @@ CLlvmBuilder::CreateFunctionPointer (
 	CValue IfaceValue;
 	CValue FunctionPtrValue = pResultType->GetUndefValue ();
 
-	CreateBitCast (RawPfnValue, pResultType->GetFunctionType ()->GetPointerType (EType_Pointer_u), &PfnValue);
-	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr), &IfaceValue);
+	CreateBitCast (RawPfnValue, pResultType->GetFunctionType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe), &PfnValue);
+	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
 	CreateInsertValue (FunctionPtrValue, PfnValue, 0, NULL, &FunctionPtrValue);
 	CreateInsertValue (FunctionPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;
@@ -619,7 +618,7 @@ bool
 CLlvmBuilder::CreatePropertyPointer (
 	const CValue& PtrValue,
 	const CValue& InterfaceValue,
-	CPropertyPointerType* pResultType,
+	CPropertyPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
@@ -628,12 +627,12 @@ CLlvmBuilder::CreatePropertyPointer (
 	ASSERT (PtrValue.GetType ()->GetTypeKind () == EType_Property);
 	CPropertyType* pPropertyType = (CPropertyType*) PtrValue.GetType ();
 
-	ASSERT (pPropertyType->CmpAccessorTypes (pResultType->GetPropertyType ()) == 0);
+	ASSERT (pPropertyType->Cmp (pResultType->GetPropertyType ()) == 0);
 
 	CValue VTablePtrValue;
 	if (PtrValue.GetValueKind () == EValue_Property)
 	{
-		bool Result = pPropertyType->GetVTablePtrValue (&VTablePtrValue);
+		bool Result = PtrValue.GetProperty ()->GetVTablePtrValue (&VTablePtrValue);
 		if (!Result)
 			return false;
 	}
@@ -643,7 +642,7 @@ CLlvmBuilder::CreatePropertyPointer (
 	}
 	
 	CStructType* pVTableType = pResultType->GetPropertyType ()->GetVTableStructType ();
-	CreateBitCast (VTablePtrValue, pVTableType->GetPointerType (EType_Pointer_u), &VTablePtrValue);
+	CreateBitCast (VTablePtrValue, pVTableType->GetDataPtrType (EDataPtrType_Unsafe), &VTablePtrValue);
 
 	CValue PropertyPtrValue = pResultType->GetUndefValue ();
 	CreateInsertValue (PropertyPtrValue, VTablePtrValue, 0, NULL, &PropertyPtrValue);
@@ -690,5 +689,5 @@ CLlvmBuilder::CheckPropertyPointerScopeLevel (
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

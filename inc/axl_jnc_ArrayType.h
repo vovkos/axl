@@ -11,22 +11,29 @@ namespace jnc {
 
 //.............................................................................
 
-class CArrayType: public CDerivedType
+class CArrayType: public CType
 {
 protected:
 	friend class CTypeMgr;
 
+	CType* m_pElementType;
+	CType* m_pRootType;
 	size_t m_ElementCount;
 
 public:
-	CArrayType ()
+	CArrayType ();
+
+	CType*
+	GetElementType ()
 	{
-		m_TypeKind = EType_Array;
-		m_ElementCount = 0;
+		return m_pElementType;
 	}
 
-	llvm::ArrayType* 
-	GetLlvmType ();
+	CType* 
+	GetRootType ()
+	{
+		return m_pRootType;
+	}
 
 	size_t
 	GetElementCount ()
@@ -34,41 +41,37 @@ public:
 		return m_ElementCount;
 	}
 
-	CType* 
-	GetRootType ()
+	virtual
+	size_t
+	GetAlignFactor ()
 	{
-		return GetRootType (m_pBaseType);
+		return m_pRootType->GetAlignFactor ();
 	}
-
-	static
-	CType* 
-	GetRootType (CType* pBaseType);
 
 	static
 	rtl::CStringA
 	CreateSignature (
-		CType* pBaseType,
+		CType* pElementType,
 		size_t ElementCount
 		)
 	{ 
-		return rtl::CStringA::Format_s ("K%d%s", ElementCount, pBaseType->GetSignature ()); 
+		return rtl::CStringA::Format_s ("A%d%s", ElementCount, pElementType->GetSignature ()); 
 	}
 
-	static
-	rtl::CString
-	CreateTypeString (
-		CType* pBaseType,
-		size_t ElementCount
-		);
+protected:
+	virtual 
+	void
+	PrepareTypeString ();
 
-	rtl::CString
-	CreateTypeString ()
+	virtual 
+	void
+	PrepareLlvmType ()
 	{
-		return CreateTypeString (m_pBaseType, m_ElementCount);
+		m_pLlvmType = llvm::ArrayType::get (m_pElementType->GetLlvmType (), m_ElementCount);
 	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

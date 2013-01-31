@@ -76,7 +76,7 @@ axl_exe_GetNextParam endp
 ;		__stdcall
 ;		axl_exe_InvokeDirect (
 ;			void* pfn,
-;			int CallingConvention,
+;			int CallConv,
 ;			axl_mem_TBlock* pStack,
 ;			size_t Count
 ;			);

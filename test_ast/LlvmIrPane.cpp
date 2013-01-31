@@ -44,15 +44,22 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 
 	uint_t CommentMdKind = pModule->m_LlvmBuilder.GetCommentMdKind ();
 
-	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFirstFunction ();
+	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		m_LogCtrl.Trace (_T("@%s ()\r\n"), Function->GetTag ());
+		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+
+		m_LogCtrl.Trace (_T("%s %s %s %s\r\n"), 
+			pFunctionType->GetReturnType ()->GetTypeString (),
+			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+			Function->m_Tag, 
+			pFunctionType->GetArgTypeString ()
+			);
 
 		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
 		if (pExternFunction)
 		{
-			m_LogCtrl.Trace (_T("  ->%s\r\n"), pExternFunction->GetTag ());
+			m_LogCtrl.Trace (_T("  ->%s\r\n"), pExternFunction->m_Tag);
 			m_LogCtrl.Trace (_T("\r\n"));
 			continue;
 		}

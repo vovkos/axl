@@ -130,7 +130,8 @@ CNamespaceMgr::OpenScope (
 	pScope->m_Level = m_pCurrentScope ? m_pCurrentScope->m_Level + 1 : 1;
 	pScope->m_pModule = m_pModule;
 	pScope->m_pFunction = pFunction;
-	pScope->m_Pos = Pos;
+	pScope->m_BeginPos = Pos;
+	pScope->m_EndPos = Pos;
 	pScope->m_pBreakBlock = pBreakBlock;
 	pScope->m_pContinueBlock = pContinueBlock;
 	m_ScopeList.InsertTail (pScope);
@@ -148,7 +149,7 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 	m_pModule->m_OperatorMgr.ProcessDestructList (&m_pCurrentScope->m_DestructList);
 
 	ASSERT (m_pCurrentScope == m_pCurrentNamespace);
-	m_pCurrentScope->m_PosEnd = Pos;
+	m_pCurrentScope->m_EndPos = Pos;
 
 	m_pCurrentNamespace = m_pCurrentScope->m_pParentNamespace;
 	ASSERT (m_pCurrentNamespace);
@@ -194,5 +195,5 @@ CNamespaceMgr::FindContinueScope (size_t Level)
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

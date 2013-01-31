@@ -15,5 +15,5 @@ CConstMgr::CConstMgr ()
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

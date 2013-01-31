@@ -11,24 +11,18 @@ namespace jnc {
 
 //.............................................................................
 
-class CImportType: 
-	public CType,
-	public rtl::TListLink
+class CImportType: public CType
 {
 protected:
 	friend class CTypeMgr;
 
 	CQualifiedName m_Name;
+	rtl::CString m_QualifiedName;
 	CNamespace* m_pAnchorNamespace;
 	CType* m_pExternType;	
 
 public:
-	CImportType ()
-	{
-		m_TypeKind = EType_Import;
-		m_pAnchorNamespace = NULL;
-		m_pExternType = NULL;
-	}
+	CImportType ();
 
 	const CQualifiedName&
 	GetName ()
@@ -42,14 +36,30 @@ public:
 		return m_pAnchorNamespace;
 	}
 
+	const rtl::CString&
+	GetQualifiedName ();
+
 	CType* 
 	GetExternType ()
 	{
 		return m_pExternType;
 	}
+
+	static 
+	rtl::CString
+	CreateTypeString (const rtl::CString& Tag)
+	{
+		return rtl::CString::Format_s (_T("import %s"), Tag);
+	}
+
+	rtl::CString
+	CreateTypeString ()
+	{
+		return CreateTypeString (GetQualifiedName ());
+	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

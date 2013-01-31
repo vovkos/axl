@@ -284,12 +284,12 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 
 			NextToken ();
 
-			SymbolFlags |= ESymbolNodeFlag_IsNoAst;
+			SymbolFlags |= ESymbolNodeFlag_NoAst;
 			IsClassSpecified = true;
 			break;
 
 		case EToken_Pragma:
-			if (SymbolFlags & ESymbolNodeFlag_IsPragma)
+			if (SymbolFlags & ESymbolNodeFlag_Pragma)
 			{
 				err::SetStringError (_T("multiple 'pragma' specifiers"));
 				return false;
@@ -297,11 +297,11 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 
 			NextToken ();
 
-			SymbolFlags |= ESymbolNodeFlag_IsPragma;
+			SymbolFlags |= ESymbolNodeFlag_Pragma;
 			break;
 
 		case EToken_Start:
-			if (SymbolFlags & ESymbolNodeFlag_IsStart)
+			if (SymbolFlags & ESymbolNodeFlag_Start)
 			{
 				err::SetStringError (_T("multiple 'start' specifiers"));
 				return false;
@@ -309,11 +309,11 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 
 			NextToken ();
 
-			SymbolFlags |= ESymbolNodeFlag_IsStart;
+			SymbolFlags |= ESymbolNodeFlag_Start;
 			break;
 
 		case EToken_Nullable:
-			if (SymbolFlags & ESymbolNodeFlag_IsNullable)
+			if (SymbolFlags & ESymbolNodeFlag_Nullable)
 			{
 				err::SetStringError (_T("multiple 'nullable' specifiers"));
 				return false;
@@ -321,7 +321,7 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 
 			NextToken ();
 
-			SymbolFlags |= ESymbolNodeFlag_IsNullable;
+			SymbolFlags |= ESymbolNodeFlag_Nullable;
 			break;
 
 		case EToken_Identifier:
@@ -390,7 +390,7 @@ CParser::ClassSpecifier ()
 		if (pToken->m_Token != '{' && pToken->m_Token != ':')
 			return pClass;
 
-		if (pClass->m_Flags & EClassFlag_IsDefined)
+		if (pClass->m_Flags & EClassFlag_Defined)
 		{
 			err::SetFormatStringError (_T("redefinition of class '%s'"), pClass->m_Name);
 			return NULL;
@@ -406,7 +406,7 @@ CParser::ClassSpecifier ()
 			return NULL;
 
 		pClass->m_pBaseClass = m_pModule->m_ClassMgr.GetClass (pToken->m_Data.m_String);
-		pClass->m_pBaseClass->m_Flags |= EClassFlag_IsUsed;
+		pClass->m_pBaseClass->m_Flags |= EClassFlag_Used;
 
 		NextToken ();
 	}
@@ -415,7 +415,7 @@ CParser::ClassSpecifier ()
 	if (!Result)
 		return NULL;
 	
-	pClass->m_Flags |= EClassFlag_IsDefined;
+	pClass->m_Flags |= EClassFlag_Defined;
 	return pClass;
 }
 
@@ -845,12 +845,12 @@ CParser::Production (const CProductionSpecifiers* pSpecifiers)
 	pSymbol->m_Flags |= pSpecifiers->m_SymbolFlags;
 
 	if (pSymbol->m_pClass)
-		pSymbol->m_pClass->m_Flags |= EClassFlag_IsUsed;
+		pSymbol->m_pClass->m_Flags |= EClassFlag_Used;
 
-	if (pSymbol->m_Flags & ESymbolNodeFlag_IsPragma)
+	if (pSymbol->m_Flags & ESymbolNodeFlag_Pragma)
 		m_pModule->m_NodeMgr.m_StartPragmaSymbol.m_ProductionArray.Append (pSymbol);
 
-	if ((pSymbol->m_Flags & ESymbolNodeFlag_IsStart) && !m_pModule->m_NodeMgr.m_pPrimaryStartSymbol)
+	if ((pSymbol->m_Flags & ESymbolNodeFlag_Start) && !m_pModule->m_NodeMgr.m_pPrimaryStartSymbol)
 		m_pModule->m_NodeMgr.m_pPrimaryStartSymbol = pSymbol;
 
 	Result = CustomizeSymbol (pSymbol);
@@ -893,7 +893,7 @@ CParser::Alternative ()
 			return false;
 
 		if (!pTemp)
-			if (pNode->m_Kind == ENode_Symbol && (pNode->m_Flags & ESymbolNodeFlag_IsNamed))
+			if (pNode->m_Kind == ENode_Symbol && (pNode->m_Flags & ESymbolNodeFlag_Named))
 			{
 				pTemp = (CSymbolNode*) pNode;
 			}

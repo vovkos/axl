@@ -132,8 +132,26 @@ CAstDoc::Compile ()
 		Lexer.NextToken ();
 	}
 
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Resolving imports...\n"));
-	Result = m_Module.m_TypeMgr.ResolveImports ();
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Resolving import types...\n"));
+	Result = m_Module.m_TypeMgr.ResolveImportTypes ();
+	if (!Result)
+	{
+		rtl::CString Text = err::GetError ()->GetDescription ();
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		return false;
+	}
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Resolving orphan functions...\n"));
+	Result = m_Module.m_FunctionMgr.ResolveOrphanFunctions ();
+	if (!Result)
+	{
+		rtl::CString Text = err::GetError ()->GetDescription ();
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		return false;
+	}
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Calculating type layouts...\n"));
+	Result = m_Module.m_TypeMgr.CalcTypeLayouts ();
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();
@@ -223,6 +241,10 @@ CAstDoc::Run ()
 	{
 		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("ERROR: %s\n"), Error.GetDescription ());
 	}
+	catch (...)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("UNKNOWN EXCEPTION\n"));
+	}
 
 	return true;
 }
@@ -275,9 +297,9 @@ StdLib_OnRuntimeError (
 		);
 }
 
-jnc::TInterfaceHdr* 
+jnc::TInterface* 
 StdLib_DynamicCastInterface (
-	jnc::TInterfaceHdr* p,
+	jnc::TInterface* p,
 	jnc::CClassType* pType
 	)
 {
@@ -292,7 +314,7 @@ StdLib_DynamicCastInterface (
 	if (!Result)
 		return NULL;
 	
-	jnc::TInterfaceHdr* p2 = (jnc::TInterfaceHdr*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_FieldCoord.m_Offset);
+	jnc::TInterface* p2 = (jnc::TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_FieldCoord.m_Offset);
 	ASSERT (p2->m_pObject == p->m_pObject);
 
 	return p2;
@@ -302,7 +324,7 @@ void
 StdLib_EventOperator (
 	jnc::TEvent* pEvent,
 	void* pfn,
-	jnc::TInterfaceHdr* pIface,
+	jnc::TInterface* pClosure,
 	jnc::EEventOp OpKind
 	)
 {
@@ -313,7 +335,7 @@ StdLib_EventOperator (
 	case jnc::EEventOp_SetHandler:
 		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
-		pHandler->m_FunctionPtr.m_pIface = pIface;
+		pHandler->m_FunctionPtr.m_pClosure = pClosure;
 		pHandler->m_pPrev = NULL;
 		pHandler->m_pNext = NULL;
 
@@ -324,7 +346,7 @@ StdLib_EventOperator (
 	case jnc::EEventOp_AddHandler:
 		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
-		pHandler->m_FunctionPtr.m_pIface = pIface;
+		pHandler->m_FunctionPtr.m_pClosure = pClosure;
 		pHandler->m_pPrev = pEvent->m_pTail;
 		pHandler->m_pNext = NULL;
 
@@ -342,7 +364,7 @@ StdLib_EventOperator (
 		for (; pHandler; pHandler = pHandler->m_pNext)
 		{
 			if (pHandler->m_FunctionPtr.m_pfn == pfn &&
-				pHandler->m_FunctionPtr.m_pIface == pIface)
+				pHandler->m_FunctionPtr.m_pClosure == pClosure)
 			{
 				if (pHandler->m_pPrev)
 					pHandler->m_pPrev->m_pNext = pHandler->m_pNext;
@@ -368,14 +390,14 @@ StdLib_EventOperator (
 void
 StdLib_FireSimpleEvent (jnc::TEvent* pEvent)
 {
-	typedef void (*FEventHandler) (jnc::TInterfaceHdr*);
+	typedef void (*FEventHandler) (jnc::TInterface*);
 
 	jnc::TEventHandler* pHandler = pEvent->m_pHead;
 
 	for (; pHandler; pHandler = pHandler->m_pNext)
 	{
 		FEventHandler pfn = (FEventHandler) pHandler->m_FunctionPtr.m_pfn;
-		pfn (pHandler->m_FunctionPtr.m_pIface);
+		pfn (pHandler->m_FunctionPtr.m_pClosure);
 	}
 }
 
@@ -517,7 +539,7 @@ StdLib_CallConvTestD (
 }
 
 void
-StdLib_PointerCheck (jnc::TSafePtr Ptr)
+StdLib_PointerCheck (jnc::TDataPtr Ptr)
 {
 	CMainFrame* pMainFrame = GetMainFrame ();
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
@@ -557,11 +579,10 @@ CAstDoc::FindGlobalFunction (const tchar_t* pName)
 	if (!pItem)
 		return NULL;
 
-	if (pItem->GetItemKind () != jnc::EModuleItem_GlobalFunction)
+	if (pItem->GetItemKind () != jnc::EModuleItem_Function)
 		return NULL;
 
-	jnc::CGlobalFunction* pFunction = (jnc::CGlobalFunction*) pItem;
-	return pFunction->GetFunction ();
+	return (jnc::CFunction*) pItem;
 }
 
 bool

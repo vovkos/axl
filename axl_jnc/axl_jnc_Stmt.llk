@@ -227,7 +227,7 @@ enter
 		{
 			$pScope = m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
 		}	  
-	  (declaration_specifier_list $s declarator_list <&$s.m_DeclSpecifiers> | expression_list) ';'
+	  (item_declaration_w_specifier | expression_or_empty_list ';') 
 	  (
 			{
 				$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_condition"));
@@ -258,7 +258,7 @@ enter
 			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pLoopBlock, $pFollowBlock);
 
-			if (!($pFollowBlock->GetFlags () & EBasicBlockFlag_IsJumped))
+			if (!($pFollowBlock->GetFlags () & EBasicBlockFlag_Jumped))
 				m_pModule->m_ControlFlowMgr.MarkUnreachable ($pFollowBlock);
 		}
 	;

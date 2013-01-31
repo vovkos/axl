@@ -36,9 +36,6 @@ GetModuleItemKindString (EModuleItem ItemKind)
 	case EModuleItem_Property:
 		return _T("property");
 
-	case EModuleItem_GlobalFunction:
-		return _T("global-function");
-
 	case EModuleItem_EnumMember:
 		return _T("enum-member");
 
@@ -48,24 +45,57 @@ GetModuleItemKindString (EModuleItem ItemKind)
 	case EModuleItem_UnionMember:
 		return _T("union-member");
 
-	case EModuleItem_ClassMember:
-		return _T("class-member");
-
 	default:
-		return _T("undefined-module-item");
+		return _T("undefined-module-item-kind");
 	}
 }
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CModuleItem::CModuleItem ()
+const tchar_t*
+GetStorageKindString (EStorage StorageKind)
 {
-	m_ItemKind = EModuleItem_Undefined;
-	m_pModule = NULL;
-	m_pAttributeSet = NULL;
+	switch (StorageKind)
+	{
+	case EStorage_Typedef:
+		return _T("typedef");
+
+	case EStorage_Static:
+		return _T("static");
+
+	case EStorage_Virtual:
+		return _T("virtual");
+
+	case EStorage_NoVirtual:
+		return _T("novirtual");
+
+	default:
+		return _T("undefined-storage-class");
+	};
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t*
+GetAccessKindString (EAccess AccessKind)
+{
+	switch (AccessKind)
+	{
+	case EAccess_Public:
+		return _T("public");
+
+	case EAccess_PublicRead:
+		return _T("publicread");
+
+	case EAccess_Protected:
+		return _T("protected");
+
+	default:
+		return _T("undefined-access-kind");
+	};
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

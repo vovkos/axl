@@ -11,6 +11,7 @@ namespace axl {
 namespace jnc {
 
 class CModule;
+class CClassType;
 
 //.............................................................................
 
@@ -114,5 +115,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

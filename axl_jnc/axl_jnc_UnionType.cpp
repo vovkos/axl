@@ -14,8 +14,15 @@ CUnionType::CreateMember (
 	size_t BitCount
 	)
 {
+	if (!(pType->GetFlags () & ETypeFlag_Pod))
+	{
+		err::SetFormatStringError (_T("non-POD '%s' cannot be union member"), pType->GetTypeString ());
+		return NULL;
+	}
+
 	CUnionMember* pMember = AXL_MEM_NEW (CUnionMember);
 	pMember->m_Name = Name;
+	pMember->m_pParentUnionType = this;
 	pMember->m_pType = pType;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
@@ -31,7 +38,7 @@ CUnionType::CreateMember (
 bool
 CUnionType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_IsLayoutReady)
+	if (m_Flags & ETypeFlag_LayoutReady)
 		return true;
 
 	bool Result = PreCalcLayout ();
@@ -75,6 +82,6 @@ CUnionType::CalcLayout ()
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
 

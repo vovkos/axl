@@ -9,6 +9,8 @@
 namespace axl {
 namespace jnc {
 
+class CStructType;
+
 //.............................................................................
 
 class CStructBaseType: public rtl::TListLink
@@ -83,14 +85,12 @@ protected:
 
 //.............................................................................
 
-class CStructMember: 
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
+class CStructMember: public CNamedModuleItem
 {
 protected:
 	friend class CStructType;
 	
+	CStructType* m_pParentStructType;
 	CType* m_pType;
 	CType* m_pBitFieldBaseType;
 	size_t m_BitCount;
@@ -98,20 +98,12 @@ protected:
 	size_t m_LlvmIndex;
 
 public:
-	CStructMember ()
-	{
-		m_ItemKind = EModuleItem_StructMember;
-		m_pType = NULL;
-		m_pBitFieldBaseType = NULL;
-		m_BitCount = 0;
-		m_Offset = 0;
-		m_LlvmIndex = -1;
-	}
+	CStructMember ();
 
 	CStructType*
-	GetParentType ()
+	GetParentStructType ()
 	{
-		return (CStructType*) (CNamedType*) m_pParentNamespace; // double cast cause CStructType is not defined yet
+		return m_pParentStructType;
 	}
 
 	CType*
@@ -139,6 +131,8 @@ class CStructType: public CNamedType
 {
 protected:
 	friend class CTypeMgr;
+	friend class CClassType;
+	friend class CProperty;
 
 	size_t m_AlignFactor;
 	size_t m_PackFactor;
@@ -151,13 +145,12 @@ protected:
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
 	size_t m_LastBitFieldOffset;
+	CModuleItem* m_pFieldParent; // if this type is a field or static field, class or property
 
 public:
 	CStructType ();
 
-	llvm::StructType* 
-	GetLlvmType ();
-
+	virtual
 	size_t 
 	GetAlignFactor ()
 	{
@@ -182,10 +175,16 @@ public:
 		return m_FieldAlignedSize;
 	}
 
-	rtl::CIteratorT <CStructBaseType>
-	GetFirstBaseType ()
+	CModuleItem*
+	GetFieldParent ()
 	{
-		return m_BaseTypeList.GetHead ();
+		return m_pFieldParent;
+	}
+
+	rtl::CConstListT <CStructBaseType>
+	GetBaseTypeList ()
+	{
+		return m_BaseTypeList;
 	}
 
 	bool
@@ -203,10 +202,10 @@ public:
 	CModuleItem*
 	FindItemWithBaseTypeList (const tchar_t* pName);
 
-	rtl::CIteratorT <CStructMember>
-	GetFirstMember ()
+	rtl::CConstListT <CStructMember>
+	GetMemberList ()
 	{
-		return m_MemberList.GetHead ();
+		return m_MemberList;
 	}
 
 	CStructMember*
@@ -235,9 +234,27 @@ public:
 	}
 
 	bool
+	Append (CStructType* pType);
+
+	virtual
+	bool
 	CalcLayout ();
 
 protected:
+	virtual 
+	void
+	PrepareTypeString ()
+	{
+		m_TypeString.Format (_T("struct %s"), m_Tag);
+	}
+
+	virtual 
+	void
+	PrepareLlvmType ()
+	{
+		m_pLlvmType = llvm::StructType::create (llvm::getGlobalContext (), (const tchar_t*) m_Tag);
+	}
+
 	bool
 	FindBaseTypeImpl (
 		CStructType* pType,
@@ -301,5 +318,5 @@ protected:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

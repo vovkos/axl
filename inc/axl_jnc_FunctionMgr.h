@@ -5,6 +5,8 @@
 #pragma once
 
 #include "axl_jnc_Function.h"
+#include "axl_jnc_Property.h"
+#include "axl_jnc_PropertyTemplate.h"
 
 namespace axl {
 namespace jnc {
@@ -39,26 +41,26 @@ enum EStdFunc
 	EStdFunc_CheckScopeLevel,
 
 	// void 
-	// jnc.CheckSafePtrRange (
+	// jnc.CheckDataPtrRange (
 	//		int8* p,
 	//		size_t Size,
 	//		jnc.sptrv Validator,
 	//		int Error
 	//		);
 
-	EStdFunc_CheckSafePtrRange,
+	EStdFunc_CheckDataPtrRange,
 
 	// void 
 	// jnc.CheckInterfaceScopeLevel (
-	//		jnc.iface* p,
+	//		object p,
 	//		size_t DstScopeLevel
 	//		);
 
 	EStdFunc_CheckInterfaceScopeLevel,
 
-	// int8*
+	// object
 	// jnc.DynamicCastInterface (
-	//		int8* p,
+	//		object p,
 	//		int8* pType
 	//		);
 
@@ -68,7 +70,7 @@ enum EStdFunc
 	// jnc.EventOperator (
 	//		jnc.event* pEvent,
 	//		void* pfn,
-	//		jnc.iface* pIface,
+	//		object pClosure,
 	//		int OpKind
 	//		);
 
@@ -103,7 +105,7 @@ protected:
 		rtl::CString m_Signature;
 		CFunction* m_pTargetFunction;
 		CFunctionType* m_pTargetFunctionType;
-		CFunctionPointerType* m_pFunctionPtrType;
+		CFunctionPtrType* m_pFunctionPtrType;
 		CClassType* m_pClosureType;
 		rtl::CArrayT <size_t> m_ClosureMap;
 
@@ -116,9 +118,11 @@ protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CFunction> m_FunctionList;
-	rtl::CStdListT <CGlobalFunction> m_GlobalFunctionList;
+	rtl::CStdListT <CProperty> m_PropertyList;
+	rtl::CStdListT <CPropertyTemplate> m_PropertyTemplateList;
+	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
 	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
-	rtl::CArrayT <CPropertyType*> m_AutoPropertyArray;
+	rtl::CArrayT <CProperty*> m_AutoPropertyArray;
 	rtl::CStringHashTableMapAT <CThunk*> m_ThunkMap;
 	rtl::CStdListT <CThunk> m_ThunkList;
 
@@ -143,40 +147,36 @@ public:
 	void
 	Clear ();
 
-	rtl::CIteratorT <CFunction>
-	GetFirstFunction ()
+	rtl::CConstListT <CFunction>
+	GetFunctionList ()
 	{
-		return m_FunctionList.GetHead ();
+		return m_FunctionList;
 	}
 
-	rtl::CIteratorT <CGlobalFunction>
-	GetFirstGlobalFunction ()
+	rtl::CConstListT <CProperty>
+	GetPropertyList ()
 	{
-		return m_GlobalFunctionList.GetHead ();
+		return m_PropertyList;
 	}
-
-	CFunction*
-	CreateAnonymousFunction (CFunctionType* pType);
 
 	CFunction*
 	CreateFunction (
-		const CQualifiedName& Name,
+		EFunction FunctionKind,
 		CFunctionType* pType,
 		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
 		);
 
-	CFunction*
-	CreatePropertyAccessorFunction (
-		EPropertyAccessor AccessorKind,
-		CFunctionType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
-		);
-
-	CGlobalFunction*
-	CreateGlobalFunction (
+	CProperty*
+	CreateProperty (
 		const rtl::CString& Name,
-		CFunction* pFunction
+		const rtl::CString& QualifiedName
 		);
+
+	CPropertyTemplate*
+	CreatePropertyTemplate ();
+
+	bool
+	ResolveOrphanFunctions ();
 
 	bool
 	CompileFunctions ();
@@ -206,14 +206,14 @@ public:
 		CFunction* pTargetFunction, // could be NULL
 		CClassType* pClosureType,   // could be NULL
 		const rtl::CArrayT <size_t>& ClosureMap,
-		CFunctionPointerType* pFunctionPtrType
+		CFunctionPtrType* pFunctionPtrType
 		);
 
 	CFunction*
 	GetThunkFunction (
 		CFunctionType* pTargetFunctionType,
 		CFunction* pTargetFunction, // could be NULL
-		CFunctionPointerType* pFunctionPtrType
+		CFunctionPtrType* pFunctionPtrType
 		)
 	{
 		return GetThunkFunction (
@@ -227,24 +227,21 @@ public:
 
 protected:
 	bool
-	ResolveOrphanFunction (CFunction* pFunction);
-
-	bool
 	CompileDirectThunk (CThunk* pThunk);
 
 	bool
 	CompileClosureThunk (CThunk* pThunk);
 
 	bool
-	CompileAutoPropertyAccessors (CPropertyType* pType);
+	CompileAutoPropertyAccessors (CProperty* pProperty);
+
+	// LLVM code support functions
 
 	CFunction*
 	CreateInternalFunction (
-		const rtl::CString& Name,
-		CFunctionType* pType
+		const tchar_t* pTag,
+		CFunctionType* pType 
 		);
-
-	// LLVM code support functions
 
 	CFunction*
 	CreateOnRuntimeError ();
@@ -256,7 +253,7 @@ protected:
 	CreateCheckScopeLevel ();
 
 	CFunction*
-	CreateCheckSafePtrRange ();
+	CreateCheckDataPtrRange ();
 
 	CFunction*
 	CreateCheckInterfaceScopeLevel ();
@@ -306,6 +303,6 @@ protected:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
 

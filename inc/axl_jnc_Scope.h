@@ -16,15 +16,15 @@ class CBasicBlock;
 
 class CScope: 
 	public CModuleItem,
-	public CNamespace,
-	public rtl::TListLink
+	public CNamespace
 {
 protected:
 	friend class CNamespaceMgr;
 
 	size_t m_Level;
 
-	CToken::CPos m_PosEnd;
+	CToken::CPos m_BeginPos;
+	CToken::CPos m_EndPos;
 	CFunction* m_pFunction;
 
 	rtl::CBoxListT <CValue> m_DestructList;
@@ -44,10 +44,16 @@ public:
 		return m_Level;
 	}
 
-	CToken::CPos 
-	GetPosEnd ()
+	const CToken::CPos&
+	GetBeginPos ()
 	{
-		return m_PosEnd;
+		return m_BeginPos;
+	}
+
+	const CToken::CPos&
+	GetEndPos ()
+	{
+		return m_EndPos;
 	}
 
 	CFunction*
@@ -78,5 +84,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

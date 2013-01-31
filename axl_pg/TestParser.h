@@ -205,7 +205,7 @@ public:
 		
 		case ESymbol_function_actual_argument_list:
 			pNode = CreateStdSymbolNode (Index);
-			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_IsNamed;
+			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_Named;
 				
 			pNode->m_pAstNode = AXL_MEM_NEW (hhhhhhh);
 				

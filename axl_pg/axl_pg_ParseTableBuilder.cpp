@@ -24,16 +24,16 @@ CParseTableBuilder::Build ()
 	{
 		CSymbolNode* pNode = m_pNodeMgr->m_SymbolArray [i];
 
-		if (pNode->m_Flags & ESymbolNodeFlag_IsNamed)
+		if (pNode->m_Flags & ESymbolNodeFlag_Named)
 		{
-			if (pNode->IsNullable () && !(pNode->m_Flags & ESymbolNodeFlag_IsNullable))
+			if (pNode->IsNullable () && !(pNode->m_Flags & ESymbolNodeFlag_Nullable))
 			{
 				err::SetFormatStringError (_T("'%s': nullable symbols must be explicitly marked as 'nullable'"), pNode->m_Name);
 				err::PushSrcPosError (pNode->m_SrcPos);
 				return false;
 			}
 
-			if (!pNode->IsNullable () && (pNode->m_Flags & ESymbolNodeFlag_IsNullable))
+			if (!pNode->IsNullable () && (pNode->m_Flags & ESymbolNodeFlag_Nullable))
 			{
 				err::SetFormatStringError (_T("'%s': marked as 'nullable' but is not nullable"), pNode->m_Name);
 				err::PushSrcPosError (pNode->m_SrcPos);
@@ -41,7 +41,7 @@ CParseTableBuilder::Build ()
 			}
 		}
 
-		if (pNode->m_Flags & ESymbolNodeFlag_IsPragma)
+		if (pNode->m_Flags & ESymbolNodeFlag_Pragma)
 		{
 			if (pNode->IsNullable ())
 			{

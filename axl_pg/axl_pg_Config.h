@@ -13,7 +13,7 @@ namespace pg {
 
 enum EConfigFlag
 {
-	EConfigFlag_IsVerbose                = 1,
+	EConfigFlag_Verbose                = 1,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

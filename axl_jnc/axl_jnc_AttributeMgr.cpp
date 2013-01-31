@@ -11,49 +11,18 @@ CAttributeMgr::CAttributeMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
-
-	m_pCurrentAttributeSet = NULL;
 }
 
-void
-CAttributeMgr::AssignAttributeSet (CModuleItem* pItem)
+CAttributeBlock*
+CAttributeMgr::CreateAttributeBlock ()
 {
-	if (!m_pCurrentAttributeSet)
-		return;
-
-	pItem->m_pAttributeSet = m_pCurrentAttributeSet;
-	m_pCurrentAttributeSet->m_pParentItem = pItem;
-	m_pCurrentAttributeSet = NULL;
-}
-
-CAttributeSet*
-CAttributeMgr::CreateAttributeSet ()
-{
-	if (m_pCurrentAttributeSet && m_pCurrentAttributeSet->GetParentItem ())
-	{
-		err::SetFormatStringError (_T("orphaned attribute set"));
-		return NULL;
-	}
-
-	CAttributeSet* pAttributeSet = AXL_MEM_NEW (CAttributeSet);
-	m_AttributeSetList.InsertTail (pAttributeSet);
-	m_pCurrentAttributeSet = pAttributeSet;
-	return pAttributeSet;
-}
-
-CAttribute*
-CAttributeMgr::CreateAttribute (
-	const rtl::CString& Name,
-	CValue* pValue
-	)
-{
-	if (!m_pCurrentAttributeSet)
-		CreateAttributeSet ();
-
-	return m_pCurrentAttributeSet->CreateAttribute (Name, pValue);
+	CAttributeBlock* pAttributeBlock = AXL_MEM_NEW (CAttributeBlock);
+	pAttributeBlock->m_pModule = m_pModule;
+	m_AttributeBlockList.InsertTail (pAttributeBlock);
+	return pAttributeBlock;
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

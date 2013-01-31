@@ -4,78 +4,76 @@
 
 #pragma once
 
-#include "axl_jnc_StructType.h"
+#include "axl_jnc_Type.h"
 
 namespace axl {
 namespace jnc {
 
-class CFunctionPointerType;
+class CFunctionPtrType;
+class CFunctionPtrTypeTuple;
 class CEventType;
+
+enum EFunctionPtrType;
 
 //.............................................................................
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_IsVarArg       = 0x010000,
-	EFunctionTypeFlag_IsUnsafeVarArg = 0x020000,
+	EFunctionTypeFlag_VarArg       = 0x010000,
+	EFunctionTypeFlag_UnsafeVarArg = 0x020000,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 enum ECallConv
 {
 	ECallConv_Cdecl = 0,
 	ECallConv_Stdcall,
-
 	ECallConv_Default = ECallConv_Cdecl,
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 const tchar_t*
-GetCallingConventionString (ECallConv CallingConvention);
+GetCallConvString (ECallConv CallConv);
 
 inline
 llvm::CallingConv::ID
-GetLlvmCallingConvention (ECallConv CallingConvention)
+GetLlvmCallConv (ECallConv CallConv)
 {
-	return CallingConvention == ECallConv_Stdcall ?
+	return CallConv == ECallConv_Stdcall ?
 		llvm::CallingConv::X86_StdCall : 
 		llvm::CallingConv::C;
 }
 
 //.............................................................................
 
-class CFunctionType: 
-	public CType,
-	public rtl::TListLink
+class CFunctionType: public CType
 {
 protected:
 	friend class CTypeMgr;
 
 	CType* m_pReturnType;
 	rtl::CArrayT <CType*> m_ArgTypeArray;
-	ECallConv m_CallingConvention;
+	ECallConv m_CallConv;
 	rtl::CStringA m_ArgSignature;
-
-	CFunctionType* m_pDefCallConvFunctionType;
-	CFunctionType* m_pAbstractMethodType;
-	CFunctionPointerType* m_pFunctionPointerType;
+	rtl::CString m_ArgTypeString;
+	CFunctionType* m_pAbstractMethodMemberType;
+	CFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
 
 public:
 	CFunctionType ();
 
-	llvm::FunctionType* 
-	GetLlvmType ();
-
 	llvm::CallingConv::ID
-	GetLlvmCallingConvention ()
+	GetLlvmCallConv ()
 	{
-		return jnc::GetLlvmCallingConvention (m_CallingConvention);
+		return jnc::GetLlvmCallConv (m_CallConv);
 	}
 
 	ECallConv 
-	GetCallingConvention ()
+	GetCallConv ()
 	{
-		return m_CallingConvention;
+		return m_CallConv;
 	}
 	
 	CType*
@@ -93,17 +91,40 @@ public:
 	rtl::CStringA
 	GetArgSignature ();
 
-	CFunctionType*
-	GetDefCallConvFunctionType ();
+	rtl::CString 
+	GetArgTypeString ();
 
 	CFunctionType*
-	GetAbstractMethodType ();
+	GetAbstractMethodMemberType ();
 
-	CFunctionPointerType* 
-	GetFunctionPointerType ();
+	CFunctionPtrType* 
+	GetFunctionPtrType (
+		EType TypeKind,
+		EFunctionPtrType PtrTypeKind = (EFunctionPtrType) 0,
+		int Flags = 0
+		);
+
+	CFunctionPtrType* 
+	GetFunctionPtrType (
+		EFunctionPtrType PtrTypeKind = (EFunctionPtrType) 0,
+		int Flags = 0
+		)
+	{
+		return GetFunctionPtrType (EType_FunctionPtr, PtrTypeKind, Flags);
+	}
 
 	CEventType*
 	GetEventType ();
+
+	static
+	rtl::CStringA
+	CreateSignature (
+		ECallConv CallConv,
+		CType* pReturnType,
+		CType* const* ppArgType,
+		size_t ArgCount,
+		int Flags
+		);
 
 	static
 	rtl::CStringA
@@ -113,109 +134,27 @@ public:
 		int Flags
 		);
 
-	static
 	rtl::CStringA
-	CreateSignature (
-		ECallConv CallingConvention,
-		CType* pReturnType,
-		CType* const* ppArgType,
-		size_t ArgCount,
-		int Flags
-		);
-
-	static
-	rtl::CString
-	CreateArgTypeString (
-		CType* const* ppArgType,
-		size_t ArgCount,
-		int Flags
-		);
-
-	rtl::CString
-	CreateArgTypeString ()
+	CreateArgSignature ()
 	{
-		return CreateArgTypeString (
+		return CreateArgSignature (
 			m_ArgTypeArray, 
 			m_ArgTypeArray.GetCount (), 
 			m_Flags
 			);
 	}
 
-	static
-	rtl::CString
-	CreateTypeString (
-		ECallConv CallingConvention,
-		CType* pReturnType,
-		CType* const* ppArgType,
-		size_t ArgCount,
-		int Flags
-		);
-
-	rtl::CString
-	CreateTypeString ()
-	{
-		return CreateTypeString (
-			m_CallingConvention, 
-			m_pReturnType, 
-			m_ArgTypeArray, 
-			m_ArgTypeArray.GetCount (), 
-			m_Flags
-			);
-	}
-};
-
-//.............................................................................
-
-class CFunctionTypeOverload
-{
 protected:
-	friend class CTypeMgr;
+	virtual 
+	void
+	PrepareTypeString ();
 
-	CFunctionType* m_pType;
-	rtl::CArrayT <CFunctionType*> m_OverloadArray;
-
-public:
-	CFunctionTypeOverload ()
-	{
-		m_pType = NULL;
-	}
-
-	CFunctionTypeOverload (CFunctionType* pType)
-	{
-		m_pType = pType;
-	}
-
-	bool
-	IsEmpty () const
-	{
-		return m_pType == NULL;
-	}
-
-	bool 
-	IsOverloaded () const
-	{
-		return m_OverloadArray.IsEmpty ();
-	}
-
-	bool
-	AddOverload (CFunctionType* pType);
-
-	size_t
-	GetOverloadCount () const
-	{
-		return !IsEmpty () ? m_OverloadArray.GetCount () + 1 : 0;
-	}
-
-	CFunctionType*
-	GetType (size_t Overload = 0) const
-	{
-		return 
-			Overload == 0 ? m_pType : 
-			Overload <= m_OverloadArray.GetCount () ? m_OverloadArray [Overload - 1] : NULL;
-	}
+	virtual 
+	void
+	PrepareLlvmType ();
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

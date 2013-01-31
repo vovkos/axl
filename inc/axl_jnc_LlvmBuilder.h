@@ -6,7 +6,7 @@
 
 #include "axl_jnc_Value.h"
 #include "axl_jnc_BasicBlock.h"
-#include "axl_jnc_PointerType.h"
+#include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Scope.h"
@@ -797,7 +797,7 @@ public:
 	llvm::Value*
 	CreateIntToPtr (
 		const CValue& OpValue,
-		CPointerType* pType,
+		CDataPtrType* pType,
 		CValue* pResultValue
 		)
 	{
@@ -937,7 +937,7 @@ public:
 	{
 		return CreateCall (
 			CalleeValue, 
-			pFunctionType->GetCallingConvention (),
+			pFunctionType->GetCallConv (),
 			pArgArray,
 			ArgCount,
 			pFunctionType->GetReturnType (),
@@ -1029,34 +1029,34 @@ public:
 	// safe pointer operations
 
 	llvm::Value*
-	CreateSafePtr (
+	CreateDataPtr (
 		const CValue& PtrValue,
 		const CValue& RegionBeginValue,
 		size_t Size,
 		const CValue& ScopeLevelValue,
-		CPointerType* pResultType,
+		CDataPtrType* pResultType,
 		CValue* pResultValue
 		);
 
 	llvm::Value*
-	CreateSafePtr (
+	CreateDataPtr (
 		const CValue& PtrValue,
 		const CValue& RegionBeginValue,
 		size_t Size,
 		CScope* pScope,
-		CPointerType* pResultType,
+		CDataPtrType* pResultType,
 		CValue* pResultValue
 		);
 
 	llvm::Value*
-	CreateSafePtr (
+	CreateDataPtr (
 		const CValue& PtrValue,
 		CVariable* pVariable,
-		CPointerType* pResultType,
+		CDataPtrType* pResultType,
 		CValue* pResultValue
 		)
 	{
-		return CreateSafePtr (
+		return CreateDataPtr (
 			PtrValue,
 			CValue (pVariable->GetLlvmValue (), NULL),
 			pVariable->GetType ()->GetSize (),
@@ -1067,15 +1067,15 @@ public:
 	}
 
 	llvm::Value*
-	ModifySafePtr (
-		const CValue& SafePtrValue,
+	ModifyDataPtr (
+		const CValue& DataPtrValue,
 		const CValue& PtrValue,
-		CPointerType* pResultType,
+		CDataPtrType* pResultType,
 		CValue* pResultValue
 		);
 
 	llvm::Value*
-	CreateSafePtrValidator (
+	CreateDataPtrValidator (
 		const CValue& RegionBeginValue,
 		size_t Size,
 		const CValue& ScopeLevelValue,
@@ -1083,7 +1083,7 @@ public:
 		);
 
 	llvm::Value*
-	CreateSafePtrValidator (
+	CreateDataPtrValidator (
 		const CValue& RegionBeginValue,
 		size_t Size,
 		CScope* pScope,
@@ -1091,12 +1091,12 @@ public:
 		);
 
 	llvm::Value*
-	CreateSafePtrValidator (
+	CreateDataPtrValidator (
 		CVariable* pVariable,
 		CValue* pResultValue
 		)
 	{
-		return CreateSafePtrValidator (
+		return CreateDataPtrValidator (
 			CValue (pVariable->GetLlvmValue (), NULL),
 			pVariable->GetType ()->GetSize (),
 			pVariable->GetScope (),
@@ -1105,7 +1105,7 @@ public:
 	}
 
 	bool
-	CheckSafePtrRange (
+	CheckDataPtrRange (
 		const CValue& PtrValue,
 		size_t Size,
 		const CValue& ValidatorValue,
@@ -1113,7 +1113,7 @@ public:
 		);
 
 	bool
-	CheckSafePtrScopeLevel (
+	CheckDataPtrScopeLevel (
 		const CValue& SrcValue,
 		const CValue& DstValue
 		);
@@ -1151,7 +1151,7 @@ public:
 	CreateFunctionPointer (
 		const CValue& PfnValue,
 		const CValue& IfaceValue,
-		CFunctionPointerType* pResultType,
+		CFunctionPtrType* pResultType,
 		CValue* pResultValue
 		);
 
@@ -1165,7 +1165,7 @@ public:
 	CreatePropertyPointer (
 		const CValue& PtrValue,
 		const CValue& InterfaceValue,
-		CPropertyPointerType* pResultType,
+		CPropertyPtrType* pResultType,
 		CValue* pResultValue
 		);
 
@@ -1184,5 +1184,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

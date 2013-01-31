@@ -6,55 +6,31 @@ namespace jnc {
 
 //.............................................................................
 
-CType* 
-CArrayType::GetRootType (CType* pBaseType)
+CArrayType::CArrayType ()
 {
-	CType* pType = pBaseType;
-
-	while (pType->GetTypeKind () == EType_Array)
-	{
-		CArrayType* pArrayType = (CArrayType*) pType;
-		pType = pArrayType->GetBaseType ();
-	}
-
-	return pType;
+	m_TypeKind = EType_Array;
+	m_pElementType = NULL;
+	m_pRootType = NULL;
+	m_ElementCount = 0;
 }
 
-rtl::CString
-CArrayType::CreateTypeString (
-	CType* pBaseType,
-	size_t ElementCount
-	)
+void
+CArrayType::PrepareTypeString ()
 {
-	CType* pRootType = GetRootType(pBaseType);
-	
 	rtl::CString String;
-	String.Format (_T("%s [%d]"), pRootType->GetTypeString (), ElementCount);
+	m_TypeString.Format (_T("%s [%d]"), m_pRootType->GetTypeString (), m_ElementCount);
 	
-	while (pBaseType->GetTypeKind () == EType_Array)
+	CType* pElementType = m_pElementType;
+	while (pElementType->GetTypeKind () == EType_Array)
 	{
-		CArrayType* pArrayType = (CArrayType*) pBaseType;
-		String.AppendFormat (_T(" [%d]"), pArrayType->m_ElementCount);
-		pBaseType = pArrayType->m_pBaseType;
+		CArrayType* pArrayType = (CArrayType*) pElementType;
+		m_TypeString.AppendFormat (_T(" [%d]"), pArrayType->m_ElementCount);
+		pElementType = pArrayType->m_pElementType;
 	}
-
-	return String;
-}
-
-llvm::ArrayType* 
-CArrayType::GetLlvmType ()
-{
-	if (m_pLlvmType)
-		return (llvm::ArrayType*) m_pLlvmType;
-	
-	ASSERT (m_ElementCount);
-	llvm::ArrayType* pLlvmType = llvm::ArrayType::get (m_pBaseType->GetLlvmType (), m_ElementCount);
-	
-	m_pLlvmType = pLlvmType;
-	return pLlvmType;
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
+

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_FunctionPointerType.h"
+#include "axl_jnc_FunctionPtrType.h"
 
 namespace axl {
 namespace jnc {
@@ -23,36 +23,28 @@ GetEventOperatorKindString (EEventOp OperaotrKind);
 
 //.............................................................................
 
-class CEventType:
-	public CType,
-	public rtl::TListLink
+class CEventType: public CType
 {
 protected:
 	friend class CTypeMgr;
 
-	CFunctionPointerType* m_pFunctionPointerType;
+	CFunctionPtrType* m_pFunctionPtrType;
 	CStructType* m_pHandlerStructType;
 	CStructType* m_pEventStructType;
 
 public:
 	CEventType ();
 
-	llvm::StructType* 
-	GetLlvmType ()
+	CFunctionPtrType* 
+	GetFunctionPtrType ()
 	{
-		return GetEventStructType ()->GetLlvmType ();
+		return m_pFunctionPtrType;
 	}
 
 	CFunctionType* 
 	GetFunctionType ()
 	{
-		return m_pFunctionPointerType->GetFunctionType ();
-	}
-
-	CFunctionPointerType* 
-	GetFunctionPointerType ()
-	{
-		return m_pFunctionPointerType;
+		return m_pFunctionPtrType->GetFunctionType ();
 	}
 
 	CStructType* 
@@ -61,18 +53,17 @@ public:
 	CStructType* 
 	GetHandlerStructType ();
 
-	static
-	rtl::CString
-	CreateTypeString (CFunctionType* pFunctionType);
+protected:
+	virtual 
+	void
+	PrepareTypeString ();
 
-	rtl::CString
-	CreateTypeString ()
-	{
-		return CreateTypeString (GetFunctionType ());
-	}
+	virtual 
+	void
+	PrepareLlvmType ();
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

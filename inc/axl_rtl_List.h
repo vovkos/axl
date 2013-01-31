@@ -20,13 +20,20 @@ struct TListLink
 	TListLink* m_pPrev;
 };
 
+struct TList
+{
+	TListLink* m_pHead;
+	TListLink* m_pTail;
+	size_t m_Count;
+};
+
 //.............................................................................
 
 template <typename T>
 class CIteratorBaseT
 {
 protected:
-	TListLink* m_p;
+	const TListLink* m_p;
 
 public:
 	CIteratorBaseT ()
@@ -34,7 +41,7 @@ public:
 		m_p = NULL; 
 	}
 
-	operator void* () const
+	operator const void* () const
 	{
 		return m_p;
 	}
@@ -118,7 +125,7 @@ public:
 		return CIteratorBaseT (*this).Inc (Count); 
 	}
 
-	TListLink* 
+	const TListLink* 
 	GetLink () const
 	{ 
 		return m_p; 
@@ -126,7 +133,7 @@ public:
 
 	static 
 	T
-	FromLink (TListLink* p)
+	FromLink (const TListLink* p)
 	{ 
 		T It;
 		It.m_p = p;
@@ -142,6 +149,9 @@ template <
 	>
 class CIteratorT: public CIteratorBaseT <CIteratorT <T, TLink> >
 {
+public:
+	typedef TLink CLink;
+
 public:
 	CIteratorT ()
 	{ 
@@ -181,14 +191,14 @@ public:
 	CIteratorT&
 	operator = (T* p)
 	{
-		m_p = p ? TLink () (p) : NULL; 
+		m_p = p ? CLink () (p) : NULL; 
 		return *this;
 	}
 
 	bool 
 	operator == (T* p)
 	{ 
-		return m_p == (p ? TLink () (p) : NULL); 
+		return m_p == (p ? CLink () (p) : NULL); 
 	}
 
 	bool 
@@ -200,7 +210,7 @@ public:
 	T* 
 	GetObject () const
 	{ 
-		size_t Offset = (size_t) TLink () ((T*) 1) - 1;
+		size_t Offset = (size_t) CLink () ((T*) 1) - 1;
 		return m_p ? (T*) ((uchar_t*) m_p - Offset) : NULL; 
 	}
 
@@ -216,20 +226,14 @@ public:
 template <
 	typename T, 
 	typename TIterator, 
-	typename TDelete,
-	typename TLink
+	typename TDelete
 	>
-class CListBaseT
+class CListBaseT: protected TList
 {
 public:
 	typedef TIterator CIterator;
 	typedef TDelete CDelete;
-	typedef TLink CLink;
-
-protected:
-	TListLink* m_pHead;
-	TListLink* m_pTail;
-	size_t m_Count;
+	typedef typename CIterator::CLink CLink;
 
 public:
 	CListBaseT ()
@@ -246,6 +250,12 @@ public:
 	IsEmpty () const
 	{ 
 		return m_pHead == NULL; 
+	}
+
+	const TList*
+	GetList () const
+	{
+		return this;
 	}
 
 	size_t 
@@ -269,7 +279,7 @@ public:
 	T* 
 	Remove (CIterator It)
 	{ 
-		TListLink* pLink = It.GetLink ();
+		TListLink* pLink = (TListLink*) It.GetLink ();
 		TListLink* pNext = pLink->m_pNext;
 		TListLink* pPrev = pLink->m_pPrev;
 
@@ -303,13 +313,13 @@ public:
 	Clear ()
 	{ 
 		while (!IsEmpty ())
-			TDelete () (RemoveHead ());
+			CDelete () (RemoveHead ());
 	}
 
 	CIterator 
 	InsertHead (T* p)
 	{ 
-		TListLink* pLink = TLink () (p);
+		TListLink* pLink = CLink () (p);
 
 		pLink->m_pPrev = NULL;
 		pLink->m_pNext = m_pHead;
@@ -328,7 +338,7 @@ public:
 	CIterator 
 	InsertTail (T* p)
 	{ 
-		TListLink* pLink = TLink () (p);
+		TListLink* pLink = CLink () (p);
 
 		pLink->m_pNext = NULL;
 		pLink->m_pPrev = m_pTail;
@@ -353,8 +363,8 @@ public:
 		if (!Before)
 			return InsertTail (p);
 
-		TListLink* pLink = TLink () (p);
-		TListLink* pBeforeLink = Before.GetLink ();
+		TListLink* pLink = CLink () (p);
+		TListLink* pBeforeLink = (TListLink*) Before.GetLink ();
 		TListLink* pPrev = pBeforeLink->m_pPrev;
 
 		pLink->m_pNext = pBeforeLink;
@@ -380,8 +390,8 @@ public:
 		if (!After)
 			return InsertHead (p);
 
-		TListLink* pLink = TLink () (p);
-		TListLink* pAfterLink = After.GetLink ();
+		TListLink* pLink = CLink () (p);
+		TListLink* pAfterLink = (TListLink*) After.GetLink ();
 		TListLink* pNext = pAfterLink->m_pNext;
 
 		pLink->m_pPrev = pAfterLink;
@@ -506,17 +516,63 @@ protected:
 
 template <
 	typename T, 
+	typename TIterator
+	>
+class CConstListBaseT
+{
+public:
+	typedef TIterator CIterator;
+	typedef typename CIterator::CLink CLink;
+
+protected:
+	const TList* m_pList;
+
+public:
+	CConstListBaseT ()
+	{ 
+		m_pList = NULL;
+	}
+
+	bool 
+	IsEmpty () const
+	{ 
+		return m_pList ? m_pList->m_pHead == NULL : true;  
+	}
+
+	size_t 
+	GetCount () const
+	{ 
+		return m_pList ? m_pList->m_Count : 0; 
+	}
+
+	CIterator 
+	GetHead () const
+	{ 
+		return m_pList ? CIterator::FromLink (m_pList->m_pHead) : CIterator ();  
+	}
+
+	CIterator 
+	GetTail () const
+	{ 
+		return m_pList ? CIterator::FromLink (m_pList->m_pTail) : CIterator (); 
+	}
+};
+
+//.............................................................................
+
+template <
+	typename T, 
 	typename TDelete, 
 	typename TLink = CImplicitCastT <T*, TListLink*> 
 	>
-class CListT: public CListBaseT <T, CIteratorT <T, TLink>, TDelete, TLink> 
+class CListT: public CListBaseT <T, CIteratorT <T, TLink>, TDelete> 
 {
 public:
 	void 
 	Delete (CIterator It)
 	{ 
 		T* p = Remove (It);
-		TDelete () (p); 
+		CDelete () (p); 
 	}
 };
 
@@ -547,7 +603,7 @@ template <
 	typename T, 
 	typename TLink = CImplicitCastT <T*, TListLink*> 
 	>
-class CAuxListT: public CListT <T, rtl::CVoidT <T*>, TLink>
+class CAuxListT: public CListT <T, rtl::CVoidT <T*>,  TLink>
 {
 public:
 	~CAuxListT ()
@@ -559,6 +615,26 @@ public:
 	Clear ()
 	{
 		Construct ();
+	}
+};
+
+//.............................................................................
+
+template <
+	typename T, 
+	typename TLink = CImplicitCastT <T*, TListLink*> 
+	>
+class CConstListT: public CConstListBaseT <T, CIteratorT <T, TLink> > 
+{
+public:
+	CConstListT ()
+	{ 
+	}
+
+	template <typename TDelete>
+	CConstListT (const CListT <T, TDelete, TLink>& List)
+	{ 
+		m_pList = List.GetList ();
 	}
 };
 

@@ -15,7 +15,7 @@ intptr_t
 AXL_STDCALL
 axl_exe_InvokeDirect (
 	void* pfn,
-	intptr_t CallingConvention,
+	intptr_t CallConv,
 	axl::mem::TBlock* pStack,
 	size_t Count
 	);
@@ -25,10 +25,10 @@ namespace exe {
 
 //.............................................................................
 
-enum ECallingConvention 
+enum ECallConv 
 {
-	ECallingConvention_Cdecl   = 0,
-	ECallingConvention_Stdcall = 1,
+	ECallConv_Cdecl   = 0,
+	ECallConv_Stdcall = 1,
 };
 
 //.............................................................................
@@ -37,12 +37,12 @@ inline
 intptr_t
 InvokeDirect (
 	void* pfn,
-	ECallingConvention CallingConvention,
+	ECallConv CallConv,
 	mem::TBlock* pStack,
 	size_t Count
 	)
 {
-	return axl_exe_InvokeDirect (pfn, CallingConvention, pStack, Count);
+	return axl_exe_InvokeDirect (pfn, CallConv, pStack, Count);
 }
 
 //.............................................................................

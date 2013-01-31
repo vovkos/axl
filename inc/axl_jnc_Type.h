@@ -10,88 +10,81 @@ namespace axl {
 namespace jnc {
 
 class CTypeMgr;
-class CDerivedType;
-class CPointerType;
 class CArrayType;
-class CFunctionType;
+class CStructType;
 class CPropertyType;
+class CDataPtrType;
+class CDataPtrTypeTuple;
 class CValue;
 
-typedef CDerivedType CQualifierType;
+enum EDataPtrType;
 
 //.............................................................................
 
 enum EType
 {
-	// basic types:
+	// primitive types (completely identified by EType)
 
-	EType_Void,               // a
-	EType_Variant,            // b
-	EType_Bool,               // c
+	EType_Void,                // v
+	EType_Variant,             // z
+	EType_Bool,                // b
 	
 	// little-endian integers
 	
-	EType_Int8,               // d
-	EType_Int8_u,             // e
-	EType_Int16,              // f
-	EType_Int16_u,            // g
-	EType_Int32,              // h
-	EType_Int32_u,            // i
-	EType_Int64,              // j
-	EType_Int64_u,            // k
+	EType_Int8,                // is1
+	EType_Int8_u,              // iu1
+	EType_Int16,               // is2
+	EType_Int16_u,             // iu2
+	EType_Int32,               // is4
+	EType_Int32_u,             // iu4
+	EType_Int64,               // is8
+	EType_Int64_u,             // iu8
 
 	// big-endian integers
 
-	EType_Int16_be,           // l
-	EType_Int16_beu,          // m
-	EType_Int32_be,           // n
-	EType_Int32_beu,          // o
-	EType_Int64_be,           // p
-	EType_Int64_beu,          // q
+	EType_Int16_be,            // ibs2
+	EType_Int16_beu,           // ibu2
+	EType_Int32_be,            // ibs4
+	EType_Int32_beu,           // ibu4
+	EType_Int64_be,            // ibb8
+	EType_Int64_beu,           // ibu8
 
 	// floating point 
 
-	EType_Float,              // r
-	EType_Double,             // s
+	EType_Float,               // f4
+	EType_Double,              // f8
 
-	// derived types:
+	// derived types
 
-	// qualifiers: const, volatile, nonull
+	EType_Array,               // A
+	EType_BitField,            // B
 
-	EType_Qualifier,          // A 
-
-	// pointers & references
-
-	EType_Pointer,            // B
-	EType_Pointer_u,          // C
-	EType_Reference,          // E
-	EType_Reference_u,        // F
-
-	// integer derivatives
-
-	EType_BitField,           // H
-	EType_Enum,               // I
-	EType_Enum_c,             // J
-
-	// aggregates
-
-	EType_Array,              // K
-	EType_Struct,             // L
-	EType_Union,              // M
-	EType_Interface,          // N
-	EType_Class,              // O
+	// named types
+	 
+	EType_Enum,                // E
+	EType_Struct,              // S
+	EType_Union,               // U
+	EType_Class,               // C
 
 	// function types
 
-	EType_Function,           // P
-	EType_FunctionPointer,    // Q
-	EType_Property,           // R
-	EType_PropertyPointer,    // S
-	EType_Event,              // T
+	EType_Function,            // FC/FS (cdecl/stdcall)
+	EType_Property,            // YY/YB (normal/bindable)
+	EType_Event,               // V
+	
+	// pointers & references
+
+	EType_DataPtr,             // PD
+	EType_DataRef,             // RD
+	EType_ClassPtr,            // PC
+	EType_FunctionPtr,         // PF
+	EType_FunctionRef,         // RF
+	EType_PropertyPtr,         // PY
+	EType_PropertyRef,         // RY
 
 	// import type (resolved after linkage or instantiation of generic)
 
-	EType_Import,             // Z
+	EType_Import,              // Z
 
 	EType__Count,
 	EType__PrimitiveTypeCount = EType_Double + 1,
@@ -127,65 +120,122 @@ enum EType
 
 //.............................................................................
 
-enum ETypeQualifier
+enum ETypeFlag
 {
-	ETypeQualifier_Const     = 0x01,
-	ETypeQualifier_Volatile  = 0x02,
-	ETypeQualifier_NoNull    = 0x04,
-	ETypeQualifier_Weak      = 0x08,
-
-	ETypeQualifier__Mask     = 0x0f,
+	ETypeFlag_LayoutReady  = 0x0001,
+	ETypeFlag_LayoutCalc   = 0x0002,
+	ETypeFlag_Named        = 0x0010,
+	ETypeFlag_Pod          = 0x0020, // plain-old-data
+	ETypeFlag_Import       = 0x0040, // is or references an import type
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const tchar_t*
-GetTypeQualifierString (ETypeQualifier Qualifier);
-
-//.............................................................................
-
-enum ETypeFlag
+enum EPtrTypeFlag
 {
-	ETypeFlag_IsNamed        = 0x0100,
-	ETypeFlag_IsPod          = 0x0200, // plain-old-data
-	ETypeFlag_IsImport       = 0x0400, // is or references an import type
-	ETypeFlag_IsLayoutReady  = 0x1000,
-	ETypeFlag_IsLayoutCalc   = 0x2000,
+	EPtrTypeFlag_NoNull    = 0x0100, // all 
+	EPtrTypeFlag_Const     = 0x0200, // class & data ptr only
+	EPtrTypeFlag_Volatile  = 0x0400, // data ptr only
 };
 
 //.............................................................................
 
 enum ETypeModifier
 {
-	ETypeModifier_Const         = 0x00000001,
-	ETypeModifier_Volatile      = 0x00000002,
-	ETypeModifier_QualifierMask = 0x00000003,
-	
-	ETypeModifier_Signed        = 0x00000010,
-	ETypeModifier_Unsigned      = 0x00000020,
-	ETypeModifier_BigEndian     = 0x00000040,
-	ETypeModifier_LittleEndian  = 0x00000080,
-	ETypeModifier_IntegerMask   = 0x000000f0,
+	ETypeModifier_Signed        = 0x00000001,
+	ETypeModifier_Unsigned      = 0x00000002,
+	ETypeModifier_LittleEndian  = 0x00000004,
+	ETypeModifier_BigEndian     = 0x00000008,
+	ETypeModifier_Const         = 0x00000010,
+	ETypeModifier_Volatile      = 0x00000020,
+	ETypeModifier_Safe          = 0x00000040,
+	ETypeModifier_Unsafe        = 0x00000080,
+	ETypeModifier_NoNull        = 0x00000100,
+	ETypeModifier_Strong        = 0x00000200,
+	ETypeModifier_Weak          = 0x00000400,
+	ETypeModifier_Cdecl         = 0x00000800,
+	ETypeModifier_Stdcall       = 0x00001000,
+	ETypeModifier_Function      = 0x00002000,
+	ETypeModifier_Property      = 0x00004000,
+	ETypeModifier_Event         = 0x00008000,
+	ETypeModifier_Bindable      = 0x00010000,
+	ETypeModifier_AutoGet       = 0x00020000,
+	ETypeModifier_Indexed       = 0x00040000,
+	ETypeModifier_Closure       = 0x00080000,
+	ETypeModifier_Thin          = 0x00100000,
+};
 
-	ETypeModifier_Safe          = 0x00000100,
-	ETypeModifier_Unsafe        = 0x00000200,	
-	ETypeModifier_NoNull        = 0x00000400,	
-	ETypeModifier_PointerMask   = 0x00000700,	
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	ETypeModifier_Cdecl         = 0x00001000,
-	ETypeModifier_Stdcall       = 0x00002000,
-	ETypeModifier_Virtual       = 0x00004000,
-	ETypeModifier_NoVirtual     = 0x00008000,
-	ETypeModifier_Event         = 0x00010000,
-	ETypeModifier_FunctionMask  = 0x0001f000,	
+enum ETypeModifierMask
+{
+	ETypeModifierMask_Sign = 
+		ETypeModifier_Signed | 
+		ETypeModifier_Unsigned,
 
-	ETypeModifier_Property      = 0x00100000,
-	ETypeModifier_Bindable      = 0x00200000,
-	ETypeModifier_PropertyMask  = 0x00300000,	
+	ETypeModifierMask_Endian = 
+		ETypeModifier_LittleEndian | 
+		ETypeModifier_BigEndian,
 
-	ETypeModifier_Strong        = 0x00400000,
-	ETypeModifier_Weak          = 0x00800000,	
-	ETypeModifier_InterfaceMask = 0x00c00000,	
+	ETypeModifierMask_Safety = 
+		ETypeModifier_Safe | 
+		ETypeModifier_Unsafe,
+
+	ETypeModifierMask_CallConv = 
+		ETypeModifier_Cdecl | 
+		ETypeModifier_Stdcall,
+
+	ETypeModifierMask_Strength = 
+		ETypeModifier_Strong | 
+		ETypeModifier_Weak,
+
+	ETypeModifierMask_Closure = 
+		ETypeModifier_Closure | 
+		ETypeModifier_Thin,
+
+	ETypeModifierMask_Integer = 
+		ETypeModifierMask_Sign | 
+		ETypeModifierMask_Endian,
+
+	ETypeModifierMask_Function = 
+		ETypeModifier_Function | 
+		ETypeModifierMask_CallConv,
+
+	ETypeModifierMask_Property = 
+		ETypeModifier_Property | 
+		ETypeModifier_Bindable | 
+		ETypeModifier_AutoGet | 
+		ETypeModifier_Indexed |
+		ETypeModifierMask_CallConv,
+
+	ETypeModifierMask_Event = 
+		ETypeModifier_Event | 
+		ETypeModifierMask_CallConv,
+
+	ETypeModifierMask_AnyPtr = 
+		ETypeModifierMask_Safety |
+		ETypeModifier_NoNull,
+
+	ETypeModifierMask_DataPtr = 
+		ETypeModifierMask_AnyPtr |
+		ETypeModifier_Const | 
+		ETypeModifier_Volatile,
+
+	ETypeModifierMask_ClassPtr = 
+		ETypeModifierMask_AnyPtr |
+		ETypeModifierMask_Strength,
+
+	ETypeModifierMask_FunctionPtr = 
+		ETypeModifierMask_AnyPtr |
+		ETypeModifierMask_Function | 
+		ETypeModifierMask_Strength | 
+		ETypeModifierMask_Closure,
+
+	ETypeModifierMask_PropertyPtr = 
+		ETypeModifierMask_AnyPtr |
+		ETypeModifierMask_Property | 
+		ETypeModifierMask_Strength | 
+		ETypeModifierMask_Closure,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -222,6 +272,12 @@ GetUInt64TypeKind (
 	bool ForceUnsigned
 	);
 
+EType
+GetUnsignedTypeKind (EType TypeKind);
+
+EType
+GetBigEndianTypeKind (EType TypeKind);
+
 rtl::CString 
 GetLlvmTypeString (llvm::Type* pLlvmType);
 
@@ -235,17 +291,11 @@ protected:
 	EType m_TypeKind;
 	size_t m_Size;
 	int m_Flags;
-		
 	rtl::CStringA m_Signature;
-	rtl::CString m_TypeString;
-	rtl::CString m_LlvmTypeString;
-
+	rtl::CString m_TypeString;	
 	llvm::Type* m_pLlvmType;
 
-	CPointerType* m_PointerTypeArray [4];
-
-public:
-	rtl::CString m_Tag;
+	CDataPtrTypeTuple* m_pDataPtrTypeTuple;
 
 public:
 	CType ();
@@ -268,19 +318,17 @@ public:
 		return m_Flags;
 	}
 
+	virtual
 	size_t
-	GetAlignFactor ();
+	GetAlignFactor ()
+	{
+		return m_Size;
+	}
 
 	rtl::CStringA
 	GetSignature ()
 	{
 		return m_Signature;
-	}
-
-	rtl::CString
-	GetTag ()
-	{
-		return m_Tag;
 	}
 
 	rtl::CString 
@@ -337,42 +385,6 @@ public:
 		return m_TypeKind >= EType_Bool && m_TypeKind <= EType_Double;
 	}
 
-	bool
-	IsPointerType ()
-	{
-		return m_TypeKind == EType_Pointer || m_TypeKind == EType_Pointer_u;
-	}
-	
-	bool
-	IsReferenceType ()
-	{
-		return m_TypeKind == EType_Reference || m_TypeKind == EType_Reference_u;
-	}
-
-	bool
-	IsClassType ()
-	{
-		return m_TypeKind == EType_Interface || m_TypeKind == EType_Class;
-	}
-
-	bool
-	IsPropertyType ()
-	{
-		return m_TypeKind == EType_Property || m_TypeKind == EType_PropertyPointer;
-	}
-
-	bool
-	IsBindablePropertyType ();
-
-	bool
-	IsFunctionType ()
-	{
-		return m_TypeKind == EType_Function || m_TypeKind == EType_FunctionPointer || IsUnsafeFunctionPointerType ();
-	}
-
-	bool
-	IsUnsafeFunctionPointerType ();
-
 	bool 
 	IsAutoSizeArrayType ();
 
@@ -380,45 +392,33 @@ public:
 	IsCharArrayType ();
 
 	bool
-	IsConstType ();
-
-	bool
-	HasLayout ()
-	{
-		return 
-			m_TypeKind == EType_Struct || m_TypeKind == EType_Union ||
-			m_TypeKind == EType_Interface || m_TypeKind == EType_Class;
-	}
-
-	bool
-	CanRefMove ()
-	{
-		return 
-			m_TypeKind == EType_Reference || 
-			m_TypeKind == EType_Reference_u ||
-			m_TypeKind == EType_PropertyPointer;
-	}
-
-	bool 
-	CalcLayout ();
-
-	CPointerType* 
-	GetPointerType (EType TypeKind);
+	IsBindablePropertyType ();
 
 	CArrayType* 
 	GetArrayType (size_t ElementCount);
 
-	CFunctionType* 
-	GetFunctionType ();
+	CDataPtrType* 
+	GetDataPtrType (
+		EType TypeKind,
+		EDataPtrType PtrTypeKind = (EDataPtrType) 0,
+		int Flags = 0
+		);
 
-	CPropertyType* 
-	GetPropertyType ();
+	CDataPtrType* 
+	GetDataPtrType (
+		EDataPtrType PtrTypeKind = (EDataPtrType) 0,
+		int Flags = 0
+		)
+	{
+		return GetDataPtrType (EType_DataPtr, PtrTypeKind, Flags);
+	}
 
-	CType* 
-	GetModifiedType (int Modifiers);
-
-	CType*
-	GetUnqualifiedType ();
+	virtual 
+	bool
+	CalcLayout ()
+	{
+		return true;
+	}
 
 protected:
 	bool 
@@ -427,59 +427,31 @@ protected:
 	void
 	PostCalcLayout ();
 
-	CType* 
-	ApplyQualifierModifiers (int Modifiers);
+	virtual 
+	void
+	PrepareTypeString ();
 
-	CType* 
-	ApplyIntegerModifiers (int Modifiers);
-
-	CType* 
-	ApplyPointerModifiers (int Modifiers);
-
-	CType* 
-	ApplyFunctionModifiers (int Modifiers);
-
-	CType* 
-	ApplyPropertyModifiers (int Modifiers);
-	
-	CType* 
-	ApplyInterfaceModifiers (int Modifiers);
-};
-
-//.............................................................................
-
-class CDerivedType: 
-	public CType,
-	public rtl::TListLink
-{
-protected:
-	friend class CTypeMgr;
-
-	CType* m_pBaseType;	
-
-public:
-	CDerivedType ()
-	{
-		m_pBaseType = NULL;
-	}
-
-	CType* 
-	GetBaseType ()
-	{
-		return m_pBaseType;
-	}
+	virtual 
+	void
+	PrepareLlvmType ();
 };
 
 //.............................................................................
 
 class CNamedType: 
 	public CType,
-	public CNamespace,
-	public rtl::TListLink
+	public CModuleItemDecl,
+	public CNamespace
 {
+public:
+	CNamedType ()
+	{
+		m_NamespaceKind = ENamespace_NamedType;
+		m_pItemDecl = this;
+	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

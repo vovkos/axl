@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_ModuleItem.h"
+#include "axl_jnc_QualifiedName.h"
 
 namespace axl {
 namespace jnc {
@@ -15,129 +16,7 @@ class CEnumMember;
 
 //.............................................................................
 
-inline
-err::CError
-SetRedefinitionError (const tchar_t* pName)
-{
-	return err::SetFormatStringError (_T("redefinition of '%s'"), pName);
-}
-
-//.............................................................................
-
-class CQualifiedName
-{
-public:
-	rtl::CString m_First;
-	rtl::CBoxListT <rtl::CString> m_List;
-
-public:
-	CQualifiedName ()
-	{
-	}
-
-	CQualifiedName (const rtl::CString& Name)
-	{
-		m_First = Name;
-	}	
-
-	CQualifiedName (const tchar_t* pName)
-	{
-		m_First = pName;
-	}	
-
-	CQualifiedName (const CQualifiedName& Name)
-	{
-		Copy (Name);
-	}	
-
-	CQualifiedName&
-	operator = (const CQualifiedName& Name)
-	{
-		Copy (Name);
-		return *this;
-	}	
-
-	void
-	Clear ()
-	{
-		m_First.Clear ();
-		m_List.Clear ();
-	}
-
-	bool
-	IsEmpty () const
-	{
-		return m_First.IsEmpty ();
-	}
-
-	bool
-	IsSimple () const
-	{
-		return m_List.IsEmpty ();
-	}
-
-	rtl::CString
-	GetShortName () const
-	{
-		return !m_List.IsEmpty () ? *m_List.GetTail () : m_First;
-	}
-
-	rtl::CString
-	GetFullName () const;
-
-	void
-	Copy (const CQualifiedName& Name);
-
-	void
-	TakeOver (CQualifiedName* pName);
-};
-
-//.............................................................................
-
-class CName
-{
-protected:
-	friend class CNamespace;
-
-	rtl::CString m_Name;
-	rtl::CString m_QualifiedName;
-
-	CNamespace* m_pParentNamespace;
-
-public:
-	CName ()
-	{
-		m_pParentNamespace = NULL;
-	}
-
-	bool
-	IsNamed ()
-	{
-		return !m_Name.IsEmpty ();
-	}
-
-	rtl::CString
-	GetName ()
-	{
-		return m_Name;
-	}
-
-	rtl::CString 
-	GetQualifiedName ();
-
-	CNamespace* 
-	GetParentNamespace ()
-	{
-		return m_pParentNamespace;
-	}
-};
-
-//.............................................................................
-
-class CAlias: 
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
+class CAlias: public CNamedModuleItem
 {
 protected:
 	friend class CNamespace;
@@ -169,20 +48,21 @@ enum ENamespace
 {
 	ENamespace_Global = 0,
 	ENamespace_Scope,
-	ENamespace_Enum,
-	ENamespace_Struct,
-	ENamespace_Class,
+	ENamespace_NamedType,
+	ENamespace_Property,
+	ENamespace_PropertyTemplate,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CNamespace: public CName
+class CNamespace: public CModuleItemName
 {
 protected:
 	friend class CNamedType;
 	friend class CNamespaceMgr;
 
 	ENamespace m_NamespaceKind;
+	CNamespace* m_pParentNamespace;
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
@@ -192,6 +72,7 @@ public:
 	CNamespace ()
 	{
 		m_NamespaceKind = ENamespace_Global;
+		m_pParentNamespace = NULL;
 	}
 
 	ENamespace 
@@ -200,10 +81,10 @@ public:
 		return m_NamespaceKind;
 	}
 
-	bool
-	IsNamedType ()
+	CNamespace* 
+	GetParentNamespace ()
 	{
-		return m_NamespaceKind >= ENamespace_Enum && m_NamespaceKind <= ENamespace_Class;
+		return m_pParentNamespace;
 	}
 
 	rtl::CString
@@ -225,13 +106,25 @@ public:
 	FindItem (const tchar_t* pName);
 
 	CModuleItem*
+	FindItem (const rtl::CString& Name)
+	{
+		return FindItem ((const tchar_t*) Name);
+	}
+
+	CModuleItem*
+	FindItem (const CQualifiedName& Name);
+
+	CModuleItem*
 	FindItemTraverse (const tchar_t* pName);
 
 	CModuleItem*
-	FindItemTraverse (
-		const CQualifiedName& Name,
-		bool IsStrict
-		);
+	FindItemTraverse (const rtl::CString& Name)
+	{
+		return FindItemTraverse ((const tchar_t*) Name);
+	}
+
+	CModuleItem*
+	FindItemTraverse (const CQualifiedName& Name);
 
 	template <typename T>
 	bool
@@ -269,21 +162,15 @@ protected:
 	bool
 	AddItem (
 		CModuleItem* pItem,
-		CName* pName
+		CModuleItemName* pName
 		);
 };
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-CNamespace*
-GetItemNamespace (CModuleItem* pItem);
 
 //.............................................................................
 
 class CGlobalNamespace: 
-	public CModuleItem,
-	public CNamespace,
-	public rtl::TListLink
+	public CDeclModuleItem,
+	public CNamespace
 {
 protected:
 	friend class CNamespaceMgr;
@@ -298,5 +185,14 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
+inline
+err::CError
+SetRedefinitionError (const tchar_t* pName)
+{
+	return err::SetFormatStringError (_T("redefinition of '%s'"), pName);
+}
+
+//.............................................................................
+
 } // namespace jnc {
+} // namespace axl {

@@ -47,7 +47,7 @@ public:
 	template <typename TArgPacker>
 	EScheduleResult
 	ScheduleV (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn, 
 		va_list va
 		)
@@ -59,7 +59,7 @@ public:
 	template <typename TArgPacker>
 	EScheduleResult
 	Schedule (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn, 
 		...
 		)
@@ -74,7 +74,7 @@ public:
 		va_list va
 		)
 	{
-		return ScheduleV <TArgPacker> (ECallingConvention_Cdecl, pfn, va);
+		return ScheduleV <TArgPacker> (ECallConv_Cdecl, pfn, va);
 	}
 
 	template <typename TArgPacker>
@@ -105,7 +105,7 @@ public:
 	template <typename TArgPacker>
 	intptr_t
 	SyncScheduleV (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn, 
 		va_list va
 		)
@@ -117,7 +117,7 @@ public:
 	template <typename TArgPacker>
 	intptr_t
 	SyncSchedule (
-		ECallingConvention Convention,
+		ECallConv Convention,
 		void* pfn, 
 		...
 		)
@@ -132,7 +132,7 @@ public:
 		va_list va
 		)
 	{
-		return SyncScheduleV <TArgPacker> (ECallingConvention_Cdecl, pfn, va);
+		return SyncScheduleV <TArgPacker> (ECallConv_Cdecl, pfn, va);
 	}
 
 	template <typename TArgPacker>

@@ -6,6 +6,24 @@ namespace jnc {
 
 //.............................................................................
 
+const tchar_t*
+GetVariableKindString (EVariable VariableKind)
+{
+	switch (VariableKind)
+	{
+	case EVariable_Global:
+		return _T("global-variable");
+
+	case EVariable_Local:
+		return _T("local-variable");
+
+	default:
+		return _T("undefined-variable-kind");
+	};
+}
+
+//.............................................................................
+
 CVariable::CVariable ()
 {
 	m_ItemKind = EModuleItem_Variable;
@@ -23,5 +41,5 @@ CVariable::~CVariable ()
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

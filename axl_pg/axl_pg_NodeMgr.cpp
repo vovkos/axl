@@ -16,23 +16,23 @@ CNodeMgr::CNodeMgr ()
 	// parse table entry equal 0 is epsilon production
 
 	m_EofTokenNode.m_Kind = ENode_Token;
-	m_AnyTokenNode.m_Flags = ESymbolNodeFlag_IsEofToken;
+	m_AnyTokenNode.m_Flags = ESymbolNodeFlag_EofToken;
 	m_EofTokenNode.m_Name = _T("$");
 	m_EofTokenNode.m_Index = 0;
 	m_EofTokenNode.m_MasterIndex = 0;
 
 	m_AnyTokenNode.m_Kind = ENode_Token;
-	m_AnyTokenNode.m_Flags = ESymbolNodeFlag_IsAnyToken;
+	m_AnyTokenNode.m_Flags = ESymbolNodeFlag_AnyToken;
 	m_AnyTokenNode.m_Name = _T("<any>");
 	m_AnyTokenNode.m_Index = 1;
 	m_AnyTokenNode.m_MasterIndex = 1;
 
 	m_EpsilonNode.m_Kind = ENode_Epsilon;
-	m_EpsilonNode.m_Flags |= EGrammarNodeFlag_IsNullable;
+	m_EpsilonNode.m_Flags |= EGrammarNodeFlag_Nullable;
 	m_EpsilonNode.m_Name = _T("<epsilon>");
 	m_EpsilonNode.m_MasterIndex = 0; 
 
-	m_StartPragmaSymbol.m_Flags |= ESymbolNodeFlag_IsPragma;
+	m_StartPragmaSymbol.m_Flags |= ESymbolNodeFlag_Pragma;
 	m_StartPragmaSymbol.m_Name = _T("<pragma>");
 }
 
@@ -111,7 +111,7 @@ CNodeMgr::GetSymbolNode (const rtl::CString& Name)
 
 	CSymbolNode* pNode = AXL_MEM_NEW (CSymbolNode);
 	pNode->m_Kind = ENode_Symbol;
-	pNode->m_Flags = ESymbolNodeFlag_IsNamed;
+	pNode->m_Flags = ESymbolNodeFlag_Named;
 	pNode->m_Name = Name;
 	
 	m_NamedSymbolList.InsertTail (pNode);
@@ -264,7 +264,7 @@ CNodeMgr::MarkReachableNodes ()
 		for (; Node; Node++)
 		{
 			CSymbolNode* pNode = *Node;
-			if (pNode->m_Flags & ESymbolNodeFlag_IsStart)
+			if (pNode->m_Flags & ESymbolNodeFlag_Start)
 				pNode->MarkReachable ();
 		}
 	else
@@ -478,7 +478,7 @@ CNodeMgr::IndexLaDfaNodes ()
 	{
 		CLaDfaNode* pNode = *Node;
 
-		if (!(pNode->m_Flags & ELaDfaNodeFlag_IsLeaf) &&       // don't index leaves
+		if (!(pNode->m_Flags & ELaDfaNodeFlag_Leaf) &&       // don't index leaves
 			(!pNode->m_pResolver || pNode->m_pResolverUplink)) // and non-chained resolvers
 		{
 			pNode->m_Index = i++;

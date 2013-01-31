@@ -9,44 +9,6 @@ namespace jnc {
 
 //.............................................................................
 
-rtl::CString
-CQualifiedName::GetFullName () const
-{
-	if (m_List.IsEmpty ())
-		return m_First;
-
-	rtl::CString Name = m_First;	
-	rtl::CBoxIteratorT <rtl::CString> It = m_List.GetHead ();
-	for (; It; It++)
-	{
-		Name.Append ('.');
-		Name.Append (*It);
-	}
-
-	return Name;
-}
-
-void
-CQualifiedName::Copy (const CQualifiedName& Name)
-{
-	m_First = Name.m_First;
-	m_List.Clear ();
-
-	rtl::CBoxIteratorT <rtl::CString> It = Name.m_List.GetHead ();
-	for (; It; It++)
-		m_List.InsertTail (*It);
-}
-
-void
-CQualifiedName::TakeOver (CQualifiedName* pName)
-{
-	m_First = pName->m_First;
-	m_List.TakeOver (&pName->m_List);
-	pName->Clear ();
-}
-
-//.............................................................................
-
 CModuleItem*
 UnAliasItem (CModuleItem* pItem)
 {
@@ -66,45 +28,35 @@ GetItemNamespace (CModuleItem* pItem)
 {
 	pItem = UnAliasItem (pItem);
 
-	EModuleItem ItemKind = pItem->GetItemKind ();
-	if (ItemKind == EModuleItem_Namespace)
+	EModuleItem ItemKind = pItem->GetItemKind ();	
+	switch (ItemKind)
+	{
+	case EModuleItem_Namespace:
 		return (CGlobalNamespace*) pItem;
 
-	if (ItemKind != EModuleItem_Type)
+	case EModuleItem_Property:
+		return (CProperty*) pItem;
+
+	case EModuleItem_Type:
+		break;
+
+	default:
 		return NULL;
+	}
 
 	CType* pType = (CType*) pItem;	
 	EType TypeKind = pType->GetTypeKind ();
-
 	switch (TypeKind)
 	{
 	case EType_Enum:
-	case EType_Enum_c:
 	case EType_Struct:
 	case EType_Union:
-	case EType_Interface:
 	case EType_Class:
 		return ((CNamedType*) pType);
 
 	default:
 		return NULL;
 	}
-}
-
-//.............................................................................
-
-rtl::CString 
-CName::GetQualifiedName ()
-{
-	if (!m_QualifiedName.IsEmpty ())
-		return m_QualifiedName;
-
-	if (m_pParentNamespace && m_pParentNamespace->IsNamed ())
-		m_QualifiedName = m_pParentNamespace->CreateQualifiedName (m_Name);
-	else
-		m_QualifiedName = m_Name;
-
-	return m_QualifiedName;
 }
 
 //.............................................................................
@@ -120,10 +72,10 @@ CNamespace::Clear ()
 rtl::CString
 CNamespace::CreateQualifiedName (const tchar_t* pName)
 {
-	if (!IsNamed ())
+	if (m_QualifiedName.IsEmpty ())
 		return pName;
 
-	rtl::CString QualifiedName = GetQualifiedName ();
+	rtl::CString QualifiedName = m_QualifiedName;
 	QualifiedName.Append (_T('.'));
 	QualifiedName.Append (pName);
 	return QualifiedName;
@@ -137,23 +89,54 @@ CNamespace::FindItem (const tchar_t* pName)
 }
 
 CModuleItem*
+CNamespace::FindItem (const CQualifiedName& Name)
+{
+	CModuleItem* pItem = FindItem (Name.m_First);
+	if (!pItem)
+		return NULL;
+
+	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
+	for (; NameIt; NameIt++)
+	{
+		CNamespace* pNamespace = GetItemNamespace (pItem);
+		if (!pNamespace)
+			return NULL;
+
+		pItem = pNamespace->FindItem (*NameIt);
+		if (!pItem)
+			return NULL;
+	}
+
+	return pItem;
+}
+
+CModuleItem*
 CNamespace::FindItemTraverse (const tchar_t* pName)
 {
 	for (CNamespace* pNamespace = this; pNamespace; pNamespace = pNamespace->m_pParentNamespace)
 	{
 		CModuleItem* pItem;
 
-		switch (pNamespace->m_NamespaceKind)
+		if (pNamespace->m_NamespaceKind == ENamespace_NamedType)
 		{
-		case ENamespace_Struct:
-			pItem = ((CStructType*) pNamespace)->FindItemWithBaseTypeList (pName);
-			break;
+			CNamedType* pNamedType = (CNamedType*) pNamespace;
+			EType NamedTypeKind = pNamedType->GetTypeKind ();
+			switch (NamedTypeKind)
+			{
+			case EType_Class:
+				pItem = ((CClassType*) pNamedType)->FindItemWithBaseTypeList (pName);
+				break;
 
-		case ENamespace_Class:
-			pItem = ((CClassType*) pNamespace)->FindItemWithBaseTypeList (pName);
-			break;
+			case EType_Struct:
+				pItem = ((CStructType*) pNamedType)->FindItemWithBaseTypeList (pName);
+				break;
 
-		default:
+			default:
+				pItem = pNamespace->FindItem (pName);
+			}
+		}
+		else
+		{
 			pItem = pNamespace->FindItem (pName);
 		}
 			
@@ -165,40 +148,22 @@ CNamespace::FindItemTraverse (const tchar_t* pName)
 }
 
 CModuleItem*
-CNamespace::FindItemTraverse (
-	const CQualifiedName& Name,
-	bool IsStrict
-	)
+CNamespace::FindItemTraverse (const CQualifiedName& Name)
 {
 	CModuleItem* pItem = FindItemTraverse (Name.m_First);
 	if (!pItem)
 		return NULL;
 
 	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
-
-	if (IsStrict) // direct members only
-		for (; NameIt; NameIt++)
-		{
-			CNamespace* pNamespace = GetItemNamespace (pItem);
-			if (!pNamespace)
-				return NULL;
-
-			pItem = pNamespace->FindItem (*NameIt);
-			if (!pItem)
-				return NULL;
-		}
-	else
-		for (; NameIt; NameIt++)
-		{
-			CNamespace* pNamespace = GetItemNamespace (pItem);
-			if (!pNamespace)
-				return NULL;
-
-			pItem = pNamespace->FindItemTraverse (*NameIt);
-			if (!pItem)
-				return NULL;
-		}
-
+	for (; NameIt; NameIt++)
+	{
+		CNamespace* pNamespace = GetItemNamespace (pItem);
+		if (!pNamespace)
+			return NULL;
+		pItem = pNamespace->FindItem (*NameIt);
+		if (!pItem)
+			return NULL;
+	}
 
 	return pItem;
 }
@@ -206,11 +171,9 @@ CNamespace::FindItemTraverse (
 bool
 CNamespace::AddItem (
 	CModuleItem* pItem,
-	CName* pName
+	CModuleItemName* pName
 	)	
 {
-	ASSERT (pName->m_pParentNamespace == NULL);
-
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (pName->m_Name);
 	if (It->m_Value)
 	{
@@ -218,7 +181,6 @@ CNamespace::AddItem (
 		return false;
 	}
 
-	pName->m_pParentNamespace = this;
 	m_ItemArray.Append (pItem);
 	It->m_Value = pItem;
 	return true;
@@ -227,7 +189,7 @@ CNamespace::AddItem (
 bool
 CNamespace::ExposeEnumMembers (CEnumType* pType)
 {
-	rtl::CIteratorT <CEnumMember> Member = pType->GetFirstMember ();
+	rtl::CIteratorT <CEnumMember> Member = pType->GetMemberList ().GetHead ();
 	for (; Member; Member++)
 	{
 		CAlias* pAlias = CreateAlias (Member->GetName (), *Member);
@@ -257,5 +219,5 @@ CNamespace::CreateAlias (
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

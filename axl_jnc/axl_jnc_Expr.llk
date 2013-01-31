@@ -57,13 +57,16 @@ expression_list
 	  )*
 	;
 
+// expression_or_empty_list might seem overcomplicated but
+// this is done to avoid having a singe EValue_Void in case of empty list
+
 class
 {
 	rtl::CBoxListT <CValue> m_ValueList;
 }
 nullable
 expression_or_empty_list
-	: expression_or_empty
+	: expression
 		{
 			$.m_ValueList.InsertTail ($1.m_Value);
 		}
@@ -73,6 +76,16 @@ expression_or_empty_list
 				$.m_ValueList.InsertTail ($e2.m_Value);
 			}
 	  )*
+	|	{
+			$.m_ValueList.InsertTail (CValue ());
+		}	
+	  (',' 
+		expression_or_empty $e2
+			{
+				$.m_ValueList.InsertTail ($e2.m_Value);
+			}
+	  )+
+	| epsilon 
 	;
 
 class
@@ -152,9 +165,9 @@ logical_or_expr <CValue* $pValue>
 	}
 	: logical_and_expr <$pValue> 
 	  (
-		EToken_LogicalOr logical_and_expr <&$OpValue2>
+		EToken_LogOr logical_and_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogicalAnd, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogAnd, $pValue, $OpValue2);
 			}
 	  )*
 	;
@@ -166,9 +179,9 @@ logical_and_expr <CValue* $pValue>
 	}
 	: inclusive_or_expr <$pValue> 
 	  (
-		EToken_LogicalAnd inclusive_or_expr <&$OpValue2>
+		EToken_LogAnd inclusive_or_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogicalOr, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogOr, $pValue, $OpValue2);
 			}
 	  )*
 	;
@@ -182,7 +195,7 @@ inclusive_or_expr <CValue* $pValue>
 	  (
 		'|' exclusive_or_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseOr, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwOr, $pValue, $OpValue2);
 			}
 	  )*
 	;
@@ -196,7 +209,7 @@ exclusive_or_expr <CValue* $pValue>
 	  (
 		'^' and_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseXor, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwXor, $pValue, $OpValue2);
 			}
 	  )*
 	;
@@ -210,7 +223,7 @@ and_expr <CValue* $pValue>
 	  (
 		'&' equality_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BitwiseAnd, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwAnd, $pValue, $OpValue2);
 			}
 	  )*
 	;
@@ -379,7 +392,7 @@ at_expr <CValue* $pValue>
 	}
 	: assignment_expr <$pValue> 
 	  (
-		'@' $o assignment_expr <&$OpValue2>
+		'@' assignment_expr <&$OpValue2>
 			{
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_At, $pValue, $OpValue2);
 			}
@@ -389,103 +402,69 @@ at_expr <CValue* $pValue>
 assignment_expr <CValue* $pValue>
 	local
 	{
-		CValue $RValue;
+		CValue $OpValue2;
 	}
 	: unary_expr <$pValue> 
 	  (
-		assignment_operator $o conditional_expr <&$RValue>
+		assignment_operator $o conditional_expr <&$OpValue2>
 			{
-				switch ($o.m_AssignKind)
-				{
-				case EAssign_Normal:
-					return m_pModule->m_OperatorMgr.MoveOperator ($RValue, *$pValue);
-
-				case EAssign_BinOp:
-					return m_pModule->m_OperatorMgr.BinOpMoveOperator ($RValue, *$pValue, $o.m_OpKind);
-
-				case EAssign_Ref:
-					return m_pModule->m_OperatorMgr.RefMoveOperator ($RValue, *$pValue);
-				}
+				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
 			}
 	  )?
 	;
 
 class
 {
-	EAssign m_AssignKind;
 	EBinOp m_OpKind;
 }
 assignment_operator
-	: direct_assignment_operator
-		{
-			$.m_AssignKind = $1.m_AssignKind;
-		}
-	| binop_assignment_operator
-		{
-			$.m_AssignKind = EAssign_BinOp;
-			$.m_OpKind = $1.m_OpKind;
-		}
-	;
-
-class
-{
-	EAssign m_AssignKind;
-}
-direct_assignment_operator
 	: '='
 		{
-			$.m_AssignKind = EAssign_Normal;
+			$.m_OpKind = EBinOp_Assign;
 		}
-	| EToken_RefAssign
+	| EToken_AddAssign
 		{
-			$.m_AssignKind = EAssign_Ref;
-		}
-	;
-
-class
-{
-	EBinOp m_OpKind;
-}
-binop_assignment_operator
-	: EToken_AddAssign
-		{
-			$.m_OpKind = EBinOp_Add;
+			$.m_OpKind = EBinOp_AddAssign;
 		}
 	| EToken_SubAssign
 		{
-			$.m_OpKind = EBinOp_Sub;
+			$.m_OpKind = EBinOp_SubAssign;
 		}
 	| EToken_MulAssign
 		{
-			$.m_OpKind = EBinOp_Mul;
+			$.m_OpKind = EBinOp_MulAssign;
 		}
 	| EToken_DivAssign
 		{
-			$.m_OpKind = EBinOp_Div;
+			$.m_OpKind = EBinOp_DivAssign;
 		}
 	| EToken_ModAssign
 		{
-			$.m_OpKind = EBinOp_Mod;
+			$.m_OpKind = EBinOp_ModAssign;
 		}
 	| EToken_ShlAssign
 		{
-			$.m_OpKind = EBinOp_Shl;
+			$.m_OpKind = EBinOp_ShlAssign;
 		}
 	| EToken_ShrAssign
 		{
-			$.m_OpKind = EBinOp_Shr;
+			$.m_OpKind = EBinOp_ShrAssign;
 		}
 	| EToken_AndAssign
 		{
-			$.m_OpKind = EBinOp_BitwiseAnd;
+			$.m_OpKind = EBinOp_AndAssign;
 		}
 	| EToken_XorAssign
 		{
-			$.m_OpKind = EBinOp_BitwiseXor;
+			$.m_OpKind = EBinOp_XorAssign;
 		}
 	| EToken_OrAssign
 		{
-			$.m_OpKind = EBinOp_BitwiseOr;
+			$.m_OpKind = EBinOp_OrAssign;
+		}
+	| EToken_ClassAssign
+		{
+			$.m_OpKind = EBinOp_ClassAssign;
 		}
 	;
 
@@ -500,15 +479,7 @@ unary_operator_expr <CValue* $pValue>
 		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
 			m_BindablePropertyList.InsertTail (*$pValue);
 	}
-	: '&' unary_expr <$pValue> 
-		{
-			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, $pValue);
-		}
-	| '*' unary_expr <$pValue> 
-		{
-			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, $pValue);
-		}
-	| '+' unary_expr <$pValue> 
+	: '+' unary_expr <$pValue> 
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Plus, $pValue);
 		}
@@ -518,11 +489,19 @@ unary_operator_expr <CValue* $pValue>
 		}
 	| '~' unary_expr <$pValue> 
 		{
-			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_BitwiseNot, $pValue);
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_BwNot, $pValue);
+		}
+	| '&' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, $pValue);
+		}
+	| '*' unary_expr <$pValue> 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, $pValue);
 		}
 	| '!' unary_expr <$pValue> 
 		{
-			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_LogicalNot, $pValue);
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_LogNot, $pValue);
 		}
 	| EToken_Inc unary_expr <$pValue> 
 		{
@@ -532,10 +511,6 @@ unary_operator_expr <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, $pValue);
 		}
-	| EToken_OnChange unary_expr <$pValue> 
-		{
-			return m_pModule->m_OperatorMgr.OnChangeOperator ($pValue);
-		}
 	| EToken_SizeOf type_name_or_expr
 		{
 			$pValue->SetConstSizeT ($2.m_pType->GetSize ());
@@ -543,6 +518,14 @@ unary_operator_expr <CValue* $pValue>
 	| EToken_TypeOf type_name_or_expr
 		{
 			$pValue->SetType ($2.m_pType);
+		}
+	| EToken_Snapshot unary_expr <$pValue> 
+		{
+			// not yet
+		}
+	| EToken_Dynamic unary_expr <$pValue> 
+		{
+			// not yet
 		}
 	| resolver (cast_operator_rslv) 
 	  '(' allocation_specifier $a? type_name $t ')' unary_expr <$pValue> 
@@ -578,7 +561,7 @@ allocation_specifier
 cast_operator_rslv
 	local
 	{
-		CTypeSpecifierModifiers $TypeSpecifier;
+		CTypeSpecifier $TypeSpecifier;
 	}
 	: '(' allocation_specifier? type_specifier_modifier <&$TypeSpecifier>
 	;
@@ -602,8 +585,7 @@ type_name_or_expr
 		}
 	| unary_expr <&$Value>
 		{
-			CType* pType = $Value.GetType ();
-			$.m_pType = pType->IsReferenceType () ? ((CPointerType*) pType)->GetBaseType () : pType;
+			$.m_pType = $Value.GetType ();
 		}
 	;
 
@@ -618,15 +600,7 @@ postfix_operator <CValue* $pValue>
 		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
 			m_BindablePropertyList.InsertTail (*$pValue);
 	}
-	: '.' EToken_Identifier
-		{
-			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $2.m_Data.m_String);
-		}
-	| EToken_Ptr EToken_Identifier
-		{
-			return m_pModule->m_OperatorMgr.PointerToMemberOperator ($pValue, $2.m_Data.m_String);
-		}
-	| '(' expression_or_empty_list ')'
+	: '(' expression_or_empty_list ')'
 		{
 			return m_pModule->m_OperatorMgr.CallOperator ($pValue, &$2.m_ValueList);
 		}		
@@ -645,6 +619,39 @@ postfix_operator <CValue* $pValue>
 	| EToken_Dec
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostDec, $pValue);
+		}
+	| '.' member_operator <$pValue>
+	| EToken_Ptr 
+		{
+			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Ptr, $pValue);
+		}
+	  member_operator <$pValue>
+	;
+
+member_operator <CValue* $pValue>
+	: EToken_Identifier $n
+		{
+			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $n.m_Data.m_String);
+		}
+	| EToken_Weak EToken_Identifier $n
+		{
+			return m_pModule->m_OperatorMgr.WeakMemberOperator ($pValue, $n.m_Data.m_String);
+		}
+	| EToken_OnChange
+		{
+			return m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent ($pValue);
+		}
+	| EToken_Get
+		{
+			return m_pModule->m_OperatorMgr.GetPropertyGetter ($pValue);
+		}
+	| EToken_Set
+		{
+			return m_pModule->m_OperatorMgr.GetPropertySetter ($pValue);
+		}
+	| EToken_PropValue
+		{
+			return m_pModule->m_OperatorMgr.GetPropertyPropValue ($pValue);
 		}
 	;
 

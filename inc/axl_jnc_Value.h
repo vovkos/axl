@@ -13,9 +13,9 @@ namespace jnc {
 class CScope;
 class CVariable;
 class CFunction;
-class CFunctionOverload;
+class CProperty;
+class CStructMember;
 class CClassType;
-class CPropertyType;
 class CClosure;
 enum EClosure;
 
@@ -29,7 +29,6 @@ enum EValue
 	EValue_Const,
 	EValue_Variable,
 	EValue_Function,
-	EValue_FunctionOverload,
 	EValue_Property,	
 	EValue_LlvmRegister,
 	EValue_BoolNot,
@@ -62,7 +61,7 @@ enum EValueFlag
 {
 	// type qualifiers are propagated to value flags and then type is unqualified
 
-	EValueFlag_IsVariableOffset        = 0x0100,
+	EValueFlag_VariableOffset          = 0x0100,
 	EValueFlag_WeakToStrong            = 0x0200, // keep it weak in the closure but convert before the call
 	EValueFlag_WeakToStrongMustSucceed = 0x0400, // fail closure call if weak-to-strong fails
 };
@@ -101,7 +100,8 @@ protected:
 	{
 		CVariable* m_pVariable;
 		CFunction* m_pFunction;
-		CFunctionOverload* m_pFunctionOverload;
+		CProperty* m_pProperty;
+		CStructMember* m_pField;
 	};
 
 	mutable llvm::Value* m_pLlvmValue;
@@ -161,10 +161,10 @@ public:
 		SetFunction (pFunction);
 	}
 
-	CValue (CFunctionOverload* pFunctionOverload)
+	CValue (CProperty* pProperty)
 	{
 		Init ();
-		SetFunctionOverload (pFunctionOverload);
+		SetProperty (pProperty);
 	}
 
 	CValue (
@@ -191,12 +191,6 @@ public:
 		return m_ValueKind;
 	}
 	
-	const tchar_t*
-	GetValueKindString () const
-	{
-		return jnc::GetValueKindString (m_ValueKind);
-	}
-
 	bool
 	IsEmpty () const
 	{
@@ -235,11 +229,11 @@ public:
 		return m_pFunction;
 	}
 
-	CFunctionOverload*
-	GetFunctionOverload () const
+	CProperty* 
+	GetProperty () const
 	{
-		ASSERT (m_ValueKind == EValue_FunctionOverload);
-		return m_pFunctionOverload;
+		ASSERT (m_ValueKind == EValue_Property);
+		return m_pProperty;
 	}
 
 	void*
@@ -286,6 +280,13 @@ public:
 
 	llvm::Value*
 	GetLlvmValue () const;
+
+	rtl::CString 
+	GetLlvmTypeString ()
+	{
+		llvm::Value* pLlvmValue = GetLlvmValue ();
+		return pLlvmValue ? jnc::GetLlvmTypeString (pLlvmValue->getType ()) : rtl::CString ();
+	}
 
 	static
 	llvm::Constant*
@@ -363,13 +364,10 @@ public:
 		);
 
 	void
-	SetProperty (CPropertyType* pPropertyType);
-
-	void
 	SetFunction (CFunction* pFunction);
 
 	void
-	SetFunctionOverload (CFunctionOverload* pFunctionOverload);
+	SetProperty (CProperty* pProperty);
 
 	bool
 	CreateConst (
@@ -524,7 +522,7 @@ protected:
 
 // header of class instance
 
-struct TObjectHdr
+struct TObject
 {
 	class CClassType* m_pType; // for GC tracing & QueryInterface; after destruction is zeroed
 	size_t m_ScopeLevel;
@@ -534,41 +532,58 @@ struct TObjectHdr
 
 // header of interface instance
 
-struct TInterfaceHdr
+struct TInterface
 {
 	void** m_pVTable; 
-	TObjectHdr* m_pObject; // for GC tracing & QueryInterface
+	TObject* m_pObject; // for GC tracing & QueryInterface
 
 	// followed by parents, then by interface data fields
 };
 
-//.............................................................................
+// function that converts weak to strong
 
-// *safe, &safe
+typedef
+TInterface* 
+(*FStrengthen) (TInterface*);
 
-struct TSafePtrValidator
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structures backing up data pointer declared like:
+// int* p;
+
+struct TDataPtrValidator
 {
 	void* m_pRegionBegin;
 	void* m_pRegionEnd;
 	size_t m_ScopeLevel;
 };
 
-struct TSafePtr
+struct TDataPtr
 {
 	void* m_p;
-	TSafePtrValidator m_Validator;
+	TDataPtrValidator m_Validator;
 };
 
-// structure backing up function pointer declared like
-// typedef void FTest ();
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structure backing up function closure pointer declared like:
+// int function* fnTest (int, int);
+// int function weak* fnTest (int, int);
 
 struct TFunctionPtr
 {
 	void* m_pfn;
-	TInterfaceHdr* m_pIface; // NULL, interface or closure
+	TInterface* m_pClosure; 
 };
 
-// structures backing up event declared like
+struct TFunctionWeakPtr: TFunctionPtr
+{
+	FStrengthen m_pfnStrengthenClosure;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structures backing up event declared like:
 // event OnFire ();
 
 struct TEventHandler
@@ -584,22 +599,59 @@ struct TEvent
 	TEventHandler* m_pTail;
 };
 
-// structure backing up property pointer declared like
-// typedef int property PTest;
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structures backing up property closure pointer declared like:
+// int property* prTest (int, int);
+// int property weak* prTest (int, int);
 
 struct TPropertyPtr
 {
 	void** m_pVTable;
-	TInterfaceHdr* m_pIface; // NULL, interface or closure
-	TEvent* m_pEvent;
+	TInterface* m_pClosure; 
 };
 
-struct TBindablePropertyPtr: TPropertyPtr
+struct TPropertyWeakPtr: TPropertyPtr
 {
-	TEvent* m_pEvent;
+	FStrengthen m_pfnStrengthenClosure;
 };
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structures backing up bindable or autoget property closure pointer declared like:
+// int bindable property* prTest (int, int);
+// int bindable property weak* prTest (int, int);
+// if both bindable & autoget modifiers used, autodata goes first, then onchange event
+
+struct TAuPropertyPtr: TPropertyPtr
+{
+	TDataPtr m_DataPtr; 
+};
+
+struct TAuPropertyWeakPtr: TAuPropertyPtr
+{
+	FStrengthen m_pfnStrengthenClosure;
+};
+
+// structure backing up bindable or autoget property thin pointer declared like:
+// int autoget property thin* prTest (int, int);
+
+struct TAuPropertyThinPtr
+{
+	void** m_pVTable;
+	TDataPtr m_DataPtr;
+};
+
+// structure backing up bindable or autoget property unsafe pointer declared like:
+// int autoget property unsafe* prTest (int, int);
+
+struct TAuPropertyUnsafePtr
+{
+	void** m_pVTable;
+	void* m_pData;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct TVariant
 {
@@ -621,8 +673,13 @@ struct TVariant
 
 		void* m_p;
 
-		TSafePtr m_SafePtr;
+		TInterface* m_pIface;
+		TDataPtr m_DataPtr;
 		TFunctionPtr m_FunctionPtr;
+		TPropertyPtr m_PropertyPtr;
+		TAuPropertyPtr m_AuPropertyPtr;
+		TAuPropertyThinPtr m_AuPropertyThinPtr;
+		TAuPropertyUnsafePtr m_AuPropertyUnsafePtr;
 	};
 };
 
@@ -640,5 +697,5 @@ enum ERuntimeError
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

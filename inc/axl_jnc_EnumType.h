@@ -10,32 +10,39 @@
 namespace axl {
 namespace jnc {
 
+class CEnumType;
+
 //.............................................................................
 
-class CEnumMember: 
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
+enum EEnumTypeFlag
+{
+	EEnumTypeFlag_Exposed = 0x010000,
+};
+
+//.............................................................................
+
+class CEnumMember: public CNamedModuleItem
 {
 protected:
 	friend class CEnumType;
 	friend class CNamespace;
 
+	CEnumType* m_pParentEnumType;
 	intptr_t m_Value;
-
 	rtl::CBoxListT <CToken> m_Expression;
 
 public:
 	CEnumMember ()
 	{
 		m_ItemKind = EModuleItem_EnumMember;
+		m_pParentEnumType = NULL;
 		m_Value = 0;
 	}
 
 	CEnumType*
-	GetParentType ()
+	GetParentEnumType ()
 	{
-		return (CEnumType*) (CNamedType*) m_pParentNamespace; // double cast cause CEnumType is not defined yet
+		return m_pParentEnumType; // double cast cause CEnumType is not defined yet
 	}
 
 	intptr_t
@@ -83,10 +90,10 @@ protected:
 public:
 	CEnumType ();
 
-	rtl::CIteratorT <CEnumMember>
-	GetFirstMember ()
+	rtl::CConstListT <CEnumMember>
+	GetMemberList ()
 	{
-		return m_MemberList.GetHead ();
+		return m_MemberList;
 	}
 
 	CEnumMember*
@@ -103,9 +110,24 @@ public:
 	{
 		return CreateMember (Name, m_CurrentValue);
 	}
+
+protected:
+	virtual 
+	void
+	PrepareTypeString ()
+	{
+		m_TypeString.Format ((m_Flags & EEnumTypeFlag_Exposed) ? _T("enumc %s") : _T("enum %s"), m_Tag);
+	}
+
+	virtual 
+	void
+	PrepareLlvmType ()
+	{
+		m_pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
+	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

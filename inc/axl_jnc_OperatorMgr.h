@@ -4,9 +4,14 @@
 
 #pragma once
 
-#include "axl_jnc_UnaryOperator.h"
-#include "axl_jnc_BinaryOperator.h"
-#include "axl_jnc_CastOperator.h"
+#include "axl_jnc_UnOp.h"
+#include "axl_jnc_UnOp_Arithmetic.h"
+#include "axl_jnc_UnOp_Ptr.h"
+#include "axl_jnc_BinOp.h"
+#include "axl_jnc_BinOp_Arithmetic.h"
+#include "axl_jnc_BinOp_Assign.h"
+#include "axl_jnc_BinOp_Cmp.h"
+#include "axl_jnc_CastOp.h"
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
@@ -32,7 +37,7 @@ protected:
 
 	CUnOp_Plus m_UnOp_Plus;
 	CUnOp_Minus m_UnOp_Minus;
-	CUnOp_BitwiseNot m_UnOp_BitwiseNot;
+	CUnOp_BwNot m_UnOp_BwNot;
 	CUnOp_Addr m_UnOp_Addr;
 	CUnOp_Indir m_UnOp_Indir;
 	
@@ -50,11 +55,11 @@ protected:
 	CBinOp_Mod m_BinOp_Mod;
 	CBinOp_Shl m_BinOp_Shl;
 	CBinOp_Shr m_BinOp_Shr;
-	CBinOp_BitwiseAnd m_BinOp_BitwiseAnd;
-	CBinOp_BitwiseOr m_BinOp_BitwiseOr;
-	CBinOp_BitwiseXor m_BinOp_BitwiseXor;
+	CBinOp_BwAnd m_BinOp_BwAnd;
+	CBinOp_BwOr m_BinOp_BwOr;
+	CBinOp_BwXor m_BinOp_BwXor;
 
-	// relational operators
+	// comparison operators
 
 	CBinOp_Eq m_BinOp_Eq;
 	CBinOp_Ne m_BinOp_Ne;
@@ -63,7 +68,7 @@ protected:
 	CBinOp_Gt m_BinOp_Gt;
 	CBinOp_Ge m_BinOp_Ge;
 
-	// special binary operators
+	// other binary operators
 
 	CBinOp_Idx m_BinOp_Idx;
 
@@ -332,12 +337,6 @@ public:
 		EBinOp OpKind
 		);
 
-	bool
-	RefMoveOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
 	// misc operators
 
 	bool
@@ -365,6 +364,13 @@ public:
 	}
 
 	bool
+	GetFieldMember (
+		const CValue& ThisValue,
+		CStructMember* pMember,
+		CValue* pResultValue
+		);
+
+	bool
 	MemberOperator (
 		const CValue& OpValue,
 		const tchar_t* pName,
@@ -381,19 +387,19 @@ public:
 	}
 
 	bool
-	PointerToMemberOperator (
+	WeakMemberOperator (
 		const CValue& OpValue,
 		const tchar_t* pName,
 		CValue* pResultValue
 		);
 
 	bool
-	PointerToMemberOperator (
+	WeakMemberOperator (
 		CValue* pValue,
 		const tchar_t* pName
 		)
 	{
-		return PointerToMemberOperator (*pValue, pName, pValue);
+		return WeakMemberOperator (*pValue, pName, pValue);
 	}
 
 	bool
@@ -429,16 +435,53 @@ public:
 	}
 
 	bool
-	OnChangeOperator (
+	GetPropertyGetter (
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
 	bool
-	OnChangeOperator (CValue* pValue)
+	GetPropertyGetter (CValue* pValue)
 	{
-		return OnChangeOperator (*pValue, pValue);
+		return GetPropertyGetter (*pValue, pValue);
 	}
+
+	bool
+	GetPropertySetter (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertySetter (CValue* pValue)
+	{
+		return GetPropertySetter (*pValue, pValue);
+	}
+
+	bool
+	GetPropertyPropValue (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyPropValue (CValue* pValue)
+	{
+		return GetPropertyPropValue (*pValue, pValue);
+	}
+
+	bool
+	GetPropertyOnChangeEvent (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyOnChangeEvent (CValue* pValue)
+	{
+		return GetPropertyOnChangeEvent (*pValue, pValue);
+	}
+
 
 	bool
 	EventOperator (
@@ -481,15 +524,15 @@ public:
 		);
 
 	bool
-	GetMethodFunction (
+	GetVirtualMethodMember (
 		CFunction* pFunction,
 		CClosure* pClosure,
 		CValue* pResultValue
 		);
 
 	bool
-	GetMemberProperty (
-		CPropertyType* pPropertyType,
+	GetVirtualPropertyMember (
+		CProperty* pProperty,
 		CClosure* pClosure,
 		CValue* pResultValue
 		);
@@ -497,14 +540,14 @@ public:
 	bool
 	GetClassFieldMemberValue (
 		const CValue& ObjValue,
-		CClassFieldMember* pMember,
+		CStructMember* pMember,
 		CValue* pValue
 		);
 
 	bool
 	SetClassFieldMemberValue (
 		const CValue& ObjValue,
-		CClassFieldMember* pMember,
+		CStructMember* pMember,
 		const CValue& Value
 		);
 
@@ -546,13 +589,6 @@ protected:
 		CType* pDstType
 		);
 
-	bool
-	RefMoveReferenceOperator (
-		const CValue& RawOpValue,
-		const CValue& RawDstValue,
-		CPointerType* pReferenceType
-		);
-
 	// member operators
 
 	bool
@@ -590,8 +626,22 @@ protected:
 	ClassFieldMemberOperator (
 		const CValue& OpValue,
 		CClassType* pClassType,
-		CClassFieldMember* pMember,
+		CStructMember* pMember,
 		CClassBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	ClassMethodMemberOperator (
+		const CValue& OpValue,
+		CFunction* pFunction,
+		CValue* pResultValue
+		);
+
+	bool
+	ClassPropertyMemberOperator (
+		const CValue& OpValue,
+		CPropertyType* pPropertyType,
 		CValue* pResultValue
 		);
 
@@ -652,6 +702,6 @@ protected:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
 

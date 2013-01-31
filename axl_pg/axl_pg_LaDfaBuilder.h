@@ -69,7 +69,7 @@ public:
 	bool
 	IsResolved ()
 	{
-		return (m_pDfaNode->m_Flags & ELaDfaNodeFlag_IsResolved) != 0;
+		return (m_pDfaNode->m_Flags & ELaDfaNodeFlag_Resolved) != 0;
 	}
 
 	bool

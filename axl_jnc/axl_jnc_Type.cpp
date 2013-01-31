@@ -72,571 +72,8 @@ GetUInt64TypeKind (
 			Integer <= INT64_MAX ? EType_Int64 : EType_Int64_u;
 }
 
-//.............................................................................
-
-rtl::CString 
-GetLlvmTypeString (llvm::Type* pLlvmType)
-{
-	std::string s;
-	llvm::raw_string_ostream Stream (s);
-	pLlvmType->print (Stream);
-	return Stream.str ().c_str ();
-}
-
-//.............................................................................
-
-const tchar_t*
-GetTypeQualifierString (ETypeQualifier Qualifier)
-{
-	switch (Qualifier)
-	{
-	case ETypeQualifier_Const:
-		return _T("const");
-
-	case ETypeQualifier_Volatile:
-		return _T("volatile");
-
-	case ETypeQualifier_NoNull:
-		return _T("nonull");
-
-	case ETypeQualifier_Weak:
-		return _T("weak");
-
-	default:
-		return _T("undefined-type-qualifier");
-	};
-}
-
-//.............................................................................
-
-
-const tchar_t*
-GetTypeModifierString (ETypeModifier Modifier)
-{
-	switch (Modifier)
-	{
-	case ETypeModifier_Const:
-		return _T("const");
-
-	case ETypeModifier_Volatile:
-		return _T("volatile");
-
-	case ETypeModifier_Signed:
-		return _T("signed");
-
-	case ETypeModifier_Unsigned:
-		return _T("unsigned");
-
-	case ETypeModifier_LittleEndian:
-		return _T("littleendian");
-
-	case ETypeModifier_BigEndian:
-		return _T("bigendian");
-
-	case ETypeModifier_Safe:
-		return _T("safe");
-
-	case ETypeModifier_Unsafe:
-		return _T("unsafe");
-		
-	case ETypeModifier_NoNull:
-		return _T("nonull");
-
-	case ETypeModifier_Cdecl:
-		return _T("cdecl");
-
-	case ETypeModifier_Stdcall:
-		return _T("stdcall");
-
-	case ETypeModifier_Virtual:
-		return _T("virtual");
-
-	case ETypeModifier_NoVirtual:
-		return _T("novirtual");
-
-	case ETypeModifier_Event:
-		return _T("event");
-
-	case ETypeModifier_Strong:
-		return _T("strong");
-
-	case ETypeModifier_Weak:
-		return _T("weak");
-
-	case ETypeModifier_Property:
-		return _T("property");
-
-	case ETypeModifier_Bindable:
-		return _T("bindable");
-
-	default:
-		return _T("undefined-type-modifier");
-	};
-}
-
-//.............................................................................
-
-CType::CType ()
-{
-	m_ItemKind = EModuleItem_Type;
-	m_TypeKind = EType_Void;
-	m_Flags = 0;
-	m_Size = 0;
-	m_pLlvmType = NULL;
-	memset (m_PointerTypeArray, 0, sizeof (m_PointerTypeArray));
-}
-
-CValue 
-CType::GetUndefValue ()
-{
-	llvm::Value* pLlvmValue = llvm::UndefValue::get (GetLlvmType ());
-	return CValue (pLlvmValue, this);
-}
-
-CValue 
-CType::GetZeroValue ()
-{
-	llvm::Value* pLlvmValue = llvm::Constant::getNullValue (GetLlvmType ());
-	return CValue (pLlvmValue, this);
-}
-
-bool 
-CType::CalcLayout ()
-{
-	switch (m_TypeKind)
-	{
-	case EType_Struct:
-		return ((CStructType*) this)->CalcLayout ();
-
-	case EType_Union:
-		return ((CUnionType*) this)->CalcLayout ();
-
-	case EType_Interface:
-	case EType_Class:
-		return ((CClassType*) this)->CalcLayout ();
-
-	default:
-		return true;
-	};
-}
-
-bool
-CType::PreCalcLayout ()
-{
-	ASSERT (!(m_Flags & ETypeFlag_IsLayoutReady));
-
-	if (m_Flags & ETypeFlag_IsLayoutCalc)
-	{
-		err::SetFormatStringError (_T("can't calculate layout of '%s' due to type recursion"), GetTypeString ());
-		return false;
-	}
-
-	m_Flags |= ETypeFlag_IsLayoutCalc;
-	return true;
-}
-
-void
-CType::PostCalcLayout ()
-{
-	m_Flags &= ~ETypeFlag_IsLayoutCalc;
-	m_Flags |= ETypeFlag_IsLayoutReady;
-}
-
-llvm::Type* 
-CType::GetLlvmType ()
-{
-	if (m_pLlvmType)
-		return m_pLlvmType;
-
-	llvm::Type* pLlvmType = NULL;
-
-	switch (m_TypeKind)
-	{
-	case EType_Void:
-		pLlvmType = llvm::Type::getVoidTy (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Bool:
-		pLlvmType = llvm::Type::getInt1Ty (llvm::getGlobalContext ());
-		break;
-
-	case EType_Int8:
-	case EType_Int8_u:
-		pLlvmType = llvm::Type::getInt8Ty (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Int16:
-	case EType_Int16_u:
-	case EType_Int16_be:
-	case EType_Int16_beu:
-		pLlvmType = llvm::Type::getInt16Ty (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Int32:
-	case EType_Int32_u:
-	case EType_Int32_be:
-	case EType_Int32_beu:
-		pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Int64:
-	case EType_Int64_u:
-	case EType_Int64_be:
-	case EType_Int64_beu:
-		pLlvmType = llvm::Type::getInt64Ty (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Float:
-		pLlvmType = llvm::Type::getFloatTy (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Double:
-		pLlvmType = llvm::Type::getDoubleTy (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Variant:
-		break;
-	
-	case EType_Qualifier:
-		pLlvmType = ((CQualifierType*) this)->GetBaseType ()->GetLlvmType ();
-		break;
-	
-	case EType_Pointer:
-	case EType_Pointer_u:
-	case EType_Reference:
-	case EType_Reference_u:
-		return ((CPointerType*) this)->GetLlvmType ();
-
-	case EType_Array:
-		return ((CArrayType*) this)->GetLlvmType ();
-	
-	case EType_BitField:
-		pLlvmType = ((CBitFieldType*) this)->GetBaseType ()->GetLlvmType ();
-		break;
-	
-	case EType_Function:
-		return ((CFunctionType*) this)->GetLlvmType ();
-
-	case EType_FunctionPointer:
-		pLlvmType = ((CFunctionPointerType*) this)->GetLlvmType ();
-		break;
-
-	case EType_PropertyPointer:
-		pLlvmType = ((CPropertyPointerType*) this)->GetLlvmType ();
-		break;
-
-	case EType_Event:
-		pLlvmType = ((CEventType*) this)->GetEventStructType ()->GetLlvmType ();
-		break;
-	
-	case EType_Enum:
-	case EType_Enum_c:
-		pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
-		break;
-	
-	case EType_Struct:
-		return ((CStructType*) this)->GetLlvmType ();
-
-	case EType_Union:
-		pLlvmType = ((CUnionType*) this)->GetStructType ()->GetLlvmType ();
-		break;
-
-	case EType_Class:
-	case EType_Interface:
-		pLlvmType = ((CClassType*) this)->GetInterfaceStructType ()->GetPointerType (EType_Pointer_u)->GetLlvmType ();
-		break;
-
-	case EType_Import:
-		return ((CImportType*) this)->GetExternType ()->GetLlvmType ();
-
-	default:
-		ASSERT (false);
-	}
-
-	m_pLlvmType = pLlvmType;
-	return pLlvmType;
-}
-
-size_t
-CType::GetAlignFactor ()
-{
-	switch (m_TypeKind)
-	{
-	case EType_Struct:
-	case EType_Union:
-		return ((CStructType*) this)->GetAlignFactor ();
-
-	case EType_Class:
-	case EType_Interface:
-		return ((CClassType*) this)->GetAlignFactor ();
-
-	case EType_Import:
-		return ((CImportType*) this)->GetExternType ()->GetAlignFactor ();
-
-	default:
-		return m_Size;
-	};
-}
-
-rtl::CString 
-CType::GetTypeString ()
-{
-	if (!m_TypeString.IsEmpty ())
-		return m_TypeString;
-
-	static const tchar_t*
-	PrimitiveTypeNameTable [EType__PrimitiveTypeCount] = 
-	{
-		_T("void"),
-		_T("variant"),
-		_T("bool"),
-		_T("int8"),
-		_T("unsigned int8"),
-		_T("int16"),
-		_T("unsigned int16"),
-		_T("int32"),
-		_T("unsigned int32"),
-		_T("int64"),
-		_T("unsigned int64"),
-		_T("bigendian int16"),
-		_T("unsigned bigendian int16"),
-		_T("bigendian int32"),
-		_T("unsigned bigendian int32"),
-		_T("bigendian int64"),
-		_T("unsigned bigendian int64"),
-		_T("float"),
-		_T("double"),
-	};
-
-	if (m_TypeKind < EType__PrimitiveTypeCount)
-	{
-		m_TypeString = PrimitiveTypeNameTable [m_TypeKind];
-	}
-	else switch (m_TypeKind)
-	{	
-	case EType_Qualifier:
-		m_TypeString = ((CQualifierType*) this)->GetBaseType ()->GetTypeString ();
-
-		for (size_t i = 1; i <= ETypeQualifier__Mask; i <<= 1)
-		{
-			m_TypeString.Append (_T(' '));
-			m_TypeString.Append (GetTypeQualifierString ((ETypeQualifier) i));
-		}
-
-		break;
-
-	case EType_Pointer:
-		m_TypeString.Format (_T("%s* safe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
-		break;
-
-	case EType_Pointer_u:
-		m_TypeString.Format (_T("%s* unsafe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
-		break;
-
-	case EType_Reference:
-		m_TypeString.Format (_T("%s& safe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
-		break;
-
-	case EType_Reference_u:
-		m_TypeString.Format (_T("%s& unsafe"), ((CPointerType*) this)->GetBaseType ()->GetTypeString ());
-		break;
-
-	case EType_BitField:
-		m_TypeString = ((CBitFieldType*) this)->CreateTypeString ();
-		break;
-
-	case EType_Enum:
-		m_TypeString.Format (_T("enum %s"), ((CNamedType*) this)->GetTag ());
-		break;
-
-	case EType_Enum_c:
-		m_TypeString.Format (_T("enumc %s"), ((CNamedType*) this)->GetTag ());
-		break;
-
-	case EType_Array:
-		m_TypeString = ((CArrayType*) this)->CreateTypeString ();
-		break;
-
-	case EType_Struct:
-		m_TypeString.Format (_T("struct %s"), ((CNamedType*) this)->GetTag ());
-		break;
-
-	case EType_Union:
-		m_TypeString.Format (_T("union %s"), ((CNamedType*) this)->GetTag ());
-		break;
-
-	case EType_Interface:
-		m_TypeString.Format (_T("interface %s"), ((CNamedType*) this)->GetTag ());
-		break;
-
-	case EType_Class:
-		m_TypeString.Format (_T("class %s"), ((CNamedType*) this)->GetTag ());
-		break;
-
-	case EType_Function:
-		m_TypeString = ((CFunctionType*) this)->CreateTypeString ();
-		break;
-
-	case EType_Event:
-		m_TypeString = ((CEventType*) this)->CreateTypeString ();
-		break;
-
-	case EType_FunctionPointer:
-		m_TypeString.Format (_T("%s.pfn"), ((CFunctionPointerType*) this)->GetShortFunctionType ()->CreateTypeString ());
-		break;
-
-	case EType_Property:
-		m_TypeString = ((CPropertyType*) this)->CreateTypeString ();
-		break;
-
-	case EType_PropertyPointer:
-		m_TypeString = ((CPropertyPointerType*) this)->GetPropertyType ()->CreateTypeString ();
-		break;
-
-	case EType_Import:
-		m_TypeString.Format (_T("import %s"), ((CImportType*) this)->GetName ().GetFullName ());
-		break;
-
-	default:
-		ASSERT (false);
-	}
-
-	return m_TypeString;
-}
-
-bool
-CType::IsBindablePropertyType ()
-{
-	return 
-		m_TypeKind == EType_Property && (m_Flags & EPropertyTypeFlag_IsBindable) ||
-		m_TypeKind == EType_PropertyPointer && (((CPropertyPointerType*) this)->GetPropertyType ()->GetFlags () & EPropertyTypeFlag_IsBindable);
-}
-
-bool 
-CType::IsAutoSizeArrayType ()
-{
-	return 
-		m_TypeKind == EType_Array &&
-		((CArrayType*) this)->GetElementCount () == 0;
-}
-
-bool 
-CType::IsCharArrayType ()
-{
-	return 
-		m_TypeKind == EType_Array &&
-		((CArrayType*) this)->GetBaseType ()->GetTypeKind () == EType_Char;
-}
-
-CPointerType* 
-CType::GetPointerType (EType TypeKind)
-{
-	return m_pModule->m_TypeMgr.GetPointerType (TypeKind, this);
-}
-
-bool
-CType::IsUnsafeFunctionPointerType ()
-{
-	return 
-		(m_TypeKind == EType_Pointer_u &&
-		((CPointerType*) this)->GetBaseType ()->GetTypeKind () == EType_Function);
-}
-
-bool
-CType::IsConstType ()
-{
-	return 
-		(m_TypeKind == EType_Qualifier &&
-		((CQualifierType*) this)->GetFlags () & ETypeQualifier_Const);
-}
-
-CArrayType* 
-CType::GetArrayType (size_t ElementCount)
-{
-	return m_pModule->m_TypeMgr.GetArrayType (this, ElementCount);
-}
-
-CFunctionType* 
-CType::GetFunctionType ()
-{
-	switch (m_TypeKind)
-	{
-	case EType_Function:
-		return (CFunctionType*) this;
-
-	case EType_FunctionPointer:
-		return ((CFunctionPointerType*) this)->GetShortFunctionType ();
-	
-	default:
-		return IsUnsafeFunctionPointerType () ? (CFunctionType*) ((CPointerType*) this)->GetBaseType () : NULL;
-	}
-}
-
-CPropertyType* 
-CType::GetPropertyType ()
-{
-	switch (m_TypeKind)
-	{
-	case EType_Property:
-		return (CPropertyType*) this;
-
-	case EType_PropertyPointer:
-		return ((CPropertyPointerType*) this)->GetPropertyType ();
-
-	default:
-		return NULL;
-	}
-}
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-static
-inline
-bool
-VerifyModifierTypeKind (
-	ETypeModifier Modifier,
-	bool IsTypeKind,
-	const tchar_t* pTypeKindString
-	)
-{
-	if (!IsTypeKind)
-	{
-		err::SetFormatStringError (
-			_T("type modifier '%s' can only be applied to %s"),
-			GetTypeModifierString (Modifier),
-			pTypeKindString
-			);
-		return false;
-	}
-
-	return true;
-}
-
-static
-inline
-bool
-VerifyAntiModifier (
-	int Modifiers,
-	ETypeModifier Modifier,
-	ETypeModifier AntiModifier
-	)
-{
-	if (Modifiers & AntiModifier)
-	{
-		err::SetFormatStringError (
-			_T("type modifiers '%s' and '%s' cannot be used together"),
-			GetTypeModifierString (Modifier),
-			GetTypeModifierString (AntiModifier)
-			);
-		return false;
-	}
-
-	return true;
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-static
 EType
 GetUnsignedTypeKind (EType TypeKind)
 {
@@ -665,7 +102,6 @@ GetUnsignedTypeKind (EType TypeKind)
 	return ResultTypeTable [TypeKind];
 }
 
-static
 EType
 GetBigEndianTypeKind (EType TypeKind)
 {
@@ -694,269 +130,363 @@ GetBigEndianTypeKind (EType TypeKind)
 	return ResultTypeTable [TypeKind];
 }
 
-static
-inline
-EType
-GetUnsafePointerTypeKind (EType TypeKind)
+//.............................................................................
+
+rtl::CString 
+GetLlvmTypeString (llvm::Type* pLlvmType)
 {
-	return 
-		TypeKind == EType_Pointer ? EType_Pointer_u :
-		TypeKind == EType_Reference ? EType_Reference_u : TypeKind;
-}
-
-CType* 
-CType::GetModifiedType (int Modifiers)
-{
-	CType* pType = this;
-
-	if (Modifiers & ETypeModifier_QualifierMask)
-		pType = ApplyQualifierModifiers (Modifiers);
-
-	if (Modifiers & ETypeModifier_IntegerMask)
-		pType = ApplyIntegerModifiers (Modifiers);
-
-	if (Modifiers & ETypeModifier_PointerMask)
-		pType = ApplyPointerModifiers (Modifiers);
-
-	if (Modifiers & ETypeModifier_FunctionMask)
-		pType = ApplyFunctionModifiers (Modifiers);
-
-	if (Modifiers & ETypeModifier_PropertyMask)
-		pType = ApplyPropertyModifiers (Modifiers);
-
-	if (Modifiers & ETypeModifier_InterfaceMask)
-		pType = ApplyInterfaceModifiers (Modifiers);
-
-	return pType;
-}
-
-CType* 
-CType::ApplyQualifierModifiers (int Modifiers)
-{
-	CType* pType = this;
-
-	int Flags = 0;
-
-	if (Modifiers & ETypeModifier_Const)
-		Flags |= ETypeQualifier_Const;
-
-	if (Modifiers & ETypeModifier_Volatile)
-		Flags |= ETypeQualifier_Volatile;
-
-	return pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, Flags);
-}
-
-CType* 
-CType::ApplyIntegerModifiers (int Modifiers)
-{
-	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_IntegerMask);
-	if (!VerifyModifierTypeKind (FirstModifier, IsIntegerType (), _T("integer type")))
-		return NULL;
-
-	CType* pType = this;
-
-	if (Modifiers & ETypeModifier_Signed)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Signed, ETypeModifier_Unsigned))
-			return NULL;
-
-		// do nothing
-	}
-
-	if (Modifiers & ETypeModifier_Unsigned)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Unsigned, ETypeModifier_Signed))
-			return NULL;
-
-		EType ModTypeKind = GetUnsignedTypeKind (pType->m_TypeKind);
-		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
-	}
-
-	if (Modifiers & ETypeModifier_LittleEndian)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_LittleEndian, ETypeModifier_BigEndian))
-			return NULL;
-
-		// do nothing
-	}
-
-	if (Modifiers & ETypeModifier_BigEndian)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_BigEndian, ETypeModifier_LittleEndian))
-			return NULL;
-
-		EType ModTypeKind = GetBigEndianTypeKind (pType->m_TypeKind);
-		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
-	}
-
-	return pType;
-}
-
-CType* 
-CType::ApplyPointerModifiers (int Modifiers)
-{
-	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_PointerMask);
-	if (!VerifyModifierTypeKind (FirstModifier, IsPointerType () || IsReferenceType (), _T("pointer or reference type")))
-		return NULL;
-
-	CType* pType = this;
-
-	if (Modifiers & ETypeModifier_Safe)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Safe, ETypeModifier_Unsafe))
-			return NULL;
-
-		// do nothing
-	}
-
-	if (Modifiers & ETypeModifier_Unsafe)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Unsafe, ETypeModifier_Safe))
-			return NULL;
-
-		EType ModTypeKind = GetUnsafePointerTypeKind (pType->m_TypeKind);
-		CPointerType* pPointerType = (CPointerType*) pType;
-		pType = m_pModule->m_TypeMgr.GetPointerType (ModTypeKind, pPointerType->GetBaseType ());
-	}
-
-	if (Modifiers & ETypeModifier_NoNull)
-	{
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_NoNull);
-	}
-
-	return pType;
-}
-
-CType* 
-CType::ApplyFunctionModifiers (int Modifiers)
-{
-	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_FunctionMask);
-	if (!VerifyModifierTypeKind (FirstModifier, m_TypeKind == EType_Function, _T("function type")))
-		return NULL;
-
-	CType* pType = this;
-
-	if (Modifiers & ETypeModifier_Cdecl)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Cdecl, ETypeModifier_Stdcall))
-			return NULL;
-
-		pType = m_pModule->m_TypeMgr.GetFunctionType (
-			ECallConv_Cdecl, 
-			((CFunctionType*) pType)->GetReturnType (),
-			((CFunctionType*) pType)->GetArgTypeArray (),
-			((CFunctionType*) pType)->GetFlags ()
-			);
-	}
-
-	if (Modifiers & ETypeModifier_Stdcall)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Stdcall, ETypeModifier_Cdecl))
-			return NULL;
-
-		pType = m_pModule->m_TypeMgr.GetFunctionType (
-			ECallConv_Stdcall, 
-			((CFunctionType*) pType)->GetReturnType (),
-			((CFunctionType*) pType)->GetArgTypeArray (),
-			((CFunctionType*) pType)->GetFlags ()
-			);
-	}
-
-	if (Modifiers & ETypeModifier_Virtual)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Virtual, ETypeModifier_NoVirtual))
-			return NULL;
-	}
-
-	if (Modifiers & ETypeModifier_NoVirtual)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_NoVirtual, ETypeModifier_Virtual))
-			return NULL;
-	}
-
-	if (Modifiers & ETypeModifier_Event)
-	{
-		pType = m_pModule->m_TypeMgr.GetEventType ((CFunctionType*) pType);
-	}
-
-	return pType;
-}
-
-CType* 
-CType::ApplyPropertyModifiers (int Modifiers)
-{
-	CType* pType = this;
-
-	if (Modifiers & ETypeModifier_Property)
-	{
-		bool IsReadOnly = pType->IsConstType () || (Modifiers & ETypeModifier_Const) != 0;
-		pType = m_pModule->m_TypeMgr.CreatePropertyType (pType->GetUnqualifiedType (), IsReadOnly);
-	}
-
-	if (Modifiers & ETypeModifier_Bindable)
-	{
-		if (pType->m_TypeKind == EType_Property)
-		{
-			CPropertyType* pPropertyType = (CPropertyType*) pType;
-			pPropertyType->m_Flags |= EPropertyTypeFlag_IsBindable;
-			pPropertyType->m_Size = sizeof (TEvent);
-		}
-		else
-		{
-			bool IsReadOnly = pType->IsConstType () || (Modifiers & ETypeModifier_Const) != 0;
-			if (IsReadOnly)
-			{
-				err::SetFormatStringError (_T("bindable auto-property cannot be read-only"));
-				return NULL;
-			}
-
-			CPropertyType* pPropertyType = m_pModule->m_TypeMgr.CreatePropertyType (pType->GetUnqualifiedType (), false);
-			pPropertyType->m_Flags |= EPropertyTypeFlag_IsBindable | EPropertyTypeFlag_IsAutoProperty;
-			pPropertyType->m_Size = pType->GetSize () + sizeof (TEvent);
-			pType = pPropertyType;
-		}
-	}
-
-	return pType;
-}
-
-CType* 
-CType::ApplyInterfaceModifiers (int Modifiers)
-{
-	ETypeModifier FirstModifier = GetFirstTypeModifier (Modifiers & ETypeModifier_InterfaceMask);
-	if (!VerifyModifierTypeKind (FirstModifier, IsClassType (), _T("interface or class type")))
-		return NULL;
-
-	CType* pType = this;
-
-	if (Modifiers & ETypeModifier_Strong)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Strong, ETypeModifier_Weak))
-			return NULL;
-
-		// do nothing
-	}
-
-	if (Modifiers & ETypeModifier_Weak)
-	{
-		if (!VerifyAntiModifier (Modifiers, ETypeModifier_Weak, ETypeModifier_Strong))
-			return NULL;
-
-		pType = m_pModule->m_TypeMgr.GetQualifiedType (pType, ETypeQualifier_Weak);
-	}
-
-	return pType;
-}
-
-CType*
-CType::GetUnqualifiedType ()
-{
-	return m_TypeKind == EType_Qualifier ? 
-		((CQualifierType*) this)->GetBaseType () : 
-		this;
+	std::string s;
+	llvm::raw_string_ostream Stream (s);
+	pLlvmType->print (Stream);
+	return Stream.str ().c_str ();
 }
 
 //.............................................................................
 
-} // namespace axl {
+const tchar_t*
+GetTypeModifierString (ETypeModifier Modifier)
+{
+	switch (Modifier)
+	{
+	case ETypeModifier_Signed:
+		return _T("signed");
+
+	case ETypeModifier_Unsigned:
+		return _T("unsigned");
+
+	case ETypeModifier_LittleEndian:
+		return _T("littleendian");
+
+	case ETypeModifier_BigEndian:
+		return _T("bigendian");
+
+	case ETypeModifier_Const:
+		return _T("const");
+
+	case ETypeModifier_Volatile:
+		return _T("volatile");
+
+	case ETypeModifier_Safe:
+		return _T("safe");
+
+	case ETypeModifier_Unsafe:
+		return _T("unsafe");
+		
+	case ETypeModifier_NoNull:
+		return _T("nonull");
+
+	case ETypeModifier_Strong:
+		return _T("strong");
+
+	case ETypeModifier_Weak:
+		return _T("weak");
+
+	case ETypeModifier_Cdecl:
+		return _T("cdecl");
+
+	case ETypeModifier_Stdcall:
+		return _T("stdcall");
+
+	case ETypeModifier_Function:
+		return _T("function");
+
+	case ETypeModifier_Property:
+		return _T("property");
+
+	case ETypeModifier_Event:
+		return _T("event");
+
+	case ETypeModifier_Bindable:
+		return _T("bindable");
+
+	case ETypeModifier_AutoGet:
+		return _T("autoget");
+
+	case ETypeModifier_Indexed:
+		return _T("indexed");
+
+	case ETypeModifier_Closure:
+		return _T("closure");
+
+	case ETypeModifier_Thin:
+		return _T("thin");
+
+	default:
+		return _T("undefined-type-modifier");
+	};
+}
+
+//.............................................................................
+
+CType::CType ()
+{
+	m_ItemKind = EModuleItem_Type;
+	m_TypeKind = EType_Void;
+	m_Flags = 0;
+	m_Size = 0;
+	m_pLlvmType = NULL;
+	m_pDataPtrTypeTuple = NULL;
+}
+
+rtl::CString 
+CType::GetTypeString ()
+{
+	if (!m_TypeString.IsEmpty ())
+		return m_TypeString;
+
+	PrepareTypeString ();
+	
+	ASSERT (!m_TypeString.IsEmpty ());
+	return m_TypeString;
+}
+
+llvm::Type* 
+CType::GetLlvmType ()
+{
+	if (m_pLlvmType)
+		return m_pLlvmType;
+
+	PrepareLlvmType ();
+	
+	ASSERT (m_pLlvmType);
+	return m_pLlvmType;
+}
+
+CValue 
+CType::GetUndefValue ()
+{
+	llvm::Value* pLlvmValue = llvm::UndefValue::get (GetLlvmType ());
+	return CValue (pLlvmValue, this);
+}
+
+CValue 
+CType::GetZeroValue ()
+{
+	llvm::Value* pLlvmValue = llvm::Constant::getNullValue (GetLlvmType ());
+	return CValue (pLlvmValue, this);
+}
+
+bool
+CType::PreCalcLayout ()
+{
+	ASSERT (!(m_Flags & ETypeFlag_LayoutReady));
+
+	if (m_Flags & ETypeFlag_LayoutCalc)
+	{
+		err::SetFormatStringError (_T("can't calculate layout of '%s' due to type recursion"), GetTypeString ());
+		return false;
+	}
+
+	m_Flags |= ETypeFlag_LayoutCalc;
+	return true;
+}
+
+void
+CType::PostCalcLayout ()
+{
+	m_Flags &= ~ETypeFlag_LayoutCalc;
+	m_Flags |= ETypeFlag_LayoutReady;
+}
+
+bool 
+CType::IsAutoSizeArrayType ()
+{
+	return 
+		m_TypeKind == EType_Array &&
+		((CArrayType*) this)->GetElementCount () == 0;
+}
+
+bool 
+CType::IsCharArrayType ()
+{
+	return 
+		m_TypeKind == EType_Array &&
+		((CArrayType*) this)->GetElementType ()->GetTypeKind () == EType_Char;
+}
+
+bool
+CType::IsBindablePropertyType ()
+{
+	return 
+		m_TypeKind == EType_PropertyRef &&
+		(((CPropertyPtrType*) this)->GetPropertyType ()->GetFlags () & EPropertyTypeFlag_Bindable) != 0;
+}
+
+CArrayType* 
+CType::GetArrayType (size_t ElementCount)
+{
+	return m_pModule->m_TypeMgr.GetArrayType (this, ElementCount);
+}
+
+CDataPtrType* 
+CType::GetDataPtrType (
+	EType TypeKind,
+	EDataPtrType PtrTypeKind,
+	int Flags
+	)
+{
+	return m_pModule->m_TypeMgr.GetDataPtrType (this, TypeKind, PtrTypeKind, Flags);
+}
+
+void
+CType::PrepareTypeString ()
+{
+	static const tchar_t*
+	PrimitiveTypeNameTable [EType__PrimitiveTypeCount] = 
+	{
+		_T("void"),
+		_T("variant"),
+		_T("bool"),
+		_T("int8"),
+		_T("unsigned int8"),
+		_T("int16"),
+		_T("unsigned int16"),
+		_T("int32"),
+		_T("unsigned int32"),
+		_T("int64"),
+		_T("unsigned int64"),
+		_T("bigendian int16"),
+		_T("unsigned bigendian int16"),
+		_T("bigendian int32"),
+		_T("unsigned bigendian int32"),
+		_T("bigendian int64"),
+		_T("unsigned bigendian int64"),
+		_T("float"),
+		_T("double"),
+	};
+
+	ASSERT (m_TypeKind < EType__PrimitiveTypeCount);
+	m_TypeString = PrimitiveTypeNameTable [m_TypeKind];
+}
+
+/*
+
+	}
+	else switch (m_TypeKind)
+	{	
+	case EType_DataPtr:
+	case EType_DataRef:
+		m_TypeString = ((CDataPtrType*) this)->CreateTypeString ();
+		break;
+
+	case EType_ClassPtr:
+		m_TypeString = ((CClassPtrType*) this)->CreateTypeString ();
+		break;
+
+	case EType_FunctionPtr:
+	case EType_FunctionRef:
+		m_TypeString = ((CFunctionPtrType*) this)->CreateTypeString ();
+		break;
+
+	case EType_PropertyPtr:
+	case EType_PropertyRef:
+		m_TypeString = ((CPropertyPtrType*) this)->CreateTypeString ();
+		break;
+
+	case EType_Import:
+		m_TypeString = ((CImportType*) this)->CreateTypeString ();
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	return m_TypeString;
+}
+
+*/
+
+void
+CType::PrepareLlvmType ()
+{
+	ASSERT (m_TypeKind < EType__PrimitiveTypeCount);
+
+	switch (m_TypeKind)
+	{
+	case EType_Void:
+		m_pLlvmType = llvm::Type::getVoidTy (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Variant:
+		ASSERT (false); // variants are not supported yet
+		break;
+
+	case EType_Bool:
+		m_pLlvmType = llvm::Type::getInt1Ty (llvm::getGlobalContext ());
+		break;
+
+	case EType_Int8:
+	case EType_Int8_u:
+		m_pLlvmType = llvm::Type::getInt8Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Int16:
+	case EType_Int16_u:
+	case EType_Int16_be:
+	case EType_Int16_beu:
+		m_pLlvmType = llvm::Type::getInt16Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Int32:
+	case EType_Int32_u:
+	case EType_Int32_be:
+	case EType_Int32_beu:
+		m_pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Int64:
+	case EType_Int64_u:
+	case EType_Int64_be:
+	case EType_Int64_beu:
+		m_pLlvmType = llvm::Type::getInt64Ty (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Float:
+		m_pLlvmType = llvm::Type::getFloatTy (llvm::getGlobalContext ());
+		break;
+	
+	case EType_Double:
+		m_pLlvmType = llvm::Type::getDoubleTy (llvm::getGlobalContext ());
+		break;
+
+	default:
+		ASSERT (false);
+	}
+}
+
+/*
+
+	case EType_DataPtr:
+	case EType_DataRef:
+		return ((CDataPtrType*) this)->GetLlvmType ();
+
+	case EType_ClassPtr:
+		return ((CClassPtrType*) this)->GetLlvmType ();
+
+	case EType_FunctionPtr:
+	case EType_FunctionRef:
+		pLlvmType = ((CFunctionPtrType*) this)->GetLlvmType ();
+		break;
+
+	case EType_PropertyPtr:
+	case EType_PropertyRef:
+		pLlvmType = ((CPropertyPtrType*) this)->GetLlvmType ();
+		break;
+
+	case EType_Import:
+		return ((CImportType*) this)->GetExternType ()->GetLlvmType ();
+
+	default:
+		ASSERT (false);
+	}
+
+	m_pLlvmType = pLlvmType;
+	return pLlvmType;
+}
+
+*/
+
+//.............................................................................
+
 } // namespace jnc {
+} // namespace axl {

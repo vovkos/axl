@@ -4,154 +4,124 @@
 
 #pragma once
 
-#include "axl_jnc_VTableType.h"
+#include "axl_jnc_FunctionTypeOverload.h"
 
 namespace axl {
 namespace jnc {
 
-class CClassType;
-class CPropertyPointerType;
-class CVariable;
-class CClassFieldMember;
+class CPropertyPtrType;
+class CPropertyPtrTypeTuple;
 
-//.............................................................................
-
-enum EProperty
-{
-	EProperty_Undefined,
-	EProperty_Global,
-	EProperty_Member,
-	EProperty_Pointer,
-};
+enum EPropertyPtrType;
 
 //.............................................................................
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_IsBindable     = 0x010000,
-	EPropertyTypeFlag_IsAutoProperty = 0x020000,
+	EPropertyTypeFlag_ReadOnly = 0x010000,
+	EPropertyTypeFlag_Bindable = 0x020000,
+	EPropertyTypeFlag_AutoGet  = 0x040000,
 };
 
 //.............................................................................
 
-class CPropertyType: public CVTableType
+class CPropertyType: public CType
 {
 protected:
 	friend class CTypeMgr;
-	friend class CClassType;
-	friend class CFunctionMgr;
-	friend class CParser;
 
-	EProperty m_PropertyKind;
-
-	CFunction* m_pGetter;
-	CFunctionOverload m_Setter;
-	CPropertyPointerType* m_pPropertyPointerType;
-
-	CClassType* m_pParentClassType;
-	size_t m_ParentVTableIndex;
-
-	union
-	{
-		struct 
-		{
-			CVariable* m_pEventVariable; // global bindable properties
-			CVariable* m_pAutoVariable;  // global bindable auto-properties
-		};
-
-		struct 
-		{
-			CClassFieldMember* m_pEventFieldMember; // member bindable properties
-			CClassFieldMember* m_pAutoFieldMember; // member bindable auto-properties
-		};
-	};
-
-	rtl::CString m_AccessorSignature;
-	rtl::CString m_ShortAccessorSignature;
+	CFunctionType* m_pGetterType;
+	CFunctionTypeOverload m_SetterType;
+	rtl::CString m_TypeModifierString;
+	CPropertyType* m_pAbstractPropertyMemberType;
+	CPropertyType* m_pBindablePropertyType;
+	CStructType* m_pVTableStructType;
+	CPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
 
 public:
 	CPropertyType ();
 
-	EProperty 
-	GetPropertyKind ()
-	{
-		return m_PropertyKind;
-	}
-
 	bool
 	IsReadOnly ()
 	{
-		return m_Setter.IsEmpty ();
+		return m_SetterType.IsEmpty ();
 	}
-	
-	CFunction*
-	GetGetter ()
-	{
-		return m_pGetter;
-	}
-
-	CFunctionOverload*
-	GetSetter ()
-	{
-		return &m_Setter;
-	}
-	
-	CClassType* 
-	GetParentClassType ()
-	{
-		return m_pParentClassType;
-	}
-
-	size_t
-	GetParentVTableIndex ()
-	{
-		return m_ParentVTableIndex;
-	}
-
-	rtl::CStringA
-	GetAccessorSignature ();
-
-	rtl::CStringA
-	GetShortAccessorSignature ();
-
-	int 
-	CmpAccessorTypes (CPropertyType* pPropertyType)
-	{
-		return GetAccessorSignature ().Cmp (pPropertyType->GetAccessorSignature ());
-	}
-
-	int 
-	CmpShortAccessorTypes (CPropertyType* pPropertyType)
-	{
-		return GetShortAccessorSignature ().Cmp (pPropertyType->GetShortAccessorSignature ());
-	}
-
-	CPropertyPointerType* 
-	GetPropertyPointerType ();
-
-	CVariable* 
-	GetEventVariable ()
-	{
-		return m_pEventVariable;
-	}
-
-	CClassFieldMember* 
-	GetEventFieldMember ()
-	{
-		return m_pEventFieldMember;
-	}
-
-	rtl::CString
-	CreateTypeString ();
-
-	void
-	TagAccessors ();
 
 	bool
-	CalcLayout ();
+	IsIndexed ()
+	{
+		return !m_pGetterType->GetArgTypeArray ().IsEmpty ();
+	}
+
+	CFunctionType*
+	GetGetterType ()
+	{
+		return m_pGetterType;
+	}
+
+	const CFunctionTypeOverload&
+	GetSetterType ()
+	{
+		return m_SetterType;
+	}
+
+	CType*
+	GetReturnType ()
+	{
+		ASSERT (m_pGetterType);
+		return m_pGetterType->GetReturnType ();
+	}
+
+	CPropertyType*
+	GetAbstractPropertyMemberType ();
+
+	CPropertyType*
+	GetBindablePropertyType ();
+
+	CPropertyPtrType* 
+	GetPropertyPtrType (
+		EType TypeKind,
+		EPropertyPtrType PtrTypeKind = (EPropertyPtrType) 0,
+		int Flags = 0
+		);
+
+	CPropertyPtrType* 
+	GetPropertyPtrType (
+		EPropertyPtrType PtrTypeKind = (EPropertyPtrType) 0,
+		int Flags = 0
+		)
+	{
+		return GetPropertyPtrType (EType_PropertyPtr, PtrTypeKind, Flags);
+	}
+
+	CStructType*
+	GetVTableStructType ();
+
+	rtl::CString
+	GetTypeModifierString ();
+
+	static
+	rtl::CStringA
+	CreateSignature (
+		CFunctionType* pGetterType,
+		const CFunctionTypeOverload& SetterType,
+		int Flags
+		);
+
+protected:
+	virtual 
+	void
+	PrepareTypeString ();
+
+	virtual 
+	void
+	PrepareLlvmType ()
+	{
+		ASSERT (false);
+	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

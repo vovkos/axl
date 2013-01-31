@@ -31,7 +31,7 @@ CProductionBuilder::Build (
 		return pProduction;
 
 	case ENode_Symbol:
-		if (pProduction->m_Flags & ESymbolNodeFlag_IsNamed)
+		if (pProduction->m_Flags & ESymbolNodeFlag_Named)
 			return pProduction;
 
 		// else fall through
@@ -102,14 +102,14 @@ CProductionBuilder::ProcessAllUserCode ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CActionNode* pNode = m_ActionArray [i];
-		if (pNode->m_Flags & EUserNodeFlag_IsUserCodeProcessed)
+		if (pNode->m_Flags & EUserNodeFlag_UserCodeProcessed)
 			continue;
 
 		Result = ProcessUserCode (pNode->m_SrcPos, &pNode->m_UserCode, pNode->m_pResolver);
 		if (!Result)
 			return false;
 
-		pNode->m_Flags |= EUserNodeFlag_IsUserCodeProcessed;
+		pNode->m_Flags |= EUserNodeFlag_UserCodeProcessed;
 		pNode->m_pDispatcher = m_pDispatcher;
 	}
 
@@ -117,7 +117,7 @@ CProductionBuilder::ProcessAllUserCode ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CArgumentNode* pNode = m_ArgumentArray [i];
-		if (pNode->m_Flags & EUserNodeFlag_IsUserCodeProcessed)
+		if (pNode->m_Flags & EUserNodeFlag_UserCodeProcessed)
 			continue;
 
 		rtl::CBoxIteratorT <rtl::CString> It = pNode->m_ArgValueList.GetHead ();
@@ -128,7 +128,7 @@ CProductionBuilder::ProcessAllUserCode ()
 				return false;
 		}
 
-		pNode->m_Flags |= EUserNodeFlag_IsUserCodeProcessed;
+		pNode->m_Flags |= EUserNodeFlag_UserCodeProcessed;
 		pNode->m_pDispatcher = m_pDispatcher;
 	}
 
@@ -157,7 +157,7 @@ CProductionBuilder::Scan (CGrammarNode* pNode)
 		break;
 
 	case ENode_Symbol:
-		if (pNode->m_Flags & ESymbolNodeFlag_IsNamed) 
+		if (pNode->m_Flags & ESymbolNodeFlag_Named) 
 			break;
 
 		pSymbol = (CSymbolNode*) pNode;
@@ -234,7 +234,7 @@ CProductionBuilder::Scan (CGrammarNode* pNode)
 bool
 CProductionBuilder::AddBeacon (CBeaconNode* pBeacon)
 {
-	if (pBeacon->m_Flags & EBeaconNodeFlag_IsAdded)
+	if (pBeacon->m_Flags & EBeaconNodeFlag_Added)
 		return true;
 
 	if (!pBeacon->m_Label.IsEmpty ())
@@ -259,7 +259,7 @@ CProductionBuilder::AddBeacon (CBeaconNode* pBeacon)
 	}
 
 	m_BeaconArray.Append (pBeacon);
-	pBeacon->m_Flags |= EBeaconNodeFlag_IsAdded;
+	pBeacon->m_Flags |= EBeaconNodeFlag_Added;
 	pBeacon->m_pResolver = m_pResolver;
 	return true;
 }
@@ -289,17 +289,17 @@ CProductionBuilder::FindAndReplaceUnusedBeacons (CGrammarNode*& pNode)
 		if (pBeacon->m_SlotIndex != -1)
 			break;
 
-		if (!(pBeacon->m_Flags & EBeaconNodeFlag_IsDeleted))
+		if (!(pBeacon->m_Flags & EBeaconNodeFlag_Deleted))
 		{
 			m_BeaconDeleteArray.Append (pBeacon);
-			pBeacon->m_Flags |= EBeaconNodeFlag_IsDeleted;
+			pBeacon->m_Flags |= EBeaconNodeFlag_Deleted;
 		}	
 
 		pNode = pBeacon->m_pTarget; // replace
 		break;
 
 	case ENode_Symbol:
-		if (pNode->m_Flags & ESymbolNodeFlag_IsNamed) 
+		if (pNode->m_Flags & ESymbolNodeFlag_Named) 
 			break;
 
 		pSymbol = (CSymbolNode*) pNode;
@@ -437,7 +437,7 @@ CProductionBuilder::ProcessUserCode (
 		switch (VariableKind)
 		{
 		case EVariable_SymbolBeacon:
-			if (pBeacon->m_pTarget->m_Flags & ESymbolNodeFlag_IsNoAst)
+			if (pBeacon->m_pTarget->m_Flags & ESymbolNodeFlag_NoAst)
 			{
 				err::SetFormatStringError (_T("'%s' is declared as 'noast' and cannot be referenced from user actions"), pBeacon->m_pTarget->m_Name);
 				return false;

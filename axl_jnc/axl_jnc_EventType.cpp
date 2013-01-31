@@ -32,7 +32,7 @@ CEventType::CEventType ()
 {
 	m_TypeKind = EType_Event;
 	m_Size = sizeof (TEvent);
-	m_pFunctionPointerType = NULL;
+	m_pFunctionPtrType = NULL;
 	m_pEventStructType = NULL;
 	m_pHandlerStructType = NULL;
 }
@@ -43,12 +43,12 @@ CEventType::GetEventStructType ()
 	if (m_pEventStructType)
 		return m_pEventStructType;
 
-	CPointerType* pHandlerPointerType = GetHandlerStructType ()->GetPointerType (EType_Pointer_u);
+	CDataPtrType* pHandlerPtrType = GetHandlerStructType ()->GetDataPtrType (EDataPtrType_Unsafe);
 
 	m_pEventStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pEventStructType->m_Tag.Format (_T("event"));
-	m_pEventStructType->CreateMember (pHandlerPointerType);
-	m_pEventStructType->CreateMember (pHandlerPointerType);
+	m_pEventStructType->CreateMember (pHandlerPtrType);
+	m_pEventStructType->CreateMember (pHandlerPtrType);
 	m_pEventStructType->CalcLayout ();
 
 	return m_pEventStructType;
@@ -63,25 +63,31 @@ CEventType::GetHandlerStructType ()
 	m_pHandlerStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pHandlerStructType->m_Tag.Format (_T("handler"));
 
-	CPointerType* pHandlerPointerType = m_pHandlerStructType->GetPointerType (EType_Pointer_u);
+	CDataPtrType* pHandlerPtrType = m_pHandlerStructType->GetDataPtrType (EDataPtrType_Unsafe);
 
-	m_pHandlerStructType->CreateMember (m_pFunctionPointerType);
-	m_pHandlerStructType->CreateMember (pHandlerPointerType);
-	m_pHandlerStructType->CreateMember (pHandlerPointerType);
+	m_pHandlerStructType->CreateMember (m_pFunctionPtrType);
+	m_pHandlerStructType->CreateMember (pHandlerPtrType);
+	m_pHandlerStructType->CreateMember (pHandlerPtrType);
 	m_pHandlerStructType->CalcLayout ();
 
 	return m_pHandlerStructType;
 }
 
-rtl::CString
-CEventType::CreateTypeString (CFunctionType* pFunctionType)
+void
+CEventType::PrepareTypeString ()
 {
-	rtl::CString String = _T("event ");
-	String += pFunctionType->CreateArgTypeString ();
-	return String;
+	m_TypeString = _T("event ");
+	m_TypeString += m_pFunctionPtrType->GetTypeModifierString ();
+	m_TypeString += m_pFunctionPtrType->GetFunctionType ()->GetArgTypeString ();
+}
+
+void
+CEventType::PrepareLlvmType ()
+{
+	m_pLlvmType = GetEventStructType ()->GetLlvmType ();
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

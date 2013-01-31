@@ -25,7 +25,6 @@ CFunctionMgr::CFunctionMgr ()
 	ASSERT (m_pModule);
 
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
-
 	m_pCurrentFunction = NULL;
 }
 
@@ -33,7 +32,9 @@ void
 CFunctionMgr::Clear ()
 {
 	m_FunctionList.Clear ();
-	m_GlobalFunctionList.Clear ();
+	m_PropertyList.Clear ();
+	m_PropertyTemplateList.Clear ();
+	m_OrphanFunctionArray.Clear ();
 	m_GlobalAutoEvTypeArray.Clear ();
 	m_AutoPropertyArray.Clear ();
 	m_ThunkMap.Clear ();
@@ -44,56 +45,17 @@ CFunctionMgr::Clear ()
 }
 
 CFunction*
-CFunctionMgr::CreateAnonymousFunction (CFunctionType* pType)
-{
-	CFunction* pFunction = AXL_MEM_NEW (CFunction);
-	pFunction->m_pModule = m_pModule;
-	pFunction->m_pType = pType;
-	m_FunctionList.InsertTail (pFunction);
-	return pFunction;
-}
-
-CFunction*
-CFunctionMgr::CreatePropertyAccessorFunction (
-	EPropertyAccessor AccessorKind,
-	CFunctionType* pType,
-	rtl::CStdListT <CFunctionFormalArg>* pArgList
-	)
-{
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-
-	CFunction* pFunction = CreateAnonymousFunction (pType);
-	pFunction->m_pAnchorNamespace = pNamespace;
-	pFunction->m_Tag = GetPropertyAccessorString (AccessorKind);
-	pFunction->m_PropertyAccessorKind = AccessorKind;
-
-	if (pNamespace->GetNamespaceKind () != ENamespace_Class)
-		pFunction->m_FunctionKind = EFunction_Global;
-
-	if (pArgList)
-		pFunction->m_ArgList.TakeOver (pArgList);
-
-	return pFunction;
-}
-
-CFunction*
 CFunctionMgr::CreateFunction (
-	const CQualifiedName& Name,
+	EFunction FunctionKind,
 	CFunctionType* pType,
 	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-
 	CFunction* pFunction = AXL_MEM_NEW (CFunction);
 	pFunction->m_pModule = m_pModule;
+	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pType = pType;
-	pFunction->m_pAnchorNamespace = pNamespace;
-	pFunction->m_Name = Name;
-	pFunction->m_Tag = pNamespace->CreateQualifiedName (Name);
-
-	if (Name.IsSimple ())
-		pFunction->m_pNamespace = pNamespace;
+	pFunction->m_pShortType = pType;
 
 	if (pArgList)
 		pFunction->m_ArgList.TakeOver (pArgList);
@@ -102,130 +64,45 @@ CFunctionMgr::CreateFunction (
 	return pFunction;
 }
 
-CFunction*
-CFunctionMgr::CreateInternalFunction (
+CProperty*
+CFunctionMgr::CreateProperty (
 	const rtl::CString& Name,
-	CFunctionType* pType
+	const rtl::CString& QualifiedName
 	)
 {
-	CFunction* pFunction = CreateAnonymousFunction (pType);
-	pFunction->m_FunctionKind = EFunction_Global;
-	pFunction->m_Tag = Name;
-	return pFunction;
+	CProperty* pProperty = AXL_MEM_NEW (CProperty);
+	pProperty->m_pModule = m_pModule;
+	pProperty->m_Name = Name;
+	pProperty->m_QualifiedName = QualifiedName;
+	pProperty->m_Tag = QualifiedName;
+	m_PropertyList.InsertTail (pProperty);
+	return pProperty;
 }
 
-CGlobalFunction*
-CFunctionMgr::CreateGlobalFunction (
-	const rtl::CString& Name,
-	CFunction* pFunction
-	)
+CPropertyTemplate*
+CFunctionMgr::CreatePropertyTemplate ()
 {
-	CGlobalFunction* pGlobalFunction = AXL_MEM_NEW (CGlobalFunction);
-	pGlobalFunction->m_Name = Name;
-	m_GlobalFunctionList.InsertTail (pGlobalFunction);
-
-	pFunction->m_FunctionKind = EFunction_Global;
-	pGlobalFunction->AddOverload (pFunction);
-	return pGlobalFunction;
+	CPropertyTemplate* pPropertyTemplate = AXL_MEM_NEW (CPropertyTemplate);
+	m_PropertyTemplateList.InsertTail (pPropertyTemplate);
+	return pPropertyTemplate;
 }
 
 bool
-CFunctionMgr::ResolveOrphanFunction (CFunction* pFunction)
+CFunctionMgr::ResolveOrphanFunctions ()
 {
-	ASSERT (pFunction->m_FunctionKind == EFunction_Undefined);
+	bool Result;
 
-	if (pFunction->m_pAnchorNamespace->GetNamespaceKind () == ENamespace_Class) 
-	{		
-		// should have been resolved during class layout
-		err::SetFormatStringError (_T("unresolved orphan class member '%s'"), pFunction->m_Tag);
-		return false;
-	}
+	size_t Count = m_OrphanFunctionArray.GetCount ();
 
-	CModuleItem* pItem = pFunction->m_pAnchorNamespace->FindItemTraverse (pFunction->m_Name, true);
-	if (!pItem)
+	for (size_t i = 0; i < Count; i++)
 	{
-		err::SetFormatStringError (_T("unresolved orphan function '%s'"), pFunction->m_Tag);
-		return false;
+		CFunction* pFunction = m_OrphanFunctionArray [i];
+		
+		Result = pFunction->ResolveOrphan ();
+		if (!Result)
+			return false;
 	}
 
-	EModuleItem ItemKind = pItem->GetItemKind ();
-	CFunction* pExternFunction = NULL;
-
-	if (pFunction->m_PropertyAccessorKind)
-	{
-		CPropertyType* pPropertyType = NULL;
-
-		switch (ItemKind)
-		{
-		case EModuleItem_Property:
-			pPropertyType = (CPropertyType*) pItem;
-			pFunction->m_FunctionKind = EFunction_Global;
-			pFunction->m_pNamespace = pPropertyType->GetParentNamespace ();
-			break;
-
-		case EModuleItem_ClassMember:			
-			CClassMember* pMember = (CClassMember*) pItem;
-			EClassMember MemberKind = pMember->GetMemberKind ();
-			
-			if (MemberKind == EClassMember_Property)
-			{
-				pPropertyType = ((CClassPropertyMember*) pItem)->GetType ();
-				pFunction->m_FunctionKind = EFunction_Method;
-				pFunction->m_pNamespace = pMember->GetParentType ();
-			}
-		};			
-
-		if (pPropertyType)
-			pExternFunction = pFunction->m_PropertyAccessorKind == EPropertyAccessor_Set ? 
-				pPropertyType->GetSetter ()->FindOverload (pFunction->GetType ()) :
-				pPropertyType->GetGetter ()->GetType ()->Cmp (pFunction->GetType ()) == 0 ?
-				pPropertyType->GetGetter () : NULL;
-	}
-	else
-	{
-		CFunctionOverload* pFunctionOverload = NULL;
-		CGlobalFunction* pGlobalFunction;
-
-		switch (ItemKind)
-		{
-		case EModuleItem_GlobalFunction:
-			pGlobalFunction = (CGlobalFunction*) pItem;
-			pFunctionOverload = pGlobalFunction;
-			pFunction->m_FunctionKind = EFunction_Global;
-			pFunction->m_pNamespace = pGlobalFunction->GetParentNamespace ();
-			break;
-
-		case EModuleItem_ClassMember:			
-			CClassMember* pMember = (CClassMember*) pItem;
-			EClassMember MemberKind = pMember->GetMemberKind ();
-
-			if (MemberKind == EClassMember_Method ||
-				MemberKind == EClassMember_Constructor ||
-				MemberKind == EClassMember_Destructor)
-			{
-				pFunctionOverload = (CClassMethodMember*) pMember;
-				pFunction->m_FunctionKind = EFunction_Method;
-				pFunction->m_pNamespace = pMember->GetParentType ();
-			}
-		};			
-
-		if (pFunctionOverload)
-			pExternFunction = pFunctionOverload->FindOverload (pFunction->GetType ());
-	}
-
-	if (!pExternFunction)
-	{
-		err::SetFormatStringError (_T("type mismatch resolving orphan function '%s'"), pFunction->m_Tag);
-		return false;
-	}
-
-	if (pExternFunction->HasBody ())
-	{
-		err::SetFormatStringError (_T("'%s' already has body"), pExternFunction->m_Tag);
-		return false;
-	}
-
-	pExternFunction->m_pExternFunction = pFunction;
 	return true;
 }
 
@@ -236,6 +113,16 @@ CFunctionMgr::CompileFunctions ()
 
 	CSetCurrentThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
+
+	// (0) layout of properties
+
+	rtl::CIteratorT <CProperty> Property = m_PropertyList.GetHead ();
+	for (; Property; Property++)
+	{
+		Result = Property->CalcLayout ();
+		if (!Result)
+			return false;
+	}
 
 	// (1) global aev
 
@@ -281,20 +168,8 @@ CFunctionMgr::CompileFunctions ()
 
 		// set namespace
 
-		CNamespace* pNamespace = pFunction->GetNamespace ();
+		CNamespace* pNamespace = pFunction->GetParentNamespace ();
 		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
-
-		// resolve orphans
-
-		EFunction FunctionKind = pFunction->GetFunctionKind ();
-		if (FunctionKind == EFunction_Undefined)
-		{
-			Result = ResolveOrphanFunction (pFunction);
-			if (!Result)
-				return false;
-
-			FunctionKind = pFunction->GetFunctionKind ();
-		}
 
 		// prologue
 
@@ -351,8 +226,8 @@ CFunctionMgr::CompileFunctions ()
 	Count = m_AutoPropertyArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CPropertyType* pPropertyType = m_AutoPropertyArray [i];
-		Result = CompileAutoPropertyAccessors (pPropertyType);
+		CProperty* pProperty = m_AutoPropertyArray [i];
+		Result = CompileAutoPropertyAccessors (pProperty);
 		if (!Result)
 			return false;
 	}
@@ -374,37 +249,16 @@ CFunctionMgr::Prologue (
 
 	// get this-value for methods
 
-	CClassType* pThisType = NULL;
-	CClassType* pOriginType = NULL;
-
-	EFunction FunctionKind = pFunction->GetFunctionKind ();
-	switch (FunctionKind)
-	{
-	case EFunction_Global:
-		break;
-
-	case EFunction_Method:
-		pThisType = pFunction->GetClassType ();
-		pOriginType = pFunction->GetVTableClassType ();
-		if (!pOriginType)
-			pOriginType = pThisType;
-		break;
-
-	case EFunction_PreConstructor:
-	case EFunction_Constructor:
-	case EFunction_Destructor:
-		pThisType = pFunction->GetClassType ();
-		pOriginType = pThisType;
-		break;
-
-	default:
-		ASSERT (false);
-	}
+	CClassType* pThisType = pFunction->GetClassType ();
+	CClassType* pArgThisType = pFunction->GetStorageKind () == EStorage_Virtual ? 
+		pFunction->GetVirtualOriginClassType () : 
+		pThisType;
 
 	// create entry block and scope
 
 	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+	m_pModule->m_ControlFlowMgr.ResetHasReturn ();
 
 	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 	pFunction->m_pScope = pScope;
@@ -416,7 +270,7 @@ CFunctionMgr::Prologue (
 	if (pThisType)
 	{
 		llvm::Value* pLlvmArg = LlvmArg;
-		CValue ArgValue (pLlvmArg, pOriginType);			
+		CValue ArgValue (pLlvmArg, pArgThisType);			
 		Result = CreateThisValue (ArgValue, pThisType, pThisValue);
 		if (!Result)
 			return false;
@@ -424,7 +278,7 @@ CFunctionMgr::Prologue (
 		LlvmArg++;
 	}
 
-	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetFirstArg ();
+	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
 	for (; Arg; Arg++, LlvmArg++)
 	{
 		CFunctionFormalArg* pArg = *Arg;
@@ -462,39 +316,39 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 {
 	ASSERT (m_pCurrentFunction);
 	CFunction* pFunction = m_pCurrentFunction;
-
+	
 	// ensure return
 
-	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
-
-	if (pReturnType->GetTypeKind () != EType_Void)
+	CBasicBlock* pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	if (!pCurrentBlock->HasReturn ()) 
 	{
-		EHasReturn HasReturn = pFunction->HasReturn ();
-
-		switch (HasReturn)
+		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
+		if (pReturnType->GetTypeKind () == EType_Void)
 		{
-		case EHasReturn_None:
+			m_pModule->m_ControlFlowMgr.Return ();
+		}
+		else if (!(m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowMgrFlag_HasReturn))
+		{
 			err::SetFormatStringError (
 				_T("function '%s' must return a '%s' value"),
 				pFunction->m_Tag,
 				pReturnType->GetTypeString ()
 				);
 			return false;
-
-		case EHasReturn_Some:
+		}
+		else if (pCurrentBlock->GetFlags () & EBasicBlockFlag_Jumped)
+		{
 			err::SetFormatStringError (
 				_T("not all control paths in function '%s' return a value"),
 				pFunction->m_Tag
 				);
 			return false;
 		}
-
-		if (!m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->IsTerminal ())
-			m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
-	}
-	else if (!m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->IsTerminal ())
-	{
-		m_pModule->m_ControlFlowMgr.Return ();
+		else if (!pCurrentBlock->HasTerminator ())
+		{	
+			// make LLVM happy
+			m_pModule->m_LlvmBuilder.CreateUnreachable (); 
+		}
 	}
 
 	m_pModule->m_NamespaceMgr.CloseScope (Pos);
@@ -507,7 +361,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	{
 		err::SetFormatStringError (
 			_T("LLVM verification fail for '%s': %s"), 
-			pFunction->GetTag (),
+			pFunction->m_Tag,
 			Error->GetDescription ()
 			);
 
@@ -524,7 +378,7 @@ CFunctionMgr::GetThunkFunction (
 	CFunction* pTargetFunction,
 	CClassType* pClosureType,
 	const rtl::CArrayT <size_t>& ClosureMap,
-	CFunctionPointerType* pFunctionPtrType
+	CFunctionPtrType* pFunctionPtrType
 	)
 {
 	rtl::CStringA Signature;
@@ -543,7 +397,7 @@ CFunctionMgr::GetThunkFunction (
 		return Thunk->m_Value->m_pThunkFunction;
 
 	CFunctionType* pThunkFunctionType = pClosureType ?
-		pClosureType->GetMethodType (pFunctionPtrType->GetShortFunctionType ()) :
+		pClosureType->GetMethodMemberType (pFunctionPtrType->GetFunctionType ()) :
 		pFunctionPtrType->GetFunctionType ();
 
 	CThunk* pThunk = AXL_MEM_NEW (CThunk);
@@ -552,7 +406,7 @@ CFunctionMgr::GetThunkFunction (
 	pThunk->m_pClosureType = pClosureType;
 	pThunk->m_ClosureMap = ClosureMap;
 	pThunk->m_pFunctionPtrType = pFunctionPtrType;
-	pThunk->m_pThunkFunction = CreateAnonymousFunction (pThunkFunctionType);
+	pThunk->m_pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
 	pThunk->m_pThunkFunction->m_Tag = _T("_thunk");
 	m_ThunkList.InsertTail (pThunk);
 	Thunk->m_Value = pThunk;
@@ -592,7 +446,7 @@ CFunctionMgr::CompileDirectThunk (CThunk* pThunk)
 
 	if (TargetArgCount == ThunkArgCount)
 	{
-		CValue IfaceValue (LlvmArg, m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr));
+		CValue IfaceValue (LlvmArg, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr));
 		m_pModule->m_LlvmBuilder.CreateBitCast (IfaceValue, TargetArgTypeArray [0], &IfaceValue);
 		ArgArray [0] = IfaceValue;
 		i++;
@@ -658,7 +512,10 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 
 	CValue ClosureValue (LlvmArg++, pThunk->m_pClosureType);
 
-	rtl::CIteratorT <CClassFieldMember> ClosureMember = pThunk->m_pClosureType->GetFirstFieldMember ();
+	CStructType* pClosureFieldStructType = pThunk->m_pClosureType->GetFieldStructType ();
+	ASSERT (pClosureFieldStructType);
+
+	rtl::CIteratorT <CStructMember> ClosureMember = pClosureFieldStructType->GetMemberList ().GetHead ();
 
 	CValue PfnValue;
 
@@ -674,8 +531,7 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 
 		ClosureMember++;
 	}
-
-
+	
 	size_t i = 0;
 	size_t iThunk = 1; // skip ClosureValue arg
 	size_t iClosure = 0;
@@ -734,14 +590,15 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 }
 
 bool
-CFunctionMgr::CompileAutoPropertyAccessors (CPropertyType* pType)
+CFunctionMgr::CompileAutoPropertyAccessors (CProperty* pProperty)
 {
-	ASSERT (pType->GetFlags () & EPropertyTypeFlag_IsAutoProperty);
+	CFunction* pGetter = pProperty->GetGetter ();
+	CFunction* pSetter = pProperty->GetSetter ();
 
-	CFunction* pGetter = pType->GetGetter ();
-	CFunction* pSetter = pType->GetSetter ()->GetFunction ();
+	err::SetFormatStringError (_T("auto-properties are not implemented yet"));
+	return false;
 
-	if (pType->GetParentClassType ())
+/*	if (pType->GetParentClassType ())
 	{
 		err::SetFormatStringError (_T("member auto-properties are not implemented yet"));
 		return false;
@@ -781,7 +638,7 @@ CFunctionMgr::CompileAutoPropertyAccessors (CPropertyType* pType)
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
 	m_pCurrentFunction = pPrevCurrentFunction;
-
+*/
 	return true;
 }
 
@@ -810,7 +667,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 		{
 			err::SetFormatStringError (
 				_T("LLVM jitting fail for '%s': %s"), 
-				pFunction->GetTag (),
+				pFunction->m_Tag,
 				Error->GetDescription ()
 				);
 
@@ -847,8 +704,8 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateCheckScopeLevel ();
 		break;
 
-	case EStdFunc_CheckSafePtrRange:
-		pFunction = CreateCheckSafePtrRange ();
+	case EStdFunc_CheckDataPtrRange:
+		pFunction = CreateCheckDataPtrRange ();
 		break;
 
 	case EStdFunc_CheckInterfaceScopeLevel:
@@ -880,6 +737,17 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 	return pFunction;
 }
 
+CFunction*
+CFunctionMgr::CreateInternalFunction (
+	const tchar_t* pTag,
+	CFunctionType* pType 
+	)
+{
+	CFunction* pFunction = CreateFunction (EFunction_Internal, pType);
+	pFunction->m_Tag = pTag;
+	return pFunction;
+}
+
 // void
 // jnc.OnRuntimeError (
 //		int Error,
@@ -890,8 +758,6 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 CFunction*
 CFunctionMgr::CreateOnRuntimeError ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
@@ -899,7 +765,7 @@ CFunctionMgr::CreateOnRuntimeError ()
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction (_T("jnc.OnRuntimeError"), pType);
 }
 
@@ -915,15 +781,13 @@ CFunctionMgr::CreateCheckNullPtr ()
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
 	};
 	
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckNullPtr"), pType);
 
 	m_pCurrentFunction = pFunction;
@@ -959,7 +823,7 @@ CFunctionMgr::CreateCheckNullPtr ()
 
 
 // void 
-// jnc.CheckSafePtrScopeLevel (
+// jnc.CheckDataPtrScopeLevel (
 //		size_t SrcScopeLevel
 //		size_t DstScopeLevel
 //		);
@@ -970,15 +834,13 @@ CFunctionMgr::CreateCheckScopeLevel ()
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
 	
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckScopeLevel"), pType);
 
 	m_pCurrentFunction = pFunction;
@@ -1012,7 +874,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 }
 
 // void 
-// jnc.CheckSafePtrRange (
+// jnc.CheckDataPtrRange (
 //		int8* p,
 //		size_t Size,
 //		jnc.sptrv Validator,
@@ -1020,23 +882,21 @@ CFunctionMgr::CreateCheckScopeLevel ()
 //		);
 
 CFunction*
-CFunctionMgr::CreateCheckSafePtrRange ()
+CFunctionMgr::CreateCheckDataPtrRange ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_SafePtrValidator),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_DataPtrValidator),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int)
 	};
 	
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckSafePtrRange"), pType);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckDataPtrRange"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -1087,7 +947,7 @@ CFunctionMgr::CreateCheckSafePtrRange ()
 
 // void 
 // jnc.CheckInterfaceScopeLevel (
-//		jnc.iface* p,
+//		object p,
 //		size_t DstScopeLevel
 //		);
 
@@ -1097,15 +957,13 @@ CFunctionMgr::CreateCheckInterfaceScopeLevel ()
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
 	
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckInterfaceScopeLevel"), pType);
 
 	m_pCurrentFunction = pFunction;
@@ -1125,7 +983,7 @@ CFunctionMgr::CreateCheckInterfaceScopeLevel ()
 
 	CValue CmpValue;
 
-	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr)->GetZeroValue ();
+	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
 
 	m_pModule->m_LlvmBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pSuccessBlock, pNoNullBlock, pNoNullBlock);
@@ -1153,20 +1011,20 @@ CFunctionMgr::CreateCheckInterfaceScopeLevel ()
 	return pFunction;
 }
 
-// jnc.iface*
+// object
 // jnc.DynamicCastInterface (
-//		jnc.iface* p,
+//		object p,
 //		int8* pType
 //		);
 
 CFunction*
 CFunctionMgr::CreateDynamicCastInterface ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr);
+	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 	};
 
@@ -1178,7 +1036,7 @@ CFunctionMgr::CreateDynamicCastInterface ()
 // jnc.EventOperator (
 //		jnc.event* pEvent,
 //		void* pfn,
-//		jnc.iface* pIface,
+//		object pIface,
 //		int OpKind
 //		);
 
@@ -1189,9 +1047,9 @@ CFunctionMgr::CreateEventOperator ()
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_AbstractInterfacePtr),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
 	};
 
@@ -1209,7 +1067,7 @@ CFunctionMgr::CreateFireSimpleEvent ()
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetPointerType (EType_Pointer_u),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe),
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
@@ -1248,12 +1106,12 @@ CFunctionMgr::CreateClassInitializer (CClassType* pClassType)
 	
 	CType* ArgTypeArray [] =
 	{
-		pClassType->GetClassStructType ()->GetPointerType (EType_Pointer_u),
+		pClassType->GetClassStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
 	};
 
 	rtl::CString Tag;
-	Tag = pClassType->GetTag ();
+	Tag = pClassType->m_Tag;
 	Tag.Append (_T(".$init"));
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
@@ -1313,7 +1171,7 @@ CFunctionMgr::InitializeInterface (
 	CValue IfaceHdrPtrValue;
 	CValue PtrValue;
 
-	// TInterfaceHdr
+	// TInterface
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
 	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &PtrValue);
@@ -1323,7 +1181,7 @@ CFunctionMgr::InitializeInterface (
 
 	// base types
 
-	rtl::CIteratorT <CClassBaseType> BaseType = pClassType->GetFirstBaseType ();
+	rtl::CIteratorT <CClassBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
 	for (; BaseType; BaseType++)
 	{
 		CClassType* pBaseClassType = BaseType->GetType ();
@@ -1346,7 +1204,7 @@ CFunctionMgr::InitializeInterface (
 
 		m_pModule->m_LlvmBuilder.CreateBitCast (
 			BaseClassVTablePtrValue, 
-			pBaseClassType->GetVTableStructType ()->GetPointerType (EType_Pointer_u),
+			pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
 			&BaseClassVTablePtrValue
 			);
 
@@ -1363,8 +1221,8 @@ CFunctionMgr::CreateThisValue (
 	CValue* pResultValue
 	)
 {
-	CClassType* pSrcType = (CClassType*) ArgValue.GetType ();
-	ASSERT (pSrcType->IsClassType ());
+	ASSERT (ArgValue.GetType ()->GetTypeKind () == EType_ClassPtr);
+	CClassType* pSrcType = ((CClassPtrType*) ArgValue.GetType ())->GetClassType ();
 
 	// adjust the pointer: argument is the pointer to the interface which DECLARES the method
 	// what we want as 'this' value is the pointer to the class which IMPLEMENTS the method
@@ -1419,6 +1277,6 @@ CFunctionMgr::RuntimeError (
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
 

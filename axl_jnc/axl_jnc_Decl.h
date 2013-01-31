@@ -6,88 +6,42 @@
 
 #include "axl_jnc_Type.h"
 #include "axl_jnc_Function.h"
+#include "axl_jnc_UnOp.h"
+#include "axl_jnc_BinOp.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
-
-enum EStorageClass
-{
-	EStorageClass_Undefined = 0,
-	EStorageClass_Static,
-	EStorageClass_Typedef,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum EAccess
-{
-	EAccess_Undefined = 0,
-	EAccess_Public,
-	EAccess_Private,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t*
-GetStorageClassString (EStorageClass StorageClass);
-
-const tchar_t*
-GetAccessString (EAccess Access);
-
-const tchar_t*
-GetPropertyAccessorString (EPropertyAccessor PropertyAccessor);
-
-//.............................................................................
-
-class CStorageClassSpecifier
+	
+class CTypeModifiers
 {
 protected:
-	EStorageClass m_StorageClass;
+	int m_TypeModifiers;
 
 public:
-	CStorageClassSpecifier ()
+	CTypeModifiers ()
 	{
-		m_StorageClass = EStorageClass_Undefined;
+		m_TypeModifiers = 0;
 	}
 
-	EStorageClass 
-	GetStorageClass ()
+	int 
+	GetTypeModifiers ()
 	{
-		return m_StorageClass;
+		return m_TypeModifiers;
 	}
 
 	bool
-	SetStorageClass (EStorageClass StorageClass);
-};
+	SetTypeModifier (ETypeModifier Modifier);
 
-//.............................................................................
-
-class CAccessSpecifier
-{
 protected:
-	EAccess m_Access;
-
-public:
-	CAccessSpecifier ()
-	{
-		m_Access = EAccess_Undefined;
-	}
-
-	EAccess 
-	GetAccess ()
-	{
-		return m_Access;
-	}
-
 	bool
-	SetAccess (EAccess Access);
+	CheckAntiTypeModifiers (int ModifierMask);
 };
 
 //.............................................................................
 
-class CTypeSpecifier
+class CTypeSpecifier: public CTypeModifiers
 {
 protected:
 	CType* m_pType;
@@ -110,75 +64,11 @@ public:
 
 //.............................................................................
 
-class CTypeModifiers
-{
-protected:
-	int m_TypeModifiers;
-
-public:
-	CTypeModifiers ()
-	{
-		m_TypeModifiers = 0;
-	}
-
-	int 
-	GetTypeModifiers ()
-	{
-		return m_TypeModifiers;
-	}
-
-	bool
-	SetTypeModifier (ETypeModifier Modifier);
-};
-
-//.............................................................................
-
-class CTypeSpecifierModifiers:
-	public CTypeSpecifier,
-	public CTypeModifiers
-{
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CDeclSpecifiers: 
-	public CAccessSpecifier,
-	public CStorageClassSpecifier,
-	public CTypeSpecifierModifiers
-{
-};
-
-//.............................................................................
-
-class CDeclPointer: 
-	public CTypeModifiers,
-	public rtl::TListLink
-{
-protected:
-	friend class CDeclarator;
-
-	EType m_TypeKind;
-
-public:
-	CDeclPointer ()
-	{
-		m_TypeKind = EType_Pointer;
-	}
-
-	EType
-	GetTypeKind ()
-	{
-		return m_TypeKind;
-	}
-};
-
-//.............................................................................
-
 enum EDeclSuffix
 {
 	EDeclSuffix_Undefined = 0,
 	EDeclSuffix_Array,
-	EDeclSuffix_FormalArg,
+	EDeclSuffix_Function,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -241,12 +131,14 @@ protected:
 
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	int m_FunctionTypeFlags;
+	int m_FunctionFlags;
 
 public:
 	CDeclFunctionSuffix ()
 	{
-		m_SuffixKind = EDeclSuffix_FormalArg;
+		m_SuffixKind = EDeclSuffix_Function;
 		m_FunctionTypeFlags = 0;
+		m_FunctionFlags = 0;
 	}
 
 	size_t 
@@ -266,33 +158,56 @@ public:
 	{
 		return m_FunctionTypeFlags;
 	}
+
+	rtl::CArrayT <CType*>
+	GetArgTypeArray ();
 };
 
 //.............................................................................
 
-class CDeclarator
+enum EDeclarator
+{
+	EDeclarator_Undefined,
+	EDeclarator_SimpleName,
+	EDeclarator_QualifiedName,
+	EDeclarator_UnnamedMethod,
+	EDeclarator_PropValue,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CDeclarator: public CTypeModifiers
 {
 protected:
 	friend class CParser;
 
-	CToken::CPos m_Pos;
+	EDeclarator m_DeclaratorKind;
+	EFunction m_FunctionKind;
 	CQualifiedName m_Name;
-	EPropertyAccessor m_PropertyAccessorKind;
+	CToken::CPos m_Pos;
+	CType* m_pType;
+	size_t m_BitCount;
 
-	rtl::CStdListT <CDeclPointer> m_PointerList;
+	rtl::CArrayT <int> m_PointerArray;
 	rtl::CStdListT <CDeclSuffix> m_SuffixList;
 
 public:
-	CDeclarator ()
+	CDeclarator ();
+
+	EDeclarator
+	GetDeclaratorKind ()
 	{
-		m_PropertyAccessorKind = EPropertyAccessor_Undefined;
+		return m_DeclaratorKind;
 	}
 
-	bool
-	IsSimple ()
+	EFunction
+	GetFunctionKind ()
 	{
-		return !m_PropertyAccessorKind && m_Name.IsSimple ();
+		return m_FunctionKind;
 	}
+	
+	bool
+	SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier);
 
 	const CQualifiedName*
 	GetName ()
@@ -300,42 +215,58 @@ public:
 		return &m_Name;
 	}
 
-	EPropertyAccessor 
-	GetPropertyAccessorKind ()
+	const CToken::CPos&
+	GetPos ()
 	{
-		return m_PropertyAccessorKind;
+		return m_Pos;
+	}
+	
+	rtl::CStdListT <CFunctionFormalArg>*
+	GetArgList ();
+	
+	size_t
+	GetBitCount ()
+	{
+		return m_BitCount;
 	}
 
-	bool
-	AddName (const rtl::CString Name);
+	CType* 
+	GetType (int* pDataPtrTypeFlags = NULL);
 
 	bool
-	AddPropertyAccessorKind (EPropertyAccessor AccessorKind);
+	AddName (rtl::CString Name);
 
-	CDeclPointer*
-	AddPointer (EType TypeKind);
+	bool
+	AddUnnamedMethod (EFunction FunctionKind);
+
+	bool
+	AddCastOperator (CType* pType);
+
+	bool
+	AddOperator (
+		EUnOp UnOpKind, 
+		EBinOp BinOpKind
+		);
+
+	bool
+	SetPropValue ();
+
+	bool
+	AddPointer ();
 
 	CDeclArraySuffix*
 	AddArraySuffix (size_t ElementCount);
 
 	CDeclFunctionSuffix*
-	AddFormalArgSuffix ();
+	AddFunctionSuffix ();
 
-	static
-	CType*
-	GetType_s (CTypeSpecifierModifiers* pTypeSpecifier);
-
-	CType*
-	GetType (
-		CTypeSpecifierModifiers* pTypeSpecifier,
-		int* pFunctionModifiers = NULL
-		);
-
-	rtl::CStdListT <CFunctionFormalArg>*
-	GetArgList ();
+	bool
+	AddBitFieldSuffix (size_t BitCount);
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
+
+

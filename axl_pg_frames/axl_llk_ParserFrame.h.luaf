@@ -247,7 +247,7 @@ public:
 			%{ end }
 		CSymbolNode_$(Symbol.Name) ()
 		{
-			m_Flags = axl::llk::ESymbolNodeFlag_IsNamed;
+			m_Flags = axl::llk::ESymbolNodeFlag_Named;
 			m_Index = ESymbol_$(Symbol.Name);
 			%{ if Symbol.Enter then }
 			m_Flags |= axl::llk::ESymbolNodeFlag_HasEnter;
@@ -408,7 +408,7 @@ public:
 			%{ elseif Symbol.Enter or Symbol.Leave or Symbol.Class or Symbol.IsNoAst then }
 		case ESymbol_$(Symbol.Name):
 			pNode = CreateStdSymbolNode (Index);
-			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_IsNamed;
+			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_Named;
 				%{ if Symbol.Enter then }
 			pNode->m_Flags |= axl::llk::ESymbolNodeFlag_HasEnter;
 				%{ end 

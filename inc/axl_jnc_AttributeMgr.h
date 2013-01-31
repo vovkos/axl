@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Attribute.h"
+#include "axl_jnc_AttributeBlock.h"
 
 namespace axl {
 namespace jnc {
@@ -19,8 +19,7 @@ protected:
 	friend class CModule;
 	CModule* m_pModule;
 
-	rtl::CStdListT <CAttributeSet> m_AttributeSetList;
-	CAttributeSet* m_pCurrentAttributeSet;
+	rtl::CStdListT <CAttributeBlock> m_AttributeBlockList;
 
 public:
 	CAttributeMgr ();
@@ -31,29 +30,14 @@ public:
 		return m_pModule;
 	}
 
-	CAttributeSet*
-	GetCurrentAttributeSet ()
-	{
-		return m_pCurrentAttributeSet;
-	}
-
-	void
-	DropCurrentAttributeSet ()
-	{
-		m_pCurrentAttributeSet = NULL;
-	}
-
-	void
-	AssignAttributeSet (CModuleItem* pItem);
-
 	void
 	Clear ()
 	{
-		m_AttributeSetList.Clear ();
+		m_AttributeBlockList.Clear ();
 	}
 
-	CAttributeSet*
-	CreateAttributeSet ();
+	CAttributeBlock*
+	CreateAttributeBlock ();
 
 	CAttribute*
 	CreateAttribute (
@@ -64,5 +48,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

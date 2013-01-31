@@ -16,28 +16,39 @@ namespace axl {
 namespace jnc {
 
 class CClassType;
-class CVTableType;
-class CClassMethodMember;
+class CPropertyType;
 
 //.............................................................................
 
 enum EFunction
 {
-	EFunction_Undefined = 0,
-	EFunction_Global,
-	EFunction_Method,
+	EFunction_Undefined = 0,	
+	EFunction_Named,
+	EFunction_Getter,
+	EFunction_Setter,
 	EFunction_PreConstructor,
 	EFunction_Constructor,
+	EFunction_StaticConstructor,
 	EFunction_Destructor,
+	EFunction_CallOperator,
+	EFunction_CastOperator,
+	EFunction_UnaryOperator,
+	EFunction_BinaryOperator,
+	EFunction_Internal, 
+	EFunction_Thunk,
+	EFunction_AutoEv,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum EPropertyAccessor
+const tchar_t*
+GetFunctionKindString (EFunction FunctionKind);
+
+//.............................................................................
+
+enum EFunctionFlag
 {
-	EPropertyAccessor_Undefined = 0,
-	EPropertyAccessor_Get,
-	EPropertyAccessor_Set,
+	EFunctionFlag_Const = 1,
 };
 
 //.............................................................................
@@ -77,34 +88,44 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CFunction: 
-	public CModuleItem,
-	public rtl::TListLink
+class CFunction: public CNamedModuleItem
 {
 protected:
 	friend class CFunctionMgr;
 	friend class CClassType;
-	friend class CVTableType;
-	friend class CPropertyType;
+	friend class CProperty;
 	friend class CParser;
 	friend class CCast_fn;
 
 	EFunction m_FunctionKind;
-	EPropertyAccessor m_PropertyAccessorKind;
 	
+	CNamespace* m_pParentNamespace;
 	CFunctionType* m_pType;
 	CFunctionType* m_pShortType;
-	CNamespace* m_pNamespace;
 
-	CNamespace* m_pAnchorNamespace;
-	CQualifiedName m_Name;
-	rtl::CString m_Tag;
+	rtl::CArrayT <CFunction*> m_OverloadArray;
 
-	CClassType* m_pClassType;
-	CVTableType* m_pVTableType;
-	size_t m_VTableIndex;
+	// orphan functions
+
+	CNamespace* m_pOrphanNamespace;
+	CQualifiedName m_OrphanName;
+	CFunction* m_pExternFunction;
+
+	// for non-static method members
+
+	CClassType* m_pClassType; 
+
+	// for virtual method members
+
+	CClassType* m_pVirtualOriginClassType; 
+	size_t m_ClassVTableIndex;
+
+	// for property accessors
+
+	CProperty* m_pProperty;
+	size_t m_PropertyVTableIndex;
 
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
@@ -114,37 +135,24 @@ protected:
 	CScope* m_pScope;
 	CVariable* m_pScopeLevelVariable;
 
-	CFunction* m_pExternFunction;
 	llvm::Function* m_pLlvmFunction;
 	void* m_pfn;
 
 public:
 	CFunction ();
 
-	EFunction
+	EFunction 
 	GetFunctionKind ()
 	{
 		return m_FunctionKind;
 	}
 
-	EPropertyAccessor
-	GetPropertyAccessorKind ()
+	CNamespace* 
+	GetParentNamespace ()
 	{
-		return m_PropertyAccessorKind;
+		return m_pParentNamespace;
 	}
 
-	const CQualifiedName&
-	GetQualifiedName ()
-	{
-		return m_Name;
-	}
-
-	rtl::CString 
-	GetTag ()
-	{
-		return m_Tag;
-	}
-	
 	CFunctionType* 
 	GetType ()
 	{
@@ -154,13 +162,7 @@ public:
 	CFunctionType* 
 	GetShortType ()
 	{
-		return m_pShortType ? m_pShortType : m_pType;
-	}
-
-	CNamespace* 
-	GetNamespace ()
-	{
-		return m_pNamespace;
+		return m_pShortType;
 	}
 
 	CClassType* 
@@ -169,31 +171,34 @@ public:
 		return m_pClassType;
 	}
 
-	CVTableType* 
-	GetVTableType ()
-	{
-		return m_pVTableType;
-	}
-
 	CClassType* 
-	GetVTableClassType ();
+	GetVirtualOriginClassType ()
+	{
+		return m_pVirtualOriginClassType;
+	}
 
 	size_t
-	GetVTableIndex ()
+	GetClassVTableIndex ()
 	{
-		return m_VTableIndex;
+		return m_ClassVTableIndex;
 	}
 
-	size_t 
-	GetArgCount ()
+	CProperty* 
+	GetProperty ()
 	{
-		return m_ArgList.GetCount ();
+		return m_pProperty;
 	}
 
-	rtl::CIteratorT <CFunctionFormalArg> 
-	GetFirstArg ()
+	size_t
+	GetPropertyVTableIndex ()
 	{
-		return m_ArgList.GetHead ();
+		return m_PropertyVTableIndex;
+	}
+
+	rtl::CConstListT <CFunctionFormalArg> 
+	GetArgList ()
+	{
+		return m_ArgList;
 	}
 
 	rtl::CString
@@ -209,12 +214,6 @@ public:
 	HasBody ()
 	{
 		return !m_Body.IsEmpty ();
-	}
-
-	EHasReturn
-	HasReturn ()
-	{
-		return m_pBlock ? m_pBlock->HasReturn () : EHasReturn_Undefined;
 	}
 
 	const rtl::CBoxListT <CToken>*
@@ -267,82 +266,44 @@ public:
 	{
 		return m_Ast;
 	}
-};
-
-//.............................................................................
-
-class CFunctionOverload
-{
-protected:
-	friend class CFunctionMgr;
-
-	CFunction* m_pFunction;
-	rtl::CArrayT <CFunction*> m_OverloadArray;
-
-public:
-	CFunctionOverload ()
-	{
-		m_pFunction = NULL;
-	}
-
-	bool 
-	IsEmpty () const
-	{
-		return m_pFunction == NULL;
-	}
 
 	bool
-	IsOverloaded () const
+	IsOverloaded ()
 	{
 		return !m_OverloadArray.IsEmpty ();
 	}
 
 	size_t
-	GetOverloadCount () const
+	GetOverloadCount ()
 	{
-		return !IsEmpty () ? m_OverloadArray.GetCount () + 1 : 0;
+		return m_OverloadArray.GetCount () + 1;
 	}
 
 	CFunction*
-	GetFunction (size_t Overload = 0) const
+	GetOverload (size_t Overload = 0)
 	{
 		return 
-			Overload == 0 ? m_pFunction : 
+			Overload == 0 ? this : 
 			Overload <= m_OverloadArray.GetCount () ? m_OverloadArray [Overload - 1] : NULL;
 	}
 
+	CFunction*
+	FindOverload (CFunctionType* pType);
+
+	CFunction*
+	FindShortOverload (CFunctionType* pType);
+
+	CFunction*
+	ChooseOverload (const rtl::CBoxListT <CValue>* pArgList);
+
 	bool
 	AddOverload (CFunction* pFunction);
-	
-	CFunction*
-	ChooseOverload (rtl::CBoxListT <CValue>* pArgList) const;
 
-	CFunction*
-	FindOverload (CFunctionType* pType) const;
-
-	CFunction*
-	FindShortOverload (CFunctionType* pType) const;
+	bool
+	ResolveOrphan ();
 };
 
 //.............................................................................
 
-class CGlobalFunction:
-	public CModuleItem,
-	public CFunctionOverload,
-	public CName,
-	public rtl::TListLink
-{
-protected:
-	friend class CFunctionMgr;
-
-public:
-	CGlobalFunction ()
-	{
-		m_ItemKind = EModuleItem_GlobalFunction;
-	}
-};
-
-//.............................................................................
-
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

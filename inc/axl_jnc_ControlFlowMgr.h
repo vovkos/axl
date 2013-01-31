@@ -12,6 +12,13 @@ namespace jnc {
 
 //.............................................................................
 
+enum EControlFlowMgrFlag
+{
+	EControlFlowMgrFlag_HasReturn = 1,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CControlFlowMgr
 {
 protected:
@@ -20,6 +27,9 @@ protected:
 
 	rtl::CStdListT <CBasicBlock> m_BlockList;
 	CBasicBlock* m_pCurrentBlock;
+	CBasicBlock* m_pUnreachableBlock;
+
+	int m_Flags;
 
 public:
 	CControlFlowMgr ();
@@ -32,6 +42,18 @@ public:
 
 	void
 	Clear ();
+
+	void
+	ResetHasReturn ()
+	{
+		m_Flags &= ~EControlFlowMgrFlag_HasReturn;
+	}
+
+	int 
+	GetFlags ()
+	{
+		return m_Flags;
+	}
 
 	CBasicBlock* 
 	CreateBlock (const rtl::CString& Name);
@@ -51,6 +73,9 @@ public:
 		CBasicBlock* pFollowBlock
 		);
 
+	void
+	Follow (CBasicBlock* pBlock);
+
 	bool
 	ConditionalJump (
 		const CValue& Value,
@@ -61,12 +86,6 @@ public:
 
 	void
 	MarkUnreachable (CBasicBlock* pBlock);
-
-	void
-	Follow (CBasicBlock* pBlock)
-	{
-		Jump (pBlock, pBlock);
-	}
 
 	bool
 	Return (const CValue& Value);
@@ -89,9 +108,12 @@ protected:
 
 	void
 	ProcessDestructList (CScope* pTargetScope = NULL);
+
+	CBasicBlock*
+	GetUnreachableBlock ();
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

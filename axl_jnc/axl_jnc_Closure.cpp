@@ -28,13 +28,12 @@ GetClosureKindString (EClosure ClosureKind)
 bool
 CClosure::IsClassMemberClosure (CValue* pIfaceValue)
 {
-	if (m_ArgList.IsEmpty () || !m_ArgList.GetHead ()->GetType ()->IsClassType ())
+	if (m_ArgList.IsEmpty () || m_ArgList.GetHead ()->GetType ()->GetTypeKind () != EType_ClassPtr)
 		return false;
 
 	*pIfaceValue = *m_ArgList.GetHead ();
 	return true;
 }
-
 
 void
 CClosure::CombineClosure (rtl::CBoxListT <CValue>* pArgList)
@@ -96,23 +95,22 @@ CClosure::GetClosureType (CType* pType)
 {
 	CModule* pModule = pType->GetModule ();
 
-	int Flags = EOpFlag_LoadReference;
+	int Flags = 0;
 	if (m_ClosureKind == EClosure_Property)
-		Flags |= EOpFlag_KeepProperty;
+		Flags |= EOpFlag_KeepPropertyRef;
 
 	pType = pModule->m_OperatorMgr.PrepareOperandType (pType, Flags);
+	EType TypeKind = pType->GetTypeKind ();
 
 	if (m_ClosureKind == EClosure_Function)
 	{
-		CFunctionType* pFunctionType = pType->GetFunctionType ();
-		if (pFunctionType)
-			return GetFunctionClosureType (pFunctionType);
+		if (TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef)
+			return GetFunctionClosureType (((CFunctionPtrType*) pType)->GetFunctionType ());
 	}
 	else if (m_ClosureKind == EClosure_Property)
 	{
-		CPropertyType* pPropertyType = pType->GetPropertyType ();
-		if (pPropertyType)
-			return GetPropertyClosureType (pPropertyType);
+		if (TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef)
+			return GetPropertyClosureType (((CPropertyPtrType*) pType)->GetPropertyType ());
 	}
 
 	err::SetFormatStringError (
@@ -133,7 +131,7 @@ CClosure::GetFunctionClosureType (CFunctionType* pType)
 
 	CModule* pModule = pType->GetModule ();
 
-	if (pType->GetFlags () & EFunctionTypeFlag_IsVarArg)
+	if (pType->GetFlags () & EFunctionTypeFlag_VarArg)
 	{
 		err::SetFormatStringError (_T("function closures cannot be applied to vararg functions"));
 		return NULL;
@@ -182,5 +180,5 @@ CClosure::GetPropertyClosureType (CPropertyType* pType)
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

@@ -2,8 +2,8 @@
 		.model	small, C
 		.code	_TEXT
 
-		axl_exe_ECallingConvention_Cdecl   equ 0
-		axl_exe_ECallingConvention_Stdcall equ 1
+		axl_exe_ECallConv_Cdecl   equ 0
+		axl_exe_ECallConv_Stdcall equ 1
 		 
 		public	axl_exe_InvokeDirect@16
 
@@ -13,7 +13,7 @@
 ;		__stdcall
 ;		axl_exe_InvokeDirect (
 ;			void* pfn,
-;			int CallingConvention,
+;			int CallConv,
 ;			axl_mem_TBlock* pStack,
 ;			size_t Count
 ;			);
@@ -22,7 +22,7 @@
 
 axl_exe_InvokeDirect@16 proc \
 		pfn               : ptr byte, \
-		CallingConvention : dword, \
+		CallConv : dword, \
 		pStack            : ptr byte, \
 		Count             : dword \
 
@@ -78,7 +78,7 @@ axl_exe_InvokeDirect@16 proc \
 		mov     eax,    pfn
 		call    eax
 		
-		cmp		CallingConvention, axl_exe_ECallingConvention_Stdcall
+		cmp		CallConv, axl_exe_ECallConv_Stdcall
 		jnz		__ret			
 		add     esp,    StackSize
 		

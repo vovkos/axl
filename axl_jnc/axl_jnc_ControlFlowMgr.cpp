@@ -11,6 +11,10 @@ CControlFlowMgr::CControlFlowMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
+
+	m_Flags = 0;
+	m_pCurrentBlock = NULL;
+	m_pUnreachableBlock = NULL;
 }
 
 void
@@ -18,6 +22,7 @@ CControlFlowMgr::Clear ()
 {
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
+	m_pUnreachableBlock = NULL;
 }
 
 CBasicBlock* 
@@ -57,17 +62,29 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 	return pPrevCurrentBlock;
 }
 
+CBasicBlock*
+CControlFlowMgr::GetUnreachableBlock ()
+{
+	if (m_pUnreachableBlock)
+		return m_pUnreachableBlock;
+
+	m_pUnreachableBlock = CreateBlock (_T("unreachable_block"));
+	MarkUnreachable (m_pUnreachableBlock);
+	return m_pUnreachableBlock;
+}
+
 void
 CControlFlowMgr::MarkUnreachable (CBasicBlock* pBlock)
 {
-	if (pBlock->m_Flags & EBasicBlockFlag_IsUnreachable)
-		return;
+	ASSERT (!(pBlock->m_Flags & EBasicBlockFlag_Jumped));
+	pBlock->m_Flags |= EBasicBlockFlag_Unreachable;
 
-	pBlock->m_Flags |= EBasicBlockFlag_IsUnreachable;
-
-	CBasicBlock* pPrevCurrentBlock = SetCurrentBlock (pBlock);
-	m_pModule->m_LlvmBuilder.CreateUnreachable ();
-	SetCurrentBlock (pPrevCurrentBlock);
+	if (!pBlock->HasTerminator ())
+	{
+		CBasicBlock* pPrevCurrentBlock = SetCurrentBlock (pBlock);
+		m_pModule->m_LlvmBuilder.CreateUnreachable ();
+		SetCurrentBlock (pPrevCurrentBlock);
+	}
 }
 
 void
@@ -76,21 +93,25 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
-	m_pCurrentBlock->m_JumpArray.Append (pBlock);
-
 	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
-	pBlock->m_Flags |= EBasicBlockFlag_IsJumped;
+	pBlock->m_Flags |= EBasicBlockFlag_Jumped;
 
-	if (pFollowBlock)
+	if (!pFollowBlock)
+		pFollowBlock = GetUnreachableBlock ();
+
+	SetCurrentBlock (pFollowBlock);
+}
+
+void
+CControlFlowMgr::Follow (CBasicBlock* pBlock)
+{
+	if (!m_pCurrentBlock->HasTerminator ())
 	{
-		SetCurrentBlock (pFollowBlock);
+		m_pModule->m_LlvmBuilder.CreateBr (pBlock);
+		pBlock->m_Flags |= EBasicBlockFlag_Jumped;
 	}
-	else
-	{
-		pFollowBlock = CreateBlock (_T("jmp_follow"));
-		SetCurrentBlock (pFollowBlock);
-		MarkUnreachable (pFollowBlock);
-	}
+
+	SetCurrentBlock (pBlock);
 }
 
 bool
@@ -106,11 +127,8 @@ CControlFlowMgr::ConditionalJump (
 	if (!Result)
 		return false;
 
-	m_pCurrentBlock->m_JumpArray.Append (pThenBlock);
-	m_pCurrentBlock->m_JumpArray.Append (pElseBlock);
-
-	pThenBlock->m_Flags |= EBasicBlockFlag_IsJumped;
-	pElseBlock->m_Flags |= EBasicBlockFlag_IsJumped;
+	pThenBlock->m_Flags |= EBasicBlockFlag_Jumped;
+	pElseBlock->m_Flags |= EBasicBlockFlag_Jumped;
 
 	m_pModule->m_LlvmBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
 
@@ -190,7 +208,7 @@ CControlFlowMgr::Return (const CValue& Value)
 	{
 		if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
 		{
-			err::SetFormatStringError (_T("function '%s' must return a '%s' value"), pFunction->GetTag (), pReturnType->GetTypeString ());
+			err::SetFormatStringError (_T("function '%s' must return a '%s' value"), pFunction->m_Tag, pReturnType->GetTypeString ());
 			return false;
 		}
 		
@@ -201,26 +219,22 @@ CControlFlowMgr::Return (const CValue& Value)
 	else
 	{
 		CValue ReturnValue;
-		bool Result = 
-			m_pModule->m_OperatorMgr.CastOperator (Value, pReturnType, &ReturnValue) &&
-			m_pModule->m_OperatorMgr.PrepareOperand (&ReturnValue, EOpFlag_VariableToSafePtr);
-
+		bool Result = m_pModule->m_OperatorMgr.CastOperator (Value, pReturnType, &ReturnValue);
 		if (!Result)
 			return false;
-		
+
 		ProcessDestructList ();
 		RestoreScopeLevel (pFunction);
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
 
-	m_pCurrentBlock->m_Flags |= EBasicBlockFlag_IsHasReturnReady;
-	m_pCurrentBlock->m_HasReturn = EHasReturn_Explicit;
+	m_Flags |= EControlFlowMgrFlag_HasReturn;
 
-	// TODO: create a special unreachable block to dump the rest of code
+	SetCurrentBlock (GetUnreachableBlock ());
 	return true;
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

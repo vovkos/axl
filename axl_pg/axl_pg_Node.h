@@ -40,7 +40,7 @@ enum ENode
 enum ENodeFlag
 {
 	ENodeFlag_RecursionStopper = 0x0001,
-	ENodeFlag_IsReachable      = 0x0002,
+	ENodeFlag_Reachable      = 0x0002,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -76,7 +76,7 @@ public:
 	bool
 	IsReachable ()
 	{ 
-		return (m_Flags & ENodeFlag_IsReachable) != 0;
+		return (m_Flags & ENodeFlag_Reachable) != 0;
 	}
 
 	virtual
@@ -95,8 +95,8 @@ public:
 
 enum EGrammarNodeFlag
 {
-	EGrammarNodeFlag_IsNullable = 0x0010,
-	EGrammarNodeFlag_IsFinal    = 0x0020,
+	EGrammarNodeFlag_Nullable = 0x0010,
+	EGrammarNodeFlag_Final    = 0x0020,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -120,13 +120,13 @@ public:
 	bool
 	IsNullable ()
 	{ 
-		return (m_Flags & EGrammarNodeFlag_IsNullable) != 0;
+		return (m_Flags & EGrammarNodeFlag_Nullable) != 0;
 	}
 
 	bool
 	IsFinal ()
 	{ 
-		return (m_Flags & EGrammarNodeFlag_IsFinal) != 0;
+		return (m_Flags & EGrammarNodeFlag_Final) != 0;
 	}
 
 	bool
@@ -147,14 +147,14 @@ protected:
 
 enum ESymbolNodeFlag
 {
-	ESymbolNodeFlag_IsNamed        = 0x0100,
-	ESymbolNodeFlag_IsEofToken     = 0x0200,
-	ESymbolNodeFlag_IsAnyToken     = 0x0400,
-	ESymbolNodeFlag_IsPragma       = 0x0800,
-	ESymbolNodeFlag_IsStart        = 0x1000,
-	ESymbolNodeFlag_IsNoAst        = 0x2000,
-	ESymbolNodeFlag_IsResolverUsed = 0x4000,
-	ESymbolNodeFlag_IsNullable     = 0x8000,
+	ESymbolNodeFlag_Named        = 0x0100,
+	ESymbolNodeFlag_EofToken     = 0x0200,
+	ESymbolNodeFlag_AnyToken     = 0x0400,
+	ESymbolNodeFlag_Pragma       = 0x0800,
+	ESymbolNodeFlag_Start        = 0x1000,
+	ESymbolNodeFlag_NoAst        = 0x2000,
+	ESymbolNodeFlag_ResolverUsed = 0x4000,
+	ESymbolNodeFlag_Nullable     = 0x8000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -240,7 +240,7 @@ public:
 
 enum EUserNodeFlag
 {
-	EUserNodeFlag_IsUserCodeProcessed = 0x010000, // prevent double processing in '+' quantifier
+	EUserNodeFlag_UserCodeProcessed = 0x010000, // prevent double processing in '+' quantifier
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -298,8 +298,8 @@ public:
 
 enum EBeaconNodeFlag
 {
-	EBeaconNodeFlag_IsAdded   = 0x100,
-	EBeaconNodeFlag_IsDeleted = 0x200,
+	EBeaconNodeFlag_Added   = 0x100,
+	EBeaconNodeFlag_Deleted = 0x200,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -387,8 +387,8 @@ public:
 
 enum ELaDfaNodeFlag
 {
-	ELaDfaNodeFlag_IsLeaf     = 0x100,
-	ELaDfaNodeFlag_IsResolved = 0x200,	
+	ELaDfaNodeFlag_Leaf     = 0x100,
+	ELaDfaNodeFlag_Resolved = 0x200,	
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

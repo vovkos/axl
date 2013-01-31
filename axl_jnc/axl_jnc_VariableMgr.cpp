@@ -34,6 +34,8 @@ CVariableMgr::CreateVariable (
 	pVariable->m_pModule = m_pModule;
 	pVariable->m_VariableKind = VariableKind;
 	pVariable->m_Name = Name;
+	pVariable->m_QualifiedName = Name;
+	pVariable->m_Tag = Name;
 	pVariable->m_pType = pType;
 
 	if (VariableKind == EVariable_Local)
@@ -123,5 +125,5 @@ CVariableMgr::GetScopeLevelVariable ()
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

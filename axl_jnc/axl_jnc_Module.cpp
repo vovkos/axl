@@ -32,5 +32,5 @@ CModule::Create (const rtl::CString& FilePath)
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

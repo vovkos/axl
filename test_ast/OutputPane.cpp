@@ -1,10 +1,61 @@
 #include "stdafx.h"
 #include "test_ast.h"
 #include "OutputPane.h"
+#include "MainFrm.h"
+#include "AstDoc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+//.............................................................................
+
+BOOL ParseFileLineString(LPCTSTR buffer, CString* pstrFile, int* pnLine)
+{
+	const TCHAR* pLeft;
+	const TCHAR* pRight;
+
+	const TCHAR* p = buffer;
+	for (;;)
+	{
+		pLeft = strchr(p, _T('('));
+		if (!pLeft)
+			return FALSE;
+
+		pRight = strchr(pLeft, _T(')'));
+		if (!pRight)
+			return FALSE;
+
+		p = pRight + 1;
+
+		while (isspace(*p))
+			p++;
+
+		if (*p == _T(':') || *p == 0) 
+			break;
+	}
+
+	*pstrFile = CString(buffer, pLeft - buffer);
+	pstrFile->TrimLeft();
+	pstrFile->TrimRight();
+
+	if (pstrFile->IsEmpty())
+		return FALSE;
+
+	CString strLine(pLeft + 1, pRight - pLeft - 1);
+	strLine.TrimLeft();
+	strLine.TrimRight();
+
+	if (strLine.IsEmpty())
+		return FALSE;
+	
+	TCHAR* pEnd;
+	*pnLine = strtol(strLine, &pEnd, 10);
+	if (pEnd == (LPCTSTR) strLine)
+		return FALSE;
+
+	return TRUE;
+}
 
 //.............................................................................
 
@@ -34,6 +85,42 @@ int COutputPane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void COutputPane::OnSize(UINT nType, int cx, int cy) 
 {
 	m_LogCtrl.MoveWindow(0, 0, cx, cy);
+}
+
+BOOL COutputPane::PreTranslateMessage (MSG* pMsg) 
+{
+	switch (pMsg->message)
+	{
+	case WM_LBUTTONDBLCLK:
+		return OnLButtonDblClk ();
+	}
+
+	return CDockablePane::PreTranslateMessage (pMsg);
+}
+
+BOOL COutputPane::OnLButtonDblClk () 
+{
+	int StartChar, StopChar;
+	m_LogCtrl.GetSel (StartChar, StopChar);
+	
+	int Line = m_LogCtrl.LineFromChar (StartChar);
+	char Buffer [1024] = { 0 };
+	m_LogCtrl.GetLine (Line, Buffer, sizeof (Buffer) - 1);
+	
+	CString FilePath;
+	BOOL Result = ParseFileLineString (Buffer, &FilePath, &Line);
+	if (!Result)
+		return FALSE;
+
+	CEdit* pEditCtrl = &GetMainFrame ()->GetDocument ()->GetView ()->GetEditCtrl ();
+	StartChar = pEditCtrl->LineIndex (Line - 1);
+	if (StartChar == -1)
+		return FALSE;
+
+	int Length = pEditCtrl->LineLength (StartChar);
+	StopChar = StartChar + Length;
+	pEditCtrl->SetSel (StartChar, StopChar);
+	return TRUE;
 }
 
 //.............................................................................

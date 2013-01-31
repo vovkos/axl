@@ -86,7 +86,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				break;
 
 			case 'v':
-				Config.m_Flags |= EConfigFlag_IsVerbose;
+				Config.m_Flags |= EConfigFlag_Verbose;
 				break;
 			}			
 		}
@@ -158,7 +158,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 6;
 	}
 
-	if (Config.m_Flags & EConfigFlag_IsVerbose)	
+	if (Config.m_Flags & EConfigFlag_Verbose)	
 		Module.Trace ();
 
 	CGenerator Generator;	

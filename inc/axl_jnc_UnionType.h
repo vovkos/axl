@@ -13,14 +13,12 @@ class CUnionType;
 
 //.............................................................................
 
-class CUnionMember: 
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
+class CUnionMember: public CNamedModuleItem
 {
 protected:
 	friend class CUnionType;
 	
+	CUnionType* m_pParentUnionType;
 	CType* m_pType;
 	CType* m_pBitFieldBaseType;
 	size_t m_BitCount;
@@ -30,14 +28,12 @@ public:
 	{
 		m_ItemKind = EModuleItem_UnionMember;
 		m_pType = NULL;
-		m_pBitFieldBaseType = NULL;
-		m_BitCount = 0;
 	}
 
 	CUnionType*
-	GetParentType ()
+	GetParentUnionType ()
 	{
-		return (CUnionType*) (CNamedType*) m_pParentNamespace; // double cast cause CUnionType is not defined yet
+		return m_pParentUnionType;
 	}
 
 	CType*
@@ -63,7 +59,7 @@ public:
 	CUnionType ()
 	{
 		m_TypeKind = EType_Union;
-		m_Flags = ETypeFlag_IsPod;
+		m_Flags = ETypeFlag_Pod;
 		m_pStructType = NULL;
 	}
 
@@ -74,10 +70,10 @@ public:
 		return m_pStructType;
 	}
 
-	rtl::CIteratorT <CUnionMember>
-	GetFirstMember ()
+	rtl::CConstListT <CUnionMember>
+	GetMemberList ()
 	{
-		return m_MemberList.GetHead ();
+		return m_MemberList;
 	}
 
 	CUnionMember*
@@ -94,11 +90,27 @@ public:
 		size_t BitCount = 0
 		);
 
+	virtual
 	bool
 	CalcLayout ();
+
+protected:
+	virtual 
+	void
+	PrepareTypeString ()
+	{
+		m_TypeString.Format (_T("union %s"), m_Tag);
+	}
+
+	virtual 
+	void
+	PrepareLlvmType ()
+	{
+		m_pLlvmType = GetStructType ()->GetLlvmType ();
+	}
 };
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

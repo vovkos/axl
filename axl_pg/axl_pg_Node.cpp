@@ -24,10 +24,10 @@ CNode::Trace ()
 bool
 CNode::MarkReachable ()
 {
-	if (m_Flags & ENodeFlag_IsReachable)
+	if (m_Flags & ENodeFlag_Reachable)
 		return false;
 
-	m_Flags |= ENodeFlag_IsReachable;
+	m_Flags |= ENodeFlag_Reachable;
 	return true;
 }
 
@@ -52,7 +52,7 @@ CGrammarNode::MarkNullable ()
 	if (IsNullable ())
 		return false;
 
-	m_Flags |= EGrammarNodeFlag_IsNullable;
+	m_Flags |= EGrammarNodeFlag_Nullable;
 	return true;
 }
 
@@ -62,7 +62,7 @@ CGrammarNode::MarkFinal ()
 	if (IsFinal ())
 		return false;
 
-	m_Flags |= EGrammarNodeFlag_IsFinal;
+	m_Flags |= EGrammarNodeFlag_Final;
 	return true;
 }
 
@@ -104,7 +104,7 @@ void
 CSymbolNode::AddProduction (CGrammarNode* pNode)
 {
 	if (pNode->m_Kind == ENode_Symbol && 
-		!(pNode->m_Flags & ESymbolNodeFlag_IsNamed) && 
+		!(pNode->m_Flags & ESymbolNodeFlag_Named) && 
 		!((CSymbolNode*) pNode)->m_pResolver)
 		m_ProductionArray.Append (((CSymbolNode*) pNode)->m_ProductionArray); // merge temp symbol productions
 	else
@@ -121,7 +121,7 @@ CSymbolNode::MarkReachable ()
 		m_pResolver->MarkReachable ();
 
 	if (m_pClass)
-		m_pClass->m_Flags |= EClassFlag_IsReachable;
+		m_pClass->m_Flags |= EClassFlag_Reachable;
 
 	size_t Count = m_ProductionArray.GetCount ();
 	for (size_t i = 0; i < Count; i++) 
@@ -163,11 +163,11 @@ CSymbolNode::Export (lua::CLuaState* pLuaState)
 	{
 		pLuaState->CreateTable (1);
 
-		if (m_Flags & ESymbolNodeFlag_IsEofToken)
+		if (m_Flags & ESymbolNodeFlag_EofToken)
 			pLuaState->SetMemberBoolean ("IsEofToken", true);
-		else if (m_Flags & ESymbolNodeFlag_IsAnyToken)
+		else if (m_Flags & ESymbolNodeFlag_AnyToken)
 			pLuaState->SetMemberBoolean ("IsAnyToken", true);
-		else if (m_Flags & ESymbolNodeFlag_IsNamed)
+		else if (m_Flags & ESymbolNodeFlag_Named)
 			pLuaState->SetMemberString ("Name", m_Name);
 		else 
 			pLuaState->SetMemberInteger ("Token", m_CharToken);
@@ -183,7 +183,7 @@ CSymbolNode::Export (lua::CLuaState* pLuaState)
 	ExportSrcPos (pLuaState, m_SrcPos);
 	pLuaState->SetMember ("SrcPos");
 
-	if (m_Flags & ESymbolNodeFlag_IsNoAst)
+	if (m_Flags & ESymbolNodeFlag_NoAst)
 		pLuaState->SetMemberBoolean ("IsNoAst", true);
 	else if (m_pClass)
 		pLuaState->SetMemberString ("Class", m_pClass->m_Name);
@@ -299,7 +299,7 @@ CSequenceNode::GetProductionString ()
 
 CUserNode::CUserNode ()
 {
-	m_Flags = EGrammarNodeFlag_IsNullable;
+	m_Flags = EGrammarNodeFlag_Nullable;
 	m_pProductionSymbol = NULL;
 	m_pDispatcher = NULL;
 	m_pResolver = NULL;
@@ -555,8 +555,8 @@ CLaDfaNode::Trace ()
 	printf (
 		"%s%s\n", 
 		m_Name, 
-		(m_Flags & ELaDfaNodeFlag_IsLeaf) ? "*" : 
-		(m_Flags & ELaDfaNodeFlag_IsResolved) ? "~" : ""
+		(m_Flags & ELaDfaNodeFlag_Leaf) ? "*" : 
+		(m_Flags & ELaDfaNodeFlag_Resolved) ? "~" : ""
 		);
 
 	if (m_pResolver)
@@ -590,7 +590,7 @@ CLaDfaNode::Trace ()
 size_t
 GetTransitionIndex (CNode* pNode)
 {
-	if (pNode->m_Kind != ENode_LaDfa || !(pNode->m_Flags & ELaDfaNodeFlag_IsLeaf))
+	if (pNode->m_Kind != ENode_LaDfa || !(pNode->m_Flags & ELaDfaNodeFlag_Leaf))
 		return pNode->m_MasterIndex;
 	
 	CLaDfaNode* pLaDfaNode = (CLaDfaNode*) pNode;
@@ -611,7 +611,7 @@ CLaDfaNode::ExportResolverMembers (lua::CLuaState* pLuaState)
 void
 CLaDfaNode::Export (lua::CLuaState* pLuaState)
 {
-	ASSERT (!(m_Flags & ELaDfaNodeFlag_IsLeaf));
+	ASSERT (!(m_Flags & ELaDfaNodeFlag_Leaf));
 
 	if (m_pResolver)
 	{

@@ -16,16 +16,19 @@ class CScope;
 
 enum EVariable
 {
+	EVariable_Undefined,
 	EVariable_Global,
 	EVariable_Local,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-	
-class CVariable:
-	public CModuleItem,
-	public CName,
-	public rtl::TListLink
+
+const tchar_t*
+GetVariableKindString (EVariable VariableKind);
+
+//.............................................................................
+
+class CVariable: public CNamedModuleItem
 {
 protected:
 	friend class CVariableMgr;
@@ -67,5 +70,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

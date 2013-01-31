@@ -36,6 +36,9 @@ template <typename T>
 class CBoxIteratorT: public CIteratorBaseT <CBoxIteratorT <T> >
 {
 public:
+	typedef CImplicitCastT <CBoxListEntryT <T>*, TListLink*> CLink;
+
+public:
 	CBoxIteratorT ()
 	{
 	}
@@ -79,13 +82,12 @@ template <
 class CBoxListT: public CListBaseT <
 	CBoxListEntryT <T>, 
 	CBoxIteratorT <T>,
-	typename mem::CStdFactoryT <CBoxListEntryT <T> >::CDelete, 
-	CImplicitCastT <CBoxListEntryT <T>*, TListLink*> 
+	typename mem::CStdFactoryT <CBoxListEntryT <T> >::CDelete
 	>
 {
 public:
 	typedef CBoxListEntryT <T> CEntry;
-	typedef CListBaseT <CEntry, CIterator, CDelete, CLink> CListBase;
+	typedef CListBaseT <CEntry, CIterator, CDelete> CListBase;
 
 public:
 	T
@@ -231,6 +233,22 @@ public:
 
 //.............................................................................
 
+template <typename T>
+class CConstBoxListT: public CConstListBaseT <T, CBoxIteratorT <T> > 
+{
+public:
+	CConstBoxListT ()
+	{ 
+	}
+
+	template <typename TInsertArg>
+	CConstBoxListT (const CBoxListT <T, TInsertArg>& List)
+	{ 
+		m_pList = List.GetList ();
+	}
+};
+
+//.............................................................................
+
 } // namespace rtl
 } // namespace axl
-

@@ -94,9 +94,6 @@
     <ClInclude Include="axl_jnc_Decl.h">
       <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_Attribute.h">
-      <Filter>module</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Value.h">
       <Filter>value</Filter>
     </ClInclude>
@@ -109,20 +106,11 @@
     <ClInclude Include="..\inc\axl_jnc_OperatorMgr.h">
       <Filter>operator</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_BinaryOperator.h">
-      <Filter>operator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_UnaryOperator.h">
-      <Filter>operator</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Variable.h">
       <Filter>variable</Filter>
     </ClInclude>
     <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h">
       <Filter>variable</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_CastOperator.h">
-      <Filter>operator</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Scope.h">
       <Filter>namespace</Filter>
@@ -133,23 +121,68 @@
     <ClInclude Include="..\inc\axl_jnc_LlvmBuilder.h">
       <Filter>module</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_PointerType.h">
-      <Filter>type</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_Closure.h">
       <Filter>value</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_VTableType.h">
-      <Filter>type</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_EventType.h">
       <Filter>type</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_FunctionPointerType.h">
+    <ClInclude Include="..\inc\axl_jnc_AttributeBlock.h">
+      <Filter>module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_FunctionPtrType.h">
       <Filter>type</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_PropertyPointerType.h">
+    <ClInclude Include="..\inc\axl_jnc_PropertyPtrType.h">
       <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_DataPtrType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Property.h">
+      <Filter>function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_ClassPtrType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_PropertyVerifier.h">
+      <Filter>function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_PropertyTemplate.h">
+      <Filter>function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_FunctionTypeOverload.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="axl_jnc_DeclTypeCalc.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_QualifiedName.h">
+      <Filter>namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnOp.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp_Arithmetic.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp_Assign.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp_Cmp.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnOp_Arithmetic.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnOp_Ptr.h">
+      <Filter>operator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -214,9 +247,6 @@
     <ClCompile Include="axl_jnc_PropertyType.cpp">
       <Filter>type</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_Attribute.cpp">
-      <Filter>module</Filter>
-    </ClCompile>
     <ClCompile Include="axl_jnc_AttributeMgr.cpp">
       <Filter>module</Filter>
     </ClCompile>
@@ -226,20 +256,11 @@
     <ClCompile Include="axl_jnc_OperatorMgr.cpp">
       <Filter>operator</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_BinaryOperator.cpp">
-      <Filter>operator</Filter>
-    </ClCompile>
-    <ClCompile Include="axl_jnc_UnaryOperator.cpp">
-      <Filter>operator</Filter>
-    </ClCompile>
     <ClCompile Include="axl_jnc_Variable.cpp">
       <Filter>variable</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_VariableMgr.cpp">
       <Filter>variable</Filter>
-    </ClCompile>
-    <ClCompile Include="axl_jnc_CastOperator.cpp">
-      <Filter>operator</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_Scope.cpp">
       <Filter>namespace</Filter>
@@ -250,54 +271,105 @@
     <ClCompile Include="axl_jnc_LlvmBuilder.cpp">
       <Filter>module</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_PointerType.cpp">
-      <Filter>type</Filter>
-    </ClCompile>
     <ClCompile Include="axl_jnc_Closure.cpp">
       <Filter>value</Filter>
-    </ClCompile>
-    <ClCompile Include="axl_jnc_VTableType.cpp">
-      <Filter>type</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_EventType.cpp">
       <Filter>type</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_FunctionPointerType.cpp">
+    <ClCompile Include="axl_jnc_AttributeBlock.cpp">
+      <Filter>module</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_FunctionPtrType.cpp">
       <Filter>type</Filter>
     </ClCompile>
-    <ClCompile Include="axl_jnc_PropertyPointerType.cpp">
+    <ClCompile Include="axl_jnc_PropertyPtrType.cpp">
       <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_DataPtrType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Property.cpp">
+      <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ClassPtrType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BitFieldType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_ImportType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_PropertyVerifier.cpp">
+      <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_PropertyTemplate.cpp">
+      <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_FunctionTypeOverload.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_DeclTypeCalc.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_QualifiedName.cpp">
+      <Filter>namespace</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_OperatorMgr_Call.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_OperatorMgr_DataRef.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_OperatorMgr_Member.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_OperatorMgr_Property.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnOp.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp_Arithmetic.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp_Cmp.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp_Assign.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnOp_Arithmetic.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnOp_Ptr.cpp">
+      <Filter>operator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="axl_jnc_AttributeBlock.llk">
-      <Filter>parser</Filter>
-    </None>
-    <None Include="axl_jnc_ClassSpecifier.llk">
-      <Filter>parser</Filter>
-    </None>
-    <None Include="axl_jnc_EnumSpecifier.llk">
-      <Filter>parser</Filter>
-    </None>
-    <None Include="axl_jnc_PropertySpecifier.llk">
-      <Filter>parser</Filter>
-    </None>
-    <None Include="axl_jnc_StructSpecifier.llk">
-      <Filter>parser</Filter>
-    </None>
     <None Include="axl_jnc_Stmt.llk">
-      <Filter>parser</Filter>
-    </None>
-    <None Include="axl_jnc_Decl.llk">
       <Filter>parser</Filter>
     </None>
     <None Include="axl_jnc_Expr.llk">
       <Filter>parser</Filter>
     </None>
-    <None Include="axl_jnc_UnionSpecifier.llk">
+    <None Include="axl_jnc_Declarator.llk">
       <Filter>parser</Filter>
     </None>
-    <None Include="axl_jnc_AutoEvSpecifier.llk">
+    <None Include="axl_jnc_Decl.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_DeclarationSpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_NamedTypeSpecifier.llk">
       <Filter>parser</Filter>
     </None>
   </ItemGroup>

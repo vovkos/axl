@@ -4,143 +4,101 @@
 
 namespace axl {
 namespace jnc {
-
+	
 //.............................................................................
 
 CPropertyType::CPropertyType ()
 {
-	m_ItemKind = EModuleItem_Property; // not just type 
 	m_TypeKind = EType_Property;
-	m_PropertyKind = EProperty_Undefined;
-	m_pGetter = NULL;
-	m_pPropertyPointerType = NULL;
-	m_pVTableStructType = NULL;	
-	m_pParentClassType = NULL;
-	m_ParentVTableIndex = -1;
-	m_pEventVariable = NULL;
-	m_pEventFieldMember = NULL;
+
+	m_pGetterType = NULL;
+	m_pAbstractPropertyMemberType = NULL;
+	m_pBindablePropertyType = NULL;
+	m_pVTableStructType = NULL;
+	m_pPropertyPtrTypeTuple = NULL;
+}
+
+CPropertyPtrType* 
+CPropertyType::GetPropertyPtrType (
+	EType TypeKind,
+	EPropertyPtrType PtrTypeKind,
+	int Flags
+	)
+{
+	return m_pModule->m_TypeMgr.GetPropertyPtrType (this, TypeKind, PtrTypeKind, Flags);
+}
+
+CStructType*
+CPropertyType::GetVTableStructType ()
+{
+	return m_pModule->m_TypeMgr.GetPropertyVTableStructType (this);
 }
 
 rtl::CStringA
-CPropertyType::GetAccessorSignature ()
+CPropertyType::CreateSignature (
+	CFunctionType* pGetterType,
+	const CFunctionTypeOverload& SetterType,
+	int Flags
+	)
 {
-	if (!m_AccessorSignature.IsEmpty ())
-		return m_AccessorSignature;
-
-	m_AccessorSignature = "{";
+	rtl::CStringA String = "Y";
 	
-	m_AccessorSignature.Append (m_pGetter->GetType ()->GetSignature ());
-	
-	size_t Count = m_Setter.GetOverloadCount ();
-	for (size_t i = 0; i < Count; i++)
+	if (Flags & EPropertyTypeFlag_Bindable)
+		String += 'b';
+
+	if (Flags & EPropertyTypeFlag_AutoGet)
+		String += 'a';
+
+	String += pGetterType->GetSignature ();
+
+	size_t OverloadCount = SetterType.GetOverloadCount ();
+	for (size_t i = 0; i < OverloadCount; i++)
 	{
-		CFunction* pSetter = m_Setter.GetFunction (i);
-		m_AccessorSignature.Append(pSetter->GetType ()->GetSignature ());
+		CFunctionType* pOverloadType = SetterType.GetOverload (i);
+		String += pOverloadType->GetSignature ();
 	}
-
-	m_AccessorSignature.Append ("}");
-	return m_AccessorSignature;
-}
-
-rtl::CStringA
-CPropertyType::GetShortAccessorSignature ()
-{
-	if (!m_ShortAccessorSignature.IsEmpty ())
-		return m_ShortAccessorSignature;
-
-	if (m_PropertyKind != EProperty_Member)
-	{
-		m_ShortAccessorSignature = GetAccessorSignature ();
-		return m_ShortAccessorSignature;
-	}
-
-	m_ShortAccessorSignature = "{";
-
-	m_ShortAccessorSignature.Append (m_pGetter->GetShortType ()->GetSignature ());
-	
-	size_t Count = m_Setter.GetOverloadCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pSetter = m_Setter.GetFunction (i);
-		m_ShortAccessorSignature.Append(pSetter->GetShortType ()->GetSignature ());
-	}
-
-	m_ShortAccessorSignature.Append ("}");
-	return m_ShortAccessorSignature;
-}
-
-rtl::CString
-CPropertyType::CreateTypeString ()
-{
-	ASSERT (m_pGetter);
-
-	rtl::CString String;
-	String.Format (
-		m_Setter.IsEmpty () ? _T("%s const property %s") : _T("%s property %s"), 
-		m_pGetter->GetType ()->GetReturnType ()->GetTypeString (),
-		GetQualifiedName ()
-		);
 
 	return String;
 }
 
+rtl::CString
+CPropertyType::GetTypeModifierString ()
+{
+	if (!m_TypeModifierString.IsEmpty ())
+		return m_TypeModifierString;
+
+	if (IsReadOnly ())
+		m_TypeModifierString += _T(" const");
+
+	if (m_Flags & EPropertyTypeFlag_Bindable)
+		m_TypeModifierString += _T(" bindable");
+
+	if (m_Flags & EPropertyTypeFlag_AutoGet)
+		m_TypeModifierString += _T(" autoget");
+
+	if (IsIndexed ())
+		m_TypeModifierString += _T(" indexed");
+
+	return m_TypeModifierString;
+}
+
 void
-CPropertyType::TagAccessors ()
+CPropertyType::PrepareTypeString ()
 {
-	ASSERT (!m_Name.IsEmpty ());
+	CType* pReturnType = GetReturnType ();
 
-	rtl::CString Tag = GetQualifiedName ();
-
-	m_pGetter->m_Tag = Tag;
-	m_pGetter->m_Tag += _T(".get");
-
-	Tag += _T(".set");
-
-	size_t Count = m_Setter.GetOverloadCount ();
-	for (size_t i = 0; i < Count; i++)
+	m_TypeString = pReturnType->GetTypeString ();
+	m_TypeString += GetTypeModifierString ();
+	m_TypeString += _T(" property");
+	
+	if (IsIndexed ())
 	{
-		CFunction* pFunction = m_Setter.GetFunction (i);
-		pFunction->m_Tag = Tag;
+		m_TypeString += _T(' ');
+		m_TypeString += m_pGetterType->GetArgTypeString ();
 	}
-}
-
-bool
-CPropertyType::CalcLayout ()
-{
-	if (m_Flags & ETypeFlag_IsLayoutReady)
-		return true;
-
-	bool Result = PreCalcLayout ();
-	if (!Result)
-		return false;
-
-	CreateVTableStructType ();
-
-	AddFunctionToVTable (m_pGetter);
-
-	size_t Count = m_Setter.GetOverloadCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pSetter = m_Setter.GetFunction (i);
-		AddFunctionToVTable (pSetter);
-	}
-
-	Result = m_pVTableStructType->CalcLayout ();
-	if (!Result)
-		return false;
-
-	PostCalcLayout ();
-
-	return true;
-}
-
-CPropertyPointerType* 
-CPropertyType::GetPropertyPointerType ()
-{
-	return m_pModule->m_TypeMgr.GetPropertyPointerType (this);
 }
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

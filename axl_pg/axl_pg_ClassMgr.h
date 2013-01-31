@@ -13,11 +13,11 @@ namespace pg {
 
 enum EClassFlag
 {
-	EClassFlag_IsDefault   = 0x01,
-	EClassFlag_IsNamed     = 0x02,
-	EClassFlag_IsDefined   = 0x04,
-	EClassFlag_IsUsed      = 0x08,
-	EClassFlag_IsReachable = 0x10,
+	EClassFlag_Default   = 0x01,
+	EClassFlag_Named     = 0x02,
+	EClassFlag_Defined   = 0x04,
+	EClassFlag_Used      = 0x08,
+	EClassFlag_Reachable = 0x10,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

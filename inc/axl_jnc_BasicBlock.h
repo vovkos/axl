@@ -11,23 +11,10 @@ class CFunction;
 
 //.............................................................................
 
-enum EHasReturn
-{
-	EHasReturn_Undefined,
-	EHasReturn_None,
-	EHasReturn_Some,
-	EHasReturn_All,
-	EHasReturn_Explicit,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 enum EBasicBlockFlag
 {
-	EBasicBlockFlag_IsHasReturnReady  = 0x01,
-	EBasicBlockFlag_IsHasReturnCalc   = 0x02,
-	EBasicBlockFlag_IsUnreachable     = 0x10,
-	EBasicBlockFlag_IsJumped          = 0x20,
+	EBasicBlockFlag_Unreachable     = 0x10,
+	EBasicBlockFlag_Jumped          = 0x20,
 };		
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -41,17 +28,11 @@ protected:
 	CFunction* m_pFunction;
 	llvm::BasicBlock* m_pLlvmBlock;
 
-	rtl::CArrayT <CBasicBlock*> m_JumpArray;
-
-	EHasReturn m_HasReturn;
 	int m_Flags;
 
 public:
 	CBasicBlock ();
 
-	EHasReturn
-	HasReturn ();
-	
 	int 
 	GetFlags ()
 	{
@@ -59,7 +40,13 @@ public:
 	}
 
 	bool
-	IsTerminal ()
+	HasTerminator ()
+	{
+		return m_pLlvmBlock->getTerminator () != NULL;
+	}
+
+	bool
+	HasReturn ()
 	{
 		llvm::TerminatorInst* pInst = m_pLlvmBlock->getTerminator ();
 		return pInst && pInst->getOpcode () == llvm::Instruction::Ret;
@@ -86,5 +73,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {

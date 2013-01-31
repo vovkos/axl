@@ -10,9 +10,9 @@ namespace axl {
 namespace jnc {
 
 class CFunctionType;
-class CFunctionPointerType;
+class CFunctionPtrType;
 class CPropertyType;
-class CPropertyPointerType;
+class CPropertyPtrType;
 
 //.............................................................................
 
@@ -88,5 +88,5 @@ public:
 
 //.............................................................................
 
-} // namespace axl {
 } // namespace jnc {
+} // namespace axl {
