@@ -156,6 +156,10 @@ CModulePane::AddItem (
 		AddFunction (hParent, (jnc::CFunction*) pItem);
 		break;
 
+	case jnc::EModuleItem_Property:
+		AddProperty (hParent, (jnc::CProperty*) pItem);
+		break;
+
 	case jnc::EModuleItem_EnumMember:
 		AddEnumMember (hParent, (jnc::CEnumMember*) pItem);
 		break;

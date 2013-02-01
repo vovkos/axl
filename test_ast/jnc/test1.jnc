@@ -1,5 +1,4 @@
-
-int autoget indexed property* foo ();
+float indexed property foo (int a, int b);
 
 //.............................................................................
 

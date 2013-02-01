@@ -86,27 +86,30 @@ CFunction::CFunction ()
 rtl::CString
 CFunction::CreateArgString ()
 {
+	rtl::CString String = _T('(');
+
 	if (m_ArgList.IsEmpty ())
-	return 
-		(m_pType->GetFlags () & EFunctionTypeFlag_VarArg) ? 
-		(m_pType->GetFlags () & EFunctionTypeFlag_UnsafeVarArg) ? 
-		_T("(unsafe ...)") : _T("(safe ...)") : _T("()");
+	{
+		rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
+		size_t ArgCount = ArgTypeArray.GetCount ();
 
-	rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
+		if (ArgCount)
+		{
+			String += ArgTypeArray [0]->GetTypeString ();
 
-	rtl::CString String;
-	String.Format (
-		_T("(%s %s"), 
-		Arg->GetType ()->GetTypeString (),
-		Arg->GetName ()
-		);
+			for (size_t i = 1; i < ArgCount; i++)
+				String.AppendFormat (_T(", %s"), ArgTypeArray [i]->GetTypeString ());
+		}
+	}
+	else
+	{
+		rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
 
-	for (Arg++; Arg; Arg++)
-		String.AppendFormat (
-			_T(", %s %s"), 
-			Arg->GetType ()->GetTypeString (),
-			Arg->GetName ()
-			);
+		String.AppendFormat (_T("%s %s"), Arg->GetType ()->GetTypeString (), Arg->GetName ());
+
+		for (Arg++; Arg; Arg++)
+			String.AppendFormat (_T(", %s %s"), Arg->GetType ()->GetTypeString (), Arg->GetName ());
+	}
 
 	if (!(m_pType->GetFlags () & EFunctionTypeFlag_VarArg))
 		String.Append (_T(")"));

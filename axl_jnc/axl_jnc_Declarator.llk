@@ -78,7 +78,7 @@ initializer_list_entry <CType* $pType>
 	: initializer <$pType>
 	| epsilon
 	;
-	
+
 //.............................................................................
 
 declarator_name <CDeclarator* $pDeclarator>

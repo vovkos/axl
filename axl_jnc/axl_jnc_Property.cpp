@@ -46,7 +46,7 @@ CProperty::Create (CPropertyType* pType)
 	{
 		CFunctionType* pSetterType = pType->GetSetterType ().GetOverload (i);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Setter, pSetterType);
-		Result = AddMethodMember (pGetter);
+		Result = AddMethodMember (pSetter);
 		if (!Result)
 			return false;
 	}

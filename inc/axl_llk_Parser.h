@@ -34,13 +34,13 @@ protected:
 	{
 		EFlag_BuildingAst = 1,
 		EFlag_TokenMatch  = 2,
-		EFlag_TokenSaved  = 4,
 	};
 
 	enum EMatchResult
 	{
 		EMatchResult_Fail,
 		EMatchResult_NextToken,
+		EMatchResult_NextTokenNoAdvance,
 		EMatchResult_Continue,
 	};
 
@@ -68,8 +68,10 @@ protected:
 	rtl::CArrayT <CLaDfaNode*> m_ResolverStack;
 	
 	rtl::CBoxListT <CToken> m_TokenList;
-	CToken m_LastMatchedToken;
+	rtl::CBoxIteratorT <CToken> m_TokenCursor;
+
 	CToken m_CurrentToken;
+	CToken m_LastMatchedToken;
 
 	int m_Flags;
 	
@@ -114,6 +116,11 @@ public:
 	bool
 	ParseToken (const CToken* pToken)
 	{
+		bool Result;
+
+		m_TokenCursor = m_TokenList.InsertTail (*pToken);
+		m_CurrentToken = *pToken;
+
 		size_t* pParseTable = ((T*) this)->GetParseTable ();
 		size_t TokenIndex = ((T*) this)->GetTokenIndex (pToken->m_Token);
 		ASSERT (TokenIndex < T::TokenCount);
@@ -127,10 +134,7 @@ public:
 				PushPrediction (ProductionIndex);
 		}
 
-		CToken Token = *pToken;
-		m_CurrentToken = Token;
-
-		m_Flags &= ~(EFlag_TokenMatch | EFlag_TokenSaved);
+		m_Flags &= ~EFlag_TokenMatch;
 
 		for (;;)
 		{
@@ -139,36 +143,26 @@ public:
 			CNode* pNode = GetPredictionTop ();
 			if (!pNode)
 			{
-				MatchResult = MatchEmptyPredictionStack (&Token);				
+				MatchResult = MatchEmptyPredictionStack ();				
 			}
 			else
-			{
-				// if resolver is active, we need to save all tokens for re-parse
-				// at the same time we want to prevent saving them twice due to re-submission from lookahead dfa
-
-				CLaDfaNode* pPreResolverNode = GetPreResolverTop ();
-				if (pPreResolverNode && pNode->m_Kind != ENode_LaDfa && !(m_Flags & EFlag_TokenSaved))
-				{
-					pPreResolverNode->m_ResolverTokenList.InsertTail (Token);
-					m_Flags |= EFlag_TokenSaved;
-				}
-				
+			{		
 				switch (pNode->m_Kind)
 				{
 				case ENode_Token:
-					MatchResult = MatchTokenNode ((CTokenNode*) pNode, &Token, TokenIndex);				
+					MatchResult = MatchTokenNode ((CTokenNode*) pNode, TokenIndex);				
 					break;
 
 				case ENode_Symbol:
-					MatchResult = MatchSymbolNode ((CSymbolNode*) pNode, &Token, pParseTable, TokenIndex);
+					MatchResult = MatchSymbolNode ((CSymbolNode*) pNode, pParseTable, TokenIndex);
 					break;
 
 				case ENode_Sequence:
-					MatchResult = MatchSequenceNode (pNode, &Token);
+					MatchResult = MatchSequenceNode (pNode);
 					break;
 
 				case ENode_Action:
-					MatchResult = MatchActionNode (pNode, &Token);
+					MatchResult = MatchActionNode (pNode);
 					break;
 
 				case ENode_Argument:
@@ -178,7 +172,7 @@ public:
 					break;
 
 				case ENode_LaDfa:
-					MatchResult = MatchLaDfaNode ((CLaDfaNode*) pNode, &Token);
+					MatchResult = MatchLaDfaNode ((CLaDfaNode*) pNode);
 					break;
 
 				default:
@@ -192,24 +186,30 @@ public:
 					return false;
 
 				MatchResult = RollbackResolver ();
+				ASSERT (MatchResult != EMatchResult_Fail); // failed resolver means there is another possibility!
 			}
 
-			if (MatchResult == EMatchResult_NextToken)
+			switch (MatchResult)
 			{
-				bool Result = GetNextToken (&Token);
+			case EMatchResult_Continue:
+				break;
+
+			case EMatchResult_NextToken:
+				Result = AdvanceTokenCursor ();
 				if (!Result)
 					return true; // no more tokens, we are done
 
-				m_CurrentToken = Token;
+				// fall through
 
-				TokenIndex = ((T*) this)->GetTokenIndex (Token.m_Token);
+			case EMatchResult_NextTokenNoAdvance:
+				m_CurrentToken = *m_TokenCursor;		
+				TokenIndex = ((T*) this)->GetTokenIndex (m_CurrentToken.m_Token);
 				ASSERT (TokenIndex < T::TokenCount);
+				m_Flags &= ~EFlag_TokenMatch;
+				break;
 
-				m_Flags &= ~(EFlag_TokenMatch | EFlag_TokenSaved);
-			}
-			else
-			{
-				ASSERT (MatchResult == EMatchResult_Continue);
+			default:
+				ASSERT (false);
 			}
 		}
 	}
@@ -255,7 +255,7 @@ public:
 		TRACE ("TOKEN LIST (%d tokens):\n", m_TokenList.GetCount ());
 		for (; Token; Token++)
 		{
-			TRACE ("%s '%s'\n", Token->GetName (), Token->GetText ());
+			TRACE ("%s '%s' %s\n", Token->GetName (), Token->GetText (), Token == m_TokenCursor ? "<--" : "");
 		}
 	}
 
@@ -295,33 +295,38 @@ public:
 
 protected:
 	bool
-	GetNextToken (CToken* pToken)
+	AdvanceTokenCursor ()
 	{
-		if (m_TokenList.IsEmpty ())
+		m_TokenCursor++;
+
+		CNode* pNode = GetPredictionTop ();
+		if (m_ResolverStack.IsEmpty () && (!pNode || pNode->m_Kind != ENode_LaDfa))
+		{
+			m_TokenList.RemoveHead (); // nobody gonna reparse you bitch
+			ASSERT (m_TokenCursor == m_TokenList.GetHead());
+		}
+
+		if (!m_TokenCursor)
 			return false;
 
-		*pToken = m_TokenList.RemoveHead ();
 		return true;
 	}
 
 	// match against different kinds of nodes on top of prediction stack
 	
 	EMatchResult 
-	MatchEmptyPredictionStack (const CToken* pToken)
+	MatchEmptyPredictionStack ()
 	{
-		if ((m_Flags & EFlag_TokenMatch) || pToken->m_Token == T::EofToken)
+		if ((m_Flags & EFlag_TokenMatch) || m_CurrentToken.m_Token == T::EofToken)
 			return EMatchResult_NextToken;
 
-		if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
-			err::SetFormatStringError (_T("prediction stack empty while parsing '%s'"), pToken->GetName ());
-
+		err::SetFormatStringError (_T("prediction stack empty while parsing '%s'"), m_CurrentToken.GetName ());
 		return EMatchResult_Fail;
 	}
 
 	EMatchResult 
 	MatchTokenNode (
 		CTokenNode* pNode,
-		const CToken* pToken,
 		size_t TokenIndex
 		)
 	{
@@ -333,7 +338,7 @@ protected:
 			if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
 			{
 				int ExpectedToken = ((T*) this)->GetTokenFromIndex (pNode->m_Index);
-				err::SetExpectedTokenError (CToken::GetName (ExpectedToken), pToken->GetName ());
+				err::SetExpectedTokenError (CToken::GetName (ExpectedToken), m_CurrentToken.GetName ());
 			}
 
 			return EMatchResult_Fail;
@@ -341,21 +346,20 @@ protected:
 
 		if (pNode->m_Flags & ENodeFlag_Locator)
 		{
-			pNode->m_Token = *pToken;
+			pNode->m_Token = m_CurrentToken;
 			pNode->m_Flags |= ENodeFlag_Matched;
 		}
 
-		m_LastMatchedToken = *pToken;
+		m_LastMatchedToken = m_CurrentToken;
 		m_Flags |= EFlag_TokenMatch;
 
 		PopPrediction ();
-		return EMatchResult_Continue;
+		return EMatchResult_Continue; // don't advance to next token just yet (execute following actions)
 	}
 
 	EMatchResult 
 	MatchSymbolNode (
 		CSymbolNode* pNode,
-		const CToken* pToken,
 		size_t* pParseTable,
 		size_t TokenIndex
 		)
@@ -392,10 +396,9 @@ protected:
 		{
 			if (pNode->m_pAstNode)
 			{
-				pNode->m_pAstNode->m_FirstToken = *pToken;
-				pNode->m_pAstNode->m_LastToken = *pToken;
-
-				m_LastMatchedToken = *pToken;
+				pNode->m_pAstNode->m_FirstToken = m_CurrentToken;
+				pNode->m_pAstNode->m_LastToken = m_CurrentToken;
+				m_LastMatchedToken = m_CurrentToken;
 			}
 					
 			CNode* pArgument = GetArgument ();
@@ -422,7 +425,7 @@ protected:
 			{
 				CSymbolNode* pSymbol = GetSymbolTop ();
 				ASSERT (pSymbol);
-				err::SetFormatStringError (_T("unexpected token '%s' in '%s'"), pToken->GetName (), ((T*) this)->GetSymbolName (pSymbol->m_Index));
+				err::SetFormatStringError (_T("unexpected token '%s' in '%s'"), m_CurrentToken.GetName (), ((T*) this)->GetSymbolName (pSymbol->m_Index));
 			}
 			
 			return EMatchResult_Fail;
@@ -438,10 +441,7 @@ protected:
 	}
 
 	EMatchResult 
-	MatchSequenceNode (
-		CNode* pNode,
-		const CToken* pToken
-		)
+	MatchSequenceNode (CNode* pNode)
 	{
 		if (m_Flags & EFlag_TokenMatch)
 			return EMatchResult_NextToken;
@@ -456,10 +456,7 @@ protected:
 	}
 
 	EMatchResult 
-	MatchActionNode (
-		CNode* pNode,
-		const CToken* pToken
-		)
+	MatchActionNode (CNode* pNode)
 	{
 		bool Result = ((T*) this)->Action (pNode->m_Index);
 		if (!Result)
@@ -470,10 +467,7 @@ protected:
 	}
 
 	EMatchResult 
-	MatchLaDfaNode (
-		CLaDfaNode* pNode,
-		const CToken* pToken
-		)
+	MatchLaDfaNode (CLaDfaNode* pNode)
 	{
 		if (pNode->m_Flags & ELaDfaNodeFlag_PreResolver) 
 		{
@@ -484,41 +478,40 @@ protected:
 			size_t ProductionIndex = pNode->m_ResolverThenIndex;
 			ASSERT (ProductionIndex < T::LaDfaFirst);
 
-			// add tokens for re-parse 
-
-			m_TokenList.InsertListHead (&pNode->m_ResolverTokenList);
-			m_TokenList.InsertListHead (&pNode->m_DfaTokenList);
+			m_TokenCursor = pNode->m_ReparseLaDfaTokenCursor;
 
 			PopPreResolver ();
 			PopPrediction ();						
 			PushPrediction (ProductionIndex);
 
-			return EMatchResult_NextToken;
+			return EMatchResult_NextTokenNoAdvance;
 		}
+
+		if (!pNode->m_ReparseLaDfaTokenCursor)
+			pNode->m_ReparseLaDfaTokenCursor = m_TokenCursor;
 
 		TLaDfaTransition Transition = { 0 };
 		
-		ELaDfaResult Result = ((T*) this)->LaDfa (pNode->m_Index, pToken->m_Token, &Transition);
-		switch (Result)
+		ELaDfaResult LaDfaResult = ((T*) this)->LaDfa (pNode->m_Index, m_CurrentToken.m_Token, &Transition);
+		switch (LaDfaResult)
 		{
-		case ELaDfaResult_Fail:
-			if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
-			{
-				CSymbolNode* pSymbol = GetSymbolTop ();
-				ASSERT (pSymbol);					
-				err::SetFormatStringError (_T("unexpected token '%s' while trying to resolve conflict in '%s'"), pToken->GetName (), ((T*) this)->GetSymbolName (pSymbol->m_Index));
-			}
-
-			return EMatchResult_Fail;
-
 		case ELaDfaResult_Production:
 			if (Transition.m_ProductionIndex >= T::LaDfaFirst && 
 				Transition.m_ProductionIndex < T::LaDfaEnd)
 			{
 				// stil in lookahead DFA, need more tokens...				
-				pNode->m_DfaTokenList.InsertTail (*pToken);
 				pNode->m_Index = Transition.m_ProductionIndex - T::LaDfaFirst;
 				return EMatchResult_NextToken;
+			}
+			else
+			{
+				// resolved! continue parsing
+				m_TokenCursor = pNode->m_ReparseLaDfaTokenCursor;
+
+				PopPrediction ();
+				PushPrediction (Transition.m_ProductionIndex);
+
+				return EMatchResult_NextTokenNoAdvance;
 			}
 
 			break;
@@ -527,24 +520,23 @@ protected:
 			pNode->m_Flags = Transition.m_Flags;
 			pNode->m_ResolverThenIndex = Transition.m_ProductionIndex;
 			pNode->m_ResolverElseIndex = Transition.m_ResolverElseIndex;
+			pNode->m_ReparseResolverTokenCursor = m_TokenCursor;
 			PushPreResolver (pNode);
 			PushPrediction (Transition.m_ResolverIndex);
 			return EMatchResult_Continue;
 
 		default:
-			ASSERT (false);
+			ASSERT (LaDfaResult == ELaDfaResult_Fail);
+
+			if (m_ResolverStack.IsEmpty ()) // can't rollback so set error
+			{
+				CSymbolNode* pSymbol = GetSymbolTop ();
+				ASSERT (pSymbol);					
+				err::SetFormatStringError (_T("unexpected token '%s' while trying to resolve conflict in '%s'"), m_CurrentToken.GetName (), ((T*) this)->GetSymbolName (pSymbol->m_Index));
+			}
+
+			return EMatchResult_Fail;
 		}
-
-		// add tokens for re-parse
-
-		m_TokenList.InsertHead (*pToken);
-		m_TokenList.InsertListHead (&pNode->m_DfaTokenList);
-
-		// resolve and continue parsing
-
-		PopPrediction ();
-		PushPrediction (Transition.m_ProductionIndex);
-		return EMatchResult_NextToken;
 	}
 
 	// rollback
@@ -581,9 +573,7 @@ protected:
 		ASSERT (GetPredictionTop () == pLaDfaNode);
 		PopPreResolver ();
 
-		// add tokens for re-parse
-
-		m_TokenList.InsertListHead (&pLaDfaNode->m_ResolverTokenList);
+		m_TokenCursor = pLaDfaNode->m_ReparseResolverTokenCursor;
 
 		// switch to resolver-else branch
 
@@ -593,28 +583,21 @@ protected:
 			// still in lookahead DFA after rollback...
 
 			pLaDfaNode->m_Index = pLaDfaNode->m_ResolverElseIndex - T::LaDfaFirst;
-			pLaDfaNode->m_Flags &= ~ELaDfaNodeFlag_PreResolver;
 			
 			if (!(pLaDfaNode->m_Flags & ELaDfaNodeFlag_HasChainedResolver))
 			{
 				// if no chained resolver, advance one token forward
-
-				rtl::CBoxListEntryT <CToken>* pEntry = m_TokenList.RemoveHeadEntry (); 
-				pLaDfaNode->m_DfaTokenList.InsertTailEntry (pEntry);
+				m_TokenCursor++;
 			}
 		}
 		else
 		{
-			// add tokens from DFA for re-parse
-
-			m_TokenList.InsertListHead (&pLaDfaNode->m_DfaTokenList);
-
 			size_t ProductionIndex = pLaDfaNode->m_ResolverElseIndex;
 			PopPrediction ();
 			PushPrediction (ProductionIndex);
 		}
 
-		return EMatchResult_NextToken;
+		return EMatchResult_NextTokenNoAdvance;
 	}
 
 	// create nodes

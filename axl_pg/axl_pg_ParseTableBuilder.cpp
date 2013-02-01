@@ -73,7 +73,7 @@ CParseTableBuilder::Build ()
 	// or 
 	//	production is nullable and symbol' FOLLOW contains anytoken 
 	// then 
-	//	set ALL EMPTY parse table entries to this production
+	//	set all parse table entries to this production
 
 	for (size_t i = 0; i < SymbolCount; i++)
 	{
@@ -236,6 +236,9 @@ CParseTableBuilder::CalcFirstFollow ()
 		CSymbolNode* pNode = m_pNodeMgr->m_SymbolArray [i];
 		pNode->m_FirstSet.SetBitCount (TokenCount);
 		pNode->m_FollowSet.SetBitCount (TokenCount);
+
+		if (pNode->m_pResolver)
+			pNode->m_pResolver->m_FollowSet.SetBitResize (1); // set anytoken FOLLOW for resolver
 	}
 
 	rtl::CIteratorT <CSequenceNode> Sequence = m_pNodeMgr->m_SequenceList.GetHead ();
@@ -266,12 +269,6 @@ CParseTableBuilder::CalcFirstFollow ()
 				CGrammarNode* pProduction = pNode->m_ProductionArray [j];
 				if (PropagateParentChild (pNode, pProduction))
 					HasChanged = true;
-			}
-
-			if (pNode->m_pResolver)
-			{
-				if (pNode->m_pResolver->m_FollowSet.Merge (pNode->m_FollowSet, rtl::EBitOp_Or))
-					HasChanged = true;			
 			}
 		}
 

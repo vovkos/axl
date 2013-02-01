@@ -487,12 +487,11 @@ CPropertyType*
 CTypeMgr::GetIndexedPropertyType (
 	ECallConv CallConv,
 	CType* pReturnType,
-	CType* const* ppIndexArgType,
-	size_t IndexArgCount,
+	const rtl::CArrayT <CType*>& IndexArgTypeArray,
 	int Flags
 	)
 {
-	CFunctionType* pGetterType = GetFunctionType (CallConv, pReturnType, ppIndexArgType, IndexArgCount, 0);
+	CFunctionType* pGetterType = GetFunctionType (CallConv, pReturnType, IndexArgTypeArray, 0);
 
 	if (Flags & EPropertyTypeFlag_ReadOnly)
 	{
@@ -500,8 +499,7 @@ CTypeMgr::GetIndexedPropertyType (
 	}
 	else
 	{
-		rtl::CArrayT <CType*> ArgTypeArray;
-		ArgTypeArray.Copy (ppIndexArgType, IndexArgCount);
+		rtl::CArrayT <CType*> ArgTypeArray = IndexArgTypeArray;
 		ArgTypeArray.Append (pReturnType);
 
 		CFunctionType* pSetterType = GetFunctionType (CallConv, NULL, ArgTypeArray, 0);

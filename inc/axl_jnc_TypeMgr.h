@@ -315,10 +315,31 @@ public:
 	GetIndexedPropertyType (
 		ECallConv CallConv,
 		CType* pReturnType,
+		const rtl::CArrayT <CType*>& ArgTypeArray,
+		int Flags = 0
+		);
+
+	CPropertyType* 
+	GetIndexedPropertyType (
+		ECallConv CallConv,
+		CType* pReturnType,
 		CType* const* ppIndexArgType,
 		size_t IndexArgCount,
 		int Flags = 0
-		);
+		)
+	{
+		return GetIndexedPropertyType (CallConv, pReturnType, rtl::CArrayT <CType*> (ppIndexArgType, IndexArgCount), Flags);
+	}
+
+	CPropertyType* 
+	GetIndexedPropertyType (
+		CType* pReturnType,
+		const rtl::CArrayT <CType*>& ArgTypeArray,
+		int Flags = 0
+		)
+	{
+		return GetIndexedPropertyType (ECallConv_Default, pReturnType, ArgTypeArray, Flags);
+	}
 
 	CPropertyType* 
 	GetIndexedPropertyType (
@@ -328,7 +349,7 @@ public:
 		int Flags = 0
 		)
 	{
-		return GetIndexedPropertyType (ECallConv_Default, pReturnType, ppIndexArgType, IndexArgCount, Flags);
+		return GetIndexedPropertyType (ECallConv_Default, pReturnType, rtl::CArrayT <CType*> (ppIndexArgType, IndexArgCount), Flags);
 	}
 
 	CPropertyType* 

@@ -2,36 +2,42 @@
 
 LL (2);
 
-program
-	: EToken_SIZEOF type_name_or_expr
+declaration
+	: (type_specifier | type_modifier)* declarator ';'
 	;
 
-type_name_or_expr
-	: '(' type_name ')'
-	| primary_expr
-	;
-
-primary_expr
-	: EToken_Identifier
+type_specifier
+	: EToken_BYTE
 		{
-			printf ("primary_expr:EToken_Identifier\n");
+			printf ("spec:byte\n");
 		}
-	| '(' primary_expr ')'
-	;
-
-
-type_name
-	: resolver (type_name_rslv)
-	  EToken_Identifier
+	| resolver (type_property_specifier_rslv)
+	  EToken_PROPERTY EToken_Integer? EToken_Identifier $n '{' '}'
 		{
-			printf ("type_name:EToken_Identifier\n");
+			printf ("spec:property %s {}\n", $n.m_Data.m_String);
 		}
 	;
 
-type_name_rslv
+type_modifier
+	: EToken_PROPERTY
+		{
+			printf ("mod:property\n");
+		}
+	| EToken_CONST
+		{
+			printf ("mod:const\n");
+		}
+	;
+	
+type_property_specifier_rslv
+	: EToken_PROPERTY EToken_Identifier '{'
+	| EToken_PROPERTY EToken_Integer
+	;
+
+declarator
 	: EToken_Identifier
 		{
-			return $1.m_Data.m_String == "TStruct";
+			printf ("decl:id %s\n", $1.m_Data.m_String);
 		}
 	;
 

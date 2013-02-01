@@ -157,7 +157,7 @@ public:
 
 enum ELaDfaNodeFlag
 {
-	ELaDfaNodeFlag_PreResolver      = 0x0010,
+	ELaDfaNodeFlag_PreResolver        = 0x0010,
 	ELaDfaNodeFlag_HasChainedResolver = 0x0020,
 };
 
@@ -173,8 +173,8 @@ public:
 	size_t m_ResolverThenIndex;
 	size_t m_ResolverElseIndex;
 
-	rtl::CBoxListT <CToken> m_DfaTokenList;
-	rtl::CBoxListT <CToken> m_ResolverTokenList;
+	rtl::CBoxIteratorT <CToken> m_ReparseLaDfaTokenCursor;
+	rtl::CBoxIteratorT <CToken> m_ReparseResolverTokenCursor;
 
 public:
 	CLaDfaNodeT ()

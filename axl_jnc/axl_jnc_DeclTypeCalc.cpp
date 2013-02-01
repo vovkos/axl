@@ -333,7 +333,7 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 		pPropertyType = m_pModule->m_TypeMgr.GetIndexedPropertyType (
 			CallConv, 
 			pReturnType, 
-			pSuffix->GetArgTypeArray (), 
+			pSuffix->GetArgTypeArray (),
 			TypeFlags
 			);
 	}
