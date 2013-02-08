@@ -438,24 +438,9 @@ CModulePane::AddFunction (
 	jnc::CFunction* pFunction
 	)
 {
-	jnc::CFunctionType* pType = pFunction->GetType ();
-
 	if (!pFunction->IsOverloaded ())
 	{
-		rtl::CString Name = pFunction->GetFunctionKind () == jnc::EFunction_Named ?
-			pFunction->GetName () : 
-			jnc::GetFunctionKindString (pFunction->GetFunctionKind ());
-
-		rtl::CString ItemName;
-		ItemName.Format (
-			_T("%s %s %s"), 
-			pType->GetReturnType ()->GetTypeString (),
-			Name,
-			pFunction->CreateArgString ()
-			);
-
-		HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-		m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pFunction);
+		AddFunctionImpl (hParent, pFunction);
 	}
 	else
 	{
@@ -472,11 +457,35 @@ CModulePane::AddFunction (
 		for (size_t i = 0; i < Count; i++)
 		{
 			jnc::CFunction* pOverload = pFunction->GetOverload (i);
-			AddFunction (hItem, pOverload);
+			AddFunctionImpl (hItem, pOverload);
 		}
 
 		m_TreeCtrl.Expand (hItem, TVE_EXPAND);
 	}
+}
+
+void
+CModulePane::AddFunctionImpl (
+	HTREEITEM hParent,
+	jnc::CFunction* pFunction
+	)
+{
+	jnc::CFunctionType* pType = pFunction->GetType ();
+
+	rtl::CString Name = pFunction->GetFunctionKind () == jnc::EFunction_Named ?
+		pFunction->GetName () : 
+		jnc::GetFunctionKindString (pFunction->GetFunctionKind ());
+
+	rtl::CString ItemName;
+	ItemName.Format (
+		_T("%s %s %s"), 
+		pType->GetReturnType ()->GetTypeString (),
+		Name,
+		pFunction->CreateArgString ()
+		);
+
+	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
+	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pFunction);
 }
 
 void

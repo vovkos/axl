@@ -72,6 +72,12 @@ protected:
 		HTREEITEM hParent,
 		jnc::CFunction* pFunction
 		);
+	
+	void
+	AddFunctionImpl (
+		HTREEITEM hParent,
+		jnc::CFunction* pFunction
+		);
 
 	void
 	AddProperty (

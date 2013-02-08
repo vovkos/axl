@@ -1,23 +1,40 @@
 //.............................................................................
 
+/*
+
+int property MyIntProp;
+
 int
-foo (
-	char x, 
-	short y,
-	long z
-	)
+MyIntProp.get ()
 {
-	return printf ("foo (%d, %d, %d)\n", x, y, z);
+	printf ("MyIntProp.get ()\n");
+	return 100;
+}
+
+MyIntProp.set (int x)
+{
+	printf ("MyIntProp.set (%d)\n", x);
+}
+
+*/
+
+foo (int x)
+{
+	printf ("foo (%d)\n", x);
+}
+
+foo (double x)
+{
+	printf ("foo (%f)\n", x);
 }
 
 int
 main ()
 {
 	printf ("hui govno i muravei\n");
-
-	void function* fn (char) = foo ~(, 1, 2);
-
-	fn (100);
+	foo (100);
+	foo ((double) 200);
+//	MyIntProp = 100;
 	return 0;
 }
 

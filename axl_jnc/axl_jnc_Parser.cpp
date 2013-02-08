@@ -316,6 +316,8 @@ CParser::DeclareFunction (
 			err::SetFormatStringError (_T("invalid %s at global scope"), GetFunctionKindString (FunctionKind));
 			return false;
 		}
+
+		pFunction->m_pParentNamespace = pNamespace;
 	}
 
 	return true;
@@ -427,6 +429,8 @@ CParser::CreatePropertyImpl (
 			err::SetFormatStringError (_T("invalid storage specifier '%s' for a global property"), GetStorageKindString (m_StorageKind));
 			return false;
 		}
+
+		pProperty->m_pParentNamespace = pNamespace;
 	}
 	
 	return pProperty;

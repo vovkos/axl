@@ -157,7 +157,7 @@ COperatorMgr::SetPropertyOperator (
 {
 	ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyRef);
 
-	err::SetFormatStringError (_T("get property operator is not implemented yet"));
+	err::SetFormatStringError (_T("set property operator is not implemented yet"));
 	return false;
 
 /*
