@@ -32,14 +32,14 @@ CDataPtrType::CDataPtrType ()
 {
 	m_TypeKind = EType_DataPtr;
 	m_PtrTypeKind = EDataPtrType_Normal;
-	m_pDataType = NULL;
+	m_pTargetType = NULL;
 	m_Size = sizeof (TDataPtr);
 }
 
 CStructType* 
 CDataPtrType::GetDataPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetDataPtrStructType (m_pDataType);
+	return m_pModule->m_TypeMgr.GetDataPtrStructType (m_pTargetType);
 }
 
 rtl::CStringA
@@ -80,7 +80,7 @@ CDataPtrType::CreateSignature (
 void
 CDataPtrType::PrepareTypeString ()
 {
-	m_TypeString = m_pDataType->GetTypeString ();
+	m_TypeString = m_pTargetType->GetTypeString ();
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
@@ -111,7 +111,7 @@ CDataPtrType::PrepareLlvmType ()
 
 	case EDataPtrType_Thin:
 	case EDataPtrType_Unsafe:
-		m_pLlvmType = llvm::PointerType::get (m_pDataType->GetLlvmType (), 0);
+		m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
 		break;
 
 	default:

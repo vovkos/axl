@@ -453,6 +453,10 @@ public:
 		if (Index + Count >= OldCount)
 			return SetCount (Index);
 
+		bool Result = EnsureExclusive ();
+		if (!Result)
+			return false;
+
 		size_t NewCount = OldCount - Count;
 
 		T* pDst = m_p + Index;

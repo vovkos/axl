@@ -32,7 +32,7 @@ CClassPtrType::CClassPtrType ()
 {
 	m_TypeKind = EType_ClassPtr;
 	m_PtrTypeKind = EClassPtrType_Normal;
-	m_pClassType = NULL;
+	m_pTargetType = NULL;
 	m_Size = sizeof (TInterface*);
 }
 
@@ -69,7 +69,7 @@ CClassPtrType::CreateSignature (
 void
 CClassPtrType::PrepareTypeString ()
 {
-	m_TypeString = m_pClassType->GetTypeString ();
+	m_TypeString = m_pTargetType->GetTypeString ();
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
@@ -89,7 +89,7 @@ CClassPtrType::PrepareTypeString ()
 void
 CClassPtrType::PrepareLlvmType ()
 {
-	m_pLlvmType = llvm::PointerType::get (m_pClassType->GetInterfaceStructType ()->GetLlvmType (), 0);
+	m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetInterfaceStructType ()->GetLlvmType (), 0);
 }
 
 //.............................................................................

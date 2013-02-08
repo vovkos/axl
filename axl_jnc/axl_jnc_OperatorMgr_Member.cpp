@@ -88,11 +88,11 @@ COperatorMgr::MemberOperator (
 
 	CType* pType = OpValue.GetType ();
 	if (pType->GetTypeKind () == EType_DataRef)
-		pType = ((CDataPtrType*) pType)->GetDataType ();
+		pType = ((CDataPtrType*) pType)->GetTargetType ();
 
 	if (pType->GetTypeKind () == EType_DataPtr)
 	{
-		pType = ((CDataPtrType*) pType)->GetDataType ();
+		pType = ((CDataPtrType*) pType)->GetTargetType ();
 
 		Result = UnaryOperator (EUnOp_Indir, &OpValue);
 		if (!Result)
@@ -352,9 +352,7 @@ COperatorMgr::ClassMemberOperator (
 		return false;
 	}
 
-	bool Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue);
-	if (!Result)
-		return false;
+	CheckClassPtrNull (OpValue);
 
 	EModuleItem MemberKind = pMember->GetItemKind ();
 	switch (MemberKind)
@@ -372,18 +370,17 @@ COperatorMgr::ClassMemberOperator (
 		pResultValue->SetFunction ((CFunction*) pMember);
 		if (pDecl->GetStorageKind () != EStorage_Static)
 		{
-			CClosure* pClosure = pResultValue->CreateClosure (EClosure_Function);
+			CClosure* pClosure = pResultValue->CreateClosure ();
 			pClosure->GetArgList ()->InsertHead (OpValue);
 		}
 
 		break;
 
-	case EModuleItem_Type:
-		pResultValue->SetType ((CType*) pMember);
-		if (pResultValue->GetValueKind () == EValue_Property && 
-			pDecl->GetStorageKind () != EStorage_Static)
+	case EModuleItem_Property:
+		pResultValue->SetProperty ((CProperty*) pMember);
+		if (pDecl->GetStorageKind () != EStorage_Static)
 		{
-			CClosure* pClosure = pResultValue->CreateClosure (EClosure_Property);
+			CClosure* pClosure = pResultValue->CreateClosure ();
 			pClosure->GetArgList ()->InsertHead (OpValue);
 		}
 		break;
@@ -422,6 +419,7 @@ COperatorMgr::ClassFieldMemberOperator (
 	m_pModule->m_LlvmBuilder.CreateLoad (ScopeLevelValue, NULL, &ScopeLevelValue); // size_t m_ScopeLevel
 	
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
+	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (1, pClassType->GetFieldMember ()->GetLlvmIndex ());
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
 
 	size_t* p = pCoord->m_FieldCoord.m_LlvmIndexArray;
@@ -459,14 +457,14 @@ COperatorMgr::GetClassFieldMemberValue (
 {
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
-	CClassType* pClassType = ((CClassPtrType*) ObjValue.GetType ())->GetClassType ();
+	CClassType* pClassType = ((CClassPtrType*) ObjValue.GetType ())->GetTargetType ();
 
 	CValue FieldValue;
 	CClassBaseTypeCoord ClosureCoord;
 
 	return 
 		ClassFieldMemberOperator (ObjValue, pClassType, pMember, &ClosureCoord, &FieldValue) && 
-		LoadReferenceOperator (FieldValue, pValue);
+		LoadDataRef (FieldValue, pValue);
 }
 
 bool
@@ -478,14 +476,14 @@ COperatorMgr::SetClassFieldMemberValue (
 {
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
-	CClassType* pClassType = ((CClassPtrType*) ObjValue.GetType ())->GetClassType ();
+	CClassType* pClassType = ((CClassPtrType*) ObjValue.GetType ())->GetTargetType ();
 
 	CValue FieldValue;
 	CClassBaseTypeCoord ClosureCoord;
 
 	return 
 		ClassFieldMemberOperator (ObjValue, pClassType, pMember, &ClosureCoord, &FieldValue) && 
-		MoveOperator (Value, FieldValue);
+		BinaryOperator (EBinOp_Assign, FieldValue, Value);
 }
 
 bool

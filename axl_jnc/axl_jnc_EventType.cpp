@@ -78,7 +78,7 @@ CEventType::PrepareTypeString ()
 {
 	m_TypeString = _T("event ");
 	m_TypeString += m_pFunctionPtrType->GetTypeModifierString ();
-	m_TypeString += m_pFunctionPtrType->GetFunctionType ()->GetArgTypeString ();
+	m_TypeString += m_pFunctionPtrType->GetTargetType ()->GetArgTypeString ();
 }
 
 void

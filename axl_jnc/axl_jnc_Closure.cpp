@@ -25,24 +25,13 @@ GetClosureKindString (EClosure ClosureKind)
 
 //.............................................................................
 
-bool
-CClosure::IsClassMemberClosure (CValue* pIfaceValue)
+size_t
+CClosure::Append (const rtl::CConstBoxListT <CValue>& ArgList)
 {
-	if (m_ArgList.IsEmpty () || m_ArgList.GetHead ()->GetType ()->GetTypeKind () != EType_ClassPtr)
-		return false;
-
-	*pIfaceValue = *m_ArgList.GetHead ();
-	return true;
-}
-
-void
-CClosure::CombineClosure (rtl::CBoxListT <CValue>* pArgList)
-{
-	if (pArgList->IsEmpty ())
-		return;
+	ASSERT (!ArgList.IsEmpty ());
 
 	rtl::CBoxIteratorT <CValue> InternalArg = m_ArgList.GetHead ();
-	rtl::CBoxIteratorT <CValue> ExternalArg = pArgList->GetHead ();
+	rtl::CBoxIteratorT <CValue> ExternalArg = ArgList.GetHead ();
 	
 	for (;;)
 	{
@@ -57,11 +46,13 @@ CClosure::CombineClosure (rtl::CBoxListT <CValue>* pArgList)
 		ExternalArg++;
 
 		if (!ExternalArg)
-			return;
+			return m_ArgList.GetCount ();
 	}
 
 	for (; ExternalArg; ExternalArg++)
 		m_ArgList.InsertTail (*ExternalArg);
+
+	return m_ArgList.GetCount ();
 }
 
 bool
@@ -93,24 +84,17 @@ CClosure::Apply (rtl::CBoxListT <CValue>* pArgList)
 CType*
 CClosure::GetClosureType (CType* pType)
 {
-	CModule* pModule = pType->GetModule ();
-
-	int Flags = 0;
-	if (m_ClosureKind == EClosure_Property)
-		Flags |= EOpFlag_KeepPropertyRef;
-
-	pType = pModule->m_OperatorMgr.PrepareOperandType (pType, Flags);
 	EType TypeKind = pType->GetTypeKind ();
 
 	if (m_ClosureKind == EClosure_Function)
 	{
 		if (TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef)
-			return GetFunctionClosureType (((CFunctionPtrType*) pType)->GetFunctionType ());
+			return GetFunctionClosureType ((CFunctionPtrType*) pType);
 	}
 	else if (m_ClosureKind == EClosure_Property)
 	{
 		if (TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef)
-			return GetPropertyClosureType (((CPropertyPtrType*) pType)->GetPropertyType ());
+			return GetPropertyClosureType ((CPropertyPtrType*) pType);
 	}
 
 	err::SetFormatStringError (
@@ -122,14 +106,24 @@ CClosure::GetClosureType (CType* pType)
 	return NULL;
 }
 
-CFunctionType*
-CClosure::GetFunctionClosureType (CFunctionType* pType)
+CFunctionPtrType*
+CClosure::GetFunctionClosureType (CFunction* pFunction)
+{
+	ASSERT (m_ClosureKind == EClosure_Function);
+
+	err::SetFormatStringError (_T("function overload closures are not implemented yet"));
+	return NULL;
+}
+
+CFunctionPtrType*
+CClosure::GetFunctionClosureType (CFunctionPtrType* pPtrType)
 {
 	ASSERT (m_ClosureKind == EClosure_Function);
 
 	bool Result;
 
-	CModule* pModule = pType->GetModule ();
+	CModule* pModule = pPtrType->GetModule ();
+	CFunctionType* pType = pPtrType->GetTargetType ();
 
 	if (pType->GetFlags () & EFunctionTypeFlag_VarArg)
 	{
@@ -166,11 +160,21 @@ CClosure::GetFunctionClosureType (CFunctionType* pType)
 		ArgCount--;
 	}
 
-	return pModule->m_TypeMgr.GetFunctionType (pType->GetReturnType (), ArgTypeArray);
+	pType = pModule->m_TypeMgr.GetFunctionType (
+		pType->GetCallConv (),
+		pType->GetReturnType (), 
+		ArgTypeArray
+		);
+	
+	return pType->GetFunctionPtrType (
+		pPtrType->GetTypeKind (),
+		pPtrType->GetPtrTypeKind (), 
+		pPtrType->GetFlags ()
+		);
 }
 
-CPropertyType*
-CClosure::GetPropertyClosureType (CPropertyType* pType)
+CPropertyPtrType*
+CClosure::GetPropertyClosureType (CPropertyPtrType* pPtrType)
 {
 	ASSERT (m_ClosureKind == EClosure_Property);
 

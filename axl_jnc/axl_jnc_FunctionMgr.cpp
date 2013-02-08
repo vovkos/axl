@@ -10,9 +10,9 @@ namespace jnc {
 
 CFunctionMgr::CThunk::CThunk ()
 {
+	m_ThunkKind = EThunk_Undefined;
 	m_pTargetFunctionType = NULL;
 	m_pTargetFunction = NULL;
-	m_pFunctionPtrType = NULL;
 	m_pClosureType = NULL;
 	m_pThunkFunction = NULL;
 }
@@ -37,8 +37,9 @@ CFunctionMgr::Clear ()
 	m_OrphanFunctionArray.Clear ();
 	m_GlobalAutoEvTypeArray.Clear ();
 	m_AutoPropertyArray.Clear ();
-	m_ThunkMap.Clear ();
 	m_ThunkList.Clear ();
+	m_ThunkFunctionMap.Clear ();
+	m_ThunkPropertyMap.Clear ();
 
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
 	m_pCurrentFunction = NULL;
@@ -55,7 +56,7 @@ CFunctionMgr::CreateFunction (
 	pFunction->m_pModule = m_pModule;
 	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pType = pType;
-	pFunction->m_pShortType = pType;
+	pFunction->m_TypeOverload.AddOverload (pType);
 
 	if (pArgList)
 		pFunction->m_ArgList.TakeOver (pArgList);
@@ -373,45 +374,278 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 }
 
 CFunction*
-CFunctionMgr::GetThunkFunction (
+CFunctionMgr::GetDirectThunkFunction (
+	CFunction* pTargetFunction,
+	CFunctionType* pThunkFunctionType,
+	bool HasUnusedClosure
+	)
+{
+	char SignatureChar = 'D';
+	EThunk ThunkKind = EThunk_Direct;
+
+	if (HasUnusedClosure)
+	{
+		SignatureChar = 'U';
+		ThunkKind = EThunk_DirectUnusedClosure;
+		pThunkFunctionType = pThunkFunctionType->GetAbstractMethodMemberType ();
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format (
+		"%c%x.%s", 
+		HasUnusedClosure ? 'U' : 'D',
+		pTargetFunction, 
+		pThunkFunctionType->GetSignature ()
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CFunction*> Thunk = m_ThunkFunctionMap.Goto (Signature);
+	if (Thunk->m_Value)
+		return Thunk->m_Value;
+	
+	CFunction* pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
+	pThunkFunction->m_Tag = _T("_direct_thunk_function");
+
+	CThunk* pThunk = AXL_MEM_NEW (CThunk);
+	pThunk->m_ThunkKind = ThunkKind;
+	pThunk->m_pTargetFunctionType = pTargetFunction->GetType ();
+	pThunk->m_pTargetFunction = pTargetFunction;
+	pThunk->m_pThunkFunction = pThunkFunction;
+	m_ThunkList.InsertTail (pThunk);
+
+	Thunk->m_Value = pThunkFunction;
+	return pThunkFunction;
+}
+
+CFunction*
+CFunctionMgr::GetClosureThunkFunction (
 	CFunctionType* pTargetFunctionType,
 	CFunction* pTargetFunction,
 	CClassType* pClosureType,
 	const rtl::CArrayT <size_t>& ClosureMap,
-	CFunctionPtrType* pFunctionPtrType
+	CFunctionType* pThunkFunctionType
 	)
 {
 	rtl::CStringA Signature;
-	Signature.Format (_T("%s.%x.%s"), 
+	Signature.Format (_T("'C'%s.%x.%s"), 
 		pTargetFunctionType->GetSignature (),
 		pTargetFunction, 
-		pFunctionPtrType->GetSignature ()
+		pThunkFunctionType->GetSignature ()
 		);
 
 	size_t Count = ClosureMap.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 		Signature.AppendFormat (_T(".%d"), ClosureMap [i]);
 
-	rtl::CStringHashTableMapIteratorAT <CThunk*> Thunk = m_ThunkMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorAT <CFunction*> Thunk = m_ThunkFunctionMap.Goto (Signature);
 	if (Thunk->m_Value)
-		return Thunk->m_Value->m_pThunkFunction;
-
-	CFunctionType* pThunkFunctionType = pClosureType ?
-		pClosureType->GetMethodMemberType (pFunctionPtrType->GetFunctionType ()) :
-		pFunctionPtrType->GetFunctionType ();
+		return Thunk->m_Value;
+	
+	pThunkFunctionType = pClosureType->GetMethodMemberType (pThunkFunctionType);
+	
+	CFunction* pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
+	pThunkFunction->m_Tag = _T("_closure_thunk_function");
 
 	CThunk* pThunk = AXL_MEM_NEW (CThunk);
+	pThunk->m_ThunkKind = EThunk_Closure;
 	pThunk->m_pTargetFunctionType = pTargetFunctionType;
 	pThunk->m_pTargetFunction = pTargetFunction;
 	pThunk->m_pClosureType = pClosureType;
 	pThunk->m_ClosureMap = ClosureMap;
-	pThunk->m_pFunctionPtrType = pFunctionPtrType;
-	pThunk->m_pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
-	pThunk->m_pThunkFunction->m_Tag = _T("_thunk");
+	pThunk->m_pThunkFunction = pThunkFunction;
 	m_ThunkList.InsertTail (pThunk);
-	Thunk->m_Value = pThunk;
+	
+	Thunk->m_Value = pThunkFunction;
+	return pThunkFunction;
+}
 
-	return pThunk->m_pThunkFunction;
+CProperty*
+CFunctionMgr::GetDirectThunkProperty (
+	CProperty* pTargetProperty,
+	CPropertyType* pThunkPropertyType,
+	bool HasUnusedClosure
+	)
+{
+	char SignatureChar = 'D';
+	EThunk ThunkKind = EThunk_Direct;
+
+	if (HasUnusedClosure)
+	{
+		SignatureChar = 'U';
+		ThunkKind = EThunk_DirectUnusedClosure;
+		pThunkPropertyType = pThunkPropertyType->GetAbstractPropertyMemberType ();
+	}
+
+	rtl::CStringA Signature;
+	Signature.Format (
+		"%c%x.%s", 
+		HasUnusedClosure ? 'U' : 'D',
+		pTargetProperty, 
+		pThunkPropertyType->GetSignature ()
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
+	if (Thunk->m_Value)
+		return Thunk->m_Value;
+	
+	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
+	pThunkProperty->m_Tag = _T("_direct_thunk_property");
+	pThunkProperty->m_pGetter = GetDirectThunkFunction (
+		pTargetProperty->m_pGetter, 
+		pThunkPropertyType->GetGetterType (),
+		HasUnusedClosure
+		);
+
+	CFunctionTypeOverload* pThunkSetterType = pThunkPropertyType->GetSetterType ();
+	size_t SetterCount = pThunkSetterType->GetOverloadCount ();
+
+	// all the checks should have been done at CheckCast ()
+
+	ASSERT (SetterCount == 0 || pTargetProperty->m_pSetter); 
+	
+	for (size_t i = 0; i < SetterCount; i++)
+	{
+		CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
+		CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
+		ASSERT (pTargetSetter);
+
+		CFunction* pThunkFunction = GetDirectThunkFunction (
+			pTargetSetter, 
+			pThunkFunctionType,
+			HasUnusedClosure
+			);
+
+		if (!pThunkProperty->m_pSetter)
+		{
+			pThunkProperty->m_pSetter = pThunkFunction;
+		}
+		else
+		{
+			bool Result = pThunkProperty->m_pSetter->AddOverload (pThunkFunction);
+			ASSERT (Result);
+		}
+	}
+
+	Thunk->m_Value = pThunkProperty;
+	return pThunkProperty;
+}
+
+CProperty*
+CFunctionMgr::GetClosureThunkProperty (
+	CPropertyType* pTargetPropertyType,
+	CProperty* pTargetProperty,
+	CClassType* pClosureType,
+	const rtl::CArrayT <size_t>& ClosureMap,
+	CPropertyType* pThunkPropertyType
+	)
+{
+	rtl::CStringA Signature;
+	Signature.Format (_T("'C'%s.%x.%s"), 
+		pTargetPropertyType->GetSignature (),
+		pTargetProperty, 
+		pThunkPropertyType->GetSignature ()
+		);
+
+	size_t Count = ClosureMap.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+		Signature.AppendFormat (_T(".%d"), ClosureMap [i]);
+
+	rtl::CStringHashTableMapIteratorAT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
+	if (Thunk->m_Value)
+		return Thunk->m_Value;
+	
+	pThunkPropertyType = pClosureType->GetPropertyMemberType (pThunkPropertyType);
+	
+	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
+	pThunkProperty->m_Tag = _T("_closure_thunk_property");
+
+	// i use ASSERT () cause all the checks should have been done at CheckCast ()
+
+	if (pTargetProperty)
+	{
+		pThunkProperty->m_pGetter = GetClosureThunkFunction (
+			pTargetProperty->m_pGetter->GetType (), 
+			pTargetProperty->m_pGetter, 
+			pClosureType,
+			ClosureMap, 
+			pThunkPropertyType->GetGetterType ()
+			);
+
+		CFunctionTypeOverload* pThunkSetterType = pThunkPropertyType->GetSetterType ();
+		size_t SetterCount = pThunkSetterType->GetOverloadCount ();
+
+		ASSERT (SetterCount == 0 || pTargetProperty->m_pSetter); 
+	
+		for (size_t i = 0; i < SetterCount; i++)
+		{
+			CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
+			CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
+			ASSERT (pTargetSetter);
+
+			CFunction* pThunkFunction = GetClosureThunkFunction (
+				pTargetSetter->GetType (), 
+				pTargetSetter,
+				pClosureType,
+				ClosureMap,
+				pThunkFunctionType
+				);
+
+			if (!pThunkProperty->m_pSetter)
+			{
+				pThunkProperty->m_pSetter = pThunkFunction;
+			}
+			else
+			{
+				bool Result = pThunkProperty->m_pSetter->AddOverload (pThunkFunction);
+				ASSERT (Result);
+			}
+		}
+	}
+	else
+	{
+		pThunkProperty->m_pGetter = GetClosureThunkFunction (
+			pTargetPropertyType->GetGetterType (), 
+			NULL, 
+			pClosureType,
+			ClosureMap, 
+			pThunkPropertyType->GetGetterType ()
+			);
+
+		CFunctionTypeOverload* pTargetSetterType = pTargetPropertyType->GetSetterType ();
+	
+		CFunctionTypeOverload* pThunkSetterType = pThunkPropertyType->GetSetterType ();
+		size_t SetterCount = pThunkSetterType->GetOverloadCount ();
+
+		for (size_t i = 0; i < SetterCount; i++)
+		{
+			CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
+
+			size_t j = pTargetSetterType->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
+			ASSERT (j != -1);
+
+			CFunctionType* pTargetFunctionType = pTargetSetterType->GetOverload (j);
+
+			CFunction* pThunkFunction = GetClosureThunkFunction (
+				pTargetFunctionType,
+				NULL,
+				pClosureType,
+				ClosureMap,
+				pThunkFunctionType
+				);
+
+			if (!pThunkProperty->m_pSetter)
+			{
+				pThunkProperty->m_pSetter = pThunkFunction;
+			}
+			else
+			{
+				bool Result = pThunkProperty->m_pSetter->AddOverload (pThunkFunction);
+				ASSERT (Result);
+			}
+		}
+	}
+
+	Thunk->m_Value = pThunkProperty;
+	return pThunkProperty;
 }
 
 bool
@@ -510,7 +744,7 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
-	CValue ClosureValue (LlvmArg++, pThunk->m_pClosureType);
+	CValue ClosureValue (LlvmArg++, pThunk->m_pClosureType->GetClassPtrType ());
 
 	CStructType* pClosureFieldStructType = pThunk->m_pClosureType->GetFieldStructType ();
 	ASSERT (pClosureFieldStructType);
@@ -541,8 +775,9 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 		CValue ArgValue;
 
 		if (i == pThunk->m_ClosureMap [iClosure])
-		{
+		{		
 			Result = m_pModule->m_OperatorMgr.GetClassFieldMemberValue (ClosureValue, *ClosureMember, &ArgValue);
+
 			if (!Result)
 				return false;
 
@@ -708,8 +943,8 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateCheckDataPtrRange ();
 		break;
 
-	case EStdFunc_CheckInterfaceScopeLevel:
-		pFunction = CreateCheckInterfaceScopeLevel ();
+	case EStdFunc_CheckClassPtrScopeLevel:
+		pFunction = CreateCheckClassPtrScopeLevel ();
 		break;
 
 	case EStdFunc_DynamicCastInterface:
@@ -946,13 +1181,13 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 }
 
 // void 
-// jnc.CheckInterfaceScopeLevel (
+// jnc.CheckClassPtrScopeLevel (
 //		object p,
 //		size_t DstScopeLevel
 //		);
 
 CFunction*
-CFunctionMgr::CreateCheckInterfaceScopeLevel ()
+CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 {
 	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
 	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -964,7 +1199,7 @@ CFunctionMgr::CreateCheckInterfaceScopeLevel ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckInterfaceScopeLevel"), pType);
+	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckClassPtrScopeLevel"), pType);
 
 	m_pCurrentFunction = pFunction;
 
@@ -988,8 +1223,15 @@ CFunctionMgr::CreateCheckInterfaceScopeLevel ()
 	m_pModule->m_LlvmBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pSuccessBlock, pNoNullBlock, pNoNullBlock);
 
+	static size_t LlvmIndexArray [] = 
+	{
+		0, // TInterfaceHdr**
+		0, // TInterfaceHdr* 
+		1, // TObject** 
+	};
+
 	CValue ObjPtrValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 1, NULL, &ObjPtrValue); // TObject** ppObject
+	m_pModule->m_LlvmBuilder.CreateGep (ArgValue1, LlvmIndexArray, countof (LlvmIndexArray), NULL, &ObjPtrValue); // TObject** ppObject
 	m_pModule->m_LlvmBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue);  // TObject* pObject
 	
 	CValue SrcScopeLevelValue;
@@ -1222,7 +1464,7 @@ CFunctionMgr::CreateThisValue (
 	)
 {
 	ASSERT (ArgValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pSrcType = ((CClassPtrType*) ArgValue.GetType ())->GetClassType ();
+	CClassType* pSrcType = ((CClassPtrType*) ArgValue.GetType ())->GetTargetType ();
 
 	// adjust the pointer: argument is the pointer to the interface which DECLARES the method
 	// what we want as 'this' value is the pointer to the class which IMPLEMENTS the method

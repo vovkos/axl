@@ -153,13 +153,13 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 
 	if (m_TypeModifiers & ETypeModifier_Unsigned)
 	{
-		EType ModTypeKind = GetUnsignedTypeKind (pType->GetTypeKind ());
+		EType ModTypeKind = GetUnsignedIntegerTypeKind (pType->GetTypeKind ());
 		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
 	}
 
 	if (m_TypeModifiers & ETypeModifier_BigEndian)
 	{
-		EType ModTypeKind = GetBigEndianTypeKind (pType->GetTypeKind ());
+		EType ModTypeKind = GetBigEndianIntegerTypeKind (pType->GetTypeKind ());
 		pType = m_pModule->m_TypeMgr.GetPrimitiveType (ModTypeKind);
 	}
 

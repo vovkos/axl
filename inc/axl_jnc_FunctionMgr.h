@@ -51,12 +51,12 @@ enum EStdFunc
 	EStdFunc_CheckDataPtrRange,
 
 	// void 
-	// jnc.CheckInterfaceScopeLevel (
+	// jnc.CheckClassPtrScopeLevel (
 	//		object p,
 	//		size_t DstScopeLevel
 	//		);
 
-	EStdFunc_CheckInterfaceScopeLevel,
+	EStdFunc_CheckClassPtrScopeLevel,
 
 	// object
 	// jnc.DynamicCastInterface (
@@ -99,13 +99,21 @@ protected:
 	friend class CParser;
 
 protected:
+	enum EThunk
+	{
+		EThunk_Undefined = 0,
+		EThunk_Direct,
+		EThunk_DirectUnusedClosure,
+		EThunk_Closure,
+	};
+
 	class CThunk: public rtl::TListLink
 	{
 	public:
-		rtl::CString m_Signature;
-		CFunction* m_pTargetFunction;
+		EThunk m_ThunkKind;
+		rtl::CStringA m_Signature;
+		CFunction* m_pTargetFunction; 
 		CFunctionType* m_pTargetFunctionType;
-		CFunctionPtrType* m_pFunctionPtrType;
 		CClassType* m_pClosureType;
 		rtl::CArrayT <size_t> m_ClosureMap;
 
@@ -123,8 +131,10 @@ protected:
 	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
 	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
 	rtl::CArrayT <CProperty*> m_AutoPropertyArray;
-	rtl::CStringHashTableMapAT <CThunk*> m_ThunkMap;
+
 	rtl::CStdListT <CThunk> m_ThunkList;
+	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
+	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
 
 	CFunction* m_pCurrentFunction;
 	CFunction* m_StdFunctionArray [EStdFunc__Count];
@@ -201,29 +211,36 @@ public:
 	CreateClassInitializer (CClassType* pType);
 
 	CFunction*
-	GetThunkFunction (
-		CFunctionType* pTargetFunctionType,
-		CFunction* pTargetFunction, // could be NULL
-		CClassType* pClosureType,   // could be NULL
-		const rtl::CArrayT <size_t>& ClosureMap,
-		CFunctionPtrType* pFunctionPtrType
+	GetDirectThunkFunction (
+		CFunction* pTargetFunction,
+		CFunctionType* pThunkFunctionType,
+		bool HasUnusedClosure = false
 		);
 
 	CFunction*
-	GetThunkFunction (
+	GetClosureThunkFunction (
 		CFunctionType* pTargetFunctionType,
 		CFunction* pTargetFunction, // could be NULL
-		CFunctionPtrType* pFunctionPtrType
-		)
-	{
-		return GetThunkFunction (
-			pTargetFunctionType, 
-			pTargetFunction, 
-			NULL, 
-			rtl::CArrayT <size_t> (), 
-			pFunctionPtrType
-			);
-	}
+		CClassType* pClosureType,
+		const rtl::CArrayT <size_t>& ClosureMap,
+		CFunctionType* pThunkFunctionType
+		);
+
+	CProperty*
+	GetDirectThunkProperty (
+		CProperty* pTargetProperty,
+		CPropertyType* pThunkPropertyType,
+		bool HasUnusedClosure = false
+		);
+
+	CProperty*
+	GetClosureThunkProperty (
+		CPropertyType* pTargetPropertyType,
+		CProperty* pTargetProperty, // could be NULL
+		CClassType* pClosureType,
+		const rtl::CArrayT <size_t>& ClosureMap,
+		CPropertyType* pThunkPropertyType
+		);
 
 protected:
 	bool
@@ -256,7 +273,7 @@ protected:
 	CreateCheckDataPtrRange ();
 
 	CFunction*
-	CreateCheckInterfaceScopeLevel ();
+	CreateCheckClassPtrScopeLevel ();
 
 	CFunction*
 	CreateDynamicCastInterface ();

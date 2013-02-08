@@ -8,37 +8,31 @@ namespace jnc {
 //.............................................................................
 
 bool
-COperatorMgr::NormalizeFunctionPointer (
-	const CValue& Value,
+COperatorMgr::ClosureOperator (
+	const CValue& RawOpValue,
+	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
 	)
 {
-	CFunctionPtrType* pFunctionPtrType = (CFunctionPtrType*) Value.GetType ();
-	ASSERT (pFunctionPtrType->GetTypeKind () == EType_FunctionPtr);
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	if (!Result)
+		return false;
 
-	CValue PfnValue;
-	CValue IfaceValue;
-
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, pFunctionPtrType->GetFunctionType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe), &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
-
-	ref::CPtrT <CClosure> OldClosure = Value.GetClosure ();
-
-	*pResultValue = PfnValue;
-
-	CClosure* pClosure;
-
-	if (OldClosure)
+	EType TypeKind = OpValue.GetType ()->GetTypeKind ();
+	if (TypeKind != EType_FunctionRef && TypeKind != EType_FunctionPtr)
 	{
-		pResultValue->SetClosure (OldClosure);
-		pClosure = OldClosure;
-	}
-	else
-	{
-		pClosure = pResultValue->CreateClosure (EClosure_Function);
+		err::SetFormatStringError (_T("closure operator cannot be applied to '%s'"), OpValue.GetType ()->GetTypeString ());
+		return false;
 	}
 
-	pClosure->GetArgList ()->InsertHead (IfaceValue);
+	*pResultValue = OpValue;
+	
+	CClosure* pClosure = pResultValue->GetClosure ();
+	if (!pClosure)
+		pClosure = pResultValue->CreateClosure ();
+
+	pClosure->Append (*pArgList);
 	return true;
 }
 
@@ -53,7 +47,7 @@ COperatorMgr::GetVarArgType (
 	switch (TypeKind)
 	{
 	case EType_DataRef:
-		return GetVarArgType (((CDataPtrType*) pType)->GetDataType (), IsUnsafeVarArg);
+		return GetVarArgType (((CDataPtrType*) pType)->GetTargetType (), IsUnsafeVarArg);
 
 	case EType_BitField:
 		return GetVarArgType (((CBitFieldType*) pType)->GetBaseType (), IsUnsafeVarArg);
@@ -93,7 +87,7 @@ COperatorMgr::CallOperator (
 	CValue OpValue;
 	if (RawOpValue.GetValueKind () == EValue_Function && RawOpValue.GetFunction ()->IsOverloaded ())
 	{
-		CFunction* pFunction = RawOpValue.GetFunction ()->ChooseOverload (pArgList);
+		CFunction* pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
 		if (!pFunction)
 			return false;
 
@@ -143,12 +137,11 @@ COperatorMgr::CallOperator (
 	}
 	else if (OpTypeKind == EType_FunctionRef || OpTypeKind == EType_FunctionPtr)
 	{
-		EFunctionPtrType PtrTypeKind = ((CFunctionPtrType*) pOpType)->GetPtrTypeKind ();
+		CFunctionPtrType* pFunctionPtrType = (CFunctionPtrType*) pOpType;
 
-		if (PtrTypeKind == EFunctionPtrType_Thin || PtrTypeKind == EFunctionPtrType_Unsafe)
-			return CallImpl (OpValue, (CFunctionType*) ((CFunctionPtrType*) pOpType)->GetFunctionType (), pArgList, pResultValue);
-
-		return CallFunctionPtr (OpValue, pArgList, pResultValue);
+		return pFunctionPtrType->HasClosure () ? 
+			CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
+			CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);
 	}
 	else 
 	{
@@ -170,7 +163,7 @@ COperatorMgr::CalcScopeLevelValue (
 	}
 
 	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
-
+	 
 	CFunction* pCurrentFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pCurrentFunction && pCurrentFunction->GetScopeLevelVariable ());
 
@@ -264,7 +257,7 @@ COperatorMgr::CallEvent (
 	ASSERT (pEventType->GetTypeKind () == EType_Event);
 	
 	CFunctionPtrType* pFunctionPointerType = pEventType->GetFunctionPtrType ();
-	CFunctionType* pFunctionType = pFunctionPointerType->GetFunctionType ();
+	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
 
 	CValue HandlerValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &HandlerValue);
@@ -293,7 +286,7 @@ COperatorMgr::CallEvent (
 	m_pModule->m_LlvmBuilder.CreateStore (HandlerValue, HandlerVariable);
 
 	CValue ResultValue;
-	CallFunctionPtr (FunctionPtrValue, pArgList, &ResultValue);
+	CallClosureFunctionPtr (FunctionPtrValue, pArgList, &ResultValue);
 
 	m_pModule->m_ControlFlowMgr.Jump (pConditionBlock, pFollowBlock);
 
@@ -301,7 +294,7 @@ COperatorMgr::CallEvent (
 }
 
 bool
-COperatorMgr::CallFunctionPtr (
+COperatorMgr::CallClosureFunctionPtr (
 	const CValue& OpValue,
 	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
@@ -310,19 +303,18 @@ COperatorMgr::CallFunctionPtr (
 	CFunctionPtrType* pFunctionPointerType = (CFunctionPtrType*) OpValue.GetType ();
 	ASSERT (pFunctionPointerType->GetTypeKind () == EType_FunctionPtr);
 
-	CFunctionType* pFunctionType = pFunctionPointerType->GetFunctionType ();
+	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
+	CFunctionType* pAbstractMethodType = pFunctionType->GetAbstractMethodMemberType ();
 
-	bool Result = m_pModule->m_LlvmBuilder.CheckNullPtr (OpValue);
-	if (!Result)
-		return false;
+	CheckFunctionPtrNull (OpValue);
 	
 	CValue PfnValue;
 	CValue IfaceValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pFunctionPointerType->GetFunctionType ()->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pAbstractMethodType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
 	pArgList->InsertHead (IfaceValue);
 
-	return CallImpl (PfnValue, pFunctionPointerType->GetFunctionType (), pArgList, pResultValue);
+	return CallImpl (PfnValue, pAbstractMethodType, pArgList, pResultValue);
 }
 
 bool
@@ -354,38 +346,6 @@ COperatorMgr::CallImpl (
 		pResultValue
 		);
 
-	return true;
-}
-
-bool
-COperatorMgr::ClosureOperator (
-	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList,
-	CValue* pResultValue
-	)
-{
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
-	if (!Result)
-		return false;
-
-	EType TypeKind = OpValue.GetType ()->GetTypeKind ();
-	if (TypeKind != EType_FunctionRef && TypeKind != EType_FunctionPtr)
-	{
-		err::SetFormatStringError (_T("closure operator cannot be applied to '%s'"), OpValue.GetType ()->GetTypeString ());
-		return false;
-	}
-
-	*pResultValue = OpValue;
-	
-	CClosure* pClosure = pResultValue->GetClosure ();
-	if (!pClosure)
-		pClosure = pResultValue->CreateClosure (EClosure_Function);
-
-	ASSERT (pClosure->GetClosureKind () == EClosure_Function); 
-	// cause property closure should have been eliminated in PrepareOperand ()
-
-	pClosure->CombineClosure (pArgList);
 	return true;
 }
 

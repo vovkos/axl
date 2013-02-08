@@ -87,6 +87,7 @@ enum EType
 	EType_Import,              // Z
 
 	EType__Count,
+	EType__EndianDelta = EType_Int16_be - EType_Int16,
 	EType__PrimitiveTypeCount = EType_Double + 1,
 
 	// aliases
@@ -272,11 +273,123 @@ GetUInt64TypeKind (
 	bool ForceUnsigned
 	);
 
-EType
-GetUnsignedTypeKind (EType TypeKind);
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// checks
+
+inline
+bool
+IsIntegerTypeKind (EType TypeKind)
+{
+	return TypeKind >= EType_Int8 && TypeKind <= EType_Int64_beu;
+}
+
+inline
+bool
+IsLittleEndianIntegerTypeKind (EType TypeKind)
+{
+	return TypeKind >= EType_Int8 && TypeKind <= EType_Int64_u;
+}
+
+inline
+bool
+IsBigEndianIntegerTypeKind (EType TypeKind)
+{
+	return TypeKind >= EType_Int16_be && TypeKind <= EType_Int64_beu;
+}
+
+inline
+bool
+IsSignedIntegerTypeKind (EType TypeKind)
+{
+	return IsIntegerTypeKind (TypeKind) && (TypeKind & 1) != 0;
+}
+
+inline
+bool
+IsUnsignedIntegerTypeKind (EType TypeKind)
+{
+	return IsIntegerTypeKind (TypeKind) && (TypeKind & 1) == 0;
+}
+
+inline
+bool
+IsEquivalentIntegerTypeKind (
+	EType TypeKind1,
+	EType TypeKind2
+	)
+{
+	return IsSignedIntegerTypeKind (TypeKind1) == IsSignedIntegerTypeKind (TypeKind2);
+}
+
+inline 
+bool 
+IsFpTypeKind (EType TypeKind)
+{
+	return TypeKind == EType_Float || TypeKind == EType_Double;
+}
+
+inline
+bool
+IsNumericTypeKind (EType TypeKind)
+{
+	return TypeKind >= EType_Bool && TypeKind <= EType_Double;
+}
+
+inline 
+bool 
+IsDataPtrTypeKind (EType TypeKind)
+{
+	return TypeKind == EType_DataPtr || TypeKind == EType_DataRef;
+}
+
+inline 
+bool 
+IsFunctionPtrTypeKind (EType TypeKind)
+{
+	return TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef;
+}
+
+inline 
+bool 
+IsPropertyPtrTypeKind (EType TypeKind)
+{
+	return TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// conversions
+
+inline
 EType
-GetBigEndianTypeKind (EType TypeKind);
+GetBigEndianIntegerTypeKind (EType TypeKind)
+{
+	return TypeKind >= EType_Int16 && TypeKind <= EType_Int64_u ? (EType) (TypeKind + EType__EndianDelta) : TypeKind;
+}
+
+inline
+EType
+GetLittleEndianIntegerTypeKind (EType TypeKind)
+{
+	return IsBigEndianIntegerTypeKind (TypeKind) ? (EType) (TypeKind - EType__EndianDelta) : TypeKind;
+}
+
+inline
+EType
+GetUnsignedIntegerTypeKind (EType TypeKind)
+{
+	return IsSignedIntegerTypeKind (TypeKind) ? (EType) (TypeKind + 1) : TypeKind;
+}
+
+inline
+EType
+GetSignedIntegerTypeKind (EType TypeKind)
+{
+	return IsUnsignedIntegerTypeKind (TypeKind) ? (EType) (TypeKind - 1) : TypeKind;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 rtl::CString 
 GetLlvmTypeString (llvm::Type* pLlvmType);
@@ -355,34 +468,70 @@ public:
 		return pType != this ? m_Signature.Cmp (pType->m_Signature) : 0;
 	}
 
-	bool 
+	bool
 	IsIntegerType ()
 	{
-		return m_TypeKind >= EType_Int8 && m_TypeKind <= EType_Int64_beu;
-	}
-
-	bool 
-	IsFpType ()
-	{
-		return m_TypeKind == EType_Float || m_TypeKind == EType_Double;
-	}
-
-	bool 
-	IsSignedType ()
-	{
-		return IsIntegerType () && (m_TypeKind & 1) != 0; // odd types are signed
-	}
-
-	bool 
-	IsUnsignedType ()
-	{
-		return !IsSignedType ();
+		return IsIntegerTypeKind (m_TypeKind);
 	}
 
 	bool
-	IsNumericType ()
+	IsLittleEndianIntegerType ()	
 	{
-		return m_TypeKind >= EType_Bool && m_TypeKind <= EType_Double;
+		return IsLittleEndianIntegerTypeKind (m_TypeKind);
+	}
+
+	bool
+	IsBigEndianIntegerType ()	
+	{
+		return IsBigEndianIntegerTypeKind (m_TypeKind);
+	}
+
+	bool
+	IsSignedIntegerType ()	
+	{
+		return IsSignedIntegerTypeKind (m_TypeKind);
+	}
+
+	bool
+	IsUnsignedIntegerType ()	
+	{
+		return IsUnsignedIntegerTypeKind (m_TypeKind);
+	}
+
+	bool
+	IsEquivalentIntegerType (CType* pType)	
+	{
+		return IsEquivalentIntegerTypeKind (m_TypeKind, pType->m_TypeKind);
+	}
+
+	bool 
+	IsFpType ()	
+	{
+		return IsFpTypeKind (m_TypeKind);
+	}
+
+	bool
+	IsNumericType ()	
+	{
+		return IsNumericTypeKind (m_TypeKind);
+	}
+
+	bool 
+	IsDataPtrType ()	
+	{
+		return IsDataPtrTypeKind (m_TypeKind);
+	}
+
+	bool 
+	IsFunctionPtrType ()	
+	{
+		return IsFunctionPtrTypeKind (m_TypeKind);
+	}
+
+	bool 
+	IsPropertyPtrType ()	
+	{
+		return IsPropertyPtrTypeKind (m_TypeKind);
 	}
 
 	bool 

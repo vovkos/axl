@@ -7268,7 +7268,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 #line 23 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Declarator.llk"
 			
-			return m_pModule->m_OperatorMgr.MoveOperator ((*(_cls33*) GetAstLocator (1)).m_Value, (CVariable*) m_pLastDeclaredItem);
+			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, (CVariable*) m_pLastDeclaredItem, (*(_cls33*) GetAstLocator (1)).m_Value);
 		;
 #line 7274 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -8303,7 +8303,7 @@ public:
 
 			(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPropertyType (
 				__pSymbol->m_Local.pTemplate->GetGetterType (), 
-				__pSymbol->m_Local.pTemplate->GetSetterType ()
+				*__pSymbol->m_Local.pTemplate->GetSetterType ()
 				);
 		;
 #line 8310 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"

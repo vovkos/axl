@@ -12,7 +12,6 @@ CProperty::CProperty ()
 	m_ItemKind = EModuleItem_Property;
 	m_NamespaceKind = ENamespace_Property;
 	m_pType = NULL;
-	m_pShortType = NULL;
 
 	m_pConstructor = NULL;
 	m_pStaticConstructor = NULL;
@@ -41,10 +40,10 @@ CProperty::Create (CPropertyType* pType)
 	if (!Result)
 		return false;
 
-	size_t SetterTypeOverloadCount = pType->GetSetterType ().GetOverloadCount ();
+	size_t SetterTypeOverloadCount = pType->GetSetterType ()->GetOverloadCount ();
 	for (size_t i = 0; i < SetterTypeOverloadCount; i++)
 	{
-		CFunctionType* pSetterType = pType->GetSetterType ().GetOverload (i);
+		CFunctionType* pSetterType = pType->GetSetterType ()->GetOverload (i);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Setter, pSetterType);
 		Result = AddMethodMember (pSetter);
 		if (!Result)
@@ -52,7 +51,6 @@ CProperty::Create (CPropertyType* pType)
 	}
 
 	m_pType = m_pParentClassType ? m_pParentClassType->GetPropertyMemberType (pType) : pType;
-	m_pShortType = pType;
 	return true;
 }
 
@@ -134,7 +132,6 @@ CProperty::AddMethodMember (CFunction* pFunction)
 		if (StorageKind != EStorage_Static)
 		{
 			pFunction->m_pClassType = m_pParentClassType;
-			pFunction->m_pShortType = pFunction->m_pType;
 			pFunction->m_pType = m_pParentClassType->GetMethodMemberType (pFunction->m_pType);
 
 			if (StorageKind == EStorage_Virtual)

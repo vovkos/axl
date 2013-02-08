@@ -5,7 +5,6 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
-#include "axl_jnc_Variable.h"
 
 namespace axl {
 namespace jnc {
@@ -59,11 +58,8 @@ GetAllocKindString (EAlloc AllocKind);
 
 enum EValueFlag
 {
-	// type qualifiers are propagated to value flags and then type is unqualified
-
-	EValueFlag_VariableOffset          = 0x0100,
-	EValueFlag_WeakToStrong            = 0x0200, // keep it weak in the closure but convert before the call
-	EValueFlag_WeakToStrongMustSucceed = 0x0400, // fail closure call if weak-to-strong fails
+	EValueFlag_VariableOffset   = 0x01,
+	EValueFlag_ImplicitClassPtr = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -149,6 +145,12 @@ public:
 		CType* pType
 		);
 
+	CValue (CType* pType)
+	{
+		Init ();
+		SetType (pType);
+	}
+
 	CValue (CVariable* pVariable)
 	{
 		Init ();
@@ -207,12 +209,6 @@ public:
 	GetFlags () const
 	{
 		return m_Flags;
-	}
-
-	CScope*
-	GetScope () const
-	{
-		return m_ValueKind == EValue_Variable ? m_pVariable->GetScope () : NULL;
 	}
 
 	CVariable*
@@ -305,7 +301,7 @@ public:
 	SetClosure (CClosure* pClosure);
 		
 	CClosure*
-	CreateClosure (EClosure ClosureKind);
+	CreateClosure ();
 
 	void
 	OverrideType (CType* pType)
@@ -516,6 +512,9 @@ public:
 protected:
 	void
 	Init ();
+
+	EClosure
+	GetClosureKind ();
 };
 
 //.............................................................................
@@ -618,28 +617,27 @@ struct TPropertyWeakPtr: TPropertyPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up bindable or autoget property closure pointer declared like:
-// int bindable property* prTest (int, int);
-// int bindable property weak* prTest (int, int);
-// if both bindable & autoget modifiers used, autodata goes first, then onchange event
-
-struct TAuPropertyPtr: TPropertyPtr
-{
-	TDataPtr m_DataPtr; 
-};
-
-struct TAuPropertyWeakPtr: TAuPropertyPtr
-{
-	FStrengthen m_pfnStrengthenClosure;
-};
-
 // structure backing up bindable or autoget property thin pointer declared like:
 // int autoget property thin* prTest (int, int);
+// if both bindable & autoget modifiers used, autodata goes first, then onchange event
 
 struct TAuPropertyThinPtr
 {
 	void** m_pVTable;
 	TDataPtr m_DataPtr;
+};
+
+// structures backing up bindable or autoget property closure pointer declared like:
+// int bindable property* prTest (int, int);
+
+struct TAuPropertyPtr: TAuPropertyThinPtr
+{
+	TInterface* m_pClosure; 
+};
+
+struct TAuPropertyWeakPtr: TAuPropertyPtr
+{
+	FStrengthen m_pfnStrengthenClosure;
 };
 
 // structure backing up bindable or autoget property unsafe pointer declared like:

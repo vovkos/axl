@@ -12,7 +12,6 @@ CEnumType::CEnumType ()
 	m_TypeKind = EType_Enum;
 	m_Flags = ETypeFlag_Pod;
 	m_CurrentValue = 0;
-	m_Size = sizeof (int32_t);
 }
 
 CEnumMember*

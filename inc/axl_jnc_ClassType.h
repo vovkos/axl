@@ -222,6 +222,12 @@ public:
 		return m_pFieldStructType;
 	}
 
+	CStructMember* 
+	GetFieldMember ()
+	{
+		return m_pFieldMember;
+	}
+
 	CStructType* 
 	GetStaticFieldStructType ()
 	{
@@ -251,7 +257,26 @@ public:
 	{
 		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount);
 	}
-	
+
+	CStructMember*
+	CreateFieldMember (
+		const rtl::CString& Name,
+		CType* pType,
+		size_t BitCount = 0
+		)
+	{
+		return CreateFieldMember (EStorage_Undefined, Name, pType, BitCount);
+	}
+
+	CStructMember*
+	CreateFieldMember (
+		CType* pType,
+		size_t BitCount = 0
+		)
+	{
+		return CreateFieldMember (EStorage_Undefined, rtl::CString (), pType, BitCount);
+	}
+
 	CFunctionType* 
 	GetMethodMemberType (CFunctionType* pShortType);
 

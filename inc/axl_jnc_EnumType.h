@@ -83,12 +83,19 @@ class CEnumType: public CNamedType
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
-
+	
+	CType* m_pBaseType;
 	rtl::CStdListT <CEnumMember> m_MemberList;
 	intptr_t m_CurrentValue;
 
 public:
 	CEnumType ();
+
+	CType*
+	GetBaseType ()
+	{
+		return m_pBaseType;
+	}
 
 	rtl::CConstListT <CEnumMember>
 	GetMemberList ()

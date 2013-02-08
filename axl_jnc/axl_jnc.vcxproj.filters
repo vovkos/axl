@@ -181,7 +181,46 @@
     <ClInclude Include="..\inc\axl_jnc_UnOp_Arithmetic.h">
       <Filter>operator</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_ClassPtr.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_DataPtr.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_FunctionPtr.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_PropertyPtr.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_Fp.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_Array.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_Bool.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnOp_Inc.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp_At.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp_Idx.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_UnOp_LogNot.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_BinOp_Logic.h">
+      <Filter>operator</Filter>
+    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_UnOp_Ptr.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_CastOp_Int.h">
       <Filter>operator</Filter>
     </ClInclude>
   </ItemGroup>
@@ -349,7 +388,49 @@
     <ClCompile Include="axl_jnc_UnOp_Arithmetic.cpp">
       <Filter>operator</Filter>
     </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_ClassPtr.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_DataPtr.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_FunctionPtr.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_PropertyPtr.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_Fp.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_Array.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_Bool.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnOp_Inc.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp_At.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp_Idx.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_UnOp_LogNot.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_BinOp_Logic.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
     <ClCompile Include="axl_jnc_UnOp_Ptr.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_CastOp_Int.cpp">
+      <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_OperatorMgr_CheckPtr.cpp">
       <Filter>operator</Filter>
     </ClCompile>
   </ItemGroup>

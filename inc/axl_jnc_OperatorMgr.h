@@ -6,12 +6,25 @@
 
 #include "axl_jnc_UnOp.h"
 #include "axl_jnc_UnOp_Arithmetic.h"
+#include "axl_jnc_UnOp_LogNot.h"
 #include "axl_jnc_UnOp_Ptr.h"
+#include "axl_jnc_UnOp_Inc.h"
 #include "axl_jnc_BinOp.h"
 #include "axl_jnc_BinOp_Arithmetic.h"
-#include "axl_jnc_BinOp_Assign.h"
+#include "axl_jnc_BinOp_Logic.h"
 #include "axl_jnc_BinOp_Cmp.h"
+#include "axl_jnc_BinOp_At.h"
+#include "axl_jnc_BinOp_Idx.h"
+#include "axl_jnc_BinOp_Assign.h"
 #include "axl_jnc_CastOp.h"
+#include "axl_jnc_CastOp_Bool.h"
+#include "axl_jnc_CastOp_Int.h"
+#include "axl_jnc_CastOp_Fp.h"
+#include "axl_jnc_CastOp_Array.h"
+#include "axl_jnc_CastOp_DataPtr.h"
+#include "axl_jnc_CastOp_ClassPtr.h"
+#include "axl_jnc_CastOp_FunctionPtr.h"
+#include "axl_jnc_CastOp_PropertyPtr.h"
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
@@ -24,29 +37,48 @@ class CModule;
 
 //.............................................................................
 
+enum EStdCast
+{
+	EStdCast_Copy,
+	EStdCast_SwapByteOrder,
+	EStdCast_PtrFromInt,
+	EStdCast_Int,
+	EStdCast_Fp,
+	EStdCast__Count
+};
+
+//.............................................................................
+
 class COperatorMgr
 {
 protected:
 	friend class CModule;
 	friend class CFunctionMgr;
-	friend class CCast_fn;
+	friend class CCast_FunctionPtr;
 
 	CModule* m_pModule;
 
-	// unary operators
+	// unary arithmetics
 
 	CUnOp_Plus m_UnOp_Plus;
 	CUnOp_Minus m_UnOp_Minus;
 	CUnOp_BwNot m_UnOp_BwNot;
-	CUnOp_Addr m_UnOp_Addr;
-	CUnOp_Indir m_UnOp_Indir;
+	CUnOp_LogNot m_UnOp_LogNot;	
 	
-	CUnOpT_PreInc <EUnOp_PreInc> m_UnOp_PreInc;
-	CUnOpT_PreInc <EUnOp_PreDec> m_UnOp_PreDec;
-	CUnOpT_PostInc <EUnOp_PostInc> m_UnOp_PostInc;
-	CUnOpT_PostInc <EUnOp_PostDec> m_UnOp_PostDec;
+	// pointer operators
 
-	// arithmetic binary operators
+	CUnOp_Addr m_UnOp_Addr;
+	CUnOp_Indir m_UnOp_Indir;	
+	CUnOp_Ptr m_UnOp_Ptr;	
+
+	// increment operators
+
+	CUnOp_PreInc m_UnOp_PreInc;
+	CUnOp_PreInc m_UnOp_PreDec;
+	CUnOp_PostInc m_UnOp_PostInc;
+	CUnOp_PostInc m_UnOp_PostDec;
+
+	// binary arithmetics
 
 	CBinOp_Add m_BinOp_Add;
 	CBinOp_Sub m_BinOp_Sub;
@@ -56,8 +88,18 @@ protected:
 	CBinOp_Shl m_BinOp_Shl;
 	CBinOp_Shr m_BinOp_Shr;
 	CBinOp_BwAnd m_BinOp_BwAnd;
-	CBinOp_BwOr m_BinOp_BwOr;
 	CBinOp_BwXor m_BinOp_BwXor;
+	CBinOp_BwOr m_BinOp_BwOr;
+
+	// special operators
+
+	CBinOp_At m_BinOp_At;
+	CBinOp_Idx m_BinOp_Idx;
+
+	// binary logic operators
+
+	CBinOp_LogAnd m_BinOp_LogAnd;
+	CBinOp_LogOr m_BinOp_LogOr;
 
 	// comparison operators
 
@@ -68,58 +110,43 @@ protected:
 	CBinOp_Gt m_BinOp_Gt;
 	CBinOp_Ge m_BinOp_Ge;
 
-	// other binary operators
+	// assignment operators
 
-	CBinOp_Idx m_BinOp_Idx;
+	CBinOp_Assign m_BinOp_Assign;
+	CBinOp_OpAssign m_BinOp_AddAssign;
+	CBinOp_OpAssign m_BinOp_SubAssign;
+	CBinOp_OpAssign m_BinOp_MulAssign;
+	CBinOp_OpAssign m_BinOp_DivAssign;
+	CBinOp_OpAssign m_BinOp_ModAssign;
+	CBinOp_OpAssign m_BinOp_ShlAssign;
+	CBinOp_OpAssign m_BinOp_ShrAssign;
+	CBinOp_OpAssign m_BinOp_AndAssign;
+	CBinOp_OpAssign m_BinOp_XorAssign;
+	CBinOp_OpAssign m_BinOp_OrAssign;
+	CBinOp_OpAssign m_BinOp_AtAssign;
 
 	// cast operators
 
-	CCast_cpy m_Cast_cpy;
-	CCast_load m_Cast_load;
-	CCast_getp m_Cast_getp;
-
-	CCast_int_trunc m_Cast_int_trunc;
-	CCast_int_ext m_Cast_int_ext;
-	CCast_int_ext_u m_Cast_int_ext_u;
-	CCast_int_swp m_Cast_int_swp;
-
-	CCast_f32_f64 m_Cast_f32_f64;
-	CCast_f64_f32 m_Cast_f64_f32;
-	
-	CCast_i32_f32 m_Cast_i32_f32;
-	CCast_i32u_f32 m_Cast_i32u_f32;
-	CCast_i32_f64 m_Cast_i32_f64;
-	CCast_i32u_f64 m_Cast_i32u_f64;
-	CCast_i64_f32 m_Cast_i64_f32;
-	CCast_i64u_f32 m_Cast_i64u_f32;
-	CCast_i64_f64 m_Cast_i64_f64;
-	CCast_i64u_f64 m_Cast_i64u_f64;
-
-	CCast_f32_i32 m_Cast_f32_i32;
-	CCast_f32_i64 m_Cast_f32_i64;
-	CCast_f64_i32 m_Cast_f64_i32;
-	CCast_f64_i64 m_Cast_f64_i64;
-	
-	CCast_num_bool m_Cast_num_bool;
-
-	CCast_getbf m_Cast_getbf;
-	CCast_setbf m_Cast_setbf;
-
-	CCast_ptr m_Cast_ptr;
-	CCast_fn m_Cast_fn;
-	CCast_prop m_Cast_prop;
-	CCast_arr m_Cast_arr;
-	CCast_arr_ptr m_Cast_arr_ptr;
-
-	CCast_class m_Cast_class;
+	CCast_Copy m_Cast_Copy;
+	CCast_SwapByteOrder m_Cast_SwapByteOrder;
+	CCast_PtrFromInt m_Cast_PtrFromInt;
+	CCast_Bool m_Cast_Bool;
+	CCast_Int m_Cast_Int;
+	CCast_BeInt m_Cast_BeInt;
+	CCast_Fp m_Cast_Fp;
+	CCast_Array m_Cast_Array;
+	CCast_Enum m_Cast_Enum;
+	CCast_DataPtr m_Cast_DataPtr;
+	CCast_ClassPtr m_Cast_ClassPtr;
+	CCast_FunctionPtr m_Cast_FunctionPtr;
+	CCast_PropertyPtr m_Cast_PropertyPtr;
 
 	// tables
 
 	IUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
 	IBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
-	ICastOperator* m_CastOperatorTable [EType__PrimitiveTypeCount] [EType__PrimitiveTypeCount];
-
-	rtl::CStdListT <CSuperCast> m_SuperCastList;
+	ICastOperator* m_CastOperatorTable [EType__Count];
+	ICastOperator* m_StdCastOperatorTable [EStdCast__Count];
 	
 public:
 	COperatorMgr ();
@@ -144,26 +171,39 @@ public:
 		return ScopeLevelValue;
 	}
 
-	// prepare is: unqualify, get property, peel double references
+	// load reference, get property, enum->int, bool->int, array->ptr -- unless specified otherwise with Flags
 
-	CType* 
+	void 
 	PrepareOperandType (
-		CType* pOpType,
-		int Flags = 0
+		const CValue& OpValue,
+		CValue* pOpValue,
+		int OpFlags = 0
 		);
+
+	void 
+	PrepareOperandType (
+		CValue* pOpValue,
+		int OpFlags = 0
+		)
+	{
+		PrepareOperandType (*pOpValue, pOpValue, OpFlags);
+	}
 
 	bool 
 	PrepareOperand (
 		const CValue& OpValue,
 		CValue* pOpValue,
-		int Flags = 0
+		int OpFlags = 0
 		);
 
 	bool 
 	PrepareOperand (
 		CValue* pOpValue,
-		int Flags = 0
-		);
+		int OpFlags = 0
+		)
+	{
+		return PrepareOperand (*pOpValue, pOpValue, OpFlags);
+	}
 	
 	bool
 	PrepareArgumentReturnValue (CValue* pValue);
@@ -174,7 +214,7 @@ public:
 	UnaryOperator (
 		EUnOp OpKind,
 		const CValue& OpValue,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		);
 	
 	bool
@@ -193,7 +233,7 @@ public:
 		EBinOp OpKind,
 		const CValue& OpValue1,
 		const CValue& OpValue2,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		);
 
 	bool
@@ -206,42 +246,47 @@ public:
 		return BinaryOperator (OpKind, *pValue, OpValue2, pValue);
 	}
 
-	// move & cast operators
+	// cast operators
+
+	ICastOperator*
+	GetStdCastOperator (EStdCast CastKind)
+	{
+		ASSERT (CastKind >= 0 && CastKind < EStdCast__Count);
+		return m_StdCastOperatorTable [CastKind];
+	}
 
 	ECast
 	GetCastKind (
-		CType* pSrcType,
-		CType* pDstType
-		);
-
-	ECast
-	GetCastKind (
-		const CValue& SrcValue,
-		CType* pDstType
+		const CValue& OpValue,
+		CType* pType
 		);
 
 	bool
 	CheckCastKind (
-		const CValue& SrcValue,
-		CType* pDstType
-		);
-
-	bool
-	CheckCastKind (
-		CType* pSrcType,
-		CType* pDstType
+		const CValue& OpValue,
+		CType* pType
 		);
 
 	ECast
 	GetArgCastKind (
 		CFunctionType* pFunctionType,
 		const rtl::CArrayT <CType*>& ArgTypeArray
+		)
+	{
+		return GetArgCastKind (pFunctionType, ArgTypeArray, ArgTypeArray.GetCount ());
+	}
+
+	ECast
+	GetArgCastKind (
+		CFunctionType* pFunctionType,
+		CType* const* ppArgTypeArray,
+		size_t Count
 		);
 
 	ECast
 	GetArgCastKind (
 		CFunctionType* pFunctionType,
-		const rtl::CBoxListT <CValue>* pArgList
+		const rtl::CConstBoxListT <CValue>& ArgList
 		);
 
 	ECast
@@ -250,19 +295,25 @@ public:
 		CFunctionType* pDstType
 		);
 
+	ECast
+	GetPropertyCastKind (
+		CPropertyType* pSrcType,
+		CPropertyType* pDstType
+		);
+
 	bool
 	CastOperator (
 		EAlloc AllocKind,
 		const CValue& OpValue,
 		CType* pType,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		);
 
 	bool
 	CastOperator (
 		const CValue& OpValue,
 		CType* pType,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		)
 	{
 		return CastOperator (EAlloc_Undefined, OpValue, pType, pResultValue);
@@ -292,14 +343,14 @@ public:
 		EAlloc AllocKind,
 		const CValue& OpValue,
 		EType TypeKind,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		);
 
 	bool
 	CastOperator (
 		const CValue& OpValue,
 		EType TypeKind,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		)
 	{
 		return CastOperator (EAlloc_Undefined, OpValue, TypeKind, pResultValue);
@@ -323,19 +374,6 @@ public:
 	{
 		return CastOperator (EAlloc_Undefined, *pValue, TypeKind, pValue);
 	}
-
-	bool
-	MoveOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	bool
-	BinOpMoveOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue,
-		EBinOp OpKind
-		);
 
 	// misc operators
 
@@ -493,22 +531,21 @@ public:
 	// load & store operators
 
 	bool
-	LoadReferenceOperator (
+	LoadDataRef (
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
 	bool
-	LoadReferenceOperator (CValue* pValue)
+	LoadDataRef (CValue* pValue)
 	{
-		return LoadReferenceOperator (*pValue, pValue);
+		return LoadDataRef (*pValue, pValue);
 	}
 
 	bool
-	StoreReferenceOperator (
+	StoreDataRef (
 		const CValue& SrcValue,
-		const CValue& DstValue,
-		bool KeepProperty
+		const CValue& DstValue
 		);
 
 	bool
@@ -551,42 +588,87 @@ public:
 		const CValue& Value
 		);
 
-	// funcion pointer to unsafe pfn + closure
-
-	bool
-	NormalizeFunctionPointer (
-		const CValue& Value,
-		CValue* pResultValue
-		);
-
-	bool
-	NormalizeFunctionPointer (CValue* pValue)
-	{
-		return NormalizeFunctionPointer (*pValue, pValue);
-	}
-
 	bool
 	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
 	
+	bool
+	CreateClosureObject (
+		EAlloc AllocKind,
+		const CValue& OpValue, // function or property ptr
+		rtl::CArrayT <size_t>* pClosureMap,
+		CValue* pResultValue
+		);
+
 protected:
-	enum EPrepareReferenceFlag
-	{
-		EPrepareReferenceFlag_Load         = 1,
-		EPrepareReferenceFlag_Store        = 2,
-		EPrepareReferenceFlag_NoRangeCheck = 4
-	};
+	// checks
 
 	bool
-	PrepareReference (
+	PrepareDataRef (
 		const CValue& Value,
-		int Flags,
+		ERuntimeError Error,
 		CValue* pPtrValue
 		);
 
-	ICastOperator*
-	GetCastOperator (
-		CType* pSrcType,
-		CType* pDstType
+	void
+	GetDataRefScopeLevel (
+		const CValue& Value,
+		CValue* pScopeLevelValue
+		);
+
+	void
+	CheckDataPtrRange (
+		const CValue& PtrValue,
+		size_t Size,
+		const CValue& ValidatorValue,
+		ERuntimeError Error
+		);
+
+	bool 
+	CheckDataPtrScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		); // can sometimes detect invalid assigns at compile time
+
+	void
+	CheckClassPtrNull (const CValue& Value);
+
+	void
+	CheckClassPtrScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	void
+	CheckFunctionPtrNull (const CValue& Value);
+
+	void
+	CheckFunctionPtrScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	void
+	CheckPropertyPtrNull (const CValue& Value);
+
+	void
+	CheckPropertyPtrScopeLevel (
+		const CValue& SrcValue,
+		const CValue& DstValue
+		);
+
+	bool
+	ExtractBitField (
+		const CValue& Value,
+		CBitFieldType* pBitFieldType,
+		CValue* pResultValue
+		);
+	
+	bool
+	MergeBitField (
+		const CValue& Value,
+		const CValue& ShadowValue,
+		CBitFieldType* pBitFieldType,
+		CValue* pResultValue
 		);
 
 	// member operators
@@ -653,19 +735,6 @@ protected:
 		);
 
 	bool
-	MergeBitField (
-		const CValue& SrcValue,
-		const CValue& DstValue,
-		CValue* pResultValue
-		);
-
-	bool
-	MergeBitField (
-		CValue* pValue,
-		const CValue& DstValue
-		);
-
-	bool
 	CallImpl (
 		const CValue& PfnValue,
 		CFunctionType* pFunctionType,
@@ -680,7 +749,7 @@ protected:
 		);
 
 	bool
-	CallFunctionPtr (
+	CallClosureFunctionPtr (
 		const CValue& OpValue,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue

@@ -8,19 +8,61 @@ namespace jnc {
 //.............................................................................
 
 bool
-COperatorMgr::LoadReferenceOperator (
+COperatorMgr::PrepareDataRef (
+	const CValue& Value,
+	ERuntimeError Error,
+	CValue* pPtrValue
+	)
+{
+	ASSERT (Value.GetType ()->GetTypeKind () == EType_DataRef);
+	CDataPtrType* pType = (CDataPtrType*) Value.GetType ();
+	EDataPtrType PtrTypeKind = pType->GetPtrTypeKind ();
+
+	CValue ValidatorValue;
+
+	switch (PtrTypeKind)
+	{
+	case EDataPtrType_Unsafe:
+		*pPtrValue = Value;
+		return true;
+
+	case EDataPtrType_Thin:
+		*pPtrValue = Value;
+		if (!(Value.GetFlags () & EValueFlag_VariableOffset))
+			return true;
+
+		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (Value.GetVariable (), &ValidatorValue);
+		break;
+
+	case EDataPtrType_Normal:
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, pPtrValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ValidatorValue);
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	CheckDataPtrRange (*pPtrValue, pType->GetTargetType ()->GetSize (), ValidatorValue, Error);
+	return true;
+}
+
+bool
+COperatorMgr::LoadDataRef (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataRef);
+	
+	bool Result;
+	
 	CDataPtrType* pType = (CDataPtrType*) OpValue.GetType ();
 
-	EType TypeKind = pType->GetTypeKind ();
-	CType* pTargetType = pType->GetDataType ();
+	CType* pTargetType = pType->GetTargetType ();
 
 	CValue PtrValue;
-	bool Result = PrepareReference (OpValue, EPrepareReferenceFlag_Load, &PtrValue);
+	Result = PrepareDataRef (OpValue, ERuntimeError_LoadOutOfRange, &PtrValue);
 	if (!Result)
 		return false;
 
@@ -31,145 +73,91 @@ COperatorMgr::LoadReferenceOperator (
 		(pType->GetFlags () & EPtrTypeFlag_Volatile) != 0
 		);
 
+	if (pTargetType->GetTypeKind () == EType_BitField)
+	{
+		Result = ExtractBitField (
+			*pResultValue, 
+			(CBitFieldType*) pTargetType,
+			pResultValue
+			);
+
+		if (!Result)
+			return false;
+	}
+
 	return true;
 }
 
 bool
-COperatorMgr::PrepareReference (
-	const CValue& Value,
-	int Flags,
-	CValue* pPtrValue
-	)
-{
-	ASSERT (Value.GetType ()->GetTypeKind () == EType_DataRef);
-	CDataPtrType* pType = (CDataPtrType*) Value.GetType ();
-
-	if (pType->GetPtrTypeKind () == EDataPtrType_Unsafe)
-	{
-		// no need to do a range check
-		*pPtrValue = Value;
-		return true;
-	}
-
-	CValue ValidatorValue;
-	if (Value.GetValueKind () == EValue_Variable)
-	{
-		*pPtrValue = Value;
-
-		if (!(Value.GetFlags () & EValueFlag_VariableOffset) || (Flags & EPrepareReferenceFlag_NoRangeCheck))
-			return true;
-
-		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (Value.GetVariable (), &ValidatorValue);
-	}
-	else
-	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, pPtrValue);
-
-		if (Flags & EPrepareReferenceFlag_NoRangeCheck)
-			return true;
-
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ValidatorValue);
-	}
-
-	ERuntimeError Error = (Flags & EPrepareReferenceFlag_Store) ? ERuntimeError_StoreOutOfRange : ERuntimeError_LoadOutOfRange;
-
-	return m_pModule->m_LlvmBuilder.CheckDataPtrRange (
-		*pPtrValue, 
-		pType->GetDataType ()->GetSize (), 
-		ValidatorValue, 
-		Error
-		);
-}
-
-bool
-COperatorMgr::StoreReferenceOperator (
+COperatorMgr::StoreDataRef (
 	const CValue& RawSrcValue,
-	const CValue& RawDstValue,
-	bool KeepProperty
+	const CValue& DstValue
 	)
 {
+	ASSERT (DstValue.GetType ()->GetTypeKind () == EType_DataRef);
+
 	bool Result;
 
-	CValue DstValue = RawDstValue;
-
-	ASSERT (DstValue.GetType ()->GetTypeKind () == EType_DataRef);
 	CDataPtrType* pDstType = (CDataPtrType*) DstValue.GetType ();
 
-	CType* pTargetType = pDstType->GetDataType ();
+	CType* pTargetType = pDstType->GetTargetType ();
+	EType TargetTypeKind = pTargetType->GetTypeKind ();
 
-	if (!KeepProperty && pTargetType->GetTypeKind () == EType_PropertyRef)
-	{
-		return 
-			LoadReferenceOperator (&DstValue) &&
-			SetPropertyOperator (RawSrcValue, DstValue);
-	} 
+	CType* pCastType = (TargetTypeKind == EType_BitField) ? 
+		((CBitFieldType*) pTargetType)->GetBaseType () : 
+		pTargetType;
 
-	if (pTargetType->GetTypeKind () == EType_Event)
-		return EventOperator (DstValue, RawSrcValue, EEventOp_SetHandler);
-
+	CValue PtrValue;
 	CValue SrcValue;
+	CValue BfShadowValue;
 
 	Result = 
-		CheckCastKind (RawSrcValue, pTargetType) &&
-		CastOperator (RawSrcValue, pTargetType, &SrcValue);
+		CheckCastKind (RawSrcValue, pCastType) &&
+		CastOperator (RawSrcValue, pCastType, &SrcValue) &&
+		PrepareDataRef (DstValue, ERuntimeError_StoreOutOfRange, &PtrValue);
 
 	if (!Result)
 		return false;
 
-	int PrepareReferenceFlags = EPrepareReferenceFlag_Store;
-
-	EType TargetTypeKind = pTargetType->GetTypeKind ();
 	switch (TargetTypeKind)
 	{
 	case EType_DataPtr:
-		Result = m_pModule->m_LlvmBuilder.CheckDataPtrScopeLevel (SrcValue, DstValue);
+		Result = CheckDataPtrScopeLevel (SrcValue, DstValue);
 		if (!Result)
 			return false;
-
-		if (SrcValue.GetValueKind () == EValue_Variable)
-			m_pModule->m_LlvmBuilder.CreateDataPtr (
-				SrcValue, 
-				SrcValue.GetVariable (),
-				(CDataPtrType*) pTargetType,
-				&SrcValue
-				);
 
 		break;
 
 	case EType_ClassPtr:
-		Result = m_pModule->m_LlvmBuilder.CheckInterfaceScopeLevel (SrcValue, DstValue);
-		if (!Result)
-			return false;
-
+		CheckClassPtrScopeLevel (SrcValue, DstValue);
 		break;
 
 	case EType_FunctionPtr:
-		Result = m_pModule->m_LlvmBuilder.CheckFunctionPointerScopeLevel (SrcValue, DstValue);
-		if (!Result)
-			return false;
-
+		CheckFunctionPtrScopeLevel (SrcValue, DstValue);
 		break;
 
 	case EType_PropertyPtr:
-		Result = m_pModule->m_LlvmBuilder.CheckPropertyPointerScopeLevel (SrcValue, DstValue);
-		if (!Result)
-			return false;
-
+		CheckPropertyPtrScopeLevel (SrcValue, DstValue);
 		break;
 
 	case EType_BitField:
-		Result = MergeBitField (&SrcValue, DstValue);
+		m_pModule->m_LlvmBuilder.CreateLoad (
+			PtrValue, 
+			pCastType,
+			&BfShadowValue,
+			(pDstType->GetFlags () & EPtrTypeFlag_Volatile) != 0
+			);
+
+		Result = MergeBitField (
+			SrcValue,
+			BfShadowValue, 
+			(CBitFieldType*) pTargetType,
+			&SrcValue
+			);
+
 		if (!Result)
 			return false;
-
-		PrepareReferenceFlags |= EPrepareReferenceFlag_NoRangeCheck; // mergebitfield checks ptr range
-		break;
 	}
-	
-	CValue PtrValue;
-	Result = PrepareReference (DstValue, PrepareReferenceFlags, &PtrValue);
-	if (!Result)
-		return false;
 
 	m_pModule->m_LlvmBuilder.CreateStore (
 		SrcValue, 
@@ -181,60 +169,89 @@ COperatorMgr::StoreReferenceOperator (
 }
 
 bool
-COperatorMgr::MergeBitField (
-	const CValue& RawSrcValue,
-	const CValue& RawDstValue,
+COperatorMgr::ExtractBitField (
+	const CValue& RawValue,
+	CBitFieldType* pBitFieldType,
 	CValue* pResultValue
 	)
 {
-	ASSERT (RawSrcValue.GetType ()->GetTypeKind () == EType_BitField);
-	ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_DataRef);
+	bool Result;
 
-	CBitFieldType* pSrcType = (CBitFieldType*) RawSrcValue.GetType ();
-	CType* pBaseType = pSrcType->GetBaseType ();
-	size_t BitOffset = pSrcType->GetBitOffset ();
-	size_t BitCount = pSrcType->GetBitCount ();
+	CType* pBaseType = pBitFieldType->GetBaseType ();
+	size_t BitOffset = pBitFieldType->GetBitOffset ();
+	size_t BitCount = pBitFieldType->GetBitCount ();
 
-	CValue MaskValue;
+	EType TypeKind = pBaseType->GetSize () <= 4 ? EType_Int32_u : EType_Int64_u;
+	int64_t Mask = ((int64_t) 1 << BitCount) - 1;
 
-	if (pSrcType->GetSize () <= 4)
-	{
-		uint32_t Mask = ~((((uint32_t) 1 << BitCount) - 1) << BitOffset);	
-		MaskValue.SetConstInt32 (Mask, EType_Int32_u);
-	}
-	else
-	{
-		uint64_t Mask = ~((((uint64_t) 1 << BitCount) - 1) << BitOffset);	
-		MaskValue.SetConstInt64 (Mask, EType_Int64_u);
-	}
+	CValue Value (RawValue, pBaseType);
+	CValue MaskValue (Mask, TypeKind);
+	CValue OffsetValue (BitOffset, TypeKind);
 
-	CValue DstValue;
-	bool Result = LoadReferenceOperator (RawDstValue, &DstValue);
+	Result = 
+		BinaryOperator (EBinOp_Shr, &Value, OffsetValue) &&
+		BinaryOperator (EBinOp_BwAnd, &Value, MaskValue);
+
 	if (!Result)
 		return false;
 
-	DstValue.OverrideType (pBaseType);
+	if (pBaseType->IsSignedIntegerType ()) // extend with sign bit
+	{
+		int64_t SignBit = (int64_t) 1 << (BitCount - 1);
 
-	CValue SrcValue (RawSrcValue, pBaseType);
-	return 
-		BinaryOperator (EBinOp_BwAnd, &DstValue, MaskValue) &&
-		BinaryOperator (EBinOp_BwOr, SrcValue, DstValue, pResultValue);
+		CValue SignBitValue (SignBit, TypeKind);
+		CValue OneValue (1, TypeKind);
+
+		CValue SignExtValue;
+		Result = 
+			BinaryOperator (EBinOp_BwAnd, &SignBitValue, Value) &&
+			BinaryOperator (EBinOp_Sub, SignBitValue, OneValue, &SignExtValue) &&
+			UnaryOperator (EUnOp_BwNot, &SignExtValue) &&
+			BinaryOperator (EBinOp_BwOr, &Value, SignExtValue);
+
+		if (!Result)
+			return false;
+	}
+
+	return CastOperator (Value, pBaseType, pResultValue);
 }
-
+	
 bool
 COperatorMgr::MergeBitField (
-	CValue* pValue,
-	const CValue& DstValue
+	const CValue& RawValue,
+	const CValue& RawShadowValue,
+	CBitFieldType* pBitFieldType,
+	CValue* pResultValue
 	)
 {
-	CValue ResultValue;
+	bool Result;
 
-	bool Result = MergeBitField (*pValue, DstValue, &ResultValue);
+	CType* pBaseType = pBitFieldType->GetBaseType ();
+	size_t BitOffset = pBitFieldType->GetBitOffset ();
+	size_t BitCount = pBitFieldType->GetBitCount ();
+
+	EType TypeKind = pBaseType->GetSize () <= 4 ? EType_Int32_u : EType_Int64_u;
+	int64_t Mask = (((int64_t) 1 << BitCount) - 1) << BitOffset;
+
+	CValue Value (RawValue, pBaseType);
+	CValue ShadowValue (RawShadowValue, pBaseType);
+	CValue MaskValue (Mask, TypeKind);
+	CValue OffsetValue (BitOffset, TypeKind);
+
+	Result = 
+		BinaryOperator (EBinOp_Shl, &Value, OffsetValue) &&
+		BinaryOperator (EBinOp_BwAnd, Value, MaskValue, pResultValue);
+
 	if (!Result)
 		return false;
 
-	*pValue = ResultValue;
-	return true;
+	Mask = ~((((uint64_t) 1 << BitCount) - 1) << BitOffset);	
+	MaskValue.SetConstInt64 (Mask, TypeKind);
+
+	return 
+		BinaryOperator (EBinOp_BwAnd, &ShadowValue, MaskValue) &&
+		BinaryOperator (EBinOp_BwOr, &Value, ShadowValue) &&
+		CastOperator (Value, pBaseType, pResultValue);
 }
 
 //.............................................................................

@@ -21,12 +21,6 @@ public:
 	};
 
 public:
-	CBinOpT_Arithmetic ()
-	{
-		m_OpFlags1 = EOpFlag_Arithmetic;
-		m_OpFlags2 = EOpFlag_Arithmetic;
-	}
-
 	virtual
 	bool
 	Operator (
@@ -67,7 +61,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedType ()
+						pType->IsUnsignedIntegerType ()
 						), 
 					pType
 					);
@@ -79,7 +73,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedType ()
+						pType->IsUnsignedIntegerType ()
 						), 
 					pType
 					);
@@ -112,7 +106,7 @@ public:
 					OpValue2, 
 					pType,
 					pResultValue,
-					pType->IsUnsignedType ()
+					pType->IsUnsignedIntegerType ()
 					);
 				break;
 
@@ -218,7 +212,7 @@ protected:
 			return true;
 		}
 
-		SizeValue.SetConstSizeT (pType->GetDataType ()->GetSize ());
+		SizeValue.SetConstSizeT (pType->GetTargetType ()->GetSize ());
 		
 		Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Mul, OpValue2, SizeValue, &IncrementValue);
 		if (!Result)

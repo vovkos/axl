@@ -41,7 +41,7 @@ protected:
 	friend class CTypeMgr;
 
 	EDataPtrType m_PtrTypeKind;
-	CType* m_pDataType;
+	CType* m_pTargetType;
 
 public:
 	CDataPtrType ();
@@ -53,9 +53,9 @@ public:
 	}
 
 	CType*
-	GetDataType ()
+	GetTargetType ()
 	{
-		return m_pDataType;
+		return m_pTargetType;
 	}
 
 	CStructType* 

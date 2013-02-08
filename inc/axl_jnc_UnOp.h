@@ -38,11 +38,11 @@ GetUnOpKindString (EUnOp OpKind);
 enum EOpFlag
 {
 	EOpFlag_KeepDataRef     = 0x01,
-	EOpFlag_KeepPropertyRef = 0x02,
-	EOpFlag_EnumToInt       = 0x10,
-	EOpFlag_BitFieldToInt   = 0x20,
-	EOpFlag_BoolToInt       = 0x40,
-	EOpFlag_Arithmetic      = EOpFlag_EnumToInt | EOpFlag_BitFieldToInt | EOpFlag_BoolToInt
+	EOpFlag_KeepPropertyRef = 0x02,	
+	EOpFlag_KeepArrayRef    = 0x04,
+	EOpFlag_KeepBool        = 0x10,
+	EOpFlag_KeepEnum        = 0x20,
+	EOpFlag_KeepRef         = EOpFlag_KeepDataRef | EOpFlag_KeepPropertyRef,
 };
 
 //.............................................................................
@@ -51,6 +51,8 @@ enum EOpFlag
 struct IUnaryOperator: obj::IRoot
 {	
 protected:
+	friend class COperatorMgr;
+
 	CModule* m_pModule;
 	EUnOp m_OpKind;
 	int m_OpFlags;
@@ -91,83 +93,6 @@ public:
 			GetUnOpKindString (m_OpKind),
 			pOpType->GetTypeString ()
 			);
-	}
-};
-
-//.............................................................................
-
-template <EUnOp UnOpKind>
-class CUnOpT_PreInc: public IUnaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOpT_PreInc, IUnaryOperator)
-
-public:
-	CUnOpT_PreInc ()
-	{
-		m_OpKind = UnOpKind;
-		m_OpFlags |= EOpFlag_KeepDataRef;
-	}
-
-	virtual
-	bool
-	Operator (
-		const CValue& OpValue,
-		CValue* pResultValue
-		)
-	{
-		CValue OneValue;
-		OneValue.SetConstInt32 (1);
-		EBinOp BinOpKind = UnOpKind == EUnOp_PreInc ? EBinOp_Add : EBinOp_Sub;
-		
-		bool Result = m_pModule->m_OperatorMgr.BinOpMoveOperator (OneValue, OpValue, BinOpKind);
-		if (!Result)
-			return false;
-
-		*pResultValue = OpValue;
-		return true;
-	}
-};
-
-//.............................................................................
-
-template <EUnOp UnOpKind>
-class CUnOpT_PostInc: public IUnaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOpT_PostInc, IUnaryOperator)
-
-public:
-	CUnOpT_PostInc ()
-	{
-		m_OpKind = UnOpKind;
-		m_OpFlags |= EOpFlag_KeepDataRef;
-	}
-
-	virtual
-	bool
-	Operator (
-		const CValue& OpValue,
-		CValue* pResultValue
-		)
-	{
-		bool Result;
-
-		CValue OldValue;
-		Result = m_pModule->m_OperatorMgr.PrepareOperand (OpValue, &OldValue);
-		if (!Result)
-			return false;
-
-		CValue OneValue;
-		OneValue.SetConstInt32 (1);
-		EBinOp BinOpKind = UnOpKind == EUnOp_PostInc ? EBinOp_Add : EBinOp_Sub;
-		
-		Result = m_pModule->m_OperatorMgr.BinOpMoveOperator (OneValue, OpValue, BinOpKind);
-		if (!Result)
-			return false;
-
-		*pResultValue = OldValue;
-		return true;
 	}
 };
 

@@ -24,7 +24,6 @@ protected:
 	friend class CParser;
 
 	CPropertyType* m_pType;
-	CPropertyType* m_pShortType;
 
 	// construction / destruction / accessors
 
@@ -63,12 +62,6 @@ public:
 	GetType ()
 	{
 		return m_pType;
-	}
-
-	CPropertyType* 
-	GetShortType ()
-	{
-		return m_pShortType;
 	}
 
 	CFunction* 

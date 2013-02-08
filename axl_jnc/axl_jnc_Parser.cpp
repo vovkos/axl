@@ -868,7 +868,7 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetPreConstructor ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvConstructorBlock);
 
-	CClosure* pClosure = HandlerValue.CreateClosure (EClosure_Function);
+	CClosure* pClosure = HandlerValue.CreateClosure ();
 	pClosure->GetArgList ()->InsertHead (m_AutoEvConstructorThisValue);
 	
 	rtl::CBoxIteratorT <CValue> PropertyValue = m_BindablePropertyList.GetHead ();
@@ -890,7 +890,7 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	m_pModule->m_FunctionMgr.m_pCurrentFunction = m_pAutoEvType->GetDestructor ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pAutoEvDestructorBlock);
 
-	pClosure = HandlerValue.CreateClosure (EClosure_Function);
+	pClosure = HandlerValue.CreateClosure ();
 	pClosure->GetArgList ()->InsertHead  (m_AutoEvDestructorThisValue);
 
 	PropertyValue = m_BindablePropertyList.GetHead ();

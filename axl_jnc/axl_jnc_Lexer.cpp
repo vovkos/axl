@@ -883,11 +883,11 @@ static const short _axl_jnc_trans_actions[] = {
 	0, 0, 0, 0, 0, 343, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 87, 89, 17, 79, 27, 
-	47, 37, 77, 23, 9, 29, 11, 31, 
-	13, 0, 0, 25, 85, 81, 0, 83, 
-	45, 0, 19, 71, 33, 15, 21, 0, 
-	73, 35, 43, 39, 75, 0, 0, 0, 
+	0, 0, 0, 87, 89, 21, 79, 37, 
+	15, 43, 77, 33, 9, 29, 11, 31, 
+	13, 0, 0, 35, 85, 81, 0, 83, 
+	27, 0, 23, 71, 39, 19, 25, 0, 
+	73, 41, 49, 45, 75, 0, 0, 0, 
 	63, 0, 0, 256, 0, 187, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	151, 0, 0, 0, 0, 184, 0, 208, 
@@ -932,7 +932,7 @@ static const short _axl_jnc_trans_actions[] = {
 	0, 0, 0, 205, 0, 0, 0, 0, 
 	124, 0, 0, 199, 0, 0, 0, 0, 
 	139, 0, 0, 0, 0, 0, 0, 0, 
-	238, 0, 166, 0, 0, 313, 41, 49
+	238, 0, 166, 0, 0, 313, 47, 17
 };
 
 static const short _axl_jnc_to_state_actions[] = {
@@ -1540,31 +1540,31 @@ _eof_trans:
 	break;
 	case 90:
 /* #line 197 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Eq); }}
+	{te = p+1;{ CreateToken (EToken_LogAnd); }}
 	break;
 	case 91:
 /* #line 198 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ne); }}
+	{te = p+1;{ CreateToken (EToken_LogOr); }}
 	break;
 	case 92:
 /* #line 199 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Le); }}
+	{te = p+1;{ CreateToken (EToken_Eq); }}
 	break;
 	case 93:
 /* #line 200 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ge); }}
+	{te = p+1;{ CreateToken (EToken_Ne); }}
 	break;
 	case 94:
 /* #line 201 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_MulAssign); }}
+	{te = p+1;{ CreateToken (EToken_Le); }}
 	break;
 	case 95:
 /* #line 202 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_DivAssign); }}
+	{te = p+1;{ CreateToken (EToken_Ge); }}
 	break;
 	case 96:
 /* #line 203 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ModAssign); }}
+	{te = p+1;{ CreateToken (EToken_ClassAssign); }}
 	break;
 	case 97:
 /* #line 204 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
@@ -1576,39 +1576,39 @@ _eof_trans:
 	break;
 	case 99:
 /* #line 206 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
+	{te = p+1;{ CreateToken (EToken_MulAssign); }}
 	break;
 	case 100:
 /* #line 207 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
+	{te = p+1;{ CreateToken (EToken_DivAssign); }}
 	break;
 	case 101:
 /* #line 208 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AndAssign); }}
+	{te = p+1;{ CreateToken (EToken_ModAssign); }}
 	break;
 	case 102:
 /* #line 209 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_XorAssign); }}
+	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
 	break;
 	case 103:
 /* #line 210 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_OrAssign); }}
+	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
 	break;
 	case 104:
 /* #line 211 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AtAssign); }}
+	{te = p+1;{ CreateToken (EToken_AndAssign); }}
 	break;
 	case 105:
 /* #line 212 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ClassAssign); }}
+	{te = p+1;{ CreateToken (EToken_XorAssign); }}
 	break;
 	case 106:
 /* #line 213 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_LogAnd); }}
+	{te = p+1;{ CreateToken (EToken_OrAssign); }}
 	break;
 	case 107:
 /* #line 214 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_LogOr); }}
+	{te = p+1;{ CreateToken (EToken_AtAssign); }}
 	break;
 	case 108:
 /* #line 215 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */

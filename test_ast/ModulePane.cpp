@@ -361,15 +361,15 @@ CModulePane::AddPropertyTypeMembers (
 	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pType);
 	
 	jnc::CFunctionType* pGetterType = pType->GetGetterType ();
-	const jnc::CFunctionTypeOverload& SetterType = pType->GetSetterType ();
+	jnc::CFunctionTypeOverload* pSetterType = pType->GetSetterType ();
 
 	AddType (hItem, pGetterType);
 	
-	size_t SetterOverloadCount = SetterType.GetOverloadCount ();
+	size_t SetterOverloadCount = pSetterType->GetOverloadCount ();
 	for (size_t i = 0; i < SetterOverloadCount; i++)
 	{
-		jnc::CFunctionType* pSetterType = SetterType.GetOverload (i);
-		AddType (hItem, pSetterType);
+		jnc::CFunctionType* pOverload = pSetterType->GetOverload (i);
+		AddType (hItem, pOverload);
 	}
 	
 	m_TreeCtrl.Expand (hItem, TVE_EXPAND);

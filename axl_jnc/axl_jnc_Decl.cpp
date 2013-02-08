@@ -141,7 +141,7 @@ CTypeSpecifier::SetType (CType* pType)
 		else if (TypeKind == EType_ClassPtr)
 		{
 			CClassPtrType* pPtrType = (CClassPtrType*) pType;
-			pType = pPtrType->GetClassType ()->GetClassPtrType (
+			pType = pPtrType->GetTargetType ()->GetClassPtrType (
 				pPtrType->GetPtrTypeKind (),
 				pPtrType->GetFlags () | EPtrTypeFlag_Const
 				);

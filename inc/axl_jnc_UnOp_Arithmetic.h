@@ -26,11 +26,6 @@ public:
 	};
 
 public:
-	CUnOpT_Arithmetic ()
-	{
-		m_OpFlags = EOpFlag_Arithmetic;
-	}
-
 	virtual
 	bool
 	Operator (

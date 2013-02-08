@@ -43,21 +43,6 @@ public:
 		m_ClosureKind = EClosure_Function;
 	}
 
-	bool 
-	IsEmpty ()
-	{
-		return m_ArgList.IsEmpty ();
-	}
-
-	bool
-	IsClassMemberClosure (CValue* pIfaceValue);
-
-	bool
-	IsSimpleClassMemberClosure (CValue* pIfaceValue)
-	{
-		return m_ArgList.GetCount () == 1 && IsClassMemberClosure (pIfaceValue);
-	}
-
 	EClosure
 	GetClosureKind ()
 	{
@@ -70,8 +55,26 @@ public:
 		return &m_ArgList;
 	}
 
-	void
-	CombineClosure (rtl::CBoxListT <CValue>* pArgList);
+	bool
+	IsSimpleClosure ()
+	{
+		return m_ArgList.GetCount () == 1 && m_ArgList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
+	}
+
+	bool
+	IsMemberClosure ()
+	{
+		return !m_ArgList.IsEmpty () && (m_ArgList.GetHead ()->GetFlags () & EValueFlag_ImplicitClassPtr);
+	}
+
+	bool
+	IsSimpleMemberClosure ()
+	{
+		return IsMemberClosure () && m_ArgList.GetCount () == 1;
+	}
+
+	size_t
+	Append (const rtl::CConstBoxListT <CValue>& ArgList);
 
 	bool
 	Apply (rtl::CBoxListT <CValue>* pArgList);
@@ -79,11 +82,14 @@ public:
 	CType*
 	GetClosureType (CType* pType);
 
-	CFunctionType*
-	GetFunctionClosureType (CFunctionType* pType);
+	CFunctionPtrType*
+	GetFunctionClosureType (CFunction* pFunction); // choose the best overload
 
-	CPropertyType*
-	GetPropertyClosureType (CPropertyType* pType);
+	CFunctionPtrType*
+	GetFunctionClosureType (CFunctionPtrType* pPtrType);
+
+	CPropertyPtrType*
+	GetPropertyClosureType (CPropertyPtrType* pPtrType);
 };
 
 //.............................................................................

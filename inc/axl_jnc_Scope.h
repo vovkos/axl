@@ -11,6 +11,7 @@ namespace axl {
 namespace jnc {
 
 class CBasicBlock;
+class CFunction;
 
 //.............................................................................
 

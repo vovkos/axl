@@ -28,23 +28,44 @@ CFunctionTypeOverload::FindOverload (CFunctionType* pType) const
 }
 
 size_t
-CFunctionTypeOverload::ChooseOverload (const rtl::CBoxListT <CValue>* pArgList) const
+CFunctionTypeOverload::FindShortOverload (CFunctionType* pType) const
+{
+	if (!m_pType)
+		return -1;
+
+	if (pType->Cmp (m_pType->GetShortType ()) == 0)
+		return 0;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunctionType* pOverloadType = m_OverloadArray [i];
+		if (pType->Cmp (pOverloadType->GetShortType ()) == 0)
+			return i + 1;
+	}
+
+	return -1;
+}
+
+size_t
+CFunctionTypeOverload::ChooseOverload (
+	CType* const* ppArgTypeArray,
+	size_t ArgCount,
+	ECast* pCastKind
+	) const
 {
 	ASSERT (m_pType);
 
 	CModule* pModule = m_pType->GetModule ();
 
-	if (m_OverloadArray.IsEmpty ())
-		return 0;
-
-	ECast BestCastKind = pModule->m_OperatorMgr.GetArgCastKind (m_pType, pArgList);
+	ECast BestCastKind = pModule->m_OperatorMgr.GetArgCastKind (m_pType, ppArgTypeArray, ArgCount);
 	size_t BestOverload = BestCastKind ? 0 : -1;
 
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunctionType* pOverloadType = m_OverloadArray [i];
-		ECast CastKind = pModule->m_OperatorMgr.GetArgCastKind (pOverloadType, pArgList);
+		ECast CastKind = pModule->m_OperatorMgr.GetArgCastKind (pOverloadType, ppArgTypeArray, ArgCount);
 		if (!CastKind)
 			continue;
 
@@ -64,8 +85,57 @@ CFunctionTypeOverload::ChooseOverload (const rtl::CBoxListT <CValue>* pArgList) 
 	if (BestOverload == -1)
 	{
 		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
-		return NULL;
+		return -1;
 	}
+
+	if (pCastKind)
+		*pCastKind = BestCastKind;
+
+	return BestOverload; 
+}
+
+size_t
+CFunctionTypeOverload::ChooseOverload (
+	const rtl::CConstBoxListT <CValue>& ArgList,
+	ECast* pCastKind
+	) const
+{
+	ASSERT (m_pType);
+
+	CModule* pModule = m_pType->GetModule ();
+
+	ECast BestCastKind = pModule->m_OperatorMgr.GetArgCastKind (m_pType, ArgList);
+	size_t BestOverload = BestCastKind ? 0 : -1;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunctionType* pOverloadType = m_OverloadArray [i];
+		ECast CastKind = pModule->m_OperatorMgr.GetArgCastKind (pOverloadType, ArgList);
+		if (!CastKind)
+			continue;
+
+		if (CastKind == BestCastKind)
+		{
+			err::SetFormatStringError (_T("ambiguous call to overloaded function"));
+			return -1;
+		}
+
+		if (CastKind > BestCastKind)
+		{
+			BestOverload = i + 1;
+			BestCastKind = CastKind;
+		}
+	}
+
+	if (BestOverload == -1)
+	{
+		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
+		return -1;
+	}
+
+	if (pCastKind)
+		*pCastKind = BestCastKind;
 
 	return BestOverload; 
 }

@@ -135,7 +135,7 @@ COperatorMgr::GetPropertyOperator (
 
 	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPtr)
 	{
-		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
+		m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (
 			FunctionValue, 
 			InterfaceValue,
 			pFunction->GetType ()->GetFunctionPtrType (),
@@ -228,7 +228,7 @@ COperatorMgr::SetPropertyOperator (
 
 	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPtr)
 	{
-		m_pModule->m_LlvmBuilder.CreateFunctionPointer (
+		m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (
 			FunctionValue, 
 			InterfaceValue,
 			pFunction->GetType ()->GetFunctionPtrType (),
@@ -244,7 +244,7 @@ COperatorMgr::SetPropertyOperator (
 	if (!EventValue.IsEmpty ())
 	{
 		CValue EventPtrValue;
-		bool Result = PrepareReference (EventValue, EPrepareReferenceFlag_Store, &EventPtrValue);
+		bool Result = PrepareDataRef (EventValue, EPrepareDataRefFlag_Store, &EventPtrValue);
 		if (!Result)
 			return false;
 

@@ -12,6 +12,7 @@ namespace jnc {
 class CFunctionPtrType;
 class CFunctionPtrTypeTuple;
 class CEventType;
+class CClassPtrType;
 
 enum EFunctionPtrType;
 
@@ -59,6 +60,7 @@ protected:
 	rtl::CStringA m_ArgSignature;
 	rtl::CString m_ArgTypeString;
 	CFunctionType* m_pAbstractMethodMemberType;
+	CFunctionType* m_pShortType;
 	CFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
 
 public:
@@ -93,6 +95,22 @@ public:
 
 	rtl::CString 
 	GetArgTypeString ();
+
+	bool
+	IsMethodMemberType ()
+	{
+		return !m_ArgTypeArray.IsEmpty () && m_ArgTypeArray [0]->GetTypeKind () == EType_ClassPtr;
+	}
+
+	CClassPtrType* 
+	GetThisArgType ()
+	{
+		return !m_ArgTypeArray.IsEmpty () && m_ArgTypeArray [0]->GetTypeKind () == EType_ClassPtr ? 
+			(CClassPtrType*) m_ArgTypeArray [0] : NULL;
+	}
+
+	CFunctionType*
+	GetShortType ();
 
 	CFunctionType*
 	GetAbstractMethodMemberType ();

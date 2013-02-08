@@ -13,202 +13,121 @@ COperatorMgr::COperatorMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
+	// operator tables
+
 	memset (m_UnaryOperatorTable, 0, sizeof (m_UnaryOperatorTable));
 	memset (m_BinaryOperatorTable, 0, sizeof (m_BinaryOperatorTable));
 	memset (m_CastOperatorTable, 0, sizeof (m_CastOperatorTable));
 
-	// unary operators
+	// unary arithmetics
 
-	m_UnaryOperatorTable [EUnOp_Plus]       = &m_UnOp_Plus;
-	m_UnaryOperatorTable [EUnOp_Minus]      = &m_UnOp_Minus;
-	m_UnaryOperatorTable [EUnOp_BwNot]      = &m_UnOp_BwNot;
-	m_UnaryOperatorTable [EUnOp_Addr]       = &m_UnOp_Addr;
-	m_UnaryOperatorTable [EUnOp_Indir]      = &m_UnOp_Indir;
-	m_UnaryOperatorTable [EUnOp_LogNot]     = NULL; // &m_UnOp_LogicalNot;
-	m_UnaryOperatorTable [EUnOp_PreInc]     = &m_UnOp_PreInc;
-	m_UnaryOperatorTable [EUnOp_PreDec]     = &m_UnOp_PreDec;
-	m_UnaryOperatorTable [EUnOp_PostInc]    = &m_UnOp_PostInc;
-	m_UnaryOperatorTable [EUnOp_PostDec]    = &m_UnOp_PostDec;
-	m_UnaryOperatorTable [EUnOp_Ptr]        = NULL; // &m_UnOp_Ptr;
+	m_UnaryOperatorTable [EUnOp_Plus]     = &m_UnOp_Plus;
+	m_UnaryOperatorTable [EUnOp_Minus]    = &m_UnOp_Minus;
+	m_UnaryOperatorTable [EUnOp_BwNot]    = &m_UnOp_BwNot;
+	m_UnaryOperatorTable [EUnOp_LogNot]   = &m_UnOp_LogNot;
 
-	// binary operators
+	// pointer operators
 
-	m_BinaryOperatorTable [EBinOp_Add]        = &m_BinOp_Add;
-	m_BinaryOperatorTable [EBinOp_Sub]        = &m_BinOp_Sub;
-	m_BinaryOperatorTable [EBinOp_Mul]        = &m_BinOp_Mul;
-	m_BinaryOperatorTable [EBinOp_Div]        = &m_BinOp_Div;
-	m_BinaryOperatorTable [EBinOp_Mod]        = &m_BinOp_Mod;
-	m_BinaryOperatorTable [EBinOp_Shl]        = &m_BinOp_Shl;
-	m_BinaryOperatorTable [EBinOp_Shr]        = &m_BinOp_Shr;
-	m_BinaryOperatorTable [EBinOp_BwAnd]      = &m_BinOp_BwAnd;
-	m_BinaryOperatorTable [EBinOp_BwOr]       = &m_BinOp_BwOr;
-	m_BinaryOperatorTable [EBinOp_BwXor]      = &m_BinOp_BwXor;
-	m_BinaryOperatorTable [EBinOp_Eq]         = &m_BinOp_Eq;
-	m_BinaryOperatorTable [EBinOp_Ne]         = &m_BinOp_Ne;
-	m_BinaryOperatorTable [EBinOp_Lt]         = &m_BinOp_Lt;
-	m_BinaryOperatorTable [EBinOp_Le]         = &m_BinOp_Le;
-	m_BinaryOperatorTable [EBinOp_Gt]         = &m_BinOp_Gt;
-	m_BinaryOperatorTable [EBinOp_Ge]         = &m_BinOp_Ge;
-	m_BinaryOperatorTable [EBinOp_LogAnd]     = NULL; // &m_BinOp_LogicalAnd;
-	m_BinaryOperatorTable [EBinOp_LogOr]      = NULL; // &m_BinOp_LogicalOr;
-	m_BinaryOperatorTable [EBinOp_Idx]        = &m_BinOp_Idx;
+	m_UnaryOperatorTable [EUnOp_Addr]     = &m_UnOp_Addr;
+	m_UnaryOperatorTable [EUnOp_Indir]    = &m_UnOp_Indir;
+	m_UnaryOperatorTable [EUnOp_Ptr]      = &m_UnOp_Ptr;
+	
+	// increment operators
 
-	// integer copies
+	m_UnOp_PreInc.m_OpKind  = EUnOp_PreInc;
+	m_UnOp_PreDec.m_OpKind  = EUnOp_PreDec;
+	m_UnOp_PostInc.m_OpKind = EUnOp_PostInc;
+	m_UnOp_PostDec.m_OpKind = EUnOp_PostInc;
 
-	m_CastOperatorTable [EType_Int8] [EType_Int8]           = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int8] [EType_Int8_u]         = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int8_u] [EType_Int8]         = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int8_u] [EType_Int8_u]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16] [EType_Int16]         = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16] [EType_Int16_u]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16_u] [EType_Int16]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16_u] [EType_Int16_u]     = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32] [EType_Int32]         = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32] [EType_Int32_u]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32_u] [EType_Int32]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32_u] [EType_Int32_u]     = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64] [EType_Int64]         = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64] [EType_Int64_u]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64_u] [EType_Int64]       = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64_u] [EType_Int64_u]     = &m_Cast_cpy;
+	m_UnaryOperatorTable [EUnOp_PreInc]   = &m_UnOp_PreInc;
+	m_UnaryOperatorTable [EUnOp_PreDec]   = &m_UnOp_PreDec;
+	m_UnaryOperatorTable [EUnOp_PostInc]  = &m_UnOp_PostInc;
+	m_UnaryOperatorTable [EUnOp_PostDec]  = &m_UnOp_PostDec;
 
-	m_CastOperatorTable [EType_Int16_be] [EType_Int16_be]   = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16_be] [EType_Int16_beu]  = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16_beu] [EType_Int16_be]  = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int16_beu] [EType_Int16_beu] = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32_be] [EType_Int32_be]   = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32_be] [EType_Int32_beu]  = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32_beu] [EType_Int32_be]  = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int32_beu] [EType_Int32_beu] = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64_be] [EType_Int64_be]   = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64_be] [EType_Int64_beu]  = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64_beu] [EType_Int64_be]  = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Int64_beu] [EType_Int64_beu] = &m_Cast_cpy;
+	// binary arithmetics
 
-	// endianness swaps
+	m_BinaryOperatorTable [EBinOp_Add]    = &m_BinOp_Add;
+	m_BinaryOperatorTable [EBinOp_Sub]    = &m_BinOp_Sub;
+	m_BinaryOperatorTable [EBinOp_Mul]    = &m_BinOp_Mul;
+	m_BinaryOperatorTable [EBinOp_Div]    = &m_BinOp_Div;
+	m_BinaryOperatorTable [EBinOp_Mod]    = &m_BinOp_Mod;
+	m_BinaryOperatorTable [EBinOp_Shl]    = &m_BinOp_Shl;
+	m_BinaryOperatorTable [EBinOp_Shr]    = &m_BinOp_Shr;
+	m_BinaryOperatorTable [EBinOp_BwAnd]  = &m_BinOp_BwAnd;
+	m_BinaryOperatorTable [EBinOp_BwXor]  = &m_BinOp_BwXor;
+	m_BinaryOperatorTable [EBinOp_BwOr]   = &m_BinOp_BwOr;
+	
+	// special operators
 
-	m_CastOperatorTable [EType_Int16] [EType_Int16_be]    = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16] [EType_Int16_beu]   = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16_u] [EType_Int16_be]  = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16_u] [EType_Int16_beu] = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16_be] [EType_Int16]    = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16_be] [EType_Int16_u]  = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16_beu] [EType_Int16]   = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int16_beu] [EType_Int16_u] = &m_Cast_int_swp;
+	m_BinaryOperatorTable [EBinOp_At]     = &m_BinOp_At;
+	m_BinaryOperatorTable [EBinOp_Idx]    = &m_BinOp_Idx;
 
-	m_CastOperatorTable [EType_Int32] [EType_Int32_be]    = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32] [EType_Int32_beu]   = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32_u] [EType_Int32_be]  = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32_u] [EType_Int32_beu] = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32_be] [EType_Int32]    = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32_be] [EType_Int32_u]  = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32_beu] [EType_Int32]   = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int32_beu] [EType_Int32_u] = &m_Cast_int_swp;
+	// binary logic operators
 
-	m_CastOperatorTable [EType_Int64] [EType_Int64_be]    = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64] [EType_Int64_beu]   = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64_u] [EType_Int64_be]  = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64_u] [EType_Int64_beu] = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64_be] [EType_Int64]    = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64_be] [EType_Int64_u]  = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64_beu] [EType_Int64]   = &m_Cast_int_swp;
-	m_CastOperatorTable [EType_Int64_beu] [EType_Int64_u] = &m_Cast_int_swp;
+	m_BinaryOperatorTable [EBinOp_LogAnd] = &m_BinOp_LogAnd;
+	m_BinaryOperatorTable [EBinOp_LogOr]  = &m_BinOp_LogOr;
 
-	// integer truncations
+	// comparison operators
 
-	m_CastOperatorTable [EType_Int16] [EType_Int8]    = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int16] [EType_Int8_u]  = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int32] [EType_Int8]    = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int32] [EType_Int8_u]  = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int32] [EType_Int16]   = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int32] [EType_Int16_u] = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int64] [EType_Int8]    = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int64] [EType_Int8_u]  = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int64] [EType_Int16]   = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int64] [EType_Int16_u] = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int64] [EType_Int32]   = &m_Cast_int_trunc;
-	m_CastOperatorTable [EType_Int64] [EType_Int32_u] = &m_Cast_int_trunc;
+	m_BinaryOperatorTable [EBinOp_Eq]     = &m_BinOp_Eq;
+	m_BinaryOperatorTable [EBinOp_Ne]     = &m_BinOp_Ne;
+	m_BinaryOperatorTable [EBinOp_Lt]     = &m_BinOp_Lt;
+	m_BinaryOperatorTable [EBinOp_Le]     = &m_BinOp_Le;
+	m_BinaryOperatorTable [EBinOp_Gt]     = &m_BinOp_Gt;
+	m_BinaryOperatorTable [EBinOp_Ge]     = &m_BinOp_Ge;
+	 
+	// assignment operators
 
-	// integer extensions
+	m_BinOp_AddAssign.m_OpKind = EBinOp_AddAssign;
+	m_BinOp_SubAssign.m_OpKind = EBinOp_SubAssign;
+	m_BinOp_MulAssign.m_OpKind = EBinOp_MulAssign;
+	m_BinOp_DivAssign.m_OpKind = EBinOp_DivAssign;
+	m_BinOp_ModAssign.m_OpKind = EBinOp_ModAssign;
+	m_BinOp_ShlAssign.m_OpKind = EBinOp_ShlAssign;
+	m_BinOp_ShrAssign.m_OpKind = EBinOp_ShrAssign;
+	m_BinOp_AndAssign.m_OpKind = EBinOp_AndAssign;
+	m_BinOp_XorAssign.m_OpKind = EBinOp_XorAssign;
+	m_BinOp_OrAssign.m_OpKind  = EBinOp_OrAssign;
+	m_BinOp_AtAssign.m_OpKind  = EBinOp_AtAssign;
 
-	m_CastOperatorTable [EType_Int8] [EType_Int16]    = &m_Cast_int_ext;
-	m_CastOperatorTable [EType_Int8] [EType_Int32]    = &m_Cast_int_ext;
-	m_CastOperatorTable [EType_Int8] [EType_Int64]    = &m_Cast_int_ext;
-	m_CastOperatorTable [EType_Int8_u] [EType_Int16]  = &m_Cast_int_ext_u;
-	m_CastOperatorTable [EType_Int8_u] [EType_Int32]  = &m_Cast_int_ext_u;
-	m_CastOperatorTable [EType_Int8_u] [EType_Int64]  = &m_Cast_int_ext_u;
-	m_CastOperatorTable [EType_Int16] [EType_Int32]   = &m_Cast_int_ext;
-	m_CastOperatorTable [EType_Int16] [EType_Int64]   = &m_Cast_int_ext;
-	m_CastOperatorTable [EType_Int16_u] [EType_Int32] = &m_Cast_int_ext_u;
-	m_CastOperatorTable [EType_Int16_u] [EType_Int64] = &m_Cast_int_ext_u;
-	m_CastOperatorTable [EType_Int32] [EType_Int64]   = &m_Cast_int_ext;
-	m_CastOperatorTable [EType_Int32_u] [EType_Int64] = &m_Cast_int_ext_u;
 
-	// floating extensions & truncations
+	m_BinaryOperatorTable [EBinOp_Assign]      = &m_BinOp_Assign;
+	m_BinaryOperatorTable [EBinOp_AddAssign]   = &m_BinOp_AddAssign;
+	m_BinaryOperatorTable [EBinOp_SubAssign]   = &m_BinOp_SubAssign;
+	m_BinaryOperatorTable [EBinOp_MulAssign]   = &m_BinOp_MulAssign;
+	m_BinaryOperatorTable [EBinOp_DivAssign]   = &m_BinOp_DivAssign;
+	m_BinaryOperatorTable [EBinOp_ModAssign]   = &m_BinOp_ModAssign;
+	m_BinaryOperatorTable [EBinOp_ShlAssign]   = &m_BinOp_ShlAssign;
+	m_BinaryOperatorTable [EBinOp_ShrAssign]   = &m_BinOp_ShrAssign;
+	m_BinaryOperatorTable [EBinOp_AndAssign]   = &m_BinOp_AndAssign;
+	m_BinaryOperatorTable [EBinOp_XorAssign]   = &m_BinOp_XorAssign;
+	m_BinaryOperatorTable [EBinOp_OrAssign]    = &m_BinOp_OrAssign;
+	m_BinaryOperatorTable [EBinOp_AtAssign]    = &m_BinOp_AtAssign;
 
-	m_CastOperatorTable [EType_Float] [EType_Float]   = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Double] [EType_Double] = &m_Cast_cpy;
-	m_CastOperatorTable [EType_Float] [EType_Double]  = &m_Cast_f32_f64;
-	m_CastOperatorTable [EType_Double] [EType_Float]  = &m_Cast_f64_f32;
+	// cast operators
 
-	// integer to floating point
+	m_StdCastOperatorTable [EStdCast_Copy] = &m_Cast_Copy;
+	m_StdCastOperatorTable [EStdCast_SwapByteOrder] = &m_Cast_SwapByteOrder;
+	m_StdCastOperatorTable [EStdCast_PtrFromInt] = &m_Cast_PtrFromInt;
+	m_StdCastOperatorTable [EStdCast_Int] = &m_Cast_Int;
+	m_StdCastOperatorTable [EStdCast_Fp] = &m_Cast_Fp;
 
-	m_CastOperatorTable [EType_Int32] [EType_Float]    = &m_Cast_i32_f32;
-	m_CastOperatorTable [EType_Int32_u] [EType_Float]  = &m_Cast_i32u_f32;
-	m_CastOperatorTable [EType_Int32] [EType_Double]   = &m_Cast_i32_f64;
-	m_CastOperatorTable [EType_Int32_u] [EType_Double] = &m_Cast_i32u_f64;
-	m_CastOperatorTable [EType_Int64] [EType_Float]    = &m_Cast_i64_f32;
-	m_CastOperatorTable [EType_Int64_u] [EType_Float]  = &m_Cast_i64u_f32;
-	m_CastOperatorTable [EType_Int64] [EType_Double]   = &m_Cast_i64_f64;
-	m_CastOperatorTable [EType_Int64_u] [EType_Double] = &m_Cast_i64u_f64;
+	m_CastOperatorTable [EType_Bool] = &m_Cast_Bool;
 
-	// floating point to integer
+	for (size_t i = EType_Int8; i <= EType_Int64_u; i++)
+		m_CastOperatorTable [i] = &m_Cast_Int;
 
-	m_CastOperatorTable [EType_Float] [EType_Int32]  = &m_Cast_f32_i32;
-	m_CastOperatorTable [EType_Double] [EType_Int32] = &m_Cast_f64_i32;
-	m_CastOperatorTable [EType_Float] [EType_Int64]  = &m_Cast_f32_i64;
-	m_CastOperatorTable [EType_Double] [EType_Int64] = &m_Cast_f64_i64;
+	for (size_t i = EType_Int16_be; i <= EType_Int64_beu; i++)
+		m_CastOperatorTable [i] = &m_Cast_BeInt;
 
-	// build super moves for basic types (floyd-warshall)
-
-	for (size_t k = 0; k < EType__PrimitiveTypeCount; k++)
-	for (size_t i = 0; i < EType__PrimitiveTypeCount; i++)
-	for (size_t j = 0; j < EType__PrimitiveTypeCount; j++)
-	{
-		ICastOperator* pOperatorIK = m_CastOperatorTable [i] [k];
-		ICastOperator* pOperatorKJ = m_CastOperatorTable [k] [j];
-		if (!pOperatorIK || !pOperatorKJ)
-			continue;
-
-		size_t SuperPrice = pOperatorIK->GetPrice () + pOperatorKJ->GetPrice ();
-
-		ICastOperator* pOperatorIJ = m_CastOperatorTable [i] [j];
-		if (pOperatorIJ && pOperatorIJ->GetPrice () <= SuperPrice)
-			continue;
-
-		CSuperCast* pSuperCast = AXL_MEM_NEW (CSuperCast);
-		pSuperCast->m_pIntermediateType = m_pModule->m_TypeMgr.GetPrimitiveType ((EType) k);
-		pSuperCast->m_pFirst = pOperatorIK;
-		pSuperCast->m_pSecond = pOperatorKJ;
-		pSuperCast->m_Price = SuperPrice;
-		m_SuperCastList.InsertTail (pSuperCast);
-
-		m_CastOperatorTable [i] [j] = pSuperCast;
-	}
-
-	// integer to bool (only after building super moves!)
-
-	for (size_t i = EType_Int8; i < EType_Int64_u; i++)
-	{
-		m_CastOperatorTable [i] [EType_Bool] = &m_Cast_num_bool;
-		m_CastOperatorTable [EType_Bool] [i] = &m_Cast_int_ext_u;
-	}
-
-	for (size_t i = EType_Int16_be; i < EType_Int64_beu; i++)
-		m_CastOperatorTable [i] [EType_Bool] = &m_Cast_num_bool;	
-
-	m_CastOperatorTable [EType_Float] [EType_Bool]  = &m_Cast_num_bool;	
-	m_CastOperatorTable [EType_Double] [EType_Bool] = &m_Cast_num_bool;	
+	m_CastOperatorTable [EType_Float]       = &m_Cast_Fp;
+	m_CastOperatorTable [EType_Double]      = &m_Cast_Fp;
+	m_CastOperatorTable [EType_Array]       = &m_Cast_Array;	
+	m_CastOperatorTable [EType_Enum]        = &m_Cast_Enum;
+	m_CastOperatorTable [EType_DataPtr]     = &m_Cast_DataPtr;
+	m_CastOperatorTable [EType_ClassPtr]    = &m_Cast_ClassPtr;
+	m_CastOperatorTable [EType_FunctionPtr] = &m_Cast_FunctionPtr;
+	m_CastOperatorTable [EType_PropertyPtr] = &m_Cast_PropertyPtr;
 }
 
 bool
@@ -228,6 +147,11 @@ COperatorMgr::UnaryOperator (
 	}
 
 	CValue OpValue;
+	CValue UnusedResultValue;
+
+	if (!pResultValue)
+		pResultValue = &UnusedResultValue;
+
 	return 
 		PrepareOperand (RawOpValue, &OpValue, pOperator->GetOpFlags ()) &&
 		pOperator->Operator (OpValue, pResultValue);
@@ -252,6 +176,10 @@ COperatorMgr::BinaryOperator (
 
 	CValue OpValue1;
 	CValue OpValue2;
+	CValue UnusedResultValue;
+
+	if (!pResultValue)
+		pResultValue = &UnusedResultValue;
 
 	return
 		PrepareOperand (RawOpValue1, &OpValue1, pOperator->GetOpFlags1 ()) &&
@@ -259,286 +187,9 @@ COperatorMgr::BinaryOperator (
 		pOperator->Operator (OpValue1, OpValue2, pResultValue);
 }
 
-bool
-COperatorMgr::CastOperator (
-	EAlloc AllocKind,
-	const CValue& RawOpValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	ICastOperator* pOperator = GetCastOperator (RawOpValue.GetType (), pType);	
-	if (!pOperator)
-	{
-		SetCastError (RawOpValue.GetType (), pType);
-		return false;
-	}
+/*
+	overloads!
 
-	CValue OpValue;
-	return 
-		PrepareOperand (RawOpValue, &OpValue, pOperator->GetOpFlags ()) &&
-		pOperator->Cast (AllocKind, OpValue, pType, pResultValue);
-}
-
-bool
-COperatorMgr::CastOperator (
-	EAlloc AllocKind,
-	const CValue& OpValue,
-	EType TypeKind,
-	CValue* pResultValue
-	)
-{
-	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	return CastOperator (AllocKind, OpValue, pType, pResultValue);
-}
-
-ICastOperator*
-COperatorMgr::GetCastOperator (
-	CType* pOpType,
-	CType* pType
-	)
-{
-	EType TypeKind = pType->GetTypeKind ();
-
-	int OpFlags = TypeKind == EType_PropertyPtr ? EOpFlag_KeepPropertyRef : 0;
-	pOpType = PrepareOperandType (pOpType, OpFlags);
-	if (pOpType->Cmp (pType) == 0)
-		return &m_Cast_cpy;
-
-	EType OpTypeKind = pOpType->GetTypeKind ();
-
-	CType* pBaseType;
-
-	switch (OpTypeKind)
-	{
-	case EType_Array:
-		return 
-			TypeKind == EType_Array ? (ICastOperator*) &m_Cast_arr :
-			TypeKind == EType_DataPtr ? (ICastOperator*) &m_Cast_arr_ptr : NULL;
-
-	case EType_BitField:
-		pBaseType = ((CBitFieldType*) pOpType)->GetBaseType ();
-		return GetCastOperator (pBaseType, pType) ? &m_Cast_getbf : NULL;
-
-	case EType_DataRef:
-		if (TypeKind == EType_PropertyPtr)
-			return &m_Cast_prop;
-
-		pBaseType = ((CDataPtrType*) pOpType)->GetDataType ();
-		return 
-			pBaseType->GetTypeKind () == EType_Array ? GetCastOperator (pBaseType, pType) : 
-			GetCastOperator (pBaseType, pType) ? &m_Cast_load : NULL;
-
-	case EType_DataPtr:
-		return TypeKind == EType_DataPtr ? &m_Cast_ptr : NULL;
-
-	case EType_ClassPtr:
-		return TypeKind == EType_ClassPtr ? &m_Cast_class : NULL;
-
-	case EType_FunctionRef:
-	case EType_FunctionPtr:
-		return &m_Cast_fn;
-
-	case EType_PropertyRef:
-		if (TypeKind == EType_PropertyPtr)
-			return &m_Cast_prop;
-
-		pBaseType = ((CPropertyPtrType*) pOpType)->GetPropertyType ()->GetReturnType ();
-		return GetCastOperator (pBaseType, pType) ? &m_Cast_getp : NULL;
-
-	case EType_PropertyPtr:
-		return TypeKind == EType_PropertyPtr ? &m_Cast_prop : NULL;
-
-	default:
-		if (TypeKind == EType_BitField)
-		{
-			pBaseType = ((CBitFieldType*) pType)->GetBaseType ();
-			return GetCastOperator (pOpType, pBaseType) ? &m_Cast_setbf : NULL;
-		}
-
-		return OpTypeKind < EType__PrimitiveTypeCount && TypeKind < EType__PrimitiveTypeCount ?
-			m_CastOperatorTable [OpTypeKind] [TypeKind] : NULL;
-	}
-}
-
-ECast
-COperatorMgr::GetCastKind (
-	CType* pSrcType,
-	CType* pDstType
-	)
-{
-	ICastOperator* pOperator = GetCastOperator (pSrcType, pDstType);
-	pSrcType = PrepareOperandType (pSrcType, pOperator->GetOpFlags ());
-	return pOperator ? pOperator->GetCastKind (pSrcType, pDstType) : ECast_None;
-}
-
-ECast
-COperatorMgr::GetCastKind (
-	const CValue& SrcValue,
-	CType* pDstType
-	)
-{
-	CType* pSrcType = SrcValue.GetType ();
-	CClosure* pClosure = SrcValue.GetClosure ();
-	if (pClosure)
-	{
-		pSrcType = pClosure->GetClosureType (pSrcType);
-		if (!pSrcType)
-			return ECast_None;
-	}
-
-	return GetCastKind (pSrcType, pDstType);
-}
-
-ECast
-COperatorMgr::GetArgCastKind (
-	CFunctionType* pFunctionType,
-	const rtl::CArrayT <CType*>& ActualArgTypeArray
-	)
-{
-	rtl::CArrayT <CType*> FormalArgTypeArray = pFunctionType->GetArgTypeArray ();
-	size_t FormalArgCount = FormalArgTypeArray.GetCount ();
-	size_t ActualArgCount = ActualArgTypeArray.GetCount ();
-
-	if (ActualArgCount < FormalArgCount || 
-		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
-	{
-		return ECast_None;
-	}
-
-	ECast WorstCastKind = ECast_Identitiy;
-
-	for (size_t i = 0; i < FormalArgCount; i++)
-	{
-		CType* pFormalArgType = FormalArgTypeArray [i];
-		CType* pActualArgType = ActualArgTypeArray [i];;
-
-		ECast CastKind = GetCastKind (pActualArgType, pFormalArgType);
-		if (!CastKind)
-			return ECast_None;
-
-		if (CastKind < WorstCastKind)
-			WorstCastKind = CastKind;
-	}
-
-	return WorstCastKind;
-}
-
-ECast
-COperatorMgr::GetArgCastKind (
-	CFunctionType* pFunctionType,
-	const rtl::CBoxListT <CValue>* pArgList
-	)
-{
-	size_t ArgCount = pArgList->GetCount ();
-
-	char Buffer [256];
-	rtl::CArrayT <CType*> ArgTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgTypeArray.SetCount (ArgCount);
-
-	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
-	for (size_t i = 0; Arg; Arg++, i++)
-		ArgTypeArray [i] = Arg->GetType ();
-
-	return GetArgCastKind (pFunctionType, ArgTypeArray);
-}
-
-ECast
-COperatorMgr::GetFunctionCastKind (
-	CFunctionType* pSrcType,
-	CFunctionType* pDstType
-	)
-{
-	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgTypeArray ());
-	if (!ArgCastKind)
-		return ECast_None;
-
-	CType* pSrcReturnType = pSrcType->GetReturnType ();
-	CType* pDstReturnType = pDstType->GetReturnType ();
-	
-	if (pDstReturnType->GetTypeKind () == EType_Void)
-		return ArgCastKind;
-
-	ECast ReturnCastKind = GetCastKind (pSrcReturnType, pDstReturnType);
-	return min (ArgCastKind, ReturnCastKind);
-}
-
-bool
-COperatorMgr::CheckCastKind (
-	CType* pSrcType,
-	CType* pDstType
-	)
-{
-	ECast CastKind = GetCastKind (pSrcType, pDstType);
-	switch (CastKind)
-	{
-	case ECast_Lossy:
-		err::SetFormatStringError (
-			_T("conversion from '%s' to '%s' requires explicit cast"),
-			pSrcType->GetTypeString (),
-			pDstType->GetTypeString ()
-			);
-		return false;
-
-	case ECast_None:
-		SetCastError (pSrcType, pDstType);
-		return false;
-	}
-
-	return true;
-}
-
-bool
-COperatorMgr::CheckCastKind (
-	const CValue& SrcValue,
-	CType* pDstType
-	)
-{
-	CType* pSrcType = SrcValue.GetType ();
-	CClosure* pClosure = SrcValue.GetClosure ();
-	if (pClosure)
-	{
-		pSrcType = pClosure->GetClosureType (pSrcType);
-		if (!pSrcType)
-			return false;
-	}
-
-	return CheckCastKind (pSrcType, pDstType);
-}
-
-bool
-COperatorMgr::MoveOperator (
-	const CValue& RawOpValue,
-	const CValue& DstValue
-	)
-{
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
-	if (!Result)
-		return false;
-
-	EType DstTypeKind = DstValue.GetType ()->GetTypeKind ();
-	switch (DstTypeKind)
-	{
-	case EType_DataRef:
-		return StoreReferenceOperator (OpValue, DstValue, false);
-
-	case EType_PropertyRef:
-		return SetPropertyOperator (OpValue, DstValue);
-
-	default:
-		err::SetFormatStringError (_T("left operand must be l-value"));
-		return false;
-	}
-}
-
-bool
-COperatorMgr::BinOpMoveOperator (
-	const CValue& SrcValue,
-	const CValue& DstValue,
-	EBinOp OpKind
-	)
-{
 	CType* pTargetType = PrepareOperandType (DstValue.GetType ());
 	EType TargetTypeKind = pTargetType->GetTypeKind ();
 
@@ -565,10 +216,221 @@ COperatorMgr::BinOpMoveOperator (
 		break;
 	}
 
-	CValue RValue;
-	return 
-		BinaryOperator (OpKind, DstValue, SrcValue, &RValue) &&
-		MoveOperator (RValue, DstValue);
+ */
+
+/*
+
+	if (pTargetType->GetTypeKind () == EType_Event)
+		return EventOperator (DstValue, RawSrcValue, EEventOp_SetHandler);
+
+
+ */
+
+
+bool
+COperatorMgr::CastOperator (
+	EAlloc AllocKind,
+	const CValue& RawOpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	EType TypeKind = pType->GetTypeKind ();
+	ASSERT (TypeKind >= 0 && TypeKind < EType__Count);
+
+	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
+	if (!pOperator)
+	{
+		SetCastError (RawOpValue, pType);
+		return false;
+	}
+
+	CValue OpValue;
+	CValue UnusedResultValue;
+
+	if (!pResultValue)
+		pResultValue = &UnusedResultValue;
+
+	Result = PrepareOperand (RawOpValue, &OpValue, pOperator->GetOpFlags ());
+	if (!Result)
+		return false;
+
+	if (OpValue.GetType ()->Cmp (pType) == 0) // identity!
+	{
+		*pResultValue = OpValue;
+		return true;
+	}
+
+	return pOperator->Cast (AllocKind, OpValue, pType, pResultValue);
+}
+
+bool
+COperatorMgr::CastOperator (
+	EAlloc AllocKind,
+	const CValue& OpValue,
+	EType TypeKind,
+	CValue* pResultValue
+	)
+{
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
+	return CastOperator (AllocKind, OpValue, pType, pResultValue);
+}
+
+ECast
+COperatorMgr::GetCastKind (
+	const CValue& RawOpValue,
+	CType* pType
+	)
+{
+	EType TypeKind = pType->GetTypeKind ();
+	ASSERT (TypeKind >= 0 && TypeKind < EType__Count);
+
+	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
+	if (!pOperator)
+		return ECast_None;
+
+	CValue OpValue;
+	PrepareOperandType (
+		RawOpValue, 
+		&OpValue, 
+		pOperator->GetOpFlags ()
+		);
+
+	if (OpValue.GetType ()->Cmp (pType) == 0) // identity!
+		return ECast_Identitiy;
+
+	return pOperator->GetCastKind (OpValue, pType);
+}
+
+ECast
+COperatorMgr::GetArgCastKind (
+	CFunctionType* pFunctionType,
+	CType* const* ppActualArgTypeArray,
+	size_t ActualArgCount
+	)
+{
+	rtl::CArrayT <CType*> FormalArgTypeArray = pFunctionType->GetArgTypeArray ();
+	size_t FormalArgCount = FormalArgTypeArray.GetCount ();
+
+	if (ActualArgCount < FormalArgCount || 
+		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
+	{
+		return ECast_None;
+	}
+
+	ECast WorstCastKind = ECast_Identitiy;
+
+	for (size_t i = 0; i < FormalArgCount; i++)
+	{
+		CType* pFormalArgType = FormalArgTypeArray [i];
+		CType* pActualArgType = ppActualArgTypeArray [i];;
+
+		ECast CastKind = GetCastKind (pActualArgType, pFormalArgType);
+		if (!CastKind)
+			return ECast_None;
+
+		if (CastKind < WorstCastKind)
+			WorstCastKind = CastKind;
+	}
+
+	return WorstCastKind;
+}
+
+ECast
+COperatorMgr::GetArgCastKind (
+	CFunctionType* pFunctionType,
+	const rtl::CConstBoxListT <CValue>& ArgList
+	)
+{
+	size_t ArgCount = ArgList.GetCount ();
+
+	char Buffer [256];
+	rtl::CArrayT <CType*> ArgTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgTypeArray.SetCount (ArgCount);
+
+	rtl::CBoxIteratorT <CValue> Arg = ArgList.GetHead ();
+	for (size_t i = 0; Arg; Arg++, i++)
+		ArgTypeArray [i] = Arg->GetType ();
+
+	return GetArgCastKind (pFunctionType, ArgTypeArray);
+}
+
+ECast
+COperatorMgr::GetFunctionCastKind (
+	CFunctionType* pSrcType,
+	CFunctionType* pDstType
+	)
+{
+	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgTypeArray ());
+	if (!ArgCastKind)
+		return ECast_None;
+
+	CType* pSrcReturnType = pSrcType->GetReturnType ();
+	CType* pDstReturnType = pDstType->GetReturnType ();
+	
+	if (pDstReturnType->GetTypeKind () == EType_Void)
+		return ArgCastKind;
+
+	ECast ReturnCastKind = GetCastKind (pSrcReturnType, pDstReturnType);
+	return min (ArgCastKind, ReturnCastKind);
+}
+
+ECast
+COperatorMgr::GetPropertyCastKind (
+	CPropertyType* pSrcType,
+	CPropertyType* pDstType
+	)
+{
+	ECast CastKind = GetFunctionCastKind (pSrcType->GetGetterType (), pDstType->GetGetterType ());
+	if (!CastKind)
+		return ECast_None;
+
+	CFunctionTypeOverload* pSrcSetterType = pSrcType->GetSetterType ();
+	CFunctionTypeOverload* pDstSetterType = pDstType->GetSetterType ();
+
+	ECast WorstCastKind = CastKind;
+
+	size_t Count = pDstSetterType->GetOverloadCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunctionType* pDstOverload = pDstSetterType->GetOverload (i);
+		
+		size_t j = pSrcSetterType->ChooseOverload (pDstOverload->GetArgTypeArray (), &CastKind);
+		if (j == -1)
+			return ECast_None;
+
+		if (CastKind < WorstCastKind)
+			WorstCastKind = CastKind;
+	}
+
+	return WorstCastKind;
+}
+
+bool
+COperatorMgr::CheckCastKind (
+	const CValue& OpValue,
+	CType* pType
+	)
+{
+	ECast CastKind = GetCastKind (OpValue, pType);
+	switch (CastKind)
+	{
+	case ECast_Explicit:
+		err::SetFormatStringError (
+			_T("conversion from '%s' to '%s' requires explicit cast"),
+			OpValue.GetType ()->GetTypeString (),
+			pType->GetTypeString ()
+			);
+		return false;
+
+	case ECast_None:
+		SetCastError (OpValue, pType);
+		return false;
+	}
+
+	return true;
 }
 
 bool
@@ -595,7 +457,7 @@ COperatorMgr::StackNewOperator (
 		if (!Result)
 			return false;
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType, pResultValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
 
 		if (pClassType->GetDestructor ())
 			pScope->AddToDestructList (*pResultValue);
@@ -651,7 +513,7 @@ COperatorMgr::HeapNewOperator (
 		if (!Result)
 			return false;
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType, pResultValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
 	}
 	else
 	{
@@ -682,7 +544,7 @@ COperatorMgr::ProcessDestructList (rtl::CBoxListT <CValue>* pList)
 		CValue Value = *It;
 		ASSERT (Value.GetType ()->GetTypeKind () == EType_ClassPtr);
 		
-		CClassType* pType = ((CClassPtrType*) Value.GetType ())->GetClassType ();
+		CClassType* pType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 
 		CFunction* pDestructor = pType->GetDestructor ();
 		ASSERT (pDestructor);
@@ -693,62 +555,97 @@ COperatorMgr::ProcessDestructList (rtl::CBoxListT <CValue>* pList)
 	return true;
 }
 
-CType* 
+void 
 COperatorMgr::PrepareOperandType (
-	CType* pOpType,
-	int Flags
+	const CValue& OpValue,
+	CValue* pOpValue,
+	int OpFlags
 	) 
 {
-	CType* pType = pOpType;
+	CValue Value = OpValue;
 	
 	for (;;)
 	{
+		CType* pType = OpValue.GetType ();
 		CType* pPrevType = pType;
 
 		EType TypeKind = pType->GetTypeKind ();
 		switch (TypeKind)
 		{			
 		case EType_DataRef:
-			if (!(Flags & EOpFlag_KeepDataRef)) // refine
-				pType = ((CDataPtrType*) pType)->GetDataType ();
+			if (!(OpFlags & EOpFlag_KeepDataRef))
+			{
+				CDataPtrType* pPtrType = (CDataPtrType*) pType;
+				CType* pTargetType = pPtrType->GetTargetType ();
+				EType TargetTypeKind = pTargetType->GetTypeKind ();
+
+				if (TargetTypeKind == EType_BitField)
+				{
+					CBitFieldType* pBitFieldType = (CBitFieldType*) pTargetType;
+					Value = pBitFieldType->GetBaseType ();
+				}
+				else if (TargetTypeKind != EType_Array)
+				{
+					Value = ((CDataPtrType*) pType)->GetTargetType ();
+				}
+				else if (!(OpFlags & EOpFlag_KeepArrayRef))
+				{
+					CArrayType* pArrayType = (CArrayType*) pTargetType;
+					Value = pArrayType->GetElementType ()->GetDataPtrType (
+						EType_DataPtr, 
+						pPtrType->GetPtrTypeKind (), 
+						pPtrType->GetFlags ()
+						);
+				}
+			}
 
 			break;
 
 		case EType_PropertyRef:
-			if (!(Flags & EOpFlag_KeepPropertyRef))
-				pType = ((CPropertyPtrType*) pType)->GetPropertyType ()->GetReturnType ();
+			if (!(OpFlags & EOpFlag_KeepPropertyRef))
+			{
+				CPropertyPtrType* pPropertyPtrType = (CPropertyPtrType*) pType;
 
-			break;
-
-		case EType_Enum:
-			if (Flags & EOpFlag_EnumToInt)
-				pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
-
-			break;
-
-		case EType_BitField:
-			if (Flags & EOpFlag_BitFieldToInt)
-				pType = ((CBitFieldType*) pType)->GetBaseType ();
+				CClosure* pClosure = Value.GetClosure ();
+				if (pClosure)
+				{
+					pPropertyPtrType = pClosure->GetPropertyClosureType (pPropertyPtrType);
+					if (!pPropertyPtrType)
+						break;
+				}
+			
+				CPropertyType* pPropertyType = pPropertyPtrType->GetTargetType ();
+				if (!pPropertyType->IsIndexed ())
+					Value = pPropertyType->GetReturnType ();
+			}
 
 			break;
 
 		case EType_Bool:
-			if (Flags & EOpFlag_BoolToInt)
-				pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
+			if (!(OpFlags & EOpFlag_KeepBool))
+				Value = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8);
+
+			break;
+
+		case EType_Enum:
+			if (!(OpFlags & EOpFlag_KeepEnum))
+				Value = ((CEnumType*) pType)->GetBaseType ();
 
 			break;
 		}
 
-		if (pType == pPrevType)
-			return pType;
+		if (Value.GetType () == pType)
+			break;
 	}
+
+	*pOpValue = Value;
 }
 
 bool 
 COperatorMgr::PrepareOperand (
 	const CValue& OpValue,
 	CValue* pOpValue,
-	int Flags
+	int OpFlags
 	) 
 {
 	bool Result;
@@ -762,19 +659,58 @@ COperatorMgr::PrepareOperand (
 		switch (TypeKind)
 		{			
 		case EType_DataRef:
-			if (!(Flags & EOpFlag_KeepPropertyRef))
+			if (!(OpFlags & EOpFlag_KeepDataRef))
 			{
-				Result = LoadReferenceOperator (&Value);
-				if (!Result)
-					return false;
+				CDataPtrType* pPtrType = (CDataPtrType*) pType;
+				if (pPtrType->GetTargetType ()->GetTypeKind () != EType_Array)
+				{
+					Result = LoadDataRef (&Value);
+					if (!Result)
+						return false;
+				}
+				else if (!(OpFlags & EOpFlag_KeepArrayRef))
+				{
+					CArrayType* pArrayType = (CArrayType*) pPtrType->GetTargetType ();
+					pType = pArrayType->GetElementType ()->GetDataPtrType (
+						EType_DataPtr, 
+						pPtrType->GetPtrTypeKind (), 
+						pPtrType->GetFlags ()
+						);
+
+					Value.OverrideType (pType);
+				}
 			}
 
 			break;
 
 		case EType_PropertyRef:
-			if (!(Flags & EOpFlag_KeepPropertyRef))
+			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
-				Result = GetPropertyOperator (Value, &Value);
+				CPropertyPtrType* pPropertyPtrType = (CPropertyPtrType*) pType;
+
+				CClosure* pClosure = Value.GetClosure ();
+				if (pClosure)
+				{
+					pPropertyPtrType = pClosure->GetPropertyClosureType (pPropertyPtrType);
+					if (!pPropertyPtrType)
+						break;
+				}
+			
+				CPropertyType* pPropertyType = pPropertyPtrType->GetTargetType ();
+				if (!pPropertyType->IsIndexed ())
+				{
+					Result = GetPropertyOperator (Value, &Value);
+					if (!Result)
+						return false;
+				}
+			}
+
+			break;
+
+		case EType_Bool:
+			if (!(OpFlags & EOpFlag_KeepBool))
+			{
+				Result = CastOperator (&Value, EType_Int8);
 				if (!Result)
 					return false;
 			}
@@ -782,53 +718,17 @@ COperatorMgr::PrepareOperand (
 			break;
 
 		case EType_Enum:
-			if (Flags & EOpFlag_EnumToInt)
-				Value.OverrideType (EType_Int);
-
-			break;
-
-		case EType_BitField:
-			if (Flags & EOpFlag_BitFieldToInt)
-			{
-				Result = CastOperator (&Value, ((CBitFieldType*) pType)->GetBaseType ());
-				if (!Result)
-					return false;
-			}
-
-			break;
-
-		case EType_Bool:
-			if (Flags & EOpFlag_BoolToInt)
-			{
-				Result = CastOperator (&Value, EType_Int);
-				if (!Result)
-					return false;
-			}
+			if (!(OpFlags & EOpFlag_KeepEnum))
+				Value.OverrideType (((CEnumType*) pType)->GetBaseType ());
 
 			break;
 		}
 
 		if (Value.GetType () == pType)
-		{
-			*pOpValue = Value;
-			return true;
-		}
+			break;
 	}
-}
 
-bool 
-COperatorMgr::PrepareOperand (
-	CValue* pOpValue,
-	int Flags
-	)
-{
-	CValue OpValue;
-
-	bool Result = PrepareOperand (*pOpValue, &OpValue, Flags);
-	if (!Result)
-		return false;
-
-	*pOpValue = OpValue;
+	*pOpValue = Value;
 	return true;
 }
 
@@ -842,13 +742,13 @@ COperatorMgr::EventOperator (
 	ASSERT (Event.GetType ()->GetTypeKind () == EType_DataRef);
 	CDataPtrType* pReferenceType = (CDataPtrType*) Event.GetType ();
 
-	CType* pTargetType = pReferenceType->GetDataType ();
+	CType* pTargetType = pReferenceType->GetTargetType ();
 	
 	CEventType* pEventType = (CEventType*) pTargetType;
 	ASSERT (pEventType->GetTypeKind () == EType_Event);
 
 	CValue EventPtrValue;
-	bool Result = PrepareReference (Event, EPrepareReferenceFlag_Store, &EventPtrValue);
+	bool Result = PrepareDataRef (Event, ERuntimeError_StoreOutOfRange, &EventPtrValue);
 	if (!Result)
 		return false;
 
@@ -889,6 +789,124 @@ COperatorMgr::EventOperator (
 		NULL
 		);
 	
+	return true;
+}
+
+bool
+COperatorMgr::CreateClosureObject (
+	EAlloc AllocKind,
+	const CValue& OpValue, // function or property thin ptr
+	rtl::CArrayT <size_t>* pClosureMap,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	CFunctionType* pSrcFunctionType;
+	if (OpValue.GetType ()->IsFunctionPtrType ())
+	{
+		pSrcFunctionType = ((CFunctionPtrType*) OpValue.GetType ())->GetTargetType ();
+	}
+	else
+	{
+		ASSERT (OpValue.GetType ()->IsPropertyPtrType ());
+		pSrcFunctionType = ((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetGetterType ();
+	}
+
+	CClassType* pClosureType = m_pModule->m_TypeMgr.CreateUnnamedClassType ();
+
+	bool IsIndirect = 
+		OpValue.GetValueKind () != EValue_Function &&
+		OpValue.GetValueKind () != EValue_Property;
+	
+	if (IsIndirect)
+		pClosureType->CreateFieldMember (OpValue.GetType ());
+
+	CClosure* pClosure = OpValue.GetClosure ();
+
+	const rtl::CBoxListT <CValue>* pClosureArgList = NULL;
+	
+	if (pClosure)
+	{
+		pClosureArgList = pClosure->GetArgList ();
+		pClosureMap->Reserve (pClosureArgList->GetCount ());
+
+		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
+		rtl::CArrayT <CType*> SrcArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
+	
+		if (pClosureArgList->GetCount () > SrcArgTypeArray.GetCount ())
+		{
+			err::SetFormatStringError (_T("closure is too big for '%s'"), pSrcFunctionType->GetTypeString ());
+			return false;
+		}
+
+		for (size_t i = 0; ClosureArg; ClosureArg++, i++)
+		{
+			if (ClosureArg->IsEmpty ())
+				continue;
+
+			ASSERT (i < SrcArgTypeArray.GetCount ());
+			pClosureMap->Append (i);
+			pClosureType->CreateFieldMember (SrcArgTypeArray [i]);
+		}
+	}
+
+	Result = pClosureType->CalcLayout ();
+	if (!Result)
+		return false;
+	
+	CValue ClosureValue;
+	Result = m_pModule->m_OperatorMgr.NewOperator (AllocKind, pClosureType, &ClosureValue);
+	if (!Result)
+		return false;
+
+	// save pfn & arguments in the closure
+	
+	CStructType* pClosureFieldStructType = pClosureType->GetFieldStructType ();
+	ASSERT (pClosureFieldStructType);
+
+	rtl::CIteratorT <CStructMember> ClosureMember = pClosureFieldStructType->GetMemberList ().GetHead ();
+	if (IsIndirect)
+	{
+		CValue PtrValue = OpValue;
+		PtrValue.SetClosure (NULL); // remove closure
+
+		Result = m_pModule->m_OperatorMgr.SetClassFieldMemberValue (
+			ClosureValue, 
+			*ClosureMember, 
+			PtrValue
+			);
+
+		if (!Result)
+			return false;
+		
+		ClosureMember++;
+	}
+
+	if (pClosure)
+	{
+		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
+		for (; ClosureArg; ClosureArg++)
+		{
+			if (ClosureArg->IsEmpty ())
+				continue;
+
+			ASSERT (ClosureMember);
+
+			Result = m_pModule->m_OperatorMgr.SetClassFieldMemberValue (
+				ClosureValue, 
+				*ClosureMember, 
+				*ClosureArg
+				);
+
+			if (!Result)
+				return false;
+
+			ClosureMember++;
+		}
+	}
+
+	*pResultValue = ClosureValue;
 	return true;
 }
 

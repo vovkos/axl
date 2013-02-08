@@ -141,10 +141,13 @@ enum EToken
 	EToken_Ptr,
 	EToken_Shl,
 	EToken_Shr,
+	EToken_LogAnd,
+	EToken_LogOr,
 	EToken_Eq,
 	EToken_Ne,
 	EToken_Le,
 	EToken_Ge,
+	EToken_ClassAssign,
 	EToken_AddAssign,
 	EToken_SubAssign,
 	EToken_MulAssign,
@@ -156,9 +159,6 @@ enum EToken
 	EToken_XorAssign,
 	EToken_OrAssign,
 	EToken_AtAssign,
-	EToken_ClassAssign,
-	EToken_LogAnd,
-	EToken_LogOr,
 	EToken_Ellipsis,
 };
 
@@ -296,10 +296,13 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Ptr,          "->")
 	AXL_PRS_TOKEN_NAME (EToken_Shl,          "<<")
 	AXL_PRS_TOKEN_NAME (EToken_Shr,          ">>")
+	AXL_PRS_TOKEN_NAME (EToken_LogAnd,       "&&")	
+	AXL_PRS_TOKEN_NAME (EToken_LogOr,        "||")
 	AXL_PRS_TOKEN_NAME (EToken_Eq,           "==")
 	AXL_PRS_TOKEN_NAME (EToken_Ne,           "!=")
 	AXL_PRS_TOKEN_NAME (EToken_Le,           "<=")
 	AXL_PRS_TOKEN_NAME (EToken_Ge,           ">=")
+	AXL_PRS_TOKEN_NAME (EToken_ClassAssign,  ":=")	
 	AXL_PRS_TOKEN_NAME (EToken_AddAssign,    "+=")
 	AXL_PRS_TOKEN_NAME (EToken_SubAssign,    "-=")
 	AXL_PRS_TOKEN_NAME (EToken_MulAssign,    "*=")
@@ -311,9 +314,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_XorAssign,    "^=")
 	AXL_PRS_TOKEN_NAME (EToken_OrAssign,     "|=")	
 	AXL_PRS_TOKEN_NAME (EToken_AtAssign,     "@=")	
-	AXL_PRS_TOKEN_NAME (EToken_ClassAssign,  ":=")	
-	AXL_PRS_TOKEN_NAME (EToken_LogAnd,       "&&")	
-	AXL_PRS_TOKEN_NAME (EToken_LogOr,        "||")
 	AXL_PRS_TOKEN_NAME (EToken_Ellipsis,     "...")
 	
 AXL_PRS_END_TOKEN_NAME_MAP ();	

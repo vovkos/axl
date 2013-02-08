@@ -242,7 +242,6 @@ CClassType::AddMethodMember (CFunction* pFunction)
 	if (StorageKind != EStorage_Static)
 	{
 		pFunction->m_pClassType = this;
-		pFunction->m_pShortType = pFunction->m_pType;
 		pFunction->m_pType = GetMethodMemberType (pFunction->m_pType);
 
 		if (StorageKind == EStorage_Virtual)
@@ -526,7 +525,7 @@ CClassType::LayoutNamedVirtualFunction (CFunction* pFunction)
 	if (pMember && pMember->GetItemKind () == EModuleItem_Function)
 	{
 		pOverridenFunction = (CFunction*) pMember;
-		pOverridenFunction = pOverridenFunction->FindShortOverload (pFunction->GetShortType ());
+		pOverridenFunction = pOverridenFunction->FindShortOverload (pFunction->GetType ()->GetShortType ());
 		
 		if (pOverridenFunction->m_StorageKind != EStorage_Virtual)
 			pOverridenFunction = NULL;

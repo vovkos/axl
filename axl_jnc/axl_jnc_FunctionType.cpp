@@ -59,6 +59,12 @@ CFunctionType::GetAbstractMethodMemberType ()
 	return m_pModule->m_TypeMgr.GetAbstractMethodMemberType (this);
 }
 
+CFunctionType*
+CFunctionType::GetShortType ()
+{
+	return m_pModule->m_TypeMgr.GetShortFunctionType (this);
+}
+
 CEventType* 
 CFunctionType::GetEventType ()
 {
@@ -156,16 +162,16 @@ CFunctionType::GetArgTypeString ()
 void
 CFunctionType::PrepareTypeString ()
 {
-	rtl::CString String = m_pReturnType->GetTypeString ();
+	m_TypeString = m_pReturnType->GetTypeString ();
 
 	if (m_CallConv != ECallConv_Default)
 	{
-		String += ' ';
-		String += GetCallConvString (m_CallConv);
+		m_TypeString += ' ';
+		m_TypeString += GetCallConvString (m_CallConv);
 	}
 
-	String += ' ';
-	String += GetArgTypeString ();
+	m_TypeString += ' ';
+	m_TypeString += GetArgTypeString ();	
 }
 
 void

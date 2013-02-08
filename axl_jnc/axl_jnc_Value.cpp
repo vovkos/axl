@@ -197,7 +197,7 @@ CValue::GetLlvmConst (
 		Integer = *(int64_t*) p;
 		pLlvmConst = llvm::ConstantInt::get (
 			pType->GetLlvmType (),
-			llvm::APInt (pType->GetSize () * 8, Integer, pType->IsSignedType ())
+			llvm::APInt (pType->GetSize () * 8, Integer, pType->IsSignedIntegerType ())
 			);
 		break;
 
@@ -242,17 +242,33 @@ CValue::GetLlvmConst (
 	return pLlvmConst;
 }
 
+EClosure
+CValue::GetClosureKind ()
+{
+	if (m_ValueKind == EValue_Function)
+		return EClosure_Function;
+
+	ASSERT (m_pType);
+	EType TypeKind = m_pType->GetTypeKind ();
+	if (TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef)
+		return EClosure_Property;
+
+	ASSERT (TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef);
+	return EClosure_Function;
+}
+
 CClosure*
-CValue::CreateClosure (EClosure ClosureKind)
+CValue::CreateClosure ()
 {
 	m_Closure = AXL_REF_NEW (CClosure);
-	m_Closure->m_ClosureKind = ClosureKind;
+	m_Closure->m_ClosureKind = GetClosureKind ();
 	return m_Closure;
 }
 
 void
 CValue::SetClosure (CClosure* pClosure)
 {
+	ASSERT (pClosure->GetClosureKind () == GetClosureKind ());
 	m_Closure = pClosure;
 }
 
@@ -333,7 +349,7 @@ void
 CValue::SetFunction (CFunction* pFunction)
 {
 	m_ValueKind = EValue_Function;
-	m_pType = !pFunction->IsOverloaded () ? pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin) : NULL;
+	m_pType = !pFunction->IsOverloaded () ? pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin) : NULL;
 	m_pFunction = pFunction;
 	m_pLlvmValue = pFunction->GetLlvmFunction (); //////////////// probably need to remove
 	m_Closure = NULL;
@@ -343,7 +359,7 @@ void
 CValue::SetProperty (CProperty* pProperty)
 {
 	m_ValueKind = EValue_Property;
-	m_pType = pProperty->GetType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
+	m_pType = pProperty->GetType ()->GetPropertyPtrType (EType_PropertyRef, EPropertyPtrType_Thin);
 	m_pProperty = pProperty;
 	m_Closure = NULL;
 }

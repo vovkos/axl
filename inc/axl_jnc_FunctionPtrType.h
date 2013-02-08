@@ -14,8 +14,8 @@ namespace jnc {
 enum EFunctionPtrType
 {
 	EFunctionPtrType_Normal = 0,
-	EFunctionPtrType_Thin,
 	EFunctionPtrType_Weak,
+	EFunctionPtrType_Thin,
 	EFunctionPtrType_Unsafe,
 	EFunctionPtrType__Count,
 };
@@ -45,7 +45,7 @@ protected:
 	friend class CTypeMgr;
 
 	EFunctionPtrType m_PtrTypeKind;
-	CFunctionType* m_pFunctionType;
+	CFunctionType* m_pTargetType;
 	CEventType* m_pEventType;
 	rtl::CString m_TypeModifierString;
 
@@ -59,19 +59,25 @@ public:
 	}
 
 	CFunctionType* 
-	GetFunctionType ()
+	GetTargetType ()
 	{
-		return m_pFunctionType;
+		return m_pTargetType;
+	}
+
+	bool
+	HasClosure ()
+	{
+		return m_PtrTypeKind == EFunctionPtrType_Normal || m_PtrTypeKind == EFunctionPtrType_Weak;
 	}
 
 	CEventType* 
 	GetEventType ();
 
 	CStructType* 
-	GetFunctionPtrStructType ();
+	GetClosureFunctionPtrStructType ();
 
 	CStructType* 
-	GetFunctionWeakPtrStructType ();
+	GetWeakClosureFunctionPtrStructType ();
 
 	rtl::CString
 	GetTypeModifierString ();

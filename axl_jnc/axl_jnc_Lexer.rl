@@ -194,24 +194,24 @@ main := |*
 '->'           { CreateToken (EToken_Ptr); };	
 '<<'           { CreateToken (EToken_Shl); };
 '>>'           { CreateToken (EToken_Shr); };
+'&&'           { CreateToken (EToken_LogAnd); };	
+'||'           { CreateToken (EToken_LogOr); };
 '=='           { CreateToken (EToken_Eq); };
 '!='           { CreateToken (EToken_Ne); };
 '<='           { CreateToken (EToken_Le); };
 '>='           { CreateToken (EToken_Ge); };	
+':='           { CreateToken (EToken_ClassAssign); };	
+'+='           { CreateToken (EToken_AddAssign); };
+'-='           { CreateToken (EToken_SubAssign); };
 '*='           { CreateToken (EToken_MulAssign); };
 '/='           { CreateToken (EToken_DivAssign); };
 '%='           { CreateToken (EToken_ModAssign); };
-'+='           { CreateToken (EToken_AddAssign); };
-'-='           { CreateToken (EToken_SubAssign); };
 '<<='          { CreateToken (EToken_ShlAssign); };
 '>>='          { CreateToken (EToken_ShrAssign); };
 '&='           { CreateToken (EToken_AndAssign); };
 '^='           { CreateToken (EToken_XorAssign); };
 '|='           { CreateToken (EToken_OrAssign); };	
 '@='           { CreateToken (EToken_AtAssign); };	
-':='           { CreateToken (EToken_ClassAssign); };	
-'&&'           { CreateToken (EToken_LogAnd); };	
-'||'           { CreateToken (EToken_LogOr); };
 '...'          { CreateToken (EToken_Ellipsis); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -18,9 +18,11 @@ enum EPropertyPtrType;
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_ReadOnly = 0x010000,
-	EPropertyTypeFlag_Bindable = 0x020000,
-	EPropertyTypeFlag_AutoGet  = 0x040000,
+	EPropertyTypeFlag_ReadOnly  = 0x010000,
+	EPropertyTypeFlag_Bindable  = 0x020000,
+	EPropertyTypeFlag_AutoGet   = 0x040000,
+	
+	EPropertyTypeFlag_Augmented = EPropertyTypeFlag_AutoGet | EPropertyTypeFlag_Bindable,
 };
 
 //.............................................................................
@@ -34,6 +36,7 @@ protected:
 	CFunctionTypeOverload m_SetterType;
 	rtl::CString m_TypeModifierString;
 	CPropertyType* m_pAbstractPropertyMemberType;
+	CPropertyType* m_pShortType;
 	CPropertyType* m_pBindablePropertyType;
 	CStructType* m_pVTableStructType;
 	CPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
@@ -53,16 +56,28 @@ public:
 		return !m_pGetterType->GetArgTypeArray ().IsEmpty ();
 	}
 
+	bool
+	IsPropertyMemberType ()
+	{
+		return m_pGetterType->IsMethodMemberType ();
+	}
+
+	CClassPtrType* 
+	GetThisArgType ()
+	{
+		return m_pGetterType->GetThisArgType ();
+	}
+
 	CFunctionType*
 	GetGetterType ()
 	{
 		return m_pGetterType;
 	}
 
-	const CFunctionTypeOverload&
+	CFunctionTypeOverload*
 	GetSetterType ()
 	{
-		return m_SetterType;
+		return &m_SetterType;
 	}
 
 	CType*
@@ -74,6 +89,9 @@ public:
 
 	CPropertyType*
 	GetAbstractPropertyMemberType ();
+
+	CPropertyType*
+	GetShortType  ();
 
 	CPropertyType*
 	GetBindablePropertyType ();

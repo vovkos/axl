@@ -21,7 +21,7 @@ full_declarator <CTypeSpecifier* $pTypeSpecifier>
 		}
 	  initializer $i <.((CVariable*) m_pLastDeclaredItem)->GetType ().> 		
 		{
-			return m_pModule->m_OperatorMgr.MoveOperator ($i.m_Value, (CVariable*) m_pLastDeclaredItem);
+			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, (CVariable*) m_pLastDeclaredItem, $i.m_Value);
 		}
 	  )?
 		{ 

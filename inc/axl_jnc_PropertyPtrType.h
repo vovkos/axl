@@ -15,8 +15,8 @@ namespace jnc {
 enum EPropertyPtrType
 {
 	EPropertyPtrType_Normal = 0,
-	EPropertyPtrType_Thin,
 	EPropertyPtrType_Weak,
+	EPropertyPtrType_Thin,
 	EPropertyPtrType_Unsafe,
 	EPropertyPtrType__Count,
 };
@@ -44,7 +44,7 @@ protected:
 	friend class CTypeMgr;
 
 	EPropertyPtrType m_PtrTypeKind;
-	CPropertyType* m_pPropertyType;
+	CPropertyType* m_pTargetType;
 
 public:
 	CPropertyPtrType ();
@@ -56,22 +56,28 @@ public:
 	}
 
 	CPropertyType* 
-	GetPropertyType ()
+	GetTargetType ()
 	{
-		return m_pPropertyType;
+		return m_pTargetType;
+	}
+
+	bool
+	HasClosure ()
+	{
+		return m_PtrTypeKind == EPropertyPtrType_Normal || m_PtrTypeKind == EPropertyPtrType_Weak;
 	}
 
 	CStructType* 
-	GetPropertyPtrStructType ();
+	GetClosurePropertyPtrStructType ();
 
 	CStructType* 
-	GetPropertyWeakPtrStructType ();
+	GetWeakClosurePropertyPtrStructType ();
 
 	CStructType* 
-	GetBindablePropertyThinPtrStructType ();
+	GetThinAuPropertyPtrStructType ();
 
 	CStructType* 
-	GetBindablePropertyUnsafePtrStructType ();
+	GetUnsafeAuPropertyPtrStructType ();
 
 	static
 	rtl::CStringA

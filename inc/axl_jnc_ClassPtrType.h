@@ -43,7 +43,7 @@ protected:
 	friend class CTypeMgr;
 
 	EClassPtrType m_PtrTypeKind;
-	CClassType* m_pClassType;
+	CClassType* m_pTargetType;
 
 public:
 	CClassPtrType ();
@@ -55,9 +55,9 @@ public:
 	}
 
 	CClassType* 
-	GetClassType ()
+	GetTargetType ()
 	{
-		return m_pClassType;
+		return m_pTargetType;
 	}
 
 	static

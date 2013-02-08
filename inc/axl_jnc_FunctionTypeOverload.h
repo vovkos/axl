@@ -9,6 +9,8 @@
 namespace axl {
 namespace jnc {
 
+enum ECast;
+
 //.............................................................................
 
 class CFunctionTypeOverload
@@ -66,7 +68,29 @@ public:
 	FindOverload (CFunctionType* pType) const;
 
 	size_t
-	ChooseOverload (const rtl::CBoxListT <CValue>* pArgList) const;
+	FindShortOverload (CFunctionType* pType) const;
+
+	size_t
+	ChooseOverload (
+		const rtl::CArrayT <CType*>& ArgTypeArray,
+		ECast* pCastKind = NULL
+		) const
+	{
+		return ChooseOverload (ArgTypeArray, ArgTypeArray.GetCount (), pCastKind);
+	}
+
+	size_t
+	ChooseOverload (
+		CType* const* ppArgTypeArray,
+		size_t Count,
+		ECast* pCastKind = NULL
+		) const;
+
+	size_t
+	ChooseOverload (
+		const rtl::CConstBoxListT <CValue>& ArgList,
+		ECast* pCastKind = NULL
+		) const;
 
 	bool
 	AddOverload (CFunctionType* pType);

@@ -15,11 +15,11 @@ GetFunctionPtrTypeKindString (EFunctionPtrType PtrTypeKind)
 	case EFunctionPtrType_Normal:
 		return _T("closure");
 
-	case EFunctionPtrType_Thin:
-		return _T("thin");
-
 	case EFunctionPtrType_Weak:
 		return _T("weak");
+
+	case EFunctionPtrType_Thin:
+		return _T("thin");
 
 	case EFunctionPtrType_Unsafe:
 		return _T("unsafe");
@@ -36,7 +36,7 @@ CFunctionPtrType::CFunctionPtrType ()
 	m_TypeKind = EType_FunctionPtr;
 	m_PtrTypeKind = EFunctionPtrType_Normal;
 	m_Size = sizeof (TFunctionPtr);
-	m_pFunctionType = NULL;
+	m_pTargetType = NULL;
 	m_pEventType = NULL;
 }
 
@@ -47,15 +47,15 @@ CFunctionPtrType::GetEventType ()
 }
 
 CStructType* 
-CFunctionPtrType::GetFunctionPtrStructType ()
+CFunctionPtrType::GetClosureFunctionPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetFunctionPtrStructType (m_pFunctionType);
+	return m_pModule->m_TypeMgr.GetClosureFunctionPtrStructType (m_pTargetType);
 }
 
 CStructType* 
-CFunctionPtrType::GetFunctionWeakPtrStructType ()
+CFunctionPtrType::GetWeakClosureFunctionPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetFunctionWeakPtrStructType (m_pFunctionType);
+	return m_pModule->m_TypeMgr.GetWeakClosureFunctionPtrStructType (m_pTargetType);
 }
 
 rtl::CStringA
@@ -105,7 +105,7 @@ CFunctionPtrType::GetTypeModifierString ()
 	if (m_Flags & EPtrTypeFlag_NoNull)
 		m_TypeModifierString += _T(" nonull");
 
-	ECallConv CallConv = m_pFunctionType->GetCallConv ();
+	ECallConv CallConv = m_pTargetType->GetCallConv ();
 	if (CallConv)
 		m_TypeString.AppendFormat (_T(" %s"), GetCallConvString (CallConv));
 
@@ -115,10 +115,10 @@ CFunctionPtrType::GetTypeModifierString ()
 void
 CFunctionPtrType::PrepareTypeString ()
 {
-	m_TypeString = m_pFunctionType->GetReturnType ()->GetTypeString ();
+	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
 	m_TypeString += GetTypeModifierString ();
 	m_TypeString += m_TypeKind == EType_FunctionRef ? " function& " : " function* ";
-	m_TypeString += m_pFunctionType->GetArgTypeString ();
+	m_TypeString += m_pTargetType->GetArgTypeString ();
 }
 
 void
@@ -127,16 +127,16 @@ CFunctionPtrType::PrepareLlvmType ()
 	switch (m_PtrTypeKind)
 	{
 	case EFunctionPtrType_Normal:
-		m_pLlvmType = GetFunctionPtrStructType ()->GetLlvmType ();
+		m_pLlvmType = GetClosureFunctionPtrStructType ()->GetLlvmType ();
 		break;
 
 	case EFunctionPtrType_Thin:
 	case EFunctionPtrType_Unsafe:
-		m_pLlvmType = llvm::PointerType::get (m_pFunctionType->GetLlvmType (), 0);
+		m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
 		break;
 
 	case EFunctionPtrType_Weak:
-		m_pLlvmType = GetFunctionWeakPtrStructType ()->GetLlvmType ();
+		m_pLlvmType = GetWeakClosureFunctionPtrStructType ()->GetLlvmType ();
 		break;
 
 	default:

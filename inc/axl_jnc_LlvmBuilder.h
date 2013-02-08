@@ -9,7 +9,7 @@
 #include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_Scope.h"
+#include "axl_jnc_Variable.h"
 
 namespace axl {
 namespace jnc {
@@ -797,7 +797,7 @@ public:
 	llvm::Value*
 	CreateIntToPtr (
 		const CValue& OpValue,
-		CDataPtrType* pType,
+		CType* pType,
 		CValue* pResultValue
 		)
 	{
@@ -1105,33 +1105,6 @@ public:
 	}
 
 	bool
-	CheckDataPtrRange (
-		const CValue& PtrValue,
-		size_t Size,
-		const CValue& ValidatorValue,
-		ERuntimeError Error
-		);
-
-	bool
-	CheckDataPtrScopeLevel (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	// interface, function & property ptr
-
-	bool
-	CheckNullPtr (const CValue& Value);
-
-	// interface operations
-
-	bool
-	CheckInterfaceScopeLevel (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	bool
 	DynamicCastInterface (
 		const CValue& Value,
 		CClassType* pResultType,
@@ -1148,37 +1121,19 @@ public:
 	// function & property pointer operations
 
 	bool
-	CreateFunctionPointer (
+	CreateClosureFunctionPtr (
 		const CValue& PfnValue,
-		const CValue& IfaceValue,
+		const CValue& ClosureValue,
 		CFunctionPtrType* pResultType,
 		CValue* pResultValue
 		);
 
 	bool
-	CheckFunctionPointerScopeLevel (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	bool
-	CreatePropertyPointer (
-		const CValue& PtrValue,
-		const CValue& InterfaceValue,
+	CreateClosurePropertyPtr (
+		const CValue& ThinPtrValue,
+		const CValue& ClosureValue,
 		CPropertyPtrType* pResultType,
 		CValue* pResultValue
-		);
-
-	bool
-	CheckPropertyPointerScopeLevel (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	bool
-	GetDstScopeLevel (
-		const CValue& DstValue,
-		CValue* pDstScopeLevelValue
 		);
 };
 

@@ -236,6 +236,8 @@ CTypeMgr::CreateEnumType (
 		pType->m_pModule = m_pModule;
 		pType->m_Signature.Format ("%s%d:%s", pSignaturePrefix, m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
 		pType->m_Tag.Format (_T("_unnamed_enum_%d"), m_UnnamedTypeCounter);
+		pType->m_pBaseType = GetPrimitiveType (EType_Int);
+		pType->m_Size = pType->m_pBaseType->GetSize ();
 		pType->m_Flags |= Flags;
 		m_EnumTypeList.InsertTail (pType);
 		return pType;
@@ -248,6 +250,8 @@ CTypeMgr::CreateEnumType (
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_Tag = QualifiedName;
+	pType->m_pBaseType = GetPrimitiveType (EType_Int);
+	pType->m_Size = pType->m_pBaseType->GetSize ();
 	pType->m_Flags |= Flags | ETypeFlag_Named;
 
 	m_EnumTypeList.InsertTail (pType);
@@ -391,14 +395,17 @@ CTypeMgr::GetMethodMemberType (
 	)
 {
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, pClassType);	
+	ArgTypeArray.Insert (0, pClassType->GetClassPtrType ());	
 	
-	return GetFunctionType (
+	CFunctionType* pMethodMemberType = GetFunctionType (
 		pFunctionType->m_CallConv,
 		pFunctionType->m_pReturnType,
 		ArgTypeArray,
 		pFunctionType->m_Flags
 		);
+
+	pMethodMemberType->m_pShortType = pFunctionType;
+	return  pMethodMemberType;
 }
 
 CFunctionType* 
@@ -410,6 +417,31 @@ CTypeMgr::GetAbstractMethodMemberType (CFunctionType* pFunctionType)
 	CClassType* pClassType = (CClassType*) GetStdType (EStdType_ObjectClass);
 	pFunctionType->m_pAbstractMethodMemberType = pClassType->GetMethodMemberType (pFunctionType);
 	return pFunctionType->m_pAbstractMethodMemberType;
+}
+
+CFunctionType* 
+CTypeMgr::GetShortFunctionType (CFunctionType* pFunctionType)
+{
+	if (pFunctionType->m_pShortType)
+		return pFunctionType->m_pShortType;
+	
+	if (!pFunctionType->IsMethodMemberType ())
+	{
+		pFunctionType->m_pShortType = pFunctionType;
+		return pFunctionType;
+	}
+
+	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->m_ArgTypeArray;
+	ArgTypeArray.Remove (0);
+
+	pFunctionType->m_pShortType = GetFunctionType (
+		pFunctionType->m_CallConv,
+		pFunctionType->m_pReturnType,
+		ArgTypeArray,
+		pFunctionType->m_Flags
+		);
+
+	return pFunctionType->m_pShortType;
 }
 
 CPropertyType* 
@@ -546,6 +578,32 @@ CTypeMgr::GetAbstractPropertyMemberType (CPropertyType* pPropertyType)
 }
 
 CPropertyType* 
+CTypeMgr::GetShortPropertyType (CPropertyType* pPropertyType)
+{
+	if (pPropertyType->m_pShortType)
+		return pPropertyType->m_pShortType;
+	
+	if (!pPropertyType->IsPropertyMemberType ())
+	{
+		pPropertyType->m_pShortType = pPropertyType;
+		return pPropertyType;
+	}
+
+	CFunctionType* pGetterType = pPropertyType->m_pGetterType->GetShortType ();
+	CFunctionTypeOverload SetterType;
+
+	size_t SetterCount = pPropertyType->m_SetterType.GetOverloadCount ();
+	for (size_t i = 0; i < SetterCount; i++)
+	{
+		CFunctionType* pSetterType = pPropertyType->m_SetterType.GetOverload (i)->GetShortType ();
+		SetterType.AddOverload (pSetterType);
+	}
+
+	pPropertyType->m_pShortType = GetPropertyType (pGetterType, SetterType, pPropertyType->m_Flags);
+	return pPropertyType->m_pShortType;
+}
+
+CPropertyType* 
 CTypeMgr::GetBindablePropertyType (CPropertyType* pPropertyType)
 {
 	if (pPropertyType->m_pBindablePropertyType)
@@ -642,7 +700,7 @@ CTypeMgr::GetDataPtrType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_PtrTypeKind = PtrTypeKind;
 	pType->m_Size = Size;
-	pType->m_pDataType = pDataType;
+	pType->m_pTargetType = pDataType;
 	pType->m_Flags = Flags;
 
 	m_DataPtrTypeList.InsertTail (pType);
@@ -689,7 +747,7 @@ CTypeMgr::GetClassPtrType (
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = CClassPtrType::CreateSignature (pClassType, PtrTypeKind, Flags);
 	pType->m_PtrTypeKind = PtrTypeKind;
-	pType->m_pClassType = pClassType;
+	pType->m_pTargetType = pClassType;
 	pType->m_Flags = Flags;
 
 	m_ClassPtrTypeList.InsertTail (pType);
@@ -750,7 +808,7 @@ CTypeMgr::GetFunctionPtrType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_PtrTypeKind = PtrTypeKind;
 	pType->m_Size = Size;
-	pType->m_pFunctionType = pFunctionType;
+	pType->m_pTargetType = pFunctionType;
 	pType->m_Flags = Flags;
 
 	m_FunctionPtrTypeList.InsertTail (pType);
@@ -759,24 +817,24 @@ CTypeMgr::GetFunctionPtrType (
 }
 
 CStructType* 
-CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
+CTypeMgr::GetClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 {
 	CFunctionPtrTypeTuple* pTuple = GetFunctionPtrTypeTuple (pFunctionType);
 	if (pTuple->m_pFunctionPtrStructType)
 		return pTuple->m_pFunctionPtrStructType;
 
-	pTuple->m_pFunctionPtrStructType = CreateFunctionPtrStructType (pFunctionType);
+	pTuple->m_pFunctionPtrStructType = CreateClosureFunctionPtrStructType (pFunctionType);
 	return pTuple->m_pFunctionPtrStructType;
 }
 
 CStructType* 
-CTypeMgr::GetFunctionWeakPtrStructType (CFunctionType* pFunctionType)
+CTypeMgr::GetWeakClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 {
 	CFunctionPtrTypeTuple* pTuple = GetFunctionPtrTypeTuple (pFunctionType);
 	if (pTuple->m_pFunctionWeakPtrStructType)
 		return pTuple->m_pFunctionWeakPtrStructType;
 
-	pTuple->m_pFunctionWeakPtrStructType = CreateFunctionWeakPtrStructType (pFunctionType);
+	pTuple->m_pFunctionWeakPtrStructType = CreateWeakClosureFunctionPtrStructType (pFunctionType);
 	return pTuple->m_pFunctionWeakPtrStructType;
 }
 
@@ -861,7 +919,7 @@ CTypeMgr::GetPropertyPtrType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_PtrTypeKind = PtrTypeKind;
 	pType->m_Size = Size;
-	pType->m_pPropertyType = pPropertyType;
+	pType->m_pTargetType = pPropertyType;
 	pType->m_Flags = Flags;
 
 	m_PropertyPtrTypeList.InsertTail (pType);
@@ -880,29 +938,29 @@ CTypeMgr::GetPropertyVTableStructType (CPropertyType* pPropertyType)
 }
 
 CStructType* 
-CTypeMgr::GetPropertyPtrStructType (CPropertyType* pPropertyType)
+CTypeMgr::GetClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 {
 	CPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 	if (pTuple->m_pPropertyPtrStructType)
 		return pTuple->m_pPropertyPtrStructType;
 
-	pTuple->m_pPropertyPtrStructType = CreatePropertyPtrStructType (pPropertyType);
+	pTuple->m_pPropertyPtrStructType = CreateClosurePropertyPtrStructType (pPropertyType);
 	return pTuple->m_pPropertyPtrStructType;
 }
 
 CStructType* 
-CTypeMgr::GetPropertyWeakPtrStructType (CPropertyType* pPropertyType)
+CTypeMgr::GetWeakClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 {
 	CPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 	if (pTuple->m_pPropertyWeakPtrStructType)
 		return pTuple->m_pPropertyWeakPtrStructType;
 
-	pTuple->m_pPropertyWeakPtrStructType = CreatePropertyWeakPtrStructType (pPropertyType);
+	pTuple->m_pPropertyWeakPtrStructType = CreateWeakClosurePropertyPtrStructType (pPropertyType);
 	return pTuple->m_pPropertyWeakPtrStructType;
 }
 
 CStructType* 
-CTypeMgr::GetBindablePropertyThinPtrStructType (CPropertyType* pPropertyType)
+CTypeMgr::GetThinAuPropertyPtrStructType (CPropertyType* pPropertyType)
 {
 	CPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 	if (pTuple->m_pBindablePropertyThinPtrStructType)
@@ -913,7 +971,7 @@ CTypeMgr::GetBindablePropertyThinPtrStructType (CPropertyType* pPropertyType)
 }
 
 CStructType* 
-CTypeMgr::GetBindablePropertyUnsafePtrStructType (CPropertyType* pPropertyType)
+CTypeMgr::GetUnsafeAuPropertyPtrStructType (CPropertyType* pPropertyType)
 {
 	CPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 	if (pTuple->m_pBindablePropertyUnsafePtrStructType)
@@ -1089,32 +1147,39 @@ CTypeMgr::CreateDataPtrStructType (CType* pBaseType)
 }
 
 CStructType* 
-CTypeMgr::CreateFunctionPtrStructType (CFunctionType* pFunctionType)
+CTypeMgr::CreateClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 {
+	CFunctionType* pAbstractMethodMemberType = pFunctionType->GetAbstractMethodMemberType ();
+
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.ptr"));
-	pType->CreateMember (pFunctionType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateMember (pAbstractMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	pType->CreateMember (GetStdType (EStdType_ObjectPtr));
 	pType->CalcLayout ();
 	return pType;
 }
 
 CStructType* 
-CTypeMgr::CreateFunctionWeakPtrStructType (CFunctionType* pFunctionType)
+CTypeMgr::CreateWeakClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 {
+	ASSERT (false);
+
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.wptr"));
+
 	pType->CreateMember (pFunctionType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
 	pType->CreateMember (GetStdType (EStdType_ObjectPtr));
 	pType->CreateMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
 	pType->CalcLayout ();
-	return NULL;
+	return pType;
 }
 
 CStructType*
 CTypeMgr::CreatePropertyVTableStructType (CPropertyType* pPropertyType)
 {
+	ASSERT (false);
+
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.vtbl"));
 	pType->CreateMember (pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
@@ -1131,8 +1196,10 @@ CTypeMgr::CreatePropertyVTableStructType (CPropertyType* pPropertyType)
 }
 
 CStructType*
-CTypeMgr::CreatePropertyPtrStructType (CPropertyType* pPropertyType)
+CTypeMgr::CreateClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 {
+	ASSERT (false);
+
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.ptr"));
 	pType->CreateMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
@@ -1146,8 +1213,10 @@ CTypeMgr::CreatePropertyPtrStructType (CPropertyType* pPropertyType)
 }
 
 CStructType*
-CTypeMgr::CreatePropertyWeakPtrStructType (CPropertyType* pPropertyType)
+CTypeMgr::CreateWeakClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 {
+	ASSERT (false);
+
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.wptr"));
@@ -1165,6 +1234,8 @@ CTypeMgr::CreatePropertyWeakPtrStructType (CPropertyType* pPropertyType)
 CStructType*
 CTypeMgr::CreateBindablePropertyThinPtrStructType (CPropertyType* pPropertyType)
 {
+	ASSERT (false);
+
 	ASSERT (pPropertyType->m_Flags & EPropertyTypeFlag_Bindable);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.tptr"));
@@ -1177,6 +1248,8 @@ CTypeMgr::CreateBindablePropertyThinPtrStructType (CPropertyType* pPropertyType)
 CStructType*
 CTypeMgr::CreateBindablePropertyUnsafePtrStructType (CPropertyType* pPropertyType)
 {
+	ASSERT (false);
+
 	ASSERT (pPropertyType->m_Flags & EPropertyTypeFlag_Bindable);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.uptr"));

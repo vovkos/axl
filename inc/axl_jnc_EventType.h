@@ -44,7 +44,7 @@ public:
 	CFunctionType* 
 	GetFunctionType ()
 	{
-		return m_pFunctionPtrType->GetFunctionType ();
+		return m_pFunctionPtrType->GetTargetType ();
 	}
 
 	CStructType* 

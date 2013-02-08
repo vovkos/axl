@@ -15,12 +15,6 @@ template <typename T>
 class CBinOpT_Cmp: public IBinaryOperator
 {
 public:
-	CBinOpT_Cmp ()
-	{
-		m_OpFlags1 = EOpFlag_Arithmetic;
-		m_OpFlags2 = EOpFlag_Arithmetic;
-	}
-
 	virtual
 	bool
 	Operator (
@@ -66,7 +60,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedType ()
+						pType->IsUnsignedIntegerType ()
 						)
 					);
 				break;
@@ -77,7 +71,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedType ()
+						pType->IsUnsignedIntegerType ()
 						)
 					);
 				break;
@@ -108,7 +102,7 @@ public:
 					OpValue1, 
 					OpValue2, 
 					pResultValue,
-					pType->IsUnsignedType ()
+					pType->IsUnsignedIntegerType ()
 					);
 				break;
 

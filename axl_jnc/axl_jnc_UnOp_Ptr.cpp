@@ -20,7 +20,7 @@ CUnOp_Addr::Operator (
 	switch (OpTypeKind)
 	{
 	case EType_DataRef:
-		pResultType = ((CDataPtrType*) pOpType)->GetDataType ()->GetDataPtrType (
+		pResultType = ((CDataPtrType*) pOpType)->GetTargetType ()->GetDataPtrType (
 			EType_DataPtr, 
 			((CDataPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -28,7 +28,7 @@ CUnOp_Addr::Operator (
 		break;
 
 	case EType_FunctionRef:
-		pResultType = ((CFunctionPtrType*) pOpType)->GetFunctionType ()->GetFunctionPtrType (
+		pResultType = ((CFunctionPtrType*) pOpType)->GetTargetType ()->GetFunctionPtrType (
 			EType_FunctionPtr, 
 			((CFunctionPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -36,7 +36,7 @@ CUnOp_Addr::Operator (
 		break;
 
 	case EType_PropertyRef:
-		pResultType = ((CPropertyPtrType*) pOpType)->GetPropertyType ()->GetPropertyPtrType (
+		pResultType = ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetPropertyPtrType (
 			EType_PropertyPtr, 
 			((CPropertyPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -67,7 +67,7 @@ CUnOp_Indir::Operator (
 	switch (OpTypeKind)
 	{
 	case EType_DataPtr:
-		pResultType = ((CDataPtrType*) pOpType)->GetDataType ()->GetDataPtrType (
+		pResultType = ((CDataPtrType*) pOpType)->GetTargetType ()->GetDataPtrType (
 			EType_DataRef, 
 			((CDataPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -75,7 +75,7 @@ CUnOp_Indir::Operator (
 		break;
 
 	case EType_FunctionPtr:
-		pResultType = ((CFunctionPtrType*) pOpType)->GetFunctionType ()->GetFunctionPtrType (
+		pResultType = ((CFunctionPtrType*) pOpType)->GetTargetType ()->GetFunctionPtrType (
 			EType_FunctionRef, 
 			((CFunctionPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -83,7 +83,7 @@ CUnOp_Indir::Operator (
 		break;
 
 	case EType_PropertyPtr:
-		pResultType = ((CPropertyPtrType*) pOpType)->GetPropertyType ()->GetPropertyPtrType (
+		pResultType = ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetPropertyPtrType (
 			EType_PropertyRef, 
 			((CPropertyPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -97,6 +97,18 @@ CUnOp_Indir::Operator (
 
 	pResultValue->OverrideType (OpValue, pResultType);
 	return true;
+}
+
+//.............................................................................
+
+bool
+CUnOp_Ptr::Operator (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	err::SetFormatStringError (_T("unary '->' is not yet implemented"));
+	return false;
 }
 
 //.............................................................................

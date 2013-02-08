@@ -100,7 +100,7 @@ CBinOp_Sub::PointerDifferenceOperator (
 {
 	ASSERT (RawOpValue1.GetType ()->GetTypeKind () == EType_DataPtr);
 
-	CType* pBaseType = ((CDataPtrType*) RawOpValue1.GetType ())->GetDataType ();
+	CType* pBaseType = ((CDataPtrType*) RawOpValue1.GetType ())->GetTargetType ();
 	CDataPtrType* pPointerType = pBaseType->GetDataPtrType (EDataPtrType_Unsafe);
 
 	CValue OpValue1;

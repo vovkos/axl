@@ -204,7 +204,7 @@ property_template_specifier
 
 			$.m_pType = m_pModule->m_TypeMgr.GetPropertyType (
 				$pTemplate->GetGetterType (), 
-				$pTemplate->GetSetterType ()
+				*$pTemplate->GetSetterType ()
 				);
 		}
 	;

@@ -11,6 +11,49 @@ namespace jnc {
 
 //.............................................................................
 
+class CBinOp_Assign: public IBinaryOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_Assign, IBinaryOperator)
+
+public:
+	CBinOp_Assign ()
+	{
+		m_OpKind = EBinOp_Assign;
+		m_OpFlags1 = EOpFlag_KeepRef;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+class CBinOp_OpAssign: public IBinaryOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CBinOp_OpAssign, IBinaryOperator)
+
+public:
+	CBinOp_OpAssign ()
+	{
+		m_OpFlags1 = EOpFlag_KeepRef;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+};
+
 //.............................................................................
 
 } // namespace jnc {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_FunctionTypeOverload.h"
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_BasicBlock.h"
 #include "axl_jnc_Scope.h"
@@ -97,14 +98,13 @@ protected:
 	friend class CClassType;
 	friend class CProperty;
 	friend class CParser;
-	friend class CCast_fn;
+	friend class CCast_FunctionPtr;
 
-	EFunction m_FunctionKind;
-	
+	EFunction m_FunctionKind;	
 	CNamespace* m_pParentNamespace;
-	CFunctionType* m_pType;
-	CFunctionType* m_pShortType;
 
+	CFunctionType* m_pType;
+	CFunctionTypeOverload m_TypeOverload;
 	rtl::CArrayT <CFunction*> m_OverloadArray;
 
 	// orphan functions
@@ -159,10 +159,10 @@ public:
 		return m_pType;
 	}
 
-	CFunctionType* 
-	GetShortType ()
-	{
-		return m_pShortType;
+	CFunctionTypeOverload*
+	GetTypeOverload ()
+	{	
+		return &m_TypeOverload;
 	}
 
 	CClassType* 
@@ -288,13 +288,45 @@ public:
 	}
 
 	CFunction*
-	FindOverload (CFunctionType* pType);
+	FindOverload (CFunctionType* pType)
+	{
+		size_t i = m_TypeOverload.FindOverload (pType);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
 
 	CFunction*
-	FindShortOverload (CFunctionType* pType);
+	FindShortOverload (CFunctionType* pType)
+	{
+		size_t i = m_TypeOverload.FindShortOverload (pType);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
 
 	CFunction*
-	ChooseOverload (const rtl::CBoxListT <CValue>* pArgList);
+	ChooseOverload (
+		const rtl::CArrayT <CType*>& ArgTypeArray,
+		ECast* pCastKind = NULL
+		)
+	{
+		return ChooseOverload (ArgTypeArray, ArgTypeArray.GetCount (), pCastKind);
+	}
+
+	CFunction*
+	ChooseOverload (
+		CType* const* ppArgTypeArray,
+		size_t Count,
+		ECast* pCastKind = NULL
+		)
+	{
+		size_t i = m_TypeOverload.ChooseOverload (ppArgTypeArray, Count, pCastKind);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
+
+	CFunction*
+	ChooseOverload (const rtl::CConstBoxListT <CValue>& ArgList)
+	{
+		size_t i = m_TypeOverload.ChooseOverload (ArgList);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
 
 	bool
 	AddOverload (CFunction* pFunction);

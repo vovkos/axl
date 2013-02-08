@@ -72,64 +72,6 @@ GetUInt64TypeKind (
 			Integer <= INT64_MAX ? EType_Int64 : EType_Int64_u;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-EType
-GetUnsignedTypeKind (EType TypeKind)
-{
-	static EType ResultTypeTable [] = 
-	{
-		EType_Void,           // EType_Void
-		EType_Variant,        // EType_Variant
-		EType_Bool,           // EType_Bool
-		EType_Int8_u,         // EType_Int8,           
-		EType_Int8_u,         // EType_Int8_u,         
-		EType_Int16_u,        // EType_Int16,          
-		EType_Int16_u,        // EType_Int16_u,        
-		EType_Int32_u,        // EType_Int32,          
-		EType_Int32_u,        // EType_Int32_u,        
-		EType_Int64_u,        // EType_Int64,          
-		EType_Int64_u,        // EType_Int64_u,        
-		EType_Int16_beu,      // EType_Int16_be,       
-		EType_Int16_beu,      // EType_Int16_beu,      
-		EType_Int32_beu,      // EType_Int32_be,       
-		EType_Int32_beu,      // EType_Int32_beu,      
-		EType_Int64_beu,      // EType_Int64_be,       
-		EType_Int64_beu,      // EType_Int64_beu,      
-	};
-
-	ASSERT (TypeKind <= EType_Int64_beu);
-	return ResultTypeTable [TypeKind];
-}
-
-EType
-GetBigEndianTypeKind (EType TypeKind)
-{
-	static EType ResultTypeTable [] = 
-	{
-		EType_Void,           // EType_Void
-		EType_Variant,        // EType_Variant
-		EType_Bool,           // EType_Bool
-		EType_Int8,           // EType_Int8,           
-		EType_Int8_u,         // EType_Int8_u,         
-		EType_Int16_be,       // EType_Int16,          
-		EType_Int16_beu,      // EType_Int16_u,        
-		EType_Int32_be,       // EType_Int32,          
-		EType_Int32_beu,      // EType_Int32_u,        
-		EType_Int64_be,       // EType_Int64,          
-		EType_Int64_beu,      // EType_Int64_u,        
-		EType_Int16_be,       // EType_Int16_be,       
-		EType_Int16_beu,      // EType_Int16_beu,      
-		EType_Int32_be,       // EType_Int32_be,       
-		EType_Int32_beu,      // EType_Int32_beu,      
-		EType_Int64_be,       // EType_Int64_be,       
-		EType_Int64_beu,      // EType_Int64_beu,      
-	};
-
-	ASSERT (TypeKind <= EType_Int64_beu);
-	return ResultTypeTable [TypeKind];
-}
-
 //.............................................................................
 
 rtl::CString 
@@ -309,7 +251,7 @@ CType::IsBindablePropertyType ()
 {
 	return 
 		m_TypeKind == EType_PropertyRef &&
-		(((CPropertyPtrType*) this)->GetPropertyType ()->GetFlags () & EPropertyTypeFlag_Bindable) != 0;
+		(((CPropertyPtrType*) this)->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable) != 0;
 }
 
 CArrayType* 

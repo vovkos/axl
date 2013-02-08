@@ -28,6 +28,11 @@ enum EBinOp
 	EBinOp_BwXor,	
 	EBinOp_BwOr,
 
+	// special ops
+
+	EBinOp_At,
+	EBinOp_Idx,
+
 	// comparison
 
 	EBinOp_Eq,
@@ -37,9 +42,15 @@ enum EBinOp
 	EBinOp_Gt,
 	EBinOp_Ge,
 
+	// logic
+
+	EBinOp_LogAnd,
+	EBinOp_LogOr,
+
 	// assignment
 
 	EBinOp_Assign,
+	EBinOp_ClassAssign,
 	EBinOp_AddAssign,
 	EBinOp_SubAssign,
 	EBinOp_MulAssign,
@@ -51,18 +62,8 @@ enum EBinOp
 	EBinOp_XorAssign,
 	EBinOp_OrAssign,
 	EBinOp_AtAssign,
-	EBinOp_ClassAssign,
 
-	// logic
-
-	EBinOp_LogAnd,
-	EBinOp_LogOr,
-
-	// other
-
-	EBinOp_Idx,
-	EBinOp_At,
-
+	EBinOp__OpAssignDelta = EBinOp_AddAssign - EBinOp_Add,
 	EBinOp__Count,
 };
 
@@ -77,6 +78,8 @@ GetBinOpKindString (EBinOp OpKind);
 struct IBinaryOperator: obj::IRoot
 {	
 protected:
+	friend class COperatorMgr;
+
 	CModule* m_pModule;
 	EBinOp m_OpKind;
 	int m_OpFlags1;
@@ -130,45 +133,6 @@ public:
 			pOpType2->GetTypeString ()
 			);
 	}
-};
-
-//.............................................................................
-
-class CBinOp_Idx: public IBinaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CBinOp_Idx, IBinaryOperator)
-
-public:
-	CBinOp_Idx ()
-	{
-		m_OpKind = EBinOp_Ge;
-		m_OpFlags1 = EOpFlag_KeepPropertyRef; // indexing properties is creating a closure
-	}
-
-	virtual
-	bool
-	Operator (
-		const CValue& RawOpValue1,
-		const CValue& RawOpValue2,
-		CValue* pResultValue
-		);
-
-protected:
-	bool
-	ArrayIndexOperator (
-		const CValue& RawOpValue1,
-		CArrayType* pArrayType,
-		const CValue& RawOpValue2,
-		CValue* pResultValue
-		);
-
-	bool
-	PropertyIndexOperator (
-		const CValue& RawOpValue1,
-		const CValue& RawOpValue2,
-		CValue* pResultValue
-		);
 };
 
 //.............................................................................

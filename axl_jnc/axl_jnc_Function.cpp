@@ -68,7 +68,6 @@ CFunction::CFunction ()
 	m_FunctionKind = EFunction_Undefined;
 	m_pParentNamespace = NULL;
 	m_pType = NULL;
-	m_pShortType = NULL;
 	m_pOrphanNamespace = NULL;
 	m_pExternFunction = NULL;
 	m_pClassType = NULL;
@@ -141,93 +140,12 @@ CFunction::GetLlvmFunction ()
 	return m_pLlvmFunction;
 }
 
-CFunction*
-CFunction::FindOverload (CFunctionType* pType)
-{
-	if (pType->Cmp (m_pType) == 0)
-		return this;
-
-	size_t Count = m_OverloadArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pFunction = m_OverloadArray [i];
-		if (pType->Cmp (pFunction->m_pType) == 0)
-			return pFunction;
-	}
-
-	return NULL;
-}
-
-CFunction*
-CFunction::FindShortOverload (CFunctionType* pType)
-{
-	if (pType->Cmp (m_pShortType) == 0)
-		return this;
-
-	size_t Count = m_OverloadArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pFunction = m_OverloadArray [i];
-		if (pType->Cmp (pFunction->m_pShortType) == 0)
-			return pFunction;
-	}
-
-	return NULL;
-}
-
-CFunction*
-CFunction::ChooseOverload (const rtl::CBoxListT <CValue>* pArgList)
-{
-	if (m_OverloadArray.IsEmpty ())
-		return this;
-
-	ECast BestCastKind = m_pModule->m_OperatorMgr.GetArgCastKind (m_pType, pArgList);
-	CFunction* pBestFunction = BestCastKind ? this : NULL;
-
-	size_t Count = m_OverloadArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pFunction = m_OverloadArray [i];
-		ECast CastKind = m_pModule->m_OperatorMgr.GetArgCastKind (pFunction->GetType (), pArgList);
-		if (!CastKind)
-			continue;
-
-		if (CastKind == BestCastKind)
-		{
-			err::SetFormatStringError (_T("ambiguous call to overloaded function"));
-			return NULL;
-		}
-
-		if (CastKind > BestCastKind)
-		{
-			pBestFunction = pFunction;
-			BestCastKind = CastKind;
-		}
-	}
-
-	if (!pBestFunction)
-	{
-		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
-		return NULL;
-	}
-
-	return pBestFunction; 
-}
-
 bool
 CFunction::AddOverload (CFunction* pFunction)
 {
-	size_t Count = m_OverloadArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pExistingFunction = m_OverloadArray [i];
-		
-		if (pFunction->GetType ()->GetArgSignature ().Cmp (pExistingFunction->GetType ()->GetArgSignature ()) == 0)
-		{
-			err::SetFormatStringError (_T("illegal function overload: duplicate argument signature"));
-			return false;
-		}
-	}
+	size_t i = m_TypeOverload.FindOverload (pFunction->m_pType);
+	if (i != -1)
+		return false;
 
 	m_OverloadArray.Append (pFunction);
 	return true;
@@ -346,7 +264,6 @@ CFunction::ResolveOrphan ()
 	m_AccessKind = pOriginFunction->m_AccessKind;
 	m_pParentNamespace = pOriginFunction->m_pParentNamespace;
 	m_pType = pOriginFunction->m_pType;
-	m_pShortType = pOriginFunction->m_pShortType;
 	m_Name = pOriginFunction->m_Name;
 	m_QualifiedName = pOriginFunction->m_QualifiedName;
 	m_Tag = pOriginFunction->m_Tag;

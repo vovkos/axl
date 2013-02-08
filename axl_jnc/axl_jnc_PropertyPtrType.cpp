@@ -15,11 +15,11 @@ GetPropertyPtrTypeKindString (EPropertyPtrType PtrTypeKind)
 	case EPropertyPtrType_Normal:
 		return _T("closure");
 
-	case EPropertyPtrType_Thin:
-		return _T("thin");
-
 	case EPropertyPtrType_Weak:
 		return _T("weak");
+
+	case EPropertyPtrType_Thin:
+		return _T("thin");
 
 	case EPropertyPtrType_Unsafe:
 		return _T("unsafe");
@@ -36,31 +36,31 @@ CPropertyPtrType::CPropertyPtrType ()
 	m_TypeKind = EType_PropertyPtr;
 	m_PtrTypeKind = EPropertyPtrType_Normal;
 	m_Size = sizeof (TPropertyPtr);
-	m_pPropertyType = NULL;
+	m_pTargetType = NULL;
 }
 
 CStructType* 
-CPropertyPtrType::GetPropertyPtrStructType ()
+CPropertyPtrType::GetClosurePropertyPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetPropertyPtrStructType (m_pPropertyType);
+	return m_pModule->m_TypeMgr.GetClosurePropertyPtrStructType (m_pTargetType);
 }
 
 CStructType* 
-CPropertyPtrType::GetPropertyWeakPtrStructType ()
+CPropertyPtrType::GetWeakClosurePropertyPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetPropertyWeakPtrStructType (m_pPropertyType);
+	return m_pModule->m_TypeMgr.GetWeakClosurePropertyPtrStructType (m_pTargetType);
 }
 
 CStructType* 
-CPropertyPtrType::GetBindablePropertyThinPtrStructType ()
+CPropertyPtrType::GetThinAuPropertyPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetBindablePropertyThinPtrStructType (m_pPropertyType);
+	return m_pModule->m_TypeMgr.GetThinAuPropertyPtrStructType (m_pTargetType);
 }
 
 CStructType* 
-CPropertyPtrType::GetBindablePropertyUnsafePtrStructType ()
+CPropertyPtrType::GetUnsafeAuPropertyPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetBindablePropertyUnsafePtrStructType (m_pPropertyType);
+	return m_pModule->m_TypeMgr.GetUnsafeAuPropertyPtrStructType (m_pTargetType);
 }
 
 rtl::CStringA
@@ -98,8 +98,8 @@ CPropertyPtrType::CreateSignature (
 void
 CPropertyPtrType::PrepareTypeString ()
 {
-	m_TypeString = m_pPropertyType->GetReturnType ()->GetTypeString ();
-	m_TypeString += m_pPropertyType->GetTypeModifierString ();
+	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
+	m_TypeString += m_pTargetType->GetTypeModifierString ();
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
@@ -112,31 +112,31 @@ CPropertyPtrType::PrepareTypeString ()
 
 	m_TypeString += m_TypeKind == EType_PropertyRef ? " property&" : " property*";
 
-	if (m_pPropertyType->IsIndexed ())
+	if (m_pTargetType->IsIndexed ())
 	{
 		m_TypeString += _T(' ');
-		m_TypeString += m_pPropertyType->GetGetterType ()->GetArgTypeString ();
+		m_TypeString += m_pTargetType->GetGetterType ()->GetArgTypeString ();
 	}
 }
 
 void
 CPropertyPtrType::PrepareLlvmType ()
 {
-	if (!(m_pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable))
+	if (!(m_pTargetType->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
 		switch (m_PtrTypeKind)
 		{
 		case EPropertyPtrType_Normal:
-			m_pLlvmType = GetPropertyPtrStructType ()->GetLlvmType ();
+			m_pLlvmType = GetClosurePropertyPtrStructType ()->GetLlvmType ();
 			break;
 
 		case EPropertyPtrType_Thin:
 		case EPropertyPtrType_Unsafe:
-			m_pLlvmType = m_pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe)->GetLlvmType ();
+			m_pLlvmType = m_pTargetType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe)->GetLlvmType ();
 			break;
 
 		case EPropertyPtrType_Weak:
-			m_pLlvmType = GetPropertyWeakPtrStructType ()->GetLlvmType ();
+			m_pLlvmType = GetWeakClosurePropertyPtrStructType ()->GetLlvmType ();
 			break;
 
 		default:
@@ -148,19 +148,19 @@ CPropertyPtrType::PrepareLlvmType ()
 		switch (m_PtrTypeKind)
 		{
 		case EPropertyPtrType_Normal:
-			m_pLlvmType = GetPropertyPtrStructType ()->GetLlvmType ();
+			m_pLlvmType = GetClosurePropertyPtrStructType ()->GetLlvmType ();
 			break;
 
 		case EPropertyPtrType_Thin:
-			m_pLlvmType = GetBindablePropertyThinPtrStructType ()->GetLlvmType ();
+			m_pLlvmType = GetThinAuPropertyPtrStructType ()->GetLlvmType ();
 			break;
 
 		case EPropertyPtrType_Unsafe:
-			m_pLlvmType = GetBindablePropertyUnsafePtrStructType ()->GetLlvmType ();
+			m_pLlvmType = GetUnsafeAuPropertyPtrStructType ()->GetLlvmType ();
 			break;
 
 		case EPropertyPtrType_Weak:
-			m_pLlvmType = GetPropertyWeakPtrStructType ()->GetLlvmType ();
+			m_pLlvmType = GetWeakClosurePropertyPtrStructType ()->GetLlvmType ();
 			break;
 
 		default:

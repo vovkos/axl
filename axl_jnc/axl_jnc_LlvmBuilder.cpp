@@ -188,8 +188,6 @@ CLlvmBuilder::CreateCall (
 
 	if (pResultType && pResultType->GetTypeKind () != EType_Void)
 	{
-		rtl::CString s = GetLlvmTypeString (CalleeValue.GetLlvmValue ()->getType ());
-
 		pInst = m_LlvmBuilder.CreateCall (
 			CalleeValue.GetLlvmValue (), 
 			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount),
@@ -323,198 +321,6 @@ CLlvmBuilder::CreateDataPtrValidator (
 }
 
 bool
-CLlvmBuilder::CheckDataPtrRange (
-	const CValue& RawPtrValue,
-	size_t Size,
-	const CValue& ValidatorValue,
-	ERuntimeError Error
-	)
-{
-	CreateComment ("check safe pointer range");
-
-	CValue SizeValue (Size, EType_SizeT);
-	CValue ErrorValue (Error, EType_Int);
-
-	CValue PtrValue;
-	CreateBitCast (RawPtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-
-	CFunction* pCheckDataPtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckDataPtrRange);
-
-	CreateCall4 (
-		pCheckDataPtrRange,
-		pCheckDataPtrRange->GetType (),
-		PtrValue,
-		SizeValue,
-		ValidatorValue,
-		ErrorValue,
-		NULL
-		);
-
-	return true;
-}
-
-bool
-CLlvmBuilder::GetDstScopeLevel (
-	const CValue& DstValue,
-	CValue* pDstScopeLevelValue
-	)
-{
-	if (DstValue.GetValueKind () == EValue_Variable)
-	{
-		CScope* pScope = DstValue.GetVariable ()->GetScope ();
-		m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope, pDstScopeLevelValue);
-	}
-	else if (DstValue.GetType ()->GetTypeKind () == EType_DataRef)
-	{
-		size_t ScopeLevelIndexArray [] = 
-		{
-			1, // TDataPtrValidator m_Validator
-			2, // size_t m_ScopeLvel
-		};
-
-		CreateExtractValue (DstValue, ScopeLevelIndexArray, countof (ScopeLevelIndexArray), m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), pDstScopeLevelValue);
-	}
-	else
-	{
-		pDstScopeLevelValue->SetConstSizeT (0);
-	}
-
-	return true;
-}
-
-bool
-CLlvmBuilder::CheckDataPtrScopeLevel (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	CValue SrcScopeLevelValue;
-
-	if (SrcValue.GetValueKind () == EValue_Variable)
-	{
-		CScope* pSrcScope = SrcValue.GetVariable ()->GetScope ();
-		size_t SrcScopeLevel = pSrcScope ? pSrcScope->GetLevel () : 0;
-
-		if (DstValue.GetValueKind () == EValue_Variable)  // can check at compile time
-		{
-			CScope* pDstScope = DstValue.GetVariable ()->GetScope ();
-
-			size_t DstScopeLevel = pDstScope ? pDstScope->GetLevel () : 0;
-
-			if (SrcScopeLevel > DstScopeLevel)
-			{
-				err::SetFormatStringError (_T("safe pointer/reference scope level mismatch"));
-				return false;
-			}
-
-			return true;
-		}
-
-		SrcScopeLevelValue.SetConstSizeT (SrcScopeLevel);
-	}
-	else
-	{
-		size_t ScopeLevelIndexArray [] = 
-		{
-				1, // TDataPtrValidator m_Validator
-				2, // size_t m_ScopeLevel
-		};
-
-		CreateExtractValue (SrcValue, ScopeLevelIndexArray, countof (ScopeLevelIndexArray), NULL, &SrcScopeLevelValue);
-	}
-
-	CValue DstScopeLevelValue;
-	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
-
-	CreateComment ("check safe pointer scope level");
-
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
-	
-	CreateCall2 (
-		pCheckFunction,
-		pCheckFunction->GetType (),
-		SrcScopeLevelValue,
-		DstScopeLevelValue,
-		NULL
-		);
-
-	return true;
-}
-
-bool
-CLlvmBuilder::CheckNullPtr (const CValue& Value)
-{
-	CreateComment ("check null pointer");
-
-	CValue PtrValue;
-	ERuntimeError Error;
-
-	CType* pType = Value.GetType ();
-	EType TypeKind = pType->GetTypeKind ();
-
-	switch (TypeKind)
-	{
-	case EType_ClassPtr:
-		PtrValue = Value;
-		Error = ERuntimeError_NullInterface;
-		break;
-
-	case EType_FunctionPtr:
-		CreateExtractValue (Value, 0, NULL, &PtrValue);
-		Error = ERuntimeError_NullFunction;
-		break;
-
-	case EType_PropertyPtr:
-		CreateExtractValue (Value, 0, NULL, &PtrValue);
-		Error = ERuntimeError_NullProperty;
-		break;
-		
-	default:
-		ASSERT (false);
-	}
-
-	CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);	
-	CreateCall2 (
-		pCheckFunction, 
-		pCheckFunction->GetType (), 
-		PtrValue, 
-		CValue (Error, EType_Int),
-		NULL
-		);
-
-	return true;
-}
-
-bool
-CLlvmBuilder::CheckInterfaceScopeLevel (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	CValue DstScopeLevelValue;
-	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
-
-	CreateComment ("check interface scope level");
-
-	CValue AbstractInterfaceValue;
-	CreateBitCast (SrcValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &AbstractInterfaceValue);
-
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
-
-	CreateCall2 (
-		pCheckFunction,
-		pCheckFunction->GetType (),
-		AbstractInterfaceValue,
-		DstScopeLevelValue,
-		NULL
-		);
-
-	return true;
-}
-
-bool
 CLlvmBuilder::DynamicCastInterface (
 	const CValue& Value,
 	CClassType* pResultType,
@@ -567,67 +373,68 @@ CLlvmBuilder::InitializeObject (
 }
 
 bool
-CLlvmBuilder::CreateFunctionPointer (
+CLlvmBuilder::CreateClosureFunctionPtr (
 	const CValue& RawPfnValue,
 	const CValue& RawIfaceValue,
 	CFunctionPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
-	CreateComment ("create function pointer");
+	CreateComment ("create closure function pointer");
 
 	CValue PfnValue;
 	CValue IfaceValue;
 	CValue FunctionPtrValue = pResultType->GetUndefValue ();
 
-	CreateBitCast (RawPfnValue, pResultType->GetFunctionType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe), &PfnValue);
+	CFunctionType* pAbstractMethodMemberType = pResultType->GetTargetType ()->GetAbstractMethodMemberType ();
+
+	CreateBitCast (RawPfnValue, pAbstractMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
 	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
+
 	CreateInsertValue (FunctionPtrValue, PfnValue, 0, NULL, &FunctionPtrValue);
 	CreateInsertValue (FunctionPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;
 }
 
 bool
-CLlvmBuilder::CheckFunctionPointerScopeLevel (
-	const CValue& SrcValue,
-	const CValue& DstValue
+CLlvmBuilder::CreateClosurePropertyPtr (
+	const CValue& RawPfnValue,
+	const CValue& RawIfaceValue,
+	CPropertyPtrType* pResultType,
+	CValue* pResultValue
 	)
 {
-	CValue DstScopeLevelValue;
-	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
+	CreateComment ("create closure property pointer");
 
-	CreateComment ("check funtion pointer scope");
+	CValue PfnValue;
+	CValue IfaceValue;
+	CValue PropertyPtrValue = pResultType->GetUndefValue ();
 
-	CValue InterfaceValue;
-	CreateExtractValue (SrcValue, 1, NULL, &InterfaceValue);
-	
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
-	
-	CreateCall2 (
-		pCheckFunction,
-		pCheckFunction->GetType (),
-		InterfaceValue,
-		DstScopeLevelValue,
-		NULL
-		);
+	CPropertyType* pAbstractMethodMemberType = pResultType->GetTargetType ()->GetAbstractPropertyMemberType ();
 
+	CreateBitCast (RawPfnValue, pAbstractMethodMemberType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
+	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
+	CreateInsertValue (PropertyPtrValue, PfnValue, 0, NULL, &PropertyPtrValue);
+	CreateInsertValue (PropertyPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;
 }
 
+/*
+
 bool
-CLlvmBuilder::CreatePropertyPointer (
+CLlvmBuilder::CreateClosurePropertyPtr (
 	const CValue& PtrValue,
 	const CValue& InterfaceValue,
 	CPropertyPtrType* pResultType,
 	CValue* pResultValue
 	)
 {
-	CreateComment ("create property pointer");
+	CreateComment ("create closure property pointer");
 
 	ASSERT (PtrValue.GetType ()->GetTypeKind () == EType_Property);
 	CPropertyType* pPropertyType = (CPropertyType*) PtrValue.GetType ();
 
-	ASSERT (pPropertyType->Cmp (pResultType->GetPropertyType ()) == 0);
+	ASSERT (pPropertyType->Cmp (pResultType->GetTargetType ()) == 0);
 
 	CValue VTablePtrValue;
 	if (PtrValue.GetValueKind () == EValue_Property)
@@ -641,7 +448,7 @@ CLlvmBuilder::CreatePropertyPointer (
 		VTablePtrValue = PtrValue;
 	}
 	
-	CStructType* pVTableType = pResultType->GetPropertyType ()->GetVTableStructType ();
+	CStructType* pVTableType = pResultType->GetTargetType ()->GetVTableStructType ();
 	CreateBitCast (VTablePtrValue, pVTableType->GetDataPtrType (EDataPtrType_Unsafe), &VTablePtrValue);
 
 	CValue PropertyPtrValue = pResultType->GetUndefValue ();
@@ -657,35 +464,7 @@ CLlvmBuilder::CreatePropertyPointer (
 	return true;
 }
 
-bool
-CLlvmBuilder::CheckPropertyPointerScopeLevel (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	if (SrcValue.GetValueKind () == EValue_Property) 
-		return true;
-
-	CValue DstScopeLevelValue;
-	GetDstScopeLevel (DstValue, &DstScopeLevelValue);
-
-	CreateComment ("check property pointer scope");
-
-	CValue InterfaceValue;
-	CreateExtractValue (SrcValue, 1, NULL, &InterfaceValue);
-
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckInterfaceScopeLevel);
-	
-	CreateCall2 (
-		pCheckFunction,
-		pCheckFunction->GetType (),
-		InterfaceValue,
-		DstScopeLevelValue,
-		NULL
-		);
-
-	return true;
-}
+*/
 
 //.............................................................................
 

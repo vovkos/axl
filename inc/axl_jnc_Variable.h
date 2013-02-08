@@ -5,7 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
-#include "axl_jnc_Namespace.h"
+#include "axl_jnc_Scope.h"
 
 namespace axl {
 namespace jnc {
@@ -59,6 +59,12 @@ public:
 	GetScope ()
 	{
 		return m_pScope;
+	}
+
+	size_t
+	GetScopeLevel ()
+	{
+		return m_pScope ? m_pScope->GetLevel () : 0;
 	}
 
 	llvm::Value* 

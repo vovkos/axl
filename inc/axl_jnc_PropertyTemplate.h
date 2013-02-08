@@ -35,10 +35,10 @@ public:
 		return m_pGetterType;
 	}
 
-	const CFunctionTypeOverload& 
+	CFunctionTypeOverload*
 	GetSetterType ()
 	{
-		return m_SetterType;
+		return &m_SetterType;
 	}
 
 	bool
