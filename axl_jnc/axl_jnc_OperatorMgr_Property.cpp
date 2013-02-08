@@ -8,23 +8,229 @@ namespace jnc {
 //.............................................................................
 
 bool
+COperatorMgr::GetPropertyThinPtr (
+	CProperty* pProperty,
+	CClosure* pClosure,
+	CPropertyPtrType* pPtrType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (pProperty->GetType ()->Cmp (pPtrType->GetTargetType ()) == 0);
+
+	if (pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Augmented)
+	{
+		err::SetFormatStringError (_T("augmented properties are not yet supported"), pPtrType->GetTypeString ());
+		return false;
+	}
+
+	bool Result = GetPropertyVTable (pProperty, pClosure, pResultValue);
+	if (!Result)
+		return false;
+
+	pResultValue->OverrideType (pPtrType);
+	return true;
+}
+
+bool
+COperatorMgr::GetPropertyVTable (
+	CProperty* pProperty,
+	CClosure* pClosure,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	if (pProperty->GetStorageKind () == EStorage_Virtual)
+	{
+		if (!pClosure || !pClosure->IsMemberClosure ())
+		{
+			err::SetFormatStringError (_T("virtual property requires an object pointer"));
+			return false;
+		}
+
+		Result = GetVirtualPropertyMember (pProperty, pClosure, pResultValue);
+		if (!Result)
+			return false;
+	}
+
+	return pProperty->GetVTablePtrValue (pResultValue);
+}
+
+bool
+COperatorMgr::GetPropertyVTable (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
+	
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
+	EPropertyPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
+
+	CType* pVTableType = pPtrType->GetTargetType ()->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe);
+
+	switch (PtrTypeKind)
+	{
+	case EPropertyPtrType_Normal:
+		break;
+
+	case EPropertyPtrType_Weak:
+		err::SetFormatStringError (_T("cannot invoke weak '%s'"), pPtrType->GetTypeString ());
+		return false;
+	
+	case EPropertyPtrType_Thin:
+		if (OpValue.GetValueKind () == EValue_Property)
+			return GetPropertyVTable (OpValue.GetProperty (), OpValue.GetClosure (), pResultValue);
+
+		// else fall through
+
+	case EPropertyPtrType_Unsafe:
+		if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Augmented)
+			m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pVTableType, pResultValue);
+		else
+			*pResultValue = OpValue;
+
+		return true;
+
+	default:
+		ASSERT (false);
+	}
+
+	CType* pClosureType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+
+	CValue ClosureValue;
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pVTableType, pResultValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, pClosureType, &ClosureValue);
+
+	pResultValue->SetClosure (OpValue.GetClosure ());
+
+	CClosure* pClosure = pResultValue->GetClosure ();
+	if (!pClosure)
+		pClosure = pResultValue->CreateClosure ();
+
+	pClosure->GetArgList ()->InsertHead (ClosureValue);
+	return true;
+}
+
+bool
 COperatorMgr::GetPropertyGetter (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("get property 'get' member is not implemented yet"));
-	return false;
+	bool Result;
+
+	if (OpValue.GetValueKind () == EValue_Property)
+	{
+		*pResultValue = OpValue.GetProperty ()->GetGetter ();
+		pResultValue->SetClosure (OpValue.GetClosure ());
+		return true;
+	}
+
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
+	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
+		pPtrType->GetTargetType ()->GetAbstractPropertyMemberType () :
+		pPtrType->GetTargetType ();
+
+	CValue VTableValue;
+	Result = GetPropertyVTable (OpValue, &VTableValue);
+	if (!Result)
+		return false;
+
+	EFunctionPtrType GetterPtrTypeKind = pPtrType->GetPtrTypeKind () == EPropertyPtrType_Unsafe ? 
+		EFunctionPtrType_Unsafe : 
+		EFunctionPtrType_Thin;
+
+	CValue PfnValue;
+	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, 0, NULL, &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateLoad (
+		PfnValue, 
+		pPropertyType->GetGetterType ()->GetFunctionPtrType (GetterPtrTypeKind), 
+		pResultValue
+		);
+
+	pResultValue->SetClosure (VTableValue.GetClosure ());
+	return true;
 }
 
 bool
 COperatorMgr::GetPropertySetter (
 	const CValue& OpValue,
+	const CValue& ArgValue,
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("get property 'set' member is not implemented yet"));
-	return false;
+	bool Result;
+
+	if (OpValue.GetValueKind () == EValue_Property)
+	{
+		*pResultValue = OpValue.GetProperty ()->GetSetter ();
+		pResultValue->SetClosure (OpValue.GetClosure ());
+		return true;
+	}
+
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
+	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
+		pPtrType->GetTargetType ()->GetAbstractPropertyMemberType () :
+		pPtrType->GetTargetType ();
+
+	if (pPropertyType->IsReadOnly ())
+	{
+		err::SetFormatStringError (_T("read-only '%s' has no setter"), pPropertyType->GetTypeString ());
+		return false;
+	}
+
+	size_t i;
+
+	CFunctionTypeOverload* pSetterType = pPropertyType->GetSetterType (); 
+	if (!pSetterType->IsOverloaded ())
+	{
+		i = 0;
+	}
+	else if (ArgValue.IsEmpty ())
+	{
+		err::SetFormatStringError (_T("cannot choose one of '%d' setter overloads"), pSetterType->GetOverloadCount ());
+		return false;
+	}
+	else
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue);
+
+		CClosure* pClosure = OpValue.GetClosure ();
+		if (pClosure)
+		{
+			Result = pClosure->Apply (&ArgList);
+			if (!Result)
+				return false;
+		}
+		
+		i = pSetterType->ChooseOverload (ArgList);
+		if (i == -1)
+			return false;
+	}
+	
+	CValue VTableValue;
+	Result = GetPropertyVTable (OpValue, &VTableValue);
+	if (!Result)
+		return false;
+
+	EFunctionPtrType SetterPtrTypeKind = pPtrType->GetPtrTypeKind () == EPropertyPtrType_Unsafe ? 
+		EFunctionPtrType_Unsafe : 
+		EFunctionPtrType_Thin;
+
+	CValue PfnValue;
+	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, i + 1, NULL, &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateLoad (
+		PfnValue, 
+		pSetterType->GetOverload (i)->GetFunctionPtrType (SetterPtrTypeKind), 
+		pResultValue
+		);
+
+	pResultValue->SetClosure (VTableValue.GetClosure ());
+	return true;
 }
 
 bool
@@ -81,17 +287,53 @@ COperatorMgr::GetPropertyOnChangeEvent (
 }
 
 bool
-COperatorMgr::GetPropertyOperator (
+COperatorMgr::GetProperty (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
+	
+	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_AutoGet)
+		return GetPropertyPropValue (OpValue, pResultValue);
+
+	CValue GetterValue;
+	return 
+		GetPropertyGetter (OpValue, &GetterValue) &&
+		CallOperator (GetterValue, NULL, pResultValue);
+}
+
+bool
+COperatorMgr::SetProperty (
+	const CValue& OpValue,
+	const CValue& SrcValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
+	
+	rtl::CBoxListT <CValue> ArgList;
+	ArgList.InsertTail (SrcValue);
+
+	CValue SetterValue;
+	CValue ReturnValue;
+	return 
+		GetPropertySetter (OpValue, SrcValue, &SetterValue) &&
+		CallOperator (SetterValue, &ArgList, &ReturnValue);
+}
+
+
+/*
+
+bool
+COperatorMgr::GetProperty (
 	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
 	ASSERT (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
 
-	err::SetFormatStringError (_T("get property operator is not implemented yet"));
-	return false;
-
-/*
 	CPropertyType* pPropertyType;
 	CValue OpValue;
 	CValue InterfaceValue;
@@ -145,22 +387,16 @@ COperatorMgr::GetPropertyOperator (
 
 	FunctionValue.SetClosure (OpValue.GetClosure ());
 	return CallOperator (FunctionValue, NULL, pResultValue);
-
-*/
 }
 
 bool
-COperatorMgr::SetPropertyOperator (
+COperatorMgr::SetProperty (
 	const CValue& SrcValue,
 	const CValue& RawDstValue
 	)
 {
 	ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyRef);
 
-	err::SetFormatStringError (_T("set property operator is not implemented yet"));
-	return false;
-
-/*
 	bool Result;
 
 	CPropertyType* pPropertyType;
@@ -258,9 +494,9 @@ COperatorMgr::SetPropertyOperator (
 	}
 
 	return true;
-
-	*/
 }
+
+*/
 
 //.............................................................................
 

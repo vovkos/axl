@@ -15,6 +15,11 @@ namespace jnc {
 class CCast_PropertyPtr_Base: public ICastOperator
 {
 public:
+	CCast_PropertyPtr_Base ()
+	{
+		m_OpFlags = EOpFlag_KeepPropertyRef;
+	}
+
 	virtual
 	ECast
 	GetCastKind (
@@ -89,6 +94,14 @@ protected:
 		const CValue& OpValue,
 		CPropertyType* pSrcPropertyType,
 		CPropertyPtrType* pDstPtrType,
+		CValue* pResultValue
+		);
+
+	bool
+	CreateClosurePropertyPtr (
+		CProperty* pProperty,
+		const CValue& ClosureValue,
+		CPropertyPtrType* pPtrType,
 		CValue* pResultValue
 		);
 };

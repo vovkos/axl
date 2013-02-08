@@ -16,12 +16,8 @@ CBinOp_Idx::Operator (
 {
 	bool Result;
 
-	CValue OpValue1;
-	CValue OpValue2;
-
-	Result = m_pModule->m_OperatorMgr.CastOperator (RawOpValue2, EType_Int_p, &OpValue2);
-	if (!Result)
-		return false;
+	CValue OpValue1 = RawOpValue1;
+	CValue OpValue2 = RawOpValue2;
 
 	CType* pOpType1 = RawOpValue1.GetType ();
 	if (pOpType1->GetTypeKind () == EType_DataRef)
@@ -29,7 +25,9 @@ CBinOp_Idx::Operator (
 		CType* pBaseType = ((CDataPtrType*) pOpType1)->GetTargetType ();
 
 		if (pBaseType->GetTypeKind () == EType_Array)
-			return ArrayIndexOperator (RawOpValue1, (CArrayType*) pBaseType, OpValue2, pResultValue);
+			return 
+				m_pModule->m_OperatorMgr.CastOperator (&OpValue2, EType_Int_p) &&
+				ArrayIndexOperator (RawOpValue1, (CArrayType*) pBaseType, OpValue2, pResultValue);
 
 		Result = m_pModule->m_OperatorMgr.LoadDataRef (RawOpValue1, &OpValue1);
 		if (!Result)
@@ -42,10 +40,14 @@ CBinOp_Idx::Operator (
 	switch (TypeKind)
 	{
 	case EType_DataPtr:
-		return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Add, OpValue1, OpValue2, pResultValue);
+		return 
+			m_pModule->m_OperatorMgr.CastOperator (&OpValue2, EType_Int_p) &&
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Add, OpValue1, OpValue2, pResultValue);
 
 	case EType_Array:
-		return ArrayIndexOperator (OpValue1, (CArrayType*) pOpType1, OpValue2, pResultValue);
+		return 
+			m_pModule->m_OperatorMgr.CastOperator (&OpValue2, EType_Int_p) &&
+			ArrayIndexOperator (OpValue1, (CArrayType*) pOpType1, OpValue2, pResultValue);
 
 	case EType_PropertyRef:
 	case EType_PropertyPtr:
@@ -103,12 +105,12 @@ CBinOp_Idx::ArrayIndexOperator (
 	{
 		CValue GepValue;
 		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
-		pResultValue->SetVariable (
-			OpValue1.GetVariable (), 
+
+		pResultValue->SetLlvmValue (
 			GepValue.GetLlvmValue (), 
-			pElementType,
-			true,
-			true
+			pElementType->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin),
+			OpValue1.GetVariable (), 
+			EValueFlag_VariableOffset
 			);
 	}
 	else
@@ -145,7 +147,6 @@ CBinOp_Idx::PropertyIndexOperator (
 	if (!pClosure)
 		pClosure = pResultValue->CreateClosure ();
 
-	ASSERT (pClosure->GetClosureKind () == EClosure_Property); 
 	pClosure->GetArgList ()->InsertTail (RawOpValue2);
 	return true;
 }

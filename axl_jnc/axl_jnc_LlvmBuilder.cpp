@@ -410,10 +410,17 @@ CLlvmBuilder::CreateClosurePropertyPtr (
 	CValue IfaceValue;
 	CValue PropertyPtrValue = pResultType->GetUndefValue ();
 
-	CPropertyType* pAbstractMethodMemberType = pResultType->GetTargetType ()->GetAbstractPropertyMemberType ();
+	CPropertyType* pAbstractPropertyMemberType = pResultType->GetTargetType ()->GetAbstractPropertyMemberType ();
 
-	CreateBitCast (RawPfnValue, pAbstractMethodMemberType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
+	CreateBitCast (RawPfnValue, pAbstractPropertyMemberType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
 	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
+	
+	rtl::CString s = GetLlvmTypeString (PfnValue.GetLlvmValue ()->getType ());
+	TRACE ("%s\n", s);
+
+	s = GetLlvmTypeString (PropertyPtrValue.GetLlvmValue ()->getType ());
+	TRACE ("%s\n", s);
+
 	CreateInsertValue (PropertyPtrValue, PfnValue, 0, NULL, &PropertyPtrValue);
 	CreateInsertValue (PropertyPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;

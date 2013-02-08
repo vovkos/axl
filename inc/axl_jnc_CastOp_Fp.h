@@ -110,7 +110,7 @@ public:
 		CType* pType
 		)
 	{
-		return OpValue.GetType ()->GetSize () < pType->GetSize () ? ECast_Implicit : ECast_Explicit;
+		return OpValue.GetType ()->GetSize () < pType->GetSize () ? ECast_ImplicitCrossFamily : ECast_Explicit;
 	}
 
 	virtual
@@ -161,7 +161,7 @@ public:
 		CType* pType
 		)
 	{
-		return OpValue.GetType ()->GetSize () < pType->GetSize () ? ECast_Implicit : ECast_Explicit;
+		return OpValue.GetType ()->GetSize () < pType->GetSize () ? ECast_ImplicitCrossFamily : ECast_Explicit;
 	}
 
 	virtual

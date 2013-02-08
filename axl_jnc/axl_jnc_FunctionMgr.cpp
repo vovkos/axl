@@ -380,6 +380,8 @@ CFunctionMgr::GetDirectThunkFunction (
 	bool HasUnusedClosure
 	)
 {
+	ASSERT (HasUnusedClosure || pTargetFunction->m_pType->Cmp (pThunkFunctionType) != 0);
+
 	char SignatureChar = 'D';
 	EThunk ThunkKind = EThunk_Direct;
 
@@ -465,15 +467,7 @@ CFunctionMgr::GetDirectThunkProperty (
 	bool HasUnusedClosure
 	)
 {
-	char SignatureChar = 'D';
-	EThunk ThunkKind = EThunk_Direct;
-
-	if (HasUnusedClosure)
-	{
-		SignatureChar = 'U';
-		ThunkKind = EThunk_DirectUnusedClosure;
-		pThunkPropertyType = pThunkPropertyType->GetAbstractPropertyMemberType ();
-	}
+	ASSERT (HasUnusedClosure || pTargetProperty->m_pType->Cmp (pThunkPropertyType) != 0);
 
 	rtl::CStringA Signature;
 	Signature.Format (
@@ -489,6 +483,9 @@ CFunctionMgr::GetDirectThunkProperty (
 	
 	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
 	pThunkProperty->m_Tag = _T("_direct_thunk_property");
+	pThunkProperty->m_pType = HasUnusedClosure ? 
+		pThunkPropertyType->GetAbstractPropertyMemberType () : 
+		pThunkPropertyType;
 	pThunkProperty->m_pGetter = GetDirectThunkFunction (
 		pTargetProperty->m_pGetter, 
 		pThunkPropertyType->GetGetterType (),
@@ -496,6 +493,7 @@ CFunctionMgr::GetDirectThunkProperty (
 		);
 
 	CFunctionTypeOverload* pThunkSetterType = pThunkPropertyType->GetSetterType ();
+
 	size_t SetterCount = pThunkSetterType->GetOverloadCount ();
 
 	// all the checks should have been done at CheckCast ()
@@ -505,6 +503,7 @@ CFunctionMgr::GetDirectThunkProperty (
 	for (size_t i = 0; i < SetterCount; i++)
 	{
 		CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
+
 		CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
 		ASSERT (pTargetSetter);
 
@@ -526,6 +525,8 @@ CFunctionMgr::GetDirectThunkProperty (
 	}
 
 	Thunk->m_Value = pThunkProperty;
+
+	pThunkProperty->CalcLayout ();
 	return pThunkProperty;
 }
 
@@ -645,6 +646,8 @@ CFunctionMgr::GetClosureThunkProperty (
 	}
 
 	Thunk->m_Value = pThunkProperty;
+
+	pThunkProperty->CalcLayout ();
 	return pThunkProperty;
 }
 

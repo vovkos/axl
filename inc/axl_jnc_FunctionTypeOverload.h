@@ -47,7 +47,7 @@ public:
 	bool 
 	IsOverloaded () const
 	{
-		return m_OverloadArray.IsEmpty ();
+		return !m_OverloadArray.IsEmpty ();
 	}
 
 	size_t

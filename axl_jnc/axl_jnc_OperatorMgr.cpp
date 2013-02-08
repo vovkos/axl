@@ -257,10 +257,21 @@ COperatorMgr::CastOperator (
 	if (!Result)
 		return false;
 
-	if (OpValue.GetType ()->Cmp (pType) == 0) // identity!
+	if (OpValue.GetType ()->Cmp (pType) == 0) // identity, try to shortcut
 	{
-		*pResultValue = OpValue;
-		return true;
+		if (OpValue.HasLlvmValue ())
+		{
+			*pResultValue = OpValue;
+			return true;
+		}
+
+		if (OpValue.GetValueKind () == EValue_Property)
+		{
+			ASSERT (pType->GetTypeKind () == EType_PropertyPtr); 
+			return GetPropertyThinPtr (OpValue.GetProperty (), OpValue.GetClosure (), (CPropertyPtrType*) pType, pResultValue);
+		}
+
+		// nope, need to go through full cast
 	}
 
 	return pOperator->Cast (AllocKind, OpValue, pType, pResultValue);
@@ -344,17 +355,33 @@ COperatorMgr::GetArgCastKind (
 	const rtl::CConstBoxListT <CValue>& ArgList
 	)
 {
-	size_t ArgCount = ArgList.GetCount ();
+	size_t ActualArgCount = ArgList.GetCount ();
 
-	char Buffer [256];
-	rtl::CArrayT <CType*> ArgTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgTypeArray.SetCount (ArgCount);
+	rtl::CArrayT <CType*> FormalArgTypeArray = pFunctionType->GetArgTypeArray ();
+	size_t FormalArgCount = FormalArgTypeArray.GetCount ();
 
-	rtl::CBoxIteratorT <CValue> Arg = ArgList.GetHead ();
-	for (size_t i = 0; Arg; Arg++, i++)
-		ArgTypeArray [i] = Arg->GetType ();
+	if (ActualArgCount < FormalArgCount || 
+		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
+	{
+		return ECast_None;
+	}
 
-	return GetArgCastKind (pFunctionType, ArgTypeArray);
+	ECast WorstCastKind = ECast_Identitiy;
+
+	const rtl::CBoxIteratorT <CValue>& Arg = ArgList.GetHead ();
+	for (size_t i = 0; i < FormalArgCount; i++)
+	{
+		CType* pFormalArgType = FormalArgTypeArray [i];
+
+		ECast CastKind = GetCastKind (*Arg, pFormalArgType);
+		if (!CastKind)
+			return ECast_None;
+
+		if (CastKind < WorstCastKind)
+			WorstCastKind = CastKind;
+	}
+
+	return WorstCastKind;
 }
 
 ECast
@@ -699,7 +726,7 @@ COperatorMgr::PrepareOperand (
 				CPropertyType* pPropertyType = pPropertyPtrType->GetTargetType ();
 				if (!pPropertyType->IsIndexed ())
 				{
-					Result = GetPropertyOperator (Value, &Value);
+					Result = GetProperty (Value, &Value);
 					if (!Result)
 						return false;
 				}

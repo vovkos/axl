@@ -114,7 +114,7 @@ COperatorMgr::CallOperator (
 
 		if (pFunction->GetStorageKind () == EStorage_Virtual)
 		{
-			if (!pClosure)
+			if (!pClosure || !pClosure->IsMemberClosure ())
 			{
 				err::SetFormatStringError (_T("virtual method call requires an object pointer"));
 				return false;

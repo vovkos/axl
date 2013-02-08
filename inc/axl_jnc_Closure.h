@@ -16,39 +16,14 @@ class CPropertyPtrType;
 
 //.............................................................................
 
-enum EClosure
-{
-	EClosure_Function,
-	EClosure_Property,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t* 
-GetClosureKindString (EClosure ClosureKind);
-
-//.............................................................................
-
 class CClosure: public ref::IRefCount
 {
 protected:
 	friend class CValue;
 
-	EClosure m_ClosureKind;
 	rtl::CBoxListT <CValue> m_ArgList;
 
 public:
-	CClosure ()
-	{
-		m_ClosureKind = EClosure_Function;
-	}
-
-	EClosure
-	GetClosureKind ()
-	{
-		return m_ClosureKind;
-	}
-
 	rtl::CBoxListT <CValue>*
 	GetArgList ()
 	{
@@ -90,6 +65,13 @@ public:
 
 	CPropertyPtrType*
 	GetPropertyClosureType (CPropertyPtrType* pPtrType);
+
+protected:
+	bool
+	GetArgTypeArray (
+		CModule* pModule,
+		rtl::CArrayT <CType*>* pArgTypeArray
+		);
 };
 
 //.............................................................................

@@ -125,11 +125,22 @@ CValue::CValue (
 }
 
 void
+CValue::Clear ()
+{
+	m_ValueKind = EValue_Void;
+	m_pType = NULL;
+	m_Flags = 0;
+	m_pItem = NULL;
+	m_pLlvmValue = NULL;
+	m_Closure = NULL;
+}
+
+void
 CValue::Init ()
 {
 	m_ValueKind = EValue_Void;
 	m_pType = NULL;
-	m_Flags = NULL;
+	m_Flags = 0;
 	memset (m_ConstBuffer, 0, sizeof (m_ConstBuffer));
 	m_Const.SetBuffer (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer));
 	m_pVariable = NULL;
@@ -242,33 +253,16 @@ CValue::GetLlvmConst (
 	return pLlvmConst;
 }
 
-EClosure
-CValue::GetClosureKind ()
-{
-	if (m_ValueKind == EValue_Function)
-		return EClosure_Function;
-
-	ASSERT (m_pType);
-	EType TypeKind = m_pType->GetTypeKind ();
-	if (TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef)
-		return EClosure_Property;
-
-	ASSERT (TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef);
-	return EClosure_Function;
-}
-
 CClosure*
 CValue::CreateClosure ()
 {
 	m_Closure = AXL_REF_NEW (CClosure);
-	m_Closure->m_ClosureKind = GetClosureKind ();
 	return m_Closure;
 }
 
 void
 CValue::SetClosure (CClosure* pClosure)
 {
-	ASSERT (pClosure->GetClosureKind () == GetClosureKind ());
 	m_Closure = pClosure;
 }
 
@@ -288,28 +282,27 @@ CValue::SetVoid ()
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
+	Clear ();
+
 	m_ValueKind = EValue_Void;
 	m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	m_Closure = NULL;
 }
 
 void
 CValue::SetNull ()
 {
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
+	Clear ();
 
 	m_ValueKind = EValue_Null;
-	m_pType = pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-	m_Closure = NULL;
 }
 
 void
 CValue::SetType (CType* pType)
 {
+	Clear ();
+
 	m_ValueKind = EValue_Type;
 	m_pType = pType;
-	m_Closure = NULL;
 }
 
 void
@@ -317,51 +310,47 @@ CValue::SetType (EType TypeKind)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
-
+	
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 	SetType (pType);
 }
 
 void
-CValue::SetVariable (
-	CVariable* pVariable,
-	llvm::Value* pLlvmValue,
-	CType* pType,
-	bool MakeReference,
-	bool IsOffset
-	)
-{
-	m_ValueKind = EValue_Variable;
-	m_pType = MakeReference ? pType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin) : pType;
-	m_pVariable = pVariable;
-	m_pLlvmValue = pLlvmValue;
-	m_Flags = IsOffset ? EValueFlag_VariableOffset : 0;
-	m_Closure = NULL;
-}
-
-void
 CValue::SetVariable (CVariable* pVariable)
 {
-	return SetVariable (pVariable, pVariable->GetLlvmValue (), pVariable->GetType (), true, false);
+	return SetLlvmValue (
+		pVariable->GetLlvmValue (), 
+		pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin), 
+		pVariable
+		);
 }
 
 void
 CValue::SetFunction (CFunction* pFunction)
 {
+	Clear ();
+
 	m_ValueKind = EValue_Function;
-	m_pType = !pFunction->IsOverloaded () ? pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin) : NULL;
 	m_pFunction = pFunction;
-	m_pLlvmValue = pFunction->GetLlvmFunction (); //////////////// probably need to remove
-	m_Closure = NULL;
+
+	if (!pFunction->IsOverloaded ())
+		m_pType = pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin);
+
+	if (pFunction->GetStorageKind () != EStorage_Virtual)
+		m_pLlvmValue = pFunction->GetLlvmFunction ();
 }
 
 void
 CValue::SetProperty (CProperty* pProperty)
 {
+	Clear ();
+
 	m_ValueKind = EValue_Property;
-	m_pType = pProperty->GetType ()->GetPropertyPtrType (EType_PropertyRef, EPropertyPtrType_Thin);
 	m_pProperty = pProperty;
-	m_Closure = NULL;
+	m_pType = pProperty->GetType ()->GetPropertyPtrType (EType_PropertyRef, EPropertyPtrType_Thin);
+
+	// don't assign LlvmValue yet cause property LlvmValue is only needed for pointers
+
 }
 
 bool
@@ -370,6 +359,8 @@ CValue::CreateConst (
 	CType* pType
 	)
 {
+	Clear ();
+
 	size_t Size = pType->GetSize ();
 
 	bool Result = m_Const.GetBuffer (sizeof (TBufHdr) + Size) != NULL;
@@ -440,10 +431,11 @@ CValue::SetLlvmValue (
 	EValue ValueKind
 	)
 {
+	Clear ();
+
 	m_ValueKind = ValueKind;
 	m_pType = pType;
 	m_pLlvmValue = pValue;
-	m_Closure = NULL;
 }
 
 void
@@ -458,6 +450,20 @@ CValue::SetLlvmValue (
 
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 	SetLlvmValue (pValue, pType, ValueKind);
+}
+
+void
+CValue::SetLlvmValue (		
+	llvm::Value* pValue,
+	CType* pType,
+	CVariable* pVariable,
+	int Flags
+	)
+{
+	SetLlvmValue (pValue, pType, EValue_Variable);
+
+	m_pVariable = pVariable;
+	m_Flags = Flags;
 }
 
 //.............................................................................

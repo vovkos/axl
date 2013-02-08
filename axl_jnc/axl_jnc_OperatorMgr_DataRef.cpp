@@ -90,8 +90,8 @@ COperatorMgr::LoadDataRef (
 
 bool
 COperatorMgr::StoreDataRef (
-	const CValue& RawSrcValue,
-	const CValue& DstValue
+	const CValue& DstValue,
+	const CValue& RawSrcValue
 	)
 {
 	ASSERT (DstValue.GetType ()->GetTypeKind () == EType_DataRef);

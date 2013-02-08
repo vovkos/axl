@@ -180,8 +180,8 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkNoClosure (
 		);
 
 	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pThunkProperty, NullValue, pDstPtrType, pResultValue);
-	return true;
+	
+	return CreateClosurePropertyPtr (pThunkProperty, NullValue, pDstPtrType, pResultValue);
 }
 
 bool
@@ -204,8 +204,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 		pThisArgType->GetTargetType ()->GetPropertyMemberType (pDstPtrType->GetTargetType ())
 		);
 
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pThunkProperty, ThisArgValue, pDstPtrType, pResultValue);
-	return true;
+	return CreateClosurePropertyPtr (pThunkProperty, ThisArgValue, pDstPtrType, pResultValue);
 }
 
 bool
@@ -236,7 +235,23 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_FullClosure (
 		pDstPtrType->GetTargetType ()
 		);
 
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pThunkProperty, ClosureObjValue, pDstPtrType, pResultValue);
+	return CreateClosurePropertyPtr (pThunkProperty, ClosureObjValue, pDstPtrType, pResultValue);
+}
+
+bool
+CCast_PropertyPtr_Thin2Normal::CreateClosurePropertyPtr (
+	CProperty* pProperty,
+	const CValue& ClosureValue,
+	CPropertyPtrType* pPtrType,
+	CValue* pResultValue
+	)
+{
+	CValue ThinPtrValue;
+	bool Result = m_pModule->m_OperatorMgr.GetPropertyThinPtr (pProperty, NULL, &ThinPtrValue);
+	if (!Result)
+		return false;
+
+	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (ThinPtrValue, ClosureValue, pPtrType, pResultValue);
 	return true;
 }
 
@@ -267,9 +282,9 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 	)
 {
 	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
 
-	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure)
+	if (OpValue.GetClosure ())
 	{
 		err::SetFormatStringError ("cannot create thin property pointer to a closure");
 		return false;
@@ -281,14 +296,16 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 		return false;
 	}
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (
-		OpValue.GetProperty (), 
-		((CPropertyPtrType*) pType)->GetTargetType ()
-		);
+	CProperty* pProperty = OpValue.GetProperty ();
 
-	pResultValue->SetProperty (pThunkProperty);
-	pResultValue->OverrideType (pType);
-	return true;
+	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Augmented)
+	{
+		err::SetFormatStringError ("augmented properties are not supported yet");
+		return false;
+	}
+
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (pProperty, pPtrType->GetTargetType ());
+	return m_pModule->m_OperatorMgr.GetPropertyThinPtr (pThunkProperty, NULL, pPtrType, pResultValue);
 }
 
 //.............................................................................
@@ -330,6 +347,8 @@ CCast_PropertyPtr_Unsafe2Unsafe::LlvmCast (
 CCast_PropertyPtr::CCast_PropertyPtr ()
 {
 	memset (m_OperatorTable, 0, sizeof (m_OperatorTable));
+
+	m_OpFlags = EOpFlag_KeepPropertyRef;
 
 	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Normal] = &m_FromNormal;
 	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Weak]   = &m_FromNormal;

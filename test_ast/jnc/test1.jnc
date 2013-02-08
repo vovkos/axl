@@ -1,7 +1,5 @@
 //.............................................................................
 
-/*
-
 int property MyIntProp;
 
 int
@@ -16,25 +14,14 @@ MyIntProp.set (int x)
 	printf ("MyIntProp.set (%d)\n", x);
 }
 
-*/
-
-foo (int x)
-{
-	printf ("foo (%d)\n", x);
-}
-
-foo (double x)
-{
-	printf ("foo (%f)\n", x);
-}
-
 int
 main ()
 {
 	printf ("hui govno i muravei\n");
-	foo (100);
-	foo ((double) 200);
-//	MyIntProp = 100;
+	int property* pr = &MyIntProp;
+
+	int x = *pr;
+
 	return 0;
 }
 

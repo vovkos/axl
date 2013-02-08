@@ -143,8 +143,8 @@ CFunction::GetLlvmFunction ()
 bool
 CFunction::AddOverload (CFunction* pFunction)
 {
-	size_t i = m_TypeOverload.FindOverload (pFunction->m_pType);
-	if (i != -1)
+	bool Result = m_TypeOverload.AddOverload (pFunction->m_pType);
+	if (!Result)
 		return false;
 
 	m_OverloadArray.Append (pFunction);

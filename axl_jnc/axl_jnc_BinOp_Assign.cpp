@@ -19,10 +19,10 @@ CBinOp_Assign::Operator (
 	switch (DstTypeKind)
 	{
 	case EType_DataRef:
-		return m_pModule->m_OperatorMgr.StoreDataRef (OpValue2, OpValue1);
+		return m_pModule->m_OperatorMgr.StoreDataRef (OpValue1, OpValue2);
 
 	case EType_PropertyRef:
-		return m_pModule->m_OperatorMgr.SetPropertyOperator (OpValue2, OpValue1);
+		return m_pModule->m_OperatorMgr.SetProperty (OpValue1, OpValue2);
 
 	default:
 		err::SetFormatStringError (_T("left operand must be l-value"));

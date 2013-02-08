@@ -20,6 +20,7 @@ enum ECast
 {
 	ECast_None,
 	ECast_Explicit,
+	ECast_ImplicitCrossFamily,
 	ECast_Implicit,
 	ECast_Identitiy,
 };

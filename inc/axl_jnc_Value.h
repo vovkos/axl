@@ -16,7 +16,6 @@ class CProperty;
 class CStructMember;
 class CClassType;
 class CClosure;
-enum EClosure;
 
 //.............................................................................
 	
@@ -94,6 +93,7 @@ protected:
 
 	union
 	{
+		CModuleItem* m_pItem;
 		CVariable* m_pVariable;
 		CFunction* m_pFunction;
 		CProperty* m_pProperty;
@@ -102,7 +102,6 @@ protected:
 
 	mutable llvm::Value* m_pLlvmValue;
 
-	EAlloc m_ClosureAllocKind;
 	ref::CPtrT <CClosure> m_Closure;
 
 public:
@@ -274,6 +273,12 @@ public:
 		return *(double*) GetConstData ();
 	}
 
+	bool
+	HasLlvmValue () const
+	{
+		return m_pLlvmValue != NULL || m_ValueKind == EValue_Const;
+	}
+
 	llvm::Value*
 	GetLlvmValue () const;
 
@@ -349,15 +354,6 @@ public:
 
 	void
 	SetVariable (CVariable* pVariable);
-
-	void
-	SetVariable (
-		CVariable* pVariable,
-		llvm::Value* pLlvmValue,
-		CType* pType,
-		bool MakeReference,
-		bool IsOffset
-		);
 
 	void
 	SetFunction (CFunction* pFunction);
@@ -509,12 +505,17 @@ public:
 		EValue ValueKind = EValue_LlvmRegister
 		);
 
+	void
+	SetLlvmValue (		
+		llvm::Value* pValue,
+		CType* pType,
+		CVariable* pVariable,
+		int Flags = 0
+		);
+
 protected:
 	void
 	Init ();
-
-	EClosure
-	GetClosureKind ();
 };
 
 //.............................................................................

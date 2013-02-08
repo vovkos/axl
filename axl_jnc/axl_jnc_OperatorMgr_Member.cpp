@@ -237,12 +237,11 @@ COperatorMgr::StructMemberOperator (
 			&PtrValue
 			);
 		
-		pResultValue->SetVariable (
-			OpValue.GetVariable (), 
+		pResultValue->SetLlvmValue(
 			PtrValue.GetLlvmValue (), 
-			pMember->GetType (),
-			true,
-			(OpValue.GetFlags () & EValueFlag_VariableOffset) != 0
+			pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
+			OpValue.GetVariable (), 
+			OpValue.GetFlags () & EValueFlag_VariableOffset
 			);
 	}
 	else
@@ -312,12 +311,12 @@ COperatorMgr::UnionMemberOperator (
 		CType* pCastType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
 		CValue CastValue;
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pCastType, &CastValue);
-		pResultValue->SetVariable (
-			OpValue.GetVariable (), 
+
+		pResultValue->SetLlvmValue (
 			CastValue.GetLlvmValue (), 
-			pMember->GetType (),
-			true,
-			(OpValue.GetFlags () & EValueFlag_VariableOffset) != 0
+			pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
+			OpValue.GetVariable (), 
+			OpValue.GetFlags () & EValueFlag_VariableOffset
 			);
 	}
 	else
@@ -523,15 +522,9 @@ COperatorMgr::GetVirtualMethodMember (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pFunction->GetStorageKind () == EStorage_Virtual && pClosure);
+	ASSERT (pFunction->GetStorageKind () == EStorage_Virtual && pClosure && pClosure->IsMemberClosure ());
 	
 	CValue Value = *pClosure->GetArgList ()->GetHead ();
-	if (Value.GetType ()->GetTypeKind () != EType_ClassPtr)
-	{
-		err::SetFormatStringError (_T("virtual method call requires an object pointer"));
-		return false;
-	}
-
 	CClassType* pClassType = (CClassType*) Value.GetType ();
 	CClassType* pVTableType = pFunction->GetVirtualOriginClassType ();
 	size_t VTableIndex = pFunction->GetClassVTableIndex ();
@@ -577,15 +570,9 @@ COperatorMgr::GetVirtualPropertyMember (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pProperty->GetStorageKind () == EStorage_Virtual && pClosure);
+	ASSERT (pProperty->GetStorageKind () == EStorage_Virtual && pClosure && pClosure->IsMemberClosure ());
 	
 	CValue Value = *pClosure->GetArgList ()->GetHead ();
-	if (Value.GetType ()->GetTypeKind () != EType_ClassPtr)
-	{
-		err::SetFormatStringError (_T("virtual property requires an object pointer"));
-		return false;
-	}
-
 	CClassType* pClassType = (CClassType*) Value.GetType ();
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
 

@@ -223,6 +223,8 @@ lit_sq         { CreateCharToken (EToken_Integer); };
 lit_dq         { CreateStringToken (EToken_Literal, 1, 1); };
 dec+           { CreateIntegerToken (10); };
 '0' [Xx] hex+  { CreateIntegerToken (16, 2); };
+dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
+		       { CreateFpToken (); };
 
 '//' [^\n]*    ;
 '/*' (any | nl)* :>> '*/' ;

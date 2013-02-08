@@ -473,6 +473,54 @@ public:
 	}
 
 	bool
+	GetPropertyThinPtr (
+		CProperty* pProperty,
+		CClosure* pClosure,
+		CPropertyPtrType* pPtrType,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyThinPtr (
+		CProperty* pProperty,
+		CClosure* pClosure,
+		CValue* pResultValue
+		)
+	{
+		return GetPropertyThinPtr (
+			pProperty, 
+			pClosure, 
+			pProperty->GetType ()->GetPropertyPtrType (EPropertyPtrType_Thin), 
+			pResultValue
+			);
+	}
+	
+	bool
+	GetPropertyVTable (
+		CProperty* pProperty,
+		CClosure* pClosure,
+		CValue* pResultValue
+		);
+
+	bool
+	GetProperty (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	SetProperty (
+		const CValue& OpValue,
+		const CValue& SrcValue
+		);
+
+	bool
+	GetPropertyVTable (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
 	GetPropertyGetter (
 		const CValue& OpValue,
 		CValue* pResultValue
@@ -487,13 +535,32 @@ public:
 	bool
 	GetPropertySetter (
 		const CValue& OpValue,
+		const CValue& ArgValue,
 		CValue* pResultValue
 		);
 
 	bool
+	GetPropertySetter (
+		CValue* pValue,
+		const CValue& ArgValue
+		)
+	{
+		return GetPropertySetter (*pValue, ArgValue, pValue);
+	}
+
+	bool
+	GetPropertySetter (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		return GetPropertySetter (OpValue, CValue (), pResultValue);
+	}
+
+	bool
 	GetPropertySetter (CValue* pValue)
 	{
-		return GetPropertySetter (*pValue, pValue);
+		return GetPropertySetter (*pValue, CValue (), pValue);
 	}
 
 	bool
@@ -520,7 +587,6 @@ public:
 		return GetPropertyOnChangeEvent (*pValue, pValue);
 	}
 
-
 	bool
 	EventOperator (
 		const CValue& Event,
@@ -544,20 +610,8 @@ public:
 
 	bool
 	StoreDataRef (
-		const CValue& SrcValue,
-		const CValue& DstValue
-		);
-
-	bool
-	GetPropertyOperator (
-		const CValue& OpValue,
-		CValue* pResultValue
-		);
-
-	bool
-	SetPropertyOperator (
-		const CValue& SrcValue,
-		const CValue& DstValue
+		const CValue& OpValue1,
+		const CValue& OpValue2
 		);
 
 	bool
