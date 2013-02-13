@@ -131,14 +131,12 @@ protected:
 
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	int m_FunctionTypeFlags;
-	int m_FunctionFlags;
 
 public:
 	CDeclFunctionSuffix ()
 	{
 		m_SuffixKind = EDeclSuffix_Function;
 		m_FunctionTypeFlags = 0;
-		m_FunctionFlags = 0;
 	}
 
 	size_t 
@@ -165,6 +163,32 @@ public:
 
 //.............................................................................
 
+enum EPostDeclaratorModifier
+{
+	EPostDeclaratorModifier_Const = 1
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+EPostDeclaratorModifier
+GetFirstPostDeclaratorModifier (int Modifiers)
+{
+	return (EPostDeclaratorModifier) (1 << rtl::GetLoBitIdx (Modifiers));
+}
+
+const tchar_t* 
+GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier);
+
+inline
+const tchar_t* 
+GetPostDeclaratorModifierString (int Modifiers)
+{
+	return GetPostDeclaratorModifierString (GetFirstPostDeclaratorModifier (Modifiers));
+}
+
+//.............................................................................
+
 enum EDeclarator
 {
 	EDeclarator_Undefined,
@@ -187,6 +211,7 @@ protected:
 	CToken::CPos m_Pos;
 	CType* m_pType;
 	size_t m_BitCount;
+	int m_PostDeclaratorModifiers;
 
 	rtl::CArrayT <int> m_PointerArray;
 	rtl::CStdListT <CDeclSuffix> m_SuffixList;
@@ -220,18 +245,27 @@ public:
 	{
 		return m_Pos;
 	}
-	
-	rtl::CStdListT <CFunctionFormalArg>*
-	GetArgList ();
-	
-	size_t
+
+	size_t 
 	GetBitCount ()
 	{
 		return m_BitCount;
 	}
 
-	CType* 
-	GetType (int* pDataPtrTypeFlags = NULL);
+	int 
+	GetPostDeclaratorModifiers ()
+	{
+		return m_PostDeclaratorModifiers;
+	}
+
+	bool
+	SetPostDeclaratorModifier (EPostDeclaratorModifier Modifier);
+
+	rtl::CStdListT <CFunctionFormalArg>*
+	GetArgList ();
+	
+	CType*
+	CalcType (int* pDataPtrTypeFlags = NULL);
 
 	bool
 	AddName (rtl::CString Name);

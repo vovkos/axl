@@ -35,30 +35,36 @@ enum EFunction
 	EFunction_CastOperator,
 	EFunction_UnaryOperator,
 	EFunction_BinaryOperator,
+	EFunction_AutoEv,
 	EFunction_Internal, 
 	EFunction_Thunk,
-	EFunction_AutoEv,
+	EFunction__Count
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum EFunctionKindFlag
+{
+	EFunctionKindFlag_NoStorage    = 0x01,
+	EFunctionKindFlag_NoOverloads  = 0x02,
+	EFunctionKindFlag_NoArgs       = 0x04,
+}; 
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const tchar_t*
 GetFunctionKindString (EFunction FunctionKind);
 
-//.............................................................................
-
-enum EFunctionFlag
-{
-	EFunctionFlag_Const = 1,
-};
+int
+GetFunctionKindFlags (EFunction FunctionKind);
 
 //.............................................................................
 
 class CFunctionFormalArg: public rtl::TListLink
 {
 protected:
+	friend class CFunction;
 	friend class CParser;
-	friend class CClassType;
 
 	rtl::CString m_Name;
 	CType* m_pType;
@@ -116,6 +122,8 @@ protected:
 	// for non-static method members
 
 	CClassType* m_pClassType; 
+	CClassPtrType* m_pThisArgType;
+	CClassPtrType* m_pThisType;
 
 	// for virtual method members
 
@@ -159,7 +167,7 @@ public:
 		return m_pType;
 	}
 
-	CFunctionTypeOverload*
+	const CFunctionTypeOverload*
 	GetTypeOverload ()
 	{	
 		return &m_TypeOverload;
@@ -175,6 +183,18 @@ public:
 	GetVirtualOriginClassType ()
 	{
 		return m_pVirtualOriginClassType;
+	}
+
+	CClassPtrType* 
+	GetThisArgType ()
+	{
+		return m_pThisArgType;
+	}
+
+	CClassPtrType* 
+	GetThisType ()
+	{
+		return m_pThisType;
 	}
 
 	size_t
@@ -200,6 +220,12 @@ public:
 	{
 		return m_ArgList;
 	}
+
+	void
+	ConvertToMethodMember (
+		CClassType* pClassType,
+		int ThisArgTypeFlags = 0
+		);
 
 	rtl::CString
 	CreateArgString ();

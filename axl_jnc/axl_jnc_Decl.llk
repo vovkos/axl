@@ -34,7 +34,10 @@ pragma_endian_value
 
 global_declaration
 	: namespace_declaration
+	| extend_declaration 
 	| using_declaration 
+	| friend_declaration 
+	| access_declaration 
 	| item_declaration
 	;
 
@@ -61,8 +64,28 @@ namespace_declaration
 		}
 	;
 
+extend_declaration
+	: EToken_Extend qualified_name 
+		{ 
+			err::SetFormatStringError (_T("named type extensions are not supported yet"));
+			return false;
+		}
+	  '{' named_type_block_declaration* '}' 
+	;
+
 using_declaration
-	: EToken_Using qualified_name ';'
+	: EToken_Using qualified_name (',' qualified_name)* ';'
+	;
+
+friend_declaration
+	: EToken_Friend qualified_name (',' qualified_name)* ';'
+	;
+
+access_declaration
+	: access_specifier ':'
+		{
+			m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->m_CurrentAccessKind = $1.m_AccessKind;
+		}
 	;
 
 //.............................................................................
@@ -119,14 +142,14 @@ item_declaration_no_specifier
 	enter
 	{
 		m_StorageKind = EStorage_Undefined;
-		m_AccessKind = m_DefaultAccessKind;		
+		m_AccessKind = EAccess_Undefined;
 		$.m_Declarator.SetTypeSpecifier (NULL);
 	}	
-	: declarator_name <&$.m_Declarator>
-	  declarator_suffix <&$.m_Declarator>*
+	: resolver (item_declaration_no_specifier_rslv) priority (2) // set higher priority than type_specifier::qualified_name
+	  declarator_name <&$.m_Declarator>
+	  function_suffix <&$.m_Declarator>
+	  post_declarator_modifier <&$.m_Declarator>*
 		{
-			CTypeSpecifier TypeSpecifier;
-			TypeSpecifier.SetType (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void));
 			return Declare (&$.m_Declarator);
 		}
 	  declaration_terminator <NULL>
@@ -186,7 +209,7 @@ type_name
 	  pointer <&$Declarator>* 
 	  declarator_suffix <&$Declarator>*
 		{
-			$.m_pType = $Declarator.GetType ();
+			$.m_pType = $Declarator.CalcType ();
 		}
 	;
 

@@ -131,9 +131,9 @@ COperatorMgr::CallOperator (
 	CType* pOpType = OpValue.GetType ();
 	EType OpTypeKind = pOpType->GetTypeKind ();
 
-	if (OpTypeKind == EType_Event)
+	if (OpTypeKind == EType_Multicast)
 	{
-		return CallEvent (OpValue, pArgList);
+		return CallMulticast (OpValue, pArgList);
 	}
 	else if (OpTypeKind == EType_FunctionRef || OpTypeKind == EType_FunctionPtr)
 	{
@@ -248,21 +248,26 @@ COperatorMgr::CastArgList (
 }
 
 bool
-COperatorMgr::CallEvent (
+COperatorMgr::CallMulticast (
 	const CValue& OpValue,
 	rtl::CBoxListT <CValue>* pArgList
 	)
 {
-	CEventType* pEventType = (CEventType*) OpValue.GetType ();
-	ASSERT (pEventType->GetTypeKind () == EType_Event);
+	CMulticastType* pMulticastType = (CMulticastType*) OpValue.GetType ();
+	ASSERT (pMulticastType->GetTypeKind () == EType_Multicast);
 	
-	CFunctionPtrType* pFunctionPointerType = pEventType->GetFunctionPtrType ();
+	CFunctionPtrType* pFunctionPtrType = pMulticastType->GetFunctionPtrType ();
+
+	err::SetFormatStringError (_T("calling multicast is not supported yet"));
+	return false;
+
+/*
 	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
 
 	CValue HandlerValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &HandlerValue);
 
-	CType* pHandlerPtrType = pEventType->GetHandlerStructType ()->GetDataPtrType (EDataPtrType_Unsafe);
+	CType* pHandlerPtrType = pMulticastType->GetHandlerStructType ()->GetDataPtrType (EDataPtrType_Unsafe);
 
 	CValue HandlerVariable;
 	m_pModule->m_LlvmBuilder.CreateAlloca (pHandlerPtrType, "event_handler", NULL, &HandlerVariable);
@@ -281,7 +286,7 @@ COperatorMgr::CallEvent (
 
 	CValue FunctionPtrValue;
 	m_pModule->m_LlvmBuilder.CreateLoad (HandlerValue, NULL, &HandlerValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 0, pEventType->GetFunctionPtrType (), &FunctionPtrValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 0, pMulticastType->GetFunctionPtrType (), &FunctionPtrValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 1, NULL, &HandlerValue);
 	m_pModule->m_LlvmBuilder.CreateStore (HandlerValue, HandlerVariable);
 
@@ -291,6 +296,7 @@ COperatorMgr::CallEvent (
 	m_pModule->m_ControlFlowMgr.Jump (pConditionBlock, pFollowBlock);
 
 	return true;
+*/
 }
 
 bool

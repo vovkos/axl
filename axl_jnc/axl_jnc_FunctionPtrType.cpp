@@ -10,23 +10,17 @@ namespace jnc {
 const tchar_t*
 GetFunctionPtrTypeKindString (EFunctionPtrType PtrTypeKind)
 {
-	switch (PtrTypeKind)
+	static const tchar_t* StringTable [EFunctionPtrType__Count] = 
 	{
-	case EFunctionPtrType_Normal:
-		return _T("closure");
+		_T("closure"),  // EFunctionPtrType_Normal = 0,
+		_T("weak"),     // EFunctionPtrType_Weak,
+		_T("thin"),     // EFunctionPtrType_Thin,
+		_T("unsafe"),   // EFunctionPtrType_Unsafe,
+	};
 
-	case EFunctionPtrType_Weak:
-		return _T("weak");
-
-	case EFunctionPtrType_Thin:
-		return _T("thin");
-
-	case EFunctionPtrType_Unsafe:
-		return _T("unsafe");
-
-	default:
-		return _T("undefined-function-ptr-kind");
-	}
+	return PtrTypeKind >= 0 && PtrTypeKind < EFunctionPtrType__Count ? 
+		StringTable [PtrTypeKind] : 
+		_T("undefined-function-ptr-kind");
 }
 
 //.............................................................................
@@ -37,13 +31,13 @@ CFunctionPtrType::CFunctionPtrType ()
 	m_PtrTypeKind = EFunctionPtrType_Normal;
 	m_Size = sizeof (TFunctionPtr);
 	m_pTargetType = NULL;
-	m_pEventType = NULL;
+	memset (m_MulticastTypeArray, 0, sizeof (m_MulticastTypeArray));
 }
 
-CEventType* 
-CFunctionPtrType::GetEventType ()
+CMulticastType* 
+CFunctionPtrType::GetMulticastType (EMulticastType MulticastTypeKind)
 {
-	return m_pModule->m_TypeMgr.GetEventType (this);
+	return m_pModule->m_TypeMgr.GetMulticastType (this, MulticastTypeKind);
 }
 
 CStructType* 
@@ -96,18 +90,18 @@ CFunctionPtrType::GetTypeModifierString ()
 	if (!m_TypeModifierString.IsEmpty ())
 		return m_TypeModifierString;
 
+	if (m_Flags & EPtrTypeFlag_NoNull)
+		m_TypeModifierString += _T("nonull ");
+
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += _T(' ');
-		m_TypeString += GetFunctionPtrTypeKindString (m_PtrTypeKind);
+		m_TypeModifierString += GetFunctionPtrTypeKindString (m_PtrTypeKind);
+		m_TypeModifierString += _T(' ');
 	}
-
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeModifierString += _T(" nonull");
 
 	ECallConv CallConv = m_pTargetType->GetCallConv ();
 	if (CallConv)
-		m_TypeString.AppendFormat (_T(" %s"), GetCallConvString (CallConv));
+		m_TypeModifierString.AppendFormat (_T("%s "), GetCallConvString (CallConv));
 
 	return m_TypeModifierString;
 }
@@ -116,8 +110,9 @@ void
 CFunctionPtrType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
+	m_TypeString += _T(' ');
 	m_TypeString += GetTypeModifierString ();
-	m_TypeString += m_TypeKind == EType_FunctionRef ? " function& " : " function* ";
+	m_TypeString += m_TypeKind == EType_FunctionRef ? "function& " : "function* ";
 	m_TypeString += m_pTargetType->GetArgTypeString ();
 }
 

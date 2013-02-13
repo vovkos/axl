@@ -24,6 +24,7 @@ enum EToken
 
 	EToken_Namespace,
 	EToken_Using,
+	EToken_Extend,
 	EToken_Pack,
 	EToken_Endian,
 
@@ -31,14 +32,16 @@ enum EToken
 
 	EToken_Typedef,
 	EToken_Static,
+	EToken_Abstract,
 	EToken_Virtual,
 	EToken_NoVirtual,
+	EToken_Mutable,
 
 	// access specifiers
 
 	EToken_Public,
-	EToken_PublicRead,
 	EToken_Protected,
+	EToken_Friend,
 
 	// type modifiers
 
@@ -47,6 +50,7 @@ enum EToken
 	EToken_LittleEndian,
 	EToken_BigEndian,
 	EToken_Const,
+	EToken_ReadOnly,
 	EToken_Volatile,
 	EToken_Safe,
 	EToken_Unsafe,
@@ -57,6 +61,7 @@ enum EToken
 	EToken_Stdcall,
 	EToken_Function,
 	EToken_Property,
+	EToken_Multicast,
 	EToken_Event,
 	EToken_Bindable,
 	EToken_AutoGet,
@@ -78,6 +83,7 @@ enum EToken
 	EToken_Float,
 	EToken_Double,
 	EToken_Int,
+	EToken_IntPtr,
 	EToken_Char,
 	EToken_Short,
 	EToken_Long,
@@ -178,6 +184,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	// global declarations & pragmas
 
 	AXL_PRS_TOKEN_NAME (EToken_Namespace,    "namespace")
+	AXL_PRS_TOKEN_NAME (EToken_Extend,       "extend")
 	AXL_PRS_TOKEN_NAME (EToken_Using,        "using")
 	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
 	AXL_PRS_TOKEN_NAME (EToken_Endian,       "endian")
@@ -186,14 +193,16 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 
 	AXL_PRS_TOKEN_NAME (EToken_Typedef,      "typedef")
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
+	AXL_PRS_TOKEN_NAME (EToken_Abstract,     "abstract")
 	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
 	AXL_PRS_TOKEN_NAME (EToken_NoVirtual,    "novirtual")
+	AXL_PRS_TOKEN_NAME (EToken_Mutable,      "mutable")
 
 	// access specifiers
 
 	AXL_PRS_TOKEN_NAME (EToken_Public,       "public")
-	AXL_PRS_TOKEN_NAME (EToken_PublicRead,   "publicread")
 	AXL_PRS_TOKEN_NAME (EToken_Protected,    "protected")
+	AXL_PRS_TOKEN_NAME (EToken_Friend,       "friend")
 
 	// type modifiers
 
@@ -202,6 +211,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
+	AXL_PRS_TOKEN_NAME (EToken_ReadOnly,     "readonly")
 	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
 	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
@@ -212,6 +222,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Stdcall,      "stdcall")
 	AXL_PRS_TOKEN_NAME (EToken_Function,     "function")
 	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
+	AXL_PRS_TOKEN_NAME (EToken_Multicast,    "multicast")	
 	AXL_PRS_TOKEN_NAME (EToken_Event,        "event")	
 	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_PRS_TOKEN_NAME (EToken_AutoGet,      "autoget")
@@ -233,6 +244,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Float,        "float")
 	AXL_PRS_TOKEN_NAME (EToken_Double,       "double")
 	AXL_PRS_TOKEN_NAME (EToken_Int,          "int")
+	AXL_PRS_TOKEN_NAME (EToken_IntPtr,       "intptr")
 	AXL_PRS_TOKEN_NAME (EToken_Char,         "char")
 	AXL_PRS_TOKEN_NAME (EToken_Short,        "short")
 	AXL_PRS_TOKEN_NAME (EToken_Long,         "long")

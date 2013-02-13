@@ -13,7 +13,7 @@
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_EventType.h"
+#include "axl_jnc_MulticastType.h"
 #include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_ClassPtrType.h"
 #include "axl_jnc_FunctionPtrType.h"
@@ -60,11 +60,11 @@ protected:
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
-	rtl::CStdListT <CEventType> m_EventTypeList;
 	rtl::CStdListT <CDataPtrType> m_DataPtrTypeList;
 	rtl::CStdListT <CClassPtrType> m_ClassPtrTypeList;
 	rtl::CStdListT <CFunctionPtrType> m_FunctionPtrTypeList;
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
+	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 	rtl::CStdListT <CDataPtrTypeTuple> m_DataPtrTypeTupleList;
 	rtl::CStdListT <CClassPtrTypeTuple> m_ClassPtrTypeTupleList;
@@ -282,7 +282,8 @@ public:
 	CFunctionType* 
 	GetMethodMemberType (
 		CClassType* pClassType,
-		CFunctionType* pFunctionType
+		CFunctionType* pFunctionType,
+		int ThisArgTypeFlags = 0
 		);
 
 	CFunctionType* 
@@ -370,17 +371,21 @@ public:
 	CPropertyType* 
 	GetBindablePropertyType (CPropertyType* pPropertyType);
 
-	CEventType* 
-	GetEventType (
+	CMulticastType* 
+	GetMulticastType (
 		CFunctionType* pFunctionType,
-		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal
+		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal,
+		EMulticastType MulticastTypeKind = EMulticastType_Normal
 		)
 	{
-		return GetEventType (GetFunctionPtrType (pFunctionType, PtrTypeKind));
+		return GetMulticastType (GetFunctionPtrType (pFunctionType, PtrTypeKind), MulticastTypeKind);
 	}
 
-	CEventType* 
-	GetEventType (CFunctionPtrType* pFunctionPtrType);
+	CMulticastType* 
+	GetMulticastType (
+		CFunctionPtrType* pFunctionPtrType,
+		EMulticastType MulticastTypeKind = EMulticastType_Normal
+		);
 
 	CDataPtrType* 
 	GetDataPtrType (

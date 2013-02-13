@@ -10,20 +10,16 @@ namespace jnc {
 const tchar_t*
 GetClassPtrTypeKindString (EClassPtrType PtrTypeKind)
 {
-	switch (PtrTypeKind)
+	static const tchar_t* StringTable [EClassPtrType__Count] = 
 	{
-	case EClassPtrType_Normal:
-		return _T("strong");
+		_T("strong"), // EClassPtrType_Normal = 0,
+		_T("weak"),   // EClassPtrType_Weak,
+		_T("unsafe"), // EClassPtrType_Unsafe,
+	};
 
-	case EClassPtrType_Weak:
-		return _T("weak");
-
-	case EClassPtrType_Unsafe:
-		return _T("unsafe");
-
-	default:
-		return _T("undefined-class-ptr-kind");
-	}
+	return PtrTypeKind >= 0 && PtrTypeKind < EClassPtrType__Count ? 
+		StringTable [PtrTypeKind] : 
+		_T("undefined-class-ptr-kind");
 }
 
 //.............................................................................
@@ -59,6 +55,9 @@ CClassPtrType::CreateSignature (
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
 
+	if (Flags & EPtrTypeFlag_ReadOnly)
+		Signature += 'r';
+
 	if (Flags & EPtrTypeFlag_NoNull)
 		Signature += 'n';
 
@@ -69,20 +68,22 @@ CClassPtrType::CreateSignature (
 void
 CClassPtrType::PrepareTypeString ()
 {
-	m_TypeString = m_pTargetType->GetTypeString ();
+	if (m_Flags & EPtrTypeFlag_Const)
+		m_TypeString += _T("const ");
+
+	if (m_Flags & EPtrTypeFlag_ReadOnly)
+		m_TypeString += _T("readonly ");
+
+	if (m_Flags & EPtrTypeFlag_NoNull)
+		m_TypeString += _T("nonull ");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += _T(' ');
 		m_TypeString += GetClassPtrTypeKindString (m_PtrTypeKind);
+		m_TypeString += _T(' ');
 	}
 
-	if (m_Flags & EPtrTypeFlag_Const)
-		m_TypeString += _T(" const");
-
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeString += _T(" nonull");
-
+	m_TypeString += m_pTargetType->GetTypeString ();
 	m_TypeString += "&";
 }
 

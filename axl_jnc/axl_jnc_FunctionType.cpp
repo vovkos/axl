@@ -65,10 +65,10 @@ CFunctionType::GetShortType ()
 	return m_pModule->m_TypeMgr.GetShortFunctionType (this);
 }
 
-CEventType* 
-CFunctionType::GetEventType ()
+CMulticastType* 
+CFunctionType::GetMulticastType ()
 {
-	return m_pModule->m_TypeMgr.GetEventType (this);
+	return m_pModule->m_TypeMgr.GetMulticastType (this);
 }
 
 rtl::CStringA

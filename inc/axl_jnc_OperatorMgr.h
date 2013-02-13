@@ -28,7 +28,7 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
-#include "axl_jnc_EventType.h"
+#include "axl_jnc_MulticastType.h"
 
 namespace axl {
 namespace jnc {
@@ -45,6 +45,16 @@ enum EStdCast
 	EStdCast_Int,
 	EStdCast_Fp,
 	EStdCast__Count
+};
+
+//.............................................................................
+
+enum EMulticastOp
+{
+	EMulticastOp_Set,
+	EMulticastOp_Add,
+	EMulticastOp_Remove,
+	EMulticastOp_Clear,
 };
 
 //.............................................................................
@@ -69,7 +79,6 @@ protected:
 
 	CUnOp_Addr m_UnOp_Addr;
 	CUnOp_Indir m_UnOp_Indir;	
-	CUnOp_Ptr m_UnOp_Ptr;	
 
 	// increment operators
 
@@ -472,6 +481,12 @@ public:
 		return ClosureOperator (*pValue,  pArgList, pValue);
 	}
 
+	void
+	GetThinDataPtrValidator (
+		const CValue& Value,
+		CValue* pResultValue
+		);
+
 	bool
 	GetPropertyThinPtr (
 		CProperty* pProperty,
@@ -588,10 +603,10 @@ public:
 	}
 
 	bool
-	EventOperator (
+	MulticastOperator (
 		const CValue& Event,
 		const CValue& Handler,
-		EEventOp OpKind
+		EMulticastOp OpKind
 		);
 
 	// load & store operators
@@ -797,7 +812,7 @@ protected:
 		);
 
 	bool
-	CallEvent (
+	CallMulticast (
 		const CValue& OpValue,
 		rtl::CBoxListT <CValue>* pArgList
 		);

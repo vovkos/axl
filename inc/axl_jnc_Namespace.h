@@ -13,6 +13,7 @@ namespace jnc {
 class CNamespace;
 class CEnumType;
 class CEnumMember;
+class CFunction;
 
 //.............................................................................
 
@@ -60,25 +61,29 @@ class CNamespace: public CModuleItemName
 protected:
 	friend class CNamedType;
 	friend class CNamespaceMgr;
+	friend class CParser;
 
 	ENamespace m_NamespaceKind;
-	CNamespace* m_pParentNamespace;
+	EAccess m_CurrentAccessKind;
+	CNamespace* m_pParentNamespace;	
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
 	rtl::CStdListT <CAlias> m_AliasList;
 
 public:
-	CNamespace ()
-	{
-		m_NamespaceKind = ENamespace_Global;
-		m_pParentNamespace = NULL;
-	}
+	CNamespace ();
 
 	ENamespace 
 	GetNamespaceKind ()
 	{
 		return m_NamespaceKind;
+	}
+
+	EAccess 
+	GetCurrentAccessKind ()
+	{
+		return m_CurrentAccessKind;
 	}
 
 	CNamespace* 
@@ -132,6 +137,9 @@ public:
 	{
 		return AddItem (pItem, pItem);
 	}
+
+	bool
+	AddFunction (CFunction* pFunction);
 
 	size_t 
 	GetItemCount ()

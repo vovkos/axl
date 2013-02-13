@@ -7,6 +7,59 @@ namespace jnc {
 
 //.............................................................................
 
+void
+COperatorMgr::GetThinDataPtrValidator (
+	const CValue& Value,
+	CValue* pResultValue
+	)
+{
+	EValue ValueKind = Value.GetValueKind ();
+	if (ValueKind == EValue_Variable)
+	{
+		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (Value.GetVariable (), pResultValue);
+		return;
+	}
+
+	ASSERT (ValueKind == EValue_Field);
+
+	CClosure* pClosure = Value.GetClosure ();
+	ASSERT (pClosure && pClosure->GetArgList ()->GetCount () == 2);
+
+	rtl::CBoxIteratorT <CValue> Arg = pClosure->GetArgList ()->GetHead ();
+	CValue ClassPtrValue = *Arg++;
+	CValue RegionBegionValue = *Arg++;
+
+	CValue ObjPtrValue;
+	
+	size_t ObjPtrIndexArray [] = 
+	{
+		0, // iface* 
+		0, // iface.hdr*
+		1, // TObject**
+	};
+
+	m_pModule->m_LlvmBuilder.CreateGep (
+		ClassPtrValue, 
+		ObjPtrIndexArray, 
+		countof (ObjPtrIndexArray), 
+		NULL, 
+		&ObjPtrValue
+		);  
+
+	m_pModule->m_LlvmBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObject* 
+
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
+	m_pModule->m_LlvmBuilder.CreateLoad (ScopeLevelValue, NULL, &ScopeLevelValue); // size_t m_ScopeLevel
+
+	m_pModule->m_LlvmBuilder.CreateDataPtrValidator (
+		RegionBegionValue, 
+		Value.GetField ()->GetType ()->GetSize (),
+		ScopeLevelValue,
+		pResultValue
+		);
+}
+
 bool
 COperatorMgr::PrepareDataRef (
 	const CValue& Value,
@@ -28,10 +81,10 @@ COperatorMgr::PrepareDataRef (
 
 	case EDataPtrType_Thin:
 		*pPtrValue = Value;
-		if (!(Value.GetFlags () & EValueFlag_VariableOffset))
+		if (Value.GetFlags () & EValueFlag_NoDataPtrRangeCheck)
 			return true;
 
-		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (Value.GetVariable (), &ValidatorValue);
+		GetThinDataPtrValidator (Value, &ValidatorValue);
 		break;
 
 	case EDataPtrType_Normal:
@@ -99,6 +152,12 @@ COperatorMgr::StoreDataRef (
 	bool Result;
 
 	CDataPtrType* pDstType = (CDataPtrType*) DstValue.GetType ();
+	
+	if (pDstType->GetFlags () & EPtrTypeFlag_Const)
+	{
+		err::SetFormatStringError (_T("cannot store into const location"));
+		return false;
+	}
 
 	CType* pTargetType = pDstType->GetTargetType ();
 	EType TargetTypeKind = pTargetType->GetTypeKind ();

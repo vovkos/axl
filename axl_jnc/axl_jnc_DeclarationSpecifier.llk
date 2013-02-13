@@ -80,6 +80,10 @@ storage_specifier
 		{
 			$.m_StorageKind = EStorage_Static;
 		}
+	| EToken_Abstract EToken_Virtual?
+		{
+			$.m_StorageKind = EStorage_Abstract;
+		}
 	| EToken_Virtual
 		{
 			$.m_StorageKind = EStorage_Virtual;
@@ -87,6 +91,10 @@ storage_specifier
 	| EToken_NoVirtual
 		{
 			$.m_StorageKind = EStorage_NoVirtual;
+		}
+	| EToken_Mutable
+		{
+			$.m_StorageKind = EStorage_Mutable;
 		}
 	;
 
@@ -100,10 +108,6 @@ access_specifier
 	: EToken_Public
 		{
 			$.m_AccessKind = EAccess_Public;
-		}
-	| EToken_PublicRead
-		{
-			$.m_AccessKind = EAccess_PublicRead;
 		}
 	| EToken_Protected
 		{
@@ -137,6 +141,10 @@ type_specifier
 	| EToken_Int
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int);
+		}
+	| EToken_IntPtr
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int_pbe : EType_Int_p);
 		}
 	| EToken_Char
 		{
@@ -283,6 +291,10 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_Const;
 		}
+	| EToken_ReadOnly
+		{
+			$.m_Modifier = ETypeModifier_ReadOnly;
+		}
 	| EToken_Volatile
 		{
 			$.m_Modifier = ETypeModifier_Volatile;
@@ -322,6 +334,10 @@ type_modifier
 	| EToken_Property
 		{
 			$.m_Modifier = ETypeModifier_Property;
+		}
+	| EToken_Multicast
+		{
+			$.m_Modifier = ETypeModifier_Multicast;
 		}
 	| EToken_Event
 		{

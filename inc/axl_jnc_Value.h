@@ -28,10 +28,12 @@ enum EValue
 	EValue_Variable,
 	EValue_Function,
 	EValue_Property,	
+	EValue_Field,
 	EValue_LlvmRegister,
 	EValue_BoolNot,
 	EValue_BoolAnd,
 	EValue_BoolOr,
+	EValue__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -46,6 +48,7 @@ enum EAlloc
 	EAlloc_Undefined = 0,
 	EAlloc_Heap,
 	EAlloc_Stack,
+	EAlloc__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -57,8 +60,8 @@ GetAllocKindString (EAlloc AllocKind);
 
 enum EValueFlag
 {
-	EValueFlag_VariableOffset   = 0x01,
-	EValueFlag_ImplicitClassPtr = 0x02,
+	EValueFlag_NoDataPtrRangeCheck = 0x01, 
+	EValueFlag_ThisArg          = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -108,12 +111,6 @@ public:
 	CValue ()
 	{
 		Init ();
-	}
-
-	CValue (const CValue& Value)
-	{
-		Init ();
-		*this = Value;
 	}
 
 	CValue (
@@ -231,6 +228,13 @@ public:
 		return m_pProperty;
 	}
 
+	CStructMember* 
+	GetField () const
+	{
+		ASSERT (m_ValueKind == EValue_Field);
+		return m_pField;
+	}
+
 	void*
 	GetConstData () const
 	{
@@ -337,6 +341,12 @@ public:
 		OverrideType (TypeKind);
 	}
 
+	void
+	OverrideFlags (int Flags)
+	{
+		m_Flags = Flags;
+	}
+		
 	void
 	Clear ();
 
@@ -513,6 +523,14 @@ public:
 		int Flags = 0
 		);
 
+	void
+	SetLlvmValue (		
+		llvm::Value* pValue,
+		CType* pType,
+		CStructMember* pField,
+		int Flags = 0
+		);
+
 protected:
 	void
 	Init ();
@@ -548,7 +566,7 @@ TInterface*
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up data pointer declared like:
+// structures backing up safe data pointer declared like:
 // int* p;
 
 struct TDataPtrValidator
@@ -583,20 +601,22 @@ struct TFunctionWeakPtr: TFunctionPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up event declared like:
-// event OnFire ();
+// structures backing up multicast declared like:
+// mutlicast OnFire ();
 
-struct TEventHandler
+struct TMulticast
 {
-	TFunctionPtr m_FunctionPtr;
-	TEventHandler* m_pNext;
-	TEventHandler* m_pPrev;
+	volatile intptr_t m_Lock;
+	void** m_ppFunctionPtrArray; // array of function closure, weak or unsafe pointers
+	size_t m_Count;
+	size_t m_BufferCount;
+	void* m_pHandleTable;
 };
 
-struct TEvent
+struct TMulticastSnapshot
 {
-	TEventHandler* m_pHead;
-	TEventHandler* m_pTail;
+	void** m_ppFunctionPtrArray; // array of function closure or unsafe pointers
+	size_t m_Count;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

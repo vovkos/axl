@@ -29,7 +29,7 @@ protected:
 
 public:
 	CType*
-	GetType (
+	CalcType (
 		CType* pType,
 		int Modifiers,
 		const int* pPointerArray,
@@ -54,8 +54,8 @@ protected:
 	CPropertyType*
 	GetPropertyType (CType* pReturnType);
 
-	CEventType*
-	GetEventType (CType* pReturnType);
+	CMulticastType*
+	GetMulticastType (CType* pReturnType);
 
 	CDataPtrType*
 	GetDataPtrType (CType* pDataType);

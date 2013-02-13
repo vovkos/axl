@@ -29,7 +29,7 @@ CTypeMgr::Clear ()
 	m_ClassTypeList.Clear ();
 	m_FunctionTypeList.Clear ();
 	m_PropertyTypeList.Clear ();
-	m_EventTypeList.Clear ();
+	m_MulticastTypeList.Clear ();
 	m_DataPtrTypeList.Clear ();
 	m_ClassPtrTypeList.Clear ();
 	m_FunctionPtrTypeList.Clear ();
@@ -84,7 +84,7 @@ CTypeMgr::GetStdType (EStdType StdType)
 		break;
 
 	case EStdType_SimpleEvent:
-		pType = GetEventType ((CFunctionType*) GetStdType (EStdType_SimpleFunction));
+		pType = GetMulticastType ((CFunctionType*) GetStdType (EStdType_SimpleFunction));
 		break;
 
 	case EStdType_StrenthenClosureFunction:
@@ -327,6 +327,8 @@ CTypeMgr::CreateClassType (
 {
 	char SignatureChar = (EClassTypeFlag_Interface) ? 'I' : 'C';
 
+	EAccess AccessKind = (Flags & EClassTypeFlag_Interface) ? EAccess_Public : EAccess_Protected;
+
 	if (Name.IsEmpty ())
 	{
 		CClassType* pType = AXL_MEM_NEW (CClassType);
@@ -334,6 +336,7 @@ CTypeMgr::CreateClassType (
 		pType->m_Signature.Format ("%c%d%s", SignatureChar, m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
 		pType->m_Tag.Format (_T("_unnamed_class_%d"), m_UnnamedTypeCounter);
 		pType->m_Flags |= Flags;
+		pType->m_CurrentAccessKind = AccessKind;
 		pType->m_PackFactor = PackFactor;
 		m_ClassTypeList.InsertTail (pType);
 		return pType;
@@ -345,6 +348,7 @@ CTypeMgr::CreateClassType (
 	pType->m_Name = Name;
 	pType->m_QualifiedName = QualifiedName;
 	pType->m_Tag = QualifiedName;
+	pType->m_CurrentAccessKind = AccessKind;
 	pType->m_PackFactor = PackFactor;
 	pType->m_Flags |= Flags | ETypeFlag_Named;
 	
@@ -391,11 +395,14 @@ CTypeMgr::GetFunctionType (
 CFunctionType* 
 CTypeMgr::GetMethodMemberType (
 	CClassType* pClassType,
-	CFunctionType* pFunctionType
+	CFunctionType* pFunctionType,
+	int ThisArgTypeFlags
 	)
 {
+	CClassPtrType* pThisArgType = pClassType->GetClassPtrType (EClassPtrType_Normal, ThisArgTypeFlags | EPtrTypeFlag_NoNull);
+
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, pClassType->GetClassPtrType ());	
+	ArgTypeArray.Insert (0, pThisArgType);	
 	
 	CFunctionType* pMethodMemberType = GetFunctionType (
 		pFunctionType->m_CallConv,
@@ -623,30 +630,25 @@ CTypeMgr::GetBindablePropertyType (CPropertyType* pPropertyType)
 	return pPropertyType->m_pBindablePropertyType;
 }
 
-CEventType* 
-CTypeMgr::GetEventType (CFunctionPtrType* pFunctionPtrType)
+CMulticastType* 
+CTypeMgr::GetMulticastType (
+	CFunctionPtrType* pFunctionPtrType,
+	EMulticastType MulticastTypeKind
+	)
 {
-	if (pFunctionPtrType->m_pEventType)
-		return pFunctionPtrType->m_pEventType;
+	ASSERT (MulticastTypeKind >= 0 && MulticastTypeKind < EMulticastType__Count);
 
-	rtl::CStringA Signature = 'V';
-	Signature += pFunctionPtrType->GetSignature ();
+	if (pFunctionPtrType->m_MulticastTypeArray [MulticastTypeKind])
+		return pFunctionPtrType->m_MulticastTypeArray [MulticastTypeKind];
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
-	if (It->m_Value)
-	{
-		ASSERT (false);
-		return (CEventType*) It->m_Value;
-	}
-
-	CEventType* pType = AXL_MEM_NEW (CEventType);
+	CMulticastType* pType = AXL_MEM_NEW (CMulticastType);
 	pType->m_pModule = m_pModule;
-	pType->m_Signature = Signature;
+	pType->m_Signature = CMulticastType::CreateSignature (pFunctionPtrType, MulticastTypeKind);
+	pType->m_MulticastTypeKind = MulticastTypeKind;
 	pType->m_pFunctionPtrType = pFunctionPtrType;
 
-	m_EventTypeList.InsertTail (pType);
-	It->m_Value = pType;
-	pFunctionPtrType->m_pEventType = pType;
+	m_MulticastTypeList.InsertTail (pType);
+	pFunctionPtrType->m_MulticastTypeArray [MulticastTypeKind] = pType;
 	return pType;
 }
 
@@ -669,8 +671,8 @@ CTypeMgr::GetDataPtrType (
 
 	size_t i1 = TypeKind == EType_DataRef;
 	size_t i2 = PtrTypeKind;
-	size_t i3 = (Flags & EPtrTypeFlag_Volatile) != 0;
-	size_t i4 = (Flags & EPtrTypeFlag_Const) != 0;
+	size_t i3 = (Flags & EPtrTypeFlag_Const) ? 1 : (Flags & EPtrTypeFlag_ReadOnly) ? 2 : 0;
+	size_t i4 = (Flags & EPtrTypeFlag_Volatile) != 0;
 	size_t i5 = (Flags & EPtrTypeFlag_NoNull) != 0;
 		
 	if (pTuple->m_DataPtrArray [i1] [i2] [i3] [i4] [i5])
@@ -737,7 +739,7 @@ CTypeMgr::GetClassPtrType (
 	// ptrkind x const x nonull
 
 	size_t i1 = PtrTypeKind;
-	size_t i2 = (Flags & EPtrTypeFlag_Const) != 0;
+	size_t i2 = (Flags & EPtrTypeFlag_Const) ? 1 : (Flags & EPtrTypeFlag_ReadOnly) ? 2 : 0;
 	size_t i3 = (Flags & EPtrTypeFlag_NoNull) != 0;
 		
 	if (pTuple->m_ClassPtrArray [i1] [i2] [i3])

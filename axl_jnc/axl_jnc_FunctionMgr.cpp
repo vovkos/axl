@@ -248,13 +248,6 @@ CFunctionMgr::Prologue (
 
 	m_pCurrentFunction = pFunction;
 
-	// get this-value for methods
-
-	CClassType* pThisType = pFunction->GetClassType ();
-	CClassType* pArgThisType = pFunction->GetStorageKind () == EStorage_Virtual ? 
-		pFunction->GetVirtualOriginClassType () : 
-		pThisType;
-
 	// create entry block and scope
 
 	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
@@ -268,11 +261,12 @@ CFunctionMgr::Prologue (
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
-	if (pThisType)
+	if (pFunction->m_pThisType)
 	{
 		llvm::Value* pLlvmArg = LlvmArg;
-		CValue ArgValue (pLlvmArg, pArgThisType);			
-		Result = CreateThisValue (ArgValue, pThisType, pThisValue);
+		CValue ThisArgValue (pLlvmArg, pFunction->m_pThisArgType);			
+		
+		Result = m_pModule->m_OperatorMgr.CastOperator (ThisArgValue, pFunction->m_pThisType, pThisValue);
 		if (!Result)
 			return false;
 
@@ -300,7 +294,7 @@ CFunctionMgr::Prologue (
 	// store scope level
 
 	pFunction->m_pScopeLevelVariable = m_pModule->m_VariableMgr.CreateVariable (
-		_T("ScopeLevel"), 
+		_T("LocalScopeLevel"), 
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
 		true
 		);
@@ -954,8 +948,8 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateDynamicCastInterface ();
 		break;
 
-	case EStdFunc_EventOperator:
-		pFunction = CreateEventOperator ();
+	case EStdFunc_MulticastOperator:
+		pFunction = CreateMulticastOperator ();
 		break;
 
 	case EStdFunc_FireSimpleEvent:
@@ -1278,7 +1272,7 @@ CFunctionMgr::CreateDynamicCastInterface ()
 }
 
 // void
-// jnc.EventOperator (
+// jnc.MulticastOperator (
 //		jnc.event* pEvent,
 //		void* pfn,
 //		object pIface,
@@ -1286,7 +1280,7 @@ CFunctionMgr::CreateDynamicCastInterface ()
 //		);
 
 CFunction*
-CFunctionMgr::CreateEventOperator ()
+CFunctionMgr::CreateMulticastOperator ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	
@@ -1299,7 +1293,7 @@ CFunctionMgr::CreateEventOperator ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction (_T("jnc.EventOperator"), pType);
+	return CreateInternalFunction (_T("jnc.MulticastOperator"), pType);
 }
 
 // void
@@ -1316,7 +1310,7 @@ CFunctionMgr::CreateFireSimpleEvent ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction (_T("jnc.FireSimpleEventOperator"), pType);
+	return CreateInternalFunction (_T("jnc.FireSimpleMulticastOperator"), pType);
 }
 
 // int8*
@@ -1456,43 +1450,6 @@ CFunctionMgr::InitializeInterface (
 		InitializeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
 	}
 	
-	return true;
-}
-
-bool
-CFunctionMgr::CreateThisValue (
-	const CValue& ArgValue,
-	CClassType* pResultType,
-	CValue* pResultValue
-	)
-{
-	ASSERT (ArgValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pSrcType = ((CClassPtrType*) ArgValue.GetType ())->GetTargetType ();
-
-	// adjust the pointer: argument is the pointer to the interface which DECLARES the method
-	// what we want as 'this' value is the pointer to the class which IMPLEMENTS the method
-
-	CClassBaseTypeCoord Coord;
-	intptr_t Offset = 0;
-
-	if (pResultType != pSrcType)
-	{
-		bool Result = pResultType->FindBaseType (pSrcType, &Coord);
-		ASSERT (Result);
-
-		Offset = -(intptr_t) Coord.m_FieldCoord.m_Offset;
-	}
-
-	if (!Offset)
-	{
-		m_pModule->m_LlvmBuilder.CreateBitCast (ArgValue, pResultType, pResultValue);
-		return true;
-	}
-
-	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateBitCast (ArgValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateGep (PtrValue, Offset, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pResultType, pResultValue);
 	return true;
 }
 

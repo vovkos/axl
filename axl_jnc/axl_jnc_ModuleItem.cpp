@@ -10,44 +10,25 @@ namespace jnc {
 const tchar_t*
 GetModuleItemKindString (EModuleItem ItemKind)
 {
-	switch (ItemKind)
+	static const tchar_t* StringTable [EModuleItem__Count] = 
 	{
-	case EModuleItem_Namespace:
-		return _T("namespace");
+		_T("undefined-module-item-kind"),  // EModuleItem_Undefined = 0,
+		_T("namespace"),                   // EModuleItem_Namespace,	
+		_T("scope"),                       // EModuleItem_Scope,	
+		_T("alias"),                       // EModuleItem_Alias,
+		_T("type"),                        // EModuleItem_Type,
+		_T("const"),                       // EModuleItem_Const,
+		_T("variable"),                    // EModuleItem_Variable,
+		_T("function"),                    // EModuleItem_Function,
+		_T("property"),                    // EModuleItem_Property,
+		_T("enum-member"),                 // EModuleItem_EnumMember,
+		_T("struct-member"),               // EModuleItem_StructMember,
+		_T("union-member"),                // EModuleItem_UnionMember,
+	};
 
-	case EModuleItem_Scope:	
-		return _T("scope");
-
-	case EModuleItem_Alias:
-		return _T("alias");
-
-	case EModuleItem_Type:
-		return _T("type");
-
-	case EModuleItem_Const:
-		return _T("const");
-
-	case EModuleItem_Variable:
-		return _T("variable");
-
-	case EModuleItem_Function:
-		return _T("function");
-
-	case EModuleItem_Property:
-		return _T("property");
-
-	case EModuleItem_EnumMember:
-		return _T("enum-member");
-
-	case EModuleItem_StructMember:
-		return _T("struct-member");
-
-	case EModuleItem_UnionMember:
-		return _T("union-member");
-
-	default:
-		return _T("undefined-module-item-kind");
-	}
+	return ItemKind >= 0 && ItemKind < EModuleItem__Count ? 
+		StringTable [ItemKind] : 
+		StringTable [EModuleItem_Undefined];
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -55,23 +36,20 @@ GetModuleItemKindString (EModuleItem ItemKind)
 const tchar_t*
 GetStorageKindString (EStorage StorageKind)
 {
-	switch (StorageKind)
+	static const tchar_t* StringTable [EStorage__Count] = 
 	{
-	case EStorage_Typedef:
-		return _T("typedef");
-
-	case EStorage_Static:
-		return _T("static");
-
-	case EStorage_Virtual:
-		return _T("virtual");
-
-	case EStorage_NoVirtual:
-		return _T("novirtual");
-
-	default:
-		return _T("undefined-storage-class");
+		_T("undefined-storage-class"),  // EStorage_Undefined = 0,
+		_T("static"),                   // EStorage_Static,
+		_T("typedef"),                  // EStorage_Typedef,
+		_T("abstract"),                 // EStorage_Abstract,
+		_T("virtual"),                  // EStorage_Virtual,
+		_T("novirtual"),                // EStorage_NoVirtual,
+		_T("mutable"),                  // EStorage_Mutable,
 	};
+
+	return StorageKind >= 0 && StorageKind < EStorage__Count ? 
+		StringTable [StorageKind] : 
+		StringTable [EStorage_Undefined];
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -79,20 +57,16 @@ GetStorageKindString (EStorage StorageKind)
 const tchar_t*
 GetAccessKindString (EAccess AccessKind)
 {
-	switch (AccessKind)
+	static const tchar_t* StringTable [EAccess__Count] = 
 	{
-	case EAccess_Public:
-		return _T("public");
-
-	case EAccess_PublicRead:
-		return _T("publicread");
-
-	case EAccess_Protected:
-		return _T("protected");
-
-	default:
-		return _T("undefined-access-kind");
+		_T("undefined-access-kind"), // EAccess_Undefined = 0,
+		_T("public"),                // EAccess_Public,
+		_T("protected"),             // EAccess_Protected,
 	};
+
+	return AccessKind >= 0 && AccessKind < EAccess__Count ? 
+		StringTable [AccessKind] : 
+		StringTable [EAccess_Undefined];
 }
 
 //.............................................................................

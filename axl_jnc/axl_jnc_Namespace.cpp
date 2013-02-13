@@ -61,6 +61,13 @@ GetItemNamespace (CModuleItem* pItem)
 
 //.............................................................................
 
+CNamespace::CNamespace ()
+{
+	m_NamespaceKind = ENamespace_Global;
+	m_CurrentAccessKind = EAccess_Public;
+	m_pParentNamespace = NULL;
+}
+
 void
 CNamespace::Clear ()
 {
@@ -184,6 +191,23 @@ CNamespace::AddItem (
 	m_ItemArray.Append (pItem);
 	It->m_Value = pItem;
 	return true;
+}
+
+bool
+CNamespace::AddFunction (CFunction* pFunction)
+{
+	CModuleItem* pOldItem = FindItem (pFunction->GetName ());
+	if (!pOldItem)
+		return AddItem (pFunction);
+
+	if (pOldItem->GetItemKind () != EModuleItem_Function)
+	{	
+		SetRedefinitionError (pFunction->m_Name);
+		return false;
+	}
+
+	CFunction* pFunctionOverload = (CFunction*) pOldItem;
+	return pFunctionOverload->AddOverload (pFunction);
 }
 
 bool

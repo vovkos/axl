@@ -30,7 +30,7 @@ COperatorMgr::COperatorMgr ()
 
 	m_UnaryOperatorTable [EUnOp_Addr]     = &m_UnOp_Addr;
 	m_UnaryOperatorTable [EUnOp_Indir]    = &m_UnOp_Indir;
-	m_UnaryOperatorTable [EUnOp_Ptr]      = &m_UnOp_Ptr;
+	m_UnaryOperatorTable [EUnOp_Ptr]      = &m_UnOp_Indir;
 	
 	// increment operators
 
@@ -195,14 +195,14 @@ COperatorMgr::BinaryOperator (
 
 	switch (TargetTypeKind)
 	{
-	case EType_Event:
+	case EType_Multicast:
 		switch (OpKind)
 		{
 		case EBinOp_Add:
-			return EventOperator (DstValue, SrcValue, EEventOp_AddHandler);
+			return MulticastOperator (DstValue, SrcValue, EMulticastOp_Add);
 
 		case EBinOp_Sub:
-			return EventOperator (DstValue, SrcValue, EEventOp_RemoveHandler);
+			return MulticastOperator (DstValue, SrcValue, EMulticastOp_Remove);
 
 		default:
 			err::SetFormatStringError (_T("invalid operator for events"), GetBinOpKindString (OpKind));
@@ -220,8 +220,8 @@ COperatorMgr::BinaryOperator (
 
 /*
 
-	if (pTargetType->GetTypeKind () == EType_Event)
-		return EventOperator (DstValue, RawSrcValue, EEventOp_SetHandler);
+	if (pTargetType->GetTypeKind () == EType_Multicast)
+		return MulticastOperator (DstValue, RawSrcValue, EMulticastOp_Set);
 
 
  */
@@ -760,10 +760,10 @@ COperatorMgr::PrepareOperand (
 }
 
 bool
-COperatorMgr::EventOperator (
+COperatorMgr::MulticastOperator (
 	const CValue& Event,
 	const CValue& RawHandler,
-	EEventOp OpKind
+	EMulticastOp OpKind
 	)
 {
 	ASSERT (Event.GetType ()->GetTypeKind () == EType_DataRef);
@@ -771,8 +771,8 @@ COperatorMgr::EventOperator (
 
 	CType* pTargetType = pReferenceType->GetTargetType ();
 	
-	CEventType* pEventType = (CEventType*) pTargetType;
-	ASSERT (pEventType->GetTypeKind () == EType_Event);
+	CMulticastType* pMulticastType = (CMulticastType*) pTargetType;
+	ASSERT (pMulticastType->GetTypeKind () == EType_Multicast);
 
 	CValue EventPtrValue;
 	bool Result = PrepareDataRef (Event, ERuntimeError_StoreOutOfRange, &EventPtrValue);
@@ -781,9 +781,9 @@ COperatorMgr::EventOperator (
 
 	if (RawHandler.GetValueKind () == EValue_Null)
 	{
-		if (OpKind == EEventOp_SetHandler)
+		if (OpKind == EMulticastOp_Set)
 			m_pModule->m_LlvmBuilder.CreateStore (
-				pEventType->GetZeroValue (), 
+				pMulticastType->GetZeroValue (), 
 				EventPtrValue, 
 				(pReferenceType->GetFlags () & EPtrTypeFlag_Volatile) != 0
 				);
@@ -793,7 +793,7 @@ COperatorMgr::EventOperator (
 	}
 
 	CValue Handler;
-	Result = CastOperator (RawHandler, pEventType->GetFunctionPtrType (), &Handler);
+	Result = CastOperator (RawHandler, pMulticastType->GetFunctionPtrType (), &Handler);
 	if (!Result)
 		return false;
 
@@ -804,7 +804,7 @@ COperatorMgr::EventOperator (
 	m_pModule->m_LlvmBuilder.CreateBitCast (FunctionPtr, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &FunctionPtr);
 	m_pModule->m_LlvmBuilder.CreateBitCast (EventPtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe), &EventPtrValue);
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_EventOperator);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_MulticastOperator);
 
 	m_pModule->m_LlvmBuilder.CreateCall4 (
 		pFunction,

@@ -1031,6 +1031,14 @@ public:
 	llvm::Value*
 	CreateDataPtr (
 		const CValue& PtrValue,
+		const CValue& ValidatorValue,
+		CDataPtrType* pResultType,
+		CValue* pResultValue
+		);
+
+	llvm::Value*
+	CreateDataPtr (
+		const CValue& PtrValue,
 		const CValue& RegionBeginValue,
 		size_t Size,
 		const CValue& ScopeLevelValue,

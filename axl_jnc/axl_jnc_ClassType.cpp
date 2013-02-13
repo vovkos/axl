@@ -39,9 +39,12 @@ CClassType::GetClassPtrType (
 }
 
 CFunctionType* 
-CClassType::GetMethodMemberType (CFunctionType* pShortType)
+CClassType::GetMethodMemberType (
+	CFunctionType* pShortType,
+	int ThisArgTypeFlags
+	)
 {
-	return m_pModule->m_TypeMgr.GetMethodMemberType (this, pShortType);
+	return m_pModule->m_TypeMgr.GetMethodMemberType (this, pShortType, ThisArgTypeFlags);
 }
 
 CPropertyType* 
@@ -192,8 +195,10 @@ CClassType::CreateFieldMember (
 {
 	CStructType* pFieldStructType;
 
-	if (!StorageKind)
+	switch (StorageKind)
 	{
+	case EStorage_Undefined:
+	case EStorage_Mutable:
 		if (!m_pFieldStructType)
 		{
 			m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
@@ -202,9 +207,9 @@ CClassType::CreateFieldMember (
 		}
 
 		pFieldStructType = m_pFieldStructType;
-	}
-	else if (StorageKind == EStorage_Static)
-	{
+		break;
+
+	case EStorage_Static:
 		if (!m_pStaticFieldStructType)
 		{
 			m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
@@ -214,9 +219,9 @@ CClassType::CreateFieldMember (
 		}
 
 		pFieldStructType = m_pStaticFieldStructType;
-	}
-	else
-	{
+		break;
+
+	default:
 		err::SetFormatStringError (_T("invalid storage '%s' for field member '%s'"), GetStorageKindString (StorageKind), Name);
 		return NULL;
 	}
@@ -234,18 +239,39 @@ CClassType::CreateFieldMember (
 }
 
 bool
-CClassType::AddMethodMember (CFunction* pFunction)
+CClassType::AddMethodMember (
+	CFunction* pFunction,
+	int ThisArgTypeFlags
+	)
 {
 	EStorage StorageKind = pFunction->GetStorageKind ();
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
+	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
 
-	if (StorageKind != EStorage_Static)
+	switch (StorageKind)
 	{
-		pFunction->m_pClassType = this;
-		pFunction->m_pType = GetMethodMemberType (pFunction->m_pType);
+	case EStorage_Static:
+		if (ThisArgTypeFlags)
+		{
+			err::SetFormatStringError (_T("static method cannot be '%s'"), GetPtrTypeFlagString (ThisArgTypeFlags));
+			return false;
+		}
 
-		if (StorageKind == EStorage_Virtual)
-			m_VirtualMethodArray.Append (pFunction);
+		break;
+
+	case EStorage_Abstract:
+	case EStorage_Virtual:
+		m_VirtualMethodArray.Append (pFunction);
+		// and fall through;
+
+	case EStorage_Undefined:
+	case EStorage_NoVirtual:
+		pFunction->ConvertToMethodMember (this, ThisArgTypeFlags);
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for method member"), GetStorageKindString (StorageKind));
+		return false;
 	}
 
 	pFunction->m_pParentNamespace = this;
@@ -271,8 +297,7 @@ CClassType::AddMethodMember (CFunction* pFunction)
 		break;
 
 	case EFunction_Named:
-		pFunction->m_Tag.Format (_T("%s.%s"), m_Tag, pFunction->m_Name);
-		return true;
+		return AddFunction (pFunction);
 
 	case EFunction_AutoEv:
 		pFunction->m_Tag.Format (_T("%s.autoev"), m_Tag);
@@ -289,23 +314,16 @@ CClassType::AddMethodMember (CFunction* pFunction)
 	{
 		*ppTarget = pFunction;
 	}
+	else if (FunctionKindFlags & EFunctionKindFlag_NoOverloads)
+	{
+		err::SetFormatStringError (_T("'%s' already has %s"), GetTypeString (), GetFunctionKindString (FunctionKind));
+		return false;
+	}
 	else
 	{
-		if (FunctionKind != EFunction_Constructor)
-		{
-			err::SetFormatStringError (_T("'%s' already has %s"), GetTypeString (), GetFunctionKindString (FunctionKind));
-			return false;
-		}
-
 		bool Result = (*ppTarget)->AddOverload (pFunction);
 		if (!Result)
 			return false;
-	}
-
-	if (FunctionKind != EFunction_Constructor && !pFunction->GetType ()->GetArgTypeArray ().IsEmpty ())
-	{
-		err::SetFormatStringError (_T("%s must have no arguments"), pFunction->m_Tag);
-		return false;
 	}
 
 	return true;

@@ -54,26 +54,5 @@ public:
 
 //.............................................................................
 
-class CUnOp_Ptr: public IUnaryOperator
-{
-public:
-	AXL_OBJ_SIMPLE_CLASS (CUnOp_Ptr, IUnaryOperator)
-
-public:
-	CUnOp_Ptr ()
-	{
-		m_OpKind = EUnOp_Ptr;
-	}
-
-	virtual
-	bool
-	Operator (
-		const CValue& OpValue,
-		CValue* pResultValue
-		);
-};
-
-//.............................................................................
-
 } // namespace jnc {
 } // namespace axl {

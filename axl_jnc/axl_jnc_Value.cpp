@@ -59,46 +59,43 @@ public:
 const tchar_t*
 GetValueKindString (EValue ValueKind)
 {
-	switch (ValueKind)
+	static const tchar_t* StringTable [EValue__Count] = 
 	{
-	case EValue_Void:
-		return _T("void");
+		_T("void"),          // EValue_Void = 0,
+		_T("null"),          // EValue_Null,
+		_T("type"),          // EValue_Type,
+		_T("const"),         // EValue_Const,
+		_T("variable"),      // EValue_Variable,
+		_T("function"),      // EValue_Function,
+		_T("property"),      // EValue_Property,	
+		_T("field"),         // EValue_Field,	
+		_T("llvm-register"), // EValue_LlvmRegister,
+		_T("bool-not"),      // EValue_BoolNot,
+		_T("bool-and"),      // EValue_BoolAnd,
+		_T("bool-or"),       // EValue_BoolOr,
+	};
 
-	case EValue_Null:	
-		return _T("null");
-
-	case EValue_Type:
-		return _T("type");
-
-	case EValue_Const:
-		return _T("const");
-
-	case EValue_Variable:
-		return _T("variable");
-
-	case EValue_Function:
-		return _T("function");
-
-	case EValue_Property:
-		return _T("property");
-
-	case EValue_LlvmRegister:
-		return _T("llvm-register");
-
-	case EValue_BoolNot:
-		return _T("bool-not");
-
-	case EValue_BoolAnd:
-		return _T("bool-and");
-
-	case EValue_BoolOr:
-		return _T("bool-or");
-
-	default:
-		return _T("undefined-value");
-	}
+	return ValueKind >= 0 && ValueKind < EValue__Count ? 
+		StringTable [ValueKind] : 
+		_T("undefined-value-kind");
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t*
+GetAllocKindString (EAlloc AllocKind)
+{
+	static const tchar_t* StringTable [EAlloc__Count] = 
+	{
+		_T("undefined-alloc-kind"), // EAlloc_Undefined = 0,
+		_T("heap"),                 // EAlloc_Heap,
+		_T("stack"),                // EAlloc_Stack,
+	};
+
+	return AllocKind >= 0 && AllocKind < EAlloc__Count ? 
+		StringTable [AllocKind] : 
+		StringTable [EAlloc_Undefined];
+}
 //.............................................................................
 
 CValue::CValue (
@@ -321,7 +318,8 @@ CValue::SetVariable (CVariable* pVariable)
 	return SetLlvmValue (
 		pVariable->GetLlvmValue (), 
 		pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin), 
-		pVariable
+		pVariable,
+		EValueFlag_NoDataPtrRangeCheck
 		);
 }
 
@@ -463,6 +461,20 @@ CValue::SetLlvmValue (
 	SetLlvmValue (pValue, pType, EValue_Variable);
 
 	m_pVariable = pVariable;
+	m_Flags = Flags;
+}
+
+void
+CValue::SetLlvmValue (		
+	llvm::Value* pValue,
+	CType* pType,
+	CStructMember* pField,
+	int Flags
+	)
+{
+	SetLlvmValue (pValue, pType, EValue_Field);
+
+	m_pField = pField;
 	m_Flags = Flags;
 }
 

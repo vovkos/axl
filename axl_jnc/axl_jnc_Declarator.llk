@@ -44,6 +44,7 @@ declarator <CTypeSpecifier* $pTypeSpecifier>
 	: pointer <&$.m_Declarator>* 
 	  declarator_name <&$.m_Declarator>
 	  declarator_suffix <&$.m_Declarator>*
+	  post_declarator_modifier <&$.m_Declarator>*
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -375,8 +376,8 @@ function_suffix <CDeclarator* $pDeclarator>
 	{
 		$pFunctionSuffix = $pDeclarator->AddFunctionSuffix ();
 	}
-	: '(' function_formal_argument_list <$pFunctionSuffix> ')' function_modifier <$pFunctionSuffix>*
-	| '(' ')' function_modifier <$pFunctionSuffix>*
+	: '(' function_formal_argument_list <$pFunctionSuffix> ')'
+	| '(' ')'
 	;	
 
 function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
@@ -402,13 +403,6 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_UnsafeVarArg;
 		}
 	;
-
-function_modifier <CDeclFunctionSuffix* $pFunctionSuffix>
-	: EToken_Const
-		{
-			$pFunctionSuffix->m_FunctionFlags |= EFunctionFlag_Const;
-		}
-	;
 	
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -419,4 +413,14 @@ bitfield_suffix <CDeclarator* $pDeclarator>
 		}
 	;
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+post_declarator_modifier <CDeclarator* $pDeclarator>
+	: EToken_Const
+		{
+			return $pDeclarator->SetPostDeclaratorModifier (EPostDeclaratorModifier_Const);
+		}
+	;
+
 //.............................................................................
+

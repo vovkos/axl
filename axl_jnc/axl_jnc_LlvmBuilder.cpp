@@ -214,6 +214,20 @@ CLlvmBuilder::CreateCall (
 llvm::Value*
 CLlvmBuilder::CreateDataPtr (
 	const CValue& PtrValue,
+	const CValue& ValidatorValue,
+	CDataPtrType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CreateComment ("create safe pointer");
+	CValue DataPtrValue = pResultType->GetUndefValue ();
+	CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
+	return CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
+}
+
+llvm::Value*
+CLlvmBuilder::CreateDataPtr (
+	const CValue& PtrValue,
 	const CValue& RegionBeginValue,
 	size_t Size,
 	const CValue& ScopeLevelValue,
@@ -228,12 +242,8 @@ CLlvmBuilder::CreateDataPtr (
 		ScopeLevelValue,
 		&ValidatorValue
 		);
-	
-	CreateComment ("create safe pointer");
 
-	CValue DataPtrValue = pResultType->GetUndefValue ();
-	CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
-	return CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
+	return CreateDataPtr (PtrValue, ValidatorValue, pResultType, pResultValue);
 }
 
 llvm::Value*

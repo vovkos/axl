@@ -82,7 +82,7 @@ COperatorMgr::MemberOperator (
 	)
 {
 	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
 	if (!Result)
 		return false;
 
@@ -111,7 +111,7 @@ COperatorMgr::MemberOperator (
 	case EType_ClassPtr:
 		return 
 			PrepareOperand (&OpValue) &&
-			ClassMemberOperator (OpValue, (CClassType*) pType, pName, pResultValue);
+			ClassMemberOperator (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName, pResultValue);
 
 	default:
 		err::SetFormatStringError (_T("member operator cannot be applied to '%s'"), pType->GetTypeString ());
@@ -241,7 +241,7 @@ COperatorMgr::StructMemberOperator (
 			PtrValue.GetLlvmValue (), 
 			pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
 			OpValue.GetVariable (), 
-			OpValue.GetFlags () & EValueFlag_VariableOffset
+			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate 
 			);
 	}
 	else
@@ -316,7 +316,7 @@ COperatorMgr::UnionMemberOperator (
 			CastValue.GetLlvmValue (), 
 			pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
 			OpValue.GetVariable (), 
-			OpValue.GetFlags () & EValueFlag_VariableOffset
+			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate trusted flag
 			);
 	}
 	else
@@ -357,6 +357,8 @@ COperatorMgr::ClassMemberOperator (
 	switch (MemberKind)
 	{
 	case EModuleItem_StructMember:
+
+
 		return ClassFieldMemberOperator (
 			OpValue, 
 			pClassType, 
@@ -367,21 +369,10 @@ COperatorMgr::ClassMemberOperator (
 		
 	case EModuleItem_Function:
 		pResultValue->SetFunction ((CFunction*) pMember);
-		if (pDecl->GetStorageKind () != EStorage_Static)
-		{
-			CClosure* pClosure = pResultValue->CreateClosure ();
-			pClosure->GetArgList ()->InsertHead (OpValue);
-		}
-
 		break;
 
 	case EModuleItem_Property:
 		pResultValue->SetProperty ((CProperty*) pMember);
-		if (pDecl->GetStorageKind () != EStorage_Static)
-		{
-			CClosure* pClosure = pResultValue->CreateClosure ();
-			pClosure->GetArgList ()->InsertHead (OpValue);
-		}
 		break;
 
 	default:
@@ -389,6 +380,14 @@ COperatorMgr::ClassMemberOperator (
 		return false;
 	}
 
+	if (pDecl->GetStorageKind () == EStorage_Static)
+		return true;
+	
+	CValue ThisArg = OpValue;
+	ThisArg.OverrideFlags (OpValue.GetFlags () & EValueFlag_ThisArg);
+
+	CClosure* pClosure = pResultValue->CreateClosure ();
+	pClosure->GetArgList ()->InsertHead (OpValue);
 	return true;
 }
 
@@ -401,28 +400,9 @@ COperatorMgr::ClassFieldMemberOperator (
 	CValue* pResultValue
 	)
 {
-	CValue ObjPtrValue;
-	
-	size_t ObjPtrIndexArray [] = 
-	{
-		0, // iface* 
-		0, // iface.hdr*
-		1, // TObject**
-	};
-
-	m_pModule->m_LlvmBuilder.CreateGep (OpValue, ObjPtrIndexArray, countof (ObjPtrIndexArray), NULL, &ObjPtrValue);  // TObject**
-	m_pModule->m_LlvmBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObject* 
-
-	CValue ScopeLevelValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
-	m_pModule->m_LlvmBuilder.CreateLoad (ScopeLevelValue, NULL, &ScopeLevelValue); // size_t m_ScopeLevel
-	
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (1, pClassType->GetFieldMember ()->GetLlvmIndex ());
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
-
-	size_t* p = pCoord->m_FieldCoord.m_LlvmIndexArray;
-	size_t Count = pCoord->m_FieldCoord.m_LlvmIndexArray.GetCount ();
 
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
@@ -433,17 +413,21 @@ COperatorMgr::ClassFieldMemberOperator (
 		&PtrValue
 		);
 
-	CDataPtrType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef);
+	int Flags = EPtrTypeFlag_NoNull;
+	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && pMember->GetStorageKind () != EStorage_Mutable)
+		Flags |= EPtrTypeFlag_Const;
 
-	m_pModule->m_LlvmBuilder.CreateDataPtr (
-		PtrValue, 
-		PtrValue, 
-		pMember->GetType ()->GetSize (),
-		ScopeLevelValue,
-		pResultType, 
-		pResultValue
+	CDataPtrType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, Flags);
+
+	pResultValue->SetLlvmValue (
+		PtrValue.GetLlvmValue (),
+		pResultType,
+		pMember,
+		EValueFlag_NoDataPtrRangeCheck
 		);
 
+	CClosure* pClosure = pResultValue->CreateClosure ();
+	pClosure->GetArgList ()->InsertHead (OpValue);
 	return true;
 }
 

@@ -63,8 +63,8 @@ enum EBinOp
 	EBinOp_OrAssign,
 	EBinOp_AtAssign,
 
-	EBinOp__OpAssignDelta = EBinOp_AddAssign - EBinOp_Add,
 	EBinOp__Count,
+	EBinOp__OpAssignDelta = EBinOp_AddAssign - EBinOp_Add,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

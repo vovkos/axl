@@ -141,7 +141,7 @@ COperatorMgr::CheckClassPtrNull (const CValue& Value)
 	CClassPtrType* pPtrType = (CClassPtrType*) Value.GetType ();
 	EClassPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (PtrTypeKind == EClassPtrType_Unsafe)
+	if (PtrTypeKind == EClassPtrType_Unsafe || (pPtrType->GetFlags () & EPtrTypeFlag_NoNull))
 		return;
 
 	m_pModule->m_LlvmBuilder.CreateComment ("check null pointer");
@@ -191,7 +191,7 @@ COperatorMgr::CheckFunctionPtrNull (const CValue& Value)
 	CFunctionPtrType* pPtrType = (CFunctionPtrType*) Value.GetType ();
 	EFunctionPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (PtrTypeKind == EFunctionPtrType_Unsafe)
+	if (PtrTypeKind == EFunctionPtrType_Unsafe || (pPtrType->GetFlags () & EPtrTypeFlag_NoNull))
 		return;
 
 	CValue PtrValue;
@@ -250,7 +250,7 @@ COperatorMgr::CheckPropertyPtrNull (const CValue& Value)
 	CFunctionPtrType* pPtrType = (CFunctionPtrType*) Value.GetType ();
 	EFunctionPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (PtrTypeKind == EFunctionPtrType_Unsafe)
+	if (PtrTypeKind == EFunctionPtrType_Unsafe || (pPtrType->GetFlags () & EPtrTypeFlag_NoNull))
 		return;
 
 	CValue PtrValue;

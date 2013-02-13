@@ -17,13 +17,14 @@ namespace llk {
 enum ENode
 {
 	ENode_Undefined = 0,
-
 	ENode_Token,
 	ENode_Symbol,
 	ENode_Sequence,
 	ENode_Action,	
 	ENode_Argument,	
 	ENode_LaDfa,	
+
+	ENode__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -32,29 +33,20 @@ inline
 const tchar_t*
 GetNodeKindString (ENode NodeKind)
 {
-	switch (NodeKind)
+	static const tchar_t* StringTable [ENode__Count] = 
 	{
-	case ENode_Token:
-		return _T("token-node");
-
-	case ENode_Symbol:
-		return _T("symbol-node");
-
-	case ENode_Sequence:
-		return _T("sequence-node");
-
-	case ENode_Action:
-		return _T("action-node");
-
-	case ENode_Argument:
-		return _T("argument-node");
-
-	case ENode_LaDfa:
-		return _T("lookahead-dfa-node");
-
-	default:
-		return _T("undefined-node-kind");
+		_T("undefined-node-kind"), // ENode_Undefined
+		_T("token-node"),          // ENode_Token,
+		_T("symbol-node"),         // ENode_Symbol,
+		_T("sequence-node"),       //  ENode_Sequence,
+		_T("action-node"),         // ENode_Action,	
+		_T("argument-node"),       // ENode_Argument,	
+		_T("lookahead-dfa-node"),  // ENode_LaDfa,	
 	};
+
+	return NodeKind >= 0 && NodeKind < ENode__Count ? 
+		StringTable [NodeKind] : 
+		StringTable [ENode_Undefined];
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

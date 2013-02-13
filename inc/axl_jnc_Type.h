@@ -70,7 +70,6 @@ enum EType
 
 	EType_Function,            // FC/FS (cdecl/stdcall)
 	EType_Property,            // YY/YB (normal/bindable)
-	EType_Event,               // V
 	
 	// pointers & references
 
@@ -81,6 +80,8 @@ enum EType
 	EType_FunctionRef,         // RF
 	EType_PropertyPtr,         // PY
 	EType_PropertyRef,         // RY
+	
+	EType_Multicast,           // M
 
 	// import type (resolved after linkage or instantiation of generic)
 
@@ -135,9 +136,29 @@ enum ETypeFlag
 enum EPtrTypeFlag
 {
 	EPtrTypeFlag_NoNull    = 0x0100, // all 
-	EPtrTypeFlag_Const     = 0x0200, // class & data ptr only
-	EPtrTypeFlag_Volatile  = 0x0400, // data ptr only
+	EPtrTypeFlag_Const     = 0x0200, // class & data ptr
+	EPtrTypeFlag_ReadOnly  = 0x0400, // class & data ptr
+	EPtrTypeFlag_Volatile  = 0x0800, // data ptr only
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+EPtrTypeFlag
+GetFirstPtrTypeFlag (int Flags)
+{
+	return (EPtrTypeFlag) (1 << rtl::GetLoBitIdx (Flags));
+}
+
+const tchar_t* 
+GetPtrTypeFlagString (EPtrTypeFlag Flag);
+
+inline
+const tchar_t* 
+GetPtrTypeFlagString (int Flags)
+{
+	return GetPtrTypeFlagString (GetFirstPtrTypeFlag (Flags));
+}
 
 //.............................................................................
 
@@ -148,22 +169,24 @@ enum ETypeModifier
 	ETypeModifier_LittleEndian  = 0x00000004,
 	ETypeModifier_BigEndian     = 0x00000008,
 	ETypeModifier_Const         = 0x00000010,
-	ETypeModifier_Volatile      = 0x00000020,
-	ETypeModifier_Safe          = 0x00000040,
-	ETypeModifier_Unsafe        = 0x00000080,
-	ETypeModifier_NoNull        = 0x00000100,
-	ETypeModifier_Strong        = 0x00000200,
-	ETypeModifier_Weak          = 0x00000400,
-	ETypeModifier_Cdecl         = 0x00000800,
-	ETypeModifier_Stdcall       = 0x00001000,
-	ETypeModifier_Function      = 0x00002000,
-	ETypeModifier_Property      = 0x00004000,
-	ETypeModifier_Event         = 0x00008000,
-	ETypeModifier_Bindable      = 0x00010000,
-	ETypeModifier_AutoGet       = 0x00020000,
-	ETypeModifier_Indexed       = 0x00040000,
-	ETypeModifier_Closure       = 0x00080000,
-	ETypeModifier_Thin          = 0x00100000,
+	ETypeModifier_ReadOnly      = 0x00000020,
+	ETypeModifier_Volatile      = 0x00000040,
+	ETypeModifier_Safe          = 0x00000080,
+	ETypeModifier_Unsafe        = 0x00000100,
+	ETypeModifier_NoNull        = 0x00000200,
+	ETypeModifier_Strong        = 0x00000400,
+	ETypeModifier_Weak          = 0x00000800,
+	ETypeModifier_Cdecl         = 0x00001000,
+	ETypeModifier_Stdcall       = 0x00002000,
+	ETypeModifier_Function      = 0x00004000,
+	ETypeModifier_Property      = 0x00008000,
+	ETypeModifier_Multicast     = 0x00010000,
+	ETypeModifier_Event         = 0x00020000,
+	ETypeModifier_Bindable      = 0x00040000,
+	ETypeModifier_AutoGet       = 0x00080000,
+	ETypeModifier_Indexed       = 0x00100000,
+	ETypeModifier_Closure       = 0x00200000,
+	ETypeModifier_Thin          = 0x00400000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -220,6 +243,7 @@ enum ETypeModifierMask
 	ETypeModifierMask_DataPtr = 
 		ETypeModifierMask_AnyPtr |
 		ETypeModifier_Const | 
+		ETypeModifier_ReadOnly | 
 		ETypeModifier_Volatile,
 
 	ETypeModifierMask_ClassPtr = 
@@ -248,10 +272,15 @@ GetFirstTypeModifier (int Modifiers)
 	return (ETypeModifier) (1 << rtl::GetLoBitIdx (Modifiers));
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 const tchar_t*
 GetTypeModifierString (ETypeModifier Modifier);
+
+inline
+const tchar_t*
+GetTypeModifierString (int Modifiers)
+{
+	return GetTypeModifierString (GetFirstTypeModifier (Modifiers));
+}
 
 //.............................................................................
 

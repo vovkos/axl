@@ -36,7 +36,7 @@ CProperty::Create (CPropertyType* pType)
 	bool Result;
 	
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pType->GetGetterType ());
-	Result = AddMethodMember (pGetter);
+	Result = AddMethodMember (pGetter, EPtrTypeFlag_Const);
 	if (!Result)
 		return false;
 
@@ -75,8 +75,10 @@ CProperty::CreateFieldMember (
 		StorageKind = EStorage_Static;
 	}
 
-	if (!StorageKind)
+	switch (StorageKind)
 	{
+	case EStorage_Undefined:
+	case EStorage_Mutable:
 		if (!m_pFieldStructType)
 		{
 			m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
@@ -88,9 +90,9 @@ CProperty::CreateFieldMember (
 		}
 
 		pFieldStructType = m_pFieldStructType;
-	}
-	else if (StorageKind == EStorage_Static)
-	{
+		break;
+
+	case EStorage_Static:
 		if (!m_pStaticFieldStructType)
 		{
 			m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
@@ -100,9 +102,9 @@ CProperty::CreateFieldMember (
 		}
 
 		pFieldStructType = m_pStaticFieldStructType;
-	}
-	else
-	{
+		break;
+
+	default:
 		err::SetFormatStringError (_T("invalid storage '%s' for field member '%s'"), GetStorageKindString (StorageKind), Name);
 		return NULL;
 	}
@@ -120,22 +122,43 @@ CProperty::CreateFieldMember (
 }
 
 bool
-CProperty::AddMethodMember (CFunction* pFunction)
+CProperty::AddMethodMember (
+	CFunction* pFunction,
+	int ThisArgTypeFlags
+	)
 {
 	bool Result;
 
 	EStorage StorageKind = pFunction->GetStorageKind ();
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
+	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
 
 	if (m_pParentClassType)
 	{
-		if (StorageKind != EStorage_Static)
+		switch (StorageKind)
 		{
-			pFunction->m_pClassType = m_pParentClassType;
-			pFunction->m_pType = m_pParentClassType->GetMethodMemberType (pFunction->m_pType);
+		case EStorage_Static:
+			if (ThisArgTypeFlags)
+			{
+				err::SetFormatStringError (_T("static method cannot be '%s'"), GetPtrTypeFlagString (ThisArgTypeFlags));
+				return false;
+			}
 
-			if (StorageKind == EStorage_Virtual)
-				m_pParentClassType->m_VirtualMethodArray.Append (pFunction);
+			break;
+
+		case EStorage_Abstract:
+		case EStorage_Virtual:
+			m_pParentClassType->m_VirtualMethodArray.Append (pFunction);
+			// and fall through;
+
+		case EStorage_Undefined:
+		case EStorage_NoVirtual:
+			pFunction->ConvertToMethodMember (m_pParentClassType, ThisArgTypeFlags);
+			break;
+
+		default:
+			err::SetFormatStringError (_T("invalid storage specifier '%s' for method member"), GetStorageKindString (StorageKind));
+			return false;
 		}
 	}
 	else
@@ -145,6 +168,13 @@ CProperty::AddMethodMember (CFunction* pFunction)
 			err::SetFormatStringError (_T("global property members cannot have storage specifier"));
 			return false;
 		}
+
+		if (ThisArgTypeFlags)
+		{
+			err::SetFormatStringError (_T("global property methods cannot be '%s'"), GetPtrTypeFlagString (ThisArgTypeFlags));
+			return false;
+		}
+
 	}
 
 	pFunction->m_pParentNamespace = this;
@@ -175,8 +205,7 @@ CProperty::AddMethodMember (CFunction* pFunction)
 		break;
 
 	case EFunction_Named:
-		pFunction->m_Tag.Format (_T("%s.%s"), m_Tag, pFunction->m_Name);
-		return true;
+		return AddFunction (pFunction);
 
 	case EFunction_AutoEv:
 		pFunction->m_Tag.Format (_T("%s.autoev"), m_Tag);

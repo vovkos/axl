@@ -10,20 +10,16 @@ namespace jnc {
 const tchar_t*
 GetDataPtrTypeKindString (EDataPtrType PtrTypeKind)
 {
-	switch (PtrTypeKind)
+	static const tchar_t* StringTable [EDataPtrType__Count] = 
 	{
-	case EDataPtrType_Normal:
-		return _T("safe");
+		_T("safe"),   // EDataPtrType_Normal = 0,
+		_T("thin"),   // EDataPtrType_Thin,
+		_T("unsafe"), // EDataPtrType_Unsafe,
+	};
 
-	case EDataPtrType_Thin:
-		return _T("thin");
-
-	case EDataPtrType_Unsafe:
-		return _T("unsafe");
-
-	default:
-		return _T("undefined-data-ptr-kind");
-	}
+	return PtrTypeKind >= 0 && PtrTypeKind < EDataPtrType__Count ? 
+		StringTable [PtrTypeKind] : 
+		_T("undefined-data-ptr-kind");
 }
 
 //.............................................................................
@@ -63,11 +59,14 @@ CDataPtrType::CreateSignature (
 		break;
 	}
 
-	if (Flags & EPtrTypeFlag_Volatile)
-		Signature += 'v';
-
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
+
+	if (Flags & EPtrTypeFlag_ReadOnly)
+		Signature += 'r';
+
+	if (Flags & EPtrTypeFlag_Volatile)
+		Signature += 'v';
 
 	if (Flags & EPtrTypeFlag_NoNull)
 		Signature += 'n';
@@ -80,23 +79,25 @@ CDataPtrType::CreateSignature (
 void
 CDataPtrType::PrepareTypeString ()
 {
-	m_TypeString = m_pTargetType->GetTypeString ();
+	if (m_Flags & EPtrTypeFlag_Const)
+		m_TypeString += _T("const ");
+
+	if (m_Flags & EPtrTypeFlag_ReadOnly)
+		m_TypeString += _T("readonly ");
+
+	if (m_Flags & EPtrTypeFlag_Volatile)
+		m_TypeString += _T("volatile ");
+
+	if (m_Flags & EPtrTypeFlag_NoNull)
+		m_TypeString += _T("nonull ");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += _T(' ');
 		m_TypeString += GetDataPtrTypeKindString (m_PtrTypeKind);
+		m_TypeString += _T(' ');
 	}
 
-	if (m_Flags & EPtrTypeFlag_Volatile)
-		m_TypeString += _T(" volatile");
-
-	if (m_Flags & EPtrTypeFlag_Const)
-		m_TypeString += _T(" const");
-
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeString += _T(" nonull");
-
+	m_TypeString += m_pTargetType->GetTypeString ();
 	m_TypeString += m_TypeKind == EType_DataRef ? "&" : "*";
 }
 
@@ -123,3 +124,4 @@ CDataPtrType::PrepareLlvmType ()
 
 } // namespace jnc {
 } // namespace axl {
+

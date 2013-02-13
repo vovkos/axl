@@ -170,12 +170,28 @@ CDeclFunctionSuffix::GetArgTypeArray ()
 
 //.............................................................................
 
+const tchar_t* 
+GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier)
+{
+	switch (Modifier)
+	{
+	case EPostDeclaratorModifier_Const:
+		return _T("const");
+
+	default:
+		return _T("undefined-declarator-modifier");
+	}
+}
+
+//.............................................................................
+
 CDeclarator::CDeclarator ()
 {
 	m_DeclaratorKind = EDeclarator_Undefined;
 	m_FunctionKind = EFunction_Undefined;
 	m_pType = NULL;
 	m_BitCount = 0;
+	m_PostDeclaratorModifiers = 0;
 }
 
 bool
@@ -260,6 +276,19 @@ CDeclarator::AddOperator (
 }
 
 bool
+CDeclarator::SetPostDeclaratorModifier (EPostDeclaratorModifier Modifier)
+{
+	if (m_PostDeclaratorModifiers & Modifier)
+	{
+		err::SetFormatStringError (_T("type modifier '%s' used more than once"), GetPostDeclaratorModifierString (Modifier));
+		return false;
+	}
+
+	m_PostDeclaratorModifiers |= Modifier;
+	return true;
+}
+
+bool
 CDeclarator::SetPropValue ()
 {
 	if (m_DeclaratorKind)
@@ -311,10 +340,10 @@ CDeclarator::AddBitFieldSuffix (size_t BitCount)
 }
 
 CType*
-CDeclarator::GetType (int* pDataPtrTypeFlags)
+CDeclarator::CalcType (int* pDataPtrTypeFlags)
 {
 	CDeclTypeCalc TypeCalc;
-	return TypeCalc.GetType (
+	return TypeCalc.CalcType (
 		m_pType, 
 		m_TypeModifiers, 
 		m_PointerArray, 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
+#include "axl_jnc_FunctionType.h"
 
 namespace axl {
 namespace jnc {
@@ -39,7 +40,7 @@ class CDataPtrType: public CType
 {
 protected:
 	friend class CTypeMgr;
-
+	
 	EDataPtrType m_PtrTypeKind;
 	CType* m_pTargetType;
 
@@ -88,8 +89,8 @@ protected:
 	friend class CTypeMgr;
 
 	CStructType* m_pDataPtrStructType;
-	CDataPtrType* m_DataPtrArray [2] [EDataPtrType__Count] [2] [2] [2]; // ref x ptrkind x volatile x const x nonull
-	CPropertyType* m_SimplePropertyTypeArray [2] [2]; // callconv x readonly
+	CDataPtrType* m_DataPtrArray [2] [EDataPtrType__Count] [3] [2] [2]; // ref x ptrkind x access x volatile x nonull
+	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [3]; // callconv x access
 
 public:
 	CDataPtrTypeTuple ()

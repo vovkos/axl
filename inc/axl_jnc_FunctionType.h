@@ -11,7 +11,7 @@ namespace jnc {
 
 class CFunctionPtrType;
 class CFunctionPtrTypeTuple;
-class CEventType;
+class CMulticastType;
 class CClassPtrType;
 
 enum EFunctionPtrType;
@@ -30,6 +30,8 @@ enum ECallConv
 {
 	ECallConv_Cdecl = 0,
 	ECallConv_Stdcall,
+	ECallConv__Count,
+
 	ECallConv_Default = ECallConv_Cdecl,
 };
 
@@ -37,6 +39,8 @@ enum ECallConv
 
 const tchar_t*
 GetCallConvString (ECallConv CallConv);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 llvm::CallingConv::ID
@@ -82,6 +86,12 @@ public:
 	GetReturnType ()
 	{
 		return m_pReturnType;
+	}
+
+	bool
+	HasArgs ()
+	{
+		return !m_ArgTypeArray.IsEmpty ();
 	}
 
 	rtl::CArrayT <CType*>
@@ -131,8 +141,8 @@ public:
 		return GetFunctionPtrType (EType_FunctionPtr, PtrTypeKind, Flags);
 	}
 
-	CEventType*
-	GetEventType ();
+	CMulticastType*
+	GetMulticastType ();
 
 	static
 	rtl::CStringA

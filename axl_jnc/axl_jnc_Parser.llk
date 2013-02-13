@@ -53,10 +53,9 @@ Members
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;
 	EEndianness m_Endianness;
-	EStorage m_StorageKind;
 	EStorage m_DefaultMethodStorageKind;
+	EStorage m_StorageKind;
 	EAccess m_AccessKind;
-	EAccess m_DefaultAccessKind;
 	CAttributeBlock* m_pAttributeBlock;
 	CValue m_ThisValue;
 	 
@@ -126,9 +125,6 @@ Members2
 		CFunctionType* pType,
 		CDeclarator* pDeclarator
 		);
-
-	bool
-	AddNamedFunction (CFunction* pFunction);
 
 	bool
 	DeclareProperty (
@@ -243,7 +239,7 @@ Members2
 	SetThis (CValue* pValue);
 
 	void
-	SetStorageAccessDefaults ();
+	SetDefaultMethodStorageKind ();
 } 
 
 OpenNamespace

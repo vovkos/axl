@@ -1,26 +1,54 @@
 //.............................................................................
 
-int property MyIntProp;
-
-int
-MyIntProp.get ()
+class CTest
 {
-	printf ("MyIntProp.get ()\n");
-	return 100;
-}
+public:
+	mutable int m_Value;
 
-MyIntProp.set (int x)
+	Foo (int x) const
+	{
+		printf ("CTest.Foo (x = %d)\n", x);
+		m_Value = x;
+	}
+
+	Bar ()
+	{
+		printf ("CTest.Bar () { m_v = %d }\n", m_Value);
+	}
+};
+
+
+/*
+
+class CTest
 {
-	printf ("MyIntProp.set (%d)\n", x);
-}
+	int m_x;
+
+	void
+	Foo (int x)
+	{
+		printf ("CTest.Foo (x = %d)\n", x);
+		m_x = x;
+	}
+
+	void
+	Bar ()
+	{
+		printf ("CTest.Bar () { m_x = %d }\n", m_x);
+	}
+};
+
+*/
 
 int
 main ()
 {
 	printf ("hui govno i muravei\n");
-	int property* pr = &MyIntProp;
 
-	int x = *pr;
+	CTest t = stack new CTest;
+
+	t.Foo (100);
+	t.Bar ();
 
 	return 0;
 }

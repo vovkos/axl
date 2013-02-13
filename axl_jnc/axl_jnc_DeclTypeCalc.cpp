@@ -8,7 +8,7 @@ namespace jnc {
 //.............................................................................
 
 CType*
-CDeclTypeCalc::GetType (
+CDeclTypeCalc::CalcType (
 	CType* pType,
 	int Modifiers,
 	const int* pPointerArray,
@@ -19,6 +19,7 @@ CDeclTypeCalc::GetType (
 {
 	m_pModule = pType->GetModule ();
 	m_Suffix = Suffix;
+
 
 	for (size_t i = 0; i < PointerCount; i++)
 	{
@@ -38,17 +39,17 @@ CDeclTypeCalc::GetType (
 		default:
 			if (m_TypeModifiers & ETypeModifier_Event)
 			{
-				CEventType* pEventType = GetEventType (pType);
-				if (!pEventType)
-					return NULL;
+				CMulticastType* pMulticastType = GetMulticastType (pType);
+				if (!pMulticastType)
+					return false;
 
-				pType = GetDataPtrType (pEventType);
+				pType = GetDataPtrType (pMulticastType);
 			}
 			else if (m_TypeModifiers & ETypeModifier_Property)
 			{
 				CPropertyType* pPropertyType = GetPropertyType (pType);
 				if (!pPropertyType)
-					return NULL;
+					return false;
 
 				pType = GetPropertyPtrType (pPropertyType);
 			}
@@ -56,7 +57,7 @@ CDeclTypeCalc::GetType (
 			{
 				CFunctionType* pFunctionType = GetFunctionType (pType);
 				if (!pFunctionType)
-					return NULL;
+					return false;
 
 				pType = GetFunctionPtrType (pFunctionType);
 			}
@@ -67,7 +68,7 @@ CDeclTypeCalc::GetType (
 		}
 
 		if (!pType || !CheckUnusedModifiers ())
-			return NULL;
+			return false;
 	}
 
 	m_TypeModifiers = Modifiers;
@@ -76,7 +77,7 @@ CDeclTypeCalc::GetType (
 	{
 		pType = GetPropertyType (pType);
 		if (!pType)
-			return NULL;
+			return false;
 	}
 
 	while (m_Suffix)
@@ -93,20 +94,20 @@ CDeclTypeCalc::GetType (
 		case EDeclSuffix_Function:
 			if (m_TypeModifiers & ETypeModifier_Event)
 			{
-				pType = GetEventType (pType);
+				pType = GetMulticastType (pType);
 			}
 			else
 			{
 				pType = GetFunctionType (pType);
 				if (!CheckUnusedModifiers ())
-					return NULL;
+					return false;
 			}
 
 			break;
 		}
 
 		if (!pType)
-			return NULL;
+			return false;
 	}
 
 	int DataPtrFlags = 0;
@@ -120,7 +121,7 @@ CDeclTypeCalc::GetType (
 	m_TypeModifiers &= ETypeModifier_Const | ETypeModifier_Volatile;
 
 	if (!CheckUnusedModifiers ())
-		return NULL;
+		return false;
 
 	if (pDataPtrFlags)
 		*pDataPtrFlags = DataPtrFlags;
@@ -133,7 +134,7 @@ CDeclTypeCalc::CheckUnusedModifiers ()
 {
 	if (m_TypeModifiers)
 	{
-		err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (GetFirstTypeModifier (m_TypeModifiers)));
+		err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (m_TypeModifiers));
 		return false;
 	}
 
@@ -147,7 +148,7 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 
 	if (!pType->IsIntegerType ())
 	{
-		err::SetFormatStringError (_T("'%s' modifier cannot be applied to '%s'"), GetTypeModifierString (GetFirstTypeModifier (m_TypeModifiers)), pType->GetTypeString ());
+		err::SetFormatStringError (_T("'%s' modifier cannot be applied to '%s'"), GetTypeModifierString (m_TypeModifiers), pType->GetTypeString ());
 		return false;
 	}
 
@@ -342,8 +343,8 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 	return pPropertyType;
 }
 
-CEventType*
-CDeclTypeCalc::GetEventType (CType* pReturnType)
+CMulticastType*
+CDeclTypeCalc::GetMulticastType (CType* pReturnType)
 {
 	if (pReturnType->GetTypeKind () != EType_Void)
 	{
@@ -359,7 +360,7 @@ CDeclTypeCalc::GetEventType (CType* pReturnType)
 	if (!pFunctionPtrType)
 		return NULL;
 
-	return m_pModule->m_TypeMgr.GetEventType (pFunctionPtrType);
+	return m_pModule->m_TypeMgr.GetMulticastType (pFunctionPtrType);
 }
 
 CDataPtrType*

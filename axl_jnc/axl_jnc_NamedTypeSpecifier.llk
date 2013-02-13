@@ -300,21 +300,19 @@ named_type_block <CNamespace* $pNamespace>
 	: '{' 
 		{
 			m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
-			SetStorageAccessDefaults ();
+			SetDefaultMethodStorageKind ();
 		}
 	  named_type_block_declaration*
 	  '}'
 		{
 			m_pModule->m_NamespaceMgr.CloseNamespace ();
-			SetStorageAccessDefaults ();		
+			SetDefaultMethodStorageKind ();		
 		}
 	;
 
 named_type_block_declaration
-	: access_specifier ':'
-		{
-			m_DefaultAccessKind = $1.m_AccessKind;
-		}
+	: friend_declaration
+	| access_declaration
 	| item_declaration
 	;
 

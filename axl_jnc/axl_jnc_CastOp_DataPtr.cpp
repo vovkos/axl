@@ -80,8 +80,16 @@ CCast_DataPtr_Base::GetCastKind (
 	CDataPtrType* pSrcType = (CDataPtrType*) OpValue.GetType ();
 	CDataPtrType* pDstType = (CDataPtrType*) pType;
 
-	CType* pSrcDataType = ((CDataPtrType*) pSrcType)->GetTargetType ();
-	CType* pDstDataType = ((CDataPtrType*) pDstType)->GetTargetType ();
+	if ((pSrcType->GetFlags () & EPtrTypeFlag_Const) != 0 && 
+		(pDstType->GetFlags () & EPtrTypeFlag_Const) == 0 &&
+		pDstType->GetPtrTypeKind () != EDataPtrType_Unsafe)
+		return ECast_None;
+
+	CType* pSrcDataType = pSrcType->GetTargetType ();
+	CType* pDstDataType = pDstType->GetTargetType ();
+
+	if (pSrcDataType->Cmp (pDstDataType) == 0)
+		return ECast_Implicit;
 
 	if (pSrcDataType->GetTypeKind () != EType_Struct ||
 		pDstDataType->GetTypeKind () != EType_Struct)
@@ -89,13 +97,9 @@ CCast_DataPtr_Base::GetCastKind (
 		return ECast_Explicit;
 	}
 
-	CStructType* pSrcStructType = (CStructType*) pSrcDataType;
-	CStructType* pDstStructType = (CStructType*) pDstDataType;
-
-	if (pSrcStructType->FindBaseType (pDstStructType, NULL))
-		return ECast_Implicit;
-
-	return ECast_Explicit;
+	return ((CStructType*) pSrcDataType)->FindBaseType (((CStructType*) pDstDataType), NULL) ?
+		ECast_Implicit :
+		ECast_Explicit;
 }
 
 intptr_t
@@ -108,7 +112,8 @@ CCast_DataPtr_Base::GetOffset (
 	CType* pSrcDataType = pSrcType->GetTargetType ();
 	CType* pDstDataType = pDstType->GetTargetType ();
 
-	if (pSrcDataType->GetTypeKind () != EType_Struct ||
+	if (pSrcDataType->Cmp (pDstDataType) == 0 ||
+		pSrcDataType->GetTypeKind () != EType_Struct ||
 		pDstDataType->GetTypeKind () != EType_Struct)
 	{
 		return 0;
@@ -224,13 +229,14 @@ CCast_DataPtr_Thin2Normal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetValueKind () == EValue_Variable);
-	CVariable* pVariable = OpValue.GetVariable ();
-
 	CValue PtrValue;
 	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType (EDataPtrType_Unsafe);
 	GetOffsetUnsafePtrValue (OpValue, (CDataPtrType*) OpValue.GetType (), pUnsafePtrType, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateDataPtr (PtrValue, pVariable, (CDataPtrType*) pType, pResultValue);
+
+	CValue ValidatorValue;
+	m_pModule->m_OperatorMgr.GetThinDataPtrValidator (OpValue, &ValidatorValue);
+
+	m_pModule->m_LlvmBuilder.CreateDataPtr (PtrValue, ValidatorValue, (CDataPtrType*) pType, pResultValue);
 	return true;
 }
 

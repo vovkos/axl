@@ -38,6 +38,19 @@ public:
 		Copy (ppTypeArray, Count);
 	}
 
+	operator CFunctionType* ()
+	{
+		return m_pType;
+	}
+
+	CFunctionTypeOverload& 
+	operator = (CFunctionType* pType)
+	{
+		m_pType = pType;
+		m_OverloadArray.Clear ();
+		return *this;
+	}
+
 	bool
 	IsEmpty () const
 	{

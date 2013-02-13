@@ -10,110 +10,47 @@ namespace jnc {
 const tchar_t*
 GetBinOpKindString (EBinOp OpKind)
 {
-	switch (OpKind)
+	static const tchar_t* StringTable [EBinOp__Count] = 
 	{
-	case EBinOp_Add:
-		return _T("+");
-
-	case EBinOp_Sub:
-		return _T("-");
-
-	case EBinOp_Mul:
-		return _T("*");
-
-	case EBinOp_Div:
-		return _T("/");
-
-	case EBinOp_Mod:
-		return _T("%");
-
-	case EBinOp_Shl:
-		return _T("<<");
-
-	case EBinOp_Shr:
-		return _T(">>");
-
-	case EBinOp_BwAnd:
-		return _T("&");
-
-	case EBinOp_BwXor:
-		return _T("^");
-
-	case EBinOp_BwOr:
-		return _T("|");
-
-	case EBinOp_At:
-		return _T("@");
-
-	case EBinOp_Idx:
-		return _T("[]");
-
-	case EBinOp_LogAnd:
-		return _T("&&");
-
-	case EBinOp_LogOr:
-		return _T("||");
-
-	case EBinOp_Eq:
-		return _T("==");
-
-	case EBinOp_Ne:
-		return _T("!=");
-
-	case EBinOp_Lt:
-		return _T("<");
-
-	case EBinOp_Le:
-		return _T("<=");
-
-	case EBinOp_Gt:
-		return _T(">");
-
-	case EBinOp_Ge:
-		return _T(">=");
-
-	case EBinOp_Assign:
-		return _T("=");
-
-	case EBinOp_ClassAssign:
-		return _T(":=");
-
-	case EBinOp_AddAssign:
-		return _T("+=");
-
-	case EBinOp_SubAssign:
-		return _T("-=");
-
-	case EBinOp_MulAssign:
-		return _T("*=");
-
-	case EBinOp_DivAssign:
-		return _T("/=");
-
-	case EBinOp_ModAssign:
-		return _T("%=");
-
-	case EBinOp_ShlAssign:
-		return _T("<<=");
-
-	case EBinOp_ShrAssign:
-		return _T(">>=");
-
-	case EBinOp_AndAssign:
-		return _T("&=");
-
-	case EBinOp_XorAssign:
-		return _T("^=");
-
-	case EBinOp_OrAssign:
-		return _T("|=");
-
-	case EBinOp_AtAssign:
-		return _T("@=");
-
-	default:
-		return _T("undefined-binary-operator");
+		_T("undefined-binary-operator"),  // EBinOp_Undefined = 0,
+		_T("+"),                          // EBinOp_Add,
+		_T("-"),                          // EBinOp_Sub,
+		_T("*"),                          // EBinOp_Mul,
+		_T("/"),                          // EBinOp_Div,
+		_T("%"),                          // EBinOp_Mod,	
+		_T("<<"),                         // EBinOp_Shl,
+		_T(">>"),                         // EBinOp_Shr,	
+		_T("&"),                          // EBinOp_BwAnd,
+		_T("^"),                          // EBinOp_BwXor,	
+		_T("|"),                          // EBinOp_BwOr,
+		_T("@"),                          // EBinOp_At,
+		_T("[]"),                         // EBinOp_Idx,
+		_T("=="),                         // EBinOp_Eq,
+		_T("!="),                         // EBinOp_Ne,
+		_T("<"),                          // EBinOp_Lt,
+		_T(">"),                          // EBinOp_Le,
+		_T("<="),                         // EBinOp_Gt,
+		_T(">="),                         // EBinOp_Ge,
+		_T("&&"),                         // EBinOp_LogAnd,
+		_T("||"),                         // EBinOp_LogOr,
+		_T("="),                          // EBinOp_Assign,
+		_T(":="),                         // EBinOp_ClassAssign,
+		_T("+="),                         // EBinOp_AddAssign,
+		_T("-="),                         // EBinOp_SubAssign,
+		_T("*="),                         // EBinOp_MulAssign,
+		_T("/="),                         // EBinOp_DivAssign,
+		_T("%="),                         // EBinOp_ModAssign,
+		_T("<<="),                        // EBinOp_ShlAssign,
+		_T(">>="),                        // EBinOp_ShrAssign,
+		_T("&="),                         // EBinOp_AndAssign,
+		_T("^="),                         // EBinOp_XorAssign,
+		_T("|="),                         // EBinOp_OrAssign,
+		_T("@="),                         // EBinOp_AtAssign,
 	};
+
+	return OpKind >= 0 && OpKind < EBinOp__Count ? 
+		StringTable [OpKind] : 
+		StringTable [EBinOp_Undefined];
 }
 
 //.............................................................................

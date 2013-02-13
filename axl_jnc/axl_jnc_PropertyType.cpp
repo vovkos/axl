@@ -87,16 +87,16 @@ CPropertyType::GetTypeModifierString ()
 		return m_TypeModifierString;
 
 	if (IsReadOnly ())
-		m_TypeModifierString += _T(" const");
+		m_TypeModifierString += _T("const ");
 
 	if (m_Flags & EPropertyTypeFlag_Bindable)
-		m_TypeModifierString += _T(" bindable");
+		m_TypeModifierString += _T("bindable ");
 
 	if (m_Flags & EPropertyTypeFlag_AutoGet)
-		m_TypeModifierString += _T(" autoget");
+		m_TypeModifierString += _T("autoget ");
 
 	if (IsIndexed ())
-		m_TypeModifierString += _T(" indexed");
+		m_TypeModifierString += _T("indexed ");
 
 	return m_TypeModifierString;
 }
@@ -107,8 +107,9 @@ CPropertyType::PrepareTypeString ()
 	CType* pReturnType = GetReturnType ();
 
 	m_TypeString = pReturnType->GetTypeString ();
+	m_TypeString += _T(' ');
 	m_TypeString += GetTypeModifierString ();
-	m_TypeString += _T(" property");
+	m_TypeString += _T("property");
 	
 	if (IsIndexed ())
 	{

@@ -164,7 +164,10 @@ public:
 	}
 
 	bool
-	AddMethodMember (CFunction* pFunction);
+	AddMethodMember (
+		CFunction* pFunction,
+		int ThisArgTypeFlags = 0
+		);
 
 	bool
 	AddPropertyMember (CProperty* pProperty);

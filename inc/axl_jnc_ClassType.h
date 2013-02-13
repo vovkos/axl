@@ -278,13 +278,19 @@ public:
 	}
 
 	CFunctionType* 
-	GetMethodMemberType (CFunctionType* pShortType);
+	GetMethodMemberType (
+		CFunctionType* pShortType,
+		int ThisArgTypeFlags = 0
+		);
 
 	CPropertyType* 
 	GetPropertyMemberType (CPropertyType* pShortType);
 
 	bool
-	AddMethodMember (CFunction* pFunction);
+	AddMethodMember (
+		CFunction* pFunction,
+		int ThisArgTypeFlags = 0
+		);
 
 	bool
 	AddPropertyMember (CProperty* pProperty);

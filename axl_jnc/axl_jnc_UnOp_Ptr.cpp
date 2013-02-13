@@ -101,17 +101,5 @@ CUnOp_Indir::Operator (
 
 //.............................................................................
 
-bool
-CUnOp_Ptr::Operator (
-	const CValue& OpValue,
-	CValue* pResultValue
-	)
-{
-	err::SetFormatStringError (_T("unary '->' is not yet implemented"));
-	return false;
-}
-
-//.............................................................................
-
 } // namespace jnc {
 } // namespace axl {

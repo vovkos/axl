@@ -28,6 +28,7 @@ enum EModuleItem
 	EModuleItem_EnumMember,
 	EModuleItem_StructMember,
 	EModuleItem_UnionMember,
+	EModuleItem__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -42,8 +43,11 @@ enum EStorage
 	EStorage_Undefined = 0,
 	EStorage_Static,
 	EStorage_Typedef,
+	EStorage_Abstract,
 	EStorage_Virtual,
 	EStorage_NoVirtual,
+	EStorage_Mutable,
+	EStorage__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -57,8 +61,8 @@ enum EAccess
 {
 	EAccess_Undefined = 0,
 	EAccess_Public,
-	EAccess_PublicRead,
 	EAccess_Protected,
+	EAccess__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

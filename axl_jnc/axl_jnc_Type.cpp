@@ -158,6 +158,30 @@ GetTypeModifierString (ETypeModifier Modifier)
 	};
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t* 
+GetPtrTypeFlagString (EPtrTypeFlag Flag)
+{
+	switch (Flag)
+	{
+	case EPtrTypeFlag_NoNull:
+		return _T("nonull");
+
+	case EPtrTypeFlag_Const:
+		return _T("const");
+
+	case EPtrTypeFlag_ReadOnly:
+		return _T("readonly");
+
+	case EPtrTypeFlag_Volatile:
+		return _T("volatile");
+
+	default:
+		return _T("undefined-ptr-type-flag");
+	}
+}
+
 //.............................................................................
 
 CType::CType ()

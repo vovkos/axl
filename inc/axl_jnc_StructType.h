@@ -92,8 +92,12 @@ protected:
 	
 	CStructType* m_pParentStructType;
 	CType* m_pType;
+	CType* m_pDualType;
+	int m_DataPtrTypeFlags;
+
 	CType* m_pBitFieldBaseType;
 	size_t m_BitCount;
+	
 	size_t m_Offset;
 	size_t m_LlvmIndex;
 

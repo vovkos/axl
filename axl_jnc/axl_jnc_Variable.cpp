@@ -9,17 +9,16 @@ namespace jnc {
 const tchar_t*
 GetVariableKindString (EVariable VariableKind)
 {
-	switch (VariableKind)
+	static const tchar_t* StringTable [EVariable__Count] = 
 	{
-	case EVariable_Global:
-		return _T("global-variable");
-
-	case EVariable_Local:
-		return _T("local-variable");
-
-	default:
-		return _T("undefined-variable-kind");
+		_T("undefined-variable-kind"),  // EVariable_Undefined = 0,
+		_T("global-variable"),          // EVariable_Global,
+		_T("local-variable"),           // EVariable_Local,
 	};
+
+	return VariableKind >= 0 && VariableKind < EVariable__Count ? 
+		StringTable [VariableKind] : 
+		StringTable [EVariable_Undefined];
 }
 
 //.............................................................................

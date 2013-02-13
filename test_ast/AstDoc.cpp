@@ -321,19 +321,19 @@ StdLib_DynamicCastInterface (
 }
 
 void
-StdLib_EventOperator (
-	jnc::TEvent* pEvent,
+StdLib_MulticastOperator (
+	jnc::TMulticast* pEvent,
 	void* pfn,
 	jnc::TInterface* pClosure,
-	jnc::EEventOp OpKind
+	jnc::EMulticastOp OpKind
 	)
 {
-	jnc::TEventHandler* pHandler;
+/*	jnc::TMulticastHandler* pHandler;
 
 	switch (OpKind)
 	{
-	case jnc::EEventOp_SetHandler:
-		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
+	case jnc::EMulticastOp_Set:
+		pHandler = AXL_MEM_NEW (jnc::TMulticastHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
 		pHandler->m_FunctionPtr.m_pClosure = pClosure;
 		pHandler->m_pPrev = NULL;
@@ -343,8 +343,8 @@ StdLib_EventOperator (
 		pEvent->m_pTail = pHandler;
 		break;
 
-	case jnc::EEventOp_AddHandler:
-		pHandler = AXL_MEM_NEW (jnc::TEventHandler);
+	case jnc::EMulticastOp_Add:
+		pHandler = AXL_MEM_NEW (jnc::TMulticastHandler);
 		pHandler->m_FunctionPtr.m_pfn = pfn;
 		pHandler->m_FunctionPtr.m_pClosure = pClosure;
 		pHandler->m_pPrev = pEvent->m_pTail;
@@ -359,7 +359,7 @@ StdLib_EventOperator (
 		pEvent->m_pTail = pHandler;
 		break;
 
-	case jnc::EEventOp_RemoveHandler:
+	case jnc::EMulticastOp_Remove:
 		pHandler = pEvent->m_pHead;
 		for (; pHandler; pHandler = pHandler->m_pNext)
 		{
@@ -384,21 +384,24 @@ StdLib_EventOperator (
 
 	default:
 		ASSERT (false);
-	}
+	} 
+
+*/
+
 }
 
 void
-StdLib_FireSimpleEvent (jnc::TEvent* pEvent)
+StdLib_FireSimpleEvent (jnc::TMulticast* pEvent)
 {
-	typedef void (*FEventHandler) (jnc::TInterface*);
+/*	typedef void (*FEventHandler) (jnc::TInterface*);
 
-	jnc::TEventHandler* pHandler = pEvent->m_pHead;
+	jnc::TMulticastHandler* pHandler = pEvent->m_pHead;
 
 	for (; pHandler; pHandler = pHandler->m_pNext)
 	{
 		FEventHandler pfn = (FEventHandler) pHandler->m_FunctionPtr.m_pfn;
 		pfn (pHandler->m_FunctionPtr.m_pClosure);
-	}
+	} */
 }
 
 void*
@@ -556,7 +559,7 @@ CAstDoc::ExportStdLib ()
 {
 	ExportStdLibFunction (jnc::EStdFunc_OnRuntimeError, StdLib_OnRuntimeError);
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
-	ExportStdLibFunction (jnc::EStdFunc_EventOperator, StdLib_EventOperator);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastOperator, StdLib_MulticastOperator);
 	ExportStdLibFunction (jnc::EStdFunc_FireSimpleEvent, StdLib_FireSimpleEvent);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 

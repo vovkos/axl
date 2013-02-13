@@ -11,53 +11,64 @@ namespace jnc {
 const tchar_t*
 GetFunctionKindString (EFunction FunctionKind)
 {
-	switch (FunctionKind)
+	static const tchar_t* StringTable [EFunction__Count] = 
 	{
-	case EFunction_Named:
-		return _T("named-function");
-
-	case EFunction_Getter:
-		return _T("get");
-
-	case EFunction_Setter:
-		return _T("set");
-
-	case EFunction_PreConstructor:
-		return _T("preconstruct");
-
-	case EFunction_Constructor:
-		return _T("this");
-
-	case EFunction_StaticConstructor:
-		return _T("static this");
-
-	case EFunction_Destructor:
-		return _T("~this");
-
-	case EFunction_CallOperator:
-		return _T("call-operator");
-
-	case EFunction_CastOperator:
-		return _T("cast-operator");
-
-	case EFunction_UnaryOperator:
-		return _T("unary-operator");
-
-	case EFunction_BinaryOperator:
-		return _T("binary-operator");
-
-	case EFunction_Internal:
-		return _T("internal");
-
-	case EFunction_Thunk:
-		return _T("thunk");
-
-	case EFunction_AutoEv:
-		return _T("autoev");
-
-	default:
-		return _T("undefined-function-kind");
+		_T("undefined-function-kind"),  // EFunction_Undefined,
+		_T("named-function"),           // EFunction_Named,
+		_T("get"),                      // EFunction_Getter,
+		_T("set"),                      // EFunction_Setter,
+		_T("preconstruct"),             // EFunction_PreConstructor,
+		_T("this"),                     // EFunction_Constructor,
+		_T("static this"),              // EFunction_StaticConstructor,
+		_T("~this"),                    // EFunction_Destructor,
+		_T("call-operator"),            // EFunction_CallOperator,
+		_T("cast-operator"),            // EFunction_CastOperator,
+		_T("unary-operator"),           // EFunction_UnaryOperator,
+		_T("binary-operator"),          // EFunction_BinaryOperator,
+		_T("autoev"),                   // EFunction_AutoEv,
+		_T("internal"),                 // EFunction_Internal, 
+		_T("thunk"),                    // EFunction_Thunk,
 	};
+
+	return FunctionKind >= 0 && FunctionKind < EFunction__Count ? 
+		StringTable [FunctionKind] : 
+		StringTable [EFunction_Undefined];
+}
+
+//.............................................................................
+
+int
+GetFunctionKindFlags (EFunction FunctionKind)
+{
+	static int FlagTable [EFunction__Count] = 
+	{
+		0,                              // EFunction_Undefined,
+		0,                              // EFunction_Named,
+		EFunctionKindFlag_NoStorage |   // EFunction_Getter,
+		EFunctionKindFlag_NoOverloads,                      		
+		EFunctionKindFlag_NoStorage,    // EFunction_Setter,
+		EFunctionKindFlag_NoStorage |   // EFunction_PreConstructor,
+		EFunctionKindFlag_NoOverloads |
+		EFunctionKindFlag_NoArgs,       
+		EFunctionKindFlag_NoStorage,    // EFunction_Constructor,
+		EFunctionKindFlag_NoStorage |   // EFunction_StaticConstructor,
+		EFunctionKindFlag_NoOverloads |
+		EFunctionKindFlag_NoArgs,              
+		EFunctionKindFlag_NoStorage |   // EFunction_Destructor,
+		EFunctionKindFlag_NoOverloads |
+		EFunctionKindFlag_NoArgs,              
+		0,                              // EFunction_CallOperator,
+		EFunctionKindFlag_NoOverloads | // EFunction_CastOperator,
+		EFunctionKindFlag_NoArgs,       
+		EFunctionKindFlag_NoOverloads | // EFunction_UnaryOperator,
+		EFunctionKindFlag_NoArgs,       
+		0,                              // EFunction_BinaryOperator,
+		0,                              // EFunction_AutoEv,
+		0,                              // EFunction_Internal, 
+		0,                              // EFunction_Thunk,
+	};
+
+	return FunctionKind >= 0 && FunctionKind < EFunction__Count ? FlagTable [FunctionKind] : 0;
 }
 
 //.............................................................................
@@ -71,6 +82,8 @@ CFunction::CFunction ()
 	m_pOrphanNamespace = NULL;
 	m_pExternFunction = NULL;
 	m_pClassType = NULL;
+	m_pThisArgType = NULL;
+	m_pThisType = NULL;
 	m_pVirtualOriginClassType = NULL;
 	m_pProperty = NULL;
 	m_ClassVTableIndex = -1;
@@ -87,27 +100,32 @@ CFunction::CreateArgString ()
 {
 	rtl::CString String = _T('(');
 
-	if (m_ArgList.IsEmpty ())
-	{
-		rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
-		size_t ArgCount = ArgTypeArray.GetCount ();
+	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
+	size_t ArgCount = ArgTypeArray.GetCount ();
 
-		if (ArgCount)
-		{
-			String += ArgTypeArray [0]->GetTypeString ();
+	if (m_pClassType)
+		String.AppendFormat (_T("%s this"), ArgTypeArray [0]->GetTypeString ());
 
-			for (size_t i = 1; i < ArgCount; i++)
-				String.AppendFormat (_T(", %s"), ArgTypeArray [i]->GetTypeString ());
-		}
-	}
-	else
+	if (!m_ArgList.IsEmpty ())
 	{
 		rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
 
-		String.AppendFormat (_T("%s %s"), Arg->GetType ()->GetTypeString (), Arg->GetName ());
+		String.AppendFormat (
+			m_pClassType ? _T(", %s %s") : _T("%s %s"), 
+			Arg->GetType ()->GetTypeString (), 
+			Arg->GetName ()
+			);
 
 		for (Arg++; Arg; Arg++)
 			String.AppendFormat (_T(", %s %s"), Arg->GetType ()->GetTypeString (), Arg->GetName ());
+	}
+	else
+	{
+		if (ArgCount && !m_pClassType)
+			String += ArgTypeArray [0]->GetTypeString ();
+
+		for (size_t i = 1; i < ArgCount; i++)
+			String.AppendFormat (_T(", %s"), ArgTypeArray [i]->GetTypeString ());
 	}
 
 	if (!(m_pType->GetFlags () & EFunctionTypeFlag_VarArg))
@@ -138,6 +156,24 @@ CFunction::GetLlvmFunction ()
 		);
 
 	return m_pLlvmFunction;
+}
+
+void
+CFunction::ConvertToMethodMember (
+	CClassType* pClassType,
+	int ThisArgTypeFlags
+	)
+{
+	ASSERT (!m_pClassType);
+	ASSERT (m_TypeOverload.GetOverloadCount () == 1);
+
+	m_pClassType = pClassType;
+	m_pType = pClassType->GetMethodMemberType (m_pType, ThisArgTypeFlags);
+	m_TypeOverload = m_pType;
+
+	ASSERT (!m_pType->GetArgTypeArray ().IsEmpty ());
+	m_pThisArgType = (CClassPtrType*) m_pType->GetArgTypeArray () [0];
+	m_pThisType = m_pThisArgType;
 }
 
 bool

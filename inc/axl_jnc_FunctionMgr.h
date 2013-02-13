@@ -67,14 +67,14 @@ enum EStdFunc
 	EStdFunc_DynamicCastInterface,
 
 	// void
-	// jnc.EventOperator (
+	// jnc.MulticastOperator (
 	//		jnc.event* pEvent,
 	//		void* pfn,
 	//		object pClosure,
 	//		int OpKind
 	//		);
 
-	EStdFunc_EventOperator,
+	EStdFunc_MulticastOperator,
 
 	// void
 	// jnc.FireSimpleEvent (jnc.event* pEvent);
@@ -85,6 +85,16 @@ enum EStdFunc
 	// jnc.HeapAllocate (int8* pType);
 
 	EStdFunc_HeapAllocate,
+
+	// void
+	// jnc.AcquireSpinLock (int32* pType);
+
+	EStdFunc_AcquireSpinLock,
+
+	// void
+	// jnc.ReleaseSpinLock (int32* pType);
+
+	EStdFunc_ReleaseSpinLock,
 
 	EStdFunc__Count
 };
@@ -279,7 +289,7 @@ protected:
 	CreateDynamicCastInterface ();
 
 	CFunction*
-	CreateEventOperator ();
+	CreateMulticastOperator ();
 
 	CFunction*
 	CreateFireSimpleEvent ();
@@ -293,13 +303,6 @@ protected:
 		const CValue& ObjectPtrValue,
 		const CValue& IfacePtrValue,
 		const CValue& VTablePtrValue
-		);
-
-	bool
-	CreateThisValue (
-		const CValue& ArgValue,
-		CClassType* pResultType,
-		CValue* pResultValue
 		);
 
 	bool

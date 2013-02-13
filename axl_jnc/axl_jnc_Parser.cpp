@@ -17,7 +17,6 @@ CParser::CParser ()
 	m_StorageKind = EStorage_Undefined;
 	m_DefaultMethodStorageKind = EStorage_Undefined;
 	m_AccessKind = EAccess_Undefined;
-	m_DefaultAccessKind = EAccess_Public;
 	m_pAutoEvType = NULL;
 	m_pAttributeBlock = NULL;
 	m_pLastDeclaredItem = NULL;
@@ -139,12 +138,22 @@ CParser::Declare (
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	CType* pType = pDeclarator->GetType ();
+	if (!m_AccessKind)
+		m_AccessKind = pNamespace->GetCurrentAccessKind ();
+
+	CType* pType = pDeclarator->CalcType ();
 	if (!pType)
 		return NULL;
 
 	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
+	int PostModifiers = pDeclarator->GetPostDeclaratorModifiers ();
 	EType TypeKind = pType->GetTypeKind ();
+
+	if (PostModifiers != 0 && TypeKind != EType_Function)
+	{
+		err::SetFormatStringError (_T("unused post-declarator modifier '%s'"), GetPostDeclaratorModifierString (PostModifiers));
+		return false;
+	}
 
 	if (DeclaratorKind == EDeclarator_SimpleName)
 	{
@@ -159,7 +168,7 @@ CParser::Declare (
 		if (TypeKind != EType_Function || m_StorageKind == EStorage_Typedef)
 		{
 			err::SetFormatStringError (_T("qualified declarators are only allowed for functions"));
-			return NULL;
+			return false;
 		}
 
 		return DeclareFunction ((CFunctionType*) pType, pDeclarator);
@@ -210,29 +219,37 @@ CParser::DeclareFunction (
 	CDeclarator* pDeclarator
 	)
 {
-	bool Result;
-
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
 	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
+	int PostModifiers = pDeclarator->GetPostDeclaratorModifiers ();
 	EFunction FunctionKind = pDeclarator->GetFunctionKind ();
+	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
+
+	if ((FunctionKindFlags & EFunctionKindFlag_NoStorage) && m_StorageKind)
+	{
+		err::SetFormatStringError (_T("%s cannot have storage specifier"), GetFunctionKindString (FunctionKind));
+		return false;
+	}
+
+	if ((FunctionKindFlags & EFunctionKindFlag_NoArgs) && pType->HasArgs ())
+	{
+		err::SetFormatStringError (_T("%s cannot have arguments"), GetFunctionKindString (FunctionKind));
+		return false;
+	}
+
+	if (!m_StorageKind)
+	{
+		m_StorageKind = 
+			FunctionKind == EFunction_StaticConstructor ? EStorage_Static :
+			!(FunctionKindFlags & EFunctionKindFlag_NoStorage) ? m_DefaultMethodStorageKind :
+			NamespaceKind == ENamespace_Property && (FunctionKind == EFunction_Getter || FunctionKind == EFunction_Setter) ?
+				((CProperty*) pNamespace)->GetStorageKind () : 
+				EStorage_Undefined;
+	}
 
 	if (NamespaceKind == ENamespace_PropertyTemplate)
-	{
-		if (DeclaratorKind != EDeclarator_UnnamedMethod)
-		{
-			err::SetFormatStringError (_T("property templates can only have accessor methods"));
-			return false;
-		}
-
-		if (m_StorageKind)
-		{
-			err::SetFormatStringError (_T("%s cannot have storage specifier"), GetFunctionKindString (FunctionKind));
-			return false;
-		}
-
 		return ((CPropertyTemplate*) pNamespace)->AddMethodMember (FunctionKind, pType);
-	}
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (
 		FunctionKind,
@@ -257,30 +274,14 @@ CParser::DeclareFunction (
 
 	if (FunctionKind == EFunction_Named)
 	{
-		if (!m_StorageKind)
-			m_StorageKind = m_DefaultMethodStorageKind;
-
 		pFunction->m_Name = pDeclarator->GetName ()->GetShortName ();
 		pFunction->m_QualifiedName = pNamespace->CreateQualifiedName (pFunction->m_Name);
 		pFunction->m_Tag = pFunction->m_QualifiedName;
-
-		Result = AddNamedFunction (pFunction);
-		if (!Result)
-			return false;
-	}
-	else
-	{
-		if (m_StorageKind)
-		{
-			err::SetFormatStringError (_T("%s cannot have storage specifier"), GetFunctionKindString (FunctionKind));
-			return false;
-		}
-
-		if (FunctionKind == EFunction_StaticConstructor)
-			pFunction->m_StorageKind = EStorage_Static; // override storage for static constructor
 	}
 
 	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
+
+	int ThisArgTypeFlags = (PostModifiers & EPostDeclaratorModifier_Const) ? EPtrTypeFlag_Const : 0;		
 
 	switch (NamespaceKind)
 	{
@@ -291,60 +292,35 @@ CParser::DeclareFunction (
 			return false;
 		}
 
-		Result = ((CClassType*) pNamespace)->AddMethodMember (pFunction);
-		if (!Result)
-			return false;
-
-		break;
+		return ((CClassType*) pNamespace)->AddMethodMember (pFunction, ThisArgTypeFlags);
 
 	case ENamespace_Property:
-		Result = ((CProperty*) pNamespace)->AddMethodMember (pFunction);
-		if (!Result)
-			return false;
-
-		break;
-
-	default:
-		if (m_StorageKind == EStorage_Virtual || m_StorageKind == EStorage_NoVirtual)
-		{
-			err::SetFormatStringError (_T("invalid storage specifier '%s' for a global function"), GetStorageKindString (m_StorageKind));
-			return false;
-		}
-
-		if (FunctionKind != EFunction_Named)
-		{
-			err::SetFormatStringError (_T("invalid %s at global scope"), GetFunctionKindString (FunctionKind));
-			return false;
-		}
-
-		pFunction->m_pParentNamespace = pNamespace;
+		return ((CProperty*) pNamespace)->AddMethodMember (pFunction, ThisArgTypeFlags);
 	}
 
-	return true;
-}
-
-bool
-CParser::AddNamedFunction (CFunction* pFunction) 
-{
-	// common logic for global, class & property named functions
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-
-	CModuleItem* pOldItem = pNamespace->FindItem (pFunction->m_Name);
-	if (!pOldItem)
+	if (PostModifiers)
 	{
-		pNamespace->AddItem (pFunction);
-		return true;
-	}
-
-	if (pOldItem->GetItemKind () != EModuleItem_Function)
-	{	
-		SetRedefinitionError (pFunction->m_Name);
+		err::SetFormatStringError (_T("unused post-declarator modifier '%s'"), GetPostDeclaratorModifierString (PostModifiers));
 		return false;
 	}
 
-	CFunction* pFunctionOverload = (CFunction*) pOldItem;
-	return pFunctionOverload->AddOverload (pFunction);
+	// global
+
+	if (FunctionKind != EFunction_Named)
+	{
+		err::SetFormatStringError (_T("invalid %s at global scope"), GetFunctionKindString (FunctionKind));
+		return false;
+	}
+
+	if (m_StorageKind)
+	{
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for a global function"), GetStorageKindString (m_StorageKind));
+		return false;
+	}
+
+	pFunction->m_pParentNamespace = pNamespace;
+
+	return pNamespace->AddFunction (pFunction);
 }
 
 bool
@@ -392,10 +368,6 @@ CParser::CreatePropertyImpl (
 	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
 	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
 	
-	Result = pNamespace->AddItem (pProperty);
-	if (!Result)
-		return NULL;
-
 	if (!m_StorageKind)
 		m_StorageKind = m_DefaultMethodStorageKind;
 
@@ -430,6 +402,10 @@ CParser::CreatePropertyImpl (
 			return false;
 		}
 
+		Result = pNamespace->AddItem (pProperty);
+		if (!Result)
+			return NULL;
+
 		pProperty->m_pParentNamespace = pNamespace;
 	}
 	
@@ -456,14 +432,17 @@ CParser::DeclareData (
 		return false;
 	}
 
-	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
-	size_t BitCount = pDeclarator->GetBitCount ();
-
 	if (m_StorageKind == EStorage_Virtual || m_StorageKind == EStorage_NoVirtual)
 	{
 		err::SetFormatStringError (_T("invalid storage specifier '%s' for data"), GetStorageKindString (m_StorageKind));
 		return NULL;
 	}
+
+	if (pType->GetTypeKind () == EType_Class) 
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
+	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
+	size_t BitCount = pDeclarator->GetBitCount ();
 
 	CModuleItem* pDataItem = NULL;
 
@@ -541,7 +520,7 @@ CParser::CreateFormalArg (
 		Name = pDeclarator->GetName ()->GetShortName ();
 	}
 
-	pType = pDeclarator->GetType ();
+	pType = pDeclarator->CalcType ();
 	if (!pType)
 		return NULL;
 
@@ -881,7 +860,7 @@ CParser::PostAutoEvExpression (const CValue& Value)
 		CValue EventValue;
 		Result = 
 			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue) &&
-			m_pModule->m_OperatorMgr.EventOperator (EventValue, HandlerValue, EEventOp_AddHandler);
+			m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Add);
 
 		if (!Result)
 			return false;
@@ -903,7 +882,7 @@ CParser::PostAutoEvExpression (const CValue& Value)
 		CValue EventValue;
 		Result = 
 			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue) &&
-			m_pModule->m_OperatorMgr.EventOperator (EventValue, HandlerValue, EEventOp_RemoveHandler);
+			m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Remove);
 
 		if (!Result)
 			return false;
@@ -1121,32 +1100,15 @@ CParser::SetThis (CValue* pValue)
 }
 
 void
-CParser::SetStorageAccessDefaults ()
+CParser::SetDefaultMethodStorageKind ()
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	if (pNamespace->GetNamespaceKind () != ENamespace_NamedType)
-	{
-		m_DefaultAccessKind = EAccess_Undefined;
-		m_DefaultMethodStorageKind = EStorage_Undefined;
-		return;
-	}
-
-	CNamedType* pNamedType =  (CNamedType*) pNamespace;
-	if (pNamedType->GetTypeKind () != EType_Class)
-	{
-		m_DefaultAccessKind = EAccess_Public;
-		m_DefaultMethodStorageKind = EStorage_Undefined;
-	}
-	else if (pNamedType->GetFlags () & EClassTypeFlag_Interface)
-	{
-		m_DefaultAccessKind = EAccess_Public;
-		m_DefaultMethodStorageKind = EStorage_Virtual;
-	}
-	else
-	{
-		m_DefaultAccessKind = EAccess_Protected;
-		m_DefaultMethodStorageKind = EStorage_NoVirtual;
-	}
+	
+	m_DefaultMethodStorageKind = 
+		pNamespace->GetNamespaceKind () != ENamespace_NamedType &&
+		((CNamedType*) pNamespace)->GetTypeKind () == EType_Class && 
+		(((CNamedType*) pNamespace)->GetFlags () & EClassTypeFlag_Interface) ?
+		EStorage_Virtual : EStorage_Undefined;
 }
 
 //.............................................................................

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_MulticastType.h"
 
 namespace axl {
 namespace jnc {
@@ -46,7 +47,7 @@ protected:
 
 	EFunctionPtrType m_PtrTypeKind;
 	CFunctionType* m_pTargetType;
-	CEventType* m_pEventType;
+	CMulticastType* m_MulticastTypeArray [EMulticastType__Count];	
 	rtl::CString m_TypeModifierString;
 
 public:
@@ -70,8 +71,8 @@ public:
 		return m_PtrTypeKind == EFunctionPtrType_Normal || m_PtrTypeKind == EFunctionPtrType_Weak;
 	}
 
-	CEventType* 
-	GetEventType ();
+	CMulticastType* 
+	GetMulticastType (EMulticastType MulticastTypeKind = EMulticastType_Normal);
 
 	CStructType* 
 	GetClosureFunctionPtrStructType ();
@@ -123,4 +124,3 @@ public:
 
 } // namespace jnc {
 } // namespace axl {
-

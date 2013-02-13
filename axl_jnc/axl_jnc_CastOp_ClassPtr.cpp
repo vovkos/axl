@@ -15,19 +15,24 @@ CCast_ClassPtr::GetCastKind (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr && pType->GetTypeKind () == EType_ClassPtr);
 
-	CClassPtrType* pSrcClassPtrType = (CClassPtrType*) OpValue.GetType ();
-	CClassPtrType* pDstClassPtrType = (CClassPtrType*) pType;
+	CClassPtrType* pSrcType = (CClassPtrType*) OpValue.GetType ();
+	CClassPtrType* pDstType = (CClassPtrType*) pType;
 
-	EClassPtrType SrcPtrTypeKind = pSrcClassPtrType->GetPtrTypeKind ();
-	EClassPtrType DstPtrTypeKind = pDstClassPtrType->GetPtrTypeKind ();
-
-	if (SrcPtrTypeKind == EClassPtrType_Unsafe && DstPtrTypeKind == EClassPtrType_Unsafe)
+	if (pSrcType->GetPtrTypeKind () == EClassPtrType_Unsafe && 
+		pDstType->GetPtrTypeKind () != EClassPtrType_Unsafe)
 		return ECast_None;
 
-	CClassType* pSrcClassType = pSrcClassPtrType->GetTargetType ();
-	CClassType* pDstClassType = pDstClassPtrType->GetTargetType ();
+	if ((pSrcType->GetFlags () & EPtrTypeFlag_Const) != 0 && 
+		(pDstType->GetFlags () & EPtrTypeFlag_Const) == 0 &&
+		pDstType->GetPtrTypeKind () != EDataPtrType_Unsafe)
+		return ECast_None;
 
-	return pSrcClassType->FindBaseType (pDstClassType) ? ECast_Implicit : ECast_Explicit;
+	CClassType* pSrcClassType = pSrcType->GetTargetType ();
+	CClassType* pDstClassType = pDstType->GetTargetType ();
+
+	return pSrcClassType->Cmp (pDstClassType) == 0 || pSrcClassType->FindBaseType (pDstClassType) ? 
+		ECast_Implicit : 
+		ECast_Explicit;
 }
 
 bool
@@ -40,14 +45,17 @@ CCast_ClassPtr::LlvmCast (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr && pType->GetTypeKind () == EType_ClassPtr);
 
-	CClassPtrType* pSrcClassPtrType = (CClassPtrType*) OpValue.GetType ();
-	CClassPtrType* pDstClassPtrType = (CClassPtrType*) pType;
+	CClassPtrType* pSrcType = (CClassPtrType*) OpValue.GetType ();
+	CClassPtrType* pDstType = (CClassPtrType*) pType;
 
-	EClassPtrType SrcPtrTypeKind = pSrcClassPtrType->GetPtrTypeKind ();
-	EClassPtrType DstPtrTypeKind = pDstClassPtrType->GetPtrTypeKind ();
+	CClassType* pSrcClassType = pSrcType->GetTargetType ();
+	CClassType* pDstClassType = pDstType->GetTargetType ();
 
-	CClassType* pSrcClassType = pSrcClassPtrType->GetTargetType ();
-	CClassType* pDstClassType = pDstClassPtrType->GetTargetType ();
+	if (pSrcClassType->Cmp (pDstClassType) == 0)
+	{
+		pResultValue->OverrideType (OpValue, pType);
+		return true;
+	}
 
 	CClassBaseTypeCoord Coord;
 	bool Result = pSrcClassType->FindBaseType (pDstClassType, &Coord);

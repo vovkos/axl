@@ -109,8 +109,7 @@ CBinOp_Idx::ArrayIndexOperator (
 		pResultValue->SetLlvmValue (
 			GepValue.GetLlvmValue (), 
 			pElementType->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin),
-			OpValue1.GetVariable (), 
-			EValueFlag_VariableOffset
+			OpValue1.GetVariable ()
 			);
 	}
 	else

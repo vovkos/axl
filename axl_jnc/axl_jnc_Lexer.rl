@@ -58,30 +58,31 @@ main := |*
 # global declarations & pragmas
 
 'namespace'    { CreateToken (EToken_Namespace); };
+'extend'       { CreateToken (EToken_Extend); };
 'using'        { CreateToken (EToken_Using); };
 'pack'         { CreateToken (EToken_Pack); };
 'endian'       { CreateToken (EToken_Endian); };
 
-# storage specifiers
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# storage & access specifiers
 
 'typedef'      { CreateToken (EToken_Typedef); };
 'static'       { CreateToken (EToken_Static); };
 'virtual'      { CreateToken (EToken_Virtual); };
 'novirtual'    { CreateToken (EToken_NoVirtual); };
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-# access specifiers
+'mutable'      { CreateToken (EToken_Mutable); };
 
 'public'       { CreateToken (EToken_Public); };
-'publicread'   { CreateToken (EToken_PublicRead); };
 'protected'    { CreateToken (EToken_Protected); };
+'friend'       { CreateToken (EToken_Friend); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 # type modifiers
 
 'const'        { CreateToken (EToken_Const); };
+'readonly'     { CreateToken (EToken_ReadOnly); };
 'volatile'     { CreateToken (EToken_Volatile); };
 'signed'       { CreateToken (EToken_Signed); };
 'unsigned'     { CreateToken (EToken_Unsigned); };
@@ -96,6 +97,7 @@ main := |*
 'stdcall'      { CreateToken (EToken_Stdcall); };
 'function'     { CreateToken (EToken_Function); };
 'property'     { CreateToken (EToken_Property); };
+'multicast'    { CreateToken (EToken_Multicast); };
 'event'        { CreateToken (EToken_Event); };
 'bindable'     { CreateToken (EToken_Bindable); };
 'autoget'      { CreateToken (EToken_AutoGet); };
@@ -119,6 +121,7 @@ main := |*
 'float'        { CreateToken (EToken_Float); };
 'double'       { CreateToken (EToken_Double); };
 'int'          { CreateToken (EToken_Int); };
+'intptr'       { CreateToken (EToken_IntPtr); };
 'char'         { CreateToken (EToken_Char); };
 'short'        { CreateToken (EToken_Short); };
 'long'         { CreateToken (EToken_Long); };

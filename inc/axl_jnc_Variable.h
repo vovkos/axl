@@ -16,9 +16,10 @@ class CScope;
 
 enum EVariable
 {
-	EVariable_Undefined,
+	EVariable_Undefined = 0,
 	EVariable_Global,
 	EVariable_Local,
+	EVariable__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -35,6 +36,7 @@ protected:
 
 	EVariable m_VariableKind;
 	CType* m_pType;
+	CType* m_pDualType;
 	CScope* m_pScope;
 	llvm::Value* m_pLlvmValue;
 

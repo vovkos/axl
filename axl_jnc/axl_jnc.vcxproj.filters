@@ -124,9 +124,6 @@
     <ClInclude Include="..\inc\axl_jnc_Closure.h">
       <Filter>value</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_EventType.h">
-      <Filter>type</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_AttributeBlock.h">
       <Filter>module</Filter>
     </ClInclude>
@@ -223,6 +220,12 @@
     <ClInclude Include="..\inc\axl_jnc_CastOp_Int.h">
       <Filter>operator</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_DualType.h">
+      <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_MulticastType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -312,9 +315,6 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_Closure.cpp">
       <Filter>value</Filter>
-    </ClCompile>
-    <ClCompile Include="axl_jnc_EventType.cpp">
-      <Filter>type</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_AttributeBlock.cpp">
       <Filter>module</Filter>
@@ -432,6 +432,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_OperatorMgr_CheckPtr.cpp">
       <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_MulticastType.cpp">
+      <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

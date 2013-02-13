@@ -39,7 +39,7 @@ public:
 	bool
 	IsMemberClosure ()
 	{
-		return !m_ArgList.IsEmpty () && (m_ArgList.GetHead ()->GetFlags () & EValueFlag_ImplicitClassPtr);
+		return !m_ArgList.IsEmpty () && (m_ArgList.GetHead ()->GetFlags () & EValueFlag_ThisArg) != 0;
 	}
 
 	bool
