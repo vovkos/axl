@@ -224,6 +224,16 @@ CParser::DeclareFunction (
 	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
 	int PostModifiers = pDeclarator->GetPostDeclaratorModifiers ();
 	EFunction FunctionKind = pDeclarator->GetFunctionKind ();
+
+	if (DeclaratorKind == EDeclarator_UnaryBinaryOperator)
+	{
+		ASSERT (!FunctionKind);
+		FunctionKind = pType->HasArgs () ? 
+			EFunction_BinaryOperator : 
+			EFunction_UnaryOperator;
+	}
+
+	ASSERT (FunctionKind);
 	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
 
 	if ((FunctionKindFlags & EFunctionKindFlag_NoStorage) && m_StorageKind)
@@ -272,11 +282,24 @@ CParser::DeclareFunction (
 		return true;
 	}
 
-	if (FunctionKind == EFunction_Named)
+	switch (FunctionKind)
 	{
+	case EFunction_Named:
 		pFunction->m_Name = pDeclarator->GetName ()->GetShortName ();
 		pFunction->m_QualifiedName = pNamespace->CreateQualifiedName (pFunction->m_Name);
 		pFunction->m_Tag = pFunction->m_QualifiedName;
+		break;
+
+	case EFunction_UnaryOperator:
+		pFunction->m_UnOpKind = pDeclarator->GetUnOpKind ();
+		break;
+
+	case EFunction_BinaryOperator:
+		pFunction->m_BinOpKind = pDeclarator->GetBinOpKind ();
+		break;
+
+	case EFunction_CastOperator:
+		break;
 	}
 
 	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());

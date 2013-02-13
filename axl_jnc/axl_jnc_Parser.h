@@ -7632,7 +7632,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 #line 132 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Declarator.llk"
 			
-			return __pSymbol->m_Arg.pDeclarator->AddOperator ((*(_cls34*) GetAstLocator (0)).m_UnOpKind, (*(_cls34*) GetAstLocator (0)).m_BinOpKind);
+			return __pSymbol->m_Arg.pDeclarator->AddUnaryBinaryOperator ((*(_cls34*) GetAstLocator (0)).m_UnOpKind, (*(_cls34*) GetAstLocator (0)).m_BinOpKind);
 		;
 #line 7638 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}

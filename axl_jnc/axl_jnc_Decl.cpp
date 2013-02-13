@@ -189,6 +189,8 @@ CDeclarator::CDeclarator ()
 {
 	m_DeclaratorKind = EDeclarator_Undefined;
 	m_FunctionKind = EFunction_Undefined;
+	m_UnOpKind = EUnOp_Undefined;
+	m_BinOpKind = EBinOp_Undefined;
 	m_pType = NULL;
 	m_BitCount = 0;
 	m_PostDeclaratorModifiers = 0;
@@ -266,13 +268,27 @@ CDeclarator::AddCastOperator (CType* pType)
 }
 
 bool
-CDeclarator::AddOperator (
+CDeclarator::AddUnaryBinaryOperator (
 	EUnOp UnOpKind,
 	EBinOp BinOpKind
 	)
 {
-	err::SetFormatStringError (_T("overloaded unary & binary operators not implemented yet"));
-	return false;
+	if (m_FunctionKind && m_FunctionKind != EFunction_Named)
+	{
+		err::SetFormatStringError (_T("cannot further qualify '%s' declarator"), GetFunctionKindString (m_FunctionKind));
+		return false;
+	}
+
+	if (BinOpKind == EBinOp_Assign)
+	{
+		err::SetFormatStringError (_T("assignment operator could not be overloaded"));
+		return false;
+	}
+
+	m_DeclaratorKind = m_Name.IsEmpty () ? EDeclarator_UnaryBinaryOperator : EDeclarator_QualifiedName;
+	m_UnOpKind = UnOpKind;
+	m_BinOpKind = BinOpKind;
+	return true;
 }
 
 bool

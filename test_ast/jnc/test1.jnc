@@ -7,7 +7,7 @@ public:
 
 	Foo (int x) const
 	{
-		printf ("CTest.Foo (x = %d)\n", x);
+		printf ("CTest.Foo (int x = %d)\n", x);
 		m_Value = x;
 	}
 
@@ -15,6 +15,28 @@ public:
 	{
 		printf ("CTest.Bar () { m_v = %d }\n", m_Value);
 	}
+
+	int
+	operator ~ ()
+	{
+		printf ("CTest.operator ~ () { m_v = %d }\n", m_Value);
+		return 123;
+	}
+
+	int 
+	operator - ()
+	{
+		printf ("CTest.operator - () { m_v = %d }\n", m_Value);
+		return 456;
+	}
+
+	int 
+	operator - (int x)
+	{
+		printf ("CTest.operator - (int x = %d) { m_v = %d }\n", x, m_Value);
+		return m_Value - x;
+	}
+
 };
 
 
@@ -49,6 +71,12 @@ main ()
 
 	t.Foo (100);
 	t.Bar ();
+
+	int x = -t;
+	printf ("-t = %d\n", x);	
+
+	x = t - 20;
+	printf ("t - 20 = %d\n", x);	
 
 	return 0;
 }

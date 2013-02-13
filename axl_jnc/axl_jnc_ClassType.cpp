@@ -303,6 +303,24 @@ CClassType::AddMethodMember (
 		pFunction->m_Tag.Format (_T("%s.autoev"), m_Tag);
 		return true;
 
+	case EFunction_UnaryOperator:
+		pFunction->m_Tag.Format (_T("%s.operator %s"), m_Tag, GetUnOpKindString (pFunction->GetUnOpKind ()));
+
+		if (m_UnaryOperatorTable.IsEmpty ())
+			m_UnaryOperatorTable.SetCount (EUnOp__Count);
+
+		ppTarget = &m_UnaryOperatorTable [pFunction->GetUnOpKind ()];
+		break;
+
+	case EFunction_BinaryOperator:
+		pFunction->m_Tag.Format (_T("%s.operator %s"), m_Tag, GetBinOpKindString (pFunction->GetBinOpKind ()));
+
+		if (m_BinaryOperatorTable.IsEmpty ())
+			m_BinaryOperatorTable.SetCount (EBinOp__Count);
+
+		ppTarget = &m_BinaryOperatorTable [pFunction->GetBinOpKind ()];
+		break;
+
 	default:
 		err::SetFormatStringError (_T("invalid %s in '%s'"), GetFunctionKindString (FunctionKind), GetTypeString ());
 		return false;

@@ -7,6 +7,8 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
+#include "axl_jnc_UnOp.h"
+#include "axl_jnc_BinOp.h"
 
 namespace axl {
 namespace jnc {
@@ -97,11 +99,6 @@ protected:
 	CFunction* m_pDestructor;
 	CFunction* m_pInitializer;
 
-	// operators
-
-	rtl::CArrayT <CFunction*> m_UnOpOverloadArray;
-	rtl::CArrayT <CFunction*> m_BinOpOverloadArray;
-
 	// base types
 
 	rtl::CStringHashTableMapAT <CClassBaseType*> m_BaseTypeMap;
@@ -123,6 +120,12 @@ protected:
 	CStructType* m_pVTableStructType;
 	rtl::CArrayT <CFunction*> m_VTable;
 	CValue m_VTablePtrValue;
+
+	// overloaded operators
+
+	rtl::CArrayT <CFunction*> m_UnaryOperatorTable;
+	rtl::CArrayT <CFunction*> m_BinaryOperatorTable;
+	rtl::CStringHashTableMapAT <CFunction*> m_CastOperatorMap;
 
 	// autoev
 
@@ -310,6 +313,20 @@ public:
 
 	bool
 	GetVTablePtrValue (CValue* pValue);
+
+	CFunction*
+	GetUnaryOperator (EUnOp OpKind)
+	{
+		ASSERT (OpKind >= 0 && OpKind < EUnOp__Count);
+		return m_UnaryOperatorTable ? m_UnaryOperatorTable [OpKind] : NULL;
+	}
+
+	CFunction*
+	GetBinaryOperator (EBinOp OpKind)
+	{
+		ASSERT (OpKind >= 0 && OpKind < EBinOp__Count);
+		return m_BinaryOperatorTable ? m_BinaryOperatorTable [OpKind] : NULL;
+	}
 
 	const rtl::CBoxListT <CToken>*
 	GetAutoEvBody ()

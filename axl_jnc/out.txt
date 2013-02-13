@@ -1,7 +1,0 @@
-  0   2/0/0/0 (a/r/c/e)
-	ACTIVE:   item_declaration_w_specifier item_declaration_no_specifier 
-	EToken_Identifier -> 1
-  1 * 1/1/0/0 (a/r/c/e)
-	ACTIVE:   item_declaration_no_specifier 
-	RESOLVER: item_declaration_w_specifier 
-D:\Prj\Ninja\axl3\axl_jnc\axl_jnc_Decl.llk(94,1): conflict at item_declaration:EToken_Static could not be resolved with 2 token lookahead; e.g. EToken_This EToken_Static 

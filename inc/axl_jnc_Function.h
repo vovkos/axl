@@ -11,6 +11,8 @@
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
 #include "axl_jnc_Closure.h"
+#include "axl_jnc_UnOp.h"
+#include "axl_jnc_BinOp.h"
 #include "axl_llk_Ast.h"
 
 namespace axl {
@@ -107,6 +109,13 @@ protected:
 	friend class CCast_FunctionPtr;
 
 	EFunction m_FunctionKind;	
+
+	union
+	{
+		EUnOp m_UnOpKind;
+		EBinOp m_BinOpKind;
+	};
+
 	CNamespace* m_pParentNamespace;
 
 	CFunctionType* m_pType;
@@ -153,6 +162,20 @@ public:
 	GetFunctionKind ()
 	{
 		return m_FunctionKind;
+	}
+
+	EUnOp
+	GetUnOpKind ()
+	{
+		ASSERT (m_FunctionKind == EFunction_UnaryOperator);
+		return m_UnOpKind;
+	}
+
+	EBinOp
+	GetBinOpKind ()
+	{
+		ASSERT (m_FunctionKind == EFunction_BinaryOperator);
+		return m_BinOpKind;
 	}
 
 	CNamespace* 

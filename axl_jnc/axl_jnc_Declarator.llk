@@ -130,7 +130,7 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 		}
 	| EToken_Operator operator_name
 		{
-			return $pDeclarator->AddOperator ($2.m_UnOpKind, $2.m_BinOpKind);
+			return $pDeclarator->AddUnaryBinaryOperator ($2.m_UnOpKind, $2.m_BinOpKind);
 		}
 	| EToken_PropValue
 		{

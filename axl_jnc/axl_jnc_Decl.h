@@ -195,6 +195,8 @@ enum EDeclarator
 	EDeclarator_SimpleName,
 	EDeclarator_QualifiedName,
 	EDeclarator_UnnamedMethod,
+	EDeclarator_CastOperator,
+	EDeclarator_UnaryBinaryOperator,
 	EDeclarator_PropValue,
 };
 
@@ -207,6 +209,8 @@ protected:
 
 	EDeclarator m_DeclaratorKind;
 	EFunction m_FunctionKind;
+	EUnOp m_UnOpKind;
+	EBinOp m_BinOpKind;
 	CQualifiedName m_Name;
 	CToken::CPos m_Pos;
 	CType* m_pType;
@@ -230,7 +234,19 @@ public:
 	{
 		return m_FunctionKind;
 	}
-	
+
+	EUnOp
+	GetUnOpKind ()
+	{
+		return m_UnOpKind;
+	}
+
+	EBinOp
+	GetBinOpKind ()
+	{
+		return m_BinOpKind;
+	}
+
 	bool
 	SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier);
 
@@ -277,7 +293,7 @@ public:
 	AddCastOperator (CType* pType);
 
 	bool
-	AddOperator (
+	AddUnaryBinaryOperator (
 		EUnOp UnOpKind, 
 		EBinOp BinOpKind
 		);

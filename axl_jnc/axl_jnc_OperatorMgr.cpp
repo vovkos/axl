@@ -140,17 +140,26 @@ COperatorMgr::UnaryOperator (
 	ASSERT (OpKind >= 0 && OpKind < EUnOp__Count);
 
 	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
-	if (!pOperator)
-	{
-		err::SetFormatStringError (_T("unary '%s' is not supported"), GetUnOpKindString (OpKind));
-		return false;
-	}
+	ASSERT (pOperator);
 
 	CValue OpValue;
 	CValue UnusedResultValue;
 
 	if (!pResultValue)
 		pResultValue = &UnusedResultValue;
+
+	PrepareOperandType (RawOpValue, &OpValue);
+	if (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr)
+	{
+		CClassType* pClassType = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
+		CFunction* pFunction = pClassType->GetUnaryOperator (OpKind);
+		if (pFunction)
+		{
+			rtl::CBoxListT <CValue> ArgList;
+			ArgList.InsertTail (RawOpValue);
+			return CallOperator (pFunction,	&ArgList, pResultValue);
+		}
+	}
 
 	return 
 		PrepareOperand (RawOpValue, &OpValue, pOperator->GetOpFlags ()) &&
@@ -166,13 +175,6 @@ COperatorMgr::BinaryOperator (
 	)
 {
 	ASSERT (OpKind >= 0 && OpKind < EBinOp__Count);
-	
-	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
-	if (!pOperator)
-	{
-		err::SetFormatStringError (_T("binary '%s' is not supported"), GetBinOpKindString (OpKind));
-		return false;
-	}
 
 	CValue OpValue1;
 	CValue OpValue2;
@@ -180,6 +182,23 @@ COperatorMgr::BinaryOperator (
 
 	if (!pResultValue)
 		pResultValue = &UnusedResultValue;
+
+	PrepareOperandType (RawOpValue1, &OpValue1);
+	if (OpValue1.GetType ()->GetTypeKind () == EType_ClassPtr)
+	{
+		CClassType* pClassType = ((CClassPtrType*) OpValue1.GetType ())->GetTargetType ();
+		CFunction* pFunction = pClassType->GetBinaryOperator (OpKind);
+		if (pFunction)
+		{
+			rtl::CBoxListT <CValue> ArgList;
+			ArgList.InsertTail (RawOpValue1);
+			ArgList.InsertTail (RawOpValue2);
+			return CallOperator (pFunction,	&ArgList, pResultValue);
+		}
+	}
+
+	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
+	ASSERT (pOperator);
 
 	return
 		PrepareOperand (RawOpValue1, &OpValue1, pOperator->GetOpFlags1 ()) &&
@@ -593,7 +612,7 @@ COperatorMgr::PrepareOperandType (
 	
 	for (;;)
 	{
-		CType* pType = OpValue.GetType ();
+		CType* pType = Value.GetType ();
 		CType* pPrevType = pType;
 
 		EType TypeKind = pType->GetTypeKind ();
