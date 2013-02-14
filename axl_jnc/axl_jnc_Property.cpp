@@ -36,7 +36,8 @@ CProperty::Create (CPropertyType* pType)
 	bool Result;
 	
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pType->GetGetterType ());
-	Result = AddMethodMember (pGetter, EPtrTypeFlag_Const);
+	pGetter->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
+	Result = AddMethodMember (pGetter);
 	if (!Result)
 		return false;
 
@@ -52,6 +53,14 @@ CProperty::Create (CPropertyType* pType)
 
 	m_pType = m_pParentClassType ? m_pParentClassType->GetPropertyMemberType (pType) : pType;
 	return true;
+}
+
+void
+CProperty::ConvertToPropertyMember (CClassType* pClassType)
+{
+	ASSERT (!m_pParentClassType);
+	m_pParentClassType = pClassType;
+	m_pType = pClassType->GetPropertyMemberType (m_pType);
 }
 
 CStructMember*
@@ -122,16 +131,14 @@ CProperty::CreateFieldMember (
 }
 
 bool
-CProperty::AddMethodMember (
-	CFunction* pFunction,
-	int ThisArgTypeFlags
-	)
+CProperty::AddMethodMember (CFunction* pFunction)
 {
 	bool Result;
 
 	EStorage StorageKind = pFunction->GetStorageKind ();
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
 	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
+	int ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
 
 	if (m_pParentClassType)
 	{
@@ -153,7 +160,7 @@ CProperty::AddMethodMember (
 
 		case EStorage_Undefined:
 		case EStorage_NoVirtual:
-			pFunction->ConvertToMethodMember (m_pParentClassType, ThisArgTypeFlags);
+			pFunction->ConvertToMethodMember (m_pParentClassType);
 			break;
 
 		default:

@@ -109,6 +109,21 @@ Members2
 		);
 
 	bool
+	OpenNamespace (
+		const CQualifiedName& Name,
+		const CToken::CPos& Pos
+		);
+
+	bool
+	OpenTypeExtension (
+		const CQualifiedName& Name,
+		const CToken::CPos& Pos
+		);
+
+	void
+	CloseNamespace ();
+
+	bool
 	Declare (
 		CDeclarator* pDeclarator,
 		bool HasInitializer = false

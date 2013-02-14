@@ -87,7 +87,7 @@ protected:
 	friend class CTypeMgr;
 	friend class CParser;
 	friend class CProperty;
-
+	
 	CStructType* m_pInterfaceStructType;
 	CStructType* m_pClassStructType;
 
@@ -210,7 +210,7 @@ public:
 		CClassBaseTypeCoord* pBaseTypeCoord = NULL
 		)
 	{
-		return FindMemberImpl (true, pName, pBaseTypeCoord, 0);
+		return FindMemberImpl (true, true, pName, pBaseTypeCoord, 0);
 	}
 
 	size_t
@@ -290,10 +290,7 @@ public:
 	GetPropertyMemberType (CPropertyType* pShortType);
 
 	bool
-	AddMethodMember (
-		CFunction* pFunction,
-		int ThisArgTypeFlags = 0
-		);
+	AddMethodMember (CFunction* pFunction);
 
 	bool
 	AddPropertyMember (CProperty* pProperty);
@@ -366,6 +363,7 @@ protected:
 	CModuleItem*
 	FindMemberImpl (
 		bool IncludeThis,
+		bool IncludeExtensionNamespace,
 		const tchar_t* pName,
 		CClassBaseTypeCoord* pBaseTypeCoord,
 		size_t Level

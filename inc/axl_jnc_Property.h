@@ -145,6 +145,9 @@ public:
 	bool
 	Create (CPropertyType* pType);
 
+	void
+	ConvertToPropertyMember (CClassType* pClassType);
+
 	CStructMember*
 	CreateFieldMember (
 		EStorage StorageKind,
@@ -164,10 +167,7 @@ public:
 	}
 
 	bool
-	AddMethodMember (
-		CFunction* pFunction,
-		int ThisArgTypeFlags = 0
-		);
+	AddMethodMember (CFunction* pFunction);
 
 	bool
 	AddPropertyMember (CProperty* pProperty);

@@ -325,43 +325,6 @@ CType::PrepareTypeString ()
 	m_TypeString = PrimitiveTypeNameTable [m_TypeKind];
 }
 
-/*
-
-	}
-	else switch (m_TypeKind)
-	{	
-	case EType_DataPtr:
-	case EType_DataRef:
-		m_TypeString = ((CDataPtrType*) this)->CreateTypeString ();
-		break;
-
-	case EType_ClassPtr:
-		m_TypeString = ((CClassPtrType*) this)->CreateTypeString ();
-		break;
-
-	case EType_FunctionPtr:
-	case EType_FunctionRef:
-		m_TypeString = ((CFunctionPtrType*) this)->CreateTypeString ();
-		break;
-
-	case EType_PropertyPtr:
-	case EType_PropertyRef:
-		m_TypeString = ((CPropertyPtrType*) this)->CreateTypeString ();
-		break;
-
-	case EType_Import:
-		m_TypeString = ((CImportType*) this)->CreateTypeString ();
-		break;
-
-	default:
-		ASSERT (false);
-	}
-
-	return m_TypeString;
-}
-
-*/
-
 void
 CType::PrepareLlvmType ()
 {
@@ -419,38 +382,6 @@ CType::PrepareLlvmType ()
 		ASSERT (false);
 	}
 }
-
-/*
-
-	case EType_DataPtr:
-	case EType_DataRef:
-		return ((CDataPtrType*) this)->GetLlvmType ();
-
-	case EType_ClassPtr:
-		return ((CClassPtrType*) this)->GetLlvmType ();
-
-	case EType_FunctionPtr:
-	case EType_FunctionRef:
-		pLlvmType = ((CFunctionPtrType*) this)->GetLlvmType ();
-		break;
-
-	case EType_PropertyPtr:
-	case EType_PropertyRef:
-		pLlvmType = ((CPropertyPtrType*) this)->GetLlvmType ();
-		break;
-
-	case EType_Import:
-		return ((CImportType*) this)->GetExternType ()->GetLlvmType ();
-
-	default:
-		ASSERT (false);
-	}
-
-	m_pLlvmType = pLlvmType;
-	return pLlvmType;
-}
-
-*/
 
 //.............................................................................
 

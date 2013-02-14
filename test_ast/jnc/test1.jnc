@@ -40,27 +40,14 @@ public:
 };
 
 
-/*
-
-class CTest
+extend CTest
 {
-	int m_x;
-
-	void
-	Foo (int x)
+	Yahoo ()
 	{
-		printf ("CTest.Foo (x = %d)\n", x);
-		m_x = x;
-	}
+		printf ("CTest.extension.Yahoo () { m_v = %d }\n", m_Value);
+	}		
+}
 
-	void
-	Bar ()
-	{
-		printf ("CTest.Bar () { m_x = %d }\n", m_x);
-	}
-};
-
-*/
 
 int
 main ()
@@ -71,6 +58,7 @@ main ()
 
 	t.Foo (100);
 	t.Bar ();
+	t.Yahoo ();
 
 	int x = -t;
 	printf ("-t = %d\n", x);	

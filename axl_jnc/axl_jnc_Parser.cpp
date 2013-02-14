@@ -127,6 +127,72 @@ CParser::SetAccessKind (EAccess AccessKind)
 }
 
 bool
+CParser::OpenNamespace (
+	const CQualifiedName& Name,
+	const CToken::CPos& Pos
+	)
+{
+	return m_pModule->m_NamespaceMgr.OpenNamespace (Pos, Name) != NULL; // REFINE namespace management
+}
+
+bool
+CParser::OpenTypeExtension (
+	const CQualifiedName& Name,
+	const CToken::CPos& Pos
+	)
+{
+	CType* pType = FindType (Name);
+	if (!pType)
+	{
+		err::SetFormatStringError (_T("'%s' is not a type"), Name.GetFullName ());
+		return false;
+	}
+
+	CNamedType* pNamedType;
+
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_Class:
+	case EType_Enum:
+		pNamedType = (CNamedType*) pType;
+		break;
+
+	case EType_Import:
+		err::SetFormatStringError (_T("extension namespaces for '%s' is not supported yet"), pType->GetTypeString ());
+		return false;
+
+	default:
+		err::SetFormatStringError (_T("'%s' could not have an extension namespace"), pType->GetTypeString ());
+		return false;
+	}
+
+	if (pNamedType->m_pExtensionNamespace)
+	{
+		m_pModule->m_NamespaceMgr.OpenNamespace (pNamedType->m_pExtensionNamespace);
+		return true;
+	}
+	
+	CGlobalNamespace* pNamespace = m_pModule->m_NamespaceMgr.CreateNamespace (_T("extension"));
+	pNamespace->m_NamespaceKind = ENamespace_TypeExtension;
+	pNamespace->m_QualifiedName = pNamedType->CreateQualifiedName (_T("extension"));
+	pNamespace->m_Tag = pNamespace->m_QualifiedName;
+	pNamespace->m_Pos = Pos;
+	pNamespace->m_pParentNamespace = pNamedType;
+
+	pNamedType->m_pExtensionNamespace = pNamespace;
+	m_pModule->m_NamespaceMgr.m_NamespaceStack.Append (m_pModule->m_NamespaceMgr.m_pCurrentNamespace);
+	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = pNamedType->m_pExtensionNamespace;
+	return true;
+}
+
+void
+CParser::CloseNamespace ()
+{
+	m_pModule->m_NamespaceMgr.CloseNamespace (); // REFINE namespace management
+}
+
+bool
 CParser::Declare (
 	CDeclarator* pDeclarator,
 	bool HasInitializer
@@ -304,45 +370,51 @@ CParser::DeclareFunction (
 
 	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
 
-	int ThisArgTypeFlags = (PostModifiers & EPostDeclaratorModifier_Const) ? EPtrTypeFlag_Const : 0;		
-
+	if (PostModifiers & EPostDeclaratorModifier_Const)
+		pFunction->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
+	
 	switch (NamespaceKind)
 	{
-	case ENamespace_NamedType:
+	case ENamespace_TypeExtension:
+		break;
+
+	case ENamespace_Type:
 		if (((CNamedType*) pNamespace)->GetTypeKind () != EType_Class)
 		{
 			err::SetFormatStringError (_T("method members are not allowed in '%s'"), ((CNamedType*) pNamespace)->GetTypeString ());
 			return false;
 		}
 
-		return ((CClassType*) pNamespace)->AddMethodMember (pFunction, ThisArgTypeFlags);
+		return ((CClassType*) pNamespace)->AddMethodMember (pFunction);
 
 	case ENamespace_Property:
-		return ((CProperty*) pNamespace)->AddMethodMember (pFunction, ThisArgTypeFlags);
-	}
+		return ((CProperty*) pNamespace)->AddMethodMember (pFunction);
+	
+	default:
+		if (PostModifiers)
+		{
+			err::SetFormatStringError (_T("unused post-declarator modifier '%s'"), GetPostDeclaratorModifierString (PostModifiers));
+			return false;
+		}
 
-	if (PostModifiers)
-	{
-		err::SetFormatStringError (_T("unused post-declarator modifier '%s'"), GetPostDeclaratorModifierString (PostModifiers));
-		return false;
+		if (m_StorageKind)
+		{
+			err::SetFormatStringError (_T("invalid storage specifier '%s' for a global function"), GetStorageKindString (m_StorageKind));
+			return false;
+		}
 	}
-
-	// global
 
 	if (FunctionKind != EFunction_Named)
 	{
-		err::SetFormatStringError (_T("invalid %s at global scope"), GetFunctionKindString (FunctionKind));
-		return false;
-	}
-
-	if (m_StorageKind)
-	{
-		err::SetFormatStringError (_T("invalid storage specifier '%s' for a global function"), GetStorageKindString (m_StorageKind));
+		err::SetFormatStringError (
+			_T("invalid '%s' at '%s' namespace"), 
+			GetFunctionKindString (FunctionKind),
+			GetNamespaceKindString (NamespaceKind)
+			);
 		return false;
 	}
 
 	pFunction->m_pParentNamespace = pNamespace;
-
 	return pNamespace->AddFunction (pFunction);
 }
 
@@ -398,7 +470,7 @@ CParser::CreatePropertyImpl (
 
 	switch (NamespaceKind)
 	{
-	case ENamespace_NamedType:
+	case ENamespace_Type:
 		if (((CNamedType*) pNamespace)->GetTypeKind () != EType_Class)
 		{
 			err::SetFormatStringError (_T("property members are not allowed in '%s'"), ((CNamedType*) pNamespace)->GetTypeString ());
@@ -473,7 +545,7 @@ CParser::DeclareData (
 	{
 		pDataItem = ((CProperty*) pNamespace)->CreateFieldMember (m_StorageKind, Name, pType, BitCount);
 	}
-	else if (NamespaceKind != ENamespace_NamedType)
+	else if (NamespaceKind != ENamespace_Type)
 	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType, HasInitializer);
 		Result = pNamespace->AddItem (pVariable);
@@ -1128,7 +1200,7 @@ CParser::SetDefaultMethodStorageKind ()
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	
 	m_DefaultMethodStorageKind = 
-		pNamespace->GetNamespaceKind () != ENamespace_NamedType &&
+		pNamespace->GetNamespaceKind () != ENamespace_Type &&
 		((CNamedType*) pNamespace)->GetTypeKind () == EType_Class && 
 		(((CNamedType*) pNamespace)->GetFlags () & EClassTypeFlag_Interface) ?
 		EStorage_Virtual : EStorage_Undefined;

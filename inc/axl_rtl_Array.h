@@ -476,6 +476,14 @@ public:
 		return Count;
 	}
 
+	T 
+	GetBackAndPop ()
+	{
+		T e = GetBack ();
+		Pop ();
+		return e;
+	}
+
 	bool 
 	Move (
 		size_t IndexDst, 

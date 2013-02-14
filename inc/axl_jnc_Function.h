@@ -134,6 +134,8 @@ protected:
 	CClassPtrType* m_pThisArgType;
 	CClassPtrType* m_pThisType;
 
+	int m_ThisArgTypeFlags; 
+
 	// for virtual method members
 
 	CClassType* m_pVirtualOriginClassType; 
@@ -245,10 +247,7 @@ public:
 	}
 
 	void
-	ConvertToMethodMember (
-		CClassType* pClassType,
-		int ThisArgTypeFlags = 0
-		);
+	ConvertToMethodMember (CClassType* pClassType);
 
 	rtl::CString
 	CreateArgString ();

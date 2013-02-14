@@ -36,6 +36,8 @@ CNamespaceMgr::CreateNamespace (const rtl::CString& Name)
 	return pNamespace;
 }
 
+#pragma AXL_TODO ("refine open / close handling: move it to CParser")
+
 CGlobalNamespace*
 CNamespaceMgr::OpenNamespace (
 	const CToken::CPos& Pos,
@@ -44,14 +46,16 @@ CNamespaceMgr::OpenNamespace (
 {
 	ASSERT (!m_pCurrentScope);
 
-	CGlobalNamespace* pNamespace = OpenNamespace (Pos, Name.m_First);
+	m_NamespaceStack.Append (m_pCurrentNamespace);
+
+	CGlobalNamespace* pNamespace = OpenNamespaceImpl (Pos, Name.m_First, false);
 	if (!pNamespace)
 		return NULL;
 
 	rtl::CBoxIteratorT <rtl::CString> It = Name.m_List.GetHead ();
 	for (; It; It++)
 	{
-		pNamespace = OpenNamespace (Pos, *It);
+		pNamespace = OpenNamespaceImpl (Pos, *It, false);
 		if (!pNamespace)
 			return NULL;
 	}
@@ -61,9 +65,10 @@ CNamespaceMgr::OpenNamespace (
 }
 
 CGlobalNamespace*
-CNamespaceMgr::OpenNamespace (
+CNamespaceMgr::OpenNamespaceImpl (
 	const CToken::CPos& Pos,
-	const rtl::CString& Name
+	const rtl::CString& Name,
+	bool AddToStack
 	)
 {
 	ASSERT (!m_pCurrentScope);
@@ -88,6 +93,9 @@ CNamespaceMgr::OpenNamespace (
 		pNamespace = (CGlobalNamespace*) pItem;
 	}
 
+	if (AddToStack)
+		m_NamespaceStack.Append (m_pCurrentNamespace);
+
 	m_pCurrentNamespace = pNamespace;
 	return pNamespace;
 }
@@ -95,6 +103,8 @@ CNamespaceMgr::OpenNamespace (
 void
 CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
 {
+	m_NamespaceStack.Append (m_pCurrentNamespace);
+
 	if (!pNamespace->m_pParentNamespace)
 		pNamespace->m_pParentNamespace = m_pCurrentNamespace;
 	else
@@ -104,16 +114,12 @@ CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
 }
 
 void
-CNamespaceMgr::CloseNamespace (size_t Count)
+CNamespaceMgr::CloseNamespace ()
 {
 	ASSERT (!m_pCurrentScope);
 
-	CNamespace* pNamespace = m_pCurrentNamespace;
-
-	for (size_t i = 0; pNamespace && i < Count; i++)
-		pNamespace = pNamespace->m_pParentNamespace;
-
-	m_pCurrentNamespace = pNamespace ? pNamespace : &m_GlobalNamespace;
+	if (!m_NamespaceStack.IsEmpty ())
+		m_pCurrentNamespace = m_NamespaceStack.GetBackAndPop ();
 }
 
 CScope*

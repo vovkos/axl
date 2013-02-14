@@ -621,11 +621,22 @@ class CNamedType:
 	public CModuleItemDecl,
 	public CNamespace
 {
+protected:
+	friend class CParser;
+
+	CNamespace* m_pExtensionNamespace;
+
 public:
 	CNamedType ()
 	{
-		m_NamespaceKind = ENamespace_NamedType;
+		m_NamespaceKind = ENamespace_Type;
 		m_pItemDecl = this;
+	}
+
+	CNamespace* 
+	GetExtensionNamespace ()
+	{
+		return m_pExtensionNamespace;
 	}
 };
 

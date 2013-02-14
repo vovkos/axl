@@ -61,9 +61,30 @@ GetItemNamespace (CModuleItem* pItem)
 
 //.............................................................................
 
+const tchar_t*
+GetNamespaceKindString (ENamespace NamespaceKind)
+{
+	static const tchar_t* StringTable [ENamespace__Count] = 
+	{
+		_T("undefined-namespace-kind"),  // ENamespace_Undefined = 0,
+		_T("global"),                    // ENamespace_Global,
+		_T("scope"),                     // ENamespace_Scope,
+		_T("named-type"),                // ENamespace_Type,
+		_T("named-type-extension"),      // ENamespace_TypeExtension,
+		_T("property"),                  // ENamespace_Property,
+		_T("property-template"),         // ENamespace_PropertyTemplate,
+	};
+
+	return NamespaceKind >= 0 && NamespaceKind < ENamespace__Count ? 
+		StringTable [NamespaceKind] : 
+		StringTable [ENamespace_Undefined];
+}
+
+//.............................................................................
+
 CNamespace::CNamespace ()
 {
-	m_NamespaceKind = ENamespace_Global;
+	m_NamespaceKind = ENamespace_Undefined;
 	m_CurrentAccessKind = EAccess_Public;
 	m_pParentNamespace = NULL;
 }
@@ -124,7 +145,7 @@ CNamespace::FindItemTraverse (const tchar_t* pName)
 	{
 		CModuleItem* pItem;
 
-		if (pNamespace->m_NamespaceKind == ENamespace_NamedType)
+		if (pNamespace->m_NamespaceKind == ENamespace_Type)
 		{
 			CNamedType* pNamedType = (CNamedType*) pNamespace;
 			EType NamedTypeKind = pNamedType->GetTypeKind ();

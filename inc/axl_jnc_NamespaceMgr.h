@@ -19,6 +19,8 @@ class CNamespaceMgr
 {
 protected:
 	friend class CModule;
+	friend class CParser;
+
 	CModule* m_pModule;
 
 	CGlobalNamespace m_GlobalNamespace;
@@ -26,6 +28,7 @@ protected:
 	rtl::CStdListT <CScope> m_ScopeList;
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
+	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 
 public:
 	CNamespaceMgr ();
@@ -82,7 +85,10 @@ public:
 	OpenNamespace (
 		const CToken::CPos& Pos,
 		const rtl::CString& Name
-		);
+		)
+	{
+		return OpenNamespaceImpl (Pos, Name, true);
+	}
 
 	CGlobalNamespace*
 	OpenNamespace (
@@ -94,7 +100,7 @@ public:
 	OpenNamespace (CNamespace* pNamespace);
 
 	void
-	CloseNamespace (size_t Count = 1);
+	CloseNamespace ();
 
 	CScope*
 	OpenScope (
@@ -111,6 +117,14 @@ public:
 
 	CScope*
 	FindContinueScope (size_t Level);
+
+protected:
+	CGlobalNamespace*
+	OpenNamespaceImpl (
+		const CToken::CPos& Pos,
+		const rtl::CString& Name,
+		bool AddToStack
+		);
 };
 
 //.............................................................................

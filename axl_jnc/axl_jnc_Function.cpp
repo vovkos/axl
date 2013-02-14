@@ -82,6 +82,7 @@ CFunction::CFunction ()
 	m_pOrphanNamespace = NULL;
 	m_pExternFunction = NULL;
 	m_pClassType = NULL;
+	m_ThisArgTypeFlags = 0;
 	m_pThisArgType = NULL;
 	m_pThisType = NULL;
 	m_pVirtualOriginClassType = NULL;
@@ -159,16 +160,13 @@ CFunction::GetLlvmFunction ()
 }
 
 void
-CFunction::ConvertToMethodMember (
-	CClassType* pClassType,
-	int ThisArgTypeFlags
-	)
+CFunction::ConvertToMethodMember (CClassType* pClassType)
 {
 	ASSERT (!m_pClassType);
 	ASSERT (m_TypeOverload.GetOverloadCount () == 1);
 
 	m_pClassType = pClassType;
-	m_pType = pClassType->GetMethodMemberType (m_pType, ThisArgTypeFlags);
+	m_pType = pClassType->GetMethodMemberType (m_pType, m_ThisArgTypeFlags);
 	m_TypeOverload = m_pType;
 
 	ASSERT (!m_pType->GetArgTypeArray ().IsEmpty ());

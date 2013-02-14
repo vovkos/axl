@@ -47,19 +47,26 @@ UnAliasItem (CModuleItem* pItem);
 
 enum ENamespace
 {
-	ENamespace_Global = 0,
+	ENamespace_Undefined,
+	ENamespace_Global,
 	ENamespace_Scope,
-	ENamespace_NamedType,
+	ENamespace_Type,
+	ENamespace_TypeExtension,
 	ENamespace_Property,
 	ENamespace_PropertyTemplate,
+	ENamespace__Count
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t*
+GetNamespaceKindString (ENamespace NamespaceKind);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CNamespace: public CModuleItemName
 {
 protected:
-	friend class CNamedType;
 	friend class CNamespaceMgr;
 	friend class CParser;
 

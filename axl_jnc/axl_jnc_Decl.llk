@@ -54,23 +54,23 @@ local_declaration
 namespace_declaration
 	: EToken_Namespace qualified_name
 		{ 
-			CNamespace* pNamespace = m_pModule->m_NamespaceMgr.OpenNamespace ($1.m_Pos, $2.m_Name);
-			if (!pNamespace)
-				return false;
+			return OpenNamespace ($2.m_Name, $2.m_FirstToken.m_Pos);
 		}
 	  '{' global_declaration* '}' 
 		{ 
-			m_pModule->m_NamespaceMgr.CloseNamespace ($2.m_Name.m_List.GetCount () + 1);
+			CloseNamespace ();
 		}
 	;
 
 extend_declaration
 	: EToken_Extend qualified_name 
 		{ 
-			err::SetFormatStringError (_T("named type extensions are not supported yet"));
-			return false;
+			return OpenTypeExtension ($2.m_Name, $2.m_FirstToken.m_Pos);
 		}
 	  '{' named_type_block_declaration* '}' 
+		{ 
+			CloseNamespace ();
+		}
 	;
 
 using_declaration

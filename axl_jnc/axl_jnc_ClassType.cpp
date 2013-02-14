@@ -12,6 +12,7 @@ CClassType::CClassType ()
 	m_TypeKind = EType_Class;
 	m_pInterfaceStructType = NULL;
 	m_pClassStructType = NULL;
+	m_pExtensionNamespace = NULL;
 
 	m_pPreConstructor = NULL;
 	m_pConstructor = NULL;
@@ -147,6 +148,7 @@ CClassType::FindItemWithBaseTypeList (const tchar_t* pName)
 CModuleItem*
 CClassType::FindMemberImpl (
 	bool IncludeThis, 
+	bool IncludeExtensionNamespace,
 	const tchar_t* pName,
 	CClassBaseTypeCoord* pBaseTypeCoord,
 	size_t Level
@@ -164,11 +166,23 @@ CClassType::FindMemberImpl (
 		}
 	}
 	
+	if (IncludeExtensionNamespace && m_pExtensionNamespace)
+	{
+		CModuleItem* pMember = m_pExtensionNamespace->FindItem (pName);
+		if (pMember)
+		{
+			if (pBaseTypeCoord)
+				pBaseTypeCoord->m_FieldCoord.m_LlvmIndexArray.SetCount (Level);
+
+			return pMember;
+		}
+	}
+
 	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
 		CClassBaseType* pBaseType = *BaseType;
-		CModuleItem* pMember = pBaseType->m_pType->FindMemberImpl (true, pName, pBaseTypeCoord, Level + 1);
+		CModuleItem* pMember = pBaseType->m_pType->FindMemberImpl (true, IncludeExtensionNamespace, pName, pBaseTypeCoord, Level + 1);
 		if (pMember)
 		{
 			if (pBaseTypeCoord)
@@ -239,14 +253,12 @@ CClassType::CreateFieldMember (
 }
 
 bool
-CClassType::AddMethodMember (
-	CFunction* pFunction,
-	int ThisArgTypeFlags
-	)
+CClassType::AddMethodMember (CFunction* pFunction)
 {
 	EStorage StorageKind = pFunction->GetStorageKind ();
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
 	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
+	int ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
 
 	switch (StorageKind)
 	{
@@ -266,7 +278,7 @@ CClassType::AddMethodMember (
 
 	case EStorage_Undefined:
 	case EStorage_NoVirtual:
-		pFunction->ConvertToMethodMember (this, ThisArgTypeFlags);
+		pFunction->ConvertToMethodMember (this);
 		break;
 
 	default:
@@ -350,13 +362,25 @@ CClassType::AddMethodMember (
 bool
 CClassType::AddPropertyMember (CProperty* pProperty)
 {
-	pProperty->m_pParentNamespace = this;
+	EStorage StorageKind = pProperty->GetStorageKind ();
 
-	if (pProperty->m_StorageKind != EStorage_Static)
-		pProperty->m_pParentClassType = this;
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		break;
 
-	if (pProperty->m_StorageKind == EStorage_Virtual)
+	case EStorage_Abstract:
+	case EStorage_Virtual:
 		m_VirtualPropertyArray.Append (pProperty);
+		// and fall through;
+
+	case EStorage_Undefined:
+	case EStorage_NoVirtual:
+		pProperty->ConvertToPropertyMember (this);
+		break;
+	}
+
+	pProperty->m_pParentNamespace = this;
 
 	return true;
 }
@@ -525,6 +549,29 @@ CClassType::CalcLayout ()
 	if (m_pFieldStructType)
 		m_pFieldMember = m_pInterfaceStructType->CreateMember (m_pFieldStructType);
 
+	// extension namespace
+
+	if (m_pExtensionNamespace)
+	{
+		size_t Count = m_pExtensionNamespace->GetItemCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CModuleItem* pItem = m_pExtensionNamespace->GetItem (i);
+			EModuleItem ItemKind = pItem->GetItemKind ();
+
+			switch (ItemKind)
+			{
+			case EModuleItem_Function:
+				((CFunction*) pItem)->ConvertToMethodMember (this);
+				break;
+
+			case EModuleItem_Property:
+				((CProperty*) pItem)->ConvertToPropertyMember (this);
+				break;
+			}
+		}
+	}
+
 	// finalize
 
 	Result = m_pInterfaceStructType->CalcLayout ();
@@ -557,7 +604,7 @@ CClassType::LayoutNamedVirtualFunction (CFunction* pFunction)
 
 	CFunction* pOverridenFunction = NULL;
 	CClassBaseTypeCoord BaseTypeCoord;
-	CModuleItem* pMember = FindMemberImpl (false, pFunction->m_Name, &BaseTypeCoord, 0);
+	CModuleItem* pMember = FindMemberImpl (false, false, pFunction->m_Name, &BaseTypeCoord, 0);
 	if (pMember && pMember->GetItemKind () == EModuleItem_Function)
 	{
 		pOverridenFunction = (CFunction*) pMember;
