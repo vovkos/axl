@@ -133,7 +133,7 @@ protected:
 	CClassType* m_pClassType; 
 	CClassPtrType* m_pThisArgType;
 	CClassPtrType* m_pThisType;
-
+	intptr_t m_ThisArgDelta;
 	int m_ThisArgTypeFlags; 
 
 	// for virtual method members
@@ -204,6 +204,12 @@ public:
 		return m_pClassType;
 	}
 
+	bool
+	IsVirtual ()
+	{
+		return m_StorageKind >= EStorage_Abstract && m_StorageKind <= EStorage_Override;
+	}
+
 	CClassType* 
 	GetVirtualOriginClassType ()
 	{
@@ -220,6 +226,12 @@ public:
 	GetThisType ()
 	{
 		return m_pThisType;
+	}
+
+	intptr_t
+	GetThisArgDelta ()
+	{
+		return m_ThisArgDelta;
 	}
 
 	size_t

@@ -1,0 +1,71 @@
+//.............................................................................
+
+class CTest
+{
+	mutable int m_Value;
+
+	Foo (int x) const
+	{
+		printf ("CTest.Foo (int x = %d)\n", x);
+		m_Value = x;
+	}
+
+	Bar ()
+	{
+		printf ("CTest.Bar () { m_v = %d }\n", m_Value);
+	}
+
+	int
+	operator ~ ()
+	{
+		printf ("CTest.operator ~ () { m_v = %d }\n", m_Value);
+		return 123;
+	}
+
+	int 
+	operator - ()
+	{
+		printf ("CTest.operator - () { m_v = %d }\n", m_Value);
+		return 456;
+	}
+
+	int 
+	operator - (int x)
+	{
+		printf ("CTest.operator - (int x = %d) { m_v = %d }\n", x, m_Value);
+		return m_Value - x;
+	}
+
+};
+
+
+extend CTest
+{
+	Yahoo ()
+	{
+		printf ("CTest.extension.Yahoo () { m_v = %d }\n", m_Value);
+	}		
+}
+
+int
+main ()
+{
+	printf ("hui govno i muravei\n");
+
+	CTest t = stack new CTest;
+	t.Foo (100);
+	t.Bar ();
+	t.Yahoo ();
+
+	return 0;
+}
+
+//.............................................................................
+
+int
+printf (
+	unsafe char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

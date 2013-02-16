@@ -90,7 +90,7 @@ CClassPtrType::PrepareTypeString ()
 void
 CClassPtrType::PrepareLlvmType ()
 {
-	m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetInterfaceStructType ()->GetLlvmType (), 0);
+	m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetIfaceStructType ()->GetLlvmType (), 0);
 }
 
 //.............................................................................

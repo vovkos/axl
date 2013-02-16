@@ -776,7 +776,6 @@ protected:
 	bool
 	ClassFieldMemberOperator (
 		const CValue& OpValue,
-		CClassType* pClassType,
 		CStructMember* pMember,
 		CClassBaseTypeCoord* pCoord,
 		CValue* pResultValue

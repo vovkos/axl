@@ -130,6 +130,12 @@ public:
 		return m_pParentClassType;
 	}
 
+	bool
+	IsVirtual ()
+	{
+		return m_StorageKind >= EStorage_Abstract && m_StorageKind <= EStorage_Override;
+	}
+
 	size_t 
 	GetParentClassVTableIndex ()
 	{

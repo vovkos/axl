@@ -29,7 +29,6 @@ CStructType::CStructType ()
 	m_FieldAlignedSize = 0;
 	m_pLastBitFieldType = NULL;
 	m_LastBitFieldOffset = 0;
-	m_pFieldParent = NULL;
 }
 
 bool

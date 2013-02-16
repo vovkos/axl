@@ -23,8 +23,7 @@ enum EClassPtrType;
 enum EClassTypeFlag
 {
 	EClassTypeFlag_StdObject = 0x010000, // EStdType_Object 
-	EClassTypeFlag_Interface = 0x020000,
-	EClassTypeFlag_AutoEv    = 0x040000,
+	EClassTypeFlag_AutoEv    = 0x020000,
 };
 
 //.............................................................................
@@ -88,7 +87,7 @@ protected:
 	friend class CParser;
 	friend class CProperty;
 	
-	CStructType* m_pInterfaceStructType;
+	CStructType* m_pIfaceStructType;
 	CStructType* m_pClassStructType;
 
 	// construction / destruction
@@ -107,8 +106,6 @@ protected:
 	// fields
 
 	size_t m_PackFactor;
-	CStructType* m_pFieldStructType;
-	CStructMember* m_pFieldMember;
 	CStructType* m_pStaticFieldStructType;
 	CVariable* m_pStaticDataVariable;
 
@@ -137,10 +134,10 @@ public:
 	CClassType ();
 
 	CStructType* 
-	GetInterfaceStructType ()
+	GetIfaceStructType ()
 	{
-		ASSERT (m_pInterfaceStructType);
-		return m_pInterfaceStructType;
+		ASSERT (m_pIfaceStructType);
+		return m_pIfaceStructType;
 	}
 
 	CStructType* 
@@ -217,18 +214,6 @@ public:
 	GetPackFactor ()
 	{
 		return m_PackFactor;
-	}
-
-	CStructType* 
-	GetFieldStructType ()
-	{
-		return m_pFieldStructType;
-	}
-
-	CStructMember* 
-	GetFieldMember ()
-	{
-		return m_pFieldMember;
 	}
 
 	CStructType* 
@@ -343,7 +328,7 @@ protected:
 	void
 	PrepareTypeString ()
 	{
-		m_TypeString.Format ((m_Flags & EClassTypeFlag_Interface) ? _T("interface %s") : _T("class %s"), m_Tag);
+		m_TypeString.Format (_T("class %s"), m_Tag);
 	}
 
 	virtual 
@@ -369,8 +354,11 @@ protected:
 		size_t Level
 		);
 
+	void
+	AddVirtualFunction (CFunction* pFunction);
+
 	bool
-	LayoutNamedVirtualFunction (CFunction* pFunction);
+	OverrideVirtualFunction (CFunction* pFunction);
 };
 
 //.............................................................................

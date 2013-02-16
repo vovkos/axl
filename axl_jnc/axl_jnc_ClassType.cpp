@@ -10,7 +10,7 @@ namespace jnc {
 CClassType::CClassType ()
 {
 	m_TypeKind = EType_Class;
-	m_pInterfaceStructType = NULL;
+	m_pIfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
 
@@ -21,8 +21,6 @@ CClassType::CClassType ()
 	m_pInitializer = NULL;
 
 	m_PackFactor = 8;
-	m_pFieldStructType = NULL;
-	m_pFieldMember = NULL;
 	m_pStaticFieldStructType = NULL;
 	m_pStaticDataVariable = NULL;
 
@@ -213,14 +211,7 @@ CClassType::CreateFieldMember (
 	{
 	case EStorage_Undefined:
 	case EStorage_Mutable:
-		if (!m_pFieldStructType)
-		{
-			m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-			m_pFieldStructType->m_pFieldParent = this;
-			m_pFieldStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
-		}
-
-		pFieldStructType = m_pFieldStructType;
+		pFieldStructType = m_pIfaceStructType;
 		break;
 
 	case EStorage_Static:
@@ -228,7 +219,7 @@ CClassType::CreateFieldMember (
 		{
 			m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 			m_pStaticFieldStructType->m_StorageKind = EStorage_Static;
-			m_pStaticFieldStructType->m_pFieldParent = this;
+			m_pStaticFieldStructType->m_pParentNamespace = this;
 			m_pStaticFieldStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
 		}
 
@@ -273,11 +264,11 @@ CClassType::AddMethodMember (CFunction* pFunction)
 
 	case EStorage_Abstract:
 	case EStorage_Virtual:
+	case EStorage_Override:
 		m_VirtualMethodArray.Append (pFunction);
 		// and fall through;
 
 	case EStorage_Undefined:
-	case EStorage_NoVirtual:
 		pFunction->ConvertToMethodMember (this);
 		break;
 
@@ -371,11 +362,11 @@ CClassType::AddPropertyMember (CProperty* pProperty)
 
 	case EStorage_Abstract:
 	case EStorage_Virtual:
+	case EStorage_Override:
 		m_VirtualPropertyArray.Append (pProperty);
 		// and fall through;
 
 	case EStorage_Undefined:
-	case EStorage_NoVirtual:
 		pProperty->ConvertToPropertyMember (this);
 		break;
 	}
@@ -452,18 +443,6 @@ CClassType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	m_pVTableStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pVTableStructType->m_Tag.Format (_T("%s.vtbl"), m_Tag);
-
-	CStructType* pIfaceHdrStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-	pIfaceHdrStructType->m_Tag.Format (_T("%s.ifacehdr"), m_Tag);
-	pIfaceHdrStructType->CreateMember (m_pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe));
-	pIfaceHdrStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Unsafe));
-
-	m_pInterfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-	m_pInterfaceStructType->m_Tag.Format (_T("%s.iface"), m_Tag);
-	m_pInterfaceStructType->AddBaseType (pIfaceHdrStructType);
-
 	// layout base types
 
 	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
@@ -475,12 +454,32 @@ CClassType::CalcLayout ()
 		if (!Result)
 			return false;
 				
-		BaseType->m_pFieldBaseType = m_pInterfaceStructType->AddBaseType (pBaseClassType->GetInterfaceStructType ());
+		BaseType->m_pFieldBaseType = m_pIfaceStructType->AddBaseType (pBaseClassType->GetIfaceStructType ());
 		BaseType->m_VTableIndex = m_VTable.GetCount ();
 
 		m_VTable.Append (pBaseClassType->m_VTable);
 		m_pVTableStructType->Append (pBaseClassType->m_pVTableStructType);
 	}
+
+	if (m_pStaticFieldStructType)
+	{
+		Result = m_pStaticFieldStructType->CalcLayout ();
+		if (!Result)
+			return false;
+
+		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
+			EVariable_Global, 
+			m_Tag, 
+			m_pStaticFieldStructType, 
+			false
+			);
+	}
+
+	// finalize
+
+	Result = m_pIfaceStructType->CalcLayout ();
+	if (!Result)
+		return false;
 
 	// layout virtual properties
 
@@ -514,40 +513,27 @@ CClassType::CalcLayout ()
 	{
 		CFunction* pFunction = m_VirtualMethodArray [i];
 
-		Result = LayoutNamedVirtualFunction (pFunction);
-		if (!Result)
-			return false;
+		switch (pFunction->m_StorageKind)
+		{
+		case EStorage_Abstract:
+		case EStorage_Virtual:
+			AddVirtualFunction (pFunction);
+			break;
+
+		case EStorage_Override:
+			Result = OverrideVirtualFunction (pFunction);
+			if (!Result)
+				return false;
+			break;
+
+		default:
+			ASSERT (false);
+		}
 	}
 
 	Result = m_pVTableStructType->CalcLayout ();
 	if (!Result)
 		return false;
-
-	// layout fields
-
-	if (m_pFieldStructType)
-	{
-		Result = m_pFieldStructType->CalcLayout ();
-		if (!Result)
-			return false;
-	}
-
-	if (m_pStaticFieldStructType)
-	{
-		Result = m_pStaticFieldStructType->CalcLayout ();
-		if (!Result)
-			return false;
-
-		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EVariable_Global, 
-			m_Tag, 
-			m_pStaticFieldStructType, 
-			false
-			);
-	}
-
-	if (m_pFieldStructType)
-		m_pFieldMember = m_pInterfaceStructType->CreateMember (m_pFieldStructType);
 
 	// extension namespace
 
@@ -572,18 +558,12 @@ CClassType::CalcLayout ()
 		}
 	}
 
-	// finalize
-
-	Result = m_pInterfaceStructType->CalcLayout ();
-	if (!Result)
-		return false;
-
 	if (m_TypeKind == EType_Class)
 	{
 		m_pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 		m_pClassStructType->m_Tag.Format (_T("%s.class"), m_Tag);
 		m_pClassStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
-		m_pClassStructType->CreateMember (m_pInterfaceStructType);
+		m_pClassStructType->CreateMember (m_pIfaceStructType);
 		m_pClassStructType->CalcLayout ();
 	}
 
@@ -591,43 +571,58 @@ CClassType::CalcLayout ()
 	return true;
 }
 
-bool
-CClassType::LayoutNamedVirtualFunction (CFunction* pFunction)
+void
+CClassType::AddVirtualFunction (CFunction* pFunction)
 {
-	ASSERT (
-		pFunction->m_FunctionKind == EFunction_Named &&
-		pFunction->m_StorageKind == EStorage_Virtual && 
-		pFunction->m_pClassType == this &&
-		pFunction->m_pVirtualOriginClassType == NULL &&
-		pFunction->m_ClassVTableIndex == -1
-		);
+	ASSERT (pFunction->m_StorageKind == EStorage_Abstract || pFunction->m_StorageKind == EStorage_Virtual);
 
-	CFunction* pOverridenFunction = NULL;
+	pFunction->m_pVirtualOriginClassType = this;
+	pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
+
+	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe);
+	m_pVTableStructType->CreateMember (pPointerType);
+	m_VTable.Append (pFunction);
+}
+
+bool
+CClassType::OverrideVirtualFunction (CFunction* pFunction)
+{
+	ASSERT (pFunction->m_StorageKind == EStorage_Override);
+
 	CClassBaseTypeCoord BaseTypeCoord;
 	CModuleItem* pMember = FindMemberImpl (false, false, pFunction->m_Name, &BaseTypeCoord, 0);
-	if (pMember && pMember->GetItemKind () == EModuleItem_Function)
+	if (!pMember)
 	{
-		pOverridenFunction = (CFunction*) pMember;
-		pOverridenFunction = pOverridenFunction->FindShortOverload (pFunction->GetType ()->GetShortType ());
-		
-		if (pOverridenFunction->m_StorageKind != EStorage_Virtual)
-			pOverridenFunction = NULL;
+		err::SetFormatStringError (_T("cannot override '%s': method not found"));
+		return false;
 	}
 
+	if (pMember->GetItemKind () != EModuleItem_Function)
+	{
+		err::SetFormatStringError (_T("cannot override '%s': not a method"));
+		return false;
+	}
+
+	CFunction* pOverridenFunction = (CFunction*) pMember;
+	pOverridenFunction = pOverridenFunction->FindShortOverload (pFunction->GetType ()->GetShortType ());
 	if (!pOverridenFunction)
 	{
-		pFunction->m_pVirtualOriginClassType = this;
-		pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
+		err::SetFormatStringError (_T("cannot override '%s': method signature mismatch"));
+		return false;
+	}
 
-		CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe);
-		m_pVTableStructType->CreateMember (pPointerType);
-		m_VTable.Append (pFunction);
-		return true;
+	if (pOverridenFunction->m_StorageKind != EStorage_Abstract && 
+		pOverridenFunction->m_StorageKind != EStorage_Virtual)
+	{
+		err::SetFormatStringError (_T("cannot override '%s': original method is not virtual"));
+		return false;
 	}
 
 	#pragma AXL_TODO ("virtual multipliers")
 
 	pFunction->m_pType = pOverridenFunction->m_pType;
+	pFunction->m_pThisArgType = pOverridenFunction->m_pThisArgType;
+	pFunction->m_ThisArgDelta = -(intptr_t) BaseTypeCoord.m_FieldCoord.m_Offset;
 	pFunction->m_pVirtualOriginClassType = pOverridenFunction->m_pVirtualOriginClassType;
 	pFunction->m_ClassVTableIndex = pOverridenFunction->m_ClassVTableIndex;
 

@@ -1,52 +1,58 @@
 //.............................................................................
 
-class CTest
+class IFoo
 {
-public:
-	mutable int m_Value;
+	int m_FooValue;
 
-	Foo (int x) const
-	{
-		printf ("CTest.Foo (int x = %d)\n", x);
-		m_Value = x;
-	}
-
-	Bar ()
-	{
-		printf ("CTest.Bar () { m_v = %d }\n", m_Value);
-	}
-
-	int
-	operator ~ ()
-	{
-		printf ("CTest.operator ~ () { m_v = %d }\n", m_Value);
-		return 123;
-	}
-
+	abstract
 	int 
-	operator - ()
-	{
-		printf ("CTest.operator - () { m_v = %d }\n", m_Value);
-		return 456;
-	}
-
-	int 
-	operator - (int x)
-	{
-		printf ("CTest.operator - (int x = %d) { m_v = %d }\n", x, m_Value);
-		return m_Value - x;
-	}
-
+	Foo ();
 };
 
-
-extend CTest
+class IBar
 {
-	Yahoo ()
+	int m_BarValue;
+
+	abstract
+	int 
+	Bar ();
+};
+
+class CTest: IFoo, IBar
+{
+	int m_TestValue;
+
+	preconstruct ()
 	{
-		printf ("CTest.extension.Yahoo () { m_v = %d }\n", m_Value);
-	}		
-}
+		m_FooValue = 100;
+		m_BarValue = 200;
+		m_TestValue = 300;
+	}	 
+
+	override 
+	int 
+	Foo ()
+	{
+		return printf (
+			"CTest.Foo () { %d, %d, %d } \n", 
+			m_FooValue,
+			m_BarValue,
+			m_TestValue
+			);
+	}
+
+	override 
+	int 
+	Bar ()
+	{
+		return printf (
+			"CTest.Bar () { %d, %d, %d } \n", 
+			m_FooValue,
+			m_BarValue,
+			m_TestValue
+			);
+	}
+};
 
 
 int
@@ -55,16 +61,14 @@ main ()
 	printf ("hui govno i muravei\n");
 
 	CTest t = stack new CTest;
-
-	t.Foo (100);
+	t.Foo ();
 	t.Bar ();
-	t.Yahoo ();
-
-	int x = -t;
-	printf ("-t = %d\n", x);	
-
-	x = t - 20;
-	printf ("t - 20 = %d\n", x);	
+	
+	IFoo f = t;
+	f.Foo ();
+	
+	IBar b = t;
+	b.Bar ();
 
 	return 0;
 }

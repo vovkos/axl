@@ -82,9 +82,10 @@ CFunction::CFunction ()
 	m_pOrphanNamespace = NULL;
 	m_pExternFunction = NULL;
 	m_pClassType = NULL;
-	m_ThisArgTypeFlags = 0;
 	m_pThisArgType = NULL;
 	m_pThisType = NULL;
+	m_ThisArgDelta = 0;
+	m_ThisArgTypeFlags = 0;
 	m_pVirtualOriginClassType = NULL;
 	m_pProperty = NULL;
 	m_ClassVTableIndex = -1;
@@ -279,6 +280,12 @@ CFunction::ResolveOrphan ()
 	if (pOriginFunction->HasBody () || pOriginFunction->m_pExternFunction)
 	{
 		err::SetFormatStringError (_T("'%s' already has a body"), m_Tag);
+		return false;
+	}
+
+	if (pOriginFunction->m_StorageKind == EStorage_Abstract)
+	{
+		err::SetFormatStringError (_T("'%s' is abstract and hence cannot have a body"), m_Tag);
 		return false;
 	}
 

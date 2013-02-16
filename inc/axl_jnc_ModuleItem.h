@@ -41,11 +41,11 @@ GetModuleItemKindString (EModuleItem ItemKind);
 enum EStorage
 {
 	EStorage_Undefined = 0,
-	EStorage_Static,
 	EStorage_Typedef,
+	EStorage_Static,
 	EStorage_Abstract,
 	EStorage_Virtual,
-	EStorage_NoVirtual,
+	EStorage_Override,
 	EStorage_Mutable,
 	EStorage__Count,
 };

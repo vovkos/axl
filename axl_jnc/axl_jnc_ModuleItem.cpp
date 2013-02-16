@@ -39,11 +39,11 @@ GetStorageKindString (EStorage StorageKind)
 	static const tchar_t* StringTable [EStorage__Count] = 
 	{
 		_T("undefined-storage-class"),  // EStorage_Undefined = 0,
-		_T("static"),                   // EStorage_Static,
 		_T("typedef"),                  // EStorage_Typedef,
+		_T("static"),                   // EStorage_Static,
 		_T("abstract"),                 // EStorage_Abstract,
 		_T("virtual"),                  // EStorage_Virtual,
-		_T("novirtual"),                // EStorage_NoVirtual,
+		_T("override"),                 // EStorage_Override,
 		_T("mutable"),                  // EStorage_Mutable,
 	};
 

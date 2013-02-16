@@ -53,7 +53,6 @@ Members
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;
 	EEndianness m_Endianness;
-	EStorage m_DefaultMethodStorageKind;
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CAttributeBlock* m_pAttributeBlock;
@@ -182,8 +181,7 @@ Members2
 	CreateClassType (
 		const rtl::CString& Name,
 		rtl::CBoxListT <CType*>* pBaseTypeList,
-		size_t PackFactor,
-		int Flags
+		size_t PackFactor
 		);
 
 	CProperty*
@@ -252,9 +250,6 @@ Members2
 
 	bool
 	SetThis (CValue* pValue);
-
-	void
-	SetDefaultMethodStorageKind ();
 } 
 
 OpenNamespace

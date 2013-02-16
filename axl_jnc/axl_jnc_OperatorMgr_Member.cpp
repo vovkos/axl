@@ -17,8 +17,8 @@ COperatorMgr::GetFieldMember (
 	bool Result;
 
 	CStructType* pStructType = pMember->GetParentStructType ();
-	CModuleItem* pFieldParent = pStructType->GetFieldParent ();
-	ASSERT (pFieldParent);
+	CNamespace* pParentNamespace = pStructType->GetParentNamespace ();
+	ASSERT (pParentNamespace);
 
 	if (pStructType->GetStorageKind () != EStorage_Static && ThisValue.IsEmpty ())
 	{
@@ -26,9 +26,9 @@ COperatorMgr::GetFieldMember (
 		return false;
 	}
 
-	if (pFieldParent->GetItemKind () == EModuleItem_Property)
+	if (pParentNamespace->GetNamespaceKind () == ENamespace_Property)
 	{
-		CProperty* pProperty = (CProperty*) pFieldParent;
+		CProperty* pProperty = (CProperty*) pParentNamespace;
 
 		if (pStructType->GetStorageKind () == EStorage_Static)
 			return StructMemberOperator (
@@ -46,7 +46,6 @@ COperatorMgr::GetFieldMember (
 		CValue FieldValue;
 		Result = ClassFieldMemberOperator (
 			ThisValue, 
-			pParentClassType,
 			pProperty->GetDataFieldMember (),
 			&Coord,
 			&FieldValue
@@ -59,8 +58,8 @@ COperatorMgr::GetFieldMember (
 	}
 	else
 	{
-		ASSERT (pFieldParent->GetItemKind () == EModuleItem_Type && ((CType*) pFieldParent)->GetTypeKind () == EType_Class);
-		CClassType* pClassType = (CClassType*) pFieldParent;
+		ASSERT (pParentNamespace->GetNamespaceKind () == ENamespace_Type && ((CNamedType*) pParentNamespace)->GetTypeKind () == EType_Class);
+		CClassType* pClassType = (CClassType*) pParentNamespace;
 
 		if (pStructType->GetStorageKind () == EStorage_Static)
 			return StructMemberOperator (
@@ -357,11 +356,8 @@ COperatorMgr::ClassMemberOperator (
 	switch (MemberKind)
 	{
 	case EModuleItem_StructMember:
-
-
 		return ClassFieldMemberOperator (
 			OpValue, 
-			pClassType, 
 			(CStructMember*) pMember, 
 			&Coord,
 			pResultValue
@@ -383,9 +379,6 @@ COperatorMgr::ClassMemberOperator (
 	if (pDecl->GetStorageKind () == EStorage_Static)
 		return true;
 	
-	CValue ThisArg = OpValue;
-	ThisArg.OverrideFlags (OpValue.GetFlags () & EValueFlag_ThisArg);
-
 	CClosure* pClosure = pResultValue->CreateClosure ();
 	pClosure->GetArgList ()->InsertHead (OpValue);
 	return true;
@@ -394,14 +387,15 @@ COperatorMgr::ClassMemberOperator (
 bool
 COperatorMgr::ClassFieldMemberOperator (
 	const CValue& OpValue,
-	CClassType* pClassType,
 	CStructMember* pMember,
 	CClassBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
 {
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
+	CClassType* pClassType = (CClassType*) pMember->GetParentStructType ()->GetParentNamespace ();
+
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
-	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (1, pClassType->GetFieldMember ()->GetLlvmIndex ());
 	pCoord->m_FieldCoord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
 
 	CValue PtrValue;
@@ -440,13 +434,11 @@ COperatorMgr::GetClassFieldMemberValue (
 {
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
-	CClassType* pClassType = ((CClassPtrType*) ObjValue.GetType ())->GetTargetType ();
-
 	CValue FieldValue;
 	CClassBaseTypeCoord ClosureCoord;
 
 	return 
-		ClassFieldMemberOperator (ObjValue, pClassType, pMember, &ClosureCoord, &FieldValue) && 
+		ClassFieldMemberOperator (ObjValue, pMember, &ClosureCoord, &FieldValue) && 
 		LoadDataRef (FieldValue, pValue);
 }
 
@@ -459,13 +451,11 @@ COperatorMgr::SetClassFieldMemberValue (
 {
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
-	CClassType* pClassType = ((CClassPtrType*) ObjValue.GetType ())->GetTargetType ();
-
 	CValue FieldValue;
 	CClassBaseTypeCoord ClosureCoord;
 
 	return 
-		ClassFieldMemberOperator (ObjValue, pClassType, pMember, &ClosureCoord, &FieldValue) && 
+		ClassFieldMemberOperator (ObjValue, pMember, &ClosureCoord, &FieldValue) && 
 		BinaryOperator (EBinOp_Assign, FieldValue, Value);
 }
 
@@ -506,10 +496,10 @@ COperatorMgr::GetVirtualMethodMember (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pFunction->GetStorageKind () == EStorage_Virtual && pClosure && pClosure->IsMemberClosure ());
+	ASSERT (pFunction->IsVirtual () && pClosure && pClosure->IsMemberClosure ());
 	
 	CValue Value = *pClosure->GetArgList ()->GetHead ();
-	CClassType* pClassType = (CClassType*) Value.GetType ();
+	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 	CClassType* pVTableType = pFunction->GetVirtualOriginClassType ();
 	size_t VTableIndex = pFunction->GetClassVTableIndex ();
 	
@@ -554,10 +544,10 @@ COperatorMgr::GetVirtualPropertyMember (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pProperty->GetStorageKind () == EStorage_Virtual && pClosure && pClosure->IsMemberClosure ());
+	ASSERT (pProperty->IsVirtual () && pClosure && pClosure->IsMemberClosure ());
 	
 	CValue Value = *pClosure->GetArgList ()->GetHead ();
-	CClassType* pClassType = (CClassType*) Value.GetType ();
+	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
 
 	CClassBaseTypeCoord Coord;

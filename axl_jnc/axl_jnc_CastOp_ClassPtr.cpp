@@ -62,8 +62,8 @@ CCast_ClassPtr::LlvmCast (
 	if (!Result)
 		return m_pModule->m_LlvmBuilder.DynamicCastInterface (OpValue, pDstClassType, pResultValue);
 
-	CValue SrcNullValue = pSrcClassType->GetZeroValue ();
-	CValue DstNullValue = pDstClassType->GetZeroValue ();
+	CValue SrcNullValue = pSrcType->GetZeroValue ();
+	CValue DstNullValue = pDstType->GetZeroValue ();
 
 	CBasicBlock* pCmpBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_phi"));

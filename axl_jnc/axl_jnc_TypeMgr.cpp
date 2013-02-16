@@ -134,6 +134,14 @@ CTypeMgr::CalcTypeLayouts ()
 {
 	bool Result;
 
+	rtl::CIteratorT <CClassType> ClassType = m_ClassTypeList.GetHead ();
+	for (; ClassType; ClassType++)
+	{
+		Result = ClassType->CalcLayout ();
+		if (!Result)
+			return false;
+	}
+
 	rtl::CIteratorT <CStructType> StructType = m_StructTypeList.GetHead ();
 	for (; StructType; StructType++)
 	{
@@ -146,14 +154,6 @@ CTypeMgr::CalcTypeLayouts ()
 	for (; UnionType; UnionType++)
 	{
 		Result = UnionType->CalcLayout ();
-		if (!Result)
-			return false;
-	}
-
-	rtl::CIteratorT <CClassType> ClassType = m_ClassTypeList.GetHead ();
-	for (; ClassType; ClassType++)
-	{
-		Result = ClassType->CalcLayout ();
 		if (!Result)
 			return false;
 	}
@@ -230,30 +230,26 @@ CTypeMgr::CreateEnumType (
 {
 	const char* pSignaturePrefix = (Flags & EEnumTypeFlag_Exposed) ? "EC" : "EE";
 
+	CEnumType* pType = AXL_MEM_NEW (CEnumType);
+
 	if (Name.IsEmpty ())
 	{
-		CEnumType* pType = AXL_MEM_NEW (CEnumType);
-		pType->m_pModule = m_pModule;
 		pType->m_Signature.Format ("%s%d:%s", pSignaturePrefix, m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
 		pType->m_Tag.Format (_T("_unnamed_enum_%d"), m_UnnamedTypeCounter);
-		pType->m_pBaseType = GetPrimitiveType (EType_Int);
-		pType->m_Size = pType->m_pBaseType->GetSize ();
-		pType->m_Flags |= Flags;
-		m_EnumTypeList.InsertTail (pType);
-		return pType;
+	}
+	else
+	{
+		pType->m_Signature.Format ("%s%s", pSignaturePrefix, QualifiedName);
+		pType->m_Name = Name;
+		pType->m_QualifiedName = QualifiedName;
+		pType->m_Tag = QualifiedName;
+		pType->m_Flags |= ETypeFlag_Named;
 	}
 
-
-	CEnumType* pType = AXL_MEM_NEW (CEnumType);
 	pType->m_pModule = m_pModule;
-	pType->m_Signature.Format ("%s%s", pSignaturePrefix, QualifiedName);
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_Tag = QualifiedName;
 	pType->m_pBaseType = GetPrimitiveType (EType_Int);
 	pType->m_Size = pType->m_pBaseType->GetSize ();
-	pType->m_Flags |= Flags | ETypeFlag_Named;
-
+	pType->m_Flags |= Flags;
 	m_EnumTypeList.InsertTail (pType);
 	return pType;
 }
@@ -265,26 +261,24 @@ CTypeMgr::CreateStructType (
 	size_t PackFactor
 	)
 {
+	CStructType* pType = AXL_MEM_NEW (CStructType);	
+
 	if (Name.IsEmpty ())
 	{
-		CStructType* pType = AXL_MEM_NEW (CStructType);
-		pType->m_pModule = m_pModule;
 		pType->m_Signature.Format ("S%d:%s", m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
 		pType->m_Tag.Format (_T("_unnamed_struct_%d"), m_UnnamedTypeCounter);
-		pType->m_PackFactor = PackFactor;
-		m_StructTypeList.InsertTail (pType);
-		return pType;
+	}
+	else
+	{
+		pType->m_Signature.Format ("S%s", QualifiedName);
+		pType->m_Name = Name;
+		pType->m_QualifiedName = QualifiedName;
+		pType->m_Tag = QualifiedName;
+		pType->m_Flags |= ETypeFlag_Named;
 	}
 
-	CStructType* pType = AXL_MEM_NEW (CStructType);	
 	pType->m_pModule = m_pModule;
-	pType->m_Signature.Format ("S%s", QualifiedName);
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_Tag = QualifiedName;
-	pType->m_Flags |= ETypeFlag_Named;
 	pType->m_PackFactor = PackFactor;
-
 	m_StructTypeList.InsertTail (pType);
 	return pType;
 }
@@ -295,24 +289,23 @@ CTypeMgr::CreateUnionType (
 	const rtl::CString& QualifiedName
 	)
 {
+	CUnionType* pType = AXL_MEM_NEW (CUnionType);
+
 	if (Name.IsEmpty ())
 	{
-		CUnionType* pType = AXL_MEM_NEW (CUnionType);
-		pType->m_pModule = m_pModule;
 		pType->m_Signature.Format ("U%d:%s", m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
 		pType->m_Tag.Format (_T("_unnamed_union_%d"), m_UnnamedTypeCounter);
-		m_UnionTypeList.InsertTail (pType);
-		return pType;
+	}
+	else
+	{
+		pType->m_Signature.Format ("U%s", QualifiedName);
+		pType->m_Name = Name;
+		pType->m_QualifiedName = QualifiedName;
+		pType->m_Tag = QualifiedName;
+		pType->m_Flags |= ETypeFlag_Named;
 	}
 
-	CUnionType* pType = AXL_MEM_NEW (CUnionType);	
 	pType->m_pModule = m_pModule;
-	pType->m_Signature.Format ("U%s", QualifiedName);
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_Tag = QualifiedName;
-	pType->m_Flags |= ETypeFlag_Named;
-	
 	m_UnionTypeList.InsertTail (pType);
 	return pType;
 }
@@ -321,40 +314,47 @@ CClassType*
 CTypeMgr::CreateClassType (
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
-	size_t PackFactor,
-	int Flags
+	size_t PackFactor
 	)
 {
-	char SignatureChar = (EClassTypeFlag_Interface) ? 'I' : 'C';
-
-	EAccess AccessKind = (Flags & EClassTypeFlag_Interface) ? EAccess_Public : EAccess_Protected;
+	CClassType* pType = AXL_MEM_NEW (CClassType);
 
 	if (Name.IsEmpty ())
 	{
-		CClassType* pType = AXL_MEM_NEW (CClassType);
-		pType->m_pModule = m_pModule;
-		pType->m_Signature.Format ("%c%d%s", SignatureChar, m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
+		pType->m_Signature.Format ("C%d%s", m_UnnamedTypeCounter++, m_pModule->GetFilePath ());
 		pType->m_Tag.Format (_T("_unnamed_class_%d"), m_UnnamedTypeCounter);
-		pType->m_Flags |= Flags;
-		pType->m_CurrentAccessKind = AccessKind;
-		pType->m_PackFactor = PackFactor;
-		m_ClassTypeList.InsertTail (pType);
-		return pType;
+	}
+	else
+	{
+		pType->m_Signature.Format ("C%s", QualifiedName);
+		pType->m_Name = Name;
+		pType->m_QualifiedName = QualifiedName;
+		pType->m_Tag = QualifiedName;
+		pType->m_Flags |= ETypeFlag_Named;
 	}
 
-	CClassType* pType = AXL_MEM_NEW (CClassType);
+	CStructType* pVTableStructType = CreateUnnamedStructType ();
+	pVTableStructType->m_Tag.Format (_T("%s.vtbl"), pType->m_Tag);
+
+	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
+	pIfaceHdrStructType->m_Tag.Format (_T("%s.ifacehdr"), pType->m_Tag);
+	pIfaceHdrStructType->CreateMember (pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe));
+	pIfaceHdrStructType->CreateMember (GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Unsafe));
+
+	CStructType* pIfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
+	pIfaceStructType->m_Tag.Format (_T("%s.iface"), pType->m_Tag);
+	pIfaceStructType->m_pParentNamespace = pType;
+	pIfaceStructType->AddBaseType (pIfaceHdrStructType);
+
 	pType->m_pModule = m_pModule;
-	pType->m_Signature.Format ("%c%s", SignatureChar, QualifiedName);
-	pType->m_Name = Name;
-	pType->m_QualifiedName = QualifiedName;
-	pType->m_Tag = QualifiedName;
-	pType->m_CurrentAccessKind = AccessKind;
 	pType->m_PackFactor = PackFactor;
-	pType->m_Flags |= Flags | ETypeFlag_Named;
-	
+	pType->m_pVTableStructType = pVTableStructType;
+	pType->m_pIfaceStructType = pIfaceStructType;
 	m_ClassTypeList.InsertTail (pType);
 	return pType;
 }
+
+
 
 CFunctionType* 
 CTypeMgr::GetFunctionType (	

@@ -149,7 +149,6 @@ protected:
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
 	size_t m_LastBitFieldOffset;
-	CModuleItem* m_pFieldParent; // if this type is a field or static field, class or property
 
 public:
 	CStructType ();
@@ -177,12 +176,6 @@ public:
 	GetFieldAlignedSize ()
 	{
 		return m_FieldAlignedSize;
-	}
-
-	CModuleItem*
-	GetFieldParent ()
-	{
-		return m_pFieldParent;
 	}
 
 	rtl::CConstListT <CStructBaseType>

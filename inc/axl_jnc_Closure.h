@@ -31,19 +31,13 @@ public:
 	}
 
 	bool
-	IsSimpleClosure ()
-	{
-		return m_ArgList.GetCount () == 1 && m_ArgList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
-	}
-
-	bool
 	IsMemberClosure ()
 	{
-		return !m_ArgList.IsEmpty () && (m_ArgList.GetHead ()->GetFlags () & EValueFlag_ThisArg) != 0;
+		return !m_ArgList.IsEmpty () && m_ArgList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
 	}
 
 	bool
-	IsSimpleMemberClosure ()
+	IsSimpleClosure ()
 	{
 		return IsMemberClosure () && m_ArgList.GetCount () == 1;
 	}

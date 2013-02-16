@@ -908,7 +908,7 @@ COperatorMgr::CreateClosureObject (
 
 	// save pfn & arguments in the closure
 	
-	CStructType* pClosureFieldStructType = pClosureType->GetFieldStructType ();
+	CStructType* pClosureFieldStructType = pClosureType->GetIfaceStructType ();
 	ASSERT (pClosureFieldStructType);
 
 	rtl::CIteratorT <CStructMember> ClosureMember = pClosureFieldStructType->GetMemberList ().GetHead ();

@@ -15,7 +15,6 @@ CParser::CParser ()
 	m_DefaultStructPackFactor = 8;
 	m_Endianness = EEndianness_LittleEndian;
 	m_StorageKind = EStorage_Undefined;
-	m_DefaultMethodStorageKind = EStorage_Undefined;
 	m_AccessKind = EAccess_Undefined;
 	m_pAutoEvType = NULL;
 	m_pAttributeBlock = NULL;
@@ -318,7 +317,6 @@ CParser::DeclareFunction (
 	{
 		m_StorageKind = 
 			FunctionKind == EFunction_StaticConstructor ? EStorage_Static :
-			!(FunctionKindFlags & EFunctionKindFlag_NoStorage) ? m_DefaultMethodStorageKind :
 			NamespaceKind == ENamespace_Property && (FunctionKind == EFunction_Getter || FunctionKind == EFunction_Setter) ?
 				((CProperty*) pNamespace)->GetStorageKind () : 
 				EStorage_Undefined;
@@ -463,9 +461,6 @@ CParser::CreatePropertyImpl (
 	rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
 	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
 	
-	if (!m_StorageKind)
-		m_StorageKind = m_DefaultMethodStorageKind;
-
 	AssignDeclarationAttributes (pProperty, Pos);
 
 	switch (NamespaceKind)
@@ -491,7 +486,7 @@ CParser::CreatePropertyImpl (
 		break;
 
 	default:
-		if (m_StorageKind == EStorage_Virtual || m_StorageKind == EStorage_NoVirtual)
+		if (m_StorageKind)
 		{
 			err::SetFormatStringError (_T("invalid storage specifier '%s' for a global property"), GetStorageKindString (m_StorageKind));
 			return false;
@@ -525,12 +520,6 @@ CParser::DeclareData (
 	{
 		err::SetFormatStringError (_T("property templates cannot have data fields"));
 		return false;
-	}
-
-	if (m_StorageKind == EStorage_Virtual || m_StorageKind == EStorage_NoVirtual)
-	{
-		err::SetFormatStringError (_T("invalid storage specifier '%s' for data"), GetStorageKindString (m_StorageKind));
-		return NULL;
 	}
 
 	if (pType->GetTypeKind () == EType_Class) 
@@ -751,8 +740,7 @@ CClassType*
 CParser::CreateClassType (
 	const rtl::CString& Name,
 	rtl::CBoxListT <CType*>* pBaseTypeList,
-	size_t PackFactor,
-	int Flags
+	size_t PackFactor
 	)
 {
 	bool Result;
@@ -762,12 +750,12 @@ CParser::CreateClassType (
 
 	if (Name.IsEmpty ())
 	{
-		pClassType = m_pModule->m_TypeMgr.CreateUnnamedClassType (PackFactor, Flags);
+		pClassType = m_pModule->m_TypeMgr.CreateUnnamedClassType (PackFactor);
 	}
 	else
 	{
 		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pClassType = m_pModule->m_TypeMgr.CreateClassType (Name, QualifiedName, PackFactor, Flags);
+		pClassType = m_pModule->m_TypeMgr.CreateClassType (Name, QualifiedName, PackFactor);
 		if (!pClassType)
 			return NULL;
 	}
@@ -1127,6 +1115,12 @@ CParser::SetFunctionBody (rtl::CBoxListT <CToken>* pBody)
 		return false;
 	}
 
+	if (pFunction->GetStorageKind () == EStorage_Abstract)
+	{
+		err::SetFormatStringError (_T("'%s' is abstract and hence cannot have a body"), pFunction->m_Tag);
+		return false;
+	}
+
 	pFunction->SetBody (pBody);
 	return true;
 }
@@ -1192,18 +1186,6 @@ CParser::SetThis (CValue* pValue)
 
 	*pValue = m_ThisValue;
 	return true;
-}
-
-void
-CParser::SetDefaultMethodStorageKind ()
-{
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	
-	m_DefaultMethodStorageKind = 
-		pNamespace->GetNamespaceKind () != ENamespace_Type &&
-		((CNamedType*) pNamespace)->GetTypeKind () == EType_Class && 
-		(((CNamedType*) pNamespace)->GetFlags () & EClassTypeFlag_Interface) ?
-		EStorage_Virtual : EStorage_Undefined;
 }
 
 //.............................................................................

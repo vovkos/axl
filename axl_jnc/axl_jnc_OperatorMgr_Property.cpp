@@ -40,7 +40,7 @@ COperatorMgr::GetPropertyVTable (
 {
 	bool Result;
 
-	if (pProperty->GetStorageKind () == EStorage_Virtual)
+	if (pProperty->IsVirtual ())
 	{
 		if (!pClosure || !pClosure->IsMemberClosure ())
 		{

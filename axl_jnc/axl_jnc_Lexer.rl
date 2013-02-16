@@ -69,8 +69,9 @@ main := |*
 
 'typedef'      { CreateToken (EToken_Typedef); };
 'static'       { CreateToken (EToken_Static); };
+'abstract'     { CreateToken (EToken_Abstract); };
 'virtual'      { CreateToken (EToken_Virtual); };
-'novirtual'    { CreateToken (EToken_NoVirtual); };
+'override'     { CreateToken (EToken_Override); };
 'mutable'      { CreateToken (EToken_Mutable); };
 
 'public'       { CreateToken (EToken_Public); };
@@ -136,7 +137,6 @@ main := |*
 'struct'       { CreateToken (EToken_Struct); };
 'union'        { CreateToken (EToken_Union); };
 'class'        { CreateToken (EToken_Class); };
-'interface'    { CreateToken (EToken_Interface); };
 'autoev'       { CreateToken (EToken_AutoEv); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

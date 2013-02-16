@@ -112,7 +112,7 @@ COperatorMgr::CallOperator (
 	{
 		CFunction* pFunction = OpValue.GetFunction ();
 
-		if (pFunction->GetStorageKind () == EStorage_Virtual)
+		if (pFunction->IsVirtual ())
 		{
 			if (!pClosure || !pClosure->IsMemberClosure ())
 			{

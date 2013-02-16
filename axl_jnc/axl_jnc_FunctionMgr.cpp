@@ -244,8 +244,6 @@ CFunctionMgr::Prologue (
 	CValue* pThisValue
 	)
 {
-	bool Result;
-
 	m_pCurrentFunction = pFunction;
 
 	// create entry block and scope
@@ -265,10 +263,20 @@ CFunctionMgr::Prologue (
 	{
 		llvm::Value* pLlvmArg = LlvmArg;
 		CValue ThisArgValue (pLlvmArg, pFunction->m_pThisArgType);			
-		
-		Result = m_pModule->m_OperatorMgr.CastOperator (ThisArgValue, pFunction->m_pThisType, pThisValue);
-		if (!Result)
-			return false;
+
+		if (pFunction->m_pThisArgType->Cmp (pFunction->m_pThisType) == 0)
+		{
+			*pThisValue = ThisArgValue;
+		}
+		else
+		{
+			ASSERT (pFunction->m_ThisArgDelta < 0);
+
+			CValue BytePtrValue;
+			m_pModule->m_LlvmBuilder.CreateBitCast (ThisArgValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &BytePtrValue);
+			m_pModule->m_LlvmBuilder.CreateGep (BytePtrValue, pFunction->m_ThisArgDelta, NULL, &BytePtrValue);
+			m_pModule->m_LlvmBuilder.CreateBitCast (BytePtrValue, pFunction->m_pThisType, pThisValue);
+		}
 
 		LlvmArg++;
 	}
@@ -743,7 +751,7 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 
 	CValue ClosureValue (LlvmArg++, pThunk->m_pClosureType->GetClassPtrType ());
 
-	CStructType* pClosureFieldStructType = pThunk->m_pClosureType->GetFieldStructType ();
+	CStructType* pClosureFieldStructType = pThunk->m_pClosureType->GetIfaceStructType ();
 	ASSERT (pClosureFieldStructType);
 
 	rtl::CIteratorT <CStructMember> ClosureMember = pClosureFieldStructType->GetMemberList ().GetHead ();

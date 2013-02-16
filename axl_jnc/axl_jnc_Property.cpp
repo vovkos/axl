@@ -91,8 +91,8 @@ CProperty::CreateFieldMember (
 		if (!m_pFieldStructType)
 		{
 			m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-			m_pFieldStructType->m_pFieldParent = this;
 			m_pFieldStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
+			m_pFieldStructType->m_pParentNamespace = this;
 
 			if (m_pParentClassType)
 				m_pParentClassFieldMember = m_pParentClassType->CreateFieldMember (StorageKind, m_pFieldStructType);
@@ -106,8 +106,8 @@ CProperty::CreateFieldMember (
 		{
 			m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 			m_pStaticFieldStructType->m_StorageKind = EStorage_Static;
-			m_pStaticFieldStructType->m_pFieldParent = this;
 			m_pStaticFieldStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
+			m_pStaticFieldStructType->m_pParentNamespace = this;
 		}
 
 		pFieldStructType = m_pStaticFieldStructType;
@@ -155,11 +155,11 @@ CProperty::AddMethodMember (CFunction* pFunction)
 
 		case EStorage_Abstract:
 		case EStorage_Virtual:
+		case EStorage_Override:
 			m_pParentClassType->m_VirtualMethodArray.Append (pFunction);
 			// and fall through;
 
 		case EStorage_Undefined:
-		case EStorage_NoVirtual:
 			pFunction->ConvertToMethodMember (m_pParentClassType);
 			break;
 

@@ -61,7 +61,6 @@ GetAllocKindString (EAlloc AllocKind);
 enum EValueFlag
 {
 	EValueFlag_NoDataPtrRangeCheck = 0x01, 
-	EValueFlag_ThisArg          = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

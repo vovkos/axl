@@ -34,7 +34,7 @@ enum EToken
 	EToken_Static,
 	EToken_Abstract,
 	EToken_Virtual,
-	EToken_NoVirtual,
+	EToken_Override,
 	EToken_Mutable,
 
 	// access specifiers
@@ -96,7 +96,6 @@ enum EToken
 	EToken_Struct,
 	EToken_Union,
 	EToken_Class,
-	EToken_Interface,
 	EToken_AutoEv,
 
 	// special members
@@ -195,7 +194,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
 	AXL_PRS_TOKEN_NAME (EToken_Abstract,     "abstract")
 	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
-	AXL_PRS_TOKEN_NAME (EToken_NoVirtual,    "novirtual")
+	AXL_PRS_TOKEN_NAME (EToken_Override,     "override")
 	AXL_PRS_TOKEN_NAME (EToken_Mutable,      "mutable")
 
 	// access specifiers
@@ -257,7 +256,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_PRS_TOKEN_NAME (EToken_Union,        "union")
 	AXL_PRS_TOKEN_NAME (EToken_Class,        "class")
-	AXL_PRS_TOKEN_NAME (EToken_Interface,    "interface")
 	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
 
 	// special members

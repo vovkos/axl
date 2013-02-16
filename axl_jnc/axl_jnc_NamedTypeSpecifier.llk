@@ -136,14 +136,14 @@ union_specifier
 
 //.............................................................................
 
-// class & interface
+// class 
 
 class
 {
 	CClassType* m_pType;
 }
 class_specifier
-	: (EToken_Class | EToken_Interface $i)
+	: EToken_Class
 	  struct_pack_factor $p?
 	  (EToken_Identifier $n generic_formal_argument_list $g?)?
 	  (':' type_name_list $b)?
@@ -151,8 +151,7 @@ class_specifier
 			$.m_pType = CreateClassType (
 				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
 				IsValidLocator ($b) ? &$b.m_TypeList : NULL,
-				IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor,
-				IsValidLocator ($i) ? EClassTypeFlag_Interface : 0
+				IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
 				);
 
 			if (!$.m_pType)
@@ -300,13 +299,11 @@ named_type_block <CNamespace* $pNamespace>
 	: '{' 
 		{
 			m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
-			SetDefaultMethodStorageKind ();
 		}
 	  named_type_block_declaration*
 	  '}'
 		{
 			m_pModule->m_NamespaceMgr.CloseNamespace ();
-			SetDefaultMethodStorageKind ();		
 		}
 	;
 

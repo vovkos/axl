@@ -334,7 +334,7 @@ CValue::SetFunction (CFunction* pFunction)
 	if (!pFunction->IsOverloaded ())
 		m_pType = pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin);
 
-	if (pFunction->GetStorageKind () != EStorage_Virtual)
+	if (!pFunction->IsVirtual ())
 		m_pLlvmValue = pFunction->GetLlvmFunction ();
 }
 

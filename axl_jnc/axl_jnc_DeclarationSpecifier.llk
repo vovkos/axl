@@ -80,7 +80,7 @@ storage_specifier
 		{
 			$.m_StorageKind = EStorage_Static;
 		}
-	| EToken_Abstract EToken_Virtual?
+	| EToken_Abstract
 		{
 			$.m_StorageKind = EStorage_Abstract;
 		}
@@ -88,9 +88,9 @@ storage_specifier
 		{
 			$.m_StorageKind = EStorage_Virtual;
 		}
-	| EToken_NoVirtual
+	| EToken_Override
 		{
-			$.m_StorageKind = EStorage_NoVirtual;
+			$.m_StorageKind = EStorage_Override;
 		}
 	| EToken_Mutable
 		{

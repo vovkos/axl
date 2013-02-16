@@ -225,17 +225,13 @@ public:
 	CreateClassType (
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		size_t PackFactor = 8,
-		int Flags = 0
+		size_t PackFactor = 8
 		);
 
 	CClassType* 
-	CreateUnnamedClassType (
-		size_t PackFactor = 8,
-		int Flags = 0
-		)
+	CreateUnnamedClassType (size_t PackFactor = 8)
 	{
-		return CreateClassType (rtl::CString (), rtl::CString (), PackFactor, Flags);
+		return CreateClassType (rtl::CString (), rtl::CString (), PackFactor);
 	}
 	
 	CFunctionType* 
