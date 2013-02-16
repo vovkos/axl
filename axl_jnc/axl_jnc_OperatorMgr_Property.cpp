@@ -38,17 +38,9 @@ COperatorMgr::GetPropertyVTable (
 	CValue* pResultValue
 	)
 {
-	bool Result;
-
 	if (pProperty->IsVirtual ())
 	{
-		if (!pClosure || !pClosure->IsMemberClosure ())
-		{
-			err::SetFormatStringError (_T("virtual property requires an object pointer"));
-			return false;
-		}
-
-		Result = GetVirtualPropertyMember (pProperty, pClosure, pResultValue);
+		bool Result = GetVirtualPropertyMember (pProperty, pClosure, pResultValue);
 		if (!Result)
 			return false;
 	}

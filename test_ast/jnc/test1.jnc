@@ -6,7 +6,7 @@ class IFoo
 
 	abstract
 	int 
-	Foo ();
+	Foo (int x);
 };
 
 class IBar
@@ -15,7 +15,7 @@ class IBar
 
 	abstract
 	int 
-	Bar ();
+	Bar (int x);
 };
 
 class CTest: IFoo, IBar
@@ -31,10 +31,11 @@ class CTest: IFoo, IBar
 
 	override 
 	int 
-	Foo ()
+	Foo (int x)
 	{
 		return printf (
-			"CTest.Foo () { %d, %d, %d } \n", 
+			"CTest.Foo (%d) { %d, %d, %d } \n", 
+			x,
 			m_FooValue,
 			m_BarValue,
 			m_TestValue
@@ -43,10 +44,11 @@ class CTest: IFoo, IBar
 
 	override 
 	int 
-	Bar ()
+	Bar (int x)
 	{
 		return printf (
-			"CTest.Bar () { %d, %d, %d } \n", 
+			"CTest.Bar (%d) { %d, %d, %d } \n", 
+			x,
 			m_FooValue,
 			m_BarValue,
 			m_TestValue
@@ -60,15 +62,12 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
-	CTest t = stack new CTest;
-	t.Foo ();
-	t.Bar ();
-	
+	CTest t = new CTest;
 	IFoo f = t;
-	f.Foo ();
-	
 	IBar b = t;
-	b.Bar ();
+
+	int function* pfn () = b.Bar ~(5);
+	pfn ();
 
 	return 0;
 }

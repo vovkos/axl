@@ -482,6 +482,12 @@ public:
 	}
 
 	void
+	GetThinDataPtrScopeLevel (
+		const CValue& Value,
+		CValue* pResultValue
+		);
+
+	void
 	GetThinDataPtrValidator (
 		const CValue& Value,
 		CValue* pResultValue

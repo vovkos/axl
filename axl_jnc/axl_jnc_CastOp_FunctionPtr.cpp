@@ -81,13 +81,15 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 bool
 CCast_FunctionPtr_Thin2Normal::LlvmCast (
 	EAlloc AllocKind,
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
-	
+	ASSERT (RawOpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
+
+	CValue OpValue = RawOpValue;
+
 	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetType ();
 	CFunctionPtrType* pDstPtrType = (CFunctionPtrType*) pType;
 
@@ -96,11 +98,18 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 
 	CClosure* pClosure = OpValue.GetClosure ();
 	
-	CValue SimpleClosureObjValue;
+	CValue SimpleClosureValue;
 	
 	bool IsSimpleClosure = pClosure && pClosure->IsSimpleClosure ();
 	if (IsSimpleClosure)
-		SimpleClosureObjValue = *pClosure->GetArgList ()->GetHead ();
+		SimpleClosureValue = *pClosure->GetArgList ()->GetHead ();
+
+	if (OpValue.GetValueKind () == EValue_Function && OpValue.GetFunction ()->IsVirtual ())
+	{
+		bool Result = m_pModule->m_OperatorMgr.GetVirtualMethodMember (OpValue.GetFunction (), pClosure, &OpValue);
+		if (!Result)
+			return false;
+	}
 
 	// case 1: no conversion required, no closure object needs to be created
 
@@ -110,7 +119,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 	{
 		return LlvmCast_NoThunkSimpleClosure (
 			OpValue,
-			SimpleClosureObjValue,
+			SimpleClosureValue,
 			pSrcFunctionType, 
 			pDstPtrType,
 			pResultValue
@@ -135,7 +144,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 		if (IsSimpleClosure && pFunction->GetType ()->IsMethodMemberType ())
 			return LlvmCast_DirectThunkSimpleClosure (
 				pFunction,
-				SimpleClosureObjValue,
+				SimpleClosureValue,
 				pDstPtrType,
 				pResultValue
 				);
@@ -236,7 +245,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 
 	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetClosureThunkFunction (
 		pSrcFunctionType,
-		OpValue.GetFunction (), 
+		OpValue.GetValueKind () == EValue_Function ? OpValue.GetFunction () : NULL, 
 		pClosureType,
 		ClosureMap,
 		pDstPtrType->GetTargetType ()

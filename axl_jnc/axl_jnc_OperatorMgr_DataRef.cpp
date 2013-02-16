@@ -8,6 +8,51 @@ namespace jnc {
 //.............................................................................
 
 void
+COperatorMgr::GetThinDataPtrScopeLevel (
+	const CValue& Value,
+	CValue* pResultValue
+	)
+{
+	EValue ValueKind = Value.GetValueKind ();
+	if (ValueKind == EValue_Variable)
+	{	
+		CalcScopeLevelValue (Value.GetVariable ()->GetScope (), pResultValue);
+		return;
+	}
+
+	ASSERT (ValueKind == EValue_Field && Value.GetClosure ());
+
+	CValue ClassPtrValue = *Value.GetClosure ()->GetArgList ()->GetHead ();
+
+	CValue ObjPtrValue;
+	
+	size_t ObjPtrIndexArray [] = 
+	{
+		0, // iface* 
+		0, // iface.hdr*
+		1, // TObject**
+	};
+
+	m_pModule->m_LlvmBuilder.CreateGep (
+		ClassPtrValue, 
+		ObjPtrIndexArray, 
+		countof (ObjPtrIndexArray), 
+		NULL, 
+		&ObjPtrValue
+		);  
+
+	m_pModule->m_LlvmBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObject* 
+
+	CValue ScopeLevelValue;
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
+	m_pModule->m_LlvmBuilder.CreateLoad (
+		ScopeLevelValue, 
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
+		pResultValue
+		); 
+}
+
+void
 COperatorMgr::GetThinDataPtrValidator (
 	const CValue& Value,
 	CValue* pResultValue
@@ -19,7 +64,7 @@ COperatorMgr::GetThinDataPtrValidator (
 		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (Value.GetVariable (), pResultValue);
 		return;
 	}
-
+	
 	ASSERT (ValueKind == EValue_Field);
 
 	CClosure* pClosure = Value.GetClosure ();

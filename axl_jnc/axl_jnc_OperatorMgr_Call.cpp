@@ -114,12 +114,6 @@ COperatorMgr::CallOperator (
 
 		if (pFunction->IsVirtual ())
 		{
-			if (!pClosure || !pClosure->IsMemberClosure ())
-			{
-				err::SetFormatStringError (_T("virtual method call requires an object pointer"));
-				return false;
-			}
-
 			Result = GetVirtualMethodMember (pFunction, pClosure, &OpValue);
 			if (!Result)
 				return false;

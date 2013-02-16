@@ -496,7 +496,13 @@ COperatorMgr::GetVirtualMethodMember (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pFunction->IsVirtual () && pClosure && pClosure->IsMemberClosure ());
+	ASSERT (pFunction->IsVirtual ());
+
+	if (!pClosure || !pClosure->IsMemberClosure ())
+	{
+		err::SetFormatStringError (_T("virtual method requires an object pointer"));
+		return false;
+	}
 	
 	CValue Value = *pClosure->GetArgList ()->GetHead ();
 	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
@@ -534,6 +540,7 @@ COperatorMgr::GetVirtualMethodMember (
 		pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin)
 		);
 
+	pResultValue->SetClosure (pClosure);
 	return true;
 }
 
@@ -544,8 +551,14 @@ COperatorMgr::GetVirtualPropertyMember (
 	CValue* pResultValue
 	)
 {
-	ASSERT (pProperty->IsVirtual () && pClosure && pClosure->IsMemberClosure ());
+	ASSERT (pProperty->IsVirtual ());
 	
+	if (!pClosure || !pClosure->IsMemberClosure ())
+	{
+		err::SetFormatStringError (_T("virtual method requires an object pointer"));
+		return false;
+	}
+
 	CValue Value = *pClosure->GetArgList ()->GetHead ();
 	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
@@ -575,6 +588,7 @@ COperatorMgr::GetVirtualPropertyMember (
 		);
 
 	pResultValue->OverrideType (PtrValue, pProperty->GetType ()->GetPropertyPtrType (EPropertyPtrType_Thin));
+	pResultValue->SetClosure (pClosure);
 	return true;
 }
 

@@ -30,8 +30,7 @@ COperatorMgr::GetDataRefScopeLevel (
 		break;
 
 	case EDataPtrType_Thin:
-		ASSERT (Value.GetValueKind () == EValue_Variable);
-		CalcScopeLevelValue (Value.GetVariable ()->GetScope (), pScopeLevelValue);
+		GetThinDataPtrScopeLevel (Value, pScopeLevelValue);
 		break;
 
 	case EDataPtrType_Unsafe:
@@ -95,9 +94,7 @@ COperatorMgr::CheckDataPtrScopeLevel (
 		break;
 
 	case EDataPtrType_Thin:
-		ASSERT (SrcValue.GetValueKind () == EValue_Variable);
-
-		if (DstValue.GetValueKind () == EValue_Variable)
+		if (SrcValue.GetValueKind () == EValue_Variable && DstValue.GetValueKind () == EValue_Variable)
 		{
 			if (SrcValue.GetVariable ()->GetScopeLevel () > DstValue.GetVariable ()->GetScopeLevel ())
 			{
@@ -108,7 +105,7 @@ COperatorMgr::CheckDataPtrScopeLevel (
 			return true;
 		}
 
-		CalcScopeLevelValue (SrcValue.GetVariable ()->GetScope (), &SrcScopeLevelValue);
+		GetThinDataPtrScopeLevel (SrcValue, &SrcScopeLevelValue);
 		break;
 
 	case EDataPtrType_Unsafe:
