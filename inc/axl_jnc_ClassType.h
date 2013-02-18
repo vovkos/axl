@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "axl_jnc_DerivableType.h"
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
@@ -26,61 +27,9 @@ enum EClassTypeFlag
 	EClassTypeFlag_AutoEv    = 0x020000,
 };
 
-//.............................................................................
-
-class CClassBaseType: public rtl::TListLink
-{
-protected:
-	friend class CClassType;
-
-	CClassType* m_pType;
-	CStructBaseType* m_pFieldBaseType;
-	size_t m_VTableIndex;
-
-public:
-	CClassBaseType ()
-	{
-		m_pType = NULL;
-		m_pFieldBaseType = NULL;
-		m_VTableIndex = -1;
-	}
-
-	CClassType*
-	GetType ()
-	{
-		return m_pType;
-	}
-
-	CStructBaseType* 
-	GetFieldBaseType ()
-	{
-		return m_pFieldBaseType;
-	}
-
-	size_t
-	GetVTableIndex ()
-	{
-		return m_VTableIndex;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CClassBaseTypeCoord
-{
-public:
-	CStructBaseTypeCoord m_FieldCoord;
-	size_t m_VTableIndex;
-
-	CClassBaseTypeCoord ()
-	{
-		m_VTableIndex = 0;
-	}
-};
-
 //............................................................................
 
-class CClassType: public CNamedType
+class CClassType: public CDerivableType
 {
 protected:
 	friend class CTypeMgr;
@@ -98,11 +47,6 @@ protected:
 	CFunction* m_pDestructor;
 	CFunction* m_pInitializer;
 
-	// base types
-
-	rtl::CStringHashTableMapAT <CClassBaseType*> m_BaseTypeMap;
-	rtl::CStdListT <CClassBaseType> m_BaseTypeList;
-
 	// fields
 
 	size_t m_PackFactor;
@@ -112,6 +56,7 @@ protected:
 	// vtable
 
 	rtl::CArrayT <CFunction*> m_VirtualMethodArray;
+	rtl::CArrayT <CFunction*> m_OverrideMethodArray;
 	rtl::CArrayT <CProperty*> m_VirtualPropertyArray;
 
 	CStructType* m_pVTableStructType;
@@ -179,36 +124,6 @@ public:
 
 	CFunction* 
 	GetInitializer ();
-
-	rtl::CConstListT <CClassBaseType>
-	GetBaseTypeList ()
-	{
-		return m_BaseTypeList;
-	}
-
-	bool
-	FindBaseType (
-		CClassType* pType,
-		CClassBaseTypeCoord* pCoord = NULL
-		)
-	{
-		return FindBaseTypeImpl (pType, pCoord, 0);
-	}
-
-	CClassBaseType*
-	AddBaseType (CClassType* pType);
-
-	CModuleItem*
-	FindItemWithBaseTypeList (const tchar_t* pName);
-	
-	CModuleItem*
-	FindMember (
-		const tchar_t* pName,
-		CClassBaseTypeCoord* pBaseTypeCoord = NULL
-		)
-	{
-		return FindMemberImpl (true, true, pName, pBaseTypeCoord, 0);
-	}
 
 	size_t
 	GetPackFactor ()
@@ -337,22 +252,6 @@ protected:
 	{
 		ASSERT (false);
 	}
-
-	bool
-	FindBaseTypeImpl (
-		CClassType* pType,
-		CClassBaseTypeCoord* pCoord,
-		size_t Level
-		);
-
-	CModuleItem*
-	FindMemberImpl (
-		bool IncludeThis,
-		bool IncludeExtensionNamespace,
-		const tchar_t* pName,
-		CClassBaseTypeCoord* pBaseTypeCoord,
-		size_t Level
-		);
 
 	void
 	AddVirtualFunction (CFunction* pFunction);

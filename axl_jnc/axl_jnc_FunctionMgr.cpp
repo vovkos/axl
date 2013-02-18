@@ -167,11 +167,6 @@ CFunctionMgr::CompileFunctions ()
 		if (!pFunction->HasBody ())
 			continue;
 
-		// set namespace
-
-		CNamespace* pNamespace = pFunction->GetParentNamespace ();
-		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
-
 		// prologue
 
 		CValue ThisValue;
@@ -246,15 +241,22 @@ CFunctionMgr::Prologue (
 {
 	m_pCurrentFunction = pFunction;
 
-	// create entry block and scope
+	// create scope
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.CreateScope ();
+	pScope->m_pParentNamespace = pFunction->GetParentNamespace ();
+	pScope->m_BeginPos = Pos;
+	pScope->m_pFunction = pFunction;
+	pFunction->m_pScope = pScope;
+
+	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pScope);
+
+	// create entry block 
 
 	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
 	m_pModule->m_ControlFlowMgr.ResetHasReturn ();
-
-	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
-	pFunction->m_pScope = pScope;
-
+	
 	// store arguments
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
@@ -317,9 +319,11 @@ CFunctionMgr::Prologue (
 bool
 CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 {
-	ASSERT (m_pCurrentFunction);
 	CFunction* pFunction = m_pCurrentFunction;
-	
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+
+	ASSERT (m_pCurrentFunction && pScope);
+
 	// ensure return
 
 	CBasicBlock* pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
@@ -354,8 +358,6 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		}
 	}
 
-	m_pModule->m_NamespaceMgr.CloseScope (Pos);
-
 	try 
 	{
 		llvm::verifyFunction (*pFunction->GetLlvmFunction (), llvm::ReturnStatusAction);
@@ -371,6 +373,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		return false;
 	}
 
+	pScope->m_EndPos = Pos;
 	m_pCurrentFunction = NULL;
 	return true;
 }
@@ -1428,16 +1431,16 @@ CFunctionMgr::InitializeInterface (
 
 	// base types
 
-	rtl::CIteratorT <CClassBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
+	rtl::CIteratorT <CBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		CClassType* pBaseClassType = BaseType->GetType ();
+		CClassType* pBaseClassType = (CClassType*) BaseType->GetType ();
 		CValue BaseClassPtrValue;
 		CValue BaseClassVTablePtrValue;
 
 		m_pModule->m_LlvmBuilder.CreateGep2 (
 			IfacePtrValue, 
-			BaseType->GetFieldBaseType ()->GetLlvmIndex (), 
+			BaseType->GetLlvmIndex (), 
 			NULL, 
 			&BaseClassPtrValue
 			);

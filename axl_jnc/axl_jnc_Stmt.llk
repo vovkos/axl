@@ -40,12 +40,12 @@ start
 compound_stmt
 	: '{' $l
 		{
-			$.m_pScope = m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
+			$.m_pScope = OpenScope ($l.m_Pos);
 		}
 	  local_declaration* 
 	  '}' $r
 		{
-			m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
+			CloseScope ($r.m_Pos);
 		}
 	;
 
@@ -122,13 +122,13 @@ switch_stmt
 		}
 	  '{' $a
 		{
-			CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope ($a.m_Pos);
+			CScope* pScope = OpenScope ($a.m_Pos);
 			pScope->m_pBreakBlock = $.m_pFollowBlock;
 		}	   
 	  switch_block_stmt <&$>* 
 	  '}' $a2
 		{
-			m_pModule->m_NamespaceMgr.CloseScope ($a2.m_Pos);
+			CloseScope ($a2.m_Pos);
 			m_pModule->m_ControlFlowMgr.Follow ($.m_pFollowBlock);
 
 			return FinalizeSwitchStmt (&$);
@@ -163,14 +163,14 @@ enter
 }
 	: EToken_While '(' expression $e ')' $a
 		{
-			CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope ($a.m_Pos);
+			CScope* pScope = OpenScope ($a.m_Pos);
 			pScope->m_pBreakBlock = $pFollowBlock;
 			pScope->m_pContinueBlock = $pConditionBlock;
 			return m_pModule->m_ControlFlowMgr.ConditionalJump ($e.m_Value, $pBodyBlock, $pFollowBlock);
 		}		
 	  statement $s
 		{
-			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
+			CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pConditionBlock, $pFollowBlock);
 		}		
 	;
@@ -191,7 +191,7 @@ enter
 }
 	: EToken_Do
 		{
-			CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+			CScope* pScope = OpenScope ($1.m_Pos);
 			pScope->m_pBreakBlock = $pFollowBlock;
 			pScope->m_pContinueBlock = $pConditionBlock;
 		}
@@ -225,7 +225,7 @@ enter
 }
 	: EToken_For '(' 
 		{
-			$pScope = m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+			$pScope = OpenScope ($1.m_Pos);
 		}	  
 	  (item_declaration_w_specifier | expression_or_empty_list ';') 
 	  (
@@ -255,7 +255,7 @@ enter
 		}
 	  statement $s
 		{
-			m_pModule->m_NamespaceMgr.CloseScope ($s.m_LastToken.m_Pos);
+			CloseScope ($s.m_LastToken.m_Pos);
 			m_pModule->m_ControlFlowMgr.Jump ($pLoopBlock, $pFollowBlock);
 
 			if (!($pFollowBlock->GetFlags () & EBasicBlockFlag_Jumped))

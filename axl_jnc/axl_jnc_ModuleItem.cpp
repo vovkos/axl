@@ -23,7 +23,6 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		_T("property"),                    // EModuleItem_Property,
 		_T("enum-member"),                 // EModuleItem_EnumMember,
 		_T("struct-member"),               // EModuleItem_StructMember,
-		_T("union-member"),                // EModuleItem_UnionMember,
 	};
 
 	return ItemKind >= 0 && ItemKind < EModuleItem__Count ? 

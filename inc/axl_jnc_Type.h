@@ -638,6 +638,15 @@ public:
 	{
 		return m_pExtensionNamespace;
 	}
+
+protected:
+	virtual
+	CModuleItem*
+	FindItemTraverseImpl (
+		const tchar_t* pName,
+		CBaseTypeCoord* pCoord,
+		int Flags
+		);
 };
 
 //.............................................................................

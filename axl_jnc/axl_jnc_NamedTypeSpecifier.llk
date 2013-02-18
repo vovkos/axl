@@ -31,12 +31,12 @@ enum_specifier
 enum_block <CEnumType* $pType>
 	: '{' 
 		{
-			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+			OpenNamespace ($pType);	
 		}
 	  enum_member_list <$pType> 
 	  '}'
 		{
-			m_pModule->m_NamespaceMgr.CloseNamespace ();	
+			CloseNamespace ();	
 		}
 	;
 
@@ -298,12 +298,12 @@ autoev_stmt
 named_type_block <CNamespace* $pNamespace>
 	: '{' 
 		{
-			m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
+			OpenNamespace ($pNamespace);
 		}
 	  named_type_block_declaration*
 	  '}'
 		{
-			m_pModule->m_NamespaceMgr.CloseNamespace ();
+			CloseNamespace ();
 		}
 	;
 

@@ -114,6 +114,7 @@ protected:
 	{
 		EUnOp m_UnOpKind;
 		EBinOp m_BinOpKind;
+		CType* m_pCastOpType;
 	};
 
 	CNamespace* m_pParentNamespace;
@@ -122,10 +123,10 @@ protected:
 	CFunctionTypeOverload m_TypeOverload;
 	rtl::CArrayT <CFunction*> m_OverloadArray;
 
-	// orphan functions
+	// override & orphan functions
 
 	CNamespace* m_pOrphanNamespace;
-	CQualifiedName m_OrphanName;
+	CQualifiedName m_DeclaratorName;
 	CFunction* m_pExternFunction;
 
 	// for non-static method members
@@ -202,6 +203,18 @@ public:
 	GetClassType ()
 	{
 		return m_pClassType;
+	}
+
+	bool
+	IsOrphan ()
+	{
+		return m_pOrphanNamespace != NULL;
+	}
+
+	bool
+	IsAccessor ()
+	{
+		return m_FunctionKind == EFunction_Getter || m_FunctionKind == EFunction_Setter;
 	}
 
 	bool

@@ -139,46 +139,13 @@ CNamespace::FindItem (const CQualifiedName& Name)
 }
 
 CModuleItem*
-CNamespace::FindItemTraverse (const tchar_t* pName)
+CNamespace::FindItemTraverse (
+	const CQualifiedName& Name,
+	CBaseTypeCoord* pCoord,
+	int Flags
+	)
 {
-	for (CNamespace* pNamespace = this; pNamespace; pNamespace = pNamespace->m_pParentNamespace)
-	{
-		CModuleItem* pItem;
-
-		if (pNamespace->m_NamespaceKind == ENamespace_Type)
-		{
-			CNamedType* pNamedType = (CNamedType*) pNamespace;
-			EType NamedTypeKind = pNamedType->GetTypeKind ();
-			switch (NamedTypeKind)
-			{
-			case EType_Class:
-				pItem = ((CClassType*) pNamedType)->FindItemWithBaseTypeList (pName);
-				break;
-
-			case EType_Struct:
-				pItem = ((CStructType*) pNamedType)->FindItemWithBaseTypeList (pName);
-				break;
-
-			default:
-				pItem = pNamespace->FindItem (pName);
-			}
-		}
-		else
-		{
-			pItem = pNamespace->FindItem (pName);
-		}
-			
-		if (pItem)
-			return pItem;
-	}
-
-	return NULL;
-}
-
-CModuleItem*
-CNamespace::FindItemTraverse (const CQualifiedName& Name)
-{
-	CModuleItem* pItem = FindItemTraverse (Name.m_First);
+	CModuleItem* pItem = FindItemTraverse (Name.m_First, pCoord, Flags);
 	if (!pItem)
 		return NULL;
 
@@ -188,12 +155,39 @@ CNamespace::FindItemTraverse (const CQualifiedName& Name)
 		CNamespace* pNamespace = GetItemNamespace (pItem);
 		if (!pNamespace)
 			return NULL;
+
 		pItem = pNamespace->FindItem (*NameIt);
 		if (!pItem)
 			return NULL;
 	}
 
 	return pItem;
+}
+
+CModuleItem*
+CNamespace::FindItemTraverseImpl (
+	const tchar_t* pName,
+	CBaseTypeCoord* pCoord,
+	int Flags
+	)
+{
+	CModuleItem* pItem;
+
+	if (!(Flags & ETraverse_NoThis))
+	{
+		pItem = FindItem (pName);
+		if (pItem)
+			return pItem;
+	}
+
+	if (!(Flags & ETraverse_NoParentNamespace) && m_pParentNamespace)
+	{
+		pItem = m_pParentNamespace->FindItemTraverse (pName, pCoord, Flags & ~ETraverse_NoThis);
+		if (pItem)
+			return pItem;
+	}
+
+	return NULL;
 }
 
 bool

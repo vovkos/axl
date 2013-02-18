@@ -28,7 +28,6 @@ protected:
 	rtl::CStdListT <CScope> m_ScopeList;
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
-	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 
 public:
 	CNamespaceMgr ();
@@ -61,10 +60,7 @@ public:
 	}
 
 	void
-	SetCurrentNamespace (CNamespace* pNamespace)
-	{
-		m_pCurrentNamespace = pNamespace ? pNamespace : &m_GlobalNamespace;
-	}
+	SetCurrentNamespace (CNamespace* pNamespace);
 
 	void
 	SetGlobalNamespace ()
@@ -79,52 +75,19 @@ public:
 	}
 
 	CGlobalNamespace*
-	CreateNamespace (const rtl::CString& Name);
-
-	CGlobalNamespace*
-	OpenNamespace (
-		const CToken::CPos& Pos,
-		const rtl::CString& Name
-		)
-	{
-		return OpenNamespaceImpl (Pos, Name, true);
-	}
-
-	CGlobalNamespace*
-	OpenNamespace (
-		const CToken::CPos& Pos,
-		const CQualifiedName& Name
+	CreateGlobalNamespace (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName
 		);
-
-	void
-	OpenNamespace (CNamespace* pNamespace);
-
-	void
-	CloseNamespace ();
 
 	CScope*
-	OpenScope (
-		const CToken::CPos& Pos,
-		CBasicBlock* pBreakBlock = NULL,
-		CBasicBlock* pContinueBlock = NULL
-		);
-
-	void
-	CloseScope (const CToken::CPos& Pos);
+	CreateScope ();
 
 	CScope*
 	FindBreakScope (size_t Level);
 
 	CScope*
 	FindContinueScope (size_t Level);
-
-protected:
-	CGlobalNamespace*
-	OpenNamespaceImpl (
-		const CToken::CPos& Pos,
-		const rtl::CString& Name,
-		bool AddToStack
-		);
 };
 
 //.............................................................................

@@ -7,7 +7,7 @@ namespace jnc {
 
 //.............................................................................
 
-CUnionMember*
+CStructMember*
 CUnionType::CreateMember (
 	const rtl::CString& Name,
 	CType* pType,
@@ -20,9 +20,9 @@ CUnionType::CreateMember (
 		return NULL;
 	}
 
-	CUnionMember* pMember = AXL_MEM_NEW (CUnionMember);
+	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
 	pMember->m_Name = Name;
-	pMember->m_pParentUnionType = this;
+	pMember->m_pParentType = this;
 	pMember->m_pType = pType;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
@@ -47,10 +47,10 @@ CUnionType::CalcLayout ()
 
 	CType* pLargestMemberType = NULL;
 
-	rtl::CIteratorT <CUnionMember> Member = m_MemberList.GetHead ();
+	rtl::CIteratorT <CStructMember> Member = m_MemberList.GetHead ();
 	for (; Member; Member++)
 	{
-		CUnionMember* pMember = *Member;
+		CStructMember* pMember = *Member;
 
 		Result = pMember->m_pType->CalcLayout ();
 		if (!Result)

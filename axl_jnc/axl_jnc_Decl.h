@@ -211,6 +211,7 @@ protected:
 	EFunction m_FunctionKind;
 	EUnOp m_UnOpKind;
 	EBinOp m_BinOpKind;
+	CType* m_pCastOpType;
 	CQualifiedName m_Name;
 	CToken::CPos m_Pos;
 	CType* m_pType;
@@ -245,6 +246,12 @@ public:
 	GetBinOpKind ()
 	{
 		return m_BinOpKind;
+	}
+
+	CType*
+	GetCastOpType ()
+	{
+		return m_pCastOpType;
 	}
 
 	bool

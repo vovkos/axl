@@ -191,6 +191,7 @@ CDeclarator::CDeclarator ()
 	m_FunctionKind = EFunction_Undefined;
 	m_UnOpKind = EUnOp_Undefined;
 	m_BinOpKind = EBinOp_Undefined;
+	m_pCastOpType = NULL;
 	m_pType = NULL;
 	m_BitCount = 0;
 	m_PostDeclaratorModifiers = 0;
@@ -263,7 +264,9 @@ CDeclarator::AddUnnamedMethod (EFunction FunctionKind)
 bool
 CDeclarator::AddCastOperator (CType* pType)
 {
-	err::SetFormatStringError (_T("overloaded cast operators not implemented yet"));
+	m_DeclaratorKind = EDeclarator_CastOperator;
+	m_FunctionKind = EFunction_CastOperator;
+	m_pCastOpType = pType;
 	return false;
 }
 

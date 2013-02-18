@@ -36,7 +36,6 @@ protected:
 
 	EVariable m_VariableKind;
 	CType* m_pType;
-	CType* m_pDualType;
 	CScope* m_pScope;
 	llvm::Value* m_pLlvmValue;
 

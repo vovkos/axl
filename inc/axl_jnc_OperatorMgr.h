@@ -414,6 +414,7 @@ public:
 	GetFieldMember (
 		const CValue& ThisValue,
 		CStructMember* pMember,
+		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 
@@ -783,7 +784,7 @@ protected:
 	ClassFieldMemberOperator (
 		const CValue& OpValue,
 		CStructMember* pMember,
-		CClassBaseTypeCoord* pCoord,
+		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 

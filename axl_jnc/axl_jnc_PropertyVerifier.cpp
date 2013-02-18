@@ -60,6 +60,11 @@ CPropertyVerifier::CreateIndexArgSignature (
 {
 	ASSERT (FunctionKind == EFunction_Getter || FunctionKind == EFunction_Setter);
 
+	// refine!!!
+
+	if (pFunctionType->IsMethodMemberType ())
+		pFunctionType = pFunctionType->GetShortType ();
+
 	if (FunctionKind == EFunction_Getter)
 		return pFunctionType->CreateArgSignature ();
 

@@ -66,6 +66,7 @@ Members
 
 	CModuleItem* m_pLastDeclaredItem;
 
+	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
 	rtl::CBoxListT <CValue> m_BindablePropertyList;
 }
@@ -107,11 +108,21 @@ Members2
 		const CToken::CPos& Pos
 		);
 
-	bool
-	OpenNamespace (
+	CGlobalNamespace*
+	OpenGlobalNamespace (
 		const CQualifiedName& Name,
 		const CToken::CPos& Pos
 		);
+
+	CGlobalNamespace*
+	GetGlobalNamespace (
+		CGlobalNamespace* pParentNamespace,
+		const rtl::CString& Name,
+		const CToken::CPos& Pos
+		);
+
+	void
+	OpenNamespace (CNamespace* pNamespace);
 
 	bool
 	OpenTypeExtension (
@@ -121,6 +132,12 @@ Members2
 
 	void
 	CloseNamespace ();
+
+	CScope*
+	OpenScope (const CToken::CPos& Pos);
+
+	void
+	CloseScope (const CToken::CPos& Pos);
 
 	bool
 	Declare (

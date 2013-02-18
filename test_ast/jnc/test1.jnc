@@ -4,70 +4,52 @@ class IFoo
 {
 	int m_FooValue;
 
-	abstract
-	int 
-	Foo (int x);
+	abstract 
+	int property FooProp;
 };
 
-class IBar
-{
-	int m_BarValue;
-
-	abstract
-	int 
-	Bar (int x);
-};
-
-class CTest: IFoo, IBar
+class CTest: IFoo
 {
 	int m_TestValue;
 
 	preconstruct ()
 	{
 		m_FooValue = 100;
-		m_BarValue = 200;
 		m_TestValue = 300;
 	}	 
 
 	override 
 	int 
-	Foo (int x)
+	FooProp.get ()
 	{
 		return printf (
-			"CTest.Foo (%d) { %d, %d, %d } \n", 
-			x,
+			"CTest.FooProp.get () { %d, %d } \n", 
 			m_FooValue,
-			m_BarValue,
 			m_TestValue
 			);
 	}
 
 	override 
-	int 
-	Bar (int x)
+	FooProp.set (int x)
 	{
-		return printf (
-			"CTest.Bar (%d) { %d, %d, %d } \n", 
+		printf (
+			"CTest.FooProp.set (%d) { %d, %d } \n", 
 			x,
 			m_FooValue,
-			m_BarValue,
 			m_TestValue
 			);
 	}
 };
-
 
 int
 main ()
 {
 	printf ("hui govno i muravei\n");
 
-	CTest t = new CTest;
-	IFoo f = t;
-	IBar b = t;
-
-	int function* pfn () = b.Bar ~(5);
-	pfn ();
+	IFoo f = new CTest;
+	
+	int x = f.FooProp;
+	f.FooProp = 500;	
 
 	return 0;
 }

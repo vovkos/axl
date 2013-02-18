@@ -21,6 +21,8 @@ class CScope:
 {
 protected:
 	friend class CNamespaceMgr;
+	friend class CFunctionMgr;
+	friend class CParser;
 
 	size_t m_Level;
 

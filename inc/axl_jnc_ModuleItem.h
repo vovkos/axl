@@ -27,7 +27,6 @@ enum EModuleItem
 	EModuleItem_Property,
 	EModuleItem_EnumMember,
 	EModuleItem_StructMember,
-	EModuleItem_UnionMember,
 	EModuleItem__Count,
 };
 

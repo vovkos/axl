@@ -113,15 +113,6 @@ protected:
 		);
 
 	void
-	AddUnionMember (
-		HTREEITEM hParent,
-		jnc::CUnionMember* pMember
-		)
-	{
-		AddValue (hParent, pMember->GetName (), pMember->GetType (), pMember);
-	}
-
-	void
 	AddClassTypeMembers (
 		HTREEITEM hParent,
 		jnc::CClassType* pType

@@ -31,130 +31,6 @@ CStructType::CStructType ()
 	m_LastBitFieldOffset = 0;
 }
 
-bool
-CStructType::FindBaseTypeImpl (
-	CStructType* pType,
-	CStructBaseTypeCoord* pCoord,
-	size_t Level
-	)
-{
-	rtl::CStringHashTableMapIteratorAT <CStructBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
-	if (It)
-	{
-		if (pCoord)
-		{
-			CStructBaseType* pBaseType = It->m_Value;
-			pCoord->m_Offset = pBaseType->m_Offset;
-			pCoord->m_LlvmIndexArray.SetCount (Level + 1);
-			pCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
-		}
-		
-		return true;
-	}
-
-	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CStructBaseType* pBaseType = *BaseType;
-
-		bool Result = pBaseType->m_pType->FindBaseTypeImpl (pType, pCoord, Level + 1);
-		if (Result)
-		{
-			if (pCoord)
-			{
-				pCoord->m_Offset += pBaseType->m_Offset;
-				pCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
-			}
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-CStructBaseType*
-CStructType::AddBaseType (CStructType* pType)
-{
-	rtl::CStringHashTableMapIteratorAT <CStructBaseType*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
-	if (It->m_Value)
-	{
-		err::SetFormatStringError (_T("'%s' is already a base type"), pType->GetTypeString ());
-		return NULL;
-	}
-
-	CStructBaseType* pBaseType = AXL_MEM_NEW (CStructBaseType);
-	pBaseType->m_pType = pType;
-	m_BaseTypeList.InsertTail (pBaseType);
-	It->m_Value = pBaseType;
-	return pBaseType;
-}
-
-CModuleItem*
-CStructType::FindItemWithBaseTypeList (const tchar_t* pName)
-{
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-	if (It)
-		return It->m_Value;
-
-	if (m_Name == pName)
-		return this;
-
-	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CStructType* pStructType = BaseType->m_pType;
-		if (pStructType->m_Name == pName)
-			return pStructType;
-
-		CModuleItem* pItem = pStructType->FindItemWithBaseTypeList (pName);
-		if (pItem)
-			return pItem;
-	}
-
-	return NULL;
-}
-
-CStructMember*
-CStructType::FindMemberImpl (
-	const tchar_t* pName,
-	CStructBaseTypeCoord* pBaseTypeCoord,
-	size_t Level
-	)
-{
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-	if (It)
-	{
-		CModuleItem* pItem = It->m_Value;
-		if (pItem->GetItemKind () != EModuleItem_StructMember)
-			return NULL;
-
-		if (pBaseTypeCoord)
-			pBaseTypeCoord->m_LlvmIndexArray.SetCount (Level);
-
-		return (CStructMember*) pItem;
-	}
-
-	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CStructBaseType* pBaseType = *BaseType;
-		CStructMember* pMember = pBaseType->m_pType->FindMemberImpl (pName, pBaseTypeCoord, Level + 1);
-		if (pMember)
-		{
-			if (pBaseTypeCoord)
-			{
-				pBaseTypeCoord->m_Offset += pBaseType->m_Offset;
-				pBaseTypeCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
-			}
-
-			return pMember;
-		}
-	}
-
-	return NULL;
-}
-
 CStructMember*
 CStructType::CreateMember (
 	const rtl::CString& Name,
@@ -164,7 +40,7 @@ CStructType::CreateMember (
 {
 	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
 	pMember->m_StorageKind = m_StorageKind;
-	pMember->m_pParentStructType = this;
+	pMember->m_pParentType = this;
 	pMember->m_Name = Name;
 	pMember->m_pType = pType;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
@@ -189,7 +65,7 @@ CStructType::Append (CStructType* pType)
 {
 	bool Result;
 
-	rtl::CIteratorT <CStructBaseType> BaseType = pType->m_BaseTypeList.GetHead ();
+	rtl::CIteratorT <CBaseType> BaseType = pType->m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
 		Result = AddBaseType (BaseType->m_pType) != NULL;
@@ -223,10 +99,10 @@ CStructType::CalcLayout ()
 
 	ResetLayout ();
 
-	rtl::CIteratorT <CStructBaseType> BaseType = m_BaseTypeList.GetHead ();
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		CStructBaseType* pBaseType = *BaseType;
+		CBaseType* pBaseType = *BaseType;
 
 		Result = pBaseType->m_pType->CalcLayout ();
 		if (!Result)

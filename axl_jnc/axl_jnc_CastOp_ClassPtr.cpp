@@ -57,7 +57,7 @@ CCast_ClassPtr::LlvmCast (
 		return true;
 	}
 
-	CClassBaseTypeCoord Coord;
+	CBaseTypeCoord Coord;
 	bool Result = pSrcClassType->FindBaseType (pDstClassType, &Coord);
 	if (!Result)
 		return m_pModule->m_LlvmBuilder.DynamicCastInterface (OpValue, pDstClassType, pResultValue);
@@ -73,13 +73,13 @@ CCast_ClassPtr::LlvmCast (
 	m_pModule->m_LlvmBuilder.CreateEq_i (OpValue, SrcNullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pPhiBlock, pNoNullBlock, pNoNullBlock);
 	
-	Coord.m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
+	Coord.m_LlvmIndexArray.Insert (0, 0);
 
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
 		OpValue, 
-		Coord.m_FieldCoord.m_LlvmIndexArray,
-		Coord.m_FieldCoord.m_LlvmIndexArray.GetCount (),
+		Coord.m_LlvmIndexArray,
+		Coord.m_LlvmIndexArray.GetCount (),
 		NULL, 
 		&PtrValue
 		);		

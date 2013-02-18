@@ -70,7 +70,7 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 		if (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Function)
 		{
 			CFunction* pFunction = (CFunction*) m_pLastDeclaredItem;
-			if (pFunction->m_pOrphanNamespace)
+			if (pFunction->IsOrphan ())
 			{
 				err::SetFormatStringError (_T("orphan function '%s' without a body"), pFunction->m_Tag);
 				return false;
@@ -125,13 +125,115 @@ CParser::SetAccessKind (EAccess AccessKind)
 	return true;
 }
 
-bool
-CParser::OpenNamespace (
+CGlobalNamespace*
+CParser::OpenGlobalNamespace (
 	const CQualifiedName& Name,
 	const CToken::CPos& Pos
 	)
 {
-	return m_pModule->m_NamespaceMgr.OpenNamespace (Pos, Name) != NULL; // REFINE namespace management
+	CNamespace* pCurrentNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	if (pCurrentNamespace->GetNamespaceKind () != ENamespace_Global)
+	{
+		err::SetFormatStringError (_T("cannot open global namespace in '%s'"), GetNamespaceKindString (pCurrentNamespace->GetNamespaceKind ()));
+		return NULL;
+	}
+
+	CGlobalNamespace* pNamespace = GetGlobalNamespace ((CGlobalNamespace*) pCurrentNamespace, Name.m_First, Pos);
+	if (!pNamespace)
+		return NULL;
+
+	rtl::CBoxIteratorT <rtl::CString> It = Name.m_List.GetHead ();
+	for (; It; It++)
+	{
+		pNamespace = GetGlobalNamespace (pNamespace, *It, Pos);
+		if (!pNamespace)
+			return NULL;
+	}
+	
+	OpenNamespace (pNamespace);
+	return pNamespace;
+}
+
+CGlobalNamespace*
+CParser::GetGlobalNamespace (
+	CGlobalNamespace* pParentNamespace,
+	const rtl::CString& Name,
+	const CToken::CPos& Pos
+	)
+{
+	CGlobalNamespace* pNamespace;
+
+	CModuleItem* pItem = pParentNamespace->FindItem (Name);
+	if (!pItem)
+	{
+		rtl::CString QualifiedName = pParentNamespace->CreateQualifiedName (Name);
+
+		pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace (Name, QualifiedName);
+		pNamespace->m_Pos = Pos;
+		pNamespace->m_pParentNamespace = pParentNamespace;
+		pParentNamespace->AddItem (pNamespace);
+	}
+	else
+	{
+		if (pItem->GetItemKind () != EModuleItem_Namespace)
+		{
+			err::SetFormatStringError (_T("'%s' exists and is not a namespace"), pParentNamespace->CreateQualifiedName (Name));
+			return NULL;
+		}
+
+		pNamespace = (CGlobalNamespace*) pItem;
+	}
+
+	return pNamespace;
+}
+
+void
+CParser::OpenNamespace (CNamespace* pNamespace)
+{
+	m_NamespaceStack.Append (m_pModule->m_NamespaceMgr.GetCurrentNamespace ());
+	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
+}
+
+void
+CParser::CloseNamespace ()
+{
+	if (m_NamespaceStack.IsEmpty ())
+		return;
+
+	CNamespace* pNamespace = m_NamespaceStack.GetBackAndPop ();
+	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
+}
+
+CScope*
+CParser::OpenScope (const CToken::CPos& Pos)
+{
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pFunction);
+
+	CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	
+	CScope* pScope = m_pModule->m_NamespaceMgr.CreateScope ();
+	pScope->m_pFunction = pFunction;
+	pScope->m_Level = pCurrentScope ? pCurrentScope->GetLevel () + 1 : 1;
+	pScope->m_BeginPos = Pos;
+	pScope->m_EndPos = Pos;
+	pScope->m_pParentNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+
+	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pScope);
+	return pScope;
+}
+
+void
+CParser::CloseScope (const CToken::CPos& Pos)
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	if (!pScope)
+		return;
+
+	pScope->m_EndPos = Pos;
+
+	m_pModule->m_OperatorMgr.ProcessDestructList (&pScope->m_DestructList);
+	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pScope->m_pParentNamespace);
 }
 
 bool
@@ -152,8 +254,10 @@ CParser::OpenTypeExtension (
 	EType TypeKind = pType->GetTypeKind ();
 	switch (TypeKind)
 	{
-	case EType_Class:
 	case EType_Enum:
+	case EType_Struct:
+	case EType_Union:
+	case EType_Class:
 		pNamedType = (CNamedType*) pType;
 		break;
 
@@ -168,27 +272,23 @@ CParser::OpenTypeExtension (
 
 	if (pNamedType->m_pExtensionNamespace)
 	{
-		m_pModule->m_NamespaceMgr.OpenNamespace (pNamedType->m_pExtensionNamespace);
+		OpenNamespace (pNamedType->m_pExtensionNamespace);
 		return true;
 	}
 	
-	CGlobalNamespace* pNamespace = m_pModule->m_NamespaceMgr.CreateNamespace (_T("extension"));
+	CGlobalNamespace* pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace (
+		_T("extension"), 
+		pNamedType->CreateQualifiedName (_T("extension"))
+		);
+
 	pNamespace->m_NamespaceKind = ENamespace_TypeExtension;
-	pNamespace->m_QualifiedName = pNamedType->CreateQualifiedName (_T("extension"));
-	pNamespace->m_Tag = pNamespace->m_QualifiedName;
 	pNamespace->m_Pos = Pos;
 	pNamespace->m_pParentNamespace = pNamedType;
 
 	pNamedType->m_pExtensionNamespace = pNamespace;
-	m_pModule->m_NamespaceMgr.m_NamespaceStack.Append (m_pModule->m_NamespaceMgr.m_pCurrentNamespace);
-	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = pNamedType->m_pExtensionNamespace;
-	return true;
-}
 
-void
-CParser::CloseNamespace ()
-{
-	m_pModule->m_NamespaceMgr.CloseNamespace (); // REFINE namespace management
+	OpenNamespace (pNamespace);
+	return true;
 }
 
 bool
@@ -303,13 +403,13 @@ CParser::DeclareFunction (
 
 	if ((FunctionKindFlags & EFunctionKindFlag_NoStorage) && m_StorageKind)
 	{
-		err::SetFormatStringError (_T("%s cannot have storage specifier"), GetFunctionKindString (FunctionKind));
+		err::SetFormatStringError (_T("'%s' cannot have storage specifier"), GetFunctionKindString (FunctionKind));
 		return false;
 	}
 
 	if ((FunctionKindFlags & EFunctionKindFlag_NoArgs) && pType->HasArgs ())
 	{
-		err::SetFormatStringError (_T("%s cannot have arguments"), GetFunctionKindString (FunctionKind));
+		err::SetFormatStringError (_T("'%s' cannot have arguments"), GetFunctionKindString (FunctionKind));
 		return false;
 	}
 
@@ -321,9 +421,23 @@ CParser::DeclareFunction (
 				((CProperty*) pNamespace)->GetStorageKind () : 
 				EStorage_Undefined;
 	}
-
+		
 	if (NamespaceKind == ENamespace_PropertyTemplate)
+	{
+		if (m_StorageKind)
+		{
+			err::SetFormatStringError (_T("invalid storage '%s' in property template"), GetStorageKindString (m_StorageKind));
+			return false;
+		}
+
+		if (PostModifiers)
+		{
+			err::SetFormatStringError (_T("unused post-declarator modifier '%s'"), GetPostDeclaratorModifierString (PostModifiers));
+			return false;
+		}
+
 		return ((CPropertyTemplate*) pNamespace)->AddMethodMember (FunctionKind, pType);
+	}
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (
 		FunctionKind,
@@ -331,20 +445,14 @@ CParser::DeclareFunction (
 		pDeclarator->GetArgList ()
 		);
 
-	if (DeclaratorKind == EDeclarator_QualifiedName)
-	{
-		pFunction->m_pOrphanNamespace = pNamespace;
-		pFunction->m_OrphanName = *pDeclarator->GetName ();
-		pFunction->m_Tag = pNamespace->CreateQualifiedName (pFunction->m_OrphanName);
+	pFunction->m_pParentNamespace = pNamespace;
+	pFunction->m_DeclaratorName = *pDeclarator->GetName ();
+	pFunction->m_Tag = pNamespace->CreateQualifiedName (pFunction->m_DeclaratorName);
 
-		if (FunctionKind != EFunction_Named)
-			pFunction->m_Tag.AppendFormat (_T(".%s"), GetFunctionKindString (FunctionKind));
+	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
 
-		m_pModule->m_FunctionMgr.m_OrphanFunctionArray.Append (pFunction);
-
-		AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
-		return true;
-	}
+	if (PostModifiers & EPostDeclaratorModifier_Const)
+		pFunction->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 
 	switch (FunctionKind)
 	{
@@ -356,24 +464,38 @@ CParser::DeclareFunction (
 
 	case EFunction_UnaryOperator:
 		pFunction->m_UnOpKind = pDeclarator->GetUnOpKind ();
+		pFunction->m_Tag.AppendFormat (_T(".unary operator %s"), GetUnOpKindString (pFunction->m_UnOpKind));
 		break;
 
 	case EFunction_BinaryOperator:
 		pFunction->m_BinOpKind = pDeclarator->GetBinOpKind ();
+		pFunction->m_Tag.AppendFormat (_T(".binary operator %s"), GetBinOpKindString (pFunction->m_BinOpKind));
 		break;
 
 	case EFunction_CastOperator:
+		pFunction->m_pCastOpType = pDeclarator->GetCastOpType ();
+		pFunction->m_Tag.AppendFormat (_T(".cast operator %s"), pFunction->m_pCastOpType);
 		break;
+
+	default:
+		pFunction->m_Tag.AppendFormat (_T(".%s"), GetFunctionKindString (FunctionKind));
 	}
-
-	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
-
-	if (PostModifiers & EPostDeclaratorModifier_Const)
-		pFunction->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 	
 	switch (NamespaceKind)
 	{
 	case ENamespace_TypeExtension:
+		if (DeclaratorKind == EDeclarator_QualifiedName)
+		{
+			err::SetFormatStringError (_T("invalid qualified declarator '%s' in type extension"), pFunction->m_Tag);
+			return false;
+		}
+
+		if (pFunction->IsVirtual ())
+		{
+			err::SetFormatStringError (_T("invalid storage '%s' in type extension"), GetStorageKindString (pFunction->m_StorageKind));
+			return false;
+		}
+
 		break;
 
 	case ENamespace_Type:
@@ -383,9 +505,21 @@ CParser::DeclareFunction (
 			return false;
 		}
 
+		if (DeclaratorKind == EDeclarator_QualifiedName && m_StorageKind != EStorage_Override)
+		{
+			err::SetFormatStringError (_T("only overrides could be qualified, '%s' is not an override"), pFunction->m_Tag);
+			return false;
+		}
+
 		return ((CClassType*) pNamespace)->AddMethodMember (pFunction);
 
 	case ENamespace_Property:
+		if (DeclaratorKind == EDeclarator_QualifiedName)
+		{
+			err::SetFormatStringError (_T("invalid qualified declarator '%s' in property"), pFunction->m_Tag);
+			return false;
+		}
+
 		return ((CProperty*) pNamespace)->AddMethodMember (pFunction);
 	
 	default:
@@ -400,6 +534,12 @@ CParser::DeclareFunction (
 			err::SetFormatStringError (_T("invalid storage specifier '%s' for a global function"), GetStorageKindString (m_StorageKind));
 			return false;
 		}
+
+		if (DeclaratorKind == EDeclarator_QualifiedName)
+		{
+			pFunction->m_pOrphanNamespace = pNamespace;
+			m_pModule->m_FunctionMgr.m_OrphanFunctionArray.Append (pFunction);
+		}
 	}
 
 	if (FunctionKind != EFunction_Named)
@@ -412,7 +552,6 @@ CParser::DeclareFunction (
 		return false;
 	}
 
-	pFunction->m_pParentNamespace = pNamespace;
 	return pNamespace->AddFunction (pFunction);
 }
 
@@ -642,6 +781,8 @@ CParser::CreateEnumType (
 			return NULL;
 	}
 
+	pEnumType->m_pParentNamespace = pNamespace;
+
 	AssignDeclarationAttributes (pEnumType, m_LastMatchedToken.m_Pos);
 	return pEnumType;
 }
@@ -704,6 +845,8 @@ CParser::CreateStructType (
 			return NULL;
 	}
 
+	pStructType->m_pParentNamespace = pNamespace;
+
 	AssignDeclarationAttributes (pStructType, m_LastMatchedToken.m_Pos);
 	return pStructType;
 }
@@ -731,6 +874,8 @@ CParser::CreateUnionType (const rtl::CString& Name)
 		if (!Result)
 			return NULL;
 	}
+
+	pUnionType->m_pParentNamespace = pNamespace;
 	
 	AssignDeclarationAttributes (pUnionType, m_LastMatchedToken.m_Pos);
 	return pUnionType;
@@ -760,6 +905,8 @@ CParser::CreateClassType (
 			return NULL;
 	}
 
+	pClassType->m_pParentNamespace = pNamespace;
+
 	if (pBaseTypeList)
 	{
 		rtl::CBoxIteratorT <CType*> BaseType = pBaseTypeList->GetHead ();
@@ -770,6 +917,12 @@ CParser::CreateClassType (
 
 			switch (BaseTypeKind)
 			{
+			case EType_Struct:
+				Result = pClassType->AddBaseType ((CStructType*) pBaseType) != NULL;
+				if (!Result)
+					return false;
+				break;
+
 			case EType_Class:
 				Result = pClassType->AddBaseType ((CClassType*) pBaseType) != NULL;
 				if (!Result)
@@ -831,6 +984,8 @@ CParser::CreateAutoEvType (CDeclarator* pDeclarator)
 		if (!Result)
 			return NULL;
 	}
+
+	pAutoEvType->m_pParentNamespace = pNamespace;
 
 	AssignDeclarationAttributes (pAutoEvType, pDeclarator->GetPos ());
 
@@ -993,13 +1148,13 @@ CParser::SwitchCaseLabel (
 		return false;
 	}
 
-	m_pModule->m_NamespaceMgr.CloseScope (ClosePos);
+	CloseScope (ClosePos);
 
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_case"));
 	m_pModule->m_ControlFlowMgr.Follow (pBlock);
 	It->m_Value = pBlock;
 
-	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (OpenPos);
+	CScope* pScope = OpenScope (OpenPos);
 	pScope->m_pBreakBlock = pSwitchStmt->m_pFollowBlock;
 	return true;
 }
@@ -1017,13 +1172,13 @@ CParser::SwitchDefaultLabel (
 		return false;
 	}
 
-	m_pModule->m_NamespaceMgr.CloseScope (ClosePos);
+	CloseScope (ClosePos);
 
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("switch_default"));
 	m_pModule->m_ControlFlowMgr.Follow (pBlock);
 	pSwitchStmt->m_pDefaultBlock = pBlock;
 
-	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (OpenPos);
+	CScope* pScope = OpenScope (OpenPos);
 	pScope->m_pBreakBlock = pSwitchStmt->m_pFollowBlock;
 	return true;
 }
@@ -1134,7 +1289,8 @@ CParser::LookupIdentifier (
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
 	
-	pItem = pNamespace->FindItemTraverse (Name);
+	CBaseTypeCoord Coord;
+	pItem = pNamespace->FindItemTraverse (Name, &Coord);
 	if (!pItem)
 	{
 		err::SetFormatStringError (_T("undeclared identifier '%s'"), Name);
@@ -1165,7 +1321,7 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_StructMember:
-		return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, (CStructMember*) pItem, pValue);
+		return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, (CStructMember*) pItem, &Coord, pValue);
 
 	default:
 		err::SetFormatStringError (_T("%s '%s' cannot be used as expression"), GetModuleItemKindString (pItem->GetItemKind ()), Name);

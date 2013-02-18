@@ -34,8 +34,11 @@ bool
 CProperty::Create (CPropertyType* pType)
 {
 	bool Result;
+
+	EStorage StorageKind = m_StorageKind == EStorage_Abstract ? EStorage_Virtual : m_StorageKind;
 	
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pType->GetGetterType ());
+	pGetter->m_StorageKind = StorageKind;
 	pGetter->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 	Result = AddMethodMember (pGetter);
 	if (!Result)
@@ -46,6 +49,7 @@ CProperty::Create (CPropertyType* pType)
 	{
 		CFunctionType* pSetterType = pType->GetSetterType ()->GetOverload (i);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Setter, pSetterType);
+		pSetter->m_StorageKind = StorageKind;
 		Result = AddMethodMember (pSetter);
 		if (!Result)
 			return false;
@@ -156,7 +160,9 @@ CProperty::AddMethodMember (CFunction* pFunction)
 		case EStorage_Abstract:
 		case EStorage_Virtual:
 		case EStorage_Override:
-			m_pParentClassType->m_VirtualMethodArray.Append (pFunction);
+			if (!pFunction->IsAccessor ())
+				m_pParentClassType->m_VirtualMethodArray.Append (pFunction); // otherwise we are already on VirtualPropertyArray
+
 			// and fall through;
 
 		case EStorage_Undefined:
@@ -250,7 +256,25 @@ CProperty::AddPropertyMember (CProperty* pProperty)
 
 	if (m_pParentClassType)
 	{
-		m_pParentClassType->AddPropertyMember (pProperty);
+		switch (StorageKind)
+		{
+		case EStorage_Static:
+			break;
+
+		case EStorage_Abstract:
+		case EStorage_Virtual:
+		case EStorage_Override:
+			m_pParentClassType->m_VirtualPropertyArray.Append (pProperty);
+			// and fall through;
+
+		case EStorage_Undefined:
+			pProperty->m_pParentClassType = m_pParentClassType;
+			break;
+
+		default:
+			err::SetFormatStringError (_T("invalid storage specifier '%s' for property member"), GetStorageKindString (StorageKind));
+			return false;
+		}
 	}
 	else if (StorageKind)
 	{

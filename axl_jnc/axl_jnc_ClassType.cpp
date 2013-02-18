@@ -59,144 +59,6 @@ CClassType::SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList)
 	m_pModule->m_FunctionMgr.m_GlobalAutoEvTypeArray.Append (this);
 }
 
-bool
-CClassType::FindBaseTypeImpl (
-	CClassType* pType,
-	CClassBaseTypeCoord* pCoord,
-	size_t Level
-	)
-{
-	rtl::CStringHashTableMapIteratorAT <CClassBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
-	if (It)
-	{
-		if (pCoord)
-		{
-			CClassBaseType* pBaseType = It->m_Value;
-
-			pCoord->m_FieldCoord.m_LlvmIndexArray.SetCount (Level + 1);
-			pCoord->m_FieldCoord.m_Offset = pBaseType->m_pFieldBaseType->GetOffset ();
-			pCoord->m_FieldCoord.m_LlvmIndexArray [Level] = pBaseType->m_pFieldBaseType->GetLlvmIndex ();
-			pCoord->m_VTableIndex = pBaseType->m_VTableIndex;
-		}
-
-		return true;
-	}
-
-	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CClassBaseType* pBaseType = *BaseType;
-
-		bool Result = pBaseType->m_pType->FindBaseType (pType, pCoord);
-		if (Result)
-		{
-			if (pCoord)
-			{
-				pCoord->m_FieldCoord.m_Offset += pBaseType->m_pFieldBaseType->GetOffset ();
-				pCoord->m_FieldCoord.m_LlvmIndexArray [Level] = pBaseType->m_pFieldBaseType->GetLlvmIndex ();
-				pCoord->m_VTableIndex += pBaseType->m_VTableIndex;
-			}
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-CClassBaseType*
-CClassType::AddBaseType (CClassType* pType)
-{
-	rtl::CStringHashTableMapIteratorAT <CClassBaseType*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
-	if (It->m_Value)
-	{
-		err::SetFormatStringError (_T("'%s' is already a base type"), pType->GetTypeString ());
-		return NULL;
-	}
-
-	CClassBaseType* pBaseType = AXL_MEM_NEW (CClassBaseType);
-	pBaseType->m_pType = pType;
-	m_BaseTypeList.InsertTail (pBaseType);
-	It->m_Value = pBaseType;
-	return pBaseType;
-}
-
-CModuleItem*
-CClassType::FindItemWithBaseTypeList (const tchar_t* pName)
-{
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-	if (It)
-		return It->m_Value;
-
-	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CClassType* pClassType = BaseType->m_pType;
-		if (pClassType->m_Name == pName)
-			return pClassType;
-
-		CModuleItem* pItem = pClassType->FindItemWithBaseTypeList (pName);
-		if (pItem)
-			return pItem;
-	}
-
-	return NULL;
-}
-
-CModuleItem*
-CClassType::FindMemberImpl (
-	bool IncludeThis, 
-	bool IncludeExtensionNamespace,
-	const tchar_t* pName,
-	CClassBaseTypeCoord* pBaseTypeCoord,
-	size_t Level
-	)
-{
-	if (IncludeThis)
-	{
-		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-		if (It)
-		{
-			if (pBaseTypeCoord)
-				pBaseTypeCoord->m_FieldCoord.m_LlvmIndexArray.SetCount (Level);
-
-			return It->m_Value;
-		}
-	}
-	
-	if (IncludeExtensionNamespace && m_pExtensionNamespace)
-	{
-		CModuleItem* pMember = m_pExtensionNamespace->FindItem (pName);
-		if (pMember)
-		{
-			if (pBaseTypeCoord)
-				pBaseTypeCoord->m_FieldCoord.m_LlvmIndexArray.SetCount (Level);
-
-			return pMember;
-		}
-	}
-
-	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CClassBaseType* pBaseType = *BaseType;
-		CModuleItem* pMember = pBaseType->m_pType->FindMemberImpl (true, IncludeExtensionNamespace, pName, pBaseTypeCoord, Level + 1);
-		if (pMember)
-		{
-			if (pBaseTypeCoord)
-			{
-				pBaseTypeCoord->m_FieldCoord.m_Offset += pBaseType->m_pFieldBaseType->GetOffset ();
-				pBaseTypeCoord->m_FieldCoord.m_LlvmIndexArray [Level] = pBaseType->m_pFieldBaseType->GetLlvmIndex ();
-				pBaseTypeCoord->m_VTableIndex += pBaseType->m_VTableIndex;
-			}
-
-			return pMember;
-		}
-	}
-
-	return NULL;
-}
-
 CStructMember*
 CClassType::CreateFieldMember (
 	EStorage StorageKind,
@@ -251,6 +113,8 @@ CClassType::AddMethodMember (CFunction* pFunction)
 	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
 	int ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
 
+	pFunction->m_pParentNamespace = this;
+
 	switch (StorageKind)
 	{
 	case EStorage_Static:
@@ -262,11 +126,16 @@ CClassType::AddMethodMember (CFunction* pFunction)
 
 		break;
 
+	case EStorage_Override:
+		m_OverrideMethodArray.Append (pFunction);
+		pFunction->ConvertToMethodMember (this);
+		return true; // layout overrides later
+
 	case EStorage_Abstract:
 	case EStorage_Virtual:
-	case EStorage_Override:
 		m_VirtualMethodArray.Append (pFunction);
-		// and fall through;
+		pFunction->ConvertToMethodMember (this);
+		break;
 
 	case EStorage_Undefined:
 		pFunction->ConvertToMethodMember (this);
@@ -276,8 +145,6 @@ CClassType::AddMethodMember (CFunction* pFunction)
 		err::SetFormatStringError (_T("invalid storage specifier '%s' for method member"), GetStorageKindString (StorageKind));
 		return false;
 	}
-
-	pFunction->m_pParentNamespace = this;
 
 	CFunction** ppTarget = NULL;
 
@@ -353,6 +220,10 @@ CClassType::AddMethodMember (CFunction* pFunction)
 bool
 CClassType::AddPropertyMember (CProperty* pProperty)
 {
+	bool Result = AddItem (pProperty);
+	if (!Result)
+		return false;
+
 	EStorage StorageKind = pProperty->GetStorageKind ();
 
 	switch (StorageKind)
@@ -367,12 +238,11 @@ CClassType::AddPropertyMember (CProperty* pProperty)
 		// and fall through;
 
 	case EStorage_Undefined:
-		pProperty->ConvertToPropertyMember (this);
+		pProperty->m_pParentClassType = this;
 		break;
 	}
 
 	pProperty->m_pParentNamespace = this;
-
 	return true;
 }
 
@@ -442,24 +312,67 @@ CClassType::CalcLayout ()
 	bool Result = PreCalcLayout ();
 	if (!Result)
 		return false;
-
+		
 	// layout base types
 
-	rtl::CIteratorT <CClassBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		CClassType* pBaseClassType = BaseType->m_pType;
+	size_t BaseTypeCount = m_BaseTypeList.GetCount ();
 
-		Result = pBaseClassType->CalcLayout ();
+	char Buffer [256];
+	rtl::CArrayT <CBaseType*> IfaceBaseTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	IfaceBaseTypeArray.SetCount (BaseTypeCount);
+
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (size_t i = 0; BaseType; i++, BaseType++)
+	{
+		Result = BaseType->m_pType->CalcLayout ();
 		if (!Result)
 			return false;
-				
-		BaseType->m_pFieldBaseType = m_pIfaceStructType->AddBaseType (pBaseClassType->GetIfaceStructType ());
-		BaseType->m_VTableIndex = m_VTable.GetCount ();
 
-		m_VTable.Append (pBaseClassType->m_VTable);
-		m_pVTableStructType->Append (pBaseClassType->m_pVTableStructType);
+		CClassType* pBaseClassType;
+		CBaseType* pIfaceBaseType;
+
+		EType TypeKind = BaseType->m_pType->GetTypeKind ();
+		switch (TypeKind)
+		{
+		case EType_Class:
+			pBaseClassType = (CClassType*) BaseType->m_pType;
+			pIfaceBaseType = m_pIfaceStructType->AddBaseType (pBaseClassType->GetIfaceStructType ());
+			BaseType->m_VTableIndex = m_VTable.GetCount ();
+			m_VTable.Append (pBaseClassType->m_VTable);
+			m_pVTableStructType->Append (pBaseClassType->m_pVTableStructType);
+			break;
+
+		case EType_Struct:
+		case EType_Union:
+			pIfaceBaseType = m_pIfaceStructType->AddBaseType (BaseType->m_pType);
+			break;
+
+		default:
+			err::SetFormatStringError (_T("invalid base type '%s'"), BaseType->m_pType->GetTypeString ());
+			return false;
+		}
+
+		IfaceBaseTypeArray [i] = pIfaceBaseType;
 	}
+
+	// finalize iface layout
+
+	Result = m_pIfaceStructType->CalcLayout ();
+	if (!Result)
+		return false;
+
+	// update base type llvm indexes & offsets
+
+	BaseType = m_BaseTypeList.GetHead ();
+	for (size_t i = 0; BaseType; i++, BaseType++)
+	{
+		CBaseType* pIfaceBaseType = IfaceBaseTypeArray [i];
+
+		BaseType->m_LlvmIndex = pIfaceBaseType->m_LlvmIndex;
+		BaseType->m_Offset = pIfaceBaseType->m_Offset;
+	}
+
+	// static fields
 
 	if (m_pStaticFieldStructType)
 	{
@@ -474,12 +387,6 @@ CClassType::CalcLayout ()
 			false
 			);
 	}
-
-	// finalize
-
-	Result = m_pIfaceStructType->CalcLayout ();
-	if (!Result)
-		return false;
 
 	// layout virtual properties
 
@@ -512,23 +419,20 @@ CClassType::CalcLayout ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunction* pFunction = m_VirtualMethodArray [i];
+		ASSERT (pFunction->m_StorageKind == EStorage_Abstract || EStorage_Virtual);
 
-		switch (pFunction->m_StorageKind)
-		{
-		case EStorage_Abstract:
-		case EStorage_Virtual:
-			AddVirtualFunction (pFunction);
-			break;
+		AddVirtualFunction (pFunction);
+	}
 
-		case EStorage_Override:
-			Result = OverrideVirtualFunction (pFunction);
-			if (!Result)
-				return false;
-			break;
+	Count = m_OverrideMethodArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = m_OverrideMethodArray [i];
+		ASSERT (pFunction->m_StorageKind == EStorage_Override);
 
-		default:
-			ASSERT (false);
-		}
+		Result = OverrideVirtualFunction (pFunction);
+		if (!Result)
+			return false;
 	}
 
 	Result = m_pVTableStructType->CalcLayout ();
@@ -575,6 +479,7 @@ void
 CClassType::AddVirtualFunction (CFunction* pFunction)
 {
 	ASSERT (pFunction->m_StorageKind == EStorage_Abstract || pFunction->m_StorageKind == EStorage_Virtual);
+	ASSERT (pFunction->m_pVirtualOriginClassType == NULL); // not layed out yet
 
 	pFunction->m_pVirtualOriginClassType = this;
 	pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
@@ -588,33 +493,77 @@ bool
 CClassType::OverrideVirtualFunction (CFunction* pFunction)
 {
 	ASSERT (pFunction->m_StorageKind == EStorage_Override);
+	ASSERT (pFunction->m_pVirtualOriginClassType == NULL); // not layed out yet
 
-	CClassBaseTypeCoord BaseTypeCoord;
-	CModuleItem* pMember = FindMemberImpl (false, false, pFunction->m_Name, &BaseTypeCoord, 0);
+	EFunction FunctionKind = pFunction->GetFunctionKind ();
+
+	CBaseTypeCoord BaseTypeCoord;
+	CModuleItem* pMember = FindItemTraverse (
+		pFunction->m_DeclaratorName, 
+		&BaseTypeCoord, 
+		ETraverse_NoExtensionNamespace | ETraverse_NoParentNamespace
+		);
+
 	if (!pMember)
 	{
-		err::SetFormatStringError (_T("cannot override '%s': method not found"));
+		err::SetFormatStringError (_T("cannot override '%s': method not found"), pFunction->m_Tag);
 		return false;
 	}
 
-	if (pMember->GetItemKind () != EModuleItem_Function)
+	CFunction* pOverridenFunction;
+
+	EModuleItem ItemKind = pMember->GetItemKind ();
+	switch (ItemKind)
 	{
-		err::SetFormatStringError (_T("cannot override '%s': not a method"));
+	case EModuleItem_Function:
+		if (FunctionKind != EFunction_Named)
+		{
+			err::SetFormatStringError (_T("cannot override '%s': function kind mismatch"), pFunction->m_Tag);
+			return false;
+		}
+
+		pOverridenFunction = (CFunction*) pMember;
+		break;
+
+	case EModuleItem_Property:
+		switch (FunctionKind)
+		{
+		case EFunction_Getter:
+			pOverridenFunction = ((CProperty*) pMember)->GetGetter ();
+			break;
+
+		case EFunction_Setter:
+			pOverridenFunction = ((CProperty*) pMember)->GetSetter ();
+			if (!pOverridenFunction)
+			{
+				err::SetFormatStringError (_T("cannot override '%s': property has no setter"), pFunction->m_Tag);
+				return false;
+			}
+
+			break;
+
+		default:
+			err::SetFormatStringError (_T("cannot override '%s': function kind mismatch"), pFunction->m_Tag);
+			return false;
+		}
+
+		break;
+
+	default:
+		err::SetFormatStringError (_T("cannot override '%s': not a method or property"), pFunction->m_Tag);
 		return false;
 	}
-
-	CFunction* pOverridenFunction = (CFunction*) pMember;
+	
 	pOverridenFunction = pOverridenFunction->FindShortOverload (pFunction->GetType ()->GetShortType ());
 	if (!pOverridenFunction)
 	{
-		err::SetFormatStringError (_T("cannot override '%s': method signature mismatch"));
+		err::SetFormatStringError (_T("cannot override '%s': method signature mismatch"), pFunction->m_Tag);
 		return false;
 	}
 
-	if (pOverridenFunction->m_StorageKind != EStorage_Abstract && 
-		pOverridenFunction->m_StorageKind != EStorage_Virtual)
+	if (!pOverridenFunction->IsVirtual ())
 	{
-		err::SetFormatStringError (_T("cannot override '%s': original method is not virtual"));
+		err::SetFormatStringError (_T("cannot override '%s': method is not virtual"), pFunction->m_Tag);
 		return false;
 	}
 
@@ -622,7 +571,7 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 
 	pFunction->m_pType = pOverridenFunction->m_pType;
 	pFunction->m_pThisArgType = pOverridenFunction->m_pThisArgType;
-	pFunction->m_ThisArgDelta = -(intptr_t) BaseTypeCoord.m_FieldCoord.m_Offset;
+	pFunction->m_ThisArgDelta = -(intptr_t) BaseTypeCoord.m_Offset;
 	pFunction->m_pVirtualOriginClassType = pOverridenFunction->m_pVirtualOriginClassType;
 	pFunction->m_ClassVTableIndex = pOverridenFunction->m_ClassVTableIndex;
 

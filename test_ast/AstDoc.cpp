@@ -309,12 +309,12 @@ StdLib_DynamicCastInterface (
 	if (p->m_pObject->m_pType->Cmp (pType) == 0)
 		return p;
 	
-	jnc::CClassBaseTypeCoord Coord;
+	jnc::CBaseTypeCoord Coord;
 	bool Result = p->m_pObject->m_pType->FindBaseType (pType, &Coord);
 	if (!Result)
 		return NULL;
 	
-	jnc::TInterface* p2 = (jnc::TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_FieldCoord.m_Offset);
+	jnc::TInterface* p2 = (jnc::TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
 	ASSERT (p2->m_pObject == p->m_pObject);
 
 	return p2;

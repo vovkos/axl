@@ -43,10 +43,9 @@ GetFunctionKindFlags (EFunction FunctionKind)
 	static int FlagTable [EFunction__Count] = 
 	{
 		0,                              // EFunction_Undefined,
-		0,                              // EFunction_Named,
-		EFunctionKindFlag_NoStorage |   // EFunction_Getter,
-		EFunctionKindFlag_NoOverloads,                      		
-		EFunctionKindFlag_NoStorage,    // EFunction_Setter,
+		0,                              // EFunction_Named,		
+		EFunctionKindFlag_NoOverloads,  // EFunction_Getter,
+		0,                              // EFunction_Setter,
 		EFunctionKindFlag_NoStorage |   // EFunction_PreConstructor,
 		EFunctionKindFlag_NoOverloads |
 		EFunctionKindFlag_NoArgs,       
@@ -78,9 +77,10 @@ CFunction::CFunction ()
 	m_ItemKind = EModuleItem_Function;
 	m_FunctionKind = EFunction_Undefined;
 	m_pParentNamespace = NULL;
-	m_pType = NULL;
 	m_pOrphanNamespace = NULL;
+	m_pType = NULL;
 	m_pExternFunction = NULL;
+	m_pCastOpType = NULL;
 	m_pClassType = NULL;
 	m_pThisArgType = NULL;
 	m_pThisType = NULL;
@@ -238,9 +238,7 @@ GetItemUnnamedMethod (
 bool
 CFunction::ResolveOrphan ()
 {
-	ASSERT (m_pOrphanNamespace);
-
-	CModuleItem* pItem = m_pOrphanNamespace->FindItemTraverse (m_OrphanName);
+	CModuleItem* pItem = m_pParentNamespace->FindItemTraverse (m_DeclaratorName);
 	if (!pItem)
 	{
 		err::SetFormatStringError (_T("unresolved orphan function '%s'"), m_Tag);

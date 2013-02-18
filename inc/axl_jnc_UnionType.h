@@ -13,45 +13,15 @@ class CUnionType;
 
 //.............................................................................
 
-class CUnionMember: public CNamedModuleItem
-{
-protected:
-	friend class CUnionType;
-	
-	CUnionType* m_pParentUnionType;
-	CType* m_pType;
-	CType* m_pBitFieldBaseType;
-	size_t m_BitCount;
+// union cannot be a child, but it can be a parent
 
-public:
-	CUnionMember ()
-	{
-		m_ItemKind = EModuleItem_UnionMember;
-		m_pType = NULL;
-	}
-
-	CUnionType*
-	GetParentUnionType ()
-	{
-		return m_pParentUnionType;
-	}
-
-	CType*
-	GetType ()
-	{
-		return m_pType;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CUnionType: public CNamedType
+class CUnionType: public CDerivableType 
 {
 protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
-	rtl::CStdListT <CUnionMember> m_MemberList;
+	rtl::CStdListT <CStructMember> m_MemberList;
 
 	CStructType* m_pStructType;
 
@@ -70,20 +40,20 @@ public:
 		return m_pStructType;
 	}
 
-	rtl::CConstListT <CUnionMember>
+	rtl::CConstListT <CStructMember>
 	GetMemberList ()
 	{
 		return m_MemberList;
 	}
 
-	CUnionMember*
+	CStructMember*
 	FindMember (const tchar_t* pName)
 	{
 		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-		return It && It->m_Value->GetItemKind () == EModuleItem_UnionMember ? (CUnionMember*) It->m_Value : NULL;
+		return It && It->m_Value->GetItemKind () == EModuleItem_StructMember ? (CStructMember*) It->m_Value : NULL;
 	}
 
-	CUnionMember*
+	CStructMember*
 	CreateMember (
 		const rtl::CString& Name,
 		CType* pType,

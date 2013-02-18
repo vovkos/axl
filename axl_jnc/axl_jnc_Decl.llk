@@ -54,7 +54,7 @@ local_declaration
 namespace_declaration
 	: EToken_Namespace qualified_name
 		{ 
-			return OpenNamespace ($2.m_Name, $2.m_FirstToken.m_Pos);
+			return OpenGlobalNamespace ($2.m_Name, $2.m_FirstToken.m_Pos) != NULL;
 		}
 	  '{' global_declaration* '}' 
 		{ 

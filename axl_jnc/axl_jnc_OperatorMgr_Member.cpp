@@ -11,16 +11,16 @@ bool
 COperatorMgr::GetFieldMember (
 	const CValue& ThisValue,
 	CStructMember* pMember,
+	CBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
 {
 	bool Result;
 
-	CStructType* pStructType = pMember->GetParentStructType ();
-	CNamespace* pParentNamespace = pStructType->GetParentNamespace ();
+	CNamespace* pParentNamespace = pMember->GetParentType ()->GetParentNamespace ();
 	ASSERT (pParentNamespace);
 
-	if (pStructType->GetStorageKind () != EStorage_Static && ThisValue.IsEmpty ())
+	if (pMember->GetStorageKind () != EStorage_Static && ThisValue.IsEmpty ())
 	{
 		err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
 		return false;
@@ -30,7 +30,7 @@ COperatorMgr::GetFieldMember (
 	{
 		CProperty* pProperty = (CProperty*) pParentNamespace;
 
-		if (pStructType->GetStorageKind () == EStorage_Static)
+		if (pMember->GetStorageKind () == EStorage_Static)
 			return StructMemberOperator (
 				pProperty->GetStaticDataVariable (), 
 				pProperty->GetStaticFieldStructType (),
@@ -41,7 +41,7 @@ COperatorMgr::GetFieldMember (
 		CClassType* pParentClassType = pProperty->GetParentClassType ();
 		ASSERT (pParentClassType);
 
-		CClassBaseTypeCoord Coord;
+		CBaseTypeCoord Coord;
 
 		CValue FieldValue;
 		Result = ClassFieldMemberOperator (
@@ -61,7 +61,7 @@ COperatorMgr::GetFieldMember (
 		ASSERT (pParentNamespace->GetNamespaceKind () == ENamespace_Type && ((CNamedType*) pParentNamespace)->GetTypeKind () == EType_Class);
 		CClassType* pClassType = (CClassType*) pParentNamespace;
 
-		if (pStructType->GetStorageKind () == EStorage_Static)
+		if (pMember->GetStorageKind () == EStorage_Static)
 			return StructMemberOperator (
 				pClassType->GetStaticDataVariable (), 
 				pClassType->GetStaticFieldStructType (),
@@ -170,23 +170,37 @@ COperatorMgr::StructMemberOperator (
 	CValue* pResultValue
 	)
 {
-	CStructBaseTypeCoord Coord;
-	CStructMember* pMember = pStructType->FindMember (pName, &Coord);
+	CBaseTypeCoord Coord;
+	CModuleItem* pMember = pStructType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);
 	if (!pMember)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pStructType->GetTypeString ());
 		return false;
 	}
 
-	Coord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
-	Coord.m_Offset += pMember->GetOffset ();
+	EModuleItem ItemKind = pMember->GetItemKind ();
+
+	switch (ItemKind)
+	{
+	case EModuleItem_StructMember:
+		break;
+
+	default:
+		err::SetFormatStringError (_T("non-struct members are not supported yet"));
+		return false;
+	}
+
+	CStructMember* pField = (CStructMember*) pMember;
+	
+	Coord.m_LlvmIndexArray.Append (pField->GetLlvmIndex ());
+	Coord.m_Offset += pField->GetOffset ();
 	
 	EValue OpValueKind = OpValue.GetValueKind ();
 	if (OpValueKind == EValue_Const)
 	{
 		pResultValue->CreateConst (
 			(char*) OpValue.GetConstData () + Coord.m_Offset,
-			pMember->GetType () 
+			pField->GetType () 
 			);
 
 		return true;
@@ -198,7 +212,7 @@ COperatorMgr::StructMemberOperator (
 			OpValue, 
 			Coord.m_LlvmIndexArray, 
 			Coord.m_LlvmIndexArray.GetCount (),
-			pMember->GetType (),
+			pField->GetType (),
 			pResultValue
 			);
 
@@ -211,7 +225,7 @@ COperatorMgr::StructMemberOperator (
 
 	if (pOpType->GetPtrTypeKind () == EDataPtrType_Unsafe)
 	{
-		CType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
 		m_pModule->m_LlvmBuilder.CreateGep (
 			OpValue, 
 			Coord.m_LlvmIndexArray, 
@@ -238,7 +252,7 @@ COperatorMgr::StructMemberOperator (
 		
 		pResultValue->SetLlvmValue(
 			PtrValue.GetLlvmValue (), 
-			pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
+			pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
 			OpValue.GetVariable (), 
 			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate 
 			);
@@ -248,7 +262,7 @@ COperatorMgr::StructMemberOperator (
 		CValue PtrValue;
 		CValue ValidatorValue;
 
-		CType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef);
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef);
 
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
@@ -276,7 +290,7 @@ COperatorMgr::UnionMemberOperator (
 	CValue* pResultValue
 	)
 {
-	CUnionMember* pMember = pUnionType->FindMember (pName);
+	CStructMember* pMember = pUnionType->FindMember (pName);
 	if (!pMember)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pUnionType->GetTypeString ());
@@ -335,8 +349,8 @@ COperatorMgr::ClassMemberOperator (
 	CValue* pResultValue
 	)
 {
-	CClassBaseTypeCoord Coord;
-	CModuleItem* pMember = pClassType->FindMember (pName, &Coord);	
+	CBaseTypeCoord Coord;
+	CModuleItem* pMember = pClassType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);	
 	if (!pMember)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pClassType->GetTypeString ());
@@ -388,21 +402,24 @@ bool
 COperatorMgr::ClassFieldMemberOperator (
 	const CValue& OpValue,
 	CStructMember* pMember,
-	CClassBaseTypeCoord* pCoord,
+	CBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pClassType = (CClassType*) pMember->GetParentStructType ()->GetParentNamespace ();
+	CClassType* pClassType = (CClassType*) pMember->GetParentType ()->GetParentNamespace ();
 
-	pCoord->m_FieldCoord.m_LlvmIndexArray.Insert (0, 0);
-	pCoord->m_FieldCoord.m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+	pCoord->m_LlvmIndexArray.Insert (0, 0);
+	pCoord->m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+
+	size_t* p = pCoord->m_LlvmIndexArray;
+	size_t n = pCoord->m_LlvmIndexArray.GetCount ();
 
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
 		OpValue, 
-		pCoord->m_FieldCoord.m_LlvmIndexArray, 
-		pCoord->m_FieldCoord.m_LlvmIndexArray.GetCount (), 
+		pCoord->m_LlvmIndexArray, 
+		pCoord->m_LlvmIndexArray.GetCount (), 
 		NULL,
 		&PtrValue
 		);
@@ -435,7 +452,7 @@ COperatorMgr::GetClassFieldMemberValue (
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
 	CValue FieldValue;
-	CClassBaseTypeCoord ClosureCoord;
+	CBaseTypeCoord ClosureCoord;
 
 	return 
 		ClassFieldMemberOperator (ObjValue, pMember, &ClosureCoord, &FieldValue) && 
@@ -452,7 +469,7 @@ COperatorMgr::SetClassFieldMemberValue (
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
 	CValue FieldValue;
-	CClassBaseTypeCoord ClosureCoord;
+	CBaseTypeCoord ClosureCoord;
 
 	return 
 		ClassFieldMemberOperator (ObjValue, pMember, &ClosureCoord, &FieldValue) && 
@@ -509,7 +526,7 @@ COperatorMgr::GetVirtualMethodMember (
 	CClassType* pVTableType = pFunction->GetVirtualOriginClassType ();
 	size_t VTableIndex = pFunction->GetClassVTableIndex ();
 	
-	CClassBaseTypeCoord Coord;
+	CBaseTypeCoord Coord;
 	pClassType->FindBaseType (pVTableType, &Coord);
 	VTableIndex += Coord.m_VTableIndex;
 	
@@ -563,7 +580,7 @@ COperatorMgr::GetVirtualPropertyMember (
 	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
 
-	CClassBaseTypeCoord Coord;
+	CBaseTypeCoord Coord;
 	pClassType->FindBaseType (pProperty->GetParentClassType (), &Coord);
 	VTableIndex += Coord.m_VTableIndex;
 

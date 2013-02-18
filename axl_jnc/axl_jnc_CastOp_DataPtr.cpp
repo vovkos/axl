@@ -106,7 +106,7 @@ intptr_t
 CCast_DataPtr_Base::GetOffset (
 	CDataPtrType* pSrcType,
 	CDataPtrType* pDstType,
-	CStructBaseTypeCoord* pCoord
+	CBaseTypeCoord* pCoord
 	)
 {	
 	CType* pSrcDataType = pSrcType->GetTargetType ();
@@ -125,7 +125,7 @@ CCast_DataPtr_Base::GetOffset (
 	if (pSrcStructType->FindBaseType (pDstStructType, pCoord))
 		return pCoord->m_Offset;
 
-	CStructBaseTypeCoord Coord;
+	CBaseTypeCoord Coord;
 	if (pDstStructType->FindBaseType (pSrcStructType, &Coord))
 		return -(intptr_t) Coord.m_Offset;
 
@@ -140,7 +140,7 @@ CCast_DataPtr_Base::GetOffsetUnsafePtrValue (
 	CValue* pResultValue
 	)
 {
-	CStructBaseTypeCoord Coord;
+	CBaseTypeCoord Coord;
 	intptr_t Offset = GetOffset (pSrcType, pDstType, &Coord);
 
 	if (!Coord.m_LlvmIndexArray.IsEmpty ())

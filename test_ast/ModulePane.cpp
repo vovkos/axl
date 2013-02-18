@@ -168,10 +168,6 @@ CModulePane::AddItem (
 		AddStructMember (hParent, (jnc::CStructMember*) pItem);
 		break;
 
-	case jnc::EModuleItem_UnionMember:
-		AddUnionMember (hParent, (jnc::CUnionMember*) pItem);
-		break;
-
 	default:
 		rtl::CString Name;
 		Name.Format (_T("item %x of kind %d"), pItem, ItemKind);
@@ -323,9 +319,9 @@ CModulePane::AddUnionTypeMembers (
 {
 //	AddStructClassTypeMembers (hParent, pType);
 
-	rtl::CIteratorT <jnc::CUnionMember> Member = pType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CStructMember> Member = pType->GetMemberList ().GetHead ();
 	for (; Member; Member++)
-		AddUnionMember (hParent, *Member);
+		AddStructMember (hParent, *Member);
 
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
@@ -577,7 +573,7 @@ GetStructMemberTip (jnc::CStructMember* pMember)
 	return rtl::CString::Format_s (
 		_T("%s %s.%s (%d bytes)"), 
 		pType->GetTypeString (), 
-		pMember->GetParentStructType ()->GetQualifiedName (),
+		pMember->GetParentType ()->GetQualifiedName (),
 		pMember->GetName (),
 		pType->GetSize ()
 		);

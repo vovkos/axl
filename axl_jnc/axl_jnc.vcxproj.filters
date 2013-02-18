@@ -220,10 +220,10 @@
     <ClInclude Include="..\inc\axl_jnc_CastOp_Int.h">
       <Filter>operator</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_DualType.h">
+    <ClInclude Include="..\inc\axl_jnc_MulticastType.h">
       <Filter>type</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\axl_jnc_MulticastType.h">
+    <ClInclude Include="..\inc\axl_jnc_DerivableType.h">
       <Filter>type</Filter>
     </ClInclude>
   </ItemGroup>
@@ -434,6 +434,9 @@
       <Filter>operator</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_MulticastType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_DerivableType.cpp">
       <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>

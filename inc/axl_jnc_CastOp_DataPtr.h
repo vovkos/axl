@@ -10,7 +10,7 @@
 namespace axl {
 namespace jnc {
 
-class CStructBaseTypeCoord;
+class CBaseTypeCoord;
 
 //.............................................................................
 
@@ -70,7 +70,7 @@ protected:
 	GetOffset (
 		CDataPtrType* pSrcType,
 		CDataPtrType* pDstType,
-		CStructBaseTypeCoord* pCoord
+		CBaseTypeCoord* pCoord
 		);
 
 	intptr_t

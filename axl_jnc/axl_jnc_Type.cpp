@@ -385,5 +385,40 @@ CType::PrepareLlvmType ()
 
 //.............................................................................
 
+CModuleItem*
+CNamedType::FindItemTraverseImpl (
+	const tchar_t* pName,
+	CBaseTypeCoord* pCoord,
+	int Flags
+	)
+{
+	CModuleItem* pItem;
+
+	if (!(Flags & ETraverse_NoThis))
+	{
+		pItem = FindItem (pName);
+		if (pItem)
+			return pItem;
+	}
+
+	if (!(Flags & ETraverse_NoExtensionNamespace) && m_pExtensionNamespace)
+	{
+		pItem = m_pExtensionNamespace->FindItem (pName);
+		if (pItem)
+			return pItem;
+	}
+
+	if (!(Flags & ETraverse_NoParentNamespace) && m_pParentNamespace)
+	{
+		pItem = m_pParentNamespace->FindItemTraverse (pName, pCoord, Flags & ~ETraverse_NoThis);
+		if (pItem)
+			return pItem;
+	}
+
+	return NULL;
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

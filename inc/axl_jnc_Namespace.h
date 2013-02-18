@@ -13,6 +13,7 @@ namespace jnc {
 class CNamespace;
 class CEnumType;
 class CEnumMember;
+class CBaseTypeCoord;
 class CFunction;
 
 //.............................................................................
@@ -61,6 +62,16 @@ enum ENamespace
 
 const tchar_t*
 GetNamespaceKindString (ENamespace NamespaceKind);
+
+//.............................................................................
+
+enum
+{
+	ETraverse_NoThis               = 0x01,
+	ETraverse_NoExtensionNamespace = 0x02,
+	ETraverse_NoBaseType           = 0x04,
+	ETraverse_NoParentNamespace    = 0x08,
+};
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -127,16 +138,31 @@ public:
 	FindItem (const CQualifiedName& Name);
 
 	CModuleItem*
-	FindItemTraverse (const tchar_t* pName);
-
-	CModuleItem*
-	FindItemTraverse (const rtl::CString& Name)
+	FindItemTraverse (
+		const rtl::CString& Name,
+		CBaseTypeCoord* pCoord = NULL,
+		int Flags = 0
+		)
 	{
-		return FindItemTraverse ((const tchar_t*) Name);
+		return FindItemTraverseImpl ((const tchar_t*) Name, pCoord, Flags);
 	}
 
 	CModuleItem*
-	FindItemTraverse (const CQualifiedName& Name);
+	FindItemTraverse (
+		const tchar_t* pName,
+		CBaseTypeCoord* pCoord = NULL,
+		int Flags = 0
+		)
+	{
+		return FindItemTraverseImpl (pName, pCoord, Flags);
+	}
+
+	CModuleItem*
+	FindItemTraverse (
+		const CQualifiedName& Name,
+		CBaseTypeCoord* pCoord = NULL,
+		int Flags = 0
+		);
 
 	template <typename T>
 	bool
@@ -178,6 +204,14 @@ protected:
 	AddItem (
 		CModuleItem* pItem,
 		CModuleItemName* pName
+		);
+
+	virtual
+	CModuleItem*
+	FindItemTraverseImpl (
+		const tchar_t* pName,
+		CBaseTypeCoord* pCoord = NULL,
+		int Flags = 0
 		);
 };
 
