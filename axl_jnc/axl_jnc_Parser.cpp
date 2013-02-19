@@ -547,6 +547,7 @@ CParser::DeclareFunction (
 		{
 			pFunction->m_pOrphanNamespace = pNamespace;
 			m_pModule->m_FunctionMgr.m_OrphanFunctionArray.Append (pFunction);
+			return true;
 		}
 	}
 

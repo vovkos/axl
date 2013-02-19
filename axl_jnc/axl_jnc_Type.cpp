@@ -135,7 +135,8 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 		_T("event"),    // EPtrTypeFlag_Event     = 0x1000,
 	};
 
-	size_t i = rtl::GetLoBitIdx32 (Flag);
+	size_t i = rtl::GetLoBitIdx32 (Flag >> 8);
+
 	return i < countof (StringTable) ? 
 		StringTable [i] : 
 		_T("undefined-ptr-type-flag");

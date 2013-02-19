@@ -39,7 +39,10 @@ CProperty::Create (CPropertyType* pType)
 	
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pType->GetGetterType ());
 	pGetter->m_StorageKind = StorageKind;
-	pGetter->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
+
+	if (m_pParentClassType)
+		pGetter->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
+
 	Result = AddMethodMember (pGetter);
 	if (!Result)
 		return false;

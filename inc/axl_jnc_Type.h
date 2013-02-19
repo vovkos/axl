@@ -254,7 +254,6 @@ enum ETypeModifierMask
 	ETypeModifierMask_DataPtr = 
 		ETypeModifierMask_AnyPtr |
 		ETypeModifier_Const | 
-		ETypeModifier_ReadOnly | 
 		ETypeModifier_Volatile,
 
 	ETypeModifierMask_ClassPtr = 

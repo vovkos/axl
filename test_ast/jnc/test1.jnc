@@ -1,60 +1,27 @@
 //.............................................................................
 
-class IFoo
+int property MyProp;
+
+int
+MyProp.get ()
 {
-	protected int m_FooValue;
+	printf ("MyProp.get ()\n");
+	return 100;
+}
 
-	readonly int m_BarValue;
-
-	abstract 
-	int 
-	property FooProp;
-};
-
-class CTest: IFoo
+MyProp.set (int x)
 {
-	int m_TestValue;
-
-	preconstruct ()
-	{
-		m_BarValue = 10;
-		m_FooValue = 100;
-		m_TestValue = 300;
-	}	 
-
-	override 
-	int 
-	FooProp.get ()
-	{
-		return printf (
-			"CTest.FooProp.get () { %d, %d } \n", 
-			m_FooValue,
-			m_TestValue
-			);
-	}
-
-	override 
-	FooProp.set (int x)
-	{
-		printf (
-			"CTest.FooProp.set (%d) { %d, %d } \n", 
-			x,
-			m_FooValue,
-			m_TestValue
-			);
-	}
-};
+	printf ("MyProp.set (%d)\n", x);
+}
 
 int 
 main ()
 {
 	printf ("hui govno i muravei\n");
 
-	IFoo f = new CTest;
-	f.m_FooValue = 100;
+	int x = MyProp;
 
-	int y = f.FooProp;
-	f.FooProp = 500;	
+	MyProp = 200;
 
 	return 0;
 }
