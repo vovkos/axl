@@ -21,7 +21,7 @@ enum EEnumTypeFlag
 
 //.............................................................................
 
-class CEnumMember: public CNamedModuleItem
+class CEnumConst: public CNamedModuleItem
 {
 protected:
 	friend class CEnumType;
@@ -32,9 +32,9 @@ protected:
 	rtl::CBoxListT <CToken> m_Expression;
 
 public:
-	CEnumMember ()
+	CEnumConst ()
 	{
-		m_ItemKind = EModuleItem_EnumMember;
+		m_ItemKind = EModuleItem_EnumConst;
 		m_pParentEnumType = NULL;
 		m_Value = 0;
 	}
@@ -42,7 +42,7 @@ public:
 	CEnumType*
 	GetParentEnumType ()
 	{
-		return m_pParentEnumType; // double cast cause CEnumType is not defined yet
+		return m_pParentEnumType;
 	}
 
 	intptr_t
@@ -85,7 +85,7 @@ protected:
 	friend class CParser;
 	
 	CType* m_pBaseType;
-	rtl::CStdListT <CEnumMember> m_MemberList;
+	rtl::CStdListT <CEnumConst> m_ConstMemberList;
 	intptr_t m_CurrentValue;
 
 public:
@@ -97,25 +97,22 @@ public:
 		return m_pBaseType;
 	}
 
-	rtl::CConstListT <CEnumMember>
+	rtl::CConstListT <CEnumConst>
 	GetMemberList ()
 	{
-		return m_MemberList;
+		return m_ConstMemberList;
 	}
 
-	CEnumMember*
-	FindMember (const tchar_t* pName);
-
-	CEnumMember*
-	CreateMember (
+	CEnumConst*
+	CreateConstMember (
 		const rtl::CString& Name,
 		intptr_t Value
 		);
 
-	CEnumMember*
-	CreateMember (const rtl::CString& Name)
+	CEnumConst*
+	CreateConstMember (const rtl::CString& Name)
 	{
-		return CreateMember (Name, m_CurrentValue);
+		return CreateConstMember (Name, m_CurrentValue);
 	}
 
 protected:

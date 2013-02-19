@@ -36,15 +36,15 @@ protected:
 	// parent class
 
 	CClassType* m_pParentClassType;
-	CStructMember* m_pParentClassFieldMember;
+	CStructField* m_pParentClassFieldMember;
 	size_t m_ParentClassVTableIndex;
-	CStructMember* m_pDataFieldMember;
+	CStructField* m_pDataFieldMember;
 
 	// fields
 
 	size_t m_PackFactor;
 	CStructType* m_pFieldStructType;
-	CStructMember* m_pEventMember;
+	CStructField* m_pEventMember;
 	CStructType* m_pStaticFieldStructType;
 	CVariable* m_pStaticDataVariable;
 
@@ -106,7 +106,7 @@ public:
 		return m_pFieldStructType;
 	}
 
-	CStructMember* 
+	CStructField* 
 	GetEventMember ()
 	{
 		return m_pEventMember;
@@ -142,7 +142,7 @@ public:
 		return m_ParentClassVTableIndex;
 	}
 
-	CStructMember* 
+	CStructField* 
 	GetDataFieldMember ()
 	{
 		return m_pDataFieldMember;
@@ -154,7 +154,7 @@ public:
 	void
 	ConvertToPropertyMember (CClassType* pClassType);
 
-	CStructMember*
+	CStructField*
 	CreateFieldMember (
 		EStorage StorageKind,
 		const rtl::CString& Name,
@@ -162,7 +162,7 @@ public:
 		size_t BitCount = 0
 		);
 
-	CStructMember*
+	CStructField*
 	CreateFieldMember (
 		EStorage StorageKind,
 		CType* pType,

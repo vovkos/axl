@@ -143,7 +143,7 @@ public:
 		return m_pStaticDataVariable;
 	}
 
-	CStructMember*
+	CStructField*
 	CreateFieldMember (
 		EStorage StorageKind,
 		const rtl::CString& Name,
@@ -151,7 +151,7 @@ public:
 		size_t BitCount = 0
 		);
 
-	CStructMember*
+	CStructField*
 	CreateFieldMember (
 		EStorage StorageKind,
 		CType* pType,
@@ -161,7 +161,7 @@ public:
 		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount);
 	}
 
-	CStructMember*
+	CStructField*
 	CreateFieldMember (
 		const rtl::CString& Name,
 		CType* pType,
@@ -171,7 +171,7 @@ public:
 		return CreateFieldMember (EStorage_Undefined, Name, pType, BitCount);
 	}
 
-	CStructMember*
+	CStructField*
 	CreateFieldMember (
 		CType* pType,
 		size_t BitCount = 0

@@ -15,13 +15,13 @@ class CUnionType;
 
 //.............................................................................
 
-class CStructMember: public CNamedModuleItem
+class CStructField: public CNamedModuleItem
 {
 protected:
 	friend class CStructType;
 	friend class CUnionType;
 	
-	CNamedType* m_pParentType; // struct or union
+	CDerivableType* m_pParentType; // struct or union
 	CType* m_pType;
 	int m_DataPtrTypeFlags;
 
@@ -32,9 +32,9 @@ protected:
 	size_t m_LlvmIndex;
 
 public:
-	CStructMember ();
+	CStructField ();
 
-	CNamedType*
+	CDerivableType*
 	GetParentType ()
 	{
 		return m_pParentType;
@@ -73,7 +73,7 @@ protected:
 	size_t m_FieldActualSize;
 	size_t m_FieldAlignedSize;
 
-	rtl::CStdListT <CStructMember> m_MemberList;
+	rtl::CStdListT <CStructField> m_FieldMemberList;
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
 	size_t m_LastBitFieldOffset;
@@ -106,26 +106,26 @@ public:
 		return m_FieldAlignedSize;
 	}
 
-	rtl::CConstListT <CStructMember>
-	GetMemberList ()
+	rtl::CConstListT <CStructField>
+	GetFieldMemberList ()
 	{
-		return m_MemberList;
+		return m_FieldMemberList;
 	}
 
-	CStructMember*
-	CreateMember (
+	CStructField*
+	CreateFieldMember (
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0
 		);
 
-	CStructMember*
-	CreateMember (
+	CStructField*
+	CreateFieldMember (
 		CType* pType,
 		size_t BitCount = 0
 		)
 	{
-		return CreateMember (rtl::CString (), pType, BitCount);
+		return CreateFieldMember (rtl::CString (), pType, BitCount);
 	}
 
 	bool

@@ -67,7 +67,7 @@ CProperty::ConvertToPropertyMember (CClassType* pClassType)
 	m_pType = pClassType->GetPropertyMemberType (m_pType);
 }
 
-CStructMember*
+CStructField*
 CProperty::CreateFieldMember (
 	EStorage StorageKind,
 	const rtl::CString& Name,
@@ -122,7 +122,7 @@ CProperty::CreateFieldMember (
 		return NULL;
 	}
 
-	CStructMember* pMember = pFieldStructType->CreateMember (Name, pType, BitCount);
+	CStructField* pMember = pFieldStructType->CreateFieldMember (Name, pType, BitCount);
 
 	if (!Name.IsEmpty ())
 	{

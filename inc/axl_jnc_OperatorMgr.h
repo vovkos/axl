@@ -413,7 +413,7 @@ public:
 	bool
 	GetFieldMember (
 		const CValue& ThisValue,
-		CStructMember* pMember,
+		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
@@ -653,14 +653,14 @@ public:
 	bool
 	GetClassFieldMemberValue (
 		const CValue& ObjValue,
-		CStructMember* pMember,
+		CStructField* pMember,
 		CValue* pValue
 		);
 
 	bool
 	SetClassFieldMemberValue (
 		const CValue& ObjValue,
-		CStructMember* pMember,
+		CStructField* pMember,
 		const CValue& Value
 		);
 
@@ -750,7 +750,7 @@ protected:
 	// member operators
 
 	bool
-	StructMemberOperator (
+	GetStructMember (
 		const CValue& OpValue,
 		CStructType* pStructType,
 		const tchar_t* pName,
@@ -758,14 +758,15 @@ protected:
 		);
 
 	bool
-	VTableIndexOperatorImpl ( 
-		const CValue& ValuePtr,
-		size_t Index,
+	GetStructFieldMember  (
+		const CValue& OpValue,
+		CStructField* pMember,
+		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 
 	bool
-	UnionMemberOperator (
+	GetUnionMember (
 		const CValue& OpValue,
 		CUnionType* pUnionType,
 		const tchar_t* pName,
@@ -773,7 +774,14 @@ protected:
 		);
 
 	bool
-	ClassMemberOperator (
+	GetUnionFieldMember (
+		const CValue& OpValue,
+		CStructField* pMember,
+		CValue* pResultValue
+		);
+
+	bool
+	GetClassMember (
 		const CValue& OpValue,
 		CClassType* pClassType,
 		const tchar_t* pName,
@@ -781,22 +789,22 @@ protected:
 		);
 
 	bool
-	ClassFieldMemberOperator (
+	GetClassFieldMember (
 		const CValue& OpValue,
-		CStructMember* pMember,
+		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 
 	bool
-	ClassMethodMemberOperator (
+	GetClassMethodMember (
 		const CValue& OpValue,
 		CFunction* pFunction,
 		CValue* pResultValue
 		);
 
 	bool
-	ClassPropertyMemberOperator (
+	GetClassPropertyMember (
 		const CValue& OpValue,
 		CPropertyType* pPropertyType,
 		CValue* pResultValue

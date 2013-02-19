@@ -21,8 +21,8 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		_T("variable"),                    // EModuleItem_Variable,
 		_T("function"),                    // EModuleItem_Function,
 		_T("property"),                    // EModuleItem_Property,
-		_T("enum-member"),                 // EModuleItem_EnumMember,
-		_T("struct-member"),               // EModuleItem_StructMember,
+		_T("enum-member"),                 // EModuleItem_EnumConst,
+		_T("struct-member"),               // EModuleItem_StructField,
 	};
 
 	return ItemKind >= 0 && ItemKind < EModuleItem__Count ? 

@@ -12,7 +12,7 @@ namespace jnc {
 
 class CNamespace;
 class CEnumType;
-class CEnumMember;
+class CEnumConst;
 class CBaseTypeCoord;
 class CFunction;
 
@@ -194,7 +194,7 @@ public:
 		);
 
 	bool
-	ExposeEnumMembers (CEnumType* pMember);
+	ExposeEnumConsts (CEnumType* pMember);
 
 protected:
 	void

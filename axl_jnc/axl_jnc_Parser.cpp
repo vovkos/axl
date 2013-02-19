@@ -694,11 +694,11 @@ CParser::DeclareData (
 			break;
 
 		case EType_Struct:
-			pDataItem = ((CStructType*) pNamedType)->CreateMember (Name, pType, BitCount);
+			pDataItem = ((CStructType*) pNamedType)->CreateFieldMember (Name, pType, BitCount);
 			break;
 
 		case EType_Union:
-			pDataItem = ((CUnionType*) pNamedType)->CreateMember (Name, pType, BitCount);
+			pDataItem = ((CUnionType*) pNamedType)->CreateFieldMember (Name, pType, BitCount);
 			break;
 
 		default:
@@ -1316,12 +1316,12 @@ CParser::LookupIdentifier (
 		pValue->SetProperty ((CProperty*) pItem);
 		break;
 
-	case EModuleItem_EnumMember:
-		pValue->SetConstInt32 (((CEnumMember*) pItem)->GetValue ());
+	case EModuleItem_EnumConst:
+		pValue->SetConstInt32 (((CEnumConst*) pItem)->GetValue ());
 		break;
 
-	case EModuleItem_StructMember:
-		return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, (CStructMember*) pItem, &Coord, pValue);
+	case EModuleItem_StructField:
+		return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, (CStructField*) pItem, &Coord, pValue);
 
 	default:
 		err::SetFormatStringError (_T("%s '%s' cannot be used as expression"), GetModuleItemKindString (pItem->GetItemKind ()), Name);

@@ -46,11 +46,11 @@ CMulticastType::GetMulticastStructType ()
 
 	m_pMulticastStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pMulticastStructType->m_Tag.Format (_T("multicast"));
-	m_pMulticastStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
-	m_pMulticastStructType->CreateMember (m_pFunctionPtrType->GetDataPtrType (EDataPtrType_Unsafe));
-	m_pMulticastStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pMulticastStructType->CreateMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pMulticastStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_pMulticastStructType->CreateFieldMember (m_pFunctionPtrType->GetDataPtrType (EDataPtrType_Unsafe));
+	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 	m_pMulticastStructType->CalcLayout ();
 
 	return m_pMulticastStructType;

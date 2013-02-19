@@ -911,7 +911,7 @@ COperatorMgr::CreateClosureObject (
 	CStructType* pClosureFieldStructType = pClosureType->GetIfaceStructType ();
 	ASSERT (pClosureFieldStructType);
 
-	rtl::CIteratorT <CStructMember> ClosureMember = pClosureFieldStructType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldMemberList ().GetHead ();
 	if (IsIndirect)
 	{
 		CValue PtrValue = OpValue;

@@ -7,9 +7,9 @@ namespace jnc {
 
 //.............................................................................
 	
-CStructMember::CStructMember ()
+CStructField::CStructField ()
 {
-	m_ItemKind = EModuleItem_StructMember;
+	m_ItemKind = EModuleItem_StructField;
 	m_pType = NULL;
 	m_pBitFieldBaseType = NULL;
 	m_BitCount = 0;
@@ -31,21 +31,21 @@ CStructType::CStructType ()
 	m_LastBitFieldOffset = 0;
 }
 
-CStructMember*
-CStructType::CreateMember (
+CStructField*
+CStructType::CreateFieldMember (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount
 	)
 {
-	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
+	CStructField* pMember = AXL_MEM_NEW (CStructField);
 	pMember->m_StorageKind = m_StorageKind;
 	pMember->m_pParentType = this;
 	pMember->m_Name = Name;
 	pMember->m_pType = pType;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
-	m_MemberList.InsertTail (pMember);
+	m_FieldMemberList.InsertTail (pMember);
 
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
 		m_Flags &= ~ETypeFlag_Pod;
@@ -73,12 +73,12 @@ CStructType::Append (CStructType* pType)
 			return false;
 	}
 
-	rtl::CIteratorT <CStructMember> Member = pType->m_MemberList.GetHead ();
+	rtl::CIteratorT <CStructField> Member = pType->m_FieldMemberList.GetHead ();
 	for (; Member; Member++)
 	{
 		Result = Member->m_BitCount ? 
-			CreateMember (Member->m_Name, Member->m_pBitFieldBaseType, Member->m_BitCount) != NULL:
-			CreateMember (Member->m_Name, Member->m_pType) != NULL;
+			CreateFieldMember (Member->m_Name, Member->m_pBitFieldBaseType, Member->m_BitCount) != NULL:
+			CreateFieldMember (Member->m_Name, Member->m_pType) != NULL;
 
 		if (!Result)
 			return false;
@@ -118,10 +118,10 @@ CStructType::CalcLayout ()
 			return false;
 	}
 
-	rtl::CIteratorT <CStructMember> Member = m_MemberList.GetHead ();
+	rtl::CIteratorT <CStructField> Member = m_FieldMemberList.GetHead ();
 	for (; Member; Member++)
 	{
-		CStructMember* pMember = *Member;
+		CStructField* pMember = *Member;
 
 		Result = pMember->m_pType->CalcLayout ();
 		if (!Result)

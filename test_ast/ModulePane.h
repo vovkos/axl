@@ -54,9 +54,9 @@ protected:
 		);
 
 	void
-	AddEnumMember (
+	AddEnumConst (
 		HTREEITEM hParent,
-		jnc::CEnumMember* pMember
+		jnc::CEnumConst* pMember
 		);
 
 	void
@@ -98,9 +98,9 @@ protected:
 		);
 
 	void
-	AddStructMember (
+	AddStructField (
 		HTREEITEM hParent,
-		jnc::CStructMember* pMember
+		jnc::CStructField* pMember
 		)
 	{
 		AddValue (hParent, pMember->GetName (), pMember->GetType (), pMember);

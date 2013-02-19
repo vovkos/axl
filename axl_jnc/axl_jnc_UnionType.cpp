@@ -7,8 +7,8 @@ namespace jnc {
 
 //.............................................................................
 
-CStructMember*
-CUnionType::CreateMember (
+CStructField*
+CUnionType::CreateFieldMember (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount
@@ -20,13 +20,13 @@ CUnionType::CreateMember (
 		return NULL;
 	}
 
-	CStructMember* pMember = AXL_MEM_NEW (CStructMember);
+	CStructField* pMember = AXL_MEM_NEW (CStructField);
 	pMember->m_Name = Name;
 	pMember->m_pParentType = this;
 	pMember->m_pType = pType;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
-	m_MemberList.InsertTail (pMember);
+	m_FieldMemberList.InsertTail (pMember);
 
 	bool Result = AddItem (pMember);
 	if (!Result)
@@ -47,10 +47,10 @@ CUnionType::CalcLayout ()
 
 	CType* pLargestMemberType = NULL;
 
-	rtl::CIteratorT <CStructMember> Member = m_MemberList.GetHead ();
+	rtl::CIteratorT <CStructField> Member = m_FieldMemberList.GetHead ();
 	for (; Member; Member++)
 	{
-		CStructMember* pMember = *Member;
+		CStructField* pMember = *Member;
 
 		Result = pMember->m_pType->CalcLayout ();
 		if (!Result)
@@ -71,7 +71,7 @@ CUnionType::CalcLayout ()
 
 	m_pStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pStructType->m_Tag.Format (_T("%s.struct"), m_Tag);
-	m_pStructType->CreateMember (pLargestMemberType);
+	m_pStructType->CreateFieldMember (pLargestMemberType);
 	Result = m_pStructType->CalcLayout ();
 	if (!Result)
 		return false;

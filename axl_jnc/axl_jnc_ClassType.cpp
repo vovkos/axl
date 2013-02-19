@@ -59,7 +59,7 @@ CClassType::SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList)
 	m_pModule->m_FunctionMgr.m_GlobalAutoEvTypeArray.Append (this);
 }
 
-CStructMember*
+CStructField*
 CClassType::CreateFieldMember (
 	EStorage StorageKind,
 	const rtl::CString& Name,
@@ -93,7 +93,7 @@ CClassType::CreateFieldMember (
 		return NULL;
 	}
 
-	CStructMember* pMember = pFieldStructType->CreateMember (Name, pType, BitCount);
+	CStructField* pMember = pFieldStructType->CreateFieldMember (Name, pType, BitCount);
 
 	if (!Name.IsEmpty ())
 	{
@@ -466,8 +466,8 @@ CClassType::CalcLayout ()
 	{
 		m_pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 		m_pClassStructType->m_Tag.Format (_T("%s.class"), m_Tag);
-		m_pClassStructType->CreateMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
-		m_pClassStructType->CreateMember (m_pIfaceStructType);
+		m_pClassStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
+		m_pClassStructType->CreateFieldMember (m_pIfaceStructType);
 		m_pClassStructType->CalcLayout ();
 	}
 
@@ -485,7 +485,7 @@ CClassType::AddVirtualFunction (CFunction* pFunction)
 	pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
 
 	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe);
-	m_pVTableStructType->CreateMember (pPointerType);
+	m_pVTableStructType->CreateFieldMember (pPointerType);
 	m_VTable.Append (pFunction);
 }
 

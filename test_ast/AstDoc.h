@@ -65,7 +65,7 @@ public:
 
 protected:
 	bool
-	CompileEnumMembers ();
+	CompileEnumConsts ();
 
 	bool
 	CompileInitializers ();

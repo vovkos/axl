@@ -13,7 +13,7 @@ class CScope;
 class CVariable;
 class CFunction;
 class CProperty;
-class CStructMember;
+class CStructField;
 class CClassType;
 class CClosure;
 
@@ -99,7 +99,7 @@ protected:
 		CVariable* m_pVariable;
 		CFunction* m_pFunction;
 		CProperty* m_pProperty;
-		CStructMember* m_pField;
+		CStructField* m_pField;
 	};
 
 	mutable llvm::Value* m_pLlvmValue;
@@ -227,7 +227,7 @@ public:
 		return m_pProperty;
 	}
 
-	CStructMember* 
+	CStructField* 
 	GetField () const
 	{
 		ASSERT (m_ValueKind == EValue_Field);
@@ -526,7 +526,7 @@ public:
 	SetLlvmValue (		
 		llvm::Value* pValue,
 		CType* pType,
-		CStructMember* pField,
+		CStructField* pField,
 		int Flags = 0
 		);
 

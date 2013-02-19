@@ -757,7 +757,7 @@ CFunctionMgr::CompileClosureThunk (CThunk* pThunk)
 	CStructType* pClosureFieldStructType = pThunk->m_pClosureType->GetIfaceStructType ();
 	ASSERT (pClosureFieldStructType);
 
-	rtl::CIteratorT <CStructMember> ClosureMember = pClosureFieldStructType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldMemberList ().GetHead ();
 
 	CValue PfnValue;
 

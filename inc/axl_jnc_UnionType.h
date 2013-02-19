@@ -21,7 +21,7 @@ protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
-	rtl::CStdListT <CStructMember> m_MemberList;
+	rtl::CStdListT <CStructField> m_FieldMemberList;
 
 	CStructType* m_pStructType;
 
@@ -40,21 +40,14 @@ public:
 		return m_pStructType;
 	}
 
-	rtl::CConstListT <CStructMember>
-	GetMemberList ()
+	rtl::CConstListT <CStructField>
+	GetFieldMemberList ()
 	{
-		return m_MemberList;
+		return m_FieldMemberList;
 	}
 
-	CStructMember*
-	FindMember (const tchar_t* pName)
-	{
-		rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-		return It && It->m_Value->GetItemKind () == EModuleItem_StructMember ? (CStructMember*) It->m_Value : NULL;
-	}
-
-	CStructMember*
-	CreateMember (
+	CStructField*
+	CreateFieldMember (
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0

@@ -40,7 +40,7 @@ public:
 		char Buffer [256];
 		rtl::CArrayT <llvm::Constant*> LlvmMemberArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
-		rtl::CIteratorT <CStructMember> Member = pType->GetMemberList ().GetHead ();
+		rtl::CIteratorT <CStructField> Member = pType->GetFieldMemberList ().GetHead ();
 		for (; Member; Member++)
 		{
 			CValue MemberConst ((char*) p + Member->GetOffset (), Member->GetType ());
@@ -468,7 +468,7 @@ void
 CValue::SetLlvmValue (		
 	llvm::Value* pValue,
 	CType* pType,
-	CStructMember* pField,
+	CStructField* pField,
 	int Flags
 	)
 {

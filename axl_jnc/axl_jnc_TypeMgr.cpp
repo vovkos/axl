@@ -338,8 +338,8 @@ CTypeMgr::CreateClassType (
 
 	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceHdrStructType->m_Tag.Format (_T("%s.ifacehdr"), pType->m_Tag);
-	pIfaceHdrStructType->CreateMember (pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe));
-	pIfaceHdrStructType->CreateMember (GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Unsafe));
+	pIfaceHdrStructType->CreateFieldMember (pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe));
+	pIfaceHdrStructType->CreateFieldMember (GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Unsafe));
 
 	CStructType* pIfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
 	pIfaceStructType->m_Tag.Format (_T("%s.iface"), pType->m_Tag);
@@ -1112,9 +1112,9 @@ CTypeMgr::CreateDataPtrValidatorType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("sptrv");
-	pType->CreateMember (GetStdType (EStdType_BytePtr));
-	pType->CreateMember (GetStdType (EStdType_BytePtr));
-	pType->CreateMember (GetPrimitiveType (EType_SizeT));
+	pType->CreateFieldMember (GetStdType (EStdType_BytePtr));
+	pType->CreateFieldMember (GetStdType (EStdType_BytePtr));
+	pType->CreateFieldMember (GetPrimitiveType (EType_SizeT));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1124,8 +1124,8 @@ CTypeMgr::CreateObjectHdrType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("objhdr");
-	pType->CreateMember (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
-	pType->CreateMember (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
+	pType->CreateFieldMember (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
+	pType->CreateFieldMember (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1145,8 +1145,8 @@ CTypeMgr::CreateDataPtrStructType (CType* pBaseType)
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("%s.sptr"), pBaseType->GetTypeString ());
-	pType->CreateMember (pBaseType->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateMember (GetStdType (EStdType_DataPtrValidator));
+	pType->CreateFieldMember (pBaseType->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateFieldMember (GetStdType (EStdType_DataPtrValidator));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1158,8 +1158,8 @@ CTypeMgr::CreateClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.ptr"));
-	pType->CreateMember (pAbstractMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin));
-	pType->CreateMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateFieldMember (pAbstractMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1173,9 +1173,9 @@ CTypeMgr::CreateWeakClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.wptr"));
 
-	pType->CreateMember (pFunctionType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
-	pType->CreateMember (GetStdType (EStdType_ObjectPtr));
-	pType->CreateMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateFieldMember (pFunctionType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1185,13 +1185,13 @@ CTypeMgr::CreatePropertyVTableStructType (CPropertyType* pPropertyType)
 {
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.vtbl"));
-	pType->CreateMember (pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateFieldMember (pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
 
 	size_t SetterTypeOverloadCount = pPropertyType->m_SetterType.GetOverloadCount ();
 	for (size_t i = 0; i < SetterTypeOverloadCount; i++)
 	{
 		CFunctionType* pSetterType = pPropertyType->m_SetterType.GetOverload (i);
-		pType->CreateMember (pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+		pType->CreateFieldMember (pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	}
 
 	pType->CalcLayout ();
@@ -1208,7 +1208,7 @@ CTypeMgr::CreateClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 
 	if (!(pPropertyType->GetFlags () & EPropertyTypeFlag_Augmented))
 	{
-		pType->CreateMember (pAbstractPropertyMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+		pType->CreateFieldMember (pAbstractPropertyMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
 	}
 	else
 	{
@@ -1216,7 +1216,7 @@ CTypeMgr::CreateClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 		// thin pointer goes first
 	}
 
-	pType->CreateMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
 
 	pType->CalcLayout ();
 	return pType;
@@ -1231,9 +1231,9 @@ CTypeMgr::CreateWeakClosurePropertyPtrStructType (CPropertyType* pPropertyType)
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.wptr"));
-	pType->CreateMember (pAbstractPropertyMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateMember (GetStdType (EStdType_ObjectPtr));
-	pType->CreateMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateFieldMember (pAbstractPropertyMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
 	pType->CalcLayout ();
 	return NULL;
 }
@@ -1246,8 +1246,8 @@ CTypeMgr::CreateBindablePropertyThinPtrStructType (CPropertyType* pPropertyType)
 	ASSERT (pPropertyType->m_Flags & EPropertyTypeFlag_Bindable);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.tptr"));
-	pType->CreateMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateMember (GetStdType (EStdType_SimpleEvent)->GetDataPtrType ());
+	pType->CreateFieldMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateFieldMember (GetStdType (EStdType_SimpleEvent)->GetDataPtrType ());
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1260,8 +1260,8 @@ CTypeMgr::CreateBindablePropertyUnsafePtrStructType (CPropertyType* pPropertyTyp
 	ASSERT (pPropertyType->m_Flags & EPropertyTypeFlag_Bindable);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.uptr"));
-	pType->CreateMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateMember (GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateFieldMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateFieldMember (GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe));
 	pType->CalcLayout ();
 	return pType;
 }

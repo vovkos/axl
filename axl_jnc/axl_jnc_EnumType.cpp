@@ -14,38 +14,23 @@ CEnumType::CEnumType ()
 	m_CurrentValue = 0;
 }
 
-CEnumMember*
-CEnumType::FindMember (const tchar_t* pName)
-{
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName); 
-	if (!It)
-		return NULL;
-
-	CModuleItem* pItem = It->m_Value;
-	return pItem->GetItemKind () == EModuleItem_EnumMember ? (CEnumMember*) pItem : NULL;
-}
-
-CEnumMember*
-CEnumType::CreateMember (
+CEnumConst*
+CEnumType::CreateConstMember (
 	const rtl::CString& Name,
 	intptr_t Value
 	)
 {
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (Name); 
-	if (It->m_Value)
-	{
-		err::SetFormatStringError (_T("redefinition of member '%s' in '%s'"), Name, GetTypeString ());
-		return NULL;
-	}
-
-	CEnumMember* pMember = AXL_MEM_NEW (CEnumMember);
+	CEnumConst* pMember = AXL_MEM_NEW (CEnumConst);
 	pMember->m_Name = Name;
 	pMember->m_pParentEnumType = this;
 	pMember->m_Value = Value;
-	m_MemberList.InsertTail (pMember);
+	m_ConstMemberList.InsertTail (pMember);
 	
+	bool Result = AddItem (pMember);
+	if (!Result)
+		return false;
+
 	m_CurrentValue = Value + 1;
-	It->m_Value = pMember;
 	return pMember;
 }
 

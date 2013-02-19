@@ -160,12 +160,12 @@ CModulePane::AddItem (
 		AddProperty (hParent, (jnc::CProperty*) pItem);
 		break;
 
-	case jnc::EModuleItem_EnumMember:
-		AddEnumMember (hParent, (jnc::CEnumMember*) pItem);
+	case jnc::EModuleItem_EnumConst:
+		AddEnumConst (hParent, (jnc::CEnumConst*) pItem);
 		break;
 
-	case jnc::EModuleItem_StructMember:
-		AddStructMember (hParent, (jnc::CStructMember*) pItem);
+	case jnc::EModuleItem_StructField:
+		AddStructField (hParent, (jnc::CStructField*) pItem);
 		break;
 
 	default:
@@ -215,9 +215,9 @@ CModulePane::AddType (
 }
 
 void
-CModulePane::AddEnumMember (
+CModulePane::AddEnumConst (
 	HTREEITEM hParent,
-	jnc::CEnumMember* pMember
+	jnc::CEnumConst* pMember
 	)
 {
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (pMember->GetName (), hParent);
@@ -249,9 +249,9 @@ CModulePane::AddEnumTypeMembers (
 	jnc::CEnumType* pType
 	)
 {
-	rtl::CIteratorT <jnc::CEnumMember> Member = pType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CEnumConst> Member = pType->GetMemberList ().GetHead ();
 	for (; Member; Member++)
-		AddEnumMember (hParent, *Member);
+		AddEnumConst (hParent, *Member);
 	
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
@@ -304,9 +304,9 @@ CModulePane::AddStructTypeMembers (
 {
 //	AddStructClassTypeMembers (hParent, pType);
 
-	rtl::CIteratorT <jnc::CStructMember> Member = pType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CStructField> Member = pType->GetFieldMemberList ().GetHead ();
 	for (; Member; Member++)
-		AddStructMember (hParent, *Member);
+		AddStructField (hParent, *Member);
 
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
@@ -319,9 +319,9 @@ CModulePane::AddUnionTypeMembers (
 {
 //	AddStructClassTypeMembers (hParent, pType);
 
-	rtl::CIteratorT <jnc::CStructMember> Member = pType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CStructField> Member = pType->GetFieldMemberList ().GetHead ();
 	for (; Member; Member++)
-		AddStructMember (hParent, *Member);
+		AddStructField (hParent, *Member);
 
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
@@ -397,7 +397,7 @@ CModulePane::AddAlias (
 		m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) pAlias);
 		break;
 
-	case jnc::EModuleItem_EnumMember:
+	case jnc::EModuleItem_EnumConst:
 		AddItem (hParent, pTarget);
 		break;
 
@@ -565,7 +565,7 @@ GetFunctionTip (jnc::CFunction* pFunction)
 }
 
 rtl::CString
-GetStructMemberTip (jnc::CStructMember* pMember)
+GetStructFieldTip (jnc::CStructField* pMember)
 {
 	jnc::CType* pType = pMember->GetType ();
 	pType = UnImportType (pType);
@@ -580,7 +580,7 @@ GetStructMemberTip (jnc::CStructMember* pMember)
 }
 
 rtl::CString
-GetEnumMemberTip (jnc::CEnumMember* pMember)
+GetEnumConstTip (jnc::CEnumConst* pMember)
 {
 	rtl::CString TipText = pMember->GetName ();
 	
@@ -620,11 +620,11 @@ CModulePane::GetItemTip (jnc::CModuleItem* pItem)
 	case jnc::EModuleItem_Alias:
 		return ((jnc::CAlias*) pItem)->GetQualifiedName ();
 
-	case jnc::EModuleItem_StructMember:
-		return GetStructMemberTip ((jnc::CStructMember*) pItem);
+	case jnc::EModuleItem_StructField:
+		return GetStructFieldTip ((jnc::CStructField*) pItem);
 
-	case jnc::EModuleItem_EnumMember:
-		return GetEnumMemberTip ((jnc::CEnumMember*) pItem);
+	case jnc::EModuleItem_EnumConst:
+		return GetEnumConstTip ((jnc::CEnumConst*) pItem);
 
 	default:		
 		return rtl::CString::Format_s (_T("item %x of kind %d"), pItem, ItemKind);
