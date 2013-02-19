@@ -17,7 +17,7 @@ class CCast_PropertyPtr_Base: public ICastOperator
 public:
 	CCast_PropertyPtr_Base ()
 	{
-		m_OpFlags = EOpFlag_KeepPropertyRef;
+		m_OpFlags = EOpFlag_PropertyRefToPtr;
 	}
 
 	virtual

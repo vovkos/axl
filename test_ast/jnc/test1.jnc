@@ -1,17 +1,20 @@
 //.............................................................................
 
-int property MyProp;
+int indexed property MyProp (int i);
 
 int
-MyProp.get ()
+MyProp.get (int i)
 {
-	printf ("MyProp.get ()\n");
+	printf ("MyProp.get (%d)\n", i);
 	return 100;
 }
 
-MyProp.set (int x)
+MyProp.set (
+	int i,
+	int x
+	)
 {
-	printf ("MyProp.set (%d)\n", x);
+	printf ("MyProp.set (%d, %d)\n", i, x);
 }
 
 int 
@@ -19,9 +22,11 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
-	int x = MyProp;
+	int thin indexed property* pr (int) = MyProp;
 
-	MyProp = 200;
+	int x = *(pr [5]);
+
+	*(pr [10]) = 200;
 
 	return 0;
 }

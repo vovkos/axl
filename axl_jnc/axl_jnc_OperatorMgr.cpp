@@ -650,19 +650,28 @@ COperatorMgr::PrepareOperandType (
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
-				CPropertyPtrType* pPropertyPtrType = (CPropertyPtrType*) pType;
+				CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
 
 				CClosure* pClosure = Value.GetClosure ();
 				if (pClosure)
 				{
-					pPropertyPtrType = pClosure->GetPropertyClosureType (pPropertyPtrType);
-					if (!pPropertyPtrType)
+					pPtrType = pClosure->GetPropertyClosureType (pPtrType);
+					if (!pPtrType)
 						break;
 				}
 			
-				CPropertyType* pPropertyType = pPropertyPtrType->GetTargetType ();
-				if (!pPropertyType->IsIndexed ())
-					Value = pPropertyType->GetReturnType ();
+				CPropertyType* pTargetType = pPtrType->GetTargetType ();
+				if (OpFlags & EOpFlag_PropertyRefToPtr)
+				{
+					if (!pTargetType->IsIndexed () && pTargetType->GetReturnType ()->GetTypeKind () == EType_PropertyPtr)
+						Value = pTargetType->GetReturnType ();
+					else
+						Value = pTargetType->GetPropertyPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
+				}
+				else if (!pTargetType->IsIndexed ())
+				{
+					Value = pTargetType->GetReturnType ();
+				}
 			}
 
 			break;
@@ -732,18 +741,33 @@ COperatorMgr::PrepareOperand (
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
-				CPropertyPtrType* pPropertyPtrType = (CPropertyPtrType*) pType;
+				CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
 
 				CClosure* pClosure = Value.GetClosure ();
 				if (pClosure)
 				{
-					pPropertyPtrType = pClosure->GetPropertyClosureType (pPropertyPtrType);
-					if (!pPropertyPtrType)
+					pPtrType = pClosure->GetPropertyClosureType (pPtrType);
+					if (!pPtrType)
 						break;
 				}
 			
-				CPropertyType* pPropertyType = pPropertyPtrType->GetTargetType ();
-				if (!pPropertyType->IsIndexed ())
+				CPropertyType* pTargetType = pPtrType->GetTargetType ();
+
+				if (OpFlags & EOpFlag_PropertyRefToPtr)
+				{
+					if (!pTargetType->IsIndexed () && pTargetType->GetReturnType ()->GetTypeKind () == EType_PropertyPtr)
+					{
+						Result = GetProperty (Value, &Value);
+						if (!Result)
+							return false;
+					}
+					else
+					{
+						pPtrType = pTargetType->GetPropertyPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
+						Value.OverrideType (pPtrType);
+					}
+				}
+				else if (!pTargetType->IsIndexed ())
 				{
 					Result = GetProperty (Value, &Value);
 					if (!Result)

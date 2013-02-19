@@ -37,12 +37,14 @@ GetUnOpKindString (EUnOp OpKind);
 
 enum EOpFlag
 {
-	EOpFlag_KeepDataRef     = 0x01,
-	EOpFlag_KeepPropertyRef = 0x02,	
-	EOpFlag_KeepArrayRef    = 0x04,
-	EOpFlag_KeepBool        = 0x10,
-	EOpFlag_KeepEnum        = 0x20,
-	EOpFlag_KeepRef         = EOpFlag_KeepDataRef | EOpFlag_KeepPropertyRef,
+	EOpFlag_KeepDataRef      = 0x01,
+	EOpFlag_KeepPropertyRef  = 0x02,
+	EOpFlag_KeepArrayRef     = 0x04,
+	EOpFlag_KeepBool         = 0x10,
+	EOpFlag_KeepEnum         = 0x20,
+	EOpFlag_PropertyRefToPtr = 0x40,
+
+	EOpFlag_KeepRef          = EOpFlag_KeepDataRef | EOpFlag_KeepPropertyRef,
 };
 
 //.............................................................................
