@@ -115,10 +115,13 @@ CDeclTypeCalc::CalcType (
 	if (m_TypeModifiers & ETypeModifier_Const)
 		DataPtrFlags |= EPtrTypeFlag_Const;
 
+	if (m_TypeModifiers & ETypeModifier_ReadOnly)
+		DataPtrFlags |= EPtrTypeFlag_ReadOnly;
+
 	if (m_TypeModifiers & ETypeModifier_Volatile)
 		DataPtrFlags |= EPtrTypeFlag_Volatile;
 
-	m_TypeModifiers &= ETypeModifier_Const | ETypeModifier_Volatile;
+	m_TypeModifiers &= ETypeModifier_Const | ETypeModifier_ReadOnly | ETypeModifier_Volatile;
 
 	if (!CheckUnusedModifiers ())
 		return false;

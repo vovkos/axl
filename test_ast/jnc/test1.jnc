@@ -2,7 +2,7 @@
 
 class IFoo
 {
-	int m_FooValue;
+	readonly int m_FooValue;
 
 	abstract 
 	int property FooProp;
@@ -47,8 +47,10 @@ main ()
 	printf ("hui govno i muravei\n");
 
 	IFoo f = new CTest;
+
+	int x = f.m_FooValue;
 	
-	int x = f.FooProp;
+	int y = f.FooProp;
 	f.FooProp = 500;	
 
 	return 0;

@@ -13,39 +13,38 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 {
 	static
 	int 
-	AntiModifierTable [32] = 
+	AntiModifierTable [] = 
 	{		
-		ETypeModifierMask_Sign,       //  0 -- ETypeModifier_Signed        = 0x00000001,		
-		ETypeModifierMask_Sign,       //  1 -- ETypeModifier_Unsigned      = 0x00000002,		
-		ETypeModifierMask_Endian,     //  2 -- ETypeModifier_LittleEndian  = 0x00000004,		
-		ETypeModifierMask_Endian,     //  3 -- ETypeModifier_BigEndian     = 0x00000008,		
-		0,                            //  4 -- ETypeModifier_Const         = 0x00000010,		
-		0,                            //  5 -- ETypeModifier_Volatile      = 0x00000020,		
-		ETypeModifierMask_Safety,     //  6 -- ETypeModifier_Safe          = 0x00000040,	
-		ETypeModifierMask_Safety |    //  7 -- ETypeModifier_Unsafe        = 0x00000080,
+		ETypeModifierMask_Sign,           //  0 -- ETypeModifier_Signed        = 0x00000001,		
+		ETypeModifierMask_Sign,           //  1 -- ETypeModifier_Unsigned      = 0x00000002,		
+		ETypeModifierMask_Endian,         //  2 -- ETypeModifier_LittleEndian  = 0x00000004,		
+		ETypeModifierMask_Endian,         //  3 -- ETypeModifier_BigEndian     = 0x00000008,		
+		ETypeModifier_ReadOnly,           //  4 -- ETypeModifier_Const         = 0x00000010,		
+		ETypeModifier_Const,              //  5 -- ETypeModifier_ReadOnly      = 0x00000020,		
+		0,                                //  6 -- ETypeModifier_Volatile      = 0x00000040,		
+		ETypeModifierMask_Safety,         //  7 -- ETypeModifier_Safe          = 0x00000080,	
+		ETypeModifierMask_Safety |        //  8 -- ETypeModifier_Unsafe        = 0x00000100,
 		ETypeModifierMask_Strength | 
 		ETypeModifierMask_Closure,		
-		0,                            //  8 -- ETypeModifier_NoNull        = 0x00000100,		
-		ETypeModifierMask_Strength |  //  9 -- ETypeModifier_Strong        = 0x00000200,
+		0,                                //  9 -- ETypeModifier_NoNull        = 0x00000200,		
+		ETypeModifierMask_Strength |      // 10 -- ETypeModifier_Strong        = 0x00000400,
 		ETypeModifier_Thin |
 		ETypeModifier_Unsafe,		
-		ETypeModifierMask_Strength |  // 10 -- ETypeModifier_Weak          = 0x00000400,
+		ETypeModifierMask_Strength |      // 11 -- ETypeModifier_Weak          = 0x00000800,
 		ETypeModifier_Thin |
 		ETypeModifier_Unsafe,		
-		ETypeModifierMask_CallConv,   // 11 -- ETypeModifier_Cdecl         = 0x00000800,		
-		ETypeModifierMask_CallConv,   // 12 -- ETypeModifier_Stdcall       = 0x00001000,		
-		ETypeModifier_Property |      // 13 -- ETypeModifier_Function      = 0x00002000,
-		ETypeModifier_Event,		
-		ETypeModifier_Function |      // 14 -- ETypeModifier_Property      = 0x00004000,
-		ETypeModifier_Event,				
-		ETypeModifier_Function |      // 15 -- ETypeModifier_Event         = 0x00008000,
-		ETypeModifier_Property,		
-		0,                            // 16 -- ETypeModifier_Bindable      = 0x00010000,		
-		ETypeModifier_Indexed,        // 17 -- ETypeModifier_AutoGet       = 0x00020000,		
-		ETypeModifier_AutoGet,        // 18 -- ETypeModifier_Indexed       = 0x00040000,		
-		ETypeModifierMask_Closure |   // 19 -- ETypeModifier_Closure       = 0x00080000,
+		ETypeModifierMask_CallConv,       // 12 -- ETypeModifier_Cdecl         = 0x00001000,		
+		ETypeModifierMask_CallConv,       // 13 -- ETypeModifier_Stdcall       = 0x00002000,		
+		ETypeModifierMask_FunctionKind,   // 14 -- ETypeModifier_Function      = 0x00004000,
+		ETypeModifierMask_FunctionKind,   // 15 -- ETypeModifier_Property      = 0x00008000,
+		ETypeModifierMask_FunctionKind,   // 16 -- ETypeModifier_Multicast     = 0x00010000,
+		ETypeModifierMask_FunctionKind,   // 17 -- ETypeModifier_Event         = 0x00020000,
+		0,                                // 18 -- ETypeModifier_Bindable      = 0x00040000,		
+		ETypeModifier_Indexed,            // 19 -- ETypeModifier_AutoGet       = 0x00080000,		
+		ETypeModifier_AutoGet,            // 20 -- ETypeModifier_Indexed       = 0x00100000,		
+		ETypeModifierMask_Closure |       // 21 -- ETypeModifier_Closure       = 0x00200000,
 		ETypeModifier_Unsafe,		
-		ETypeModifierMask_Closure |   // 20 -- ETypeModifier_Thin          = 0x00100000,
+		ETypeModifierMask_Closure |       // 22 -- ETypeModifier_Thin          = 0x00400000,
 		ETypeModifierMask_Strength |        
 		ETypeModifier_Unsafe,
 	};
@@ -57,7 +56,8 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 	}
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
-	ASSERT (i < 32);
+	if (i >= countof (AntiModifierTable))
+		return true; // allow adding new modifiers without changing table
 
 	if (m_TypeModifiers & AntiModifierTable [i])
 	{

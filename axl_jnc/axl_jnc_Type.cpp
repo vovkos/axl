@@ -88,74 +88,37 @@ GetLlvmTypeString (llvm::Type* pLlvmType)
 const tchar_t*
 GetTypeModifierString (ETypeModifier Modifier)
 {
-	switch (Modifier)
+	static const tchar_t* StringTable [] = 
 	{
-	case ETypeModifier_Signed:
-		return _T("signed");
-
-	case ETypeModifier_Unsigned:
-		return _T("unsigned");
-
-	case ETypeModifier_LittleEndian:
-		return _T("littleendian");
-
-	case ETypeModifier_BigEndian:
-		return _T("bigendian");
-
-	case ETypeModifier_Const:
-		return _T("const");
-
-	case ETypeModifier_Volatile:
-		return _T("volatile");
-
-	case ETypeModifier_Safe:
-		return _T("safe");
-
-	case ETypeModifier_Unsafe:
-		return _T("unsafe");
-		
-	case ETypeModifier_NoNull:
-		return _T("nonull");
-
-	case ETypeModifier_Strong:
-		return _T("strong");
-
-	case ETypeModifier_Weak:
-		return _T("weak");
-
-	case ETypeModifier_Cdecl:
-		return _T("cdecl");
-
-	case ETypeModifier_Stdcall:
-		return _T("stdcall");
-
-	case ETypeModifier_Function:
-		return _T("function");
-
-	case ETypeModifier_Property:
-		return _T("property");
-
-	case ETypeModifier_Event:
-		return _T("event");
-
-	case ETypeModifier_Bindable:
-		return _T("bindable");
-
-	case ETypeModifier_AutoGet:
-		return _T("autoget");
-
-	case ETypeModifier_Indexed:
-		return _T("indexed");
-
-	case ETypeModifier_Closure:
-		return _T("closure");
-
-	case ETypeModifier_Thin:
-		return _T("thin");
-
-	default:
-		return _T("undefined-type-modifier");
+		_T("signed"),        // ETypeModifier_Signed        = 0x00000001,
+		_T("unsigned"),      // ETypeModifier_Unsigned      = 0x00000002,
+		_T("littleendian"),  // ETypeModifier_LittleEndian  = 0x00000004,
+		_T("bigendian"),     // ETypeModifier_BigEndian     = 0x00000008,
+		_T("const"),         // ETypeModifier_Const         = 0x00000010,
+		_T("readonly"),      // ETypeModifier_ReadOnly      = 0x00000020,
+		_T("volatile"),      // ETypeModifier_Volatile      = 0x00000040,
+		_T("safe"),          // ETypeModifier_Safe          = 0x00000080,
+		_T("unsafe"),        // ETypeModifier_Unsafe        = 0x00000100,
+		_T("nonull"),        // ETypeModifier_NoNull        = 0x00000200,
+		_T("strong"),        // ETypeModifier_Strong        = 0x00000400,
+		_T("weak"),          // ETypeModifier_Weak          = 0x00000800,
+		_T("cdecl"),         // ETypeModifier_Cdecl         = 0x00001000,
+		_T("stdcall"),       // ETypeModifier_Stdcall       = 0x00002000,
+		_T("function"),      // ETypeModifier_Function      = 0x00004000,
+		_T("property"),      // ETypeModifier_Property      = 0x00008000,
+		_T("multicast"),     // ETypeModifier_Multicast     = 0x00010000,
+		_T("event"),         // ETypeModifier_Event         = 0x00020000,
+		_T("bindable"),      // ETypeModifier_Bindable      = 0x00040000,
+		_T("autoget"),       // ETypeModifier_AutoGet       = 0x00080000,
+		_T("indexed"),       // ETypeModifier_Indexed       = 0x00100000,
+		_T("closure"),       // ETypeModifier_Closure       = 0x00200000,
+		_T("thin"),          // ETypeModifier_Thin          = 0x00400000,
 	};
+
+	size_t i = rtl::GetLoBitIdx32 (Modifier);
+	return i < countof (StringTable) ? 
+		StringTable [i] : 
+		_T("undefined-type-modifier");
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -163,23 +126,18 @@ GetTypeModifierString (ETypeModifier Modifier)
 const tchar_t* 
 GetPtrTypeFlagString (EPtrTypeFlag Flag)
 {
-	switch (Flag)
+	static const tchar_t* StringTable [] = 
 	{
-	case EPtrTypeFlag_NoNull:
-		return _T("nonull");
+		_T("nonull"),   // EPtrTypeFlag_NoNull    = 0x0100,
+		_T("const"),    // EPtrTypeFlag_Const     = 0x0200,
+		_T("readonly"), // EPtrTypeFlag_ReadOnly  = 0x0400,
+		_T("volatile"), // EPtrTypeFlag_Volatile  = 0x0800,
+	};
 
-	case EPtrTypeFlag_Const:
-		return _T("const");
-
-	case EPtrTypeFlag_ReadOnly:
-		return _T("readonly");
-
-	case EPtrTypeFlag_Volatile:
-		return _T("volatile");
-
-	default:
-		return _T("undefined-ptr-type-flag");
-	}
+	size_t i = rtl::GetLoBitIdx32 (Flag);
+	return i < countof (StringTable) ? 
+		StringTable [i] : 
+		_T("undefined-ptr-type-flag");
 }
 
 //.............................................................................
@@ -297,8 +255,7 @@ CType::GetDataPtrType (
 void
 CType::PrepareTypeString ()
 {
-	static const tchar_t*
-	PrimitiveTypeNameTable [EType__PrimitiveTypeCount] = 
+	static const tchar_t* StringTable [EType__PrimitiveTypeCount] = 
 	{
 		_T("void"),
 		_T("variant"),
@@ -322,7 +279,7 @@ CType::PrepareTypeString ()
 	};
 
 	ASSERT (m_TypeKind < EType__PrimitiveTypeCount);
-	m_TypeString = PrimitiveTypeNameTable [m_TypeKind];
+	m_TypeString = StringTable [m_TypeKind];
 }
 
 void

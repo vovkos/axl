@@ -221,6 +221,12 @@ enum ETypeModifierMask
 		ETypeModifierMask_Sign | 
 		ETypeModifierMask_Endian,
 
+	ETypeModifierMask_FunctionKind = 
+		ETypeModifier_Function |	
+		ETypeModifier_Property |	
+		ETypeModifier_Multicast |	
+		ETypeModifier_Event,	
+
 	ETypeModifierMask_Function = 
 		ETypeModifier_Function | 
 		ETypeModifierMask_CallConv,
@@ -230,6 +236,10 @@ enum ETypeModifierMask
 		ETypeModifier_Bindable | 
 		ETypeModifier_AutoGet | 
 		ETypeModifier_Indexed |
+		ETypeModifierMask_CallConv,
+
+	ETypeModifierMask_Multicast = 
+		ETypeModifier_Multicast | 
 		ETypeModifierMask_CallConv,
 
 	ETypeModifierMask_Event = 
