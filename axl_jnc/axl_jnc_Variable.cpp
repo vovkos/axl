@@ -28,6 +28,7 @@ CVariable::CVariable ()
 	m_ItemKind = EModuleItem_Variable;
 	m_VariableKind = EVariable_Global;
 	m_pType = NULL;
+	m_PtrTypeFlags = 0;
 	m_pScope = NULL;
 	m_pLlvmValue = NULL;
 }

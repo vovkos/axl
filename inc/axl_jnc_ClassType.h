@@ -148,36 +148,40 @@ public:
 		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		);
 
 	CStructField*
 	CreateFieldMember (
 		EStorage StorageKind,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount);
+		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	CStructField*
 	CreateFieldMember (
 		const rtl::CString& Name,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (EStorage_Undefined, Name, pType, BitCount);
+		return CreateFieldMember (EStorage_Undefined, Name, pType, BitCount, PtrTypeFlags);
 	}
 
 	CStructField*
 	CreateFieldMember (
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (EStorage_Undefined, rtl::CString (), pType, BitCount);
+		return CreateFieldMember (EStorage_Undefined, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	CFunctionType* 

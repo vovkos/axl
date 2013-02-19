@@ -68,6 +68,9 @@ public:
 		m_pCurrentNamespace = &m_GlobalNamespace;
 	}
 
+	EAccess
+	GetAccessKind (CNamespace* pNamespace);
+
 	rtl::CString
 	CreateQualifiedName (const tchar_t* pName)
 	{

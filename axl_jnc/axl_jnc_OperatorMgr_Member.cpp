@@ -241,7 +241,8 @@ COperatorMgr::GetStructFieldMember (
 
 	if (pOpType->GetPtrTypeKind () == EDataPtrType_Unsafe)
 	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, pField->GetPtrTypeFlags ());
+
 		m_pModule->m_LlvmBuilder.CreateGep (
 			OpValue, 
 			pCoord->m_LlvmIndexArray, 
@@ -257,6 +258,8 @@ COperatorMgr::GetStructFieldMember (
 
 	if (OpValue.GetValueKind () == EValue_Variable)
 	{
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pField->GetPtrTypeFlags ());
+
 		CValue PtrValue;
 		m_pModule->m_LlvmBuilder.CreateGep (
 			OpValue, 
@@ -268,17 +271,17 @@ COperatorMgr::GetStructFieldMember (
 		
 		pResultValue->SetLlvmValue(
 			PtrValue.GetLlvmValue (), 
-			pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
+			pResultType,
 			OpValue.GetVariable (), 
 			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate 
 			);
 	}
 	else
 	{
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Normal, pField->GetPtrTypeFlags ());
+
 		CValue PtrValue;
 		CValue ValidatorValue;
-
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef);
 
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
@@ -349,27 +352,30 @@ COperatorMgr::GetUnionFieldMember (
 
 	if (pOpType->GetPtrTypeKind () == EDataPtrType_Unsafe)
 	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, pField->GetPtrTypeFlags ());
+
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pResultType, pResultValue);
 		return true;
 	}
 	
 	if (OpValue.GetValueKind () == EValue_Variable)
 	{
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pField->GetPtrTypeFlags ());
+
 		CType* pCastType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
 		CValue CastValue;
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pCastType, &CastValue);
 
 		pResultValue->SetLlvmValue (
 			CastValue.GetLlvmValue (), 
-			pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
+			pResultType,
 			OpValue.GetVariable (), 
 			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate trusted flag
 			);
 	}
 	else
 	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef);
+		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Normal, pField->GetPtrTypeFlags ());
 		pResultValue->OverrideType (OpValue, pResultType);
 	}
 
@@ -393,9 +399,10 @@ COperatorMgr::GetClassMember (
 	}
 
 	CModuleItemDecl* pDecl = pMember->GetItemDecl ();
-	if (pDecl->GetAccessKind () != EAccess_Public)
+	if (pDecl->GetAccessKind () != EAccess_Public &&
+		m_pModule->m_NamespaceMgr.GetAccessKind (Coord.m_pType) == EAccess_Public)
 	{
-		err::SetFormatStringError (_T("'%s' is not accessible"), pName);
+		err::SetFormatStringError (_T("'%s.%s' is protected"), Coord.m_pType->GetQualifiedName (), pName);
 		return false;
 	}
 
@@ -421,7 +428,7 @@ COperatorMgr::GetClassMember (
 		break;
 
 	default:
-		err::SetFormatStringError (_T("invalid interface member kind"));
+		err::SetFormatStringError (_T("invalid class member kind"));
 		return false;
 	}
 
@@ -447,9 +454,6 @@ COperatorMgr::GetClassFieldMember (
 	pCoord->m_LlvmIndexArray.Insert (0, 0);
 	pCoord->m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
 
-	size_t* p = pCoord->m_LlvmIndexArray;
-	size_t n = pCoord->m_LlvmIndexArray.GetCount ();
-
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
 		OpValue, 
@@ -459,11 +463,16 @@ COperatorMgr::GetClassFieldMember (
 		&PtrValue
 		);
 
-	int Flags = EPtrTypeFlag_NoNull;
-	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && pMember->GetStorageKind () != EStorage_Mutable)
-		Flags |= EPtrTypeFlag_Const;
+	int PtrTypeFlags = pMember->GetPtrTypeFlags ();
+	
+	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && pMember->GetStorageKind () != EStorage_Mutable ||
+		(PtrTypeFlags & EPtrTypeFlag_ReadOnly) && 
+		m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
+	{
+		PtrTypeFlags |= EPtrTypeFlag_Const;
+	}
 
-	CDataPtrType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, Flags);
+	CDataPtrType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
 	pResultValue->SetLlvmValue (
 		PtrValue.GetLlvmValue (),

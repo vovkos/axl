@@ -50,7 +50,8 @@ public:
 	CreateFieldMember (
 		const rtl::CString& Name,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount,
+		int PtrTypeFlags
 		);
 
 	virtual

@@ -36,6 +36,7 @@ protected:
 
 	EVariable m_VariableKind;
 	CType* m_pType;
+	int m_PtrTypeFlags;
 	CScope* m_pScope;
 	llvm::Value* m_pLlvmValue;
 
@@ -54,6 +55,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	int 
+	GetPtrTypeFlags ()
+	{
+		return m_PtrTypeFlags;
 	}
 
 	CScope*

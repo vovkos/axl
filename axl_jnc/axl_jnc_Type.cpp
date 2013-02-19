@@ -132,6 +132,7 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 		_T("const"),    // EPtrTypeFlag_Const     = 0x0200,
 		_T("readonly"), // EPtrTypeFlag_ReadOnly  = 0x0400,
 		_T("volatile"), // EPtrTypeFlag_Volatile  = 0x0800,
+		_T("event"),    // EPtrTypeFlag_Event     = 0x1000,
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Flag);

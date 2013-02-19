@@ -38,15 +38,9 @@ public:
 	CreateVariable (
 		EVariable VariableKind,
 		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
 		CType* pType,
-		bool HasInitializer
-		);
-
-	CVariable*
-	CreateVariable (
-		const rtl::CString& Name,
-		CType* pType,
-		bool HasInitializer
+		int PtrTypeFlags = 0
 		);
 
 	bool

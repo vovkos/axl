@@ -290,9 +290,11 @@ CFunctionMgr::Prologue (
 		llvm::Value* pLlvmArg = LlvmArg;
 
 		CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
+			EVariable_Local,
+			pArg->GetName (), 
 			pArg->GetName (), 
 			pArg->GetType (), 
-			true
+			pArg->GetPtrTypeFlags ()
 			);
 
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
@@ -303,13 +305,14 @@ CFunctionMgr::Prologue (
 
 	// store scope level
 
+	CValue ScopeLevelValue;
 	pFunction->m_pScopeLevelVariable = m_pModule->m_VariableMgr.CreateVariable (
+		EVariable_Local,
 		_T("LocalScopeLevel"), 
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
-		true
+		_T("LocalScopeLevel"), 
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
 		);
 
-	CValue ScopeLevelValue;
 	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &ScopeLevelValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pFunction->m_pScopeLevelVariable);
 

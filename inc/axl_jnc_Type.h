@@ -137,8 +137,9 @@ enum EPtrTypeFlag
 {
 	EPtrTypeFlag_NoNull    = 0x0100, // all 
 	EPtrTypeFlag_Const     = 0x0200, // class & data ptr
-	EPtrTypeFlag_ReadOnly  = 0x0400, // class & data ptr
+	EPtrTypeFlag_ReadOnly  = 0x0400, // data ptr only
 	EPtrTypeFlag_Volatile  = 0x0800, // data ptr only
+	EPtrTypeFlag_Event     = 0x1000, // multicast ptr only
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

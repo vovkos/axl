@@ -105,7 +105,7 @@ public:
 
 	bool
 	FindBaseType (
-		CDerivableType* pType,
+		CType* pType,
 		CBaseTypeCoord* pCoord = NULL
 		)
 	{
@@ -115,7 +115,7 @@ public:
 protected:
 	bool
 	FindBaseTypeImpl (
-		CDerivableType* pType,
+		CType* pType,
 		CBaseTypeCoord* pCoord,
 		size_t Level
 		);

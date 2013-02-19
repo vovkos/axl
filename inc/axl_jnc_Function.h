@@ -70,12 +70,15 @@ protected:
 
 	rtl::CString m_Name;
 	CType* m_pType;
+	int m_PtrTypeFlags;
+
 	CValue m_DefaultValue;
 
 public:
 	CFunctionFormalArg ()
 	{
 		m_pType = NULL;
+		m_PtrTypeFlags = 0;
 	}
 
 	rtl::CString 
@@ -88,6 +91,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	int 
+	GetPtrTypeFlags ()
+	{
+		return m_PtrTypeFlags;
 	}
 
 	const CValue&

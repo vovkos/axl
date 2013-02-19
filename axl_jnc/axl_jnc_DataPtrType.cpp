@@ -62,14 +62,14 @@ CDataPtrType::CreateSignature (
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
 
-	if (Flags & EPtrTypeFlag_ReadOnly)
-		Signature += 'r';
-
 	if (Flags & EPtrTypeFlag_Volatile)
 		Signature += 'v';
 
 	if (Flags & EPtrTypeFlag_NoNull)
 		Signature += 'n';
+
+	if (Flags & EPtrTypeFlag_Event)
+		Signature += 'e';
 
 	Signature += 'D';
 	Signature += pBaseType->GetSignature ();
@@ -82,14 +82,14 @@ CDataPtrType::PrepareTypeString ()
 	if (m_Flags & EPtrTypeFlag_Const)
 		m_TypeString += _T("const ");
 
-	if (m_Flags & EPtrTypeFlag_ReadOnly)
-		m_TypeString += _T("readonly ");
-
 	if (m_Flags & EPtrTypeFlag_Volatile)
 		m_TypeString += _T("volatile ");
 
 	if (m_Flags & EPtrTypeFlag_NoNull)
 		m_TypeString += _T("nonull ");
+
+	if (m_Flags & EPtrTypeFlag_Event)
+		m_TypeString += _T("event ");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{

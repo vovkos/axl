@@ -306,7 +306,8 @@ CParser::Declare (
 	if (!m_AccessKind)
 		m_AccessKind = pNamespace->GetCurrentAccessKind ();
 
-	CType* pType = pDeclarator->CalcType ();
+	int DataPtrTypeFlags;
+	CType* pType = pDeclarator->CalcType (&DataPtrTypeFlags);
 	if (!pType)
 		return NULL;
 
@@ -320,13 +321,20 @@ CParser::Declare (
 		return false;
 	}
 
+	if (DataPtrTypeFlags && 
+		(m_StorageKind == EStorage_Typedef || TypeKind == EType_Function ||	TypeKind == EType_Property))
+	{
+		err::SetFormatStringError (_T("unused modifier '%s'"), GetPtrTypeFlagString (DataPtrTypeFlags));
+		return false;
+	}
+
 	if (DeclaratorKind == EDeclarator_SimpleName)
 	{
 		return
 			m_StorageKind == EStorage_Typedef ? DeclareTypedef (pType, pDeclarator) :
 			TypeKind == EType_Function ? DeclareFunction ((CFunctionType*) pType, pDeclarator) :
 			TypeKind == EType_Property ? DeclareProperty ((CPropertyType*) pType, pDeclarator) :
-			DeclareData (pType, pDeclarator, HasInitializer);		
+			DeclareData (pType, pDeclarator, DataPtrTypeFlags, HasInitializer);		
 	}
 	else
 	{
@@ -645,6 +653,7 @@ bool
 CParser::DeclareData (	
 	CType* pType,
 	CDeclarator* pDeclarator,
+	int PtrTypeFlags,
 	bool HasInitializer
 	)
 {
@@ -671,11 +680,23 @@ CParser::DeclareData (
 
 	if (NamespaceKind == ENamespace_Property)
 	{
-		pDataItem = ((CProperty*) pNamespace)->CreateFieldMember (m_StorageKind, Name, pType, BitCount);
+		pDataItem = ((CProperty*) pNamespace)->CreateFieldMember (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
 	}
 	else if (NamespaceKind != ENamespace_Type)
 	{
-		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (Name, pType, HasInitializer);
+		CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+
+		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
+			pFunction ? EVariable_Local : EVariable_Global,
+			Name, 
+			pNamespace->CreateQualifiedName (Name),
+			pType, 
+			PtrTypeFlags
+			);
+
+		if (pFunction && !HasInitializer)
+			m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), pVariable);
+
 		Result = pNamespace->AddItem (pVariable);
 		if (!Result)
 			return false;
@@ -690,15 +711,15 @@ CParser::DeclareData (
 		switch (NamedTypeKind)
 		{
 		case EType_Class:
-			pDataItem = ((CClassType*) pNamedType)->CreateFieldMember (m_StorageKind, Name, pType, BitCount);
+			pDataItem = ((CClassType*) pNamedType)->CreateFieldMember (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
 			break;
 
 		case EType_Struct:
-			pDataItem = ((CStructType*) pNamedType)->CreateFieldMember (Name, pType, BitCount);
+			pDataItem = ((CStructType*) pNamedType)->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
 			break;
 
 		case EType_Union:
-			pDataItem = ((CUnionType*) pNamedType)->CreateFieldMember (Name, pType, BitCount);
+			pDataItem = ((CUnionType*) pNamedType)->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
 			break;
 
 		default:

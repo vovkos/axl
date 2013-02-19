@@ -11,6 +11,7 @@ CStructField::CStructField ()
 {
 	m_ItemKind = EModuleItem_StructField;
 	m_pType = NULL;
+	m_PtrTypeFlags = 0;
 	m_pBitFieldBaseType = NULL;
 	m_BitCount = 0;
 	m_Offset = 0;
@@ -35,7 +36,8 @@ CStructField*
 CStructType::CreateFieldMember (
 	const rtl::CString& Name,
 	CType* pType,
-	size_t BitCount
+	size_t BitCount,
+	int PtrTypeFlags
 	)
 {
 	CStructField* pMember = AXL_MEM_NEW (CStructField);
@@ -43,6 +45,7 @@ CStructType::CreateFieldMember (
 	pMember->m_pParentType = this;
 	pMember->m_Name = Name;
 	pMember->m_pType = pType;
+	pMember->m_PtrTypeFlags = PtrTypeFlags;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
 	m_FieldMemberList.InsertTail (pMember);
@@ -77,8 +80,8 @@ CStructType::Append (CStructType* pType)
 	for (; Member; Member++)
 	{
 		Result = Member->m_BitCount ? 
-			CreateFieldMember (Member->m_Name, Member->m_pBitFieldBaseType, Member->m_BitCount) != NULL:
-			CreateFieldMember (Member->m_Name, Member->m_pType) != NULL;
+			CreateFieldMember (Member->m_Name, Member->m_pBitFieldBaseType, Member->m_BitCount, Member->m_PtrTypeFlags) != NULL:
+			CreateFieldMember (Member->m_Name, Member->m_pType, 0, Member->m_PtrTypeFlags) != NULL;
 
 		if (!Result)
 			return false;

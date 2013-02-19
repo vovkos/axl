@@ -159,17 +159,19 @@ public:
 		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		);
 
 	CStructField*
 	CreateFieldMember (
 		EStorage StorageKind,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount);
+		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	bool

@@ -23,7 +23,7 @@ protected:
 	
 	CDerivableType* m_pParentType; // struct or union
 	CType* m_pType;
-	int m_DataPtrTypeFlags;
+	int m_PtrTypeFlags;
 
 	CType* m_pBitFieldBaseType;
 	size_t m_BitCount;
@@ -44,6 +44,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	int
+	GetPtrTypeFlags ()
+	{
+		return m_PtrTypeFlags;
 	}
 
 	size_t
@@ -116,16 +122,18 @@ public:
 	CreateFieldMember (
 		const rtl::CString& Name,
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		);
 
 	CStructField*
 	CreateFieldMember (
 		CType* pType,
-		size_t BitCount = 0
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (rtl::CString (), pType, BitCount);
+		return CreateFieldMember (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	bool

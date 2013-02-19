@@ -2,10 +2,13 @@
 
 class IFoo
 {
-	readonly int m_FooValue;
+	protected int m_FooValue;
+
+	readonly int m_BarValue;
 
 	abstract 
-	int property FooProp;
+	int 
+	property FooProp;
 };
 
 class CTest: IFoo
@@ -14,6 +17,7 @@ class CTest: IFoo
 
 	preconstruct ()
 	{
+		m_BarValue = 10;
 		m_FooValue = 100;
 		m_TestValue = 300;
 	}	 
@@ -41,15 +45,14 @@ class CTest: IFoo
 	}
 };
 
-int
+int 
 main ()
 {
 	printf ("hui govno i muravei\n");
 
 	IFoo f = new CTest;
+	f.m_FooValue = 100;
 
-	int x = f.m_FooValue;
-	
 	int y = f.FooProp;
 	f.FooProp = 500;	
 
@@ -60,7 +63,7 @@ main ()
 
 int
 printf (
-	unsafe char* pFormat,
+	unsafe const char* pFormat,
 	unsafe ...
 	);
 

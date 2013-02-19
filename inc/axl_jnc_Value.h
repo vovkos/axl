@@ -612,12 +612,6 @@ struct TMulticast
 	void* m_pHandleTable;
 };
 
-struct TMulticastSnapshot
-{
-	void** m_ppFunctionPtrArray; // array of function closure or unsafe pointers
-	size_t m_Count;
-};
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // structures backing up property closure pointer declared like:

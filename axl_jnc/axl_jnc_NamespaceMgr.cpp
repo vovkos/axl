@@ -36,6 +36,65 @@ CNamespaceMgr::SetCurrentNamespace (CNamespace* pNamespace)
 	m_pCurrentScope = pNamespace->m_NamespaceKind == ENamespace_Scope ? (CScope*) pNamespace : NULL;
 }
 
+EAccess
+CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
+{
+	CNamespace* pNamespace = m_pCurrentNamespace;
+
+	if (!pTargetNamespace->IsNamed ())
+	{
+		for (; pNamespace; pNamespace = pNamespace->m_pParentNamespace)
+		{
+			if (pNamespace == pTargetNamespace)
+				return EAccess_Protected;
+		}
+
+		return EAccess_Public;
+	}
+
+	if (pTargetNamespace->m_NamespaceKind != ENamespace_Type)
+	{
+		for (; pNamespace; pNamespace = pNamespace->m_pParentNamespace)
+		{
+			if (!pNamespace->IsNamed ())
+				continue;
+
+			if (pNamespace == pTargetNamespace || 
+				pTargetNamespace->m_QualifiedName.Cmp (pNamespace->m_QualifiedName) == 0 ||
+				pTargetNamespace->m_FriendSet.Find (pNamespace->m_QualifiedName))
+				return EAccess_Protected;
+		}
+
+		return EAccess_Public;
+	}
+
+	CNamedType* pTargetType = (CNamedType*) pTargetNamespace;
+
+	for (; pNamespace; pNamespace = pNamespace->m_pParentNamespace)
+	{
+		if (!pNamespace->IsNamed ())
+			continue;
+
+		if (pNamespace == pTargetNamespace || 
+			pTargetNamespace->m_QualifiedName.Cmp (pNamespace->m_QualifiedName) == 0 ||
+			pTargetNamespace->m_FriendSet.Find (pNamespace->m_QualifiedName))
+			return EAccess_Protected;
+
+		if (pNamespace->m_NamespaceKind == ENamespace_Type)
+		{
+			CNamedType* pType = (CNamedType*) pNamespace;
+			EType TypeKind = pType->GetTypeKind ();
+			if (TypeKind == EType_Class || TypeKind == EType_Struct)
+			{
+				bool Result = ((CDerivableType*) pType)->FindBaseType (pTargetType);
+				if (Result)
+					return EAccess_Protected;
+			}
+		}
+	}
+
+	return EAccess_Public;
+}
 
 CGlobalNamespace*
 CNamespaceMgr::CreateGlobalNamespace (

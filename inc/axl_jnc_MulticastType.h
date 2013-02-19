@@ -17,7 +17,6 @@ class CFunctionPtrType;
 enum EMulticastType
 {
 	EMulticastType_Normal = 0,
-	EMulticastType_Event,
 	EMulticastType_Snapshot,
 	EMulticastType__Count,
 };
@@ -26,15 +25,6 @@ enum EMulticastType
 
 const tchar_t*
 GetMulticastTypeKindString (EMulticastType MulticastTypeKind);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-EMulticastType
-GetMulticastTypeKindFromModifiers (int Modifiers)
-{
-	return (Modifiers & ETypeModifier_Event) ? EMulticastType_Event : EMulticastType_Normal;
-}
 
 //.............................................................................
 

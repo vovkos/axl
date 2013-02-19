@@ -89,8 +89,8 @@ protected:
 	friend class CTypeMgr;
 
 	CStructType* m_pDataPtrStructType;
-	CDataPtrType* m_DataPtrArray [2] [EDataPtrType__Count] [3] [2] [2]; // ref x ptrkind x access x volatile x nonull
-	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [3]; // callconv x access
+	CDataPtrType* m_DataPtrArray [2] [EDataPtrType__Count] [2] [2] [2]; // ref x ptrkind x const x volatile x nonull
+	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [2]; // callconv x const
 
 public:
 	CDataPtrTypeTuple ()

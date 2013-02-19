@@ -671,7 +671,7 @@ CTypeMgr::GetDataPtrType (
 
 	size_t i1 = TypeKind == EType_DataRef;
 	size_t i2 = PtrTypeKind;
-	size_t i3 = (Flags & EPtrTypeFlag_Const) ? 1 : (Flags & EPtrTypeFlag_ReadOnly) ? 2 : 0;
+	size_t i3 = (Flags & EPtrTypeFlag_Const) != 0;
 	size_t i4 = (Flags & EPtrTypeFlag_Volatile) != 0;
 	size_t i5 = (Flags & EPtrTypeFlag_NoNull) != 0;
 		
@@ -706,7 +706,7 @@ CTypeMgr::GetDataPtrType (
 	pType->m_PtrTypeKind = PtrTypeKind;
 	pType->m_Size = Size;
 	pType->m_pTargetType = pDataType;
-	pType->m_Flags = Flags;
+	pType->m_Flags = Flags & ~EPtrTypeFlag_ReadOnly; // not really necessary, just to keep it clean
 
 	m_DataPtrTypeList.InsertTail (pType);
 	pTuple->m_DataPtrArray [i1] [i2] [i3] [i4] [i5] = pType;	
@@ -739,7 +739,7 @@ CTypeMgr::GetClassPtrType (
 	// ptrkind x const x nonull
 
 	size_t i1 = PtrTypeKind;
-	size_t i2 = (Flags & EPtrTypeFlag_Const) ? 1 : (Flags & EPtrTypeFlag_ReadOnly) ? 2 : 0;
+	size_t i2 = (Flags & EPtrTypeFlag_Const) != 0;
 	size_t i3 = (Flags & EPtrTypeFlag_NoNull) != 0;
 		
 	if (pTuple->m_ClassPtrArray [i1] [i2] [i3])

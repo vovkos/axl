@@ -26,17 +26,19 @@ CVariable*
 CVariableMgr::CreateVariable (
 	EVariable VariableKind,
 	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
 	CType* pType,
-	bool HasInitializer
+	int PtrTypeFlags
 	)
 {
 	CVariable* pVariable = AXL_MEM_NEW (CVariable);
 	pVariable->m_pModule = m_pModule;
 	pVariable->m_VariableKind = VariableKind;
 	pVariable->m_Name = Name;
-	pVariable->m_QualifiedName = Name;
-	pVariable->m_Tag = Name;
+	pVariable->m_QualifiedName = QualifiedName;
+	pVariable->m_Tag = QualifiedName;
 	pVariable->m_pType = pType;
+	pVariable->m_PtrTypeFlags = PtrTypeFlags;
 
 	if (VariableKind == EVariable_Local)
 	{
@@ -44,9 +46,6 @@ CVariableMgr::CreateVariable (
 		
 		CValue PtrValue;
 		m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name, NULL, &PtrValue);
-
-		if (!HasInitializer)
-			m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
 
 		pVariable->m_pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
@@ -59,17 +58,6 @@ CVariableMgr::CreateVariable (
 	}
 
 	return pVariable;
-}
-
-CVariable*
-CVariableMgr::CreateVariable (
-	const rtl::CString& Name,
-	CType* pType,
-	bool HasInitializer
-	)
-{
-	EVariable VariableKind = m_pModule->m_FunctionMgr.GetCurrentFunction () ? EVariable_Local : EVariable_Global;
-	return CreateVariable (VariableKind, Name, pType, HasInitializer);
 }
 
 bool
@@ -102,12 +90,7 @@ CVariableMgr::GetScopeLevelVariable ()
 
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
-	m_pScopeLevelVariable = CreateVariable (
-		EVariable_Global,
-		_T("ScopeLevel"),
-		pType,
-		true
-		);
+	m_pScopeLevelVariable = CreateVariable (EVariable_Global, _T("ScopeLevel"), _T("jnc.ScopeLevel"), pType);
 
 	m_pScopeLevelVariable->m_pLlvmValue = new llvm::GlobalVariable (
 		*m_pModule->m_pLlvmModule,

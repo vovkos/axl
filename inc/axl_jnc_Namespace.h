@@ -87,6 +87,7 @@ protected:
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
+	rtl::CStringHashTable m_FriendSet; 
 	rtl::CStdListT <CAlias> m_AliasList;
 
 public:
@@ -123,6 +124,12 @@ public:
 	CreateQualifiedName (const CQualifiedName& Name)
 	{
 		return CreateQualifiedName (Name.GetFullName ());
+	}
+
+	bool
+	IsFriend (CNamespace* pNamespace)
+	{
+		return m_FriendSet.Find (pNamespace->m_QualifiedName) != NULL;
 	}
 
 	CModuleItem*

@@ -167,6 +167,7 @@ Members2
 	DeclareData (
 		CType* pType,
 		CDeclarator* pDeclarator,
+		int PtrTypeFlags,
 		bool HasInitializer
 		);
 

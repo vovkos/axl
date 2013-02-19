@@ -55,9 +55,6 @@ CClassPtrType::CreateSignature (
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
 
-	if (Flags & EPtrTypeFlag_ReadOnly)
-		Signature += 'r';
-
 	if (Flags & EPtrTypeFlag_NoNull)
 		Signature += 'n';
 
@@ -70,9 +67,6 @@ CClassPtrType::PrepareTypeString ()
 {
 	if (m_Flags & EPtrTypeFlag_Const)
 		m_TypeString += _T("const ");
-
-	if (m_Flags & EPtrTypeFlag_ReadOnly)
-		m_TypeString += _T("readonly ");
 
 	if (m_Flags & EPtrTypeFlag_NoNull)
 		m_TypeString += _T("nonull ");

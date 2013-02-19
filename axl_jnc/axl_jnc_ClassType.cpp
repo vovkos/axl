@@ -64,7 +64,8 @@ CClassType::CreateFieldMember (
 	EStorage StorageKind,
 	const rtl::CString& Name,
 	CType* pType,
-	size_t BitCount
+	size_t BitCount,
+	int PtrTypeFlags
 	)
 {
 	CStructType* pFieldStructType;
@@ -93,7 +94,7 @@ CClassType::CreateFieldMember (
 		return NULL;
 	}
 
-	CStructField* pMember = pFieldStructType->CreateFieldMember (Name, pType, BitCount);
+	CStructField* pMember = pFieldStructType->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
 
 	if (!Name.IsEmpty ())
 	{
@@ -382,9 +383,9 @@ CClassType::CalcLayout ()
 
 		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
 			EVariable_Global, 
-			m_Tag, 
-			m_pStaticFieldStructType, 
-			false
+			_T("static_field"),
+			m_Tag + _T(".static_field"), 
+			m_pStaticFieldStructType
 			);
 	}
 

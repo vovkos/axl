@@ -85,7 +85,7 @@ class CClassPtrTypeTuple: public rtl::TListLink
 protected:
 	friend class CTypeMgr;
 
-	CClassPtrType* m_ClassPtrArray [EClassPtrType__Count] [3] [2]; // ptrkind x access x nonull
+	CClassPtrType* m_ClassPtrArray [EClassPtrType__Count] [2] [2]; // ptrkind x const x nonull
 
 public:
 	CClassPtrTypeTuple ()

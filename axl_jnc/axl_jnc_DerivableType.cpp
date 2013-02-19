@@ -47,7 +47,7 @@ CDerivableType::AddBaseType (CDerivableType* pType)
 
 bool
 CDerivableType::FindBaseTypeImpl (
-	CDerivableType* pType,
+	CType* pType,
 	CBaseTypeCoord* pCoord,
 	size_t Level
 	)
@@ -70,9 +70,8 @@ CDerivableType::FindBaseTypeImpl (
 	for (; BaseType; BaseType++)
 	{
 		CBaseType* pBaseType = *BaseType;
-		ASSERT (pBaseType->m_pType->GetTypeKind () == EType_Struct);
 
-		bool Result = ((CStructType*) pBaseType->m_pType)->FindBaseTypeImpl (pType, pCoord, Level + 1);
+		bool Result = pBaseType->m_pType->FindBaseTypeImpl (pType, pCoord, Level + 1);
 		if (Result)
 		{
 			if (pCoord)

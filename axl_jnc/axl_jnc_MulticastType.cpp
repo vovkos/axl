@@ -13,7 +13,6 @@ GetMulticastTypeKindString (EMulticastType MulticastTypeKind)
 	static const tchar_t* StringTable [EMulticastType__Count] = 
 	{
 		_T("multicast"),   // EMulticastType_Normal = 0,
-		_T("event"),       // EMulticastType_Event,
 		_T("mcsnapshot"),  // EMulticastType_Snapshot,
 	};
 
@@ -66,10 +65,6 @@ CMulticastType::CreateSignature (
 
 	switch (MulticastTypeKind)
 	{
-	case EMulticastType_Event:
-		Signature += 'e';
-		break;
-
 	case EMulticastType_Snapshot:
 		Signature += 's';
 		break;

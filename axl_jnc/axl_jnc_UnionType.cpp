@@ -11,7 +11,8 @@ CStructField*
 CUnionType::CreateFieldMember (
 	const rtl::CString& Name,
 	CType* pType,
-	size_t BitCount
+	size_t BitCount,
+	int PtrTypeFlags
 	)
 {
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
@@ -24,6 +25,7 @@ CUnionType::CreateFieldMember (
 	pMember->m_Name = Name;
 	pMember->m_pParentType = this;
 	pMember->m_pType = pType;
+	pMember->m_PtrTypeFlags = PtrTypeFlags;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
 	m_FieldMemberList.InsertTail (pMember);

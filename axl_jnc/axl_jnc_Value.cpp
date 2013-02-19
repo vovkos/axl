@@ -317,7 +317,7 @@ CValue::SetVariable (CVariable* pVariable)
 {
 	return SetLlvmValue (
 		pVariable->GetLlvmValue (), 
-		pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin), 
+		pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pVariable->GetPtrTypeFlags ()), 
 		pVariable,
 		EValueFlag_NoDataPtrRangeCheck
 		);

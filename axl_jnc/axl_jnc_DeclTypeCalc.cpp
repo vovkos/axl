@@ -14,7 +14,7 @@ CDeclTypeCalc::CalcType (
 	const int* pPointerArray,
 	size_t PointerCount,
 	rtl::CIteratorT <CDeclSuffix> Suffix,
-	int* pDataPtrFlags
+	int* pDataPtrTypeFlags
 	)
 {
 	m_pModule = pType->GetModule ();
@@ -109,25 +109,27 @@ CDeclTypeCalc::CalcType (
 		if (!pType)
 			return false;
 	}
+	
+	if (pDataPtrTypeFlags)
+	{
+		int Flags = 0;
 
-	int DataPtrFlags = 0;
+		if (m_TypeModifiers & ETypeModifier_Const)
+			Flags |= EPtrTypeFlag_Const;
 
-	if (m_TypeModifiers & ETypeModifier_Const)
-		DataPtrFlags |= EPtrTypeFlag_Const;
+		if (m_TypeModifiers & ETypeModifier_ReadOnly)
+			Flags |= EPtrTypeFlag_ReadOnly;
 
-	if (m_TypeModifiers & ETypeModifier_ReadOnly)
-		DataPtrFlags |= EPtrTypeFlag_ReadOnly;
+		if (m_TypeModifiers & ETypeModifier_Volatile)
+			Flags |= EPtrTypeFlag_Volatile;
 
-	if (m_TypeModifiers & ETypeModifier_Volatile)
-		DataPtrFlags |= EPtrTypeFlag_Volatile;
+		m_TypeModifiers &= ~(ETypeModifier_Const | ETypeModifier_ReadOnly | ETypeModifier_Volatile);
 
-	m_TypeModifiers &= ETypeModifier_Const | ETypeModifier_ReadOnly | ETypeModifier_Volatile;
+		*pDataPtrTypeFlags = Flags;
+	}
 
 	if (!CheckUnusedModifiers ())
 		return false;
-
-	if (pDataPtrFlags)
-		*pDataPtrFlags = DataPtrFlags;
 
 	return pType;
 }
