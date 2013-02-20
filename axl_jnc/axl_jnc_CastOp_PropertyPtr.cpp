@@ -348,8 +348,6 @@ CCast_PropertyPtr::CCast_PropertyPtr ()
 {
 	memset (m_OperatorTable, 0, sizeof (m_OperatorTable));
 
-	m_OpFlags = EOpFlag_PropertyRefToPtr;
-
 	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Normal] = &m_FromNormal;
 	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Weak]   = &m_FromNormal;
 	m_OperatorTable [EPropertyPtrType_Weak] [EPropertyPtrType_Normal]   = &m_Weak2Normal;

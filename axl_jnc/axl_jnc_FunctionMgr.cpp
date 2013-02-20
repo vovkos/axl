@@ -512,7 +512,7 @@ CFunctionMgr::GetDirectThunkProperty (
 	{
 		CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
 
-		CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
+		CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseSetterOverload (pThunkFunctionType);
 		ASSERT (pTargetSetter);
 
 		CFunction* pThunkFunction = GetDirectThunkFunction (
@@ -561,11 +561,10 @@ CFunctionMgr::GetClosureThunkProperty (
 	rtl::CStringHashTableMapIteratorAT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
-	
-	pThunkPropertyType = pClosureType->GetPropertyMemberType (pThunkPropertyType);
-	
+
 	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
 	pThunkProperty->m_Tag = _T("_closure_thunk_property");
+	pThunkProperty->m_pType = pClosureType->GetPropertyMemberType (pThunkPropertyType);
 
 	// i use ASSERT () cause all the checks should have been done at CheckCast ()
 
@@ -587,7 +586,8 @@ CFunctionMgr::GetClosureThunkProperty (
 		for (size_t i = 0; i < SetterCount; i++)
 		{
 			CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
-			CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
+
+			CFunction* pTargetSetter = pTargetProperty->m_pSetter->ChooseSetterOverload (pThunkFunctionType);
 			ASSERT (pTargetSetter);
 
 			CFunction* pThunkFunction = GetClosureThunkFunction (
@@ -628,7 +628,7 @@ CFunctionMgr::GetClosureThunkProperty (
 		{
 			CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
 
-			size_t j = pTargetSetterType->ChooseOverload (pThunkFunctionType->GetArgTypeArray ());
+			size_t j = pTargetSetterType->ChooseSetterOverload (pThunkFunctionType);
 			ASSERT (j != -1);
 
 			CFunctionType* pTargetFunctionType = pTargetSetterType->GetOverload (j);

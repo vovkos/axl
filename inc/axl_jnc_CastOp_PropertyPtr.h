@@ -15,11 +15,6 @@ namespace jnc {
 class CCast_PropertyPtr_Base: public ICastOperator
 {
 public:
-	CCast_PropertyPtr_Base ()
-	{
-		m_OpFlags = EOpFlag_PropertyRefToPtr;
-	}
-
 	virtual
 	ECast
 	GetCastKind (

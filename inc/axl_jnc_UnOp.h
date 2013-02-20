@@ -42,7 +42,6 @@ enum EOpFlag
 	EOpFlag_KeepArrayRef     = 0x04,
 	EOpFlag_KeepBool         = 0x10,
 	EOpFlag_KeepEnum         = 0x20,
-	EOpFlag_PropertyRefToPtr = 0x40,
 
 	EOpFlag_KeepRef          = EOpFlag_KeepDataRef | EOpFlag_KeepPropertyRef,
 };

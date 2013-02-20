@@ -404,9 +404,42 @@ public:
 	}
 
 	CFunction*
-	ChooseOverload (const rtl::CConstBoxListT <CValue>& ArgList)
+	ChooseOverload (
+		const rtl::CConstBoxListT <CValue>& ArgList,
+		ECast* pCastKind = NULL
+		)
 	{
-		size_t i = m_TypeOverload.ChooseOverload (ArgList);
+		size_t i = m_TypeOverload.ChooseOverload (ArgList, pCastKind);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
+
+	CFunction*
+	ChooseSetterOverload (
+		CType* pArgType,
+		ECast* pCastKind = NULL
+		)
+	{
+		size_t i = m_TypeOverload.ChooseSetterOverload (pArgType, pCastKind);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
+
+	CFunction*
+	ChooseSetterOverload (
+		const CValue& ArgValue,
+		ECast* pCastKind = NULL
+		)
+	{
+		size_t i = m_TypeOverload.ChooseSetterOverload (ArgValue, pCastKind);
+		return i != -1 ? GetOverload (i) : NULL;
+	}
+
+	CFunction*
+	ChooseSetterOverload (
+		CFunctionType* pFunctionType,
+		ECast* pCastKind = NULL
+		)
+	{
+		size_t i = m_TypeOverload.ChooseSetterOverload (pFunctionType, pCastKind);
 		return i != -1 ? GetOverload (i) : NULL;
 	}
 

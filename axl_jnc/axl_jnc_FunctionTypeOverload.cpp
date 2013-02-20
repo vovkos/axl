@@ -140,6 +140,104 @@ CFunctionTypeOverload::ChooseOverload (
 	return BestOverload; 
 }
 
+size_t
+CFunctionTypeOverload::ChooseSetterOverload (
+	CType* pType,
+	ECast* pCastKind
+	) const
+{
+	ASSERT (m_pType);
+
+	CModule* pModule = m_pType->GetModule ();
+
+	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();	
+	ECast BestCastKind = pModule->m_OperatorMgr.GetCastKind (pType, ArgTypeArray.GetBack ());
+	size_t BestOverload = BestCastKind ? 0 : -1;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunctionType* pOverloadType = m_OverloadArray [i];
+
+		ArgTypeArray = pOverloadType->GetArgTypeArray ();	
+		ECast CastKind = pModule->m_OperatorMgr.GetCastKind (pType, ArgTypeArray.GetBack ());
+		if (!CastKind)
+			continue;
+
+		if (CastKind == BestCastKind)
+		{
+			err::SetFormatStringError (_T("ambiguous call to overloaded function"));
+			return -1;
+		}
+
+		if (CastKind > BestCastKind)
+		{
+			BestOverload = i + 1;
+			BestCastKind = CastKind;
+		}
+	}
+
+	if (BestOverload == -1)
+	{
+		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
+		return -1;
+	}
+
+	if (pCastKind)
+		*pCastKind = BestCastKind;
+
+	return BestOverload; 
+}
+
+size_t
+CFunctionTypeOverload::ChooseSetterOverload (
+	const CValue& Value,
+	ECast* pCastKind
+	) const
+{
+	ASSERT (m_pType);
+
+	CModule* pModule = m_pType->GetModule ();
+
+	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
+	ECast BestCastKind = pModule->m_OperatorMgr.GetCastKind (Value, ArgTypeArray.GetBack ());
+	size_t BestOverload = BestCastKind ? 0 : -1;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunctionType* pOverloadType = m_OverloadArray [i];
+		
+		ArgTypeArray = m_pType->GetArgTypeArray ();	
+		ECast CastKind = pModule->m_OperatorMgr.GetCastKind (Value, ArgTypeArray.GetBack ());
+		if (!CastKind)
+			continue;
+
+		if (CastKind == BestCastKind)
+		{
+			err::SetFormatStringError (_T("ambiguous call to overloaded function"));
+			return -1;
+		}
+
+		if (CastKind > BestCastKind)
+		{
+			BestOverload = i + 1;
+			BestCastKind = CastKind;
+		}
+	}
+
+	if (BestOverload == -1)
+	{
+		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
+		return -1;
+	}
+
+	if (pCastKind)
+		*pCastKind = BestCastKind;
+
+	return BestOverload; 
+}
+
 bool
 CFunctionTypeOverload::AddOverload (CFunctionType* pType)
 {

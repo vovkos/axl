@@ -105,6 +105,27 @@ public:
 		ECast* pCastKind = NULL
 		) const;
 
+	size_t
+	ChooseSetterOverload (
+		CType* pArgType,
+		ECast* pCastKind = NULL
+		) const;
+
+	size_t
+	ChooseSetterOverload (
+		const CValue& ArgValue,
+		ECast* pCastKind = NULL
+		) const;
+
+	size_t
+	ChooseSetterOverload (
+		CFunctionType* pFunctionType,
+		ECast* pCastKind = NULL
+		) const
+	{
+		return ChooseSetterOverload (pFunctionType->GetArgTypeArray ().GetBack (), pCastKind);
+	}
+
 	bool
 	AddOverload (CFunctionType* pType);
 

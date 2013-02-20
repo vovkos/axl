@@ -661,17 +661,8 @@ COperatorMgr::PrepareOperandType (
 				}
 			
 				CPropertyType* pTargetType = pPtrType->GetTargetType ();
-				if (OpFlags & EOpFlag_PropertyRefToPtr)
-				{
-					if (!pTargetType->IsIndexed () && pTargetType->GetReturnType ()->GetTypeKind () == EType_PropertyPtr)
-						Value = pTargetType->GetReturnType ();
-					else
-						Value = pTargetType->GetPropertyPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
-				}
-				else if (!pTargetType->IsIndexed ())
-				{
+				if (!pTargetType->IsIndexed ())
 					Value = pTargetType->GetReturnType ();
-				}
 			}
 
 			break;
@@ -752,22 +743,7 @@ COperatorMgr::PrepareOperand (
 				}
 			
 				CPropertyType* pTargetType = pPtrType->GetTargetType ();
-
-				if (OpFlags & EOpFlag_PropertyRefToPtr)
-				{
-					if (!pTargetType->IsIndexed () && pTargetType->GetReturnType ()->GetTypeKind () == EType_PropertyPtr)
-					{
-						Result = GetProperty (Value, &Value);
-						if (!Result)
-							return false;
-					}
-					else
-					{
-						pPtrType = pTargetType->GetPropertyPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
-						Value.OverrideType (pPtrType);
-					}
-				}
-				else if (!pTargetType->IsIndexed ())
+				if (!pTargetType->IsIndexed ())
 				{
 					Result = GetProperty (Value, &Value);
 					if (!Result)
