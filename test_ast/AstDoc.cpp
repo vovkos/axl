@@ -320,6 +320,8 @@ StdLib_DynamicCastInterface (
 	return p2;
 }
 
+/*
+
 void
 StdLib_MulticastOperator (
 	jnc::TMulticast* pEvent,
@@ -328,7 +330,7 @@ StdLib_MulticastOperator (
 	jnc::EMulticastOp OpKind
 	)
 {
-/*	jnc::TMulticastHandler* pHandler;
+	jnc::TMulticastHandler* pHandler;
 
 	switch (OpKind)
 	{
@@ -386,14 +388,12 @@ StdLib_MulticastOperator (
 		ASSERT (false);
 	} 
 
-*/
-
 }
 
 void
 StdLib_FireSimpleEvent (jnc::TMulticast* pEvent)
 {
-/*	typedef void (*FEventHandler) (jnc::TInterface*);
+	typedef void (*FEventHandler) (jnc::TInterface*);
 
 	jnc::TMulticastHandler* pHandler = pEvent->m_pHead;
 
@@ -401,8 +401,10 @@ StdLib_FireSimpleEvent (jnc::TMulticast* pEvent)
 	{
 		FEventHandler pfn = (FEventHandler) pHandler->m_FunctionPtr.m_pfn;
 		pfn (pHandler->m_FunctionPtr.m_pClosure);
-	} */
+	} 
 }
+
+*/
 
 void*
 StdLib_HeapAllocate (jnc::CType* pType)
@@ -559,8 +561,6 @@ CAstDoc::ExportStdLib ()
 {
 	ExportStdLibFunction (jnc::EStdFunc_OnRuntimeError, StdLib_OnRuntimeError);
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
-	ExportStdLibFunction (jnc::EStdFunc_MulticastOperator, StdLib_MulticastOperator);
-	ExportStdLibFunction (jnc::EStdFunc_FireSimpleEvent, StdLib_FireSimpleEvent);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
 	ExportStdLibFunction (_T("printf"), StdLib_printf);

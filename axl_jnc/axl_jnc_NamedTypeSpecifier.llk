@@ -160,21 +160,6 @@ class_specifier
 	  named_type_block <$.m_pType>
 	;
 
-class
-{
-	EType m_TypeKind;
-}
-class_kind
-	: EToken_Interface
-		{
-			$.m_TypeKind = EType_Interface;
-		}
-	| EToken_Class
-		{
-			$.m_TypeKind = EType_Class;
-		}
-	;
-
 //.............................................................................
 
 // property

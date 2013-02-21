@@ -7,34 +7,20 @@ namespace jnc {
 
 //.............................................................................
 
-const tchar_t*
-GetMulticastTypeKindString (EMulticastType MulticastTypeKind)
-{
-	static const tchar_t* StringTable [EMulticastType__Count] = 
-	{
-		_T("multicast"),   // EMulticastType_Normal = 0,
-		_T("mcsnapshot"),  // EMulticastType_Snapshot,
-	};
-
-	return MulticastTypeKind >= 0 && MulticastTypeKind < EMulticastType__Count ? 
-		StringTable [MulticastTypeKind] : 
-		_T("undefined-multicast-kind");
-}
-
-//.............................................................................
-
 CMulticastType::CMulticastType ()
 {
 	m_TypeKind = EType_Multicast;
 	m_Size = sizeof (TMulticast);
-	m_pFunctionPtrType = NULL;
+	m_pTargetType = NULL;
 	m_pMulticastStructType = NULL;
-}
-
-CFunctionType* 
-CMulticastType::GetFunctionType ()
-{
-	return m_pFunctionPtrType->GetTargetType ();
+	m_pSetMethod_s = NULL;
+	m_pSetMethod_u = NULL;
+	m_pAddMethod_s = NULL;
+	m_pAddMethod_u = NULL;
+	m_pRemoveMethod_s = NULL;
+	m_pRemoveMethod_u = NULL;
+	m_pSnapshotMethod_s = NULL;
+	m_pSnapshotMethod_u = NULL;
 }
 
 CStructType* 
@@ -46,7 +32,7 @@ CMulticastType::GetMulticastStructType ()
 	m_pMulticastStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pMulticastStructType->m_Tag.Format (_T("multicast"));
 	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
-	m_pMulticastStructType->CreateFieldMember (m_pFunctionPtrType->GetDataPtrType (EDataPtrType_Unsafe));
+	m_pMulticastStructType->CreateFieldMember (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
 	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
 	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
 	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
@@ -55,38 +41,242 @@ CMulticastType::GetMulticastStructType ()
 	return m_pMulticastStructType;
 }
 
-rtl::CStringA
-CMulticastType::CreateSignature (
-	CFunctionPtrType* pFunctionPtrType,
-	EMulticastType MulticastTypeKind
-	)
-{
-	rtl::CStringA Signature = 'M';
-
-	switch (MulticastTypeKind)
-	{
-	case EMulticastType_Snapshot:
-		Signature += 's';
-		break;
-	}
-
-	Signature += pFunctionPtrType->GetSignature ();
-	return Signature;
-}
-
 void
 CMulticastType::PrepareTypeString ()
 {
-	m_TypeString = GetMulticastTypeKindString (m_MulticastTypeKind);
-	m_TypeString += _T(' ');
-	m_TypeString += m_pFunctionPtrType->GetTypeModifierString ();
-	m_TypeString += m_pFunctionPtrType->GetTargetType ()->GetArgTypeString ();
+	m_TypeString += m_pTargetType->GetTypeModifierString ();
+	m_TypeString += _T("multicast ");
+	m_TypeString += m_pTargetType->GetTargetType ()->GetArgTypeString ();
 }
 
-void
-CMulticastType::PrepareLlvmType ()
+CFunction* 
+CMulticastType::GetSetMethod_s ()
 {
-	m_pLlvmType = GetMulticastStructType ()->GetLlvmType ();
+	if (m_pSetMethod_s)
+		return m_pSetMethod_s;
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Normal),
+		m_pTargetType
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastSet_s"), pType);
+
+	CValue ArgValueArray [2];
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pSetMethod_s = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetSetMethod_u ()
+{
+	if (m_pSetMethod_u)
+		return m_pSetMethod_u;
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Unsafe),
+		m_pTargetType
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastSet_u"), pType);
+
+	CValue ArgValueArray [2];
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pSetMethod_u = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetAddMethod_s ()
+{
+	if (m_pAddMethod_s)
+		return m_pAddMethod_s;
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Normal),
+		m_pTargetType
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastAdd_s"), pType);
+
+	CValue ArgValueArray [2];
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pAddMethod_s = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetAddMethod_u ()
+{
+	if (m_pAddMethod_u)
+		return m_pAddMethod_u;
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Unsafe),
+		m_pTargetType
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastAdd_u"), pType);
+
+	CValue ArgValueArray [2];
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pAddMethod_u = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetRemoveMethod_s ()
+{
+	if (m_pRemoveMethod_s)
+		return m_pRemoveMethod_s;
+
+	CType* pReturnType = m_pTargetType;
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Normal),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastRemove_s"), pType);
+
+	CValue ArgValueArray [2];
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pRemoveMethod_s = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetRemoveMethod_u ()
+{
+	if (m_pRemoveMethod_u)
+		return m_pRemoveMethod_u;
+
+	CType* pReturnType = m_pTargetType;
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Unsafe),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastRemove_u"), pType);
+
+	CValue ArgValueArray [2];
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pRemoveMethod_u = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetSnapshotMethod_s ()
+{
+	if (m_pSnapshotMethod_s)
+		return m_pSnapshotMethod_s;
+
+	CType* pReturnType = m_pTargetType->GetMcSnapshotType ();
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Normal),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastSnapshot_s"), pType);
+
+	CValue ArgValue;
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pSnapshotMethod_s = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::GetSnapshotMethod_u ()
+{
+	if (m_pSnapshotMethod_u)
+		return m_pSnapshotMethod_u;
+
+	CType* pReturnType = m_pTargetType->GetMcSnapshotType ();
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Unsafe),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastSnapshot_u"), pType);
+
+	CValue ArgValue;
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	m_pModule->m_ControlFlowMgr.Return (pReturnType->GetZeroValue ());
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pSnapshotMethod_u = pFunction;
+	return pFunction;
 }
 
 //.............................................................................

@@ -226,6 +226,9 @@
     <ClInclude Include="..\inc\axl_jnc_DerivableType.h">
       <Filter>type</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_McSnapshotType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -437,6 +440,9 @@
       <Filter>type</Filter>
     </ClCompile>
     <ClCompile Include="axl_jnc_DerivableType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_McSnapshotType.cpp">
       <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>

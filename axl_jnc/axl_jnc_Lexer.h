@@ -26,7 +26,6 @@ enum EToken
 	EToken_Using,
 	EToken_Extend,
 	EToken_Pack,
-	EToken_Endian,
 
 	// storage specifiers
 
@@ -47,16 +46,14 @@ enum EToken
 
 	EToken_Signed,
 	EToken_Unsigned,
-	EToken_LittleEndian,
 	EToken_BigEndian,
+	EToken_NoNull,
 	EToken_Const,
 	EToken_ReadOnly,
 	EToken_Volatile,
-	EToken_Safe,
-	EToken_Unsafe,
-	EToken_NoNull,
-	EToken_Strong,
 	EToken_Weak,
+	EToken_Thin,
+	EToken_Unsafe,
 	EToken_Cdecl,
 	EToken_Stdcall,
 	EToken_Function,
@@ -66,8 +63,6 @@ enum EToken
 	EToken_Bindable,
 	EToken_AutoGet,
 	EToken_Indexed,
-	EToken_Closure,
-	EToken_Thin,
 
 	// type specifiers
 
@@ -183,10 +178,9 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	// global declarations & pragmas
 
 	AXL_PRS_TOKEN_NAME (EToken_Namespace,    "namespace")
-	AXL_PRS_TOKEN_NAME (EToken_Extend,       "extend")
 	AXL_PRS_TOKEN_NAME (EToken_Using,        "using")
+	AXL_PRS_TOKEN_NAME (EToken_Extend,       "extend")
 	AXL_PRS_TOKEN_NAME (EToken_Pack,         "pack")
-	AXL_PRS_TOKEN_NAME (EToken_Endian,       "endian")
 
 	// storage specifiers
 
@@ -207,16 +201,14 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 
 	AXL_PRS_TOKEN_NAME (EToken_Signed,       "signed")
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
-	AXL_PRS_TOKEN_NAME (EToken_LittleEndian, "littleendian")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
+	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
 	AXL_PRS_TOKEN_NAME (EToken_ReadOnly,     "readonly")
 	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
-	AXL_PRS_TOKEN_NAME (EToken_Safe,         "safe")
-	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
-	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
-	AXL_PRS_TOKEN_NAME (EToken_Strong,       "strong")
 	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
+	AXL_PRS_TOKEN_NAME (EToken_Thin,         "thin")
+	AXL_PRS_TOKEN_NAME (EToken_Unsafe,       "unsafe")
 	AXL_PRS_TOKEN_NAME (EToken_Cdecl,        "cdecl")
 	AXL_PRS_TOKEN_NAME (EToken_Stdcall,      "stdcall")
 	AXL_PRS_TOKEN_NAME (EToken_Function,     "function")
@@ -226,8 +218,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_PRS_TOKEN_NAME (EToken_AutoGet,      "autoget")
 	AXL_PRS_TOKEN_NAME (EToken_Indexed,      "indexed")
-	AXL_PRS_TOKEN_NAME (EToken_Closure,      "closure")
-	AXL_PRS_TOKEN_NAME (EToken_Thin,         "thin")
 
 	// type specifiers
 

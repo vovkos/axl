@@ -206,46 +206,6 @@ COperatorMgr::BinaryOperator (
 		pOperator->Operator (OpValue1, OpValue2, pResultValue);
 }
 
-/*
-	overloads!
-
-	CType* pTargetType = PrepareOperandType (DstValue.GetType ());
-	EType TargetTypeKind = pTargetType->GetTypeKind ();
-
-	switch (TargetTypeKind)
-	{
-	case EType_Multicast:
-		switch (OpKind)
-		{
-		case EBinOp_Add:
-			return MulticastOperator (DstValue, SrcValue, EMulticastOp_Add);
-
-		case EBinOp_Sub:
-			return MulticastOperator (DstValue, SrcValue, EMulticastOp_Remove);
-
-		default:
-			err::SetFormatStringError (_T("invalid operator for events"), GetBinOpKindString (OpKind));
-			return false;
-		}
-
-		break;
-
-	case EType_ClassPtr:
-//		#pragma AXL_TODO ("overloaded operators for interfaces & classes")
-		break;
-	}
-
- */
-
-/*
-
-	if (pTargetType->GetTypeKind () == EType_Multicast)
-		return MulticastOperator (DstValue, RawSrcValue, EMulticastOp_Set);
-
-
- */
-
-
 bool
 COperatorMgr::CastOperator (
 	EAlloc AllocKind,
@@ -778,6 +738,8 @@ COperatorMgr::PrepareOperand (
 	return true;
 }
 
+/*
+
 bool
 COperatorMgr::MulticastOperator (
 	const CValue& Event,
@@ -812,7 +774,7 @@ COperatorMgr::MulticastOperator (
 	}
 
 	CValue Handler;
-	Result = CastOperator (RawHandler, pMulticastType->GetFunctionPtrType (), &Handler);
+	Result = CastOperator (RawHandler, pMulticastType->GetTargetType (), &Handler);
 	if (!Result)
 		return false;
 
@@ -837,6 +799,8 @@ COperatorMgr::MulticastOperator (
 	
 	return true;
 }
+
+*/
 
 bool
 COperatorMgr::CreateClosureObject (

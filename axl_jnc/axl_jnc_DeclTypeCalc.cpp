@@ -7,71 +7,85 @@ namespace jnc {
 
 //.............................................................................
 
+CDeclTypeCalc::CDeclTypeCalc ()
+{
+	m_pModule = NULL;
+	m_TypeModifiers = 0;
+	m_MulticastTypeModifiers = 0;
+	m_ClassPtrTypeModifiers = 0;
+}
+
 CType*
 CDeclTypeCalc::CalcType (
-	CType* pType,
-	int Modifiers,
-	const int* pPointerArray,
-	size_t PointerCount,
-	rtl::CIteratorT <CDeclSuffix> Suffix,
+	CDeclarator* pDeclarator,
 	int* pDataPtrTypeFlags
 	)
 {
+	CType* pType = pDeclarator->GetBaseType (); 
+	rtl::CArrayT <TDeclPrefix> PrefixArray = pDeclarator->GetPrefixArray ();
+	m_Suffix = pDeclarator->GetSuffixList ().GetTail ();
 	m_pModule = pType->GetModule ();
-	m_Suffix = Suffix;
 
-
-	for (size_t i = 0; i < PointerCount; i++)
+	size_t PrefixCount = PrefixArray.GetCount ();
+	for (size_t i = 0; i < PrefixCount; i++)
 	{
-		m_TypeModifiers = pPointerArray [i];
+		m_TypeModifiers = PrefixArray [i].m_TypeModifiers;
 
+		EDeclPrefix PrefixKind = PrefixArray [i].m_PrefixKind;
 		EType TypeKind = pType->GetTypeKind ();
-		switch (TypeKind)
+
+		switch (PrefixKind)
 		{
-		case EType_Function:
-			pType = GetFunctionPtrType ((CFunctionType*) pType);
-			break;
-
-		case EType_Property:
-			pType = GetPropertyPtrType ((CPropertyType*) pType);
-			break;
-
-		default:
-			if (m_TypeModifiers & ETypeModifier_Event)
+		case EDeclPrefix_CommonPtr:
+			switch (TypeKind)
 			{
-				CMulticastType* pMulticastType = GetMulticastType (pType);
-				if (!pMulticastType)
-					return false;
+			case EType_Function:
+				pType = GetFunctionPtrType ((CFunctionType*) pType);
+				break;
 
-				pType = GetDataPtrType (pMulticastType);
-			}
-			else if (m_TypeModifiers & ETypeModifier_Property)
-			{
-				CPropertyType* pPropertyType = GetPropertyType (pType);
-				if (!pPropertyType)
-					return false;
+			case EType_Property:
+				pType = GetPropertyPtrType ((CPropertyType*) pType);
+				break;
 
-				pType = GetPropertyPtrType (pPropertyType);
-			}
-			else if (m_TypeModifiers & ETypeModifier_Function)
-			{
-				CFunctionType* pFunctionType = GetFunctionType (pType);
-				if (!pFunctionType)
-					return false;
-
-				pType = GetFunctionPtrType (pFunctionType);
-			}
-			else
-			{
+			default:
 				pType = GetDataPtrType (pType);
 			}
+
+			break;
+
+		case EDeclPrefix_FunctionPtr:
+			pType = GetFunctionType (pType);
+			if (!pType)
+				return false;
+
+			pType = GetFunctionPtrType ((CFunctionType*) pType);
+			break;
+		
+		case EDeclPrefix_PropertyPtr:
+			pType = GetPropertyType (pType);
+			if (!pType)
+				return false;
+
+			pType = GetPropertyPtrType ((CPropertyType*) pType);
+			break;
+		
+		case EDeclPrefix_Multicast:
+		case EDeclPrefix_Event:
+			pType = GetMulticastType (pType);
+			if (!pType)
+				return false;
+
+			break;
 		}
 
 		if (!pType || !CheckUnusedModifiers ())
 			return false;
+
+		if (PrefixKind == EDeclPrefix_Event)
+			m_TypeModifiers = ETypeModifier_Event;
 	}
 
-	m_TypeModifiers = Modifiers;
+	m_TypeModifiers |= pDeclarator->GetTypeModifiers ();
 
 	if (m_TypeModifiers & ETypeModifier_Property)
 	{
@@ -92,16 +106,9 @@ CDeclTypeCalc::CalcType (
 			break;
 
 		case EDeclSuffix_Function:
-			if (m_TypeModifiers & ETypeModifier_Event)
-			{
-				pType = GetMulticastType (pType);
-			}
-			else
-			{
-				pType = GetFunctionType (pType);
-				if (!CheckUnusedModifiers ())
-					return false;
-			}
+			pType = GetFunctionType (pType);
+			if (!CheckUnusedModifiers ())
+				return false;
 
 			break;
 		}
@@ -109,7 +116,10 @@ CDeclTypeCalc::CalcType (
 		if (!pType)
 			return false;
 	}
-	
+
+	if (pType->GetTypeKind () == EType_Class)
+		pType = GetClassPtrType ((CClassType*) pType);
+
 	if (pDataPtrTypeFlags)
 	{
 		int Flags = 0;
@@ -123,7 +133,18 @@ CDeclTypeCalc::CalcType (
 		if (m_TypeModifiers & ETypeModifier_Volatile)
 			Flags |= EPtrTypeFlag_Volatile;
 
-		m_TypeModifiers &= ~(ETypeModifier_Const | ETypeModifier_ReadOnly | ETypeModifier_Volatile);
+		if (m_TypeModifiers & ETypeModifier_Event)
+		{
+			if (pType->GetTypeKind () != EType_Multicast)
+			{
+				err::SetFormatStringError (_T("'event' modifier can only be applied to multicast"));
+				return false;
+			}
+
+			Flags |= EPtrTypeFlag_Event;
+		}
+
+		m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
 
 		*pDataPtrTypeFlags = Flags;
 	}
@@ -191,9 +212,6 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 
 	case EType_Class:
 		pElementType = GetClassPtrType ((CClassType*) pElementType);
-		if (!pElementType)
-			return NULL;
-
 		break;
 
 	default:
@@ -223,14 +241,12 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	{
 	case EType_Function:
 	case EType_Property:
+	case EType_Multicast:
 		err::SetFormatStringError (_T("function cannot return '%s'"), pReturnType->GetTypeString ());
 		return NULL;
 
 	case EType_Class:
 		pReturnType= GetClassPtrType ((CClassType*) pReturnType);
-		if (!pReturnType)
-			return NULL;
-
 		break;
 
 	default:
@@ -284,14 +300,12 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 	case EType_Void:
 	case EType_Function:
 	case EType_Property:
+	case EType_Multicast:
 		err::SetFormatStringError (_T("property cannot return '%s'"), pReturnType->GetTypeString ());
 		return NULL;
 
 	case EType_Class:
 		pReturnType= GetClassPtrType ((CClassType*) pReturnType);
-		if (!pReturnType)
-			return NULL;
-
 		break;
 
 	default:
@@ -353,7 +367,7 @@ CDeclTypeCalc::GetMulticastType (CType* pReturnType)
 {
 	if (pReturnType->GetTypeKind () != EType_Void)
 	{
-		err::SetFormatStringError (_T("event can only return void, not '%s'"), pReturnType->GetTypeString ());
+		err::SetFormatStringError (_T("multicast can only return void, not '%s'"), pReturnType->GetTypeString ());
 		return NULL;
 	}
 	
@@ -365,10 +379,11 @@ CDeclTypeCalc::GetMulticastType (CType* pReturnType)
 	if (!pFunctionPtrType)
 		return NULL;
 
+	m_TypeModifiers &= ~ETypeModifierMask_Multicast;
 	return m_pModule->m_TypeMgr.GetMulticastType (pFunctionPtrType);
 }
 
-CDataPtrType*
+CDataPtrType* 
 CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 {
 	EType TypeKind = pDataType->GetTypeKind ();
@@ -381,9 +396,6 @@ CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 
 	case EType_Class:
 		pDataType = GetClassPtrType ((CClassType*) pDataType);
-		if (!pDataType)
-			return NULL;
-
 		break;
 
 	default:
@@ -417,10 +429,10 @@ CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 	EClassPtrType PtrTypeKind = GetClassPtrTypeKindFromModifiers (m_TypeModifiers);
 	int TypeFlags = 0;
 
-	if (m_TypeModifiers & ETypeModifier_Const)
+	if (m_TypeModifiers & (ETypeModifier_Const | ETypeModifier_Const_p))
 		TypeFlags |= EPtrTypeFlag_Const;
 
-	if (m_TypeModifiers & ETypeModifier_NoNull)
+	if (m_TypeModifiers & (ETypeModifier_NoNull | ETypeModifier_NoNull_p))
 		TypeFlags |= EPtrTypeFlag_NoNull;
 
 	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;

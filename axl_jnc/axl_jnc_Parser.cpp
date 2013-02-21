@@ -13,7 +13,6 @@ CParser::CParser ()
 	m_Stage = EStage_Pass1;
 	m_StructPackFactor = 8;
 	m_DefaultStructPackFactor = 8;
-	m_Endianness = EEndianness_LittleEndian;
 	m_StorageKind = EStorage_Undefined;
 	m_AccessKind = EAccess_Undefined;
 	m_pAutoEvType = NULL;
@@ -30,7 +29,7 @@ CParser::IsTypeSpecified ()
 	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
 	return 
 		pTypeSpecifier->GetType () != NULL ||
-		pTypeSpecifier->GetTypeModifiers () & (ETypeModifier_Signed | ETypeModifier_Unsigned | ETypeModifier_Event);
+		pTypeSpecifier->GetTypeModifiers () & ETypeModifierMask_Integer;
 }
 
 CType*
@@ -1119,8 +1118,8 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	{
 		CValue EventValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue) &&
-			m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Add);
+			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue);// &&
+			// m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Add);
 
 		if (!Result)
 			return false;
@@ -1141,8 +1140,8 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	{
 		CValue EventValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue) &&
-			m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Remove);
+			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue);// &&
+			//m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Remove);
 
 		if (!Result)
 			return false;

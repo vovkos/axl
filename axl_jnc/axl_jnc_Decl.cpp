@@ -15,39 +15,28 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 	int 
 	AntiModifierTable [] = 
 	{		
-		ETypeModifierMask_Sign,           //  0 -- ETypeModifier_Signed        = 0x00000001,		
-		ETypeModifierMask_Sign,           //  1 -- ETypeModifier_Unsigned      = 0x00000002,		
-		ETypeModifierMask_Endian,         //  2 -- ETypeModifier_LittleEndian  = 0x00000004,		
-		ETypeModifierMask_Endian,         //  3 -- ETypeModifier_BigEndian     = 0x00000008,		
-		ETypeModifier_ReadOnly,           //  4 -- ETypeModifier_Const         = 0x00000010,		
-		ETypeModifier_Const,              //  5 -- ETypeModifier_ReadOnly      = 0x00000020,		
-		0,                                //  6 -- ETypeModifier_Volatile      = 0x00000040,		
-		ETypeModifierMask_Safety,         //  7 -- ETypeModifier_Safe          = 0x00000080,	
-		ETypeModifierMask_Safety |        //  8 -- ETypeModifier_Unsafe        = 0x00000100,
-		ETypeModifierMask_Strength | 
-		ETypeModifierMask_Closure,		
-		0,                                //  9 -- ETypeModifier_NoNull        = 0x00000200,		
-		ETypeModifierMask_Strength |      // 10 -- ETypeModifier_Strong        = 0x00000400,
-		ETypeModifier_Thin |
-		ETypeModifier_Unsafe,		
-		ETypeModifierMask_Strength |      // 11 -- ETypeModifier_Weak          = 0x00000800,
-		ETypeModifier_Thin |
-		ETypeModifier_Unsafe,		
-		ETypeModifierMask_CallConv,       // 12 -- ETypeModifier_Cdecl         = 0x00001000,		
-		ETypeModifierMask_CallConv,       // 13 -- ETypeModifier_Stdcall       = 0x00002000,		
-		ETypeModifierMask_FunctionKind,   // 14 -- ETypeModifier_Function      = 0x00004000,
-		ETypeModifierMask_FunctionKind,   // 15 -- ETypeModifier_Property      = 0x00008000,
-		ETypeModifierMask_FunctionKind,   // 16 -- ETypeModifier_Multicast     = 0x00010000,
-		ETypeModifierMask_FunctionKind,   // 17 -- ETypeModifier_Event         = 0x00020000,
-		0,                                // 18 -- ETypeModifier_Bindable      = 0x00040000,		
-		ETypeModifier_Indexed,            // 19 -- ETypeModifier_AutoGet       = 0x00080000,		
-		ETypeModifier_AutoGet,            // 20 -- ETypeModifier_Indexed       = 0x00100000,		
-		ETypeModifierMask_Closure |       // 21 -- ETypeModifier_Closure       = 0x00200000,
-		ETypeModifier_Unsafe,		
-		ETypeModifierMask_Closure |       // 22 -- ETypeModifier_Thin          = 0x00400000,
-		ETypeModifierMask_Strength |        
-		ETypeModifier_Unsafe,
+		ETypeModifier_Unsigned,     // ETypeModifier_Signed           = 0x00000001,
+		ETypeModifier_Signed,       // ETypeModifier_Unsigned         = 0x00000002,
+		0,                          // ETypeModifier_BigEndian        = 0x00000004,
+		0,                          // ETypeModifier_NoNull           = 0x00000008,
+		ETypeModifier_ReadOnly,     // ETypeModifier_Const            = 0x00000010,
+		ETypeModifier_Const,        // ETypeModifier_ReadOnly         = 0x00000020,
+		0,                          // ETypeModifier_Volatile         = 0x00000040,
+		ETypeModifier_Thin |        // ETypeModifier_Weak             = 0x00000080,
+		ETypeModifier_Unsafe,   
+		ETypeModifier_Weak |        // ETypeModifier_Thin             = 0x00000100,
+		ETypeModifier_Unsafe,   
+		ETypeModifier_Weak |        // ETypeModifier_Unsafe           = 0x00000200,
+		ETypeModifier_Thin,   
+		ETypeModifier_Stdcall,      // ETypeModifier_Cdecl            = 0x00000400,
+		ETypeModifier_Cdecl,        // ETypeModifier_Stdcall          = 0x00000800,
+		0,                          // ETypeModifier_Property         = 0x00001000,
+		0,                          // ETypeModifier_Bindable         = 0x00002000,
+		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00004000,
+		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00008000,
 	};
+
+	// check duplicates
 
 	if (m_TypeModifiers & Modifier)
 	{
@@ -58,6 +47,8 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
 	if (i >= countof (AntiModifierTable))
 		return true; // allow adding new modifiers without changing table
+
+	// check anti-modifiers
 
 	if (m_TypeModifiers & AntiModifierTable [i])
 	{
@@ -101,13 +92,12 @@ CTypeModifiers::CheckAntiTypeModifiers (int ModifierMask)
 	return false;
 }
 
-
 //.............................................................................
 
 bool
 CTypeSpecifier::SetType (CType* pType)
 {
-	if (m_pType || (m_TypeModifiers & ETypeModifier_Event))
+	if (m_pType)
 	{
 		err::SetFormatStringError (
 			_T("more than one type specifiers ('%s' and '%s')"), 
@@ -125,30 +115,23 @@ CTypeSpecifier::SetType (CType* pType)
 		return NULL;
 	}
 
-	// eat left 'const' modifier for classes 
-	// since class to class ptr conversion is implicit,
-	// there is a conflict in where to apply 'const' modifier, e.g.
-	// const CMyClass x; <-- is it a const class ptr or const variable?
-
-	if (m_TypeModifiers & ETypeModifier_Const)
+	if (TypeKind == EType_Class || TypeKind == EType_ClassPtr)
 	{
-		if (TypeKind == EType_Class)
-		{
-			EClassPtrType PtrTypeKind = GetClassPtrTypeKindFromModifiers (m_TypeModifiers);
-			pType = ((CClassType*) pType)->GetClassPtrType (EClassPtrType_Normal, EPtrTypeFlag_Const);
-			m_TypeModifiers &= ~ETypeModifier_Const;
-		}
-		else if (TypeKind == EType_ClassPtr)
-		{
-			CClassPtrType* pPtrType = (CClassPtrType*) pType;
-			pType = pPtrType->GetTargetType ()->GetClassPtrType (
-				pPtrType->GetPtrTypeKind (),
-				pPtrType->GetFlags () | EPtrTypeFlag_Const
-				);
-			m_TypeModifiers &= ~ETypeModifier_Const;
-		}
-	}
+		if (m_TypeModifiers & ETypeModifier_NoNull)
+			m_TypeModifiers |= ETypeModifier_NoNull_p;
 
+		if (m_TypeModifiers & ETypeModifier_Const)
+			m_TypeModifiers |= ETypeModifier_Const_p;
+
+		if (m_TypeModifiers & ETypeModifier_Weak)
+			m_TypeModifiers |= ETypeModifier_Weak_p;
+
+		if (m_TypeModifiers & ETypeModifier_Unsafe)
+			m_TypeModifiers |= ETypeModifier_Unsafe_p;
+
+		m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;
+	}
+	
 	m_pType = pType;
 	return true;
 }
@@ -192,9 +175,9 @@ CDeclarator::CDeclarator ()
 	m_UnOpKind = EUnOp_Undefined;
 	m_BinOpKind = EBinOp_Undefined;
 	m_pCastOpType = NULL;
-	m_pType = NULL;
 	m_BitCount = 0;
 	m_PostDeclaratorModifiers = 0;
+	m_pBaseType = NULL;
 }
 
 bool
@@ -205,16 +188,16 @@ CDeclarator::SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 
 	if (!pTypeSpecifier)
 	{
-		m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		m_pBaseType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 		return true;
 	}
 
-	m_pType = pTypeSpecifier->GetType ();
+	m_pBaseType = pTypeSpecifier->GetType ();
 	m_TypeModifiers = pTypeSpecifier->GetTypeModifiers ();
 	
-	if (!m_pType)
+	if (!m_pBaseType)
 	{
-		m_pType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
+		m_pBaseType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
 			pModule->m_TypeMgr.GetPrimitiveType (EType_Int) : 
 			pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	}
@@ -321,9 +304,13 @@ CDeclarator::SetPropValue ()
 }
 
 bool
-CDeclarator::AddPointer ()
+CDeclarator::AddPrefix (EDeclPrefix PrefixKind)
 {
-	m_PointerArray.Append (m_TypeModifiers);
+	TDeclPrefix Prefix;
+	Prefix.m_PrefixKind = PrefixKind;
+	Prefix.m_TypeModifiers = m_TypeModifiers;
+
+	m_PrefixArray.Append (Prefix);
 	m_TypeModifiers = 0;
 	return true;
 }
@@ -348,7 +335,7 @@ CDeclarator::AddFunctionSuffix ()
 bool
 CDeclarator::AddBitFieldSuffix (size_t BitCount)
 {
-	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PointerArray.IsEmpty ())
+	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PrefixArray.IsEmpty ())
 	{
 		err::SetFormatStringError (_T("bit field can only be applied to integer type"));
 		return false;
@@ -362,14 +349,7 @@ CType*
 CDeclarator::CalcType (int* pDataPtrTypeFlags)
 {
 	CDeclTypeCalc TypeCalc;
-	return TypeCalc.CalcType (
-		m_pType, 
-		m_TypeModifiers, 
-		m_PointerArray, 
-		m_PointerArray.GetCount (), 
-		m_SuffixList.GetTail (),
-		pDataPtrTypeFlags
-		);
+	return TypeCalc.CalcType (this, pDataPtrTypeFlags);
 }
 
 rtl::CStdListT <CFunctionFormalArg>*

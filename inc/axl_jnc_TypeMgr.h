@@ -13,11 +13,12 @@
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_MulticastType.h"
 #include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_ClassPtrType.h"
 #include "axl_jnc_FunctionPtrType.h"
 #include "axl_jnc_PropertyPtrType.h"
+#include "axl_jnc_MulticastType.h"
+#include "axl_jnc_McSnapshotType.h"
 #include "axl_jnc_ImportType.h"
 
 namespace axl {
@@ -65,6 +66,7 @@ protected:
 	rtl::CStdListT <CFunctionPtrType> m_FunctionPtrTypeList;
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
 	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
+	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 	rtl::CStdListT <CDataPtrTypeTuple> m_DataPtrTypeTupleList;
 	rtl::CStdListT <CClassPtrTypeTuple> m_ClassPtrTypeTupleList;
@@ -370,18 +372,26 @@ public:
 	CMulticastType* 
 	GetMulticastType (
 		CFunctionType* pFunctionType,
-		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal,
-		EMulticastType MulticastTypeKind = EMulticastType_Normal
+		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal
 		)
 	{
-		return GetMulticastType (GetFunctionPtrType (pFunctionType, PtrTypeKind), MulticastTypeKind);
+		return GetMulticastType (GetFunctionPtrType (pFunctionType, PtrTypeKind));
 	}
 
 	CMulticastType* 
-	GetMulticastType (
-		CFunctionPtrType* pFunctionPtrType,
-		EMulticastType MulticastTypeKind = EMulticastType_Normal
-		);
+	GetMulticastType (CFunctionPtrType* pFunctionPtrType);
+
+	CMcSnapshotType* 
+	GetMcSnapshotType (
+		CFunctionType* pFunctionType,
+		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal
+		)
+	{
+		return GetMcSnapshotType (GetFunctionPtrType (pFunctionType, PtrTypeKind));
+	}
+
+	CMcSnapshotType* 
+	GetMcSnapshotType (CFunctionPtrType* pFunctionPtrType);
 
 	CDataPtrType* 
 	GetDataPtrType (

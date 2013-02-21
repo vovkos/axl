@@ -1,30 +1,10 @@
 //.............................................................................
 
-// pragmas
-
 pragma
 pragma_pack
 	: '#' EToken_Pack '(' struct_pack_factor_value $v ')'
 		{
 			m_StructPackFactor = $v.m_Value;
-		}
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-pragma
-pragma_endian
-	: '#' EToken_Endian '(' pragma_endian_value ')'
-	;
-
-pragma_endian_value
-	: (EToken_LittleEndian | EToken_Default)
-		{
-			m_Endianness = EEndianness_LittleEndian;
-		}
-	| EToken_BigEndian
-		{
-			m_Endianness = EEndianness_BigEndian;
 		}
 	;
 
@@ -206,7 +186,7 @@ type_name
 		{
 			$Declarator.SetTypeSpecifier (&$1.m_TypeSpecifier);
 		}
-	  pointer <&$Declarator>* 
+	  declarator_prefix <&$Declarator>* 
 	  declarator_suffix <&$Declarator>*
 		{
 			$.m_pType = $Declarator.CalcType ();

@@ -58,10 +58,9 @@ main := |*
 # global declarations & pragmas
 
 'namespace'    { CreateToken (EToken_Namespace); };
-'extend'       { CreateToken (EToken_Extend); };
 'using'        { CreateToken (EToken_Using); };
+'extend'       { CreateToken (EToken_Extend); };
 'pack'         { CreateToken (EToken_Pack); };
-'endian'       { CreateToken (EToken_Endian); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -82,18 +81,16 @@ main := |*
 
 # type modifiers
 
+'signed'       { CreateToken (EToken_Signed); };
+'unsigned'     { CreateToken (EToken_Unsigned); };
+'bigendian'    { CreateToken (EToken_BigEndian); };
+'nonull'       { CreateToken (EToken_NoNull); };
 'const'        { CreateToken (EToken_Const); };
 'readonly'     { CreateToken (EToken_ReadOnly); };
 'volatile'     { CreateToken (EToken_Volatile); };
-'signed'       { CreateToken (EToken_Signed); };
-'unsigned'     { CreateToken (EToken_Unsigned); };
-'littleendian' { CreateToken (EToken_LittleEndian); };
-'bigendian'    { CreateToken (EToken_BigEndian); };
-'safe'         { CreateToken (EToken_Safe); };
-'unsafe'       { CreateToken (EToken_Unsafe); };
-'nonull'       { CreateToken (EToken_NoNull); };
-'strong'       { CreateToken (EToken_Strong); };
 'weak'         { CreateToken (EToken_Weak); };
+'thin'         { CreateToken (EToken_Thin); };
+'unsafe'       { CreateToken (EToken_Unsafe); };
 'cdecl'        { CreateToken (EToken_Cdecl); };
 'stdcall'      { CreateToken (EToken_Stdcall); };
 'function'     { CreateToken (EToken_Function); };
@@ -103,8 +100,6 @@ main := |*
 'bindable'     { CreateToken (EToken_Bindable); };
 'autoget'      { CreateToken (EToken_AutoGet); };
 'indexed'      { CreateToken (EToken_Indexed); };
-'closure'      { CreateToken (EToken_Closure); };
-'thin'         { CreateToken (EToken_Thin); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

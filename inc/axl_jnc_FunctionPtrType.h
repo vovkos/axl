@@ -5,10 +5,12 @@
 #pragma once
 
 #include "axl_jnc_FunctionType.h"
-#include "axl_jnc_MulticastType.h"
 
 namespace axl {
 namespace jnc {
+
+class CMulticastType;
+class CMcSnapshotType;
 
 //.............................................................................
 
@@ -47,7 +49,8 @@ protected:
 
 	EFunctionPtrType m_PtrTypeKind;
 	CFunctionType* m_pTargetType;
-	CMulticastType* m_MulticastTypeArray [EMulticastType__Count];	
+	CMulticastType* m_pMulticastType;
+	CMcSnapshotType* m_pMcSnapshotType;
 	rtl::CString m_TypeModifierString;
 
 public:
@@ -72,7 +75,10 @@ public:
 	}
 
 	CMulticastType* 
-	GetMulticastType (EMulticastType MulticastTypeKind = EMulticastType_Normal);
+	GetMulticastType ();
+
+	CMcSnapshotType* 
+	GetMcSnapshotType ();
 
 	CStructType* 
 	GetClosureFunctionPtrStructType ();

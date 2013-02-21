@@ -247,15 +247,14 @@ COperatorMgr::CallMulticast (
 	rtl::CBoxListT <CValue>* pArgList
 	)
 {
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Multicast);
 	CMulticastType* pMulticastType = (CMulticastType*) OpValue.GetType ();
-	ASSERT (pMulticastType->GetTypeKind () == EType_Multicast);
 	
-	CFunctionPtrType* pFunctionPtrType = pMulticastType->GetFunctionPtrType ();
-
 	err::SetFormatStringError (_T("calling multicast is not supported yet"));
 	return false;
 
 /*
+	CFunctionPtrType* pFunctionPtrType = pMulticastType->GetFunctionPtrType ();
 	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
 
 	CValue HandlerValue;

@@ -81,7 +81,10 @@ enum EType
 	EType_PropertyPtr,         // PY
 	EType_PropertyRef,         // RY
 	
+	// multicast
+
 	EType_Multicast,           // M
+	EType_McSnapshot,          // Ms
 
 	// import type (resolved after linkage or instantiation of generic)
 
@@ -165,112 +168,107 @@ GetPtrTypeFlagString (int Flags)
 
 enum ETypeModifier
 {
-	ETypeModifier_Signed        = 0x00000001,
-	ETypeModifier_Unsigned      = 0x00000002,
-	ETypeModifier_LittleEndian  = 0x00000004,
-	ETypeModifier_BigEndian     = 0x00000008,
-	ETypeModifier_Const         = 0x00000010,
-	ETypeModifier_ReadOnly      = 0x00000020,
-	ETypeModifier_Volatile      = 0x00000040,
-	ETypeModifier_Safe          = 0x00000080,
-	ETypeModifier_Unsafe        = 0x00000100,
-	ETypeModifier_NoNull        = 0x00000200,
-	ETypeModifier_Strong        = 0x00000400,
-	ETypeModifier_Weak          = 0x00000800,
-	ETypeModifier_Cdecl         = 0x00001000,
-	ETypeModifier_Stdcall       = 0x00002000,
-	ETypeModifier_Function      = 0x00004000,
-	ETypeModifier_Property      = 0x00008000,
-	ETypeModifier_Multicast     = 0x00010000,
-	ETypeModifier_Event         = 0x00020000,
-	ETypeModifier_Bindable      = 0x00040000,
-	ETypeModifier_AutoGet       = 0x00080000,
-	ETypeModifier_Indexed       = 0x00100000,
-	ETypeModifier_Closure       = 0x00200000,
-	ETypeModifier_Thin          = 0x00400000,
+	ETypeModifier_Signed    = 0x00000001,
+	ETypeModifier_Unsigned  = 0x00000002,
+	ETypeModifier_BigEndian = 0x00000004,
+	ETypeModifier_NoNull    = 0x00000008,
+	ETypeModifier_Const     = 0x00000010,
+	ETypeModifier_ReadOnly  = 0x00000020,
+	ETypeModifier_Volatile  = 0x00000040,
+	ETypeModifier_Weak      = 0x00000080,
+	ETypeModifier_Thin      = 0x00000100,
+	ETypeModifier_Unsafe    = 0x00000200,
+	ETypeModifier_Cdecl     = 0x00000400,
+	ETypeModifier_Stdcall   = 0x00000800,
+	ETypeModifier_Property  = 0x00001000,
+	ETypeModifier_Bindable  = 0x00002000,
+	ETypeModifier_AutoGet   = 0x00004000,
+	ETypeModifier_Indexed   = 0x00008000,
+
+	// since 'class' impose pointer w/o requiring '*' symbol
+	// we need to somehow distinguish where to apply certain modifier.
+	// we 'promote' conflicting modifiers upon discovering 'class' or 'import' type
+	// thus applying it to the leftmost site on the right of the modifier
+
+	// nonull weak CClass nonull weak function* x ();
+	// nonull const unsafe CClass nonull const unsafe* y;
+
+	ETypeModifier_NoNull_p  = 0x00010000,
+	ETypeModifier_Const_p   = 0x00020000,
+	ETypeModifier_Weak_p    = 0x00040000,
+	ETypeModifier_Unsafe_p  = 0x00080000,
+
+	// this modifier is sort of virtual: it doesnt come from the parser
+	// its created during type calculation upon discovering EDeclPrefix_Event
+
+	ETypeModifier_Event     = 0x00100000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ETypeModifierMask
 {
-	ETypeModifierMask_Sign = 
+	ETypeModifierMask_Integer = 
 		ETypeModifier_Signed | 
-		ETypeModifier_Unsigned,
-
-	ETypeModifierMask_Endian = 
-		ETypeModifier_LittleEndian | 
+		ETypeModifier_Unsigned |
 		ETypeModifier_BigEndian,
 
-	ETypeModifierMask_Safety = 
-		ETypeModifier_Safe | 
-		ETypeModifier_Unsafe,
-
-	ETypeModifierMask_CallConv = 
+	ETypeModifierMask_Function = 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall,
 
-	ETypeModifierMask_Strength = 
-		ETypeModifier_Strong | 
-		ETypeModifier_Weak,
-
-	ETypeModifierMask_Closure = 
-		ETypeModifier_Closure | 
-		ETypeModifier_Thin,
-
-	ETypeModifierMask_Integer = 
-		ETypeModifierMask_Sign | 
-		ETypeModifierMask_Endian,
-
-	ETypeModifierMask_FunctionKind = 
-		ETypeModifier_Function |	
-		ETypeModifier_Property |	
-		ETypeModifier_Multicast |	
-		ETypeModifier_Event,	
-
-	ETypeModifierMask_Function = 
-		ETypeModifier_Function | 
-		ETypeModifierMask_CallConv,
-
 	ETypeModifierMask_Property = 
 		ETypeModifier_Property | 
+		ETypeModifier_Cdecl | 
+		ETypeModifier_Stdcall |
+		ETypeModifier_Bindable | 
+		ETypeModifier_AutoGet | 
+		ETypeModifier_Indexed,
+
+	ETypeModifierMask_DataPtr = 
+		ETypeModifier_NoNull |
+		ETypeModifier_Const | 
+		ETypeModifier_ReadOnly | 
+		ETypeModifier_Volatile |
+		ETypeModifier_Unsafe |
+		ETypeModifier_Event,
+
+	ETypeModifierMask_ClassPtr = 
+		ETypeModifier_NoNull |
+		ETypeModifier_Const | 
+		ETypeModifier_Weak |
+		ETypeModifier_Unsafe |
+		ETypeModifier_NoNull_p |
+		ETypeModifier_Const_p | 
+		ETypeModifier_Weak_p |
+		ETypeModifier_Unsafe_p,
+
+	ETypeModifierMask_FunctionPtr = 
+		ETypeModifier_Cdecl | 
+		ETypeModifier_Stdcall |
+		ETypeModifier_NoNull |
+		ETypeModifier_Weak | 
+		ETypeModifier_Thin |
+		ETypeModifier_Unsafe,
+
+	ETypeModifierMask_PropertyPtr = 
+		ETypeModifier_Cdecl | 
+		ETypeModifier_Stdcall |
 		ETypeModifier_Bindable | 
 		ETypeModifier_AutoGet | 
 		ETypeModifier_Indexed |
-		ETypeModifierMask_CallConv,
+		ETypeModifier_NoNull |
+		ETypeModifier_Weak | 
+		ETypeModifier_Thin |
+		ETypeModifier_Unsafe,
 
 	ETypeModifierMask_Multicast = 
-		ETypeModifier_Multicast | 
-		ETypeModifierMask_CallConv,
-
-	ETypeModifierMask_Event = 
-		ETypeModifier_Event | 
-		ETypeModifierMask_CallConv,
-
-	ETypeModifierMask_AnyPtr = 
-		ETypeModifierMask_Safety |
-		ETypeModifier_NoNull,
-
-	ETypeModifierMask_DataPtr = 
-		ETypeModifierMask_AnyPtr |
-		ETypeModifier_Const | 
-		ETypeModifier_Volatile,
-
-	ETypeModifierMask_ClassPtr = 
-		ETypeModifierMask_AnyPtr |
-		ETypeModifierMask_Strength,
-
-	ETypeModifierMask_FunctionPtr = 
-		ETypeModifierMask_AnyPtr |
-		ETypeModifierMask_Function | 
-		ETypeModifierMask_Strength | 
-		ETypeModifierMask_Closure,
-
-	ETypeModifierMask_PropertyPtr = 
-		ETypeModifierMask_AnyPtr |
-		ETypeModifierMask_Property | 
-		ETypeModifierMask_Strength | 
-		ETypeModifierMask_Closure,
+		ETypeModifier_Cdecl |
+		ETypeModifier_Stdcall |
+		ETypeModifier_NoNull |
+		ETypeModifier_Weak |
+		ETypeModifier_Thin |
+		ETypeModifier_Unsafe,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -451,7 +449,7 @@ protected:
 
 public:
 	CType ();
-	
+
 	EType
 	GetTypeKind ()
 	{

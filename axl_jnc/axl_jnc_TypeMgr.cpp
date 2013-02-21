@@ -30,6 +30,7 @@ CTypeMgr::Clear ()
 	m_FunctionTypeList.Clear ();
 	m_PropertyTypeList.Clear ();
 	m_MulticastTypeList.Clear ();
+	m_McSnapshotTypeList.Clear ();
 	m_DataPtrTypeList.Clear ();
 	m_ClassPtrTypeList.Clear ();
 	m_FunctionPtrTypeList.Clear ();
@@ -631,24 +632,34 @@ CTypeMgr::GetBindablePropertyType (CPropertyType* pPropertyType)
 }
 
 CMulticastType* 
-CTypeMgr::GetMulticastType (
-	CFunctionPtrType* pFunctionPtrType,
-	EMulticastType MulticastTypeKind
-	)
+CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 {
-	ASSERT (MulticastTypeKind >= 0 && MulticastTypeKind < EMulticastType__Count);
-
-	if (pFunctionPtrType->m_MulticastTypeArray [MulticastTypeKind])
-		return pFunctionPtrType->m_MulticastTypeArray [MulticastTypeKind];
+	if (pFunctionPtrType->m_pMulticastType)
+		return pFunctionPtrType->m_pMulticastType;
 
 	CMulticastType* pType = AXL_MEM_NEW (CMulticastType);
 	pType->m_pModule = m_pModule;
-	pType->m_Signature = CMulticastType::CreateSignature (pFunctionPtrType, MulticastTypeKind);
-	pType->m_MulticastTypeKind = MulticastTypeKind;
-	pType->m_pFunctionPtrType = pFunctionPtrType;
+	pType->m_Signature.Format ("M%s", pFunctionPtrType->GetSignature ());
+	pType->m_pTargetType = pFunctionPtrType;
 
 	m_MulticastTypeList.InsertTail (pType);
-	pFunctionPtrType->m_MulticastTypeArray [MulticastTypeKind] = pType;
+	pFunctionPtrType->m_pMulticastType = pType;
+	return pType;
+}
+
+CMcSnapshotType* 
+CTypeMgr::GetMcSnapshotType (CFunctionPtrType* pFunctionPtrType)
+{
+	if (pFunctionPtrType->m_pMcSnapshotType)
+		return pFunctionPtrType->m_pMcSnapshotType;
+
+	CMcSnapshotType* pType = AXL_MEM_NEW (CMcSnapshotType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature.Format ("Ms%s", pFunctionPtrType->GetSignature ());
+	pType->m_pTargetType = pFunctionPtrType;
+
+	m_McSnapshotTypeList.InsertTail (pType);
+	pFunctionPtrType->m_pMcSnapshotType = pType;
 	return pType;
 }
 

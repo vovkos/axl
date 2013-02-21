@@ -49,16 +49,6 @@ enum EStdCast
 
 //.............................................................................
 
-enum EMulticastOp
-{
-	EMulticastOp_Set,
-	EMulticastOp_Add,
-	EMulticastOp_Remove,
-	EMulticastOp_Clear,
-};
-
-//.............................................................................
-
 class COperatorMgr
 {
 protected:
@@ -467,6 +457,76 @@ public:
 	}
 
 	bool
+	CallOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		return CallOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
+	CallOperator (
+		const CValue& OpValue,
+		const CValue& ArgValue,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue);
+		return CallOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
+	CallOperator2 (
+		const CValue& OpValue,
+		const CValue& ArgValue1,
+		const CValue& ArgValue2,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue1);
+		ArgList.InsertTail (ArgValue2);
+		return CallOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
+	CallOperator3 (
+		const CValue& OpValue,
+		const CValue& ArgValue1,
+		const CValue& ArgValue2,
+		const CValue& ArgValue3,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue1);
+		ArgList.InsertTail (ArgValue2);
+		ArgList.InsertTail (ArgValue3);
+		return CallOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
+	CallOperator4 (
+		const CValue& OpValue,
+		const CValue& ArgValue1,
+		const CValue& ArgValue2,
+		const CValue& ArgValue3,
+		const CValue& ArgValue4,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue1);
+		ArgList.InsertTail (ArgValue2);
+		ArgList.InsertTail (ArgValue3);
+		ArgList.InsertTail (ArgValue4);
+		return CallOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
 	ClosureOperator (
 		const CValue& OpValue,
 		rtl::CBoxListT <CValue>* pArgList,
@@ -608,13 +668,6 @@ public:
 	{
 		return GetPropertyOnChangeEvent (*pValue, pValue);
 	}
-
-	bool
-	MulticastOperator (
-		const CValue& Event,
-		const CValue& Handler,
-		EMulticastOp OpKind
-		);
 
 	// load & store operators
 

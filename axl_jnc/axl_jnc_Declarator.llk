@@ -41,7 +41,7 @@ declarator <CTypeSpecifier* $pTypeSpecifier>
 	{
 		return $.m_Declarator.SetTypeSpecifier ($pTypeSpecifier);
 	}
-	: pointer <&$.m_Declarator>* 
+	: declarator_prefix <&$.m_Declarator>* 
 	  declarator_name <&$.m_Declarator>
 	  declarator_suffix <&$.m_Declarator>*
 	  post_declarator_modifier <&$.m_Declarator>*
@@ -111,8 +111,7 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 		{
 			return $pDeclarator->AddUnnamedMethod (EFunction_Constructor);
 		}
-	| resolver (static_this_rslv)
-	  EToken_Static EToken_This
+	| EToken_Static EToken_This
 		{
 			return $pDeclarator->AddUnnamedMethod (EFunction_StaticConstructor);
 		}
@@ -136,13 +135,6 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 		{
 			return $pDeclarator->SetPropValue ();
 		}
-	;
-
-// resolve storage_specifier + declarator_qualifier vs single declarator_qualifier
-// in favor of single declarator_qualifier
-
-static_this_rslv
-	: EToken_Static EToken_This
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -329,16 +321,43 @@ operator_name
 // prefix
 
 noast
-pointer <CDeclarator* $pDeclarator>
-	: '*' 
+declarator_prefix <CDeclarator* $pDeclarator>
+	: declarator_prefix_kind
 		{
-			return $pDeclarator->AddPointer ();
+			return $pDeclarator->AddPrefix ($1.m_PrefixKind);
 		}
 	  (type_modifier $m
 		{
 			return $pDeclarator->SetTypeModifier ($m.m_Modifier);
 		}
 	  )*
+	;
+
+class
+{
+	EDeclPrefix m_PrefixKind;
+}
+declarator_prefix_kind
+	: '*'
+		{
+			$.m_PrefixKind = EDeclPrefix_CommonPtr;			
+		}
+	| EToken_Function '*'
+		{
+			$.m_PrefixKind = EDeclPrefix_FunctionPtr;			
+		}
+	| EToken_Property '*'
+		{
+			$.m_PrefixKind = EDeclPrefix_FunctionPtr;
+		}
+	| EToken_Multicast
+		{
+			$.m_PrefixKind = EDeclPrefix_Multicast;
+		}
+	| EToken_Event
+		{
+			$.m_PrefixKind = EDeclPrefix_Event;
+		}
 	;
 	
 //.............................................................................
@@ -396,7 +415,7 @@ function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 				CValue ()
 				) != NULL;
 		}
-	| (EToken_Safe | EToken_Unsafe $u)? EToken_Ellipsis
+	| EToken_Unsafe $u? EToken_Ellipsis
 		{
 			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_VarArg;
 			if (IsValidLocator ($u))

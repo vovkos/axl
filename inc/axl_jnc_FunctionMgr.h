@@ -66,36 +66,48 @@ enum EStdFunc
 
 	EStdFunc_DynamicCastInterface,
 
-	// void
-	// jnc.MulticastOperator (
-	//		jnc.event* pEvent,
-	//		void* pfn,
-	//		object pClosure,
-	//		int OpKind
-	//		);
-
-	EStdFunc_MulticastOperator,
-
-	// void
-	// jnc.FireSimpleEvent (jnc.event* pEvent);
-
-	EStdFunc_FireSimpleEvent,
-
 	// int8*
 	// jnc.HeapAllocate (int8* pType);
 
 	EStdFunc_HeapAllocate,
 
-	// void
-	// jnc.AcquireSpinLock (int32* pType);
+	// intptr
+	// jnc.MulticastSet (
+	//		multicast* pMulticast (), 
+	//		function* pfn ()
+	//		);
 
-	EStdFunc_AcquireSpinLock,
+	EStdFunc_MulticastSet_s,
+	EStdFunc_MulticastSet_w,
+	EStdFunc_MulticastSet_u,
 
-	// void
-	// jnc.ReleaseSpinLock (int32* pType);
+	// intptr
+	// jnc.MulticastAdd (
+	//		multicast* pMulticast (), 
+	//		function* pfn ()
+	//		);
 
-	EStdFunc_ReleaseSpinLock,
+	EStdFunc_MulticastAdd_s,
+	EStdFunc_MulticastAdd_w,
+	EStdFunc_MulticastAdd_u,
 
+	// function* pfn ()
+	// jnc.MulticastRemove (
+	//		multicast* pMulticast (), 
+	//		intptr Handle
+	//		);
+
+	EStdFunc_MulticastRemove_s,
+	EStdFunc_MulticastRemove_w,
+	EStdFunc_MulticastRemove_u,
+
+	// function** pfn ()
+	// jnc.MulticastSnapshot (multicast* pMulticast ());
+
+	EStdFunc_MulticastSnapshot_s,
+	EStdFunc_MulticastSnapshot_w,
+	EStdFunc_MulticastSnapshot_u,
+ 
 	EStdFunc__Count
 };
 
@@ -132,6 +144,12 @@ protected:
 		CThunk ();
 	};
 
+	struct TEmissionContext
+	{
+		CFunction* m_pFunction;
+		CBasicBlock* m_pBlock;
+	};
+
 protected:
 	CModule* m_pModule;
 
@@ -148,6 +166,8 @@ protected:
 
 	CFunction* m_pCurrentFunction;
 	CFunction* m_StdFunctionArray [EStdFunc__Count];
+
+	rtl::CArrayT <TEmissionContext> m_EmissionContextStack;
 
 public:
 	CFunctionMgr ();
@@ -186,6 +206,12 @@ public:
 		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
 		);
 
+	CFunction*
+	CreateInternalFunction (
+		const tchar_t* pTag,
+		CFunctionType* pType 
+		);
+
 	CProperty*
 	CreateProperty (
 		const rtl::CString& Name,
@@ -210,6 +236,16 @@ public:
 
 	bool
 	Epilogue (const CToken::CPos& Pos);
+
+	void
+	InternalPrologue (
+		CFunction* pFunction,
+		CValue* pArgValueArray,
+		size_t ArgCount
+		);
+
+	void
+	InternalEpilogue ();
 
 	bool
 	JitFunctions (llvm::ExecutionEngine* pExecutionEngine);
@@ -265,12 +301,6 @@ protected:
 	// LLVM code support functions
 
 	CFunction*
-	CreateInternalFunction (
-		const tchar_t* pTag,
-		CFunctionType* pType 
-		);
-
-	CFunction*
 	CreateOnRuntimeError ();
 
 	CFunction*
@@ -289,13 +319,31 @@ protected:
 	CreateDynamicCastInterface ();
 
 	CFunction*
-	CreateMulticastOperator ();
-
-	CFunction*
-	CreateFireSimpleEvent ();
-
-	CFunction*
 	CreateHeapAllocate ();
+
+	CFunction*
+	CreateMulticastSet (
+		EFunctionPtrType PtrTypeKind,
+		const tchar_t* pTag
+		);
+
+	CFunction*
+	CreateMulticastAdd (
+		EFunctionPtrType PtrTypeKind,
+		const tchar_t* pTag
+		);
+
+	CFunction*
+	CreateMulticastRemove (
+		EFunctionPtrType PtrTypeKind,
+		const tchar_t* pTag
+		);
+
+	CFunction*
+	CreateMulticastSnapshot (
+		EFunctionPtrType PtrTypeKind,
+		const tchar_t* pTag
+		);
 
 	bool
 	InitializeInterface (
@@ -325,4 +373,3 @@ protected:
 
 } // namespace jnc {
 } // namespace axl {
-

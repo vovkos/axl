@@ -138,25 +138,45 @@ type_specifier
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
 		}
+	| EToken_Int8
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8);
+		}
+	| EToken_Int16
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int16);
+		}
+	| EToken_Int32
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
+		}
+	| EToken_Int64
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64);
+		}
 	| EToken_Int
 		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int);
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 		}
 	| EToken_IntPtr
 		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int_pbe : EType_Int_p);
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 		}
 	| EToken_Char
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char);
 		}
+	| EToken_WChar
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_WChar);
+		}
 	| EToken_Short
 		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Short);
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Short);
 		}
 	| EToken_Long
 		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Long);
+			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Long);
 		}
 	| EToken_Float
 		{
@@ -165,26 +185,6 @@ type_specifier
 	| EToken_Double
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
-		}
-	| EToken_Int8
-		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8);
-		}
-	| EToken_Int16
-		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int16_be : EType_Int16);
-		}
-	| EToken_Int32
-		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int32_be : EType_Int32);
-		}
-	| EToken_Int64
-		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (m_Endianness == EEndianness_BigEndian ? EType_Int64_be : EType_Int64);
-		}
-	| EToken_WChar
-		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_WChar);
 		}
 	| EToken_Auto
 		{
@@ -279,13 +279,13 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_Unsigned;
 		}
-	| EToken_LittleEndian
-		{
-			$.m_Modifier = ETypeModifier_LittleEndian;
-		}
 	| EToken_BigEndian
 		{
 			$.m_Modifier = ETypeModifier_BigEndian;
+		}
+	| EToken_NoNull
+		{
+			$.m_Modifier = ETypeModifier_NoNull;
 		}
 	| EToken_Const
 		{
@@ -299,25 +299,17 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_Volatile;
 		}
-	| EToken_Safe
+	| EToken_Weak
 		{
-			$.m_Modifier = ETypeModifier_Safe;
+			$.m_Modifier = ETypeModifier_Weak;
+		}
+	| EToken_Thin
+		{
+			$.m_Modifier = ETypeModifier_Thin;
 		}
 	| EToken_Unsafe
 		{
 			$.m_Modifier = ETypeModifier_Unsafe;
-		}
-	| EToken_NoNull
-		{
-			$.m_Modifier = ETypeModifier_NoNull;
-		}
-	| EToken_Strong
-		{
-			$.m_Modifier = ETypeModifier_Strong;
-		}
-	| EToken_Weak
-		{
-			$.m_Modifier = ETypeModifier_Weak;
 		}
 	| EToken_Cdecl
 		{
@@ -327,21 +319,9 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_Stdcall;
 		}
-	| EToken_Function
-		{
-			$.m_Modifier = ETypeModifier_Function;
-		}
 	| EToken_Property
 		{
 			$.m_Modifier = ETypeModifier_Property;
-		}
-	| EToken_Multicast
-		{
-			$.m_Modifier = ETypeModifier_Multicast;
-		}
-	| EToken_Event
-		{
-			$.m_Modifier = ETypeModifier_Event;
 		}
 	| EToken_Bindable
 		{
@@ -354,14 +334,6 @@ type_modifier
 	| EToken_Indexed
 		{
 			$.m_Modifier = ETypeModifier_Indexed;
-		}
-	| EToken_Closure
-		{
-			$.m_Modifier = ETypeModifier_Closure;
-		}
-	| EToken_Thin
-		{
-			$.m_Modifier = ETypeModifier_Thin;
 		}
 	;
 

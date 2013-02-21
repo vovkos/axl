@@ -99,6 +99,7 @@
     <ClInclude Include="..\Inc\axl_jnc_ControlFlowMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_EnumType.h" />
     <ClInclude Include="..\inc\axl_jnc_DerivableType.h" />
+    <ClInclude Include="..\inc\axl_jnc_McSnapshotType.h" />
     <ClInclude Include="..\inc\axl_jnc_MulticastType.h" />
     <ClInclude Include="..\Inc\axl_jnc_Function.h" />
     <ClInclude Include="..\Inc\axl_jnc_FunctionMgr.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="axl_jnc_DeclTypeCalc.cpp" />
     <ClCompile Include="axl_jnc_EnumType.cpp" />
     <ClCompile Include="axl_jnc_DerivableType.cpp" />
+    <ClCompile Include="axl_jnc_McSnapshotType.cpp" />
     <ClCompile Include="axl_jnc_MulticastType.cpp" />
     <ClCompile Include="axl_jnc_Function.cpp" />
     <ClCompile Include="axl_jnc_FunctionMgr.cpp" />

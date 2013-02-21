@@ -31,13 +31,20 @@ CFunctionPtrType::CFunctionPtrType ()
 	m_PtrTypeKind = EFunctionPtrType_Normal;
 	m_Size = sizeof (TFunctionPtr);
 	m_pTargetType = NULL;
-	memset (m_MulticastTypeArray, 0, sizeof (m_MulticastTypeArray));
+	m_pMulticastType = NULL;
+	m_pMcSnapshotType = NULL;
 }
 
 CMulticastType* 
-CFunctionPtrType::GetMulticastType (EMulticastType MulticastTypeKind)
+CFunctionPtrType::GetMulticastType ()
 {
-	return m_pModule->m_TypeMgr.GetMulticastType (this, MulticastTypeKind);
+	return m_pModule->m_TypeMgr.GetMulticastType (this);
+}
+
+CMcSnapshotType* 
+CFunctionPtrType::GetMcSnapshotType ()
+{
+	return m_pModule->m_TypeMgr.GetMcSnapshotType (this);
 }
 
 CStructType* 

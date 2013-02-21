@@ -595,7 +595,7 @@ struct TFunctionPtr
 
 struct TFunctionWeakPtr: TFunctionPtr
 {
-	FStrengthen m_pfnStrengthenClosure;
+	FStrengthen m_pfnStrengthen;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -626,7 +626,7 @@ struct TPropertyPtr
 
 struct TPropertyWeakPtr: TPropertyPtr
 {
-	FStrengthen m_pfnStrengthenClosure;
+	FStrengthen m_pfnStrengthen;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -651,7 +651,7 @@ struct TAuPropertyPtr: TAuPropertyThinPtr
 
 struct TAuPropertyWeakPtr: TAuPropertyPtr
 {
-	FStrengthen m_pfnStrengthenClosure;
+	FStrengthen m_pfnStrengthen;
 };
 
 // structure backing up bindable or autoget property unsafe pointer declared like:

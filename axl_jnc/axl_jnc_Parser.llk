@@ -36,12 +36,6 @@ Members
 		EStage_Pass2, // statements and expressions (after linkage)
 	};
 
-	enum EEndianness
-	{
-		EEndianness_LittleEndian,
-		EEndianness_BigEndian,
-	};
-
 	enum EAssign
 	{
 		EAssign_Normal,
@@ -52,7 +46,6 @@ Members
 	EStage m_Stage;
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;
-	EEndianness m_Endianness;
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CAttributeBlock* m_pAttributeBlock;

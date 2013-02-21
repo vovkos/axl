@@ -13,7 +13,7 @@ namespace axl {
 namespace jnc {
 
 //.............................................................................
-	
+
 class CTypeModifiers
 {
 protected:
@@ -60,6 +60,26 @@ public:
 
 	bool
 	SetType (CType* pType);
+};
+
+//.............................................................................
+
+enum EDeclPrefix
+{
+	EDeclPrefix_Undefined = 0,
+	EDeclPrefix_CommonPtr,
+	EDeclPrefix_FunctionPtr,
+	EDeclPrefix_PropertyPtr,
+	EDeclPrefix_Multicast,
+	EDeclPrefix_Event,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TDeclPrefix
+{
+	EDeclPrefix m_PrefixKind;
+	int m_TypeModifiers;
 };
 
 //.............................................................................
@@ -214,11 +234,11 @@ protected:
 	CType* m_pCastOpType;
 	CQualifiedName m_Name;
 	CToken::CPos m_Pos;
-	CType* m_pType;
 	size_t m_BitCount;
 	int m_PostDeclaratorModifiers;
+	CType* m_pBaseType;
 
-	rtl::CArrayT <int> m_PointerArray;
+	rtl::CArrayT <TDeclPrefix> m_PrefixArray;
 	rtl::CStdListT <CDeclSuffix> m_SuffixList;
 
 public:
@@ -281,6 +301,24 @@ public:
 		return m_PostDeclaratorModifiers;
 	}
 
+	CType* 
+	GetBaseType ()
+	{
+		return m_pBaseType;
+	}
+
+	rtl::CArrayT <TDeclPrefix> 
+	GetPrefixArray ()
+	{
+		return m_PrefixArray;
+	}
+
+	rtl::CConstListT <CDeclSuffix> 
+	GetSuffixList ()
+	{
+		return m_SuffixList;
+	}
+
 	bool
 	SetPostDeclaratorModifier (EPostDeclaratorModifier Modifier);
 
@@ -309,7 +347,7 @@ public:
 	SetPropValue ();
 
 	bool
-	AddPointer ();
+	AddPrefix (EDeclPrefix PrefixKind);
 
 	CDeclArraySuffix*
 	AddArraySuffix (size_t ElementCount);

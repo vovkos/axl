@@ -381,6 +381,38 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	return true;
 }
 
+void
+CFunctionMgr::InternalPrologue (
+	CFunction* pFunction,
+	CValue* pArgValueArray,
+	size_t ArgCount
+	)
+{
+	TEmissionContext Context;
+	Context.m_pFunction = m_pCurrentFunction;
+	Context.m_pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	m_EmissionContextStack.Append (Context);
+
+	m_pCurrentFunction = pFunction;
+	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+
+	rtl::CArrayT <CType*> ArgTypeArray = pFunction->GetType ()->GetArgTypeArray ();
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin ();
+
+	for (size_t i = 0; i < ArgCount; i++, LlvmArg++)
+		pArgValueArray [i] = CValue (LlvmArg, ArgTypeArray [i]);
+}
+
+void
+CFunctionMgr::InternalEpilogue ()
+{
+	TEmissionContext Context = m_EmissionContextStack.GetBackAndPop ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (Context.m_pBlock);
+	m_pCurrentFunction = Context.m_pFunction;
+}
+
 CFunction*
 CFunctionMgr::GetDirectThunkFunction (
 	CFunction* pTargetFunction,
@@ -962,16 +994,56 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateDynamicCastInterface ();
 		break;
 
-	case EStdFunc_MulticastOperator:
-		pFunction = CreateMulticastOperator ();
-		break;
-
-	case EStdFunc_FireSimpleEvent:
-		pFunction = CreateFireSimpleEvent ();
-		break;
-
 	case EStdFunc_HeapAllocate:
 		pFunction = CreateHeapAllocate ();
+		break;
+
+	case EStdFunc_MulticastSet_s:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastSet_s"));
+		break;
+
+	case EStdFunc_MulticastSet_w:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastSet_w"));
+		break;
+
+	case EStdFunc_MulticastSet_u:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastSet_u"));
+		break;
+
+	case EStdFunc_MulticastAdd_s:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastAdd_s"));
+		break;
+
+	case EStdFunc_MulticastAdd_w:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastAdd_w"));
+		break;
+
+	case EStdFunc_MulticastAdd_u:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastAdd_u"));
+		break;
+
+	case EStdFunc_MulticastRemove_s:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastRemove_s"));
+		break;
+
+	case EStdFunc_MulticastRemove_w:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastRemove_w"));
+		break;
+
+	case EStdFunc_MulticastRemove_u:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastRemove_u"));
+		break;
+
+	case EStdFunc_MulticastSnapshot_s:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastSnapshot_s"));
+		break;
+
+	case EStdFunc_MulticastSnapshot_w:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastSnapshot_w"));
+		break;
+
+	case EStdFunc_MulticastSnapshot_u:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastSnapshot_u"));
 		break;
 
 	default:
@@ -1285,48 +1357,6 @@ CFunctionMgr::CreateDynamicCastInterface ()
 	return CreateInternalFunction (_T("jnc.DynamicCastInterface"), pType);
 }
 
-// void
-// jnc.MulticastOperator (
-//		jnc.event* pEvent,
-//		void* pfn,
-//		object pIface,
-//		int OpKind
-//		);
-
-CFunction*
-CFunctionMgr::CreateMulticastOperator ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction (_T("jnc.MulticastOperator"), pType);
-}
-
-// void
-// jnc.FireSimpleEvent (jnc.event* pEvent);
-
-CFunction*
-CFunctionMgr::CreateFireSimpleEvent ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleEvent)->GetDataPtrType (EDataPtrType_Unsafe),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction (_T("jnc.FireSimpleMulticastOperator"), pType);
-}
-
 // int8*
 // jnc.HeapAllocate (int8* pType);
 
@@ -1342,6 +1372,110 @@ CFunctionMgr::CreateHeapAllocate ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction (_T("jnc.HeapAllocate"), pType);
+}
+
+// intptr
+// jnc.MulticastSet (
+//		multicast* pMulticast (), 
+//		function* pfn ()
+//		);
+
+CFunction*
+CFunctionMgr::CreateMulticastSet (
+	EFunctionPtrType PtrTypeKind,
+	const tchar_t* pTag
+	)
+{
+	CFunctionType* pFunctionType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunctionPtrType* pPtrType = pFunctionType->GetFunctionPtrType (PtrTypeKind);
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+
+	CType* ArgTypeArray [] =
+	{
+		pPtrType->GetMulticastType ()->GetDataPtrType (EDataPtrType_Unsafe),
+		pPtrType
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (pTag, pType);
+}
+
+// intptr
+// jnc.MulticastAdd (
+//		multicast* pMulticast (), 
+//		function* pfn ()
+//		);
+
+CFunction*
+CFunctionMgr::CreateMulticastAdd (
+	EFunctionPtrType PtrTypeKind,
+	const tchar_t* pTag
+	)
+{
+	CFunctionType* pFunctionType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunctionPtrType* pPtrType = pFunctionType->GetFunctionPtrType (PtrTypeKind);
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+
+	CType* ArgTypeArray [] =
+	{
+		pPtrType->GetMulticastType ()->GetDataPtrType (EDataPtrType_Unsafe),
+		pPtrType
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (pTag, pType);
+}
+
+// function* pfn ()
+// jnc.MulticastRemove (
+//		multicast* pMulticast (), 
+//		intptr Handle
+//		);
+
+CFunction*
+CFunctionMgr::CreateMulticastRemove (
+	EFunctionPtrType PtrTypeKind,
+	const tchar_t* pTag
+	)
+{
+	CFunctionType* pFunctionType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunctionPtrType* pPtrType = pFunctionType->GetFunctionPtrType (PtrTypeKind);
+
+	CType* pReturnType = pPtrType;
+
+	CType* ArgTypeArray [] =
+	{
+		pPtrType->GetMulticastType ()->GetDataPtrType (EDataPtrType_Unsafe),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (pTag, pType);
+}
+
+// function** pfn ()
+// jnc.MulticastSnapshot (multicast* pMulticast ());
+
+CFunction*
+CFunctionMgr::CreateMulticastSnapshot (
+	EFunctionPtrType PtrTypeKind,
+	const tchar_t* pTag
+	)
+{
+	CFunctionType* pFunctionType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunctionPtrType* pPtrType = pFunctionType->GetFunctionPtrType (PtrTypeKind);
+
+	CType* pReturnType = pPtrType->GetDataPtrType (EDataPtrType_Unsafe);
+
+	CType* ArgTypeArray [] =
+	{
+		pPtrType->GetMulticastType ()->GetDataPtrType (EDataPtrType_Unsafe),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (pTag, pType);
 }
 
 CFunction* 
@@ -1495,4 +1629,3 @@ CFunctionMgr::RuntimeError (
 
 } // namespace jnc {
 } // namespace axl {
-

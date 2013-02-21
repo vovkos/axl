@@ -26,15 +26,15 @@ protected:
 	CModule* m_pModule;
 	rtl::CIteratorT <CDeclSuffix> m_Suffix;
 	int m_TypeModifiers;
+	int m_MulticastTypeModifiers;
+	int m_ClassPtrTypeModifiers;
 
 public:
+	CDeclTypeCalc ();
+
 	CType*
 	CalcType (
-		CType* pType,
-		int Modifiers,
-		const int* pPointerArray,
-		size_t PointerCount,
-		rtl::CIteratorT <CDeclSuffix> Suffix,
+		CDeclarator* pDeclarator,
 		int* pDataPtrTypeFlags
 		);
 
