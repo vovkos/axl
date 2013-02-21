@@ -11,8 +11,6 @@ CDeclTypeCalc::CDeclTypeCalc ()
 {
 	m_pModule = NULL;
 	m_TypeModifiers = 0;
-	m_MulticastTypeModifiers = 0;
-	m_ClassPtrTypeModifiers = 0;
 }
 
 CType*

@@ -348,7 +348,7 @@ declarator_prefix_kind
 		}
 	| EToken_Property '*'
 		{
-			$.m_PrefixKind = EDeclPrefix_FunctionPtr;
+			$.m_PrefixKind = EDeclPrefix_PropertyPtr;
 		}
 	| EToken_Multicast
 		{

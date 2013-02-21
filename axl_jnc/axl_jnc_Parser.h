@@ -8122,7 +8122,7 @@ public:
 			_cls35* __pAstNode = (_cls35*) __pSymbol->m_pAstNode;
 #line 350 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Declarator.llk"
 			
-			(*__pAstNode).m_PrefixKind = EDeclPrefix_FunctionPtr;
+			(*__pAstNode).m_PrefixKind = EDeclPrefix_PropertyPtr;
 		;
 #line 8128 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}

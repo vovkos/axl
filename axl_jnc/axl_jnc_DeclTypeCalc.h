@@ -26,8 +26,6 @@ protected:
 	CModule* m_pModule;
 	rtl::CIteratorT <CDeclSuffix> m_Suffix;
 	int m_TypeModifiers;
-	int m_MulticastTypeModifiers;
-	int m_ClassPtrTypeModifiers;
 
 public:
 	CDeclTypeCalc ();
