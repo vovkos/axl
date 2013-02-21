@@ -1011,39 +1011,39 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		break;
 
 	case EStdFunc_MulticastAdd_s:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastAdd_s"));
+		pFunction = CreateMulticastAdd (EFunctionPtrType_Normal, _T("jnc.MulticastAdd_s"));
 		break;
 
 	case EStdFunc_MulticastAdd_w:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastAdd_w"));
+		pFunction = CreateMulticastAdd (EFunctionPtrType_Weak, _T("jnc.MulticastAdd_w"));
 		break;
 
 	case EStdFunc_MulticastAdd_u:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastAdd_u"));
+		pFunction = CreateMulticastAdd (EFunctionPtrType_Unsafe, _T("jnc.MulticastAdd_u"));
 		break;
 
 	case EStdFunc_MulticastRemove_s:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastRemove_s"));
+		pFunction = CreateMulticastRemove (EFunctionPtrType_Normal, _T("jnc.MulticastRemove_s"));
 		break;
 
 	case EStdFunc_MulticastRemove_w:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastRemove_w"));
+		pFunction = CreateMulticastRemove (EFunctionPtrType_Weak, _T("jnc.MulticastRemove_w"));
 		break;
 
 	case EStdFunc_MulticastRemove_u:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastRemove_u"));
+		pFunction = CreateMulticastRemove (EFunctionPtrType_Unsafe, _T("jnc.MulticastRemove_u"));
 		break;
 
 	case EStdFunc_MulticastSnapshot_s:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastSnapshot_s"));
+		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Normal, _T("jnc.MulticastSnapshot_s"));
 		break;
 
 	case EStdFunc_MulticastSnapshot_w:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastSnapshot_w"));
+		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Weak, _T("jnc.MulticastSnapshot_w"));
 		break;
 
 	case EStdFunc_MulticastSnapshot_u:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastSnapshot_u"));
+		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Unsafe, _T("jnc.MulticastSnapshot_u"));
 		break;
 
 	default:
@@ -1096,28 +1096,20 @@ CFunctionMgr::CreateOnRuntimeError ()
 CFunction*
 CFunctionMgr::CreateCheckNullPtr ()
 {
-	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
-	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
 	};
-	
+
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckNullPtr"), pType);
 
-	m_pCurrentFunction = pFunction;
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
-
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	
-	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
-	CValue ArgValue2 (LlvmArg++, ArgTypeArray [0]);
+	CValue ArgValue1 = ArgValueArray [0];
+	CValue ArgValue2 = ArgValueArray [1];
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("iface_success"));
@@ -1133,8 +1125,7 @@ CFunctionMgr::CreateCheckNullPtr ()
 	m_pModule->m_ControlFlowMgr.Follow (pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.Return ();
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
-	m_pCurrentFunction = pPrevCurrentFunction;
+	InternalEpilogue ();
 
 	return pFunction;
 }
@@ -1161,16 +1152,11 @@ CFunctionMgr::CreateCheckScopeLevel ()
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckScopeLevel"), pType);
 
-	m_pCurrentFunction = pFunction;
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
-
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	
-	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
-	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
+	CValue ArgValue1 = ArgValueArray [0];
+	CValue ArgValue2 = ArgValueArray [1];
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("scope_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("scope_success"));
@@ -1185,8 +1171,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 	m_pModule->m_ControlFlowMgr.Follow (pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.Return ();
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
-	m_pCurrentFunction = pPrevCurrentFunction;
+	InternalEpilogue ();
 
 	return pFunction;
 }
@@ -1216,18 +1201,13 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckDataPtrRange"), pType);
 
-	m_pCurrentFunction = pFunction;
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
-
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	
-	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
-	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
-	CValue ArgValue3 (LlvmArg++, ArgTypeArray [2]);
-	CValue ArgValue4 (LlvmArg++, ArgTypeArray [3]);
+	CValue ArgValue1 = ArgValueArray [0];
+	CValue ArgValue2 = ArgValueArray [1];
+	CValue ArgValue3 = ArgValueArray [2];
+	CValue ArgValue4 = ArgValueArray [3];
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
@@ -1257,8 +1237,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	m_pModule->m_ControlFlowMgr.Follow (pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.Return ();
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
-	m_pCurrentFunction = pPrevCurrentFunction;
+	InternalEpilogue ();
 
 	return pFunction;
 }
@@ -1284,16 +1263,11 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (_T("jnc.CheckClassPtrScopeLevel"), pType);
 
-	m_pCurrentFunction = pFunction;
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
-
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	
-	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
-	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
+	CValue ArgValue1 = ArgValueArray [0];
+	CValue ArgValue2 = ArgValueArray [1];
 
 	CBasicBlock* pNoNullBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("scope_nonull"));
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("scope_fail"));
@@ -1330,8 +1304,7 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	m_pModule->m_ControlFlowMgr.Follow (pSuccessBlock);
 	m_pModule->m_ControlFlowMgr.Return ();
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
-	m_pCurrentFunction = pPrevCurrentFunction;
+	InternalEpilogue ();
 
 	return pFunction;
 }
@@ -1504,16 +1477,11 @@ CFunctionMgr::CreateClassInitializer (CClassType* pClassType)
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction (Tag, pType);
 
-	m_pCurrentFunction = pFunction;
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
-
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	
-	CValue ArgValue1 (LlvmArg++, ArgTypeArray [0]);
-	CValue ArgValue2 (LlvmArg++, ArgTypeArray [1]);
+	CValue ArgValue1 = ArgValueArray [0];
+	CValue ArgValue2 = ArgValueArray [1];
 
 	CValue TypeValue (&pClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 	CValue ObjectPtrValue;
@@ -1541,8 +1509,7 @@ CFunctionMgr::CreateClassInitializer (CClassType* pClassType)
 
 	m_pModule->m_ControlFlowMgr.Return ();
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
-	m_pCurrentFunction = pPrevCurrentFunction;
+	InternalEpilogue ();
 
 	return pFunction;
 }
