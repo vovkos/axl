@@ -207,6 +207,13 @@ public:
 	bool
 	PrepareArgumentReturnValue (CValue* pValue);
 
+	bool
+	PrepareDataPtr (
+		const CValue& Value,
+		ERuntimeError Error,
+		CValue* pPtrValue
+		);
+
 	// unary operators
 
 	bool
@@ -731,13 +738,6 @@ public:
 protected:
 	// checks
 
-	bool
-	PrepareDataRef (
-		const CValue& Value,
-		ERuntimeError Error,
-		CValue* pPtrValue
-		);
-
 	void
 	GetDataRefScopeLevel (
 		const CValue& Value,
@@ -830,6 +830,14 @@ protected:
 	GetUnionFieldMember (
 		const CValue& OpValue,
 		CStructField* pMember,
+		CValue* pResultValue
+		);
+
+	bool
+	GetMulticastMember (
+		const CValue& OpValue,
+		CMulticastType* pMulticastType,
+		const tchar_t* pName,
 		CValue* pResultValue
 		);
 

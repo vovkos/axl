@@ -316,9 +316,189 @@ StdLib_DynamicCastInterface (
 	
 	jnc::TInterface* p2 = (jnc::TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
 	ASSERT (p2->m_pObject == p->m_pObject);
-
 	return p2;
 }
+
+bool
+SetMulticastCount (
+	jnc::TMulticast* pMulticast,
+	size_t Count,
+	size_t Size
+	)
+{
+	if (pMulticast->m_MaxCount >= Count)
+	{
+		pMulticast->m_Count = Count;
+		return true;		
+	}
+
+	size_t MaxCount = rtl::GetMinPower2Ge (Count);
+	
+	void* p = AXL_MEM_ALLOC (MaxCount * Size);
+	if (!p)
+		return false;
+
+	pMulticast->m_pPtrArray = p;
+	pMulticast->m_MaxCount = MaxCount;
+	pMulticast->m_Count = Count;
+	return true;
+}
+
+intptr_t
+StdLib_MulticastSet (
+	jnc::TMulticast* pMulticast,
+	jnc::TFunctionPtr Ptr
+	)
+{
+	if (!Ptr.m_pfn)
+	{
+		SetMulticastCount (pMulticast, 0, sizeof (jnc::TFunctionPtr));
+		return 0;
+	}
+
+	SetMulticastCount (pMulticast, 1, sizeof (jnc::TFunctionPtr));
+	*(jnc::TFunctionPtr*) pMulticast->m_pPtrArray = Ptr;
+	return -1; // not yet
+}
+
+intptr_t
+StdLib_MulticastSet_w (
+	jnc::TMulticast* pMulticast,
+	jnc::TFunctionPtr_w Ptr
+	)
+{
+	if (!Ptr.m_pfn)
+	{
+		SetMulticastCount (pMulticast, 0, sizeof (jnc::TFunctionPtr));
+		return 0;
+	}
+
+	SetMulticastCount (pMulticast, 1, sizeof (jnc::TFunctionPtr_w));
+	*(jnc::TFunctionPtr_w*) pMulticast->m_pPtrArray = Ptr;
+	return -1; // not yet
+}
+
+intptr_t
+StdLib_MulticastSet_u (
+	jnc::TMulticast* pMulticast,
+	void* pfn
+	)
+{
+	if (!pfn)
+	{
+		SetMulticastCount (pMulticast, 0, sizeof (jnc::TFunctionPtr));
+		return 0;
+	}
+
+	SetMulticastCount (pMulticast, 1, sizeof (void*));
+	*(void**) pMulticast->m_pPtrArray = pfn;
+	return -1; // not yet
+}
+
+intptr_t
+StdLib_MulticastAdd (
+	jnc::TMulticast* pMulticast,
+	jnc::TFunctionPtr Ptr
+	)
+{
+	if (!Ptr.m_pfn)
+		return 0;
+
+	size_t Count = pMulticast->m_Count;
+	SetMulticastCount (pMulticast, Count + 1, sizeof (jnc::TFunctionPtr));
+	*((jnc::TFunctionPtr*) pMulticast->m_pPtrArray + Count) = Ptr;
+	return -1; // not yet
+}
+
+intptr_t
+StdLib_MulticastAdd_w (
+	jnc::TMulticast* pMulticast,
+	jnc::TFunctionPtr_w Ptr
+	)
+{
+	if (!Ptr.m_pfn)
+		return 0;
+
+	size_t Count = pMulticast->m_Count;
+	SetMulticastCount (pMulticast, Count + 1, sizeof (jnc::TFunctionPtr_w));
+	*((jnc::TFunctionPtr_w*) pMulticast->m_pPtrArray + Count) = Ptr;
+	return -1; // not yet
+}
+
+intptr_t
+StdLib_MulticastAdd_u (
+	jnc::TMulticast* pMulticast,
+	void* pfn
+	)
+{
+	if (!pfn)
+		return 0;
+
+	size_t Count = pMulticast->m_Count;
+	SetMulticastCount (pMulticast, Count + 1, sizeof (void*));
+	*((void**) pMulticast->m_pPtrArray + Count) = pfn;
+	return -1; // not yet
+}
+
+jnc::TFunctionPtr
+StdLib_MulticastRemove (
+	jnc::TMulticast* pMulticast,
+	intptr_t Handle
+	)
+{
+	jnc::TFunctionPtr Ptr;
+	memset (&Ptr, 0, sizeof (Ptr));
+	return Ptr;
+}
+
+jnc::TFunctionPtr_w
+StdLib_MulticastRemove_w (
+	jnc::TMulticast* pMulticast,
+	intptr_t Handle
+	)
+{
+	jnc::TFunctionPtr_w Ptr;
+	memset (&Ptr, 0, sizeof (Ptr));
+	return Ptr;
+}
+
+void*
+StdLib_MulticastRemove_u (
+	jnc::TMulticast* pMulticast,
+	intptr_t Handle
+	)
+{
+	return NULL;
+}
+
+jnc::TFunctionPtr*
+StdLib_MulticastSnapshot (
+	jnc::TMulticast* pMulticast,
+	intptr_t Handle
+	)
+{
+	return NULL;
+}
+
+jnc::TFunctionPtr*
+StdLib_MulticastSnapshot_w (
+	jnc::TMulticast* pMulticast,
+	intptr_t Handle
+	)
+{
+	ASSERT (false);
+	return NULL;
+}
+
+void**
+StdLib_MulticastSnapshot_u (
+	jnc::TMulticast* pMulticast,
+	intptr_t Handle
+	)
+{
+	return NULL;
+}
+
 
 /*
 
@@ -563,6 +743,28 @@ CAstDoc::ExportStdLib ()
 	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
 	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
 
+	// implementation for thin and unsafe is the same
+
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSet,   StdLib_MulticastSet);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSet_w, StdLib_MulticastSet_w);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSet_t, StdLib_MulticastSet_u);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSet_u, StdLib_MulticastSet_u);
+
+	ExportStdLibFunction (jnc::EStdFunc_MulticastAdd,   StdLib_MulticastAdd);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastAdd_w, StdLib_MulticastAdd_w);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastAdd_t, StdLib_MulticastAdd_u);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastAdd_u, StdLib_MulticastAdd_u);
+
+	ExportStdLibFunction (jnc::EStdFunc_MulticastRemove,   StdLib_MulticastRemove);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastRemove_w, StdLib_MulticastRemove_w);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastRemove_t, StdLib_MulticastRemove_u);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastRemove_u, StdLib_MulticastRemove_u);
+
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSnapshot,   StdLib_MulticastSnapshot);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSnapshot_w, StdLib_MulticastSnapshot_w);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSnapshot_t, StdLib_MulticastSnapshot_u);
+	ExportStdLibFunction (jnc::EStdFunc_MulticastSnapshot_u, StdLib_MulticastSnapshot_u);
+	
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
 	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
 	ExportStdLibFunction (_T("StructTest"), StdLib_StructTest);

@@ -180,12 +180,13 @@ enum ETypeModifier
 	ETypeModifier_Unsafe    = 0x00000200,
 	ETypeModifier_Cdecl     = 0x00000400,
 	ETypeModifier_Stdcall   = 0x00000800,
-	ETypeModifier_Property  = 0x00001000,
-	ETypeModifier_Bindable  = 0x00002000,
-	ETypeModifier_AutoGet   = 0x00004000,
-	ETypeModifier_Indexed   = 0x00008000,
+	ETypeModifier_Function  = 0x00001000,
+	ETypeModifier_Property  = 0x00002000,
+	ETypeModifier_Bindable  = 0x00004000,
+	ETypeModifier_AutoGet   = 0x00008000,
+	ETypeModifier_Indexed   = 0x00010000,
 
-	// since 'class' impose pointer w/o requiring '*' symbol
+	// since 'class' implies pointer w/o requiring '*' symbol
 	// we need to somehow distinguish where to apply certain modifier.
 	// we 'promote' conflicting modifiers upon discovering 'class' or 'import' type
 	// thus applying it to the leftmost site on the right of the modifier
@@ -193,10 +194,10 @@ enum ETypeModifier
 	// nonull weak CClass nonull weak function* x ();
 	// nonull const unsafe CClass nonull const unsafe* y;
 
-	ETypeModifier_NoNull_p  = 0x00010000,
-	ETypeModifier_Const_p   = 0x00020000,
-	ETypeModifier_Weak_p    = 0x00040000,
-	ETypeModifier_Unsafe_p  = 0x00080000,
+	ETypeModifier_NoNull_p  = 0x000200000,
+	ETypeModifier_Const_p   = 0x00100000,
+	ETypeModifier_Weak_p    = 0x00200000,
+	ETypeModifier_Unsafe_p  = 0x00400000,
 
 	// this modifier is sort of virtual: it doesnt come from the parser
 	// its created during type calculation upon discovering EDeclPrefix_Event
@@ -214,6 +215,7 @@ enum ETypeModifierMask
 		ETypeModifier_BigEndian,
 
 	ETypeModifierMask_Function = 
+		ETypeModifier_Function | 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall,
 

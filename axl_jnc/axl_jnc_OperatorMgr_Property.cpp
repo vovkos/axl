@@ -472,7 +472,7 @@ COperatorMgr::SetProperty (
 	if (!EventValue.IsEmpty ())
 	{
 		CValue EventPtrValue;
-		bool Result = PrepareDataRef (EventValue, EPrepareDataRefFlag_Store, &EventPtrValue);
+		bool Result = PrepareDataPtr (EventValue, EPrepareDataPtrFlag_Store, &EventPtrValue);
 		if (!Result)
 			return false;
 

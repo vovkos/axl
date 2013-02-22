@@ -806,7 +806,7 @@ CTypeMgr::GetFunctionPtrType (
 		break;
 
 	case EFunctionPtrType_Weak:
-		Size = sizeof (TFunctionWeakPtr);
+		Size = sizeof (TFunctionPtr_w);
 		break;
 
 	case EFunctionPtrType_Unsafe:
@@ -891,7 +891,7 @@ CTypeMgr::GetPropertyPtrType (
 			break;
 		
 		case EPropertyPtrType_Weak:
-			Size = sizeof (TPropertyWeakPtr);
+			Size = sizeof (TPropertyPtr_w);
 			break;
 
 		case EPropertyPtrType_Unsafe:
@@ -912,15 +912,15 @@ CTypeMgr::GetPropertyPtrType (
 			break;
 
 		case EPropertyPtrType_Thin:
-			Size = sizeof (TAuPropertyThinPtr);
+			Size = sizeof (TAuPropertyPtr_t);
 			break;
 
 		case EPropertyPtrType_Weak:
-			Size = sizeof (TAuPropertyWeakPtr);
+			Size = sizeof (TAuPropertyPtr_w);
 			break;
 
 		case EPropertyPtrType_Unsafe:
-			Size = sizeof (TAuPropertyUnsafePtr);
+			Size = sizeof (TAuPropertyPtr_u);
 			Flags |= ETypeFlag_Pod;
 			break;
 
@@ -1178,15 +1178,14 @@ CTypeMgr::CreateClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 CStructType* 
 CTypeMgr::CreateWeakClosureFunctionPtrStructType (CFunctionType* pFunctionType)
 {
-	ASSERT (false);
-
+	CFunctionType* pAbstractMethodMemberType = pFunctionType->GetAbstractMethodMemberType ();
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
+
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.wptr"));
-
-	pType->CreateFieldMember (pFunctionType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateFieldMember (pAbstractMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
-	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	pType->CalcLayout ();
 	return pType;
 }

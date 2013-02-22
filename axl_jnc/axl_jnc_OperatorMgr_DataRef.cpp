@@ -106,34 +106,40 @@ COperatorMgr::GetThinDataPtrValidator (
 }
 
 bool
-COperatorMgr::PrepareDataRef (
+COperatorMgr::PrepareDataPtr (
 	const CValue& Value,
 	ERuntimeError Error,
-	CValue* pPtrValue
+	CValue* pResultValue
 	)
 {
-	ASSERT (Value.GetType ()->GetTypeKind () == EType_DataRef);
+	ASSERT (Value.GetType ()->GetTypeKind () == EType_DataPtr || Value.GetType ()->GetTypeKind () == EType_DataRef);
 	CDataPtrType* pType = (CDataPtrType*) Value.GetType ();
 	EDataPtrType PtrTypeKind = pType->GetPtrTypeKind ();
 
-	CValue ValidatorValue;
+	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType (EDataPtrType_Unsafe);
+
+	CValue PtrValue;
+	CValue ValidatorValue;	
 
 	switch (PtrTypeKind)
 	{
 	case EDataPtrType_Unsafe:
-		*pPtrValue = Value;
+		pResultValue->OverrideType (Value, pResultType);
 		return true;
 
 	case EDataPtrType_Thin:
-		*pPtrValue = Value;
 		if (Value.GetFlags () & EValueFlag_NoDataPtrRangeCheck)
+		{
+			pResultValue->OverrideType (Value, pResultType);
 			return true;
+		}
 
+		PtrValue.OverrideType (Value, pResultType);
 		GetThinDataPtrValidator (Value, &ValidatorValue);
 		break;
 
 	case EDataPtrType_Normal:
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, NULL, pPtrValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
 		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ValidatorValue);
 		break;
 
@@ -141,7 +147,8 @@ COperatorMgr::PrepareDataRef (
 		ASSERT (false);
 	}
 
-	CheckDataPtrRange (*pPtrValue, pType->GetTargetType ()->GetSize (), ValidatorValue, Error);
+	CheckDataPtrRange (PtrValue, pType->GetTargetType ()->GetSize (), ValidatorValue, Error);
+	*pResultValue = PtrValue;
 	return true;
 }
 
@@ -160,7 +167,7 @@ COperatorMgr::LoadDataRef (
 	CType* pTargetType = pType->GetTargetType ();
 
 	CValue PtrValue;
-	Result = PrepareDataRef (OpValue, ERuntimeError_LoadOutOfRange, &PtrValue);
+	Result = PrepareDataPtr (OpValue, ERuntimeError_LoadOutOfRange, &PtrValue);
 	if (!Result)
 		return false;
 
@@ -218,7 +225,7 @@ COperatorMgr::StoreDataRef (
 	Result = 
 		CheckCastKind (RawSrcValue, pCastType) &&
 		CastOperator (RawSrcValue, pCastType, &SrcValue) &&
-		PrepareDataRef (DstValue, ERuntimeError_StoreOutOfRange, &PtrValue);
+		PrepareDataPtr (DstValue, ERuntimeError_StoreOutOfRange, &PtrValue);
 
 	if (!Result)
 		return false;

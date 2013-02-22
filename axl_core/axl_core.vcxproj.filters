@@ -328,6 +328,9 @@
     <ClInclude Include="..\inc\axl_rtl_HexEncoding.h">
       <Filter>rtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_rtl_HandleTable.h">
+      <Filter>rtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="axl_rtl_djb2.cpp">

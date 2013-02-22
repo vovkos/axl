@@ -30,10 +30,11 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifier_Thin,   
 		ETypeModifier_Stdcall,      // ETypeModifier_Cdecl            = 0x00000400,
 		ETypeModifier_Cdecl,        // ETypeModifier_Stdcall          = 0x00000800,
-		0,                          // ETypeModifier_Property         = 0x00001000,
-		0,                          // ETypeModifier_Bindable         = 0x00002000,
-		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00004000,
-		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00008000,
+		ETypeModifier_Property,     // ETypeModifier_Function         = 0x00001000,
+		ETypeModifier_Function,     // ETypeModifier_Property         = 0x00002000,
+		0,                          // ETypeModifier_Bindable         = 0x00004000,
+		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00008000,
+		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00010000,
 	};
 
 	// check duplicates
@@ -180,7 +181,7 @@ CDeclarator::CDeclarator ()
 	m_pBaseType = NULL;
 }
 
-bool
+void
 CDeclarator::SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 {
 	CModule* pModule = GetCurrentThreadModule ();
@@ -189,20 +190,19 @@ CDeclarator::SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 	if (!pTypeSpecifier)
 	{
 		m_pBaseType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-		return true;
 	}
-
-	m_pBaseType = pTypeSpecifier->GetType ();
-	m_TypeModifiers = pTypeSpecifier->GetTypeModifiers ();
-	
-	if (!m_pBaseType)
+	else
 	{
-		m_pBaseType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
-			pModule->m_TypeMgr.GetPrimitiveType (EType_Int) : 
-			pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	}
+		m_pBaseType = pTypeSpecifier->GetType ();
+		m_TypeModifiers = pTypeSpecifier->GetTypeModifiers ();
 	
-	return true;
+		if (!m_pBaseType)
+		{
+			m_pBaseType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
+				pModule->m_TypeMgr.GetPrimitiveType (EType_Int) : 
+				pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		}
+	}
 }
 
 bool

@@ -77,8 +77,9 @@ enum EStdFunc
 	//		function* pfn ()
 	//		);
 
-	EStdFunc_MulticastSet_s,
+	EStdFunc_MulticastSet,
 	EStdFunc_MulticastSet_w,
+	EStdFunc_MulticastSet_t,
 	EStdFunc_MulticastSet_u,
 
 	// intptr
@@ -87,8 +88,9 @@ enum EStdFunc
 	//		function* pfn ()
 	//		);
 
-	EStdFunc_MulticastAdd_s,
+	EStdFunc_MulticastAdd,
 	EStdFunc_MulticastAdd_w,
+	EStdFunc_MulticastAdd_t,
 	EStdFunc_MulticastAdd_u,
 
 	// function* pfn ()
@@ -97,15 +99,17 @@ enum EStdFunc
 	//		intptr Handle
 	//		);
 
-	EStdFunc_MulticastRemove_s,
+	EStdFunc_MulticastRemove,
 	EStdFunc_MulticastRemove_w,
+	EStdFunc_MulticastRemove_t,
 	EStdFunc_MulticastRemove_u,
 
 	// function** pfn ()
 	// jnc.MulticastSnapshot (multicast* pMulticast ());
 
-	EStdFunc_MulticastSnapshot_s,
+	EStdFunc_MulticastSnapshot,
 	EStdFunc_MulticastSnapshot_w,
+	EStdFunc_MulticastSnapshot_t,
 	EStdFunc_MulticastSnapshot_u,
  
 	EStdFunc__Count

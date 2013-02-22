@@ -206,7 +206,7 @@ protected:
 	CCast_DataPtr_Normal2Unsafe m_FromDataPtr_Normal2Unsafe;
 	CCast_DataPtr_Unsafe2Unsafe m_FromDataPtr_Unsafe2Unsafe;
 
-	ICastOperator* m_OperatorTable [EDataPtrType__Count] [2];
+	ICastOperator* m_OperatorTable [EDataPtrType__Count] [EDataPtrType__Count];
 
 public:
 	CCast_DataPtr ();

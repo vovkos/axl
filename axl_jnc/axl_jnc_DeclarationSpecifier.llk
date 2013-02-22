@@ -319,6 +319,10 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_Stdcall;
 		}
+	| EToken_Function
+		{
+			$.m_Modifier = ETypeModifier_Function;
+		}
 	| EToken_Property
 		{
 			$.m_Modifier = ETypeModifier_Property;

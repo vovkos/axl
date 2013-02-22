@@ -292,10 +292,4 @@ named_type_block <CNamespace* $pNamespace>
 		}
 	;
 
-named_type_block_declaration
-	: friend_declaration
-	| access_declaration
-	| item_declaration
-	;
-
 //.............................................................................

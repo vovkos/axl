@@ -593,7 +593,7 @@ struct TFunctionPtr
 	TInterface* m_pClosure; 
 };
 
-struct TFunctionWeakPtr: TFunctionPtr
+struct TFunctionPtr_w: TFunctionPtr
 {
 	FStrengthen m_pfnStrengthen;
 };
@@ -606,9 +606,9 @@ struct TFunctionWeakPtr: TFunctionPtr
 struct TMulticast
 {
 	volatile intptr_t m_Lock;
-	void** m_ppFunctionPtrArray; // array of function closure, weak or unsafe pointers
+	void* m_pPtrArray; // array of function closure, weak or unsafe pointers
+	size_t m_MaxCount;
 	size_t m_Count;
-	size_t m_BufferCount;
 	void* m_pHandleTable;
 };
 
@@ -624,7 +624,7 @@ struct TPropertyPtr
 	TInterface* m_pClosure; 
 };
 
-struct TPropertyWeakPtr: TPropertyPtr
+struct TPropertyPtr_w: TPropertyPtr
 {
 	FStrengthen m_pfnStrengthen;
 };
@@ -635,7 +635,7 @@ struct TPropertyWeakPtr: TPropertyPtr
 // int autoget property thin* prTest (int, int);
 // if both bindable & autoget modifiers used, autodata goes first, then onchange event
 
-struct TAuPropertyThinPtr
+struct TAuPropertyPtr_t
 {
 	void** m_pVTable;
 	TDataPtr m_DataPtr;
@@ -644,12 +644,12 @@ struct TAuPropertyThinPtr
 // structures backing up bindable or autoget property closure pointer declared like:
 // int bindable property* prTest (int, int);
 
-struct TAuPropertyPtr: TAuPropertyThinPtr
+struct TAuPropertyPtr: TAuPropertyPtr_t
 {
 	TInterface* m_pClosure; 
 };
 
-struct TAuPropertyWeakPtr: TAuPropertyPtr
+struct TAuPropertyPtr_w: TAuPropertyPtr
 {
 	FStrengthen m_pfnStrengthen;
 };
@@ -657,7 +657,7 @@ struct TAuPropertyWeakPtr: TAuPropertyPtr
 // structure backing up bindable or autoget property unsafe pointer declared like:
 // int autoget property unsafe* prTest (int, int);
 
-struct TAuPropertyUnsafePtr
+struct TAuPropertyPtr_u
 {
 	void** m_pVTable;
 	void* m_pData;
@@ -688,10 +688,13 @@ struct TVariant
 		TInterface* m_pIface;
 		TDataPtr m_DataPtr;
 		TFunctionPtr m_FunctionPtr;
+		TFunctionPtr_w m_FunctionPtr_w;
 		TPropertyPtr m_PropertyPtr;
+		TPropertyPtr_w m_PropertyPtr_w;
 		TAuPropertyPtr m_AuPropertyPtr;
-		TAuPropertyThinPtr m_AuPropertyThinPtr;
-		TAuPropertyUnsafePtr m_AuPropertyUnsafePtr;
+		TAuPropertyPtr_w m_AuPropertyPtr_w;
+		TAuPropertyPtr_t m_AuPropertyPtr_t;
+		TAuPropertyPtr_u m_AuPropertyPtr_u;
 	};
 };
 

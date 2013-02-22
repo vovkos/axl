@@ -112,14 +112,18 @@ CFunction::CreateArgString ()
 	{
 		rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
 
-		String.AppendFormat (
-			m_pClassType ? _T(", %s %s") : _T("%s %s"), 
-			Arg->GetType ()->GetTypeString (), 
-			Arg->GetName ()
-			);
+		String.AppendFormat (m_pClassType ? _T(", %s") : _T("%s"), Arg->GetType ()->GetTypeString ());
+
+		if (!Arg->GetName ().IsEmpty ())
+			String.AppendFormat (_T(" %s"), Arg->GetName ());
 
 		for (Arg++; Arg; Arg++)
-			String.AppendFormat (_T(", %s %s"), Arg->GetType ()->GetTypeString (), Arg->GetName ());
+		{
+			String.AppendFormat (_T(", %s"), Arg->GetType ()->GetTypeString ());
+
+			if (!Arg->GetName ().IsEmpty ())
+				String.AppendFormat (_T(" %s"), Arg->GetName ());
+		}
 	}
 	else
 	{

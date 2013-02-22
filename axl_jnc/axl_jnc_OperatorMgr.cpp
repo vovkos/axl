@@ -756,7 +756,7 @@ COperatorMgr::MulticastOperator (
 	ASSERT (pMulticastType->GetTypeKind () == EType_Multicast);
 
 	CValue EventPtrValue;
-	bool Result = PrepareDataRef (Event, ERuntimeError_StoreOutOfRange, &EventPtrValue);
+	bool Result = PrepareDataPtr (Event, ERuntimeError_StoreOutOfRange, &EventPtrValue);
 	if (!Result)
 		return false;
 

@@ -67,9 +67,7 @@ public:
 enum EDeclPrefix
 {
 	EDeclPrefix_Undefined = 0,
-	EDeclPrefix_CommonPtr,
-	EDeclPrefix_FunctionPtr,
-	EDeclPrefix_PropertyPtr,
+	EDeclPrefix_Pointer,
 	EDeclPrefix_Multicast,
 	EDeclPrefix_Event,
 };
@@ -274,7 +272,7 @@ public:
 		return m_pCastOpType;
 	}
 
-	bool
+	void
 	SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier);
 
 	const CQualifiedName*

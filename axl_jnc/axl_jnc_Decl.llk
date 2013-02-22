@@ -18,13 +18,25 @@ global_declaration
 	| using_declaration 
 	| friend_declaration 
 	| access_declaration 
-	| item_declaration
+	| item_declaration_w_specifier
+	| resolver (item_declaration_no_specifier_rslv) priority (2) // set higher priority than type_specifier::qualified_name
+	  item_declaration_no_specifier
+	;
+
+named_type_block_declaration
+	: friend_declaration
+	| access_declaration
+	| item_declaration_w_specifier
+	| resolver (item_declaration_no_specifier_rslv) priority (2) // set higher priority than type_specifier::qualified_name
+	  item_declaration_no_specifier
 	;
 
 local_declaration
-	: using_declaration 
+	: statement
+	| using_declaration 
 	| item_declaration_w_specifier
-	| statement
+	| resolver ({ return false; }) priority (2) // set higher priority than type_specifier::qualified_name
+	  item_declaration_no_specifier
 	;
 
 //.............................................................................
@@ -94,13 +106,6 @@ qualified_name_impl <CQualifiedName* $pName>
 
 // item declarations
 
-item_declaration
-	: item_declaration_w_specifier
-	| item_declaration_no_specifier
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 item_declaration_w_specifier
 	enter
 	{
@@ -114,29 +119,32 @@ item_declaration_w_specifier
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class
-{
-	CDeclarator m_Declarator;
-}
 item_declaration_no_specifier
+	local
+	{
+		CDeclarator $Declarator;
+	}
 	enter
 	{
 		m_StorageKind = EStorage_Undefined;
 		m_AccessKind = EAccess_Undefined;
-		$.m_Declarator.SetTypeSpecifier (NULL);
+		$Declarator.SetTypeSpecifier (NULL);
 	}	
-	: resolver (item_declaration_no_specifier_rslv) priority (2) // set higher priority than type_specifier::qualified_name
-	  declarator_name <&$.m_Declarator>
-	  function_suffix <&$.m_Declarator>
-	  post_declarator_modifier <&$.m_Declarator>*
+	: declarator_prefix <&$Declarator>*
+	  declarator_name <&$Declarator>
+	  function_suffix <&$Declarator> declarator_suffix <&$Declarator>*
+	  post_declarator_modifier <&$Declarator>*
 		{
-			return Declare (&$.m_Declarator);
+			return Declare (&$Declarator);
 		}
 	  declaration_terminator <NULL>
 	;
 
-// this resolver is needed to deal with the conflict in item_declaration between
-// item_declaration_w_specifier::qualified_type_name and item_declaration_no_specifier::declarator_name
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// conflict at EToken_Identifier in global scope and in named type block 
+// between qualified_type_name and declarator_name 
+// prefer declarator_name if and only if this is a function
 
 item_declaration_no_specifier_rslv
 	local
@@ -146,7 +154,7 @@ item_declaration_no_specifier_rslv
 	: declarator_name <&$Declarator> '(' // must be a function
 	;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 declaration_terminator <CTypeSpecifier* $pTypeSpecifier>
 	leave 

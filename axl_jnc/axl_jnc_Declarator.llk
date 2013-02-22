@@ -39,7 +39,7 @@ class
 declarator <CTypeSpecifier* $pTypeSpecifier>
 	enter
 	{
-		return $.m_Declarator.SetTypeSpecifier ($pTypeSpecifier);
+		$.m_Declarator.SetTypeSpecifier ($pTypeSpecifier);
 	}
 	: declarator_prefix <&$.m_Declarator>* 
 	  declarator_name <&$.m_Declarator>
@@ -340,15 +340,7 @@ class
 declarator_prefix_kind
 	: '*'
 		{
-			$.m_PrefixKind = EDeclPrefix_CommonPtr;			
-		}
-	| EToken_Function '*'
-		{
-			$.m_PrefixKind = EDeclPrefix_FunctionPtr;			
-		}
-	| EToken_Property '*'
-		{
-			$.m_PrefixKind = EDeclPrefix_PropertyPtr;
+			$.m_PrefixKind = EDeclPrefix_Pointer;			
 		}
 	| EToken_Multicast
 		{
@@ -359,7 +351,7 @@ declarator_prefix_kind
 			$.m_PrefixKind = EDeclPrefix_Event;
 		}
 	;
-	
+
 //.............................................................................
 
 // suffix 
@@ -405,24 +397,64 @@ function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
 	;
 
 function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
+	: function_formal_argument_w_specifier <$pFunctionSuffix>
+	| function_formal_argument_no_specifier <$pFunctionSuffix>
+	| function_formal_argument_ellipsis <$pFunctionSuffix>
+	;
+
+function_formal_argument_w_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
+	local
+	{
+		CDeclarator $Declarator;
+	}
 	: type_specifier_modifier_list $s
-	  (declarator $d <&$s.m_TypeSpecifier> ('=' expression_pass1 $v)?)?
+		{
+			$Declarator.SetTypeSpecifier (&$s.m_TypeSpecifier);
+		}
+	  declarator_prefix <&$Declarator>*
+	  declarator_name <&$Declarator>?
+	  declarator_suffix <&$Declarator>*
+	  ('=' expression_pass1 $v)?
 		{
 			return CreateFormalArg (
 				$pFunctionSuffix, 
-				&$s.m_TypeSpecifier, 
-				IsValidLocator ($d) ? &$d.m_Declarator : NULL, 
+				&$Declarator, 
 				CValue ()
 				) != NULL;
 		}
-	| EToken_Unsafe $u? EToken_Ellipsis
+	;
+
+function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
+	local
+	{
+		CDeclarator $Declarator;
+	}
+	enter 
+	{
+		$Declarator.SetTypeSpecifier (NULL);
+	}
+	: declarator_prefix <&$Declarator>+
+	  declarator_name <&$Declarator>?
+	  declarator_suffix <&$Declarator>*
+	  ('=' expression_pass1 $v)?
+		{
+			return CreateFormalArg (
+				$pFunctionSuffix,
+				&$Declarator,
+				CValue ()
+				) != NULL;
+		}
+	;
+
+function_formal_argument_ellipsis <CDeclFunctionSuffix* $pFunctionSuffix>
+	: EToken_Unsafe $u? EToken_Ellipsis
 		{
 			$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_VarArg;
 			if (IsValidLocator ($u))
 				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_UnsafeVarArg;
 		}
 	;
-	
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bitfield_suffix <CDeclarator* $pDeclarator>
@@ -442,4 +474,3 @@ post_declarator_modifier <CDeclarator* $pDeclarator>
 	;
 
 //.............................................................................
-

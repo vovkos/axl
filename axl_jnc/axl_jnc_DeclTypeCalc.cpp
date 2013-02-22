@@ -34,8 +34,24 @@ CDeclTypeCalc::CalcType (
 
 		switch (PrefixKind)
 		{
-		case EDeclPrefix_CommonPtr:
-			switch (TypeKind)
+		case EDeclPrefix_Pointer:
+			if (m_TypeModifiers & ETypeModifier_Function)
+			{
+				CFunctionType* pFunctionType = GetFunctionType (pType);
+				if (!pFunctionType)
+					return false;
+
+				pType = GetFunctionPtrType (pFunctionType);
+			}
+			else if (m_TypeModifiers & ETypeModifier_Property)
+			{
+				CPropertyType* pPropertyType = GetPropertyType (pType);
+				if (!pPropertyType)
+					return false;
+
+				pType = GetPropertyPtrType (pPropertyType);
+			}
+			else switch (TypeKind)
 			{
 			case EType_Function:
 				pType = GetFunctionPtrType ((CFunctionType*) pType);
@@ -51,22 +67,7 @@ CDeclTypeCalc::CalcType (
 
 			break;
 
-		case EDeclPrefix_FunctionPtr:
-			pType = GetFunctionType (pType);
-			if (!pType)
-				return false;
-
-			pType = GetFunctionPtrType ((CFunctionType*) pType);
-			break;
-		
-		case EDeclPrefix_PropertyPtr:
-			pType = GetPropertyType (pType);
-			if (!pType)
-				return false;
-
-			pType = GetPropertyPtrType ((CPropertyType*) pType);
-			break;
-		
+	
 		case EDeclPrefix_Multicast:
 		case EDeclPrefix_Event:
 			pType = GetMulticastType (pType);

@@ -156,11 +156,11 @@ COperatorMgr::CalcScopeLevelValue (
 		return true;
 	}
 
-	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
-	 
 	CFunction* pCurrentFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pCurrentFunction && pCurrentFunction->GetScopeLevelVariable ());
 
+	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
+	 
 	CValue ScopeBaseLevelValue;
 	m_pModule->m_LlvmBuilder.CreateLoad (pCurrentFunction->GetScopeLevelVariable (), NULL, &ScopeBaseLevelValue);
 
@@ -331,11 +331,14 @@ COperatorMgr::CallImpl (
 	if (!Result)
 		return false;
 
-	CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
+	if (m_pModule->m_FunctionMgr.GetCurrentFunction ()->GetScopeLevelVariable ())
+	{
+		CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+		CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
 
-	m_pModule->m_LlvmBuilder.CreateComment ("update scope level before call");
-	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
+		m_pModule->m_LlvmBuilder.CreateComment ("update scope level before call");
+		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
+	}
 
 	m_pModule->m_LlvmBuilder.CreateCall (
 		PfnValue,

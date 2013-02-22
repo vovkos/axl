@@ -112,7 +112,9 @@ CDataPtrType::PrepareLlvmType ()
 
 	case EDataPtrType_Thin:
 	case EDataPtrType_Unsafe:
-		m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
+		m_pLlvmType = m_pTargetType->GetTypeKind () != EType_Void ? 
+			llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0) :
+			m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetLlvmType ();
 		break;
 
 	default:

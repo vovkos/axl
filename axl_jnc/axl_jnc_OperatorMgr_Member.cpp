@@ -117,6 +117,9 @@ COperatorMgr::MemberOperator (
 	case EType_Union:
 		return GetUnionMember (OpValue, (CUnionType*) pType, pName, pResultValue);
 
+	case EType_Multicast:
+		return GetMulticastMember (OpValue, (CMulticastType*) pType, pName, pResultValue);
+
 	case EType_ClassPtr:
 		return 
 			PrepareOperand (&OpValue) &&
@@ -378,6 +381,43 @@ COperatorMgr::GetUnionFieldMember (
 		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Normal, pField->GetPtrTypeFlags ());
 		pResultValue->OverrideType (OpValue, pResultType);
 	}
+
+	return true;
+}
+
+bool
+COperatorMgr::GetMulticastMember (
+	const CValue& OpValue,
+	CMulticastType* pMulticastType,
+	const tchar_t* pName,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataRef);
+	CDataPtrType* pPtrType = (CDataPtrType*) OpValue.GetType ();
+	EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
+
+	CFunction* pFunction;
+
+	if (_tcscmp (pName, _T("Set")) == 0)
+		pFunction = pMulticastType->GetSetMethod (PtrTypeKind);
+	else if (_tcscmp (pName, _T("Add")) == 0)
+		pFunction = pMulticastType->GetAddMethod (PtrTypeKind);
+	else if (_tcscmp (pName, _T("Remove")) == 0)
+		pFunction = pMulticastType->GetRemoveMethod (PtrTypeKind);
+	else if (_tcscmp (pName, _T("Snapshot")) == 0)
+		pFunction = pMulticastType->GetSnapshotMethod (PtrTypeKind);
+	else if (_tcscmp (pName, _T("Call")) == 0)
+		pFunction = pMulticastType->GetCallMethod (PtrTypeKind);
+	else 
+	{
+		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pMulticastType->GetTypeString ());
+		return false;
+	}
+
+//	pResult
+	
+
 
 	return true;
 }

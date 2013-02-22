@@ -738,7 +738,6 @@ CParser::DeclareData (
 CFunctionFormalArg*
 CParser::CreateFormalArg (
 	CDeclFunctionSuffix* pArgSuffix,
-	CTypeSpecifier* pTypeSpecifier,
 	CDeclarator* pDeclarator,
 	const CValue& DefaultValue
 	)
@@ -746,22 +745,20 @@ CParser::CreateFormalArg (
 	CType* pType;
 	rtl::CString Name;
 
-	CDeclarator EmptyDeclarator;
+	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
 
-	if (!pDeclarator)
+	switch (DeclaratorKind)
 	{
-		pDeclarator = &EmptyDeclarator;
-		pDeclarator->SetTypeSpecifier (pTypeSpecifier);
-	}
-	else
-	{
-		if (pDeclarator->GetDeclaratorKind () != EDeclarator_SimpleName)
-		{
-			err::SetFormatStringError (_T("only simple name declarators allowed for formal argument"));
-			return NULL;
-		}
+	case EDeclarator_Undefined:
+		break;
 
+	case EDeclarator_SimpleName:
 		Name = pDeclarator->GetName ()->GetShortName ();
+		break;
+
+	default:
+		err::SetFormatStringError (_T("only simple name declarators allowed for formal argument"));
+		return NULL;
 	}
 
 	pType = pDeclarator->CalcType ();

@@ -12,6 +12,17 @@
 namespace axl {
 namespace jnc {
 
+enum EMulticastMethod
+{
+	EMulticastMethod_Clear,
+	EMulticastMethod_Set,
+	EMulticastMethod_Add,
+	EMulticastMethod_Remove,
+	EMulticastMethod_Snapshot,
+	EMulticastMethod_Call,
+	EMulticastMethod__Count,
+};
+
 //.............................................................................
 
 class CMulticastType: public CType
@@ -22,14 +33,16 @@ protected:
 	CFunctionPtrType* m_pTargetType;
 	CStructType* m_pMulticastStructType;
 
-	CFunction* m_pSetMethod_s;
+	CFunction* m_pSetMethod;
 	CFunction* m_pSetMethod_u;
-	CFunction* m_pAddMethod_s;
+	CFunction* m_pAddMethod;
 	CFunction* m_pAddMethod_u;
-	CFunction* m_pRemoveMethod_s;
+	CFunction* m_pRemoveMethod;
 	CFunction* m_pRemoveMethod_u;
-	CFunction* m_pSnapshotMethod_s;
+	CFunction* m_pSnapshotMethod;
 	CFunction* m_pSnapshotMethod_u;
+	CFunction* m_pCallMethod;
+	CFunction* m_pCallMethod_u;
 
 public:
 	CMulticastType ();
@@ -52,25 +65,32 @@ public:
 	CFunction* 
 	GetSetMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
 	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetSetMethod_u () : GetSetMethod_s ();
+		return PtrTypeKind == EDataPtrType_Unsafe ? GetSetMethodImpl_u () : GetSetMethodImpl ();
 	}
 
 	CFunction* 
 	GetAddMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
 	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetAddMethod_u () : GetAddMethod_s ();
+		return PtrTypeKind == EDataPtrType_Unsafe ? GetAddMethodImpl_u () : GetAddMethodImpl ();
 	}
 
 	CFunction* 
 	GetRemoveMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
 	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetRemoveMethod_u () : GetRemoveMethod_s ();
+		return PtrTypeKind == EDataPtrType_Unsafe ? GetRemoveMethodImpl_u () : GetRemoveMethodImpl ();
 	}
 
 	CFunction* 
 	GetSnapshotMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
 	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetSnapshotMethod_u () : GetSnapshotMethod_s ();
+		return PtrTypeKind == EDataPtrType_Unsafe ? GetSnapshotMethodImpl_u () : GetSnapshotMethodImpl ();
+	}
+
+	CFunction* 
+	GetCallMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
+	{
+		return PtrTypeKind == EDataPtrType_Unsafe ? GetSnapshotMethodImpl_u () : GetSnapshotMethodImpl ();
+//		return PtrTypeKind == EDataPtrType_Unsafe ? GetCallMethodImpl_u () : GetCallMethodImpl ();
 	}
 
 protected:
@@ -86,28 +106,34 @@ protected:
 	}
 
 	CFunction* 
-	GetSetMethod_s ();
+	GetSetMethodImpl ();
 
 	CFunction* 
-	GetSetMethod_u ();
+	GetSetMethodImpl_u ();
 
 	CFunction* 
-	GetAddMethod_s ();
+	GetAddMethodImpl ();
 
 	CFunction* 
-	GetAddMethod_u ();
+	GetAddMethodImpl_u ();
 
 	CFunction* 
-	GetRemoveMethod_s ();
+	GetRemoveMethodImpl ();
 
 	CFunction* 
-	GetRemoveMethod_u ();
+	GetRemoveMethodImpl_u ();
 
 	CFunction* 
-	GetSnapshotMethod_s ();
+	GetSnapshotMethodImpl ();
 
 	CFunction* 
-	GetSnapshotMethod_u ();
+	GetSnapshotMethodImpl_u ();
+
+	void
+	ConvertToSimpleMulticastPtr (CValue* pMulticastPtrValue);
+
+	void
+	ConvertToSimpleFunctionPtr (CValue* pFunctionPtrValue);
 };
 
 //.............................................................................

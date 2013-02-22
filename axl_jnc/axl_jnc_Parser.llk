@@ -167,7 +167,6 @@ Members2
 	CFunctionFormalArg*
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
-		CTypeSpecifier* pTypeSpecifier,
 		CDeclarator* pDeclarator,
 		const CValue& DefaultValue
 		);

@@ -998,48 +998,64 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateHeapAllocate ();
 		break;
 
-	case EStdFunc_MulticastSet_s:
-		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastSet_s"));
+	case EStdFunc_MulticastSet:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Normal, _T("jnc.MulticastSet"));
 		break;
 
 	case EStdFunc_MulticastSet_w:
 		pFunction = CreateMulticastSet (EFunctionPtrType_Weak, _T("jnc.MulticastSet_w"));
 		break;
 
+	case EStdFunc_MulticastSet_t:
+		pFunction = CreateMulticastSet (EFunctionPtrType_Thin, _T("jnc.MulticastSet_t"));
+		break;
+
 	case EStdFunc_MulticastSet_u:
 		pFunction = CreateMulticastSet (EFunctionPtrType_Unsafe, _T("jnc.MulticastSet_u"));
 		break;
 
-	case EStdFunc_MulticastAdd_s:
-		pFunction = CreateMulticastAdd (EFunctionPtrType_Normal, _T("jnc.MulticastAdd_s"));
+	case EStdFunc_MulticastAdd:
+		pFunction = CreateMulticastAdd (EFunctionPtrType_Normal, _T("jnc.MulticastAdd"));
 		break;
 
 	case EStdFunc_MulticastAdd_w:
 		pFunction = CreateMulticastAdd (EFunctionPtrType_Weak, _T("jnc.MulticastAdd_w"));
 		break;
 
+	case EStdFunc_MulticastAdd_t:
+		pFunction = CreateMulticastAdd (EFunctionPtrType_Thin, _T("jnc.MulticastAdd_t"));
+		break;
+
 	case EStdFunc_MulticastAdd_u:
 		pFunction = CreateMulticastAdd (EFunctionPtrType_Unsafe, _T("jnc.MulticastAdd_u"));
 		break;
 
-	case EStdFunc_MulticastRemove_s:
-		pFunction = CreateMulticastRemove (EFunctionPtrType_Normal, _T("jnc.MulticastRemove_s"));
+	case EStdFunc_MulticastRemove:
+		pFunction = CreateMulticastRemove (EFunctionPtrType_Normal, _T("jnc.MulticastRemove"));
 		break;
 
 	case EStdFunc_MulticastRemove_w:
 		pFunction = CreateMulticastRemove (EFunctionPtrType_Weak, _T("jnc.MulticastRemove_w"));
 		break;
 
+	case EStdFunc_MulticastRemove_t:
+		pFunction = CreateMulticastRemove (EFunctionPtrType_Thin, _T("jnc.MulticastRemove_t"));
+		break;
+
 	case EStdFunc_MulticastRemove_u:
 		pFunction = CreateMulticastRemove (EFunctionPtrType_Unsafe, _T("jnc.MulticastRemove_u"));
 		break;
 
-	case EStdFunc_MulticastSnapshot_s:
-		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Normal, _T("jnc.MulticastSnapshot_s"));
+	case EStdFunc_MulticastSnapshot:
+		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Normal, _T("jnc.MulticastSnapshot"));
 		break;
 
 	case EStdFunc_MulticastSnapshot_w:
 		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Weak, _T("jnc.MulticastSnapshot_w"));
+		break;
+
+	case EStdFunc_MulticastSnapshot_t:
+		pFunction = CreateMulticastSnapshot (EFunctionPtrType_Thin, _T("jnc.MulticastSnapshot_t"));
 		break;
 
 	case EStdFunc_MulticastSnapshot_u:

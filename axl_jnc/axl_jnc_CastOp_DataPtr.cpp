@@ -358,7 +358,7 @@ CCast_DataPtr::GetCastOperator (
 	}
 
 	ASSERT (SrcPtrTypeKind >= 0 && SrcPtrTypeKind < EDataPtrType__Count);
-	ASSERT (DstPtrTypeKind >= 0 && DstPtrTypeKind < 2);
+	ASSERT (DstPtrTypeKind >= 0 && DstPtrTypeKind < EDataPtrType__Count);
 
 	return m_OperatorTable [SrcPtrTypeKind] [DstPtrTypeKind];
 }
