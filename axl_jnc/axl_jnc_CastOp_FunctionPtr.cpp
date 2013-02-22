@@ -296,6 +296,14 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 		return false;
 	}
 
+	CFunctionType* pTargetType = ((CFunctionPtrType*) pType)->GetTargetType ();
+
+	if (OpValue.GetFunction ()->GetType ()->Cmp (pTargetType) == 0)
+	{
+		pResultValue->OverrideType (OpValue, pType);
+		return true;
+	}
+
 	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (
 		OpValue.GetFunction (), 
 		((CFunctionPtrType*) pType)->GetTargetType ()

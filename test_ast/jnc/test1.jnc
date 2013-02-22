@@ -10,21 +10,17 @@ function bar (int x)
 	printf ("bar (%d)\n", x);
 }
 
-bool Schedule (function* pfn ());
-
-bzz (*);
-grr (int);
-
-
 int 
 main ()
 {
 	printf ("hui govno i muravei\n");
 	
-	thin multicast mc (int);
+	thin function* pfn (int) = foo;
+	pfn (500);
 
+/*	thin multicast mc (int);
 	mc += &foo;
-	mc += &bar;
+	mc += &bar; */
 
 	return 0;
 }
