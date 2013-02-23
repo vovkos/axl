@@ -338,6 +338,9 @@ SetMulticastCount (
 	if (!p)
 		return false;
 
+	if (pMulticast->m_pPtrArray)
+		memcpy (p, pMulticast->m_pPtrArray, pMulticast->m_Count * Size);
+
 	pMulticast->m_pPtrArray = p;
 	pMulticast->m_MaxCount = MaxCount;
 	pMulticast->m_Count = Count;
@@ -471,32 +474,41 @@ StdLib_MulticastRemove_u (
 	return NULL;
 }
 
-jnc::TFunctionPtr*
+jnc::TMcSnapshot
 StdLib_MulticastSnapshot (
 	jnc::TMulticast* pMulticast,
 	intptr_t Handle
 	)
 {
-	return NULL;
+	jnc::TMcSnapshot Snapshot = {0};
+	Snapshot.m_Count = pMulticast->m_Count;
+	Snapshot.m_pPtrArray = pMulticast->m_pPtrArray;
+	return Snapshot;
 }
 
-jnc::TFunctionPtr*
+jnc::TMcSnapshot
 StdLib_MulticastSnapshot_w (
 	jnc::TMulticast* pMulticast,
 	intptr_t Handle
 	)
 {
 	ASSERT (false);
-	return NULL;
+	jnc::TMcSnapshot Snapshot = {0};
+	Snapshot.m_Count = pMulticast->m_Count;
+	Snapshot.m_pPtrArray = pMulticast->m_pPtrArray;
+	return Snapshot;
 }
 
-void**
+jnc::TMcSnapshot
 StdLib_MulticastSnapshot_u (
 	jnc::TMulticast* pMulticast,
 	intptr_t Handle
 	)
 {
-	return NULL;
+	jnc::TMcSnapshot Snapshot = {0};
+	Snapshot.m_Count = pMulticast->m_Count;
+	Snapshot.m_pPtrArray = pMulticast->m_pPtrArray;
+	return Snapshot;
 }
 
 

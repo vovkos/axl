@@ -344,6 +344,12 @@ class CHashTableMapT: public CHashTableT <
 	CHashTableMapEntryT <TKey, TValue>
 	>
 {
+public:
+	TValue& 
+	operator [] (const CKey& Key)
+	{
+		return Goto (Key)->m_Value;
+	}
 };
 
 //.............................................................................

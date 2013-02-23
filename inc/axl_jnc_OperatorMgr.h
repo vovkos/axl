@@ -21,6 +21,7 @@
 #include "axl_jnc_CastOp_Int.h"
 #include "axl_jnc_CastOp_Fp.h"
 #include "axl_jnc_CastOp_Array.h"
+#include "axl_jnc_CastOp_Struct.h"
 #include "axl_jnc_CastOp_DataPtr.h"
 #include "axl_jnc_CastOp_ClassPtr.h"
 #include "axl_jnc_CastOp_FunctionPtr.h"
@@ -126,6 +127,7 @@ protected:
 
 	// cast operators
 
+	CCast_Default m_Cast_Default;
 	CCast_Copy m_Cast_Copy;
 	CCast_SwapByteOrder m_Cast_SwapByteOrder;
 	CCast_PtrFromInt m_Cast_PtrFromInt;
@@ -135,6 +137,7 @@ protected:
 	CCast_Fp m_Cast_Fp;
 	CCast_Array m_Cast_Array;
 	CCast_Enum m_Cast_Enum;
+	CCast_Struct m_Cast_Struct;
 	CCast_DataPtr m_Cast_DataPtr;
 	CCast_ClassPtr m_Cast_ClassPtr;
 	CCast_FunctionPtr m_Cast_FunctionPtr;
@@ -147,6 +150,8 @@ protected:
 	ICastOperator* m_CastOperatorTable [EType__Count];
 	ICastOperator* m_StdCastOperatorTable [EStdCast__Count];
 	
+	rtl::CStringHashTableMapT <EMulticastMethod> m_MulticastMethodMap;
+
 public:
 	COperatorMgr ();
 
@@ -211,8 +216,17 @@ public:
 	PrepareDataPtr (
 		const CValue& Value,
 		ERuntimeError Error,
-		CValue* pPtrValue
+		CValue* pResultValue
 		);
+
+	bool
+	PrepareDataPtr (
+		CValue* pValue,
+		ERuntimeError Error
+		)
+	{
+		return PrepareDataPtr (*pValue, Error, pValue);
+	}
 
 	// unary operators
 
@@ -884,12 +898,6 @@ protected:
 		CFunctionType* pFunctionType,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
-		);
-
-	bool
-	CallMulticast (
-		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList
 		);
 
 	bool

@@ -32,7 +32,7 @@ CBinOp_Assign::Operator (
 			}
 
 			CMulticastType* pMulticastType = (CMulticastType*) pPtrType->GetTargetType ();
-			CFunction* pMethod = pMulticastType->GetSetMethod (pPtrType->GetPtrTypeKind ());
+			CFunction* pMethod = pMulticastType->GetMethod (EMulticastMethod_Set, pPtrType->GetPtrTypeKind ());
 			
 			CValue MulticastPtrValue;
 			return 
@@ -70,9 +70,10 @@ CBinOp_OpAssign::Operator (
 		{
 			CMulticastType* pMulticastType = (CMulticastType*) pPtrType->GetTargetType ();
 		
-			CFunction* pMethod = m_OpKind == EBinOp_AddAssign ? 
-				pMulticastType->GetAddMethod (pPtrType->GetPtrTypeKind ()) :
-				pMulticastType->GetRemoveMethod (pPtrType->GetPtrTypeKind ());
+			CFunction* pMethod = pMulticastType->GetMethod (
+				m_OpKind == EBinOp_AddAssign ? EMulticastMethod_Add : EMulticastMethod_Remove,
+				pPtrType->GetPtrTypeKind ()
+				);
 
 			CValue MulticastPtrValue;
 			return 

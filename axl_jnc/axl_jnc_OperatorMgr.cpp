@@ -112,6 +112,9 @@ COperatorMgr::COperatorMgr ()
 	m_StdCastOperatorTable [EStdCast_Int] = &m_Cast_Int;
 	m_StdCastOperatorTable [EStdCast_Fp] = &m_Cast_Fp;
 
+	for (size_t i = 0; i < EType__Count; i++)
+		m_CastOperatorTable [i] = &m_Cast_Default;
+
 	m_CastOperatorTable [EType_Bool] = &m_Cast_Bool;
 
 	for (size_t i = EType_Int8; i <= EType_Int64_u; i++)
@@ -124,10 +127,19 @@ COperatorMgr::COperatorMgr ()
 	m_CastOperatorTable [EType_Double]      = &m_Cast_Fp;
 	m_CastOperatorTable [EType_Array]       = &m_Cast_Array;	
 	m_CastOperatorTable [EType_Enum]        = &m_Cast_Enum;
+	m_CastOperatorTable [EType_Struct]      = &m_Cast_Struct;
 	m_CastOperatorTable [EType_DataPtr]     = &m_Cast_DataPtr;
 	m_CastOperatorTable [EType_ClassPtr]    = &m_Cast_ClassPtr;
 	m_CastOperatorTable [EType_FunctionPtr] = &m_Cast_FunctionPtr;
 	m_CastOperatorTable [EType_PropertyPtr] = &m_Cast_PropertyPtr;
+
+	// multicast methods
+
+	m_MulticastMethodMap [_T("Clear")]  = EMulticastMethod_Clear;
+	m_MulticastMethodMap [_T("Set")]    = EMulticastMethod_Set;
+	m_MulticastMethodMap [_T("Add")]    = EMulticastMethod_Add;
+	m_MulticastMethodMap [_T("Remove")] = EMulticastMethod_Remove;
+	m_MulticastMethodMap [_T("Call")]   = EMulticastMethod_Call;
 }
 
 bool
@@ -220,11 +232,7 @@ COperatorMgr::CastOperator (
 	ASSERT (TypeKind >= 0 && TypeKind < EType__Count);
 
 	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
-	if (!pOperator)
-	{
-		SetCastError (RawOpValue, pType);
-		return false;
-	}
+	ASSERT (pOperator); // there is always a default
 
 	CValue OpValue;
 	CValue UnusedResultValue;

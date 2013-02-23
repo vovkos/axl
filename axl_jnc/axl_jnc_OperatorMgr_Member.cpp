@@ -395,30 +395,21 @@ COperatorMgr::GetMulticastMember (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataRef);
 	CDataPtrType* pPtrType = (CDataPtrType*) OpValue.GetType ();
-	EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
-
-	CFunction* pFunction;
-
-	if (_tcscmp (pName, _T("Set")) == 0)
-		pFunction = pMulticastType->GetSetMethod (PtrTypeKind);
-	else if (_tcscmp (pName, _T("Add")) == 0)
-		pFunction = pMulticastType->GetAddMethod (PtrTypeKind);
-	else if (_tcscmp (pName, _T("Remove")) == 0)
-		pFunction = pMulticastType->GetRemoveMethod (PtrTypeKind);
-	else if (_tcscmp (pName, _T("Snapshot")) == 0)
-		pFunction = pMulticastType->GetSnapshotMethod (PtrTypeKind);
-	else if (_tcscmp (pName, _T("Call")) == 0)
-		pFunction = pMulticastType->GetCallMethod (PtrTypeKind);
-	else 
+	
+	rtl::CStringHashTableMapIteratorT <EMulticastMethod> Method = m_MulticastMethodMap.Find (pName);
+	if (!Method)
 	{
 		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pMulticastType->GetTypeString ());
 		return false;
 	}
 
-//	pResult
+	CFunction* pFunction = pMulticastType->GetMethod (Method->m_Value, pPtrType->GetPtrTypeKind ());
+	pResultValue->SetFunction (pFunction);
+	CClosure* pClosure = pResultValue->CreateClosure ();
 	
-
-
+	CValue PtrValue;
+	UnaryOperator (EUnOp_Addr, OpValue, &PtrValue);
+	pClosure->GetArgList ()->InsertHead (PtrValue);
 	return true;
 }
 

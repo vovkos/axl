@@ -93,7 +93,7 @@ enum EStdFunc
 	EStdFunc_MulticastAdd_t,
 	EStdFunc_MulticastAdd_u,
 
-	// function* pfn ()
+	// function* ()
 	// jnc.MulticastRemove (
 	//		multicast* pMulticast (), 
 	//		intptr Handle
@@ -104,7 +104,7 @@ enum EStdFunc
 	EStdFunc_MulticastRemove_t,
 	EStdFunc_MulticastRemove_u,
 
-	// function** pfn ()
+	// mcsnapshot ()
 	// jnc.MulticastSnapshot (multicast* pMulticast ());
 
 	EStdFunc_MulticastSnapshot,

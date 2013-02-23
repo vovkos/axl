@@ -1,13 +1,19 @@
 //.............................................................................
 
-foo (int x)
+foo (
+	int x,
+	int y
+	)
 {
-	printf ("foo (%d)\n", x);
+	printf ("foo (%d, %d)\n", x, y);
 }
 
-function bar (int x)
+function bar (
+	int x,
+	int y
+	)
 {
-	printf ("bar (%d)\n", x);
+	printf ("bar (%d, %d)\n", x, y);
 }
 
 int 
@@ -15,12 +21,17 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 	
-	thin function* pfn (int) = foo;
-	pfn (500);
+	multicast mc (int);
+	mc += foo ~(10);
+	mc += foo ~(20);
+	mc += bar ~(30);
+	mc (123);
 
-/*	thin multicast mc (int);
-	mc += &foo;
-	mc += &bar; */
+	mc.Clear ();
+
+	mc.Add (bar ~(40));
+	mc.Add (foo ~(50));
+	mc.Call (456);
 
 	return 0;
 }

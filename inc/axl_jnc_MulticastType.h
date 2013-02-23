@@ -12,6 +12,8 @@
 namespace axl {
 namespace jnc {
 
+//.............................................................................
+
 enum EMulticastMethod
 {
 	EMulticastMethod_Clear,
@@ -32,17 +34,7 @@ protected:
 
 	CFunctionPtrType* m_pTargetType;
 	CStructType* m_pMulticastStructType;
-
-	CFunction* m_pSetMethod;
-	CFunction* m_pSetMethod_u;
-	CFunction* m_pAddMethod;
-	CFunction* m_pAddMethod_u;
-	CFunction* m_pRemoveMethod;
-	CFunction* m_pRemoveMethod_u;
-	CFunction* m_pSnapshotMethod;
-	CFunction* m_pSnapshotMethod_u;
-	CFunction* m_pCallMethod;
-	CFunction* m_pCallMethod_u;
+	CFunction* m_MethodArray [EMulticastMethod__Count] [2];
 
 public:
 	CMulticastType ();
@@ -63,35 +55,10 @@ public:
 	GetMulticastStructType ();
 
 	CFunction* 
-	GetSetMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
-	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetSetMethodImpl_u () : GetSetMethodImpl ();
-	}
-
-	CFunction* 
-	GetAddMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
-	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetAddMethodImpl_u () : GetAddMethodImpl ();
-	}
-
-	CFunction* 
-	GetRemoveMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
-	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetRemoveMethodImpl_u () : GetRemoveMethodImpl ();
-	}
-
-	CFunction* 
-	GetSnapshotMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
-	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetSnapshotMethodImpl_u () : GetSnapshotMethodImpl ();
-	}
-
-	CFunction* 
-	GetCallMethod (EDataPtrType PtrTypeKind = EDataPtrType_Normal)
-	{
-		return PtrTypeKind == EDataPtrType_Unsafe ? GetSnapshotMethodImpl_u () : GetSnapshotMethodImpl ();
-//		return PtrTypeKind == EDataPtrType_Unsafe ? GetCallMethodImpl_u () : GetCallMethodImpl ();
-	}
+	GetMethod (
+		EMulticastMethod Method,
+		EDataPtrType PtrTypeKind = EDataPtrType_Normal
+		);
 
 protected:
 	virtual 
@@ -106,28 +73,40 @@ protected:
 	}
 
 	CFunction* 
-	GetSetMethodImpl ();
+	CreateClearMethod ();
 
 	CFunction* 
-	GetSetMethodImpl_u ();
+	CreateClearMethod_u ();
 
 	CFunction* 
-	GetAddMethodImpl ();
+	CreateSetMethod ();
 
 	CFunction* 
-	GetAddMethodImpl_u ();
+	CreateSetMethod_u ();
 
 	CFunction* 
-	GetRemoveMethodImpl ();
+	CreateAddMethod ();
 
 	CFunction* 
-	GetRemoveMethodImpl_u ();
+	CreateAddMethod_u ();
 
 	CFunction* 
-	GetSnapshotMethodImpl ();
+	CreateRemoveMethod ();
 
 	CFunction* 
-	GetSnapshotMethodImpl_u ();
+	CreateRemoveMethod_u ();
+
+	CFunction* 
+	CreateSnapshotMethod ();
+
+	CFunction* 
+	CreateSnapshotMethod_u ();
+	
+	CFunction* 
+	CreateCallMethod ();
+
+	CFunction* 
+	CreateCallMethod_u ();
 
 	void
 	ConvertToSimpleMulticastPtr (CValue* pMulticastPtrValue);

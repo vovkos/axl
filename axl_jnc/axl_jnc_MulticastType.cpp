@@ -13,14 +13,7 @@ CMulticastType::CMulticastType ()
 	m_Size = sizeof (TMulticast);
 	m_pTargetType = NULL;
 	m_pMulticastStructType = NULL;
-	m_pSetMethod = NULL;
-	m_pSetMethod_u = NULL;
-	m_pAddMethod = NULL;
-	m_pAddMethod_u = NULL;
-	m_pRemoveMethod = NULL;
-	m_pRemoveMethod_u = NULL;
-	m_pSnapshotMethod = NULL;
-	m_pSnapshotMethod_u = NULL;
+	memset (m_MethodArray, 0, sizeof (m_MethodArray));
 }
 
 CStructType* 
@@ -32,9 +25,9 @@ CMulticastType::GetMulticastStructType ()
 	m_pMulticastStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pMulticastStructType->m_Tag.Format (_T("multicast"));
 	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
 	m_pMulticastStructType->CreateFieldMember (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
-	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
 	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 	m_pMulticastStructType->CalcLayout ();
 
@@ -50,11 +43,111 @@ CMulticastType::PrepareTypeString ()
 }
 
 CFunction* 
-CMulticastType::GetSetMethodImpl ()
+CMulticastType::GetMethod (
+	EMulticastMethod Method,
+	EDataPtrType PtrTypeKind
+	)
 {
-	if (m_pSetMethod)
-		return m_pSetMethod;
+	GetMulticastStructType ();
 
+	ASSERT (Method >= 0 && Method < EMulticastMethod__Count);
+
+	size_t i2 = PtrTypeKind == EDataPtrType_Unsafe;
+
+	if (m_MethodArray [Method] [i2])
+		return m_MethodArray [Method] [i2];
+
+	CFunction* pFunction;
+
+	switch (Method)
+	{
+	case EMulticastMethod_Clear:
+		pFunction = i2 ? CreateClearMethod_u () : CreateClearMethod ();
+		break;
+
+	case EMulticastMethod_Set:
+		pFunction = i2 ? CreateSetMethod_u () : CreateSetMethod ();
+		break;
+
+	case EMulticastMethod_Add:
+		pFunction = i2 ? CreateAddMethod_u () : CreateAddMethod ();
+		break;
+
+	case EMulticastMethod_Remove:
+		pFunction = i2 ? CreateRemoveMethod_u () : CreateRemoveMethod ();
+		break;
+
+	case EMulticastMethod_Snapshot:
+		pFunction = i2 ? CreateSnapshotMethod_u () : CreateSnapshotMethod ();
+		break;
+
+	case EMulticastMethod_Call:
+		pFunction = i2 ? CreateCallMethod_u () : CreateCallMethod ();
+		break;
+
+	default:
+		ASSERT (false);
+		pFunction = NULL;
+	}
+
+	m_MethodArray [Method] [i2] = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::CreateClearMethod ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Normal),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastClear_s"), pType);
+
+	CValue ArgValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	m_pModule->m_OperatorMgr.PrepareDataPtr (&ArgValue, ERuntimeError_StoreOutOfRange);
+	m_pModule->m_LlvmBuilder.CreateStore (GetZeroValue (), ArgValue);
+	m_pModule->m_ControlFlowMgr.Return ();
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::CreateClearMethod_u ()
+{
+	ASSERT (false);
+
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetDataPtrType (EDataPtrType_Unsafe),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastClear_u"), pType);
+
+	CValue ArgValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	m_pModule->m_LlvmBuilder.CreateStore (GetZeroValue (), ArgValue);
+	m_pModule->m_ControlFlowMgr.Return ();
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::CreateSetMethod ()
+{
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 	
 	CType* ArgTypeArray [] =
@@ -74,7 +167,7 @@ CMulticastType::GetSetMethodImpl ()
 
 	m_pModule->m_OperatorMgr.PrepareDataPtr (ArgValue1, ERuntimeError_StoreOutOfRange, &ArgValue1);
 
-	CFunction* pImplFunction = GetSetMethodImpl_u ();
+	CFunction* pImplFunction = GetMethod (EMulticastMethod_Set, EDataPtrType_Unsafe);
 
 	CValue ReturnValue;
 	m_pModule->m_LlvmBuilder.CreateCall2 (
@@ -89,16 +182,12 @@ CMulticastType::GetSetMethodImpl ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pSetMethod = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetSetMethodImpl_u ()
+CMulticastType::CreateSetMethod_u ()
 {
-	if (m_pSetMethod_u)
-		return m_pSetMethod_u;
-
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 	
 	CType* ArgTypeArray [] =
@@ -113,26 +202,23 @@ CMulticastType::GetSetMethodImpl_u ()
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	CValue ArgValue1 = ArgValueArray [0];
-	CValue ArgValue2 = ArgValueArray [1];
-
 	EFunctionPtrType PtrTypeKind = m_pTargetType->GetPtrTypeKind ();
 	EStdFunc FuncKind = 
 		PtrTypeKind == EFunctionPtrType_Unsafe ? EStdFunc_MulticastSet_u :
 		PtrTypeKind == EFunctionPtrType_Thin ? EStdFunc_MulticastSet_t :
 		PtrTypeKind == EFunctionPtrType_Weak ? EStdFunc_MulticastSet_w : EStdFunc_MulticastSet;
 
-	ConvertToSimpleMulticastPtr (&ArgValue1);
-	ConvertToSimpleFunctionPtr (&ArgValue2);
+	ConvertToSimpleMulticastPtr (&ArgValueArray [0]);
+	ConvertToSimpleFunctionPtr (&ArgValueArray [1]);
 
-	CFunction* pImplFunction = m_pModule->m_FunctionMgr.GetStdFunction (FuncKind);
+	CFunction* pStdFunction = m_pModule->m_FunctionMgr.GetStdFunction (FuncKind);
 
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall2 (
-		pImplFunction,
-		pImplFunction->GetType (),
-		ArgValue1,
-		ArgValue2,
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pStdFunction,
+		pStdFunction->GetType (),
+		ArgValueArray,
+		countof (ArgValueArray),
 		&ReturnValue
 		);
 
@@ -140,16 +226,12 @@ CMulticastType::GetSetMethodImpl_u ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pSetMethod_u = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetAddMethodImpl ()
+CMulticastType::CreateAddMethod ()
 {
-	if (m_pAddMethod)
-		return m_pAddMethod;
-
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 	
 	CType* ArgTypeArray [] =
@@ -164,19 +246,16 @@ CMulticastType::GetAddMethodImpl ()
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	CValue ArgValue1 = ArgValueArray [0];
-	CValue ArgValue2 = ArgValueArray [1];
+	m_pModule->m_OperatorMgr.PrepareDataPtr (&ArgValueArray [0], ERuntimeError_StoreOutOfRange);
 
-	m_pModule->m_OperatorMgr.PrepareDataPtr (ArgValue1, ERuntimeError_StoreOutOfRange, &ArgValue1);
-
-	CFunction* pImplFunction = GetAddMethodImpl_u ();
+	CFunction* pImplFunction = GetMethod (EMulticastMethod_Add, EDataPtrType_Unsafe);
 
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	m_pModule->m_LlvmBuilder.CreateCall (
 		pImplFunction,
 		pImplFunction->GetType (),
-		ArgValue1,
-		ArgValue2,
+		ArgValueArray,
+		countof (ArgValueArray),
 		&ReturnValue
 		);
 
@@ -184,16 +263,12 @@ CMulticastType::GetAddMethodImpl ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pAddMethod = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetAddMethodImpl_u ()
+CMulticastType::CreateAddMethod_u ()
 {
-	if (m_pAddMethod_u)
-		return m_pAddMethod_u;
-
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 	
 	CType* ArgTypeArray [] =
@@ -208,26 +283,23 @@ CMulticastType::GetAddMethodImpl_u ()
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	CValue ArgValue1 = ArgValueArray [0];
-	CValue ArgValue2 = ArgValueArray [1];
-
 	EFunctionPtrType PtrTypeKind = m_pTargetType->GetPtrTypeKind ();
 	EStdFunc FuncKind = 
 		PtrTypeKind == EFunctionPtrType_Unsafe ? EStdFunc_MulticastAdd_u :
 		PtrTypeKind == EFunctionPtrType_Thin ? EStdFunc_MulticastAdd_t :
 		PtrTypeKind == EFunctionPtrType_Weak ? EStdFunc_MulticastAdd_w : EStdFunc_MulticastAdd;
 
-	ConvertToSimpleMulticastPtr (&ArgValue1);
-	ConvertToSimpleFunctionPtr (&ArgValue2);
+	ConvertToSimpleMulticastPtr (&ArgValueArray [0]);
+	ConvertToSimpleFunctionPtr (&ArgValueArray [1]);
 
 	CFunction* pStdFunction = m_pModule->m_FunctionMgr.GetStdFunction (FuncKind);
 
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	m_pModule->m_LlvmBuilder.CreateCall (
 		pStdFunction,
 		pStdFunction->GetType (),
-		ArgValue1,
-		ArgValue2,
+		ArgValueArray,
+		countof (ArgValueArray),
 		&ReturnValue
 		);
 
@@ -235,16 +307,12 @@ CMulticastType::GetAddMethodImpl_u ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pAddMethod_u = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetRemoveMethodImpl ()
+CMulticastType::CreateRemoveMethod ()
 {
-	if (m_pRemoveMethod)
-		return m_pRemoveMethod;
-
 	CType* pReturnType = m_pTargetType;
 	
 	CType* ArgTypeArray [] =
@@ -259,19 +327,16 @@ CMulticastType::GetRemoveMethodImpl ()
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	CValue ArgValue1 = ArgValueArray [0];
-	CValue ArgValue2 = ArgValueArray [1];
+	m_pModule->m_OperatorMgr.PrepareDataPtr (&ArgValueArray [0], ERuntimeError_StoreOutOfRange);
 
-	m_pModule->m_OperatorMgr.PrepareDataPtr (ArgValue1, ERuntimeError_StoreOutOfRange, &ArgValue1);
-
-	CFunction* pImplFunction = GetRemoveMethodImpl_u ();
+	CFunction* pImplFunction = GetMethod (EMulticastMethod_Remove, EDataPtrType_Unsafe);
 
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	m_pModule->m_LlvmBuilder.CreateCall (
 		pImplFunction,
 		pImplFunction->GetType (),
-		ArgValue1,
-		ArgValue2,
+		ArgValueArray,
+		countof (ArgValueArray),
 		&ReturnValue
 		);
 
@@ -279,16 +344,12 @@ CMulticastType::GetRemoveMethodImpl ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pRemoveMethod = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetRemoveMethodImpl_u ()
+CMulticastType::CreateRemoveMethod_u ()
 {
-	if (m_pRemoveMethod_u)
-		return m_pRemoveMethod_u;
-
 	CType* pReturnType = m_pTargetType;
 	
 	CType* ArgTypeArray [] =
@@ -303,25 +364,22 @@ CMulticastType::GetRemoveMethodImpl_u ()
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
-	CValue ArgValue1 = ArgValueArray [0];
-	CValue ArgValue2 = ArgValueArray [1];
-
 	EFunctionPtrType PtrTypeKind = m_pTargetType->GetPtrTypeKind ();
 	EStdFunc FuncKind = 
 		PtrTypeKind == EFunctionPtrType_Unsafe ? EStdFunc_MulticastRemove_u :
 		PtrTypeKind == EFunctionPtrType_Thin ? EStdFunc_MulticastRemove_t :
 		PtrTypeKind == EFunctionPtrType_Weak ? EStdFunc_MulticastRemove_w : EStdFunc_MulticastRemove;
 
-	ConvertToSimpleMulticastPtr (&ArgValue1);
+	ConvertToSimpleMulticastPtr (&ArgValueArray [0]);
 
 	CFunction* pStdFunction = m_pModule->m_FunctionMgr.GetStdFunction (FuncKind);
 
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	m_pModule->m_LlvmBuilder.CreateCall (
 		pStdFunction,
 		pStdFunction->GetType (),
-		ArgValue1,
-		ArgValue2,
+		ArgValueArray,
+		countof (ArgValueArray),
 		&ReturnValue
 		);
 
@@ -329,16 +387,12 @@ CMulticastType::GetRemoveMethodImpl_u ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pRemoveMethod_u = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetSnapshotMethodImpl ()
+CMulticastType::CreateSnapshotMethod ()
 {
-	if (m_pSnapshotMethod)
-		return m_pSnapshotMethod;
-
 	CType* pReturnType = m_pTargetType->GetMcSnapshotType ();
 	
 	CType* ArgTypeArray [] =
@@ -352,9 +406,9 @@ CMulticastType::GetSnapshotMethodImpl ()
 	CValue ArgValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
 
-	m_pModule->m_OperatorMgr.PrepareDataPtr (ArgValue, ERuntimeError_StoreOutOfRange, &ArgValue);
+	m_pModule->m_OperatorMgr.PrepareDataPtr (&ArgValue, ERuntimeError_StoreOutOfRange);
 
-	CFunction* pImplFunction = GetSnapshotMethodImpl_u ();
+	CFunction* pImplFunction = GetMethod (EMulticastMethod_Snapshot, EDataPtrType_Unsafe);
 
 	CValue ReturnValue;
 	m_pModule->m_LlvmBuilder.CreateCall (
@@ -368,16 +422,12 @@ CMulticastType::GetSnapshotMethodImpl ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pSnapshotMethod = pFunction;
 	return pFunction;
 }
 
 CFunction* 
-CMulticastType::GetSnapshotMethodImpl_u ()
-{
-	if (m_pSnapshotMethod_u)
-		return m_pSnapshotMethod_u;
-
+CMulticastType::CreateSnapshotMethod_u ()
+{	
 	CType* pReturnType = m_pTargetType->GetMcSnapshotType ();
 	
 	CType* ArgTypeArray [] =
@@ -409,11 +459,118 @@ CMulticastType::GetSnapshotMethodImpl_u ()
 		&ReturnValue
 		);
 
+	// stdfunc returns simple-funciton snapshot so we either 
+	// need a real ICastOperator or manually bitcast it to our type
+	// since casting to mcsnapshot is not needed anywhere just bitcast it here
+
+	ASSERT (ReturnValue.GetType ()->GetTypeKind () == EType_McSnapshot);
+
+	CValue CountValue;
+	CValue PtrPfnValue;
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ReturnValue, 0, NULL, &CountValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ReturnValue, 1, NULL, &PtrPfnValue);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrPfnValue, m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe), &PtrPfnValue);
+	
+	ReturnValue = pReturnType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ReturnValue, CountValue, 0, pReturnType, &ReturnValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ReturnValue, PtrPfnValue, 1, pReturnType, &ReturnValue);
+
 	m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pSnapshotMethod_u = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::CreateCallMethod ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+
+	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, GetDataPtrType (EDataPtrType_Normal));
+	size_t ArgCount = ArgTypeArray.GetCount ();
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastCall_s"), pType);
+
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, ArgCount);
+
+	m_pModule->m_OperatorMgr.PrepareDataPtr (&ArgValueArray [0], ERuntimeError_LoadOutOfRange);
+
+	CFunction* pImplFunction = GetMethod (EMulticastMethod_Call, EDataPtrType_Unsafe);
+
+	CValue ReturnValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pImplFunction,
+		pImplFunction->GetType (),
+		ArgValueArray,
+		ArgCount,
+		&ReturnValue
+		);
+
+	m_pModule->m_ControlFlowMgr.Return ();
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	return pFunction;
+}
+
+CFunction* 
+CMulticastType::CreateCallMethod_u ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+
+	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
+	ArgTypeArray.Insert (0, GetDataPtrType (EDataPtrType_Unsafe));
+	size_t ArgCount = ArgTypeArray.GetCount ();
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastCall_u"), pType);
+
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, ArgCount);
+
+	CFunction* pImplFunction = GetMethod (EMulticastMethod_Snapshot, EDataPtrType_Unsafe);
+
+	rtl::CString s = jnc::GetLlvmTypeString (ArgValueArray [0].GetLlvmValue ()->getType ());
+
+	CValue SnapshotValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pImplFunction,
+		pImplFunction->GetType (),
+		ArgValueArray [0],
+		&SnapshotValue
+		);
+
+	CMcSnapshotType* pMcSnapshotType = m_pTargetType->GetMcSnapshotType ();
+
+	ASSERT (SnapshotValue.GetType ()->Cmp (pMcSnapshotType) == 0);
+	ArgValueArray [0] = SnapshotValue;
+
+	pImplFunction = pMcSnapshotType->GetCallMethod ();
+
+	CValue ReturnValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pImplFunction,
+		pImplFunction->GetType (),
+		ArgValueArray,
+		ArgCount,
+		&ReturnValue
+		);
+
+	m_pModule->m_ControlFlowMgr.Return ();
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
 	return pFunction;
 }
 
@@ -441,25 +598,19 @@ CMulticastType::ConvertToSimpleFunctionPtr (CValue* pFunctionPtrValue)
 		return;
 	}
 
-	CValue FunctionPtrValue = pFunctionPtrType->GetUndefValue ();
-
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (*pFunctionPtrValue, 0, NULL, &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PfnValue, pFuncitonType->GetFunctionPtrType (EFunctionPtrType_Unsafe), &PfnValue);	
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, PfnValue, 0, pFunctionPtrType, &FunctionPtrValue);
-
 	CValue ClosureValue;
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (*pFunctionPtrValue, 0, NULL, &PfnValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (*pFunctionPtrValue, 1, NULL, &ClosureValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, ClosureValue, 1, pFunctionPtrType, &FunctionPtrValue);
+	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (PfnValue, ClosureValue, pFunctionPtrType, pFunctionPtrValue);
 
 	if (PtrTypeKind == EFunctionPtrType_Weak)
 	{
 		CValue StrengthenValue;
 		m_pModule->m_LlvmBuilder.CreateExtractValue (*pFunctionPtrValue, 2, NULL, &StrengthenValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (FunctionPtrValue, StrengthenValue, 2, pFunctionPtrType, &FunctionPtrValue);
+		m_pModule->m_LlvmBuilder.CreateInsertValue (*pFunctionPtrValue, StrengthenValue, 2, pFunctionPtrType, pFunctionPtrValue);
 	}
-
-	*pFunctionPtrValue = FunctionPtrValue;
 }
 
 //.............................................................................

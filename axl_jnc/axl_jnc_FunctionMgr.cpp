@@ -409,8 +409,8 @@ void
 CFunctionMgr::InternalEpilogue ()
 {
 	TEmissionContext Context = m_EmissionContextStack.GetBackAndPop ();
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (Context.m_pBlock);
 	m_pCurrentFunction = Context.m_pFunction;
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (Context.m_pBlock);
 }
 
 CFunction*
@@ -1444,7 +1444,7 @@ CFunctionMgr::CreateMulticastRemove (
 	return CreateInternalFunction (pTag, pType);
 }
 
-// function** pfn ()
+// mcsnapshot ()
 // jnc.MulticastSnapshot (multicast* pMulticast ());
 
 CFunction*
@@ -1456,7 +1456,7 @@ CFunctionMgr::CreateMulticastSnapshot (
 	CFunctionType* pFunctionType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunctionPtrType* pPtrType = pFunctionType->GetFunctionPtrType (PtrTypeKind);
 
-	CType* pReturnType = pPtrType->GetDataPtrType (EDataPtrType_Unsafe);
+	CType* pReturnType = pPtrType->GetMcSnapshotType ();
 
 	CType* ArgTypeArray [] =
 	{

@@ -606,10 +606,16 @@ struct TFunctionPtr_w: TFunctionPtr
 struct TMulticast
 {
 	volatile intptr_t m_Lock;
-	void* m_pPtrArray; // array of function closure, weak or unsafe pointers
 	size_t m_MaxCount;
 	size_t m_Count;
+	void* m_pPtrArray; // array of function closure, weak or unsafe pointers
 	void* m_pHandleTable;
+};
+
+struct TMcSnapshot
+{
+	size_t m_Count;
+	void* m_pPtrArray; // array of function closure or unsafe pointers
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

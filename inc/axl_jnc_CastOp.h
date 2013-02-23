@@ -94,6 +94,40 @@ public:
 
 //.............................................................................
 
+// fail by default
+
+class CCast_Default: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_Default, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		)
+	{
+		return ECast_None;
+	}
+
+	virtual
+	bool
+	LlvmCast (
+		EAlloc AllocKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		)
+	{
+		SetCastError (OpValue, pType);
+		return false;
+	}
+};
+
+//.............................................................................
+
 // simple copy
 
 class CCast_Copy: public ICastOperator
@@ -129,7 +163,6 @@ public:
 		CValue* pResultValue
 		);
 };
-
 //.............................................................................
 
 // master cast chooses particular implementation

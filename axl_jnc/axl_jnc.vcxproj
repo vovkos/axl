@@ -93,6 +93,7 @@
     <ClInclude Include="..\inc\axl_jnc_CastOp_FunctionPtr.h" />
     <ClInclude Include="..\inc\axl_jnc_CastOp_Int.h" />
     <ClInclude Include="..\inc\axl_jnc_CastOp_PropertyPtr.h" />
+    <ClInclude Include="..\inc\axl_jnc_CastOp_Struct.h" />
     <ClInclude Include="..\inc\axl_jnc_ClassPtrType.h" />
     <ClInclude Include="..\inc\axl_jnc_Closure.h" />
     <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="axl_jnc_CastOp_FunctionPtr.cpp" />
     <ClCompile Include="axl_jnc_CastOp_Int.cpp" />
     <ClCompile Include="axl_jnc_CastOp_PropertyPtr.cpp" />
+    <ClCompile Include="axl_jnc_CastOp_Struct.cpp" />
     <ClCompile Include="axl_jnc_ClassPtrType.cpp" />
     <ClCompile Include="axl_jnc_Closure.cpp" />
     <ClCompile Include="axl_jnc_ConstMgr.cpp" />

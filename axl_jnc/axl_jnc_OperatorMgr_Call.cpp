@@ -80,11 +80,37 @@ COperatorMgr::CallOperator (
 {
 	bool Result;
 
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue);
+	int OpFlags = OpValue.GetType ()->GetTypeKind () == EType_Multicast ? EOpFlag_KeepDataRef : 0;
+	Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
+	if (!Result)
+		return false;
+
+	if (OpValue.GetType ()->GetTypeKind () == EType_DataRef)
+	{
+		CDataPtrType* pPtrType = (CDataPtrType*) OpValue.GetType ();
+		ASSERT (pPtrType->GetTargetType ()->GetTypeKind () == EType_Multicast);
+
+		CMulticastType* pMulticastType = (CMulticastType*) pPtrType->GetTargetType ();
+		CFunction* pCallMethod = pMulticastType->GetMethod (EMulticastMethod_Call, pPtrType->GetPtrTypeKind ());
+
+		ref::CPtrT <CClosure> Closure = OpValue.GetClosure ();
+		if (!Closure)
+			Closure = OpValue.CreateClosure ();
+
+		CValue PtrValue;
+		UnaryOperator (EUnOp_Addr, OpValue, &PtrValue);
+		Closure->GetArgList ()->InsertHead (PtrValue);
+
+		OpValue.SetFunction (pCallMethod);
+		OpValue.SetClosure (Closure);
+	}
+
 	rtl::CBoxListT <CValue> EmptyArgList;
 	if (!pArgList)
 		pArgList = &EmptyArgList;
 
-	CValue OpValue;
 	if (RawOpValue.GetValueKind () == EValue_Function && RawOpValue.GetFunction ()->IsOverloaded ())
 	{
 		CFunction* pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
@@ -92,12 +118,6 @@ COperatorMgr::CallOperator (
 			return false;
 
 		OpValue.SetFunction (pFunction);
-	}
-	else
-	{
-		Result = PrepareOperand (RawOpValue, &OpValue);
-		if (!Result)
-			return false;
 	}
 
 	CClosure* pClosure = OpValue.GetClosure ();
@@ -125,23 +145,17 @@ COperatorMgr::CallOperator (
 	CType* pOpType = OpValue.GetType ();
 	EType OpTypeKind = pOpType->GetTypeKind ();
 
-	if (OpTypeKind == EType_Multicast)
-	{
-		return CallMulticast (OpValue, pArgList);
-	}
-	else if (OpTypeKind == EType_FunctionRef || OpTypeKind == EType_FunctionPtr)
-	{
-		CFunctionPtrType* pFunctionPtrType = (CFunctionPtrType*) pOpType;
-
-		return pFunctionPtrType->HasClosure () ? 
-			CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
-			CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);
-	}
-	else 
+	if (OpTypeKind != EType_FunctionRef && OpTypeKind != EType_FunctionPtr)
 	{
 		err::SetFormatStringError (_T("cannot call '%s'"), pOpType->GetTypeString ());
 		return false;
 	}
+
+	CFunctionPtrType* pFunctionPtrType = (CFunctionPtrType*) pOpType;
+
+	return pFunctionPtrType->HasClosure () ? 
+		CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
+		CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);
 }
 
 bool
@@ -239,57 +253,6 @@ COperatorMgr::CastArgList (
 	}
 
 	return true;
-}
-
-bool
-COperatorMgr::CallMulticast (
-	const CValue& OpValue,
-	rtl::CBoxListT <CValue>* pArgList
-	)
-{
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Multicast);
-	CMulticastType* pMulticastType = (CMulticastType*) OpValue.GetType ();
-	
-	err::SetFormatStringError (_T("calling multicast is not supported yet"));
-	return false;
-
-/*
-	CFunctionPtrType* pFunctionPtrType = pMulticastType->GetFunctionPtrType ();
-	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
-
-	CValue HandlerValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &HandlerValue);
-
-	CType* pHandlerPtrType = pMulticastType->GetHandlerStructType ()->GetDataPtrType (EDataPtrType_Unsafe);
-
-	CValue HandlerVariable;
-	m_pModule->m_LlvmBuilder.CreateAlloca (pHandlerPtrType, "event_handler", NULL, &HandlerVariable);
-	m_pModule->m_LlvmBuilder.CreateStore (HandlerValue, HandlerVariable);
-
-	CBasicBlock* pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("event_cond"));
-	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("event_loop"));
-	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("event_follow"));
-
-	m_pModule->m_ControlFlowMgr.Follow (pConditionBlock);
-
-	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateLoad (HandlerVariable, NULL, &HandlerValue);
-	m_pModule->m_LlvmBuilder.CreateEq_i (HandlerValue, pHandlerPtrType->GetZeroValue (), &CmpValue);
-	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFollowBlock, pBodyBlock, pBodyBlock);
-
-	CValue FunctionPtrValue;
-	m_pModule->m_LlvmBuilder.CreateLoad (HandlerValue, NULL, &HandlerValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 0, pMulticastType->GetFunctionPtrType (), &FunctionPtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (HandlerValue, 1, NULL, &HandlerValue);
-	m_pModule->m_LlvmBuilder.CreateStore (HandlerValue, HandlerVariable);
-
-	CValue ResultValue;
-	CallClosureFunctionPtr (FunctionPtrValue, pArgList, &ResultValue);
-
-	m_pModule->m_ControlFlowMgr.Jump (pConditionBlock, pFollowBlock);
-
-	return true;
-*/
 }
 
 bool

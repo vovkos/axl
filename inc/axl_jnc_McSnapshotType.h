@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_FunctionPtrType.h"
+#include "axl_jnc_StructType.h"
 #include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_Function.h"
 
@@ -19,6 +20,7 @@ protected:
 	friend class CTypeMgr;
 
 	CFunctionPtrType* m_pTargetType;
+	CStructType* m_pMcSnapshotStructType;
 	CFunction* m_pCallMethod;
 
 public:
@@ -36,6 +38,9 @@ public:
 		return m_pTargetType->GetTargetType ();
 	}
 
+	CStructType* 
+	GetMcSnapshotStructType ();
+
 	CFunction* 
 	GetCallMethod ();
 
@@ -46,10 +51,7 @@ protected:
 
 	virtual 
 	void
-	PrepareLlvmType ()
-	{
-		m_pLlvmType = m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe)->GetLlvmType ();
-	}
+	PrepareLlvmType ();
 };
 
 //.............................................................................
