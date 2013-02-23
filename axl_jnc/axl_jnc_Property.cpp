@@ -12,6 +12,7 @@ CProperty::CProperty ()
 	m_ItemKind = EModuleItem_Property;
 	m_NamespaceKind = ENamespace_Property;
 	m_pType = NULL;
+	m_TypeFlags = 0;
 
 	m_pConstructor = NULL;
 	m_pStaticConstructor = NULL;
@@ -28,6 +29,20 @@ CProperty::CProperty ()
 	m_pEventMember = NULL;
 	m_pStaticFieldStructType = NULL;
 	m_pStaticDataVariable = NULL;
+}
+
+CType*
+CProperty::CalcType ()
+{
+	ASSERT (!m_pType);
+
+	int Flags = 0;
+
+	m_pType = m_pSetter ?
+		m_pModule->m_TypeMgr.GetPropertyType (m_pGetter->GetType (), *m_pSetter->GetTypeOverload (), Flags) :
+		m_pModule->m_TypeMgr.GetPropertyType (m_pGetter->GetType (), NULL, Flags);
+
+	return m_pType;
 }
 
 bool
@@ -94,8 +109,8 @@ CProperty::CreateFieldMember (
 
 	switch (StorageKind)
 	{
-	case EStorage_Undefined:
 	case EStorage_Mutable:
+	case EStorage_Undefined:
 		if (!m_pFieldStructType)
 		{
 			m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);

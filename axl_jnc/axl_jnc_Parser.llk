@@ -83,6 +83,12 @@ Members2
 		m_TypeSpecifierStack.Append (pTypeSpecifier);
 	}
 
+	CTypeSpecifier*
+	GetTypeSpecifier ()
+	{
+		return m_TypeSpecifierStack.GetBack ();
+	}
+
 	void
 	PopTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 	{
@@ -195,20 +201,20 @@ Members2
 		);
 
 	CProperty*
+	CreateProperty (
+		const rtl::CString& Name,
+		size_t PackFactor
+		);
+
+	CPropertyTemplate*
+	CreatePropertyTemplate ();
+
+	CProperty*
 	CreatePropertyImpl (
 		const rtl::CString& Name,
 		const CToken::CPos& Pos,
 		size_t PackFactor
 		);
-
-	CProperty*
-	CreateProperty (
-		const rtl::CString& Name,
-		size_t PackFactor
-		)
-	{
-		return CreatePropertyImpl (Name, m_LastMatchedToken.m_Pos, PackFactor);
-	}
 
 	CClassType*
 	CreateAutoEvType (CDeclarator* pDeclarator);

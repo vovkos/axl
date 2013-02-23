@@ -4,6 +4,40 @@
 
 namespace axl {
 namespace jnc {
+
+//.............................................................................
+
+const tchar_t* 
+GetPropertyTypeFlagString (EPropertyTypeFlag Flag)
+{
+	static const tchar_t* StringTable [] = 
+	{
+		_T("autoget"),   // EPropertyTypeFlag_AutoGet = 0x0100,
+		_T("bindable"),  // EPropertyTypeFlag_Bindable  = 0x0200,
+	};
+
+	size_t i = rtl::GetLoBitIdx32 (Flag >> 8);
+
+	return i < countof (StringTable) ? 
+		StringTable [i] : 
+		_T("undefined-property-type-flag");
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+int
+GetPropertyTypeFlagsFromModifiers (int Modifiers)
+{
+	int Flags;
+
+	if (Modifiers & ETypeModifier_AutoGet)
+		Flags |= EPropertyTypeFlag_AutoGet;
+
+	if (Modifiers & ETypeModifier_Bindable)
+		Flags |= EPropertyTypeFlag_Bindable;
+
+	return Flags;
+}
 	
 //.............................................................................
 

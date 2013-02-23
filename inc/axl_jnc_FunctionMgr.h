@@ -223,7 +223,10 @@ public:
 		);
 
 	CPropertyTemplate*
-	CreatePropertyTemplate ();
+	CreatePropertyTemplate (int TypeFlags = 0);
+
+	bool
+	CalcPropertyLayouts ();
 
 	bool
 	ResolveOrphanFunctions ();

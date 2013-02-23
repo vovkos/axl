@@ -357,8 +357,14 @@ CParser::AssignDeclarationAttributes (
 	if (!pDecl)
 		return;
 
-	pDecl->m_StorageKind = m_StorageKind;
-	pDecl->m_AccessKind = m_AccessKind;
+	// don't overwrite unless explicit
+
+	if (m_AccessKind)
+		pDecl->m_AccessKind = m_AccessKind;
+
+	if (m_StorageKind)
+		pDecl->m_StorageKind = m_StorageKind;
+
 	pDecl->m_Pos = Pos;
 	pDecl->m_pAttributeBlock = m_pAttributeBlock;
 
@@ -585,6 +591,26 @@ CParser::DeclareProperty (
 		return false;
 
 	return true;
+}
+
+CPropertyTemplate*
+CParser::CreatePropertyTemplate ()
+{
+	int TypeFlags = GetPropertyTypeFlagsFromModifiers (GetTypeSpecifier ()->GetTypeModifiers ());
+	CPropertyTemplate* pPropertyTemplate = m_pModule->m_FunctionMgr.CreatePropertyTemplate (TypeFlags);
+	return pPropertyTemplate;
+
+}
+
+CProperty*
+CParser::CreateProperty (
+	const rtl::CString& Name,
+	size_t PackFactor
+	)
+{
+	CProperty* pProperty = CreatePropertyImpl (Name, m_LastMatchedToken.m_Pos, PackFactor);
+	pProperty->m_TypeFlags = GetPropertyTypeFlagsFromModifiers (GetTypeSpecifier ()->GetTypeModifiers ());
+	return pProperty;
 }
 
 CProperty*

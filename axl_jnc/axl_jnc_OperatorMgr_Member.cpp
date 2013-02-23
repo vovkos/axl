@@ -20,26 +20,30 @@ COperatorMgr::GetFieldMember (
 	CNamespace* pParentNamespace = pMember->GetParentType ()->GetParentNamespace ();
 	ASSERT (pParentNamespace);
 
-	if (pMember->GetStorageKind () != EStorage_Static && ThisValue.IsEmpty ())
-	{
-		err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
-		return false;
-	}
-
 	if (pParentNamespace->GetNamespaceKind () == ENamespace_Property)
 	{
 		CProperty* pProperty = (CProperty*) pParentNamespace;
-
 		if (pMember->GetStorageKind () == EStorage_Static)
+		{
+			CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
+			ASSERT (pStaticVariable);
+
 			return GetStructFieldMember (
-				pProperty->GetStaticDataVariable (), 
+				pStaticVariable, 
 				pMember,
 				pCoord,
 				pResultValue
 				);
+		}
 
 		CClassType* pParentClassType = pProperty->GetParentClassType ();
 		ASSERT (pParentClassType);
+
+		if (ThisValue.IsEmpty ())
+		{
+			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
+			return false;
+		}
 
 		CBaseTypeCoord Coord;
 
@@ -73,6 +77,12 @@ COperatorMgr::GetFieldMember (
 				pCoord,
 				pResultValue
 				);
+
+		if (ThisValue.IsEmpty ())
+		{
+			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
+			return false;
+		}
 
 		return GetClassFieldMember (
 			ThisValue, 

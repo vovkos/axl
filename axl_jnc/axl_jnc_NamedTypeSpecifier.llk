@@ -173,11 +173,10 @@ property_template_specifier
 	{
 		CPropertyTemplate* $pTemplate;
 	}
-	enter
-	{
-		$pTemplate = m_pModule->m_FunctionMgr.CreatePropertyTemplate ();
-	}
 	: EToken_Property 
+		{
+			$pTemplate = CreatePropertyTemplate ();
+		}
 	  named_type_block <$pTemplate>		
 		{
 			if (!$pTemplate->GetGetterType ()) 
@@ -211,6 +210,10 @@ property_specifier
 				return false;
 		}	  
 	  named_type_block <$.m_pProperty>
+		{
+			$.m_pProperty->CalcType ();
+			m_pLastDeclaredItem = $.m_pProperty;
+		}
 	;
 
 // since EToken_Property EToken_Identifier is a conflict against epsilon production we need a resolver

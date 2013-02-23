@@ -24,6 +24,7 @@ protected:
 	friend class CParser;
 
 	CPropertyType* m_pType;
+	int m_TypeFlags; // before the type was calculated
 
 	// construction / destruction / accessors
 
@@ -147,6 +148,9 @@ public:
 	{
 		return m_pDataFieldMember;
 	}
+
+	CType*
+	CalcType ();
 
 	bool
 	Create (CPropertyType* pType);

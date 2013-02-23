@@ -151,7 +151,10 @@ CAstDoc::Compile ()
 	}
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Calculating type layouts...\n"));
-	Result = m_Module.m_TypeMgr.CalcTypeLayouts ();
+	Result = 
+		m_Module.m_TypeMgr.CalcTypeLayouts () &&
+		m_Module.m_FunctionMgr.CalcPropertyLayouts ();
+
 	if (!Result)
 	{
 		rtl::CString Text = err::GetError ()->GetDescription ();

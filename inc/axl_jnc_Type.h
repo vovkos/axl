@@ -164,6 +164,9 @@ GetPtrTypeFlagString (int Flags)
 	return GetPtrTypeFlagString (GetFirstPtrTypeFlag (Flags));
 }
 
+int
+GetPtrTypeFlagsFromModifiers (int Modifiers);
+
 //.............................................................................
 
 enum ETypeModifier

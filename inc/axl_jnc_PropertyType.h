@@ -18,12 +18,34 @@ enum EPropertyPtrType;
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_ReadOnly  = 0x010000,
-	EPropertyTypeFlag_Bindable  = 0x020000,
-	EPropertyTypeFlag_AutoGet   = 0x040000,
+	EPropertyTypeFlag_ReadOnly  = 0x0100,
+	EPropertyTypeFlag_AutoGet   = 0x0200,
+	EPropertyTypeFlag_Bindable  = 0x0400,
 	
 	EPropertyTypeFlag_Augmented = EPropertyTypeFlag_AutoGet | EPropertyTypeFlag_Bindable,
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+EPropertyTypeFlag
+GetFirstPropertyTypeFlag (int Flags)
+{
+	return (EPropertyTypeFlag) (1 << rtl::GetLoBitIdx (Flags));
+}
+
+const tchar_t* 
+GetPropertyTypeFlagString (EPropertyTypeFlag Flag);
+
+inline
+const tchar_t* 
+GetPropertyTypeFlagString (int Flags)
+{
+	return GetPropertyTypeFlagString (GetFirstPropertyTypeFlag (Flags));
+}
+
+int
+GetPropertyTypeFlagsFromModifiers (int Modifiers);
 
 //.............................................................................
 

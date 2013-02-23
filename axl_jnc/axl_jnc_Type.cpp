@@ -141,6 +141,31 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 		_T("undefined-ptr-type-flag");
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+int
+GetPtrTypeFlagsFromModifiers (int Modifiers)
+{
+	int Flags;
+
+	if (Modifiers & ETypeModifier_NoNull)
+		Flags |= EPtrTypeFlag_NoNull;
+
+	if (Modifiers & ETypeModifier_Const)
+		Flags |= EPtrTypeFlag_Const;
+
+	if (Modifiers & ETypeModifier_ReadOnly)
+		Flags |= EPtrTypeFlag_ReadOnly;
+
+	if (Modifiers & ETypeModifier_Volatile)
+		Flags |= EPtrTypeFlag_Volatile;
+
+	if (Modifiers & ETypeModifier_Event)
+		Flags |= EPtrTypeFlag_Event;
+
+	return Flags;
+}
+
 //.............................................................................
 
 CType::CType ()

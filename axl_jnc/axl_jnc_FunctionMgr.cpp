@@ -81,9 +81,10 @@ CFunctionMgr::CreateProperty (
 }
 
 CPropertyTemplate*
-CFunctionMgr::CreatePropertyTemplate ()
+CFunctionMgr::CreatePropertyTemplate (int TypeFlags)
 {
 	CPropertyTemplate* pPropertyTemplate = AXL_MEM_NEW (CPropertyTemplate);
+	pPropertyTemplate->m_TypeFlags = TypeFlags;
 	m_PropertyTemplateList.InsertTail (pPropertyTemplate);
 	return pPropertyTemplate;
 }
@@ -108,14 +109,9 @@ CFunctionMgr::ResolveOrphanFunctions ()
 }
 
 bool
-CFunctionMgr::CompileFunctions ()
+CFunctionMgr::CalcPropertyLayouts ()
 {
 	bool Result;
-
-	CSetCurrentThreadModule ScopeModule (m_pModule);
-	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
-
-	// (0) layout of properties
 
 	rtl::CIteratorT <CProperty> Property = m_PropertyList.GetHead ();
 	for (; Property; Property++)
@@ -124,6 +120,17 @@ CFunctionMgr::CompileFunctions ()
 		if (!Result)
 			return false;
 	}
+
+	return true;
+}
+
+bool
+CFunctionMgr::CompileFunctions ()
+{
+	bool Result;
+
+	CSetCurrentThreadModule ScopeModule (m_pModule);
+	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 
 	// (1) global aev
 

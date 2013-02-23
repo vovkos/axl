@@ -19,14 +19,18 @@ class CPropertyTemplate:
 	public CNamespace
 {
 protected:
+	friend class CFunctionMgr;
+
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CPropertyVerifier m_Verifier;
+	int m_TypeFlags;
 
 public:
 	CPropertyTemplate ()
 	{
 		m_pGetterType = NULL;
+		m_TypeFlags = 0;
 	}
 
 	CFunctionType* 

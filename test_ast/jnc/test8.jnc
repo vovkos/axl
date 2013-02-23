@@ -1,39 +1,37 @@
 //.............................................................................
 
-property MyProp
+foo (
+	int x,
+	int y
+	)
 {
-	int m_x;
+	printf ("foo (%d, %d)\n", x, y);
+}
 
-	int 
-	get ()
-	{
-		printf ("MyProp.get () return %d\n", m_x);
-		foo ();
-		return m_x;
-	}
-
-	set (int x)
-	{
-		printf ("MyProp.set (%d)\n", x);
-		m_x = x;
-		foo ();
-	}
-
-	foo ()
-	{
-		printf ("MyProp.foo (%d)\n", m_x);
-	}
-};
+function bar (
+	int x,
+	int y
+	)
+{
+	printf ("bar (%d, %d)\n", x, y);
+}
 
 int 
 main ()
 {
 	printf ("hui govno i muravei\n");
+	
+	multicast mc (int);
+	mc += foo ~(10);
+	mc += foo ~(20);
+	mc += bar ~(30);
+	mc (123);
 
-	MyProp = 10;
+	mc.Clear ();
 
-	int x = MyProp;
-	printf ("x = %d\n", x);	
+	mc.Add (bar ~(40));
+	mc.Add (foo ~(50));
+	mc.Call (456);
 
 	return 0;
 }
