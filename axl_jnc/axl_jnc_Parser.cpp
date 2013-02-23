@@ -64,27 +64,37 @@ CParser::FindType (const CQualifiedName& Name)
 bool
 CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 {
-	if (m_pLastDeclaredItem)
+	if (!m_pLastDeclaredItem)
 	{
-		if (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Function)
+		ASSERT (pTypeSpecifier);
+		CType* pType = pTypeSpecifier->GetType ();
+		if (!pType || !(pType->GetFlags () & ETypeFlag_Named))
 		{
-			CFunction* pFunction = (CFunction*) m_pLastDeclaredItem;
-			if (pFunction->IsOrphan ())
-			{
-				err::SetFormatStringError (_T("orphan function '%s' without a body"), pFunction->m_Tag);
-				return false;
-			}
+			err::SetFormatStringError (_T("invalid declaration (no declarator, no named type)"));
+			return false;
 		}
-
-		return true;
 	}
 
-	ASSERT (pTypeSpecifier);
-	CType* pType = pTypeSpecifier->GetType ();
-	if (!pType || !(pType->GetFlags () & ETypeFlag_Named))
+	EModuleItem ItemKind = m_pLastDeclaredItem->GetItemKind ();
+	switch (ItemKind)
 	{
-		err::SetFormatStringError (_T("invalid declaration (no declarator, no named type)"));
-		return false;
+	case EModuleItem_Function:
+		if (((CFunction*) m_pLastDeclaredItem)->IsOrphan ())
+		{
+			err::SetFormatStringError (_T("orphan function '%s' without a body"), m_pLastDeclaredItem->m_Tag);
+			return false;
+		}
+			
+		break;
+			
+	case EModuleItem_Property:
+		if (pTypeSpecifier->GetTypeModifiers ())
+		{
+			err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (pTypeSpecifier->GetTypeModifiers ()));
+			return false;
+		}
+
+		break;
 	}
 
 	return true;
@@ -327,16 +337,25 @@ CParser::Declare (
 		return false;
 	}
 
-	if (DeclaratorKind == EDeclarator_SimpleName)
+	switch (DeclaratorKind)
 	{
+	case EDeclarator_SimpleName:
 		return
 			m_StorageKind == EStorage_Typedef ? DeclareTypedef (pType, pDeclarator) :
 			TypeKind == EType_Function ? DeclareFunction ((CFunctionType*) pType, pDeclarator) :
 			TypeKind == EType_Property ? DeclareProperty ((CPropertyType*) pType, pDeclarator) :
 			DeclareData (pType, pDeclarator, DataPtrTypeFlags, HasInitializer);		
-	}
-	else
-	{
+
+	case EDeclarator_PropValue:
+		if (pDeclarator->GetBitCount ())
+		{
+			err::SetFormatStringError (_T("'propvalue' cannot be a bitfield"));
+			return false;
+		}
+
+		return DeclarePropValue (pType, DataPtrTypeFlags, HasInitializer);
+	
+	default:
 		if (TypeKind != EType_Function || m_StorageKind == EStorage_Typedef)
 		{
 			err::SetFormatStringError (_T("qualified declarators are only allowed for functions"));
@@ -596,8 +615,8 @@ CParser::DeclareProperty (
 CPropertyTemplate*
 CParser::CreatePropertyTemplate ()
 {
-	int TypeFlags = GetPropertyTypeFlagsFromModifiers (GetTypeSpecifier ()->GetTypeModifiers ());
-	CPropertyTemplate* pPropertyTemplate = m_pModule->m_FunctionMgr.CreatePropertyTemplate (TypeFlags);
+	CPropertyTemplate* pPropertyTemplate = m_pModule->m_FunctionMgr.CreatePropertyTemplate ();
+	pPropertyTemplate->m_TypeModifiers = GetTypeSpecifier ()->ClearTypeModifiers (ETypeModifierMask_Property);
 	return pPropertyTemplate;
 
 }
@@ -609,7 +628,7 @@ CParser::CreateProperty (
 	)
 {
 	CProperty* pProperty = CreatePropertyImpl (Name, m_LastMatchedToken.m_Pos, PackFactor);
-	pProperty->m_TypeFlags = GetPropertyTypeFlagsFromModifiers (GetTypeSpecifier ()->GetTypeModifiers ());
+	pProperty->m_TypeModifiers = GetTypeSpecifier ()->ClearTypeModifiers (ETypeModifierMask_Property);
 	return pProperty;
 }
 
@@ -758,6 +777,50 @@ CParser::DeclareData (
 		return false;
 
 	AssignDeclarationAttributes (pDataItem, pDeclarator->GetPos ());
+	return true;
+}
+
+bool
+CParser::DeclarePropValue (	
+	CType* pType,
+	int PtrTypeFlags,
+	bool HasInitializer
+	)
+{
+	bool Result;
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
+
+	if (pType->GetTypeKind () == EType_Class) 
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
+	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
+
+	if (NamespaceKind == ENamespace_PropertyTemplate)
+	{
+		CPropertyTemplate* pPropertyTemplate = (CPropertyTemplate*) pNamespace;
+		pPropertyTemplate->m_pPropValueType = pType;
+		pPropertyTemplate->m_TypeModifiers |= ETypeModifier_AutoGet;
+		return pPropertyTemplate->AddMethodMember (EFunction_Getter, pGetterType);
+	}
+	
+	if (NamespaceKind != ENamespace_Property)
+	{
+		err::SetFormatStringError (_T("'propvalue' is only allowed in property body"));
+		return false;
+	}
+
+	CProperty* pProperty = (CProperty*) pNamespace;
+	pProperty->m_pPropValue = pProperty->CreateFieldMember (m_StorageKind, pType, 0, PtrTypeFlags);
+	pProperty->m_TypeModifiers |= ETypeModifier_AutoGet;
+
+	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pGetterType);
+	Result = pProperty->AddMethodMember (pGetter);
+	if (!Result)
+		return false;
+
+	AssignDeclarationAttributes (pProperty->m_pPropValue, m_LastMatchedToken.m_Pos);
 	return true;
 }
 
@@ -1386,6 +1449,34 @@ CParser::SetThis (CValue* pValue)
 
 	*pValue = m_ThisValue;
 	return true;
+}
+
+bool
+CParser::SetPropValue (CValue* pValue)
+{
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	if (!pFunction->m_pProperty || !pFunction->m_pProperty->m_pPropValue)
+	{
+		err::SetFormatStringError (_T("function '%s' has no 'propvalue' field"), pFunction->m_Tag);
+		return false;
+	}
+
+	CBaseTypeCoord Coord;
+	return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, pFunction->m_pProperty->m_pPropValue, &Coord, pValue);
+}
+
+bool
+CParser::SetOnChange (CValue* pValue)
+{
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	if (!pFunction->m_pProperty || !pFunction->m_pProperty->m_pOnChangeEvent)
+	{
+		err::SetFormatStringError (_T("function '%s' has no 'onchange' field"), pFunction->m_Tag);
+		return false;
+	}
+
+	CBaseTypeCoord Coord;
+	return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, pFunction->m_pProperty->m_pOnChangeEvent, &Coord, pValue);
 }
 
 //.............................................................................

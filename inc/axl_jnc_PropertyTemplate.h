@@ -20,18 +20,16 @@ class CPropertyTemplate:
 {
 protected:
 	friend class CFunctionMgr;
+	friend class CParser;
 
+	CType* m_pPropValueType;
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CPropertyVerifier m_Verifier;
-	int m_TypeFlags;
+	int m_TypeModifiers;
 
 public:
-	CPropertyTemplate ()
-	{
-		m_pGetterType = NULL;
-		m_TypeFlags = 0;
-	}
+	CPropertyTemplate ();
 
 	CFunctionType* 
 	GetGetterType ()
@@ -50,6 +48,10 @@ public:
 		EFunction FunctionKind,
 		CFunctionType* pFunctionType
 		);
+
+	CPropertyType*
+	CalcType ();
+
 };
 
 //.............................................................................

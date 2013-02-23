@@ -179,16 +179,8 @@ property_template_specifier
 		}
 	  named_type_block <$pTemplate>		
 		{
-			if (!$pTemplate->GetGetterType ()) 
-			{
-				err::SetFormatStringError (_T("incomplete property template (no getter)"));
-				return false;
-			}
-
-			$.m_pType = m_pModule->m_TypeMgr.GetPropertyType (
-				$pTemplate->GetGetterType (), 
-				*$pTemplate->GetSetterType ()
-				);
+			$.m_pType = $pTemplate->CalcType ();
+			return $.m_pType != NULL;
 		}
 	;
 
@@ -211,8 +203,8 @@ property_specifier
 		}	  
 	  named_type_block <$.m_pProperty>
 		{
-			$.m_pProperty->CalcType ();
 			m_pLastDeclaredItem = $.m_pProperty;
+			return $.m_pProperty->CalcType () != NULL; 
 		}
 	;
 

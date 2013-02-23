@@ -2,26 +2,18 @@
 
 property MyProp
 {
-	int m_x;
-
-	int 
-	get ()
-	{
-		printf ("MyProp.get () return %d\n", m_x);
-		foo ();
-		return m_x;
-	}
+	int propvalue;
 
 	set (int x)
 	{
 		printf ("MyProp.set (%d)\n", x);
-		m_x = x;
+		propvalue = x;
 		foo ();
 	}
 
 	foo ()
 	{
-		printf ("MyProp.foo (%d)\n", m_x);
+		printf ("MyProp.foo (%d)\n", propvalue);
 	}
 };
 
@@ -30,7 +22,7 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
-	MyProp = 10;
+	MyProp = 50;
 
 	int x = MyProp;
 	printf ("x = %d\n", x);	

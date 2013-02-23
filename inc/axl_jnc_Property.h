@@ -24,7 +24,7 @@ protected:
 	friend class CParser;
 
 	CPropertyType* m_pType;
-	int m_TypeFlags; // before the type was calculated
+	int m_TypeModifiers; // before the type was calculated
 
 	// construction / destruction / accessors
 
@@ -45,7 +45,8 @@ protected:
 
 	size_t m_PackFactor;
 	CStructType* m_pFieldStructType;
-	CStructField* m_pEventMember;
+	CStructField* m_pPropValue;
+	CStructField* m_pOnChangeEvent;
 	CStructType* m_pStaticFieldStructType;
 	CVariable* m_pStaticDataVariable;
 
@@ -108,9 +109,15 @@ public:
 	}
 
 	CStructField* 
-	GetEventMember ()
+	GetPropValue ()
 	{
-		return m_pEventMember;
+		return m_pPropValue;
+	}
+
+	CStructField* 
+	GetOnChangeEvent ()
+	{
+		return m_pOnChangeEvent;
 	}
 
 	CStructType* 
@@ -149,7 +156,7 @@ public:
 		return m_pDataFieldMember;
 	}
 
-	CType*
+	CPropertyType*
 	CalcType ();
 
 	bool

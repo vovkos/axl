@@ -170,6 +170,13 @@ Members2
 		bool HasInitializer
 		);
 
+	bool
+	DeclarePropValue (
+		CType* pType,
+		int PtrTypeFlags,
+		bool HasInitializer
+		);
+
 	CFunctionFormalArg*
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
@@ -266,6 +273,12 @@ Members2
 
 	bool
 	SetThis (CValue* pValue);
+
+	bool
+	SetPropValue (CValue* pValue);
+
+	bool
+	SetOnChange (CValue* pValue);
 } 
 
 OpenNamespace

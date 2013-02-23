@@ -12,7 +12,7 @@ CProperty::CProperty ()
 	m_ItemKind = EModuleItem_Property;
 	m_NamespaceKind = ENamespace_Property;
 	m_pType = NULL;
-	m_TypeFlags = 0;
+	m_TypeModifiers = 0;
 
 	m_pConstructor = NULL;
 	m_pStaticConstructor = NULL;
@@ -26,17 +26,30 @@ CProperty::CProperty ()
 
 	m_PackFactor = 8;
 	m_pFieldStructType = NULL;
-	m_pEventMember = NULL;
+	m_pPropValue = NULL;
+	m_pOnChangeEvent = NULL;
 	m_pStaticFieldStructType = NULL;
 	m_pStaticDataVariable = NULL;
 }
 
-CType*
+CPropertyType*
 CProperty::CalcType ()
 {
 	ASSERT (!m_pType);
 
-	int Flags = 0;
+	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pPropValue)
+	{
+		err::SetFormatStringError (_T("incomplete autoget property: no 'propvalue' field"));
+		return NULL;
+	}
+
+	if (!m_pGetter)
+	{
+		err::SetFormatStringError (_T("incomplete property: no 'get' method / 'propvalue' field"));
+		return NULL;
+	}
+
+	int Flags = GetPropertyTypeFlagsFromModifiers (m_TypeModifiers);
 
 	m_pType = m_pSetter ?
 		m_pModule->m_TypeMgr.GetPropertyType (m_pGetter->GetType (), *m_pSetter->GetTypeOverload (), Flags) :

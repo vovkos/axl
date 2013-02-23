@@ -81,10 +81,9 @@ CFunctionMgr::CreateProperty (
 }
 
 CPropertyTemplate*
-CFunctionMgr::CreatePropertyTemplate (int TypeFlags)
+CFunctionMgr::CreatePropertyTemplate ()
 {
 	CPropertyTemplate* pPropertyTemplate = AXL_MEM_NEW (CPropertyTemplate);
-	pPropertyTemplate->m_TypeFlags = TypeFlags;
 	m_PropertyTemplateList.InsertTail (pPropertyTemplate);
 	return pPropertyTemplate;
 }

@@ -231,17 +231,40 @@ COperatorMgr::GetPropertyPropValue (
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("get property 'propvalue' member is not implemented yet"));
-	return false;
+	if (OpValue.GetValueKind () != EValue_Property)
+	{
+		err::SetFormatStringError (_T("'propvalue' field for property pointers is not implemented yet"));
+		return false;
+	}
+
+	CProperty* pProperty = OpValue.GetProperty ();
+	CStructField* pField = pProperty->GetPropValue ();
+	if (!pField)
+	{
+		err::SetFormatStringError (_T("'%s' has no 'propvalue' field"), pProperty->m_Tag);
+		return false;
+	}
+
+	if (pField->GetStorageKind () != EStorage_Static)
+	{
+		err::SetFormatStringError (_T("non-static 'propvalue' is not implemented yet"));
+		return false;
+	}
+
+	CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
+	ASSERT (pStaticVariable);
+
+	CBaseTypeCoord Coord;
+	return GetStructFieldMember (pStaticVariable, pField, &Coord, pResultValue);
 }
 
 bool
 COperatorMgr::GetPropertyOnChangeEvent (
-	const CValue& RawOpValue,
+	const CValue& OpValue,
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("get property 'onchange' member is not implemented yet"));
+	err::SetFormatStringError (_T("'onchange' is not implemented yet"));
 	return false;
 
 /*

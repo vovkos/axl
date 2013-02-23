@@ -205,7 +205,7 @@ CClassType::AddMethodMember (CFunction* pFunction)
 	}
 	else if (FunctionKindFlags & EFunctionKindFlag_NoOverloads)
 	{
-		err::SetFormatStringError (_T("'%s' already has %s"), GetTypeString (), GetFunctionKindString (FunctionKind));
+		err::SetFormatStringError (_T("'%s' already has '%s' method"), GetTypeString (), GetFunctionKindString (FunctionKind));
 		return false;
 	}
 	else

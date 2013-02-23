@@ -7,6 +7,13 @@ namespace jnc {
 
 //.............................................................................
 
+CPropertyTemplate::CPropertyTemplate ()
+{
+	m_pGetterType = NULL;
+	m_pPropValueType = NULL;
+	m_TypeModifiers = 0;
+}
+
 bool
 CPropertyTemplate::AddMethodMember (
 	EFunction FunctionKind,
@@ -34,6 +41,25 @@ CPropertyTemplate::AddMethodMember (
 		return false;
 
 	return true;
+}
+
+CPropertyType*
+CPropertyTemplate::CalcType ()
+{
+	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pPropValueType)
+	{
+		err::SetFormatStringError (_T("incomplete autoget property template: no 'propvalue' field"));
+		return NULL;
+	}
+
+	if (!m_pGetterType)
+	{
+		err::SetFormatStringError (_T("incomplete property template: no 'get' method / 'propvalue' field"));
+		return NULL;
+	}
+
+	int Flags = GetPropertyTypeFlagsFromModifiers (m_TypeModifiers);
+	return m_pModule->m_TypeMgr.GetPropertyType (m_pGetterType, m_SetterType, Flags);
 }
 
 //.............................................................................

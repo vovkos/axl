@@ -45,7 +45,7 @@ CPropertyVerifier::AddMethodMember (
 	}
 	else if (FunctionKind != EFunction_Setter)
 	{
-		err::SetFormatStringError (_T("property already has %s"), GetFunctionKindString (FunctionKind));
+		err::SetFormatStringError (_T("property already has '%s' method"), GetFunctionKindString (FunctionKind));
 		return false;
 	}
 

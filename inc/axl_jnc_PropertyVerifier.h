@@ -17,7 +17,7 @@ class CPropertyVerifier
 protected:
 	int m_MethodMemberMask;           // only setter could be overloaded
 	rtl::CString m_IndexArgSignature; // all accessors must have matching index arg signature
-
+	
 public:
 	CPropertyVerifier ()
 	{

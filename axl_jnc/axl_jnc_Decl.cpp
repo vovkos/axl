@@ -67,6 +67,14 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 	return true;
 }
 
+int
+CTypeModifiers::ClearTypeModifiers (int ModifierMask)
+{
+	int TypeModifiers = m_TypeModifiers & ModifierMask;
+	m_TypeModifiers &= ~ModifierMask;
+	return TypeModifiers;
+}
+
 bool
 CTypeModifiers::CheckAntiTypeModifiers (int ModifierMask)
 {

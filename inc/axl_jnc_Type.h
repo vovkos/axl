@@ -226,6 +226,7 @@ enum ETypeModifierMask
 		ETypeModifier_Property | 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall |
+		ETypeModifier_Const | 
 		ETypeModifier_Bindable | 
 		ETypeModifier_AutoGet | 
 		ETypeModifier_Indexed,

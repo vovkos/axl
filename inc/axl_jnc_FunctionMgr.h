@@ -223,7 +223,7 @@ public:
 		);
 
 	CPropertyTemplate*
-	CreatePropertyTemplate (int TypeFlags = 0);
+	CreatePropertyTemplate ();
 
 	bool
 	CalcPropertyLayouts ();

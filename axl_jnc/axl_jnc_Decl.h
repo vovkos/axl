@@ -34,6 +34,9 @@ public:
 	bool
 	SetTypeModifier (ETypeModifier Modifier);
 
+	int
+	ClearTypeModifiers (int ModifierMask);
+
 protected:
 	bool
 	CheckAntiTypeModifiers (int ModifierMask);
