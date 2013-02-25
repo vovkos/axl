@@ -12,6 +12,7 @@ CProperty::CProperty ()
 	m_ItemKind = EModuleItem_Property;
 	m_NamespaceKind = ENamespace_Property;
 	m_pType = NULL;
+	m_pAuPropValueType = NULL;
 	m_TypeModifiers = 0;
 
 	m_pConstructor = NULL;
@@ -26,8 +27,6 @@ CProperty::CProperty ()
 
 	m_PackFactor = 8;
 	m_pFieldStructType = NULL;
-	m_pPropValue = NULL;
-	m_pOnChangeEvent = NULL;
 	m_pStaticFieldStructType = NULL;
 	m_pStaticDataVariable = NULL;
 }
@@ -37,7 +36,7 @@ CProperty::CalcType ()
 {
 	ASSERT (!m_pType);
 
-	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pPropValue)
+	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pAuPropValueType)
 	{
 		err::SetFormatStringError (_T("incomplete autoget property: no 'propvalue' field"));
 		return NULL;
@@ -107,54 +106,11 @@ CProperty::CreateFieldMember (
 	int PtrTypeFlags
 	)
 {
-	CStructType* pFieldStructType;
-
-	if (!m_pParentClassType)
-	{
-		if (StorageKind)
-		{
-			err::SetFormatStringError (_T("global property members cannot have storage specifier"));
-			return NULL;
-		}
-
-		StorageKind = EStorage_Static;
-	}
-
-	switch (StorageKind)
-	{
-	case EStorage_Mutable:
-	case EStorage_Undefined:
-		if (!m_pFieldStructType)
-		{
-			m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-			m_pFieldStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
-			m_pFieldStructType->m_pParentNamespace = this;
-
-			if (m_pParentClassType)
-				m_pParentClassFieldMember = m_pParentClassType->CreateFieldMember (StorageKind, m_pFieldStructType);
-		}
-
-		pFieldStructType = m_pFieldStructType;
-		break;
-
-	case EStorage_Static:
-		if (!m_pStaticFieldStructType)
-		{
-			m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-			m_pStaticFieldStructType->m_StorageKind = EStorage_Static;
-			m_pStaticFieldStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
-			m_pStaticFieldStructType->m_pParentNamespace = this;
-		}
-
-		pFieldStructType = m_pStaticFieldStructType;
-		break;
-
-	default:
-		err::SetFormatStringError (_T("invalid storage '%s' for field member '%s'"), GetStorageKindString (StorageKind), Name);
+	CStructType* pStructType = GetFieldStructType (StorageKind);
+	if (!pStructType)
 		return NULL;
-	}
 
-	CStructField* pMember = pFieldStructType->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
+	CStructField* pMember = pStructType->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
 
 	if (!Name.IsEmpty ())
 	{
@@ -164,6 +120,45 @@ CProperty::CreateFieldMember (
 	}
 
 	return pMember;
+}
+
+CStructType*
+CProperty::GetFieldStructType (EStorage StorageKind)
+{
+	switch (StorageKind)
+	{
+	case EStorage_Member:
+	case EStorage_Mutable:
+		if (!m_pParentClassType)
+		{
+			err::SetFormatStringError (_T("invalid storage '%s' for global property member '%s'"), GetStorageKindString (StorageKind));
+			return NULL;
+		}
+
+
+		if (m_pFieldStructType)
+			return m_pFieldStructType;
+
+		m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+		m_pFieldStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
+		m_pFieldStructType->m_pParentNamespace = this;
+		m_pParentClassFieldMember = m_pParentClassType->CreateFieldMember (StorageKind, m_pFieldStructType);
+		return m_pFieldStructType;
+
+	case EStorage_Static:
+		if (m_pStaticFieldStructType)
+			return m_pStaticFieldStructType;
+
+		m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+		m_pStaticFieldStructType->m_StorageKind = EStorage_Static;
+		m_pStaticFieldStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
+		m_pStaticFieldStructType->m_pParentNamespace = this;
+		return m_pStaticFieldStructType;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage '%s' for field member"), GetStorageKindString (StorageKind));
+		return NULL;
+	}
 }
 
 bool
@@ -208,9 +203,9 @@ CProperty::AddMethodMember (CFunction* pFunction)
 	}
 	else
 	{
-		if (StorageKind)
+		if (StorageKind != EStorage_Static)
 		{
-			err::SetFormatStringError (_T("global property members cannot have storage specifier"));
+			err::SetFormatStringError (_T("invalid storage specifier '%s' for global property member"), GetStorageKindString (StorageKind));
 			return false;
 		}
 
@@ -308,9 +303,9 @@ CProperty::AddPropertyMember (CProperty* pProperty)
 			return false;
 		}
 	}
-	else if (StorageKind)
+	else if (StorageKind != EStorage_Static)
 	{
-		err::SetFormatStringError (_T("global property members cannot have storage specifier"));
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for global property member"), GetStorageKindString (StorageKind));
 		return NULL;
 	}
 
@@ -324,6 +319,15 @@ CProperty::CalcLayout ()
 
 	if (!m_VTable.IsEmpty ())
 		return true;
+
+	if (m_pType->GetFlags () & EPropertyTypeFlag_Augmented)
+	{
+		CStructType* pStructType = GetFieldStructType (m_StorageKind);
+		if (!pStructType)
+			return false;
+
+		pStructType->AddBaseType (m_pType->GetAuFieldStructType ());			
+	}
 
 	if (m_pFieldStructType)
 	{

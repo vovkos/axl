@@ -24,7 +24,8 @@ protected:
 	friend class CParser;
 
 	CPropertyType* m_pType;
-	int m_TypeModifiers; // before the type was calculated
+	CType* m_pAuPropValueType; // before the type was calculated
+	int m_TypeModifiers;       // before the type was calculated
 
 	// construction / destruction / accessors
 
@@ -41,12 +42,10 @@ protected:
 	size_t m_ParentClassVTableIndex;
 	CStructField* m_pDataFieldMember;
 
-	// fields
+	// fields (augmented fields are stored in a base type)
 
 	size_t m_PackFactor;
 	CStructType* m_pFieldStructType;
-	CStructField* m_pPropValue;
-	CStructField* m_pOnChangeEvent;
 	CStructType* m_pStaticFieldStructType;
 	CVariable* m_pStaticDataVariable;
 
@@ -106,18 +105,6 @@ public:
 	GetFieldStructType ()
 	{
 		return m_pFieldStructType;
-	}
-
-	CStructField* 
-	GetPropValue ()
-	{
-		return m_pPropValue;
-	}
-
-	CStructField* 
-	GetOnChangeEvent ()
-	{
-		return m_pOnChangeEvent;
 	}
 
 	CStructType* 
@@ -202,6 +189,10 @@ public:
 
 	bool
 	GetVTablePtrValue (CValue* pValue);
+
+protected:
+	CStructType*
+	GetFieldStructType (EStorage StorageKind);
 };
 
 //.............................................................................

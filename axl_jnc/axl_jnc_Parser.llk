@@ -279,6 +279,13 @@ Members2
 
 	bool
 	SetOnChange (CValue* pValue);
+
+	bool
+	GetAuPropertyFieldMember (
+		CProperty* pProperty,
+		CStructField* pMember,
+		CValue* pResultValue
+		);
 } 
 
 OpenNamespace

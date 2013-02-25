@@ -22,10 +22,10 @@ protected:
 	friend class CFunctionMgr;
 	friend class CParser;
 
-	CType* m_pPropValueType;
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CPropertyVerifier m_Verifier;
+	CType* m_pAuPropValueType; // before the type was calculated
 	int m_TypeModifiers;
 
 public:

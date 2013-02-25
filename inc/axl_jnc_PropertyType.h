@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_FunctionTypeOverload.h"
+#include "axl_jnc_StructType.h"
 
 namespace axl {
 namespace jnc {
@@ -18,7 +19,7 @@ enum EPropertyPtrType;
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_ReadOnly  = 0x0100,
+	EPropertyTypeFlag_Const  = 0x0100,
 	EPropertyTypeFlag_AutoGet   = 0x0200,
 	EPropertyTypeFlag_Bindable  = 0x0400,
 	
@@ -61,7 +62,11 @@ protected:
 	CPropertyType* m_pShortType;
 	CPropertyType* m_pBindablePropertyType;
 	CStructType* m_pVTableStructType;
+	CStructType* m_pAuFieldStructType;
+	CStructField* m_pAuPropValue;
+	CStructField* m_pAuOnChangeEvent;
 	CPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
+
 
 public:
 	CPropertyType ();
@@ -132,6 +137,24 @@ public:
 		)
 	{
 		return GetPropertyPtrType (EType_PropertyPtr, PtrTypeKind, Flags);
+	}
+
+	CStructType* 
+	GetAuFieldStructType ()
+	{
+		return m_pAuFieldStructType;
+	}
+
+	CStructField* 
+	GetAuPropValue ()
+	{
+		return m_pAuPropValue;
+	}
+
+	CStructField* 
+	GetAuOnChangeEvent ()
+	{
+		return m_pAuOnChangeEvent;
 	}
 
 	CStructType*

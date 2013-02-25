@@ -36,7 +36,7 @@ enum EStdType
 	EStdType_ObjectClass,
 	EStdType_ObjectPtr,
 	EStdType_SimpleFunction,
-	EStdType_SimpleEvent,
+	EStdType_SimpleMulticast,
 	EStdType_StrenthenClosureFunction,
 	EStdType__Count,
 };
@@ -440,10 +440,10 @@ public:
 	}
 
 	CStructType* 
-	GetClosureFunctionPtrStructType (CFunctionType* pFunctionType);
+	GetFunctionPtrStructType (CFunctionType* pFunctionType);
 
 	CStructType* 
-	GetWeakClosureFunctionPtrStructType (CFunctionType* pFunctionType);
+	GetFunctionPtrStructType_w (CFunctionType* pFunctionType);
 
 	CPropertyPtrType* 
 	GetPropertyPtrType (
@@ -467,16 +467,16 @@ public:
 	GetPropertyVTableStructType (CPropertyType* pPropertyType);
 
 	CStructType*
-	GetClosurePropertyPtrStructType (CPropertyType* pPropertyType);
+	GetPropertyPtrStructType (CPropertyType* pPropertyType);
 
 	CStructType*
-	GetWeakClosurePropertyPtrStructType (CPropertyType* pPropertyType);
+	GetPropertyPtrStructType_w (CPropertyType* pPropertyType);
 
 	CStructType*
-	GetThinAuPropertyPtrStructType (CPropertyType* pPropertyType);
+	GetAuPropertyPtrStructType_t (CPropertyType* pPropertyType);
 
 	CStructType*
-	GetUnsafeAuPropertyPtrStructType (CPropertyType* pPropertyType);
+	GetAuPropertyPtrStructType_u (CPropertyType* pPropertyType);
 
 	CImportType*
 	GetImportType (	
@@ -520,25 +520,25 @@ protected:
 	CreateDataPtrStructType (CType* pDataType);
 
 	CStructType* 
-	CreateClosureFunctionPtrStructType (CFunctionType* pFunctionType);
+	CreateFunctionPtrStructType (CFunctionType* pFunctionType);
 
 	CStructType* 
-	CreateWeakClosureFunctionPtrStructType (CFunctionType* pFunctionType);
+	CreateFunctionPtrStructType_w (CFunctionType* pFunctionType);
 
 	CStructType*
 	CreatePropertyVTableStructType (CPropertyType* pPropertyType);
 
 	CStructType*
-	CreateClosurePropertyPtrStructType (CPropertyType* pPropertyType);
+	CreatePropertyPtrStructType (CPropertyType* pPropertyType);
 
 	CStructType*
-	CreateWeakClosurePropertyPtrStructType (CPropertyType* pPropertyType);
+	CreatePropertyPtrStructType_w (CPropertyType* pPropertyType);
 
 	CStructType*
-	CreateBindablePropertyThinPtrStructType (CPropertyType* pPropertyType);
+	CreateAuPropertyPtrStructType_t (CPropertyType* pPropertyType);
 
 	CStructType*
-	CreateBindablePropertyUnsafePtrStructType (CPropertyType* pPropertyType);
+	CreateAuPropertyPtrStructType_u (CPropertyType* pPropertyType);
 };
 
 //.............................................................................

@@ -50,6 +50,9 @@ CPropertyType::CPropertyType ()
 	m_pShortType = NULL;
 	m_pBindablePropertyType = NULL;
 	m_pVTableStructType = NULL;
+	m_pAuFieldStructType = NULL;
+	m_pAuPropValue = NULL;
+	m_pAuOnChangeEvent = NULL;
 	m_pPropertyPtrTypeTuple = NULL;
 }
 

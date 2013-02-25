@@ -42,10 +42,12 @@ enum EStorage
 	EStorage_Undefined = 0,
 	EStorage_Typedef,
 	EStorage_Static,
+	EStorage_Local,
+	EStorage_Member,
+	EStorage_Mutable,
 	EStorage_Abstract,
 	EStorage_Virtual,
 	EStorage_Override,
-	EStorage_Mutable,
 	EStorage__Count,
 };
 

@@ -55,6 +55,7 @@ class COperatorMgr
 protected:
 	friend class CModule;
 	friend class CFunctionMgr;
+	friend class CParser;
 	friend class CCast_FunctionPtr;
 
 	CModule* m_pModule;

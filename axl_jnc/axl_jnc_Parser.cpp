@@ -73,6 +73,14 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 			err::SetFormatStringError (_T("invalid declaration (no declarator, no named type)"));
 			return false;
 		}
+
+		if (pTypeSpecifier->GetTypeModifiers ())
+		{
+			err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (pTypeSpecifier->GetTypeModifiers ()));
+			return false;
+		}
+
+		return true;
 	}
 
 	EModuleItem ItemKind = m_pLastDeclaredItem->GetItemKind ();
@@ -88,9 +96,9 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 		break;
 			
 	case EModuleItem_Property:
-		if (pTypeSpecifier->GetTypeModifiers ())
+		if (pTypeSpecifier->GetTypeModifiers () & ~ETypeModifierMask_Property)
 		{
-			err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (pTypeSpecifier->GetTypeModifiers ()));
+			err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (pTypeSpecifier->GetTypeModifiers () & ~ETypeModifierMask_Property));
 			return false;
 		}
 
@@ -449,9 +457,7 @@ CParser::DeclareFunction (
 	{
 		m_StorageKind = 
 			FunctionKind == EFunction_StaticConstructor ? EStorage_Static :
-			NamespaceKind == ENamespace_Property && (FunctionKind == EFunction_Getter || FunctionKind == EFunction_Setter) ?
-				((CProperty*) pNamespace)->GetStorageKind () : 
-				EStorage_Undefined;
+			NamespaceKind == ENamespace_Property ? ((CProperty*) pNamespace)->GetStorageKind () : EStorage_Undefined;
 	}
 		
 	if (NamespaceKind == ENamespace_PropertyTemplate)
@@ -573,6 +579,8 @@ CParser::DeclareFunction (
 			m_pModule->m_FunctionMgr.m_OrphanFunctionArray.Append (pFunction);
 			return true;
 		}
+
+		pFunction->m_StorageKind = EStorage_Static;
 	}
 
 	if (FunctionKind != EFunction_Named)
@@ -688,6 +696,7 @@ CParser::CreatePropertyImpl (
 		if (!Result)
 			return NULL;
 
+		pProperty->m_StorageKind = EStorage_Static;
 		pProperty->m_pParentNamespace = pNamespace;
 	}
 	
@@ -789,6 +798,12 @@ CParser::DeclarePropValue (
 {
 	bool Result;
 
+	if (m_StorageKind)
+	{
+		err::SetFormatStringError (_T("'propvalue' cannot have a storage specifier"));
+		return false;
+	}
+
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
 
@@ -800,7 +815,7 @@ CParser::DeclarePropValue (
 	if (NamespaceKind == ENamespace_PropertyTemplate)
 	{
 		CPropertyTemplate* pPropertyTemplate = (CPropertyTemplate*) pNamespace;
-		pPropertyTemplate->m_pPropValueType = pType;
+		pPropertyTemplate->m_pAuPropValueType = pType;
 		pPropertyTemplate->m_TypeModifiers |= ETypeModifier_AutoGet;
 		return pPropertyTemplate->AddMethodMember (EFunction_Getter, pGetterType);
 	}
@@ -812,7 +827,7 @@ CParser::DeclarePropValue (
 	}
 
 	CProperty* pProperty = (CProperty*) pNamespace;
-	pProperty->m_pPropValue = pProperty->CreateFieldMember (m_StorageKind, pType, 0, PtrTypeFlags);
+	pProperty->m_pAuPropValueType = pType;
 	pProperty->m_TypeModifiers |= ETypeModifier_AutoGet;
 
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pGetterType);
@@ -820,7 +835,7 @@ CParser::DeclarePropValue (
 	if (!Result)
 		return false;
 
-	AssignDeclarationAttributes (pProperty->m_pPropValue, m_LastMatchedToken.m_Pos);
+	AssignDeclarationAttributes (pGetter, m_LastMatchedToken.m_Pos);
 	return true;
 }
 
@@ -1455,28 +1470,60 @@ bool
 CParser::SetPropValue (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty || !pFunction->m_pProperty->m_pPropValue)
+	if (!pFunction->m_pProperty || !pFunction->m_pProperty->GetType ()->GetAuPropValue ())
 	{
 		err::SetFormatStringError (_T("function '%s' has no 'propvalue' field"), pFunction->m_Tag);
 		return false;
 	}
-
-	CBaseTypeCoord Coord;
-	return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, pFunction->m_pProperty->m_pPropValue, &Coord, pValue);
+	
+	return GetAuPropertyFieldMember (
+		pFunction->m_pProperty, 
+		pFunction->m_pProperty->GetType ()->GetAuPropValue (),
+		pValue
+		);
 }
 
 bool
 CParser::SetOnChange (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty || !pFunction->m_pProperty->m_pOnChangeEvent)
+	if (!pFunction->m_pProperty || !pFunction->m_pProperty->GetType ()->GetAuOnChangeEvent ())
 	{
 		err::SetFormatStringError (_T("function '%s' has no 'onchange' field"), pFunction->m_Tag);
 		return false;
 	}
 
+	return GetAuPropertyFieldMember (
+		pFunction->m_pProperty, 
+		pFunction->m_pProperty->GetType ()->GetAuOnChangeEvent (),
+		pValue
+		);
+}
+
+bool
+CParser::GetAuPropertyFieldMember (
+	CProperty* pProperty,
+	CStructField* pMember,
+	CValue* pResultValue
+	)
+{
 	CBaseTypeCoord Coord;
-	return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, pFunction->m_pProperty->m_pOnChangeEvent, &Coord, pValue);
+	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
+
+	if (pProperty->GetStorageKind () == EStorage_Static)
+	{
+		return m_pModule->m_OperatorMgr.GetStructFieldMember (
+			pProperty->GetStaticDataVariable (), 
+			pMember, 
+			&Coord, 
+			pResultValue
+			);		
+	}
+	else
+	{
+		err::SetFormatStringError (_T("non-static augmented properties are not implemented yet"));
+		return false;
+	}
 }
 
 //.............................................................................

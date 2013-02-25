@@ -48,15 +48,15 @@ CFunctionPtrType::GetMcSnapshotType ()
 }
 
 CStructType* 
-CFunctionPtrType::GetClosureFunctionPtrStructType ()
+CFunctionPtrType::GetFunctionPtrStructType ()
 {
-	return m_pModule->m_TypeMgr.GetClosureFunctionPtrStructType (m_pTargetType);
+	return m_pModule->m_TypeMgr.GetFunctionPtrStructType (m_pTargetType);
 }
 
 CStructType* 
-CFunctionPtrType::GetWeakClosureFunctionPtrStructType ()
+CFunctionPtrType::GetFunctionPtrStructType_w ()
 {
-	return m_pModule->m_TypeMgr.GetWeakClosureFunctionPtrStructType (m_pTargetType);
+	return m_pModule->m_TypeMgr.GetFunctionPtrStructType_w (m_pTargetType);
 }
 
 rtl::CStringA
@@ -129,16 +129,16 @@ CFunctionPtrType::PrepareLlvmType ()
 	switch (m_PtrTypeKind)
 	{
 	case EFunctionPtrType_Normal:
-		m_pLlvmType = GetClosureFunctionPtrStructType ()->GetLlvmType ();
+		m_pLlvmType = GetFunctionPtrStructType ()->GetLlvmType ();
+		break;
+
+	case EFunctionPtrType_Weak:
+		m_pLlvmType = GetFunctionPtrStructType_w ()->GetLlvmType ();
 		break;
 
 	case EFunctionPtrType_Thin:
 	case EFunctionPtrType_Unsafe:
 		m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
-		break;
-
-	case EFunctionPtrType_Weak:
-		m_pLlvmType = GetWeakClosureFunctionPtrStructType ()->GetLlvmType ();
 		break;
 
 	default:

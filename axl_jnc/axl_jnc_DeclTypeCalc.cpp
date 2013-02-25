@@ -327,7 +327,10 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 		CallConv = ECallConv_Stdcall;
 
 	if (m_TypeModifiers & ETypeModifier_Const)
-		TypeFlags |= EPropertyTypeFlag_ReadOnly;
+		TypeFlags |= EPropertyTypeFlag_Const;
+
+	if (m_TypeModifiers & ETypeModifier_AutoGet)
+		TypeFlags |= EPropertyTypeFlag_AutoGet;
 
 	if (m_TypeModifiers & ETypeModifier_Bindable)
 		TypeFlags |= EPropertyTypeFlag_Bindable;

@@ -68,16 +68,16 @@ public:
 	}
 
 	CStructType* 
-	GetClosurePropertyPtrStructType ();
+	GetPropertyPtrStructType ();
 
 	CStructType* 
-	GetWeakClosurePropertyPtrStructType ();
+	GetPropertyPtrStructType_w ();
 
 	CStructType* 
-	GetThinAuPropertyPtrStructType ();
+	GetAuPropertyPtrStructType_t ();
 
 	CStructType* 
-	GetUnsafeAuPropertyPtrStructType ();
+	GetAuPropertyPtrStructType_u ();
 
 	static
 	rtl::CStringA

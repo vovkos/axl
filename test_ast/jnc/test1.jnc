@@ -1,21 +1,13 @@
 //.............................................................................
 
-property MyProp
+int autoget property MyProp;
+
+MyProp.set (int x)
 {
-	int propvalue;
+	printf ("MyProp.set (%d)\n", x);
+	propvalue = x;
+}
 
-	set (int x)
-	{
-		printf ("MyProp.set (%d)\n", x);
-		propvalue = x;
-		foo ();
-	}
-
-	foo ()
-	{
-		printf ("MyProp.foo (%d)\n", propvalue);
-	}
-};
 
 int 
 main ()

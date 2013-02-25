@@ -90,7 +90,7 @@ protected:
 
 	CStructType* m_pDataPtrStructType;
 	CDataPtrType* m_DataPtrArray [2] [EDataPtrType__Count] [2] [2] [2]; // ref x ptrkind x const x volatile x nonull
-	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [2]; // callconv x const
+	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [2] [2]; // callconv x const x autoget
 
 public:
 	CDataPtrTypeTuple ()

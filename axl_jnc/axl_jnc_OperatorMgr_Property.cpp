@@ -238,14 +238,14 @@ COperatorMgr::GetPropertyPropValue (
 	}
 
 	CProperty* pProperty = OpValue.GetProperty ();
-	CStructField* pField = pProperty->GetPropValue ();
+	CStructField* pField = pProperty->GetType ()->GetAuPropValue ();
 	if (!pField)
 	{
 		err::SetFormatStringError (_T("'%s' has no 'propvalue' field"), pProperty->m_Tag);
 		return false;
 	}
 
-	if (pField->GetStorageKind () != EStorage_Static)
+	if (pProperty->GetStorageKind () != EStorage_Static)
 	{
 		err::SetFormatStringError (_T("non-static 'propvalue' is not implemented yet"));
 		return false;
@@ -255,6 +255,7 @@ COperatorMgr::GetPropertyPropValue (
 	ASSERT (pStaticVariable);
 
 	CBaseTypeCoord Coord;
+	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
 	return GetStructFieldMember (pStaticVariable, pField, &Coord, pResultValue);
 }
 
@@ -264,41 +265,32 @@ COperatorMgr::GetPropertyOnChangeEvent (
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError (_T("'onchange' is not implemented yet"));
-	return false;
-
-/*
-
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
-	if (!Result)
-		return false;
-
-	CType* pOpType = OpValue.GetType ();
-	if (!pOpType->IsBindablePropertyType ())
+	if (OpValue.GetValueKind () != EValue_Property)
 	{
-		err::SetFormatStringError (_T("'onchange' can only be applied to bindable properties"));
+		err::SetFormatStringError (_T("'onchange' field for property pointers is not implemented yet"));
 		return false;
 	}
 
-	EType OpTypeKind = pOpType->GetTypeKind ();
-	if (OpTypeKind != EType_Property)
+	CProperty* pProperty = OpValue.GetProperty ();
+	CStructField* pField = pProperty->GetType ()->GetAuOnChangeEvent ();
+	if (!pField)
 	{
-		err::SetFormatStringError (_T("'onchange' for property pointers is not implemented yet"));
+		err::SetFormatStringError (_T("'%s' has no 'onchange' field"), pProperty->m_Tag);
 		return false;
 	}
 
-	CPropertyType* pPropertyType = (CPropertyType*) pOpType;
-	if (pPropertyType->GetParentClassType ())
+	if (pProperty->GetStorageKind () != EStorage_Static)
 	{
-		err::SetFormatStringError (_T("'onchange' for member properties is not implemented yet"));
+		err::SetFormatStringError (_T("non-static 'onchange' is not implemented yet"));
 		return false;
 	}
 
-//	CVariable* pEventVariable = pPropertyType->GetEventVariable ();
-//	pResultValue->SetVariable (pEventVariable);
-	return true;
-*/
+	CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
+	ASSERT (pStaticVariable);
+
+	CBaseTypeCoord Coord;
+	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
+	return GetStructFieldMember (pStaticVariable, pField, &Coord, pResultValue);
 }
 
 bool

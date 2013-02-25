@@ -10,7 +10,7 @@ namespace jnc {
 CPropertyTemplate::CPropertyTemplate ()
 {
 	m_pGetterType = NULL;
-	m_pPropValueType = NULL;
+	m_pAuPropValueType = NULL;
 	m_TypeModifiers = 0;
 }
 
@@ -46,7 +46,7 @@ CPropertyTemplate::AddMethodMember (
 CPropertyType*
 CPropertyTemplate::CalcType ()
 {
-	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pPropValueType)
+	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pAuPropValueType)
 	{
 		err::SetFormatStringError (_T("incomplete autoget property template: no 'propvalue' field"));
 		return NULL;

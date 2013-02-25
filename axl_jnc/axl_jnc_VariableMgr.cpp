@@ -47,6 +47,7 @@ CVariableMgr::CreateVariable (
 		CValue PtrValue;
 		m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name, NULL, &PtrValue);
 
+		pVariable->m_StorageKind = EStorage_Local;
 		pVariable->m_pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
 		m_LocalVariableList.InsertTail (pVariable);
@@ -54,6 +55,8 @@ CVariableMgr::CreateVariable (
 	else
 	{
 		ASSERT (VariableKind == EVariable_Global);
+
+		pVariable->m_StorageKind = EStorage_Static;
 		m_GlobalVariableList.InsertTail (pVariable);
 	}
 

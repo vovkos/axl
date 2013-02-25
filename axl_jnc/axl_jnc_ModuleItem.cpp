@@ -40,10 +40,12 @@ GetStorageKindString (EStorage StorageKind)
 		_T("undefined-storage-class"),  // EStorage_Undefined = 0,
 		_T("typedef"),                  // EStorage_Typedef,
 		_T("static"),                   // EStorage_Static,
+		_T("local"),                    // EStorage_Local,
+		_T("member"),                   // EStorage_Member,
+		_T("mutable"),                  // EStorage_Mutable,
 		_T("abstract"),                 // EStorage_Abstract,
 		_T("virtual"),                  // EStorage_Virtual,
 		_T("override"),                 // EStorage_Override,
-		_T("mutable"),                  // EStorage_Mutable,
 	};
 
 	return StorageKind >= 0 && StorageKind < EStorage__Count ? 

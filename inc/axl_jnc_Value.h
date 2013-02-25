@@ -637,17 +637,17 @@ struct TPropertyPtr_w: TPropertyPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structure backing up bindable or autoget property thin pointer declared like:
+// structure backing up augmented property (bindable or autoget) thin pointer declared like:
 // int autoget property thin* prTest (int, int);
-// if both bindable & autoget modifiers used, autodata goes first, then onchange event
+// if both bindable & autoget modifiers used then onchange event goes first followed by propvalue
 
 struct TAuPropertyPtr_t
 {
 	void** m_pVTable;
-	TDataPtr m_DataPtr;
+	TDataPtr m_AuDataPtr;
 };
 
-// structures backing up bindable or autoget property closure pointer declared like:
+// structures backing up augmented property (bindable or autoget) pointer declared like:
 // int bindable property* prTest (int, int);
 
 struct TAuPropertyPtr: TAuPropertyPtr_t
@@ -660,13 +660,13 @@ struct TAuPropertyPtr_w: TAuPropertyPtr
 	FStrengthen m_pfnStrengthen;
 };
 
-// structure backing up bindable or autoget property unsafe pointer declared like:
+// structure backing up augmented property (bindable or autoget) unsafe pointer declared like:
 // int autoget property unsafe* prTest (int, int);
 
 struct TAuPropertyPtr_u
 {
 	void** m_pVTable;
-	void* m_pData;
+	void* m_pAuData;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

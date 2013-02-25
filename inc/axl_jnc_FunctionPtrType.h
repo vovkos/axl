@@ -81,10 +81,10 @@ public:
 	GetMcSnapshotType ();
 
 	CStructType* 
-	GetClosureFunctionPtrStructType ();
+	GetFunctionPtrStructType ();
 
 	CStructType* 
-	GetWeakClosureFunctionPtrStructType ();
+	GetFunctionPtrStructType_w ();
 
 	rtl::CString
 	GetTypeModifierString ();
