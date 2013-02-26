@@ -19,11 +19,12 @@ enum EPropertyPtrType;
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_Const  = 0x0100,
-	EPropertyTypeFlag_AutoGet   = 0x0200,
-	EPropertyTypeFlag_Bindable  = 0x0400,
+	EPropertyTypeFlag_Const     = 0x0100,
+	EPropertyTypeFlag_Bindable  = 0x0200,
+	EPropertyTypeFlag_AutoGet   = 0x0400,
+	EPropertyTypeFlag_AutoSet   = 0x0800,
 	
-	EPropertyTypeFlag_Augmented = EPropertyTypeFlag_AutoGet | EPropertyTypeFlag_Bindable,
+	EPropertyTypeFlag_Augmented = EPropertyTypeFlag_Bindable | EPropertyTypeFlag_AutoGet,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -186,6 +187,23 @@ protected:
 	PrepareLlvmType ()
 	{
 		ASSERT (false);
+	}
+};
+
+//.............................................................................
+
+class CPropertyTypeTuple: public rtl::TListLink
+{
+protected:
+	friend class CTypeMgr;
+
+	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [2] [3]; // callconv x const x autoget/autoset
+	CPropertyType* m_DataRefPropertyTypeArray [ECallConv__Count] [2]; // callconv x const
+
+public:
+	CPropertyTypeTuple ()
+	{
+		memset (this, 0, sizeof (CPropertyTypeTuple));
 	}
 };
 

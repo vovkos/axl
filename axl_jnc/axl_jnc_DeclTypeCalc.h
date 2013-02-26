@@ -52,6 +52,9 @@ protected:
 	CPropertyType*
 	GetPropertyType (CType* pReturnType);
 
+	CPropertyType*
+	GetBindableDataType (CType* pDataType);
+
 	CMulticastType*
 	GetMulticastType (CType* pReturnType);
 
@@ -66,6 +69,9 @@ protected:
 
 	CPropertyPtrType*
 	GetPropertyPtrType (CPropertyType* pPropertyType);
+
+	CType*
+	PrepareReturnType (CType* pType);
 };
 
 //.............................................................................

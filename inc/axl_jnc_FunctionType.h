@@ -42,6 +42,19 @@ GetCallConvString (ECallConv CallConv);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+ECallConv
+GetCallConvFromModifiers (int Modifiers)
+{
+	return 
+		(Modifiers & ETypeModifier_Cdecl) ? ECallConv_Cdecl :
+		(Modifiers & ETypeModifier_Stdcall) ? ECallConv_Stdcall : ECallConv_Default;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 inline
 llvm::CallingConv::ID
 GetLlvmCallConv (ECallConv CallConv)

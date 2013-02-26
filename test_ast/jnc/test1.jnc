@@ -1,12 +1,6 @@
 //.............................................................................
 
-int autoget bindable property MyProp;
-
-MyProp.set (int x)
-{
-	printf ("CTest.MyProp.set (%d)\n", x);
-	propvalue = x;
-}
+bindable int MyProp;
 
 foo ()
 {

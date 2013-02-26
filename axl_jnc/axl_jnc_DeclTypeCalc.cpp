@@ -92,6 +92,12 @@ CDeclTypeCalc::CalcType (
 		if (!pType)
 			return false;
 	}
+	else if (m_TypeModifiers & ETypeModifier_Bindable)
+	{
+		pType = GetBindableDataType (pType);
+		if (!pType)
+			return false;
+	}
 
 	while (m_Suffix)
 	{
@@ -225,37 +231,43 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 	return m_pModule->m_TypeMgr.GetArrayType (pElementType, pSuffix->GetElementCount ());
 }
 
-CFunctionType*
-CDeclTypeCalc::GetFunctionType (CType* pReturnType)
+CType*
+CDeclTypeCalc::PrepareReturnType (CType* pType)
 {
 	while (m_Suffix && m_Suffix->GetSuffixKind () == EDeclSuffix_Array)
 	{
-		pReturnType = GetArrayType (pReturnType);
-		if (!pReturnType)
+		pType = GetArrayType (pType);
+		if (!pType)
 			return NULL;
 	}
 
-	EType TypeKind = pReturnType->GetTypeKind ();
+	EType TypeKind = pType->GetTypeKind ();
 	switch (TypeKind)
 	{
 	case EType_Function:
 	case EType_Property:
 	case EType_Multicast:
-		err::SetFormatStringError (_T("function cannot return '%s'"), pReturnType->GetTypeString ());
+		err::SetFormatStringError (_T("function cannot return '%s'"), pType->GetTypeString ());
 		return NULL;
 
 	case EType_Class:
-		pReturnType= GetClassPtrType ((CClassType*) pReturnType);
+		pType = GetClassPtrType ((CClassType*) pType);
 		break;
 
 	default:
 		if (m_TypeModifiers & ETypeModifierMask_Integer)
-		{
-			pReturnType = GetIntegerType (pReturnType);
-			if (!pReturnType)
-				return NULL;
-		}
+			pType = GetIntegerType (pType);
 	}
+
+	return pType;
+}
+
+CFunctionType*
+CDeclTypeCalc::GetFunctionType (CType* pReturnType)
+{
+	pReturnType = PrepareReturnType (pReturnType);
+	if (!pReturnType)
+		return NULL;
 
 	if (!m_Suffix || m_Suffix->GetSuffixKind () != EDeclSuffix_Function)
 	{
@@ -265,13 +277,7 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 
 	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
 
-	ECallConv CallConv = ECallConv_Default;
-
-	if (m_TypeModifiers & ETypeModifier_Cdecl)
-		CallConv = ECallConv_Cdecl;
-
-	if (m_TypeModifiers & ETypeModifier_Stdcall)
-		CallConv = ECallConv_Stdcall;
+	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
 
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
 
@@ -286,46 +292,19 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 CPropertyType*
 CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 {
-	while (m_Suffix && m_Suffix->GetSuffixKind () == EDeclSuffix_Array)
-	{
-		pReturnType = GetArrayType (pReturnType);
-		if (!pReturnType)
-			return NULL;
-	}
-
-	EType TypeKind = pReturnType->GetTypeKind ();
-	switch (TypeKind)
-	{
-	case EType_Void:
-	case EType_Function:
-	case EType_Property:
-	case EType_Multicast:
-		err::SetFormatStringError (_T("property cannot return '%s'"), pReturnType->GetTypeString ());
+	pReturnType = PrepareReturnType (pReturnType);
+	if (!pReturnType)
 		return NULL;
 
-	case EType_Class:
-		pReturnType= GetClassPtrType ((CClassType*) pReturnType);
-		break;
-
-	default:
-		if (m_TypeModifiers & ETypeModifierMask_Integer)
-		{
-			pReturnType = GetIntegerType (pReturnType);
-			if (!pReturnType)
-				return NULL;
-		}
+	if (pReturnType->GetTypeKind () == EType_Void)
+	{
+		err::SetFormatStringError (_T("property cannot return 'void'"));
+		return NULL;
 	}
 
-	CPropertyType* pPropertyType;
+	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
+
 	int TypeFlags = 0;
-	ECallConv CallConv = ECallConv_Default;
-
-	if (m_TypeModifiers & ETypeModifier_Cdecl)
-		CallConv = ECallConv_Cdecl;
-
-	if (m_TypeModifiers & ETypeModifier_Stdcall)
-		CallConv = ECallConv_Stdcall;
-
 	if (m_TypeModifiers & ETypeModifier_Const)
 		TypeFlags |= EPropertyTypeFlag_Const;
 
@@ -335,9 +314,11 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 	if (m_TypeModifiers & ETypeModifier_Bindable)
 		TypeFlags |= EPropertyTypeFlag_Bindable;
 
+	m_TypeModifiers &= ~ETypeModifierMask_Property;
+
 	if (!(m_TypeModifiers & ETypeModifier_Indexed))
 	{
-		pPropertyType = m_pModule->m_TypeMgr.GetSimplePropertyType (
+		return m_pModule->m_TypeMgr.GetSimplePropertyType (
 			CallConv, 
 			pReturnType, 
 			TypeFlags
@@ -352,16 +333,42 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 		}
 
 		CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
-		pPropertyType = m_pModule->m_TypeMgr.GetIndexedPropertyType (
+		return m_pModule->m_TypeMgr.GetIndexedPropertyType (
 			CallConv, 
 			pReturnType, 
 			pSuffix->GetArgTypeArray (),
 			TypeFlags
 			);
 	}
+}
+
+CPropertyType*
+CDeclTypeCalc::GetBindableDataType (CType* pDataType)
+{
+	pDataType = PrepareReturnType (pDataType);
+	if (!pDataType)
+		return NULL;
+
+	if (pDataType->GetTypeKind () == EType_Void)
+	{
+		err::SetFormatStringError (_T("bindable data cannot be 'void'"));
+		return NULL;
+	}
+
+	if (m_TypeModifiers & ETypeModifier_Indexed)
+	{
+		err::SetFormatStringError (_T("bindable data cannot be 'indexed'"));
+		return NULL;
+	}
+
+	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
+	int TypeFlags = 
+		EPropertyTypeFlag_Bindable | 
+		EPropertyTypeFlag_AutoGet | 
+		EPropertyTypeFlag_AutoSet;
 
 	m_TypeModifiers &= ~ETypeModifierMask_Property;
-	return pPropertyType;
+	return m_pModule->m_TypeMgr.GetSimplePropertyType (CallConv, pDataType, TypeFlags);
 }
 
 CMulticastType*

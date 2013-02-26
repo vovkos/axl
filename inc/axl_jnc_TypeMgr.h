@@ -68,10 +68,13 @@ protected:
 	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
 	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
+
+	rtl::CStdListT <CPropertyTypeTuple> m_PropertyTypeTupleList;
 	rtl::CStdListT <CDataPtrTypeTuple> m_DataPtrTypeTupleList;
 	rtl::CStdListT <CClassPtrTypeTuple> m_ClassPtrTypeTupleList;
 	rtl::CStdListT <CFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
 	rtl::CStdListT <CPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
+
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
 	size_t m_UnnamedTypeCounter;
@@ -485,6 +488,9 @@ public:
 		);
 
 protected:
+	CPropertyTypeTuple*
+	GetPropertyTypeTuple (CType* pType);
+
 	CDataPtrTypeTuple*
 	GetDataPtrTypeTuple (CType* pType);
 

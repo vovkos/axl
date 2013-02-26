@@ -285,12 +285,16 @@ COperatorMgr::GetProperty (
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	
 	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_AutoGet)
+	{
 		return GetAuPropertyFieldMember (OpValue, EAuPropertyField_PropValue, pResultValue);
-
-	CValue GetterValue;
-	return 
-		GetPropertyGetter (OpValue, &GetterValue) &&
-		CallOperator (GetterValue, NULL, pResultValue);
+	}
+	else
+	{
+		CValue GetterValue;
+		return 
+			GetPropertyGetter (OpValue, &GetterValue) &&
+			CallOperator (GetterValue, NULL, pResultValue);
+	}
 }
 
 bool
@@ -301,191 +305,29 @@ COperatorMgr::SetProperty (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
-	
-	rtl::CBoxListT <CValue> ArgList;
-	ArgList.InsertTail (SrcValue);
 
-	CValue SetterValue;
-	CValue ReturnValue;
-	return 
-		GetPropertySetter (OpValue, SrcValue, &SetterValue) &&
-		CallOperator (SetterValue, &ArgList, &ReturnValue);
-}
-
-
-/*
-
-bool
-COperatorMgr::GetProperty (
-	const CValue& RawOpValue,
-	CValue* pResultValue
-	)
-{
-	ASSERT (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
-
-	CPropertyType* pPropertyType;
-	CValue OpValue;
-	CValue InterfaceValue;
-
-	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPtr)
-	{
-		m_pModule->m_LlvmBuilder.CheckNullPtr (RawOpValue);
-
-		CPropertyPtrType* pPropertyPointerType = (CPropertyPtrType*) RawOpValue.GetType ();
-		pPropertyType = pPropertyPointerType->GetPropertyType ();
-		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 0, pPropertyType, &OpValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (RawOpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_Object), &InterfaceValue);
-	}
-	else
-	{
-		ASSERT (RawOpValue.GetType ()->GetTypeKind () == EType_Property);
-		pPropertyType = (CPropertyType*) RawOpValue.GetType ();
-		OpValue = RawOpValue;
-	}
-	
-	CFunction* pFunction = pPropertyType->GetGetter ();
-	ASSERT (pFunction->GetPropertyType () == pPropertyType);
-
-	CValue FunctionValue;
-
-	if (OpValue.GetValueKind () == EValue_Property)
-	{
-		FunctionValue = pFunction;
-	}
-	else
-	{
-		// pfn*
-
-		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue, pFunction->GetPropertyVTableIndex (), NULL, &PtrValue);
-
-		// pfn
-
-		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType ()->GetDataPtrType (EType_DataPtr_u), &FunctionValue);
-	}
-
-	if (RawOpValue.GetType ()->GetTypeKind () == EType_PropertyPtr)
-	{
-		m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (
-			FunctionValue, 
-			InterfaceValue,
-			pFunction->GetType ()->GetFunctionPtrType (),
-			&FunctionValue
-			);
-	}
-
-	FunctionValue.SetClosure (OpValue.GetClosure ());
-	return CallOperator (FunctionValue, NULL, pResultValue);
-}
-
-bool
-COperatorMgr::SetProperty (
-	const CValue& SrcValue,
-	const CValue& RawDstValue
-	)
-{
-	ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyRef);
-
-	bool Result;
-
-	CPropertyType* pPropertyType;
-	CValue DstValue;
-	CValue InterfaceValue;
-	CValue EventValue;
-
-	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPtr)
-	{
-		CPropertyPtrType* pPropertyPointerType = (CPropertyPtrType*) RawDstValue.GetType ();
-		pPropertyType = pPropertyPointerType->GetPropertyType ();
-		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 0, pPropertyType, &DstValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (RawDstValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_Object), &InterfaceValue);
-	}
-	else
-	{
-		ASSERT (RawDstValue.GetType ()->GetTypeKind () == EType_Property);
-		pPropertyType = (CPropertyType*) RawDstValue.GetType ();
-		DstValue = RawDstValue;
+	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_AutoSet)
+	{	
+		CValue PropValue;
+		CValue OnChangeValue;
+		CValue ReturnValue;
 		
-		if (pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable)
-		{
-			CVariable* pEventVariable = pPropertyType->GetEventVariable ();
-			EventValue.SetVariable (pEventVariable);
-		}
-	}
-
-	if (pPropertyType->IsReadOnly ())
-	{
-		err::SetFormatStringError (_T("cannot assign to a read-only property"));
-		return false;
-	}
-
-	CClosure* pClosure = DstValue.GetClosure ();
-
-	rtl::CBoxListT <CValue> ArgList;
-	ArgList.InsertTail (SrcValue);
-
-	if (pClosure)
-		pClosure->Apply (&ArgList);
-
-	CFunction* pSetter = pPropertyType->GetSetter);
-	CFunction* pFunction = pSetter->ChooseOverload (&ArgList);
-	if (!pFunction)
-		return false;
-
-	ASSERT (pFunction->GetPropertyType () == pPropertyType);
-
-	CValue FunctionValue;
-	if (DstValue.GetValueKind () == EValue_Property)
-	{
-		FunctionValue = pFunction;
+		return
+			GetAuPropertyFieldMember (OpValue, EAuPropertyField_PropValue, &PropValue) &&
+			GetAuPropertyFieldMember (OpValue, EAuPropertyField_OnChangeEvent, &OnChangeValue) &&
+			StoreDataRef (PropValue, SrcValue) &&
+			CallOperator (OnChangeValue, &ReturnValue);
 	}
 	else
 	{
-		// pfn*
+		CValue SetterValue;
+		CValue ReturnValue;
 
-		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (DstValue, pFunction->GetPropertyVTableIndex (), NULL, &PtrValue);
-
-		// pfn
-
-		m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pFunction->GetType ()->GetDataPtrType (EType_DataPtr_u), &FunctionValue);
+		return 
+			GetPropertySetter (OpValue, SrcValue, &SetterValue) &&
+			CallOperator (SetterValue, SrcValue, &ReturnValue);
 	}
-
-	if (RawDstValue.GetType ()->GetTypeKind () == EType_PropertyPtr)
-	{
-		m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (
-			FunctionValue, 
-			InterfaceValue,
-			pFunction->GetType ()->GetFunctionPtrType (),
-			&FunctionValue
-			);
-	}
-
-	CValue ReturnValue;
-	Result = CallOperator (FunctionValue, &ArgList, &ReturnValue);
-	if (!Result)
-		return false;
-
-	if (!EventValue.IsEmpty ())
-	{
-		CValue EventPtrValue;
-		bool Result = PrepareDataPtr (EventValue, EPrepareDataPtrFlag_Store, &EventPtrValue);
-		if (!Result)
-			return false;
-
-		CFunction* pFireSimpleEvent = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_FireSimpleEvent);
-		m_pModule->m_LlvmBuilder.CreateCall (
-			pFireSimpleEvent,
-			pFireSimpleEvent->GetType (),
-			EventPtrValue,
-			&ReturnValue
-			);
-	}
-
-	return true;
 }
-
-*/
 
 //.............................................................................
 

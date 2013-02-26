@@ -15,6 +15,7 @@ class CStructType;
 class CPropertyType;
 class CDataPtrType;
 class CDataPtrTypeTuple;
+class CPropertyTypeTuple;
 class CValue;
 
 enum EDataPtrType;
@@ -452,6 +453,7 @@ protected:
 	llvm::Type* m_pLlvmType;
 
 	CDataPtrTypeTuple* m_pDataPtrTypeTuple;
+	CPropertyTypeTuple* m_pPropertyTypeTuple;
 
 public:
 	CType ();

@@ -36,6 +36,8 @@ CTypeMgr::Clear ()
 	m_FunctionPtrTypeList.Clear ();
 	m_PropertyPtrTypeList.Clear ();
 	m_ImportTypeList.Clear ();
+
+	m_PropertyTypeTupleList.Clear ();
 	m_DataPtrTypeTupleList.Clear ();
 	m_ClassPtrTypeTupleList.Clear ();
 	m_FunctionPtrTypeTupleList.Clear ();
@@ -511,11 +513,11 @@ CTypeMgr::GetSimplePropertyType (
 		return GetBindablePropertyType (pPropertType);
 	}
 
-	CDataPtrTypeTuple* pTuple = GetDataPtrTypeTuple (pReturnType);
+	CPropertyTypeTuple* pTuple = GetPropertyTypeTuple (pReturnType);
 
 	size_t i1 = CallConv == ECallConv_Stdcall;
 	size_t i2 = (Flags & EPropertyTypeFlag_Const) != 0;
-	size_t i3 = (Flags & EPropertyTypeFlag_AutoGet) != 0;
+	size_t i3 = (Flags & EPropertyTypeFlag_AutoSet) ? 2 : (Flags & EPropertyTypeFlag_AutoGet) ? 1 : 0;
 
 	if (pTuple->m_SimplePropertyTypeArray [i1] [i2] [i3])
 		return pTuple->m_SimplePropertyTypeArray [i1] [i2] [i3];
@@ -1034,6 +1036,18 @@ CTypeMgr::GetImportType (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+CPropertyTypeTuple*
+CTypeMgr::GetPropertyTypeTuple (CType* pType)
+{
+	if (pType->m_pPropertyTypeTuple)
+		return pType->m_pPropertyTypeTuple;
+
+	CPropertyTypeTuple* pTuple = AXL_MEM_NEW (CPropertyTypeTuple);
+	pType->m_pPropertyTypeTuple = pTuple;
+	m_PropertyTypeTupleList.InsertTail (pTuple);
+	return pTuple;
+}
+
 CDataPtrTypeTuple*
 CTypeMgr::GetDataPtrTypeTuple (CType* pType)
 {
@@ -1081,6 +1095,7 @@ CTypeMgr::GetPropertyPtrTypeTuple (CPropertyType* pPropertyType)
 	m_PropertyPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }
+
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

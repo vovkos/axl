@@ -176,6 +176,7 @@ CType::CType ()
 	m_Size = 0;
 	m_pLlvmType = NULL;
 	m_pDataPtrTypeTuple = NULL;
+	m_pPropertyTypeTuple = NULL;
 }
 
 rtl::CString 
