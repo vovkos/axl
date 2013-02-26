@@ -10,17 +10,15 @@ namespace jnc {
 const tchar_t*
 GetCallConvString (ECallConv CallConv)
 {
-	switch (CallConv)
-	{	
-	case ECallConv_Cdecl:
-		return _T("cdecl");
+	static const tchar_t* StringTable [] = 
+	{
+		_T("cdec"),     // ECallConv_Cdecl,
+		_T("stdcall"),  // ECallConv_Stdcall,
+	};
 
-	case ECallConv_Stdcall:
-		return _T("stdcall");
-
-	default:
-		return _T("undefined-calling-convention");
-	}
+	return (size_t) CallConv < countof (StringTable) ? 
+		StringTable [CallConv] : 
+		_T("undefined-calling-convention");
 }
 
 //.............................................................................

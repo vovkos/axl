@@ -30,7 +30,7 @@ GetFunctionKindString (EFunction FunctionKind)
 		_T("thunk"),                    // EFunction_Thunk,
 	};
 
-	return FunctionKind >= 0 && FunctionKind < EFunction__Count ? 
+	return (size_t) FunctionKind < EFunction__Count ? 
 		StringTable [FunctionKind] : 
 		StringTable [EFunction_Undefined];
 }
@@ -304,17 +304,24 @@ CFunction::ResolveOrphan ()
 		return false;
 	}
 
-	m_AccessKind = pOriginFunction->m_AccessKind;
-	m_pParentNamespace = pOriginFunction->m_pParentNamespace;
-	m_pType = pOriginFunction->m_pType;
-	m_Name = pOriginFunction->m_Name;
-	m_QualifiedName = pOriginFunction->m_QualifiedName;
-	m_Tag = pOriginFunction->m_Tag;
-	m_pClassType = pOriginFunction->m_pClassType;
-	m_pVirtualOriginClassType = pOriginFunction->m_pVirtualOriginClassType;
-	m_pProperty = pOriginFunction->m_pProperty;
-
+	MakeStub (pOriginFunction);
 	return true;
+}
+
+void
+CFunction::MakeStub (CFunction* pFunction)
+{
+	m_AccessKind = pFunction->m_AccessKind;
+	m_pParentNamespace = pFunction->m_pParentNamespace;
+	m_pType = pFunction->m_pType;
+	m_Name = pFunction->m_Name;
+	m_QualifiedName = pFunction->m_QualifiedName;
+	m_Tag = pFunction->m_Tag;
+	m_pClassType = pFunction->m_pClassType;
+	m_pThisArgType = pFunction->m_pThisArgType;
+	m_pThisType = pFunction->m_pThisType;
+	m_pVirtualOriginClassType = pFunction->m_pVirtualOriginClassType;
+	m_pProperty = pFunction->m_pProperty;
 }
 
 //.............................................................................

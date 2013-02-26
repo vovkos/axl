@@ -24,7 +24,6 @@
 #define new DEBUG_NEW
 #endif
 
-
 // CAstApp
 
 BEGIN_MESSAGE_MAP(CAstApp, CWinAppEx)
@@ -72,7 +71,6 @@ CAstApp theApp;
 BOOL CAstApp::InitInstance()
 {
 //	_crtBreakAlloc = 401;
-	atexit (&clear_type_info_cache);
 
 	llvm::InitializeNativeTarget ();
 	err::CParseErrorProvider::Register ();

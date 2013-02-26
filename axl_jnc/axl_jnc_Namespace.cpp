@@ -75,7 +75,7 @@ GetNamespaceKindString (ENamespace NamespaceKind)
 		_T("property-template"),         // ENamespace_PropertyTemplate,
 	};
 
-	return NamespaceKind >= 0 && NamespaceKind < ENamespace__Count ? 
+	return (size_t) NamespaceKind < ENamespace__Count ? 
 		StringTable [NamespaceKind] : 
 		StringTable [ENamespace_Undefined];
 }

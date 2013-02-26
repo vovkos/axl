@@ -50,7 +50,7 @@ CMulticastType::GetMethod (
 {
 	GetMulticastStructType ();
 
-	ASSERT (Method >= 0 && Method < EMulticastMethod__Count);
+	ASSERT ((size_t) Method < EMulticastMethod__Count);
 
 	size_t i2 = PtrTypeKind == EDataPtrType_Unsafe;
 

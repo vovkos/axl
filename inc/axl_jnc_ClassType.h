@@ -218,14 +218,14 @@ public:
 	CFunction*
 	GetUnaryOperator (EUnOp OpKind)
 	{
-		ASSERT (OpKind >= 0 && OpKind < EUnOp__Count);
+		ASSERT ((size_t) OpKind < EUnOp__Count);
 		return m_UnaryOperatorTable ? m_UnaryOperatorTable [OpKind] : NULL;
 	}
 
 	CFunction*
 	GetBinaryOperator (EBinOp OpKind)
 	{
-		ASSERT (OpKind >= 0 && OpKind < EBinOp__Count);
+		ASSERT ((size_t) OpKind < EBinOp__Count);
 		return m_BinaryOperatorTable ? m_BinaryOperatorTable [OpKind] : NULL;
 	}
 

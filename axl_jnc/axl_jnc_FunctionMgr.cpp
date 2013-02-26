@@ -123,6 +123,8 @@ CFunctionMgr::CalcPropertyLayouts ()
 	return true;
 }
 
+#ifdef _AXL_JNC_PARSER_H
+
 bool
 CFunctionMgr::CompileFunctions ()
 {
@@ -238,6 +240,78 @@ CFunctionMgr::CompileFunctions ()
 	return true;
 }
 
+#endif
+
+CFunction*
+CFunctionMgr::CreateBindableSetterStubFunction (CFunction* pFunction)
+{
+	ASSERT (
+		pFunction->m_FunctionKind == EFunction_Setter &&
+		pFunction->m_pProperty && 
+		pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable
+		);
+
+	size_t ArgCount = pFunction->m_pType->GetArgTypeArray ().GetCount ();
+
+	CFunction* pStubFunction = CreateFunction (EFunction_Setter, pFunction->m_pType, &pFunction->m_ArgList);	
+	pStubFunction->MakeStub (pFunction);
+	pStubFunction->m_Tag = pFunction->m_Tag + _T(".stub");
+
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);
+
+	InternalPrologue (pFunction, ArgValueArray, ArgCount);
+
+	CValue ReturnValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pStubFunction, 
+		pStubFunction->m_pType, 
+		ArgValueArray,
+		ArgCount,
+		&ReturnValue
+		);
+
+	CValue PropertyValue = pFunction->m_pProperty;
+
+	/*
+	if (pFunction->m_pThisType)
+	{
+		llvm::Value* pLlvmArg = LlvmArg;
+		CValue ThisArgValue (pLlvmArg, pFunction->m_pThisArgType);			
+
+		if (pFunction->m_pThisArgType->Cmp (pFunction->m_pThisType) == 0)
+		{
+			*pThisValue = ThisArgValue;
+		}
+		else
+		{
+			ASSERT (pFunction->m_ThisArgDelta < 0);
+
+			CValue BytePtrValue;
+			m_pModule->m_LlvmBuilder.CreateBitCast (ThisArgValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &BytePtrValue);
+			m_pModule->m_LlvmBuilder.CreateGep (BytePtrValue, pFunction->m_ThisArgDelta, NULL, &BytePtrValue);
+			m_pModule->m_LlvmBuilder.CreateBitCast (BytePtrValue, pFunction->m_pThisType, pThisValue);
+		}
+
+		LlvmArg++;
+	}
+
+	*/
+	
+	CValue OnChangeEventValue;
+	CValue OnChangeReturnValue;
+	bool Result = 
+		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (PropertyValue, EAuPropertyField_OnChangeEvent, &OnChangeEventValue) &&
+		m_pModule->m_OperatorMgr.CallOperator (OnChangeEventValue, &OnChangeReturnValue);
+
+	m_pModule->m_ControlFlowMgr.Return (ReturnValue);
+
+	InternalEpilogue ();
+
+	return pStubFunction;
+}
+
 bool
 CFunctionMgr::Prologue (
 	CFunction* pFunction,
@@ -245,6 +319,14 @@ CFunctionMgr::Prologue (
 	CValue* pThisValue
 	)
 {
+	if (pFunction->m_FunctionKind == EFunction_Setter &&
+		pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable)
+	{
+		pFunction = CreateBindableSetterStubFunction (pFunction);
+		if (!pFunction)
+			return false;
+	}
+
 	m_pCurrentFunction = pFunction;
 
 	// create scope
@@ -967,7 +1049,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 CFunction*
 CFunctionMgr::GetStdFunction (EStdFunc Func)
 {
-	ASSERT (Func >= 0 && Func < EStdFunc__Count);
+	ASSERT ((size_t) Func < EStdFunc__Count);
 
 	if (m_StdFunctionArray [Func])
 		return m_StdFunctionArray [Func];

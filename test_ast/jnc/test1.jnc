@@ -1,18 +1,30 @@
 //.............................................................................
 
-int autoget property MyProp;
+int autoget bindable property MyProp;
 
 MyProp.set (int x)
 {
-	printf ("MyProp.set (%d)\n", x);
+	printf ("CTest.MyProp.set (%d)\n", x);
 	propvalue = x;
 }
 
+foo ()
+{
+	printf ("foo ()\n");
+}
+
+bar ()
+{
+	printf ("bar ()\n");
+}
 
 int 
 main ()
 {
 	printf ("hui govno i muravei\n");
+
+	MyProp.onchange += foo;
+	MyProp.onchange += bar;
 
 	MyProp = 50;
 

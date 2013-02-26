@@ -17,7 +17,7 @@ GetDataPtrTypeKindString (EDataPtrType PtrTypeKind)
 		_T("unsafe"), // EDataPtrType_Unsafe,
 	};
 
-	return PtrTypeKind >= 0 && PtrTypeKind < EDataPtrType__Count ? 
+	return (size_t) PtrTypeKind < EDataPtrType__Count ? 
 		StringTable [PtrTypeKind] : 
 		_T("undefined-data-ptr-kind");
 }

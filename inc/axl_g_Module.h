@@ -82,8 +82,6 @@ public:
 
 //.............................................................................
 
-#ifndef _AXL_CUSTOM_MODULE
-
 AXL_SELECT_ANY 
 CModule g_Module;
 
@@ -93,13 +91,6 @@ GetModule ()
 {
 	return &g_Module;
 }
-
-#else
-
-CModule*
-GetModule ();
-
-#endif
 
 //.............................................................................
 

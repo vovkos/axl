@@ -41,6 +41,22 @@ GetPropertyTypeFlagsFromModifiers (int Modifiers)
 	
 //.............................................................................
 
+const tchar_t* 
+GetAuPropertyFieldString (EAuPropertyField Field)
+{
+	static const tchar_t* StringTable [] = 
+	{
+		_T("onchange"),   // EAuPropertyField_OnChange,
+		_T("propvalue"),  // EAuPropertyField_PropValue,
+	};
+
+	return (size_t) Field < countof (StringTable) ? 
+		StringTable [Field] : 
+		_T("undefined-augmented-property-type-field");
+}
+
+//.............................................................................
+
 CPropertyType::CPropertyType ()
 {
 	m_TypeKind = EType_Property;
@@ -51,8 +67,7 @@ CPropertyType::CPropertyType ()
 	m_pBindablePropertyType = NULL;
 	m_pVTableStructType = NULL;
 	m_pAuFieldStructType = NULL;
-	m_pAuPropValue = NULL;
-	m_pAuOnChangeEvent = NULL;
+	memset (m_AuFieldArray, 0, sizeof (m_AuFieldArray));
 	m_pPropertyPtrTypeTuple = NULL;
 }
 

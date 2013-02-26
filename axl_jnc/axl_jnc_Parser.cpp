@@ -1219,7 +1219,7 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	{
 		CValue EventValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue);// &&
+			m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*PropertyValue, EAuPropertyField_OnChangeEvent, &EventValue);// &&
 			// m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Add);
 
 		if (!Result)
@@ -1241,7 +1241,7 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	{
 		CValue EventValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent (*PropertyValue, &EventValue);// &&
+			m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*PropertyValue, EAuPropertyField_OnChangeEvent, &EventValue);// &&
 			//m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Remove);
 
 		if (!Result)
@@ -1454,7 +1454,7 @@ CParser::LookupIdentifier (
 }
 
 bool
-CParser::SetThis (CValue* pValue)
+CParser::GetThis (CValue* pValue)
 {
 	if (m_ThisValue.IsEmpty ())
 	{
@@ -1467,63 +1467,19 @@ CParser::SetThis (CValue* pValue)
 }
 
 bool
-CParser::SetPropValue (CValue* pValue)
-{
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty || !pFunction->m_pProperty->GetType ()->GetAuPropValue ())
-	{
-		err::SetFormatStringError (_T("function '%s' has no 'propvalue' field"), pFunction->m_Tag);
-		return false;
-	}
-	
-	return GetAuPropertyFieldMember (
-		pFunction->m_pProperty, 
-		pFunction->m_pProperty->GetType ()->GetAuPropValue (),
-		pValue
-		);
-}
-
-bool
-CParser::SetOnChange (CValue* pValue)
-{
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty || !pFunction->m_pProperty->GetType ()->GetAuOnChangeEvent ())
-	{
-		err::SetFormatStringError (_T("function '%s' has no 'onchange' field"), pFunction->m_Tag);
-		return false;
-	}
-
-	return GetAuPropertyFieldMember (
-		pFunction->m_pProperty, 
-		pFunction->m_pProperty->GetType ()->GetAuOnChangeEvent (),
-		pValue
-		);
-}
-
-bool
 CParser::GetAuPropertyFieldMember (
-	CProperty* pProperty,
-	CStructField* pMember,
-	CValue* pResultValue
+	CValue* pValue,
+	EAuPropertyField Field
 	)
 {
-	CBaseTypeCoord Coord;
-	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
-
-	if (pProperty->GetStorageKind () == EStorage_Static)
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	if (!pFunction->m_pProperty)
 	{
-		return m_pModule->m_OperatorMgr.GetStructFieldMember (
-			pProperty->GetStaticDataVariable (), 
-			pMember, 
-			&Coord, 
-			pResultValue
-			);		
-	}
-	else
-	{
-		err::SetFormatStringError (_T("non-static augmented properties are not implemented yet"));
+		err::SetFormatStringError (_T("function '%s' has no '%s' field"), pFunction->m_Tag, GetAuPropertyFieldString (Field));
 		return false;
 	}
+
+	return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (pFunction->m_pProperty, Field, pValue);
 }
 
 //.............................................................................

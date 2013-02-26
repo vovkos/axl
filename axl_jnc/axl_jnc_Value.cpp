@@ -75,7 +75,7 @@ GetValueKindString (EValue ValueKind)
 		_T("bool-or"),       // EValue_BoolOr,
 	};
 
-	return ValueKind >= 0 && ValueKind < EValue__Count ? 
+	return (size_t) ValueKind < EValue__Count ? 
 		StringTable [ValueKind] : 
 		_T("undefined-value-kind");
 }
@@ -92,7 +92,7 @@ GetAllocKindString (EAlloc AllocKind)
 		_T("stack"),                // EAlloc_Stack,
 	};
 
-	return AllocKind >= 0 && AllocKind < EAlloc__Count ? 
+	return (size_t) AllocKind < EAlloc__Count ? 
 		StringTable [AllocKind] : 
 		StringTable [EAlloc_Undefined];
 }

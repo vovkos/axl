@@ -18,7 +18,7 @@ GetFunctionPtrTypeKindString (EFunctionPtrType PtrTypeKind)
 		_T("unsafe"),   // EFunctionPtrType_Unsafe,
 	};
 
-	return PtrTypeKind >= 0 && PtrTypeKind < EFunctionPtrType__Count ? 
+	return (size_t) PtrTypeKind < EFunctionPtrType__Count ? 
 		StringTable [PtrTypeKind] : 
 		_T("undefined-function-ptr-kind");
 }

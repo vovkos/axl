@@ -22,6 +22,8 @@ ParserClassName = CParser;
 
 Includes
 {
+	#define _AXL_JNC_PARSER_H
+
 	#include "axl_jnc_Lexer.h"
 	#include "axl_jnc_Module.h"
 	#include "axl_jnc_Decl.h"
@@ -272,19 +274,12 @@ Members2
 		);
 
 	bool
-	SetThis (CValue* pValue);
-
-	bool
-	SetPropValue (CValue* pValue);
-
-	bool
-	SetOnChange (CValue* pValue);
+	GetThis (CValue* pValue);
 
 	bool
 	GetAuPropertyFieldMember (
-		CProperty* pProperty,
-		CStructField* pMember,
-		CValue* pResultValue
+		CValue* pValue,
+		EAuPropertyField Field
 		);
 } 
 

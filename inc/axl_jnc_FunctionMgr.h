@@ -352,6 +352,9 @@ protected:
 		const tchar_t* pTag
 		);
 
+	CFunction*
+	CreateBindableSetterStubFunction (CFunction* pFunction);
+
 	bool
 	InitializeInterface (
 		CClassType* pType,

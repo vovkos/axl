@@ -637,13 +637,13 @@ member_operator <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.WeakMemberOperator ($pValue, $n.m_Data.m_String);
 		}
-	| EToken_PropValue
-		{
-			return m_pModule->m_OperatorMgr.GetPropertyPropValue ($pValue);
-		}
 	| EToken_OnChange
 		{
-			return m_pModule->m_OperatorMgr.GetPropertyOnChangeEvent ($pValue);
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChangeEvent);
+		}
+	| EToken_PropValue
+		{
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_PropValue);
 		}
 	| EToken_Get
 		{
@@ -667,15 +667,15 @@ primary_expr <CValue* $pValue>
 		}
 	| EToken_This
 		{
-			return SetThis ($pValue);
-		}
-	| EToken_PropValue
-		{
-			return SetPropValue ($pValue);
+			return GetThis ($pValue);
 		}
 	| EToken_OnChange
 		{
-			return SetOnChange ($pValue);
+			return GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChangeEvent);
+		}
+	| EToken_PropValue
+		{
+			return GetAuPropertyFieldMember ($pValue, EAuPropertyField_PropValue);
 		}
 	| EToken_Integer
 		{

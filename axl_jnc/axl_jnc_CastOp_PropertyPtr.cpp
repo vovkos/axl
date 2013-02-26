@@ -385,8 +385,8 @@ CCast_PropertyPtr::GetCastOperator (
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) pSrcType;
 	EPropertyPtrType SrcPtrTypeKind = pSrcPtrType->GetPtrTypeKind ();
 
-	ASSERT (SrcPtrTypeKind >= 0 && SrcPtrTypeKind < EPropertyPtrType__Count);
-	ASSERT (DstPtrTypeKind >= 0 && DstPtrTypeKind < EPropertyPtrType__Count);
+	ASSERT ((size_t) SrcPtrTypeKind < EPropertyPtrType__Count);
+	ASSERT ((size_t) DstPtrTypeKind < EPropertyPtrType__Count);
 
 	return m_OperatorTable [SrcPtrTypeKind] [DstPtrTypeKind];
 }

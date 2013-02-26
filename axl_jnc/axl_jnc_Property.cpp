@@ -106,6 +106,9 @@ CProperty::CreateFieldMember (
 	int PtrTypeFlags
 	)
 {
+	if (!StorageKind)
+		StorageKind = m_pParentClassType ? EStorage_Member : EStorage_Static;
+
 	CStructType* pStructType = GetFieldStructType (StorageKind);
 	if (!pStructType)
 		return NULL;
@@ -184,15 +187,20 @@ CProperty::AddMethodMember (CFunction* pFunction)
 
 			break;
 
+		case EStorage_Undefined:
+			pFunction->m_StorageKind = EStorage_Member;
+			// and fall through
+		
+		case EStorage_Member:
+			pFunction->ConvertToMethodMember (m_pParentClassType);
+			break;
+
 		case EStorage_Abstract:
 		case EStorage_Virtual:
 		case EStorage_Override:
 			if (!pFunction->IsAccessor ())
 				m_pParentClassType->m_VirtualMethodArray.Append (pFunction); // otherwise we are already on VirtualPropertyArray
 
-			// and fall through;
-
-		case EStorage_Undefined:
 			pFunction->ConvertToMethodMember (m_pParentClassType);
 			break;
 
@@ -288,13 +296,18 @@ CProperty::AddPropertyMember (CProperty* pProperty)
 		case EStorage_Static:
 			break;
 
+		case EStorage_Undefined:
+			pProperty->m_StorageKind = EStorage_Member;
+			// and fall through
+
+		case EStorage_Member:
+			pProperty->m_pParentClassType = m_pParentClassType;
+			break;
+
 		case EStorage_Abstract:
 		case EStorage_Virtual:
 		case EStorage_Override:
 			m_pParentClassType->m_VirtualPropertyArray.Append (pProperty);
-			// and fall through;
-
-		case EStorage_Undefined:
 			pProperty->m_pParentClassType = m_pParentClassType;
 			break;
 
@@ -316,6 +329,8 @@ bool
 CProperty::CalcLayout ()
 {
 	bool Result;
+
+	ASSERT (m_StorageKind);
 
 	if (!m_VTable.IsEmpty ())
 		return true;

@@ -25,7 +25,7 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		_T("struct-member"),               // EModuleItem_StructField,
 	};
 
-	return ItemKind >= 0 && ItemKind < EModuleItem__Count ? 
+	return (size_t) ItemKind < EModuleItem__Count ? 
 		StringTable [ItemKind] : 
 		StringTable [EModuleItem_Undefined];
 }
@@ -48,7 +48,7 @@ GetStorageKindString (EStorage StorageKind)
 		_T("override"),                 // EStorage_Override,
 	};
 
-	return StorageKind >= 0 && StorageKind < EStorage__Count ? 
+	return (size_t) StorageKind < EStorage__Count ? 
 		StringTable [StorageKind] : 
 		StringTable [EStorage_Undefined];
 }
@@ -65,7 +65,7 @@ GetAccessKindString (EAccess AccessKind)
 		_T("protected"),             // EAccess_Protected,
 	};
 
-	return AccessKind >= 0 && AccessKind < EAccess__Count ? 
+	return (size_t) AccessKind < EAccess__Count ? 
 		StringTable [AccessKind] : 
 		StringTable [EAccess_Undefined];
 }

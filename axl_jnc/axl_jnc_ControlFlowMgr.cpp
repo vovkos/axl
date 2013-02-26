@@ -47,8 +47,10 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 		return pBlock;
 
 	CBasicBlock* pPrevCurrentBlock = m_pCurrentBlock;
-
 	m_pCurrentBlock = pBlock;
+	if (!pBlock)
+		return pPrevCurrentBlock;
+
 	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock);
 
 	if (pBlock->m_pFunction)

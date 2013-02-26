@@ -149,7 +149,7 @@ COperatorMgr::UnaryOperator (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpKind >= 0 && OpKind < EUnOp__Count);
+	ASSERT ((size_t) OpKind < EUnOp__Count);
 
 	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
 	ASSERT (pOperator);
@@ -186,7 +186,7 @@ COperatorMgr::BinaryOperator (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpKind >= 0 && OpKind < EBinOp__Count);
+	ASSERT ((size_t) OpKind < EBinOp__Count);
 
 	CValue OpValue1;
 	CValue OpValue2;
@@ -229,7 +229,7 @@ COperatorMgr::CastOperator (
 	bool Result;
 
 	EType TypeKind = pType->GetTypeKind ();
-	ASSERT (TypeKind >= 0 && TypeKind < EType__Count);
+	ASSERT ((size_t) TypeKind < EType__Count);
 
 	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
 	ASSERT (pOperator); // there is always a default
@@ -283,7 +283,7 @@ COperatorMgr::GetCastKind (
 	)
 {
 	EType TypeKind = pType->GetTypeKind ();
-	ASSERT (TypeKind >= 0 && TypeKind < EType__Count);
+	ASSERT ((size_t) TypeKind < EType__Count);
 
 	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
 	if (!pOperator)

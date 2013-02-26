@@ -226,59 +226,41 @@ COperatorMgr::GetPropertySetter (
 }
 
 bool
-COperatorMgr::GetPropertyPropValue (
+COperatorMgr::GetAuPropertyFieldMember (
 	const CValue& OpValue,
+	EAuPropertyField Field, 
 	CValue* pResultValue
 	)
 {
-	if (OpValue.GetValueKind () != EValue_Property)
+	ASSERT (
+		OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr ||
+		OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
+
+	CPropertyType* pPropertyType = ((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ();
+	CStructField* pMember = pPropertyType->GetAuField (Field);
+	if (!pMember)
 	{
-		err::SetFormatStringError (_T("'propvalue' field for property pointers is not implemented yet"));
+		err::SetFormatStringError (_T("'%s' has no '%s' field"), pPropertyType->GetTypeString (), GetAuPropertyFieldString (Field));
 		return false;
 	}
 
-	CProperty* pProperty = OpValue.GetProperty ();
-	CStructField* pField = pProperty->GetType ()->GetAuPropValue ();
-	if (!pField)
-	{
-		err::SetFormatStringError (_T("'%s' has no 'propvalue' field"), pProperty->m_Tag);
-		return false;
-	}
-
-	if (pProperty->GetStorageKind () != EStorage_Static)
-	{
-		err::SetFormatStringError (_T("non-static 'propvalue' is not implemented yet"));
-		return false;
-	}
-
-	CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
-	ASSERT (pStaticVariable);
-
-	CBaseTypeCoord Coord;
-	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
-	return GetStructFieldMember (pStaticVariable, pField, &Coord, pResultValue);
+	return GetAuPropertyFieldMember (OpValue, pMember, pResultValue);
 }
 
 bool
-COperatorMgr::GetPropertyOnChangeEvent (
+COperatorMgr::GetAuPropertyFieldMember (
 	const CValue& OpValue,
+	CStructField* pMember,
 	CValue* pResultValue
 	)
 {
 	if (OpValue.GetValueKind () != EValue_Property)
 	{
-		err::SetFormatStringError (_T("'onchange' field for property pointers is not implemented yet"));
+		err::SetFormatStringError (_T("'%s' field for property pointers is not implemented yet"), pMember->GetName ());
 		return false;
 	}
 
 	CProperty* pProperty = OpValue.GetProperty ();
-	CStructField* pField = pProperty->GetType ()->GetAuOnChangeEvent ();
-	if (!pField)
-	{
-		err::SetFormatStringError (_T("'%s' has no 'onchange' field"), pProperty->m_Tag);
-		return false;
-	}
-
 	if (pProperty->GetStorageKind () != EStorage_Static)
 	{
 		err::SetFormatStringError (_T("non-static 'onchange' is not implemented yet"));
@@ -290,7 +272,7 @@ COperatorMgr::GetPropertyOnChangeEvent (
 
 	CBaseTypeCoord Coord;
 	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
-	return GetStructFieldMember (pStaticVariable, pField, &Coord, pResultValue);
+	return GetStructFieldMember (pStaticVariable, pMember, &Coord, pResultValue);
 }
 
 bool
@@ -303,7 +285,7 @@ COperatorMgr::GetProperty (
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	
 	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_AutoGet)
-		return GetPropertyPropValue (OpValue, pResultValue);
+		return GetAuPropertyFieldMember (OpValue, EAuPropertyField_PropValue, pResultValue);
 
 	CValue GetterValue;
 	return 

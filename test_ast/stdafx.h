@@ -21,29 +21,40 @@
 #include <new>
 #include <typeinfo>
 
+__declspec (selectany) 
+class CClearTypeInfoCache
+{
+public:
+	CClearTypeInfoCache ()
+	{
+		atexit (ClearTypeInfoCache);
+	}
+
+protected:
+	static
+	void 
+	ClearTypeInfoCache ()
+	{
+	   __type_info_node* & node = __type_info_root_node._Next;
+	   while(node)
+	   {
+		  if (node->_MemPtr)
+		  {
+			 delete node->_MemPtr;
+		  }
+		  __type_info_node* tempNode = node;
+		  node = node->_Next;
+		  delete tempNode;
+	   }
+	}
+} g_ClearTypeInfoCache;
+
 // http://connect.microsoft.com/VisualStudio/feedback/details/621653/including-stdint-after-intsafe-generates-warnings
 // warning C4005: 'INT8_MIN' : macro redefinition
 #pragma warning (disable : 4005)
 #include <stdint.h>
 #include <intsafe.h>
 #pragma warning (default : 4005)
-
-inline
-void 
-clear_type_info_cache()
-{
-   __type_info_node* & node = __type_info_root_node._Next;
-   while(node)
-   {
-      if (node->_MemPtr)
-      {
-         delete node->_MemPtr;
-      }
-      __type_info_node* tempNode = node;
-      node = node->_Next;
-      delete tempNode;
-   }
-}
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
@@ -62,11 +73,7 @@ clear_type_info_cache()
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
-
-
 #include <afxdisp.h>        // MFC Automation classes
-
-
 
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
@@ -87,7 +94,6 @@ clear_type_info_cache()
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 #endif
-
 
 // LUA
 

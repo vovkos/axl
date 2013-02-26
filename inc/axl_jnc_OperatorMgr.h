@@ -272,7 +272,7 @@ public:
 	ICastOperator*
 	GetStdCastOperator (EStdCast CastKind)
 	{
-		ASSERT (CastKind >= 0 && CastKind < EStdCast__Count);
+		ASSERT ((size_t) CastKind < EStdCast__Count);
 		return m_StdCastOperatorTable [CastKind];
 	}
 
@@ -668,28 +668,27 @@ public:
 	}
 
 	bool
-	GetPropertyPropValue (
+	GetAuPropertyFieldMember (
 		const CValue& OpValue,
+		EAuPropertyField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetPropertyPropValue (CValue* pValue)
+	GetAuPropertyFieldMember (
+		CValue* pValue,	
+		EAuPropertyField Field
+		)
 	{
-		return GetPropertyPropValue (*pValue, pValue);
+		return GetAuPropertyFieldMember (*pValue, Field, pValue);
 	}
 
 	bool
-	GetPropertyOnChangeEvent (
+	GetAuPropertyFieldMember (
 		const CValue& OpValue,
+		CStructField* pMember,
 		CValue* pResultValue
 		);
-
-	bool
-	GetPropertyOnChangeEvent (CValue* pValue)
-	{
-		return GetPropertyOnChangeEvent (*pValue, pValue);
-	}
 
 	// load & store operators
 

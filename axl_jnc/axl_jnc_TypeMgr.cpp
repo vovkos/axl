@@ -52,7 +52,7 @@ CTypeMgr::Clear ()
 CType* 
 CTypeMgr::GetStdType (EStdType StdType)
 {
-	ASSERT (StdType >= 0 && StdType < EStdType__Count);
+	ASSERT ((size_t) StdType < EStdType__Count);
 	if (m_StdTypeArray [StdType])
 		return m_StdTypeArray [StdType];
 
@@ -345,6 +345,7 @@ CTypeMgr::CreateClassType (
 	CStructType* pIfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
 	pIfaceStructType->m_Tag.Format (_T("%s.iface"), pType->m_Tag);
 	pIfaceStructType->m_pParentNamespace = pType;
+	pIfaceStructType->m_StorageKind = EStorage_Member;
 	pIfaceStructType->AddBaseType (pIfaceHdrStructType);
 
 	pType->m_pModule = m_pModule;
@@ -481,13 +482,13 @@ CTypeMgr::GetPropertyType (
 
 		if (Flags & EPropertyTypeFlag_Bindable) // event first
 		{
-			pType->m_pAuOnChangeEvent = pType->m_pAuFieldStructType->CreateFieldMember (GetStdType (EStdType_SimpleMulticast));
+			pType->m_AuFieldArray [EAuPropertyField_OnChangeEvent] = pType->m_pAuFieldStructType->CreateFieldMember (GetStdType (EStdType_SimpleMulticast));
 			pType->m_pBindablePropertyType = pType;
 		}
 
 		if (Flags & EPropertyTypeFlag_AutoGet)
 		{
-			pType->m_pAuPropValue = pType->m_pAuFieldStructType->CreateFieldMember (pGetterType->GetReturnType ());
+			pType->m_AuFieldArray [EAuPropertyField_PropValue] = pType->m_pAuFieldStructType->CreateFieldMember (pGetterType->GetReturnType ());
 		}
 	}
 
@@ -681,7 +682,7 @@ CTypeMgr::GetDataPtrType (
 	)
 {
 	ASSERT (TypeKind == EType_DataPtr || TypeKind == EType_DataRef);
-	ASSERT (PtrTypeKind >= 0 && PtrTypeKind < EDataPtrType__Count);
+	ASSERT ((size_t) PtrTypeKind < EDataPtrType__Count);
 
 	ASSERT (TypeKind != EType_DataRef || pDataType->m_TypeKind != EType_DataRef); // dbl reference
 	
@@ -752,7 +753,7 @@ CTypeMgr::GetClassPtrType (
 	int Flags
 	)
 {
-	ASSERT (PtrTypeKind >= 0 && PtrTypeKind < EClassPtrType__Count);
+	ASSERT ((size_t) PtrTypeKind < EClassPtrType__Count);
 
 	CClassPtrTypeTuple* pTuple = GetClassPtrTypeTuple (pClassType);
 
@@ -789,7 +790,7 @@ CTypeMgr::GetFunctionPtrType (
 	)
 {
 	ASSERT (TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef);
-	ASSERT (PtrTypeKind >= 0 && PtrTypeKind < EFunctionPtrType__Count);
+	ASSERT ((size_t) PtrTypeKind < EFunctionPtrType__Count);
 
 	CFunctionPtrTypeTuple* pTuple = GetFunctionPtrTypeTuple (pFunctionType);
 
@@ -872,7 +873,7 @@ CTypeMgr::GetPropertyPtrType (
 	)
 {
 	ASSERT (TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef);
-	ASSERT (PtrTypeKind >= 0 && PtrTypeKind < EPropertyPtrType__Count);
+	ASSERT ((size_t) PtrTypeKind < EPropertyPtrType__Count);
 
 	CPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 

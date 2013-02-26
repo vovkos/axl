@@ -448,6 +448,9 @@ public:
 
 	bool
 	ResolveOrphan ();
+
+	void
+	MakeStub (CFunction* pFunction);
 };
 
 //.............................................................................

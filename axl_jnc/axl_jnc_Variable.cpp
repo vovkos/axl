@@ -16,7 +16,7 @@ GetVariableKindString (EVariable VariableKind)
 		_T("local-variable"),           // EVariable_Local,
 	};
 
-	return VariableKind >= 0 && VariableKind < EVariable__Count ? 
+	return (size_t) VariableKind < EVariable__Count ? 
 		StringTable [VariableKind] : 
 		StringTable [EVariable_Undefined];
 }

@@ -26,7 +26,7 @@ GetUnOpKindString (EUnOp OpKind)
 		_T("->"),                        // EUnOp_Ptr,
 	};
 
-	return OpKind >= 0 && OpKind < EUnOp__Count ? 
+	return (size_t) OpKind < EUnOp__Count ? 
 		StringTable [OpKind] : 
 		StringTable [EUnOp_Undefined];
 }

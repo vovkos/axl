@@ -18,7 +18,7 @@ GetPropertyPtrTypeKindString (EPropertyPtrType PtrTypeKind)
 		_T("unsafe"),   // EPropertyPtrType_Unsafe,
 	};
 
-	return PtrTypeKind >= 0 && PtrTypeKind < EPropertyPtrType__Count ? 
+	return (size_t) PtrTypeKind < EPropertyPtrType__Count ? 
 		StringTable [PtrTypeKind] : 
 		_T("undefined-property-ptr-kind");
 }

@@ -398,8 +398,8 @@ CCast_FunctionPtr::GetCastOperator (
 	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) pSrcType;
 	EFunctionPtrType SrcPtrTypeKind = pSrcPtrType->GetPtrTypeKind ();
 
-	ASSERT (SrcPtrTypeKind >= 0 && SrcPtrTypeKind < EFunctionPtrType__Count);
-	ASSERT (DstPtrTypeKind >= 0 && DstPtrTypeKind < EFunctionPtrType__Count);
+	ASSERT ((size_t) SrcPtrTypeKind < EFunctionPtrType__Count);
+	ASSERT ((size_t) DstPtrTypeKind < EFunctionPtrType__Count);
 
 	return m_OperatorTable [SrcPtrTypeKind] [DstPtrTypeKind];
 }

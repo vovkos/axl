@@ -48,7 +48,7 @@ GetBinOpKindString (EBinOp OpKind)
 		_T("@="),                         // EBinOp_AtAssign,
 	};
 
-	return OpKind >= 0 && OpKind < EBinOp__Count ? 
+	return (size_t) OpKind < EBinOp__Count ? 
 		StringTable [OpKind] : 
 		StringTable [EBinOp_Undefined];
 }

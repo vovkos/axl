@@ -17,7 +17,7 @@ GetClassPtrTypeKindString (EClassPtrType PtrTypeKind)
 		_T("unsafe"), // EClassPtrType_Unsafe,
 	};
 
-	return PtrTypeKind >= 0 && PtrTypeKind < EClassPtrType__Count ? 
+	return (size_t) PtrTypeKind < EClassPtrType__Count ? 
 		StringTable [PtrTypeKind] : 
 		_T("undefined-class-ptr-kind");
 }

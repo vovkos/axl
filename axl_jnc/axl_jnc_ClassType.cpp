@@ -73,6 +73,7 @@ CClassType::CreateFieldMember (
 	switch (StorageKind)
 	{
 	case EStorage_Undefined:
+	case EStorage_Member:
 	case EStorage_Mutable:
 		pFieldStructType = m_pIfaceStructType;
 		break;
@@ -127,6 +128,14 @@ CClassType::AddMethodMember (CFunction* pFunction)
 
 		break;
 
+	case EStorage_Undefined:
+		pFunction->m_StorageKind = EStorage_Member;
+		// and fall through
+
+	case EStorage_Member:
+		pFunction->ConvertToMethodMember (this);
+		break;
+
 	case EStorage_Override:
 		m_OverrideMethodArray.Append (pFunction);
 		pFunction->ConvertToMethodMember (this);
@@ -135,10 +144,6 @@ CClassType::AddMethodMember (CFunction* pFunction)
 	case EStorage_Abstract:
 	case EStorage_Virtual:
 		m_VirtualMethodArray.Append (pFunction);
-		pFunction->ConvertToMethodMember (this);
-		break;
-
-	case EStorage_Undefined:
 		pFunction->ConvertToMethodMember (this);
 		break;
 
@@ -232,13 +237,18 @@ CClassType::AddPropertyMember (CProperty* pProperty)
 	case EStorage_Static:
 		break;
 
+	case EStorage_Undefined:
+		pProperty->m_StorageKind = EStorage_Member;
+		//and fall through
+
+	case EStorage_Member:
+		pProperty->m_pParentClassType = this;
+		break;
+
 	case EStorage_Abstract:
 	case EStorage_Virtual:
 	case EStorage_Override:
 		m_VirtualPropertyArray.Append (pProperty);
-		// and fall through;
-
-	case EStorage_Undefined:
 		pProperty->m_pParentClassType = this;
 		break;
 	}
