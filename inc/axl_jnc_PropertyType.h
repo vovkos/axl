@@ -58,6 +58,8 @@ enum EAuPropertyField
 	EAuPropertyField__Count
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 const tchar_t* 
 GetAuPropertyFieldString (EAuPropertyField Field);
 
