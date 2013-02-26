@@ -31,6 +31,9 @@ CVariableMgr::CreateVariable (
 	int PtrTypeFlags
 	)
 {
+	if (pType->GetTypeKind () == EType_Class)
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
 	CVariable* pVariable = AXL_MEM_NEW (CVariable);
 	pVariable->m_pModule = m_pModule;
 	pVariable->m_VariableKind = VariableKind;

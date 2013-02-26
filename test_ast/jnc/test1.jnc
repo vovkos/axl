@@ -36,6 +36,10 @@ main ()
 
 	stack new AColor;
 
+	Red = 10;
+	Green = 100;
+	Blue = 1000; 
+
 	return 0;
 }
 

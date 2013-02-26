@@ -122,7 +122,7 @@ CDeclTypeCalc::CalcType (
 			return false;
 	}
 
-	if (pType->GetTypeKind () == EType_Class)
+	if (pType->GetTypeKind () == EType_Class && (m_TypeModifiers & ETypeModifierMask_ClassPtr))
 		pType = GetClassPtrType ((CClassType*) pType);
 
 	if (pDataPtrTypeFlags)
@@ -438,10 +438,10 @@ CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 	EClassPtrType PtrTypeKind = GetClassPtrTypeKindFromModifiers (m_TypeModifiers);
 	int TypeFlags = 0;
 
-	if (m_TypeModifiers & (ETypeModifier_Const | ETypeModifier_Const_p))
+	if (m_TypeModifiers & ETypeModifier_Const_p)
 		TypeFlags |= EPtrTypeFlag_Const;
 
-	if (m_TypeModifiers & (ETypeModifier_NoNull | ETypeModifier_NoNull_p))
+	if (m_TypeModifiers & ETypeModifier_NoNull_p)
 		TypeFlags |= EPtrTypeFlag_NoNull;
 
 	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;

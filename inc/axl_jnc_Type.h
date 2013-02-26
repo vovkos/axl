@@ -241,15 +241,11 @@ enum ETypeModifierMask
 		ETypeModifier_Event,
 
 	ETypeModifierMask_ClassPtr = 
-		ETypeModifier_NoNull |
-		ETypeModifier_Const | 
-		ETypeModifier_Weak |
-		ETypeModifier_Unsafe |
 		ETypeModifier_NoNull_p |
 		ETypeModifier_Const_p | 
 		ETypeModifier_Weak_p |
 		ETypeModifier_Unsafe_p,
-
+		
 	ETypeModifierMask_FunctionPtr = 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall |

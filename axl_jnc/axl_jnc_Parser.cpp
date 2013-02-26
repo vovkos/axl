@@ -1217,10 +1217,11 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	rtl::CBoxIteratorT <CValue> PropertyValue = m_BindablePropertyList.GetHead ();
 	for (; PropertyValue; PropertyValue++)
 	{
+		CValue CookieValue;
 		CValue EventValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*PropertyValue, EAuPropertyField_OnChangeEvent, &EventValue);// &&
-			// m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Add);
+			m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*PropertyValue, EAuPropertyField_OnChangeEvent, &EventValue) &&
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_AddAssign, EventValue, HandlerValue, &CookieValue);
 
 		if (!Result)
 			return false;
@@ -1241,8 +1242,8 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	{
 		CValue EventValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*PropertyValue, EAuPropertyField_OnChangeEvent, &EventValue);// &&
-			//m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Remove);
+			m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*PropertyValue, EAuPropertyField_OnChangeEvent, &EventValue); // &&
+			// m_pModule->m_OperatorMgr.MulticastOperator (EventValue, HandlerValue, EMulticastOp_Remove);
 
 		if (!Result)
 			return false;

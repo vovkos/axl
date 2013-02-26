@@ -31,8 +31,8 @@ EClassPtrType
 GetClassPtrTypeKindFromModifiers (int Modifiers)
 {
 	return 
-		(Modifiers & (ETypeModifier_Unsafe | ETypeModifier_Unsafe_p)) ? EClassPtrType_Unsafe :
-		(Modifiers & (ETypeModifier_Weak | ETypeModifier_Weak_p)) ? EClassPtrType_Weak : EClassPtrType_Normal;
+		(Modifiers & ETypeModifier_Unsafe_p) ? EClassPtrType_Unsafe :
+		(Modifiers & ETypeModifier_Weak_p) ? EClassPtrType_Weak : EClassPtrType_Normal;
 }
 
 //.............................................................................

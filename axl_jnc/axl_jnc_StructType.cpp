@@ -40,6 +40,9 @@ CStructType::CreateFieldMember (
 	int PtrTypeFlags
 	)
 {
+	if (pType->GetTypeKind () == EType_Class)
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
 	CStructField* pMember = AXL_MEM_NEW (CStructField);
 	pMember->m_StorageKind = m_StorageKind;
 	pMember->m_pParentType = this;
