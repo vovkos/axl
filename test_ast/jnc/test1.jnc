@@ -34,11 +34,15 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
+	Red   = 10;
+	Green = 100;
+	Blue  = 1000; 
+
 	stack new AColor;
 
-	Red = 10;
-	Green = 100;
-	Blue = 1000; 
+	Red   = 20;
+	Green = 200;
+	Blue  = 2000; 
 
 	return 0;
 }
