@@ -1,29 +1,40 @@
 //.............................................................................
 
-bindable int MyProp;
+bindable int Red, Green, Blue;
 
-foo ()
+int autoget property Yellow, Purple, Cyan;
+
+Yellow.set (int Value)
 {
-	printf ("foo ()\n");
+	propvalue = Value;
+	printf ("Yellow.set (%d)\n", Value);
 }
 
-bar ()
+Purple.set (int Value)
 {
-	printf ("bar ()\n");
+	propvalue = Value;
+	printf ("Purple.set (%d)\n", Value);
 }
+
+Cyan.set (int Value)
+{
+	propvalue = Value;
+	printf ("Cyan.set (%d)\n", Value);
+}
+
+autoev AColor
+{
+	Purple = Red + Blue;
+	Yellow = Red + Green;
+	Cyan = Green + Blue;
+};
 
 int 
 main ()
 {
 	printf ("hui govno i muravei\n");
 
-	MyProp.onchange += foo;
-	MyProp.onchange += bar;
-
-	MyProp = 50;
-
-	int x = MyProp;
-	printf ("x = %d\n", x);	
+	stack new AColor;
 
 	return 0;
 }

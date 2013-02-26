@@ -1139,6 +1139,7 @@ CTypeMgr::SetupPrimitiveType (
 	pType->m_Size = Size;
 	pType->m_Signature = pSignature;
 	pType->m_pDataPtrTypeTuple = NULL;
+	pType->m_pPropertyTypeTuple = NULL;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

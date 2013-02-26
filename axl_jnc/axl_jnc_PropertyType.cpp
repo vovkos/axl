@@ -118,7 +118,10 @@ CPropertyType::CreateSignature (
 		String += 'b';
 
 	if (Flags & EPropertyTypeFlag_AutoGet)
-		String += 'a';
+		String += 'g';
+
+	if (Flags & EPropertyTypeFlag_AutoSet)
+		String += 's';
 
 	String += pGetterType->GetSignature ();
 
@@ -146,6 +149,9 @@ CPropertyType::GetTypeModifierString ()
 
 	if (m_Flags & EPropertyTypeFlag_AutoGet)
 		m_TypeModifierString += _T("autoget ");
+
+	if (m_Flags & EPropertyTypeFlag_AutoSet)
+		m_TypeModifierString += _T("autoset ");
 
 	if (IsIndexed ())
 		m_TypeModifierString += _T("indexed ");
