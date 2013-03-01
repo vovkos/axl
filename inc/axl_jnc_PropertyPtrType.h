@@ -110,7 +110,7 @@ protected:
 	CStructType* m_pBindablePropertyThinPtrStructType;
 	CStructType* m_pBindablePropertyUnsafePtrStructType;
 
-	CPropertyPtrType* m_PropertyPtrArray [2] [EPropertyPtrType__Count] [2]; // ref x kind x nonull
+	CPropertyPtrType* m_PropertyPtrArray [2] [EPropertyPtrType__Count] [2]; // ref x kind x nullable
 
 public:
 	CPropertyPtrTypeTuple ()

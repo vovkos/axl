@@ -84,7 +84,7 @@ main := |*
 'signed'       { CreateToken (EToken_Signed); };
 'unsigned'     { CreateToken (EToken_Unsigned); };
 'bigendian'    { CreateToken (EToken_BigEndian); };
-'nonull'       { CreateToken (EToken_NoNull); };
+'nullable'     { CreateToken (EToken_Nullable); };
 'const'        { CreateToken (EToken_Const); };
 'readonly'     { CreateToken (EToken_ReadOnly); };
 'volatile'     { CreateToken (EToken_Volatile); };
@@ -97,6 +97,7 @@ main := |*
 'property'     { CreateToken (EToken_Property); };
 'multicast'    { CreateToken (EToken_Multicast); };
 'event'        { CreateToken (EToken_Event); };
+'autoev'       { CreateToken (EToken_AutoEv); };
 'bindable'     { CreateToken (EToken_Bindable); };
 'autoget'      { CreateToken (EToken_AutoGet); };
 'indexed'      { CreateToken (EToken_Indexed); };
@@ -121,7 +122,6 @@ main := |*
 'char'         { CreateToken (EToken_Char); };
 'short'        { CreateToken (EToken_Short); };
 'long'         { CreateToken (EToken_Long); };
-'wchar_t'      { CreateToken (EToken_WChar); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -132,7 +132,6 @@ main := |*
 'struct'       { CreateToken (EToken_Struct); };
 'union'        { CreateToken (EToken_Union); };
 'class'        { CreateToken (EToken_Class); };
-'autoev'       { CreateToken (EToken_AutoEv); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -156,8 +155,6 @@ main := |*
 'heap'         { CreateToken (EToken_Heap); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
-'snapshot'     { CreateToken (EToken_Snapshot); };
-'dynamic'      { CreateToken (EToken_Dynamic); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

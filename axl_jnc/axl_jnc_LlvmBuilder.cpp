@@ -359,30 +359,6 @@ CLlvmBuilder::DynamicCastInterface (
 }
 
 bool
-CLlvmBuilder::InitializeObject (
-	const CValue& Value,
-	CClassType* pType,
-	CScope* pScope
-	)
-{
-	CreateComment ("initialize object");
-
-	CFunction* pInializeObject = pType->GetInitializer ();
-	if (!pInializeObject)
-		return false;
-
-	CreateCall2 (
-		pInializeObject,
-		pInializeObject->GetType (),
-		Value,
-		m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope),
-		NULL
-		);
-
-	return true;
-}
-
-bool
 CLlvmBuilder::CreateClosureFunctionPtr (
 	const CValue& RawPfnValue,
 	const CValue& RawIfaceValue,
@@ -425,63 +401,30 @@ CLlvmBuilder::CreateClosurePropertyPtr (
 	CreateBitCast (RawPfnValue, pAbstractPropertyMemberType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
 	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
 	
-	rtl::CString s = GetLlvmTypeString (PfnValue.GetLlvmValue ()->getType ());
-	TRACE ("%s\n", s);
-
-	s = GetLlvmTypeString (PropertyPtrValue.GetLlvmValue ()->getType ());
-	TRACE ("%s\n", s);
-
 	CreateInsertValue (PropertyPtrValue, PfnValue, 0, NULL, &PropertyPtrValue);
 	CreateInsertValue (PropertyPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;
 }
 
-/*
-
 bool
-CLlvmBuilder::CreateClosurePropertyPtr (
-	const CValue& PtrValue,
-	const CValue& InterfaceValue,
-	CPropertyPtrType* pResultType,
-	CValue* pResultValue
-	)
+CLlvmBuilder::RuntimeError (const CValue& ErrorValue)
 {
-	CreateComment ("create closure property pointer");
+	CFunction* pOnRuntimeError = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_OnRuntimeError);
 
-	ASSERT (PtrValue.GetType ()->GetTypeKind () == EType_Property);
-	CPropertyType* pPropertyType = (CPropertyType*) PtrValue.GetType ();
+	// TODO: calc real code address
 
-	ASSERT (pPropertyType->Cmp (pResultType->GetTargetType ()) == 0);
+	CValue CodeAddrValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
-	CValue VTablePtrValue;
-	if (PtrValue.GetValueKind () == EValue_Property)
-	{
-		bool Result = PtrValue.GetProperty ()->GetVTablePtrValue (&VTablePtrValue);
-		if (!Result)
-			return false;
-	}
-	else
-	{
-		VTablePtrValue = PtrValue;
-	}
-	
-	CStructType* pVTableType = pResultType->GetTargetType ()->GetVTableStructType ();
-	CreateBitCast (VTablePtrValue, pVTableType->GetDataPtrType (EDataPtrType_Unsafe), &VTablePtrValue);
-
-	CValue PropertyPtrValue = pResultType->GetUndefValue ();
-	CreateInsertValue (PropertyPtrValue, VTablePtrValue, 0, NULL, &PropertyPtrValue);
-	CreateInsertValue (PropertyPtrValue, InterfaceValue, 1, NULL, &PropertyPtrValue);
-
-	pResultValue->SetLlvmValue (
-		PropertyPtrValue.GetLlvmValue (),
-		pResultType,
-		PtrValue.GetValueKind () == EValue_Property ? EValue_Property : EValue_LlvmRegister
+	CreateCall2 (
+		pOnRuntimeError, 
+		pOnRuntimeError->GetType (),
+		ErrorValue, 
+		CodeAddrValue,
+		NULL
 		);
 
 	return true;
 }
-
-*/
 
 //.............................................................................
 

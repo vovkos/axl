@@ -403,7 +403,7 @@ CTypeMgr::GetMethodMemberType (
 	int ThisArgTypeFlags
 	)
 {
-	CClassPtrType* pThisArgType = pClassType->GetClassPtrType (EClassPtrType_Normal, ThisArgTypeFlags | EPtrTypeFlag_NoNull);
+	CClassPtrType* pThisArgType = pClassType->GetClassPtrType (EClassPtrType_Normal, ThisArgTypeFlags);
 
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, pThisArgType);	
@@ -690,13 +690,13 @@ CTypeMgr::GetDataPtrType (
 	
 	CDataPtrTypeTuple* pTuple = GetDataPtrTypeTuple (pDataType);
 
-	// ref x ptrkind x volatile x const x nonull
+	// ref x ptrkind x volatile x const x nullable
 
 	size_t i1 = TypeKind == EType_DataRef;
 	size_t i2 = PtrTypeKind;
 	size_t i3 = (Flags & EPtrTypeFlag_Const) != 0;
 	size_t i4 = (Flags & EPtrTypeFlag_Volatile) != 0;
-	size_t i5 = (Flags & EPtrTypeFlag_NoNull) != 0;
+	size_t i5 = (Flags & EPtrTypeFlag_Nullable) != 0;
 		
 	if (pTuple->m_DataPtrArray [i1] [i2] [i3] [i4] [i5])
 		return pTuple->m_DataPtrArray [i1] [i2] [i3] [i4] [i5];
@@ -759,11 +759,11 @@ CTypeMgr::GetClassPtrType (
 
 	CClassPtrTypeTuple* pTuple = GetClassPtrTypeTuple (pClassType);
 
-	// ptrkind x const x nonull
+	// ptrkind x const x nullable
 
 	size_t i1 = PtrTypeKind;
 	size_t i2 = (Flags & EPtrTypeFlag_Const) != 0;
-	size_t i3 = (Flags & EPtrTypeFlag_NoNull) != 0;
+	size_t i3 = (Flags & EPtrTypeFlag_Nullable) != 0;
 		
 	if (pTuple->m_ClassPtrArray [i1] [i2] [i3])
 		return pTuple->m_ClassPtrArray [i1] [i2] [i3];
@@ -796,11 +796,11 @@ CTypeMgr::GetFunctionPtrType (
 
 	CFunctionPtrTypeTuple* pTuple = GetFunctionPtrTypeTuple (pFunctionType);
 
-	// ref x kind x nonull
+	// ref x kind x nullable
 
 	size_t i1 = TypeKind == EType_FunctionRef;
 	size_t i2 = PtrTypeKind;
-	size_t i3 = (Flags & EPtrTypeFlag_NoNull) != 0;
+	size_t i3 = (Flags & EPtrTypeFlag_Nullable) != 0;
 
 	if (pTuple->m_FunctionPtrArray [i1] [i2] [i3])
 		return pTuple->m_FunctionPtrArray [i1] [i2] [i3];
@@ -879,11 +879,11 @@ CTypeMgr::GetPropertyPtrType (
 
 	CPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 
-	// ref x kind x nonull
+	// ref x kind x nullable
 
 	size_t i1 = TypeKind == EType_PropertyRef;
 	size_t i2 = PtrTypeKind;
-	size_t i3 = (Flags & EPtrTypeFlag_NoNull) != 0;
+	size_t i3 = (Flags & EPtrTypeFlag_Nullable) != 0;
 
 	if (pTuple->m_PropertyPtrArray [i1] [i2] [i3])
 		return pTuple->m_PropertyPtrArray [i1] [i2] [i3];

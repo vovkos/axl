@@ -82,7 +82,7 @@ CPropertyPtrType::CreateSignature (
 		break;
 	}
 
-	if (Flags & EPtrTypeFlag_NoNull)
+	if (Flags & EPtrTypeFlag_Nullable)
 		Signature += 'n';
 
 	Signature += pPropertyType->GetSignature ();
@@ -93,20 +93,19 @@ void
 CPropertyPtrType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
-	m_TypeString += _T(' ');
 
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeString += _T("nonull ");
+	if (m_Flags & EPtrTypeFlag_Nullable)
+		m_TypeString += _T(" nullable");
 
 	m_TypeString += m_pTargetType->GetTypeModifierString ();
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += GetPropertyPtrTypeKindString (m_PtrTypeKind);
 		m_TypeString += _T(' ');
+		m_TypeString += GetPropertyPtrTypeKindString (m_PtrTypeKind);
 	}
 
-	m_TypeString += m_TypeKind == EType_PropertyRef ? "property&" : "property*";
+	m_TypeString += m_TypeKind == EType_PropertyRef ? " property&" : " property*";
 
 	if (m_pTargetType->IsIndexed ())
 	{

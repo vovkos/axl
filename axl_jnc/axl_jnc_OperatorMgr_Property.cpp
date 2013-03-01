@@ -45,7 +45,8 @@ COperatorMgr::GetPropertyVTable (
 			return false;
 	}
 
-	return pProperty->GetVTablePtrValue (pResultValue);
+	*pResultValue = pProperty->GetVTablePtrValue ();
+	return true;
 }
 
 bool
@@ -181,7 +182,7 @@ COperatorMgr::GetPropertySetter (
 	{
 		i = 0;
 	}
-	else if (ArgValue.IsEmpty ())
+	else if (!ArgValue)
 	{
 		err::SetFormatStringError (_T("cannot choose one of '%d' setter overloads"), pSetterType->GetOverloadCount ());
 		return false;

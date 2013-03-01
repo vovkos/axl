@@ -14,6 +14,7 @@ CControlFlowMgr::CControlFlowMgr ()
 
 	m_Flags = 0;
 	m_pCurrentBlock = NULL;
+	m_pReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -22,6 +23,7 @@ CControlFlowMgr::Clear ()
 {
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
+	m_pReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -152,7 +154,7 @@ CControlFlowMgr::Break (size_t Level)
 	}
 
 	ProcessDestructList (pTargetScope);
-	Jump (pTargetScope->m_pBreakBlock, NULL);
+	Jump (pTargetScope->m_pBreakBlock);
 	return true;
 }
 
@@ -167,7 +169,7 @@ CControlFlowMgr::Continue (size_t Level)
 	}
 
 	ProcessDestructList (pTargetScope);
-	Jump (pTargetScope->m_pContinueBlock, NULL);
+	Jump (pTargetScope->m_pContinueBlock);
 	return true;
 }
 
@@ -186,14 +188,13 @@ CControlFlowMgr::ProcessDestructList (CScope* pTargetScope)
 }
 
 void
-CControlFlowMgr::RestoreScopeLevel (CFunction* pFunction)
+CControlFlowMgr::RestoreScopeLevel ()
 {
-	if (!pFunction->GetScopeLevelVariable ())
+	CValue ScopeLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
+	if (!ScopeLevelValue)
 		return;
 
-	CValue ScopeLevelValue;
 	m_pModule->m_LlvmBuilder.CreateComment (_T("restore scope level before return"));
-	m_pModule->m_LlvmBuilder.CreateLoad (pFunction->GetScopeLevelVariable (), NULL, &ScopeLevelValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 }
 
@@ -206,7 +207,7 @@ CControlFlowMgr::Return (const CValue& Value)
 	CFunctionType* pFunctionType = pFunction->GetType ();
 	CType* pReturnType = pFunctionType->GetReturnType ();
 	
-	if (Value.GetValueKind () == EValue_Void)
+	if (!Value)
 	{
 		if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
 		{
@@ -215,8 +216,12 @@ CControlFlowMgr::Return (const CValue& Value)
 		}
 		
 		ProcessDestructList ();
-		RestoreScopeLevel (pFunction);
-		m_pModule->m_LlvmBuilder.CreateRet ();
+		RestoreScopeLevel ();
+
+		if (m_pReturnBlock)
+			Jump (m_pReturnBlock);
+		else
+			m_pModule->m_LlvmBuilder.CreateRet ();
 	}
 	else
 	{
@@ -226,11 +231,11 @@ CControlFlowMgr::Return (const CValue& Value)
 			return false;
 
 		ProcessDestructList ();
-		RestoreScopeLevel (pFunction);
+		RestoreScopeLevel ();
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
 
-	m_Flags |= EControlFlowMgrFlag_HasReturn;
+	m_Flags |= EFlag_HasReturn;
 
 	SetCurrentBlock (GetUnreachableBlock ());
 	return true;

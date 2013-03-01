@@ -25,7 +25,7 @@ protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CPropertyVerifier m_Verifier;
-	CType* m_pAuPropValueType; // before the type was calculated
+	CType* m_pAuPropValueType; // before the type is calculated
 	int m_TypeModifiers;
 
 public:

@@ -117,7 +117,7 @@ protected:
 
 	CStructType* m_pFunctionPtrStructType;
 	CStructType* m_pFunctionWeakPtrStructType;
-	CFunctionPtrType* m_FunctionPtrArray [2] [EFunctionPtrType__Count] [2]; // ref x kind x nonull
+	CFunctionPtrType* m_FunctionPtrArray [2] [EFunctionPtrType__Count] [2]; // ref x kind x nullable
 
 public:
 	CFunctionPtrTypeTuple ()

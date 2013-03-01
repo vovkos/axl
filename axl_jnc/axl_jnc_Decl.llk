@@ -50,7 +50,7 @@ namespace_declaration
 		}
 	  '{' global_declaration* '}' 
 		{ 
-			CloseNamespace ();
+			m_pModule->m_NamespaceMgr.CloseNamespace ();
 		}
 	;
 
@@ -61,7 +61,7 @@ extend_declaration
 		}
 	  '{' named_type_block_declaration* '}' 
 		{ 
-			CloseNamespace ();
+			m_pModule->m_NamespaceMgr.CloseNamespace ();
 		}
 	;
 
@@ -216,26 +216,6 @@ type_name_list
 		}
 	  )*
 
-	;
-
-//.............................................................................
-
-// generics
-
-generic_formal_argument_list
-	: '<' EToken_Identifier (',' generic_formal_argument)* '>'
-	;
-
-generic_formal_argument
-	: EToken_Identifier
-/*		{						
-			CImportType* pArgumentType = m_pModule->m_TypeMgr.GetImportType ($1.m_Data.m_String, $pType);
-			return $pType->AddGenericArgument (pArgumentType);
-		} */
-	;
-
-generic_actual_argument_list
-	: '<' type_name (',' type_name)* '>'
 	;
 
 //.............................................................................

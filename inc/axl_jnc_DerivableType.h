@@ -15,6 +15,13 @@ class CClassType;
 
 //.............................................................................
 
+enum EBaseTypeFlag
+{
+	EBaseTypeFlag_Constructed = 1
+};
+
+//.............................................................................
+
 class CBaseType: public rtl::TListLink
 {
 protected:
@@ -23,12 +30,20 @@ protected:
 	friend class CClassType;
 
 	CDerivableType* m_pType;
+
+	int m_Flags;
 	size_t m_Offset;
 	size_t m_LlvmIndex;
 	size_t m_VTableIndex;
 
 public:
 	CBaseType ();
+
+	int 
+	GetFlags ()
+	{
+		return m_Flags;
+	}
 
 	CDerivableType*
 	GetType ()
@@ -103,18 +118,34 @@ public:
 	CBaseType*
 	AddBaseType (CDerivableType* pType);
 
+	CBaseType*
+	FindBaseType (CType* pType)
+	{
+		rtl::CStringHashTableMapIteratorAT <CBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
+		return It ? It->m_Value : NULL;
+	}
+
 	bool
-	FindBaseType (
+	FindBaseTypeTraverse (
 		CType* pType,
 		CBaseTypeCoord* pCoord = NULL
 		)
 	{
-		return FindBaseTypeImpl (pType, pCoord, 0);
+		return FindBaseTypeTraverseImpl (pType, pCoord, 0);
 	}
+
+	void
+	MarkConstructed (CBaseType* pBaseType)
+	{
+		pBaseType->m_Flags |= EBaseTypeFlag_Constructed;
+	}
+
+	void
+	ClearConstructedFlag ();
 
 protected:
 	bool
-	FindBaseTypeImpl (
+	FindBaseTypeTraverseImpl (
 		CType* pType,
 		CBaseTypeCoord* pCoord,
 		size_t Level

@@ -1119,13 +1119,6 @@ public:
 		CValue* pResultValue
 		);
 
-	bool
-	InitializeObject (
-		const CValue& Value,
-		CClassType* pType,
-		CScope* pScope
-		);
-
 	// function & property pointer operations
 
 	bool
@@ -1143,6 +1136,17 @@ public:
 		CPropertyPtrType* pResultType,
 		CValue* pResultValue
 		);
+
+	// runtime error
+
+	bool
+	RuntimeError (const CValue& ErrorValue);
+
+	bool
+	RuntimeError (ERuntimeError Error)
+	{
+		return RuntimeError (CValue (Error, EType_Int));
+	}
 };
 
 //.............................................................................

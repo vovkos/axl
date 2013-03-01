@@ -81,11 +81,23 @@ COperatorMgr::CallOperator (
 	bool Result;
 
 	CValue OpValue;
-	PrepareOperandType (RawOpValue, &OpValue);
-	int OpFlags = OpValue.GetType ()->GetTypeKind () == EType_Multicast ? EOpFlag_KeepDataRef : 0;
-	Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
-	if (!Result)
-		return false;
+
+	if (RawOpValue.GetValueKind () == EValue_Function && RawOpValue.GetFunction ()->IsOverloaded ())
+	{
+		CFunction* pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
+		if (!pFunction)
+			return false;
+
+		OpValue.SetFunction (pFunction);
+	}
+	else
+	{
+		PrepareOperandType (RawOpValue, &OpValue);
+		int OpFlags = OpValue.GetType ()->GetTypeKind () == EType_Multicast ? EOpFlag_KeepDataRef : 0;
+		Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
+		if (!Result)
+			return false;
+	}
 
 	if (OpValue.GetType ()->GetTypeKind () == EType_DataRef)
 	{
@@ -110,15 +122,6 @@ COperatorMgr::CallOperator (
 	rtl::CBoxListT <CValue> EmptyArgList;
 	if (!pArgList)
 		pArgList = &EmptyArgList;
-
-	if (RawOpValue.GetValueKind () == EValue_Function && RawOpValue.GetFunction ()->IsOverloaded ())
-	{
-		CFunction* pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
-		if (!pFunction)
-			return false;
-
-		OpValue.SetFunction (pFunction);
-	}
 
 	CClosure* pClosure = OpValue.GetClosure ();
 	if (pClosure)
@@ -159,6 +162,96 @@ COperatorMgr::CallOperator (
 }
 
 bool
+COperatorMgr::CallBaseTypeConstructor (
+	CType* pType,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	bool Result;
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pFunction->GetFunctionKind () == EFunction_Constructor);
+
+	CClassType* pClassType = pFunction->GetClassType ();
+	CBaseType* pBaseType = pClassType->FindBaseType (pType);
+
+	if (!pBaseType)
+	{
+		err::SetFormatStringError (_T("'%s' is not a base type of '%s'"), pType->GetTypeString (), pClassType->GetTypeString ());
+		return false;
+	}
+	
+	if (pType->GetTypeKind () != EType_Class)
+	{
+		err::SetFormatStringError (_T("non-class inheritance is not implemented yet"));
+		return false;
+	}
+
+	CClassType* pBaseClassType = (CClassType*) pType;
+	CFunction* pConstructor = pBaseClassType->GetConstructor ();
+	if (!pConstructor)
+	{
+		err::SetFormatStringError (_T("'%s' has no constructor"), pBaseClassType->GetTypeString ());
+		return false;
+	}
+
+	pArgList->InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
+
+	CValue ReturnValue;
+	Result = CallOperator (pConstructor, pArgList, &ReturnValue);
+	if (!Result)
+		return false;
+
+	pClassType->MarkConstructed (pBaseType);
+	return true;
+}
+
+bool
+COperatorMgr::PostBaseTypeConstructorList ()
+{
+	bool Result;
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pFunction->GetFunctionKind () == EFunction_Constructor);
+
+	rtl::CBoxListT <CValue> ArgList;
+	ArgList.InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
+
+	CClassType* pClassType = pFunction->GetClassType ();	
+	rtl::CIteratorT <CBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		if ((BaseType->GetFlags () & EBaseTypeFlag_Constructed) ||
+			BaseType->GetType ()->GetTypeKind () != EType_Class)
+			continue;
+
+		CClassType* pBaseClassType = (CClassType*) BaseType->GetType ();
+		CFunction* pConstructor = pBaseClassType->GetConstructor ();
+		if (!pConstructor)
+			continue;
+
+		pConstructor = pBaseClassType->GetDefaultConstructor ();
+		if (!pConstructor)
+		{
+			err::SetFormatStringError (_T("'%s' has no default constructor"), pBaseClassType->GetTypeString ());
+			return false;
+		}
+
+		CValue ReturnValue;
+		Result = CallOperator (pConstructor, &ArgList, &ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	CFunction* pPreConstructor = pFunction->GetClassType ()->GetPreConstructor ();
+
+	CValue ReturnValue;
+	return pPreConstructor ? 
+		CallOperator (pPreConstructor, &ArgList, &ReturnValue) : 
+		true;
+}
+
+bool
 COperatorMgr::CalcScopeLevelValue (
 	CScope* pScope,
 	CValue* pScopeLevelValue
@@ -170,14 +263,9 @@ COperatorMgr::CalcScopeLevelValue (
 		return true;
 	}
 
-	CFunction* pCurrentFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	ASSERT (pCurrentFunction && pCurrentFunction->GetScopeLevelVariable ());
-
 	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
 	 
-	CValue ScopeBaseLevelValue;
-	m_pModule->m_LlvmBuilder.CreateLoad (pCurrentFunction->GetScopeLevelVariable (), NULL, &ScopeBaseLevelValue);
-
+	CValue ScopeBaseLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
 	CValue ScopeIncValue (pScope->GetLevel (), EType_SizeT);
 
 	m_pModule->m_LlvmBuilder.CreateAdd_i (
@@ -294,7 +382,8 @@ COperatorMgr::CallImpl (
 	if (!Result)
 		return false;
 
-	if (m_pModule->m_FunctionMgr.GetCurrentFunction ()->GetScopeLevelVariable ())
+	CValue ScopeLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
+	if (ScopeLevelValue)
 	{
 		CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 		CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);

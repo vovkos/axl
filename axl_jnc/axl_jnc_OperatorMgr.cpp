@@ -448,8 +448,51 @@ COperatorMgr::CheckCastKind (
 }
 
 bool
+COperatorMgr::InitializeObject (
+	const CValue& ObjPtrValue,
+	CClassType* pClassType,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	if (pClassType->GetFlags () & EClassTypeFlag_Abstract)
+	{
+		err::SetFormatStringError (_T("cannot instantiate abstract '%s'"), pClassType->GetTypeString ());
+		return false;
+	}
+
+	m_pModule->m_LlvmBuilder.CreateComment ("initialize object");
+
+	CFunction* pInializer = pClassType->GetInitializer ();
+
+	m_pModule->m_LlvmBuilder.CreateCall2 (
+		pInializer,
+		pInializer->GetType (),
+		ObjPtrValue,
+		CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope ()),
+		NULL
+		);
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+
+	CFunction* pConstructor = pClassType->GetConstructor ();
+	if (!pConstructor)
+		return true;
+
+	rtl::CBoxListT <CValue> ArgList;
+	if (!pArgList)
+		pArgList = &ArgList;
+
+	pArgList->InsertHead (*pResultValue);
+
+	CValue ReturnValue;
+	return CallOperator (pConstructor, pArgList, &ReturnValue);
+}
+
+bool
 COperatorMgr::StackNewOperator (
 	CType* pType,
+	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
 	)
 {
@@ -467,18 +510,16 @@ COperatorMgr::StackNewOperator (
 		CValue ObjPtrValue;
 		m_pModule->m_LlvmBuilder.CreateAlloca (pClassType->GetClassStructType (), _T("new"), NULL, &ObjPtrValue);
 		
-		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (ObjPtrValue, pClassType, pScope);
+		bool Result = InitializeObject (ObjPtrValue, pClassType, pArgList, pResultValue);
 		if (!Result)
 			return false;
-
-		m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
 
 		if (pClassType->GetDestructor ())
 			pScope->AddToDestructList (*pResultValue);
 	}
 	else
 	{
-		CDataPtrType* pResultType = m_pModule->m_TypeMgr.GetDataPtrType (pType, EType_DataPtr);
+		CDataPtrType* pResultType = pType->GetDataPtrType ();
 
 		CValue PtrValue;
 		m_pModule->m_LlvmBuilder.CreateAlloca (pType, _T("new"), NULL, &PtrValue);
@@ -500,6 +541,7 @@ COperatorMgr::StackNewOperator (
 bool
 COperatorMgr::HeapNewOperator (
 	CType* pType,
+	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
 	)
 {
@@ -518,16 +560,13 @@ COperatorMgr::HeapNewOperator (
 	if (pType->GetTypeKind () == EType_Class)
 	{
 		CClassType* pClassType = (CClassType*) pType;
-
 		CDataPtrType* pPointerType = pClassType->GetClassStructType ()->GetDataPtrType (EDataPtrType_Unsafe);
 		
 		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPointerType, &PtrValue);
 
-		bool Result = m_pModule->m_LlvmBuilder.InitializeObject (PtrValue, pClassType, NULL);
+		bool Result = InitializeObject (PtrValue, pClassType, pArgList, pResultValue);
 		if (!Result)
 			return false;
-
-		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
 	}
 	else
 	{
@@ -810,7 +849,7 @@ COperatorMgr::CreateClosureObject (
 		return false;
 	
 	CValue ClosureValue;
-	Result = m_pModule->m_OperatorMgr.NewOperator (AllocKind, pClosureType, &ClosureValue);
+	Result = m_pModule->m_OperatorMgr.NewOperator (AllocKind, pClosureType, NULL, &ClosureValue);
 	if (!Result)
 		return false;
 

@@ -232,6 +232,9 @@
     <ClInclude Include="..\inc\axl_jnc_CastOp_Struct.h">
       <Filter>operator</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_AutoEv.h">
+      <Filter>function</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -450,6 +453,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_CastOp_Struct.cpp">
       <Filter>operator</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_AutoEv.cpp">
+      <Filter>function</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

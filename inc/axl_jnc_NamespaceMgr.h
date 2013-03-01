@@ -26,6 +26,7 @@ protected:
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
+	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
 
@@ -60,13 +61,10 @@ public:
 	}
 
 	void
-	SetCurrentNamespace (CNamespace* pNamespace);
+	OpenNamespace (CNamespace* pNamespace);
 
 	void
-	SetGlobalNamespace ()
-	{
-		m_pCurrentNamespace = &m_GlobalNamespace;
-	}
+	CloseNamespace ();
 
 	EAccess
 	GetAccessKind (CNamespace* pNamespace);
@@ -97,3 +95,4 @@ public:
 
 } // namespace jnc {
 } // namespace axl {
+

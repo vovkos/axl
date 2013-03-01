@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "axl_jnc_PropertyVerifier.h"
-#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {

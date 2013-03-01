@@ -519,25 +519,39 @@ unary_operator_expr <CValue* $pValue>
 		{
 			$pValue->SetType ($2.m_pType);
 		}
-	| EToken_Snapshot unary_expr <$pValue> 
-		{
-			// not yet
-		}
-	| EToken_Dynamic unary_expr <$pValue> 
-		{
-			// not yet
-		}
 	| resolver (cast_operator_rslv) 
 	  '(' allocation_specifier $a? type_name $t ')' unary_expr <$pValue> 
 		{
 			EAlloc AllocKind = IsValidLocator ($a) ? $a.m_AllocKind : EAlloc_Undefined;
 			return m_pModule->m_OperatorMgr.CastOperator (AllocKind, $pValue, $t.m_pType);
 		}
-	| allocation_specifier $a? EToken_New type_name $t
+	| allocation_specifier $a? EToken_New new_operator_type $t
 		{
 			EAlloc AllocKind = IsValidLocator ($a) ? $a.m_AllocKind : EAlloc_Undefined;
-			return m_pModule->m_OperatorMgr.NewOperator (AllocKind, $t.m_pType, $pValue);
+			return m_pModule->m_OperatorMgr.NewOperator (AllocKind, $t.m_pType, &$t.m_ArgList, $pValue);
 		}
+	;
+
+class
+{
+	CType* m_pType;
+	rtl::CBoxListT <CValue> m_ArgList;
+}
+new_operator_type
+	: type_name
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| resolver (type_name_w_constructor_rslv) priority (2) // set higher priority than type_specifier::qualified_name
+	  qualified_type_name $t '(' expression_or_empty_list $a ')'
+		{
+			$.m_pType = $t.m_pType;
+			$.m_ArgList.TakeOver (&$a.m_ValueList);
+		}
+	;
+
+type_name_w_constructor_rslv
+	: qualified_name '('
 	;
 
 class
@@ -667,7 +681,7 @@ primary_expr <CValue* $pValue>
 		}
 	| EToken_This
 		{
-			return GetThis ($pValue);
+			return GetThisValue ($pValue);
 		}
 	| EToken_OnChange
 		{

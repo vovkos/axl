@@ -31,12 +31,12 @@ enum_specifier
 enum_block <CEnumType* $pType>
 	: '{' 
 		{
-			OpenNamespace ($pType);	
+			m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
 		}
 	  enum_member_list <$pType> 
 	  '}'
 		{
-			CloseNamespace ();	
+			m_pModule->m_NamespaceMgr.CloseNamespace ();	
 		}
 	;
 
@@ -72,7 +72,7 @@ class
 struct_specifier
 	: EToken_Struct
 	  struct_pack_factor $p?
-	  (EToken_Identifier $n generic_formal_argument_list $g?)?
+	  EToken_Identifier $n?
 	  (':' type_name_list $b)?
 		{
 			$.m_pType = CreateStructType (
@@ -125,7 +125,7 @@ class
 }
 union_specifier
 	: EToken_Union
-	  (EToken_Identifier $n generic_formal_argument_list $g?)?
+	  EToken_Identifier $n?
 		{
 			$.m_pType = CreateUnionType (IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ());
 			if (!$.m_pType)
@@ -145,7 +145,7 @@ class
 class_specifier
 	: EToken_Class
 	  struct_pack_factor $p?
-	  (EToken_Identifier $n generic_formal_argument_list $g?)?
+	  EToken_Identifier $n
 	  (':' type_name_list $b)?
 		{
 			$.m_pType = CreateClassType (
@@ -162,27 +162,36 @@ class_specifier
 
 //.............................................................................
 
-// property
+// autoev class 
 
 class
 {
-	CPropertyType* m_pType;
+	CClassType* m_pType;
 }
-property_template_specifier
-	local
+autoev_class_specifier
+	local 
 	{
-		CPropertyTemplate* $pTemplate;
+		CDeclarator $Declarator;
 	}
-	: EToken_Property 
-		{
-			$pTemplate = CreatePropertyTemplate ();
-		}
-	  named_type_block <$pTemplate>		
-		{
-			$.m_pType = $pTemplate->CalcType ();
-			return $.m_pType != NULL;
+	: EToken_Class
+	  EToken_Identifier $n
+	  function_suffix $a <&$Declarator>?
+	  function_body_pass1 $b?
+	;
+
+// class_specifier vs autoev_class_specifier at type_specifier::EToken_Class
+
+autoev_class_specifier_rslv 
+	: EToken_Class
+	  EToken_Identifier
+	  	{
+			return (GetTypeSpecifier ()->GetTypeModifiers () & ETypeModifier_AutoEv) != 0;
 		}
 	;
+
+//.............................................................................
+
+// property
 
 class
 {
@@ -217,59 +226,28 @@ property_specifier_rslv
 
 //.............................................................................
 
-// autoev
+// property template
 
 class
 {
-	CClassType* m_pType;
-	CDeclarator m_Declarator;
+	CPropertyType* m_pType;
 }
-autoev_specifier
-	: EToken_AutoEv
-	  (EToken_Identifier $n
+property_template_specifier
+	local
+	{
+		CPropertyTemplate* $pTemplate;
+	}
+	: EToken_Property 
 		{
-			$.m_Declarator.AddName ($n.m_Data.m_String);
+			$pTemplate = CreatePropertyTemplate ();
 		}
-	  )?
-	  function_suffix $a <&$.m_Declarator>?
+	  named_type_block <$pTemplate>		
 		{
-			$.m_pType = CreateAutoEvType (&$.m_Declarator);
-			if (!$.m_pType)
-				return false;
+			$.m_pType = $pTemplate->CalcType ();
+			return $.m_pType != NULL;
 		}
-	  (
-		resolver ({ return m_Stage == EStage_Pass1 }) 
-		function_body_pass1 $b
-			{
-				$.m_pType->SetAutoEvBody (&$b.m_TokenList);
-			}
-	  |	autoev_body <$.m_pType> 
-	  )	  
 	;
 
-start
-autoev_body <CClassType* $pType>
-	: 
-		{
-			return PreAutoEvBlock ($pType);
-		}
-	  '{' autoev_stmt* '}'
-		{
-			return PostAutoEvBlock ();
-		}
-	;
-	
-autoev_stmt
-	: 
-		{
-			return PreAutoEvExpression ();
-		}
-	  expression ';'
-		{
-			return PostAutoEvExpression ($1.m_Value);
-		}
-	| ';'
-	;
 
 //.............................................................................
 
@@ -278,12 +256,12 @@ autoev_stmt
 named_type_block <CNamespace* $pNamespace>
 	: '{' 
 		{
-			OpenNamespace ($pNamespace);
+			m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
 		}
 	  named_type_block_declaration*
 	  '}'
 		{
-			CloseNamespace ();
+			m_pModule->m_NamespaceMgr.CloseNamespace ();
 		}
 	;
 

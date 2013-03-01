@@ -401,12 +401,14 @@ public:
 	bool
 	StackNewOperator (
 		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
 		);
 
 	bool
 	HeapNewOperator (
 		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
 		);
 
@@ -414,12 +416,13 @@ public:
 	NewOperator (
 		EAlloc AllocKind,
 		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
 		)
 	{
 		return AllocKind == EAlloc_Stack ? 
-			StackNewOperator (pType, pResultValue) :
-			HeapNewOperator (pType, pResultValue);
+			StackNewOperator (pType, pArgList, pResultValue) :
+			HeapNewOperator (pType, pArgList, pResultValue);
 	}
 
 	bool
@@ -563,6 +566,15 @@ public:
 	{
 		return ClosureOperator (*pValue,  pArgList, pValue);
 	}
+
+	bool
+	CallBaseTypeConstructor (
+		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	PostBaseTypeConstructorList ();
 
 	void
 	GetThinDataPtrScopeLevel (
@@ -918,6 +930,14 @@ protected:
 	GetVarArgType (
 		CType* pType,
 		bool IsUnsafeVarArg
+		);
+
+	bool
+	InitializeObject (
+		const CValue& ObjPtrValue,
+		CClassType* pClassType,
+		rtl::CBoxListT <CValue>* pArgList,
+		CValue* pResultValue
 		);
 };
 

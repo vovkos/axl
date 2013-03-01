@@ -90,31 +90,33 @@ GetTypeModifierString (ETypeModifier Modifier)
 {
 	static const tchar_t* StringTable [] = 
 	{
-		_T("signed"),        // ETypeModifier_Signed    = 0x00000001,
-		_T("unsigned"),      // ETypeModifier_Unsigned  = 0x00000002,
-		_T("bigendian"),     // ETypeModifier_BigEndian = 0x00000004,
-		_T("nonull"),        // ETypeModifier_NoNull    = 0x00000008,
-		_T("const"),         // ETypeModifier_Const     = 0x00000010,
-		_T("readonly"),      // ETypeModifier_ReadOnly  = 0x00000020,
-		_T("volatile"),      // ETypeModifier_Volatile  = 0x00000040,
-		_T("weak"),          // ETypeModifier_Weak      = 0x00000080,
-		_T("thin"),          // ETypeModifier_Thin      = 0x00000100,
-		_T("unsafe"),        // ETypeModifier_Unsafe    = 0x00000200,
-		_T("cdecl"),         // ETypeModifier_Cdecl     = 0x00000400,
-		_T("stdcall"),       // ETypeModifier_Stdcall   = 0x00000800,
-		_T("function"),      // ETypeModifier_Function  = 0x00001000,
-		_T("property"),      // ETypeModifier_Property  = 0x00002000,
-		_T("bindable"),      // ETypeModifier_Bindable  = 0x00004000,
-		_T("autoget"),       // ETypeModifier_AutoGet   = 0x00008000,
-		_T("indexed"),       // ETypeModifier_Indexed   = 0x00010000,
-		_T("nonull"),        // ETypeModifier_NoNull_p  = 0x00020000,
-		_T("const"),         // ETypeModifier_Const_p   = 0x00040000,
-		_T("weak"),          // ETypeModifier_Weak_p    = 0x00080000,
-		_T("unsafe"),        // ETypeModifier_Unsafe_p  = 0x00100000,
-		_T("event"),         // ETypeModifier_Event     = 0x00200000,
+		_T("signed"),        // ETypeModifier_Signed     = 0x00000001,
+		_T("unsigned"),      // ETypeModifier_Unsigned   = 0x00000002,
+		_T("bigendian"),     // ETypeModifier_BigEndian  = 0x00000004,
+		_T("nonull"),        // ETypeModifier_Nullable   = 0x00000008,
+		_T("const"),         // ETypeModifier_Const      = 0x00000010,
+		_T("readonly"),      // ETypeModifier_ReadOnly   = 0x00000020,
+		_T("volatile"),      // ETypeModifier_Volatile   = 0x00000040,
+		_T("weak"),          // ETypeModifier_Weak       = 0x00000080,
+		_T("thin"),          // ETypeModifier_Thin       = 0x00000100,
+		_T("unsafe"),        // ETypeModifier_Unsafe     = 0x00000200,
+		_T("cdecl"),         // ETypeModifier_Cdecl      = 0x00000400,
+		_T("stdcall"),       // ETypeModifier_Stdcall    = 0x00000800,
+		_T("class"),         // ETypeModifier_Class      = 0x00001000,
+		_T("function"),      // ETypeModifier_Function   = 0x00002000,
+		_T("property"),      // ETypeModifier_Property   = 0x00004000,
+		_T("autoev"),        // ETypeModifier_AutoEv     = 0x00008000,
+		_T("bindable"),      // ETypeModifier_Bindable   = 0x00010000,
+		_T("autoget"),       // ETypeModifier_AutoGet    = 0x00020000,
+		_T("indexed"),       // ETypeModifier_Indexed    = 0x00040000,
+		_T("nonull"),        // ETypeModifier_Nullable_p = 0x00080000,
+		_T("const"),         // ETypeModifier_Const_p    = 0x00100000,
+		_T("weak"),          // ETypeModifier_Weak_p     = 0x00200000,
+		_T("unsafe"),        // ETypeModifier_Unsafe_p   = 0x00400000,
+		_T("event"),         // ETypeModifier_Event      = 0x00800000,
 	};
 
-	size_t i = rtl::GetLoBitIdx32 (Modifier);
+	size_t i  = rtl::GetLoBitIdx32 (Modifier);
 	return i < countof (StringTable) ? 
 		StringTable [i] : 
 		_T("undefined-type-modifier");
@@ -127,7 +129,7 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 {
 	static const tchar_t* StringTable [] = 
 	{
-		_T("nonull"),   // EPtrTypeFlag_NoNull    = 0x0100,
+		_T("nullable"), // EPtrTypeFlag_Nullable  = 0x0100,
 		_T("const"),    // EPtrTypeFlag_Const     = 0x0200,
 		_T("readonly"), // EPtrTypeFlag_ReadOnly  = 0x0400,
 		_T("volatile"), // EPtrTypeFlag_Volatile  = 0x0800,
@@ -148,8 +150,8 @@ GetPtrTypeFlagsFromModifiers (int Modifiers)
 {
 	int Flags;
 
-	if (Modifiers & ETypeModifier_NoNull)
-		Flags |= EPtrTypeFlag_NoNull;
+	if (Modifiers & ETypeModifier_Nullable)
+		Flags |= EPtrTypeFlag_Nullable;
 
 	if (Modifiers & ETypeModifier_Const)
 		Flags |= EPtrTypeFlag_Const;

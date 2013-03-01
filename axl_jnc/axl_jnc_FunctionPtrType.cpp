@@ -84,7 +84,7 @@ CFunctionPtrType::CreateSignature (
 		break;
 	}
 
-	if (Flags & EPtrTypeFlag_NoNull)
+	if (Flags & EPtrTypeFlag_Nullable)
 		Signature += 'n';
 
 	Signature += pFunctionType->GetSignature ();
@@ -97,18 +97,21 @@ CFunctionPtrType::GetTypeModifierString ()
 	if (!m_TypeModifierString.IsEmpty ())
 		return m_TypeModifierString;
 
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeModifierString += _T("nonull ");
+	if (m_Flags & EPtrTypeFlag_Nullable)
+		m_TypeModifierString += _T(" nullable");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeModifierString += GetFunctionPtrTypeKindString (m_PtrTypeKind);
 		m_TypeModifierString += _T(' ');
+		m_TypeModifierString += GetFunctionPtrTypeKindString (m_PtrTypeKind);
 	}
 
 	ECallConv CallConv = m_pTargetType->GetCallConv ();
 	if (CallConv)
-		m_TypeModifierString.AppendFormat (_T("%s "), GetCallConvString (CallConv));
+	{
+		m_TypeModifierString += _T(' ');
+		m_TypeModifierString += GetCallConvString (CallConv);
+	}
 
 	return m_TypeModifierString;
 }
@@ -117,9 +120,8 @@ void
 CFunctionPtrType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
-	m_TypeString += _T(' ');
 	m_TypeString += GetTypeModifierString ();
-	m_TypeString += m_TypeKind == EType_FunctionRef ? "function& " : "function* ";
+	m_TypeString += m_TypeKind == EType_FunctionRef ? " function& " : " function* ";
 	m_TypeString += m_pTargetType->GetArgTypeString ();
 }
 

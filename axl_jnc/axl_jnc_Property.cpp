@@ -332,7 +332,7 @@ CProperty::CalcLayout ()
 
 	ASSERT (m_StorageKind);
 
-	if (!m_VTable.IsEmpty ())
+	if (!m_VTable.IsEmpty ()) // done already
 		return true;
 
 	if (m_pType->GetFlags () & EPropertyTypeFlag_Augmented)
@@ -365,13 +365,7 @@ CProperty::CalcLayout ()
 			);
 	}
 
-	if (!m_pSetter)
-	{
-		m_VTable.Copy (m_pGetter);
-		return true;
-	}
-
-	size_t SetterCount = m_pSetter->GetOverloadCount ();
+	size_t SetterCount = m_pSetter ? m_pSetter->GetOverloadCount () : 0;
 	m_VTable.SetCount (SetterCount + 1);
 	m_VTable [0] = m_pGetter;
 
@@ -381,18 +375,13 @@ CProperty::CalcLayout ()
 		m_VTable [i + 1] = pSetter;
 	}
 
+	CreateVTablePtr ();
 	return true;
 }
 
-bool
-CProperty::GetVTablePtrValue (CValue* pValue)
+void
+CProperty::CreateVTablePtr ()
 {
-	if (!m_VTablePtrValue.IsEmpty ())
-	{
-		*pValue = m_VTablePtrValue;
-		return true;
-	}
-
 	char Buffer [256];
 	rtl::CArrayT <llvm::Constant*> LlvmVTable (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
@@ -403,18 +392,9 @@ CProperty::GetVTablePtrValue (CValue* pValue)
 	{
 		CFunction* pFunction = m_VTable [i];
 
-		#pragma AXL_TODO ("think about how to report undefined functions")
+		if (pFunction->GetStorageKind () == EStorage_Abstract)
+			pFunction = pFunction->GetType ()->GetAbstractFunction ();
 
-/*		if (!pFunction->IsDefined ())
-		{
-			err::SetFormatStringError (
-				_T("cannot create property '%s': '%s' has no body"), 
-				m_Tag,
-				pFunction->m_Tag
-				);
-			return false;
-		}
-*/
 		LlvmVTable [i] = pFunction->GetLlvmFunction ();
 	}
 	
@@ -441,9 +421,6 @@ CProperty::GetVTablePtrValue (CValue* pValue)
 		pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe),
 		EValue_Const
 		);
-
-	*pValue = m_VTablePtrValue;
-	return true;
 }
 
 //.............................................................................

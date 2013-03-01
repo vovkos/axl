@@ -58,7 +58,7 @@ CCast_ClassPtr::LlvmCast (
 	}
 
 	CBaseTypeCoord Coord;
-	bool Result = pSrcClassType->FindBaseType (pDstClassType, &Coord);
+	bool Result = pSrcClassType->FindBaseTypeTraverse (pDstClassType, &Coord);
 	if (!Result)
 		return m_pModule->m_LlvmBuilder.DynamicCastInterface (OpValue, pDstClassType, pResultValue);
 

@@ -167,7 +167,7 @@ CParser::OpenGlobalNamespace (
 			return NULL;
 	}
 	
-	OpenNamespace (pNamespace);
+	m_pModule->m_NamespaceMgr.OpenNamespace (pNamespace);
 	return pNamespace;
 }
 
@@ -204,23 +204,6 @@ CParser::GetGlobalNamespace (
 	return pNamespace;
 }
 
-void
-CParser::OpenNamespace (CNamespace* pNamespace)
-{
-	m_NamespaceStack.Append (m_pModule->m_NamespaceMgr.GetCurrentNamespace ());
-	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
-}
-
-void
-CParser::CloseNamespace ()
-{
-	if (m_NamespaceStack.IsEmpty ())
-		return;
-
-	CNamespace* pNamespace = m_NamespaceStack.GetBackAndPop ();
-	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
-}
-
 CScope*
 CParser::OpenScope (const CToken::CPos& Pos)
 {
@@ -236,7 +219,7 @@ CParser::OpenScope (const CToken::CPos& Pos)
 	pScope->m_EndPos = Pos;
 	pScope->m_pParentNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pScope);
+	m_pModule->m_NamespaceMgr.OpenNamespace (pScope);
 	return pScope;
 }
 
@@ -244,13 +227,12 @@ void
 CParser::CloseScope (const CToken::CPos& Pos)
 {
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	if (!pScope)
-		return;
+	ASSERT (pScope);
 
 	pScope->m_EndPos = Pos;
 
 	m_pModule->m_OperatorMgr.ProcessDestructList (&pScope->m_DestructList);
-	m_pModule->m_NamespaceMgr.SetCurrentNamespace (pScope->m_pParentNamespace);
+	m_pModule->m_NamespaceMgr.CloseNamespace ();
 }
 
 bool
@@ -289,7 +271,7 @@ CParser::OpenTypeExtension (
 
 	if (pNamedType->m_pExtensionNamespace)
 	{
-		OpenNamespace (pNamedType->m_pExtensionNamespace);
+		m_pModule->m_NamespaceMgr.OpenNamespace (pNamedType->m_pExtensionNamespace);
 		return true;
 	}
 	
@@ -304,7 +286,7 @@ CParser::OpenTypeExtension (
 
 	pNamedType->m_pExtensionNamespace = pNamespace;
 
-	OpenNamespace (pNamespace);
+	m_pModule->m_NamespaceMgr.OpenNamespace (pNamespace);
 	return true;
 }
 
@@ -1125,24 +1107,24 @@ CParser::PreAutoEvBlock (CClassType* pAutoEvType)
 
 	Result = m_pModule->m_FunctionMgr.Prologue (
 		pAutoEvType->GetPreConstructor (), 
-		m_LastMatchedToken.m_Pos, 
-		&m_AutoEvConstructorThisValue
+		m_LastMatchedToken.m_Pos
 		);
 
 	if (!Result)
 		return false;	
 
+	m_AutoEvConstructorThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	m_pAutoEvConstructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 
 	Result = m_pModule->m_FunctionMgr.Prologue (
 		pAutoEvType->GetDestructor (), 
-		m_LastMatchedToken.m_Pos, 
-		&m_AutoEvDestructorThisValue
+		m_LastMatchedToken.m_Pos
 		);
 
 	if (!Result)
 		return false;	
 
+	m_AutoEvDestructorThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	m_pAutoEvDestructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 		
 	m_pAutoEvType = pAutoEvType;
@@ -1188,11 +1170,7 @@ CParser::PreAutoEvExpression ()
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_AutoEv, pFunctionType);
 	m_pAutoEvType->AddMethodMember (pFunction);
 
-	bool Result = m_pModule->m_FunctionMgr.Prologue (pFunction, m_CurrentToken.m_Pos, &m_ThisValue);
-	if (!Result)
-		return false;
-
-	return true;
+	return m_pModule->m_FunctionMgr.Prologue (pFunction, m_CurrentToken.m_Pos);
 }
 
 bool
@@ -1252,7 +1230,6 @@ CParser::PostAutoEvExpression (const CValue& Value)
 	m_pAutoEvDestructorBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 
 	m_BindablePropertyList.Clear ();
-	m_ThisValue.SetVoid ();
 	return true;
 }
 
@@ -1409,6 +1386,8 @@ CParser::LookupIdentifier (
 	CValue* pValue
 	)
 {
+	bool Result;
+
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
 	
@@ -1433,10 +1412,26 @@ CParser::LookupIdentifier (
 
 	case EModuleItem_Function:
 		pValue->SetFunction ((CFunction*) pItem);
+
+		if (((CFunction*) pItem)->IsMember ())
+		{
+			Result = CreateMemberClosure (pValue);
+			if (!Result)
+				return false;
+		}
+
 		break;
 
 	case EModuleItem_Property:
 		pValue->SetProperty ((CProperty*) pItem);
+
+		if (((CProperty*) pItem)->IsMember ())
+		{
+			Result = CreateMemberClosure (pValue);
+			if (!Result)
+				return false;
+		}
+
 		break;
 
 	case EModuleItem_EnumConst:
@@ -1444,7 +1439,12 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_StructField:
-		return m_pModule->m_OperatorMgr.GetFieldMember (m_ThisValue, (CStructField*) pItem, &Coord, pValue);
+		return m_pModule->m_OperatorMgr.GetFieldMember (
+			m_pModule->m_FunctionMgr.GetThisValue (), 
+			(CStructField*) pItem, 
+			&Coord, 
+			pValue
+			);
 
 	default:
 		err::SetFormatStringError (_T("%s '%s' cannot be used as expression"), GetModuleItemKindString (pItem->GetItemKind ()), Name);
@@ -1455,15 +1455,28 @@ CParser::LookupIdentifier (
 }
 
 bool
-CParser::GetThis (CValue* pValue)
+CParser::CreateMemberClosure (CValue* pValue)
 {
-	if (m_ThisValue.IsEmpty ())
+	CValue ThisValue;
+	bool Result = GetThisValue (&ThisValue);
+	if (!Result)
+		return false;
+
+	CClosure* pClosure = pValue->CreateClosure ();
+	pClosure->GetArgList ()->InsertHead (ThisValue);
+	return true;
+}
+
+bool
+CParser::GetThisValue (CValue* pValue)
+{
+	*pValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	if (pValue->IsEmpty ())
 	{
 		err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
 		return false;
 	}
 
-	*pValue = m_ThisValue;
 	return true;
 }
 

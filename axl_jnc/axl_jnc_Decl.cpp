@@ -5,7 +5,7 @@
 
 namespace axl {
 namespace jnc {
-	
+
 //.............................................................................
 
 bool
@@ -18,7 +18,7 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifier_Unsigned,     // ETypeModifier_Signed           = 0x00000001,
 		ETypeModifier_Signed,       // ETypeModifier_Unsigned         = 0x00000002,
 		0,                          // ETypeModifier_BigEndian        = 0x00000004,
-		0,                          // ETypeModifier_NoNull           = 0x00000008,
+		0,                          // ETypeModifier_Nullable           = 0x00000008,
 		ETypeModifier_ReadOnly,     // ETypeModifier_Const            = 0x00000010,
 		ETypeModifier_Const,        // ETypeModifier_ReadOnly         = 0x00000020,
 		0,                          // ETypeModifier_Volatile         = 0x00000040,
@@ -30,11 +30,15 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifier_Thin,   
 		ETypeModifier_Stdcall,      // ETypeModifier_Cdecl            = 0x00000400,
 		ETypeModifier_Cdecl,        // ETypeModifier_Stdcall          = 0x00000800,
-		ETypeModifier_Property,     // ETypeModifier_Function         = 0x00001000,
-		ETypeModifier_Function,     // ETypeModifier_Property         = 0x00002000,
-		0,                          // ETypeModifier_Bindable         = 0x00004000,
-		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00008000,
-		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00010000,
+		ETypeModifier_Function |    // ETypeModifier_Class            = 0x00001000,
+		ETypeModifier_Property,      
+		ETypeModifier_Class |       // ETypeModifier_Function         = 0x00002000,
+		ETypeModifier_Property,      
+		ETypeModifier_Class |       // ETypeModifier_Property         = 0x00004000,
+		ETypeModifier_Function,      
+		0,                          // ETypeModifier_Bindable         = 0x00008000,
+		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00010000,
+		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00020000,
 	};
 
 	// check duplicates
@@ -126,18 +130,7 @@ CTypeSpecifier::SetType (CType* pType)
 
 	if (TypeKind == EType_Class || TypeKind == EType_ClassPtr)
 	{
-		if (m_TypeModifiers & ETypeModifier_NoNull)
-			m_TypeModifiers |= ETypeModifier_NoNull_p;
-
-		if (m_TypeModifiers & ETypeModifier_Const)
-			m_TypeModifiers |= ETypeModifier_Const_p;
-
-		if (m_TypeModifiers & ETypeModifier_Weak)
-			m_TypeModifiers |= ETypeModifier_Weak_p;
-
-		if (m_TypeModifiers & ETypeModifier_Unsafe)
-			m_TypeModifiers |= ETypeModifier_Unsafe_p;
-
+		m_TypeModifiers |= PromoteClassPtrTypeModifiers (m_TypeModifiers);
 		m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;
 	}
 	

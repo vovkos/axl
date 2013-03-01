@@ -35,6 +35,16 @@ CDeclTypeCalc::CalcType (
 		switch (PrefixKind)
 		{
 		case EDeclPrefix_Pointer:
+			if (m_TypeModifiers & ETypeModifier_Class)
+			{
+				if (pType->GetTypeKind () != EType_Class)
+				{
+					err::SetFormatStringError (_T("cannot create a class pointer to '%s'"), pType->GetTypeString ());
+					return NULL;
+				}
+
+				pType = GetClassPtrType ((CClassType*) pType);
+			}
 			if (m_TypeModifiers & ETypeModifier_Function)
 			{
 				CFunctionType* pFunctionType = GetFunctionType (pType);
@@ -67,7 +77,6 @@ CDeclTypeCalc::CalcType (
 
 			break;
 
-	
 		case EDeclPrefix_Multicast:
 		case EDeclPrefix_Event:
 			pType = GetMulticastType (pType);
@@ -122,7 +131,7 @@ CDeclTypeCalc::CalcType (
 			return false;
 	}
 
-	if (pType->GetTypeKind () == EType_Class && (m_TypeModifiers & ETypeModifierMask_ClassPtr))
+	if (pType->GetTypeKind () == EType_Class && (m_TypeModifiers & ETypeModifierMask_ClassPtr_p) != 0)
 		pType = GetClassPtrType ((CClassType*) pType);
 
 	if (pDataPtrTypeFlags)
@@ -425,8 +434,8 @@ CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 	if (m_TypeModifiers & ETypeModifier_Volatile)
 		TypeFlags |= EPtrTypeFlag_Volatile;
 
-	if (m_TypeModifiers & ETypeModifier_NoNull)
-		TypeFlags |= EPtrTypeFlag_NoNull;
+	if (m_TypeModifiers & ETypeModifier_Nullable)
+		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
 	return m_pModule->m_TypeMgr.GetDataPtrType (pDataType, PtrTypeKind, TypeFlags);
@@ -435,16 +444,22 @@ CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 CClassPtrType*
 CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 {
+	if (m_TypeModifiers & ETypeModifier_Class)
+	{
+		m_TypeModifiers |= PromoteClassPtrTypeModifiers (m_TypeModifiers);
+		m_TypeModifiers &= ~(ETypeModifier_Class | ETypeModifierMask_ClassPtr);
+	}
+
 	EClassPtrType PtrTypeKind = GetClassPtrTypeKindFromModifiers (m_TypeModifiers);
 	int TypeFlags = 0;
 
 	if (m_TypeModifiers & ETypeModifier_Const_p)
 		TypeFlags |= EPtrTypeFlag_Const;
 
-	if (m_TypeModifiers & ETypeModifier_NoNull_p)
-		TypeFlags |= EPtrTypeFlag_NoNull;
+	if (m_TypeModifiers & ETypeModifier_Nullable_p)
+		TypeFlags |= EPtrTypeFlag_Nullable;
 
-	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;
+	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr_p;
 	return m_pModule->m_TypeMgr.GetClassPtrType (pClassType, PtrTypeKind, TypeFlags);
 }
 
@@ -454,8 +469,8 @@ CDeclTypeCalc::GetFunctionPtrType (CFunctionType* pFunctionType)
 	EFunctionPtrType PtrTypeKind = GetFunctionPtrTypeKindFromModifiers (m_TypeModifiers);
 	int TypeFlags = 0;
 
-	if (m_TypeModifiers & ETypeModifier_NoNull)
-		TypeFlags |= EPtrTypeFlag_NoNull;
+	if (m_TypeModifiers & ETypeModifier_Nullable)
+		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_FunctionPtr;
 	return m_pModule->m_TypeMgr.GetFunctionPtrType (pFunctionType, PtrTypeKind, TypeFlags);
@@ -467,8 +482,8 @@ CDeclTypeCalc::GetPropertyPtrType (CPropertyType* pPropertyType)
 	EPropertyPtrType PtrTypeKind = GetPropertyPtrTypeKindFromModifiers (m_TypeModifiers);
 	int TypeFlags = 0;
 
-	if (m_TypeModifiers & ETypeModifier_NoNull)
-		TypeFlags |= EPtrTypeFlag_NoNull;
+	if (m_TypeModifiers & ETypeModifier_Nullable)
+		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_PropertyPtr;
 	return m_pModule->m_TypeMgr.GetPropertyPtrType (pPropertyType, PtrTypeKind, TypeFlags);

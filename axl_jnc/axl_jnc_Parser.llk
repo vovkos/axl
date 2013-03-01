@@ -51,7 +51,6 @@ Members
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CAttributeBlock* m_pAttributeBlock;
-	CValue m_ThisValue;
 	 
 	CClassType* m_pAutoEvType;
 	CBasicBlock* m_pAutoEvConstructorBlock;
@@ -61,7 +60,6 @@ Members
 
 	CModuleItem* m_pLastDeclaredItem;
 
-	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
 	rtl::CBoxListT <CValue> m_BindablePropertyList;
 }
@@ -122,23 +120,17 @@ Members2
 		const CToken::CPos& Pos
 		);
 
+	CScope*
+	OpenScope (const CToken::CPos& Pos);
+
 	void
-	OpenNamespace (CNamespace* pNamespace);
+	CloseScope (const CToken::CPos& Pos);
 
 	bool
 	OpenTypeExtension (
 		const CQualifiedName& Name,
 		const CToken::CPos& Pos
 		);
-
-	void
-	CloseNamespace ();
-
-	CScope*
-	OpenScope (const CToken::CPos& Pos);
-
-	void
-	CloseScope (const CToken::CPos& Pos);
 
 	bool
 	Declare (
@@ -274,7 +266,10 @@ Members2
 		);
 
 	bool
-	GetThis (CValue* pValue);
+	CreateMemberClosure (CValue* pValue);
+
+	bool
+	GetThisValue (CValue* pValue);
 
 	bool
 	GetAuPropertyFieldMember (

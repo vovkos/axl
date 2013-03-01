@@ -25,6 +25,7 @@ enum EModuleItem
 	EModuleItem_Variable,
 	EModuleItem_Function,
 	EModuleItem_Property,
+	EModuleItem_AutoEv,
 	EModuleItem_EnumConst,
 	EModuleItem_StructField,
 	EModuleItem__Count,

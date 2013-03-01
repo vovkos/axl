@@ -76,6 +76,7 @@
     <ClInclude Include="..\Inc\axl_jnc_ArrayType.h" />
     <ClInclude Include="..\inc\axl_jnc_AttributeBlock.h" />
     <ClInclude Include="..\inc\axl_jnc_AttributeMgr.h" />
+    <ClInclude Include="..\inc\axl_jnc_AutoEv.h" />
     <ClInclude Include="..\Inc\axl_jnc_BasicBlock.h" />
     <ClInclude Include="..\inc\axl_jnc_BinOp.h" />
     <ClInclude Include="..\inc\axl_jnc_BinOp_Arithmetic.h" />
@@ -146,6 +147,7 @@
     <ClCompile Include="axl_jnc_ArrayType.cpp" />
     <ClCompile Include="axl_jnc_AttributeBlock.cpp" />
     <ClCompile Include="axl_jnc_AttributeMgr.cpp" />
+    <ClCompile Include="axl_jnc_AutoEv.cpp" />
     <ClCompile Include="axl_jnc_BasicBlock.cpp" />
     <ClCompile Include="axl_jnc_BinOp.cpp" />
     <ClCompile Include="axl_jnc_BinOp_Arithmetic.cpp" />

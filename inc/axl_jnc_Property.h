@@ -24,8 +24,8 @@ protected:
 	friend class CParser;
 
 	CPropertyType* m_pType;
-	CType* m_pAuPropValueType; // before the type was calculated
-	int m_TypeModifiers;       // before the type was calculated
+	CType* m_pAuPropValueType; // before the type is calculated
+	int m_TypeModifiers;       // before the type is calculated
 
 	// construction / destruction / accessors
 
@@ -126,6 +126,12 @@ public:
 	}
 
 	bool
+	IsMember ()
+	{
+		return m_StorageKind >= EStorage_Member && m_StorageKind <= EStorage_Override;
+	}
+
+	bool
 	IsVirtual ()
 	{
 		return m_StorageKind >= EStorage_Abstract && m_StorageKind <= EStorage_Override;
@@ -181,16 +187,16 @@ public:
 	bool
 	CalcLayout ();
 
-	rtl::CArrayT <CFunction*>
-	GetVTable ()
+	CValue
+	GetVTablePtrValue ()
 	{
-		return m_VTable;
+		return m_VTablePtrValue;
 	}
 
-	bool
-	GetVTablePtrValue (CValue* pValue);
-
 protected:
+	void
+	CreateVTablePtr ();
+
 	CStructType*
 	GetFieldStructType (EStorage StorageKind);
 };

@@ -22,6 +22,28 @@ GetClassPtrTypeKindString (EClassPtrType PtrTypeKind)
 		_T("undefined-class-ptr-kind");
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+int 
+PromoteClassPtrTypeModifiers (int Modifiers)
+{
+	int PromotedModifiers = 0;
+
+	if (Modifiers & ETypeModifier_Nullable)
+		PromotedModifiers |= ETypeModifier_Nullable_p;
+
+	if (Modifiers & ETypeModifier_Const)
+		PromotedModifiers |= ETypeModifier_Const_p;
+
+	if (Modifiers & ETypeModifier_Weak)
+		PromotedModifiers |= ETypeModifier_Weak_p;
+
+	if (Modifiers & ETypeModifier_Unsafe)
+		PromotedModifiers |= ETypeModifier_Unsafe_p;
+
+	return PromotedModifiers;
+}
+
 //.............................................................................
 
 CClassPtrType::CClassPtrType ()
@@ -55,7 +77,7 @@ CClassPtrType::CreateSignature (
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
 
-	if (Flags & EPtrTypeFlag_NoNull)
+	if (Flags & EPtrTypeFlag_Nullable)
 		Signature += 'n';
 
 	Signature += pClassType->GetSignature ();
@@ -65,20 +87,21 @@ CClassPtrType::CreateSignature (
 void
 CClassPtrType::PrepareTypeString ()
 {
-	if (m_Flags & EPtrTypeFlag_Const)
-		m_TypeString += _T("const ");
+	m_TypeString += m_pTargetType->GetTypeString ();
 
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeString += _T("nonull ");
+	if (m_Flags & EPtrTypeFlag_Const)
+		m_TypeString += _T(" const");
+
+	if (m_Flags & EPtrTypeFlag_Nullable)
+		m_TypeString += _T(" nullable");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += GetClassPtrTypeKindString (m_PtrTypeKind);
 		m_TypeString += _T(' ');
+		m_TypeString += GetClassPtrTypeKindString (m_PtrTypeKind);
 	}
 
-	m_TypeString += m_pTargetType->GetTypeString ();
-	m_TypeString += "&";
+	m_TypeString += " class*";
 }
 
 void

@@ -72,7 +72,7 @@ class
 	EStorage m_StorageKind;
 }
 storage_specifier
-	: EToken_Typedef generic_formal_argument_list $g?
+	: EToken_Typedef
 		{
 			$.m_StorageKind = EStorage_Typedef;
 		}
@@ -166,10 +166,6 @@ type_specifier
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char);
 		}
-	| EToken_WChar
-		{
-			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_WChar);
-		}
 	| EToken_Short
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Short);
@@ -207,6 +203,11 @@ type_specifier
 		{
 			$.m_pType = $1.m_pType;
 		}
+	| resolver (autoev_class_specifier_rslv)
+	  autoev_class_specifier $t
+		{
+			$.m_pType = $t.m_pType;
+		}
 	| property_template_specifier
 		{
 			$.m_pType = $1.m_pType;
@@ -216,13 +217,8 @@ type_specifier
 		{
 			$.m_pType = $t.m_pProperty->GetType ();
 		}
-	| autoev_specifier
-		{
-			$.m_pType = $1.m_pType;
-		}
 	| resolver (qualified_type_name_rslv)
 	  qualified_type_name $t
-	  generic_actual_argument_list?
 		{
 			$.m_pType = $t.m_pType;
 		}
@@ -283,9 +279,9 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_BigEndian;
 		}
-	| EToken_NoNull
+	| EToken_Nullable
 		{
-			$.m_Modifier = ETypeModifier_NoNull;
+			$.m_Modifier = ETypeModifier_Nullable;
 		}
 	| EToken_Const
 		{
@@ -319,6 +315,10 @@ type_modifier
 		{
 			$.m_Modifier = ETypeModifier_Stdcall;
 		}
+	| EToken_Class
+		{
+			$.m_Modifier = ETypeModifier_Class;
+		}
 	| EToken_Function
 		{
 			$.m_Modifier = ETypeModifier_Function;
@@ -326,6 +326,10 @@ type_modifier
 	| EToken_Property
 		{
 			$.m_Modifier = ETypeModifier_Property;
+		}
+	| EToken_AutoEv
+		{
+			$.m_Modifier = ETypeModifier_AutoEv;
 		}
 	| EToken_Bindable
 		{
@@ -342,3 +346,4 @@ type_modifier
 	;
 
 //.............................................................................
+

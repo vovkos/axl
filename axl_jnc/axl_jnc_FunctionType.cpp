@@ -12,7 +12,7 @@ GetCallConvString (ECallConv CallConv)
 {
 	static const tchar_t* StringTable [] = 
 	{
-		_T("cdec"),     // ECallConv_Cdecl,
+		_T("cdecl"),    // ECallConv_Cdecl,
 		_T("stdcall"),  // ECallConv_Stdcall,
 	};
 
@@ -52,12 +52,6 @@ CFunctionType::GetFunctionPtrType (
 }
 
 CFunctionType*
-CFunctionType::GetAbstractMethodMemberType ()
-{
-	return m_pModule->m_TypeMgr.GetAbstractMethodMemberType (this);
-}
-
-CFunctionType*
 CFunctionType::GetShortType ()
 {
 	return m_pModule->m_TypeMgr.GetShortFunctionType (this);
@@ -67,6 +61,28 @@ CMulticastType*
 CFunctionType::GetMulticastType ()
 {
 	return m_pModule->m_TypeMgr.GetMulticastType (this);
+}
+
+CFunctionType*
+CFunctionType::GetAbstractMethodMemberType ()
+{
+	return m_pModule->m_TypeMgr.GetAbstractMethodMemberType (this);
+}
+
+CFunction*
+CFunctionType::GetAbstractFunction ()
+{
+	if (m_pAbstractFunction)
+		return m_pAbstractFunction;
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("abtract_method"), this);
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, NULL, 0);
+	m_pModule->m_LlvmBuilder.RuntimeError (ERuntimeError_AbstractFunction);
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pAbstractFunction = pFunction;
+	return pFunction;
 }
 
 rtl::CStringA
@@ -151,7 +167,10 @@ CFunctionType::GetArgTypeString ()
 		if (ArgCount)
 			m_ArgTypeString.Append (_T(", "));
 
-		m_ArgTypeString.Append ((m_Flags & EFunctionTypeFlag_UnsafeVarArg) ? _T("unsafe ...)") : _T("safe ...)"));
+		if (m_Flags & EFunctionTypeFlag_UnsafeVarArg)
+			m_ArgTypeString.Append (_T("unsafe "));
+
+		m_ArgTypeString.Append (_T("...)"));
 	}
 
 	return m_ArgTypeString;

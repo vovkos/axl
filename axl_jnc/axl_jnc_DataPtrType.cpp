@@ -65,7 +65,7 @@ CDataPtrType::CreateSignature (
 	if (Flags & EPtrTypeFlag_Volatile)
 		Signature += 'v';
 
-	if (Flags & EPtrTypeFlag_NoNull)
+	if (Flags & EPtrTypeFlag_Nullable)
 		Signature += 'n';
 
 	if (Flags & EPtrTypeFlag_Event)
@@ -79,25 +79,26 @@ CDataPtrType::CreateSignature (
 void
 CDataPtrType::PrepareTypeString ()
 {
+	m_TypeString += m_pTargetType->GetTypeString ();
+
 	if (m_Flags & EPtrTypeFlag_Const)
-		m_TypeString += _T("const ");
+		m_TypeString += _T(" const");
 
 	if (m_Flags & EPtrTypeFlag_Volatile)
-		m_TypeString += _T("volatile ");
+		m_TypeString += _T(" volatile");
 
-	if (m_Flags & EPtrTypeFlag_NoNull)
-		m_TypeString += _T("nonull ");
+	if (m_Flags & EPtrTypeFlag_Nullable)
+		m_TypeString += _T(" nullable");
 
 	if (m_Flags & EPtrTypeFlag_Event)
-		m_TypeString += _T("event ");
+		m_TypeString += _T(" event");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += GetDataPtrTypeKindString (m_PtrTypeKind);
 		m_TypeString += _T(' ');
+		m_TypeString += GetDataPtrTypeKindString (m_PtrTypeKind);
 	}
 
-	m_TypeString += m_pTargetType->GetTypeString ();
 	m_TypeString += m_TypeKind == EType_DataRef ? "&" : "*";
 }
 

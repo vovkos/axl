@@ -47,7 +47,7 @@ enum EToken
 	EToken_Signed,
 	EToken_Unsigned,
 	EToken_BigEndian,
-	EToken_NoNull,
+	EToken_Nullable,
 	EToken_Const,
 	EToken_ReadOnly,
 	EToken_Volatile,
@@ -60,6 +60,7 @@ enum EToken
 	EToken_Property,
 	EToken_Multicast,
 	EToken_Event,
+	EToken_AutoEv,
 	EToken_Bindable,
 	EToken_AutoGet,
 	EToken_Indexed,
@@ -82,7 +83,6 @@ enum EToken
 	EToken_Char,
 	EToken_Short,
 	EToken_Long,
-	EToken_WChar,
 
 	// named type specifiers
 
@@ -91,7 +91,6 @@ enum EToken
 	EToken_Struct,
 	EToken_Union,
 	EToken_Class,
-	EToken_AutoEv,
 
 	// special members
 
@@ -131,8 +130,6 @@ enum EToken
 	EToken_Heap,
 	EToken_SizeOf,
 	EToken_TypeOf,
-	EToken_Snapshot,
-	EToken_Dynamic,
 
 	// symbol tokens
 
@@ -202,7 +199,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Signed,       "signed")
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
-	AXL_PRS_TOKEN_NAME (EToken_NoNull,       "nonull")
+	AXL_PRS_TOKEN_NAME (EToken_Nullable,     "nullable")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
 	AXL_PRS_TOKEN_NAME (EToken_ReadOnly,     "readonly")
 	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
@@ -237,7 +234,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Char,         "char")
 	AXL_PRS_TOKEN_NAME (EToken_Short,        "short")
 	AXL_PRS_TOKEN_NAME (EToken_Long,         "long")
-	AXL_PRS_TOKEN_NAME (EToken_WChar,        "wchar_t")
 
 	// named type specifiers
 
@@ -286,8 +282,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
-	AXL_PRS_TOKEN_NAME (EToken_Snapshot,     "snapshot")
-	AXL_PRS_TOKEN_NAME (EToken_Dynamic,      "dynamic")
 
 	// symbol tokens
 

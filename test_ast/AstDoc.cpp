@@ -313,7 +313,7 @@ StdLib_DynamicCastInterface (
 		return p;
 	
 	jnc::CBaseTypeCoord Coord;
-	bool Result = p->m_pObject->m_pType->FindBaseType (pType, &Coord);
+	bool Result = p->m_pObject->m_pType->FindBaseTypeTraverse (pType, &Coord);
 	if (!Result)
 		return NULL;
 	

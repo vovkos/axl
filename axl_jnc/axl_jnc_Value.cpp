@@ -330,9 +330,7 @@ CValue::SetFunction (CFunction* pFunction)
 
 	m_ValueKind = EValue_Function;
 	m_pFunction = pFunction;
-
-	if (!pFunction->IsOverloaded ())
-		m_pType = pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin);
+	m_pType = pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin);
 
 	if (!pFunction->IsVirtual ())
 		m_pLlvmValue = pFunction->GetLlvmFunction ();

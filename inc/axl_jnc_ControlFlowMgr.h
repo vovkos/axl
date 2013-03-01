@@ -12,22 +12,25 @@ namespace jnc {
 
 //.............................................................................
 
-enum EControlFlowMgrFlag
-{
-	EControlFlowMgrFlag_HasReturn = 1,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class CControlFlowMgr
 {
 protected:
 	friend class CModule;
+	friend class CFunctionMgr;
+
+protected:
+	enum EFlag
+	{
+		EFlag_HasReturn = 1,
+	};
+
+protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CBasicBlock> m_BlockList;
-	CBasicBlock* m_pCurrentBlock;
 	CBasicBlock* m_pUnreachableBlock;
+	CBasicBlock* m_pCurrentBlock;
+	CBasicBlock* m_pReturnBlock; // bindable setters & destructors return here
 
 	int m_Flags;
 
@@ -43,16 +46,10 @@ public:
 	void
 	Clear ();
 
-	void
-	ResetHasReturn ()
+	bool
+	HasReturn ()
 	{
-		m_Flags &= ~EControlFlowMgrFlag_HasReturn;
-	}
-
-	int 
-	GetFlags ()
-	{
-		return m_Flags;
+		return (m_Flags & EFlag_HasReturn) != 0;
 	}
 
 	CBasicBlock* 
@@ -70,7 +67,7 @@ public:
 	void
 	Jump (
 		CBasicBlock* pBlock,
-		CBasicBlock* pFollowBlock
+		CBasicBlock* pFollowBlock = NULL
 		);
 
 	void
@@ -104,7 +101,7 @@ public:
 	
 protected:
 	void
-	RestoreScopeLevel (CFunction* pFunction);
+	RestoreScopeLevel ();
 
 	void
 	ProcessDestructList (CScope* pTargetScope = NULL);

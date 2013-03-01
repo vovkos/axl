@@ -39,7 +39,7 @@ COperatorMgr::GetFieldMember (
 		CClassType* pParentClassType = pProperty->GetParentClassType ();
 		ASSERT (pParentClassType);
 
-		if (ThisValue.IsEmpty ())
+		if (!ThisValue)
 		{
 			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
 			return false;
@@ -78,7 +78,7 @@ COperatorMgr::GetFieldMember (
 				pResultValue
 				);
 
-		if (ThisValue.IsEmpty ())
+		if (!ThisValue)
 		{
 			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
 			return false;
@@ -612,7 +612,7 @@ COperatorMgr::GetVirtualMethodMember (
 	size_t VTableIndex = pFunction->GetClassVTableIndex ();
 	
 	CBaseTypeCoord Coord;
-	pClassType->FindBaseType (pVTableType, &Coord);
+	pClassType->FindBaseTypeTraverse (pVTableType, &Coord);
 	VTableIndex += Coord.m_VTableIndex;
 	
 	// class.vtbl*
@@ -666,7 +666,7 @@ COperatorMgr::GetVirtualPropertyMember (
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
 
 	CBaseTypeCoord Coord;
-	pClassType->FindBaseType (pProperty->GetParentClassType (), &Coord);
+	pClassType->FindBaseTypeTraverse (pProperty->GetParentClassType (), &Coord);
 	VTableIndex += Coord.m_VTableIndex;
 
 	// class.vtbl*

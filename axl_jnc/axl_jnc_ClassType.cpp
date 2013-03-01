@@ -52,6 +52,22 @@ CClassType::GetPropertyMemberType (CPropertyType* pShortType)
 	return m_pModule->m_TypeMgr.GetPropertyMemberType (this, pShortType);
 }
 
+CFunction* 
+CClassType::GetDefaultConstructor ()
+{
+	ASSERT (m_pConstructor);
+
+	CType* pThisArgType = GetClassPtrType ();
+	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
+	if (!pDefaultConstructor)
+	{
+		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
+		return NULL;
+	}
+
+	return pDefaultConstructor;
+}
+
 void
 CClassType::SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList)
 {
@@ -258,63 +274,6 @@ CClassType::AddPropertyMember (CProperty* pProperty)
 }
 
 bool
-CClassType::GetVTablePtrValue (CValue* pValue)
-{
-	if (!m_VTablePtrValue.IsEmpty ())
-	{
-		*pValue = m_VTablePtrValue;
-		return true;
-	}
-
-	char Buffer [256];
-	rtl::CArrayT <llvm::Constant*> LlvmVTable (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	size_t Count = m_VTable.GetCount ();
-	LlvmVTable.SetCount (Count);
-
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunction* pFunction = m_VTable [i];
-		if (!pFunction->IsDefined ())
-		{
-			err::SetFormatStringError (
-				_T("cannot instantiate abstract '%s': '%s' has no body"), 
-				GetTypeString (),
-				pFunction->m_Tag
-				);
-			return false;
-		}
-
-		LlvmVTable [i] = pFunction->GetLlvmFunction ();
-	}
-
-	llvm::Constant* pLlvmVTableConstant = llvm::ConstantStruct::get (
-		(llvm::StructType*) m_pVTableStructType->GetLlvmType (),
-		llvm::ArrayRef <llvm::Constant*> (LlvmVTable, Count)
-		);
-
-	rtl::CString VariableTag;
-	VariableTag.Format (_T("%s.vtbl"), GetQualifiedName ());
-	llvm::GlobalVariable* pLlvmVTableVariable = new llvm::GlobalVariable (
-			*m_pModule->m_pLlvmModule,
-			m_pVTableStructType->GetLlvmType (),
-			false,
-			llvm::GlobalVariable::ExternalLinkage,
-			pLlvmVTableConstant,
-			(const tchar_t*) VariableTag
-			);
-
-	m_VTablePtrValue.SetLlvmValue (
-		pLlvmVTableVariable, 
-		m_pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe),
-		EValue_Const
-		);
-
-	*pValue = m_VTablePtrValue;
-	return true;
-}
-
-bool
 CClassType::CalcLayout ()
 {
 	if (m_Flags & ETypeFlag_LayoutReady)
@@ -325,6 +284,9 @@ CClassType::CalcLayout ()
 		return false;
 		
 	// layout base types
+
+	bool HasBaseConstructor = false;
+	bool HasBaseDestructor = false;
 
 	size_t BaseTypeCount = m_BaseTypeList.GetCount ();
 
@@ -351,6 +313,13 @@ CClassType::CalcLayout ()
 			BaseType->m_VTableIndex = m_VTable.GetCount ();
 			m_VTable.Append (pBaseClassType->m_VTable);
 			m_pVTableStructType->Append (pBaseClassType->m_pVTableStructType);
+
+			if (pBaseClassType->m_pConstructor)
+				HasBaseConstructor = true;
+
+			if (pBaseClassType->m_pDestructor)
+				HasBaseDestructor = true;
+
 			break;
 
 		case EType_Struct:
@@ -473,18 +442,34 @@ CClassType::CalcLayout ()
 		}
 	}
 
-	if (m_TypeKind == EType_Class)
+	m_pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+	m_pClassStructType->m_Tag.Format (_T("%s.class"), m_Tag);
+	m_pClassStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
+	m_pClassStructType->CreateFieldMember (m_pIfaceStructType);
+	m_pClassStructType->CalcLayout ();
+
+	CreateVTablePtr ();
+
+	if (!m_pConstructor && (m_pPreConstructor || HasBaseConstructor))
 	{
-		m_pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-		m_pClassStructType->m_Tag.Format (_T("%s.class"), m_Tag);
-		m_pClassStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
-		m_pClassStructType->CreateFieldMember (m_pIfaceStructType);
-		m_pClassStructType->CalcLayout ();
+		Result = CreateDefaultConstructor ();
+		if (!Result)
+			return false;
 	}
+
+	if (!m_pDestructor && HasBaseDestructor)
+	{
+		Result = CreateDefaultDestructor ();
+		if (!Result)
+			return false;
+	}
+
+	CreateInitializer ();
 
 	PostCalcLayout ();
 	return true;
 }
+
 
 void
 CClassType::AddVirtualFunction (CFunction* pFunction)
@@ -592,14 +577,280 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 	return true;
 }
 
-CFunction* 
-CClassType::GetInitializer ()
+void
+CClassType::CreateVTablePtr ()
 {
-	if (m_pInitializer)
-		return m_pInitializer;
+	if (m_VTable.IsEmpty ())
+	{
+		m_VTablePtrValue = m_pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe)->GetZeroValue ();
+		return;
+	}
 
-	m_pInitializer = m_pModule->m_FunctionMgr.CreateClassInitializer (this);
-	return m_pInitializer;
+	char Buffer [256];
+	rtl::CArrayT <llvm::Constant*> LlvmVTable (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	size_t Count = m_VTable.GetCount ();
+	LlvmVTable.SetCount (Count);
+
+	for (size_t i = 0; i < Count; i++)
+	{
+		CFunction* pFunction = m_VTable [i];
+		if (pFunction->GetStorageKind () == EStorage_Abstract)
+		{
+			pFunction = pFunction->GetType ()->GetAbstractFunction ();
+			m_Flags |= EClassTypeFlag_Abstract;
+		}
+
+		LlvmVTable [i] = pFunction->GetLlvmFunction ();
+	}
+
+	llvm::Constant* pLlvmVTableConstant = llvm::ConstantStruct::get (
+		(llvm::StructType*) m_pVTableStructType->GetLlvmType (),
+		llvm::ArrayRef <llvm::Constant*> (LlvmVTable, Count)
+		);
+
+	rtl::CString VariableTag;
+	VariableTag.Format (_T("%s.vtbl"), GetQualifiedName ());
+	llvm::GlobalVariable* pLlvmVTableVariable = new llvm::GlobalVariable (
+			*m_pModule->m_pLlvmModule,
+			m_pVTableStructType->GetLlvmType (),
+			false,
+			llvm::GlobalVariable::ExternalLinkage,
+			pLlvmVTableConstant,
+			(const tchar_t*) VariableTag
+			);
+
+	m_VTablePtrValue.SetLlvmValue (
+		pLlvmVTableVariable, 
+		m_pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe),
+		EValue_Const
+		);
+}
+
+bool
+CClassType::CreateDefaultConstructor ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetClassPtrType ()
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + _T(".this"), pType);
+
+	CValue ArgValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		if (BaseType->m_pType->GetTypeKind () != EType_Class)
+			continue;
+
+		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+		if (!pBaseClassType->GetConstructor ())
+			continue;
+
+		CFunction* pConstructor = pBaseClassType->GetDefaultConstructor ();
+		if (!pConstructor)
+			return false;
+
+		CValue ReturnValue;
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ArgValue, &ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	if (m_pPreConstructor)
+	{
+		CValue ReturnValue;
+		m_pModule->m_LlvmBuilder.CreateCall (
+			m_pPreConstructor, 
+			m_pPreConstructor->GetType (), 
+			ArgValue, 
+			&ReturnValue
+			);
+	}
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	return true;
+}
+
+bool
+CClassType::CreateDefaultDestructor ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetClassPtrType ()
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + _T(".~this"), pType);
+		
+	CValue ArgValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		if (BaseType->m_pType->GetTypeKind () != EType_Class)
+			continue;
+
+		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+		
+		CFunction* pDestructor = pBaseClassType->GetDestructor ();
+		if (!pDestructor)
+			continue;
+
+		CValue ReturnValue;
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ArgValue, &ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pDestructor = pFunction;
+
+	return true;
+}
+
+void
+CClassType::CreateInitializer ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		GetClassStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + _T(".init"), pType);
+
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	CValue ArgValue1 = ArgValueArray [0];
+	CValue ArgValue2 = ArgValueArray [1];
+
+	CClassType* pClassType = this;
+	CValue TypeValue (&pClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+	CValue ObjectPtrValue;
+	CValue IfacePtrValue;
+	CValue PtrValue;
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 0, NULL, &ObjectPtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 1, NULL, &IfacePtrValue);
+
+	// store CClassType*
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (TypeValue, PtrValue);
+
+	// store ScopeLevel
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 1, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ArgValue2, PtrValue);
+
+	InitializeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pInitializer = pFunction;
+}
+
+bool
+CClassType::InitializeInterface (
+	CClassType* pClassType,
+	const CValue& ObjectPtrValue,
+	const CValue& IfacePtrValue,
+	const CValue& VTablePtrValue
+	)
+{
+	CValue IfaceHdrPtrValue;
+	CValue VTablePtrPtrValue;
+	CValue ObjectPtrPtrValue;
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &VTablePtrPtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 1, NULL, &ObjectPtrPtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (VTablePtrValue, VTablePtrPtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ObjectPtrValue, ObjectPtrPtrValue);
+
+	rtl::CIteratorT <CBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		if (BaseType->m_pType->GetTypeKind () != EType_Class)
+			continue;
+
+		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+
+		CValue BaseClassPtrValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (
+			IfacePtrValue, 
+			BaseType->GetLlvmIndex (), 
+			NULL, 
+			&BaseClassPtrValue
+			);
+
+		CValue BaseClassVTablePtrValue;
+
+		if (!pBaseClassType->HasVTable ())
+		{
+			BaseClassVTablePtrValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe)->GetZeroValue ();
+		}
+		else
+		{
+			m_pModule->m_LlvmBuilder.CreateGep2 (
+				VTablePtrValue, 
+				BaseType->GetVTableIndex (), 
+				NULL, 
+				&BaseClassVTablePtrValue
+				);
+
+			m_pModule->m_LlvmBuilder.CreateBitCast (
+				BaseClassVTablePtrValue, 
+				pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
+				&BaseClassVTablePtrValue
+				);
+		}		
+
+		InitializeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
+	}
+
+	return true;
+}
+
+bool
+CClassType::CallBaseDestructors (const CValue& ThisValue)
+{
+	bool Result;
+
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		if (BaseType->m_pType->GetTypeKind () != EType_Class)
+			continue;
+
+		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+		CFunction* pDestructor = pBaseClassType->GetDestructor ();		
+		if (!pDestructor)
+			continue;
+
+		CValue ReturnValue;
+		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue, &ReturnValue);
+		if (!Result)
+			return false;
+	}
+		
+	return true;
 }
 
 //.............................................................................

@@ -182,6 +182,11 @@ public:
 		SetLlvmValue (pLlvmValue, TypeKind);
 	}
 
+	operator bool () const
+	{
+		return !IsEmpty ();
+	}
+
 	EValue 
 	GetValueKind () const
 	{
@@ -714,6 +719,7 @@ enum ERuntimeError
 	ERuntimeError_NullInterface,
 	ERuntimeError_NullFunction,
 	ERuntimeError_NullProperty,
+	ERuntimeError_AbstractFunction,
 };
 
 //.............................................................................

@@ -13,6 +13,7 @@ CBaseType::CBaseType ()
 	m_Offset = 0;
 	m_LlvmIndex = -1;
 	m_VTableIndex = -1;
+	m_Flags = 0;
 }
 
 //.............................................................................
@@ -45,8 +46,16 @@ CDerivableType::AddBaseType (CDerivableType* pType)
 	return pBaseType;
 }
 
+void
+CDerivableType::ClearConstructedFlag ()
+{
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+		BaseType->m_Flags &= ~EBaseTypeFlag_Constructed;
+}
+
 bool
-CDerivableType::FindBaseTypeImpl (
+CDerivableType::FindBaseTypeTraverseImpl (
 	CType* pType,
 	CBaseTypeCoord* pCoord,
 	size_t Level
@@ -59,7 +68,7 @@ CDerivableType::FindBaseTypeImpl (
 			return true;
 
 		CBaseType* pBaseType = It->m_Value;
-		pCoord->m_pType = this;
+		pCoord->m_pType = pBaseType->m_pType;
 		pCoord->m_Offset = pBaseType->m_Offset;
 		pCoord->m_LlvmIndexArray.SetCount (Level + 1);
 		pCoord->m_LlvmIndexArray [Level] = pBaseType->m_LlvmIndex;
@@ -71,7 +80,7 @@ CDerivableType::FindBaseTypeImpl (
 	{
 		CBaseType* pBaseType = *BaseType;
 
-		bool Result = pBaseType->m_pType->FindBaseTypeImpl (pType, pCoord, Level + 1);
+		bool Result = pBaseType->m_pType->FindBaseTypeTraverseImpl (pType, pCoord, Level + 1);
 		if (Result)
 		{
 			if (pCoord)

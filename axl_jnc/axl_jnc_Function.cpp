@@ -92,7 +92,6 @@ CFunction::CFunction ()
 	m_PropertyVTableIndex = -1;
 	m_pBlock = NULL;
 	m_pScope = NULL;
-	m_pScopeLevelVariable = NULL;
 	m_pLlvmFunction = NULL;
 	m_pfn = NULL;
 }

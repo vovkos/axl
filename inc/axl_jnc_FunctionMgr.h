@@ -18,8 +18,7 @@ enum EStdFunc
 	// void
 	// jnc.OnRuntimeError (
 	//		int Error,
-	//		int8* pCodeAddr,
-	//		int8* pDataAddr
+	//		int8* pCodeAddr
 	//		);
 
 	EStdFunc_OnRuntimeError,
@@ -133,25 +132,27 @@ protected:
 		EThunk_Closure,
 	};
 
-	class CThunk: public rtl::TListLink
+	struct TThunk: rtl::TListLink
 	{
-	public:
 		EThunk m_ThunkKind;
 		rtl::CStringA m_Signature;
 		CFunction* m_pTargetFunction; 
 		CFunctionType* m_pTargetFunctionType;
 		CClassType* m_pClosureType;
 		rtl::CArrayT <size_t> m_ClosureMap;
-
 		CFunction* m_pThunkFunction;
-
-		CThunk ();
 	};
 
-	struct TEmissionContext
+	struct TEmissionContext: rtl::TListLink
 	{
-		CFunction* m_pFunction;
-		CBasicBlock* m_pBlock;
+		CFunction* m_pCurrentFunction;
+		CBasicBlock* m_pCurrentBlock;
+		CBasicBlock* m_pReturnBlock;
+		int m_ControlFlowMgrFlags;
+		CValue m_ThisValue;
+		CValue m_ScopeLevelValue;
+		CValue m_VTablePtrPtrValue; 
+		CValue m_VTablePtrValue;
 	};
 
 protected:
@@ -164,14 +165,19 @@ protected:
 	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
 	rtl::CArrayT <CProperty*> m_AutoPropertyArray;
 
-	rtl::CStdListT <CThunk> m_ThunkList;
+	rtl::CStdListT <TThunk> m_ThunkList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
 	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
 
 	CFunction* m_pCurrentFunction;
-	CFunction* m_StdFunctionArray [EStdFunc__Count];
+	CValue m_ThisValue;
+	CValue m_ScopeLevelValue;
+	CValue m_VTablePtrPtrValue; 
+	CValue m_VTablePtrValue;
 
-	rtl::CArrayT <TEmissionContext> m_EmissionContextStack;
+	rtl::CStdListT <TEmissionContext> m_EmissionContextStack;
+
+	CFunction* m_StdFunctionArray [EStdFunc__Count];
 
 public:
 	CFunctionMgr ();
@@ -186,6 +192,18 @@ public:
 	GetCurrentFunction ()
 	{
 		return m_pCurrentFunction;
+	}
+
+	CValue 
+	GetThisValue ()
+	{
+		return m_ThisValue;
+	}
+
+	CValue 
+	GetScopeLevelValue ()
+	{
+		return m_ScopeLevelValue;
 	}
 
 	void
@@ -237,8 +255,7 @@ public:
 	bool
 	Prologue (
 		CFunction* pFunction,
-		const CToken::CPos& Pos,
-		CValue* pThisValue
+		const CToken::CPos& Pos
 		);
 
 	bool
@@ -259,9 +276,6 @@ public:
 
 	CFunction*
 	GetStdFunction (EStdFunc Func);
-
-	CFunction*
-	CreateClassInitializer (CClassType* pType);
 
 	CFunction*
 	GetDirectThunkFunction (
@@ -297,13 +311,28 @@ public:
 
 protected:
 	bool
-	CompileDirectThunk (CThunk* pThunk);
+	CompileDirectThunk (TThunk* pThunk);
 
 	bool
-	CompileClosureThunk (CThunk* pThunk);
+	CompileClosureThunk (TThunk* pThunk);
 
 	bool
 	CompileAutoPropertyAccessors (CProperty* pProperty);
+
+	void
+	SaveEmissionContext ();
+
+	void
+	RestoreEmissionContext ();
+
+	void
+	CutVTable (const CValue& ThisArgValue);
+
+	void
+	RestoreVTable ();
+
+	bool
+	FireOnChangeEvent ();
 
 	// LLVM code support functions
 
@@ -351,32 +380,6 @@ protected:
 		EFunctionPtrType PtrTypeKind,
 		const tchar_t* pTag
 		);
-
-	CFunction*
-	CreateBindableSetterStubFunction (CFunction* pFunction);
-
-	bool
-	InitializeInterface (
-		CClassType* pType,
-		const CValue& ObjectPtrValue,
-		const CValue& IfacePtrValue,
-		const CValue& VTablePtrValue
-		);
-
-	bool
-	RuntimeError (
-		const CValue& ErrorValue,
-		const CValue& DataAddrValue
-		);
-
-	bool
-	RuntimeError (
-		ERuntimeError Error,
-		const CValue& DataAddrValue
-		)
-	{
-		return RuntimeError (CValue (Error, EType_Int), DataAddrValue);
-	}
 };
 
 //.............................................................................

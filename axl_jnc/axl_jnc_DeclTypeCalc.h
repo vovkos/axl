@@ -17,6 +17,8 @@ class CFunctionType;
 class CFunctionPtrType;
 class CPropertyType;
 class CPropertyPtrType;
+class CMulticastType;
+class CMcSnapshotType;
 
 //.............................................................................
 

@@ -29,7 +29,7 @@ CCast_Struct::ConstCast (
 	CStructType* pStructType = (CStructType*) OpValue.GetType ();
 
 	CBaseTypeCoord Coord;
-	bool Result = pStructType->FindBaseType (pType, &Coord);
+	bool Result = pStructType->FindBaseTypeTraverse (pType, &Coord);
 	if (!Result)
 	{
 		SetCastError (OpValue, pType);
@@ -52,7 +52,7 @@ CCast_Struct::LlvmCast (
 	CStructType* pStructType = (CStructType*) OpValue.GetType ();
 
 	CBaseTypeCoord Coord;
-	bool Result = pStructType->FindBaseType (pType, &Coord);
+	bool Result = pStructType->FindBaseTypeTraverse (pType, &Coord);
 	if (!Result)
 	{
 		SetCastError (OpValue, pType);

@@ -162,7 +162,6 @@ protected:
 	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > m_Ast;
 	CBasicBlock* m_pBlock;
 	CScope* m_pScope;
-	CVariable* m_pScopeLevelVariable;
 
 	llvm::Function* m_pLlvmFunction;
 	void* m_pfn;
@@ -227,9 +226,24 @@ public:
 	}
 
 	bool
+	IsMember ()
+	{
+		return m_StorageKind >= EStorage_Member && m_StorageKind <= EStorage_Override;
+	}
+
+	bool
 	IsVirtual ()
 	{
 		return m_StorageKind >= EStorage_Abstract && m_StorageKind <= EStorage_Override;
+	}
+
+	bool
+	NeedsVTablePtrCut ()
+	{
+		return 
+			m_FunctionKind == EFunction_PreConstructor ||
+			m_FunctionKind == EFunction_Constructor ||
+			m_FunctionKind == EFunction_Destructor;
 	}
 
 	CClassType* 
@@ -320,12 +334,6 @@ public:
 	GetBlock ()
 	{
 		return m_pBlock;
-	}
-
-	CVariable* 
-	GetScopeLevelVariable ()
-	{
-		return m_pScopeLevelVariable;
 	}
 
 	CFunction*

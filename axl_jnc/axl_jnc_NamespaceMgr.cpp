@@ -21,19 +21,28 @@ CNamespaceMgr::Clear ()
 {
 	m_GlobalNamespace.Clear ();
 	m_NamespaceList.Clear ();
+	m_NamespaceStack.Clear ();
 	m_ScopeList.Clear ();
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
 }
 
 void
-CNamespaceMgr::SetCurrentNamespace (CNamespace* pNamespace)
+CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
 {
-	if (!pNamespace)
-		pNamespace = &m_GlobalNamespace;
-
+	m_NamespaceStack.Append (m_pCurrentNamespace);
 	m_pCurrentNamespace = pNamespace;
 	m_pCurrentScope = pNamespace->m_NamespaceKind == ENamespace_Scope ? (CScope*) pNamespace : NULL;
+}
+
+void
+CNamespaceMgr::CloseNamespace ()
+{
+	if (m_NamespaceStack.IsEmpty ())
+		return;
+
+	m_pCurrentNamespace = m_NamespaceStack.GetBackAndPop ();
+	m_pCurrentScope = m_pCurrentNamespace->m_NamespaceKind == ENamespace_Scope ? (CScope*) m_pCurrentNamespace : NULL;
 }
 
 EAccess
@@ -86,7 +95,7 @@ CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 			EType TypeKind = pType->GetTypeKind ();
 			if (TypeKind == EType_Class || TypeKind == EType_Struct)
 			{
-				bool Result = ((CDerivableType*) pType)->FindBaseType (pTargetType);
+				bool Result = ((CDerivableType*) pType)->FindBaseTypeTraverse (pTargetType);
 				if (Result)
 					return EAccess_Protected;
 			}

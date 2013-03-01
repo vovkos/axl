@@ -25,6 +25,7 @@ enum EClassTypeFlag
 {
 	EClassTypeFlag_StdObject = 0x010000, // EStdType_Object 
 	EClassTypeFlag_AutoEv    = 0x020000,
+	EClassTypeFlag_Abstract  = 0x040000,
 };
 
 //............................................................................
@@ -111,6 +112,9 @@ public:
 	}
 
 	CFunction* 
+	GetDefaultConstructor ();
+
+	CFunction* 
 	GetStaticConstructor ()
 	{
 		return m_pStaticConstructor;
@@ -123,7 +127,10 @@ public:
 	}
 
 	CFunction* 
-	GetInitializer ();
+	GetInitializer ()
+	{
+		return m_pInitializer;
+	}
 
 	size_t
 	GetPackFactor ()
@@ -199,10 +206,10 @@ public:
 	bool
 	AddPropertyMember (CProperty* pProperty);
 
-	rtl::CArrayT <CFunction*>
-	GetVTable ()
+	bool
+	HasVTable ()
 	{
-		return m_VTable;
+		return m_VTable.IsEmpty ();
 	}
 
 	CStructType* 
@@ -212,8 +219,11 @@ public:
 		return m_pVTableStructType;
 	}
 
-	bool
-	GetVTablePtrValue (CValue* pValue);
+	CValue
+	GetVTablePtrValue ()
+	{
+		return m_VTablePtrValue;
+	}
 
 	CFunction*
 	GetUnaryOperator (EUnOp OpKind)
@@ -242,6 +252,9 @@ public:
 	bool
 	CalcLayout ();
 
+	bool
+	CallBaseDestructors (const CValue& ThisValue);
+
 protected:
 	virtual 
 	void
@@ -262,6 +275,26 @@ protected:
 
 	bool
 	OverrideVirtualFunction (CFunction* pFunction);
+
+	void
+	CreateVTablePtr ();
+
+	bool
+	CreateDefaultConstructor ();
+
+	bool
+	CreateDefaultDestructor ();
+
+	void
+	CreateInitializer ();
+
+	bool
+	InitializeInterface (
+		CClassType* pClassType,
+		const CValue& ObjectPtrValue,
+		const CValue& IfacePtrValue,
+		const CValue& VTablePtrValue
+		);
 };
 
 //.............................................................................

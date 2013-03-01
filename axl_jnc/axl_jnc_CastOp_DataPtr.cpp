@@ -91,13 +91,10 @@ CCast_DataPtr_Base::GetCastKind (
 	if (pSrcDataType->Cmp (pDstDataType) == 0)
 		return ECast_Implicit;
 
-	if (pSrcDataType->GetTypeKind () != EType_Struct ||
-		pDstDataType->GetTypeKind () != EType_Struct)
-	{
+	if (pSrcDataType->GetTypeKind () != EType_Struct)
 		return ECast_Explicit;
-	}
 
-	return ((CStructType*) pSrcDataType)->FindBaseType (((CStructType*) pDstDataType), NULL) ?
+	return ((CStructType*) pSrcDataType)->FindBaseTypeTraverse (pDstDataType) ?
 		ECast_Implicit :
 		ECast_Explicit;
 }
@@ -122,11 +119,11 @@ CCast_DataPtr_Base::GetOffset (
 	CStructType* pSrcStructType = (CStructType*) pSrcDataType;
 	CStructType* pDstStructType = (CStructType*) pDstDataType;
 
-	if (pSrcStructType->FindBaseType (pDstStructType, pCoord))
+	if (pSrcStructType->FindBaseTypeTraverse (pDstStructType, pCoord))
 		return pCoord->m_Offset;
 
 	CBaseTypeCoord Coord;
-	if (pDstStructType->FindBaseType (pSrcStructType, &Coord))
+	if (pDstStructType->FindBaseTypeTraverse (pSrcStructType, &Coord))
 		return -(intptr_t) Coord.m_Offset;
 
 	return 0;

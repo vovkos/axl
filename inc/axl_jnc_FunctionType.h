@@ -76,8 +76,9 @@ protected:
 	ECallConv m_CallConv;
 	rtl::CStringA m_ArgSignature;
 	rtl::CString m_ArgTypeString;
-	CFunctionType* m_pAbstractMethodMemberType;
 	CFunctionType* m_pShortType;
+	CFunctionType* m_pAbstractMethodMemberType;
+	CFunction* m_pAbstractFunction;
 	CFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
 
 public:
@@ -134,9 +135,12 @@ public:
 
 	CFunctionType*
 	GetShortType ();
-
+	
 	CFunctionType*
 	GetAbstractMethodMemberType ();
+
+	CFunction*
+	GetAbstractFunction ();
 
 	CFunctionPtrType* 
 	GetFunctionPtrType (

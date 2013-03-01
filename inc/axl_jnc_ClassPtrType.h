@@ -35,6 +35,11 @@ GetClassPtrTypeKindFromModifiers (int Modifiers)
 		(Modifiers & ETypeModifier_Weak_p) ? EClassPtrType_Weak : EClassPtrType_Normal;
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+int 
+PromoteClassPtrTypeModifiers (int Modifiers);
+
 //.............................................................................
 
 class CClassPtrType: public CType
@@ -85,7 +90,7 @@ class CClassPtrTypeTuple: public rtl::TListLink
 protected:
 	friend class CTypeMgr;
 
-	CClassPtrType* m_ClassPtrArray [EClassPtrType__Count] [2] [2]; // ptrkind x const x nonull
+	CClassPtrType* m_ClassPtrArray [EClassPtrType__Count] [2] [2]; // ptrkind x const x nullable
 
 public:
 	CClassPtrTypeTuple ()

@@ -32,21 +32,47 @@ statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCompoundStmt
-{
-	CScope* m_pScope;
-}
 start
 compound_stmt
 	: '{' $l
 		{
-			$.m_pScope = OpenScope ($l.m_Pos);
+			OpenScope ($l.m_Pos);
 		}
 	  local_declaration* 
 	  '}' $r
 		{
 			CloseScope ($r.m_Pos);
 		}
+	;
+
+start
+constructor_compound_stmt
+	: '{' $l
+		{
+			OpenScope ($l.m_Pos);
+		}
+	  base_type_constructor*
+		{
+			return m_pModule->m_OperatorMgr.PostBaseTypeConstructorList ();
+		}
+	  local_declaration* 
+	  '}' $r
+		{
+			CloseScope ($r.m_Pos);
+		}
+	;
+
+base_type_constructor
+	: resolver (base_type_constructor_rslv)
+	  qualified_type_name $t '(' expression_or_empty_list $a ')'
+		{
+			return m_pModule->m_OperatorMgr.CallBaseTypeConstructor ($t.m_pType, &$a.m_ValueList);
+		}
+	| ';'
+	;
+
+base_type_constructor_rslv
+	: qualified_type_name '('
 	;
 
 statement
@@ -67,18 +93,18 @@ expression_stmt
 	;
 
 if_stmt
-local
-{
-	CBasicBlock* $pThenBlock;
-	CBasicBlock* $pElseBlock;
-	CBasicBlock* $pFollowBlock;
-}
-enter
-{
-	$pThenBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("if_then"));
-	$pElseBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("if_else"));
-	$pFollowBlock = $pElseBlock;
-}
+	local
+	{
+		CBasicBlock* $pThenBlock;
+		CBasicBlock* $pElseBlock;
+		CBasicBlock* $pFollowBlock;
+	}
+	enter
+	{
+		$pThenBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("if_then"));
+		$pElseBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("if_else"));
+		$pFollowBlock = $pElseBlock;
+	}
 	: EToken_If '(' expression $e ')' 
 		{
 			return m_pModule->m_ControlFlowMgr.ConditionalJump ($e.m_Value, $pThenBlock, $pElseBlock);
@@ -148,19 +174,19 @@ switch_block_stmt <CSwitchStmt* $pSwitchStmt>
 	;
 
 while_stmt
-local
-{
-	CBasicBlock* $pConditionBlock;
-	CBasicBlock* $pBodyBlock;
-	CBasicBlock* $pFollowBlock;
-}
-enter
-{
-	$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("while_condition"));
-	$pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("while_body"));
-	$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("while_follow"));
-	m_pModule->m_ControlFlowMgr.Follow ($pConditionBlock);
-}
+	local
+	{
+		CBasicBlock* $pConditionBlock;
+		CBasicBlock* $pBodyBlock;
+		CBasicBlock* $pFollowBlock;
+	}
+	enter
+	{
+		$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("while_condition"));
+		$pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("while_body"));
+		$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("while_follow"));
+		m_pModule->m_ControlFlowMgr.Follow ($pConditionBlock);
+	}
 	: EToken_While '(' expression $e ')' $a
 		{
 			CScope* pScope = OpenScope ($a.m_Pos);
@@ -176,19 +202,19 @@ enter
 	;
 
 do_stmt
-local
-{
-	CBasicBlock* $pConditionBlock;
-	CBasicBlock* $pBodyBlock;
-	CBasicBlock* $pFollowBlock;
-}
-enter
-{
-	$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_condition"));
-	$pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_body"));
-	$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_follow"));
-	m_pModule->m_ControlFlowMgr.Follow ($pBodyBlock);
-}
+	local
+	{
+		CBasicBlock* $pConditionBlock;
+		CBasicBlock* $pBodyBlock;
+		CBasicBlock* $pFollowBlock;
+	}
+	enter
+	{
+		$pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_condition"));
+		$pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_body"));
+		$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("do_follow"));
+		m_pModule->m_ControlFlowMgr.Follow ($pBodyBlock);
+	}
 	: EToken_Do
 		{
 			CScope* pScope = OpenScope ($1.m_Pos);
@@ -208,21 +234,21 @@ enter
 	;
 
 for_stmt
-local
-{
-	CScope* $pScope;
-	CBasicBlock* $pConditionBlock;
-	CBasicBlock* $pBodyBlock;
-	CBasicBlock* $pLoopBlock;
-	CBasicBlock* $pFollowBlock;
-}
-enter
-{
-	$pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_body"));
-	$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_follow"));
-	$pConditionBlock = $pBodyBlock;
-	$pLoopBlock = $pBodyBlock;
-}
+	local
+	{
+		CScope* $pScope;
+		CBasicBlock* $pConditionBlock;
+		CBasicBlock* $pBodyBlock;
+		CBasicBlock* $pLoopBlock;
+		CBasicBlock* $pFollowBlock;
+	}
+	enter
+	{
+		$pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_body"));
+		$pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("for_follow"));
+		$pConditionBlock = $pBodyBlock;
+		$pLoopBlock = $pBodyBlock;
+	}
 	: EToken_For '(' 
 		{
 			$pScope = OpenScope ($1.m_Pos);
@@ -284,4 +310,62 @@ return_stmt
 		}
 	;
 
+//.............................................................................
+
+/*
+
+// autoev
+
+class
+{
+	CClassType* m_pType;
+	CDeclarator m_Declarator;
+}
+autoev_specifier
+	: EToken_AutoEv
+	  (EToken_Identifier $n
+		{
+			$.m_Declarator.AddName ($n.m_Data.m_String);
+		}
+	  )?
+	  function_suffix $a <&$.m_Declarator>?
+		{
+			$.m_pType = CreateAutoEvType (&$.m_Declarator);
+			if (!$.m_pType)
+				return false;
+		}
+	  (
+		resolver ({ return m_Stage == EStage_Pass1 }) 
+		function_body_pass1 $b
+			{
+				$.m_pType->SetAutoEvBody (&$b.m_TokenList);
+			}
+	  |	autoev_body <$.m_pType> 
+	  )	  
+	;
+
+start
+autoev_body <CClassType* $pType>
+	: 
+		{
+			return PreAutoEvBlock ($pType);
+		}
+	  '{' autoev_stmt* '}'
+		{
+			return PostAutoEvBlock ();
+		}
+	;
+	
+autoev_stmt
+	: 
+		{
+			return PreAutoEvExpression ();
+		}
+	  expression ';'
+		{
+			return PostAutoEvExpression ($1.m_Value);
+		}
+	| ';'
+	;
+*/
 //.............................................................................
