@@ -42,7 +42,7 @@ CCast_Struct::ConstCast (
 
 bool
 CCast_Struct::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue

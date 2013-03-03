@@ -151,6 +151,12 @@ Members2
 		);
 
 	bool
+	DeclareAutoEv (
+		CAutoEvType* pType,
+		CDeclarator* pDeclarator
+		);
+
+	bool
 	DeclareProperty (
 		CPropertyType* pType,
 		CDeclarator* pDeclarator

@@ -45,7 +45,7 @@ ICastOperator::ICastOperator()
 
 bool
 ICastOperator::Cast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -59,7 +59,7 @@ ICastOperator::Cast (
 			ConstCast (OpValue, pType, pResultValue->GetConstData ());
 	}
 
-	return LlvmCast (AllocKind, OpValue, pType, pResultValue);
+	return LlvmCast (StorageKind, OpValue, pType, pResultValue);
 }
 
 bool
@@ -100,7 +100,7 @@ CCast_Copy::ConstCast (
 
 bool
 CCast_Copy::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -163,7 +163,7 @@ CCast_Master::ConstCast (
 
 bool
 CCast_Master::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -186,7 +186,7 @@ CCast_Master::LlvmCast (
 			return false;
 	}
 		
-	return pOperator->LlvmCast (AllocKind, OpValue, pType, pResultValue);
+	return pOperator->LlvmCast (StorageKind, OpValue, pType, pResultValue);
 }
 
 //.............................................................................
@@ -280,7 +280,7 @@ CCast_SuperMaster::ConstCast (
 
 bool
 CCast_SuperMaster::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -317,12 +317,12 @@ CCast_SuperMaster::LlvmCast (
 	}
 
 	if (!pOperator2) 
-		return pOperator1->LlvmCast (AllocKind, OpValue, pType, pResultValue);
+		return pOperator1->LlvmCast (StorageKind, OpValue, pType, pResultValue);
 
 	CValue TmpValue;
 	return 
-		pOperator1->LlvmCast (AllocKind, OpValue, pIntermediateType, &TmpValue) &&
-		pOperator2->LlvmCast (AllocKind, TmpValue, pType, pResultValue);
+		pOperator1->LlvmCast (StorageKind, OpValue, pIntermediateType, &TmpValue) &&
+		pOperator2->LlvmCast (StorageKind, TmpValue, pType, pResultValue);
 }
 
 //.............................................................................

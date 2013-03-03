@@ -19,6 +19,7 @@
 #include "axl_jnc_PropertyPtrType.h"
 #include "axl_jnc_MulticastType.h"
 #include "axl_jnc_McSnapshotType.h"
+#include "axl_jnc_AutoEvType.h"
 #include "axl_jnc_ImportType.h"
 
 namespace axl {
@@ -67,6 +68,7 @@ protected:
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
 	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
 	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
+	rtl::CStdListT <CAutoEvType> m_AutoEvTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStdListT <CPropertyTypeTuple> m_PropertyTypeTupleList;
@@ -395,6 +397,12 @@ public:
 
 	CMcSnapshotType* 
 	GetMcSnapshotType (CFunctionPtrType* pFunctionPtrType);
+
+	CAutoEvType* 
+	GetAutoEvType (
+		CFunctionType* pStarterType,
+		CFunctionType* pStopperType = NULL
+		);
 
 	CDataPtrType* 
 	GetDataPtrType (

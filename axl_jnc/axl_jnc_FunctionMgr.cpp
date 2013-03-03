@@ -1138,12 +1138,24 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateCheckClassPtrScopeLevel ();
 		break;
 
-	case EStdFunc_DynamicCastInterface:
-		pFunction = CreateDynamicCastInterface ();
+	case EStdFunc_DynamicCastClassPtr:
+		pFunction = CreateDynamicCastClassPtr ();
 		break;
 
-	case EStdFunc_HeapAllocate:
-		pFunction = CreateHeapAllocate ();
+	case EStdFunc_HeapAlloc:
+		pFunction = CreateHeapAlloc ();
+		break;
+
+	case EStdFunc_UHeapAlloc:
+		pFunction = CreateUHeapAlloc ();
+		break;
+
+	case EStdFunc_UHeapFree:
+		pFunction = CreateUHeapFree ();
+		break;
+
+	case EStdFunc_UHeapFreeClassPtr:
+		pFunction = CreateUHeapFree ();
 		break;
 
 	case EStdFunc_MulticastSet:
@@ -1464,13 +1476,13 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 }
 
 // object
-// jnc.DynamicCastInterface (
+// jnc.DynamicCastClassPtr (
 //		object p,
 //		int8* pType
 //		);
 
 CFunction*
-CFunctionMgr::CreateDynamicCastInterface ()
+CFunctionMgr::CreateDynamicCastClassPtr ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
 	
@@ -1481,14 +1493,14 @@ CFunctionMgr::CreateDynamicCastInterface ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction (_T("jnc.DynamicCastInterface"), pType);
+	return CreateInternalFunction (_T("jnc.DynamicCastClassPtr"), pType);
 }
 
 // int8*
-// jnc.HeapAllocate (int8* pType);
+// jnc.HeapAlloc (int8* pType);
 
 CFunction*
-CFunctionMgr::CreateHeapAllocate ()
+CFunctionMgr::CreateHeapAlloc ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 	
@@ -1498,8 +1510,60 @@ CFunctionMgr::CreateHeapAllocate ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction (_T("jnc.HeapAllocate"), pType);
+	return CreateInternalFunction (_T("jnc.HeapAlloc"), pType);
 }
+
+// int8*
+// jnc.UHeapAlloc (int8* pType);
+
+CFunction*
+CFunctionMgr::CreateUHeapAlloc ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+	
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (_T("jnc.UHeapAlloc"), pType);
+}
+
+// void
+// jnc.UHeapFree (int8* p);
+
+CFunction*
+CFunctionMgr::CreateUHeapFree ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (_T("jnc.UHeapFree"), pType);
+}
+
+// void
+// jnc.UHeapFreeClassPtr (object p);
+
+CFunction*
+CFunctionMgr::CreateUHeapFreeClassPtr ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction (_T("jnc.UHeapFree"), pType);
+}
+
 
 // intptr
 // jnc.MulticastSet (

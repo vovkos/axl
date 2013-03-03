@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "axl_jnc_AutoEvType.h"
 #include "axl_jnc_Function.h"
 
 namespace axl {
@@ -14,7 +15,7 @@ namespace jnc {
 class CAutoEv: public CNamedModuleItem
 {
 protected:
-	CFunctionType* m_pType;
+	CAutoEvType* m_pType;
 	CFunction* m_pStart;
 	CFunction* m_pStop;
 	CClassType* m_pParentClassType;
@@ -25,7 +26,7 @@ protected:
 public:
 	CAutoEv ();
 
-	CFunctionType* 
+	CAutoEvType* 
 	GetType ()
 	{
 		return m_pType;
@@ -66,3 +67,5 @@ public:
 
 } // namespace jnc {
 } // namespace axl {
+
+

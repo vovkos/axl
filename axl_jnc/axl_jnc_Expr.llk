@@ -520,15 +520,23 @@ unary_operator_expr <CValue* $pValue>
 			$pValue->SetType ($2.m_pType);
 		}
 	| resolver (cast_operator_rslv) 
-	  '(' allocation_specifier $a? type_name $t ')' unary_expr <$pValue> 
+	  '(' storage_specifier $s? type_name $t ')' unary_expr <$pValue> 
 		{
-			EAlloc AllocKind = IsValidLocator ($a) ? $a.m_AllocKind : EAlloc_Undefined;
-			return m_pModule->m_OperatorMgr.CastOperator (AllocKind, $pValue, $t.m_pType);
+			EStorage StorageKind = IsValidLocator ($s) ? $s.m_StorageKind : EStorage_Undefined;
+			return m_pModule->m_OperatorMgr.CastOperator (StorageKind, $pValue, $t.m_pType);
 		}
-	| allocation_specifier $a? EToken_New new_operator_type $t
+	| storage_specifier $s? EToken_New new_operator_type $t
 		{
-			EAlloc AllocKind = IsValidLocator ($a) ? $a.m_AllocKind : EAlloc_Undefined;
-			return m_pModule->m_OperatorMgr.NewOperator (AllocKind, $t.m_pType, &$t.m_ArgList, $pValue);
+			EStorage StorageKind = IsValidLocator ($s) ? $s.m_StorageKind : EStorage_Undefined;
+			return m_pModule->m_OperatorMgr.NewOperator (StorageKind, $t.m_pType, &$t.m_ArgList, $pValue);
+		}
+	| EToken_Delete unary_expr <$pValue> 
+		{
+			bool Result = m_pModule->m_OperatorMgr.DeleteOperator (*$pValue);
+			if (!Result)
+				return false;
+
+			$pValue->SetVoid ();
 		}
 	;
 
@@ -554,21 +562,6 @@ type_name_w_constructor_rslv
 	: qualified_name '('
 	;
 
-class
-{
-	EAlloc m_AllocKind;
-}
-allocation_specifier
-	: EToken_Stack
-		{
-			$.m_AllocKind = EAlloc_Stack;
-		}
-	| EToken_Heap
-		{
-			$.m_AllocKind = EAlloc_Heap;
-		}
-	;
-
 // since '(' at 'unary_expr' is a conflict against epsilon production we need a resolver
 // otherwise epsilon production (i.e. no more unary operators) always loses
 
@@ -577,7 +570,7 @@ cast_operator_rslv
 	{
 		CTypeSpecifier $TypeSpecifier;
 	}
-	: '(' allocation_specifier? type_specifier_modifier <&$TypeSpecifier>
+	: '(' storage_specifier? type_specifier_modifier <&$TypeSpecifier>
 	;
 
 class

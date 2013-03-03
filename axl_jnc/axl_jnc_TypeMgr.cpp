@@ -31,6 +31,7 @@ CTypeMgr::Clear ()
 	m_PropertyTypeList.Clear ();
 	m_MulticastTypeList.Clear ();
 	m_McSnapshotTypeList.Clear ();
+	m_AutoEvTypeList.Clear ();
 	m_DataPtrTypeList.Clear ();
 	m_ClassPtrTypeList.Clear ();
 	m_FunctionPtrTypeList.Clear ();
@@ -350,15 +351,20 @@ CTypeMgr::CreateClassType (
 	pIfaceStructType->m_StorageKind = EStorage_Member;
 	pIfaceStructType->AddBaseType (pIfaceHdrStructType);
 
+	CStructType* pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
+	pClassStructType->m_Tag.Format (_T("%s.class"), pType->m_Tag);
+	pClassStructType->m_pParentNamespace = pType;
+	pClassStructType->CreateFieldMember (GetStdType (EStdType_ObjectHdr));
+	pClassStructType->CreateFieldMember (pIfaceStructType);
+
 	pType->m_pModule = m_pModule;
 	pType->m_PackFactor = PackFactor;
 	pType->m_pVTableStructType = pVTableStructType;
 	pType->m_pIfaceStructType = pIfaceStructType;
+	pType->m_pClassStructType = pClassStructType;
 	m_ClassTypeList.InsertTail (pType);
 	return pType;
 }
-
-
 
 CFunctionType* 
 CTypeMgr::GetFunctionType (	
@@ -673,6 +679,33 @@ CTypeMgr::GetMcSnapshotType (CFunctionPtrType* pFunctionPtrType)
 	m_McSnapshotTypeList.InsertTail (pType);
 	pFunctionPtrType->m_pMcSnapshotType = pType;
 	return pType;
+}
+
+CAutoEvType* 
+CTypeMgr::GetAutoEvType (
+	CFunctionType* pStarterType,
+	CFunctionType* pStopperType
+	)
+{
+	if (!pStopperType)
+		pStopperType = (CFunctionType*) GetStdType (EStdType_SimpleFunction);
+
+	rtl::CStringA Signature = CAutoEvType::CreateSignature (pStarterType, pStopperType);
+	
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CAutoEvType*) It->m_Value;
+
+	CAutoEvType* pType = AXL_MEM_NEW (CAutoEvType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_pStarterType = pStarterType;
+	pType->m_pStopperType = pStopperType;
+
+	m_AutoEvTypeList.InsertTail (pType);
+	It->m_Value = pType;	
+	return pType;
+
 }
 
 CDataPtrType* 

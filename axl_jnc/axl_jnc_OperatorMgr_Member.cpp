@@ -506,9 +506,8 @@ COperatorMgr::GetClassFieldMember (
 
 	int PtrTypeFlags = pMember->GetPtrTypeFlags ();
 	
-	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && pMember->GetStorageKind () != EStorage_Mutable ||
-		(PtrTypeFlags & EPtrTypeFlag_ReadOnly) && 
-		m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
+	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && !(PtrTypeFlags & EPtrTypeFlag_Mutable) ||
+		(PtrTypeFlags & EPtrTypeFlag_ReadOnly) && m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
 	{
 		PtrTypeFlags |= EPtrTypeFlag_Const;
 	}

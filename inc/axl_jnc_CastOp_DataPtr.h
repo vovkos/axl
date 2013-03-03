@@ -40,7 +40,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -101,7 +101,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -131,7 +131,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -157,7 +157,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -183,7 +183,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue

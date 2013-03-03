@@ -39,7 +39,7 @@ CCast_FunctionPtr_Base::GetCastKind (
 
 bool
 CCast_FunctionPtr_FromNormal::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -73,14 +73,14 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 
 	pClosure->GetArgList ()->InsertHead (ClosureObjValue);
 
-	return m_pModule->m_OperatorMgr.CastOperator (AllocKind, PfnValue, pType, pResultValue);
+	return m_pModule->m_OperatorMgr.CastOperator (StorageKind, PfnValue, pType, pResultValue);
 }
 
 //.............................................................................
 
 bool
 CCast_FunctionPtr_Thin2Normal::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -153,7 +153,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 	// case 3: closure object needs to be created (so conversion is required even if function signatures match)
 
 	return LlvmCast_FullClosure (
-		AllocKind,
+		StorageKind,
 		OpValue,
 		pSrcFunctionType,
 		pDstPtrType,
@@ -225,7 +225,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 
 bool
 CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CFunctionType* pSrcFunctionType,
 	CFunctionPtrType* pDstPtrType,
@@ -236,7 +236,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 	rtl::CArrayT <size_t> ClosureMap (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
 	CValue ClosureObjValue;
-	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (AllocKind, OpValue, &ClosureMap, &ClosureObjValue);
+	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (StorageKind, OpValue, &ClosureMap, &ClosureObjValue);
 	if (!Result)
 		return false;
 
@@ -259,7 +259,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 
 bool
 CCast_FunctionPtr_Weak2Normal::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -275,7 +275,7 @@ CCast_FunctionPtr_Weak2Normal::LlvmCast (
 
 bool
 CCast_FunctionPtr_Thin2Thin::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -318,7 +318,7 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 
 bool
 CCast_FunctionPtr_Thin2Weak::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -330,15 +330,15 @@ CCast_FunctionPtr_Thin2Weak::LlvmCast (
 
 	CValue TmpValue;
 	return 
-		m_pModule->m_OperatorMgr.CastOperator (AllocKind, OpValue, pIntermediateType, pResultValue) &&
-		m_pModule->m_OperatorMgr.CastOperator (AllocKind, TmpValue, pType, pResultValue);
+		m_pModule->m_OperatorMgr.CastOperator (StorageKind, OpValue, pIntermediateType, pResultValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (StorageKind, TmpValue, pType, pResultValue);
 }
 
 //.............................................................................
 
 bool
 CCast_FunctionPtr_Unsafe2Unsafe::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue

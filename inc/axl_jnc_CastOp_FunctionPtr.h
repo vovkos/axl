@@ -34,7 +34,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -52,7 +52,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -85,7 +85,7 @@ protected:
 
 	bool
 	LlvmCast_FullClosure (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CFunctionType* pSrcFunctionType,
 		CFunctionPtrType* pDstPtrType,
@@ -104,7 +104,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -122,7 +122,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -140,7 +140,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
@@ -158,7 +158,7 @@ public:
 	virtual
 	bool
 	LlvmCast (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue

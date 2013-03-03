@@ -331,7 +331,7 @@ CLlvmBuilder::CreateDataPtrValidator (
 }
 
 bool
-CLlvmBuilder::DynamicCastInterface (
+CLlvmBuilder::DynamicCastClassPtr (
 	const CValue& Value,
 	CClassType* pResultType,
 	CValue* pResultValue
@@ -344,11 +344,11 @@ CLlvmBuilder::DynamicCastInterface (
 
 	CValue TypeValue (&pResultType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
-	CFunction* pDynamicCastInterface = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastInterface);
+	CFunction* pDynamicCastClassPtr = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastClassPtr);
 	
 	CreateCall2 (
-		pDynamicCastInterface,
-		pDynamicCastInterface->GetType (),
+		pDynamicCastClassPtr,
+		pDynamicCastClassPtr->GetType (),
 		PtrValue,
 		TypeValue,
 		&PtrValue

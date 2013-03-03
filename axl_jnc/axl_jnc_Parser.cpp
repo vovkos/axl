@@ -321,39 +321,50 @@ CParser::Declare (
 	}
 
 	if (DataPtrTypeFlags && 
-		(m_StorageKind == EStorage_Typedef || TypeKind == EType_Function ||	TypeKind == EType_Property))
+		(m_StorageKind == EStorage_Typedef || 
+		TypeKind == EType_Function ||	
+		TypeKind == EType_Property || 
+		TypeKind == EType_AutoEv))
 	{
 		err::SetFormatStringError (_T("unused modifier '%s'"), GetPtrTypeFlagString (DataPtrTypeFlags));
 		return false;
 	}
 
-	switch (DeclaratorKind)
+	if (m_StorageKind == EStorage_Typedef)
+		return DeclareTypedef (pType, pDeclarator);
+
+	switch (TypeKind)
 	{
-	case EDeclarator_SimpleName:
-		return
-			m_StorageKind == EStorage_Typedef ? DeclareTypedef (pType, pDeclarator) :
-			TypeKind == EType_Function ? DeclareFunction ((CFunctionType*) pType, pDeclarator) :
-			TypeKind == EType_Property ? DeclareProperty ((CPropertyType*) pType, pDeclarator) :
-			DeclareData (pType, pDeclarator, DataPtrTypeFlags, HasInitializer);		
+	case EType_Function:
+		return DeclareFunction ((CFunctionType*) pType, pDeclarator);
 
-	case EDeclarator_PropValue:
-		if (pDeclarator->GetBitCount ())
-		{
-			err::SetFormatStringError (_T("'propvalue' cannot be a bitfield"));
-			return false;
-		}
+	case EType_Property:
+		return DeclareProperty ((CPropertyType*) pType, pDeclarator);
 
-		return DeclarePropValue (pType, DataPtrTypeFlags, HasInitializer);
-	
+	case EType_AutoEv:
+		return DeclareAutoEv ((CAutoEvType*) pType, pDeclarator);			
+
 	default:
-		if (TypeKind != EType_Function || m_StorageKind == EStorage_Typedef)
+		switch (DeclaratorKind)
 		{
+		case EDeclarator_SimpleName:
+			return DeclareData (pType, pDeclarator, DataPtrTypeFlags, HasInitializer);		
+
+		case EDeclarator_PropValue:
+			if (pDeclarator->GetBitCount ())
+			{
+				err::SetFormatStringError (_T("'propvalue' cannot be a bitfield"));
+				return false;
+			}
+
+			return DeclarePropValue (pType, DataPtrTypeFlags, HasInitializer);
+	
+		default:
 			err::SetFormatStringError (_T("qualified declarators are only allowed for functions"));
 			return false;
 		}
+	}		
 
-		return DeclareFunction ((CFunctionType*) pType, pDeclarator);
-	}
 }
 
 void
@@ -576,6 +587,15 @@ CParser::DeclareFunction (
 	}
 
 	return pNamespace->AddFunction (pFunction);
+}
+
+bool
+CParser::DeclareAutoEv (
+	CAutoEvType* pType,
+	CDeclarator* pDeclarator
+	)
+{
+	return true;
 }
 
 bool

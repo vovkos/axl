@@ -324,7 +324,7 @@ public:
 
 	bool
 	CastOperator (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue = NULL
@@ -337,17 +337,17 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		return CastOperator (EAlloc_Undefined, OpValue, pType, pResultValue);
+		return CastOperator (EStorage_Undefined, OpValue, pType, pResultValue);
 	}
 
 	bool
 	CastOperator (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		CValue* pValue,
 		CType* pType
 		)
 	{
-		return CastOperator (AllocKind, *pValue, pType, pValue);
+		return CastOperator (StorageKind, *pValue, pType, pValue);
 	}
 
 	bool
@@ -356,12 +356,12 @@ public:
 		CType* pType
 		)
 	{
-		return CastOperator (EAlloc_Undefined, *pValue, pType, pValue);
+		return CastOperator (EStorage_Undefined, *pValue, pType, pValue);
 	}
 
 	bool
 	CastOperator (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue,
 		EType TypeKind,
 		CValue* pResultValue = NULL
@@ -374,17 +374,17 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		return CastOperator (EAlloc_Undefined, OpValue, TypeKind, pResultValue);
+		return CastOperator (EStorage_Undefined, OpValue, TypeKind, pResultValue);
 	}
-
+		
 	bool
 	CastOperator (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		CValue* pValue,
 		EType TypeKind
 		)
 	{
-		return CastOperator (AllocKind, *pValue, TypeKind, pValue);
+		return CastOperator (StorageKind, *pValue, TypeKind, pValue);
 	}
 
 	bool
@@ -393,37 +393,21 @@ public:
 		EType TypeKind
 		)
 	{
-		return CastOperator (EAlloc_Undefined, *pValue, TypeKind, pValue);
+		return CastOperator (EStorage_Undefined, *pValue, TypeKind, pValue);
 	}
 
 	// misc operators
 
 	bool
-	StackNewOperator (
-		CType* pType,
-		rtl::CBoxListT <CValue>* pArgList,
-		CValue* pResultValue
-		);
-
-	bool
-	HeapNewOperator (
-		CType* pType,
-		rtl::CBoxListT <CValue>* pArgList,
-		CValue* pResultValue
-		);
-
-	bool
 	NewOperator (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		CType* pType,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
-		)
-	{
-		return AllocKind == EAlloc_Stack ? 
-			StackNewOperator (pType, pArgList, pResultValue) :
-			HeapNewOperator (pType, pArgList, pResultValue);
-	}
+		);
+
+	bool
+	DeleteOperator (const CValue& OpValue);
 
 	bool
 	GetFieldMember (
@@ -755,7 +739,7 @@ public:
 	
 	bool
 	CreateClosureObject (
-		EAlloc AllocKind,
+		EStorage StorageKind,
 		const CValue& OpValue, // function or property ptr
 		rtl::CArrayT <size_t>* pClosureMap,
 		CValue* pResultValue
@@ -939,6 +923,12 @@ protected:
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
 		);
+
+	bool
+	DeleteDataPtr (const CValue& OpValue);
+
+	bool
+	DeleteClassPtr (const CValue& OpValue);
 };
 
 //.............................................................................

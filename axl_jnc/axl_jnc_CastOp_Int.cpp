@@ -25,7 +25,7 @@ CCast_IntTrunc::ConstCast (
 
 bool
 CCast_IntTrunc::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -62,7 +62,7 @@ CCast_IntExt::ConstCast (
 
 bool
 CCast_IntExt::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -95,7 +95,7 @@ CCast_IntExt_u::ConstCast (
 
 bool
 CCast_IntExt_u::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -127,7 +127,7 @@ CCast_SwapByteOrder::ConstCast (
 
 bool
 CCast_SwapByteOrder::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -212,7 +212,7 @@ CCast_BeInt::GetCastOperators (
 
 bool
 CCast_IntFromFp::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -321,7 +321,7 @@ CCast_IntFromPtr::ConstCast (
 
 bool
 CCast_IntFromPtr::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -354,7 +354,7 @@ CCast_PtrFromInt::ConstCast (
 
 bool
 CCast_PtrFromInt::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue

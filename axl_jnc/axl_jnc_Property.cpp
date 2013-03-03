@@ -131,7 +131,6 @@ CProperty::GetFieldStructType (EStorage StorageKind)
 	switch (StorageKind)
 	{
 	case EStorage_Member:
-	case EStorage_Mutable:
 		if (!m_pParentClassType)
 		{
 			err::SetFormatStringError (_T("invalid storage '%s' for global property member '%s'"), GetStorageKindString (StorageKind));

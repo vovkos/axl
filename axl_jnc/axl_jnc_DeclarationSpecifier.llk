@@ -80,6 +80,22 @@ storage_specifier
 		{
 			$.m_StorageKind = EStorage_Static;
 		}
+	| EToken_Stack
+		{
+			$.m_StorageKind = EStorage_Stack;
+		}
+	| EToken_Heap
+		{
+			$.m_StorageKind = EStorage_Heap;
+		}
+	| EToken_UHeap
+		{
+			$.m_StorageKind = EStorage_UHeap;
+		}
+	| EToken_Member
+		{
+			$.m_StorageKind = EStorage_Member;
+		}
 	| EToken_Abstract
 		{
 			$.m_StorageKind = EStorage_Abstract;
@@ -91,10 +107,6 @@ storage_specifier
 	| EToken_Override
 		{
 			$.m_StorageKind = EStorage_Override;
-		}
-	| EToken_Mutable
-		{
-			$.m_StorageKind = EStorage_Mutable;
 		}
 	;
 
@@ -290,6 +302,10 @@ type_modifier
 	| EToken_ReadOnly
 		{
 			$.m_Modifier = ETypeModifier_ReadOnly;
+		}
+	| EToken_Mutable
+		{
+			$.m_Modifier = ETypeModifier_Mutable;
 		}
 	| EToken_Volatile
 		{

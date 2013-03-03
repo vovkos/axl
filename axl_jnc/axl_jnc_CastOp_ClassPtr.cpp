@@ -37,7 +37,7 @@ CCast_ClassPtr::GetCastKind (
 
 bool
 CCast_ClassPtr::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -60,7 +60,7 @@ CCast_ClassPtr::LlvmCast (
 	CBaseTypeCoord Coord;
 	bool Result = pSrcClassType->FindBaseTypeTraverse (pDstClassType, &Coord);
 	if (!Result)
-		return m_pModule->m_LlvmBuilder.DynamicCastInterface (OpValue, pDstClassType, pResultValue);
+		return m_pModule->m_LlvmBuilder.DynamicCastClassPtr (OpValue, pDstClassType, pResultValue);
 
 	CValue SrcNullValue = pSrcType->GetZeroValue ();
 	CValue DstNullValue = pDstType->GetZeroValue ();

@@ -32,6 +32,15 @@ CStructType::CStructType ()
 	m_LastBitFieldOffset = 0;
 }
 
+bool
+CStructType::IsClassStructType ()
+{
+	return 
+		m_pParentNamespace->GetNamespaceKind () == ENamespace_Type &&
+		((CNamedType*) m_pParentNamespace)->GetTypeKind () == EType_Class &&
+		((CClassType*) m_pParentNamespace)->GetClassStructType () == this;
+}
+
 CStructField*
 CStructType::CreateFieldMember (
 	const rtl::CString& Name,

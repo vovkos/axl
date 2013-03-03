@@ -34,7 +34,7 @@ CCast_BoolFromZeroCmp::ConstCast (
 
 bool
 CCast_BoolFromZeroCmp::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -48,18 +48,18 @@ CCast_BoolFromZeroCmp::LlvmCast (
 
 bool
 CCast_BoolFromPtr::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
 	)
 {
 	if (OpValue.GetType ()->GetSize () == sizeof (void*))
-		return CCast_BoolFromZeroCmp::LlvmCast (AllocKind, OpValue, pType, pResultValue);
+		return CCast_BoolFromZeroCmp::LlvmCast (StorageKind, OpValue, pType, pResultValue);
 
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-	return CCast_BoolFromZeroCmp::LlvmCast (AllocKind, PtrValue, pType, pResultValue);
+	return CCast_BoolFromZeroCmp::LlvmCast (StorageKind, PtrValue, pType, pResultValue);
 }
 
 //.............................................................................

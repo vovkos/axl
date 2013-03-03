@@ -1,41 +1,6 @@
-//.............................................................................
-
-class CRoot
-{
-	preconstruct ()
-	{
-		printf ("CRoot.preconstruct ()\n");
-		Foo ();
-	}
-
-	this ()
-	{
-		printf ("CRoot.this ()\n");
-		Foo ();
-	}
-
-	this (int x)
-	{
-		printf ("CRoot.this (%d)\n", x);
-		Foo ();
-	}
-
-	~this ()
-	{
-		printf ("CRoot.~this ()\n");
-		Foo ();
-	}		
-
-	virtual
-	Foo ()
-	{
-		printf ("CRoot.Foo ()\n");
-	}
-};
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CBase: CRoot
+class CBase
 {
 	preconstruct ()
 	{
@@ -47,7 +12,7 @@ class CBase: CRoot
 	{
 		printf ("CBase.this ()\n");
 		Foo ();
-	}
+	} 
 
 	this (int x)
 	{
@@ -59,9 +24,9 @@ class CBase: CRoot
 	{
 		printf ("CBase.~this ()\n");
 		Foo ();
-	}		
+	}
 
-	override
+	virtual
 	Foo ()
 	{
 		printf ("CBase.Foo ()\n");
@@ -86,6 +51,7 @@ class CTest: CBase
 
 	this (int x)
 	{
+		CBase (x * 2);
 		printf ("CTest.this (%d)\n", x);
 		Foo ();
 	}
@@ -94,7 +60,7 @@ class CTest: CBase
 	{
 		printf ("CTest.~this ()\n");
 		Foo ();
-	}		
+	}
 
 	override
 	Foo ()
@@ -110,9 +76,7 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
-	CTest t = stack new CTest;
-
-	t.Foo ();
+	CTest t = stack new CTest (10);
 
 	return 0;
 }

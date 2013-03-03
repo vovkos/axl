@@ -118,6 +118,9 @@ public:
 		return m_FieldMemberList;
 	}
 
+	bool
+	IsClassStructType ();
+
 	CStructField*
 	CreateFieldMember (
 		const rtl::CString& Name,

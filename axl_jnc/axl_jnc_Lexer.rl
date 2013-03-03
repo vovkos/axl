@@ -68,10 +68,13 @@ main := |*
 
 'typedef'      { CreateToken (EToken_Typedef); };
 'static'       { CreateToken (EToken_Static); };
+'stack'        { CreateToken (EToken_Stack); };
+'heap'         { CreateToken (EToken_Heap); };
+'uheap'        { CreateToken (EToken_UHeap); };
+'member'       { CreateToken (EToken_Member); };
 'abstract'     { CreateToken (EToken_Abstract); };
 'virtual'      { CreateToken (EToken_Virtual); };
 'override'     { CreateToken (EToken_Override); };
-'mutable'      { CreateToken (EToken_Mutable); };
 
 'public'       { CreateToken (EToken_Public); };
 'protected'    { CreateToken (EToken_Protected); };
@@ -87,6 +90,7 @@ main := |*
 'nullable'     { CreateToken (EToken_Nullable); };
 'const'        { CreateToken (EToken_Const); };
 'readonly'     { CreateToken (EToken_ReadOnly); };
+'mutable'      { CreateToken (EToken_Mutable); };
 'volatile'     { CreateToken (EToken_Volatile); };
 'weak'         { CreateToken (EToken_Weak); };
 'thin'         { CreateToken (EToken_Thin); };
@@ -151,8 +155,7 @@ main := |*
 # operators
 
 'new'          { CreateToken (EToken_New); };
-'stack'        { CreateToken (EToken_Stack); };
-'heap'         { CreateToken (EToken_Heap); };
+'delete'       { CreateToken (EToken_Delete); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
 

@@ -9,7 +9,7 @@ namespace jnc {
 
 bool
 CCast_FpTrunc::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -23,7 +23,7 @@ CCast_FpTrunc::LlvmCast (
 
 bool
 CCast_FpExt::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -37,7 +37,7 @@ CCast_FpExt::LlvmCast (
 
 bool
 CCast_FpFromInt::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -140,7 +140,7 @@ CCast_FpFromInt::ConstCast_Fp64 (
 
 bool
 CCast_FpFromInt_u::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue

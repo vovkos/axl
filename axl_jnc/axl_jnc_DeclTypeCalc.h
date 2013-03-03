@@ -19,6 +19,7 @@ class CPropertyType;
 class CPropertyPtrType;
 class CMulticastType;
 class CMcSnapshotType;
+class CAutoEvType;
 
 //.............................................................................
 
@@ -50,6 +51,9 @@ protected:
 
 	CFunctionType*
 	GetFunctionType (CType* pReturnType);
+
+	CAutoEvType*
+	GetAutoEvType (CType* pReturnType);
 
 	CPropertyType*
 	GetPropertyType (CType* pReturnType);

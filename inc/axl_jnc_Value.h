@@ -43,21 +43,6 @@ GetValueKindString (EValue ValueKind);
 
 //.............................................................................
 
-enum EAlloc
-{
-	EAlloc_Undefined = 0,
-	EAlloc_Heap,
-	EAlloc_Stack,
-	EAlloc__Count,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t*
-GetAllocKindString (EAlloc AllocKind);
-
-//.............................................................................
-
 enum EValueFlag
 {
 	EValueFlag_NoDataPtrRangeCheck = 0x01, 

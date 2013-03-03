@@ -301,7 +301,7 @@ StdLib_OnRuntimeError (
 }
 
 jnc::TInterface* 
-StdLib_DynamicCastInterface (
+StdLib_DynamicCastClassPtr (
 	jnc::TInterface* p,
 	jnc::CClassType* pType
 	)
@@ -515,22 +515,43 @@ StdLib_MulticastSnapshot_u (
 }
 
 void*
-StdLib_HeapAllocate (jnc::CType* pType)
+StdLib_HeapAlloc (jnc::CType* pType)
 {
-	void* p;
+	void* p = malloc (pType->GetSize ());
+	memset (p, 0, pType->GetSize ());
 
-	if (pType->GetTypeKind () == jnc::EType_Class)
+	if (pType->GetTypeKind () == jnc::EType_Struct && ((jnc::CStructType*) pType)->IsClassStructType ())
 	{
-		jnc::CClassType* pClassType = (jnc::CClassType*) pType;
-		p = malloc (pClassType->GetClassStructType ()->GetSize ());
-	}
-	else
-	{
-		p = malloc (pType->GetSize ());
-		memset (p, 0, pType->GetSize ());
+		jnc::CClassType* pClassType = (jnc::CClassType*) ((jnc::CStructType*) pType)->GetParentNamespace ();
+		jnc::CFunction* pDestructor = pClassType->GetDestructor ();
+		
+		if (pDestructor)
+		{
+			// add to finalizer list
+		}
 	}
 
 	return p;
+}
+
+void*
+StdLib_UHeapAlloc (jnc::CType* pType)
+{
+	void* p = malloc (pType->GetSize ());
+	memset (p, 0, pType->GetSize ());
+	return p;
+}
+
+void
+StdLib_UHeapFree (void* p)
+{
+	free (p);
+}
+
+void
+StdLib_UHeapFreeClassPtr (jnc::TInterface* p)
+{
+	free (p->m_pObject);
 }
 
 void
@@ -668,8 +689,11 @@ bool
 CAstDoc::ExportStdLib ()
 {
 	ExportStdLibFunction (jnc::EStdFunc_OnRuntimeError, StdLib_OnRuntimeError);
-	ExportStdLibFunction (jnc::EStdFunc_DynamicCastInterface, StdLib_DynamicCastInterface);
-	ExportStdLibFunction (jnc::EStdFunc_HeapAllocate, StdLib_HeapAllocate);
+	ExportStdLibFunction (jnc::EStdFunc_DynamicCastClassPtr, StdLib_DynamicCastClassPtr);
+	ExportStdLibFunction (jnc::EStdFunc_HeapAlloc, StdLib_HeapAlloc);
+	ExportStdLibFunction (jnc::EStdFunc_UHeapAlloc, StdLib_UHeapAlloc);
+	ExportStdLibFunction (jnc::EStdFunc_UHeapFree, StdLib_UHeapFree);
+	ExportStdLibFunction (jnc::EStdFunc_UHeapFreeClassPtr, StdLib_UHeapFreeClassPtr);
 
 	// implementation for thin and unsafe is the same
 

@@ -192,7 +192,7 @@ CCast_DataPtr_Normal2Normal::ConstCast (
 
 bool
 CCast_DataPtr_Normal2Normal::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -220,7 +220,7 @@ CCast_DataPtr_Normal2Normal::LlvmCast (
 
 bool
 CCast_DataPtr_Thin2Normal::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -256,7 +256,7 @@ CCast_DataPtr_Normal2Unsafe::ConstCast (
 
 bool
 CCast_DataPtr_Normal2Unsafe::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue
@@ -290,7 +290,7 @@ CCast_DataPtr_Unsafe2Unsafe::ConstCast (
 
 bool
 CCast_DataPtr_Unsafe2Unsafe::LlvmCast (
-	EAlloc AllocKind,
+	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
 	CValue* pResultValue

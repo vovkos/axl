@@ -31,10 +31,13 @@ enum EToken
 
 	EToken_Typedef,
 	EToken_Static,
+	EToken_Stack,
+	EToken_Heap,
+	EToken_UHeap,
+	EToken_Member,
 	EToken_Abstract,
 	EToken_Virtual,
 	EToken_Override,
-	EToken_Mutable,
 
 	// access specifiers
 
@@ -50,6 +53,7 @@ enum EToken
 	EToken_Nullable,
 	EToken_Const,
 	EToken_ReadOnly,
+	EToken_Mutable,
 	EToken_Volatile,
 	EToken_Weak,
 	EToken_Thin,
@@ -126,8 +130,7 @@ enum EToken
 	// keyword operators
 
 	EToken_New,
-	EToken_Stack,
-	EToken_Heap,
+	EToken_Delete,
 	EToken_SizeOf,
 	EToken_TypeOf,
 
@@ -183,10 +186,13 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 
 	AXL_PRS_TOKEN_NAME (EToken_Typedef,      "typedef")
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
+	AXL_PRS_TOKEN_NAME (EToken_Stack,        "stack")
+	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
+	AXL_PRS_TOKEN_NAME (EToken_UHeap,        "uheap")
+	AXL_PRS_TOKEN_NAME (EToken_Member,       "member")
 	AXL_PRS_TOKEN_NAME (EToken_Abstract,     "abstract")
 	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
 	AXL_PRS_TOKEN_NAME (EToken_Override,     "override")
-	AXL_PRS_TOKEN_NAME (EToken_Mutable,      "mutable")
 
 	// access specifiers
 
@@ -202,6 +208,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Nullable,     "nullable")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
 	AXL_PRS_TOKEN_NAME (EToken_ReadOnly,     "readonly")
+	AXL_PRS_TOKEN_NAME (EToken_Mutable,      "mutable")
 	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_PRS_TOKEN_NAME (EToken_Thin,         "thin")
@@ -278,8 +285,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	// keyword operators
 
 	AXL_PRS_TOKEN_NAME (EToken_New,          "new")
-	AXL_PRS_TOKEN_NAME (EToken_Stack,        "stack")
-	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
+	AXL_PRS_TOKEN_NAME (EToken_Delete,       "delete")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
 

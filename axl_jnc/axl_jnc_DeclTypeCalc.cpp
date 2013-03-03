@@ -120,7 +120,11 @@ CDeclTypeCalc::CalcType (
 			break;
 
 		case EDeclSuffix_Function:
-			pType = GetFunctionType (pType);
+			if (m_TypeModifiers & ETypeModifier_AutoEv)
+				pType = GetAutoEvType (pType);
+			else
+				pType = GetFunctionType (pType);
+
 			if (!CheckUnusedModifiers ())
 				return false;
 
@@ -143,6 +147,9 @@ CDeclTypeCalc::CalcType (
 
 		if (m_TypeModifiers & ETypeModifier_ReadOnly)
 			Flags |= EPtrTypeFlag_ReadOnly;
+
+		if (m_TypeModifiers & ETypeModifier_Mutable)
+			Flags |= EPtrTypeFlag_Mutable;
 
 		if (m_TypeModifiers & ETypeModifier_Volatile)
 			Flags |= EPtrTypeFlag_Volatile;
@@ -296,6 +303,24 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 		pSuffix->GetArgTypeArray (),
 		pSuffix->GetFunctionTypeFlags ()
 		);
+}
+
+CAutoEvType*
+CDeclTypeCalc::GetAutoEvType (CType* pReturnType)
+{
+	if (pReturnType->GetTypeKind () != EType_Void)
+	{
+		err::SetFormatStringError (_T("autoev function must be 'void'"));
+		return NULL;
+	}
+
+	CFunctionType* pStarterType = GetFunctionType (pReturnType);
+	if (!pStarterType)
+		return NULL;
+
+	m_TypeModifiers &= ~ETypeModifier_AutoEv;
+
+	return m_pModule->m_TypeMgr.GetAutoEvType (pStarterType);
 }
 
 CPropertyType*

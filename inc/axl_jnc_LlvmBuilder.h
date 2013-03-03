@@ -1113,7 +1113,7 @@ public:
 	}
 
 	bool
-	DynamicCastInterface (
+	DynamicCastClassPtr (
 		const CValue& Value,
 		CClassType* pResultType,
 		CValue* pResultValue

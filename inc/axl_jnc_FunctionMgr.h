@@ -7,6 +7,7 @@
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
 #include "axl_jnc_PropertyTemplate.h"
+#include "axl_jnc_AutoEv.h"
 
 namespace axl {
 namespace jnc {
@@ -58,17 +59,32 @@ enum EStdFunc
 	EStdFunc_CheckClassPtrScopeLevel,
 
 	// object
-	// jnc.DynamicCastInterface (
+	// jnc.DynamicCastClassPtr (
 	//		object p,
 	//		int8* pType
 	//		);
 
-	EStdFunc_DynamicCastInterface,
+	EStdFunc_DynamicCastClassPtr,
 
 	// int8*
-	// jnc.HeapAllocate (int8* pType);
+	// jnc.HeapAlloc (int8* pType);
 
-	EStdFunc_HeapAllocate,
+	EStdFunc_HeapAlloc,
+
+	// int8*
+	// jnc.UHeapAlloc (int8* pType);
+
+	EStdFunc_UHeapAlloc,
+
+	// void
+	// jnc.UHeapFree (int8* p);
+
+	EStdFunc_UHeapFree,
+
+	// void
+	// jnc.UHeapFreeClassPtr (object p);
+
+	EStdFunc_UHeapFreeClassPtr,
 
 	// intptr
 	// jnc.MulticastSet (
@@ -161,6 +177,8 @@ protected:
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CPropertyTemplate> m_PropertyTemplateList;
+	rtl::CStdListT <CAutoEv> m_AutoEvList;
+
 	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
 	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
 	rtl::CArrayT <CProperty*> m_AutoPropertyArray;
@@ -242,6 +260,9 @@ public:
 
 	CPropertyTemplate*
 	CreatePropertyTemplate ();
+
+	CAutoEv*
+	CreateAutoEv (CAutoEvType* pType);
 
 	bool
 	CalcPropertyLayouts ();
@@ -352,10 +373,19 @@ protected:
 	CreateCheckClassPtrScopeLevel ();
 
 	CFunction*
-	CreateDynamicCastInterface ();
+	CreateDynamicCastClassPtr ();
 
 	CFunction*
-	CreateHeapAllocate ();
+	CreateHeapAlloc ();
+
+	CFunction*
+	CreateUHeapAlloc ();
+
+	CFunction*
+	CreateUHeapFree ();
+
+	CFunction*
+	CreateUHeapFreeClassPtr ();
 
 	CFunction*
 	CreateMulticastSet (

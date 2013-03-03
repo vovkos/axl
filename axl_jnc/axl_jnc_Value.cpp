@@ -80,22 +80,6 @@ GetValueKindString (EValue ValueKind)
 		_T("undefined-value-kind");
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t*
-GetAllocKindString (EAlloc AllocKind)
-{
-	static const tchar_t* StringTable [EAlloc__Count] = 
-	{
-		_T("undefined-alloc-kind"), // EAlloc_Undefined = 0,
-		_T("heap"),                 // EAlloc_Heap,
-		_T("stack"),                // EAlloc_Stack,
-	};
-
-	return (size_t) AllocKind < EAlloc__Count ? 
-		StringTable [AllocKind] : 
-		StringTable [EAlloc_Undefined];
-}
 //.............................................................................
 
 CValue::CValue (

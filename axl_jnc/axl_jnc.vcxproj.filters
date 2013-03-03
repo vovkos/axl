@@ -235,6 +235,9 @@
     <ClInclude Include="..\inc\axl_jnc_AutoEv.h">
       <Filter>function</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_AutoEvType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -456,6 +459,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_AutoEv.cpp">
       <Filter>function</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_AutoEvType.cpp">
+      <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

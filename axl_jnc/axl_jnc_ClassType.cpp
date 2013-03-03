@@ -90,7 +90,6 @@ CClassType::CreateFieldMember (
 	{
 	case EStorage_Undefined:
 	case EStorage_Member:
-	case EStorage_Mutable:
 		pFieldStructType = m_pIfaceStructType;
 		break;
 
@@ -442,10 +441,6 @@ CClassType::CalcLayout ()
 		}
 	}
 
-	m_pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-	m_pClassStructType->m_Tag.Format (_T("%s.class"), m_Tag);
-	m_pClassStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdr));
-	m_pClassStructType->CreateFieldMember (m_pIfaceStructType);
 	m_pClassStructType->CalcLayout ();
 
 	CreateVTablePtr ();
