@@ -13,10 +13,12 @@
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
+#include "axl_jnc_AutoEvType.h"
 #include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_ClassPtrType.h"
 #include "axl_jnc_FunctionPtrType.h"
 #include "axl_jnc_PropertyPtrType.h"
+#include "axl_jnc_AutoEvPtrType.h"
 #include "axl_jnc_MulticastType.h"
 #include "axl_jnc_McSnapshotType.h"
 #include "axl_jnc_AutoEvType.h"
@@ -39,6 +41,7 @@ enum EStdType
 	EStdType_SimpleFunction,
 	EStdType_SimpleMulticast,
 	EStdType_StrenthenClosureFunction,
+	EStdType_AutoEvBindSite,
 	EStdType__Count,
 };
 
@@ -62,13 +65,14 @@ protected:
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
+	rtl::CStdListT <CAutoEvType> m_AutoEvTypeList;
 	rtl::CStdListT <CDataPtrType> m_DataPtrTypeList;
 	rtl::CStdListT <CClassPtrType> m_ClassPtrTypeList;
 	rtl::CStdListT <CFunctionPtrType> m_FunctionPtrTypeList;
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
+	rtl::CStdListT <CAutoEvPtrType> m_AutoEvPtrTypeList;
 	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
 	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
-	rtl::CStdListT <CAutoEvType> m_AutoEvTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
 
 	rtl::CStdListT <CPropertyTypeTuple> m_PropertyTypeTupleList;
@@ -76,10 +80,14 @@ protected:
 	rtl::CStdListT <CClassPtrTypeTuple> m_ClassPtrTypeTupleList;
 	rtl::CStdListT <CFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
 	rtl::CStdListT <CPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
+	rtl::CStdListT <CAutoEvPtrTypeTuple> m_AutoEvPtrTypeTupleList;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
-	size_t m_UnnamedTypeCounter;
+	size_t m_UnnamedEnumTypeCounter;
+	size_t m_UnnamedStructTypeCounter;
+	size_t m_UnnamedUnionTypeCounter;
+	size_t m_UnnamedClassTypeCounter;
 
 public:
 	CTypeMgr ();
@@ -290,7 +298,7 @@ public:
 		);
 
 	CFunctionType* 
-	GetAbstractMethodMemberType (CFunctionType* pFunctionType);
+	GetStdObjectMethodMemberType (CFunctionType* pFunctionType);
 
 	CFunctionType* 
 	GetShortFunctionType (CFunctionType* pFunctionType);
@@ -366,7 +374,7 @@ public:
 		);
 
 	CPropertyType* 
-	GetAbstractPropertyMemberType (CPropertyType* pPropertyType);
+	GetStdObjectPropertyMemberType (CPropertyType* pPropertyType);
 
 	CPropertyType* 
 	GetShortPropertyType (CPropertyType* pPropertyType);
@@ -403,6 +411,18 @@ public:
 		CFunctionType* pStarterType,
 		CFunctionType* pStopperType = NULL
 		);
+
+	CAutoEvType* 
+	GetAutoEvMemberType (
+		CClassType* pClassType,
+		CAutoEvType* pAutoEvType
+		);
+
+	CAutoEvType* 
+	GetStdObjectAutoEvMemberType (CAutoEvType* pAutoEvType);
+
+	CAutoEvType* 
+	GetShortAutoEvType (CAutoEvType* pAutoEvType);
 
 	CDataPtrType* 
 	GetDataPtrType (
@@ -488,7 +508,34 @@ public:
 
 	CStructType*
 	GetAuPropertyPtrStructType_u (CPropertyType* pPropertyType);
+	
+	CAutoEvPtrType* 
+	GetAutoEvPtrType (
+		CAutoEvType* pAutoEvType,
+		EType TypeKind,
+		EAutoEvPtrType PtrTypeKind = EAutoEvPtrType_Normal,
+		int Flags = 0
+		);
 
+	CAutoEvPtrType* 
+	GetAutoEvPtrType (
+		CAutoEvType* pAutoEvType,
+		EAutoEvPtrType PtrTypeKind = EAutoEvPtrType_Normal,
+		int Flags = 0
+		)
+	{
+		return GetAutoEvPtrType (pAutoEvType, EType_AutoEvPtr, PtrTypeKind, Flags);
+	}
+
+	CStructType*
+	GetAutoEvVTableStructType (CAutoEvType* pAutoEvType);
+
+	CStructType*
+	GetAutoEvPtrStructType (CAutoEvType* pAutoEvType);
+
+	CStructType*
+	GetAutoEvPtrStructType_w (CAutoEvType* pAutoEvType);
+	
 	CImportType*
 	GetImportType (	
 		const CQualifiedName& Name,
@@ -511,6 +558,9 @@ protected:
 	CPropertyPtrTypeTuple*
 	GetPropertyPtrTypeTuple (CPropertyType* pPropertyType);
 
+	CAutoEvPtrTypeTuple*
+	GetAutoEvPtrTypeTuple (CAutoEvType* pAutoEvType);
+
 	void
 	SetupAllPrimitiveTypes ();
 
@@ -529,6 +579,9 @@ protected:
 
 	CClassType*
 	CreateObjectType ();
+
+	CStructType* 
+	CreateAutoEvBindSiteType ();
 
 	CStructType*
 	CreateDataPtrStructType (CType* pDataType);
@@ -553,6 +606,15 @@ protected:
 
 	CStructType*
 	CreateAuPropertyPtrStructType_u (CPropertyType* pPropertyType);
+
+	CStructType*
+	CreateAutoEvVTableStructType (CAutoEvType* pAutoEvType);
+
+	CStructType*
+	CreateAutoEvPtrStructType (CAutoEvType* pAutoEvType);
+
+	CStructType*
+	CreateAutoEvPtrStructType_w (CAutoEvType* pAutoEvType);
 };
 
 //.............................................................................

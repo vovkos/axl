@@ -25,7 +25,9 @@ GetFunctionKindString (EFunction FunctionKind)
 		_T("cast-operator"),            // EFunction_CastOperator,
 		_T("unary-operator"),           // EFunction_UnaryOperator,
 		_T("binary-operator"),          // EFunction_BinaryOperator,
-		_T("autoev"),                   // EFunction_AutoEv,
+		_T("autoev-starter"),           // EFunction_AutoEvStarter,
+		_T("autoev-stopper"),           // EFunction_AutoEvStopper,
+		_T("autoev-handler"),           // EFunction_AutoEvHandler,
 		_T("internal"),                 // EFunction_Internal, 
 		_T("thunk"),                    // EFunction_Thunk,
 	};
@@ -62,7 +64,9 @@ GetFunctionKindFlags (EFunction FunctionKind)
 		EFunctionKindFlag_NoOverloads | // EFunction_UnaryOperator,
 		EFunctionKindFlag_NoArgs,       
 		0,                              // EFunction_BinaryOperator,
-		0,                              // EFunction_AutoEv,
+		0,                              // EFunction_AutoEvStarter,
+		0,                              // EFunction_AutoEvStopper,
+		0,                              // EFunction_AutoEvHandler,
 		0,                              // EFunction_Internal, 
 		0,                              // EFunction_Thunk,
 	};
@@ -76,7 +80,6 @@ CFunction::CFunction ()
 {
 	m_ItemKind = EModuleItem_Function;
 	m_FunctionKind = EFunction_Undefined;
-	m_pParentNamespace = NULL;
 	m_pOrphanNamespace = NULL;
 	m_pType = NULL;
 	m_pExternFunction = NULL;
@@ -88,6 +91,7 @@ CFunction::CFunction ()
 	m_ThisArgTypeFlags = 0;
 	m_pVirtualOriginClassType = NULL;
 	m_pProperty = NULL;
+	m_pAutoEv = NULL;
 	m_ClassVTableIndex = -1;
 	m_PropertyVTableIndex = -1;
 	m_pBlock = NULL;

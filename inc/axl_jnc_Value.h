@@ -12,7 +12,9 @@ namespace jnc {
 class CScope;
 class CVariable;
 class CFunction;
+class CFunctionTypeOverload;
 class CProperty;
+class CAutoEv;
 class CStructField;
 class CClassType;
 class CClosure;
@@ -27,7 +29,9 @@ enum EValue
 	EValue_Const,
 	EValue_Variable,
 	EValue_Function,
+	EValue_FunctionTypeOverload,
 	EValue_Property,	
+	EValue_AutoEv,	
 	EValue_Field,
 	EValue_LlvmRegister,
 	EValue_BoolNot,
@@ -83,7 +87,9 @@ protected:
 		CModuleItem* m_pItem;
 		CVariable* m_pVariable;
 		CFunction* m_pFunction;
+		CFunctionTypeOverload* m_pFunctionTypeOverload;
 		CProperty* m_pProperty;
+		CAutoEv* m_pAutoEv;
 		CStructField* m_pField;
 	};
 
@@ -143,10 +149,22 @@ public:
 		SetFunction (pFunction);
 	}
 
+	CValue (CFunctionTypeOverload* pFunctionTypeOverload)
+	{
+		Init ();
+		SetFunctionTypeOverload (pFunctionTypeOverload);
+	}
+
 	CValue (CProperty* pProperty)
 	{
 		Init ();
 		SetProperty (pProperty);
+	}
+
+	CValue (CAutoEv* pAutoEv)
+	{
+		Init ();
+		SetAutoEv (pAutoEv);
 	}
 
 	CValue (
@@ -210,11 +228,25 @@ public:
 		return m_pFunction;
 	}
 
+	CFunctionTypeOverload* 
+	GetFunctionTypeOverload () const
+	{
+		ASSERT (m_ValueKind == EValue_Function);
+		return m_pFunctionTypeOverload;
+	}
+
 	CProperty* 
 	GetProperty () const
 	{
 		ASSERT (m_ValueKind == EValue_Property);
 		return m_pProperty;
+	}
+
+	CAutoEv* 
+	GetAutoEv () const
+	{
+		ASSERT (m_ValueKind == EValue_AutoEv);
+		return m_pAutoEv;
 	}
 
 	CStructField* 
@@ -358,7 +390,13 @@ public:
 	SetFunction (CFunction* pFunction);
 
 	void
+	SetFunctionTypeOverload (CFunctionTypeOverload* pFunctionTypeOverload);
+
+	void
 	SetProperty (CProperty* pProperty);
+
+	void
+	SetAutoEv (CAutoEv* pAutoEv);
 
 	bool
 	CreateConst (
@@ -555,41 +593,6 @@ TInterface*
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up safe data pointer declared like:
-// int* p;
-
-struct TDataPtrValidator
-{
-	void* m_pRegionBegin;
-	void* m_pRegionEnd;
-	size_t m_ScopeLevel;
-};
-
-struct TDataPtr
-{
-	void* m_p;
-	TDataPtrValidator m_Validator;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// structure backing up function closure pointer declared like:
-// int function* fnTest (int, int);
-// int function weak* fnTest (int, int);
-
-struct TFunctionPtr
-{
-	void* m_pfn;
-	TInterface* m_pClosure; 
-};
-
-struct TFunctionPtr_w: TFunctionPtr
-{
-	FStrengthen m_pfnStrengthen;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 // structures backing up multicast declared like:
 // mutlicast OnFire ();
 
@@ -610,9 +613,44 @@ struct TMcSnapshot
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// structures backing up safe data pointer declared like:
+// int* p;
+
+struct TDataPtrValidator
+{
+	void* m_pRegionBegin;
+	void* m_pRegionEnd;
+	size_t m_ScopeLevel;
+};
+
+struct TDataPtr
+{
+	void* m_p;
+	TDataPtrValidator m_Validator;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structure backing up function closure pointer declared like:
+// int function* pfnTest (int, int);
+// int function weak* pfnTest (int, int);
+
+struct TFunctionPtr
+{
+	void* m_pfn;
+	TInterface* m_pClosure; 
+};
+
+struct TFunctionPtr_w: TFunctionPtr
+{
+	FStrengthen m_pfnStrengthen;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 // structures backing up property closure pointer declared like:
-// int property* prTest (int, int);
-// int property weak* prTest (int, int);
+// int property* pyTest;
+// int property weak* pyTest;
 
 struct TPropertyPtr
 {
@@ -628,7 +666,7 @@ struct TPropertyPtr_w: TPropertyPtr
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // structure backing up augmented property (bindable or autoget) thin pointer declared like:
-// int autoget property thin* prTest (int, int);
+// int autoget property thin* pyTest;
 // if both bindable & autoget modifiers used then onchange event goes first followed by propvalue
 
 struct TAuPropertyPtr_t
@@ -638,7 +676,7 @@ struct TAuPropertyPtr_t
 };
 
 // structures backing up augmented property (bindable or autoget) pointer declared like:
-// int bindable property* prTest (int, int);
+// int bindable property* pyTest;
 
 struct TAuPropertyPtr: TAuPropertyPtr_t
 {
@@ -651,12 +689,29 @@ struct TAuPropertyPtr_w: TAuPropertyPtr
 };
 
 // structure backing up augmented property (bindable or autoget) unsafe pointer declared like:
-// int autoget property unsafe* prTest (int, int);
+// int autoget property unsafe* pyTest;
 
 struct TAuPropertyPtr_u
 {
 	void** m_pVTable;
 	void* m_pAuData;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structures backing up autoev closure pointer declared like:
+// int autoev* paeTest (int);
+// int autoev weak* paeTest (int);
+
+struct TAutoEvPtr
+{
+	void** m_pVTable;
+	TInterface* m_pClosure; 
+};
+
+struct TAutoEvPtr_w: TAutoEvPtr
+{
+	FStrengthen m_pfnStrengthen;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

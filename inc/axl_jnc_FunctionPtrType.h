@@ -115,9 +115,9 @@ class CFunctionPtrTypeTuple: public rtl::TListLink
 protected:
 	friend class CTypeMgr;
 
-	CStructType* m_pFunctionPtrStructType;
-	CStructType* m_pFunctionWeakPtrStructType;
-	CFunctionPtrType* m_FunctionPtrArray [2] [EFunctionPtrType__Count] [2]; // ref x kind x nullable
+	CStructType* m_pPtrStructType;
+	CStructType* m_pPtrStructType_w;
+	CFunctionPtrType* m_PtrTypeArray [2] [EFunctionPtrType__Count] [2]; // ref x kind x nullable
 
 public:
 	CFunctionPtrTypeTuple ()

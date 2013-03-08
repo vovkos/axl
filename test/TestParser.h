@@ -279,11 +279,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-#line 11 "D:/Prj/Ninja/axl3/test/TestParser.llk"
+ #line 11 "D:/Prj/Ninja/axl3/test/TestParser.llk"
 			
 			printf ("spec:byte\n");
 		;
-#line 287 "D:/Prj/Ninja/axl3/test/TestParser.h"
+ #line 287 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;
@@ -292,11 +292,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-#line 16 "D:/Prj/Ninja/axl3/test/TestParser.llk"
+ #line 16 "D:/Prj/Ninja/axl3/test/TestParser.llk"
 			
 			printf ("spec:property %s {}\n", (*GetTokenLocator (0)).m_Data.m_String);
 		;
-#line 300 "D:/Prj/Ninja/axl3/test/TestParser.h"
+ #line 300 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;
@@ -305,11 +305,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-#line 23 "D:/Prj/Ninja/axl3/test/TestParser.llk"
+ #line 23 "D:/Prj/Ninja/axl3/test/TestParser.llk"
 			
 			printf ("mod:property\n");
 		;
-#line 313 "D:/Prj/Ninja/axl3/test/TestParser.h"
+ #line 313 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;
@@ -318,11 +318,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-#line 27 "D:/Prj/Ninja/axl3/test/TestParser.llk"
+ #line 27 "D:/Prj/Ninja/axl3/test/TestParser.llk"
 			
 			printf ("mod:const\n");
 		;
-#line 326 "D:/Prj/Ninja/axl3/test/TestParser.h"
+ #line 326 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;
@@ -331,11 +331,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-#line 39 "D:/Prj/Ninja/axl3/test/TestParser.llk"
+ #line 39 "D:/Prj/Ninja/axl3/test/TestParser.llk"
 			
 			printf ("decl:id %s\n", (*GetTokenLocator (0)).m_Data.m_String);
 		;
-#line 339 "D:/Prj/Ninja/axl3/test/TestParser.h"
+ #line 339 "D:/Prj/Ninja/axl3/test/TestParser.h"
 			}
 
 			return true;

@@ -7,6 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+CUnOp_PreInc::GetResultType (const CValue& OpValue)
+{
+	return OpValue.GetType ();
+}
+
 bool
 CUnOp_PreInc::Operator (
 	const CValue& OpValue,
@@ -26,7 +32,15 @@ CUnOp_PreInc::Operator (
 }
 
 //.............................................................................
-	
+
+CType*
+CUnOp_PostInc::GetResultType (const CValue& OpValue)
+{
+	CValue OldValue;
+	m_pModule->m_OperatorMgr.PrepareOperandType (OpValue, &OldValue);
+	return OldValue.GetType ();
+}
+
 bool
 CUnOp_PostInc::Operator (
 	const CValue& OpValue,

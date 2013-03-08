@@ -98,19 +98,19 @@ CFunctionPtrType::GetTypeModifierString ()
 		return m_TypeModifierString;
 
 	if (m_Flags & EPtrTypeFlag_Nullable)
-		m_TypeModifierString += _T(" nullable");
+		m_TypeModifierString += _T("nullable ");
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeModifierString += _T(' ');
 		m_TypeModifierString += GetFunctionPtrTypeKindString (m_PtrTypeKind);
+		m_TypeModifierString += _T(' ');
 	}
 
 	ECallConv CallConv = m_pTargetType->GetCallConv ();
 	if (CallConv)
 	{
-		m_TypeModifierString += _T(' ');
 		m_TypeModifierString += GetCallConvString (CallConv);
+		m_TypeModifierString += _T(' ');
 	}
 
 	return m_TypeModifierString;
@@ -120,8 +120,9 @@ void
 CFunctionPtrType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
+	m_TypeString += _T(' ');
 	m_TypeString += GetTypeModifierString ();
-	m_TypeString += m_TypeKind == EType_FunctionRef ? " function& " : " function* ";
+	m_TypeString += m_TypeKind == EType_FunctionRef ? "function& " : "function* ";
 	m_TypeString += m_pTargetType->GetArgTypeString ();
 }
 

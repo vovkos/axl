@@ -7,6 +7,47 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+CBinOp_Idx::GetResultType (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	)
+{
+	CType* pOpType1 = OpValue1.GetType ();
+	if (pOpType1->GetTypeKind () == EType_DataRef)
+	{
+		CDataPtrType* pPtrType = (CDataPtrType*) pOpType1;
+		CType* pBaseType = pPtrType->GetTargetType ();
+
+		if (pBaseType->GetTypeKind () == EType_Array)
+			return ((CArrayType*) pBaseType)->GetElementType ()->GetDataPtrType (
+				EType_DataRef, 
+				pPtrType->GetPtrTypeKind (), 
+				pPtrType->GetFlags ()
+				);
+
+		pOpType1 = pBaseType;
+	}
+
+	EType TypeKind = pOpType1->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_DataPtr:
+		return pOpType1;
+
+	case EType_Array:
+		return ((CArrayType*) pOpType1)->GetElementType ();
+
+	case EType_PropertyRef:
+	case EType_PropertyPtr:
+		return GetPropertyIndexResultType (OpValue1, OpValue2);
+
+	default:
+		err::SetFormatStringError (_T("cannot index '%s'"), pOpType1->GetTypeString ());
+		return NULL;
+	}
+}
+
 bool
 CBinOp_Idx::Operator (
 	const CValue& RawOpValue1,
@@ -148,6 +189,17 @@ CBinOp_Idx::PropertyIndexOperator (
 
 	pClosure->GetArgList ()->InsertTail (RawOpValue2);
 	return true;
+}
+
+CType*
+CBinOp_Idx::GetPropertyIndexResultType (
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2
+	)
+{
+	CValue ResultValue;
+	PropertyIndexOperator (RawOpValue1, RawOpValue2, &ResultValue);
+	return ResultValue.GetClosure ()->GetClosureType (RawOpValue1.GetType ());
 }
 
 //.............................................................................

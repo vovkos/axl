@@ -9,6 +9,11 @@
 namespace axl {
 namespace jnc {
 
+class CAutoEvPtrType;
+class CAutoEvPtrTypeTuple;
+
+enum EAutoEvPtrType;
+
 //.............................................................................
 
 class CAutoEvType: public CType
@@ -18,6 +23,11 @@ protected:
 
 	CFunctionType* m_pStarterType;
 	CFunctionType* m_pStopperType;
+	CAutoEvType* m_pStdObjectAutoEvMemberType;
+	CAutoEvType* m_pShortType;
+	CStructType* m_pVTableStructType;
+
+	CAutoEvPtrTypeTuple* m_pAutoEvPtrTypeTuple;
 
 public:
 	CAutoEvType ();
@@ -33,6 +43,46 @@ public:
 	{
 		return m_pStopperType;
 	}
+
+	bool
+	IsAutoEvMemberType ()
+	{
+		return m_pStarterType->IsMethodMemberType ();
+	}
+
+	CClassPtrType* 
+	GetThisArgType ()
+	{
+		return m_pStarterType->GetThisArgType ();
+	}
+
+	CAutoEvType*
+	GetAutoEvMemberType (CClassType* pType);
+
+	CAutoEvType*
+	GetStdObjectAutoEvMemberType ();
+
+	CAutoEvType*
+	GetShortType  ();
+
+	CAutoEvPtrType* 
+	GetAutoEvPtrType (
+		EType TypeKind,
+		EAutoEvPtrType PtrTypeKind = (EAutoEvPtrType) 0,
+		int Flags = 0
+		);
+
+	CAutoEvPtrType* 
+	GetAutoEvPtrType (
+		EAutoEvPtrType PtrTypeKind = (EAutoEvPtrType) 0,
+		int Flags = 0
+		)
+	{
+		return GetAutoEvPtrType (EType_AutoEvPtr, PtrTypeKind, Flags);
+	}
+
+	CStructType*
+	GetVTableStructType ();
 
 	static
 	rtl::CStringA

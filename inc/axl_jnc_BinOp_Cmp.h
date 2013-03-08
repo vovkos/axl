@@ -16,6 +16,16 @@ class CBinOpT_Cmp: public IBinaryOperator
 {
 public:
 	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
+	}
+
+	virtual
 	bool
 	Operator (
 		const CValue& RawOpValue1,

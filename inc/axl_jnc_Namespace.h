@@ -18,7 +18,7 @@ class CFunction;
 
 //.............................................................................
 
-class CAlias: public CNamedModuleItem
+class CAlias: public CUserModuleItem
 {
 protected:
 	friend class CNamespace;
@@ -55,6 +55,7 @@ enum ENamespace
 	ENamespace_TypeExtension,
 	ENamespace_Property,
 	ENamespace_PropertyTemplate,
+	ENamespace_AutoEv,
 	ENamespace__Count
 };
 
@@ -75,7 +76,7 @@ enum
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CNamespace: public CModuleItemName
+class CNamespace: public CModuleItemDecl
 {
 protected:
 	friend class CNamespaceMgr;
@@ -83,7 +84,6 @@ protected:
 
 	ENamespace m_NamespaceKind;
 	EAccess m_CurrentAccessKind;
-	CNamespace* m_pParentNamespace;	
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
@@ -103,12 +103,6 @@ public:
 	GetCurrentAccessKind ()
 	{
 		return m_CurrentAccessKind;
-	}
-
-	CNamespace* 
-	GetParentNamespace ()
-	{
-		return m_pParentNamespace;
 	}
 
 	rtl::CString
@@ -210,7 +204,7 @@ protected:
 	bool
 	AddItem (
 		CModuleItem* pItem,
-		CModuleItemName* pName
+		CModuleItemDecl* pDecl
 		);
 
 	virtual
@@ -225,7 +219,7 @@ protected:
 //.............................................................................
 
 class CGlobalNamespace: 
-	public CDeclModuleItem,
+	public CModuleItem,
 	public CNamespace
 {
 protected:
@@ -236,6 +230,7 @@ public:
 	{
 		m_ItemKind = EModuleItem_Namespace;
 		m_NamespaceKind = ENamespace_Global;
+		m_pItemDecl = this;
 	}
 };
 

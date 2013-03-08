@@ -9,6 +9,10 @@ $Includes
 %{
 	-------------------------------------------------------------------------------
 
+	if NoPpLine then
+		PpLinePrefix = "//"
+	end
+
 	if ParserClassName == nil then
 		ParserClassName = "CParser"
 	end
@@ -214,9 +218,9 @@ public:
 	class $(Class.Name): public $BaseClass
 	{
 	public:
-#line $(GetPpLine (Class.SrcPos.FilePath, Class.SrcPos.Line))
+$PpLinePrefix #line $(GetPpLine (Class.SrcPos.FilePath, Class.SrcPos.Line))
 		$(Class.Members);
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 	};
 	%{ end }
 
@@ -232,17 +236,17 @@ public:
 			%{ if Symbol.Arg then }
 		struct
 		{
-#line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.ArgLine))
+$PpLinePrefix #line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.ArgLine))
 			$((string.gsub (Symbol.Arg, ",", ";")));
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 		} m_Arg;	
 			%{ end
 			if Symbol.Local then }
 		struct
 		{
-#line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.LocalLine))
+$PpLinePrefix #line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.LocalLine))
 			$(Symbol.Local);
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 		} m_Local;	
 			%{ end }
 		CSymbolNode_$(Symbol.Name) ()
@@ -468,9 +472,9 @@ public:
 			{
 			$(GetSymbolDeclaration (ProductionSymbol, SymbolVariableName, "GetSymbolTop ()"))
 			$(GetAstDeclaration (ProductionSymbol, AstNodeVariableName, SymbolVariableName))
-#line $(GetPpLine (Action.SrcPos.FilePath, Action.SrcPos.Line))
+$PpLinePrefix #line $(GetPpLine (Action.SrcPos.FilePath, Action.SrcPos.Line))
 			$(ProcessActionUserCode (Action.UserCode, Action.Dispatcher, SymbolVariableName, AstNodeVariableName));
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 			}
 
 			return true;
@@ -505,9 +509,9 @@ public:
 				ArgumentName = TargetSymbol.ArgNameTable [j]
 				ArgumentValue = ProcessActionUserCode (ValueTable [j], Argument.Dispatcher, SymbolVariableName, AstNodeVariableName)
 				}
-#line $(GetPpLine (Argument.SrcPos.FilePath, Argument.SrcPos.Line))
+$PpLinePrefix #line $(GetPpLine (Argument.SrcPos.FilePath, Argument.SrcPos.Line))
 			__pTarget->m_Arg.$ArgumentName = $ArgumentValue;
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 			%{ end }
 			}
 			break;
@@ -530,9 +534,9 @@ public:
 			{
 				$(GetSymbolDeclaration (Symbol, SymbolVariableName, "GetSymbolTop ()"))
 				$(GetAstDeclaration (Symbol, AstNodeVariableName, SymbolVariableName))
-#line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.EnterLine))
+$PpLinePrefix #line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.EnterLine))
 				$(ProcessActionUserCode (Symbol.Enter, nil, SymbolVariableName, AstNodeVariableName));
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 			}
 			return true;
 			%{ end }
@@ -555,9 +559,9 @@ public:
 			{
 				$(GetSymbolDeclaration (Symbol, SymbolVariableName, "GetSymbolTop ()"))
 				$(GetAstDeclaration (Symbol, AstNodeVariableName, SymbolVariableName))
-#line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.LeaveLine))
+$PpLinePrefix #line $(GetPpLine (Symbol.SrcPos.FilePath, Symbol.LeaveLine))
 				$(ProcessActionUserCode (Symbol.Leave, nil, SymbolVariableName, AstNodeVariableName));
-#line $(GetPpLineDefault ())
+$PpLinePrefix #line $(GetPpLineDefault ())
 			}
 			return true;
 			%{ end }

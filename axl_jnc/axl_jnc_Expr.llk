@@ -10,16 +10,40 @@ expression_pass1
 
 noast
 primary_expr_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	: '{' primary_expr_pass1 <$pTokenList>+ '}'
-	| '[' primary_expr_pass1 <$pTokenList>+ ']'
-	| '(' primary_expr_pass1 <$pTokenList>* ')'
+	: '{' 
+		{
+			$pTokenList->InsertTail ($1);
+		}
+	  primary_expr_pass1 <$pTokenList>+ 
+	  '}'
+		{
+			$pTokenList->InsertTail ($3);
+		}
+	| '[' 
+		{
+			$pTokenList->InsertTail ($1);
+		}
+	  primary_expr_pass1 <$pTokenList>+ 
+	  ']'
+		{
+			$pTokenList->InsertTail ($3);
+		}
+	| '(' 
+		{
+			$pTokenList->InsertTail ($1);
+		}
+	  primary_expr_pass1 <$pTokenList>* 
+	  ')'
+		{
+			$pTokenList->InsertTail ($3);
+		}
 	| any
 		{
 			$pTokenList->InsertTail ($1);
 		}
 	;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 class
 {
@@ -79,7 +103,7 @@ expression_or_empty_list
 	|	{
 			$.m_ValueList.InsertTail (CValue ());
 		}	
-	  (',' 
+	  ( ',' 
 		expression_or_empty $e2
 			{
 				$.m_ValueList.InsertTail ($e2.m_Value);
@@ -153,7 +177,7 @@ conditional_expr <CValue* $pValue>
 		':' 
 		conditional_expr <&$.m_FalseValue>
 			{
-				FinalizeConditionalExpr (&$, $pValue);
+				return FinalizeConditionalExpr (&$, $pValue);
 			}
 	  )?
 	;
@@ -406,6 +430,10 @@ assignment_expr <CValue* $pValue>
 	}
 	: unary_expr <$pValue> 
 	  (
+			{
+				if (IsAutoEvStarter ())  // reset on assignment
+					m_AutoEvBindSiteList.Clear (); 
+			}
 		assignment_operator $o conditional_expr <&$OpValue2>
 			{
 				return m_pModule->m_OperatorMgr.BinaryOperator ($o.m_OpKind, $pValue, $OpValue2);
@@ -476,8 +504,8 @@ unary_expr <CValue* $pValue>
 unary_operator_expr <CValue* $pValue>
 	leave 
 	{
-		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
-			m_BindablePropertyList.InsertTail (*$pValue);
+		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+			m_AutoEvBindSiteList.InsertTail (*$pValue);
 	}
 	: '+' unary_expr <$pValue> 
 		{
@@ -590,7 +618,7 @@ type_name_or_expr
 		{
 			$.m_pType = $2.m_pType;
 		}
-	| unary_expr <&$Value>
+	| unary_expr_t <&$Value>
 		{
 			$.m_pType = $Value.GetType ();
 		}
@@ -604,8 +632,8 @@ postfix_expr <CValue* $pValue>
 postfix_operator <CValue* $pValue>
 	leave 
 	{
-		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
-			m_BindablePropertyList.InsertTail (*$pValue);
+		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+			m_AutoEvBindSiteList.InsertTail (*$pValue);
 	}
 	: '(' expression_or_empty_list ')'
 		{
@@ -646,7 +674,7 @@ member_operator <CValue* $pValue>
 		}
 	| EToken_OnChange
 		{
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChangeEvent);
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChange);
 		}
 	| EToken_PropValue
 		{
@@ -665,8 +693,8 @@ member_operator <CValue* $pValue>
 primary_expr <CValue* $pValue>
 	leave 
 	{
-		if (m_pAutoEvType && $pValue->GetType ()->IsBindablePropertyType ())
-			m_BindablePropertyList.InsertTail (*$pValue);
+		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+			m_AutoEvBindSiteList.InsertTail (*$pValue);
 	}
 	: EToken_Identifier
 		{
@@ -678,7 +706,7 @@ primary_expr <CValue* $pValue>
 		}
 	| EToken_OnChange
 		{
-			return GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChangeEvent);
+			return GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChange);
 		}
 	| EToken_PropValue
 		{

@@ -12,6 +12,7 @@ namespace jnc {
 
 class CPropertyPtrType;
 class CPropertyPtrTypeTuple;
+class CClassType;
 
 enum EPropertyPtrType;
 
@@ -53,7 +54,7 @@ GetPropertyTypeFlagsFromModifiers (int Modifiers);
 
 enum EAuPropertyField
 {
-	EAuPropertyField_OnChangeEvent = 0,
+	EAuPropertyField_OnChange = 0,
 	EAuPropertyField_PropValue,
 	EAuPropertyField__Count
 };
@@ -73,7 +74,7 @@ protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	rtl::CString m_TypeModifierString;
-	CPropertyType* m_pAbstractPropertyMemberType;
+	CPropertyType* m_pStdObjectPropertyMemberType;
 	CPropertyType* m_pShortType;
 	CPropertyType* m_pBindablePropertyType;
 	CStructType* m_pVTableStructType;
@@ -128,7 +129,10 @@ public:
 	}
 
 	CPropertyType*
-	GetAbstractPropertyMemberType ();
+	GetPropertyMemberType (CClassType* pType);
+
+	CPropertyType*
+	GetStdObjectPropertyMemberType ();
 
 	CPropertyType*
 	GetShortType  ();

@@ -24,6 +24,16 @@ public:
 	}
 
 	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		return OpValue1.GetType ();
+	}
+
+	virtual
 	bool
 	Operator (
 		const CValue& OpValue1,
@@ -43,6 +53,16 @@ public:
 	CBinOp_OpAssign ()
 	{
 		m_OpFlags1 = EOpFlag_KeepRef;
+	}
+
+	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		return OpValue1.GetType ();
 	}
 
 	virtual

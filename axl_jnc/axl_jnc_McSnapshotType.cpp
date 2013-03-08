@@ -96,19 +96,12 @@ CMcSnapshotType::GetCallMethod ()
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFollowBlock, pBodyBlock, pBodyBlock);
 
 	CValue PfnValue;
-	CValue ReturnValue;
 	m_pModule->m_LlvmBuilder.CreateLoad (PtrPfnValue, m_pTargetType, &PfnValue);
-	m_pModule->m_OperatorMgr.CallOperator (
-		PfnValue, 
-		&ArgValueList,
-		&ReturnValue
-		);
+	m_pModule->m_OperatorMgr.CallOperator (PfnValue, &ArgValueList);
 
 	m_pModule->m_LlvmBuilder.CreateGep (PtrPfnValue, 1, pPtrPfnType, &PtrPfnValue);
 	m_pModule->m_LlvmBuilder.CreateStore (PtrPfnValue, PtrPfnVariable);
-
 	m_pModule->m_ControlFlowMgr.Jump (pConditionBlock, pFollowBlock);
-	m_pModule->m_ControlFlowMgr.Return ();
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 

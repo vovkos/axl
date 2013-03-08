@@ -238,6 +238,9 @@
     <ClInclude Include="..\inc\axl_jnc_AutoEvType.h">
       <Filter>type</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_AutoEvPtrType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -463,6 +466,9 @@
     <ClCompile Include="axl_jnc_AutoEvType.cpp">
       <Filter>type</Filter>
     </ClCompile>
+    <ClCompile Include="axl_jnc_AutoEvPtrType.cpp">
+      <Filter>type</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="axl_jnc_Stmt.llk">
@@ -481,6 +487,12 @@
       <Filter>parser</Filter>
     </None>
     <None Include="axl_jnc_NamedTypeSpecifier.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_Expr_t.llk">
+      <Filter>parser</Filter>
+    </None>
+    <None Include="axl_jnc_Stmt_0.llk">
       <Filter>parser</Filter>
     </None>
   </ItemGroup>

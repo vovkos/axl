@@ -64,6 +64,21 @@ IBinaryOperator::IBinaryOperator()
 	m_OpFlags1 = m_OpFlags2 = 0;
 }
 
+bool
+IBinaryOperator::GetResultType (
+	const CValue& OpValue1,
+	const CValue& OpValue2,
+	CValue* pResultValue
+	)
+{
+	CType* pType = GetResultType (OpValue1, OpValue2);
+	if (!pType)
+		return false;
+
+	pResultValue->SetType (pType);
+	return true;
+}
+
 //.............................................................................
 
 } // namespace jnc {

@@ -21,6 +21,7 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		_T("variable"),                    // EModuleItem_Variable,
 		_T("function"),                    // EModuleItem_Function,
 		_T("property"),                    // EModuleItem_Property,
+		_T("property-template"),           // EModuleItem_PropertyTemplate,
 		_T("autoev"),                      // EModuleItem_AutoEv,
 		_T("enum-member"),                 // EModuleItem_EnumConst,
 		_T("struct-member"),               // EModuleItem_StructField,
@@ -70,6 +71,25 @@ GetAccessKindString (EAccess AccessKind)
 	return (size_t) AccessKind < EAccess__Count ? 
 		StringTable [AccessKind] : 
 		StringTable [EAccess_Undefined];
+}
+
+//.............................................................................
+
+CModuleItemDecl::CModuleItemDecl ()
+{
+	m_StorageKind = EStorage_Undefined;
+	m_AccessKind = EAccess_Undefined;
+	m_pParentNamespace = NULL;
+	m_pAttributeBlock = NULL;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+CModuleItem::CModuleItem ()
+{
+	m_pModule = NULL;
+	m_ItemKind = EModuleItem_Undefined;
+	m_pItemDecl = NULL;
 }
 
 //.............................................................................

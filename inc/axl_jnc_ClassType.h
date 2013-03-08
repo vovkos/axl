@@ -8,6 +8,7 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
+#include "axl_jnc_AutoEv.h"
 #include "axl_jnc_UnOp.h"
 #include "axl_jnc_BinOp.h"
 
@@ -24,8 +25,8 @@ enum EClassPtrType;
 enum EClassTypeFlag
 {
 	EClassTypeFlag_StdObject = 0x010000, // EStdType_Object 
-	EClassTypeFlag_AutoEv    = 0x020000,
-	EClassTypeFlag_Abstract  = 0x040000,
+	EClassTypeFlag_Abstract  = 0x020000,
+	EClassTypeFlag_AutoEv    = 0x040000,
 };
 
 //............................................................................
@@ -70,10 +71,11 @@ protected:
 	rtl::CArrayT <CFunction*> m_BinaryOperatorTable;
 	rtl::CStringHashTableMapAT <CFunction*> m_CastOperatorMap;
 
-	// autoev
+	// autoev (handlers must be disconnected in destructor)
 
-	rtl::CBoxListT <CToken> m_AutoEvBody;
-
+	rtl::CArrayT <CAutoEv*> m_AutoEvArray;
+	
+	
 	CClassPtrTypeTuple* m_pClassPtrTypeTuple;
 
 public:
@@ -127,10 +129,7 @@ public:
 	}
 
 	CFunction* 
-	GetInitializer ()
-	{
-		return m_pInitializer;
-	}
+	GetInitializer ();
 
 	size_t
 	GetPackFactor ()
@@ -200,11 +199,17 @@ public:
 	CPropertyType* 
 	GetPropertyMemberType (CPropertyType* pShortType);
 
+	CAutoEvType* 
+	GetAutoEvMemberType (CAutoEvType* pShortType);
+
 	bool
 	AddMethodMember (CFunction* pFunction);
 
 	bool
 	AddPropertyMember (CProperty* pProperty);
+
+	bool
+	AddAutoEvMember (CAutoEv* pAutoEv);
 
 	bool
 	HasVTable ()
@@ -239,15 +244,6 @@ public:
 		return m_BinaryOperatorTable ? m_BinaryOperatorTable [OpKind] : NULL;
 	}
 
-	const rtl::CBoxListT <CToken>*
-	GetAutoEvBody ()
-	{
-		return &m_AutoEvBody;
-	}
-
-	void
-	SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList);
-
 	virtual
 	bool
 	CalcLayout ();
@@ -280,14 +276,14 @@ protected:
 	CreateVTablePtr ();
 
 	bool
+	CreateAutoEvConstructor ();
+
+	bool
 	CreateDefaultConstructor ();
 
 	bool
 	CreateDefaultDestructor ();
-
-	void
-	CreateInitializer ();
-
+	
 	bool
 	InitializeInterface (
 		CClassType* pClassType,

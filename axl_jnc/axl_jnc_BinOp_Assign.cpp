@@ -14,6 +14,8 @@ CBinOp_Assign::Operator (
 	CValue* pResultValue
 	)
 {
+	*pResultValue = OpValue1;
+
 	EType DstTypeKind = OpValue1.GetType ()->GetTypeKind ();
 	
 	CDataPtrType* pPtrType;
@@ -37,7 +39,7 @@ CBinOp_Assign::Operator (
 			CValue MulticastPtrValue;
 			return 
 				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
-				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2, pResultValue);
+				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2);
 		}
 
 		return m_pModule->m_OperatorMgr.StoreDataRef (OpValue1, OpValue2);
@@ -62,6 +64,8 @@ CBinOp_OpAssign::Operator (
 {
 	ASSERT (m_OpKind >= EBinOp_AddAssign && m_OpKind <= EBinOp_AtAssign);
 
+	*pResultValue = OpValue1;
+
 	if ((m_OpKind == EBinOp_AddAssign || m_OpKind == EBinOp_SubAssign) && 
 		OpValue1.GetType ()->GetTypeKind () == EType_DataRef)
 	{
@@ -78,7 +82,7 @@ CBinOp_OpAssign::Operator (
 			CValue MulticastPtrValue;
 			return 
 				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
-				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2, pResultValue);
+				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2);
 		}
 	}
 

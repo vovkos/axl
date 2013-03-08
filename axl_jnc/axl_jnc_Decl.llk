@@ -93,11 +93,11 @@ qualified_name
 qualified_name_impl <CQualifiedName* $pName>
 	: EToken_Identifier       
 		{  
-			$pName->m_First = $1.m_Data.m_String; 
+			$pName->AddName ($1.m_Data.m_String); 
 		}
 	  ('.' EToken_Identifier $n2
 		{ 
-			$pName->m_List.InsertTail ($n2.m_Data.m_String);
+			$pName->AddName ($n2.m_Data.m_String);
 		}
 	  )*
 	; 

@@ -20,6 +20,7 @@ class CPropertyPtrType;
 class CMulticastType;
 class CMcSnapshotType;
 class CAutoEvType;
+class CAutoEvPtrType;
 
 //.............................................................................
 
@@ -52,14 +53,14 @@ protected:
 	CFunctionType*
 	GetFunctionType (CType* pReturnType);
 
-	CAutoEvType*
-	GetAutoEvType (CType* pReturnType);
-
 	CPropertyType*
 	GetPropertyType (CType* pReturnType);
 
 	CPropertyType*
 	GetBindableDataType (CType* pDataType);
+
+	CAutoEvType*
+	GetAutoEvType (CType* pReturnType);
 
 	CMulticastType*
 	GetMulticastType (CType* pReturnType);
@@ -75,6 +76,9 @@ protected:
 
 	CPropertyPtrType*
 	GetPropertyPtrType (CPropertyType* pPropertyType);
+
+	CAutoEvPtrType*
+	GetAutoEvPtrType (CAutoEvType* pAutoEvType);
 
 	CType*
 	PrepareReturnType (CType* pType);

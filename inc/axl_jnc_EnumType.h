@@ -21,7 +21,7 @@ enum EEnumTypeFlag
 
 //.............................................................................
 
-class CEnumConst: public CNamedModuleItem
+class CEnumConst: public CUserModuleItem
 {
 protected:
 	friend class CEnumType;

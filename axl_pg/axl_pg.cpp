@@ -21,6 +21,7 @@ PrintUsage ()
 		"    -F <frame_dir>    add frame file directory <frame_dir> (multiple allowed)\n"
 		"    -I <import_dir>   add import file directory <import_dir> (multiple allowed)\n"
 		"    -t <trace_file>   write debug information into <trace_file>\n"
+		"    -l                suppress #line preprocessor directives\n"
 		"    -v                verbose mode\n"
 		);
 }
@@ -87,6 +88,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			case 'v':
 				Config.m_Flags |= EConfigFlag_Verbose;
+				break;
+
+			case 'l':
+				Config.m_Flags |= EConfigFlag_NoPpLine;
 				break;
 			}			
 		}

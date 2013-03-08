@@ -7,6 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+CUnOp_LogNot::GetResultType (const CValue& OpValue)
+{
+	return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
+}
+
 bool
 CUnOp_LogNot::Operator (
 	const CValue& OpValue,

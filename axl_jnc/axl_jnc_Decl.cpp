@@ -215,19 +215,9 @@ CDeclarator::AddName (rtl::CString Name)
 		return false;
 	}
 
+	m_DeclaratorKind = EDeclarator_Name;
 	m_FunctionKind = EFunction_Named;
-
-	if (m_Name.m_First.IsEmpty ())
-	{
-		m_DeclaratorKind = EDeclarator_SimpleName;
-		m_Name.m_First = Name;
-	}
-	else
-	{
-		m_DeclaratorKind = EDeclarator_QualifiedName;
-		m_Name.m_List.InsertTail (Name);
-	}
-
+	m_Name.AddName (Name);
 	return true;
 }
 
@@ -240,8 +230,8 @@ CDeclarator::AddUnnamedMethod (EFunction FunctionKind)
 		return false;
 	}
 
+	m_DeclaratorKind = EDeclarator_UnnamedMethod;
 	m_FunctionKind = FunctionKind;
-	m_DeclaratorKind = m_Name.IsEmpty () ? EDeclarator_UnnamedMethod : EDeclarator_QualifiedName;
 	return true;
 }
 
@@ -272,7 +262,7 @@ CDeclarator::AddUnaryBinaryOperator (
 		return false;
 	}
 
-	m_DeclaratorKind = m_Name.IsEmpty () ? EDeclarator_UnaryBinaryOperator : EDeclarator_QualifiedName;
+	m_DeclaratorKind = EDeclarator_UnaryBinaryOperator;
 	m_UnOpKind = UnOpKind;
 	m_BinOpKind = BinOpKind;
 	return true;
@@ -351,17 +341,6 @@ CDeclarator::CalcType (int* pDataPtrTypeFlags)
 {
 	CDeclTypeCalc TypeCalc;
 	return TypeCalc.CalcType (this, pDataPtrTypeFlags);
-}
-
-rtl::CStdListT <CFunctionFormalArg>*
-CDeclarator::GetArgList ()
-{
-	rtl::CIteratorT <CDeclSuffix> Suffix = m_SuffixList.GetHead ();
-	if (!Suffix || Suffix->GetSuffixKind () != EDeclSuffix_Function)
-		return NULL;
-
-	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *Suffix;
-	return &pSuffix->m_ArgList;
 }
 
 //.............................................................................

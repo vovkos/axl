@@ -11,24 +11,17 @@ namespace jnc {
 
 //.............................................................................
 
-class CAttribute: public CDeclModuleItem
+class CAttribute: public CUserModuleItem
 {
 protected:
 	friend class CAttributeBlock;
 
-	rtl::CString m_Name;
 	CValue* m_pValue;
 
 public:
 	CAttribute ()
 	{
 		m_pValue = NULL;
-	}
-
-	rtl::CString 
-	GetName ()
-	{
-		return m_Name;
 	}
 
 	CValue* 
@@ -40,7 +33,7 @@ public:
 
 //.............................................................................
 
-class CAttributeBlock: public CDeclModuleItem
+class CAttributeBlock: public CUserModuleItem
 {
 protected:
 	friend class CAttributeMgr;

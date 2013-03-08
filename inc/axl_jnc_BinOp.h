@@ -112,6 +112,20 @@ public:
 		return m_OpFlags2;
 	}
 
+	bool
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+
+	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		) = 0;
+
 	virtual
 	bool
 	Operator (

@@ -6,6 +6,15 @@ namespace jnc {
 
 //.............................................................................
 
+void
+CQualifiedName::AddName (const rtl::CString& Name)
+{
+	if (m_First.IsEmpty ())
+		m_First = Name;
+	else
+		m_List.InsertTail (Name);
+}
+
 rtl::CString
 CQualifiedName::GetFullName () const
 {

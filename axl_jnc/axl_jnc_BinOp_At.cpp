@@ -7,6 +7,15 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+CBinOp_At::GetResultType (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	)
+{
+	return OpValue1.GetType ();
+}
+
 bool
 CBinOp_At::Operator (
 	const CValue& RawOpValue1,

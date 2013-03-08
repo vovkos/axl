@@ -7,6 +7,15 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+CBinOp_LogAnd::GetResultType (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	)
+{
+	return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
+}
+
 bool
 CBinOp_LogAnd::Operator (
 	const CValue& RawOpValue1,
@@ -19,6 +28,15 @@ CBinOp_LogAnd::Operator (
 }
 
 //.............................................................................
+
+CType*
+CBinOp_LogOr::GetResultType (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	)
+{
+	return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
+}
 
 bool
 CBinOp_LogOr::Operator (

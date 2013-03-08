@@ -50,6 +50,7 @@ CGenerator::Generate (
 	rtl::CString TargetFilePath = io::GetFullFilePath (pFileName);
 
 	m_StringTemplate.m_LuaState.SetGlobalString ("TargetFilePath", TargetFilePath);
+	m_StringTemplate.m_LuaState.SetGlobalBoolean ("NoPpLine", (m_pConfig->m_Flags & EConfigFlag_NoPpLine) != 0);
 
 	Result = m_StringTemplate.Process (&m_Buffer, pFrameFileName, p, Size);
 	if (!Result)

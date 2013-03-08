@@ -7,6 +7,7 @@
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_PropertyVerifier.h"
 #include "axl_jnc_Function.h"
+#include "axl_jnc_AutoEv.h"
 
 namespace axl {
 namespace jnc {
@@ -14,7 +15,7 @@ namespace jnc {
 //.............................................................................
 
 class CProperty: 
-	public CDeclModuleItem,
+	public CModuleItem,
 	public CNamespace
 {
 protected:
@@ -125,6 +126,12 @@ public:
 		return m_pParentClassType;
 	}
 
+	CStructField* 
+	GetParentClassFieldMember ()
+	{
+		return m_pParentClassFieldMember;
+	}
+
 	bool
 	IsMember ()
 	{
@@ -183,6 +190,9 @@ public:
 
 	bool
 	AddPropertyMember (CProperty* pProperty);
+
+	bool
+	AddAutoEvMember (CAutoEv* pAutoEv);
 
 	bool
 	CalcLayout ();

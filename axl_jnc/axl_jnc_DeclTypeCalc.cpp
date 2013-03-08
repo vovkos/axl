@@ -61,6 +61,14 @@ CDeclTypeCalc::CalcType (
 
 				pType = GetPropertyPtrType (pPropertyType);
 			}
+			else if (m_TypeModifiers & ETypeModifier_AutoEv)
+			{
+				CAutoEvType* pAutoEvType = GetAutoEvType (pType);
+				if (!pAutoEvType)
+					return false;
+
+				pType = GetAutoEvPtrType (pAutoEvType);
+			}
 			else switch (TypeKind)
 			{
 			case EType_Function:
@@ -69,6 +77,10 @@ CDeclTypeCalc::CalcType (
 
 			case EType_Property:
 				pType = GetPropertyPtrType ((CPropertyType*) pType);
+				break;
+
+			case EType_AutoEv:
+				pType = GetAutoEvPtrType ((CAutoEvType*) pType);
 				break;
 
 			default:
@@ -305,24 +317,6 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 		);
 }
 
-CAutoEvType*
-CDeclTypeCalc::GetAutoEvType (CType* pReturnType)
-{
-	if (pReturnType->GetTypeKind () != EType_Void)
-	{
-		err::SetFormatStringError (_T("autoev function must be 'void'"));
-		return NULL;
-	}
-
-	CFunctionType* pStarterType = GetFunctionType (pReturnType);
-	if (!pStarterType)
-		return NULL;
-
-	m_TypeModifiers &= ~ETypeModifier_AutoEv;
-
-	return m_pModule->m_TypeMgr.GetAutoEvType (pStarterType);
-}
-
 CPropertyType*
 CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 {
@@ -403,6 +397,24 @@ CDeclTypeCalc::GetBindableDataType (CType* pDataType)
 
 	m_TypeModifiers &= ~ETypeModifierMask_Property;
 	return m_pModule->m_TypeMgr.GetSimplePropertyType (CallConv, pDataType, TypeFlags);
+}
+
+CAutoEvType*
+CDeclTypeCalc::GetAutoEvType (CType* pReturnType)
+{
+	if (pReturnType->GetTypeKind () != EType_Void)
+	{
+		err::SetFormatStringError (_T("autoev function must be 'void'"));
+		return NULL;
+	}
+
+	CFunctionType* pStarterType = GetFunctionType (pReturnType);
+	if (!pStarterType)
+		return NULL;
+
+	m_TypeModifiers &= ~ETypeModifier_AutoEv;
+
+	return m_pModule->m_TypeMgr.GetAutoEvType (pStarterType);
 }
 
 CMulticastType*
@@ -512,6 +524,19 @@ CDeclTypeCalc::GetPropertyPtrType (CPropertyType* pPropertyType)
 
 	m_TypeModifiers &= ~ETypeModifierMask_PropertyPtr;
 	return m_pModule->m_TypeMgr.GetPropertyPtrType (pPropertyType, PtrTypeKind, TypeFlags);
+}
+
+CAutoEvPtrType*
+CDeclTypeCalc::GetAutoEvPtrType (CAutoEvType* pAutoEvType)
+{
+	EAutoEvPtrType PtrTypeKind = GetAutoEvPtrTypeKindFromModifiers (m_TypeModifiers);
+	int TypeFlags = 0;
+
+	if (m_TypeModifiers & ETypeModifier_Nullable)
+		TypeFlags |= EPtrTypeFlag_Nullable;
+
+	m_TypeModifiers &= ~ETypeModifierMask_AutoEvPtr;
+	return m_pModule->m_TypeMgr.GetAutoEvPtrType (pAutoEvType, PtrTypeKind, TypeFlags);
 }
 
 //.............................................................................

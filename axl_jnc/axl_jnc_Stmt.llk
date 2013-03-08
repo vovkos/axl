@@ -10,14 +10,14 @@ function_body_pass1
 
 noast
 compound_stmt_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	: '{' $l
+	: '{'
 		{
-			$pTokenList->InsertTail ($l);
+			$pTokenList->InsertTail ($1);
 		}
 	  statement_pass1 <$pTokenList>* 
-	  '}' $r
+	  '}'
 		{
-			$pTokenList->InsertTail ($r);
+			$pTokenList->InsertTail ($3);
 		}
 	;
 
@@ -312,60 +312,37 @@ return_stmt
 
 //.............................................................................
 
-/*
-
-// autoev
-
-class
-{
-	CClassType* m_pType;
-	CDeclarator m_Declarator;
-}
-autoev_specifier
-	: EToken_AutoEv
-	  (EToken_Identifier $n
-		{
-			$.m_Declarator.AddName ($n.m_Data.m_String);
-		}
-	  )?
-	  function_suffix $a <&$.m_Declarator>?
-		{
-			$.m_pType = CreateAutoEvType (&$.m_Declarator);
-			if (!$.m_pType)
-				return false;
-		}
-	  (
-		resolver ({ return m_Stage == EStage_Pass1 }) 
-		function_body_pass1 $b
-			{
-				$.m_pType->SetAutoEvBody (&$b.m_TokenList);
-			}
-	  |	autoev_body <$.m_pType> 
-	  )	  
-	;
-
 start
-autoev_body <CClassType* $pType>
-	: 
+autoev_body
+	: '{' autoev_stmt+ '}'
 		{
-			return PreAutoEvBlock ($pType);
-		}
-	  '{' autoev_stmt* '}'
-		{
-			return PostAutoEvBlock ();
+			return FinalizeAutoEv ();
 		}
 	;
 	
 autoev_stmt
-	: 
-		{
-			return PreAutoEvExpression ();
-		}
-	  expression ';'
-		{
-			return PostAutoEvExpression ($1.m_Value);
-		}
+	: resolver ({ return true; }) // within autoev_body prefer autoev_onchange_stmt 
+	  autoev_onchange_stmt 
+	| autoev_expression_stmt
 	| ';'
 	;
-*/
+
+autoev_onchange_stmt
+	: EToken_OnChange '(' expression_list ')'
+		{
+			return FinalizeAutoEvOnChangeClause ();
+		}
+	  statement 
+		{
+			FinalizeAutoEvOnChangeStmt ();
+		}
+	;
+
+autoev_expression_stmt
+	: expression_pass1 ';'
+		{
+			return AutoEvExpressionStmt (&$1.m_TokenList);
+		}
+	;
+
 //.............................................................................

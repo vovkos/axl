@@ -7,6 +7,44 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+COperatorMgr::GetClosureOperatorResultType (
+	const CValue& RawOpValue,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	if (!Result)
+		return false;
+
+	EType TypeKind = OpValue.GetType ()->GetTypeKind ();
+	if (TypeKind != EType_FunctionRef && TypeKind != EType_FunctionPtr)
+	{
+		err::SetFormatStringError (_T("closure operator cannot be applied to '%s'"), OpValue.GetType ()->GetTypeString ());
+		return false;
+	}
+
+	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
+	Closure->Append (*pArgList);
+	return Closure->GetClosureType (OpValue.GetType ());
+}
+
+bool
+COperatorMgr::GetClosureOperatorResultType (
+	const CValue& RawOpValue,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	CType* pResultType = GetClosureOperatorResultType (RawOpValue, pArgList);
+	if (!pResultType)
+		return false;
+
+	pResultValue->SetType (pResultType);
+	return true;
+}
+
 bool
 COperatorMgr::ClosureOperator (
 	const CValue& RawOpValue,
@@ -46,6 +84,9 @@ COperatorMgr::GetVarArgType (
 
 	switch (TypeKind)
 	{
+	case EType_PropertyRef:
+		return GetVarArgType (((CPropertyPtrType*) pType)->GetTargetType ()->GetReturnType (), IsUnsafeVarArg);
+
 	case EType_DataRef:
 		return GetVarArgType (((CDataPtrType*) pType)->GetTargetType (), IsUnsafeVarArg);
 
@@ -71,6 +112,66 @@ COperatorMgr::GetVarArgType (
 	}
 }
 
+CType*
+COperatorMgr::GetCallOperatorResultType (
+	const CValue& RawOpValue,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	CValue OpValue;
+
+	EValue OpValueKind = RawOpValue.GetValueKind ();	
+	if (OpValueKind == EValue_FunctionTypeOverload)
+	{
+		size_t i = RawOpValue.GetFunctionTypeOverload ()->ChooseOverload (*pArgList);
+		if (i == -1)
+			return false;
+
+		CFunctionType* pFunctionType = RawOpValue.GetFunctionTypeOverload ()->GetOverload (i);
+		return pFunctionType->GetReturnType ();
+	}
+	
+	ASSERT (OpValueKind == EValue_Type);
+	PrepareOperandType (RawOpValue, &OpValue);
+		
+	CFunctionType* pFunctionType;
+		
+	CType* pType = OpValue.GetType ();
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_Function:
+		pFunctionType = (CFunctionType*) pType;
+		break;
+
+	case EType_FunctionRef:
+	case EType_FunctionPtr:
+		pFunctionType = ((CFunctionPtrType*) pType)->GetTargetType ();
+		break;
+
+	default:
+		err::SetFormatStringError (_T("cannot call '%s'"), OpValue.GetType ()->GetTypeString ());
+		return false;
+	}
+
+	return pFunctionType->GetReturnType ();
+}
+
+bool
+COperatorMgr::GetCallOperatorResultType (
+	const CValue& RawOpValue,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	CType* pResultType = GetCallOperatorResultType (RawOpValue, pArgList);
+	if (!pResultType)
+		return false;
+
+	pResultValue->SetType (pResultType);
+	return true;
+}
+
 bool
 COperatorMgr::CallOperator (
 	const CValue& RawOpValue,
@@ -81,19 +182,36 @@ COperatorMgr::CallOperator (
 	bool Result;
 
 	CValue OpValue;
+	CValue ReturnValue;
 
-	if (RawOpValue.GetValueKind () == EValue_Function && RawOpValue.GetFunction ()->IsOverloaded ())
+	if (!pResultValue)
+		pResultValue = &ReturnValue;
+
+	EValue OpValueKind = RawOpValue.GetValueKind ();	
+	if (OpValueKind == EValue_AutoEv)
 	{
-		CFunction* pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
-		if (!pFunction)
-			return false;
+		CFunction* pFunction = RawOpValue.GetAutoEv ()->GetStarter ();
+		OpValue.SetFunction (pFunction);
+		OpValue.SetClosure (RawOpValue.GetClosure ());
+	}
+	else if (OpValueKind == EValue_Function)
+	{
+		CFunction* pFunction = RawOpValue.GetFunction ();
+		if (pFunction->IsOverloaded ())
+		{
+			pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
+			if (!pFunction)
+				return false;
+		}
 
 		OpValue.SetFunction (pFunction);
+		OpValue.SetClosure (RawOpValue.GetClosure ());
 	}
 	else
 	{
 		PrepareOperandType (RawOpValue, &OpValue);
 		int OpFlags = OpValue.GetType ()->GetTypeKind () == EType_Multicast ? EOpFlag_KeepDataRef : 0;
+
 		Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
 		if (!Result)
 			return false;
@@ -144,7 +262,7 @@ COperatorMgr::CallOperator (
 
 		return CallImpl (OpValue, pFunction->GetType (), pArgList, pResultValue);
 	}
-	
+
 	CType* pOpType = OpValue.GetType ();
 	EType OpTypeKind = pOpType->GetTypeKind ();
 
@@ -155,7 +273,6 @@ COperatorMgr::CallOperator (
 	}
 
 	CFunctionPtrType* pFunctionPtrType = (CFunctionPtrType*) pOpType;
-
 	return pFunctionPtrType->HasClosure () ? 
 		CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
 		CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);
@@ -197,8 +314,7 @@ COperatorMgr::CallBaseTypeConstructor (
 
 	pArgList->InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
 
-	CValue ReturnValue;
-	Result = CallOperator (pConstructor, pArgList, &ReturnValue);
+	Result = CallOperator (pConstructor, pArgList);
 	if (!Result)
 		return false;
 
@@ -237,18 +353,13 @@ COperatorMgr::PostBaseTypeConstructorList ()
 			return false;
 		}
 
-		CValue ReturnValue;
-		Result = CallOperator (pConstructor, &ArgList, &ReturnValue);
+		Result = CallOperator (pConstructor, &ArgList);
 		if (!Result)
 			return false;
 	}
 
 	CFunction* pPreConstructor = pFunction->GetClassType ()->GetPreConstructor ();
-
-	CValue ReturnValue;
-	return pPreConstructor ? 
-		CallOperator (pPreConstructor, &ArgList, &ReturnValue) : 
-		true;
+	return pPreConstructor ? CallOperator (pPreConstructor, &ArgList) : true;
 }
 
 bool
@@ -354,7 +465,7 @@ COperatorMgr::CallClosureFunctionPtr (
 	ASSERT (pFunctionPointerType->GetTypeKind () == EType_FunctionPtr);
 
 	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
-	CFunctionType* pAbstractMethodType = pFunctionType->GetAbstractMethodMemberType ();
+	CFunctionType* pAbstractMethodType = pFunctionType->GetStdObjectMethodMemberType ();
 
 	CheckFunctionPtrNull (OpValue);
 	

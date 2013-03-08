@@ -11,7 +11,7 @@ namespace jnc {
 
 class CQualifiedName
 {
-public:
+protected:
 	rtl::CString m_First;
 	rtl::CBoxListT <rtl::CString> m_List;
 
@@ -49,6 +49,9 @@ public:
 		m_List.Clear ();
 	}
 
+	void
+	AddName (const rtl::CString& Name);
+
 	bool
 	IsEmpty () const
 	{
@@ -59,6 +62,18 @@ public:
 	IsSimple () const
 	{
 		return m_List.IsEmpty ();
+	}
+
+	rtl::CString 
+	GetFirstName () const
+	{
+		return m_First;
+	}
+
+	rtl::CConstBoxListT <rtl::CString> 
+	GetNameList () const
+	{
+		return m_List;
 	}
 
 	rtl::CString

@@ -10,6 +10,7 @@ namespace axl {
 namespace jnc {
 
 class CModule;
+class CNamespace;
 class CAttributeBlock;
 
 //.............................................................................
@@ -25,6 +26,7 @@ enum EModuleItem
 	EModuleItem_Variable,
 	EModuleItem_Function,
 	EModuleItem_Property,
+	EModuleItem_PropertyTemplate,
 	EModuleItem_AutoEv,
 	EModuleItem_EnumConst,
 	EModuleItem_StructField,
@@ -79,19 +81,18 @@ class CModuleItemDecl
 {
 protected:
 	friend class CParser;
+	friend class CNamespace;
 
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CToken::CPos m_Pos;
+	rtl::CString m_Name;
+	rtl::CString m_QualifiedName;
+	CNamespace* m_pParentNamespace;
 	CAttributeBlock* m_pAttributeBlock;
 
 public:
-	CModuleItemDecl ()
-	{
-		m_StorageKind = EStorage_Undefined;
-		m_AccessKind = EAccess_Undefined;
-		m_pAttributeBlock = NULL;
-	}
+	CModuleItemDecl ();
 
 	EStorage
 	GetStorageKind ()
@@ -111,24 +112,6 @@ public:
 		return m_Pos;
 	}
 
-	CAttributeBlock* 
-	GetAttributeBlock ()
-	{
-		return m_pAttributeBlock;
-	}
-};
-
-//.............................................................................
-
-class CModuleItemName
-{
-protected:
-	friend class CNamespace;
-
-	rtl::CString m_Name;
-	rtl::CString m_QualifiedName;
-
-public:
 	bool
 	IsNamed ()
 	{
@@ -146,6 +129,18 @@ public:
 	{
 		return m_QualifiedName;
 	}
+
+	CNamespace* 
+	GetParentNamespace ()
+	{
+		return m_pParentNamespace;
+	}
+
+	CAttributeBlock* 
+	GetAttributeBlock ()
+	{
+		return m_pAttributeBlock;
+	}
 };
 
 //.............................................................................
@@ -161,12 +156,7 @@ public:
 	rtl::CString m_Tag;
 
 public:
-	CModuleItem ()
-	{
-		m_pModule = NULL;
-		m_ItemKind = EModuleItem_Undefined;
-		m_pItemDecl = NULL;
-	}
+	CModuleItem ();
 
 	CModule*
 	GetModule ()
@@ -189,23 +179,15 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CDeclModuleItem:
+class CUserModuleItem:
 	public CModuleItem,
 	public CModuleItemDecl
 {
 public:
-	CDeclModuleItem ()
+	CUserModuleItem ()
 	{
 		m_pItemDecl = this;
 	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CNamedModuleItem:
-	public CDeclModuleItem,
-	public CModuleItemName
-{
 };
 
 //.............................................................................

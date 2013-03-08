@@ -50,7 +50,7 @@ enum EOpFlag
 
 [uuid ("5def51c9-959f-4170-a032-892ac4f7e622")]
 struct IUnaryOperator: obj::IRoot
-{	
+{
 protected:
 	friend class COperatorMgr;
 
@@ -78,6 +78,16 @@ public:
 	{
 		return m_OpFlags;
 	}
+
+	bool
+	GetResultType (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	virtual
+	CType*
+	GetResultType (const CValue& OpValue) = 0;
 
 	virtual
 	bool

@@ -86,6 +86,12 @@ protected:
 		);
 
 	void
+	AddAutoEv (
+		HTREEITEM hParent,
+		jnc::CAutoEv* pAutoEv
+		);
+
+	void
 	AddEnumTypeMembers (
 		HTREEITEM hParent,
 		jnc::CEnumType* pType

@@ -23,6 +23,10 @@ public:
 	}
 
 	virtual
+	CType*
+	GetResultType (const CValue& OpValue);
+
+	virtual
 	bool
 	Operator (
 		const CValue& OpValue,

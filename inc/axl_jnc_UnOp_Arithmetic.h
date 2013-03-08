@@ -27,18 +27,27 @@ public:
 
 public:
 	virtual
+	CType*
+	GetResultType (const CValue& OpValue)
+	{
+		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue.GetType ());
+		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
+		{
+			SetOperatorError (OpValue.GetType ());
+			return NULL;
+		}
+
+		return pType;
+	}
+
+	virtual
 	bool
 	Operator (
 		const CValue& RawOpValue,
 		CValue* pResultValue
 		)
 	{
-		CType* pType = GetArithmeticOperatorResultTypeKind (RawOpValue.GetType ());
-		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
-		{
-			SetOperatorError (RawOpValue.GetType ());
-			return false;
-		}
+		CType* pType = GetResultType (RawOpValue);
 
 		CValue OpValue;
 		bool Result = m_pModule->m_OperatorMgr.CastOperator (RawOpValue, pType, &OpValue);

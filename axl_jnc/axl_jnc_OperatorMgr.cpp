@@ -142,6 +142,49 @@ COperatorMgr::COperatorMgr ()
 	m_MulticastMethodMap [_T("Call")]   = EMulticastMethod_Call;
 }
 
+CType*
+COperatorMgr::GetUnaryOperatorResultType (
+	EUnOp OpKind,
+	const CValue& RawOpValue
+	)
+{
+	ASSERT ((size_t) OpKind < EUnOp__Count);
+
+	CValue OpValue;
+
+	PrepareOperandType (RawOpValue, &OpValue);
+	if (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr)
+	{
+		CClassType* pClassType = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
+		CFunction* pFunction = pClassType->GetUnaryOperator (OpKind);
+		if (pFunction)
+		{
+			rtl::CBoxListT <CValue> ArgList;
+			ArgList.InsertTail (RawOpValue);
+			return GetCallOperatorResultType (pFunction->GetTypeOverload (), &ArgList);
+		}
+	}
+
+	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
+	ASSERT (pOperator);
+	return pOperator->GetResultType (OpValue);
+}
+
+bool
+COperatorMgr::GetUnaryOperatorResultType (
+	EUnOp OpKind,
+	const CValue& RawOpValue,
+	CValue* pResultValue
+	)
+{
+	CType* pResultType = GetUnaryOperatorResultType (OpKind, RawOpValue);
+	if (!pResultType)
+		return false;
+
+	pResultValue->SetType (pResultType);
+	return true;
+}
+
 bool
 COperatorMgr::UnaryOperator (
 	EUnOp OpKind,
@@ -150,9 +193,6 @@ COperatorMgr::UnaryOperator (
 	)
 {
 	ASSERT ((size_t) OpKind < EUnOp__Count);
-
-	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
-	ASSERT (pOperator);
 
 	CValue OpValue;
 	CValue UnusedResultValue;
@@ -169,13 +209,66 @@ COperatorMgr::UnaryOperator (
 		{
 			rtl::CBoxListT <CValue> ArgList;
 			ArgList.InsertTail (RawOpValue);
-			return CallOperator (pFunction,	&ArgList, pResultValue);
+			return CallOperator (pFunction, &ArgList, pResultValue);
 		}
 	}
+
+	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
+	ASSERT (pOperator);
 
 	return 
 		PrepareOperand (RawOpValue, &OpValue, pOperator->GetOpFlags ()) &&
 		pOperator->Operator (OpValue, pResultValue);
+}
+
+CType*
+COperatorMgr::GetBinaryOperatorResultType (
+	EBinOp OpKind,
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2
+	)
+{
+	ASSERT ((size_t) OpKind < EBinOp__Count);
+
+	CValue OpValue1;
+	CValue OpValue2;
+
+	PrepareOperandType (RawOpValue1, &OpValue1);
+	if (OpValue1.GetType ()->GetTypeKind () == EType_ClassPtr)
+	{
+		CClassType* pClassType = ((CClassPtrType*) OpValue1.GetType ())->GetTargetType ();
+		CFunction* pFunction = pClassType->GetBinaryOperator (OpKind);
+
+		if (pFunction)
+		{
+			rtl::CBoxListT <CValue> ArgList;
+			ArgList.InsertTail (RawOpValue1);
+			ArgList.InsertTail (RawOpValue2);
+			return GetCallOperatorResultType (pFunction->GetTypeOverload (), &ArgList);
+		}
+	}
+
+	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
+	ASSERT (pOperator);
+
+	PrepareOperandType (RawOpValue2, &OpValue2);
+	return pOperator->GetResultType (OpValue1, OpValue2);
+}
+
+bool
+COperatorMgr::GetBinaryOperatorResultType (
+	EBinOp OpKind,
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2,
+	CValue* pResultValue
+	)
+{
+	CType* pResultType = GetBinaryOperatorResultType (OpKind, RawOpValue1, RawOpValue2);
+	if (!pResultType)
+		return false;
+
+	pResultValue->SetType (pResultType);
+	return true;
 }
 
 bool
@@ -200,12 +293,13 @@ COperatorMgr::BinaryOperator (
 	{
 		CClassType* pClassType = ((CClassPtrType*) OpValue1.GetType ())->GetTargetType ();
 		CFunction* pFunction = pClassType->GetBinaryOperator (OpKind);
+
 		if (pFunction)
 		{
 			rtl::CBoxListT <CValue> ArgList;
 			ArgList.InsertTail (RawOpValue1);
 			ArgList.InsertTail (RawOpValue2);
-			return CallOperator (pFunction,	&ArgList, pResultValue);
+			return CallOperator (pFunction, &ArgList, pResultValue);
 		}
 	}
 
@@ -477,7 +571,15 @@ COperatorMgr::InitializeObject (
 
 	CFunction* pConstructor = pClassType->GetConstructor ();
 	if (!pConstructor)
+	{
+		if (pArgList && !pArgList->IsEmpty ())
+		{
+			err::SetFormatStringError (_T("'%s' has no constructor"), pClassType->GetTypeString ());
+			return false;
+		}
+
 		return true;
+	}
 
 	rtl::CBoxListT <CValue> ArgList;
 	if (!pArgList)
@@ -485,8 +587,7 @@ COperatorMgr::InitializeObject (
 
 	pArgList->InsertHead (*pResultValue);
 
-	CValue ReturnValue;
-	return CallOperator (pConstructor, pArgList, &ReturnValue);
+	return CallOperator (pConstructor, pArgList);
 }
 
 bool
@@ -584,8 +685,6 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 	CFunction* pFree;
 
 	CValue PtrValue;
-	CValue ReturnValue;
-
 	EType TypeKind = OpValue.GetType ()->GetTypeKind ();
 	switch (TypeKind)
 	{
@@ -612,7 +711,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 		CFunction* pDestructor = pClassType->GetDestructor ();
 		if (pDestructor)
 		{
-			Result = CallOperator (pDestructor, OpValue, &ReturnValue);
+			Result = CallOperator (pDestructor, OpValue);
 			if (!Result)
 				return false;			
 		}
@@ -631,6 +730,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 		return false;
 	}
 
+	CValue ReturnValue;
 	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
 	return true;

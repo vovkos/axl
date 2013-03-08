@@ -23,6 +23,13 @@ public:
 	}
 
 	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		);
+
+	virtual
 	bool
 	Operator (
 		const CValue& RawOpValue1,
@@ -43,6 +50,13 @@ public:
 	{
 		m_OpKind = EBinOp_LogOr;
 	}
+
+	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		);
 
 	virtual
 	bool

@@ -12,16 +12,34 @@ namespace jnc {
 
 //.............................................................................
 
-class CAutoEv: public CNamedModuleItem
+class CAutoEv: 
+	public CModuleItem,
+	public CNamespace
 {
 protected:
+	friend class CFunctionMgr;
+	friend class CClassType;
+	friend class CProperty;
+	friend class CParser;
+
 	CAutoEvType* m_pType;
-	CFunction* m_pStart;
-	CFunction* m_pStop;
-	CClassType* m_pParentClassType;
-	CStructField* m_pParentClassFieldMember;
+	CFunction* m_pStarter;
+	CFunction* m_pStopper;
+	CClassType* m_pClassType;
+	CStructField* m_pClassFieldMember;
 	CStructType* m_pFieldStructType;
+	CStructField* m_pBindSiteArrayField;
 	CVariable* m_pStaticDataVariable;
+
+	rtl::CBoxListT <CToken> m_Body;
+	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > m_Ast;
+
+	// vtable
+
+	rtl::CArrayT <CFunction*> m_VTable;
+	CValue m_VTablePtrValue;
+
+	size_t m_BindSiteCount;
 
 public:
 	CAutoEv ();
@@ -33,15 +51,27 @@ public:
 	}
 
 	CFunction* 
-	GetStart ()
+	GetStarter ()
 	{
-		return m_pStart;
+		return m_pStarter;
 	}
 
 	CFunction* 
-	GetStop ()
+	GetStopper ()
 	{
-		return m_pStop;
+		return m_pStopper;
+	}
+
+	CClassType* 
+	GetClassType ()
+	{
+		return m_pClassType;
+	}
+
+	CStructField* 
+	GetClassFieldMember ()
+	{
+		return m_pClassFieldMember;
 	}
 
 	CStructType* 
@@ -50,10 +80,10 @@ public:
 		return m_pFieldStructType;
 	}
 
-	CClassType* 
-	GetParentClassType ()
+	CStructField* 
+	GetBindSiteArrayField ()
 	{
-		return m_pParentClassType;
+		return m_pBindSiteArrayField;
 	}
 
 	CVariable* 
@@ -61,6 +91,56 @@ public:
 	{
 		return m_pStaticDataVariable;
 	}
+
+	bool
+	IsMember ()
+	{
+		return m_StorageKind == EStorage_Member;
+	}
+
+	void
+	ConvertToAutoEvMember (CClassType* pClassType);
+
+	bool
+	HasBody ()
+	{
+		return !m_Body.IsEmpty ();
+	}
+
+	const rtl::CBoxListT <CToken>*
+	GetBody ()
+	{
+		return &m_Body;
+	}
+
+	void
+	SetBody (rtl::CBoxListT <CToken>* pTokenList)
+	{
+		m_Body.TakeOver (pTokenList);
+	}
+
+	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > 
+	GetAst ()
+	{
+		return m_Ast;
+	}
+
+	bool
+	Create (
+		CAutoEvType* pType,
+		rtl::CStdListT <CFunctionFormalArg>* pArgList
+		);
+
+	CFunction* 
+	CreateHandler ();
+
+	bool
+	CalcLayout ();
+
+
+protected:
+	void
+	CreateVTablePtr ();
 };
 
 //.............................................................................

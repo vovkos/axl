@@ -15,7 +15,7 @@ class CUnionType;
 
 //.............................................................................
 
-class CStructField: public CNamedModuleItem
+class CStructField: public CUserModuleItem
 {
 protected:
 	friend class CStructType;
@@ -73,6 +73,7 @@ protected:
 	friend class CTypeMgr;
 	friend class CClassType;
 	friend class CProperty;
+	friend class CAutoEv;
 
 	size_t m_AlignFactor;
 	size_t m_PackFactor;

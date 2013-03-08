@@ -109,6 +109,7 @@ public:
 		m_SymbolStack.Clear ();
 		m_ResolverStack.Clear ();
 		m_TokenList.Clear ();
+		m_TokenCursor = NULL; 
 		m_Ast.Release ();
 		m_Flags = 0;
 	}

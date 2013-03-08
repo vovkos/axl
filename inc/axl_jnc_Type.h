@@ -81,6 +81,8 @@ enum EType
 	EType_FunctionRef,         // RF
 	EType_PropertyPtr,         // PY
 	EType_PropertyRef,         // RY
+	EType_AutoEvPtr,           // PV
+	EType_AutoEvRef,           // RV
 	
 	// multicast
 
@@ -275,6 +277,12 @@ enum ETypeModifierMask
 		ETypeModifier_Bindable | 
 		ETypeModifier_AutoGet | 
 		ETypeModifier_Indexed |
+		ETypeModifier_Nullable |
+		ETypeModifier_Weak | 
+		ETypeModifier_Thin |
+		ETypeModifier_Unsafe,
+
+	ETypeModifierMask_AutoEvPtr = 
 		ETypeModifier_Nullable |
 		ETypeModifier_Weak | 
 		ETypeModifier_Thin |
@@ -645,7 +653,6 @@ protected:
 
 class CNamedType: 
 	public CType,
-	public CModuleItemDecl,
 	public CNamespace
 {
 protected:

@@ -22,6 +22,27 @@ public:
 
 public:
 	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		CType* pOpType1 = OpValue1.GetType ();
+		CType* pOpType2 = OpValue2.GetType ();
+		CType* pMaxOpType = pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2;
+
+		CType* pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
+		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
+		{
+			SetOperatorError (pOpType1, pOpType2);
+			return NULL;
+		}
+
+		return pType;
+	}
+
+	virtual
 	bool
 	Operator (
 		const CValue& RawOpValue1,
@@ -29,16 +50,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		CType* pOpType1 = RawOpValue1.GetType ();
-		CType* pOpType2 = RawOpValue2.GetType ();
-		CType* pMaxOpType = pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2;
-
-		CType* pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
-		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
-		{
-			SetOperatorError (pOpType1, pOpType2);
+		CType* pType = GetResultType (RawOpValue1, RawOpValue2);
+		if (!pType)
 			return false;
-		}
 
 		CValue OpValue1;
 		CValue OpValue2;

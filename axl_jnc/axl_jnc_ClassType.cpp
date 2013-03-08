@@ -52,6 +52,12 @@ CClassType::GetPropertyMemberType (CPropertyType* pShortType)
 	return m_pModule->m_TypeMgr.GetPropertyMemberType (this, pShortType);
 }
 
+CAutoEvType* 
+CClassType::GetAutoEvMemberType (CAutoEvType* pShortType)
+{
+	return m_pModule->m_TypeMgr.GetAutoEvMemberType (this, pShortType);
+}
+
 CFunction* 
 CClassType::GetDefaultConstructor ()
 {
@@ -66,13 +72,6 @@ CClassType::GetDefaultConstructor ()
 	}
 
 	return pDefaultConstructor;
-}
-
-void
-CClassType::SetAutoEvBody (rtl::CBoxListT <CToken>* pTokenList)
-{
-	m_AutoEvBody.TakeOver (pTokenList);
-	m_pModule->m_FunctionMgr.m_GlobalAutoEvTypeArray.Append (this);
 }
 
 CStructField*
@@ -190,10 +189,6 @@ CClassType::AddMethodMember (CFunction* pFunction)
 	case EFunction_Named:
 		return AddFunction (pFunction);
 
-	case EFunction_AutoEv:
-		pFunction->m_Tag.Format (_T("%s.autoev"), m_Tag);
-		return true;
-
 	case EFunction_UnaryOperator:
 		pFunction->m_Tag.Format (_T("%s.operator %s"), m_Tag, GetUnOpKindString (pFunction->GetUnOpKind ()));
 
@@ -241,12 +236,14 @@ CClassType::AddMethodMember (CFunction* pFunction)
 bool
 CClassType::AddPropertyMember (CProperty* pProperty)
 {
+	ASSERT (pProperty->IsNamed ());
 	bool Result = AddItem (pProperty);
 	if (!Result)
 		return false;
 
-	EStorage StorageKind = pProperty->GetStorageKind ();
+	pProperty->m_pParentNamespace = this;
 
+	EStorage StorageKind = pProperty->GetStorageKind ();
 	switch (StorageKind)
 	{
 	case EStorage_Static:
@@ -268,7 +265,42 @@ CClassType::AddPropertyMember (CProperty* pProperty)
 		break;
 	}
 
-	pProperty->m_pParentNamespace = this;
+	return true;
+}
+
+bool
+CClassType::AddAutoEvMember (CAutoEv* pAutoEv)
+{
+	ASSERT (pAutoEv->IsNamed () || (m_Flags & EClassTypeFlag_AutoEv));
+	if (!pAutoEv->IsNamed ())
+	{
+		bool Result = AddItem (pAutoEv);
+		if (!Result)
+			return false;
+	}
+
+	pAutoEv->m_pParentNamespace = this;
+
+	EStorage StorageKind = pAutoEv->GetStorageKind ();
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		break;
+
+	case EStorage_Undefined:
+		pAutoEv->m_StorageKind = EStorage_Member;
+		//and fall through
+
+	case EStorage_Member:
+		pAutoEv->ConvertToAutoEvMember (this);
+		m_AutoEvArray.Append (pAutoEv);
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage '%s' for autoev member"), GetStorageKindString (StorageKind));
+		return false;
+	}
+
 	return true;
 }
 
@@ -445,26 +477,32 @@ CClassType::CalcLayout ()
 
 	CreateVTablePtr ();
 
-	if (!m_pConstructor && (m_pPreConstructor || HasBaseConstructor))
+	if (m_Flags & EClassTypeFlag_AutoEv)
 	{
-		Result = CreateDefaultConstructor ();
+		Result = CreateAutoEvConstructor () && CreateDefaultDestructor ();
 		if (!Result)
 			return false;
 	}
-
-	if (!m_pDestructor && HasBaseDestructor)
+	else
 	{
-		Result = CreateDefaultDestructor ();
-		if (!Result)
-			return false;
-	}
+		if (!m_pConstructor && (m_pPreConstructor || HasBaseConstructor))
+		{
+			Result = CreateDefaultConstructor ();
+			if (!Result)
+				return false;
+		}
 
-	CreateInitializer ();
+		if (!m_pDestructor && (!m_AutoEvArray.IsEmpty () || HasBaseDestructor))
+		{
+			Result = CreateDefaultDestructor ();
+			if (!Result)
+				return false;
+		}
+	}
 
 	PostCalcLayout ();
 	return true;
 }
-
 
 void
 CClassType::AddVirtualFunction (CFunction* pFunction)
@@ -623,8 +661,43 @@ CClassType::CreateVTablePtr ()
 }
 
 bool
+CClassType::CreateAutoEvConstructor ()
+{
+	ASSERT (!m_pConstructor && m_AutoEvArray.GetCount () == 1);
+
+	CAutoEv* pAutoEv = m_AutoEvArray [0];
+	CFunction* pStarter = pAutoEv->GetStarter ();
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pStarter->GetType ());
+	pFunction->m_Tag = m_Tag + _T(".this");
+
+	size_t ArgCount = pStarter->GetType ()->GetArgTypeArray ().GetCount ();
+	
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, ArgCount);
+
+	CValue ReturnValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pStarter, 
+		pStarter->GetType (), 
+		ArgValueArray, 
+		ArgCount,
+		&ReturnValue
+		);
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
+	m_pConstructor = pFunction;
+	return true;
+}
+
+bool
 CClassType::CreateDefaultConstructor ()
 {
+	ASSERT (!m_pConstructor);
+
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	
 	CType* ArgTypeArray [] =
@@ -633,7 +706,8 @@ CClassType::CreateDefaultConstructor ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + _T(".this"), pType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
+	pFunction->m_Tag = m_Tag + _T(".this");
 
 	CValue ArgValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
@@ -652,8 +726,7 @@ CClassType::CreateDefaultConstructor ()
 		if (!pConstructor)
 			return false;
 
-		CValue ReturnValue;
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ArgValue, &ReturnValue);
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ArgValue);
 		if (!Result)
 			return false;
 	}
@@ -671,12 +744,15 @@ CClassType::CreateDefaultConstructor ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
+	m_pConstructor = pFunction;
 	return true;
 }
 
 bool
 CClassType::CreateDefaultDestructor ()
 {
+	ASSERT (!m_pDestructor);
+
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	
 	CType* ArgTypeArray [] =
@@ -685,10 +761,19 @@ CClassType::CreateDefaultDestructor ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + _T(".~this"), pType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
+	pFunction->m_Tag = m_Tag + _T(".~this");
 		
 	CValue ArgValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+
+	size_t AutoEvCount = m_AutoEvArray.GetCount ();
+	for (size_t i = 0; i < AutoEvCount; i++)
+	{
+		CAutoEv* pAutoEv = m_AutoEvArray [i];
+
+		// stop autoev
+	}
 
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
@@ -702,8 +787,7 @@ CClassType::CreateDefaultDestructor ()
 		if (!pDestructor)
 			continue;
 
-		CValue ReturnValue;
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ArgValue, &ReturnValue);
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ArgValue);
 		if (!Result)
 			return false;
 	}
@@ -711,13 +795,15 @@ CClassType::CreateDefaultDestructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pDestructor = pFunction;
-
 	return true;
 }
 
-void
-CClassType::CreateInitializer ()
+CFunction* 
+CClassType::GetInitializer ()
 {
+	if (m_pInitializer)
+		return m_pInitializer;
+
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	
 	CType* ArgTypeArray [] =
@@ -759,6 +845,7 @@ CClassType::CreateInitializer ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pInitializer = pFunction;
+	return m_pInitializer;
 }
 
 bool
@@ -839,8 +926,7 @@ CClassType::CallBaseDestructors (const CValue& ThisValue)
 		if (!pDestructor)
 			continue;
 
-		CValue ReturnValue;
-		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue, &ReturnValue);
+		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
 		if (!Result)
 			return false;
 	}

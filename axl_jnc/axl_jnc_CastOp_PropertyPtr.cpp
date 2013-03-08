@@ -44,7 +44,7 @@ CCast_PropertyPtr_FromNormal::LlvmCast (
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();
 	
-	CPropertyPtrType* pThinPtrType = pSrcPropertyType->GetAbstractPropertyMemberType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
+	CPropertyPtrType* pThinPtrType = pSrcPropertyType->GetStdObjectPropertyMemberType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
 
 	CValue PfnValue;
 	CValue ClosureObjValue;

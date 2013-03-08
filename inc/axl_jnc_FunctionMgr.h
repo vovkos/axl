@@ -180,14 +180,13 @@ protected:
 	rtl::CStdListT <CAutoEv> m_AutoEvList;
 
 	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
-	rtl::CArrayT <CClassType*> m_GlobalAutoEvTypeArray;
-	rtl::CArrayT <CProperty*> m_AutoPropertyArray;
 
 	rtl::CStdListT <TThunk> m_ThunkList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
 	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
 
 	CFunction* m_pCurrentFunction;
+	
 	CValue m_ThisValue;
 	CValue m_ScopeLevelValue;
 	CValue m_VTablePtrPtrValue; 
@@ -210,6 +209,18 @@ public:
 	GetCurrentFunction ()
 	{
 		return m_pCurrentFunction;
+	}
+
+	CProperty*
+	GetCurrentProperty ()
+	{
+		return m_pCurrentFunction ? m_pCurrentFunction->GetProperty () : NULL;
+	}
+
+	CAutoEv*
+	GetCurrentAutoEv ()
+	{
+		return m_pCurrentFunction ? m_pCurrentFunction->GetAutoEv () : NULL;
 	}
 
 	CValue 
@@ -262,13 +273,28 @@ public:
 	CreatePropertyTemplate ();
 
 	CAutoEv*
-	CreateAutoEv (CAutoEvType* pType);
+	CreateAutoEv (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName
+		);
+
+	CAutoEv*
+	CreateUnnamedAutoEv ()
+	{
+		return CreateAutoEv (rtl::CString (), rtl::CString ());
+	}
 
 	bool
 	CalcPropertyLayouts ();
 
 	bool
+	CalcAutoEvLayouts ();
+
+	bool
 	ResolveOrphanFunctions ();
+
+	bool
+	ScanAutoEvs ();
 
 	bool
 	CompileFunctions ();

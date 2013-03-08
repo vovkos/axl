@@ -136,8 +136,7 @@ CAstDoc::Compile ()
 	Result = m_Module.m_TypeMgr.ResolveImportTypes ();
 	if (!Result)
 	{
-		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 		return false;
 	}
 
@@ -145,20 +144,27 @@ CAstDoc::Compile ()
 	Result = m_Module.m_FunctionMgr.ResolveOrphanFunctions ();
 	if (!Result)
 	{
-		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
+		return false;
+	}
+
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Scanning autoevs...\n"));
+	Result = m_Module.m_FunctionMgr.ScanAutoEvs ();
+	if (!Result)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 		return false;
 	}
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Calculating type layouts...\n"));
 	Result = 
 		m_Module.m_TypeMgr.CalcTypeLayouts () &&
-		m_Module.m_FunctionMgr.CalcPropertyLayouts ();
+		m_Module.m_FunctionMgr.CalcPropertyLayouts () &&
+		m_Module.m_FunctionMgr.CalcAutoEvLayouts ();
 
 	if (!Result)
 	{
-		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 		return false;
 	}
 
@@ -166,8 +172,7 @@ CAstDoc::Compile ()
 	Result = m_Module.m_VariableMgr.AllocateGlobalVariables ();
 	if (!Result)
 	{
-		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 		return false;
 	}
 
@@ -177,10 +182,7 @@ CAstDoc::Compile ()
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
 	Result = m_Module.m_FunctionMgr.CompileFunctions ();
 	if (!Result)
-	{
-		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
-	}
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 
 	// show compiled IM nevetheless
 
@@ -196,8 +198,7 @@ CAstDoc::Compile ()
 	Result = m_Module.m_FunctionMgr.JitFunctions (m_pLlvmExecutionEngine);
 	if (!Result)
 	{
-		rtl::CString Text = err::GetError ()->GetDescription ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), Text);
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 		return false;
 	}
 

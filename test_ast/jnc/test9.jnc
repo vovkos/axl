@@ -76,7 +76,10 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
-	CTest t = stack new CTest (10);
+	CTest t = uheap new CTest (10);
+	
+	delete t;
+
 
 	return 0;
 }

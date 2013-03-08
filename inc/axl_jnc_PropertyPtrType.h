@@ -79,6 +79,9 @@ public:
 	CStructType* 
 	GetAuPropertyPtrStructType_u ();
 
+	CDataPtrType*
+	GetAuDataPtrType (EType TypeKind);
+
 	static
 	rtl::CStringA
 	CreateSignature (
@@ -105,12 +108,12 @@ class CPropertyPtrTypeTuple: public rtl::TListLink
 protected:
 	friend class CTypeMgr;
 
-	CStructType* m_pPropertyPtrStructType;
-	CStructType* m_pPropertyWeakPtrStructType;
-	CStructType* m_pBindablePropertyThinPtrStructType;
-	CStructType* m_pBindablePropertyUnsafePtrStructType;
+	CStructType* m_pPtrStructType;
+	CStructType* m_pPtrStructType_w;
+	CStructType* m_pAuPtrStructType_t;
+	CStructType* m_pAuPtrStructType_u;
 
-	CPropertyPtrType* m_PropertyPtrArray [2] [EPropertyPtrType__Count] [2]; // ref x kind x nullable
+	CPropertyPtrType* m_PtrTypeArray [2] [EPropertyPtrType__Count] [2]; // ref x kind x nullable
 
 public:
 	CPropertyPtrTypeTuple ()

@@ -14,6 +14,7 @@ CFunctionMgr::CFunctionMgr ()
 	ASSERT (m_pModule);
 
 	m_pCurrentFunction = NULL;
+
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
 }
 
@@ -23,15 +24,16 @@ CFunctionMgr::Clear ()
 	m_FunctionList.Clear ();
 	m_PropertyList.Clear ();
 	m_PropertyTemplateList.Clear ();
+	m_AutoEvList.Clear ();
 	m_OrphanFunctionArray.Clear ();
-	m_GlobalAutoEvTypeArray.Clear ();
-	m_AutoPropertyArray.Clear ();
 	m_ThunkList.Clear ();
 	m_ThunkFunctionMap.Clear ();
 	m_ThunkPropertyMap.Clear ();
+	m_EmissionContextStack.Clear ();
+
+	m_pCurrentFunction = NULL;
 
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
-	m_pCurrentFunction = NULL;
 }
 
 CFunction*
@@ -77,6 +79,21 @@ CFunctionMgr::CreatePropertyTemplate ()
 	return pPropertyTemplate;
 }
 
+CAutoEv*
+CFunctionMgr::CreateAutoEv (
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName
+	)
+{
+	CAutoEv* pAutoEv = AXL_MEM_NEW (CAutoEv);
+	pAutoEv->m_pModule = m_pModule;
+	pAutoEv->m_Name = Name;
+	pAutoEv->m_QualifiedName = QualifiedName;	
+	pAutoEv->m_Tag = QualifiedName;
+	m_AutoEvList.InsertTail (pAutoEv);
+	return pAutoEv;
+}
+
 bool
 CFunctionMgr::ResolveOrphanFunctions ()
 {
@@ -112,7 +129,65 @@ CFunctionMgr::CalcPropertyLayouts ()
 	return true;
 }
 
+bool
+CFunctionMgr::CalcAutoEvLayouts ()
+{
+	bool Result;
+
+	rtl::CIteratorT <CAutoEv> AutoEv = m_AutoEvList.GetHead ();
+	for (; AutoEv; AutoEv++)
+	{
+		Result = AutoEv->CalcLayout ();
+		if (!Result)
+			return false;
+	}
+
+	return true;
+}
+
 #ifdef _AXL_JNC_PARSER_H
+
+bool
+CFunctionMgr::ScanAutoEvs ()
+{
+	bool Result;
+
+	CSetCurrentThreadModule ScopeModule (m_pModule);
+	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
+
+	rtl::CIteratorT <CAutoEv> AutoEv = m_AutoEvList.GetHead ();
+	for (; AutoEv; AutoEv++)
+	{
+		CAutoEv* pAutoEv = *AutoEv;
+		if (!pAutoEv->HasBody ())
+		{
+			err::SetFormatStringError (_T("autoev '%s' has no body"), pAutoEv->m_Tag);
+			return false;
+		}
+
+		// scan
+
+		CParser Parser;
+		Parser.m_Stage = CParser::EStage_AutoEvScan;
+		Parser.m_pModule = m_pModule;
+
+		CFunction* pStarter = pAutoEv->GetStarter ();
+		m_pCurrentFunction = pStarter;
+		m_pModule->m_NamespaceMgr.OpenNamespace (pStarter->GetParentNamespace ());
+
+		Result = Parser.ParseTokenList (ESymbol_autoev_body_0, *pAutoEv->GetBody (), false);
+		if (!Result)
+			return false;
+
+		ASSERT (Parser.m_AutoEvBindSiteTotalCount);
+		pAutoEv->m_BindSiteCount = Parser.m_AutoEvBindSiteTotalCount;
+
+		m_pModule->m_NamespaceMgr.CloseNamespace ();
+	}
+
+	m_pCurrentFunction = NULL;
+	return true;
+}
 
 bool
 CFunctionMgr::CompileFunctions ()
@@ -122,39 +197,7 @@ CFunctionMgr::CompileFunctions ()
 	CSetCurrentThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 
-	// (1) global aev
-
-	size_t Count = m_GlobalAutoEvTypeArray.GetCount ();
-/*	for (size_t i = 0; i < Count; i++)
-	{
-		CClassType* pType = m_GlobalAutoEvTypeArray [i];
-
-		CNamespace* pNamespace = pType->GetParentNamespace ();
-		m_pModule->m_NamespaceMgr.SetCurrentNamespace (pNamespace);
-
-		CParser Parser;
-		Parser.m_Stage = CParser::EStage_Pass2;
-		Parser.m_pModule = m_pModule;
-		// Parser.m_ThisValue = ThisValue; 
-		
-		Parser.Create (ESymbol_autoev_body, true); 
-		
-		CParser::CSymbolNode_autoev_body* pSymbol = (CParser::CSymbolNode_autoev_body*) Parser.GetPredictionTop ();
-		pSymbol->m_Arg.pType = pType;
-			
-		rtl::CBoxIteratorT <CToken> Token = pType->GetAutoEvBody ()->GetHead ();
-		for (; Token; Token++)
-		{
-			Result = Parser.ParseToken (&*Token);
-			if (!Result)
-			{
-				err::PushSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
-				return false;
-			}
-		}
-	} */
-
-	// (2) functions
+	// (1) functions
 
 	rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
 	for (; Function; Function++)
@@ -177,20 +220,12 @@ CFunctionMgr::CompileFunctions ()
 			ESymbol_compound_stmt;
 
 		CParser Parser;
-		Parser.m_Stage = CParser::EStage_Pass2;
 		Parser.m_pModule = m_pModule;
-		Parser.Create (StartSymbol, true); 
-			
-		rtl::CBoxIteratorT <CToken> Token = pFunction->GetBody ()->GetHead ();
-		for (; Token; Token++)
-		{
-			Result = Parser.ParseToken (&*Token);
-			if (!Result)
-			{
-				err::PushSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
-				return false;
-			}
-		}
+		Parser.m_Stage = CParser::EStage_Pass2;
+
+		Result = Parser.ParseTokenList (StartSymbol, *pFunction->GetBody (), true);
+		if (!Result)
+			return false;
 
 		pFunction->m_Ast = Parser.GetAst ();
 
@@ -199,6 +234,49 @@ CFunctionMgr::CompileFunctions ()
 		Result = Epilogue (pFunction->GetBody ()->GetTail ()->m_Pos);
 		if (!Result)
 			return false;
+	}
+
+	// (2) autoevs
+
+	rtl::CIteratorT <CAutoEv> AutoEv = m_AutoEvList.GetHead ();
+	for (; AutoEv; AutoEv++)
+	{
+		CAutoEv* pAutoEv = *AutoEv;
+		ASSERT (pAutoEv->HasBody ());
+
+		CFunction* pStarter = pAutoEv->GetStarter ();
+
+		// prologue
+
+		Result = Prologue (pStarter, pAutoEv->GetBody ()->GetHead ()->m_Pos);
+		if (!Result)
+			return false;
+
+		// body
+
+		CParser Parser;
+		Parser.m_Stage = CParser::EStage_Pass2;
+		Parser.m_pModule = m_pModule;
+
+		Result = Parser.ParseTokenList (ESymbol_autoev_body, *pAutoEv->GetBody (), true);
+		if (!Result)
+			return false;
+
+		pAutoEv->m_Ast = Parser.GetAst ();
+
+		// epilogue
+
+		Result = Epilogue (pAutoEv->GetBody ()->GetTail ()->m_Pos);
+		if (!Result)
+			return false;
+
+		CFunction* pStopper = pAutoEv->GetStopper ();
+
+		InternalPrologue (pStopper, NULL, 0);
+
+		// remove all the event handlers added in starter
+
+		InternalEpilogue ();
 	}
 
 	// (3) thunks
@@ -210,17 +288,6 @@ CFunctionMgr::CompileFunctions ()
 			CompileClosureThunk (*Thunk) :
 			CompileDirectThunk (*Thunk);
 
-		if (!Result)
-			return false;
-	}
-
-	// (4) auto-properties
-
-	Count = m_AutoPropertyArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CProperty* pProperty = m_AutoPropertyArray [i];
-		Result = CompileAutoPropertyAccessors (pProperty);
 		if (!Result)
 			return false;
 	}
@@ -319,11 +386,9 @@ CFunctionMgr::FireOnChangeEvent ()
 	}
 
 	CValue OnChangeEventValue;
-	CValue OnChangeReturnValue;
-	
 	return
-		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (PropertyValue, EAuPropertyField_OnChangeEvent, &OnChangeEventValue) &&
-		m_pModule->m_OperatorMgr.CallOperator (OnChangeEventValue, &OnChangeReturnValue);
+		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (PropertyValue, EAuPropertyField_OnChange, &OnChangeEventValue) &&
+		m_pModule->m_OperatorMgr.CallOperator (OnChangeEventValue);
 }
 
 bool
@@ -332,9 +397,12 @@ CFunctionMgr::Prologue (
 	const CToken::CPos& Pos
 	)
 {
+	bool Result;
+
 	SaveEmissionContext ();
 
 	m_pCurrentFunction = pFunction;
+
 	m_ThisValue.Clear ();
 	m_ScopeLevelValue.Clear ();
 	m_VTablePtrPtrValue.Clear (); 
@@ -345,6 +413,7 @@ CFunctionMgr::Prologue (
 	CScope* pScope = m_pModule->m_NamespaceMgr.CreateScope ();
 	pScope->m_pParentNamespace = pFunction->GetParentNamespace ();
 	pScope->m_BeginPos = Pos;
+	pScope->m_EndPos = Pos;
 	pScope->m_pFunction = pFunction;
 	pFunction->m_pScope = pScope;
 
@@ -384,28 +453,57 @@ CFunctionMgr::Prologue (
 
 		LlvmArg++;
 	}
-	
-	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
-	for (; Arg; Arg++, LlvmArg++)
+
+	if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
 	{
-		CFunctionFormalArg* pArg = *Arg;
-		llvm::Value* pLlvmArg = LlvmArg;
+		CValue ArgFieldValue;
 
-		CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EVariable_Local,
-			pArg->GetName (), 
-			pArg->GetName (), 
-			pArg->GetType (), 
-			pArg->GetPtrTypeFlags ()
-			);
+		Result = m_pModule->m_OperatorMgr.GetAutoEvData (pFunction->m_pAutoEv, &ArgFieldValue);
+		if (!Result)
+			return false;
 
-		CValue ArgValue (pLlvmArg, pArg->GetType ());
+		rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFieldStructType ()->GetFieldMemberList ().GetHead ();
+		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
+		for (; Arg; Arg++, LlvmArg++, ArgField++)
+		{
+			CFunctionFormalArg* pArg = *Arg;
+			llvm::Value* pLlvmArg = LlvmArg;
+			CStructField* pArgField = *ArgField;
 
-		m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
-		pScope->AddItem (pArgVariable);
+			CValue ArgValue (pLlvmArg, pArg->GetType ());
+
+			CBaseTypeCoord Coord;
+			CValue StoreValue;
+
+			Result = m_pModule->m_OperatorMgr.GetStructFieldMember (ArgFieldValue, pArgField, &Coord, &StoreValue);
+			if (!Result)
+				return false;
+			
+			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, StoreValue);
+		}
 	}
+	else
+	{
+		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
+		for (; Arg; Arg++, LlvmArg++)
+		{
+			CFunctionFormalArg* pArg = *Arg;
+			llvm::Value* pLlvmArg = LlvmArg;
 
-	// store scope level
+			CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
+				EVariable_Local,
+				pArg->GetName (), 
+				pArg->GetName (), 
+				pArg->GetType (), 
+				pArg->GetPtrTypeFlags ()
+				);
+
+			CValue ArgValue (pLlvmArg, pArg->GetType ());
+
+			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
+			pScope->AddItem (pArgVariable);
+		}
+	}
 
 	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
 
@@ -576,13 +674,13 @@ CFunctionMgr::GetDirectThunkFunction (
 	{
 		SignatureChar = 'U';
 		ThunkKind = EThunk_DirectUnusedClosure;
-		pThunkFunctionType = pThunkFunctionType->GetAbstractMethodMemberType ();
+		pThunkFunctionType = pThunkFunctionType->GetStdObjectMethodMemberType ();
 	}
 
 	rtl::CStringA Signature;
 	Signature.Format (
 		"%c%x.%s", 
-		HasUnusedClosure ? 'U' : 'D',
+		SignatureChar,
 		pTargetFunction, 
 		pThunkFunctionType->GetSignature ()
 		);
@@ -596,6 +694,7 @@ CFunctionMgr::GetDirectThunkFunction (
 
 	TThunk* pThunk = AXL_MEM_NEW (TThunk);
 	pThunk->m_ThunkKind = ThunkKind;
+	pThunk->m_Signature = Signature;
 	pThunk->m_pTargetFunctionType = pTargetFunction->GetType ();
 	pThunk->m_pTargetFunction = pTargetFunction;
 	pThunk->m_pClosureType = NULL;
@@ -637,6 +736,7 @@ CFunctionMgr::GetClosureThunkFunction (
 
 	TThunk* pThunk = AXL_MEM_NEW (TThunk);
 	pThunk->m_ThunkKind = EThunk_Closure;
+	pThunk->m_Signature = Signature;
 	pThunk->m_pTargetFunctionType = pTargetFunctionType;
 	pThunk->m_pTargetFunction = pTargetFunction;
 	pThunk->m_pClosureType = pClosureType;
@@ -672,7 +772,7 @@ CFunctionMgr::GetDirectThunkProperty (
 	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
 	pThunkProperty->m_Tag = _T("_direct_thunk_property");
 	pThunkProperty->m_pType = HasUnusedClosure ? 
-		pThunkPropertyType->GetAbstractPropertyMemberType () : 
+		pThunkPropertyType->GetStdObjectPropertyMemberType () : 
 		pThunkPropertyType;
 	pThunkProperty->m_pGetter = GetDirectThunkFunction (
 		pTargetProperty->m_pGetter, 
@@ -858,10 +958,7 @@ CFunctionMgr::CompileDirectThunk (TThunk* pThunk)
 
 	CFunction* pFunction = pThunk->m_pThunkFunction;
 
-	m_pCurrentFunction = pFunction;
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+	InternalPrologue (pFunction, NULL, 0);
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
@@ -902,9 +999,15 @@ CFunctionMgr::CompileDirectThunk (TThunk* pThunk)
 		&ReturnValue
 		);
 
-	return pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void ?
-		m_pModule->m_ControlFlowMgr.Return (ReturnValue) :
-		m_pModule->m_ControlFlowMgr.Return ();
+	if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
+	{
+		Result = m_pModule->m_ControlFlowMgr.Return (ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	InternalEpilogue ();
+	return true;
 }
 
 bool
@@ -928,10 +1031,7 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 
 	CFunction* pFunction = pThunk->m_pThunkFunction;
 
-	m_pCurrentFunction = pFunction;
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+	InternalPrologue (pFunction, NULL, 0);
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
@@ -1010,9 +1110,15 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 		&ReturnValue
 		);
 
-	return pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void ?
-		m_pModule->m_ControlFlowMgr.Return (ReturnValue) :
-		m_pModule->m_ControlFlowMgr.Return ();
+	if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
+	{
+		Result = m_pModule->m_ControlFlowMgr.Return (ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	InternalEpilogue ();
+	return true;
 }
 
 bool
@@ -1071,9 +1177,11 @@ CFunctionMgr::CompileAutoPropertyAccessors (CProperty* pProperty)
 bool
 CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 {
-/*	err::SetFormatStringError (_T("cancel LLVM jitting for now"));
+#ifdef _AXL_JNC_NO_JIT
+	err::SetFormatStringError (_T("LLVM jitting is disabled"));
 	return false;
-	*/
+#endif
+	
 	CSetCurrentThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 

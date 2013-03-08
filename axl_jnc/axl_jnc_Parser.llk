@@ -1,6 +1,8 @@
 import "axl_jnc_Decl.llk";
 import "axl_jnc_Expr.llk";
+import "axl_jnc_Expr_t.llk";
 import "axl_jnc_Stmt.llk";
+import "axl_jnc_Stmt_0.llk";
 
 import "axl_jnc_DeclarationSpecifier.llk";
 import "axl_jnc_Declarator.llk";
@@ -35,7 +37,8 @@ Members
 	enum EStage
 	{
 		EStage_Pass1, // global declarations (before linkage)
-		EStage_Pass2, // statements and expressions (after linkage)
+		EStage_Pass2, // statements and expressions (after linkage & calclayout)		
+		EStage_AutoEvScan, // scan autoev body to build bind site map (after linkage but before calclayout)
 	};
 
 	enum EAssign
@@ -43,30 +46,38 @@ Members
 		EAssign_Normal,
 		EAssign_BinOp,
 	};
+	
+	struct TAutoEvHandler: rtl::TListLink
+	{
+		rtl::CBoxListT <CValue> m_BindSiteList;
+		CFunction* m_pFunction;
+	};
 
 	CModule* m_pModule;
 	EStage m_Stage;
 	size_t m_StructPackFactor;
-	size_t m_DefaultStructPackFactor;
+	size_t m_DefaultStructPackFactor;	
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CAttributeBlock* m_pAttributeBlock;
-	 
-	CClassType* m_pAutoEvType;
-	CBasicBlock* m_pAutoEvConstructorBlock;
-	CBasicBlock* m_pAutoEvDestructorBlock;
-	CValue m_AutoEvConstructorThisValue;
-	CValue m_AutoEvDestructorThisValue;
-
 	CModuleItem* m_pLastDeclaredItem;
-
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
-	rtl::CBoxListT <CValue> m_BindablePropertyList;
+	rtl::CStdListT <TAutoEvHandler> m_AutoEvHandlerList;
+	rtl::CBoxListT <CValue> m_AutoEvBindSiteList;
+	size_t m_AutoEvBindSiteCount;
+	size_t m_AutoEvBindSiteTotalCount;
 }
 
 Members2
 {
 	CParser ();
+
+	bool
+	ParseTokenList (
+		ESymbol Symbol, 
+		const rtl::CConstBoxListT <CToken>& TokenList,
+		bool IsBuildingAst = false
+		);
 
 	CType*
 	FindType (const CQualifiedName& Name);
@@ -95,6 +106,13 @@ Members2
 		m_TypeSpecifierStack.Pop ();
 	}
 
+	bool 
+	IsAutoEvStarter ()
+	{
+		CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+		return pFunction && pFunction->GetFunctionKind () == EFunction_AutoEvStarter;
+	}
+
 	bool
 	IsTypeSpecified ();
 
@@ -104,6 +122,7 @@ Members2
 	void
 	AssignDeclarationAttributes (
 		CModuleItem* pItem,
+		CNamespace* pNamespace,
 		const CToken::CPos& Pos
 		);
 
@@ -151,14 +170,14 @@ Members2
 		);
 
 	bool
-	DeclareAutoEv (
-		CAutoEvType* pType,
+	DeclareProperty (
+		CPropertyType* pType,
 		CDeclarator* pDeclarator
 		);
 
 	bool
-	DeclareProperty (
-		CPropertyType* pType,
+	DeclareAutoEv (
+		CAutoEvType* pType,
 		CDeclarator* pDeclarator
 		);
 
@@ -224,19 +243,11 @@ Members2
 		);
 
 	CClassType*
-	CreateAutoEvType (CDeclarator* pDeclarator);
-
-	bool
-	PreAutoEvBlock (CClassType* pAutoEvTyoe);
-
-	bool
-	PostAutoEvBlock ();
-
-	bool
-	PreAutoEvExpression ();
-
-	bool
-	PostAutoEvExpression (const CValue& Value);
+	CreateAutoEvClassType (
+		const rtl::CString& Name,
+		CDeclFunctionSuffix* pFunctionSuffix,
+		rtl::CBoxListT <CToken>* pTokenList
+		);
 
 	bool
 	SwitchCaseLabel (
@@ -263,10 +274,38 @@ Members2
 		);
 
 	bool
+	FinalizeConditionalExpr_t (
+		const CValue& TrueValue,
+		const CValue& FalseValue,
+		CValue* pResultValue
+		);
+
+	bool
+	FinalizeAutoEv ();
+
+	bool
+	FinalizeAutoEvOnChangeClause ();
+
+	void
+	FinalizeAutoEvOnChangeStmt ();
+
+	bool
+	AutoEvExpressionStmt (rtl::CBoxListT <CToken>* pTokenList);
+
+	bool
+	CountAutoEvBindSites ();
+
+	bool
 	SetFunctionBody (rtl::CBoxListT <CToken>* pBody);
 
 	bool
 	LookupIdentifier (
+		const rtl::CString& Name,
+		CValue* pValue
+		);
+
+	bool
+	LookupIdentifierType (
 		const rtl::CString& Name,
 		CValue* pValue
 		);
@@ -278,7 +317,16 @@ Members2
 	GetThisValue (CValue* pValue);
 
 	bool
+	GetThisValueType (CValue* pValue);
+
+	bool
 	GetAuPropertyFieldMember (
+		CValue* pValue,
+		EAuPropertyField Field
+		);
+
+	bool
+	GetAuPropertyFieldMemberType (
 		CValue* pValue,
 		EAuPropertyField Field
 		);

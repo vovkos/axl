@@ -42,6 +42,20 @@ IUnaryOperator::IUnaryOperator ()
 	m_OpFlags = 0;
 }
 
+bool
+IUnaryOperator::GetResultType (
+	const CValue& OpValue,
+	CValue* pResultValue
+	)
+{
+	CType* pType = GetResultType (OpValue);
+	if (!pType)
+		return false;
+
+	pResultValue->SetType (pType);
+	return true;
+}
+
 //.............................................................................
 
 } // namespace jnc {

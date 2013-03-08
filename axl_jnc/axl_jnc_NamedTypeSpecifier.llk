@@ -175,8 +175,18 @@ autoev_class_specifier
 	}
 	: EToken_Class
 	  EToken_Identifier $n
-	  function_suffix $a <&$Declarator>?
+	  function_suffix <&$Declarator>?
 	  function_body_pass1 $b?
+		{
+			$.m_pType = CreateAutoEvClassType (
+				$n.m_Data.m_String, 
+				$Declarator.GetFunctionSuffix (), 
+				IsValidLocator ($b) ? &$b.m_TokenList : NULL
+				);
+
+			if (!$.m_pType)
+				return false;
+		}
 	;
 
 // class_specifier vs autoev_class_specifier at type_specifier::EToken_Class

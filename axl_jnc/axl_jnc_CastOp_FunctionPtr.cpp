@@ -50,7 +50,7 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetType ();
 	CFunctionType* pSrcFunctionType = pSrcPtrType->GetTargetType ();
 	
-	CFunctionPtrType* pThinPtrType = pSrcFunctionType->GetAbstractMethodMemberType ()->GetFunctionPtrType (EFunctionPtrType_Thin);
+	CFunctionPtrType* pThinPtrType = pSrcFunctionType->GetStdObjectMethodMemberType ()->GetFunctionPtrType (EFunctionPtrType_Thin);
 
 	CValue PfnValue;
 	CValue ClosureObjValue;

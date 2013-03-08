@@ -13,7 +13,8 @@ namespace pg {
 
 enum EConfigFlag
 {
-	EConfigFlag_Verbose                = 1,
+	EConfigFlag_Verbose  = 0x01,
+	EConfigFlag_NoPpLine = 0x02
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

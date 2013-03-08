@@ -57,6 +57,33 @@ CPropertyPtrType::GetAuPropertyPtrStructType_u ()
 	return m_pModule->m_TypeMgr.GetAuPropertyPtrStructType_u (m_pTargetType);
 }
 
+CDataPtrType*
+CPropertyPtrType::GetAuDataPtrType (EType TypeKind)
+{
+	EDataPtrType DataPtrTypeKind;
+
+	switch (m_PtrTypeKind)
+	{
+	case EPropertyPtrType_Normal:
+	case EPropertyPtrType_Weak:
+		DataPtrTypeKind = EDataPtrType_Normal;
+		break;
+
+	case EPropertyPtrType_Thin:
+		DataPtrTypeKind = EDataPtrType_Thin;
+		break;
+
+	case EPropertyPtrType_Unsafe:
+		DataPtrTypeKind = EDataPtrType_Unsafe;
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	return m_pTargetType->GetAuFieldStructType ()->GetDataPtrType (TypeKind, DataPtrTypeKind);
+}
+
 rtl::CStringA
 CPropertyPtrType::CreateSignature (
 	CPropertyType* pPropertyType,
@@ -93,19 +120,20 @@ void
 CPropertyPtrType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
+	m_TypeString += _T(' ');
 
 	if (m_Flags & EPtrTypeFlag_Nullable)
-		m_TypeString += _T(" nullable");
+		m_TypeString += _T("nullable ");
 
 	m_TypeString += m_pTargetType->GetTypeModifierString ();
 
 	if (m_PtrTypeKind != EClassPtrType_Normal)
 	{
-		m_TypeString += _T(' ');
 		m_TypeString += GetPropertyPtrTypeKindString (m_PtrTypeKind);
+		m_TypeString += _T(' ');
 	}
 
-	m_TypeString += m_TypeKind == EType_PropertyRef ? " property&" : " property*";
+	m_TypeString += m_TypeKind == EType_PropertyRef ? "property&" : "property*";
 
 	if (m_pTargetType->IsIndexed ())
 	{

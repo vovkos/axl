@@ -68,8 +68,7 @@ public:
 	CScope*
 	GetParentScope ()
 	{
-		return m_pParentNamespace && m_pParentNamespace->GetNamespaceKind () == ENamespace_Scope ? 
-			(CScope*) m_pParentNamespace : NULL;
+		return m_pParentNamespace && m_pParentNamespace->GetNamespaceKind () == ENamespace_Scope ? (CScope*) m_pParentNamespace : NULL;
 	}
 
 	void

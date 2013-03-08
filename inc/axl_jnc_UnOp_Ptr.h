@@ -24,6 +24,10 @@ public:
 	}
 
 	virtual
+	CType*
+	GetResultType (const CValue& OpValue);
+
+	virtual
 	bool
 	Operator (
 		const CValue& OpValue,
@@ -43,6 +47,10 @@ public:
 	{
 		m_OpKind = EUnOp_Indir;
 	}
+
+	virtual
+	CType*
+	GetResultType (const CValue& OpValue);
 
 	virtual
 	bool

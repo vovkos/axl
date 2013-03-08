@@ -88,8 +88,8 @@ class CDataPtrTypeTuple: public rtl::TListLink
 protected:
 	friend class CTypeMgr;
 
-	CStructType* m_pDataPtrStructType;
-	CDataPtrType* m_DataPtrArray [2] [EDataPtrType__Count] [2] [2] [2]; // ref x ptrkind x const x volatile x nullable
+	CStructType* m_pPtrStructType;
+	CDataPtrType* m_PtrTypeArray [2] [EDataPtrType__Count] [2] [2] [2]; // ref x ptrkind x const x volatile x nullable
 
 public:
 	CDataPtrTypeTuple ()

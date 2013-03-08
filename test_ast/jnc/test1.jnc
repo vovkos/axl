@@ -1,72 +1,56 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CBase
+int bindable Red;
+int bindable Green;
+int bindable Blue;
+
+Purple (int r, int b)
 {
-	preconstruct ()
-	{
-		printf ("CBase.preconstruct ()\n");
-		Foo ();
-	}
+	printf ("Purple (%d, %d)\n", r, b);
+}
 
-	this ()
-	{
-		printf ("CBase.this ()\n");
-		Foo ();
-	} 
+Yellow (int r, int g)
+{
+	printf ("Yellow (%d, %d)\n", r, g);
+}
 
-	this (int x)
-	{
-		printf ("CBase.this (%d)\n", x);
-		Foo ();
-	}
-
-	~this ()
-	{
-		printf ("CBase.~this ()\n");
-		Foo ();
-	}
-
-	virtual
-	Foo ()
-	{
-		printf ("CBase.Foo ()\n");
-	}
-};
+Cyan (int g, int b)
+{
+	printf ("Cyan (%d, %d)\n", g, b);
+}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CTest: CBase
+
+/*
+
+class CMyClass
 {
-	preconstruct ()
-	{
-		printf ("CTest.preconstruct ()\n");
-		Foo ();
-	}
+	int m_x;
 
-	this ()
+	autoev ColorAutoEv (int x)
 	{
-		printf ("CTest.this ()\n");
-		Foo ();
-	}
+		onchange (Green) 
+			for (int i = 0; i < x; i++)
+				printf ("Green = %d; x = %d, m_x = %d\n", Green, x, m_x);
 
-	this (int x)
-	{
-		CBase (x * 2);
-		printf ("CTest.this (%d)\n", x);
-		Foo ();
+		Purple (Red + m_x, Blue + x);
+		Yellow (Red + m_x, Green + x);
+		Cyan (Green + m_x, Blue + x);	
 	}
+};
 
-	~this ()
-	{
-		printf ("CTest.~this ()\n");
-		Foo ();
-	}
+*/
 
-	override
-	Foo ()
-	{
-		printf ("CTest.Foo ()\n");
-	}
+autoev class CColorAutoEv (int x)
+{
+	onchange (Green) 
+		for (int i = 0; i < x; i++)
+			printf ("Green = %d; x = %d, m_x = %d\n", Green, x, x);
+
+	Purple (Red + x, Blue + x);
+	Yellow (Red + x, Green + x);
+	Cyan (Green + x, Blue + x);	
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -76,14 +60,20 @@ main ()
 {
 	printf ("hui govno i muravei\n");
 
-	CTest t = uheap new CTest (10);
-	
-	delete t;
+//	CMyClass c = stack new CMyClass;
+//	c.m_x = 1;
+//	c.ColorAutoEv (5);
 
+	stack new CColorAutoEv (5);
 
+	Red = 10;
+	Green = 200;
+	Blue = 3000;
+
+	printf ("muravei govno i hui\n");
 	return 0;
 }
-
+ 
 //.............................................................................
 
 int

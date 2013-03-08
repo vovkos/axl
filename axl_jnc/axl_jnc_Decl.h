@@ -160,18 +160,12 @@ public:
 		m_FunctionTypeFlags = 0;
 	}
 
-	size_t 
-	GetArgCount ()
+	rtl::CStdListT <CFunctionFormalArg>*
+	GetArgList ()
 	{
-		return m_ArgList.GetCount ();
+		return &m_ArgList;
 	}
 
-	rtl::CIteratorT <CFunctionFormalArg> 
-	GetFirstArg ()
-	{
-		return m_ArgList.GetHead ();
-	}
-	
 	int 
 	GetFunctionTypeFlags ()
 	{
@@ -212,12 +206,11 @@ GetPostDeclaratorModifierString (int Modifiers)
 
 enum EDeclarator
 {
-	EDeclarator_Undefined,
-	EDeclarator_SimpleName,
-	EDeclarator_QualifiedName,
+	EDeclarator_Undefined = 0,
+	EDeclarator_Name,
 	EDeclarator_UnnamedMethod,
-	EDeclarator_CastOperator,
 	EDeclarator_UnaryBinaryOperator,
+	EDeclarator_CastOperator,
 	EDeclarator_PropValue,
 };
 
@@ -244,6 +237,18 @@ protected:
 
 public:
 	CDeclarator ();
+
+	bool
+	IsSimple ()
+	{
+		return m_DeclaratorKind == EDeclarator_Name && m_Name.IsSimple ();
+	}
+
+	bool
+	IsQualified ()
+	{
+		return m_DeclaratorKind == EDeclarator_Name ? !m_Name.IsSimple () : !m_Name.IsEmpty ();
+	}
 
 	EDeclarator
 	GetDeclaratorKind ()
@@ -323,8 +328,19 @@ public:
 	bool
 	SetPostDeclaratorModifier (EPostDeclaratorModifier Modifier);
 
+	CDeclFunctionSuffix*
+	GetFunctionSuffix ()
+	{
+		rtl::CIteratorT <CDeclSuffix> Suffix = m_SuffixList.GetHead ();
+		return Suffix && Suffix->GetSuffixKind () == EDeclSuffix_Function ? (CDeclFunctionSuffix*) *Suffix : NULL;
+	}
+
 	rtl::CStdListT <CFunctionFormalArg>*
-	GetArgList ();
+	GetArgList ()
+	{
+		CDeclFunctionSuffix* pSuffix = GetFunctionSuffix ();
+		return pSuffix ? &pSuffix->m_ArgList : NULL;
+	}
 	
 	CType*
 	CalcType (int* pDataPtrTypeFlags = NULL);

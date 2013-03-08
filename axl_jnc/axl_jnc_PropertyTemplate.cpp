@@ -9,6 +9,9 @@ namespace jnc {
 
 CPropertyTemplate::CPropertyTemplate ()
 {
+	m_ItemKind = EModuleItem_PropertyTemplate;
+	m_NamespaceKind = ENamespace_PropertyTemplate;
+	m_pItemDecl = this;
 	m_pGetterType = NULL;
 	m_pAuPropValueType = NULL;
 	m_TypeModifiers = 0;

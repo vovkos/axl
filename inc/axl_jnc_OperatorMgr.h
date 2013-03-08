@@ -231,6 +231,28 @@ public:
 
 	// unary operators
 
+	CType*
+	GetUnaryOperatorResultType (
+		EUnOp OpKind,
+		const CValue& OpValue
+		);
+
+	bool
+	GetUnaryOperatorResultType (
+		EUnOp OpKind,
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+	
+	bool
+	GetUnaryOperatorResultType (
+		EUnOp OpKind,
+		CValue* pValue
+		)
+	{
+		return GetUnaryOperatorResultType (OpKind, *pValue, pValue);
+	}
+
 	bool
 	UnaryOperator (
 		EUnOp OpKind,
@@ -248,6 +270,31 @@ public:
 	}
 
 	// binary operators
+
+	CType*
+	GetBinaryOperatorResultType (
+		EBinOp OpKind,
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		);
+
+	bool
+	GetBinaryOperatorResultType (
+		EBinOp OpKind,
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		);
+
+	bool
+	GetBinaryOperatorResultType (
+		EBinOp OpKind,
+		CValue* pValue,
+		const CValue& OpValue2
+		)
+	{
+		return GetBinaryOperatorResultType (OpKind, *pValue, OpValue2, pValue);
+	}
 
 	bool
 	BinaryOperator (
@@ -396,7 +443,15 @@ public:
 		return CastOperator (EStorage_Undefined, *pValue, TypeKind, pValue);
 	}
 
-	// misc operators
+	// new & delete operators
+
+	CType* 
+	GetNewOperatorResultType (CType* pType)
+	{
+		return pType->GetTypeKind () == EType_Class ? 
+			(CType*) ((CClassType*) pType)->GetClassPtrType () : 
+			pType->GetDataPtrType ();
+	}
 
 	bool
 	NewOperator (
@@ -409,13 +464,29 @@ public:
 	bool
 	DeleteOperator (const CValue& OpValue);
 
+	// member operators
+
+	CType*
+	GetMemberOperatorResultType (
+		const CValue& OpValue,
+		const tchar_t* pName
+		);
+
 	bool
-	GetFieldMember (
-		const CValue& ThisValue,
-		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
+	GetMemberOperatorResultType (
+		const CValue& OpValue,
+		const tchar_t* pName,
 		CValue* pResultValue
 		);
+
+	bool
+	GetMemberOperatorResultType (
+		CValue* pValue,
+		const tchar_t* pName
+		)
+	{
+		return GetMemberOperatorResultType (*pValue, pName, pValue);
+	}
 
 	bool
 	MemberOperator (
@@ -431,6 +502,28 @@ public:
 		)
 	{
 		return MemberOperator (*pValue, pName, pValue);
+	}
+
+	CType*
+	GetWeakMemberOperatorResultType (
+		const CValue& OpValue,
+		const tchar_t* pName
+		);
+
+	bool
+	GetWeakMemberOperatorResultType (
+		const CValue& OpValue,
+		const tchar_t* pName,
+		CValue* pResultValue
+		);
+
+	bool
+	GetWeakMemberOperatorResultType (
+		CValue* pValue,
+		const tchar_t* pName
+		)
+	{
+		return GetWeakMemberOperatorResultType (*pValue, pName, pValue);
 	}
 
 	bool
@@ -449,11 +542,35 @@ public:
 		return WeakMemberOperator (*pValue, pName, pValue);
 	}
 
+	// call operators
+
+	CType*
+	GetCallOperatorResultType (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	GetCallOperatorResultType (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList,
+		CValue* pResultValue
+		);
+
+	bool
+	GetCallOperatorResultType (
+		CValue* pValue,
+		rtl::CBoxListT <CValue>* pArgList
+		)
+	{
+		return GetCallOperatorResultType (*pValue, pArgList, pValue);
+	}
+
 	bool
 	CallOperator (
 		const CValue& OpValue,
 		rtl::CBoxListT <CValue>* pArgList,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		);
 
 	bool
@@ -468,7 +585,7 @@ public:
 	bool
 	CallOperator (
 		const CValue& OpValue,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		)
 	{
 		rtl::CBoxListT <CValue> ArgList;
@@ -479,7 +596,7 @@ public:
 	CallOperator (
 		const CValue& OpValue,
 		const CValue& ArgValue,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		)
 	{
 		rtl::CBoxListT <CValue> ArgList;
@@ -492,7 +609,7 @@ public:
 		const CValue& OpValue,
 		const CValue& ArgValue1,
 		const CValue& ArgValue2,
-		CValue* pResultValue
+		CValue* pResultValue = NULL
 		)
 	{
 		rtl::CBoxListT <CValue> ArgList;
@@ -501,38 +618,39 @@ public:
 		return CallOperator (OpValue, &ArgList, pResultValue);
 	}
 
-	bool
-	CallOperator3 (
-		const CValue& OpValue,
-		const CValue& ArgValue1,
-		const CValue& ArgValue2,
-		const CValue& ArgValue3,
-		CValue* pResultValue
-		)
-	{
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (ArgValue1);
-		ArgList.InsertTail (ArgValue2);
-		ArgList.InsertTail (ArgValue3);
-		return CallOperator (OpValue, &ArgList, pResultValue);
-	}
+	// base type constructor calls
 
 	bool
-	CallOperator4 (
+	CallBaseTypeConstructor (
+		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	PostBaseTypeConstructorList ();
+
+	// closure operators
+
+	CType*
+	GetClosureOperatorResultType (
 		const CValue& OpValue,
-		const CValue& ArgValue1,
-		const CValue& ArgValue2,
-		const CValue& ArgValue3,
-		const CValue& ArgValue4,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	GetClosureOperatorResultType (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
+		);
+
+	bool
+	GetClosureOperatorResultType (
+		CValue* pValue,
+		rtl::CBoxListT <CValue>* pArgList
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (ArgValue1);
-		ArgList.InsertTail (ArgValue2);
-		ArgList.InsertTail (ArgValue3);
-		ArgList.InsertTail (ArgValue4);
-		return CallOperator (OpValue, &ArgList, pResultValue);
+		return GetClosureOperatorResultType (*pValue,  pArgList, pValue);
 	}
 
 	bool
@@ -552,24 +670,202 @@ public:
 	}
 
 	bool
-	CallBaseTypeConstructor (
-		CType* pType,
-		rtl::CBoxListT <CValue>* pArgList
+	ClosureOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		return ClosureOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
+	ClosureOperator (
+		const CValue& OpValue,
+		const CValue& ArgValue,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue);
+		return ClosureOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	bool
+	ClosureOperator2 (
+		const CValue& OpValue,
+		const CValue& ArgValue1,
+		const CValue& ArgValue2,
+		CValue* pResultValue
+		)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (ArgValue1);
+		ArgList.InsertTail (ArgValue2);
+		return ClosureOperator (OpValue, &ArgList, pResultValue);
+	}
+
+	// property accessors
+
+	CType*
+	GetFunctionType (
+		const CValue& OpValue,
+		CFunctionType* pFunctionType
+		);
+
+	CType*
+	GetPropertyGetterType (const CValue& OpValue);
+
+	bool
+	GetPropertyGetterType (
+		const CValue& OpValue,
+		CValue* pResultValue
 		);
 
 	bool
-	PostBaseTypeConstructorList ();
+	GetPropertyGetterType (CValue* pValue)
+	{
+		return GetPropertyGetterType (*pValue, pValue);
+	}
 
-	void
-	GetThinDataPtrScopeLevel (
-		const CValue& Value,
+	bool
+	GetPropertyGetter (
+		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
-	void
-	GetThinDataPtrValidator (
-		const CValue& Value,
+	bool
+	GetPropertyGetter (CValue* pValue)
+	{
+		return GetPropertyGetter (*pValue, pValue);
+	}
+
+	CType*
+	GetPropertySetterType (
+		const CValue& OpValue,
+		const CValue& ArgValue
+		);
+
+	bool
+	GetPropertySetterType (
+		const CValue& OpValue,
+		const CValue& ArgValue,
 		CValue* pResultValue
+		);
+
+	bool
+	GetPropertySetterType (
+		CValue* pValue,
+		const CValue& ArgValue
+		)
+	{
+		return GetPropertySetterType (*pValue, ArgValue, pValue);
+	}
+
+	bool
+	GetPropertySetter (
+		const CValue& OpValue,
+		const CValue& ArgValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertySetter (
+		CValue* pValue,
+		const CValue& ArgValue
+		)
+	{
+		return GetPropertySetter (*pValue, ArgValue, pValue);
+	}
+
+	CType*
+	GetPropertySetterType (const CValue& OpValue)
+	{
+		return GetPropertySetterType (OpValue, CValue ());
+	}
+
+	bool
+	GetPropertySetterType (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		return GetPropertySetterType (OpValue, CValue (), pResultValue);
+	}
+
+	bool
+	GetPropertySetterType (CValue* pValue)
+	{
+		return GetPropertySetterType (*pValue, CValue (), pValue);
+	}
+
+	bool
+	GetPropertySetter (
+		const CValue& OpValue,
+		CValue* pResultValue
+		)
+	{
+		return GetPropertySetter (OpValue, CValue (), pResultValue);
+	}
+
+	bool
+	GetPropertySetter (CValue* pValue)
+	{
+		return GetPropertySetter (*pValue, CValue (), pValue);
+	}
+
+	// augmented property fields
+
+	CType*
+	GetAuPropertyFieldMemberType (
+		const CValue& OpValue,
+		EAuPropertyField Field
+		);
+
+	bool
+	GetAuPropertyFieldMemberType (
+		const CValue& OpValue,
+		EAuPropertyField Field,
+		CValue* pResultValue
+		);
+
+	bool
+	GetAuPropertyFieldMemberType (
+		CValue* pValue,	
+		EAuPropertyField Field
+		)
+	{
+		return GetAuPropertyFieldMemberType (*pValue, Field, pValue);
+	}
+
+	bool
+	GetAuPropertyFieldMember (
+		const CValue& OpValue,
+		EAuPropertyField Field,
+		CValue* pResultValue
+		);
+
+	bool
+	GetAuPropertyFieldMember (
+		CValue* pValue,	
+		EAuPropertyField Field
+		)
+	{
+		return GetAuPropertyFieldMember (*pValue, Field, pValue);
+	}
+
+	// misc property functions
+
+	bool
+	GetProperty (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	SetProperty (
+		const CValue& OpValue,
+		const CValue& SrcValue
 		);
 
 	bool
@@ -603,86 +899,8 @@ public:
 		);
 
 	bool
-	GetProperty (
-		const CValue& OpValue,
-		CValue* pResultValue
-		);
-
-	bool
-	SetProperty (
-		const CValue& OpValue,
-		const CValue& SrcValue
-		);
-
-	bool
 	GetPropertyVTable (
 		const CValue& OpValue,
-		CValue* pResultValue
-		);
-
-	bool
-	GetPropertyGetter (
-		const CValue& OpValue,
-		CValue* pResultValue
-		);
-
-	bool
-	GetPropertyGetter (CValue* pValue)
-	{
-		return GetPropertyGetter (*pValue, pValue);
-	}
-
-	bool
-	GetPropertySetter (
-		const CValue& OpValue,
-		const CValue& ArgValue,
-		CValue* pResultValue
-		);
-
-	bool
-	GetPropertySetter (
-		CValue* pValue,
-		const CValue& ArgValue
-		)
-	{
-		return GetPropertySetter (*pValue, ArgValue, pValue);
-	}
-
-	bool
-	GetPropertySetter (
-		const CValue& OpValue,
-		CValue* pResultValue
-		)
-	{
-		return GetPropertySetter (OpValue, CValue (), pResultValue);
-	}
-
-	bool
-	GetPropertySetter (CValue* pValue)
-	{
-		return GetPropertySetter (*pValue, CValue (), pValue);
-	}
-
-	bool
-	GetAuPropertyFieldMember (
-		const CValue& OpValue,
-		EAuPropertyField Field,
-		CValue* pResultValue
-		);
-
-	bool
-	GetAuPropertyFieldMember (
-		CValue* pValue,	
-		EAuPropertyField Field
-		)
-	{
-		return GetAuPropertyFieldMember (*pValue, Field, pValue);
-	}
-
-	bool
-	GetAuPropertyFieldMember (
-		const CValue& OpValue,
-		CStructField* pMember,
 		CValue* pResultValue
 		);
 
@@ -705,6 +923,8 @@ public:
 		const CValue& OpValue1,
 		const CValue& OpValue2
 		);
+
+	// misc
 
 	bool
 	GetVirtualMethodMember (
@@ -734,6 +954,18 @@ public:
 		const CValue& Value
 		);
 
+	void
+	GetThinDataPtrScopeLevel (
+		const CValue& Value,
+		CValue* pResultValue
+		);
+
+	void
+	GetThinDataPtrValidator (
+		const CValue& Value,
+		CValue* pResultValue
+		);
+
 	bool
 	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
 	
@@ -745,7 +977,14 @@ public:
 		CValue* pResultValue
 		);
 
+	bool
+	GetAutoEvData (
+		CAutoEv* pAutoEv,
+		CValue* pResultValue
+		);
+
 protected:
+
 	// checks
 
 	void
@@ -812,6 +1051,26 @@ protected:
 
 	// member operators
 
+	CType*
+	GetFieldMemberType (
+		const CValue& OpValue,
+		CStructField* pMember
+		);
+
+	bool
+	GetFieldMember (
+		CStructField* pMember,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	CType*
+	GetStructMemberType (
+		const CValue& OpValue,
+		CStructType* pStructType,
+		const tchar_t* pName
+		);
+
 	bool
 	GetStructMember (
 		const CValue& OpValue,
@@ -826,6 +1085,13 @@ protected:
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
+		);
+
+	CType*
+	GetUnionMemberType (
+		const CValue& OpValue,
+		CUnionType* pUnionType,
+		const tchar_t* pName
 		);
 
 	bool
@@ -843,12 +1109,41 @@ protected:
 		CValue* pResultValue
 		);
 
+	CType*
+	GetMulticastMemberType (
+		const CValue& OpValue,
+		CMulticastType* pMulticastType,
+		const tchar_t* pName
+		);
+
 	bool
 	GetMulticastMember (
 		const CValue& OpValue,
 		CMulticastType* pMulticastType,
 		const tchar_t* pName,
 		CValue* pResultValue
+		);
+
+	CType*
+	GetAutoEvMemberType (
+		const CValue& OpValue,
+		CAutoEvType* pAutoEvType,
+		const tchar_t* pName
+		);
+
+	bool
+	GetAutoEvMember (
+		const CValue& OpValue,
+		CAutoEvType* pAutoEvType,
+		const tchar_t* pName,
+		CValue* pResultValue
+		);
+
+	CType*
+	GetClassMemberType (
+		const CValue& OpValue,
+		CClassType* pClassType,
+		const tchar_t* pName
 		);
 
 	bool
@@ -864,20 +1159,6 @@ protected:
 		const CValue& OpValue,
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
-	GetClassMethodMember (
-		const CValue& OpValue,
-		CFunction* pFunction,
-		CValue* pResultValue
-		);
-
-	bool
-	GetClassPropertyMember (
-		const CValue& OpValue,
-		CPropertyType* pPropertyType,
 		CValue* pResultValue
 		);
 

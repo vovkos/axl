@@ -20,6 +20,8 @@ namespace jnc {
 
 class CClassType;
 class CPropertyType;
+class CProperty;
+class CAutoEv;
 
 //.............................................................................
 
@@ -37,7 +39,9 @@ enum EFunction
 	EFunction_CastOperator,
 	EFunction_UnaryOperator,
 	EFunction_BinaryOperator,
-	EFunction_AutoEv,
+	EFunction_AutoEvStarter,
+	EFunction_AutoEvStopper,
+	EFunction_AutoEvHandler,
 	EFunction_Internal, 
 	EFunction_Thunk,
 	EFunction__Count
@@ -108,12 +112,13 @@ public:
 
 //.............................................................................
 
-class CFunction: public CNamedModuleItem
+class CFunction: public CUserModuleItem
 {
 protected:
 	friend class CFunctionMgr;
 	friend class CClassType;
 	friend class CProperty;
+	friend class CAutoEv;
 	friend class CParser;
 	friend class CCast_FunctionPtr;
 
@@ -125,8 +130,6 @@ protected:
 		EBinOp m_BinOpKind;
 		CType* m_pCastOpType;
 	};
-
-	CNamespace* m_pParentNamespace;
 
 	CFunctionType* m_pType;
 	CFunctionTypeOverload m_TypeOverload;
@@ -151,10 +154,14 @@ protected:
 	CClassType* m_pVirtualOriginClassType; 
 	size_t m_ClassVTableIndex;
 
-	// for property accessors
+	// for property gettes/setters
 
 	CProperty* m_pProperty;
 	size_t m_PropertyVTableIndex;
+
+	// for autoev starters/stoppers/handlers
+
+	CAutoEv* m_pAutoEv;
 
 	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
@@ -189,19 +196,13 @@ public:
 		return m_BinOpKind;
 	}
 
-	CNamespace* 
-	GetParentNamespace ()
-	{
-		return m_pParentNamespace;
-	}
-
 	CFunctionType* 
 	GetType ()
 	{
 		return m_pType;
 	}
 
-	const CFunctionTypeOverload*
+	CFunctionTypeOverload*
 	GetTypeOverload ()
 	{	
 		return &m_TypeOverload;
@@ -286,6 +287,12 @@ public:
 	GetPropertyVTableIndex ()
 	{
 		return m_PropertyVTableIndex;
+	}
+
+	CAutoEv* 
+	GetAutoEv ()
+	{
+		return m_pAutoEv;
 	}
 
 	rtl::CConstListT <CFunctionFormalArg> 

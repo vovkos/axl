@@ -11,6 +11,7 @@ CProperty::CProperty ()
 {
 	m_ItemKind = EModuleItem_Property;
 	m_NamespaceKind = ENamespace_Property;
+	m_pItemDecl = this;
 	m_pType = NULL;
 	m_pAuPropValueType = NULL;
 	m_TypeModifiers = 0;
@@ -137,7 +138,6 @@ CProperty::GetFieldStructType (EStorage StorageKind)
 			return NULL;
 		}
 
-
 		if (m_pFieldStructType)
 			return m_pFieldStructType;
 
@@ -254,10 +254,6 @@ CProperty::AddMethodMember (CFunction* pFunction)
 	case EFunction_Named:
 		return AddFunction (pFunction);
 
-	case EFunction_AutoEv:
-		pFunction->m_Tag.Format (_T("%s.autoev"), m_Tag);
-		return true;
-
 	default:
 		err::SetFormatStringError (_T("invalid %s in '%s'"), GetFunctionKindString (FunctionKind), m_Tag);
 		return false;
@@ -286,39 +282,76 @@ CProperty::AddMethodMember (CFunction* pFunction)
 bool
 CProperty::AddPropertyMember (CProperty* pProperty)
 {
+	ASSERT (pProperty->IsNamed ());
+	bool Result = AddItem (pProperty);
+	if (!Result)
+		return false;
+
+	pProperty->m_pParentNamespace = this;
+
+	if (!m_pParentClassType)
+		return true;
+
 	EStorage StorageKind = pProperty->GetStorageKind ();
-
-	if (m_pParentClassType)
+	switch (StorageKind)
 	{
-		switch (StorageKind)
-		{
-		case EStorage_Static:
-			break;
+	case EStorage_Static:
+		break;
 
-		case EStorage_Undefined:
-			pProperty->m_StorageKind = EStorage_Member;
-			// and fall through
+	case EStorage_Undefined:
+		pProperty->m_StorageKind = EStorage_Member;
+		// and fall through
 
-		case EStorage_Member:
-			pProperty->m_pParentClassType = m_pParentClassType;
-			break;
+	case EStorage_Member:
+		pProperty->m_pParentClassType = m_pParentClassType;
+		break;
 
-		case EStorage_Abstract:
-		case EStorage_Virtual:
-		case EStorage_Override:
-			m_pParentClassType->m_VirtualPropertyArray.Append (pProperty);
-			pProperty->m_pParentClassType = m_pParentClassType;
-			break;
+	case EStorage_Abstract:
+	case EStorage_Virtual:
+	case EStorage_Override:
+		m_pParentClassType->m_VirtualPropertyArray.Append (pProperty);
+		pProperty->m_pParentClassType = m_pParentClassType;
+		break;
 
-		default:
-			err::SetFormatStringError (_T("invalid storage specifier '%s' for property member"), GetStorageKindString (StorageKind));
-			return false;
-		}
+	default:
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for property member"), GetStorageKindString (StorageKind));
+		return false;
 	}
-	else if (StorageKind != EStorage_Static)
+
+	return true;
+}
+
+bool
+CProperty::AddAutoEvMember (CAutoEv* pAutoEv)
+{
+	ASSERT (pAutoEv->IsNamed ());
+	bool Result = AddItem (pAutoEv);
+	if (!Result)
+		return false;
+
+	pAutoEv->m_pParentNamespace = this;
+
+	if (!m_pParentClassType)
+		return true;
+
+	EStorage StorageKind = pAutoEv->GetStorageKind ();
+	switch (StorageKind)
 	{
-		err::SetFormatStringError (_T("invalid storage specifier '%s' for global property member"), GetStorageKindString (StorageKind));
-		return NULL;
+	case EStorage_Static:
+		break;
+
+	case EStorage_Undefined:
+		pAutoEv->m_StorageKind = EStorage_Member;
+		//and fall through
+
+	case EStorage_Member:
+		pAutoEv->ConvertToAutoEvMember (m_pParentClassType);
+		m_pParentClassType->m_AutoEvArray.Append (pAutoEv);
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage '%s' for autoev member"), GetStorageKindString (StorageKind));
+		return false;
 	}
 
 	return true;

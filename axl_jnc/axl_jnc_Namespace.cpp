@@ -73,6 +73,7 @@ GetNamespaceKindString (ENamespace NamespaceKind)
 		_T("named-type-extension"),      // ENamespace_TypeExtension,
 		_T("property"),                  // ENamespace_Property,
 		_T("property-template"),         // ENamespace_PropertyTemplate,
+		_T("autoev"),                    // ENamespace_AutoEv,
 	};
 
 	return (size_t) NamespaceKind < ENamespace__Count ? 
@@ -86,7 +87,6 @@ CNamespace::CNamespace ()
 {
 	m_NamespaceKind = ENamespace_Undefined;
 	m_CurrentAccessKind = EAccess_Public;
-	m_pParentNamespace = NULL;
 }
 
 void
@@ -119,11 +119,11 @@ CNamespace::FindItem (const tchar_t* pName)
 CModuleItem*
 CNamespace::FindItem (const CQualifiedName& Name)
 {
-	CModuleItem* pItem = FindItem (Name.m_First);
+	CModuleItem* pItem = FindItem (Name.GetFirstName ());
 	if (!pItem)
 		return NULL;
 
-	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
+	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.GetNameList ().GetHead ();
 	for (; NameIt; NameIt++)
 	{
 		CNamespace* pNamespace = GetItemNamespace (pItem);
@@ -145,11 +145,11 @@ CNamespace::FindItemTraverse (
 	int Flags
 	)
 {
-	CModuleItem* pItem = FindItemTraverse (Name.m_First, pCoord, Flags);
+	CModuleItem* pItem = FindItemTraverse (Name.GetFirstName (), pCoord, Flags);
 	if (!pItem)
 		return NULL;
 
-	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.m_List.GetHead ();
+	rtl::CBoxIteratorT <rtl::CString> NameIt = Name.GetNameList ().GetHead ();
 	for (; NameIt; NameIt++)
 	{
 		CNamespace* pNamespace = GetItemNamespace (pItem);
@@ -193,13 +193,13 @@ CNamespace::FindItemTraverseImpl (
 bool
 CNamespace::AddItem (
 	CModuleItem* pItem,
-	CModuleItemName* pName
+	CModuleItemDecl* pDecl
 	)	
 {
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (pName->m_Name);
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (pDecl->m_Name);
 	if (It->m_Value)
 	{
-		SetRedefinitionError (pName->m_Name);
+		SetRedefinitionError (pDecl->m_Name);
 		return false;
 	}
 
@@ -217,7 +217,7 @@ CNamespace::AddFunction (CFunction* pFunction)
 
 	if (pOldItem->GetItemKind () != EModuleItem_Function)
 	{	
-		SetRedefinitionError (pFunction->m_Name);
+		SetRedefinitionError (pFunction->GetName ());
 		return false;
 	}
 

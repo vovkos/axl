@@ -29,7 +29,7 @@ GetVariableKindString (EVariable VariableKind);
 
 //.............................................................................
 
-class CVariable: public CNamedModuleItem
+class CVariable: public CUserModuleItem
 {
 protected:
 	friend class CVariableMgr;

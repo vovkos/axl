@@ -61,18 +61,20 @@ GetValueKindString (EValue ValueKind)
 {
 	static const tchar_t* StringTable [EValue__Count] = 
 	{
-		_T("void"),          // EValue_Void = 0,
-		_T("null"),          // EValue_Null,
-		_T("type"),          // EValue_Type,
-		_T("const"),         // EValue_Const,
-		_T("variable"),      // EValue_Variable,
-		_T("function"),      // EValue_Function,
-		_T("property"),      // EValue_Property,	
-		_T("field"),         // EValue_Field,	
-		_T("llvm-register"), // EValue_LlvmRegister,
-		_T("bool-not"),      // EValue_BoolNot,
-		_T("bool-and"),      // EValue_BoolAnd,
-		_T("bool-or"),       // EValue_BoolOr,
+		_T("void"),                   // EValue_Void = 0,
+		_T("null"),                   // EValue_Null,
+		_T("type"),                   // EValue_Type,
+		_T("const"),                  // EValue_Const,
+		_T("variable"),               // EValue_Variable,
+		_T("function"),               // EValue_Function,
+		_T("function-type-overload"), // EValue_FunctionTypeOverload,
+		_T("property"),               // EValue_Property,	
+		_T("autoev"),                 // EValue_AutoEv,	
+		_T("field"),                  // EValue_Field,	
+		_T("llvm-register"),          // EValue_LlvmRegister,
+		_T("bool-not"),               // EValue_BoolNot,
+		_T("bool-and"),               // EValue_BoolAnd,
+		_T("bool-or"),                // EValue_BoolOr,
 	};
 
 	return (size_t) ValueKind < EValue__Count ? 
@@ -321,6 +323,16 @@ CValue::SetFunction (CFunction* pFunction)
 }
 
 void
+CValue::SetFunctionTypeOverload (CFunctionTypeOverload* pFunctionTypeOverload)
+{
+	Clear ();
+
+	m_ValueKind = pFunctionTypeOverload->IsOverloaded () ? EValue_FunctionTypeOverload : EValue_Type;
+	m_pFunctionTypeOverload = pFunctionTypeOverload;
+	m_pType = pFunctionTypeOverload->GetOverload (0);
+}
+
+void
 CValue::SetProperty (CProperty* pProperty)
 {
 	Clear ();
@@ -330,7 +342,18 @@ CValue::SetProperty (CProperty* pProperty)
 	m_pType = pProperty->GetType ()->GetPropertyPtrType (EType_PropertyRef, EPropertyPtrType_Thin);
 
 	// don't assign LlvmValue yet cause property LlvmValue is only needed for pointers
+}
 
+void
+CValue::SetAutoEv (CAutoEv* pAutoEv)
+{
+	Clear ();
+
+	m_ValueKind = EValue_AutoEv;
+	m_pAutoEv = pAutoEv;
+	m_pType = pAutoEv->GetType ()->GetAutoEvPtrType (EType_AutoEvRef, EAutoEvPtrType_Thin);
+
+	// don't assign LlvmValue yet cause autoev LlvmValue is only needed for pointers
 }
 
 bool
