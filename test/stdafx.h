@@ -55,6 +55,7 @@ extern "C" {
 #include <axl_rtl_BoxList.h>
 #include <axl_rtl_Packer.h>
 #include <axl_rtl_Unpacker.h>
+#include <axl_rtl_HandleTable.h>
 
 #include <axl_exe_WorkerThread.h>
 #include <axl_exe_WorkerWindow.h>
@@ -74,6 +75,7 @@ extern "C" {
 #include <axl_io_DgramSock.h>
 
 #include <axl_lex_RagelLexer.h>
+#include <axl_llk_Parser.h>
 
 #include <axl_st_StringTemplate.h>
 

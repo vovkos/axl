@@ -1,8 +1,6 @@
 #include "stdafx.h"
-#include <axl_llk_Parser.h>
- 
-#include "TestLexer.h"
-#include "TestParser.h"
+// #include "TestLexer.h"
+// #include "TestParser.h"
 
 //.............................................................................
 
@@ -1445,7 +1443,7 @@ Run ()
 }
 
 //.............................................................................
-
+/*
 namespace parse_test
 {
 
@@ -1490,7 +1488,7 @@ Run (const tchar_t* pFileName)
 }
 
 }
-
+*/
 //.............................................................................
 
 namespace st_test
@@ -1529,6 +1527,32 @@ Run (const tchar_t* pFileName)
 
 //.............................................................................
 
+namespace handle_table_test
+{
+
+void
+Run ()
+{
+	printf ("hui govno i muravei\n");
+
+	axl::rtl::CHandleTableT <int> HandleTable (0xffffffff);
+
+	handle_t h1 = HandleTable.Add (100);
+	handle_t h2 = HandleTable.Add (200);
+	handle_t h3 = HandleTable.Add (300);
+	handle_t h4 = HandleTable.Add (400);
+
+	axl::rtl::CIteratorT <axl::rtl::CHandleTableT <int>::CEntry> It = HandleTable.GetList ().GetHead ();
+	for (; It; It++)
+	{
+		printf ("0x%x = %d\n", It->GetHandle (), It->m_Value);
+	}
+}
+
+}
+
+//.............................................................................
+
 int _tmain (int argc, _TCHAR* argv [])
 {
 	WSADATA WsaData;
@@ -1556,7 +1580,7 @@ int _tmain (int argc, _TCHAR* argv [])
 
 	//size_t x = offsetofclass (CMyObject, IFunction);
 
-	parse_test::Run ("expr.txt");
+	handle_table_test::Run ();
 
 	return 0;
 }

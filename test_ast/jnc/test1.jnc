@@ -21,9 +21,6 @@ Cyan (int g, int b)
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-
-/*
-
 class CMyClass
 {
 	int m_x;
@@ -40,7 +37,7 @@ class CMyClass
 	}
 };
 
-*/
+/*
 
 autoev class CColorAutoEv (int x)
 {
@@ -53,24 +50,25 @@ autoev class CColorAutoEv (int x)
 	Cyan (Green + x, Blue + x);	
 };
 
+*/
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
 main ()
 {
-	printf ("hui govno i muravei\n");
+	printf ("jancy autoev test\n");
 
-//	CMyClass c = stack new CMyClass;
-//	c.m_x = 1;
-//	c.ColorAutoEv (5);
+	CMyClass c = stack new CMyClass;
+	c.m_x = 1;
+	c.ColorAutoEv (5);
 
-	stack new CColorAutoEv (5);
+//	stack new CColorAutoEv (5);
 
 	Red = 10;
 	Green = 200;
 	Blue = 3000;
 
-	printf ("muravei govno i hui\n");
 	return 0;
 }
  

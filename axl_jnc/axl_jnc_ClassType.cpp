@@ -272,7 +272,7 @@ bool
 CClassType::AddAutoEvMember (CAutoEv* pAutoEv)
 {
 	ASSERT (pAutoEv->IsNamed () || (m_Flags & EClassTypeFlag_AutoEv));
-	if (!pAutoEv->IsNamed ())
+	if (pAutoEv->IsNamed ())
 	{
 		bool Result = AddItem (pAutoEv);
 		if (!Result)
