@@ -79,9 +79,6 @@
     <ClInclude Include="..\Inc\axl_jnc_ConstMgr.h">
       <Filter>value</Filter>
     </ClInclude>
-    <ClInclude Include="axl_jnc_Lexer.h">
-      <Filter>parser</Filter>
-    </ClInclude>
     <ClInclude Include="axl_jnc_Parser.h">
       <Filter>parser</Filter>
     </ClInclude>
@@ -240,6 +237,9 @@
     </ClInclude>
     <ClInclude Include="..\inc\axl_jnc_AutoEvPtrType.h">
       <Filter>type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Lexer.h">
+      <Filter>parser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

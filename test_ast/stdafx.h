@@ -113,22 +113,6 @@ extern "C" {
 
 #define _CRT_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" string functions
 
-// AXL
-
-#include "axl_io_MappedFile.h"
-#include "axl_st_StringTemplate.h"
-#include "axl_rtl_ArrayList.h"
-#include "axl_rtl_BitMap.h"
-#include "axl_rtl_StringHashTable.h"
-#include "axl_rtl_EscapeEncoding.h"
-#include "axl_io_FilePathUtils.h"
-#include "axl_lex_RagelLexer.h"
-#include "axl_err_ParseError.h"
-
-#include "axl_rtl_HexEncoding.h"
-
-using namespace axl;
-
 // LLVM
 
 // warning C4146: unary minus operator applied to unsigned type, result still unsigned
@@ -181,3 +165,21 @@ using namespace axl;
 #pragma warning (default: 4146)
 #pragma warning (default: 4355)
 #pragma warning (default: 4800)
+
+// AXL
+
+#include "axl_io_MappedFile.h"
+#include "axl_st_StringTemplate.h"
+#include "axl_rtl_ArrayList.h"
+#include "axl_rtl_BitMap.h"
+#include "axl_rtl_HandleTable.h"
+#include "axl_rtl_StringHashTable.h"
+#include "axl_rtl_EscapeEncoding.h"
+#include "axl_io_FilePathUtils.h"
+#include "axl_lex_RagelLexer.h"
+#include "axl_err_ParseError.h"
+#include "axl_jnc_Value.h"
+
+#include "axl_rtl_HexEncoding.h"
+
+using namespace axl;

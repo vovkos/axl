@@ -32,10 +32,13 @@ public:
 			return m_Handle;
 		}
 	};
+
+	typedef CIteratorT <CEntry> CListIterator;
+	typedef CHashTableMapIteratorT <handle_t, CListIterator> CMapIterator;
 	
 protected:
 	CStdListT <CEntry> m_List;
-	CHashTableMapT <handle_t, CIteratorT <CEntry>, CHashIdT <handle_t> > m_HashTable;
+	CHashTableMapT <handle_t, CListIterator, CHashIdT <handle_t> > m_HashTable;
 	uintptr_t m_Seed;
 
 public:
@@ -74,6 +77,12 @@ public:
 		m_List.Clear ();
 		m_HashTable.Clear ();
 	}
+
+	CMapIterator
+	Find (handle_t Handle) const
+	{
+		return m_HashTable.Find (Handle);
+	}
 	
 	bool
 	Find (
@@ -81,7 +90,7 @@ public:
 		T* pValue
 		) const
 	{
-		CHashTableMapIteratorT <handle_t, CIteratorT <CEntry> > It = m_HashTable.Find (Handle);
+		CMapIterator It = m_HashTable.Find (Handle);
 		if (!It)
 			return false;
 
@@ -99,7 +108,7 @@ public:
 		pEntry->m_Handle = Handle;
 		pEntry->m_Value = Value;
 		
-		CIteratorT <CEntry> It = m_List.InsertTail (pEntry);
+		CListIterator It = m_List.InsertTail (pEntry);
 		m_HashTable [Handle] = It;
 
 		m_Seed++;
@@ -109,15 +118,21 @@ public:
 		return Handle;
 	}
 
+	void
+	Remove (CMapIterator It)
+	{
+		m_List.Delete (It->m_Value);
+		m_HashTable.Delete (It);
+	}
+
 	bool
 	Remove (handle_t Handle)
 	{
-		CHashTableMapIteratorT <handle_t, CIteratorT <CEntry> > It = m_HashTable.Find (Handle);
+		CMapIterator It = m_HashTable.Find (Handle);
 		if (!It)
 			return false;
-		
-		m_List.Delete (It->m_Value);
-		m_HashTable.Delete (It);
+
+		Remove (It);
 		return true;			
 	}
 };

@@ -641,8 +641,10 @@ struct TFunctionPtr
 	TInterface* m_pClosure; 
 };
 
-struct TFunctionPtr_w: TFunctionPtr
+struct TFunctionPtr_w
 {
+	void* m_pfn;
+	TInterface* m_pClosure; 
 	FStrengthen m_pfnStrengthen;
 };
 
@@ -658,8 +660,10 @@ struct TPropertyPtr
 	TInterface* m_pClosure; 
 };
 
-struct TPropertyPtr_w: TPropertyPtr
+struct TPropertyPtr_w
 {
+	void** m_pVTable;
+	TInterface* m_pClosure; 
 	FStrengthen m_pfnStrengthen;
 };
 
@@ -678,13 +682,18 @@ struct TAuPropertyPtr_t
 // structures backing up augmented property (bindable or autoget) pointer declared like:
 // int bindable property* pyTest;
 
-struct TAuPropertyPtr: TAuPropertyPtr_t
+struct TAuPropertyPtr
 {
+	void** m_pVTable;
+	TDataPtr m_AuDataPtr;
 	TInterface* m_pClosure; 
 };
 
-struct TAuPropertyPtr_w: TAuPropertyPtr
+struct TAuPropertyPtr_w
 {
+	void** m_pVTable;
+	TDataPtr m_AuDataPtr;
+	TInterface* m_pClosure; 
 	FStrengthen m_pfnStrengthen;
 };
 
@@ -709,8 +718,10 @@ struct TAutoEvPtr
 	TInterface* m_pClosure; 
 };
 
-struct TAutoEvPtr_w: TAutoEvPtr
+struct TAutoEvPtr_w
 {
+	void** m_pVTable;
+	TInterface* m_pClosure; 
 	FStrengthen m_pfnStrengthen;
 };
 

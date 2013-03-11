@@ -1,5 +1,7 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+/*
+
 int bindable Red;
 int bindable Green;
 int bindable Blue;
@@ -37,6 +39,8 @@ class CMyClass
 	}
 };
 
+*/
+
 /*
 
 autoev class CColorAutoEv (int x)
@@ -54,12 +58,29 @@ autoev class CColorAutoEv (int x)
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+int bindable Red;
+
+foo ()
+{
+	printf ("foo ()\n");
+}
+
+bar ()
+{
+	printf ("bar ()\n");
+}
+
+bzz ()
+{
+	printf ("bzz ()\n");
+}
+
 int 
 main ()
 {
 	printf ("jancy autoev test\n");
 
-	CMyClass c = stack new CMyClass;
+/*	CMyClass c = stack new CMyClass;
 	c.m_x = 1;
 	c.ColorAutoEv (5);
 
@@ -68,6 +89,20 @@ main ()
 	Red = 10;
 	Green = 200;
 	Blue = 3000;
+*/
+
+	intptr h1 = Red.onchange.Add (foo);
+	intptr h2 = Red.onchange.Add (bar);
+	intptr h3 = Red.onchange.Add (bzz);
+
+	Red = 100;
+
+	printf ("removing 2 handlers\n");
+
+	Red.onchange.Remove (h1); 
+	Red.onchange.Remove (h3);
+
+	Red = 200;
 
 	return 0;
 }

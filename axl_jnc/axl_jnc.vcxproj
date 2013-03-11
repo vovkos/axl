@@ -103,6 +103,7 @@
     <ClInclude Include="..\Inc\axl_jnc_ControlFlowMgr.h" />
     <ClInclude Include="..\Inc\axl_jnc_EnumType.h" />
     <ClInclude Include="..\inc\axl_jnc_DerivableType.h" />
+    <ClInclude Include="..\inc\axl_jnc_Lexer.h" />
     <ClInclude Include="..\inc\axl_jnc_McSnapshotType.h" />
     <ClInclude Include="..\inc\axl_jnc_MulticastType.h" />
     <ClInclude Include="..\Inc\axl_jnc_Function.h" />
@@ -141,7 +142,6 @@
     <ClInclude Include="..\Inc\axl_jnc_VariableMgr.h" />
     <ClInclude Include="axl_jnc_Decl.h" />
     <ClInclude Include="axl_jnc_DeclTypeCalc.h" />
-    <ClInclude Include="axl_jnc_Lexer.h" />
     <ClInclude Include="axl_jnc_Parser.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

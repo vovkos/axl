@@ -22,6 +22,7 @@
 #include "MainFrm.h"
 
 #include "AstDoc.h"
+#include "Multicast.h"
 
 #include <propkey.h>
 
@@ -323,196 +324,103 @@ StdLib_DynamicCastClassPtr (
 	return p2;
 }
 
-bool
-SetMulticastCount (
-	jnc::TMulticast* pMulticast,
-	size_t Count,
-	size_t Size
-	)
-{
-	if (pMulticast->m_MaxCount >= Count)
-	{
-		pMulticast->m_Count = Count;
-		return true;		
-	}
-
-	size_t MaxCount = rtl::GetMinPower2Ge (Count);
-	
-	void* p = AXL_MEM_ALLOC (MaxCount * Size);
-	if (!p)
-		return false;
-
-	if (pMulticast->m_pPtrArray)
-		memcpy (p, pMulticast->m_pPtrArray, pMulticast->m_Count * Size);
-
-	pMulticast->m_pPtrArray = p;
-	pMulticast->m_MaxCount = MaxCount;
-	pMulticast->m_Count = Count;
-	return true;
-}
-
-intptr_t
+handle_t
 StdLib_MulticastSet (
 	jnc::TMulticast* pMulticast,
 	jnc::TFunctionPtr Ptr
 	)
 {
-	if (!Ptr.m_pfn)
-	{
-		SetMulticastCount (pMulticast, 0, sizeof (jnc::TFunctionPtr));
-		return 0;
-	}
-
-	SetMulticastCount (pMulticast, 1, sizeof (jnc::TFunctionPtr));
-	*(jnc::TFunctionPtr*) pMulticast->m_pPtrArray = Ptr;
-	return -1; // not yet
+	return ((CMulticast*) pMulticast)->SetHandler (Ptr);
 }
 
-intptr_t
+handle_t
 StdLib_MulticastSet_w (
 	jnc::TMulticast* pMulticast,
 	jnc::TFunctionPtr_w Ptr
 	)
 {
-	if (!Ptr.m_pfn)
-	{
-		SetMulticastCount (pMulticast, 0, sizeof (jnc::TFunctionPtr));
-		return 0;
-	}
-
-	SetMulticastCount (pMulticast, 1, sizeof (jnc::TFunctionPtr_w));
-	*(jnc::TFunctionPtr_w*) pMulticast->m_pPtrArray = Ptr;
-	return -1; // not yet
+	return ((CMulticast*) pMulticast)->SetHandler_w (Ptr);
 }
 
-intptr_t
+handle_t
 StdLib_MulticastSet_u (
 	jnc::TMulticast* pMulticast,
 	void* pfn
 	)
 {
-	if (!pfn)
-	{
-		SetMulticastCount (pMulticast, 0, sizeof (jnc::TFunctionPtr));
-		return 0;
-	}
-
-	SetMulticastCount (pMulticast, 1, sizeof (void*));
-	*(void**) pMulticast->m_pPtrArray = pfn;
-	return -1; // not yet
+	return ((CMulticast*) pMulticast)->SetHandler_u (pfn);
 }
 
-intptr_t
+handle_t
 StdLib_MulticastAdd (
 	jnc::TMulticast* pMulticast,
 	jnc::TFunctionPtr Ptr
 	)
 {
-	if (!Ptr.m_pfn)
-		return 0;
-
-	size_t Count = pMulticast->m_Count;
-	SetMulticastCount (pMulticast, Count + 1, sizeof (jnc::TFunctionPtr));
-	*((jnc::TFunctionPtr*) pMulticast->m_pPtrArray + Count) = Ptr;
-	return -1; // not yet
+	return ((CMulticast*) pMulticast)->AddHandler (Ptr);
 }
 
-intptr_t
+handle_t
 StdLib_MulticastAdd_w (
 	jnc::TMulticast* pMulticast,
 	jnc::TFunctionPtr_w Ptr
 	)
 {
-	if (!Ptr.m_pfn)
-		return 0;
-
-	size_t Count = pMulticast->m_Count;
-	SetMulticastCount (pMulticast, Count + 1, sizeof (jnc::TFunctionPtr_w));
-	*((jnc::TFunctionPtr_w*) pMulticast->m_pPtrArray + Count) = Ptr;
-	return -1; // not yet
+	return ((CMulticast*) pMulticast)->AddHandler_w (Ptr);
 }
 
-intptr_t
+handle_t
 StdLib_MulticastAdd_u (
 	jnc::TMulticast* pMulticast,
 	void* pfn
 	)
 {
-	if (!pfn)
-		return 0;
-
-	size_t Count = pMulticast->m_Count;
-	SetMulticastCount (pMulticast, Count + 1, sizeof (void*));
-	*((void**) pMulticast->m_pPtrArray + Count) = pfn;
-	return -1; // not yet
+	return ((CMulticast*) pMulticast)->AddHandler_u (pfn);
 }
 
 jnc::TFunctionPtr
 StdLib_MulticastRemove (
 	jnc::TMulticast* pMulticast,
-	intptr_t Handle
+	handle_t Handle
 	)
 {
-	jnc::TFunctionPtr Ptr;
-	memset (&Ptr, 0, sizeof (Ptr));
-	return Ptr;
+	return ((CMulticast*) pMulticast)->RemoveHandler (Handle);
 }
 
 jnc::TFunctionPtr_w
 StdLib_MulticastRemove_w (
 	jnc::TMulticast* pMulticast,
-	intptr_t Handle
+	handle_t Handle
 	)
 {
-	jnc::TFunctionPtr_w Ptr;
-	memset (&Ptr, 0, sizeof (Ptr));
-	return Ptr;
+	return ((CMulticast*) pMulticast)->RemoveHandler_w (Handle);
 }
 
 void*
 StdLib_MulticastRemove_u (
 	jnc::TMulticast* pMulticast,
-	intptr_t Handle
+	handle_t Handle
 	)
 {
-	return NULL;
+	return ((CMulticast*) pMulticast)->RemoveHandler_u (Handle);
 }
 
 jnc::TMcSnapshot
-StdLib_MulticastSnapshot (
-	jnc::TMulticast* pMulticast,
-	intptr_t Handle
-	)
+StdLib_MulticastSnapshot (jnc::TMulticast* pMulticast)
 {
-	jnc::TMcSnapshot Snapshot = {0};
-	Snapshot.m_Count = pMulticast->m_Count;
-	Snapshot.m_pPtrArray = pMulticast->m_pPtrArray;
-	return Snapshot;
+	return ((CMulticast*) pMulticast)->Snapshot ();
 }
 
 jnc::TMcSnapshot
-StdLib_MulticastSnapshot_w (
-	jnc::TMulticast* pMulticast,
-	intptr_t Handle
-	)
+StdLib_MulticastSnapshot_w (jnc::TMulticast* pMulticast)
 {
-	ASSERT (false);
-	jnc::TMcSnapshot Snapshot = {0};
-	Snapshot.m_Count = pMulticast->m_Count;
-	Snapshot.m_pPtrArray = pMulticast->m_pPtrArray;
-	return Snapshot;
+	return ((CMulticast*) pMulticast)->Snapshot_w ();
 }
 
 jnc::TMcSnapshot
-StdLib_MulticastSnapshot_u (
-	jnc::TMulticast* pMulticast,
-	intptr_t Handle
-	)
+StdLib_MulticastSnapshot_u (jnc::TMulticast* pMulticast)
 {
-	jnc::TMcSnapshot Snapshot = {0};
-	Snapshot.m_Count = pMulticast->m_Count;
-	Snapshot.m_pPtrArray = pMulticast->m_pPtrArray;
-	return Snapshot;
+	return ((CMulticast*) pMulticast)->Snapshot_u ();
 }
 
 void*

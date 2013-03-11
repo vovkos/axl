@@ -129,6 +129,7 @@
     <ClInclude Include="LogCtrl.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ModulePane.h" />
+    <ClInclude Include="Multicast.h" />
     <ClInclude Include="OutputPane.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -143,6 +144,7 @@
     <ClCompile Include="LogCtrl.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ModulePane.cpp" />
+    <ClCompile Include="Multicast.cpp" />
     <ClCompile Include="OutputPane.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
