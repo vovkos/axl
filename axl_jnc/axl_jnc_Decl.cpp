@@ -18,27 +18,34 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifier_Unsigned,     // ETypeModifier_Signed           = 0x00000001,
 		ETypeModifier_Signed,       // ETypeModifier_Unsigned         = 0x00000002,
 		0,                          // ETypeModifier_BigEndian        = 0x00000004,
-		0,                          // ETypeModifier_Nullable           = 0x00000008,
+		0,                          // ETypeModifier_Nullable         = 0x00000008,
 		ETypeModifier_ReadOnly,     // ETypeModifier_Const            = 0x00000010,
 		ETypeModifier_Const,        // ETypeModifier_ReadOnly         = 0x00000020,
-		0,                          // ETypeModifier_Volatile         = 0x00000040,
-		ETypeModifier_Thin |        // ETypeModifier_Weak             = 0x00000080,
+		0,                          // ETypeModifier_Mutable          = 0x00000040,
+		0,                          // ETypeModifier_Volatile         = 0x00000080,
+		ETypeModifier_Thin |        // ETypeModifier_Weak             = 0x00000100,
 		ETypeModifier_Unsafe,   
-		ETypeModifier_Weak |        // ETypeModifier_Thin             = 0x00000100,
+		ETypeModifier_Weak |        // ETypeModifier_Thin             = 0x00000200,
 		ETypeModifier_Unsafe,   
-		ETypeModifier_Weak |        // ETypeModifier_Unsafe           = 0x00000200,
+		ETypeModifier_Weak |        // ETypeModifier_Unsafe           = 0x00000400,
 		ETypeModifier_Thin,   
-		ETypeModifier_Stdcall,      // ETypeModifier_Cdecl            = 0x00000400,
-		ETypeModifier_Cdecl,        // ETypeModifier_Stdcall          = 0x00000800,
-		ETypeModifier_Function |    // ETypeModifier_Class            = 0x00001000,
+		ETypeModifier_Stdcall,      // ETypeModifier_Cdecl            = 0x00000800,
+		ETypeModifier_Cdecl,        // ETypeModifier_Stdcall          = 0x00001000,
+		ETypeModifier_Function |    // ETypeModifier_Class            = 0x00002000,
+		ETypeModifier_Property |
+		ETypeModifier_AutoEv,      
+		ETypeModifier_Class |       // ETypeModifier_Function         = 0x00004000,
+		ETypeModifier_Property |
+		ETypeModifier_AutoEv,      
+		ETypeModifier_Class |       // ETypeModifier_Property         = 0x00008000,
+		ETypeModifier_Function |
+		ETypeModifier_AutoEv,      
+		ETypeModifier_Class |       // ETypeModifier_AutoEv           = 0x00010000,
+		ETypeModifier_Function |
 		ETypeModifier_Property,      
-		ETypeModifier_Class |       // ETypeModifier_Function         = 0x00002000,
-		ETypeModifier_Property,      
-		ETypeModifier_Class |       // ETypeModifier_Property         = 0x00004000,
-		ETypeModifier_Function,      
-		0,                          // ETypeModifier_Bindable         = 0x00008000,
-		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00010000,
-		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00020000,
+		0,                          // ETypeModifier_Bindable         = 0x00020000,
+		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00040000,
+		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00080000,
 	};
 
 	// check duplicates
@@ -51,7 +58,10 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
 	if (i >= countof (AntiModifierTable))
+	{
+		m_TypeModifiers |= Modifier;
 		return true; // allow adding new modifiers without changing table
+	}
 
 	// check anti-modifiers
 
