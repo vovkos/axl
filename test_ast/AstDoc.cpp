@@ -289,6 +289,10 @@ StdLib_OnRuntimeError (
 		pErrorString = "NULL_PROPERTY";
 		break;
 
+	case jnc::ERuntimeError_AbstractFunction:
+		pErrorString = "ABSTRACT_FUNCTION";
+		break;
+
 	default:
 		ASSERT (false);
 		pErrorString = "<UNDEF>";
@@ -473,112 +477,33 @@ StdLib_printf (
 	pMainFrame->m_OutputPane.m_LogCtrl.TraceV (pFormat, va_start_e (pFormat));
 }
 
-int
-StdLib_StructTest (
-	void* p,
-	size_t Size
-	)
+ulong_t
+StdLib_GetCurrentThreadId ()
 {
-	CMainFrame* pMainFrame = GetMainFrame ();
+	return GetCurrentThreadId ();
+}
 
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("StructTest (%x, %d)\n", p, Size);
-	/*
-	struct TBase
-	{
-		int m_a;
-		int m_b;
-	};
+DWORD 
+WINAPI
+StdLib_ThreadProc (PVOID pContext)
+{
+	jnc::TFunctionPtr* pPtr = (jnc::TFunctionPtr*) pContext;
+	jnc::TFunctionPtr Ptr = *pPtr;
+	AXL_MEM_DELETE (pPtr);
 
-	struct TStruct: TBase
-	{
-		int m_c;
-		int m_d;
-	};
-	*/
-
-	struct TStruct
-	{
-		unsigned __int16 m_a:1;
-		unsigned __int16 m_b:2;
-		unsigned __int16 m_c:5;
-		unsigned __int16 m_d:7;
-	};
-
-	union TUnion
-	{
-		TStruct m_s;
-		unsigned __int16 m_i;
-	};
-
-	TStruct* pStruct = (TStruct*) p;
-	TUnion* pUnion = (TUnion*) p;
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
-		"TStruct = { %x, %x, %x, %x }; Size = %d; sizeof (TStruct) = %d;\n", 
-		pStruct->m_a, pStruct->m_b, pStruct->m_c, pStruct->m_d,
-		Size,
-		sizeof (TStruct)
-		);
-
+	((void (__cdecl*) (jnc::TInterface*)) Ptr.m_pfn) (Ptr.m_pClosure);
 	return 0;
 }
 
 int
-StdLib_ReadInteger ()
+StdLib_CreateThread (jnc::TFunctionPtr Ptr)
 {
-	return 10;
-}
+	jnc::TFunctionPtr* pPtr = AXL_MEM_NEW (jnc::TFunctionPtr);
+	*pPtr = Ptr;
 
-int
-__cdecl
-StdLib_CallConvTestA (
-	int a,
-	int b, 
-	int c
-	)
-{
-	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestA (%d, %d, %d)\n", a, b, c);
-	return 1000;
-}
-
-int
-__cdecl
-StdLib_CallConvTestB (
-	int a,
-	int b, 
-	int c
-	)
-{
-	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestB (%d, %d, %d)\n", a, b, c);
-	return 2000;
-}
-
-int
-__stdcall
-StdLib_CallConvTestC (
-	int a,
-	int b, 
-	int c
-	)
-{
-	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestC (%d, %d, %d)\n", a, b, c);
-	return 3000;
-}
-
-int
-__stdcall
-StdLib_CallConvTestD (
-	int a,
-	int b, 
-	int c
-	)
-{
-	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("CallConvTestD (%d, %d, %d)\n", a, b, c);
-	return 4000;
+	DWORD ThreadId;
+	HANDLE h = CreateThread (NULL, 0, StdLib_ThreadProc, pPtr, 0, &ThreadId);
+	return h != NULL;
 }
 
 void
@@ -592,6 +517,12 @@ StdLib_PointerCheck (jnc::TDataPtr Ptr)
 		Ptr.m_Validator.m_pRegionEnd,
 		Ptr.m_Validator.m_ScopeLevel
 		);
+}
+
+void
+StdLib_IfaceTest (jnc::TInterface* p)
+{
+	_asm int 3;
 }
 
 bool
@@ -627,14 +558,10 @@ CAstDoc::ExportStdLib ()
 	ExportStdLibFunction (jnc::EStdFunc_MulticastSnapshot_u, StdLib_MulticastSnapshot_u);
 	
 	ExportStdLibFunction (_T("printf"), StdLib_printf);
-	ExportStdLibFunction (_T("ReadInteger"), StdLib_ReadInteger);
-	ExportStdLibFunction (_T("StructTest"), StdLib_StructTest);
-	ExportStdLibFunction (_T("CallConvTestA"), StdLib_CallConvTestA);
-	ExportStdLibFunction (_T("CallConvTestB"), StdLib_CallConvTestB);
-	ExportStdLibFunction (_T("CallConvTestC"), StdLib_CallConvTestC);
-	ExportStdLibFunction (_T("CallConvTestD"), StdLib_CallConvTestD);
-	ExportStdLibFunction (_T("PointerCheck"), StdLib_PointerCheck);
-
+	ExportStdLibFunction (_T("GetCurrentThreadId"), StdLib_GetCurrentThreadId);
+	ExportStdLibFunction (_T("CreateThread"), StdLib_CreateThread);
+	ExportStdLibFunction (_T("IfaceTest"), StdLib_IfaceTest);
+	
 	return true;
 }
 

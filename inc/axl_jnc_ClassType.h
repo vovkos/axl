@@ -214,7 +214,7 @@ public:
 	bool
 	HasVTable ()
 	{
-		return m_VTable.IsEmpty ();
+		return !m_VTable.IsEmpty ();
 	}
 
 	CStructType* 

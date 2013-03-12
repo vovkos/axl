@@ -966,6 +966,9 @@ CParser::CreateFormalArg (
 	if (!pType)
 		return NULL;
 
+	if (pType->GetTypeKind () == EType_Class)
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
 	rtl::CString Name;
 
 	if (pDeclarator->IsSimple ())

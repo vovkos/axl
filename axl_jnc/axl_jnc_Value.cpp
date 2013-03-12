@@ -174,6 +174,13 @@ CValue::GetLlvmConst (
 	switch (TypeKind)
 	{
 	case EType_Bool:
+		Integer = *(int8_t*) p != 0;
+		pLlvmConst = llvm::ConstantInt::get (
+			pType->GetLlvmType (),
+			llvm::APInt (1, Integer, pType->IsSignedIntegerType ())
+			);
+		break;
+
 	case EType_Int8:
 	case EType_Int8_u:
 	case EType_Int16:

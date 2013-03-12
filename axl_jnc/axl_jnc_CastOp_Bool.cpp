@@ -70,16 +70,7 @@ CCast_Bool::GetCastOperator (
 	CType* pType
 	)
 {
-	CType* pSrcType = OpValue.GetType ();
-
-	EType SrcTypeKind = pSrcType->GetTypeKind ();
-	EType DstTypeKind = pType->GetTypeKind ();
-
-	size_t SrcSize = pSrcType->GetSize ();
-	size_t DstSize = pType->GetSize ();
-
-	ASSERT (DstTypeKind >= EType_Int8 && DstTypeKind <= EType_Int64_u);
-
+	EType SrcTypeKind = OpValue.GetType ()->GetTypeKind ();
 	switch (SrcTypeKind)
 	{
 	case EType_Bool:

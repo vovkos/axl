@@ -45,7 +45,7 @@ CDeclTypeCalc::CalcType (
 
 				pType = GetClassPtrType ((CClassType*) pType);
 			}
-			if (m_TypeModifiers & ETypeModifier_Function)
+			else if (m_TypeModifiers & ETypeModifier_Function)
 			{
 				CFunctionType* pFunctionType = GetFunctionType (pType);
 				if (!pFunctionType)
@@ -475,7 +475,7 @@ CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
-	return m_pModule->m_TypeMgr.GetDataPtrType (pDataType, PtrTypeKind, TypeFlags);
+	return pDataType->GetDataPtrType (PtrTypeKind, TypeFlags);
 }
 
 CClassPtrType*
@@ -497,7 +497,7 @@ CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr_p;
-	return m_pModule->m_TypeMgr.GetClassPtrType (pClassType, PtrTypeKind, TypeFlags);
+	return pClassType->GetClassPtrType (PtrTypeKind, TypeFlags);
 }
 
 CFunctionPtrType*
@@ -510,7 +510,7 @@ CDeclTypeCalc::GetFunctionPtrType (CFunctionType* pFunctionType)
 		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_FunctionPtr;
-	return m_pModule->m_TypeMgr.GetFunctionPtrType (pFunctionType, PtrTypeKind, TypeFlags);
+	return pFunctionType->GetFunctionPtrType (PtrTypeKind, TypeFlags);
 }
 
 CPropertyPtrType*
@@ -523,7 +523,7 @@ CDeclTypeCalc::GetPropertyPtrType (CPropertyType* pPropertyType)
 		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_PropertyPtr;
-	return m_pModule->m_TypeMgr.GetPropertyPtrType (pPropertyType, PtrTypeKind, TypeFlags);
+	return pPropertyType->GetPropertyPtrType (PtrTypeKind, TypeFlags);
 }
 
 CAutoEvPtrType*
@@ -536,7 +536,7 @@ CDeclTypeCalc::GetAutoEvPtrType (CAutoEvType* pAutoEvType)
 		TypeFlags |= EPtrTypeFlag_Nullable;
 
 	m_TypeModifiers &= ~ETypeModifierMask_AutoEvPtr;
-	return m_pModule->m_TypeMgr.GetAutoEvPtrType (pAutoEvType, PtrTypeKind, TypeFlags);
+	return pAutoEvType->GetAutoEvPtrType (PtrTypeKind, TypeFlags);
 }
 
 //.............................................................................

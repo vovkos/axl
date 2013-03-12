@@ -85,5 +85,5 @@ inline
 CMainFrame*
 GetMainFrame ()
 {
-	return (CMainFrame*) AfxGetMainWnd ();
+	return (CMainFrame*) AfxGetApp ()->GetMainWnd ();
 }

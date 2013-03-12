@@ -1,22 +1,45 @@
 //.............................................................................
 
-int autoget property MyProp;
-
-MyProp.set (int x)
+class IScheduler
 {
-	printf ("MyProp.set (%d)\n", x);
-	propvalue = x;
+	abstract 
+	bool 
+	Schedule (function* pfn ());
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CNewThreadScheduler: IScheduler
+{
+	override
+	bool 
+	Schedule (function* pfn ())
+	{
+		printf ("CNewThreadScheduler.Schedule ()\n");
+		pfn ();
+		return true;
+	}
+};
+
+//.............................................................................
+
+foo ()
+{
+	printf ("foo () TID: %d\n", GetCurrentThreadId ());
 }
 
 int 
 main ()
 {
-	printf ("jancy property test\n");
+	printf ("main () TID: %d\n", GetCurrentThreadId ());
 
-	MyProp = 100;
+	foo ();
 
-	int x = MyProp;
-	printf ("x = %d\n", x);
+	IScheduler s = stack new CNewThreadScheduler;
+
+	IScheduler class* s2 = s;
+
+//	s.Schedule (foo);
 
 	return 0;
 }
@@ -28,5 +51,14 @@ printf (
 	unsafe const char* pFormat,
 	unsafe ...
 	);
+
+int
+GetCurrentThreadId ();
+
+bool
+CreateThread (function* pfn ());
+
+void
+IfaceTest (CNewThreadScheduler);
 
 //.............................................................................
