@@ -983,6 +983,12 @@ public:
 		CValue* pResultValue
 		);
 
+	bool
+	GetAutoEvBindSiteArray (
+		CAutoEv* pAutoEv,
+		CValue* pResultValue
+		);
+
 protected:
 
 	// checks

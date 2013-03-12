@@ -248,6 +248,9 @@ public:
 	bool
 	CalcLayout ();
 
+	bool 
+	StopAutoEvs (const CValue& ThisValue);
+
 	bool
 	CallBaseDestructors (const CValue& ThisValue);
 

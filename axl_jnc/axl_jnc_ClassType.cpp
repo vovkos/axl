@@ -292,8 +292,8 @@ CClassType::AddAutoEvMember (CAutoEv* pAutoEv)
 		//and fall through
 
 	case EStorage_Member:
-		pAutoEv->ConvertToAutoEvMember (this);
 		m_AutoEvArray.Append (pAutoEv);
+		pAutoEv->m_pParentClassType = this;
 		break;
 
 	default:
@@ -767,30 +767,12 @@ CClassType::CreateDefaultDestructor ()
 	CValue ArgValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
 
-	size_t AutoEvCount = m_AutoEvArray.GetCount ();
-	for (size_t i = 0; i < AutoEvCount; i++)
-	{
-		CAutoEv* pAutoEv = m_AutoEvArray [i];
+	bool Result = 
+		StopAutoEvs (ArgValue) &&
+		CallBaseDestructors (ArgValue);
 
-		// stop autoev
-	}
-
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		if (BaseType->m_pType->GetTypeKind () != EType_Class)
-			continue;
-
-		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
-		
-		CFunction* pDestructor = pBaseClassType->GetDestructor ();
-		if (!pDestructor)
-			continue;
-
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ArgValue);
-		if (!Result)
-			return false;
-	}
+	if (!Result)
+		return false;
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
@@ -934,8 +916,29 @@ CClassType::CallBaseDestructors (const CValue& ThisValue)
 	return true;
 }
 
+bool 
+CClassType::StopAutoEvs (const CValue& ThisValue)
+{
+	bool Result;
+
+	size_t AutoEvCount = m_AutoEvArray.GetCount ();
+	for (size_t i = 0; i < AutoEvCount; i++)
+	{
+		CAutoEv* pAutoEv = m_AutoEvArray [i];
+
+		CFunction* pStopper = pAutoEv->GetStopper ();		
+		if (!pStopper)
+			continue;
+
+		Result = m_pModule->m_OperatorMgr.CallOperator (pStopper, ThisValue);
+		if (!Result)
+			return false;			
+	}
+
+	return true;
+}
+
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
-

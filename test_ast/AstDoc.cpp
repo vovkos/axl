@@ -159,9 +159,9 @@ CAstDoc::Compile ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Calculating type layouts...\n"));
 	Result = 
-		m_Module.m_TypeMgr.CalcTypeLayouts () &&
 		m_Module.m_FunctionMgr.CalcPropertyLayouts () &&
-		m_Module.m_FunctionMgr.CalcAutoEvLayouts ();
+		m_Module.m_FunctionMgr.CalcAutoEvLayouts () &&
+		m_Module.m_TypeMgr.CalcTypeLayouts ();
 
 	if (!Result)
 	{

@@ -82,7 +82,7 @@ CBinOp_OpAssign::Operator (
 			CValue MulticastPtrValue;
 			return 
 				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
-				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2);
+				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2, pResultValue);
 		}
 	}
 

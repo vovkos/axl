@@ -289,14 +289,12 @@ CLlvmBuilder::ModifyDataPtr (
 llvm::Value*
 CLlvmBuilder::CreateDataPtrValidator (
 	const CValue& RawRegionBeginValue,
-	size_t Size,
+	const CValue& SizeValue,
 	const CValue& ScopeLevelValue,
 	CValue* pResultValue
 	)
 {
 	CreateComment ("create safe pointer validator");
-
-	CValue SizeValue (Size, EType_SizeT);
 
 	CValue RegionBeginValue;
 	CreateBitCast (RawRegionBeginValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &RegionBeginValue);
@@ -310,24 +308,6 @@ CLlvmBuilder::CreateDataPtrValidator (
 	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionBeginValue, 0, NULL, &ValidatorValue);
 	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionEndValue, 1, NULL, &ValidatorValue);	
 	return m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, ScopeLevelValue, 2, pType, pResultValue);
-}
-
-llvm::Value*
-CLlvmBuilder::CreateDataPtrValidator (
-	const CValue& RegionBeginValue,
-	size_t Size,
-	CScope* pScope,
-	CValue* pResultValue
-	)
-{
-	CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope);
-
-	return CreateDataPtrValidator (
-		RegionBeginValue,
-		Size,
-		ScopeLevelValue,
-		pResultValue
-		);
 }
 
 bool

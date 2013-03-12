@@ -99,6 +99,10 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = GetMulticastType ((CFunctionType*) GetStdType (EStdType_SimpleFunction));
 		break;
 
+	case EStdType_SimpleEventPtr:
+		pType = GetStdType (EStdType_SimpleMulticast)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Event);
+		break;
+
 	case EStdType_StrenthenClosureFunction:
 		pType = GetFunctionType (GetStdType (EStdType_ObjectPtr), GetStdType (EStdType_ObjectPtr), 0);
 		break;
@@ -223,10 +227,15 @@ CTypeMgr::GetArrayType (
 	if (It->m_Value)
 		return (CArrayType*) It->m_Value;
 
+	CType* pRootType = pElementType->m_TypeKind == EType_Array ? 
+		((CArrayType*) pElementType)->m_pRootType : 
+		pElementType;
+
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
 	pType->m_pElementType = pElementType;
+	pType->m_pRootType = pRootType;
 	pType->m_ElementCount = ElementCount;
 	pType->m_Size = pElementType->GetSize () * ElementCount;
 	pType->m_Flags = pElementType->GetFlags () & ETypeFlag_Pod;
@@ -1381,7 +1390,7 @@ CTypeMgr::CreateAutoEvBindSiteType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("aevbindsite");
-	pType->CreateFieldMember (GetStdType (EStdType_SimpleMulticast)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Event));
+	pType->CreateFieldMember (GetStdType (EStdType_SimpleEventPtr));
 	pType->CreateFieldMember (GetPrimitiveType (EType_Int_p));
 	pType->CalcLayout ();
 	return pType;

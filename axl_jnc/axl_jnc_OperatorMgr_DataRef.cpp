@@ -61,18 +61,26 @@ COperatorMgr::GetThinDataPtrValidator (
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
 	{
-		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (Value.GetVariable (), pResultValue);
+		CVariable* pVariable = Value.GetVariable ();
+
+		CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pVariable->GetScope ());
+
+		m_pModule->m_LlvmBuilder.CreateDataPtrValidator (
+			CValue (pVariable->GetLlvmValue (), NULL),
+			CValue (pVariable->GetType ()->GetSize (), EType_SizeT),
+			ScopeLevelValue,
+			pResultValue
+			);
+
 		return;
 	}
 	
-	ASSERT (ValueKind == EValue_Field);
+	ASSERT (ValueKind == EValue_Field && Value.GetClosure ());
 
-	CClosure* pClosure = Value.GetClosure ();
-	ASSERT (pClosure && pClosure->GetArgList ()->GetCount () == 2);
-
-	rtl::CBoxIteratorT <CValue> Arg = pClosure->GetArgList ()->GetHead ();
+	rtl::CBoxIteratorT <CValue> Arg = Value.GetClosure ()->GetArgList ()->GetHead ();
 	CValue ClassPtrValue = *Arg++;
 	CValue RegionBegionValue = *Arg++;
+	CValue SizeValue = *Arg++;
 
 	CValue ObjPtrValue;
 	
@@ -99,7 +107,7 @@ COperatorMgr::GetThinDataPtrValidator (
 
 	m_pModule->m_LlvmBuilder.CreateDataPtrValidator (
 		RegionBegionValue, 
-		Value.GetField ()->GetType ()->GetSize (),
+		SizeValue,
 		ScopeLevelValue,
 		pResultValue
 		);

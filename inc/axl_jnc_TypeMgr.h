@@ -40,6 +40,7 @@ enum EStdType
 	EStdType_ObjectPtr,
 	EStdType_SimpleFunction,
 	EStdType_SimpleMulticast,
+	EStdType_SimpleEventPtr,
 	EStdType_StrenthenClosureFunction,
 	EStdType_AutoEvBindSite,
 	EStdType__Count,

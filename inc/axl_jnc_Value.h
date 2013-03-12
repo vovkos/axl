@@ -398,6 +398,37 @@ public:
 	void
 	SetAutoEv (CAutoEv* pAutoEv);
 
+	void
+	SetVariable (		
+		llvm::Value* pValue,
+		CType* pType,
+		CVariable* pVariable,
+		int Flags = 0
+		);
+
+	void
+	SetField (		
+		llvm::Value* pValue,
+		CType* pType,
+		CStructField* pField,
+		CClosure* pClosure,
+		int Flags = 0
+		);
+
+	void
+	SetLlvmValue (		
+		llvm::Value* pValue,
+		CType* pType,
+		EValue ValueKind = EValue_LlvmRegister
+		);
+
+	void
+	SetLlvmValue (
+		llvm::Value* pValue,
+		EType TypeKind,
+		EValue ValueKind = EValue_LlvmRegister
+		);
+
 	bool
 	CreateConst (
 		const void* p,
@@ -527,36 +558,6 @@ public:
 		SetLiteralA (p, Length);
 #endif
 	}
-
-	void
-	SetLlvmValue (		
-		llvm::Value* pValue,
-		CType* pType,
-		EValue ValueKind = EValue_LlvmRegister
-		);
-
-	void
-	SetLlvmValue (
-		llvm::Value* pValue,
-		EType TypeKind,
-		EValue ValueKind = EValue_LlvmRegister
-		);
-
-	void
-	SetLlvmValue (		
-		llvm::Value* pValue,
-		CType* pType,
-		CVariable* pVariable,
-		int Flags = 0
-		);
-
-	void
-	SetLlvmValue (		
-		llvm::Value* pValue,
-		CType* pType,
-		CStructField* pField,
-		int Flags = 0
-		);
 
 protected:
 	void

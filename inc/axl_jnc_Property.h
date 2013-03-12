@@ -41,7 +41,6 @@ protected:
 	CClassType* m_pParentClassType;
 	CStructField* m_pParentClassFieldMember;
 	size_t m_ParentClassVTableIndex;
-	CStructField* m_pDataFieldMember;
 
 	// fields (augmented fields are stored in a base type)
 
@@ -148,12 +147,6 @@ public:
 	GetParentClassVTableIndex ()
 	{
 		return m_ParentClassVTableIndex;
-	}
-
-	CStructField* 
-	GetDataFieldMember ()
-	{
-		return m_pDataFieldMember;
 	}
 
 	CPropertyType*

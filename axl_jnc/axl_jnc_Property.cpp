@@ -345,8 +345,8 @@ CProperty::AddAutoEvMember (CAutoEv* pAutoEv)
 		//and fall through
 
 	case EStorage_Member:
-		pAutoEv->ConvertToAutoEvMember (m_pParentClassType);
 		m_pParentClassType->m_AutoEvArray.Append (pAutoEv);
+		pAutoEv->m_pParentClassType = m_pParentClassType;
 		break;
 
 	default:

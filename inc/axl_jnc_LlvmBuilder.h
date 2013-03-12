@@ -1085,33 +1085,11 @@ public:
 	llvm::Value*
 	CreateDataPtrValidator (
 		const CValue& RegionBeginValue,
-		size_t Size,
+		const CValue& SizeValue,
 		const CValue& ScopeLevelValue,
 		CValue* pResultValue
 		);
-
-	llvm::Value*
-	CreateDataPtrValidator (
-		const CValue& RegionBeginValue,
-		size_t Size,
-		CScope* pScope,
-		CValue* pResultValue
-		);
-
-	llvm::Value*
-	CreateDataPtrValidator (
-		CVariable* pVariable,
-		CValue* pResultValue
-		)
-	{
-		return CreateDataPtrValidator (
-			CValue (pVariable->GetLlvmValue (), NULL),
-			pVariable->GetType ()->GetSize (),
-			pVariable->GetScope (),
-			pResultValue
-			);
-	}
-
+		
 	bool
 	DynamicCastClassPtr (
 		const CValue& Value,

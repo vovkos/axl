@@ -147,10 +147,22 @@ CBinOp_Idx::ArrayIndexOperator (
 		CValue GepValue;
 		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
 
-		pResultValue->SetLlvmValue (
+		pResultValue->SetVariable (
 			GepValue.GetLlvmValue (), 
-			pElementType->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin),
+			pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
 			OpValue1.GetVariable ()
+			);
+	}
+	else if (OpValue1.GetValueKind () == EValue_Field)
+	{
+		CValue GepValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
+
+		pResultValue->SetField (
+			GepValue.GetLlvmValue (), 
+			pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
+			OpValue1.GetField (),
+			OpValue1.GetClosure ()
 			);
 	}
 	else

@@ -301,7 +301,7 @@ CValue::SetType (EType TypeKind)
 void
 CValue::SetVariable (CVariable* pVariable)
 {
-	return SetLlvmValue (
+	return SetVariable (
 		pVariable->GetLlvmValue (), 
 		pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pVariable->GetPtrTypeFlags ()), 
 		pVariable,
@@ -354,6 +354,72 @@ CValue::SetAutoEv (CAutoEv* pAutoEv)
 	m_pType = pAutoEv->GetType ()->GetAutoEvPtrType (EType_AutoEvRef, EAutoEvPtrType_Thin);
 
 	// don't assign LlvmValue yet cause autoev LlvmValue is only needed for pointers
+}
+
+void
+CValue::SetVariable (		
+	llvm::Value* pValue,
+	CType* pType,
+	CVariable* pVariable,
+	int Flags
+	)
+{
+	Clear ();
+
+	m_ValueKind = EValue_Variable;
+	m_pType = pType;
+	m_pLlvmValue = pValue;
+	m_pVariable = pVariable;
+	m_Flags = Flags;
+}
+
+void
+CValue::SetField (		
+	llvm::Value* pValue,
+	CType* pType,
+	CStructField* pField,
+	CClosure* pClosure,
+	int Flags
+	)
+{
+	ASSERT (pClosure && pClosure->GetArgList ()->GetCount () == 3);
+
+	Clear ();
+
+	m_ValueKind = EValue_Field;
+	m_pType = pType;
+	m_pLlvmValue = pValue;
+	m_pField = pField;
+	m_Closure = pClosure;
+	m_Flags = Flags;
+}
+
+void
+CValue::SetLlvmValue (
+	llvm::Value* pValue,
+	CType* pType,
+	EValue ValueKind
+	)
+{
+	Clear ();
+
+	m_ValueKind = ValueKind;
+	m_pType = pType;
+	m_pLlvmValue = pValue;
+}
+
+void
+CValue::SetLlvmValue (
+	llvm::Value* pValue,
+	EType TypeKind,
+	EValue ValueKind
+	)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
+	SetLlvmValue (pValue, pType, ValueKind);
 }
 
 bool
@@ -425,62 +491,6 @@ CValue::SetLiteralW (
 
 	CreateConst (p, pModule->m_TypeMgr.GetLiteralTypeW (Length));
 	((wchar_t*) GetConstData ()) [Length] = 0;
-}
-
-void
-CValue::SetLlvmValue (
-	llvm::Value* pValue,
-	CType* pType,
-	EValue ValueKind
-	)
-{
-	Clear ();
-
-	m_ValueKind = ValueKind;
-	m_pType = pType;
-	m_pLlvmValue = pValue;
-}
-
-void
-CValue::SetLlvmValue (
-	llvm::Value* pValue,
-	EType TypeKind,
-	EValue ValueKind
-	)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	SetLlvmValue (pValue, pType, ValueKind);
-}
-
-void
-CValue::SetLlvmValue (		
-	llvm::Value* pValue,
-	CType* pType,
-	CVariable* pVariable,
-	int Flags
-	)
-{
-	SetLlvmValue (pValue, pType, EValue_Variable);
-
-	m_pVariable = pVariable;
-	m_Flags = Flags;
-}
-
-void
-CValue::SetLlvmValue (		
-	llvm::Value* pValue,
-	CType* pType,
-	CStructField* pField,
-	int Flags
-	)
-{
-	SetLlvmValue (pValue, pType, EValue_Field);
-
-	m_pField = pField;
-	m_Flags = Flags;
 }
 
 //.............................................................................

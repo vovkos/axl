@@ -86,6 +86,7 @@ statement
 	| break_stmt
 	| continue_stmt
 	| return_stmt
+	| ';'
 	;
 
 expression_stmt

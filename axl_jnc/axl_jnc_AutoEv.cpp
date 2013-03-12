@@ -15,9 +15,9 @@ CAutoEv::CAutoEv ()
 	m_pType = NULL;
 	m_pStarter = NULL;
 	m_pStopper = NULL;
-	m_pClassType = NULL;
+	m_pParentClassType = NULL;
 
-	m_pClassFieldMember = NULL;
+	m_pParentClassFieldMember = NULL;
 	m_pFieldStructType = NULL;
 	m_pBindSiteArrayField = NULL;
 	m_pStaticDataVariable = NULL;
@@ -31,19 +31,32 @@ CAutoEv::Create (
 	rtl::CStdListT <CFunctionFormalArg>* pArgList
 	)
 {
+	ASSERT (m_StorageKind);
+
 	m_pType = pType;
 	m_pStarter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_AutoEvStarter, pType->GetStarterType (), pArgList);
+	m_pStarter->m_StorageKind = m_StorageKind;
 	m_pStarter->m_pParentNamespace = this;
 	m_pStarter->m_pAutoEv = this;
 	m_pStarter->m_Tag = m_Tag + _T(".Start");
 	
 	m_pStopper = m_pModule->m_FunctionMgr.CreateFunction (EFunction_AutoEvStopper, pType->GetStopperType ());
+	m_pStopper->m_StorageKind = m_StorageKind;
 	m_pStopper->m_pParentNamespace = this;
 	m_pStopper->m_pAutoEv = this;
 	m_pStopper->m_Tag = m_Tag + _T(".Stop");
 
 	m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pFieldStructType->m_StorageKind = m_StorageKind;
 	m_pFieldStructType->m_pParentNamespace = this;
+
+	if (m_pParentClassType)
+	{
+		m_pParentClassFieldMember = m_pParentClassType->GetIfaceStructType ()->CreateFieldMember (m_pFieldStructType);
+		m_pType = m_pType->GetAutoEvMemberType (m_pParentClassType);
+		m_pStarter->ConvertToMethodMember (m_pParentClassType);
+		m_pStopper->ConvertToMethodMember (m_pParentClassType);
+	}
 
 	rtl::CIteratorT <CFunctionFormalArg> Arg = m_pStarter->GetArgList ().GetHead ();
 	for (; Arg; Arg++)
@@ -68,22 +81,10 @@ CAutoEv::CreateHandler ()
 	pHandler->m_pAutoEv = this;
 	pHandler->m_Tag = m_Tag + _T(".Handler");
 
-	if (m_pClassType)
-		pHandler->ConvertToMethodMember (m_pClassType);
+	if (m_pParentClassType)
+		pHandler->ConvertToMethodMember (m_pParentClassType);
 
 	return pHandler;
-}
-
-void
-CAutoEv::ConvertToAutoEvMember (CClassType* pClassType)
-{
-	ASSERT (!m_pClassType && !m_pClassFieldMember);
-	
-	m_pClassType = pClassType;
-	m_pClassFieldMember = pClassType->GetIfaceStructType ()->CreateFieldMember (m_pFieldStructType);
-	m_pType = m_pType->GetAutoEvMemberType (pClassType);
-	m_pStarter->ConvertToMethodMember (pClassType);
-	m_pStopper->ConvertToMethodMember (pClassType);
 }
 
 bool

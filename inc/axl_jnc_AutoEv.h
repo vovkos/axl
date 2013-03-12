@@ -25,10 +25,12 @@ protected:
 	CAutoEvType* m_pType;
 	CFunction* m_pStarter;
 	CFunction* m_pStopper;
-	CClassType* m_pClassType;
-	CStructField* m_pClassFieldMember;
+	
+	CClassType* m_pParentClassType;
+	CStructField* m_pParentClassFieldMember;
+	
 	CStructType* m_pFieldStructType;
-	CStructField* m_pBindSiteArrayField;
+	CStructField* m_pBindSiteArrayField;	
 	CVariable* m_pStaticDataVariable;
 
 	rtl::CBoxListT <CToken> m_Body;
@@ -63,21 +65,27 @@ public:
 	}
 
 	CClassType* 
-	GetClassType ()
+	GetParentClassType ()
 	{
-		return m_pClassType;
+		return m_pParentClassType;
 	}
 
 	CStructField* 
-	GetClassFieldMember ()
+	GetParentClassFieldMember ()
 	{
-		return m_pClassFieldMember;
+		return m_pParentClassFieldMember;
 	}
 
 	CStructType* 
 	GetFieldStructType ()
 	{
 		return m_pFieldStructType;
+	}
+
+	size_t 
+	GetBindSiteCount ()
+	{
+		return m_BindSiteCount;
 	}
 
 	CStructField* 
@@ -97,9 +105,6 @@ public:
 	{
 		return m_StorageKind == EStorage_Member;
 	}
-
-	void
-	ConvertToAutoEvMember (CClassType* pClassType);
 
 	bool
 	HasBody ()

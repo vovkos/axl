@@ -238,6 +238,10 @@ CFunctionMgr::CompileFunctions ()
 
 	// (2) autoevs
 
+	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
+	CStructField* pEventPtrField = *pBindSiteType->GetFieldMemberList ().GetHead ();
+	CStructField* pCookieField = *pBindSiteType->GetFieldMemberList ().GetTail ();
+
 	rtl::CIteratorT <CAutoEv> AutoEv = m_AutoEvList.GetHead ();
 	for (; AutoEv; AutoEv++)
 	{
@@ -246,13 +250,13 @@ CFunctionMgr::CompileFunctions ()
 
 		CFunction* pStarter = pAutoEv->GetStarter ();
 
-		// prologue
+		// starter prologue
 
 		Result = Prologue (pStarter, pAutoEv->GetBody ()->GetHead ()->m_Pos);
 		if (!Result)
 			return false;
 
-		// body
+		// starter body
 
 		CParser Parser;
 		Parser.m_Stage = CParser::EStage_Pass2;
@@ -264,7 +268,7 @@ CFunctionMgr::CompileFunctions ()
 
 		pAutoEv->m_Ast = Parser.GetAst ();
 
-		// epilogue
+		// starter epilogue
 
 		Result = Epilogue (pAutoEv->GetBody ()->GetTail ()->m_Pos);
 		if (!Result)
@@ -272,9 +276,40 @@ CFunctionMgr::CompileFunctions ()
 
 		CFunction* pStopper = pAutoEv->GetStopper ();
 
-		InternalPrologue (pStopper, NULL, 0);
+		// stopper prologue
 
-		// remove all the event handlers added in starter
+		if (pStopper->IsMember ())
+			InternalPrologue (pStopper, &m_ThisValue, 1);			 
+		else
+			InternalPrologue (pStopper, NULL, 0);
+
+		// stopper body: disconnect all event handlers
+
+		CValue BindSiteArrayValue;
+		Result = m_pModule->m_OperatorMgr.GetAutoEvBindSiteArray (pAutoEv, &BindSiteArrayValue);
+		if (!Result)
+			return false;
+
+		size_t Count = pAutoEv->GetBindSiteCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CValue IdxValue (i, EType_SizeT);
+			CValue BindSiteValue;
+			CValue OnChangeValue;
+			CValue CookieValue;
+
+			Result = 
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
+				m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
+				m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pCookieField, NULL, &CookieValue) &&
+				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangeValue) &&
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_SubAssign, OnChangeValue, CookieValue);
+
+			if (!Result)
+				return false;
+		}
+
+		// stopper epilogue
 
 		InternalEpilogue ();
 	}
@@ -472,10 +507,8 @@ CFunctionMgr::Prologue (
 
 			CValue ArgValue (pLlvmArg, pArg->GetType ());
 
-			CBaseTypeCoord Coord;
 			CValue StoreValue;
-
-			Result = m_pModule->m_OperatorMgr.GetStructFieldMember (ArgFieldValue, pArgField, &Coord, &StoreValue);
+			Result = m_pModule->m_OperatorMgr.GetStructFieldMember (ArgFieldValue, pArgField, NULL, &StoreValue);
 			if (!Result)
 				return false;
 			
@@ -548,7 +581,10 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	{
 		ASSERT (pFunction->m_pClassType && m_ThisValue);
 
-		Result = pFunction->m_pClassType->CallBaseDestructors (m_ThisValue);
+		Result = 
+			pFunction->m_pClassType->StopAutoEvs (m_ThisValue) &&
+			pFunction->m_pClassType->CallBaseDestructors (m_ThisValue);
+
 		if (!Result)
 			return false;
 	}

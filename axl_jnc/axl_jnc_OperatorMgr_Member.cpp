@@ -46,13 +46,11 @@ COperatorMgr::GetFieldMember (
 			return false;
 		}
 
-		CBaseTypeCoord Coord;
-
 		CValue FieldValue;
 		Result = GetClassFieldMember (
 			ThisValue, 
-			pProperty->GetDataFieldMember (),
-			&Coord,
+			pProperty->GetParentClassFieldMember (),
+			NULL,
 			&FieldValue
 			);
 
@@ -82,7 +80,7 @@ COperatorMgr::GetFieldMember (
 				);
 		}
 
-		CClassType* pParentClassType = pAutoEv->GetClassType ();
+		CClassType* pParentClassType = pAutoEv->GetParentClassType ();
 		ASSERT (pParentClassType);
 
 		if (!ThisValue)
@@ -91,13 +89,11 @@ COperatorMgr::GetFieldMember (
 			return false;
 		}
 
-		CBaseTypeCoord Coord;
-
 		CValue FieldValue;
 		Result = GetClassFieldMember (
 			ThisValue, 
-			pAutoEv->GetClassFieldMember (),
-			&Coord,
+			pAutoEv->GetParentClassFieldMember (),
+			NULL,
 			&FieldValue
 			);
 
@@ -397,6 +393,10 @@ COperatorMgr::GetStructFieldMember (
 	CValue* pResultValue
 	)
 {
+	CBaseTypeCoord Coord;
+	if (!pCoord)
+		pCoord = &Coord;
+
 	pCoord->m_LlvmIndexArray.Append (pField->GetLlvmIndex ());
 	pCoord->m_Offset += pField->GetOffset ();
 	
@@ -458,7 +458,7 @@ COperatorMgr::GetStructFieldMember (
 			&PtrValue
 			);
 		
-		pResultValue->SetLlvmValue(
+		pResultValue->SetVariable (
 			PtrValue.GetLlvmValue (), 
 			pResultType,
 			OpValue.GetVariable (), 
@@ -478,10 +478,11 @@ COperatorMgr::GetStructFieldMember (
 			&PtrValue
 			);
 		
-		pResultValue->SetLlvmValue(
+		pResultValue->SetField (
 			PtrValue.GetLlvmValue (), 
 			pResultType,
 			OpValue.GetField (), 
+			OpValue.GetClosure (),
 			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate 
 			);
 	}
@@ -601,7 +602,7 @@ COperatorMgr::GetUnionFieldMember (
 		CValue CastValue;
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pCastType, &CastValue);
 
-		pResultValue->SetLlvmValue (
+		pResultValue->SetVariable (
 			CastValue.GetLlvmValue (), 
 			pResultType,
 			OpValue.GetVariable (), 
@@ -849,6 +850,10 @@ COperatorMgr::GetClassFieldMember (
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 	CClassType* pClassType = (CClassType*) pMember->GetParentType ()->GetParentNamespace ();
 
+	CBaseTypeCoord Coord;
+	if (!pCoord)
+		pCoord = &Coord;
+
 	pCoord->m_LlvmIndexArray.Insert (0, 0);
 	pCoord->m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
 
@@ -871,15 +876,19 @@ COperatorMgr::GetClassFieldMember (
 
 	CDataPtrType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
-	pResultValue->SetLlvmValue (
+	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
+	Closure->GetArgList ()->InsertTail (OpValue);
+	Closure->GetArgList ()->InsertTail (PtrValue);
+	Closure->GetArgList ()->InsertTail (CValue (pMember->GetType ()->GetSize (), EType_SizeT));
+
+	pResultValue->SetField (
 		PtrValue.GetLlvmValue (),
 		pResultType,
 		pMember,
+		Closure,
 		EValueFlag_NoDataPtrRangeCheck
 		);
 
-	CClosure* pClosure = pResultValue->CreateClosure ();
-	pClosure->GetArgList ()->InsertHead (OpValue);
 	return true;
 }
 
@@ -893,10 +902,8 @@ COperatorMgr::GetClassFieldMemberValue (
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
 	CValue FieldValue;
-	CBaseTypeCoord ClosureCoord;
-
 	return 
-		GetClassFieldMember (ObjValue, pMember, &ClosureCoord, &FieldValue) && 
+		GetClassFieldMember (ObjValue, pMember, NULL, &FieldValue) && 
 		LoadDataRef (FieldValue, pValue);
 }
 
@@ -910,10 +917,8 @@ COperatorMgr::SetClassFieldMemberValue (
 	ASSERT (ObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
 
 	CValue FieldValue;
-	CBaseTypeCoord ClosureCoord;
-
 	return 
-		GetClassFieldMember (ObjValue, pMember, &ClosureCoord, &FieldValue) && 
+		GetClassFieldMember (ObjValue, pMember, NULL, &FieldValue) && 
 		BinaryOperator (EBinOp_Assign, FieldValue, Value);
 }
 
@@ -1145,12 +1150,6 @@ COperatorMgr::GetAutoEvData (
 {
 	if (pAutoEv->GetStorageKind () == EStorage_Static)
 	{
-		err::SetFormatStringError (_T("non-static 'onchange' is not implemented yet"));
-		return false;
-	}
-
-	if (pAutoEv->GetStorageKind () == EStorage_Static)
-	{
 		CVariable* pStaticVariable = pAutoEv->GetStaticDataVariable ();
 		ASSERT (pStaticVariable);
 
@@ -1160,10 +1159,28 @@ COperatorMgr::GetAutoEvData (
 
 	CBaseTypeCoord Coord;
 	return GetFieldMember (
-		pAutoEv->GetClassFieldMember (),
+		pAutoEv->GetParentClassFieldMember (),
 		&Coord, 
 		pResultValue
 		);
+}
+
+bool
+COperatorMgr::GetAutoEvBindSiteArray (
+	CAutoEv* pAutoEv,
+	CValue* pResultValue
+	)
+{
+	CValue AutoEvDataValue;
+
+	return
+		GetAutoEvData (pAutoEv, &AutoEvDataValue) &&
+		GetStructFieldMember (
+			AutoEvDataValue, 
+			pAutoEv->GetBindSiteArrayField (),
+			NULL, 
+			pResultValue
+			);
 }
 
 //.............................................................................
