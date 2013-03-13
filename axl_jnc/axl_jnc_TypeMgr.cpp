@@ -111,6 +111,14 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateAutoEvBindSiteType ();
 		break;
 
+	case EStdType_IScheduler:
+		pType = CreateISchedulerType ();
+		break;
+
+	case EStdType_ISchedulerPtr:
+		pType = ((CClassType*) GetStdType (EStdType_IScheduler))->GetClassPtrType ();
+		break;
+
 	default:
 		ASSERT (false);
 		return NULL;
@@ -1392,6 +1400,18 @@ CTypeMgr::CreateAutoEvBindSiteType ()
 	pType->m_Tag = _T("aevbindsite");
 	pType->CreateFieldMember (GetStdType (EStdType_SimpleEventPtr));
 	pType->CreateFieldMember (GetPrimitiveType (EType_Int_p));
+	pType->CalcLayout ();
+	return pType;
+}
+
+CClassType* 
+CTypeMgr::CreateISchedulerType ()
+{
+	CClassType* pType = CreateClassType (_T("IScheduler"), _T("IScheduler"));
+	CType* pReturnType = GetPrimitiveType (EType_Void);
+	CType* pArgType = ((CFunctionType*) GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType ();
+	CFunctionType* pScheduleType = GetFunctionType (pReturnType, &pArgType, 1);
+	pType->CreateMethodMember (EStorage_Abstract, _T("Schedule"), pScheduleType);
 	pType->CalcLayout ();
 	return pType;
 }

@@ -3,7 +3,6 @@
 class IScheduler
 {
 	abstract 
-	bool 
 	Schedule (function* pfn ());
 };
 
@@ -12,20 +11,18 @@ class IScheduler
 class CNewThreadScheduler: IScheduler
 {
 	override
-	bool 
 	Schedule (function* pfn ())
 	{
 		printf ("CNewThreadScheduler.Schedule ()\n");
-		pfn ();
-		return true;
+		CreateThread (pfn);
 	}
 };
 
 //.............................................................................
 
-foo ()
+foo (int x)
 {
-	printf ("foo () TID: %d\n", GetCurrentThreadId ());
+	printf ("foo (%d) TID: %d\n", x, GetCurrentThreadId ());
 }
 
 int 
@@ -33,13 +30,11 @@ main ()
 {
 	printf ("main () TID: %d\n", GetCurrentThreadId ());
 
-	foo ();
+	foo (5);
 
 	IScheduler s = stack new CNewThreadScheduler;
 
-	IScheduler class* s2 = s;
-
-//	s.Schedule (foo);
+	(foo @ s) (10);
 
 	return 0;
 }
@@ -57,8 +52,5 @@ GetCurrentThreadId ();
 
 bool
 CreateThread (function* pfn ());
-
-void
-IfaceTest (CNewThreadScheduler);
 
 //.............................................................................

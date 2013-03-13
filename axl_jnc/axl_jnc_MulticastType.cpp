@@ -97,14 +97,12 @@ CMulticastType::GetMethod (
 CFunction* 
 CMulticastType::CreateClearMethod ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	CType* ArgTypeArray [] =
 	{
 		GetDataPtrType (EDataPtrType_Normal),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastClear_s"), pType);
 
 	CValue ArgValue;
@@ -124,14 +122,12 @@ CMulticastType::CreateClearMethod_u ()
 {
 	ASSERT (false);
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		GetDataPtrType (EDataPtrType_Unsafe),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastClear_u"), pType);
 
 	CValue ArgValue;
@@ -486,13 +482,11 @@ CMulticastType::CreateSnapshotMethod_u ()
 CFunction* 
 CMulticastType::CreateCallMethod ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, GetDataPtrType (EDataPtrType_Normal));
 	size_t ArgCount = ArgTypeArray.GetCount ();
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastCall_s"), pType);
 
 	char Buffer [256];
@@ -524,13 +518,11 @@ CMulticastType::CreateCallMethod ()
 CFunction* 
 CMulticastType::CreateCallMethod_u ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, GetDataPtrType (EDataPtrType_Unsafe));
 	size_t ArgCount = ArgTypeArray.GetCount ();
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastCall_u"), pType);
 
 	char Buffer [256];

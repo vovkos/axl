@@ -22,17 +22,16 @@ CCast_FunctionPtr_Base::GetCastKind (
 
 	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
 
-	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetType ();
+	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetClosureAwareType ();
 	CFunctionPtrType* pDstPtrType = (CFunctionPtrType*) pType;
 
-	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure)
-		pSrcPtrType = pClosure->GetFunctionClosureType (pSrcPtrType);
+	if (!pSrcPtrType)
+		return ECast_None;
 
-	CFunctionType* pSrcFunctionType = pSrcPtrType->GetTargetType ();
-	CFunctionType* pDstFunctionType = pDstPtrType->GetTargetType ();
-	
-	return m_pModule->m_OperatorMgr.GetFunctionCastKind (pSrcFunctionType, pDstFunctionType);
+	return m_pModule->m_OperatorMgr.GetFunctionCastKind (
+		pSrcPtrType->GetTargetType (), 
+		pDstPtrType->GetTargetType ()
+		);
 }
 
 //.............................................................................

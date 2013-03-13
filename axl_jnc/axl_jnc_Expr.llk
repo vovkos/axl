@@ -668,10 +668,6 @@ member_operator <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $n.m_Data.m_String);
 		}
-	| EToken_Weak EToken_Identifier $n
-		{
-			return m_pModule->m_OperatorMgr.WeakMemberOperator ($pValue, $n.m_Data.m_String);
-		}
 	| EToken_OnChange
 		{
 			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChange);

@@ -216,7 +216,7 @@ protected:
 		CDataPtrType* pType = (CDataPtrType*) OpValue1.GetType ();
 		if (pType->GetTypeKind () != EType_DataPtr)
 		{
-			SetOperatorError (OpValue1.GetType (), OpValue2.GetType ());
+			SetOperatorError (OpValue1, OpValue2);
 			return false;
 		}
 

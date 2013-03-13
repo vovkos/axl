@@ -808,16 +808,10 @@ COperatorMgr::PrepareOperandType (
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
-				CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
+				CPropertyPtrType* pPtrType = (CPropertyPtrType*) Value.GetClosureAwareType ();
+				if (!pPtrType)
+					break;
 
-				CClosure* pClosure = Value.GetClosure ();
-				if (pClosure)
-				{
-					pPtrType = pClosure->GetPropertyClosureType (pPtrType);
-					if (!pPtrType)
-						break;
-				}
-			
 				CPropertyType* pTargetType = pPtrType->GetTargetType ();
 				if (!pTargetType->IsIndexed ())
 					Value = pTargetType->GetReturnType ();
@@ -890,15 +884,9 @@ COperatorMgr::PrepareOperand (
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
-				CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
-
-				CClosure* pClosure = Value.GetClosure ();
-				if (pClosure)
-				{
-					pPtrType = pClosure->GetPropertyClosureType (pPtrType);
-					if (!pPtrType)
-						break;
-				}
+				CPropertyPtrType* pPtrType = (CPropertyPtrType*) Value.GetClosureAwareType ();
+				if (!pPtrType)
+					return false;
 			
 				CPropertyType* pTargetType = pPtrType->GetTargetType ();
 				if (!pTargetType->IsIndexed ())

@@ -30,6 +30,7 @@ GetFunctionKindString (EFunction FunctionKind)
 		_T("autoev-handler"),           // EFunction_AutoEvHandler,
 		_T("internal"),                 // EFunction_Internal, 
 		_T("thunk"),                    // EFunction_Thunk,
+		_T("schedule-launcher"),        // EFunction_ScheduleLauncher,
 	};
 
 	return (size_t) FunctionKind < EFunction__Count ? 

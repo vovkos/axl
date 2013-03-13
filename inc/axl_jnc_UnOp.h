@@ -105,6 +105,12 @@ public:
 			pOpType->GetTypeString ()
 			);
 	}
+
+	err::CError
+	SetOperatorError (const CValue& OpValue)
+	{
+		return SetOperatorError (OpValue.GetType ());
+	}
 };
 
 //.............................................................................

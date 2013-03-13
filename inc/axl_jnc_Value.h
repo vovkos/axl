@@ -321,6 +321,12 @@ public:
 		const void* p
 		);
 
+	bool
+	HasClosure () const
+	{
+		return m_Closure != NULL;
+	}
+
 	CClosure*
 	GetClosure () const
 	{
@@ -332,6 +338,9 @@ public:
 		
 	CClosure*
 	CreateClosure ();
+
+	CType*
+	GetClosureAwareType () const;
 
 	void
 	OverrideType (CType* pType)

@@ -260,42 +260,6 @@ COperatorMgr::MemberOperator (
 }
 
 CType*
-COperatorMgr::GetWeakMemberOperatorResultType (
-	const CValue& RawOpValue,
-	const tchar_t* pName
-	)
-{
-	err::SetFormatStringError (_T("weak member operator is not implemented yet"));
-	return NULL;
-}
-
-bool
-COperatorMgr::GetWeakMemberOperatorResultType (
-	const CValue& RawOpValue,
-	const tchar_t* pName,
-	CValue* pResultValue
-	)
-{
-	CType* pResultType = GetWeakMemberOperatorResultType (RawOpValue, pName);
-	if (!pResultType)
-		return false;
-
-	pResultValue->SetType (pResultType);
-	return true;
-}
-
-bool
-COperatorMgr::WeakMemberOperator (
-	const CValue& RawOpValue,
-	const tchar_t* pName,
-	CValue* pResultValue
-	)
-{
-	err::SetFormatStringError (_T("weak member operator is not implemented yet"));
-	return false;
-}
-
-CType*
 COperatorMgr::GetFieldMemberType (
 	const CValue& OpValue,
 	CStructField* pMember

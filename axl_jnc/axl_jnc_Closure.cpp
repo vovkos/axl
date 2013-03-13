@@ -82,12 +82,7 @@ CClosure::GetClosureType (CType* pType)
 		return GetPropertyClosureType ((CPropertyPtrType*) pType);
 
 	default:
-		err::SetFormatStringError (
-			_T("cannot apply closure to '%s'"), 
-			pType->GetTypeString ()
-			);
-
-		return NULL;
+		return pType;
 	}
 }
 

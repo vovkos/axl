@@ -256,6 +256,12 @@ CValue::SetClosure (CClosure* pClosure)
 	m_Closure = pClosure;
 }
 
+CType*
+CValue::GetClosureAwareType () const
+{
+	return m_Closure ? m_Closure->GetClosureType (m_pType) : m_pType;
+}
+
 void
 CValue::OverrideType (EType TypeKind)
 {

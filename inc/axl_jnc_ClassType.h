@@ -204,9 +204,23 @@ public:
 
 	bool
 	AddMethodMember (CFunction* pFunction);
+	
+	CFunction*
+	CreateMethodMember (
+		EStorage StorageKind,
+		const rtl::CString& Name,
+		CFunctionType* pShortType
+		);
 
 	bool
 	AddPropertyMember (CProperty* pProperty);
+
+	CProperty*
+	CreatePropertyMember (
+		EStorage StorageKind,
+		const rtl::CString& Name,
+		CPropertyType* pShortType
+		);
 
 	bool
 	AddAutoEvMember (CAutoEv* pAutoEv);

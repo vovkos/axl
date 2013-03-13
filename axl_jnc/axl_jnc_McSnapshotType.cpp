@@ -50,13 +50,11 @@ CMcSnapshotType::GetCallMethod ()
 	if (m_pCallMethod)
 		return m_pCallMethod;
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-
 	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, this);
 	size_t ArgCount = ArgTypeArray.GetCount ();
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("McSnapshotCall"), pType);
 
 	char Buffer [256];

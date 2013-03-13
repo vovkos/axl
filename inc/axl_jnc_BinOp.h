@@ -147,6 +147,15 @@ public:
 			pOpType2->GetTypeString ()
 			);
 	}
+
+	err::CError
+	SetOperatorError (		
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		return SetOperatorError (OpValue1.GetType (), OpValue2.GetType ());
+	}
 };
 
 //.............................................................................

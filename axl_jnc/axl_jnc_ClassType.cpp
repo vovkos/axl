@@ -304,6 +304,49 @@ CClassType::AddAutoEvMember (CAutoEv* pAutoEv)
 	return true;
 }
 
+CFunction*
+CClassType::CreateMethodMember (
+	EStorage StorageKind,
+	const rtl::CString& Name,
+	CFunctionType* pShortType
+	)
+{
+	rtl::CString QualifiedName = CreateQualifiedName (Name);
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Named, pShortType);
+	pFunction->m_StorageKind = StorageKind;
+	pFunction->m_Name = Name;
+	pFunction->m_QualifiedName = QualifiedName;
+	pFunction->m_Tag = QualifiedName;
+
+	bool Result = AddMethodMember (pFunction);
+	if (!Result)
+		return NULL;
+
+	return pFunction;
+}
+
+CProperty*
+CClassType::CreatePropertyMember (
+	EStorage StorageKind,
+	const rtl::CString& Name,
+	CPropertyType* pShortType
+	)
+{
+	rtl::CString QualifiedName = CreateQualifiedName (Name);
+
+	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
+
+	bool Result = 
+		AddPropertyMember (pProperty) &&
+		pProperty->Create (pShortType);
+
+	if (!Result)
+		return NULL;
+	
+	return pProperty;
+}
+
 bool
 CClassType::CalcLayout ()
 {
@@ -698,14 +741,12 @@ CClassType::CreateDefaultConstructor ()
 {
 	ASSERT (!m_pConstructor);
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		GetClassPtrType ()
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
 	pFunction->m_Tag = m_Tag + _T(".this");
 
@@ -753,14 +794,12 @@ CClassType::CreateDefaultDestructor ()
 {
 	ASSERT (!m_pDestructor);
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		GetClassPtrType ()
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
 	pFunction->m_Tag = m_Tag + _T(".~this");
 		
@@ -786,15 +825,13 @@ CClassType::GetInitializer ()
 	if (m_pInitializer)
 		return m_pInitializer;
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		GetClassStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + _T(".init"), pType);
 
 	CValue ArgValueArray [countof (ArgTypeArray)];

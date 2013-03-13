@@ -504,44 +504,6 @@ public:
 		return MemberOperator (*pValue, pName, pValue);
 	}
 
-	CType*
-	GetWeakMemberOperatorResultType (
-		const CValue& OpValue,
-		const tchar_t* pName
-		);
-
-	bool
-	GetWeakMemberOperatorResultType (
-		const CValue& OpValue,
-		const tchar_t* pName,
-		CValue* pResultValue
-		);
-
-	bool
-	GetWeakMemberOperatorResultType (
-		CValue* pValue,
-		const tchar_t* pName
-		)
-	{
-		return GetWeakMemberOperatorResultType (*pValue, pName, pValue);
-	}
-
-	bool
-	WeakMemberOperator (
-		const CValue& OpValue,
-		const tchar_t* pName,
-		CValue* pResultValue
-		);
-
-	bool
-	WeakMemberOperator (
-		CValue* pValue,
-		const tchar_t* pName
-		)
-	{
-		return WeakMemberOperator (*pValue, pName, pValue);
-	}
-
 	// call operators
 
 	CType*

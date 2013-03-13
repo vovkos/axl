@@ -1195,9 +1195,8 @@ CParser::CreateAutoEvClassType (
 
 	AssignDeclarationAttributes (pClassType, pNamespace, m_LastMatchedToken.m_Pos);
 
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 	CFunctionType* pStarterType = pFunctionSuffix ? m_pModule->m_TypeMgr.GetFunctionType (
-		pReturnType, 
+		NULL, 
 		pFunctionSuffix->GetArgTypeArray (),
 		pFunctionSuffix->GetFunctionTypeFlags ()
 		) : 

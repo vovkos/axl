@@ -29,6 +29,7 @@ CFunctionMgr::Clear ()
 	m_ThunkList.Clear ();
 	m_ThunkFunctionMap.Clear ();
 	m_ThunkPropertyMap.Clear ();
+	m_ScheduleLauncherFunctionMap.Clear ();
 	m_EmissionContextStack.Clear ();
 
 	m_pCurrentFunction = NULL;
@@ -460,6 +461,10 @@ CFunctionMgr::Prologue (
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 
+	// save scope level
+
+	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
+
 	// store arguments
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
@@ -537,8 +542,6 @@ CFunctionMgr::Prologue (
 			pScope->AddItem (pArgVariable);
 		}
 	}
-
-	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
 
 	if (pFunction->NeedsVTablePtrCut () ||
 		pFunction->m_FunctionKind == EFunction_Setter &&
@@ -663,6 +666,8 @@ CFunctionMgr::InternalPrologue (
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
+
+	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
 
 	if (!ArgCount)
 		return;	
@@ -973,6 +978,85 @@ CFunctionMgr::GetClosureThunkProperty (
 
 	pThunkProperty->CalcLayout ();
 	return pThunkProperty;
+}
+
+CFunction*
+CFunctionMgr::GetScheduleLauncherFunction (
+	CFunctionPtrType* pTargetFunctionPtrType,
+	CFunction* pTargetFunction, // could be NULL
+	CClassPtrType* pSchedulerType // could be weak
+	)
+{
+	bool Result;
+
+	rtl::CStringA Signature;
+	Signature.Format (
+		"%s.%x.%s", 
+		pTargetFunctionPtrType->GetSignature (),
+		pTargetFunction, 
+		pSchedulerType->GetSignature ()
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CFunction*> Thunk = m_ScheduleLauncherFunctionMap.Goto (Signature);
+	if (Thunk->m_Value)
+		return Thunk->m_Value;
+
+	size_t SchedulerIdx = 0;
+
+	rtl::CArrayT <CType*> ArgTypeArray  = pTargetFunctionPtrType->GetTargetType ()->GetArgTypeArray ();
+	if (!pTargetFunction)
+	{
+		ArgTypeArray.Insert (0, pTargetFunctionPtrType);
+		ArgTypeArray.Insert (1, pSchedulerType);
+		SchedulerIdx = 1;
+	}
+	else
+	{
+		ArgTypeArray.Insert (0, pSchedulerType);
+		SchedulerIdx = 0;
+	}
+
+	CFunctionType* pLauncherType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+	CFunction* pLauncher = CreateFunction (EFunction_ScheduleLauncher, pLauncherType);
+	pLauncher->m_Tag = _T("_schedule_launcher_function");
+	
+	size_t ArgCount = ArgTypeArray.GetCount (); 
+
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);
+
+	InternalPrologue (pLauncher, ArgValueArray, ArgCount);
+
+	CValue ScheduleValue;
+	m_pModule->m_OperatorMgr.MemberOperator (ArgValueArray [SchedulerIdx], _T("Schedule"), &ScheduleValue);
+
+	CValue FunctionPtrValue;
+
+	if (pTargetFunction)
+		FunctionPtrValue = pTargetFunction;
+	else
+		FunctionPtrValue = ArgValueArray [0];
+
+	if (ArgCount > SchedulerIdx + 1)
+	{
+		rtl::CBoxListT <CValue> ArgList;
+		for (size_t i = SchedulerIdx + 1; i < ArgCount; i++)
+			ArgList.InsertTail (ArgValueArray [i]);
+
+		Result = m_pModule->m_OperatorMgr.ClosureOperator (&FunctionPtrValue, &ArgList);
+		if (!Result)
+			return NULL;
+	}
+
+	m_pModule->m_OperatorMgr.CallOperator (ScheduleValue, FunctionPtrValue);
+	if (!Result)
+		return NULL;
+	
+	InternalEpilogue ();
+
+	Thunk->m_Value = pLauncher;
+	return pLauncher;
 }
 
 bool
@@ -1680,14 +1764,12 @@ CFunctionMgr::CreateUHeapAlloc ()
 CFunction*
 CFunctionMgr::CreateUHeapFree ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction (_T("jnc.UHeapFree"), pType);
 }
 
@@ -1697,14 +1779,12 @@ CFunctionMgr::CreateUHeapFree ()
 CFunction*
 CFunctionMgr::CreateUHeapFreeClassPtr ()
 {
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction (_T("jnc.UHeapFree"), pType);
 }
 

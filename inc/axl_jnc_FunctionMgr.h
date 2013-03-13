@@ -184,6 +184,7 @@ protected:
 	rtl::CStdListT <TThunk> m_ThunkList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
 	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
+	rtl::CStringHashTableMapAT <CFunction*> m_ScheduleLauncherFunctionMap;
 
 	CFunction* m_pCurrentFunction;
 	
@@ -354,6 +355,13 @@ public:
 		CClassType* pClosureType,
 		const rtl::CArrayT <size_t>& ClosureMap,
 		CPropertyType* pThunkPropertyType
+		);
+
+	CFunction*
+	GetScheduleLauncherFunction (
+		CFunctionPtrType* pTargetFunctionPtrType,
+		CFunction* pTargetFunction, // could be NULL
+		CClassPtrType* pSchedulerType // could be weak
 		);
 
 protected:

@@ -16,17 +16,16 @@ CCast_PropertyPtr_Base::GetCastKind (
 {
 	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
 
-	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
+	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetClosureAwareType ();
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
 
-	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure)
-		pSrcPtrType = pClosure->GetPropertyClosureType (pSrcPtrType);
+	if (!pSrcPtrType)
+		return ECast_None;
 
-	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();
-	CPropertyType* pDstPropertyType = pDstPtrType->GetTargetType ();
-	
-	return m_pModule->m_OperatorMgr.GetPropertyCastKind (pSrcPropertyType, pDstPropertyType);
+	return m_pModule->m_OperatorMgr.GetPropertyCastKind (
+		pSrcPtrType->GetTargetType (), 
+		pDstPtrType->GetTargetType ()
+		);
 }
 
 //.............................................................................

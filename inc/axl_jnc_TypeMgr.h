@@ -43,6 +43,8 @@ enum EStdType
 	EStdType_SimpleEventPtr,
 	EStdType_StrenthenClosureFunction,
 	EStdType_AutoEvBindSite,
+	EStdType_IScheduler,
+	EStdType_ISchedulerPtr,
 	EStdType__Count,
 };
 
@@ -583,6 +585,9 @@ protected:
 
 	CStructType* 
 	CreateAutoEvBindSiteType ();
+
+	CClassType* 
+	CreateISchedulerType ();
 
 	CStructType*
 	CreateDataPtrStructType (CType* pDataType);

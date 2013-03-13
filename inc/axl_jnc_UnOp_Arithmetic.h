@@ -33,7 +33,7 @@ public:
 		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue.GetType ());
 		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
 		{
-			SetOperatorError (OpValue.GetType ());
+			SetOperatorError (OpValue);
 			return NULL;
 		}
 

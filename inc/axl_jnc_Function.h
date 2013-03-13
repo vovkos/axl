@@ -44,6 +44,7 @@ enum EFunction
 	EFunction_AutoEvHandler,
 	EFunction_Internal, 
 	EFunction_Thunk,
+	EFunction_ScheduleLauncher,
 	EFunction__Count
 };
 
