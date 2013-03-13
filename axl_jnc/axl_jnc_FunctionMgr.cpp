@@ -277,15 +277,13 @@ CFunctionMgr::CompileFunctions ()
 		CAutoEv* pAutoEv = *AutoEv;
 		ASSERT (pAutoEv->HasBody ());
 
-		CFunction* pStarter = pAutoEv->GetStarter ();
+		// starter 
 
-		// starter prologue
+		CFunction* pStarter = pAutoEv->GetStarter ();
 
 		Result = Prologue (pStarter, pAutoEv->GetBody ()->GetHead ()->m_Pos);
 		if (!Result)
 			return false;
-
-		// starter body
 
 		CParser Parser;
 		Parser.m_Stage = CParser::EStage_Pass2;
@@ -297,22 +295,15 @@ CFunctionMgr::CompileFunctions ()
 
 		pAutoEv->m_Ast = Parser.GetAst ();
 
-		// starter epilogue
-
 		Result = Epilogue (pAutoEv->GetBody ()->GetTail ()->m_Pos);
 		if (!Result)
 			return false;
 
+		// stopper 
+
 		CFunction* pStopper = pAutoEv->GetStopper ();
 
-		// stopper prologue
-
-		if (pStopper->IsMember ())
-			InternalPrologue (pStopper, &m_ThisValue, 1);			 
-		else
-			InternalPrologue (pStopper, NULL, 0);
-
-		// stopper body: disconnect all event handlers
+		InternalPrologue (pStopper);
 
 		CValue BindSiteArrayValue;
 		Result = m_pModule->m_OperatorMgr.GetAutoEvBindSiteArray (pAutoEv, &BindSiteArrayValue);
@@ -337,8 +328,6 @@ CFunctionMgr::CompileFunctions ()
 			if (!Result)
 				return false;
 		}
-
-		// stopper epilogue
 
 		InternalEpilogue ();
 	}
@@ -1012,6 +1001,105 @@ CFunctionMgr::GetClosureThunkProperty (
 	return pThunkProperty;
 }
 
+CProperty*
+CFunctionMgr::GetDirectDataThunkProperty (
+	CVariable* pTargetVariable,
+	CPropertyType* pThunkPropertyType,
+	bool HasUnusedClosure
+	)
+{
+	bool Result;
+
+	rtl::CStringA Signature;
+	Signature.Format (
+		"%c%x.%s", 
+		HasUnusedClosure ? 'U' : 'D',
+		pTargetVariable, 
+		pThunkPropertyType->GetSignature ()
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
+	if (Thunk->m_Value)
+		return Thunk->m_Value;
+	
+	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
+	pThunkProperty->m_StorageKind = EStorage_Static;
+	pThunkProperty->m_Tag = _T("_direct_data_thunk_property");
+	pThunkProperty->m_pType = HasUnusedClosure ? 
+		pThunkPropertyType->GetStdObjectPropertyMemberType () : 
+		pThunkPropertyType;
+
+
+	CFunction* pGetter = CreateFunction (EFunction_Getter, pThunkProperty->m_pType->GetGetterType ());
+	pGetter->m_StorageKind = EStorage_Static;
+	pGetter->m_Tag = _T("_direct_data_thunk_getter");
+		
+	InternalPrologue (pGetter);
+
+	Result = m_pModule->m_ControlFlowMgr.Return (pTargetVariable);
+	ASSERT (Result);
+
+	InternalEpilogue ();
+
+	pThunkProperty->m_pGetter = pGetter;
+
+	CFunctionTypeOverload* pThunkSetterType = pThunkProperty->m_pType->GetSetterType ();
+
+	size_t SetterCount = pThunkSetterType->GetOverloadCount ();
+
+	// all the checks should have been done at CheckCast ()
+
+	for (size_t i = 0; i < SetterCount; i++)
+	{
+		CFunction* pSetter = CreateFunction (EFunction_Setter, pThunkSetterType->GetOverload (i));
+		pSetter->m_StorageKind = EStorage_Static;
+		pSetter->m_Tag = _T("_direct_data_thunk_setter");
+
+		CValue SrcValue;
+
+		if (HasUnusedClosure)
+		{
+			CValue ArgValueArray [2];
+			InternalPrologue (pSetter, ArgValueArray, 2);
+			SrcValue = ArgValueArray [1];
+		}
+		else
+		{
+			InternalPrologue (pSetter, &SrcValue, 1);
+		}
+
+		Result = m_pModule->m_OperatorMgr.StoreDataRef (pTargetVariable, SrcValue);
+		ASSERT (Result);
+
+		InternalEpilogue ();
+
+		if (!pThunkProperty->m_pSetter)
+		{
+			pThunkProperty->m_pSetter = pSetter;
+		}
+		else
+		{
+			Result = pThunkProperty->m_pSetter->AddOverload (pSetter);
+			ASSERT (Result);
+		}
+	}
+
+	Thunk->m_Value = pThunkProperty;
+
+	pThunkProperty->CalcLayout ();
+	return pThunkProperty;
+}
+
+CProperty*
+CFunctionMgr::GetClosureDataThunkProperty (
+	CDataPtrType* pTargetDataPtrType,
+	CPropertyType* pThunkPropertyType
+	)
+{
+	ASSERT (false); // not yet
+	return NULL;
+}
+
 CFunction*
 CFunctionMgr::GetScheduleLauncherFunction (
 	CFunctionPtrType* pTargetFunctionPtrType,
@@ -1110,7 +1198,7 @@ CFunctionMgr::CompileDirectThunk (TThunk* pThunk)
 
 	CFunction* pFunction = pThunk->m_pThunkFunction;
 
-	InternalPrologue (pFunction, NULL, 0);
+	InternalPrologue (pFunction);
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 
@@ -1183,7 +1271,7 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 
 	CFunction* pFunction = pThunk->m_pThunkFunction;
 
-	InternalPrologue (pFunction, NULL, 0);
+	InternalPrologue (pFunction);
 
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
 

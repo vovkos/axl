@@ -462,7 +462,7 @@ CProperty::CompileAutoGetter ()
 
 	bool Result;
 
-	m_pModule->m_FunctionMgr.InternalPrologue (m_pGetter, NULL, 0);
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pGetter);
 	
 	CValue PropValue;
 	Result = 
@@ -489,10 +489,9 @@ CProperty::CompileAutoSetter ()
 
 	CValue SrcValue;
 
-	CValue ArgValueArray [2];
-
 	if (IsMember ())
 	{
+		CValue ArgValueArray [2];
 		m_pModule->m_FunctionMgr.InternalPrologue (m_pSetter, ArgValueArray, 2);
 		SrcValue = ArgValueArray [1];
 	}

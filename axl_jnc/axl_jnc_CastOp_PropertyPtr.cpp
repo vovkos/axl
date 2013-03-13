@@ -9,12 +9,81 @@ namespace jnc {
 //.............................................................................
 
 ECast
+CCast_PropertyPtr_FromDataPtr::GetCastKind (
+	const CValue& OpValue,
+	CType* pType
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataPtr && pType->GetTypeKind () == EType_PropertyPtr);
+
+	CDataPtrType* pSrcPtrType = (CDataPtrType*) OpValue.GetType ();
+	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
+	CPropertyType* pPropertyType = pDstPtrType->GetTargetType ();
+
+	return !pPropertyType->IsIndexed ()  ?
+		m_pModule->m_OperatorMgr.GetCastKind (pSrcPtrType->GetTargetType (), pPropertyType->GetReturnType ()) :
+		ECast_None;
+}
+
+bool
+CCast_PropertyPtr_FromDataPtr::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataPtr && pType->GetTypeKind () == EType_PropertyPtr);
+
+	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
+
+	CProperty* pThunkProperty;
+	CValue ClosureArgValue;
+	
+	if (OpValue.GetValueKind () == EValue_Variable &&
+		OpValue.GetVariable ()->GetVariableKind () == EVariable_Global &&
+		OpValue.GetLlvmValue () == OpValue.GetVariable ()->GetLlvmValue ())
+	{
+		pThunkProperty = m_pModule->m_FunctionMgr.GetDirectDataThunkProperty (
+			OpValue.GetVariable (),
+			pDstPtrType->GetTargetType (),
+			pDstPtrType->HasClosure ()
+			);
+
+		if (pDstPtrType->HasClosure ())
+			ClosureArgValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
+	}
+	else
+	{
+		pThunkProperty = m_pModule->m_FunctionMgr.GetClosureDataThunkProperty (
+			(CDataPtrType*) OpValue.GetType (),
+			pDstPtrType->GetTargetType ()
+			);
+
+		ClosureArgValue = OpValue;
+	}
+
+	CValue PropertyPtrValue = pThunkProperty;
+	m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &PropertyPtrValue);
+
+	if (ClosureArgValue)
+	{
+		CClosure* pClosure = PropertyPtrValue.CreateClosure ();
+		pClosure->GetArgList ()->InsertHead (ClosureArgValue);
+	}
+
+	return m_pModule->m_OperatorMgr.CastOperator (PropertyPtrValue, pType, pResultValue);
+}
+
+//.............................................................................
+
+ECast
 CCast_PropertyPtr_Base::GetCastKind (
 	const CValue& OpValue,
 	CType* pType
 	)
 {
-	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
 
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetClosureAwareType ();
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
@@ -38,7 +107,7 @@ CCast_PropertyPtr_FromNormal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
 
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();
@@ -79,7 +148,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
 	
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
@@ -160,6 +229,9 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 	bool Result = m_pModule->m_OperatorMgr.CastOperator (SimpleClosureObjValue, pThisArgType, &ThisArgValue);
 	if (!Result)
 		return false;
+
+	if (OpValue.GetValueKind () == EValue_Property)
+		return CreateClosurePropertyPtr (OpValue.GetProperty (), ThisArgValue, pDstPtrType, pResultValue);
 
 	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (OpValue, ThisArgValue, pDstPtrType, pResultValue);
 	return true;
@@ -264,7 +336,7 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
 
 	err::SetFormatStringError ("CCast_PropertyPtr_Weak2Normal::LlvmCast not yet implemented");
 	return false;
@@ -280,7 +352,7 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
 
 	if (OpValue.GetClosure ())
@@ -317,7 +389,7 @@ CCast_PropertyPtr_Thin2Weak::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsPropertyPtrType () && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
 
 	CPropertyPtrType* pIntermediateType = ((CPropertyPtrType*) pType)->GetTargetType ()->GetPropertyPtrType (EPropertyPtrType_Normal);
 
@@ -367,27 +439,27 @@ CCast_PropertyPtr::GetCastOperator (
 
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
 	EPropertyPtrType DstPtrTypeKind = pDstPtrType->GetPtrTypeKind ();
-
-	CType* pSrcType = OpValue.GetType ();
-	
-	if (pSrcType->IsIntegerType ())
-	{
-		return DstPtrTypeKind == EPropertyPtrType_Unsafe ? 
-			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
-			NULL;
-	}
-	else if (!pSrcType->IsPropertyPtrType ())
-	{
-		return NULL;
-	}
-
-	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) pSrcType;
-	EPropertyPtrType SrcPtrTypeKind = pSrcPtrType->GetPtrTypeKind ();
-
-	ASSERT ((size_t) SrcPtrTypeKind < EPropertyPtrType__Count);
 	ASSERT ((size_t) DstPtrTypeKind < EPropertyPtrType__Count);
 
-	return m_OperatorTable [SrcPtrTypeKind] [DstPtrTypeKind];
+	EType SrcTypeKind = OpValue.GetType ()->GetTypeKind ();
+	switch (SrcTypeKind)
+	{
+	case EType_DataPtr:
+		return &m_FromDataPtr;
+
+	case EType_PropertyPtr:
+		{
+		EPropertyPtrType SrcPtrTypeKind = ((CPropertyPtrType*) OpValue.GetType ())->GetPtrTypeKind ();
+		ASSERT ((size_t) SrcPtrTypeKind < EPropertyPtrType__Count);
+
+		return m_OperatorTable [SrcPtrTypeKind] [DstPtrTypeKind];
+		}
+
+	default:
+		return IsIntegerTypeKind (SrcTypeKind) && DstPtrTypeKind == EPropertyPtrType_Unsafe ?
+			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
+			NULL;
+	};
 }
 
 //.............................................................................

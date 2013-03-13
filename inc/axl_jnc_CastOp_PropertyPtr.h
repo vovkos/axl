@@ -12,6 +12,31 @@ namespace jnc {
 
 //.............................................................................
 
+class CCast_PropertyPtr_FromDataPtr: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_PropertyPtr_FromDataPtr, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 class CCast_PropertyPtr_Base: public ICastOperator
 {
 public:
@@ -183,6 +208,7 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_PropertyPtr, ICastOperator)
 
 protected:
+	CCast_PropertyPtr_FromDataPtr m_FromDataPtr;
 	CCast_PropertyPtr_FromNormal m_FromNormal;
 	CCast_PropertyPtr_Weak2Normal m_Weak2Normal;
 	CCast_PropertyPtr_Thin2Normal m_Thin2Normal;

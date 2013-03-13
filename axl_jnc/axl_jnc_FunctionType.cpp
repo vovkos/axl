@@ -86,7 +86,7 @@ CFunctionType::GetAbstractFunction ()
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("abtract_method"), this);
 
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, NULL, 0);
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction);
 	m_pModule->m_LlvmBuilder.RuntimeError (ERuntimeError_AbstractFunction);
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 

@@ -1,21 +1,16 @@
 //.............................................................................
 
-int autoget property IntProp;
-
-IntProp.set (int x)
-{
-	printf ("IntProp.set (%d)\n", x);
-	propvalue = x;
-}
+int g;
 
 int 
 main ()
 {
 	printf ("main ()\n");
 
-	int property* py = &IntProp;
+	int property* py = &g;
 
 	*py = 200;
+	printf ("g = %d\n", g);
 
 	int x = *py;
 	printf ("x = %d\n", x);

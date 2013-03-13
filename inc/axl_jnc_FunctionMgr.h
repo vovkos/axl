@@ -312,8 +312,8 @@ public:
 	void
 	InternalPrologue (
 		CFunction* pFunction,
-		CValue* pArgValueArray,
-		size_t ArgCount
+		CValue* pArgValueArray = NULL,
+		size_t ArgCount = 0
 		);
 
 	void
@@ -354,6 +354,19 @@ public:
 		CProperty* pTargetProperty, // could be NULL
 		CClassType* pClosureType,
 		const rtl::CArrayT <size_t>& ClosureMap,
+		CPropertyType* pThunkPropertyType
+		);
+
+	CProperty*
+	GetDirectDataThunkProperty (
+		CVariable* pTargetVariable,
+		CPropertyType* pThunkPropertyType,
+		bool HasUnusedClosure = false
+		);
+
+	CProperty*
+	GetClosureDataThunkProperty (
+		CDataPtrType* pTargetDataPtrType,
 		CPropertyType* pThunkPropertyType
 		);
 

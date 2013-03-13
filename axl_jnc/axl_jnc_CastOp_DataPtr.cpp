@@ -8,7 +8,7 @@ namespace jnc {
 //.............................................................................
 
 ECast
-CCast_DataPtrFromArray::GetCastKind (
+CCast_DataPtr_FromArray::GetCastKind (
 	const CValue& OpValue,
 	CType* pType
 	)
@@ -29,7 +29,7 @@ CCast_DataPtrFromArray::GetCastKind (
 }
 
 bool
-CCast_DataPtrFromArray::ConstCast (
+CCast_DataPtr_FromArray::ConstCast (
 	const CValue& OpValue,
 	CType* pType,
 	void* pDst
@@ -309,11 +309,11 @@ CCast_DataPtr::CCast_DataPtr ()
 {
 	memset (m_OperatorTable, 0, sizeof (m_OperatorTable));
 
-	m_OperatorTable [EDataPtrType_Normal] [EDataPtrType_Normal] = &m_FromDataPtr_Normal2Normal;
-	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Normal]   = &m_FromDataPtr_Thin2Normal;
-	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Unsafe]   = &m_FromDataPtr_Normal2Unsafe;
-	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Unsafe]   = &m_FromDataPtr_Unsafe2Unsafe;
-	m_OperatorTable [EDataPtrType_Unsafe] [EDataPtrType_Unsafe] = &m_FromDataPtr_Unsafe2Unsafe;
+	m_OperatorTable [EDataPtrType_Normal] [EDataPtrType_Normal] = &m_Normal2Normal;
+	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Normal]   = &m_Thin2Normal;
+	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Unsafe]   = &m_Normal2Unsafe;
+	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Unsafe]   = &m_Unsafe2Unsafe;
+	m_OperatorTable [EDataPtrType_Unsafe] [EDataPtrType_Unsafe] = &m_Unsafe2Unsafe;
 }
 
 ICastOperator*

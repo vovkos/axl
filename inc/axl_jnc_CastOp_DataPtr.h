@@ -16,10 +16,10 @@ class CBaseTypeCoord;
 
 // array -> ptr
 
-class CCast_DataPtrFromArray: public ICastOperator
+class CCast_DataPtr_FromArray: public ICastOperator
 {
 public:
-	AXL_OBJ_SIMPLE_CLASS (CCast_DataPtrFromArray, ICastOperator)
+	AXL_OBJ_SIMPLE_CLASS (CCast_DataPtr_FromArray, ICastOperator)
 
 public:
 	virtual
@@ -200,11 +200,11 @@ public:
 	AXL_OBJ_SIMPLE_CLASS (CCast_DataPtr, ICastOperator)
 
 protected:
-	CCast_DataPtrFromArray m_FromArray;
-	CCast_DataPtr_Normal2Normal m_FromDataPtr_Normal2Normal;
-	CCast_DataPtr_Thin2Normal m_FromDataPtr_Thin2Normal;
-	CCast_DataPtr_Normal2Unsafe m_FromDataPtr_Normal2Unsafe;
-	CCast_DataPtr_Unsafe2Unsafe m_FromDataPtr_Unsafe2Unsafe;
+	CCast_DataPtr_FromArray m_FromArray;
+	CCast_DataPtr_Normal2Normal m_Normal2Normal;
+	CCast_DataPtr_Thin2Normal m_Thin2Normal;
+	CCast_DataPtr_Normal2Unsafe m_Normal2Unsafe;
+	CCast_DataPtr_Unsafe2Unsafe m_Unsafe2Unsafe;
 
 	ICastOperator* m_OperatorTable [EDataPtrType__Count] [EDataPtrType__Count];
 
