@@ -882,8 +882,8 @@ public:
 
 	bool
 	StoreDataRef (
-		const CValue& OpValue1,
-		const CValue& OpValue2
+		const CValue& DstValue,
+		const CValue& SrcValue
 		);
 
 	// misc

@@ -455,6 +455,80 @@ CProperty::CreateVTablePtr ()
 		);
 }
 
+bool 
+CProperty::CompileAutoGetter ()
+{
+	ASSERT (m_pGetter);
+
+	bool Result;
+
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pGetter, NULL, 0);
+	
+	CValue PropValue;
+	Result = 
+		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (
+			GetAutoAccessorPropertyValue (),
+			EAuPropertyField_PropValue,
+			&PropValue
+			) &&
+		m_pModule->m_ControlFlowMgr.Return (PropValue);
+
+	if (!Result)
+		return false;		
+	
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+bool 
+CProperty::CompileAutoSetter ()
+{
+	ASSERT (m_pSetter && !m_pSetter->IsOverloaded ());
+
+	bool Result;
+
+	CValue SrcValue;
+
+	CValue ArgValueArray [2];
+
+	if (IsMember ())
+	{
+		m_pModule->m_FunctionMgr.InternalPrologue (m_pSetter, ArgValueArray, 2);
+		SrcValue = ArgValueArray [1];
+	}
+	else
+	{
+		m_pModule->m_FunctionMgr.InternalPrologue (m_pSetter, &SrcValue, 1);
+	}
+
+	CValue PropValue;
+	Result = 
+		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (
+			GetAutoAccessorPropertyValue (),
+			EAuPropertyField_PropValue,
+			&PropValue
+			) &&
+		m_pModule->m_OperatorMgr.StoreDataRef (PropValue, SrcValue);
+
+	if (!Result)
+		return false;		
+	
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+CValue
+CProperty::GetAutoAccessorPropertyValue ()
+{
+	if (!IsMember ())
+		return this;
+
+	CValue Value = this;
+	CClosure* pClosure = Value.CreateClosure ();
+	pClosure->GetArgList ()->InsertTail (m_pModule->m_FunctionMgr.GetThisValue ());
+	return Value;
+}
+
 //.............................................................................
 
 } // namespace jnc {

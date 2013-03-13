@@ -196,9 +196,18 @@ public:
 		return m_VTablePtrValue;
 	}
 
+	bool 
+	CompileAutoGetter ();
+
+	bool 
+	CompileAutoSetter ();
+
 protected:
 	void
 	CreateVTablePtr ();
+
+	CValue
+	GetAutoAccessorPropertyValue ();
 
 	CStructType*
 	GetFieldStructType (EStorage StorageKind);

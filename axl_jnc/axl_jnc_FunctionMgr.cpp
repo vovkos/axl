@@ -237,7 +237,35 @@ CFunctionMgr::CompileFunctions ()
 			return false;
 	}
 
-	// (2) autoevs
+	// (2) auto-properties 
+
+	rtl::CIteratorT <CProperty> Property = m_PropertyList.GetHead ();
+	for (; Property; Property++)
+	{
+		CProperty* pProperty = *Property;
+
+		Result = pProperty->CalcLayout ();
+		if (!Result)
+			return false;
+
+		int Flags = pProperty->GetType ()->GetFlags ();
+
+		if (Flags & EPropertyTypeFlag_AutoGet)
+		{
+			Result = pProperty->CompileAutoGetter ();
+			if (!Result)
+				return false;
+		}
+
+		if (Flags & EPropertyTypeFlag_AutoSet)
+		{
+			Result = pProperty->CompileAutoSetter ();
+			if (!Result)
+				return false;
+		}
+	}
+
+	// (3) autoevs
 
 	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
 	CStructField* pEventPtrField = *pBindSiteType->GetFieldMemberList ().GetHead ();
@@ -315,7 +343,7 @@ CFunctionMgr::CompileFunctions ()
 		InternalEpilogue ();
 	}
 
-	// (3) thunks
+	// (4) thunks
 
 	rtl::CIteratorT <TThunk> Thunk = m_ThunkList.GetHead ();
 	for (; Thunk; Thunk++)
@@ -669,11 +697,11 @@ CFunctionMgr::InternalPrologue (
 
 	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
 
-	if (!ArgCount)
-		return;	
-
 	rtl::CArrayT <CType*> ArgTypeArray = pFunction->GetType ()->GetArgTypeArray ();
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin ();
+
+	if (pFunction->IsMember ())
+		m_ThisValue = CValue (LlvmArg, pFunction->GetThisArgType ());
 
 	for (size_t i = 0; i < ArgCount; i++, LlvmArg++)
 		pArgValueArray [i] = CValue (LlvmArg, ArgTypeArray [i]);
@@ -731,6 +759,7 @@ CFunctionMgr::GetDirectThunkFunction (
 		return Thunk->m_Value;
 	
 	CFunction* pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
+	pThunkFunction->m_StorageKind = EStorage_Static;
 	pThunkFunction->m_Tag = _T("_direct_thunk_function");
 
 	TThunk* pThunk = AXL_MEM_NEW (TThunk);
@@ -773,6 +802,7 @@ CFunctionMgr::GetClosureThunkFunction (
 	pThunkFunctionType = pClosureType->GetMethodMemberType (pThunkFunctionType);
 	
 	CFunction* pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
+	pThunkFunction->m_StorageKind = EStorage_Static;
 	pThunkFunction->m_Tag = _T("_closure_thunk_function");
 
 	TThunk* pThunk = AXL_MEM_NEW (TThunk);
@@ -811,6 +841,7 @@ CFunctionMgr::GetDirectThunkProperty (
 		return Thunk->m_Value;
 	
 	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
+	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Tag = _T("_direct_thunk_property");
 	pThunkProperty->m_pType = HasUnusedClosure ? 
 		pThunkPropertyType->GetStdObjectPropertyMemberType () : 
@@ -884,6 +915,7 @@ CFunctionMgr::GetClosureThunkProperty (
 		return Thunk->m_Value;
 
 	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
+	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Tag = _T("_closure_thunk_property");
 	pThunkProperty->m_pType = pClosureType->GetPropertyMemberType (pThunkPropertyType);
 
@@ -1238,59 +1270,6 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 	}
 
 	InternalEpilogue ();
-	return true;
-}
-
-bool
-CFunctionMgr::CompileAutoPropertyAccessors (CProperty* pProperty)
-{
-	CFunction* pGetter = pProperty->GetGetter ();
-	CFunction* pSetter = pProperty->GetSetter ();
-
-	err::SetFormatStringError (_T("auto-properties are not implemented yet"));
-	return false;
-
-/*	if (pType->GetParentClassType ())
-	{
-		err::SetFormatStringError (_T("member auto-properties are not implemented yet"));
-		return false;
-	}
-
-	ASSERT (pType->m_pAutoVariable);
-
-	// save
-
-	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
-	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
-	// getter
-
-	m_pCurrentFunction = pGetter;
-
-	pGetter->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pGetter->m_pBlock);
-	m_pModule->m_ControlFlowMgr.Return (pType->m_pAutoVariable);
-	
-	// setter
-
-	m_pCurrentFunction = pSetter;
-
-	pSetter->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("function_entry"));
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSetter->m_pBlock);
-	
-	llvm::Function::arg_iterator LlvmArg = pSetter->GetLlvmFunction ()->arg_begin();
-	
-	CValue ArgValue1 (LlvmArg++, NULL);
-	m_pModule->m_LlvmBuilder.CreateStore (ArgValue1, pType->m_pAutoVariable);
-	m_pModule->m_ControlFlowMgr.Return ();
-
-	// restore
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevCurrentBlock);
-	m_pCurrentFunction = pPrevCurrentFunction;
-*/
 	return true;
 }
 

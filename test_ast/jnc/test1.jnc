@@ -1,40 +1,24 @@
 //.............................................................................
 
-class IScheduler
+int autoget property IntProp;
+
+IntProp.set (int x)
 {
-	abstract 
-	Schedule (function* pfn ());
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CNewThreadScheduler: IScheduler
-{
-	override
-	Schedule (function* pfn ())
-	{
-		printf ("CNewThreadScheduler.Schedule ()\n");
-		CreateThread (pfn);
-	}
-};
-
-//.............................................................................
-
-foo (int x)
-{
-	printf ("foo (%d) TID: %d\n", x, GetCurrentThreadId ());
+	printf ("IntProp.set (%d)\n", x);
+	propvalue = x;
 }
 
 int 
 main ()
 {
-	printf ("main () TID: %d\n", GetCurrentThreadId ());
+	printf ("main ()\n");
 
-	foo (5);
+	int property* py = &IntProp;
 
-	IScheduler s = stack new CNewThreadScheduler;
+	*py = 200;
 
-	(foo @ s) (10);
+	int x = *py;
+	printf ("x = %d\n", x);
 
 	return 0;
 }
