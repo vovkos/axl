@@ -55,11 +55,11 @@ CCast_PropertyPtr_FromDataPtr::LlvmCast (
 	}
 	else
 	{
-		pThunkProperty = m_pModule->m_FunctionMgr.GetClosureDataThunkProperty (
-			(CDataPtrType*) OpValue.GetType (),
-			pDstPtrType->GetTargetType ()
-			);
+		CDataPtrType* pTargetPtrType = (CDataPtrType*) OpValue.GetType ();
+		if (pTargetPtrType->GetPtrTypeKind () == EDataPtrType_Thin)	
+			pTargetPtrType = pTargetPtrType->GetTargetType ()->GetDataPtrType (EDataPtrType_Normal, pTargetPtrType->GetFlags ());
 
+		pThunkProperty = m_pModule->m_FunctionMgr.GetClosureDataThunkProperty (pTargetPtrType, pDstPtrType->GetTargetType ());
 		ClosureArgValue = OpValue;
 	}
 

@@ -774,7 +774,7 @@ CFunctionMgr::GetClosureThunkFunction (
 	)
 {
 	rtl::CStringA Signature;
-	Signature.Format (_T("'C'%s.%x.%s"), 
+	Signature.Format (_T("C%s.%x.%s"), 
 		pTargetFunctionType->GetSignature (),
 		pTargetFunction, 
 		pThunkFunctionType->GetSignature ()
@@ -889,7 +889,7 @@ CFunctionMgr::GetClosureThunkProperty (
 	)
 {
 	rtl::CStringA Signature;
-	Signature.Format (_T("'C'%s.%x.%s"), 
+	Signature.Format (_T("C%s.%x.%s"), 
 		pTargetPropertyType->GetSignature (),
 		pTargetProperty, 
 		pThunkPropertyType->GetSignature ()
@@ -1029,7 +1029,6 @@ CFunctionMgr::GetDirectDataThunkProperty (
 		pThunkPropertyType->GetStdObjectPropertyMemberType () : 
 		pThunkPropertyType;
 
-
 	CFunction* pGetter = CreateFunction (EFunction_Getter, pThunkProperty->m_pType->GetGetterType ());
 	pGetter->m_StorageKind = EStorage_Static;
 	pGetter->m_Tag = _T("_direct_data_thunk_getter");
@@ -1096,8 +1095,94 @@ CFunctionMgr::GetClosureDataThunkProperty (
 	CPropertyType* pThunkPropertyType
 	)
 {
-	ASSERT (false); // not yet
-	return NULL;
+	ASSERT (pTargetDataPtrType->GetPtrTypeKind () != EDataPtrType_Thin);
+
+	bool Result;
+
+	rtl::CStringA Signature;
+	Signature.Format (_T("C%s.%s"), 
+		pTargetDataPtrType->GetSignature (),
+		pThunkPropertyType->GetSignature ()
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
+	if (Thunk->m_Value)
+		return Thunk->m_Value;
+
+	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
+	pThunkProperty->m_StorageKind = EStorage_Static;
+	pThunkProperty->m_Tag = _T("_closure_data_thunk_property");
+
+	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (
+		pThunkPropertyType->GetGetterType ()->GetReturnType (),
+		pTargetDataPtrType
+		);
+
+	CFunction* pGetter = CreateFunction (EFunction_Getter, pGetterType);
+	pGetter->m_StorageKind = EStorage_Static;
+	pGetter->m_Tag = _T("_closure_data_thunk_getter");
+		
+	CValue DataValue;
+	InternalPrologue (pGetter, &DataValue, 1);
+
+	Result = 
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &DataValue) &&
+		m_pModule->m_ControlFlowMgr.Return (DataValue);
+
+	ASSERT (Result);
+
+	InternalEpilogue ();
+
+	pThunkProperty->m_pGetter = pGetter;
+
+	CFunctionTypeOverload* pThunkSetterType = pThunkPropertyType->GetSetterType ();
+	size_t SetterCount = pThunkSetterType->GetOverloadCount ();
+
+	for (size_t i = 0; i < SetterCount; i++)
+	{
+		CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
+
+		rtl::CArrayT <CType*> ArgTypeArray = pThunkFunctionType->GetArgTypeArray ();
+		ArgTypeArray.Insert (0, pTargetDataPtrType);
+
+		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+
+		CFunction* pSetter = CreateFunction (EFunction_Setter, pSetterType);
+		pSetter->m_StorageKind = EStorage_Static;
+		pSetter->m_Tag = _T("_closure_data_thunk_setter");
+		
+		CValue ArgValueArray [2];
+		InternalPrologue (pSetter, ArgValueArray, 2);
+
+		Result = 
+			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &ArgValueArray [0]) &&
+			m_pModule->m_OperatorMgr.StoreDataRef (ArgValueArray [0], ArgValueArray [1]);
+
+		ASSERT (Result);
+
+		InternalEpilogue ();
+
+		if (!pThunkProperty->m_pSetter)
+		{
+			pThunkProperty->m_pSetter = pSetter;
+		}
+		else
+		{
+			bool Result = pThunkProperty->m_pSetter->AddOverload (pSetter);
+			ASSERT (Result);
+		}
+	}
+
+	pThunkProperty->m_pType = m_pModule->m_TypeMgr.GetPropertyType (
+		pGetterType, 
+		pThunkProperty->m_pSetter ? *pThunkProperty->m_pSetter->GetTypeOverload () : NULL, 
+		pThunkPropertyType->GetFlags ()
+		);
+
+	Thunk->m_Value = pThunkProperty;
+
+	pThunkProperty->CalcLayout ();
+	return pThunkProperty;
 }
 
 CFunction*

@@ -1,16 +1,25 @@
 //.............................................................................
 
-int g;
+struct TPoint
+{
+	int x;
+	int y;
+};
+
+TPoint g;
 
 int 
 main ()
 {
 	printf ("main ()\n");
 
-	int property* py = &g;
+	g.x = 10;
+	g.y = 20;
+
+	int property* py = &g.y;
 
 	*py = 200;
-	printf ("g = %d\n", g);
+	printf ("g = { %d, %d }\n", g.x, g.y);
 
 	int x = *py;
 	printf ("x = %d\n", x);
