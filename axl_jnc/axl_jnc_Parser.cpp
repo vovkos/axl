@@ -1255,7 +1255,7 @@ CParser::FinalizeAutoEv ()
 	CStructField* pCookieField = *pBindSiteType->GetFieldMemberList ().GetTail ();
 
 	CValue BindSiteArrayValue;
-	Result = m_pModule->m_OperatorMgr.GetAutoEvBindSiteArray (pAutoEv, &BindSiteArrayValue);
+	Result = m_pModule->m_OperatorMgr.GetAutoEvFieldMember (pAutoEv, pAutoEv->GetBindSiteArrayField (), &BindSiteArrayValue);
 	if (!Result)
 		return false;
 

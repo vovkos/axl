@@ -1130,21 +1130,17 @@ COperatorMgr::GetAutoEvData (
 }
 
 bool
-COperatorMgr::GetAutoEvBindSiteArray (
+COperatorMgr::GetAutoEvFieldMember (
 	CAutoEv* pAutoEv,
+	CStructField* pField,
 	CValue* pResultValue
 	)
 {
-	CValue AutoEvDataValue;
+	CValue DataValue;
 
 	return
-		GetAutoEvData (pAutoEv, &AutoEvDataValue) &&
-		GetStructFieldMember (
-			AutoEvDataValue, 
-			pAutoEv->GetBindSiteArrayField (),
-			NULL, 
-			pResultValue
-			);
+		GetAutoEvData (pAutoEv, &DataValue) &&
+		GetStructFieldMember (DataValue, pField, NULL, pResultValue);
 }
 
 //.............................................................................

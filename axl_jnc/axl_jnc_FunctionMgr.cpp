@@ -267,21 +267,17 @@ CFunctionMgr::CompileFunctions ()
 
 	// (3) autoevs
 
-	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
-	CStructField* pEventPtrField = *pBindSiteType->GetFieldMemberList ().GetHead ();
-	CStructField* pCookieField = *pBindSiteType->GetFieldMemberList ().GetTail ();
-
 	rtl::CIteratorT <CAutoEv> AutoEv = m_AutoEvList.GetHead ();
 	for (; AutoEv; AutoEv++)
 	{
 		CAutoEv* pAutoEv = *AutoEv;
 		ASSERT (pAutoEv->HasBody ());
 
-		// starter 
+		Result = Prologue (pAutoEv->GetStarter (), pAutoEv->GetBody ()->GetHead ()->m_Pos);
+		if (!Result)
+			return false;
 
-		CFunction* pStarter = pAutoEv->GetStarter ();
-
-		Result = Prologue (pStarter, pAutoEv->GetBody ()->GetHead ()->m_Pos);
+		Result = m_pModule->m_OperatorMgr.CallOperator (pAutoEv->GetStopper ());
 		if (!Result)
 			return false;
 
@@ -295,41 +291,18 @@ CFunctionMgr::CompileFunctions ()
 
 		pAutoEv->m_Ast = Parser.GetAst ();
 
-		Result = Epilogue (pAutoEv->GetBody ()->GetTail ()->m_Pos);
+		CValue StateValue;
+		Result = 
+			m_pModule->m_OperatorMgr.GetAutoEvFieldMember (pAutoEv, pAutoEv->GetStateField (), &StateValue) &&
+			m_pModule->m_OperatorMgr.StoreDataRef (StateValue, CValue ((int64_t) 1, EType_Int_p)) &&
+			Epilogue (pAutoEv->GetBody ()->GetTail ()->m_Pos);
+
 		if (!Result)
 			return false;
 
-		// stopper 
-
-		CFunction* pStopper = pAutoEv->GetStopper ();
-
-		InternalPrologue (pStopper);
-
-		CValue BindSiteArrayValue;
-		Result = m_pModule->m_OperatorMgr.GetAutoEvBindSiteArray (pAutoEv, &BindSiteArrayValue);
+		Result = pAutoEv->CreateStopper ();
 		if (!Result)
 			return false;
-
-		size_t Count = pAutoEv->GetBindSiteCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CValue IdxValue (i, EType_SizeT);
-			CValue BindSiteValue;
-			CValue OnChangeValue;
-			CValue CookieValue;
-
-			Result = 
-				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
-				m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
-				m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pCookieField, NULL, &CookieValue) &&
-				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangeValue) &&
-				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_SubAssign, OnChangeValue, CookieValue);
-
-			if (!Result)
-				return false;
-		}
-
-		InternalEpilogue ();
 	}
 
 	// (4) thunks
@@ -520,6 +493,9 @@ CFunctionMgr::Prologue (
 			return false;
 
 		rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFieldStructType ()->GetFieldMemberList ().GetHead ();
+		ArgField++; // m_Lock
+		ArgField++; // m_State
+
 		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
 		for (; Arg; Arg++, LlvmArg++, ArgField++)
 		{

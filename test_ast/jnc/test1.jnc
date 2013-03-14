@@ -6,9 +6,11 @@ int bindable Blue;
 
 int RGB;
 
-autoev AutoRgb ()
+autoev AutoRgb (int x)
 {
-	RGB = Red * 100 + Green * 10 + Blue;
+	printf ("x = %d;\t Red = %d\n", x, Red);
+	printf ("x = %d;\t Green = %d\n", x, Green);
+	printf ("x = %d;\t Blue = %d\n", x, Blue);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -104,7 +106,8 @@ class CMyClass
 
 /*
 
-autoev class CColorAutoEv (int x)
+autoev 
+class CColorAutoEv (int x)
 {
 	onchange (Green, Blue) 
 		for (int i = 0; i < x; i++)
@@ -122,15 +125,19 @@ main ()
 {
 	printf ("jancy autoev test\n");
 
-	AutoRgb ();
+	AutoRgb (10);
 
 	printf ("autoev is active\n");
 
 	Red = 1; 
-	Green = 2;
-	Blue = 3;
 
-	printf ("RGB = %d\n", RGB);
+	AutoRgb (20);
+
+	Green = 2;
+
+	AutoRgb (30);
+
+	Blue = 3;
 
 /*
 	CColorAutoEv c = heap new CColorAutoEv (7);

@@ -718,6 +718,26 @@ struct TAuPropertyPtr_u
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// structures backing up autoev declared like:
+// autoev TestAutoEv ();
+
+struct TAutoEv
+{
+	volatile intptr_t m_Lock;
+	size_t m_State;
+
+	// followed by starter arguments
+	// followed by bind site array
+};
+
+struct TAutoEvBindSite
+{
+	TDataPtr m_OnChangePtr;
+	intptr_t m_Cookie;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 // structures backing up autoev closure pointer declared like:
 // int autoev* paeTest (int);
 // int autoev weak* paeTest (int);

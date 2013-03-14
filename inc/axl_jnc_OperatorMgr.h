@@ -889,6 +889,14 @@ public:
 	// misc
 
 	bool
+	GetStructFieldMember  (
+		const CValue& OpValue,
+		CStructField* pMember,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
 	GetVirtualMethodMember (
 		CFunction* pFunction,
 		CClosure* pClosure,
@@ -946,8 +954,9 @@ public:
 		);
 
 	bool
-	GetAutoEvBindSiteArray (
+	GetAutoEvFieldMember (
 		CAutoEv* pAutoEv,
+		CStructField* pField,
 		CValue* pResultValue
 		);
 
@@ -1044,14 +1053,6 @@ protected:
 		const CValue& OpValue,
 		CStructType* pStructType,
 		const tchar_t* pName,
-		CValue* pResultValue
-		);
-
-	bool
-	GetStructFieldMember  (
-		const CValue& OpValue,
-		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 

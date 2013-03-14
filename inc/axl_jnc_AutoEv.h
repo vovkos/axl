@@ -30,7 +30,9 @@ protected:
 	CStructField* m_pParentClassFieldMember;
 	
 	CStructType* m_pFieldStructType;
-	CStructField* m_pBindSiteArrayField;	
+	CStructField* m_pLockField;
+	CStructField* m_pStateField;
+	CStructField* m_pBindSiteArrayField;
 	CVariable* m_pStaticDataVariable;
 
 	rtl::CBoxListT <CToken> m_Body;
@@ -80,6 +82,18 @@ public:
 	GetFieldStructType ()
 	{
 		return m_pFieldStructType;
+	}
+
+	CStructField* 
+	GetLockField ()
+	{
+		return m_pLockField;
+	}
+
+	CStructField* 
+	GetStateField ()
+	{
+		return m_pStateField;
 	}
 
 	size_t 
@@ -138,10 +152,12 @@ public:
 
 	CFunction* 
 	CreateHandler ();
+	
+	bool
+	CreateStopper ();
 
 	bool
 	CalcLayout ();
-
 
 protected:
 	void

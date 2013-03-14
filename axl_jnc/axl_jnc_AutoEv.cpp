@@ -19,6 +19,8 @@ CAutoEv::CAutoEv ()
 
 	m_pParentClassFieldMember = NULL;
 	m_pFieldStructType = NULL;
+	m_pLockField = NULL;
+	m_pStateField = NULL;
 	m_pBindSiteArrayField = NULL;
 	m_pStaticDataVariable = NULL;
 
@@ -49,6 +51,9 @@ CAutoEv::Create (
 	m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pFieldStructType->m_StorageKind = m_StorageKind;
 	m_pFieldStructType->m_pParentNamespace = this;
+
+	m_pLockField = m_pFieldStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_pStateField = m_pFieldStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
 
 	if (m_pParentClassType)
 	{
@@ -85,6 +90,63 @@ CAutoEv::CreateHandler ()
 		pHandler->ConvertToMethodMember (m_pParentClassType);
 
 	return pHandler;
+}
+
+bool
+CAutoEv::CreateStopper ()
+{
+	bool Result;
+
+	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
+	CStructField* pEventPtrField = *pBindSiteType->GetFieldMemberList ().GetHead ();
+	CStructField* pCookieField = *pBindSiteType->GetFieldMemberList ().GetTail ();
+
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pStopper);
+
+	CBasicBlock* pUnadviseBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("unadvise_block"));
+	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("follow_block"));
+
+	CValue StateValue; 
+	CValue StateCmpValue; 
+	CValue BindSiteArrayValue;
+
+	Result = 
+		m_pModule->m_OperatorMgr.GetAutoEvFieldMember (this, m_pStateField, &StateValue) &&	
+		m_pModule->m_ControlFlowMgr.ConditionalJump (StateValue, pUnadviseBlock, pFollowBlock);
+
+	if (!Result)
+		return false;
+
+	Result = m_pModule->m_OperatorMgr.GetAutoEvFieldMember (this, m_pBindSiteArrayField, &BindSiteArrayValue);
+
+	if (!Result)
+		return false;
+
+	for (size_t i = 0; i < m_BindSiteCount; i++)
+	{
+		CValue IdxValue (i, EType_SizeT);
+		CValue BindSiteValue;
+		CValue OnChangeValue;
+		CValue CookieValue;
+
+		Result = 
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
+			m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
+			m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pCookieField, NULL, &CookieValue) &&
+			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangeValue) &&
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_SubAssign, OnChangeValue, CookieValue);
+
+		if (!Result)
+			return false;
+	}
+
+	Result = m_pModule->m_OperatorMgr.StoreDataRef (StateValue, CValue ((int64_t) 0, EType_Int_p));
+	ASSERT (Result);
+	
+	m_pModule->m_ControlFlowMgr.Follow (pFollowBlock);
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
 }
 
 bool
