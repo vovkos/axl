@@ -28,6 +28,8 @@ CParser::ParseTokenList (
 	bool IsBuildingAst
 	)
 {
+	ASSERT (!TokenList.IsEmpty ());
+
 	bool Result;
 
 	Create (Symbol, IsBuildingAst);
@@ -41,6 +43,25 @@ CParser::ParseTokenList (
 			err::PushSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
 			return false;
 		}
+	}
+
+	// important: process EOF token, it might actually trigger actions!
+
+	CToken::CPos Pos = TokenList.GetTail ()->m_Pos;
+
+	CToken EofToken;
+	EofToken.m_Token = 0;
+	EofToken.m_Pos = Pos;
+	EofToken.m_Pos.m_p += Pos.m_Length;
+	EofToken.m_Pos.m_Offset += Pos.m_Length;
+	EofToken.m_Pos.m_Col += Pos.m_Length;
+	EofToken.m_Pos.m_Length = 0;
+
+	Result = ParseToken (&EofToken);
+	if (!Result)
+	{
+		err::PushSrcPosError (m_pModule->GetFilePath (), EofToken.m_Pos.m_Line, EofToken.m_Pos.m_Col);
+		return false;
 	}
 
 	return true;

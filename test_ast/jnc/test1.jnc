@@ -1,28 +1,147 @@
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TPoint
+int bindable Red;
+int bindable Green;
+int bindable Blue;
+
+int RGB;
+
+autoev AutoRgb ()
 {
-	int x;
-	int y;
+	RGB = Red * 100 + Green * 10 + Blue;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+/*
+
+Purple (int r, int b)
+{
+	printf ("Purple (%d, %d)\n", r, b);
+}
+
+Yellow (int r, int g)
+{
+	printf ("Yellow (%d, %d)\n", r, g);
+}
+
+Cyan (int g, int b)
+{
+	printf ("Cyan (%d, %d)\n", g, b);
+}
+
+*/
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+/*
+
+autoev ColorAutoEv (int x)
+{
+	onchange (Red, Blue)
+		for (int i = 0; i < x; i++)
+			printf ("Green = %d; Blue = %d; x = %d\n", Green, Blue, x);
+
+	Purple (Red + x, Blue + x);
+	Yellow (Red + x, Green + x);
+	Cyan (Green + x, Blue + x);
+}
+
+*/
+
+/*
+
+class CMyClass
+{
+	int m_x;
+
+	this (int x)
+	{
+		m_x = x;
+	}
+
+	~this ()
+	{	
+		printf ("CMyClass.~this ()\n");
+	}
+
+	autoev ColorAutoEv (int x)
+	{
+		onchange (Green, Blue) 
+			for (int i = 0; i < x; i++)
+				printf ("Green = %d; Blue = %d; x = %d; { m_x = %d }\n", Green, Blue, x, m_x);
+
+		Purple (Red + m_x, Blue + x);
+		Yellow (Red + m_x, Green + x);
+		Cyan (Green + m_x, Blue + x);	
+	}
 };
 
-TPoint g;
+*/
+
+/*
+
+class CMyClass
+{
+	this (int x)
+	{
+		ColorAutoEv (x);
+	}
+
+	autoev ColorAutoEv (int x)
+	{
+		onchange (Green, Blue) 
+			for (int i = 0; i < x; i++)
+				printf ("Green = %d; Blue = %d; x = %d;\n", Green, Blue, x);
+
+		Purple (Red + x, Blue + x);
+		Yellow (Red + x, Green + x);
+		Cyan (Green + x, Blue + x);	
+	}
+};
+
+*/
+
+/*
+
+autoev class CColorAutoEv (int x)
+{
+	onchange (Green, Blue) 
+		for (int i = 0; i < x; i++)
+			printf ("Green = %d; Blue = %d; x = %d\n", Green, Blue, x);
+
+	Purple (Red + x, Blue + x);
+	Yellow (Red + x, Green + x);
+	Cyan (Green + x, Blue + x);	
+};
+
+*/
 
 int 
 main ()
 {
-	printf ("main ()\n");
+	printf ("jancy autoev test\n");
 
-	g.x = 10;
-	g.y = 20;
+	AutoRgb ();
 
-	int property* py = &g.y;
+	printf ("autoev is active\n");
 
-	*py = 200;
-	printf ("g = { %d, %d }\n", g.x, g.y);
+	Red = 1; 
+	Green = 2;
+	Blue = 3;
 
-	int x = *py;
-	printf ("x = %d\n", x);
+	printf ("RGB = %d\n", RGB);
+
+/*
+	CColorAutoEv c = heap new CColorAutoEv (7);
+
+	// stack new CColorAutoEv (5);
+
+	printf ("autoev is active\n");
+	Red = 10;
+	Green = 200;
+	Blue = 3000;
+*/
 
 	return 0;
 }
@@ -34,11 +153,5 @@ printf (
 	unsafe const char* pFormat,
 	unsafe ...
 	);
-
-int
-GetCurrentThreadId ();
-
-bool
-CreateThread (function* pfn ());
 
 //.............................................................................

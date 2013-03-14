@@ -239,6 +239,9 @@ CParseTableBuilder::CalcFirstFollow ()
 
 		if (pNode->m_pResolver)
 			pNode->m_pResolver->m_FollowSet.SetBitResize (1); // set anytoken FOLLOW for resolver
+
+		if (pNode->m_Flags & ESymbolNodeFlag_Start)
+			pNode->MarkFinal ();
 	}
 
 	rtl::CIteratorT <CSequenceNode> Sequence = m_pNodeMgr->m_SequenceList.GetHead ();
