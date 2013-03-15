@@ -180,6 +180,7 @@ protected:
 	rtl::CStdListT <CAutoEv> m_AutoEvList;
 
 	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
+	rtl::CArrayT <CClassType*> m_DefaultPreConstructorClassArray;
 
 	rtl::CStdListT <TThunk> m_ThunkList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;

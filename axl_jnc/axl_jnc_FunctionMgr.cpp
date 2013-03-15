@@ -26,6 +26,7 @@ CFunctionMgr::Clear ()
 	m_PropertyTemplateList.Clear ();
 	m_AutoEvList.Clear ();
 	m_OrphanFunctionArray.Clear ();
+	m_DefaultPreConstructorClassArray.Clear ();
 	m_ThunkList.Clear ();
 	m_ThunkFunctionMap.Clear ();
 	m_ThunkPropertyMap.Clear ();
@@ -305,7 +306,27 @@ CFunctionMgr::CompileFunctions ()
 			return false;
 	}
 
-	// (4) thunks
+	// (4) default preconstructors for classes with initialized fields
+
+	size_t Count = m_DefaultPreConstructorClassArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CClassType* pClassType = m_DefaultPreConstructorClassArray [i];
+		CFunction* pPreConstructor = pClassType->GetPreConstructor ();
+		ASSERT (pPreConstructor);
+
+		InternalPrologue (pPreConstructor);
+		m_pModule->m_NamespaceMgr.OpenNamespace (pClassType);
+
+		bool Result = pClassType->GetIfaceStructType ()->InitializeFields ();
+		if (!Result)
+			return false;
+
+		m_pModule->m_NamespaceMgr.CloseNamespace ();
+		m_pModule->m_FunctionMgr.InternalEpilogue ();
+	}
+
+	// (5) thunks
 
 	rtl::CIteratorT <TThunk> Thunk = m_ThunkList.GetHead ();
 	for (; Thunk; Thunk++)

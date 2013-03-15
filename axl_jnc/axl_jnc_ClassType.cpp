@@ -769,16 +769,7 @@ CClassType::CreateDefaultPreConstructor ()
 	if (!pFunction)
 		return false;
 
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction);
-	m_pModule->m_NamespaceMgr.OpenNamespace (this);
-
-	bool Result = m_pIfaceStructType->InitializeFields ();
-	if (!Result)
-		return false;
-
-	m_pModule->m_NamespaceMgr.CloseNamespace ();
-	m_pModule->m_FunctionMgr.InternalEpilogue ();
-
+	m_pModule->m_FunctionMgr.m_DefaultPreConstructorClassArray.Append (this);
 	return true;
 }
 
@@ -862,6 +853,52 @@ CClassType::CreateDefaultDestructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pDestructor = pFunction;
+	return true;
+}
+
+bool
+CClassType::CallBaseDestructors (const CValue& ThisValue)
+{
+	bool Result;
+
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		if (BaseType->m_pType->GetTypeKind () != EType_Class)
+			continue;
+
+		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+		CFunction* pDestructor = pBaseClassType->GetDestructor ();		
+		if (!pDestructor)
+			continue;
+
+		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
+		if (!Result)
+			return false;
+	}
+		
+	return true;
+}
+
+bool 
+CClassType::StopAutoEvs (const CValue& ThisValue)
+{
+	bool Result;
+
+	size_t AutoEvCount = m_AutoEvArray.GetCount ();
+	for (size_t i = 0; i < AutoEvCount; i++)
+	{
+		CAutoEv* pAutoEv = m_AutoEvArray [i];
+
+		CFunction* pStopper = pAutoEv->GetStopper ();		
+		if (!pStopper)
+			continue;
+
+		Result = m_pModule->m_OperatorMgr.CallOperator (pStopper, ThisValue);
+		if (!Result)
+			return false;			
+	}
+
 	return true;
 }
 
@@ -970,52 +1007,6 @@ CClassType::InitializeInterface (
 		}		
 
 		InitializeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
-	}
-
-	return true;
-}
-
-bool
-CClassType::CallBaseDestructors (const CValue& ThisValue)
-{
-	bool Result;
-
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		if (BaseType->m_pType->GetTypeKind () != EType_Class)
-			continue;
-
-		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
-		CFunction* pDestructor = pBaseClassType->GetDestructor ();		
-		if (!pDestructor)
-			continue;
-
-		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
-		if (!Result)
-			return false;
-	}
-		
-	return true;
-}
-
-bool 
-CClassType::StopAutoEvs (const CValue& ThisValue)
-{
-	bool Result;
-
-	size_t AutoEvCount = m_AutoEvArray.GetCount ();
-	for (size_t i = 0; i < AutoEvCount; i++)
-	{
-		CAutoEv* pAutoEv = m_AutoEvArray [i];
-
-		CFunction* pStopper = pAutoEv->GetStopper ();		
-		if (!pStopper)
-			continue;
-
-		Result = m_pModule->m_OperatorMgr.CallOperator (pStopper, ThisValue);
-		if (!Result)
-			return false;			
 	}
 
 	return true;

@@ -2,23 +2,29 @@
 
 class CMyClass
 {
-	int m_x = 10;
-	int m_y = foo (m_x);
-
-	preconstruct ()
+	class CClassA
 	{
-		printf ("CMyClass.preconstruct () { m_x = %d; m_y = %d }\n", m_x, m_y);
-	}	
+		this ()
+		{
+			printf ("CClassA.this ()\n");
+		}
 
+		~this ()
+		{
+			printf ("CClassA.~this ()\n");
+		}
+	};
+	
+	CClassA m_x = member new CClassA;
+	
 	this ()
 	{
-		printf ("CMyClass.this () { m_x = %d; m_y = %d }\n", m_x, m_y);
+		printf ("CMyClass.this ()\n");
 	}
 
-	int
-	foo (int x)
+	~this ()
 	{
-		return x * 20;
+		printf ("CMyClass.~this ()\n");
 	}
 };
 
@@ -29,7 +35,7 @@ main ()
 {
 	printf ("field initializers test\n");
 
-	heap new CMyClass;
+	stack new CMyClass;
 
 	return 0;
 }
