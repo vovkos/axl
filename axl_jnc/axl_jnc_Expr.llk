@@ -626,7 +626,7 @@ type_name_or_expr
 		{
 			$.m_pType = $2.m_pType;
 		}
-	| unary_expr_t <&$Value>
+	| unary_expr_s <&$Value>
 		{
 			$.m_pType = $Value.GetType ();
 		}

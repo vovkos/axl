@@ -99,7 +99,7 @@ CClassType::CreateField (
 			m_pStaticDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 			m_pStaticDataStructType->m_StorageKind = EStorage_Static;
 			m_pStaticDataStructType->m_pParentNamespace = this;
-			m_pStaticDataStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
+			m_pStaticDataStructType->m_Tag.Format (_T("%s.static_data_struct"), m_Tag);
 		}
 
 		pStructType = m_pStaticDataStructType;
@@ -120,6 +120,30 @@ CClassType::CreateField (
 	}
 
 	return pField;
+}
+
+bool
+CClassType::AddMemberNewType (CType* pType)
+{
+	if (pType->GetTypeKind () == EType_Class)
+	{
+		CClassType* pClassType = (CClassType*) pType;
+		bool Result = pClassType->CalcLayout ();
+		if (!Result)
+			return false;
+
+		if (pClassType->GetDestructor ())
+			m_MemberNewDestructArray.Append (pClassType);
+
+		pType = pClassType->GetClassStructType ();
+	}
+
+	CStructField* pField = CreateField (pType);
+
+	if (!m_FirstMemberNewField)
+		m_FirstMemberNewField = pField;
+
+	return true;
 }
 
 bool
@@ -425,6 +449,19 @@ CClassType::CalcLayout ()
 		}
 
 		IfaceBaseTypeArray [i] = pIfaceBaseType;
+	}
+
+	// scan for member new operators 
+
+	if (!m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ())
+	{
+		m_pModule->m_NamespaceMgr.OpenNamespace (this);
+
+		Result = m_pIfaceStructType->ScanInitializersForMemberNewOperators ();
+		if (!Result)
+			return false;
+
+		m_pModule->m_NamespaceMgr.CloseNamespace ();
 	}
 
 	// finalize iface layout

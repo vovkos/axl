@@ -232,12 +232,12 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\till %(FullPath) /F..\axl_pg_frames /o %(Filename).h /f axl_llk_ParserFrame.h.luaf /l</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">axl_jnc_Decl.llk;axl_jnc_Expr.llk;axl_jnc_Expr_0.llk;axl_jnc_Stmt.llk;axl_jnc_Stmt_0.llk;axl_jnc_DeclarationSpecifier.llk;axl_jnc_Declarator.llk;axl_jnc_NamedTypeSpecifier.llk;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">axl_jnc_Decl.llk;axl_jnc_Expr.llk;axl_jnc_Expr_s.llk;axl_jnc_Stmt.llk;axl_jnc_Stmt_0.llk;axl_jnc_DeclarationSpecifier.llk;axl_jnc_Declarator.llk;axl_jnc_NamedTypeSpecifier.llk;%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
     <None Include="axl_jnc_Decl.llk" />
     <None Include="axl_jnc_Declarator.llk" />
     <None Include="axl_jnc_DeclarationSpecifier.llk" />
-    <None Include="axl_jnc_Expr_0.llk" />
+    <None Include="axl_jnc_Expr_s.llk" />
     <None Include="axl_jnc_NamedTypeSpecifier.llk" />
     <None Include="axl_jnc_Expr.llk" />
     <None Include="axl_jnc_Stmt.llk" />

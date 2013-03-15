@@ -356,6 +356,7 @@ CFunctionMgr::SaveEmissionContext ()
 	pContext->m_ScopeLevelValue = m_ScopeLevelValue;
 	pContext->m_VTablePtrPtrValue = m_VTablePtrPtrValue;
 	pContext->m_VTablePtrValue = m_VTablePtrValue;
+	pContext->m_MemberNewField = m_MemberNewField;
 
 	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
@@ -376,6 +377,7 @@ CFunctionMgr::RestoreEmissionContext ()
 	m_ScopeLevelValue = pContext->m_ScopeLevelValue;
 	m_VTablePtrPtrValue = pContext->m_VTablePtrPtrValue;
 	m_VTablePtrValue = pContext->m_VTablePtrValue;
+	m_MemberNewField = pContext->m_MemberNewField;
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pContext->m_pCurrentBlock);
 	m_pModule->m_ControlFlowMgr.m_pReturnBlock = pContext->m_pReturnBlock;
@@ -507,10 +509,12 @@ CFunctionMgr::Prologue (
 
 	if (pFunction->GetFunctionKind () == EFunction_PreConstructor)
 	{
-		CStructType* pStructType = pFunction->m_pThisType->GetTargetType ()->GetIfaceStructType ();
-		Result = pStructType->InitializeFields ();
+		m_MemberNewField = pFunction->m_pClassType->GetFirstMemberNewField ();
+
+		Result = pFunction->m_pClassType->GetIfaceStructType ()->InitializeFields ();
 		if (!Result)
 			return false;
+		
 	}
 	else if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
 	{
@@ -690,7 +694,12 @@ CFunctionMgr::InternalPrologue (
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin ();
 
 	if (pFunction->IsMember ())
+	{
 		m_ThisValue = CValue (LlvmArg, pFunction->GetThisArgType ());
+
+		if (pFunction->GetFunctionKind () == EFunction_PreConstructor)
+			m_MemberNewField = pFunction->m_pClassType->GetFirstMemberNewField ();
+	}
 
 	for (size_t i = 0; i < ArgCount; i++, LlvmArg++)
 		pArgValueArray [i] = CValue (LlvmArg, ArgTypeArray [i]);

@@ -169,8 +169,8 @@ CAutoEv::CalcLayout ()
 	{
 		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
 			EVariable_Global, 
-			_T("static_field"),
-			m_Tag + _T(".static_field"), 
+			_T("static_data"),
+			m_Tag + _T(".static_data"), 
 			m_pDataStructType
 			);
 	}

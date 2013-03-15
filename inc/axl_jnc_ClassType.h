@@ -54,6 +54,7 @@ protected:
 	size_t m_PackFactor;
 	CStructType* m_pStaticDataStructType;
 	CVariable* m_pStaticDataVariable;
+	rtl::CIteratorT <CStructField> m_FirstMemberNewField;
 
 	// vtable
 
@@ -74,7 +75,9 @@ protected:
 	// autoev (handlers must be disconnected in destructor)
 
 	rtl::CArrayT <CAutoEv*> m_AutoEvArray;
-	
+
+	rtl::CArrayT <CType*> m_MemberNewTypeArray;
+	rtl::CArrayT <CClassType*> m_MemberNewDestructArray;
 	
 	CClassPtrTypeTuple* m_pClassPtrTypeTuple;
 
@@ -147,6 +150,12 @@ public:
 	GetStaticDataVariable ()
 	{
 		return m_pStaticDataVariable;
+	}
+
+	rtl::CIteratorT <CStructField>
+	GetFirstMemberNewField ()
+	{
+		return m_FirstMemberNewField;
 	}
 
 	CStructField*
@@ -234,6 +243,9 @@ public:
 	AddAutoEv (CAutoEv* pAutoEv);
 
 	bool
+	AddMemberNewType (CType* pType);
+
+	bool
 	HasVTable ()
 	{
 		return !m_VTable.IsEmpty ();
@@ -311,7 +323,7 @@ protected:
 
 	bool
 	CreateDefaultDestructor ();
-	
+
 	bool
 	InitializeInterface (
 		CClassType* pClassType,

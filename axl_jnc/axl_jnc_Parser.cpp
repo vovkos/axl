@@ -19,6 +19,7 @@ CParser::CParser ()
 	m_pLastDeclaredItem = NULL;
 	m_AutoEvBindSiteCount = 0;
 	m_AutoEvBindSiteTotalCount = 0;
+	m_pMemberNewTargetType = NULL;
 }
 
 bool
@@ -1535,7 +1536,7 @@ CParser::FinalizeConditionalExpr (
 }
 
 bool
-CParser::FinalizeConditionalExpr_t (
+CParser::FinalizeConditionalExpr_s (
 	const CValue& TrueValue,
 	const CValue& FalseValue,
 	CValue* pResultValue
@@ -1557,6 +1558,24 @@ CParser::FinalizeConditionalExpr_t (
 	}
 
 	pResultValue->SetType (pType);
+	return true;
+}
+
+bool
+CParser::NewOperator_s (
+	EStorage StorageKind, 
+	CType* pType, 
+	CValue* pResultValue
+	)
+{
+	if (m_pMemberNewTargetType && StorageKind == EStorage_Member)
+	{
+		bool Result = m_pMemberNewTargetType->AddMemberNewType (pType);
+		if (!Result)
+			return false;
+	}
+
+	pResultValue->SetType (m_pModule->m_OperatorMgr.GetNewOperatorResultType (pType));
 	return true;
 }
 

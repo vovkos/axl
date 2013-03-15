@@ -165,6 +165,9 @@ public:
 	bool
 	InitializeFields ();
 
+	bool
+	ScanInitializersForMemberNewOperators ();
+
 protected:
 	virtual 
 	void

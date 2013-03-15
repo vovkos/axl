@@ -143,7 +143,7 @@ CProperty::GetDataStructType (EStorage StorageKind)
 			return m_pDataStructType;
 
 		m_pDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-		m_pDataStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
+		m_pDataStructType->m_Tag.Format (_T("%s.data_struct"), m_Tag);
 		m_pDataStructType->m_pParentNamespace = this;
 		m_pParentClassField = m_pParentClassType->CreateField (StorageKind, m_pDataStructType);
 		return m_pDataStructType;
@@ -154,7 +154,7 @@ CProperty::GetDataStructType (EStorage StorageKind)
 
 		m_pStaticDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 		m_pStaticDataStructType->m_StorageKind = EStorage_Static;
-		m_pStaticDataStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
+		m_pStaticDataStructType->m_Tag.Format (_T("%s.static_data_struct"), m_Tag);
 		m_pStaticDataStructType->m_pParentNamespace = this;
 		return m_pStaticDataStructType;
 

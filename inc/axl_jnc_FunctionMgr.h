@@ -169,6 +169,7 @@ protected:
 		CValue m_ScopeLevelValue;
 		CValue m_VTablePtrPtrValue; 
 		CValue m_VTablePtrValue;
+		rtl::CIteratorT <CStructField> m_MemberNewField;
 	};
 
 protected:
@@ -193,6 +194,7 @@ protected:
 	CValue m_ScopeLevelValue;
 	CValue m_VTablePtrPtrValue; 
 	CValue m_VTablePtrValue;
+	rtl::CIteratorT <CStructField> m_MemberNewField;
 
 	rtl::CStdListT <TEmissionContext> m_EmissionContextStack;
 
@@ -235,6 +237,19 @@ public:
 	GetScopeLevelValue ()
 	{
 		return m_ScopeLevelValue;
+	}
+
+	CStructField*
+	GetMemberNewField ()
+	{
+		return *m_MemberNewField;
+	}
+
+	void
+	NextMemberNewField ()
+	{
+		ASSERT (m_MemberNewField);
+		m_MemberNewField++;
 	}
 
 	void

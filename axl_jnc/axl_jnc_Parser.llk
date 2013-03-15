@@ -1,6 +1,6 @@
 import "axl_jnc_Decl.llk";
 import "axl_jnc_Expr.llk";
-import "axl_jnc_Expr_0.llk";
+import "axl_jnc_Expr_s.llk";
 import "axl_jnc_Stmt.llk";
 import "axl_jnc_Stmt_0.llk";
 
@@ -67,6 +67,7 @@ Members
 	size_t m_AutoEvBindSiteCount;
 	size_t m_AutoEvBindSiteTotalCount;
 	CValue m_ExpressionValue;
+	CClassType* m_pMemberNewTargetType;
 }
 
 Members2
@@ -275,9 +276,16 @@ Members2
 		);
 
 	bool
-	FinalizeConditionalExpr_t (
+	FinalizeConditionalExpr_s (
 		const CValue& TrueValue,
 		const CValue& FalseValue,
+		CValue* pResultValue
+		);
+
+	bool
+	NewOperator_s (
+		EStorage StorageKind, 
+		CType* pType, 
 		CValue* pResultValue
 		);
 

@@ -83,7 +83,7 @@ autoev_stmt_0
 	;
 
 autoev_onchange_stmt_0
-	: EToken_OnChange '(' expression_list_t ')' 
+	: EToken_OnChange '(' expression_list_s ')' 
 		{
 			return CountAutoEvBindSites ();
 		}
@@ -91,7 +91,7 @@ autoev_onchange_stmt_0
 	;
 
 autoev_expression_stmt_0
-	: expression_t ';'
+	: expression_s ';'
 		{
 			return CountAutoEvBindSites ();
 		}

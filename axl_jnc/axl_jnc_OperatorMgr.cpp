@@ -598,6 +598,8 @@ COperatorMgr::NewOperator (
 	CValue* pResultValue
 	)
 {
+	bool Result;
+
 	CScope* pScope = NULL;
 	CFunction* pAlloc = NULL;
 	CType* pAllocType = pType;
@@ -639,8 +641,21 @@ COperatorMgr::NewOperator (
 		break;
 
 	case EStorage_Member:
-		err::SetFormatStringError (_T("'member new' is not supported yet"));
-		return false;
+		if (!m_pModule->m_FunctionMgr.GetMemberNewField ())
+		{
+			err::SetFormatStringError (_T("'member new' operator can only be called from field initalizer"));
+			return false;
+		}
+
+		Result = 
+			GetField (m_pModule->m_FunctionMgr.GetMemberNewField (), NULL, &PtrValue) &&
+			UnaryOperator (EUnOp_Addr, &PtrValue);
+
+		if (!Result)
+			return false;
+		
+		m_pModule->m_FunctionMgr.NextMemberNewField ();
+		break;
 
 	default:
 		err::SetFormatStringError (_T("invalid storage specifier '%s' in 'new' operator"), GetStorageKindString (StorageKind));
@@ -651,7 +666,9 @@ COperatorMgr::NewOperator (
 	{
 		CClassType* pClassType = (CClassType*) pType;
 
-		bool Result = InitializeObject (PtrValue, pClassType, pArgList, pResultValue);
+		rtl::CString s = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
+		
+		Result = InitializeObject (PtrValue, pClassType, pArgList, pResultValue);
 		if (!Result)
 			return false;
 		
