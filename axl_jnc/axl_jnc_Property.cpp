@@ -104,17 +104,18 @@ CProperty::CreateField (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags
+	int PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	if (!StorageKind)
 		StorageKind = m_pParentClassType ? EStorage_Member : EStorage_Static;
 
-	CStructType* pStructType = GetFieldStructType (StorageKind);
+	CStructType* pStructType = GetDataStructType (StorageKind);
 	if (!pStructType)
 		return NULL;
 
-	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags);
+	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 
 	if (!Name.IsEmpty ())
 	{
@@ -127,7 +128,7 @@ CProperty::CreateField (
 }
 
 CStructType*
-CProperty::GetFieldStructType (EStorage StorageKind)
+CProperty::GetDataStructType (EStorage StorageKind)
 {
 	switch (StorageKind)
 	{
@@ -369,7 +370,7 @@ CProperty::CalcLayout ()
 
 	if (m_pType->GetFlags () & EPropertyTypeFlag_Augmented)
 	{
-		CStructType* pStructType = GetFieldStructType (m_StorageKind);
+		CStructType* pStructType = GetDataStructType (m_StorageKind);
 		if (!pStructType)
 			return false;
 

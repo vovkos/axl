@@ -5,28 +5,9 @@ declarator_list <CTypeSpecifier* $pTypeSpecifier>
 	;
 		
 full_declarator <CTypeSpecifier* $pTypeSpecifier>
-	: declarator <$pTypeSpecifier>
-	  ('='
-		{
-			bool Result = Declare (&$1.m_Declarator, true);
-			if (!Result)
-				return false;
-
-			if (!m_pLastDeclaredItem || 
-				m_pLastDeclaredItem->GetItemKind () != EModuleItem_Variable)
-			{
-				err::SetFormatStringError (_T("can only apply initializers to variables"));
-				return false;
-			}
-		}
-	  initializer $i <.((CVariable*) m_pLastDeclaredItem)->GetType ().> 		
-		{
-			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, (CVariable*) m_pLastDeclaredItem, $i.m_Value);
-		}
-	  )?
+	: declarator <$pTypeSpecifier> ('=' expression_pass1 $i) ?
 		{ 
-			if (!IsValidLocator ($i))
-				return Declare (&$1.m_Declarator);
+			return Declare (&$1.m_Declarator, IsValidLocator ($i) ? &$i.m_TokenList : NULL);
 		}
 	;
 
@@ -79,6 +60,8 @@ initializer_list_entry <CType* $pType>
 	: initializer <$pType>
 	| epsilon
 	;
+
+
 
 //.............................................................................
 

@@ -24,6 +24,7 @@ protected:
 	CDerivableType* m_pParentType; // struct or union
 	CType* m_pType;
 	int m_PtrTypeFlags;
+	rtl::CBoxListT <CToken> m_Initializer;
 
 	CType* m_pBitFieldBaseType;
 	size_t m_BitCount;
@@ -50,6 +51,12 @@ public:
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
+	}
+
+	rtl::CConstBoxListT <CToken> 
+	GetInitializer ()
+	{
+		return m_Initializer;
 	}
 
 	size_t
@@ -81,6 +88,7 @@ protected:
 	size_t m_FieldAlignedSize;
 
 	rtl::CStdListT <CStructField> m_FieldList;
+	rtl::CArrayT <CStructField*> m_InitializedFieldArray;
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
 	size_t m_LastBitFieldOffset;
@@ -119,6 +127,12 @@ public:
 		return m_FieldList;
 	}
 
+	rtl::CArrayT <CStructField*> 
+	GetInitializedFieldArray ()
+	{
+		return m_InitializedFieldArray;
+	}
+
 	bool
 	IsClassStructType ();
 
@@ -127,7 +141,8 @@ public:
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
-		int PtrTypeFlags = 0
+		int PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
 	CStructField*
@@ -147,6 +162,9 @@ public:
 	bool
 	CalcLayout ();
 
+	bool
+	InitializeFields ();
+
 protected:
 	virtual 
 	void
@@ -161,9 +179,6 @@ protected:
 	{
 		m_pLlvmType = llvm::StructType::create (llvm::getGlobalContext (), (const tchar_t*) m_Tag);
 	}
-
-	void
-	ResetLayout ();
 
 	bool
 	LayoutField (

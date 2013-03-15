@@ -484,7 +484,14 @@ CFunctionMgr::Prologue (
 		LlvmArg++;
 	}
 
-	if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
+	if (pFunction->GetFunctionKind () == EFunction_PreConstructor)
+	{
+		CStructType* pStructType = pFunction->m_pThisType->GetTargetType ()->GetIfaceStructType ();
+		Result = pStructType->InitializeFields ();
+		if (!Result)
+			return false;
+	}
+	else if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
 	{
 		CValue AutoEvDataValue;
 

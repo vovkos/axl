@@ -66,6 +66,7 @@ Members
 	rtl::CBoxListT <CValue> m_AutoEvBindSiteList;
 	size_t m_AutoEvBindSiteCount;
 	size_t m_AutoEvBindSiteTotalCount;
+	CValue m_ExpressionValue;
 }
 
 Members2
@@ -154,7 +155,7 @@ Members2
 	bool
 	Declare (
 		CDeclarator* pDeclarator,
-		bool HasInitializer = false
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 		
 	bool
@@ -186,14 +187,14 @@ Members2
 		CType* pType,
 		CDeclarator* pDeclarator,
 		int PtrTypeFlags,
-		bool HasInitializer
+		rtl::CBoxListT <CToken>* pInitializer
 		);
 
 	bool
 	DeclarePropValue (
 		CType* pType,
 		int PtrTypeFlags,
-		bool HasInitializer
+		rtl::CBoxListT <CToken>* pInitializer
 		);
 
 	CFunctionFormalArg*

@@ -1,154 +1,35 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-int bindable Red;
-int bindable Green;
-int bindable Blue;
-
-int RGB;
-
-autoev AutoRgb (int x)
-{
-	printf ("x = %d;\t Red = %d\n", x, Red);
-	printf ("x = %d;\t Green = %d\n", x, Green);
-	printf ("x = %d;\t Blue = %d\n", x, Blue);
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-/*
-
-Purple (int r, int b)
-{
-	printf ("Purple (%d, %d)\n", r, b);
-}
-
-Yellow (int r, int g)
-{
-	printf ("Yellow (%d, %d)\n", r, g);
-}
-
-Cyan (int g, int b)
-{
-	printf ("Cyan (%d, %d)\n", g, b);
-}
-
-*/
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-/*
-
-autoev ColorAutoEv (int x)
-{
-	onchange (Red, Blue)
-		for (int i = 0; i < x; i++)
-			printf ("Green = %d; Blue = %d; x = %d\n", Green, Blue, x);
-
-	Purple (Red + x, Blue + x);
-	Yellow (Red + x, Green + x);
-	Cyan (Green + x, Blue + x);
-}
-
-*/
-
-/*
-
 class CMyClass
 {
-	int m_x;
+	int m_x = 10;
+	int m_y = foo (m_x);
 
-	this (int x)
+	preconstruct ()
 	{
-		m_x = x;
+		printf ("CMyClass.preconstruct () { m_x = %d; m_y = %d }\n", m_x, m_y);
+	}	
+
+	this ()
+	{
+		printf ("CMyClass.this () { m_x = %d; m_y = %d }\n", m_x, m_y);
 	}
 
-	~this ()
-	{	
-		printf ("CMyClass.~this ()\n");
-	}
-
-	autoev ColorAutoEv (int x)
+	int
+	foo (int x)
 	{
-		onchange (Green, Blue) 
-			for (int i = 0; i < x; i++)
-				printf ("Green = %d; Blue = %d; x = %d; { m_x = %d }\n", Green, Blue, x, m_x);
-
-		Purple (Red + m_x, Blue + x);
-		Yellow (Red + m_x, Green + x);
-		Cyan (Green + m_x, Blue + x);	
+		return x * 20;
 	}
 };
 
-*/
-
-/*
-
-class CMyClass
-{
-	this (int x)
-	{
-		ColorAutoEv (x);
-	}
-
-	autoev ColorAutoEv (int x)
-	{
-		onchange (Green, Blue) 
-			for (int i = 0; i < x; i++)
-				printf ("Green = %d; Blue = %d; x = %d;\n", Green, Blue, x);
-
-		Purple (Red + x, Blue + x);
-		Yellow (Red + x, Green + x);
-		Cyan (Green + x, Blue + x);	
-	}
-};
-
-*/
-
-/*
-
-autoev 
-class CColorAutoEv (int x)
-{
-	onchange (Green, Blue) 
-		for (int i = 0; i < x; i++)
-			printf ("Green = %d; Blue = %d; x = %d\n", Green, Blue, x);
-
-	Purple (Red + x, Blue + x);
-	Yellow (Red + x, Green + x);
-	Cyan (Green + x, Blue + x);	
-};
-
-*/
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
 main ()
 {
-	printf ("jancy autoev test\n");
+	printf ("field initializers test\n");
 
-	AutoRgb (10);
-
-	printf ("autoev is active\n");
-
-	Red = 1; 
-
-	AutoRgb (20);
-
-	Green = 2;
-
-	AutoRgb (30);
-
-	Blue = 3;
-
-/*
-	CColorAutoEv c = heap new CColorAutoEv (7);
-
-	// stack new CColorAutoEv (5);
-
-	printf ("autoev is active\n");
-	Red = 10;
-	Green = 200;
-	Blue = 3000;
-*/
+	heap new CMyClass;
 
 	return 0;
 }

@@ -37,6 +37,8 @@ protected:
 	EVariable m_VariableKind;
 	CType* m_pType;
 	int m_PtrTypeFlags;
+	rtl::CBoxListT <CToken> m_Initializer;
+
 	CScope* m_pScope;
 	llvm::Value* m_pLlvmValue;
 
@@ -61,6 +63,12 @@ public:
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
+	}
+
+	rtl::CConstBoxListT <CToken> 
+	GetInitializer ()
+	{
+		return m_Initializer;
 	}
 
 	CScope*

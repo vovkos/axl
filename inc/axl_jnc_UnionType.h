@@ -22,16 +22,11 @@ protected:
 	friend class CParser;
 
 	rtl::CStdListT <CStructField> m_FieldList;
-
+	CStructField* m_pInitializedField;
 	CStructType* m_pStructType;
 
 public:
-	CUnionType ()
-	{
-		m_TypeKind = EType_Union;
-		m_Flags = ETypeFlag_Pod;
-		m_pStructType = NULL;
-	}
+	CUnionType ();
 
 	CStructType*
 	GetStructType ()
@@ -51,7 +46,8 @@ public:
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount,
-		int PtrTypeFlags
+		int PtrTypeFlags,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
 	virtual

@@ -164,7 +164,8 @@ public:
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
-		int PtrTypeFlags = 0
+		int PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
 	CStructField*
@@ -210,7 +211,7 @@ protected:
 	GetAutoAccessorPropertyValue ();
 
 	CStructType*
-	GetFieldStructType (EStorage StorageKind);
+	GetDataStructType (EStorage StorageKind);
 };
 
 //.............................................................................

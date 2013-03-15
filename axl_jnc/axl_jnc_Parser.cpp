@@ -339,9 +339,31 @@ CParser::OpenTypeExtension (
 bool
 CParser::Declare (
 	CDeclarator* pDeclarator,
-	bool HasInitializer
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
+	/*
+	  ('='
+		{
+			bool Result = Declare (&$1.m_Declarator, true);
+			if (!Result)
+				return false;
+
+			if (!m_pLastDeclaredItem || 
+				m_pLastDeclaredItem->GetItemKind () != EModuleItem_Variable)
+			{
+				err::SetFormatStringError (_T("can only apply initializers to variables"));
+				return false;
+			}
+		}
+	  initializer $i <.((CVariable*) m_pLastDeclaredItem)->GetType ().> 		
+		{
+			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, (CVariable*) m_pLastDeclaredItem, $i.m_Value);
+		}
+	  )?
+
+	*/
+
 	ASSERT (pDeclarator);
 
 	m_pLastDeclaredItem = NULL;
@@ -366,14 +388,22 @@ CParser::Declare (
 		return false;
 	}
 
-	if (DataPtrTypeFlags && 
-		(m_StorageKind == EStorage_Typedef || 
+	if (m_StorageKind == EStorage_Typedef || 
 		TypeKind == EType_Function ||	
 		TypeKind == EType_Property || 
-		TypeKind == EType_AutoEv))
+		TypeKind == EType_AutoEv) // not data
 	{
-		err::SetFormatStringError (_T("unused modifier '%s'"), GetPtrTypeFlagString (DataPtrTypeFlags));
-		return false;
+		if (DataPtrTypeFlags)
+		{
+			err::SetFormatStringError (_T("unused modifier '%s'"), GetPtrTypeFlagString (DataPtrTypeFlags));
+			return false;
+		}
+
+		if (DataPtrTypeFlags)
+		{
+			err::SetFormatStringError (_T("unused modifier '%s'"), GetPtrTypeFlagString (DataPtrTypeFlags));
+			return false;
+		}
 	}
 
 	if (m_StorageKind == EStorage_Typedef)
@@ -392,7 +422,7 @@ CParser::Declare (
 
 	default:
 		if (DeclaratorKind != EDeclarator_PropValue)
-			return DeclareData (pType, pDeclarator, DataPtrTypeFlags, HasInitializer);		
+			return DeclareData (pType, pDeclarator, DataPtrTypeFlags, pInitializer);		
 
 		if (pDeclarator->IsQualified () || pDeclarator->GetBitCount ())
 		{
@@ -400,7 +430,7 @@ CParser::Declare (
 			return false;
 		}
 
-		return DeclarePropValue (pType, DataPtrTypeFlags, HasInitializer);
+		return DeclarePropValue (pType, DataPtrTypeFlags, pInitializer);
 	}		
 }
 
@@ -841,7 +871,7 @@ CParser::DeclareData (
 	CType* pType,
 	CDeclarator* pDeclarator,
 	int PtrTypeFlags,
-	bool HasInitializer
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	if (!pDeclarator->IsSimple ())
@@ -871,7 +901,7 @@ CParser::DeclareData (
 
 	if (NamespaceKind == ENamespace_Property)
 	{
-		pDataItem = ((CProperty*) pNamespace)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
+		pDataItem = ((CProperty*) pNamespace)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags, pInitializer);
 	}
 	else if (NamespaceKind != ENamespace_Type)
 	{
@@ -882,47 +912,51 @@ CParser::DeclareData (
 			Name, 
 			pNamespace->CreateQualifiedName (Name),
 			pType, 
-			PtrTypeFlags
+			PtrTypeFlags,
+			pInitializer
 			);
 
-		if (pFunction && !HasInitializer)
-			m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), pVariable);
+		AssignDeclarationAttributes (pVariable, pNamespace, pDeclarator->GetPos ());
 
 		Result = pNamespace->AddItem (pVariable);
 		if (!Result)
 			return false;
 
-		pDataItem = pVariable;
+		if (pFunction)
+		{
+			Result = m_pModule->m_VariableMgr.InitializeVariable (pVariable);
+			if (!Result)
+				return false;
+		}
 	}
 	else
 	{
+		CStructField* pField;
 		CNamedType* pNamedType =  (CNamedType*) pNamespace;
 		EType NamedTypeKind = pNamedType->GetTypeKind ();
-		
+
 		switch (NamedTypeKind)
 		{
 		case EType_Class:
-			pDataItem = ((CClassType*) pNamedType)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
+			pField = ((CClassType*) pNamedType)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags, pInitializer);
 			break;
 
 		case EType_Struct:
-			pDataItem = ((CStructType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags);
+			pField = ((CStructType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 			break;
 
 		case EType_Union:
-			pDataItem = ((CUnionType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags);
+			pField = ((CUnionType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 			break;
 
 		default:
 			err::SetFormatStringError (_T("field members are not allowed in '%s'"), pNamedType->GetTypeString ());
 			return false;
 		}
+
+		AssignDeclarationAttributes (pField, pNamespace, pDeclarator->GetPos ());
 	}
 
-	if (!pDataItem)
-		return false;
-
-	AssignDeclarationAttributes (pDataItem, pNamespace, pDeclarator->GetPos ());
 	return true;
 }
 
@@ -930,7 +964,7 @@ bool
 CParser::DeclarePropValue (	
 	CType* pType,
 	int PtrTypeFlags,
-	bool HasInitializer
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	bool Result;

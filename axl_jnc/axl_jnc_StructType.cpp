@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_StructType.h"
+#include "axl_jnc_Parser.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -46,7 +47,8 @@ CStructType::CreateField (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags
+	int PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	if (pType->GetTypeKind () == EType_Class)
@@ -60,6 +62,13 @@ CStructType::CreateField (
 	pField->m_PtrTypeFlags = PtrTypeFlags;
 	pField->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pField->m_BitCount = BitCount;
+
+	if (pInitializer)
+	{
+		pField->m_Initializer.TakeOver (pInitializer);		
+		m_InitializedFieldArray.Append (pField);
+	}
+
 	m_FieldList.InsertTail (pField);
 
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
@@ -111,8 +120,6 @@ CStructType::CalcLayout ()
 	bool Result = PreCalcLayout ();
 	if (!Result)
 		return false;
-
-	ResetLayout ();
 
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
@@ -175,15 +182,36 @@ CStructType::CalcLayout ()
 	return true;
 }
 
-void
-CStructType::ResetLayout ()
+bool
+CStructType::InitializeFields ()
 {
-	m_FieldActualSize = 0;
-	m_FieldAlignedSize = 0;
-	m_LlvmFieldTypeArray.Clear ();
-	m_pLastBitFieldType = NULL;
-	m_LastBitFieldOffset = 0;
-	m_Flags &= ~ETypeFlag_LayoutReady;
+	bool Result;
+
+	size_t Count = m_InitializedFieldArray.GetCount ();
+	
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_InitializedFieldArray [i];
+
+		CParser Parser;
+		Parser.m_pModule = m_pModule;
+		Parser.m_Stage = CParser::EStage_Pass2;
+
+		Result = Parser.ParseTokenList (ESymbol_expression_save_value, pField->m_Initializer);
+		if (!Result)
+			return false;
+
+		CValue FieldValue;
+
+		Result = 
+			m_pModule->m_OperatorMgr.GetField (pField, NULL, &FieldValue) &&
+			m_pModule->m_OperatorMgr.StoreDataRef (FieldValue, Parser.m_ExpressionValue);
+
+		if (!Result)
+			return false;
+	}
+
+	return true;
 }
 
 bool

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_VariableMgr.h"
+#include "axl_jnc_Parser.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -28,7 +29,8 @@ CVariableMgr::CreateVariable (
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
 	CType* pType,
-	int PtrTypeFlags
+	int PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	if (pType->GetTypeKind () == EType_Class)
@@ -42,6 +44,9 @@ CVariableMgr::CreateVariable (
 	pVariable->m_Tag = QualifiedName;
 	pVariable->m_pType = pType;
 	pVariable->m_PtrTypeFlags = PtrTypeFlags;
+
+	if (pInitializer)
+		pVariable->m_Initializer.TakeOver (pInitializer);
 
 	if (VariableKind == EVariable_Local)
 	{
@@ -88,6 +93,26 @@ CVariableMgr::AllocateGlobalVariables ()
 	return true;
 }
 
+bool
+CVariableMgr::InitializeVariable (CVariable* pVariable)
+{
+	if (pVariable->m_Initializer.IsEmpty ()) // no initializer
+	{
+		if (pVariable->m_VariableKind == EVariable_Local)
+			m_pModule->m_LlvmBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), pVariable);
+
+		return true;
+	}
+
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	return 
+		Parser.ParseTokenList (ESymbol_expression_save_value, pVariable->m_Initializer) &&
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, pVariable, Parser.m_ExpressionValue);
+}
+
 CVariable*
 CVariableMgr::GetScopeLevelVariable ()
 {
@@ -116,3 +141,4 @@ CVariableMgr::GetScopeLevelVariable ()
 
 } // namespace jnc {
 } // namespace axl {
+

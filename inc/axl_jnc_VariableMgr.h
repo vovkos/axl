@@ -40,8 +40,12 @@ public:
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		CType* pType,
-		int PtrTypeFlags = 0
+		int PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
+
+	bool
+	InitializeVariable (CVariable* pVariable);
 
 	bool
 	AllocateGlobalVariables ();

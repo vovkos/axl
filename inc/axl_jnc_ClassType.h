@@ -155,7 +155,8 @@ public:
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
-		int PtrTypeFlags = 0
+		int PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
 	CStructField*
@@ -204,11 +205,18 @@ public:
 
 	bool
 	AddMethod (CFunction* pFunction);
-	
+
 	CFunction*
 	CreateMethod (
 		EStorage StorageKind,
 		const rtl::CString& Name,
+		CFunctionType* pShortType
+		);
+
+	CFunction*
+	CreateUnnamedMethod (
+		EStorage StorageKind,
+		EFunction FunctionKind,
 		CFunctionType* pShortType
 		);
 
@@ -294,6 +302,9 @@ protected:
 
 	bool
 	CreateAutoEvConstructor ();
+
+	bool
+	CreateDefaultPreConstructor ();
 
 	bool
 	CreateDefaultConstructor ();

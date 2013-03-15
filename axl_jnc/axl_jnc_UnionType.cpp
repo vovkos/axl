@@ -7,12 +7,21 @@ namespace jnc {
 
 //.............................................................................
 
+CUnionType::CUnionType ()
+{
+	m_TypeKind = EType_Union;
+	m_Flags = ETypeFlag_Pod;
+	m_pStructType = NULL;
+	m_pInitializedField = NULL;
+}
+
 CStructField*
 CUnionType::CreateField (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags
+	int PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
@@ -21,20 +30,33 @@ CUnionType::CreateField (
 		return NULL;
 	}
 
-	CStructField* pMember = AXL_MEM_NEW (CStructField);
-	pMember->m_Name = Name;
-	pMember->m_pParentType = this;
-	pMember->m_pType = pType;
-	pMember->m_PtrTypeFlags = PtrTypeFlags;
-	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
-	pMember->m_BitCount = BitCount;
-	m_FieldList.InsertTail (pMember);
+	CStructField* pField = AXL_MEM_NEW (CStructField);
+	pField->m_Name = Name;
+	pField->m_pParentType = this;
+	pField->m_pType = pType;
+	pField->m_PtrTypeFlags = PtrTypeFlags;
+	pField->m_pBitFieldBaseType = BitCount ? pType : NULL;
+	pField->m_BitCount = BitCount;
 
-	bool Result = AddItem (pMember);
+	if (pInitializer)
+	{
+		if (m_pInitializedField)
+		{
+			err::SetFormatStringError (_T("'%s' already has initialized field '%s'"), pType->GetTypeString (), m_pInitializedField->GetName ());
+			return NULL;
+		}
+
+		pField->m_Initializer.TakeOver (pInitializer);		
+		m_pInitializedField = pField;
+	}
+
+	m_FieldList.InsertTail (pField);
+
+	bool Result = AddItem (pField);
 	if (!Result)
 		return NULL;
 
-	return pMember;
+	return pField;
 }
 
 bool

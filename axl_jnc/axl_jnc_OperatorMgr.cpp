@@ -355,9 +355,6 @@ COperatorMgr::CastOperator (
 		// nope, need to go through full cast
 	}
 
-	if (!StorageKind)
-		StorageKind = EStorage_Heap; // allocate (if needed) on managed heap by default
-
 	return pOperator->Cast (StorageKind, OpValue, pType, pResultValue);
 }
 

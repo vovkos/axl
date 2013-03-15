@@ -888,6 +888,19 @@ public:
 
 	// misc
 
+	CType*
+	GetFieldType (
+		const CValue& OpValue,
+		CStructField* pMember
+		);
+
+	bool
+	GetField (
+		CStructField* pMember,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
 	bool
 	GetStructField  (
 		const CValue& OpValue,
@@ -1027,19 +1040,6 @@ protected:
 		);
 
 	// member operators
-
-	CType*
-	GetFieldType (
-		const CValue& OpValue,
-		CStructField* pMember
-		);
-
-	bool
-	GetField (
-		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
 
 	CType*
 	GetStructMemberType (

@@ -80,16 +80,17 @@ CClassType::CreateField (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags
+	int PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	CStructType* pFieldStructType;
+	CStructType* pStructType;
 
 	switch (StorageKind)
 	{
 	case EStorage_Undefined:
 	case EStorage_Member:
-		pFieldStructType = m_pIfaceStructType;
+		pStructType = m_pIfaceStructType;
 		break;
 
 	case EStorage_Static:
@@ -101,7 +102,7 @@ CClassType::CreateField (
 			m_pStaticDataStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
 		}
 
-		pFieldStructType = m_pStaticDataStructType;
+		pStructType = m_pStaticDataStructType;
 		break;
 
 	default:
@@ -109,7 +110,7 @@ CClassType::CreateField (
 		return NULL;
 	}
 
-	CStructField* pField = pFieldStructType->CreateField (Name, pType, BitCount, PtrTypeFlags);
+	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 
 	if (!Name.IsEmpty ())
 	{
@@ -326,6 +327,23 @@ CClassType::CreateMethod (
 	return pFunction;
 }
 
+CFunction*
+CClassType::CreateUnnamedMethod (
+	EStorage StorageKind,
+	EFunction FunctionKind,
+	CFunctionType* pShortType
+	)
+{
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pShortType);
+	pFunction->m_StorageKind = StorageKind;
+	
+	bool Result = AddMethod (pFunction);
+	if (!Result)
+		return NULL;
+
+	return pFunction;
+}
+
 CProperty*
 CClassType::CreateProperty (
 	EStorage StorageKind,
@@ -528,6 +546,13 @@ CClassType::CalcLayout ()
 	}
 	else
 	{
+		if (!m_pPreConstructor && !m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ())
+		{
+			Result = CreateDefaultPreConstructor ();
+			if (!Result)
+				return false;
+		}
+
 		if (!m_pConstructor && (m_pPreConstructor || HasBaseConstructor))
 		{
 			Result = CreateDefaultConstructor ();
@@ -733,6 +758,27 @@ CClassType::CreateAutoEvConstructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pConstructor = pFunction;
+	return true;
+}
+
+bool
+CClassType::CreateDefaultPreConstructor ()
+{
+	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+	CFunction* pFunction = CreateUnnamedMethod (EStorage_Member, EFunction_PreConstructor, pType);
+	if (!pFunction)
+		return false;
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pFunction);
+	m_pModule->m_NamespaceMgr.OpenNamespace (this);
+
+	bool Result = m_pIfaceStructType->InitializeFields ();
+	if (!Result)
+		return false;
+
+	m_pModule->m_NamespaceMgr.CloseNamespace ();
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+
 	return true;
 }
 
