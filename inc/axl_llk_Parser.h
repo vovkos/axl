@@ -585,11 +585,8 @@ protected:
 
 			pLaDfaNode->m_Index = pLaDfaNode->m_ResolverElseIndex - T::LaDfaFirst;
 			
-			if (!(pLaDfaNode->m_Flags & ELaDfaNodeFlag_HasChainedResolver))
-			{
-				// if no chained resolver, advance one token forward
-				m_TokenCursor++;
-			}
+			if (!(pLaDfaNode->m_Flags & ELaDfaNodeFlag_HasChainedResolver)) 
+				return EMatchResult_NextToken; // if no chained resolver, advance to next token
 		}
 		else
 		{
