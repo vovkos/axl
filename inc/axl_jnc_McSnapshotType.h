@@ -14,6 +14,24 @@ namespace jnc {
 
 //.............................................................................
 
+enum EMcSnapshotField
+{
+	EMcSnapshotField_Count,
+	EMcSnapshotField_PtrArray,
+
+	EMcSnapshotField__Count,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum EMcSnapshotMethod
+{
+	EMcSnapshotMethod_Call,
+
+	EMcSnapshotMethod__Count,
+};
+//.............................................................................
+
 class CMcSnapshotType: public CType
 {
 protected:
@@ -21,7 +39,8 @@ protected:
 
 	CFunctionPtrType* m_pTargetType;
 	CStructType* m_pMcSnapshotStructType;
-	CFunction* m_pCallMethod;
+	CStructField* m_FieldArray [EMcSnapshotField__Count];
+	CFunction* m_MethodArray [EMcSnapshotMethod__Count];
 
 public:
 	CMcSnapshotType ();
@@ -41,8 +60,15 @@ public:
 	CStructType* 
 	GetMcSnapshotStructType ();
 
+	CStructField* 
+	GetField (EMcSnapshotField Field)
+	{
+		ASSERT (Field < EMcSnapshotField__Count);
+		return m_FieldArray [Field];
+	}
+
 	CFunction* 
-	GetCallMethod ();
+	GetMethod (EMcSnapshotMethod Method);
 
 protected:
 	virtual 
@@ -52,6 +78,9 @@ protected:
 	virtual 
 	void
 	PrepareLlvmType ();
+
+	CFunction* 
+	CreateCallMethod ();
 };
 
 //.............................................................................

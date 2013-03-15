@@ -49,7 +49,7 @@ nullable
 enum_member <CEnumType* $pType>
 	: EToken_Identifier ('=' expression_pass1 $e)?
 		{
-			CEnumConst* pMember = $pType->CreateConstMember ($1.m_Data.m_String);
+			CEnumConst* pMember = $pType->CreateConst ($1.m_Data.m_String);
 			if (!pMember)
 				return false;
 

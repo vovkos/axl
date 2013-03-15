@@ -253,7 +253,7 @@ CModulePane::AddEnumTypeMembers (
 	jnc::CEnumType* pType
 	)
 {
-	rtl::CIteratorT <jnc::CEnumConst> Member = pType->GetMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CEnumConst> Member = pType->GetConstList ().GetHead ();
 	for (; Member; Member++)
 		AddEnumConst (hParent, *Member);
 	
@@ -308,7 +308,7 @@ CModulePane::AddStructTypeMembers (
 {
 //	AddStructClassTypeMembers (hParent, pType);
 
-	rtl::CIteratorT <jnc::CStructField> Member = pType->GetFieldMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CStructField> Member = pType->GetFieldList ().GetHead ();
 	for (; Member; Member++)
 		AddStructField (hParent, *Member);
 
@@ -323,7 +323,7 @@ CModulePane::AddUnionTypeMembers (
 {
 //	AddStructClassTypeMembers (hParent, pType);
 
-	rtl::CIteratorT <jnc::CStructField> Member = pType->GetFieldMemberList ().GetHead ();
+	rtl::CIteratorT <jnc::CStructField> Member = pType->GetFieldList ().GetHead ();
 	for (; Member; Member++)
 		AddStructField (hParent, *Member);
 

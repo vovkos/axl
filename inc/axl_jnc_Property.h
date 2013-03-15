@@ -39,14 +39,14 @@ protected:
 	// parent class
 
 	CClassType* m_pParentClassType;
-	CStructField* m_pParentClassFieldMember;
+	CStructField* m_pParentClassField;
 	size_t m_ParentClassVTableIndex;
 
 	// fields (augmented fields are stored in a base type)
 
 	size_t m_PackFactor;
-	CStructType* m_pFieldStructType;
-	CStructType* m_pStaticFieldStructType;
+	CStructType* m_pDataStructType;
+	CStructType* m_pStaticDataStructType;
 	CVariable* m_pStaticDataVariable;
 
 	// vtable
@@ -102,15 +102,15 @@ public:
 	}
 
 	CStructType* 
-	GetFieldStructType ()
+	GetDataStructType ()
 	{
-		return m_pFieldStructType;
+		return m_pDataStructType;
 	}
 
 	CStructType* 
-	GetStaticFieldStructType ()
+	GetStaticDataStructType ()
 	{
-		return m_pStaticFieldStructType;
+		return m_pStaticDataStructType;
 	}
 
 	CVariable* 
@@ -126,9 +126,9 @@ public:
 	}
 
 	CStructField* 
-	GetParentClassFieldMember ()
+	GetParentClassField ()
 	{
-		return m_pParentClassFieldMember;
+		return m_pParentClassField;
 	}
 
 	bool
@@ -156,10 +156,10 @@ public:
 	Create (CPropertyType* pType);
 
 	void
-	ConvertToPropertyMember (CClassType* pClassType);
+	ConvertToMemberProperty (CClassType* pClassType);
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
@@ -168,24 +168,24 @@ public:
 		);
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	bool
-	AddMethodMember (CFunction* pFunction);
+	AddMethod (CFunction* pFunction);
 
 	bool
-	AddPropertyMember (CProperty* pProperty);
+	AddProperty (CProperty* pProperty);
 
 	bool
-	AddAutoEvMember (CAutoEv* pAutoEv);
+	AddAutoEv (CAutoEv* pAutoEv);
 
 	bool
 	CalcLayout ();

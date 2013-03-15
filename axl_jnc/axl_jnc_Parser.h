@@ -3020,13 +3020,13 @@ public:
 	GetThisValueType (CValue* pValue);
 
 	bool
-	GetAuPropertyFieldMember (
+	GetAuPropertyField (
 		CValue* pValue,
 		EAuPropertyField Field
 		);
 
 	bool
-	GetAuPropertyFieldMemberType (
+	GetAuPropertyFieldType (
 		CValue* pValue,
 		EAuPropertyField Field
 		);
@@ -7347,7 +7347,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 672 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
+			return m_pModule->m_OperatorMgr.GetAuPropertyField (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
 		;
 // #line 7353 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -7360,7 +7360,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 676 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
+			return m_pModule->m_OperatorMgr.GetAuPropertyField (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
 		;
 // #line 7366 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -7425,7 +7425,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 704 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			return GetAuPropertyFieldMember (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
+			return GetAuPropertyField (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
 		;
 // #line 7431 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -7438,7 +7438,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 708 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr.llk"
 			
-			return GetAuPropertyFieldMember (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
+			return GetAuPropertyField (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
 		;
 // #line 7444 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -8102,7 +8102,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 386 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr_t.llk"
 			
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMemberType (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldType (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
 		;
 // #line 8108 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -8115,7 +8115,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 390 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr_t.llk"
 			
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMemberType (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldType (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
 		;
 // #line 8121 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -8180,7 +8180,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 418 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr_t.llk"
 			
-			return GetAuPropertyFieldMemberType (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
+			return GetAuPropertyFieldType (__pSymbol->m_Arg.pValue, EAuPropertyField_OnChange);
 		;
 // #line 8186 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -8193,7 +8193,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 422 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Expr_t.llk"
 			
-			return GetAuPropertyFieldMemberType (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
+			return GetAuPropertyFieldType (__pSymbol->m_Arg.pValue, EAuPropertyField_PropValue);
 		;
 // #line 8199 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Parser.h"
 			}
@@ -10686,7 +10686,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 51 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			
-			CEnumConst* pMember = __pSymbol->m_Arg.pType->CreateConstMember ((*GetTokenLocator (0)).m_Data.m_String);
+			CEnumConst* pMember = __pSymbol->m_Arg.pType->CreateConst ((*GetTokenLocator (0)).m_Data.m_String);
 			if (!pMember)
 				return false;
 

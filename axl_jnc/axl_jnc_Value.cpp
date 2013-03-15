@@ -40,7 +40,7 @@ public:
 		char Buffer [256];
 		rtl::CArrayT <llvm::Constant*> LlvmMemberArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
-		rtl::CIteratorT <CStructField> Member = pType->GetFieldMemberList ().GetHead ();
+		rtl::CIteratorT <CStructField> Member = pType->GetFieldList ().GetHead ();
 		for (; Member; Member++)
 		{
 			CValue MemberConst ((char*) p + Member->GetOffset (), Member->GetType ());

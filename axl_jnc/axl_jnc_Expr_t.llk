@@ -384,11 +384,11 @@ member_operator_t <CValue* $pValue>
 		}
 	| EToken_OnChange
 		{
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMemberType ($pValue, EAuPropertyField_OnChange);
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldType ($pValue, EAuPropertyField_OnChange);
 		}
 	| EToken_PropValue
 		{
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMemberType ($pValue, EAuPropertyField_PropValue);
+			return m_pModule->m_OperatorMgr.GetAuPropertyFieldType ($pValue, EAuPropertyField_PropValue);
 		}
 	| EToken_Get
 		{
@@ -416,11 +416,11 @@ primary_expr_t <CValue* $pValue>
 		}
 	| EToken_OnChange
 		{
-			return GetAuPropertyFieldMemberType ($pValue, EAuPropertyField_OnChange);
+			return GetAuPropertyFieldType ($pValue, EAuPropertyField_OnChange);
 		}
 	| EToken_PropValue
 		{
-			return GetAuPropertyFieldMemberType ($pValue, EAuPropertyField_PropValue);
+			return GetAuPropertyFieldType ($pValue, EAuPropertyField_PropValue);
 		}
 	| EToken_Integer
 		{

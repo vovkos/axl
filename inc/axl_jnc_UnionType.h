@@ -21,7 +21,7 @@ protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
-	rtl::CStdListT <CStructField> m_FieldMemberList;
+	rtl::CStdListT <CStructField> m_FieldList;
 
 	CStructType* m_pStructType;
 
@@ -41,13 +41,13 @@ public:
 	}
 
 	rtl::CConstListT <CStructField>
-	GetFieldMemberList ()
+	GetFieldList ()
 	{
-		return m_FieldMemberList;
+		return m_FieldList;
 	}
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount,

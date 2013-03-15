@@ -255,7 +255,7 @@ COperatorMgr::CallOperator (
 
 		if (pFunction->IsVirtual ())
 		{
-			Result = GetVirtualMethodMember (pFunction, pClosure, &OpValue);
+			Result = GetVirtualMethod (pFunction, pClosure, &OpValue);
 			if (!Result)
 				return false;
 		}
@@ -465,7 +465,7 @@ COperatorMgr::CallClosureFunctionPtr (
 	ASSERT (pFunctionPointerType->GetTypeKind () == EType_FunctionPtr);
 
 	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
-	CFunctionType* pAbstractMethodType = pFunctionType->GetStdObjectMethodMemberType ();
+	CFunctionType* pAbstractMethodType = pFunctionType->GetStdObjectMemberMethodType ();
 
 	CheckFunctionPtrNull (OpValue);
 	

@@ -779,41 +779,41 @@ public:
 	// augmented property fields
 
 	CType*
-	GetAuPropertyFieldMemberType (
+	GetAuPropertyFieldType (
 		const CValue& OpValue,
 		EAuPropertyField Field
 		);
 
 	bool
-	GetAuPropertyFieldMemberType (
+	GetAuPropertyFieldType (
 		const CValue& OpValue,
 		EAuPropertyField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetAuPropertyFieldMemberType (
+	GetAuPropertyFieldType (
 		CValue* pValue,	
 		EAuPropertyField Field
 		)
 	{
-		return GetAuPropertyFieldMemberType (*pValue, Field, pValue);
+		return GetAuPropertyFieldType (*pValue, Field, pValue);
 	}
 
 	bool
-	GetAuPropertyFieldMember (
+	GetAuPropertyField (
 		const CValue& OpValue,
 		EAuPropertyField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetAuPropertyFieldMember (
+	GetAuPropertyField (
 		CValue* pValue,	
 		EAuPropertyField Field
 		)
 	{
-		return GetAuPropertyFieldMember (*pValue, Field, pValue);
+		return GetAuPropertyField (*pValue, Field, pValue);
 	}
 
 	// misc property functions
@@ -889,7 +889,7 @@ public:
 	// misc
 
 	bool
-	GetStructFieldMember  (
+	GetStructField  (
 		const CValue& OpValue,
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
@@ -897,28 +897,28 @@ public:
 		);
 
 	bool
-	GetVirtualMethodMember (
+	GetVirtualMethod (
 		CFunction* pFunction,
 		CClosure* pClosure,
 		CValue* pResultValue
 		);
 
 	bool
-	GetVirtualPropertyMember (
+	GetVirtualProperty (
 		CProperty* pProperty,
 		CClosure* pClosure,
 		CValue* pResultValue
 		);
 
 	bool
-	GetClassFieldMemberValue (
+	GetClassFieldValue (
 		const CValue& ObjValue,
 		CStructField* pMember,
 		CValue* pValue
 		);
 
 	bool
-	SetClassFieldMemberValue (
+	SetClassFieldValue (
 		const CValue& ObjValue,
 		CStructField* pMember,
 		const CValue& Value
@@ -948,15 +948,15 @@ public:
 		);
 
 	bool
-	GetAutoEvData (
+	COperatorMgr::GetAutoEvData (
 		CAutoEv* pAutoEv,
 		CValue* pResultValue
 		);
 
 	bool
-	GetAutoEvFieldMember (
+	GetAutoEvField (
 		CAutoEv* pAutoEv,
-		CStructField* pField,
+		EAutoEvField Field,
 		CValue* pResultValue
 		);
 
@@ -1029,13 +1029,13 @@ protected:
 	// member operators
 
 	CType*
-	GetFieldMemberType (
+	GetFieldType (
 		const CValue& OpValue,
 		CStructField* pMember
 		);
 
 	bool
-	GetFieldMember (
+	GetField (
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
@@ -1072,7 +1072,7 @@ protected:
 		);
 
 	bool
-	GetUnionFieldMember (
+	GetUnionField (
 		const CValue& OpValue,
 		CStructField* pMember,
 		CValue* pResultValue
@@ -1094,7 +1094,7 @@ protected:
 		);
 
 	CType*
-	GetAutoEvMemberType (
+	GetMemberAutoEvType (
 		const CValue& OpValue,
 		CAutoEvType* pAutoEvType,
 		const tchar_t* pName
@@ -1124,7 +1124,7 @@ protected:
 		);
 
 	bool
-	GetClassFieldMember (
+	GetClassField (
 		const CValue& OpValue,
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,

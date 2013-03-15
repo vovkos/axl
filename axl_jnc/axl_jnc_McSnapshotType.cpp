@@ -12,7 +12,8 @@ CMcSnapshotType::CMcSnapshotType ()
 	m_TypeKind = EType_McSnapshot;
 	m_pTargetType = NULL;
 	m_pMcSnapshotStructType = NULL;
-	m_pCallMethod = NULL;
+	memset (m_FieldArray, 0, sizeof (m_FieldArray));
+	memset (m_MethodArray, 0, sizeof (m_MethodArray));
 }
 
 void
@@ -37,19 +38,41 @@ CMcSnapshotType::GetMcSnapshotStructType ()
 
 	m_pMcSnapshotStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pMcSnapshotStructType->m_Tag.Format (_T("mcsnapshot"));
-	m_pMcSnapshotStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pMcSnapshotStructType->CreateFieldMember (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
+
+	m_FieldArray [EMcSnapshotField_Count] = m_pMcSnapshotStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_FieldArray [EMcSnapshotField_PtrArray] = m_pMcSnapshotStructType->CreateField (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
+	
 	m_pMcSnapshotStructType->CalcLayout ();
 
 	return m_pMcSnapshotStructType;
 }
 
 CFunction* 
-CMcSnapshotType::GetCallMethod ()
+CMcSnapshotType::GetMethod (EMcSnapshotMethod Method)
 {
-	if (m_pCallMethod)
-		return m_pCallMethod;
+	if (m_MethodArray [Method])
+		return m_MethodArray [Method];
 
+	CFunction* pFunction;
+
+	switch (Method)
+	{
+	case EMcSnapshotMethod_Call:
+		pFunction = CreateCallMethod ();
+		break;
+
+	default:
+		ASSERT (false);
+		pFunction = NULL;
+	}
+
+	m_MethodArray [Method] = pFunction;
+	return pFunction;
+}
+
+CFunction* 
+CMcSnapshotType::CreateCallMethod ()
+{
 	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, this);
 	size_t ArgCount = ArgTypeArray.GetCount ();
@@ -103,7 +126,6 @@ CMcSnapshotType::GetCallMethod ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pCallMethod = pFunction;
 	return pFunction;
 }
 

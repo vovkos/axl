@@ -18,7 +18,7 @@ CPropertyTemplate::CPropertyTemplate ()
 }
 
 bool
-CPropertyTemplate::AddMethodMember (
+CPropertyTemplate::AddMethod (
 	EFunction FunctionKind,
 	CFunctionType* pFunctionType
 	)
@@ -29,7 +29,7 @@ CPropertyTemplate::AddMethodMember (
 		return false;
 	}
 
-	bool Result = m_Verifier.AddMethodMember (FunctionKind, pFunctionType);
+	bool Result = m_Verifier.AddMethod (FunctionKind, pFunctionType);
 	if (!Result)
 		return false;
 

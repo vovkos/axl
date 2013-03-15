@@ -49,7 +49,7 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetType ();
 	CFunctionType* pSrcFunctionType = pSrcPtrType->GetTargetType ();
 	
-	CFunctionPtrType* pThinPtrType = pSrcFunctionType->GetStdObjectMethodMemberType ()->GetFunctionPtrType (EFunctionPtrType_Thin);
+	CFunctionPtrType* pThinPtrType = pSrcFunctionType->GetStdObjectMemberMethodType ()->GetFunctionPtrType (EFunctionPtrType_Thin);
 
 	CValue PfnValue;
 	CValue ClosureObjValue;
@@ -105,7 +105,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 
 	if (OpValue.GetValueKind () == EValue_Function && OpValue.GetFunction ()->IsVirtual ())
 	{
-		bool Result = m_pModule->m_OperatorMgr.GetVirtualMethodMember (OpValue.GetFunction (), pClosure, &OpValue);
+		bool Result = m_pModule->m_OperatorMgr.GetVirtualMethod (OpValue.GetFunction (), pClosure, &OpValue);
 		if (!Result)
 			return false;
 	}
@@ -113,7 +113,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 	// case 1: no conversion required, no closure object needs to be created
 
 	if (IsSimpleClosure && 
-		pSrcFunctionType->IsMethodMemberType () &&
+		pSrcFunctionType->IsMemberMethodType () &&
 		pSrcFunctionType->GetShortType ()->Cmp (pDstFunctionType) == 0)
 	{
 		return LlvmCast_NoThunkSimpleClosure (
@@ -140,7 +140,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 
 		// case 2.2: same as above, but simple closure is passed as closure arg
 
-		if (IsSimpleClosure && pFunction->GetType ()->IsMethodMemberType ())
+		if (IsSimpleClosure && pFunction->GetType ()->IsMemberMethodType ())
 			return LlvmCast_DirectThunkSimpleClosure (
 				pFunction,
 				SimpleClosureValue,
@@ -215,7 +215,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 
 	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (
 		pFunction, 
-		pThisArgType->GetTargetType ()->GetMethodMemberType (pDstPtrType->GetTargetType ())
+		pThisArgType->GetTargetType ()->GetMemberMethodType (pDstPtrType->GetTargetType ())
 		);
 
 	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pThunkFunction, ThisArgValue, pDstPtrType, pResultValue);

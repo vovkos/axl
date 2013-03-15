@@ -15,7 +15,7 @@ CEnumType::CEnumType ()
 }
 
 CEnumConst*
-CEnumType::CreateConstMember (
+CEnumType::CreateConst (
 	const rtl::CString& Name,
 	intptr_t Value
 	)
@@ -24,7 +24,7 @@ CEnumType::CreateConstMember (
 	pMember->m_Name = Name;
 	pMember->m_pParentEnumType = this;
 	pMember->m_Value = Value;
-	m_ConstMemberList.InsertTail (pMember);
+	m_ConstList.InsertTail (pMember);
 	
 	bool Result = AddItem (pMember);
 	if (!Result)

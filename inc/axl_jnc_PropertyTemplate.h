@@ -44,7 +44,7 @@ public:
 	}
 
 	bool
-	AddMethodMember (
+	AddMethod (
 		EFunction FunctionKind,
 		CFunctionType* pFunctionType
 		);

@@ -228,10 +228,10 @@ CNamespace::AddFunction (CFunction* pFunction)
 bool
 CNamespace::ExposeEnumConsts (CEnumType* pType)
 {
-	rtl::CIteratorT <CEnumConst> Member = pType->GetMemberList ().GetHead ();
-	for (; Member; Member++)
+	rtl::CIteratorT <CEnumConst> Const = pType->GetConstList ().GetHead ();
+	for (; Const; Const++)
 	{
-		CAlias* pAlias = CreateAlias (Member->GetName (), *Member);
+		CAlias* pAlias = CreateAlias (Const->GetName (), *Const);
 		if (!pAlias)
 			return false;
 	}

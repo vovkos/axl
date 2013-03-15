@@ -169,13 +169,13 @@ CFunction::GetLlvmFunction ()
 }
 
 void
-CFunction::ConvertToMethodMember (CClassType* pClassType)
+CFunction::ConvertToMemberMethod (CClassType* pClassType)
 {
 	ASSERT (!m_pClassType);
 	ASSERT (m_TypeOverload.GetOverloadCount () == 1);
 
 	m_pClassType = pClassType;
-	m_pType = pClassType->GetMethodMemberType (m_pType, m_ThisArgTypeFlags);
+	m_pType = pClassType->GetMemberMethodType (m_pType, m_ThisArgTypeFlags);
 	m_TypeOverload = m_pType;
 
 	ASSERT (!m_pType->GetArgTypeArray ().IsEmpty ());

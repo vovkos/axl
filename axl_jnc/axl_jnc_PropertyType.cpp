@@ -62,7 +62,7 @@ CPropertyType::CPropertyType ()
 	m_TypeKind = EType_Property;
 
 	m_pGetterType = NULL;
-	m_pStdObjectPropertyMemberType = NULL;
+	m_pStdObjectMemberPropertyType = NULL;
 	m_pShortType = NULL;
 	m_pBindablePropertyType = NULL;
 	m_pVTableStructType = NULL;
@@ -82,15 +82,15 @@ CPropertyType::GetPropertyPtrType (
 }
 
 CPropertyType*
-CPropertyType::GetPropertyMemberType (CClassType* pClassType)
+CPropertyType::GetMemberPropertyType (CClassType* pClassType)
 {
-	return m_pModule->m_TypeMgr.GetPropertyMemberType (pClassType, this);
+	return m_pModule->m_TypeMgr.GetMemberPropertyType (pClassType, this);
 }
 
 CPropertyType*
-CPropertyType::GetStdObjectPropertyMemberType ()
+CPropertyType::GetStdObjectMemberPropertyType ()
 {
-	return m_pModule->m_TypeMgr.GetStdObjectPropertyMemberType (this);
+	return m_pModule->m_TypeMgr.GetStdObjectMemberPropertyType (this);
 }
 
 CPropertyType*

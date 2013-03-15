@@ -294,14 +294,14 @@ public:
 	}
 
 	CFunctionType* 
-	GetMethodMemberType (
+	GetMemberMethodType (
 		CClassType* pClassType,
 		CFunctionType* pFunctionType,
 		int ThisArgTypeFlags = 0
 		);
 
 	CFunctionType* 
-	GetStdObjectMethodMemberType (CFunctionType* pFunctionType);
+	GetStdObjectMemberMethodType (CFunctionType* pFunctionType);
 
 	CFunctionType* 
 	GetShortFunctionType (CFunctionType* pFunctionType);
@@ -371,13 +371,13 @@ public:
 	}
 
 	CPropertyType* 
-	GetPropertyMemberType (
+	GetMemberPropertyType (
 		CClassType* pClassType,
 		CPropertyType* pPropertyType
 		);
 
 	CPropertyType* 
-	GetStdObjectPropertyMemberType (CPropertyType* pPropertyType);
+	GetStdObjectMemberPropertyType (CPropertyType* pPropertyType);
 
 	CPropertyType* 
 	GetShortPropertyType (CPropertyType* pPropertyType);
@@ -416,13 +416,13 @@ public:
 		);
 
 	CAutoEvType* 
-	GetAutoEvMemberType (
+	GetMemberAutoEvType (
 		CClassType* pClassType,
 		CAutoEvType* pAutoEvType
 		);
 
 	CAutoEvType* 
-	GetStdObjectAutoEvMemberType (CAutoEvType* pAutoEvType);
+	GetStdObjectMemberAutoEvType (CAutoEvType* pAutoEvType);
 
 	CAutoEvType* 
 	GetShortAutoEvType (CAutoEvType* pAutoEvType);

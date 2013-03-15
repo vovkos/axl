@@ -12,6 +12,16 @@ namespace jnc {
 
 //.............................................................................
 
+enum EAutoEvField
+{
+	EAutoEvField_Lock,
+	EAutoEvField_State,
+	EAutoEvField_BindSiteArray,
+	EAutoEvField__Count,
+};
+
+//.............................................................................
+
 class CAutoEv: 
 	public CModuleItem,
 	public CNamespace
@@ -27,12 +37,11 @@ protected:
 	CFunction* m_pStopper;
 	
 	CClassType* m_pParentClassType;
-	CStructField* m_pParentClassFieldMember;
+	CStructField* m_pParentClassField;
 	
-	CStructType* m_pFieldStructType;
-	CStructField* m_pLockField;
-	CStructField* m_pStateField;
-	CStructField* m_pBindSiteArrayField;
+	CStructType* m_pDataStructType;
+	CStructField* m_FieldArray [EAutoEvField__Count];
+
 	CVariable* m_pStaticDataVariable;
 
 	rtl::CBoxListT <CToken> m_Body;
@@ -73,39 +82,28 @@ public:
 	}
 
 	CStructField* 
-	GetParentClassFieldMember ()
+	GetParentClassField ()
 	{
-		return m_pParentClassFieldMember;
+		return m_pParentClassField;
 	}
 
 	CStructType* 
-	GetFieldStructType ()
+	GetDataStructType ()
 	{
-		return m_pFieldStructType;
+		return m_pDataStructType;
+	}
+
+	rtl::CIteratorT <CStructField> 
+	GetFirstArgField ()
+	{
+		return m_pDataStructType->GetFieldList ().GetHead () + 2;
 	}
 
 	CStructField* 
-	GetLockField ()
+	GetField (EAutoEvField Field)
 	{
-		return m_pLockField;
-	}
-
-	CStructField* 
-	GetStateField ()
-	{
-		return m_pStateField;
-	}
-
-	size_t 
-	GetBindSiteCount ()
-	{
-		return m_BindSiteCount;
-	}
-
-	CStructField* 
-	GetBindSiteArrayField ()
-	{
-		return m_pBindSiteArrayField;
+		ASSERT (Field < EAutoEvField__Count);
+		return m_FieldArray [Field];
 	}
 
 	CVariable* 

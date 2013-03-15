@@ -952,7 +952,7 @@ COperatorMgr::CreateClosureObject (
 		OpValue.GetValueKind () != EValue_Property;
 	
 	if (IsIndirect)
-		pClosureType->CreateFieldMember (OpValue.GetType ());
+		pClosureType->CreateField (OpValue.GetType ());
 
 	CClosure* pClosure = OpValue.GetClosure ();
 
@@ -979,7 +979,7 @@ COperatorMgr::CreateClosureObject (
 
 			ASSERT (i < SrcArgTypeArray.GetCount ());
 			pClosureMap->Append (i);
-			pClosureType->CreateFieldMember (SrcArgTypeArray [i]);
+			pClosureType->CreateField (SrcArgTypeArray [i]);
 		}
 	}
 
@@ -997,13 +997,13 @@ COperatorMgr::CreateClosureObject (
 	CStructType* pClosureFieldStructType = pClosureType->GetIfaceStructType ();
 	ASSERT (pClosureFieldStructType);
 
-	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldMemberList ().GetHead ();
+	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldList ().GetHead ();
 	if (IsIndirect)
 	{
 		CValue PtrValue = OpValue;
 		PtrValue.SetClosure (NULL); // remove closure
 
-		Result = m_pModule->m_OperatorMgr.SetClassFieldMemberValue (
+		Result = m_pModule->m_OperatorMgr.SetClassFieldValue (
 			ClosureValue, 
 			*ClosureMember, 
 			PtrValue
@@ -1025,7 +1025,7 @@ COperatorMgr::CreateClosureObject (
 
 			ASSERT (ClosureMember);
 
-			Result = m_pModule->m_OperatorMgr.SetClassFieldMemberValue (
+			Result = m_pModule->m_OperatorMgr.SetClassFieldValue (
 				ClosureValue, 
 				*ClosureMember, 
 				*ClosureArg

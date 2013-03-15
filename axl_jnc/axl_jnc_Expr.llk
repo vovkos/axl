@@ -670,11 +670,11 @@ member_operator <CValue* $pValue>
 		}
 	| EToken_OnChange
 		{
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChange);
+			return m_pModule->m_OperatorMgr.GetAuPropertyField ($pValue, EAuPropertyField_OnChange);
 		}
 	| EToken_PropValue
 		{
-			return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember ($pValue, EAuPropertyField_PropValue);
+			return m_pModule->m_OperatorMgr.GetAuPropertyField ($pValue, EAuPropertyField_PropValue);
 		}
 	| EToken_Get
 		{
@@ -702,11 +702,11 @@ primary_expr <CValue* $pValue>
 		}
 	| EToken_OnChange
 		{
-			return GetAuPropertyFieldMember ($pValue, EAuPropertyField_OnChange);
+			return GetAuPropertyField ($pValue, EAuPropertyField_OnChange);
 		}
 	| EToken_PropValue
 		{
-			return GetAuPropertyFieldMember ($pValue, EAuPropertyField_PropValue);
+			return GetAuPropertyField ($pValue, EAuPropertyField_PropValue);
 		}
 	| EToken_Integer
 		{

@@ -303,7 +303,7 @@ public:
 	}
 
 	void
-	ConvertToMethodMember (CClassType* pClassType);
+	ConvertToMemberMethod (CClassType* pClassType);
 
 	rtl::CString
 	CreateArgString ();

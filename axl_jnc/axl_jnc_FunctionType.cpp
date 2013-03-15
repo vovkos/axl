@@ -28,7 +28,7 @@ CFunctionType::CFunctionType ()
 	m_TypeKind = EType_Function;
 	m_pReturnType = NULL;
 	m_CallConv = ECallConv_Default;
-	m_pStdObjectMethodMemberType = NULL;
+	m_pStdObjectMemberMethodType = NULL;
 	m_pFunctionPtrTypeTuple = NULL;
 }
 
@@ -64,18 +64,18 @@ CFunctionType::GetMulticastType ()
 }
 
 CFunctionType*
-CFunctionType::GetMethodMemberType (
+CFunctionType::GetMemberMethodType (
 	CClassType* pClassType, 
 	int ThisArgTypeFlags
 	)
 {
-	return m_pModule->m_TypeMgr.GetMethodMemberType (pClassType, this, ThisArgTypeFlags);
+	return m_pModule->m_TypeMgr.GetMemberMethodType (pClassType, this, ThisArgTypeFlags);
 }
 
 CFunctionType*
-CFunctionType::GetStdObjectMethodMemberType ()
+CFunctionType::GetStdObjectMemberMethodType ()
 {
-	return m_pModule->m_TypeMgr.GetStdObjectMethodMemberType (this);
+	return m_pModule->m_TypeMgr.GetStdObjectMemberMethodType (this);
 }
 
 CFunction*

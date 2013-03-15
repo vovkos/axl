@@ -510,7 +510,7 @@ CParser::DeclareFunction (
 			return false;
 		}
 
-		return ((CPropertyTemplate*) pNamespace)->AddMethodMember (FunctionKind, pType);
+		return ((CPropertyTemplate*) pNamespace)->AddMethod (FunctionKind, pType);
 	}
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType, pDeclarator->GetArgList ());
@@ -579,7 +579,7 @@ CParser::DeclareFunction (
 			return false;
 		}
 
-		return ((CClassType*) pNamespace)->AddMethodMember (pFunction);
+		return ((CClassType*) pNamespace)->AddMethod (pFunction);
 
 	case ENamespace_Property:
 		if (pDeclarator->IsQualified ())
@@ -588,7 +588,7 @@ CParser::DeclareFunction (
 			return false;
 		}
 
-		return ((CProperty*) pNamespace)->AddMethodMember (pFunction);
+		return ((CProperty*) pNamespace)->AddMethod (pFunction);
 	
 	default:
 		if (PostModifiers)
@@ -705,14 +705,14 @@ CParser::CreatePropertyImpl (
 			return false;
 		}
 
-		Result = ((CClassType*) pNamespace)->AddPropertyMember (pProperty);
+		Result = ((CClassType*) pNamespace)->AddProperty (pProperty);
 		if (!Result)
 			return false;
 
 		break;
 
 	case ENamespace_Property:
-		Result = ((CProperty*) pNamespace)->AddPropertyMember (pProperty);
+		Result = ((CProperty*) pNamespace)->AddProperty (pProperty);
 		if (!Result)
 			return false;
 
@@ -800,7 +800,7 @@ CParser::DeclareAutoEv (
 			return false;
 		}
 
-		Result = ((CClassType*) pNamespace)->AddAutoEvMember (pAutoEv);
+		Result = ((CClassType*) pNamespace)->AddAutoEv (pAutoEv);
 		if (!Result)
 			return false;
 
@@ -813,7 +813,7 @@ CParser::DeclareAutoEv (
 			return false;
 		}
 
-		Result = ((CProperty*) pNamespace)->AddAutoEvMember (pAutoEv);
+		Result = ((CProperty*) pNamespace)->AddAutoEv (pAutoEv);
 		if (!Result)
 			return false;
 
@@ -871,7 +871,7 @@ CParser::DeclareData (
 
 	if (NamespaceKind == ENamespace_Property)
 	{
-		pDataItem = ((CProperty*) pNamespace)->CreateFieldMember (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
+		pDataItem = ((CProperty*) pNamespace)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
 	}
 	else if (NamespaceKind != ENamespace_Type)
 	{
@@ -902,15 +902,15 @@ CParser::DeclareData (
 		switch (NamedTypeKind)
 		{
 		case EType_Class:
-			pDataItem = ((CClassType*) pNamedType)->CreateFieldMember (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
+			pDataItem = ((CClassType*) pNamedType)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags);
 			break;
 
 		case EType_Struct:
-			pDataItem = ((CStructType*) pNamedType)->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
+			pDataItem = ((CStructType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags);
 			break;
 
 		case EType_Union:
-			pDataItem = ((CUnionType*) pNamedType)->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
+			pDataItem = ((CUnionType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags);
 			break;
 
 		default:
@@ -954,7 +954,7 @@ CParser::DeclarePropValue (
 		CPropertyTemplate* pPropertyTemplate = (CPropertyTemplate*) pNamespace;
 		pPropertyTemplate->m_pAuPropValueType = pType;
 		pPropertyTemplate->m_TypeModifiers |= ETypeModifier_AutoGet;
-		return pPropertyTemplate->AddMethodMember (EFunction_Getter, pGetterType);
+		return pPropertyTemplate->AddMethod (EFunction_Getter, pGetterType);
 	}
 	
 	if (NamespaceKind != ENamespace_Property)
@@ -968,7 +968,7 @@ CParser::DeclarePropValue (
 	pProperty->m_TypeModifiers |= ETypeModifier_AutoGet;
 
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pGetterType);
-	Result = pProperty->AddMethodMember (pGetter);
+	Result = pProperty->AddMethod (pGetter);
 	if (!Result)
 		return false;
 
@@ -1228,7 +1228,7 @@ CParser::CreateAutoEvClassType (
 	CAutoEv* pAutoEv = m_pModule->m_FunctionMgr.CreateUnnamedAutoEv ();
 	
 	Result = 
-		pClassType->AddAutoEvMember (pAutoEv) &&
+		pClassType->AddAutoEv (pAutoEv) &&
 		pAutoEv->Create (pAutoEvType, pFunctionSuffix ? pFunctionSuffix->GetArgList () : NULL);
 
 	if (!Result)
@@ -1251,11 +1251,11 @@ CParser::FinalizeAutoEv ()
 	bool IsMember = pAutoEv->IsMember ();
 
 	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
-	CStructField* pEventPtrField = *pBindSiteType->GetFieldMemberList ().GetHead ();
-	CStructField* pCookieField = *pBindSiteType->GetFieldMemberList ().GetTail ();
+	CStructField* pEventPtrField = *pBindSiteType->GetFieldList ().GetHead ();
+	CStructField* pCookieField = *pBindSiteType->GetFieldList ().GetTail ();
 
 	CValue BindSiteArrayValue;
-	Result = m_pModule->m_OperatorMgr.GetAutoEvFieldMember (pAutoEv, pAutoEv->GetBindSiteArrayField (), &BindSiteArrayValue);
+	Result = m_pModule->m_OperatorMgr.GetAutoEvField (pAutoEv, EAutoEvField_BindSiteArray, &BindSiteArrayValue);
 	if (!Result)
 		return false;
 
@@ -1269,7 +1269,7 @@ CParser::FinalizeAutoEv ()
 		for (; Value; Value++, i++)
 		{
 			CValue OnChangeValue;
-			Result = m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (*Value, EAuPropertyField_OnChange, &OnChangeValue);
+			Result = m_pModule->m_OperatorMgr.GetAuPropertyField (*Value, EAuPropertyField_OnChange, &OnChangeValue);
 			if (!Result)
 				return false;
 	
@@ -1290,8 +1290,8 @@ CParser::FinalizeAutoEv ()
 			Result = 
 				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_AddAssign, OnChangeValue, HandlerValue, &CookieValue) &&
 				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
-				m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pEventPtrField, NULL, &DstOnChangeValue) &&
-				m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pCookieField, NULL, &DstCookieValue) &&
+				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &DstOnChangeValue) &&
+				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &DstCookieValue) &&
 				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &OnChangeValue) &&
 				m_pModule->m_OperatorMgr.StoreDataRef (DstOnChangeValue, OnChangeValue) &&
 				m_pModule->m_OperatorMgr.StoreDataRef (DstCookieValue, CookieValue);
@@ -1652,7 +1652,7 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_StructField:
-		return m_pModule->m_OperatorMgr.GetFieldMember (
+		return m_pModule->m_OperatorMgr.GetField (
 			(CStructField*) pItem, 
 			&Coord, 
 			pValue
@@ -1794,7 +1794,7 @@ CParser::GetThisValueType (CValue* pValue)
 }
 
 bool
-CParser::GetAuPropertyFieldMember (
+CParser::GetAuPropertyField (
 	CValue* pValue,
 	EAuPropertyField Field
 	)
@@ -1806,11 +1806,11 @@ CParser::GetAuPropertyFieldMember (
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (pFunction->m_pProperty, Field, pValue);
+	return m_pModule->m_OperatorMgr.GetAuPropertyField (pFunction->m_pProperty, Field, pValue);
 }
 
 bool
-CParser::GetAuPropertyFieldMemberType (
+CParser::GetAuPropertyFieldType (
 	CValue* pValue,
 	EAuPropertyField Field
 	)

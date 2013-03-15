@@ -40,7 +40,7 @@ COperatorMgr::GetPropertyVTable (
 {
 	if (pProperty->IsVirtual ())
 	{
-		bool Result = GetVirtualPropertyMember (pProperty, pClosure, pResultValue);
+		bool Result = GetVirtualProperty (pProperty, pClosure, pResultValue);
 		if (!Result)
 			return false;
 	}
@@ -119,7 +119,7 @@ COperatorMgr::GetPropertyGetterType (const CValue& OpValue)
 		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
 		CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 		pPropertyType = pPtrType->HasClosure () ? 
-			pPtrType->GetTargetType ()->GetStdObjectPropertyMemberType () :
+			pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
 			pPtrType->GetTargetType ();
 	}
 
@@ -158,7 +158,7 @@ COperatorMgr::GetPropertyGetter (
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
-		pPtrType->GetTargetType ()->GetStdObjectPropertyMemberType () :
+		pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
 		pPtrType->GetTargetType ();
 
 	CValue VTableValue;
@@ -199,7 +199,7 @@ COperatorMgr::GetPropertySetterType (
 		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
 		CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 		pPropertyType = pPtrType->HasClosure () ? 
-			pPtrType->GetTargetType ()->GetStdObjectPropertyMemberType () :
+			pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
 			pPtrType->GetTargetType ();
 	}
 
@@ -255,7 +255,7 @@ COperatorMgr::GetPropertySetter (
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
-		pPtrType->GetTargetType ()->GetStdObjectPropertyMemberType () :
+		pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
 		pPtrType->GetTargetType ();
 
 	if (pPropertyType->IsReadOnly ())
@@ -306,7 +306,7 @@ COperatorMgr::GetProperty (
 	
 	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_AutoGet)
 	{
-		return GetAuPropertyFieldMember (OpValue, EAuPropertyField_PropValue, pResultValue);
+		return GetAuPropertyField (OpValue, EAuPropertyField_PropValue, pResultValue);
 	}
 	else
 	{
@@ -334,8 +334,8 @@ COperatorMgr::SetProperty (
 		CValue OnChangeValue;
 		
 		return
-			GetAuPropertyFieldMember (OpValue, EAuPropertyField_PropValue, &PropValue) &&
-			GetAuPropertyFieldMember (OpValue, EAuPropertyField_OnChange, &OnChangeValue) &&
+			GetAuPropertyField (OpValue, EAuPropertyField_PropValue, &PropValue) &&
+			GetAuPropertyField (OpValue, EAuPropertyField_OnChange, &OnChangeValue) &&
 			StoreDataRef (PropValue, SrcValue) &&
 			CallOperator (OnChangeValue);
 	}

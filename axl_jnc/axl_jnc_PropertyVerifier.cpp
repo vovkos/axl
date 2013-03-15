@@ -7,7 +7,7 @@ namespace jnc {
 //.............................................................................
 
 bool
-CPropertyVerifier::AddMethodMember (
+CPropertyVerifier::AddMethod (
 	EFunction FunctionKind,
 	CFunctionType* pFunctionType
 	)
@@ -38,9 +38,9 @@ CPropertyVerifier::AddMethodMember (
 	}
 
 	int FunctionKindMask = 1 << FunctionKind;
-	if (!(m_MethodMemberMask & FunctionKindMask))
+	if (!(m_MethodMask & FunctionKindMask))
 	{
-		m_MethodMemberMask |= FunctionKindMask;
+		m_MethodMask |= FunctionKindMask;
 	}
 	else if (FunctionKind != EFunction_Setter)
 	{
@@ -61,7 +61,7 @@ CPropertyVerifier::CreateIndexArgSignature (
 
 	// refine!!!
 
-	if (pFunctionType->IsMethodMemberType ())
+	if (pFunctionType->IsMemberMethodType ())
 		pFunctionType = pFunctionType->GetShortType ();
 
 	if (FunctionKind == EFunction_Getter)

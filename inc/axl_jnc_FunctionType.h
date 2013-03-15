@@ -77,7 +77,7 @@ protected:
 	rtl::CStringA m_ArgSignature;
 	rtl::CString m_ArgTypeString;
 	CFunctionType* m_pShortType;
-	CFunctionType* m_pStdObjectMethodMemberType;
+	CFunctionType* m_pStdObjectMemberMethodType;
 	CFunction* m_pAbstractFunction;
 	CFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
 
@@ -121,7 +121,7 @@ public:
 	GetArgTypeString ();
 
 	bool
-	IsMethodMemberType ()
+	IsMemberMethodType ()
 	{
 		return !m_ArgTypeArray.IsEmpty () && m_ArgTypeArray [0]->GetTypeKind () == EType_ClassPtr;
 	}
@@ -137,13 +137,13 @@ public:
 	GetShortType ();
 	
 	CFunctionType*
-	GetMethodMemberType (
+	GetMemberMethodType (
 		CClassType* pType, 
 		int ThisArgFlags = 0
 		);
 
 	CFunctionType*
-	GetStdObjectMethodMemberType ();
+	GetStdObjectMemberMethodType ();
 
 	CFunction*
 	GetAbstractFunction ();

@@ -15,17 +15,17 @@ namespace jnc {
 class CPropertyVerifier
 {
 protected:
-	int m_MethodMemberMask;           // only setter could be overloaded
+	int m_MethodMask;           // only setter could be overloaded
 	rtl::CString m_IndexArgSignature; // all accessors must have matching index arg signature
 	
 public:
 	CPropertyVerifier ()
 	{
-		m_MethodMemberMask = 0;
+		m_MethodMask = 0;
 	}
 
 	bool
-	AddMethodMember (
+	AddMethod (
 		EFunction FunctionKind,
 		CFunctionType* pFunctionType
 		);

@@ -293,7 +293,7 @@ CFunctionMgr::CompileFunctions ()
 
 		CValue StateValue;
 		Result = 
-			m_pModule->m_OperatorMgr.GetAutoEvFieldMember (pAutoEv, pAutoEv->GetStateField (), &StateValue) &&
+			m_pModule->m_OperatorMgr.GetAutoEvField (pAutoEv, EAutoEvField_State, &StateValue) &&
 			m_pModule->m_OperatorMgr.StoreDataRef (StateValue, CValue ((int64_t) 1, EType_Int_p)) &&
 			Epilogue (pAutoEv->GetBody ()->GetTail ()->m_Pos);
 
@@ -413,7 +413,7 @@ CFunctionMgr::FireOnChangeEvent ()
 
 	CValue OnChangeEventValue;
 	return
-		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (PropertyValue, EAuPropertyField_OnChange, &OnChangeEventValue) &&
+		m_pModule->m_OperatorMgr.GetAuPropertyField (PropertyValue, EAuPropertyField_OnChange, &OnChangeEventValue) &&
 		m_pModule->m_OperatorMgr.CallOperator (OnChangeEventValue);
 }
 
@@ -486,16 +486,13 @@ CFunctionMgr::Prologue (
 
 	if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
 	{
-		CValue ArgFieldValue;
+		CValue AutoEvDataValue;
 
-		Result = m_pModule->m_OperatorMgr.GetAutoEvData (pFunction->m_pAutoEv, &ArgFieldValue);
+		Result = m_pModule->m_OperatorMgr.GetAutoEvData (pFunction->m_pAutoEv, &AutoEvDataValue);
 		if (!Result)
 			return false;
 
-		rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFieldStructType ()->GetFieldMemberList ().GetHead ();
-		ArgField++; // m_Lock
-		ArgField++; // m_State
-
+		rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFirstArgField ();
 		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
 		for (; Arg; Arg++, LlvmArg++, ArgField++)
 		{
@@ -506,7 +503,7 @@ CFunctionMgr::Prologue (
 			CValue ArgValue (pLlvmArg, pArg->GetType ());
 
 			CValue StoreValue;
-			Result = m_pModule->m_OperatorMgr.GetStructFieldMember (ArgFieldValue, pArgField, NULL, &StoreValue);
+			Result = m_pModule->m_OperatorMgr.GetStructField (AutoEvDataValue, pArgField, NULL, &StoreValue);
 			if (!Result)
 				return false;
 			
@@ -520,7 +517,6 @@ CFunctionMgr::Prologue (
 		{
 			CFunctionFormalArg* pArg = *Arg;
 			llvm::Value* pLlvmArg = LlvmArg;
-
 			CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
 				EVariable_Local,
 				pArg->GetName (), 
@@ -708,7 +704,7 @@ CFunctionMgr::GetDirectThunkFunction (
 	{
 		SignatureChar = 'U';
 		ThunkKind = EThunk_DirectUnusedClosure;
-		pThunkFunctionType = pThunkFunctionType->GetStdObjectMethodMemberType ();
+		pThunkFunctionType = pThunkFunctionType->GetStdObjectMemberMethodType ();
 	}
 
 	rtl::CStringA Signature;
@@ -764,7 +760,7 @@ CFunctionMgr::GetClosureThunkFunction (
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
 	
-	pThunkFunctionType = pClosureType->GetMethodMemberType (pThunkFunctionType);
+	pThunkFunctionType = pClosureType->GetMemberMethodType (pThunkFunctionType);
 	
 	CFunction* pThunkFunction = CreateFunction (EFunction_Thunk, pThunkFunctionType);
 	pThunkFunction->m_StorageKind = EStorage_Static;
@@ -809,7 +805,7 @@ CFunctionMgr::GetDirectThunkProperty (
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Tag = _T("_direct_thunk_property");
 	pThunkProperty->m_pType = HasUnusedClosure ? 
-		pThunkPropertyType->GetStdObjectPropertyMemberType () : 
+		pThunkPropertyType->GetStdObjectMemberPropertyType () : 
 		pThunkPropertyType;
 	pThunkProperty->m_pGetter = GetDirectThunkFunction (
 		pTargetProperty->m_pGetter, 
@@ -882,7 +878,7 @@ CFunctionMgr::GetClosureThunkProperty (
 	CProperty* pThunkProperty = CreateProperty (rtl::CString (), rtl::CString ());
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Tag = _T("_closure_thunk_property");
-	pThunkProperty->m_pType = pClosureType->GetPropertyMemberType (pThunkPropertyType);
+	pThunkProperty->m_pType = pClosureType->GetMemberPropertyType (pThunkPropertyType);
 
 	// i use ASSERT () cause all the checks should have been done at CheckCast ()
 
@@ -1002,7 +998,7 @@ CFunctionMgr::GetDirectDataThunkProperty (
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Tag = _T("_direct_data_thunk_property");
 	pThunkProperty->m_pType = HasUnusedClosure ? 
-		pThunkPropertyType->GetStdObjectPropertyMemberType () : 
+		pThunkPropertyType->GetStdObjectMemberPropertyType () : 
 		pThunkPropertyType;
 
 	CFunction* pGetter = CreateFunction (EFunction_Getter, pThunkProperty->m_pType->GetGetterType ());
@@ -1341,7 +1337,7 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 	CStructType* pClosureFieldStructType = pThunk->m_pClosureType->GetIfaceStructType ();
 	ASSERT (pClosureFieldStructType);
 
-	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldMemberList ().GetHead ();
+	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldList ().GetHead ();
 
 	CValue PfnValue;
 
@@ -1351,7 +1347,7 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 	}
 	else
 	{
-		Result = m_pModule->m_OperatorMgr.GetClassFieldMemberValue (ClosureValue, *ClosureMember, &PfnValue);
+		Result = m_pModule->m_OperatorMgr.GetClassFieldValue (ClosureValue, *ClosureMember, &PfnValue);
 		if (!Result)
 			return false;
 
@@ -1368,7 +1364,7 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 
 		if (i == pThunk->m_ClosureMap [iClosure])
 		{		
-			Result = m_pModule->m_OperatorMgr.GetClassFieldMemberValue (ClosureValue, *ClosureMember, &ArgValue);
+			Result = m_pModule->m_OperatorMgr.GetClassFieldValue (ClosureValue, *ClosureMember, &ArgValue);
 
 			if (!Result)
 				return false;

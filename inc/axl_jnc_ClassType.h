@@ -52,7 +52,7 @@ protected:
 	// fields
 
 	size_t m_PackFactor;
-	CStructType* m_pStaticFieldStructType;
+	CStructType* m_pStaticDataStructType;
 	CVariable* m_pStaticDataVariable;
 
 	// vtable
@@ -138,9 +138,9 @@ public:
 	}
 
 	CStructType* 
-	GetStaticFieldStructType ()
+	GetStaticDataStructType ()
 	{
-		return m_pStaticFieldStructType;
+		return m_pStaticDataStructType;
 	}
 
 	CVariable* 
@@ -150,7 +150,7 @@ public:
 	}
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
@@ -159,71 +159,71 @@ public:
 		);
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (EStorage_Undefined, Name, pType, BitCount, PtrTypeFlags);
+		return CreateField (EStorage_Undefined, Name, pType, BitCount, PtrTypeFlags);
 	}
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (EStorage_Undefined, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (EStorage_Undefined, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	CFunctionType* 
-	GetMethodMemberType (
+	GetMemberMethodType (
 		CFunctionType* pShortType,
 		int ThisArgTypeFlags = 0
 		);
 
 	CPropertyType* 
-	GetPropertyMemberType (CPropertyType* pShortType);
+	GetMemberPropertyType (CPropertyType* pShortType);
 
 	CAutoEvType* 
-	GetAutoEvMemberType (CAutoEvType* pShortType);
+	GetMemberAutoEvType (CAutoEvType* pShortType);
 
 	bool
-	AddMethodMember (CFunction* pFunction);
+	AddMethod (CFunction* pFunction);
 	
 	CFunction*
-	CreateMethodMember (
+	CreateMethod (
 		EStorage StorageKind,
 		const rtl::CString& Name,
 		CFunctionType* pShortType
 		);
 
 	bool
-	AddPropertyMember (CProperty* pProperty);
+	AddProperty (CProperty* pProperty);
 
 	CProperty*
-	CreatePropertyMember (
+	CreateProperty (
 		EStorage StorageKind,
 		const rtl::CString& Name,
 		CPropertyType* pShortType
 		);
 
 	bool
-	AddAutoEvMember (CAutoEv* pAutoEv);
+	AddAutoEv (CAutoEv* pAutoEv);
 
 	bool
 	HasVTable ()

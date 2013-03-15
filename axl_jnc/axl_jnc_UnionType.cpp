@@ -8,7 +8,7 @@ namespace jnc {
 //.............................................................................
 
 CStructField*
-CUnionType::CreateFieldMember (
+CUnionType::CreateField (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
@@ -28,7 +28,7 @@ CUnionType::CreateFieldMember (
 	pMember->m_PtrTypeFlags = PtrTypeFlags;
 	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pMember->m_BitCount = BitCount;
-	m_FieldMemberList.InsertTail (pMember);
+	m_FieldList.InsertTail (pMember);
 
 	bool Result = AddItem (pMember);
 	if (!Result)
@@ -49,7 +49,7 @@ CUnionType::CalcLayout ()
 
 	CType* pLargestMemberType = NULL;
 
-	rtl::CIteratorT <CStructField> Member = m_FieldMemberList.GetHead ();
+	rtl::CIteratorT <CStructField> Member = m_FieldList.GetHead ();
 	for (; Member; Member++)
 	{
 		CStructField* pMember = *Member;
@@ -73,7 +73,7 @@ CUnionType::CalcLayout ()
 
 	m_pStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pStructType->m_Tag.Format (_T("%s.struct"), m_Tag);
-	m_pStructType->CreateFieldMember (pLargestMemberType);
+	m_pStructType->CreateField (pLargestMemberType);
 	Result = m_pStructType->CalcLayout ();
 	if (!Result)
 		return false;

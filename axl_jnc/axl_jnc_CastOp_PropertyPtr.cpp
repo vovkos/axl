@@ -112,7 +112,7 @@ CCast_PropertyPtr_FromNormal::LlvmCast (
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();
 	
-	CPropertyPtrType* pThinPtrType = pSrcPropertyType->GetStdObjectPropertyMemberType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
+	CPropertyPtrType* pThinPtrType = pSrcPropertyType->GetStdObjectMemberPropertyType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
 
 	CValue PfnValue;
 	CValue ClosureObjValue;
@@ -167,7 +167,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast (
 	// case 1: no conversion required, no closure object needs to be created
 
 	if (IsSimpleClosure && 
-		pSrcPropertyType->IsPropertyMemberType () &&
+		pSrcPropertyType->IsMemberPropertyType () &&
 		pSrcPropertyType->GetShortType ()->Cmp (pDstPropertyType) == 0)
 	{
 		return LlvmCast_NoThunkSimpleClosure (
@@ -194,7 +194,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast (
 
 		// case 2.2: same as above, but simple closure is passed as closure arg
 
-		if (IsSimpleClosure && pProperty->GetType ()->IsPropertyMemberType ())
+		if (IsSimpleClosure && pProperty->GetType ()->IsMemberPropertyType ())
 			return LlvmCast_DirectThunkSimpleClosure (
 				pProperty,
 				SimpleClosureObjValue,
@@ -272,7 +272,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (
 		pProperty, 
-		pThisArgType->GetTargetType ()->GetPropertyMemberType (pDstPtrType->GetTargetType ())
+		pThisArgType->GetTargetType ()->GetMemberPropertyType (pDstPtrType->GetTargetType ())
 		);
 
 	return CreateClosurePropertyPtr (pThunkProperty, ThisArgValue, pDstPtrType, pResultValue);

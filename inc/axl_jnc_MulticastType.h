@@ -14,6 +14,19 @@ namespace jnc {
 
 //.............................................................................
 
+enum EMulticastField
+{
+	EMulticastField_Lock,
+	EMulticastField_MaxCount,
+	EMulticastField_Count,
+	EMulticastField_PtrArray,
+	EMulticastField_HandleTable,
+
+	EMulticastField__Count,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum EMulticastMethod
 {
 	EMulticastMethod_Clear,
@@ -34,6 +47,7 @@ protected:
 
 	CFunctionPtrType* m_pTargetType;
 	CStructType* m_pMulticastStructType;
+	CStructField* m_FieldArray [EMulticastField__Count];
 	CFunction* m_MethodArray [EMulticastMethod__Count] [2];
 
 public:
@@ -53,6 +67,13 @@ public:
 
 	CStructType* 
 	GetMulticastStructType ();
+
+	CStructField* 
+	GetField (EMulticastField Field)
+	{
+		ASSERT (Field < EMulticastField__Count);
+		return m_FieldArray [Field];
+	}
 
 	CFunction* 
 	GetMethod (

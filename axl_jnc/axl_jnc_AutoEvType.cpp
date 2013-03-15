@@ -12,7 +12,7 @@ CAutoEvType::CAutoEvType ()
 	m_TypeKind = EType_AutoEv;
 	m_pStarterType = NULL;
 	m_pStopperType = NULL;
-	m_pStdObjectAutoEvMemberType = NULL;
+	m_pStdObjectMemberAutoEvType = NULL;
 	m_pVTableStructType = NULL;
 	m_pShortType = NULL;
 }
@@ -28,15 +28,15 @@ CAutoEvType::GetAutoEvPtrType (
 }
 
 CAutoEvType*
-CAutoEvType::GetAutoEvMemberType (CClassType* pClassType)
+CAutoEvType::GetMemberAutoEvType (CClassType* pClassType)
 {
-	return m_pModule->m_TypeMgr.GetAutoEvMemberType (pClassType, this);
+	return m_pModule->m_TypeMgr.GetMemberAutoEvType (pClassType, this);
 }
 
 CAutoEvType*
-CAutoEvType::GetStdObjectAutoEvMemberType ()
+CAutoEvType::GetStdObjectMemberAutoEvType ()
 {
-	return m_pModule->m_TypeMgr.GetStdObjectAutoEvMemberType (this);
+	return m_pModule->m_TypeMgr.GetStdObjectMemberAutoEvType (this);
 }
 
 CAutoEvType*

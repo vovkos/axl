@@ -17,14 +17,13 @@ CAutoEv::CAutoEv ()
 	m_pStopper = NULL;
 	m_pParentClassType = NULL;
 
-	m_pParentClassFieldMember = NULL;
-	m_pFieldStructType = NULL;
-	m_pLockField = NULL;
-	m_pStateField = NULL;
-	m_pBindSiteArrayField = NULL;
+	m_pParentClassField = NULL;
+	m_pDataStructType = NULL;
 	m_pStaticDataVariable = NULL;
 
 	m_BindSiteCount = 0;
+
+	memset (m_FieldArray, 0, sizeof (m_FieldArray));
 }
 
 bool
@@ -48,25 +47,29 @@ CAutoEv::Create (
 	m_pStopper->m_pAutoEv = this;
 	m_pStopper->m_Tag = m_Tag + _T(".Stop");
 
-	m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pFieldStructType->m_StorageKind = m_StorageKind;
-	m_pFieldStructType->m_pParentNamespace = this;
+	m_pDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
+	m_pDataStructType->m_StorageKind = m_StorageKind;
+	m_pDataStructType->m_pParentNamespace = this;
+	m_pDataStructType->m_Tag = m_Tag + _T(".Data");
 
-	m_pLockField = m_pFieldStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
-	m_pStateField = m_pFieldStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_FieldArray [EAutoEvField_Lock] = m_pDataStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_FieldArray [EAutoEvField_State] = m_pDataStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
 
 	if (m_pParentClassType)
 	{
-		m_pParentClassFieldMember = m_pParentClassType->GetIfaceStructType ()->CreateFieldMember (m_pFieldStructType);
-		m_pType = m_pType->GetAutoEvMemberType (m_pParentClassType);
-		m_pStarter->ConvertToMethodMember (m_pParentClassType);
-		m_pStopper->ConvertToMethodMember (m_pParentClassType);
+		m_pParentClassField = m_pParentClassType->GetIfaceStructType ()->CreateField (m_pDataStructType);
+		m_pType = m_pType->GetMemberAutoEvType (m_pParentClassType);
+		m_pStarter->ConvertToMemberMethod (m_pParentClassType);
+		m_pStopper->ConvertToMemberMethod (m_pParentClassType);
 	}
-
+	
 	rtl::CIteratorT <CFunctionFormalArg> Arg = m_pStarter->GetArgList ().GetHead ();
+	if (!Arg)
+		return false;
+
 	for (; Arg; Arg++)
 	{
-		CStructField* pField = m_pFieldStructType->CreateFieldMember (Arg->GetName (), Arg->GetType ());
+		CStructField* pField = m_pDataStructType->CreateField (Arg->GetName (), Arg->GetType ());
 		if (!pField)
 			return false;
 
@@ -87,7 +90,7 @@ CAutoEv::CreateHandler ()
 	pHandler->m_Tag = m_Tag + _T(".Handler");
 
 	if (m_pParentClassType)
-		pHandler->ConvertToMethodMember (m_pParentClassType);
+		pHandler->ConvertToMemberMethod (m_pParentClassType);
 
 	return pHandler;
 }
@@ -98,8 +101,8 @@ CAutoEv::CreateStopper ()
 	bool Result;
 
 	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
-	CStructField* pEventPtrField = *pBindSiteType->GetFieldMemberList ().GetHead ();
-	CStructField* pCookieField = *pBindSiteType->GetFieldMemberList ().GetTail ();
+	CStructField* pEventPtrField = *pBindSiteType->GetFieldList ().GetHead ();
+	CStructField* pCookieField = *pBindSiteType->GetFieldList ().GetTail ();
 
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pStopper);
 
@@ -111,14 +114,13 @@ CAutoEv::CreateStopper ()
 	CValue BindSiteArrayValue;
 
 	Result = 
-		m_pModule->m_OperatorMgr.GetAutoEvFieldMember (this, m_pStateField, &StateValue) &&	
+		m_pModule->m_OperatorMgr.GetAutoEvField (this, EAutoEvField_State, &StateValue) &&	
 		m_pModule->m_ControlFlowMgr.ConditionalJump (StateValue, pUnadviseBlock, pFollowBlock);
 
 	if (!Result)
 		return false;
 
-	Result = m_pModule->m_OperatorMgr.GetAutoEvFieldMember (this, m_pBindSiteArrayField, &BindSiteArrayValue);
-
+	Result = m_pModule->m_OperatorMgr.GetAutoEvField (this, EAutoEvField_BindSiteArray, &BindSiteArrayValue);
 	if (!Result)
 		return false;
 
@@ -131,8 +133,8 @@ CAutoEv::CreateStopper ()
 
 		Result = 
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
-			m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
-			m_pModule->m_OperatorMgr.GetStructFieldMember (BindSiteValue, pCookieField, NULL, &CookieValue) &&
+			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
+			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &CookieValue) &&
 			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangeValue) &&
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_SubAssign, OnChangeValue, CookieValue);
 
@@ -159,8 +161,8 @@ CAutoEv::CalcLayout ()
 
 	CType* pBindSiteType = m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
 	CArrayType* pBindSiteArrayType = pBindSiteType->GetArrayType (m_BindSiteCount);
-	m_pBindSiteArrayField = m_pFieldStructType->CreateFieldMember (pBindSiteArrayType);
-	m_pFieldStructType->CalcLayout ();
+	m_FieldArray [EAutoEvField_BindSiteArray] = m_pDataStructType->CreateField (pBindSiteArrayType);
+	m_pDataStructType->CalcLayout ();
 
 	ASSERT (IsMember () || m_StorageKind == EStorage_Static);
 	if (m_StorageKind == EStorage_Static)
@@ -169,7 +171,7 @@ CAutoEv::CalcLayout ()
 			EVariable_Global, 
 			_T("static_field"),
 			m_Tag + _T(".static_field"), 
-			m_pFieldStructType
+			m_pDataStructType
 			);
 	}
 	

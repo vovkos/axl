@@ -23,7 +23,7 @@ protected:
 
 	CFunctionType* m_pStarterType;
 	CFunctionType* m_pStopperType;
-	CAutoEvType* m_pStdObjectAutoEvMemberType;
+	CAutoEvType* m_pStdObjectMemberAutoEvType;
 	CAutoEvType* m_pShortType;
 	CStructType* m_pVTableStructType;
 
@@ -45,9 +45,9 @@ public:
 	}
 
 	bool
-	IsAutoEvMemberType ()
+	IsMemberAutoEvType ()
 	{
-		return m_pStarterType->IsMethodMemberType ();
+		return m_pStarterType->IsMemberMethodType ();
 	}
 
 	CClassPtrType* 
@@ -57,10 +57,10 @@ public:
 	}
 
 	CAutoEvType*
-	GetAutoEvMemberType (CClassType* pType);
+	GetMemberAutoEvType (CClassType* pType);
 
 	CAutoEvType*
-	GetStdObjectAutoEvMemberType ();
+	GetStdObjectMemberAutoEvType ();
 
 	CAutoEvType*
 	GetShortType  ();

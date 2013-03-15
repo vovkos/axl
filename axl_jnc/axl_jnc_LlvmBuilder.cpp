@@ -352,9 +352,9 @@ CLlvmBuilder::CreateClosureFunctionPtr (
 	CValue IfaceValue;
 	CValue FunctionPtrValue = pResultType->GetUndefValue ();
 
-	CFunctionType* pStdObjectMethodMemberType = pResultType->GetTargetType ()->GetStdObjectMethodMemberType ();
+	CFunctionType* pStdObjectMemberMethodType = pResultType->GetTargetType ()->GetStdObjectMemberMethodType ();
 
-	CreateBitCast (RawPfnValue, pStdObjectMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
+	CreateBitCast (RawPfnValue, pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
 	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
 
 	CreateInsertValue (FunctionPtrValue, PfnValue, 0, NULL, &FunctionPtrValue);
@@ -376,9 +376,9 @@ CLlvmBuilder::CreateClosurePropertyPtr (
 	CValue IfaceValue;
 	CValue PropertyPtrValue = pResultType->GetUndefValue ();
 
-	CPropertyType* pStdObjectPropertyMemberType = pResultType->GetTargetType ()->GetStdObjectPropertyMemberType ();
+	CPropertyType* pStdObjectMemberPropertyType = pResultType->GetTargetType ()->GetStdObjectMemberPropertyType ();
 
-	CreateBitCast (RawPfnValue, pStdObjectPropertyMemberType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
+	CreateBitCast (RawPfnValue, pStdObjectMemberPropertyType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
 	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
 	
 	CreateInsertValue (PropertyPtrValue, PfnValue, 0, NULL, &PropertyPtrValue);

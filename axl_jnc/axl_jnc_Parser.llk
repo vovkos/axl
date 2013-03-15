@@ -320,13 +320,13 @@ Members2
 	GetThisValueType (CValue* pValue);
 
 	bool
-	GetAuPropertyFieldMember (
+	GetAuPropertyField (
 		CValue* pValue,
 		EAuPropertyField Field
 		);
 
 	bool
-	GetAuPropertyFieldMemberType (
+	GetAuPropertyFieldType (
 		CValue* pValue,
 		EAuPropertyField Field
 		);

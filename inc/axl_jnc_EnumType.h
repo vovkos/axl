@@ -85,7 +85,7 @@ protected:
 	friend class CParser;
 	
 	CType* m_pBaseType;
-	rtl::CStdListT <CEnumConst> m_ConstMemberList;
+	rtl::CStdListT <CEnumConst> m_ConstList;
 	intptr_t m_CurrentValue;
 
 public:
@@ -98,21 +98,21 @@ public:
 	}
 
 	rtl::CConstListT <CEnumConst>
-	GetMemberList ()
+	GetConstList ()
 	{
-		return m_ConstMemberList;
+		return m_ConstList;
 	}
 
 	CEnumConst*
-	CreateConstMember (
+	CreateConst (
 		const rtl::CString& Name,
 		intptr_t Value
 		);
 
 	CEnumConst*
-	CreateConstMember (const rtl::CString& Name)
+	CreateConst (const rtl::CString& Name)
 	{
-		return CreateConstMember (Name, m_CurrentValue);
+		return CreateConst (Name, m_CurrentValue);
 	}
 
 protected:

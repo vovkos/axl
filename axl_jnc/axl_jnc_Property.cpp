@@ -23,12 +23,12 @@ CProperty::CProperty ()
 	m_pSetter = NULL;
 
 	m_pParentClassType = NULL;
-	m_pParentClassFieldMember = NULL;
+	m_pParentClassField = NULL;
 	m_ParentClassVTableIndex = -1;
 
 	m_PackFactor = 8;
-	m_pFieldStructType = NULL;
-	m_pStaticFieldStructType = NULL;
+	m_pDataStructType = NULL;
+	m_pStaticDataStructType = NULL;
 	m_pStaticDataVariable = NULL;
 }
 
@@ -71,7 +71,7 @@ CProperty::Create (CPropertyType* pType)
 	if (m_pParentClassType)
 		pGetter->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 
-	Result = AddMethodMember (pGetter);
+	Result = AddMethod (pGetter);
 	if (!Result)
 		return false;
 
@@ -81,25 +81,25 @@ CProperty::Create (CPropertyType* pType)
 		CFunctionType* pSetterType = pType->GetSetterType ()->GetOverload (i);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Setter, pSetterType);
 		pSetter->m_StorageKind = StorageKind;
-		Result = AddMethodMember (pSetter);
+		Result = AddMethod (pSetter);
 		if (!Result)
 			return false;
 	}
 
-	m_pType = m_pParentClassType ? m_pParentClassType->GetPropertyMemberType (pType) : pType;
+	m_pType = m_pParentClassType ? m_pParentClassType->GetMemberPropertyType (pType) : pType;
 	return true;
 }
 
 void
-CProperty::ConvertToPropertyMember (CClassType* pClassType)
+CProperty::ConvertToMemberProperty (CClassType* pClassType)
 {
 	ASSERT (!m_pParentClassType);
 	m_pParentClassType = pClassType;
-	m_pType = pClassType->GetPropertyMemberType (m_pType);
+	m_pType = pClassType->GetMemberPropertyType (m_pType);
 }
 
 CStructField*
-CProperty::CreateFieldMember (
+CProperty::CreateField (
 	EStorage StorageKind,
 	const rtl::CString& Name,
 	CType* pType,
@@ -114,16 +114,16 @@ CProperty::CreateFieldMember (
 	if (!pStructType)
 		return NULL;
 
-	CStructField* pMember = pStructType->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
+	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags);
 
 	if (!Name.IsEmpty ())
 	{
-		bool Result = AddItem (pMember);
+		bool Result = AddItem (pField);
 		if (!Result)
 			return NULL;
 	}
 
-	return pMember;
+	return pField;
 }
 
 CStructType*
@@ -138,24 +138,24 @@ CProperty::GetFieldStructType (EStorage StorageKind)
 			return NULL;
 		}
 
-		if (m_pFieldStructType)
-			return m_pFieldStructType;
+		if (m_pDataStructType)
+			return m_pDataStructType;
 
-		m_pFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-		m_pFieldStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
-		m_pFieldStructType->m_pParentNamespace = this;
-		m_pParentClassFieldMember = m_pParentClassType->CreateFieldMember (StorageKind, m_pFieldStructType);
-		return m_pFieldStructType;
+		m_pDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+		m_pDataStructType->m_Tag.Format (_T("%s.field_struct"), m_Tag);
+		m_pDataStructType->m_pParentNamespace = this;
+		m_pParentClassField = m_pParentClassType->CreateField (StorageKind, m_pDataStructType);
+		return m_pDataStructType;
 
 	case EStorage_Static:
-		if (m_pStaticFieldStructType)
-			return m_pStaticFieldStructType;
+		if (m_pStaticDataStructType)
+			return m_pStaticDataStructType;
 
-		m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-		m_pStaticFieldStructType->m_StorageKind = EStorage_Static;
-		m_pStaticFieldStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
-		m_pStaticFieldStructType->m_pParentNamespace = this;
-		return m_pStaticFieldStructType;
+		m_pStaticDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+		m_pStaticDataStructType->m_StorageKind = EStorage_Static;
+		m_pStaticDataStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
+		m_pStaticDataStructType->m_pParentNamespace = this;
+		return m_pStaticDataStructType;
 
 	default:
 		err::SetFormatStringError (_T("invalid storage '%s' for field member"), GetStorageKindString (StorageKind));
@@ -164,7 +164,7 @@ CProperty::GetFieldStructType (EStorage StorageKind)
 }
 
 bool
-CProperty::AddMethodMember (CFunction* pFunction)
+CProperty::AddMethod (CFunction* pFunction)
 {
 	bool Result;
 
@@ -191,7 +191,7 @@ CProperty::AddMethodMember (CFunction* pFunction)
 			// and fall through
 		
 		case EStorage_Member:
-			pFunction->ConvertToMethodMember (m_pParentClassType);
+			pFunction->ConvertToMemberMethod (m_pParentClassType);
 			break;
 
 		case EStorage_Abstract:
@@ -200,7 +200,7 @@ CProperty::AddMethodMember (CFunction* pFunction)
 			if (!pFunction->IsAccessor ())
 				m_pParentClassType->m_VirtualMethodArray.Append (pFunction); // otherwise we are already on VirtualPropertyArray
 
-			pFunction->ConvertToMethodMember (m_pParentClassType);
+			pFunction->ConvertToMemberMethod (m_pParentClassType);
 			break;
 
 		default:
@@ -259,7 +259,7 @@ CProperty::AddMethodMember (CFunction* pFunction)
 		return false;
 	}
 
-	Result = m_Verifier.AddMethodMember (FunctionKind, pFunction->GetType ());
+	Result = m_Verifier.AddMethod (FunctionKind, pFunction->GetType ());
 	if (!Result)
 		return false;
 
@@ -280,7 +280,7 @@ CProperty::AddMethodMember (CFunction* pFunction)
 }
 
 bool
-CProperty::AddPropertyMember (CProperty* pProperty)
+CProperty::AddProperty (CProperty* pProperty)
 {
 	ASSERT (pProperty->IsNamed ());
 	bool Result = AddItem (pProperty);
@@ -322,7 +322,7 @@ CProperty::AddPropertyMember (CProperty* pProperty)
 }
 
 bool
-CProperty::AddAutoEvMember (CAutoEv* pAutoEv)
+CProperty::AddAutoEv (CAutoEv* pAutoEv)
 {
 	ASSERT (pAutoEv->IsNamed ());
 	bool Result = AddItem (pAutoEv);
@@ -376,16 +376,16 @@ CProperty::CalcLayout ()
 		pStructType->AddBaseType (m_pType->GetAuFieldStructType ());			
 	}
 
-	if (m_pFieldStructType)
+	if (m_pDataStructType)
 	{
-		Result = m_pFieldStructType->CalcLayout ();
+		Result = m_pDataStructType->CalcLayout ();
 		if (!Result)
 			return false;
 	}
 
-	if (m_pStaticFieldStructType)
+	if (m_pStaticDataStructType)
 	{
-		Result = m_pStaticFieldStructType->CalcLayout ();
+		Result = m_pStaticDataStructType->CalcLayout ();
 		if (!Result)
 			return false;
 
@@ -393,7 +393,7 @@ CProperty::CalcLayout ()
 			EVariable_Global, 
 			_T("static_field"),
 			m_Tag + _T(".static_field"), 
-			m_pStaticFieldStructType
+			m_pStaticDataStructType
 			);
 	}
 
@@ -466,7 +466,7 @@ CProperty::CompileAutoGetter ()
 	
 	CValue PropValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (
+		m_pModule->m_OperatorMgr.GetAuPropertyField (
 			GetAutoAccessorPropertyValue (),
 			EAuPropertyField_PropValue,
 			&PropValue
@@ -502,7 +502,7 @@ CProperty::CompileAutoSetter ()
 
 	CValue PropValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetAuPropertyFieldMember (
+		m_pModule->m_OperatorMgr.GetAuPropertyField (
 			GetAutoAccessorPropertyValue (),
 			EAuPropertyField_PropValue,
 			&PropValue

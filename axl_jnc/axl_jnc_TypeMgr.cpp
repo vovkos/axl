@@ -375,8 +375,8 @@ CTypeMgr::CreateClassType (
 
 	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceHdrStructType->m_Tag.Format (_T("%s.ifacehdr"), pType->m_Tag);
-	pIfaceHdrStructType->CreateFieldMember (pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe));
-	pIfaceHdrStructType->CreateFieldMember (GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Unsafe));
+	pIfaceHdrStructType->CreateField (pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe));
+	pIfaceHdrStructType->CreateField (GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Unsafe));
 
 	CStructType* pIfaceStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
 	pIfaceStructType->m_Tag.Format (_T("%s.iface"), pType->m_Tag);
@@ -387,8 +387,8 @@ CTypeMgr::CreateClassType (
 	CStructType* pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
 	pClassStructType->m_Tag.Format (_T("%s.class"), pType->m_Tag);
 	pClassStructType->m_pParentNamespace = pType;
-	pClassStructType->CreateFieldMember (GetStdType (EStdType_ObjectHdr));
-	pClassStructType->CreateFieldMember (pIfaceStructType);
+	pClassStructType->CreateField (GetStdType (EStdType_ObjectHdr));
+	pClassStructType->CreateField (pIfaceStructType);
 
 	pType->m_pModule = m_pModule;
 	pType->m_PackFactor = PackFactor;
@@ -436,7 +436,7 @@ CTypeMgr::GetFunctionType (
 }
 
 CFunctionType* 
-CTypeMgr::GetMethodMemberType (
+CTypeMgr::GetMemberMethodType (
 	CClassType* pClassType,
 	CFunctionType* pFunctionType,
 	int ThisArgTypeFlags
@@ -447,26 +447,26 @@ CTypeMgr::GetMethodMemberType (
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, pThisArgType);	
 	
-	CFunctionType* pMethodMemberType = GetFunctionType (
+	CFunctionType* pMemberMethodType = GetFunctionType (
 		pFunctionType->m_CallConv,
 		pFunctionType->m_pReturnType,
 		ArgTypeArray,
 		pFunctionType->m_Flags
 		);
 
-	pMethodMemberType->m_pShortType = pFunctionType;
-	return  pMethodMemberType;
+	pMemberMethodType->m_pShortType = pFunctionType;
+	return  pMemberMethodType;
 }
 
 CFunctionType* 
-CTypeMgr::GetStdObjectMethodMemberType (CFunctionType* pFunctionType)
+CTypeMgr::GetStdObjectMemberMethodType (CFunctionType* pFunctionType)
 {
-	if (pFunctionType->m_pStdObjectMethodMemberType)
-		return pFunctionType->m_pStdObjectMethodMemberType;
+	if (pFunctionType->m_pStdObjectMemberMethodType)
+		return pFunctionType->m_pStdObjectMemberMethodType;
 	
 	CClassType* pClassType = (CClassType*) GetStdType (EStdType_ObjectClass);
-	pFunctionType->m_pStdObjectMethodMemberType = pClassType->GetMethodMemberType (pFunctionType);
-	return pFunctionType->m_pStdObjectMethodMemberType;
+	pFunctionType->m_pStdObjectMemberMethodType = pClassType->GetMemberMethodType (pFunctionType);
+	return pFunctionType->m_pStdObjectMemberMethodType;
 }
 
 CFunctionType* 
@@ -475,7 +475,7 @@ CTypeMgr::GetShortFunctionType (CFunctionType* pFunctionType)
 	if (pFunctionType->m_pShortType)
 		return pFunctionType->m_pShortType;
 	
-	if (!pFunctionType->IsMethodMemberType ())
+	if (!pFunctionType->IsMemberMethodType ())
 	{
 		pFunctionType->m_pShortType = pFunctionType;
 		return pFunctionType;
@@ -523,13 +523,13 @@ CTypeMgr::GetPropertyType (
 
 		if (Flags & EPropertyTypeFlag_Bindable) // event first
 		{
-			pType->m_AuFieldArray [EAuPropertyField_OnChange] = pType->m_pAuFieldStructType->CreateFieldMember (_T("onchange"), GetStdType (EStdType_SimpleMulticast));
+			pType->m_AuFieldArray [EAuPropertyField_OnChange] = pType->m_pAuFieldStructType->CreateField (_T("onchange"), GetStdType (EStdType_SimpleMulticast));
 			pType->m_pBindablePropertyType = pType;
 		}
 
 		if (Flags & EPropertyTypeFlag_AutoGet)
 		{
-			pType->m_AuFieldArray [EAuPropertyField_PropValue] = pType->m_pAuFieldStructType->CreateFieldMember (_T("propvalue"), pGetterType->GetReturnType ());
+			pType->m_AuFieldArray [EAuPropertyField_PropValue] = pType->m_pAuFieldStructType->CreateField (_T("propvalue"), pGetterType->GetReturnType ());
 		}
 	}
 
@@ -599,12 +599,12 @@ CTypeMgr::GetIndexedPropertyType (
 }
 
 CPropertyType* 
-CTypeMgr::GetPropertyMemberType (
+CTypeMgr::GetMemberPropertyType (
 	CClassType* pClassType,
 	CPropertyType* pPropertyType
 	)
 {
-	CFunctionType* pGetterType = GetMethodMemberType (pClassType, pPropertyType->m_pGetterType);
+	CFunctionType* pGetterType = GetMemberMethodType (pClassType, pPropertyType->m_pGetterType);
 
 	size_t SetterTypeOverloadCount = pPropertyType->m_SetterType.GetOverloadCount ();
 
@@ -615,28 +615,28 @@ CTypeMgr::GetPropertyMemberType (
 	for (size_t i = 0; i < SetterTypeOverloadCount; i++)
 	{
 		CFunctionType* pOverloadType = pPropertyType->m_SetterType.GetOverload (i);
-		SetterTypeOverloadArray [i] = GetMethodMemberType (pClassType, pOverloadType);
+		SetterTypeOverloadArray [i] = GetMemberMethodType (pClassType, pOverloadType);
 	}
 
-	CPropertyType* pPropertyMemberType = GetPropertyType (
+	CPropertyType* pMemberPropertyType = GetPropertyType (
 		pGetterType, 
 		CFunctionTypeOverload (SetterTypeOverloadArray, SetterTypeOverloadCount), 
 		pPropertyType->m_Flags
 		);
 
-	pPropertyMemberType->m_pShortType = pPropertyType;
-	return pPropertyMemberType;
+	pMemberPropertyType->m_pShortType = pPropertyType;
+	return pMemberPropertyType;
 }
 
 CPropertyType* 
-CTypeMgr::GetStdObjectPropertyMemberType (CPropertyType* pPropertyType)
+CTypeMgr::GetStdObjectMemberPropertyType (CPropertyType* pPropertyType)
 {
-	if (pPropertyType->m_pStdObjectPropertyMemberType)
-		return pPropertyType->m_pStdObjectPropertyMemberType;
+	if (pPropertyType->m_pStdObjectMemberPropertyType)
+		return pPropertyType->m_pStdObjectMemberPropertyType;
 
 	CClassType* pClassType = (CClassType*) GetStdType (EStdType_ObjectClass);
-	pPropertyType->m_pStdObjectPropertyMemberType = pClassType->GetPropertyMemberType (pPropertyType);
-	return pPropertyType->m_pStdObjectPropertyMemberType;
+	pPropertyType->m_pStdObjectMemberPropertyType = pClassType->GetMemberPropertyType (pPropertyType);
+	return pPropertyType->m_pStdObjectMemberPropertyType;
 }
 
 CPropertyType* 
@@ -645,7 +645,7 @@ CTypeMgr::GetShortPropertyType (CPropertyType* pPropertyType)
 	if (pPropertyType->m_pShortType)
 		return pPropertyType->m_pShortType;
 	
-	if (!pPropertyType->IsPropertyMemberType ())
+	if (!pPropertyType->IsMemberPropertyType ())
 	{
 		pPropertyType->m_pShortType = pPropertyType;
 		return pPropertyType;
@@ -683,29 +683,29 @@ CTypeMgr::GetBindablePropertyType (CPropertyType* pPropertyType)
 }
 
 CAutoEvType* 
-CTypeMgr::GetAutoEvMemberType (
+CTypeMgr::GetMemberAutoEvType (
 	CClassType* pClassType,
 	CAutoEvType* pAutoEvType
 	)
 {
-	CAutoEvType* pAutoEvMemberType = GetAutoEvType (
-		GetMethodMemberType (pClassType, pAutoEvType->m_pStarterType), 
-		GetMethodMemberType (pClassType, pAutoEvType->m_pStopperType)
+	CAutoEvType* pMemberAutoEvType = GetAutoEvType (
+		GetMemberMethodType (pClassType, pAutoEvType->m_pStarterType), 
+		GetMemberMethodType (pClassType, pAutoEvType->m_pStopperType)
 		);
 
-	pAutoEvMemberType->m_pShortType = pAutoEvType;
-	return pAutoEvMemberType;
+	pMemberAutoEvType->m_pShortType = pAutoEvType;
+	return pMemberAutoEvType;
 }
 
 CAutoEvType* 
-CTypeMgr::GetStdObjectAutoEvMemberType (CAutoEvType* pAutoEvType)
+CTypeMgr::GetStdObjectMemberAutoEvType (CAutoEvType* pAutoEvType)
 {
-	if (pAutoEvType->m_pStdObjectAutoEvMemberType)
-		return pAutoEvType->m_pStdObjectAutoEvMemberType;
+	if (pAutoEvType->m_pStdObjectMemberAutoEvType)
+		return pAutoEvType->m_pStdObjectMemberAutoEvType;
 
 	CClassType* pClassType = (CClassType*) GetStdType (EStdType_ObjectClass);
-	pAutoEvType->m_pStdObjectAutoEvMemberType = pClassType->GetAutoEvMemberType (pAutoEvType);
-	return pAutoEvType->m_pStdObjectAutoEvMemberType;
+	pAutoEvType->m_pStdObjectMemberAutoEvType = pClassType->GetMemberAutoEvType (pAutoEvType);
+	return pAutoEvType->m_pStdObjectMemberAutoEvType;
 }
 
 CAutoEvType* 
@@ -714,7 +714,7 @@ CTypeMgr::GetShortAutoEvType (CAutoEvType* pAutoEvType)
 	if (pAutoEvType->m_pShortType)
 		return pAutoEvType->m_pShortType;
 	
-	if (!pAutoEvType->IsAutoEvMemberType ())
+	if (!pAutoEvType->IsMemberAutoEvType ())
 	{
 		pAutoEvType->m_pShortType = pAutoEvType;
 		return pAutoEvType;
@@ -1365,9 +1365,9 @@ CTypeMgr::CreateDataPtrValidatorType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("ptrvtor");
-	pType->CreateFieldMember (GetStdType (EStdType_BytePtr));
-	pType->CreateFieldMember (GetStdType (EStdType_BytePtr));
-	pType->CreateFieldMember (GetPrimitiveType (EType_SizeT));
+	pType->CreateField (GetStdType (EStdType_BytePtr));
+	pType->CreateField (GetStdType (EStdType_BytePtr));
+	pType->CreateField (GetPrimitiveType (EType_SizeT));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1377,8 +1377,8 @@ CTypeMgr::CreateObjectHdrType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("objhdr");
-	pType->CreateFieldMember (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
-	pType->CreateFieldMember (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
+	pType->CreateField (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
+	pType->CreateField (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1398,8 +1398,8 @@ CTypeMgr::CreateAutoEvBindSiteType ()
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag = _T("aevbindsite");
-	pType->CreateFieldMember (GetStdType (EStdType_SimpleEventPtr));
-	pType->CreateFieldMember (GetPrimitiveType (EType_Int_p));
+	pType->CreateField (GetStdType (EStdType_SimpleEventPtr));
+	pType->CreateField (GetPrimitiveType (EType_Int_p));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1411,7 +1411,7 @@ CTypeMgr::CreateISchedulerType ()
 	CType* pReturnType = GetPrimitiveType (EType_Void);
 	CType* pArgType = ((CFunctionType*) GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType ();
 	CFunctionType* pScheduleType = GetFunctionType (pReturnType, &pArgType, 1);
-	pType->CreateMethodMember (EStorage_Abstract, _T("Schedule"), pScheduleType);
+	pType->CreateMethod (EStorage_Abstract, _T("Schedule"), pScheduleType);
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1421,8 +1421,8 @@ CTypeMgr::CreateDataPtrStructType (CType* pBaseType)
 {
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("%s.ptr"), pBaseType->GetTypeString ());
-	pType->CreateFieldMember (pBaseType->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateFieldMember (GetStdType (EStdType_DataPtrValidator));
+	pType->CreateField (pBaseType->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (GetStdType (EStdType_DataPtrValidator));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1430,12 +1430,12 @@ CTypeMgr::CreateDataPtrStructType (CType* pBaseType)
 CStructType* 
 CTypeMgr::CreateFunctionPtrStructType (CFunctionType* pFunctionType)
 {
-	CFunctionType* pStdObjectMethodMemberType = pFunctionType->GetStdObjectMethodMemberType ();
+	CFunctionType* pStdObjectMemberMethodType = pFunctionType->GetStdObjectMemberMethodType ();
 
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.ptr"));
-	pType->CreateFieldMember (pStdObjectMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin));
-	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField (pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField (GetStdType (EStdType_ObjectPtr));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1443,14 +1443,14 @@ CTypeMgr::CreateFunctionPtrStructType (CFunctionType* pFunctionType)
 CStructType* 
 CTypeMgr::CreateFunctionPtrStructType_w (CFunctionType* pFunctionType)
 {
-	CFunctionType* pStdObjectMethodMemberType = pFunctionType->GetStdObjectMethodMemberType ();
+	CFunctionType* pStdObjectMemberMethodType = pFunctionType->GetStdObjectMemberMethodType ();
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
 
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("fn.ptr_w"));
-	pType->CreateFieldMember (pStdObjectMethodMemberType->GetFunctionPtrType (EFunctionPtrType_Thin));
-	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
-	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField (pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1460,13 +1460,13 @@ CTypeMgr::CreatePropertyVTableStructType (CPropertyType* pPropertyType)
 {
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.vtbl"));
-	pType->CreateFieldMember (pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField (pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
 
 	size_t SetterTypeOverloadCount = pPropertyType->m_SetterType.GetOverloadCount ();
 	for (size_t i = 0; i < SetterTypeOverloadCount; i++)
 	{
 		CFunctionType* pSetterType = pPropertyType->m_SetterType.GetOverload (i);
-		pType->CreateFieldMember (pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+		pType->CreateField (pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	}
 
 	pType->CalcLayout ();
@@ -1476,14 +1476,14 @@ CTypeMgr::CreatePropertyVTableStructType (CPropertyType* pPropertyType)
 CStructType*
 CTypeMgr::CreatePropertyPtrStructType (CPropertyType* pPropertyType)
 {
-	CPropertyType* pStdObjectPropertyMemberType = pPropertyType->GetStdObjectPropertyMemberType ();
+	CPropertyType* pStdObjectMemberPropertyType = pPropertyType->GetStdObjectMemberPropertyType ();
 
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.ptr"));
 
 	if (!(pPropertyType->GetFlags () & EPropertyTypeFlag_Augmented))
 	{
-		pType->CreateFieldMember (pStdObjectPropertyMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+		pType->CreateField (pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
 	}
 	else
 	{
@@ -1491,7 +1491,7 @@ CTypeMgr::CreatePropertyPtrStructType (CPropertyType* pPropertyType)
 		// thin pointer goes first
 	}
 
-	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField (GetStdType (EStdType_ObjectPtr));
 
 	pType->CalcLayout ();
 	return pType;
@@ -1502,13 +1502,13 @@ CTypeMgr::CreatePropertyPtrStructType_w (CPropertyType* pPropertyType)
 {
 	ASSERT (false);
 
-	CPropertyType* pStdObjectPropertyMemberType = pPropertyType->GetStdObjectPropertyMemberType ();
+	CPropertyType* pStdObjectMemberPropertyType = pPropertyType->GetStdObjectMemberPropertyType ();
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.ptr_w"));
-	pType->CreateFieldMember (pStdObjectPropertyMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
-	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateField (pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
 	pType->CalcLayout ();
 	return NULL;
 }
@@ -1519,8 +1519,8 @@ CTypeMgr::CreateAuPropertyPtrStructType_t (CPropertyType* pPropertyType)
 	ASSERT (pPropertyType->m_Flags & EPropertyTypeFlag_Augmented);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.ptr_t"));
-	pType->CreateFieldMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateFieldMember (pPropertyType->GetAuFieldStructType ()->GetDataPtrType ());
+	pType->CreateField (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (pPropertyType->GetAuFieldStructType ()->GetDataPtrType ());
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1531,8 +1531,8 @@ CTypeMgr::CreateAuPropertyPtrStructType_u (CPropertyType* pPropertyType)
 	ASSERT (pPropertyType->m_Flags & EPropertyTypeFlag_Augmented);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.ptr_u"));
-	pType->CreateFieldMember (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateFieldMember (pPropertyType->GetAuFieldStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (pPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (pPropertyType->GetAuFieldStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1542,8 +1542,8 @@ CTypeMgr::CreateAutoEvVTableStructType (CAutoEvType* pAutoEvType)
 {
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("autoev.vtbl"));
-	pType->CreateFieldMember (pAutoEvType->m_pStarterType->GetFunctionPtrType (EFunctionPtrType_Thin));
-	pType->CreateFieldMember (pAutoEvType->m_pStopperType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField (pAutoEvType->m_pStarterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField (pAutoEvType->m_pStopperType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	pType->CalcLayout ();
 	return pType;
 }
@@ -1551,12 +1551,12 @@ CTypeMgr::CreateAutoEvVTableStructType (CAutoEvType* pAutoEvType)
 CStructType*
 CTypeMgr::CreateAutoEvPtrStructType (CAutoEvType* pAutoEvType)
 {
-	CAutoEvType* pStdObjectAutoEvMemberType = pAutoEvType->GetStdObjectAutoEvMemberType ();
+	CAutoEvType* pStdObjectMemberAutoEvType = pAutoEvType->GetStdObjectMemberAutoEvType ();
 
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("autoev.ptr"));
-	pType->CreateFieldMember (pStdObjectAutoEvMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField (pStdObjectMemberAutoEvType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (GetStdType (EStdType_ObjectPtr));
 
 	pType->CalcLayout ();
 	return pType;
@@ -1567,13 +1567,13 @@ CTypeMgr::CreateAutoEvPtrStructType_w (CAutoEvType* pAutoEvType)
 {
 	ASSERT (false);
 
-	CAutoEvType* pStdObjectAutoEvMemberType = pAutoEvType->GetStdObjectAutoEvMemberType ();
+	CAutoEvType* pStdObjectMemberAutoEvType = pAutoEvType->GetStdObjectMemberAutoEvType ();
 	CFunctionType* pStrenthenClosureType = (CFunctionType*) GetStdType (EStdType_StrenthenClosureFunction);
 	CStructType* pType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("prop.ptr_w"));
-	pType->CreateFieldMember (pStdObjectAutoEvMemberType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateFieldMember (GetStdType (EStdType_ObjectPtr));
-	pType->CreateFieldMember (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
+	pType->CreateField (pStdObjectMemberAutoEvType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe));
+	pType->CreateField (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField (pStrenthenClosureType->GetFunctionPtrType (EFunctionPtrType_Unsafe));
 	pType->CalcLayout ();
 	return NULL;
 }

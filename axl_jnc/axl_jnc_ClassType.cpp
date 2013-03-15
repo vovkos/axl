@@ -21,7 +21,7 @@ CClassType::CClassType ()
 	m_pInitializer = NULL;
 
 	m_PackFactor = 8;
-	m_pStaticFieldStructType = NULL;
+	m_pStaticDataStructType = NULL;
 	m_pStaticDataVariable = NULL;
 
 	m_pVTableStructType = NULL;
@@ -38,24 +38,24 @@ CClassType::GetClassPtrType (
 }
 
 CFunctionType* 
-CClassType::GetMethodMemberType (
+CClassType::GetMemberMethodType (
 	CFunctionType* pShortType,
 	int ThisArgTypeFlags
 	)
 {
-	return m_pModule->m_TypeMgr.GetMethodMemberType (this, pShortType, ThisArgTypeFlags);
+	return m_pModule->m_TypeMgr.GetMemberMethodType (this, pShortType, ThisArgTypeFlags);
 }
 
 CPropertyType* 
-CClassType::GetPropertyMemberType (CPropertyType* pShortType)
+CClassType::GetMemberPropertyType (CPropertyType* pShortType)
 {
-	return m_pModule->m_TypeMgr.GetPropertyMemberType (this, pShortType);
+	return m_pModule->m_TypeMgr.GetMemberPropertyType (this, pShortType);
 }
 
 CAutoEvType* 
-CClassType::GetAutoEvMemberType (CAutoEvType* pShortType)
+CClassType::GetMemberAutoEvType (CAutoEvType* pShortType)
 {
-	return m_pModule->m_TypeMgr.GetAutoEvMemberType (this, pShortType);
+	return m_pModule->m_TypeMgr.GetMemberAutoEvType (this, pShortType);
 }
 
 CFunction* 
@@ -75,7 +75,7 @@ CClassType::GetDefaultConstructor ()
 }
 
 CStructField*
-CClassType::CreateFieldMember (
+CClassType::CreateField (
 	EStorage StorageKind,
 	const rtl::CString& Name,
 	CType* pType,
@@ -93,15 +93,15 @@ CClassType::CreateFieldMember (
 		break;
 
 	case EStorage_Static:
-		if (!m_pStaticFieldStructType)
+		if (!m_pStaticDataStructType)
 		{
-			m_pStaticFieldStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-			m_pStaticFieldStructType->m_StorageKind = EStorage_Static;
-			m_pStaticFieldStructType->m_pParentNamespace = this;
-			m_pStaticFieldStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
+			m_pStaticDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+			m_pStaticDataStructType->m_StorageKind = EStorage_Static;
+			m_pStaticDataStructType->m_pParentNamespace = this;
+			m_pStaticDataStructType->m_Tag.Format (_T("%s.static_field_struct"), m_Tag);
 		}
 
-		pFieldStructType = m_pStaticFieldStructType;
+		pFieldStructType = m_pStaticDataStructType;
 		break;
 
 	default:
@@ -109,20 +109,20 @@ CClassType::CreateFieldMember (
 		return NULL;
 	}
 
-	CStructField* pMember = pFieldStructType->CreateFieldMember (Name, pType, BitCount, PtrTypeFlags);
+	CStructField* pField = pFieldStructType->CreateField (Name, pType, BitCount, PtrTypeFlags);
 
 	if (!Name.IsEmpty ())
 	{
-		bool Result = AddItem (pMember);
+		bool Result = AddItem (pField);
 		if (!Result)
 			return NULL;
 	}
 
-	return pMember;
+	return pField;
 }
 
 bool
-CClassType::AddMethodMember (CFunction* pFunction)
+CClassType::AddMethod (CFunction* pFunction)
 {
 	EStorage StorageKind = pFunction->GetStorageKind ();
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
@@ -147,18 +147,18 @@ CClassType::AddMethodMember (CFunction* pFunction)
 		// and fall through
 
 	case EStorage_Member:
-		pFunction->ConvertToMethodMember (this);
+		pFunction->ConvertToMemberMethod (this);
 		break;
 
 	case EStorage_Override:
 		m_OverrideMethodArray.Append (pFunction);
-		pFunction->ConvertToMethodMember (this);
+		pFunction->ConvertToMemberMethod (this);
 		return true; // layout overrides later
 
 	case EStorage_Abstract:
 	case EStorage_Virtual:
 		m_VirtualMethodArray.Append (pFunction);
-		pFunction->ConvertToMethodMember (this);
+		pFunction->ConvertToMemberMethod (this);
 		break;
 
 	default:
@@ -234,7 +234,7 @@ CClassType::AddMethodMember (CFunction* pFunction)
 }
 
 bool
-CClassType::AddPropertyMember (CProperty* pProperty)
+CClassType::AddProperty (CProperty* pProperty)
 {
 	ASSERT (pProperty->IsNamed ());
 	bool Result = AddItem (pProperty);
@@ -269,7 +269,7 @@ CClassType::AddPropertyMember (CProperty* pProperty)
 }
 
 bool
-CClassType::AddAutoEvMember (CAutoEv* pAutoEv)
+CClassType::AddAutoEv (CAutoEv* pAutoEv)
 {
 	ASSERT (pAutoEv->IsNamed () || (m_Flags & EClassTypeFlag_AutoEv));
 	if (pAutoEv->IsNamed ())
@@ -305,7 +305,7 @@ CClassType::AddAutoEvMember (CAutoEv* pAutoEv)
 }
 
 CFunction*
-CClassType::CreateMethodMember (
+CClassType::CreateMethod (
 	EStorage StorageKind,
 	const rtl::CString& Name,
 	CFunctionType* pShortType
@@ -319,7 +319,7 @@ CClassType::CreateMethodMember (
 	pFunction->m_QualifiedName = QualifiedName;
 	pFunction->m_Tag = QualifiedName;
 
-	bool Result = AddMethodMember (pFunction);
+	bool Result = AddMethod (pFunction);
 	if (!Result)
 		return NULL;
 
@@ -327,7 +327,7 @@ CClassType::CreateMethodMember (
 }
 
 CProperty*
-CClassType::CreatePropertyMember (
+CClassType::CreateProperty (
 	EStorage StorageKind,
 	const rtl::CString& Name,
 	CPropertyType* pShortType
@@ -338,7 +338,7 @@ CClassType::CreatePropertyMember (
 	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
 
 	bool Result = 
-		AddPropertyMember (pProperty) &&
+		AddProperty (pProperty) &&
 		pProperty->Create (pShortType);
 
 	if (!Result)
@@ -428,9 +428,9 @@ CClassType::CalcLayout ()
 
 	// static fields
 
-	if (m_pStaticFieldStructType)
+	if (m_pStaticDataStructType)
 	{
-		Result = m_pStaticFieldStructType->CalcLayout ();
+		Result = m_pStaticDataStructType->CalcLayout ();
 		if (!Result)
 			return false;
 
@@ -438,7 +438,7 @@ CClassType::CalcLayout ()
 			EVariable_Global, 
 			_T("static_field"),
 			m_Tag + _T(".static_field"), 
-			m_pStaticFieldStructType
+			m_pStaticDataStructType
 			);
 	}
 
@@ -506,11 +506,11 @@ CClassType::CalcLayout ()
 			switch (ItemKind)
 			{
 			case EModuleItem_Function:
-				((CFunction*) pItem)->ConvertToMethodMember (this);
+				((CFunction*) pItem)->ConvertToMemberMethod (this);
 				break;
 
 			case EModuleItem_Property:
-				((CProperty*) pItem)->ConvertToPropertyMember (this);
+				((CProperty*) pItem)->ConvertToMemberProperty (this);
 				break;
 			}
 		}
@@ -557,7 +557,7 @@ CClassType::AddVirtualFunction (CFunction* pFunction)
 	pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
 
 	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe);
-	m_pVTableStructType->CreateFieldMember (pPointerType);
+	m_pVTableStructType->CreateField (pPointerType);
 	m_VTable.Append (pFunction);
 }
 

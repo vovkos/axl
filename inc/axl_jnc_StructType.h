@@ -80,7 +80,7 @@ protected:
 	size_t m_FieldActualSize;
 	size_t m_FieldAlignedSize;
 
-	rtl::CStdListT <CStructField> m_FieldMemberList;
+	rtl::CStdListT <CStructField> m_FieldList;
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
 	size_t m_LastBitFieldOffset;
@@ -114,16 +114,16 @@ public:
 	}
 
 	rtl::CConstListT <CStructField>
-	GetFieldMemberList ()
+	GetFieldList ()
 	{
-		return m_FieldMemberList;
+		return m_FieldList;
 	}
 
 	bool
 	IsClassStructType ();
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
@@ -131,13 +131,13 @@ public:
 		);
 
 	CStructField*
-	CreateFieldMember (
+	CreateField (
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateFieldMember (rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	bool

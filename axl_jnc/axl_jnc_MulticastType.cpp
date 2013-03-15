@@ -13,6 +13,7 @@ CMulticastType::CMulticastType ()
 	m_Size = sizeof (TMulticast);
 	m_pTargetType = NULL;
 	m_pMulticastStructType = NULL;
+	memset (m_FieldArray, 0, sizeof (m_FieldArray));
 	memset (m_MethodArray, 0, sizeof (m_MethodArray));
 }
 
@@ -24,11 +25,13 @@ CMulticastType::GetMulticastStructType ()
 
 	m_pMulticastStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
 	m_pMulticastStructType->m_Tag.Format (_T("multicast"));
-	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
-	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_pMulticastStructType->CreateFieldMember (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
-	m_pMulticastStructType->CreateFieldMember (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+
+	m_FieldArray [EMulticastField_Lock] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
+	m_FieldArray [EMulticastField_Count] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_FieldArray [EMulticastField_MaxCount] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
+	m_FieldArray [EMulticastField_PtrArray] = m_pMulticastStructType->CreateField (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
+	m_FieldArray [EMulticastField_HandleTable] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+	
 	m_pMulticastStructType->CalcLayout ();
 
 	return m_pMulticastStructType;
@@ -548,7 +551,7 @@ CMulticastType::CreateCallMethod_u ()
 	ASSERT (SnapshotValue.GetType ()->Cmp (pMcSnapshotType) == 0);
 	ArgValueArray [0] = SnapshotValue;
 
-	pImplFunction = pMcSnapshotType->GetCallMethod ();
+	pImplFunction = pMcSnapshotType->GetMethod (EMcSnapshotMethod_Call);
 
 	CValue ReturnValue;
 	m_pModule->m_LlvmBuilder.CreateCall (

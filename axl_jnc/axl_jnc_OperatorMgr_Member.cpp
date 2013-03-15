@@ -8,7 +8,7 @@ namespace jnc {
 //.............................................................................
 
 bool
-COperatorMgr::GetFieldMember (
+COperatorMgr::GetField (
 	CStructField* pMember,
 	CBaseTypeCoord* pCoord,
 	CValue* pResultValue
@@ -29,7 +29,7 @@ COperatorMgr::GetFieldMember (
 			CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
 			ASSERT (pStaticVariable);
 
-			return GetStructFieldMember (
+			return GetStructField (
 				pStaticVariable, 
 				pMember,
 				pCoord,
@@ -47,9 +47,9 @@ COperatorMgr::GetFieldMember (
 		}
 
 		CValue FieldValue;
-		Result = GetClassFieldMember (
+		Result = GetClassField (
 			ThisValue, 
-			pProperty->GetParentClassFieldMember (),
+			pProperty->GetParentClassField (),
 			NULL,
 			&FieldValue
 			);
@@ -57,7 +57,7 @@ COperatorMgr::GetFieldMember (
 		if (!Result)
 			return false;
 
-		return GetStructFieldMember (
+		return GetStructField (
 			FieldValue, 
 			pMember,
 			pCoord,
@@ -72,7 +72,7 @@ COperatorMgr::GetFieldMember (
 			CVariable* pStaticVariable = pAutoEv->GetStaticDataVariable ();
 			ASSERT (pStaticVariable);
 
-			return GetStructFieldMember (
+			return GetStructField (
 				pStaticVariable, 
 				pMember,
 				pCoord,
@@ -90,9 +90,9 @@ COperatorMgr::GetFieldMember (
 		}
 
 		CValue FieldValue;
-		Result = GetClassFieldMember (
+		Result = GetClassField (
 			ThisValue, 
-			pAutoEv->GetParentClassFieldMember (),
+			pAutoEv->GetParentClassField (),
 			NULL,
 			&FieldValue
 			);
@@ -100,7 +100,7 @@ COperatorMgr::GetFieldMember (
 		if (!Result)
 			return false;
 
-		return GetStructFieldMember (
+		return GetStructField (
 			FieldValue, 
 			pMember,
 			pCoord,
@@ -113,7 +113,7 @@ COperatorMgr::GetFieldMember (
 		CClassType* pClassType = (CClassType*) pParentNamespace;
 
 		if (pMember->GetStorageKind () == EStorage_Static)
-			return GetStructFieldMember (
+			return GetStructField (
 				pClassType->GetStaticDataVariable (), 
 				pMember,
 				pCoord,
@@ -126,7 +126,7 @@ COperatorMgr::GetFieldMember (
 			return false;
 		}
 
-		return GetClassFieldMember (
+		return GetClassField (
 			ThisValue, 
 			pMember,
 			pCoord,
@@ -176,7 +176,7 @@ COperatorMgr::GetMemberOperatorResultType (
 		return GetMulticastMemberType (OpValue, (CMulticastType*) pType, pName);
 
 	case EType_AutoEv:
-		return GetAutoEvMemberType (OpValue, (CAutoEvType*) pType, pName);
+		return GetMemberAutoEvType (OpValue, (CAutoEvType*) pType, pName);
 
 	case EType_ClassPtr:
 		PrepareOperandType (&OpValue);
@@ -260,7 +260,7 @@ COperatorMgr::MemberOperator (
 }
 
 CType*
-COperatorMgr::GetFieldMemberType (
+COperatorMgr::GetFieldType (
 	const CValue& OpValue,
 	CStructField* pMember
 	)	
@@ -313,7 +313,7 @@ COperatorMgr::GetStructMemberType (
 	switch (ItemKind)
 	{
 	case EModuleItem_StructField:
-		return GetFieldMemberType (OpValue, (CStructField*) pMember);
+		return GetFieldType (OpValue, (CStructField*) pMember);
 
 	default:
 		err::SetFormatStringError (_T("non-field members structs are not supported yet"));
@@ -341,7 +341,7 @@ COperatorMgr::GetStructMember (
 	switch (ItemKind)
 	{
 	case EModuleItem_StructField:
-		return GetStructFieldMember (OpValue, (CStructField*) pMember, &Coord, pResultValue);
+		return GetStructField (OpValue, (CStructField*) pMember, &Coord, pResultValue);
 
 	default:
 		err::SetFormatStringError (_T("non-field members in structs are not supported yet"));
@@ -350,7 +350,7 @@ COperatorMgr::GetStructMember (
 }
 
 bool
-COperatorMgr::GetStructFieldMember (
+COperatorMgr::GetStructField (
 	const CValue& OpValue,
 	CStructField* pField,
 	CBaseTypeCoord* pCoord,
@@ -493,7 +493,7 @@ COperatorMgr::GetUnionMemberType (
 	switch (ItemKind)
 	{
 	case EModuleItem_StructField:
-		return GetFieldMemberType (OpValue, (CStructField*) pMember);
+		return GetFieldType (OpValue, (CStructField*) pMember);
 
 	default:
 		err::SetFormatStringError (_T("non-field members in unions are not supported yet"));
@@ -520,7 +520,7 @@ COperatorMgr::GetUnionMember (
 	switch (ItemKind)
 	{
 	case EModuleItem_StructField:
-		return GetUnionFieldMember (OpValue, (CStructField*) pMember, pResultValue);
+		return GetUnionField (OpValue, (CStructField*) pMember, pResultValue);
 
 	default:
 		err::SetFormatStringError (_T("non-field members in unions are not supported yet"));
@@ -529,7 +529,7 @@ COperatorMgr::GetUnionMember (
 }
 
 bool
-COperatorMgr::GetUnionFieldMember (
+COperatorMgr::GetUnionField (
 	const CValue& OpValue,
 	CStructField* pField,
 	CValue* pResultValue
@@ -638,7 +638,7 @@ COperatorMgr::GetMulticastMember (
 }
 
 CType*
-COperatorMgr::GetAutoEvMemberType (
+COperatorMgr::GetMemberAutoEvType (
 	const CValue& OpValue,
 	CAutoEvType* pAutoEvType,
 	const tchar_t* pName
@@ -715,7 +715,7 @@ COperatorMgr::GetClassMemberType (
 	switch (MemberKind)
 	{
 	case EModuleItem_StructField:
-		return GetFieldMemberType (OpValue, (CStructField*) pMember	);
+		return GetFieldType (OpValue, (CStructField*) pMember	);
 		
 	case EModuleItem_Function:
 		return ((CFunction*) pMember)->GetType ()->GetShortType ()->GetFunctionPtrType (
@@ -771,7 +771,7 @@ COperatorMgr::GetClassMember (
 	switch (MemberKind)
 	{
 	case EModuleItem_StructField:
-		return GetClassFieldMember (
+		return GetClassField (
 			OpValue, 
 			(CStructField*) pMember, 
 			&Coord,
@@ -804,7 +804,7 @@ COperatorMgr::GetClassMember (
 }
 
 bool
-COperatorMgr::GetClassFieldMember (
+COperatorMgr::GetClassField (
 	const CValue& OpValue,
 	CStructField* pMember,
 	CBaseTypeCoord* pCoord,
@@ -857,7 +857,7 @@ COperatorMgr::GetClassFieldMember (
 }
 
 bool
-COperatorMgr::GetClassFieldMemberValue (
+COperatorMgr::GetClassFieldValue (
 	const CValue& ObjValue,
 	CStructField* pMember,
 	CValue* pValue
@@ -867,12 +867,12 @@ COperatorMgr::GetClassFieldMemberValue (
 
 	CValue FieldValue;
 	return 
-		GetClassFieldMember (ObjValue, pMember, NULL, &FieldValue) && 
+		GetClassField (ObjValue, pMember, NULL, &FieldValue) && 
 		LoadDataRef (FieldValue, pValue);
 }
 
 bool
-COperatorMgr::SetClassFieldMemberValue (
+COperatorMgr::SetClassFieldValue (
 	const CValue& ObjValue,
 	CStructField* pMember,
 	const CValue& Value
@@ -882,7 +882,7 @@ COperatorMgr::SetClassFieldMemberValue (
 
 	CValue FieldValue;
 	return 
-		GetClassFieldMember (ObjValue, pMember, NULL, &FieldValue) && 
+		GetClassField (ObjValue, pMember, NULL, &FieldValue) && 
 		BinaryOperator (EBinOp_Assign, FieldValue, Value);
 }
 
@@ -917,7 +917,7 @@ COperatorMgr::GetClassVTable (
 }
 
 bool
-COperatorMgr::GetVirtualMethodMember (
+COperatorMgr::GetVirtualMethod (
 	CFunction* pFunction,
 	CClosure* pClosure,
 	CValue* pResultValue
@@ -972,7 +972,7 @@ COperatorMgr::GetVirtualMethodMember (
 }
 
 bool
-COperatorMgr::GetVirtualPropertyMember (
+COperatorMgr::GetVirtualProperty (
 	CProperty* pProperty,
 	CClosure* pClosure,
 	CValue* pResultValue
@@ -1020,7 +1020,7 @@ COperatorMgr::GetVirtualPropertyMember (
 }
 
 CType*
-COperatorMgr::GetAuPropertyFieldMemberType (
+COperatorMgr::GetAuPropertyFieldType (
 	const CValue& OpValue,
 	EAuPropertyField Field
 	)
@@ -1038,17 +1038,17 @@ COperatorMgr::GetAuPropertyFieldMemberType (
 		return false;
 	}
 
-	return GetFieldMemberType (pPtrType->GetAuDataPtrType (EType_DataRef), pMember);
+	return GetFieldType (pPtrType->GetAuDataPtrType (EType_DataRef), pMember);
 }
 
 bool
-COperatorMgr::GetAuPropertyFieldMemberType (
+COperatorMgr::GetAuPropertyFieldType (
 	const CValue& OpValue,
 	EAuPropertyField Field,
 	CValue* pResultValue
 	)
 {
-	CType* pResultType = GetAuPropertyFieldMemberType (OpValue, Field);
+	CType* pResultType = GetAuPropertyFieldType (OpValue, Field);
 	if (!pResultType)
 		return false;
 
@@ -1057,7 +1057,7 @@ COperatorMgr::GetAuPropertyFieldMemberType (
 }
 
 bool
-COperatorMgr::GetAuPropertyFieldMember (
+COperatorMgr::GetAuPropertyField (
 	const CValue& OpValue,
 	EAuPropertyField Field, 
 	CValue* pResultValue
@@ -1093,17 +1093,14 @@ COperatorMgr::GetAuPropertyFieldMember (
 	}
 	else
 	{
-		CBaseTypeCoord Coord;
-		return GetFieldMember (
-			pProperty->GetParentClassFieldMember (),
-			&Coord, 
-			pResultValue
-			);
+		bool Result = GetField (pProperty->GetParentClassField (), NULL, &DataValue);
+		if (!Result)
+			return false;
 	}
 
 	CBaseTypeCoord Coord;
 	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
-	return GetStructFieldMember (DataValue, pMember, &Coord, pResultValue);
+	return GetStructField (DataValue, pMember, &Coord, pResultValue);
 }
 
 bool
@@ -1112,35 +1109,36 @@ COperatorMgr::GetAutoEvData (
 	CValue* pResultValue
 	)
 {
+	CValue DataValue;
+
 	if (pAutoEv->GetStorageKind () == EStorage_Static)
 	{
 		CVariable* pStaticVariable = pAutoEv->GetStaticDataVariable ();
-		ASSERT (pStaticVariable);
-
+		ASSERT (pStaticVariable);		
 		pResultValue->SetVariable (pStaticVariable);
 		return true;
 	}
-
-	CBaseTypeCoord Coord;
-	return GetFieldMember (
-		pAutoEv->GetParentClassFieldMember (),
-		&Coord, 
-		pResultValue
-		);
+	else
+	{
+		return GetField (pAutoEv->GetParentClassField (), NULL, pResultValue);
+	}
 }
 
 bool
-COperatorMgr::GetAutoEvFieldMember (
+COperatorMgr::GetAutoEvField (
 	CAutoEv* pAutoEv,
-	CStructField* pField,
+	EAutoEvField Field,
 	CValue* pResultValue
 	)
 {
-	CValue DataValue;
+	CStructField* pMember = pAutoEv->GetField (Field);
+	ASSERT (pMember);
 
-	return
-		GetAutoEvData (pAutoEv, &DataValue) &&
-		GetStructFieldMember (DataValue, pField, NULL, pResultValue);
+	CValue AutoEvDataValue;
+	
+	return 
+		GetAutoEvData (pAutoEv, &AutoEvDataValue) &&
+		GetStructField (AutoEvDataValue, pMember, NULL, pResultValue);
 }
 
 //.............................................................................

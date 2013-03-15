@@ -42,7 +42,7 @@ CStructType::IsClassStructType ()
 }
 
 CStructField*
-CStructType::CreateFieldMember (
+CStructType::CreateField (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
@@ -52,27 +52,27 @@ CStructType::CreateFieldMember (
 	if (pType->GetTypeKind () == EType_Class)
 		pType = ((CClassType*) pType)->GetClassPtrType ();
 
-	CStructField* pMember = AXL_MEM_NEW (CStructField);
-	pMember->m_StorageKind = m_StorageKind;
-	pMember->m_pParentType = this;
-	pMember->m_Name = Name;
-	pMember->m_pType = pType;
-	pMember->m_PtrTypeFlags = PtrTypeFlags;
-	pMember->m_pBitFieldBaseType = BitCount ? pType : NULL;
-	pMember->m_BitCount = BitCount;
-	m_FieldMemberList.InsertTail (pMember);
+	CStructField* pField = AXL_MEM_NEW (CStructField);
+	pField->m_StorageKind = m_StorageKind;
+	pField->m_pParentType = this;
+	pField->m_Name = Name;
+	pField->m_pType = pType;
+	pField->m_PtrTypeFlags = PtrTypeFlags;
+	pField->m_pBitFieldBaseType = BitCount ? pType : NULL;
+	pField->m_BitCount = BitCount;
+	m_FieldList.InsertTail (pField);
 
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
 		m_Flags &= ~ETypeFlag_Pod;
 
 	if (!Name.IsEmpty ())
 	{
-		bool Result = AddItem (pMember);
+		bool Result = AddItem (pField);
 		if (!Result)
 			return NULL;
 	}
 
-	return pMember;
+	return pField;
 }
 
 bool
@@ -88,12 +88,12 @@ CStructType::Append (CStructType* pType)
 			return false;
 	}
 
-	rtl::CIteratorT <CStructField> Member = pType->m_FieldMemberList.GetHead ();
-	for (; Member; Member++)
+	rtl::CIteratorT <CStructField> Field = pType->m_FieldList.GetHead ();
+	for (; Field; Field++)
 	{
-		Result = Member->m_BitCount ? 
-			CreateFieldMember (Member->m_Name, Member->m_pBitFieldBaseType, Member->m_BitCount, Member->m_PtrTypeFlags) != NULL:
-			CreateFieldMember (Member->m_Name, Member->m_pType, 0, Member->m_PtrTypeFlags) != NULL;
+		Result = Field->m_BitCount ? 
+			CreateField (Field->m_Name, Field->m_pBitFieldBaseType, Field->m_BitCount, Field->m_PtrTypeFlags) != NULL:
+			CreateField (Field->m_Name, Field->m_pType, 0, Field->m_PtrTypeFlags) != NULL;
 
 		if (!Result)
 			return false;
@@ -133,27 +133,27 @@ CStructType::CalcLayout ()
 			return false;
 	}
 
-	rtl::CIteratorT <CStructField> Member = m_FieldMemberList.GetHead ();
-	for (; Member; Member++)
+	rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
+	for (; Field; Field++)
 	{
-		CStructField* pMember = *Member;
+		CStructField* pField = *Field;
 
-		Result = pMember->m_pType->CalcLayout ();
+		Result = pField->m_pType->CalcLayout ();
 		if (!Result)
 			return false;
 
-		Result = pMember->m_BitCount ? 
+		Result = pField->m_BitCount ? 
 			LayoutBitField (
-				pMember->m_pBitFieldBaseType,
-				pMember->m_BitCount,
-				&pMember->m_pType,
-				&pMember->m_Offset,
-				&pMember->m_LlvmIndex
+				pField->m_pBitFieldBaseType,
+				pField->m_BitCount,
+				&pField->m_pType,
+				&pField->m_Offset,
+				&pField->m_LlvmIndex
 				) :
 			LayoutField (
-				pMember->m_pType,
-				&pMember->m_Offset,
-				&pMember->m_LlvmIndex
+				pField->m_pType,
+				&pField->m_Offset,
+				&pField->m_LlvmIndex
 				);
 
 		if (!Result)

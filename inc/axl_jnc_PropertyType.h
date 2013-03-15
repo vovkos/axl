@@ -74,7 +74,7 @@ protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	rtl::CString m_TypeModifierString;
-	CPropertyType* m_pStdObjectPropertyMemberType;
+	CPropertyType* m_pStdObjectMemberPropertyType;
 	CPropertyType* m_pShortType;
 	CPropertyType* m_pBindablePropertyType;
 	CStructType* m_pVTableStructType;
@@ -98,9 +98,9 @@ public:
 	}
 
 	bool
-	IsPropertyMemberType ()
+	IsMemberPropertyType ()
 	{
-		return m_pGetterType->IsMethodMemberType ();
+		return m_pGetterType->IsMemberMethodType ();
 	}
 
 	CClassPtrType* 
@@ -129,10 +129,10 @@ public:
 	}
 
 	CPropertyType*
-	GetPropertyMemberType (CClassType* pType);
+	GetMemberPropertyType (CClassType* pType);
 
 	CPropertyType*
-	GetStdObjectPropertyMemberType ();
+	GetStdObjectMemberPropertyType ();
 
 	CPropertyType*
 	GetShortType  ();
