@@ -55,6 +55,7 @@ protected:
 	CStructType* m_pStaticDataStructType;
 	CVariable* m_pStaticDataVariable;
 	rtl::CIteratorT <CStructField> m_FirstMemberNewField;
+	rtl::CArrayT <CStructField*> m_MemberDestructArray;
 
 	// vtable
 
@@ -75,9 +76,6 @@ protected:
 	// autoev (handlers must be disconnected in destructor)
 
 	rtl::CArrayT <CAutoEv*> m_AutoEvArray;
-
-	rtl::CArrayT <CType*> m_MemberNewTypeArray;
-	rtl::CArrayT <CClassType*> m_MemberNewDestructArray;
 	
 	CClassPtrTypeTuple* m_pClassPtrTypeTuple;
 
@@ -284,6 +282,9 @@ public:
 
 	bool 
 	StopAutoEvs (const CValue& ThisValue);
+
+	bool
+	CallMemberNewDestructors (const CValue& ThisValue);
 
 	bool
 	CallBaseDestructors (const CValue& ThisValue);

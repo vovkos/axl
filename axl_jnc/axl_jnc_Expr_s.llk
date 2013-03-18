@@ -87,7 +87,7 @@ conditional_expr_s <CValue* $pValue>
 	  (
 		'?' conditional_expr_s <&$TrueValue> ':' conditional_expr_s <&$FalseValue>
 			{
-				return FinalizeConditionalExpr_s ($TrueValue, $FalseValue, $pValue);				
+				return m_pModule->m_OperatorMgr.GetConditionalOperatorResultType ($TrueValue, $FalseValue, $pValue);
 			}
 	  )?
 	;

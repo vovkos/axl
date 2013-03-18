@@ -28,41 +28,6 @@ declarator <CTypeSpecifier* $pTypeSpecifier>
 	  post_declarator_modifier <&$.m_Declarator>*
 	;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class
-{
-	CValue m_Value;
-	rtl::CBoxListT <CToken> m_TokenList;
-}
-initializer <CType* $pType>
-	: resolver ({ return m_Stage == EStage_Pass1 }) 
-	  expression_pass1 $e
-		{
-			$.m_TokenList.TakeOver (&$e.m_TokenList);
-		}
-	| expression
-		{
-			$.m_Value = $1.m_Value;
-		}
-	| '{' initializer_list <$pType> '}'
-		{
-		}
-	;
-
-nullable
-initializer_list <CType* $pType>
-	: initializer_list_entry <$pType> (',' initializer_list_entry <$pType>)*
-	;
-
-nullable
-initializer_list_entry <CType* $pType>
-	: initializer <$pType>
-	| epsilon
-	;
-
-
-
 //.............................................................................
 
 declarator_name <CDeclarator* $pDeclarator>
@@ -343,7 +308,8 @@ noast
 declarator_suffix <CDeclarator* $pDeclarator>
 	: array_suffix <$pDeclarator>
 	| function_suffix <$pDeclarator>
-	| bitfield_suffix <$pDeclarator>
+	| resolver ({ return false; }) // prefer conditional-expr over type-name
+	  bitfield_suffix <$pDeclarator>
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

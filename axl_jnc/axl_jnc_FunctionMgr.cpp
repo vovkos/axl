@@ -607,6 +607,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 
 		Result = 
 			pFunction->m_pClassType->StopAutoEvs (m_ThisValue) &&
+			pFunction->m_pClassType->CallMemberNewDestructors (m_ThisValue) &&
 			pFunction->m_pClassType->CallBaseDestructors (m_ThisValue);
 
 		if (!Result)
@@ -623,7 +624,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		{
 			m_pModule->m_ControlFlowMgr.Return ();
 		}
-		else if (!m_pModule->m_ControlFlowMgr.HasReturn ())
+		else if (!(m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasReturn))
 		{
 			err::SetFormatStringError (
 				_T("function '%s' must return a '%s' value"),

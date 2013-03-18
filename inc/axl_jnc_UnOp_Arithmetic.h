@@ -14,6 +14,33 @@ namespace jnc {
 CType*
 GetArithmeticOperatorResultTypeKind (CType* pOpType);
 
+inline
+CType*
+GetArithmeticOperatorResultTypeKind (const CValue& OpValue)
+{
+	return GetArithmeticOperatorResultTypeKind (OpValue.GetType ());
+}
+
+inline 
+CType*
+GetArithmeticOperatorResultTypeKind (
+	CType* pOpType1,
+	CType* pOpType2
+	)
+{
+	return GetArithmeticOperatorResultTypeKind (pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2);
+}
+
+inline
+CType*
+GetArithmeticOperatorResultTypeKind (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	)
+{
+	return GetArithmeticOperatorResultTypeKind (OpValue1.GetType (), OpValue2.GetType ());
+}
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
@@ -30,7 +57,7 @@ public:
 	CType*
 	GetResultType (const CValue& OpValue)
 	{
-		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue.GetType ());
+		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue);
 		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
 		{
 			SetOperatorError (OpValue);

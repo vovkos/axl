@@ -117,6 +117,25 @@ PushSrcPosError (const lex::CSrcPos& SrcPos)
 
 inline
 CError
+EnsureSrcPosError (
+	const tchar_t* pFilePath,
+	long Line,
+	long Col = 0
+	)
+{
+	CError Error = GetError ();
+	return Error->IsKind (GUID_ParseError, EParseError_SrcPos) ? Error : PushSrcPosError (pFilePath, Line, Col);
+}
+
+inline
+CError
+EnsureSrcPosError (const lex::CSrcPos& SrcPos)
+{
+	return EnsureSrcPosError (SrcPos.m_FilePath, SrcPos.m_Line, SrcPos.m_Col);
+}
+
+inline
+CError
 SetSyntaxError ()
 {
 	return SetError (GUID_ParseError, EParseError_InvalidSyntax);

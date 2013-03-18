@@ -1402,6 +1402,7 @@ CTypeMgr::CreateObjectHdrType ()
 	pType->m_Tag = _T("objhdr");
 	pType->CreateField (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
 	pType->CreateField (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
+	pType->CreateField (GetPrimitiveType (EType_Int_p)); // intptr_t m_Flags;
 	pType->CalcLayout ();
 	return pType;
 }

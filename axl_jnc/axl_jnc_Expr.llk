@@ -160,7 +160,7 @@ constant_integer_expr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CConditionalExpr
+class
 {
 	CValue m_TrueValue;
 	CValue m_FalseValue;
@@ -185,7 +185,13 @@ conditional_expr <CValue* $pValue>
 		':' 
 		conditional_expr <&$.m_FalseValue>
 			{
-				return FinalizeConditionalExpr (&$, $pValue);
+				return m_pModule->m_OperatorMgr.ConditionalOperator (
+					$.m_TrueValue,
+					$.m_FalseValue,
+					$.m_pThenBlock,
+					$.m_pPhiBlock, 
+					$pValue
+					);
 			}
 	  )?
 	;

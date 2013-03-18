@@ -85,7 +85,7 @@ CVariableMgr::CreateAlias (
 	pAlias->m_Name = Name;
 	pAlias->m_QualifiedName = QualifiedName;
 	pAlias->m_Tag = QualifiedName;
-	pAlias->m_Iniaizlier.TakeOver (pInitializer);
+	pAlias->m_Initializer.TakeOver (pInitializer);
 
 	m_AliasList.InsertTail (pAlias);
 
@@ -128,6 +128,8 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 	CParser Parser;
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
+
+	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
 
 	return 
 		Parser.ParseTokenList (ESymbol_expression_save_value, pVariable->m_Initializer) &&

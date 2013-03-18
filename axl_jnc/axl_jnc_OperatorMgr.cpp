@@ -129,9 +129,12 @@ COperatorMgr::COperatorMgr ()
 	m_CastOperatorTable [EType_Enum]        = &m_Cast_Enum;
 	m_CastOperatorTable [EType_Struct]      = &m_Cast_Struct;
 	m_CastOperatorTable [EType_DataPtr]     = &m_Cast_DataPtr;
+	m_CastOperatorTable [EType_DataRef]     = &m_Cast_DataRef;
 	m_CastOperatorTable [EType_ClassPtr]    = &m_Cast_ClassPtr;
 	m_CastOperatorTable [EType_FunctionPtr] = &m_Cast_FunctionPtr;
+	m_CastOperatorTable [EType_FunctionRef] = &m_Cast_FunctionRef;
 	m_CastOperatorTable [EType_PropertyPtr] = &m_Cast_PropertyPtr;
+	m_CastOperatorTable [EType_PropertyRef] = &m_Cast_PropertyRef;
 
 	// multicast methods
 
@@ -310,6 +313,81 @@ COperatorMgr::BinaryOperator (
 		PrepareOperand (RawOpValue1, &OpValue1, pOperator->GetOpFlags1 ()) &&
 		PrepareOperand (RawOpValue2, &OpValue2, pOperator->GetOpFlags2 ()) &&
 		pOperator->Operator (OpValue1, OpValue2, pResultValue);
+}
+
+CType*
+COperatorMgr::GetConditionalOperatorResultType (
+	const CValue& TrueValue,
+	const CValue& FalseValue
+	)
+{
+	CType* pTrueType = TrueValue.GetType ();
+	CType* pFalseType = FalseValue.GetType ();
+
+	CType* pResultType = 
+		pTrueType->Cmp (pFalseType) == 0 ? pTrueType : 
+		pTrueType->IsNumericType () && pFalseType->IsNumericType () ?
+			GetArithmeticOperatorResultTypeKind (pTrueType, pFalseType) :
+			m_pModule->m_OperatorMgr.PrepareOperandType (pTrueType);
+
+	if (pResultType->IsDataPtrType () && ((CDataPtrType*) pResultType)->GetPtrTypeKind () == EDataPtrType_Thin)
+		pResultType = ((CDataPtrType*) pResultType)->GetTargetType ()->GetDataPtrType (
+			pResultType->GetTypeKind (),
+			EDataPtrType_Normal,
+			pResultType->GetFlags ()
+			);
+
+	return pResultType;
+}
+
+bool 
+COperatorMgr::GetConditionalOperatorResultType (
+	const CValue& TrueValue,
+	const CValue& FalseValue,
+	CValue* pResultValue
+	)
+{
+	CType* pResultType = GetConditionalOperatorResultType (TrueValue, FalseValue);
+	if (!pResultType)
+		return false;
+
+	pResultValue->SetType (pResultType);
+	return true;
+}
+
+bool 
+COperatorMgr::ConditionalOperator (
+	const CValue& RawTrueValue,
+	const CValue& RawFalseValue,
+	CBasicBlock* pThenBlock,
+	CBasicBlock* pPhiBlock,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	CValue TrueValue;
+	CValue FalseValue;
+
+	CType* pResultType = GetConditionalOperatorResultType (RawTrueValue, RawFalseValue);
+
+	Result = CastOperator (RawFalseValue, pResultType, &FalseValue);
+	if (!Result)
+		return false;
+
+	CBasicBlock* pElseBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
+
+	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pThenBlock);	
+
+	Result = CastOperator (RawTrueValue, pResultType, &TrueValue);
+	if (!Result)
+		return false;
+
+	pThenBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
+
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
+	m_pModule->m_LlvmBuilder.CreatePhi (TrueValue, pThenBlock, FalseValue, pElseBlock, pResultValue);
+	return true;
 }
 
 bool
@@ -541,238 +619,6 @@ COperatorMgr::CheckCastKind (
 	return true;
 }
 
-bool
-COperatorMgr::InitializeObject (
-	const CValue& ObjPtrValue,
-	CClassType* pClassType,
-	rtl::CBoxListT <CValue>* pArgList,
-	CValue* pResultValue
-	)
-{
-	if (pClassType->GetFlags () & EClassTypeFlag_Abstract)
-	{
-		err::SetFormatStringError (_T("cannot instantiate abstract '%s'"), pClassType->GetTypeString ());
-		return false;
-	}
-
-	m_pModule->m_LlvmBuilder.CreateComment ("initialize object");
-
-	CFunction* pInializer = pClassType->GetInitializer ();
-
-	m_pModule->m_LlvmBuilder.CreateCall2 (
-		pInializer,
-		pInializer->GetType (),
-		ObjPtrValue,
-		CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope ()),
-		NULL
-		);
-
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
-
-	CFunction* pConstructor = pClassType->GetConstructor ();
-	if (!pConstructor)
-	{
-		if (pArgList && !pArgList->IsEmpty ())
-		{
-			err::SetFormatStringError (_T("'%s' has no constructor"), pClassType->GetTypeString ());
-			return false;
-		}
-
-		return true;
-	}
-
-	rtl::CBoxListT <CValue> ArgList;
-	if (!pArgList)
-		pArgList = &ArgList;
-
-	pArgList->InsertHead (*pResultValue);
-
-	return CallOperator (pConstructor, pArgList);
-}
-
-bool
-COperatorMgr::NewOperator (
-	EStorage StorageKind,
-	CType* pType,
-	rtl::CBoxListT <CValue>* pArgList,
-	CValue* pResultValue
-	)
-{
-	bool Result;
-
-	CScope* pScope = NULL;
-	CFunction* pAlloc = NULL;
-	CType* pAllocType = pType;
-	if (pType->GetTypeKind () == EType_Class)
-		pAllocType = ((CClassType*) pType)->GetClassStructType ();
-	
-	CType* pPtrType = pAllocType->GetDataPtrType (EDataPtrType_Unsafe);
-	
-	CValue PtrValue;
-	switch (StorageKind)
-	{
-	case EStorage_Static:
-		err::SetFormatStringError (_T("'static new' is not supported yet"));
-		return false;
-
-	case EStorage_Stack:
-		pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		if (!pScope)
-		{
-			err::SetFormatStringError (_T("'stack new' operator can only be called at local scope"));
-			return false;
-		}
-
-		m_pModule->m_LlvmBuilder.CreateAlloca (pAllocType, _T("new"), pPtrType, &PtrValue);
-		break;
-
-	case EStorage_Heap:
-	case EStorage_UHeap:
-		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (StorageKind == EStorage_UHeap ? EStdFunc_UHeapAlloc : EStdFunc_HeapAlloc);
-
-		m_pModule->m_LlvmBuilder.CreateCall (
-			pAlloc,
-			pAlloc->GetType (),
-			CValue (&pAllocType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)),
-			&PtrValue
-			);
-
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, &PtrValue);
-		break;
-
-	case EStorage_Member:
-		if (!m_pModule->m_FunctionMgr.GetMemberNewField ())
-		{
-			err::SetFormatStringError (_T("'member new' operator can only be called from field initalizer"));
-			return false;
-		}
-
-		Result = 
-			GetField (m_pModule->m_FunctionMgr.GetMemberNewField (), NULL, &PtrValue) &&
-			UnaryOperator (EUnOp_Addr, &PtrValue);
-
-		if (!Result)
-			return false;
-		
-		m_pModule->m_FunctionMgr.NextMemberNewField ();
-		break;
-
-	default:
-		err::SetFormatStringError (_T("invalid storage specifier '%s' in 'new' operator"), GetStorageKindString (StorageKind));
-		return false;
-	}
-	
-	if (pType->GetTypeKind () == EType_Class)
-	{
-		CClassType* pClassType = (CClassType*) pType;
-
-		rtl::CString s = GetLlvmTypeString (PtrValue.GetLlvmValue ()->getType ());
-		
-		Result = InitializeObject (PtrValue, pClassType, pArgList, pResultValue);
-		if (!Result)
-			return false;
-		
-		if (StorageKind == EStorage_Stack && pClassType->GetDestructor ())
-			pScope->AddToDestructList (*pResultValue);
-	}
-	else
-	{
-		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
-		m_pModule->m_LlvmBuilder.CreateDataPtr (
-			PtrValue, 
-			PtrValue, 
-			pType->GetSize (),
-			pScope,
-			pType->GetDataPtrType (),
-			pResultValue
-			);			
-	}
-
-	return true;
-}
-
-bool
-COperatorMgr::DeleteOperator (const CValue& RawOpValue)
-{
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
-	if (!Result)
-		return false;
-
-	CFunction* pFree;
-
-	CValue PtrValue;
-	EType TypeKind = OpValue.GetType ()->GetTypeKind ();
-	switch (TypeKind)
-	{
-	case EType_DataPtr:
-		{
-		EDataPtrType PtrTypeKind = ((CDataPtrType*) OpValue.GetType ())->GetPtrTypeKind ();		
-		if (PtrTypeKind == EDataPtrType_Thin)
-		{
-			err::SetFormatStringError (_T("invalid 'delete' on variable- or field-derived pointer"));
-			return false;
-		}
-
-		Result = PrepareDataPtr (OpValue, ERuntimeError_LoadOutOfRange, &PtrValue);
-		if (!Result)
-			return false;
-
-		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFree);	
-		}
-		break;
-
-	case EType_ClassPtr:
-		{
-		CClassType* pClassType = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
-		CFunction* pDestructor = pClassType->GetDestructor ();
-		if (pDestructor)
-		{
-			Result = CallOperator (pDestructor, OpValue);
-			if (!Result)
-				return false;			
-		}
-		else
-		{
-			CheckClassPtrNull (OpValue);
-		}
-
-		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFreeClassPtr);	
-		PtrValue = OpValue;
-		}
-		break;
-
-	default:
-		err::SetFormatStringError (_T("cannot delete '%s'"), OpValue.GetType ()->GetTypeString ());
-		return false;
-	}
-
-	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
-	return true;
-}
-
-bool
-COperatorMgr::ProcessDestructList (rtl::CBoxListT <CValue>* pList)
-{
-	rtl::CBoxIteratorT <CValue> It = pList->GetHead ();
-	for (; It; It++)
-	{
-		CValue Value = *It;
-		ASSERT (Value.GetType ()->GetTypeKind () == EType_ClassPtr);
-		
-		CClassType* pType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
-
-		CFunction* pDestructor = pType->GetDestructor ();
-		ASSERT (pDestructor);
-
-		m_pModule->m_LlvmBuilder.CreateCall (pDestructor, pDestructor->GetType (), Value, NULL);		
-	}
-
-	return true;
-}
-
 void 
 COperatorMgr::PrepareOperandType (
 	const CValue& OpValue,
@@ -851,6 +697,17 @@ COperatorMgr::PrepareOperandType (
 	}
 
 	*pOpValue = Value;
+}
+
+CType*
+COperatorMgr::PrepareOperandType (
+	const CValue& OpValue,
+	int OpFlags
+	)
+{
+	CValue ResultValue;
+	PrepareOperandType (OpValue, &ResultValue, OpFlags);
+	return ResultValue.GetType ();
 }
 
 bool 

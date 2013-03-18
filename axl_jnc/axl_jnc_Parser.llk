@@ -277,19 +277,6 @@ Members2
 	FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt);
 
 	bool
-	FinalizeConditionalExpr (
-		CConditionalExpr* pConditionalExpr,
-		CValue* pResultValue
-		);
-
-	bool
-	FinalizeConditionalExpr_s (
-		const CValue& TrueValue,
-		const CValue& FalseValue,
-		CValue* pResultValue
-		);
-
-	bool
 	NewOperator_s (
 		EStorage StorageKind, 
 		CType* pType, 

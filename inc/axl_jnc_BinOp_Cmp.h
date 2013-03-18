@@ -33,19 +33,10 @@ public:
 		CValue* pResultValue
 		)
 	{
-		CType* pOpType1 = RawOpValue1.GetType ();
-		CType* pOpType2 = RawOpValue2.GetType ();
-		CType* pMaxOpType = pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2;
-
-		CType* pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
+		CType* pType = GetArithmeticOperatorResultTypeKind (RawOpValue1, RawOpValue2);
 		if (!pType)
 		{
-			err::SetFormatStringError (
-				_T("relational '%s' cannot be applied to '%s' and '%s'"),
-				GetBinOpKindString (m_OpKind),
-				pOpType1->GetTypeString (),
-				pOpType2->GetTypeString ()
-				);
+			SetOperatorError (RawOpValue1, RawOpValue2);
 			return false;
 		}
 

@@ -140,9 +140,12 @@ protected:
 	CCast_Enum m_Cast_Enum;
 	CCast_Struct m_Cast_Struct;
 	CCast_DataPtr m_Cast_DataPtr;
+	CCast_DataRef m_Cast_DataRef;
 	CCast_ClassPtr m_Cast_ClassPtr;
 	CCast_FunctionPtr m_Cast_FunctionPtr;
+	CCast_FunctionRef m_Cast_FunctionRef;
 	CCast_PropertyPtr m_Cast_PropertyPtr;
+	CCast_PropertyRef m_Cast_PropertyRef;
 
 	// tables
 
@@ -193,6 +196,12 @@ public:
 	{
 		PrepareOperandType (*pOpValue, pOpValue, OpFlags);
 	}
+
+	CType*
+	PrepareOperandType (
+		const CValue& OpValue,
+		int OpFlags = 0
+		);
 
 	bool 
 	PrepareOperand (
@@ -313,6 +322,30 @@ public:
 	{
 		return BinaryOperator (OpKind, *pValue, OpValue2, pValue);
 	}
+
+	// conditional operator
+
+	CType*
+	GetConditionalOperatorResultType (
+		const CValue& TrueValue,
+		const CValue& FalseValue
+		);
+
+	bool 
+	GetConditionalOperatorResultType (
+		const CValue& TrueValue,
+		const CValue& FalseValue,
+		CValue* pResultValue
+		);
+
+	bool 
+	ConditionalOperator (
+		const CValue& TrueValue,
+		const CValue& FalseValue,
+		CBasicBlock* pThenBlock,
+		CBasicBlock* pPhiBlock,
+		CValue* pResultValue = NULL
+		);
 
 	// cast operators
 
@@ -910,6 +943,27 @@ public:
 		);
 
 	bool
+	GetClassField (
+		const CValue& OpValue,
+		CStructField* pMember,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetAutoEvData (
+		CAutoEv* pAutoEv,
+		CValue* pResultValue
+		);
+
+	bool
+	GetAutoEvField (
+		CAutoEv* pAutoEv,
+		EAutoEvField Field,
+		CValue* pResultValue
+		);
+
+	bool
 	GetVirtualMethod (
 		CFunction* pFunction,
 		CClosure* pClosure,
@@ -957,19 +1011,6 @@ public:
 		EStorage StorageKind,
 		const CValue& OpValue, // function or property ptr
 		rtl::CArrayT <size_t>* pClosureMap,
-		CValue* pResultValue
-		);
-
-	bool
-	COperatorMgr::GetAutoEvData (
-		CAutoEv* pAutoEv,
-		CValue* pResultValue
-		);
-
-	bool
-	GetAutoEvField (
-		CAutoEv* pAutoEv,
-		EAutoEvField Field,
 		CValue* pResultValue
 		);
 
@@ -1124,14 +1165,6 @@ protected:
 		);
 
 	bool
-	GetClassField (
-		const CValue& OpValue,
-		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
 	GetClassVTable (
 		const CValue& OpValue,
 		CClassType* pClassType,
@@ -1168,6 +1201,7 @@ protected:
 
 	bool
 	InitializeObject (
+		EStorage StorageKind,
 		const CValue& ObjPtrValue,
 		CClassType* pClassType,
 		rtl::CBoxListT <CValue>* pArgList,

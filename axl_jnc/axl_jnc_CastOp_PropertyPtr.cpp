@@ -464,5 +464,54 @@ CCast_PropertyPtr::GetCastOperator (
 
 //.............................................................................
 
+ECast
+CCast_PropertyRef::GetCastKind (
+	const CValue& OpValue,
+	CType* pType
+	)
+{
+	ASSERT (pType->GetTypeKind () == EType_PropertyRef);
+
+	CType* pIntermediateSrcType = m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Addr, OpValue);
+	if (!pIntermediateSrcType)
+		return ECast_None;
+
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
+	CPropertyPtrType* pIntermediateDstType = pPtrType->GetTargetType ()->GetPropertyPtrType (
+		EType_PropertyPtr,
+		pPtrType->GetPtrTypeKind (),
+		pPtrType->GetFlags ()
+		);
+
+	return m_pModule->m_OperatorMgr.GetCastKind (pIntermediateSrcType, pIntermediateDstType);
+}
+
+bool
+CCast_PropertyRef::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (pType->GetTypeKind () == EType_PropertyRef);
+	
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
+	CPropertyPtrType* pIntermediateType = pPtrType->GetTargetType ()->GetPropertyPtrType (
+		EType_PropertyPtr,
+		pPtrType->GetPtrTypeKind (),
+		pPtrType->GetFlags ()
+		);
+
+	CValue IntermediateValue;
+
+	return
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue, &IntermediateValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (&IntermediateValue, pIntermediateType) &&
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, IntermediateValue, pResultValue);
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

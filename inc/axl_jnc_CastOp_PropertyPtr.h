@@ -231,5 +231,37 @@ public:
 
 //.............................................................................
 
+// data ref (EUnOp_Indir => data ptr cast => EUnOp_Addr)
+
+class CCast_PropertyRef: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_PropertyRef, ICastOperator)
+
+public:
+	CCast_PropertyRef ()
+	{
+		m_OpFlags = EOpFlag_KeepRef;
+	}
+
+	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

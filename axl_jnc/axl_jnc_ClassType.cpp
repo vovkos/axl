@@ -125,20 +125,25 @@ CClassType::CreateField (
 bool
 CClassType::AddMemberNewType (CType* pType)
 {
-	if (pType->GetTypeKind () == EType_Class)
+	bool Result = pType->CalcLayout ();
+	if (!Result)
+		return false;
+
+	CStructField* pField;
+
+	if (pType->GetTypeKind () != EType_Class)
+	{
+		pField = CreateField (pType);
+	}
+	else
 	{
 		CClassType* pClassType = (CClassType*) pType;
-		bool Result = pClassType->CalcLayout ();
-		if (!Result)
-			return false;
+
+		pField = CreateField (pClassType->GetClassStructType ());
 
 		if (pClassType->GetDestructor ())
-			m_MemberNewDestructArray.Append (pClassType);
-
-		pType = pClassType->GetClassStructType ();
+			m_MemberDestructArray.Append (pField);
 	}
-
-	CStructField* pField = CreateField (pType);
 
 	if (!m_FirstMemberNewField)
 		m_FirstMemberNewField = pField;
@@ -403,6 +408,7 @@ CClassType::CalcLayout ()
 
 	bool HasBaseConstructor = false;
 	bool HasBaseDestructor = false;
+	bool HasMemberDestructor = false;
 
 	size_t BaseTypeCount = m_BaseTypeList.GetCount ();
 
@@ -460,6 +466,8 @@ CClassType::CalcLayout ()
 		Result = m_pIfaceStructType->ScanInitializersForMemberNewOperators ();
 		if (!Result)
 			return false;
+
+		HasMemberDestructor = !m_MemberDestructArray.IsEmpty ();
 
 		m_pModule->m_NamespaceMgr.CloseNamespace ();
 	}
@@ -597,7 +605,7 @@ CClassType::CalcLayout ()
 				return false;
 		}
 
-		if (!m_pDestructor && (!m_AutoEvArray.IsEmpty () || HasBaseDestructor))
+		if (!m_pDestructor && (!m_AutoEvArray.IsEmpty () || HasBaseDestructor || HasMemberDestructor))
 		{
 			Result = CreateDefaultDestructor ();
 			if (!Result)
@@ -868,6 +876,8 @@ CClassType::CreateDefaultDestructor ()
 {
 	ASSERT (!m_pDestructor);
 
+	bool Result;
+
 	CType* ArgTypeArray [] =
 	{
 		GetClassPtrType ()
@@ -880,8 +890,9 @@ CClassType::CreateDefaultDestructor ()
 	CValue ArgValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
 
-	bool Result = 
+	Result = 
 		StopAutoEvs (ArgValue) &&
+		CallMemberNewDestructors (ArgValue) &&
 		CallBaseDestructors (ArgValue);
 
 	if (!Result)
@@ -890,6 +901,58 @@ CClassType::CreateDefaultDestructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pDestructor = pFunction;
+	return true;
+}
+
+bool
+CClassType::CallMemberNewDestructors (const CValue& ThisValue)
+{
+	bool Result;
+
+	if (m_MemberDestructArray.IsEmpty ())
+		return true;
+
+	CValue FlagsValue;
+
+	size_t Count = m_MemberDestructArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_MemberDestructArray [i];
+		ASSERT (pField->GetType ()->GetTypeKind () == EType_Struct && ((CStructType*) pField->GetType ())->IsClassStructType ());
+
+		CClassType* pClassType = (CClassType*) ((CStructType*) pField->GetType ())->GetParentNamespace ();				
+		CFunction* pDestructor = pClassType->GetDestructor ();
+		ASSERT (pDestructor);
+
+		CValue FieldValue;
+		Result = m_pModule->m_OperatorMgr.GetClassField (ThisValue, pField, NULL, &FieldValue);
+		if (!Result)
+			return false;
+
+		static size_t LlvmIndexArray [] = 
+		{
+			0, // TObjectHdr**
+			0, // TObjectHdr*
+			2, // intptr_t m_Flags
+		};
+
+		CValue FlagsValue;
+		m_pModule->m_LlvmBuilder.CreateGep (
+			FieldValue, 
+			LlvmIndexArray, 
+			countof (LlvmIndexArray), 
+			NULL, 
+			&FlagsValue
+			);
+
+		CValue IfaceValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (FieldValue, 1, pDestructor->GetThisArgType (), &IfaceValue);
+
+		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, IfaceValue);
+		if (!Result)
+			return false;				
+	}
+
 	return true;
 }
 
@@ -948,7 +1011,8 @@ CClassType::GetInitializer ()
 	CType* ArgTypeArray [] =
 	{
 		GetClassStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
@@ -959,6 +1023,7 @@ CClassType::GetInitializer ()
 
 	CValue ArgValue1 = ArgValueArray [0];
 	CValue ArgValue2 = ArgValueArray [1];
+	CValue ArgValue3 = ArgValueArray [2];
 
 	CClassType* pClassType = this;
 	CValue TypeValue (&pClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
@@ -978,6 +1043,11 @@ CClassType::GetInitializer ()
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 1, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ArgValue2, PtrValue);
+
+	// store Flags
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (ArgValue3, PtrValue);
 
 	InitializeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
 

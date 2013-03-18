@@ -39,6 +39,20 @@ RegisterStdProviders ()
 
 //.............................................................................
 
+bool
+TError::IsKind (
+	const GUID& Guid,
+	long Code
+	) const
+{
+	const TError* pError = this;
+	
+	if (InlineIsEqualGUID (m_Guid, GUID_NULL) && m_Code == EStdError_Stack)
+		pError++;
+
+	return InlineIsEqualGUID (pError->m_Guid, Guid) && pError->m_Code == Code;
+}
+
 rtl::CString
 TError::GetDescription () const
 {

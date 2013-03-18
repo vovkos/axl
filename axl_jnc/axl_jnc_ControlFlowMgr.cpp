@@ -97,8 +97,10 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
+	m_Flags |= EControlFlowFlag_HasJump;
 	pBlock->m_Flags |= EBasicBlockFlag_Jumped;
+
+	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
 
 	if (!pFollowBlock)
 		pFollowBlock = GetUnreachableBlock ();
@@ -131,6 +133,7 @@ CControlFlowMgr::ConditionalJump (
 	if (!Result)
 		return false;
 
+	m_Flags |= EControlFlowFlag_HasJump;
 	pThenBlock->m_Flags |= EBasicBlockFlag_Jumped;
 	pElseBlock->m_Flags |= EBasicBlockFlag_Jumped;
 
@@ -235,7 +238,7 @@ CControlFlowMgr::Return (const CValue& Value)
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}
 
-	m_Flags |= EFlag_HasReturn;
+	m_Flags |= EControlFlowFlag_HasReturn;
 
 	SetCurrentBlock (GetUnreachableBlock ());
 	return true;

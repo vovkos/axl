@@ -201,10 +201,7 @@ struct TError
 	IsKind (
 		const GUID& Guid,
 		long Code
-		) const
-	{
-		return InlineIsEqualGUID (m_Guid, Guid) && m_Code == Code;
-	}
+		) const;
 };
 
 extern const TError NoError;

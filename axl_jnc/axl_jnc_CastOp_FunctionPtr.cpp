@@ -405,5 +405,54 @@ CCast_FunctionPtr::GetCastOperator (
 
 //.............................................................................
 
+ECast
+CCast_FunctionRef::GetCastKind (
+	const CValue& OpValue,
+	CType* pType
+	)
+{
+	ASSERT (pType->GetTypeKind () == EType_FunctionRef);
+
+	CType* pIntermediateSrcType = m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Addr, OpValue);
+	if (!pIntermediateSrcType)
+		return ECast_None;
+
+	CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
+	CFunctionPtrType* pIntermediateDstType = pPtrType->GetTargetType ()->GetFunctionPtrType (
+		EType_FunctionPtr,
+		pPtrType->GetPtrTypeKind (),
+		pPtrType->GetFlags ()
+		);
+
+	return m_pModule->m_OperatorMgr.GetCastKind (pIntermediateSrcType, pIntermediateDstType);
+}
+
+bool
+CCast_FunctionRef::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (pType->GetTypeKind () == EType_FunctionRef);
+	
+	CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
+	CFunctionPtrType* pIntermediateType = pPtrType->GetTargetType ()->GetFunctionPtrType (
+		EType_FunctionPtr,
+		pPtrType->GetPtrTypeKind (),
+		pPtrType->GetFlags ()
+		);
+
+	CValue IntermediateValue;
+
+	return
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue, &IntermediateValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (&IntermediateValue, pIntermediateType) &&
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, IntermediateValue, pResultValue);
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

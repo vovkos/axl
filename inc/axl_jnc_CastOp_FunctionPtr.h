@@ -197,5 +197,32 @@ public:
 
 //.............................................................................
 
+// function ref (EUnOp_Indir => function ptr cast => EUnOp_Addr)
+
+class CCast_FunctionRef: public ICastOperator
+{
+public:
+	AXL_OBJ_SIMPLE_CLASS (CCast_FunctionRef, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

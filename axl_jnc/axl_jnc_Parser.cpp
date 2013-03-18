@@ -41,7 +41,7 @@ CParser::ParseTokenList (
 		Result = ParseToken (&*Token);
 		if (!Result)
 		{
-			err::PushSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
+			err::EnsureSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
 			return false;
 		}
 	}
@@ -61,7 +61,7 @@ CParser::ParseTokenList (
 	Result = ParseToken (&EofToken);
 	if (!Result)
 	{
-		err::PushSrcPosError (m_pModule->GetFilePath (), EofToken.m_Pos.m_Line, EofToken.m_Pos.m_Col);
+		err::EnsureSrcPosError (m_pModule->GetFilePath (), EofToken.m_Pos.m_Line, EofToken.m_Pos.m_Col);
 		return false;
 	}
 
@@ -1539,76 +1539,6 @@ CParser::FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt)
 		);
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pSwitchStmt->m_pFollowBlock);
-	return true;
-}
-
-bool
-CParser::FinalizeConditionalExpr (
-	CConditionalExpr* pConditionalExpr,
-	CValue* pResultValue
-	)
-{
-	bool Result;
-
-	CValue TrueValue = pConditionalExpr->m_TrueValue;
-	CValue FalseValue = pConditionalExpr->m_FalseValue;
-
-	CType* pType;
-	CType* pTrueType = TrueValue.GetType ();
-	CType* pFalseType = FalseValue.GetType ();
-
-	if (!pTrueType->IsNumericType () && !pFalseType->IsNumericType ())
-	{
-		pType = pTrueType;
-	}
-	else
-	{
-		CType* pMaxOpType = pTrueType->GetTypeKind () > pFalseType->GetTypeKind () ? pTrueType : pFalseType;
-		pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
-	}
-
-	Result = m_pModule->m_OperatorMgr.CastOperator (&FalseValue, pType);
-	if (!Result)
-		return false;
-
-	CBasicBlock* pElseBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
-
-	m_pModule->m_ControlFlowMgr.Jump (pConditionalExpr->m_pPhiBlock, pConditionalExpr->m_pThenBlock);	
-
-	Result = m_pModule->m_OperatorMgr.CastOperator (&TrueValue, pType);
-	if (!Result)
-		return false;
-
-	CBasicBlock* pThenBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
-
-	m_pModule->m_ControlFlowMgr.Follow (pConditionalExpr->m_pPhiBlock);
-	m_pModule->m_LlvmBuilder.CreatePhi (TrueValue, pThenBlock, FalseValue, pElseBlock, pResultValue);
-	return true;
-}
-
-bool
-CParser::FinalizeConditionalExpr_s (
-	const CValue& TrueValue,
-	const CValue& FalseValue,
-	CValue* pResultValue
-	)
-{
-
-	CType* pType;
-	CType* pTrueType = TrueValue.GetType ();
-	CType* pFalseType = FalseValue.GetType ();
-
-	if (!pTrueType->IsNumericType () && !pFalseType->IsNumericType ())
-	{
-		pType = pTrueType;
-	}
-	else
-	{
-		CType* pMaxOpType = pTrueType->GetTypeKind () > pFalseType->GetTypeKind () ? pTrueType : pFalseType;
-		pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
-	}
-
-	pResultValue->SetType (pType);
 	return true;
 }
 

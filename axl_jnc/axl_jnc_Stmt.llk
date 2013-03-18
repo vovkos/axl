@@ -76,6 +76,10 @@ base_type_constructor_rslv
 	;
 
 statement
+	enter
+	{
+		m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+	}
 	: compound_stmt
 	| expression_stmt
 	| if_stmt

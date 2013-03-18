@@ -157,7 +157,6 @@ CParseErrorProviderW::GetErrorDescription (const TError* pError)
 	return String;
 }
 
-
 //.............................................................................
 
 } // namespace err

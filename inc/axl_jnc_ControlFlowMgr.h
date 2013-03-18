@@ -12,17 +12,19 @@ namespace jnc {
 
 //.............................................................................
 
+enum EControlFlowFlag
+{
+	EControlFlowFlag_HasReturn = 1,
+	EControlFlowFlag_HasJump   = 2,
+};
+
+//.............................................................................
+
 class CControlFlowMgr
 {
 protected:
 	friend class CModule;
 	friend class CFunctionMgr;
-
-protected:
-	enum EFlag
-	{
-		EFlag_HasReturn = 1,
-	};
 
 protected:
 	CModule* m_pModule;
@@ -46,10 +48,16 @@ public:
 	void
 	Clear ();
 
-	bool
-	HasReturn ()
+	int
+	GetFlags ()
 	{
-		return (m_Flags & EFlag_HasReturn) != 0;
+		return m_Flags;
+	}
+
+	void
+	ResetJumpFlag ()
+	{
+		m_Flags &= ~EControlFlowFlag_HasJump;
 	}
 
 	CBasicBlock* 

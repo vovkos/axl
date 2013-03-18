@@ -28,14 +28,10 @@ public:
 		const CValue& OpValue2
 		)
 	{
-		CType* pOpType1 = OpValue1.GetType ();
-		CType* pOpType2 = OpValue2.GetType ();
-		CType* pMaxOpType = pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? pOpType1 : pOpType2;
-
-		CType* pType = GetArithmeticOperatorResultTypeKind (pMaxOpType);
+		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue1, OpValue2);
 		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
 		{
-			SetOperatorError (pOpType1, pOpType2);
+			SetOperatorError (OpValue1, OpValue2);
 			return NULL;
 		}
 

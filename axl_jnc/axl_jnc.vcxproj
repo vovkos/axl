@@ -201,6 +201,7 @@
     <ClCompile Include="axl_jnc_OperatorMgr_CheckPtr.cpp" />
     <ClCompile Include="axl_jnc_OperatorMgr_DataRef.cpp" />
     <ClCompile Include="axl_jnc_OperatorMgr_Member.cpp" />
+    <ClCompile Include="axl_jnc_OperatorMgr_New.cpp" />
     <ClCompile Include="axl_jnc_OperatorMgr_Property.cpp" />
     <ClCompile Include="axl_jnc_Parser.cpp" />
     <ClCompile Include="axl_jnc_Property.cpp" />

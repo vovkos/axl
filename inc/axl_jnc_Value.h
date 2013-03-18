@@ -575,12 +575,24 @@ protected:
 
 //.............................................................................
 
+enum EObjectFlag
+{
+	EObjectFlag_Alive  = 0x01,
+	EObjectFlag_Static = 0x02,
+	EObjectFlag_Stack  = 0x04,
+	EObjectFlag_UHeap  = 0x08,
+
+	EObjectFlag_CallMemberDestructors = EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap,
+};
+
+
 // header of class instance
 
 struct TObject
 {
 	class CClassType* m_pType; // for GC tracing & QueryInterface; after destruction is zeroed
 	size_t m_ScopeLevel;
+	intptr_t m_Flags;
 
 	// followed by TInterface of object
 };
