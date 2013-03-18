@@ -685,5 +685,28 @@ protected:
 
 //.............................................................................
 
+class CTypedef: public CUserModuleItem
+{
+protected:
+	friend class CTypeMgr;
+
+	CType* m_pType;
+
+public:
+	CTypedef ()
+	{
+		m_ItemKind = EModuleItem_Typedef;
+		m_pType  = NULL;
+	}
+
+	CType*
+	GetType ()
+	{
+		return m_pType;
+	}
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

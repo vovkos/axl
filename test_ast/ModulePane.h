@@ -42,9 +42,9 @@ protected:
 		);
 
 	void
-	AddAlias (
+	AddTypedef (
 		HTREEITEM hParent,
-		jnc::CAlias* pAlias
+		jnc::CTypedef* pTypedef
 		);
 
 	void

@@ -1,5 +1,13 @@
 //.............................................................................
 
+start
+expression_save_value_s
+	: expression_s
+		{
+			m_ExpressionValue = $1.m_Value;
+		}
+	;
+
 class
 {
 	CValue m_Value;	

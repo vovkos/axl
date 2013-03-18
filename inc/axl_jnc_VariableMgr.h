@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Variable.h"
+#include "axl_jnc_Alias.h"
 
 namespace axl {
 namespace jnc {
@@ -19,6 +20,7 @@ protected:
 
 	rtl::CStdListT <CVariable> m_GlobalVariableList;
 	rtl::CStdListT <CVariable> m_LocalVariableList;
+	rtl::CStdListT <CAlias> m_AliasList;
 
 	CVariable* m_pScopeLevelVariable;
 
@@ -42,6 +44,14 @@ public:
 		CType* pType,
 		int PtrTypeFlags = 0,
 		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
+	CAlias*
+	CreateAlias (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		CType* pType,
+		rtl::CBoxListT <CToken>* pInitializer
 		);
 
 	bool

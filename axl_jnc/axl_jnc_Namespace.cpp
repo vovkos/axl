@@ -9,25 +9,9 @@ namespace jnc {
 
 //.............................................................................
 
-CModuleItem*
-UnAliasItem (CModuleItem* pItem)
-{
-	while (pItem->GetItemKind () == EModuleItem_Alias)
-	{
-		CAlias* pAlias = (CAlias*) pItem;
-		pItem = pAlias->GetTarget ();
-	}
-
-	return pItem;
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 CNamespace*
 GetItemNamespace (CModuleItem* pItem)
 {
-	pItem = UnAliasItem (pItem);
-
 	EModuleItem ItemKind = pItem->GetItemKind ();	
 	switch (ItemKind)
 	{
@@ -38,6 +22,10 @@ GetItemNamespace (CModuleItem* pItem)
 		return (CProperty*) pItem;
 
 	case EModuleItem_Type:
+		break;
+
+	case EModuleItem_Typedef:
+		pItem = ((CTypedef*) pItem)->GetType ();
 		break;
 
 	default:
@@ -94,7 +82,6 @@ CNamespace::Clear ()
 {
 	m_ItemArray.Clear (); 
 	m_ItemMap.Clear (); 
-	m_AliasList.Clear ();
 }
 
 rtl::CString
@@ -228,32 +215,17 @@ CNamespace::AddFunction (CFunction* pFunction)
 bool
 CNamespace::ExposeEnumConsts (CEnumType* pType)
 {
+	bool Result;
+
 	rtl::CIteratorT <CEnumConst> Const = pType->GetConstList ().GetHead ();
 	for (; Const; Const++)
 	{
-		CAlias* pAlias = CreateAlias (Const->GetName (), *Const);
-		if (!pAlias)
+		Result = AddItem (*Const);
+		if (!Result)
 			return false;
 	}
 
 	return true;	
-}
-
-CAlias*
-CNamespace::CreateAlias (
-	const rtl::CString& Name,
-	CModuleItem* pTarget
-	)
-{
-	CAlias* pAlias = AXL_MEM_NEW (CAlias);
-	pAlias->m_Name = Name;
-	pAlias->m_pTarget = pTarget;
-	m_AliasList.InsertTail (pAlias);
-	bool Result = AddItem (pAlias);
-	if (!Result)
-		return NULL;
-
-	return pAlias;
 }
 
 //.............................................................................

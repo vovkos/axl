@@ -1,5 +1,5 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
+/*
 class CMyClass
 {
 	class CClassA
@@ -28,6 +28,8 @@ class CMyClass
 	}
 };
 
+*/
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
@@ -35,7 +37,14 @@ main ()
 {
 	printf ("field initializers test\n");
 
-	stack new CMyClass;
+//	stack new CMyClass;
+
+	int x = 10;
+	int y = 20;
+
+	alias p = x + y++;
+
+	printf ("%d, %d, %d\n", p, p, p);
 
 	return 0;
 }

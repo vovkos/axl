@@ -20,8 +20,9 @@ enum EModuleItem
 	EModuleItem_Undefined = 0,
 	EModuleItem_Namespace,	
 	EModuleItem_Scope,	
-	EModuleItem_Alias,
 	EModuleItem_Type,
+	EModuleItem_Typedef,
+	EModuleItem_Alias,
 	EModuleItem_Const,
 	EModuleItem_Variable,
 	EModuleItem_Function,
@@ -44,6 +45,7 @@ enum EStorage
 {
 	EStorage_Undefined = 0,
 	EStorage_Typedef,
+	EStorage_Alias,
 	EStorage_Static,
 	EStorage_Stack,
 	EStorage_Heap,

@@ -241,6 +241,9 @@
     <ClInclude Include="..\inc\axl_jnc_Lexer.h">
       <Filter>parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_Alias.h">
+      <Filter>variable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -468,6 +471,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_AutoEvPtrType.cpp">
       <Filter>type</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_Alias.cpp">
+      <Filter>variable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

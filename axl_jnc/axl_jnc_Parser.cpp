@@ -100,13 +100,18 @@ CParser::FindType (const CQualifiedName& Name)
 			return NULL;
 	}
 
-	pItem = UnAliasItem (pItem);
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	switch (ItemKind)
+	{
+	case EModuleItem_Type:
+		return (CType*) pItem;
 
-	if (pItem->GetItemKind () != EModuleItem_Type)
+	case EModuleItem_Typedef:
+		return ((CTypedef*) pItem)->GetType ();
+
+	default:
 		return NULL;
-	
-	CType* pType = (CType*) pItem;
-	return pType->GetTypeKind () != EType_Property ? pType : NULL;
+	}
 }
 
 bool
@@ -343,28 +348,6 @@ CParser::Declare (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	/*
-	  ('='
-		{
-			bool Result = Declare (&$1.m_Declarator, true);
-			if (!Result)
-				return false;
-
-			if (!m_pLastDeclaredItem || 
-				m_pLastDeclaredItem->GetItemKind () != EModuleItem_Variable)
-			{
-				err::SetFormatStringError (_T("can only apply initializers to variables"));
-				return false;
-			}
-		}
-	  initializer $i <.((CVariable*) m_pLastDeclaredItem)->GetType ().> 		
-		{
-			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, (CVariable*) m_pLastDeclaredItem, $i.m_Value);
-		}
-	  )?
-
-	*/
-
 	ASSERT (pDeclarator);
 
 	m_pLastDeclaredItem = NULL;
@@ -407,32 +390,39 @@ CParser::Declare (
 		}
 	}
 
-	if (m_StorageKind == EStorage_Typedef)
+	switch (m_StorageKind)
+	{
+	case EStorage_Typedef:
 		return DeclareTypedef (pType, pDeclarator);
 
-	switch (TypeKind)
-	{
-	case EType_Function:
-		return DeclareFunction ((CFunctionType*) pType, pDeclarator);
-
-	case EType_Property:
-		return DeclareProperty ((CPropertyType*) pType, pDeclarator);
-
-	case EType_AutoEv:
-		return DeclareAutoEv ((CAutoEvType*) pType, pDeclarator);			
+	case EStorage_Alias:
+		return DeclareAlias (pType, pDeclarator, pInitializer);
 
 	default:
-		if (DeclaratorKind != EDeclarator_PropValue)
-			return DeclareData (pType, pDeclarator, DataPtrTypeFlags, pInitializer);		
-
-		if (pDeclarator->IsQualified () || pDeclarator->GetBitCount ())
+		switch (TypeKind)
 		{
-			err::SetFormatStringError (_T("invalid propvalue declarator"));
-			return false;
-		}
+		case EType_Function:
+			return DeclareFunction ((CFunctionType*) pType, pDeclarator);
 
-		return DeclarePropValue (pType, DataPtrTypeFlags, pInitializer);
-	}		
+		case EType_Property:
+			return DeclareProperty ((CPropertyType*) pType, pDeclarator);
+
+		case EType_AutoEv:
+			return DeclareAutoEv ((CAutoEvType*) pType, pDeclarator);			
+
+		default:
+			if (DeclaratorKind != EDeclarator_PropValue)
+				return DeclareData (pType, pDeclarator, DataPtrTypeFlags, pInitializer);		
+
+			if (pDeclarator->IsQualified () || pDeclarator->GetBitCount ())
+			{
+				err::SetFormatStringError (_T("invalid propvalue declarator"));
+				return false;
+			}
+
+			return DeclarePropValue (pType, DataPtrTypeFlags, pInitializer);
+		}		
+		}
 }
 
 void
@@ -469,19 +459,80 @@ CParser::DeclareTypedef (
 {
 	ASSERT (m_StorageKind == EStorage_Typedef);
 
+	bool Result;
+
 	if (!pDeclarator->IsSimple ())
 	{
 		err::SetFormatStringError (_T("invalid typedef declarator"));
 		return false;
 	}
 
-	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	CAlias* pAlias = pNamespace->CreateAlias (Name, pType);
-	if (!pAlias)
+
+	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
+	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
+
+	CTypedef* pTypedef = m_pModule->m_TypeMgr.CreateTypedef (Name, QualifiedName, pType);
+	AssignDeclarationAttributes (pTypedef, pNamespace, pDeclarator->GetPos ());
+
+	Result = pNamespace->AddItem (pTypedef);
+	if (!Result)
 		return false;
 
+	return true;
+}
+
+bool
+CParser::DeclareAlias (
+	CType* pType,
+	CDeclarator* pDeclarator,
+	rtl::CBoxListT <CToken>* pInitializer
+	)
+{
+	ASSERT (m_StorageKind == EStorage_Alias);
+
+	bool Result;
+
+	if (pType->GetTypeKind () != EType_Void)
+	{
+		err::SetFormatStringError (_T("alias cannot have type"));
+		return false;
+	}
+
+	if (!pDeclarator->IsSimple ())
+	{
+		err::SetFormatStringError (_T("invalid alias declarator"));
+		return false;
+	}
+
+	if (!pInitializer)
+	{
+		err::SetFormatStringError (_T("alias must have an initializer"));
+		return false;
+	}
+
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = EStage_Pass2;
+
+	Result = Parser.ParseTokenList (ESymbol_expression_save_value_s, *pInitializer);
+	if (!Result)
+		return false;
+
+	pType = Parser.m_ExpressionValue.GetType ();
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+
+	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
+	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
+
+	CAlias* pAlias = m_pModule->m_VariableMgr.CreateAlias (Name, QualifiedName, pType, pInitializer);
 	AssignDeclarationAttributes (pAlias, pNamespace, pDeclarator->GetPos ());
+
+	Result = pNamespace->AddItem (pAlias);
+	if (!Result)
+		return false;
+
 	return true;
 }
 
@@ -1657,6 +1708,13 @@ CParser::LookupIdentifier (
 		pValue->SetType ((CType*) pItem);
 		break;
 
+	case EModuleItem_Typedef:
+		pValue->SetType (((CTypedef*) pItem)->GetType ());
+		break;
+
+	case EModuleItem_Alias:
+		return EvaluateAlias ((CAlias*) pItem, pValue);
+
 	case EModuleItem_Variable:
 		pValue->SetVariable ((CVariable*) pItem);
 		break;
@@ -1744,8 +1802,16 @@ CParser::LookupIdentifierType (
 		pValue->SetType ((CType*) pItem);
 		break;
 
+	case EModuleItem_Typedef:
+		pValue->SetType (((CTypedef*) pItem)->GetType ());
+		break;
+
 	case EModuleItem_Variable:
 		pValue->SetType (((CVariable*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
+		break;
+
+	case EModuleItem_Alias:
+		pValue->SetType (((CAlias*) pItem)->GetType ());
 		break;
 
 	case EModuleItem_Function:
@@ -1884,6 +1950,24 @@ CParser::GetAuPropertyFieldType (
 	}
 
 	pValue->SetType (pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
+	return true;
+}
+
+bool
+CParser::EvaluateAlias (
+	CAlias* pAlias,
+	CValue* pResultValue
+	)
+{
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = EStage_Pass2;
+
+	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, pAlias->GetInitializer ());
+	if (!Result)
+		return false;
+
+	*pResultValue = Parser.m_ExpressionValue;
 	return true;
 }
 

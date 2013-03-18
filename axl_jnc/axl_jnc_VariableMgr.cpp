@@ -71,6 +71,27 @@ CVariableMgr::CreateVariable (
 	return pVariable;
 }
 
+CAlias*
+CVariableMgr::CreateAlias (
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
+	CType* pType,
+	rtl::CBoxListT <CToken>* pInitializer
+	)
+{
+	ASSERT (pInitializer);
+
+	CAlias* pAlias = AXL_MEM_NEW (CAlias);
+	pAlias->m_Name = Name;
+	pAlias->m_QualifiedName = QualifiedName;
+	pAlias->m_Tag = QualifiedName;
+	pAlias->m_Iniaizlier.TakeOver (pInitializer);
+
+	m_AliasList.InsertTail (pAlias);
+
+	return pAlias;
+}
+
 bool
 CVariableMgr::AllocateGlobalVariables ()
 {

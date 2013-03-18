@@ -85,6 +85,7 @@ protected:
 	rtl::CStdListT <CPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
 	rtl::CStdListT <CAutoEvPtrTypeTuple> m_AutoEvPtrTypeTupleList;
 
+	rtl::CStdListT <CTypedef> m_TypedefList;
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
 	size_t m_UnnamedEnumTypeCounter;
@@ -193,6 +194,13 @@ public:
 		return GetLiteralTypeA (Length);
 #endif
 	}
+
+	CTypedef*
+	CreateTypedef (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		CType* pType
+		);
 
 	CEnumType* 
 	CreateEnumType (

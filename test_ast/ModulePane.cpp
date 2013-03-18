@@ -144,8 +144,8 @@ CModulePane::AddItem (
 		AddType (hParent, (jnc::CType*) pItem);
 		break;
 
-	case jnc::EModuleItem_Alias:
-		AddAlias (hParent, (jnc::CAlias*) pItem);
+	case jnc::EModuleItem_Typedef:
+		AddTypedef (hParent, (jnc::CTypedef*) pItem);
 		break;
 
 	case jnc::EModuleItem_Variable:
@@ -377,42 +377,20 @@ CModulePane::AddPropertyTypeMembers (
 
 
 void
-CModulePane::AddAlias (
+CModulePane::AddTypedef (
 	HTREEITEM hParent,
-	jnc::CAlias* pAlias
+	jnc::CTypedef* pTypedef
 	)
 {
-	jnc::CModuleItem* pTarget = pAlias->GetTarget ();
-	jnc::EModuleItem TargetKind = pTarget->GetItemKind ();
-
 	rtl::CString ItemName;
-	HTREEITEM hItem;
+	ItemName.Format (
+		_T("typedef %s %s"), 
+		pTypedef->GetType ()->GetTypeString (),
+		pTypedef->GetName ()
+		);
 
-	switch (TargetKind)
-	{
-	case jnc::EModuleItem_Type:
-		ItemName.Format (
-			_T("typedef %s %s"), 
-			((jnc::CType*) pTarget)->GetTypeString (),
-			pAlias->GetName ()
-			);
-
-		hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-		m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) (jnc::CModuleItem*) pAlias);
-		break;
-
-	case jnc::EModuleItem_EnumConst:
-		AddItem (hParent, pTarget);
-		break;
-
-	default:
-		ItemName.Format (_T("alias %s"),  pAlias->GetName ());
-
-		hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
-		m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) (jnc::CModuleItem*) pAlias);
-
-		AddItem (hItem, pTarget);
-	}
+	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
+	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) (jnc::CModuleItem*) pTypedef);
 }
 
 void
@@ -683,8 +661,8 @@ CModulePane::GetItemTip (jnc::CModuleItem* pItem)
 	case jnc::EModuleItem_Type:
 		return ((jnc::CType*) pItem)->GetTypeString ();
 
-	case jnc::EModuleItem_Alias:
-		return ((jnc::CAlias*) pItem)->GetQualifiedName ();
+	case jnc::EModuleItem_Typedef:
+		return ((jnc::CTypedef*) pItem)->GetQualifiedName ();
 
 	case jnc::EModuleItem_StructField:
 		return GetStructFieldTip ((jnc::CStructField*) pItem);

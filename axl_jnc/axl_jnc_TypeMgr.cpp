@@ -48,6 +48,7 @@ CTypeMgr::Clear ()
 	m_FunctionPtrTypeTupleList.Clear ();
 	m_PropertyPtrTypeTupleList.Clear ();
 
+	m_TypedefList.Clear ();
 	m_TypeMap.Clear ();
 
 	SetupAllPrimitiveTypes ();
@@ -142,16 +143,21 @@ CTypeMgr::ResolveImportTypes ()
 			return false;
 		}
 
-		pItem = UnAliasItem (pItem);
-		
 		EModuleItem ItemKind = pItem->GetItemKind ();
-		if (ItemKind != EModuleItem_Type)
+		switch (ItemKind)
 		{
+		case EModuleItem_Type:
+			pImportType->m_pExternType = (CType*) pItem;
+			break;
+
+		case EModuleItem_Typedef:
+			pImportType->m_pExternType = ((CTypedef*) pItem)->GetType ();
+			break;
+
+		default:
 			err::SetFormatStringError (_T("'%s' is not a type"), pImportType->m_Name.GetFullName ());
 			return false;
 		}
-
-		pImportType->m_pExternType = (CType*) pItem;
 	}
 
 	return true;
@@ -252,6 +258,23 @@ CTypeMgr::GetArrayType (
 	It->m_Value = pType;
 	
 	return pType;
+}
+
+CTypedef*
+CTypeMgr::CreateTypedef (
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
+	CType* pType
+	)
+{
+	CTypedef* pTypedef = AXL_MEM_NEW (CTypedef);
+	pTypedef->m_Name = Name;
+	pTypedef->m_QualifiedName = QualifiedName;
+	pTypedef->m_Tag = QualifiedName;
+	pTypedef->m_pType = pType;
+	m_TypedefList.InsertTail (pTypedef);
+
+	return pTypedef;
 }
 
 CEnumType* 

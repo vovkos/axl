@@ -67,6 +67,7 @@ main := |*
 # storage & access specifiers
 
 'typedef'      { CreateToken (EToken_Typedef); };
+'alias'        { CreateToken (EToken_Alias); };
 'static'       { CreateToken (EToken_Static); };
 'stack'        { CreateToken (EToken_Stack); };
 'heap'         { CreateToken (EToken_Heap); };

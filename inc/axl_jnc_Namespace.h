@@ -18,34 +18,6 @@ class CFunction;
 
 //.............................................................................
 
-class CAlias: public CUserModuleItem
-{
-protected:
-	friend class CNamespace;
-
-	CModuleItem* m_pTarget;
-
-public:
-	CAlias ()
-	{
-		m_ItemKind = EModuleItem_Alias;
-		m_pTarget = NULL;
-	}
-
-	CModuleItem*
-	GetTarget ()
-	{
-		return m_pTarget;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-CModuleItem*
-UnAliasItem (CModuleItem* pItem);
-
-//.............................................................................
-
 enum ENamespace
 {
 	ENamespace_Undefined,
@@ -88,7 +60,6 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
 	rtl::CStringHashTable m_FriendSet; 
-	rtl::CStdListT <CAlias> m_AliasList;
 
 public:
 	CNamespace ();
@@ -187,12 +158,6 @@ public:
 		ASSERT (Index < m_ItemArray.GetCount ());
 		return m_ItemArray [Index];
 	}
-
-	CAlias*
-	CreateAlias (
-		const rtl::CString& Name,
-		CModuleItem* pTarget
-		);
 
 	bool
 	ExposeEnumConsts (CEnumType* pMember);

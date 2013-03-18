@@ -73,6 +73,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\inc\axl_jnc_Alias.h" />
     <ClInclude Include="..\Inc\axl_jnc_ArrayType.h" />
     <ClInclude Include="..\inc\axl_jnc_AttributeBlock.h" />
     <ClInclude Include="..\inc\axl_jnc_AttributeMgr.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="axl_jnc_Alias.cpp" />
     <ClCompile Include="axl_jnc_ArrayType.cpp" />
     <ClCompile Include="axl_jnc_AttributeBlock.cpp" />
     <ClCompile Include="axl_jnc_AttributeMgr.cpp" />

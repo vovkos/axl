@@ -15,8 +15,9 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		_T("undefined-module-item-kind"),  // EModuleItem_Undefined = 0,
 		_T("namespace"),                   // EModuleItem_Namespace,	
 		_T("scope"),                       // EModuleItem_Scope,	
-		_T("alias"),                       // EModuleItem_Alias,
 		_T("type"),                        // EModuleItem_Type,
+		_T("typedef"),                     // EModuleItem_Typedef,
+		_T("alias"),                       // EModuleItem_Alias,
 		_T("const"),                       // EModuleItem_Const,
 		_T("variable"),                    // EModuleItem_Variable,
 		_T("function"),                    // EModuleItem_Function,
@@ -41,6 +42,7 @@ GetStorageKindString (EStorage StorageKind)
 	{
 		_T("undefined-storage-class"),  // EStorage_Undefined = 0,
 		_T("typedef"),                  // EStorage_Typedef,
+		_T("alias"),                    // EStorage_Alias,
 		_T("static"),                   // EStorage_Static,
 		_T("stack"),                    // EStorage_Stack,
 		_T("heap"),                     // EStorage_Heap,

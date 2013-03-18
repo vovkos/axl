@@ -166,6 +166,13 @@ Members2
 		);
 
 	bool
+	DeclareAlias (
+		CType* pType,
+		CDeclarator* pDeclarator,
+		rtl::CBoxListT <CToken>* pInitializer
+		);
+
+	bool
 	DeclareFunction (
 		CFunctionType* pType,
 		CDeclarator* pDeclarator
@@ -338,6 +345,12 @@ Members2
 	GetAuPropertyFieldType (
 		CValue* pValue,
 		EAuPropertyField Field
+		);
+
+	bool
+	EvaluateAlias (
+		CAlias* pAlias,
+		CValue* pResultValue
 		);
 } 
 
