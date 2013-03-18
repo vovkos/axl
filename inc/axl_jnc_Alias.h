@@ -17,7 +17,7 @@ protected:
 	friend class CVariableMgr;
 
 	CType* m_pType;
-	rtl::CBoxListT <CToken> m_Iniaizlier;
+	rtl::CBoxListT <CToken> m_Initializer;
 
 public:
 	CAlias ()
@@ -35,7 +35,7 @@ public:
 	rtl::CConstBoxListT <CToken> 
 	GetInitializer ()
 	{
-		return m_Iniaizlier;
+		return m_Initializer;
 	}
 };
 
