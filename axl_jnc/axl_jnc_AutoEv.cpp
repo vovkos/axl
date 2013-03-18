@@ -168,7 +168,7 @@ CAutoEv::CalcLayout ()
 	if (m_StorageKind == EStorage_Static)
 	{
 		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EVariable_Global, 
+			EStorage_Static, 
 			_T("static_data"),
 			m_Tag + _T(".static_data"), 
 			m_pDataStructType

@@ -28,10 +28,11 @@ enum EToken
 	EToken_Pack,
 
 	// storage specifiers
-
+		
 	EToken_Typedef,
 	EToken_Alias,
 	EToken_Static,
+	EToken_Tls,
 	EToken_Stack,
 	EToken_Heap,
 	EToken_UHeap,
@@ -188,6 +189,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Typedef,      "typedef")
 	AXL_PRS_TOKEN_NAME (EToken_Alias,        "alias")
 	AXL_PRS_TOKEN_NAME (EToken_Static,       "static")
+	AXL_PRS_TOKEN_NAME (EToken_Tls,          "tls")
 	AXL_PRS_TOKEN_NAME (EToken_Stack,        "stack")
 	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
 	AXL_PRS_TOKEN_NAME (EToken_UHeap,        "uheap")

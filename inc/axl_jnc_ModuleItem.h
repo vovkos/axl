@@ -47,6 +47,7 @@ enum EStorage
 	EStorage_Typedef,
 	EStorage_Alias,
 	EStorage_Static,
+	EStorage_Tls,
 	EStorage_Stack,
 	EStorage_Heap,
 	EStorage_UHeap,

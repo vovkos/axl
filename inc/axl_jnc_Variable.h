@@ -14,27 +14,11 @@ class CScope;
 
 //.............................................................................
 
-enum EVariable
-{
-	EVariable_Undefined = 0,
-	EVariable_Global,
-	EVariable_Local,
-	EVariable__Count,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t*
-GetVariableKindString (EVariable VariableKind);
-
-//.............................................................................
-
 class CVariable: public CUserModuleItem
 {
 protected:
 	friend class CVariableMgr;
 
-	EVariable m_VariableKind;
 	CType* m_pType;
 	int m_PtrTypeFlags;
 	rtl::CBoxListT <CToken> m_Initializer;
@@ -44,14 +28,6 @@ protected:
 
 public:
 	CVariable ();
-
-	~CVariable ();
-
-	EVariable
-	GetVariableKind ()
-	{
-		return m_VariableKind;
-	}
 
 	CType* 
 	GetType ()

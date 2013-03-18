@@ -41,7 +41,7 @@ CCast_PropertyPtr_FromDataPtr::LlvmCast (
 	CValue ClosureArgValue;
 	
 	if (OpValue.GetValueKind () == EValue_Variable &&
-		OpValue.GetVariable ()->GetVariableKind () == EVariable_Global &&
+		OpValue.GetVariable ()->GetStorageKind () == EStorage_Static &&
 		OpValue.GetLlvmValue () == OpValue.GetVariable ()->GetLlvmValue ())
 	{
 		pThunkProperty = m_pModule->m_FunctionMgr.GetDirectDataThunkProperty (

@@ -478,6 +478,14 @@ public:
 
 	// new & delete operators
 
+	bool
+	Allocate (
+		EStorage StorageKind,
+		CType* pType,
+		const tchar_t* pTag,
+		CValue* pResultValue
+		);
+
 	CType* 
 	GetNewOperatorResultType (CType* pType)
 	{

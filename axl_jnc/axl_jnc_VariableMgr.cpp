@@ -18,14 +18,14 @@ CVariableMgr::CVariableMgr ()
 void
 CVariableMgr::Clear ()
 {
-	m_LocalVariableList.Clear ();
-	m_GlobalVariableList.Clear ();
+	m_VariableList.Clear ();
+	m_AliasList.Clear ();
+	m_GlobalVariableArray.Clear ();
 	m_pScopeLevelVariable = NULL;
 }
 
 CVariable*
 CVariableMgr::CreateVariable (
-	EVariable VariableKind,
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
 	CType* pType,
@@ -38,7 +38,6 @@ CVariableMgr::CreateVariable (
 
 	CVariable* pVariable = AXL_MEM_NEW (CVariable);
 	pVariable->m_pModule = m_pModule;
-	pVariable->m_VariableKind = VariableKind;
 	pVariable->m_Name = Name;
 	pVariable->m_QualifiedName = QualifiedName;
 	pVariable->m_Tag = QualifiedName;
@@ -48,27 +47,44 @@ CVariableMgr::CreateVariable (
 	if (pInitializer)
 		pVariable->m_Initializer.TakeOver (pInitializer);
 
-	if (VariableKind == EVariable_Local)
-	{
-		ASSERT (m_pModule->m_FunctionMgr.GetCurrentFunction ());
-		
-		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateAlloca (pType, Name, NULL, &PtrValue);
-
-		pVariable->m_StorageKind = EStorage_Stack;
-		pVariable->m_pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
-		m_LocalVariableList.InsertTail (pVariable);
-	}
-	else
-	{
-		ASSERT (VariableKind == EVariable_Global);
-
-		pVariable->m_StorageKind = EStorage_Static;
-		m_GlobalVariableList.InsertTail (pVariable);
-	}
-
 	return pVariable;
+}
+
+CVariable*
+CVariableMgr::CreateVariable (
+	EStorage StorageKind,
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
+	CType* pType,
+	int PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pInitializer
+	)
+{
+	CVariable* pVariable = CreateVariable (Name, QualifiedName, pType, PtrTypeFlags, pInitializer);
+	pVariable->m_StorageKind = StorageKind;
+	return pVariable;
+}
+
+llvm::GlobalVariable*
+CVariableMgr::CreateLlvmGlobalVariable (
+	CType* pType,
+	const tchar_t* pTag,
+	bool IsThreadLocal
+	)
+{
+	llvm::GlobalVariable* pLlvmValue = new llvm::GlobalVariable (
+		*m_pModule->m_pLlvmModule,
+		pType->GetLlvmType (),
+		false,
+		llvm::GlobalVariable::ExternalLinkage,
+		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
+		pTag,
+		0,
+		IsThreadLocal
+		);
+
+	m_LlvmGlobalVariableArray.Append (pLlvmValue);
+	return pLlvmValue;
 }
 
 CAlias*
@@ -95,22 +111,36 @@ CVariableMgr::CreateAlias (
 bool
 CVariableMgr::AllocateGlobalVariables ()
 {
-	rtl::CIteratorT <CVariable> Variable = m_GlobalVariableList.GetHead ();
-	for (; Variable; Variable++)
-	{
-		CVariable* pVariable = *Variable;
+	bool Result;
 
-		if (!pVariable->m_pLlvmValue)
-			pVariable->m_pLlvmValue = new llvm::GlobalVariable (
-				*m_pModule->m_pLlvmModule,
-				pVariable->m_pType->GetLlvmType (),
-				false,
-				llvm::GlobalVariable::ExternalLinkage,
-				(llvm::Constant*) pVariable->m_pType->GetZeroValue ().GetLlvmValue (),
-				(const tchar_t*) pVariable->GetQualifiedName ()
-				);
+	size_t Count = m_GlobalVariableArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		Result = AllocateVariable (m_GlobalVariableArray [i]);
+		if (!Result)
+			return false;
 	}
 
+	return true;
+}
+
+bool
+CVariableMgr::AllocateVariable (CVariable* pVariable)
+{
+	ASSERT (!pVariable->m_pLlvmValue);
+
+	CValue PtrValue;
+	bool Result = m_pModule->m_OperatorMgr.Allocate (
+		pVariable->m_StorageKind, 
+		pVariable->m_pType,
+		pVariable->m_Tag,
+		&PtrValue
+		);
+
+	if (!Result)
+		return false;
+		
+	pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
 	return true;
 }
 
@@ -119,7 +149,7 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 {
 	if (pVariable->m_Initializer.IsEmpty ()) // no initializer
 	{
-		if (pVariable->m_VariableKind == EVariable_Local)
+		if (pVariable->m_StorageKind == EStorage_Stack)
 			m_pModule->m_LlvmBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), pVariable);
 
 		return true;
@@ -144,19 +174,11 @@ CVariableMgr::GetScopeLevelVariable ()
 
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
-	m_pScopeLevelVariable = CreateVariable (EVariable_Global, _T("ScopeLevel"), _T("jnc.ScopeLevel"), pType);
+	m_pScopeLevelVariable = CreateVariable (_T("ScopeLevel"), _T("jnc.ScopeLevel"), pType);
+	m_pScopeLevelVariable->m_StorageKind = EStorage_Static;
 
-	m_pScopeLevelVariable->m_pLlvmValue = new llvm::GlobalVariable (
-		*m_pModule->m_pLlvmModule,
-		pType->GetLlvmType (),
-		false,
-		llvm::GlobalVariable::ExternalLinkage,
-		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
-		_T("jnc.ScopeLevel"),
-		NULL,
-		false // true // thread local -- currently JIT produces an error
-		);
-	
+	AllocateVariable (m_pScopeLevelVariable);
+
 	return m_pScopeLevelVariable;
 }
 

@@ -74,33 +74,30 @@ COperatorMgr::InitializeObject (
 }
 
 bool
-COperatorMgr::NewOperator (
+COperatorMgr::Allocate (
 	EStorage StorageKind,
 	CType* pType,
-	rtl::CBoxListT <CValue>* pArgList,
+	const tchar_t* pTag,
 	CValue* pResultValue
 	)
 {
 	bool Result;
 
-	CScope* pScope = NULL;
-	CFunction* pAlloc = NULL;
-	CType* pAllocType = pType;
-	if (pType->GetTypeKind () == EType_Class)
-		pAllocType = ((CClassType*) pType)->GetClassStructType ();
-	
-	CType* pPtrType = pAllocType->GetDataPtrType (EDataPtrType_Unsafe);
-	
+	llvm::GlobalVariable* pLlvmGlobalVariable;
+	CFunction* pAlloc;
+
+	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Unsafe);
 	CValue PtrValue;
+
 	switch (StorageKind)
 	{
 	case EStorage_Static:
-		err::SetFormatStringError (_T("'static new' is not supported yet"));
-		return false;
+		pLlvmGlobalVariable = m_pModule->m_VariableMgr.CreateLlvmGlobalVariable (pType, pTag);
+		PtrValue.SetLlvmValue (pLlvmGlobalVariable, pPtrType);
+		break;
 
 	case EStorage_Stack:
-		pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		if (!pScope)
+		if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
 		{
 			err::SetFormatStringError (_T("'stack new' operator can only be called at local scope"));
 			return false;
@@ -112,7 +109,7 @@ COperatorMgr::NewOperator (
 			return false;
 		}
 
-		m_pModule->m_LlvmBuilder.CreateAlloca (pAllocType, _T("new"), pPtrType, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
 		break;
 
 	case EStorage_Heap:
@@ -122,7 +119,7 @@ COperatorMgr::NewOperator (
 		m_pModule->m_LlvmBuilder.CreateCall (
 			pAlloc,
 			pAlloc->GetType (),
-			CValue (&pAllocType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)),
+			CValue (&pType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)),
 			&PtrValue
 			);
 
@@ -156,6 +153,31 @@ COperatorMgr::NewOperator (
 		err::SetFormatStringError (_T("invalid storage specifier '%s' in 'new' operator"), GetStorageKindString (StorageKind));
 		return false;
 	}
+
+	*pResultValue = PtrValue;
+	return true;
+}
+
+bool
+COperatorMgr::NewOperator (
+	EStorage StorageKind,
+	CType* pType,
+	rtl::CBoxListT <CValue>* pArgList,
+	CValue* pResultValue
+	)
+{
+	bool Result;
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+
+	CType* pAllocType = pType;
+	if (pType->GetTypeKind () == EType_Class)
+		pAllocType = ((CClassType*) pType)->GetClassStructType ();
+
+	CValue PtrValue;
+	Result = Allocate (StorageKind, pAllocType, _T("new"), &PtrValue);
+	if (!Result)
+		return false;
 	
 	if (pType->GetTypeKind () == EType_Class)
 	{

@@ -69,6 +69,7 @@ main := |*
 'typedef'      { CreateToken (EToken_Typedef); };
 'alias'        { CreateToken (EToken_Alias); };
 'static'       { CreateToken (EToken_Static); };
+'tls'          { CreateToken (EToken_Tls); };
 'stack'        { CreateToken (EToken_Stack); };
 'heap'         { CreateToken (EToken_Heap); };
 'uheap'        { CreateToken (EToken_UHeap); };

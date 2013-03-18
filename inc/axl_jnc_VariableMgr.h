@@ -18,9 +18,11 @@ protected:
 	friend class CModule;
 	CModule* m_pModule;
 
-	rtl::CStdListT <CVariable> m_GlobalVariableList;
-	rtl::CStdListT <CVariable> m_LocalVariableList;
+	rtl::CStdListT <CVariable> m_VariableList;
 	rtl::CStdListT <CAlias> m_AliasList;
+
+	rtl::CArrayT <CVariable*> m_GlobalVariableArray;
+	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
 
 	CVariable* m_pScopeLevelVariable;
 
@@ -38,12 +40,28 @@ public:
 
 	CVariable*
 	CreateVariable (
-		EVariable VariableKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		CType* pType,
 		int PtrTypeFlags = 0,
 		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
+	CVariable*
+	CreateVariable (
+		EStorage StorageKind,
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		CType* pType,
+		int PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
+	llvm::GlobalVariable*
+	CreateLlvmGlobalVariable (
+		CType* pType,
+		const tchar_t* pTag,
+		bool IsThreadLocal = false
 		);
 
 	CAlias*
@@ -53,6 +71,9 @@ public:
 		CType* pType,
 		rtl::CBoxListT <CToken>* pInitializer
 		);
+
+	bool
+	AllocateVariable (CVariable* pVariable);
 
 	bool
 	InitializeVariable (CVariable* pVariable);

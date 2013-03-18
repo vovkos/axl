@@ -498,7 +498,7 @@ CClassType::CalcLayout ()
 			return false;
 
 		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EVariable_Global, 
+			EStorage_Static,
 			_T("static_field"),
 			m_Tag + _T(".static_field"), 
 			m_pStaticDataStructType

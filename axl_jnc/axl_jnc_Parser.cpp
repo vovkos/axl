@@ -926,13 +926,13 @@ CParser::DeclareData (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
+	bool Result;
+
 	if (!pDeclarator->IsSimple ())
 	{
 		err::SetFormatStringError (_T("invalid data declarator"));
 		return false;
 	}
-
-	bool Result;
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
@@ -957,10 +957,33 @@ CParser::DeclareData (
 	}
 	else if (NamespaceKind != ENamespace_Type)
 	{
-		CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+
+		switch (m_StorageKind)
+		{
+		case EStorage_Undefined:
+			m_StorageKind = pScope ? EStorage_Stack : EStorage_Static;
+			break;
+
+		case EStorage_Static:
+		case EStorage_Heap:
+			break;
+
+		case EStorage_Stack:
+			if (!pScope)
+			{
+				err::SetFormatStringError (_T("can only use 'stack' storage specifier for local variables"));
+				return false;
+			}
+
+			break;
+
+		default:
+			err::SetFormatStringError (_T("invalid storage specifier '%s' for variable"), GetStorageKindString (m_StorageKind));
+			return false;
+		}
 
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
-			pFunction ? EVariable_Local : EVariable_Global,
 			Name, 
 			pNamespace->CreateQualifiedName (Name),
 			pType, 
@@ -974,9 +997,12 @@ CParser::DeclareData (
 		if (!Result)
 			return false;
 
-		if (pFunction)
+		if (pScope)
 		{
-			Result = m_pModule->m_VariableMgr.InitializeVariable (pVariable);
+			Result = 
+				m_pModule->m_VariableMgr.AllocateVariable (pVariable) &&
+				m_pModule->m_VariableMgr.InitializeVariable (pVariable);
+
 			if (!Result)
 				return false;
 		}

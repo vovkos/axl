@@ -549,13 +549,16 @@ CFunctionMgr::Prologue (
 		{
 			CFunctionFormalArg* pArg = *Arg;
 			llvm::Value* pLlvmArg = LlvmArg;
+			
 			CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
-				EVariable_Local,
+				EStorage_Stack,
 				pArg->GetName (), 
 				pArg->GetName (), 
 				pArg->GetType (), 
 				pArg->GetPtrTypeFlags ()
 				);
+
+			m_pModule->m_VariableMgr.AllocateVariable (pArgVariable);
 
 			CValue ArgValue (pLlvmArg, pArg->GetType ());
 

@@ -1,43 +1,11 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMyClass
-{
-	class CClassA
-	{
-		this ()
-		{
-			printf ("CClassA.this ()\n");
-		}
-
-		~this ()
-		{
-			printf ("CClassA.~this ()\n");
-		}
-	};
-	
-	CClassA m_x = member new CClassA;
-	
-	this ()
-	{
-		printf ("CMyClass.this ()\n");
-	}
-
-	~this ()
-	{
-		printf ("CMyClass.~this ()\n");
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 int 
 main ()
 {
 	printf ("field initializers test\n");
 
-	CMyClass x = 1 ? stack new CMyClass : stack new CMyClass;
-
-	delete x;	
+	heap char a [10];
 
 	return 0; 
 }

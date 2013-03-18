@@ -585,7 +585,6 @@ enum EObjectFlag
 	EObjectFlag_CallMemberDestructors = EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap,
 };
 
-
 // header of class instance
 
 struct TObject

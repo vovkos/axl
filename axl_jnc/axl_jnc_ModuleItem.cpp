@@ -44,6 +44,7 @@ GetStorageKindString (EStorage StorageKind)
 		_T("typedef"),                  // EStorage_Typedef,
 		_T("alias"),                    // EStorage_Alias,
 		_T("static"),                   // EStorage_Static,
+		_T("tls"),                      // EStorage_Tls,
 		_T("stack"),                    // EStorage_Stack,
 		_T("heap"),                     // EStorage_Heap,
 		_T("uheap"),                    // EStorage_UHeap,

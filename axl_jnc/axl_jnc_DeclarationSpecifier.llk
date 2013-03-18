@@ -84,6 +84,10 @@ storage_specifier
 		{
 			$.m_StorageKind = EStorage_Static;
 		}
+	| EToken_Tls
+		{			
+			$.m_StorageKind = EStorage_Tls;
+		}
 	| EToken_Stack
 		{
 			$.m_StorageKind = EStorage_Stack;
