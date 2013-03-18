@@ -18,6 +18,7 @@ class CVariable: public CUserModuleItem
 {
 protected:
 	friend class CVariableMgr;
+	friend class CParser;
 
 	CType* m_pType;
 	int m_PtrTypeFlags;

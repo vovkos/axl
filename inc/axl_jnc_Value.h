@@ -124,12 +124,29 @@ public:
 	CValue (
 		int64_t Value,
 		EType TypeKind = EType_Int32
-		);
+		)
+	{
+		Init ();
+		CreateConst (&Value, TypeKind);
+	}
+
+	CValue (
+		int64_t Value,
+		CType* pType
+		)
+	{
+		Init ();
+		CreateConst (&Value, pType);
+	}
 
 	CValue (
 		const void* p,
 		CType* pType
-		);
+		)
+	{
+		Init ();
+		CreateConst (p, pType);
+	}
 
 	CValue (CType* pType)
 	{

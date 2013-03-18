@@ -999,6 +999,8 @@ CParser::DeclareData (
 
 		if (pScope)
 		{
+			pVariable->m_pScope = pScope;
+
 			Result = 
 				m_pModule->m_VariableMgr.AllocateVariable (pVariable) &&
 				m_pModule->m_VariableMgr.InitializeVariable (pVariable);
@@ -1569,6 +1571,91 @@ CParser::FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt)
 }
 
 bool
+CParser::InitializeOnceStmt (COnceStmt* pOnceStmt)
+{
+	bool Result;
+
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
+
+	CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
+		EStorage_Static, 
+		_T("once_flag"), 
+		_T("once_flag"), 
+		pType,
+		EPtrTypeFlag_Volatile
+		);
+
+	CBasicBlock* pPreBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("once_prebody"));
+	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("once_body"));
+	CBasicBlock* pLoopBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("once_loop"));
+	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("once_follow"));
+	
+	CValue Value;
+
+	Result = 
+		m_pModule->m_VariableMgr.AllocateVariable (pVariable) &&
+		m_pModule->m_OperatorMgr.LoadDataRef (pVariable, &Value);
+	
+	if (!Result)
+		return false;
+
+	intptr_t ConstArray [2] = { 0, 1 };
+	CBasicBlock* BlockArray [2] = { pPreBodyBlock, pLoopBlock };
+
+	m_pModule->m_LlvmBuilder.CreateSwitch (Value, pFollowBlock, ConstArray, BlockArray, 2);
+
+	// loop
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pLoopBlock);
+
+	Result = 
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, pVariable, CValue (2, pType), &Value) &&
+		m_pModule->m_ControlFlowMgr.ConditionalJump (Value, pFollowBlock, pLoopBlock, pPreBodyBlock);
+
+	if (!Result)
+		return false;
+
+	// pre body
+
+	m_pModule->m_LlvmBuilder.CreateCmpXchg (
+		pVariable, 
+		CValue ((int64_t) 0, pType), 
+		CValue (1, pType), 
+		llvm::Acquire,
+		llvm::CrossThread,
+		&Value
+		);
+
+	Result = 
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, Value, CValue ((int64_t) 0, pType), &Value) &&
+		m_pModule->m_ControlFlowMgr.ConditionalJump (Value, pBodyBlock, pLoopBlock);
+
+	if (!Result)
+		return false;
+
+	pOnceStmt->m_pFlagVariable = pVariable;
+	pOnceStmt->m_pFollowBlock = pFollowBlock; 
+	return true;
+}
+
+bool
+CParser::FinalizeOnceStmt (COnceStmt* pOnceStmt)
+{
+	CValue TmpValue;
+	m_pModule->m_LlvmBuilder.CreateRmw (
+		llvm::AtomicRMWInst::Xchg,
+		pOnceStmt->m_pFlagVariable, 
+		CValue ((int64_t) 2, EType_Int32), 
+		llvm::Release,
+		llvm::CrossThread,
+		&TmpValue
+		);
+
+	m_pModule->m_ControlFlowMgr.Follow (pOnceStmt->m_pFollowBlock);
+	return true;
+}
+
+bool
 CParser::NewOperator_s (
 	EStorage StorageKind, 
 	CType* pType, 
@@ -1653,6 +1740,9 @@ CParser::LookupIdentifier (
 	pItem = pNamespace->FindItemTraverse (Name, &Coord);
 	if (!pItem)
 	{
+		if (Name == _T("__ScopeLevel")) // tmp
+			return m_pModule->m_OperatorMgr.CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope (), pValue);
+
 		err::SetFormatStringError (_T("undeclared identifier '%s'"), Name);
 		return false;
 	}

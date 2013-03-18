@@ -1,11 +1,37 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+/*
+class CMyClass
+{
+	this ()
+	{
+		printf ("CMyClass.this (%x)\n", this);
+	}
+
+	~this ()
+	{
+		printf ("CMyClass.~this ()\n");
+	}
+};
+*/
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+foo ()
+{
+	printf ("foo ()\n");
+//	CMyClass c = static new CMyClass;		
+}
+
 int 
 main ()
 {
 	printf ("field initializers test\n");
 
-	heap char a [10];
+	for (int i = 0; i < 5; i++)
+	{
+		once foo ();
+		printf ("i = %d\n", i);
+	}
 
 	return 0; 
 }
@@ -19,3 +45,4 @@ printf (
 	);
 
 //.............................................................................
+ 

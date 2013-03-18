@@ -84,29 +84,6 @@ GetValueKindString (EValue ValueKind)
 
 //.............................................................................
 
-CValue::CValue (
-	const void* p,
-	CType* pType
-	)
-{
-	Init ();
-	CreateConst (p, pType);
-}
-
-CValue::CValue (
-	int64_t Value,
-	EType TypeKind
-	)
-{	
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-
-	Init ();
-	CreateConst (&Value, pType);
-}
-
 void
 CValue::Clear ()
 {

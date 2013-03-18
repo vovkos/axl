@@ -94,6 +94,15 @@ public:
 		size_t CaseCount
 		);
 
+	llvm::SwitchInst*
+	CreateSwitch (
+		const CValue& Value,
+		CBasicBlock* pDefaultBlock,
+		intptr_t* pConstArray,
+		CBasicBlock** pBlockArray,
+		size_t CaseCount
+		);
+
 	llvm::ReturnInst*
 	CreateRet ()
 	{
@@ -777,6 +786,50 @@ public:
 	{
 		llvm::Value* pInst = m_LlvmBuilder.CreateFCmpOGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
+		return pInst;
+	}
+
+	llvm::AtomicCmpXchgInst*
+	CreateCmpXchg (
+		const CValue& PtrValue,
+		const CValue& CmpValue,
+		const CValue& NewValue,
+		llvm::AtomicOrdering OrderingKind,
+		llvm::SynchronizationScope SyncKind,
+		CValue* pResultValue
+		)
+	{
+		llvm::AtomicCmpXchgInst* pInst = m_LlvmBuilder.CreateAtomicCmpXchg (
+			PtrValue.GetLlvmValue (), 
+			CmpValue.GetLlvmValue (), 
+			NewValue.GetLlvmValue (),
+			OrderingKind, 
+			SyncKind
+			);
+		
+		pResultValue->SetLlvmValue (pInst, NewValue.GetType ());
+		return pInst;
+	}
+
+	llvm::AtomicRMWInst*
+	CreateRmw (
+		llvm::AtomicRMWInst::BinOp OpKind,
+		const CValue& PtrValue,
+		const CValue& NewValue,
+		llvm::AtomicOrdering OrderingKind,
+		llvm::SynchronizationScope SyncKind,
+		CValue* pResultValue
+		)
+	{
+		llvm::AtomicRMWInst* pInst = m_LlvmBuilder.CreateAtomicRMW (
+			OpKind,
+			PtrValue.GetLlvmValue (), 
+			NewValue.GetLlvmValue (),
+			llvm::Acquire, 
+			llvm::CrossThread
+			);
+		
+		pResultValue->SetLlvmValue (pInst, NewValue.GetType ());
 		return pInst;
 	}
 

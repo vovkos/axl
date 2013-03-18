@@ -667,6 +667,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	}
 
 	pScope->m_EndPos = Pos;
+	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
 	RestoreEmissionContext ();
 	return true;

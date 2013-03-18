@@ -38,6 +38,13 @@ COperatorMgr::InitializeObject (
 		return false;
 	}
 
+	CValue ScopeLevelValue;
+
+	if (StorageKind == EStorage_Stack)
+		ScopeLevelValue = CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope ());
+	else
+		ScopeLevelValue.SetConstSizeT (0);
+
 	m_pModule->m_LlvmBuilder.CreateComment ("initialize object");
 		
 	CFunction* pInializer = pClassType->GetInitializer ();
@@ -45,7 +52,7 @@ COperatorMgr::InitializeObject (
 		pInializer,
 		pInializer->GetType (),
 		ObjPtrValue,
-		CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope ()),
+		ScopeLevelValue,
 		CValue (Flags, EType_Int_p),
 		NULL
 		);

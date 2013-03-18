@@ -90,6 +90,7 @@ statement
 	| break_stmt
 	| continue_stmt
 	| return_stmt
+	| once_stmt
 	| ';'
 	;
 
@@ -312,6 +313,22 @@ return_stmt
 	: EToken_Return expression $e? ';'
 		{
 			return m_pModule->m_ControlFlowMgr.Return (IsValidLocator ($e) ? $e.m_Value : CValue ());
+		}
+	;
+
+class COnceStmt
+{
+	CVariable* m_pFlagVariable;
+	CBasicBlock* m_pFollowBlock;
+}
+once_stmt
+	: EToken_Once
+		{
+			return InitializeOnceStmt (&$);
+		}
+		statement
+		{
+			return FinalizeOnceStmt (&$);
 		}
 	;
 

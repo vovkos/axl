@@ -277,6 +277,12 @@ Members2
 	FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt);
 
 	bool
+	InitializeOnceStmt (COnceStmt* pOnceStmt);
+
+	bool
+	FinalizeOnceStmt (COnceStmt* pOnceStmt);
+
+	bool
 	NewOperator_s (
 		EStorage StorageKind, 
 		CType* pType, 

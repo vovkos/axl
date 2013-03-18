@@ -174,8 +174,7 @@ CVariableMgr::GetScopeLevelVariable ()
 
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
-	m_pScopeLevelVariable = CreateVariable (_T("ScopeLevel"), _T("jnc.ScopeLevel"), pType);
-	m_pScopeLevelVariable->m_StorageKind = EStorage_Static;
+	m_pScopeLevelVariable = CreateVariable (EStorage_Static, _T("ScopeLevel"), _T("jnc.ScopeLevel"), pType);
 
 	AllocateVariable (m_pScopeLevelVariable);
 

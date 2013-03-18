@@ -11,6 +11,7 @@ statement_0
 	| break_stmt_0
 	| continue_stmt_0
 	| return_stmt_0
+	| once_stmt_0
 	| ';'
 	;
 
@@ -62,6 +63,10 @@ continue_stmt_0
 
 return_stmt_0
 	: EToken_Return expression_0? ';'
+	;
+
+once_stmt_0
+	: EToken_Once statement_0
 	;
 
 //.............................................................................

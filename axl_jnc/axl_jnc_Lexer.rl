@@ -176,6 +176,7 @@ main := |*
 'switch'       { CreateToken (EToken_Switch); };
 'case'         { CreateToken (EToken_Case); };
 'default'      { CreateToken (EToken_Default); };
+'once'         { CreateToken (EToken_Once); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

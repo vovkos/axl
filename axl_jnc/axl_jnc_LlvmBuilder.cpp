@@ -64,6 +64,36 @@ CLlvmBuilder::CreateSwitch (
 	return pInst;
 }
 
+llvm::SwitchInst*
+CLlvmBuilder::CreateSwitch (
+	const CValue& Value,
+	CBasicBlock* pDefaultBlock,
+	intptr_t* pConstArray,
+	CBasicBlock** pBlockArray,
+	size_t CaseCount
+	)
+{
+	CType* pType = Value.GetType ();
+	ASSERT (pType->IsIntegerType ());
+
+	llvm::SwitchInst* pInst = m_LlvmBuilder.CreateSwitch (
+		Value.GetLlvmValue (), 
+		pDefaultBlock->GetLlvmBlock (), 
+		CaseCount
+		);
+
+	for (size_t i = 0; i < CaseCount; i++)
+	{
+		CValue ConstValue (pConstArray [i], pType);
+		CBasicBlock* pBlock = pBlockArray [i];
+
+		pInst->addCase ((llvm::ConstantInt*) ConstValue.GetLlvmValue (), pBlock->GetLlvmBlock ());
+	}
+
+	return pInst;
+}
+
+
 llvm::PHINode*
 CLlvmBuilder::CreatePhi (
 	const CValue* pValueArray,

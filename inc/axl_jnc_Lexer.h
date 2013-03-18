@@ -122,6 +122,7 @@ enum EToken
 	EToken_Switch,
 	EToken_Case,
 	EToken_Default,
+	EToken_Once,
 
 	// constants
 
@@ -279,6 +280,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Switch,       "switch")
 	AXL_PRS_TOKEN_NAME (EToken_Case,         "case")
 	AXL_PRS_TOKEN_NAME (EToken_Default,      "default")
+	AXL_PRS_TOKEN_NAME (EToken_Once,         "once")
 
 	// constants
 
