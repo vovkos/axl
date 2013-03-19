@@ -147,6 +147,8 @@ CVariableMgr::AllocateVariable (CVariable* pVariable)
 bool
 CVariableMgr::InitializeVariable (CVariable* pVariable)
 {
+	bool Result;
+
 	if (pVariable->m_Initializer.IsEmpty ()) // no initializer
 	{
 		if (pVariable->m_StorageKind == EStorage_Stack)
@@ -159,11 +161,33 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
 
+	if (pVariable->m_StorageKind != EStorage_Static)
+	{
+		m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+
+		return
+			Parser.ParseTokenList (ESymbol_expression_save_value, pVariable->m_Initializer) &&
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, pVariable, Parser.m_ExpressionValue);
+	}
+
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
+
+	Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, pVariable->m_Initializer.GetHead ()->m_Pos);
+	if (!Result)
+		return false;
+
 	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
 
-	return 
+	Result = 
 		Parser.ParseTokenList (ESymbol_expression_save_value, pVariable->m_Initializer) &&
 		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, pVariable, Parser.m_ExpressionValue);
+
+	if (!Result)
+		return false;
+
+	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, pVariable->m_Initializer.GetTail ()->m_Pos);
+	return true;
 }
 
 CVariable*

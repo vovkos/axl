@@ -1,24 +1,18 @@
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CMyClass
+int
+bar ()
 {
-	this ()
-	{
-		printf ("CMyClass.this (%x)\n", this);
-	}
-
-	~this ()
-	{
-		printf ("CMyClass.~this ()\n");
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+	printf ("bar ()\n");
+	return 10;
+}
 
 foo ()
 {
 	printf ("foo ()\n");
-	CMyClass c = static new CMyClass;		
+
+	static int x = bar ();
+	printf ("x = %d\n", x);
 }
 
 int 
@@ -37,7 +31,7 @@ main ()
 
 	return 0; 
 }
- 
+
 //.............................................................................
 
 int
