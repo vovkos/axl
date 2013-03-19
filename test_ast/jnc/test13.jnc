@@ -2,9 +2,24 @@
 
 class CMyClass
 {
+	class CClassA
+	{
+		this ()
+		{
+			printf ("CClassA.this ()\n");
+		}
+
+		~this ()
+		{
+			printf ("CClassA.~this ()\n");
+		}
+	};
+	
+	CClassA m_x = member new CClassA;
+	
 	this ()
 	{
-		printf ("CMyClass.this (%x)\n", this);
+		printf ("CMyClass.this ()\n");
 	}
 
 	~this ()
@@ -15,36 +30,14 @@ class CMyClass
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-int
-bar ()
-{
-	printf ("bar ()\n");
-	return 10;
-}
-
-foo ()
-{
-	static int x = bar ();
-
-	printf ("foo () { x = %d; } \n", x);
-	CMyClass c = static new CMyClass;		
-}
-
 int 
 main ()
 {
-	printf ("once & static new test\n");
+	printf ("member new test\n");
 
-	for (int i = 0; i < 5; i++)
-	{
-		printf ("i = %d\n", i);
+	stack new CMyClass;
 
-		once printf ("once stmt\n");
-
-		foo ();
-	}
-
-	return 0; 
+	return 0;
 }
  
 //.............................................................................
