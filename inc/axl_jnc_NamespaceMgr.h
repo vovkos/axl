@@ -66,6 +66,12 @@ public:
 	void
 	CloseNamespace ();
 
+	CScope*
+	OpenScope (const CToken::CPos& Pos);
+
+	void
+	CloseScope (const CToken::CPos& Pos);
+
 	EAccess
 	GetAccessKind (CNamespace* pNamespace);
 
@@ -80,9 +86,6 @@ public:
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName
 		);
-
-	CScope*
-	CreateScope ();
 
 	CScope*
 	FindBreakScope (size_t Level);

@@ -77,10 +77,10 @@ public:
 		m_DestructList.InsertTail (Value);
 	}
 
-	rtl::CBoxListT <CValue>*
+	rtl::CConstBoxListT <CValue>
 	GetDestructList ()
 	{
-		return &m_DestructList;
+		return m_DestructList;
 	}
 };
 

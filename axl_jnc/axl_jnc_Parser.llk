@@ -141,12 +141,6 @@ Members2
 		const CToken::CPos& Pos
 		);
 
-	CScope*
-	OpenScope (const CToken::CPos& Pos);
-
-	void
-	CloseScope (const CToken::CPos& Pos);
-
 	bool
 	OpenTypeExtension (
 		const CQualifiedName& Name,
@@ -257,30 +251,6 @@ Members2
 		CDeclFunctionSuffix* pFunctionSuffix,
 		rtl::CBoxListT <CToken>* pTokenList
 		);
-
-	bool
-	SwitchCaseLabel (
-		CSwitchStmt* pSwitchStmt,
-		intptr_t Value,
-		const CToken::CPos& ClosePos,
-		const CToken::CPos& OpenPos
-		);
-
-	bool
-	SwitchDefaultLabel (
-		CSwitchStmt* pSwitchStmt,
-		const CToken::CPos& ClosePos,
-		const CToken::CPos& OpenPos
-		);
-
-	bool
-	FinalizeSwitchStmt (CSwitchStmt* pSwitchStmt);
-
-	bool
-	InitializeOnceStmt (COnceStmt* pOnceStmt);
-
-	bool
-	FinalizeOnceStmt (COnceStmt* pOnceStmt);
 
 	bool
 	NewOperator_s (

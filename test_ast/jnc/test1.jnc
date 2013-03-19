@@ -1,6 +1,5 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-/*
 class CMyClass
 {
 	this ()
@@ -13,24 +12,27 @@ class CMyClass
 		printf ("CMyClass.~this ()\n");
 	}
 };
-*/
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 foo ()
 {
 	printf ("foo ()\n");
-//	CMyClass c = static new CMyClass;		
+	CMyClass c = static new CMyClass;		
 }
 
 int 
 main ()
 {
-	printf ("field initializers test\n");
+	printf ("once & static new test\n");
 
 	for (int i = 0; i < 5; i++)
 	{
-		once foo ();
 		printf ("i = %d\n", i);
+
+		once printf ("once stmt\n");
+
+		foo ();
 	}
 
 	return 0; 

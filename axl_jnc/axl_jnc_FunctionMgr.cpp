@@ -458,15 +458,9 @@ CFunctionMgr::Prologue (
 	m_VTablePtrValue.Clear ();
 
 	// create scope
-
-	CScope* pScope = m_pModule->m_NamespaceMgr.CreateScope ();
-	pScope->m_pParentNamespace = pFunction->GetParentNamespace ();
-	pScope->m_BeginPos = Pos;
-	pScope->m_EndPos = Pos;
-	pScope->m_pFunction = pFunction;
-	pFunction->m_pScope = pScope;
-
-	m_pModule->m_NamespaceMgr.OpenNamespace (pScope);
+	
+	m_pModule->m_NamespaceMgr.OpenNamespace (pFunction->m_pParentNamespace);
+	pFunction->m_pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 
 	// create entry block 
 
@@ -563,7 +557,7 @@ CFunctionMgr::Prologue (
 			CValue ArgValue (pLlvmArg, pArg->GetType ());
 
 			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
-			pScope->AddItem (pArgVariable);
+			pFunction->m_pScope->AddItem (pArgVariable);
 		}
 	}
 
@@ -666,7 +660,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		return false;
 	}
 
-	pScope->m_EndPos = Pos;
+	m_pModule->m_NamespaceMgr.CloseScope (Pos);
 	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
 	RestoreEmissionContext ();

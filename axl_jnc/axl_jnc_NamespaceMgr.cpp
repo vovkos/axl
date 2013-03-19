@@ -45,6 +45,35 @@ CNamespaceMgr::CloseNamespace ()
 	m_pCurrentScope = m_pCurrentNamespace->m_NamespaceKind == ENamespace_Scope ? (CScope*) m_pCurrentNamespace : NULL;
 }
 
+CScope*
+CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
+{
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	ASSERT (pFunction);
+
+	CScope* pScope = AXL_MEM_NEW (CScope);
+	pScope->m_pModule = m_pModule;
+	pScope->m_pFunction = pFunction;
+	pScope->m_Level = m_pCurrentScope ? m_pCurrentScope->GetLevel () + 1 : 1;
+	pScope->m_BeginPos = Pos;
+	pScope->m_EndPos = Pos;
+	pScope->m_pParentNamespace = m_pCurrentNamespace;
+	m_ScopeList.InsertTail (pScope);
+
+	OpenNamespace (pScope);
+	return pScope;
+}
+
+void
+CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
+{
+	ASSERT (m_pCurrentScope);
+
+	m_pCurrentScope->m_EndPos = Pos;
+	m_pModule->m_OperatorMgr.ProcessDestructList (m_pCurrentScope->GetDestructList ());
+	CloseNamespace ();
+}
+
 EAccess
 CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 {
@@ -118,15 +147,6 @@ CNamespaceMgr::CreateGlobalNamespace (
 	pNamespace->m_Tag = QualifiedName;
 	m_NamespaceList.InsertTail (pNamespace);
 	return pNamespace;
-}
-
-CScope*
-CNamespaceMgr::CreateScope ()
-{
-	CScope* pScope = AXL_MEM_NEW (CScope);
-	pScope->m_pModule = m_pModule;
-	m_ScopeList.InsertTail (pScope);
-	return pScope;
 }
 
 CScope*

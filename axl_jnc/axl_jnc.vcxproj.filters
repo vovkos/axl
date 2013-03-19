@@ -478,6 +478,9 @@
     <ClCompile Include="axl_jnc_OperatorMgr_New.cpp">
       <Filter>operator</Filter>
     </ClCompile>
+    <ClCompile Include="axl_jnc_ControlFlowMgr_Stmt.cpp">
+      <Filter>controlflow</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="axl_jnc_Stmt.llk">

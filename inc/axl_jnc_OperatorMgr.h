@@ -1012,7 +1012,7 @@ public:
 		);
 
 	bool
-	ProcessDestructList (rtl::CBoxListT <CValue>* pList);
+	ProcessDestructList (const rtl::CConstBoxListT <CValue>& List);
 	
 	bool
 	CreateClosureObject (

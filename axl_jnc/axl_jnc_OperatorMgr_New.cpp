@@ -190,9 +190,28 @@ COperatorMgr::NewOperator (
 	{
 		CClassType* pClassType = (CClassType*) pType;
 	
-		Result = InitializeObject (StorageKind, PtrValue, pClassType, pArgList, pResultValue);
-		if (!Result)
-			return false;
+		if (StorageKind == EStorage_Static)
+		{
+			CToken::CPos Pos;
+
+			TOnceStmt Stmt;
+			m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
+
+			Result = 
+				m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
+				InitializeObject (StorageKind, PtrValue, pClassType, pArgList, pResultValue);
+
+			if (!Result)
+				return false;
+				
+			m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
+		}
+		else
+		{
+			Result = InitializeObject (StorageKind, PtrValue, pClassType, pArgList, pResultValue);
+			if (!Result)
+				return false;
+		}
 		
 		if (StorageKind == EStorage_Stack && pClassType->GetDestructor ())
 			pScope->AddToDestructList (*pResultValue);
@@ -276,9 +295,9 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 }
 
 bool
-COperatorMgr::ProcessDestructList (rtl::CBoxListT <CValue>* pList)
+COperatorMgr::ProcessDestructList (const rtl::CConstBoxListT <CValue>& List)
 {
-	rtl::CBoxIteratorT <CValue> It = pList->GetHead ();
+	rtl::CBoxIteratorT <CValue> It = List.GetHead ();
 	for (; It; It++)
 	{
 		CValue Value = *It;
