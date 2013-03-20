@@ -1081,6 +1081,8 @@ public:
 
 	// safe pointer operations
 
+	/*
+
 	llvm::Value*
 	CreateDataPtr (
 		const CValue& PtrValue,
@@ -1142,7 +1144,9 @@ public:
 		const CValue& ScopeLevelValue,
 		CValue* pResultValue
 		);
-		
+
+	*/
+
 	bool
 	DynamicCastClassPtr (
 		const CValue& Value,

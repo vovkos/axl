@@ -5,7 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
-#include "axl_jnc_Namespace.h"
+#include "axl_jnc_NamedType.h"
 
 namespace axl {
 namespace jnc {

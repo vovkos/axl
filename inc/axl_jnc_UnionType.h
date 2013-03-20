@@ -24,6 +24,12 @@ protected:
 	rtl::CStdListT <CStructField> m_FieldList;
 	CStructField* m_pInitializedField;
 	CStructType* m_pStructType;
+	
+	// construction (no destruction)
+
+	CFunction* m_pPreConstructor;
+	CFunction* m_pConstructor;
+	CFunction* m_pStaticConstructor;
 
 public:
 	CUnionType ();

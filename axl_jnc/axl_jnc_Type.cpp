@@ -373,37 +373,36 @@ CType::PrepareLlvmType ()
 
 //.............................................................................
 
-CModuleItem*
-CNamedType::FindItemTraverseImpl (
-	const tchar_t* pName,
-	CBaseTypeCoord* pCoord,
-	int Flags
+CGetType::CGetType (
+	CModule* pModule, 
+	EType TypeKind
 	)
 {
-	CModuleItem* pItem;
+	m_pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
+}
 
-	if (!(Flags & ETraverse_NoThis))
-	{
-		pItem = FindItem (pName);
-		if (pItem)
-			return pItem;
-	}
+CGetType::CGetType (
+	CModule* pModule, 
+	EStdType TypeKind
+	)
+{
+	m_pType = pModule->m_TypeMgr.GetStdType (TypeKind);
+}
 
-	if (!(Flags & ETraverse_NoExtensionNamespace) && m_pExtensionNamespace)
-	{
-		pItem = m_pExtensionNamespace->FindItem (pName);
-		if (pItem)
-			return pItem;
-	}
+CGetType::CGetType (EType TypeKind)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
 
-	if (!(Flags & ETraverse_NoParentNamespace) && m_pParentNamespace)
-	{
-		pItem = m_pParentNamespace->FindItemTraverse (pName, pCoord, Flags & ~ETraverse_NoThis);
-		if (pItem)
-			return pItem;
-	}
+	m_pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
+}
 
-	return NULL;
+CGetType::CGetType (EStdType TypeKind)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	m_pType = pModule->m_TypeMgr.GetStdType (TypeKind);
 }
 
 //.............................................................................

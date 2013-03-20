@@ -117,8 +117,6 @@ CBinOp_Idx::ArrayIndexOperator (
 		return true;
 	}
 
-	llvm::Value* pLlvmValue = OpValue1.GetLlvmValue ();
-
 	EType OpTypeKind1 = OpValue1.GetType ()->GetTypeKind ();
 
 	if (OpTypeKind1 != EType_DataRef)
@@ -130,57 +128,58 @@ CBinOp_Idx::ArrayIndexOperator (
 
 	CDataPtrType* pOpType1 = (CDataPtrType*) OpValue1.GetType ();
 
-	if (pOpType1->GetPtrTypeKind () == EDataPtrType_Unsafe)
+	CDataPtrType* pPtrType;
+	int PtrTypeFlags = pOpType1->GetFlags () | EPtrTypeFlag_Nullable;
+	
+	CValue PtrValue;
+
+	EDataPtrType PtrTypeKind = pOpType1->GetPtrTypeKind ();
+	switch (PtrTypeKind)
 	{
-		CType* pResultType = pElementType->GetDataPtrType (
-			EType_DataRef, 
-			EDataPtrType_Unsafe,
-			pOpType1->GetFlags ()
-			);
+	case EDataPtrType_Unsafe:
+		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, PtrTypeFlags);
 
-		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, pResultType, pResultValue);
-		return true;
-	}
+		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, pPtrType, pResultValue);
+		break;
 
-	if (OpValue1.GetValueKind () == EValue_Variable)
-	{
-		CValue GepValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
+	case EDataPtrType_Thin:
+		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
-		pResultValue->SetVariable (
-			GepValue.GetLlvmValue (), 
-			pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
-			OpValue1.GetVariable ()
-			);
-	}
-	else if (OpValue1.GetValueKind () == EValue_Field)
-	{
-		CValue GepValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &GepValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &PtrValue);
 
-		pResultValue->SetField (
-			GepValue.GetLlvmValue (), 
-			pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin),
-			OpValue1.GetField (),
-			OpValue1.GetClosure ()
-			);
-	}
-	else
-	{
-		CValue SizeValue;
-		SizeValue.SetConstSizeT (pElementType->GetSize ());
-		
-		CValue IncrementValue;
-		bool Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Mul, OpValue2, SizeValue, &IncrementValue);
-		if (!Result)
-			return false;
+		if (OpValue1.GetValueKind () == EValue_Variable)
+			pResultValue->SetThinDataPtr (
+				PtrValue.GetLlvmValue (), 
+				pPtrType,
+				OpValue1
+				);
+		else
+			pResultValue->SetThinDataPtr (
+				PtrValue.GetLlvmValue (), 
+				pPtrType,
+				OpValue1.GetClosure ()
+				);
+		break;
 
-		CType* pResultType = pElementType->GetDataPtrType (EType_DataRef);
-
-		CValue PtrValue;
+	case EDataPtrType_Normal:
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateGep (PtrValue, IncrementValue, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (OpValue1, PtrValue, 0, pResultType, pResultValue);
+
+		pPtrType = pElementType->GetDataPtrType (EDataPtrType_Unsafe);
+
+		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, OpValue2, NULL, &PtrValue);
+
+		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+
+		pResultValue->SetThinDataPtr (
+			PtrValue.GetLlvmValue (), 
+			pPtrType,
+			OpValue1
+			);
+
+		break;
+
+	default:
+		ASSERT (false);
 	}
 
 	return true;

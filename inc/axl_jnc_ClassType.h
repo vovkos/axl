@@ -41,11 +41,6 @@ protected:
 	CStructType* m_pIfaceStructType;
 	CStructType* m_pClassStructType;
 
-	// construction / destruction
-
-	CFunction* m_pPreConstructor;
-	CFunction* m_pConstructor;
-	CFunction* m_pStaticConstructor;
 	CFunction* m_pDestructor;
 	CFunction* m_pInitializer;
 
@@ -66,13 +61,7 @@ protected:
 	CStructType* m_pVTableStructType;
 	rtl::CArrayT <CFunction*> m_VTable;
 	CValue m_VTablePtrValue;
-
-	// overloaded operators
-
-	rtl::CArrayT <CFunction*> m_UnaryOperatorTable;
-	rtl::CArrayT <CFunction*> m_BinaryOperatorTable;
-	rtl::CStringHashTableMapAT <CFunction*> m_CastOperatorMap;
-
+	
 	// autoev (handlers must be disconnected in destructor)
 
 	rtl::CArrayT <CAutoEv*> m_AutoEvArray;
@@ -101,27 +90,6 @@ public:
 		EClassPtrType PtrTypeKind = (EClassPtrType) 0,
 		int Flags = 0
 		);
-
-	CFunction* 
-	GetPreConstructor ()
-	{
-		return m_pPreConstructor;
-	}
-
-	CFunction* 
-	GetConstructor ()
-	{
-		return m_pConstructor;
-	}
-
-	CFunction* 
-	GetDefaultConstructor ();
-
-	CFunction* 
-	GetStaticConstructor ()
-	{
-		return m_pStaticConstructor;
-	}
 
 	CFunction* 
 	GetDestructor ()
@@ -197,15 +165,6 @@ public:
 	{
 		return CreateField (EStorage_Undefined, rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
-
-	CFunctionType* 
-	GetMemberMethodType (
-		CFunctionType* pShortType,
-		int ThisArgTypeFlags = 0
-		);
-
-	CPropertyType* 
-	GetMemberPropertyType (CPropertyType* pShortType);
 
 	CAutoEvType* 
 	GetMemberAutoEvType (CAutoEvType* pShortType);

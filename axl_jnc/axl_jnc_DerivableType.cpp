@@ -29,6 +29,13 @@ CBaseTypeCoord::Init ()
 
 //.............................................................................
 
+CDerivableType::CDerivableType ()
+{
+	m_pPreConstructor = NULL;
+	m_pConstructor = NULL;
+	m_pStaticConstructor = NULL;
+}
+
 CBaseType*
 CDerivableType::AddBaseType (CDerivableType* pType)
 {
@@ -46,8 +53,128 @@ CDerivableType::AddBaseType (CDerivableType* pType)
 	return pBaseType;
 }
 
+CFunction* 
+CDerivableType::GetDefaultConstructor ()
+{
+	ASSERT (m_pConstructor);
+
+	CType* pThisArgType = GetThisArgType ();
+	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
+	if (!pDefaultConstructor)
+	{
+		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
+		return NULL;
+	}
+
+	return pDefaultConstructor;
+}
+
+bool
+CDerivableType::AddMethod (CFunction* pFunction)
+{
+	EStorage StorageKind = pFunction->GetStorageKind ();
+	EFunction FunctionKind = pFunction->GetFunctionKind ();
+	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
+	int ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
+
+	pFunction->m_pParentNamespace = this;
+
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		if (ThisArgTypeFlags)
+		{
+			err::SetFormatStringError (_T("static method cannot be '%s'"), GetPtrTypeFlagString (ThisArgTypeFlags));
+			return false;
+		}
+
+		break;
+
+	case EStorage_Undefined:
+		pFunction->m_StorageKind = EStorage_Member;
+		// and fall through
+
+	case EStorage_Member:
+		pFunction->ConvertToMemberMethod (this);
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for method member"), GetStorageKindString (StorageKind));
+		return false;
+	}
+
+	CFunction** ppTarget = NULL;
+
+	switch (FunctionKind)
+	{
+	case EFunction_Constructor:
+		ppTarget = &m_pConstructor;
+		break;
+
+	case EFunction_PreConstructor:
+		ppTarget = &m_pPreConstructor;
+		break;
+
+	case EFunction_StaticConstructor:
+		ppTarget = &m_pStaticConstructor;
+		break;
+
+	case EFunction_Named:
+		return AddFunction (pFunction);
+
+	case EFunction_UnaryOperator:
+		pFunction->m_Tag.Format (_T("%s.operator %s"), m_Tag, GetUnOpKindString (pFunction->GetUnOpKind ()));
+
+		if (m_UnaryOperatorTable.IsEmpty ())
+			m_UnaryOperatorTable.SetCount (EUnOp__Count);
+
+		ppTarget = &m_UnaryOperatorTable [pFunction->GetUnOpKind ()];
+		break;
+
+	case EFunction_BinaryOperator:
+		pFunction->m_Tag.Format (_T("%s.operator %s"), m_Tag, GetBinOpKindString (pFunction->GetBinOpKind ()));
+
+		if (m_BinaryOperatorTable.IsEmpty ())
+			m_BinaryOperatorTable.SetCount (EBinOp__Count);
+
+		ppTarget = &m_BinaryOperatorTable [pFunction->GetBinOpKind ()];
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid %s in '%s'"), GetFunctionKindString (FunctionKind), GetTypeString ());
+		return false;
+	}
+
+	pFunction->m_Tag.Format (_T("%s.%s"), m_Tag, GetFunctionKindString (FunctionKind));
+
+	if (!*ppTarget)
+	{
+		*ppTarget = pFunction;
+	}
+	else if (FunctionKindFlags & EFunctionKindFlag_NoOverloads)
+	{
+		err::SetFormatStringError (_T("'%s' already has '%s' method"), GetTypeString (), GetFunctionKindString (FunctionKind));
+		return false;
+	}
+	else
+	{
+		bool Result = (*ppTarget)->AddOverload (pFunction);
+		if (!Result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
+CDerivableType::AddProperty (CProperty* pProperty)
+{
+	err::SetFormatStringError (_T("properties in structs / unions are not supported yet"));
+	return false;
+}
+
 void
-CDerivableType::ClearConstructedFlag ()
+CDerivableType::ClearAllBaseTypeConstructedFlags ()
 {
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)

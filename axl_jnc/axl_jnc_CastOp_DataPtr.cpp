@@ -51,9 +51,9 @@ CCast_DataPtr_FromArray::ConstCast (
 	{
 		TDataPtr* pPtr = (TDataPtr*) pDst;
 		pPtr->m_p = p;
-		pPtr->m_Validator.m_pRegionBegin = p;
-		pPtr->m_Validator.m_pRegionEnd = (char*) p + pSrcType->GetSize ();
-		pPtr->m_Validator.m_ScopeLevel = 0;
+		pPtr->m_pRangeBegin = p;
+		pPtr->m_pRangeEnd = (char*) p + pSrcType->GetSize ();
+		pPtr->m_ScopeLevel = 0;
 	}
 	else if (PtrTypeKind == EDataPtrType_Unsafe)
 	{
@@ -186,7 +186,9 @@ CCast_DataPtr_Normal2Normal::ConstCast (
 	TDataPtr* pDstPtr = (TDataPtr*) pDst;
 	TDataPtr* pSrcPtr = (TDataPtr*) OpValue.GetConstData ();
 	pDstPtr->m_p = (char*) pSrcPtr->m_p + Offset;
-	pDstPtr->m_Validator = pSrcPtr->m_Validator;
+	pDstPtr->m_pRangeBegin = pSrcPtr->m_pRangeBegin;
+	pDstPtr->m_pRangeEnd = pSrcPtr->m_pRangeEnd;
+	pDstPtr->m_ScopeLevel = pSrcPtr->m_ScopeLevel;
 	return true;
 }
 
@@ -230,10 +232,18 @@ CCast_DataPtr_Thin2Normal::LlvmCast (
 	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType (EDataPtrType_Unsafe);
 	GetOffsetUnsafePtrValue (OpValue, (CDataPtrType*) OpValue.GetType (), pUnsafePtrType, &PtrValue);
 
-	CValue ValidatorValue;
-	m_pModule->m_OperatorMgr.GetThinDataPtrValidator (OpValue, &ValidatorValue);
+	CValue RangeBeginValue;
+	CValue RangeEndValue;
+	CValue ScopeLevelValue;
 
-	m_pModule->m_LlvmBuilder.CreateDataPtr (PtrValue, ValidatorValue, (CDataPtrType*) pType, pResultValue);
+	m_pModule->m_OperatorMgr.GetThinDataPtrRange (OpValue, &RangeBeginValue, &RangeEndValue);
+	m_pModule->m_OperatorMgr.GetThinDataPtrScopeLevel (OpValue, &ScopeLevelValue);
+
+	CValue ResultValue = pType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
 	return true;
 }
 

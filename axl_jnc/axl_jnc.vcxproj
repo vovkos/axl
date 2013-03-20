@@ -118,6 +118,7 @@
     <ClInclude Include="..\Inc\axl_jnc_Module.h" />
     <ClInclude Include="..\inc\axl_jnc_ModuleItem.h" />
     <ClInclude Include="..\inc\axl_jnc_CastOp.h" />
+    <ClInclude Include="..\inc\axl_jnc_NamedType.h" />
     <ClInclude Include="..\inc\axl_jnc_QualifiedName.h" />
     <ClInclude Include="..\Inc\axl_jnc_Namespace.h" />
     <ClInclude Include="..\Inc\axl_jnc_NamespaceMgr.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="axl_jnc_Module.cpp" />
     <ClCompile Include="axl_jnc_ModuleItem.cpp" />
     <ClCompile Include="axl_jnc_CastOp.cpp" />
+    <ClCompile Include="axl_jnc_NamedType.cpp" />
     <ClCompile Include="axl_jnc_Namespace.cpp" />
     <ClCompile Include="axl_jnc_NamespaceMgr.cpp" />
     <ClCompile Include="axl_jnc_OperatorMgr.cpp" />
@@ -233,7 +235,7 @@
   <ItemGroup>
     <CustomBuild Include="axl_jnc_Parser.llk">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\till %(FullPath) /F..\axl_pg_frames /o %(Filename).h /f axl_llk_ParserFrame.h.luaf</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\till %(FullPath) /F..\axl_pg_frames /o %(Filename).h /f axl_llk_ParserFrame.h.luaf /l</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">axl_jnc_Decl.llk;axl_jnc_Expr.llk;axl_jnc_Expr_s.llk;axl_jnc_Stmt.llk;axl_jnc_Stmt_0.llk;axl_jnc_DeclarationSpecifier.llk;axl_jnc_Declarator.llk;axl_jnc_NamedTypeSpecifier.llk;%(AdditionalInputs)</AdditionalInputs>

@@ -14,6 +14,7 @@ class CFunctionPtrTypeTuple;
 class CMulticastType;
 class CClassType;
 class CClassPtrType;
+class CFunction;
 enum EFunctionPtrType;
 
 //.............................................................................

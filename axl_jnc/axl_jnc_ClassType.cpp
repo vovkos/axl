@@ -14,9 +14,6 @@ CClassType::CClassType ()
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
 
-	m_pPreConstructor = NULL;
-	m_pConstructor = NULL;
-	m_pStaticConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pInitializer = NULL;
 
@@ -37,41 +34,10 @@ CClassType::GetClassPtrType (
 	return m_pModule->m_TypeMgr.GetClassPtrType (this, PtrTypeKind, Flags);
 }
 
-CFunctionType* 
-CClassType::GetMemberMethodType (
-	CFunctionType* pShortType,
-	int ThisArgTypeFlags
-	)
-{
-	return m_pModule->m_TypeMgr.GetMemberMethodType (this, pShortType, ThisArgTypeFlags);
-}
-
-CPropertyType* 
-CClassType::GetMemberPropertyType (CPropertyType* pShortType)
-{
-	return m_pModule->m_TypeMgr.GetMemberPropertyType (this, pShortType);
-}
-
 CAutoEvType* 
 CClassType::GetMemberAutoEvType (CAutoEvType* pShortType)
 {
 	return m_pModule->m_TypeMgr.GetMemberAutoEvType (this, pShortType);
-}
-
-CFunction* 
-CClassType::GetDefaultConstructor ()
-{
-	ASSERT (m_pConstructor);
-
-	CType* pThisArgType = GetClassPtrType ();
-	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
-	if (!pDefaultConstructor)
-	{
-		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
-		return NULL;
-	}
-
-	return pDefaultConstructor;
 }
 
 CStructField*

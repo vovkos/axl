@@ -85,7 +85,6 @@ CFunction::CFunction ()
 	m_pType = NULL;
 	m_pExternFunction = NULL;
 	m_pCastOpType = NULL;
-	m_pClassType = NULL;
 	m_pThisArgType = NULL;
 	m_pThisType = NULL;
 	m_ThisArgDelta = 0;
@@ -109,14 +108,14 @@ CFunction::CreateArgString ()
 	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
 	size_t ArgCount = ArgTypeArray.GetCount ();
 
-	if (m_pClassType)
-		String.AppendFormat (_T("%s this"), ArgTypeArray [0]->GetTypeString ());
+	if (m_pThisArgType)
+		String.AppendFormat (_T("%s this"), m_pThisArgType->GetTypeString ());
 
 	if (!m_ArgList.IsEmpty ())
 	{
 		rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
 
-		String.AppendFormat (m_pClassType ? _T(", %s") : _T("%s"), Arg->GetType ()->GetTypeString ());
+		String.AppendFormat (m_pThisArgType ? _T(", %s") : _T("%s"), Arg->GetType ()->GetTypeString ());
 
 		if (!Arg->GetName ().IsEmpty ())
 			String.AppendFormat (_T(" %s"), Arg->GetName ());
@@ -131,7 +130,7 @@ CFunction::CreateArgString ()
 	}
 	else
 	{
-		if (ArgCount && !m_pClassType)
+		if (ArgCount && !m_pThisArgType)
 			String += ArgTypeArray [0]->GetTypeString ();
 
 		for (size_t i = 1; i < ArgCount; i++)
@@ -169,13 +168,12 @@ CFunction::GetLlvmFunction ()
 }
 
 void
-CFunction::ConvertToMemberMethod (CClassType* pClassType)
+CFunction::ConvertToMemberMethod (CNamedType* pParentType)
 {
-	ASSERT (!m_pClassType);
 	ASSERT (m_TypeOverload.GetOverloadCount () == 1);
 
-	m_pClassType = pClassType;
-	m_pType = pClassType->GetMemberMethodType (m_pType, m_ThisArgTypeFlags);
+	m_pParentNamespace = pParentType;
+	m_pType = pParentType->GetMemberMethodType (m_pType, m_ThisArgTypeFlags);
 	m_TypeOverload = m_pType;
 
 	ASSERT (!m_pType->GetArgTypeArray ().IsEmpty ());
@@ -321,7 +319,6 @@ CFunction::MakeStub (CFunction* pFunction)
 	m_Name = pFunction->m_Name;
 	m_QualifiedName = pFunction->m_QualifiedName;
 	m_Tag = pFunction->m_Tag;
-	m_pClassType = pFunction->m_pClassType;
 	m_pThisArgType = pFunction->m_pThisArgType;
 	m_pThisType = pFunction->m_pThisType;
 	m_pVirtualOriginClassType = pFunction->m_pVirtualOriginClassType;

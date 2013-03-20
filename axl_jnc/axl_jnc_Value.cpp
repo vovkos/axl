@@ -70,7 +70,6 @@ GetValueKindString (EValue ValueKind)
 		_T("function-type-overload"), // EValue_FunctionTypeOverload,
 		_T("property"),               // EValue_Property,	
 		_T("autoev"),                 // EValue_AutoEv,	
-		_T("field"),                  // EValue_Field,	
 		_T("llvm-register"),          // EValue_LlvmRegister,
 		_T("bool-not"),               // EValue_BoolNot,
 		_T("bool-and"),               // EValue_BoolAnd,
@@ -85,26 +84,24 @@ GetValueKindString (EValue ValueKind)
 //.............................................................................
 
 void
-CValue::Clear ()
-{
-	m_ValueKind = EValue_Void;
-	m_pType = NULL;
-	m_Flags = 0;
-	m_pItem = NULL;
-	m_pLlvmValue = NULL;
-	m_Closure = NULL;
-}
-
-void
 CValue::Init ()
 {
 	m_ValueKind = EValue_Void;
 	m_pType = NULL;
-	m_Flags = 0;
 	memset (m_ConstBuffer, 0, sizeof (m_ConstBuffer));
 	m_Const.SetBuffer (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer));
 	m_pVariable = NULL;
 	m_pLlvmValue = NULL;
+}
+
+void
+CValue::Clear ()
+{
+	m_ValueKind = EValue_Void;
+	m_pType = NULL;
+	m_pItem = NULL;
+	m_pLlvmValue = NULL;
+	m_Closure = NULL;
 }
 
 llvm::Value*
@@ -291,12 +288,12 @@ CValue::SetType (EType TypeKind)
 void
 CValue::SetVariable (CVariable* pVariable)
 {
-	return SetVariable (
-		pVariable->GetLlvmValue (), 
-		pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pVariable->GetPtrTypeFlags ()), 
-		pVariable,
-		EValueFlag_NoDataPtrRangeCheck
-		);
+	Clear ();
+
+	m_ValueKind = EValue_Variable;
+	m_pType = pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pVariable->GetPtrTypeFlags ());
+	m_pLlvmValue = pVariable->GetLlvmValue ();
+	m_pVariable = pVariable;
 }
 
 void
@@ -347,46 +344,8 @@ CValue::SetAutoEv (CAutoEv* pAutoEv)
 }
 
 void
-CValue::SetVariable (		
-	llvm::Value* pValue,
-	CType* pType,
-	CVariable* pVariable,
-	int Flags
-	)
-{
-	Clear ();
-
-	m_ValueKind = EValue_Variable;
-	m_pType = pType;
-	m_pLlvmValue = pValue;
-	m_pVariable = pVariable;
-	m_Flags = Flags;
-}
-
-void
-CValue::SetField (		
-	llvm::Value* pValue,
-	CType* pType,
-	CStructField* pField,
-	CClosure* pClosure,
-	int Flags
-	)
-{
-	ASSERT (pClosure && pClosure->GetArgList ()->GetCount () == 3);
-
-	Clear ();
-
-	m_ValueKind = EValue_Field;
-	m_pType = pType;
-	m_pLlvmValue = pValue;
-	m_pField = pField;
-	m_Closure = pClosure;
-	m_Flags = Flags;
-}
-
-void
 CValue::SetLlvmValue (
-	llvm::Value* pValue,
+	llvm::Value* pLlvmValue,
 	CType* pType,
 	EValue ValueKind
 	)
@@ -395,12 +354,12 @@ CValue::SetLlvmValue (
 
 	m_ValueKind = ValueKind;
 	m_pType = pType;
-	m_pLlvmValue = pValue;
+	m_pLlvmValue = pLlvmValue;
 }
 
 void
 CValue::SetLlvmValue (
-	llvm::Value* pValue,
+	llvm::Value* pLlvmValue,
 	EType TypeKind,
 	EValue ValueKind
 	)
@@ -409,7 +368,54 @@ CValue::SetLlvmValue (
 	ASSERT (pModule);
 
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	SetLlvmValue (pValue, pType, ValueKind);
+	SetLlvmValue (pLlvmValue, pType, ValueKind);
+}
+
+void
+CValue::SetThinDataPtr (		
+	llvm::Value* pLlvmValue,
+	CDataPtrType* pType,
+	CClosure* pClosure
+	)
+{
+	ASSERT (pType->IsDataPtrType ());
+
+	Clear ();
+
+	m_ValueKind = EValue_LlvmRegister;
+	m_pType = pType;
+	m_pLlvmValue = pLlvmValue;
+	m_Closure = pClosure;
+}
+
+void
+CValue::SetThinDataPtr (		
+	llvm::Value* pLlvmValue,
+	CDataPtrType* pType,
+	const CValue& ValidatorValue
+	)
+{
+	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
+	Closure->GetArgList ()->InsertTail (ValidatorValue);
+
+	SetThinDataPtr (pLlvmValue, pType, Closure);
+}
+
+void
+CValue::SetThinDataPtr (		
+	llvm::Value* pLlvmValue,
+	CDataPtrType* pType,
+	const CValue& RangeBeginValue,
+	size_t Size,
+	const CValue& ScopeValidatorValue
+	)
+{
+	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
+	Closure->GetArgList ()->InsertTail (RangeBeginValue);
+	Closure->GetArgList ()->InsertTail (CValue (Size, EType_SizeT));
+	Closure->GetArgList ()->InsertTail (ScopeValidatorValue);
+
+	SetThinDataPtr (pLlvmValue, pType, Closure);
 }
 
 bool

@@ -503,12 +503,33 @@ CFunctionMgr::Prologue (
 
 	if (pFunction->GetFunctionKind () == EFunction_PreConstructor)
 	{
-		m_MemberNewField = pFunction->m_pClassType->GetFirstMemberNewField ();
+		CNamedType* pParentType = pFunction->GetParentType ();
+		CStructType* pStructType;
 
-		Result = pFunction->m_pClassType->GetIfaceStructType ()->InitializeFields ();
+		EType TypeKind = pParentType->GetTypeKind ();
+		switch (TypeKind)
+		{
+		case EType_Struct:
+			pStructType = (CStructType*) pParentType;
+			break;
+
+		case EType_Union:
+			pStructType = ((CUnionType*) pParentType)->GetStructType ();
+			break;
+
+		case EType_Class:
+			pStructType = ((CClassType*) pParentType)->GetIfaceStructType ();
+			m_MemberNewField = ((CClassType*) pParentType)->GetFirstMemberNewField ();
+			break;
+
+		default:
+			err::SetFormatStringError (_T("invalid preconstructor '%s'"), pFunction->m_Tag);
+			return false;
+		}
+
+		Result = pStructType->InitializeFields ();
 		if (!Result)
 			return false;
-		
 	}
 	else if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
 	{
@@ -600,12 +621,14 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	
 	if (pFunction->m_FunctionKind == EFunction_Destructor)
 	{
-		ASSERT (pFunction->m_pClassType && m_ThisValue);
+		ASSERT (pFunction->GetParentType ()->GetTypeKind () == EType_Class && m_ThisValue);
+
+		CClassType* pClassType = (CClassType*) pFunction->GetParentType ();
 
 		Result = 
-			pFunction->m_pClassType->StopAutoEvs (m_ThisValue) &&
-			pFunction->m_pClassType->CallMemberNewDestructors (m_ThisValue) &&
-			pFunction->m_pClassType->CallBaseDestructors (m_ThisValue);
+			pClassType->StopAutoEvs (m_ThisValue) &&
+			pClassType->CallMemberNewDestructors (m_ThisValue) &&
+			pClassType->CallBaseDestructors (m_ThisValue);
 
 		if (!Result)
 			return false;
@@ -693,12 +716,7 @@ CFunctionMgr::InternalPrologue (
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin ();
 
 	if (pFunction->IsMember ())
-	{
 		m_ThisValue = CValue (LlvmArg, pFunction->GetThisArgType ());
-
-		if (pFunction->GetFunctionKind () == EFunction_PreConstructor)
-			m_MemberNewField = pFunction->m_pClassType->GetFirstMemberNewField ();
-	}
 
 	for (size_t i = 0; i < ArgCount; i++, LlvmArg++)
 		pArgValueArray [i] = CValue (LlvmArg, ArgTypeArray [i]);
@@ -1738,7 +1756,8 @@ CFunctionMgr::CreateCheckScopeLevel ()
 // jnc.CheckDataPtrRange (
 //		int8* p,
 //		size_t Size,
-//		jnc.sptrv Validator,
+//		int8* pRangeBegin,
+//		int8* pRangeEnd,
 //		int Error
 //		);
 
@@ -1752,7 +1771,8 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_DataPtrValidator),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int)
 	};
 	
@@ -1766,6 +1786,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	CValue ArgValue2 = ArgValueArray [1];
 	CValue ArgValue3 = ArgValueArray [2];
 	CValue ArgValue4 = ArgValueArray [3];
+	CValue ArgValue5 = ArgValueArray [4];
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_fail"));
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("sptr_success"));
@@ -1778,19 +1799,15 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	m_pModule->m_LlvmBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pCmp2Block, pCmp2Block);
 
-	CValue RegionBeginValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue3, 0, NULL, &RegionBeginValue);
-	m_pModule->m_LlvmBuilder.CreateLt_u (ArgValue1, RegionBeginValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateLt_u (ArgValue1, ArgValue3, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pCmp3Block, pCmp3Block);	
 
 	CValue PtrEndValue;
-	CValue RegionEndValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValue3, 1, NULL, &RegionEndValue);
 	m_pModule->m_LlvmBuilder.CreateGep (ArgValue1, ArgValue2, NULL ,&PtrEndValue);
-	m_pModule->m_LlvmBuilder.CreateGt_u (PtrEndValue, RegionEndValue, &CmpValue);
+	m_pModule->m_LlvmBuilder.CreateGt_u (PtrEndValue, ArgValue4, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pSuccessBlock);
 
-	m_pModule->m_LlvmBuilder.RuntimeError (ArgValue4);
+	m_pModule->m_LlvmBuilder.RuntimeError (ArgValue5);
 
 	m_pModule->m_ControlFlowMgr.Follow (pSuccessBlock);
 

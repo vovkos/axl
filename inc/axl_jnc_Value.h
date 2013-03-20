@@ -32,7 +32,6 @@ enum EValue
 	EValue_FunctionTypeOverload,
 	EValue_Property,	
 	EValue_AutoEv,	
-	EValue_Field,
 	EValue_LlvmRegister,
 	EValue_BoolNot,
 	EValue_BoolAnd,
@@ -46,13 +45,6 @@ const tchar_t*
 GetValueKindString (EValue ValueKind);
 
 //.............................................................................
-
-enum EValueFlag
-{
-	EValueFlag_NoDataPtrRangeCheck = 0x01, 
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CValue
 {
@@ -77,7 +69,6 @@ protected:
 protected:
 	EValue m_ValueKind;
 	CType* m_pType;	
-	int m_Flags;
 
 	CConstBuf m_Const;
 	uchar_t m_ConstBuffer [CConstBuf::MinBufSize + 8];
@@ -90,7 +81,6 @@ protected:
 		CFunctionTypeOverload* m_pFunctionTypeOverload;
 		CProperty* m_pProperty;
 		CAutoEv* m_pAutoEv;
-		CStructField* m_pField;
 	};
 
 	mutable llvm::Value* m_pLlvmValue;
@@ -123,7 +113,7 @@ public:
 
 	CValue (
 		int64_t Value,
-		EType TypeKind = EType_Int32
+		EType TypeKind
 		)
 	{
 		Init ();
@@ -186,20 +176,22 @@ public:
 
 	CValue (
 		llvm::Value* pLlvmValue,
-		CType* pType
+		CType* pType,
+		EValue ValueKind = EValue_LlvmRegister
 		)
 	{
 		Init ();
-		SetLlvmValue (pLlvmValue, pType);
+		SetLlvmValue (pLlvmValue, pType, ValueKind);
 	}
 
 	CValue (
 		llvm::Value* pLlvmValue,
-		EType TypeKind
+		EType TypeKind,
+		EValue ValueKind = EValue_LlvmRegister
 		)
 	{
 		Init ();
-		SetLlvmValue (pLlvmValue, TypeKind);
+		SetLlvmValue (pLlvmValue, TypeKind, ValueKind);
 	}
 
 	operator bool () const
@@ -225,12 +217,6 @@ public:
 		return m_pType;
 	}
 
-	int 
-	GetFlags () const
-	{
-		return m_Flags;
-	}
-
 	CVariable*
 	GetVariable () const
 	{
@@ -248,7 +234,7 @@ public:
 	CFunctionTypeOverload* 
 	GetFunctionTypeOverload () const
 	{
-		ASSERT (m_ValueKind == EValue_Function);
+		ASSERT (m_ValueKind == EValue_FunctionTypeOverload);
 		return m_pFunctionTypeOverload;
 	}
 
@@ -264,13 +250,6 @@ public:
 	{
 		ASSERT (m_ValueKind == EValue_AutoEv);
 		return m_pAutoEv;
-	}
-
-	CStructField* 
-	GetField () const
-	{
-		ASSERT (m_ValueKind == EValue_Field);
-		return m_pField;
 	}
 
 	void*
@@ -387,13 +366,7 @@ public:
 		*this = Value;
 		OverrideType (TypeKind);
 	}
-
-	void
-	OverrideFlags (int Flags)
-	{
-		m_Flags = Flags;
-	}
-		
+	
 	void
 	Clear ();
 
@@ -425,34 +398,40 @@ public:
 	SetAutoEv (CAutoEv* pAutoEv);
 
 	void
-	SetVariable (		
-		llvm::Value* pValue,
-		CType* pType,
-		CVariable* pVariable,
-		int Flags = 0
-		);
-
-	void
-	SetField (		
-		llvm::Value* pValue,
-		CType* pType,
-		CStructField* pField,
-		CClosure* pClosure,
-		int Flags = 0
-		);
-
-	void
 	SetLlvmValue (		
-		llvm::Value* pValue,
+		llvm::Value* pLlvmValue,
 		CType* pType,
 		EValue ValueKind = EValue_LlvmRegister
 		);
 
 	void
 	SetLlvmValue (
-		llvm::Value* pValue,
+		llvm::Value* pLlvmValue,
 		EType TypeKind,
 		EValue ValueKind = EValue_LlvmRegister
+		);
+
+	void
+	SetThinDataPtr (		
+		llvm::Value* pLlvmValue,
+		CDataPtrType* pType,
+		CClosure* pClosure
+		);
+
+	void
+	SetThinDataPtr (		
+		llvm::Value* pLlvmValue,
+		CDataPtrType* pType,
+		const CValue& ValidatorValue // EValue_Variable or EDataPtrType_Normal
+		);
+
+	void
+	SetThinDataPtr (		
+		llvm::Value* pLlvmValue,
+		CDataPtrType* pType,
+		const CValue& RangeBeginValue,
+		size_t Size,
+		const CValue& ScopeValidatorValue
 		);
 
 	bool
@@ -654,17 +633,12 @@ struct TMcSnapshot
 // structures backing up safe data pointer declared like:
 // int* p;
 
-struct TDataPtrValidator
-{
-	void* m_pRegionBegin;
-	void* m_pRegionEnd;
-	size_t m_ScopeLevel;
-};
-
 struct TDataPtr
 {
 	void* m_p;
-	TDataPtrValidator m_Validator;
+	void* m_pRangeBegin;
+	void* m_pRangeEnd;
+	size_t m_ScopeLevel;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

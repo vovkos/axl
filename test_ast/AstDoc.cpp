@@ -513,9 +513,9 @@ StdLib_PointerCheck (jnc::TDataPtr Ptr)
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (
 		"PointerCheck (%p; range = %p:%p; scope = %d)\n", 
 		Ptr.m_p,
-		Ptr.m_Validator.m_pRegionBegin,
-		Ptr.m_Validator.m_pRegionEnd,
-		Ptr.m_Validator.m_ScopeLevel
+		Ptr.m_pRangeBegin,
+		Ptr.m_pRangeEnd,
+		Ptr.m_ScopeLevel
 		);
 }
 

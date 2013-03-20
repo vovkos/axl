@@ -31,25 +31,6 @@ class CModule;
 
 //.............................................................................
 
-enum EStdType
-{
-	EStdType_BytePtr,
-	EStdType_DataPtrValidator,
-	EStdType_ObjectHdr,
-	EStdType_ObjectClass,
-	EStdType_ObjectPtr,
-	EStdType_SimpleFunction,
-	EStdType_SimpleMulticast,
-	EStdType_SimpleEventPtr,
-	EStdType_StrenthenClosureFunction,
-	EStdType_AutoEvBindSite,
-	EStdType_IScheduler,
-	EStdType_ISchedulerPtr,
-	EStdType__Count,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class CTypeMgr
 {
 protected:
@@ -303,7 +284,7 @@ public:
 
 	CFunctionType* 
 	GetMemberMethodType (
-		CClassType* pClassType,
+		CNamedType* pParentType,
 		CFunctionType* pFunctionType,
 		int ThisArgTypeFlags = 0
 		);
@@ -380,7 +361,7 @@ public:
 
 	CPropertyType* 
 	GetMemberPropertyType (
-		CClassType* pClassType,
+		CNamedType* pParentType,
 		CPropertyType* pPropertyType
 		);
 
@@ -581,9 +562,6 @@ protected:
 		size_t Size,
 		const char* pSignature
 		);
-
-	CStructType* 
-	CreateDataPtrValidatorType ();
 
 	CStructType*
 	CreateObjectHdrType ();

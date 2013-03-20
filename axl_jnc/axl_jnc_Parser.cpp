@@ -599,6 +599,8 @@ CParser::DeclareFunction (
 	default:
 		pFunction->m_Tag.AppendFormat (_T(".%s"), GetFunctionKindString (FunctionKind));
 	}
+
+	EType TypeKind;
 	
 	switch (NamespaceKind)
 	{
@@ -618,19 +620,28 @@ CParser::DeclareFunction (
 		break;
 
 	case ENamespace_Type:
-		if (((CNamedType*) pNamespace)->GetTypeKind () != EType_Class)
-		{
-			err::SetFormatStringError (_T("method members are not allowed in '%s'"), ((CNamedType*) pNamespace)->GetTypeString ());
-			return false;
-		}
-
 		if (pDeclarator->IsQualified () && m_StorageKind != EStorage_Override)
 		{
 			err::SetFormatStringError (_T("only overrides could be qualified, '%s' is not an override"), pFunction->m_Tag);
 			return false;
 		}
 
-		return ((CClassType*) pNamespace)->AddMethod (pFunction);
+		TypeKind = ((CNamedType*) pNamespace)->GetTypeKind ();
+		switch (TypeKind)
+		{
+		case EType_Struct:
+			return ((CStructType*) pNamespace)->AddMethod (pFunction);
+
+		case EType_Union:
+			return ((CUnionType*) pNamespace)->AddMethod (pFunction);
+
+		case EType_Class:
+			return ((CClassType*) pNamespace)->AddMethod (pFunction);
+
+		default:
+			err::SetFormatStringError (_T("method members are not allowed in '%s'"), ((CNamedType*) pNamespace)->GetTypeString ());
+			return false;
+		}
 
 	case ENamespace_Property:
 		if (pDeclarator->IsQualified ())
@@ -739,7 +750,7 @@ CParser::CreatePropertyImpl (
 	if (NamespaceKind == ENamespace_PropertyTemplate)
 	{
 		err::SetFormatStringError (_T("property templates cannot have property memberts"));
-		return false;
+		return NULL;
 	}
 
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
@@ -747,18 +758,33 @@ CParser::CreatePropertyImpl (
 	
 	AssignDeclarationAttributes (pProperty, pNamespace, Pos);
 
+	EType TypeKind;
+
 	switch (NamespaceKind)
 	{
 	case ENamespace_Type:
-		if (((CNamedType*) pNamespace)->GetTypeKind () != EType_Class)
+		TypeKind = ((CNamedType*) pNamespace)->GetTypeKind ();
+		switch (TypeKind)
 		{
+		case EType_Struct:
+			Result = ((CStructType*) pNamespace)->AddProperty (pProperty);
+			break;
+
+		case EType_Union:
+			Result = ((CUnionType*) pNamespace)->AddProperty (pProperty);
+			break;
+
+		case EType_Class:
+			Result = ((CClassType*) pNamespace)->AddProperty (pProperty);
+			break;
+
+		default:
 			err::SetFormatStringError (_T("property members are not allowed in '%s'"), ((CNamedType*) pNamespace)->GetTypeString ());
-			return false;
+			return NULL;
 		}
 
-		Result = ((CClassType*) pNamespace)->AddProperty (pProperty);
 		if (!Result)
-			return false;
+			return NULL;
 
 		break;
 

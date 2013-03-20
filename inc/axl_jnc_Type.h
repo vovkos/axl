@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Namespace.h"
+#include "axl_jnc_ModuleItem.h"
 
 namespace axl {
 namespace jnc {
@@ -128,6 +128,24 @@ enum EType
 	EType_ULong    = EType_Int32_u,
 	EType_DWord    = EType_Int32_u,
 	EType_QWord    = EType_Int64_u,
+};
+
+//.............................................................................
+
+enum EStdType
+{
+	EStdType_BytePtr,
+	EStdType_ObjectHdr,
+	EStdType_ObjectClass,
+	EStdType_ObjectPtr,
+	EStdType_SimpleFunction,
+	EStdType_SimpleMulticast,
+	EStdType_SimpleEventPtr,
+	EStdType_StrenthenClosureFunction,
+	EStdType_AutoEvBindSite,
+	EStdType_IScheduler,
+	EStdType_ISchedulerPtr,
+	EStdType__Count,
 };
 
 //.............................................................................
@@ -399,6 +417,13 @@ IsNumericTypeKind (EType TypeKind)
 	return TypeKind >= EType_Bool && TypeKind <= EType_Double;
 }
 
+inline
+bool
+IsDerivableTypeKind (EType TypeKind)
+{
+	return TypeKind >= EType_Struct && TypeKind <= EType_Class;
+}
+
 inline 
 bool 
 IsDataPtrTypeKind (EType TypeKind)
@@ -580,6 +605,12 @@ public:
 		return IsNumericTypeKind (m_TypeKind);
 	}
 
+	bool
+	IsDerivableType ()	
+	{
+		return IsDerivableTypeKind (m_TypeKind);
+	}
+
 	bool 
 	IsDataPtrType ()	
 	{
@@ -651,40 +682,6 @@ protected:
 
 //.............................................................................
 
-class CNamedType: 
-	public CType,
-	public CNamespace
-{
-protected:
-	friend class CParser;
-
-	CNamespace* m_pExtensionNamespace;
-
-public:
-	CNamedType ()
-	{
-		m_NamespaceKind = ENamespace_Type;
-		m_pItemDecl = this;
-	}
-
-	CNamespace* 
-	GetExtensionNamespace ()
-	{
-		return m_pExtensionNamespace;
-	}
-
-protected:
-	virtual
-	CModuleItem*
-	FindItemTraverseImpl (
-		const tchar_t* pName,
-		CBaseTypeCoord* pCoord,
-		int Flags
-		);
-};
-
-//.............................................................................
-
 class CTypedef: public CUserModuleItem
 {
 protected:
@@ -701,6 +698,34 @@ public:
 
 	CType*
 	GetType ()
+	{
+		return m_pType;
+	}
+};
+
+//.............................................................................
+
+class CGetType 
+{
+protected:
+	CType* m_pType;
+
+public:
+	CGetType (
+		CModule* pModule, 
+		EType TypeKind
+		);
+
+	CGetType (
+		CModule* pModule, 
+		EStdType TypeKind
+		);
+
+	CGetType (EType TypeKind);
+
+	CGetType (EStdType TypeKind);
+
+	operator CType* ()
 	{
 		return m_pType;
 	}

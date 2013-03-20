@@ -117,6 +117,7 @@ class CFunction: public CUserModuleItem
 {
 protected:
 	friend class CFunctionMgr;
+	friend class CDerivableType;
 	friend class CClassType;
 	friend class CProperty;
 	friend class CAutoEv;
@@ -144,9 +145,8 @@ protected:
 
 	// for non-static method members
 
-	CClassType* m_pClassType; 
-	CClassPtrType* m_pThisArgType;
-	CClassPtrType* m_pThisType;
+	CType* m_pThisArgType;
+	CType* m_pThisType;
 	intptr_t m_ThisArgDelta;
 	int m_ThisArgTypeFlags; 
 
@@ -209,12 +209,6 @@ public:
 		return &m_TypeOverload;
 	}
 
-	CClassType* 
-	GetClassType ()
-	{
-		return m_pClassType;
-	}
-
 	bool
 	IsOrphan ()
 	{
@@ -254,13 +248,19 @@ public:
 		return m_pVirtualOriginClassType;
 	}
 
-	CClassPtrType* 
+	CNamedType*
+	GetParentType ()
+	{
+		return m_pParentNamespace->GetNamespaceKind () == ENamespace_Type ? (CNamedType*) m_pParentNamespace : NULL;
+	}
+
+	CType* 
 	GetThisArgType ()
 	{
 		return m_pThisArgType;
 	}
 
-	CClassPtrType* 
+	CType* 
 	GetThisType ()
 	{
 		return m_pThisType;
@@ -303,7 +303,7 @@ public:
 	}
 
 	void
-	ConvertToMemberMethod (CClassType* pClassType);
+	ConvertToMemberMethod (CNamedType* pParentType);
 
 	rtl::CString
 	CreateArgString ();

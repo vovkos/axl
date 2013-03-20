@@ -16,6 +16,8 @@ class CMyClass
 	};
 	
 	CClassA m_x = member new CClassA;
+	CClassA m_x = member new CClassA;
+	CClassA m_x = member new CClassA;
 	
 	this ()
 	{

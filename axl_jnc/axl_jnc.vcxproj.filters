@@ -244,6 +244,9 @@
     <ClInclude Include="..\inc\axl_jnc_Alias.h">
       <Filter>variable</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\axl_jnc_NamedType.h">
+      <Filter>type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -480,6 +483,9 @@
     </ClCompile>
     <ClCompile Include="axl_jnc_ControlFlowMgr_Stmt.cpp">
       <Filter>controlflow</Filter>
+    </ClCompile>
+    <ClCompile Include="axl_jnc_NamedType.cpp">
+      <Filter>type</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

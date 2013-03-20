@@ -287,28 +287,30 @@ COperatorMgr::CallBaseTypeConstructor (
 	bool Result;
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	ASSERT (pFunction->GetFunctionKind () == EFunction_Constructor);
+	ASSERT (
+		pFunction->GetFunctionKind () == EFunction_Constructor && 
+		pFunction->GetParentType ()->IsDerivableType ()
+		);
 
-	CClassType* pClassType = pFunction->GetClassType ();
-	CBaseType* pBaseType = pClassType->FindBaseType (pType);
-
+	CDerivableType* pParentType = (CDerivableType* ) pFunction->GetParentType ();
+	CBaseType* pBaseType = pParentType->FindBaseType (pType);
 	if (!pBaseType)
 	{
-		err::SetFormatStringError (_T("'%s' is not a base type of '%s'"), pType->GetTypeString (), pClassType->GetTypeString ());
-		return false;
-	}
-	
-	if (pType->GetTypeKind () != EType_Class)
-	{
-		err::SetFormatStringError (_T("non-class inheritance is not implemented yet"));
+		err::SetFormatStringError (_T("'%s' is not a base type of '%s'"), pType->GetTypeString (), pParentType->GetTypeString ());
 		return false;
 	}
 
-	CClassType* pBaseClassType = (CClassType*) pType;
-	CFunction* pConstructor = pBaseClassType->GetConstructor ();
+	if (pBaseType->GetFlags () & EBaseTypeFlag_Constructed)
+	{
+		err::SetFormatStringError (_T("'%s' is already constructed"), pType->GetTypeString ());
+		return false;
+	}
+
+	ASSERT (pType->IsDerivableType ());
+	CFunction* pConstructor = ((CDerivableType*) pType)->GetConstructor ();
 	if (!pConstructor)
 	{
-		err::SetFormatStringError (_T("'%s' has no constructor"), pBaseClassType->GetTypeString ());
+		err::SetFormatStringError (_T("'%s' has no constructor"), pType->GetTypeString ());
 		return false;
 	}
 
@@ -318,7 +320,7 @@ COperatorMgr::CallBaseTypeConstructor (
 	if (!Result)
 		return false;
 
-	pClassType->MarkConstructed (pBaseType);
+	pBaseType->MarkConstructed ();
 	return true;
 }
 
@@ -328,13 +330,17 @@ COperatorMgr::PostBaseTypeConstructorList ()
 	bool Result;
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	ASSERT (pFunction->GetFunctionKind () == EFunction_Constructor);
+	ASSERT (
+		pFunction->GetFunctionKind () == EFunction_Constructor && 
+		pFunction->GetParentType ()->IsDerivableType ()
+		);
+
+	CDerivableType* pParentType = (CDerivableType* ) pFunction->GetParentType ();
 
 	rtl::CBoxListT <CValue> ArgList;
 	ArgList.InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
 
-	CClassType* pClassType = pFunction->GetClassType ();	
-	rtl::CIteratorT <CBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
+	rtl::CIteratorT <CBaseType> BaseType = pParentType->GetBaseTypeList ().GetHead ();
 	for (; BaseType; BaseType++)
 	{
 		if ((BaseType->GetFlags () & EBaseTypeFlag_Constructed) ||
@@ -358,7 +364,9 @@ COperatorMgr::PostBaseTypeConstructorList ()
 			return false;
 	}
 
-	CFunction* pPreConstructor = pFunction->GetClassType ()->GetPreConstructor ();
+	pParentType->ClearAllBaseTypeConstructedFlags ();
+
+	CFunction* pPreConstructor = pParentType->GetPreConstructor ();
 	return pPreConstructor ? CallOperator (pPreConstructor, &ArgList) : true;
 }
 

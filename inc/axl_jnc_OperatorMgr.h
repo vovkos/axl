@@ -943,10 +943,34 @@ public:
 		);
 
 	bool
+	GetNamedTypeField (
+		const CValue& OpValue,
+		CNamedType* pNamedType,
+		CStructField* pField,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetNamedTypeStaticField (
+		CNamedType* pNamedType,
+		CStructField* pField,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
 	GetStructField  (
 		const CValue& OpValue,
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetUnionField (
+		const CValue& OpValue,
+		CStructField* pMember,
 		CValue* pResultValue
 		);
 
@@ -1000,13 +1024,20 @@ public:
 		);
 
 	void
+	GetThinDataPtrRange (
+		const CValue& Value,
+		CValue* pRangeBeginValue,
+		CValue* pRangeEndValue
+		);
+
+	void
 	GetThinDataPtrScopeLevel (
 		const CValue& Value,
 		CValue* pResultValue
 		);
 
 	void
-	GetThinDataPtrValidator (
+	GetClassPtrScopeLevel (
 		const CValue& Value,
 		CValue* pResultValue
 		);
@@ -1036,7 +1067,8 @@ protected:
 	CheckDataPtrRange (
 		const CValue& PtrValue,
 		size_t Size,
-		const CValue& ValidatorValue,
+		const CValue& RangeBeginValue,
+		const CValue& RangeEndValue,
 		ERuntimeError Error
 		);
 
@@ -1091,39 +1123,17 @@ protected:
 	// member operators
 
 	CType*
-	GetStructMemberType (
+	GetNamedTypeMemberType (
 		const CValue& OpValue,
-		CStructType* pStructType,
+		CNamedType* pNamedType,
 		const tchar_t* pName
 		);
 
 	bool
-	GetStructMember (
+	GetNamedTypeMember (
 		const CValue& OpValue,
-		CStructType* pStructType,
+		CNamedType* pNamedType,
 		const tchar_t* pName,
-		CValue* pResultValue
-		);
-
-	CType*
-	GetUnionMemberType (
-		const CValue& OpValue,
-		CUnionType* pUnionType,
-		const tchar_t* pName
-		);
-
-	bool
-	GetUnionMember (
-		const CValue& OpValue,
-		CUnionType* pUnionType,
-		const tchar_t* pName,
-		CValue* pResultValue
-		);
-
-	bool
-	GetUnionField (
-		const CValue& OpValue,
-		CStructField* pMember,
 		CValue* pResultValue
 		);
 
@@ -1153,21 +1163,6 @@ protected:
 	GetAutoEvMember (
 		const CValue& OpValue,
 		CAutoEvType* pAutoEvType,
-		const tchar_t* pName,
-		CValue* pResultValue
-		);
-
-	CType*
-	GetClassMemberType (
-		const CValue& OpValue,
-		CClassType* pClassType,
-		const tchar_t* pName
-		);
-
-	bool
-	GetClassMember (
-		const CValue& OpValue,
-		CClassType* pClassType,
 		const tchar_t* pName,
 		CValue* pResultValue
 		);

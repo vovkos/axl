@@ -9,7 +9,7 @@ namespace jnc {
 
 bool
 COperatorMgr::GetField (
-	CStructField* pMember,
+	CStructField* pField,
 	CBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
@@ -18,20 +18,20 @@ COperatorMgr::GetField (
 
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 
-	CNamespace* pParentNamespace = pMember->GetParentType ()->GetParentNamespace ();
-	ASSERT (pParentNamespace);
+	CNamespace* pParentNamespace = pField->GetParentType ()->GetParentNamespace ();
+	ENamespace NamespaceKind = pParentNamespace->GetNamespaceKind ();
 
-	if (pParentNamespace->GetNamespaceKind () == ENamespace_Property)
+	if (NamespaceKind == ENamespace_Property)
 	{
 		CProperty* pProperty = (CProperty*) pParentNamespace;
-		if (pMember->GetStorageKind () == EStorage_Static)
+		if (pField->GetStorageKind () == EStorage_Static)
 		{
 			CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
 			ASSERT (pStaticVariable);
 
 			return GetStructField (
 				pStaticVariable, 
-				pMember,
+				pField,
 				pCoord,
 				pResultValue
 				);
@@ -59,22 +59,22 @@ COperatorMgr::GetField (
 
 		return GetStructField (
 			FieldValue, 
-			pMember,
+			pField,
 			pCoord,
 			pResultValue
 			);
 	}
-	else if (pParentNamespace->GetNamespaceKind () == ENamespace_AutoEv)
+	else if (NamespaceKind == ENamespace_AutoEv)
 	{
 		CAutoEv* pAutoEv = (CAutoEv*) pParentNamespace;
-		if (pMember->GetStorageKind () == EStorage_Static)
+		if (pField->GetStorageKind () == EStorage_Static)
 		{
 			CVariable* pStaticVariable = pAutoEv->GetStaticDataVariable ();
 			ASSERT (pStaticVariable);
 
 			return GetStructField (
 				pStaticVariable, 
-				pMember,
+				pField,
 				pCoord,
 				pResultValue
 				);
@@ -102,23 +102,18 @@ COperatorMgr::GetField (
 
 		return GetStructField (
 			FieldValue, 
-			pMember,
+			pField,
 			pCoord,
 			pResultValue
 			);
 	}
-	else
+	else if (NamespaceKind == ENamespace_Type)
 	{
-		ASSERT (pParentNamespace->GetNamespaceKind () == ENamespace_Type && ((CNamedType*) pParentNamespace)->GetTypeKind () == EType_Class);
+		ASSERT (((CNamedType*) pParentNamespace)->GetTypeKind () == EType_Class);
 		CClassType* pClassType = (CClassType*) pParentNamespace;
 
-		if (pMember->GetStorageKind () == EStorage_Static)
-			return GetStructField (
-				pClassType->GetStaticDataVariable (), 
-				pMember,
-				pCoord,
-				pResultValue
-				);
+		if (pField->GetStorageKind () == EStorage_Static)
+			return GetStructField (pClassType->GetStaticDataVariable (), pField, pCoord, pResultValue);	
 
 		if (!ThisValue)
 		{
@@ -126,12 +121,20 @@ COperatorMgr::GetField (
 			return false;
 		}
 
-		return GetClassField (
-			ThisValue, 
-			pMember,
-			pCoord,
-			pResultValue
-			);	
+		return GetClassField (ThisValue, pField, pCoord, pResultValue);	
+	}
+	else
+	{
+		if (pField->GetStorageKind () == EStorage_Static)
+			return GetNamedTypeStaticField (pField->GetParentType (), pField, pCoord, pResultValue);	
+
+		if (!ThisValue)
+		{
+			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
+			return false;
+		}
+
+		return GetNamedTypeField (ThisValue, pField->GetParentType (), pField, pCoord, pResultValue);	
 	}
 }
 
@@ -167,10 +170,8 @@ COperatorMgr::GetMemberOperatorResultType (
 	switch (TypeKind)
 	{
 	case EType_Struct:
-		return GetStructMemberType (OpValue, (CStructType*) pType, pName);
-
 	case EType_Union:
-		return GetUnionMemberType (OpValue, (CUnionType*) pType, pName);
+		return GetNamedTypeMemberType (OpValue, (CNamedType*) pType, pName);
 
 	case EType_Multicast:
 		return GetMulticastMemberType (OpValue, (CMulticastType*) pType, pName);
@@ -180,12 +181,421 @@ COperatorMgr::GetMemberOperatorResultType (
 
 	case EType_ClassPtr:
 		PrepareOperandType (&OpValue);
-		return GetClassMemberType (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName);
+		return GetNamedTypeMemberType (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName);
 
 	default:
 		err::SetFormatStringError (_T("member operator cannot be applied to '%s'"), pType->GetTypeString ());
 		return false;
 	}
+}
+
+CType*
+COperatorMgr::GetNamedTypeMemberType (
+	const CValue& OpValue,
+	CNamedType* pNamedType,
+	const tchar_t* pName
+	)
+{
+	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, NULL, ETraverse_NoParentNamespace);	
+	if (!pMember)
+	{
+		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pNamedType->GetTypeString ());
+		return false;
+	}
+
+	EModuleItem MemberKind = pMember->GetItemKind ();
+	switch (MemberKind)
+	{
+	case EModuleItem_StructField:
+		return GetFieldType (OpValue, (CStructField*) pMember);
+		
+	case EModuleItem_Function:
+		return ((CFunction*) pMember)->GetType ()->GetShortType ()->GetFunctionPtrType (
+			EType_FunctionRef, 
+			EFunctionPtrType_Thin
+			);
+
+	case EModuleItem_Property:
+		return ((CProperty*) pMember)->GetType ()->GetShortType ()->GetPropertyPtrType (
+			EType_PropertyRef, 
+			EPropertyPtrType_Thin
+			);
+
+	case EModuleItem_AutoEv:
+		return ((CAutoEv*) pMember)->GetType ()->GetShortType ()->GetAutoEvPtrType (
+			EType_AutoEvRef, 
+			EAutoEvPtrType_Thin
+			);
+
+	default:
+		err::SetFormatStringError (_T("invalid member kind '%s'"), GetModuleItemKindString (MemberKind));
+		return false;
+	}
+}
+
+bool
+COperatorMgr::GetNamedTypeMember (
+	const CValue& OpValue,
+	CNamedType* pNamedType,
+	const tchar_t* pName,
+	CValue* pResultValue
+	)
+{
+	CBaseTypeCoord Coord;
+	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);	
+	if (!pMember)
+	{
+		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pNamedType->GetTypeString ());
+		return false;
+	}
+
+	CModuleItemDecl* pDecl = pMember->GetItemDecl ();
+	if (pDecl->GetAccessKind () != EAccess_Public &&
+		m_pModule->m_NamespaceMgr.GetAccessKind (Coord.m_pType) == EAccess_Public)
+	{
+		err::SetFormatStringError (_T("'%s.%s' is protected"), Coord.m_pType->GetQualifiedName (), pName);
+		return false;
+	}
+
+	EModuleItem MemberKind = pMember->GetItemKind ();
+	switch (MemberKind)
+	{
+	case EModuleItem_StructField:
+		return GetNamedTypeField (OpValue, pNamedType, (CStructField*) pMember, &Coord, pResultValue);
+	
+	case EModuleItem_Function:
+		pResultValue->SetFunction ((CFunction*) pMember);
+		break;
+
+	case EModuleItem_Property:
+		pResultValue->SetProperty ((CProperty*) pMember);
+		break;
+
+	case EModuleItem_AutoEv:
+		pResultValue->SetAutoEv ((CAutoEv*) pMember);
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid class member kind"));
+		return false;
+	}
+
+	if (pDecl->GetStorageKind () == EStorage_Static)
+		return true;
+	
+	CValue ThisArgValue = OpValue;
+	if (pNamedType->GetTypeKind () != EType_Class)
+	{
+		bool Result = UnaryOperator (EUnOp_Addr, &ThisArgValue);
+		if (!Result)
+			return false;
+	}
+
+	CClosure* pClosure = pResultValue->CreateClosure ();
+	pClosure->GetArgList ()->InsertHead (ThisArgValue);
+	return true;
+}
+
+bool
+COperatorMgr::GetNamedTypeField (
+	const CValue& OpValue,
+	CNamedType* pNamedType,
+	CStructField* pField,
+	CBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	EType TypeKind = pNamedType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_Struct:
+		return GetStructField (OpValue, pField, pCoord,	pResultValue);
+
+	case EType_Union:
+		return GetUnionField (OpValue, pField, pResultValue);
+
+	case EType_Class:
+		return GetClassField (OpValue, pField, pCoord, pResultValue);
+
+	default:
+		err::SetFormatStringError (_T("cannot get a field member of '%s'"), pNamedType->GetTypeString ());
+		return false;
+	}
+}
+
+bool
+COperatorMgr::GetNamedTypeStaticField (
+	CNamedType* pNamedType,
+	CStructField* pField,
+	CBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	CVariable* pStaticDataVariable;
+
+	EType TypeKind = pNamedType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	//case EType_Struct:
+	//	pStaticDataVariable = ((CStructType*) pNamedType)->GetStaticDataVariable ();
+	//	break;
+
+	case EType_Class:
+		pStaticDataVariable = ((CClassType*) pNamedType)->GetStaticDataVariable ();
+		break;
+
+	default:
+		err::SetFormatStringError (_T("cannot get a field member of '%s'"), pNamedType->GetTypeString ());
+		return false;
+	}
+
+	return GetStructField (pStaticDataVariable, pField, pCoord, pResultValue);
+}
+
+bool
+COperatorMgr::GetStructField (
+	const CValue& OpValue,
+	CStructField* pField,
+	CBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	CBaseTypeCoord Coord;
+	if (!pCoord)
+		pCoord = &Coord;
+
+	pCoord->m_LlvmIndexArray.Append (pField->GetLlvmIndex ());
+	pCoord->m_Offset += pField->GetOffset ();
+	
+	EValue OpValueKind = OpValue.GetValueKind ();
+	if (OpValueKind == EValue_Const)
+	{
+		pResultValue->CreateConst (
+			(char*) OpValue.GetConstData () + pCoord->m_Offset,
+			pField->GetType () 
+			);
+
+		return true;
+	}
+
+	if (OpValue.GetType ()->GetTypeKind () == EType_Struct)
+	{
+		m_pModule->m_LlvmBuilder.CreateExtractValue (
+			OpValue, 
+			pCoord->m_LlvmIndexArray, 
+			pCoord->m_LlvmIndexArray.GetCount (),
+			pField->GetType (),
+			pResultValue
+			);
+
+		return true;
+	}
+
+	ASSERT (OpValue.GetType ()->IsDataPtrType ());
+	CDataPtrType* pOpType = (CDataPtrType*) OpValue.GetType ();
+
+	pCoord->m_LlvmIndexArray.Insert (0, 0);
+
+	CDataPtrType* pPtrType;
+	int PtrTypeFlags = pOpType->GetFlags () | pField->GetPtrTypeFlags ();
+	
+	CValue PtrValue;
+
+	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
+	switch (PtrTypeKind)
+	{
+	case EDataPtrType_Unsafe:
+		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, PtrTypeFlags);
+
+		m_pModule->m_LlvmBuilder.CreateGep (
+			OpValue, 
+			pCoord->m_LlvmIndexArray, 
+			pCoord->m_LlvmIndexArray.GetCount (), 
+			pPtrType, 
+			pResultValue
+			);
+		break;
+
+	case EDataPtrType_Thin:
+		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+
+		m_pModule->m_LlvmBuilder.CreateGep (
+			OpValue, 
+			pCoord->m_LlvmIndexArray, 
+			pCoord->m_LlvmIndexArray.GetCount (), 
+			NULL, 
+			&PtrValue
+			);
+
+		if (OpValue.GetValueKind () == EValue_Variable)
+			pResultValue->SetThinDataPtr (
+				PtrValue.GetLlvmValue (), 
+				pPtrType,
+				OpValue
+				);
+		else
+			pResultValue->SetThinDataPtr (
+				PtrValue.GetLlvmValue (), 
+				pPtrType,
+				OpValue.GetClosure ()
+				);
+		break;
+
+	case EDataPtrType_Normal:
+		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+
+		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+
+		m_pModule->m_LlvmBuilder.CreateGep (
+			PtrValue, 
+			pCoord->m_LlvmIndexArray, 
+			pCoord->m_LlvmIndexArray.GetCount (), 
+			NULL, 
+			&PtrValue
+			);
+
+		pResultValue->SetThinDataPtr (
+			PtrValue.GetLlvmValue (), 
+			pPtrType,
+			OpValue
+			);
+
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	return true;
+}
+
+;
+
+bool
+COperatorMgr::GetUnionField (
+	const CValue& OpValue,
+	CStructField* pField,
+	CValue* pResultValue
+	)
+{
+	EValue OpValueKind = OpValue.GetValueKind ();
+	if (OpValueKind == EValue_Const)
+	{
+		pResultValue->CreateConst (OpValue.GetConstData (), pField->GetType ());
+		return true;
+	}
+
+	if (OpValue.GetType ()->GetTypeKind () != EType_DataRef)
+	{
+		err::SetFormatStringError (_T("union member operator on registers is not implemented yet"));
+		return false;
+	}
+
+	CDataPtrType* pOpType = (CDataPtrType*) OpValue.GetType ();
+
+	CDataPtrType* pPtrType;
+	int PtrTypeFlags = pOpType->GetFlags () | pField->GetPtrTypeFlags ();
+	
+	CValue PtrValue;
+
+	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
+	switch (PtrTypeKind)
+	{
+	case EDataPtrType_Unsafe:
+		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, PtrTypeFlags);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pPtrType, pResultValue);
+		break;
+
+	case EDataPtrType_Thin:
+		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
+
+		if (OpValue.GetValueKind () == EValue_Variable)
+			pResultValue->SetThinDataPtr (
+				PtrValue.GetLlvmValue (), 
+				pPtrType,
+				OpValue
+				);
+		else
+			pResultValue->SetThinDataPtr (
+				PtrValue.GetLlvmValue (), 
+				pPtrType,
+				OpValue.GetClosure ()
+				);
+		break;
+
+	case EDataPtrType_Normal:
+		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+
+		pPtrType = pField->GetType ()->GetDataPtrType (EDataPtrType_Unsafe);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
+
+		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+
+		pResultValue->SetThinDataPtr (
+			PtrValue.GetLlvmValue (), 
+			pPtrType,
+			OpValue
+			);
+
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	return true;
+}
+
+bool
+COperatorMgr::GetClassField (
+	const CValue& OpValue,
+	CStructField* pMember,
+	CBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
+	CClassType* pClassType = (CClassType*) pMember->GetParentType ()->GetParentNamespace ();
+
+	CBaseTypeCoord Coord;
+	if (!pCoord)
+		pCoord = &Coord;
+
+	pCoord->m_LlvmIndexArray.Insert (0, 0);
+	pCoord->m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+
+	CValue PtrValue;
+	m_pModule->m_LlvmBuilder.CreateGep (
+		OpValue, 
+		pCoord->m_LlvmIndexArray, 
+		pCoord->m_LlvmIndexArray.GetCount (), 
+		NULL,
+		&PtrValue
+		);
+
+	int PtrTypeFlags = pMember->GetPtrTypeFlags ();
+	
+	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && !(PtrTypeFlags & EPtrTypeFlag_Mutable) ||
+		(PtrTypeFlags & EPtrTypeFlag_ReadOnly) && m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
+	{
+		PtrTypeFlags |= EPtrTypeFlag_Const;
+	}
+
+	CDataPtrType* pPtrType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+
+	pResultValue->SetThinDataPtr (
+		PtrValue.GetLlvmValue (), 
+		pPtrType,
+		PtrValue, 
+		pMember->GetType ()->GetSize (),
+		OpValue
+		);
+
+	return true;
 }
 
 bool
@@ -237,21 +647,19 @@ COperatorMgr::MemberOperator (
 	switch (TypeKind)
 	{
 	case EType_Struct:
-		return GetStructMember (OpValue, (CStructType*) pType, pName, pResultValue);
-
 	case EType_Union:
-		return GetUnionMember (OpValue, (CUnionType*) pType, pName, pResultValue);
+		return GetNamedTypeMember (OpValue, (CNamedType*) pType, pName, pResultValue);
+
+	case EType_ClassPtr:
+		return 
+			PrepareOperand (&OpValue) &&
+			GetNamedTypeMember (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName, pResultValue);
 
 	case EType_Multicast:
 		return GetMulticastMember (OpValue, (CMulticastType*) pType, pName, pResultValue);
 
 	case EType_AutoEv:
 		return GetAutoEvMember (OpValue, (CAutoEvType*) pType, pName, pResultValue);
-
-	case EType_ClassPtr:
-		return 
-			PrepareOperand (&OpValue) &&
-			GetClassMember (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName, pResultValue);
 
 	default:
 		err::SetFormatStringError (_T("member operator cannot be applied to '%s'"), pType->GetTypeString ());
@@ -292,294 +700,6 @@ COperatorMgr::GetFunctionType (
 		return pFunctionPtrType;
 
 	return GetClosureOperatorResultType (pFunctionPtrType, pClosure->GetArgList ());
-}
-
-CType*
-COperatorMgr::GetStructMemberType (
-	const CValue& OpValue,
-	CStructType* pStructType,
-	const tchar_t* pName
-	)
-{
-	CBaseTypeCoord Coord;
-	CModuleItem* pMember = pStructType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pStructType->GetTypeString ());
-		return false;
-	}
-
-	EModuleItem ItemKind = pMember->GetItemKind ();
-	switch (ItemKind)
-	{
-	case EModuleItem_StructField:
-		return GetFieldType (OpValue, (CStructField*) pMember);
-
-	default:
-		err::SetFormatStringError (_T("non-field members structs are not supported yet"));
-		return false;
-	}
-}
-
-bool
-COperatorMgr::GetStructMember (
-	const CValue& OpValue,
-	CStructType* pStructType,
-	const tchar_t* pName,
-	CValue* pResultValue
-	)
-{
-	CBaseTypeCoord Coord;
-	CModuleItem* pMember = pStructType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pStructType->GetTypeString ());
-		return false;
-	}
-
-	EModuleItem ItemKind = pMember->GetItemKind ();
-	switch (ItemKind)
-	{
-	case EModuleItem_StructField:
-		return GetStructField (OpValue, (CStructField*) pMember, &Coord, pResultValue);
-
-	default:
-		err::SetFormatStringError (_T("non-field members in structs are not supported yet"));
-		return false;
-	}
-}
-
-bool
-COperatorMgr::GetStructField (
-	const CValue& OpValue,
-	CStructField* pField,
-	CBaseTypeCoord* pCoord,
-	CValue* pResultValue
-	)
-{
-	CBaseTypeCoord Coord;
-	if (!pCoord)
-		pCoord = &Coord;
-
-	pCoord->m_LlvmIndexArray.Append (pField->GetLlvmIndex ());
-	pCoord->m_Offset += pField->GetOffset ();
-	
-	EValue OpValueKind = OpValue.GetValueKind ();
-	if (OpValueKind == EValue_Const)
-	{
-		pResultValue->CreateConst (
-			(char*) OpValue.GetConstData () + pCoord->m_Offset,
-			pField->GetType () 
-			);
-
-		return true;
-	}
-
-	if (OpValue.GetType ()->GetTypeKind () != EType_DataRef)
-	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (
-			OpValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (),
-			pField->GetType (),
-			pResultValue
-			);
-
-		return true;
-	}
-
-	CDataPtrType* pOpType = (CDataPtrType*) OpValue.GetType ();
-
-	pCoord->m_LlvmIndexArray.Insert (0, 0);
-
-	if (pOpType->GetPtrTypeKind () == EDataPtrType_Unsafe)
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, pField->GetPtrTypeFlags ());
-
-		m_pModule->m_LlvmBuilder.CreateGep (
-			OpValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (), 
-			pResultType, 
-			pResultValue
-			);
-
-		return true;
-	}
-	
-	ASSERT (pOpType->GetTypeKind () == EType_DataRef);
-
-	if (OpValue.GetValueKind () == EValue_Variable)
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pField->GetPtrTypeFlags ());
-
-		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateGep (
-			OpValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (), 
-			NULL, 
-			&PtrValue
-			);
-		
-		pResultValue->SetVariable (
-			PtrValue.GetLlvmValue (), 
-			pResultType,
-			OpValue.GetVariable (), 
-			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate 
-			);
-	}
-	else if (OpValue.GetValueKind () == EValue_Field)
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pField->GetPtrTypeFlags ());
-
-		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateGep (
-			OpValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (), 
-			NULL, 
-			&PtrValue
-			);
-		
-		pResultValue->SetField (
-			PtrValue.GetLlvmValue (), 
-			pResultType,
-			OpValue.GetField (), 
-			OpValue.GetClosure (),
-			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate 
-			);
-	}
-	else
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Normal, pField->GetPtrTypeFlags ());
-
-		CValue PtrValue;
-		CValue ValidatorValue;
-
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &ValidatorValue);
-		m_pModule->m_LlvmBuilder.CreateGep (
-			PtrValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (), 
-			NULL, 
-			&PtrValue
-			);
-
-		CValue DataPtrValue = pResultType->GetUndefValue ();
-		m_pModule->m_LlvmBuilder.CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
-	}
-
-	return true;
-}
-
-CType*
-COperatorMgr::GetUnionMemberType (
-	const CValue& OpValue,
-	CUnionType* pUnionType,
-	const tchar_t* pName
-	)
-{
-	CModuleItem* pMember = pUnionType->FindItem (pName);
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pUnionType->GetTypeString ());
-		return false;
-	}
-
-	EModuleItem ItemKind = pMember->GetItemKind ();
-	switch (ItemKind)
-	{
-	case EModuleItem_StructField:
-		return GetFieldType (OpValue, (CStructField*) pMember);
-
-	default:
-		err::SetFormatStringError (_T("non-field members in unions are not supported yet"));
-		return false;
-	}
-}
-
-bool
-COperatorMgr::GetUnionMember (
-	const CValue& OpValue,
-	CUnionType* pUnionType,
-	const tchar_t* pName,
-	CValue* pResultValue
-	)
-{
-	CModuleItem* pMember = pUnionType->FindItem (pName);
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pUnionType->GetTypeString ());
-		return false;
-	}
-
-	EModuleItem ItemKind = pMember->GetItemKind ();
-	switch (ItemKind)
-	{
-	case EModuleItem_StructField:
-		return GetUnionField (OpValue, (CStructField*) pMember, pResultValue);
-
-	default:
-		err::SetFormatStringError (_T("non-field members in unions are not supported yet"));
-		return false;
-	}
-}
-
-bool
-COperatorMgr::GetUnionField (
-	const CValue& OpValue,
-	CStructField* pField,
-	CValue* pResultValue
-	)
-{
-	EValue OpValueKind = OpValue.GetValueKind ();
-	if (OpValueKind == EValue_Const)
-	{
-		pResultValue->CreateConst (OpValue.GetConstData (), pField->GetType ());
-		return true;
-	}
-
-	if (OpValue.GetType ()->GetTypeKind () != EType_DataRef)
-	{
-		err::SetFormatStringError (_T("union member operator on registers is not implemented yet"));
-		return false;
-	}
-
-	CDataPtrType* pOpType = (CDataPtrType*) OpValue.GetType ();
-
-	if (pOpType->GetPtrTypeKind () == EDataPtrType_Unsafe)
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, pField->GetPtrTypeFlags ());
-
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pResultType, pResultValue);
-		return true;
-	}
-	
-	if (OpValue.GetValueKind () == EValue_Variable)
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pField->GetPtrTypeFlags ());
-
-		CType* pCastType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe);
-		CValue CastValue;
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pCastType, &CastValue);
-
-		pResultValue->SetVariable (
-			CastValue.GetLlvmValue (), 
-			pResultType,
-			OpValue.GetVariable (), 
-			OpValue.GetFlags () & EValueFlag_NoDataPtrRangeCheck // propagate trusted flag
-			);
-	}
-	else
-	{
-		CType* pResultType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Normal, pField->GetPtrTypeFlags ());
-		pResultValue->OverrideType (OpValue, pResultType);
-	}
-
-	return true;
 }
 
 CType*
@@ -693,166 +813,6 @@ COperatorMgr::GetAutoEvMember (
 
 	pResultValue->SetFunction (pFunction);
 	pResultValue->SetClosure (OpValue.GetClosure ());
-	return true;
-}
-
-CType*
-COperatorMgr::GetClassMemberType (
-	const CValue& OpValue,
-	CClassType* pClassType,
-	const tchar_t* pName
-	)
-{
-	CBaseTypeCoord Coord;
-	CModuleItem* pMember = pClassType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);	
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pClassType->GetTypeString ());
-		return false;
-	}
-
-	EModuleItem MemberKind = pMember->GetItemKind ();
-	switch (MemberKind)
-	{
-	case EModuleItem_StructField:
-		return GetFieldType (OpValue, (CStructField*) pMember	);
-		
-	case EModuleItem_Function:
-		return ((CFunction*) pMember)->GetType ()->GetShortType ()->GetFunctionPtrType (
-			EType_FunctionRef, 
-			EFunctionPtrType_Thin
-			);
-
-	case EModuleItem_Property:
-		return ((CProperty*) pMember)->GetType ()->GetShortType ()->GetPropertyPtrType (
-			EType_PropertyRef, 
-			EPropertyPtrType_Thin
-			);
-
-	case EModuleItem_AutoEv:
-		return ((CAutoEv*) pMember)->GetType ()->GetShortType ()->GetAutoEvPtrType (
-			EType_AutoEvRef, 
-			EAutoEvPtrType_Thin
-			);
-
-	default:
-		err::SetFormatStringError (_T("invalid class member kind"));
-		return false;
-	}
-}
-
-bool
-COperatorMgr::GetClassMember (
-	const CValue& OpValue,
-	CClassType* pClassType,
-	const tchar_t* pName,
-	CValue* pResultValue
-	)
-{
-	CBaseTypeCoord Coord;
-	CModuleItem* pMember = pClassType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);	
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' is not a member of '%s'"), pName, pClassType->GetTypeString ());
-		return false;
-	}
-
-	CModuleItemDecl* pDecl = pMember->GetItemDecl ();
-	if (pDecl->GetAccessKind () != EAccess_Public &&
-		m_pModule->m_NamespaceMgr.GetAccessKind (Coord.m_pType) == EAccess_Public)
-	{
-		err::SetFormatStringError (_T("'%s.%s' is protected"), Coord.m_pType->GetQualifiedName (), pName);
-		return false;
-	}
-
-	CheckClassPtrNull (OpValue);
-
-	EModuleItem MemberKind = pMember->GetItemKind ();
-	switch (MemberKind)
-	{
-	case EModuleItem_StructField:
-		return GetClassField (
-			OpValue, 
-			(CStructField*) pMember, 
-			&Coord,
-			pResultValue
-			);
-		
-	case EModuleItem_Function:
-		pResultValue->SetFunction ((CFunction*) pMember);
-		break;
-
-	case EModuleItem_Property:
-		pResultValue->SetProperty ((CProperty*) pMember);
-		break;
-
-	case EModuleItem_AutoEv:
-		pResultValue->SetAutoEv ((CAutoEv*) pMember);
-		break;
-
-	default:
-		err::SetFormatStringError (_T("invalid class member kind"));
-		return false;
-	}
-
-	if (pDecl->GetStorageKind () == EStorage_Static)
-		return true;
-	
-	CClosure* pClosure = pResultValue->CreateClosure ();
-	pClosure->GetArgList ()->InsertHead (OpValue);
-	return true;
-}
-
-bool
-COperatorMgr::GetClassField (
-	const CValue& OpValue,
-	CStructField* pMember,
-	CBaseTypeCoord* pCoord,
-	CValue* pResultValue
-	)
-{
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pClassType = (CClassType*) pMember->GetParentType ()->GetParentNamespace ();
-
-	CBaseTypeCoord Coord;
-	if (!pCoord)
-		pCoord = &Coord;
-
-	pCoord->m_LlvmIndexArray.Insert (0, 0);
-	pCoord->m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
-
-	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateGep (
-		OpValue, 
-		pCoord->m_LlvmIndexArray, 
-		pCoord->m_LlvmIndexArray.GetCount (), 
-		NULL,
-		&PtrValue
-		);
-
-	int PtrTypeFlags = pMember->GetPtrTypeFlags ();
-	
-	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && !(PtrTypeFlags & EPtrTypeFlag_Mutable) ||
-		(PtrTypeFlags & EPtrTypeFlag_ReadOnly) && m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
-	{
-		PtrTypeFlags |= EPtrTypeFlag_Const;
-	}
-
-	CDataPtrType* pResultType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
-
-	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
-	Closure->GetArgList ()->InsertTail (OpValue);
-	Closure->GetArgList ()->InsertTail (PtrValue);
-	Closure->GetArgList ()->InsertTail (CValue (pMember->GetType ()->GetSize (), EType_SizeT));
-
-	pResultValue->SetField (
-		PtrValue.GetLlvmValue (),
-		pResultType,
-		pMember,
-		Closure,
-		EValueFlag_NoDataPtrRangeCheck
-		);
-
 	return true;
 }
 

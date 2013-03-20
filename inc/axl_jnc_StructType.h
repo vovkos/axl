@@ -87,6 +87,12 @@ protected:
 	size_t m_FieldActualSize;
 	size_t m_FieldAlignedSize;
 
+	// construction (no destruction)
+
+	CFunction* m_pPreConstructor;
+	CFunction* m_pConstructor;
+	CFunction* m_pStaticConstructor;
+
 	rtl::CStdListT <CStructField> m_FieldList;
 	rtl::CArrayT <CStructField*> m_InitializedFieldArray;
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;

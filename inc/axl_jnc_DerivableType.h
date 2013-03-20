@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_NamedType.h"
 
 namespace axl {
 namespace jnc {
@@ -12,6 +12,8 @@ namespace jnc {
 class CDerivableType;
 class CStructType;
 class CClassType;
+class CFunction;
+class CProperty;
 
 //.............................................................................
 
@@ -68,6 +70,12 @@ public:
 	{
 		return m_VTableIndex;
 	}
+
+	void
+	MarkConstructed ()
+	{
+		m_Flags |= EBaseTypeFlag_Constructed;
+	}
 };
 
 //.............................................................................
@@ -108,7 +116,21 @@ protected:
 	rtl::CStringHashTableMapAT <CBaseType*> m_BaseTypeMap;
 	rtl::CStdListT <CBaseType> m_BaseTypeList;
 	
+	// construction
+
+	CFunction* m_pPreConstructor;
+	CFunction* m_pConstructor;
+	CFunction* m_pStaticConstructor;
+
+	// overloaded operators
+
+	rtl::CArrayT <CFunction*> m_UnaryOperatorTable;
+	rtl::CArrayT <CFunction*> m_BinaryOperatorTable;
+	rtl::CStringHashTableMapAT <CFunction*> m_CastOperatorMap;
+
 public:
+	CDerivableType ();
+
 	rtl::CConstListT <CBaseType>
 	GetBaseTypeList ()
 	{
@@ -135,13 +157,34 @@ public:
 	}
 
 	void
-	MarkConstructed (CBaseType* pBaseType)
+	ClearAllBaseTypeConstructedFlags ();
+
+	CFunction* 
+	GetPreConstructor ()
 	{
-		pBaseType->m_Flags |= EBaseTypeFlag_Constructed;
+		return m_pPreConstructor;
 	}
 
-	void
-	ClearConstructedFlag ();
+	CFunction* 
+	GetConstructor ()
+	{
+		return m_pConstructor;
+	}
+
+	CFunction* 
+	GetDefaultConstructor ();
+
+	CFunction* 
+	GetStaticConstructor ()
+	{
+		return m_pStaticConstructor;
+	}
+
+	bool
+	AddMethod (CFunction* pFunction);
+
+	bool
+	AddProperty (CProperty* pProperty);
 
 protected:
 	bool

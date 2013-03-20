@@ -44,7 +44,8 @@ void
 COperatorMgr::CheckDataPtrRange (
 	const CValue& RawPtrValue,
 	size_t Size,
-	const CValue& ValidatorValue,
+	const CValue& RangeBeginValue,
+	const CValue& RangeEndValue,
 	ERuntimeError Error
 	)
 {
@@ -56,15 +57,22 @@ COperatorMgr::CheckDataPtrRange (
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateBitCast (RawPtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
-	CFunction* pCheckDataPtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckDataPtrRange);
-
-	m_pModule->m_LlvmBuilder.CreateCall4 (
-		pCheckDataPtrRange,
-		pCheckDataPtrRange->GetType (),
+	CValue ArgValueArray [] = 
+	{
 		PtrValue,
 		SizeValue,
-		ValidatorValue,
+		RangeBeginValue,
+		RangeEndValue,
 		ErrorValue,
+	};
+
+	CFunction* pCheckDataPtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckDataPtrRange);
+
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pCheckDataPtrRange,
+		pCheckDataPtrRange->GetType (),
+		ArgValueArray,
+		countof (ArgValueArray),
 		NULL
 		);
 }

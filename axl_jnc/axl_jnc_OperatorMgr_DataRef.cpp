@@ -8,25 +8,16 @@ namespace jnc {
 //.............................................................................
 
 void
-COperatorMgr::GetThinDataPtrScopeLevel (
+COperatorMgr::GetClassPtrScopeLevel (
 	const CValue& Value,
 	CValue* pResultValue
 	)
 {
-	EValue ValueKind = Value.GetValueKind ();
-	if (ValueKind == EValue_Variable)
-	{	
-		CalcScopeLevelValue (Value.GetVariable ()->GetScope (), pResultValue);
-		return;
-	}
-
-	ASSERT (ValueKind == EValue_Field && Value.GetClosure ());
-
-	CValue ClassPtrValue = *Value.GetClosure ()->GetArgList ()->GetHead ();
+	ASSERT (Value.GetType ()->GetTypeKind () == EType_ClassPtr);
 
 	CValue ObjPtrValue;
 	
-	size_t ObjPtrIndexArray [] = 
+	static size_t LlvmIndexArray [] = 
 	{
 		0, // iface* 
 		0, // iface.hdr*
@@ -34,9 +25,9 @@ COperatorMgr::GetThinDataPtrScopeLevel (
 	};
 
 	m_pModule->m_LlvmBuilder.CreateGep (
-		ClassPtrValue, 
-		ObjPtrIndexArray, 
-		countof (ObjPtrIndexArray), 
+		Value, 
+		LlvmIndexArray, 
+		countof (LlvmIndexArray), 
 		NULL, 
 		&ObjPtrValue
 		);  
@@ -50,6 +41,154 @@ COperatorMgr::GetThinDataPtrScopeLevel (
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
 		pResultValue
 		); 
+}
+
+void
+COperatorMgr::GetThinDataPtrScopeLevel (
+	const CValue& Value,
+	CValue* pResultValue
+	)
+{
+	ASSERT (Value.GetType ()->IsDataPtrType ());
+
+	EValue ValueKind = Value.GetValueKind ();
+	if (ValueKind == EValue_Variable)
+	{	
+		CalcScopeLevelValue (Value.GetVariable ()->GetScope (), pResultValue);
+		return;
+	}
+
+	ASSERT (Value.GetClosure ());
+	CValue ScopeValidatorValue = *Value.GetClosure ()->GetArgList ()->GetTail ();
+
+	if (ScopeValidatorValue.GetValueKind () == EValue_Variable)
+	{
+		CalcScopeLevelValue (ScopeValidatorValue.GetVariable ()->GetScope (), pResultValue);
+		return;
+	}
+	
+	EType TypeKind = ScopeValidatorValue.GetType ()->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_SizeT:
+		*pResultValue = ScopeValidatorValue;
+		break;
+
+	case EType_DataPtr:
+		ASSERT (((CDataPtrType*) ScopeValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (ScopeValidatorValue, 3, CGetType (m_pModule, EType_SizeT), pResultValue);
+		break;
+
+	case EType_ClassPtr:
+		GetClassPtrScopeLevel (Value, pResultValue);
+		break;
+
+	default:
+		ASSERT (false);
+	}
+}
+
+
+/*
+
+
+llvm::Value*
+CLlvmBuilder::CreateDataPtr (
+	const CValue& PtrValue,
+	const CValue& ValidatorValue,
+	CDataPtrType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CreateComment ("create safe pointer");
+	CValue DataPtrValue = pResultType->GetUndefValue ();
+	CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
+	return CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
+}
+
+llvm::Value*
+CLlvmBuilder::CreateDataPtr (
+	const CValue& PtrValue,
+	const CValue& RegionBeginValue,
+	size_t Size,
+	const CValue& ScopeLevelValue,
+	CDataPtrType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CValue ValidatorValue;
+	CreateDataPtrValidator (
+		RegionBeginValue,
+		CValue (Size, EType_SizeT),
+		ScopeLevelValue,
+		&ValidatorValue
+		);
+
+	return CreateDataPtr (PtrValue, ValidatorValue, pResultType, pResultValue);
+}
+
+llvm::Value*
+CLlvmBuilder::CreateDataPtr (
+	const CValue& PtrValue,
+	const CValue& RegionBeginValue,
+	size_t Size,
+	CScope* pScope,
+	CDataPtrType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CValue ScopeLevelValue = m_pModule->m_OperatorMgr.CalcScopeLevelValue (pScope);
+
+	return CreateDataPtr (
+		PtrValue,
+		RegionBeginValue,
+		Size,
+		ScopeLevelValue,
+		pResultType,
+		pResultValue
+		);
+}
+
+llvm::Value*
+CLlvmBuilder::ModifyDataPtr (
+	const CValue& SrcDataPtrValue,
+	const CValue& PtrValue,
+	CDataPtrType* pResultType,
+	CValue* pResultValue
+	)
+{
+	CreateComment ("modify safe pointer");
+
+	CValue ValidatorValue;
+	CreateExtractValue (SrcDataPtrValue, 0, NULL, &ValidatorValue);
+	
+	CValue DataPtrValue = pResultType->GetUndefValue ();
+	CreateInsertValue (DataPtrValue, PtrValue, 0, NULL, &DataPtrValue);
+	return CreateInsertValue (DataPtrValue, ValidatorValue, 1, pResultType, pResultValue);
+}
+
+llvm::Value*
+CLlvmBuilder::CreateDataPtrValidator (
+	const CValue& RawRegionBeginValue,
+	const CValue& SizeValue,
+	const CValue& ScopeLevelValue,
+	CValue* pResultValue
+	)
+{
+	CreateComment ("create safe pointer validator");
+
+	CValue RegionBeginValue;
+	CreateBitCast (RawRegionBeginValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &RegionBeginValue);
+
+	CValue RegionEndValue;
+	CreateGep (RegionBeginValue, SizeValue, NULL, &RegionEndValue);
+	
+	CType* pType = m_pModule->m_TypeMgr.GetStdType (EStdType_DataPtrValidator);
+
+	CValue ValidatorValue = pType->GetUndefValue ();
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionBeginValue, 0, NULL, &ValidatorValue);
+	m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, RegionEndValue, 1, NULL, &ValidatorValue);	
+	return m_pModule->m_LlvmBuilder.CreateInsertValue (ValidatorValue, ScopeLevelValue, 2, pType, pResultValue);
 }
 
 void
@@ -113,6 +252,60 @@ COperatorMgr::GetThinDataPtrValidator (
 		);
 }
 
+*/
+
+void
+COperatorMgr::GetThinDataPtrRange (
+	const CValue& Value,
+	CValue* pRangeBeginValue,
+	CValue* pRangeEndValue
+	)
+{
+	ASSERT (Value.GetType ()->IsDataPtrType ());
+
+	CType* pBytePtrType = CGetType (m_pModule, EStdType_BytePtr);
+
+	EValue ValueKind = Value.GetValueKind ();
+	if (ValueKind == EValue_Variable)
+	{	
+		size_t Size =  Value.GetVariable ()->GetType ()->GetSize ();
+		m_pModule->m_LlvmBuilder.CreateBitCast (Value, pBytePtrType, pRangeBeginValue);
+		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, Size, pBytePtrType, pRangeEndValue);
+		return;
+	}
+
+	CClosure* pClosure = Value.GetClosure ();
+	ASSERT (pClosure);
+
+	if (pClosure->GetArgList ()->GetCount () == 3)
+	{
+		rtl::CBoxIteratorT <CValue> It = pClosure->GetArgList ()->GetHead ();
+		CValue RangeBeginValue = *It++;
+		CValue SizeValue = *It++;
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (RangeBeginValue, pBytePtrType, pRangeBeginValue);
+		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, SizeValue.GetSizeT (), pBytePtrType, pRangeEndValue);
+		return;
+	}
+
+	CValue ValidatorValue = *pClosure->GetArgList ()->GetHead ();
+
+	if (ValidatorValue.GetValueKind () == EValue_Variable)
+	{
+		size_t Size = ValidatorValue.GetVariable ()->GetType ()->GetSize ();
+		m_pModule->m_LlvmBuilder.CreateBitCast (ValidatorValue, pBytePtrType, pRangeBeginValue);
+		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, Size, pBytePtrType, pRangeEndValue);
+		return;
+	}
+
+	ASSERT (
+		ValidatorValue.GetType ()->GetTypeKind () == EType_DataPtr &&
+		((CDataPtrType*) ValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
+
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ValidatorValue, 1, pBytePtrType, pRangeBeginValue);
+	m_pModule->m_LlvmBuilder.CreateExtractValue (ValidatorValue, 2, pBytePtrType, pRangeEndValue);		
+}
+
 bool
 COperatorMgr::PrepareDataPtr (
 	const CValue& Value,
@@ -127,7 +320,8 @@ COperatorMgr::PrepareDataPtr (
 	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType (EDataPtrType_Unsafe);
 
 	CValue PtrValue;
-	CValue ValidatorValue;	
+	CValue RangeBeginValue;	
+	CValue RangeEndValue;	
 
 	switch (PtrTypeKind)
 	{
@@ -136,26 +330,34 @@ COperatorMgr::PrepareDataPtr (
 		return true;
 
 	case EDataPtrType_Thin:
-		if (Value.GetFlags () & EValueFlag_NoDataPtrRangeCheck)
+		if (!(pType->GetFlags () & EPtrTypeFlag_Nullable))
 		{
 			pResultValue->OverrideType (Value, pResultType);
 			return true;
 		}
 
 		PtrValue.OverrideType (Value, pResultType);
-		GetThinDataPtrValidator (Value, &ValidatorValue);
+		GetThinDataPtrRange (Value, &RangeBeginValue, &RangeEndValue);
 		break;
 
 	case EDataPtrType_Normal:
 		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &ValidatorValue);
+
+		if (!(pType->GetFlags () & EPtrTypeFlag_Nullable))
+		{
+			*pResultValue = PtrValue;
+			return true;
+		}
+
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &RangeBeginValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 2, NULL, &RangeEndValue);
 		break;
 
 	default:
 		ASSERT (false);
 	}
 
-	CheckDataPtrRange (PtrValue, pType->GetTargetType ()->GetSize (), ValidatorValue, Error);
+	CheckDataPtrRange (PtrValue, pType->GetTargetType ()->GetSize (), RangeBeginValue, RangeEndValue, Error);
 	*pResultValue = PtrValue;
 	return true;
 }

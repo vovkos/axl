@@ -87,7 +87,7 @@ CControlFlowMgr::SwitchStmt_Condition (
 bool
 CControlFlowMgr::SwitchStmt_Case (
 	TSwitchStmt* pStmt,
-	const CValue& Value,
+	intptr_t Value,
 	const CToken::CPos& Pos1,
 	const CToken::CPos& Pos2
 	)

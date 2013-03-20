@@ -218,15 +218,20 @@ COperatorMgr::NewOperator (
 	}
 	else
 	{
-		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
-		m_pModule->m_LlvmBuilder.CreateDataPtr (
-			PtrValue, 
-			PtrValue, 
+		CValue ScopeLevelValue;
+
+		if (StorageKind == EStorage_Stack)
+			CalcScopeLevelValue (pScope, &ScopeLevelValue);
+		else
+			ScopeLevelValue.SetConstSizeT (0);
+		
+		pResultValue->SetThinDataPtr (
+			PtrValue.GetLlvmValue (),
+			pType->GetDataPtrType (EDataPtrType_Thin),
+			PtrValue,
 			pType->GetSize (),
-			pScope,
-			pType->GetDataPtrType (),
-			pResultValue
-			);			
+			ScopeLevelValue
+			);
 	}
 
 	return true;

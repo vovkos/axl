@@ -1,48 +1,37 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMyClass
+struct TPoint
 {
-	this ()
-	{
-		printf ("CMyClass.this (%x)\n", this);
-	}
+	int m_x;
+	int m_y;
 
-	~this ()
+	Setup (
+		int x,
+		int y
+		)
 	{
-		printf ("CMyClass.~this ()\n");
+		printf ("TPoint.Setup (%d, %d)\n", x, y);	
+
+		m_x = x;
+		m_y = y;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-int
-bar ()
-{
-	printf ("bar ()\n");
-	return 10;
-}
-
-foo ()
-{
-	static int x = bar ();
-
-	printf ("foo () { x = %d; } \n", x);
-	CMyClass c = static new CMyClass;		
-}
-
 int 
 main ()
 {
-	printf ("once & static new test\n");
+	printf ("struct / union members\n");
 
-	for (int i = 0; i < 5; i++)
-	{
-		printf ("i = %d\n", i);
+	TPoint p;
+	p.m_x = 1;
+	p.m_y = 2;
 
-		once printf ("once stmt\n");
+	p.Setup (10, 20);
 
-		foo ();
-	}
+
+	printf ("{ %d, %d }\n", p.m_x, p.m_y);
 
 	return 0; 
 }

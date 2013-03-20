@@ -76,10 +76,6 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = GetPrimitiveType (EType_Int8_u)->GetDataPtrType (EDataPtrType_Unsafe);
 		break;
 
-	case EStdType_DataPtrValidator:
-		pType = CreateDataPtrValidatorType ();
-		break;
-
 	case EStdType_ObjectHdr:
 		pType = CreateObjectHdrType ();
 		break;
@@ -460,12 +456,12 @@ CTypeMgr::GetFunctionType (
 
 CFunctionType* 
 CTypeMgr::GetMemberMethodType (
-	CClassType* pClassType,
+	CNamedType* pParentType,
 	CFunctionType* pFunctionType,
 	int ThisArgTypeFlags
 	)
 {
-	CClassPtrType* pThisArgType = pClassType->GetClassPtrType (EClassPtrType_Normal, ThisArgTypeFlags);
+	CType* pThisArgType = pParentType->GetThisArgType (ThisArgTypeFlags);
 
 	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
 	ArgTypeArray.Insert (0, pThisArgType);	
@@ -623,11 +619,11 @@ CTypeMgr::GetIndexedPropertyType (
 
 CPropertyType* 
 CTypeMgr::GetMemberPropertyType (
-	CClassType* pClassType,
+	CNamedType* pParentType,
 	CPropertyType* pPropertyType
 	)
 {
-	CFunctionType* pGetterType = GetMemberMethodType (pClassType, pPropertyType->m_pGetterType);
+	CFunctionType* pGetterType = GetMemberMethodType (pParentType, pPropertyType->m_pGetterType);
 
 	size_t SetterTypeOverloadCount = pPropertyType->m_SetterType.GetOverloadCount ();
 
@@ -638,7 +634,7 @@ CTypeMgr::GetMemberPropertyType (
 	for (size_t i = 0; i < SetterTypeOverloadCount; i++)
 	{
 		CFunctionType* pOverloadType = pPropertyType->m_SetterType.GetOverload (i);
-		SetterTypeOverloadArray [i] = GetMemberMethodType (pClassType, pOverloadType);
+		SetterTypeOverloadArray [i] = GetMemberMethodType (pParentType, pOverloadType);
 	}
 
 	CPropertyType* pMemberPropertyType = GetPropertyType (
@@ -1383,18 +1379,6 @@ CTypeMgr::SetupPrimitiveType (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CStructType* 
-CTypeMgr::CreateDataPtrValidatorType ()
-{
-	CStructType* pType = CreateUnnamedStructType ();
-	pType->m_Tag = _T("ptrvtor");
-	pType->CreateField (GetStdType (EStdType_BytePtr));
-	pType->CreateField (GetStdType (EStdType_BytePtr));
-	pType->CreateField (GetPrimitiveType (EType_SizeT));
-	pType->CalcLayout ();
-	return pType;
-}
-
 CStructType*
 CTypeMgr::CreateObjectHdrType ()
 {
@@ -1446,7 +1430,9 @@ CTypeMgr::CreateDataPtrStructType (CType* pBaseType)
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format (_T("%s.ptr"), pBaseType->GetTypeString ());
 	pType->CreateField (pBaseType->GetDataPtrType (EDataPtrType_Unsafe));
-	pType->CreateField (GetStdType (EStdType_DataPtrValidator));
+	pType->CreateField (GetStdType (EStdType_BytePtr));
+	pType->CreateField (GetStdType (EStdType_BytePtr));
+	pType->CreateField (GetPrimitiveType (EType_SizeT));
 	pType->CalcLayout ();
 	return pType;
 }

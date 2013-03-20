@@ -44,7 +44,8 @@ enum EStdFunc
 	// jnc.CheckDataPtrRange (
 	//		int8* p,
 	//		size_t Size,
-	//		jnc.sptrv Validator,
+	//		int8* pRangeBegin,
+	//		int8* pRangeEnd,
 	//		int Error
 	//		);
 

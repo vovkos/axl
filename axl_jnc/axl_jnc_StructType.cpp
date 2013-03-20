@@ -29,6 +29,9 @@ CStructType::CStructType ()
 	m_PackFactor = 8;
 	m_FieldActualSize = 0;
 	m_FieldAlignedSize = 0;
+	m_pPreConstructor = NULL;
+	m_pConstructor = NULL;
+	m_pStaticConstructor = NULL;
 	m_pLastBitFieldType = NULL;
 	m_LastBitFieldOffset = 0;
 }

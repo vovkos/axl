@@ -13,6 +13,9 @@ CUnionType::CUnionType ()
 	m_Flags = ETypeFlag_Pod;
 	m_pStructType = NULL;
 	m_pInitializedField = NULL;
+	m_pPreConstructor = NULL;
+	m_pConstructor = NULL;
+	m_pStaticConstructor = NULL;
 }
 
 CStructField*
