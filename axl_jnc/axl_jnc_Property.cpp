@@ -22,8 +22,8 @@ CProperty::CProperty ()
 	m_pGetter = NULL;
 	m_pSetter = NULL;
 
-	m_pParentClassType = NULL;
-	m_pParentClassField = NULL;
+	m_pParentType = NULL;
+	m_pParentTypeField = NULL;
 	m_ParentClassVTableIndex = -1;
 
 	m_PackFactor = 8;
@@ -68,7 +68,7 @@ CProperty::Create (CPropertyType* pType)
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pType->GetGetterType ());
 	pGetter->m_StorageKind = StorageKind;
 
-	if (m_pParentClassType)
+	if (m_pParentType)
 		pGetter->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 
 	Result = AddMethod (pGetter);
@@ -86,16 +86,16 @@ CProperty::Create (CPropertyType* pType)
 			return false;
 	}
 
-	m_pType = m_pParentClassType ? m_pParentClassType->GetMemberPropertyType (pType) : pType;
+	m_pType = m_pParentType ? m_pParentType->GetMemberPropertyType (pType) : pType;
 	return true;
 }
 
 void
-CProperty::ConvertToMemberProperty (CClassType* pClassType)
+CProperty::ConvertToMemberProperty (CNamedType* pParentType)
 {
-	ASSERT (!m_pParentClassType);
-	m_pParentClassType = pClassType;
-	m_pType = pClassType->GetMemberPropertyType (m_pType);
+	ASSERT (!m_pParentType);
+	m_pParentType = pParentType;
+	m_pType = pParentType->GetMemberPropertyType (m_pType);
 }
 
 CStructField*
@@ -109,7 +109,7 @@ CProperty::CreateField (
 	)
 {
 	if (!StorageKind)
-		StorageKind = m_pParentClassType ? EStorage_Member : EStorage_Static;
+		StorageKind = m_pParentType ? EStorage_Member : EStorage_Static;
 
 	CStructType* pStructType = GetDataStructType (StorageKind);
 	if (!pStructType)
@@ -130,10 +130,12 @@ CProperty::CreateField (
 CStructType*
 CProperty::GetDataStructType (EStorage StorageKind)
 {
+	EType ParentTypeKind;
+
 	switch (StorageKind)
 	{
 	case EStorage_Member:
-		if (!m_pParentClassType)
+		if (!m_pParentType)
 		{
 			err::SetFormatStringError (_T("invalid storage '%s' for global property member '%s'"), GetStorageKindString (StorageKind));
 			return NULL;
@@ -145,7 +147,27 @@ CProperty::GetDataStructType (EStorage StorageKind)
 		m_pDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
 		m_pDataStructType->m_Tag.Format (_T("%s.data_struct"), m_Tag);
 		m_pDataStructType->m_pParentNamespace = this;
-		m_pParentClassField = m_pParentClassType->CreateField (StorageKind, m_pDataStructType);
+
+		ParentTypeKind = m_pParentType->GetTypeKind ();
+		switch (ParentTypeKind)
+		{
+		case EType_Class:
+			m_pParentTypeField = ((CClassType*) m_pParentType)->CreateField (m_pDataStructType);
+			break;
+
+		case EType_Struct:
+			m_pParentTypeField = ((CStructType*) m_pParentType)->CreateField (m_pDataStructType);
+			break;
+
+		case EType_Union:
+			m_pParentTypeField = ((CUnionType*) m_pParentType)->CreateField (m_pDataStructType);
+			break;
+
+		default:
+			err::SetFormatStringError (_T("'%s' cannot have fields"), m_pParentType->GetTypeString ());
+			return NULL;
+		}
+
 		return m_pDataStructType;
 
 	case EStorage_Static:
@@ -174,7 +196,7 @@ CProperty::AddMethod (CFunction* pFunction)
 	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
 	int ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
 
-	if (m_pParentClassType)
+	if (m_pParentType)
 	{
 		switch (StorageKind)
 		{
@@ -192,16 +214,22 @@ CProperty::AddMethod (CFunction* pFunction)
 			// and fall through
 		
 		case EStorage_Member:
-			pFunction->ConvertToMemberMethod (m_pParentClassType);
+			pFunction->ConvertToMemberMethod (m_pParentType);
 			break;
 
 		case EStorage_Abstract:
 		case EStorage_Virtual:
 		case EStorage_Override:
-			if (!pFunction->IsAccessor ())
-				m_pParentClassType->m_VirtualMethodArray.Append (pFunction); // otherwise we are already on VirtualPropertyArray
+			if (m_pParentType->GetTypeKind () != EType_Class)
+			{
+				err::SetFormatStringError (_T("'%s' method cannot be part of '%s'"), GetStorageKindString (StorageKind), m_pParentType->GetTypeString ());
+				return false;
+			}
 
-			pFunction->ConvertToMemberMethod (m_pParentClassType);
+			if (!pFunction->IsAccessor ())
+				((CClassType*) m_pParentType)->m_VirtualMethodArray.Append (pFunction); // otherwise we are already on VirtualPropertyArray
+
+			pFunction->ConvertToMemberMethod (m_pParentType);
 			break;
 
 		default:
@@ -290,7 +318,7 @@ CProperty::AddProperty (CProperty* pProperty)
 
 	pProperty->m_pParentNamespace = this;
 
-	if (!m_pParentClassType)
+	if (!m_pParentType)
 		return true;
 
 	EStorage StorageKind = pProperty->GetStorageKind ();
@@ -304,14 +332,20 @@ CProperty::AddProperty (CProperty* pProperty)
 		// and fall through
 
 	case EStorage_Member:
-		pProperty->m_pParentClassType = m_pParentClassType;
+		pProperty->m_pParentType = m_pParentType;
 		break;
 
 	case EStorage_Abstract:
 	case EStorage_Virtual:
 	case EStorage_Override:
-		m_pParentClassType->m_VirtualPropertyArray.Append (pProperty);
-		pProperty->m_pParentClassType = m_pParentClassType;
+		if (m_pParentType->GetTypeKind () != EType_Class)
+		{
+			err::SetFormatStringError (_T("'%s' property cannot be part of '%s'"), GetStorageKindString (StorageKind), m_pParentType->GetTypeString ());
+			return false;
+		}
+
+		((CClassType*) m_pParentType)->m_VirtualPropertyArray.Append (pProperty);
+		pProperty->m_pParentType = m_pParentType;
 		break;
 
 	default:
@@ -332,7 +366,7 @@ CProperty::AddAutoEv (CAutoEv* pAutoEv)
 
 	pAutoEv->m_pParentNamespace = this;
 
-	if (!m_pParentClassType)
+	if (!m_pParentType)
 		return true;
 
 	EStorage StorageKind = pAutoEv->GetStorageKind ();
@@ -346,8 +380,14 @@ CProperty::AddAutoEv (CAutoEv* pAutoEv)
 		//and fall through
 
 	case EStorage_Member:
-		m_pParentClassType->m_AutoEvArray.Append (pAutoEv);
-		pAutoEv->m_pParentClassType = m_pParentClassType;
+		if (m_pParentType->GetTypeKind () != EType_Class)
+		{
+			err::SetFormatStringError (_T("autoev cannot be part of '%s'"), m_pParentType->GetTypeString ());
+			return false;
+		}
+
+		((CClassType*) m_pParentType)->m_AutoEvArray.Append (pAutoEv);
+		pAutoEv->m_pParentClassType = (CClassType*) m_pParentType;
 		break;
 
 	default:

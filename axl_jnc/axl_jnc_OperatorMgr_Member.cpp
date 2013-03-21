@@ -17,6 +17,8 @@ COperatorMgr::GetField (
 	bool Result;
 
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
+		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
 
 	CNamespace* pParentNamespace = pField->GetParentType ()->GetParentNamespace ();
 	ENamespace NamespaceKind = pParentNamespace->GetNamespaceKind ();
@@ -37,8 +39,8 @@ COperatorMgr::GetField (
 				);
 		}
 
-		CClassType* pParentClassType = pProperty->GetParentClassType ();
-		ASSERT (pParentClassType);
+		CNamedType* pParentType = pProperty->GetParentType ();
+		ASSERT (pParentType);
 
 		if (!ThisValue)
 		{
@@ -49,7 +51,7 @@ COperatorMgr::GetField (
 		CValue FieldValue;
 		Result = GetClassField (
 			ThisValue, 
-			pProperty->GetParentClassField (),
+			pProperty->GetParentTypeField (),
 			NULL,
 			&FieldValue
 			);
@@ -107,13 +109,14 @@ COperatorMgr::GetField (
 			pResultValue
 			);
 	}
-	else if (NamespaceKind == ENamespace_Type)
+	else 
 	{
-		ASSERT (((CNamedType*) pParentNamespace)->GetTypeKind () == EType_Class);
-		CClassType* pClassType = (CClassType*) pParentNamespace;
-
+		CNamedType* pNamedType = NamespaceKind == ENamespace_Type ? 
+			(CNamedType*) pParentNamespace : 
+			pField->GetParentType ();
+			
 		if (pField->GetStorageKind () == EStorage_Static)
-			return GetStructField (pClassType->GetStaticDataVariable (), pField, pCoord, pResultValue);	
+			return GetStructField (pNamedType->GetStaticVariable (), pField, pCoord, pResultValue);
 
 		if (!ThisValue)
 		{
@@ -121,20 +124,7 @@ COperatorMgr::GetField (
 			return false;
 		}
 
-		return GetClassField (ThisValue, pField, pCoord, pResultValue);	
-	}
-	else
-	{
-		if (pField->GetStorageKind () == EStorage_Static)
-			return GetNamedTypeStaticField (pField->GetParentType (), pField, pCoord, pResultValue);	
-
-		if (!ThisValue)
-		{
-			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
-			return false;
-		}
-
-		return GetNamedTypeField (ThisValue, pField->GetParentType (), pField, pCoord, pResultValue);	
+		return GetNamedTypeField (ThisValue, pNamedType, pField, pCoord, pResultValue);	
 	}
 }
 
@@ -321,35 +311,6 @@ COperatorMgr::GetNamedTypeField (
 		err::SetFormatStringError (_T("cannot get a field member of '%s'"), pNamedType->GetTypeString ());
 		return false;
 	}
-}
-
-bool
-COperatorMgr::GetNamedTypeStaticField (
-	CNamedType* pNamedType,
-	CStructField* pField,
-	CBaseTypeCoord* pCoord,
-	CValue* pResultValue
-	)
-{
-	CVariable* pStaticDataVariable;
-
-	EType TypeKind = pNamedType->GetTypeKind ();
-	switch (TypeKind)
-	{
-	//case EType_Struct:
-	//	pStaticDataVariable = ((CStructType*) pNamedType)->GetStaticDataVariable ();
-	//	break;
-
-	case EType_Class:
-		pStaticDataVariable = ((CClassType*) pNamedType)->GetStaticDataVariable ();
-		break;
-
-	default:
-		err::SetFormatStringError (_T("cannot get a field member of '%s'"), pNamedType->GetTypeString ());
-		return false;
-	}
-
-	return GetStructField (pStaticDataVariable, pField, pCoord, pResultValue);
 }
 
 bool
@@ -951,7 +912,7 @@ COperatorMgr::GetVirtualProperty (
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
 
 	CBaseTypeCoord Coord;
-	pClassType->FindBaseTypeTraverse (pProperty->GetParentClassType (), &Coord);
+	pClassType->FindBaseTypeTraverse (pProperty->GetParentType (), &Coord);
 	VTableIndex += Coord.m_VTableIndex;
 
 	// class.vtbl*
@@ -1053,7 +1014,7 @@ COperatorMgr::GetAuPropertyField (
 	}
 	else
 	{
-		bool Result = GetField (pProperty->GetParentClassField (), NULL, &DataValue);
+		bool Result = GetField (pProperty->GetParentTypeField (), NULL, &DataValue);
 		if (!Result)
 			return false;
 	}

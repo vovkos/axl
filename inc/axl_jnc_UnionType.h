@@ -56,6 +56,16 @@ public:
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
+	CStructField*
+	CreateField (
+		CType* pType,
+		size_t BitCount = 0,
+		int PtrTypeFlags = 0
+		)
+	{
+		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
+	}
+
 	virtual
 	bool
 	CalcLayout ();

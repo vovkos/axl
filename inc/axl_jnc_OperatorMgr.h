@@ -952,14 +952,6 @@ public:
 		);
 
 	bool
-	GetNamedTypeStaticField (
-		CNamedType* pNamedType,
-		CStructField* pField,
-		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
 	GetStructField  (
 		const CValue& OpValue,
 		CStructField* pMember,

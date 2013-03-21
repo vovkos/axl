@@ -20,6 +20,7 @@ class CProperty:
 {
 protected:
 	friend class CTypeMgr;
+	friend class CDerivableType;
 	friend class CClassType;
 	friend class CFunctionMgr;
 	friend class CParser;
@@ -36,10 +37,10 @@ protected:
 	CFunction* m_pGetter;
 	CFunction* m_pSetter;
 
-	// parent class
+	// parent type
 
-	CClassType* m_pParentClassType;
-	CStructField* m_pParentClassField;
+	CNamedType* m_pParentType;
+	CStructField* m_pParentTypeField;
 	size_t m_ParentClassVTableIndex;
 
 	// fields (augmented fields are stored in a base type)
@@ -119,16 +120,16 @@ public:
 		return m_pStaticDataVariable;
 	}
 	
-	CClassType* 
-	GetParentClassType ()
+	CNamedType* 
+	GetParentType ()
 	{
-		return m_pParentClassType;
+		return m_pParentType;
 	}
 
 	CStructField* 
-	GetParentClassField ()
+	GetParentTypeField ()
 	{
-		return m_pParentClassField;
+		return m_pParentTypeField;
 	}
 
 	bool
@@ -156,7 +157,7 @@ public:
 	Create (CPropertyType* pType);
 
 	void
-	ConvertToMemberProperty (CClassType* pClassType);
+	ConvertToMemberProperty (CNamedType* pParentType);
 
 	CStructField*
 	CreateField (

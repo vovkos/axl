@@ -323,9 +323,6 @@ CParser::Declare (
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	if (!m_AccessKind)
-		m_AccessKind = pNamespace->GetCurrentAccessKind ();
-
 	int DataPtrTypeFlags;
 	CType* pType = pDeclarator->CalcType (&DataPtrTypeFlags);
 	if (!pType)
@@ -404,10 +401,12 @@ CParser::AssignDeclarationAttributes (
 	CModuleItemDecl* pDecl = pItem->GetItemDecl ();
 	ASSERT (pDecl);
 
-	// don't overwrite unless explicit
+	if (!m_AccessKind)
+		m_AccessKind = pNamespace->GetCurrentAccessKind ();
 
-	if (m_AccessKind)
-		pDecl->m_AccessKind = m_AccessKind;
+	pDecl->m_AccessKind = m_AccessKind;
+
+	// don't overwrite storage unless explicit
 
 	if (m_StorageKind)
 		pDecl->m_StorageKind = m_StorageKind;
@@ -706,14 +705,7 @@ CParser::DeclareProperty (
 		m_StructPackFactor
 		);
 
-	if (!pProperty)
-		return false;
-
-	bool Result = pProperty->Create (pType);
-	if (!Result)
-		return false;
-
-	return true;
+	return pProperty && pProperty->Create (pType);
 }
 
 CPropertyTemplate*
@@ -731,6 +723,9 @@ CParser::CreateProperty (
 	)
 {
 	CProperty* pProperty = CreatePropertyImpl (Name, m_LastMatchedToken.m_Pos, PackFactor);
+	if (!pProperty)
+		return NULL;
+
 	pProperty->m_TypeModifiers = GetTypeSpecifier ()->ClearTypeModifiers (ETypeModifierMask_Property);
 	return pProperty;
 }
@@ -743,6 +738,8 @@ CParser::CreatePropertyImpl (
 	)
 {
 	bool Result;
+
+	m_pLastDeclaredItem = NULL;
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();

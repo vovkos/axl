@@ -167,6 +167,7 @@ protected:
 		CBasicBlock* m_pReturnBlock;
 		int m_ControlFlowMgrFlags;
 		CValue m_ThisValue;
+		CValue m_ThinThisValue;
 		CValue m_ScopeLevelValue;
 		CValue m_VTablePtrPtrValue; 
 		CValue m_VTablePtrValue;
@@ -192,6 +193,7 @@ protected:
 	CFunction* m_pCurrentFunction;
 	
 	CValue m_ThisValue;
+	CValue m_ThinThisValue;
 	CValue m_ScopeLevelValue;
 	CValue m_VTablePtrPtrValue; 
 	CValue m_VTablePtrValue;
@@ -232,6 +234,12 @@ public:
 	GetThisValue ()
 	{
 		return m_ThisValue;
+	}
+
+	CValue 
+	GetThinThisValue ()
+	{
+		return m_ThinThisValue;
 	}
 
 	CValue 
@@ -405,10 +413,16 @@ protected:
 	CompileAutoPropertyAccessors (CProperty* pProperty);
 
 	void
+	CreateThinThisValue ();
+
+	void
 	SaveEmissionContext ();
 
 	void
 	RestoreEmissionContext ();
+
+	void
+	ClearEmissionContext ();
 
 	void
 	CutVTable (const CValue& ThisArgValue);

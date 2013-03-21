@@ -46,9 +46,6 @@ protected:
 
 	// fields
 
-	size_t m_PackFactor;
-	CStructType* m_pStaticDataStructType;
-	CVariable* m_pStaticDataVariable;
 	rtl::CIteratorT <CStructField> m_FirstMemberNewField;
 	rtl::CArrayT <CStructField*> m_MemberDestructArray;
 
@@ -99,24 +96,6 @@ public:
 
 	CFunction* 
 	GetInitializer ();
-
-	size_t
-	GetPackFactor ()
-	{
-		return m_PackFactor;
-	}
-
-	CStructType* 
-	GetStaticDataStructType ()
-	{
-		return m_pStaticDataStructType;
-	}
-
-	CVariable* 
-	GetStaticDataVariable ()
-	{
-		return m_pStaticDataVariable;
-	}
 
 	rtl::CIteratorT <CStructField>
 	GetFirstMemberNewField ()

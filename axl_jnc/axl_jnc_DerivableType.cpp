@@ -169,8 +169,33 @@ CDerivableType::AddMethod (CFunction* pFunction)
 bool
 CDerivableType::AddProperty (CProperty* pProperty)
 {
-	err::SetFormatStringError (_T("properties in structs / unions are not supported yet"));
-	return false;
+	ASSERT (pProperty->IsNamed ());
+	bool Result = AddItem (pProperty);
+	if (!Result)
+		return false;
+
+	pProperty->m_pParentNamespace = this;
+
+	EStorage StorageKind = pProperty->GetStorageKind ();
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		break;
+
+	case EStorage_Undefined:
+		pProperty->m_StorageKind = EStorage_Member;
+		//and fall through
+
+	case EStorage_Member:
+		pProperty->m_pParentType = this;
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for method member"), GetStorageKindString (StorageKind));
+		return false;
+	}
+
+	return true;
 }
 
 void

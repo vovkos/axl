@@ -5,6 +5,23 @@ struct TPoint
 	int m_x;
 	int m_y;
 
+	property MyProp
+	{
+		int
+		get ()
+		{
+			printf ("TPoint.MyProp.get ()\n");
+			return m_x * 10 + m_y;
+		}
+		
+		set (int z)
+		{
+			printf ("TPoint.MyProp.set (%d)\n", z);
+			m_x = z / 10;
+			m_y = z % 10;
+		}
+	};
+
 	Setup (
 		int x,
 		int y
@@ -25,12 +42,11 @@ main ()
 	printf ("struct / union members\n");
 
 	TPoint p;
-	p.m_x = 1;
-	p.m_y = 2;
+	p.MyProp = (34);
+
+	printf ("{ %d, %d }\n", p.m_x, p.m_y);
 
 	p.Setup (10, 20);
-
-
 	printf ("{ %d, %d }\n", p.m_x, p.m_y);
 
 	return 0; 

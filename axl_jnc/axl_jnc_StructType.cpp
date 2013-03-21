@@ -124,6 +124,16 @@ CStructType::CalcLayout ()
 	if (!Result)
 		return false;
 
+	if (m_pExtensionNamespace)
+		ApplyExtensionNamespace ();
+
+	if (m_pStaticStructType)
+	{
+		Result = CreateStaticVariable ();
+		if (!Result)
+			return false;
+	}
+
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{

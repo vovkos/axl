@@ -401,6 +401,7 @@ CTypeMgr::CreateClassType (
 	pIfaceStructType->m_Tag.Format (_T("%s.iface"), pType->m_Tag);
 	pIfaceStructType->m_pParentNamespace = pType;
 	pIfaceStructType->m_StorageKind = EStorage_Member;
+	pIfaceStructType->m_PackFactor = PackFactor;
 	pIfaceStructType->AddBaseType (pIfaceHdrStructType);
 
 	CStructType* pClassStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (PackFactor);
@@ -410,7 +411,6 @@ CTypeMgr::CreateClassType (
 	pClassStructType->CreateField (pIfaceStructType);
 
 	pType->m_pModule = m_pModule;
-	pType->m_PackFactor = PackFactor;
 	pType->m_pVTableStructType = pVTableStructType;
 	pType->m_pIfaceStructType = pIfaceStructType;
 	pType->m_pClassStructType = pClassStructType;

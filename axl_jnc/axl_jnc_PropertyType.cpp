@@ -28,7 +28,7 @@ GetPropertyTypeFlagString (EPropertyTypeFlag Flag)
 int
 GetPropertyTypeFlagsFromModifiers (int Modifiers)
 {
-	int Flags;
+	int Flags = 0;
 
 	if (Modifiers & ETypeModifier_AutoGet)
 		Flags |= EPropertyTypeFlag_AutoGet;

@@ -55,9 +55,12 @@ CUnionType::CreateField (
 
 	m_FieldList.InsertTail (pField);
 
-	bool Result = AddItem (pField);
-	if (!Result)
-		return NULL;
+	if (!Name.IsEmpty ())
+	{
+		bool Result = AddItem (pField);
+		if (!Result)
+			return NULL;
+	}
 
 	return pField;
 }
@@ -71,6 +74,16 @@ CUnionType::CalcLayout ()
 	bool Result = PreCalcLayout ();
 	if (!Result)
 		return false;
+
+	if (m_pExtensionNamespace)
+		ApplyExtensionNamespace ();
+
+	if (m_pStaticStructType)
+	{
+		Result = CreateStaticVariable ();
+		if (!Result)
+			return false;
+	}
 
 	CType* pLargestMemberType = NULL;
 
