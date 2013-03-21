@@ -699,7 +699,7 @@ CParser::DeclareProperty (
 		return false;
 	}
 
-	CProperty* pProperty = CreatePropertyImpl (
+	CProperty* pProperty = CreateProperty (
 		pDeclarator->GetName ()->GetShortName (), 
 		pDeclarator->GetPos (), 
 		m_StructPackFactor
@@ -718,20 +718,6 @@ CParser::CreatePropertyTemplate ()
 
 CProperty*
 CParser::CreateProperty (
-	const rtl::CString& Name,
-	size_t PackFactor
-	)
-{
-	CProperty* pProperty = CreatePropertyImpl (Name, m_LastMatchedToken.m_Pos, PackFactor);
-	if (!pProperty)
-		return NULL;
-
-	pProperty->m_TypeModifiers = GetTypeSpecifier ()->ClearTypeModifiers (ETypeModifierMask_Property);
-	return pProperty;
-}
-
-CProperty*
-CParser::CreatePropertyImpl (
 	const rtl::CString& Name,
 	const CToken::CPos& Pos,
 	size_t PackFactor

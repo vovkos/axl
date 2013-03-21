@@ -1,64 +1,89 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TPoint
+class CBase
 {
-	int m_x = 1;
-	int m_y = 2;
-
 	preconstruct ()
 	{
-		printf ("TPoint.preconstruct ()\n");
-		m_y = 4;
+		printf ("CBase.preconstruct ()\n");
+		Foo ();
 	}
 
-	property MyProp
+	this ()
 	{
-		int
-		get ()
-		{
-			printf ("TPoint.MyProp.get ()\n");
-			return m_x * 10 + m_y;
-		}
-		
-		set (int z)
-		{
-			printf ("TPoint.MyProp.set (%d)\n", z);
-			m_x = z / 10;
-			m_y = z % 10;
-		}
-	};
+		printf ("CBase.this ()\n");
+		Foo ();
+	} 
 
-	Setup (
-		int x,
-		int y
-		)
+	this (int x)
 	{
-		printf ("TPoint.Setup (%d, %d)\n", x, y);	
-
-		m_x = x;
-		m_y = y;
+		printf ("CBase.this (%d)\n", x);
+		Foo ();
 	}
-};
+
+	~this ()
+	{
+		printf ("CBase.~this ()\n");
+		Foo ();
+	}
+
+	virtual
+	Foo ()
+	{
+		printf ("CBase.Foo ()\n");
+	}
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CTest: CBase
+{
+	preconstruct ()
+	{
+		printf ("CTest.preconstruct ()\n");
+		Foo ();
+	}
+
+	this ()
+	{
+		printf ("CTest.this ()\n");
+		Foo ();
+	}
+
+	this (int x)
+	{
+		CBase (x * 2);
+		printf ("CTest.this (%d)\n", x);
+		Foo ();
+	}
+
+	~this ()
+	{
+		printf ("CTest.~this ()\n");
+		Foo ();
+	}
+
+	override
+	Foo ()
+	{
+		printf ("CTest.Foo ()\n");
+	}
+}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
 main ()
 {
-	printf ("struct / union members\n");
+	printf ("hui govno i muravei\n");
 
-	TPoint p;
-	printf ("{ %d, %d }\n", p.m_x, p.m_y);
+	CTest t = uheap new CTest (10);
+	
+	delete t;
 
-	p.MyProp = 75;
-	printf ("{ %d, %d }\n", p.m_x, p.m_y);
 
-	p.Setup (10, 20);
-	printf ("{ %d, %d }\n", p.m_x, p.m_y);
-
-	return 0; 
+	return 0;
 }
- 
+
 //.............................................................................
 
 int

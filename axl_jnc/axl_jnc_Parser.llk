@@ -232,18 +232,12 @@ Members2
 	CProperty*
 	CreateProperty (
 		const rtl::CString& Name,
+		const CToken::CPos& Pos,
 		size_t PackFactor
 		);
 
 	CPropertyTemplate*
 	CreatePropertyTemplate ();
-
-	CProperty*
-	CreatePropertyImpl (
-		const rtl::CString& Name,
-		const CToken::CPos& Pos,
-		size_t PackFactor
-		);
 
 	CClassType*
 	CreateAutoEvClassType (
