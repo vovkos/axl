@@ -47,6 +47,7 @@ CVariableMgr::CreateVariable (
 	if (pInitializer)
 		pVariable->m_Initializer.TakeOver (pInitializer);
 
+	m_VariableList.InsertTail (pVariable);
 	return pVariable;
 }
 
@@ -62,6 +63,10 @@ CVariableMgr::CreateVariable (
 {
 	CVariable* pVariable = CreateVariable (Name, QualifiedName, pType, PtrTypeFlags, pInitializer);
 	pVariable->m_StorageKind = StorageKind;
+
+	if (StorageKind == EStorage_Static)
+		m_GlobalVariableArray.Append (pVariable);
+
 	return pVariable;
 }
 

@@ -212,6 +212,7 @@ enum EDeclarator
 	EDeclarator_UnaryBinaryOperator,
 	EDeclarator_CastOperator,
 	EDeclarator_PropValue,
+	EDeclarator_OnChange,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -362,6 +363,9 @@ public:
 
 	bool
 	SetPropValue ();
+
+	bool
+	SetOnChange ();
 
 	bool
 	AddPrefix (EDeclPrefix PrefixKind);

@@ -378,6 +378,7 @@ CFunctionMgr::SaveEmissionContext ()
 
 	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
+	pContext->m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock;
 	pContext->m_ControlFlowMgrFlags = m_pModule->m_ControlFlowMgr.m_Flags;
 
 	m_EmissionContextStack.InsertTail (pContext);
@@ -400,6 +401,7 @@ CFunctionMgr::RestoreEmissionContext ()
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pContext->m_pCurrentBlock);
 	m_pModule->m_ControlFlowMgr.m_pReturnBlock = pContext->m_pReturnBlock;
+	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = pContext->m_pSilentReturnBlock;
 	m_pModule->m_ControlFlowMgr.m_Flags = pContext->m_ControlFlowMgrFlags;
 
 	AXL_MEM_DELETE (pContext);
@@ -627,11 +629,14 @@ CFunctionMgr::Prologue (
 		}
 	}
 
-	if (pFunction->NeedsVTablePtrCut () ||
-		pFunction->m_FunctionKind == EFunction_Setter &&
-		(pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
+	if (pFunction->NeedsVTablePtrCut ())
 	{
 		m_pModule->m_ControlFlowMgr.m_pReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("return_block"));
+	}
+	else if (pFunction->m_FunctionKind == EFunction_Setter && (pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
+	{
+		m_pModule->m_ControlFlowMgr.m_pReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("return_block"));
+		m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("silent_return_block"));
 	}
 
 	return true;
@@ -662,6 +667,13 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		Result = FireOnChangeEvent ();
 		if (!Result)
 			return false;
+
+		ASSERT (m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock);
+
+		if (m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock->GetFlags () & EBasicBlockFlag_Jumped)
+			m_pModule->m_ControlFlowMgr.Follow (m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock);
+
+		m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
 	}
 	
 	if (pFunction->m_FunctionKind == EFunction_Destructor)

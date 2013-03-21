@@ -157,7 +157,7 @@ CBinOp_Idx::ArrayIndexOperator (
 			pResultValue->SetThinDataPtr (
 				PtrValue.GetLlvmValue (), 
 				pPtrType,
-				OpValue1.GetClosure ()
+				OpValue1.GetThinDataPtrValidator ()
 				);
 		break;
 

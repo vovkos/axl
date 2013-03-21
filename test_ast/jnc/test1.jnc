@@ -1,85 +1,40 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CBase
+property MyProp
 {
-	preconstruct ()
+	int propvalue;
+	event onchange ();
+		
+	set (int x)
 	{
-		printf ("CBase.preconstruct ()\n");
-		Foo ();
-	}
+		printf ("MyProp.set (%d)\n", x);
 
-	this ()
-	{
-		printf ("CBase.this ()\n");
-		Foo ();
-	} 
+		propvalue = x;		
 
-	this (int x)
-	{
-		printf ("CBase.this (%d)\n", x);
-		Foo ();
-	}
-
-	~this ()
-	{
-		printf ("CBase.~this ()\n");
-		Foo ();
-	}
-
-	virtual
-	Foo ()
-	{
-		printf ("CBase.Foo ()\n");
+		if (x > 10)
+			silent return;
 	}
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CTest: CBase
+foo ()
 {
-	preconstruct ()
-	{
-		printf ("CTest.preconstruct ()\n");
-		Foo ();
-	}
-
-	this ()
-	{
-		printf ("CTest.this ()\n");
-		Foo ();
-	}
-
-	this (int x)
-	{
-		CBase (x * 2);
-		printf ("CTest.this (%d)\n", x);
-		Foo ();
-	}
-
-	~this ()
-	{
-		printf ("CTest.~this ()\n");
-		Foo ();
-	}
-
-	override
-	Foo ()
-	{
-		printf ("CTest.Foo ()\n");
-	}
+	printf ("foo ()\n");
 }
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
 main ()
 {
-	printf ("hui govno i muravei\n");
+	printf ("bindable property test\n");
 
-	CTest t = uheap new CTest (10);
-	
-	delete t;
+	MyProp.onchange += foo;
 
+	MyProp = 10;
+	MyProp = 20;
+
+	int x = MyProp;
+	printf ("x = %d\n", x);
 
 	return 0;
 }

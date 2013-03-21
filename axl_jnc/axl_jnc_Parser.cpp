@@ -135,27 +135,12 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 
 		return true;
 	}
-
-	EModuleItem ItemKind = m_pLastDeclaredItem->GetItemKind ();
-	switch (ItemKind)
+	else if (
+		m_pLastDeclaredItem->GetItemKind () == EModuleItem_Function && 
+		((CFunction*) m_pLastDeclaredItem)->IsOrphan ())
 	{
-	case EModuleItem_Function:
-		if (((CFunction*) m_pLastDeclaredItem)->IsOrphan ())
-		{
-			err::SetFormatStringError (_T("orphan function '%s' without a body"), m_pLastDeclaredItem->m_Tag);
-			return false;
-		}
-			
-		break;
-			
-	case EModuleItem_Property:
-		if (pTypeSpecifier->GetTypeModifiers () & ~ETypeModifierMask_Property)
-		{
-			err::SetFormatStringError (_T("unused modifier '%s'"), GetTypeModifierString (pTypeSpecifier->GetTypeModifiers () & ~ETypeModifierMask_Property));
-			return false;
-		}
-
-		break;
+		err::SetFormatStringError (_T("orphan function '%s' without a body"), m_pLastDeclaredItem->m_Tag);
+		return false;
 	}
 
 	return true;
@@ -377,18 +362,19 @@ CParser::Declare (
 			return DeclareAutoEv ((CAutoEvType*) pType, pDeclarator);			
 
 		default:
-			if (DeclaratorKind != EDeclarator_PropValue)
-				return DeclareData (pType, pDeclarator, DataPtrTypeFlags, pInitializer);		
-
-			if (pDeclarator->IsQualified () || pDeclarator->GetBitCount ())
+			switch (DeclaratorKind)
 			{
-				err::SetFormatStringError (_T("invalid propvalue declarator"));
-				return false;
-			}
+			case EDeclarator_PropValue:
+				return DeclarePropValue (pType, DataPtrTypeFlags, pInitializer);
 
-			return DeclarePropValue (pType, DataPtrTypeFlags, pInitializer);
+			case EDeclarator_OnChange:
+				return DeclareOnChange (pType, DataPtrTypeFlags);
+
+			default:
+				return DeclareData (pType, pDeclarator, DataPtrTypeFlags, pInitializer);		
+			}
 		}		
-		}
+	}
 }
 
 void
@@ -932,6 +918,7 @@ CParser::DeclareData (
 	if (NamespaceKind == ENamespace_Property)
 	{
 		pDataItem = ((CProperty*) pNamespace)->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
+		AssignDeclarationAttributes (pDataItem, pNamespace, pDeclarator->GetPos ());
 	}
 	else if (NamespaceKind != ENamespace_Type || m_StorageKind == EStorage_Static)
 	{
@@ -1025,8 +1012,6 @@ CParser::DeclarePropValue (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	bool Result;
-
 	if (m_StorageKind)
 	{
 		err::SetFormatStringError (_T("'propvalue' cannot have a storage specifier"));
@@ -1060,11 +1045,61 @@ CParser::DeclarePropValue (
 	pProperty->m_TypeModifiers |= ETypeModifier_AutoGet;
 
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pGetterType);
-	Result = pProperty->AddMethod (pGetter);
-	if (!Result)
-		return false;
-
+	
+	m_StorageKind = pProperty->GetStorageKind ();
 	AssignDeclarationAttributes (pGetter, pNamespace, m_LastMatchedToken.m_Pos);
+	return pProperty->AddMethod (pGetter);
+}
+
+bool
+CParser::DeclareOnChange (
+	CType* pType,
+	int PtrTypeFlags
+	)
+{
+	if (m_StorageKind)
+	{
+		err::SetFormatStringError (_T("'onchange' cannot have a storage specifier"));
+		return false;
+	}
+	
+	if (pType->Cmp (CGetType (m_pModule, EStdType_SimpleMulticast)) != 0 || !(PtrTypeFlags & EPtrTypeFlag_Event))
+	{
+		err::SetFormatStringError (_T("invalid type for 'onchange' event"));
+		return false;
+	}
+
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
+
+	if (NamespaceKind == ENamespace_PropertyTemplate)
+	{
+		CPropertyTemplate* pPropertyTemplate = (CPropertyTemplate*) pNamespace;
+		if (pPropertyTemplate->m_TypeModifiers & ETypeModifier_Bindable)
+		{
+			err::SetFormatStringError (_T("property already has 'onchange' event"));
+			return false;
+		}
+
+		pPropertyTemplate->m_TypeModifiers |= ETypeModifier_Bindable;
+		return true;
+	}
+	
+	if (NamespaceKind != ENamespace_Property)
+	{
+		err::SetFormatStringError (_T("'onchange' is only allowed in property body"));
+		return false;
+	}
+
+	CProperty* pProperty = (CProperty*) pNamespace;
+	if (pProperty->m_TypeModifiers & ETypeModifier_Bindable)
+	{
+		err::SetFormatStringError (_T("property already has 'onchange' event"));
+		return false;
+	}
+
+	pProperty->m_TypeModifiers |= ETypeModifier_Bindable;
+	m_pLastDeclaredItem = pProperty; // allow empty declaration terminator
 	return true;
 }
 

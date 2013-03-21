@@ -199,6 +199,12 @@ Members2
 		rtl::CBoxListT <CToken>* pInitializer
 		);
 
+	bool
+	DeclareOnChange (
+		CType* pType,
+		int PtrTypeFlags
+		);
+
 	CFunctionFormalArg*
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,

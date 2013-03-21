@@ -378,7 +378,7 @@ COperatorMgr::GetStructField (
 			pResultValue->SetThinDataPtr (
 				PtrValue.GetLlvmValue (), 
 				pPtrType,
-				OpValue.GetClosure ()
+				OpValue.GetThinDataPtrValidator ()
 				);
 		break;
 
@@ -461,7 +461,7 @@ COperatorMgr::GetUnionField (
 			pResultValue->SetThinDataPtr (
 				PtrValue.GetLlvmValue (), 
 				pPtrType,
-				OpValue.GetClosure ()
+				OpValue.GetThinDataPtrValidator ()
 				);
 		break;
 
@@ -529,9 +529,9 @@ COperatorMgr::GetClassField (
 	pResultValue->SetThinDataPtr (
 		PtrValue.GetLlvmValue (), 
 		pPtrType,
+		OpValue,
 		PtrValue,
-		pField->GetType ()->GetSize (),
-		OpValue
+		pField->GetType ()->GetSize ()
 		);
 
 	return true;

@@ -255,9 +255,9 @@ COperatorMgr::NewOperator (
 		pResultValue->SetThinDataPtr (
 			PtrValue.GetLlvmValue (),
 			pType->GetDataPtrType (EDataPtrType_Thin),
+			ScopeLevelValue,
 			PtrValue,
-			pType->GetSize (),
-			ScopeLevelValue
+			pType->GetSize ()
 			);
 	}
 

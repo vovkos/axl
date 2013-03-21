@@ -15,6 +15,7 @@ CControlFlowMgr::CControlFlowMgr ()
 	m_Flags = 0;
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
+	m_pSilentReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -24,6 +25,7 @@ CControlFlowMgr::Clear ()
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
+	m_pSilentReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -202,7 +204,10 @@ CControlFlowMgr::RestoreScopeLevel ()
 }
 
 bool
-CControlFlowMgr::Return (const CValue& Value)
+CControlFlowMgr::Return (
+	const CValue& Value,
+	bool IsSilent
+	)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
@@ -210,6 +215,12 @@ CControlFlowMgr::Return (const CValue& Value)
 	CFunctionType* pFunctionType = pFunction->GetType ();
 	CType* pReturnType = pFunctionType->GetReturnType ();
 	
+	if (IsSilent && !m_pSilentReturnBlock)
+	{
+		err::SetFormatStringError (_T("cannot 'silent return' from '%s'"), pFunction->m_Tag);
+		return false;
+	}
+
 	if (!Value)
 	{
 		if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
@@ -222,7 +233,7 @@ CControlFlowMgr::Return (const CValue& Value)
 		RestoreScopeLevel ();
 
 		if (m_pReturnBlock)
-			Jump (m_pReturnBlock);
+			Jump (IsSilent ? m_pSilentReturnBlock : m_pReturnBlock);
 		else
 			m_pModule->m_LlvmBuilder.CreateRet ();
 	}

@@ -36,12 +36,6 @@ CProperty::CalcType ()
 {
 	ASSERT (!m_pType);
 
-	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pAuPropValueType)
-	{
-		err::SetFormatStringError (_T("incomplete autoget property: no 'propvalue' field"));
-		return NULL;
-	}
-
 	if (!m_pGetter)
 	{
 		err::SetFormatStringError (_T("incomplete property: no 'get' method / 'propvalue' field"));

@@ -166,6 +166,7 @@ protected:
 		CFunction* m_pCurrentFunction;
 		CBasicBlock* m_pCurrentBlock;
 		CBasicBlock* m_pReturnBlock;
+		CBasicBlock* m_pSilentReturnBlock;
 		int m_ControlFlowMgrFlags;
 		CValue m_ThisValue;
 		CValue m_ThinThisValue;
