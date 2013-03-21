@@ -945,9 +945,9 @@ CParser::DeclareData (
 
 	if (NamespaceKind == ENamespace_Property)
 	{
-		pDataItem = ((CProperty*) pNamespace)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags, pInitializer);
+		pDataItem = ((CProperty*) pNamespace)->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 	}
-	else if (NamespaceKind != ENamespace_Type)
+	else if (NamespaceKind != ENamespace_Type || m_StorageKind == EStorage_Static)
 	{
 		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 
@@ -1010,7 +1010,7 @@ CParser::DeclareData (
 		switch (NamedTypeKind)
 		{
 		case EType_Class:
-			pField = ((CClassType*) pNamedType)->CreateField (m_StorageKind, Name, pType, BitCount, PtrTypeFlags, pInitializer);
+			pField = ((CClassType*) pNamedType)->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 			break;
 
 		case EType_Struct:

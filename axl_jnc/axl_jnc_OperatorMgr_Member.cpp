@@ -14,118 +14,98 @@ COperatorMgr::GetField (
 	CValue* pResultValue
 	)
 {
-	bool Result;
-
-	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
-		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
-
 	CNamespace* pParentNamespace = pField->GetParentType ()->GetParentNamespace ();
 	ENamespace NamespaceKind = pParentNamespace->GetNamespaceKind ();
 
-	if (NamespaceKind == ENamespace_Property)
+	CNamedType* pNamedType;
+
+	switch (NamespaceKind)
 	{
-		CProperty* pProperty = (CProperty*) pParentNamespace;
-		if (pField->GetStorageKind () == EStorage_Static)
-		{
-			CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
-			ASSERT (pStaticVariable);
+	case ENamespace_Property:
+		return GetPropertyField ((CProperty*) pParentNamespace, pField, pCoord, pResultValue);
 
-			return GetStructField (
-				pStaticVariable, 
-				pField,
-				pCoord,
-				pResultValue
-				);
-		}
+	case ENamespace_AutoEv:
+		return GetAutoEvField ((CAutoEv*) pParentNamespace, pField, pCoord, pResultValue);
 
-		CNamedType* pParentType = pProperty->GetParentType ();
-		ASSERT (pParentType);
+	case ENamespace_Type:
+		pNamedType = (CNamedType*) pParentNamespace;
 
-		if (!ThisValue)
-		{
-			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
-			return false;
-		}
+	default:
+		pNamedType = pField->GetParentType ();
+	}
 
-		CValue FieldValue;
-		Result = GetClassField (
-			ThisValue, 
-			pProperty->GetParentTypeField (),
-			NULL,
-			&FieldValue
-			);
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	if (!ThisValue)
+	{
+		err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
+		return false;
+	}
 
-		if (!Result)
-			return false;
+	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
+		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
 
+	return GetNamedTypeField (ThisValue, pNamedType, pField, pCoord, pResultValue);	
+}
+
+bool
+COperatorMgr::GetPropertyField (
+	CProperty* pProperty,
+	CStructField* pField,
+	CBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	if (!pProperty->GetParentType ())
 		return GetStructField (
-			FieldValue, 
+			pProperty->GetStaticDataVariable (), 
 			pField,
 			pCoord,
 			pResultValue
 			);
-	}
-	else if (NamespaceKind == ENamespace_AutoEv)
+
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	if (!ThisValue)
 	{
-		CAutoEv* pAutoEv = (CAutoEv*) pParentNamespace;
-		if (pField->GetStorageKind () == EStorage_Static)
-		{
-			CVariable* pStaticVariable = pAutoEv->GetStaticDataVariable ();
-			ASSERT (pStaticVariable);
+		err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
+		return false;
+	}
 
-			return GetStructField (
-				pStaticVariable, 
-				pField,
-				pCoord,
-				pResultValue
-				);
-		}
+	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
+		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
 
-		CClassType* pParentClassType = pAutoEv->GetParentClassType ();
-		ASSERT (pParentClassType);
+	CValue FieldValue;	
+	return 
+		GetNamedTypeField (ThisValue, pProperty->GetParentType (), pProperty->GetParentTypeField (),  NULL, &FieldValue) &&
+		GetStructField (FieldValue, pField, pCoord, pResultValue);
+}
 
-		if (!ThisValue)
-		{
-			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
-			return false;
-		}
-
-		CValue FieldValue;
-		Result = GetClassField (
-			ThisValue, 
-			pAutoEv->GetParentClassField (),
-			NULL,
-			&FieldValue
-			);
-
-		if (!Result)
-			return false;
-
+bool
+COperatorMgr::GetAutoEvField (
+	CAutoEv* pAutoEv,
+	CStructField* pField,
+	CBaseTypeCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	if (!pAutoEv->GetParentClassType ())
 		return GetStructField (
-			FieldValue, 
+			pAutoEv->GetStaticDataVariable (), 
 			pField,
 			pCoord,
 			pResultValue
 			);
-	}
-	else 
+
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	if (!ThisValue)
 	{
-		CNamedType* pNamedType = NamespaceKind == ENamespace_Type ? 
-			(CNamedType*) pParentNamespace : 
-			pField->GetParentType ();
-			
-		if (pField->GetStorageKind () == EStorage_Static)
-			return GetStructField (pNamedType->GetStaticVariable (), pField, pCoord, pResultValue);
-
-		if (!ThisValue)
-		{
-			err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
-			return false;
-		}
-
-		return GetNamedTypeField (ThisValue, pNamedType, pField, pCoord, pResultValue);	
+		err::SetFormatStringError (_T("function '%s' has no 'this' pointer"), m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag);
+		return false;
 	}
+
+	CValue FieldValue;
+	return 
+		GetClassField (ThisValue, pAutoEv->GetParentClassField (), NULL, &FieldValue) &&
+		GetStructField (FieldValue, pField, pCoord, pResultValue);
 }
 
 CType*
@@ -430,8 +410,6 @@ COperatorMgr::GetStructField (
 	return true;
 }
 
-;
-
 bool
 COperatorMgr::GetUnionField (
 	const CValue& OpValue,
@@ -514,20 +492,20 @@ COperatorMgr::GetUnionField (
 bool
 COperatorMgr::GetClassField (
 	const CValue& OpValue,
-	CStructField* pMember,
+	CStructField* pField,
 	CBaseTypeCoord* pCoord,
 	CValue* pResultValue
 	)
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pClassType = (CClassType*) pMember->GetParentType ()->GetParentNamespace ();
+	CClassType* pClassType = (CClassType*) pField->GetParentType ()->GetParentNamespace ();
 
 	CBaseTypeCoord Coord;
 	if (!pCoord)
 		pCoord = &Coord;
 
 	pCoord->m_LlvmIndexArray.Insert (0, 0);
-	pCoord->m_LlvmIndexArray.Append (pMember->GetLlvmIndex ());
+	pCoord->m_LlvmIndexArray.Append (pField->GetLlvmIndex ());
 
 	CValue PtrValue;
 	m_pModule->m_LlvmBuilder.CreateGep (
@@ -538,7 +516,7 @@ COperatorMgr::GetClassField (
 		&PtrValue
 		);
 
-	int PtrTypeFlags = pMember->GetPtrTypeFlags ();
+	int PtrTypeFlags = pField->GetPtrTypeFlags ();
 	
 	if ((OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Const) && !(PtrTypeFlags & EPtrTypeFlag_Mutable) ||
 		(PtrTypeFlags & EPtrTypeFlag_ReadOnly) && m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
@@ -546,13 +524,13 @@ COperatorMgr::GetClassField (
 		PtrTypeFlags |= EPtrTypeFlag_Const;
 	}
 
-	CDataPtrType* pPtrType = pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+	CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
 	pResultValue->SetThinDataPtr (
 		PtrValue.GetLlvmValue (), 
 		pPtrType,
-		PtrValue, 
-		pMember->GetType ()->GetSize (),
+		PtrValue,
+		pField->GetType ()->GetSize (),
 		OpValue
 		);
 

@@ -11,20 +11,6 @@ CNamedType::CNamedType ()
 {
 	m_NamespaceKind = ENamespace_Type;
 	m_pItemDecl = this;
-	m_StaticPackFactor = 8;
-	m_pStaticStructType = NULL;
-	m_pStaticVariable = NULL;
-}
-
-CStructType*
-CNamedType::CreateStaticStructType ()
-{
-	CStructType* pStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_StaticPackFactor);
-	pStructType->m_StorageKind = EStorage_Static;
-	pStructType->m_pParentNamespace = this;
-	pStructType->m_Tag.Format (_T("%s.static_struct"), m_Tag);
-	m_pStaticStructType = pStructType;
-	return pStructType;
 }
 
 CType*
@@ -97,13 +83,6 @@ CNamedType::CalcLayout ()
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	if (m_pStaticStructType)
-	{
-		Result = CreateStaticVariable ();
-		if (!Result)
-			return false;
-	}
-
 	PostCalcLayout ();
 	return true;
 }
@@ -130,25 +109,6 @@ CNamedType::ApplyExtensionNamespace ()
 			break;
 		}
 	}
-}
-
-bool
-CNamedType::CreateStaticVariable ()
-{
-	ASSERT (m_pStaticStructType);
-
-	bool Result = m_pStaticStructType->CalcLayout ();
-	if (!Result)
-		return false;
-
-	m_pStaticVariable = m_pModule->m_VariableMgr.CreateVariable (
-		EStorage_Static,
-		_T("static_field"),
-		m_Tag + _T(".static_field"), 
-		m_pStaticStructType
-		);
-	
-	return true;
 }
 
 //.............................................................................

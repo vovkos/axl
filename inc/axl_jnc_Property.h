@@ -47,7 +47,6 @@ protected:
 
 	size_t m_PackFactor;
 	CStructType* m_pDataStructType;
-	CStructType* m_pStaticDataStructType;
 	CVariable* m_pStaticDataVariable;
 
 	// vtable
@@ -108,12 +107,6 @@ public:
 		return m_pDataStructType;
 	}
 
-	CStructType* 
-	GetStaticDataStructType ()
-	{
-		return m_pStaticDataStructType;
-	}
-
 	CVariable* 
 	GetStaticDataVariable ()
 	{
@@ -161,7 +154,6 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
@@ -171,13 +163,12 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateField (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	bool
@@ -212,7 +203,7 @@ protected:
 	GetAutoAccessorPropertyValue ();
 
 	CStructType*
-	GetDataStructType (EStorage StorageKind);
+	CreateDataStructType ();
 };
 
 //.............................................................................

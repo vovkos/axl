@@ -78,13 +78,6 @@ CUnionType::CalcLayout ()
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	if (m_pStaticStructType)
-	{
-		Result = CreateStaticVariable ();
-		if (!Result)
-			return false;
-	}
-
 	CType* pLargestMemberType = NULL;
 
 	rtl::CIteratorT <CStructField> Member = m_FieldList.GetHead ();

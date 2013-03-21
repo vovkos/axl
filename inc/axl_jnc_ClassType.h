@@ -105,7 +105,6 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
@@ -115,34 +114,12 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateField (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
-	}
-
-	CStructField*
-	CreateField (
-		const rtl::CString& Name,
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (EStorage_Undefined, Name, pType, BitCount, PtrTypeFlags);
-	}
-
-	CStructField*
-	CreateField (
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (EStorage_Undefined, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	CAutoEvType* 

@@ -26,10 +26,6 @@ protected:
 
 	CNamespace* m_pExtensionNamespace;
 
-	size_t m_StaticPackFactor;
-	CStructType* m_pStaticStructType;
-	CVariable* m_pStaticVariable;
-
 public:
 	CNamedType ();
 
@@ -51,24 +47,6 @@ public:
 	CPropertyType* 
 	GetMemberPropertyType (CPropertyType* pShortType);
 
-	size_t
-	GetStaticPackFactor ()
-	{
-		return m_StaticPackFactor;
-	}
-
-	CStructType* 
-	GetStaticStructType ()
-	{
-		return m_pStaticStructType;
-	}
-
-	CVariable* 
-	GetStaticVariable ()
-	{
-		return m_pStaticVariable;
-	}
-
 	virtual
 	bool
 	CalcLayout ();
@@ -76,12 +54,6 @@ public:
 protected:
 	void
 	ApplyExtensionNamespace ();
-
-	bool
-	CreateStaticVariable ();
-
-	CStructType*
-	CreateStaticStructType ();
 
 	virtual
 	CModuleItem*

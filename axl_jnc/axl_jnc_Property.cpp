@@ -28,7 +28,6 @@ CProperty::CProperty ()
 
 	m_PackFactor = 8;
 	m_pDataStructType = NULL;
-	m_pStaticDataStructType = NULL;
 	m_pStaticDataVariable = NULL;
 }
 
@@ -100,7 +99,6 @@ CProperty::ConvertToMemberProperty (CNamedType* pParentType)
 
 CStructField*
 CProperty::CreateField (
-	EStorage StorageKind,
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
@@ -108,14 +106,10 @@ CProperty::CreateField (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	if (!StorageKind)
-		StorageKind = m_pParentType ? EStorage_Member : EStorage_Static;
+	if (!m_pDataStructType)
+		CreateDataStructType ();
 
-	CStructType* pStructType = GetDataStructType (StorageKind);
-	if (!pStructType)
-		return NULL;
-
-	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
+	CStructField* pField = m_pDataStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 
 	if (!Name.IsEmpty ())
 	{
@@ -128,26 +122,18 @@ CProperty::CreateField (
 }
 
 CStructType*
-CProperty::GetDataStructType (EStorage StorageKind)
+CProperty::CreateDataStructType ()
 {
+	ASSERT (!m_pDataStructType);
+
 	EType ParentTypeKind;
 
-	switch (StorageKind)
+	m_pDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
+	m_pDataStructType->m_Tag.Format (_T("%s.data_struct"), m_Tag);
+	m_pDataStructType->m_pParentNamespace = this;
+
+	if (m_pParentType)
 	{
-	case EStorage_Member:
-		if (!m_pParentType)
-		{
-			err::SetFormatStringError (_T("invalid storage '%s' for global property member '%s'"), GetStorageKindString (StorageKind));
-			return NULL;
-		}
-
-		if (m_pDataStructType)
-			return m_pDataStructType;
-
-		m_pDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-		m_pDataStructType->m_Tag.Format (_T("%s.data_struct"), m_Tag);
-		m_pDataStructType->m_pParentNamespace = this;
-
 		ParentTypeKind = m_pParentType->GetTypeKind ();
 		switch (ParentTypeKind)
 		{
@@ -164,26 +150,11 @@ CProperty::GetDataStructType (EStorage StorageKind)
 			break;
 
 		default:
-			err::SetFormatStringError (_T("'%s' cannot have fields"), m_pParentType->GetTypeString ());
-			return NULL;
+			ASSERT (false);
 		}
-
-		return m_pDataStructType;
-
-	case EStorage_Static:
-		if (m_pStaticDataStructType)
-			return m_pStaticDataStructType;
-
-		m_pStaticDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-		m_pStaticDataStructType->m_StorageKind = EStorage_Static;
-		m_pStaticDataStructType->m_Tag.Format (_T("%s.static_data_struct"), m_Tag);
-		m_pStaticDataStructType->m_pParentNamespace = this;
-		return m_pStaticDataStructType;
-
-	default:
-		err::SetFormatStringError (_T("invalid storage '%s' for field member"), GetStorageKindString (StorageKind));
-		return NULL;
 	}
+
+	return m_pDataStructType;
 }
 
 bool
@@ -410,11 +381,10 @@ CProperty::CalcLayout ()
 
 	if (m_pType->GetFlags () & EPropertyTypeFlag_Augmented)
 	{
-		CStructType* pStructType = GetDataStructType (m_StorageKind);
-		if (!pStructType)
-			return false;
+		if (!m_pDataStructType)
+			CreateDataStructType ();
 
-		pStructType->AddBaseType (m_pType->GetAuFieldStructType ());			
+		m_pDataStructType->AddBaseType (m_pType->GetAuFieldStructType ());			
 	}
 
 	if (m_pDataStructType)
@@ -424,17 +394,17 @@ CProperty::CalcLayout ()
 			return false;
 	}
 
-	if (m_pStaticDataStructType)
+	if (m_pDataStructType && !m_pParentType)
 	{
-		Result = m_pStaticDataStructType->CalcLayout ();
+		Result = m_pDataStructType->CalcLayout ();
 		if (!Result)
 			return false;
 
 		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
 			EStorage_Static,
-			_T("static_field"),
-			m_Tag + _T(".static_field"), 
-			m_pStaticDataStructType
+			_T("static_data"),
+			m_Tag + _T(".static_data"), 
+			m_pDataStructType
 			);	
 	}
 

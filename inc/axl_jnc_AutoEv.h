@@ -41,7 +41,6 @@ protected:
 	
 	CStructType* m_pDataStructType;
 	CStructField* m_FieldArray [EAutoEvField__Count];
-
 	CVariable* m_pStaticDataVariable;
 
 	rtl::CBoxListT <CToken> m_Body;

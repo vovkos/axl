@@ -36,7 +36,6 @@ CClassType::GetMemberAutoEvType (CAutoEvType* pShortType)
 
 CStructField*
 CClassType::CreateField (
-	EStorage StorageKind,
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
@@ -44,28 +43,7 @@ CClassType::CreateField (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	CStructType* pStructType;
-
-	switch (StorageKind)
-	{
-	case EStorage_Undefined:
-	case EStorage_Member:
-		pStructType = m_pIfaceStructType;
-		break;
-
-	case EStorage_Static:
-		if (!m_pStaticStructType)
-			CreateStaticStructType ();
-
-		pStructType = m_pStaticStructType;
-		break;
-
-	default:
-		err::SetFormatStringError (_T("invalid storage '%s' for field member '%s'"), GetStorageKindString (StorageKind), Name);
-		return NULL;
-	}
-
-	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
+	CStructField* pField = m_pIfaceStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 
 	if (!Name.IsEmpty ())
 	{
@@ -361,13 +339,6 @@ CClassType::CalcLayout ()
 	
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
-
-	if (m_pStaticStructType)
-	{
-		Result = CreateStaticVariable ();
-		if (!Result)
-			return false;
-	}
 
 	// layout base types
 

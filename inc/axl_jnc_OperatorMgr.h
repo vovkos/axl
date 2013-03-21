@@ -975,6 +975,22 @@ public:
 		);
 
 	bool
+	GetPropertyField (
+		CProperty* pProperty,
+		CStructField* pField,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetAutoEvField (
+		CAutoEv* pAutoEv,
+		CStructField* pField,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
 	GetAutoEvData (
 		CAutoEv* pAutoEv,
 		CValue* pResultValue
