@@ -81,6 +81,29 @@ COperatorMgr::InitializeObject (
 }
 
 bool
+COperatorMgr::InitializeData (
+	EStorage StorageKind,
+	const CValue& PtrValue,
+	CType* pType
+	)
+{
+	if (StorageKind == EStorage_Stack)
+		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
+		
+	if (pType->GetTypeKind () != EType_Struct && pType->GetTypeKind () != EType_Union)
+		return true;
+
+	CFunction* pPreConstructor = ((CDerivableType*) pType)->GetPreConstructor ();
+	if (!pPreConstructor)
+		return true;
+
+	CValue ThisArgValue;
+	return 
+		UnaryOperator (EUnOp_Addr, PtrValue, &ThisArgValue) &&
+		CallOperator (pPreConstructor, ThisArgValue);
+}
+
+bool
 COperatorMgr::Allocate (
 	EStorage StorageKind,
 	CType* pType,
@@ -218,6 +241,10 @@ COperatorMgr::NewOperator (
 	}
 	else
 	{
+		Result = InitializeData (StorageKind, PtrValue, pType);
+		if (!Result)
+			return false;
+
 		CValue ScopeLevelValue;
 
 		if (StorageKind == EStorage_Stack)

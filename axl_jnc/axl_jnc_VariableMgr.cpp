@@ -150,12 +150,11 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 	bool Result;
 
 	if (pVariable->m_Initializer.IsEmpty ()) // no initializer
-	{
-		if (pVariable->m_StorageKind == EStorage_Stack)
-			m_pModule->m_LlvmBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), pVariable);
-
-		return true;
-	}
+		return m_pModule->m_OperatorMgr.InitializeData (
+			pVariable->GetStorageKind (), 
+			pVariable,
+			pVariable->GetType ()
+			);
 
 	CParser Parser;
 	Parser.m_pModule = m_pModule;

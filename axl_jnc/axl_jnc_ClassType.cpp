@@ -13,6 +13,7 @@ CClassType::CClassType ()
 	m_pIfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
+	m_pConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pInitializer = NULL;
 	m_pVTableStructType = NULL;
@@ -32,6 +33,22 @@ CAutoEvType*
 CClassType::GetMemberAutoEvType (CAutoEvType* pShortType)
 {
 	return m_pModule->m_TypeMgr.GetMemberAutoEvType (this, pShortType);
+}
+
+CFunction* 
+CClassType::GetDefaultConstructor ()
+{
+	ASSERT (m_pConstructor);
+
+	CType* pThisArgType = GetThisArgType ();
+	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
+	if (!pDefaultConstructor)
+	{
+		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
+		return NULL;
+	}
+
+	return pDefaultConstructor;
 }
 
 CStructField*
@@ -700,18 +717,6 @@ CClassType::CreateAutoEvConstructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pConstructor = pFunction;
-	return true;
-}
-
-bool
-CClassType::CreateDefaultPreConstructor ()
-{
-	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
-	CFunction* pFunction = CreateUnnamedMethod (EStorage_Member, EFunction_PreConstructor, pType);
-	if (!pFunction)
-		return false;
-
-	m_pModule->m_FunctionMgr.m_DefaultPreConstructorClassArray.Append (this);
 	return true;
 }
 

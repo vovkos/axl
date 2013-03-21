@@ -26,7 +26,7 @@ CFunctionMgr::Clear ()
 	m_PropertyTemplateList.Clear ();
 	m_AutoEvList.Clear ();
 	m_OrphanFunctionArray.Clear ();
-	m_DefaultPreConstructorClassArray.Clear ();
+	m_DefaultPreConstructorTypeArray.Clear ();
 	m_ThunkList.Clear ();
 	m_ThunkFunctionMap.Clear ();
 	m_ThunkPropertyMap.Clear ();
@@ -308,17 +308,34 @@ CFunctionMgr::CompileFunctions ()
 
 	// (4) default preconstructors for classes with initialized fields
 
-	size_t Count = m_DefaultPreConstructorClassArray.GetCount ();
+	size_t Count = m_DefaultPreConstructorTypeArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CClassType* pClassType = m_DefaultPreConstructorClassArray [i];
-		CFunction* pPreConstructor = pClassType->GetPreConstructor ();
+		CDerivableType* pType = m_DefaultPreConstructorTypeArray [i];
+		CFunction* pPreConstructor = pType->GetPreConstructor ();
 		ASSERT (pPreConstructor);
 
 		InternalPrologue (pPreConstructor);
-		m_pModule->m_NamespaceMgr.OpenNamespace (pClassType);
+		m_pModule->m_NamespaceMgr.OpenNamespace (pType);
 
-		bool Result = pClassType->GetIfaceStructType ()->InitializeFields ();
+		EType TypeKind = pType->GetTypeKind ();
+		switch (TypeKind)
+		{
+		case EType_Class:
+			Result = ((CClassType*) pType)->GetIfaceStructType ()->InitializeFields ();
+			break;
+
+		case EType_Struct:
+			Result = 
+				((CStructType*) pType)->CallBaseTypePreConstructors () &&
+				((CStructType*) pType)->InitializeFields ();
+			break;
+
+		case EType_Union:
+			Result = ((CUnionType*) pType)->InitializeField ();
+			break;
+		}
+
 		if (!Result)
 			return false;
 

@@ -119,7 +119,6 @@ protected:
 	// construction
 
 	CFunction* m_pPreConstructor;
-	CFunction* m_pConstructor;
 	CFunction* m_pStaticConstructor;
 
 	// overloaded operators
@@ -166,15 +165,6 @@ public:
 	}
 
 	CFunction* 
-	GetConstructor ()
-	{
-		return m_pConstructor;
-	}
-
-	CFunction* 
-	GetDefaultConstructor ();
-
-	CFunction* 
 	GetStaticConstructor ()
 	{
 		return m_pStaticConstructor;
@@ -187,6 +177,9 @@ public:
 	AddProperty (CProperty* pProperty);
 
 protected:
+	bool
+	CreateDefaultPreConstructor ();
+
 	bool
 	FindBaseTypeTraverseImpl (
 		CType* pType,

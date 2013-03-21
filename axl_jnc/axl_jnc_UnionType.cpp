@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -13,9 +14,6 @@ CUnionType::CUnionType ()
 	m_Flags = ETypeFlag_Pod;
 	m_pStructType = NULL;
 	m_pInitializedField = NULL;
-	m_pPreConstructor = NULL;
-	m_pConstructor = NULL;
-	m_pStaticConstructor = NULL;
 }
 
 CStructField*
@@ -109,12 +107,40 @@ CUnionType::CalcLayout ()
 	if (!Result)
 		return false;
 
+	if (!m_pPreConstructor && m_pInitializedField)
+	{
+		Result = CreateDefaultPreConstructor ();
+		if (!Result)
+			return false;
+	}
+
 	PostCalcLayout ();
 	return true;
+}
+
+bool
+CUnionType::InitializeField ()
+{
+	ASSERT (m_pInitializedField);
+
+	bool Result;
+	
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	Result = Parser.ParseTokenList (ESymbol_expression_save_value, m_pInitializedField->m_Initializer);
+	if (!Result)
+		return false;
+
+	CValue FieldValue;
+
+	return
+		m_pModule->m_OperatorMgr.GetField (m_pInitializedField, NULL, &FieldValue) &&
+		m_pModule->m_OperatorMgr.StoreDataRef (FieldValue, Parser.m_ExpressionValue);
 }
 
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
-

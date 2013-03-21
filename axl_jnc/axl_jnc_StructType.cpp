@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_StructType.h"
-#include "axl_jnc_Parser.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -29,9 +29,6 @@ CStructType::CStructType ()
 	m_PackFactor = 8;
 	m_FieldActualSize = 0;
 	m_FieldAlignedSize = 0;
-	m_pPreConstructor = NULL;
-	m_pConstructor = NULL;
-	m_pStaticConstructor = NULL;
 	m_pLastBitFieldType = NULL;
 	m_LastBitFieldOffset = 0;
 }
@@ -127,6 +124,8 @@ CStructType::CalcLayout ()
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
+	bool HasBasePreConstructor = false;
+
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
@@ -135,6 +134,9 @@ CStructType::CalcLayout ()
 		Result = pBaseType->m_pType->CalcLayout ();
 		if (!Result)
 			return false;
+
+		if (pBaseType->m_pType->GetPreConstructor ())
+			HasBasePreConstructor = true;
 
 		Result = LayoutField (
 				pBaseType->m_pType,
@@ -184,7 +186,36 @@ CStructType::CalcLayout ()
 
 	m_Size = m_FieldAlignedSize;
 
+	if (!m_pPreConstructor && 
+		(HasBasePreConstructor || !m_InitializedFieldArray.IsEmpty ()))
+	{
+		Result = CreateDefaultPreConstructor ();
+		if (!Result)
+			return false;
+	}
+
 	PostCalcLayout ();
+	return true;
+}
+
+bool
+CStructType::CallBaseTypePreConstructors ()
+{
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
+	for (; BaseType; BaseType++)
+	{
+		CFunction* pPreConstructor = BaseType->m_pType->GetPreConstructor ();
+		if (!pPreConstructor)
+			return false;
+
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pPreConstructor, ThisValue);
+		if (!Result)
+			return false;
+	}
+
 	return true;
 }
 

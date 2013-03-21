@@ -54,6 +54,7 @@ class COperatorMgr
 {
 protected:
 	friend class CModule;
+	friend class CVariableMgr;
 	friend class CFunctionMgr;
 	friend class CParser;
 	friend class CCast_FunctionPtr;
@@ -1217,6 +1218,13 @@ protected:
 		CClassType* pClassType,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
+		);
+
+	bool
+	InitializeData (
+		EStorage StorageKind,
+		const CValue& PtrValue,
+		CType* pType
 		);
 
 	bool

@@ -137,6 +137,7 @@ class CFunctionMgr
 {
 protected:
 	friend class CModule;
+	friend class CDerivableType;
 	friend class CClassType;
 	friend class CParser;
 
@@ -183,7 +184,7 @@ protected:
 	rtl::CStdListT <CAutoEv> m_AutoEvList;
 
 	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
-	rtl::CArrayT <CClassType*> m_DefaultPreConstructorClassArray;
+	rtl::CArrayT <CDerivableType*> m_DefaultPreConstructorTypeArray;
 
 	rtl::CStdListT <TThunk> m_ThunkList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;

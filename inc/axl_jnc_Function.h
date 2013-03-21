@@ -237,9 +237,10 @@ public:
 	NeedsVTablePtrCut ()
 	{
 		return 
-			m_FunctionKind == EFunction_PreConstructor ||
+			(m_FunctionKind == EFunction_PreConstructor ||
 			m_FunctionKind == EFunction_Constructor ||
-			m_FunctionKind == EFunction_Destructor;
+			m_FunctionKind == EFunction_Destructor) &&
+			m_pThisType->GetTypeKind () == EType_ClassPtr;
 	}
 
 	CClassType* 
