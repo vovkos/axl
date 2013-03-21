@@ -1,5 +1,5 @@
 
-/* #line 1 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 1 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 #include "stdafx.h"
 #include "axl_jnc_Lexer.h"
 
@@ -1092,7 +1092,7 @@ static const int axl_jnc_error = -1;
 static const int axl_jnc_en_main = 7;
 
 
-/* #line 239 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 239 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 
 //.............................................................................
@@ -1109,7 +1109,7 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 247 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 247 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 }
 
 bool
@@ -1202,7 +1202,7 @@ _eof_trans:
 		switch ( *_acts++ )
 		{
 	case 0:
-/* #line 44 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 44 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{ NewLine (p + 1); }
 	break;
 	case 3:
@@ -1210,531 +1210,531 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 4:
-/* #line 60 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 60 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 1;}
 	break;
 	case 5:
-/* #line 61 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 61 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 2;}
 	break;
 	case 6:
-/* #line 62 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 62 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 3;}
 	break;
 	case 7:
-/* #line 63 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 63 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 4;}
 	break;
 	case 8:
-/* #line 69 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 69 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 5;}
 	break;
 	case 9:
-/* #line 70 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 70 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 6;}
 	break;
 	case 10:
-/* #line 71 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 71 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 7;}
 	break;
 	case 11:
-/* #line 72 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 72 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 8;}
 	break;
 	case 12:
-/* #line 73 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 73 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 9;}
 	break;
 	case 13:
-/* #line 74 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 74 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 10;}
 	break;
 	case 14:
-/* #line 75 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 75 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 11;}
 	break;
 	case 15:
-/* #line 76 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 76 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 12;}
 	break;
 	case 16:
-/* #line 77 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 77 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 13;}
 	break;
 	case 17:
-/* #line 78 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 78 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 14;}
 	break;
 	case 18:
-/* #line 79 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 79 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 15;}
 	break;
 	case 19:
-/* #line 81 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 81 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 16;}
 	break;
 	case 20:
-/* #line 82 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 82 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 17;}
 	break;
 	case 21:
-/* #line 83 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 83 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 18;}
 	break;
 	case 22:
-/* #line 89 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 89 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 19;}
 	break;
 	case 23:
-/* #line 90 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 90 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 20;}
 	break;
 	case 24:
-/* #line 91 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 91 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 21;}
 	break;
 	case 25:
-/* #line 92 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 92 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 22;}
 	break;
 	case 26:
-/* #line 93 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 93 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 23;}
 	break;
 	case 27:
-/* #line 94 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 94 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 24;}
 	break;
 	case 28:
-/* #line 95 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 95 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 25;}
 	break;
 	case 29:
-/* #line 96 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 96 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 26;}
 	break;
 	case 30:
-/* #line 97 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 97 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 27;}
 	break;
 	case 31:
-/* #line 98 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 98 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 28;}
 	break;
 	case 32:
-/* #line 99 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 99 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 29;}
 	break;
 	case 33:
-/* #line 100 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 100 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 30;}
 	break;
 	case 34:
-/* #line 101 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 101 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 31;}
 	break;
 	case 35:
-/* #line 102 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 102 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 32;}
 	break;
 	case 36:
-/* #line 103 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 103 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 33;}
 	break;
 	case 37:
-/* #line 104 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 104 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 34;}
 	break;
 	case 38:
-/* #line 105 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 105 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 35;}
 	break;
 	case 39:
-/* #line 106 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 106 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 36;}
 	break;
 	case 40:
-/* #line 107 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 107 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 37;}
 	break;
 	case 41:
-/* #line 108 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 108 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 38;}
 	break;
 	case 42:
-/* #line 109 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 109 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 39;}
 	break;
 	case 43:
-/* #line 116 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 116 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 41;}
 	break;
 	case 44:
-/* #line 117 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 117 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 42;}
 	break;
 	case 45:
-/* #line 118 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 118 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 43;}
 	break;
 	case 46:
-/* #line 119 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 119 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 44;}
 	break;
 	case 47:
-/* #line 120 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 120 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 45;}
 	break;
 	case 48:
-/* #line 121 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 121 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 46;}
 	break;
 	case 49:
-/* #line 122 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 122 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 47;}
 	break;
 	case 50:
-/* #line 123 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 123 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 48;}
 	break;
 	case 51:
-/* #line 124 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 124 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 49;}
 	break;
 	case 52:
-/* #line 125 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 125 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 50;}
 	break;
 	case 53:
-/* #line 127 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 127 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 52;}
 	break;
 	case 54:
-/* #line 128 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 128 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 53;}
 	break;
 	case 55:
-/* #line 129 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 129 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 54;}
 	break;
 	case 56:
-/* #line 130 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 130 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 55;}
 	break;
 	case 57:
-/* #line 137 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 137 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 57;}
 	break;
 	case 58:
-/* #line 138 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 138 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 58;}
 	break;
 	case 59:
-/* #line 139 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 139 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 59;}
 	break;
 	case 60:
-/* #line 140 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 140 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 60;}
 	break;
 	case 61:
-/* #line 146 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 146 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 61;}
 	break;
 	case 62:
-/* #line 147 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 147 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 62;}
 	break;
 	case 63:
-/* #line 148 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 148 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 63;}
 	break;
 	case 64:
-/* #line 149 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 149 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 64;}
 	break;
 	case 65:
-/* #line 150 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 150 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 65;}
 	break;
 	case 66:
-/* #line 151 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 151 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 66;}
 	break;
 	case 67:
-/* #line 152 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 152 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 67;}
 	break;
 	case 68:
-/* #line 153 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 153 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 68;}
 	break;
 	case 69:
-/* #line 159 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 159 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 69;}
 	break;
 	case 70:
-/* #line 160 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 160 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 70;}
 	break;
 	case 71:
-/* #line 161 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 161 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 71;}
 	break;
 	case 72:
-/* #line 162 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 162 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 72;}
 	break;
 	case 73:
-/* #line 168 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 168 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 73;}
 	break;
 	case 74:
-/* #line 169 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 169 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 74;}
 	break;
 	case 75:
-/* #line 170 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 170 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 75;}
 	break;
 	case 76:
-/* #line 171 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 171 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 76;}
 	break;
 	case 77:
-/* #line 173 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 173 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 78;}
 	break;
 	case 78:
-/* #line 174 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 174 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 79;}
 	break;
 	case 79:
-/* #line 175 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 175 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 80;}
 	break;
 	case 80:
-/* #line 176 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 176 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 81;}
 	break;
 	case 81:
-/* #line 177 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 177 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 82;}
 	break;
 	case 82:
-/* #line 178 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 178 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 83;}
 	break;
 	case 83:
-/* #line 179 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 179 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 84;}
 	break;
 	case 84:
-/* #line 185 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 185 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 85;}
 	break;
 	case 85:
-/* #line 186 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 186 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 86;}
 	break;
 	case 86:
-/* #line 222 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 222 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 112;}
 	break;
 	case 87:
-/* #line 223 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 223 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 113;}
 	break;
 	case 88:
-/* #line 224 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 224 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 114;}
 	break;
 	case 89:
-/* #line 225 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 225 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 115;}
 	break;
 	case 90:
-/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 121;}
 	break;
 	case 91:
-/* #line 193 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 193 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Inc); }}
 	break;
 	case 92:
-/* #line 194 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 194 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Dec); }}
 	break;
 	case 93:
-/* #line 195 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 195 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ptr); }}
 	break;
 	case 94:
-/* #line 198 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 198 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_LogAnd); }}
 	break;
 	case 95:
-/* #line 199 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 199 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_LogOr); }}
 	break;
 	case 96:
-/* #line 200 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 200 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Eq); }}
 	break;
 	case 97:
-/* #line 201 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 201 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ne); }}
 	break;
 	case 98:
-/* #line 202 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 202 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Le); }}
 	break;
 	case 99:
-/* #line 203 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 203 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ge); }}
 	break;
 	case 100:
-/* #line 204 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 204 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ClassAssign); }}
 	break;
 	case 101:
-/* #line 205 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 205 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_AddAssign); }}
 	break;
 	case 102:
-/* #line 206 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 206 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_SubAssign); }}
 	break;
 	case 103:
-/* #line 207 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 207 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_MulAssign); }}
 	break;
 	case 104:
-/* #line 208 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 208 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_DivAssign); }}
 	break;
 	case 105:
-/* #line 209 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 209 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ModAssign); }}
 	break;
 	case 106:
-/* #line 210 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 210 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
 	break;
 	case 107:
-/* #line 211 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 211 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
 	break;
 	case 108:
-/* #line 212 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 212 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_AndAssign); }}
 	break;
 	case 109:
-/* #line 213 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 213 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_XorAssign); }}
 	break;
 	case 110:
-/* #line 214 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 214 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_OrAssign); }}
 	break;
 	case 111:
-/* #line 215 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 215 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_AtAssign); }}
 	break;
 	case 112:
-/* #line 216 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 216 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (EToken_Ellipsis); }}
 	break;
 	case 113:
-/* #line 223 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 223 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 114:
-/* #line 224 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 224 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 115:
-/* #line 231 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 231 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 116:
-/* #line 233 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 233 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 117:
-/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 118:
-/* #line 115 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 115 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Auto); }}
 	break;
 	case 119:
-/* #line 126 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 126 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Int); }}
 	break;
 	case 120:
-/* #line 136 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 136 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Enum); }}
 	break;
 	case 121:
-/* #line 172 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 172 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Do); }}
 	break;
 	case 122:
-/* #line 187 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 187 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Null); }}
 	break;
 	case 123:
-/* #line 196 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 196 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Shl); }}
 	break;
 	case 124:
-/* #line 197 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 197 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (EToken_Shr); }}
 	break;
 	case 125:
-/* #line 222 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 222 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateStringToken (EToken_Identifier); }}
 	break;
 	case 126:
-/* #line 223 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 223 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 127:
-/* #line 224 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 224 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 128:
-/* #line 225 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 225 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateIntegerToken (10); }}
 	break;
 	case 129:
-/* #line 226 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 226 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateIntegerToken (16, 2); }}
 	break;
 	case 130:
-/* #line 228 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 228 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateFpToken (); }}
 	break;
 	case 131:
-/* #line 230 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 230 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;}
 	break;
 	case 132:
-/* #line 233 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 233 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;}
 	break;
 	case 133:
-/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (ts [0]); }}
 	break;
 	case 134:
-/* #line 225 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 225 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
 	break;
 	case 135:
-/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
 	break;
 	case 136:
@@ -2034,7 +2034,7 @@ _again:
 
 	}
 
-/* #line 253 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 253 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 	bool Result = cs != axl_jnc_error;
 	if (!Result)
