@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_Module.h"
-#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -82,6 +81,27 @@ CStructType::CreateField (
 	}
 
 	return pField;
+}
+
+CStructField*
+CStructType::GetFieldByIndex (size_t Index)
+{
+	size_t Count = m_FieldList.GetCount ();
+	if (Index >= Count)
+	{
+		err::SetFormatStringError (_T("index '%d' is out of bounds"), Index);
+		return NULL;
+	}
+
+	if (m_FieldArray.GetCount () != Count)
+	{
+		m_FieldArray.SetCount (Count);
+		rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
+		for (size_t i = 0; i < Count; i++, Field++)
+			m_FieldArray [i] = *Field;	
+	}
+
+	return m_FieldArray [Index];
 }
 
 bool
@@ -229,49 +249,11 @@ CStructType::InitializeFields ()
 	{
 		CStructField* pField = m_InitializedFieldArray [i];
 
-		CParser Parser;
-		Parser.m_pModule = m_pModule;
-		Parser.m_Stage = CParser::EStage_Pass2;
-
-		Result = Parser.ParseTokenList (ESymbol_expression_save_value, pField->m_Initializer);
-		if (!Result)
-			return false;
-
 		CValue FieldValue;
-
 		Result = 
 			m_pModule->m_OperatorMgr.GetField (pField, NULL, &FieldValue) &&
-			m_pModule->m_OperatorMgr.StoreDataRef (FieldValue, Parser.m_ExpressionValue);
+			m_pModule->m_OperatorMgr.ParseInitializer (FieldValue, pField->GetInitializer ());
 
-		if (!Result)
-			return false;
-	}
-
-	return true;
-}
-
-bool
-CStructType::ScanInitializersForMemberNewOperators ()
-{
-	ASSERT (
-		m_pParentNamespace->GetNamespaceKind () == ENamespace_Type &&
-		((CNamedType*) m_pParentNamespace)->GetTypeKind () == EType_Class);
-		
-	bool Result;
-
-	CClassType* pClassType = (CClassType*) m_pParentNamespace;
-
-	size_t Count = m_InitializedFieldArray.GetCount ();	
-	for (size_t i = 0; i < Count; i++)
-	{
-		CStructField* pField = m_InitializedFieldArray [i];
-
-		CParser Parser;
-		Parser.m_pModule = m_pModule;
-		Parser.m_Stage = CParser::EStage_Pass2;
-		Parser.m_pMemberNewTargetType = pClassType;
-		
-		Result = Parser.ParseTokenList (ESymbol_expression_s, pField->m_Initializer);
 		if (!Result)
 			return false;
 	}

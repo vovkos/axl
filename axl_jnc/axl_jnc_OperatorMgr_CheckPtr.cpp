@@ -83,12 +83,6 @@ COperatorMgr::CheckDataPtrScopeLevel (
 	const CValue& DstValue
 	)
 {
-	static size_t ScopeLevelIndexArray [] = 
-	{
-			1, // TDataPtrValidator m_Validator
-			2, // size_t m_ScopeLevel
-	};
-
 	ASSERT (SrcValue.GetType ()->GetTypeKind () == EType_DataPtr);
 	CDataPtrType* pPtrType = (CDataPtrType*) SrcValue.GetType ();
 	EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
@@ -98,7 +92,7 @@ COperatorMgr::CheckDataPtrScopeLevel (
 	switch (PtrTypeKind)
 	{
 	case EDataPtrType_Normal:
-		m_pModule->m_LlvmBuilder.CreateExtractValue (SrcValue, ScopeLevelIndexArray, countof (ScopeLevelIndexArray), m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), &SrcScopeLevelValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (SrcValue, 3, m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), &SrcScopeLevelValue);
 		break;
 
 	case EDataPtrType_Thin:

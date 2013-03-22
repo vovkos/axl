@@ -1,26 +1,11 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-property MyProp
+struct TPoint
 {
-	int propvalue;
-	event onchange ();
-		
-	set (int x)
-	{
-		printf ("MyProp.set (%d)\n", x);
+	int m_x = 5;
 
-		propvalue = x;		
-
-		if (x > 10)
-			silent return;
-	}
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-foo ()
-{
-	printf ("foo ()\n");
+	int m_y;
+	int m_z;
 }
 
 int 
@@ -28,13 +13,17 @@ main ()
 {
 	printf ("bindable property test\n");
 
-	MyProp.onchange += foo;
 
-	MyProp = 10;
-	MyProp = 20;
+	int x;
 
-	int x = MyProp;
-	printf ("x = %d\n", x);
+	TPoint p;
+
+	p = { , 20, m_z = 30 };
+
+	printf ("p = { %d, %d, %d }\n", p.m_x, p.m_y, p.m_z);
+
+	TPoint* p2 = stack new TPoint { , 6, m_z = 7 };
+	printf ("p2 = { %d, %d, %d }\n", p2.m_x, p2.m_y, p2.m_z);
 
 	return 0;
 }

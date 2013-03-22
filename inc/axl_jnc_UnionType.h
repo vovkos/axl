@@ -22,6 +22,7 @@ protected:
 	friend class CParser;
 
 	rtl::CStdListT <CStructField> m_FieldList;
+	rtl::CArrayT <CStructField*> m_FieldArray;
 	CStructField* m_pInitializedField;
 	CStructType* m_pStructType;
 	
@@ -59,6 +60,9 @@ public:
 	{
 		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
+
+	CStructField*
+	GetFieldByIndex (size_t Index);
 
 	bool
 	InitializeField ();

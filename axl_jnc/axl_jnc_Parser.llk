@@ -53,6 +53,14 @@ Members
 		CFunction* m_pFunction;
 	};
 
+	struct TCurlyInitializer
+	{
+		CValue m_TargetValue;
+		CValue m_IndexedMemberValue;
+		size_t m_Index;
+		size_t m_Count;
+	};
+
 	CModule* m_pModule;
 	EStage m_Stage;
 	size_t m_StructPackFactor;
@@ -67,6 +75,7 @@ Members
 	size_t m_AutoEvBindSiteCount;
 	size_t m_AutoEvBindSiteTotalCount;
 	CValue m_ExpressionValue;
+	CValue m_CurlyInitializerTargetValue;
 	CClassType* m_pMemberNewTargetType;
 }
 
@@ -315,6 +324,28 @@ Members2
 		CAlias* pAlias,
 		CValue* pResultValue
 		);
+
+	void
+	PreStatement ();
+
+	bool
+	CurlyInitializerNamedItem (
+		TCurlyInitializer* pInitializer, 
+		const tchar_t* pName,
+		const CValue& Value
+		);
+
+	bool
+	PreCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer);
+
+	bool
+	CurlyInitializerIndexedItem (
+		TCurlyInitializer* pInitializer, 
+		const CValue& Value
+		);
+
+	bool
+	SkipCurlyInitializerItem (TCurlyInitializer* pInitializer);
 } 
 
 OpenNamespace

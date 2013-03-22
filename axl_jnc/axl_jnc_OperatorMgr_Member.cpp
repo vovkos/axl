@@ -555,6 +555,49 @@ COperatorMgr::GetMemberOperatorResultType (
 bool
 COperatorMgr::MemberOperator (
 	const CValue& RawOpValue,
+	size_t Index,
+	CValue* pResultValue
+	)
+{
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
+	if (!Result)
+		return false;
+
+	CType* pType = OpValue.GetType ();
+	if (!pType->IsDataPtrType ())
+	{
+		err::SetFormatStringError (_T("indexed member operator cannot be applied to '%s'"), pType->GetTypeString ());
+		return false;		
+	}
+
+	pType = ((CDataPtrType*) pType)->GetTargetType ();
+
+	CStructField* pField;
+
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_Array:
+		return BinaryOperator (EBinOp_Idx, OpValue, CValue (Index, EType_SizeT), pResultValue);
+
+	case EType_Struct:
+		pField = ((CStructType*) pType)->GetFieldByIndex (Index);		
+		return pField && GetStructField (OpValue, pField, NULL, pResultValue);
+
+	case EType_Union:
+		pField = ((CUnionType*) pType)->GetFieldByIndex (Index);		
+		return pField && GetUnionField (OpValue, pField, pResultValue);
+
+	default:
+		err::SetFormatStringError (_T("indexed member operator cannot be applied to '%s'"), pType->GetTypeString ());
+		return false;
+	}
+}
+
+bool
+COperatorMgr::MemberOperator (
+	const CValue& RawOpValue,
 	const tchar_t* pName,
 	CValue* pResultValue
 	)

@@ -412,6 +412,7 @@ CValue::SetThinDataPtr (
 	)
 {
 	ref::CPtrT <CThinDataPtrValidator> Validator = AXL_REF_NEW (CThinDataPtrValidator);
+	Validator->m_ValidatorKind = EThinDataPtrValidator_Complex;
 	Validator->m_ScopeValidatorValue = ScopeValidatorValue;
 	Validator->m_RangeBeginValue = RangeBeginValue;
 	Validator->m_Size = Size;

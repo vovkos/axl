@@ -232,7 +232,6 @@ dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
 '/*' (any | nl)* :>> '*/' ;
 
 ws | nl        ;
-
 any            { CreateToken (ts [0]); };
 
 *|;

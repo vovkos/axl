@@ -229,6 +229,9 @@ protected:
 		ASSERT (false);
 	}
 
+	bool
+	ScanInitializersForMemberNewOperators ();
+
 	void
 	AddVirtualFunction (CFunction* pFunction);
 

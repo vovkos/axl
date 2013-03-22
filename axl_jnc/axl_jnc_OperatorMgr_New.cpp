@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_OperatorMgr.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -94,13 +95,30 @@ COperatorMgr::InitializeData (
 		return true;
 
 	CFunction* pPreConstructor = ((CDerivableType*) pType)->GetPreConstructor ();
-	if (!pPreConstructor)
-		return true;
+	return pPreConstructor ? CallOperator (pPreConstructor, PtrValue) : true;
+}
 
-	CValue ThisArgValue;
+bool
+COperatorMgr::ParseInitializer (
+	const CValue& Value,
+	const rtl::CConstBoxListT <CToken> TokenList
+	)
+{
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+
+	if (TokenList.GetHead ()->m_Token == '{')
+	{
+		Parser.m_CurlyInitializerTargetValue = Value;
+		return Parser.ParseTokenList (ESymbol_curly_initializer, TokenList);
+	}
+
 	return 
-		UnaryOperator (EUnOp_Addr, PtrValue, &ThisArgValue) &&
-		CallOperator (pPreConstructor, ThisArgValue);
+		Parser.ParseTokenList (ESymbol_expression_save_value, TokenList) &&
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, Value, Parser.m_ExpressionValue);
 }
 
 bool
@@ -241,24 +259,25 @@ COperatorMgr::NewOperator (
 	}
 	else
 	{
-		Result = InitializeData (StorageKind, PtrValue, pType);
-		if (!Result)
-			return false;
-
 		CValue ScopeLevelValue;
-
 		if (StorageKind == EStorage_Stack)
 			CalcScopeLevelValue (pScope, &ScopeLevelValue);
 		else
 			ScopeLevelValue.SetConstSizeT (0);
-		
-		pResultValue->SetThinDataPtr (
+
+		PtrValue.SetThinDataPtr (
 			PtrValue.GetLlvmValue (),
 			pType->GetDataPtrType (EDataPtrType_Thin),
 			ScopeLevelValue,
 			PtrValue,
 			pType->GetSize ()
 			);
+
+		Result = InitializeData (StorageKind, PtrValue, pType);
+		if (!Result)
+			return false;
+	
+		*pResultValue = PtrValue;
 	}
 
 	return true;

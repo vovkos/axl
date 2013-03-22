@@ -506,7 +506,51 @@ public:
 	bool
 	DeleteOperator (const CValue& OpValue);
 
+	bool
+	ParseInitializer (
+		const CValue& Value,
+		const rtl::CConstBoxListT <CToken> TokenList
+		);
+
 	// member operators
+
+	CType*
+	GetMemberOperatorResultType (
+		const CValue& OpValue,
+		size_t Index
+		);
+
+	bool
+	GetMemberOperatorResultType (
+		const CValue& OpValue,
+		size_t Index,
+		CValue* pResultValue
+		);
+
+	bool
+	GetMemberOperatorResultType (
+		CValue* pValue,
+		size_t Index
+		)
+	{
+		return GetMemberOperatorResultType (*pValue, Index, pValue);
+	}
+
+	bool
+	MemberOperator (
+		const CValue& OpValue,
+		size_t Index,
+		CValue* pResultValue
+		);
+
+	bool
+	MemberOperator (
+		CValue* pValue,
+		size_t Index
+		)
+	{
+		return MemberOperator (*pValue, Index, pValue);
+	}
 
 	CType*
 	GetMemberOperatorResultType (
@@ -545,7 +589,6 @@ public:
 	{
 		return MemberOperator (*pValue, pName, pValue);
 	}
-
 	// call operators
 
 	CType*

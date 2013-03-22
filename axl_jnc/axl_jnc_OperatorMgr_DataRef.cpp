@@ -118,6 +118,7 @@ COperatorMgr::GetThinDataPtrRange (
 		return;
 	}
 
+	ASSERT (pValidator->GetValidatorKind () == EThinDataPtrValidator_Simple);
 	CValue ValidatorValue = pValidator->GetScopeValidator ();
 
 	if (ValidatorValue.GetValueKind () == EValue_Variable)
