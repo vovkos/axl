@@ -32,7 +32,6 @@ CBaseTypeCoord::Init ()
 CDerivableType::CDerivableType ()
 {
 	m_pPreConstructor = NULL;
-	m_pConstructor = NULL;
 	m_pStaticConstructor = NULL;
 }
 
@@ -51,22 +50,6 @@ CDerivableType::AddBaseType (CDerivableType* pType)
 	m_BaseTypeList.InsertTail (pBaseType);
 	It->m_Value = pBaseType;
 	return pBaseType;
-}
-
-CFunction* 
-CDerivableType::GetDefaultConstructor ()
-{
-	ASSERT (m_pConstructor);
-
-	CType* pThisArgType = GetThisArgType ();
-	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
-	if (!pDefaultConstructor)
-	{
-		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
-		return NULL;
-	}
-
-	return pDefaultConstructor;
 }
 
 bool
@@ -107,10 +90,6 @@ CDerivableType::AddMethod (CFunction* pFunction)
 
 	switch (FunctionKind)
 	{
-	case EFunction_Constructor:
-		ppTarget = &m_pConstructor;
-		break;
-
 	case EFunction_PreConstructor:
 		ppTarget = &m_pPreConstructor;
 		break;
@@ -169,8 +148,49 @@ CDerivableType::AddMethod (CFunction* pFunction)
 bool
 CDerivableType::AddProperty (CProperty* pProperty)
 {
-	err::SetFormatStringError (_T("properties in structs / unions are not supported yet"));
-	return false;
+	ASSERT (pProperty->IsNamed ());
+	bool Result = AddItem (pProperty);
+	if (!Result)
+		return false;
+
+	pProperty->m_pParentNamespace = this;
+
+	EStorage StorageKind = pProperty->GetStorageKind ();
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		break;
+
+	case EStorage_Undefined:
+		pProperty->m_StorageKind = EStorage_Member;
+		//and fall through
+
+	case EStorage_Member:
+		pProperty->m_pParentType = this;
+		break;
+
+	default:
+		err::SetFormatStringError (_T("invalid storage specifier '%s' for method member"), GetStorageKindString (StorageKind));
+		return false;
+	}
+
+	return true;
+}
+
+bool
+CDerivableType::CreateDefaultPreConstructor ()
+{
+	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_PreConstructor, pType);
+	pFunction->m_StorageKind = EStorage_Member;
+	
+	bool Result = AddMethod (pFunction);
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.m_DefaultPreConstructorTypeArray.Append (this);
+	return true;
 }
 
 void

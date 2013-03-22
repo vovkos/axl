@@ -30,7 +30,8 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 		{
 			return $pTypeSpecifier->SetType ($1.m_pType);
 		}
-	| type_modifier 
+	| resolver ({ return false; }) // prefer named-type-specifier over type-modifier
+	  type_modifier 
 		{
 			return $pTypeSpecifier->SetTypeModifier ($1.m_Modifier);
 		}
@@ -207,35 +208,9 @@ type_specifier
 			err::SetStringError (_T("'auto' type specifier is not yet supported"));
 			return false; 
 		}
-	| enum_specifier
-		{
-			$.m_pType = $1.m_pType;
-		}
-	| struct_specifier
-		{
-			$.m_pType = $1.m_pType;
-		}
-	| union_specifier
-		{
-			$.m_pType = $1.m_pType;
-		}
-	| class_specifier
-		{
-			$.m_pType = $1.m_pType;
-		}
-	| resolver (autoev_class_specifier_rslv)
-	  autoev_class_specifier $t
-		{
-			$.m_pType = $t.m_pType;
-		}
 	| property_template_specifier
 		{
 			$.m_pType = $1.m_pType;
-		}
-	| resolver (property_specifier_rslv)
-	  property_specifier $t
-		{
-			$.m_pType = $t.m_pProperty->GetType ();
 		}
 	| resolver (qualified_type_name_rslv)
 	  qualified_type_name $t

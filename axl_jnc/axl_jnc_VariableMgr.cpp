@@ -47,6 +47,7 @@ CVariableMgr::CreateVariable (
 	if (pInitializer)
 		pVariable->m_Initializer.TakeOver (pInitializer);
 
+	m_VariableList.InsertTail (pVariable);
 	return pVariable;
 }
 
@@ -62,6 +63,10 @@ CVariableMgr::CreateVariable (
 {
 	CVariable* pVariable = CreateVariable (Name, QualifiedName, pType, PtrTypeFlags, pInitializer);
 	pVariable->m_StorageKind = StorageKind;
+
+	if (StorageKind == EStorage_Static)
+		m_GlobalVariableArray.Append (pVariable);
+
 	return pVariable;
 }
 
@@ -150,12 +155,11 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 	bool Result;
 
 	if (pVariable->m_Initializer.IsEmpty ()) // no initializer
-	{
-		if (pVariable->m_StorageKind == EStorage_Stack)
-			m_pModule->m_LlvmBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), pVariable);
-
-		return true;
-	}
+		return m_pModule->m_OperatorMgr.InitializeData (
+			pVariable->GetStorageKind (), 
+			pVariable,
+			pVariable->GetType ()
+			);
 
 	CParser Parser;
 	Parser.m_pModule = m_pModule;

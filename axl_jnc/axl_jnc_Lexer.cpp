@@ -1,5 +1,5 @@
 
-/* #line 1 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 1 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 #include "stdafx.h"
 #include "axl_jnc_Lexer.h"
 
@@ -16,19 +16,19 @@ namespace jnc {
 /* #line 2 "axl_jnc_Lexer.cpp" */
 static const unsigned char _axl_jnc_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
-	3, 1, 91, 1, 92, 1, 93, 1, 
-	94, 1, 95, 1, 96, 1, 97, 1, 
-	98, 1, 99, 1, 100, 1, 101, 1, 
-	102, 1, 103, 1, 104, 1, 105, 1, 
-	106, 1, 107, 1, 108, 1, 109, 1, 
-	110, 1, 111, 1, 112, 1, 113, 1, 
-	114, 1, 115, 1, 117, 1, 118, 1, 
-	119, 1, 120, 1, 121, 1, 122, 1, 
-	123, 1, 124, 1, 125, 1, 126, 1, 
-	127, 1, 128, 1, 129, 1, 130, 1, 
-	131, 1, 132, 1, 133, 1, 134, 1, 
-	135, 1, 136, 2, 0, 113, 2, 0, 
-	114, 2, 0, 116, 2, 3, 4, 2, 
+	3, 1, 92, 1, 93, 1, 94, 1, 
+	95, 1, 96, 1, 97, 1, 98, 1, 
+	99, 1, 100, 1, 101, 1, 102, 1, 
+	103, 1, 104, 1, 105, 1, 106, 1, 
+	107, 1, 108, 1, 109, 1, 110, 1, 
+	111, 1, 112, 1, 113, 1, 114, 1, 
+	115, 1, 116, 1, 118, 1, 119, 1, 
+	120, 1, 121, 1, 122, 1, 123, 1, 
+	124, 1, 125, 1, 126, 1, 127, 1, 
+	128, 1, 129, 1, 130, 1, 131, 1, 
+	132, 1, 133, 1, 134, 1, 135, 1, 
+	136, 1, 137, 2, 0, 114, 2, 0, 
+	115, 2, 0, 117, 2, 3, 4, 2, 
 	3, 5, 2, 3, 6, 2, 3, 7, 
 	2, 3, 8, 2, 3, 9, 2, 3, 
 	10, 2, 3, 11, 2, 3, 12, 2, 
@@ -61,7 +61,7 @@ static const unsigned char _axl_jnc_actions[] = {
 	82, 2, 3, 83, 2, 3, 84, 2, 
 	3, 85, 2, 3, 86, 2, 3, 87, 
 	2, 3, 88, 2, 3, 89, 2, 3, 
-	90
+	90, 2, 3, 91
 };
 
 static const short _axl_jnc_key_offsets[] = {
@@ -97,16 +97,17 @@ static const short _axl_jnc_key_offsets[] = {
 	1747, 1755, 1763, 1771, 1779, 1787, 1795, 1803, 
 	1811, 1819, 1827, 1835, 1843, 1852, 1860, 1868, 
 	1876, 1884, 1892, 1900, 1908, 1916, 1928, 1936, 
-	1944, 1952, 1960, 1969, 1977, 1985, 1993, 2001, 
-	2009, 2017, 2027, 2036, 2044, 2052, 2060, 2068, 
-	2076, 2084, 2092, 2100, 2108, 2116, 2124, 2132, 
-	2140, 2148, 2159, 2167, 2176, 2184, 2192, 2200, 
-	2208, 2216, 2225, 2233, 2241, 2249, 2259, 2267, 
-	2275, 2283, 2292, 2300, 2308, 2317, 2325, 2333, 
-	2341, 2349, 2357, 2365, 2373, 2381, 2389, 2399, 
-	2407, 2415, 2423, 2431, 2439, 2447, 2455, 2463, 
-	2471, 2479, 2488, 2496, 2504, 2512, 2520, 2528, 
-	2536, 2545, 2553, 2561, 2569, 2577, 2585
+	1944, 1952, 1960, 1970, 1978, 1986, 1994, 2002, 
+	2010, 2018, 2026, 2034, 2042, 2052, 2061, 2069, 
+	2077, 2085, 2093, 2101, 2109, 2117, 2125, 2133, 
+	2141, 2149, 2157, 2165, 2173, 2184, 2192, 2201, 
+	2209, 2217, 2225, 2233, 2241, 2250, 2258, 2266, 
+	2274, 2284, 2292, 2300, 2308, 2317, 2325, 2333, 
+	2342, 2350, 2358, 2366, 2374, 2382, 2390, 2398, 
+	2406, 2414, 2424, 2432, 2440, 2448, 2456, 2464, 
+	2472, 2480, 2488, 2496, 2504, 2513, 2521, 2529, 
+	2537, 2545, 2553, 2561, 2570, 2578, 2586, 2594, 
+	2602, 2610
 };
 
 static const char _axl_jnc_trans_keys[] = {
@@ -355,85 +356,88 @@ static const char _axl_jnc_trans_keys[] = {
 	95, 111, 48, 57, 65, 90, 97, 122, 
 	95, 114, 48, 57, 65, 90, 97, 122, 
 	95, 116, 48, 57, 65, 90, 97, 122, 
-	95, 103, 122, 48, 57, 65, 90, 97, 
-	121, 95, 110, 48, 57, 65, 90, 97, 
-	122, 95, 101, 48, 57, 65, 90, 97, 
-	122, 95, 100, 48, 57, 65, 90, 97, 
-	122, 95, 101, 48, 57, 65, 90, 97, 
-	122, 95, 111, 48, 57, 65, 90, 97, 
-	122, 95, 102, 48, 57, 65, 90, 97, 
-	122, 95, 97, 100, 114, 48, 57, 65, 
-	90, 98, 122, 95, 99, 116, 48, 57, 
-	65, 90, 97, 122, 95, 107, 48, 57, 
-	65, 90, 97, 122, 95, 105, 48, 57, 
-	65, 90, 97, 122, 95, 99, 48, 57, 
-	65, 90, 97, 122, 95, 99, 48, 57, 
-	65, 90, 97, 122, 95, 97, 48, 57, 
-	65, 90, 98, 122, 95, 108, 48, 57, 
-	65, 90, 97, 122, 95, 108, 48, 57, 
-	65, 90, 97, 122, 95, 117, 48, 57, 
-	65, 90, 97, 122, 95, 99, 48, 57, 
-	65, 90, 97, 122, 95, 116, 48, 57, 
-	65, 90, 97, 122, 95, 105, 48, 57, 
-	65, 90, 97, 122, 95, 116, 48, 57, 
-	65, 90, 97, 122, 95, 99, 48, 57, 
-	65, 90, 97, 122, 95, 104, 48, 57, 
-	65, 90, 97, 122, 95, 104, 108, 114, 
-	121, 48, 57, 65, 90, 97, 122, 95, 
-	105, 48, 57, 65, 90, 97, 122, 95, 
-	110, 115, 48, 57, 65, 90, 97, 122, 
-	95, 115, 48, 57, 65, 90, 97, 122, 
-	95, 117, 48, 57, 65, 90, 97, 122, 
-	95, 101, 48, 57, 65, 90, 97, 122, 
-	95, 112, 48, 57, 65, 90, 97, 122, 
-	95, 101, 48, 57, 65, 90, 97, 122, 
-	95, 100, 111, 48, 57, 65, 90, 97, 
-	122, 95, 101, 48, 57, 65, 90, 97, 
-	122, 95, 102, 48, 57, 65, 90, 97, 
-	122, 95, 102, 48, 57, 65, 90, 97, 
-	122, 95, 104, 110, 115, 48, 57, 65, 
-	90, 97, 122, 95, 101, 48, 57, 65, 
-	90, 97, 122, 95, 97, 48, 57, 65, 
-	90, 98, 122, 95, 112, 48, 57, 65, 
-	90, 97, 122, 95, 105, 115, 48, 57, 
-	65, 90, 97, 122, 95, 111, 48, 57, 
-	65, 90, 97, 122, 95, 110, 48, 57, 
-	65, 90, 97, 122, 95, 97, 105, 48, 
-	57, 65, 90, 98, 122, 95, 102, 48, 
-	57, 65, 90, 97, 122, 95, 101, 48, 
-	57, 65, 90, 97, 122, 95, 103, 48, 
-	57, 65, 90, 97, 122, 95, 110, 48, 
-	57, 65, 90, 97, 122, 95, 101, 48, 
-	57, 65, 90, 97, 122, 95, 100, 48, 
+	95, 103, 108, 122, 48, 57, 65, 90, 
+	97, 121, 95, 110, 48, 57, 65, 90, 
+	97, 122, 95, 101, 48, 57, 65, 90, 
+	97, 122, 95, 100, 48, 57, 65, 90, 
+	97, 122, 95, 101, 48, 57, 65, 90, 
+	97, 122, 95, 110, 48, 57, 65, 90, 
+	97, 122, 95, 116, 48, 57, 65, 90, 
+	97, 122, 95, 101, 48, 57, 65, 90, 
+	97, 122, 95, 111, 48, 57, 65, 90, 
+	97, 122, 95, 102, 48, 57, 65, 90, 
+	97, 122, 95, 97, 100, 114, 48, 57, 
+	65, 90, 98, 122, 95, 99, 116, 48, 
+	57, 65, 90, 97, 122, 95, 107, 48, 
 	57, 65, 90, 97, 122, 95, 105, 48, 
-	57, 65, 90, 97, 122, 95, 110, 48, 
-	57, 65, 90, 97, 122, 95, 103, 48, 
-	57, 65, 90, 97, 122, 95, 97, 105, 
-	111, 48, 57, 65, 90, 98, 122, 95, 
-	114, 48, 57, 65, 90, 97, 122, 95, 
-	105, 48, 57, 65, 90, 97, 122, 95, 
-	97, 48, 57, 65, 90, 98, 122, 95, 
-	110, 48, 57, 65, 90, 97, 122, 95, 
-	116, 48, 57, 65, 90, 97, 122, 95, 
-	114, 48, 57, 65, 90, 97, 122, 95, 
-	116, 48, 57, 65, 90, 97, 122, 95, 
-	117, 48, 57, 65, 90, 97, 122, 95, 
-	97, 48, 57, 65, 90, 98, 122, 95, 
-	108, 48, 57, 65, 90, 97, 122, 95, 
-	105, 108, 48, 57, 65, 90, 97, 122, 
-	95, 100, 48, 57, 65, 90, 97, 122, 
-	95, 97, 48, 57, 65, 90, 98, 122, 
-	95, 116, 48, 57, 65, 90, 97, 122, 
+	57, 65, 90, 97, 122, 95, 99, 48, 
+	57, 65, 90, 97, 122, 95, 99, 48, 
+	57, 65, 90, 97, 122, 95, 97, 48, 
+	57, 65, 90, 98, 122, 95, 108, 48, 
+	57, 65, 90, 97, 122, 95, 108, 48, 
+	57, 65, 90, 97, 122, 95, 117, 48, 
+	57, 65, 90, 97, 122, 95, 99, 48, 
+	57, 65, 90, 97, 122, 95, 116, 48, 
+	57, 65, 90, 97, 122, 95, 105, 48, 
+	57, 65, 90, 97, 122, 95, 116, 48, 
+	57, 65, 90, 97, 122, 95, 99, 48, 
+	57, 65, 90, 97, 122, 95, 104, 48, 
+	57, 65, 90, 97, 122, 95, 104, 108, 
+	114, 121, 48, 57, 65, 90, 97, 122, 
 	95, 105, 48, 57, 65, 90, 97, 122, 
+	95, 110, 115, 48, 57, 65, 90, 97, 
+	122, 95, 115, 48, 57, 65, 90, 97, 
+	122, 95, 117, 48, 57, 65, 90, 97, 
+	122, 95, 101, 48, 57, 65, 90, 97, 
+	122, 95, 112, 48, 57, 65, 90, 97, 
+	122, 95, 101, 48, 57, 65, 90, 97, 
+	122, 95, 100, 111, 48, 57, 65, 90, 
+	97, 122, 95, 101, 48, 57, 65, 90, 
+	97, 122, 95, 102, 48, 57, 65, 90, 
+	97, 122, 95, 102, 48, 57, 65, 90, 
+	97, 122, 95, 104, 110, 115, 48, 57, 
+	65, 90, 97, 122, 95, 101, 48, 57, 
+	65, 90, 97, 122, 95, 97, 48, 57, 
+	65, 90, 98, 122, 95, 112, 48, 57, 
+	65, 90, 97, 122, 95, 105, 115, 48, 
+	57, 65, 90, 97, 122, 95, 111, 48, 
+	57, 65, 90, 97, 122, 95, 110, 48, 
+	57, 65, 90, 97, 122, 95, 97, 105, 
+	48, 57, 65, 90, 98, 122, 95, 102, 
+	48, 57, 65, 90, 97, 122, 95, 101, 
+	48, 57, 65, 90, 97, 122, 95, 103, 
+	48, 57, 65, 90, 97, 122, 95, 110, 
+	48, 57, 65, 90, 97, 122, 95, 101, 
+	48, 57, 65, 90, 97, 122, 95, 100, 
+	48, 57, 65, 90, 97, 122, 95, 105, 
+	48, 57, 65, 90, 97, 122, 95, 110, 
+	48, 57, 65, 90, 97, 122, 95, 103, 
+	48, 57, 65, 90, 97, 122, 95, 97, 
+	105, 111, 48, 57, 65, 90, 98, 122, 
+	95, 114, 48, 57, 65, 90, 97, 122, 
+	95, 105, 48, 57, 65, 90, 97, 122, 
+	95, 97, 48, 57, 65, 90, 98, 122, 
+	95, 110, 48, 57, 65, 90, 97, 122, 
+	95, 116, 48, 57, 65, 90, 97, 122, 
+	95, 114, 48, 57, 65, 90, 97, 122, 
+	95, 116, 48, 57, 65, 90, 97, 122, 
+	95, 117, 48, 57, 65, 90, 97, 122, 
+	95, 97, 48, 57, 65, 90, 98, 122, 
 	95, 108, 48, 57, 65, 90, 97, 122, 
-	95, 101, 48, 57, 65, 90, 97, 122, 
-	95, 101, 104, 48, 57, 65, 90, 97, 
+	95, 105, 108, 48, 57, 65, 90, 97, 
+	122, 95, 100, 48, 57, 65, 90, 97, 
 	122, 95, 97, 48, 57, 65, 90, 98, 
-	122, 95, 107, 48, 57, 65, 90, 97, 
+	122, 95, 116, 48, 57, 65, 90, 97, 
 	122, 95, 105, 48, 57, 65, 90, 97, 
 	122, 95, 108, 48, 57, 65, 90, 97, 
 	122, 95, 101, 48, 57, 65, 90, 97, 
-	122, 61, 124, 0
+	122, 95, 101, 104, 48, 57, 65, 90, 
+	97, 122, 95, 97, 48, 57, 65, 90, 
+	98, 122, 95, 107, 48, 57, 65, 90, 
+	97, 122, 95, 105, 48, 57, 65, 90, 
+	97, 122, 95, 108, 48, 57, 65, 90, 
+	97, 122, 95, 101, 48, 57, 65, 90, 
+	97, 122, 61, 124, 0
 };
 
 static const char _axl_jnc_single_lengths[] = {
@@ -469,16 +473,17 @@ static const char _axl_jnc_single_lengths[] = {
 	2, 2, 2, 2, 2, 2, 2, 2, 
 	2, 2, 2, 2, 3, 2, 2, 2, 
 	2, 2, 2, 2, 2, 6, 2, 2, 
-	2, 2, 3, 2, 2, 2, 2, 2, 
-	2, 4, 3, 2, 2, 2, 2, 2, 
+	2, 2, 4, 2, 2, 2, 2, 2, 
+	2, 2, 2, 2, 4, 3, 2, 2, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 5, 2, 3, 2, 2, 2, 2, 
-	2, 3, 2, 2, 2, 4, 2, 2, 
-	2, 3, 2, 2, 3, 2, 2, 2, 
-	2, 2, 2, 2, 2, 2, 4, 2, 
+	2, 2, 2, 2, 5, 2, 3, 2, 
+	2, 2, 2, 2, 3, 2, 2, 2, 
+	4, 2, 2, 2, 3, 2, 2, 3, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 3, 2, 2, 2, 2, 2, 2, 
-	3, 2, 2, 2, 2, 2, 2
+	2, 4, 2, 2, 2, 2, 2, 2, 
+	2, 2, 2, 2, 3, 2, 2, 2, 
+	2, 2, 2, 3, 2, 2, 2, 2, 
+	2, 2
 };
 
 static const char _axl_jnc_range_lengths[] = {
@@ -523,7 +528,8 @@ static const char _axl_jnc_range_lengths[] = {
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
-	3, 3, 3, 3, 3, 3, 0
+	3, 3, 3, 3, 3, 3, 3, 3, 
+	3, 0
 };
 
 static const short _axl_jnc_index_offsets[] = {
@@ -559,16 +565,17 @@ static const short _axl_jnc_index_offsets[] = {
 	1372, 1378, 1384, 1390, 1396, 1402, 1408, 1414, 
 	1420, 1426, 1432, 1438, 1444, 1451, 1457, 1463, 
 	1469, 1475, 1481, 1487, 1493, 1499, 1509, 1515, 
-	1521, 1527, 1533, 1540, 1546, 1552, 1558, 1564, 
-	1570, 1576, 1584, 1591, 1597, 1603, 1609, 1615, 
-	1621, 1627, 1633, 1639, 1645, 1651, 1657, 1663, 
-	1669, 1675, 1684, 1690, 1697, 1703, 1709, 1715, 
-	1721, 1727, 1734, 1740, 1746, 1752, 1760, 1766, 
-	1772, 1778, 1785, 1791, 1797, 1804, 1810, 1816, 
-	1822, 1828, 1834, 1840, 1846, 1852, 1858, 1866, 
-	1872, 1878, 1884, 1890, 1896, 1902, 1908, 1914, 
-	1920, 1926, 1933, 1939, 1945, 1951, 1957, 1963, 
-	1969, 1976, 1982, 1988, 1994, 2000, 2006
+	1521, 1527, 1533, 1541, 1547, 1553, 1559, 1565, 
+	1571, 1577, 1583, 1589, 1595, 1603, 1610, 1616, 
+	1622, 1628, 1634, 1640, 1646, 1652, 1658, 1664, 
+	1670, 1676, 1682, 1688, 1694, 1703, 1709, 1716, 
+	1722, 1728, 1734, 1740, 1746, 1753, 1759, 1765, 
+	1771, 1779, 1785, 1791, 1797, 1804, 1810, 1816, 
+	1823, 1829, 1835, 1841, 1847, 1853, 1859, 1865, 
+	1871, 1877, 1885, 1891, 1897, 1903, 1909, 1915, 
+	1921, 1927, 1933, 1939, 1945, 1952, 1958, 1964, 
+	1970, 1976, 1982, 1988, 1995, 2001, 2007, 2013, 
+	2019, 2025
 };
 
 static const short _axl_jnc_indicies[] = {
@@ -764,66 +771,68 @@ static const short _axl_jnc_indicies[] = {
 	38, 38, 96, 38, 367, 38, 38, 38, 
 	96, 38, 368, 38, 38, 38, 96, 38, 
 	369, 38, 38, 38, 96, 38, 370, 371, 
-	38, 38, 38, 96, 38, 372, 38, 38, 
-	38, 96, 38, 373, 38, 38, 38, 96, 
-	38, 374, 38, 38, 38, 96, 38, 375, 
-	38, 38, 38, 96, 38, 376, 38, 38, 
-	38, 96, 38, 377, 38, 38, 38, 96, 
-	38, 378, 379, 380, 38, 38, 38, 96, 
-	38, 381, 382, 38, 38, 38, 96, 38, 
-	383, 38, 38, 38, 96, 38, 384, 38, 
-	38, 38, 96, 38, 385, 38, 38, 38, 
-	96, 38, 386, 38, 38, 38, 96, 38, 
-	387, 38, 38, 38, 96, 38, 388, 38, 
-	38, 38, 96, 38, 389, 38, 38, 38, 
-	96, 38, 390, 38, 38, 38, 96, 38, 
-	391, 38, 38, 38, 96, 38, 392, 38, 
-	38, 38, 96, 38, 393, 38, 38, 38, 
-	96, 38, 394, 38, 38, 38, 96, 38, 
-	395, 38, 38, 38, 96, 38, 396, 38, 
-	38, 38, 96, 38, 397, 398, 399, 400, 
-	38, 38, 38, 96, 38, 401, 38, 38, 
-	38, 96, 38, 402, 403, 38, 38, 38, 
-	96, 38, 404, 38, 38, 38, 96, 38, 
-	405, 38, 38, 38, 96, 38, 406, 38, 
-	38, 38, 96, 38, 407, 38, 38, 38, 
-	96, 38, 408, 38, 38, 38, 96, 38, 
-	409, 410, 38, 38, 38, 96, 38, 411, 
+	372, 38, 38, 38, 96, 38, 373, 38, 
+	38, 38, 96, 38, 374, 38, 38, 38, 
+	96, 38, 375, 38, 38, 38, 96, 38, 
+	376, 38, 38, 38, 96, 38, 377, 38, 
+	38, 38, 96, 38, 378, 38, 38, 38, 
+	96, 38, 379, 38, 38, 38, 96, 38, 
+	380, 38, 38, 38, 96, 38, 381, 38, 
+	38, 38, 96, 38, 382, 383, 384, 38, 
+	38, 38, 96, 38, 385, 386, 38, 38, 
+	38, 96, 38, 387, 38, 38, 38, 96, 
+	38, 388, 38, 38, 38, 96, 38, 389, 
+	38, 38, 38, 96, 38, 390, 38, 38, 
+	38, 96, 38, 391, 38, 38, 38, 96, 
+	38, 392, 38, 38, 38, 96, 38, 393, 
+	38, 38, 38, 96, 38, 394, 38, 38, 
+	38, 96, 38, 395, 38, 38, 38, 96, 
+	38, 396, 38, 38, 38, 96, 38, 397, 
+	38, 38, 38, 96, 38, 398, 38, 38, 
+	38, 96, 38, 399, 38, 38, 38, 96, 
+	38, 400, 38, 38, 38, 96, 38, 401, 
+	402, 403, 404, 38, 38, 38, 96, 38, 
+	405, 38, 38, 38, 96, 38, 406, 407, 
+	38, 38, 38, 96, 38, 408, 38, 38, 
+	38, 96, 38, 409, 38, 38, 38, 96, 
+	38, 410, 38, 38, 38, 96, 38, 411, 
 	38, 38, 38, 96, 38, 412, 38, 38, 
-	38, 96, 38, 413, 38, 38, 38, 96, 
-	38, 414, 415, 416, 38, 38, 38, 96, 
-	38, 417, 38, 38, 38, 96, 38, 418, 
-	38, 38, 38, 96, 38, 419, 38, 38, 
-	38, 96, 38, 420, 421, 38, 38, 38, 
+	38, 96, 38, 413, 414, 38, 38, 38, 
+	96, 38, 415, 38, 38, 38, 96, 38, 
+	416, 38, 38, 38, 96, 38, 417, 38, 
+	38, 38, 96, 38, 418, 419, 420, 38, 
+	38, 38, 96, 38, 421, 38, 38, 38, 
 	96, 38, 422, 38, 38, 38, 96, 38, 
 	423, 38, 38, 38, 96, 38, 424, 425, 
 	38, 38, 38, 96, 38, 426, 38, 38, 
 	38, 96, 38, 427, 38, 38, 38, 96, 
-	38, 428, 38, 38, 38, 96, 38, 429, 
-	38, 38, 38, 96, 38, 430, 38, 38, 
-	38, 96, 38, 431, 38, 38, 38, 96, 
-	38, 432, 38, 38, 38, 96, 38, 433, 
-	38, 38, 38, 96, 38, 434, 38, 38, 
-	38, 96, 38, 435, 436, 437, 38, 38, 
-	38, 96, 38, 438, 38, 38, 38, 96, 
-	38, 439, 38, 38, 38, 96, 38, 440, 
-	38, 38, 38, 96, 38, 441, 38, 38, 
-	38, 96, 38, 442, 38, 38, 38, 96, 
-	38, 443, 38, 38, 38, 96, 38, 444, 
-	38, 38, 38, 96, 38, 445, 38, 38, 
-	38, 96, 38, 446, 38, 38, 38, 96, 
-	38, 447, 38, 38, 38, 96, 38, 448, 
+	38, 428, 429, 38, 38, 38, 96, 38, 
+	430, 38, 38, 38, 96, 38, 431, 38, 
+	38, 38, 96, 38, 432, 38, 38, 38, 
+	96, 38, 433, 38, 38, 38, 96, 38, 
+	434, 38, 38, 38, 96, 38, 435, 38, 
+	38, 38, 96, 38, 436, 38, 38, 38, 
+	96, 38, 437, 38, 38, 38, 96, 38, 
+	438, 38, 38, 38, 96, 38, 439, 440, 
+	441, 38, 38, 38, 96, 38, 442, 38, 
+	38, 38, 96, 38, 443, 38, 38, 38, 
+	96, 38, 444, 38, 38, 38, 96, 38, 
+	445, 38, 38, 38, 96, 38, 446, 38, 
+	38, 38, 96, 38, 447, 38, 38, 38, 
+	96, 38, 448, 38, 38, 38, 96, 38, 
 	449, 38, 38, 38, 96, 38, 450, 38, 
 	38, 38, 96, 38, 451, 38, 38, 38, 
-	96, 38, 452, 38, 38, 38, 96, 38, 
-	453, 38, 38, 38, 96, 38, 454, 38, 
-	38, 38, 96, 38, 455, 38, 38, 38, 
-	96, 38, 456, 457, 38, 38, 38, 96, 
+	96, 38, 452, 453, 38, 38, 38, 96, 
+	38, 454, 38, 38, 38, 96, 38, 455, 
+	38, 38, 38, 96, 38, 456, 38, 38, 
+	38, 96, 38, 457, 38, 38, 38, 96, 
 	38, 458, 38, 38, 38, 96, 38, 459, 
-	38, 38, 38, 96, 38, 460, 38, 38, 
-	38, 96, 38, 461, 38, 38, 38, 96, 
-	38, 462, 38, 38, 38, 96, 463, 464, 
-	63, 0
+	38, 38, 38, 96, 38, 460, 461, 38, 
+	38, 38, 96, 38, 462, 38, 38, 38, 
+	96, 38, 463, 38, 38, 38, 96, 38, 
+	464, 38, 38, 38, 96, 38, 465, 38, 
+	38, 38, 96, 38, 466, 38, 38, 38, 
+	96, 467, 468, 63, 0
 };
 
 static const short _axl_jnc_trans_targs[] = {
@@ -834,7 +843,7 @@ static const short _axl_jnc_trans_targs[] = {
 	24, 26, 27, 29, 30, 32, 33, 34, 
 	36, 37, 53, 71, 89, 102, 115, 133, 
 	135, 138, 150, 153, 169, 184, 207, 243, 
-	253, 281, 293, 310, 328, 334, 7, 7, 
+	253, 284, 296, 313, 331, 337, 7, 7, 
 	7, 7, 7, 7, 7, 7, 7, 7, 
 	7, 7, 7, 7, 2, 21, 7, 7, 
 	7, 5, 6, 7, 7, 7, 28, 7, 
@@ -872,29 +881,29 @@ static const short _axl_jnc_trans_targs[] = {
 	33, 231, 232, 233, 33, 235, 236, 237, 
 	238, 33, 240, 241, 242, 33, 244, 245, 
 	250, 246, 247, 248, 249, 33, 251, 252, 
-	33, 254, 255, 258, 265, 277, 33, 256, 
-	257, 33, 259, 262, 260, 261, 33, 263, 
-	264, 33, 266, 270, 274, 267, 268, 33, 
-	269, 33, 271, 272, 273, 33, 275, 276, 
-	33, 278, 279, 280, 33, 282, 284, 285, 
-	287, 283, 33, 33, 33, 286, 33, 288, 
-	289, 290, 292, 291, 33, 33, 294, 297, 
-	307, 295, 296, 33, 298, 300, 299, 33, 
-	301, 303, 302, 33, 304, 305, 306, 33, 
-	308, 309, 33, 311, 316, 321, 312, 313, 
-	314, 315, 33, 317, 318, 319, 320, 33, 
-	322, 323, 33, 324, 325, 326, 327, 33, 
-	329, 331, 330, 33, 332, 333, 33, 7, 
-	7
+	33, 254, 255, 258, 268, 280, 33, 256, 
+	257, 33, 259, 262, 265, 260, 261, 33, 
+	263, 264, 33, 266, 267, 33, 269, 273, 
+	277, 270, 271, 33, 272, 33, 274, 275, 
+	276, 33, 278, 279, 33, 281, 282, 283, 
+	33, 285, 287, 288, 290, 286, 33, 33, 
+	33, 289, 33, 291, 292, 293, 295, 294, 
+	33, 33, 297, 300, 310, 298, 299, 33, 
+	301, 303, 302, 33, 304, 306, 305, 33, 
+	307, 308, 309, 33, 311, 312, 33, 314, 
+	319, 324, 315, 316, 317, 318, 33, 320, 
+	321, 322, 323, 33, 325, 326, 33, 327, 
+	328, 329, 330, 33, 332, 334, 333, 33, 
+	335, 336, 33, 7, 7
 };
 
 static const short _axl_jnc_trans_actions[] = {
-	97, 0, 102, 55, 360, 0, 99, 53, 
-	357, 95, 51, 0, 1, 0, 57, 0, 
-	93, 0, 59, 0, 105, 0, 366, 0, 
-	0, 366, 0, 0, 0, 7, 7, 363, 
-	363, 0, 0, 0, 0, 0, 354, 354, 
-	0, 0, 0, 0, 0, 354, 0, 0, 
+	97, 0, 102, 55, 363, 0, 99, 53, 
+	360, 95, 51, 0, 1, 0, 57, 0, 
+	93, 0, 59, 0, 105, 0, 369, 0, 
+	0, 369, 0, 0, 0, 7, 7, 366, 
+	366, 0, 0, 0, 0, 0, 357, 357, 
+	0, 0, 0, 0, 0, 357, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 89, 91, 
 	21, 79, 37, 15, 43, 77, 33, 9, 
@@ -914,7 +923,7 @@ static const short _axl_jnc_trans_actions[] = {
 	0, 0, 252, 0, 0, 0, 0, 0, 
 	318, 0, 0, 65, 267, 0, 0, 210, 
 	0, 0, 0, 114, 0, 0, 0, 0, 
-	0, 0, 0, 351, 0, 0, 249, 321, 
+	0, 0, 0, 354, 0, 0, 249, 321, 
 	0, 0, 0, 159, 0, 0, 0, 0, 
 	0, 201, 0, 279, 0, 0, 135, 315, 
 	0, 0, 0, 0, 0, 0, 222, 63, 
@@ -935,19 +944,19 @@ static const short _axl_jnc_trans_actions[] = {
 	0, 156, 0, 0, 0, 153, 0, 0, 
 	0, 0, 0, 0, 0, 177, 0, 0, 
 	333, 0, 0, 0, 0, 0, 282, 0, 
-	0, 261, 0, 0, 0, 0, 162, 0, 
-	0, 309, 0, 0, 0, 0, 0, 132, 
-	0, 126, 0, 0, 0, 198, 0, 0, 
-	270, 0, 0, 0, 336, 0, 0, 0, 
-	0, 0, 189, 285, 129, 0, 348, 0, 
-	0, 0, 0, 0, 120, 312, 0, 0, 
-	0, 0, 0, 138, 0, 0, 0, 273, 
-	0, 0, 0, 192, 0, 0, 0, 165, 
-	0, 0, 111, 0, 0, 0, 0, 0, 
-	0, 0, 231, 0, 0, 0, 0, 147, 
-	0, 0, 225, 0, 0, 0, 0, 183, 
-	0, 0, 0, 186, 0, 0, 324, 47, 
-	17
+	0, 261, 0, 0, 0, 0, 0, 162, 
+	0, 0, 348, 0, 0, 309, 0, 0, 
+	0, 0, 0, 132, 0, 126, 0, 0, 
+	0, 198, 0, 0, 270, 0, 0, 0, 
+	336, 0, 0, 0, 0, 0, 189, 285, 
+	129, 0, 351, 0, 0, 0, 0, 0, 
+	120, 312, 0, 0, 0, 0, 0, 138, 
+	0, 0, 0, 273, 0, 0, 0, 192, 
+	0, 0, 0, 165, 0, 0, 111, 0, 
+	0, 0, 0, 0, 0, 0, 231, 0, 
+	0, 0, 0, 147, 0, 0, 225, 0, 
+	0, 0, 0, 183, 0, 0, 0, 186, 
+	0, 0, 324, 47, 17
 };
 
 static const short _axl_jnc_to_state_actions[] = {
@@ -992,7 +1001,8 @@ static const short _axl_jnc_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0
 };
 
 static const short _axl_jnc_from_state_actions[] = {
@@ -1037,7 +1047,8 @@ static const short _axl_jnc_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0
 };
 
 static const short _axl_jnc_eof_trans[] = {
@@ -1082,7 +1093,8 @@ static const short _axl_jnc_eof_trans[] = {
 	97, 97, 97, 97, 97, 97, 97, 97, 
 	97, 97, 97, 97, 97, 97, 97, 97, 
 	97, 97, 97, 97, 97, 97, 97, 97, 
-	97, 97, 97, 97, 97, 97, 64
+	97, 97, 97, 97, 97, 97, 97, 97, 
+	97, 64
 };
 
 static const int axl_jnc_start = 7;
@@ -1092,7 +1104,7 @@ static const int axl_jnc_error = -1;
 static const int axl_jnc_en_main = 7;
 
 
-/* #line 239 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 240 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 
 //.............................................................................
@@ -1101,7 +1113,7 @@ void
 CLexer::Init ()
 {
 	
-/* #line 1079 "axl_jnc_Lexer.cpp" */
+/* #line 1091 "axl_jnc_Lexer.cpp" */
 	{
 	cs = axl_jnc_start;
 	ts = 0;
@@ -1109,14 +1121,14 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 247 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 248 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 }
 
 bool
 CLexer::Exec ()
 {
 	
-/* #line 1085 "axl_jnc_Lexer.cpp" */
+/* #line 1097 "axl_jnc_Lexer.cpp" */
 	{
 	int _klen;
 	unsigned int _trans;
@@ -1135,7 +1147,7 @@ _resume:
 /* #line 1 "NONE" */
 	{ts = p;}
 	break;
-/* #line 1102 "axl_jnc_Lexer.cpp" */
+/* #line 1114 "axl_jnc_Lexer.cpp" */
 		}
 	}
 
@@ -1202,7 +1214,7 @@ _eof_trans:
 		switch ( *_acts++ )
 		{
 	case 0:
-/* #line 44 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 44 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{ NewLine (p + 1); }
 	break;
 	case 3:
@@ -1210,534 +1222,538 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 4:
-/* #line 60 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 60 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 1;}
 	break;
 	case 5:
-/* #line 61 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 61 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 2;}
 	break;
 	case 6:
-/* #line 62 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 62 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 3;}
 	break;
 	case 7:
-/* #line 63 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 63 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 4;}
 	break;
 	case 8:
-/* #line 69 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 69 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 5;}
 	break;
 	case 9:
-/* #line 70 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 70 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 6;}
 	break;
 	case 10:
-/* #line 71 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 71 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 7;}
 	break;
 	case 11:
-/* #line 72 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 72 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 8;}
 	break;
 	case 12:
-/* #line 73 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 73 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 9;}
 	break;
 	case 13:
-/* #line 74 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 74 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 10;}
 	break;
 	case 14:
-/* #line 75 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 75 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 11;}
 	break;
 	case 15:
-/* #line 76 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 76 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 12;}
 	break;
 	case 16:
-/* #line 77 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 77 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 13;}
 	break;
 	case 17:
-/* #line 78 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 78 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 14;}
 	break;
 	case 18:
-/* #line 79 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 79 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 15;}
 	break;
 	case 19:
-/* #line 81 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 81 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 16;}
 	break;
 	case 20:
-/* #line 82 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 82 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 17;}
 	break;
 	case 21:
-/* #line 83 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 83 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 18;}
 	break;
 	case 22:
-/* #line 89 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 89 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 19;}
 	break;
 	case 23:
-/* #line 90 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 90 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 20;}
 	break;
 	case 24:
-/* #line 91 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 91 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 21;}
 	break;
 	case 25:
-/* #line 92 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 92 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 22;}
 	break;
 	case 26:
-/* #line 93 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 93 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 23;}
 	break;
 	case 27:
-/* #line 94 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 94 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 24;}
 	break;
 	case 28:
-/* #line 95 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 95 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 25;}
 	break;
 	case 29:
-/* #line 96 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 96 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 26;}
 	break;
 	case 30:
-/* #line 97 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 97 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 27;}
 	break;
 	case 31:
-/* #line 98 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 98 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 28;}
 	break;
 	case 32:
-/* #line 99 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 99 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 29;}
 	break;
 	case 33:
-/* #line 100 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 100 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 30;}
 	break;
 	case 34:
-/* #line 101 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 101 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 31;}
 	break;
 	case 35:
-/* #line 102 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 102 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 32;}
 	break;
 	case 36:
-/* #line 103 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 103 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 33;}
 	break;
 	case 37:
-/* #line 104 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 104 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 34;}
 	break;
 	case 38:
-/* #line 105 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 105 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 35;}
 	break;
 	case 39:
-/* #line 106 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 106 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 36;}
 	break;
 	case 40:
-/* #line 107 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 107 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 37;}
 	break;
 	case 41:
-/* #line 108 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 108 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 38;}
 	break;
 	case 42:
-/* #line 109 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 109 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 39;}
 	break;
 	case 43:
-/* #line 116 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 116 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 41;}
 	break;
 	case 44:
-/* #line 117 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 117 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 42;}
 	break;
 	case 45:
-/* #line 118 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 118 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 43;}
 	break;
 	case 46:
-/* #line 119 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 119 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 44;}
 	break;
 	case 47:
-/* #line 120 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 120 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 45;}
 	break;
 	case 48:
-/* #line 121 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 121 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 46;}
 	break;
 	case 49:
-/* #line 122 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 122 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 47;}
 	break;
 	case 50:
-/* #line 123 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 123 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 48;}
 	break;
 	case 51:
-/* #line 124 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 124 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 49;}
 	break;
 	case 52:
-/* #line 125 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 125 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 50;}
 	break;
 	case 53:
-/* #line 127 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 127 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 52;}
 	break;
 	case 54:
-/* #line 128 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 128 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 53;}
 	break;
 	case 55:
-/* #line 129 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 129 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 54;}
 	break;
 	case 56:
-/* #line 130 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 130 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 55;}
 	break;
 	case 57:
-/* #line 137 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 137 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 57;}
 	break;
 	case 58:
-/* #line 138 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 138 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 58;}
 	break;
 	case 59:
-/* #line 139 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 139 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 59;}
 	break;
 	case 60:
-/* #line 140 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 140 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 60;}
 	break;
 	case 61:
-/* #line 146 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 146 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 61;}
 	break;
 	case 62:
-/* #line 147 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 147 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 62;}
 	break;
 	case 63:
-/* #line 148 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 148 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 63;}
 	break;
 	case 64:
-/* #line 149 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 149 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 64;}
 	break;
 	case 65:
-/* #line 150 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 150 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 65;}
 	break;
 	case 66:
-/* #line 151 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 151 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 66;}
 	break;
 	case 67:
-/* #line 152 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 152 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 67;}
 	break;
 	case 68:
-/* #line 153 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 153 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 68;}
 	break;
 	case 69:
-/* #line 159 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 159 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 69;}
 	break;
 	case 70:
-/* #line 160 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 160 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 70;}
 	break;
 	case 71:
-/* #line 161 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 161 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 71;}
 	break;
 	case 72:
-/* #line 162 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 162 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 72;}
 	break;
 	case 73:
-/* #line 168 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 168 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 73;}
 	break;
 	case 74:
-/* #line 169 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 169 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 74;}
 	break;
 	case 75:
-/* #line 170 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 170 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 75;}
 	break;
 	case 76:
-/* #line 171 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 171 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 76;}
 	break;
 	case 77:
-/* #line 173 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 173 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 78;}
 	break;
 	case 78:
-/* #line 174 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 174 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 79;}
 	break;
 	case 79:
-/* #line 175 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 175 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 80;}
 	break;
 	case 80:
-/* #line 176 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 176 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 81;}
 	break;
 	case 81:
-/* #line 177 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 177 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 82;}
 	break;
 	case 82:
-/* #line 178 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 178 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 83;}
 	break;
 	case 83:
-/* #line 179 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 179 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 84;}
 	break;
 	case 84:
-/* #line 185 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 180 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 85;}
 	break;
 	case 85:
-/* #line 186 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 186 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 86;}
 	break;
 	case 86:
-/* #line 222 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 112;}
+/* #line 187 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 87;}
 	break;
 	case 87:
-/* #line 223 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 223 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 113;}
 	break;
 	case 88:
-/* #line 224 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 224 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 114;}
 	break;
 	case 89:
-/* #line 225 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 225 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 115;}
 	break;
 	case 90:
-/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{act = 121;}
+/* #line 226 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 116;}
 	break;
 	case 91:
-/* #line 193 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Inc); }}
+/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{act = 122;}
 	break;
 	case 92:
-/* #line 194 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Dec); }}
+/* #line 194 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Inc); }}
 	break;
 	case 93:
-/* #line 195 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ptr); }}
+/* #line 195 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Dec); }}
 	break;
 	case 94:
-/* #line 198 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_LogAnd); }}
+/* #line 196 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Ptr); }}
 	break;
 	case 95:
-/* #line 199 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_LogOr); }}
+/* #line 199 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_LogAnd); }}
 	break;
 	case 96:
-/* #line 200 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Eq); }}
+/* #line 200 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_LogOr); }}
 	break;
 	case 97:
-/* #line 201 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ne); }}
+/* #line 201 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Eq); }}
 	break;
 	case 98:
-/* #line 202 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Le); }}
+/* #line 202 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Ne); }}
 	break;
 	case 99:
-/* #line 203 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ge); }}
+/* #line 203 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Le); }}
 	break;
 	case 100:
-/* #line 204 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ClassAssign); }}
+/* #line 204 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Ge); }}
 	break;
 	case 101:
-/* #line 205 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AddAssign); }}
+/* #line 205 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_ClassAssign); }}
 	break;
 	case 102:
-/* #line 206 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_SubAssign); }}
+/* #line 206 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_AddAssign); }}
 	break;
 	case 103:
-/* #line 207 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_MulAssign); }}
+/* #line 207 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_SubAssign); }}
 	break;
 	case 104:
-/* #line 208 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_DivAssign); }}
+/* #line 208 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_MulAssign); }}
 	break;
 	case 105:
-/* #line 209 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ModAssign); }}
+/* #line 209 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_DivAssign); }}
 	break;
 	case 106:
-/* #line 210 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
+/* #line 210 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_ModAssign); }}
 	break;
 	case 107:
-/* #line 211 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
+/* #line 211 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_ShlAssign); }}
 	break;
 	case 108:
-/* #line 212 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AndAssign); }}
+/* #line 212 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_ShrAssign); }}
 	break;
 	case 109:
-/* #line 213 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_XorAssign); }}
+/* #line 213 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_AndAssign); }}
 	break;
 	case 110:
-/* #line 214 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_OrAssign); }}
+/* #line 214 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_XorAssign); }}
 	break;
 	case 111:
-/* #line 215 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_AtAssign); }}
+/* #line 215 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_OrAssign); }}
 	break;
 	case 112:
-/* #line 216 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (EToken_Ellipsis); }}
+/* #line 216 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_AtAssign); }}
 	break;
 	case 113:
-/* #line 223 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateCharToken (EToken_Integer); }}
+/* #line 217 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (EToken_Ellipsis); }}
 	break;
 	case 114:
-/* #line 224 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateStringToken (EToken_Literal, 1, 1); }}
+/* #line 224 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 115:
-/* #line 231 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;}
+/* #line 225 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 116:
-/* #line 233 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 232 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;}
 	break;
 	case 117:
-/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p+1;{ CreateToken (ts [0]); }}
+/* #line 234 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;}
 	break;
 	case 118:
-/* #line 115 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Auto); }}
+/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 119:
-/* #line 126 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Int); }}
+/* #line 115 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Auto); }}
 	break;
 	case 120:
-/* #line 136 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Enum); }}
+/* #line 126 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Int); }}
 	break;
 	case 121:
-/* #line 172 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Do); }}
+/* #line 136 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Enum); }}
 	break;
 	case 122:
-/* #line 187 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Null); }}
+/* #line 172 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Do); }}
 	break;
 	case 123:
-/* #line 196 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Shl); }}
+/* #line 188 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Null); }}
 	break;
 	case 124:
-/* #line 197 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (EToken_Shr); }}
+/* #line 197 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Shl); }}
 	break;
 	case 125:
-/* #line 222 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateStringToken (EToken_Identifier); }}
+/* #line 198 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (EToken_Shr); }}
 	break;
 	case 126:
-/* #line 223 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateCharToken (EToken_Integer); }}
+/* #line 223 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateStringToken (EToken_Identifier); }}
 	break;
 	case 127:
-/* #line 224 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateStringToken (EToken_Literal, 1, 1); }}
+/* #line 224 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateCharToken (EToken_Integer); }}
 	break;
 	case 128:
-/* #line 225 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateIntegerToken (10); }}
+/* #line 225 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateStringToken (EToken_Literal, 1, 1); }}
 	break;
 	case 129:
-/* #line 226 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateIntegerToken (16, 2); }}
+/* #line 226 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateIntegerToken (10); }}
 	break;
 	case 130:
-/* #line 228 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateFpToken (); }}
+/* #line 227 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateIntegerToken (16, 2); }}
 	break;
 	case 131:
-/* #line 230 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;}
+/* #line 229 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateFpToken (); }}
 	break;
 	case 132:
-/* #line 233 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 231 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;}
 	break;
 	case 133:
-/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateToken (ts [0]); }}
+/* #line 234 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;}
 	break;
 	case 134:
-/* #line 225 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
+/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{te = p;p--;{ CreateToken (ts [0]); }}
 	break;
 	case 135:
-/* #line 235 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
-	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
+/* #line 226 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
 	break;
 	case 136:
+/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
+	break;
+	case 137:
 /* #line 1 "NONE" */
 	{	switch( act ) {
 	case 1:
@@ -1981,30 +1997,33 @@ _eof_trans:
 	{{p = ((te))-1;} CreateToken (EToken_Once); }
 	break;
 	case 85:
-	{{p = ((te))-1;} CreateToken (EToken_True); }
+	{{p = ((te))-1;} CreateToken (EToken_Silent); }
 	break;
 	case 86:
+	{{p = ((te))-1;} CreateToken (EToken_True); }
+	break;
+	case 87:
 	{{p = ((te))-1;} CreateToken (EToken_False); }
 	break;
-	case 112:
+	case 113:
 	{{p = ((te))-1;} CreateStringToken (EToken_Identifier); }
 	break;
-	case 113:
+	case 114:
 	{{p = ((te))-1;} CreateCharToken (EToken_Integer); }
 	break;
-	case 114:
+	case 115:
 	{{p = ((te))-1;} CreateStringToken (EToken_Literal, 1, 1); }
 	break;
-	case 115:
+	case 116:
 	{{p = ((te))-1;} CreateIntegerToken (10); }
 	break;
-	case 121:
+	case 122:
 	{{p = ((te))-1;} CreateToken (ts [0]); }
 	break;
 	}
 	}
 	break;
-/* #line 1835 "axl_jnc_Lexer.cpp" */
+/* #line 1853 "axl_jnc_Lexer.cpp" */
 		}
 	}
 
@@ -2017,7 +2036,7 @@ _again:
 /* #line 1 "NONE" */
 	{ts = 0;}
 	break;
-/* #line 1846 "axl_jnc_Lexer.cpp" */
+/* #line 1864 "axl_jnc_Lexer.cpp" */
 		}
 	}
 
@@ -2034,7 +2053,7 @@ _again:
 
 	}
 
-/* #line 253 "C:/root/Projects/Ninja/PRJ_V.GIT/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 254 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 	bool Result = cs != axl_jnc_error;
 	if (!Result)

@@ -93,6 +93,7 @@ protected:
 	CBasicBlock* m_pUnreachableBlock;
 	CBasicBlock* m_pCurrentBlock;
 	CBasicBlock* m_pReturnBlock; // bindable setters & destructors return here
+	CBasicBlock* m_pSilentReturnBlock; // bindable setters
 
 	int m_Flags;
 
@@ -161,12 +162,15 @@ public:
 	Continue (size_t Level);
 
 	bool
-	Return (const CValue& Value);
+	Return (
+		const CValue& Value,
+		bool IsSilent = false
+		);
 
 	bool
 	Return ()
 	{
-		return Return (CValue ());
+		return Return (CValue (), false);
 	}
 
 	// if stmt

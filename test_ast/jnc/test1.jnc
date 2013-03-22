@@ -1,41 +1,44 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TPoint
+property MyProp
 {
-	int m_x;
-	int m_y;
-
-	Setup (
-		int x,
-		int y
-		)
+	int propvalue;
+	event onchange ();
+		
+	set (int x)
 	{
-		printf ("TPoint.Setup (%d, %d)\n", x, y);	
+		printf ("MyProp.set (%d)\n", x);
 
-		m_x = x;
-		m_y = y;
+		propvalue = x;		
+
+		if (x > 10)
+			silent return;
 	}
-};
+}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+foo ()
+{
+	printf ("foo ()\n");
+}
 
 int 
 main ()
 {
-	printf ("struct / union members\n");
+	printf ("bindable property test\n");
 
-	TPoint p;
-	p.m_x = 1;
-	p.m_y = 2;
+	MyProp.onchange += foo;
 
-	p.Setup (10, 20);
+	MyProp = 10;
+	MyProp = 20;
 
+	int x = MyProp;
+	printf ("x = %d\n", x);
 
-	printf ("{ %d, %d }\n", p.m_x, p.m_y);
-
-	return 0; 
+	return 0;
 }
- 
+
 //.............................................................................
 
 int

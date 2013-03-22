@@ -102,6 +102,7 @@ CValue::Clear ()
 	m_pItem = NULL;
 	m_pLlvmValue = NULL;
 	m_Closure = NULL;
+	m_ThinDataPtrValidator = NULL;
 }
 
 llvm::Value*
@@ -375,7 +376,7 @@ void
 CValue::SetThinDataPtr (		
 	llvm::Value* pLlvmValue,
 	CDataPtrType* pType,
-	CClosure* pClosure
+	CThinDataPtrValidator* pValidator
 	)
 {
 	ASSERT (pType->IsDataPtrType ());
@@ -385,7 +386,7 @@ CValue::SetThinDataPtr (
 	m_ValueKind = EValue_LlvmRegister;
 	m_pType = pType;
 	m_pLlvmValue = pLlvmValue;
-	m_Closure = pClosure;
+	m_ThinDataPtrValidator = pValidator;
 }
 
 void
@@ -395,27 +396,27 @@ CValue::SetThinDataPtr (
 	const CValue& ValidatorValue
 	)
 {
-	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
-	Closure->GetArgList ()->InsertTail (ValidatorValue);
-
-	SetThinDataPtr (pLlvmValue, pType, Closure);
+	ref::CPtrT <CThinDataPtrValidator> Validator = AXL_REF_NEW (CThinDataPtrValidator);
+	Validator->m_ValidatorKind = EThinDataPtrValidator_Simple;
+	Validator->m_ScopeValidatorValue = ValidatorValue;
+	SetThinDataPtr (pLlvmValue, pType, Validator);
 }
 
 void
 CValue::SetThinDataPtr (		
 	llvm::Value* pLlvmValue,
 	CDataPtrType* pType,
+	const CValue& ScopeValidatorValue,
 	const CValue& RangeBeginValue,
-	size_t Size,
-	const CValue& ScopeValidatorValue
+	size_t Size
 	)
 {
-	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
-	Closure->GetArgList ()->InsertTail (RangeBeginValue);
-	Closure->GetArgList ()->InsertTail (CValue (Size, EType_SizeT));
-	Closure->GetArgList ()->InsertTail (ScopeValidatorValue);
+	ref::CPtrT <CThinDataPtrValidator> Validator = AXL_REF_NEW (CThinDataPtrValidator);
+	Validator->m_ScopeValidatorValue = ScopeValidatorValue;
+	Validator->m_RangeBeginValue = RangeBeginValue;
+	Validator->m_Size = Size;
 
-	SetThinDataPtr (pLlvmValue, pType, Closure);
+	SetThinDataPtr (pLlvmValue, pType, Validator);
 }
 
 bool

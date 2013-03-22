@@ -137,6 +137,7 @@ class CFunctionMgr
 {
 protected:
 	friend class CModule;
+	friend class CDerivableType;
 	friend class CClassType;
 	friend class CParser;
 
@@ -165,8 +166,10 @@ protected:
 		CFunction* m_pCurrentFunction;
 		CBasicBlock* m_pCurrentBlock;
 		CBasicBlock* m_pReturnBlock;
+		CBasicBlock* m_pSilentReturnBlock;
 		int m_ControlFlowMgrFlags;
 		CValue m_ThisValue;
+		CValue m_ThinThisValue;
 		CValue m_ScopeLevelValue;
 		CValue m_VTablePtrPtrValue; 
 		CValue m_VTablePtrValue;
@@ -182,7 +185,7 @@ protected:
 	rtl::CStdListT <CAutoEv> m_AutoEvList;
 
 	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
-	rtl::CArrayT <CClassType*> m_DefaultPreConstructorClassArray;
+	rtl::CArrayT <CDerivableType*> m_DefaultPreConstructorTypeArray;
 
 	rtl::CStdListT <TThunk> m_ThunkList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
@@ -192,6 +195,7 @@ protected:
 	CFunction* m_pCurrentFunction;
 	
 	CValue m_ThisValue;
+	CValue m_ThinThisValue;
 	CValue m_ScopeLevelValue;
 	CValue m_VTablePtrPtrValue; 
 	CValue m_VTablePtrValue;
@@ -232,6 +236,12 @@ public:
 	GetThisValue ()
 	{
 		return m_ThisValue;
+	}
+
+	CValue 
+	GetThinThisValue ()
+	{
+		return m_ThinThisValue;
 	}
 
 	CValue 
@@ -405,10 +415,16 @@ protected:
 	CompileAutoPropertyAccessors (CProperty* pProperty);
 
 	void
+	CreateThinThisValue ();
+
+	void
 	SaveEmissionContext ();
 
 	void
 	RestoreEmissionContext ();
+
+	void
+	ClearEmissionContext ();
 
 	void
 	CutVTable (const CValue& ThisArgValue);

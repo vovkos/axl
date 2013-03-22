@@ -13,14 +13,9 @@ CClassType::CClassType ()
 	m_pIfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
-
+	m_pConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pInitializer = NULL;
-
-	m_PackFactor = 8;
-	m_pStaticDataStructType = NULL;
-	m_pStaticDataVariable = NULL;
-
 	m_pVTableStructType = NULL;
 	m_pClassPtrTypeTuple = NULL;
 }
@@ -40,9 +35,24 @@ CClassType::GetMemberAutoEvType (CAutoEvType* pShortType)
 	return m_pModule->m_TypeMgr.GetMemberAutoEvType (this, pShortType);
 }
 
+CFunction* 
+CClassType::GetDefaultConstructor ()
+{
+	ASSERT (m_pConstructor);
+
+	CType* pThisArgType = GetThisArgType ();
+	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
+	if (!pDefaultConstructor)
+	{
+		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
+		return NULL;
+	}
+
+	return pDefaultConstructor;
+}
+
 CStructField*
 CClassType::CreateField (
-	EStorage StorageKind,
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
@@ -50,33 +60,7 @@ CClassType::CreateField (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	CStructType* pStructType;
-
-	switch (StorageKind)
-	{
-	case EStorage_Undefined:
-	case EStorage_Member:
-		pStructType = m_pIfaceStructType;
-		break;
-
-	case EStorage_Static:
-		if (!m_pStaticDataStructType)
-		{
-			m_pStaticDataStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType (m_PackFactor);
-			m_pStaticDataStructType->m_StorageKind = EStorage_Static;
-			m_pStaticDataStructType->m_pParentNamespace = this;
-			m_pStaticDataStructType->m_Tag.Format (_T("%s.static_data_struct"), m_Tag);
-		}
-
-		pStructType = m_pStaticDataStructType;
-		break;
-
-	default:
-		err::SetFormatStringError (_T("invalid storage '%s' for field member '%s'"), GetStorageKindString (StorageKind), Name);
-		return NULL;
-	}
-
-	CStructField* pField = pStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
+	CStructField* pField = m_pIfaceStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
 
 	if (!Name.IsEmpty ())
 	{
@@ -250,14 +234,14 @@ CClassType::AddProperty (CProperty* pProperty)
 		//and fall through
 
 	case EStorage_Member:
-		pProperty->m_pParentClassType = this;
+		pProperty->m_pParentType = this;
 		break;
 
 	case EStorage_Abstract:
 	case EStorage_Virtual:
 	case EStorage_Override:
 		m_VirtualPropertyArray.Append (pProperty);
-		pProperty->m_pParentClassType = this;
+		pProperty->m_pParentType = this;
 		break;
 	}
 
@@ -369,7 +353,10 @@ CClassType::CalcLayout ()
 	bool Result = PreCalcLayout ();
 	if (!Result)
 		return false;
-		
+	
+	if (m_pExtensionNamespace)
+		ApplyExtensionNamespace ();
+
 	// layout base types
 
 	bool HasBaseConstructor = false;
@@ -455,22 +442,6 @@ CClassType::CalcLayout ()
 		BaseType->m_Offset = pIfaceBaseType->m_Offset;
 	}
 
-	// static fields
-
-	if (m_pStaticDataStructType)
-	{
-		Result = m_pStaticDataStructType->CalcLayout ();
-		if (!Result)
-			return false;
-
-		m_pStaticDataVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EStorage_Static,
-			_T("static_field"),
-			m_Tag + _T(".static_field"), 
-			m_pStaticDataStructType
-			);
-	}
-
 	// layout virtual properties
 
 	size_t Count = m_VirtualPropertyArray.GetCount ();
@@ -521,29 +492,6 @@ CClassType::CalcLayout ()
 	Result = m_pVTableStructType->CalcLayout ();
 	if (!Result)
 		return false;
-
-	// extension namespace
-
-	if (m_pExtensionNamespace)
-	{
-		size_t Count = m_pExtensionNamespace->GetItemCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CModuleItem* pItem = m_pExtensionNamespace->GetItem (i);
-			EModuleItem ItemKind = pItem->GetItemKind ();
-
-			switch (ItemKind)
-			{
-			case EModuleItem_Function:
-				((CFunction*) pItem)->ConvertToMemberMethod (this);
-				break;
-
-			case EModuleItem_Property:
-				((CProperty*) pItem)->ConvertToMemberProperty (this);
-				break;
-			}
-		}
-	}
 
 	m_pClassStructType->CalcLayout ();
 
@@ -769,18 +717,6 @@ CClassType::CreateAutoEvConstructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pConstructor = pFunction;
-	return true;
-}
-
-bool
-CClassType::CreateDefaultPreConstructor ()
-{
-	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
-	CFunction* pFunction = CreateUnnamedMethod (EStorage_Member, EFunction_PreConstructor, pType);
-	if (!pFunction)
-		return false;
-
-	m_pModule->m_FunctionMgr.m_DefaultPreConstructorClassArray.Append (this);
 	return true;
 }
 

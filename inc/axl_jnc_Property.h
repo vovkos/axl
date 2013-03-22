@@ -20,6 +20,7 @@ class CProperty:
 {
 protected:
 	friend class CTypeMgr;
+	friend class CDerivableType;
 	friend class CClassType;
 	friend class CFunctionMgr;
 	friend class CParser;
@@ -36,17 +37,16 @@ protected:
 	CFunction* m_pGetter;
 	CFunction* m_pSetter;
 
-	// parent class
+	// parent type
 
-	CClassType* m_pParentClassType;
-	CStructField* m_pParentClassField;
+	CNamedType* m_pParentType;
+	CStructField* m_pParentTypeField;
 	size_t m_ParentClassVTableIndex;
 
 	// fields (augmented fields are stored in a base type)
 
 	size_t m_PackFactor;
 	CStructType* m_pDataStructType;
-	CStructType* m_pStaticDataStructType;
 	CVariable* m_pStaticDataVariable;
 
 	// vtable
@@ -107,28 +107,22 @@ public:
 		return m_pDataStructType;
 	}
 
-	CStructType* 
-	GetStaticDataStructType ()
-	{
-		return m_pStaticDataStructType;
-	}
-
 	CVariable* 
 	GetStaticDataVariable ()
 	{
 		return m_pStaticDataVariable;
 	}
 	
-	CClassType* 
-	GetParentClassType ()
+	CNamedType* 
+	GetParentType ()
 	{
-		return m_pParentClassType;
+		return m_pParentType;
 	}
 
 	CStructField* 
-	GetParentClassField ()
+	GetParentTypeField ()
 	{
-		return m_pParentClassField;
+		return m_pParentTypeField;
 	}
 
 	bool
@@ -156,11 +150,10 @@ public:
 	Create (CPropertyType* pType);
 
 	void
-	ConvertToMemberProperty (CClassType* pClassType);
+	ConvertToMemberProperty (CNamedType* pParentType);
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
@@ -170,13 +163,12 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateField (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	bool
@@ -211,7 +203,7 @@ protected:
 	GetAutoAccessorPropertyValue ();
 
 	CStructType*
-	GetDataStructType (EStorage StorageKind);
+	CreateDataStructType ();
 };
 
 //.............................................................................

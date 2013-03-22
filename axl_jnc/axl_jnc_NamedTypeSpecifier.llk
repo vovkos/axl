@@ -1,5 +1,40 @@
 //.............................................................................
 
+// root
+
+class
+{
+	CType* m_pType;
+}
+named_type_specifier
+	: enum_specifier
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| struct_specifier
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| union_specifier
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| class_specifier
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| property_specifier
+		{
+			$.m_pType = $1.m_pProperty->GetType ();
+		}
+	| autoev_class_specifier 
+		{
+			$.m_pType = $1.m_pType;
+		}
+	;
+
+//.............................................................................
+
 // enum
 
 class
@@ -173,7 +208,8 @@ autoev_class_specifier
 	{
 		CDeclarator $Declarator;
 	}
-	: EToken_Class
+	: EToken_AutoEv
+	  EToken_Class
 	  EToken_Identifier $n
 	  function_suffix <&$Declarator>?
 	  function_body_pass1 $b?
@@ -186,16 +222,6 @@ autoev_class_specifier
 
 			if (!$.m_pType)
 				return false;
-		}
-	;
-
-// class_specifier vs autoev_class_specifier at type_specifier::EToken_Class
-
-autoev_class_specifier_rslv 
-	: EToken_Class
-	  EToken_Identifier
-	  	{
-			return (GetTypeSpecifier ()->GetTypeModifiers () & ETypeModifier_AutoEv) != 0;
 		}
 	;
 
@@ -214,6 +240,7 @@ property_specifier
 		{
 			$.m_pProperty = CreateProperty (
 				$n.m_Data.m_String,
+				$n.m_Pos,
 				IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
 				);
 
@@ -225,13 +252,6 @@ property_specifier
 			m_pLastDeclaredItem = $.m_pProperty;
 			return $.m_pProperty->CalcType () != NULL; 
 		}
-	;
-
-// since EToken_Property EToken_Identifier is a conflict against epsilon production we need a resolver
-// otherwise epsilon production (i.e. property modifier) always loses
-
-property_specifier_rslv 
-	: EToken_Property struct_pack_factor? EToken_Identifier '{'
 	;
 
 //.............................................................................
@@ -258,7 +278,6 @@ property_template_specifier
 		}
 	;
 
-
 //.............................................................................
 
 // struct, union, class, interface, property
@@ -276,3 +295,4 @@ named_type_block <CNamespace* $pNamespace>
 	;
 
 //.............................................................................
+

@@ -54,6 +54,7 @@ class COperatorMgr
 {
 protected:
 	friend class CModule;
+	friend class CVariableMgr;
 	friend class CFunctionMgr;
 	friend class CParser;
 	friend class CCast_FunctionPtr;
@@ -952,14 +953,6 @@ public:
 		);
 
 	bool
-	GetNamedTypeStaticField (
-		CNamedType* pNamedType,
-		CStructField* pField,
-		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
 	GetStructField  (
 		const CValue& OpValue,
 		CStructField* pMember,
@@ -978,6 +971,22 @@ public:
 	GetClassField (
 		const CValue& OpValue,
 		CStructField* pMember,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyField (
+		CProperty* pProperty,
+		CStructField* pField,
+		CBaseTypeCoord* pCoord,
+		CValue* pResultValue
+		);
+
+	bool
+	GetAutoEvField (
+		CAutoEv* pAutoEv,
+		CStructField* pField,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
@@ -1209,6 +1218,13 @@ protected:
 		CClassType* pClassType,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
+		);
+
+	bool
+	InitializeData (
+		EStorage StorageKind,
+		const CValue& PtrValue,
+		CType* pType
 		);
 
 	bool

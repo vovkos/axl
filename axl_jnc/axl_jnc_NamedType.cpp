@@ -7,6 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
+CNamedType::CNamedType ()
+{
+	m_NamespaceKind = ENamespace_Type;
+	m_pItemDecl = this;
+}
+
 CType*
 CNamedType::GetThisArgType (int ThisArgTypeFlags)
 {
@@ -62,6 +68,47 @@ CNamedType::FindItemTraverseImpl (
 	}
 
 	return NULL;
+}
+
+bool
+CNamedType::CalcLayout ()
+{
+	if (m_Flags & ETypeFlag_LayoutReady)
+		return true;
+
+	bool Result = PreCalcLayout ();
+	if (!Result)
+		return false;
+
+	if (m_pExtensionNamespace)
+		ApplyExtensionNamespace ();
+
+	PostCalcLayout ();
+	return true;
+}
+
+void
+CNamedType::ApplyExtensionNamespace ()
+{
+	ASSERT (m_pExtensionNamespace);
+
+	size_t Count = m_pExtensionNamespace->GetItemCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CModuleItem* pItem = m_pExtensionNamespace->GetItem (i);
+		EModuleItem ItemKind = pItem->GetItemKind ();
+
+		switch (ItemKind)
+		{
+		case EModuleItem_Function:
+			((CFunction*) pItem)->ConvertToMemberMethod (this);
+			break;
+
+		case EModuleItem_Property:
+			((CProperty*) pItem)->ConvertToMemberProperty (this);
+			break;
+		}
+	}
 }
 
 //.............................................................................

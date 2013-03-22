@@ -49,12 +49,6 @@ CPropertyTemplate::AddMethod (
 CPropertyType*
 CPropertyTemplate::CalcType ()
 {
-	if ((m_TypeModifiers & ETypeModifier_AutoGet) && !m_pAuPropValueType)
-	{
-		err::SetFormatStringError (_T("incomplete autoget property template: no 'propvalue' field"));
-		return NULL;
-	}
-
 	if (!m_pGetterType)
 	{
 		err::SetFormatStringError (_T("incomplete property template: no 'get' method / 'propvalue' field"));

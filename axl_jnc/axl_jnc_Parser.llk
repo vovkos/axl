@@ -199,6 +199,12 @@ Members2
 		rtl::CBoxListT <CToken>* pInitializer
 		);
 
+	bool
+	DeclareOnChange (
+		CType* pType,
+		int PtrTypeFlags
+		);
+
 	CFunctionFormalArg*
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
@@ -232,18 +238,12 @@ Members2
 	CProperty*
 	CreateProperty (
 		const rtl::CString& Name,
+		const CToken::CPos& Pos,
 		size_t PackFactor
 		);
 
 	CPropertyTemplate*
 	CreatePropertyTemplate ();
-
-	CProperty*
-	CreatePropertyImpl (
-		const rtl::CString& Name,
-		const CToken::CPos& Pos,
-		size_t PackFactor
-		);
 
 	CClassType*
 	CreateAutoEvClassType (

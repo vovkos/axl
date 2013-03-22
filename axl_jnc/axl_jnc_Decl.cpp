@@ -305,6 +305,19 @@ CDeclarator::SetPropValue ()
 }
 
 bool
+CDeclarator::SetOnChange ()
+{
+	if (m_DeclaratorKind)
+	{
+		err::SetFormatStringError (_T("cannot create qualified 'onchange' declarator"));
+		return false;
+	}
+
+	m_DeclaratorKind = EDeclarator_OnChange;
+	return true;
+}
+
+bool
 CDeclarator::AddPrefix (EDeclPrefix PrefixKind)
 {
 	TDeclPrefix Prefix;

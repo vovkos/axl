@@ -62,7 +62,7 @@ continue_stmt_0
 	;
 
 return_stmt_0
-	: EToken_Return expression_0? ';'
+	: EToken_Silent? EToken_Return expression_0? ';'
 	;
 
 once_stmt_0

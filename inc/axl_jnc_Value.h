@@ -18,6 +18,7 @@ class CAutoEv;
 class CStructField;
 class CClassType;
 class CClosure;
+class CThinDataPtrValidator;
 
 //.............................................................................
 	
@@ -86,6 +87,7 @@ protected:
 	mutable llvm::Value* m_pLlvmValue;
 
 	ref::CPtrT <CClosure> m_Closure;
+	ref::CPtrT <CThinDataPtrValidator> m_ThinDataPtrValidator;
 
 public:
 	CValue ()
@@ -415,7 +417,7 @@ public:
 	SetThinDataPtr (		
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
-		CClosure* pClosure
+		CThinDataPtrValidator* pValidator
 		);
 
 	void
@@ -429,10 +431,16 @@ public:
 	SetThinDataPtr (		
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
+		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
-		size_t Size,
-		const CValue& ScopeValidatorValue
+		size_t Size
 		);
+
+	CThinDataPtrValidator*
+	GetThinDataPtrValidator () const
+	{
+		return m_ThinDataPtrValidator;
+	}
 
 	bool
 	CreateConst (
@@ -568,6 +576,61 @@ protected:
 	void
 	Init ();
 };
+
+//.............................................................................
+
+enum EThinDataPtrValidator
+{
+	EThinDataPtrValidator_Undefined,
+	EThinDataPtrValidator_Simple,
+	EThinDataPtrValidator_Complex,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CThinDataPtrValidator: public ref::IRefCount
+{
+protected:
+	friend class CValue;
+
+	EThinDataPtrValidator m_ValidatorKind;
+
+	CValue m_ScopeValidatorValue;
+	CValue m_RangeBeginValue;
+	size_t m_Size;
+
+public:
+	CThinDataPtrValidator ()
+	{
+		m_ValidatorKind = EThinDataPtrValidator_Undefined;
+		m_Size = 0;
+	}
+
+	EThinDataPtrValidator 
+	GetValidatorKind ()
+	{
+		return m_ValidatorKind;
+	}
+
+	CValue 
+	GetScopeValidator ()
+	{
+		return m_ScopeValidatorValue;
+	}
+
+	CValue 
+	GetRangeBegin ()
+	{
+		return m_RangeBeginValue;
+	}
+
+	size_t
+	GetSize ()
+	{
+		return m_Size;
+	}
+};
+
 
 //.............................................................................
 

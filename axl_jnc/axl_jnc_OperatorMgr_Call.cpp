@@ -306,9 +306,7 @@ COperatorMgr::CallBaseTypeConstructor (
 		return false;
 	}
 
-	ASSERT (pType->IsDerivableType ());
-	CFunction* pConstructor = ((CDerivableType*) pType)->GetConstructor ();
-	if (!pConstructor)
+	if (pType->GetTypeKind () != EType_Class || !((CClassType*) pType)->GetConstructor ())
 	{
 		err::SetFormatStringError (_T("'%s' has no constructor"), pType->GetTypeString ());
 		return false;
@@ -316,6 +314,7 @@ COperatorMgr::CallBaseTypeConstructor (
 
 	pArgList->InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
 
+	CFunction* pConstructor = ((CClassType*) pType)->GetConstructor ();
 	Result = CallOperator (pConstructor, pArgList);
 	if (!Result)
 		return false;

@@ -41,14 +41,12 @@ protected:
 	CStructType* m_pIfaceStructType;
 	CStructType* m_pClassStructType;
 
+	CFunction* m_pConstructor;
 	CFunction* m_pDestructor;
 	CFunction* m_pInitializer;
 
 	// fields
 
-	size_t m_PackFactor;
-	CStructType* m_pStaticDataStructType;
-	CVariable* m_pStaticDataVariable;
 	rtl::CIteratorT <CStructField> m_FirstMemberNewField;
 	rtl::CArrayT <CStructField*> m_MemberDestructArray;
 
@@ -92,6 +90,15 @@ public:
 		);
 
 	CFunction* 
+	GetConstructor ()
+	{
+		return m_pConstructor;
+	}
+
+	CFunction* 
+	GetDefaultConstructor ();
+
+	CFunction* 
 	GetDestructor ()
 	{
 		return m_pDestructor;
@@ -99,24 +106,6 @@ public:
 
 	CFunction* 
 	GetInitializer ();
-
-	size_t
-	GetPackFactor ()
-	{
-		return m_PackFactor;
-	}
-
-	CStructType* 
-	GetStaticDataStructType ()
-	{
-		return m_pStaticDataStructType;
-	}
-
-	CVariable* 
-	GetStaticDataVariable ()
-	{
-		return m_pStaticDataVariable;
-	}
 
 	rtl::CIteratorT <CStructField>
 	GetFirstMemberNewField ()
@@ -126,7 +115,6 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
@@ -136,34 +124,12 @@ public:
 
 	CStructField*
 	CreateField (
-		EStorage StorageKind,
 		CType* pType,
 		size_t BitCount = 0,
 		int PtrTypeFlags = 0
 		)
 	{
-		return CreateField (StorageKind, rtl::CString (), pType, BitCount, PtrTypeFlags);
-	}
-
-	CStructField*
-	CreateField (
-		const rtl::CString& Name,
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (EStorage_Undefined, Name, pType, BitCount, PtrTypeFlags);
-	}
-
-	CStructField*
-	CreateField (
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (EStorage_Undefined, rtl::CString (), pType, BitCount, PtrTypeFlags);
+		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
 	}
 
 	CAutoEvType* 
@@ -274,9 +240,6 @@ protected:
 
 	bool
 	CreateAutoEvConstructor ();
-
-	bool
-	CreateDefaultPreConstructor ();
 
 	bool
 	CreateDefaultConstructor ();

@@ -150,7 +150,7 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 int
 GetPtrTypeFlagsFromModifiers (int Modifiers)
 {
-	int Flags;
+	int Flags = 0;
 
 	if (Modifiers & ETypeModifier_Nullable)
 		Flags |= EPtrTypeFlag_Nullable;

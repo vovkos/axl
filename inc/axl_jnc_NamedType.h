@@ -12,6 +12,8 @@ namespace jnc {
 
 class CFunctionType;
 class CPropertyType;
+class CStructType;
+class CVariable;
 
 //.............................................................................
 
@@ -25,11 +27,7 @@ protected:
 	CNamespace* m_pExtensionNamespace;
 
 public:
-	CNamedType ()
-	{
-		m_NamespaceKind = ENamespace_Type;
-		m_pItemDecl = this;
-	}
+	CNamedType ();
 
 	CNamespace* 
 	GetExtensionNamespace ()
@@ -49,7 +47,14 @@ public:
 	CPropertyType* 
 	GetMemberPropertyType (CPropertyType* pShortType);
 
+	virtual
+	bool
+	CalcLayout ();
+
 protected:
+	void
+	ApplyExtensionNamespace ();
+
 	virtual
 	CModuleItem*
 	FindItemTraverseImpl (
