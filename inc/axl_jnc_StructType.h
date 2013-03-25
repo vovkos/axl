@@ -88,6 +88,7 @@ protected:
 	size_t m_FieldAlignedSize;
 
 	rtl::CStdListT <CStructField> m_FieldList;
+	rtl::CArrayT <CStructField*> m_FieldArray;
 	rtl::CArrayT <CStructField*> m_InitializedFieldArray;
 	rtl::CArrayT <llvm::Type*> m_LlvmFieldTypeArray;
 	CBitFieldType* m_pLastBitFieldType;
@@ -126,6 +127,9 @@ public:
 	{
 		return m_FieldList;
 	}
+
+	CStructField*
+	GetFieldByIndex (size_t Index);
 
 	rtl::CArrayT <CStructField*> 
 	GetInitializedFieldArray ()
@@ -167,9 +171,6 @@ public:
 
 	bool
 	InitializeFields ();
-
-	bool
-	ScanInitializersForMemberNewOperators ();
 
 protected:
 	virtual 

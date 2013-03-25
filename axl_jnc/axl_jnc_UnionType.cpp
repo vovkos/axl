@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_Module.h"
-#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -61,6 +60,27 @@ CUnionType::CreateField (
 	}
 
 	return pField;
+}
+
+CStructField*
+CUnionType::GetFieldByIndex (size_t Index)
+{
+	size_t Count = m_FieldList.GetCount ();
+	if (Index >= Count)
+	{
+		err::SetFormatStringError (_T("index '%d' is out of bounds"), Index);
+		return NULL;
+	}
+
+	if (m_FieldArray.GetCount () != Count)
+	{
+		m_FieldArray.SetCount (Count);
+		rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
+		for (size_t i = 0; i < Count; i++, Field++)
+			m_FieldArray [i] = *Field;	
+	}
+
+	return m_FieldArray [Index];
 }
 
 bool
@@ -123,21 +143,10 @@ CUnionType::InitializeField ()
 {
 	ASSERT (m_pInitializedField);
 
-	bool Result;
-	
-	CParser Parser;
-	Parser.m_pModule = m_pModule;
-	Parser.m_Stage = CParser::EStage_Pass2;
-
-	Result = Parser.ParseTokenList (ESymbol_expression_save_value, m_pInitializedField->m_Initializer);
-	if (!Result)
-		return false;
-
 	CValue FieldValue;
-
-	return
+	return 
 		m_pModule->m_OperatorMgr.GetField (m_pInitializedField, NULL, &FieldValue) &&
-		m_pModule->m_OperatorMgr.StoreDataRef (FieldValue, Parser.m_ExpressionValue);
+		m_pModule->m_OperatorMgr.ParseInitializer (FieldValue, m_pInitializedField->GetInitializer ());
 }
 
 //.............................................................................

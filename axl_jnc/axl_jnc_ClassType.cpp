@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Parser.h"
 
 namespace axl {
 namespace jnc {
@@ -416,7 +417,7 @@ CClassType::CalcLayout ()
 	{
 		m_pModule->m_NamespaceMgr.OpenNamespace (this);
 
-		Result = m_pIfaceStructType->ScanInitializersForMemberNewOperators ();
+		Result = ScanInitializersForMemberNewOperators ();
 		if (!Result)
 			return false;
 
@@ -528,6 +529,29 @@ CClassType::CalcLayout ()
 	}
 
 	PostCalcLayout ();
+	return true;
+}
+
+bool
+CClassType::ScanInitializersForMemberNewOperators ()
+{
+	bool Result;
+
+	size_t Count = m_pIfaceStructType->m_InitializedFieldArray.GetCount ();	
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_pIfaceStructType->m_InitializedFieldArray [i];
+
+		CParser Parser;
+		Parser.m_pModule = m_pModule;
+		Parser.m_Stage = CParser::EStage_Pass2;
+		Parser.m_pMemberNewTargetType = this;
+		
+		Result = Parser.ParseTokenList (ESymbol_expression_s, pField->GetInitializer());
+		if (!Result)
+			return false;
+	}
+
 	return true;
 }
 

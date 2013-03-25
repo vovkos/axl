@@ -1104,7 +1104,7 @@ static const int axl_jnc_error = -1;
 static const int axl_jnc_en_main = 7;
 
 
-/* #line 240 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 239 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 
 //.............................................................................
@@ -1121,7 +1121,7 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 248 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 247 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 }
 
 bool
@@ -1570,7 +1570,7 @@ _eof_trans:
 	{act = 116;}
 	break;
 	case 91:
-/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{act = 122;}
 	break;
 	case 92:
@@ -1678,7 +1678,7 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 118:
-/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 119:
@@ -1742,7 +1742,7 @@ _eof_trans:
 	{te = p;p--;}
 	break;
 	case 134:
-/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{te = p;p--;{ CreateToken (ts [0]); }}
 	break;
 	case 135:
@@ -1750,7 +1750,7 @@ _eof_trans:
 	{{p = ((te))-1;}{ CreateIntegerToken (10); }}
 	break;
 	case 136:
-/* #line 236 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 235 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 	{{p = ((te))-1;}{ CreateToken (ts [0]); }}
 	break;
 	case 137:
@@ -2053,7 +2053,7 @@ _again:
 
 	}
 
-/* #line 254 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
+/* #line 253 "D:/Prj/Ninja/axl3/axl_jnc/axl_jnc_Lexer.rl" */
 
 	bool Result = cs != axl_jnc_error;
 	if (!Result)

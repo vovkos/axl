@@ -154,43 +154,35 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 {
 	bool Result;
 
+	CValue PtrValue;
+	Result = m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, pVariable, &PtrValue);
+	ASSERT (Result);
+
 	if (pVariable->m_Initializer.IsEmpty ()) // no initializer
-		return m_pModule->m_OperatorMgr.InitializeData (
-			pVariable->GetStorageKind (), 
-			pVariable,
-			pVariable->GetType ()
-			);
+		return m_pModule->m_OperatorMgr.InitializeData (pVariable->GetStorageKind (), PtrValue, pVariable->GetType ());
 
-	CParser Parser;
-	Parser.m_pModule = m_pModule;
-	Parser.m_Stage = CParser::EStage_Pass2;
-
-	if (pVariable->m_StorageKind != EStorage_Static)
+	if (pVariable->m_Initializer.GetHead ()->m_Token == '{') // curly intializer
 	{
-		m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
-
-		return
-			Parser.ParseTokenList (ESymbol_expression_save_value, pVariable->m_Initializer) &&
-			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, pVariable, Parser.m_ExpressionValue);
+		Result = m_pModule->m_OperatorMgr.InitializeData (pVariable->GetStorageKind (), PtrValue, pVariable->GetType ());
+		if (!Result)
+			return false;
 	}
 
+	return m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->GetInitializer ());
+
+	#pragma AXL_TODO ("refine static variable initialization")
+
+/*
 	TOnceStmt Stmt;
 	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
 
-	Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, pVariable->m_Initializer.GetHead ()->m_Pos);
-	if (!Result)
-		return false;
-
-	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
-
 	Result = 
-		Parser.ParseTokenList (ESymbol_expression_save_value, pVariable->m_Initializer) &&
-		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, pVariable, Parser.m_ExpressionValue);
-
-	if (!Result)
-		return false;
+		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, pVariable->m_Initializer.GetHead ()->m_Pos) &&
+		m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->GetInitializer ());
 
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, pVariable->m_Initializer.GetTail ()->m_Pos);
+*/
+
 	return true;
 }
 

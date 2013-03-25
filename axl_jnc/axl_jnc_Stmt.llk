@@ -78,7 +78,7 @@ base_type_constructor_rslv
 statement
 	enter
 	{
-		m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+		PreStatement ();
 	}
 	: compound_stmt
 	| expression_stmt
