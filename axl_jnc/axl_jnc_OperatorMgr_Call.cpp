@@ -432,7 +432,7 @@ COperatorMgr::CastArgList (
 	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
 	{
 		CType* pFormalArgType = ArgTypeArray [i];
-		
+	
 		CValue ArgCast;
 		Result = 
 			CheckCastKind (*Arg, pFormalArgType) &&

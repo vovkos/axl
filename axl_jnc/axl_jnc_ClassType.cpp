@@ -151,20 +151,24 @@ CClassType::AddMethod (CFunction* pFunction)
 
 	switch (FunctionKind)
 	{
+	case EFunction_PreConstructor:
+		ppTarget = &m_pPreConstructor;
+		break;
+
 	case EFunction_Constructor:
 		ppTarget = &m_pConstructor;
 		break;
 
-	case EFunction_PreConstructor:
-		ppTarget = &m_pPreConstructor;
+	case EFunction_Destructor:
+		ppTarget = &m_pDestructor;
 		break;
 
 	case EFunction_StaticConstructor:
 		ppTarget = &m_pStaticConstructor;
 		break;
 
-	case EFunction_Destructor:
-		ppTarget = &m_pDestructor;
+	case EFunction_StaticDestructor:
+		ppTarget = &m_pStaticDestructor;
 		break;
 
 	case EFunction_Named:

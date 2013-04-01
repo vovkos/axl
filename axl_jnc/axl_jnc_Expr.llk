@@ -560,13 +560,16 @@ unary_operator_expr <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, $pValue);
 		}
-	| EToken_SizeOf type_name_or_expr
+	| EToken_SizeOf '(' type_name_or_expr $t ')'
 		{
-			$pValue->SetConstSizeT ($2.m_pType->GetSize ());
+			$pValue->SetConstSizeT ($t.m_pType->GetTypeKind () == EType_DataRef ? 
+				((CDataPtrType*) $t.m_pType)->GetTargetType ()->GetSize () : 
+				$t.m_pType->GetSize ()
+				);
 		}
-	| EToken_TypeOf type_name_or_expr
+	| EToken_TypeOf '(' type_name_or_expr $t ')' 
 		{
-			$pValue->SetType ($2.m_pType);
+			$pValue->SetType ($t.m_pType);
 		}
 	| resolver (cast_operator_rslv) 
 	  '(' storage_specifier $s? type_name $t ')' unary_expr <$pValue> 
@@ -629,29 +632,6 @@ cast_operator_rslv
 		CTypeSpecifier $TypeSpecifier;
 	}
 	: '(' storage_specifier? type_specifier_modifier <&$TypeSpecifier>
-	;
-
-class
-{
-	CType* m_pType;
-}
-type_name_or_expr
-	local
-	{
-		CValue $Value;
-	}	
-	: type_name 
-		{
-			$.m_pType = $1.m_pType;
-		}
-	| '(' type_name ')'
-		{
-			$.m_pType = $2.m_pType;
-		}
-	| unary_expr_s <&$Value>
-		{
-			$.m_pType = $Value.GetType ();
-		}
 	;
 
 postfix_expr <CValue* $pValue>

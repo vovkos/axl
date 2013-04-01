@@ -19,8 +19,9 @@ GetFunctionKindString (EFunction FunctionKind)
 		_T("set"),                      // EFunction_Setter,
 		_T("preconstruct"),             // EFunction_PreConstructor,
 		_T("this"),                     // EFunction_Constructor,
-		_T("static this"),              // EFunction_StaticConstructor,
 		_T("~this"),                    // EFunction_Destructor,
+		_T("static this"),              // EFunction_StaticConstructor,
+		_T("static ~this"),             // EFunction_StaticDestructor,
 		_T("call-operator"),            // EFunction_CallOperator,
 		_T("cast-operator"),            // EFunction_CastOperator,
 		_T("unary-operator"),           // EFunction_UnaryOperator,
@@ -53,10 +54,13 @@ GetFunctionKindFlags (EFunction FunctionKind)
 		EFunctionKindFlag_NoOverloads |
 		EFunctionKindFlag_NoArgs,       
 		EFunctionKindFlag_NoStorage,    // EFunction_Constructor,
+		EFunctionKindFlag_NoStorage |   // EFunction_Destructor,
+		EFunctionKindFlag_NoOverloads |
+		EFunctionKindFlag_NoArgs,              
 		EFunctionKindFlag_NoStorage |   // EFunction_StaticConstructor,
 		EFunctionKindFlag_NoOverloads |
 		EFunctionKindFlag_NoArgs,              
-		EFunctionKindFlag_NoStorage |   // EFunction_Destructor,
+		EFunctionKindFlag_NoStorage |   // EFunction_StaticDestructor,
 		EFunctionKindFlag_NoOverloads |
 		EFunctionKindFlag_NoArgs,              
 		0,                              // EFunction_CallOperator,

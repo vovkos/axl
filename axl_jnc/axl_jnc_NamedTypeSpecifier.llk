@@ -49,9 +49,11 @@ enum_specifier
 	}
 	: (EToken_Enum | EToken_EnumC $c)
 	  EToken_Identifier $n?
+	  (':' type_name $b)?
 		{
 			$.m_pType = CreateEnumType (
 				IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+				IsValidLocator ($b) ? $b.m_pType : NULL,
 				IsValidLocator ($c) ? EEnumTypeFlag_Exposed : 0
 				);
 

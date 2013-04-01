@@ -277,6 +277,7 @@ CEnumType*
 CTypeMgr::CreateEnumType (
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
+	CType* pBaseType,
 	int Flags
 	)
 {
@@ -299,9 +300,12 @@ CTypeMgr::CreateEnumType (
 		pType->m_Flags |= ETypeFlag_Named;
 	}
 
+	if (!pBaseType)
+		pBaseType = GetPrimitiveType (EType_Int);
+
 	pType->m_pModule = m_pModule;
-	pType->m_pBaseType = GetPrimitiveType (EType_Int);
-	pType->m_Size = pType->m_pBaseType->GetSize ();
+	pType->m_pBaseType = pBaseType;
+	pType->m_Size = pBaseType->GetSize ();
 	pType->m_Flags |= Flags;
 	m_EnumTypeList.InsertTail (pType);
 	return pType;

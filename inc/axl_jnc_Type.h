@@ -47,7 +47,7 @@ enum EType
 	EType_Int16_beu,           // ibu2
 	EType_Int32_be,            // ibs4
 	EType_Int32_beu,           // ibu4
-	EType_Int64_be,            // ibb8
+	EType_Int64_be,            // ibs8
 	EType_Int64_beu,           // ibu8
 
 	// floating point 

@@ -218,12 +218,13 @@ Members2
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
 		CDeclarator* pDeclarator,
-		const CValue& DefaultValue
+		rtl::CBoxListT <CToken>* pInitializer
 		);
 
 	CEnumType*
 	CreateEnumType (
 		const rtl::CString& Name,
+		CType* pBaseType,
 		int Flags
 		);
 

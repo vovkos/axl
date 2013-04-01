@@ -1,29 +1,71 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TPoint
+enumc EProto: short
 {
-	int m_x = 5;
+	EProto_Icmp = 1,
+	EProto_Tcp  = 6,
+	EProto_Udp  = 17,
+};
 
-	int m_y;
-	int m_z;
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+/*
+class C1
+{
+	static int s_Field;
+
+	static this ()
+	{
+		printf ("C1.static this ()\n");
+	}
+
+	static ~this ()
+	{
+		printf ("C1.static ~this ()\n");
+	}
+
+	this ()
+	{
+		printf ("C1.this ()\n");
+	}
+
+	~this ()
+	{
+		printf ("C1.~this ()\n");
+	}
+
+	static ~this ()
+	{
+		printf ("C1.static ~this ()\n");
+	}
+
+	static 
+	int 
+	foo ()
+	{
+		printf ("C1.foo ()\n");
+		return 20;
+	}
+}
+*/
+
+foo (
+	int a = 1,
+	int b = 2,
+	int c = 3,
+	int d = 4
+	)
+{
+	printf ("foo (%d, %d, %d, %d)\n", a, b, c, d);
 }
 
 int 
 main ()
 {
-	printf ("bindable property test\n");
+	printf ("main ()\n");
 
-
-	int x;
-
-	TPoint p;
-
-	p = { , 20, m_z = 30 };
-
-	printf ("p = { %d, %d, %d }\n", p.m_x, p.m_y, p.m_z);
-
-	TPoint* p2 = stack new TPoint { , 6, m_z = 7 };
-	printf ("p2 = { %d, %d, %d }\n", p2.m_x, p2.m_y, p2.m_z);
+	EProto Proto;
+	printf ("sizeof (Proto) = %d\n", sizeof (EProto_Tcp));
 
 	return 0;
 }

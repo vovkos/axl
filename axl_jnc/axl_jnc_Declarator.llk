@@ -59,13 +59,17 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 		{
 			return $pDeclarator->AddUnnamedMethod (EFunction_Constructor);
 		}
+	| '~' EToken_This
+		{
+			return $pDeclarator->AddUnnamedMethod (EFunction_Destructor);
+		}
 	| EToken_Static EToken_This
 		{
 			return $pDeclarator->AddUnnamedMethod (EFunction_StaticConstructor);
 		}
-	| '~' EToken_This
+	| EToken_Static '~' EToken_This
 		{
-			return $pDeclarator->AddUnnamedMethod (EFunction_Destructor);
+			return $pDeclarator->AddUnnamedMethod (EFunction_StaticDestructor);
 		}
 	| EToken_Operator
 		{
@@ -367,12 +371,12 @@ function_formal_argument_w_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 	  declarator_prefix <&$Declarator>*
 	  declarator_name <&$Declarator>?
 	  declarator_suffix <&$Declarator>*
-	  ('=' expression_pass1 $v)?
+	  ('=' expression_pass1 $i)?
 		{
 			return CreateFormalArg (
 				$pFunctionSuffix, 
 				&$Declarator, 
-				CValue ()
+				IsValidLocator ($i) ? &$i.m_TokenList : NULL
 				) != NULL;
 		}
 	;
@@ -389,12 +393,12 @@ function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 	: declarator_prefix <&$Declarator>+
 	  declarator_name <&$Declarator>?
 	  declarator_suffix <&$Declarator>*
-	  ('=' expression_pass1 $v)?
+	  ('=' expression_pass1 $i)?
 		{
 			return CreateFormalArg (
 				$pFunctionSuffix,
 				&$Declarator,
-				CValue ()
+				IsValidLocator ($i) ? &$i.m_TokenList : NULL
 				) != NULL;
 		}
 	;

@@ -307,13 +307,13 @@ unary_operator_expr_s <CValue* $pValue>
 		{
 			return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PreDec, $pValue);
 		}
-	| EToken_SizeOf type_name_or_expr
+	| EToken_SizeOf '(' type_name_or_expr $t ')'
 		{
-			$pValue->SetConstSizeT ($2.m_pType->GetSize ());
+			$pValue->SetConstSizeT ($t.m_pType->GetSize ());
 		}
-	| EToken_TypeOf type_name_or_expr
+	| EToken_TypeOf '(' type_name_or_expr $t ')'
 		{
-			$pValue->SetType ($2.m_pType);
+			$pValue->SetType ($t.m_pType);
 		}
 	| resolver (cast_operator_rslv) 
 	  '(' storage_specifier? type_name $t ')' unary_expr_s <$pValue> 

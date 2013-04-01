@@ -528,7 +528,7 @@ CParser::DeclareFunction (
 	if (!m_StorageKind)
 	{
 		m_StorageKind = 
-			FunctionKind == EFunction_StaticConstructor ? EStorage_Static :
+			FunctionKind == EFunction_StaticConstructor || FunctionKind == EFunction_StaticDestructor ? EStorage_Static :
 			NamespaceKind == ENamespace_Property ? ((CProperty*) pNamespace)->GetStorageKind () : EStorage_Undefined;
 	}
 		
@@ -1107,9 +1107,11 @@ CFunctionFormalArg*
 CParser::CreateFormalArg (
 	CDeclFunctionSuffix* pArgSuffix,
 	CDeclarator* pDeclarator,
-	const CValue& DefaultValue
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+
 	CType* pType = pDeclarator->CalcType ();
 	if (!pType)
 		return NULL;
@@ -1132,14 +1134,21 @@ CParser::CreateFormalArg (
 	CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
 	pArg->m_Name = Name;
 	pArg->m_pType = pType;
-	pArg->m_DefaultValue = DefaultValue;
+
+	if (pInitializer)
+		pArg->m_Initializer.TakeOver (pInitializer);
+
 	pArgSuffix->m_ArgList.InsertTail (pArg);
+
+	AssignDeclarationAttributes (pArg, pNamespace, pDeclarator->GetPos ());
+
 	return pArg;
 }
 
 CEnumType*
 CParser::CreateEnumType (
 	const rtl::CString& Name,
+	CType* pBaseType,
 	int Flags
 	)
 {
@@ -1148,13 +1157,13 @@ CParser::CreateEnumType (
 
 	if (Name.IsEmpty ())
 	{
-		pEnumType = m_pModule->m_TypeMgr.CreateUnnamedEnumType ();
+		pEnumType = m_pModule->m_TypeMgr.CreateUnnamedEnumType (pBaseType);
 		pEnumType->m_Flags = EEnumTypeFlag_Exposed;
 	}
 	else
 	{
 		rtl::CString& QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pEnumType = m_pModule->m_TypeMgr.CreateEnumType (Name, QualifiedName, Flags);
+		pEnumType = m_pModule->m_TypeMgr.CreateEnumType (Name, QualifiedName, pBaseType, Flags);
 		if (!pEnumType)
 			return NULL;
 

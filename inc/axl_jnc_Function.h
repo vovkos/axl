@@ -27,14 +27,15 @@ class CAutoEv;
 
 enum EFunction
 {
-	EFunction_Undefined = 0,	
+	EFunction_Undefined = 0,
 	EFunction_Named,
 	EFunction_Getter,
 	EFunction_Setter,
 	EFunction_PreConstructor,
 	EFunction_Constructor,
-	EFunction_StaticConstructor,
 	EFunction_Destructor,
+	EFunction_StaticConstructor,
+	EFunction_StaticDestructor,
 	EFunction_CallOperator,
 	EFunction_CastOperator,
 	EFunction_UnaryOperator,
@@ -52,9 +53,9 @@ enum EFunction
 
 enum EFunctionKindFlag
 {
-	EFunctionKindFlag_NoStorage    = 0x01,
-	EFunctionKindFlag_NoOverloads  = 0x02,
-	EFunctionKindFlag_NoArgs       = 0x04,
+	EFunctionKindFlag_NoStorage   = 0x01,
+	EFunctionKindFlag_NoOverloads = 0x02,
+	EFunctionKindFlag_NoArgs      = 0x04,
 }; 
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -67,17 +68,15 @@ GetFunctionKindFlags (EFunction FunctionKind);
 
 //.............................................................................
 
-class CFunctionFormalArg: public rtl::TListLink
+class CFunctionFormalArg: public CUserModuleItem
 {
 protected:
 	friend class CFunction;
 	friend class CParser;
 
-	rtl::CString m_Name;
 	CType* m_pType;
 	int m_PtrTypeFlags;
-
-	CValue m_DefaultValue;
+	rtl::CBoxListT <CToken> m_Initializer;
 
 public:
 	CFunctionFormalArg ()
@@ -104,10 +103,10 @@ public:
 		return m_PtrTypeFlags;
 	}
 
-	const CValue&
-	GetDefaultValue ()
+	const rtl::CConstBoxListT <CToken>
+	GetInitializer ()
 	{
-		return m_DefaultValue;
+		return m_Initializer;
 	}
 };
 

@@ -223,6 +223,21 @@ type_name_list
 
 	;
 
+class
+{
+	CType* m_pType;
+}
+type_name_or_expr
+	: type_name 
+		{
+			$.m_pType = $1.m_pType;
+		}
+	| expression_s
+		{
+			$.m_pType = $1.m_Value.GetType ();
+		}
+	;
+
 //.............................................................................
 
 // attributes

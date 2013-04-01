@@ -33,6 +33,7 @@ CDerivableType::CDerivableType ()
 {
 	m_pPreConstructor = NULL;
 	m_pStaticConstructor = NULL;
+	m_pStaticDestructor = NULL;
 }
 
 CBaseType*
@@ -96,6 +97,10 @@ CDerivableType::AddMethod (CFunction* pFunction)
 
 	case EFunction_StaticConstructor:
 		ppTarget = &m_pStaticConstructor;
+		break;
+
+	case EFunction_StaticDestructor:
+		ppTarget = &m_pStaticDestructor;
 		break;
 
 	case EFunction_Named:

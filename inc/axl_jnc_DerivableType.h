@@ -120,6 +120,7 @@ protected:
 
 	CFunction* m_pPreConstructor;
 	CFunction* m_pStaticConstructor;
+	CFunction* m_pStaticDestructor;
 
 	// overloaded operators
 
@@ -168,6 +169,12 @@ public:
 	GetStaticConstructor ()
 	{
 		return m_pStaticConstructor;
+	}
+
+	CFunction* 
+	GetStaticDestructor ()
+	{
+		return m_pStaticDestructor;
 	}
 
 	bool

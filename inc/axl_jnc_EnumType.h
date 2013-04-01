@@ -127,7 +127,7 @@ protected:
 	void
 	PrepareLlvmType ()
 	{
-		m_pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
+		m_pLlvmType = m_pBaseType->GetLlvmType ();
 	}
 };
 

@@ -187,13 +187,14 @@ public:
 	CreateEnumType (
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
+		CType* pBaseType = NULL,
 		int Flags = 0
 		);
 
 	CEnumType* 
-	CreateUnnamedEnumType ()
+	CreateUnnamedEnumType (CType* pBaseType = NULL)
 	{
-		return CreateEnumType (rtl::CString (), rtl::CString ());
+		return CreateEnumType (rtl::CString (), rtl::CString (), pBaseType = NULL);
 	}
 
 	CStructType* 

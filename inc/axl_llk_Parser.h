@@ -303,6 +303,8 @@ protected:
 		CNode* pNode = GetPredictionTop ();
 		if (m_ResolverStack.IsEmpty () && (!pNode || pNode->m_Kind != ENode_LaDfa))
 		{
+			TraceTokenList ();
+
 			m_TokenList.RemoveHead (); // nobody gonna reparse you bitch
 			ASSERT (m_TokenCursor == m_TokenList.GetHead());
 		}
