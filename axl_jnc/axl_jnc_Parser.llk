@@ -56,7 +56,7 @@ Members
 	struct TCurlyInitializer
 	{
 		CValue m_TargetValue;
-		CValue m_IndexedMemberValue;
+		CValue m_MemberValue;
 		size_t m_Index;
 		size_t m_Count;
 	};
@@ -330,20 +330,13 @@ Members2
 	PreStatement ();
 
 	bool
-	CurlyInitializerNamedItem (
+	PrepareCurlyInitializerNamedItem (
 		TCurlyInitializer* pInitializer, 
-		const tchar_t* pName,
-		const CValue& Value
+		const tchar_t* pName
 		);
 
 	bool
-	PreCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer);
-
-	bool
-	CurlyInitializerIndexedItem (
-		TCurlyInitializer* pInitializer, 
-		const CValue& Value
-		);
+	PrepareCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer);
 
 	bool
 	SkipCurlyInitializerItem (TCurlyInitializer* pInitializer);

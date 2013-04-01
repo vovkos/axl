@@ -789,18 +789,32 @@ curly_initializer
 
 nullable
 curly_initializer_item <TCurlyInitializer* $pInitializer>
+	local
+	{
+		CValue PrevCurlyInitializerTargetValue;
+	}
 	: resolver ({ return true; })
-	  EToken_Identifier $n '=' expression $e
+	  EToken_Identifier $n '=' 
 		{
-			return CurlyInitializerNamedItem ($pInitializer, $n.m_Data.m_String, $e.m_Value);				
+			return PrepareCurlyInitializerNamedItem ($pInitializer, $n.m_Data.m_String);
 		}
+	  (	curly_initializer
+	  | expression $e
+			{
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, $pInitializer->m_MemberValue, $e.m_Value);
+			}
+	  )
 	|	{
-			return PreCurlyInitializerIndexedItem ($pInitializer);
+			return PrepareCurlyInitializerIndexedItem ($pInitializer);
 		}
 	  expression $e
 		{
-			return CurlyInitializerIndexedItem ($pInitializer, $e.m_Value);
+			return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, $pInitializer->m_MemberValue, $e.m_Value);
 		}	  
+	|	{
+			return PrepareCurlyInitializerIndexedItem ($pInitializer);
+		}
+	  curly_initializer
 	| epsilon
 		{
 			return SkipCurlyInitializerItem ($pInitializer);

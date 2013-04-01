@@ -1,53 +1,6 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enumc EProto: short
-{
-	EProto_Icmp = 1,
-	EProto_Tcp  = 6,
-	EProto_Udp  = 17,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 /*
-class C1
-{
-	static int s_Field;
-
-	static this ()
-	{
-		printf ("C1.static this ()\n");
-	}
-
-	static ~this ()
-	{
-		printf ("C1.static ~this ()\n");
-	}
-
-	this ()
-	{
-		printf ("C1.this ()\n");
-	}
-
-	~this ()
-	{
-		printf ("C1.~this ()\n");
-	}
-
-	static ~this ()
-	{
-		printf ("C1.static ~this ()\n");
-	}
-
-	static 
-	int 
-	foo ()
-	{
-		printf ("C1.foo ()\n");
-		return 20;
-	}
-}
-*/
 
 foo (
 	int a = 1,
@@ -64,8 +17,34 @@ main ()
 {
 	printf ("main ()\n");
 
-	EProto Proto;
-	printf ("sizeof (Proto) = %d\n", sizeof (EProto_Tcp));
+	function* pfn (
+		int a = 10,
+		int b = 20,
+		int c = 30,
+		int d = 40
+		);
+
+	return 0;
+} */
+
+int
+main ()
+{
+	int a [3] [3] = 
+	{
+		{ 1,  2,  3 },
+		{ 4, -5,  6 },
+		{ 7,  8,  9 },
+	};
+
+	int i, j;
+
+	for (i = 0; i < 3; i++)
+	for (j = 0; j < 3; j++)
+		if (a [i] [j] < 0)
+			break 2;
+
+	printf ("%d\n", a [i] [j]);  // -5
 
 	return 0;
 }

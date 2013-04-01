@@ -1891,28 +1891,30 @@ CParser::PreStatement ()
 }
 
 bool
-CParser::CurlyInitializerNamedItem (
+CParser::PrepareCurlyInitializerNamedItem (
 	TCurlyInitializer* pInitializer, 
-	const tchar_t* pName,
-	const CValue& Value
+	const tchar_t* pName
 	)
 {
 	CValue MemberValue;
 
-	bool Result = 
-		m_pModule->m_OperatorMgr.MemberOperator (pInitializer->m_TargetValue, pName, &MemberValue) &&
-		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, MemberValue, Value);		
-	
+	bool Result = m_pModule->m_OperatorMgr.MemberOperator (
+		pInitializer->m_TargetValue, 
+		pName, 
+		&pInitializer->m_MemberValue
+		);
+
 	if (!Result)
 		return false;
 
 	pInitializer->m_Index = -1;
 	pInitializer->m_Count++;
+	m_CurlyInitializerTargetValue = pInitializer->m_MemberValue;
 	return true;
 }
 
 bool
-CParser::PreCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer)
+CParser::PrepareCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer)
 {
 	if (pInitializer->m_Index == -1)
 	{
@@ -1923,28 +1925,15 @@ CParser::PreCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer)
 	bool Result = m_pModule->m_OperatorMgr.MemberOperator (
 		pInitializer->m_TargetValue, 
 		pInitializer->m_Index, 
-		&pInitializer->m_IndexedMemberValue
+		&pInitializer->m_MemberValue
 		);
 
 	if (!Result)
 		return false;
 
-	m_CurlyInitializerTargetValue = pInitializer->m_IndexedMemberValue;
-	return true;
-}
-
-bool
-CParser::CurlyInitializerIndexedItem (
-	TCurlyInitializer* pInitializer, 
-	const CValue& Value
-	)
-{
-	bool Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, pInitializer->m_IndexedMemberValue, Value);
-	if (!Result)
-		return false;
-
 	pInitializer->m_Index++;
 	pInitializer->m_Count++;
+	m_CurlyInitializerTargetValue = pInitializer->m_MemberValue;
 	return true;
 }
 
