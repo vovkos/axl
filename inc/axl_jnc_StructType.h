@@ -167,7 +167,7 @@ public:
 	CalcLayout ();
 
 	bool
-	CallBaseTypePreConstructors ();
+	CallBaseTypeConstructors ();
 
 	bool
 	InitializeFields ();

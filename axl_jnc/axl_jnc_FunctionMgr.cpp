@@ -217,7 +217,9 @@ CFunctionMgr::CompileFunctions ()
 
 		// parse body
 
-		ESymbol StartSymbol = pFunction->GetFunctionKind () == EFunction_Constructor ? 
+		ESymbol StartSymbol = 
+			pFunction->GetFunctionKind () == EFunction_Constructor && 
+			pFunction->GetParentType ()->GetTypeKind () == EType_Class ? 
 			ESymbol_constructor_compound_stmt :
 			ESymbol_compound_stmt;
 
@@ -306,41 +308,20 @@ CFunctionMgr::CompileFunctions ()
 			return false;
 	}
 
-	// (4) default preconstructors for classes with initialized fields
+	// (4) default preconstructors for classes/structs/unions with initialized fields
 
 	size_t Count = m_DefaultPreConstructorTypeArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CDerivableType* pType = m_DefaultPreConstructorTypeArray [i];
-		CFunction* pPreConstructor = pType->GetPreConstructor ();
-		ASSERT (pPreConstructor);
 
-		InternalPrologue (pPreConstructor);
 		m_pModule->m_NamespaceMgr.OpenNamespace (pType);
 
-		EType TypeKind = pType->GetTypeKind ();
-		switch (TypeKind)
-		{
-		case EType_Class:
-			Result = ((CClassType*) pType)->GetIfaceStructType ()->InitializeFields ();
-			break;
-
-		case EType_Struct:
-			Result = 
-				((CStructType*) pType)->CallBaseTypePreConstructors () &&
-				((CStructType*) pType)->InitializeFields ();
-			break;
-
-		case EType_Union:
-			Result = ((CUnionType*) pType)->InitializeField ();
-			break;
-		}
-
+		Result = CreateDefaultPreConstructor (pType);
 		if (!Result)
 			return false;
 
 		m_pModule->m_NamespaceMgr.CloseNamespace ();
-		m_pModule->m_FunctionMgr.InternalEpilogue ();
 	}
 
 	// (5) thunks
@@ -360,6 +341,45 @@ CFunctionMgr::CompileFunctions ()
 }
 
 #endif
+
+bool
+CFunctionMgr::CreateDefaultPreConstructor (CDerivableType* pType)
+{
+	bool Result;
+
+	EType TypeKind = pType->GetTypeKind ();
+
+	CFunction* pPreConstructor = TypeKind == EType_Class ? 
+		((CClassType*) pType)->GetPreConstructor () :
+		pType->GetConstructor ();
+
+	ASSERT (pPreConstructor);
+
+	InternalPrologue (pPreConstructor);
+
+	switch (TypeKind)
+	{
+	case EType_Class:
+		Result = ((CClassType*) pType)->GetIfaceStructType ()->InitializeFields ();
+		break;
+
+	case EType_Struct:
+		Result = 
+			((CStructType*) pType)->CallBaseTypeConstructors () &&
+			((CStructType*) pType)->InitializeFields ();
+		break;
+
+	case EType_Union:
+		Result = ((CUnionType*) pType)->InitializeField ();
+		break;
+	}
+
+	if (!Result)
+		return false;
+
+	InternalEpilogue ();
+	return true;
+}
 
 void
 CFunctionMgr::SaveEmissionContext ()
@@ -516,14 +536,12 @@ CFunctionMgr::Prologue (
 
 	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
 	
-	// store arguments
-
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+	// 'this' arg
 
 	if (pFunction->IsMember ())
 	{
-		llvm::Value* pLlvmArg = LlvmArg;
-		CValue ThisArgValue (pLlvmArg, pFunction->m_pThisArgType);			
+		llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+		CValue ThisArgValue (LlvmArg, pFunction->m_pThisArgType);			
 		CValue PtrValue;
 
 		if (pFunction->m_pThisArgType->Cmp (pFunction->m_pThisType) == 0)
@@ -544,90 +562,47 @@ CFunctionMgr::Prologue (
 
 		if (pFunction->NeedsVTablePtrCut ())
 			CutVTable (ThisArgValue);
-
-		LlvmArg++;
 	}
 
-	if (pFunction->GetFunctionKind () == EFunction_PreConstructor)
-	{
-		CNamedType* pParentType = pFunction->GetParentType ();
-		CStructType* pStructType;
+	CNamedType* pParentType = pFunction->GetParentType ();
 
-		EType TypeKind = pParentType->GetTypeKind ();
-		switch (TypeKind)
+	EFunction FuncitonKind = pFunction->GetFunctionKind ();
+	switch (FuncitonKind) 
+	{
+	case EFunction_PreConstructor:
+		ASSERT (pParentType && pParentType->GetTypeKind () == EType_Class);
+		m_MemberNewField = ((CClassType*) pParentType)->GetFirstMemberNewField ();
+		Result = ((CClassType*) pParentType)->GetIfaceStructType ()->InitializeFields ();
+		break;
+
+	case EFunction_Constructor:
+		ASSERT (pParentType);
+		switch (pParentType->GetTypeKind ())
 		{
 		case EType_Struct:
-			pStructType = (CStructType*) pParentType;
+			Result = ((CStructType*) pParentType)->InitializeFields ();
 			break;
 
 		case EType_Union:
-			pStructType = ((CUnionType*) pParentType)->GetStructType ();
-			break;
-
-		case EType_Class:
-			pStructType = ((CClassType*) pParentType)->GetIfaceStructType ();
-			m_MemberNewField = ((CClassType*) pParentType)->GetFirstMemberNewField ();
+			Result = ((CUnionType*) pParentType)->InitializeField ();
 			break;
 
 		default:
-			err::SetFormatStringError (_T("invalid preconstructor '%s'"), pFunction->m_Tag);
-			return false;
+			Result = true;
 		}
 
-		Result = pStructType->InitializeFields ();
-		if (!Result)
-			return false;
+		break;
+
+	case EFunction_AutoEvStarter:
+		Result = CreateAutoEvArgFields ();
+		break;
+
+	default:
+		Result = CreateShadowArgVariables ();
 	}
-	else if (pFunction->GetFunctionKind () == EFunction_AutoEvStarter)
-	{
-		CValue AutoEvDataValue;
 
-		Result = m_pModule->m_OperatorMgr.GetAutoEvData (pFunction->m_pAutoEv, &AutoEvDataValue);
-		if (!Result)
-			return false;
-
-		rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFirstArgField ();
-		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
-		for (; Arg; Arg++, LlvmArg++, ArgField++)
-		{
-			CFunctionFormalArg* pArg = *Arg;
-			llvm::Value* pLlvmArg = LlvmArg;
-			CStructField* pArgField = *ArgField;
-
-			CValue ArgValue (pLlvmArg, pArg->GetType ());
-
-			CValue StoreValue;
-			Result = m_pModule->m_OperatorMgr.GetStructField (AutoEvDataValue, pArgField, NULL, &StoreValue);
-			if (!Result)
-				return false;
-			
-			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, StoreValue);
-		}
-	}
-	else
-	{
-		rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
-		for (; Arg; Arg++, LlvmArg++)
-		{
-			CFunctionFormalArg* pArg = *Arg;
-			llvm::Value* pLlvmArg = LlvmArg;
-			
-			CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
-				EStorage_Stack,
-				pArg->GetName (), 
-				pArg->GetName (), 
-				pArg->GetType (), 
-				pArg->GetPtrTypeFlags ()
-				);
-
-			m_pModule->m_VariableMgr.AllocateVariable (pArgVariable);
-
-			CValue ArgValue (pLlvmArg, pArg->GetType ());
-
-			m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
-			pFunction->m_pScope->AddItem (pArgVariable);
-		}
-	}
+	if (!Result)
+		return false;
 
 	if (pFunction->NeedsVTablePtrCut ())
 	{
@@ -637,6 +612,78 @@ CFunctionMgr::Prologue (
 	{
 		m_pModule->m_ControlFlowMgr.m_pReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("return_block"));
 		m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock (_T("silent_return_block"));
+	}
+
+	return true;
+}
+
+bool
+CFunctionMgr::CreateShadowArgVariables ()
+{
+	CFunction* pFunction = m_pCurrentFunction;
+	ASSERT (pFunction);
+
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+	if (pFunction->IsMember ())
+		LlvmArg++;
+
+	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
+	for (; Arg; Arg++, LlvmArg++)
+	{
+		CFunctionFormalArg* pArg = *Arg;
+		llvm::Value* pLlvmArg = LlvmArg;
+			
+		CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
+			EStorage_Stack,
+			pArg->GetName (), 
+			pArg->GetName (), 
+			pArg->GetType (), 
+			pArg->GetPtrTypeFlags ()
+			);
+
+		m_pModule->m_VariableMgr.AllocateVariable (pArgVariable);
+
+		CValue ArgValue (pLlvmArg, pArg->GetType ());
+
+		m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
+		pFunction->m_pScope->AddItem (pArgVariable);
+	}
+
+	return true;
+}
+
+bool
+CFunctionMgr::CreateAutoEvArgFields ()
+{
+	CFunction* pFunction = m_pCurrentFunction;
+	ASSERT (pFunction && pFunction->m_pAutoEv);
+
+	CValue AutoEvDataValue;
+
+	bool Result = m_pModule->m_OperatorMgr.GetAutoEvData (pFunction->m_pAutoEv, &AutoEvDataValue);
+	if (!Result)
+		return false;
+
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+	if (pFunction->IsMember ())
+		LlvmArg++;
+
+	rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFirstArgField ();
+	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
+	for (; Arg; Arg++, LlvmArg++, ArgField++)
+	{
+		CFunctionFormalArg* pArg = *Arg;
+		llvm::Value* pLlvmArg = LlvmArg;
+		CStructField* pArgField = *ArgField;
+
+		CValue ArgValue (pLlvmArg, pArg->GetType ());
+
+		CValue StoreValue;
+		Result = m_pModule->m_OperatorMgr.GetStructField (AutoEvDataValue, pArgField, NULL, &StoreValue);
+		if (!Result)
+			return false;
+			
+		m_pModule->m_LlvmBuilder.CreateStore (ArgValue, StoreValue);
 	}
 
 	return true;

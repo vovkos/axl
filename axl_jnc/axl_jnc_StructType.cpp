@@ -144,7 +144,7 @@ CStructType::CalcLayout ()
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	bool HasBasePreConstructor = false;
+	bool HasBaseConstructor = false;
 
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
@@ -155,8 +155,8 @@ CStructType::CalcLayout ()
 		if (!Result)
 			return false;
 
-		if (pBaseType->m_pType->GetPreConstructor ())
-			HasBasePreConstructor = true;
+		if (pBaseType->m_pType->GetConstructor ())
+			HasBaseConstructor = true;
 
 		Result = LayoutField (
 				pBaseType->m_pType,
@@ -206,10 +206,10 @@ CStructType::CalcLayout ()
 
 	m_Size = m_FieldAlignedSize;
 
-	if (!m_pPreConstructor && 
-		(HasBasePreConstructor || !m_InitializedFieldArray.IsEmpty ()))
+	if (!m_pConstructor && 
+		(HasBaseConstructor || !m_InitializedFieldArray.IsEmpty ()))
 	{
-		Result = CreateDefaultPreConstructor ();
+		Result = CreateDefaultConstructor ();
 		if (!Result)
 			return false;
 	}
@@ -219,7 +219,7 @@ CStructType::CalcLayout ()
 }
 
 bool
-CStructType::CallBaseTypePreConstructors ()
+CStructType::CallBaseTypeConstructors ()
 {
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
@@ -227,11 +227,11 @@ CStructType::CallBaseTypePreConstructors ()
 	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
 	for (; BaseType; BaseType++)
 	{
-		CFunction* pPreConstructor = BaseType->m_pType->GetPreConstructor ();
-		if (!pPreConstructor)
+		CFunction* pConstructor = BaseType->m_pType->GetConstructor ();
+		if (!pConstructor)
 			return false;
 
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pPreConstructor, ThisValue);
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ThisValue);
 		if (!Result)
 			return false;
 	}

@@ -31,7 +31,7 @@ CBaseTypeCoord::Init ()
 
 CDerivableType::CDerivableType ()
 {
-	m_pPreConstructor = NULL;
+	m_pConstructor = NULL;
 	m_pStaticConstructor = NULL;
 	m_pStaticDestructor = NULL;
 }
@@ -91,8 +91,14 @@ CDerivableType::AddMethod (CFunction* pFunction)
 
 	switch (FunctionKind)
 	{
-	case EFunction_PreConstructor:
-		ppTarget = &m_pPreConstructor;
+	case EFunction_Constructor:
+		if (!pFunction->GetArgList ().IsEmpty ())
+		{
+			err::SetFormatStringError (_T("constructor of '%s' cannot have arguments"), GetTypeString ());
+			return false;
+		}
+
+		ppTarget = &m_pConstructor;
 		break;
 
 	case EFunction_StaticConstructor:
@@ -183,11 +189,11 @@ CDerivableType::AddProperty (CProperty* pProperty)
 }
 
 bool
-CDerivableType::CreateDefaultPreConstructor ()
+CDerivableType::CreateDefaultConstructor ()
 {
 	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_PreConstructor, pType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
 	pFunction->m_StorageKind = EStorage_Member;
 	
 	bool Result = AddMethod (pFunction);

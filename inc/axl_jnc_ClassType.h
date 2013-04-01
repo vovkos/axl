@@ -41,7 +41,7 @@ protected:
 	CStructType* m_pIfaceStructType;
 	CStructType* m_pClassStructType;
 
-	CFunction* m_pConstructor;
+	CFunction* m_pPreConstructor;
 	CFunction* m_pDestructor;
 	CFunction* m_pInitializer;
 
@@ -90,9 +90,9 @@ public:
 		);
 
 	CFunction* 
-	GetConstructor ()
+	GetPreConstructor ()
 	{
-		return m_pConstructor;
+		return m_pPreConstructor;
 	}
 
 	CFunction* 
@@ -243,6 +243,9 @@ protected:
 
 	bool
 	CreateAutoEvConstructor ();
+
+	bool
+	CreateDefaultPreConstructor ();
 
 	bool
 	CreateDefaultConstructor ();

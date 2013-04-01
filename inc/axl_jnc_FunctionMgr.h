@@ -414,9 +414,18 @@ protected:
 	bool
 	CompileAutoPropertyAccessors (CProperty* pProperty);
 
+	bool
+	CreateDefaultPreConstructor (CDerivableType* pType);
+
+	bool
+	CreateShadowArgVariables ();
+
+	bool
+	CreateAutoEvArgFields ();
+
 	void
 	CreateThinThisValue ();
-
+	
 	void
 	SaveEmissionContext ();
 

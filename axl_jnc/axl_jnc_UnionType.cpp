@@ -127,9 +127,9 @@ CUnionType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	if (!m_pPreConstructor && m_pInitializedField)
+	if (!m_pConstructor && m_pInitializedField)
 	{
-		Result = CreateDefaultPreConstructor ();
+		Result = CreateDefaultConstructor ();
 		if (!Result)
 			return false;
 	}

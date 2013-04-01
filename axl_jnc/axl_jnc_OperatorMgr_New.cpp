@@ -94,8 +94,8 @@ COperatorMgr::InitializeData (
 	if (pType->GetTypeKind () != EType_Struct && pType->GetTypeKind () != EType_Union)
 		return true;
 
-	CFunction* pPreConstructor = ((CDerivableType*) pType)->GetPreConstructor ();
-	return pPreConstructor ? CallOperator (pPreConstructor, PtrValue) : true;
+	CFunction* pConstructor = ((CDerivableType*) pType)->GetConstructor ();
+	return pConstructor ? CallOperator (pConstructor, PtrValue) : true;
 }
 
 bool

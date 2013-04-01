@@ -14,7 +14,7 @@ CClassType::CClassType ()
 	m_pIfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
-	m_pConstructor = NULL;
+	m_pPreConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pInitializer = NULL;
 	m_pVTableStructType = NULL;
@@ -745,6 +745,22 @@ CClassType::CreateAutoEvConstructor ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	m_pConstructor = pFunction;
+	return true;
+}
+
+bool
+CClassType::CreateDefaultPreConstructor ()
+{
+	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_PreConstructor, pType);
+	pFunction->m_StorageKind = EStorage_Member;
+	
+	bool Result = AddMethod (pFunction);
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.m_DefaultPreConstructorTypeArray.Append (this);
 	return true;
 }
 

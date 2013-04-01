@@ -331,10 +331,10 @@ COperatorMgr::PostBaseTypeConstructorList ()
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (
 		pFunction->GetFunctionKind () == EFunction_Constructor && 
-		pFunction->GetParentType ()->IsDerivableType ()
+		pFunction->GetParentType ()->GetTypeKind () == EType_Class
 		);
 
-	CDerivableType* pParentType = (CDerivableType* ) pFunction->GetParentType ();
+	CClassType* pParentType = (CClassType*) pFunction->GetParentType ();
 
 	rtl::CBoxListT <CValue> ArgList;
 	ArgList.InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());

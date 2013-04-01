@@ -118,7 +118,7 @@ protected:
 	
 	// construction
 
-	CFunction* m_pPreConstructor;
+	CFunction* m_pConstructor;
 	CFunction* m_pStaticConstructor;
 	CFunction* m_pStaticDestructor;
 
@@ -160,9 +160,9 @@ public:
 	ClearAllBaseTypeConstructedFlags ();
 
 	CFunction* 
-	GetPreConstructor ()
+	GetConstructor ()
 	{
-		return m_pPreConstructor;
+		return m_pConstructor;
 	}
 
 	CFunction* 
@@ -185,7 +185,7 @@ public:
 
 protected:
 	bool
-	CreateDefaultPreConstructor ();
+	CreateDefaultConstructor ();
 
 	bool
 	FindBaseTypeTraverseImpl (
