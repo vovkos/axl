@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_FunctionArg.h"
 
 namespace axl {
 namespace jnc {
@@ -12,6 +12,7 @@ namespace jnc {
 class CFunctionPtrType;
 class CFunctionPtrTypeTuple;
 class CMulticastType;
+class CNamedType;
 class CClassType;
 class CClassPtrType;
 class CFunction;
@@ -21,8 +22,9 @@ enum EFunctionPtrType;
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_VarArg       = 0x010000,
-	EFunctionTypeFlag_UnsafeVarArg = 0x020000,
+	EFunctionTypeFlag_User         = 0x010000,
+	EFunctionTypeFlag_VarArg       = 0x020000,
+	EFunctionTypeFlag_UnsafeVarArg = 0x040000,
 };
 
 //.............................................................................
@@ -40,8 +42,6 @@ enum ECallConv
 
 const tchar_t*
 GetCallConvString (ECallConv CallConv);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -73,10 +73,10 @@ protected:
 	friend class CTypeMgr;
 
 	CType* m_pReturnType;
-	rtl::CArrayT <CType*> m_ArgTypeArray;
+	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	ECallConv m_CallConv;
 	rtl::CStringA m_ArgSignature;
-	rtl::CString m_ArgTypeString;
+	rtl::CString m_ArgString;
 	CFunctionType* m_pShortType;
 	CFunctionType* m_pStdObjectMemberMethodType;
 	CFunction* m_pAbstractFunction;
@@ -103,43 +103,42 @@ public:
 		return m_pReturnType;
 	}
 
-	bool
-	HasArgs ()
+	rtl::CArrayT <CFunctionArg*> 
+	GetArgArray ()
 	{
-		return !m_ArgTypeArray.IsEmpty ();
-	}
-
-	rtl::CArrayT <CType*>
-	GetArgTypeArray ()
-	{
-		return m_ArgTypeArray;
+		return m_ArgArray;
 	}
 
 	rtl::CStringA
 	GetArgSignature ();
 
 	rtl::CString 
-	GetArgTypeString ();
+	GetArgString ();
 
 	bool
 	IsMemberMethodType ()
 	{
-		return !m_ArgTypeArray.IsEmpty () && m_ArgTypeArray [0]->GetTypeKind () == EType_ClassPtr;
+		return !m_ArgArray.IsEmpty () && (m_ArgArray [0]->GetPtrTypeFlags () & EPtrTypeFlag_This) != 0;
 	}
 
-	CClassPtrType* 
+	CType* 
 	GetThisArgType ()
 	{
-		return !m_ArgTypeArray.IsEmpty () && m_ArgTypeArray [0]->GetTypeKind () == EType_ClassPtr ? 
-			(CClassPtrType*) m_ArgTypeArray [0] : NULL;
+		return IsMemberMethodType () ? m_ArgArray [0]->GetType () : NULL;
 	}
 
+	CNamedType*
+	GetThisTargetType ();
+
 	CFunctionType*
-	GetShortType ();
+	GetShortType ()
+	{
+		return m_pShortType;
+	}
 	
 	CFunctionType*
 	GetMemberMethodType (
-		CClassType* pType, 
+		CNamedType* pType, 
 		int ThisArgFlags = 0
 		);
 
@@ -169,11 +168,25 @@ public:
 	GetMulticastType ();
 
 	static
+	rtl::CString 
+	CreateCallConvSignature (ECallConv CallConv);
+
+	static
 	rtl::CStringA
 	CreateSignature (
 		ECallConv CallConv,
 		CType* pReturnType,
-		CType* const* ppArgType,
+		CType* const* pArgTypeArray,
+		size_t ArgCount,
+		int Flags
+		);
+
+	static
+	rtl::CStringA
+	CreateSignature (
+		ECallConv CallConv,
+		CType* pReturnType,
+		CFunctionArg* const* pArgArray,
 		size_t ArgCount,
 		int Flags
 		);
@@ -181,7 +194,15 @@ public:
 	static
 	rtl::CStringA
 	CreateArgSignature (
-		CType* const* ppArgType,
+		CType* const* pArgTypeArray,
+		size_t ArgCount,
+		int Flags
+		);
+
+	static
+	rtl::CStringA
+	CreateArgSignature (
+		CFunctionArg* const* pArgArray,
 		size_t ArgCount,
 		int Flags
 		);
@@ -189,14 +210,11 @@ public:
 	rtl::CStringA
 	CreateArgSignature ()
 	{
-		return CreateArgSignature (
-			m_ArgTypeArray, 
-			m_ArgTypeArray.GetCount (), 
-			m_Flags
-			);
+		return CreateArgSignature (m_ArgArray, m_ArgArray.GetCount (), m_Flags);
 	}
 
 protected:
+
 	virtual 
 	void
 	PrepareTypeString ();

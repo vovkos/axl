@@ -18,6 +18,7 @@ protected:
 
 	CType* m_pType;
 	rtl::CBoxListT <CToken> m_Initializer;
+	rtl::CString m_InitializerString;
 
 public:
 	CAlias ()
@@ -36,6 +37,15 @@ public:
 	GetInitializer ()
 	{
 		return m_Initializer;
+	}
+
+	rtl::CString 
+	GetInitializerString ()
+	{
+		if (m_InitializerString.IsEmpty ())
+			m_InitializerString = CToken::GetTokenListString (m_Initializer);
+
+		return m_InitializerString;
 	}
 };
 

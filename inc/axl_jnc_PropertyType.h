@@ -94,7 +94,7 @@ public:
 	bool
 	IsIndexed ()
 	{
-		return !m_pGetterType->GetArgTypeArray ().IsEmpty ();
+		return !m_pGetterType->GetArgArray ().IsEmpty ();
 	}
 
 	bool
@@ -103,10 +103,16 @@ public:
 		return m_pGetterType->IsMemberMethodType ();
 	}
 
-	CClassPtrType* 
+	CType* 
 	GetThisArgType ()
 	{
 		return m_pGetterType->GetThisArgType ();
+	}
+
+	CNamedType*
+	GetThisTargetType ()
+	{
+		return m_pGetterType->GetThisTargetType ();
 	}
 
 	CFunctionType*

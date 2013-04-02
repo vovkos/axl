@@ -459,7 +459,7 @@ CModulePane::AddFunctionImpl (
 		_T("%s %s %s"), 
 		pType->GetReturnType ()->GetTypeString (),
 		Name,
-		pFunction->CreateArgString ()
+		pFunction->GetType ()->GetArgString ()
 		);
 
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
@@ -497,13 +497,13 @@ CModulePane::AddAutoEv (
 	if (!pAutoEv->IsNamed ())
 		ItemName.Format (
 			_T("autoev %s"), 
-			pAutoEv->GetStarter ()->CreateArgString ()
+			pAutoEv->GetStarter ()->GetType ()->GetArgString ()
 			);
 	else
 		ItemName.Format (
 			_T("autoev %s"), 
 			pAutoEv->GetName (),
-			pAutoEv->GetStarter ()->CreateArgString ()
+			pAutoEv->GetStarter ()->GetType ()->GetArgString ()
 			);
 
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hParent);
@@ -551,7 +551,7 @@ GetFunctionTip (jnc::CFunction* pFunction)
 	TipText.Format (
 		_T("%s %s"), 
 		pType->GetReturnType ()->GetTypeString (),
-		pFunction->CreateArgString ()
+		pFunction->GetType ()->GetArgString ()
 		);
 
 	jnc::CScope* pScope = pFunction->GetScope ();
@@ -594,7 +594,7 @@ GetAutoEvTip (jnc::CAutoEv* pAutoEv)
 	TipText.Format (
 		_T("autoev %s %s"), 
 		pAutoEv->GetName (),
-		pAutoEv->GetStarter ()->CreateArgString ()
+		pAutoEv->GetStarter ()->GetType ()->GetArgString ()
 		);
 
 	return TipText;

@@ -16,6 +16,8 @@ class CPropertyType;
 class CDataPtrType;
 class CDataPtrTypeTuple;
 class CPropertyTypeTuple;
+class CFunctionArgTuple;
+class CFunctionArg;
 class CValue;
 
 enum EDataPtrType;
@@ -155,8 +157,9 @@ enum ETypeFlag
 	ETypeFlag_LayoutReady  = 0x0001,
 	ETypeFlag_LayoutCalc   = 0x0002,
 	ETypeFlag_Named        = 0x0010,
-	ETypeFlag_Pod          = 0x0020, // plain-old-data
-	ETypeFlag_Import       = 0x0040, // is or references an import type
+	ETypeFlag_Moveable     = 0x0020, // moveable by byte-to-byte copy
+	ETypeFlag_Pod          = 0x0040, // plain-old-data
+	ETypeFlag_Import       = 0x0080, // is or references an import type
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -169,6 +172,7 @@ enum EPtrTypeFlag
 	EPtrTypeFlag_Mutable   = 0x0800, // data ptr only
 	EPtrTypeFlag_Volatile  = 0x1000, // data ptr only
 	EPtrTypeFlag_Event     = 0x2000, // multicast ptr only
+	EPtrTypeFlag_This      = 0x4000, // 'this' arguments have this flag
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -498,6 +502,7 @@ protected:
 
 	CDataPtrTypeTuple* m_pDataPtrTypeTuple;
 	CPropertyTypeTuple* m_pPropertyTypeTuple;
+	CFunctionArgTuple* m_pFunctionArgTuple;
 
 public:
 	CType ();
@@ -656,6 +661,9 @@ public:
 	{
 		return GetDataPtrType (EType_DataPtr, PtrTypeKind, Flags);
 	}
+
+	CFunctionArg* 
+	GetSimpleFunctionArg (int PtrTypeFlags = 0);
 
 	virtual 
 	bool

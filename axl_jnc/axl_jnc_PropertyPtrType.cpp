@@ -138,7 +138,7 @@ CPropertyPtrType::PrepareTypeString ()
 	if (m_pTargetType->IsIndexed ())
 	{
 		m_TypeString += _T(' ');
-		m_TypeString += m_pTargetType->GetGetterType ()->GetArgTypeString ();
+		m_TypeString += m_pTargetType->GetGetterType ()->GetArgString ();
 	}
 }
 

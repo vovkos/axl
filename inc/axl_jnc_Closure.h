@@ -64,7 +64,7 @@ protected:
 	bool
 	GetArgTypeArray (
 		CModule* pModule,
-		rtl::CArrayT <CType*>* pArgTypeArray
+		rtl::CArrayT <CFunctionArg*>* pArgArray
 		);
 };
 

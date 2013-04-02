@@ -150,7 +150,7 @@ protected:
 	friend class CDeclarator;
 	friend class CParser;
 
-	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
+	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	int m_FunctionTypeFlags;
 
 public:
@@ -160,10 +160,10 @@ public:
 		m_FunctionTypeFlags = 0;
 	}
 
-	rtl::CStdListT <CFunctionFormalArg>*
-	GetArgList ()
+	rtl::CArrayT <CFunctionArg*>
+	GetArgArray ()
 	{
-		return &m_ArgList;
+		return m_ArgArray;
 	}
 
 	int 
@@ -171,9 +171,6 @@ public:
 	{
 		return m_FunctionTypeFlags;
 	}
-
-	rtl::CArrayT <CType*>
-	GetArgTypeArray ();
 };
 
 //.............................................................................
@@ -336,13 +333,6 @@ public:
 		return Suffix && Suffix->GetSuffixKind () == EDeclSuffix_Function ? (CDeclFunctionSuffix*) *Suffix : NULL;
 	}
 
-	rtl::CStdListT <CFunctionFormalArg>*
-	GetArgList ()
-	{
-		CDeclFunctionSuffix* pSuffix = GetFunctionSuffix ();
-		return pSuffix ? &pSuffix->m_ArgList : NULL;
-	}
-	
 	CType*
 	CalcType (int* pDataPtrTypeFlags = NULL);
 

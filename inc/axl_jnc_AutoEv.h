@@ -142,10 +142,7 @@ public:
 	}
 
 	bool
-	Create (
-		CAutoEvType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList
-		);
+	Create (CAutoEvType* pType);
 
 	CFunction* 
 	CreateHandler ();

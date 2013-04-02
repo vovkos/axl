@@ -41,8 +41,7 @@ CFunctionMgr::Clear ()
 CFunction*
 CFunctionMgr::CreateFunction (
 	EFunction FunctionKind,
-	CFunctionType* pType,
-	rtl::CStdListT <CFunctionFormalArg>* pArgList
+	CFunctionType* pType
 	)
 {
 	CFunction* pFunction = AXL_MEM_NEW (CFunction);
@@ -50,10 +49,6 @@ CFunctionMgr::CreateFunction (
 	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pType = pType;
 	pFunction->m_TypeOverload.AddOverload (pType);
-
-	if (pArgList)
-		pFunction->m_ArgList.TakeOver (pArgList);
-
 	m_FunctionList.InsertTail (pFunction);
 	return pFunction;
 }
@@ -623,15 +618,25 @@ CFunctionMgr::CreateShadowArgVariables ()
 	CFunction* pFunction = m_pCurrentFunction;
 	ASSERT (pFunction);
 
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	if (pFunction->IsMember ())
-		LlvmArg++;
+	rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->GetType ()->GetArgArray ();
+	size_t ArgCount = ArgArray.GetCount ();
+	size_t i = 0;
 
-	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
-	for (; Arg; Arg++, LlvmArg++)
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+
+	if (pFunction->IsMember ())
 	{
-		CFunctionFormalArg* pArg = *Arg;
+		i++;
+		LlvmArg++;
+	}
+
+	for (; i < ArgCount; i++, LlvmArg++)
+	{
+		CFunctionArg* pArg = ArgArray [i];
 		llvm::Value* pLlvmArg = LlvmArg;
+
+		if (!pArg->IsNamed ())
+			continue;
 			
 		CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
 			EStorage_Stack,
@@ -664,17 +669,27 @@ CFunctionMgr::CreateAutoEvArgFields ()
 	if (!Result)
 		return false;
 
-	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
-	if (pFunction->IsMember ())
-		LlvmArg++;
+	rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->GetType ()->GetArgArray ();
+	size_t ArgCount = ArgArray.GetCount ();
+	size_t i = 0;
 
 	rtl::CIteratorT <CStructField> ArgField = pFunction->m_pAutoEv->GetFirstArgField ();
-	rtl::CIteratorT <CFunctionFormalArg> Arg = pFunction->GetArgList ().GetHead ();
-	for (; Arg; Arg++, LlvmArg++, ArgField++)
+	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin();
+
+	if (pFunction->IsMember ())
 	{
-		CFunctionFormalArg* pArg = *Arg;
+		i++;
+		LlvmArg++;
+	}
+
+	for (; i < ArgCount; i++, LlvmArg++, ArgField++)
+	{
+		CFunctionArg* pArg = ArgArray [i];
 		llvm::Value* pLlvmArg = LlvmArg;
 		CStructField* pArgField = *ArgField;
+
+		if (!pArg->IsNamed ())
+			continue;
 
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
 
@@ -813,7 +828,7 @@ CFunctionMgr::InternalPrologue (
 
 	m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
 
-	rtl::CArrayT <CType*> ArgTypeArray = pFunction->GetType ()->GetArgTypeArray ();
+	rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->GetType ()->GetArgArray ();
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin ();
 
 	if (pFunction->IsMember ())
@@ -827,7 +842,7 @@ CFunctionMgr::InternalPrologue (
 	}
 
 	for (size_t i = 0; i < ArgCount; i++, LlvmArg++)
-		pArgValueArray [i] = CValue (LlvmArg, ArgTypeArray [i]);
+		pArgValueArray [i] = CValue (LlvmArg, ArgArray [i]->GetType ());
 }
 
 void
@@ -1247,10 +1262,13 @@ CFunctionMgr::GetClosureDataThunkProperty (
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Tag = _T("_closure_data_thunk_property");
 
-	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (
-		pThunkPropertyType->GetGetterType ()->GetReturnType (),
-		pTargetDataPtrType
-		);
+	CType* pReturnType = pThunkPropertyType->GetGetterType ()->GetReturnType ();
+	CFunctionArg* pThisArg = pTargetDataPtrType->GetSimpleFunctionArg ();
+
+	rtl::CArrayT <CFunctionArg*> ArgArray = pThunkPropertyType->GetGetterType ()->GetArgArray ();
+	ArgArray.Insert (0, pThisArg);
+
+	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgArray);
 
 	CFunction* pGetter = CreateFunction (EFunction_Getter, pGetterType);
 	pGetter->m_StorageKind = EStorage_Static;
@@ -1276,10 +1294,10 @@ CFunctionMgr::GetClosureDataThunkProperty (
 	{
 		CFunctionType* pThunkFunctionType = pThunkSetterType->GetOverload (i);
 
-		rtl::CArrayT <CType*> ArgTypeArray = pThunkFunctionType->GetArgTypeArray ();
-		ArgTypeArray.Insert (0, pTargetDataPtrType);
+		ArgArray = pThunkFunctionType->GetArgArray ();
+		ArgArray.Insert (0, pThisArg);
 
-		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 
 		CFunction* pSetter = CreateFunction (EFunction_Setter, pSetterType);
 		pSetter->m_StorageKind = EStorage_Static;
@@ -1342,24 +1360,24 @@ CFunctionMgr::GetScheduleLauncherFunction (
 
 	size_t SchedulerIdx = 0;
 
-	rtl::CArrayT <CType*> ArgTypeArray  = pTargetFunctionPtrType->GetTargetType ()->GetArgTypeArray ();
+	rtl::CArrayT <CFunctionArg*> ArgArray  = pTargetFunctionPtrType->GetTargetType ()->GetArgArray ();
 	if (!pTargetFunction)
 	{
-		ArgTypeArray.Insert (0, pTargetFunctionPtrType);
-		ArgTypeArray.Insert (1, pSchedulerType);
+		ArgArray.Insert (0, pTargetFunctionPtrType->GetSimpleFunctionArg ());
+		ArgArray.Insert (1, pSchedulerType->GetSimpleFunctionArg ());
 		SchedulerIdx = 1;
 	}
 	else
 	{
-		ArgTypeArray.Insert (0, pSchedulerType);
+		ArgArray.Insert (0, pSchedulerType->GetSimpleFunctionArg ());
 		SchedulerIdx = 0;
 	}
 
-	CFunctionType* pLauncherType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+	CFunctionType* pLauncherType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 	CFunction* pLauncher = CreateFunction (EFunction_ScheduleLauncher, pLauncherType);
 	pLauncher->m_Tag = _T("_schedule_launcher_function");
 	
-	size_t ArgCount = ArgTypeArray.GetCount (); 
+	size_t ArgCount = ArgArray.GetCount (); 
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
@@ -1405,11 +1423,11 @@ CFunctionMgr::CompileDirectThunk (TThunk* pThunk)
 
 	bool Result;
 
-	rtl::CArrayT <CType*> TargetArgTypeArray = pThunk->m_pTargetFunction->GetType ()->GetArgTypeArray ();
-	rtl::CArrayT <CType*> ThunkArgTypeArray = pThunk->m_pThunkFunction->GetType ()->GetArgTypeArray ();
+	rtl::CArrayT <CFunctionArg*> TargetArgArray = pThunk->m_pTargetFunction->GetType ()->GetArgArray ();
+	rtl::CArrayT <CFunctionArg*> ThunkArgArray = pThunk->m_pThunkFunction->GetType ()->GetArgArray ();
 
-	size_t TargetArgCount = TargetArgTypeArray.GetCount ();
-	size_t ThunkArgCount = ThunkArgTypeArray.GetCount ();
+	size_t TargetArgCount = TargetArgArray.GetCount ();
+	size_t ThunkArgCount = ThunkArgArray.GetCount ();
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
@@ -1428,21 +1446,21 @@ CFunctionMgr::CompileDirectThunk (TThunk* pThunk)
 	if (TargetArgCount == ThunkArgCount)
 	{
 		CValue IfaceValue (LlvmArg, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr));
-		m_pModule->m_LlvmBuilder.CreateBitCast (IfaceValue, TargetArgTypeArray [0], &IfaceValue);
+		m_pModule->m_LlvmBuilder.CreateBitCast (IfaceValue, TargetArgArray [0]->GetType (), &IfaceValue);
 		ArgArray [0] = IfaceValue;
 		i++;
 	}
 	else
 	{
 		ASSERT (ThunkArgCount == TargetArgCount + 1);
-		ThunkArgTypeArray.Remove (0); 
+		ThunkArgArray.Remove (0); 
 		LlvmArg++;
 	}
 
 	for (; i < TargetArgCount; i++, LlvmArg++)
 	{
-		CValue ArgValue (LlvmArg, ThunkArgTypeArray [i]);
-		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgTypeArray [i]);
+		CValue ArgValue (LlvmArg, ThunkArgArray [i]->GetType ());
+		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgArray [i]->GetType ());
 		if (!Result)
 			return false;
 
@@ -1476,12 +1494,12 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 
 	bool Result;
 
-	rtl::CArrayT <CType*> TargetArgTypeArray = pThunk->m_pTargetFunctionType->GetArgTypeArray ();
-	rtl::CArrayT <CType*> ThunkArgTypeArray = pThunk->m_pThunkFunction->GetType ()->GetArgTypeArray ();
+	rtl::CArrayT <CFunctionArg*> TargetArgArray = pThunk->m_pTargetFunctionType->GetArgArray ();
+	rtl::CArrayT <CFunctionArg*> ThunkArgArray = pThunk->m_pThunkFunction->GetType ()->GetArgArray ();
 	rtl::CArrayT <size_t> ClosureMap = pThunk->m_ClosureMap;
 
-	size_t TargetArgCount = TargetArgTypeArray.GetCount ();
-	size_t ThunkArgCount = ThunkArgTypeArray.GetCount ();
+	size_t TargetArgCount = TargetArgArray.GetCount ();
+	size_t ThunkArgCount = ThunkArgArray.GetCount ();
 	size_t ClosureArgCount = pThunk->m_ClosureMap.GetCount ();
 
 	char Buffer [256];
@@ -1536,12 +1554,12 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 		}
 		else
 		{
-			ArgValue = CValue (LlvmArg, ThunkArgTypeArray [iThunk]);
+			ArgValue = CValue (LlvmArg, ThunkArgArray [iThunk]->GetType ());
 			LlvmArg++;
 			iThunk++;
 		}
 
-		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgTypeArray [i]);
+		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgArray [i]->GetType ());
 		if (!Result)
 			return false;
 
@@ -1550,9 +1568,9 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 
 	for (; i < TargetArgCount; i++, iThunk, LlvmArg++)
 	{
-		CValue ArgValue (LlvmArg, ThunkArgTypeArray [iThunk]);
+		CValue ArgValue (LlvmArg, ThunkArgArray [iThunk]->GetType ());
 
-		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgTypeArray [i]);
+		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgArray [i]->GetType ());
 		if (!Result)
 			return false;
 

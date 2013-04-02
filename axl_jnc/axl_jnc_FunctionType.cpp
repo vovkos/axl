@@ -15,7 +15,7 @@ GetCallConvString (ECallConv CallConv)
 		_T("cdecl"),    // ECallConv_Cdecl,
 		_T("stdcall"),  // ECallConv_Stdcall,
 	};
-
+	
 	return (size_t) CallConv < countof (StringTable) ? 
 		StringTable [CallConv] : 
 		_T("undefined-calling-convention");
@@ -28,15 +28,38 @@ CFunctionType::CFunctionType ()
 	m_TypeKind = EType_Function;
 	m_pReturnType = NULL;
 	m_CallConv = ECallConv_Default;
+	m_pShortType = this;
 	m_pStdObjectMemberMethodType = NULL;
 	m_pFunctionPtrTypeTuple = NULL;
+}
+
+CNamedType*
+CFunctionType::GetThisTargetType ()
+{
+	CType* pThisArgType = GetThisArgType ();
+	if (!pThisArgType)
+		return NULL;
+
+	EType ThisArgTypeKind = pThisArgType->GetTypeKind ();
+	switch (ThisArgTypeKind)
+	{
+	case EType_ClassPtr:
+		return ((CClassPtrType*) pThisArgType)->GetTargetType ();
+
+	case EType_DataPtr:
+		return (CNamedType*) ((CDataPtrType*) pThisArgType)->GetTargetType ();
+
+	default:
+		ASSERT (false);
+		return NULL;
+	}
 }
 
 rtl::CStringA
 CFunctionType::GetArgSignature ()
 {
 	if (m_ArgSignature.IsEmpty ())
-		m_ArgSignature = CreateArgSignature (m_ArgTypeArray, m_ArgTypeArray.GetCount (), m_Flags);
+		m_ArgSignature = CreateArgSignature ();
 
 	return m_ArgSignature;
 }
@@ -51,12 +74,6 @@ CFunctionType::GetFunctionPtrType (
 	return m_pModule->m_TypeMgr.GetFunctionPtrType (this, TypeKind, PtrTypeKind, Flags);
 }
 
-CFunctionType*
-CFunctionType::GetShortType ()
-{
-	return m_pModule->m_TypeMgr.GetShortFunctionType (this);
-}
-
 CMulticastType* 
 CFunctionType::GetMulticastType ()
 {
@@ -65,11 +82,11 @@ CFunctionType::GetMulticastType ()
 
 CFunctionType*
 CFunctionType::GetMemberMethodType (
-	CClassType* pClassType, 
+	CNamedType* pParentType, 
 	int ThisArgTypeFlags
 	)
 {
-	return m_pModule->m_TypeMgr.GetMemberMethodType (pClassType, this, ThisArgTypeFlags);
+	return m_pModule->m_TypeMgr.GetMemberMethodType (pParentType, this, ThisArgTypeFlags);
 }
 
 CFunctionType*
@@ -96,7 +113,7 @@ CFunctionType::GetAbstractFunction ()
 
 rtl::CStringA
 CFunctionType::CreateArgSignature (
-	CType* const* ppArgType,
+	CType* const* pArgTypeArray,
 	size_t ArgCount,
 	int Flags
 	)
@@ -105,8 +122,9 @@ CFunctionType::CreateArgSignature (
 
 	for (size_t i = 0; i < ArgCount; i++)
 	{
-		CType* pType = ppArgType [i];
+		CType* pType = pArgTypeArray [i];
 		String.Append (pType->GetSignature ());
+		String.Append (",");
 	}
 
 	String.Append (
@@ -118,71 +136,144 @@ CFunctionType::CreateArgSignature (
 }
 
 rtl::CStringA
-CFunctionType::CreateSignature (
-	ECallConv CallConv,
-	CType* pReturnType,
-	CType* const* ppArgType,
+CFunctionType::CreateArgSignature (
+	CFunctionArg* const* pArgArray,
 	size_t ArgCount,
 	int Flags
 	)
 {
-	rtl::CStringA String = "F";
+	rtl::CStringA String = "(";
+
+	for (size_t i = 0; i < ArgCount; i++)
+	{
+		CFunctionArg* pArg = pArgArray [i];
+
+		if (pArg->GetPtrTypeFlags () & EPtrTypeFlag_This)
+			String.Append ("+");
+
+		String.Append (pArg->GetType ()->GetSignature ());
+		String.Append (",");
+	}
+
+	String.Append (
+		(Flags & EFunctionTypeFlag_VarArg) ? 
+		(Flags & EFunctionTypeFlag_UnsafeVarArg) ? ".-)" : ".)" : ")"
+		);
+	
+	return String;
+}
+
+rtl::CString 
+CFunctionType::CreateCallConvSignature (ECallConv CallConv)
+{
+	rtl::CStringA String;
 
 	switch (CallConv)
 	{
 	case ECallConv_Cdecl:
-		String += 'C';
+		String = 'C';
 		break;
 
 	case ECallConv_Stdcall:
-		String += 'S';
+		String = 'S';
 		break;
 
 	default:
 		ASSERT (false);
 	}
 
+	return String;
+}
+
+rtl::CStringA
+CFunctionType::CreateSignature (
+	ECallConv CallConv,
+	CType* pReturnType,
+	CType* const* pArgTypeArray,
+	size_t ArgCount,
+	int Flags
+	)
+{
+	rtl::CStringA String = "F";
+	String.Append (CreateCallConvSignature (CallConv));
 	String.Append (pReturnType->GetSignature ());
-	String.Append (CreateArgSignature (ppArgType, ArgCount, Flags));
+	String.Append (CreateArgSignature (pArgTypeArray, ArgCount, Flags));
+	return String;
+}
+
+rtl::CStringA
+CFunctionType::CreateSignature (
+	ECallConv CallConv,
+	CType* pReturnType,
+	CFunctionArg* const* pArgArray,
+	size_t ArgCount,
+	int Flags
+	)
+{
+	rtl::CStringA String = "F";
+	String.Append (CreateCallConvSignature (CallConv));
+	String.Append (pReturnType->GetSignature ());
+	String.Append (CreateArgSignature (pArgArray, ArgCount, Flags));
 	return String;
 }
 
 rtl::CString
-CFunctionType::GetArgTypeString ()
+CFunctionType::GetArgString ()
 {
-	if (!m_ArgTypeString.IsEmpty ())
-		return m_ArgTypeString;
+	if (!m_ArgString.IsEmpty ())
+		return m_ArgString;
 
-	m_ArgTypeString = _T("(");
+	bool IsUserType = (m_Flags & EFunctionTypeFlag_User) != 0;
 
-	size_t ArgCount = m_ArgTypeArray.GetCount ();
-	if (ArgCount)
+	m_ArgString = _T("(");
+
+	if (!m_ArgArray.IsEmpty ())
 	{
-		CType* pType = m_ArgTypeArray [0];
-		m_ArgTypeString.Append(pType->GetTypeString ());
-	}
+		CFunctionArg* pArg = m_ArgArray [0];
+		m_ArgString.AppendFormat (_T("%s"), pArg->GetType ()->GetTypeString ());
 
-	for (size_t i = 1; i < ArgCount; i++)
-	{
-		CType* pType = m_ArgTypeArray [i];
-		m_ArgTypeString.Append(_T(", "));
-		m_ArgTypeString.Append(pType->GetTypeString ());
+		if (pArg->GetPtrTypeFlags () & EPtrTypeFlag_This)
+		{
+			m_ArgString.Append (_T(" this"));
+		}
+		else if (IsUserType)
+		{
+				if (!pArg->GetName ().IsEmpty ())
+					m_ArgString.AppendFormat (_T(" %s"), pArg->GetName ());
+
+				if (!pArg->GetInitializer ().IsEmpty ())
+					m_ArgString.AppendFormat (_T(" = %s"), pArg->GetInitializerString ());
+		}
+
+		size_t ArgCount = m_ArgArray.GetCount ();
+		for (size_t i = 1; i < ArgCount; i++)
+		{
+			pArg = m_ArgArray [i];
+
+			m_ArgString.AppendFormat (_T(", %s"), pArg->GetType ()->GetTypeString ());
+
+			if (IsUserType)
+			{
+				if (!pArg->GetName ().IsEmpty ())
+					m_ArgString.AppendFormat (_T(" %s"), pArg->GetName ());
+
+				if (!pArg->GetInitializer ().IsEmpty ())
+					m_ArgString.AppendFormat (_T(" = %s"), pArg->GetInitializerString ());
+			}
+		}
+
+		if (m_Flags & EFunctionTypeFlag_VarArg)
+			m_ArgString.Append (_T(", "));
 	}
 
 	if (!(m_Flags & EFunctionTypeFlag_VarArg))
-		m_ArgTypeString.Append (_T(")"));
-	else 
-	{
-		if (ArgCount)
-			m_ArgTypeString.Append (_T(", "));
+		m_ArgString.Append (_T(")"));
+	else if (m_Flags & EFunctionTypeFlag_UnsafeVarArg)
+		m_ArgString.Append (_T("unsafe ...)"));
+	else
+		m_ArgString.Append (_T("...)"));
 
-		if (m_Flags & EFunctionTypeFlag_UnsafeVarArg)
-			m_ArgTypeString.Append (_T("unsafe "));
-
-		m_ArgTypeString.Append (_T("...)"));
-	}
-
-	return m_ArgTypeString;
+	return m_ArgString;
 }
 
 void
@@ -197,24 +288,20 @@ CFunctionType::PrepareTypeString ()
 	}
 
 	m_TypeString += ' ';
-	m_TypeString += GetArgTypeString ();	
+	m_TypeString += GetArgString ();	
 }
 
 void
 CFunctionType::PrepareLlvmType ()
 {
-	size_t ArgCount = m_ArgTypeArray.GetCount ();
+	size_t ArgCount = m_ArgArray.GetCount ();
 
 	char Buffer [256];
 	rtl::CArrayT <llvm::Type*> LlvmArgTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	LlvmArgTypeArray.SetCount (ArgCount);
 
 	for (size_t i = 0; i < ArgCount; i++)
-	{
-		CType* pType = m_ArgTypeArray [i];
-		llvm::Type* pLlvmType = pType->GetLlvmType ();
-		LlvmArgTypeArray [i] = pLlvmType;
-	}
+		LlvmArgTypeArray [i] = m_ArgArray [i]->GetType ()->GetLlvmType ();
 
 	m_pLlvmType = llvm::FunctionType::get (
 		m_pReturnType->GetLlvmType (),

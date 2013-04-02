@@ -10,7 +10,7 @@ namespace jnc {
 CEnumType::CEnumType ()
 {
 	m_TypeKind = EType_Enum;
-	m_Flags = ETypeFlag_Pod;
+	m_Flags = ETypeFlag_Pod | ETypeFlag_Moveable;
 	m_CurrentValue = 0;
 }
 

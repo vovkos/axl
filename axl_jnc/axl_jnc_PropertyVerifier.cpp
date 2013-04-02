@@ -14,7 +14,7 @@ CPropertyVerifier::AddMethod (
 {
 	if (FunctionKind == EFunction_Getter || FunctionKind == EFunction_Setter)
 	{
-		if (FunctionKind == EFunction_Setter && pFunctionType->GetArgTypeArray ().IsEmpty ())
+		if (FunctionKind == EFunction_Setter && pFunctionType->GetArgArray ().IsEmpty ())
 		{
 			err::SetFormatStringError (_T("setter must have at least one argument"));
 			return false;
@@ -31,7 +31,7 @@ CPropertyVerifier::AddMethod (
 			return false;
 		}
 	}
-	else if (!pFunctionType->GetArgTypeArray ().IsEmpty ())
+	else if (!pFunctionType->GetArgArray ().IsEmpty ())
 	{
 		err::SetFormatStringError (_T("%s must have no arguments"), GetFunctionKindString (FunctionKind));
 		return false;
@@ -67,10 +67,11 @@ CPropertyVerifier::CreateIndexArgSignature (
 	if (FunctionKind == EFunction_Getter)
 		return pFunctionType->CreateArgSignature ();
 
-	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
-	size_t ArgCount = ArgTypeArray.GetCount ();
+	rtl::CArrayT <CFunctionArg*> ArgArray = pFunctionType->GetArgArray ();
+	size_t ArgCount = ArgArray.GetCount ();
 	ASSERT (ArgCount);
-	return pFunctionType->CreateArgSignature (ArgTypeArray, ArgCount - 1, 0);
+
+	return pFunctionType->CreateArgSignature (ArgArray, ArgCount - 1, 0);
 }
 
 //.............................................................................

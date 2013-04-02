@@ -92,7 +92,7 @@ CDerivableType::AddMethod (CFunction* pFunction)
 	switch (FunctionKind)
 	{
 	case EFunction_Constructor:
-		if (!pFunction->GetArgList ().IsEmpty ())
+		if (pFunction->GetType ()->GetArgArray ().GetCount () > 1)
 		{
 			err::SetFormatStringError (_T("constructor of '%s' cannot have arguments"), GetTypeString ());
 			return false;

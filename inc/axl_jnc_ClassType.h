@@ -42,6 +42,7 @@ protected:
 	CStructType* m_pClassStructType;
 
 	CFunction* m_pPreConstructor;
+	CFunction* m_pDefaultConstructor;
 	CFunction* m_pDestructor;
 	CFunction* m_pInitializer;
 

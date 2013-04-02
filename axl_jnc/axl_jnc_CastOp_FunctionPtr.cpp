@@ -169,7 +169,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 	CValue* pResultValue
 	)
 {
-	CClassPtrType* pThisArgType = pSrcFunctionType->GetThisArgType ();
+	CType* pThisArgType = pSrcFunctionType->GetThisArgType ();
 
 	CValue ThisArgValue;
 	bool Result = m_pModule->m_OperatorMgr.CastOperator (SimpleClosureObjValue, pThisArgType, &ThisArgValue);
@@ -206,7 +206,8 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 	CValue* pResultValue
 	)
 {
-	CClassPtrType* pThisArgType = pFunction->GetType ()->GetThisArgType ();
+	CType* pThisArgType = pFunction->GetType ()->GetThisArgType ();
+	CNamedType* pThisTargetType = pFunction->GetType ()->GetThisTargetType ();
 
 	CValue ThisArgValue;
 	bool Result = m_pModule->m_OperatorMgr.CastOperator (SimpleClosureObjValue, pThisArgType, &ThisArgValue);
@@ -215,7 +216,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 
 	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (
 		pFunction, 
-		pThisArgType->GetTargetType ()->GetMemberMethodType (pDstPtrType->GetTargetType ())
+		m_pModule->m_TypeMgr.GetMemberMethodType (pThisTargetType, pDstPtrType->GetTargetType ())
 		);
 
 	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pThunkFunction, ThisArgValue, pDstPtrType, pResultValue);

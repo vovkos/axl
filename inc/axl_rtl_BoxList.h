@@ -246,6 +246,12 @@ public:
 	{ 
 		m_pList = List.GetList ();
 	}
+
+	template <typename TDelete>
+	CConstBoxListT (const CListT <CBoxListEntryT <T>, TDelete>& List)
+	{ 
+		m_pList = List.GetList ();
+	}
 };
 
 //.............................................................................

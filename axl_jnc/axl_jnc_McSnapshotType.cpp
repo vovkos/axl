@@ -21,7 +21,7 @@ CMcSnapshotType::PrepareTypeString ()
 {
 	m_TypeString += _T("mcsnapshot ");
 	m_TypeString += m_pTargetType->GetTypeModifierString ();
-	m_TypeString += m_pTargetType->GetTargetType ()->GetArgTypeString ();
+	m_TypeString += m_pTargetType->GetTargetType ()->GetArgString ();
 }
 
 void
@@ -73,11 +73,11 @@ CMcSnapshotType::GetMethod (EMcSnapshotMethod Method)
 CFunction* 
 CMcSnapshotType::CreateCallMethod ()
 {
-	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, this);
-	size_t ArgCount = ArgTypeArray.GetCount ();
+	rtl::CArrayT <CFunctionArg*> ArgArray = m_pTargetType->GetTargetType ()->GetArgArray ();
+	ArgArray.Insert (0, GetSimpleFunctionArg ());
+	size_t ArgCount = ArgArray.GetCount ();
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("McSnapshotCall"), pType);
 
 	char Buffer [256];

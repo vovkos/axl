@@ -49,7 +49,7 @@ CFunctionTypeOverload::FindShortOverload (CFunctionType* pType) const
 
 size_t
 CFunctionTypeOverload::ChooseOverload (
-	CType* const* ppArgTypeArray,
+	CFunctionArg* const* pArgArray,
 	size_t ArgCount,
 	ECast* pCastKind
 	) const
@@ -58,14 +58,14 @@ CFunctionTypeOverload::ChooseOverload (
 
 	CModule* pModule = m_pType->GetModule ();
 
-	ECast BestCastKind = pModule->m_OperatorMgr.GetArgCastKind (m_pType, ppArgTypeArray, ArgCount);
+	ECast BestCastKind = pModule->m_OperatorMgr.GetArgCastKind (m_pType, pArgArray, ArgCount);
 	size_t BestOverload = BestCastKind ? 0 : -1;
 
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunctionType* pOverloadType = m_OverloadArray [i];
-		ECast CastKind = pModule->m_OperatorMgr.GetArgCastKind (pOverloadType, ppArgTypeArray, ArgCount);
+		ECast CastKind = pModule->m_OperatorMgr.GetArgCastKind (pOverloadType, pArgArray, ArgCount);
 		if (!CastKind)
 			continue;
 
@@ -142,55 +142,6 @@ CFunctionTypeOverload::ChooseOverload (
 
 size_t
 CFunctionTypeOverload::ChooseSetterOverload (
-	CType* pType,
-	ECast* pCastKind
-	) const
-{
-	ASSERT (m_pType);
-
-	CModule* pModule = m_pType->GetModule ();
-
-	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();	
-	ECast BestCastKind = pModule->m_OperatorMgr.GetCastKind (pType, ArgTypeArray.GetBack ());
-	size_t BestOverload = BestCastKind ? 0 : -1;
-
-	size_t Count = m_OverloadArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CFunctionType* pOverloadType = m_OverloadArray [i];
-
-		ArgTypeArray = pOverloadType->GetArgTypeArray ();	
-		ECast CastKind = pModule->m_OperatorMgr.GetCastKind (pType, ArgTypeArray.GetBack ());
-		if (!CastKind)
-			continue;
-
-		if (CastKind == BestCastKind)
-		{
-			err::SetFormatStringError (_T("ambiguous call to overloaded function"));
-			return -1;
-		}
-
-		if (CastKind > BestCastKind)
-		{
-			BestOverload = i + 1;
-			BestCastKind = CastKind;
-		}
-	}
-
-	if (BestOverload == -1)
-	{
-		err::SetFormatStringError (_T("none of the %d overloads accept the specified argument list"), Count + 1);
-		return -1;
-	}
-
-	if (pCastKind)
-		*pCastKind = BestCastKind;
-
-	return BestOverload; 
-}
-
-size_t
-CFunctionTypeOverload::ChooseSetterOverload (
 	const CValue& Value,
 	ECast* pCastKind
 	) const
@@ -199,17 +150,20 @@ CFunctionTypeOverload::ChooseSetterOverload (
 
 	CModule* pModule = m_pType->GetModule ();
 
-	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
-	ECast BestCastKind = pModule->m_OperatorMgr.GetCastKind (Value, ArgTypeArray.GetBack ());
+	size_t SetterValueIdx = m_pType->GetArgArray ().GetCount () - 1;
+	ASSERT (SetterValueIdx != -1);
+
+	CType* pSetterValueArgType = m_pType->GetArgArray () [SetterValueIdx]->GetType ();
+	ECast BestCastKind = pModule->m_OperatorMgr.GetCastKind (Value, pSetterValueArgType);
 	size_t BestOverload = BestCastKind ? 0 : -1;
 
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CFunctionType* pOverloadType = m_OverloadArray [i];
-		
-		ArgTypeArray = m_pType->GetArgTypeArray ();	
-		ECast CastKind = pModule->m_OperatorMgr.GetCastKind (Value, ArgTypeArray.GetBack ());
+		CFunctionType* pOverloadType = m_OverloadArray [i];		
+		CType* pSetterValueArgType = pOverloadType->GetArgArray () [SetterValueIdx]->GetType ();
+
+		ECast CastKind = pModule->m_OperatorMgr.GetCastKind (Value, pSetterValueArgType);
 		if (!CastKind)
 			continue;
 

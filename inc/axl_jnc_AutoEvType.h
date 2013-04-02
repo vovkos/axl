@@ -50,10 +50,10 @@ public:
 		return m_pStarterType->IsMemberMethodType ();
 	}
 
-	CClassPtrType* 
+	CType*
 	GetThisArgType ()
 	{
-		return m_pStarterType->GetThisArgType ();
+		return m_pStarterType->GetThisArgType (); 
 	}
 
 	CAutoEvType*
@@ -99,7 +99,7 @@ protected:
 	void
 	PrepareTypeString ()
 	{
-		m_TypeString.Format (_T("autoev %s"), m_pStarterType->GetArgTypeString ());
+		m_TypeString.Format (_T("autoev %s"), m_pStarterType->GetArgString ());
 	}
 
 	virtual 

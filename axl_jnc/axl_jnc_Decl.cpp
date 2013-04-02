@@ -150,21 +150,6 @@ CTypeSpecifier::SetType (CType* pType)
 
 //.............................................................................
 
-rtl::CArrayT <CType*>
-CDeclFunctionSuffix::GetArgTypeArray ()
-{
-	rtl::CArrayT <CType*> ArgTypeArray;
-	ArgTypeArray.SetCount (m_ArgList.GetCount ());
-
-	rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
-	for (size_t i = 0; Arg; Arg++, i++)
-		ArgTypeArray [i] = Arg->GetType ();
-
-	return ArgTypeArray;
-}
-
-//.............................................................................
-
 const tchar_t* 
 GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier)
 {

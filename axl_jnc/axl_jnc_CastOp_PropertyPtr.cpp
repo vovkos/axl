@@ -223,7 +223,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 	CValue* pResultValue
 	)
 {
-	CClassPtrType* pThisArgType = pSrcPropertyType->GetThisArgType ();
+	CType* pThisArgType = pSrcPropertyType->GetThisArgType ();
 
 	CValue ThisArgValue;
 	bool Result = m_pModule->m_OperatorMgr.CastOperator (SimpleClosureObjValue, pThisArgType, &ThisArgValue);
@@ -263,7 +263,8 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 	CValue* pResultValue
 	)
 {
-	CClassPtrType* pThisArgType = pProperty->GetType ()->GetThisArgType ();
+	CType* pThisArgType = pProperty->GetType ()->GetThisArgType ();
+	CNamedType* pThisTargetType = pProperty->GetType ()->GetThisTargetType ();
 
 	CValue ThisArgValue;
 	bool Result = m_pModule->m_OperatorMgr.CastOperator (SimpleClosureObjValue, pThisArgType, &ThisArgValue);
@@ -272,7 +273,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (
 		pProperty, 
-		pThisArgType->GetTargetType ()->GetMemberPropertyType (pDstPtrType->GetTargetType ())
+		m_pModule->m_TypeMgr.GetMemberPropertyType (pThisTargetType, pDstPtrType->GetTargetType ())
 		);
 
 	return CreateClosurePropertyPtr (pThunkProperty, ThisArgValue, pDstPtrType, pResultValue);

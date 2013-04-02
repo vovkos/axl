@@ -214,7 +214,7 @@ Members2
 		int PtrTypeFlags
 		);
 
-	CFunctionFormalArg*
+	CFunctionArg*
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
 		CDeclarator* pDeclarator,
@@ -318,12 +318,6 @@ Members2
 	GetAuPropertyFieldType (
 		CValue* pValue,
 		EAuPropertyField Field
-		);
-
-	bool
-	EvaluateAlias (
-		CAlias* pAlias,
-		CValue* pResultValue
 		);
 
 	void

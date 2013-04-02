@@ -58,15 +58,18 @@ protected:
 	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
 	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
 	rtl::CStdListT <CImportType> m_ImportTypeList;
-
+	
 	rtl::CStdListT <CPropertyTypeTuple> m_PropertyTypeTupleList;
 	rtl::CStdListT <CDataPtrTypeTuple> m_DataPtrTypeTupleList;
 	rtl::CStdListT <CClassPtrTypeTuple> m_ClassPtrTypeTupleList;
 	rtl::CStdListT <CFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
 	rtl::CStdListT <CPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
 	rtl::CStdListT <CAutoEvPtrTypeTuple> m_AutoEvPtrTypeTupleList;
+	rtl::CStdListT <CFunctionArgTuple> m_FunctionArgTupleList;
 
+	rtl::CStdListT <CFunctionArg> m_FunctionArgList;
 	rtl::CStdListT <CTypedef> m_TypedefList;
+
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
 	size_t m_UnnamedEnumTypeCounter;
@@ -241,37 +244,48 @@ public:
 	{
 		return CreateClassType (rtl::CString (), rtl::CString (), PackFactor);
 	}
-	
+
+	CFunctionArg*
+	CreateFunctionArg (
+		const rtl::CString& Name,
+		CType* pType,
+		int PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
+	CFunctionArg*
+	GetSimpleFunctionArg (
+		CType* pType,
+		int PtrTypeFlags = 0
+		);
+
 	CFunctionType* 
 	GetFunctionType (
 		ECallConv CallConv,
 		CType* pReturnType,
-		const rtl::CArrayT <CType*>& ArgTypeArray,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		int Flags = 0
 		);
-	
-	CFunctionType* 
-	GetFunctionType (	
-		ECallConv CallConv,
-		CType* pReturnType,
-		CType* const* ppArgType,
-		size_t ArgCount,
-		int Flags = 0
-		)
-	{
-		return GetFunctionType (CallConv, pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
-	}
 
 	CFunctionType* 
 	GetFunctionType (
 		CType* pReturnType,
-		const rtl::CArrayT <CType*>& ArgTypeArray,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		int Flags = 0
 		)
 	{
-		return GetFunctionType (ECallConv_Default, pReturnType, ArgTypeArray, Flags);
+		return GetFunctionType (ECallConv_Default, pReturnType, ArgArray, Flags);
 	}
-	
+
+	CFunctionType* 
+	GetFunctionType (	
+		ECallConv CallConv,
+		CType* pReturnType,
+		CType* const* ppArgType,
+		size_t ArgCount,
+		int Flags = 0
+		);
+
 	CFunctionType* 
 	GetFunctionType (	
 		CType* pReturnType,
@@ -280,7 +294,25 @@ public:
 		int Flags = 0
 		)
 	{
-		return GetFunctionType (ECallConv_Default, pReturnType, rtl::CArrayT <CType*> (ppArgType, ArgCount), Flags);
+		return GetFunctionType (ECallConv_Default, pReturnType, ppArgType, ArgCount, Flags);
+	}
+
+	CFunctionType* 
+	CreateUserFunctionType (
+		ECallConv CallConv,
+		CType* pReturnType,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
+		int Flags = 0
+		);
+
+	CFunctionType* 
+	CreateUserFunctionType (
+		CType* pReturnType,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
+		int Flags = 0
+		)
+	{
+		return CreateUserFunctionType (ECallConv_Default, pReturnType, ArgArray, Flags);
 	}
 
 	CFunctionType* 
@@ -292,9 +324,6 @@ public:
 
 	CFunctionType* 
 	GetStdObjectMemberMethodType (CFunctionType* pFunctionType);
-
-	CFunctionType* 
-	GetShortFunctionType (CFunctionType* pFunctionType);
 
 	CPropertyType* 
 	GetPropertyType (
@@ -323,41 +352,56 @@ public:
 	GetIndexedPropertyType (
 		ECallConv CallConv,
 		CType* pReturnType,
-		const rtl::CArrayT <CType*>& ArgTypeArray,
+		CType* const* ppIndexArgType,
+		size_t IndexArgCount,
 		int Flags = 0
 		);
 
 	CPropertyType* 
 	GetIndexedPropertyType (
+		CType* pReturnType,
+		CType* const* ppIndexArgType,
+		size_t IndexArgCount,
+		int Flags = 0
+		)
+	{
+		return GetIndexedPropertyType (ECallConv_Default, pReturnType, ppIndexArgType, IndexArgCount, Flags);
+	}
+
+	CPropertyType* 
+	GetIndexedPropertyType (
 		ECallConv CallConv,
 		CType* pReturnType,
-		CType* const* ppIndexArgType,
-		size_t IndexArgCount,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		int Flags = 0
-		)
-	{
-		return GetIndexedPropertyType (CallConv, pReturnType, rtl::CArrayT <CType*> (ppIndexArgType, IndexArgCount), Flags);
-	}
+		);
 
 	CPropertyType* 
 	GetIndexedPropertyType (
 		CType* pReturnType,
-		const rtl::CArrayT <CType*>& ArgTypeArray,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		int Flags = 0
 		)
 	{
-		return GetIndexedPropertyType (ECallConv_Default, pReturnType, ArgTypeArray, Flags);
+		return GetIndexedPropertyType (ECallConv_Default, pReturnType, ArgArray, Flags);
 	}
 
 	CPropertyType* 
-	GetIndexedPropertyType (
+	CreateIndexedPropertyType (
+		ECallConv CallConv,
 		CType* pReturnType,
-		CType* const* ppIndexArgType,
-		size_t IndexArgCount,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
+		int Flags = 0
+		);
+
+	CPropertyType* 
+	CreateIndexedPropertyType (
+		CType* pReturnType,
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		int Flags = 0
 		)
 	{
-		return GetIndexedPropertyType (ECallConv_Default, pReturnType, rtl::CArrayT <CType*> (ppIndexArgType, IndexArgCount), Flags);
+		return CreateIndexedPropertyType (ECallConv_Default, pReturnType, ArgArray, Flags);
 	}
 
 	CPropertyType* 
@@ -536,11 +580,14 @@ public:
 		);
 
 protected:
+	CDataPtrTypeTuple*
+	GetDataPtrTypeTuple (CType* pType);
+
 	CPropertyTypeTuple*
 	GetPropertyTypeTuple (CType* pType);
 
-	CDataPtrTypeTuple*
-	GetDataPtrTypeTuple (CType* pType);
+	CFunctionArgTuple*
+	GetFunctionArgTuple (CType* pType);
 
 	CClassPtrTypeTuple*
 	GetClassPtrTypeTuple (CClassType* pClassType);

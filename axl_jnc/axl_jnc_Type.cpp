@@ -136,6 +136,7 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 		_T("mutable"),  // EPtrTypeFlag_Mutable   = 0x0800,
 		_T("volatile"), // EPtrTypeFlag_Volatile  = 0x1000,
 		_T("event"),    // EPtrTypeFlag_Event     = 0x2000,
+		_T("this"),     // EPtrTypeFlag_This      = 0x4000,
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Flag >> 8);
@@ -181,6 +182,7 @@ CType::CType ()
 	m_pLlvmType = NULL;
 	m_pDataPtrTypeTuple = NULL;
 	m_pPropertyTypeTuple = NULL;
+	m_pFunctionArgTuple = NULL;
 }
 
 rtl::CString 
@@ -281,6 +283,12 @@ CType::GetDataPtrType (
 	)
 {
 	return m_pModule->m_TypeMgr.GetDataPtrType (this, TypeKind, PtrTypeKind, Flags);
+}
+
+CFunctionArg* 
+CType::GetSimpleFunctionArg (int PtrTypeFlags)
+{
+	return m_pModule->m_TypeMgr.GetSimpleFunctionArg (this, PtrTypeFlags);
 }
 
 void

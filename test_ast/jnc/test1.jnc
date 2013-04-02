@@ -1,7 +1,5 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-/*
-
 foo (
 	int a = 1,
 	int b = 2,
@@ -17,36 +15,17 @@ main ()
 {
 	printf ("main ()\n");
 
-	function* pfn (
-		int a = 10,
-		int b = 20,
-		int c = 30,
-		int d = 40
-		);
+	foo (, 200,, 400);
 
-	return 0;
-} */
+	thin function* pfn (
+		int x = 10,
+		int y = 20,
+		int z = 30,
+		int w = 40  
+		) = foo;
 
-struct TPoint
-{
-	int x;
-	int y;
-	int z = 30;
-
-	this ()
-	{
-		x = 10;
-		y = 20;
-	}
-};
-
-int
-main ()
-{
-	TPoint Point;
-
-	printf ("Point = { %d, %d, %d }\n", Point.x, Point.y, Point.z);
-
+	pfn (1000,, 3000);
+	
 	return 0;
 }
 

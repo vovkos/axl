@@ -14,22 +14,18 @@ class CScope;
 
 //.............................................................................
 
-class CVariable: public CUserModuleItem
+class CFunctionArg: public CUserModuleItem
 {
 protected:
-	friend class CVariableMgr;
-	friend class CParser;
+	friend class CTypeMgr;
 
 	CType* m_pType;
 	int m_PtrTypeFlags;
 	rtl::CBoxListT <CToken> m_Initializer;
 	rtl::CString m_InitializerString;
 
-	CScope* m_pScope;
-	llvm::Value* m_pLlvmValue;
-
 public:
-	CVariable ();
+	CFunctionArg ();
 
 	CType* 
 	GetType ()
@@ -57,23 +53,21 @@ public:
 
 		return m_InitializerString;
 	}
+};
 
-	CScope*
-	GetScope ()
-	{
-		return m_pScope;
-	}
+//.............................................................................
 
-	size_t
-	GetScopeLevel ()
-	{
-		return m_pScope ? m_pScope->GetLevel () : 0;
-	}
+class CFunctionArgTuple: public rtl::TListLink
+{
+protected:
+	friend class CTypeMgr;
 
-	llvm::Value* 
-	GetLlvmValue ()
+	CFunctionArg* m_ArgArray [2] [2]; // const x this
+
+public:
+	CFunctionArgTuple ()
 	{
-		return m_pLlvmValue;
+		memset (this, 0, sizeof (CFunctionArgTuple));
 	}
 };
 

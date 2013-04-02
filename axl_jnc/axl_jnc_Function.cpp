@@ -104,53 +104,6 @@ CFunction::CFunction ()
 	m_pfn = NULL;
 }
 
-rtl::CString
-CFunction::CreateArgString ()
-{
-	rtl::CString String = _T('(');
-
-	rtl::CArrayT <CType*> ArgTypeArray = m_pType->GetArgTypeArray ();
-	size_t ArgCount = ArgTypeArray.GetCount ();
-
-	if (m_pThisArgType)
-		String.AppendFormat (_T("%s this"), m_pThisArgType->GetTypeString ());
-
-	if (!m_ArgList.IsEmpty ())
-	{
-		rtl::CIteratorT <CFunctionFormalArg> Arg = m_ArgList.GetHead ();
-
-		String.AppendFormat (m_pThisArgType ? _T(", %s") : _T("%s"), Arg->GetType ()->GetTypeString ());
-
-		if (!Arg->GetName ().IsEmpty ())
-			String.AppendFormat (_T(" %s"), Arg->GetName ());
-
-		for (Arg++; Arg; Arg++)
-		{
-			String.AppendFormat (_T(", %s"), Arg->GetType ()->GetTypeString ());
-
-			if (!Arg->GetName ().IsEmpty ())
-				String.AppendFormat (_T(" %s"), Arg->GetName ());
-		}
-	}
-	else
-	{
-		if (ArgCount && !m_pThisArgType)
-			String += ArgTypeArray [0]->GetTypeString ();
-
-		for (size_t i = 1; i < ArgCount; i++)
-			String.AppendFormat (_T(", %s"), ArgTypeArray [i]->GetTypeString ());
-	}
-
-	if (!(m_pType->GetFlags () & EFunctionTypeFlag_VarArg))
-		String.Append (_T(")"));
-	else if (m_pType->GetFlags () & EFunctionTypeFlag_UnsafeVarArg)
-		String.Append (_T(", unsafe ...)"));
-	else
-		String.Append (_T(", safe ...)"));
-
-	return String;
-}
-
 llvm::Function* 
 CFunction::GetLlvmFunction ()
 {
@@ -180,8 +133,8 @@ CFunction::ConvertToMemberMethod (CNamedType* pParentType)
 	m_pType = pParentType->GetMemberMethodType (m_pType, m_ThisArgTypeFlags);
 	m_TypeOverload = m_pType;
 
-	ASSERT (!m_pType->GetArgTypeArray ().IsEmpty ());
-	m_pThisArgType = (CClassPtrType*) m_pType->GetArgTypeArray () [0];
+	ASSERT (!m_pType->GetArgArray ().IsEmpty ());
+	m_pThisArgType = m_pType->GetArgArray () [0]->GetType ();
 	m_pThisType = m_pThisArgType;
 }
 

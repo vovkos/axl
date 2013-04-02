@@ -281,8 +281,7 @@ public:
 	CFunction*
 	CreateFunction (
 		EFunction FunctionKind,
-		CFunctionType* pType,
-		rtl::CStdListT <CFunctionFormalArg>* pArgList = NULL
+		CFunctionType* pType
 		);
 
 	CFunction*

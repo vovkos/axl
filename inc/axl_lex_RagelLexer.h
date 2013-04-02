@@ -45,6 +45,24 @@ public:
 	{
 		return rtl::CStringA (m_Pos.m_p, m_Pos.m_Length);
 	}
+
+	static
+	rtl::CString 
+	GetTokenListString (const rtl::CConstBoxListT <CRagelTokenT>& List)
+	{
+		if (List.IsEmpty ())
+			return rtl::CString ();
+
+		rtl::CBoxIteratorT <CRagelTokenT> Token = List.GetHead ();
+		rtl::CString String (Token->m_Pos.m_p, Token->m_Pos.m_Length);
+		for (Token++; Token; Token++)
+		{
+			String.Append (_T(' '));
+			String.Append (Token->m_Pos.m_p, Token->m_Pos.m_Length);
+		}
+
+		return String;
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

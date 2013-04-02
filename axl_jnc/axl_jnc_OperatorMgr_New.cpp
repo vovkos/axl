@@ -122,6 +122,24 @@ COperatorMgr::ParseInitializer (
 }
 
 bool
+COperatorMgr::EvaluateAlias (
+	const rtl::CConstBoxListT <CToken> TokenList,
+	CValue* pResultValue
+	)
+{
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, TokenList);
+	if (!Result)
+		return false;
+
+	*pResultValue = Parser.m_ExpressionValue;
+	return true;
+}
+
+bool
 COperatorMgr::Allocate (
 	EStorage StorageKind,
 	CType* pType,

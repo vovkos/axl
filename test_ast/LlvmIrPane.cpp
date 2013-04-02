@@ -53,7 +53,7 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 			pFunctionType->GetReturnType ()->GetTypeString (),
 			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
 			Function->m_Tag, 
-			pFunctionType->GetArgTypeString ()
+			pFunctionType->GetArgString ()
 			);
 
 		jnc::CFunction* pExternFunction = Function->GetExternFunction ();

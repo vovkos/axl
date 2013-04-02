@@ -42,7 +42,7 @@ CMulticastType::PrepareTypeString ()
 {
 	m_TypeString += m_pTargetType->GetTypeModifierString ();
 	m_TypeString += _T("multicast ");
-	m_TypeString += m_pTargetType->GetTargetType ()->GetArgTypeString ();
+	m_TypeString += m_pTargetType->GetTargetType ()->GetArgString ();
 }
 
 CFunction* 
@@ -485,11 +485,13 @@ CMulticastType::CreateSnapshotMethod_u ()
 CFunction* 
 CMulticastType::CreateCallMethod ()
 {
-	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, GetDataPtrType (EDataPtrType_Normal));
-	size_t ArgCount = ArgTypeArray.GetCount ();
+	CFunctionArg* pThisArg = GetDataPtrType (EDataPtrType_Normal)->GetSimpleFunctionArg ();
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+	rtl::CArrayT <CFunctionArg*> ArgArray = m_pTargetType->GetTargetType ()->GetArgArray ();
+	ArgArray.Insert (0, pThisArg);
+	size_t ArgCount = ArgArray.GetCount ();
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastCall_s"), pType);
 
 	char Buffer [256];
@@ -521,11 +523,13 @@ CMulticastType::CreateCallMethod ()
 CFunction* 
 CMulticastType::CreateCallMethod_u ()
 {
-	rtl::CArrayT <CType*> ArgTypeArray = m_pTargetType->GetTargetType ()->GetArgTypeArray ();
-	ArgTypeArray.Insert (0, GetDataPtrType (EDataPtrType_Unsafe));
-	size_t ArgCount = ArgTypeArray.GetCount ();
+	CFunctionArg* pThisArg = GetDataPtrType (EDataPtrType_Unsafe)->GetSimpleFunctionArg ();
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray);
+	rtl::CArrayT <CFunctionArg*> ArgArray = m_pTargetType->GetTargetType ()->GetArgArray ();
+	ArgArray.Insert (0, pThisArg);
+	size_t ArgCount = ArgArray.GetCount ();
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (_T("MulticastCall_u"), pType);
 
 	char Buffer [256];

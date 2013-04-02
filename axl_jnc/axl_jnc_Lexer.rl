@@ -64,12 +64,12 @@ main := |*
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-# storage & access specifiers
+# storage specifiers
 
 'typedef'      { CreateToken (EToken_Typedef); };
 'alias'        { CreateToken (EToken_Alias); };
 'static'       { CreateToken (EToken_Static); };
-'tls'          { CreateToken (EToken_Tls); };
+'thread'       { CreateToken (EToken_Thread); };
 'stack'        { CreateToken (EToken_Stack); };
 'heap'         { CreateToken (EToken_Heap); };
 'uheap'        { CreateToken (EToken_UHeap); };
@@ -77,6 +77,10 @@ main := |*
 'abstract'     { CreateToken (EToken_Abstract); };
 'virtual'      { CreateToken (EToken_Virtual); };
 'override'     { CreateToken (EToken_Override); };
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# access specifiers
 
 'public'       { CreateToken (EToken_Public); };
 'protected'    { CreateToken (EToken_Protected); };

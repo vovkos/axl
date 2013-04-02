@@ -15,6 +15,7 @@ CClassType::CClassType ()
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
 	m_pPreConstructor = NULL;
+	m_pDefaultConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pInitializer = NULL;
 	m_pVTableStructType = NULL;
@@ -40,16 +41,24 @@ CFunction*
 CClassType::GetDefaultConstructor ()
 {
 	ASSERT (m_pConstructor);
+	if (m_pDefaultConstructor)
+		return m_pDefaultConstructor;
+
+	rtl::CBoxListEntryT <CValue> ThisArgValue;
+	ThisArgValue.m_Value.SetType (GetThisArgType ());
+	
+	rtl::CAuxListT <rtl::CBoxListEntryT <CValue> > ArgList;
+	ArgList.InsertTail (&ThisArgValue);
 
 	CType* pThisArgType = GetThisArgType ();
-	CFunction* pDefaultConstructor = m_pConstructor->ChooseOverload (&pThisArgType, 1);
-	if (!pDefaultConstructor)
+	m_pDefaultConstructor = m_pConstructor->ChooseOverload (ArgList);
+	if (!m_pDefaultConstructor)
 	{
 		err::SetFormatStringError (_T("'%s' does not provide a default constructor"), GetTypeString ());
 		return NULL;
 	}
 
-	return pDefaultConstructor;
+	return m_pDefaultConstructor;
 }
 
 CStructField*
@@ -725,7 +734,7 @@ CClassType::CreateAutoEvConstructor ()
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pStarter->GetType ());
 	pFunction->m_Tag = m_Tag + _T(".this");
 
-	size_t ArgCount = pStarter->GetType ()->GetArgTypeArray ().GetCount ();
+	size_t ArgCount = pStarter->GetType ()->GetArgArray ().GetCount ();
 	
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));

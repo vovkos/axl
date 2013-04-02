@@ -99,13 +99,13 @@ CClosure::GetFunctionClosureType (CFunction* pFunction)
 bool
 CClosure::GetArgTypeArray (
 	CModule* pModule,
-	rtl::CArrayT <CType*>* pArgTypeArray
+	rtl::CArrayT <CFunctionArg*>* pArgArray
 	)
 {
 	bool Result;
 
 	size_t ClosureArgCount = m_ArgList.GetCount ();
-	size_t ArgCount = pArgTypeArray->GetCount ();
+	size_t ArgCount = pArgArray->GetCount ();
 
 	if (ClosureArgCount > ArgCount)
 	{
@@ -124,11 +124,11 @@ CClosure::GetArgTypeArray (
 
 		ASSERT (i < ArgCount);
 
-		Result = pModule->m_OperatorMgr.CheckCastKind (ClosureArg->GetType (), (*pArgTypeArray) [i]);
+		Result = pModule->m_OperatorMgr.CheckCastKind (ClosureArg->GetType (), (*pArgArray) [i]->GetType ());
 		if (!Result)
 			return false;
 
-		pArgTypeArray->Remove (i);
+		pArgArray->Remove (i);
 		ArgCount--;
 	}
 
@@ -149,15 +149,15 @@ CClosure::GetFunctionClosureType (CFunctionPtrType* pPtrType)
 		return NULL;
 	}
 
-	rtl::CArrayT <CType*> ArgTypeArray = pType->GetArgTypeArray ();
-	Result = GetArgTypeArray (pModule, &ArgTypeArray);
+	rtl::CArrayT <CFunctionArg*> ArgArray = pType->GetArgArray ();
+	Result = GetArgTypeArray (pModule, &ArgArray);
 	if (!Result)
 		return NULL;
 
 	CFunctionType* pClosureType = pModule->m_TypeMgr.GetFunctionType (
 		pType->GetCallConv (),
 		pType->GetReturnType (), 
-		ArgTypeArray
+		ArgArray
 		);
 	
 	return pClosureType->GetFunctionPtrType (
@@ -177,15 +177,15 @@ CClosure::GetPropertyClosureType (CPropertyPtrType* pPtrType)
 	CFunctionType* pGetterType = pType->GetGetterType ();
 	CFunctionTypeOverload* pSetterType = pType->GetSetterType ();
 
-	rtl::CArrayT <CType*> ArgTypeArray = pGetterType->GetArgTypeArray ();
-	Result = GetArgTypeArray (pModule, &ArgTypeArray);
+	rtl::CArrayT <CFunctionArg*> ArgArray = pGetterType->GetArgArray ();
+	Result = GetArgTypeArray (pModule, &ArgArray);
 	if (!Result)
 		return NULL;
 	
 	CFunctionType* pClosureGetterType = pModule->m_TypeMgr.GetFunctionType (
 		pGetterType->GetCallConv (),
 		pGetterType->GetReturnType (), 
-		ArgTypeArray
+		ArgArray
 		);
 
 	CFunctionTypeOverload ClosureSetterType;
@@ -194,17 +194,17 @@ CClosure::GetPropertyClosureType (CPropertyPtrType* pPtrType)
 	for (size_t i = 0; i < SetterCount; i++)
 	{
 		CFunctionType* pOverloadType = pSetterType->GetOverload (i);
-		ASSERT (!pOverloadType->GetArgTypeArray ().IsEmpty ());
+		ASSERT (!pOverloadType->GetArgArray ().IsEmpty ());
 
-		ArgTypeArray.Append (pOverloadType->GetArgTypeArray ().GetBack ());
+		ArgArray.Append (pOverloadType->GetArgArray ().GetBack ());
 
 		CFunctionType* pClosureOverloadType = pModule->m_TypeMgr.GetFunctionType (
 			pOverloadType->GetCallConv (),
 			pOverloadType->GetReturnType (), 
-			ArgTypeArray
+			ArgArray
 			);
 
-		ArgTypeArray.Pop ();
+		ArgArray.Pop ();
 
 		Result = ClosureSetterType.AddOverload (pClosureOverloadType);
 		if (!Result)

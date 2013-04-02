@@ -477,12 +477,12 @@ COperatorMgr::GetCastKind (
 ECast
 COperatorMgr::GetArgCastKind (
 	CFunctionType* pFunctionType,
-	CType* const* ppActualArgTypeArray,
+	CFunctionArg* const* pActualArgArray,
 	size_t ActualArgCount
 	)
 {
-	rtl::CArrayT <CType*> FormalArgTypeArray = pFunctionType->GetArgTypeArray ();
-	size_t FormalArgCount = FormalArgTypeArray.GetCount ();
+	rtl::CArrayT <CFunctionArg*> FormalArgArray = pFunctionType->GetArgArray ();
+	size_t FormalArgCount = FormalArgArray.GetCount ();
 
 	if (ActualArgCount < FormalArgCount || 
 		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
@@ -494,8 +494,8 @@ COperatorMgr::GetArgCastKind (
 
 	for (size_t i = 0; i < FormalArgCount; i++)
 	{
-		CType* pFormalArgType = FormalArgTypeArray [i];
-		CType* pActualArgType = ppActualArgTypeArray [i];;
+		CType* pFormalArgType = FormalArgArray [i]->GetType ();
+		CType* pActualArgType = pActualArgArray [i]->GetType ();
 
 		ECast CastKind = GetCastKind (pActualArgType, pFormalArgType);
 		if (!CastKind)
@@ -516,8 +516,8 @@ COperatorMgr::GetArgCastKind (
 {
 	size_t ActualArgCount = ArgList.GetCount ();
 
-	rtl::CArrayT <CType*> FormalArgTypeArray = pFunctionType->GetArgTypeArray ();
-	size_t FormalArgCount = FormalArgTypeArray.GetCount ();
+	rtl::CArrayT <CFunctionArg*> FormalArgArray = pFunctionType->GetArgArray ();
+	size_t FormalArgCount = FormalArgArray.GetCount ();
 
 	if (ActualArgCount < FormalArgCount || 
 		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
@@ -530,7 +530,7 @@ COperatorMgr::GetArgCastKind (
 	const rtl::CBoxIteratorT <CValue>& Arg = ArgList.GetHead ();
 	for (size_t i = 0; i < FormalArgCount; i++)
 	{
-		CType* pFormalArgType = FormalArgTypeArray [i];
+		CType* pFormalArgType = FormalArgArray [i]->GetType ();
 
 		ECast CastKind = GetCastKind (*Arg, pFormalArgType);
 		if (!CastKind)
@@ -549,7 +549,7 @@ COperatorMgr::GetFunctionCastKind (
 	CFunctionType* pDstType
 	)
 {
-	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgTypeArray ());
+	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgArray ());
 	if (!ArgCastKind)
 		return ECast_None;
 
@@ -583,7 +583,7 @@ COperatorMgr::GetPropertyCastKind (
 	{
 		CFunctionType* pDstOverload = pDstSetterType->GetOverload (i);
 		
-		size_t j = pSrcSetterType->ChooseOverload (pDstOverload->GetArgTypeArray (), &CastKind);
+		size_t j = pSrcSetterType->ChooseOverload (pDstOverload->GetArgArray (), &CastKind);
 		if (j == -1)
 			return ECast_None;
 
@@ -832,12 +832,16 @@ COperatorMgr::CreateClosureObject (
 	if (pClosure)
 	{
 		pClosureArgList = pClosure->GetArgList ();
-		pClosureMap->Reserve (pClosureArgList->GetCount ());
+		rtl::CArrayT <CFunctionArg*> SrcArgArray = pSrcFunctionType->GetArgArray ();
+
+		size_t ClosureArgCount = pClosureArgList->GetCount ();
+		size_t SrcArgCount = SrcArgArray.GetCount ();
+
+		pClosureMap->Reserve (ClosureArgCount);
 
 		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
-		rtl::CArrayT <CType*> SrcArgTypeArray = pSrcFunctionType->GetArgTypeArray ();
-	
-		if (pClosureArgList->GetCount () > SrcArgTypeArray.GetCount ())
+
+		if (ClosureArgCount > SrcArgCount)
 		{
 			err::SetFormatStringError (_T("closure is too big for '%s'"), pSrcFunctionType->GetTypeString ());
 			return false;
@@ -848,9 +852,9 @@ COperatorMgr::CreateClosureObject (
 			if (ClosureArg->IsEmpty ())
 				continue;
 
-			ASSERT (i < SrcArgTypeArray.GetCount ());
+			ASSERT (i < SrcArgCount);
 			pClosureMap->Append (i);
-			pClosureType->CreateField (SrcArgTypeArray [i]);
+			pClosureType->CreateField (SrcArgArray [i]->GetType ());
 		}
 	}
 

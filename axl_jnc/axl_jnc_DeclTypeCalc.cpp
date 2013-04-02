@@ -309,10 +309,10 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
 
-	return m_pModule->m_TypeMgr.GetFunctionType (
+	return m_pModule->m_TypeMgr.CreateUserFunctionType (
 		CallConv,
 		pReturnType, 
-		pSuffix->GetArgTypeArray (),
+		pSuffix->GetArgArray (),
 		pSuffix->GetFunctionTypeFlags ()
 		);
 }
@@ -361,10 +361,10 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 		}
 
 		CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
-		return m_pModule->m_TypeMgr.GetIndexedPropertyType (
+		return m_pModule->m_TypeMgr.CreateIndexedPropertyType (
 			CallConv, 
 			pReturnType, 
-			pSuffix->GetArgTypeArray (),
+			pSuffix->GetArgArray (),
 			TypeFlags
 			);
 	}

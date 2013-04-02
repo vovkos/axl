@@ -23,7 +23,7 @@ CStructField::CStructField ()
 CStructType::CStructType ()
 {
 	m_TypeKind = EType_Struct;
-	m_Flags = ETypeFlag_Pod;
+	m_Flags = ETypeFlag_Pod | ETypeFlag_Moveable;
 	m_AlignFactor = 1;
 	m_PackFactor = 8;
 	m_FieldActualSize = 0;
@@ -72,6 +72,9 @@ CStructType::CreateField (
 
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
 		m_Flags &= ~ETypeFlag_Pod;
+
+	if (!(pType->GetFlags () & ETypeFlag_Moveable))
+		m_Flags &= ~ETypeFlag_Moveable;
 
 	if (!Name.IsEmpty ())
 	{

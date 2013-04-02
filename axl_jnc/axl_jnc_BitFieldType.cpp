@@ -9,7 +9,7 @@ namespace jnc {
 CBitFieldType::CBitFieldType ()
 {
 	m_TypeKind = EType_BitField;
-	m_Flags = ETypeFlag_Pod;
+	m_Flags = ETypeFlag_Pod | ETypeFlag_Moveable;
 	m_pBaseType = NULL;
 	m_BitOffset = 0;
 	m_BitCount = 0;

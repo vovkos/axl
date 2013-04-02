@@ -372,18 +372,18 @@ public:
 	ECast
 	GetArgCastKind (
 		CFunctionType* pFunctionType,
-		const rtl::CArrayT <CType*>& ArgTypeArray
-		)
-	{
-		return GetArgCastKind (pFunctionType, ArgTypeArray, ArgTypeArray.GetCount ());
-	}
+		CFunctionArg* const* pArgArray,
+		size_t ArgCount
+		);
 
 	ECast
 	GetArgCastKind (
 		CFunctionType* pFunctionType,
-		CType* const* ppArgTypeArray,
-		size_t Count
-		);
+		const rtl::CArrayT <CFunctionArg*>& ArgArray
+		)
+	{
+		return GetArgCastKind (pFunctionType, ArgArray, ArgArray.GetCount ());
+	}
 
 	ECast
 	GetArgCastKind (
@@ -505,6 +505,12 @@ public:
 
 	bool
 	DeleteOperator (const CValue& OpValue);
+
+	bool
+	EvaluateAlias (
+		const rtl::CConstBoxListT <CToken> TokenList,
+		CValue* pResultValue
+		);
 
 	bool
 	ParseInitializer (

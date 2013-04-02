@@ -123,7 +123,7 @@ CFunctionPtrType::PrepareTypeString ()
 	m_TypeString += _T(' ');
 	m_TypeString += GetTypeModifierString ();
 	m_TypeString += m_TypeKind == EType_FunctionRef ? "function& " : "function* ";
-	m_TypeString += m_pTargetType->GetArgTypeString ();
+	m_TypeString += m_pTargetType->GetArgString ();
 }
 
 void

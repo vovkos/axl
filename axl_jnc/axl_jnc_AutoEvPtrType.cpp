@@ -90,7 +90,7 @@ CAutoEvPtrType::PrepareTypeString ()
 	}
 
 	m_TypeString += m_TypeKind == EType_AutoEvRef ? "autoev& " : "autoev* ";
-	m_TypeString += m_pTargetType->GetStarterType ()->GetArgTypeString ();
+	m_TypeString += m_pTargetType->GetStarterType ()->GetArgString ();
 }
 
 void

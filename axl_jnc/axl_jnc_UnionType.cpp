@@ -10,7 +10,7 @@ namespace jnc {
 CUnionType::CUnionType ()
 {
 	m_TypeKind = EType_Union;
-	m_Flags = ETypeFlag_Pod;
+	m_Flags = ETypeFlag_Pod | ETypeFlag_Moveable;
 	m_pStructType = NULL;
 	m_pInitializedField = NULL;
 }

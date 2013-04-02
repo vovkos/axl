@@ -63,52 +63,10 @@ enum EFunctionKindFlag
 const tchar_t*
 GetFunctionKindString (EFunction FunctionKind);
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 int
 GetFunctionKindFlags (EFunction FunctionKind);
-
-//.............................................................................
-
-class CFunctionFormalArg: public CUserModuleItem
-{
-protected:
-	friend class CFunction;
-	friend class CParser;
-
-	CType* m_pType;
-	int m_PtrTypeFlags;
-	rtl::CBoxListT <CToken> m_Initializer;
-
-public:
-	CFunctionFormalArg ()
-	{
-		m_pType = NULL;
-		m_PtrTypeFlags = 0;
-	}
-
-	rtl::CString 
-	GetName ()
-	{
-		return m_Name;
-	}
-
-	CType* 
-	GetType ()
-	{
-		return m_pType;
-	}
-
-	int 
-	GetPtrTypeFlags ()
-	{
-		return m_PtrTypeFlags;
-	}
-
-	const rtl::CConstBoxListT <CToken>
-	GetInitializer ()
-	{
-		return m_Initializer;
-	}
-};
 
 //.............................................................................
 
@@ -163,7 +121,6 @@ protected:
 
 	CAutoEv* m_pAutoEv;
 
-	rtl::CStdListT <CFunctionFormalArg> m_ArgList;
 	rtl::CBoxListT <CToken> m_Body;
 
 	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > m_Ast;
@@ -296,17 +253,8 @@ public:
 		return m_pAutoEv;
 	}
 
-	rtl::CConstListT <CFunctionFormalArg> 
-	GetArgList ()
-	{
-		return m_ArgList;
-	}
-
 	void
 	ConvertToMemberMethod (CNamedType* pParentType);
-
-	rtl::CString
-	CreateArgString ();
 
 	bool
 	IsDefined ()
@@ -401,21 +349,12 @@ public:
 
 	CFunction*
 	ChooseOverload (
-		const rtl::CArrayT <CType*>& ArgTypeArray,
+		CFunctionArg* const* pArgArray,
+		size_t ArgCount,
 		ECast* pCastKind = NULL
 		)
 	{
-		return ChooseOverload (ArgTypeArray, ArgTypeArray.GetCount (), pCastKind);
-	}
-
-	CFunction*
-	ChooseOverload (
-		CType* const* ppArgTypeArray,
-		size_t Count,
-		ECast* pCastKind = NULL
-		)
-	{
-		size_t i = m_TypeOverload.ChooseOverload (ppArgTypeArray, Count, pCastKind);
+		size_t i = m_TypeOverload.ChooseOverload (pArgArray, ArgCount, pCastKind);
 		return i != -1 ? GetOverload (i) : NULL;
 	}
 

@@ -27,15 +27,12 @@ CAutoEv::CAutoEv ()
 }
 
 bool
-CAutoEv::Create (
-	CAutoEvType* pType,
-	rtl::CStdListT <CFunctionFormalArg>* pArgList
-	)
+CAutoEv::Create (CAutoEvType* pType)
 {
 	ASSERT (m_StorageKind);
 
 	m_pType = pType;
-	m_pStarter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_AutoEvStarter, pType->GetStarterType (), pArgList);
+	m_pStarter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_AutoEvStarter, pType->GetStarterType ());
 	m_pStarter->m_StorageKind = m_StorageKind;
 	m_pStarter->m_pParentNamespace = this;
 	m_pStarter->m_pAutoEv = this;
@@ -62,14 +59,16 @@ CAutoEv::Create (
 		m_pStarter->ConvertToMemberMethod (m_pParentClassType);
 		m_pStopper->ConvertToMemberMethod (m_pParentClassType);
 	}
-	
-	rtl::CIteratorT <CFunctionFormalArg> Arg = m_pStarter->GetArgList ().GetHead ();
-	if (!Arg)
-		return false;
 
-	for (; Arg; Arg++)
+	rtl::CArrayT <CFunctionArg*> ArgArray = m_pStarter->GetType ()->GetArgArray ();
+	if (ArgArray.IsEmpty ())
+		return true;
+
+	size_t ArgCount = ArgArray.GetCount ();
+	for (size_t i = 0; i < ArgCount; i++)
 	{
-		CStructField* pField = m_pDataStructType->CreateField (Arg->GetName (), Arg->GetType ());
+		CFunctionArg* pArg = ArgArray [i];
+		CStructField* pField = m_pDataStructType->CreateField (pArg->GetName (), pArg->GetType ());
 		if (!pField)
 			return false;
 

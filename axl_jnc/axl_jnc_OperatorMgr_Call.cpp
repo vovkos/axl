@@ -405,38 +405,63 @@ COperatorMgr::CastArgList (
 {
 	bool Result;
 
-	rtl::CArrayT <CType*> ArgTypeArray = pFunctionType->GetArgTypeArray ();
+	rtl::CArrayT <CFunctionArg*> ArgArray = pFunctionType->GetArgArray ();
 
-	size_t FormalArgCount = ArgTypeArray.GetCount ();
+	size_t FormalArgCount = ArgArray.GetCount ();
 	size_t ActualArgCount = pArgList->GetCount ();
 
 	bool IsVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg) != 0;
 	bool IsUnsafeVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_UnsafeVarArg) != 0;
 
-	if (IsVarArg && ActualArgCount < FormalArgCount ||
-		!IsVarArg && ActualArgCount != FormalArgCount)
+	size_t CommonArgCount;
+
+	if (ActualArgCount <= FormalArgCount)
 	{
-		err::SetFormatStringError (
-			_T("'%s' takes %d arguments; %d passed"), 
-			pFunctionType->GetTypeString (), 
-			FormalArgCount, 
-			ActualArgCount
-			);
+		CommonArgCount = ActualArgCount;
+	}
+	else if (IsVarArg)
+	{
+		CommonArgCount = FormalArgCount;
+	}
+	else
+	{
+		err::SetFormatStringError (_T("too many arguments in a call to '%s'"), pFunctionType->GetTypeString ());
 		return false;
 	}
 
 	pArgArray->Clear ();
 	pArgArray->Reserve (ActualArgCount);
 	
+	size_t i = 0;
 	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
-	for (size_t i = 0; i < FormalArgCount; Arg++, i++)
+
+	// common for both formal and actual
+
+	for (; i < CommonArgCount; Arg++, i++)
 	{
-		CType* pFormalArgType = ArgTypeArray [i];
+		CValue ArgValue = *Arg;
+
+		CFunctionArg* pArg = ArgArray [i];
+		if (ArgValue.IsEmpty ())
+		{
+			rtl::CConstBoxListT <CToken> Initializer = pArg->GetInitializer ();
+			if (Initializer.IsEmpty ())
+			{
+				err::SetFormatStringError (_T("argument (%d) of '%s' has no default value"), i + 1, pFunctionType->GetTypeString ());
+				return false;
+			}
+
+			Result = EvaluateAlias (Initializer, &ArgValue);
+			if (!Result)
+				return false;
+		}
+
+		CType* pFormalArgType = pArg->GetType ();
 	
 		CValue ArgCast;
 		Result = 
-			CheckCastKind (*Arg, pFormalArgType) &&
-			CastOperator (*Arg, pFormalArgType, &ArgCast);
+			CheckCastKind (ArgValue, pFormalArgType) &&
+			CastOperator (ArgValue, pFormalArgType, &ArgCast);
 
 		if (!Result)
 			return false;
@@ -444,7 +469,38 @@ COperatorMgr::CastArgList (
 		pArgArray->Append (ArgCast);
 	}
 
-	// vararg
+	// default formal arguments
+
+	for (; i < FormalArgCount; i++)
+	{
+		CValue ArgValue;
+
+		CFunctionArg* pArg = ArgArray [i];
+		rtl::CConstBoxListT <CToken> Initializer = pArg->GetInitializer ();
+		if (Initializer.IsEmpty ())
+		{
+			err::SetFormatStringError (_T("argument (%d) of '%s' has no default value"), i + 1, pFunctionType->GetTypeString ());
+			return false;
+		}
+
+		Result = EvaluateAlias (Initializer, &ArgValue);
+		if (!Result)
+			return false;
+
+		CType* pFormalArgType = pArg->GetType ();
+	
+		CValue ArgCast;
+		Result = 
+			CheckCastKind (ArgValue, pFormalArgType) &&
+			CastOperator (ArgValue, pFormalArgType, &ArgCast);
+
+		if (!Result)
+			return false;
+
+		pArgArray->Append (ArgCast);
+	}
+
+	// vararg arguments
 
 	for (; Arg; Arg++)
 	{

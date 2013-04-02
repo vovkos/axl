@@ -501,11 +501,12 @@ CParser::DeclareFunction (
 	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
 	int PostModifiers = pDeclarator->GetPostDeclaratorModifiers ();
 	EFunction FunctionKind = pDeclarator->GetFunctionKind ();
+	bool HasArgs = !pType->GetArgArray ().IsEmpty ();
 
 	if (DeclaratorKind == EDeclarator_UnaryBinaryOperator)
 	{
 		ASSERT (!FunctionKind);
-		FunctionKind = pType->HasArgs () ? 
+		FunctionKind = HasArgs ? 
 			EFunction_BinaryOperator : 
 			EFunction_UnaryOperator;
 	}
@@ -519,7 +520,7 @@ CParser::DeclareFunction (
 		return false;
 	}
 
-	if ((FunctionKindFlags & EFunctionKindFlag_NoArgs) && pType->HasArgs ())
+	if ((FunctionKindFlags & EFunctionKindFlag_NoArgs) && HasArgs)
 	{
 		err::SetFormatStringError (_T("'%s' cannot have arguments"), GetFunctionKindString (FunctionKind));
 		return false;
@@ -549,7 +550,7 @@ CParser::DeclareFunction (
 		return ((CPropertyTemplate*) pNamespace)->AddMethod (FunctionKind, pType);
 	}
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType, pDeclarator->GetArgList ());
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType);
 	pFunction->m_DeclaratorName = *pDeclarator->GetName ();
 	pFunction->m_Tag = pNamespace->CreateQualifiedName (pFunction->m_DeclaratorName);
 
@@ -793,8 +794,6 @@ CParser::DeclareAutoEv (
 	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
 	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
 
-	rtl::CStdListT <CFunctionFormalArg>* pList = pDeclarator->GetArgList ();
-
 	if (!pDeclarator->IsSimple ())
 	{
 		err::SetFormatStringError (_T("invalid autoev declarator (qualified autoev not supported yet)"));
@@ -879,7 +878,7 @@ CParser::DeclareAutoEv (
 			return false;
 	}
 
-	return pAutoEv->Create (pType, pDeclarator->GetArgList ());
+	return pAutoEv->Create (pType);
 }
 
 bool
@@ -1103,7 +1102,7 @@ CParser::DeclareOnChange (
 	return true;
 }
 
-CFunctionFormalArg*
+CFunctionArg*
 CParser::CreateFormalArg (
 	CDeclFunctionSuffix* pArgSuffix,
 	CDeclarator* pDeclarator,
@@ -1112,7 +1111,8 @@ CParser::CreateFormalArg (
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	CType* pType = pDeclarator->CalcType ();
+	int PtrTypeFlags = 0;
+	CType* pType = pDeclarator->CalcType (&PtrTypeFlags);
 	if (!pType)
 		return NULL;
 
@@ -1131,16 +1131,10 @@ CParser::CreateFormalArg (
 		return NULL;
 	}
 
-	CFunctionFormalArg* pArg = AXL_MEM_NEW (CFunctionFormalArg);
-	pArg->m_Name = Name;
-	pArg->m_pType = pType;
-
-	if (pInitializer)
-		pArg->m_Initializer.TakeOver (pInitializer);
-
-	pArgSuffix->m_ArgList.InsertTail (pArg);
-
+	CFunctionArg* pArg = m_pModule->m_TypeMgr.CreateFunctionArg (Name, pType, PtrTypeFlags, pInitializer);
 	AssignDeclarationAttributes (pArg, pNamespace, pDeclarator->GetPos ());
+
+	pArgSuffix->m_ArgArray.Append (pArg);
 
 	return pArg;
 }
@@ -1354,7 +1348,7 @@ CParser::CreateAutoEvClassType (
 
 	CFunctionType* pStarterType = pFunctionSuffix ? m_pModule->m_TypeMgr.GetFunctionType (
 		NULL, 
-		pFunctionSuffix->GetArgTypeArray (),
+		pFunctionSuffix->GetArgArray (),
 		pFunctionSuffix->GetFunctionTypeFlags ()
 		) : 
 		(CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
@@ -1365,7 +1359,7 @@ CParser::CreateAutoEvClassType (
 	
 	Result = 
 		pClassType->AddAutoEv (pAutoEv) &&
-		pAutoEv->Create (pAutoEvType, pFunctionSuffix ? pFunctionSuffix->GetArgList () : NULL);
+		pAutoEv->Create (pAutoEvType);
 
 	if (!Result)
 		return false;
@@ -1626,7 +1620,7 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_Alias:
-		return EvaluateAlias ((CAlias*) pItem, pValue);
+		return m_pModule->m_OperatorMgr.EvaluateAlias (((CAlias*) pItem)->GetInitializer (), pValue);
 
 	case EModuleItem_Variable:
 		pValue->SetVariable ((CVariable*) pItem);
@@ -1863,24 +1857,6 @@ CParser::GetAuPropertyFieldType (
 	}
 
 	pValue->SetType (pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
-	return true;
-}
-
-bool
-CParser::EvaluateAlias (
-	CAlias* pAlias,
-	CValue* pResultValue
-	)
-{
-	CParser Parser;
-	Parser.m_pModule = m_pModule;
-	Parser.m_Stage = EStage_Pass2;
-
-	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, pAlias->GetInitializer ());
-	if (!Result)
-		return false;
-
-	*pResultValue = Parser.m_ExpressionValue;
 	return true;
 }
 

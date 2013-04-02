@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_FunctionType.h"
+#include "axl_jnc_Value.h"
 
 namespace axl {
 namespace jnc {
@@ -85,29 +86,23 @@ public:
 
 	size_t
 	ChooseOverload (
-		const rtl::CArrayT <CType*>& ArgTypeArray,
+		CFunctionArg* const* pArgArray,
+		size_t ArgCount,
+		ECast* pCastKind = NULL
+		) const;
+
+	size_t
+	ChooseOverload (
+		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		ECast* pCastKind = NULL
 		) const
 	{
-		return ChooseOverload (ArgTypeArray, ArgTypeArray.GetCount (), pCastKind);
+		return ChooseOverload (ArgArray, ArgArray.GetCount (), pCastKind);
 	}
 
 	size_t
 	ChooseOverload (
-		CType* const* ppArgTypeArray,
-		size_t Count,
-		ECast* pCastKind = NULL
-		) const;
-
-	size_t
-	ChooseOverload (
 		const rtl::CConstBoxListT <CValue>& ArgList,
-		ECast* pCastKind = NULL
-		) const;
-
-	size_t
-	ChooseSetterOverload (
-		CType* pArgType,
 		ECast* pCastKind = NULL
 		) const;
 
@@ -123,7 +118,7 @@ public:
 		ECast* pCastKind = NULL
 		) const
 	{
-		return ChooseSetterOverload (pFunctionType->GetArgTypeArray ().GetBack (), pCastKind);
+		return ChooseSetterOverload (pFunctionType->GetArgArray ().GetBack ()->GetType (), pCastKind);
 	}
 
 	bool
