@@ -504,6 +504,12 @@ COperatorMgr::CastArgList (
 
 	for (; Arg; Arg++)
 	{
+		if (Arg->IsEmpty ())
+		{
+			err::SetFormatStringError (_T("vararg arguments cannot be skipped"));
+			return false;
+		}
+
 		CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
 
 		CValue ArgCast;

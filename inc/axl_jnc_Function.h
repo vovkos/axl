@@ -36,6 +36,8 @@ enum EFunction
 	EFunction_Destructor,
 	EFunction_StaticConstructor,
 	EFunction_StaticDestructor,
+	EFunction_ModuleConstructor,
+	EFunction_ModuleDestructor,
 	EFunction_CallOperator,
 	EFunction_CastOperator,
 	EFunction_UnaryOperator,
@@ -73,6 +75,7 @@ GetFunctionKindFlags (EFunction FunctionKind);
 class CFunction: public CUserModuleItem
 {
 protected:
+	friend class CModule;
 	friend class CFunctionMgr;
 	friend class CDerivableType;
 	friend class CClassType;

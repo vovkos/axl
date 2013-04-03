@@ -72,6 +72,8 @@ protected:
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
 
+	rtl::CArrayT <CClassType*> m_StaticDestructArray; // classes with static destructors 
+
 	size_t m_UnnamedEnumTypeCounter;
 	size_t m_UnnamedStructTypeCounter;
 	size_t m_UnnamedUnionTypeCounter;
@@ -94,6 +96,12 @@ public:
 
 	bool
 	CalcTypeLayouts ();
+
+	rtl::CArrayT <CClassType*> 
+	GetStaticDestructArray ()
+	{
+		return m_StaticDestructArray;
+	}
 
 	CType* 
 	GetPrimitiveType (EType TypeKind)

@@ -1,13 +1,28 @@
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-foo (
-	int a = 1,
-	int b = 2,
-	int c = 3,
-	int d = 4
-	)
+/*
+
+class C1
 {
-	printf ("foo (%d, %d, %d, %d)\n", a, b, c, d);
+	this ()
+	{
+		printf ("C1.this ()\n");
+	}
+
+	~this ()
+	{
+		printf ("C1.~this ()\n");
+	}
+
+	static this ()
+	{
+		printf ("C1.static this ()\n");
+	}
+
+	static ~this ()
+	{
+		printf ("C1.static ~this ()\n");
+	}
 }
 
 int 
@@ -15,18 +30,40 @@ main ()
 {
 	printf ("main ()\n");
 
-	foo (, 200,, 400);
+	C1 a = stack new C1;
+	C1 b = stack new C1;
+	C1 c = stack new C1;
 
-	thin function* pfn (
-		int x = 10,
-		int y = 20,
-		int z = 30,
-		int w = 40  
-		) = foo;
-
-	pfn (1000,, 3000);
-	
 	return 0;
+}
+
+*/
+
+int 
+foo ()
+{
+	printf ("foo ()\n");
+	return 200;
+}
+
+int g_Global = foo ();
+
+int 
+main ()
+{
+	printf ("main ()\n");
+	printf ("g_Global = %d\n", g_Global);
+	return 0;
+}
+
+this ()
+{
+	printf ("module.this ()\n");
+}
+
+~this ()
+{
+	printf ("module.~this ()\n");
 }
 
 //.............................................................................

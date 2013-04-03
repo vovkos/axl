@@ -839,7 +839,7 @@ CClassType::CreateDefaultDestructor ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Destructor, pType);
 	pFunction->m_Tag = m_Tag + _T(".~this");
 		
 	CValue ArgValue;

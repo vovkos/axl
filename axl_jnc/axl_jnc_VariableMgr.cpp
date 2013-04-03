@@ -21,11 +21,14 @@ CVariableMgr::Clear ()
 	m_VariableList.Clear ();
 	m_AliasList.Clear ();
 	m_GlobalVariableArray.Clear ();
+	m_InitalizedGlobalVariableArray.Clear ();
+	m_StaticDestructArray.Clear ();
 	m_pScopeLevelVariable = NULL;
 }
 
 CVariable*
 CVariableMgr::CreateVariable (
+	EStorage StorageKind,
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
 	CType* pType,
@@ -42,30 +45,22 @@ CVariableMgr::CreateVariable (
 	pVariable->m_QualifiedName = QualifiedName;
 	pVariable->m_Tag = QualifiedName;
 	pVariable->m_pType = pType;
+	pVariable->m_StorageKind = StorageKind;
 	pVariable->m_PtrTypeFlags = PtrTypeFlags;
 
 	if (pInitializer)
 		pVariable->m_Initializer.TakeOver (pInitializer);
 
 	m_VariableList.InsertTail (pVariable);
-	return pVariable;
-}
 
-CVariable*
-CVariableMgr::CreateVariable (
-	EStorage StorageKind,
-	const rtl::CString& Name,
-	const rtl::CString& QualifiedName,
-	CType* pType,
-	int PtrTypeFlags,
-	rtl::CBoxListT <CToken>* pInitializer
-	)
-{
-	CVariable* pVariable = CreateVariable (Name, QualifiedName, pType, PtrTypeFlags, pInitializer);
-	pVariable->m_StorageKind = StorageKind;
-
-	if (StorageKind == EStorage_Static)
+	if (StorageKind == EStorage_Static)	
+	{
+		pVariable->m_pLlvmValue = CreateLlvmGlobalVariable (pType, QualifiedName);
 		m_GlobalVariableArray.Append (pVariable);
+
+		if (pInitializer)
+			m_InitalizedGlobalVariableArray.Append (pVariable);
+	}
 
 	return pVariable;
 }
@@ -114,14 +109,23 @@ CVariableMgr::CreateAlias (
 }
 
 bool
-CVariableMgr::AllocateGlobalVariables ()
+CVariableMgr::InitializeGlobalVariables ()
 {
 	bool Result;
 
 	size_t Count = m_GlobalVariableArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		Result = AllocateVariable (m_GlobalVariableArray [i]);
+		CVariable* pVariable = m_GlobalVariableArray [i];
+		m_pModule->m_LlvmBuilder.CreateStore (pVariable->GetType ()->GetZeroValue (), pVariable);
+	}
+
+	Count = m_InitalizedGlobalVariableArray.GetCount ();	
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = m_InitalizedGlobalVariableArray [i];
+
+		Result = m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->GetInitializer ());
 		if (!Result)
 			return false;
 	}
@@ -132,7 +136,8 @@ CVariableMgr::AllocateGlobalVariables ()
 bool
 CVariableMgr::AllocateVariable (CVariable* pVariable)
 {
-	ASSERT (!pVariable->m_pLlvmValue);
+	if (pVariable->m_pLlvmValue)
+		return true;
 
 	CValue PtrValue;
 	bool Result = m_pModule->m_OperatorMgr.Allocate (
@@ -193,10 +198,7 @@ CVariableMgr::GetScopeLevelVariable ()
 		return m_pScopeLevelVariable;
 
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
 	m_pScopeLevelVariable = CreateVariable (EStorage_Static, _T("ScopeLevel"), _T("jnc.ScopeLevel"), pType);
-
-	AllocateVariable (m_pScopeLevelVariable);
 
 	return m_pScopeLevelVariable;
 }

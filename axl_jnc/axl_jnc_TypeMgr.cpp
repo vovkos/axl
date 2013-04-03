@@ -54,6 +54,8 @@ CTypeMgr::Clear ()
 
 	m_TypeMap.Clear ();
 
+	m_StaticDestructArray.Clear ();
+
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));

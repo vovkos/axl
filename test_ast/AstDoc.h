@@ -65,10 +65,10 @@ public:
 
 protected:
 	bool
-	CompileEnumConsts ();
-
-	bool
-	CompileInitializers ();
+	RunFunction (
+		jnc::CFunction* pFunction,
+		int* pReturnValue = NULL
+		);
 
 	bool
 	ExportStdLib ();

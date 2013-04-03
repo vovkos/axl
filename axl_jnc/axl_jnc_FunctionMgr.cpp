@@ -588,6 +588,10 @@ CFunctionMgr::Prologue (
 
 		break;
 
+	case EFunction_ModuleConstructor:
+		Result = m_pModule->m_VariableMgr.InitializeGlobalVariables ();
+		break;
+
 	case EFunction_AutoEvStarter:
 		Result = CreateAutoEvArgFields ();
 		break;
@@ -1614,7 +1618,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	{
 		CFunction* pFunction = *Function;
 
-		if (!pFunction->HasBody ())
+		if (!pFunction->GetBlock ())
 			continue;
 
 		try 

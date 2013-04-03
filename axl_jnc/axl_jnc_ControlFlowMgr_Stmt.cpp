@@ -333,10 +333,7 @@ CControlFlowMgr::OnceStmt_PreBody (
 
 	CValue Value;
 
-	Result = 
-		m_pModule->m_VariableMgr.AllocateVariable (pStmt->m_pFlagVariable) &&
-		m_pModule->m_OperatorMgr.LoadDataRef (pStmt->m_pFlagVariable, &Value);
-	
+	Result = m_pModule->m_OperatorMgr.LoadDataRef (pStmt->m_pFlagVariable, &Value);	
 	if (!Result)
 		return false;
 

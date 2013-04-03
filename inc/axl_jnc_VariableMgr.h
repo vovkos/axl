@@ -10,6 +10,8 @@
 namespace axl {
 namespace jnc {
 
+class CClassType;
+
 //.............................................................................
 
 class CVariableMgr
@@ -22,6 +24,8 @@ protected:
 	rtl::CStdListT <CAlias> m_AliasList;
 
 	rtl::CArrayT <CVariable*> m_GlobalVariableArray;
+	rtl::CArrayT <CVariable*> m_InitalizedGlobalVariableArray;
+	rtl::CArrayT <CVariable*> m_StaticDestructArray; // variables allocated for static new instances of classes with destructors
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
 
 	CVariable* m_pScopeLevelVariable;
@@ -38,14 +42,17 @@ public:
 	void
 	Clear ();
 
-	CVariable*
-	CreateVariable (
-		const rtl::CString& Name,
-		const rtl::CString& QualifiedName,
-		CType* pType,
-		int PtrTypeFlags = 0,
-		rtl::CBoxListT <CToken>* pInitializer = NULL
-		);
+	rtl::CArrayT <CVariable*> 
+	GetGlobalVariableArray ()
+	{
+		return m_GlobalVariableArray;
+	}
+
+	rtl::CArrayT <CVariable*>
+	GetStaticDestructArray ()
+	{
+		return m_StaticDestructArray;
+	}
 
 	CVariable*
 	CreateVariable (
@@ -79,7 +86,7 @@ public:
 	InitializeVariable (CVariable* pVariable);
 
 	bool
-	AllocateGlobalVariables ();
+	InitializeGlobalVariables ();
 
 	CVariable*
 	GetScopeLevelVariable ();
@@ -89,3 +96,4 @@ public:
 
 } // namespace jnc {
 } // namespace axl {
+

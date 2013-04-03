@@ -92,6 +92,9 @@ class CModule: public CPreModule
 protected:
 	rtl::CString m_FilePath;
 
+	CFunction* m_pConstructor;
+	CFunction* m_pDestructor;
+
 public:
 	llvm::Module* m_pLlvmModule;
 
@@ -122,11 +125,42 @@ public:
 		return m_FilePath;
 	}
 
+	CFunction* 
+	GetConstructor ()
+	{
+		return m_pConstructor;
+	}
+
+	bool
+	SetConstructor (CFunction* pFunction);
+
+	CFunction* 
+	GetDestructor ()
+	{
+		return m_pDestructor;
+	}
+
+	bool
+	SetDestructor (CFunction* pFunction);
+
 	void
 	Clear ();
 
 	bool
 	Create (const rtl::CString& FilePath);
+
+	bool
+	Link (CModule* pModule);
+
+	bool
+	Compile ();
+
+protected:
+	bool
+	CreateDefaultConstructor ();
+
+	bool
+	CreateDefaultDestructor ();
 };
 
 //.............................................................................

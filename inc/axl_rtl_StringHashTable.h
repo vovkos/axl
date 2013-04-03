@@ -28,6 +28,10 @@ typedef CStringHashTableT <char>    CStringHashTableA;
 typedef CStringHashTableT <wchar_t> CStringHashTableW;
 typedef CStringHashTableT <tchar_t> CStringHashTable;
 
+typedef CStringHashTableA::CIterator CStringHashTableIteratorA;
+typedef CStringHashTableW::CIterator CStringHashTableIteratorW;
+typedef CStringHashTable::CIterator CStringHashTableIterator;
+
 //.............................................................................
 
 template <

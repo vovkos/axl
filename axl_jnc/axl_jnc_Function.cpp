@@ -22,6 +22,8 @@ GetFunctionKindString (EFunction FunctionKind)
 		_T("~this"),                    // EFunction_Destructor,
 		_T("static this"),              // EFunction_StaticConstructor,
 		_T("static ~this"),             // EFunction_StaticDestructor,
+		_T("module this"),              // EFunction_ModuleConstructor,
+		_T("module ~this"),             // EFunction_ModuleDestructor,
 		_T("call-operator"),            // EFunction_CallOperator,
 		_T("cast-operator"),            // EFunction_CastOperator,
 		_T("unary-operator"),           // EFunction_UnaryOperator,

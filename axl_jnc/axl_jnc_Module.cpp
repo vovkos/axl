@@ -17,6 +17,8 @@ CModule::Clear ()
 	m_ConstMgr.Clear ();
 	m_ControlFlowMgr.Clear ();
 
+	m_pConstructor = NULL;
+	m_pDestructor = NULL;
 	m_pLlvmModule = NULL;
 }
 
@@ -27,6 +29,159 @@ CModule::Create (const rtl::CString& FilePath)
 	m_FilePath = FilePath;
 	m_pLlvmModule = (llvm::Module*) AXL_MEM_ALLOC (sizeof (llvm::Module));
 	new (m_pLlvmModule) llvm::Module ((const tchar_t*) m_FilePath, llvm::getGlobalContext());
+	return true;
+}
+
+bool
+CModule::SetConstructor (CFunction* pFunction)
+{
+	if (!pFunction->GetType ()->GetArgArray ().IsEmpty ())
+	{
+		err::SetFormatStringError (_T("module 'this' cannot have arguments"));
+		return false;
+	}
+
+	if (m_pConstructor)
+	{
+		err::SetFormatStringError (_T("module already has 'this' method"));
+		return false;
+	}
+
+	pFunction->m_FunctionKind = EFunction_ModuleConstructor;
+	pFunction->m_StorageKind = EStorage_Static;
+	pFunction->m_Tag = _T("module.this");
+	m_pConstructor = pFunction;
+	return true;
+}
+
+bool
+CModule::SetDestructor (CFunction* pFunction)
+{
+	if (m_pDestructor)
+	{
+		err::SetFormatStringError (_T("module already has '~this' method"));
+		return false;
+	}
+
+	pFunction->m_FunctionKind = EFunction_ModuleDestructor;
+	pFunction->m_StorageKind = EStorage_Static;
+	pFunction->m_Tag = _T("module.~this");
+	m_pDestructor = pFunction;
+	return true;
+}
+
+bool
+CModule::Link (CModule* pModule)
+{
+	err::SetFormatStringError (_T("module link is not yet implemented"));
+	return false;
+}
+
+bool
+CModule::Compile ()
+{
+	bool Result = 
+		m_TypeMgr.ResolveImportTypes () &&
+		m_FunctionMgr.ResolveOrphanFunctions () &&
+		m_FunctionMgr.ScanAutoEvs () &&
+		m_FunctionMgr.CalcPropertyLayouts () &&
+		m_FunctionMgr.CalcAutoEvLayouts () &&
+		m_TypeMgr.CalcTypeLayouts () &&
+		m_FunctionMgr.CompileFunctions ();
+
+	if (!Result)
+		return false;
+
+	if (!m_pConstructor && !m_VariableMgr.GetGlobalVariableArray ().IsEmpty ())
+	{
+		Result = CreateDefaultConstructor ();
+		if (!Result)
+			return false;
+	}
+
+	if (!m_pDestructor && 
+		(!m_TypeMgr.GetStaticDestructArray ().IsEmpty () || 
+		 m_VariableMgr.GetStaticDestructArray ().IsEmpty ()))
+	{
+		Result = CreateDefaultDestructor ();
+		if (!Result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
+CModule::CreateDefaultConstructor ()
+{
+	bool Result;
+
+	ASSERT (!m_pConstructor);
+
+	CFunctionType* pType = (CFunctionType*) (CType*) CGetType (this, EStdType_SimpleFunction);
+	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleConstructor, pType);
+	pFunction->m_StorageKind = EStorage_Static;
+	pFunction->m_Tag = _T("module.this");
+
+	m_FunctionMgr.InternalPrologue (pFunction);
+
+	Result = m_VariableMgr.InitializeGlobalVariables ();
+	if (!Result)
+		return false;
+
+	m_FunctionMgr.InternalEpilogue ();
+
+	m_pConstructor = pFunction;
+	return true;
+}
+
+bool
+CModule::CreateDefaultDestructor ()
+{
+	bool Result;
+
+	ASSERT (!m_pDestructor);
+
+	CFunctionType* pType = (CFunctionType*) (CType*) CGetType (this, EStdType_SimpleFunction);
+	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleDestructor, pType);
+	pFunction->m_StorageKind = EStorage_Static;
+	pFunction->m_Tag = _T("module.~this");
+		
+	m_FunctionMgr.InternalPrologue (pFunction);
+
+	rtl::CArrayT <CVariable*> StaticVariableDestructArray = m_VariableMgr.GetStaticDestructArray ();
+	size_t Count = StaticVariableDestructArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = StaticVariableDestructArray [i];
+		ASSERT (pVariable->GetType ()->GetTypeKind () == EType_Class);
+
+		CClassType* pClassType = (CClassType*) pVariable->GetType ();
+		CFunction* pDestructor = pClassType->GetDestructor ();
+		ASSERT (pDestructor);
+
+		CValue ThisValue (pVariable->GetLlvmValue (), pClassType->GetClassPtrType ());
+		Result = m_OperatorMgr.CallOperator (pDestructor, ThisValue);
+		if (!Result)
+			return false;
+	}
+
+	rtl::CArrayT <CClassType*> StaticTypeDestructArray = m_TypeMgr.GetStaticDestructArray ();
+	Count = StaticTypeDestructArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CClassType* pClassType = StaticTypeDestructArray [i];
+		CFunction* pDestructor = pClassType->GetStaticDestructor ();
+		ASSERT (pDestructor);
+
+		Result = m_OperatorMgr.CallOperator (pDestructor);
+		if (!Result)
+			return false;
+	}
+
+	m_FunctionMgr.InternalEpilogue ();
+
+	m_pDestructor = pFunction;
 	return true;
 }
 

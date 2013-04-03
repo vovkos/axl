@@ -94,7 +94,7 @@ CDerivableType::AddMethod (CFunction* pFunction)
 	case EFunction_Constructor:
 		if (pFunction->GetType ()->GetArgArray ().GetCount () > 1)
 		{
-			err::SetFormatStringError (_T("constructor of '%s' cannot have arguments"), GetTypeString ());
+			err::SetFormatStringError (_T("'%s.this' cannot have arguments"), GetTypeString ());
 			return false;
 		}
 

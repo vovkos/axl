@@ -133,66 +133,22 @@ CAstDoc::Compile ()
 		Lexer.NextToken ();
 	}
 
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Resolving import types...\n"));
-	Result = m_Module.m_TypeMgr.ResolveImportTypes ();
-	if (!Result)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
-		return false;
-	}
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling...\n"));
+	Result = m_Module.Compile ();
 
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Resolving orphan functions...\n"));
-	Result = m_Module.m_FunctionMgr.ResolveOrphanFunctions ();
-	if (!Result)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
-		return false;
-	}
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Scanning autoevs...\n"));
-	Result = m_Module.m_FunctionMgr.ScanAutoEvs ();
-	if (!Result)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
-		return false;
-	}
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Calculating type layouts...\n"));
-	Result = 
-		m_Module.m_FunctionMgr.CalcPropertyLayouts () &&
-		m_Module.m_FunctionMgr.CalcAutoEvLayouts () &&
-		m_Module.m_TypeMgr.CalcTypeLayouts ();
-
-	if (!Result)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
-		return false;
-	}
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Allocating globals...\n"));
-	Result = m_Module.m_VariableMgr.AllocateGlobalVariables ();
-	if (!Result)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
-		return false;
-	}
+	// show module contents nevetheless
 
 	pMainFrame->m_GlobalAstPane.Build (Parser.GetAst ());
 	pMainFrame->m_ModulePane.Build (&m_Module);
-
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Compiling functions...\n"));
-	Result = m_Module.m_FunctionMgr.CompileFunctions ();
-	if (!Result)
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
-
-	// show compiled IM nevetheless
-
 	pMainFrame->m_LlvmIrPane.Build (&m_Module);
 
 	if (!Result)
+	{
+		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("%s\n"), err::GetError ()->GetDescription ());
 		return false;
+	}
 
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting functions...\n"));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("JITting...\n"));
 
 	ExportStdLib ();
 
@@ -209,6 +165,38 @@ CAstDoc::Compile ()
 }
 
 bool
+CAstDoc::RunFunction (
+	jnc::CFunction* pFunction,
+	int* pReturnValue
+	)
+{
+	typedef int (*FFunction) ();
+	FFunction pfn = (FFunction) pFunction->GetFunctionPointer ();
+	ASSERT (pfn);
+
+	bool Result = true;
+
+	try
+	{
+		int ReturnValue = pfn ();
+		if (pReturnValue)
+			*pReturnValue = ReturnValue;
+	}
+	catch (err::CError Error)
+	{
+		GetMainFrame ()->m_OutputPane.m_LogCtrl.Trace (_T("ERROR: %s\n"), Error.GetDescription ());
+		Result = false;
+	}
+	catch (...)
+	{
+		GetMainFrame ()->m_OutputPane.m_LogCtrl.Trace (_T("UNKNOWN EXCEPTION\n"));
+		Result = false;
+	}
+
+	return Result;
+}	
+
+bool
 CAstDoc::Run ()
 {
 	bool Result;
@@ -222,35 +210,36 @@ CAstDoc::Run ()
 			return false;
 	}
 
-	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Finding 'main'...\n"));
-
-	jnc::CFunction* pFunction = FindGlobalFunction (_T("main"));
-	if (!pFunction)
+	jnc::CFunction* pMainFunction = FindGlobalFunction (_T("main"));
+	if (!pMainFunction)
 	{
 		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("'main' is not found or not a function\n"));
 		return false;
 	}
-		
+
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Running...\n"));
 
-	typedef int (*FMain) ();
-	FMain pfnMain = (FMain) pFunction->GetFunctionPointer ();
-	ASSERT (pfnMain);
-
-	try
+	jnc::CFunction* pConstructor = m_Module.GetConstructor ();
+	if (pConstructor)
 	{
-		int Result = pfnMain ();
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done (retval = %d).\n"), Result);
-	}
-	catch (err::CError Error)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("ERROR: %s\n"), Error.GetDescription ());
-	}
-	catch (...)
-	{
-		pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("UNKNOWN EXCEPTION\n"));
+		Result = RunFunction (pConstructor);
+		if (!Result)
+			return false;
 	}
 
+	Result = RunFunction (pMainFunction);
+	if (!Result)
+		return false;
+
+	jnc::CFunction* pDestructor = m_Module.GetDestructor ();
+	if (pDestructor)
+	{
+		Result = RunFunction (pDestructor);
+		if (!Result)
+			return false;
+	}
+		
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace (_T("Done (retval = %d).\n"), Result);
 	return true;
 }
 

@@ -637,7 +637,7 @@ CParser::DeclareFunction (
 		}
 
 		return ((CProperty*) pNamespace)->AddMethod (pFunction);
-	
+
 	default:
 		if (PostModifiers)
 		{
@@ -660,6 +660,16 @@ CParser::DeclareFunction (
 
 		pFunction->m_StorageKind = EStorage_Static;
 	}
+
+	if (!pNamespace->GetParentNamespace ()) // module constructor / destructor
+		switch (FunctionKind)
+		{
+		case EFunction_Constructor:
+			return pFunction->GetModule ()->SetConstructor (pFunction);
+
+		case EFunction_Destructor:
+			return pFunction->GetModule ()->SetDestructor (pFunction);
+		}
 
 	if (FunctionKind != EFunction_Named)
 	{
@@ -948,6 +958,7 @@ CParser::DeclareData (
 		}
 
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
+			m_StorageKind,
 			Name, 
 			pNamespace->CreateQualifiedName (Name),
 			pType, 
