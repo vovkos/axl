@@ -1,28 +1,9 @@
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-/*
-
-class C1
+foo (object o)
 {
-	this ()
-	{
-		printf ("C1.this ()\n");
-	}
-
-	~this ()
-	{
-		printf ("C1.~this ()\n");
-	}
-
-	static this ()
-	{
-		printf ("C1.static this ()\n");
-	}
-
-	static ~this ()
-	{
-		printf ("C1.static ~this ()\n");
-	}
+	object <int> a = o;
+	printf ("foo (%d)\n", a.value);
 }
 
 int 
@@ -30,40 +11,12 @@ main ()
 {
 	printf ("main ()\n");
 
-	C1 a = stack new C1;
-	C1 b = stack new C1;
-	C1 c = stack new C1;
+	object <int> a = new object <int>;
+	a.value = 100;
+
+	foo (a);
 
 	return 0;
-}
-
-*/
-
-int 
-foo ()
-{
-	printf ("foo ()\n");
-	return 200;
-}
-
-int g_Global = foo ();
-
-int 
-main ()
-{
-	printf ("main ()\n");
-	printf ("g_Global = %d\n", g_Global);
-	return 0;
-}
-
-this ()
-{
-	printf ("module.this ()\n");
-}
-
-~this ()
-{
-	printf ("module.~this ()\n");
 }
 
 //.............................................................................

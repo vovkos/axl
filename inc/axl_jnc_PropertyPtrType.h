@@ -79,9 +79,6 @@ public:
 	CStructType* 
 	GetAuPropertyPtrStructType_u ();
 
-	CDataPtrType*
-	GetAuDataPtrType (EType TypeKind);
-
 	static
 	rtl::CStringA
 	CreateSignature (

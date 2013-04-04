@@ -34,6 +34,7 @@ CDerivableType::CDerivableType ()
 	m_pConstructor = NULL;
 	m_pStaticConstructor = NULL;
 	m_pStaticDestructor = NULL;
+	m_pStaticConstructorFlag = NULL;
 }
 
 CBaseType*

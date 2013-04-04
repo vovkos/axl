@@ -27,6 +27,7 @@ enum EClassTypeFlag
 	EClassTypeFlag_StdObject = 0x010000, // EStdType_Object 
 	EClassTypeFlag_Abstract  = 0x020000,
 	EClassTypeFlag_AutoEv    = 0x040000,
+	EClassTypeFlag_Box       = 0x080000,
 };
 
 //............................................................................
@@ -47,7 +48,7 @@ protected:
 	CFunction* m_pInitializer;
 
 	// fields
-
+	
 	rtl::CIteratorT <CStructField> m_FirstMemberNewField;
 	rtl::CArrayT <CStructField*> m_MemberDestructArray;
 
@@ -113,6 +114,9 @@ public:
 	{
 		return m_FirstMemberNewField;
 	}
+
+	CStructField*
+	GetStdField (EStdField Field);
 
 	CStructField*
 	CreateField (

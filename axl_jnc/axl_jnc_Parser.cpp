@@ -1410,7 +1410,7 @@ CParser::FinalizeAutoEv ()
 		for (; Value; Value++, i++)
 		{
 			CValue OnChangeValue;
-			Result = m_pModule->m_OperatorMgr.GetAuPropertyField (*Value, EAuPropertyField_OnChange, &OnChangeValue);
+			Result = m_pModule->m_OperatorMgr.GetStdField (*Value, EStdField_OnChange, &OnChangeValue);
 			if (!Result)
 				return false;
 	
@@ -1831,41 +1831,38 @@ CParser::GetThisValueType (CValue* pValue)
 }
 
 bool
-CParser::GetAuPropertyField (
+CParser::GetStdField (
 	CValue* pValue,
-	EAuPropertyField Field
+	EStdField Field
 	)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	if (!pFunction->m_pProperty)
 	{
-		err::SetFormatStringError (_T("function '%s' has no '%s' field"), pFunction->m_Tag, GetAuPropertyFieldString (Field));
+		err::SetFormatStringError (_T("function '%s' has no '%s' field"), pFunction->m_Tag, GetStdFieldString (Field));
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetAuPropertyField (pFunction->m_pProperty, Field, pValue);
+	return m_pModule->m_OperatorMgr.GetStdField (pFunction->m_pProperty, Field, pValue);
 }
 
 bool
-CParser::GetAuPropertyFieldType (
+CParser::GetStdFieldType (
 	CValue* pValue,
-	EAuPropertyField Field
+	EStdField Field
 	)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	if (!pFunction->m_pProperty)
 	{
-		err::SetFormatStringError (_T("function '%s' has no '%s' field"), pFunction->m_Tag, GetAuPropertyFieldString (Field));
+		err::SetFormatStringError (_T("function '%s' has no '%s' field"), pFunction->m_Tag, GetStdFieldString (Field));
 		return false;
 	}
 
 	CPropertyType* pPropertyType = pFunction->m_pProperty->GetType ();
-	CStructField* pMember = pPropertyType->GetAuField (Field);
+	CStructField* pMember = pPropertyType->GetStdField (Field);
 	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' has no '%s' field"), pPropertyType->GetTypeString (), GetAuPropertyFieldString (Field));
 		return false;
-	}
 
 	pValue->SetType (pMember->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
 	return true;

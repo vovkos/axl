@@ -867,45 +867,59 @@ public:
 		return GetPropertySetter (*pValue, CValue (), pValue);
 	}
 
-	// augmented property fields
+	// std fields
 
 	CType*
-	GetAuPropertyFieldType (
+	GetStdFieldType (
 		const CValue& OpValue,
-		EAuPropertyField Field
+		EStdField Field
 		);
 
 	bool
-	GetAuPropertyFieldType (
+	GetStdFieldType (
 		const CValue& OpValue,
-		EAuPropertyField Field,
+		EStdField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetAuPropertyFieldType (
+	GetStdFieldType (
 		CValue* pValue,	
-		EAuPropertyField Field
+		EStdField Field
 		)
 	{
-		return GetAuPropertyFieldType (*pValue, Field, pValue);
+		return GetStdFieldType (*pValue, Field, pValue);
 	}
 
 	bool
-	GetAuPropertyField (
+	GetStdField (
 		const CValue& OpValue,
-		EAuPropertyField Field,
+		EStdField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetAuPropertyField (
+	GetStdField (
 		CValue* pValue,	
-		EAuPropertyField Field
+		EStdField Field
 		)
 	{
-		return GetAuPropertyField (*pValue, Field, pValue);
+		return GetStdField (*pValue, Field, pValue);
 	}
+
+	bool
+	GetClassStdField (
+		const CValue& OpValue,
+		EStdField Field, 
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyStdField (
+		const CValue& OpValue,
+		EStdField Field, 
+		CValue* pResultValue
+		);
 
 	// misc property functions
 
@@ -979,17 +993,17 @@ public:
 
 	// misc
 
-	CType*
-	GetFieldType (
-		const CValue& OpValue,
-		CStructField* pMember
-		);
-
 	bool
 	GetField (
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
+		);
+
+	CType*
+	GetFieldType (
+		const CValue& OpValue,
+		CStructField* pField
 		);
 
 	bool

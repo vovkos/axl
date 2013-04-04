@@ -4,6 +4,22 @@
 
 namespace axl {
 namespace jnc {
+	
+//.............................................................................
+
+const tchar_t* 
+GetStdFieldString (EStdField Field)
+{
+	static const tchar_t* StringTable [] = 
+	{
+		_T("onchange"),   // EStdField_OnChange,
+		_T("value"),      // EStdField_Value,
+	};
+
+	return (size_t) Field < countof (StringTable) ? 
+		StringTable [Field] : 
+		_T("undefined-std-field");
+}
 
 //.............................................................................
 	

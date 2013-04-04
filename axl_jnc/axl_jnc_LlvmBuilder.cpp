@@ -242,34 +242,6 @@ CLlvmBuilder::CreateCall (
 }
 
 bool
-CLlvmBuilder::DynamicCastClassPtr (
-	const CValue& Value,
-	CClassType* pResultType,
-	CValue* pResultValue
-	)
-{
-	CreateComment ("dynamic cast interface");
-
-	CValue PtrValue;
-	CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
-
-	CValue TypeValue (&pResultType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
-
-	CFunction* pDynamicCastClassPtr = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastClassPtr);
-	
-	CreateCall2 (
-		pDynamicCastClassPtr,
-		pDynamicCastClassPtr->GetType (),
-		PtrValue,
-		TypeValue,
-		&PtrValue
-		);
-
-	CreateBitCast (PtrValue, pResultType, &PtrValue);
-	return true;
-}
-
-bool
 CLlvmBuilder::CreateClosureFunctionPtr (
 	const CValue& RawPfnValue,
 	const CValue& RawIfaceValue,

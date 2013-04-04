@@ -82,7 +82,7 @@ GetAccessKindString (EAccess AccessKind)
 CModuleItemDecl::CModuleItemDecl ()
 {
 	m_StorageKind = EStorage_Undefined;
-	m_AccessKind = EAccess_Undefined;
+	m_AccessKind = EAccess_Public; // public by default
 	m_pParentNamespace = NULL;
 	m_pAttributeBlock = NULL;
 }

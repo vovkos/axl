@@ -471,9 +471,9 @@ CProperty::CompileAutoGetter ()
 	
 	CValue PropValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetAuPropertyField (
+		m_pModule->m_OperatorMgr.GetStdField (
 			GetAutoAccessorPropertyValue (),
-			EAuPropertyField_PropValue,
+			EStdField_Value,
 			&PropValue
 			) &&
 		m_pModule->m_ControlFlowMgr.Return (PropValue);
@@ -507,9 +507,9 @@ CProperty::CompileAutoSetter ()
 
 	CValue PropValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetAuPropertyField (
+		m_pModule->m_OperatorMgr.GetStdField (
 			GetAutoAccessorPropertyValue (),
-			EAuPropertyField_PropValue,
+			EStdField_Value,
 			&PropValue
 			) &&
 		m_pModule->m_OperatorMgr.StoreDataRef (PropValue, SrcValue);

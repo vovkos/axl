@@ -309,15 +309,15 @@ Members2
 	GetThisValueType (CValue* pValue);
 
 	bool
-	GetAuPropertyField (
+	GetStdField (
 		CValue* pValue,
-		EAuPropertyField Field
+		EStdField Field
 		);
 
 	bool
-	GetAuPropertyFieldType (
+	GetStdFieldType (
 		CValue* pValue,
-		EAuPropertyField Field
+		EStdField Field
 		);
 
 	void

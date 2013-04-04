@@ -122,6 +122,8 @@ protected:
 	CFunction* m_pStaticConstructor;
 	CFunction* m_pStaticDestructor;
 
+	CVariable* m_pStaticConstructorFlag; // 'once' semantics
+
 	// overloaded operators
 
 	rtl::CArrayT <CFunction*> m_UnaryOperatorTable;

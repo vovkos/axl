@@ -106,7 +106,7 @@ enum EToken
 	EToken_PreConstruct,
 	EToken_Operator,
 	EToken_Postfix,
-	EToken_PropValue,
+	EToken_Value,
 	EToken_OnChange,
 
 	// statements
@@ -265,7 +265,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
 	AXL_PRS_TOKEN_NAME (EToken_Operator,     "operator")
 	AXL_PRS_TOKEN_NAME (EToken_Postfix,      "postfix")
-	AXL_PRS_TOKEN_NAME (EToken_PropValue,    "propvalue")
+	AXL_PRS_TOKEN_NAME (EToken_Value,        "value")
 	AXL_PRS_TOKEN_NAME (EToken_OnChange,     "onchange")
 
 	// statements

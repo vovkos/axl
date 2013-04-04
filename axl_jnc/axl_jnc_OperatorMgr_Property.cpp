@@ -306,7 +306,7 @@ COperatorMgr::GetProperty (
 	
 	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_AutoGet)
 	{
-		return GetAuPropertyField (OpValue, EAuPropertyField_PropValue, pResultValue);
+		return GetStdField (OpValue, EStdField_Value, pResultValue);
 	}
 	else
 	{
@@ -334,8 +334,8 @@ COperatorMgr::SetProperty (
 		CValue OnChangeValue;
 		
 		return
-			GetAuPropertyField (OpValue, EAuPropertyField_PropValue, &PropValue) &&
-			GetAuPropertyField (OpValue, EAuPropertyField_OnChange, &OnChangeValue) &&
+			GetStdField (OpValue, EStdField_Value, &PropValue) &&
+			GetStdField (OpValue, EStdField_OnChange, &OnChangeValue) &&
 			StoreDataRef (PropValue, SrcValue) &&
 			CallOperator (OnChangeValue);
 	}

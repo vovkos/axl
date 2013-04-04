@@ -71,6 +71,7 @@ protected:
 	rtl::CStdListT <CTypedef> m_TypedefList;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
+	rtl::CStringHashTableMapAT <CClassType*> m_BoxClassTypeMap;
 
 	rtl::CArrayT <CClassType*> m_StaticDestructArray; // classes with static destructors 
 
@@ -252,6 +253,9 @@ public:
 	{
 		return CreateClassType (rtl::CString (), rtl::CString (), PackFactor);
 	}
+
+	CClassType* 
+	GetBoxClassType (CType* pBaseType);
 
 	CFunctionArg*
 	CreateFunctionArg (
@@ -496,7 +500,7 @@ public:
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		int Flags = 0
 		);
-
+	
 	CFunctionPtrType* 
 	GetFunctionPtrType (
 		CFunctionType* pFunctionType,

@@ -62,6 +62,19 @@ CClassType::GetDefaultConstructor ()
 }
 
 CStructField*
+CClassType::GetStdField (EStdField Field)
+{
+	if (Field != EStdField_Value || !(m_Flags & EClassTypeFlag_Box))
+	{
+		err::SetFormatStringError (_T("'%s' has no field '%s'"), GetTypeString (), GetStdFieldString (Field));
+		return NULL;
+	}
+
+	ASSERT (m_pIfaceStructType->GetFieldList ().GetCount () == 1);
+	return *m_pIfaceStructType->GetFieldList ().GetHead ();	
+}
+
+CStructField*
 CClassType::CreateField (
 	const rtl::CString& Name,
 	CType* pType,

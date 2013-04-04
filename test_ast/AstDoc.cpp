@@ -456,14 +456,19 @@ StdLib_UHeapFreeClassPtr (jnc::TInterface* p)
 	free (p->m_pObject);
 }
 
-void
+int
 StdLib_printf (
 	const char* pFormat,
 	...
 	)
 {
+	rtl::CString Text;
+	Text.FormatV (pFormat, va_start_e (pFormat));
+
 	CMainFrame* pMainFrame = GetMainFrame ();
-	pMainFrame->m_OutputPane.m_LogCtrl.TraceV (pFormat, va_start_e (pFormat));
+	pMainFrame->m_OutputPane.m_LogCtrl.Trace0 (Text);
+
+	return Text.GetLength ();
 }
 
 ulong_t

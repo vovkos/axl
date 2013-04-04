@@ -153,7 +153,7 @@ main := |*
 'preconstruct' { CreateToken (EToken_PreConstruct); };
 'operator'     { CreateToken (EToken_Operator); };
 'postfix'      { CreateToken (EToken_Postfix); };
-'propvalue'    { CreateToken (EToken_PropValue); };
+'value'        { CreateToken (EToken_Value); };
 'onchange'     { CreateToken (EToken_OnChange); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

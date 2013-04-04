@@ -30,7 +30,11 @@ CCast_ClassPtr::GetCastKind (
 	CClassType* pSrcClassType = pSrcType->GetTargetType ();
 	CClassType* pDstClassType = pDstType->GetTargetType ();
 
-	return pSrcClassType->Cmp (pDstClassType) == 0 || pSrcClassType->FindBaseType (pDstClassType) ? 
+	return 
+		(pSrcClassType->GetFlags () & EClassTypeFlag_StdObject) ||
+		(pDstClassType->GetFlags () & EClassTypeFlag_StdObject) ||
+		pSrcClassType->Cmp (pDstClassType) == 0 || 
+		pSrcClassType->FindBaseType (pDstClassType) ? 
 		ECast_Implicit : 
 		ECast_Explicit;
 }
@@ -51,6 +55,12 @@ CCast_ClassPtr::LlvmCast (
 	CClassType* pSrcClassType = pSrcType->GetTargetType ();
 	CClassType* pDstClassType = pDstType->GetTargetType ();
 
+	if (pDstClassType->GetFlags () & EClassTypeFlag_StdObject)
+	{
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pDstType, pResultValue);
+		return true;
+	}
+
 	if (pSrcClassType->Cmp (pDstClassType) == 0)
 	{
 		pResultValue->OverrideType (OpValue, pType);
@@ -60,7 +70,24 @@ CCast_ClassPtr::LlvmCast (
 	CBaseTypeCoord Coord;
 	bool Result = pSrcClassType->FindBaseTypeTraverse (pDstClassType, &Coord);
 	if (!Result)
-		return m_pModule->m_LlvmBuilder.DynamicCastClassPtr (OpValue, pDstClassType, pResultValue);
+	{
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
+
+		CValue TypeValue (&pDstClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+
+		CFunction* pDynamicCastClassPtr = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastClassPtr);
+		m_pModule->m_LlvmBuilder.CreateCall2 (
+			pDynamicCastClassPtr,
+			pDynamicCastClassPtr->GetType (),
+			PtrValue,
+			TypeValue,
+			&PtrValue
+			);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pDstType, pResultValue);
+		return true;
+	}
 
 	CValue SrcNullValue = pSrcType->GetZeroValue ();
 	CValue DstNullValue = pDstType->GetZeroValue ();

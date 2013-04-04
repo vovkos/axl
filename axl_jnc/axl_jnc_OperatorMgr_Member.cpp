@@ -266,6 +266,44 @@ COperatorMgr::GetNamedTypeMember (
 	return true;
 }
 
+CType*
+COperatorMgr::GetFieldType (
+	const CValue& OpValue,
+	CStructField* pField
+	)	
+{
+	CType* pOpType = OpValue.GetType ();
+	EType OpTypeKind = pOpType->GetTypeKind ();
+
+	bool IsUnsafe;
+
+	switch (OpTypeKind)
+	{
+	case EType_DataPtr:
+	case EType_DataRef:
+		IsUnsafe = ((CDataPtrType*) pOpType)->GetPtrTypeKind () == EDataPtrType_Unsafe;
+		break;
+
+	case EType_ClassPtr:
+		IsUnsafe = ((CClassPtrType*) pOpType)->GetPtrTypeKind () == EClassPtrType_Unsafe;
+		break;
+
+	case EType_PropertyPtr:
+	case EType_PropertyRef:
+		IsUnsafe = ((CPropertyPtrType*) pOpType)->GetPtrTypeKind () == EPropertyPtrType_Unsafe;
+		break;
+
+	default:
+		return pField->GetType ();
+	}
+
+	return pField->GetType ()->GetDataPtrType (
+		EType_DataRef,
+		IsUnsafe ? EDataPtrType_Unsafe : EDataPtrType_Thin,
+		pOpType->GetFlags ()
+		);
+}
+
 bool
 COperatorMgr::GetNamedTypeField (
 	const CValue& OpValue,
@@ -650,23 +688,6 @@ COperatorMgr::MemberOperator (
 }
 
 CType*
-COperatorMgr::GetFieldType (
-	const CValue& OpValue,
-	CStructField* pMember
-	)	
-{
-	if (OpValue.GetType ()->GetTypeKind () != EType_DataRef)
-		return pMember->GetType ();
-
-	CDataPtrType* pPtrType = (CDataPtrType*) OpValue.GetType ();
-	return ((CStructField*) pMember)->GetType ()->GetDataPtrType (
-		EType_DataRef,
-		pPtrType->GetPtrTypeKind (),
-		pPtrType->GetFlags ()
-		);
-}
-
-CType*
 COperatorMgr::GetFunctionType (
 	const CValue& OpValue,
 	CFunctionType* pFunctionType
@@ -962,35 +983,56 @@ COperatorMgr::GetVirtualProperty (
 }
 
 CType*
-COperatorMgr::GetAuPropertyFieldType (
-	const CValue& OpValue,
-	EAuPropertyField Field
+COperatorMgr::GetStdFieldType (
+	const CValue& RawOpValue,
+	EStdField Field
 	)
 {
-	ASSERT (
-		OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr ||
-		OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue);
 
-	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
-	CPropertyType* pPropertyType = pPtrType->GetTargetType ();
-	CStructField* pMember = pPropertyType->GetAuField (Field);
-	if (!pMember)
+	CType* pOpType = OpValue.GetType ();
+	EType OpTypeKind = pOpType->GetTypeKind ();
+
+	CStructField* pField;
+	bool IsUnsafe;
+
+	switch (OpTypeKind)
 	{
-		err::SetFormatStringError (_T("'%s' has no '%s' field"), pPropertyType->GetTypeString (), GetAuPropertyFieldString (Field));
+	case EType_ClassPtr:
+		pField = ((CClassPtrType*) pOpType)->GetTargetType ()->GetStdField (Field);
+		IsUnsafe = ((CClassPtrType*) pOpType)->GetPtrTypeKind () == EClassPtrType_Unsafe;
+		break;
+
+	case EType_PropertyPtr:
+	case EType_PropertyRef:
+		pField = ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetStdField (Field);
+		IsUnsafe = ((CPropertyPtrType*) pOpType)->GetPtrTypeKind () == EPropertyPtrType_Unsafe;
+		break;
+
+	default:
+		err::SetFormatStringError (_T("'%s' has no field '%s'"), OpValue.GetType ()->GetTypeString (), GetStdFieldString (Field));
 		return false;
 	}
 
-	return GetFieldType (pPtrType->GetAuDataPtrType (EType_DataRef), pMember);
+	if (!pField)
+		return NULL;
+
+	return pField->GetType ()->GetDataPtrType (
+		EType_DataRef,
+		IsUnsafe ? EDataPtrType_Unsafe : EDataPtrType_Thin,
+		pOpType->GetFlags ()
+		);
 }
 
 bool
-COperatorMgr::GetAuPropertyFieldType (
+COperatorMgr::GetStdFieldType (
 	const CValue& OpValue,
-	EAuPropertyField Field,
+	EStdField Field,
 	CValue* pResultValue
 	)
 {
-	CType* pResultType = GetAuPropertyFieldType (OpValue, Field);
+	CType* pResultType = GetStdFieldType (OpValue, Field);
 	if (!pResultType)
 		return false;
 
@@ -999,9 +1041,57 @@ COperatorMgr::GetAuPropertyFieldType (
 }
 
 bool
-COperatorMgr::GetAuPropertyField (
+COperatorMgr::GetStdField (
+	const CValue& RawOpValue,
+	EStdField Field, 
+	CValue* pResultValue
+	)
+{
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	if (!Result)
+		return false;
+
+	CType* pOpType = OpValue.GetType ();
+	EType OpTypeKind = pOpType->GetTypeKind ();
+
+	switch (OpTypeKind)
+	{
+	case EType_ClassPtr:
+		return GetClassStdField (OpValue, Field, pResultValue);
+
+	case EType_PropertyPtr:
+	case EType_PropertyRef:
+		return GetPropertyStdField (OpValue, Field, pResultValue);
+
+	default:
+		err::SetFormatStringError (_T("'%s' has no field '%s'"), OpValue.GetType ()->GetTypeString (), GetStdFieldString (Field));
+		return false;
+	}
+}
+
+bool
+COperatorMgr::GetClassStdField (
 	const CValue& OpValue,
-	EAuPropertyField Field, 
+	EStdField Field, 
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr);
+
+	CClassPtrType* pPtrType = (CClassPtrType*) OpValue.GetType ();
+	CClassType* pClassType = pPtrType->GetTargetType ();
+	CStructField* pField = pClassType->GetStdField (Field);
+	if (!pField)
+		return false;
+
+	return GetClassField (OpValue, pField, NULL, pResultValue);
+}
+
+bool
+COperatorMgr::GetPropertyStdField (
+	const CValue& OpValue,
+	EStdField Field, 
 	CValue* pResultValue
 	)
 {
@@ -1011,18 +1101,15 @@ COperatorMgr::GetAuPropertyField (
 
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->GetTargetType ();
-	CStructField* pMember = pPropertyType->GetAuField (Field);
-	if (!pMember)
-	{
-		err::SetFormatStringError (_T("'%s' has no '%s' field"), pPropertyType->GetTypeString (), GetAuPropertyFieldString (Field));
+	CStructField* pField = pPropertyType->GetStdField (Field);
+	if (!pField)
 		return false;
-	}
 
 	CValue DataValue;
 
 	if (OpValue.GetValueKind () != EValue_Property)
 	{
-		err::SetFormatStringError (_T("'%s' field for property pointers is not implemented yet"), pMember->GetName ());
+		err::SetFormatStringError (_T("'%s' field for property pointers is not implemented yet"), pField->GetName ());
 		return false;
 	}
 
@@ -1042,7 +1129,7 @@ COperatorMgr::GetAuPropertyField (
 
 	CBaseTypeCoord Coord;
 	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
-	return GetStructField (DataValue, pMember, &Coord, pResultValue);
+	return GetStructField (DataValue, pField, &Coord, pResultValue);
 }
 
 bool

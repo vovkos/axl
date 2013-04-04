@@ -67,7 +67,7 @@ enum EType
 	EType_Enum,                // E
 	EType_Struct,              // S
 	EType_Union,               // U
-	EType_Class,               // C
+	EType_Class,               // C/O/X (class/object/box)
 
 	// function types
 

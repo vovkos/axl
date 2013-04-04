@@ -15,6 +15,20 @@ class CUnionType;
 
 //.............................................................................
 
+enum EStdField
+{
+	EStdField_OnChange = 0,
+	EStdField_Value,
+	EStdField__Count
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const tchar_t* 
+GetStdFieldString (EStdField Field);
+
+//.............................................................................
+
 class CStructField: public CUserModuleItem
 {
 protected:

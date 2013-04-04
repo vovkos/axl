@@ -57,33 +57,6 @@ CPropertyPtrType::GetAuPropertyPtrStructType_u ()
 	return m_pModule->m_TypeMgr.GetAuPropertyPtrStructType_u (m_pTargetType);
 }
 
-CDataPtrType*
-CPropertyPtrType::GetAuDataPtrType (EType TypeKind)
-{
-	EDataPtrType DataPtrTypeKind;
-
-	switch (m_PtrTypeKind)
-	{
-	case EPropertyPtrType_Normal:
-	case EPropertyPtrType_Weak:
-		DataPtrTypeKind = EDataPtrType_Normal;
-		break;
-
-	case EPropertyPtrType_Thin:
-		DataPtrTypeKind = EDataPtrType_Thin;
-		break;
-
-	case EPropertyPtrType_Unsafe:
-		DataPtrTypeKind = EDataPtrType_Unsafe;
-		break;
-
-	default:
-		ASSERT (false);
-	}
-
-	return m_pTargetType->GetAuFieldStructType ()->GetDataPtrType (TypeKind, DataPtrTypeKind);
-}
-
 rtl::CStringA
 CPropertyPtrType::CreateSignature (
 	CPropertyType* pPropertyType,

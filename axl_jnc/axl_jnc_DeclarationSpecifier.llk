@@ -155,6 +155,10 @@ type_specifier
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass);
 		}
+	| EToken_Object '<' type_name '>'
+		{
+			$.m_pType = m_pModule->m_TypeMgr.GetBoxClassType ($3.m_pType);
+		}
 	| EToken_Bool
 		{
 			$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);

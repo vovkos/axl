@@ -38,22 +38,6 @@ GetPropertyTypeFlagsFromModifiers (int Modifiers)
 
 	return Flags;
 }
-	
-//.............................................................................
-
-const tchar_t* 
-GetAuPropertyFieldString (EAuPropertyField Field)
-{
-	static const tchar_t* StringTable [] = 
-	{
-		_T("onchange"),   // EAuPropertyField_OnChange,
-		_T("propvalue"),  // EAuPropertyField_PropValue,
-	};
-
-	return (size_t) Field < countof (StringTable) ? 
-		StringTable [Field] : 
-		_T("undefined-augmented-property-type-field");
-}
 
 //.............................................................................
 
@@ -109,6 +93,21 @@ CStructType*
 CPropertyType::GetVTableStructType ()
 {
 	return m_pModule->m_TypeMgr.GetPropertyVTableStructType (this);
+}
+
+CStructField* 
+CPropertyType::GetStdField (EStdField Field)
+{
+	ASSERT ((size_t) Field < EStdField__Count);
+	
+	CStructField* pField = m_AuFieldArray [Field];
+	if (!pField)
+	{
+		err::SetFormatStringError (_T("'%s' has no field '%s'"), GetTypeString (), GetStdFieldString (Field));
+		return NULL;
+	}
+
+	return pField;
 }
 
 rtl::CStringA

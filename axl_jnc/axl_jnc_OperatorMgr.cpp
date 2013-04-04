@@ -400,6 +400,9 @@ COperatorMgr::CastOperator (
 {
 	bool Result;
 
+	if (pType->GetTypeKind () == EType_Class) 
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 
@@ -454,12 +457,14 @@ COperatorMgr::GetCastKind (
 	CType* pType
 	)
 {
+	if (pType->GetTypeKind () == EType_Class) 
+		pType = ((CClassType*) pType)->GetClassPtrType ();
+
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 
 	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
-	if (!pOperator)
-		return ECast_None;
+	ASSERT (pOperator); // there is always a default
 
 	CValue OpValue;
 	PrepareOperandType (

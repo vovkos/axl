@@ -484,7 +484,7 @@ CFunctionMgr::FireOnChangeEvent ()
 
 	CValue OnChangeEventValue;
 	return
-		m_pModule->m_OperatorMgr.GetAuPropertyField (PropertyValue, EAuPropertyField_OnChange, &OnChangeEventValue) &&
+		m_pModule->m_OperatorMgr.GetStdField (PropertyValue, EStdField_OnChange, &OnChangeEventValue) &&
 		m_pModule->m_OperatorMgr.CallOperator (OnChangeEventValue);
 }
 

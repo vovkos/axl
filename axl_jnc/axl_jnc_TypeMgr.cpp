@@ -53,6 +53,7 @@ CTypeMgr::Clear ()
 	m_TypedefList.Clear ();
 
 	m_TypeMap.Clear ();
+	m_BoxClassTypeMap.Clear ();
 
 	m_StaticDestructArray.Clear ();
 
@@ -428,6 +429,35 @@ CTypeMgr::CreateClassType (
 	return pType;
 }
 
+CClassType* 
+CTypeMgr::GetBoxClassType (CType* pBaseType)
+{
+	EType BaseTypeKind = pBaseType->GetTypeKind ();
+	switch (BaseTypeKind)
+	{
+	case EType_Void:
+		err::SetFormatStringError (_T("cannot create a box class for 'void'"));
+		return false;
+
+	case EType_Class:
+		return (CClassType*) pBaseType;
+	}
+
+	rtl::CStringHashTableMapIteratorAT <CClassType*> It = m_BoxClassTypeMap.Goto (pBaseType->GetSignature ());
+	if (It->m_Value)
+		return It->m_Value;
+
+	CClassType* pBoxClassType = CreateUnnamedClassType ();
+	pBoxClassType->m_Tag.Format (_T("object <%s>"), pBaseType->GetTypeString ());
+	pBoxClassType->m_Signature.Format ("X%s", pBaseType->GetSignature ());
+	pBoxClassType->m_Flags |= EClassTypeFlag_Box;
+	pBoxClassType->CreateField (pBaseType);
+	pBoxClassType->CalcLayout ();
+	
+	It->m_Value = pBoxClassType;
+	return pBoxClassType;
+}
+
 CFunctionArg*
 CTypeMgr::CreateFunctionArg (
 	const rtl::CString& Name,
@@ -666,13 +696,13 @@ CTypeMgr::GetPropertyType (
 
 		if (Flags & EPropertyTypeFlag_Bindable) // event first
 		{
-			pType->m_AuFieldArray [EAuPropertyField_OnChange] = pType->m_pAuFieldStructType->CreateField (_T("onchange"), GetStdType (EStdType_SimpleMulticast));
+			pType->m_AuFieldArray [EStdField_OnChange] = pType->m_pAuFieldStructType->CreateField (_T("onchange"), GetStdType (EStdType_SimpleMulticast));
 			pType->m_pBindablePropertyType = pType;
 		}
 
 		if (Flags & EPropertyTypeFlag_AutoGet)
 		{
-			pType->m_AuFieldArray [EAuPropertyField_PropValue] = pType->m_pAuFieldStructType->CreateField (_T("propvalue"), pGetterType->GetReturnType ());
+			pType->m_AuFieldArray [EStdField_Value] = pType->m_pAuFieldStructType->CreateField (_T("propvalue"), pGetterType->GetReturnType ());
 		}
 	}
 
@@ -1576,6 +1606,7 @@ CTypeMgr::CreateObjectType ()
 {
 	CClassType* pType = CreateUnnamedClassType ();
 	pType->m_Tag = _T("object");
+	pType->m_Signature = "O";
 	pType->m_Flags |= EClassTypeFlag_StdObject;
 	pType->CalcLayout ();
 	return pType;

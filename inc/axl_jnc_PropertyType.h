@@ -52,20 +52,6 @@ GetPropertyTypeFlagsFromModifiers (int Modifiers);
 
 //.............................................................................
 
-enum EAuPropertyField
-{
-	EAuPropertyField_OnChange = 0,
-	EAuPropertyField_PropValue,
-	EAuPropertyField__Count
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const tchar_t* 
-GetAuPropertyFieldString (EAuPropertyField Field);
-
-//.............................................................................
-
 class CPropertyType: public CType
 {
 protected:
@@ -79,7 +65,7 @@ protected:
 	CPropertyType* m_pBindablePropertyType;
 	CStructType* m_pVTableStructType;
 	CStructType* m_pAuFieldStructType;
-	CStructField* m_AuFieldArray [EAuPropertyField__Count];
+	CStructField* m_AuFieldArray [EStdField__Count];
 	CPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
 
 public:
@@ -169,11 +155,7 @@ public:
 	}
 
 	CStructField* 
-	GetAuField (EAuPropertyField Field)
-	{
-		ASSERT ((size_t) Field < EAuPropertyField__Count);
-		return m_AuFieldArray [Field];
-	}
+	GetStdField (EStdField Field);
 
 	CStructType*
 	GetVTableStructType ();
