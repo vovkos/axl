@@ -1,0 +1,242 @@
+/*
+
+typedef FBar (int, int);
+
+//.............................................................................
+
+foo (double a, double b, double c, double d)
+{
+	printf ("%f %f %f %f\n", a, b, c, d);
+}
+
+//.............................................................................
+
+bindable int Red;
+bindable int Green;
+bindable int Blue;
+
+autoev AutoEv
+{
+	printf ("autoev: Red = %02x\n", Red);
+	printf ("autoev: Green = %02x\n", Green);
+	printf ("autoev: Blue = %02x\n", Blue);
+	printf ("autoev: RGB (%02x %02x, %02x)\n", Red, Green, Blue);
+};
+
+//.............................................................................
+
+OnRedChange ()
+{
+	printf ("OnRedChange: Red = %02x\n", Red);
+}
+
+class CTest
+{
+	preconstruct ()
+	{
+		printf ("CTest.preconstruct ()\n");
+	}
+
+	~this ()
+	{
+		printf ("CTest.~this ()\n");
+	}
+}
+
+//.............................................................................
+
+int
+main ()
+{
+	FBar pf = (stack FBar) foo ~(,20,, 40);	
+	pf (30, 40);
+
+	{
+		printf ("{\n");
+		CTest t = stack new CTest;
+		printf ("}\n");
+	}
+
+	onchange (Red) += OnRedChange;
+	
+	{
+	stack new AutoEv;
+	Red = 0xab;
+	Green = 0xcd;
+	Blue = 0xef;
+	}
+
+	Red = 0xff;
+	
+	printf ("done\n");
+	return 0;
+}
+
+*/
+
+//.............................................................................
+
+/*
+
+property MyProp
+{
+	int m_x [2];
+
+	int
+	get (int i)
+	{
+		int Value = m_x [i];
+		printf ("MyProp.get (%d) returns %d\n", i, Value);
+		return Value;
+	}
+
+	set (int i, int Value)
+	{
+		printf ("MyProp.set (%d, %d)\n", i, Value);
+		m_x [i] = Value;
+	}
+};
+
+typedef int property PIntProp;
+
+*/
+
+//.............................................................................
+
+/*
+
+interface CTest
+{
+	virtual int property MyProp (int);
+
+	virtual
+	void
+	Foo ();
+};
+
+class CTestChild: CTest
+{	
+	virtual
+	int 
+	MyProp.get ()
+	{
+		printf ("CTestChild.MyProp.get ()\n");
+		return 100;
+	}
+
+	virtual
+	MyProp.set (int x)
+	{
+		printf ("CTestChild.MyProp.set ()\n");
+	}
+
+	virtual
+	void
+	Foo ()
+	{
+		printf ("CTestChild.Foo ()\n");
+	}
+};
+
+*/
+
+/*
+
+int property MyIndexProp (int, int);
+
+int 
+MyIndexProp.get (
+	int i, 
+	int j
+	)
+{
+	printf ("MyIndexProp.get (%d, %d)\n", i, j);
+	return i + j;
+}
+
+MyIndexProp.set (
+	int i, 
+	int j, 
+	int Value
+	)
+{
+	printf ("MyIndexProp.set (%d, %d, %d)\n", i, j, Value);
+}
+
+*/
+
+property MyIntProp 
+{
+	int m_x;
+
+	int 
+	get ()
+	{
+		printf ("MyIntProp.get () = %d\n", m_x);
+		return m_x;
+	}
+
+	set (int x)
+	{
+		printf ("MyIntProp.set (%d)\n", x);
+		m_x = x;
+	}
+};
+
+int
+main ()
+{
+	printf ("hui govno i muravei\n");
+
+	MyIntProp = 100;
+	int x = MyIntProp;
+
+	int property unsafe prInt = (stack int property unsafe) MyIntProp;
+
+	prInt = 200;
+
+	int unsafe* unsafe function* ();
+	int safe property* prInt (); 
+
+	int &
+
+	*prInt = 
+
+	
+/*
+	MyIndexProp [10] [20] = 30;
+	int x = MyIndexProp [50] [60];
+
+	PInt prInt = (stack ) MyIndexProp [70] [80];
+*/
+
+/*
+	CTest t = stack new CTestChild;	
+	t.Foo ();
+
+	MyProp [0] = 100;
+	MyProp [1] = 200;
+
+	printf ("MyProp = { %d, %d }\n", MyProp [0], MyProp [1]);
+
+	PIntProp prInt1 := (stack PIntProp) MyProp [0];
+	PIntProp prInt2 := (stack PIntProp) MyProp [1];
+
+	printf ("prInt1 = %d, prInt2 = %d\n", prInt1, prInt2);
+
+*/
+
+	printf ("done\n");
+	return 0;
+}
+
+//.............................................................................
+
+int
+printf (
+	unsafe char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................
+

@@ -1,0 +1,344 @@
+//.............................................................................
+
+class
+{
+	CTypeSpecifier m_TypeSpecifier;
+}	
+declaration_specifier_list
+	enter 
+	{
+		PushTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	leave
+	{
+		PopTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	:	declaration_specifier <&$.m_TypeSpecifier>+
+	;
+
+declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
+	:	attribute_block
+	|	storage_specifier
+			{
+				return SetStorageKind ($1.m_StorageKind);
+			}
+	|	access_specifier
+			{
+				return SetAccessKind ($1.m_AccessKind);
+			}
+	|	type_specifier
+			{
+				return $pTypeSpecifier->SetType ($1.m_pType);
+			}
+	|	resolver ({ return false; }) // prefer named-type-specifier over type-modifier
+		type_modifier 
+			{
+				return $pTypeSpecifier->SetTypeModifier ($1.m_Modifier);
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CTypeSpecifier m_TypeSpecifier;
+}	
+type_specifier_modifier_list
+	enter 
+	{
+		PushTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	leave
+	{
+		PopTypeSpecifier (&$.m_TypeSpecifier);
+	}
+	: type_specifier_modifier <&$.m_TypeSpecifier>+
+	;
+
+type_specifier_modifier <CTypeSpecifier* $pTypeSpecifier>
+	:	type_specifier
+			{
+				return $pTypeSpecifier->SetType ($1.m_pType);
+			}
+	|	type_modifier 
+			{
+				return $pTypeSpecifier->SetTypeModifier ($1.m_Modifier);
+			}
+	;
+
+//.............................................................................
+
+class
+{
+	EStorage m_StorageKind;
+}
+storage_specifier
+	:	EToken_Typedef
+			{
+				$.m_StorageKind = EStorage_Typedef;
+			}
+	|	EToken_Alias
+			{
+				$.m_StorageKind = EStorage_Alias;
+			}
+	|	EToken_Static 
+			{
+				$.m_StorageKind = EStorage_Static;
+			}
+	|	EToken_Thread
+			{			
+				$.m_StorageKind = EStorage_Thread;
+			}
+	|	EToken_Stack
+			{
+				$.m_StorageKind = EStorage_Stack;
+			}
+	|	EToken_Heap
+			{
+				$.m_StorageKind = EStorage_Heap;
+			}
+	|	EToken_UHeap
+			{
+				$.m_StorageKind = EStorage_UHeap;
+			}
+	|	EToken_Member
+			{
+				$.m_StorageKind = EStorage_Member;
+			}
+	|	EToken_Abstract
+			{
+				$.m_StorageKind = EStorage_Abstract;
+			}
+	|	EToken_Virtual
+			{
+				$.m_StorageKind = EStorage_Virtual;
+			}
+	|	EToken_Override
+			{
+				$.m_StorageKind = EStorage_Override;
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	EAccess m_AccessKind;
+}
+access_specifier
+	:	EToken_Public
+			{
+				$.m_AccessKind = EAccess_Public;
+			}
+	|	EToken_Protected
+			{
+				$.m_AccessKind = EAccess_Protected;
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CType* m_pType;
+}
+type_specifier
+	:	EToken_Void
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+			}
+	|	EToken_Variant
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Variant);
+			}
+	|	EToken_Object
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass);
+			}
+	|	EToken_Object '<' type_name '>'
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetBoxClassType ($3.m_pType);
+			}
+	|	EToken_Bool
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
+			}
+	|	EToken_Int8
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8);
+			}
+	|	EToken_Int16
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int16);
+			}
+	|	EToken_Int32
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
+			}
+	|	EToken_Int64
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64);
+			}
+	|	EToken_Int
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
+			}
+	|	EToken_IntPtr
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+			}
+	|	EToken_Char
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char);
+			}
+	|	EToken_Float
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Float);
+			}
+	|	EToken_Double
+			{
+				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
+			}
+	|	EToken_Auto
+			{
+				err::SetStringError ("'auto' type specifier is not yet supported");
+				return false; 
+			}
+	|	property_template_specifier
+			{
+				$.m_pType = $1.m_pType;
+			}
+	|	resolver (qualified_type_name_rslv)
+		qualified_type_name $t
+			{
+				$.m_pType = $t.m_pType;
+			}
+	;
+
+// expression vs item_declaration_w_specifier
+
+qualified_type_name_rslv
+	:		{
+				if (IsTypeSpecified ())
+					return false;
+			}
+		qualified_name $n		
+			{
+				return m_Stage == EStage_Pass1 || FindType ($n.m_Name) != NULL;
+			}
+		('(' // we need this check if we are already in type_specifier_modifier_list
+			{
+				return false;
+			}
+		)?
+	;
+
+class
+{
+	CType* m_pType;
+}
+qualified_type_name
+	:	qualified_name
+			{
+				CType* pType = FindType ($1.m_Name);
+				if (!pType)
+				{
+					err::SetFormatStringError ("'%s' is not a type", $1.m_Name.GetFullName ().cc ());
+					return false;
+				}
+
+				$.m_pType = pType;
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class 
+{
+	ETypeModifier m_Modifier;
+}
+type_modifier
+	:	EToken_Signed
+			{
+				$.m_Modifier = ETypeModifier_Signed;
+			}
+	|	EToken_Unsigned
+			{
+				$.m_Modifier = ETypeModifier_Unsigned;
+			}
+	|	EToken_BigEndian
+			{
+				$.m_Modifier = ETypeModifier_BigEndian;
+			}
+	|	EToken_Nullable
+			{
+				$.m_Modifier = ETypeModifier_Nullable;
+			}
+	|	EToken_Const
+			{
+				$.m_Modifier = ETypeModifier_Const;
+			}
+	|	EToken_ReadOnly
+			{
+				$.m_Modifier = ETypeModifier_ReadOnly;
+			}
+	|	EToken_Mutable
+			{
+				$.m_Modifier = ETypeModifier_Mutable;
+			}
+	|	EToken_Volatile
+			{
+				$.m_Modifier = ETypeModifier_Volatile;
+			}
+	|	EToken_Weak
+			{
+				$.m_Modifier = ETypeModifier_Weak;
+			}
+	|	EToken_Thin
+			{
+				$.m_Modifier = ETypeModifier_Thin;
+			}
+	|	EToken_Unsafe
+			{
+				$.m_Modifier = ETypeModifier_Unsafe;
+			}
+	|	EToken_Cdecl
+			{
+				$.m_Modifier = ETypeModifier_Cdecl;
+			}
+	|	EToken_Stdcall
+			{
+				$.m_Modifier = ETypeModifier_Stdcall;
+			}
+	|	EToken_Class
+			{
+				$.m_Modifier = ETypeModifier_Class;
+			}
+	|	EToken_Function
+			{
+				$.m_Modifier = ETypeModifier_Function;
+			}
+	|	EToken_Property
+			{
+				$.m_Modifier = ETypeModifier_Property;
+			}
+	|	EToken_AutoEv
+			{
+				$.m_Modifier = ETypeModifier_AutoEv;
+			}
+	|	EToken_Bindable
+			{
+				$.m_Modifier = ETypeModifier_Bindable;
+			}
+	|	EToken_AutoGet
+			{
+				$.m_Modifier = ETypeModifier_AutoGet;
+			}
+	|	EToken_Indexed
+			{
+				$.m_Modifier = ETypeModifier_Indexed;
+			}
+	;
+
+//.............................................................................
+

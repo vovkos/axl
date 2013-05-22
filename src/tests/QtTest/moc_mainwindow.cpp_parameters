@@ -1,0 +1,7 @@
+-ID:/Prj/Ninja/axl/src/../include
+-DUNICODE
+-D_UNICODE
+-DWIN32
+-o
+D:/Prj/Ninja/axl/src/tests/QtTest/moc_mainwindow.cpp
+D:/Prj/Ninja/axl/src/tests/QtTest/mainwindow.h

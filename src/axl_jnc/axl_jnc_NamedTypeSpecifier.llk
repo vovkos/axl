@@ -1,0 +1,300 @@
+//.............................................................................
+
+// root
+
+class
+{
+	CType* m_pType;
+}
+named_type_specifier
+	:	enum_specifier
+			{
+				$.m_pType = $1.m_pType;
+			}
+	|	struct_specifier
+			{
+				$.m_pType = $1.m_pType;
+			}
+	|	union_specifier
+			{
+				$.m_pType = $1.m_pType;
+			}
+	|	class_specifier
+			{
+				$.m_pType = $1.m_pType;
+			}
+	|	property_specifier
+			{
+				$.m_pType = $1.m_pProperty->GetType ();
+			}
+	|	autoev_class_specifier 
+			{
+				$.m_pType = $1.m_pType;
+			}
+	;
+
+//.............................................................................
+
+// enum
+
+class
+{
+	CEnumType* m_pType;
+}
+enum_specifier
+	leave
+	{
+		if ($.m_pType->GetName ().IsEmpty () || ($.m_pType->GetFlags () & EEnumTypeFlag_Exposed))
+			return m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumConsts ($.m_pType);
+	}
+	:	(EToken_Enum | EToken_EnumC $c)
+		EToken_Identifier $n?
+		(':' type_name $b)?
+			{
+				$.m_pType = CreateEnumType (
+					IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+					IsValidLocator ($b) ? $b.m_pType : NULL,
+					IsValidLocator ($c) ? EEnumTypeFlag_Exposed : 0
+					);
+
+				if (!$.m_pType)
+					return false;
+			}	
+		enum_block <$.m_pType>
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum_block <CEnumType* $pType>
+	:	'{' 
+			{
+				m_pModule->m_NamespaceMgr.OpenNamespace ($pType);	
+			}
+		enum_member_list <$pType> 
+		'}'
+			{
+				m_pModule->m_NamespaceMgr.CloseNamespace ();	
+			}
+	;
+
+nullable
+enum_member_list <CEnumType* $pType>
+	:	enum_member <$pType> (',' enum_member <$pType>)*
+	;
+
+nullable
+enum_member <CEnumType* $pType>
+	:	EToken_Identifier ('=' expression_pass1 $e)?
+			{
+				CEnumConst* pMember = $pType->CreateConst ($1.m_Data.m_String);
+				if (!pMember)
+					return false;
+
+				pMember->m_Pos = $1.m_Pos;
+			
+				if (IsValidLocator ($e)) 
+					pMember->SetExpression (&$e.m_TokenList);
+			}
+	|	epsilon
+	;
+
+//.............................................................................
+	
+// struct
+
+class
+{
+	CStructType* m_pType;
+}
+struct_specifier
+	:	EToken_Struct
+		struct_pack_factor $p?
+		EToken_Identifier $n?
+		(':' type_name_list $b)?
+			{
+				$.m_pType = CreateStructType (
+					IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+					IsValidLocator ($b) ? &$b.m_TypeList : NULL,
+					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
+					);
+
+				if (!$.m_pType)
+					return false;
+			}
+		named_type_block <$.m_pType>
+	;
+	 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	size_t m_PackFactor;
+}
+struct_pack_factor
+	:	EToken_Pack '(' struct_pack_factor_value $v ')'	 
+			{
+				$.m_PackFactor = $v.m_Value;
+			}
+	;
+
+class
+{
+	size_t m_Value;
+}
+struct_pack_factor_value
+	:	EToken_Integer
+			{
+				$.m_Value = $1.m_Data.m_Integer;
+			}
+	|	EToken_Default
+			{
+				$.m_Value = m_DefaultStructPackFactor;
+			}
+	;
+
+//.............................................................................
+
+// union
+
+class
+{
+	CUnionType* m_pType;
+}
+union_specifier
+	:	EToken_Union
+		EToken_Identifier $n?
+			{
+				$.m_pType = CreateUnionType (IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ());
+				if (!$.m_pType)
+					return false;
+			}	  
+		named_type_block <$.m_pType>
+	;
+
+//.............................................................................
+
+// class 
+
+class
+{
+	CClassType* m_pType;
+}
+class_specifier
+	:	EToken_Class
+		struct_pack_factor $p?
+		EToken_Identifier $n
+		(':' type_name_list $b)?
+			{
+				$.m_pType = CreateClassType (
+					IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+					IsValidLocator ($b) ? &$b.m_TypeList : NULL,
+					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
+					);
+
+				if (!$.m_pType)
+					return false;
+			}
+		named_type_block <$.m_pType>
+	;
+
+//.............................................................................
+
+// autoev class 
+
+class
+{
+	CClassType* m_pType;
+}
+autoev_class_specifier
+	local 
+	{
+		CDeclarator $Declarator;
+	}
+	:	EToken_AutoEv
+		EToken_Class
+		EToken_Identifier $n
+		function_suffix <&$Declarator>?
+		function_body_pass1 $b?
+			{
+				$.m_pType = CreateAutoEvClassType (
+					$n.m_Data.m_String, 
+					$Declarator.GetFunctionSuffix (), 
+					IsValidLocator ($b) ? &$b.m_TokenList : NULL
+					);
+
+				if (!$.m_pType)
+					return false;
+			}
+	;
+
+//.............................................................................
+
+// property
+
+class
+{
+	CProperty* m_pProperty;
+}
+property_specifier
+	:	EToken_Property 
+		struct_pack_factor $p?
+		EToken_Identifier $n
+			{
+				$.m_pProperty = CreateProperty (
+					$n.m_Data.m_String,
+					$n.m_Pos,
+					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
+					);
+
+				if (!$.m_pProperty)
+					return false;
+			}	  
+		named_type_block <$.m_pProperty>
+			{
+				m_pLastDeclaredItem = $.m_pProperty;
+				return $.m_pProperty->CalcType () != NULL; 
+			}
+	;
+
+//.............................................................................
+
+// property template
+
+class
+{
+	CPropertyType* m_pType;
+}
+property_template_specifier
+	local
+	{
+		CPropertyTemplate* $pTemplate;
+	}
+	:	EToken_Property 
+			{
+				$pTemplate = CreatePropertyTemplate ();
+			}
+		named_type_block <$pTemplate>		
+			{
+				$.m_pType = $pTemplate->CalcType ();
+				return $.m_pType != NULL;
+			}
+	;
+
+//.............................................................................
+
+// struct, union, class, interface, property
+
+named_type_block <CNamespace* $pNamespace>
+	:	'{' 
+			{
+				m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
+			}
+		named_type_block_declaration*
+		'}'
+			{
+				m_pModule->m_NamespaceMgr.CloseNamespace ();
+			}
+	;
+
+//.............................................................................
+

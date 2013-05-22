@@ -1,0 +1,66 @@
+// This file is part of AXL (R) Library
+// Tibbo Technology Inc (C) 2004-2013. All rights reserved
+// Author: Vladimir Gladkov
+
+#pragma once
+
+#include "axl_jnc_UnOp.h"
+
+namespace axl {
+namespace jnc {
+
+//.............................................................................
+
+class CUnOp_Addr: public IUnaryOperator
+{
+public:
+	AXL_OBJ_CLASS_0 (CUnOp_Addr, IUnaryOperator)
+
+public:
+	CUnOp_Addr ()
+	{
+		m_OpKind = EUnOp_Addr;
+		m_OpFlags = EOpFlag_KeepRef;
+	}
+
+	virtual
+	CType*
+	GetResultType (const CValue& OpValue);
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+class CUnOp_Indir: public IUnaryOperator
+{
+public:
+	AXL_OBJ_CLASS_0 (CUnOp_Indir, IUnaryOperator)
+
+public:
+	CUnOp_Indir ()
+	{
+		m_OpKind = EUnOp_Indir;
+	}
+
+	virtual
+	CType*
+	GetResultType (const CValue& OpValue);
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
+} // namespace jnc {
+} // namespace axl {

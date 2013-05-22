@@ -1,0 +1,433 @@
+//.............................................................................
+
+declarator_list <CTypeSpecifier* $pTypeSpecifier>
+	:	full_declarator <$pTypeSpecifier> (',' full_declarator <$pTypeSpecifier>)*
+	;
+		
+full_declarator <CTypeSpecifier* $pTypeSpecifier>
+	:	declarator <$pTypeSpecifier> ('=' expression_pass1 $i) ?
+			{ 
+				return Declare (&$1.m_Declarator, IsValidLocator ($i) ? &$i.m_TokenList : NULL);
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	CDeclarator m_Declarator;
+}	
+declarator <CTypeSpecifier* $pTypeSpecifier>
+	enter
+	{
+		$.m_Declarator.SetTypeSpecifier ($pTypeSpecifier);
+	}
+	:	declarator_prefix <&$.m_Declarator>* 
+		declarator_name <&$.m_Declarator>
+		declarator_suffix <&$.m_Declarator>*
+		post_declarator_modifier <&$.m_Declarator>*
+	;
+
+//.............................................................................
+
+declarator_name <CDeclarator* $pDeclarator>
+	:	declarator_qualifier <$pDeclarator> 
+			{
+				$pDeclarator->m_Pos = $1.m_FirstToken.m_Pos;
+			}
+		('.' declarator_qualifier <$pDeclarator>)*
+	;
+
+declarator_qualifier <CDeclarator* $pDeclarator>
+	:	EToken_Identifier
+			{
+				return $pDeclarator->AddName ($1.m_Data.m_String);
+			}
+	|	EToken_Get
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_Getter);
+			}
+	|	EToken_Set
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_Setter);
+			}
+	|	EToken_PreConstruct
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_PreConstructor);
+			}
+	|	EToken_This
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_Constructor);
+			}
+	|	'~' EToken_This
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_Destructor);
+			}
+	|	EToken_Static EToken_This
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_StaticConstructor);
+			}
+	|	EToken_Static '~' EToken_This
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_StaticDestructor);
+			}
+	|	EToken_Operator
+			{
+				return $pDeclarator->AddUnnamedMethod (EFunction_CallOperator);
+			}
+	|	EToken_Operator type_name
+			{
+				return $pDeclarator->AddCastOperator ($2.m_pType);
+			}
+	|	EToken_Operator operator_name
+			{
+				return $pDeclarator->AddUnaryBinaryOperator ($2.m_UnOpKind, $2.m_BinOpKind);
+			}
+	|	EToken_Value
+			{
+				return $pDeclarator->SetPropValue ();
+			}
+	|	EToken_OnChange
+			{
+				return $pDeclarator->SetOnChange ();
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	EUnOp m_UnOpKind;
+	EBinOp m_BinOpKind;
+}
+operator_name
+	enter
+	{
+		$.m_UnOpKind = EUnOp_Undefined;
+		$.m_BinOpKind = EBinOp_Undefined;
+	}
+	:	'~'
+			{
+				$.m_UnOpKind = EUnOp_BwNot;
+			}
+	|	'!'
+			{
+				$.m_UnOpKind = EUnOp_LogNot;
+			}
+	|	EToken_Inc
+			{
+				$.m_UnOpKind = EUnOp_PreInc;
+			}
+	|	EToken_Dec
+			{
+				$.m_UnOpKind = EUnOp_PreDec;
+			}
+	|	EToken_Postfix EToken_Inc
+			{
+				$.m_UnOpKind = EUnOp_PostInc;
+			}
+	|	EToken_Postfix EToken_Dec
+			{
+				$.m_UnOpKind = EUnOp_PostDec;
+			}
+	|	EToken_Postfix? EToken_Ptr
+			{
+				$.m_UnOpKind = EUnOp_Ptr;
+			}
+	|	'+'
+			{
+				$.m_UnOpKind = EUnOp_Plus;
+				$.m_BinOpKind = EBinOp_Add;
+			}
+	|	'-'
+			{
+				$.m_UnOpKind = EUnOp_Minus;
+				$.m_BinOpKind = EBinOp_Sub;
+			}
+	|	'*'
+			{
+				$.m_UnOpKind = EUnOp_Indir;
+				$.m_BinOpKind = EBinOp_Mul;
+			}
+	|	'/'
+			{
+				$.m_BinOpKind = EBinOp_Div;
+			}
+	|	'%'
+			{
+				$.m_BinOpKind = EBinOp_Mod;
+			}
+	|	EToken_Shl
+			{
+				$.m_BinOpKind = EBinOp_Shl;
+			}
+	|	EToken_Shr
+			{
+				$.m_BinOpKind = EBinOp_Shr;
+			}
+	|	'&'
+			{
+				$.m_UnOpKind = EUnOp_Addr;
+				$.m_BinOpKind = EBinOp_BwAnd;
+			}
+	|	'^'
+			{
+				$.m_BinOpKind = EBinOp_BwXor;
+			}
+	|	'|'
+			{
+				$.m_BinOpKind = EBinOp_BwOr;
+			}
+	|	EToken_Eq
+			{
+				$.m_BinOpKind = EBinOp_Eq;
+			}
+	|	EToken_Ne
+			{
+				$.m_BinOpKind = EBinOp_Ne;
+			}
+	|	'<'
+			{
+				$.m_BinOpKind = EBinOp_Lt;
+			}
+	|	EToken_Le
+			{
+				$.m_BinOpKind = EBinOp_Le;
+			}
+	|	'>'
+			{
+				$.m_BinOpKind = EBinOp_Gt;
+			}
+	|	EToken_Ge
+			{
+				$.m_BinOpKind = EBinOp_Ge;
+			}
+	|	'='
+			{
+				$.m_BinOpKind = EBinOp_Assign;
+			}
+	|	EToken_AddAssign
+			{
+				$.m_BinOpKind = EBinOp_AddAssign;
+			}
+	|	EToken_SubAssign
+			{
+				$.m_BinOpKind = EBinOp_SubAssign;
+			}
+	|	EToken_MulAssign
+			{
+				$.m_BinOpKind = EBinOp_MulAssign;
+			}
+	|	EToken_DivAssign
+			{
+				$.m_BinOpKind = EBinOp_DivAssign;
+			}
+	|	EToken_ModAssign
+			{
+				$.m_BinOpKind = EBinOp_ModAssign;
+			}
+	|	EToken_ShlAssign
+			{
+				$.m_BinOpKind = EBinOp_ShlAssign;
+			}
+	|	EToken_ShrAssign
+			{
+				$.m_BinOpKind = EBinOp_ShrAssign;
+			}
+	|	EToken_AndAssign
+			{
+				$.m_BinOpKind = EBinOp_AndAssign;
+			}
+	|	EToken_XorAssign
+			{
+				$.m_BinOpKind = EBinOp_XorAssign;
+			}
+	|	EToken_OrAssign
+			{
+				$.m_BinOpKind = EBinOp_OrAssign;
+			}
+	|	EToken_AtAssign
+			{
+				$.m_BinOpKind = EBinOp_AtAssign;
+			}
+	|	EToken_ClassAssign
+			{
+				$.m_BinOpKind = EBinOp_ClassAssign;
+			}
+	|	EToken_LogAnd
+			{
+				$.m_BinOpKind = EBinOp_LogAnd;
+			}
+	|	EToken_LogOr
+			{
+				$.m_BinOpKind = EBinOp_LogOr;
+			}
+	|	'[' ']'
+			{
+				$.m_BinOpKind = EBinOp_Idx;
+			}
+	|	'@'
+			{
+				$.m_BinOpKind = EBinOp_At;
+			}
+	;
+
+//.............................................................................
+
+// prefix
+
+noast
+declarator_prefix <CDeclarator* $pDeclarator>
+	:	declarator_prefix_kind
+			{
+				return $pDeclarator->AddPrefix ($1.m_PrefixKind);
+			}
+		(type_modifier $m
+			{
+				return $pDeclarator->SetTypeModifier ($m.m_Modifier);
+			}
+		)*
+	;
+
+class
+{
+	EDeclPrefix m_PrefixKind;
+}
+declarator_prefix_kind
+	:	'*'
+			{
+				$.m_PrefixKind = EDeclPrefix_Pointer;			
+			}
+	|	EToken_Multicast
+			{
+				$.m_PrefixKind = EDeclPrefix_Multicast;
+			}
+	|	EToken_Event
+			{
+				$.m_PrefixKind = EDeclPrefix_Event;
+			}
+	;
+
+//.............................................................................
+
+// suffix 
+
+noast
+declarator_suffix <CDeclarator* $pDeclarator>
+	:	array_suffix <$pDeclarator>
+	|	function_suffix <$pDeclarator>
+	|	resolver ({ return false; }) // prefer conditional-expr over type-name
+		bitfield_suffix <$pDeclarator>
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+array_suffix <CDeclarator* $pDeclarator>
+	:	'[' EToken_Integer ']'
+			{
+				$pDeclarator->AddArraySuffix ($2.m_Data.m_Integer);
+			}
+	|	'[' ']'
+			{
+				$pDeclarator->AddArraySuffix (0);
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+function_suffix <CDeclarator* $pDeclarator>
+	local
+	{
+		CDeclFunctionSuffix* $pFunctionSuffix;
+	}
+	enter
+	{
+		$pFunctionSuffix = $pDeclarator->AddFunctionSuffix ();
+	}
+	:	'(' function_formal_argument_list <$pFunctionSuffix> ')'
+	|	'(' ')'
+	;	
+
+function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
+	:	function_formal_argument <$pFunctionSuffix> 
+		(',' function_formal_argument <$pFunctionSuffix>)*
+	;
+
+function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
+	:	function_formal_argument_w_specifier <$pFunctionSuffix>
+	|	function_formal_argument_no_specifier <$pFunctionSuffix>
+	|	function_formal_argument_ellipsis <$pFunctionSuffix>
+	;
+
+function_formal_argument_w_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
+	local
+	{
+		CDeclarator $Declarator;
+	}
+	:	type_specifier_modifier_list $s
+			{
+				$Declarator.SetTypeSpecifier (&$s.m_TypeSpecifier);
+			}
+		declarator_prefix <&$Declarator>*
+		declarator_name <&$Declarator>?
+		declarator_suffix <&$Declarator>*
+		('=' expression_pass1 $i)?
+			{
+				return CreateFormalArg (
+					$pFunctionSuffix, 
+					&$Declarator, 
+					IsValidLocator ($i) ? &$i.m_TokenList : NULL
+					) != NULL;
+			}
+	;
+
+function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
+	local
+	{
+		CDeclarator $Declarator;
+	}
+	enter 
+	{
+		$Declarator.SetTypeSpecifier (NULL);
+	}
+	:	declarator_prefix <&$Declarator>+
+		declarator_name <&$Declarator>?
+		declarator_suffix <&$Declarator>*
+		('=' expression_pass1 $i)?
+			{
+				return CreateFormalArg (
+					$pFunctionSuffix,
+					&$Declarator,
+					IsValidLocator ($i) ? &$i.m_TokenList : NULL
+					) != NULL;
+			}
+	;
+
+function_formal_argument_ellipsis <CDeclFunctionSuffix* $pFunctionSuffix>
+	:	EToken_Unsafe $u? EToken_Ellipsis
+			{
+				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_VarArg;
+				if (IsValidLocator ($u))
+					$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_UnsafeVarArg;
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bitfield_suffix <CDeclarator* $pDeclarator>
+	:	':' EToken_Integer
+			{
+				return $pDeclarator->AddBitFieldSuffix ($2.m_Data.m_Integer);
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+post_declarator_modifier <CDeclarator* $pDeclarator>
+	:	EToken_Const
+			{
+				return $pDeclarator->SetPostDeclaratorModifier (EPostDeclaratorModifier_Const);
+			}
+	;
+
+//.............................................................................
