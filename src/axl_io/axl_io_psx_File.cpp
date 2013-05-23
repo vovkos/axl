@@ -47,7 +47,7 @@ CFile::GetPosition () const
 size_t
 CFile::Read (
 	void* p, 
-	ulong_t Size
+	size_t Size
 	) const
 {
 	size_t ActualSize = read (m_h, p, Size);

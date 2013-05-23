@@ -111,7 +111,7 @@ ConcatFilePath (
 		return *pFilePath;
 	}
 
-	char Last = *pFilePath [pFilePath->GetLength () - 1];
+	char Last = (*pFilePath) [pFilePath->GetLength () - 1];
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	if (Last != '\\' && Last != '/')

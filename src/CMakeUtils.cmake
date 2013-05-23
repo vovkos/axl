@@ -82,61 +82,10 @@ create_flag_list_regex
 endmacro ()
 
 macro (
-create_flag_setting_impl
-	_SETTING
-	_TARGET_FLAG_STRING
-	_DESCRIPTION
-	_REGEX
-	# ...
-	)
-
-	set (_FLAG_LIST ${ARGN})
-
-	string (
-		REGEX MATCH 
-		"${_REGEX}" 
-		_TARGET_SETTING_VALUE
-		"${${_TARGET_FLAG_STRING}}"
-		)
-
-	string (
-		STRIP
-		"${_TARGET_SETTING_VALUE}"
-		_TARGET_SETTING_VALUE
-		)
-
-	if (NOT ${_SETTING}) 
-		set (
-			${_SETTING} ${_TARGET_SETTING_VALUE}
-			CACHE STRING ${_DESCRIPTION}
-			)
-
-		set_property	(
-			CACHE 
-			${_SETTING}
-			PROPERTY STRINGS 
-			" " ${_FLAG_LIST}
-			)
-	else ()
-		if ("${_TARGET_SETTING_VALUE}" STREQUAL "")
-			set (${_TARGET_FLAG_STRING} "${${_TARGET_FLAG_STRING}} ${${_SETTING}}")
-		else  ()
-			string (
-				REGEX REPLACE 
-				"${_REGEX}" 
-				" ${${_SETTING}} " 
-				${_TARGET_FLAG_STRING} 
-				"${${_TARGET_FLAG_STRING}}"
-				)
-		endif ()
-	endif ()
-endmacro ()
-
-macro (
 create_flag_setting
-	_IS_PER_CONFIG
 	_SETTING
-	_TARGET_FLAG_STRING
+	_DEFAULT_VALUE
+	_TARGET_VARIABLE
 	_DESCRIPTION
 	# ...
 	)
@@ -145,24 +94,53 @@ create_flag_setting
 
 	create_flag_list_regex (_REGEX ${_FLAG_LIST})
 
-	if (${_IS_PER_CONFIG})
-		foreach (_CONFIG_TYPE ${CMAKE_CONFIGURATION_TYPES})
-			string (TOUPPER "${_CONFIG_TYPE}" _CONFIG_TYPE)
-			create_flag_setting_impl (
-				${_SETTING}_${_CONFIG_TYPE} 
-				${_TARGET_FLAG_STRING}_${_CONFIG_TYPE} 
-				${_DESCRIPTION} 
-				${_REGEX}
-				${_FLAG_LIST}
-				)
-		endforeach ()
+	string (
+		REGEX MATCH 
+		"${_REGEX}" 
+		_CURRENT_VALUE
+		"${${_TARGET_VARIABLE}}"
+		)
+
+	string (
+		STRIP
+		"${_CURRENT_VALUE}"
+		_CURRENT_VALUE
+		)
+
+	if (NOT ${_SETTING})
+		set (_FORCE FORCE)
 	else ()
-		create_flag_setting_impl (
-			${_SETTING} 
-			${_TARGET_FLAG_STRING}
-			${_DESCRIPTION} 
-			${_REGEX}
-			${_FLAG_LIST}
+		set (_FORCE)
+	endif ()
+
+	if ("${_DEFAULT_VALUE}" STREQUAL "")
+		set (
+			${_SETTING} ${_CURRENT_VALUE}
+			CACHE STRING ${_DESCRIPTION} ${_FORCE}
+			)
+	else ()
+		set (
+			${_SETTING} ${_DEFAULT_VALUE}
+			CACHE STRING ${_DESCRIPTION} ${_FORCE}
+			)
+	endif ()
+
+	set_property (
+		CACHE 
+		${_SETTING}
+		PROPERTY STRINGS 
+		" " ${_FLAG_LIST}
+		)
+
+	if ("${_CURRENT_VALUE}" STREQUAL "")
+		set (${_TARGET_VARIABLE} "${${_TARGET_VARIABLE}} ${${_SETTING}}")
+	else  ()
+		string (
+			REGEX REPLACE 
+			"${_REGEX}" 
+			" ${${_SETTING}} " 
+			${_TARGET_VARIABLE} 
+			"${${_TARGET_VARIABLE}}"
 			)
 	endif ()
 endmacro ()
@@ -171,64 +149,33 @@ endmacro ()
 
 macro (
 create_setting
-	_IS_PER_CONFIG
 	_SETTING
-	_DEFAULT
+	_DEFAULT_VALUE
 	_TYPE
 	_DESCRIPTION
 	# ...
 	)
 
-	if (${ARGC} GREATER 5)
+	if (NOT ${_SETTING})
+		set (_FORCE FORCE)
+	else ()
+		set (_FORCE)
+	endif ()
+
+	set (
+		${_SETTING} ${_DEFAULT_VALUE}
+		CACHE ${_TYPE} ${_DESCRIPTION} ${_FORCE}
+		)
+
+	if (${ARGC} GREATER 4)
 		set (_OPTION_LIST ${ARGN})
 
-		if (${_IS_PER_CONFIG})
-			foreach (_CONFIG_TYPE ${CMAKE_CONFIGURATION_TYPES})
-				string (TOUPPER "${_CONFIG_TYPE}" _CONFIG_TYPE)
-				set  (
-					${_SETTING}_${_CONFIG_TYPE} ${${_DEFAULT}_${_CONFIG_TYPE}}
-					CACHE ${_TYPE}
-					${_DESCRIPTION} 
-					)
-
-				set_property	(
-					CACHE 
-					${_SETTING}_${_CONFIG_TYPE} 
-					PROPERTY STRINGS 
-					${_OPTION_LIST}
-					)
-			endforeach ()
-		else ()
-			set (
-				${_SETTING} ${${_DEFAULT}}
-				CACHE ${_TYPE}
-				${_DESCRIPTION} 
-				)
-
-			set_property	(
-				CACHE 
-				${_SETTING}
-				PROPERTY STRINGS 
-				${_OPTION_LIST}
-				)
-		endif ()
-	else ()
-		if (${_IS_PER_CONFIG})
-			foreach (_CONFIG_TYPE ${CMAKE_CONFIGURATION_TYPES})
-				string (TOUPPER "${_CONFIG_TYPE}" _CONFIG_TYPE)
-				set  (
-					${_SETTING}_${_CONFIG_TYPE} ${${_DEFAULT}_${_CONFIG_TYPE}}
-					CACHE ${_TYPE}
-					${_DESCRIPTION} 
-					)
-			endforeach ()
-		else ()
-			set (
-				${_SETTING} ${${_DEFAULT}}
-				CACHE ${_TYPE}
-				${_DESCRIPTION} 
-				)
-		endif ()
+		set_property	(
+			CACHE 
+			${_SETTING}
+			PROPERTY STRINGS 
+			${_OPTION_LIST}
+			)
 	endif ()
 endmacro ()
 
