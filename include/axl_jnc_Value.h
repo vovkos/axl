@@ -571,9 +571,9 @@ enum EThinDataPtrValidator
 
 class CThinDataPtrValidator: public ref::IRefCount
 {
-protected:
 	friend class CValue;
 
+protected:
 	EThinDataPtrValidator m_ValidatorKind;
 
 	CValue m_ScopeValidatorValue;

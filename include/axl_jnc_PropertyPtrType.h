@@ -14,9 +14,9 @@ namespace jnc {
 
 class CPropertyPtrType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	EPropertyPtrType m_PtrTypeKind;
 	CPropertyType* m_pTargetType;
 
@@ -76,9 +76,9 @@ protected:
 
 class CPropertyPtrTypeTuple: public rtl::TListLink
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CStructType* m_pPtrStructType;
 	CStructType* m_pPtrStructType_w;
 	CStructType* m_pAuPtrStructType_t;

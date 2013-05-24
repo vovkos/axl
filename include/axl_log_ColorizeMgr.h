@@ -16,9 +16,9 @@ namespace log {
 
 class CColorizeMgr
 { 
-protected:
 	friend class CWidget;
 
+protected:
 	IColorizer* m_pColorizer;
 	CCacheMgr* m_pCacheMgr;
 

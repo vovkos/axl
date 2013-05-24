@@ -15,9 +15,9 @@ namespace log {
 
 class CColorizeTarget
 {
-protected:
 	friend class CColorizeMgr;
 
+protected:
 	gui::CTextAttrAnchorArray m_AttrArray;
 	size_t m_Metric;
 

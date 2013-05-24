@@ -15,8 +15,9 @@ class CModule;
 
 class CAttributeMgr: public rtl::TListLink
 {
-protected:
 	friend class CModule;
+
+protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CAttributeBlock> m_AttributeBlockList;

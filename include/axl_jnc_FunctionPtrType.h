@@ -16,9 +16,9 @@ class CMcSnapshotType;
 
 class CFunctionPtrType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	EFunctionPtrType m_PtrTypeKind;
 	CFunctionType* m_pTargetType;
 	CMulticastType* m_pMulticastType;
@@ -84,9 +84,9 @@ protected:
 
 class CFunctionPtrTypeTuple: public rtl::TListLink
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CStructType* m_pPtrStructType;
 	CStructType* m_pPtrStructType_w;
 	CFunctionPtrType* m_PtrTypeArray [2] [EFunctionPtrType__Count] [2]; // ref x kind x nullable

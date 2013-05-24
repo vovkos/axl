@@ -20,8 +20,9 @@ class CHandleTableT
 public:
 	class CEntry: public rtl::TListLink
 	{
-	protected:
 		friend class CHandleTableT;
+
+	protected:
 		handle_t m_Handle;
 
 	public:

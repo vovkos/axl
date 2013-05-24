@@ -32,8 +32,22 @@
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/JIT.h"
+#include "llvm/ExecutionEngine/JITEventListener.h"
 #include "llvm/Target/TargetData.h"
- 
+
+#include "../lib/MC/MCDisassembler/EDDisassembler.h"
+#include "../lib/MC/MCDisassembler/EDInst.h" 
+#include "../lib/MC/MCDisassembler/EDOperand.h"
+#include "../lib/MC/MCDisassembler/EDToken.h"
+
+#include "llvm/MC/MCAsmInfo.h"
+#include "llvm/MC/MCDisassembler.h"
+#include "llvm/MC/MCInst.h"
+#include "llvm/MC/MCInstPrinter.h"
+#include "llvm/MC/MCSubtargetInfo.h"
+
+#include "llvm/CodeGen/MachineCodeInfo.h"
+
 #pragma warning (default: 4146)
 #pragma warning (default: 4355) 
 #pragma warning (default: 4800)

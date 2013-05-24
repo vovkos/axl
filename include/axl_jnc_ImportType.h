@@ -14,9 +14,9 @@ namespace jnc {
 
 class CImportType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CQualifiedName m_Name;
 	rtl::CString m_QualifiedName;
 	CNamespace* m_pAnchorNamespace;

@@ -133,12 +133,12 @@ enum EStdFunc
 
 //.............................................................................
 
-class CFunctionMgr
+class CFunctionMgr: public llvm::JITEventListener
 {
-protected:
 	friend class CModule;
 	friend class CDerivableType;
 	friend class CClassType;
+	friend class CFunction;
 	friend class CParser;
 
 protected:
@@ -179,6 +179,10 @@ protected:
 protected:
 	CModule* m_pModule;
 
+	// unfortunately LLVM does not provide a slot for back-pointer from llvm::Function, hence the map
+
+	rtl::CHashTableMapT <llvm::Function*, CFunction*, rtl::CHashIdT <llvm::Function*> > m_LlvmFunctionMap; 
+
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CPropertyTemplate> m_PropertyTemplateList;
@@ -218,6 +222,13 @@ public:
 	GetCurrentFunction ()
 	{
 		return m_pCurrentFunction;
+	}
+
+	CFunction*
+	FindFunctionByLlvmFunction (llvm::Function* pLlvmFunction)
+	{
+		rtl::CHashTableMapIteratorT <llvm::Function*, CFunction*> It = m_LlvmFunctionMap.Find (pLlvmFunction);
+		return It ? It->m_Value : NULL;
 	}
 
 	CProperty*
@@ -498,6 +509,18 @@ protected:
 		EFunctionPtrType PtrTypeKind,
 		const char* pTag
 		);
+
+	// llvm::JITEventListener
+
+	virtual
+	void
+	NotifyFunctionEmitted (
+		const llvm::Function& LlvmFunction, 
+		void* p, 
+		size_t Size, 
+		const EmittedFunctionDetails& Details
+		);
+
 };
 
 //.............................................................................

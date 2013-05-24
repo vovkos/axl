@@ -18,9 +18,9 @@ class CPropertyPtrType;
 
 class CClosure: public ref::IRefCount
 {
-protected:
 	friend class CValue;
 
+protected:
 	rtl::CBoxListT <CValue> m_ArgList;
 
 public:

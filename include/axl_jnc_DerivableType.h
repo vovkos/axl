@@ -26,11 +26,11 @@ enum EBaseTypeFlag
 
 class CBaseType: public rtl::TListLink
 {
-protected:
 	friend class CDerivableType;
 	friend class CStructType;
 	friend class CClassType;
 
+protected:
 	CDerivableType* m_pType;
 
 	int m_Flags;

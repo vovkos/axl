@@ -26,12 +26,12 @@ class CAutoEv:
 	public CModuleItem,
 	public CNamespace
 {
-protected:
 	friend class CFunctionMgr;
 	friend class CClassType;
 	friend class CProperty;
 	friend class CParser;
 
+protected:
 	CAutoEvType* m_pType;
 	CFunction* m_pStarter;
 	CFunction* m_pStopper;

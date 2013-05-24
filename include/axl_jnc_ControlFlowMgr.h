@@ -82,7 +82,6 @@ enum EControlFlowFlag
 
 class CControlFlowMgr
 {
-protected:
 	friend class CModule;
 	friend class CFunctionMgr;
 

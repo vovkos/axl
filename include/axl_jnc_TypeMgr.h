@@ -33,9 +33,9 @@ class CModule;
 
 class CTypeMgr
 {
-protected:
 	friend class CModule;
 
+protected:
 	CModule* m_pModule;
 
 	CType m_PrimitiveTypeArray [EType__PrimitiveTypeCount];

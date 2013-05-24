@@ -60,7 +60,7 @@ void Disassembly::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
 }
 
 const QMetaObject Disassembly::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_Disassembly.data,
+    { &Editor::staticMetaObject, qt_meta_stringdata_Disassembly.data,
       qt_meta_data_Disassembly,  qt_static_metacall, 0, 0}
 };
 
@@ -75,12 +75,12 @@ void *Disassembly::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_Disassembly.stringdata))
         return static_cast<void*>(const_cast< Disassembly*>(this));
-    return QWidget::qt_metacast(_clname);
+    return Editor::qt_metacast(_clname);
 }
 
 int Disassembly::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWidget::qt_metacall(_c, _id, _a);
+    _id = Editor::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     return _id;

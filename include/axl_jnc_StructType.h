@@ -31,10 +31,10 @@ GetStdFieldString (EStdField Field);
 
 class CStructField: public CUserModuleItem
 {
-protected:
 	friend class CStructType;
 	friend class CUnionType;
 	
+protected:
 	CDerivableType* m_pParentType; // struct or union
 	CType* m_pType;
 	int m_PtrTypeFlags;
@@ -90,12 +90,12 @@ public:
 
 class CStructType: public CDerivableType
 {
-protected:
 	friend class CTypeMgr;
 	friend class CClassType;
 	friend class CProperty;
 	friend class CAutoEv;
 
+protected:
 	size_t m_AlignFactor;
 	size_t m_PackFactor;
 	size_t m_FieldActualSize;

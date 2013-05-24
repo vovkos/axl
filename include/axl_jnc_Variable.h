@@ -16,10 +16,10 @@ class CScope;
 
 class CVariable: public CUserModuleItem
 {
-protected:
 	friend class CVariableMgr;
 	friend class CParser;
 
+protected:
 	CType* m_pType;
 	int m_PtrTypeFlags;
 	rtl::CBoxListT <CToken> m_Initializer;

@@ -174,6 +174,7 @@ llvm_map_components_to_libraries (
 	LLVM_LIB_LIST 
 	jit 
 	native
+	MCDisassembler
 	)
 
 target_link_libraries (

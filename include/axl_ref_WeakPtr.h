@@ -25,13 +25,13 @@ class CPtrT;
 template <typename T>
 class CWeakPtrT
 {
-protected:
 	template <typename T2>
 	friend class CPtrT;
 
 	template <typename T2>
 	friend class CWeakPtrT;
 
+protected:
 	T* m_p;
 	IRefCount* m_pRefCount;
 

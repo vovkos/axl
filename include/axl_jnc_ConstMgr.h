@@ -13,8 +13,9 @@ namespace jnc {
 
 class CConstMgr
 {
-protected:
 	friend class CModule;
+
+protected:
 	CModule* m_pModule;
 
 	rtl::CBoxListT <CValue> m_ConstList;

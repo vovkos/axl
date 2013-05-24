@@ -76,9 +76,13 @@
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/JIT.h"
+#include "llvm/ExecutionEngine/JITEventListener.h"
 #include "llvm/Target/TargetData.h"
 
-#include <minmax.h>
+#include "../lib/MC/MCDisassembler/EDDisassembler.h"
+#include "../lib/MC/MCDisassembler/EDInst.h" 
+#include "../lib/MC/MCDisassembler/EDOperand.h"
+#include "../lib/MC/MCDisassembler/EDToken.h"
 
 #pragma warning (default: 4146)
 #pragma warning (default: 4355)
@@ -98,7 +102,9 @@
 #include "axl_jnc_Value.h"
 #include "axl_jnc_StdLib.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Disassembler.h"
 #include "../../axl_jnc/axl_jnc_Parser.llk.h"
+
 
 #include "axl_rtl_HexEncoding.h"
 

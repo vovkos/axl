@@ -16,8 +16,9 @@ class CClassType;
 
 class CVariableMgr
 {
-protected:
 	friend class CModule;
+
+protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CVariable> m_VariableList;

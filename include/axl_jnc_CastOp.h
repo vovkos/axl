@@ -60,6 +60,8 @@ CastOperator (
 
 struct ICastOperator: obj::IRoot
 {	
+	friend class COperatorMgr;
+
 	// {3B565CAF-8BA0-408F-9108-D28ECDEF518D}
 	AXL_OBJ_INTERFACE (
 		ICastOperator,
@@ -67,8 +69,6 @@ struct ICastOperator: obj::IRoot
 		)
 
 protected:
-	friend class COperatorMgr;
-
 	CModule* m_pModule;
 	int m_OpFlags;
 

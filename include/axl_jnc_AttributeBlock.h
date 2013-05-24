@@ -14,9 +14,9 @@ namespace jnc {
 
 class CAttribute: public CUserModuleItem
 {
-protected:
 	friend class CAttributeBlock;
 
+protected:
 	CValue* m_pValue;
 
 public:
@@ -36,9 +36,9 @@ public:
 
 class CAttributeBlock: public CUserModuleItem
 {
-protected:
 	friend class CAttributeMgr;
 
+protected:
 	CModuleItem* m_pParentItem;
 
 	rtl::CStdListT <CAttribute> m_AttributeList;

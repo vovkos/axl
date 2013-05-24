@@ -49,7 +49,8 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 	{
 		jnc::CFunctionType* pFunctionType = Function->GetType (); 
 
-		m_LogCtrl.Trace ("%s %s %s %s\r\n", 
+		m_LogCtrl.Trace (
+			"%s %s %s %s\r\n", 
 			pFunctionType->GetReturnType ()->GetTypeString (),
 			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
 			Function->m_Tag, 

@@ -51,10 +51,10 @@ enum
 
 class CNamespace: public CModuleItemDecl
 {
-protected:
 	friend class CNamespaceMgr;
 	friend class CParser;
 
+protected:
 	ENamespace m_NamespaceKind;
 	EAccess m_CurrentAccessKind;
 
@@ -188,7 +188,6 @@ class CGlobalNamespace:
 	public CModuleItem,
 	public CNamespace
 {
-protected:
 	friend class CNamespaceMgr;
 
 public:

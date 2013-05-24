@@ -74,7 +74,6 @@ GetFunctionKindFlags (EFunction FunctionKind);
 
 class CFunction: public CUserModuleItem
 {
-protected:
 	friend class CModule;
 	friend class CFunctionMgr;
 	friend class CDerivableType;
@@ -84,6 +83,7 @@ protected:
 	friend class CParser;
 	friend class CCast_FunctionPtr;
 
+protected:
 	EFunction m_FunctionKind;	
 
 	union
@@ -131,7 +131,11 @@ protected:
 	CScope* m_pScope;
 
 	llvm::Function* m_pLlvmFunction;
-	void* m_pf;
+	
+	// native machine code
+
+	void* m_pfMachineCode;
+	size_t m_MachineCodeSize;
 
 public:
 	CFunction ();
@@ -305,9 +309,15 @@ public:
 	GetLlvmFunction ();
 	
 	void*
-	GetFunctionPointer ()
+	GetMachineCode ()
 	{
-		return m_pf;
+		return m_pfMachineCode;
+	}
+
+	size_t 
+	GetMachineCodeSize ()
+	{
+		return m_MachineCodeSize;
 	}
 
 	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > 

@@ -14,38 +14,71 @@ LlvmIr::LlvmIr(QWidget *parent)
 
 bool LlvmIr::build(jnc::CModule *module)
 {
-	clear();
-	
-	rtl::CIteratorT<jnc::CFunction> function = module->m_FunctionMgr.GetFunctionList().GetHead ();
-	for (; function; function++) {
-		QString text;
-		text.sprintf("@%s ()", function->m_Tag.cc ());
-		appendPlainText(text);
+	clear ();
 
-		llvm::Function *llvmFunction = function->GetLlvmFunction();
-		llvm::Function::BasicBlockListType &blockList = llvmFunction->getBasicBlockList();
-		llvm::Function::BasicBlockListType::iterator block = blockList.begin();
+	uint_t CommentMdKind = module->m_LlvmBuilder.GetCommentMdKind ();
 
-		for (; block != blockList.end(); block++) {
-			text.sprintf("%s:", block->getName());
-			appendPlainText(text);
+	rtl::CIteratorT <jnc::CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
+	for (; Function; Function++)
+	{
+		jnc::CFunctionType* pFunctionType = Function->GetType (); 
 
-			llvm::BasicBlock::InstListType &instList = block->getInstList();
-			llvm::BasicBlock::InstListType::iterator instIt = instList.begin();
-			for (; instIt != instList.end(); instIt++) {
-				std::string string;
-				llvm::raw_string_ostream stream(string);
+		appendFormat ("%s %s %s %s\n", 
+			pFunctionType->GetReturnType ()->GetTypeString (),
+			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+			Function->m_Tag, 
+			pFunctionType->GetArgString ()
+			);
 
-				llvm::Instruction *inst = instIt;
-				inst->print(stream);
+		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
+		if (pExternFunction)
+		{
+			appendFormat ("  ->%s\n", pExternFunction->m_Tag);
+			appendFormat ("\n");
+			continue;
+		}
 
-				appendPlainText(string.c_str());
+		llvm::Function* pLlvmFunction = Function->GetLlvmFunction ();
+		llvm::Function::BasicBlockListType& BlockList = pLlvmFunction->getBasicBlockList ();
+		llvm::Function::BasicBlockListType::iterator Block = BlockList.begin ();
+
+		for (; Block != BlockList.end (); Block++)
+		{
+			std::string Name = Block->getName ();
+			appendFormat ("%s\n", Name.c_str ());
+
+			llvm::BasicBlock::InstListType& InstList = Block->getInstList ();
+			llvm::BasicBlock::InstListType::iterator& Inst = InstList.begin ();
+			for (; Inst != InstList.end (); Inst++)
+			{
+				std::string String;
+				llvm::raw_string_ostream Stream (String);
+
+				llvm::Instruction* pInst = Inst;
+
+				llvm::MDNode* pMdComment = pInst->getMetadata (CommentMdKind);
+				if (pMdComment)
+					pInst->setMetadata (CommentMdKind, NULL); // remove before print
+
+				pInst->print (Stream);
+
+				appendFormat ("%s\n", String.c_str ());
+
+				if (pMdComment)
+				{
+					pInst->setMetadata (CommentMdKind, pMdComment); // restore
+					llvm::MDString* pMdString = (llvm::MDString*) pMdComment->getOperand (0);
+					appendFormat ("\n; %s\n", pMdString->getString ().data ());
+				}
 			}
 		}
+
+		appendFormat ("\n........................................\n\n");
 	}
 
 	return true;
 }
+
 
 void LlvmIr::setupHighlighter()
 {

@@ -19,11 +19,11 @@ class CScope:
 	public CModuleItem,
 	public CNamespace
 {
-protected:
 	friend class CNamespaceMgr;
 	friend class CFunctionMgr;
 	friend class CParser;
 
+protected:
 	size_t m_Level;
 
 	CToken::CPos m_BeginPos;

@@ -34,9 +34,9 @@ enum EMcSnapshotMethod
 
 class CMcSnapshotType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CFunctionPtrType* m_pTargetType;
 	CStructType* m_pMcSnapshotStructType;
 	CStructField* m_FieldArray [EMcSnapshotField__Count];

@@ -2,6 +2,7 @@
 #include "axl_jnc_FunctionMgr.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Parser.llk.h"
+#include "axl_jnc_Disassembler.h"
 
 namespace axl {
 namespace jnc {
@@ -21,6 +22,7 @@ CFunctionMgr::CFunctionMgr ()
 void
 CFunctionMgr::Clear ()
 {
+	m_LlvmFunctionMap.Clear ();
 	m_FunctionList.Clear ();
 	m_PropertyList.Clear ();
 	m_PropertyTemplateList.Clear ();
@@ -1618,6 +1620,8 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	err::SetFormatStringError ("LLVM jitting is disabled");
 	return false;
 #endif
+
+	pExecutionEngine->RegisterJITEventListener (this);
 	
 	CScopeThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
@@ -1631,8 +1635,9 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 			continue;
 
 		try 
-		{
-			pFunction->m_pf = pExecutionEngine->getPointerToFunction (pFunction->GetLlvmFunction ());
+		{		
+			void* pf = pExecutionEngine->getPointerToFunction (pFunction->GetLlvmFunction ());
+			ASSERT (pFunction->m_pfMachineCode == pf && pFunction->m_MachineCodeSize != 0);
 		}
 		catch (err::CError Error)
 		{
@@ -1645,10 +1650,27 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 			return false;
 		}
 
-		ASSERT (pFunction->m_pf);
 	}
 
+	pExecutionEngine->UnregisterJITEventListener (this);
+
 	return true;
+}
+
+void
+CFunctionMgr::NotifyFunctionEmitted (
+	const llvm::Function& LlvmFunction, 
+	void* p, 
+	size_t Size, 
+	const EmittedFunctionDetails& Details
+	)
+{
+	CFunction* pFunction = FindFunctionByLlvmFunction ((llvm::Function*) &LlvmFunction);
+	if (pFunction)
+	{
+		pFunction->m_pfMachineCode = p;
+		pFunction->m_MachineCodeSize = Size;
+	}
 }
 
 CFunction*

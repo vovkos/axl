@@ -26,9 +26,9 @@ struct TReRepresent
 
 class CCacheMgr 
 { 	
-protected:
 	friend class CWidget;
 
+protected:
 	CWidget* m_pWidget;
 	CIndexMgr* m_pIndexMgr;
 

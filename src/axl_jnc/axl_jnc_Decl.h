@@ -96,9 +96,9 @@ enum EDeclSuffix
 
 class CDeclSuffix: public rtl::TListLink
 {
-protected:
 	friend class CDeclarator;
 
+protected:
 	EDeclSuffix m_SuffixKind;
 
 public:
@@ -123,9 +123,9 @@ public:
 
 class CDeclArraySuffix: public CDeclSuffix
 {
-protected:
 	friend class CDeclarator;
 
+protected:
 	size_t m_ElementCount;
 
 public:
@@ -146,10 +146,10 @@ public:
 
 class CDeclFunctionSuffix: public CDeclSuffix
 {
-protected:
 	friend class CDeclarator;
 	friend class CParser;
 
+protected:
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	int m_FunctionTypeFlags;
 
@@ -216,9 +216,9 @@ enum EDeclarator
 
 class CDeclarator: public CTypeModifiers
 {
-protected:
 	friend class CParser;
 
+protected:
 	EDeclarator m_DeclaratorKind;
 	EFunction m_FunctionKind;
 	EUnOp m_UnOpKind;

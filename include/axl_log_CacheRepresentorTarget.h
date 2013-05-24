@@ -17,12 +17,12 @@ namespace log {
 
 class CCacheRepresentorTarget: public IRepresentorTarget 
 {
+	friend class CCacheMgr;
+
 public:
 	AXL_OBJ_CLASS_0 (CCacheRepresentorTarget, IRepresentorTarget);
 
 protected:
-	friend class CCacheMgr;
-
 	CCachePage* m_pPage;
 	TCacheVolatilePacket* m_pVolatilePacket;
 	

@@ -16,9 +16,9 @@ namespace pg {
 
 class CModule
 {	
-protected:
 	friend class CParser;
 
+protected:
 	rtl::CArrayT <CNode*> m_ParseTable;
 	size_t m_LookaheadLimit;
 	size_t m_Lookahead;

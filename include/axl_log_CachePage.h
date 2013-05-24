@@ -38,11 +38,11 @@ struct TCacheVolatilePacket
 
 class CCachePage: public rtl::TListLink
 {
-protected:
 	friend class CCacheRepresentorTarget;
 	friend class CCacheMgr;
 	friend class CColorizeMgr;
 
+protected:
 	CCacheMgr* m_pCacheMgr;
 
 	rtl::CHashTableMapIteratorT <size_t, CCachePage*> m_CacheMapIt; // log index node -> cache page

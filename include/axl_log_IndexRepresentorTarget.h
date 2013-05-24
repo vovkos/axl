@@ -32,12 +32,11 @@ class CIndexRepresentorTarget:
 	public IRepresentorTarget,
 	public TIndexRepresentorTargetData
 {
+	friend class CIndexMgr;
+
 public:
 	AXL_OBJ_CLASS_0 (CIndexRepresentorTarget, IRepresentorTarget);
-
-protected:
-	friend class CIndexMgr;
-		
+	
 public:
 	virtual 
 	void 

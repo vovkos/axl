@@ -83,10 +83,10 @@ GetAccessKindString (EAccess AccessKind);
 
 class CModuleItemDecl
 {
-protected:
 	friend class CParser;
 	friend class CNamespace;
 
+protected:
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CToken::CPos m_Pos;

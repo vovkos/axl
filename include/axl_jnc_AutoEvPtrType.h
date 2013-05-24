@@ -14,9 +14,9 @@ namespace jnc {
 
 class CAutoEvPtrType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	EAutoEvPtrType m_PtrTypeKind;
 	CAutoEvType* m_pTargetType;
 
@@ -70,9 +70,9 @@ protected:
 
 class CAutoEvPtrTypeTuple: public rtl::TListLink
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CStructType* m_pPtrStructType;
 	CStructType* m_pPtrStructType_w;
 

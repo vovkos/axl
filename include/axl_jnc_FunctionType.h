@@ -97,9 +97,9 @@ GetFunctionPtrTypeKindFromModifiers (uint_t Modifiers)
 
 class CFunctionType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CType* m_pReturnType;
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	ECallConv m_CallConv;

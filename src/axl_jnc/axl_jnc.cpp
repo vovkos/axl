@@ -114,7 +114,7 @@ RunFunction (
 	)
 {
 	typedef int (*FFunction) ();
-	FFunction pf = (FFunction) pFunction->GetFunctionPointer ();
+	FFunction pf = (FFunction) pFunction->GetMachineCode ();
 	ASSERT (pf);
 
 	bool Result = true;

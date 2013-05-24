@@ -40,7 +40,42 @@ void CDasmPane::OnSize(UINT nType, int cx, int cy)
 bool
 CDasmPane::Build (jnc::CModule* pModule)
 {
-	Clear ();
+	jnc::CDisassembler Dasm;
+
+	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
+	for (; Function; Function++)
+	{
+		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+
+		m_LogCtrl.Trace (
+			"%s %s %s %s\r\n", 
+			pFunctionType->GetReturnType ()->GetTypeString (),
+			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+			Function->m_Tag, 
+			pFunctionType->GetArgString ()
+			);
+
+		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
+		if (pExternFunction)
+		{
+			m_LogCtrl.Trace ("  ->%s\r\n", pExternFunction->m_Tag);
+			m_LogCtrl.Trace ("\r\n");
+			continue;
+		}
+
+		void* pf = Function->GetMachineCode ();
+		size_t Size = Function->GetMachineCodeSize ();
+
+		if (pf)
+		{
+			rtl::CString s = Dasm.Disassemble (pf, Size);
+			m_LogCtrl.Trace ("\r\n%s", s);
+		}
+		
+
+		m_LogCtrl.Trace ("\r\n........................................\r\n\r\n");
+	}
+
 	return true;
 }
 

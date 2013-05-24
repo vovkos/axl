@@ -35,6 +35,7 @@ source_group (
 set (
 	FUNCTION_H_LIST
 	${AXL_INC_DIR}/axl_jnc_AutoEv.h
+	${AXL_INC_DIR}/axl_jnc_Disassembler.h
 	${AXL_INC_DIR}/axl_jnc_Function.h
 	${AXL_INC_DIR}/axl_jnc_FunctionMgr.h
 	${AXL_INC_DIR}/axl_jnc_Property.h
@@ -45,6 +46,7 @@ set (
 set (
 	FUNCTION_CPP_LIST
 	axl_jnc_AutoEv.cpp
+	axl_jnc_Disassembler.cpp
 	axl_jnc_Function.cpp
 	axl_jnc_FunctionMgr.cpp
 	axl_jnc_Property.cpp
@@ -498,6 +500,7 @@ if (AXL_BUILD_JNCC)
 		LLVM_LIB_LIST 
 		jit 
 		native
+		MCDisassembler
 		)
 
 	add_executable (

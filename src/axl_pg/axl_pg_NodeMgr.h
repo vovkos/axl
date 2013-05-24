@@ -13,12 +13,12 @@ namespace pg {
 
 class CNodeMgr
 {
-protected:
 	friend class CModule;
 	friend class CParser;
 	friend class CLaDfaBuilder;
 	friend class CParseTableBuilder;
 
+protected:
 	rtl::CHashTableMapT <int, CSymbolNode*, rtl::CHashIdT <int>, rtl::CCmpT <int> > m_TokenMap;
 	rtl::CStringHashTableMapT <CSymbolNode*> m_SymbolMap;
 

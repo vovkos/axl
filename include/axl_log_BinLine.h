@@ -33,12 +33,12 @@ struct TBinLinePart
 
 class CBinLine: public CLine 
 {
-protected:
 	friend class CColorizeMgr;
 	friend class CCachePage;
 	friend class CCacheRepresentorTarget;
 	friend class CWidget;
 
+protected:
 	size_t m_Offset;
 	rtl::CArrayT <uchar_t> m_BinData;
 	rtl::CArrayT <TBinLinePart> m_PartArray;
@@ -136,11 +136,11 @@ struct TLogBinTextMapEntry
 
 class CBinTextLine: public CBinLine 
 {
-protected:
 	friend class CCachePage;
 	friend class CCacheRepresentorTarget;
 	friend class CWidget;
 
+protected:
 	rtl::CString m_BinText;
 	rtl::CArrayT <TLogBinTextMapEntry> m_BinTextMap;
 

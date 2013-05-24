@@ -52,13 +52,13 @@ enum EStdCast
 
 class COperatorMgr
 {
-protected:
 	friend class CModule;
 	friend class CVariableMgr;
 	friend class CFunctionMgr;
 	friend class CParser;
 	friend class CCast_FunctionPtr;
 
+protected:
 	CModule* m_pModule;
 
 	// unary arithmetics

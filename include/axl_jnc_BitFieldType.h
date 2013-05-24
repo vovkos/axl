@@ -13,9 +13,9 @@ namespace jnc {
 
 class CBitFieldType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CType* m_pBaseType;
 	size_t m_BitOffset;
 	size_t m_BitCount;

@@ -16,9 +16,9 @@ class CScope;
 
 class CFunctionArg: public CUserModuleItem
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CType* m_pType;
 	int m_PtrTypeFlags;
 	rtl::CBoxListT <CToken> m_Initializer;
@@ -59,9 +59,9 @@ public:
 
 class CFunctionArgTuple: public rtl::TListLink
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CFunctionArg* m_ArgArray [2] [2]; // const x this
 
 public:

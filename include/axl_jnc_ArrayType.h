@@ -13,9 +13,9 @@ namespace jnc {
 
 class CArrayType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CType* m_pElementType;
 	CType* m_pRootType;
 	size_t m_ElementCount;

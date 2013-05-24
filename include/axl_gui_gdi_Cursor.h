@@ -17,7 +17,7 @@ namespace gdi {
 
 class CCursor: 
 	public ICursor,
-		public rtl::CHandleT <HCURSOR>
+	public rtl::CHandleT <HCURSOR>
 {
 	friend class CEngine;
 

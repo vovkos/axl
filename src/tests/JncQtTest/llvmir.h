@@ -2,7 +2,6 @@
 #define _LLVMIR_H
 
 #include "editor.h"
-#include "../../axl_jnc/axl_jnc_Parser.llk.h"
 
 class LlvmIrHighlighter;
 

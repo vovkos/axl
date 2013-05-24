@@ -230,11 +230,7 @@ void MainWindow::writeStatus(const QString &text, int timeout)
 
 void MainWindow::writeOutput_va(const char* format, va_list va)
 {
-	rtl::CString Text;
-	Text.Format_va (format, va);
-
-	output->moveCursor (QTextCursor::End);
-	output->insertPlainText(QString::fromUtf8 (Text, Text.GetLength ()));
+	output->appendFormat_va (format, va);
 	output->repaint ();
 }
 
@@ -340,11 +336,9 @@ bool MainWindow::compile ()
 
 	writeOutput("Parsing...\n");
 
-	//m_GlobalAstPane.Clear ();
-	//m_FunctionAstPane.Clear ();
 	modulePane->clear ();
 	llvmIr->clear ();
-	//m_DasmPane.Clear ();
+	disassembly->clear ();
 
 	QByteArray sourceBytes = child->toPlainText().toUtf8();
 
@@ -387,7 +381,6 @@ bool MainWindow::compile ()
 
 	// show module contents nevetheless
 
-	// m_GlobalAstPane.Build (Parser.GetAst ());
 	modulePane->build (&module, child);
 	llvmIr->build (&module);
 
@@ -409,7 +402,7 @@ bool MainWindow::compile ()
 		return false;
 	}
 
-	// m_DasmPane.Build (&module);
+	disassembly->build (&module);
 	writeOutput ("Done.\n");
 	child->setCompilationNeeded (false);
 	return true;
@@ -418,7 +411,7 @@ bool MainWindow::compile ()
 bool MainWindow::runFunction (jnc::CFunction* pFunction, int* pReturnValue)
 {
 	typedef int (*FFunction) ();
-	FFunction pf = (FFunction) pFunction->GetFunctionPointer ();
+	FFunction pf = (FFunction) pFunction->GetMachineCode ();
 	ASSERT (pf);
 
 	bool Result = true;

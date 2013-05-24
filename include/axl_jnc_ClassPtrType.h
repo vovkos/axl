@@ -13,9 +13,9 @@ namespace jnc {
 
 class CClassPtrType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	EClassPtrType m_PtrTypeKind;
 	CClassType* m_pTargetType;
 
@@ -56,9 +56,9 @@ protected:
 
 class CClassPtrTypeTuple: public rtl::TListLink
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CClassPtrType* m_PtrTypeArray [EClassPtrType__Count] [2] [2]; // ptrkind x const x nullable
 
 public:

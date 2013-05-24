@@ -62,13 +62,13 @@ struct TLineAttr: gui::TTextAttr
 
 class CLine
 {
-protected:
 	friend class CColorizeMgr;
 	friend class CCacheMgr;
 	friend class CCachePage;
 	friend class CCacheRepresentorTarget;
 	friend class CWidget;
 
+protected:
 	ELine m_LineKind;
 
 	CCachePage* m_pPage;
@@ -137,10 +137,10 @@ public:
 
 class CTextLine: public CLine
 {
-protected:
 	friend class CCacheRepresentorTarget;
 	friend class CWidget;
 
+protected:
 	gui::CHyperText m_HyperText;
 
 public:

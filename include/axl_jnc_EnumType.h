@@ -23,10 +23,10 @@ enum EEnumTypeFlag
 
 class CEnumConst: public CUserModuleItem
 {
-protected:
 	friend class CEnumType;
 	friend class CNamespace;
 
+protected:
 	CEnumType* m_pParentEnumType;
 	intptr_t m_Value;
 	rtl::CBoxListT <CToken> m_Expression;
@@ -80,10 +80,10 @@ public:
 
 class CEnumType: public CNamedType
 {
-protected:
 	friend class CTypeMgr;
 	friend class CParser;
 	
+protected:
 	CType* m_pBaseType;
 	rtl::CStdListT <CEnumConst> m_ConstList;
 	intptr_t m_CurrentValue;

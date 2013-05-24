@@ -17,10 +17,10 @@ class CClassType;
 
 class CNamespaceMgr
 {
-protected:
 	friend class CModule;
 	friend class CParser;
 
+protected:
 	CModule* m_pModule;
 
 	CGlobalNamespace m_GlobalNamespace;

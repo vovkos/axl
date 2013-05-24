@@ -42,9 +42,9 @@ enum EMulticastMethod
 
 class CMulticastType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CFunctionPtrType* m_pTargetType;
 	CStructType* m_pMulticastStructType;
 	CStructField* m_FieldArray [EMulticastField__Count];

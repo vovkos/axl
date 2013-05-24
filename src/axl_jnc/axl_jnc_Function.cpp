@@ -103,7 +103,8 @@ CFunction::CFunction ()
 	m_pBlock = NULL;
 	m_pScope = NULL;
 	m_pLlvmFunction = NULL;
-	m_pf = NULL;
+	m_pfMachineCode = NULL;
+	m_MachineCodeSize = 0;
 }
 
 llvm::Function* 
@@ -123,6 +124,7 @@ CFunction::GetLlvmFunction ()
 		m_pModule->m_pLlvmModule
 		);
 
+	m_pModule->m_FunctionMgr.m_LlvmFunctionMap [m_pLlvmFunction] = this;
 	return m_pLlvmFunction;
 }
 

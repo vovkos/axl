@@ -21,8 +21,9 @@ class CScope;
 
 class CLlvmBuilder
 {
-protected:
 	friend class CModule;
+
+protected:
 	CModule* m_pModule;
 
 	llvm::IRBuilder <> m_LlvmBuilder;

@@ -21,9 +21,9 @@ class CNamedType:
 	public CType,
 	public CNamespace
 {
-protected:
 	friend class CParser;
 
+protected:
 	CNamespace* m_pExtensionNamespace;
 
 public:

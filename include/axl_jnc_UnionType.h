@@ -17,10 +17,10 @@ class CUnionType;
 
 class CUnionType: public CDerivableType 
 {
-protected:
 	friend class CTypeMgr;
 	friend class CParser;
 
+protected:
 	rtl::CStdListT <CStructField> m_FieldList;
 	rtl::CArrayT <CStructField*> m_FieldArray;
 	CStructField* m_pInitializedField;

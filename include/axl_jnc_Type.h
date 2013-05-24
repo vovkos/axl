@@ -506,9 +506,9 @@ GetLlvmTypeString (llvm::Type* pLlvmType);
 
 class CType: public CModuleItem
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	EType m_TypeKind;
 	size_t m_Size;
 	int m_Flags;
@@ -708,9 +708,9 @@ protected:
 
 class CTypedef: public CUserModuleItem
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CType* m_pType;
 
 public:

@@ -63,11 +63,11 @@ PromoteClassPtrTypeModifiers (uint_t Modifiers);
 
 class CClassType: public CDerivableType
 {
-protected:
 	friend class CTypeMgr;
 	friend class CParser;
 	friend class CProperty;
 	
+protected:
 	CStructType* m_pIfaceStructType;
 	CStructType* m_pClassStructType;
 

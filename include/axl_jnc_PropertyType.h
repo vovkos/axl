@@ -78,9 +78,9 @@ GetPropertyPtrTypeKindFromModifiers (uint_t Modifiers)
 
 class CPropertyType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	rtl::CString m_TypeModifierString;
@@ -212,9 +212,9 @@ protected:
 
 class CPropertyTypeTuple: public rtl::TListLink
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [2] [3]; // callconv x const x autoget/autoset
 	CPropertyType* m_DataRefPropertyTypeArray [ECallConv__Count] [2]; // callconv x const
 

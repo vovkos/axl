@@ -44,9 +44,9 @@ GetAutoEvPtrTypeKindFromModifiers (uint_t Modifiers)
 
 class CAutoEvType: public CType
 {
-protected:
 	friend class CTypeMgr;
 
+protected:
 	CFunctionType* m_pStarterType;
 	CFunctionType* m_pStopperType;
 	CAutoEvType* m_pStdObjectMemberAutoEvType;

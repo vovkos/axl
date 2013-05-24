@@ -15,6 +15,22 @@ public:
 	void selectLine(int line, bool isHighlighted = false);	
 
 	int posFromLine(int line);
+
+	void appendFormat_va (const char* format, va_list va)
+	{
+		rtl::CString Text;
+		Text.Format_va (format, va);
+
+		moveCursor (QTextCursor::End);
+		insertPlainText (QString::fromUtf8 (Text, Text.GetLength ()));
+	}
+
+	void appendFormat (const char* format, ...)
+	{
+		va_list va;
+		va_start (va, format);
+		appendFormat_va (format, va);
+	}
 };
 
 #endif

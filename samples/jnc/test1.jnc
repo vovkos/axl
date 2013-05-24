@@ -1,6 +1,6 @@
 //.............................................................................
 
-foo (object o)
+stdcall foo (object o)
 {
 	object <int> a = o;
 	printf ("foo (%d)\n", a.value);

@@ -18,13 +18,13 @@ class CProperty:
 	public CModuleItem,
 	public CNamespace
 {
-protected:
 	friend class CTypeMgr;
 	friend class CDerivableType;
 	friend class CClassType;
 	friend class CFunctionMgr;
 	friend class CParser;
 
+protected:
 	CPropertyType* m_pType;
 	CType* m_pAuPropValueType; // before the type is calculated
 	uint_t m_TypeModifiers;    // before the type is calculated

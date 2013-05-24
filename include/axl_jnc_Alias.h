@@ -13,9 +13,9 @@ namespace jnc {
 
 class CAlias: public CUserModuleItem
 {
-protected:
 	friend class CVariableMgr;
 
+protected:
 	CType* m_pType;
 	rtl::CBoxListT <CToken> m_Initializer;
 	rtl::CString m_InitializerString;

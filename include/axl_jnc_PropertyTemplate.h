@@ -18,10 +18,10 @@ class CPropertyTemplate:
 	public CModuleItem,
 	public CNamespace
 {
-protected:
 	friend class CFunctionMgr;
 	friend class CParser;
 
+protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CPropertyVerifier m_Verifier;

@@ -144,29 +144,20 @@ add_executable (
 	${RES_RC_LIST}
 	)
 
+llvm_map_components_to_libraries (
+	LLVM_LIB_LIST 
+	jit 
+	native
+	MCDisassembler
+	)
+
 target_link_libraries (
 	JncMfcTest
 	axl_core
 	axl_io
 	axl_jnc
 	axl_parse
-	LLVMSupport
-	LLVMCore
-	LLVMAnalysis
-	LLVMSelectionDAG
-	LLVMTransformUtils
-	LLVMScalarOpts
-	LLVMInstCombine
-	LLVMExecutionEngine
-	LLVMJIT
-	LLVMCodeGen
-	LLVMTarget
-	LLVMMC
-	LLVMX86AsmPrinter
-	LLVMX86CodeGen
-	LLVMX86Desc
-	LLVMX86Info
-	LLVMX86Utils
+	${LLVM_LIB_LIST}
 	)
 
 if (AXL_USE_PCH)
