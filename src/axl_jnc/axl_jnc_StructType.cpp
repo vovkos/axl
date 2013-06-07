@@ -66,8 +66,7 @@ CStructType::CreateField (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	if (pType->GetTypeKind () == EType_Class)
-		pType = ((CClassType*) pType)->GetClassPtrType ();
+	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
 
 	CStructField* pField = AXL_MEM_NEW (CStructField);
 	pField->m_StorageKind = m_StorageKind;

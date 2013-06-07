@@ -22,6 +22,7 @@ class CClassType;
 class CPropertyType;
 class CProperty;
 class CAutoEv;
+class CJitEventListener;
 
 //.............................................................................
 
@@ -82,6 +83,7 @@ class CFunction: public CUserModuleItem
 	friend class CAutoEv;
 	friend class CParser;
 	friend class CCast_FunctionPtr;
+	friend class CJitEventListener;
 
 protected:
 	EFunction m_FunctionKind;	

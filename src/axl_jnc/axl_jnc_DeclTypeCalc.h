@@ -21,6 +21,9 @@ class CMulticastType;
 class CMcSnapshotType;
 class CAutoEvType;
 class CAutoEvPtrType;
+class CImportType;
+class CPrimaryImportType;
+class CSecondaryImportType;
 
 //.............................................................................
 
@@ -37,12 +40,28 @@ public:
 	CType*
 	CalcType (
 		CDeclarator* pDeclarator,
-		int* pDataPtrTypeFlags
+		uint_t* pDataPtrTypeFlags
+		);
+
+	CType*
+	CalcDataType (
+		CType* pType,
+		uint_t TypeModifiers,
+		uint_t* pDataPtrTypeFlags
+		);
+
+	CType*
+	CalcPtrType (
+		CType* pType,
+		uint_t TypeModifiers
 		);
 
 protected:
 	bool
 	CheckUnusedModifiers ();
+
+	uint_t 
+	GetDataPtrTypeFlags ();
 
 	CType*
 	GetIntegerType (CType* pType);
@@ -79,6 +98,9 @@ protected:
 
 	CAutoEvPtrType*
 	GetAutoEvPtrType (CAutoEvType* pAutoEvType);
+
+	CType*
+	GetImportPtrType (CImportType* pImportType);
 
 	CType*
 	PrepareReturnType (CType* pType);

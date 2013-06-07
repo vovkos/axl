@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_Parser.llk.h"
 #include "axl_jnc_StdLib.h"
+#include "axl_jnc_Disassembler.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_io_File.h"
 #include "axl_io_MappedFile.h"
@@ -41,7 +42,8 @@ void
 PrintVersion ()
 {
 	printf (
-		"Jancy compiler v%d.%d.%d\n",
+		"Jancy compiler (%s) v%d.%d.%d\n",
+		_AXL_CPU_STRING,
 		HIBYTE (HIWORD (EJnc_CompilerVersion)),
 		LOBYTE (HIWORD (EJnc_CompilerVersion)),
 		LOWORD (EJnc_CompilerVersion)
@@ -108,6 +110,30 @@ Compile (
 }
 
 bool 
+Jit (CModule* pModule)
+{
+	llvm::EngineBuilder EngineBuilder (pModule->m_pLlvmModule);	
+	std::string ErrorString;
+	EngineBuilder.setErrorStr (&ErrorString);	
+	
+#if (_AXL_CPU == AXL_CPU_X86)
+	EngineBuilder.setMArch ("x86");
+#endif
+
+	llvm::ExecutionEngine* pLlvmExecutionEngine = EngineBuilder.create ();
+	if (!pLlvmExecutionEngine)
+	{
+		err::SetFormatStringError ("Error creating a JITter (%s)\n", ErrorString.c_str ());
+		return false;
+	}
+
+	CStdLib::Export (pModule, pLlvmExecutionEngine);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) printf);
+	
+	return pModule->m_FunctionMgr.JitFunctions (pLlvmExecutionEngine);
+} 
+
+bool 
 RunFunction (
 	CFunction* pFunction, 
 	int* pReturnValue = NULL
@@ -147,25 +173,6 @@ Run (
 	)
 {
 	bool Result;
-	
-	llvm::EngineBuilder EngineBuilder (pModule->m_pLlvmModule);	
-	std::string ErrorString;
-	EngineBuilder.setErrorStr (&ErrorString);
-	EngineBuilder.setUseMCJIT(true);
-
-	llvm::ExecutionEngine* pLlvmExecutionEngine = EngineBuilder.create ();
-	if (!pLlvmExecutionEngine)
-	{
-		err::SetFormatStringError ("Error creating a JITter (%s)\n", ErrorString.c_str ());
-		return false;
-	}
-
-	CStdLib::Export (pModule, pLlvmExecutionEngine);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) printf);
-
-	Result = pModule->m_FunctionMgr.JitFunctions (pLlvmExecutionEngine);
-	if (!Result)
-		return false;
 
 	CModuleItem* pFunctionItem = pModule->m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pFunctionName);
 	if (!pFunctionItem || pFunctionItem->GetItemKind () != EModuleItem_Function)
@@ -266,6 +273,54 @@ PrintLlvmIr (
 	return true;
 }
 
+bool 
+PrintDisassembly (
+	jnc::CModule *module,
+	FILE* pFile
+	)
+{
+	jnc::CDisassembler Dasm;
+
+	rtl::CIteratorT <jnc::CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
+	for (; Function; Function++)
+	{
+		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+
+		fprintf (
+			pFile,
+			"%s %s %s %s\n", 
+			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
+			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+			Function->m_Tag.cc (), 
+			pFunctionType->GetArgString ().cc ()
+			);
+
+		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
+		if (pExternFunction)
+		{
+			fprintf (
+				pFile,
+				"  ->%s\n\n", 
+				pExternFunction->m_Tag.cc ()
+				);
+			continue;
+		}
+
+		void* pf = Function->GetMachineCode ();
+		size_t Size = Function->GetMachineCodeSize ();
+
+		if (pf)
+		{
+			rtl::CString s = Dasm.Disassemble (pf, Size);
+			fprintf (pFile, "\n%s", s.cc ());
+		}
+		
+		fprintf (pFile, "\n........................................\n\n");
+	}
+
+	return true;
+}
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -285,6 +340,10 @@ main (
 	bool Result;
 
 	llvm::InitializeNativeTarget ();
+	llvm::InitializeNativeTargetAsmParser ();
+	llvm::InitializeNativeTargetAsmPrinter ();
+	llvm::InitializeNativeTargetDisassembler ();
+
 	err::CParseErrorProvider::Register ();
 
 	// analyze command line
@@ -352,7 +411,10 @@ main (
 	rtl::CString SrcFilePath = io::GetFullFilePath (SrcFileName);
 
 	CModule Module;
-	Result = Compile (&Module, SrcFilePath, (const char*) p, (size_t) SrcFile.GetSize ());
+	Result = 
+		Compile (&Module, SrcFilePath, (const char*) p, (size_t) SrcFile.GetSize ()) &&
+		Jit (&Module);
+	
 	if (!Result)
 	{
 		printf ("%s\n", err::GetError ()->GetDescription ().cc ());
@@ -376,6 +438,7 @@ main (
 	else if (DstFileName.IsEmpty ())
 	{
 		PrintLlvmIr (&Module, stdout);
+		PrintDisassembly (&Module, stdout);
 	}
 	else
 	{
@@ -392,6 +455,7 @@ main (
 		}
 
 		PrintLlvmIr (&Module, pFile);
+		PrintDisassembly (&Module, pFile);
 		fclose (pFile);
 	}
 	

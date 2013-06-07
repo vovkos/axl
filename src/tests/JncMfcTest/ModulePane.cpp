@@ -512,23 +512,10 @@ GetNamespaceTip (jnc::CGlobalNamespace* pNamespace)
 	return rtl::CString::Format_s ("namespace %s", pNamespace->GetQualifiedName ());
 }
 
-inline
-jnc::CType* 
-UnImportType (jnc::CType* pType)
-{
-	if (pType->GetTypeKind () != jnc::EType_Import)
-		return pType;
-
-	jnc::CImportType* pImportType = (jnc::CImportType*) pType;
-	jnc::CType* pExternType = pImportType->GetExternType ();
-	return pExternType ? pExternType : pType;
-}
-
 rtl::CString
 GetVariableTip (jnc::CVariable* pVariable)
 {
 	jnc::CType* pType = pVariable->GetType ();
-	pType = UnImportType (pType);
 	
 	return rtl::CString::Format_s (
 		"%s %s (%d bytes)", 
@@ -600,7 +587,6 @@ rtl::CString
 GetStructFieldTip (jnc::CStructField* pMember)
 {
 	jnc::CType* pType = pMember->GetType ();
-	pType = UnImportType (pType);
 	
 	return rtl::CString::Format_s (
 		"%s %s.%s (%d bytes)", 

@@ -133,7 +133,7 @@ enum EStdFunc
 
 //.............................................................................
 
-class CFunctionMgr: public llvm::JITEventListener
+class CFunctionMgr
 {
 	friend class CModule;
 	friend class CDerivableType;
@@ -509,18 +509,6 @@ protected:
 		EFunctionPtrType PtrTypeKind,
 		const char* pTag
 		);
-
-	// llvm::JITEventListener
-
-	virtual
-	void
-	NotifyFunctionEmitted (
-		const llvm::Function& LlvmFunction, 
-		void* p, 
-		size_t Size, 
-		const EmittedFunctionDetails& Details
-		);
-
 };
 
 //.............................................................................

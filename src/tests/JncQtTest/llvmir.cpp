@@ -24,16 +24,16 @@ bool LlvmIr::build(jnc::CModule *module)
 		jnc::CFunctionType* pFunctionType = Function->GetType (); 
 
 		appendFormat ("%s %s %s %s\n", 
-			pFunctionType->GetReturnType ()->GetTypeString (),
+			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
 			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
-			Function->m_Tag, 
-			pFunctionType->GetArgString ()
+			Function->m_Tag.cc (), 
+			pFunctionType->GetArgString ().cc ()
 			);
 
 		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
 		if (pExternFunction)
 		{
-			appendFormat ("  ->%s\n", pExternFunction->m_Tag);
+			appendFormat ("  ->%s\n", pExternFunction->m_Tag.cc ());
 			appendFormat ("\n");
 			continue;
 		}
@@ -48,7 +48,7 @@ bool LlvmIr::build(jnc::CModule *module)
 			appendFormat ("%s\n", Name.c_str ());
 
 			llvm::BasicBlock::InstListType& InstList = Block->getInstList ();
-			llvm::BasicBlock::InstListType::iterator& Inst = InstList.begin ();
+			llvm::BasicBlock::InstListType::iterator Inst = InstList.begin ();
 			for (; Inst != InstList.end (); Inst++)
 			{
 				std::string String;

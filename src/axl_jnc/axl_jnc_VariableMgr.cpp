@@ -36,8 +36,7 @@ CVariableMgr::CreateVariable (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	if (pType->GetTypeKind () == EType_Class)
-		pType = ((CClassType*) pType)->GetClassPtrType ();
+	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
 
 	CVariable* pVariable = AXL_MEM_NEW (CVariable);
 	pVariable->m_pModule = m_pModule;
@@ -55,7 +54,6 @@ CVariableMgr::CreateVariable (
 
 	if (StorageKind == EStorage_Static)	
 	{
-		pVariable->m_pLlvmValue = CreateLlvmGlobalVariable (pType, QualifiedName);
 		m_GlobalVariableArray.Append (pVariable);
 
 		if (pInitializer)
@@ -68,8 +66,7 @@ CVariableMgr::CreateVariable (
 llvm::GlobalVariable*
 CVariableMgr::CreateLlvmGlobalVariable (
 	CType* pType,
-	const char* pTag,
-	bool IsThreadLocal
+	const char* pTag
 	)
 {
 	llvm::GlobalVariable* pLlvmValue = new llvm::GlobalVariable (
@@ -78,9 +75,7 @@ CVariableMgr::CreateLlvmGlobalVariable (
 		false,
 		llvm::GlobalVariable::ExternalLinkage,
 		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
-		pTag,
-		0,
-		IsThreadLocal
+		pTag
 		);
 
 	m_LlvmGlobalVariableArray.Append (pLlvmValue);
@@ -106,6 +101,22 @@ CVariableMgr::CreateAlias (
 	m_AliasList.InsertTail (pAlias);
 
 	return pAlias;
+}
+
+bool
+CVariableMgr::AllocateGlobalVariables ()
+{
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+	m_pScopeLevelVariable = CreateVariable (EStorage_Static, "ScopeLevel", "jnc.ScopeLevel", pType);
+
+	size_t Count = m_GlobalVariableArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = m_GlobalVariableArray [i];
+		pVariable->m_pLlvmValue = CreateLlvmGlobalVariable (pVariable->GetType (), pVariable->GetQualifiedName ());
+	}
+
+	return true;
 }
 
 bool
@@ -189,18 +200,6 @@ CVariableMgr::InitializeVariable (CVariable* pVariable)
 */
 
 	return true;
-}
-
-CVariable*
-CVariableMgr::GetScopeLevelVariable ()
-{
-	if (m_pScopeLevelVariable)
-		return m_pScopeLevelVariable;
-
-	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-	m_pScopeLevelVariable = CreateVariable (EStorage_Static, "ScopeLevel", "jnc.ScopeLevel", pType);
-
-	return m_pScopeLevelVariable;
 }
 
 //.............................................................................

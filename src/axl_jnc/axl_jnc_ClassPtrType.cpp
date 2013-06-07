@@ -22,8 +22,6 @@ GetClassPtrTypeKindString (EClassPtrType PtrTypeKind)
 		"undefined-class-ptr-kind";
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 uint_t
 PromoteClassPtrTypeModifiers (uint_t Modifiers)
 {
@@ -42,6 +40,64 @@ PromoteClassPtrTypeModifiers (uint_t Modifiers)
 		PromotedModifiers |= ETypeModifier_Unsafe_p;
 
 	return PromotedModifiers;
+}
+
+bool
+PromoteClassPtrTypeModifiers (uint_t* pModifiers)
+{
+	uint_t Modifiers = *pModifiers;
+	if (!(Modifiers & ETypeModifierMask_ClassPtr))
+		return true;
+
+	uint_t PromotedModifiers = PromoteClassPtrTypeModifiers (Modifiers);
+	if (Modifiers & PromotedModifiers)
+	{
+		err::SetFormatStringError ("type modifier '%s' used more than once", GetTypeModifierString (Modifiers & PromotedModifiers));
+		return false;
+	}
+
+	*pModifiers |= PromotedModifiers;
+	*pModifiers &= ~ETypeModifierMask_ClassPtr;
+	return true;
+}
+
+uint_t
+DemoteClassPtrTypeModifiers (uint_t Modifiers)
+{
+	uint_t DemotedModifiers = 0;
+
+	if (Modifiers & ETypeModifier_Nullable_p)
+		DemotedModifiers |= ETypeModifier_Nullable;
+
+	if (Modifiers & ETypeModifier_Const_p)
+		DemotedModifiers |= ETypeModifier_Const;
+
+	if (Modifiers & ETypeModifier_Weak_p)
+		DemotedModifiers |= ETypeModifier_Weak;
+
+	if (Modifiers & ETypeModifier_Unsafe_p)
+		DemotedModifiers |= ETypeModifier_Unsafe;
+
+	return DemotedModifiers;
+}
+
+bool
+DemoteClassPtrTypeModifiers (uint_t* pModifiers)
+{
+	uint_t Modifiers = *pModifiers;
+	if (!(Modifiers & ETypeModifierMask_ClassPtr_p))
+		return true;
+
+	uint_t DemotedModifiers = DemoteClassPtrTypeModifiers (Modifiers);
+	if (Modifiers & DemotedModifiers)
+	{
+		err::SetFormatStringError ("type modifier '%s' used more than once", GetTypeModifierString (Modifiers & DemotedModifiers));
+		return false;
+	}
+
+	*pModifiers |= DemotedModifiers;
+	*pModifiers &= ~ETypeModifierMask_ClassPtr_p;
+	return true;
 }
 
 //.............................................................................

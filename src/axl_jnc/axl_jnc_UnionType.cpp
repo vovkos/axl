@@ -24,6 +24,8 @@ CUnionType::CreateField (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
+	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
+
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
 	{
 		err::SetFormatStringError ("non-POD '%s' cannot be union member", pType->GetTypeString ().cc ());

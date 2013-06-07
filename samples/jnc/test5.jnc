@@ -44,8 +44,8 @@ int g_Parity;
 int g_Baud2;
 int g_Parity2;
 
-int bindable property PBaud;
-int bindable property PParity;
+int bindable property Baud;
+int bindable property Parity;
 
 int
 PBaud.get ()
@@ -75,29 +75,71 @@ PParity.set (int Value)
 
 //.............................................................................
 
-autoev ASerialRule
+autoev ASerialAutoEv (
+	int x,
+	int y
+	)
 {
 	g_Baud2 = PBaud * 10;
 	g_Parity2 = PParity * 100;
-};
+}
 
-int
+const C* c;
+
+thin multicast ();
+weak multicast * ();
+unsafe multicast
+
+event 
+weak multicast
+
+typedef unsafe cdecl multicast* class* pMOnClick () = ;
+
+weak event* OnCick
+
+MOnClick m_OnClick;
+
+ASerialAutoEv* g_pAutoEv = new ASerialAutoEv (1, 2);
+
+const C* x;
+const 
+
+typedef int thin function* event* X (): ;
+
+typedef 
+
+multicast F x;
+typedef multicast F
+
+event F;
+
+String*
 main ()
 {
-	ASerialRule ppp = stack new ASerialRule;
+	String* s;
+	s += ;
+	return s;
+
+	ASerialAutoEv ppp (1, 2); = stack new CSerialAutoEv;
 
 	int x = 10;
 
 	printf ("hui\n");
 
-	event
-	OnMouseClick (
+	const C a;
+	const S b = { 1, 2 };
+
+	MOnChange* p = stack new MOnChange;
+
+	unsafe 
+	multicast
+	pOnMouseClick (
 		int x, 
 		int y
-		);
+		) = new multicast (int, int);
 
-	OnMouseClick = test;
-	OnMouseClick += test2;
+	pOnMouseClick := test;
+	pOnMouseClick += test2;
 
 	OnMouseClick (10, 20);
 
@@ -113,4 +155,291 @@ main ()
 	return 0;
 }
 
+readonly int x;
+readonly int property
+
+void thin function* multicast OnClick ();
+
+const int x: int;
+const event const unsafe OnClick (): multicast () = member new multicast ();
+
+const String* Name: String;
+
+const C f;
+
+autoev AFoo
+{	
+}
+
+weak function* multicast MOnClick ();
+
+const int x <int>;
+
+const int*
+foo () 
+
+autoev A ()
+{
+}
+
+A a;
+this ()
+
+weak multicast Multi
+
+class C
+{
+protected:
+	enum EFlag_p
+	{
+		ReadOnly,
+		Exclusive,
+		DeleteOnClose,
+	}	
+
+public:
+	janitor EFlag: EFlag_p
+	{
+	protected:
+		Exclusive,
+		DeleteOnClose;
+
+	public:
+		ReadOnly
+	}
+   
+	xconst int Hwnd;
+	
+	weak function* event MOnClick ();
+
+	dual (const int : int) int Hwnd;
+
+	const int x is int;
+	const char int! Flags;
+
+	weak function* dual (event : multicast)* const OnClick () = new;
+	weak function* dual event OnClick ();
+
+        event OnClick ();
+	multicast M ();
+
+	M = x;
+
+
+	dual const int* 
+	foo (dual)
+
+	dual <const EFlag : EFlag_p> Flags;
+
+	dual <event : multicast>* OnClick () = member new;
+
+	xconst String* const m_pName = new String;
+	xevent PFOnClick* const m_pOnClick = new multicast PFOnClick;
+        
+	foo (const String* s)
+	{       
+
+		m_pName := "grrr";
+		m_pName := s; // <--		
+		String* p = s;
+	}
+	
+}
+
+foo ("pizda")
+
+typedef weak function* PFOnClick ();
+
+public:
+	event PFOnClick* const pOnClick is multicast PFOnClick* = member new multicast PFOnClick;
+
+	xconst int x [10]
+	xconst int* xconst p;
+
+ 	readonly String* readonly m_pName;
+	readonly List* readonly m_pList;
+
+	const String* const m_pName is String* = "sssuka";
+	String* S = $"gr$i";
+
+	m_pName = "suka suka";
+
+	int propvalue;
+	weak event onchange () = member new weak function* multicast ()
+
+	String s;
+
+	const String* s2;
+	unsafe String* 
+        
+	s = "hui";
+	s2 := 
+
+	const String s ();
+
+	const char* s.sp ();
+	const unsafe char* s.up ();
+
+	xconst == dual (const | )
+	xconst String s;
+
+	String* p = s;
+	
+
+
+typedef weak function* onchange_t ();
+
+const String* autoget property Name;
+
+event OnChange ();
+
+unsafe multicast unsafe* p
+unsafe cdecl function*
+
+
+String s := $"foo";
+
+s += '/';
+
+unsafe function* event m_OnClick ();
+
+unsafe function* event OnClick ();
+unsafe event* OnClick
+
+weak function* event m_OnClick ();
+
+
+autoev ALoo ()
+{
+}
+
+class 
+	dual (C | J)* x = new;
+
+janitor J: C
+{
+protected: 
+	*
+public:    
+	Read, Write;
+}
+
+
+typedef event X ();
+        
+property Foo
+{
+	const String* const x;
+
+	auto s = new String;
+	
+	C* s = 
+
+	const dual (const int | int)* A;
+
+	dual Foo:
+		int function ()
+		int function ()
+	{
+	}
+
+	readonly int property Grrr;
+
+	readonly List* readonly m_A = new;
+	readonly String* const m_A dual String* = new;
+	event OnClick ()
+                        
+	auto s = stack new String;
+	s := "bzzzzzz";
+
+	readonly String* const propvalue = member new;
+	%(const) String* const propvalue = member new;
+
+	dual (const String*, String*)
+	dual const int Foo [4] / int;
+
+	dual (const)
+	dual (int, unsigned int)
+
+	weak function* xevent* const pOnChange () = member new;
+	weak function* dual (event, multicast)* const pOnChange () = member new;
+
+	weak event OnChange ();
+
+	dual (JanitorList, )
+
+	set (int i)
+	{
+		propvalue := uheap $"integer $i";
+	}
+	
+	set (double f)
+	{
+		propvalue := $"double $f";
+	}
+
+
+	typedef weak function* onchange_t ();
+
+	const String* const m_pName = member new String ("suka");
+
+	onchange_t event* const onchange is member new onchange_t multicast;
+        
+	weak function* event onchange ();
+
+	weak function* event* const onchange () is 
+	weak function* multicast* () = 
+	member new weak function* multicast ();
+
+	weak function* eventx 
+	constx	
+};
+
+
+const_dt
+const_cl
+
+weak_cl
+weak_fn
+weak_pr
+
+thin
+thin_fn
+thin_pr
+
+const String p;
+
+autoev Foo ()
+{
+}
+
+thin multicast Foo ();
+
+thin multicast Foo (int);
+
+thin event Foo (int);
+autoev Foo (int);
+
+String* p;
+
+event*
+
+
+unsafe_c
+unsafe_d
+unsafe_f
+unsafe_p
+
 //.............................................................................
+
+class C
+{
+	event* 
+	OnChange (): multicast ();
+}
+
+foo ()
+{
+	CString* s = static new String;
+	
+}

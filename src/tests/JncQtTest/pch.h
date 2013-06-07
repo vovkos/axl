@@ -44,7 +44,7 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 #include "llvm/PassManager.h"
-#include "llvm/Support/IRBuilder.h"
+#include "llvm/IRBuilder.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/raw_ostream.h"
@@ -55,7 +55,6 @@
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/JIT.h"
 #include "llvm/ExecutionEngine/JITEventListener.h"
-#include "llvm/Target/TargetData.h"
 
 #include "../lib/MC/MCDisassembler/EDDisassembler.h"
 #include "../lib/MC/MCDisassembler/EDInst.h" 

@@ -29,10 +29,15 @@ ByteReader (
 CDisassembler::CDisassembler ()
 {
 	m_pDisassembler = llvm::EDDisassembler::getDisassembler (
-		llvm::Triple::x86, 
+#if (_AXL_CPU == AXL_CPU_X86)
+		llvm::Triple::x86,
+#elif (_AXL_CPU == AXL_CPU_AMD64)
+		llvm::Triple::x86_64,
+#endif
 		llvm::EDDisassembler::kEDAssemblySyntaxX86ATT 
 		// llvm::EDDisassembler::kEDAssemblySyntaxX86Intel -- does not work!
 		);
+	ASSERT (m_pDisassembler);
 }
 
 bool 
@@ -71,7 +76,7 @@ CDisassembler::Disassemble (
 			pString->Append (pTokenString);
 		}
 
-		pString->Append ("\r\n");
+		pString->Append ("\n");
 
 		Address += (size_t) pInst->byteSize ();
 		delete pInst;

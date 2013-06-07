@@ -67,12 +67,18 @@
 #			define _AXL_CPU AXL_CPU_AMD64
 #		endif
 #	endif
-#	ifndef _AXL_CPU
-#		error Unsupported processor
-#	endif
-#elif (_AXL_CPU != AXL_CPU_X86 && _AXL_CPU != AXL_CPU_AMD64)
+#endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#if (_AXL_CPU == AXL_CPU_X86)
+#	define _AXL_CPU_STRING "x86"
+#elif (_AXL_CPU == AXL_CPU_AMD64)
+#	define _AXL_CPU_STRING "amd64"
+#else
 #	error _AXL_CPU is set to unknown CPU arch id
 #endif
+
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

@@ -400,9 +400,8 @@ COperatorMgr::CastOperator (
 {
 	bool Result;
 
-	if (pType->GetTypeKind () == EType_Class) 
-		pType = ((CClassType*) pType)->GetClassPtrType ();
-
+	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
+	
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 
@@ -457,8 +456,7 @@ COperatorMgr::GetCastKind (
 	CType* pType
 	)
 {
-	if (pType->GetTypeKind () == EType_Class) 
-		pType = ((CClassType*) pType)->GetClassPtrType ();
+	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
 
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
@@ -695,6 +693,12 @@ COperatorMgr::PrepareOperandType (
 				Value = ((CEnumType*) pType)->GetBaseType ();
 
 			break;
+
+		case EType_Import:
+			if (!(OpFlags & EOpFlag_KeepImport))
+				Value = ((CImportType*) pType)->GetActualType ();
+
+			break;
 		}
 
 		if (Value.GetType () == pType)
@@ -788,6 +792,12 @@ COperatorMgr::PrepareOperand (
 		case EType_Enum:
 			if (!(OpFlags & EOpFlag_KeepEnum))
 				Value.OverrideType (((CEnumType*) pType)->GetBaseType ());
+
+			break;
+
+		case EType_Import:
+			if (!(OpFlags & EOpFlag_KeepImport))
+				Value.OverrideType (((CImportType*) pType)->GetActualType ());
 
 			break;
 		}

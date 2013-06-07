@@ -16,10 +16,9 @@ int main (int argc, char *argv[])
 	QCoreApplication::setApplicationName("JancyEdit");
 
 	llvm::InitializeNativeTarget ();
-	llvm::InitializeAllTargetInfos();
-	llvm::InitializeAllTargetMCs();
-	llvm::InitializeAllAsmParsers();
-	llvm::InitializeAllDisassemblers();
+	llvm::InitializeNativeTargetAsmParser ();
+	llvm::InitializeNativeTargetAsmPrinter ();
+	llvm::InitializeNativeTargetDisassembler ();
 
 	err::CParseErrorProvider::Register ();
 

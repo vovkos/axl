@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_TypeMgr.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_DeclTypeCalc.h"
 
 namespace axl {
 namespace jnc {
@@ -40,7 +41,8 @@ CTypeMgr::Clear ()
 	m_ClassPtrTypeList.Clear ();
 	m_FunctionPtrTypeList.Clear ();
 	m_PropertyPtrTypeList.Clear ();
-	m_ImportTypeList.Clear ();
+	m_PrimaryImportTypeList.Clear ();
+	m_SecondaryImportTypeList.Clear ();
 
 	m_PropertyTypeTupleList.Clear ();
 	m_DataPtrTypeTupleList.Clear ();
@@ -135,14 +137,19 @@ CTypeMgr::GetStdType (EStdType StdType)
 bool
 CTypeMgr::ResolveImportTypes ()
 {
-	rtl::CIteratorT <CImportType> ImportType = m_ImportTypeList.GetHead ();
-	for (; ImportType; ImportType++)
+	bool Result;
+
+	char Buffer [256];
+	rtl::CArrayT <CPrimaryImportType*> SuperImportTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+
+	rtl::CIteratorT <CPrimaryImportType> PriImportType = m_PrimaryImportTypeList.GetHead ();
+	for (; PriImportType; PriImportType++)
 	{
-		CImportType* pImportType = *ImportType;
+		CPrimaryImportType* pImportType = *PriImportType;
 		CModuleItem* pItem = pImportType->m_pAnchorNamespace->FindItemTraverse (pImportType->m_Name);
 		if (!pItem)
 		{
-			err::SetFormatStringError ("unresolved import '%s'", pImportType->m_Name.GetFullName ().cc ());
+			err::SetFormatStringError ("unresolved import '%s'", pImportType->GetTypeString ().cc ());
 			return false;
 		}
 
@@ -150,17 +157,77 @@ CTypeMgr::ResolveImportTypes ()
 		switch (ItemKind)
 		{
 		case EModuleItem_Type:
-			pImportType->m_pExternType = (CType*) pItem;
+			pImportType->m_pActualType = (CType*) pItem;
 			break;
 
 		case EModuleItem_Typedef:
-			pImportType->m_pExternType = ((CTypedef*) pItem)->GetType ();
+			pImportType->m_pActualType = ((CTypedef*) pItem)->GetType ();
+			if (pImportType->m_pActualType->GetTypeKind () == EType_Import)
+				SuperImportTypeArray.Append (pImportType);
 			break;
 
 		default:
-			err::SetFormatStringError ("'%s' is not a type", pImportType->m_Name.GetFullName ().cc ());
+			err::SetFormatStringError ("'%s' is not a type", pImportType->GetTypeString ().cc ());
 			return false;
 		}
+	}
+
+	// eliminate super-imports and detect import loops
+
+	size_t Count = SuperImportTypeArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CPrimaryImportType* pSuperImportType = SuperImportTypeArray [i];
+		pSuperImportType->m_Flags |= ETypeFlag_ImportLoop;
+	
+		CType* pType = pSuperImportType->m_pActualType;
+		while (pType->m_TypeKind == EType_Import)
+		{
+			CImportType* pImportType = (CImportType*) pType;
+			if (pImportType->m_Flags & ETypeFlag_ImportLoop)
+			{
+				err::SetFormatStringError ("'%s': import loop detected", pImportType->GetTypeString ().cc ());
+				return false;
+			}
+
+			pImportType->m_Flags |= ETypeFlag_ImportLoop;
+			pType = pImportType->m_pActualType;
+		}
+
+		CType* pExternType = pType;
+		while (pType->m_TypeKind == EType_Import)
+		{
+			CImportType* pImportType = (CImportType*) pType;
+			pImportType->m_pActualType = pExternType;
+			pImportType->m_Flags &= ~ETypeFlag_ImportLoop;
+			pType = pImportType->m_pActualType;
+		}
+	}
+
+	rtl::CIteratorT <CSecondaryImportType> SecImportType = m_SecondaryImportTypeList.GetHead ();
+	for (; SecImportType; SecImportType++)
+	{
+		CSecondaryImportType* pImportType = *SecImportType;
+		CType* pType = pImportType->m_pPrimaryImportType->m_pActualType;
+		uint_t TypeModifiers = pImportType->m_TypeModifiers;
+
+		if (pType->GetTypeKind () != EType_Class && (TypeModifiers & ETypeModifierMask_ClassPtr_p) != 0)
+		{	
+			Result = DemoteClassPtrTypeModifiers (&TypeModifiers);
+			if (!Result)
+				return false;
+		}
+
+		CDeclTypeCalc TypeCalc;
+
+		pType = pImportType->GetImportTypeKind () == EImportType_Pointer ? 
+			TypeCalc.CalcPtrType (pType, TypeModifiers) : 
+			TypeCalc.CalcDataType (pType, TypeModifiers, NULL);
+
+		if (!pType)
+			return false;
+
+		pImportType->m_pActualType = pType;
 	}
 
 	return true;
@@ -238,6 +305,8 @@ CTypeMgr::GetArrayType (
 	size_t ElementCount
 	)
 {
+	pElementType = PrepareDataType (pElementType);
+
 	rtl::CString Signature = CArrayType::CreateSignature (pElementType, ElementCount);
 
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
@@ -466,8 +535,7 @@ CTypeMgr::CreateFunctionArg (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	if (pType->GetTypeKind () == EType_Class)
-		pType = ((CClassType*) pType)->GetClassPtrType ();
+	pType = PrepareDataType (pType);
 
 	CFunctionArg* pFunctionArg = AXL_MEM_NEW (CFunctionArg);
 	pFunctionArg->m_pModule = m_pModule;
@@ -490,8 +558,7 @@ CTypeMgr::GetSimpleFunctionArg (
 	int PtrTypeFlags
 	)
 {
-	if (pType->GetTypeKind () == EType_Class)
-		pType = ((CClassType*) pType)->GetClassPtrType ();
+	pType = PrepareDataType (pType);
 
 	CFunctionArgTuple* pTuple = GetFunctionArgTuple (pType);
 
@@ -518,6 +585,8 @@ CTypeMgr::GetFunctionType (
 {
 	if (!pReturnType)
 		pReturnType = GetPrimitiveType (EType_Void);
+
+	pReturnType = PrepareDataType (pReturnType);
 
 	rtl::CString Signature = CFunctionType::CreateSignature (
 		CallConv, 
@@ -1430,27 +1499,79 @@ CTypeMgr::GetAutoEvPtrStructType_w (CAutoEvType* pAutoEvType)
 	return pTuple->m_pPtrStructType_w;
 }
 
-CImportType*
-CTypeMgr::GetImportType (
+CPrimaryImportType*
+CTypeMgr::GetPrimaryImportType (
 	const CQualifiedName& Name,
 	CNamespace* pAnchorNamespace
 	)
 {
-	rtl::CString Signature;
-	Signature.Format ("Z%s.%s", pAnchorNamespace->GetQualifiedName ().cc (), Name.GetFullName ().cc ());
+	rtl::CString Signature = CPrimaryImportType::CreateSignature (Name, pAnchorNamespace);
 	
 	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CImportType*) It->m_Value;
+		return (CPrimaryImportType*) It->m_Value;
 
-	CImportType* pType = AXL_MEM_NEW (CImportType);
+	CPrimaryImportType* pType = AXL_MEM_NEW (CPrimaryImportType);
 	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
 	pType->m_Name = Name;
 	pType->m_pAnchorNamespace = pAnchorNamespace;
-	pType->m_pModule = m_pModule;
+	pType->m_pModule = m_pModule;	
 
-	m_ImportTypeList.InsertTail (pType);
+	m_PrimaryImportTypeList.InsertTail (pType);
 	It->m_Value = pType;
+
+	return pType;
+}
+
+CSecondaryImportType*
+CTypeMgr::GetSecondaryImportType (	
+	EImportType ImportTypeKind,
+	CPrimaryImportType* pPrimaryImportType,
+	uint_t TypeModifiers
+	)
+{
+	rtl::CString Signature = CSecondaryImportType::CreateSignature (
+		ImportTypeKind, 
+		pPrimaryImportType, 
+		TypeModifiers
+		);
+	
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CSecondaryImportType*) It->m_Value;
+
+	CSecondaryImportType* pType = AXL_MEM_NEW (CSecondaryImportType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_ImportTypeKind = ImportTypeKind;
+	pType->m_pPrimaryImportType = pPrimaryImportType;
+	pType->m_TypeModifiers = TypeModifiers;
+
+	m_SecondaryImportTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
+	return pType;
+}
+
+CType*
+CTypeMgr::PrepareDataType (CType* pType)
+{
+	if (pType->GetTypeKind () == EType_Import)
+	{
+		CImportType* pImportType = (CImportType*) pType;
+		if (!pImportType->IsResolved ())
+		{
+			return pImportType->GetImportTypeKind () == EImportType_Primary ? 
+				GetSecondaryImportType (EImportType_Data, (CPrimaryImportType*) pImportType) : 
+				pImportType;
+		}
+
+		pType = pImportType->GetActualType ();
+	}
+
+	if (pType->GetTypeKind () == EType_Class)
+		return GetClassPtrType ((CClassType*) pType);
 
 	return pType;
 }

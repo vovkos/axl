@@ -23,16 +23,16 @@ bool Disassembly::build(jnc::CModule *module)
 
 		appendFormat (
 			"%s %s %s %s\n", 
-			pFunctionType->GetReturnType ()->GetTypeString (),
+			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
 			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
-			Function->m_Tag, 
-			pFunctionType->GetArgString ()
+			Function->m_Tag.cc (), 
+			pFunctionType->GetArgString ().cc ()
 			);
 
 		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
 		if (pExternFunction)
 		{
-			appendFormat ("  ->%s\n", pExternFunction->m_Tag);
+			appendFormat ("  ->%s\n", pExternFunction->m_Tag.cc ());
 			appendFormat ("\n");
 			continue;
 		}
@@ -43,7 +43,7 @@ bool Disassembly::build(jnc::CModule *module)
 		if (pf)
 		{
 			rtl::CString s = Dasm.Disassemble (pf, Size);
-			appendFormat ("\n%s", s);
+			appendFormat ("\n%s", s.cc ());
 		}
 		
 		appendFormat ("\n........................................\n\n");

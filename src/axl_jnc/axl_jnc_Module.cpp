@@ -106,6 +106,7 @@ CModule::Compile ()
 		m_FunctionMgr.CalcPropertyLayouts () &&
 		m_FunctionMgr.CalcAutoEvLayouts () &&
 		m_TypeMgr.CalcTypeLayouts () &&
+		m_VariableMgr.AllocateGlobalVariables () &&
 		m_FunctionMgr.CompileFunctions ();
 
 	if (!Result)
@@ -126,8 +127,8 @@ CModule::Compile ()
 		if (!Result)
 			return false;
 	}
-
-	return true;
+	
+	return true;	
 }
 
 bool

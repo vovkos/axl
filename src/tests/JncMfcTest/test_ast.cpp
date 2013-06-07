@@ -73,10 +73,9 @@ BOOL CAstApp::InitInstance()
 //	_crtBreakAlloc = 401;
 
 	llvm::InitializeNativeTarget ();
-	llvm::InitializeAllTargetInfos();
-	llvm::InitializeAllTargetMCs();
-	llvm::InitializeAllAsmParsers();
-	llvm::InitializeAllDisassemblers();
+	llvm::InitializeNativeTargetAsmParser ();
+	llvm::InitializeNativeTargetAsmPrinter ();
+	llvm::InitializeNativeTargetDisassembler ();
 
 	err::CParseErrorProvider::Register ();
 

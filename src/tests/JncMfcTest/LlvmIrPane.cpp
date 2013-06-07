@@ -75,7 +75,7 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 			m_LogCtrl.Trace ("%s\r\n", Name.c_str ());
 
 			llvm::BasicBlock::InstListType& InstList = Block->getInstList ();
-			llvm::BasicBlock::InstListType::iterator& Inst = InstList.begin ();
+			llvm::BasicBlock::InstListType::iterator Inst = InstList.begin ();
 			for (; Inst != InstList.end (); Inst++)
 			{
 				std::string String;

@@ -89,9 +89,13 @@ CParser::FindType (const CQualifiedName& Name)
 
 	if (m_Stage == EStage_Pass1)
 	{
-		pItem = pNamespace->FindItem (Name.GetShortName ());
+		if (!Name.IsSimple ())
+			return m_pModule->m_TypeMgr.GetPrimaryImportType (Name, pNamespace);
+
+		rtl::CString ShortName = Name.GetShortName ();
+		pItem = pNamespace->FindItem (ShortName);
 		if (!pItem)
-			return m_pModule->m_TypeMgr.GetImportType (Name, pNamespace);				
+			return m_pModule->m_TypeMgr.GetPrimaryImportType (ShortName, pNamespace);				
 	}
 	else
 	{	
@@ -308,7 +312,7 @@ CParser::Declare (
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	int DataPtrTypeFlags;
+	uint_t DataPtrTypeFlags;
 	CType* pType = pDeclarator->CalcType (&DataPtrTypeFlags);
 	if (!pType)
 		return NULL;
@@ -323,17 +327,11 @@ CParser::Declare (
 		return false;
 	}
 
-	if (m_StorageKind == EStorage_Typedef || 
-		TypeKind == EType_Function ||	
-		TypeKind == EType_Property || 
+	if (m_StorageKind == EStorage_Typedef ||
+		TypeKind == EType_Function ||
+		TypeKind == EType_Property ||
 		TypeKind == EType_AutoEv) // not data
 	{
-		if (DataPtrTypeFlags)
-		{
-			err::SetFormatStringError ("unused modifier '%s'", GetPtrTypeFlagString (DataPtrTypeFlags));
-			return false;
-		}
-
 		if (DataPtrTypeFlags)
 		{
 			err::SetFormatStringError ("unused modifier '%s'", GetPtrTypeFlagString (DataPtrTypeFlags));
@@ -916,9 +914,6 @@ CParser::DeclareData (
 		return false;
 	}
 
-	if (pType->GetTypeKind () == EType_Class) 
-		pType = ((CClassType*) pType)->GetClassPtrType ();
-
 	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	size_t BitCount = pDeclarator->GetBitCount ();
 
@@ -1009,6 +1004,9 @@ CParser::DeclareData (
 			return false;
 		}
 
+		if (!pField)
+			return false;
+
 		AssignDeclarationAttributes (pField, pNamespace, pDeclarator->GetPos ());
 	}
 
@@ -1031,8 +1029,7 @@ CParser::DeclarePropValue (
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
 
-	if (pType->GetTypeKind () == EType_Class) 
-		pType = ((CClassType*) pType)->GetClassPtrType ();
+	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
 
 	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
 
@@ -1122,13 +1119,10 @@ CParser::CreateFormalArg (
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	int PtrTypeFlags = 0;
+	uint_t PtrTypeFlags = 0;
 	CType* pType = pDeclarator->CalcType (&PtrTypeFlags);
 	if (!pType)
 		return NULL;
-
-	if (pType->GetTypeKind () == EType_Class)
-		pType = ((CClassType*) pType)->GetClassPtrType ();
 
 	rtl::CString Name;
 

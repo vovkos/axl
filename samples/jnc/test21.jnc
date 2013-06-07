@@ -1,26 +1,26 @@
 //.............................................................................
 
-TPoint g_Point = { 1, 2 };
-
-thin FFoo* g_pfFoo = &foo;
-
-void
-foo (int x)
+int 
+bar (int a, int b)
 {
-	printf ("foo (%d)\n", x);	
+	return a + b;
+}
+
+foo (object o)
+{
+	object <int> a = o;
+	printf ("foo (%d)\n", a.value);
 }
 
 int  
 main ()
 {
-	printf ("main ()\n"); 
+	printf ("main такие дела!! 你好 ()\n"); 
 
-	stack String s;
+	object <int> a = new object <int>;
+	a.value = 200;
 
-	g_pfFoo (123);
-
-	g_Point.m_y = 20;
-	printf ("Point = { %d, %d }\n", g_Point.m_x, g_Point.m_y);
+	foo (a);
 
 	return 10;
 }
@@ -32,14 +32,6 @@ printf (
 	unsafe const char* pFormat,
 	unsafe ...
 	); 
-
-struct TPoint 
-{
-	int m_x;
-	int m_y;
-}
-
-typedef void FFoo (int x);
 
 //.............................................................................
  

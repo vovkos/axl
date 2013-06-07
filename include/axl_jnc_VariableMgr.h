@@ -68,8 +68,7 @@ public:
 	llvm::GlobalVariable*
 	CreateLlvmGlobalVariable (
 		CType* pType,
-		const char* pTag,
-		bool IsThreadLocal = false
+		const char* pTag
 		);
 
 	CAlias*
@@ -87,10 +86,17 @@ public:
 	InitializeVariable (CVariable* pVariable);
 
 	bool
+	AllocateGlobalVariables ();
+
+	bool
 	InitializeGlobalVariables ();
 
 	CVariable*
-	GetScopeLevelVariable ();
+	GetScopeLevelVariable ()
+	{
+		ASSERT (m_pScopeLevelVariable); // should be called after AllocateGlobalVariables ()
+		return m_pScopeLevelVariable;
+	}
 };
 
 //.............................................................................

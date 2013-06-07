@@ -237,6 +237,10 @@ COperatorMgr::NewOperator (
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 
 	CType* pAllocType = pType;
+
+	if (pType->GetTypeKind () == EType_Import)
+		pType = ((CImportType*) pType)->GetActualType ();
+
 	if (pType->GetTypeKind () == EType_Class)
 		pAllocType = ((CClassType*) pType)->GetClassStructType ();
 

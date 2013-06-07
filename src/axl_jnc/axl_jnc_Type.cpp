@@ -99,7 +99,30 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"undefined-type-modifier";
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+rtl::CString
+GetTypeModifierString (uint_t Modifiers)
+{
+	if (!Modifiers)
+		return rtl::CString ();
+
+	ETypeModifier Modifier = GetFirstTypeModifier (Modifiers);
+	rtl::CString String = GetTypeModifierString (Modifier);
+	Modifiers &= ~Modifier;
+
+	while (Modifiers)
+	{
+		Modifier = GetFirstTypeModifier (Modifiers);
+
+		String += ' ';
+		String += GetTypeModifierString (Modifier);
+
+		Modifiers &= ~Modifier;
+	}
+
+	return String;
+}
+
+//.............................................................................
 
 const char* 
 GetPtrTypeFlagString (EPtrTypeFlag Flag)
@@ -122,7 +145,28 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 		"undefined-ptr-type-flag";
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+rtl::CString
+GetPtrTypeFlagString (uint_t Flags)
+{
+	if (!Flags)
+		return rtl::CString ();
+
+	EPtrTypeFlag Flag = GetFirstPtrTypeFlag (Flags);
+	rtl::CString String = GetPtrTypeFlagString (Flag);
+	Flags &= ~Flag;
+
+	while (Flags)
+	{
+		Flag = GetFirstPtrTypeFlag (Flags);
+
+		String += ' ';
+		String += GetPtrTypeFlagString (Flag);
+
+		Flags &= ~Flag;
+	}
+
+	return String;
+}
 
 uint_t
 GetPtrTypeFlagsFromModifiers (uint_t Modifiers)

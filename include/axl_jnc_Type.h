@@ -95,7 +95,7 @@ enum EType
 
 	// import type (resolved after linkage or instantiation of generic)
 
-	EType_Import,              // Z
+	EType_Import,              // ZN/ZD/ZP (name/data/pointer)
 
 	EType__Count,
 	EType__EndianDelta = EType_Int16_be - EType_Int16,
@@ -154,10 +154,10 @@ enum ETypeFlag
 {
 	ETypeFlag_LayoutReady  = 0x0001,
 	ETypeFlag_LayoutCalc   = 0x0002,
-	ETypeFlag_Named        = 0x0010,
-	ETypeFlag_Moveable     = 0x0020, // moveable by byte-to-byte copy
-	ETypeFlag_Pod          = 0x0040, // plain-old-data
-	ETypeFlag_Import       = 0x0080, // is or references an import type
+	ETypeFlag_Named        = 0x0004,
+	ETypeFlag_Moveable     = 0x0008, // moveable by byte-to-byte copy
+	ETypeFlag_Pod          = 0x0010, // plain-old-data
+	ETypeFlag_ImportLoop   = 0x0020, // used for detection of import loops
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -185,9 +185,12 @@ GetFirstPtrTypeFlag (uint_t Flags)
 const char* 
 GetPtrTypeFlagString (EPtrTypeFlag Flag);
 
+rtl::CString
+GetPtrTypeFlagString (uint_t Flags);
+
 inline
 const char* 
-GetPtrTypeFlagString (uint_t Flags)
+GetFirstPtrTypeFlagString (uint_t Flags)
 {
 	return GetPtrTypeFlagString (GetFirstPtrTypeFlag (Flags));
 }
@@ -223,7 +226,7 @@ enum ETypeModifier
 	// since 'class' implies pointer w/o requiring '*' symbol
 	// we need to somehow distinguish where to apply certain modifier.
 	// we 'promote' conflicting modifiers upon discovering 'class' or 'import' type
-	// thus applying it to the leftmost site on the right of the modifier
+	// thus applying it to the leftmost site on the right of the modifier, e.g.
 
 	// nonull weak CClass nonull weak function* x ();
 	// nonull const unsafe CClass nonull const unsafe* y;
@@ -308,6 +311,14 @@ enum ETypeModifierMask
 		ETypeModifier_Thin |
 		ETypeModifier_Unsafe,
 
+	ETypeModifierMask_ImportPtr = 
+		ETypeModifierMask_DataPtr |
+		ETypeModifierMask_ClassPtr |
+		ETypeModifierMask_ClassPtr_p |
+		ETypeModifierMask_FunctionPtr |
+		ETypeModifierMask_PropertyPtr |
+		ETypeModifierMask_AutoEvPtr,
+
 	ETypeModifierMask_Multicast = 
 		ETypeModifier_Cdecl |
 		ETypeModifier_Stdcall |
@@ -329,9 +340,12 @@ GetFirstTypeModifier (uint_t Modifiers)
 const char*
 GetTypeModifierString (ETypeModifier Modifier);
 
+rtl::CString
+GetTypeModifierString (uint_t Modifiers);
+
 inline
 const char*
-GetTypeModifierString (uint_t Modifiers)
+GetFirstTypeModifierString (uint_t Modifiers)
 {
 	return GetTypeModifierString (GetFirstTypeModifier (Modifiers));
 }

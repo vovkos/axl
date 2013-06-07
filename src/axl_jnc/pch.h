@@ -9,10 +9,12 @@
 // warning C4146: unary minus operator applied to unsigned type, result still unsigned
 // warning C4355: 'this' : used in base member initializer list
 // warning C4800: 'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
+// warning C4244: 'return' : conversion from 'uint64_t' to 'unsigned int', possible loss of data
 
 #pragma warning (disable: 4146)
 #pragma warning (disable: 4355)
 #pragma warning (disable: 4800) 
+#pragma warning (disable: 4244) 
 
 #undef min
 #undef max
@@ -22,7 +24,7 @@
 #include "llvm/Module.h"
 #include "llvm/Intrinsics.h"
 #include "llvm/PassManager.h"
-#include "llvm/Support/IRBuilder.h"
+#include "llvm/IRBuilder.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/raw_ostream.h"
@@ -33,7 +35,6 @@
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/JIT.h"
 #include "llvm/ExecutionEngine/JITEventListener.h"
-#include "llvm/Target/TargetData.h"
 
 #include "../lib/MC/MCDisassembler/EDDisassembler.h"
 #include "../lib/MC/MCDisassembler/EDInst.h" 
@@ -51,5 +52,6 @@
 #pragma warning (default: 4146)
 #pragma warning (default: 4355) 
 #pragma warning (default: 4800)
+#pragma warning (default: 4244) 
 
 //.............................................................................

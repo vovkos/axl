@@ -43,8 +43,6 @@ enum EClassPtrType
 const char*
 GetClassPtrTypeKindString (EClassPtrType PtrTypeKind);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 inline
 EClassPtrType 
 GetClassPtrTypeKindFromModifiers (uint_t Modifiers)
@@ -54,10 +52,17 @@ GetClassPtrTypeKindFromModifiers (uint_t Modifiers)
 		(Modifiers & ETypeModifier_Weak_p) ? EClassPtrType_Weak : EClassPtrType_Normal;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 uint_t 
 PromoteClassPtrTypeModifiers (uint_t Modifiers);
+
+bool
+PromoteClassPtrTypeModifiers (uint_t* pModifiers);
+
+uint_t 
+DemoteClassPtrTypeModifiers (uint_t Modifiers);
+
+bool
+DemoteClassPtrTypeModifiers (uint_t* pModifiers);
 
 //............................................................................
 

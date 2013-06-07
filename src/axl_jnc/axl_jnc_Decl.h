@@ -192,9 +192,12 @@ GetFirstPostDeclaratorModifier (uint_t Modifiers)
 const char* 
 GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier);
 
+rtl::CString
+GetPostDeclaratorModifierString (uint_t Modifiers);
+
 inline
 const char* 
-GetPostDeclaratorModifierString (uint_t Modifiers)
+GetFirstPostDeclaratorModifierString (uint_t Modifiers)
 {
 	return GetPostDeclaratorModifierString (GetFirstPostDeclaratorModifier (Modifiers));
 }
@@ -334,7 +337,7 @@ public:
 	}
 
 	CType*
-	CalcType (int* pDataPtrTypeFlags = NULL);
+	CalcType (uint_t* pDataPtrTypeFlags = NULL);
 
 	bool
 	AddName (rtl::CString Name);

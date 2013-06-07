@@ -131,18 +131,18 @@ CTypeSpecifier::SetType (CType* pType)
 		return false;
 	}
 
-	int TypeKind = pType->GetTypeKind ();
-	if (TypeKind == EType_Import)
+	CModule* pModule = pType->GetModule ();
+
+	if (pType->GetTypeKind () == EType_Import)
 	{
-		err::SetFormatStringError ("import types are not supported yet");
-		return NULL;
+		CImportType* pImportType = (CImportType*) pType;
+		if (pImportType->IsResolved ())
+			pType = pImportType->GetActualType ();
 	}
 
-	if (TypeKind == EType_Class || TypeKind == EType_ClassPtr)
-	{
-		m_TypeModifiers |= PromoteClassPtrTypeModifiers (m_TypeModifiers);
-		m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;
-	}
+	if (pType->GetTypeKind () == EType_Class || 
+		pType->GetTypeKind () == EType_Import && ((CImportType*) pType)->GetImportTypeKind () == EImportType_Primary)
+		PromoteClassPtrTypeModifiers (&m_TypeModifiers);
 	
 	m_pType = pType;
 	return true;
@@ -162,6 +162,29 @@ GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier)
 	return i < countof (StringTable) ? 
 		StringTable [i] : 
 		"undefined-post-declarator-modifier";
+}
+
+rtl::CString
+GetPostDeclaratorModifierString (uint_t Modifiers)
+{
+	if (!Modifiers)
+		return rtl::CString ();
+
+	EPostDeclaratorModifier Modifier = GetFirstPostDeclaratorModifier (Modifiers);
+	rtl::CString String = GetPostDeclaratorModifierString (Modifier);
+	Modifiers &= ~Modifier;
+
+	while (Modifiers)
+	{
+		Modifier = GetFirstPostDeclaratorModifier (Modifiers);
+
+		String += ' ';
+		String += GetPostDeclaratorModifierString (Modifier);
+
+		Modifiers &= ~Modifier;
+	}
+
+	return String;
 }
 
 //.............................................................................
@@ -346,7 +369,7 @@ CDeclarator::AddBitFieldSuffix (size_t BitCount)
 }
 
 CType*
-CDeclarator::CalcType (int* pDataPtrTypeFlags)
+CDeclarator::CalcType (uint_t* pDataPtrTypeFlags)
 {
 	CDeclTypeCalc TypeCalc;
 	return TypeCalc.CalcType (this, pDataPtrTypeFlags);

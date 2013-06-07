@@ -57,7 +57,8 @@ protected:
 	rtl::CStdListT <CAutoEvPtrType> m_AutoEvPtrTypeList;
 	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
 	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
-	rtl::CStdListT <CImportType> m_ImportTypeList;
+	rtl::CStdListT <CPrimaryImportType> m_PrimaryImportTypeList;
+	rtl::CStdListT <CSecondaryImportType> m_SecondaryImportTypeList;
 	
 	rtl::CStdListT <CPropertyTypeTuple> m_PropertyTypeTupleList;
 	rtl::CStdListT <CDataPtrTypeTuple> m_DataPtrTypeTupleList;
@@ -569,11 +570,21 @@ public:
 	CStructType*
 	GetAutoEvPtrStructType_w (CAutoEvType* pAutoEvType);
 	
-	CImportType*
-	GetImportType (	
+	CPrimaryImportType*
+	GetPrimaryImportType (	
 		const CQualifiedName& Name,
 		CNamespace* pAnchorNamespace
 		);
+
+	CSecondaryImportType*
+	GetSecondaryImportType (	
+		EImportType ImportTypeKind,
+		CPrimaryImportType* pPrimaryImportType,
+		uint_t TypeModifiers = 0
+		);
+
+	CType*
+	PrepareDataType (CType* pType);
 
 protected:
 	CDataPtrTypeTuple*

@@ -16,9 +16,11 @@ CDeclTypeCalc::CDeclTypeCalc ()
 CType*
 CDeclTypeCalc::CalcType (
 	CDeclarator* pDeclarator,
-	int* pDataPtrTypeFlags
+	uint_t* pDataPtrTypeFlags
 	)
 {
+	bool Result;
+
 	CType* pType = pDeclarator->GetBaseType (); 
 	rtl::CArrayT <TDeclPrefix> PrefixArray = pDeclarator->GetPrefixArray ();
 	m_Suffix = pDeclarator->GetSuffixList ().GetTail ();
@@ -45,6 +47,10 @@ CDeclTypeCalc::CalcType (
 						);
 					return NULL;
 				}
+
+				Result = PromoteClassPtrTypeModifiers (&m_TypeModifiers);
+				if (!Result)
+					return NULL;
 
 				pType = GetClassPtrType ((CClassType*) pType);
 			}
@@ -84,6 +90,10 @@ CDeclTypeCalc::CalcType (
 
 			case EType_AutoEv:
 				pType = GetAutoEvPtrType ((CAutoEvType*) pType);
+				break;
+
+			case EType_Import:
+				pType = GetImportPtrType ((CImportType*) pType);
 				break;
 
 			default:
@@ -150,39 +160,80 @@ CDeclTypeCalc::CalcType (
 			return NULL;
 	}
 
-	if (pType->GetTypeKind () == EType_Class && (m_TypeModifiers & ETypeModifierMask_ClassPtr_p) != 0)
+	if ((m_TypeModifiers & ETypeModifierMask_ClassPtr_p) != 0)
+	{
+		if (pType->GetTypeKind () == EType_Class)
+		{
+			pType = GetClassPtrType ((CClassType*) pType);
+		}
+		else if (pType->GetTypeKind () == EType_Import && 
+			((CImportType*) pType)->GetImportTypeKind () == EImportType_Primary)
+		{
+			pType = m_pModule->m_TypeMgr.GetSecondaryImportType (
+				EImportType_Data, 
+				(CPrimaryImportType*) pType,
+				m_TypeModifiers & ETypeModifierMask_ClassPtr_p
+				);
+
+			m_TypeModifiers &= ~ETypeModifierMask_ClassPtr_p;
+		}
+	}
+
+	if (pDataPtrTypeFlags)
+		*pDataPtrTypeFlags = GetDataPtrTypeFlags ();
+
+	if (!CheckUnusedModifiers ())
+		return NULL;
+
+	return pType;
+}
+
+CType*
+CDeclTypeCalc::CalcDataType (
+	CType* pType,
+	uint_t TypeModifiers,
+	uint_t* pDataPtrTypeFlags
+	)
+{
+	m_TypeModifiers = TypeModifiers;
+
+	if (pType->GetTypeKind () == EType_Class)
 		pType = GetClassPtrType ((CClassType*) pType);
 
 	if (pDataPtrTypeFlags)
+		*pDataPtrTypeFlags = GetDataPtrTypeFlags ();
+
+	if (!CheckUnusedModifiers ())
+		return NULL;
+
+	return pType;
+}
+
+CType*
+CDeclTypeCalc::CalcPtrType (
+	CType* pType,
+	uint_t TypeModifiers
+	)
+{
+	m_TypeModifiers = TypeModifiers;
+
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
 	{
-		uint_t Flags = 0;
+	case EType_Function:
+		pType = GetFunctionPtrType ((CFunctionType*) pType);
+		break;
 
-		if (m_TypeModifiers & ETypeModifier_Const)
-			Flags |= EPtrTypeFlag_Const;
+	case EType_Property:
+		pType = GetPropertyPtrType ((CPropertyType*) pType);
+		break;
 
-		if (m_TypeModifiers & ETypeModifier_ReadOnly)
-			Flags |= EPtrTypeFlag_ReadOnly;
+	case EType_AutoEv:
+		pType = GetAutoEvPtrType ((CAutoEvType*) pType);
+		break;
 
-		if (m_TypeModifiers & ETypeModifier_Mutable)
-			Flags |= EPtrTypeFlag_Mutable;
-
-		if (m_TypeModifiers & ETypeModifier_Volatile)
-			Flags |= EPtrTypeFlag_Volatile;
-
-		if (m_TypeModifiers & ETypeModifier_Event)
-		{
-			if (pType->GetTypeKind () != EType_Multicast)
-			{
-				err::SetFormatStringError ("'event' modifier can only be applied to multicast");
-				return NULL;
-			}
-
-			Flags |= EPtrTypeFlag_Event;
-		}
-
-		m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
-
-		*pDataPtrTypeFlags = Flags;
+	default:
+		pType = GetDataPtrType (pType);
 	}
 
 	if (!CheckUnusedModifiers ())
@@ -203,6 +254,31 @@ CDeclTypeCalc::CheckUnusedModifiers ()
 	return true;
 }
 
+uint_t 
+CDeclTypeCalc::GetDataPtrTypeFlags ()
+{
+	uint_t Flags = 0;
+
+	if (m_TypeModifiers & ETypeModifier_Const)
+		Flags |= EPtrTypeFlag_Const;
+
+	if (m_TypeModifiers & ETypeModifier_ReadOnly)
+		Flags |= EPtrTypeFlag_ReadOnly;
+
+	if (m_TypeModifiers & ETypeModifier_Mutable)
+		Flags |= EPtrTypeFlag_Mutable;
+
+	if (m_TypeModifiers & ETypeModifier_Volatile)
+		Flags |= EPtrTypeFlag_Volatile;
+
+	if (m_TypeModifiers & ETypeModifier_Event)
+		Flags |= EPtrTypeFlag_Event;
+
+	m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
+
+	return Flags;
+}
+
 CType*
 CDeclTypeCalc::GetIntegerType (CType* pType)
 {
@@ -211,7 +287,7 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 	if (!pType->IsIntegerType ())
 	{
 		err::SetFormatStringError ("'%s' modifier cannot be applied to '%s'", 
-			GetTypeModifierString (m_TypeModifiers), 
+			GetTypeModifierString (m_TypeModifiers & ETypeModifierMask_Integer), 
 			pType->GetTypeString ().cc () 
 			);
 		return NULL;
@@ -552,6 +628,23 @@ CDeclTypeCalc::GetAutoEvPtrType (CAutoEvType* pAutoEvType)
 
 	m_TypeModifiers &= ~ETypeModifierMask_AutoEvPtr;
 	return pAutoEvType->GetAutoEvPtrType (PtrTypeKind, TypeFlags);
+}
+
+CType*
+CDeclTypeCalc::GetImportPtrType (CImportType* pImportType)
+{
+	EImportType ImportTypeKind = pImportType->GetImportTypeKind ();
+	if (ImportTypeKind != EImportType_Primary)
+		return GetDataPtrType (pImportType);
+
+	uint_t TypeModifiers = m_TypeModifiers & ETypeModifierMask_ImportPtr;
+	m_TypeModifiers &= ~ETypeModifierMask_ImportPtr;
+	
+	return m_pModule->m_TypeMgr.GetSecondaryImportType (
+		EImportType_Pointer, 
+		(CPrimaryImportType*) pImportType, 
+		TypeModifiers
+		);
 }
 
 //.............................................................................

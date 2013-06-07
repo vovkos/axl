@@ -13,7 +13,9 @@ CCast_Struct::GetCastKind (
 	CType* pType
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Struct);
+	if (OpValue.GetType ()->GetTypeKind () != EType_Struct)
+		return ECast_None;
+
 	CStructType* pStructType = (CStructType*) OpValue.GetType ();
 	return pStructType->FindBaseType (pType) ? ECast_Implicit : ECast_None;
 }
@@ -25,7 +27,12 @@ CCast_Struct::ConstCast (
 	void* pDst
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Struct);
+	if (OpValue.GetType ()->GetTypeKind () != EType_Struct)
+	{
+		SetCastError (OpValue, pType);
+		return false;
+	}
+
 	CStructType* pStructType = (CStructType*) OpValue.GetType ();
 
 	CBaseTypeCoord Coord;
@@ -48,7 +55,12 @@ CCast_Struct::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Struct);
+	if (OpValue.GetType ()->GetTypeKind () != EType_Struct)
+	{
+		SetCastError (OpValue, pType);
+		return false;
+	}
+
 	CStructType* pStructType = (CStructType*) OpValue.GetType ();
 
 	CBaseTypeCoord Coord;

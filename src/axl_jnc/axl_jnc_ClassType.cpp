@@ -91,6 +91,8 @@ CClassType::CreateField (
 	)
 {
 	CStructField* pField = m_pIfaceStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
+	if (!pField)
+		return NULL;
 
 	if (!Name.IsEmpty ())
 	{

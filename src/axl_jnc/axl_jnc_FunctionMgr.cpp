@@ -1613,6 +1613,101 @@ CFunctionMgr::CompileClosureThunk (TThunk* pThunk)
 	return true;
 }
 
+class LlvmJITEventListener_clone 
+{
+public:
+	typedef llvm::JITEventListener::EmittedFunctionDetails EmittedFunctionDetails;
+	
+	virtual 
+	~LlvmJITEventListener_clone ()
+	{		
+	}
+		
+	operator llvm::JITEventListener* ()
+	{
+		return (llvm::JITEventListener*) this;
+	}
+
+	/// NotifyFunctionEmitted - Called after a function has been successfully
+	/// emitted to memory.  The function still has its MachineFunction attached,
+	/// if you should happen to need that.
+	virtual 
+	void 
+	NotifyFunctionEmitted (
+		const llvm::Function&,
+		void*, 
+		size_t,
+		const EmittedFunctionDetails&
+		)
+	{		
+	}
+
+	/// NotifyFreeingMachineCode - Called from freeMachineCodeForFunction(), after
+	/// the global mapping is removed, but before the machine code is returned to
+	/// the allocator.
+	///
+	/// OldPtr is the address of the machine code and will be the same as the Code
+	/// parameter to a previous NotifyFunctionEmitted call.  The Function passed
+	/// to NotifyFunctionEmitted may have been destroyed by the time of the
+	/// matching NotifyFreeingMachineCode call.
+	virtual 
+	void 
+	NotifyFreeingMachineCode (void *)
+	{
+	}
+
+	/// NotifyObjectEmitted - Called after an object has been successfully
+	/// emitted to memory.  NotifyFunctionEmitted will not be called for
+	/// individual functions in the object.
+	///
+	/// ELF-specific information
+	/// The ObjectImage contains the generated object image
+	/// with section headers updated to reflect the address at which sections
+	/// were loaded and with relocations performed in-place on debug sections.
+	virtual 
+	void 
+	NotifyObjectEmitted (const llvm::ObjectImage &Obj) 
+	{
+	}
+
+	/// NotifyFreeingObject - Called just before the memory associated with
+	/// a previously emitted object is released.
+	virtual 
+	void 
+	NotifyFreeingObject (const llvm::ObjectImage &Obj) 
+	{
+	}
+};
+
+class CJitEventListener: public LlvmJITEventListener_clone
+{
+protected:
+	CFunctionMgr* m_pFunctionMgr;
+	
+public:
+	CJitEventListener (CFunctionMgr* pFunctionMgr)
+	{
+		m_pFunctionMgr = pFunctionMgr;
+	}	
+	
+	virtual
+	void
+	NotifyFunctionEmitted (
+		const llvm::Function& LlvmFunction, 
+		void* p, 
+		size_t Size, 
+		const EmittedFunctionDetails& Details
+		)
+	{
+		CFunction* pFunction = m_pFunctionMgr->FindFunctionByLlvmFunction ((llvm::Function*) &LlvmFunction);
+		if (pFunction)
+		{
+			pFunction->m_pfMachineCode = p;
+			pFunction->m_MachineCodeSize = Size;
+		}
+	}
+};
+
 bool
 CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 {
@@ -1621,7 +1716,9 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	return false;
 #endif
 
-	pExecutionEngine->RegisterJITEventListener (this);
+	CJitEventListener JitEventListener (this);
+		
+	pExecutionEngine->RegisterJITEventListener (JitEventListener);
 	
 	CScopeThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
@@ -1649,30 +1746,18 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 
 			return false;
 		}
-
 	}
 
-	pExecutionEngine->UnregisterJITEventListener (this);
+	pExecutionEngine->UnregisterJITEventListener (JitEventListener);
 
 	return true;
 }
 
-void
-CFunctionMgr::NotifyFunctionEmitted (
-	const llvm::Function& LlvmFunction, 
-	void* p, 
-	size_t Size, 
-	const EmittedFunctionDetails& Details
-	)
-{
-	CFunction* pFunction = FindFunctionByLlvmFunction ((llvm::Function*) &LlvmFunction);
-	if (pFunction)
-	{
-		pFunction->m_pfMachineCode = p;
-		pFunction->m_MachineCodeSize = Size;
-	}
-}
+/*
 
+
+ */
+ 
 CFunction*
 CFunctionMgr::GetStdFunction (EStdFunc Func)
 {

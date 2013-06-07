@@ -23,7 +23,28 @@ GetPropertyTypeFlagString (EPropertyTypeFlag Flag)
 		"undefined-property-type-flag";
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+rtl::CString
+GetPropertyTypeFlagString (uint_t Flags)
+{
+	if (!Flags)
+		return rtl::CString ();
+
+	EPropertyTypeFlag Flag = GetFirstPropertyTypeFlag (Flags);
+	rtl::CString String = GetPropertyTypeFlagString (Flag);
+	Flags &= ~Flag;
+
+	while (Flags)
+	{
+		Flag = GetFirstPropertyTypeFlag (Flags);
+
+		String += ' ';
+		String += GetPropertyTypeFlagString (Flag);
+
+		Flags &= ~Flag;
+	}
+
+	return String;
+}
 
 uint_t
 GetPropertyTypeFlagsFromModifiers (uint_t Modifiers)

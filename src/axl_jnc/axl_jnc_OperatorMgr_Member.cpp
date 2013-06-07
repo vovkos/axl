@@ -612,13 +612,16 @@ COperatorMgr::MemberOperator (
 		return false;
 
 	CType* pType = OpValue.GetType ();
-	if (!pType->IsDataPtrType ())
+	if (pType->GetTypeKind () != EType_DataRef)
 	{
 		err::SetFormatStringError ("indexed member operator cannot be applied to '%s'", pType->GetTypeString ().cc ());
 		return false;		
 	}
 
 	pType = ((CDataPtrType*) pType)->GetTargetType ();
+
+	if (pType->GetTypeKind () == EType_Import)
+		pType = ((CImportType*) pType)->GetActualType ();
 
 	CStructField* pField;
 
@@ -662,6 +665,9 @@ COperatorMgr::MemberOperator (
 		pType->GetTypeKind () == EType_AutoEvRef
 		)
 		pType = ((CAutoEvPtrType*) pType)->GetTargetType ();
+
+	if (pType->GetTypeKind () == EType_Import)
+		pType = ((CImportType*) pType)->GetActualType ();
 
 	if (pType->GetTypeKind () == EType_DataPtr)
 	{

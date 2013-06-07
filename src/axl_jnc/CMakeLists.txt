@@ -518,6 +518,8 @@ if (AXL_BUILD_JNCC)
 		axl_core
 		axl_parse
 		${LLVM_LIB_LIST}
+		LLVMJIT
+		LLVMMCJIT
 		)
 
 	if (AXL_USE_PCH)

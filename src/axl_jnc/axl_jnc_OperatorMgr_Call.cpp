@@ -142,21 +142,22 @@ COperatorMgr::GetCallOperatorResultType (
 		
 	CFunctionType* pFunctionType;
 		
-	CType* pType = OpValue.GetType ();
-	EType TypeKind = pType->GetTypeKind ();
+	CType* pOpType = OpValue.GetType ();
+	EType TypeKind = pOpType->GetTypeKind ();
+
 	switch (TypeKind)
 	{
 	case EType_Function:
-		pFunctionType = (CFunctionType*) pType;
+		pFunctionType = (CFunctionType*) pOpType;
 		break;
 
 	case EType_FunctionRef:
 	case EType_FunctionPtr:
-		pFunctionType = ((CFunctionPtrType*) pType)->GetTargetType ();
+		pFunctionType = ((CFunctionPtrType*) pOpType)->GetTargetType ();
 		break;
 
 	default:
-		err::SetFormatStringError ("cannot call '%s'", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("cannot call '%s'", pOpType->GetTypeString ().cc ());
 		return NULL;
 	}
 

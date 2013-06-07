@@ -38,9 +38,12 @@ GetFirstPropertyTypeFlag (uint_t Flags)
 const char* 
 GetPropertyTypeFlagString (EPropertyTypeFlag Flag);
 
+rtl::CString
+GetPropertyTypeFlagString (uint_t Flags);
+
 inline
 const char* 
-GetPropertyTypeFlagString (uint_t Flags)
+GetFirstPropertyTypeFlagString (uint_t Flags)
 {
 	return GetPropertyTypeFlagString (GetFirstPropertyTypeFlag (Flags));
 }
