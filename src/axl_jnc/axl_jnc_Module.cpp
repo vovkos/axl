@@ -121,7 +121,7 @@ CModule::Compile ()
 
 	if (!m_pDestructor && 
 		(!m_TypeMgr.GetStaticDestructArray ().IsEmpty () || 
-		 m_VariableMgr.GetStaticDestructArray ().IsEmpty ()))
+		 !m_VariableMgr.GetStaticDestructArray ().IsEmpty ()))
 	{
 		Result = CreateDefaultDestructor ();
 		if (!Result)
