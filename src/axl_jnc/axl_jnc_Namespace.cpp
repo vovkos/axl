@@ -61,7 +61,6 @@ GetNamespaceKindString (ENamespace NamespaceKind)
 		"named-type-extension",      // ENamespace_TypeExtension,
 		"property",                  // ENamespace_Property,
 		"property-template",         // ENamespace_PropertyTemplate,
-		"autoev",                    // ENamespace_AutoEv,
 	};
 
 	return (size_t) NamespaceKind < ENamespace__Count ? 

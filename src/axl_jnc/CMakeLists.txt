@@ -34,24 +34,24 @@ source_group (
 
 set (
 	FUNCTION_H_LIST
-	${AXL_INC_DIR}/axl_jnc_AutoEv.h
 	${AXL_INC_DIR}/axl_jnc_Disassembler.h
 	${AXL_INC_DIR}/axl_jnc_Function.h
 	${AXL_INC_DIR}/axl_jnc_FunctionMgr.h
 	${AXL_INC_DIR}/axl_jnc_Property.h
 	${AXL_INC_DIR}/axl_jnc_PropertyTemplate.h
 	${AXL_INC_DIR}/axl_jnc_PropertyVerifier.h
+	${AXL_INC_DIR}/axl_jnc_ThunkFunction.h
 	)
 
 set (
 	FUNCTION_CPP_LIST
-	axl_jnc_AutoEv.cpp
 	axl_jnc_Disassembler.cpp
 	axl_jnc_Function.cpp
 	axl_jnc_FunctionMgr.cpp
 	axl_jnc_Property.cpp
 	axl_jnc_PropertyTemplate.cpp
 	axl_jnc_PropertyVerifier.cpp
+	axl_jnc_ThunkFunction.cpp
 	)
 
 source_group (
@@ -175,9 +175,11 @@ set (
 	axl_jnc_OperatorMgr_Call.cpp
 	axl_jnc_OperatorMgr_CheckPtr.cpp
 	axl_jnc_OperatorMgr_DataRef.cpp
+	axl_jnc_OperatorMgr_Field.cpp
 	axl_jnc_OperatorMgr_Member.cpp
 	axl_jnc_OperatorMgr_New.cpp
 	axl_jnc_OperatorMgr_Property.cpp
+	axl_jnc_OperatorMgr_Virtual.cpp
 	axl_jnc_UnOp.cpp
 	axl_jnc_UnOp_Arithmetic.cpp
 	axl_jnc_UnOp_Inc.cpp
@@ -250,6 +252,7 @@ add_till_step (
 	axl_jnc_Declarator.llk
 	axl_jnc_Expr.llk
 	axl_jnc_Expr_s.llk
+	axl_jnc_NamedTypeSpecifier.llk
 	axl_jnc_Stmt.llk
 	axl_jnc_Stmt_0.llk
 	)  
@@ -273,11 +276,11 @@ source_group (
 set (
 	TYPE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_ArrayType.h
-	${AXL_INC_DIR}/axl_jnc_AutoEvPtrType.h
-	${AXL_INC_DIR}/axl_jnc_AutoEvType.h
+	${AXL_INC_DIR}/axl_jnc_AutoEvClassType.h
 	${AXL_INC_DIR}/axl_jnc_BitFieldType.h
 	${AXL_INC_DIR}/axl_jnc_ClassPtrType.h
 	${AXL_INC_DIR}/axl_jnc_ClassType.h
+	${AXL_INC_DIR}/axl_jnc_ClosureClassType.h
 	${AXL_INC_DIR}/axl_jnc_DataPtrType.h
 	${AXL_INC_DIR}/axl_jnc_DerivableType.h
 	${AXL_INC_DIR}/axl_jnc_EnumType.h
@@ -286,8 +289,8 @@ set (
 	${AXL_INC_DIR}/axl_jnc_FunctionType.h
 	${AXL_INC_DIR}/axl_jnc_FunctionTypeOverload.h
 	${AXL_INC_DIR}/axl_jnc_ImportType.h
-	${AXL_INC_DIR}/axl_jnc_McSnapshotType.h
-	${AXL_INC_DIR}/axl_jnc_MulticastType.h
+	${AXL_INC_DIR}/axl_jnc_McSnapshotClassType.h
+	${AXL_INC_DIR}/axl_jnc_MulticastClassType.h
 	${AXL_INC_DIR}/axl_jnc_NamedType.h
 	${AXL_INC_DIR}/axl_jnc_PropertyPtrType.h
 	${AXL_INC_DIR}/axl_jnc_PropertyType.h
@@ -300,11 +303,11 @@ set (
 set (
 	TYPE_CPP_LIST
 	axl_jnc_ArrayType.cpp
-	axl_jnc_AutoEvPtrType.cpp
-	axl_jnc_AutoEvType.cpp
+	axl_jnc_AutoEvClassType.cpp
 	axl_jnc_BitFieldType.cpp
 	axl_jnc_ClassPtrType.cpp
 	axl_jnc_ClassType.cpp
+	axl_jnc_ClosureClassType.cpp
 	axl_jnc_DataPtrType.cpp
 	axl_jnc_DerivableType.cpp
 	axl_jnc_EnumType.cpp
@@ -313,8 +316,8 @@ set (
 	axl_jnc_FunctionType.cpp
 	axl_jnc_FunctionTypeOverload.cpp
 	axl_jnc_ImportType.cpp
-	axl_jnc_McSnapshotType.cpp
-	axl_jnc_MulticastType.cpp
+	axl_jnc_McSnapshotClassType.cpp
+	axl_jnc_MulticastClassType.cpp
 	axl_jnc_NamedType.cpp
 	axl_jnc_PropertyPtrType.cpp
 	axl_jnc_PropertyType.cpp
@@ -340,6 +343,7 @@ set (
 	VALUE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Closure.h
 	${AXL_INC_DIR}/axl_jnc_ConstMgr.h
+	${AXL_INC_DIR}/axl_jnc_ThinDataPtrValidator.h
 	${AXL_INC_DIR}/axl_jnc_Value.h
 	)
 
@@ -347,6 +351,7 @@ set (
 	VALUE_CPP_LIST
 	axl_jnc_Closure.cpp
 	axl_jnc_ConstMgr.cpp
+	axl_jnc_ThinDataPtrValidator.cpp
 	axl_jnc_Value.cpp
 	)
 

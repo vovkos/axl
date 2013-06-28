@@ -15,7 +15,6 @@ GetFunctionPtrTypeKindString (EFunctionPtrType PtrTypeKind)
 		"closure",  // EFunctionPtrType_Normal = 0,
 		"weak",     // EFunctionPtrType_Weak,
 		"thin",     // EFunctionPtrType_Thin,
-		"unsafe",   // EFunctionPtrType_Unsafe,
 	};
 
 	return (size_t) PtrTypeKind < EFunctionPtrType__Count ? 
@@ -32,19 +31,6 @@ CFunctionPtrType::CFunctionPtrType ()
 	m_Size = sizeof (TFunctionPtr);
 	m_pTargetType = NULL;
 	m_pMulticastType = NULL;
-	m_pMcSnapshotType = NULL;
-}
-
-CMulticastType* 
-CFunctionPtrType::GetMulticastType ()
-{
-	return m_pModule->m_TypeMgr.GetMulticastType (this);
-}
-
-CMcSnapshotType* 
-CFunctionPtrType::GetMcSnapshotType ()
-{
-	return m_pModule->m_TypeMgr.GetMcSnapshotType (this);
 }
 
 CStructType* 
@@ -53,10 +39,10 @@ CFunctionPtrType::GetFunctionPtrStructType ()
 	return m_pModule->m_TypeMgr.GetFunctionPtrStructType (m_pTargetType);
 }
 
-CStructType* 
-CFunctionPtrType::GetFunctionPtrStructType_w ()
+CClassType* 
+CFunctionPtrType::GetMulticastType ()
 {
-	return m_pModule->m_TypeMgr.GetFunctionPtrStructType_w (m_pTargetType);
+	return m_pModule->m_TypeMgr.GetMulticastType (this);
 }
 
 rtl::CString
@@ -67,7 +53,7 @@ CFunctionPtrType::CreateSignature (
 	uint_t Flags
 	)
 {
-	rtl::CString Signature = TypeKind == EType_FunctionRef ? 'R' : 'P';
+	rtl::CString Signature = TypeKind == EType_FunctionRef ? "RF" : "PF";
 
 	switch (PtrTypeKind)
 	{
@@ -78,15 +64,9 @@ CFunctionPtrType::CreateSignature (
 	case EFunctionPtrType_Weak:
 		Signature += 'w';
 		break;
-
-	case EFunctionPtrType_Unsafe:
-		Signature += 'u';
-		break;
 	}
 
-	if (Flags & EPtrTypeFlag_Nullable)
-		Signature += 'n';
-
+	Signature += GetPtrTypeFlagSignature (Flags);
 	Signature += pFunctionType->GetSignature ();
 	return Signature;
 }
@@ -97,8 +77,11 @@ CFunctionPtrType::GetTypeModifierString ()
 	if (!m_TypeModifierString.IsEmpty ())
 		return m_TypeModifierString;
 
-	if (m_Flags & EPtrTypeFlag_Nullable)
-		m_TypeModifierString += "nullable ";
+	if (m_Flags & EPtrTypeFlag__AllMask)
+	{
+		m_TypeModifierString += ' ';
+		m_TypeModifierString += GetPtrTypeFlagString (m_Flags);
+	}
 
 	if (m_PtrTypeKind != EFunctionPtrType_Normal)
 	{
@@ -129,24 +112,9 @@ CFunctionPtrType::PrepareTypeString ()
 void
 CFunctionPtrType::PrepareLlvmType ()
 {
-	switch (m_PtrTypeKind)
-	{
-	case EFunctionPtrType_Normal:
-		m_pLlvmType = GetFunctionPtrStructType ()->GetLlvmType ();
-		break;
-
-	case EFunctionPtrType_Weak:
-		m_pLlvmType = GetFunctionPtrStructType_w ()->GetLlvmType ();
-		break;
-
-	case EFunctionPtrType_Thin:
-	case EFunctionPtrType_Unsafe:
-		m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
-		break;
-
-	default:
-		ASSERT (false);
-	}
+	m_pLlvmType = 
+		m_PtrTypeKind != EFunctionPtrType_Thin ? GetFunctionPtrStructType ()->GetLlvmType () :
+		llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
 }
 
 //.............................................................................

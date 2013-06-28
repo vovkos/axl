@@ -47,6 +47,9 @@ protected:
 	CFunction* m_pConstructor;
 	CFunction* m_pDestructor;
 
+	rtl::CArrayT <CModuleItem*> m_CalcLayoutArray;
+	rtl::CArrayT <CModuleItem*> m_CompileArray;
+
 public:
 	llvm::Module* m_pLlvmModule;
 
@@ -70,6 +73,18 @@ public:
 	~CModule ()
 	{
 		Clear ();
+	}
+
+	CType*
+	GetSimpleType (EType TypeKind)
+	{
+		return m_TypeMgr.GetPrimitiveType (TypeKind);
+	}
+
+	CType*
+	GetSimpleType (EStdType StdType)
+	{
+		return m_TypeMgr.GetStdType (StdType);
 	}
 
 	rtl::CString
@@ -122,6 +137,12 @@ public:
 		const char* pName,
 		void* pf
 		);
+
+	void 
+	MarkForLayout (CModuleItem* pItem);
+
+	void 
+	MarkForCompile (CModuleItem* pItem);
 
 	void
 	Clear ();

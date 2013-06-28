@@ -30,7 +30,7 @@ public:
 		)
 	{
 		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue1, OpValue2);
-		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
+		if (!pType || T::IsIntegerOnly && !(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 		{
 			SetOperatorError (OpValue1, OpValue2);
 			return NULL;
@@ -72,7 +72,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedIntegerType ()
+						(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0
 						), 
 					pType
 					);
@@ -84,7 +84,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedIntegerType ()
+						(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0
 						), 
 					pType
 					);
@@ -116,7 +116,7 @@ public:
 					OpValue2, 
 					pType,
 					pResultValue,
-					pType->IsUnsignedIntegerType ()
+					(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0
 					);
 				break;
 
@@ -345,14 +345,6 @@ public:
 		const CValue& OpValue1,
 		const CValue& OpValue2,
 		CType* pResultType,
-		CValue* pResultValue
-		);
-
-protected:
-	bool
-	PointerDifferenceOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
 		CValue* pResultValue
 		);
 };

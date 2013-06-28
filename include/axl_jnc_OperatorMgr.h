@@ -29,7 +29,6 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
-#include "axl_jnc_MulticastType.h"
 
 namespace axl {
 namespace jnc {
@@ -154,8 +153,6 @@ protected:
 	IBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
 	ICastOperator* m_CastOperatorTable [EType__Count];
 	ICastOperator* m_StdCastOperatorTable [EStdCast__Count];
-	
-	rtl::CStringHashTableMapT <EMulticastMethod> m_MulticastMethodMap;
 
 public:
 	COperatorMgr ();
@@ -226,17 +223,13 @@ public:
 	bool
 	PrepareDataPtr (
 		const CValue& Value,
-		ERuntimeError Error,
 		CValue* pResultValue
 		);
 
 	bool
-	PrepareDataPtr (
-		CValue* pValue,
-		ERuntimeError Error
-		)
+	PrepareDataPtr (CValue* pValue)
 	{
-		return PrepareDataPtr (*pValue, Error, pValue);
+		return PrepareDataPtr (*pValue, pValue);
 	}
 
 	// unary operators
@@ -418,9 +411,9 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		return CastOperator (EStorage_Undefined, OpValue, pType, pResultValue);
+		return CastOperator (EStorage_Heap, OpValue, pType, pResultValue);
 	}
-
+	
 	bool
 	CastOperator (
 		EStorage StorageKind,
@@ -437,7 +430,7 @@ public:
 		CType* pType
 		)
 	{
-		return CastOperator (EStorage_Undefined, *pValue, pType, pValue);
+		return CastOperator (EStorage_Heap, *pValue, pType, pValue);
 	}
 
 	bool
@@ -455,7 +448,7 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		return CastOperator (EStorage_Undefined, OpValue, TypeKind, pResultValue);
+		return CastOperator (EStorage_Heap, OpValue, TypeKind, pResultValue);
 	}
 		
 	bool
@@ -474,7 +467,7 @@ public:
 		EType TypeKind
 		)
 	{
-		return CastOperator (EStorage_Undefined, *pValue, TypeKind, pValue);
+		return CastOperator (EStorage_Heap, *pValue, TypeKind, pValue);
 	}
 
 	// new & delete operators
@@ -485,6 +478,27 @@ public:
 		CType* pType,
 		const char* pTag,
 		CValue* pResultValue
+		);
+
+	bool
+	Prime (
+		EStorage StorageKind,
+		const CValue& PtrValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+
+	bool
+	Construct (
+		const CValue& OpValue,
+		rtl::CBoxListT <CValue>* pArgList = NULL
+		);
+
+	bool
+	ParseInitializer (
+		const CValue& Value,
+		const rtl::CConstBoxListT <CToken>& ConstructorTokenList,
+		const rtl::CConstBoxListT <CToken>& InitializerTokenList
 		);
 
 	CType* 
@@ -510,12 +524,6 @@ public:
 	EvaluateAlias (
 		const rtl::CConstBoxListT <CToken> TokenList,
 		CValue* pResultValue
-		);
-
-	bool
-	ParseInitializer (
-		const CValue& Value,
-		const rtl::CConstBoxListT <CToken> TokenList
 		);
 
 	// member operators
@@ -595,7 +603,14 @@ public:
 	{
 		return MemberOperator (*pValue, pName, pValue);
 	}
+
 	// call operators
+
+	void
+	CallTraceFunction (
+		const char* pFunctionName,
+		const char* pString
+		);
 
 	CType*
 	GetCallOperatorResultType (
@@ -670,17 +685,6 @@ public:
 		ArgList.InsertTail (ArgValue2);
 		return CallOperator (OpValue, &ArgList, pResultValue);
 	}
-
-	// base type constructor calls
-
-	bool
-	CallBaseTypeConstructor (
-		CType* pType,
-		rtl::CBoxListT <CValue>* pArgList
-		);
-
-	bool
-	PostBaseTypeConstructorList ();
 
 	// closure operators
 
@@ -758,13 +762,13 @@ public:
 		return ClosureOperator (OpValue, &ArgList, pResultValue);
 	}
 
-	// property accessors
-
 	CType*
 	GetFunctionType (
 		const CValue& OpValue,
 		CFunctionType* pFunctionType
 		);
+
+	// property getter
 
 	CType*
 	GetPropertyGetterType (const CValue& OpValue);
@@ -792,6 +796,8 @@ public:
 	{
 		return GetPropertyGetter (*pValue, pValue);
 	}
+
+	// property setter
 
 	CType*
 	GetPropertySetterType (
@@ -867,59 +873,90 @@ public:
 		return GetPropertySetter (*pValue, CValue (), pValue);
 	}
 
-	// std fields
+	// property binder
 
 	CType*
-	GetStdFieldType (
-		const CValue& OpValue,
-		EStdField Field
-		);
+	GetPropertyBinderType (const CValue& OpValue);
 
 	bool
-	GetStdFieldType (
+	GetPropertyBinderType (
 		const CValue& OpValue,
-		EStdField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetStdFieldType (
-		CValue* pValue,	
-		EStdField Field
-		)
+	GetPropertyBinderType (CValue* pValue)
 	{
-		return GetStdFieldType (*pValue, Field, pValue);
+		return GetPropertyBinderType (*pValue, pValue);
 	}
 
 	bool
-	GetStdField (
+	GetPropertyBinder (
 		const CValue& OpValue,
-		EStdField Field,
 		CValue* pResultValue
 		);
 
 	bool
-	GetStdField (
-		CValue* pValue,	
-		EStdField Field
-		)
+	GetPropertyBinder (CValue* pValue)
 	{
-		return GetStdField (*pValue, Field, pValue);
+		return GetPropertyBinder (*pValue, pValue);
+	}
+
+	// propvalue & onchange
+
+	CType*
+	GetPropertyPropValueType (const CValue& OpValue);
+
+	bool
+	GetPropertyPropValueType (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyPropValueType (CValue* pValue)
+	{
+		return GetPropertyPropValueType (*pValue, pValue);
 	}
 
 	bool
-	GetClassStdField (
+	GetPropertyPropValue (
 		const CValue& OpValue,
-		EStdField Field, 
 		CValue* pResultValue
 		);
 
 	bool
-	GetPropertyStdField (
+	GetPropertyPropValue (CValue* pValue)
+	{
+		return GetPropertyPropValue (*pValue, pValue);
+	}
+
+	CType*
+	GetPropertyOnChangeType (const CValue& OpValue);
+
+	bool
+	GetPropertyOnChangeType (
 		const CValue& OpValue,
-		EStdField Field, 
 		CValue* pResultValue
 		);
+
+	bool
+	GetPropertyOnChangeType (CValue* pValue)
+	{
+		return GetPropertyOnChangeType (*pValue, pValue);
+	}
+
+	bool
+	GetPropertyOnChange (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetPropertyOnChange (CValue* pValue)
+	{
+		return GetPropertyOnChange (*pValue, pValue);
+	}
 
 	// misc property functions
 
@@ -991,29 +1028,65 @@ public:
 		const CValue& SrcValue
 		);
 
-	// misc
+	// weakening
+
+	CType*
+	GetWeakenedType (const CValue& OpValue);
+
+	bool
+	GetWeakenedType (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	GetWeakenedType (CValue* pValue)
+	{
+		return GetWeakenedType (*pValue, pValue);
+	}
+
+	bool
+	Weaken (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	Weaken (CValue* pValue)
+	{
+		return Weaken (*pValue, pValue);
+	}
+
+	// fields
 
 	bool
 	GetField (
+		const CValue& OpValue,
 		CStructField* pMember,
 		CBaseTypeCoord* pCoord,
 		CValue* pResultValue
 		);
 
-	CType*
-	GetFieldType (
+	bool
+	GetField (
 		const CValue& OpValue,
-		CStructField* pField
-		);
+		CStructField* pMember,
+		CValue* pResultValue
+		)
+	{
+		return GetField (OpValue, pMember, NULL, pResultValue);
+	}
 
 	bool
-	GetNamedTypeField (
-		const CValue& OpValue,
-		CNamedType* pNamedType,
-		CStructField* pField,
-		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
+	GetField (
+		CValue* pValue,
+		CStructField* pMember
+		)
+	{
+		return GetField (*pValue, pMember, NULL, pValue);
+	}
+
+	// impl
 
 	bool
 	GetStructField  (
@@ -1040,32 +1113,12 @@ public:
 
 	bool
 	GetPropertyField (
-		CProperty* pProperty,
-		CStructField* pField,
-		CBaseTypeCoord* pCoord,
+		const CValue& OpValue,
+		CModuleItem* pMember,
 		CValue* pResultValue
 		);
 
-	bool
-	GetAutoEvField (
-		CAutoEv* pAutoEv,
-		CStructField* pField,
-		CBaseTypeCoord* pCoord,
-		CValue* pResultValue
-		);
-
-	bool
-	GetAutoEvData (
-		CAutoEv* pAutoEv,
-		CValue* pResultValue
-		);
-
-	bool
-	GetAutoEvField (
-		CAutoEv* pAutoEv,
-		EAutoEvField Field,
-		CValue* pResultValue
-		);
+	// misc
 
 	bool
 	GetVirtualMethod (
@@ -1079,20 +1132,6 @@ public:
 		CProperty* pProperty,
 		CClosure* pClosure,
 		CValue* pResultValue
-		);
-
-	bool
-	GetClassFieldValue (
-		const CValue& ObjValue,
-		CStructField* pMember,
-		CValue* pValue
-		);
-
-	bool
-	SetClassFieldValue (
-		const CValue& ObjValue,
-		CStructField* pMember,
-		const CValue& Value
 		);
 
 	void
@@ -1125,8 +1164,6 @@ public:
 		CValue* pResultValue
 		);
 
-protected:
-
 	// checks
 
 	void
@@ -1136,12 +1173,14 @@ protected:
 		);
 
 	void
+	CheckDataPtrRange (const CValue& Value);
+
+	void
 	CheckDataPtrRange (
 		const CValue& PtrValue,
 		size_t Size,
 		const CValue& RangeBeginValue,
-		const CValue& RangeEndValue,
-		ERuntimeError Error
+		const CValue& RangeEndValue
 		);
 
 	bool 
@@ -1177,6 +1216,9 @@ protected:
 		const CValue& DstValue
 		);
 
+protected:
+	// bit fields
+
 	bool
 	ExtractBitField (
 		const CValue& Value,
@@ -1205,36 +1247,6 @@ protected:
 	GetNamedTypeMember (
 		const CValue& OpValue,
 		CNamedType* pNamedType,
-		const char* pName,
-		CValue* pResultValue
-		);
-
-	CType*
-	GetMulticastMemberType (
-		const CValue& OpValue,
-		CMulticastType* pMulticastType,
-		const char* pName
-		);
-
-	bool
-	GetMulticastMember (
-		const CValue& OpValue,
-		CMulticastType* pMulticastType,
-		const char* pName,
-		CValue* pResultValue
-		);
-
-	CType*
-	GetMemberAutoEvType (
-		const CValue& OpValue,
-		CAutoEvType* pAutoEvType,
-		const char* pName
-		);
-
-	bool
-	GetAutoEvMember (
-		const CValue& OpValue,
-		CAutoEvType* pAutoEvType,
 		const char* pName,
 		CValue* pResultValue
 		);
@@ -1272,22 +1284,6 @@ protected:
 	GetVarArgType (
 		CType* pType,
 		bool IsUnsafeVarArg
-		);
-
-	bool
-	InitializeObject (
-		EStorage StorageKind,
-		const CValue& ObjPtrValue,
-		CClassType* pClassType,
-		rtl::CBoxListT <CValue>* pArgList,
-		CValue* pResultValue
-		);
-
-	bool
-	InitializeData (
-		EStorage StorageKind,
-		const CValue& PtrValue,
-		CType* pType
 		);
 
 	bool

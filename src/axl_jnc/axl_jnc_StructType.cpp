@@ -4,22 +4,6 @@
 
 namespace axl {
 namespace jnc {
-	
-//.............................................................................
-
-const char* 
-GetStdFieldString (EStdField Field)
-{
-	static const char* StringTable [] = 
-	{
-		"onchange",   // EStdField_OnChange,
-		"value",      // EStdField_Value,
-	};
-
-	return (size_t) Field < countof (StringTable) ? 
-		StringTable [Field] : 
-		"undefined-std-field";
-}
 
 //.............................................................................
 	
@@ -27,6 +11,7 @@ CStructField::CStructField ()
 {
 	m_ItemKind = EModuleItem_StructField;
 	m_pType = NULL;
+	m_pType_i = NULL;
 	m_PtrTypeFlags = 0;
 	m_pBitFieldBaseType = NULL;
 	m_BitCount = 0;
@@ -39,8 +24,7 @@ CStructField::CStructField ()
 CStructType::CStructType ()
 {
 	m_TypeKind = EType_Struct;
-	m_Flags = ETypeFlag_Pod | ETypeFlag_Moveable;
-	m_AlignFactor = 1;
+	m_Flags = ETypeFlag_Pod;
 	m_PackFactor = 8;
 	m_FieldActualSize = 0;
 	m_FieldAlignedSize = 0;
@@ -48,38 +32,36 @@ CStructType::CStructType ()
 	m_LastBitFieldOffset = 0;
 }
 
-bool
-CStructType::IsClassStructType ()
-{
-	return 
-		m_pParentNamespace->GetNamespaceKind () == ENamespace_Type &&
-		((CNamedType*) m_pParentNamespace)->GetTypeKind () == EType_Class &&
-		((CClassType*) m_pParentNamespace)->GetClassStructType () == this;
-}
-
 CStructField*
-CStructType::CreateField (
+CStructType::CreateFieldImpl (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags,
+	uint_t PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pConstructor,
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
+	ASSERT (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code));
 
 	CStructField* pField = AXL_MEM_NEW (CStructField);
 	pField->m_StorageKind = m_StorageKind;
-	pField->m_pParentType = this;
+	pField->m_pParentNamespace = this;
 	pField->m_Name = Name;
 	pField->m_pType = pType;
 	pField->m_PtrTypeFlags = PtrTypeFlags;
 	pField->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pField->m_BitCount = BitCount;
 
+	if (pConstructor)
+		pField->m_Constructor.TakeOver (pConstructor);		
+
 	if (pInitializer)
-	{
 		pField->m_Initializer.TakeOver (pInitializer);		
+
+	if (!pField->m_Constructor.IsEmpty () || 
+		!pField->m_Initializer.IsEmpty ())
+	{
 		m_InitializedFieldArray.Append (pField);
 	}
 
@@ -88,9 +70,6 @@ CStructType::CreateField (
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
 		m_Flags &= ~ETypeFlag_Pod;
 
-	if (!(pType->GetFlags () & ETypeFlag_Moveable))
-		m_Flags &= ~ETypeFlag_Moveable;
-
 	if (!Name.IsEmpty ())
 	{
 		bool Result = AddItem (pField);
@@ -98,12 +77,28 @@ CStructType::CreateField (
 			return NULL;
 	}
 
+	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
+	{
+		pField->m_pType_i = (CImportType*) pType;
+		m_ImportFieldArray.Append (pField);
+	}
+
+	m_MemberFieldArray.Append (pField);
 	return pField;
 }
 
 CStructField*
-CStructType::GetFieldByIndex (size_t Index)
+CStructType::GetFieldByIndexImpl (
+	size_t Index,
+	bool IgnoreBaseTypes
+	)
 {
+	if (!IgnoreBaseTypes && !m_BaseTypeList.IsEmpty ())
+	{
+		err::SetFormatStringError ("'%s' has base types, cannot use indexed member operator", GetTypeString ().cc ());
+		return NULL;
+	}
+
 	size_t Count = m_FieldList.GetCount ();
 	if (Index >= Count)
 	{
@@ -127,10 +122,10 @@ CStructType::Append (CStructType* pType)
 {
 	bool Result;
 
-	rtl::CIteratorT <CBaseType> BaseType = pType->m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
+	rtl::CIteratorT <CBaseTypeSlot> Slot = pType->m_BaseTypeList.GetHead ();
+	for (; Slot; Slot++)
 	{
-		Result = AddBaseType (BaseType->m_pType) != NULL;
+		Result = AddBaseType (Slot->m_pType) != NULL;
 		if (!Result)
 			return false;
 	}
@@ -152,38 +147,65 @@ CStructType::Append (CStructType* pType)
 bool
 CStructType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_LayoutReady)
-		return true;
-
-	bool Result = PreCalcLayout ();
-	if (!Result)
-		return false;
+	bool Result;
 
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	bool HasBaseConstructor = false;
+	Result = 
+		ResolveImportBaseTypes () &&
+		ResolveImportFields ();
 
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
+	if (!Result)
+		return false;
+
+	rtl::CIteratorT <CBaseTypeSlot> Slot = m_BaseTypeList.GetHead ();
+	for (; Slot; Slot++)
 	{
-		CBaseType* pBaseType = *BaseType;
+		CBaseTypeSlot* pSlot = *Slot;
 
-		Result = pBaseType->m_pType->CalcLayout ();
+		Result = pSlot->m_pType->EnsureLayout ();
 		if (!Result)
 			return false;
 
-		if (pBaseType->m_pType->GetConstructor ())
-			HasBaseConstructor = true;
+		if (pSlot->m_pType->GetConstructor ())
+			m_BaseTypeConstructArray.Append (pSlot);
 
 		Result = LayoutField (
-				pBaseType->m_pType,
-				&pBaseType->m_Offset,
-				&pBaseType->m_LlvmIndex
+				pSlot->m_pType,
+				&pSlot->m_Offset,
+				&pSlot->m_LlvmIndex
 				);
 
 		if (!Result)
 			return false;
+	}
+
+	// scan members for constructors (not for auxilary structs such as class iface)
+	
+	if (m_StructTypeKind == EStructType_Normal)
+	{
+		size_t Count = m_MemberFieldArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CStructField* pField = m_MemberFieldArray [i];
+			CType* pType = pField->GetType ();
+		
+			if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
+				m_MemberFieldConstructArray.Append (pField);
+		}
+
+		Count = m_MemberPropertyArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CProperty* pProperty = m_MemberPropertyArray [i];
+			Result = pProperty->EnsureLayout ();
+			if (!Result)
+				return false;
+
+			if (pProperty->GetConstructor ())
+				m_MemberPropertyConstructArray.Append (pProperty);
+		}
 	}
 
 	rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
@@ -191,7 +213,7 @@ CStructType::CalcLayout ()
 	{
 		CStructField* pField = *Field;
 
-		Result = pField->m_pType->CalcLayout ();
+		Result = pField->m_pType->EnsureLayout ();
 		if (!Result)
 			return false;
 
@@ -224,32 +246,44 @@ CStructType::CalcLayout ()
 
 	m_Size = m_FieldAlignedSize;
 
-	if (!m_pConstructor && 
-		(HasBaseConstructor || !m_InitializedFieldArray.IsEmpty ()))
+	if (m_StructTypeKind == EStructType_Normal)
 	{
-		Result = CreateDefaultConstructor ();
-		if (!Result)
-			return false;
+		if (!m_pPreConstructor && !m_InitializedFieldArray.IsEmpty ())
+		{
+			Result = CreateDefaultMemberMethod (EFunction_PreConstructor);
+			if (!Result)
+				return false;
+		}
+
+		if (!m_pConstructor && 
+			(m_pPreConstructor || 
+			!m_MemberFieldConstructArray.IsEmpty () ||
+			!m_MemberPropertyConstructArray.IsEmpty ()))
+		{
+			Result = CreateDefaultMemberMethod (EFunction_Constructor);
+			if (!Result)
+				return false;
+		}
 	}
 
-	PostCalcLayout ();
 	return true;
 }
 
 bool
-CStructType::CallBaseTypeConstructors ()
+CStructType::Compile ()
 {
-	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	ASSERT (ThisValue);
+	bool Result;
 
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
+	if (m_pPreConstructor && !(m_pPreConstructor->GetFlags () & EModuleItemFlag_User))
 	{
-		CFunction* pConstructor = BaseType->m_pType->GetConstructor ();
-		if (!pConstructor)
+		Result = CompileDefaultPreConstructor ();
+		if (!Result)
 			return false;
+	}
 
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ThisValue);
+	if (m_pConstructor && !(m_pConstructor->GetFlags () & EModuleItemFlag_User))
+	{
+		Result = CompileDefaultConstructor ();
 		if (!Result)
 			return false;
 	}
@@ -258,7 +292,25 @@ CStructType::CallBaseTypeConstructors ()
 }
 
 bool
-CStructType::InitializeFields ()
+CStructType::CompileDefaultPreConstructor ()
+{
+	ASSERT (m_pPreConstructor);
+
+	bool Result;
+
+	CValue ThisValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pPreConstructor, &ThisValue, 1);
+
+	Result = InitializeFields (ThisValue);
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+bool
+CStructType::InitializeFields (const CValue& ThisValue)
 {
 	bool Result;
 
@@ -268,9 +320,15 @@ CStructType::InitializeFields ()
 		CStructField* pField = m_InitializedFieldArray [i];
 
 		CValue FieldValue;
-		Result = 
-			m_pModule->m_OperatorMgr.GetField (pField, NULL, &FieldValue) &&
-			m_pModule->m_OperatorMgr.ParseInitializer (FieldValue, pField->GetInitializer ());
+		Result = m_pModule->m_OperatorMgr.GetField (ThisValue, pField, NULL, &FieldValue);
+		if (!Result)
+			return false;
+
+		Result = m_pModule->m_OperatorMgr.ParseInitializer (
+			FieldValue, 
+			pField->m_Constructor,
+			pField->m_Initializer
+			);
 
 		if (!Result)
 			return false;

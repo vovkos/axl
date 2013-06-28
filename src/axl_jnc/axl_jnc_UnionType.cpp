@@ -10,22 +10,21 @@ namespace jnc {
 CUnionType::CUnionType ()
 {
 	m_TypeKind = EType_Union;
-	m_Flags = ETypeFlag_Pod | ETypeFlag_Moveable;
+	m_Flags = ETypeFlag_Pod;
 	m_pStructType = NULL;
 	m_pInitializedField = NULL;
 }
 
 CStructField*
-CUnionType::CreateField (
+CUnionType::CreateFieldImpl (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags,
+	uint_t PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pConstructor,
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
-
 	if (!(pType->GetFlags () & ETypeFlag_Pod))
 	{
 		err::SetFormatStringError ("non-POD '%s' cannot be union member", pType->GetTypeString ().cc ());
@@ -34,13 +33,20 @@ CUnionType::CreateField (
 
 	CStructField* pField = AXL_MEM_NEW (CStructField);
 	pField->m_Name = Name;
-	pField->m_pParentType = this;
+	pField->m_pParentNamespace = this;
 	pField->m_pType = pType;
 	pField->m_PtrTypeFlags = PtrTypeFlags;
 	pField->m_pBitFieldBaseType = BitCount ? pType : NULL;
 	pField->m_BitCount = BitCount;
 
+	if (pConstructor)
+		pField->m_Constructor.TakeOver (pConstructor);
+
 	if (pInitializer)
+		pField->m_Initializer.TakeOver (pInitializer);
+
+	if (!pField->m_Constructor.IsEmpty () || 
+		!pField->m_Initializer.IsEmpty ())
 	{
 		if (m_pInitializedField)
 		{
@@ -52,7 +58,6 @@ CUnionType::CreateField (
 			return NULL;
 		}
 
-		pField->m_Initializer.TakeOver (pInitializer);		
 		m_pInitializedField = pField;
 	}
 
@@ -92,15 +97,14 @@ CUnionType::GetFieldByIndex (size_t Index)
 bool
 CUnionType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_LayoutReady)
-		return true;
-
-	bool Result = PreCalcLayout ();
-	if (!Result)
-		return false;
+	bool Result;
 
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
+
+	Result = ResolveImportFields ();
+	if (!Result)
+		return false;
 
 	CType* pLargestMemberType = NULL;
 
@@ -109,7 +113,7 @@ CUnionType::CalcLayout ()
 	{
 		CStructField* pMember = *Member;
 
-		Result = pMember->m_pType->CalcLayout ();
+		Result = pMember->m_pType->EnsureLayout ();
 		if (!Result)
 			return false;
 
@@ -126,33 +130,84 @@ CUnionType::CalcLayout ()
 
 	ASSERT (pLargestMemberType);
 
-	m_pStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pStructType->m_Tag.Format ("%s.struct", m_Tag.cc ());
 	m_pStructType->CreateField (pLargestMemberType);
-	Result = m_pStructType->CalcLayout ();
+	Result = m_pStructType->EnsureLayout ();
 	if (!Result)
 		return false;
 
-	if (!m_pConstructor && m_pInitializedField)
+	if (!m_pPreConstructor && m_pInitializedField)
 	{
-		Result = CreateDefaultConstructor ();
+		Result = CreateDefaultMemberMethod (EFunction_PreConstructor);
 		if (!Result)
 			return false;
 	}
 
-	PostCalcLayout ();
+	if (!m_pConstructor && m_pPreConstructor)
+	{
+		Result = CreateDefaultMemberMethod (EFunction_Constructor);
+		if (!Result)
+			return false;
+	}
+
+	m_Size = m_pStructType->GetSize ();
+	m_AlignFactor = m_pStructType->GetAlignFactor ();
 	return true;
 }
 
 bool
-CUnionType::InitializeField ()
+CUnionType::Compile ()
+{
+	bool Result;
+
+	if (m_pPreConstructor && !(m_pPreConstructor->GetFlags () & EModuleItemFlag_User))
+	{
+		Result = CompileDefaultPreConstructor ();
+		if (!Result)
+			return false;
+	}
+
+	if (m_pConstructor && !(m_pConstructor->GetFlags () & EModuleItemFlag_User))
+	{
+		Result = CompileDefaultConstructor ();
+		if (!Result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
+CUnionType::CompileDefaultPreConstructor ()
+{
+	ASSERT (m_pPreConstructor);
+
+	bool Result;
+
+	CValue ThisValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pPreConstructor, &ThisValue, 1);
+
+	Result = InitializeField (ThisValue);
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+
+bool
+CUnionType::InitializeField (const CValue& ThisValue)
 {
 	ASSERT (m_pInitializedField);
 
 	CValue FieldValue;
 	return 
-		m_pModule->m_OperatorMgr.GetField (m_pInitializedField, NULL, &FieldValue) &&
-		m_pModule->m_OperatorMgr.ParseInitializer (FieldValue, m_pInitializedField->GetInitializer ());
+		m_pModule->m_OperatorMgr.GetField (ThisValue, m_pInitializedField, NULL, &FieldValue) &&
+		m_pModule->m_OperatorMgr.ParseInitializer (
+			FieldValue, 
+			m_pInitializedField->m_Constructor,
+			m_pInitializedField->m_Initializer
+			);
 }
 
 //.............................................................................

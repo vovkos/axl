@@ -34,7 +34,6 @@ private:
 	void addFunction(QTreeWidgetItem *parent, jnc::CFunction *function);
 	void addFunctionImpl(QTreeWidgetItem *parent, jnc::CFunction *function);
 	void addProperty(QTreeWidgetItem *parent, jnc::CProperty *prop);
-	void addAutoEv(QTreeWidgetItem *parent, jnc::CAutoEv *autoEv);
 	void addEnumTypeMembers(QTreeWidgetItem *parent, jnc::CEnumType *type);
 	void addStructTypeMembers(QTreeWidgetItem *parent, jnc::CStructType *type);
 	

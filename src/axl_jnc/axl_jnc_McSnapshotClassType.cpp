@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_jnc_McSnapshotType.h"
+#include "axl_jnc_McSnapshotClassType.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -7,78 +7,28 @@ namespace jnc {
 
 //.............................................................................
 
-CMcSnapshotType::CMcSnapshotType ()
+CMcSnapshotClassType::CMcSnapshotClassType ()
 {
-	m_TypeKind = EType_McSnapshot;
+	m_ClassTypeKind = EClassType_McSnapshot;
 	m_pTargetType = NULL;
-	m_pMcSnapshotStructType = NULL;
 	memset (m_FieldArray, 0, sizeof (m_FieldArray));
 	memset (m_MethodArray, 0, sizeof (m_MethodArray));
 }
 
 void
-CMcSnapshotType::PrepareTypeString ()
+CMcSnapshotClassType::PrepareTypeString ()
 {
-	m_TypeString += "mcsnapshot ";
-	m_TypeString += m_pTargetType->GetTypeModifierString ();
-	m_TypeString += m_pTargetType->GetTargetType ()->GetArgString ();
+	m_TypeString = m_pTargetType->GetTypeModifierString ();
+	m_TypeString.AppendFormat ("mcsnapshot %s", m_pTargetType->GetTargetType ()->GetArgString ());
 }
 
-void
-CMcSnapshotType::PrepareLlvmType ()
+bool
+CMcSnapshotClassType::CompileCallMethod ()
 {
-	m_pLlvmType = GetMcSnapshotStructType ()->GetLlvmType ();
-}
+	CFunction* pFunction = m_MethodArray [EMcSnapshotMethod_Call];
 
-CStructType* 
-CMcSnapshotType::GetMcSnapshotStructType ()
-{
-	if (m_pMcSnapshotStructType)
-		return m_pMcSnapshotStructType;
-
-	m_pMcSnapshotStructType = m_pModule->m_TypeMgr.CreateUnnamedStructType ();
-	m_pMcSnapshotStructType->m_Tag.Format ("mcsnapshot");
-
-	m_FieldArray [EMcSnapshotField_Count] = m_pMcSnapshotStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_FieldArray [EMcSnapshotField_PtrArray] = m_pMcSnapshotStructType->CreateField (m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe));
-	
-	m_pMcSnapshotStructType->CalcLayout ();
-
-	return m_pMcSnapshotStructType;
-}
-
-CFunction* 
-CMcSnapshotType::GetMethod (EMcSnapshotMethod Method)
-{
-	if (m_MethodArray [Method])
-		return m_MethodArray [Method];
-
-	CFunction* pFunction;
-
-	switch (Method)
-	{
-	case EMcSnapshotMethod_Call:
-		pFunction = CreateCallMethod ();
-		break;
-
-	default:
-		ASSERT (false);
-		pFunction = NULL;
-	}
-
-	m_MethodArray [Method] = pFunction;
-	return pFunction;
-}
-
-CFunction* 
-CMcSnapshotType::CreateCallMethod ()
-{
-	rtl::CArrayT <CFunctionArg*> ArgArray = m_pTargetType->GetTargetType ()->GetArgArray ();
-	ArgArray.Insert (0, GetSimpleFunctionArg ());
+	rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->GetType ()->GetArgArray ();
 	size_t ArgCount = ArgArray.GetCount ();
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction ("McSnapshotCall", pType);
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
@@ -95,12 +45,15 @@ CMcSnapshotType::CreateCallMethod ()
 	CValue PtrPfnEndValue;
 	CValue PtrPfnVariable;
 
-	CType* pPtrPfnType = m_pTargetType->GetDataPtrType (EDataPtrType_Unsafe);
+	CType* pPtrPfnType = m_pTargetType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 	CType* pSizeType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValueArray [0], 0, pSizeType, &CountValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ArgValueArray [0], 1, pPtrPfnType, &PtrPfnValue);
+	m_pModule->m_OperatorMgr.GetClassField (ArgValueArray [0], m_FieldArray [EMcSnapshotField_Count], NULL, &CountValue);
+	m_pModule->m_OperatorMgr.GetClassField (ArgValueArray [0], m_FieldArray [EMcSnapshotField_PtrArray], NULL, &PtrPfnValue);
+
 	m_pModule->m_LlvmBuilder.CreateAlloca (pPtrPfnType, "ppf", NULL, &PtrPfnVariable);
+	m_pModule->m_LlvmBuilder.CreateLoad (PtrPfnValue, PtrPfnValue.GetType (), &PtrPfnValue);
+	m_pModule->m_LlvmBuilder.CreateLoad (CountValue, CountValue.GetType (), &CountValue);
 	m_pModule->m_LlvmBuilder.CreateStore (PtrPfnValue, PtrPfnVariable);
 	m_pModule->m_LlvmBuilder.CreateGep (PtrPfnValue, CountValue, pPtrPfnType, &PtrPfnEndValue);
 
@@ -126,7 +79,7 @@ CMcSnapshotType::CreateCallMethod ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	return pFunction;
+	return true;
 }
 
 //.............................................................................

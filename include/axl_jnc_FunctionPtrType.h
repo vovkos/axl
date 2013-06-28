@@ -9,9 +9,6 @@
 namespace axl {
 namespace jnc {
 
-class CMulticastType;
-class CMcSnapshotType;
-
 //.............................................................................
 
 class CFunctionPtrType: public CType
@@ -21,8 +18,7 @@ class CFunctionPtrType: public CType
 protected:
 	EFunctionPtrType m_PtrTypeKind;
 	CFunctionType* m_pTargetType;
-	CMulticastType* m_pMulticastType;
-	CMcSnapshotType* m_pMcSnapshotType;
+	CClassType* m_pMulticastType;
 	rtl::CString m_TypeModifierString;
 
 public:
@@ -46,17 +42,27 @@ public:
 		return m_PtrTypeKind == EFunctionPtrType_Normal || m_PtrTypeKind == EFunctionPtrType_Weak;
 	}
 
-	CMulticastType* 
-	GetMulticastType ();
+	CFunctionPtrType*
+	GetCheckedPtrType ()
+	{
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
+			m_pTargetType->GetFunctionPtrType (m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
+			this;			
+	}
 
-	CMcSnapshotType* 
-	GetMcSnapshotType ();
+	CFunctionPtrType*
+	GetUnCheckedPtrType ()
+	{
+		return (m_Flags & EPtrTypeFlag_Checked) ?  
+			m_pTargetType->GetFunctionPtrType (m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
+	CClassType* 
+	GetMulticastType ();
 
 	CStructType* 
 	GetFunctionPtrStructType ();
-
-	CStructType* 
-	GetFunctionPtrStructType_w ();
 
 	rtl::CString
 	GetTypeModifierString ();
@@ -82,20 +88,10 @@ protected:
 
 //.............................................................................
 
-class CFunctionPtrTypeTuple: public rtl::TListLink
+struct TFunctionPtrTypeTuple: rtl::TListLink
 {
-	friend class CTypeMgr;
-
-protected:
 	CStructType* m_pPtrStructType;
-	CStructType* m_pPtrStructType_w;
-	CFunctionPtrType* m_PtrTypeArray [2] [EFunctionPtrType__Count] [2]; // ref x kind x nullable
-
-public:
-	CFunctionPtrTypeTuple ()
-	{
-		memset (this, 0, sizeof (CFunctionPtrTypeTuple));
-	}
+	CFunctionPtrType* m_PtrTypeArray [2] [3] [3]; // ref x kind x unsafe/checked
 };
 
 //.............................................................................

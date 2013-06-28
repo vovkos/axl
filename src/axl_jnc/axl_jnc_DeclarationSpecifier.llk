@@ -30,8 +30,7 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return $pTypeSpecifier->SetType ($1.m_pType);
 			}
-	|	resolver ({ return false; }) // prefer named-type-specifier over type-modifier
-		type_modifier 
+	|	type_modifier
 			{
 				return $pTypeSpecifier->SetTypeModifier ($1.m_Modifier);
 			}
@@ -101,10 +100,6 @@ storage_specifier
 			{
 				$.m_StorageKind = EStorage_UHeap;
 			}
-	|	EToken_Member
-			{
-				$.m_StorageKind = EStorage_Member;
-			}
 	|	EToken_Abstract
 			{
 				$.m_StorageKind = EStorage_Abstract;
@@ -116,6 +111,14 @@ storage_specifier
 	|	EToken_Override
 			{
 				$.m_StorageKind = EStorage_Override;
+			}
+	|	EToken_Mutable
+			{
+				$.m_StorageKind = EStorage_Mutable;
+			}
+	|	EToken_Nullable
+			{
+				$.m_StorageKind = EStorage_Nullable;
 			}
 	;
 
@@ -258,21 +261,13 @@ class
 	ETypeModifier m_Modifier;
 }
 type_modifier
-	:	EToken_Signed
-			{
-				$.m_Modifier = ETypeModifier_Signed;
-			}
-	|	EToken_Unsigned
+	:	EToken_Unsigned
 			{
 				$.m_Modifier = ETypeModifier_Unsigned;
 			}
 	|	EToken_BigEndian
 			{
 				$.m_Modifier = ETypeModifier_BigEndian;
-			}
-	|	EToken_Nullable
-			{
-				$.m_Modifier = ETypeModifier_Nullable;
 			}
 	|	EToken_Const
 			{
@@ -281,10 +276,6 @@ type_modifier
 	|	EToken_ReadOnly
 			{
 				$.m_Modifier = ETypeModifier_ReadOnly;
-			}
-	|	EToken_Mutable
-			{
-				$.m_Modifier = ETypeModifier_Mutable;
 			}
 	|	EToken_Volatile
 			{
@@ -310,10 +301,6 @@ type_modifier
 			{
 				$.m_Modifier = ETypeModifier_Stdcall;
 			}
-	|	EToken_Class
-			{
-				$.m_Modifier = ETypeModifier_Class;
-			}
 	|	EToken_Function
 			{
 				$.m_Modifier = ETypeModifier_Function;
@@ -321,10 +308,6 @@ type_modifier
 	|	EToken_Property
 			{
 				$.m_Modifier = ETypeModifier_Property;
-			}
-	|	EToken_AutoEv
-			{
-				$.m_Modifier = ETypeModifier_AutoEv;
 			}
 	|	EToken_Bindable
 			{
@@ -338,7 +321,18 @@ type_modifier
 			{
 				$.m_Modifier = ETypeModifier_Indexed;
 			}
+	|	EToken_Multicast
+			{
+				$.m_Modifier = ETypeModifier_Multicast;
+			}
+	|	EToken_Event
+			{
+				$.m_Modifier = ETypeModifier_Event;
+			}
+	|	EToken_AutoEv
+			{
+				$.m_Modifier = ETypeModifier_AutoEv;
+			}
 	;
 
 //.............................................................................
-

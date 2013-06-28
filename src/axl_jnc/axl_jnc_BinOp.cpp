@@ -34,7 +34,7 @@ GetBinOpKindString (EBinOp OpKind)
 		"&&",                         // EBinOp_LogAnd,
 		"||",                         // EBinOp_LogOr,
 		"=",                          // EBinOp_Assign,
-		":=",                         // EBinOp_ClassAssign,
+		":=",                         // EBinOp_RefAssign,
 		"+=",                         // EBinOp_AddAssign,
 		"-=",                         // EBinOp_SubAssign,
 		"*=",                         // EBinOp_MulAssign,

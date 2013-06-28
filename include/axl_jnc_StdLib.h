@@ -9,6 +9,8 @@
 namespace axl {
 namespace jnc {
 
+class CMulticastClassType;
+
 //.............................................................................
 
 class CStdLib
@@ -37,6 +39,10 @@ public:
 		);
 
 	static
+	void
+	MulticastClear (jnc::TMulticast* pMulticast);
+
+	static
 	handle_t
 	MulticastSet (
 		jnc::TMulticast* pMulticast,
@@ -45,14 +51,7 @@ public:
 
 	static
 	handle_t
-	MulticastSet_w (
-		jnc::TMulticast* pMulticast,
-		jnc::TFunctionPtr_w Ptr
-		);
-
-	static
-	handle_t
-	MulticastSet_u (
+	MulticastSet_t (
 		jnc::TMulticast* pMulticast,
 		void* pf
 		);
@@ -66,14 +65,7 @@ public:
 
 	static
 	handle_t
-	MulticastAdd_w (
-		jnc::TMulticast* pMulticast,
-		jnc::TFunctionPtr_w Ptr
-		);
-
-	static
-	handle_t
-	MulticastAdd_u (
+	MulticastAdd_t (
 		jnc::TMulticast* pMulticast,
 		void* pf
 		);
@@ -86,30 +78,15 @@ public:
 		);
 
 	static
-	jnc::TFunctionPtr_w
-	MulticastRemove_w (
-		jnc::TMulticast* pMulticast,
-		handle_t Handle
-		);
-
-	static
 	void*
-	MulticastRemove_u (
+	MulticastRemove_t (
 		jnc::TMulticast* pMulticast,
 		handle_t Handle
 		);
 
 	static
-	jnc::TMcSnapshot
-	MulticastSnapshot (jnc::TMulticast* pMulticast);
-
-	static
-	jnc::TMcSnapshot
-	MulticastSnapshot_w (jnc::TMulticast* pMulticast);
-
-	static
-	jnc::TMcSnapshot
-	MulticastSnapshot_u (jnc::TMulticast* pMulticast);
+	jnc::TFunctionPtr
+	MulticastGetSnapshot (jnc::TMulticast* pMulticast);
 
 	static
 	void*
@@ -146,6 +123,14 @@ protected:
 	WINAPI
 	ThreadProc (PVOID pContext);
 #endif
+
+	static
+	void
+	ExportMulticastMethods (
+		CModule* pModule,
+		llvm::ExecutionEngine* pLlvmExecutionEngine,
+		CMulticastClassType* pMulticastType
+		);
 };
 
 //.............................................................................

@@ -38,13 +38,6 @@ struct CStringDetailsT <char>
 	}
 
 	static 
-	const char* 
-	GetEmptyLiteral ()
-	{ 
-		return ""; 
-	}
-
-	static 
 	int 
 	Cmp (
 		const char* p1, 
@@ -146,13 +139,6 @@ struct CStringDetailsT <wchar_t>
 	CalcLength (const wchar_t* p)
 	{ 
 		return wcslen (p); 
-	}
-
-	static 
-	const wchar_t* 
-	GetEmptyLiteral ()
-	{ 
-		return L""; 
 	}
 
 	static 
@@ -342,10 +328,6 @@ public:
 
 	operator const C* () const
 	{ 
-		// orginally was like this:
-		// return m_p ? m_p : CDetails::GetEmptyLiteral (); 
-		// but in this case there will be difference in passing CString as const char* or as vararg
-		
 		return m_p; 
 	}
 

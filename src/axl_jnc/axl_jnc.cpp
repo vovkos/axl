@@ -214,25 +214,20 @@ PrintLlvmIr (
 {
 	uint_t CommentMdKind = pModule->m_LlvmBuilder.GetCommentMdKind ();
 
-	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
+	rtl::CIteratorT <CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+		if (Function->GetFlags () & EModuleItemFlag_Orphan)
+			continue;
+
+		CFunctionType* pFunctionType = Function->GetType (); 
 
 		fprintf (pFile, "%s %s %s %s\n", 
 			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+			GetCallConvString (pFunctionType->GetCallConv ()),
 			Function->m_Tag.cc (), 
 			pFunctionType->GetArgString ().cc ()
 			);
-
-		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
-		if (pExternFunction)
-		{
-			fprintf (pFile, "  ->%s\n", pExternFunction->m_Tag.cc ());
-			fprintf (pFile, "\n");
-			continue;
-		}
 
 		llvm::Function* pLlvmFunction = Function->GetLlvmFunction ();
 		llvm::Function::BasicBlockListType& BlockList = pLlvmFunction->getBasicBlockList ();
@@ -275,36 +270,28 @@ PrintLlvmIr (
 
 bool 
 PrintDisassembly (
-	jnc::CModule *module,
+	CModule *module,
 	FILE* pFile
 	)
 {
-	jnc::CDisassembler Dasm;
+	CDisassembler Dasm;
 
-	rtl::CIteratorT <jnc::CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
+	rtl::CIteratorT <CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+		if (Function->GetFlags () & EModuleItemFlag_Orphan)
+			continue;
+
+		CFunctionType* pFunctionType = Function->GetType (); 
 
 		fprintf (
 			pFile,
 			"%s %s %s %s\n", 
 			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+			GetCallConvString (pFunctionType->GetCallConv ()),
 			Function->m_Tag.cc (), 
 			pFunctionType->GetArgString ().cc ()
 			);
-
-		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
-		if (pExternFunction)
-		{
-			fprintf (
-				pFile,
-				"  ->%s\n\n", 
-				pExternFunction->m_Tag.cc ()
-				);
-			continue;
-		}
 
 		void* pf = Function->GetMachineCode ();
 		size_t Size = Function->GetMachineCodeSize ();

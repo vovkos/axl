@@ -54,7 +54,7 @@ protected:
 
 	struct TLaDfaTransition
 	{
-		int m_Flags;
+		uint_t m_Flags;
 		size_t m_ProductionIndex;
 		size_t m_ResolverIndex;
 		size_t m_ResolverElseIndex;
@@ -74,7 +74,7 @@ protected:
 	CToken m_CurrentToken;
 	CToken m_LastMatchedToken;
 
-	int m_Flags;
+	uint_t m_Flags;
 	
 public:
 	CParserT ()
@@ -916,9 +916,9 @@ protected:
 
 	// bool
 	// Argument (
-	//	size_t Index,
-	//	CSymbolNode* pSymbol
-	//	);
+	//		size_t Index,
+	//		CSymbolNode* pSymbol
+	//		);
 
 	// bool
 	// Enter (size_t Index)
@@ -928,10 +928,10 @@ protected:
 
 	// ELaDfaResult
 	// LaDfa (
-	//	size_t Index,
-	//	int LookaheadToken,
-	//	TLaDfaTransition* pTransition
-	//	)
+	//		size_t Index,
+	//		int LookaheadToken,
+	//		TLaDfaTransition* pTransition
+	//		);
 };
 
 //.............................................................................

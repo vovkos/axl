@@ -7,12 +7,20 @@
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_PropertyVerifier.h"
 #include "axl_jnc_Function.h"
-#include "axl_jnc_AutoEv.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
+
+enum EPropertyFlag
+{
+	EPropertyFlag_AutoGet  = 0x020000,
+	EPropertyFlag_AutoSet  = 0x040000,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 
 class CProperty: 
 	public CModuleItem,
@@ -26,28 +34,34 @@ class CProperty:
 
 protected:
 	CPropertyType* m_pType;
-	CType* m_pAuPropValueType; // before the type is calculated
-	uint_t m_TypeModifiers;    // before the type is calculated
 
 	// construction / destruction / accessors
 
+	CFunction* m_pPreConstructor;
 	CFunction* m_pConstructor;
+	CFunction* m_pDefaultConstructor;
 	CFunction* m_pStaticConstructor;
 	CFunction* m_pDestructor;
+	CFunction* m_pStaticDestructor;
+
 	CFunction* m_pGetter;
 	CFunction* m_pSetter;
+	CFunction* m_pBinder;
+
+	// member data is CStructField or CVariable
+	
+	CModuleItem* m_pOnChange;
+	CModuleItem* m_pPropValue;
 
 	// parent type
 
 	CNamedType* m_pParentType;
-	CStructField* m_pParentTypeField;
 	size_t m_ParentClassVTableIndex;
 
-	// fields (augmented fields are stored in a base type)
-
-	size_t m_PackFactor;
-	CStructType* m_pDataStructType;
-	CVariable* m_pStaticDataVariable;
+	rtl::CArrayT <CStructField*> m_MemberFieldConstructArray;
+	rtl::CArrayT <CStructField*> m_MemberFieldDestructArray;
+	rtl::CArrayT <CProperty*> m_MemberPropertyConstructArray;
+	rtl::CArrayT <CProperty*> m_MemberPropertyDestructArray;
 
 	// vtable
 
@@ -66,6 +80,12 @@ public:
 	}
 
 	CFunction* 
+	GetPreConstructor ()
+	{
+		return m_pPreConstructor;
+	}
+
+	CFunction* 
 	GetConstructor ()
 	{
 		return m_pConstructor;
@@ -78,9 +98,18 @@ public:
 	}
 
 	CFunction* 
+	GetDefaultConstructor ();
+
+	CFunction* 
 	GetDestructor ()
 	{
 		return m_pDestructor;
+	}
+
+	CFunction* 
+	GetStaticDestructor ()
+	{
+		return m_pStaticDestructor;
 	}
 
 	CFunction* 
@@ -95,34 +124,28 @@ public:
 		return m_pSetter;
 	}
 
-	size_t
-	GetPackFactor ()
+	CFunction* 
+	GetBinder ()
 	{
-		return m_PackFactor;
+		return m_pBinder;
 	}
 
-	CStructType* 
-	GetDataStructType ()
+	CModuleItem*
+	GetOnChange ()
 	{
-		return m_pDataStructType;
+		return m_pOnChange;
 	}
 
-	CVariable* 
-	GetStaticDataVariable ()
+	CModuleItem*
+	GetPropValue ()
 	{
-		return m_pStaticDataVariable;
+		return m_pPropValue;
 	}
-	
+
 	CNamedType* 
 	GetParentType ()
 	{
 		return m_pParentType;
-	}
-
-	CStructField* 
-	GetParentTypeField ()
-	{
-		return m_pParentTypeField;
 	}
 
 	bool
@@ -152,12 +175,25 @@ public:
 	void
 	ConvertToMemberProperty (CNamedType* pParentType);
 
+	bool
+	CreateOnChange ();
+
+	bool
+	CreatePropValue (
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
 	CStructField*
 	CreateField (
 		const rtl::CString& Name,
 		CType* pType,
 		size_t BitCount = 0,
-		int PtrTypeFlags = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
@@ -165,7 +201,7 @@ public:
 	CreateField (
 		CType* pType,
 		size_t BitCount = 0,
-		int PtrTypeFlags = 0
+		uint_t PtrTypeFlags = 0
 		)
 	{
 		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
@@ -178,10 +214,16 @@ public:
 	AddProperty (CProperty* pProperty);
 
 	bool
-	AddAutoEv (CAutoEv* pAutoEv);
+	CallMemberFieldConstructors (const CValue& ThisValue);
 
 	bool
-	CalcLayout ();
+	CallMemberFieldDestructors (const CValue& ThisValue);
+
+	bool
+	CallMemberPropertyConstructors (const CValue& ThisValue);
+
+	bool
+	CallMemberPropertyDestructors (const CValue& ThisValue);
 
 	CValue
 	GetVTablePtrValue ()
@@ -189,21 +231,29 @@ public:
 		return m_VTablePtrValue;
 	}
 
-	bool 
-	CompileAutoGetter ();
-
-	bool 
-	CompileAutoSetter ();
+	virtual 
+	bool
+	Compile ();
 
 protected:
+	virtual
+	bool
+	CalcLayout ();
+
 	void
 	CreateVTablePtr ();
 
 	CValue
 	GetAutoAccessorPropertyValue ();
 
-	CStructType*
-	CreateDataStructType ();
+	bool 
+	CompileAutoGetter ();
+
+	bool 
+	CompileAutoSetter ();
+
+	bool 
+	CompileBinder ();
 };
 
 //.............................................................................

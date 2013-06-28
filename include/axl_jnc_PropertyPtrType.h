@@ -41,17 +41,24 @@ public:
 		return m_PtrTypeKind == EPropertyPtrType_Normal || m_PtrTypeKind == EPropertyPtrType_Weak;
 	}
 
+	CPropertyPtrType*
+	GetCheckedPtrType ()
+	{
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
+			m_pTargetType->GetPropertyPtrType (m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
+	CPropertyPtrType*
+	GetUnCheckedPtrType ()
+	{
+		return (m_Flags & EPtrTypeFlag_Checked) ?  
+			m_pTargetType->GetPropertyPtrType (m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
 	CStructType* 
 	GetPropertyPtrStructType ();
-
-	CStructType* 
-	GetPropertyPtrStructType_w ();
-
-	CStructType* 
-	GetAuPropertyPtrStructType_t ();
-
-	CStructType* 
-	GetAuPropertyPtrStructType_u ();
 
 	static
 	rtl::CString
@@ -74,24 +81,22 @@ protected:
 
 //.............................................................................
 
-class CPropertyPtrTypeTuple: public rtl::TListLink
+struct TPropertyPtrTypeTuple: rtl::TListLink
 {
-	friend class CTypeMgr;
-
-protected:
 	CStructType* m_pPtrStructType;
-	CStructType* m_pPtrStructType_w;
-	CStructType* m_pAuPtrStructType_t;
-	CStructType* m_pAuPtrStructType_u;
-
-	CPropertyPtrType* m_PtrTypeArray [2] [EPropertyPtrType__Count] [2]; // ref x kind x nullable
-
-public:
-	CPropertyPtrTypeTuple ()
-	{
-		memset (this, 0, sizeof (CPropertyPtrTypeTuple));
-	}
+	CPropertyPtrType* m_PtrTypeArray [2] [3] [3]; // ref x kind x unsafe / checked
 };
+
+//.............................................................................
+
+inline
+bool
+IsBindableType (CType* pType)
+{
+	return 
+		pType->GetTypeKind () == EType_PropertyRef &&
+		(((CPropertyPtrType*) pType)->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable) != 0;
+}
 
 //.............................................................................
 

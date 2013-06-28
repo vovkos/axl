@@ -39,7 +39,6 @@ enum EToken
 	EToken_Stack,
 	EToken_Heap,
 	EToken_UHeap,
-	EToken_Member,
 	EToken_Abstract,
 	EToken_Virtual,
 	EToken_Override,
@@ -105,9 +104,11 @@ enum EToken
 	EToken_Set,
 	EToken_This,
 	EToken_PreConstruct,
+	EToken_Construct,
+	EToken_Destruct,
 	EToken_Operator,
 	EToken_Postfix,
-	EToken_Value,
+	EToken_PropValue,
 	EToken_OnChange,
 
 	// statements
@@ -152,7 +153,7 @@ enum EToken
 	EToken_Ne,
 	EToken_Le,
 	EToken_Ge,
-	EToken_ClassAssign,
+	EToken_RefAssign,
 	EToken_AddAssign,
 	EToken_SubAssign,
 	EToken_MulAssign,
@@ -196,7 +197,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Stack,        "stack")
 	AXL_PRS_TOKEN_NAME (EToken_Heap,         "heap")
 	AXL_PRS_TOKEN_NAME (EToken_UHeap,        "uheap")
-	AXL_PRS_TOKEN_NAME (EToken_Member,       "member")
 	AXL_PRS_TOKEN_NAME (EToken_Abstract,     "abstract")
 	AXL_PRS_TOKEN_NAME (EToken_Virtual,      "virtual")
 	AXL_PRS_TOKEN_NAME (EToken_Override,     "override")
@@ -207,15 +207,18 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Protected,    "protected")
 	AXL_PRS_TOKEN_NAME (EToken_Friend,       "friend")
 
+	// storage modifiers
+
+	AXL_PRS_TOKEN_NAME (EToken_Nullable,     "nullable")
+	AXL_PRS_TOKEN_NAME (EToken_Mutable,      "mutable")
+
 	// type modifiers
 
 	AXL_PRS_TOKEN_NAME (EToken_Signed,       "signed")
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
-	AXL_PRS_TOKEN_NAME (EToken_Nullable,     "nullable")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
 	AXL_PRS_TOKEN_NAME (EToken_ReadOnly,     "readonly")
-	AXL_PRS_TOKEN_NAME (EToken_Mutable,      "mutable")
 	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_PRS_TOKEN_NAME (EToken_Thin,         "thin")
@@ -262,9 +265,11 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Set,          "set")
 	AXL_PRS_TOKEN_NAME (EToken_This,         "this")
 	AXL_PRS_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
+	AXL_PRS_TOKEN_NAME (EToken_Construct,    "construct")
+	AXL_PRS_TOKEN_NAME (EToken_Destruct,     "destruct")
 	AXL_PRS_TOKEN_NAME (EToken_Operator,     "operator")
 	AXL_PRS_TOKEN_NAME (EToken_Postfix,      "postfix")
-	AXL_PRS_TOKEN_NAME (EToken_Value,        "value")
+	AXL_PRS_TOKEN_NAME (EToken_PropValue,    "propvalue")
 	AXL_PRS_TOKEN_NAME (EToken_OnChange,     "onchange")
 
 	// statements
@@ -309,7 +314,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Ne,           "!=")
 	AXL_PRS_TOKEN_NAME (EToken_Le,           "<=")
 	AXL_PRS_TOKEN_NAME (EToken_Ge,           ">=")
-	AXL_PRS_TOKEN_NAME (EToken_ClassAssign,  ":=")	
+	AXL_PRS_TOKEN_NAME (EToken_RefAssign,    ":=")	
 	AXL_PRS_TOKEN_NAME (EToken_AddAssign,    "+=")
 	AXL_PRS_TOKEN_NAME (EToken_SubAssign,    "-=")
 	AXL_PRS_TOKEN_NAME (EToken_MulAssign,    "*=")

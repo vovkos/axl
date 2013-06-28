@@ -1,6 +1,7 @@
 #pragma once
 
 #include "axl_jnc_Value.h"
+#include "axl_jnc_MulticastClassType.h"
 #include "axl_rtl_HandleTable.h"
 
 namespace axl {
@@ -8,74 +9,44 @@ namespace jnc {
 
 //.............................................................................
 
-class CMulticast: public jnc::TMulticast
+class CMulticast: public TMulticast
 {
 public:
 	void
 	Clear ();
 
 	handle_t
-	SetHandler (jnc::TFunctionPtr Ptr);
+	SetHandler (TFunctionPtr Ptr);
 
 	handle_t
-	SetHandler_w (jnc::TFunctionPtr_w Ptr);
+	SetHandler_t (void* pf);
 
 	handle_t
-	SetHandler_u (void* pf);
-
-	handle_t
-	AddHandler (jnc::TFunctionPtr Ptr)
+	AddHandler (TFunctionPtr Ptr)
 	{
 		return Ptr.m_pf ? AddHandlerImpl (Ptr) : NULL;
 	}
 
 	handle_t
-	AddHandler_w (jnc::TFunctionPtr_w Ptr)
-	{
-		return Ptr.m_pf ? AddHandlerImpl (Ptr) : NULL;
-	}
-
-	handle_t
-	AddHandler_u (void* pf)
+	AddHandler_t (void* pf)
 	{
 		return pf ? AddHandlerImpl (pf) : NULL;
 	}
 
-	jnc::TFunctionPtr
+	TFunctionPtr
 	RemoveHandler (handle_t Handle)
 	{
-		return RemoveHandlerImpl <jnc::TFunctionPtr> (Handle);
-	}
-
-	jnc::TFunctionPtr_w 
-	RemoveHandler_w (handle_t Handle)
-	{
-		return RemoveHandlerImpl <jnc::TFunctionPtr_w> (Handle);
+		return RemoveHandlerImpl <TFunctionPtr> (Handle);
 	}
 
 	void* 
-	RemoveHandler_u (handle_t Handle)
+	RemoveHandler_t (handle_t Handle)
 	{
 		return RemoveHandlerImpl <void*> (Handle);
 	}
 
-	jnc::TMcSnapshot
-	Snapshot ()
-	{
-		return SnapshotImpl <jnc::TFunctionPtr> ();
-	}
-
-	jnc::TMcSnapshot
-	Snapshot_w ()
-	{
-		return SnapshotImpl <jnc::TFunctionPtr_w> ();
-	}
-
-	jnc::TMcSnapshot
-	Snapshot_u ()
-	{
-		return SnapshotImpl <void*> ();
-	}
+	TFunctionPtr
+	GetSnapshot ();
 
 protected:
 	rtl::CHandleTableT <size_t>*
@@ -138,17 +109,6 @@ protected:
 		pHandleTable->Remove (MapIt);
 		return Ptr;
 	}
-
-	template <typename T>
-	jnc::TMcSnapshot
-	SnapshotImpl ()
-	{
-		jnc::TMcSnapshot Snapshot = {0};
-		Snapshot.m_Count = m_Count;
-		Snapshot.m_pPtrArray = m_pPtrArray;
-		return Snapshot;
-	}
-
 };
 
 //.............................................................................

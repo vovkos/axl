@@ -10,6 +10,7 @@ CArrayType::CArrayType ()
 {
 	m_TypeKind = EType_Array;
 	m_pElementType = NULL;
+	m_pElementType_i = NULL;
 	m_pRootType = NULL;
 	m_ElementCount = 0;
 }
@@ -31,6 +32,32 @@ CArrayType::PrepareTypeString ()
 		m_TypeString.AppendFormat (" [%d]", pArrayType->m_ElementCount);
 		pElementType = pArrayType->m_pElementType;
 	}
+}
+
+bool
+CArrayType::CalcLayout ()
+{
+	if (m_pElementType_i)
+		m_pElementType = m_pElementType_i->GetActualType ();
+
+	bool Result = m_pElementType->EnsureLayout ();
+	if (!Result)
+		return false;
+
+	m_pRootType = m_pElementType->GetTypeKind () == EType_Array ? 
+		((CArrayType*) m_pElementType)->GetRootType () :	
+		m_pElementType;
+
+	m_TypeString.Clear (); // ensure updated type string
+
+	if (m_pRootType->GetFlags () & ETypeFlag_Pod)
+		m_Flags |= ETypeFlag_Pod;
+	else
+		m_Flags &= ~ETypeFlag_Pod;
+
+	m_Size = m_pElementType->GetSize () * m_ElementCount;
+	m_AlignFactor = m_pElementType->GetAlignFactor ();
+	return true;
 }
 
 //.............................................................................

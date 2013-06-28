@@ -14,13 +14,14 @@ CCast_FunctionPtr_Base::GetCastKind (
 	CType* pType
 	)
 {
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
+
 	if (!OpValue.GetType ()) 
 	{
 		ASSERT (OpValue.GetValueKind () == EValue_Function && OpValue.GetFunction ()->IsOverloaded ());
 		return ECast_None; // choosing overload is not yet implemented
 	}
-
-	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
 
 	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetClosureAwareType ();
 	CFunctionPtrType* pDstPtrType = (CFunctionPtrType*) pType;
@@ -44,7 +45,8 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
 
 	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetType ();
 	CFunctionType* pSrcFunctionType = pSrcPtrType->GetTargetType ();
@@ -56,21 +58,8 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pThinPtrType, &PfnValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &ClosureObjValue);
 
-	ref::CPtrT <CClosure> OldClosure = OpValue.GetClosure ();
-
-	CClosure* pClosure;
-
-	if (OldClosure)
-	{
-		PfnValue.SetClosure (OldClosure);
-		pClosure = OldClosure;
-	}
-	else
-	{
-		pClosure = PfnValue.CreateClosure ();
-	}
-
-	pClosure->GetArgList ()->InsertHead (ClosureObjValue);
+	PfnValue.SetClosure (OpValue.GetClosure ());
+	PfnValue.InsertToClosureHead (ClosureObjValue);
 
 	return m_pModule->m_OperatorMgr.CastOperator (StorageKind, PfnValue, pType, pResultValue);
 }
@@ -85,7 +74,8 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (RawOpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
+	ASSERT (RawOpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
 
 	CValue OpValue = RawOpValue;
 
@@ -265,7 +255,8 @@ CCast_FunctionPtr_Weak2Normal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
 
 	err::SetFormatStringError ("CCast_FunctionPtr_Weak2Normal::LlvmCast not yet implemented");
 	return false;
@@ -281,7 +272,8 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
 
 	CClosure* pClosure = OpValue.GetClosure ();
 	if (pClosure)
@@ -324,7 +316,8 @@ CCast_FunctionPtr_Thin2Weak::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->IsFunctionPtrType () && pType->GetTypeKind () == EType_FunctionPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
 
 	CFunctionPtrType* pIntermediateType = ((CFunctionPtrType*) pType)->GetTargetType ()->GetFunctionPtrType (EFunctionPtrType_Normal);
 
@@ -332,20 +325,6 @@ CCast_FunctionPtr_Thin2Weak::LlvmCast (
 	return 
 		m_pModule->m_OperatorMgr.CastOperator (StorageKind, OpValue, pIntermediateType, pResultValue) &&
 		m_pModule->m_OperatorMgr.CastOperator (StorageKind, TmpValue, pType, pResultValue);
-}
-
-//.............................................................................
-
-bool
-CCast_FunctionPtr_Unsafe2Unsafe::LlvmCast (
-	EStorage StorageKind,
-	const CValue& OpValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pType, pResultValue);
-	return true;
 }
 
 //.............................................................................
@@ -360,8 +339,6 @@ CCast_FunctionPtr::CCast_FunctionPtr ()
 	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Normal]   = &m_Thin2Normal;
 	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Weak]     = &m_Thin2Weak;
 	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Thin]     = &m_Thin2Thin;
-	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Unsafe]   = &m_Unsafe2Unsafe;
-	m_OperatorTable [EFunctionPtrType_Unsafe] [EFunctionPtrType_Unsafe] = &m_Unsafe2Unsafe;
 }
 
 ICastOperator*
@@ -384,13 +361,13 @@ CCast_FunctionPtr::GetCastOperator (
 		return m_OperatorTable [EFunctionPtrType_Thin] [DstPtrTypeKind];
 	}
 	
-	if (pSrcType->IsIntegerType ())
+	if (pSrcType->GetTypeKindFlags () & ETypeKindFlag_Integer)
 	{
-		return DstPtrTypeKind == EFunctionPtrType_Unsafe ? 
+		return DstPtrTypeKind == EFunctionPtrType_Thin && (pType->GetFlags () & EPtrTypeFlag_Unsafe) ? 
 			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
 			NULL;
 	}
-	else if (!pSrcType->IsFunctionPtrType ())
+	else if (!(pSrcType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr))
 	{
 		return NULL;
 	}

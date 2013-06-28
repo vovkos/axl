@@ -11,19 +11,16 @@ namespace axl {
 namespace jnc {
 
 class CPropertyPtrType;
-class CPropertyPtrTypeTuple;
 class CClassType;
+
+struct TPropertyPtrTypeTuple;
 
 //.............................................................................
 
 enum EPropertyTypeFlag
 {
-	EPropertyTypeFlag_Const     = 0x0100,
-	EPropertyTypeFlag_Bindable  = 0x0200,
-	EPropertyTypeFlag_AutoGet   = 0x0400,
-	EPropertyTypeFlag_AutoSet   = 0x0800,
-	
-	EPropertyTypeFlag_Augmented = EPropertyTypeFlag_Bindable | EPropertyTypeFlag_AutoGet,
+	EPropertyTypeFlag_Const    = 0x010000,
+	EPropertyTypeFlag_Bindable = 0x020000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -48,9 +45,6 @@ GetFirstPropertyTypeFlagString (uint_t Flags)
 	return GetPropertyTypeFlagString (GetFirstPropertyTypeFlag (Flags));
 }
 
-uint_t
-GetPropertyTypeFlagsFromModifiers (uint_t Modifiers);
-
 //.............................................................................
 
 enum EPropertyPtrType
@@ -58,24 +52,11 @@ enum EPropertyPtrType
 	EPropertyPtrType_Normal = 0,
 	EPropertyPtrType_Weak,
 	EPropertyPtrType_Thin,
-	EPropertyPtrType_Unsafe,
 	EPropertyPtrType__Count,
 };
 
 const char*
 GetPropertyPtrTypeKindString (EPropertyPtrType PtrTypeKind);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-EPropertyPtrType 
-GetPropertyPtrTypeKindFromModifiers (uint_t Modifiers)
-{
-	return 
-		(Modifiers & ETypeModifier_Unsafe) ? EPropertyPtrType_Unsafe :
-		(Modifiers & ETypeModifier_Weak) ? EPropertyPtrType_Weak : 
-		(Modifiers & ETypeModifier_Thin) ? EPropertyPtrType_Thin : EPropertyPtrType_Normal;
-}
 
 //.............................................................................
 
@@ -86,14 +67,12 @@ class CPropertyType: public CType
 protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
+	CFunctionType* m_pBinderType;
 	rtl::CString m_TypeModifierString;
 	CPropertyType* m_pStdObjectMemberPropertyType;
 	CPropertyType* m_pShortType;
-	CPropertyType* m_pBindablePropertyType;
 	CStructType* m_pVTableStructType;
-	CStructType* m_pAuFieldStructType;
-	CStructField* m_AuFieldArray [EStdField__Count];
-	CPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
+	TPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
 
 public:
 	CPropertyType ();
@@ -140,6 +119,12 @@ public:
 		return &m_SetterType;
 	}
 
+	CFunctionType*
+	GetBinderType ()
+	{
+		return m_pBinderType;
+	}
+
 	CType*
 	GetReturnType ()
 	{
@@ -156,9 +141,6 @@ public:
 	CPropertyType*
 	GetShortType  ();
 
-	CPropertyType*
-	GetBindablePropertyType ();
-
 	CPropertyPtrType* 
 	GetPropertyPtrType (
 		EType TypeKind,
@@ -174,15 +156,6 @@ public:
 	{
 		return GetPropertyPtrType (EType_PropertyPtr, PtrTypeKind, Flags);
 	}
-
-	CStructType* 
-	GetAuFieldStructType ()
-	{
-		return m_pAuFieldStructType;
-	}
-
-	CStructField* 
-	GetStdField (EStdField Field);
 
 	CStructType*
 	GetVTableStructType ();
@@ -213,19 +186,9 @@ protected:
 
 //.............................................................................
 
-class CPropertyTypeTuple: public rtl::TListLink
+struct TSimplePropertyTypeTuple: rtl::TListLink
 {
-	friend class CTypeMgr;
-
-protected:
-	CPropertyType* m_SimplePropertyTypeArray [ECallConv__Count] [2] [3]; // callconv x const x autoget/autoset
-	CPropertyType* m_DataRefPropertyTypeArray [ECallConv__Count] [2]; // callconv x const
-
-public:
-	CPropertyTypeTuple ()
-	{
-		memset (this, 0, sizeof (CPropertyTypeTuple));
-	}
+	CPropertyType* m_PropertyTypeArray [ECallConv__Count] [2] [2]; // callconv x const x bindable
 };
 
 //.............................................................................

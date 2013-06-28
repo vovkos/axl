@@ -1,4 +1,4 @@
-//.............................................................................
+	//.............................................................................
 
 // root
 
@@ -23,13 +23,10 @@ named_type_specifier
 			{
 				$.m_pType = $1.m_pType;
 			}
-	|	property_specifier
+	|	resolver (property_specifier_rslv) // prefer named_type_specifier over type_modifier
+		property_specifier
 			{
-				$.m_pType = $1.m_pProperty->GetType ();
-			}
-	|	autoev_class_specifier 
-			{
-				$.m_pType = $1.m_pType;
+				$.m_pType = $2.m_pProperty->GetType ();
 			}
 	;
 
@@ -186,7 +183,7 @@ class_specifier
 		(':' type_name_list $b)?
 			{
 				$.m_pType = CreateClassType (
-					IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+					$n.m_Data.m_String,
 					IsValidLocator ($b) ? &$b.m_TypeList : NULL,
 					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
 					);
@@ -199,55 +196,32 @@ class_specifier
 
 //.............................................................................
 
-// autoev class 
-
-class
-{
-	CClassType* m_pType;
-}
-autoev_class_specifier
-	local 
-	{
-		CDeclarator $Declarator;
-	}
-	:	EToken_AutoEv
-		EToken_Class
-		EToken_Identifier $n
-		function_suffix <&$Declarator>?
-		function_body_pass1 $b?
-			{
-				$.m_pType = CreateAutoEvClassType (
-					$n.m_Data.m_String, 
-					$Declarator.GetFunctionSuffix (), 
-					IsValidLocator ($b) ? &$b.m_TokenList : NULL
-					);
-
-				if (!$.m_pType)
-					return false;
-			}
-	;
-
-//.............................................................................
-
 // property
+
+property_specifier_rslv
+	:	EToken_Bindable?
+		EToken_Property 
+		(EToken_Pack | EToken_Identifier)
+	;
 
 class
 {
 	CProperty* m_pProperty;
 }
 property_specifier
-	:	EToken_Property 
-		struct_pack_factor $p?
+	:	EToken_Bindable $b?
+		EToken_Property 
 		EToken_Identifier $n
 			{
 				$.m_pProperty = CreateProperty (
 					$n.m_Data.m_String,
-					$n.m_Pos,
-					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
+					$n.m_Pos
 					);
 
 				if (!$.m_pProperty)
 					return false;
+
+				return IsValidLocator ($b) ? $.m_pProperty->CreateOnChange () : true;
 			}	  
 		named_type_block <$.m_pProperty>
 			{

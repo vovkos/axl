@@ -27,10 +27,12 @@ CFunctionType::CFunctionType ()
 {
 	m_TypeKind = EType_Function;
 	m_pReturnType = NULL;
+	m_pReturnType_i = NULL;
 	m_CallConv = ECallConv_Default;
 	m_pShortType = this;
 	m_pStdObjectMemberMethodType = NULL;
 	m_pFunctionPtrTypeTuple = NULL;
+	m_pAutoEvInterfaceType = NULL;
 }
 
 CNamedType*
@@ -74,7 +76,7 @@ CFunctionType::GetFunctionPtrType (
 	return m_pModule->m_TypeMgr.GetFunctionPtrType (this, TypeKind, PtrTypeKind, Flags);
 }
 
-CMulticastType* 
+CClassType* 
 CFunctionType::GetMulticastType ()
 {
 	return m_pModule->m_TypeMgr.GetMulticastType (this);
@@ -83,7 +85,7 @@ CFunctionType::GetMulticastType ()
 CFunctionType*
 CFunctionType::GetMemberMethodType (
 	CNamedType* pParentType, 
-	int ThisArgTypeFlags
+	uint_t ThisArgTypeFlags
 	)
 {
 	return m_pModule->m_TypeMgr.GetMemberMethodType (pParentType, this, ThisArgTypeFlags);
@@ -102,13 +104,21 @@ CFunctionType::GetAbstractFunction ()
 		return m_pAbstractFunction;
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction ("abtract_method", this);
+	m_pAbstractFunction = pFunction;
+	m_pModule->MarkForCompile (this);
+	return pFunction;
+}
 
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction);
+bool
+CFunctionType::Compile ()
+{
+	ASSERT (m_pAbstractFunction);
+
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pAbstractFunction);
 	m_pModule->m_LlvmBuilder.RuntimeError (ERuntimeError_AbstractFunction);
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
-	m_pAbstractFunction = pFunction;
-	return pFunction;
+	return true;
 }
 
 rtl::CString
@@ -147,9 +157,6 @@ CFunctionType::CreateArgSignature (
 	for (size_t i = 0; i < ArgCount; i++)
 	{
 		CFunctionArg* pArg = pArgArray [i];
-
-		if (pArg->GetPtrTypeFlags () & EPtrTypeFlag_This)
-			String.Append ("+");
 
 		String.Append (pArg->GetType ()->GetSignature ());
 		String.Append (",");
@@ -232,7 +239,7 @@ CFunctionType::GetArgString ()
 		CFunctionArg* pArg = m_ArgArray [0];
 		m_ArgString.AppendFormat ("%s", pArg->GetType ()->GetTypeString ().cc ()); // thanks a lot gcc
 
-		if (pArg->GetPtrTypeFlags () & EPtrTypeFlag_This)
+		if (pArg->GetStorageKind () == EStorage_This)
 		{
 			m_ArgString.Append (" this");
 		}
@@ -308,6 +315,17 @@ CFunctionType::PrepareLlvmType ()
 		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, ArgCount),
 		(m_Flags & EFunctionTypeFlag_VarArg) != 0
 		);
+}
+
+bool
+CFunctionType::CalcLayout ()
+{
+	if (m_pReturnType_i)
+		m_pReturnType = m_pReturnType_i->GetActualType ();
+
+	// TODO: check for valid return type
+
+	return m_pReturnType->EnsureLayout ();
 }
 
 //.............................................................................

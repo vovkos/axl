@@ -5,9 +5,19 @@ declarator_list <CTypeSpecifier* $pTypeSpecifier>
 	;
 		
 full_declarator <CTypeSpecifier* $pTypeSpecifier>
-	:	declarator <$pTypeSpecifier> ('=' expression_pass1 $i) ?
+	:	declarator $d <$pTypeSpecifier> 
+		(EToken_Construct arg_list_pass1 $c
+			{
+				$d.m_Declarator.m_Constructor.TakeOver (&$c.m_TokenList);
+			}			
+		)?
+		('=' expression_pass1 $i
+			{
+				$d.m_Declarator.m_Initializer.TakeOver (&$i.m_TokenList);
+			}			
+		)?
 			{ 
-				return Declare (&$1.m_Declarator, IsValidLocator ($i) ? &$i.m_TokenList : NULL);
+				return Declare (&$d.m_Declarator);
 			}
 	;
 
@@ -55,19 +65,19 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_PreConstructor);
 			}
-	|	EToken_This
+	|	EToken_Construct
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_Constructor);
 			}
-	|	'~' EToken_This
+	|	EToken_Destruct
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_Destructor);
 			}
-	|	EToken_Static EToken_This
+	|	EToken_Static EToken_Construct
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_StaticConstructor);
 			}
-	|	EToken_Static '~' EToken_This
+	|	EToken_Static EToken_Destruct
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_StaticDestructor);
 			}
@@ -83,13 +93,9 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 			{
 				return $pDeclarator->AddUnaryBinaryOperator ($2.m_UnOpKind, $2.m_BinOpKind);
 			}
-	|	EToken_Value
+	|	EToken_PropValue
 			{
 				return $pDeclarator->SetPropValue ();
-			}
-	|	EToken_OnChange
-			{
-				return $pDeclarator->SetOnChange ();
 			}
 	;
 
@@ -206,6 +212,10 @@ operator_name
 			{
 				$.m_BinOpKind = EBinOp_Assign;
 			}
+	|	EToken_RefAssign
+			{
+				$.m_BinOpKind = EBinOp_RefAssign;
+			}
 	|	EToken_AddAssign
 			{
 				$.m_BinOpKind = EBinOp_AddAssign;
@@ -250,10 +260,6 @@ operator_name
 			{
 				$.m_BinOpKind = EBinOp_AtAssign;
 			}
-	|	EToken_ClassAssign
-			{
-				$.m_BinOpKind = EBinOp_ClassAssign;
-			}
 	|	EToken_LogAnd
 			{
 				$.m_BinOpKind = EBinOp_LogAnd;
@@ -274,13 +280,13 @@ operator_name
 
 //.............................................................................
 
-// prefix
+// prefix & suffix
 
 noast
 declarator_prefix <CDeclarator* $pDeclarator>
-	:	declarator_prefix_kind
+	:	'*'
 			{
-				return $pDeclarator->AddPrefix ($1.m_PrefixKind);
+				$pDeclarator->AddPointerPrefix ();
 			}
 		(type_modifier $m
 			{
@@ -289,28 +295,7 @@ declarator_prefix <CDeclarator* $pDeclarator>
 		)*
 	;
 
-class
-{
-	EDeclPrefix m_PrefixKind;
-}
-declarator_prefix_kind
-	:	'*'
-			{
-				$.m_PrefixKind = EDeclPrefix_Pointer;			
-			}
-	|	EToken_Multicast
-			{
-				$.m_PrefixKind = EDeclPrefix_Multicast;
-			}
-	|	EToken_Event
-			{
-				$.m_PrefixKind = EDeclPrefix_Event;
-			}
-	;
-
-//.............................................................................
-
-// suffix 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 noast
 declarator_suffix <CDeclarator* $pDeclarator>
@@ -339,11 +324,17 @@ function_suffix <CDeclarator* $pDeclarator>
 	local
 	{
 		CDeclFunctionSuffix* $pFunctionSuffix;
+		EStorage $PrevStorageKind;
 	}
 	enter
 	{
 		$pFunctionSuffix = $pDeclarator->AddFunctionSuffix ();
+		$PrevStorageKind = m_StorageKind;
 	}
+	leave
+	{
+		m_StorageKind = $PrevStorageKind;
+	}	
 	:	'(' function_formal_argument_list <$pFunctionSuffix> ')'
 	|	'(' ')'
 	;	
@@ -364,20 +355,24 @@ function_formal_argument_w_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 	{
 		CDeclarator $Declarator;
 	}
-	:	type_specifier_modifier_list $s
+	enter
+	{
+		m_StorageKind = EStorage_Undefined;
+	}	
+	:	declaration_specifier_list $s
 			{
 				$Declarator.SetTypeSpecifier (&$s.m_TypeSpecifier);
 			}
 		declarator_prefix <&$Declarator>*
 		declarator_name <&$Declarator>?
 		declarator_suffix <&$Declarator>*
-		('=' expression_pass1 $i)?
+		('=' expression_pass1 $i
 			{
-				return CreateFormalArg (
-					$pFunctionSuffix, 
-					&$Declarator, 
-					IsValidLocator ($i) ? &$i.m_TokenList : NULL
-					) != NULL;
+				$Declarator.m_Initializer.TakeOver (&$i.m_TokenList);
+			}
+		)?
+			{
+				return CreateFormalArg ($pFunctionSuffix, &$Declarator) != NULL;
 			}
 	;
 
@@ -388,18 +383,19 @@ function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 	}
 	enter 
 	{
+		m_StorageKind = EStorage_Undefined;
 		$Declarator.SetTypeSpecifier (NULL);
 	}
 	:	declarator_prefix <&$Declarator>+
 		declarator_name <&$Declarator>?
 		declarator_suffix <&$Declarator>*
-		('=' expression_pass1 $i)?
+		('=' expression_pass1 $i
 			{
-				return CreateFormalArg (
-					$pFunctionSuffix,
-					&$Declarator,
-					IsValidLocator ($i) ? &$i.m_TokenList : NULL
-					) != NULL;
+				$Declarator.m_Initializer.TakeOver (&$i.m_TokenList);
+			}
+		)?
+			{
+				return CreateFormalArg ($pFunctionSuffix, &$Declarator) != NULL;
 			}
 	;
 

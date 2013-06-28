@@ -25,13 +25,15 @@ enum EBasicBlockFlag
 class CBasicBlock: public rtl::TListLink
 {
 	friend class CControlFlowMgr;
+	friend class CLlvmBuilder;
 
 protected:
 	rtl::CString m_Name;
+	rtl::CString m_LeadingComment;
 	CFunction* m_pFunction;
 	llvm::BasicBlock* m_pLlvmBlock;
 
-	int m_Flags;
+	uint_t m_Flags;
 
 public:
 	CBasicBlock ();
@@ -59,6 +61,12 @@ public:
 	GetName ()
 	{
 		return m_Name;
+	}
+
+	rtl::CString 
+	GetLeadingComment ()
+	{
+		return m_LeadingComment;
 	}
 
 	CFunction* 

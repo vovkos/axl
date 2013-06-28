@@ -1,49 +1,14 @@
 #include "pch.h"
 #include "axl_jnc_ImportType.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
 
-CImportType::CImportType ()
-{
-	m_TypeKind = EType_Import;
-	m_ImportTypeKind = EImportType_Undefined;
-	m_pActualType = NULL;
-}
-
-bool
-CImportType::CalcLayout ()
-{
-	ASSERT (m_pActualType);
-
-	if (m_Flags & ETypeFlag_LayoutReady)
-		return true;
-
-	bool Result = PreCalcLayout ();
-	if (!Result)
-		return false;
-
-	Result = m_pActualType->CalcLayout ();
-	if (!Result)
-		return false;
-
-	PostCalcLayout ();
-	return true;
-}
-
-void
-CImportType::PrepareLlvmType ()
-{
-	ASSERT (m_pActualType && m_pActualType->GetTypeKind () != EType_Import);
-	m_pLlvmType = m_pActualType->GetLlvmType ();
-}
-
-//.............................................................................
-
 rtl::CString
-CPrimaryImportType::GetQualifiedName ()
+CNamedImportType::GetQualifiedName ()
 {
 	if (!m_QualifiedName.IsEmpty ())
 		return m_QualifiedName;
@@ -52,37 +17,28 @@ CPrimaryImportType::GetQualifiedName ()
 	return m_QualifiedName;
 }
 
-void
-CPrimaryImportType::PrepareTypeString ()
+CImportPtrType* 
+CNamedImportType::GetImportPtrType (
+	uint_t TypeModifiers,
+	uint_t Flags
+	)
 {
-	if (m_pActualType)
-		m_TypeString = m_pActualType->GetTypeString ();
-	else
-		m_TypeString.Format ("import %s", GetQualifiedName ());
+	return m_pModule->m_TypeMgr.GetImportPtrType (this, TypeModifiers, Flags);
 }
 
 //.............................................................................
 
-rtl::CString
-CSecondaryImportType::CreateSignature (
-	EImportType ImportTypeKind,
-	CPrimaryImportType* pPrimaryImportType,
-	uint_t TypeModifiers
-	)
+CImportPtrType::CImportPtrType ()
 {
-	rtl::CString Signature = ImportTypeKind == EImportType_Pointer ? "ZP" : "ZD";	
-	Signature += pPrimaryImportType->GetQualifiedName ();
-
-	if (TypeModifiers)
-		Signature.AppendFormat (":%d", TypeModifiers);
-
-	return Signature;
+	m_TypeKind = EType_ImportPtr;
+	m_pTargetType = NULL;
+	m_TypeModifiers = 0;
 }
 
 void
-CSecondaryImportType::PrepareTypeString ()
+CImportPtrType::PrepareTypeString ()
 {
-	ASSERT (m_pPrimaryImportType);
+	ASSERT (m_pTargetType);
 
 	if (m_pActualType)
 	{
@@ -90,24 +46,16 @@ CSecondaryImportType::PrepareTypeString ()
 		return;
 	}
 
-	m_TypeString = m_ImportTypeKind == EImportType_Pointer ? "import_p " : "import_d ";
+	m_TypeString = "import ";
 	
-	if (m_TypeModifiers & ETypeModifierMask_ClassPtr_p)
+	if (m_TypeModifiers)
 	{
-		m_TypeString += GetTypeModifierString (m_TypeModifiers & ETypeModifierMask_ClassPtr_p);
+		m_TypeString += GetTypeModifierString (m_TypeModifiers);
 		m_TypeString += ' ';
 	}
 
-	m_TypeString += m_pPrimaryImportType->GetQualifiedName ();
-
-	if (m_TypeModifiers & ~ETypeModifierMask_ClassPtr_p)
-	{
-		m_TypeString += ' ';
-		m_TypeString += GetTypeModifierString (m_TypeModifiers & ~ETypeModifierMask_ClassPtr_p);
-	}
-
-	if (m_ImportTypeKind == EImportType_Pointer)
-		m_TypeString += '*';
+	m_TypeString += m_pTargetType->GetQualifiedName ();
+	m_TypeString += '*';
 }
 
 //.............................................................................

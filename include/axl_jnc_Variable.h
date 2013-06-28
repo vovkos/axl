@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_ImportType.h"
 #include "axl_jnc_Scope.h"
 
 namespace axl {
@@ -21,12 +21,15 @@ class CVariable: public CUserModuleItem
 
 protected:
 	CType* m_pType;
-	int m_PtrTypeFlags;
+	CImportType* m_pType_i;
+	uint_t m_PtrTypeFlags;
+	rtl::CBoxListT <CToken> m_Constructor;
 	rtl::CBoxListT <CToken> m_Initializer;
 	rtl::CString m_InitializerString;
 
 	CScope* m_pScope;
 	llvm::Value* m_pLlvmValue;
+	llvm::Value* m_pLlvmAllocValue;
 
 public:
 	CVariable ();
@@ -37,10 +40,22 @@ public:
 		return m_pType;
 	}
 
-	int 
+	CImportType* 
+	GetType_i ()
+	{
+		return m_pType_i;
+	}
+
+	uint_t 
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
+	}
+
+	rtl::CConstBoxListT <CToken> 
+	GetConstructor ()
+	{
+		return m_Constructor;
 	}
 
 	rtl::CConstBoxListT <CToken> 
@@ -75,6 +90,17 @@ public:
 	{
 		return m_pLlvmValue;
 	}
+
+	llvm::Value* 
+	GetLlvmAllocValue ()
+	{
+		return m_pLlvmAllocValue;
+	}
+
+protected:
+	virtual 
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

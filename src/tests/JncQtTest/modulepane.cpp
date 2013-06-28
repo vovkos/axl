@@ -168,10 +168,6 @@ void ModulePane::addItem(QTreeWidgetItem *parent, jnc::CModuleItem *item)
 		addProperty (parent, (jnc::CProperty*) item);
 		break;
 
-	case jnc::EModuleItem_AutoEv:
-		addAutoEv (parent, (jnc::CAutoEv*) item);
-		break;
-
 	case jnc::EModuleItem_EnumConst:
 		addEnumConst (parent, (jnc::CEnumConst*) item);
 		break;
@@ -235,14 +231,7 @@ void ModulePane::addTypedef (QTreeWidgetItem *parent, jnc::CTypedef* typed)
 
 void ModulePane::addVariable(QTreeWidgetItem *parent, jnc::CVariable *variable)
 {
-	QString itemName;
-	itemName.sprintf(
-		"%s %s",
-		variable->GetType()->GetTypeString().cc (),
-		variable->GetName().cc ()
-		);
-
-	insertItem(itemName, parent, variable);
+	addValue (parent, variable->GetName().cc (), variable->GetType(), variable);
 }
 
 void ModulePane::addEnumConst(QTreeWidgetItem *parent, jnc::CEnumConst *member)
@@ -257,6 +246,9 @@ void ModulePane::addValue (QTreeWidgetItem *parent, const char* name, jnc::CType
 	itemName.sprintf ("%s %s", type->GetTypeString ().cc (), name);
 	QTreeWidgetItem *item = insertItem(itemName, parent);
 	item->setData(0, Qt::UserRole, qVariantFromValue((void *) moduleItem));
+
+	if (jnc::IsAutoEvClassType (type))
+		addClassTypeMembers (item, (jnc::CClassType*) type);
 }
 
 void ModulePane::addEnumTypeMembers (QTreeWidgetItem *parent, jnc::CEnumType* type)
@@ -293,7 +285,16 @@ void ModulePane::addUnionTypeMembers (QTreeWidgetItem *parent, jnc::CUnionType* 
 void ModulePane::addClassTypeMembers (QTreeWidgetItem *parent, jnc::CClassType* pType)
 {
 //	AddStructClassTypeMembers (hParent, pType);
-	
+
+	if (pType->GetPreConstructor ())
+		addItem (parent, pType->GetPreConstructor ());
+
+	if (pType->GetConstructor ())
+		addItem (parent, pType->GetConstructor ());
+
+	if (pType->GetDestructor ())
+		addItem (parent, pType->GetDestructor ());
+
 	size_t Count = pType->GetItemCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
@@ -316,7 +317,7 @@ void ModulePane::addFunction (QTreeWidgetItem *parent, jnc::CFunction* pFunction
 
 		QString itemName;
 		itemName.sprintf (
-			"function %s (%d overloads)", 
+			"%s (%d overloads)", 
 			pFunction->m_Tag.cc (), 
 			count		
 			);
@@ -366,24 +367,4 @@ void ModulePane::addProperty (QTreeWidgetItem *parent, jnc::CProperty* pProperty
 		addFunction (item, pSetter);
 	
 	expandItem (item);
-}
-
-void ModulePane::addAutoEv (QTreeWidgetItem *parent, jnc::CAutoEv* pAutoEv)
-{
-	QString itemName;
-
-	if (!pAutoEv->IsNamed ())
-		itemName.sprintf (
-			"autoev %s", 
-			pAutoEv->GetStarter ()->GetType ()->GetArgString ().cc ()
-			);
-	else
-		itemName.sprintf (
-			"autoev %s", 
-			pAutoEv->GetName ().cc (),
-			pAutoEv->GetStarter ()->GetType ()->GetArgString ().cc ()
-			);
-
-	QTreeWidgetItem *item = insertItem (itemName, parent);
-	item->setData(0, Qt::UserRole, qVariantFromValue((void *)(jnc::CModuleItem*) pAutoEv));
 }

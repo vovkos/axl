@@ -165,7 +165,7 @@ CCast_IntFromBeInt::GetCastOperators (
 	CType** ppIntermediateType
 	)
 {
-	ASSERT (IsBigEndianIntegerTypeKind (OpValue.GetType ()->GetTypeKind ()));
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_BigEndian);
 
 	EType IntermediateTypeKind = GetLittleEndianIntegerTypeKind (OpValue.GetType ()->GetTypeKind ());
 
@@ -192,7 +192,7 @@ CCast_BeInt::GetCastOperators (
 	CType** ppIntermediateType
 	)
 {
-	ASSERT (IsBigEndianIntegerTypeKind (pType->GetTypeKind ()));
+	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_BigEndian);
 
 	EType IntermediateTypeKind = GetLittleEndianIntegerTypeKind (pType->GetTypeKind ());
 
@@ -457,7 +457,9 @@ CCast_Int::GetCastOperator (
 		return 
 			SrcSize == DstSize ? m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_Copy) : 
 			SrcSize > DstSize ? (ICastOperator*) &m_Trunc : 
-			IsUnsignedIntegerTypeKind (SrcTypeKind) ? (ICastOperator*) &m_Ext_u : (ICastOperator*) &m_Ext;
+			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Unsigned) ?			
+				(ICastOperator*) &m_Ext_u : 
+				(ICastOperator*) &m_Ext;
 
 	case EType_Int16_be:
 	case EType_Int16_beu:

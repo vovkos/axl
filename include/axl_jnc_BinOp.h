@@ -50,7 +50,7 @@ enum EBinOp
 	// assignment
 
 	EBinOp_Assign,
-	EBinOp_ClassAssign,
+	EBinOp_RefAssign,
 	EBinOp_AddAssign,
 	EBinOp_SubAssign,
 	EBinOp_MulAssign,
@@ -87,8 +87,8 @@ struct IBinaryOperator: obj::IRoot
 protected:
 	CModule* m_pModule;
 	EBinOp m_OpKind;
-	int m_OpFlags1;
-	int m_OpFlags2;
+	uint_t m_OpFlags1;
+	uint_t m_OpFlags2;
 
 public:
 	IBinaryOperator ();

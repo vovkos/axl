@@ -25,8 +25,7 @@ protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CPropertyVerifier m_Verifier;
-	CType* m_pAuPropValueType; // before the type is calculated
-	uint_t m_TypeModifiers;
+	uint_t m_TypeFlags; // before the type is calculated
 
 public:
 	CPropertyTemplate ();
@@ -51,7 +50,6 @@ public:
 
 	CPropertyType*
 	CalcType ();
-
 };
 
 //.............................................................................

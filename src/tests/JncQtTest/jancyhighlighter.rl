@@ -36,31 +36,52 @@ main := |*
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 (
-'import'       |
 'namespace'    |
 'using'        |
+'extend'       |
 'pack'         |
-'endian'       |
 
 'typedef'      |
+'alias'        |
 'static'       |
+'thread'       |
+'stack'        |
+'heap'         |
+'uheap'        |
+'abstract'     |
+'virtual'      |
+'override'     |
 
 'public'       |
-'private'      |
+'protected'    |
+'friend'       |
 
-'const'        |
-'volatile'     |
 'signed'       |
 'unsigned'     |
-'littleendian' |
 'bigendian'    |
-'safe'         |
+'nullable'     |
+'const'        |
+'readonly'     |
+'mutable'      |
+'volatile'     |
+'weak'         |
+'thin'         |
 'unsafe'       |
+'cdecl'        |
+'stdcall'      |
+'function'     |
+'property'     |
+'multicast'    |
+'event'        |
+'autoev'       |
+'bindable'     |
+'autoget'      |
+'indexed'      |
 
 'auto'         |
 'void'         |
-'variant'      |
 'object'       |
+'variant'      |
 'bool'         |
 'int8'         |
 'int16'        |
@@ -68,23 +89,26 @@ main := |*
 'int64'        |
 'float'        |
 'double'       |
-'int'          |
 'char'         |
-'short'        |
-'long'         |
+'int'          |
+'intptr'       |
 
 'enum'         |
 'enumc'        |
 'struct'       |
 'union'        |
 'class'        |
-'interface'    |
-'property'     |
+
 'get'          |
 'set'          |
-
-'sizeof'       |
-'typeof'       |
+'this'         |
+'preconstruct' |
+'construct'    |
+'destruct'     |
+'operator'     |
+'postfix'      |
+'propvalue'    |
+'onchange'     |
 
 'if'           |
 'else'         |
@@ -97,18 +121,26 @@ main := |*
 'switch'       |
 'case'         |
 'default'      |
+'once'         |
+'silent'       |
 
 'true'         |
 'false'        |
-'null'         
+'null'         |
+
+'new'          |
+'delete'       |
+'sizeof'       |
+'typeof'       
+
 )			   { colorize(ts, te, Qt::blue); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 id								{  };
 (lit_sq | lit_dq)				{ colorize(ts, te, Qt::darkRed); };
-dec+							{  };
-'0' [Xx] hex+					{  };
+dec+							{ colorize(ts, te, Qt::darkRed); };
+'0' [Xx] hex+					{ colorize(ts, te, Qt::darkRed); };
 
 '//' [^\n]*						{ colorize(ts, te, Qt::darkGreen); };
 

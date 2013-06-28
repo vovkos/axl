@@ -129,42 +129,48 @@ CBinOp_Idx::ArrayIndexOperator (
 	CDataPtrType* pOpType1 = (CDataPtrType*) OpValue1.GetType ();
 
 	CDataPtrType* pPtrType;
-	int PtrTypeFlags = pOpType1->GetFlags () | EPtrTypeFlag_Nullable;
+
+	uint_t PtrTypeFlags = pOpType1->GetFlags ();
+
+	if (PtrTypeFlags & EPtrTypeFlag_Checked)
+	{
+		if (OpValue2.GetValueKind () == EValue_Const)
+		{			
+			CValue IdxValue;
+			bool Result = m_pModule->m_OperatorMgr.CastOperator (OpValue2, EType_Int_p, &IdxValue);
+			if (!Result)
+				return false;
+
+			intptr_t i = IdxValue.GetSizeT ();
+			if (i < 0 || i >= (intptr_t) pArrayType->GetElementCount ())
+			{
+				err::SetFormatStringError ("index '%d' is out of bounds in '%s'", i, pArrayType->GetTypeString ().cc ());
+				return false;
+			}
+		}
+		else
+		{
+			PtrTypeFlags &= ~EPtrTypeFlag_Checked;
+		}
+	}
 	
 	CValue PtrValue;
 
-	EDataPtrType PtrTypeKind = pOpType1->GetPtrTypeKind ();
-	switch (PtrTypeKind)
+	if (pOpType1->GetPtrTypeKind () == EDataPtrType_Thin)
 	{
-	case EDataPtrType_Unsafe:
-		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Unsafe, PtrTypeFlags);
-
-		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, pPtrType, pResultValue);
-		break;
-
-	case EDataPtrType_Thin:
 		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
-
-		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, NULL, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateGep2 (OpValue1, OpValue2, pPtrType, pResultValue);
 
 		if (OpValue1.GetValueKind () == EValue_Variable)
-			pResultValue->SetThinDataPtr (
-				PtrValue.GetLlvmValue (), 
-				pPtrType,
-				OpValue1
-				);
+			pResultValue->SetThinDataPtrValidator (OpValue1);
 		else
-			pResultValue->SetThinDataPtr (
-				PtrValue.GetLlvmValue (), 
-				pPtrType,
-				OpValue1.GetThinDataPtrValidator ()
-				);
-		break;
-
-	case EDataPtrType_Normal:
+			pResultValue->SetThinDataPtrValidator (OpValue1.GetThinDataPtrValidator ());
+	}
+	else 
+	{
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);
 
-		pPtrType = pElementType->GetDataPtrType (EDataPtrType_Unsafe);
+		pPtrType = pElementType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 
 		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, OpValue2, NULL, &PtrValue);
 
@@ -175,11 +181,6 @@ CBinOp_Idx::ArrayIndexOperator (
 			pPtrType,
 			OpValue1
 			);
-
-		break;
-
-	default:
-		ASSERT (false);
 	}
 
 	return true;
@@ -193,12 +194,7 @@ CBinOp_Idx::PropertyIndexOperator (
 	)
 {
 	*pResultValue = RawOpValue1;
-	
-	CClosure* pClosure = pResultValue->GetClosure ();
-	if (!pClosure)
-		pClosure = pResultValue->CreateClosure ();
-
-	pClosure->GetArgList ()->InsertTail (RawOpValue2);
+	pResultValue->InsertToClosureTail (RawOpValue2);
 	return true;
 }
 

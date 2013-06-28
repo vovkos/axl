@@ -29,9 +29,9 @@ enum EModuleItem
 	EModuleItem_Function,
 	EModuleItem_Property,
 	EModuleItem_PropertyTemplate,
-	EModuleItem_AutoEv,
 	EModuleItem_EnumConst,
 	EModuleItem_StructField,
+	EModuleItem_BaseTypeSlot,
 	EModuleItem__Count,
 };
 
@@ -39,6 +39,20 @@ enum EModuleItem
 
 const char*
 GetModuleItemKindString (EModuleItem ItemKind);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum EModuleItemFlag
+{
+	EModuleItemFlag_User         = 0x01,
+	EModuleItemFlag_Orphan       = 0x02,
+	EModuleItemFlag_NeedLayout   = 0x04,
+	EModuleItemFlag_NeedCompile  = 0x08,
+	EModuleItemFlag_InCalcLayout = 0x10,
+	EModuleItemFlag_LayoutReady  = 0x20,
+	EModuleItemFlag_Constructed  = 0x40, // fields, properties, base type slots
+};
+
 
 //.............................................................................
 
@@ -56,6 +70,9 @@ enum EStorage
 	EStorage_Abstract,
 	EStorage_Virtual,
 	EStorage_Override,
+	EStorage_Mutable,
+	EStorage_Nullable,
+	EStorage_This,
 	EStorage__Count,
 };
 
@@ -151,9 +168,13 @@ public:
 
 class CModuleItem: public rtl::TListLink
 {
+	friend class CModule;
+	friend class CParser;
+
 protected:
 	CModule* m_pModule;
 	EModuleItem m_ItemKind;
+	uint_t m_Flags;
 	CModuleItemDecl* m_pItemDecl;
 
 public:
@@ -174,10 +195,36 @@ public:
 		return m_ItemKind;
 	}
 
+	uint_t
+	GetFlags ()
+	{
+		return m_Flags;
+	}
+
 	CModuleItemDecl*
 	GetItemDecl ()
 	{
 		return m_pItemDecl;
+	}
+
+	bool
+	EnsureLayout ();
+
+	virtual
+	bool 
+	Compile ()
+	{
+		ASSERT (false);
+		return true;
+	}
+
+protected:
+	virtual
+	bool 
+	CalcLayout ()
+	{
+		ASSERT (false);
+		return true;
 	}
 };
 

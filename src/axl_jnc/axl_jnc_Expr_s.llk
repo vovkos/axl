@@ -239,7 +239,7 @@ assignment_expr_s <CValue* $pValue>
 	:	unary_expr_s <$pValue> 
 		(
 				{
-					if (IsAutoEvStarter ())
+					if (IsAutoEv ())
 						m_AutoEvBindSiteCount = 0; // reset on assignment
 				}
 			assignment_operator $o conditional_expr_s <&$OpValue2>
@@ -257,7 +257,7 @@ unary_expr_s <CValue* $pValue>
 unary_operator_expr_s <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
 			m_AutoEvBindSiteCount++;
 	}
 	:	'+' unary_expr_s <$pValue> 
@@ -340,7 +340,7 @@ postfix_expr_s <CValue* $pValue>
 postfix_operator_s <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
 			m_AutoEvBindSiteCount++;
 	}
 	:	'(' expression_or_empty_list_s ')'
@@ -363,7 +363,10 @@ postfix_operator_s <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PostDec, $pValue);
 			}
-	|	'.' member_operator_s <$pValue>
+	|	'.' EToken_Weak $w? member_operator_s <$pValue>
+			{
+				return IsValidLocator ($w) ? m_pModule->m_OperatorMgr.GetWeakenedType ($pValue) : true;
+			}
 	|	EToken_Ptr 
 			{
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Ptr, $pValue);
@@ -378,11 +381,11 @@ member_operator_s <CValue* $pValue>
 			}
 	|	EToken_OnChange
 			{
-				return m_pModule->m_OperatorMgr.GetStdFieldType ($pValue, EStdField_OnChange);
+				return m_pModule->m_OperatorMgr.GetPropertyOnChangeType ($pValue);
 			}
-	|	EToken_Value
+	|	EToken_PropValue
 			{
-				return m_pModule->m_OperatorMgr.GetStdFieldType ($pValue, EStdField_Value);
+				return m_pModule->m_OperatorMgr.GetPropertyPropValueType ($pValue);
 			}
 	|	EToken_Get
 			{
@@ -397,7 +400,7 @@ member_operator_s <CValue* $pValue>
 primary_expr_s <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
 			m_AutoEvBindSiteCount++;
 	}
 	:	EToken_Identifier
@@ -410,11 +413,11 @@ primary_expr_s <CValue* $pValue>
 			}
 	|	EToken_OnChange
 			{
-				return GetStdFieldType ($pValue, EStdField_OnChange);
+				return GetOnChangeType ($pValue);
 			}
-	|	EToken_Value
+	|	EToken_PropValue
 			{
-				return GetStdFieldType ($pValue, EStdField_Value);
+				return GetPropValueType ($pValue);
 			}
 	|	EToken_Integer
 			{

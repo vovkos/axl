@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_ImportType.h"
 
 namespace axl {
 namespace jnc {
@@ -17,6 +17,7 @@ class CBitFieldType: public CType
 
 protected:
 	CType* m_pBaseType;
+	CImportType* m_pBaseType_i;
 	size_t m_BitOffset;
 	size_t m_BitCount;
 
@@ -27,6 +28,12 @@ public:
 	GetBaseType ()
 	{
 		return m_pBaseType;
+	}
+
+	CImportType*
+	GetBaseType_i ()
+	{
+		return m_pBaseType_i;
 	}
 
 	size_t
@@ -68,6 +75,10 @@ protected:
 	{
 		m_pLlvmType = m_pBaseType->GetLlvmType ();
 	}
+
+	virtual 
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

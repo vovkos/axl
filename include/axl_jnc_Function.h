@@ -6,7 +6,7 @@
 
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_FunctionTypeOverload.h"
-#include "axl_jnc_StructType.h"
+#include "axl_jnc_NamedType.h"
 #include "axl_jnc_BasicBlock.h"
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Value.h"
@@ -20,8 +20,8 @@ namespace jnc {
 
 class CClassType;
 class CPropertyType;
+class CAutoEvClassType;
 class CProperty;
-class CAutoEv;
 class CJitEventListener;
 
 //.............................................................................
@@ -32,6 +32,8 @@ enum EFunction
 	EFunction_Named,
 	EFunction_Getter,
 	EFunction_Setter,
+	EFunction_Binder,
+	EFunction_Primer,
 	EFunction_PreConstructor,
 	EFunction_Constructor,
 	EFunction_Destructor,
@@ -43,11 +45,9 @@ enum EFunction
 	EFunction_CastOperator,
 	EFunction_UnaryOperator,
 	EFunction_BinaryOperator,
-	EFunction_AutoEvStarter,
-	EFunction_AutoEvStopper,
-	EFunction_AutoEvHandler,
 	EFunction_Internal, 
 	EFunction_Thunk,
+	EFunction_AutoEvHandler,
 	EFunction_ScheduleLauncher,
 	EFunction__Count
 };
@@ -80,7 +80,6 @@ class CFunction: public CUserModuleItem
 	friend class CDerivableType;
 	friend class CClassType;
 	friend class CProperty;
-	friend class CAutoEv;
 	friend class CParser;
 	friend class CCast_FunctionPtr;
 	friend class CJitEventListener;
@@ -101,18 +100,16 @@ protected:
 
 	// override & orphan functions
 
-	CNamespace* m_pOrphanNamespace;
 	CQualifiedName m_DeclaratorName;
-	CFunction* m_pExternFunction;
 
-	// for non-static method members
+	// for non-static member methods
 
 	CType* m_pThisArgType;
 	CType* m_pThisType;
 	intptr_t m_ThisArgDelta;
-	int m_ThisArgTypeFlags; 
+	uint_t m_ThisArgTypeFlags; 
 
-	// for virtual method members
+	// for virtual member methods
 
 	CClassType* m_pVirtualOriginClassType; 
 	size_t m_ClassVTableIndex;
@@ -122,13 +119,8 @@ protected:
 	CProperty* m_pProperty;
 	size_t m_PropertyVTableIndex;
 
-	// for autoev starters/stoppers/handlers
-
-	CAutoEv* m_pAutoEv;
-
 	rtl::CBoxListT <CToken> m_Body;
 
-	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > m_Ast;
 	CBasicBlock* m_pBlock;
 	CScope* m_pScope;
 
@@ -175,12 +167,6 @@ public:
 	}
 
 	bool
-	IsOrphan ()
-	{
-		return m_pOrphanNamespace != NULL;
-	}
-
-	bool
 	IsAccessor ()
 	{
 		return m_FunctionKind == EFunction_Getter || m_FunctionKind == EFunction_Setter;
@@ -189,7 +175,7 @@ public:
 	bool
 	IsMember ()
 	{
-		return m_StorageKind >= EStorage_Member && m_StorageKind <= EStorage_Override;
+		return m_pThisType != NULL;
 	}
 
 	bool
@@ -205,6 +191,7 @@ public:
 			(m_FunctionKind == EFunction_PreConstructor ||
 			m_FunctionKind == EFunction_Constructor ||
 			m_FunctionKind == EFunction_Destructor) &&
+			m_pThisType && 
 			m_pThisType->GetTypeKind () == EType_ClassPtr;
 	}
 
@@ -256,20 +243,8 @@ public:
 		return m_PropertyVTableIndex;
 	}
 
-	CAutoEv* 
-	GetAutoEv ()
-	{
-		return m_pAutoEv;
-	}
-
 	void
 	ConvertToMemberMethod (CNamedType* pParentType);
-
-	bool
-	IsDefined ()
-	{
-		return HasBody () || m_pExternFunction && m_pExternFunction->IsDefined ();
-	}
 
 	bool
 	HasBody ()
@@ -283,11 +258,8 @@ public:
 		return &m_Body;
 	}
 
-	void
-	SetBody (rtl::CBoxListT <CToken>* pTokenList)
-	{
-		m_Body.TakeOver (pTokenList);
-	}
+	bool
+	SetBody (rtl::CBoxListT <CToken>* pTokenList);
 
 	CScope*
 	GetScope ()
@@ -299,12 +271,6 @@ public:
 	GetBlock ()
 	{
 		return m_pBlock;
-	}
-
-	CFunction*
-	GetExternFunction ()
-	{
-		return m_pExternFunction;
 	}
 
 	llvm::Function* 
@@ -320,12 +286,6 @@ public:
 	GetMachineCodeSize ()
 	{
 		return m_MachineCodeSize;
-	}
-
-	ref::CBufT <llk::CAstT <llk::CAstNodeT <CToken> > > 
-	GetAst ()
-	{
-		return m_Ast;
 	}
 
 	bool
@@ -416,11 +376,14 @@ public:
 	bool
 	AddOverload (CFunction* pFunction);
 
+	virtual
 	bool
-	ResolveOrphan ();
+	Compile ();
 
-	void
-	MakeStub (CFunction* pFunction);
+protected:
+	virtual
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

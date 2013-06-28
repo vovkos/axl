@@ -13,8 +13,7 @@ CPropertyTemplate::CPropertyTemplate ()
 	m_NamespaceKind = ENamespace_PropertyTemplate;
 	m_pItemDecl = this;
 	m_pGetterType = NULL;
-	m_pAuPropValueType = NULL;
-	m_TypeModifiers = 0;
+	m_TypeFlags = 0;
 }
 
 bool
@@ -23,25 +22,37 @@ CPropertyTemplate::AddMethod (
 	CFunctionType* pFunctionType
 	)
 {
+	bool Result;
+
 	if (FunctionKind != EFunction_Getter && FunctionKind != EFunction_Setter)
 	{
 		err::SetFormatStringError ("property templates can only have accessors");
 		return false;
 	}
 
-	bool Result = m_Verifier.AddMethod (FunctionKind, pFunctionType);
-	if (!Result)
-		return false;
-
 	if (FunctionKind == EFunction_Getter)
 	{
-		m_pGetterType = pFunctionType;
-		return true;
-	}
+		Result = m_Verifier.CheckGetter (pFunctionType);
+		if (!Result)
+			return false;
 
-	Result = m_SetterType.AddOverload (pFunctionType);
-	if (!Result)
-		return false;
+		if (m_pGetterType)
+		{
+			err::SetFormatStringError ("property template already has a getter");
+			return false;
+		}
+
+		m_pGetterType = pFunctionType;
+	}
+	else
+	{
+		Result = 
+			m_Verifier.CheckSetter (pFunctionType) &&
+			m_SetterType.AddOverload (pFunctionType);
+
+		if (!Result)
+			return false;
+	}
 
 	return true;
 }
@@ -51,12 +62,11 @@ CPropertyTemplate::CalcType ()
 {
 	if (!m_pGetterType)
 	{
-		err::SetFormatStringError ("incomplete property template: no 'get' method / 'propvalue' field");
+		err::SetFormatStringError ("incomplete property template: no 'get' method");
 		return NULL;
 	}
 
-	uint_t Flags = GetPropertyTypeFlagsFromModifiers (m_TypeModifiers);
-	return m_pModule->m_TypeMgr.GetPropertyType (m_pGetterType, m_SetterType, Flags);
+	return m_pModule->m_TypeMgr.GetPropertyType (m_pGetterType, m_SetterType, m_TypeFlags);
 }
 
 //.............................................................................

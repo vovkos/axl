@@ -34,6 +34,22 @@ public:
 		return m_pTargetType;
 	}
 
+	CDataPtrType*
+	GetCheckedPtrType ()
+	{
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
+			m_pTargetType->GetDataPtrType (m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
+	CDataPtrType*
+	GetUnCheckedPtrType ()
+	{
+		return (m_Flags & EPtrTypeFlag_Checked) ?  
+			m_pTargetType->GetDataPtrType (m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
 	CStructType* 
 	GetDataPtrStructType ();
 
@@ -58,19 +74,10 @@ protected:
 
 //.............................................................................
 
-class CDataPtrTypeTuple: public rtl::TListLink
+struct TDataPtrTypeTuple: rtl::TListLink
 {
-	friend class CTypeMgr;
-
-protected:
 	CStructType* m_pPtrStructType;
-	CDataPtrType* m_PtrTypeArray [2] [EDataPtrType__Count] [2] [2] [2]; // ref x ptrkind x const x volatile x nullable
-
-public:
-	CDataPtrTypeTuple ()
-	{
-		memset (this, 0, sizeof (CDataPtrTypeTuple));
-	}
+	CDataPtrType* m_PtrTypeArray [2] [2] [2] [2] [3]; // ref x kind x const x volatile x unsafe / checked
 };
 
 //.............................................................................

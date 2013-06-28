@@ -23,6 +23,20 @@ CStdLib::Export (
 
 	// implementation for thin and unsafe is the same
 
+	rtl::CConstListT <CMulticastClassType> McTypeList = pModule->m_TypeMgr.GetMulticastClassTypeList ();
+	rtl::CIteratorT <CMulticastClassType> McType = McTypeList.GetHead ();
+	for (; McType; McType++)
+	{
+		ExportMulticastMethods (
+			pModule, 
+			pLlvmExecutionEngine, 
+			*McType
+			);
+	}
+
+
+/*	
+
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet,   (void*) MulticastSet);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet_w, (void*) MulticastSet_w);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet_t, (void*) MulticastSet_u);
@@ -43,6 +57,7 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSnapshot_t, (void*) MulticastSnapshot_u);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSnapshot_u, (void*) MulticastSnapshot_u);
 
+*/
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "GetCurrentThreadId", (void*) GetCurrentThreadId);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "CreateThread", (void*) CreateThread);
 }
@@ -58,28 +73,24 @@ CStdLib::OnRuntimeError (
 
 	switch (Error)
 	{
-	case jnc::ERuntimeError_LoadOutOfRange:
-		pErrorString = "READ_OOR";
-		break;
-
-	case jnc::ERuntimeError_StoreOutOfRange:
-		pErrorString = "WRITE_OOR";
+	case jnc::ERuntimeError_DataPtrOutOfRange:
+		pErrorString = "DATA_PTR_OOR";
 		break;
 
 	case jnc::ERuntimeError_ScopeMismatch:
 		pErrorString = "SCOPE_MISMATCH";
 		break;
 
-	case jnc::ERuntimeError_NullInterface:
-		pErrorString = "NULL_INTERFACE";
+	case jnc::ERuntimeError_NullClassPtr:
+		pErrorString = "NULL_CLASS_PTR";
 		break;
 
-	case jnc::ERuntimeError_NullFunction:
-		pErrorString = "NULL_FUNCTION";
+	case jnc::ERuntimeError_NullFunctionPtr:
+		pErrorString = "NULL_FUNCTION_PTR";
 		break;
 
-	case jnc::ERuntimeError_NullProperty:
-		pErrorString = "NULL_PROPERTY";
+	case jnc::ERuntimeError_NullPropertyPtr:
+		pErrorString = "NULL_PROPERTY_PTR";
 		break;
 
 	case jnc::ERuntimeError_AbstractFunction:
@@ -121,6 +132,12 @@ CStdLib::DynamicCastClassPtr (
 	return p2;
 }
 
+void
+CStdLib::MulticastClear (jnc::TMulticast* pMulticast)
+{
+	return ((CMulticast*) pMulticast)->Clear ();
+}
+
 handle_t
 CStdLib::MulticastSet (
 	jnc::TMulticast* pMulticast,
@@ -131,21 +148,12 @@ CStdLib::MulticastSet (
 }
 
 handle_t
-CStdLib::MulticastSet_w (
-	jnc::TMulticast* pMulticast,
-	jnc::TFunctionPtr_w Ptr
-	)
-{
-	return ((CMulticast*) pMulticast)->SetHandler_w (Ptr);
-}
-
-handle_t
-CStdLib::MulticastSet_u (
+CStdLib::MulticastSet_t (
 	jnc::TMulticast* pMulticast,
 	void* pf
 	)
 {
-	return ((CMulticast*) pMulticast)->SetHandler_u (pf);
+	return ((CMulticast*) pMulticast)->SetHandler_t (pf);
 }
 
 handle_t
@@ -158,21 +166,12 @@ CStdLib::MulticastAdd (
 }
 
 handle_t
-CStdLib::MulticastAdd_w (
-	jnc::TMulticast* pMulticast,
-	jnc::TFunctionPtr_w Ptr
-	)
-{
-	return ((CMulticast*) pMulticast)->AddHandler_w (Ptr);
-}
-
-handle_t
-CStdLib::MulticastAdd_u (
+CStdLib::MulticastAdd_t (
 	jnc::TMulticast* pMulticast,
 	void* pf
 	)
 {
-	return ((CMulticast*) pMulticast)->AddHandler_u (pf);
+	return ((CMulticast*) pMulticast)->AddHandler_t (pf);
 }
 
 jnc::TFunctionPtr
@@ -184,40 +183,19 @@ CStdLib::MulticastRemove (
 	return ((CMulticast*) pMulticast)->RemoveHandler (Handle);
 }
 
-jnc::TFunctionPtr_w
-CStdLib::MulticastRemove_w (
-	jnc::TMulticast* pMulticast,
-	handle_t Handle
-	)
-{
-	return ((CMulticast*) pMulticast)->RemoveHandler_w (Handle);
-}
-
 void*
-CStdLib::MulticastRemove_u (
+CStdLib::MulticastRemove_t (
 	jnc::TMulticast* pMulticast,
 	handle_t Handle
 	)
 {
-	return ((CMulticast*) pMulticast)->RemoveHandler_u (Handle);
+	return ((CMulticast*) pMulticast)->RemoveHandler_t (Handle);
 }
 
-jnc::TMcSnapshot
-CStdLib::MulticastSnapshot (jnc::TMulticast* pMulticast)
+jnc::TFunctionPtr
+CStdLib::MulticastGetSnapshot (jnc::TMulticast* pMulticast)
 {
-	return ((CMulticast*) pMulticast)->Snapshot ();
-}
-
-jnc::TMcSnapshot
-CStdLib::MulticastSnapshot_w (jnc::TMulticast* pMulticast)
-{
-	return ((CMulticast*) pMulticast)->Snapshot_w ();
-}
-
-jnc::TMcSnapshot
-CStdLib::MulticastSnapshot_u (jnc::TMulticast* pMulticast)
-{
-	return ((CMulticast*) pMulticast)->Snapshot_u ();
+	return ((CMulticast*) pMulticast)->GetSnapshot ();
 }
 
 void*
@@ -226,9 +204,9 @@ CStdLib::HeapAlloc (jnc::CType* pType)
 	void* p = malloc (pType->GetSize ());
 	memset (p, 0, pType->GetSize ());
 
-	if (pType->GetTypeKind () == jnc::EType_Struct && ((jnc::CStructType*) pType)->IsClassStructType ())
+	if (pType->GetTypeKind () == jnc::EType_Class)
 	{
-		jnc::CClassType* pClassType = (jnc::CClassType*) ((jnc::CStructType*) pType)->GetParentNamespace ();
+		jnc::CClassType* pClassType = (jnc::CClassType*) pType;
 		jnc::CFunction* pDestructor = pClassType->GetDestructor ();
 		
 		if (pDestructor)
@@ -317,6 +295,55 @@ CStdLib::PointerCheck (jnc::TDataPtr Ptr)
 		Ptr.m_pRangeEnd,
 		Ptr.m_ScopeLevel
 		);
+}
+
+void
+CStdLib::ExportMulticastMethods (
+	CModule* pModule,
+	llvm::ExecutionEngine* pLlvmExecutionEngine,
+	CMulticastClassType* pMulticastType
+	)
+{
+	static 
+	void*
+	MethodTable [3] [5] = 
+	{
+		{
+			MulticastClear,
+			MulticastSet,
+			MulticastAdd,
+			MulticastRemove,
+			MulticastGetSnapshot,
+		},
+
+		{
+			MulticastClear,
+			MulticastSet,
+			MulticastAdd,
+			MulticastRemove,
+			MulticastGetSnapshot,
+		},
+
+		{
+			MulticastClear,
+			MulticastSet_t,
+			MulticastAdd_t,
+			MulticastRemove_t,
+			MulticastGetSnapshot,
+		},
+	};
+
+	EFunctionPtrType PtrTypeKind = pMulticastType->GetTargetType ()->GetPtrTypeKind ();
+	ASSERT (PtrTypeKind < EFunctionPtrType__Count);
+
+	for (size_t i = 0; i < 5; i++)
+	{
+		pModule->SetFunctionPointer (
+			pLlvmExecutionEngine, 
+			pMulticastType->GetMethod ((EMulticastMethod) i), 
+			MethodTable [PtrTypeKind] [i]
+			);
+	}
 }
 
 //.............................................................................

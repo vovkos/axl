@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_ImportType.h"
 #include "axl_jnc_NamedType.h"
 
 namespace axl {
@@ -85,6 +85,7 @@ class CEnumType: public CNamedType
 	
 protected:
 	CType* m_pBaseType;
+	CImportType* m_pBaseType_i;
 	rtl::CStdListT <CEnumConst> m_ConstList;
 	intptr_t m_CurrentValue;
 
@@ -95,6 +96,12 @@ public:
 	GetBaseType ()
 	{
 		return m_pBaseType;
+	}
+
+	CImportType*
+	GetBaseType_i ()
+	{
+		return m_pBaseType_i;
 	}
 
 	rtl::CConstListT <CEnumConst>
@@ -134,6 +141,10 @@ protected:
 	{
 		m_pLlvmType = m_pBaseType->GetLlvmType ();
 	}
+
+	virtual 
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

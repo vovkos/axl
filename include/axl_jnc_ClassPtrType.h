@@ -34,10 +34,27 @@ public:
 		return m_pTargetType;
 	}
 
+	CClassPtrType*
+	GetCheckedPtrType ()
+	{
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
+			m_pTargetType->GetClassPtrType (m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
+	CClassPtrType*
+	GetUnCheckedPtrType ()
+	{
+		return (m_Flags & EPtrTypeFlag_Checked) ?  
+			m_pTargetType->GetClassPtrType (m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
 	static
 	rtl::CString
 	CreateSignature (
 		CClassType* pClassType,
+		EType TypeKind,
 		EClassPtrType PtrTypeKind,
 		uint_t Flags
 		);
@@ -54,18 +71,9 @@ protected:
 
 //.............................................................................
 
-class CClassPtrTypeTuple: public rtl::TListLink
+struct TClassPtrTypeTuple: rtl::TListLink
 {
-	friend class CTypeMgr;
-
-protected:
-	CClassPtrType* m_PtrTypeArray [EClassPtrType__Count] [2] [2]; // ptrkind x const x nullable
-
-public:
-	CClassPtrTypeTuple ()
-	{
-		memset (this, 0, sizeof (CClassPtrTypeTuple));
-	}
+	CClassPtrType* m_PtrTypeArray [2] [2] [2] [2] [3]; // ref x kind x const x volatile x unsafe / checked
 };
 
 //.............................................................................

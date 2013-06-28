@@ -28,6 +28,7 @@ protected:
 
 	llvm::IRBuilder <> m_LlvmBuilder;
 	uint_t m_CommentMdKind;
+	uint_t m_EmptyLineMdKind;
 
 public:
 	CLlvmBuilder ();
@@ -53,6 +54,15 @@ public:
 		const char* pFormat,
 		axl_va_list va
 		);
+
+	bool
+	CreateComment_0 (const char* pText);
+
+	bool
+	CreateEmptyLine ()
+	{
+		return CreateComment_0 (NULL);
+	}
 
 	// branches
 
@@ -1112,6 +1122,31 @@ public:
 	RuntimeError (ERuntimeError Error)
 	{
 		return RuntimeError (CValue (Error, EType_Int));
+	}
+};
+
+//.............................................................................
+
+class CLlvmScopeComment
+{
+protected:
+	CLlvmBuilder* m_pLlvmBuilder;
+
+public:
+	CLlvmScopeComment (
+		CLlvmBuilder* pLlvmBuilder,
+		const char* pFormat,
+		...
+		)
+	{
+		AXL_VA_DECL (va, pFormat);
+		pLlvmBuilder->CreateComment_va (pFormat, va);
+		m_pLlvmBuilder = pLlvmBuilder;
+	}
+
+	~CLlvmScopeComment ()
+	{
+		m_pLlvmBuilder->CreateEmptyLine ();
 	}
 };
 

@@ -42,36 +42,29 @@ public:
 		return m_FieldList;
 	}
 
-	CStructField*
-	CreateField (
-		const rtl::CString& Name,
-		CType* pType,
-		size_t BitCount,
-		int PtrTypeFlags,
-		rtl::CBoxListT <CToken>* pInitializer = NULL
-		);
-
-	CStructField*
-	CreateField (
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
-	}
-
+	virtual
 	CStructField*
 	GetFieldByIndex (size_t Index);
 
 	bool
-	InitializeField ();
+	InitializeField (const CValue& ThisValue);
 
 	virtual
 	bool
-	CalcLayout ();
+	Compile ();
 
 protected:
+	virtual
+	CStructField*
+	CreateFieldImpl (
+		const rtl::CString& Name,
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
 	virtual 
 	void
 	PrepareTypeString ()
@@ -85,6 +78,13 @@ protected:
 	{
 		m_pLlvmType = GetStructType ()->GetLlvmType ();
 	}
+
+	virtual
+	bool
+	CalcLayout ();
+
+	bool
+	CompileDefaultPreConstructor ();
 };
 
 //.............................................................................

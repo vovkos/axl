@@ -67,10 +67,7 @@ CCast_PropertyPtr_FromDataPtr::LlvmCast (
 	m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &PropertyPtrValue);
 
 	if (ClosureArgValue)
-	{
-		CClosure* pClosure = PropertyPtrValue.CreateClosure ();
-		pClosure->GetArgList ()->InsertHead (ClosureArgValue);
-	}
+		PropertyPtrValue.InsertToClosureHead (ClosureArgValue);
 
 	return m_pModule->m_OperatorMgr.CastOperator (PropertyPtrValue, pType, pResultValue);
 }
@@ -119,21 +116,8 @@ CCast_PropertyPtr_FromNormal::LlvmCast (
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pThinPtrType, &PfnValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &ClosureObjValue);
 
-	ref::CPtrT <CClosure> OldClosure = OpValue.GetClosure ();
-
-	CClosure* pClosure;
-
-	if (OldClosure)
-	{
-		PfnValue.SetClosure (OldClosure);
-		pClosure = OldClosure;
-	}
-	else
-	{
-		pClosure = PfnValue.CreateClosure ();
-	}
-
-	pClosure->GetArgList ()->InsertHead (ClosureObjValue);
+	PfnValue.SetClosure (OpValue.GetClosure ());
+	PfnValue.InsertToClosureHead (ClosureObjValue);
 
 	return m_pModule->m_OperatorMgr.CastOperator (StorageKind, PfnValue, pType, pResultValue);
 }
@@ -370,9 +354,9 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 
 	CProperty* pProperty = OpValue.GetProperty ();
 
-	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Augmented)
+	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable)
 	{
-		err::SetFormatStringError ("augmented properties are not supported yet");
+		err::SetFormatStringError ("bindable properties are not supported yet");
 		return false;
 	}
 
@@ -402,20 +386,6 @@ CCast_PropertyPtr_Thin2Weak::LlvmCast (
 
 //.............................................................................
 
-bool
-CCast_PropertyPtr_Unsafe2Unsafe::LlvmCast (
-	EStorage StorageKind,
-	const CValue& OpValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pType, pResultValue);
-	return true;
-}
-
-//.............................................................................
-
 CCast_PropertyPtr::CCast_PropertyPtr ()
 {
 	memset (m_OperatorTable, 0, sizeof (m_OperatorTable));
@@ -426,8 +396,6 @@ CCast_PropertyPtr::CCast_PropertyPtr ()
 	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Normal]   = &m_Thin2Normal;
 	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Weak]     = &m_Thin2Weak;
 	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Thin]     = &m_Thin2Thin;
-	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Unsafe]   = &m_Unsafe2Unsafe;
-	m_OperatorTable [EPropertyPtrType_Unsafe] [EPropertyPtrType_Unsafe] = &m_Unsafe2Unsafe;
 }
 
 ICastOperator*
@@ -457,9 +425,12 @@ CCast_PropertyPtr::GetCastOperator (
 		}
 
 	default:
-		return IsIntegerTypeKind (SrcTypeKind) && DstPtrTypeKind == EPropertyPtrType_Unsafe ?
-			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
-			NULL;
+		return 
+			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Integer) && 
+			DstPtrTypeKind == EPropertyPtrType_Thin &&
+			(pType->GetFlags () & EPtrTypeFlag_Unsafe) ?
+				m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
+				NULL;
 	};
 }
 

@@ -35,23 +35,27 @@ public:
 		return m_pExtensionNamespace;
 	}
 
+	virtual
 	CType*
-	GetThisArgType (int ThisArgTypeFlags = 0);
+	GetThisArgType (uint_t PtrTypeFlags)
+	{
+		return (CType*) GetDataPtrType (EDataPtrType_Normal, PtrTypeFlags);
+	}
 
 	CFunctionType* 
 	GetMemberMethodType (
 		CFunctionType* pShortType,
-		int ThisArgTypeFlags = 0
+		uint_t ThisArgTypeFlags = 0
 		);
 
 	CPropertyType* 
 	GetMemberPropertyType (CPropertyType* pShortType);
 
+protected:
 	virtual
 	bool
 	CalcLayout ();
 
-protected:
 	void
 	ApplyExtensionNamespace ();
 

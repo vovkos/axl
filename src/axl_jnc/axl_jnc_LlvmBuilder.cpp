@@ -21,15 +21,27 @@ CLlvmBuilder::CreateComment_va (
 	axl_va_list va
 	)
 {
-	if (m_LlvmBuilder.GetInsertBlock ()->getInstList ().empty ())
-		return false;
-
 	char Buffer [256];
 	rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	String.Format_va (pFormat, va);
 
-	llvm::Instruction* pInst = &m_LlvmBuilder.GetInsertBlock ()->getInstList ().back ();
-	llvm::MDString* pMdString = llvm::MDString::get (llvm::getGlobalContext (), String);	
+	return CreateComment_0 (String);
+}
+
+bool
+CLlvmBuilder::CreateComment_0 (const char* pText)
+{
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	llvm::BasicBlock* pLlvmBlock = pBlock->GetLlvmBlock ();
+
+	if (pLlvmBlock->getInstList ().empty ())
+	{
+		pBlock->m_LeadingComment = pText;
+		return true;
+	}
+
+	llvm::Instruction* pInst = &pLlvmBlock->getInstList ().back ();
+	llvm::MDString* pMdString = llvm::MDString::get (llvm::getGlobalContext (), pText);
 	llvm::MDNode* pMdNode = llvm::MDNode::get (llvm::getGlobalContext (), llvm::ArrayRef <llvm::Value*> ((llvm::Value**) &pMdString, 1));
 	pInst->setMetadata (m_CommentMdKind, pMdNode);
 	return true;
@@ -44,7 +56,7 @@ CLlvmBuilder::CreateSwitch (
 	)
 {
 	CType* pType = Value.GetType ();
-	ASSERT (pType->IsIntegerType ());
+	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
 	llvm::SwitchInst* pInst = m_LlvmBuilder.CreateSwitch (
 		Value.GetLlvmValue (), 
@@ -74,7 +86,7 @@ CLlvmBuilder::CreateSwitch (
 	)
 {
 	CType* pType = Value.GetType ();
-	ASSERT (pType->IsIntegerType ());
+	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
 	llvm::SwitchInst* pInst = m_LlvmBuilder.CreateSwitch (
 		Value.GetLlvmValue (), 
@@ -249,7 +261,7 @@ CLlvmBuilder::CreateClosureFunctionPtr (
 	CValue* pResultValue
 	)
 {
-	CreateComment ("create closure function pointer");
+	CLlvmScopeComment Comment (this, "create closure function pointer");
 
 	CValue PfnValue;
 	CValue IfaceValue;
@@ -273,7 +285,7 @@ CLlvmBuilder::CreateClosurePropertyPtr (
 	CValue* pResultValue
 	)
 {
-	CreateComment ("create closure property pointer");
+	CLlvmScopeComment Comment (this, "create closure property pointer");
 
 	CValue PfnValue;
 	CValue IfaceValue;

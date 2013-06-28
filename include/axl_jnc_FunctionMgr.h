@@ -5,9 +5,9 @@
 #pragma once
 
 #include "axl_jnc_Function.h"
+#include "axl_jnc_ThunkFunction.h"
 #include "axl_jnc_Property.h"
 #include "axl_jnc_PropertyTemplate.h"
-#include "axl_jnc_AutoEv.h"
 
 namespace axl {
 namespace jnc {
@@ -45,8 +45,7 @@ enum EStdFunc
 	//		int8* p,
 	//		size_t Size,
 	//		int8* pRangeBegin,
-	//		int8* pRangeEnd,
-	//		int Error
+	//		int8* pRangeEnd
 	//		);
 
 	EStdFunc_CheckDataPtrRange,
@@ -87,47 +86,6 @@ enum EStdFunc
 
 	EStdFunc_UHeapFreeClassPtr,
 
-	// intptr
-	// jnc.MulticastSet (
-	//		multicast* pMulticast (), 
-	//		function* pf ()
-	//		);
-
-	EStdFunc_MulticastSet,
-	EStdFunc_MulticastSet_w,
-	EStdFunc_MulticastSet_t,
-	EStdFunc_MulticastSet_u,
-
-	// intptr
-	// jnc.MulticastAdd (
-	//		multicast* pMulticast (), 
-	//		function* pf ()
-	//		);
-
-	EStdFunc_MulticastAdd,
-	EStdFunc_MulticastAdd_w,
-	EStdFunc_MulticastAdd_t,
-	EStdFunc_MulticastAdd_u,
-
-	// function* ()
-	// jnc.MulticastRemove (
-	//		multicast* pMulticast (), 
-	//		intptr Handle
-	//		);
-
-	EStdFunc_MulticastRemove,
-	EStdFunc_MulticastRemove_w,
-	EStdFunc_MulticastRemove_t,
-	EStdFunc_MulticastRemove_u,
-
-	// mcsnapshot ()
-	// jnc.MulticastSnapshot (multicast* pMulticast ());
-
-	EStdFunc_MulticastSnapshot,
-	EStdFunc_MulticastSnapshot_w,
-	EStdFunc_MulticastSnapshot_t,
-	EStdFunc_MulticastSnapshot_u,
- 
 	EStdFunc__Count
 };
 
@@ -142,38 +100,17 @@ class CFunctionMgr
 	friend class CParser;
 
 protected:
-	enum EThunk
-	{
-		EThunk_Undefined = 0,
-		EThunk_Direct,
-		EThunk_DirectUnusedClosure,
-		EThunk_Closure,
-	};
-
-	struct TThunk: rtl::TListLink
-	{
-		EThunk m_ThunkKind;
-		rtl::CString m_Signature;
-		CFunction* m_pTargetFunction; 
-		CFunctionType* m_pTargetFunctionType;
-		CClassType* m_pClosureType;
-		rtl::CArrayT <size_t> m_ClosureMap;
-		CFunction* m_pThunkFunction;
-	};
-
 	struct TEmissionContext: rtl::TListLink
 	{
 		CFunction* m_pCurrentFunction;
 		CBasicBlock* m_pCurrentBlock;
 		CBasicBlock* m_pReturnBlock;
 		CBasicBlock* m_pSilentReturnBlock;
-		int m_ControlFlowMgrFlags;
+		uint_t m_ControlFlowMgrFlags;
 		CValue m_ThisValue;
-		CValue m_ThinThisValue;
 		CValue m_ScopeLevelValue;
 		CValue m_VTablePtrPtrValue; 
 		CValue m_VTablePtrValue;
-		rtl::CIteratorT <CStructField> m_MemberNewField;
 	};
 
 protected:
@@ -186,12 +123,7 @@ protected:
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CPropertyTemplate> m_PropertyTemplateList;
-	rtl::CStdListT <CAutoEv> m_AutoEvList;
-
-	rtl::CArrayT <CFunction*> m_OrphanFunctionArray;
-	rtl::CArrayT <CDerivableType*> m_DefaultPreConstructorTypeArray;
-
-	rtl::CStdListT <TThunk> m_ThunkList;
+	rtl::CStdListT <CThunkFunction> m_ThunkFunctionList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
 	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
 	rtl::CStringHashTableMapAT <CFunction*> m_ScheduleLauncherFunctionMap;
@@ -199,11 +131,9 @@ protected:
 	CFunction* m_pCurrentFunction;
 	
 	CValue m_ThisValue;
-	CValue m_ThinThisValue;
 	CValue m_ScopeLevelValue;
 	CValue m_VTablePtrPtrValue; 
 	CValue m_VTablePtrValue;
-	rtl::CIteratorT <CStructField> m_MemberNewField;
 
 	rtl::CStdListT <TEmissionContext> m_EmissionContextStack;
 
@@ -237,12 +167,6 @@ public:
 		return m_pCurrentFunction ? m_pCurrentFunction->GetProperty () : NULL;
 	}
 
-	CAutoEv*
-	GetCurrentAutoEv ()
-	{
-		return m_pCurrentFunction ? m_pCurrentFunction->GetAutoEv () : NULL;
-	}
-
 	CValue 
 	GetThisValue ()
 	{
@@ -250,28 +174,9 @@ public:
 	}
 
 	CValue 
-	GetThinThisValue ()
-	{
-		return m_ThinThisValue;
-	}
-
-	CValue 
 	GetScopeLevelValue ()
 	{
 		return m_ScopeLevelValue;
-	}
-
-	CStructField*
-	GetMemberNewField ()
-	{
-		return *m_MemberNewField;
-	}
-
-	void
-	NextMemberNewField ()
-	{
-		ASSERT (m_MemberNewField);
-		m_MemberNewField++;
 	}
 
 	void
@@ -287,6 +192,12 @@ public:
 	GetPropertyList ()
 	{
 		return m_PropertyList;
+	}
+
+	rtl::CConstListT <CThunkFunction>
+	GetThunkFunctionList ()
+	{
+		return m_ThunkFunctionList;
 	}
 
 	CFunction*
@@ -310,33 +221,6 @@ public:
 	CPropertyTemplate*
 	CreatePropertyTemplate ();
 
-	CAutoEv*
-	CreateAutoEv (
-		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
-		);
-
-	CAutoEv*
-	CreateUnnamedAutoEv ()
-	{
-		return CreateAutoEv (rtl::CString (), rtl::CString ());
-	}
-
-	bool
-	CalcPropertyLayouts ();
-
-	bool
-	CalcAutoEvLayouts ();
-
-	bool
-	ResolveOrphanFunctions ();
-
-	bool
-	ScanAutoEvs ();
-
-	bool
-	CompileFunctions ();
-
 	bool
 	Prologue (
 		CFunction* pFunction,
@@ -358,6 +242,8 @@ public:
 
 	bool
 	JitFunctions (llvm::ExecutionEngine* pExecutionEngine);
+
+	// std functions
 
 	CFunction*
 	GetStdFunction (EStdFunc Func);
@@ -416,26 +302,11 @@ public:
 
 protected:
 	bool
-	CompileDirectThunk (TThunk* pThunk);
-
-	bool
-	CompileClosureThunk (TThunk* pThunk);
-
-	bool
-	CompileAutoPropertyAccessors (CProperty* pProperty);
-
-	bool
-	CreateDefaultPreConstructor (CDerivableType* pType);
-
-	bool
 	CreateShadowArgVariables ();
 
-	bool
-	CreateAutoEvArgFields ();
-
 	void
-	CreateThinThisValue ();
-	
+	CreateThisValue (const CValue& ThisArgValue);
+
 	void
 	SaveEmissionContext ();
 
@@ -485,30 +356,6 @@ protected:
 
 	CFunction*
 	CreateUHeapFreeClassPtr ();
-
-	CFunction*
-	CreateMulticastSet (
-		EFunctionPtrType PtrTypeKind,
-		const char* pTag
-		);
-
-	CFunction*
-	CreateMulticastAdd (
-		EFunctionPtrType PtrTypeKind,
-		const char* pTag
-		);
-
-	CFunction*
-	CreateMulticastRemove (
-		EFunctionPtrType PtrTypeKind,
-		const char* pTag
-		);
-
-	CFunction*
-	CreateMulticastSnapshot (
-		EFunctionPtrType PtrTypeKind,
-		const char* pTag
-		);
 };
 
 //.............................................................................

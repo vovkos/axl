@@ -250,7 +250,7 @@ CCast_FpFromBeInt::GetCastOperators (
 	CType** ppIntermediateType
 	)
 {
-	ASSERT (IsBigEndianIntegerTypeKind (OpValue.GetType ()->GetTypeKind ()));
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_BigEndian);
 
 	EType IntermediateTypeKind = GetLittleEndianIntegerTypeKind (OpValue.GetType ()->GetTypeKind ());
 

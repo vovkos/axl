@@ -28,7 +28,6 @@ enum ENamespace
 	ENamespace_TypeExtension,
 	ENamespace_Property,
 	ENamespace_PropertyTemplate,
-	ENamespace_AutoEv,
 	ENamespace__Count
 };
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_Value.h"
+#include "axl_jnc_Value.h"
 #include "axl_jnc_Closure.h"
 #include "axl_jnc_Module.h"
 
@@ -69,7 +70,6 @@ GetValueKindString (EValue ValueKind)
 		"function",               // EValue_Function,
 		"function-type-overload", // EValue_FunctionTypeOverload,
 		"property",               // EValue_Property,	
-		"autoev",                 // EValue_AutoEv,	
 		"llvm-register",          // EValue_LlvmRegister,
 		"bool-not",               // EValue_BoolNot,
 		"bool-and",               // EValue_BoolAnd,
@@ -152,7 +152,7 @@ CValue::GetLlvmConst (
 		Integer = *(int8_t*) p != 0;
 		pLlvmConst = llvm::ConstantInt::get (
 			pType->GetLlvmType (),
-			llvm::APInt (1, Integer, pType->IsSignedIntegerType ())
+			llvm::APInt (1, Integer, (pType->GetTypeKindFlags () & ETypeKindFlag_Signed) != 0)
 			);
 		break;
 
@@ -173,7 +173,7 @@ CValue::GetLlvmConst (
 		Integer = *(int64_t*) p;
 		pLlvmConst = llvm::ConstantInt::get (
 			pType->GetLlvmType (),
-			llvm::APInt (pType->GetSize () * 8, Integer, pType->IsSignedIntegerType ())
+			llvm::APInt (pType->GetSize () * 8, Integer, (pType->GetTypeKindFlags () & ETypeKindFlag_Signed) != 0)
 			);
 		break;
 
@@ -216,6 +216,24 @@ CValue::GetLlvmConst (
 	}
 
 	return pLlvmConst;
+}
+
+void
+CValue::InsertToClosureHead (const CValue& Value)
+{
+	if (!m_Closure)
+		m_Closure = AXL_REF_NEW (CClosure);
+
+	m_Closure->GetArgList ()->InsertHead (Value);
+}
+
+void
+CValue::InsertToClosureTail (const CValue& Value)
+{
+	if (!m_Closure)
+		m_Closure = AXL_REF_NEW (CClosure);
+
+	m_Closure->GetArgList ()->InsertTail (Value);
 }
 
 CClosure*
@@ -292,9 +310,16 @@ CValue::SetVariable (CVariable* pVariable)
 	Clear ();
 
 	m_ValueKind = EValue_Variable;
-	m_pType = pVariable->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, pVariable->GetPtrTypeFlags ());
 	m_pLlvmValue = pVariable->GetLlvmValue ();
 	m_pVariable = pVariable;
+
+	uint_t PtrTypeFlags = pVariable->GetPtrTypeFlags () | EPtrTypeFlag_Checked;
+
+	CType* pType = pVariable->GetType ();
+	if (pType->GetTypeKind () == EType_Class)
+		m_pType = ((CClassType*) pType)->GetClassPtrType (EType_ClassRef, EClassPtrType_Normal, PtrTypeFlags);
+	else
+		m_pType = pType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 }
 
 void
@@ -305,9 +330,7 @@ CValue::SetFunction (CFunction* pFunction)
 	m_ValueKind = EValue_Function;
 	m_pFunction = pFunction;
 	m_pType = pFunction->GetType ()->GetFunctionPtrType (EType_FunctionRef, EFunctionPtrType_Thin);
-
-	if (!pFunction->IsVirtual ())
-		m_pLlvmValue = pFunction->GetLlvmFunction ();
+	m_pLlvmValue = pFunction->GetLlvmFunction ();
 }
 
 void
@@ -330,18 +353,6 @@ CValue::SetProperty (CProperty* pProperty)
 	m_pType = pProperty->GetType ()->GetPropertyPtrType (EType_PropertyRef, EPropertyPtrType_Thin);
 
 	// don't assign LlvmValue yet cause property LlvmValue is only needed for pointers
-}
-
-void
-CValue::SetAutoEv (CAutoEv* pAutoEv)
-{
-	Clear ();
-
-	m_ValueKind = EValue_AutoEv;
-	m_pAutoEv = pAutoEv;
-	m_pType = pAutoEv->GetType ()->GetAutoEvPtrType (EType_AutoEvRef, EAutoEvPtrType_Thin);
-
-	// don't assign LlvmValue yet cause autoev LlvmValue is only needed for pointers
 }
 
 void
@@ -373,39 +384,25 @@ CValue::SetLlvmValue (
 }
 
 void
-CValue::SetThinDataPtr (		
-	llvm::Value* pLlvmValue,
-	CDataPtrType* pType,
-	CThinDataPtrValidator* pValidator
-	)
+CValue::SetThinDataPtrValidator (CThinDataPtrValidator* pValidator)
 {
-	ASSERT (pType->IsDataPtrType ());
+	ASSERT (m_pType->GetTypeKindFlags () & ETypeKindFlag_DataPtr);
+	ASSERT (((CDataPtrType*) m_pType)->GetPtrTypeKind () == EDataPtrType_Thin);
 
-	Clear ();
-
-	m_ValueKind = EValue_LlvmRegister;
-	m_pType = pType;
-	m_pLlvmValue = pLlvmValue;
 	m_ThinDataPtrValidator = pValidator;
 }
 
 void
-CValue::SetThinDataPtr (		
-	llvm::Value* pLlvmValue,
-	CDataPtrType* pType,
-	const CValue& ValidatorValue
-	)
+CValue::SetThinDataPtrValidator (const CValue& ValidatorValue)
 {
 	ref::CPtrT <CThinDataPtrValidator> Validator = AXL_REF_NEW (CThinDataPtrValidator);
 	Validator->m_ValidatorKind = EThinDataPtrValidator_Simple;
 	Validator->m_ScopeValidatorValue = ValidatorValue;
-	SetThinDataPtr (pLlvmValue, pType, Validator);
+	SetThinDataPtrValidator (Validator);
 }
 
 void
-CValue::SetThinDataPtr (		
-	llvm::Value* pLlvmValue,
-	CDataPtrType* pType,
+CValue::SetThinDataPtrValidator (		
 	const CValue& ScopeValidatorValue,
 	const CValue& RangeBeginValue,
 	size_t Size
@@ -417,7 +414,7 @@ CValue::SetThinDataPtr (
 	Validator->m_RangeBeginValue = RangeBeginValue;
 	Validator->m_Size = Size;
 
-	SetThinDataPtr (pLlvmValue, pType, Validator);
+	SetThinDataPtrValidator (Validator);
 }
 
 bool

@@ -13,19 +13,10 @@ CNamedType::CNamedType ()
 	m_pItemDecl = this;
 }
 
-CType*
-CNamedType::GetThisArgType (int ThisArgTypeFlags)
-{
-	if (m_TypeKind == EType_Class)
-		return ((CClassType*) this)->GetClassPtrType (EClassPtrType_Normal, ThisArgTypeFlags);
-	else
-		return GetDataPtrType (EDataPtrType_Normal, ThisArgTypeFlags);
-}
-
 CFunctionType* 
 CNamedType::GetMemberMethodType (
 	CFunctionType* pShortType,
-	int ThisArgTypeFlags
+	uint_t ThisArgTypeFlags
 	)
 {
 	return m_pModule->m_TypeMgr.GetMemberMethodType (this, pShortType, ThisArgTypeFlags);
@@ -73,17 +64,9 @@ CNamedType::FindItemTraverseImpl (
 bool
 CNamedType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_LayoutReady)
-		return true;
-
-	bool Result = PreCalcLayout ();
-	if (!Result)
-		return false;
-
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	PostCalcLayout ();
 	return true;
 }
 

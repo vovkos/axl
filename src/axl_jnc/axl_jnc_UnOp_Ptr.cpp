@@ -21,6 +21,13 @@ CUnOp_Addr::GetResultType (const CValue& OpValue)
 			pOpType->GetFlags ()
 			);
 
+	case EType_ClassRef:
+		return ((CClassPtrType*) pOpType)->GetTargetType ()->GetClassPtrType (
+			EType_ClassPtr, 
+			((CClassPtrType*) pOpType)->GetPtrTypeKind (),
+			pOpType->GetFlags ()
+			);
+
 	case EType_FunctionRef:
 		return ((CFunctionPtrType*) pOpType)->GetTargetType ()->GetFunctionPtrType (
 			EType_FunctionPtr, 
@@ -32,13 +39,6 @@ CUnOp_Addr::GetResultType (const CValue& OpValue)
 		return ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetPropertyPtrType (
 			EType_PropertyPtr, 
 			((CPropertyPtrType*) pOpType)->GetPtrTypeKind (),
-			pOpType->GetFlags ()
-			);
-
-	case EType_AutoEvRef:
-		return ((CAutoEvPtrType*) pOpType)->GetTargetType ()->GetAutoEvPtrType (
-			EType_AutoEvPtr, 
-			((CAutoEvPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
 			);
 
@@ -78,6 +78,13 @@ CUnOp_Indir::GetResultType (const CValue& OpValue)
 			pOpType->GetFlags ()
 			);
 
+	case EType_ClassPtr:
+		return ((CClassPtrType*) pOpType)->GetTargetType ()->GetClassPtrType (
+			EType_ClassRef, 
+			((CClassPtrType*) pOpType)->GetPtrTypeKind (),
+			pOpType->GetFlags ()
+			);
+
 	case EType_FunctionPtr:
 		return ((CFunctionPtrType*) pOpType)->GetTargetType ()->GetFunctionPtrType (
 			EType_FunctionRef, 
@@ -89,13 +96,6 @@ CUnOp_Indir::GetResultType (const CValue& OpValue)
 		return ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetPropertyPtrType (
 			EType_PropertyRef, 
 			((CPropertyPtrType*) pOpType)->GetPtrTypeKind (),
-			pOpType->GetFlags ()
-			);
-
-	case EType_AutoEvPtr:
-		return ((CAutoEvPtrType*) pOpType)->GetTargetType ()->GetAutoEvPtrType (
-			EType_AutoEvRef, 
-			((CAutoEvPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
 			);
 

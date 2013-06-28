@@ -54,7 +54,7 @@ public:
 		void* pAddrHint,
 		size_t Size,
 		int Protection,
-		int Flags,
+		uint_t Flags,
 		int fd,
 		size_t Offset = 0
 		);

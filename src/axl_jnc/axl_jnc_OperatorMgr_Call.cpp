@@ -7,6 +7,39 @@ namespace jnc {
 
 //.............................................................................
 
+void
+COperatorMgr::CallTraceFunction (
+	const char* pFunctionName,
+	const char* pString
+	)
+{
+	CModuleItem* pItem = m_pModule->m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pFunctionName);
+	if (pItem && pItem->GetItemKind () == EModuleItem_Function)
+	{
+		CValue LiteralValue;
+		LiteralValue.SetLiteral (pString);
+		m_pModule->m_OperatorMgr.CallOperator ((CFunction*) pItem, LiteralValue);
+	}
+}
+
+CType*
+COperatorMgr::GetFunctionType (
+	const CValue& OpValue,
+	CFunctionType* pFunctionType
+	)	
+{
+	CFunctionPtrType* pFunctionPtrType = pFunctionType->GetFunctionPtrType (
+		EType_FunctionRef, 
+		EFunctionPtrType_Thin
+		);
+
+	CClosure* pClosure = OpValue.GetClosure ();
+	if (!pClosure)
+		return pFunctionPtrType;
+
+	return GetClosureOperatorResultType (pFunctionPtrType, pClosure->GetArgList ());
+}
+
 CType*
 COperatorMgr::GetClosureOperatorResultType (
 	const CValue& RawOpValue,
@@ -106,7 +139,7 @@ COperatorMgr::GetVarArgType (
 		return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
 
 	default:
-		if (pType->IsIntegerType ())
+		if (pType->GetTypeKindFlags () & ETypeKindFlag_Integer)
 		{
 			if (pType->GetSize () <= 4)
 				return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
@@ -195,13 +228,7 @@ COperatorMgr::CallOperator (
 		pResultValue = &ReturnValue;
 
 	EValue OpValueKind = RawOpValue.GetValueKind ();	
-	if (OpValueKind == EValue_AutoEv)
-	{
-		CFunction* pFunction = RawOpValue.GetAutoEv ()->GetStarter ();
-		OpValue.SetFunction (pFunction);
-		OpValue.SetClosure (RawOpValue.GetClosure ());
-	}
-	else if (OpValueKind == EValue_Function)
+	if (OpValueKind == EValue_Function)
 	{
 		CFunction* pFunction = RawOpValue.GetFunction ();
 		if (pFunction->IsOverloaded ())
@@ -216,32 +243,9 @@ COperatorMgr::CallOperator (
 	}
 	else
 	{
-		PrepareOperandType (RawOpValue, &OpValue);
-		uint_t OpFlags = OpValue.GetType ()->GetTypeKind () == EType_Multicast ? EOpFlag_KeepDataRef : 0;
-
-		Result = PrepareOperand (RawOpValue, &OpValue, OpFlags);
+		Result = PrepareOperand (RawOpValue, &OpValue, 0);
 		if (!Result)
 			return false;
-	}
-
-	if (OpValue.GetType ()->GetTypeKind () == EType_DataRef)
-	{
-		CDataPtrType* pPtrType = (CDataPtrType*) OpValue.GetType ();
-		ASSERT (pPtrType->GetTargetType ()->GetTypeKind () == EType_Multicast);
-
-		CMulticastType* pMulticastType = (CMulticastType*) pPtrType->GetTargetType ();
-		CFunction* pCallMethod = pMulticastType->GetMethod (EMulticastMethod_Call, pPtrType->GetPtrTypeKind ());
-
-		ref::CPtrT <CClosure> Closure = OpValue.GetClosure ();
-		if (!Closure)
-			Closure = OpValue.CreateClosure ();
-
-		CValue PtrValue;
-		UnaryOperator (EUnOp_Addr, OpValue, &PtrValue);
-		Closure->GetArgList ()->InsertHead (PtrValue);
-
-		OpValue.SetFunction (pCallMethod);
-		OpValue.SetClosure (Closure);
 	}
 
 	rtl::CBoxListT <CValue> EmptyArgList;
@@ -271,9 +275,7 @@ COperatorMgr::CallOperator (
 	}
 
 	CType* pOpType = OpValue.GetType ();
-	EType OpTypeKind = pOpType->GetTypeKind ();
-
-	if (OpTypeKind != EType_FunctionRef && OpTypeKind != EType_FunctionPtr)
+	if (!(pOpType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr))
 	{
 		err::SetFormatStringError ("cannot call '%s'", pOpType->GetTypeString ().cc ());
 		return NULL;
@@ -283,101 +285,6 @@ COperatorMgr::CallOperator (
 	return pFunctionPtrType->HasClosure () ? 
 		CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
 		CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);
-}
-
-bool
-COperatorMgr::CallBaseTypeConstructor (
-	CType* pType,
-	rtl::CBoxListT <CValue>* pArgList
-	)
-{
-	bool Result;
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	ASSERT (
-		pFunction->GetFunctionKind () == EFunction_Constructor && 
-		pFunction->GetParentType ()->IsDerivableType ()
-		);
-
-	CDerivableType* pParentType = (CDerivableType* ) pFunction->GetParentType ();
-	CBaseType* pBaseType = pParentType->FindBaseType (pType);
-	if (!pBaseType)
-	{
-		err::SetFormatStringError (
-			"'%s' is not a base type of '%s'", 
-			pType->GetTypeString ().cc (), 
-			pParentType->GetTypeString ().cc ()
-			);
-		return false;
-	}
-
-	if (pBaseType->GetFlags () & EBaseTypeFlag_Constructed)
-	{
-		err::SetFormatStringError ("'%s' is already constructed", pType->GetTypeString ().cc ());
-		return false;
-	}
-
-	if (pType->GetTypeKind () != EType_Class || !((CClassType*) pType)->GetConstructor ())
-	{
-		err::SetFormatStringError ("'%s' has no constructor", pType->GetTypeString ().cc ());
-		return false;
-	}
-
-	pArgList->InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
-
-	CFunction* pConstructor = ((CClassType*) pType)->GetConstructor ();
-	Result = CallOperator (pConstructor, pArgList);
-	if (!Result)
-		return false;
-
-	pBaseType->MarkConstructed ();
-	return true;
-}
-
-bool
-COperatorMgr::PostBaseTypeConstructorList ()
-{
-	bool Result;
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	ASSERT (
-		pFunction->GetFunctionKind () == EFunction_Constructor && 
-		pFunction->GetParentType ()->GetTypeKind () == EType_Class
-		);
-
-	CClassType* pParentType = (CClassType*) pFunction->GetParentType ();
-
-	rtl::CBoxListT <CValue> ArgList;
-	ArgList.InsertHead (m_pModule->m_FunctionMgr.GetThisValue ());
-
-	rtl::CIteratorT <CBaseType> BaseType = pParentType->GetBaseTypeList ().GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		if ((BaseType->GetFlags () & EBaseTypeFlag_Constructed) ||
-			BaseType->GetType ()->GetTypeKind () != EType_Class)
-			continue;
-
-		CClassType* pBaseClassType = (CClassType*) BaseType->GetType ();
-		CFunction* pConstructor = pBaseClassType->GetConstructor ();
-		if (!pConstructor)
-			continue;
-
-		pConstructor = pBaseClassType->GetDefaultConstructor ();
-		if (!pConstructor)
-		{
-			err::SetFormatStringError ("'%s' has no default constructor", pBaseClassType->GetTypeString ().cc ());
-			return false;
-		}
-
-		Result = CallOperator (pConstructor, &ArgList);
-		if (!Result)
-			return false;
-	}
-
-	pParentType->ClearAllBaseTypeConstructedFlags ();
-
-	CFunction* pPreConstructor = pParentType->GetPreConstructor ();
-	return pPreConstructor ? CallOperator (pPreConstructor, &ArgList) : true;
 }
 
 bool
@@ -392,7 +299,7 @@ COperatorMgr::CalcScopeLevelValue (
 		return true;
 	}
 
-	m_pModule->m_LlvmBuilder.CreateComment ("calc scope level value");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "calc scope level value");
 	 
 	CValue ScopeBaseLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
 	CValue ScopeIncValue (pScope->GetLevel (), EType_SizeT);
@@ -587,7 +494,7 @@ COperatorMgr::CallImpl (
 		CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 		CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
 
-		m_pModule->m_LlvmBuilder.CreateComment ("update scope level before call");
+		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "update scope level before call");
 		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 	}
 

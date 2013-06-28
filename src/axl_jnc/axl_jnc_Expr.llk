@@ -45,6 +45,29 @@ primary_expr_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 
 //.............................................................................
 
+// arg list is simplier cause we only need to count parentheses
+
+class
+{
+	rtl::CBoxListT <CToken> m_TokenList;
+}
+arg_list_pass1
+	:	'(' arg_pass1 <&$.m_TokenList>* ')'
+	;
+  
+noast
+arg_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	:	'(' 
+		arg_pass1 <$pTokenList>* 
+		')'
+	|	any
+			{
+				$pTokenList->InsertTail ($1);
+			}
+	;
+
+//.............................................................................
+
 start
 expression_save_value
 	:	expression
@@ -52,6 +75,17 @@ expression_save_value
 				m_ExpressionValue = $1.m_Value;
 			}
 	;
+
+start
+nullable
+expression_or_empty_list_save_list
+	:	expression_or_empty_list
+			{
+				m_ExpressionValueList.TakeOver (&$1.m_ValueList);
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class
 {
@@ -141,7 +175,8 @@ start
 constant_integer_expr
 	:	expression
 			{						
-				if ($1.m_Value.GetValueKind () != EValue_Const || !$1.m_Value.GetType ()->IsIntegerType ())
+				if ($1.m_Value.GetValueKind () != EValue_Const || 
+					!($1.m_Value.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Integer))
 				{
 					err::SetFormatStringError ("not a constant integer expression");
 					return false;
@@ -434,7 +469,7 @@ assignment_operator_expr <CValue* $pValue>
 	}
 	enter
 	{
-		if (IsAutoEvStarter ())  // reset on assignment
+		if (IsAutoEv ())  // reset on assignment
 			m_AutoEvBindSiteList.Clear (); 
 	}
 	:	assignment_operator $o conditional_expr <&$OpValue2>
@@ -456,6 +491,10 @@ assignment_operator
 	:	'='
 			{
 				$.m_OpKind = EBinOp_Assign;
+			}
+	|	EToken_RefAssign
+			{
+				$.m_OpKind = EBinOp_RefAssign;
 			}
 	|	EToken_AddAssign
 			{
@@ -497,10 +536,6 @@ assignment_operator
 			{
 				$.m_OpKind = EBinOp_OrAssign;
 			}
-	|	EToken_ClassAssign
-			{
-				$.m_OpKind = EBinOp_ClassAssign;
-			}
 	;
 
 unary_expr <CValue* $pValue>
@@ -511,7 +546,7 @@ unary_expr <CValue* $pValue>
 unary_operator_expr <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
 			m_AutoEvBindSiteList.InsertTail (*$pValue);
 	}
 	:	'+' unary_expr <$pValue> 
@@ -628,7 +663,7 @@ postfix_expr <CValue* $pValue>
 postfix_operator <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
 			m_AutoEvBindSiteList.InsertTail (*$pValue);
 	}
 	:	'(' expression_or_empty_list ')'
@@ -651,7 +686,10 @@ postfix_operator <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostDec, $pValue);
 			}
-	|	'.' member_operator <$pValue>
+	|	'.' EToken_Weak $w? member_operator <$pValue>
+			{
+				return IsValidLocator ($w) ? m_pModule->m_OperatorMgr.Weaken ($pValue) : true;
+			}
 	|	EToken_Ptr 
 			{
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Ptr, $pValue);
@@ -666,11 +704,11 @@ member_operator <CValue* $pValue>
 			}
 	|	EToken_OnChange
 			{
-				return m_pModule->m_OperatorMgr.GetStdField ($pValue, EStdField_OnChange);
+				return m_pModule->m_OperatorMgr.GetPropertyOnChange ($pValue);
 			}
-	|	EToken_Value
+	|	EToken_PropValue
 			{
-				return m_pModule->m_OperatorMgr.GetStdField ($pValue, EStdField_Value);
+				return m_pModule->m_OperatorMgr.GetPropertyPropValue ($pValue);
 			}
 	|	EToken_Get
 			{
@@ -685,7 +723,7 @@ member_operator <CValue* $pValue>
 primary_expr <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEvStarter () && $pValue->GetType ()->IsBindablePropertyType ())
+		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
 			m_AutoEvBindSiteList.InsertTail (*$pValue);
 	}
 	:	EToken_Identifier
@@ -698,11 +736,11 @@ primary_expr <CValue* $pValue>
 			}
 	|	EToken_OnChange
 			{
-				return GetStdField ($pValue, EStdField_OnChange);
+				return GetOnChange ($pValue);
 			}
-	|	EToken_Value
+	|	EToken_PropValue
 			{
-				return GetStdField ($pValue, EStdField_Value);
+				return GetPropValue ($pValue);
 			}
 	|	EToken_Integer
 			{

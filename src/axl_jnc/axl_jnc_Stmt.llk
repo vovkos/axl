@@ -51,9 +51,9 @@ constructor_compound_stmt
 			{
 				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
 			} 
-		base_type_constructor*
+		btm_construct_stmt*
 			{
-				return m_pModule->m_OperatorMgr.PostBaseTypeConstructorList ();
+				return FinalizeBaseTypeMemberConstructBlock ();
 			}
 		local_declaration* 
 		'}' $r
@@ -62,17 +62,38 @@ constructor_compound_stmt
 			}
 	;
 
-base_type_constructor
-	:	resolver (base_type_constructor_rslv)
-		qualified_type_name $t '(' expression_or_empty_list $a ')'
+// conflict at qualified_name : '.' is a continue-vs-fold conflict, in which fold loses immediatly
+// this problem could be solved with double resolvers, but it looks really ugly
+// actually, LADFA should be modified to allow LL(k) lookup also in case of continue-vs-fold conflict 
+
+btm_construct_stmt
+	:	resolver (btm_construct_stmt_rslv)
+		btm_construct_name $n '(' expression_or_empty_list $a ')'
 			{
-				return m_pModule->m_OperatorMgr.CallBaseTypeConstructor ($t.m_pType, &$a.m_ValueList);
+				return CallBaseTypeMemberConstructor ($n.m_Name, &$a.m_ValueList);
 			}
 	|	';'
 	;
 
-base_type_constructor_rslv
-	:	qualified_type_name '('
+btm_construct_stmt_rslv
+	: EToken_Identifier '.' (EToken_Identifier '.')* EToken_Construct
+	;
+
+class 
+{
+	CQualifiedName m_Name;
+}
+btm_construct_name
+	:	EToken_Identifier '.' 
+			{  
+				$.m_Name.AddName ($1.m_Data.m_String); 
+			}
+		(EToken_Identifier $n2 '.'
+			{ 
+				$.m_Name.AddName ($n2.m_Data.m_String);
+			}
+		)*
+		EToken_Construct
 	;
 
 statement
@@ -302,7 +323,7 @@ autoev_onchange_stmt
 			}
 		statement 
 			{
-				FinalizeAutoEvOnChangeStmt ();
+				return FinalizeAutoEvOnChangeStmt ();
 			}
 	;
 

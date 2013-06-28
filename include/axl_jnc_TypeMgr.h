@@ -13,16 +13,15 @@
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
-#include "axl_jnc_AutoEvType.h"
 #include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_ClassPtrType.h"
 #include "axl_jnc_FunctionPtrType.h"
 #include "axl_jnc_PropertyPtrType.h"
-#include "axl_jnc_AutoEvPtrType.h"
-#include "axl_jnc_MulticastType.h"
-#include "axl_jnc_McSnapshotType.h"
-#include "axl_jnc_AutoEvType.h"
 #include "axl_jnc_ImportType.h"
+#include "axl_jnc_AutoEvClassType.h"
+#include "axl_jnc_ClosureClassType.h"
+#include "axl_jnc_McSnapshotClassType.h"
+#include "axl_jnc_MulticastClassType.h"
 
 namespace axl {
 namespace jnc {
@@ -49,30 +48,28 @@ protected:
 	rtl::CStdListT <CClassType> m_ClassTypeList;
 	rtl::CStdListT <CFunctionType> m_FunctionTypeList;
 	rtl::CStdListT <CPropertyType> m_PropertyTypeList;
-	rtl::CStdListT <CAutoEvType> m_AutoEvTypeList;
 	rtl::CStdListT <CDataPtrType> m_DataPtrTypeList;
 	rtl::CStdListT <CClassPtrType> m_ClassPtrTypeList;
 	rtl::CStdListT <CFunctionPtrType> m_FunctionPtrTypeList;
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
-	rtl::CStdListT <CAutoEvPtrType> m_AutoEvPtrTypeList;
-	rtl::CStdListT <CMulticastType> m_MulticastTypeList;
-	rtl::CStdListT <CMcSnapshotType> m_McSnapshotTypeList;
-	rtl::CStdListT <CPrimaryImportType> m_PrimaryImportTypeList;
-	rtl::CStdListT <CSecondaryImportType> m_SecondaryImportTypeList;
+	rtl::CStdListT <CNamedImportType> m_NamedImportTypeList;
+	rtl::CStdListT <CImportPtrType> m_ImportPtrTypeList;
+	rtl::CStdListT <CAutoEvClassType> m_AutoEvClassTypeList;
+	rtl::CStdListT <CClosureClassType> m_ClosureClassTypeList;
+	rtl::CStdListT <CMulticastClassType> m_MulticastClassTypeList;
+	rtl::CStdListT <CMcSnapshotClassType> m_McSnapshotClassTypeList;
 	
-	rtl::CStdListT <CPropertyTypeTuple> m_PropertyTypeTupleList;
-	rtl::CStdListT <CDataPtrTypeTuple> m_DataPtrTypeTupleList;
-	rtl::CStdListT <CClassPtrTypeTuple> m_ClassPtrTypeTupleList;
-	rtl::CStdListT <CFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
-	rtl::CStdListT <CPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
-	rtl::CStdListT <CAutoEvPtrTypeTuple> m_AutoEvPtrTypeTupleList;
-	rtl::CStdListT <CFunctionArgTuple> m_FunctionArgTupleList;
-
-	rtl::CStdListT <CFunctionArg> m_FunctionArgList;
 	rtl::CStdListT <CTypedef> m_TypedefList;
+	rtl::CStdListT <CFunctionArg> m_FunctionArgList;
+
+	rtl::CStdListT <TSimplePropertyTypeTuple> m_SimplePropertyTypeTupleList;
+	rtl::CStdListT <TFunctionArgTuple> m_FunctionArgTupleList;
+	rtl::CStdListT <TDataPtrTypeTuple> m_DataPtrTypeTupleList;
+	rtl::CStdListT <TClassPtrTypeTuple> m_ClassPtrTypeTupleList;
+	rtl::CStdListT <TFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
+	rtl::CStdListT <TPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
-	rtl::CStringHashTableMapAT <CClassType*> m_BoxClassTypeMap;
 
 	rtl::CArrayT <CClassType*> m_StaticDestructArray; // classes with static destructors 
 
@@ -96,8 +93,119 @@ public:
 	bool
 	ResolveImportTypes ();
 
-	bool
-	CalcTypeLayouts ();
+	rtl::CConstListT <CArrayType> 
+	GetArrayTypeList ()
+	{
+		return m_ArrayTypeList;
+	}
+	
+	rtl::CConstListT <CBitFieldType> 
+	GetBitFieldTypeList ()
+	{
+		return m_BitFieldTypeList;
+	}
+	
+	rtl::CConstListT <CEnumType> 
+	GetEnumTypeList ()
+	{
+		return m_EnumTypeList;
+	}
+
+	rtl::CConstListT <CStructType> 
+	GetStructTypeList ()
+	{
+		return m_StructTypeList;
+	}
+
+	rtl::CConstListT <CUnionType> 
+	GetUnionTypeList ()
+	{
+		return m_UnionTypeList;
+	}
+
+	rtl::CConstListT <CClassType> 
+	GetClassTypeList ()
+	{
+		return m_ClassTypeList;
+	}
+
+	rtl::CConstListT <CFunctionType> 
+	GetFunctionTypeList ()
+	{
+		return m_FunctionTypeList;
+	}
+
+	rtl::CConstListT <CPropertyType> 
+	GetPropertyTypeList ()
+	{
+		return m_PropertyTypeList;
+	}
+
+	rtl::CConstListT <CDataPtrType> 
+	GetDataPtrTypeList ()
+	{
+		return m_DataPtrTypeList;
+	}
+
+	rtl::CConstListT <CClassPtrType> 
+	GetClassPtrTypeList ()
+	{
+		return m_ClassPtrTypeList;
+	}
+
+	rtl::CConstListT <CFunctionPtrType> 
+	GetFunctionPtrTypeList ()
+	{
+		return m_FunctionPtrTypeList;
+	}
+
+	rtl::CConstListT <CPropertyPtrType> 
+	GetPropertyPtrTypeList ()
+	{
+		return m_PropertyPtrTypeList;
+	}
+
+	rtl::CConstListT <CNamedImportType> 
+	GetNamedImportTypeList ()
+	{
+		return m_NamedImportTypeList;
+	}
+
+	rtl::CConstListT <CImportPtrType> 
+	GetImportPtrTypeList ()
+	{
+		return m_ImportPtrTypeList;
+	}
+
+	rtl::CConstListT <CAutoEvClassType> 
+	GetAutoEvClassTypeList ()
+	{
+		return m_AutoEvClassTypeList;
+	}
+
+	rtl::CConstListT <CClosureClassType> 
+	GetClosureClassTypeList ()
+	{
+		return m_ClosureClassTypeList;
+	}
+
+	rtl::CConstListT <CMulticastClassType> 
+	GetMulticastClassTypeList ()
+	{
+		return m_MulticastClassTypeList;
+	}
+
+	rtl::CConstListT <CMcSnapshotClassType> 
+	GetMcSnapshotClassTypeList ()
+	{
+		return m_McSnapshotClassTypeList;
+	}
+
+	rtl::CConstListT <CTypedef> 
+	GetTypedefList ()
+	{
+		return m_TypedefList;
+	}
 
 	rtl::CArrayT <CClassType*> 
 	GetStaticDestructArray ()
@@ -227,16 +335,36 @@ public:
 	}
 
 	CClassType* 
-	CreateClassType (
+	CreateClassType (	
+		EClassType ClassTypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		size_t PackFactor = 8
 		);
 
 	CClassType* 
+	CreateClassType (	
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		size_t PackFactor = 8
+		)
+	{
+		return CreateClassType (EClassType_Normal, Name, QualifiedName, PackFactor);
+	}
+
+	CClassType* 
+	CreateUnnamedClassType (
+		EClassType ClassTypeKind,	
+		size_t PackFactor = 8
+		)
+	{
+		return CreateClassType (ClassTypeKind,	rtl::CString (), rtl::CString (), PackFactor);
+	}
+
+	CClassType* 
 	CreateUnnamedClassType (size_t PackFactor = 8)
 	{
-		return CreateClassType (rtl::CString (), rtl::CString (), PackFactor);
+		return CreateClassType (EClassType_Normal, rtl::CString (), rtl::CString (), PackFactor);
 	}
 
 	CClassType* 
@@ -246,15 +374,25 @@ public:
 	CreateFunctionArg (
 		const rtl::CString& Name,
 		CType* pType,
-		int PtrTypeFlags = 0,
+		uint_t PtrTypeFlags = 0,
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
 	CFunctionArg*
 	GetSimpleFunctionArg (
+		EStorage StorageKind,
 		CType* pType,
-		int PtrTypeFlags = 0
+		uint_t PtrTypeFlags = 0
 		);
+
+	CFunctionArg*
+	GetSimpleFunctionArg (
+		CType* pType,
+		uint_t PtrTypeFlags = 0
+		)
+	{
+		return GetSimpleFunctionArg (EStorage_Stack, pType, PtrTypeFlags);
+	}
 
 	CFunctionType* 
 	GetFunctionType (
@@ -316,7 +454,7 @@ public:
 	GetMemberMethodType (
 		CNamedType* pParentType,
 		CFunctionType* pFunctionType,
-		int ThisArgTypeFlags = 0
+		uint_t ThisArgPtrTypeFlags = 0
 		);
 
 	CFunctionType* 
@@ -413,10 +551,7 @@ public:
 	CPropertyType* 
 	GetShortPropertyType (CPropertyType* pPropertyType);
 
-	CPropertyType* 
-	GetBindablePropertyType (CPropertyType* pPropertyType);
-
-	CMulticastType* 
+	CClassType* 
 	GetMulticastType (
 		CFunctionType* pFunctionType,
 		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal
@@ -425,38 +560,19 @@ public:
 		return GetMulticastType (GetFunctionPtrType (pFunctionType, PtrTypeKind));
 	}
 
-	CMulticastType* 
+	CClassType* 
 	GetMulticastType (CFunctionPtrType* pFunctionPtrType);
 
-	CMcSnapshotType* 
-	GetMcSnapshotType (
-		CFunctionType* pFunctionType,
-		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal
-		)
-	{
-		return GetMcSnapshotType (GetFunctionPtrType (pFunctionType, PtrTypeKind));
-	}
-
-	CMcSnapshotType* 
-	GetMcSnapshotType (CFunctionPtrType* pFunctionPtrType);
-
-	CAutoEvType* 
-	GetAutoEvType (
-		CFunctionType* pStarterType,
-		CFunctionType* pStopperType = NULL
+	CClassType* 
+	GetAutoEvInterfaceType (CFunctionType* pStartMethodType);
+	
+	CAutoEvClassType* 
+	CreateAutoEvType (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		CClassType* pIfaceType,
+		CClassType* pParentType
 		);
-
-	CAutoEvType* 
-	GetMemberAutoEvType (
-		CClassType* pClassType,
-		CAutoEvType* pAutoEvType
-		);
-
-	CAutoEvType* 
-	GetStdObjectMemberAutoEvType (CAutoEvType* pAutoEvType);
-
-	CAutoEvType* 
-	GetShortAutoEvType (CAutoEvType* pAutoEvType);
 
 	CDataPtrType* 
 	GetDataPtrType (
@@ -482,10 +598,21 @@ public:
 	CClassPtrType* 
 	GetClassPtrType (
 		CClassType* pClassType,
+		EType TypeKind,
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		uint_t Flags = 0
 		);
-	
+
+	CClassPtrType* 
+	GetClassPtrType (
+		CClassType* pClassType,
+		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetClassPtrType (pClassType, EType_ClassPtr, PtrTypeKind, Flags);	
+	}
+
 	CFunctionPtrType* 
 	GetFunctionPtrType (
 		CFunctionType* pFunctionType,
@@ -506,9 +633,6 @@ public:
 
 	CStructType* 
 	GetFunctionPtrStructType (CFunctionType* pFunctionType);
-
-	CStructType* 
-	GetFunctionPtrStructType_w (CFunctionType* pFunctionType);
 
 	CPropertyPtrType* 
 	GetPropertyPtrType (
@@ -534,79 +658,40 @@ public:
 	CStructType*
 	GetPropertyPtrStructType (CPropertyType* pPropertyType);
 
-	CStructType*
-	GetPropertyPtrStructType_w (CPropertyType* pPropertyType);
-
-	CStructType*
-	GetAuPropertyPtrStructType_t (CPropertyType* pPropertyType);
-
-	CStructType*
-	GetAuPropertyPtrStructType_u (CPropertyType* pPropertyType);
-	
-	CAutoEvPtrType* 
-	GetAutoEvPtrType (
-		CAutoEvType* pAutoEvType,
-		EType TypeKind,
-		EAutoEvPtrType PtrTypeKind = EAutoEvPtrType_Normal,
-		uint_t Flags = 0
-		);
-
-	CAutoEvPtrType* 
-	GetAutoEvPtrType (
-		CAutoEvType* pAutoEvType,
-		EAutoEvPtrType PtrTypeKind = EAutoEvPtrType_Normal,
-		uint_t Flags = 0
-		)
-	{
-		return GetAutoEvPtrType (pAutoEvType, EType_AutoEvPtr, PtrTypeKind, Flags);
-	}
-
-	CStructType*
-	GetAutoEvVTableStructType (CAutoEvType* pAutoEvType);
-
-	CStructType*
-	GetAutoEvPtrStructType (CAutoEvType* pAutoEvType);
-
-	CStructType*
-	GetAutoEvPtrStructType_w (CAutoEvType* pAutoEvType);
-	
-	CPrimaryImportType*
-	GetPrimaryImportType (	
+	CNamedImportType*
+	GetNamedImportType (	
 		const CQualifiedName& Name,
 		CNamespace* pAnchorNamespace
 		);
 
-	CSecondaryImportType*
-	GetSecondaryImportType (	
-		EImportType ImportTypeKind,
-		CPrimaryImportType* pPrimaryImportType,
-		uint_t TypeModifiers = 0
+	CImportPtrType*
+	GetImportPtrType (	
+		CNamedImportType* pImportType,
+		uint_t TypeModifiers = 0,
+		uint_t Flags = 0
 		);
 
 	CType*
-	PrepareDataType (CType* pType);
+	GetCheckedPtrType (CType* pType);
 
 protected:
-	CDataPtrTypeTuple*
-	GetDataPtrTypeTuple (CType* pType);
+	TSimplePropertyTypeTuple*
+	GetSimplePropertyTypeTuple (CType* pType);
 
-	CPropertyTypeTuple*
-	GetPropertyTypeTuple (CType* pType);
-
-	CFunctionArgTuple*
+	TFunctionArgTuple*
 	GetFunctionArgTuple (CType* pType);
 
-	CClassPtrTypeTuple*
+	TDataPtrTypeTuple*
+	GetDataPtrTypeTuple (CType* pType);
+
+	TClassPtrTypeTuple*
 	GetClassPtrTypeTuple (CClassType* pClassType);
 
-	CFunctionPtrTypeTuple*
+	TFunctionPtrTypeTuple*
 	GetFunctionPtrTypeTuple (CFunctionType* pFunctionType);
 
-	CPropertyPtrTypeTuple*
+	TPropertyPtrTypeTuple*
 	GetPropertyPtrTypeTuple (CPropertyType* pPropertyType);
-
-	CAutoEvPtrTypeTuple*
-	GetAutoEvPtrTypeTuple (CAutoEvType* pAutoEvType);
 
 	void
 	SetupAllPrimitiveTypes ();
@@ -630,38 +715,8 @@ protected:
 	CClassType* 
 	CreateISchedulerType ();
 
-	CStructType*
-	CreateDataPtrStructType (CType* pDataType);
-
-	CStructType* 
-	CreateFunctionPtrStructType (CFunctionType* pFunctionType);
-
-	CStructType* 
-	CreateFunctionPtrStructType_w (CFunctionType* pFunctionType);
-
-	CStructType*
-	CreatePropertyVTableStructType (CPropertyType* pPropertyType);
-
-	CStructType*
-	CreatePropertyPtrStructType (CPropertyType* pPropertyType);
-
-	CStructType*
-	CreatePropertyPtrStructType_w (CPropertyType* pPropertyType);
-
-	CStructType*
-	CreateAuPropertyPtrStructType_t (CPropertyType* pPropertyType);
-
-	CStructType*
-	CreateAuPropertyPtrStructType_u (CPropertyType* pPropertyType);
-
-	CStructType*
-	CreateAutoEvVTableStructType (CAutoEvType* pAutoEvType);
-
-	CStructType*
-	CreateAutoEvPtrStructType (CAutoEvType* pAutoEvType);
-
-	CStructType*
-	CreateAutoEvPtrStructType_w (CAutoEvType* pAutoEvType);
+	bool
+	CreateMulticastCallMethod (CClassType* pMulticastType);
 };
 
 //.............................................................................

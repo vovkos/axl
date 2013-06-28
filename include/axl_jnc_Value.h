@@ -14,7 +14,6 @@ class CVariable;
 class CFunction;
 class CFunctionTypeOverload;
 class CProperty;
-class CAutoEv;
 class CStructField;
 class CClassType;
 class CClosure;
@@ -32,7 +31,6 @@ enum EValue
 	EValue_Function,
 	EValue_FunctionTypeOverload,
 	EValue_Property,	
-	EValue_AutoEv,	
 	EValue_LlvmRegister,
 	EValue_BoolNot,
 	EValue_BoolAnd,
@@ -81,7 +79,6 @@ protected:
 		CFunction* m_pFunction;
 		CFunctionTypeOverload* m_pFunctionTypeOverload;
 		CProperty* m_pProperty;
-		CAutoEv* m_pAutoEv;
 	};
 
 	mutable llvm::Value* m_pLlvmValue;
@@ -170,12 +167,6 @@ public:
 		SetProperty (pProperty);
 	}
 
-	CValue (CAutoEv* pAutoEv)
-	{
-		Init ();
-		SetAutoEv (pAutoEv);
-	}
-
 	CValue (
 		llvm::Value* pLlvmValue,
 		CType* pType,
@@ -247,18 +238,25 @@ public:
 		return m_pProperty;
 	}
 
-	CAutoEv* 
-	GetAutoEv () const
-	{
-		ASSERT (m_ValueKind == EValue_AutoEv);
-		return m_pAutoEv;
-	}
-
 	void*
 	GetConstData () const
 	{
 		ASSERT (m_ValueKind == EValue_Const);
 		return (void*) (m_Const + 1);
+	}
+
+	int
+	GetInt () const
+	{
+		ASSERT (m_ValueKind == EValue_Const && m_pType->GetSize () >= sizeof (int));
+		return *(int*) GetConstData ();
+	}
+
+	intptr_t
+	GetIntPtr () const
+	{
+		ASSERT (m_ValueKind == EValue_Const && m_pType->GetSize () >= sizeof (intptr_t));
+		return *(intptr_t*) GetConstData ();
 	}
 
 	int32_t
@@ -319,23 +317,29 @@ public:
 		const void* p
 		);
 
-	bool
-	HasClosure () const
-	{
-		return m_Closure != NULL;
-	}
-
 	CClosure*
 	GetClosure () const
 	{
 		return m_Closure;
 	}
 
-	void
-	SetClosure (CClosure* pClosure);
-		
 	CClosure*
 	CreateClosure ();
+
+	void
+	SetClosure (CClosure* pClosure);
+
+	void
+	ClearClosure ()
+	{
+		m_Closure = ref::EPtr_Null;
+	}
+
+	void
+	InsertToClosureHead (const CValue& Value);
+
+	void
+	InsertToClosureTail (const CValue& Value);
 
 	CType*
 	GetClosureAwareType () const;
@@ -397,9 +401,6 @@ public:
 	SetProperty (CProperty* pProperty);
 
 	void
-	SetAutoEv (CAutoEv* pAutoEv);
-
-	void
 	SetLlvmValue (		
 		llvm::Value* pLlvmValue,
 		CType* pType,
@@ -413,19 +414,46 @@ public:
 		EValue ValueKind = EValue_LlvmRegister
 		);
 
+	CThinDataPtrValidator*
+	GetThinDataPtrValidator () const
+	{
+		return m_ThinDataPtrValidator;
+	}
+
 	void
-	SetThinDataPtr (		
-		llvm::Value* pLlvmValue,
-		CDataPtrType* pType,
-		CThinDataPtrValidator* pValidator
+	SetThinDataPtrValidator (CThinDataPtrValidator* pValidator);
+
+	void
+	SetThinDataPtrValidator (const CValue& ValidatorValue);
+
+	void
+	SetThinDataPtrValidator (		
+		const CValue& ScopeValidatorValue,
+		const CValue& RangeBeginValue,
+		size_t Size
 		);
 
 	void
-	SetThinDataPtr (		
+	SetThinDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
-		const CValue& ValidatorValue // EValue_Variable or EDataPtrType_Normal
-		);
+		CThinDataPtrValidator* pValidator
+		)
+	{
+		SetLlvmValue (pLlvmValue, (CType*) pType);
+		SetThinDataPtrValidator (pValidator);
+	}
+
+	void
+	SetThinDataPtr (
+		llvm::Value* pLlvmValue,
+		CDataPtrType* pType,
+		const CValue& ValidatorValue
+		)
+	{
+		SetLlvmValue (pLlvmValue, (CType*) pType);
+		SetThinDataPtrValidator (ValidatorValue);
+	}
 
 	void
 	SetThinDataPtr (		
@@ -434,12 +462,10 @@ public:
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
 		size_t Size
-		);
-
-	CThinDataPtrValidator*
-	GetThinDataPtrValidator () const
+		)
 	{
-		return m_ThinDataPtrValidator;
+		SetLlvmValue (pLlvmValue, (CType*) pType);
+		SetThinDataPtrValidator (ScopeValidatorValue, RangeBeginValue, Size);
 	}
 
 	bool
@@ -560,104 +586,42 @@ protected:
 
 //.............................................................................
 
-enum EThinDataPtrValidator
-{
-	EThinDataPtrValidator_Undefined,
-	EThinDataPtrValidator_Simple,
-	EThinDataPtrValidator_Complex,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CThinDataPtrValidator: public ref::IRefCount
-{
-	friend class CValue;
-
-protected:
-	EThinDataPtrValidator m_ValidatorKind;
-
-	CValue m_ScopeValidatorValue;
-	CValue m_RangeBeginValue;
-	size_t m_Size;
-
-public:
-	CThinDataPtrValidator ()
-	{
-		m_ValidatorKind = EThinDataPtrValidator_Undefined;
-		m_Size = 0;
-	}
-
-	EThinDataPtrValidator 
-	GetValidatorKind ()
-	{
-		return m_ValidatorKind;
-	}
-
-	CValue 
-	GetScopeValidator ()
-	{
-		return m_ScopeValidatorValue;
-	}
-
-	CValue 
-	GetRangeBegin ()
-	{
-		return m_RangeBeginValue;
-	}
-
-	size_t
-	GetSize ()
-	{
-		return m_Size;
-	}
-};
-
-
-//.............................................................................
-
 enum EObjectFlag
 {
 	EObjectFlag_Alive  = 0x01,
 	EObjectFlag_Static = 0x02,
 	EObjectFlag_Stack  = 0x04,
 	EObjectFlag_UHeap  = 0x08,
-
 	EObjectFlag_CallMemberDestructors = EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap,
 };
 
-// header of class instance
+// master header of class instance
 
 struct TObject
 {
-	class CClassType* m_pType; // for GC tracing & QueryInterface; after destruction is zeroed
+	class CClassType* m_pType; // for GC tracing & QueryInterface
 	size_t m_ScopeLevel;
 	intptr_t m_Flags;
 
 	// followed by TInterface of object
 };
 
-// header of interface instance
+// header of class interface
 
 struct TInterface
 {
 	void** m_pVTable; 
-	TObject* m_pObject; // for GC tracing & QueryInterface
+	TObject* m_pObject; // back pointer to master header
 
 	// followed by parents, then by interface data fields
 };
 
-// function that converts weak to strong
-
-typedef
-TInterface* 
-(*FStrengthen) (TInterface*);
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up multicast declared like:
+// structures backing up multicast, e.g.:
 // mutlicast OnFire ();
 
-struct TMulticast
+struct TMulticast: TInterface
 {
 	volatile intptr_t m_Lock;
 	size_t m_MaxCount;
@@ -666,7 +630,11 @@ struct TMulticast
 	void* m_pHandleTable;
 };
 
-struct TMcSnapshot
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// multicast snapshot returns function pointer with this closure:
+
+struct TMcSnapshot: TInterface
 {
 	size_t m_Count;
 	void* m_pPtrArray; // array of function closure or unsafe pointers
@@ -674,8 +642,8 @@ struct TMcSnapshot
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up safe data pointer declared like:
-// int* p;
+// structure backing up fat data pointer, e.g.:
+// int* p;int* p;
 
 struct TDataPtr
 {
@@ -687,7 +655,7 @@ struct TDataPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structure backing up function closure pointer declared like:
+// structures backing up fat function pointers, e.g.:
 // int function* pfTest (int, int);
 // int function weak* pfTest (int, int);
 
@@ -697,18 +665,11 @@ struct TFunctionPtr
 	TInterface* m_pClosure; 
 };
 
-struct TFunctionPtr_w
-{
-	void* m_pf;
-	TInterface* m_pClosure; 
-	FStrengthen m_pfStrengthen;
-};
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up property closure pointer declared like:
-// int property* pyTest;
-// int property weak* pyTest;
+// structures backing up property pointers, e.g.:
+// int property* pxTest;
+// int property weak* pxTest;
 
 struct TPropertyPtr
 {
@@ -716,89 +677,12 @@ struct TPropertyPtr
 	TInterface* m_pClosure; 
 };
 
-struct TPropertyPtr_w
-{
-	void** m_pVTable;
-	TInterface* m_pClosure; 
-	FStrengthen m_pfStrengthen;
-};
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// structure backing up augmented property (bindable or autoget) thin pointer declared like:
-// int autoget property thin* pyTest;
-// if both bindable & autoget modifiers used then onchange event goes first followed by propvalue
-
-struct TAuPropertyPtr_t
-{
-	void** m_pVTable;
-	TDataPtr m_AuDataPtr;
-};
-
-// structures backing up augmented property (bindable or autoget) pointer declared like:
-// int bindable property* pyTest;
-
-struct TAuPropertyPtr
-{
-	void** m_pVTable;
-	TDataPtr m_AuDataPtr;
-	TInterface* m_pClosure; 
-};
-
-struct TAuPropertyPtr_w
-{
-	void** m_pVTable;
-	TDataPtr m_AuDataPtr;
-	TInterface* m_pClosure; 
-	FStrengthen m_pfStrengthen;
-};
-
-// structure backing up augmented property (bindable or autoget) unsafe pointer declared like:
-// int autoget property unsafe* pyTest;
-
-struct TAuPropertyPtr_u
-{
-	void** m_pVTable;
-	void* m_pAuData;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// structures backing up autoev declared like:
-// autoev TestAutoEv ();
-
-struct TAutoEv
-{
-	volatile intptr_t m_Lock;
-	size_t m_State;
-
-	// followed by starter arguments
-	// followed by bind site array
-};
 
 struct TAutoEvBindSite
 {
-	TDataPtr m_OnChangePtr;
+	TInterface* m_pOnChange;
 	intptr_t m_Cookie;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// structures backing up autoev closure pointer declared like:
-// int autoev* paeTest (int);
-// int autoev weak* paeTest (int);
-
-struct TAutoEvPtr
-{
-	void** m_pVTable;
-	TInterface* m_pClosure; 
-};
-
-struct TAutoEvPtr_w
-{
-	void** m_pVTable;
-	TInterface* m_pClosure; 
-	FStrengthen m_pfStrengthen;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -822,17 +706,12 @@ struct TVariant
 		double m_Double;
 
 		void* m_p;
+		intptr_t (__cdecl* m_pf) (...);
 
-		TInterface* m_pIface;
 		TDataPtr m_DataPtr;
+		TInterface* m_pClassPtr;
 		TFunctionPtr m_FunctionPtr;
-		TFunctionPtr_w m_FunctionPtr_w;
 		TPropertyPtr m_PropertyPtr;
-		TPropertyPtr_w m_PropertyPtr_w;
-		TAuPropertyPtr m_AuPropertyPtr;
-		TAuPropertyPtr_w m_AuPropertyPtr_w;
-		TAuPropertyPtr_t m_AuPropertyPtr_t;
-		TAuPropertyPtr_u m_AuPropertyPtr_u;
 	};
 };
 
@@ -841,11 +720,10 @@ struct TVariant
 enum ERuntimeError
 {
 	ERuntimeError_ScopeMismatch,
-	ERuntimeError_LoadOutOfRange,
-	ERuntimeError_StoreOutOfRange,
-	ERuntimeError_NullInterface,
-	ERuntimeError_NullFunction,
-	ERuntimeError_NullProperty,
+	ERuntimeError_DataPtrOutOfRange,
+	ERuntimeError_NullClassPtr,
+	ERuntimeError_NullFunctionPtr,
+	ERuntimeError_NullPropertyPtr,
 	ERuntimeError_AbstractFunction,
 };
 

@@ -70,7 +70,7 @@ struct ICastOperator: obj::IRoot
 
 protected:
 	CModule* m_pModule;
-	int m_OpFlags;
+	uint_t m_OpFlags;
 
 public:
 	ICastOperator ();

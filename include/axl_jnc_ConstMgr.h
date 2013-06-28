@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Value.h"
+#include "axl_jnc_ThinDataPtrValidator.h"
 
 namespace axl {
 namespace jnc {
@@ -18,6 +19,7 @@ class CConstMgr
 protected:
 	CModule* m_pModule;
 
+	ref::CPtrT <CThinDataPtrValidator> m_UnsafeThinDataPtrValidator;
 	rtl::CBoxListT <CValue> m_ConstList;
 
 public:
@@ -30,9 +32,7 @@ public:
 	}
 
 	void
-	Clear ()
-	{
-	}
+	Clear ();
 
 	const CValue& 
 	SaveValue (const CValue& Value)
@@ -40,6 +40,9 @@ public:
 		rtl::CBoxIteratorT <CValue> It = m_ConstList.InsertTail (Value);
 		return *It;
 	}
+
+	CThinDataPtrValidator*
+	GetUnsafeThinDataPtrValidator ();
 };
 
 //.............................................................................

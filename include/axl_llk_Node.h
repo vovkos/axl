@@ -63,7 +63,7 @@ class CNode: public rtl::TListLink
 {
 public:
 	ENode m_Kind;
-	int m_Flags;
+	uint_t m_Flags;
 	size_t m_Index;
 
 public:

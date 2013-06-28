@@ -12,40 +12,27 @@ bool
 CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 {
 	static
-	int 
+	uint_t
 	AntiModifierTable [] = 
 	{		
-		ETypeModifier_Unsigned,     // ETypeModifier_Signed           = 0x00000001,
-		ETypeModifier_Signed,       // ETypeModifier_Unsigned         = 0x00000002,
-		0,                          // ETypeModifier_BigEndian        = 0x00000004,
-		0,                          // ETypeModifier_Nullable         = 0x00000008,
-		ETypeModifier_ReadOnly,     // ETypeModifier_Const            = 0x00000010,
-		ETypeModifier_Const,        // ETypeModifier_ReadOnly         = 0x00000020,
-		0,                          // ETypeModifier_Mutable          = 0x00000040,
-		0,                          // ETypeModifier_Volatile         = 0x00000080,
-		ETypeModifier_Thin |        // ETypeModifier_Weak             = 0x00000100,
-		ETypeModifier_Unsafe,   
-		ETypeModifier_Weak |        // ETypeModifier_Thin             = 0x00000200,
-		ETypeModifier_Unsafe,   
-		ETypeModifier_Weak |        // ETypeModifier_Unsafe           = 0x00000400,
-		ETypeModifier_Thin,   
-		ETypeModifier_Stdcall,      // ETypeModifier_Cdecl            = 0x00000800,
-		ETypeModifier_Cdecl,        // ETypeModifier_Stdcall          = 0x00001000,
-		ETypeModifier_Function |    // ETypeModifier_Class            = 0x00002000,
-		ETypeModifier_Property |
-		ETypeModifier_AutoEv,      
-		ETypeModifier_Class |       // ETypeModifier_Function         = 0x00004000,
-		ETypeModifier_Property |
-		ETypeModifier_AutoEv,      
-		ETypeModifier_Class |       // ETypeModifier_Property         = 0x00008000,
-		ETypeModifier_Function |
-		ETypeModifier_AutoEv,      
-		ETypeModifier_Class |       // ETypeModifier_AutoEv           = 0x00010000,
-		ETypeModifier_Function |
-		ETypeModifier_Property,      
-		0,                          // ETypeModifier_Bindable         = 0x00020000,
-		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00040000,
-		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00080000,
+		0,                          // ETypeModifier_Unsigned         = 0x00000001,
+		0,                          // ETypeModifier_BigEndian        = 0x00000002,
+		ETypeModifierMask_Const,    // ETypeModifier_Const            = 0x00000004,
+		ETypeModifierMask_Const,    // ETypeModifier_ReadOnly         = 0x00000008,
+		0,                          // ETypeModifier_Volatile         = 0x00000010,
+		ETypeModifierMask_PtrKind,  // ETypeModifier_Weak             = 0x00000020,
+		ETypeModifierMask_PtrKind,  // ETypeModifier_Thin             = 0x00000040,
+		0,                          // ETypeModifier_Unsafe           = 0x00000080,
+		ETypeModifierMask_CallConv, // ETypeModifier_Cdecl            = 0x00000100,
+		ETypeModifierMask_CallConv, // ETypeModifier_Stdcall          = 0x00000200,
+		ETypeModifierMask_TypeKind, // ETypeModifier_Function         = 0x00000400,
+		ETypeModifierMask_TypeKind, // ETypeModifier_Property         = 0x00000800,
+		0,                          // ETypeModifier_Bindable         = 0x00001000,
+		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00002000,
+		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00004000,
+		ETypeModifierMask_TypeKind, // ETypeModifier_Multicast        = 0x00008000,
+		ETypeModifierMask_TypeKind, // ETypeModifier_Event            = 0x00010000,
+		ETypeModifierMask_TypeKind, // ETypeModifier_AutoEv           = 0x00020000,
 	};
 
 	// check duplicates
@@ -131,19 +118,6 @@ CTypeSpecifier::SetType (CType* pType)
 		return false;
 	}
 
-	CModule* pModule = pType->GetModule ();
-
-	if (pType->GetTypeKind () == EType_Import)
-	{
-		CImportType* pImportType = (CImportType*) pType;
-		if (pImportType->IsResolved ())
-			pType = pImportType->GetActualType ();
-	}
-
-	if (pType->GetTypeKind () == EType_Class || 
-		pType->GetTypeKind () == EType_Import && ((CImportType*) pType)->GetImportTypeKind () == EImportType_Primary)
-		PromoteClassPtrTypeModifiers (&m_TypeModifiers);
-	
 	m_pType = pType;
 	return true;
 }
@@ -155,7 +129,7 @@ GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier)
 {
 	static const char* StringTable [] = 
 	{
-		"const", // EPostDeclaratorModifier_Const = 0x01,
+		"const",    // EPostDeclaratorModifier_Const    = 0x01,
 	};
 
 	size_t i  = rtl::GetLoBitIdx32 (Modifier);
@@ -313,29 +287,11 @@ CDeclarator::SetPropValue ()
 	return true;
 }
 
-bool
-CDeclarator::SetOnChange ()
+void
+CDeclarator::AddPointerPrefix ()
 {
-	if (m_DeclaratorKind)
-	{
-		err::SetFormatStringError ("cannot create qualified 'onchange' declarator");
-		return false;
-	}
-
-	m_DeclaratorKind = EDeclarator_OnChange;
-	return true;
-}
-
-bool
-CDeclarator::AddPrefix (EDeclPrefix PrefixKind)
-{
-	TDeclPrefix Prefix;
-	Prefix.m_PrefixKind = PrefixKind;
-	Prefix.m_TypeModifiers = m_TypeModifiers;
-
-	m_PrefixArray.Append (Prefix);
+	m_PointerPrefixArray.Append (m_TypeModifiers);
 	m_TypeModifiers = 0;
-	return true;
 }
 
 CDeclArraySuffix*
@@ -358,7 +314,7 @@ CDeclarator::AddFunctionSuffix ()
 bool
 CDeclarator::AddBitFieldSuffix (size_t BitCount)
 {
-	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PrefixArray.IsEmpty ())
+	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PointerPrefixArray.IsEmpty ())
 	{
 		err::SetFormatStringError ("bit field can only be applied to integer type");
 		return false;
@@ -369,10 +325,10 @@ CDeclarator::AddBitFieldSuffix (size_t BitCount)
 }
 
 CType*
-CDeclarator::CalcType (uint_t* pDataPtrTypeFlags)
+CDeclarator::CalcType (uint_t* pFlags)
 {
 	CDeclTypeCalc TypeCalc;
-	return TypeCalc.CalcType (this, pDataPtrTypeFlags);
+	return TypeCalc.CalcType (this, pFlags);
 }
 
 //.............................................................................

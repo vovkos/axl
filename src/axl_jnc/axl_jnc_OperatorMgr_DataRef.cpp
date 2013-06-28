@@ -49,7 +49,7 @@ COperatorMgr::GetThinDataPtrScopeLevel (
 	CValue* pResultValue
 	)
 {
-	ASSERT (Value.GetType ()->IsDataPtrType ());
+	ASSERT (Value.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr);
 
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
@@ -76,11 +76,11 @@ COperatorMgr::GetThinDataPtrScopeLevel (
 
 	case EType_DataPtr:
 		ASSERT (((CDataPtrType*) ScopeValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (ScopeValidatorValue, 3, CGetType (m_pModule, EType_SizeT), pResultValue);
+		m_pModule->m_LlvmBuilder.CreateExtractValue (ScopeValidatorValue, 3, m_pModule->GetSimpleType (EType_SizeT), pResultValue);
 		break;
 
 	case EType_ClassPtr:
-		GetClassPtrScopeLevel (Value, pResultValue);
+		GetClassPtrScopeLevel (ScopeValidatorValue, pResultValue);
 		break;
 
 	default:
@@ -95,9 +95,11 @@ COperatorMgr::GetThinDataPtrRange (
 	CValue* pRangeEndValue
 	)
 {
-	ASSERT (Value.GetType ()->IsDataPtrType ());
+	ASSERT (Value.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr);
 
-	CType* pBytePtrType = CGetType (m_pModule, EStdType_BytePtr);
+	CType* pBytePtrType = m_pModule->GetSimpleType (EStdType_BytePtr);
+
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "calc thin data pointer range");
 
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
@@ -140,7 +142,6 @@ COperatorMgr::GetThinDataPtrRange (
 bool
 COperatorMgr::PrepareDataPtr (
 	const CValue& Value,
-	ERuntimeError Error,
 	CValue* pResultValue
 	)
 {
@@ -148,20 +149,15 @@ COperatorMgr::PrepareDataPtr (
 	CDataPtrType* pType = (CDataPtrType*) Value.GetType ();
 	EDataPtrType PtrTypeKind = pType->GetPtrTypeKind ();
 
-	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType (EDataPtrType_Unsafe);
+	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 
 	CValue PtrValue;
 	CValue RangeBeginValue;	
 	CValue RangeEndValue;	
 
-	switch (PtrTypeKind)
+	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-	case EDataPtrType_Unsafe:
-		pResultValue->OverrideType (Value, pResultType);
-		return true;
-
-	case EDataPtrType_Thin:
-		if (!(pType->GetFlags () & EPtrTypeFlag_Nullable))
+		if (pType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
 		{
 			pResultValue->OverrideType (Value, pResultType);
 			return true;
@@ -169,12 +165,12 @@ COperatorMgr::PrepareDataPtr (
 
 		PtrValue.OverrideType (Value, pResultType);
 		GetThinDataPtrRange (Value, &RangeBeginValue, &RangeEndValue);
-		break;
-
-	case EDataPtrType_Normal:
+	}
+	else
+	{
 		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
 
-		if (!(pType->GetFlags () & EPtrTypeFlag_Nullable))
+		if (pType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
 		{
 			*pResultValue = PtrValue;
 			return true;
@@ -182,13 +178,9 @@ COperatorMgr::PrepareDataPtr (
 
 		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &RangeBeginValue);
 		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 2, NULL, &RangeEndValue);
-		break;
-
-	default:
-		ASSERT (false);
 	}
 
-	CheckDataPtrRange (PtrValue, pType->GetTargetType ()->GetSize (), RangeBeginValue, RangeEndValue, Error);
+	CheckDataPtrRange (PtrValue, pType->GetTargetType ()->GetSize (), RangeBeginValue, RangeEndValue);
 	*pResultValue = PtrValue;
 	return true;
 }
@@ -208,7 +200,7 @@ COperatorMgr::LoadDataRef (
 	CType* pTargetType = pType->GetTargetType ();
 
 	CValue PtrValue;
-	Result = PrepareDataPtr (OpValue, ERuntimeError_LoadOutOfRange, &PtrValue);
+	Result = PrepareDataPtr (OpValue, &PtrValue);
 	if (!Result)
 		return false;
 
@@ -266,7 +258,7 @@ COperatorMgr::StoreDataRef (
 	Result = 
 		CheckCastKind (RawSrcValue, pCastType) &&
 		CastOperator (RawSrcValue, pCastType, &SrcValue) &&
-		PrepareDataPtr (DstValue, ERuntimeError_StoreOutOfRange, &PtrValue);
+		PrepareDataPtr (DstValue, &PtrValue);
 
 	if (!Result)
 		return false;
@@ -347,7 +339,7 @@ COperatorMgr::ExtractBitField (
 	if (!Result)
 		return false;
 
-	if (pBaseType->IsSignedIntegerType ()) // extend with sign bit
+	if (pBaseType->GetTypeKindFlags () & ETypeKindFlag_Signed) // extend with sign bit
 	{
 		int64_t SignBit = (int64_t) 1 << (BitCount - 1);
 

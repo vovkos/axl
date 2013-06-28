@@ -2,6 +2,7 @@
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_Parser.llk.h"
 
 namespace axl {
 namespace jnc {
@@ -17,22 +18,22 @@ GetFunctionKindString (EFunction FunctionKind)
 		"named-function",           // EFunction_Named,
 		"get",                      // EFunction_Getter,
 		"set",                      // EFunction_Setter,
+		"bind",                     // EFunction_Binder,
+		"prime",                    // EFunction_Primer,
 		"preconstruct",             // EFunction_PreConstructor,
-		"this",                     // EFunction_Constructor,
-		"~this",                    // EFunction_Destructor,
-		"static this",              // EFunction_StaticConstructor,
-		"static ~this",             // EFunction_StaticDestructor,
-		"module this",              // EFunction_ModuleConstructor,
-		"module ~this",             // EFunction_ModuleDestructor,
+		"construct",                // EFunction_Constructor,
+		"destruct",                 // EFunction_Destructor,
+		"static construct",         // EFunction_StaticConstructor,
+		"static destruct",          // EFunction_StaticDestructor,
+		"module construct",         // EFunction_ModuleConstructor,
+		"module destruct",          // EFunction_ModuleDestructor,
 		"call-operator",            // EFunction_CallOperator,
 		"cast-operator",            // EFunction_CastOperator,
 		"unary-operator",           // EFunction_UnaryOperator,
 		"binary-operator",          // EFunction_BinaryOperator,
-		"autoev-starter",           // EFunction_AutoEvStarter,
-		"autoev-stopper",           // EFunction_AutoEvStopper,
-		"autoev-handler",           // EFunction_AutoEvHandler,
 		"internal",                 // EFunction_Internal, 
 		"thunk",                    // EFunction_Thunk,
+		"autoev-handler",           // EFunction_AutoEvHandler,
 		"schedule-launcher",        // EFunction_ScheduleLauncher,
 	};
 
@@ -52,6 +53,8 @@ GetFunctionKindFlags (EFunction FunctionKind)
 		0,                              // EFunction_Named,		
 		EFunctionKindFlag_NoOverloads,  // EFunction_Getter,
 		0,                              // EFunction_Setter,
+		0,                              // EFunction_Binder,
+		0,                              // EFunction_Primer,
 		EFunctionKindFlag_NoStorage |   // EFunction_PreConstructor,
 		EFunctionKindFlag_NoOverloads |
 		EFunctionKindFlag_NoArgs,       
@@ -71,11 +74,10 @@ GetFunctionKindFlags (EFunction FunctionKind)
 		EFunctionKindFlag_NoOverloads | // EFunction_UnaryOperator,
 		EFunctionKindFlag_NoArgs,       
 		0,                              // EFunction_BinaryOperator,
-		0,                              // EFunction_AutoEvStarter,
-		0,                              // EFunction_AutoEvStopper,
-		0,                              // EFunction_AutoEvHandler,
 		0,                              // EFunction_Internal, 
 		0,                              // EFunction_Thunk,
+		0,                              // EFunction_AutoEvHandler,
+		0,                              // EFunction_ScheduleLauncher,
 	};
 
 	return FunctionKind >= 0 && FunctionKind < EFunction__Count ? FlagTable [FunctionKind] : 0;
@@ -87,9 +89,7 @@ CFunction::CFunction ()
 {
 	m_ItemKind = EModuleItem_Function;
 	m_FunctionKind = EFunction_Undefined;
-	m_pOrphanNamespace = NULL;
 	m_pType = NULL;
-	m_pExternFunction = NULL;
 	m_pCastOpType = NULL;
 	m_pThisArgType = NULL;
 	m_pThisType = NULL;
@@ -97,7 +97,6 @@ CFunction::CFunction ()
 	m_ThisArgTypeFlags = 0;
 	m_pVirtualOriginClassType = NULL;
 	m_pProperty = NULL;
-	m_pAutoEv = NULL;
 	m_ClassVTableIndex = -1;
 	m_PropertyVTableIndex = -1;
 	m_pBlock = NULL;
@@ -107,14 +106,36 @@ CFunction::CFunction ()
 	m_MachineCodeSize = 0;
 }
 
+bool
+CFunction::SetBody (rtl::CBoxListT <CToken>* pTokenList)
+{
+	if (!m_Body.IsEmpty ())
+	{
+		err::SetFormatStringError ("'%s' already has a body", m_Tag.cc ());
+		return false;
+	}
+
+	if (m_StorageKind == EStorage_Abstract)
+	{
+		err::SetFormatStringError ("'%s' is abstract and hence cannot have a body", m_Tag.cc ());
+		return false;
+	}
+
+	m_Body.TakeOver (pTokenList);
+
+	if (m_Flags & EModuleItemFlag_Orphan)
+		m_pModule->MarkForLayout (this);
+	else
+		m_pModule->MarkForCompile (this);
+
+	return true;
+}
+
 llvm::Function* 
 CFunction::GetLlvmFunction ()
 {
 	if (m_pLlvmFunction)
 		return m_pLlvmFunction;
-
-	if (m_pExternFunction)
-		return m_pExternFunction->GetLlvmFunction ();
 
 	llvm::FunctionType* pLlvmType = (llvm::FunctionType*) m_pType->GetLlvmType ();
 	m_pLlvmFunction = llvm::Function::Create (
@@ -203,8 +224,10 @@ GetItemUnnamedMethod (
 }
 
 bool
-CFunction::ResolveOrphan ()
+CFunction::CalcLayout ()
 {
+	ASSERT (m_Flags & EModuleItemFlag_Orphan); // otherwise function should not have been added to CalcLayoutArray
+
 	CModuleItem* pItem = m_pParentNamespace->FindItemTraverse (m_DeclaratorName);
 	if (!pItem)
 	{
@@ -242,51 +265,140 @@ CFunction::ResolveOrphan ()
 		return false;
 	}
 
-	if (pOriginFunction->HasBody () || pOriginFunction->m_pExternFunction)
+	if (!(pOriginFunction->m_Flags & EModuleItemFlag_User))
 	{
-		err::SetFormatStringError ("'%s' already has a body", m_Tag.cc ()); 
-		return false;
-	}
-
-	if (pOriginFunction->m_StorageKind == EStorage_Abstract)
-	{
-		err::SetFormatStringError ("'%s' is abstract and hence cannot have a body", m_Tag.cc ());
+		err::SetFormatStringError ("'%s' is a compiler-generated function", m_Tag.cc ()); 
 		return false;
 	}
 
 	ASSERT (pOriginFunction->m_FunctionKind == m_FunctionKind);
-	pOriginFunction->m_pExternFunction = this;
 
-	if (!m_StorageKind)
-	{
-		m_StorageKind = pOriginFunction->m_StorageKind;
-	}
-	else if (m_StorageKind != pOriginFunction->m_StorageKind)
+	if (m_StorageKind && m_StorageKind != pOriginFunction->m_StorageKind)
 	{
 		err::SetFormatStringError ("storage specifier mismatch for orphan function '%s'", m_Tag.cc ()); 
 		return false;
 	}
 
-	MakeStub (pOriginFunction);
+	bool Result = pOriginFunction->SetBody (&m_Body);
+	if (!Result)
+		return false;
+	
+	// copy arg names and make sure orphan funciton does not override default values
+
+	rtl::CArrayT <CFunctionArg*> DstArgArray = pOriginFunction->m_pType->GetArgArray ();
+	rtl::CArrayT <CFunctionArg*> SrcArgArray = m_pType->GetArgArray ();
+	
+	size_t ArgCount = DstArgArray.GetCount ();
+
+	size_t iDst = 0;
+	size_t iSrc = 0;
+
+	if (pOriginFunction->IsMember ())
+		iDst++;
+
+	for (; iDst < ArgCount; iDst++, iSrc++)
+	{
+		CFunctionArg* pDstArg = DstArgArray [iDst];
+		CFunctionArg* pSrcArg = SrcArgArray [iSrc];
+
+		if (!pSrcArg->m_Initializer.IsEmpty ())
+		{
+			err::SetFormatStringError ("redefinition of default value for '%s'", pSrcArg->m_Name.cc ()); 
+			return false;
+		}
+
+		pDstArg->m_Name = pSrcArg->m_Name;
+		pDstArg->m_QualifiedName = pSrcArg->m_QualifiedName;
+		pDstArg->m_Tag = pSrcArg->m_Tag;
+	}
+
+	rtl::CIteratorT <CFunctionArg> SrcArg;
+
+	pOriginFunction->m_pType = m_pType;
 	return true;
 }
 
-void
-CFunction::MakeStub (CFunction* pFunction)
+bool
+CFunction::Compile ()
 {
-	m_AccessKind = pFunction->m_AccessKind;
-	m_pParentNamespace = pFunction->m_pParentNamespace;
-	m_pType = pFunction->m_pType;
-	m_Name = pFunction->m_Name;
-	m_QualifiedName = pFunction->m_QualifiedName;
-	m_Tag = pFunction->m_Tag;
-	m_pThisArgType = pFunction->m_pThisArgType;
-	m_pThisType = pFunction->m_pThisType;
-	m_pVirtualOriginClassType = pFunction->m_pVirtualOriginClassType;
-	m_pProperty = pFunction->m_pProperty;
+	ASSERT (!m_Body.IsEmpty ()); // otherwise what are we doing here?
+	ASSERT (!m_pBlock || m_FunctionKind == EFunction_ModuleConstructor);
+
+	bool Result;
+
+	if (m_pBlock) // already compiled 
+		return true;
+
+	// prologue
+
+	Result = m_pModule->m_FunctionMgr.Prologue (this, m_Body.GetHead ()->m_Pos);
+	if (!Result)
+		return false;
+
+	// parse body
+
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	ESymbol StartSymbol = ESymbol_compound_stmt;
+	
+	if (m_FunctionKind == EFunction_PreConstructor)
+	{
+		CType* pParentType = GetParentType ();
+		if (!pParentType)
+		{
+			err::SetFormatStringError ("preconstructors for properties are not yet supported");
+		}
+
+		CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+		ASSERT (ThisValue);
+
+		EType TypeKind = pParentType->GetTypeKind ();
+		
+		switch (TypeKind)
+		{
+		case EType_Struct:
+			Result = ((CStructType*) pParentType)->InitializeFields (ThisValue);
+			break;
+
+		case EType_Union:
+			Result = ((CUnionType*) pParentType)->InitializeField (ThisValue);
+			break;
+		
+		case EType_Class:
+			Result = ((CClassType*) pParentType)->GetIfaceStructType ()->InitializeFields (ThisValue);
+			break;
+		}
+	}
+	else if (m_FunctionKind == EFunction_Constructor)
+	{
+		StartSymbol = ESymbol_constructor_compound_stmt;
+		
+		ENamespace Namespace = m_pParentNamespace->GetNamespaceKind ();
+		ASSERT (Namespace == ENamespace_Type || Namespace == ENamespace_Property);
+
+		if (Namespace == ENamespace_Type)
+			Parser.m_pConstructorType = (CDerivableType*) m_pParentNamespace;
+		else
+			Parser.m_pConstructorProperty = (CProperty*) m_pParentNamespace;
+	}
+
+	Result = Parser.ParseTokenList (StartSymbol, m_Body, true);
+	if (!Result)
+		return false;
+
+	// epilogue
+
+	Result = m_pModule->m_FunctionMgr.Epilogue (m_Body.GetTail ()->m_Pos);
+	if (!Result)
+		return false;
+
+	return true;
 }
 
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
+

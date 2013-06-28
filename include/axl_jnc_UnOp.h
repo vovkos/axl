@@ -38,13 +38,13 @@ GetUnOpKindString (EUnOp OpKind);
 enum EOpFlag
 {
 	EOpFlag_KeepDataRef      = 0x01,
-	EOpFlag_KeepPropertyRef  = 0x02,
-	EOpFlag_KeepArrayRef     = 0x04,
+	EOpFlag_KeepClassRef	 = 0x02,
+	EOpFlag_KeepPropertyRef  = 0x04,
+	EOpFlag_KeepArrayRef     = 0x08,
 	EOpFlag_KeepBool         = 0x10,
 	EOpFlag_KeepEnum         = 0x20,
-	EOpFlag_KeepImport       = 0x40,
-
-	EOpFlag_KeepRef          = EOpFlag_KeepDataRef | EOpFlag_KeepPropertyRef,
+	
+	EOpFlag_KeepRef          = EOpFlag_KeepDataRef | EOpFlag_KeepClassRef | EOpFlag_KeepPropertyRef,
 };
 
 //.............................................................................
@@ -62,7 +62,7 @@ struct IUnaryOperator: obj::IRoot
 protected:
 	CModule* m_pModule;
 	EUnOp m_OpKind;
-	int m_OpFlags;
+	uint_t m_OpFlags;
 
 public:
 	IUnaryOperator ();

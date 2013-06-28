@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_ImportType.h"
 
 namespace axl {
 namespace jnc {
@@ -17,6 +17,7 @@ class CArrayType: public CType
 
 protected:
 	CType* m_pElementType;
+	CImportType* m_pElementType_i;
 	CType* m_pRootType;
 	size_t m_ElementCount;
 
@@ -29,6 +30,12 @@ public:
 		return m_pElementType;
 	}
 
+	CImportType*
+	GetElementType_i ()
+	{
+		return m_pElementType_i;
+	}
+
 	CType* 
 	GetRootType ()
 	{
@@ -39,13 +46,6 @@ public:
 	GetElementCount ()
 	{
 		return m_ElementCount;
-	}
-
-	virtual
-	size_t
-	GetAlignFactor ()
-	{
-		return m_pRootType->GetAlignFactor ();
 	}
 
 	static
@@ -64,6 +64,10 @@ public:
 
 protected:
 	virtual 
+	bool
+	CalcLayout ();
+
+	virtual 
 	void
 	PrepareTypeString ();
 
@@ -74,6 +78,26 @@ protected:
 		m_pLlvmType = llvm::ArrayType::get (m_pElementType->GetLlvmType (), m_ElementCount);
 	}
 };
+
+//.............................................................................
+
+inline
+bool 
+IsAutoSizeArrayType (CType* pType)
+{
+	return 
+		pType->GetTypeKind () == EType_Array &&
+		((CArrayType*) pType)->GetElementCount () == 0;
+}
+
+inline
+bool 
+IsCharArrayType (CType* pType)
+{
+	return 
+		pType->GetTypeKind () == EType_Array &&
+		((CArrayType*) pType)->GetElementType ()->GetTypeKind () == EType_Char;
+}
 
 //.............................................................................
 

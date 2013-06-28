@@ -1,45 +1,51 @@
 //.............................................................................
 
-TPoint g_Point = { 1, 2 };
-
-thin FFoo* g_pfFoo = &foo;
-
-void
-foo (int x)
+class C1
 {
-	printf ("foo (%d)\n", x);	
+	int m_Int;
+
+	autoev m_MyAutoEv ()
+	{
+		m_Int = gx_MyProp * 2;
+	}
 }
+
+int bindable gx_MyProp;
 
 int  
 main ()
 {
-	printf ("main ()\n"); 
+	printf ("main ()\n");
 
-	stack String s;
+	C1 c;
+	c.m_MyAutoEv.Start ();
 
-	g_pfFoo (123);
+	gx_MyProp.onchange.Add (foo);
+	gx_MyProp.onchange.Add (bar ~(5));
 
-	g_Point.m_y = 20;
-	printf ("Point = { %d, %d }\n", g_Point.m_x, g_Point.m_y);
+	gx_MyProp = 12;
+
+	printf ("c.m_Int = %d\n", c.m_Int);
 
 	return 10;
 }
- 
+
+foo ()
+{
+	printf ("foo ()\n");
+}
+
+bar (int x)
+{
+	printf ("bar (%d)\n", x);
+}
+
 //.............................................................................
 
 int
 printf (
-	unsafe const char* pFormat,
+	unsafe thin const char* pFormat,
 	unsafe ...
-	); 
-
-struct TPoint 
-{
-	int m_x;
-	int m_y;
-}
-
-typedef void FFoo (int x);
+	);
 
 //.............................................................................
- 

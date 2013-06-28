@@ -12,11 +12,11 @@ GetPropertyTypeFlagString (EPropertyTypeFlag Flag)
 {
 	static const char* StringTable [] = 
 	{
-		"autoget",   // EPropertyTypeFlag_AutoGet = 0x0100,
-		"bindable",  // EPropertyTypeFlag_Bindable  = 0x0200,
+		"const",     // EPropertyTypeFlag_Const    = 0x010000,
+		"bindable",  // EPropertyTypeFlag_Bindable = 0x020000,
 	};
 
-	size_t i = rtl::GetLoBitIdx32 (Flag >> 8);
+	size_t i = rtl::GetLoBitIdx32 (Flag >> 16);
 
 	return i < countof (StringTable) ? 
 		StringTable [i] : 
@@ -51,8 +51,8 @@ GetPropertyTypeFlagsFromModifiers (uint_t Modifiers)
 {
 	uint_t Flags = 0;
 
-	if (Modifiers & ETypeModifier_AutoGet)
-		Flags |= EPropertyTypeFlag_AutoGet;
+	if (Modifiers & ETypeModifier_Const)
+		Flags |= EPropertyTypeFlag_Const;
 
 	if (Modifiers & ETypeModifier_Bindable)
 		Flags |= EPropertyTypeFlag_Bindable;
@@ -67,12 +67,10 @@ CPropertyType::CPropertyType ()
 	m_TypeKind = EType_Property;
 
 	m_pGetterType = NULL;
+	m_pBinderType = NULL;
 	m_pStdObjectMemberPropertyType = NULL;
 	m_pShortType = NULL;
-	m_pBindablePropertyType = NULL;
 	m_pVTableStructType = NULL;
-	m_pAuFieldStructType = NULL;
-	memset (m_AuFieldArray, 0, sizeof (m_AuFieldArray));
 	m_pPropertyPtrTypeTuple = NULL;
 }
 
@@ -104,35 +102,10 @@ CPropertyType::GetShortType  ()
 	return m_pModule->m_TypeMgr.GetShortPropertyType (this);
 }
 
-CPropertyType*
-CPropertyType::GetBindablePropertyType ()
-{
-	return m_pModule->m_TypeMgr.GetBindablePropertyType (this);
-}
-
 CStructType*
 CPropertyType::GetVTableStructType ()
 {
 	return m_pModule->m_TypeMgr.GetPropertyVTableStructType (this);
-}
-
-CStructField* 
-CPropertyType::GetStdField (EStdField Field)
-{
-	ASSERT ((size_t) Field < EStdField__Count);
-	
-	CStructField* pField = m_AuFieldArray [Field];
-	if (!pField)
-	{
-		err::SetFormatStringError (
-			"'%s' has no field '%s'", 
-			GetTypeString ().cc (), // thanks a lot gcc
-			GetStdFieldString (Field)
-			);
-		return NULL;
-	}
-
-	return pField;
 }
 
 rtl::CString
@@ -142,16 +115,10 @@ CPropertyType::CreateSignature (
 	uint_t Flags
 	)
 {
-	rtl::CString String = "Y";
+	rtl::CString String = "X";
 	
 	if (Flags & EPropertyTypeFlag_Bindable)
 		String += 'b';
-
-	if (Flags & EPropertyTypeFlag_AutoGet)
-		String += 'g';
-
-	if (Flags & EPropertyTypeFlag_AutoSet)
-		String += 's';
 
 	String += pGetterType->GetSignature ();
 
@@ -171,17 +138,11 @@ CPropertyType::GetTypeModifierString ()
 	if (!m_TypeModifierString.IsEmpty ())
 		return m_TypeModifierString;
 
-	if (IsReadOnly ())
+	if (m_Flags & EPropertyTypeFlag_Const)
 		m_TypeModifierString += "const ";
 
 	if (m_Flags & EPropertyTypeFlag_Bindable)
 		m_TypeModifierString += "bindable ";
-
-	if (m_Flags & EPropertyTypeFlag_AutoGet)
-		m_TypeModifierString += "autoget ";
-
-	if (m_Flags & EPropertyTypeFlag_AutoSet)
-		m_TypeModifierString += "autoset ";
 
 	if (IsIndexed ())
 		m_TypeModifierString += "indexed ";

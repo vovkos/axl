@@ -13,26 +13,24 @@ CCast_ClassPtr::GetCastKind (
 	CType* pType
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr && pType->GetTypeKind () == EType_ClassPtr);
+	ASSERT (pType->GetTypeKind () == EType_ClassPtr);
+
+	if (OpValue.GetType ()->GetTypeKind () != EType_ClassPtr)
+		return ECast_None; // TODO: user conversions later via constructors
 
 	CClassPtrType* pSrcType = (CClassPtrType*) OpValue.GetType ();
 	CClassPtrType* pDstType = (CClassPtrType*) pType;
 
-	if (pSrcType->GetPtrTypeKind () == EClassPtrType_Unsafe && 
-		pDstType->GetPtrTypeKind () != EClassPtrType_Unsafe)
-		return ECast_None;
-
 	if ((pSrcType->GetFlags () & EPtrTypeFlag_Const) != 0 && 
-		(pDstType->GetFlags () & EPtrTypeFlag_Const) == 0 &&
-		pDstType->GetPtrTypeKind () != EClassPtrType_Unsafe)
+		(pDstType->GetFlags () & (EPtrTypeFlag_Const | EPtrTypeFlag_Unsafe)) == 0)
 		return ECast_None;
 
 	CClassType* pSrcClassType = pSrcType->GetTargetType ();
 	CClassType* pDstClassType = pDstType->GetTargetType ();
 
 	return 
-		(pSrcClassType->GetFlags () & EClassTypeFlag_StdObject) ||
-		(pDstClassType->GetFlags () & EClassTypeFlag_StdObject) ||
+		(pSrcClassType->GetClassTypeKind () == EClassType_StdObject) ||
+		(pDstClassType->GetClassTypeKind () == EClassType_StdObject) ||
 		pSrcClassType->Cmp (pDstClassType) == 0 || 
 		pSrcClassType->FindBaseType (pDstClassType) ? 
 		ECast_Implicit : 
@@ -47,7 +45,15 @@ CCast_ClassPtr::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr && pType->GetTypeKind () == EType_ClassPtr);
+	ASSERT (pType->GetTypeKind () == EType_ClassPtr);
+
+	bool Result;
+
+	if (OpValue.GetType ()->GetTypeKind () != EType_ClassPtr)
+	{
+		SetCastError (OpValue, pType);
+		return false; // TODO: user conversions later via constructors
+	}
 
 	CClassPtrType* pSrcType = (CClassPtrType*) OpValue.GetType ();
 	CClassPtrType* pDstType = (CClassPtrType*) pType;
@@ -55,7 +61,10 @@ CCast_ClassPtr::LlvmCast (
 	CClassType* pSrcClassType = pSrcType->GetTargetType ();
 	CClassType* pDstClassType = pDstType->GetTargetType ();
 
-	if (pDstClassType->GetFlags () & EClassTypeFlag_StdObject)
+	if (pDstType->GetFlags () & EPtrTypeFlag_Checked)
+		m_pModule->m_OperatorMgr.CheckClassPtrNull (OpValue);
+
+	if (pDstClassType->GetClassTypeKind () == EClassType_StdObject)
 	{
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pDstType, pResultValue);
 		return true;
@@ -68,7 +77,7 @@ CCast_ClassPtr::LlvmCast (
 	}
 
 	CBaseTypeCoord Coord;
-	bool Result = pSrcClassType->FindBaseTypeTraverse (pDstClassType, &Coord);
+	Result = pSrcClassType->FindBaseTypeTraverse (pDstClassType, &Coord);
 	if (!Result)
 	{
 		CValue PtrValue;

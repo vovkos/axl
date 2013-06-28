@@ -14,85 +14,51 @@ CClassType::CClassType ()
 	m_pIfaceStructType = NULL;
 	m_pClassStructType = NULL;
 	m_pExtensionNamespace = NULL;
-	m_pPreConstructor = NULL;
-	m_pDefaultConstructor = NULL;
+	m_pPrimer = NULL;
 	m_pDestructor = NULL;
-	m_pInitializer = NULL;
 	m_pVTableStructType = NULL;
 	m_pClassPtrTypeTuple = NULL;
 }
 
 CClassPtrType* 
 CClassType::GetClassPtrType (
+	EType TypeKind,
 	EClassPtrType PtrTypeKind,
 	uint_t Flags
 	)
 {
-	return m_pModule->m_TypeMgr.GetClassPtrType (this, PtrTypeKind, Flags);
-}
-
-CAutoEvType* 
-CClassType::GetMemberAutoEvType (CAutoEvType* pShortType)
-{
-	return m_pModule->m_TypeMgr.GetMemberAutoEvType (this, pShortType);
-}
-
-CFunction* 
-CClassType::GetDefaultConstructor ()
-{
-	ASSERT (m_pConstructor);
-	if (m_pDefaultConstructor)
-		return m_pDefaultConstructor;
-
-	rtl::CBoxListEntryT <CValue> ThisArgValue;
-	ThisArgValue.m_Value.SetType (GetThisArgType ());
-	
-	rtl::CAuxListT <rtl::CBoxListEntryT <CValue> > ArgList;
-	ArgList.InsertTail (&ThisArgValue);
-
-	CType* pThisArgType = GetThisArgType ();
-	m_pDefaultConstructor = m_pConstructor->ChooseOverload (ArgList);
-	if (!m_pDefaultConstructor)
-	{
-		err::SetFormatStringError (
-			"'%s' does not provide a default constructor", 
-			GetTypeString ().cc () // thanks a lot gcc
-			);
-		return NULL;
-	}
-
-	return m_pDefaultConstructor;
+	return m_pModule->m_TypeMgr.GetClassPtrType (this, TypeKind, PtrTypeKind, Flags);
 }
 
 CStructField*
-CClassType::GetStdField (EStdField Field)
+CClassType::GetFieldByIndex (size_t Index)
 {
-	if (Field != EStdField_Value || !(m_Flags & EClassTypeFlag_Box))
+	if (!m_BaseTypeList.IsEmpty ())
 	{
-		err::SetFormatStringError (
-			"'%s' has no field '%s'", 
-			GetTypeString ().cc (), 
-			GetStdFieldString (Field)
-			);
+		err::SetFormatStringError ("'%s' has base types, cannot use indexed member operator", GetTypeString ().cc ());
 		return NULL;
 	}
 
-	ASSERT (m_pIfaceStructType->GetFieldList ().GetCount () == 1);
-	return *m_pIfaceStructType->GetFieldList ().GetHead ();	
+	return m_pIfaceStructType->GetFieldByIndexImpl (Index, true);
 }
 
 CStructField*
-CClassType::CreateField (
+CClassType::CreateFieldImpl (
 	const rtl::CString& Name,
 	CType* pType,
 	size_t BitCount,
-	int PtrTypeFlags,
+	uint_t PtrTypeFlags,
+	rtl::CBoxListT <CToken>* pConstructor,
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	CStructField* pField = m_pIfaceStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pInitializer);
+	CStructField* pField = m_pIfaceStructType->CreateField (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
 	if (!pField)
 		return NULL;
+
+	// re-parent
+
+	pField->m_pParentNamespace = this;
 
 	if (!Name.IsEmpty ())
 	{
@@ -101,36 +67,8 @@ CClassType::CreateField (
 			return NULL;
 	}
 
+	m_MemberFieldArray.Append (pField);
 	return pField;
-}
-
-bool
-CClassType::AddMemberNewType (CType* pType)
-{
-	bool Result = pType->CalcLayout ();
-	if (!Result)
-		return false;
-
-	CStructField* pField;
-
-	if (pType->GetTypeKind () != EType_Class)
-	{
-		pField = CreateField (pType);
-	}
-	else
-	{
-		CClassType* pClassType = (CClassType*) pType;
-
-		pField = CreateField (pClassType->GetClassStructType ());
-
-		if (pClassType->GetDestructor ())
-			m_MemberDestructArray.Append (pField);
-	}
-
-	if (!m_FirstMemberNewField)
-		m_FirstMemberNewField = pField;
-
-	return true;
 }
 
 bool
@@ -138,8 +76,8 @@ CClassType::AddMethod (CFunction* pFunction)
 {
 	EStorage StorageKind = pFunction->GetStorageKind ();
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
-	int FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
-	int ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
+	uint_t FunctionKindFlags = GetFunctionKindFlags (FunctionKind);
+	uint_t ThisArgTypeFlags = pFunction->m_ThisArgTypeFlags;
 
 	pFunction->m_pParentNamespace = this;
 
@@ -223,6 +161,12 @@ CClassType::AddMethod (CFunction* pFunction)
 		ppTarget = &m_BinaryOperatorTable [pFunction->GetBinOpKind ()];
 		break;
 
+	case EFunction_AutoEvHandler:
+		if (m_ClassTypeKind == EClassType_AutoEv)
+			return true;
+
+		// else fall through and fail
+
 	default:
 		err::SetFormatStringError (
 			"invalid %s in '%s'", 
@@ -289,212 +233,132 @@ CClassType::AddProperty (CProperty* pProperty)
 		break;
 	}
 
+	m_MemberPropertyArray.Append (pProperty);
 	return true;
-}
-
-bool
-CClassType::AddAutoEv (CAutoEv* pAutoEv)
-{
-	ASSERT (pAutoEv->IsNamed () || (m_Flags & EClassTypeFlag_AutoEv));
-	if (pAutoEv->IsNamed ())
-	{
-		bool Result = AddItem (pAutoEv);
-		if (!Result)
-			return false;
-	}
-
-	pAutoEv->m_pParentNamespace = this;
-
-	EStorage StorageKind = pAutoEv->GetStorageKind ();
-	switch (StorageKind)
-	{
-	case EStorage_Static:
-		break;
-
-	case EStorage_Undefined:
-		pAutoEv->m_StorageKind = EStorage_Member;
-		//and fall through
-
-	case EStorage_Member:
-		m_AutoEvArray.Append (pAutoEv);
-		pAutoEv->m_pParentClassType = this;
-		break;
-
-	default:
-		err::SetFormatStringError ("invalid storage '%s' for autoev member", GetStorageKindString (StorageKind));
-		return false;
-	}
-
-	return true;
-}
-
-CFunction*
-CClassType::CreateMethod (
-	EStorage StorageKind,
-	const rtl::CString& Name,
-	CFunctionType* pShortType
-	)
-{
-	rtl::CString QualifiedName = CreateQualifiedName (Name);
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Named, pShortType);
-	pFunction->m_StorageKind = StorageKind;
-	pFunction->m_Name = Name;
-	pFunction->m_QualifiedName = QualifiedName;
-	pFunction->m_Tag = QualifiedName;
-
-	bool Result = AddMethod (pFunction);
-	if (!Result)
-		return NULL;
-
-	return pFunction;
-}
-
-CFunction*
-CClassType::CreateUnnamedMethod (
-	EStorage StorageKind,
-	EFunction FunctionKind,
-	CFunctionType* pShortType
-	)
-{
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pShortType);
-	pFunction->m_StorageKind = StorageKind;
-	
-	bool Result = AddMethod (pFunction);
-	if (!Result)
-		return NULL;
-
-	return pFunction;
-}
-
-CProperty*
-CClassType::CreateProperty (
-	EStorage StorageKind,
-	const rtl::CString& Name,
-	CPropertyType* pShortType
-	)
-{
-	rtl::CString QualifiedName = CreateQualifiedName (Name);
-
-	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
-
-	bool Result = 
-		AddProperty (pProperty) &&
-		pProperty->Create (pShortType);
-
-	if (!Result)
-		return NULL;
-	
-	return pProperty;
 }
 
 bool
 CClassType::CalcLayout ()
 {
-	if (m_Flags & ETypeFlag_LayoutReady)
-		return true;
+	bool Result;
 
-	bool Result = PreCalcLayout ();
-	if (!Result)
-		return false;
-	
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	// layout base types
+	// resolve imports
 
-	bool HasBaseConstructor = false;
-	bool HasBaseDestructor = false;
-	bool HasMemberDestructor = false;
+	Result = 
+		ResolveImportBaseTypes () &&
+		ResolveImportFields ();
+
+	if (!Result)
+		return false;
+
+	// layout base types
 
 	size_t BaseTypeCount = m_BaseTypeList.GetCount ();
 
 	char Buffer [256];
-	rtl::CArrayT <CBaseType*> IfaceBaseTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	rtl::CArrayT <CBaseTypeSlot*> IfaceBaseTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	IfaceBaseTypeArray.SetCount (BaseTypeCount);
 
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (size_t i = 0; BaseType; i++, BaseType++)
+	rtl::CIteratorT <CBaseTypeSlot> Slot = m_BaseTypeList.GetHead ();
+	for (size_t i = 0; Slot; i++, Slot++)
 	{
-		Result = BaseType->m_pType->CalcLayout ();
+		CBaseTypeSlot* pSlot = *Slot;
+
+		CDerivableType* pType = pSlot->GetType ();
+		Result = pType->EnsureLayout ();
 		if (!Result)
 			return false;
 
-		CClassType* pBaseClassType;
-		CBaseType* pIfaceBaseType;
+		if (pSlot->m_pType->GetConstructor ())
+			m_BaseTypeConstructArray.Append (pSlot);
 
-		EType TypeKind = BaseType->m_pType->GetTypeKind ();
-		switch (TypeKind)
+		if (pSlot->m_pType->GetTypeKind () != EType_Class)
 		{
-		case EType_Class:
-			pBaseClassType = (CClassType*) BaseType->m_pType;
-			pIfaceBaseType = m_pIfaceStructType->AddBaseType (pBaseClassType->GetIfaceStructType ());
-			BaseType->m_VTableIndex = m_VTable.GetCount ();
-			m_VTable.Append (pBaseClassType->m_VTable);
-			m_pVTableStructType->Append (pBaseClassType->m_pVTableStructType);
-
-			if (pBaseClassType->m_pConstructor)
-				HasBaseConstructor = true;
-
-			if (pBaseClassType->m_pDestructor)
-				HasBaseDestructor = true;
-
-			break;
-
-		case EType_Struct:
-		case EType_Union:
-			pIfaceBaseType = m_pIfaceStructType->AddBaseType (BaseType->m_pType);
-			break;
-
-		default:
-			err::SetFormatStringError ("invalid base type '%s'", BaseType->m_pType->GetTypeString ().cc ());
-			return false;
+			IfaceBaseTypeArray [i] = m_pIfaceStructType->AddBaseType (pSlot->m_pType);
+			continue;
 		}
 
-		IfaceBaseTypeArray [i] = pIfaceBaseType;
-	}
+		CClassType* pBaseClassType = (CClassType*) pSlot->m_pType;
+		IfaceBaseTypeArray [i] = m_pIfaceStructType->AddBaseType (pBaseClassType->GetIfaceStructType ());
+		pSlot->m_VTableIndex = m_VTable.GetCount ();
+		m_VTable.Append (pBaseClassType->m_VTable);
+		m_pVTableStructType->Append (pBaseClassType->m_pVTableStructType);
 
-	// scan for member new operators 
+		m_BaseTypePrimeArray.Append (pSlot);
 
-	if (!m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ())
-	{
-		m_pModule->m_NamespaceMgr.OpenNamespace (this);
-
-		Result = ScanInitializersForMemberNewOperators ();
-		if (!Result)
-			return false;
-
-		HasMemberDestructor = !m_MemberDestructArray.IsEmpty ();
-
-		m_pModule->m_NamespaceMgr.CloseNamespace ();
+		if (pBaseClassType->m_pDestructor)
+			m_BaseTypeDestructArray.Append (pBaseClassType);
 	}
 
 	// finalize iface layout
 
-	Result = m_pIfaceStructType->CalcLayout ();
+	Result = m_pIfaceStructType->EnsureLayout ();
 	if (!Result)
 		return false;
 
+	// scan members for constructors & destructors 
+
+	size_t Count = m_MemberFieldArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_MemberFieldArray [i];
+		CType* pType = pField->GetType ();
+		
+		if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
+			m_MemberFieldConstructArray.Append (pField);
+
+		if (pType->GetTypeKind () == EType_Class)
+		{
+			if (pType->GetFlags () & EClassTypeFlag_Abstract)
+			{
+				err::SetFormatStringError ("cannot instantiate abstract '%s'", pType->GetTypeString ().cc ()); 
+				return false;
+			}
+
+			m_MemberPrimeArray.Append (pField);
+
+			if (((CClassType*) pType)->GetDestructor ())
+				m_MemberFieldDestructArray.Append (pField);
+		}
+	}
+
+	Count = m_MemberPropertyArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CProperty* pProperty = m_MemberPropertyArray [i];
+		Result = pProperty->EnsureLayout ();
+		if (!Result)
+			return false;
+
+		if (pProperty->GetConstructor ())
+			m_MemberPropertyConstructArray.Append (pProperty);
+
+		if (pProperty->GetDestructor ())
+			m_MemberPropertyDestructArray.Append (pProperty);
+	}
+
 	// update base type llvm indexes & offsets
 
-	BaseType = m_BaseTypeList.GetHead ();
-	for (size_t i = 0; BaseType; i++, BaseType++)
+	Slot = m_BaseTypeList.GetHead ();
+	for (size_t i = 0; Slot; i++, Slot++)
 	{
-		CBaseType* pIfaceBaseType = IfaceBaseTypeArray [i];
+		CBaseTypeSlot* pSlot = *Slot;
+		CBaseTypeSlot* pIfaceSlot = IfaceBaseTypeArray [i];
 
-		BaseType->m_LlvmIndex = pIfaceBaseType->m_LlvmIndex;
-		BaseType->m_Offset = pIfaceBaseType->m_Offset;
+		Slot->m_LlvmIndex = pIfaceSlot->m_LlvmIndex;
+		Slot->m_Offset = pIfaceSlot->m_Offset;
 	}
 
 	// layout virtual properties
 
-	size_t Count = m_VirtualPropertyArray.GetCount ();
+	Count = m_VirtualPropertyArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CProperty* pProperty = m_VirtualPropertyArray [i];
-		Result = pProperty->CalcLayout ();
-		if (!Result)
-			return false;
+		ASSERT (pProperty->m_StorageKind == EStorage_Abstract || pProperty->m_StorageKind == EStorage_Virtual);
 
 		size_t VTableIndex = m_VTable.GetCount ();
 
@@ -517,7 +381,7 @@ CClassType::CalcLayout ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunction* pFunction = m_VirtualMethodArray [i];
-		ASSERT (pFunction->m_StorageKind == EStorage_Abstract || EStorage_Virtual);
+		ASSERT (pFunction->m_StorageKind == EStorage_Abstract || pFunction->m_StorageKind == EStorage_Virtual);
 
 		AddVirtualFunction (pFunction);
 	}
@@ -533,68 +397,47 @@ CClassType::CalcLayout ()
 			return false;
 	}
 
-	Result = m_pVTableStructType->CalcLayout ();
+	Result = m_pVTableStructType->EnsureLayout ();
 	if (!Result)
 		return false;
 
-	m_pClassStructType->CalcLayout ();
+	m_pClassStructType->EnsureLayout ();
 
 	CreateVTablePtr ();
 
-	if (m_Flags & EClassTypeFlag_AutoEv)
+	if (!m_pPreConstructor && !m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ())
 	{
-		Result = CreateAutoEvConstructor () && CreateDefaultDestructor ();
-		if (!Result)
-			return false;
-	}
-	else
-	{
-		if (!m_pPreConstructor && !m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ())
-		{
-			Result = CreateDefaultPreConstructor ();
-			if (!Result)
-				return false;
-		}
-
-		if (!m_pConstructor && (m_pPreConstructor || HasBaseConstructor))
-		{
-			Result = CreateDefaultConstructor ();
-			if (!Result)
-				return false;
-		}
-
-		if (!m_pDestructor && (!m_AutoEvArray.IsEmpty () || HasBaseDestructor || HasMemberDestructor))
-		{
-			Result = CreateDefaultDestructor ();
-			if (!Result)
-				return false;
-		}
-	}
-
-	PostCalcLayout ();
-	return true;
-}
-
-bool
-CClassType::ScanInitializersForMemberNewOperators ()
-{
-	bool Result;
-
-	size_t Count = m_pIfaceStructType->m_InitializedFieldArray.GetCount ();	
-	for (size_t i = 0; i < Count; i++)
-	{
-		CStructField* pField = m_pIfaceStructType->m_InitializedFieldArray [i];
-
-		CParser Parser;
-		Parser.m_pModule = m_pModule;
-		Parser.m_Stage = CParser::EStage_Pass2;
-		Parser.m_pMemberNewTargetType = this;
-		
-		Result = Parser.ParseTokenList (ESymbol_expression_s, pField->GetInitializer());
+		Result = CreateDefaultMemberMethod (EFunction_PreConstructor);
 		if (!Result)
 			return false;
 	}
 
+	if (!m_pConstructor && 
+		(m_pPreConstructor || 
+		!m_BaseTypeConstructArray.IsEmpty () ||
+		!m_MemberFieldConstructArray.IsEmpty () ||
+		!m_MemberPropertyConstructArray.IsEmpty ()))
+	{
+		Result = CreateDefaultMemberMethod (EFunction_Constructor);
+		if (!Result)
+			return false;
+	}
+
+	if (!m_pDestructor && 
+		(!m_BaseTypeDestructArray.IsEmpty () || 
+		!m_MemberFieldDestructArray.IsEmpty () ||
+		!m_MemberPropertyDestructArray.IsEmpty ()))
+	{
+		Result = CreateDefaultMemberMethod (EFunction_Destructor);
+		if (!Result)
+			return false;
+	}
+
+	if (!(m_Flags & EClassTypeFlag_Abstract))
+		CreatePrimer ();
+
+	m_Size = m_pClassStructType->GetSize ();
+	m_AlignFactor = m_pClassStructType->GetAlignFactor ();
 	return true;
 }
 
@@ -607,7 +450,7 @@ CClassType::AddVirtualFunction (CFunction* pFunction)
 	pFunction->m_pVirtualOriginClassType = this;
 	pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
 
-	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Unsafe);
+	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin, EPtrTypeFlag_Unsafe);
 	m_pVTableStructType->CreateField (pPointerType);
 	m_VTable.Append (pFunction);
 }
@@ -712,7 +555,7 @@ CClassType::CreateVTablePtr ()
 {
 	if (m_VTable.IsEmpty ())
 	{
-		m_VTablePtrValue = m_pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe)->GetZeroValue ();
+		m_VTablePtrValue = m_pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetZeroValue ();
 		return;
 	}
 
@@ -752,171 +595,95 @@ CClassType::CreateVTablePtr ()
 
 	m_VTablePtrValue.SetLlvmValue (
 		pLlvmVTableVariable, 
-		m_pVTableStructType->GetDataPtrType (EDataPtrType_Unsafe),
+		m_pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
 		EValue_Const
 		);
 }
 
 bool
-CClassType::CreateAutoEvConstructor ()
+CClassType::Compile ()
 {
-	ASSERT (!m_pConstructor && m_AutoEvArray.GetCount () == 1);
+	bool Result;
 
-	CAutoEv* pAutoEv = m_AutoEvArray [0];
-	CFunction* pStarter = pAutoEv->GetStarter ();
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pStarter->GetType ());
-	pFunction->m_Tag = m_Tag + ".this";
-
-	size_t ArgCount = pStarter->GetType ()->GetArgArray ().GetCount ();
-	
-	char Buffer [256];
-	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgValueArray.SetCount (ArgCount);
-
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, ArgCount);
-
-	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall (
-		pStarter, 
-		pStarter->GetType (), 
-		ArgValueArray, 
-		ArgCount,
-		&ReturnValue
-		);
-
-	m_pModule->m_FunctionMgr.InternalEpilogue ();
-
-	m_pConstructor = pFunction;
-	return true;
-}
-
-bool
-CClassType::CreateDefaultPreConstructor ()
-{
-	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_PreConstructor, pType);
-	pFunction->m_StorageKind = EStorage_Member;
-	
-	bool Result = AddMethod (pFunction);
-	if (!Result)
-		return false;
-
-	m_pModule->m_FunctionMgr.m_DefaultPreConstructorTypeArray.Append (this);
-	return true;
-}
-
-bool
-CClassType::CreateDefaultConstructor ()
-{
-	ASSERT (!m_pConstructor);
-
-	CType* ArgTypeArray [] =
+	if (m_pPreConstructor && !(m_pPreConstructor->GetFlags () & EModuleItemFlag_User))
 	{
-		GetClassPtrType ()
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pType);
-	pFunction->m_Tag = m_Tag + ".this";
-
-	CValue ArgValue;
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
-
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		if (BaseType->m_pType->GetTypeKind () != EType_Class)
-			continue;
-
-		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
-		if (!pBaseClassType->GetConstructor ())
-			continue;
-
-		CFunction* pConstructor = pBaseClassType->GetDefaultConstructor ();
-		if (!pConstructor)
-			return false;
-
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ArgValue);
+		Result = CompileDefaultPreConstructor ();
 		if (!Result)
 			return false;
 	}
 
-	if (m_pPreConstructor)
+	if (m_pConstructor && !(m_pConstructor->GetFlags () & EModuleItemFlag_User))
 	{
-		CValue ReturnValue;
-		m_pModule->m_LlvmBuilder.CreateCall (
-			m_pPreConstructor, 
-			m_pPreConstructor->GetType (), 
-			ArgValue, 
-			&ReturnValue
-			);
+		Result = CompileDefaultConstructor ();
+		if (!Result)
+			return false;
 	}
 
-	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	if (m_pDestructor && !(m_pDestructor->GetFlags () & EModuleItemFlag_User))
+	{
+		Result = CompileDefaultDestructor ();
+		if (!Result)
+			return false;
+	}
 
-	m_pConstructor = pFunction;
+	if (m_pPrimer)
+	{
+		Result = CompilePrimer ();
+		if (!Result)
+			return false;
+	}
+
 	return true;
 }
 
 bool
-CClassType::CreateDefaultDestructor ()
+CClassType::CompileDefaultPreConstructor ()
 {
-	ASSERT (!m_pDestructor);
+	ASSERT (m_pPreConstructor);
 
 	bool Result;
 
-	CType* ArgTypeArray [] =
-	{
-		GetClassPtrType ()
-	};
+	CValue ThisValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pPreConstructor, &ThisValue, 1);
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Destructor, pType);
-	pFunction->m_Tag = m_Tag + ".~this";
-		
+	Result = m_pIfaceStructType->InitializeFields (ThisValue);
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+bool
+CClassType::CompileDefaultDestructor ()
+{
+	ASSERT (m_pDestructor);
+
+	bool Result;
+	
 	CValue ArgValue;
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, &ArgValue, 1);
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pDestructor, &ArgValue, 1);
 
 	Result = 
-		StopAutoEvs (ArgValue) &&
-		CallMemberNewDestructors (ArgValue) &&
-		CallBaseDestructors (ArgValue);
+		CallMemberPropertyDestructors (ArgValue) &&
+		CallMemberFieldDestructors (ArgValue) &&
+		CallBaseTypeDestructors (ArgValue);
 
 	if (!Result)
 		return false;
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
-
-	m_pDestructor = pFunction;
 	return true;
 }
 
 bool
-CClassType::CallMemberNewDestructors (const CValue& ThisValue)
+CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 {
 	bool Result;
 
-	if (m_MemberDestructArray.IsEmpty ())
-		return true;
+	// TODO: only call member field destructors if class is allocated on stack
 
-	CValue FlagsValue;
-
-	size_t Count = m_MemberDestructArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CStructField* pField = m_MemberDestructArray [i];
-		ASSERT (pField->GetType ()->GetTypeKind () == EType_Struct && ((CStructType*) pField->GetType ())->IsClassStructType ());
-
-		CClassType* pClassType = (CClassType*) ((CStructType*) pField->GetType ())->GetParentNamespace ();				
-		CFunction* pDestructor = pClassType->GetDestructor ();
-		ASSERT (pDestructor);
-
-		CValue FieldValue;
-		Result = m_pModule->m_OperatorMgr.GetClassField (ThisValue, pField, NULL, &FieldValue);
-		if (!Result)
-			return false;
-
+/*
 		static int32_t LlvmIndexArray [] = 
 		{
 			0, // TObjectHdr**
@@ -932,11 +699,45 @@ CClassType::CallMemberNewDestructors (const CValue& ThisValue)
 			NULL, 
 			&FlagsValue
 			);
+*/
 
-		CValue IfaceValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (FieldValue, 1, pDestructor->GetThisArgType (), &IfaceValue);
+	size_t Count = m_MemberFieldDestructArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_MemberFieldDestructArray [i];
+		CType* pType = pField->GetType ();
 
-		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, IfaceValue);
+		ASSERT (pType->GetTypeKind () == EType_Class);
+
+		CFunction* pDestructor = ((CClassType*) pType)->GetDestructor ();
+		ASSERT (pDestructor);
+
+		CValue FieldValue;
+		Result = 
+			m_pModule->m_OperatorMgr.GetClassField (ThisValue, pField, NULL, &FieldValue) &&
+			m_pModule->m_OperatorMgr.CallOperator (pDestructor, FieldValue);
+
+		if (!Result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
+CClassType::CallMemberPropertyDestructors (const CValue& ThisValue)
+{
+	bool Result;
+
+	size_t Count = m_MemberPropertyDestructArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CProperty* pProperty = m_MemberPropertyDestructArray [i];
+
+		CFunction* pDestructor = pProperty->GetDestructor ();
+		ASSERT (pDestructor);
+
+		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
 		if (!Result)
 			return false;				
 	}
@@ -945,20 +746,16 @@ CClassType::CallMemberNewDestructors (const CValue& ThisValue)
 }
 
 bool
-CClassType::CallBaseDestructors (const CValue& ThisValue)
+CClassType::CallBaseTypeDestructors (const CValue& ThisValue)
 {
 	bool Result;
 
-	rtl::CIteratorT <CBaseType> BaseType = m_BaseTypeList.GetHead ();
-	for (; BaseType; BaseType++)
+	size_t Count = m_BaseTypeDestructArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
 	{
-		if (BaseType->m_pType->GetTypeKind () != EType_Class)
-			continue;
-
-		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+		CClassType* pBaseClassType = m_BaseTypeDestructArray [i];
 		CFunction* pDestructor = pBaseClassType->GetDestructor ();		
-		if (!pDestructor)
-			continue;
+		ASSERT (pDestructor);
 
 		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
 		if (!Result)
@@ -968,46 +765,30 @@ CClassType::CallBaseDestructors (const CValue& ThisValue)
 	return true;
 }
 
-bool 
-CClassType::StopAutoEvs (const CValue& ThisValue)
+void
+CClassType::CreatePrimer ()
 {
-	bool Result;
-
-	size_t AutoEvCount = m_AutoEvArray.GetCount ();
-	for (size_t i = 0; i < AutoEvCount; i++)
-	{
-		CAutoEv* pAutoEv = m_AutoEvArray [i];
-
-		CFunction* pStopper = pAutoEv->GetStopper ();		
-		if (!pStopper)
-			continue;
-
-		Result = m_pModule->m_OperatorMgr.CallOperator (pStopper, ThisValue);
-		if (!Result)
-			return false;			
-	}
-
-	return true;
-}
-
-CFunction* 
-CClassType::GetInitializer ()
-{
-	if (m_pInitializer)
-		return m_pInitializer;
-
 	CType* ArgTypeArray [] =
 	{
-		GetClassStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
+		GetClassStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction (m_Tag + ".init", pType);
+	m_pPrimer = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Primer, pType);
+	m_pPrimer->m_Tag = m_Tag + ".prime";
 
-	CValue ArgValueArray [countof (ArgTypeArray)];
-	m_pModule->m_FunctionMgr.InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+	m_pModule->MarkForCompile (this);
+}
+
+bool
+CClassType::CompilePrimer ()
+{
+	ASSERT (m_pPrimer);
+
+	CValue ArgValueArray [3];
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pPrimer, ArgValueArray, countof (ArgValueArray));
 
 	CValue ArgValue1 = ArgValueArray [0];
 	CValue ArgValue2 = ArgValueArray [1];
@@ -1021,6 +802,10 @@ CClassType::GetInitializer ()
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 0, NULL, &ObjectPtrValue);
 	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 1, NULL, &IfacePtrValue);
+
+	// zero memory
+
+	m_pModule->m_LlvmBuilder.CreateStore (GetZeroValue (), ArgValue1);
 
 	// store CClassType*
 
@@ -1037,16 +822,44 @@ CClassType::GetInitializer ()
 	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ArgValue3, PtrValue);
 
-	InitializeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
+	PrimeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
+
+	// prime members fields
+
+	size_t Count = pClassType->m_MemberPrimeArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = pClassType->m_MemberPrimeArray [i];
+		
+		ASSERT (pField->m_pType->GetTypeKind () == EType_Class);
+		CClassType* pClassType = (CClassType*) pField->m_pType;
+
+		CValue FieldValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (
+			IfacePtrValue, 
+			pField->GetLlvmIndex (), 
+			pClassType->GetClassStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe), 
+			&FieldValue
+			);		
+
+		CFunction* pPrimer = pClassType->GetPrimer ();
+		ASSERT (pPrimer); // should have been checked during CalcLayout
+
+		rtl::CBoxListT <CValue> ArgList;
+		ArgList.InsertTail (FieldValue);
+		ArgList.InsertTail (ArgValue2);
+		ArgList.InsertTail (ArgValue3);
+
+		bool Result = m_pModule->m_OperatorMgr.CallOperator (pPrimer, &ArgList);
+		ASSERT (Result);
+	}
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
-
-	m_pInitializer = pFunction;
-	return m_pInitializer;
+	return true;
 }
 
 bool
-CClassType::InitializeInterface (
+CClassType::PrimeInterface (
 	CClassType* pClassType,
 	const CValue& ObjectPtrValue,
 	const CValue& IfacePtrValue,
@@ -1063,18 +876,20 @@ CClassType::InitializeInterface (
 	m_pModule->m_LlvmBuilder.CreateStore (VTablePtrValue, VTablePtrPtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (ObjectPtrValue, ObjectPtrPtrValue);
 
-	rtl::CIteratorT <CBaseType> BaseType = pClassType->GetBaseTypeList ().GetHead ();
-	for (; BaseType; BaseType++)
-	{
-		if (BaseType->m_pType->GetTypeKind () != EType_Class)
-			continue;
+	// prime base types
 
-		CClassType* pBaseClassType = (CClassType*) BaseType->m_pType;
+	size_t Count = pClassType->m_BaseTypePrimeArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CBaseTypeSlot* pSlot = pClassType->m_BaseTypePrimeArray [i];
+		ASSERT (pSlot->m_pType->GetTypeKind () == EType_Class);
+
+		CClassType* pBaseClassType = (CClassType*) pSlot->m_pType;
 
 		CValue BaseClassPtrValue;
 		m_pModule->m_LlvmBuilder.CreateGep2 (
 			IfacePtrValue, 
-			BaseType->GetLlvmIndex (), 
+			pSlot->GetLlvmIndex (), 
 			NULL, 
 			&BaseClassPtrValue
 			);
@@ -1083,25 +898,25 @@ CClassType::InitializeInterface (
 
 		if (!pBaseClassType->HasVTable ())
 		{
-			BaseClassVTablePtrValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe)->GetZeroValue ();
+			BaseClassVTablePtrValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetZeroValue ();
 		}
 		else
 		{
 			m_pModule->m_LlvmBuilder.CreateGep2 (
 				VTablePtrValue, 
-				BaseType->GetVTableIndex (), 
+				pSlot->GetVTableIndex (), 
 				NULL, 
 				&BaseClassVTablePtrValue
 				);
 
 			m_pModule->m_LlvmBuilder.CreateBitCast (
 				BaseClassVTablePtrValue, 
-				pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe),
+				pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
 				&BaseClassVTablePtrValue
 				);
 		}		
 
-		InitializeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
+		PrimeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
 	}
 
 	return true;

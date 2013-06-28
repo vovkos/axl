@@ -15,45 +15,28 @@ class CUnionType;
 
 //.............................................................................
 
-enum EStdField
-{
-	EStdField_OnChange = 0,
-	EStdField_Value,
-	EStdField__Count
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const char* 
-GetStdFieldString (EStdField Field);
-
-//.............................................................................
-
 class CStructField: public CUserModuleItem
 {
+	friend class CDerivableType;
+	friend class CProperty;
 	friend class CStructType;
 	friend class CUnionType;
+	friend class CClassType;
 	
 protected:
-	CDerivableType* m_pParentType; // struct or union
 	CType* m_pType;
-	int m_PtrTypeFlags;
+	CImportType* m_pType_i;
+	uint_t m_PtrTypeFlags;
+	rtl::CBoxListT <CToken> m_Constructor;
 	rtl::CBoxListT <CToken> m_Initializer;
 
 	CType* m_pBitFieldBaseType;
-	size_t m_BitCount;
-	
+	size_t m_BitCount;	
 	size_t m_Offset;
 	uint_t m_LlvmIndex;
 
 public:
 	CStructField ();
-
-	CDerivableType*
-	GetParentType ()
-	{
-		return m_pParentType;
-	}
 
 	CType*
 	GetType ()
@@ -61,10 +44,22 @@ public:
 		return m_pType;
 	}
 
+	CImportType*
+	GetType_i ()
+	{
+		return m_pType_i;
+	}
+
 	int
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
+	}
+
+	rtl::CConstBoxListT <CToken> 
+	GetConstructor ()
+	{
+		return m_Constructor;
 	}
 
 	rtl::CConstBoxListT <CToken> 
@@ -88,15 +83,25 @@ public:
 
 //.............................................................................
 
+enum EStructType
+{
+	EStructType_Normal,
+	EStructType_IfaceStruct,
+	EStructType_ClassStruct,
+	EStructType_UnionStruct,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CStructType: public CDerivableType
 {
 	friend class CTypeMgr;
 	friend class CClassType;
 	friend class CProperty;
-	friend class CAutoEv;
 
 protected:
-	size_t m_AlignFactor;
+	EStructType m_StructTypeKind;
+
 	size_t m_PackFactor;
 	size_t m_FieldActualSize;
 	size_t m_FieldAlignedSize;
@@ -111,11 +116,10 @@ protected:
 public:
 	CStructType ();
 
-	virtual
-	size_t 
-	GetAlignFactor ()
+	EStructType 
+	GetStructTypeKind ()
 	{
-		return m_AlignFactor;
+		return m_StructTypeKind;
 	}
 
 	size_t 
@@ -142,8 +146,12 @@ public:
 		return m_FieldList;
 	}
 
+	virtual
 	CStructField*
-	GetFieldByIndex (size_t Index);
+	GetFieldByIndex (size_t Index)
+	{
+		return GetFieldByIndexImpl (Index, false);
+	}
 
 	rtl::CArrayT <CStructField*> 
 	GetInitializedFieldArray ()
@@ -152,41 +160,27 @@ public:
 	}
 
 	bool
-	IsClassStructType ();
-
-	CStructField*
-	CreateField (
-		const rtl::CString& Name,
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0,
-		rtl::CBoxListT <CToken>* pInitializer = NULL
-		);
-
-	CStructField*
-	CreateField (
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
-	}
+	Append (CStructType* pType);
 
 	bool
-	Append (CStructType* pType);
+	InitializeFields (const CValue& ThisValue);
 
 	virtual
 	bool
-	CalcLayout ();
-
-	bool
-	CallBaseTypeConstructors ();
-
-	bool
-	InitializeFields ();
+	Compile ();
 
 protected:
+	virtual
+	CStructField*
+	CreateFieldImpl (
+		const rtl::CString& Name,
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
 	virtual 
 	void
 	PrepareTypeString ()
@@ -200,6 +194,19 @@ protected:
 	{
 		m_pLlvmType = llvm::StructType::create (llvm::getGlobalContext (), m_Tag.cc ());
 	}
+
+	virtual
+	bool
+	CalcLayout ();
+
+	bool
+	CompileDefaultPreConstructor ();
+
+	CStructField*
+	GetFieldByIndexImpl (
+		size_t Index,
+		bool IgnoreBaseTypes
+		);
 
 	bool
 	LayoutField (

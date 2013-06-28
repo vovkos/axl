@@ -24,9 +24,9 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		"function",                    // EModuleItem_Function,
 		"property",                    // EModuleItem_Property,
 		"property-template",           // EModuleItem_PropertyTemplate,
-		"autoev",                      // EModuleItem_AutoEv,
 		"enum-member",                 // EModuleItem_EnumConst,
 		"struct-member",               // EModuleItem_StructField,
+		"base-type-slot",              // EModuleItem_BaseTypeSlot,
 	};
 
 	return (size_t) ItemKind < EModuleItem__Count ? 
@@ -53,6 +53,9 @@ GetStorageKindString (EStorage StorageKind)
 		"abstract",                 // EStorage_Abstract,
 		"virtual",                  // EStorage_Virtual,
 		"override",                 // EStorage_Override,
+		"mutable",                  // EStorage_Mutable,		
+		"nullable",                 // EStorage_Nullable,
+		"this",                     // EStorage_This,
 	};
 
 	return (size_t) StorageKind < EStorage__Count ? 
@@ -87,13 +90,41 @@ CModuleItemDecl::CModuleItemDecl ()
 	m_pAttributeBlock = NULL;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 CModuleItem::CModuleItem ()
 {
 	m_pModule = NULL;
 	m_ItemKind = EModuleItem_Undefined;
+	m_Flags = 0;
 	m_pItemDecl = NULL;
+}
+
+bool
+CModuleItem::EnsureLayout ()
+{
+	bool Result;
+
+	if (m_Flags & EModuleItemFlag_LayoutReady)
+		return true;
+		
+	if (m_Flags & EModuleItemFlag_InCalcLayout)
+	{
+		err::SetFormatStringError ("can't calculate layout of '%s' due to recursion", m_Tag.cc ());
+		return false;
+	}
+
+	m_Flags |= EModuleItemFlag_InCalcLayout;
+	
+	Result = CalcLayout ();
+	
+	m_Flags &= ~EModuleItemFlag_InCalcLayout;
+
+	if (!Result)
+		return false;
+
+	m_Flags |= EModuleItemFlag_LayoutReady;
+	return true;
 }
 
 //.............................................................................

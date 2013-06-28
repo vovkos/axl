@@ -199,7 +199,7 @@ CControlFlowMgr::RestoreScopeLevel ()
 	if (!ScopeLevelValue)
 		return;
 
-	m_pModule->m_LlvmBuilder.CreateComment ("restore scope level before return");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "restore scope level before return");
 	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
 }
 

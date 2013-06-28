@@ -9,8 +9,6 @@
 namespace axl {
 namespace jnc {
 
-class CBaseTypeCoord;
-
 //.............................................................................
 
 class CCast_Struct: public ICastOperator

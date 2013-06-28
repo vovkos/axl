@@ -46,12 +46,6 @@ Members
 		EAssign_Normal,
 		EAssign_BinOp,
 	};
-	
-	struct TAutoEvHandler: rtl::TListLink
-	{
-		rtl::CBoxListT <CValue> m_BindSiteList;
-		CFunction* m_pFunction;
-	};
 
 	struct TCurlyInitializer
 	{
@@ -70,13 +64,22 @@ Members
 	CAttributeBlock* m_pAttributeBlock;
 	CModuleItem* m_pLastDeclaredItem;
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
+	
+	CAutoEvClassType* m_pAutoEvType;
 	rtl::CStdListT <TAutoEvHandler> m_AutoEvHandlerList;
 	rtl::CBoxListT <CValue> m_AutoEvBindSiteList;
 	size_t m_AutoEvBindSiteCount;
 	size_t m_AutoEvBindSiteTotalCount;
-	CValue m_ExpressionValue;
+	
+	CDerivableType* m_pConstructorType;
+	CProperty* m_pConstructorProperty;
+
 	CValue m_CurlyInitializerTargetValue;
-	CClassType* m_pMemberNewTargetType;
+
+	// saved attributes
+
+	CValue m_ExpressionValue;
+	rtl::CBoxListT <CValue> m_ExpressionValueList;
 }
 
 Members2
@@ -118,10 +121,9 @@ Members2
 	}
 
 	bool 
-	IsAutoEvStarter ()
+	IsAutoEv ()
 	{
-		CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-		return pFunction && pFunction->GetFunctionKind () == EFunction_AutoEvStarter;
+		return m_pAutoEvType != NULL;
 	}
 
 	bool
@@ -157,10 +159,7 @@ Members2
 		);
 
 	bool
-	Declare (
-		CDeclarator* pDeclarator,
-		rtl::CBoxListT <CToken>* pInitializer = NULL
-		);
+	Declare (CDeclarator* pDeclarator);
 		
 	bool
 	DeclareTypedef (
@@ -171,8 +170,7 @@ Members2
 	bool
 	DeclareAlias (
 		CType* pType,
-		CDeclarator* pDeclarator,
-		rtl::CBoxListT <CToken>* pInitializer
+		CDeclarator* pDeclarator
 		);
 
 	bool
@@ -184,41 +182,35 @@ Members2
 	bool
 	DeclareProperty (
 		CPropertyType* pType,
-		CDeclarator* pDeclarator
-		);
-
-	bool
-	DeclareAutoEv (
-		CAutoEvType* pType,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		uint_t PropertyFlags
 		);
 
 	bool
 	DeclareData (
 		CType* pType,
 		CDeclarator* pDeclarator,
-		int PtrTypeFlags,
-		rtl::CBoxListT <CToken>* pInitializer
+		uint_t PtrTypeFlags
+		);
+
+	bool
+	DeclareAutoEv (
+		CAutoEvClassType* pType,
+		CDeclarator* pDeclarator,
+		uint_t PtrTypeFlags
 		);
 
 	bool
 	DeclarePropValue (
 		CType* pType,
-		int PtrTypeFlags,
-		rtl::CBoxListT <CToken>* pInitializer
-		);
-
-	bool
-	DeclareOnChange (
-		CType* pType,
-		int PtrTypeFlags
+		CDeclarator* pDeclarator,
+		uint_t PtrTypeFlags
 		);
 
 	CFunctionArg*
 	CreateFormalArg (
 		CDeclFunctionSuffix* pArgSuffix,
-		CDeclarator* pDeclarator,
-		rtl::CBoxListT <CToken>* pInitializer
+		CDeclarator* pDeclarator
 		);
 
 	CEnumType*
@@ -248,19 +240,11 @@ Members2
 	CProperty*
 	CreateProperty (
 		const rtl::CString& Name,
-		const CToken::CPos& Pos,
-		size_t PackFactor
+		const CToken::CPos& Pos
 		);
 
 	CPropertyTemplate*
 	CreatePropertyTemplate ();
-
-	CClassType*
-	CreateAutoEvClassType (
-		const rtl::CString& Name,
-		CDeclFunctionSuffix* pFunctionSuffix,
-		rtl::CBoxListT <CToken>* pTokenList
-		);
 
 	bool
 	NewOperator_s (
@@ -275,14 +259,38 @@ Members2
 	bool
 	FinalizeAutoEvOnChangeClause ();
 
-	void
-	FinalizeAutoEvOnChangeStmt ();
+	bool
+	FinalizeAutoEvOnChangeStmt ()
+	{
+		return m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
+	}
 
 	bool
 	AutoEvExpressionStmt (rtl::CBoxListT <CToken>* pTokenList);
 
 	bool
 	CountAutoEvBindSites ();
+
+	bool
+	CallBaseTypeMemberConstructor (
+		const CQualifiedName& Name,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	CallBaseTypeConstructor (
+		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	CallFieldConstructor (
+		CStructField* pField,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	FinalizeBaseTypeMemberConstructBlock ();
 
 	bool
 	SetFunctionBody (rtl::CBoxListT <CToken>* pBody);
@@ -309,16 +317,16 @@ Members2
 	GetThisValueType (CValue* pValue);
 
 	bool
-	GetStdField (
-		CValue* pValue,
-		EStdField Field
-		);
+	GetPropValue (CValue* pValue);
 
 	bool
-	GetStdFieldType (
-		CValue* pValue,
-		EStdField Field
-		);
+	GetPropValueType (CValue* pValue);
+
+	bool
+	GetOnChange (CValue* pValue);
+
+	bool
+	GetOnChangeType (CValue* pValue);
 
 	void
 	PreStatement ();

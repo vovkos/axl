@@ -109,7 +109,7 @@ protected:
 	size_t m_ReadAheadSize;
 	size_t m_MaxDynamicViewCount;
 
-	int m_FileFlags;
+	uint_t m_FileFlags;
 	uint64_t m_FileSize;
 
 public:

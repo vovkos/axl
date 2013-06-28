@@ -5,6 +5,8 @@
 #pragma once
 
 #include "axl_jnc_NamedType.h"
+#include "axl_jnc_ImportType.h"
+#include "axl_jnc_Function.h"
 
 namespace axl {
 namespace jnc {
@@ -17,14 +19,7 @@ class CProperty;
 
 //.............................................................................
 
-enum EBaseTypeFlag
-{
-	EBaseTypeFlag_Constructed = 1
-};
-
-//.............................................................................
-
-class CBaseType: public rtl::TListLink
+class CBaseTypeSlot: public CUserModuleItem
 {
 	friend class CDerivableType;
 	friend class CStructType;
@@ -32,16 +27,16 @@ class CBaseType: public rtl::TListLink
 
 protected:
 	CDerivableType* m_pType;
+	CImportType* m_pType_i;
 
-	int m_Flags;
 	size_t m_Offset;
 	size_t m_VTableIndex;
 	uint_t m_LlvmIndex;
 
 public:
-	CBaseType ();
+	CBaseTypeSlot ();
 
-	int 
+	uint_t
 	GetFlags ()
 	{
 		return m_Flags;
@@ -51,6 +46,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	CImportType*
+	GetType_i ()
+	{
+		return m_pType_i;
 	}
 
 	size_t 
@@ -70,12 +71,6 @@ public:
 	{
 		return m_LlvmIndex;
 	}
-	
-	void
-	MarkConstructed ()
-	{
-		m_Flags |= EBaseTypeFlag_Constructed;
-	}
 };
 
 //.............................................................................
@@ -90,6 +85,7 @@ public:
 	size_t m_Offset;
 	rtl::CArrayT <int32_t> m_LlvmIndexArray;
 	size_t m_VTableIndex;
+	size_t m_ParentNamespaceLevel;
 
 public:
 	CBaseTypeCoord ()
@@ -113,16 +109,34 @@ protected:
 class CDerivableType: public CNamedType
 {
 protected:
-	rtl::CStringHashTableMapAT <CBaseType*> m_BaseTypeMap;
-	rtl::CStdListT <CBaseType> m_BaseTypeList;
+	// base types
+
+	rtl::CStringHashTableMapAT <CBaseTypeSlot*> m_BaseTypeMap;
+	rtl::CStdListT <CBaseTypeSlot> m_BaseTypeList;
+	rtl::CArrayT <CBaseTypeSlot*> m_ImportBaseTypeArray;
+
+	// members
+
+	rtl::CArrayT <CStructField*> m_MemberFieldArray;
+	rtl::CArrayT <CFunction*> m_MemberMethodArray;
+	rtl::CArrayT <CProperty*> m_MemberPropertyArray;
+	rtl::CArrayT <CStructField*> m_ImportFieldArray;
 	
 	// construction
 
+	CFunction* m_pPreConstructor;
 	CFunction* m_pConstructor;
+	CFunction* m_pDefaultConstructor;
 	CFunction* m_pStaticConstructor;
 	CFunction* m_pStaticDestructor;
 
 	CVariable* m_pStaticConstructorFlag; // 'once' semantics
+
+	// construct arrays
+
+	rtl::CArrayT <CBaseTypeSlot*> m_BaseTypeConstructArray;
+	rtl::CArrayT <CStructField*> m_MemberFieldConstructArray;
+	rtl::CArrayT <CProperty*> m_MemberPropertyConstructArray;
 
 	// overloaded operators
 
@@ -133,19 +147,19 @@ protected:
 public:
 	CDerivableType ();
 
-	rtl::CConstListT <CBaseType>
+	rtl::CConstListT <CBaseTypeSlot>
 	GetBaseTypeList ()
 	{
 		return m_BaseTypeList;
 	}
 
-	CBaseType*
-	AddBaseType (CDerivableType* pType);
+	CBaseTypeSlot*
+	AddBaseType (CType* pType);
 
-	CBaseType*
+	CBaseTypeSlot*
 	FindBaseType (CType* pType)
 	{
-		rtl::CStringHashTableMapIteratorAT <CBaseType*> It = m_BaseTypeMap.Find (pType->GetSignature ());
+		rtl::CStringHashTableMapIteratorAT <CBaseTypeSlot*> It = m_BaseTypeMap.Find (pType->GetSignature ());
 		return It ? It->m_Value : NULL;
 	}
 
@@ -158,14 +172,47 @@ public:
 		return FindBaseTypeTraverseImpl (pType, pCoord, 0);
 	}
 
-	void
-	ClearAllBaseTypeConstructedFlags ();
+	rtl::CArrayT <CStructField*> 
+	GetMemberFieldArray ()
+	{
+		return m_MemberFieldArray;
+	}
+
+	rtl::CArrayT <CFunction*>
+	GetMemberMethodArray ()
+	{
+		return m_MemberMethodArray;
+	}
+
+	rtl::CArrayT <CProperty*>
+	GetMemberPropertyArray ()
+	{
+		return m_MemberPropertyArray;
+	}
+	
+	bool
+	CallBaseTypeConstructors (const CValue& ThisValue);
+
+	bool
+	CallMemberFieldConstructors (const CValue& ThisValue);
+
+	bool
+	CallMemberPropertyConstructors (const CValue& ThisValue);
+
+	CFunction* 
+	GetPreConstructor ()
+	{
+		return m_pPreConstructor;
+	}
 
 	CFunction* 
 	GetConstructor ()
 	{
 		return m_pConstructor;
 	}
+
+	CFunction* 
+	GetDefaultConstructor ();
 
 	CFunction* 
 	GetStaticConstructor ()
@@ -179,15 +226,88 @@ public:
 		return m_pStaticDestructor;
 	}
 
+	virtual
+	CStructField*
+	GetFieldByIndex (size_t Index) = 0;
+
+	CStructField*
+	CreateField (
+		const rtl::CString& Name,
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		)
+	{
+		return CreateFieldImpl (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
+	}
+
+	CStructField*
+	CreateField (
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0
+		)
+	{
+		return CreateFieldImpl (rtl::CString (), pType, BitCount, PtrTypeFlags);
+	}
+
+	CFunction*
+	CreateMethod (
+		EStorage StorageKind,
+		const rtl::CString& Name,
+		CFunctionType* pShortType
+		);
+
+	CFunction*
+	CreateUnnamedMethod (
+		EStorage StorageKind,
+		EFunction FunctionKind,
+		CFunctionType* pShortType
+		);
+
+	CProperty*
+	CreateProperty (
+		EStorage StorageKind,
+		const rtl::CString& Name,
+		CPropertyType* pShortType
+		);
+
+	virtual
 	bool
 	AddMethod (CFunction* pFunction);
 
+	virtual
 	bool
 	AddProperty (CProperty* pProperty);
 
 protected:
+	virtual
+	CStructField*
+	CreateFieldImpl (
+		const rtl::CString& Name,
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		) = 0;
+
 	bool
-	CreateDefaultConstructor ();
+	ResolveImportBaseType (CBaseTypeSlot* pSlot);
+
+	bool
+	ResolveImportBaseTypes ();
+
+	bool
+	ResolveImportFields ();
+
+	bool
+	CreateDefaultMemberMethod (EFunction FunctionKind);
+
+	bool
+	CompileDefaultConstructor ();
 
 	bool
 	FindBaseTypeTraverseImpl (

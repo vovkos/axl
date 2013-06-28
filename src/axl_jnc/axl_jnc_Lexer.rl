@@ -73,7 +73,6 @@ main := |*
 'stack'        { CreateToken (EToken_Stack); };
 'heap'         { CreateToken (EToken_Heap); };
 'uheap'        { CreateToken (EToken_UHeap); };
-'member'       { CreateToken (EToken_Member); };
 'abstract'     { CreateToken (EToken_Abstract); };
 'virtual'      { CreateToken (EToken_Virtual); };
 'override'     { CreateToken (EToken_Override); };
@@ -149,9 +148,11 @@ main := |*
 'set'          { CreateToken (EToken_Set); };
 'this'         { CreateToken (EToken_This); };
 'preconstruct' { CreateToken (EToken_PreConstruct); };
+'construct'    { CreateToken (EToken_Construct); };
+'destruct'     { CreateToken (EToken_Destruct); };
 'operator'     { CreateToken (EToken_Operator); };
 'postfix'      { CreateToken (EToken_Postfix); };
-'value'        { CreateToken (EToken_Value); };
+'propvalue'    { CreateToken (EToken_PropValue); };
 'onchange'     { CreateToken (EToken_OnChange); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -204,7 +205,7 @@ main := |*
 '!='           { CreateToken (EToken_Ne); };
 '<='           { CreateToken (EToken_Le); };
 '>='           { CreateToken (EToken_Ge); };	
-':='           { CreateToken (EToken_ClassAssign); };	
+':='           { CreateToken (EToken_RefAssign); };	
 '+='           { CreateToken (EToken_AddAssign); };
 '-='           { CreateToken (EToken_SubAssign); };
 '*='           { CreateToken (EToken_MulAssign); };

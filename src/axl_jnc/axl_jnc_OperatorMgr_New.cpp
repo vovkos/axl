@@ -9,137 +9,6 @@ namespace jnc {
 //.............................................................................
 
 bool
-COperatorMgr::InitializeObject (
-	EStorage StorageKind,
-	const CValue& ObjPtrValue,
-	CClassType* pClassType,
-	rtl::CBoxListT <CValue>* pArgList,
-	CValue* pResultValue
-	)
-{
-	uint_t Flags = EObjectFlag_Alive;
-	switch (StorageKind)
-	{
-	case EStorage_Static:
-		Flags |= EObjectFlag_Static;
-		break;
-
-	case EStorage_Stack:
-		Flags |= EObjectFlag_Stack;
-		break;
-
-	case EStorage_UHeap:
-		Flags |= EObjectFlag_UHeap;
-		break;
-	}
-
-	if (pClassType->GetFlags () & EClassTypeFlag_Abstract)
-	{
-		err::SetFormatStringError ("cannot instantiate abstract '%s'", pClassType->GetTypeString ().cc ()); 
-		return false;
-	}
-
-	CValue ScopeLevelValue;
-
-	if (StorageKind == EStorage_Stack)
-		ScopeLevelValue = CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope ());
-	else
-		ScopeLevelValue.SetConstSizeT (0);
-
-	m_pModule->m_LlvmBuilder.CreateComment ("initialize object");
-		
-	CFunction* pInializer = pClassType->GetInitializer ();
-	m_pModule->m_LlvmBuilder.CreateCall3 (
-		pInializer,
-		pInializer->GetType (),
-		ObjPtrValue,
-		ScopeLevelValue,
-		CValue (Flags, EType_Int_p),
-		NULL
-		);
-
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
-
-	CFunction* pConstructor = pClassType->GetConstructor ();
-	if (!pConstructor)
-	{
-		if (pArgList && !pArgList->IsEmpty ())
-		{
-			err::SetFormatStringError ("'%s' has no constructor", pClassType->GetTypeString ().cc ());
-			return false;
-		}
-
-		return true;
-	}
-
-	rtl::CBoxListT <CValue> ArgList;
-	if (!pArgList)
-		pArgList = &ArgList;
-
-	pArgList->InsertHead (*pResultValue);
-
-	return CallOperator (pConstructor, pArgList);
-}
-
-bool
-COperatorMgr::InitializeData (
-	EStorage StorageKind,
-	const CValue& PtrValue,
-	CType* pType
-	)
-{
-	if (StorageKind == EStorage_Stack)
-		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
-		
-	if (pType->GetTypeKind () != EType_Struct && pType->GetTypeKind () != EType_Union)
-		return true;
-
-	CFunction* pConstructor = ((CDerivableType*) pType)->GetConstructor ();
-	return pConstructor ? CallOperator (pConstructor, PtrValue) : true;
-}
-
-bool
-COperatorMgr::ParseInitializer (
-	const CValue& Value,
-	const rtl::CConstBoxListT <CToken> TokenList
-	)
-{
-	CParser Parser;
-	Parser.m_pModule = m_pModule;
-	Parser.m_Stage = CParser::EStage_Pass2;
-
-	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
-
-	if (TokenList.GetHead ()->m_Token == '{')
-	{
-		Parser.m_CurlyInitializerTargetValue = Value;
-		return Parser.ParseTokenList (ESymbol_curly_initializer, TokenList);
-	}
-
-	return 
-		Parser.ParseTokenList (ESymbol_expression_save_value, TokenList) &&
-		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, Value, Parser.m_ExpressionValue);
-}
-
-bool
-COperatorMgr::EvaluateAlias (
-	const rtl::CConstBoxListT <CToken> TokenList,
-	CValue* pResultValue
-	)
-{
-	CParser Parser;
-	Parser.m_pModule = m_pModule;
-	Parser.m_Stage = CParser::EStage_Pass2;
-
-	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, TokenList);
-	if (!Result)
-		return false;
-
-	*pResultValue = Parser.m_ExpressionValue;
-	return true;
-}
-
-bool
 COperatorMgr::Allocate (
 	EStorage StorageKind,
 	CType* pType,
@@ -147,12 +16,10 @@ COperatorMgr::Allocate (
 	CValue* pResultValue
 	)
 {
-	bool Result;
-
 	llvm::GlobalVariable* pLlvmGlobalVariable;
 	CFunction* pAlloc;
 
-	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Unsafe);
+	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 	CValue PtrValue;
 
 	switch (StorageKind)
@@ -192,35 +59,248 @@ COperatorMgr::Allocate (
 		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, &PtrValue);
 		break;
 
-	case EStorage_Member:
-		if (!m_pModule->m_FunctionMgr.GetMemberNewField ())
-		{
-			err::SetFormatStringError ("'member new' operator can only be called from field initalizer");
-			return false;
-		}
-
-		if (m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasJump)
-		{
-			err::SetFormatStringError ("'member new' cannot be used in branched expression");
-			return false;
-		}
-
-		Result = 
-			GetField (m_pModule->m_FunctionMgr.GetMemberNewField (), NULL, &PtrValue) &&
-			UnaryOperator (EUnOp_Addr, &PtrValue);
-
-		if (!Result)
-			return false;
-		
-		m_pModule->m_FunctionMgr.NextMemberNewField ();
-		break;
-
 	default:
 		err::SetFormatStringError ("invalid storage specifier '%s' in 'new' operator", GetStorageKindString (StorageKind));
 		return false;
 	}
 
 	*pResultValue = PtrValue;
+	return true;
+}
+
+bool
+COperatorMgr::Prime (
+	EStorage StorageKind,
+	const CValue& PtrValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	CValue ScopeLevelValue;
+
+	if (StorageKind == EStorage_Stack)
+	{
+		ASSERT (pScope);
+		ScopeLevelValue = CalcScopeLevelValue (pScope);
+	}
+	else
+		ScopeLevelValue.SetConstSizeT (0);
+
+	if (pType->GetTypeKind () != EType_Class)
+	{
+		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
+
+		pResultValue->SetThinDataPtr (
+			PtrValue.GetLlvmValue (),
+			pType->GetDataPtrType (EDataPtrType_Thin),
+			ScopeLevelValue,
+			PtrValue,
+			pType->GetSize ()
+			);
+
+		return true;
+	}
+
+	CClassType* pClassType = (CClassType*) pType;
+	
+	uint_t Flags = EObjectFlag_Alive;
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		Flags |= EObjectFlag_Static;
+		break;
+
+	case EStorage_Stack:
+		Flags |= EObjectFlag_Stack;
+		break;
+
+	case EStorage_UHeap:
+		Flags |= EObjectFlag_UHeap;
+		break;
+	}
+
+	if (pClassType->GetFlags () & EClassTypeFlag_Abstract)
+	{
+		err::SetFormatStringError ("cannot instantiate abstract '%s'", pClassType->GetTypeString ().cc ()); 
+		return false;
+	}
+
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prime object");
+
+	CFunction* pPrimer = pClassType->GetPrimer ();
+	m_pModule->m_LlvmBuilder.CreateCall3 (
+		pPrimer,
+		pPrimer->GetType (),
+		PtrValue,
+		ScopeLevelValue,
+		CValue (Flags, EType_Int_p),
+		NULL
+		);
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+
+	if (pClassType->GetDestructor ())
+	{
+		switch (StorageKind)
+		{
+		case EStorage_Stack:
+			ASSERT (pScope);
+			pScope->AddToDestructList (*pResultValue);
+			break;
+
+		case EStorage_Static:
+			m_pModule->m_VariableMgr.AddToStaticDestructList (*pResultValue);
+			break;
+		}
+	}
+
+	return true;
+}
+
+bool
+COperatorMgr::Construct (
+	const CValue& RawOpValue,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	CType* pType = RawOpValue.GetType ();
+	EType PtrTypeKind = pType->GetTypeKind ();
+
+	switch (PtrTypeKind)
+	{
+	case EType_DataRef:
+	case EType_DataPtr:
+		pType = ((CDataPtrType*) pType)->GetTargetType ();
+		break;
+
+	case EType_ClassPtr:
+	case EType_ClassRef:
+		pType = ((CClassPtrType*) pType)->GetTargetType ();
+		break;
+
+	default:
+		err::SetFormatStringError ("'%s' is not a pointer or reference", pType->GetTypeString ().cc ());
+		return false;
+	}
+
+	EType TypeKind = pType->GetTypeKind ();
+
+	CFunction* pConstructor = NULL;
+	
+	switch (TypeKind)
+	{
+	case EType_Struct:
+	case EType_Union:
+		pConstructor = ((CDerivableType*) pType)->GetConstructor ();
+		break;
+
+	case EType_Class:
+		pConstructor = ((CClassType*) pType)->GetConstructor ();
+		break;
+	}
+
+	if (!pConstructor)
+	{
+		if (pArgList && !pArgList->IsEmpty ())
+		{
+			err::SetFormatStringError ("'%s' has no constructor", pType->GetTypeString ().cc ());
+			return false;
+		}
+
+		return true;
+	}
+
+	rtl::CBoxListT <CValue> ArgList;
+	if (!pArgList)
+		pArgList = &ArgList;
+
+	CValue OpValue = RawOpValue;
+	if (PtrTypeKind == EType_DataRef || PtrTypeKind == EType_ClassRef)
+	{
+		bool Result = UnaryOperator (EUnOp_Addr, &OpValue);
+		if (!Result)
+			return false;
+	}
+	
+	pArgList->InsertHead (OpValue);
+
+	return CallOperator (pConstructor, pArgList);
+}
+
+bool
+COperatorMgr::ParseInitializer (
+	const CValue& Value,
+	const rtl::CConstBoxListT <CToken>& ConstructorTokenList,
+	const rtl::CConstBoxListT <CToken>& InitializerTokenList
+	)
+{
+	bool Result;
+
+	rtl::CBoxListT <CValue> ArgList;
+	if (!ConstructorTokenList.IsEmpty ())
+	{
+		CParser Parser;
+		Parser.m_pModule = m_pModule;
+		Parser.m_Stage = CParser::EStage_Pass2;
+
+		m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+
+		Result = Parser.ParseTokenList (ESymbol_expression_or_empty_list_save_list, ConstructorTokenList);
+		if (!Result)
+			return false;
+
+		ArgList.TakeOver (&Parser.m_ExpressionValueList);
+	}
+
+	Result = Construct (Value, &ArgList);
+	if (!Result)
+		return false;
+
+	if (!InitializerTokenList.IsEmpty ())
+	{
+		CParser Parser;
+		Parser.m_pModule = m_pModule;
+		Parser.m_Stage = CParser::EStage_Pass2;
+
+		m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+
+		if (InitializerTokenList.GetHead ()->m_Token == '{')
+		{
+			Parser.m_CurlyInitializerTargetValue = Value;
+			Result = Parser.ParseTokenList (ESymbol_curly_initializer, InitializerTokenList);
+			if (!Result)
+				return false;
+		}
+		else
+		{
+			Result = 
+				Parser.ParseTokenList (ESymbol_expression_save_value, InitializerTokenList) &&
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, Value, Parser.m_ExpressionValue);
+
+			if (!Result)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool
+COperatorMgr::EvaluateAlias (
+	const rtl::CConstBoxListT <CToken> TokenList,
+	CValue* pResultValue
+	)
+{
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, TokenList);
+	if (!Result)
+		return false;
+
+	*pResultValue = Parser.m_ExpressionValue;
 	return true;
 }
 
@@ -236,71 +316,32 @@ COperatorMgr::NewOperator (
 
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 
-	CType* pAllocType = pType;
-
-	if (pType->GetTypeKind () == EType_Import)
-		pType = ((CImportType*) pType)->GetActualType ();
-
-	if (pType->GetTypeKind () == EType_Class)
-		pAllocType = ((CClassType*) pType)->GetClassStructType ();
-
 	CValue PtrValue;
-	Result = Allocate (StorageKind, pAllocType, "new", &PtrValue);
+	Result = Allocate (StorageKind, pType, "new", &PtrValue);
 	if (!Result)
 		return false;
-	
-	if (pType->GetTypeKind () == EType_Class)
-	{
-		CClassType* pClassType = (CClassType*) pType;
-	
-		if (StorageKind == EStorage_Static)
-		{
-			CToken::CPos Pos;
 
-			TOnceStmt Stmt;
-			m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
+	if (StorageKind != EStorage_Static)
+		return 
+			Prime (StorageKind, PtrValue, pType, pResultValue) && 
+			Construct (*pResultValue, pArgList);
 
-			Result = 
-				m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
-				InitializeObject (StorageKind, PtrValue, pClassType, pArgList, pResultValue);
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
 
-			if (!Result)
-				return false;
-				
-			m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
-		}
-		else
-		{
-			Result = InitializeObject (StorageKind, PtrValue, pClassType, pArgList, pResultValue);
-			if (!Result)
-				return false;
-		}
-		
-		if (StorageKind == EStorage_Stack && pClassType->GetDestructor ())
-			pScope->AddToDestructList (*pResultValue);
-	}
-	else
-	{
-		CValue ScopeLevelValue;
-		if (StorageKind == EStorage_Stack)
-			CalcScopeLevelValue (pScope, &ScopeLevelValue);
-		else
-			ScopeLevelValue.SetConstSizeT (0);
+	CToken::CPos Pos;
+	Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
+	if (!Result)
+		return false;
 
-		PtrValue.SetThinDataPtr (
-			PtrValue.GetLlvmValue (),
-			pType->GetDataPtrType (EDataPtrType_Thin),
-			ScopeLevelValue,
-			PtrValue,
-			pType->GetSize ()
-			);
+	Result = 
+		Prime (StorageKind, PtrValue, pType, pResultValue) && 
+		Construct (*pResultValue, pArgList);
 
-		Result = InitializeData (StorageKind, PtrValue, pType);
-		if (!Result)
-			return false;
-	
-		*pResultValue = PtrValue;
-	}
+	if (!Result)
+		return false;
+
+	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
 
 	return true;
 }
@@ -328,7 +369,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 			return false;
 		}
 
-		Result = PrepareDataPtr (OpValue, ERuntimeError_LoadOutOfRange, &PtrValue);
+		Result = PrepareDataPtr (OpValue, &PtrValue);
 		if (!Result)
 			return false;
 
@@ -370,8 +411,8 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 bool
 COperatorMgr::ProcessDestructList (const rtl::CConstBoxListT <CValue>& List)
 {
-	rtl::CBoxIteratorT <CValue> It = List.GetHead ();
-	for (; It; It++)
+	rtl::CBoxIteratorT <CValue> It = List.GetTail ();
+	for (; It; It--)
 	{
 		CValue Value = *It;
 		ASSERT (Value.GetType ()->GetTypeKind () == EType_ClassPtr);

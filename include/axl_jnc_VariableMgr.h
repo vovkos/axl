@@ -25,10 +25,9 @@ protected:
 	rtl::CStdListT <CAlias> m_AliasList;
 
 	rtl::CArrayT <CVariable*> m_GlobalVariableArray;
-	rtl::CArrayT <CVariable*> m_InitalizedGlobalVariableArray;
-	rtl::CArrayT <CVariable*> m_StaticDestructArray; // variables allocated for static new instances of classes with destructors
+	rtl::CBoxListT <CValue> m_StaticDestructList;
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
-
+	
 	CVariable* m_pScopeLevelVariable;
 
 public:
@@ -42,17 +41,23 @@ public:
 
 	void
 	Clear ();
-
+	
 	rtl::CArrayT <CVariable*> 
 	GetGlobalVariableArray ()
 	{
 		return m_GlobalVariableArray;
 	}
 
-	rtl::CArrayT <CVariable*>
-	GetStaticDestructArray ()
+	rtl::CConstBoxListT <CValue>
+	GetStaticDestructList ()
 	{
-		return m_StaticDestructArray;
+		return m_StaticDestructList;
+	}
+
+	void
+	AddToStaticDestructList (const CValue& Value)
+	{
+		m_StaticDestructList.InsertTail (Value);
 	}
 
 	CVariable*
@@ -61,10 +66,11 @@ public:
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		CType* pType,
-		int PtrTypeFlags = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
-
+		
 	llvm::GlobalVariable*
 	CreateLlvmGlobalVariable (
 		CType* pType,
@@ -80,23 +86,27 @@ public:
 		);
 
 	bool
-	AllocateVariable (CVariable* pVariable);
+	AllocateInitializeVariable (
+		CVariable* pVariable,
+		bool AllocateOnly = false
+		);
 
 	bool
-	InitializeVariable (CVariable* pVariable);
-
-	bool
-	AllocateGlobalVariables ();
-
-	bool
-	InitializeGlobalVariables ();
+	AllocateInitializeGlobalVariables ();
 
 	CVariable*
 	GetScopeLevelVariable ()
 	{
-		ASSERT (m_pScopeLevelVariable); // should be called after AllocateGlobalVariables ()
+		ASSERT (m_pScopeLevelVariable); // should be called after AllocateInitializeGlobalVariables ()
 		return m_pScopeLevelVariable;
 	}
+
+protected:	
+	bool
+	InitializeVariable (
+		CVariable* pVariable,
+		const CValue& PtrValue
+		);
 };
 
 //.............................................................................

@@ -18,31 +18,14 @@ CBinOp_Assign::Operator (
 
 	EType DstTypeKind = OpValue1.GetType ()->GetTypeKind ();
 	
-	CDataPtrType* pPtrType;
-
 	switch (DstTypeKind)
 	{
 	case EType_DataRef:
-		pPtrType = (CDataPtrType*) OpValue1.GetType ();
-
-		if (pPtrType->GetTargetType ()->GetTypeKind () == EType_Multicast)
-		{
-			if (pPtrType->GetFlags () & EPtrTypeFlag_Event)
-			{
-				err::SetFormatStringError ("illegal event assignment (only '+=' and '-=' permitted)");
-				return false;
-			}
-
-			CMulticastType* pMulticastType = (CMulticastType*) pPtrType->GetTargetType ();
-			CFunction* pMethod = pMulticastType->GetMethod (EMulticastMethod_Set, pPtrType->GetPtrTypeKind ());
-			
-			CValue MulticastPtrValue;
-			return 
-				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
-				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2);
-		}
-
 		return m_pModule->m_OperatorMgr.StoreDataRef (OpValue1, OpValue2);
+
+	case EType_ClassRef:
+		err::SetFormatStringError ("assigning to class not yet implemented");
+		return false;
 
 	case EType_PropertyRef:
 		return m_pModule->m_OperatorMgr.SetProperty (OpValue1, OpValue2);
@@ -66,26 +49,6 @@ CBinOp_OpAssign::Operator (
 
 	*pResultValue = OpValue1;
 
-	if ((m_OpKind == EBinOp_AddAssign || m_OpKind == EBinOp_SubAssign) && 
-		OpValue1.GetType ()->GetTypeKind () == EType_DataRef)
-	{
-		CDataPtrType* pPtrType = (CDataPtrType*) OpValue1.GetType ();
-		if (pPtrType->GetTargetType ()->GetTypeKind () == EType_Multicast)
-		{
-			CMulticastType* pMulticastType = (CMulticastType*) pPtrType->GetTargetType ();
-		
-			CFunction* pMethod = pMulticastType->GetMethod (
-				m_OpKind == EBinOp_AddAssign ? EMulticastMethod_Add : EMulticastMethod_Remove,
-				pPtrType->GetPtrTypeKind ()
-				);
-
-			CValue MulticastPtrValue;
-			return 
-				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
-				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2, pResultValue);
-		}
-	}
-
 	EBinOp OpKind = (EBinOp) (m_OpKind - EBinOp__OpAssignDelta);
 
 	CValue RValue;
@@ -98,3 +61,40 @@ CBinOp_OpAssign::Operator (
 
 } // namespace jnc {
 } // namespace axl {
+
+
+/*		CDataPtrType* pPtrType = (CDataPtrType*) OpValue1.GetType ();
+
+		if (pPtrType->GetTargetType ()->GetTypeKind () == EType_Multicast)
+		{
+			CMulticastClassType* pMulticastType = (CMulticastClassType*) pPtrType->GetTargetType ();
+			CFunction* pMethod = pMulticastType->GetMethod (EMulticastMethod_Set, pPtrType->GetPtrTypeKind ());
+			
+			CValue MulticastPtrValue;
+			return 
+				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
+				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2);
+		}
+
+//.............................................................................
+
+	if ((m_OpKind == EBinOp_AddAssign || m_OpKind == EBinOp_SubAssign) && 
+		OpValue1.GetType ()->GetTypeKind () == EType_DataRef)
+	{
+		CDataPtrType* pPtrType = (CDataPtrType*) OpValue1.GetType ();
+		if (pPtrType->GetTargetType ()->GetTypeKind () == EType_Multicast)
+		{
+			CMulticastClassType* pMulticastType = (CMulticastClassType*) pPtrType->GetTargetType ();
+		
+			CFunction* pMethod = pMulticastType->GetMethod (
+				m_OpKind == EBinOp_AddAssign ? EMulticastMethod_Add : EMulticastMethod_Remove,
+				pPtrType->GetPtrTypeKind ()
+				);
+
+			CValue MulticastPtrValue;
+			return 
+				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, OpValue1, &MulticastPtrValue) &&
+				m_pModule->m_OperatorMgr.CallOperator2 (pMethod, MulticastPtrValue, OpValue2, pResultValue);
+		}
+	}
+*/

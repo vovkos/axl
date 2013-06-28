@@ -19,6 +19,7 @@ public:
 
 private:
 	void setupHighlighter();
+	void addFunction(jnc::CFunction* function);
 
 	LlvmIrHighlighter *highlighter;
 };

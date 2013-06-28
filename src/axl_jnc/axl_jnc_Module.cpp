@@ -16,6 +16,8 @@ CModule::Clear ()
 	m_VariableMgr.Clear ();
 	m_ConstMgr.Clear ();
 	m_ControlFlowMgr.Clear ();
+	m_CalcLayoutArray.Clear ();
+	m_CompileArray.Clear ();
 
 	m_pConstructor = NULL;
 	m_pDestructor = NULL;
@@ -49,7 +51,7 @@ CModule::SetConstructor (CFunction* pFunction)
 
 	pFunction->m_FunctionKind = EFunction_ModuleConstructor;
 	pFunction->m_StorageKind = EStorage_Static;
-	pFunction->m_Tag = "module.this";
+	pFunction->m_Tag = "module.construct";
 	m_pConstructor = pFunction;
 	return true;
 }
@@ -59,13 +61,13 @@ CModule::SetDestructor (CFunction* pFunction)
 {
 	if (m_pDestructor)
 	{
-		err::SetFormatStringError ("module already has '~this' method");
+		err::SetFormatStringError ("module already has 'destruct' method");
 		return false;
 	}
 
 	pFunction->m_FunctionKind = EFunction_ModuleDestructor;
 	pFunction->m_StorageKind = EStorage_Static;
-	pFunction->m_Tag = "module.~this";
+	pFunction->m_Tag = "module.destruct";
 	m_pDestructor = pFunction;
 	return true;
 }
@@ -96,39 +98,88 @@ CModule::Link (CModule* pModule)
 	return false;
 }
 
+void 
+CModule::MarkForLayout (CModuleItem* pItem)
+{
+	if (pItem->m_Flags & EModuleItemFlag_NeedLayout)
+		return;
+
+	pItem->m_Flags |= EModuleItemFlag_NeedLayout;
+	m_CalcLayoutArray.Append (pItem);
+}
+
+void 
+CModule::MarkForCompile (CModuleItem* pItem)
+{
+	if (pItem->m_Flags & EModuleItemFlag_NeedCompile)
+		return;
+
+	pItem->m_Flags |= EModuleItemFlag_NeedCompile;
+	m_CompileArray.Append (pItem);
+}
+
 bool
 CModule::Compile ()
 {
-	bool Result = 
-		m_TypeMgr.ResolveImportTypes () &&
-		m_FunctionMgr.ResolveOrphanFunctions () &&
-		m_FunctionMgr.ScanAutoEvs () &&
-		m_FunctionMgr.CalcPropertyLayouts () &&
-		m_FunctionMgr.CalcAutoEvLayouts () &&
-		m_TypeMgr.CalcTypeLayouts () &&
-		m_VariableMgr.AllocateGlobalVariables () &&
-		m_FunctionMgr.CompileFunctions ();
+	bool Result;
 
+	// step 1: resolve import types
+
+	Result = m_TypeMgr.ResolveImportTypes ();
 	if (!Result)
 		return false;
 
-	if (!m_pConstructor && !m_VariableMgr.GetGlobalVariableArray ().IsEmpty ())
+	// step 2: calc layouts
+
+	for (size_t i = 0; i < m_CalcLayoutArray.GetCount (); i++) // new items could be added in process
+	{
+		Result = m_CalcLayoutArray [i]->EnsureLayout ();
+		if (!Result)
+			return false;
+	}
+
+	// step 3: compile module constructor 
+
+	if (m_pConstructor)
+	{
+		if (!m_pConstructor->HasBody ())
+		{
+			err::SetFormatStringError ("unresolved module constructor");
+			return false;
+		}
+
+		Result = m_pConstructor->Compile ();
+		if (!Result)
+			return false;
+	}
+	else
 	{
 		Result = CreateDefaultConstructor ();
 		if (!Result)
 			return false;
 	}
 
+	// step 4: ensure module destructor (if needed)
+
 	if (!m_pDestructor && 
 		(!m_TypeMgr.GetStaticDestructArray ().IsEmpty () || 
-		 !m_VariableMgr.GetStaticDestructArray ().IsEmpty ()))
+		 !m_VariableMgr.GetStaticDestructList ().IsEmpty ()))
 	{
 		Result = CreateDefaultDestructor ();
 		if (!Result)
 			return false;
 	}
-	
-	return true;	
+
+	// step 5: compile the rest 
+
+	for (size_t i = 0; i < m_CompileArray.GetCount (); i++) // new items could be added in process
+	{
+		Result = m_CompileArray [i]->Compile ();
+		if (!Result)
+			return false;
+	}
+
+	return true;
 }
 
 bool
@@ -138,14 +189,14 @@ CModule::CreateDefaultConstructor ()
 
 	ASSERT (!m_pConstructor);
 
-	CFunctionType* pType = (CFunctionType*) (CType*) CGetType (this, EStdType_SimpleFunction);
+	CFunctionType* pType = (CFunctionType*) GetSimpleType (EStdType_SimpleFunction);
 	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleConstructor, pType);
 	pFunction->m_StorageKind = EStorage_Static;
-	pFunction->m_Tag = "module.this";
+	pFunction->m_Tag = "module.construct";
 
 	m_FunctionMgr.InternalPrologue (pFunction);
 
-	Result = m_VariableMgr.InitializeGlobalVariables ();
+	Result = m_VariableMgr.AllocateInitializeGlobalVariables ();
 	if (!Result)
 		return false;
 
@@ -162,32 +213,17 @@ CModule::CreateDefaultDestructor ()
 
 	ASSERT (!m_pDestructor);
 
-	CFunctionType* pType = (CFunctionType*) (CType*) CGetType (this, EStdType_SimpleFunction);
+	CFunctionType* pType = (CFunctionType*) GetSimpleType (EStdType_SimpleFunction);
 	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleDestructor, pType);
 	pFunction->m_StorageKind = EStorage_Static;
-	pFunction->m_Tag = "module.~this";
+	pFunction->m_Tag = "module.destruct";
 		
 	m_FunctionMgr.InternalPrologue (pFunction);
 
-	rtl::CArrayT <CVariable*> StaticVariableDestructArray = m_VariableMgr.GetStaticDestructArray ();
-	size_t Count = StaticVariableDestructArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CVariable* pVariable = StaticVariableDestructArray [i];
-		ASSERT (pVariable->GetType ()->GetTypeKind () == EType_Class);
-
-		CClassType* pClassType = (CClassType*) pVariable->GetType ();
-		CFunction* pDestructor = pClassType->GetDestructor ();
-		ASSERT (pDestructor);
-
-		CValue ThisValue (pVariable->GetLlvmValue (), pClassType->GetClassPtrType ());
-		Result = m_OperatorMgr.CallOperator (pDestructor, ThisValue);
-		if (!Result)
-			return false;
-	}
+	m_OperatorMgr.ProcessDestructList (m_VariableMgr.GetStaticDestructList ());
 
 	rtl::CArrayT <CClassType*> StaticTypeDestructArray = m_TypeMgr.GetStaticDestructArray ();
-	Count = StaticTypeDestructArray.GetCount ();
+	size_t Count = StaticTypeDestructArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CClassType* pClassType = StaticTypeDestructArray [i];

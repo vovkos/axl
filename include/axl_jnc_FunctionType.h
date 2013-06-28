@@ -4,19 +4,19 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
 #include "axl_jnc_FunctionArg.h"
 
 namespace axl {
 namespace jnc {
 
 class CFunctionPtrType;
-class CFunctionPtrTypeTuple;
-class CMulticastType;
 class CNamedType;
 class CClassType;
 class CClassPtrType;
+class CAutoEvClassType;
 class CFunction;
+
+struct TFunctionPtrTypeTuple;
 
 //.............................................................................
 
@@ -72,7 +72,6 @@ enum EFunctionPtrType
 	EFunctionPtrType_Normal = 0,
 	EFunctionPtrType_Weak,
 	EFunctionPtrType_Thin,
-	EFunctionPtrType_Unsafe,
 	EFunctionPtrType__Count,
 };
 
@@ -80,18 +79,6 @@ enum EFunctionPtrType
 
 const char*
 GetFunctionPtrTypeKindString (EFunctionPtrType PtrTypeKind);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-EFunctionPtrType 
-GetFunctionPtrTypeKindFromModifiers (uint_t Modifiers)
-{
-	return 
-		(Modifiers & ETypeModifier_Unsafe) ? EFunctionPtrType_Unsafe :
-		(Modifiers & ETypeModifier_Weak) ? EFunctionPtrType_Weak : 
-		(Modifiers & ETypeModifier_Thin) ? EFunctionPtrType_Thin : EFunctionPtrType_Normal;
-}
 
 //.............................................................................
 
@@ -101,6 +88,7 @@ class CFunctionType: public CType
 
 protected:
 	CType* m_pReturnType;
+	CImportType* m_pReturnType_i;
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	ECallConv m_CallConv;
 	rtl::CString m_ArgSignature;
@@ -108,7 +96,8 @@ protected:
 	CFunctionType* m_pShortType;
 	CFunctionType* m_pStdObjectMemberMethodType;
 	CFunction* m_pAbstractFunction;
-	CFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
+	TFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
+	CAutoEvClassType* m_pAutoEvInterfaceType;
 
 public:
 	CFunctionType ();
@@ -131,6 +120,12 @@ public:
 		return m_pReturnType;
 	}
 
+	CImportType*
+	GetReturnType_i ()
+	{
+		return m_pReturnType_i;
+	}
+
 	rtl::CArrayT <CFunctionArg*> 
 	GetArgArray ()
 	{
@@ -146,7 +141,7 @@ public:
 	bool
 	IsMemberMethodType ()
 	{
-		return !m_ArgArray.IsEmpty () && (m_ArgArray [0]->GetPtrTypeFlags () & EPtrTypeFlag_This) != 0;
+		return !m_ArgArray.IsEmpty () && m_ArgArray [0]->GetStorageKind () == EStorage_This;
 	}
 
 	CType* 
@@ -167,7 +162,7 @@ public:
 	CFunctionType*
 	GetMemberMethodType (
 		CNamedType* pType, 
-		int ThisArgFlags = 0
+		uint_t ThisArgFlags = 0
 		);
 
 	CFunctionType*
@@ -192,7 +187,7 @@ public:
 		return GetFunctionPtrType (EType_FunctionPtr, PtrTypeKind, Flags);
 	}
 
-	CMulticastType*
+	CClassType*
 	GetMulticastType ();
 
 	static
@@ -241,8 +236,11 @@ public:
 		return CreateArgSignature (m_ArgArray, m_ArgArray.GetCount (), m_Flags);
 	}
 
-protected:
+	virtual 
+	bool
+	Compile ();
 
+protected:
 	virtual 
 	void
 	PrepareTypeString ();
@@ -250,6 +248,10 @@ protected:
 	virtual 
 	void
 	PrepareLlvmType ();
+
+	virtual 
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................

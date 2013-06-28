@@ -15,6 +15,9 @@ public:
 	QSize sizeHint() const { return QSize(300, 50); }	
 
 	bool build(jnc::CModule *module);
+
+protected:
+	void addFunction(jnc::CFunction* function);
 };
 
 

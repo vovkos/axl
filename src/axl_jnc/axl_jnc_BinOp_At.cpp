@@ -62,7 +62,7 @@ CBinOp_At::Operator (
 
 	pClosure->GetArgList ()->InsertTail (SchedulerValue);
 
-	if (OpValue1.HasClosure ())
+	if (OpValue1.GetClosure ())
 		pClosure->Append (*OpValue1.GetClosure ()->GetArgList ());
 
 	return true;

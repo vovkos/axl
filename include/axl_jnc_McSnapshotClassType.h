@@ -4,10 +4,8 @@
 
 #pragma once
 
+#include "axl_jnc_ClassType.h"
 #include "axl_jnc_FunctionPtrType.h"
-#include "axl_jnc_StructType.h"
-#include "axl_jnc_DataPtrType.h"
-#include "axl_jnc_Function.h"
 
 namespace axl {
 namespace jnc {
@@ -30,20 +28,20 @@ enum EMcSnapshotMethod
 
 	EMcSnapshotMethod__Count,
 };
+
 //.............................................................................
 
-class CMcSnapshotType: public CType
+class CMcSnapshotClassType: public CClassType
 {
 	friend class CTypeMgr;
 
 protected:
 	CFunctionPtrType* m_pTargetType;
-	CStructType* m_pMcSnapshotStructType;
 	CStructField* m_FieldArray [EMcSnapshotField__Count];
 	CFunction* m_MethodArray [EMcSnapshotMethod__Count];
 
 public:
-	CMcSnapshotType ();
+	CMcSnapshotClassType ();
 
 	CFunctionPtrType* 
 	GetTargetType ()
@@ -57,9 +55,6 @@ public:
 		return m_pTargetType->GetTargetType ();
 	}
 
-	CStructType* 
-	GetMcSnapshotStructType ();
-
 	CStructField* 
 	GetField (EMcSnapshotField Field)
 	{
@@ -68,19 +63,28 @@ public:
 	}
 
 	CFunction* 
-	GetMethod (EMcSnapshotMethod Method);
+	GetMethod (EMcSnapshotMethod Method)
+	{
+		ASSERT (Method < EMcSnapshotMethod__Count);
+		return m_MethodArray [Method];
+	}
+
+	virtual
+	bool
+	Compile ()
+	{
+		return 
+			CClassType::Compile () &&
+			CompileCallMethod ();
+	}
 
 protected:
 	virtual 
 	void
 	PrepareTypeString ();
 
-	virtual 
-	void
-	PrepareLlvmType ();
-
-	CFunction* 
-	CreateCallMethod ();
+	bool
+	CompileCallMethod ();
 };
 
 //.............................................................................

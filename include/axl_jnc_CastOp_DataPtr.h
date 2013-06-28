@@ -122,11 +122,7 @@ public:
 		const CValue& OpValue,
 		CType* pType,
 		void* pDst
-		)
-	{
-		ASSERT (false); // const cannot be thin
-		return false;
-	}
+		);
 
 	virtual
 	bool
@@ -140,10 +136,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_DataPtr_Normal2Unsafe: public CCast_DataPtr_Base
+class CCast_DataPtr_Normal2Thin: public CCast_DataPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_Normal2Unsafe, ICastOperator)
+	AXL_OBJ_CLASS_0 (CCast_DataPtr_Normal2Thin, ICastOperator)
 
 public:
 	virtual
@@ -166,10 +162,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_DataPtr_Unsafe2Unsafe: public CCast_DataPtr_Base
+class CCast_DataPtr_Thin2Thin: public CCast_DataPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_Unsafe2Unsafe, ICastOperator)
+	AXL_OBJ_CLASS_0 (CCast_DataPtr_Thin2Thin, ICastOperator)
 
 public:
 	virtual
@@ -203,8 +199,8 @@ protected:
 	CCast_DataPtr_FromArray m_FromArray;
 	CCast_DataPtr_Normal2Normal m_Normal2Normal;
 	CCast_DataPtr_Thin2Normal m_Thin2Normal;
-	CCast_DataPtr_Normal2Unsafe m_Normal2Unsafe;
-	CCast_DataPtr_Unsafe2Unsafe m_Unsafe2Unsafe;
+	CCast_DataPtr_Normal2Thin m_Normal2Thin;
+	CCast_DataPtr_Thin2Thin m_Thin2Thin;
 
 	ICastOperator* m_OperatorTable [EDataPtrType__Count] [EDataPtrType__Count];
 

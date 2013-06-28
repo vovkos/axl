@@ -63,7 +63,7 @@ public:
 	GetResultType (const CValue& OpValue)
 	{
 		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue);
-		if (!pType || T::IsIntegerOnly && !pType->IsIntegerType ())
+		if (!pType || T::IsIntegerOnly && !(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 		{
 			SetOperatorError (OpValue);
 			return NULL;

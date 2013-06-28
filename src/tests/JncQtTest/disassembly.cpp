@@ -14,40 +14,48 @@ bool Disassembly::build(jnc::CModule *module)
 {
 	clear();
 	
-	jnc::CDisassembler Dasm;
-
 	rtl::CIteratorT <jnc::CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		jnc::CFunctionType* pFunctionType = Function->GetType (); 
-
-		appendFormat (
-			"%s %s %s %s\n", 
-			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
-			Function->m_Tag.cc (), 
-			pFunctionType->GetArgString ().cc ()
-			);
-
-		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
-		if (pExternFunction)
-		{
-			appendFormat ("  ->%s\n", pExternFunction->m_Tag.cc ());
-			appendFormat ("\n");
+		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
 			continue;
-		}
 
-		void* pf = Function->GetMachineCode ();
-		size_t Size = Function->GetMachineCodeSize ();
+		addFunction (*Function);		
+		appendFormat ("\n;........................................\n\n");
+	}
 
-		if (pf)
-		{
-			rtl::CString s = Dasm.Disassemble (pf, Size);
-			appendFormat ("\n%s", s.cc ());
-		}
-		
-		appendFormat ("\n........................................\n\n");
+	Function = module->m_FunctionMgr.GetThunkFunctionList ().GetHead ();
+	if (Function)
+		appendFormat ("\n; THUNKS\n\n");
+
+	for (; Function; Function++)
+	{
+		addFunction (*Function);		
+		appendFormat ("\n;........................................\n\n");
 	}
 
 	return true;
+}
+
+void Disassembly::addFunction(jnc::CFunction* function)
+{
+	jnc::CFunctionType* pFunctionType = function->GetType (); 
+
+	appendFormat (
+		"%s %s %s %s\n", 
+		pFunctionType->GetReturnType ()->GetTypeString ().cc (),
+		jnc::GetCallConvString (pFunctionType->GetCallConv ()),
+		function->m_Tag.cc (), 
+		pFunctionType->GetArgString ().cc ()
+		);
+
+	void* pf = function->GetMachineCode ();
+	size_t Size = function->GetMachineCodeSize ();
+
+	if (pf)
+	{
+		jnc::CDisassembler Dasm;
+		rtl::CString s = Dasm.Disassemble (pf, Size);
+		appendFormat ("\n%s", s.cc ());
+	}
 }

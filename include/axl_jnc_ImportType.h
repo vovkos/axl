@@ -6,34 +6,11 @@
 
 #include "axl_jnc_Type.h"
 #include "axl_jnc_Namespace.h"
-#include "axl_rtl_List.h"
 
 namespace axl {
 namespace jnc {
-	
-//.............................................................................
 
-// primary usage:
-// typeof (TImport)
-// sizeof (TImport)
-
-// data usage (for classes, spawns class ptr)
-// TImport a;
-// TImport a [];
-// TImport foo (TImport x);
-
-// pointer usage (spawns one of: data ptr, class ptr, function ptr, property ptr, autoev ptr)
-// TImport* p;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum EImportType
-{
-	EImportType_Undefined = 0,
-	EImportType_Primary,
-	EImportType_Data,
-	EImportType_Pointer,
-};
+class CImportPtrType;
 
 //.............................................................................
 
@@ -42,16 +19,12 @@ class CImportType: public CType
 	friend class CTypeMgr;
 
 protected:
-	EImportType m_ImportTypeKind;
 	CType* m_pActualType;
 
 public:
-	CImportType ();
-
-	EImportType 
-	GetImportTypeKind ()
+	CImportType ()
 	{
-		return m_ImportTypeKind;
+		m_pActualType = NULL;
 	}
 
 	bool
@@ -63,23 +36,22 @@ public:
 	CType* 
 	GetActualType ()
 	{
-		ASSERT (m_pActualType); // by this time actual type should be known or compilation should be halted
+		ASSERT (m_pActualType);
 		return m_pActualType;
 	}
-
-	virtual 
-	bool
-	CalcLayout ();
 
 protected:
 	virtual 
 	void
-	PrepareLlvmType ();
+	PrepareLlvmType ()
+	{
+		ASSERT (false);
+	}
 };
 
 //.............................................................................
 
-class CPrimaryImportType: public CImportType
+class CNamedImportType: public CImportType
 {
 	friend class CTypeMgr;
 
@@ -89,10 +61,10 @@ protected:
 	CNamespace* m_pAnchorNamespace;
 
 public:
-	CPrimaryImportType ()
+	CNamedImportType ()
 	{
-		m_ImportTypeKind = EImportType_Primary;
-		m_pAnchorNamespace = NULL;	
+		m_TypeKind = EType_NamedImport;
+		m_pAnchorNamespace = NULL;
 	}
 
 	const CQualifiedName&
@@ -110,6 +82,12 @@ public:
 	rtl::CString
 	GetQualifiedName ();
 
+	CImportPtrType* 
+	GetImportPtrType (
+		uint_t TypeModifiers = 0,
+		uint_t Flags = 0
+		);
+
 	static
 	rtl::CString
 	CreateSignature (
@@ -123,30 +101,29 @@ public:
 protected:
 	virtual 
 	void
-	PrepareTypeString ();
+	PrepareTypeString ()
+	{
+		m_TypeString.Format ("import %s", GetQualifiedName ());
+	}
 };
 
 //.............................................................................
 
-class CSecondaryImportType: public CImportType
+class CImportPtrType: public CImportType
 {
 	friend class CTypeMgr;
 
 protected:
-	CPrimaryImportType* m_pPrimaryImportType;
+	CNamedImportType* m_pTargetType;
 	uint_t m_TypeModifiers;
 
 public:
-	CSecondaryImportType ()
-	{
-		m_pPrimaryImportType = NULL;
-		m_TypeModifiers = 0;
-	}
+	CImportPtrType ();
 
-	CPrimaryImportType* 
-	GetPrimaryImportType ()
+	CNamedImportType* 
+	GetTargetType ()
 	{
-		return m_pPrimaryImportType;
+		return m_pTargetType;
 	}
 
 	uint_t
@@ -155,13 +132,32 @@ public:
 		return m_TypeModifiers;
 	}
 
+	CImportPtrType*
+	GetCheckedPtrType ()
+	{
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
+			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags | EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
+	CImportPtrType*
+	GetUnCheckedPtrType ()
+	{
+		return (m_Flags & EPtrTypeFlag_Checked) ?  
+			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags & ~EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
 	static
 	rtl::CString
 	CreateSignature (
-		EImportType ImportTypeKind,
-		CPrimaryImportType* pPrimaryImportType,
-		uint_t TypeModifiers
-		);
+		CNamedImportType* pImportType,
+		uint_t TypeModifiers,
+		uint_t Flags
+		)
+	{
+		return rtl::CString::Format_s ("ZP%s:%d:%d", pImportType->GetQualifiedName (), TypeModifiers, Flags);
+	}
 
 protected:
 	virtual 

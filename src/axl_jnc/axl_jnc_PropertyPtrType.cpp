@@ -15,7 +15,6 @@ GetPropertyPtrTypeKindString (EPropertyPtrType PtrTypeKind)
 		"closure",  // EPropertyPtrType_Normal = 0,
 		"weak",     // EPropertyPtrType_Weak,
 		"thin",     // EPropertyPtrType_Thin,
-		"unsafe",   // EPropertyPtrType_Unsafe,
 	};
 
 	return (size_t) PtrTypeKind < EPropertyPtrType__Count ? 
@@ -39,24 +38,6 @@ CPropertyPtrType::GetPropertyPtrStructType ()
 	return m_pModule->m_TypeMgr.GetPropertyPtrStructType (m_pTargetType);
 }
 
-CStructType* 
-CPropertyPtrType::GetPropertyPtrStructType_w ()
-{
-	return m_pModule->m_TypeMgr.GetPropertyPtrStructType_w (m_pTargetType);
-}
-
-CStructType* 
-CPropertyPtrType::GetAuPropertyPtrStructType_t ()
-{
-	return m_pModule->m_TypeMgr.GetAuPropertyPtrStructType_t (m_pTargetType);
-}
-
-CStructType* 
-CPropertyPtrType::GetAuPropertyPtrStructType_u ()
-{
-	return m_pModule->m_TypeMgr.GetAuPropertyPtrStructType_u (m_pTargetType);
-}
-
 rtl::CString
 CPropertyPtrType::CreateSignature (
 	CPropertyType* pPropertyType,
@@ -65,7 +46,7 @@ CPropertyPtrType::CreateSignature (
 	uint_t Flags
 	)
 {
-	rtl::CString Signature = TypeKind == EType_PropertyRef ? 'R' : 'P';
+	rtl::CString Signature = TypeKind == EType_PropertyRef ? "RX" : "PX";
 
 	switch (PtrTypeKind)
 	{
@@ -76,15 +57,9 @@ CPropertyPtrType::CreateSignature (
 	case EPropertyPtrType_Weak:
 		Signature += 'w';
 		break;
-
-	case EPropertyPtrType_Unsafe:
-		Signature += 'u';
-		break;
 	}
 
-	if (Flags & EPtrTypeFlag_Nullable)
-		Signature += 'n';
-
+	Signature += GetPtrTypeFlagSignature (Flags);
 	Signature += pPropertyType->GetSignature ();
 	return Signature;
 }
@@ -94,11 +69,13 @@ CPropertyPtrType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetReturnType ()->GetTypeString ();
 	m_TypeString += ' ';
-
-	if (m_Flags & EPtrTypeFlag_Nullable)
-		m_TypeString += "nullable ";
-
 	m_TypeString += m_pTargetType->GetTypeModifierString ();
+
+	if (m_Flags & EPtrTypeFlag__AllMask)
+	{
+		m_TypeString += ' ';
+		m_TypeString += GetPtrTypeFlagString (m_Flags);
+	}
 
 	if (m_PtrTypeKind != EPropertyPtrType_Normal)
 	{
@@ -118,51 +95,9 @@ CPropertyPtrType::PrepareTypeString ()
 void
 CPropertyPtrType::PrepareLlvmType ()
 {
-	if (!(m_pTargetType->GetFlags () & EPropertyTypeFlag_Bindable))
-	{
-		switch (m_PtrTypeKind)
-		{
-		case EPropertyPtrType_Normal:
-			m_pLlvmType = GetPropertyPtrStructType ()->GetLlvmType ();
-			break;
-
-		case EPropertyPtrType_Weak:
-			m_pLlvmType = GetPropertyPtrStructType_w ()->GetLlvmType ();
-			break;
-
-		case EPropertyPtrType_Thin:
-		case EPropertyPtrType_Unsafe:
-			m_pLlvmType = m_pTargetType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Unsafe)->GetLlvmType ();
-			break;
-
-		default:
-			ASSERT (false);
-		}
-	}
-	else
-	{
-		switch (m_PtrTypeKind)
-		{
-		case EPropertyPtrType_Normal:
-			m_pLlvmType = GetPropertyPtrStructType ()->GetLlvmType ();
-			break;
-
-		case EPropertyPtrType_Weak:
-			m_pLlvmType = GetPropertyPtrStructType_w ()->GetLlvmType ();
-			break;
-
-		case EPropertyPtrType_Thin:
-			m_pLlvmType = GetAuPropertyPtrStructType_t ()->GetLlvmType ();
-			break;
-
-		case EPropertyPtrType_Unsafe:
-			m_pLlvmType = GetAuPropertyPtrStructType_u ()->GetLlvmType ();
-			break;
-
-		default:
-			ASSERT (false);
-		}
-	}
+	m_pLlvmType = 
+		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmType () : 
+		m_pTargetType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetLlvmType ();
 }
 
 //.............................................................................

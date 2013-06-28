@@ -8,7 +8,6 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
-#include "axl_jnc_AutoEv.h"
 #include "axl_jnc_UnOp.h"
 #include "axl_jnc_BinOp.h"
 
@@ -16,16 +15,28 @@ namespace axl {
 namespace jnc {
 
 class CClassPtrType;
-class CClassPtrTypeTuple;
+struct TClassPtrTypeTuple;
 
 //.............................................................................
 
+enum EClassType
+{
+	EClassType_Normal = 0,
+	EClassType_StdObject, // EStdType_Object
+	EClassType_Box,
+	EClassType_Multicast,
+	EClassType_McSnapshot,
+	EClassType_AutoEv,
+	EClassType_AutoEvIface,
+	EClassType_Closure,
+	EClassType_WeakClosure,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum EClassTypeFlag
 {
-	EClassTypeFlag_StdObject = 0x010000, // EStdType_Object 
-	EClassTypeFlag_Abstract  = 0x020000,
-	EClassTypeFlag_AutoEv    = 0x040000,
-	EClassTypeFlag_Box       = 0x080000,
+	EClassTypeFlag_Abstract = 0x010000,
 };
 
 //.............................................................................
@@ -34,7 +45,6 @@ enum EClassPtrType
 {
 	EClassPtrType_Normal = 0,
 	EClassPtrType_Weak,
-	EClassPtrType_Unsafe,
 	EClassPtrType__Count,
 };
 
@@ -42,27 +52,6 @@ enum EClassPtrType
 
 const char*
 GetClassPtrTypeKindString (EClassPtrType PtrTypeKind);
-
-inline
-EClassPtrType 
-GetClassPtrTypeKindFromModifiers (uint_t Modifiers)
-{
-	return 
-		(Modifiers & ETypeModifier_Unsafe_p) ? EClassPtrType_Unsafe :
-		(Modifiers & ETypeModifier_Weak_p) ? EClassPtrType_Weak : EClassPtrType_Normal;
-}
-
-uint_t 
-PromoteClassPtrTypeModifiers (uint_t Modifiers);
-
-bool
-PromoteClassPtrTypeModifiers (uint_t* pModifiers);
-
-uint_t 
-DemoteClassPtrTypeModifiers (uint_t Modifiers);
-
-bool
-DemoteClassPtrTypeModifiers (uint_t* pModifiers);
 
 //............................................................................
 
@@ -73,18 +62,24 @@ class CClassType: public CDerivableType
 	friend class CProperty;
 	
 protected:
+	EClassType m_ClassTypeKind;
+
 	CStructType* m_pIfaceStructType;
 	CStructType* m_pClassStructType;
 
-	CFunction* m_pPreConstructor;
-	CFunction* m_pDefaultConstructor;
+	CFunction* m_pPrimer;
 	CFunction* m_pDestructor;
-	CFunction* m_pInitializer;
 
-	// fields
-	
-	rtl::CIteratorT <CStructField> m_FirstMemberNewField;
-	rtl::CArrayT <CStructField*> m_MemberDestructArray;
+	// prime arrays
+
+	rtl::CArrayT <CBaseTypeSlot*> m_BaseTypePrimeArray;
+	rtl::CArrayT <CStructField*> m_MemberPrimeArray;
+
+	// destruct arrays
+
+	rtl::CArrayT <CClassType*> m_BaseTypeDestructArray;
+	rtl::CArrayT <CStructField*> m_MemberFieldDestructArray;
+	rtl::CArrayT <CProperty*> m_MemberPropertyDestructArray;
 
 	// vtable
 
@@ -96,14 +91,16 @@ protected:
 	rtl::CArrayT <CFunction*> m_VTable;
 	CValue m_VTablePtrValue;
 	
-	// autoev (handlers must be disconnected in destructor)
-
-	rtl::CArrayT <CAutoEv*> m_AutoEvArray;
-	
-	CClassPtrTypeTuple* m_pClassPtrTypeTuple;
+	TClassPtrTypeTuple* m_pClassPtrTypeTuple;
 
 public:
 	CClassType ();
+
+	EClassType 
+	GetClassTypeKind ()
+	{
+		return m_ClassTypeKind;
+	}
 
 	CStructType* 
 	GetIfaceStructType ()
@@ -121,18 +118,32 @@ public:
 
 	CClassPtrType* 
 	GetClassPtrType (
+		EType TypeKind,
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		uint_t Flags = 0
 		);
 
-	CFunction* 
-	GetPreConstructor ()
+	CClassPtrType* 
+	GetClassPtrType (
+		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
+		uint_t Flags = 0
+		)
 	{
-		return m_pPreConstructor;
+		return GetClassPtrType (EType_ClassPtr, PtrTypeKind, Flags);
+	}
+
+	virtual
+	CType*
+	GetThisArgType (uint_t PtrTypeFlags)
+	{		
+		return (CType*) GetClassPtrType (EClassPtrType_Normal, PtrTypeFlags);
 	}
 
 	CFunction* 
-	GetDefaultConstructor ();
+	GetPrimer ()
+	{
+		return m_pPrimer;
+	}
 
 	CFunction* 
 	GetDestructor ()
@@ -140,77 +151,34 @@ public:
 		return m_pDestructor;
 	}
 
-	CFunction* 
-	GetInitializer ();
-
-	rtl::CIteratorT <CStructField>
-	GetFirstMemberNewField ()
-	{
-		return m_FirstMemberNewField;
-	}
-
+	virtual
 	CStructField*
-	GetStdField (EStdField Field);
+	GetFieldByIndex (size_t Index);
 
-	CStructField*
-	CreateField (
-		const rtl::CString& Name,
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0,
-		rtl::CBoxListT <CToken>* pInitializer = NULL
-		);
-
-	CStructField*
-	CreateField (
-		CType* pType,
-		size_t BitCount = 0,
-		int PtrTypeFlags = 0
-		)
-	{
-		return CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags);
-	}
-
-	CAutoEvType* 
-	GetMemberAutoEvType (CAutoEvType* pShortType);
-
+	virtual
 	bool
 	AddMethod (CFunction* pFunction);
 
-	CFunction*
-	CreateMethod (
-		EStorage StorageKind,
-		const rtl::CString& Name,
-		CFunctionType* pShortType
-		);
-
-	CFunction*
-	CreateUnnamedMethod (
-		EStorage StorageKind,
-		EFunction FunctionKind,
-		CFunctionType* pShortType
-		);
-
+	virtual
 	bool
 	AddProperty (CProperty* pProperty);
-
-	CProperty*
-	CreateProperty (
-		EStorage StorageKind,
-		const rtl::CString& Name,
-		CPropertyType* pShortType
-		);
-
-	bool
-	AddAutoEv (CAutoEv* pAutoEv);
-
-	bool
-	AddMemberNewType (CType* pType);
 
 	bool
 	HasVTable ()
 	{
 		return !m_VTable.IsEmpty ();
+	}
+
+	rtl::CArrayT <CFunction*> 
+	GetVirtualMethodArray ()
+	{
+		return m_VirtualMethodArray;
+	}
+	
+	rtl::CArrayT <CProperty*> 
+	GetVirtualPropertyArray ()
+	{
+		return m_VirtualPropertyArray;
 	}
 
 	CStructType* 
@@ -240,20 +208,31 @@ public:
 		return m_BinaryOperatorTable ? m_BinaryOperatorTable [OpKind] : NULL;
 	}
 
-	virtual
+	virtual 
 	bool
-	CalcLayout ();
-
-	bool 
-	StopAutoEvs (const CValue& ThisValue);
+	Compile ();
 
 	bool
-	CallMemberNewDestructors (const CValue& ThisValue);
+	CallBaseTypeDestructors (const CValue& ThisValue);
 
 	bool
-	CallBaseDestructors (const CValue& ThisValue);
+	CallMemberFieldDestructors (const CValue& ThisValue);
+
+	bool
+	CallMemberPropertyDestructors (const CValue& ThisValue);
 
 protected:
+	virtual
+	CStructField*
+	CreateFieldImpl (
+		const rtl::CString& Name,
+		CType* pType,
+		size_t BitCount = 0,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		);
+
 	virtual 
 	void
 	PrepareTypeString ()
@@ -265,11 +244,12 @@ protected:
 	void
 	PrepareLlvmType ()
 	{
-		ASSERT (false);
+		m_pLlvmType = GetClassStructType ()->GetLlvmType ();
 	}
 
+	virtual
 	bool
-	ScanInitializersForMemberNewOperators ();
+	CalcLayout ();
 
 	void
 	AddVirtualFunction (CFunction* pFunction);
@@ -280,26 +260,37 @@ protected:
 	void
 	CreateVTablePtr ();
 
-	bool
-	CreateAutoEvConstructor ();
+	void
+	CreatePrimer ();
 
 	bool
-	CreateDefaultPreConstructor ();
-
-	bool
-	CreateDefaultConstructor ();
-
-	bool
-	CreateDefaultDestructor ();
-
-	bool
-	InitializeInterface (
+	PrimeInterface (
 		CClassType* pClassType,
 		const CValue& ObjectPtrValue,
 		const CValue& IfacePtrValue,
 		const CValue& VTablePtrValue
 		);
+
+	bool
+	CompileDefaultPreConstructor ();
+
+	bool
+	CompileDefaultDestructor ();
+
+	bool
+	CompilePrimer ();
 };
+
+//.............................................................................
+
+inline 
+bool
+IsStdObjectType (CType* pType)
+{
+	return 
+		pType->GetTypeKind () == EType_Class &&
+		((CClassType*) pType)->GetClassTypeKind () == EClassType_StdObject;
+}
 
 //.............................................................................
 

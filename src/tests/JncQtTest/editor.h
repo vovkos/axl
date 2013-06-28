@@ -16,13 +16,17 @@ public:
 
 	int posFromLine(int line);
 
+	void appendText (const char* text)
+	{
+		moveCursor (QTextCursor::End);
+		insertPlainText (QString::fromUtf8 (text));
+	}
+
 	void appendFormat_va (const char* format, va_list va)
 	{
 		rtl::CString Text;
 		Text.Format_va (format, va);
-
-		moveCursor (QTextCursor::End);
-		insertPlainText (QString::fromUtf8 (Text, Text.GetLength ()));
+		appendText (Text);
 	}
 
 	void appendFormat (const char* format, ...)

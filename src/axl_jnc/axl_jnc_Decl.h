@@ -67,24 +67,6 @@ public:
 
 //.............................................................................
 
-enum EDeclPrefix
-{
-	EDeclPrefix_Undefined = 0,
-	EDeclPrefix_Pointer,
-	EDeclPrefix_Multicast,
-	EDeclPrefix_Event,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct TDeclPrefix
-{
-	EDeclPrefix m_PrefixKind;
-	uint_t m_TypeModifiers;
-};
-
-//.............................................................................
-
 enum EDeclSuffix
 {
 	EDeclSuffix_Undefined = 0,
@@ -151,7 +133,7 @@ class CDeclFunctionSuffix: public CDeclSuffix
 
 protected:
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
-	int m_FunctionTypeFlags;
+	uint_t m_FunctionTypeFlags;
 
 public:
 	CDeclFunctionSuffix ()
@@ -177,7 +159,8 @@ public:
 
 enum EPostDeclaratorModifier
 {
-	EPostDeclaratorModifier_Const = 0x01,
+	EPostDeclaratorModifier_Const    = 0x01,
+	EPostDeclaratorModifier_Volatile = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -212,7 +195,6 @@ enum EDeclarator
 	EDeclarator_UnaryBinaryOperator,
 	EDeclarator_CastOperator,
 	EDeclarator_PropValue,
-	EDeclarator_OnChange,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -233,8 +215,10 @@ protected:
 	uint_t m_PostDeclaratorModifiers;
 	CType* m_pBaseType;
 
-	rtl::CArrayT <TDeclPrefix> m_PrefixArray;
+	rtl::CArrayT <uint_t> m_PointerPrefixArray;
 	rtl::CStdListT <CDeclSuffix> m_SuffixList;
+	rtl::CBoxListT <CToken> m_Constructor;
+	rtl::CBoxListT <CToken> m_Initializer;
 
 public:
 	CDeclarator ();
@@ -314,10 +298,10 @@ public:
 		return m_pBaseType;
 	}
 
-	rtl::CArrayT <TDeclPrefix> 
-	GetPrefixArray ()
+	rtl::CArrayT <uint_t> 
+	GetPointerPrefixArray ()
 	{
-		return m_PrefixArray;
+		return m_PointerPrefixArray;
 	}
 
 	rtl::CConstListT <CDeclSuffix> 
@@ -337,7 +321,7 @@ public:
 	}
 
 	CType*
-	CalcType (uint_t* pDataPtrTypeFlags = NULL);
+	CalcType (uint_t* pFlags = NULL);
 
 	bool
 	AddName (rtl::CString Name);
@@ -360,8 +344,8 @@ public:
 	bool
 	SetOnChange ();
 
-	bool
-	AddPrefix (EDeclPrefix PrefixKind);
+	void
+	AddPointerPrefix ();
 
 	CDeclArraySuffix*
 	AddArraySuffix (size_t ElementCount);

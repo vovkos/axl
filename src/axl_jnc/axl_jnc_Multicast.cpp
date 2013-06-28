@@ -15,7 +15,7 @@ CMulticast::Clear ()
 }
 
 handle_t
-CMulticast::SetHandler (jnc::TFunctionPtr Ptr)
+CMulticast::SetHandler (TFunctionPtr Ptr)
 {
 	if (Ptr.m_pf)
 		return SetHandlerImpl (Ptr);
@@ -25,17 +25,7 @@ CMulticast::SetHandler (jnc::TFunctionPtr Ptr)
 }
 
 handle_t
-CMulticast::SetHandler_w (jnc::TFunctionPtr_w Ptr)
-{
-	if (Ptr.m_pf)
-		return SetHandlerImpl (Ptr);
-
-	Clear ();
-	return NULL;
-}
-
-handle_t
-CMulticast::SetHandler_u (void* pf)
+CMulticast::SetHandler_t (void* pf)
 {
 	if (pf)
 		return SetHandlerImpl (pf);
@@ -80,6 +70,42 @@ CMulticast::SetCount (
 	m_MaxCount = MaxCount;
 	m_Count = Count;
 	return true;
+}
+
+TFunctionPtr
+CMulticast::GetSnapshot ()
+{
+	ASSERT (m_pObject->m_pType->GetClassTypeKind () == EClassType_Multicast);
+	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
+	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
+	
+	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
+
+	struct TMcSnapshotObject: 
+		TObject,
+		TMcSnapshot
+	{
+	};
+	
+	TMcSnapshotObject* pSnapshot = AXL_MEM_NEW (TMcSnapshotObject);
+	pSnapshot->m_pType = pSnapshotType;
+	pSnapshot->m_pObject = pSnapshot;
+
+	if (Size)
+	{
+		pSnapshot->m_pPtrArray = AXL_MEM_ALLOC (Size);
+		pSnapshot->m_Count = m_Count;
+
+		memcpy (pSnapshot->m_pPtrArray, m_pPtrArray, Size);
+	}	
+
+	TFunctionPtr Ptr = { 0 };
+	Ptr.m_pClosure = pSnapshot;
+	Ptr.m_pf = pSnapshotType->GetMethod (EMcSnapshotMethod_Call)->GetMachineCode ();
+
+	ASSERT (Ptr.m_pf);
+
+	return Ptr;
 }
 
 //.............................................................................

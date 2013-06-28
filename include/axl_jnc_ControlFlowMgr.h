@@ -94,7 +94,7 @@ protected:
 	CBasicBlock* m_pReturnBlock; // bindable setters & destructors return here
 	CBasicBlock* m_pSilentReturnBlock; // bindable setters
 
-	int m_Flags;
+	uint_t m_Flags;
 
 public:
 	CControlFlowMgr ();

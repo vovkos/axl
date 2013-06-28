@@ -17,13 +17,9 @@ class CFunctionType;
 class CFunctionPtrType;
 class CPropertyType;
 class CPropertyPtrType;
-class CMulticastType;
-class CMcSnapshotType;
-class CAutoEvType;
-class CAutoEvPtrType;
+class CAutoEvClassType;
 class CImportType;
-class CPrimaryImportType;
-class CSecondaryImportType;
+class CImportPtrType;
 
 //.............................................................................
 
@@ -40,14 +36,7 @@ public:
 	CType*
 	CalcType (
 		CDeclarator* pDeclarator,
-		uint_t* pDataPtrTypeFlags
-		);
-
-	CType*
-	CalcDataType (
-		CType* pType,
-		uint_t TypeModifiers,
-		uint_t* pDataPtrTypeFlags
+		uint_t* pFlags
 		);
 
 	CType*
@@ -61,7 +50,10 @@ protected:
 	CheckUnusedModifiers ();
 
 	uint_t 
-	GetDataPtrTypeFlags ();
+	GetPtrTypeFlags ();
+
+	uint_t 
+	GetPropertyFlags ();
 
 	CType*
 	GetIntegerType (CType* pType);
@@ -78,11 +70,11 @@ protected:
 	CPropertyType*
 	GetBindableDataType (CType* pDataType);
 
-	CAutoEvType*
+	CClassType*
 	GetAutoEvType (CType* pReturnType);
 
-	CMulticastType*
-	GetMulticastType (CType* pReturnType);
+	CClassType*
+	GetMulticastType (CType* pLeftType);
 
 	CDataPtrType*
 	GetDataPtrType (CType* pDataType);
@@ -96,11 +88,8 @@ protected:
 	CPropertyPtrType*
 	GetPropertyPtrType (CPropertyType* pPropertyType);
 
-	CAutoEvPtrType*
-	GetAutoEvPtrType (CAutoEvType* pAutoEvType);
-
-	CType*
-	GetImportPtrType (CImportType* pImportType);
+	CImportPtrType*
+	GetImportPtrType (CNamedImportType* pImportType);
 
 	CType*
 	PrepareReturnType (CType* pType);
@@ -110,5 +99,3 @@ protected:
 
 } // namespace jnc {
 } // namespace axl {
-
-

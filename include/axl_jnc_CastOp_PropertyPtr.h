@@ -180,24 +180,6 @@ public:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CCast_PropertyPtr_Unsafe2Unsafe: public CCast_PropertyPtr_Base
-{
-public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr_Unsafe2Unsafe, ICastOperator)
-
-public:
-	virtual
-	bool
-	LlvmCast (
-		EStorage StorageKind,
-		const CValue& OpValue,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
 //.............................................................................
 
 // safe / unsafe fn pointer -> safe fn pointer
@@ -214,7 +196,6 @@ protected:
 	CCast_PropertyPtr_Thin2Normal m_Thin2Normal;
 	CCast_PropertyPtr_Thin2Weak m_Thin2Weak;
 	CCast_PropertyPtr_Thin2Thin m_Thin2Thin;
-	CCast_PropertyPtr_Unsafe2Unsafe m_Unsafe2Unsafe;
 
 	ICastOperator* m_OperatorTable [EPropertyPtrType__Count] [EPropertyPtrType__Count];
 

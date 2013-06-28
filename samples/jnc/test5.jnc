@@ -443,3 +443,15 @@ foo ()
 	CString* s = static new String;
 	
 }
+
+weak function* multicast Multi ();
+
+autoev* pCoo ();
+
+int property* p
+
+pmMulti ();
+
+m_Property;
+
+

@@ -135,14 +135,6 @@ COperatorMgr::COperatorMgr ()
 	m_CastOperatorTable [EType_FunctionRef] = &m_Cast_FunctionRef;
 	m_CastOperatorTable [EType_PropertyPtr] = &m_Cast_PropertyPtr;
 	m_CastOperatorTable [EType_PropertyRef] = &m_Cast_PropertyRef;
-
-	// multicast methods
-
-	m_MulticastMethodMap ["Clear"]  = EMulticastMethod_Clear;
-	m_MulticastMethodMap ["Set"]    = EMulticastMethod_Set;
-	m_MulticastMethodMap ["Add"]    = EMulticastMethod_Add;
-	m_MulticastMethodMap ["Remove"] = EMulticastMethod_Remove;
-	m_MulticastMethodMap ["Call"]   = EMulticastMethod_Call;
 }
 
 CType*
@@ -326,11 +318,12 @@ COperatorMgr::GetConditionalOperatorResultType (
 
 	CType* pResultType = 
 		pTrueType->Cmp (pFalseType) == 0 ? pTrueType : 
-		pTrueType->IsNumericType () && pFalseType->IsNumericType () ?
+		(pTrueType->GetTypeKindFlags () & pFalseType->GetTypeKindFlags () & ETypeKindFlag_Numeric) ?
 			GetArithmeticOperatorResultTypeKind (pTrueType, pFalseType) :
 			m_pModule->m_OperatorMgr.PrepareOperandType (pTrueType);
 
-	if (pResultType->IsDataPtrType () && ((CDataPtrType*) pResultType)->GetPtrTypeKind () == EDataPtrType_Thin)
+	if ((pResultType->GetTypeKindFlags () & ETypeKindFlag_DataPtr) && 
+		((CDataPtrType*) pResultType)->GetPtrTypeKind () == EDataPtrType_Thin)
 		pResultType = ((CDataPtrType*) pResultType)->GetTargetType ()->GetDataPtrType (
 			pResultType->GetTypeKind (),
 			EDataPtrType_Normal,
@@ -400,8 +393,6 @@ COperatorMgr::CastOperator (
 {
 	bool Result;
 
-	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
-	
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 
@@ -456,8 +447,6 @@ COperatorMgr::GetCastKind (
 	CType* pType
 	)
 {
-	pType = m_pModule->m_TypeMgr.PrepareDataType (pType);
-
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 
@@ -668,6 +657,16 @@ COperatorMgr::PrepareOperandType (
 
 			break;
 
+		case EType_ClassRef:
+			if (!(OpFlags & EOpFlag_KeepClassRef))
+			{
+				CClassPtrType* pPtrType = (CClassPtrType*) pType;
+				CClassType* pTargetType = pPtrType->GetTargetType ();
+				Value = pTargetType->GetClassPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
+			}
+
+			break;
+
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
@@ -691,12 +690,6 @@ COperatorMgr::PrepareOperandType (
 		case EType_Enum:
 			if (!(OpFlags & EOpFlag_KeepEnum))
 				Value = ((CEnumType*) pType)->GetBaseType ();
-
-			break;
-
-		case EType_Import:
-			if (!(OpFlags & EOpFlag_KeepImport))
-				Value = ((CImportType*) pType)->GetActualType ();
 
 			break;
 		}
@@ -761,6 +754,16 @@ COperatorMgr::PrepareOperand (
 
 			break;
 
+		case EType_ClassRef:
+			if (!(OpFlags & EOpFlag_KeepClassRef))
+			{
+				CClassPtrType* pPtrType = (CClassPtrType*) pType;
+				CClassType* pTargetType = pPtrType->GetTargetType ();
+				Value.OverrideType (pTargetType->GetClassPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ()));
+			}
+
+			break;
+
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
@@ -794,12 +797,6 @@ COperatorMgr::PrepareOperand (
 				Value.OverrideType (((CEnumType*) pType)->GetBaseType ());
 
 			break;
-
-		case EType_Import:
-			if (!(OpFlags & EOpFlag_KeepImport))
-				Value.OverrideType (((CImportType*) pType)->GetActualType ());
-
-			break;
 		}
 
 		if (Value.GetType () == pType)
@@ -821,13 +818,13 @@ COperatorMgr::CreateClosureObject (
 	bool Result;
 
 	CFunctionType* pSrcFunctionType;
-	if (OpValue.GetType ()->IsFunctionPtrType ())
+	if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr)
 	{
 		pSrcFunctionType = ((CFunctionPtrType*) OpValue.GetType ())->GetTargetType ();
 	}
 	else
 	{
-		ASSERT (OpValue.GetType ()->IsPropertyPtrType ());
+		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
 		pSrcFunctionType = ((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetGetterType ();
 	}
 
@@ -873,7 +870,7 @@ COperatorMgr::CreateClosureObject (
 		}
 	}
 
-	Result = pClosureType->CalcLayout ();
+	Result = pClosureType->EnsureLayout ();
 	if (!Result)
 		return false;
 	
@@ -893,11 +890,10 @@ COperatorMgr::CreateClosureObject (
 		CValue PtrValue = OpValue;
 		PtrValue.SetClosure (NULL); // remove closure
 
-		Result = m_pModule->m_OperatorMgr.SetClassFieldValue (
-			ClosureValue, 
-			*ClosureMember, 
-			PtrValue
-			);
+		CValue FieldValue;
+		Result = 
+			GetClassField (ClosureValue, *ClosureMember, NULL, &FieldValue) &&
+			BinaryOperator (EBinOp_Assign, FieldValue, PtrValue);
 
 		if (!Result)
 			return false;
@@ -915,11 +911,10 @@ COperatorMgr::CreateClosureObject (
 
 			ASSERT (ClosureMember);
 
-			Result = m_pModule->m_OperatorMgr.SetClassFieldValue (
-				ClosureValue, 
-				*ClosureMember, 
-				*ClosureArg
-				);
+			CValue FieldValue;
+			Result = 
+				GetClassField (ClosureValue, *ClosureMember, NULL, &FieldValue) &&
+				BinaryOperator (EBinOp_Assign, FieldValue, *ClosureArg);
 
 			if (!Result)
 				return false;

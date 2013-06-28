@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "axl_jnc_Type.h"
+#include "axl_jnc_ImportType.h"
 #include "axl_jnc_Scope.h"
 
 namespace axl {
@@ -17,10 +17,12 @@ class CScope;
 class CFunctionArg: public CUserModuleItem
 {
 	friend class CTypeMgr;
+	friend class CFunction;
 
 protected:
 	CType* m_pType;
-	int m_PtrTypeFlags;
+	CImportType* m_pType_i;
+	uint_t m_PtrTypeFlags;
 	rtl::CBoxListT <CToken> m_Initializer;
 	rtl::CString m_InitializerString;
 
@@ -33,7 +35,13 @@ public:
 		return m_pType;
 	}
 
-	int 
+	CImportType* 
+	GetType_i ()
+	{
+		return m_pType_i;
+	}
+
+	uint_t 
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
@@ -53,22 +61,18 @@ public:
 
 		return m_InitializerString;
 	}
+
+protected:
+	virtual 
+	bool
+	CalcLayout ();
 };
 
 //.............................................................................
 
-class CFunctionArgTuple: public rtl::TListLink
+struct TFunctionArgTuple: rtl::TListLink
 {
-	friend class CTypeMgr;
-
-protected:
-	CFunctionArg* m_ArgArray [2] [2]; // const x this
-
-public:
-	CFunctionArgTuple ()
-	{
-		memset (this, 0, sizeof (CFunctionArgTuple));
-	}
+	CFunctionArg* m_ArgArray [2] [2] [2]; // this x const x volatile
 };
 
 //.............................................................................

@@ -23,7 +23,7 @@ public:
 		const CValue& OpValue2
 		)
 	{
-		return CGetType (m_pModule, EType_Bool);
+		return m_pModule->GetSimpleType (EType_Bool);
 	}
 
 	virtual
@@ -62,7 +62,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedIntegerType ()
+						(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0
 						)
 					);
 				break;
@@ -73,7 +73,7 @@ public:
 					T::ConstOpInt32 (
 						OpValue1.GetInt32 (), 
 						OpValue2.GetInt32 (), 
-						pType->IsUnsignedIntegerType ()
+						(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0
 						)
 					);
 				break;
@@ -103,7 +103,7 @@ public:
 					OpValue1, 
 					OpValue2, 
 					pResultValue,
-					pType->IsUnsignedIntegerType ()
+					(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0
 					);
 				break;
 
