@@ -33,6 +33,22 @@ public:
 		CType* pType,
 		CValue* pResultValue
 		);
+
+protected:
+	bool
+	LlvmCast_DirectThunk (
+		CVariable* pVariable,
+		CPropertyPtrType* pDstPtrType,
+		CValue* pResultValue
+		);
+
+	bool
+	LlvmCast_FullClosure (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CPropertyPtrType* pDstPtrType,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................

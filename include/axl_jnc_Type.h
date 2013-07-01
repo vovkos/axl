@@ -67,8 +67,8 @@ enum EType
 	EType_Enum,                // E
 	EType_Struct,              // SS/SP (struct/pointer struct)
 	EType_Union,               // U
-	EType_Class,               // CC/CO/CB/CA (class/object/box/autoev)
-
+	EType_Class,               // CC/CO/CB/CA/CF/CD (class/object/box/autoev-iface/f-closure/d-closure)
+	
 	// function types
 
 	EType_Function,            // F
@@ -342,8 +342,9 @@ enum ETypeKindFlag
 	ETypeKindFlag_FunctionPtr  = 0x00000400,
 	ETypeKindFlag_PropertyPtr  = 0x00000800,
 	ETypeKindFlag_Ptr          = 0x00001000,
-	ETypeKindFlag_Import       = 0x00002000,
-	ETypeKindFlag_Code         = 0x00004000,
+	ETypeKindFlag_Ref          = 0x00002000,
+	ETypeKindFlag_Import       = 0x00004000,
+	ETypeKindFlag_Code         = 0x00008000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

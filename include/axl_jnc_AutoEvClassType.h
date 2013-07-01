@@ -143,25 +143,5 @@ protected:
 
 //.............................................................................
 
-inline
-bool
-IsAutoEvClassType (CType* pType)
-{
-	return 
-		pType->GetTypeKind () == EType_Class &&
-		((CClassType*) pType)->GetClassTypeKind () == EClassType_AutoEv;
-}
-
-inline
-bool
-IsAutoEvIfaceType (CType* pType)
-{
-	return 
-		pType->GetTypeKind () == EType_Class &&
-		((CClassType*) pType)->GetClassTypeKind () == EClassType_AutoEvIface;
-}
-
-//.............................................................................
-
 } // namespace jnc {
 } // namespace axl {

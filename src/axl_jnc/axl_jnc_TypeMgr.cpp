@@ -41,7 +41,9 @@ CTypeMgr::Clear ()
 	m_NamedImportTypeList.Clear ();
 	m_ImportPtrTypeList.Clear ();
 	m_AutoEvClassTypeList.Clear ();
-	m_ClosureClassTypeList.Clear ();
+	m_FunctionClosureClassTypeList.Clear ();
+	m_PropertyClosureClassTypeList.Clear ();
+	m_DataClosureClassTypeList.Clear ();
 	m_MulticastClassTypeList.Clear ();
 	m_McSnapshotClassTypeList.Clear ();
 
@@ -456,10 +458,19 @@ CTypeMgr::CreateClassType (
 		m_AutoEvClassTypeList.InsertTail ((CAutoEvClassType*) pType);
 		break;
 
-	case EClassType_Closure:
-	case EClassType_WeakClosure:
-		pType = AXL_MEM_NEW (CClosureClassType);
-		m_ClosureClassTypeList.InsertTail ((CClosureClassType*) pType);
+	case EClassType_FunctionClosure:
+		pType = AXL_MEM_NEW (CFunctionClosureClassType);
+		m_FunctionClosureClassTypeList.InsertTail ((CFunctionClosureClassType*) pType);
+		break;
+
+	case EClassType_PropertyClosure:
+		pType = AXL_MEM_NEW (CPropertyClosureClassType);
+		m_PropertyClosureClassTypeList.InsertTail ((CPropertyClosureClassType*) pType);
+		break;
+
+	case EClassType_DataClosure:
+		pType = AXL_MEM_NEW (CDataClosureClassType);
+		m_DataClosureClassTypeList.InsertTail ((CDataClosureClassType*) pType);
 		break;
 
 	case EClassType_Multicast:
@@ -777,7 +788,7 @@ CTypeMgr::GetMemberMethodType (
 	uint_t ThisArgPtrTypeFlags
 	)
 {
-	if (!IsStdObjectType (pParentType)) // std object members are miscellaneous closures
+	if (!IsClassType (pParentType, EClassType_StdObject)) // std object members are miscellaneous closures
 		ThisArgPtrTypeFlags |= EPtrTypeFlag_Checked;
 
 	CType* pThisArgType = pParentType->GetThisArgType (ThisArgPtrTypeFlags);
@@ -1201,12 +1212,131 @@ CTypeMgr::CreateAutoEvType (
 	return pType;
 }
 
+CFunctionClosureClassType* 
+CTypeMgr::GetFunctionClosureClassType (
+	CFunctionType* pTargetType,
+	CFunctionType* pThunkType,
+	CType* const* ppArgTypeArray,
+	const size_t* pClosureMap,
+	size_t ArgCount,
+	uint64_t WeakMask
+	)
+{
+	rtl::CString Signature = CClosureClassType::CreateSignature (
+		pTargetType,
+		pThunkType,
+		ppArgTypeArray, 
+		pClosureMap, 
+		ArgCount, 
+		WeakMask
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CFunctionClosureClassType*) It->m_Value;
+
+	CFunctionClosureClassType* pType = (CFunctionClosureClassType*) CreateUnnamedClassType (EClassType_FunctionClosure);
+	pType->m_Signature = Signature;
+	pType->m_ClosureMap.Copy (pClosureMap, ArgCount);
+	pType->m_WeakMask = WeakMask;
+
+	pType->CreateField (pTargetType->GetFunctionPtrType (EFunctionPtrType_Thin));
+
+	for (size_t i = 0; i < ArgCount; i++)
+		pType->CreateField (ppArgTypeArray [i]);
+
+	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.CreateInternalFunction ("thunk_function", pThunkType);
+	pType->AddMethod (pThunkFunction);
+	pType->m_pThunkFunction = pThunkFunction;
+
+	pType->EnsureLayout ();
+	m_pModule->MarkForCompile (pType);
+
+	It->m_Value = pType;
+
+	return pType;
+}
+
+CPropertyClosureClassType* 
+CTypeMgr::GetPropertyClosureClassType (
+	CPropertyType* pTargetType,
+	CPropertyType* pThunkType,
+	CType* const* ppArgTypeArray,
+	const size_t* pClosureMap,
+	size_t ArgCount,
+	uint64_t WeakMask
+	)
+{
+	rtl::CString Signature = CClosureClassType::CreateSignature (
+		pTargetType,
+		pThunkType,
+		ppArgTypeArray, 
+		pClosureMap, 
+		ArgCount, 
+		WeakMask
+		);
+
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CPropertyClosureClassType*) It->m_Value;
+
+	CPropertyClosureClassType* pType = (CPropertyClosureClassType*) CreateUnnamedClassType (EClassType_PropertyClosure);
+	pType->m_Signature = Signature;
+	pType->m_ClosureMap.Copy (pClosureMap, ArgCount);
+	pType->m_WeakMask = WeakMask;
+
+	pType->CreateField (pTargetType->GetPropertyPtrType (EPropertyPtrType_Thin));
+
+	for (size_t i = 0; i < ArgCount; i++)
+		pType->CreateField (ppArgTypeArray [i]);
+
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property", pThunkType);
+	pType->AddProperty (pThunkProperty);
+	pType->m_pThunkProperty = pThunkProperty;
+
+	pType->EnsureLayout ();
+	m_pModule->MarkForCompile (pType);
+
+	It->m_Value = pType;
+
+	return pType;
+}
+
+CDataClosureClassType* 
+CTypeMgr::GetDataClosureClassType (
+	CType* pTargetType,
+	CPropertyType* pThunkType
+	)
+{
+	rtl::CString Signature = CDataClosureClassType::CreateSignature (pTargetType, pThunkType);
+
+	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+		return (CDataClosureClassType*) It->m_Value;
+
+	CDataClosureClassType* pType = (CDataClosureClassType*) CreateUnnamedClassType (EClassType_DataClosure);
+	pType->m_Signature = Signature;
+
+	pType->CreateField (pTargetType->GetDataPtrType ());
+
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property", pThunkType);
+	pType->AddProperty (pThunkProperty);
+	pType->m_pThunkProperty = pThunkProperty;
+
+	pType->EnsureLayout ();
+	m_pModule->MarkForCompile (pType);
+
+	It->m_Value = pType;
+
+	return pType;
+}
+
 CDataPtrType* 
 CTypeMgr::GetDataPtrType (
 	CType* pDataType,
 	EType TypeKind,
 	EDataPtrType PtrTypeKind,
-	uint_t Flags
+		uint_t Flags
 	)
 {
 	ASSERT (TypeKind == EType_DataPtr || TypeKind == EType_DataRef);

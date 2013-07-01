@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_jnc_CastOp_PropertyPtr.h"
-#include "axl_jnc_Closure.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -37,39 +36,73 @@ CCast_PropertyPtr_FromDataPtr::LlvmCast (
 
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
 
-	CProperty* pThunkProperty;
-	CValue ClosureArgValue;
-	
 	if (OpValue.GetValueKind () == EValue_Variable &&
 		OpValue.GetVariable ()->GetStorageKind () == EStorage_Static &&
 		OpValue.GetLlvmValue () == OpValue.GetVariable ()->GetLlvmValue ())
 	{
-		pThunkProperty = m_pModule->m_FunctionMgr.GetDirectDataThunkProperty (
-			OpValue.GetVariable (),
-			pDstPtrType->GetTargetType (),
-			pDstPtrType->HasClosure ()
-			);
-
-		if (pDstPtrType->HasClosure ())
-			ClosureArgValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
+		return LlvmCast_DirectThunk (OpValue.GetVariable (), pDstPtrType, pResultValue);
 	}
-	else
+
+	if (pDstPtrType->GetPtrTypeKind () == EPropertyPtrType_Thin)
 	{
-		CDataPtrType* pTargetPtrType = (CDataPtrType*) OpValue.GetType ();
-		if (pTargetPtrType->GetPtrTypeKind () == EDataPtrType_Thin)	
-			pTargetPtrType = pTargetPtrType->GetTargetType ()->GetDataPtrType (EDataPtrType_Normal, pTargetPtrType->GetFlags ());
-
-		pThunkProperty = m_pModule->m_FunctionMgr.GetClosureDataThunkProperty (pTargetPtrType, pDstPtrType->GetTargetType ());
-		ClosureArgValue = OpValue;
+		SetCastError (OpValue, pType);
+		return false;
 	}
 
-	CValue PropertyPtrValue = pThunkProperty;
-	m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &PropertyPtrValue);
+	return LlvmCast_FullClosure (StorageKind, OpValue, pDstPtrType, pResultValue);
+}
 
-	if (ClosureArgValue)
-		PropertyPtrValue.InsertToClosureHead (ClosureArgValue);
+bool
+CCast_PropertyPtr_FromDataPtr::LlvmCast_DirectThunk (
+	CVariable* pVariable,
+	CPropertyPtrType* pDstPtrType,
+	CValue* pResultValue
+	)
+{
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectDataThunkProperty (
+		pVariable,
+		pDstPtrType->GetTargetType (),
+		pDstPtrType->HasClosure ()
+		);
 
-	return m_pModule->m_OperatorMgr.CastOperator (PropertyPtrValue, pType, pResultValue);
+	CValue PropertyValue = pThunkProperty;
+	m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &PropertyValue);
+
+	CValue ClosureValue;
+
+	if (pDstPtrType->HasClosure ())
+	{
+		ClosureValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
+		PropertyValue.InsertToClosureHead (ClosureValue);
+	}
+
+	return m_pModule->m_OperatorMgr.CastOperator (PropertyValue, pDstPtrType, pResultValue);
+}
+
+bool
+CCast_PropertyPtr_FromDataPtr::LlvmCast_FullClosure (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CPropertyPtrType* pDstPtrType,
+	CValue* pResultValue
+	)
+{
+	CValue ClosureValue;
+	bool Result = m_pModule->m_OperatorMgr.CreateDataClosureObject (
+		StorageKind, 
+		OpValue, 
+		pDstPtrType->GetTargetType (),
+		&ClosureValue
+		);
+
+	if (!Result)
+		return false;
+	
+	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_PropertyClosure));
+
+	CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
+	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
+	return true;
 }
 
 //.............................................................................
@@ -272,26 +305,22 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_FullClosure (
 	CValue* pResultValue
 	)
 {
-	char Buffer [256];
-	rtl::CArrayT <size_t> ClosureMap (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	CValue ClosureValue;
+	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (
+		StorageKind, 
+		OpValue, 
+		pDstPtrType->GetTargetType (),
+		&ClosureValue
+		);
 
-	CValue ClosureObjValue;
-	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (StorageKind, OpValue, &ClosureMap, &ClosureObjValue);
 	if (!Result)
 		return false;
 
-	ASSERT (ClosureObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pClosureType = ((CClassPtrType*) ClosureObjValue.GetType ())->GetTargetType ();
+	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_PropertyClosure));
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetClosureThunkProperty (
-		pSrcPropertyType,
-		OpValue.GetProperty (), 
-		pClosureType,
-		ClosureMap,
-		pDstPtrType->GetTargetType ()
-		);
-
-	return CreateClosurePropertyPtr (pThunkProperty, ClosureObjValue, pDstPtrType, pResultValue);
+	CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
+	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
+	return true;
 }
 
 bool

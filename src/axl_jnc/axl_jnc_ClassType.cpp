@@ -120,6 +120,9 @@ CClassType::AddMethod (CFunction* pFunction)
 
 	switch (FunctionKind)
 	{
+	case EFunction_Internal:
+		return true;
+
 	case EFunction_PreConstructor:
 		ppTarget = &m_pPreConstructor;
 		break;

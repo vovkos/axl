@@ -13,6 +13,17 @@ namespace jnc {
 
 //.............................................................................
 
+enum EProperty
+{
+	EProperty_Undefined = 0,
+	EProperty_Normal,
+	EProperty_Thunk,
+	EProperty_DataThunk,
+	EProperty__Count
+};
+
+//.............................................................................
+
 enum EPropertyFlag
 {
 	EPropertyFlag_AutoGet  = 0x020000,
@@ -20,7 +31,6 @@ enum EPropertyFlag
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 
 class CProperty: 
 	public CModuleItem,
@@ -33,6 +43,8 @@ class CProperty:
 	friend class CParser;
 
 protected:
+	EProperty m_PropertyKind;
+
 	CPropertyType* m_pType;
 
 	// construction / destruction / accessors
@@ -72,6 +84,12 @@ protected:
 
 public:
 	CProperty ();
+
+	EProperty 
+	GetPropertyKind ()
+	{
+		return m_PropertyKind;
+	}
 
 	CPropertyType* 
 	GetType ()

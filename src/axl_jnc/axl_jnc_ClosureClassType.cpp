@@ -7,116 +7,116 @@ namespace jnc {
 
 //.............................................................................
 
-CClosureClassType::CClosureClassType ()
+rtl::CString
+CClosureClassType::CreateSignature (
+	CType* pTargetType, // function or property
+	CType* pThunkType, // function or property
+	CType* const* ppArgTypeArray,
+	const size_t* pClosureMap,
+	size_t ArgCount,
+	uint64_t WeakMask
+	)
 {
-	m_ClassTypeKind = EClassType_Closure;
-	m_pThunkMethod = NULL;
+	rtl::CString Signature = "CF";
+
+	if (WeakMask)
+		Signature.AppendFormat ("W%x-", WeakMask);
+
+	Signature.AppendFormat (
+		"%s-%s(", 
+		pTargetType->GetTypeString ().cc (),
+		pThunkType->GetTypeString ().cc ()
+		);
+	
+	ASSERT (ArgCount);
+	for (size_t i = 0; i < ArgCount; i++)
+		Signature.AppendFormat ("%d:%s", pClosureMap [i], ppArgTypeArray [i]->GetTypeString ().cc ());
+
+	Signature.Append (')');
+	return Signature;
 }
 
-bool
-CClosureClassType::CompileThunkMethod ()
+void
+CClosureClassType::BuildArgValueList (
+	const CValue& ClosureValue,
+	const CValue* pThunkArgValueArray,
+	size_t ThunkArgCount,
+	rtl::CBoxListT <CValue>* pArgValueList
+	)
 {
-/*
+	rtl::CIteratorT <CStructField> Field = GetFieldList ().GetHead ();
+	Field++; // skip function / property ptr
 
-bool
-CThunkFunction::CompileClosureThunk ()
-{
-	ASSERT (m_pClosureType);
-
-	bool Result;
-
-	rtl::CArrayT <CFunctionArg*> TargetArgArray = m_pTargetFunctionType->GetArgArray ();
-	rtl::CArrayT <CFunctionArg*> ThunkArgArray = m_pType->GetArgArray ();
-	rtl::CArrayT <size_t> ClosureMap = m_ClosureMap;
-
-	size_t TargetArgCount = TargetArgArray.GetCount ();
-	size_t ThunkArgCount = ThunkArgArray.GetCount ();
-	size_t ClosureArgCount = m_ClosureMap.GetCount ();
-
-	char Buffer [256];
-	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgArray.SetCount (TargetArgCount);
-
-	m_pModule->m_FunctionMgr.InternalPrologue (this);
-
-	llvm::Function::arg_iterator LlvmArg = GetLlvmFunction ()->arg_begin();
-
-	CValue ClosureValue (LlvmArg++, m_pClosureType->GetClassPtrType ());
-
-	CStructType* pClosureFieldStructType = m_pClosureType->GetIfaceStructType ();
-	ASSERT (pClosureFieldStructType);
-
-	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldList ().GetHead ();
-
-	CValue PfnValue;
-
-	if (m_pTargetFunction)
-	{
-		PfnValue = m_pTargetFunction;
-	}
-	else
-	{
-		Result = m_pModule->m_OperatorMgr.GetClassField (ClosureValue, *ClosureMember, NULL, &PfnValue);
-		if (!Result)
-			return false;
-
-		ClosureMember++;
-	}
-	
-	size_t i = 0;
-	size_t iThunk = 1; // skip ClosureValue arg
 	size_t iClosure = 0;
+	size_t iThunk = 1; // skip 'this' arg
 
-	for (; i < TargetArgCount && iClosure < ClosureArgCount; i++)
+	// part 1 -- arguments come both from closure and from thunk
+
+	for (size_t i = 0; Field; i++)
 	{
 		CValue ArgValue;
 
 		if (i == m_ClosureMap [iClosure])
 		{		
-			Result = m_pModule->m_OperatorMgr.GetClassField (ClosureValue, *ClosureMember, NULL, &ArgValue);
-
-			if (!Result)
-				return false;
-
-			ClosureMember++;
+			m_pModule->m_OperatorMgr.GetClassField (ClosureValue, *Field, NULL, &ArgValue);
+			Field++;
 			iClosure++;
 		}
 		else
 		{
-			ArgValue = CValue (LlvmArg, ThunkArgArray [iThunk]->GetType ());
-			LlvmArg++;
+			ArgValue = pThunkArgValueArray [iThunk];
 			iThunk++;
 		}
 
-		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgArray [i]->GetType ());
-		if (!Result)
-			return false;
-
-		ArgArray [i] = ArgValue;
+		pArgValueList->InsertTail (ArgValue);
 	}	
 
-	for (; i < TargetArgCount; i++, iThunk, LlvmArg++)
-	{
-		CValue ArgValue (LlvmArg, ThunkArgArray [iThunk]->GetType ());
+	// part 2 -- arguments come from thunk only
 
-		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgArray [i]->GetType ());
-		if (!Result)
-			return false;
+	for (; iThunk < ThunkArgCount; iThunk++)
+		pArgValueList->InsertTail (pThunkArgValueArray [iThunk]);
+}
 
-		ArgArray [i] = ArgValue;
-	}	
+//.............................................................................
+
+CFunctionClosureClassType::CFunctionClosureClassType ()
+{
+	m_ClassTypeKind = EClassType_FunctionClosure;
+	m_pThunkFunction = NULL;
+}
+
+bool
+CFunctionClosureClassType::Compile ()
+{
+	ASSERT (m_pThunkFunction);
+
+	bool Result = CClassType::Compile ();
+	if (!Result)
+		return false;
+
+	size_t ArgCount = m_pThunkFunction->GetType ()->GetArgArray ().GetCount ();
+
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);	
+
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pThunkFunction, ArgValueArray, ArgCount);	
+	
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	CValue PfnValue;
+	m_pModule->m_OperatorMgr.GetClassField (ThisValue, *GetFieldList ().GetHead (), NULL, &PfnValue);
+
+	rtl::CBoxListT <CValue> ArgValueList;
+	BuildArgValueList (ThisValue, ArgValueArray, ArgCount, &ArgValueList);
 
 	CValue ReturnValue;
+	Result = m_pModule->m_OperatorMgr.CallOperator (PfnValue, &ArgValueList, &ReturnValue);
+	if (!Result)
+		return false;
 
-	m_pModule->m_LlvmBuilder.CreateCall (
-		PfnValue, 
-		m_pTargetFunctionType,
-		ArgArray,
-		ArgArray.GetCount (),
-		&ReturnValue
-		);
-
-	if (m_pType->GetReturnType ()->GetTypeKind () != EType_Void)
+	if (m_pThunkFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
 	{
 		Result = m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 		if (!Result)
@@ -127,135 +127,223 @@ CThunkFunction::CompileClosureThunk ()
 	return true;
 }
 
+//.............................................................................
 
-*/
-
-	return true;
+CPropertyClosureClassType::CPropertyClosureClassType ()
+{
+	m_ClassTypeKind = EClassType_PropertyClosure;
+	m_pThunkProperty = NULL;
 }
-
-/*
 
 bool
-COperatorMgr::CreateClosureObject (
-	EStorage StorageKind,
-	const CValue& OpValue, // function or property thin ptr
-	rtl::CArrayT <size_t>* pClosureMap,
-	CValue* pResultValue
-	)
+CPropertyClosureClassType::Compile ()
 {
-	bool Result;
+	ASSERT (m_pThunkProperty);
 
-	CFunctionType* pSrcFunctionType;
-	if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr)
-	{
-		pSrcFunctionType = ((CFunctionPtrType*) OpValue.GetType ())->GetTargetType ();
-	}
-	else
-	{
-		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
-		pSrcFunctionType = ((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetGetterType ();
-	}
-
-	CClassType* pClosureType = m_pModule->m_TypeMgr.CreateUnnamedClassType ();
-
-	bool IsIndirect = 
-		OpValue.GetValueKind () != EValue_Function &&
-		OpValue.GetValueKind () != EValue_Property;
-	
-	if (IsIndirect)
-		pClosureType->CreateField (OpValue.GetType ());
-
-	CClosure* pClosure = OpValue.GetClosure ();
-
-	const rtl::CBoxListT <CValue>* pClosureArgList = NULL;
-	
-	if (pClosure)
-	{
-		pClosureArgList = pClosure->GetArgList ();
-		rtl::CArrayT <CFunctionArg*> SrcArgArray = pSrcFunctionType->GetArgArray ();
-
-		size_t ClosureArgCount = pClosureArgList->GetCount ();
-		size_t SrcArgCount = SrcArgArray.GetCount ();
-
-		pClosureMap->Reserve (ClosureArgCount);
-
-		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
-
-		if (ClosureArgCount > SrcArgCount)
-		{
-			err::SetFormatStringError ("closure is too big for '%s'", pSrcFunctionType->GetTypeString ().cc ());
-			return false;
-		}
-
-		for (size_t i = 0; ClosureArg; ClosureArg++, i++)
-		{
-			if (ClosureArg->IsEmpty ())
-				continue;
-
-			ASSERT (i < SrcArgCount);
-			pClosureMap->Append (i);
-			pClosureType->CreateField (SrcArgArray [i]->GetType ());
-		}
-	}
-
-	Result = pClosureType->EnsureLayout ();
-	if (!Result)
-		return false;
-	
-	CValue ClosureValue;
-	Result = m_pModule->m_OperatorMgr.NewOperator (StorageKind, pClosureType, NULL, &ClosureValue);
+	bool Result = CClassType::Compile ();
 	if (!Result)
 		return false;
 
-	// save pf & arguments in the closure
-	
-	CStructType* pClosureFieldStructType = pClosureType->GetIfaceStructType ();
-	ASSERT (pClosureFieldStructType);
+	CFunction* pGetter = m_pThunkProperty->GetGetter ();
+	CFunction* pSetter = m_pThunkProperty->GetSetter ();
+	CFunction* pBinder = m_pThunkProperty->GetBinder ();
 
-	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldList ().GetHead ();
-	if (IsIndirect)
+	if (pBinder)
 	{
-		CValue PtrValue = OpValue;
-		PtrValue.SetClosure (NULL); // remove closure
-
-		CValue FieldValue;
-		Result = 
-			GetClassField (ClosureValue, *ClosureMember, NULL, &FieldValue) &&
-			BinaryOperator (EBinOp_Assign, FieldValue, PtrValue);
-
+		Result = CompileAccessor (pBinder);
 		if (!Result)
 			return false;
-		
-		ClosureMember++;
 	}
 
-	if (pClosure)
+	Result = CompileAccessor (pGetter);
+	if (!Result)
+		return false;
+	
+	if (pSetter)
 	{
-		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
-		for (; ClosureArg; ClosureArg++)
+		size_t OverloadCount = pSetter->GetOverloadCount ();
+
+		for (size_t i = 0; i < OverloadCount; i++)
 		{
-			if (ClosureArg->IsEmpty ())
-				continue;
+			CFunction* pOverload = pSetter->GetOverload (i);
 
-			ASSERT (ClosureMember);
-
-			CValue FieldValue;
-			Result = 
-				GetClassField (ClosureValue, *ClosureMember, NULL, &FieldValue) &&
-				BinaryOperator (EBinOp_Assign, FieldValue, *ClosureArg);
-
+			Result = CompileAccessor (pOverload);
 			if (!Result)
 				return false;
-
-			ClosureMember++;
 		}
 	}
 
-	*pResultValue = ClosureValue;
 	return true;
 }
 
-*/
+bool
+CPropertyClosureClassType::CompileAccessor (CFunction* pAccessor)
+{
+	ASSERT (pAccessor->GetProperty () == m_pThunkProperty);
+
+	bool Result;
+
+	size_t ArgCount = pAccessor->GetType ()->GetArgArray ().GetCount ();
+
+	char Buffer [256];
+	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	ArgValueArray.SetCount (ArgCount);	
+
+	m_pModule->m_FunctionMgr.InternalPrologue (pAccessor, ArgValueArray, ArgCount);	
+	
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	CValue PropertyPtrValue;
+	Result = m_pModule->m_OperatorMgr.GetClassField (ThisValue, *GetFieldList ().GetHead (), NULL, &PropertyPtrValue);
+	ASSERT (Result);
+
+	CValue PfnValue;
+
+	EFunction AccessorKind = pAccessor->GetFunctionKind ();
+	switch (AccessorKind)
+	{
+	case EFunction_Binder:
+		Result = m_pModule->m_OperatorMgr.GetPropertyBinder (PropertyPtrValue, &PfnValue);
+		break;
+
+	case EFunction_Getter:
+		Result = m_pModule->m_OperatorMgr.GetPropertyGetter (PropertyPtrValue, &PfnValue);
+		break;
+
+	case EFunction_Setter:
+		Result = m_pModule->m_OperatorMgr.GetPropertySetter (PropertyPtrValue, ArgValueArray [ArgCount - 1], &PfnValue);
+		break;
+
+	default:
+		err::SetFormatStringError ("invalid property accessor '%s' in property closure", GetFunctionKindString (AccessorKind));
+		return false;
+	}
+
+	if (!Result)
+		return false;
+
+	rtl::CBoxListT <CValue> ArgValueList;
+	BuildArgValueList (ThisValue, ArgValueArray, ArgCount, &ArgValueList);
+
+	CValue ReturnValue;
+	Result = m_pModule->m_OperatorMgr.CallOperator (PfnValue, &ArgValueList, &ReturnValue);
+	if (!Result)
+		return false;
+
+	if (pAccessor->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
+	{
+		Result = m_pModule->m_ControlFlowMgr.Return (ReturnValue);
+		if (!Result)
+			return false;
+	}
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+//.............................................................................
+
+CDataClosureClassType::CDataClosureClassType ()
+{
+	m_ClassTypeKind = EClassType_DataClosure;
+	m_pThunkProperty = NULL;
+}
+
+rtl::CString
+CDataClosureClassType::CreateSignature (
+	CType* pTargetType,
+	CPropertyType* pThunkType
+	)
+{
+	rtl::CString Signature = "CD";
+
+	Signature.AppendFormat (
+		"%s-%s", 
+		pTargetType->GetTypeString ().cc (),
+		pThunkType->GetTypeString ().cc ()
+		);
+
+	return Signature;
+}
+
+bool
+CDataClosureClassType::Compile ()
+{
+	ASSERT (m_pThunkProperty);
+
+	bool Result = CClassType::Compile ();
+	if (!Result)
+		return false;
+
+	CFunction* pGetter = m_pThunkProperty->GetGetter ();
+	CFunction* pSetter = m_pThunkProperty->GetSetter ();
+
+	Result = CompileGetter (pGetter);
+	if (!Result)
+		return false;
+	
+	if (pSetter)
+	{
+		size_t OverloadCount = pSetter->GetOverloadCount ();
+
+		for (size_t i = 0; i < OverloadCount; i++)
+		{
+			CFunction* pOverload = pSetter->GetOverload (i);
+
+			Result = CompileSetter (pOverload);
+			if (!Result)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool
+CDataClosureClassType::CompileGetter (CFunction* pGetter)
+{
+	m_pModule->m_FunctionMgr.InternalPrologue (pGetter);	
+	
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	CValue PtrValue;
+
+	bool Result = 
+		m_pModule->m_OperatorMgr.GetClassField (ThisValue, *GetFieldList ().GetHead (), NULL, &PtrValue) &&
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &PtrValue) && 
+		m_pModule->m_ControlFlowMgr.Return (PtrValue);
+
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
+
+bool
+CDataClosureClassType::CompileSetter (CFunction* pSetter)
+{
+	CValue ArgValue;
+	m_pModule->m_FunctionMgr.InternalPrologue (pSetter, &ArgValue, 1);	
+	
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	CValue PtrValue;
+
+	bool Result = 
+		m_pModule->m_OperatorMgr.GetClassField (ThisValue, *GetFieldList ().GetHead (), NULL, &PtrValue) &&
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &PtrValue) && 
+		m_pModule->m_OperatorMgr.StoreDataRef (PtrValue, ArgValue);
+
+	if (!Result)
+		return false;
+
+	m_pModule->m_FunctionMgr.InternalEpilogue ();
+	return true;
+}
 
 //.............................................................................
 

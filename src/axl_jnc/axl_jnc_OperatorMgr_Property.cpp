@@ -33,11 +33,7 @@ COperatorMgr::GetPropertyVTable (
 	)
 {
 	if (pProperty->IsVirtual ())
-	{
-		bool Result = GetVirtualProperty (pProperty, pClosure, pResultValue);
-		if (!Result)
-			return false;
-	}
+		return GetVirtualProperty (pProperty, pClosure, pResultValue);
 
 	*pResultValue = pProperty->GetVTablePtrValue ();
 	return true;
@@ -148,8 +144,10 @@ COperatorMgr::GetPropertyGetter (
 	if (!Result)
 		return false;
 
+	size_t Index = (pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable) ? 1 : 0;
+
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, 0, NULL, &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, Index, NULL, &PfnValue);
 	m_pModule->m_LlvmBuilder.CreateLoad (
 		PfnValue, 
 		pPropertyType->GetGetterType ()->GetFunctionPtrType (EFunctionPtrType_Thin, pPtrType->GetFlags ()), 
@@ -257,8 +255,11 @@ COperatorMgr::GetPropertySetter (
 	if (!Result)
 		return false;
 
+	size_t Index = (pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable) ? 2 : 1;
+	Index += i;
+
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, i + 1, NULL, &PfnValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, Index, NULL, &PfnValue);
 	m_pModule->m_LlvmBuilder.CreateLoad (
 		PfnValue, 
 		pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin, pPtrType->GetFlags ()), 

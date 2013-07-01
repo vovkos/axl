@@ -41,6 +41,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_PropertyTemplate.h
 	${AXL_INC_DIR}/axl_jnc_PropertyVerifier.h
 	${AXL_INC_DIR}/axl_jnc_ThunkFunction.h
+	${AXL_INC_DIR}/axl_jnc_ThunkProperty.h
 	)
 
 set (
@@ -52,6 +53,7 @@ set (
 	axl_jnc_PropertyTemplate.cpp
 	axl_jnc_PropertyVerifier.cpp
 	axl_jnc_ThunkFunction.cpp
+	axl_jnc_ThunkProperty.cpp
 	)
 
 source_group (
@@ -174,6 +176,7 @@ set (
 	axl_jnc_OperatorMgr.cpp
 	axl_jnc_OperatorMgr_Call.cpp
 	axl_jnc_OperatorMgr_CheckPtr.cpp
+	axl_jnc_OperatorMgr_Closure.cpp
 	axl_jnc_OperatorMgr_DataRef.cpp
 	axl_jnc_OperatorMgr_Field.cpp
 	axl_jnc_OperatorMgr_Member.cpp

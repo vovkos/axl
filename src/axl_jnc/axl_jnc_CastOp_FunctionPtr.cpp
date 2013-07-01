@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_jnc_CastOp_FunctionPtr.h"
-#include "axl_jnc_Closure.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -118,6 +117,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 	if (OpValue.GetValueKind () == EValue_Function)
 	{
 		CFunction* pFunction = OpValue.GetFunction ();
+		ASSERT (!pFunction->IsVirtual ());
 
 		// case 2.1: conversion is required, but no closure object needs to be created (closure arg is null)
 		
@@ -222,26 +222,21 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 	CValue* pResultValue
 	)
 {
-	char Buffer [256];
-	rtl::CArrayT <size_t> ClosureMap (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	CValue ClosureValue;
+	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (
+		StorageKind, 
+		OpValue, 
+		pDstPtrType->GetTargetType (),
+		&ClosureValue
+		);
 
-	CValue ClosureObjValue;
-	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (StorageKind, OpValue, &ClosureMap, &ClosureObjValue);
 	if (!Result)
 		return false;
 
-	ASSERT (ClosureObjValue.GetType ()->GetTypeKind () == EType_ClassPtr);
-	CClassType* pClosureType = ((CClassPtrType*) ClosureObjValue.GetType ())->GetTargetType ();
+	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_FunctionClosure));
 
-	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetClosureThunkFunction (
-		pSrcFunctionType,
-		OpValue.GetValueKind () == EValue_Function ? OpValue.GetFunction () : NULL, 
-		pClosureType,
-		ClosureMap,
-		pDstPtrType->GetTargetType ()
-		);
-
-	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pThunkFunction, ClosureObjValue, pDstPtrType, pResultValue);
+	CFunctionClosureClassType* pClosureType = (CFunctionClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
+	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pClosureType->GetThunkFunction (), ClosureValue, pDstPtrType, pResultValue);
 	return true;
 }
 

@@ -354,7 +354,7 @@ CParser::Declare (CDeclarator* pDeclarator)
 				return DeclarePropValue (pType, pDeclarator, ItemFlags);
 
 			default:
-				return IsAutoEvIfaceType (pType) ?
+				return IsClassType (pType, EClassType_AutoEvIface) ?
 					DeclareAutoEv ((CAutoEvClassType*) pType, pDeclarator, ItemFlags) :				
 					DeclareData (pType, pDeclarator, ItemFlags);
 			}
@@ -415,7 +415,7 @@ CParser::DeclareTypedef (
 
 	CModuleItem* pItem;
 
-	if (IsAutoEvIfaceType (pType))
+	if (IsClassType (pType, EClassType_AutoEvIface))
 	{
 		pType = m_pModule->m_TypeMgr.CreateAutoEvType (Name, QualifiedName, (CClassType*) pType, NULL);
 		pItem = pType;
@@ -1554,7 +1554,7 @@ CParser::SetFunctionBody (rtl::CBoxListT <CToken>* pBody)
 		return false;
 	}
 
-	if (!IsAutoEvClassType (pType))
+	if (!IsClassType (pType, EClassType_AutoEv))
 	{
 		err::SetFormatStringError ("only functions and autoevs can have bodies, not '%s'", pType->GetTypeString ());
 		return false;

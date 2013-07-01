@@ -78,5 +78,19 @@ struct TClassPtrTypeTuple: rtl::TListLink
 
 //.............................................................................
 
+inline
+bool
+IsClassPtrType (
+	CType* pType, 
+	EClassType ClassTypeKind
+	)
+{
+	return 
+		(pType->GetTypeKindFlags () & ETypeKindFlag_ClassPtr) &&
+		((CClassPtrType*) pType)->GetTargetType ()->GetClassTypeKind () == ClassTypeKind;
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

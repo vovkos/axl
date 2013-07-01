@@ -28,8 +28,9 @@ enum EClassType
 	EClassType_McSnapshot,
 	EClassType_AutoEv,
 	EClassType_AutoEvIface,
-	EClassType_Closure,
-	EClassType_WeakClosure,
+	EClassType_FunctionClosure,
+	EClassType_PropertyClosure,
+	EClassType_DataClosure,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -149,6 +150,12 @@ public:
 	GetDestructor ()
 	{
 		return m_pDestructor;
+	}
+
+	rtl::CConstListT <CStructField>
+	GetFieldList ()
+	{
+		return m_pIfaceStructType->GetFieldList ();
 	}
 
 	virtual
@@ -283,13 +290,16 @@ protected:
 
 //.............................................................................
 
-inline 
+inline
 bool
-IsStdObjectType (CType* pType)
+IsClassType (
+	CType* pType, 
+	EClassType ClassTypeKind
+	)
 {
 	return 
 		pType->GetTypeKind () == EType_Class &&
-		((CClassType*) pType)->GetClassTypeKind () == EClassType_StdObject;
+		((CClassType*) pType)->GetClassTypeKind () == ClassTypeKind;
 }
 
 //.............................................................................

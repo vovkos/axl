@@ -100,25 +100,29 @@ GetTypeKindFlags (EType TypeKind)
 		ETypeKindFlag_Ptr,
 
 		ETypeKindFlag_DataPtr |      // EType_DataRef
-		ETypeKindFlag_Ptr,
+		ETypeKindFlag_Ptr |
+		ETypeKindFlag_Ref,
 
 		ETypeKindFlag_ClassPtr |     // EType_ClassPtr
 		ETypeKindFlag_Ptr,
 
 		ETypeKindFlag_ClassPtr |     // EType_ClassRef
-		ETypeKindFlag_Ptr,
+		ETypeKindFlag_Ptr |
+		ETypeKindFlag_Ref,
 
 		ETypeKindFlag_FunctionPtr |  // EType_FunctionPtr
 		ETypeKindFlag_Ptr,
 
 		ETypeKindFlag_FunctionPtr |  // EType_FunctionRef
-		ETypeKindFlag_Ptr,
+		ETypeKindFlag_Ptr |
+		ETypeKindFlag_Ref,
 
 		ETypeKindFlag_PropertyPtr |  // EType_PropertyPtr
 		ETypeKindFlag_Ptr,
 
 		ETypeKindFlag_PropertyPtr |  // EType_PropertyRef
-		ETypeKindFlag_Ptr,
+		ETypeKindFlag_Ptr |
+		ETypeKindFlag_Ref,
 
 		ETypeKindFlag_Import,        // EType_NamedImport
 

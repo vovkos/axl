@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_jnc_OperatorMgr.h"
-#include "axl_jnc_Closure.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -543,7 +542,12 @@ COperatorMgr::GetFunctionCastKind (
 {
 	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgArray ());
 	if (!ArgCastKind)
+	{
+		rtl::CString s1 = pSrcType->GetTypeString ();
+		rtl::CString s2 = pDstType->GetTypeString ();
+
 		return ECast_None;
+	}
 
 	CType* pSrcReturnType = pSrcType->GetReturnType ();
 	CType* pDstReturnType = pDstType->GetReturnType ();
@@ -804,126 +808,6 @@ COperatorMgr::PrepareOperand (
 	}
 
 	*pOpValue = Value;
-	return true;
-}
-
-bool
-COperatorMgr::CreateClosureObject (
-	EStorage StorageKind,
-	const CValue& OpValue, // function or property thin ptr
-	rtl::CArrayT <size_t>* pClosureMap,
-	CValue* pResultValue
-	)
-{
-	bool Result;
-
-	CFunctionType* pSrcFunctionType;
-	if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr)
-	{
-		pSrcFunctionType = ((CFunctionPtrType*) OpValue.GetType ())->GetTargetType ();
-	}
-	else
-	{
-		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
-		pSrcFunctionType = ((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetGetterType ();
-	}
-
-	CClassType* pClosureType = m_pModule->m_TypeMgr.CreateUnnamedClassType ();
-
-	bool IsIndirect = 
-		OpValue.GetValueKind () != EValue_Function &&
-		OpValue.GetValueKind () != EValue_Property;
-	
-	if (IsIndirect)
-		pClosureType->CreateField (OpValue.GetType ());
-
-	CClosure* pClosure = OpValue.GetClosure ();
-
-	const rtl::CBoxListT <CValue>* pClosureArgList = NULL;
-	
-	if (pClosure)
-	{
-		pClosureArgList = pClosure->GetArgList ();
-		rtl::CArrayT <CFunctionArg*> SrcArgArray = pSrcFunctionType->GetArgArray ();
-
-		size_t ClosureArgCount = pClosureArgList->GetCount ();
-		size_t SrcArgCount = SrcArgArray.GetCount ();
-
-		pClosureMap->Reserve (ClosureArgCount);
-
-		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
-
-		if (ClosureArgCount > SrcArgCount)
-		{
-			err::SetFormatStringError ("closure is too big for '%s'", pSrcFunctionType->GetTypeString ().cc ());
-			return false;
-		}
-
-		for (size_t i = 0; ClosureArg; ClosureArg++, i++)
-		{
-			if (ClosureArg->IsEmpty ())
-				continue;
-
-			ASSERT (i < SrcArgCount);
-			pClosureMap->Append (i);
-			pClosureType->CreateField (SrcArgArray [i]->GetType ());
-		}
-	}
-
-	Result = pClosureType->EnsureLayout ();
-	if (!Result)
-		return false;
-	
-	CValue ClosureValue;
-	Result = m_pModule->m_OperatorMgr.NewOperator (StorageKind, pClosureType, NULL, &ClosureValue);
-	if (!Result)
-		return false;
-
-	// save pf & arguments in the closure
-	
-	CStructType* pClosureFieldStructType = pClosureType->GetIfaceStructType ();
-	ASSERT (pClosureFieldStructType);
-
-	rtl::CIteratorT <CStructField> ClosureMember = pClosureFieldStructType->GetFieldList ().GetHead ();
-	if (IsIndirect)
-	{
-		CValue PtrValue = OpValue;
-		PtrValue.SetClosure (NULL); // remove closure
-
-		CValue FieldValue;
-		Result = 
-			GetClassField (ClosureValue, *ClosureMember, NULL, &FieldValue) &&
-			BinaryOperator (EBinOp_Assign, FieldValue, PtrValue);
-
-		if (!Result)
-			return false;
-		
-		ClosureMember++;
-	}
-
-	if (pClosure)
-	{
-		rtl::CBoxIteratorT <CValue> ClosureArg = pClosureArgList->GetHead ();
-		for (; ClosureArg; ClosureArg++)
-		{
-			if (ClosureArg->IsEmpty ())
-				continue;
-
-			ASSERT (ClosureMember);
-
-			CValue FieldValue;
-			Result = 
-				GetClassField (ClosureValue, *ClosureMember, NULL, &FieldValue) &&
-				BinaryOperator (EBinOp_Assign, FieldValue, *ClosureArg);
-
-			if (!Result)
-				return false;
-
-			ClosureMember++;
-		}
-	}
-
-	*pResultValue = ClosureValue;
 	return true;
 }
 

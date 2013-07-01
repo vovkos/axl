@@ -1156,11 +1156,21 @@ public:
 	bool
 	ProcessDestructList (const rtl::CConstBoxListT <CValue>& List);
 	
+	// closures
+
 	bool
 	CreateClosureObject (
 		EStorage StorageKind,
-		const CValue& OpValue, // function or property ptr
-		rtl::CArrayT <size_t>* pClosureMap,
+		const CValue& OpValue, // thin function or property ptr with closure
+		CType* pThunkType, // function or property type
+		CValue* pResultValue
+		);
+
+	bool
+	CreateDataClosureObject (
+		EStorage StorageKind,
+		const CValue& OpValue, // data ptr
+		CPropertyType* pThunkType, // function or property type
 		CValue* pResultValue
 		);
 

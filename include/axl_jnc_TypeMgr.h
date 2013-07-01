@@ -55,7 +55,9 @@ protected:
 	rtl::CStdListT <CNamedImportType> m_NamedImportTypeList;
 	rtl::CStdListT <CImportPtrType> m_ImportPtrTypeList;
 	rtl::CStdListT <CAutoEvClassType> m_AutoEvClassTypeList;
-	rtl::CStdListT <CClosureClassType> m_ClosureClassTypeList;
+	rtl::CStdListT <CFunctionClosureClassType> m_FunctionClosureClassTypeList;
+	rtl::CStdListT <CPropertyClosureClassType> m_PropertyClosureClassTypeList;
+	rtl::CStdListT <CDataClosureClassType> m_DataClosureClassTypeList;
 	rtl::CStdListT <CMulticastClassType> m_MulticastClassTypeList;
 	rtl::CStdListT <CMcSnapshotClassType> m_McSnapshotClassTypeList;
 	
@@ -183,10 +185,22 @@ public:
 		return m_AutoEvClassTypeList;
 	}
 
-	rtl::CConstListT <CClosureClassType> 
-	GetClosureClassTypeList ()
+	rtl::CConstListT <CFunctionClosureClassType> 
+	GetFunctionClosureClassTypeList ()
 	{
-		return m_ClosureClassTypeList;
+		return m_FunctionClosureClassTypeList;
+	}
+
+	rtl::CConstListT <CPropertyClosureClassType> 
+	GetPropertyClosureClassTypeList ()
+	{
+		return m_PropertyClosureClassTypeList;
+	}
+
+	rtl::CConstListT <CDataClosureClassType> 
+	GetDataClosureClassTypeList ()
+	{
+		return m_DataClosureClassTypeList;
 	}
 
 	rtl::CConstListT <CMulticastClassType> 
@@ -572,6 +586,32 @@ public:
 		const rtl::CString& QualifiedName,
 		CClassType* pIfaceType,
 		CClassType* pParentType
+		);
+
+	CFunctionClosureClassType* 
+	GetFunctionClosureClassType (
+		CFunctionType* pTargetType,
+		CFunctionType* pThunkType,
+		CType* const* ppArgTypeArray,
+		const size_t* pClosureMap,
+		size_t ArgCount,
+		uint64_t WeakMask
+		);
+
+	CPropertyClosureClassType* 
+	GetPropertyClosureClassType (
+		CPropertyType* pTargetType,
+		CPropertyType* pThunkType,
+		CType* const* ppArgTypeArray,
+		const size_t* pClosureMap,
+		size_t ArgCount,
+		uint64_t WeakMask
+		);
+
+	CDataClosureClassType* 
+	GetDataClosureClassType (
+		CType* pTargetType,
+		CPropertyType* pThunkType
 		);
 
 	CDataPtrType* 

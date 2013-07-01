@@ -5,8 +5,9 @@
 #pragma once
 
 #include "axl_jnc_Function.h"
-#include "axl_jnc_ThunkFunction.h"
 #include "axl_jnc_Property.h"
+#include "axl_jnc_ThunkFunction.h"
+#include "axl_jnc_ThunkProperty.h"
 #include "axl_jnc_PropertyTemplate.h"
 
 namespace axl {
@@ -124,6 +125,8 @@ protected:
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CPropertyTemplate> m_PropertyTemplateList;
 	rtl::CStdListT <CThunkFunction> m_ThunkFunctionList;
+	rtl::CStdListT <CThunkProperty> m_ThunkPropertyList;
+	rtl::CStdListT <CDataThunkProperty> m_DataThunkPropertyList;
 	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
 	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
 	rtl::CStringHashTableMapAT <CFunction*> m_ScheduleLauncherFunctionMap;
@@ -200,6 +203,18 @@ public:
 		return m_ThunkFunctionList;
 	}
 
+	rtl::CConstListT <CThunkProperty>
+	GetThunkPropertyList ()
+	{
+		return m_ThunkPropertyList;
+	}
+
+	rtl::CConstListT <CDataThunkProperty>
+	GetDataThunkPropertyList ()
+	{
+		return m_DataThunkPropertyList;
+	}
+
 	CFunction*
 	CreateFunction (
 		EFunction FunctionKind,
@@ -214,8 +229,24 @@ public:
 
 	CProperty*
 	CreateProperty (
+		EProperty PropertyKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName
+		);
+
+	CProperty*
+	CreateProperty (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName
+		)
+	{
+		return CreateProperty (EProperty_Normal, Name, QualifiedName);
+	}
+
+	CProperty*
+	CreateInternalProperty (
+		const char* pTag,
+		CPropertyType* pType
 		);
 
 	CPropertyTemplate*
@@ -255,15 +286,6 @@ public:
 		bool HasUnusedClosure = false
 		);
 
-	CFunction*
-	GetClosureThunkFunction (
-		CFunctionType* pTargetFunctionType,
-		CFunction* pTargetFunction, // could be NULL
-		CClassType* pClosureType,
-		const rtl::CArrayT <size_t>& ClosureMap,
-		CFunctionType* pThunkFunctionType
-		);
-
 	CProperty*
 	GetDirectThunkProperty (
 		CProperty* pTargetProperty,
@@ -272,25 +294,10 @@ public:
 		);
 
 	CProperty*
-	GetClosureThunkProperty (
-		CPropertyType* pTargetPropertyType,
-		CProperty* pTargetProperty, // could be NULL
-		CClassType* pClosureType,
-		const rtl::CArrayT <size_t>& ClosureMap,
-		CPropertyType* pThunkPropertyType
-		);
-
-	CProperty*
 	GetDirectDataThunkProperty (
 		CVariable* pTargetVariable,
 		CPropertyType* pThunkPropertyType,
 		bool HasUnusedClosure = false
-		);
-
-	CProperty*
-	GetClosureDataThunkProperty (
-		CDataPtrType* pTargetDataPtrType,
-		CPropertyType* pThunkPropertyType
 		);
 
 	CFunction*
