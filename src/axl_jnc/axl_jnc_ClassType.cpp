@@ -310,6 +310,9 @@ CClassType::CalcLayout ()
 		CStructField* pField = m_MemberFieldArray [i];
 		CType* pType = pField->GetType ();
 		
+		if (pType->GetFlags () & ETypeFlag_GcRoot)
+			m_Flags |= ETypeFlag_GcRoot;
+
 		if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
 			m_MemberFieldConstructArray.Append (pField);
 

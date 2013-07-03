@@ -71,6 +71,7 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 
 	m_pCurrentScope->m_EndPos = Pos;
 	m_pModule->m_OperatorMgr.ProcessDestructList (m_pCurrentScope->GetDestructList ());
+	m_pModule->m_OperatorMgr.NullifyGcRootList (m_pCurrentScope->GetGcRootList ());
 	CloseNamespace ();
 }
 

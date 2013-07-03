@@ -1877,12 +1877,6 @@ CParser::GetPropValueType (CValue* pValue)
 	return m_pModule->m_OperatorMgr.GetPropertyPropValueType (pFunction->m_pProperty, pValue);
 }
 
-void
-CParser::PreStatement ()
-{
-	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
-}
-
 bool
 CParser::PrepareCurlyInitializerNamedItem (
 	TCurlyInitializer* pInitializer, 

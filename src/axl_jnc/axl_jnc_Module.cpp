@@ -7,6 +7,16 @@ namespace jnc {
 //.............................................................................
 
 void
+RegisterGcStrategy (int);
+
+CModule::CModule ()
+{
+	mt::CallOnce (RegisterGcStrategy, 0);
+	m_pLlvmModule = NULL;
+	RestorePrevModule ();
+}
+
+void
 CModule::Clear ()
 {
 	m_FilePath.Clear ();

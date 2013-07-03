@@ -64,11 +64,7 @@ public:
 	CLlvmBuilder m_LlvmBuilder;
 
 public:
-	CModule ()
-	{
-		m_pLlvmModule = NULL;
-		RestorePrevModule ();
-	}
+	CModule ();
 
 	~CModule ()
 	{

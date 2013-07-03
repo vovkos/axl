@@ -22,6 +22,7 @@ CControlFlowMgr::CControlFlowMgr ()
 void
 CControlFlowMgr::Clear ()
 {
+	m_Flags = 0;
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
@@ -158,7 +159,7 @@ CControlFlowMgr::Break (size_t Level)
 		return false;
 	}
 
-	ProcessDestructList (pTargetScope);
+	OnLeaveScope (pTargetScope);
 	Jump (pTargetScope->m_pBreakBlock);
 	return true;
 }
@@ -173,13 +174,13 @@ CControlFlowMgr::Continue (size_t Level)
 		return false;
 	}
 
-	ProcessDestructList (pTargetScope);
+	OnLeaveScope (pTargetScope);
 	Jump (pTargetScope->m_pContinueBlock);
 	return true;
 }
 
 void
-CControlFlowMgr::ProcessDestructList (CScope* pTargetScope)
+CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
@@ -188,6 +189,7 @@ CControlFlowMgr::ProcessDestructList (CScope* pTargetScope)
 	while (pScope && pScope != pTargetScope && pScope->GetFunction () == pFunction)
 	{	
 		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
+		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
 		pScope = pScope->GetParentScope ();
 	}
 }
@@ -233,7 +235,7 @@ CControlFlowMgr::Return (
 			return false;
 		}
 		
-		ProcessDestructList ();
+		OnLeaveScope ();
 		RestoreScopeLevel ();
 
 		if (m_pReturnBlock)
@@ -248,7 +250,7 @@ CControlFlowMgr::Return (
 		if (!Result)
 			return false;
 
-		ProcessDestructList ();
+		OnLeaveScope ();
 		RestoreScopeLevel ();
 		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
 	}

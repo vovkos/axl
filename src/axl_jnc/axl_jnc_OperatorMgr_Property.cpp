@@ -221,13 +221,6 @@ COperatorMgr::GetPropertySetter (
 {
 	bool Result;
 
-	if (OpValue.GetValueKind () == EValue_Property)
-	{
-		*pResultValue = OpValue.GetProperty ()->GetSetter ();
-		pResultValue->SetClosure (OpValue.GetClosure ());
-		return true;
-	}
-
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
@@ -238,6 +231,13 @@ COperatorMgr::GetPropertySetter (
 	{
 		err::SetFormatStringError ("read-only '%s' has no setter", pPropertyType->GetTypeString ().cc ());
 		return false;
+	}
+
+	if (OpValue.GetValueKind () == EValue_Property)
+	{
+		*pResultValue = OpValue.GetProperty ()->GetSetter ();
+		pResultValue->SetClosure (OpValue.GetClosure ());
+		return true;
 	}
 
 	CFunctionTypeOverload* pSetterTypeOverload = pPropertyType->GetSetterType ();

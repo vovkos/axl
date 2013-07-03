@@ -178,19 +178,19 @@ CTypeMgr::ResolveImportTypes ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CNamedImportType* pSuperImportType = SuperImportTypeArray [i];
-		pSuperImportType->m_Flags |= ETypeFlag_ImportLoop;
+		pSuperImportType->m_Flags |= EImportTypeFlag_ImportLoop;
 	
 		CType* pType = pSuperImportType->m_pActualType;
 		while (pType->m_TypeKind == EType_NamedImport)
 		{
 			CImportType* pImportType = (CImportType*) pType;
-			if (pImportType->m_Flags & ETypeFlag_ImportLoop)
+			if (pImportType->m_Flags & EImportTypeFlag_ImportLoop)
 			{
 				err::SetFormatStringError ("'%s': import loop detected", pImportType->GetTypeString ().cc ());
 				return false;
 			}
 
-			pImportType->m_Flags |= ETypeFlag_ImportLoop;
+			pImportType->m_Flags |= EImportTypeFlag_ImportLoop;
 			pType = pImportType->m_pActualType;
 		}
 
@@ -199,7 +199,7 @@ CTypeMgr::ResolveImportTypes ()
 		{
 			CImportType* pImportType = (CImportType*) pType;
 			pImportType->m_pActualType = pExternType;
-			pImportType->m_Flags &= ~ETypeFlag_ImportLoop;
+			pImportType->m_Flags &= ~EImportTypeFlag_ImportLoop;
 			pType = pImportType->m_pActualType;
 		}
 	}
@@ -1336,7 +1336,7 @@ CTypeMgr::GetDataPtrType (
 	CType* pDataType,
 	EType TypeKind,
 	EDataPtrType PtrTypeKind,
-		uint_t Flags
+	uint_t Flags
 	)
 {
 	ASSERT (TypeKind == EType_DataPtr || TypeKind == EType_DataRef);
@@ -1347,6 +1347,8 @@ CTypeMgr::GetDataPtrType (
 	
 	if (Flags & EPtrTypeFlag_Unsafe)
 		Flags |= ETypeFlag_Pod;
+	else if (TypeKind == EType_DataPtr && PtrTypeKind == EDataPtrType_Normal)
+		Flags |= ETypeFlag_GcRoot;
 
 	TDataPtrTypeTuple* pTuple = GetDataPtrTypeTuple (pDataType);
 	
@@ -1409,6 +1411,8 @@ CTypeMgr::GetClassPtrType (
 
 	if (Flags & EPtrTypeFlag_Unsafe)
 		Flags |= ETypeFlag_Pod;
+	else if (TypeKind == EType_ClassPtr)
+		Flags |= ETypeFlag_GcRoot;
 
 	TClassPtrTypeTuple* pTuple = GetClassPtrTypeTuple (pClassType);
 
@@ -1449,6 +1453,8 @@ CTypeMgr::GetFunctionPtrType (
 
 	if (Flags & EPtrTypeFlag_Unsafe)
 		Flags |= ETypeFlag_Pod;
+	else if (TypeKind == EType_FunctionPtr && PtrTypeKind != EFunctionPtrType_Thin)
+		Flags |= ETypeFlag_GcRoot;
 
 	TFunctionPtrTypeTuple* pTuple = GetFunctionPtrTypeTuple (pFunctionType);
 
@@ -1519,6 +1525,8 @@ CTypeMgr::GetPropertyPtrType (
 
 	if (Flags & EPtrTypeFlag_Unsafe)
 		Flags |= ETypeFlag_Pod;
+	else if (TypeKind == EType_PropertyPtr && PtrTypeKind != EPropertyPtrType_Thin)
+		Flags |= ETypeFlag_GcRoot;
 
 	TPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
 

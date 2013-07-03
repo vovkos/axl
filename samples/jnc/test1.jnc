@@ -1,16 +1,37 @@
 //.............................................................................
+/*
+class C1
+{
+	construct ()
+	{
+		printf ("C1.construct ()\n");
+	}
 
-int gx_Int;
+	destruct ()
+	{
+		printf ("C1.destruct ()\n");
+	}
+}
+*/
+
+property gx_MyProp
+{
+	int 
+	get ()
+	{
+		printf ("gx_MyProp.get ()\n");
+		return 0;
+	}
+}
 
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	int thin property* px = &gx_Int;
-	*px = 100;
+	int x = gx_MyProp;
 
-	printf ("gx_Int = %d\n", gx_Int);
+	gx_MyProp = 100;
 
 	return 10;
 }
@@ -61,10 +82,15 @@ bar (int x)
 
 //.............................................................................
 
+// system functions
+
 int
 printf (
 	unsafe thin const char* pFormat,
 	unsafe ...
 	);
+
+void
+RunGc ();
 
 //.............................................................................

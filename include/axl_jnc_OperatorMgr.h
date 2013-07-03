@@ -177,6 +177,12 @@ public:
 		return ScopeLevelValue;
 	}
 
+	void
+	MarkGcRoot (
+		const CValue& PtrValue,
+		CType* pType
+		);
+
 	// load reference, get property, enum->int, bool->int, array->ptr -- unless specified otherwise with Flags
 
 	void 
@@ -1153,8 +1159,11 @@ public:
 		CValue* pResultValue
 		);
 
-	bool
+	void
 	ProcessDestructList (const rtl::CConstBoxListT <CValue>& List);
+
+	void
+	NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List);
 	
 	// closures
 

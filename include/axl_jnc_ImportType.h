@@ -14,6 +14,13 @@ class CImportPtrType;
 
 //.............................................................................
 
+enum EImportTypeFlag
+{
+	EImportTypeFlag_ImportLoop = 0x010000, // used for detection of import loops
+};
+
+//.............................................................................
+
 class CImportType: public CType
 {
 	friend class CTypeMgr;

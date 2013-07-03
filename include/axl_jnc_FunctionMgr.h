@@ -87,6 +87,14 @@ enum EStdFunc
 
 	EStdFunc_UHeapFreeClassPtr,
 
+	// void
+	// jnc.MarkGcRoot (
+	//		int8* p,
+	//		int8* pType
+	//		);
+
+	EStdFunc_MarkGcRoot,
+
 	EStdFunc__Count
 };
 
@@ -105,6 +113,7 @@ protected:
 	{
 		CFunction* m_pCurrentFunction;
 		CBasicBlock* m_pCurrentBlock;
+		CBasicBlock* m_pGcRootBlock;
 		CBasicBlock* m_pReturnBlock;
 		CBasicBlock* m_pSilentReturnBlock;
 		uint_t m_ControlFlowMgrFlags;
@@ -363,6 +372,9 @@ protected:
 
 	CFunction*
 	CreateUHeapFreeClassPtr ();
+
+	CFunction*
+	CreateMarkGcRoot ();
 };
 
 //.............................................................................

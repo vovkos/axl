@@ -50,7 +50,7 @@ enum EModuleItemFlag
 	EModuleItemFlag_NeedCompile  = 0x08,
 	EModuleItemFlag_InCalcLayout = 0x10,
 	EModuleItemFlag_LayoutReady  = 0x20,
-	EModuleItemFlag_Constructed  = 0x40, // fields, properties, base type slots
+	EModuleItemFlag_Constructed  = 0x40, // fields, properties, base type slots	
 };
 
 

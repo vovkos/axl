@@ -20,6 +20,7 @@ COperatorMgr::Allocate (
 	CFunction* pAlloc;
 
 	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	
 	CValue PtrValue;
 
 	switch (StorageKind)
@@ -43,16 +44,35 @@ COperatorMgr::Allocate (
 		}
 
 		m_pModule->m_LlvmBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
+
+		if (pType->GetFlags () & ETypeFlag_GcRoot)
+			MarkGcRoot (PtrValue, pType);
+
 		break;
 
 	case EStorage_Heap:
-	case EStorage_UHeap:
-		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (StorageKind == EStorage_UHeap ? EStdFunc_UHeapAlloc : EStdFunc_HeapAlloc);
+		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAlloc);
 
 		m_pModule->m_LlvmBuilder.CreateCall (
-			pAlloc,
-			pAlloc->GetType (),
-			CValue (&pType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)),
+			pAlloc, 
+			pAlloc->GetType (), 
+			CValue (&pType, m_pModule->GetSimpleType (EStdType_BytePtr)), 
+			&PtrValue
+			);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, &PtrValue);
+
+		MarkGcRoot (PtrValue, pType);
+		break;
+
+
+	case EStorage_UHeap:
+		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
+
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pAlloc, 
+			pAlloc->GetType (), 
+			CValue (&pType, m_pModule->GetSimpleType (EStdType_BytePtr)), 
 			&PtrValue
 			);
 
@@ -315,6 +335,7 @@ COperatorMgr::NewOperator (
 	bool Result;
 
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope);
 
 	CValue PtrValue;
 	Result = Allocate (StorageKind, pType, "new", &PtrValue);
@@ -408,9 +429,14 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 	return true;
 }
 
-bool
+void
 COperatorMgr::ProcessDestructList (const rtl::CConstBoxListT <CValue>& List)
 {
+	if (List.IsEmpty ())
+		return;
+
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "process destruct list");
+
 	rtl::CBoxIteratorT <CValue> It = List.GetTail ();
 	for (; It; It--)
 	{
@@ -424,8 +450,74 @@ COperatorMgr::ProcessDestructList (const rtl::CConstBoxListT <CValue>& List)
 
 		m_pModule->m_LlvmBuilder.CreateCall (pDestructor, pDestructor->GetType (), Value, NULL);		
 	}
+}
 
-	return true;
+void
+COperatorMgr::NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List)
+{
+	if (List.IsEmpty ())
+		return;
+
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "nullify gcroot list");
+
+	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
+
+	rtl::CBoxIteratorT <CValue> It = List.GetTail ();
+	for (; It; It--)
+	{
+		CValue Value = *It;
+		ASSERT (Value.GetType ()->GetTypeKind () == EType_DataPtr);
+		
+		m_pModule->m_LlvmBuilder.CreateStore (NullValue, Value);
+	}
+}
+
+void
+COperatorMgr::MarkGcRoot (
+	const CValue& PtrValue,
+	CType* pType
+	)
+{
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+
+	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+	
+	CValue GcRootValue;
+	m_pModule->m_LlvmBuilder.CreateAlloca (
+		pBytePtrType, 
+		"gc_root", 
+		pBytePtrType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe), 
+		&GcRootValue
+		);
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope);
+
+	pScope->AddToGcRootList (GcRootValue);
+
+	CFunction* pMarkGcRoot = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_MarkGcRoot);
+	ASSERT (pMarkGcRoot);
+	
+	CValue ArgValueArray [2];
+	ArgValueArray [0] = GcRootValue;
+	ArgValueArray [1].CreateConst (&pType, m_pModule->GetSimpleType (EStdType_BytePtr));
+		
+	CValue ResultValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pMarkGcRoot, 
+		pMarkGcRoot->GetType (),
+		ArgValueArray, 2,
+		&ResultValue
+		);	
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+	
+	CValue BytePtrValue;
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pBytePtrType, &BytePtrValue);
+	m_pModule->m_LlvmBuilder.CreateStore (BytePtrValue, GcRootValue);
 }
 
 //.............................................................................

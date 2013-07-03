@@ -97,10 +97,6 @@ btm_construct_name
 	;
 
 statement
-	enter
-	{
-		PreStatement ();
-	}
 	:	compound_stmt
 	|	expression_stmt
 	|	if_stmt

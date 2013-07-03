@@ -50,10 +50,11 @@ CArrayType::CalcLayout ()
 
 	m_TypeString.Clear (); // ensure updated type string
 
-	if (m_pRootType->GetFlags () & ETypeFlag_Pod)
+	uint_t RootTypeFlags = m_pRootType->GetFlags ();
+	if (RootTypeFlags & ETypeFlag_Pod)
 		m_Flags |= ETypeFlag_Pod;
-	else
-		m_Flags &= ~ETypeFlag_Pod;
+	else if (RootTypeFlags & ETypeFlag_GcRoot)
+		m_Flags |= ETypeFlag_GcRoot;
 
 	m_Size = m_pElementType->GetSize () * m_ElementCount;
 	m_AlignFactor = m_pElementType->GetAlignFactor ();

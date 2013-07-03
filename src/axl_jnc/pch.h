@@ -10,11 +10,13 @@
 // warning C4355: 'this' : used in base member initializer list
 // warning C4800: 'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
 // warning C4244: 'return' : conversion from 'uint64_t' to 'unsigned int', possible loss of data
+// warning C4624: destructor could not be generated because a base class destructor is inaccessible
 
 #pragma warning (disable: 4146)
 #pragma warning (disable: 4355)
 #pragma warning (disable: 4800) 
 #pragma warning (disable: 4244) 
+#pragma warning (disable: 4624) 
 
 #undef min
 #undef max
@@ -23,11 +25,14 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 #include "llvm/Intrinsics.h"
+#include "llvm/IntrinsicInst.h"
 #include "llvm/PassManager.h"
 #include "llvm/IRBuilder.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/CallSite.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Analysis/Passes.h"
 #include "llvm/Transforms/Scalar.h"
@@ -48,10 +53,15 @@
 #include "llvm/MC/MCSubtargetInfo.h"
 
 #include "llvm/CodeGen/MachineCodeInfo.h"
+#include "llvm/CodeGen/GCStrategy.h"
+#include "llvm/CodeGen/GCs.h"
 
 #pragma warning (default: 4146)
 #pragma warning (default: 4355) 
 #pragma warning (default: 4800)
 #pragma warning (default: 4244) 
+#pragma warning (default: 4624) 
 
 //.............................................................................
+
+

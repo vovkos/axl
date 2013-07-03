@@ -129,7 +129,7 @@ CFunctionMgr::SaveEmissionContext ()
 	pContext->m_ScopeLevelValue = m_ScopeLevelValue;
 	pContext->m_VTablePtrPtrValue = m_VTablePtrPtrValue;
 	pContext->m_VTablePtrValue = m_VTablePtrValue;
-
+	
 	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
 	pContext->m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock;
@@ -188,7 +188,6 @@ CFunctionMgr::CutVTable (const CValue& ThisArgValue)
 	m_pModule->m_LlvmBuilder.CreateGep (ThisArgValue, LlvmIndexArray, countof (LlvmIndexArray), NULL, &m_VTablePtrPtrValue);
 	m_pModule->m_LlvmBuilder.CreateLoad (m_VTablePtrPtrValue, NULL, &m_VTablePtrValue);
 	m_pModule->m_LlvmBuilder.CreateStore (pClassType->GetVTablePtrValue (), m_VTablePtrPtrValue);
-
 }
 
 void
@@ -243,11 +242,16 @@ CFunctionMgr::Prologue (
 	m_pModule->m_NamespaceMgr.OpenNamespace (pFunction->m_pParentNamespace);
 	pFunction->m_pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 
-	// create entry block 
+	// create entry block (gc roots come here)
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
+	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
+
+	pFunction->m_pEntryBlock = pEntryBlock;
+	
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
+	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prologue");
 
@@ -488,13 +492,17 @@ CFunctionMgr::InternalPrologue (
 {
 	SaveEmissionContext ();
 	ClearEmissionContext ();
-
+	
 	m_pCurrentFunction = pFunction;
 
-	pFunction->m_pBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
+	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
+	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->m_pBlock);
+	pFunction->m_pEntryBlock = pEntryBlock;
+
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
+	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
 
 	if (pFunction->m_FunctionKind != EFunction_ModuleConstructor) // do not save / restore scope level in module constructor
 		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
@@ -850,7 +858,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	{
 		CFunction* pFunction = *Function;
 
-		if (!pFunction->GetBlock ())
+		if (!pFunction->GetEntryBlock ())
 			continue;
 
 		try 
@@ -924,7 +932,11 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		break;
 
 	case EStdFunc_UHeapFreeClassPtr:
-		pFunction = CreateUHeapFree ();
+		pFunction = CreateUHeapFreeClassPtr ();
+		break;
+
+	case EStdFunc_MarkGcRoot:
+		pFunction = CreateMarkGcRoot ();
 		break;
 
 	default:
@@ -1258,7 +1270,42 @@ CFunctionMgr::CreateUHeapFreeClassPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.UHeapFree", pType);
+	return CreateInternalFunction ("jnc.UHeapFreeClassPtr", pType);
+}
+
+// void
+// jnc.MarkGcRoot (
+//		int8* p,
+//		int8* pType
+//		);
+
+CFunction*
+CFunctionMgr::CreateMarkGcRoot ()
+{
+	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+
+	CType* ArgTypeArray [] =
+	{
+		pBytePtrType,
+		pBytePtrType,
+	};
+
+	llvm::Type* LlvmArgTypeArray [2] = 
+	{
+		pBytePtrType->GetLlvmType (),
+		pBytePtrType->GetLlvmType (),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateInternalFunction ("jnc.MarkGcRoot", pType);
+
+	pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
+		m_pModule->m_pLlvmModule,
+		llvm::Intrinsic::gcroot,
+		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, countof (LlvmArgTypeArray))
+		);
+
+	return pFunction;
 }
 
 //.............................................................................

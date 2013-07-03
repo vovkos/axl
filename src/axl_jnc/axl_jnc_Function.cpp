@@ -99,7 +99,7 @@ CFunction::CFunction ()
 	m_pProperty = NULL;
 	m_ClassVTableIndex = -1;
 	m_PropertyVTableIndex = -1;
-	m_pBlock = NULL;
+	m_pEntryBlock = NULL;
 	m_pScope = NULL;
 	m_pLlvmFunction = NULL;
 	m_pfMachineCode = NULL;
@@ -144,6 +144,8 @@ CFunction::GetLlvmFunction ()
 		(const char*) m_Tag, 
 		m_pModule->m_pLlvmModule
 		);
+
+	m_pLlvmFunction->setGC ("jnc-shadow-stack");
 
 	m_pModule->m_FunctionMgr.m_LlvmFunctionMap [m_pLlvmFunction] = this;
 	return m_pLlvmFunction;
@@ -322,11 +324,11 @@ bool
 CFunction::Compile ()
 {
 	ASSERT (!m_Body.IsEmpty ()); // otherwise what are we doing here?
-	ASSERT (!m_pBlock || m_FunctionKind == EFunction_ModuleConstructor);
+	ASSERT (!m_pEntryBlock || m_FunctionKind == EFunction_ModuleConstructor);
 
 	bool Result;
 
-	if (m_pBlock) // already compiled 
+	if (m_pEntryBlock) // already compiled 
 		return true;
 
 	// prologue

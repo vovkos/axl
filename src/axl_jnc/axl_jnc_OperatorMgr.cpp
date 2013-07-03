@@ -542,12 +542,7 @@ COperatorMgr::GetFunctionCastKind (
 {
 	ECast ArgCastKind = GetArgCastKind (pSrcType, pDstType->GetArgArray ());
 	if (!ArgCastKind)
-	{
-		rtl::CString s1 = pSrcType->GetTypeString ();
-		rtl::CString s2 = pDstType->GetTypeString ();
-
 		return ECast_None;
-	}
 
 	CType* pSrcReturnType = pSrcType->GetReturnType ();
 	CType* pDstReturnType = pDstType->GetReturnType ();

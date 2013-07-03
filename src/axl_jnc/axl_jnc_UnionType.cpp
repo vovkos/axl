@@ -25,12 +25,6 @@ CUnionType::CreateFieldImpl (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	if (!(pType->GetFlags () & ETypeFlag_Pod))
-	{
-		err::SetFormatStringError ("non-POD '%s' cannot be union member", pType->GetTypeString ().cc ());
-		return NULL;
-	}
-
 	CStructField* pField = AXL_MEM_NEW (CStructField);
 	pField->m_Name = Name;
 	pField->m_pParentNamespace = this;
@@ -106,31 +100,39 @@ CUnionType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	CType* pLargestMemberType = NULL;
+	CType* pLargestFieldType = NULL;
 
-	rtl::CIteratorT <CStructField> Member = m_FieldList.GetHead ();
-	for (; Member; Member++)
+	rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
+	for (; Field; Field++)
 	{
-		CStructField* pMember = *Member;
+		CStructField* pField = *Field;
 
-		Result = pMember->m_pType->EnsureLayout ();
+		Result = pField->m_pType->EnsureLayout ();
 		if (!Result)
 			return false;
 
-		if (pMember->m_BitCount)
+		uint_t FieldTypeFlags = pField->m_pType->GetFlags ();
+
+		if (!(FieldTypeFlags & ETypeFlag_Pod))
 		{
-			pMember->m_pType = m_pModule->m_TypeMgr.GetBitFieldType (pMember->m_pBitFieldBaseType, 0, pMember->m_BitCount);
-			if (!pMember->m_pType)
+			err::SetFormatStringError ("non-POD '%s' cannot be union member", pField->m_pType->GetTypeString ().cc ());
+			return NULL;
+		}
+
+		if (pField->m_BitCount)
+		{
+			pField->m_pType = m_pModule->m_TypeMgr.GetBitFieldType (pField->m_pBitFieldBaseType, 0, pField->m_BitCount);
+			if (!pField->m_pType)
 				return false;
 		}
 
-		if (!pLargestMemberType || pMember->m_pType->GetSize () > pLargestMemberType->GetSize ())
-			pLargestMemberType = pMember->m_pType;
+		if (!pLargestFieldType || pField->m_pType->GetSize () > pLargestFieldType->GetSize ())
+			pLargestFieldType = pField->m_pType;
 	}
 
-	ASSERT (pLargestMemberType);
+	ASSERT (pLargestFieldType);
 
-	m_pStructType->CreateField (pLargestMemberType);
+	m_pStructType->CreateField (pLargestFieldType);
 	Result = m_pStructType->EnsureLayout ();
 	if (!Result)
 		return false;

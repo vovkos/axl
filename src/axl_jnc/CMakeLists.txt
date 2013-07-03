@@ -65,6 +65,27 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# gc folder
+#
+
+set (
+	GC_H_LIST
+	)
+
+set (
+	GC_CPP_LIST
+	axl_jnc_GcStrategy.cpp
+	)
+
+source_group (
+	gc
+	FILES 
+	${GC_H_LIST}
+	${GC_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # module folder
 #
 
@@ -465,6 +486,8 @@ add_library (
 	${CONTROLFLOW_CPP_LIST}
 	${FUNCTION_H_LIST}
 	${FUNCTION_CPP_LIST}
+	${GC_H_LIST}
+	${GC_CPP_LIST}
 	${MODULE_H_LIST}
 	${MODULE_CPP_LIST}
 	${NAMESPACE_H_LIST}

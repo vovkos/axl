@@ -66,7 +66,7 @@ public:
 	size_t
 	GetOverloadCount () const
 	{
-		return m_OverloadArray.GetCount () + 1;
+		return m_pType ? m_OverloadArray.GetCount () + 1 : 0;
 	}
 
 	CFunctionType*

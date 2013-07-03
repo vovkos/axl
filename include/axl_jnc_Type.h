@@ -262,9 +262,9 @@ GetFirstTypeModifierString (uint_t Modifiers)
 enum ETypeFlag
 {
 	ETypeFlag_Named        = 0x0100,
-	ETypeFlag_Pod          = 0x0200, // plain-old-data
-	ETypeFlag_Child        = 0x0400, // constructor has an implicit 'parent' arg
-	ETypeFlag_ImportLoop   = 0x0800, // used for detection of import loops
+	ETypeFlag_Child        = 0x0200, // constructor has an implicit 'parent' arg
+	ETypeFlag_Pod          = 0x0400, // plain-old-data
+	ETypeFlag_GcRoot       = 0x0800, // is or contains gc-traceable pointers
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

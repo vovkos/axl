@@ -114,6 +114,10 @@ public:
 
 	static
 	void
+	RunGc ();
+
+	static
+	void
 	PointerCheck (jnc::TDataPtr Ptr);
 
 protected:

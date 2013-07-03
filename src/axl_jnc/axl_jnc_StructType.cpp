@@ -67,9 +67,6 @@ CStructType::CreateFieldImpl (
 
 	m_FieldList.InsertTail (pField);
 
-	if (!(pType->GetFlags () & ETypeFlag_Pod))
-		m_Flags &= ~ETypeFlag_Pod;
-
 	if (!Name.IsEmpty ())
 	{
 		bool Result = AddItem (pField);
@@ -181,33 +178,6 @@ CStructType::CalcLayout ()
 			return false;
 	}
 
-	// scan members for constructors (not for auxilary structs such as class iface)
-	
-	if (m_StructTypeKind == EStructType_Normal)
-	{
-		size_t Count = m_MemberFieldArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CStructField* pField = m_MemberFieldArray [i];
-			CType* pType = pField->GetType ();
-		
-			if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
-				m_MemberFieldConstructArray.Append (pField);
-		}
-
-		Count = m_MemberPropertyArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CProperty* pProperty = m_MemberPropertyArray [i];
-			Result = pProperty->EnsureLayout ();
-			if (!Result)
-				return false;
-
-			if (pProperty->GetConstructor ())
-				m_MemberPropertyConstructArray.Append (pProperty);
-		}
-	}
-
 	rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
 	for (; Field; Field++)
 	{
@@ -237,6 +207,41 @@ CStructType::CalcLayout ()
 
 	if (m_FieldAlignedSize > m_FieldActualSize)
 		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
+
+	// scan members for gcroots and constructors (not for auxilary structs such as class iface)
+	
+	if (m_StructTypeKind == EStructType_Normal)
+	{
+		size_t Count = m_MemberFieldArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CStructField* pField = m_MemberFieldArray [i];
+			CType* pType = pField->GetType ();
+
+			uint_t FieldTypeFlags = pType->GetFlags ();
+
+			if (!(FieldTypeFlags & ETypeFlag_Pod))
+				m_Flags &= ~ETypeFlag_Pod;
+
+			if (FieldTypeFlags & ETypeFlag_GcRoot)
+				m_Flags |= ETypeFlag_GcRoot;
+		
+			if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
+				m_MemberFieldConstructArray.Append (pField);
+		}
+
+		Count = m_MemberPropertyArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CProperty* pProperty = m_MemberPropertyArray [i];
+			Result = pProperty->EnsureLayout ();
+			if (!Result)
+				return false;
+
+			if (pProperty->GetConstructor ())
+				m_MemberPropertyConstructArray.Append (pProperty);
+		}
+	}
 
 	llvm::StructType* pLlvmStructType = (llvm::StructType*) GetLlvmType ();
 	pLlvmStructType->setBody (

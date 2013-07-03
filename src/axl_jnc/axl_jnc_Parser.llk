@@ -328,9 +328,6 @@ Members2
 	bool
 	GetOnChangeType (CValue* pValue);
 
-	void
-	PreStatement ();
-
 	bool
 	PrepareCurlyInitializerNamedItem (
 		TCurlyInitializer* pInitializer, 

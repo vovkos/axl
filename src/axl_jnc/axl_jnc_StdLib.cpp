@@ -60,6 +60,7 @@ CStdLib::Export (
 */
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "GetCurrentThreadId", (void*) GetCurrentThreadId);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "CreateThread", (void*) CreateThread);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, "RunGc", (void*) RunGc);
 }
 
 void
@@ -344,6 +345,12 @@ CStdLib::ExportMulticastMethods (
 			MethodTable [PtrTypeKind] [i]
 			);
 	}
+}
+
+void
+CStdLib::RunGc ()
+{
+	printf ("Running GC...\n");
 }
 
 //.............................................................................

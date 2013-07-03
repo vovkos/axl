@@ -121,7 +121,7 @@ protected:
 
 	rtl::CBoxListT <CToken> m_Body;
 
-	CBasicBlock* m_pBlock;
+	CBasicBlock* m_pEntryBlock;
 	CScope* m_pScope;
 
 	llvm::Function* m_pLlvmFunction;
@@ -268,9 +268,9 @@ public:
 	}
 
 	CBasicBlock*
-	GetBlock ()
+	GetEntryBlock ()
 	{
-		return m_pBlock;
+		return m_pEntryBlock;
 	}
 
 	llvm::Function* 

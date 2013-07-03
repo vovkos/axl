@@ -89,10 +89,10 @@ protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CBasicBlock> m_BlockList;
-	CBasicBlock* m_pUnreachableBlock;
 	CBasicBlock* m_pCurrentBlock;
 	CBasicBlock* m_pReturnBlock; // bindable setters & destructors return here
 	CBasicBlock* m_pSilentReturnBlock; // bindable setters
+	CBasicBlock* m_pUnreachableBlock;
 
 	uint_t m_Flags;
 
@@ -327,7 +327,7 @@ protected:
 	RestoreScopeLevel ();
 
 	void
-	ProcessDestructList (CScope* pTargetScope = NULL);
+	OnLeaveScope (CScope* pTargetScope = NULL);
 
 	CBasicBlock*
 	GetUnreachableBlock ();

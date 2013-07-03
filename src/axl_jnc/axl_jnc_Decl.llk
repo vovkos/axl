@@ -36,6 +36,10 @@ named_type_block_declaration
 	;
 
 local_declaration
+	enter
+	{
+		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
+	}
 	:	statement
 	|	using_declaration 
 	|	named_type_specifier

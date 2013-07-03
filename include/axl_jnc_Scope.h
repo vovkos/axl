@@ -31,6 +31,7 @@ protected:
 	CFunction* m_pFunction;
 
 	rtl::CBoxListT <CValue> m_DestructList;
+	rtl::CBoxListT <CValue> m_GcRootList;
 
 public:
 	CBasicBlock* m_pBreakBlock;
@@ -71,6 +72,12 @@ public:
 		return m_pParentNamespace && m_pParentNamespace->GetNamespaceKind () == ENamespace_Scope ? (CScope*) m_pParentNamespace : NULL;
 	}
 
+	rtl::CConstBoxListT <CValue>
+	GetDestructList ()
+	{
+		return m_DestructList;
+	}
+
 	void
 	AddToDestructList (const CValue& Value)
 	{
@@ -78,9 +85,15 @@ public:
 	}
 
 	rtl::CConstBoxListT <CValue>
-	GetDestructList ()
+	GetGcRootList ()
 	{
-		return m_DestructList;
+		return m_GcRootList;
+	}
+
+	void
+	AddToGcRootList (const CValue& Value)
+	{
+		m_GcRootList.InsertTail (Value);
 	}
 };
 
