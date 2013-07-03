@@ -249,9 +249,9 @@ CFunctionMgr::Prologue (
 
 	pFunction->m_pEntryBlock = pEntryBlock;
 	
-	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
+	m_pModule->m_ControlFlowMgr.m_Flags = 0; // clear jump flag
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prologue");
 
@@ -362,7 +362,8 @@ CFunctionMgr::CreateShadowArgVariables ()
 			);
 
 		bool Result = m_pModule->m_VariableMgr.AllocateInitializeVariable (pArgVariable, true);
-		ASSERT (Result);
+		if (!Result)
+			return false;
 
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
 
@@ -500,9 +501,9 @@ CFunctionMgr::InternalPrologue (
 
 	pFunction->m_pEntryBlock = pEntryBlock;
 
-	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
+	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 
 	if (pFunction->m_FunctionKind != EFunction_ModuleConstructor) // do not save / restore scope level in module constructor
 		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);

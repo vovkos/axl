@@ -885,8 +885,33 @@ CParser::DeclareData (
 
 	if (NamespaceKind == ENamespace_Property)
 	{
-		pDataItem = ((CProperty*) pNamespace)->CreateField (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
-		AssignDeclarationAttributes (pDataItem, pNamespace, pDeclarator->GetPos ());
+		CProperty* pProperty = (CProperty*) pNamespace;
+
+		if (pProperty->GetParentType ())
+		{
+			pDataItem = pProperty->CreateField (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
+			AssignDeclarationAttributes (pDataItem, pNamespace, pDeclarator->GetPos ());
+		}
+		else
+		{
+			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
+				EStorage_Static,
+				Name, 
+				pNamespace->CreateQualifiedName (Name),
+				pType, 
+				PtrTypeFlags,
+				pConstructor,
+				pInitializer
+				);
+
+			AssignDeclarationAttributes (pVariable, pNamespace, pDeclarator->GetPos ());
+
+			Result = pNamespace->AddItem (pVariable);
+			if (!Result)
+				return false;
+
+			pDataItem = pVariable;
+		}
 	}
 	else if (NamespaceKind != ENamespace_Type || m_StorageKind == EStorage_Static)
 	{
