@@ -305,8 +305,11 @@ CFunctionMgr::CreateThisValue (const CValue& ThisArgValue)
 		}
 		else // make it thin
 		{
-			CDataPtrType* pPtrType = ((CDataPtrType*) m_ThisValue.GetType ());
-			ASSERT (pPtrType->GetPtrTypeKind () == EDataPtrType_Normal);
+			ASSERT (
+				ThisArgValue.GetType ()->GetTypeKind () == EType_DataPtr && 
+				((CDataPtrType*) ThisArgValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
+			
+			CDataPtrType* pPtrType = ((CDataPtrType*) ThisArgValue.GetType ());
 
 			CValue PtrValue;
 			m_pModule->m_LlvmBuilder.CreateExtractValue (ThisArgValue, 0, NULL, &PtrValue);

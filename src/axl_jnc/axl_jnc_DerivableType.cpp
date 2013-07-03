@@ -280,6 +280,10 @@ CDerivableType::AddMethod (CFunction* pFunction)
 
 	switch (FunctionKind)
 	{
+	case EFunction_PreConstructor:
+		ppTarget = &m_pPreConstructor;
+		break;
+
 	case EFunction_Constructor:
 		ppTarget = &m_pConstructor;
 		break;

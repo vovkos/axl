@@ -14,20 +14,14 @@ class C1
 }
 */
 
-property gx_MyProp
+struct TPoint
 {
-	int m_x;
+	int m_x = 1;
+	int m_y = 2;
 
-	int 
-	get ()
+	construct (int x)
 	{
-		printf ("gx_MyProp.get ()\n");
-		return m_x;
-	}
-
-	set (int x)
-	{
-		printf ("gx_MyProp.set (%d)\n", x);
+		printf ("TPoint.construct (%d)\n", x);
 		m_x = x;
 	}
 }
@@ -37,9 +31,9 @@ main ()
 {
 	printf ("main ()\n");
 
-	gx_MyProp = 200;
-	int x = gx_MyProp;
-	printf ("x = %d\n", x);
+	TPoint Point construct (100);
+
+	printf ("Point = { %d, %d }\n", Point.m_x, Point.m_y);		
 
 	return 10;
 }
