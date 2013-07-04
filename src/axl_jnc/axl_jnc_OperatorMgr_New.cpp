@@ -307,6 +307,53 @@ COperatorMgr::ParseInitializer (
 }
 
 bool
+COperatorMgr::ParseConstExpression (
+	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+	CValue* pResultValue
+	)
+{
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+
+	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, ExpressionTokenList);
+	if (!Result)
+		return false;
+
+	if (Parser.m_ExpressionValue.GetValueKind () != EValue_Const)
+	{
+		err::SetFormatStringError ("expression is not constant");
+		return false;
+	}
+
+	*pResultValue = Parser.m_ExpressionValue;
+	return true;
+}
+
+bool
+COperatorMgr::ParseConstIntegerExpression (
+	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+	intptr_t* pInteger
+	)
+{
+	CValue Value;
+	bool Result = ParseConstExpression (ExpressionTokenList, &Value);
+	if (!Result)
+		return false;
+
+	if (!(Value.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Integer))
+	{
+		err::SetFormatStringError ("expression is not integer constant");
+		return false;
+	}
+	
+	memcpy (pInteger, Value.GetConstData (), Value.GetType ()->GetSize ());
+	return true;
+}
+
+bool
 COperatorMgr::EvaluateAlias (
 	const rtl::CConstBoxListT <CToken> TokenList,
 	CValue* pResultValue

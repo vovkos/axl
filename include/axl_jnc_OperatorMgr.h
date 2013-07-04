@@ -507,6 +507,18 @@ public:
 		const rtl::CConstBoxListT <CToken>& InitializerTokenList
 		);
 
+	bool
+	ParseConstExpression (
+		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+		CValue* pResultValue
+		);
+
+	bool
+	ParseConstIntegerExpression (
+		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+		intptr_t* pInteger
+		);
+
 	CType* 
 	GetNewOperatorResultType (CType* pType)
 	{

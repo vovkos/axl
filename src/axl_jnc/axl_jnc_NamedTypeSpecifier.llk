@@ -81,16 +81,17 @@ enum_member_list <CEnumType* $pType>
 
 nullable
 enum_member <CEnumType* $pType>
-	:	EToken_Identifier ('=' expression_pass1 $e)?
+	:	EToken_Identifier ('=' expression_pass1 $i)?
 			{
-				CEnumConst* pMember = $pType->CreateConst ($1.m_Data.m_String);
+				CEnumConst* pMember = $pType->CreateConst (
+					$1.m_Data.m_String,
+					IsValidLocator ($i) ? &$i.m_TokenList : NULL
+					);
+
 				if (!pMember)
 					return false;
 
 				pMember->m_Pos = $1.m_Pos;
-			
-				if (IsValidLocator ($e)) 
-					pMember->SetExpression (&$e.m_TokenList);
 			}
 	|	epsilon
 	;

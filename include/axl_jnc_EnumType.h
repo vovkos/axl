@@ -29,7 +29,7 @@ class CEnumConst: public CUserModuleItem
 protected:
 	CEnumType* m_pParentEnumType;
 	intptr_t m_Value;
-	rtl::CBoxListT <CToken> m_Expression;
+	rtl::CBoxListT <CToken> m_Initializer;
 
 public:
 	CEnumConst ()
@@ -51,28 +51,10 @@ public:
 		return m_Value;
 	}
 
-	bool
-	HasExpression ()
+	rtl::CConstBoxListT <CToken> 
+	GetInitializer ()
 	{
-		return !m_Expression.IsEmpty ();
-	}
-
-	void
-	SetExpression (rtl::CBoxListT <CToken>* pTokenList)
-	{
-		m_Expression.TakeOver (pTokenList);
-	}
-
-	rtl::CBoxIteratorT <CToken>
-	GetExpressionFirstToken ()
-	{
-		return m_Expression.GetHead ();
-	}
-
-	rtl::CBoxIteratorT <CToken>
-	GetExpressionLastToken ()
-	{
-		return m_Expression.GetTail ();
+		return m_Initializer;
 	}
 };
 
@@ -87,7 +69,6 @@ protected:
 	CType* m_pBaseType;
 	CImportType* m_pBaseType_i;
 	rtl::CStdListT <CEnumConst> m_ConstList;
-	intptr_t m_CurrentValue;
 
 public:
 	CEnumType ();
@@ -113,14 +94,8 @@ public:
 	CEnumConst*
 	CreateConst (
 		const rtl::CString& Name,
-		intptr_t Value
+		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
-
-	CEnumConst*
-	CreateConst (const rtl::CString& Name)
-	{
-		return CreateConst (Name, m_CurrentValue);
-	}
 
 protected:
 	virtual 

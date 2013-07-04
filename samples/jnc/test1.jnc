@@ -12,7 +12,7 @@ main ()
 {
 	printf ("main ()\n");
 
-	EColor Color = EColor.Blue;
+	EColor Color = EColor.Green;
 	printf ("Color = %d\n", Color);
 	
 	return 10;

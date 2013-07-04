@@ -360,17 +360,9 @@ CTypeMgr::CreateEnumType (
 	m_EnumTypeList.InsertTail (pType);
 
 	if (pBaseType->GetTypeKindFlags () & ETypeKindFlag_Import)
-	{
 		pType->m_pBaseType_i = (CImportType*) pBaseType;
-		m_pModule->MarkForLayout (pType);
-	}
-	else
-	{
-		bool Result = pType->EnsureLayout ();
-		if (!Result)
-			return NULL;
-	}
 
+	m_pModule->MarkForLayout (pType);
 	return pType;
 }
 

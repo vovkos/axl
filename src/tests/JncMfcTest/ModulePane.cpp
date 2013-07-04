@@ -559,11 +559,13 @@ GetEnumConstTip (jnc::CEnumConst* pMember)
 {
 	rtl::CString TipText = pMember->GetName ();
 	
-	if (!pMember->HasExpression ())
+	rtl::CConstBoxListT <jnc::CToken> Initializer = pMember->GetInitializer ();
+
+	if (Initializer.IsEmpty ())
 		return TipText;
 
-	rtl::CBoxIteratorT <jnc::CToken> First = pMember->GetExpressionFirstToken ();
-	rtl::CBoxIteratorT <jnc::CToken> Last = pMember->GetExpressionLastToken ();
+	rtl::CBoxIteratorT <jnc::CToken> First = Initializer.GetHead ();
+	rtl::CBoxIteratorT <jnc::CToken> Last = Initializer.GetTail ();
 
 	TipText.Append (" = ");
 	TipText.Append (

@@ -13,32 +13,35 @@ CEnumType::CEnumType ()
 	m_Flags = ETypeFlag_Pod;
 	m_pBaseType = NULL;
 	m_pBaseType_i = NULL;
-	m_CurrentValue = 0;
 }
 
 CEnumConst*
 CEnumType::CreateConst (
 	const rtl::CString& Name,
-	intptr_t Value
+	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	CEnumConst* pMember = AXL_MEM_NEW (CEnumConst);
-	pMember->m_Name = Name;
-	pMember->m_pParentEnumType = this;
-	pMember->m_Value = Value;
-	m_ConstList.InsertTail (pMember);
+	CEnumConst* pConst = AXL_MEM_NEW (CEnumConst);
+	pConst->m_Name = Name;
+	pConst->m_pParentEnumType = this;
+
+	if (pInitializer)
+		pConst->m_Initializer.TakeOver (pInitializer);
+
+	m_ConstList.InsertTail (pConst);
 	
-	bool Result = AddItem (pMember);
+	bool Result = AddItem (pConst);
 	if (!Result)
 		return NULL;
 
-	m_CurrentValue = Value + 1;
-	return pMember;
+	return pConst;
 }
 
 bool
 CEnumType::CalcLayout ()
 {
+	bool Result;
+
 	if (m_pBaseType_i)
 		m_pBaseType = m_pBaseType_i->GetActualType ();
 
@@ -50,6 +53,24 @@ CEnumType::CalcLayout ()
 
 	m_Size = m_pBaseType->GetSize ();
 	m_AlignFactor = m_pBaseType->GetAlignFactor ();
+
+	// assign values to consts
+
+	intptr_t Value = 0;
+
+	rtl::CIteratorT <CEnumConst> Const = m_ConstList.GetHead ();
+	for (; Const; Const++, Value++)
+	{
+		if (!Const->m_Initializer.IsEmpty ())
+		{
+			Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (Const->m_Initializer, &Value);
+			if (!Result)
+				return false;
+		}
+
+		Const->m_Value = Value;
+	}
+
 	return true;
 }
 
