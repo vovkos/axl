@@ -64,6 +64,7 @@ GetValueKindString (EValue ValueKind)
 	{
 		"void",                   // EValue_Void = 0,
 		"null",                   // EValue_Null,
+		"namespace",              // EValue_Namespace,
 		"type",                   // EValue_Type,
 		"const",                  // EValue_Const,
 		"variable",               // EValue_Variable,
@@ -142,6 +143,9 @@ CValue::GetLlvmConst (
 	int64_t Integer;
 	double Double;
 	llvm::Constant* pLlvmConst = NULL;
+
+	if (pType->GetTypeKind () == EType_Enum)
+		pType = ((CEnumType*) pType)->GetBaseType ();
 
 	CModule* pModule = pType->GetModule ();
 
@@ -299,9 +303,22 @@ CValue::SetType (EType TypeKind)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
-	
+
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 	SetType (pType);
+}
+
+void
+CValue::SetNamespace (CNamespace* pNamespace)
+{
+	Clear ();
+
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	m_ValueKind = EValue_Namespace;
+	m_pNamespace = pNamespace;
+	m_pType = pModule->GetSimpleType (EType_Void);
 }
 
 void

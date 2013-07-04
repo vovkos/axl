@@ -114,7 +114,6 @@ CAstDoc::Compile ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Parsing...\n");
 	pMainFrame->m_GlobalAstPane.Clear ();
-	pMainFrame->m_FunctionAstPane.Clear ();
 	pMainFrame->m_ModulePane.Clear ();
 	pMainFrame->m_LlvmIrPane.Clear ();
 	pMainFrame->m_DasmPane.Clear ();

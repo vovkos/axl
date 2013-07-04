@@ -9,6 +9,7 @@
 namespace axl {
 namespace jnc {
 
+class CNamespace;
 class CScope;
 class CVariable;
 class CFunction;
@@ -25,6 +26,7 @@ enum EValue
 {
 	EValue_Void = 0,
 	EValue_Null,
+	EValue_Namespace,
 	EValue_Type,
 	EValue_Const,
 	EValue_Variable,
@@ -75,6 +77,7 @@ protected:
 	union
 	{
 		CModuleItem* m_pItem;
+		CNamespace* m_pNamespace;
 		CVariable* m_pVariable;
 		CFunction* m_pFunction;
 		CFunctionTypeOverload* m_pFunctionTypeOverload;
@@ -143,6 +146,12 @@ public:
 		SetType (pType);
 	}
 
+	CValue (CNamespace* pNamespace)
+	{
+		Init ();
+		SetNamespace (pNamespace);
+	}
+
 	CValue (CVariable* pVariable)
 	{
 		Init ();
@@ -208,6 +217,13 @@ public:
 	GetType () const
 	{
 		return m_pType;
+	}
+
+	CNamespace*
+	GetNamespace () const
+	{
+		ASSERT (m_ValueKind == EValue_Namespace);
+		return m_pNamespace;
 	}
 
 	CVariable*
@@ -383,10 +399,13 @@ public:
 	SetNull ();
 
 	void
-	SetType (CType* pType);
+	SetNamespace (CNamespace* pNamespace);
 
 	void
 	SetType (EType TypeKind);
+
+	void
+	SetType (CType* pType);
 
 	void
 	SetVariable (CVariable* pVariable);

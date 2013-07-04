@@ -54,7 +54,6 @@ public:  // control bar embedded members
 	CMFCToolBarImages m_PanelImages;
 	CMFCRibbonStatusBar  m_wndStatusBar;
 	CAstPane m_GlobalAstPane;
-	CAstPane m_FunctionAstPane;
 	CModulePane m_ModulePane;
 	CLlvmIrPane m_LlvmIrPane;
 	CDasmPane m_DasmPane;

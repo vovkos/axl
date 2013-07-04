@@ -88,10 +88,16 @@ GetTypeKindFlags (EType TypeKind)
 		0,                           // EType_Array
 		0,                           // EType_BitField
 
-		0,                           // EType_Enum
-		ETypeKindFlag_Derivable,     // EType_Struct
-		ETypeKindFlag_Derivable,     // EType_Union
-		ETypeKindFlag_Derivable,     // EType_Class
+		ETypeKindFlag_Named,         // EType_Enum
+
+		ETypeKindFlag_Derivable |    // EType_Struct
+		ETypeKindFlag_Named,
+
+		ETypeKindFlag_Derivable |    // EType_Union
+		ETypeKindFlag_Named,
+
+		ETypeKindFlag_Derivable |    // EType_Class
+		ETypeKindFlag_Named,
 
 		ETypeKindFlag_Code,          // EType_Function
 		ETypeKindFlag_Code,          // EType_Property

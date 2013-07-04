@@ -7,45 +7,84 @@ namespace jnc {
 
 //.............................................................................
 
-CType*
-COperatorMgr::GetMemberOperatorResultType (
-	const CValue& RawOpValue,
-	const char* pName
+bool
+COperatorMgr::GetNamespaceMember (
+	CNamespace* pNamespace,
+	const char* pName,
+	CValue* pResultValue
 	)
 {
-	bool Result;
-
-	CValue OpValue;
-	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
-	
-	CType* pType = OpValue.GetType ();
-	if (pType->GetTypeKind () == EType_DataRef)
-		pType = ((CDataPtrType*) pType)->GetTargetType ();
-
-	if (pType->GetTypeKind () == EType_DataPtr)
+	CModuleItem* pItem = pNamespace->FindItem (pName);
+	if (!pItem)
 	{
-		pType = ((CDataPtrType*) pType)->GetTargetType ();
-
-		Result = GetUnaryOperatorResultType (EUnOp_Indir, &OpValue);
-		if (!Result)
-			return NULL;
+		err::SetFormatStringError ("'%s' is not a member of '%s'", pName, pNamespace->GetQualifiedName ().cc ());
+		return false;
 	}
 
-	EType TypeKind = pType->GetTypeKind ();
-	switch (TypeKind)
-	{
-	case EType_Struct:
-	case EType_Union:
-		return GetNamedTypeMemberType (OpValue, (CNamedType*) pType, pName);
+	bool Result = true;
 
-	case EType_ClassPtr:
-		PrepareOperandType (&OpValue);
-		return GetNamedTypeMemberType (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName);
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	switch (ItemKind)
+	{
+	case EModuleItem_Namespace:
+		pResultValue->SetNamespace ((CGlobalNamespace*) pItem);
+		break;
+
+	case EModuleItem_Typedef:
+		pItem = ((CTypedef*) pItem)->GetType ();
+		// and fall through
+
+	case EModuleItem_Type:	
+		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
+		{
+			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
+			return false;
+		}
+
+		pResultValue->SetNamespace ((CNamedType*) pItem);
+		break;
+
+	case EModuleItem_Alias:
+		return m_pModule->m_OperatorMgr.EvaluateAlias (((CAlias*) pItem)->GetInitializer (), pResultValue);
+
+	case EModuleItem_Variable:
+		pResultValue->SetVariable ((CVariable*) pItem);
+		break;
+
+	case EModuleItem_Function:
+		pResultValue->SetFunction ((CFunction*) pItem);
+
+		if (((CFunction*) pItem)->IsMember ())
+			Result = false;
+
+		break;
+
+	case EModuleItem_Property:
+		pResultValue->SetProperty ((CProperty*) pItem);
+
+		if (((CProperty*) pItem)->IsMember ())
+			Result = false;
+
+		break;
+
+	case EModuleItem_EnumConst:
+		pResultValue->SetConstInt64 (
+			((CEnumConst*) pItem)->GetValue (),
+			((CEnumConst*) pItem)->GetParentEnumType ()->GetBaseType ()
+			);
+		break;
 
 	default:
-		err::SetFormatStringError ("member operator cannot be applied to '%s'", pType->GetTypeString ().cc ());
-		return NULL;
+		Result = false;
+	};
+
+	if (!Result)
+	{
+		err::SetFormatStringError ("'%s.%s' cannot be used as expression", pNamespace->GetQualifiedName ().cc (), pName);
+		return false;
 	}
+
+	return true;
 }
 
 CType*
@@ -166,6 +205,47 @@ COperatorMgr::GetMemberOperatorResultType (
 	return true;
 }
 
+CType*
+COperatorMgr::GetMemberOperatorResultType (
+	const CValue& RawOpValue,
+	const char* pName
+	)
+{
+	bool Result;
+
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
+	
+	CType* pType = OpValue.GetType ();
+	if (pType->GetTypeKind () == EType_DataRef)
+		pType = ((CDataPtrType*) pType)->GetTargetType ();
+
+	if (pType->GetTypeKind () == EType_DataPtr)
+	{
+		pType = ((CDataPtrType*) pType)->GetTargetType ();
+
+		Result = GetUnaryOperatorResultType (EUnOp_Indir, &OpValue);
+		if (!Result)
+			return NULL;
+	}
+
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_Struct:
+	case EType_Union:
+		return GetNamedTypeMemberType (OpValue, (CNamedType*) pType, pName);
+
+	case EType_ClassPtr:
+		PrepareOperandType (&OpValue);
+		return GetNamedTypeMemberType (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName);
+
+	default:
+		err::SetFormatStringError ("member operator cannot be applied to '%s'", pType->GetTypeString ().cc ());
+		return NULL;
+	}
+}
+
 bool
 COperatorMgr::MemberOperator (
 	const CValue& RawOpValue,
@@ -224,6 +304,9 @@ COperatorMgr::MemberOperator (
 	CValue* pResultValue
 	)
 {
+	if (RawOpValue.GetValueKind () == EValue_Namespace)
+		return GetNamespaceMember (RawOpValue.GetNamespace (), pName, pResultValue);
+
 	CValue OpValue;
 	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
 	if (!Result)

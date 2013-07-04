@@ -1595,7 +1595,7 @@ CParser::LookupIdentifier (
 	)
 {
 	bool Result;
-
+	
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
 	
@@ -1615,12 +1615,22 @@ CParser::LookupIdentifier (
 	EModuleItem ItemKind = pItem->GetItemKind ();
 	switch (ItemKind)
 	{
-	case EModuleItem_Type:
-		pValue->SetType ((CType*) pItem);
+	case EModuleItem_Namespace:
+		pValue->SetNamespace ((CGlobalNamespace*) pItem);
 		break;
 
 	case EModuleItem_Typedef:
-		pValue->SetType (((CTypedef*) pItem)->GetType ());
+		pItem = ((CTypedef*) pItem)->GetType ();
+		// and fall through
+
+	case EModuleItem_Type:	
+		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
+		{
+			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
+			return false;
+		}
+
+		pValue->SetNamespace ((CNamedType*) pItem);
 		break;
 
 	case EModuleItem_Alias:
@@ -1733,12 +1743,22 @@ CParser::LookupIdentifierType (
 	EModuleItem ItemKind = pItem->GetItemKind ();
 	switch (ItemKind)
 	{
-	case EModuleItem_Type:
-		pValue->SetType ((CType*) pItem);
+	case EModuleItem_Namespace:
+		pValue->SetNamespace ((CGlobalNamespace*) pItem);
 		break;
 
 	case EModuleItem_Typedef:
-		pValue->SetType (((CTypedef*) pItem)->GetType ());
+		pItem = ((CTypedef*) pItem)->GetType ();
+		// and fall through
+
+	case EModuleItem_Type:	
+		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
+		{
+			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
+			return false;
+		}
+
+		pValue->SetNamespace ((CNamedType*) pItem);
 		break;
 
 	case EModuleItem_Variable:
@@ -1784,11 +1804,7 @@ CParser::LookupIdentifierType (
 		break;
 		
 	default:
-		err::SetFormatStringError (
-			"%s '%s' cannot be used as expression", 
-			GetModuleItemKindString (pItem->GetItemKind ()), 
-			Name.cc ()
-			);
+		err::SetFormatStringError ("'%s' cannot be used as expression", Name.cc ());
 		return false;
 	};
 

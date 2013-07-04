@@ -21,7 +21,8 @@ int CDasmPane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	VERIFY(m_LogCtrl.Create(
-		WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_VSCROLL, 
+		WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL |
+		ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 
 		CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST));
 	
 	m_LogCtrl.ModifyStyleEx(0, WS_EX_CLIENTEDGE);
@@ -45,6 +46,9 @@ CDasmPane::Build (jnc::CModule* pModule)
 	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
+		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
+			continue;
+
 		jnc::CFunctionType* pFunctionType = Function->GetType (); 
 
 		m_LogCtrl.Trace (
@@ -55,20 +59,12 @@ CDasmPane::Build (jnc::CModule* pModule)
 			pFunctionType->GetArgString ()
 			);
 
-		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
-		if (pExternFunction)
-		{
-			m_LogCtrl.Trace ("  ->%s\r\n", pExternFunction->m_Tag);
-			m_LogCtrl.Trace ("\r\n");
-			continue;
-		}
-
 		void* pf = Function->GetMachineCode ();
 		size_t Size = Function->GetMachineCodeSize ();
 
 		if (pf)
 		{
-			rtl::CString s = Dasm.Disassemble (pf, Size);
+			rtl::CString s = Dasm.Disassemble (pf, Size).cc ();
 			m_LogCtrl.Trace ("\r\n%s", s);
 		}
 		

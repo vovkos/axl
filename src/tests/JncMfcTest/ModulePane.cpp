@@ -157,10 +157,6 @@ CModulePane::AddItem (
 		AddProperty (hParent, (jnc::CProperty*) pItem);
 		break;
 
-	case jnc::EModuleItem_AutoEv:
-		AddAutoEv (hParent, (jnc::CAutoEv*) pItem);
-		break;
-
 	case jnc::EModuleItem_EnumConst:
 		AddEnumConst (hParent, (jnc::CEnumConst*) pItem);
 		break;
@@ -482,30 +478,6 @@ CModulePane::AddProperty (
 	m_TreeCtrl.Expand (hItem, TVE_EXPAND);
 }
 
-void
-CModulePane::AddAutoEv (
-	HTREEITEM hParent,
-	jnc::CAutoEv* pAutoEv
-	)
-{
-	rtl::CString ItemName;
-
-	if (!pAutoEv->IsNamed ())
-		ItemName.Format (
-			"autoev %s", 
-			pAutoEv->GetStarter ()->GetType ()->GetArgString ()
-			);
-	else
-		ItemName.Format (
-			"autoev %s", 
-			pAutoEv->GetName (),
-			pAutoEv->GetStarter ()->GetType ()->GetArgString ()
-			);
-
-	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName.cc2 (), hParent);
-	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) (jnc::CModuleItem*) pAutoEv);
-}
-
 rtl::CString
 GetNamespaceTip (jnc::CGlobalNamespace* pNamespace)
 {
@@ -569,21 +541,6 @@ GetPropertyTip (jnc::CProperty* pProperty)
 }
 
 rtl::CString
-GetAutoEvTip (jnc::CAutoEv* pAutoEv)
-{
-	jnc::CAutoEvType* pType = pAutoEv->GetType ();
-
-	rtl::CString TipText;
-	TipText.Format (
-		"autoev %s %s", 
-		pAutoEv->GetName (),
-		pAutoEv->GetStarter ()->GetType ()->GetArgString ()
-		);
-
-	return TipText;
-}
-
-rtl::CString
 GetStructFieldTip (jnc::CStructField* pMember)
 {
 	jnc::CType* pType = pMember->GetType ();
@@ -591,7 +548,7 @@ GetStructFieldTip (jnc::CStructField* pMember)
 	return rtl::CString::Format_s (
 		"%s %s.%s (%d bytes)", 
 		pType->GetTypeString (), 
-		pMember->GetParentType ()->GetQualifiedName (),
+		pMember->GetParentNamespace ()->GetQualifiedName (),
 		pMember->GetName (),
 		pType->GetSize ()
 		);
@@ -637,9 +594,6 @@ CModulePane::GetItemTip (jnc::CModuleItem* pItem)
 	case jnc::EModuleItem_Property:
 		return GetPropertyTip ((jnc::CProperty*) pItem);
 
-	case jnc::EModuleItem_AutoEv:
-		return GetAutoEvTip ((jnc::CAutoEv*) pItem);
-
 	case jnc::EModuleItem_Type:
 		return ((jnc::CType*) pItem)->GetTypeString ();
 
@@ -680,11 +634,6 @@ CModulePane::OnDblClk (NMHDR* pNMHDR, LRESULT* pResult)
 	pView->GetEditCtrl ().SetSel (Offset1, Offset1);
 	pView->GetEditCtrl ().SetSel (Offset1, Offset2);
 
-	if (pItem->GetItemKind () == jnc::EModuleItem_Function)
-	{
-		jnc::CFunction* pFunction = (jnc::CFunction*) pItem;
-		GetMainFrame ()->m_FunctionAstPane.Build (pFunction->GetAst ());
-	}
 
 	*pResult = 0;
 }

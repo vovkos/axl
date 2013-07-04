@@ -1,10 +1,10 @@
 //.............................................................................
 
-void
-foo ()
+enum EColor
 {
-	new int;
-	int* y;
+	Red   = 10,
+	Green = 20,
+	Blue  = 30
 }
 
 int  
@@ -12,9 +12,9 @@ main ()
 {
 	printf ("main ()\n");
 
-	foo ();
-	RunGc ();
-
+	EColor Color = EColor.Blue;
+	printf ("Color = %d\n", Color);
+	
 	return 10;
 }
 

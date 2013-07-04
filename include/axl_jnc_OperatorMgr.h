@@ -1255,6 +1255,20 @@ protected:
 
 	// member operators
 
+	bool
+	GetNamespaceMemberType (
+		CNamespace* pNamespace,
+		const char* pName,
+		CValue* pResultValue
+		);
+
+	bool
+	GetNamespaceMember (
+		CNamespace* pNamespace,
+		const char* pName,
+		CValue* pResultValue
+		);
+
 	CType*
 	GetNamedTypeMemberType (
 		const CValue& OpValue,

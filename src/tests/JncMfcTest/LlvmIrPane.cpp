@@ -21,7 +21,8 @@ int CLlvmIrPane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	VERIFY(m_LogCtrl.Create(
-		WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_VSCROLL, 
+		WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL |
+		ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 
 		CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST));
 	
 	m_LogCtrl.ModifyStyleEx(0, WS_EX_CLIENTEDGE);
@@ -47,6 +48,9 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
+		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
+			continue;
+
 		jnc::CFunctionType* pFunctionType = Function->GetType (); 
 
 		m_LogCtrl.Trace (
@@ -56,14 +60,6 @@ CLlvmIrPane::Build (jnc::CModule* pModule)
 			Function->m_Tag, 
 			pFunctionType->GetArgString ()
 			);
-
-		jnc::CFunction* pExternFunction = Function->GetExternFunction ();
-		if (pExternFunction)
-		{
-			m_LogCtrl.Trace ("  ->%s\r\n", pExternFunction->m_Tag);
-			m_LogCtrl.Trace ("\r\n");
-			continue;
-		}
 
 		llvm::Function* pLlvmFunction = Function->GetLlvmFunction ();
 		llvm::Function::BasicBlockListType& BlockList = pLlvmFunction->getBasicBlockList ();

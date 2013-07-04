@@ -22,9 +22,28 @@ CLogCtrl::Trace_va (
 void
 CLogCtrl::Trace_0 (const char* pText)
 {
+	// normalize CR-LF
+
+	const char* p0 = pText;
+	const char* p  = pText;
+
+	rtl::CString_w Text;
+
+	for (; *p; p++)
+		if (*p == '\n' && (p == p0 || *(p - 1) != '\r'))
+		{
+			Text.Append (p0, p - p0);
+			Text.Append (L"\r\n");
+			p0 = p + 1;
+		}
+
+	Text.Append (p0, p - p0);
+
+	// add to edit control
+
 	size_t Length = GetWindowTextLength ();
 	SetSel ((int) Length, (int) Length);
-	ReplaceSel (rtl::CString_w (pText));
+	ReplaceSel (Text);
 }
 
 //.............................................................................

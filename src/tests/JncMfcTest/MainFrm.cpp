@@ -83,7 +83,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	UINT Style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_FLOAT_MULTI;
 
 	m_GlobalAstPane.Create (L"Global AST", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_GLOBALASTPANE, Style | CBRS_LEFT);
-	m_FunctionAstPane.Create (L"Function AST", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_FUNCTIONASTPANE, Style | CBRS_LEFT);
 	m_ModulePane.Create (L"Module", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_MODULEPANE, Style | CBRS_LEFT);
 	m_LlvmIrPane.Create (L"LLVM IR", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_LLVMIRPANE, Style | CBRS_LEFT);
 	m_DasmPane.Create (L"Disassembly", this, CRect (0, 0, 300, 300), TRUE, ID_VIEW_DASMPANE, Style | CBRS_LEFT);
@@ -93,7 +92,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane (&m_OutputPane, AFX_IDW_DOCKBAR_BOTTOM);
 	DockPane (&m_GlobalAstPane, AFX_IDW_DOCKBAR_LEFT);
 	DockPane (&m_ModulePane, AFX_IDW_DOCKBAR_RIGHT);
-	m_FunctionAstPane.DockToWindow (&m_GlobalAstPane, CBRS_ALIGN_BOTTOM);
 	m_LlvmIrPane.DockToWindow (&m_ModulePane, CBRS_ALIGN_BOTTOM);
 	m_DasmPane.AttachToTabWnd (&m_LlvmIrPane, DM_SHOW, FALSE);
 
