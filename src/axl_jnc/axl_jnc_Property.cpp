@@ -689,7 +689,14 @@ CProperty::CompileAutoSetter ()
 
 	if (!Result)
 		return false;		
-	
+
+	if (m_pType->GetFlags () & EPropertyTypeFlag_Bindable)
+	{
+		Result = m_pModule->m_FunctionMgr.FireOnChangeEvent ();
+		if (!Result)
+			return false;
+	}
+
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
 }

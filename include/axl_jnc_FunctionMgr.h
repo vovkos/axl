@@ -270,6 +270,9 @@ public:
 	bool
 	Epilogue (const CToken::CPos& Pos);
 
+	bool
+	FireOnChangeEvent ();
+
 	void
 	InternalPrologue (
 		CFunction* pFunction,
@@ -337,9 +340,6 @@ protected:
 
 	void
 	RestoreVTable ();
-
-	bool
-	FireOnChangeEvent ();
 
 	// LLVM code support functions
 

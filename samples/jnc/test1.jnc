@@ -1,21 +1,28 @@
 //.............................................................................
 
-enum EColor
-{
-	Red   = 10,
-	Green = 20,
-	Blue  = 30
-}
+int g_MyPropValue;
+
+bindable int gx_MyProp;
 
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	EColor Color = EColor.Green;
-	printf ("Color = %d\n", Color);
+	gx_MyProp.onchange.Add (foo);
+
+	int property* px = &gx_MyProp;
+
+	*px = 200;
+
+	printf ("gx_MyProp = %d\n", gx_MyProp);
 	
 	return 10;
+}
+
+foo ()
+{
+	printf ("foo ()\n");
 }
 
 /*
