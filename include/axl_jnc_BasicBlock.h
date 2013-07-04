@@ -16,8 +16,9 @@ class CFunction;
 
 enum EBasicBlockFlag
 {
-	EBasicBlockFlag_Unreachable     = 0x10,
-	EBasicBlockFlag_Jumped          = 0x20,
+	EBasicBlockFlag_Unreachable = 0x10,
+	EBasicBlockFlag_Jumped      = 0x20,
+	EBasicBlockFlag_Entry       = 0x40,
 };		
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -79,6 +80,12 @@ public:
 	GetLlvmBlock ()
 	{
 		return m_pLlvmBlock;
+	}
+
+	void
+	MarkEntry ()
+	{
+		m_Flags |= EBasicBlockFlag_Entry;
 	}
 };
 

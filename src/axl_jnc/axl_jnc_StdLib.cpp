@@ -2,6 +2,7 @@
 #include "axl_jnc_StdLib.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Multicast.h"
+#include "axl_jnc_GcStrategy.h"
 
 namespace axl {
 namespace jnc {
@@ -351,6 +352,44 @@ void
 CStdLib::RunGc ()
 {
 	printf ("Running GC...\n");
+
+	/// @brief The head of the singly-linked list of StackEntries.  Functions push
+	///        and pop onto this in their prologue and epilogue.
+	///
+	/// Since there is only a global list, this technique is not threadsafe.
+	
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	StackEntry* llvm_gc_root_chain = NULL;
+
+	/// @brief Calls Visitor(root, meta) for each GC root on the stack.
+	///        root and meta are exactly the values passed to
+	///        @llvm.gcroot.
+	///
+	/// Visitor could be a function to recursively mark live objects.  Or it
+	/// might copy them to another heap or generation.
+	///
+	/// @param Visitor A function to invoke for every GC root on the stack.
+
+	for (StackEntry *R = llvm_gc_root_chain; R; R = R->Next) 
+	{
+		ASSERT (R->Map->NumMeta == R->Map->NumRoots); // all should have meta
+
+		unsigned e = R->Map->NumMeta;
+		unsigned i = 0;
+		
+		// For roots [0, NumMeta), the metadata pointer is in the FrameMap.
+		for (; i != e; ++i)
+		{
+			CType* pType = (CType*) R->Map->Meta[i];
+			void* p = R->Roots [i];
+
+			printf ("%08x: %s\n", p, pType->GetTypeString ().cc ());
+		}
+	}
+
+	printf ("Done.\n");
 }
 
 //.............................................................................

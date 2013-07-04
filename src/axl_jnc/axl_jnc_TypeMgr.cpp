@@ -1102,21 +1102,20 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
 	{
 		m_pModule->MarkForLayout (pType);
-		m_pModule->MarkForCompile (pType);
 		m_pModule->MarkForLayout (pType->m_pSnapshotType);
-		m_pModule->MarkForCompile (pType->m_pSnapshotType);
 	}
 	else
 	{
 		Result = 
 			pType->CalcLayout () &&
-			pType->Compile () &&
-			pType->m_pSnapshotType->CalcLayout () &&
-			pType->m_pSnapshotType->Compile ();
+			pType->m_pSnapshotType->CalcLayout ();
 
 		if (!Result)
 			return NULL;
 	}
+
+	m_pModule->MarkForCompile (pType);
+	m_pModule->MarkForCompile (pType->m_pSnapshotType);
 
 	pFunctionPtrType->m_pMulticastType = pType;
 	return pType;

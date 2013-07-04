@@ -133,6 +133,7 @@ CFunctionMgr::SaveEmissionContext ()
 	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
 	pContext->m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock;
+	pContext->m_pUnreachableBlock = m_pModule->m_ControlFlowMgr.m_pUnreachableBlock;
 	pContext->m_ControlFlowMgrFlags = m_pModule->m_ControlFlowMgr.m_Flags;
 
 	m_EmissionContextStack.InsertTail (pContext);
@@ -154,6 +155,7 @@ CFunctionMgr::RestoreEmissionContext ()
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pContext->m_pCurrentBlock);
 	m_pModule->m_ControlFlowMgr.m_pReturnBlock = pContext->m_pReturnBlock;
 	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = pContext->m_pSilentReturnBlock;
+	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = pContext->m_pUnreachableBlock;
 	m_pModule->m_ControlFlowMgr.m_Flags = pContext->m_ControlFlowMgrFlags;
 
 	AXL_MEM_DELETE (pContext);
@@ -247,11 +249,13 @@ CFunctionMgr::Prologue (
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
 	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
 
-	pFunction->m_pEntryBlock = pEntryBlock;
-	
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
+	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0; // clear jump flag
+
+	pFunction->m_pEntryBlock = pEntryBlock;
+	pEntryBlock->MarkEntry ();
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prologue");
 
@@ -434,10 +438,15 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	// ensure return
 
 	CBasicBlock* pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	if (!pCurrentBlock->HasReturn ()) 
+	if (!pCurrentBlock->HasTerminator ()) 
 	{
 		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
-		if (pReturnType->GetTypeKind () == EType_Void)
+
+		if (!(pCurrentBlock->GetFlags () & EBasicBlockFlag_Jumped))
+		{
+			m_pModule->m_LlvmBuilder.CreateUnreachable (); // just to make LLVM happy
+		}
+		else if (pReturnType->GetTypeKind () == EType_Void)
 		{
 			m_pModule->m_ControlFlowMgr.Return ();
 		}
@@ -450,18 +459,13 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 				);
 			return false;
 		}
-		else if (pCurrentBlock->GetFlags () & EBasicBlockFlag_Jumped)
+		else 
 		{
 			err::SetFormatStringError (
 				"not all control paths in function '%s' return a value",
 				pFunction->m_Tag.cc ()
 				);
 			return false;
-		}
-		else if (!pCurrentBlock->HasTerminator ())
-		{	
-			// make LLVM happy
-			m_pModule->m_LlvmBuilder.CreateUnreachable (); 
 		}
 	}
 
@@ -499,14 +503,16 @@ CFunctionMgr::InternalPrologue (
 	
 	m_pCurrentFunction = pFunction;
 
-	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
-	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
-
-	pFunction->m_pEntryBlock = pEntryBlock;
+	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry_i");
+	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue_i");
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
+	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
+
+	pFunction->m_pEntryBlock = pEntryBlock;
+	pEntryBlock->MarkEntry ();
 
 	if (pFunction->m_FunctionKind != EFunction_ModuleConstructor) // do not save / restore scope level in module constructor
 		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
@@ -527,7 +533,7 @@ CFunctionMgr::InternalEpilogue ()
 	CFunction* pFunction = m_pCurrentFunction;
 
 	CBasicBlock* pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	if (!pCurrentBlock->HasReturn ()) 
+	if (!pCurrentBlock->HasTerminator ()) 
 	{
 		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
 

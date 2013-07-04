@@ -116,6 +116,7 @@ protected:
 		CBasicBlock* m_pGcRootBlock;
 		CBasicBlock* m_pReturnBlock;
 		CBasicBlock* m_pSilentReturnBlock;
+		CBasicBlock* m_pUnreachableBlock;
 		uint_t m_ControlFlowMgrFlags;
 		CValue m_ThisValue;
 		CValue m_ScopeLevelValue;

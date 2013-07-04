@@ -29,6 +29,7 @@ protected:
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
 	
 	CVariable* m_pScopeLevelVariable;
+	CVariable* m_pShadowStackTopVariable;
 
 public:
 	CVariableMgr ();
@@ -99,6 +100,13 @@ public:
 	{
 		ASSERT (m_pScopeLevelVariable); // should be called after AllocateInitializeGlobalVariables ()
 		return m_pScopeLevelVariable;
+	}
+
+	CVariable*
+	GetShadowStackTopVariable ()
+	{
+		ASSERT (m_pShadowStackTopVariable); // should be called after AllocateInitializeGlobalVariables ()
+		return m_pShadowStackTopVariable;
 	}
 
 protected:	

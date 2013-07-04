@@ -469,6 +469,8 @@ MainWindow::run ()
 			return false;
 	}
 
+	jnc::CScopeThreadModule ScopeModule (&module);
+
 	int ReturnValue;
 	Result = runFunction (pMainFunction, &ReturnValue);
 	if (!Result)

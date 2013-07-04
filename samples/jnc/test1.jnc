@@ -1,58 +1,15 @@
 //.............................................................................
 
-int g_MyPropValue;
-
-bindable int gx_MyProp;
-
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	gx_MyProp.onchange.Add (foo);
+	thin multicast m ();
 
-	int property* px = &gx_MyProp;
-
-	*px = 200;
-
-	printf ("gx_MyProp = %d\n", gx_MyProp);
-	
-	return 10;
-}
-
-foo ()
-{
-	printf ("foo ()\n");
-}
-
-/*
-
-class C1
-{
-	int m_Int;
-
-	autoev m_MyAutoEv ()
-	{
-		m_Int = gx_MyProp * 2;
-	}
-}
-
-int bindable gx_MyProp;
-
-int  
-main ()
-{
-	printf ("main ()\n");
-
-	C1 c;
-	c.m_MyAutoEv.Start ();
-
-	gx_MyProp.onchange.Add (foo);
-	gx_MyProp.onchange.Add (bar ~(5));
-
-	gx_MyProp = 12;
-
-	printf ("c.m_Int = %d\n", c.m_Int);
+	m.Add (foo);
+	m.Add (bar);
+ 	m.Call ();
 
 	return 10;
 }
@@ -62,12 +19,10 @@ foo ()
 	printf ("foo ()\n");
 }
 
-bar (int x)
+bar ()
 {
-	printf ("bar (%d)\n", x);
+	printf ("bar ()\n");
 }
-
-*/
 
 //.............................................................................
 

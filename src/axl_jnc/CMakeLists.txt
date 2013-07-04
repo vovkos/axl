@@ -70,6 +70,7 @@ source_group (
 
 set (
 	GC_H_LIST
+	axl_jnc_GcStrategy.h
 	)
 
 set (

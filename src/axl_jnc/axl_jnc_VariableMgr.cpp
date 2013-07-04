@@ -12,7 +12,9 @@ CVariableMgr::CVariableMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
+	
 	m_pScopeLevelVariable = NULL;
+	m_pShadowStackTopVariable = NULL;
 }
 
 void
@@ -22,7 +24,9 @@ CVariableMgr::Clear ()
 	m_AliasList.Clear ();
 	m_GlobalVariableArray.Clear ();
 	m_StaticDestructList.Clear ();
+
 	m_pScopeLevelVariable = NULL;
+	m_pShadowStackTopVariable = NULL;
 }
 
 CVariable*

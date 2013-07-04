@@ -79,12 +79,10 @@ CLlvmBuilder::CreateSwitch (
 void
 CLlvmBuilder::SetInsertPoint (CBasicBlock* pBlock)
 {
-	llvm::TerminatorInst* pLlvmTermintator = pBlock->GetLlvmBlock ()->getTerminator ();
-
-	if (pLlvmTermintator)
-		m_LlvmBuilder.SetInsertPoint (pLlvmTermintator);
-	else
+	if (!(pBlock->GetFlags () & EBasicBlockFlag_Entry) || !pBlock->HasTerminator ())
 		m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
+	else
+		m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->getTerminator ());
 }
 
 llvm::SwitchInst*

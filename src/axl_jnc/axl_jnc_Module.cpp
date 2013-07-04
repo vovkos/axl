@@ -1,13 +1,11 @@
 #include "pch.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_GcStrategy.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
-
-void
-RegisterGcStrategy (int);
 
 CModule::CModule ()
 {
