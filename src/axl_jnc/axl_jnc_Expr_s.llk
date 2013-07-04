@@ -326,7 +326,7 @@ new_operator_sype_s
 				$.m_pType = $1.m_pType;
 			}
 	|	resolver (type_name_w_constructor_rslv) priority (2) // set higher priority than type_specifier::qualified_name
-		qualified_type_name $t '(' expression_or_empty_list_s ')'
+		qualified_type_name $t EToken_Construct? '(' expression_or_empty_list_s ')'
 			{
 				$.m_pType = $t.m_pType;
 			}
