@@ -67,10 +67,7 @@ public:
 	// branches
 
 	void
-	SetInsertPoint (CBasicBlock* pBlock)
-	{
-		m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
-	}
+	SetInsertPoint (CBasicBlock* pBlock);
 
 	llvm::UnreachableInst*
 	CreateUnreachable ()

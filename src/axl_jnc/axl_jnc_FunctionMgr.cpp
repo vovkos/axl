@@ -1287,10 +1287,11 @@ CFunction*
 CFunctionMgr::CreateMarkGcRoot ()
 {
 	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+	CType* pBytePtrPtrType = pBytePtrType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 
 	CType* ArgTypeArray [] =
 	{
-		pBytePtrType,
+		pBytePtrPtrType,
 		pBytePtrType,
 	};
 
@@ -1301,12 +1302,18 @@ CFunctionMgr::CreateMarkGcRoot ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
+
 	CFunction* pFunction = CreateInternalFunction ("jnc.MarkGcRoot", pType);
+
+	//pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
+	//	m_pModule->m_pLlvmModule,
+	//	llvm::Intrinsic::gcroot,
+	//	llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, countof (LlvmArgTypeArray))
+	//	);
 
 	pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
 		m_pModule->m_pLlvmModule,
-		llvm::Intrinsic::gcroot,
-		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, countof (LlvmArgTypeArray))
+		llvm::Intrinsic::gcroot
 		);
 
 	return pFunction;

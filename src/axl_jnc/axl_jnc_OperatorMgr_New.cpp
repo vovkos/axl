@@ -511,7 +511,7 @@ COperatorMgr::MarkGcRoot (
 		pMarkGcRoot->GetType (),
 		ArgValueArray, 2,
 		&ResultValue
-		);	
+		);
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 	

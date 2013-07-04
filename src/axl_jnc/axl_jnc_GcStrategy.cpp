@@ -166,8 +166,11 @@ class EscapeEnumerator
 // -----------------------------------------------------------------------------
 
 ShadowStackGC::ShadowStackGC() : Head(0), StackEntryTy(0) {
-  InitRoots = true;
-  CustomRoots = true;
+	InitRoots = true;
+	CustomRoots = true;
+	Head = NULL;
+	StackEntryTy = NULL;
+	FrameMapTy = NULL;
 }
 
 Constant *ShadowStackGC::GetFrameMap(Function &F) {

@@ -320,18 +320,6 @@ bool MainWindow::compile ()
 	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.data(), llvm::getGlobalContext ());
 	module.m_pLlvmModule = pLlvmModule;
 
-	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
-	std::string errorString;
-	EngineBuilder.setErrorStr (&errorString);
-	EngineBuilder.setUseMCJIT(true);
-
-	llvmExecutionEngine = EngineBuilder.create ();
-	if (!llvmExecutionEngine)
-	{
-		writeOutput ("Error creating a JITter (%s)\n", errorString.c_str());
-		return false;
-	}
-
 	jnc::CScopeThreadModule ScopeModule (&module);
 
 	writeOutput("Parsing...\n");
@@ -391,6 +379,18 @@ bool MainWindow::compile ()
 	}
 
 	writeOutput("JITting...\n");
+
+	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
+	std::string errorString;
+	EngineBuilder.setErrorStr (&errorString);
+	EngineBuilder.setUseMCJIT(true);
+
+	llvmExecutionEngine = EngineBuilder.create ();
+	if (!llvmExecutionEngine)
+	{
+		writeOutput ("Error creating a JITter (%s)\n", errorString.c_str());
+		return false;
+	}
 
 	jnc::CStdLib::Export (&module, llvmExecutionEngine);
 	module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib_printf);
