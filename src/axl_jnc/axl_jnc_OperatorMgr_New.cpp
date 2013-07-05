@@ -234,12 +234,19 @@ COperatorMgr::Construct (
 
 bool
 COperatorMgr::ParseInitializer (
-	const CValue& Value,
+	const CValue& RawValue,
 	const rtl::CConstBoxListT <CToken>& ConstructorTokenList,
 	const rtl::CConstBoxListT <CToken>& InitializerTokenList
 	)
 {
 	bool Result;
+
+	CValue Value = RawValue;
+
+	if (RawValue.GetType ()->GetTypeKind () == EType_DataRef)
+		Value.OverrideType (((CDataPtrType*) RawValue.GetType ())->GetUnConstPtrType ());
+	else if (RawValue.GetType ()->GetTypeKind () == EType_ClassRef)
+		Value.OverrideType (((CClassPtrType*) RawValue.GetType ())->GetUnConstPtrType ());
 
 	rtl::CBoxListT <CValue> ArgList;
 	if (!ConstructorTokenList.IsEmpty ())

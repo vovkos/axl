@@ -38,7 +38,7 @@ public:
 	GetCheckedPtrType ()
 	{
 		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
-			m_pTargetType->GetClassPtrType (m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
+			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
 			this;			
 	}
 
@@ -46,7 +46,15 @@ public:
 	GetUnCheckedPtrType ()
 	{
 		return (m_Flags & EPtrTypeFlag_Checked) ?  
-			m_pTargetType->GetClassPtrType (m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			this;			
+	}
+
+	CClassPtrType*
+	GetUnConstPtrType ()
+	{
+		return (m_Flags & EPtrTypeFlag_Const) ?  
+			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Const) : 
 			this;			
 	}
 

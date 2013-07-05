@@ -46,7 +46,7 @@ public:
 	GetCheckedPtrType ()
 	{
 		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
-			m_pTargetType->GetFunctionPtrType (m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
+			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
 			this;			
 	}
 
@@ -54,7 +54,7 @@ public:
 	GetUnCheckedPtrType ()
 	{
 		return (m_Flags & EPtrTypeFlag_Checked) ?  
-			m_pTargetType->GetFunctionPtrType (m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
+			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
 			this;			
 	}
 
