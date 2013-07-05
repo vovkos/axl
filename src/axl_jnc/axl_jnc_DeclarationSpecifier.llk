@@ -152,7 +152,8 @@ type_specifier
 			}
 	|	EToken_Variant
 			{
-				$.m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Variant);
+				err::SetStringError ("'variant' type specifier is not yet supported");
+				return false; 
 			}
 	|	EToken_Object
 			{
