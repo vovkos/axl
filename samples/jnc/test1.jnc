@@ -1,36 +1,28 @@
 //.............................................................................
-/*
-property MyProp
-{
-	int
-	get ();
-		
-	set (int);
-}
 
-int
-MyProp.get ()
+struct TPoint
 {
-	printf ("MyProp.get ()\n");
-	return 100;
-}
+	int m_x;
+	int m_y;
 
-MyProp.set (int x)
-{
-	printf ("MyProp.set (%d)\n", x);
-}
-*/
-
-class C1
-{
-	construct ()
+	preconstruct ()
 	{
-		printf ("C1.construct ()\n");
+		printf ("TPoint.preconstruct ()\n");
 	}
 
-	destruct ()
+	construct ()
 	{
-		printf ("C1.destruct ()\n");
+		printf ("TPoint.construct ()\n");
+	}
+
+	static construct ()
+	{
+		printf ("TPoint.static construct ()\n");
+	}
+
+	static destruct ()
+	{
+		printf ("TPoint.static destruct ()\n");
 	}
 }
 
@@ -40,39 +32,14 @@ main ()
 	printf ("main ()\n");
 
 	foo ();
-	foo ();
-	foo ();
 
 	return 10;
 }
 
 foo ()
 {
-	printf ("foo ()\n");
-	static C1 c;
-
-	once
-	{
-		printf ("once!\n");
-	}
+	TPoint Point;
 }
-
-/*
-foo ()
-{
-	printf ("foo ()\n");
-
-	once 
-	{
-		printf ("foo.once ()\n");
-	}
-}
-
-bar ()
-{
-	printf ("bar ()\n");
-}
-*/
 
 //.............................................................................
 

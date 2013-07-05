@@ -129,8 +129,7 @@ protected:
 	CFunction* m_pDefaultConstructor;
 	CFunction* m_pStaticConstructor;
 	CFunction* m_pStaticDestructor;
-
-	CVariable* m_pStaticConstructorFlag; // 'once' semantics
+	CVariable* m_pStaticOnceFlagVariable; // 'once' semantics for static constructor
 
 	// construct arrays
 
@@ -226,6 +225,12 @@ public:
 		return m_pStaticDestructor;
 	}
 
+	CVariable*
+	GetStaticOnceFlagVariable ()
+	{
+		return m_pStaticOnceFlagVariable;
+	}
+
 	virtual
 	CStructField*
 	GetFieldByIndex (size_t Index) = 0;
@@ -304,7 +309,13 @@ protected:
 	ResolveImportFields ();
 
 	bool
-	CreateDefaultMemberMethod (EFunction FunctionKind);
+	CreateDefaultMethod (
+		EFunction FunctionKind,
+		EStorage StorageKind = EStorage_Member
+		);
+
+	bool
+	CompileDefaultStaticConstructor ();
 
 	bool
 	CompileDefaultConstructor ();

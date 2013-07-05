@@ -515,7 +515,7 @@ COperatorMgr::ProcessStaticDestructList (const rtl::CConstListT <TStaticDestruct
 		m_pModule->m_LlvmBuilder.CreateCall (
 			pDestruct->m_pDestructor, 
 			pDestruct->m_pDestructor->GetType (), 
-			&ArgValue, 1,
+			&ArgValue, ArgCount,
 			NULL
 			);
 

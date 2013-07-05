@@ -201,10 +201,11 @@ public:
 		return m_pVirtualOriginClassType;
 	}
 
-	CNamedType*
+	CDerivableType*
 	GetParentType ()
 	{
-		return m_pParentNamespace->GetNamespaceKind () == ENamespace_Type ? (CNamedType*) m_pParentNamespace : NULL;
+		return m_pParentNamespace->GetNamespaceKind () == ENamespace_Type ? 
+			(CDerivableType*) (CNamedType*) m_pParentNamespace : NULL;
 	}
 
 	CType* 

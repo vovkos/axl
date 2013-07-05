@@ -21,8 +21,8 @@ class CFunction;
 struct TStaticDestruct: rtl::TListLink 
 {
 	CVariable* m_pFlagVariable;
-	CVariable* m_pVariable; // could be null for static destructors
 	CFunction* m_pDestructor;
+	CVariable* m_pVariable; // could be null for static destructors
 };
 
 //.............................................................................
@@ -88,6 +88,13 @@ public:
 		return m_StaticDestructList;
 	}
 
+	void
+	AddToStaticDestructList (
+		CVariable* pFlagVariable,
+		CFunction* pDestructor,
+		CVariable* pVariable = NULL
+		);
+
 	CVariable*
 	CreateVariable (
 		EStorage StorageKind,
@@ -98,7 +105,10 @@ public:
 		rtl::CBoxListT <CToken>* pConstructor = NULL,
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
-		
+
+	CVariable*
+	CreateOnceFlagVariable ();		
+
 	llvm::GlobalVariable*
 	CreateLlvmGlobalVariable (
 		CType* pType,

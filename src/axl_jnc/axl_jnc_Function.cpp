@@ -333,9 +333,14 @@ CFunction::Compile ()
 
 	// prologue
 
-	Result = m_pModule->m_FunctionMgr.Prologue (this, m_Body.GetHead ()->m_Pos);
+	CToken::CPos BeginPos = m_Body.GetHead ()->m_Pos;
+	CToken::CPos EndPos = m_Body.GetTail ()->m_Pos;
+
+	Result = m_pModule->m_FunctionMgr.Prologue (this, BeginPos);
 	if (!Result)
 		return false;
+
+	TOnceStmt Stmt; // for static constructors
 
 	// parse body
 
@@ -344,20 +349,46 @@ CFunction::Compile ()
 	Parser.m_Stage = CParser::EStage_Pass2;
 
 	ESymbol StartSymbol = ESymbol_compound_stmt;
-	
-	if (m_FunctionKind == EFunction_PreConstructor)
+
+	if (m_FunctionKind == EFunction_StaticConstructor)
 	{
-		CType* pParentType = GetParentType ();
+		CDerivableType* pParentType = GetParentType ();
+		if (!pParentType)
+		{
+			err::SetFormatStringError ("static constructors for properties are not yet supported");
+			return false;
+		}
+
+		m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, pParentType->GetStaticOnceFlagVariable ());
+		
+		Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, BeginPos);
+		if (!Result)
+			return false;
+	}
+	else if (m_FunctionKind == EFunction_PreConstructor)
+	{
+		CDerivableType* pParentType = GetParentType ();
 		if (!pParentType)
 		{
 			err::SetFormatStringError ("preconstructors for properties are not yet supported");
+			return false;
+		}
+
+		CFunction* pStaticConstructor = pParentType->GetStaticConstructor ();
+		if (pStaticConstructor)
+		{
+			CValue ReturnValue;
+			m_pModule->m_LlvmBuilder.CreateCall (
+				pStaticConstructor,
+				pStaticConstructor->GetType (),
+				&ReturnValue
+				);
 		}
 
 		CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 		ASSERT (ThisValue);
 
-		EType TypeKind = pParentType->GetTypeKind ();
-		
+		EType TypeKind = pParentType->GetTypeKind ();		
 		switch (TypeKind)
 		{
 		case EType_Struct:
@@ -390,9 +421,12 @@ CFunction::Compile ()
 	if (!Result)
 		return false;
 
+	if (m_FunctionKind == EFunction_StaticConstructor)
+		m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, EndPos);
+
 	// epilogue
 
-	Result = m_pModule->m_FunctionMgr.Epilogue (m_Body.GetTail ()->m_Pos);
+	Result = m_pModule->m_FunctionMgr.Epilogue (EndPos);
 	if (!Result)
 		return false;
 
@@ -403,4 +437,3 @@ CFunction::Compile ()
 
 } // namespace jnc {
 } // namespace axl {
-

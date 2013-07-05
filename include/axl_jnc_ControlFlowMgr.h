@@ -308,7 +308,10 @@ public:
 	// once stmt
 
 	void
-	OnceStmt_Create (TOnceStmt* pStmt);
+	OnceStmt_Create (
+		TOnceStmt* pStmt,
+		CVariable* pFlagVariable = NULL
+		);
 
 	bool
 	OnceStmt_PreBody (

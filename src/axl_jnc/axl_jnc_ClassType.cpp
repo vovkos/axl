@@ -411,9 +411,24 @@ CClassType::CalcLayout ()
 
 	CreateVTablePtr ();
 
-	if (!m_pPreConstructor && !m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ())
+	if (!m_pStaticConstructor && m_pStaticDestructor)
 	{
-		Result = CreateDefaultMemberMethod (EFunction_PreConstructor);
+		Result = CreateDefaultMethod (EFunction_StaticConstructor, EStorage_Static);
+		if (!Result)
+			return false;
+	}
+
+	if (m_pStaticConstructor)
+		m_pStaticOnceFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable ();
+
+	if (m_pStaticDestructor)
+		m_pModule->m_VariableMgr.AddToStaticDestructList (m_pStaticOnceFlagVariable, m_pStaticDestructor);
+
+	if (!m_pPreConstructor && 
+		(m_pStaticConstructor ||
+		!m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ()))
+	{
+		Result = CreateDefaultMethod (EFunction_PreConstructor);
 		if (!Result)
 			return false;
 	}
@@ -424,7 +439,7 @@ CClassType::CalcLayout ()
 		!m_MemberFieldConstructArray.IsEmpty () ||
 		!m_MemberPropertyConstructArray.IsEmpty ()))
 	{
-		Result = CreateDefaultMemberMethod (EFunction_Constructor);
+		Result = CreateDefaultMethod (EFunction_Constructor);
 		if (!Result)
 			return false;
 	}
@@ -434,7 +449,7 @@ CClassType::CalcLayout ()
 		!m_MemberFieldDestructArray.IsEmpty () ||
 		!m_MemberPropertyDestructArray.IsEmpty ()))
 	{
-		Result = CreateDefaultMemberMethod (EFunction_Destructor);
+		Result = CreateDefaultMethod (EFunction_Destructor);
 		if (!Result)
 			return false;
 	}
@@ -610,6 +625,13 @@ bool
 CClassType::Compile ()
 {
 	bool Result;
+
+	if (m_pStaticConstructor && !(m_pStaticConstructor->GetFlags () & EModuleItemFlag_User))
+	{
+		Result = CompileDefaultStaticConstructor ();
+		if (!Result)
+			return false;
+	}
 
 	if (m_pPreConstructor && !(m_pPreConstructor->GetFlags () & EModuleItemFlag_User))
 	{

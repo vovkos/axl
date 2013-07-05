@@ -28,6 +28,21 @@ CVariableMgr::Clear ()
 	memset (m_StdVariableArray, 0, sizeof (m_StdVariableArray));
 }
 
+void
+CVariableMgr::AddToStaticDestructList (
+	CVariable* pFlagVariable,
+	CFunction* pDestructor,
+	CVariable* pVariable
+	)
+{
+	TStaticDestruct* pDestruct = AXL_MEM_NEW (TStaticDestruct);
+	pDestruct->m_pFlagVariable = pFlagVariable;
+	pDestruct->m_pDestructor = pDestructor;
+	pDestruct->m_pVariable = pVariable;
+
+	m_StaticDestructList.InsertTail (pDestruct);
+}
+
 CVariable*
 CVariableMgr::GetStdVariable (EStdVariable Variable)
 {
@@ -91,6 +106,18 @@ CVariableMgr::CreateVariable (
 	}
 
 	return pVariable;
+}
+
+CVariable*
+CVariableMgr::CreateOnceFlagVariable ()
+{
+	return CreateVariable (
+		EStorage_Static, 
+		"once_flag", 
+		"once_flag", 
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
+		EPtrTypeFlag_Volatile
+		);
 }
 
 llvm::GlobalVariable*
@@ -244,12 +271,11 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 	if (pVariable->m_pType->GetTypeKind () == EType_Class &&
 		((CClassType*) pVariable->m_pType)->GetDestructor ())
 	{
-		TStaticDestruct* pDestruct = AXL_MEM_NEW (TStaticDestruct);
-		pDestruct->m_pFlagVariable = Stmt.m_pFlagVariable;
-		pDestruct->m_pVariable = pVariable;
-		pDestruct->m_pDestructor = ((CClassType*) pVariable->m_pType)->GetDestructor ();
-
-		m_StaticDestructList.InsertTail (pDestruct);
+		AddToStaticDestructList (
+			Stmt.m_pFlagVariable, 
+			((CClassType*) pVariable->m_pType)->GetDestructor (), 
+			pVariable
+			);
 	}
 
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);

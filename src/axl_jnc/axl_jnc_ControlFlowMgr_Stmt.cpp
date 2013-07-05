@@ -305,23 +305,24 @@ CControlFlowMgr::ForStmt_PostBody (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-CControlFlowMgr::OnceStmt_Create (TOnceStmt* pStmt)
+CControlFlowMgr::OnceStmt_Create (
+	TOnceStmt* pStmt,
+	CVariable* pFlagVariable
+	)
 {
-	pStmt->m_pFlagVariable = m_pModule->m_VariableMgr.CreateVariable (
-		EStorage_Static, 
-		"once_flag", 
-		"once_flag", 
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
-		EPtrTypeFlag_Volatile
-		);
+	if (!pFlagVariable)
+	{
+		pFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable ();
 
-	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
+		CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
 
-	m_pModule->m_VariableMgr.AllocatePrimeGlobalVariable (pStmt->m_pFlagVariable);
+		m_pModule->m_VariableMgr.AllocatePrimeGlobalVariable (pFlagVariable);
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+	}
 
+	pStmt->m_pFlagVariable = pFlagVariable;
 	pStmt->m_pPreBodyBlock = CreateBlock ("once_prebody");
 	pStmt->m_pBodyBlock = CreateBlock ("once_body");
 	pStmt->m_pLoopBlock = CreateBlock ("once_loop");

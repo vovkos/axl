@@ -38,7 +38,7 @@ CDerivableType::CDerivableType ()
 	m_pDefaultConstructor = NULL;
 	m_pStaticConstructor = NULL;
 	m_pStaticDestructor = NULL;
-	m_pStaticConstructorFlag = NULL;
+	m_pStaticOnceFlagVariable = NULL;
 }
 
 CFunction* 
@@ -384,11 +384,14 @@ CDerivableType::AddProperty (CProperty* pProperty)
 }
 
 bool
-CDerivableType::CreateDefaultMemberMethod (EFunction FunctionKind)
+CDerivableType::CreateDefaultMethod (
+	EFunction FunctionKind,
+	EStorage StorageKind
+	)
 {
 	CFunctionType* pType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType);
-	pFunction->m_StorageKind = EStorage_Member;
+	pFunction->m_StorageKind = StorageKind;
 	pFunction->m_Tag.Format ("%s.%s", m_Tag.cc (), GetFunctionKindString (FunctionKind));
 
 	bool Result = AddMethod (pFunction);
@@ -396,6 +399,24 @@ CDerivableType::CreateDefaultMemberMethod (EFunction FunctionKind)
 		return false;
 
 	m_pModule->MarkForCompile (this);
+	return true;
+}
+
+bool
+CDerivableType::CompileDefaultStaticConstructor ()
+{
+	ASSERT (m_pStaticConstructor);
+
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
+
+	CToken::CPos Pos;
+	
+	bool Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
+	if (!Result)
+		return false;
+
+	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
 	return true;
 }
 

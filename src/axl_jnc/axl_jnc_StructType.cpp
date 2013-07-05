@@ -253,19 +253,35 @@ CStructType::CalcLayout ()
 
 	if (m_StructTypeKind == EStructType_Normal)
 	{
-		if (!m_pPreConstructor && !m_InitializedFieldArray.IsEmpty ())
+		if (!m_pStaticConstructor && m_pStaticDestructor)
 		{
-			Result = CreateDefaultMemberMethod (EFunction_PreConstructor);
+			Result = CreateDefaultMethod (EFunction_StaticConstructor, EStorage_Static);
+			if (!Result)
+				return false;
+		}
+
+		if (m_pStaticConstructor)
+			m_pStaticOnceFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable ();
+
+		if (m_pStaticDestructor)
+			m_pModule->m_VariableMgr.AddToStaticDestructList (m_pStaticOnceFlagVariable, m_pStaticDestructor);
+
+		if (!m_pPreConstructor && 
+			(m_pStaticConstructor ||
+			!m_InitializedFieldArray.IsEmpty ()))
+		{
+			Result = CreateDefaultMethod (EFunction_PreConstructor);
 			if (!Result)
 				return false;
 		}
 
 		if (!m_pConstructor && 
 			(m_pPreConstructor || 
+			!m_BaseTypeConstructArray.IsEmpty () ||
 			!m_MemberFieldConstructArray.IsEmpty () ||
 			!m_MemberPropertyConstructArray.IsEmpty ()))
 		{
-			Result = CreateDefaultMemberMethod (EFunction_Constructor);
+			Result = CreateDefaultMethod (EFunction_Constructor);
 			if (!Result)
 				return false;
 		}
@@ -278,6 +294,13 @@ bool
 CStructType::Compile ()
 {
 	bool Result;
+
+	if (m_pStaticConstructor && !(m_pStaticConstructor->GetFlags () & EModuleItemFlag_User))
+	{
+		Result = CompileDefaultStaticConstructor ();
+		if (!Result)
+			return false;
+	}
 
 	if (m_pPreConstructor && !(m_pPreConstructor->GetFlags () & EModuleItemFlag_User))
 	{

@@ -294,6 +294,8 @@ CFunctionMgr::Prologue (
 
 		CreateThisValue (ThisArgValue);
 
+		// cut vtable
+
 		if (pFunction->NeedsVTablePtrCut ())
 		{
 			CutVTable (ThisArgValue);

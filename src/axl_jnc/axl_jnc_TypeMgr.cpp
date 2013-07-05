@@ -1189,10 +1189,10 @@ CTypeMgr::CreateAutoEvType (
 	} 
 	else 
 	{
-		pType->CreateDefaultMemberMethod (EFunction_Constructor);
+		pType->CreateDefaultMethod (EFunction_Constructor);
 	}
 
-	pType->CreateDefaultMemberMethod (EFunction_Destructor);
+	pType->CreateDefaultMethod (EFunction_Destructor);
 
 	// methods
 
