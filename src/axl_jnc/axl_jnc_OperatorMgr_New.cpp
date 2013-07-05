@@ -413,20 +413,12 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 	switch (TypeKind)
 	{
 	case EType_DataPtr:
-		{
-		EDataPtrType PtrTypeKind = ((CDataPtrType*) OpValue.GetType ())->GetPtrTypeKind ();		
-		if (PtrTypeKind == EDataPtrType_Thin)
-		{
-			err::SetFormatStringError ("invalid 'delete' on variable- or field-derived pointer");
-			return false;
-		}
-
-		Result = PrepareDataPtr (OpValue, &PtrValue);
+		Result = PrepareDataPtr (&OpValue);
 		if (!Result)
 			return false;
 
 		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFree);	
-		}
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 		break;
 
 	case EType_ClassPtr:
@@ -445,7 +437,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 		}
 
 		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFreeClassPtr);	
-		PtrValue = OpValue;
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
 		}
 		break;
 
@@ -453,9 +445,8 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 		err::SetFormatStringError ("cannot delete '%s'", OpValue.GetType ()->GetTypeString ().cc ());
 		return false;
 	}
-
+			
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
 	return true;
 }

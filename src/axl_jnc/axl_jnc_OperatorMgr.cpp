@@ -392,9 +392,21 @@ COperatorMgr::CastOperator (
 {
 	bool Result;
 
+	if (RawOpValue.GetValueKind () == EValue_Null)
+	{
+		if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr))
+		{
+			SetCastError (RawOpValue, pType);
+			return false;
+		}
+
+		*pResultValue = pType->GetZeroValue ();
+		return true;
+	}
+
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
-
+	
 	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
 	ASSERT (pOperator); // there is always a default
 
@@ -446,6 +458,9 @@ COperatorMgr::GetCastKind (
 	CType* pType
 	)
 {
+	if (RawOpValue.GetValueKind () == EValue_Null)
+		return (pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) ? ECast_Implicit : ECast_None;
+
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 

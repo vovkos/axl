@@ -191,6 +191,7 @@ public:
 		CValue* pResultValue
 		);
 };
+
 //.............................................................................
 
 // master cast chooses particular implementation

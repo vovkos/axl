@@ -284,9 +284,13 @@ CValue::SetVoid ()
 void
 CValue::SetNull ()
 {
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
 	Clear ();
 
 	m_ValueKind = EValue_Null;
+	m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 }
 
 void
@@ -318,7 +322,7 @@ CValue::SetNamespace (CNamespace* pNamespace)
 
 	m_ValueKind = EValue_Namespace;
 	m_pNamespace = pNamespace;
-	m_pType = pModule->GetSimpleType (EType_Void);
+	m_pType = pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 }
 
 void

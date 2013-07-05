@@ -1,44 +1,20 @@
 //.............................................................................
 
-struct TPoint
+class C1
 {
-	int m_x;
-	int m_y;
-
-	preconstruct ()
-	{
-		printf ("TPoint.preconstruct ()\n");
-	}
-
-	construct ()
-	{
-		printf ("TPoint.construct ()\n");
-	}
-
-	static construct ()
-	{
-		printf ("TPoint.static construct ()\n");
-	}
-
-	static destruct ()
-	{
-		printf ("TPoint.static destruct ()\n");
-	}
 }
 
 int  
 main ()
 {
 	printf ("main ()\n");
+	
+	C1* p;
 
-	foo ();
+	delete p;
+	
 
 	return 10;
-}
-
-foo ()
-{
-	TPoint Point;
 }
 
 //.............................................................................

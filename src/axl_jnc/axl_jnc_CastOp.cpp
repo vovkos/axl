@@ -28,7 +28,7 @@ SetCastError (
 
 	return err::SetFormatStringError (
 		"cannot convert from '%s' to '%s'",
-		OpValue.GetType ()->GetTypeString ().cc (), 
+		OpValue.GetValueKind () == EValue_Null ? "null" : OpValue.GetType ()->GetTypeString ().cc (), 
 		pDstType->GetTypeString ().cc ()
 		);
 }
