@@ -964,7 +964,7 @@ CParser::DeclareData (
 		{
 			pVariable->m_pScope = pScope;
 
-			Result = m_pModule->m_VariableMgr.AllocateInitializeVariable (pVariable);
+			Result = m_pModule->m_VariableMgr.AllocatePrimeInitializeVariable (pVariable);
 			if (!Result)
 				return false;
 		}

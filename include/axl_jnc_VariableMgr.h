@@ -11,6 +11,29 @@ namespace axl {
 namespace jnc {
 
 class CClassType;
+class CFunction;
+
+//.............................................................................
+
+// for static variables and static destructors we need to check 
+// whether the item was actually created or not
+
+struct TStaticDestruct: rtl::TListLink 
+{
+	CVariable* m_pFlagVariable;
+	CVariable* m_pVariable; // could be null for static destructors
+	CFunction* m_pDestructor;
+};
+
+//.............................................................................
+
+enum EStdVariable
+{
+	EStdVariable_ScopeLevel = 0,
+	EStdVariable_GcShadowStackTop,
+
+	EStdVariable__Count,
+};
 
 //.............................................................................
 
@@ -25,11 +48,12 @@ protected:
 	rtl::CStdListT <CAlias> m_AliasList;
 
 	rtl::CArrayT <CVariable*> m_GlobalVariableArray;
-	rtl::CBoxListT <CValue> m_StaticDestructList;
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
-	
-	CVariable* m_pScopeLevelVariable;
-	CVariable* m_pShadowStackTopVariable;
+
+	rtl::CArrayT <CVariable*> m_GlobalDestructArray;
+	rtl::CStdListT <TStaticDestruct> m_StaticDestructList;
+
+	CVariable* m_StdVariableArray [EStdVariable__Count];
 
 public:
 	CVariableMgr ();
@@ -42,6 +66,9 @@ public:
 
 	void
 	Clear ();
+
+	CVariable*
+	GetStdVariable (EStdVariable Variable);
 	
 	rtl::CArrayT <CVariable*> 
 	GetGlobalVariableArray ()
@@ -49,16 +76,16 @@ public:
 		return m_GlobalVariableArray;
 	}
 
-	rtl::CConstBoxListT <CValue>
+	rtl::CArrayT <CVariable*> 
+	GetGlobalDestructArray ()
+	{
+		return m_GlobalDestructArray;
+	}
+
+	rtl::CConstListT <TStaticDestruct>
 	GetStaticDestructList ()
 	{
 		return m_StaticDestructList;
-	}
-
-	void
-	AddToStaticDestructList (const CValue& Value)
-	{
-		m_StaticDestructList.InsertTail (Value);
 	}
 
 	CVariable*
@@ -87,34 +114,31 @@ public:
 		);
 
 	bool
-	AllocateInitializeVariable (
-		CVariable* pVariable,
-		bool AllocateOnly = false
-		);
+	AllocatePrimeGlobalVariable (CVariable* pVariable);
 
 	bool
-	AllocateInitializeGlobalVariables ();
+	AllocatePrimeGlobalVariables ();
 
-	CVariable*
-	GetScopeLevelVariable ()
-	{
-		ASSERT (m_pScopeLevelVariable); // should be called after AllocateInitializeGlobalVariables ()
-		return m_pScopeLevelVariable;
-	}
+	bool
+	InitializeGlobalVariables ();
 
-	CVariable*
-	GetShadowStackTopVariable ()
+	bool
+	AllocatePrimeInitializeVariable (CVariable* pVariable)
 	{
-		ASSERT (m_pShadowStackTopVariable); // should be called after AllocateInitializeGlobalVariables ()
-		return m_pShadowStackTopVariable;
+		return pVariable->m_StorageKind == EStorage_Static ? 
+			AllocatePrimeInitializeStaticVariable (pVariable) :
+			AllocatePrimeInitializeNonStaticVariable (pVariable);
 	}
 
 protected:	
+	CVariable*
+	CreateScopeLevelVariable ();
+
 	bool
-	InitializeVariable (
-		CVariable* pVariable,
-		const CValue& PtrValue
-		);
+	AllocatePrimeInitializeStaticVariable (CVariable* pVariable);
+
+	bool
+	AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable);
 };
 
 //.............................................................................

@@ -30,7 +30,7 @@ protected:
 	CToken::CPos m_EndPos;
 	CFunction* m_pFunction;
 
-	rtl::CBoxListT <CValue> m_DestructList;
+	rtl::CArrayT <CVariable*> m_DestructArray;
 	rtl::CBoxListT <CValue> m_GcRootList;
 
 public:
@@ -72,16 +72,16 @@ public:
 		return m_pParentNamespace && m_pParentNamespace->GetNamespaceKind () == ENamespace_Scope ? (CScope*) m_pParentNamespace : NULL;
 	}
 
-	rtl::CConstBoxListT <CValue>
-	GetDestructList ()
+	rtl::CArrayT <CVariable*>
+	GetDestructArray ()
 	{
-		return m_DestructList;
+		return m_DestructArray;
 	}
 
 	void
-	AddToDestructList (const CValue& Value)
+	AddToDestructArray (CVariable* pVariable)
 	{
-		m_DestructList.InsertTail (Value);
+		m_DestructArray.Append (pVariable);
 	}
 
 	rtl::CConstBoxListT <CValue>

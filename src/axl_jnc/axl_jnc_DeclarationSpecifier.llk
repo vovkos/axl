@@ -207,9 +207,10 @@ type_specifier
 				err::SetStringError ("'auto' type specifier is not yet supported");
 				return false; 
 			}
-	|	property_template_specifier
+	|	resolver (EToken_Property '{')
+		property_template_specifier $t
 			{
-				$.m_pType = $1.m_pType;
+				$.m_pType = $t.m_pType;
 			}
 	|	resolver (qualified_type_name_rslv)
 		qualified_type_name $t

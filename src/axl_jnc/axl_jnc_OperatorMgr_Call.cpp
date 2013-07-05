@@ -495,7 +495,8 @@ COperatorMgr::CallImpl (
 		CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
 
 		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "update scope level before call");
-		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
+		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
+		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pVariable);
 	}
 
 	m_pModule->m_LlvmBuilder.CreateCall (

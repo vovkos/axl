@@ -249,20 +249,37 @@ CFunctionMgr::Prologue (
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
 	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
 
+	pFunction->m_pEntryBlock = pEntryBlock;
+	pEntryBlock->MarkEntry ();
+
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
+
+	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
+	{
+		bool Result = m_pModule->m_VariableMgr.AllocatePrimeGlobalVariables ();
+		if (!Result)
+			return false;
+	}
+	
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0; // clear jump flag
-
-	pFunction->m_pEntryBlock = pEntryBlock;
-	pEntryBlock->MarkEntry ();
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prologue");
 
 	// save scope level
 
-	if (pFunction->m_FunctionKind != EFunction_ModuleConstructor) // do not save / restore scope level in module constructor
-		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
+	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
+	{
+		Result = m_pModule->m_VariableMgr.InitializeGlobalVariables ();
+		if (!Result)
+			return false;
+	}
+	else // do not save / restore scope level in module constructor
+	{
+		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
+		m_pModule->m_LlvmBuilder.CreateLoad (pVariable, NULL, &m_ScopeLevelValue);
+	}
 	
 	Result = CreateShadowArgVariables ();
 	if (!Result)
@@ -336,6 +353,8 @@ CFunctionMgr::CreateThisValue (const CValue& ThisArgValue)
 bool
 CFunctionMgr::CreateShadowArgVariables ()
 {
+	bool Result;
+
 	CFunction* pFunction = m_pCurrentFunction;
 	ASSERT (pFunction);
 
@@ -368,10 +387,20 @@ CFunctionMgr::CreateShadowArgVariables ()
 			pArg->GetPtrTypeFlags ()
 			);
 
-		bool Result = m_pModule->m_VariableMgr.AllocateInitializeVariable (pArgVariable, true);
+		CValue PtrValue;
+		Result = m_pModule->m_OperatorMgr.Allocate (
+			EStorage_Stack, 
+			pArg->GetType (), 
+			pArg->GetName (), 
+			&PtrValue
+			);
+
 		if (!Result)
 			return false;
 
+		pArgVariable->m_pLlvmAllocValue = PtrValue.GetLlvmValue ();
+		pArgVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
+			
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
 
 		m_pModule->m_LlvmBuilder.CreateStore (ArgValue, pArgVariable);
@@ -433,7 +462,10 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	}
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleDestructor)
-		m_pModule->m_OperatorMgr.ProcessDestructList (m_pModule->m_VariableMgr.GetStaticDestructList ());
+	{
+		m_pModule->m_OperatorMgr.ProcessDestructArray (m_pModule->m_VariableMgr.GetGlobalDestructArray ());
+		m_pModule->m_OperatorMgr.ProcessStaticDestructList (m_pModule->m_VariableMgr.GetStaticDestructList ());
+	}
 
 	// ensure return
 
@@ -503,19 +535,22 @@ CFunctionMgr::InternalPrologue (
 	
 	m_pCurrentFunction = pFunction;
 
-	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry_i");
-	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue_i");
+	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
+	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
+
+	pFunction->m_pEntryBlock = pEntryBlock;
+	pEntryBlock->MarkEntry ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 
-	pFunction->m_pEntryBlock = pEntryBlock;
-	pEntryBlock->MarkEntry ();
-
 	if (pFunction->m_FunctionKind != EFunction_ModuleConstructor) // do not save / restore scope level in module constructor
-		m_pModule->m_LlvmBuilder.CreateLoad (m_pModule->m_VariableMgr.GetScopeLevelVariable (), NULL, &m_ScopeLevelValue);
+	{
+		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
+		m_pModule->m_LlvmBuilder.CreateLoad (pVariable, NULL, &m_ScopeLevelValue);
+	}
 
 	rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->GetType ()->GetArgArray ();
 	llvm::Function::arg_iterator LlvmArg = pFunction->GetLlvmFunction ()->arg_begin ();

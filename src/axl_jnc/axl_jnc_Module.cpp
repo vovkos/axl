@@ -167,24 +167,22 @@ CModule::Compile ()
 			return false;
 	}
 
-	// step 4: ensure module destructor (if needed)
-
-	if (!m_pDestructor && 
-		(!m_TypeMgr.GetStaticDestructArray ().IsEmpty () || 
-		 !m_VariableMgr.GetStaticDestructList ().IsEmpty ()))
-	{
-		Result = CreateDefaultDestructor ();
-		if (!Result)
-			return false;
-	}
-
-	// step 5: compile the rest 
+	// step 4: compile the rest 
 
 	for (size_t i = 0; i < m_CompileArray.GetCount (); i++) // new items could be added in process
 	{
 		Result = m_CompileArray [i]->Compile ();
 		if (!Result)
 			return false;
+	}
+
+	// step 5: ensure module destructor (if needed)
+
+	if (!m_pDestructor && 
+		(!m_VariableMgr.GetGlobalDestructArray ().IsEmpty () ||
+		 !m_VariableMgr.GetStaticDestructList ().IsEmpty ()))
+	{
+		CreateDefaultDestructor ();
 	}
 
 	return true;
@@ -202,51 +200,46 @@ CModule::CreateDefaultConstructor ()
 	pFunction->m_StorageKind = EStorage_Static;
 	pFunction->m_Tag = "module.construct";
 
+	m_pConstructor = pFunction;
+
 	m_FunctionMgr.InternalPrologue (pFunction);
 
-	Result = m_VariableMgr.AllocateInitializeGlobalVariables ();
+	CBasicBlock* pBlock = m_ControlFlowMgr.GetCurrentBlock ();
+	m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+
+	Result = m_VariableMgr.AllocatePrimeGlobalVariables ();
+	if (!Result)
+		return false;
+
+	m_ControlFlowMgr.SetCurrentBlock (pBlock);
+
+	Result = m_VariableMgr.InitializeGlobalVariables ();
 	if (!Result)
 		return false;
 
 	m_FunctionMgr.InternalEpilogue ();
 
-	m_pConstructor = pFunction;
 	return true;
 }
 
-bool
+void
 CModule::CreateDefaultDestructor ()
 {
-	bool Result;
-
 	ASSERT (!m_pDestructor);
 
 	CFunctionType* pType = (CFunctionType*) GetSimpleType (EStdType_SimpleFunction);
 	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleDestructor, pType);
 	pFunction->m_StorageKind = EStorage_Static;
 	pFunction->m_Tag = "module.destruct";
-		
-	m_FunctionMgr.InternalPrologue (pFunction);
-
-	m_OperatorMgr.ProcessDestructList (m_VariableMgr.GetStaticDestructList ());
-
-	rtl::CArrayT <CClassType*> StaticTypeDestructArray = m_TypeMgr.GetStaticDestructArray ();
-	size_t Count = StaticTypeDestructArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CClassType* pClassType = StaticTypeDestructArray [i];
-		CFunction* pDestructor = pClassType->GetStaticDestructor ();
-		ASSERT (pDestructor);
-
-		Result = m_OperatorMgr.CallOperator (pDestructor);
-		if (!Result)
-			return false;
-	}
-
-	m_FunctionMgr.InternalEpilogue ();
 
 	m_pDestructor = pFunction;
-	return true;
+
+	m_FunctionMgr.InternalPrologue (pFunction);
+
+	m_OperatorMgr.ProcessDestructArray (m_VariableMgr.GetGlobalDestructArray ());
+	m_OperatorMgr.ProcessStaticDestructList (m_VariableMgr.GetStaticDestructList ());
+
+	m_FunctionMgr.InternalEpilogue ();
 }
 
 //.............................................................................

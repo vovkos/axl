@@ -17,6 +17,7 @@ class CScope;
 class CVariable: public CUserModuleItem
 {
 	friend class CVariableMgr;
+	friend class CFunctionMgr;
 	friend class CParser;
 
 protected:

@@ -315,6 +315,13 @@ CControlFlowMgr::OnceStmt_Create (TOnceStmt* pStmt)
 		EPtrTypeFlag_Volatile
 		);
 
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
+
+	m_pModule->m_VariableMgr.AllocatePrimeGlobalVariable (pStmt->m_pFlagVariable);
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+
 	pStmt->m_pPreBodyBlock = CreateBlock ("once_prebody");
 	pStmt->m_pBodyBlock = CreateBlock ("once_body");
 	pStmt->m_pLoopBlock = CreateBlock ("once_loop");

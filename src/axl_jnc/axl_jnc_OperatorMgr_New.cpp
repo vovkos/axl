@@ -159,22 +159,6 @@ COperatorMgr::Prime (
 		);
 
 	m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
-
-	if (pClassType->GetDestructor ())
-	{
-		switch (StorageKind)
-		{
-		case EStorage_Stack:
-			ASSERT (pScope);
-			pScope->AddToDestructList (*pResultValue);
-			break;
-
-		case EStorage_Static:
-			m_pModule->m_VariableMgr.AddToStaticDestructList (*pResultValue);
-			break;
-		}
-	}
-
 	return true;
 }
 
@@ -477,25 +461,65 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 }
 
 void
-COperatorMgr::ProcessDestructList (const rtl::CConstBoxListT <CValue>& List)
+COperatorMgr::ProcessDestructArray (
+	CVariable* const* ppDestructArray,
+	size_t Count
+	)
 {
-	if (List.IsEmpty ())
-		return;
-
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "process destruct list");
 
-	rtl::CBoxIteratorT <CValue> It = List.GetTail ();
-	for (; It; It--)
+	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
-		CValue Value = *It;
-		ASSERT (Value.GetType ()->GetTypeKind () == EType_ClassPtr);
-		
-		CClassType* pType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
+		CVariable* pVariable = ppDestructArray [i];
+		ASSERT (pVariable->GetType ()->GetTypeKind () == EType_Class);
 
+		CClassType* pType = (CClassType*) pVariable->GetType ();
 		CFunction* pDestructor = pType->GetDestructor ();
 		ASSERT (pDestructor);
 
-		m_pModule->m_LlvmBuilder.CreateCall (pDestructor, pDestructor->GetType (), Value, NULL);		
+		m_pModule->m_LlvmBuilder.CreateCall (pDestructor, pDestructor->GetType (), pVariable, NULL);		
+	}
+}
+
+void
+COperatorMgr::ProcessStaticDestructList (const rtl::CConstListT <TStaticDestruct>& List)
+{
+	rtl::CIteratorT <TStaticDestruct> Destruct = List.GetHead ();
+	for (; Destruct; Destruct++)
+	{
+		TStaticDestruct* pDestruct = *Destruct;
+
+		CBasicBlock* pDestructBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("destruct_block");
+		CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow_block");
+
+		CValue CmpValue;
+
+		m_pModule->m_OperatorMgr.BinaryOperator (
+			EBinOp_Ne, 
+			pDestruct->m_pFlagVariable, 
+			pDestruct->m_pFlagVariable->GetType ()->GetZeroValue (),
+			&CmpValue
+			);
+
+		m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pDestructBlock, pFollowBlock);
+
+		CValue ArgValue;
+		size_t ArgCount = 0;
+
+		if (pDestruct->m_pVariable)
+		{
+			ArgValue.SetVariable (pDestruct->m_pVariable);
+			ArgCount = 1;
+		}
+
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pDestruct->m_pDestructor, 
+			pDestruct->m_pDestructor->GetType (), 
+			&ArgValue, 1,
+			NULL
+			);
+
+		m_pModule->m_ControlFlowMgr.Follow (pFollowBlock);
 	}
 }
 

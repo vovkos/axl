@@ -188,7 +188,7 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	while (pScope && pScope != pTargetScope && pScope->GetFunction () == pFunction)
 	{	
-		m_pModule->m_OperatorMgr.ProcessDestructList (pScope->GetDestructList ());
+		m_pModule->m_OperatorMgr.ProcessDestructArray (pScope->GetDestructArray ());
 		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
 		pScope = pScope->GetParentScope ();
 	}
@@ -202,7 +202,8 @@ CControlFlowMgr::RestoreScopeLevel ()
 		return;
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "restore scope level before return");
-	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, m_pModule->m_VariableMgr.GetScopeLevelVariable ());
+	CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
+	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pVariable);
 }
 
 bool

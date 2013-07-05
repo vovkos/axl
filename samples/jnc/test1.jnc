@@ -1,15 +1,47 @@
 //.............................................................................
+/*
+property MyProp
+{
+	int
+	get ();
+		
+	set (int);
+}
+
+int
+MyProp.get ()
+{
+	printf ("MyProp.get ()\n");
+	return 100;
+}
+
+MyProp.set (int x)
+{
+	printf ("MyProp.set (%d)\n", x);
+}
+*/
+
+class C1
+{
+	construct ()
+	{
+		printf ("C1.construct ()\n");
+	}
+
+	destruct ()
+	{
+		printf ("C1.destruct ()\n");
+	}
+}
 
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	thin multicast m ();
-
-	m.Add (foo);
-	m.Add (bar);
- 	m.Call ();
+	foo ();
+	foo ();
+	foo ();
 
 	return 10;
 }
@@ -17,12 +49,30 @@ main ()
 foo ()
 {
 	printf ("foo ()\n");
+	static C1 c;
+
+	once
+	{
+		printf ("once!\n");
+	}
+}
+
+/*
+foo ()
+{
+	printf ("foo ()\n");
+
+	once 
+	{
+		printf ("foo.once ()\n");
+	}
 }
 
 bar ()
 {
 	printf ("bar ()\n");
 }
+*/
 
 //.............................................................................
 

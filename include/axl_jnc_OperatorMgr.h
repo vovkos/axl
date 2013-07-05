@@ -29,6 +29,7 @@
 #include "axl_jnc_StructType.h"
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_VariableMgr.h"
 
 namespace axl {
 namespace jnc {
@@ -1172,7 +1173,19 @@ public:
 		);
 
 	void
-	ProcessDestructList (const rtl::CConstBoxListT <CValue>& List);
+	ProcessDestructArray (
+		CVariable* const* ppDestructArray,
+		size_t Count
+		);
+
+	void
+	ProcessDestructArray (const rtl::CArrayT <CVariable*> DestructArray)
+	{
+		ProcessDestructArray (DestructArray, DestructArray.GetCount ());
+	}
+
+	void
+	ProcessStaticDestructList (const rtl::CConstListT <TStaticDestruct>& List);
 
 	void
 	NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List);

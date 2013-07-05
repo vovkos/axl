@@ -113,7 +113,6 @@ protected:
 	{
 		CFunction* m_pCurrentFunction;
 		CBasicBlock* m_pCurrentBlock;
-		CBasicBlock* m_pGcRootBlock;
 		CBasicBlock* m_pReturnBlock;
 		CBasicBlock* m_pSilentReturnBlock;
 		CBasicBlock* m_pUnreachableBlock;
