@@ -1,35 +1,32 @@
 //.............................................................................
 
-class C1
-{
-	int
-	operator += (int x)
-	{
-		printf ("operator += (%d)\n");		
-		return 100;
-	}
-
-	operator () (int x)
-	{
-		printf ("operator (int %d)\n", x);		
-	}
-
-	operator () (double x)
-	{
-		printf ("operator (double %f)\n", x);		
-	}
-}
-
-
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	C1 c;
-	c (5.5);	
+	thin multicast m (int);
+	m += foo;
+	m += bar;	
+	m = zoo;
+	m (100);	
 
 	return 10;
+}
+
+foo (int x)
+{
+	printf ("foo (%d)\n", x);
+}
+
+bar (int x)
+{
+	printf ("bar (%d)\n", x);
+}
+
+zoo (int x)
+{
+	printf ("zoo (%d)\n", x);
 }
 
 //.............................................................................

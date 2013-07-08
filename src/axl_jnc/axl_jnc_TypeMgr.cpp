@@ -1080,6 +1080,14 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	pMethodType = pFunctionPtrType->GetTargetType ();
 	pType->m_MethodArray [EMulticastMethod_Call] = pType->CreateMethod (EStorage_Member, "Call", pMethodType);
 
+	// overloaded operators
+
+	pType->m_BinaryOperatorTable.SetCount (EBinOp__Count);
+	pType->m_BinaryOperatorTable [EBinOp_RefAssign] = pType->m_MethodArray [EMulticastMethod_Set];
+	pType->m_BinaryOperatorTable [EBinOp_AddAssign] = pType->m_MethodArray [EMulticastMethod_Add];
+	pType->m_BinaryOperatorTable [EBinOp_SubAssign] = pType->m_MethodArray [EMulticastMethod_Remove];
+	pType->m_pCallOperator = pType->m_MethodArray [EMulticastMethod_Call];
+
 	// snapshot closure
 
 	CMcSnapshotClassType* pSnapshotType = (CMcSnapshotClassType*) CreateUnnamedClassType (EClassType_McSnapshot);
@@ -1134,8 +1142,9 @@ CTypeMgr::GetAutoEvInterfaceType (CFunctionType* pStartMethodType)
 
 	CClassType* pType = CreateUnnamedClassType (EClassType_AutoEvIface);
 	pType->m_Signature.Format ("CA%s", pStartMethodType->GetTypeString ().cc ());
-	pType->CreateMethod (EStorage_Abstract, "Start", pStartMethodType);
+	CFunction* pStarter = pType->CreateMethod (EStorage_Abstract, "Start", pStartMethodType);
 	pType->CreateMethod (EStorage_Abstract, "Stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
+	pType->m_pCallOperator = pStarter;
 	return pType;
 }
 
@@ -1198,6 +1207,7 @@ CTypeMgr::CreateAutoEvType (
 
 	pType->m_MethodArray [EAutoEvMethod_Start] = pType->CreateMethod (EStorage_Override, "Start", pStartMethodType);
 	pType->m_MethodArray [EAutoEvMethod_Stop]  = pType->CreateMethod (EStorage_Override, "Stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
+	pType->m_pCallOperator = pType->m_MethodArray [EAutoEvMethod_Start];
 	return pType;
 }
 

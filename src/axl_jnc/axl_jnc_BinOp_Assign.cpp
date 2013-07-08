@@ -24,8 +24,7 @@ CBinOp_Assign::Operator (
 		return m_pModule->m_OperatorMgr.StoreDataRef (OpValue1, OpValue2);
 
 	case EType_ClassRef:
-		err::SetFormatStringError ("assigning to class not yet implemented");
-		return false;
+		return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_RefAssign, OpValue1, OpValue2, pResultValue);
 
 	case EType_PropertyRef:
 		return m_pModule->m_OperatorMgr.SetProperty (OpValue1, OpValue2);
