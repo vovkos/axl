@@ -555,7 +555,12 @@ CParser::DeclareFunction (
 			return false;
 		}
 
-		return ((CPropertyTemplate*) pNamespace)->AddMethod (FunctionKind, pType);
+		bool Result = ((CPropertyTemplate*) pNamespace)->AddMethod (FunctionKind, pType);
+		if (!Result)
+			return false;
+
+		m_pLastDeclaredItem = pType;
+		return true;
 	}
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType);

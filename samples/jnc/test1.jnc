@@ -1,16 +1,35 @@
 //.............................................................................
 
-const int x = 100;
+int property gx_MyProp;
+
+int 
+gx_MyProp.get ()
+{
+	printf ("gx_MyProp.get ()\n");
+	return 100;
+}
+
+gx_MyProp.set (int x)
+{
+	printf ("gx_MyProp.set (%d)\n", x);
+}
 
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	const int y = 200;
+	property 
+	{
+		int 
+		get ();
 
-	// x = 1;
-	// y = 1;
+		set (int);
+	} thin* px = &gx_MyProp;
+
+	int x = *px;
+	*px = 500;
+	
 
 	return 10;
 }

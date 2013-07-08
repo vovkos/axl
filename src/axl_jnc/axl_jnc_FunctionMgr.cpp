@@ -113,6 +113,7 @@ CPropertyTemplate*
 CFunctionMgr::CreatePropertyTemplate ()
 {
 	CPropertyTemplate* pPropertyTemplate = AXL_MEM_NEW (CPropertyTemplate);
+	pPropertyTemplate->m_pModule = m_pModule;
 	m_PropertyTemplateList.InsertTail (pPropertyTemplate);
 	return pPropertyTemplate;
 }
