@@ -164,6 +164,11 @@ CClassType::AddMethod (CFunction* pFunction)
 		ppTarget = &m_BinaryOperatorTable [pFunction->GetBinOpKind ()];
 		break;
 
+	case EFunction_CallOperator:
+		pFunction->m_Tag.Format ("%s.operator ()", m_Tag.cc ());
+		ppTarget = &m_pCallOperator;
+		break;
+
 	case EFunction_AutoEvHandler:
 		if (m_ClassTypeKind == EClassType_AutoEv)
 			return true;

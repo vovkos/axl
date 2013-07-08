@@ -39,6 +39,7 @@ CDerivableType::CDerivableType ()
 	m_pStaticConstructor = NULL;
 	m_pStaticDestructor = NULL;
 	m_pStaticOnceFlagVariable = NULL;
+	m_pCallOperator = NULL;
 }
 
 CFunction* 
@@ -315,6 +316,11 @@ CDerivableType::AddMethod (CFunction* pFunction)
 			m_BinaryOperatorTable.SetCount (EBinOp__Count);
 
 		ppTarget = &m_BinaryOperatorTable [pFunction->GetBinOpKind ()];
+		break;
+
+	case EFunction_CallOperator:
+		pFunction->m_Tag.Format ("%s.operator ()", m_Tag.cc ());
+		ppTarget = &m_pCallOperator;
 		break;
 
 	default:

@@ -142,6 +142,7 @@ protected:
 	rtl::CArrayT <CFunction*> m_UnaryOperatorTable;
 	rtl::CArrayT <CFunction*> m_BinaryOperatorTable;
 	rtl::CStringHashTableMapAT <CFunction*> m_CastOperatorMap;
+	CFunction* m_pCallOperator;
 
 public:
 	CDerivableType ();
@@ -229,6 +230,26 @@ public:
 	GetStaticOnceFlagVariable ()
 	{
 		return m_pStaticOnceFlagVariable;
+	}
+
+	CFunction*
+	GetUnaryOperator (EUnOp OpKind)
+	{
+		ASSERT ((size_t) OpKind < EUnOp__Count);
+		return m_UnaryOperatorTable ? m_UnaryOperatorTable [OpKind] : NULL;
+	}
+
+	CFunction*
+	GetBinaryOperator (EBinOp OpKind)
+	{
+		ASSERT ((size_t) OpKind < EBinOp__Count);
+		return m_BinaryOperatorTable ? m_BinaryOperatorTable [OpKind] : NULL;
+	}
+
+	CFunction*
+	GetCallOperator ()
+	{
+		return m_pCallOperator;
 	}
 
 	virtual

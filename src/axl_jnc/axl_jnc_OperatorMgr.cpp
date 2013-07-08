@@ -533,8 +533,8 @@ COperatorMgr::GetArgCastKind (
 
 	ECast WorstCastKind = ECast_Identitiy;
 
-	const rtl::CBoxIteratorT <CValue>& Arg = ArgList.GetHead ();
-	for (size_t i = 0; i < FormalArgCount; i++)
+	rtl::CBoxIteratorT <CValue> Arg = ArgList.GetHead ();
+	for (size_t i = 0; i < FormalArgCount; i++, Arg++)
 	{
 		CType* pFormalArgType = FormalArgArray [i]->GetType ();
 

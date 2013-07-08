@@ -157,10 +157,35 @@ COperatorMgr::GetCallOperatorResultType (
 	rtl::CBoxListT <CValue>* pArgList
 	)
 {
-	CValue OpValue;
+	bool Result;
 
-	EValue OpValueKind = RawOpValue.GetValueKind ();	
-	if (OpValueKind == EValue_FunctionTypeOverload)
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue);
+
+	if (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr)
+	{
+		CFunction* pCallOperator = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ()->GetCallOperator ();
+		if (!pCallOperator)
+		{
+			err::SetFormatStringError ("cannot call '%s'", OpValue.GetType ()->GetTypeString ().cc ());
+			return NULL;
+		}
+
+		CValue ObjValue = OpValue;
+		
+		OpValue.SetFunctionTypeOverload (pCallOperator->GetTypeOverload ());
+		OpValue.InsertToClosureTail (ObjValue);
+	}
+
+	ref::CPtrT <CClosure> Closure = OpValue.GetClosure ();
+	if (Closure)
+	{
+		Result = Closure->Apply (pArgList);
+		if (!Result)
+			return false;
+	}
+
+	if (RawOpValue.GetValueKind () == EValue_FunctionTypeOverload)
 	{
 		size_t i = RawOpValue.GetFunctionTypeOverload ()->ChooseOverload (*pArgList);
 		if (i == -1)
@@ -169,9 +194,6 @@ COperatorMgr::GetCallOperatorResultType (
 		CFunctionType* pFunctionType = RawOpValue.GetFunctionTypeOverload ()->GetOverload (i);
 		return pFunctionType->GetReturnType ();
 	}
-	
-	ASSERT (OpValueKind == EValue_Type);
-	PrepareOperandType (RawOpValue, &OpValue);
 		
 	CFunctionType* pFunctionType;
 		
@@ -222,42 +244,50 @@ COperatorMgr::CallOperator (
 	bool Result;
 
 	CValue OpValue;
-	CValue ReturnValue;
+	CValue UnusedReturnValue;
+	rtl::CBoxListT <CValue> EmptyArgList;
 
 	if (!pResultValue)
-		pResultValue = &ReturnValue;
+		pResultValue = &UnusedReturnValue;
 
-	EValue OpValueKind = RawOpValue.GetValueKind ();	
-	if (OpValueKind == EValue_Function)
-	{
-		CFunction* pFunction = RawOpValue.GetFunction ();
-		if (pFunction->IsOverloaded ())
-		{
-			pFunction = RawOpValue.GetFunction ()->ChooseOverload (*pArgList);
-			if (!pFunction)
-				return false;
-		}
-
-		OpValue.SetFunction (pFunction);
-		OpValue.SetClosure (RawOpValue.GetClosure ());
-	}
-	else
-	{
-		Result = PrepareOperand (RawOpValue, &OpValue, 0);
-		if (!Result)
-			return false;
-	}
-
-	rtl::CBoxListT <CValue> EmptyArgList;
 	if (!pArgList)
 		pArgList = &EmptyArgList;
 
-	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure)
+	Result = PrepareOperand (RawOpValue, &OpValue, 0);
+	if (!Result)
+		return false;
+
+	if (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr)
 	{
-		Result = pClosure->Apply (pArgList);
+		CFunction* pCallOperator = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ()->GetCallOperator ();
+		if (!pCallOperator)
+		{
+			err::SetFormatStringError ("cannot call '%s'", OpValue.GetType ()->GetTypeString ().cc ());
+			return NULL;
+		}
+
+		CValue ObjValue = OpValue;
+		
+		OpValue.SetFunction (pCallOperator);
+		OpValue.InsertToClosureTail (ObjValue);
+	}
+
+	ref::CPtrT <CClosure> Closure = OpValue.GetClosure ();
+	if (Closure)
+	{
+		Result = Closure->Apply (pArgList);
 		if (!Result)
 			return false;
+	}
+
+	if (OpValue.GetValueKind () == EValue_Function && OpValue.GetFunction ()->IsOverloaded ())
+	{
+		CFunction* pFunction = OpValue.GetFunction ()->ChooseOverload (*pArgList);
+		if (!pFunction)
+			return false;
+
+		OpValue.SetFunction (pFunction);
+		OpValue.SetClosure (Closure);
 	}
 
 	if (OpValue.GetValueKind () == EValue_Function)
@@ -266,7 +296,7 @@ COperatorMgr::CallOperator (
 
 		if (pFunction->IsVirtual ())
 		{
-			Result = GetVirtualMethod (pFunction, pClosure, &OpValue);
+			Result = GetVirtualMethod (pFunction, Closure, &OpValue);
 			if (!Result)
 				return false;
 		}

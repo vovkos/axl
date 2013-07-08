@@ -201,20 +201,6 @@ public:
 		return m_VTablePtrValue;
 	}
 
-	CFunction*
-	GetUnaryOperator (EUnOp OpKind)
-	{
-		ASSERT ((size_t) OpKind < EUnOp__Count);
-		return m_UnaryOperatorTable ? m_UnaryOperatorTable [OpKind] : NULL;
-	}
-
-	CFunction*
-	GetBinaryOperator (EBinOp OpKind)
-	{
-		ASSERT ((size_t) OpKind < EBinOp__Count);
-		return m_BinaryOperatorTable ? m_BinaryOperatorTable [OpKind] : NULL;
-	}
-
 	virtual 
 	bool
 	Compile ();

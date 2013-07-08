@@ -68,6 +68,12 @@ GetFunctionKindFlags (EFunction FunctionKind)
 		EFunctionKindFlag_NoStorage |   // EFunction_StaticDestructor,
 		EFunctionKindFlag_NoOverloads |
 		EFunctionKindFlag_NoArgs,              
+		EFunctionKindFlag_NoStorage |   // EFunction_ModuleConstructor,
+		EFunctionKindFlag_NoOverloads |
+		EFunctionKindFlag_NoArgs,              
+		EFunctionKindFlag_NoStorage |   // EFunction_ModuleDestructor,
+		EFunctionKindFlag_NoOverloads |
+		EFunctionKindFlag_NoArgs,              
 		0,                              // EFunction_CallOperator,
 		EFunctionKindFlag_NoOverloads | // EFunction_CastOperator,
 		EFunctionKindFlag_NoArgs,       

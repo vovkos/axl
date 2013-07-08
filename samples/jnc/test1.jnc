@@ -1,35 +1,33 @@
 //.............................................................................
 
-int property gx_MyProp;
-
-int 
-gx_MyProp.get ()
+class C1
 {
-	printf ("gx_MyProp.get ()\n");
-	return 100;
+	int
+	operator += (int x)
+	{
+		printf ("operator += (%d)\n");		
+		return 100;
+	}
+
+	operator () (int x)
+	{
+		printf ("operator (int %d)\n", x);		
+	}
+
+	operator () (double x)
+	{
+		printf ("operator (double %f)\n", x);		
+	}
 }
 
-gx_MyProp.set (int x)
-{
-	printf ("gx_MyProp.set (%d)\n", x);
-}
 
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	property 
-	{
-		int 
-		get ();
-
-		set (int);
-	} thin* px = &gx_MyProp;
-
-	int x = *px;
-	*px = 500;
-	
+	C1 c;
+	c (5.5);	
 
 	return 10;
 }

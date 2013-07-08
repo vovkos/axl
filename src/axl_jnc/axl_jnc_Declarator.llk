@@ -81,7 +81,7 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_StaticDestructor);
 			}
-	|	EToken_Operator
+	|	EToken_Operator '(' ')'
 			{
 				return $pDeclarator->AddUnnamedMethod (EFunction_CallOperator);
 			}
