@@ -117,6 +117,39 @@ CFunctionPtrType::PrepareLlvmType ()
 		llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0);
 }
 
+void
+CFunctionPtrType::EnumGcRoots (
+	CGcHeap* pGcHeap,
+	void* p
+	)
+{
+	ASSERT (m_PtrTypeKind == EFunctionPtrType_Normal || EFunctionPtrType_Weak);
+
+	TFunctionPtr* pPtr = (TFunctionPtr*) p;
+	if (!pGcHeap->ShouldMark (pPtr->m_pClosure))
+		return;
+
+	TObject* pObject = pPtr->m_pClosure->m_pObject;
+	
+	if (m_PtrTypeKind == EFunctionPtrType_Normal)
+	{
+		pGcHeap->MarkValue (pObject, pObject->m_pType);
+	}
+	else if (pObject->m_pType->GetClassTypeKind () != EClassType_FunctionClosure)
+	{
+		pGcHeap->MarkRange (pObject, pObject->m_pType->GetSize ());
+	}
+	else
+	{
+		CFunctionClosureClassType* pClosureType = (CFunctionClosureClassType*) pObject->m_pType;
+
+		#pragma AXL_TODO ("special processing for weak function closure")
+		
+		// for now, keep everything strong
+		pGcHeap->MarkValue (pObject, pObject->m_pType);
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

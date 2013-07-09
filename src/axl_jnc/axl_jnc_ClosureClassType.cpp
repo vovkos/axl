@@ -77,6 +77,42 @@ CClosureClassType::BuildArgValueList (
 		pArgValueList->InsertTail (pThunkArgValueArray [iThunk]);
 }
 
+jnc::TInterface* 
+CClosureClassType::Strengthen (jnc::TInterface* p)
+{
+	if (!m_WeakMask)
+		return p;
+
+	uint64_t WeakMask = m_WeakMask;
+	while (WeakMask)
+	{
+		size_t Index = rtl::GetLoBitIdx64 (WeakMask);		
+		
+		CStructField* pField = GetFieldByIndex (Index);
+		if (!pField)
+			return NULL;
+
+		void* p2 = (char*) p + pField->GetOffset ();
+
+		EType TypeKind = pField->GetType ()->GetTypeKind ();
+		switch (TypeKind)
+		{
+		case EType_ClassPtr:
+			break;
+
+		case EType_FunctionPtr:
+			break;
+
+		case EType_PropertyPtr:
+			break;
+		}
+
+		WeakMask &= ~(1 << Index);
+	}
+
+	return p;
+}
+
 //.............................................................................
 
 CFunctionClosureClassType::CFunctionClosureClassType ()

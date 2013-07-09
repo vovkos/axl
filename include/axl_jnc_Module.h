@@ -14,6 +14,7 @@
 #include "axl_jnc_OperatorMgr.h"
 #include "axl_jnc_LlvmBuilder.h"
 #include "axl_jnc_ThreadModule.h"
+#include "axl_jnc_GcHeap.h"
 
 namespace axl {
 namespace jnc {
@@ -62,6 +63,7 @@ public:
 	CControlFlowMgr m_ControlFlowMgr;
 	COperatorMgr m_OperatorMgr;	
 	CLlvmBuilder m_LlvmBuilder;
+	CGcHeap m_GcHeap;
 
 public:
 	CModule ();

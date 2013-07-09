@@ -44,6 +44,9 @@ public:
 	bool
 	Compile () = 0;
 
+	jnc::TInterface* 
+	Strengthen (jnc::TInterface* p);
+
 protected:
 	void
 	BuildArgValueList (

@@ -321,7 +321,8 @@ public:
 		CType* pType
 		)
 	{
-		return OpValue.GetType ()->GetSize () == sizeof (intptr_t) ? ECast_Explicit : ECast_None;
+		ASSERT (OpValue.GetType ()->GetSize () >= sizeof (intptr_t));
+		return ECast_Explicit;
 	}
 
 	virtual

@@ -149,6 +149,7 @@ COperatorMgr::Prime (
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prime object");
 
 	CFunction* pPrimer = pClassType->GetPrimer ();
+
 	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pPrimer,
 		pPrimer->GetType (),
@@ -158,7 +159,27 @@ COperatorMgr::Prime (
 		NULL
 		);
 
+	if (StorageKind == EStorage_Heap)
+	{
+		CFunction* pAddObject = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcAddObject);
+
+		CValue ObjectPtrValue;
+		m_pModule->m_LlvmBuilder.CreateBitCast (
+			PtrValue,
+			m_pModule->GetSimpleType (EStdType_ObjectHdrPtr),
+			&ObjectPtrValue
+			);
+
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pAddObject,
+			pAddObject->GetType (),
+			ObjectPtrValue,
+			NULL
+			);
+	}
+
 	m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+
 	return true;
 }
 

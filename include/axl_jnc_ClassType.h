@@ -74,7 +74,7 @@ protected:
 	// prime arrays
 
 	rtl::CArrayT <CBaseTypeSlot*> m_BaseTypePrimeArray;
-	rtl::CArrayT <CStructField*> m_MemberPrimeArray;
+	rtl::CArrayT <CStructField*> m_ClassMemberFieldArray;
 
 	// destruct arrays
 
@@ -174,6 +174,12 @@ public:
 	HasVTable ()
 	{
 		return !m_VTable.IsEmpty ();
+	}
+
+	rtl::CArrayT <CStructField*> 
+	GetClassMemberFieldArray ()
+	{
+		return m_ClassMemberFieldArray;
 	}
 
 	rtl::CArrayT <CFunction*> 

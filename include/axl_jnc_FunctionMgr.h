@@ -53,19 +53,24 @@ enum EStdFunc
 
 	// void 
 	// jnc.CheckClassPtrScopeLevel (
-	//		object p,
+	//		object* p,
 	//		size_t DstScopeLevel
 	//		);
 
 	EStdFunc_CheckClassPtrScopeLevel,
 
-	// object
+	// object*
 	// jnc.DynamicCastClassPtr (
-	//		object p,
+	//		object* p,
 	//		int8* pType
 	//		);
 
 	EStdFunc_DynamicCastClassPtr,
+
+	// object*
+	// jnc.StrengthenClassPtr (weak object* p);
+
+	EStdFunc_StrengthenClassPtr,
 
 	// int8*
 	// jnc.HeapAlloc (int8* pType);
@@ -83,9 +88,14 @@ enum EStdFunc
 	EStdFunc_UHeapFree,
 
 	// void
-	// jnc.UHeapFreeClassPtr (object p);
+	// jnc.UHeapFreeClassPtr (object* p);
 
 	EStdFunc_UHeapFreeClassPtr,
+
+	// void
+	// jnc.GcAddObject (object.hdr* p);
+
+	EStdFunc_GcAddObject,
 
 	// void
 	// jnc.MarkGcRoot (
@@ -362,6 +372,9 @@ protected:
 	CreateDynamicCastClassPtr ();
 
 	CFunction*
+	CreateStrengthenClassPtr ();
+
+	CFunction*
 	CreateHeapAlloc ();
 
 	CFunction*
@@ -372,6 +385,9 @@ protected:
 
 	CFunction*
 	CreateUHeapFreeClassPtr ();
+
+	CFunction*
+	CreateGcAddObject ();
 
 	CFunction*
 	CreateMarkGcRoot ();

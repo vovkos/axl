@@ -100,6 +100,39 @@ CPropertyPtrType::PrepareLlvmType ()
 		m_pTargetType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetLlvmType ();
 }
 
+void
+CPropertyPtrType::EnumGcRoots (
+	CGcHeap* pGcHeap,
+	void* p
+	)
+{
+	ASSERT (m_PtrTypeKind == EPropertyPtrType_Normal || EPropertyPtrType_Weak);
+
+	TPropertyPtr* pPtr = (TPropertyPtr*) p;
+	if (!pGcHeap->ShouldMark (pPtr->m_pClosure))
+		return;
+
+	TObject* pObject = pPtr->m_pClosure->m_pObject;
+	
+	if (m_PtrTypeKind == EPropertyPtrType_Normal)
+	{
+		pGcHeap->MarkValue (pObject, pObject->m_pType);
+	}
+	else if (pObject->m_pType->GetClassTypeKind () != EClassType_PropertyClosure)
+	{
+		pGcHeap->MarkRange (pObject, pObject->m_pType->GetSize ());
+	}
+	else
+	{
+		CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) pObject->m_pType;
+
+		#pragma AXL_TODO ("special processing for weak property closure")
+		
+		// for now, keep everything strong
+		pGcHeap->MarkValue (pObject, pObject->m_pType);
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

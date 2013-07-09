@@ -682,6 +682,29 @@ CDerivableType::FindItemTraverseImpl (
 	return NULL;
 }
 
+void
+CDerivableType::EnumGcRoots (
+	CGcHeap* pGcHeap,
+	void* _p
+	)
+{
+	char* p = (char*) _p;
+
+	size_t Count = m_GcRootBaseTypeArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CBaseTypeSlot* pSlot = m_GcRootBaseTypeArray [i];
+		pSlot->GetType ()->EnumGcRoots (pGcHeap, p + pSlot->GetOffset ());
+	}
+
+	Count = m_GcRootMemberFieldArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_GcRootMemberFieldArray [i];
+		pField->GetType ()->EnumGcRoots (pGcHeap, p + pField->GetOffset ());
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

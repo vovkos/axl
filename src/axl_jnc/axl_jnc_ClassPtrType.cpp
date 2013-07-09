@@ -76,6 +76,24 @@ CClassPtrType::PrepareLlvmType ()
 	m_pLlvmType = llvm::PointerType::get (m_pTargetType->GetIfaceStructType ()->GetLlvmType (), 0);
 }
 
+void
+CClassPtrType::EnumGcRoots (
+	CGcHeap* pGcHeap,
+	void* p
+	)
+{
+	TInterface* pIface = *(TInterface**) p;
+	if (!pGcHeap->ShouldMark (pIface))
+		return;
+
+	TObject* pObject = pIface->m_pObject;
+	
+	if (m_PtrTypeKind == EClassPtrType_Normal)
+		pGcHeap->MarkValue (pObject, pObject->m_pType);
+	else
+		pGcHeap->MarkRange (pObject, pObject->m_pType->GetSize ()); // actually can only keep headers. but whatever
+}
+
 //.............................................................................
 
 } // namespace jnc {

@@ -61,6 +61,22 @@ CArrayType::CalcLayout ()
 	return true;
 }
 
+void
+CArrayType::EnumGcRoots (
+	CGcHeap* pGcHeap,
+	void* _p
+	)
+{
+	ASSERT (m_Flags & ETypeFlag_GcRoot);
+
+	char* p = (char*) _p;
+	for (size_t i = 0; i < m_ElementCount; i++)
+	{
+		m_pElementType->EnumGcRoots (pGcHeap, p);
+		p += m_pElementType->GetSize ();
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

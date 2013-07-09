@@ -928,6 +928,10 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 
 	pExecutionEngine->UnregisterJITEventListener (JitEventListener);
 
+	llvm::GlobalVariable* pLlvmVariable = m_pModule->m_pLlvmModule->getGlobalVariable("llvm_gc_root_chain");
+	ASSERT (pLlvmVariable); 
+
+	m_pModule->m_GcHeap.m_pShadowStack = pExecutionEngine->getPointerToGlobal (pLlvmVariable);
 	return true;
 }
  
@@ -967,6 +971,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateDynamicCastClassPtr ();
 		break;
 
+	case EStdFunc_StrengthenClassPtr:
+		pFunction = CreateStrengthenClassPtr ();
+		break;
+
 	case EStdFunc_HeapAlloc:
 		pFunction = CreateHeapAlloc ();
 		break;
@@ -981,6 +989,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 
 	case EStdFunc_UHeapFreeClassPtr:
 		pFunction = CreateUHeapFreeClassPtr ();
+		break;
+
+	case EStdFunc_GcAddObject:
+		pFunction = CreateGcAddObject ();
 		break;
 
 	case EStdFunc_MarkGcRoot:
@@ -1174,7 +1186,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 
 // void 
 // jnc.CheckClassPtrScopeLevel (
-//		object p,
+//		object* p,
 //		size_t DstScopeLevel
 //		);
 
@@ -1236,9 +1248,9 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	return pFunction;
 }
 
-// object
+// object*
 // jnc.DynamicCastClassPtr (
-//		object p,
+//		object* p,
 //		int8* pType
 //		);
 
@@ -1255,6 +1267,23 @@ CFunctionMgr::CreateDynamicCastClassPtr ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction ("jnc.DynamicCastClassPtr", pType);
+}
+
+// object*
+// jnc.StrengthenClassPtr (weak object* p);
+
+CFunction*
+CFunctionMgr::CreateStrengthenClassPtr ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+	
+	CType* ArgTypeArray [] =
+	{
+		((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass))->GetClassPtrType (EClassPtrType_Weak)
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction ("jnc.StrengthenClassPtr", pType);
 }
 
 // int8*
@@ -1307,7 +1336,7 @@ CFunctionMgr::CreateUHeapFree ()
 }
 
 // void
-// jnc.UHeapFreeClassPtr (object p);
+// jnc.UHeapFreeClassPtr (object* p);
 
 CFunction*
 CFunctionMgr::CreateUHeapFreeClassPtr ()
@@ -1319,6 +1348,21 @@ CFunctionMgr::CreateUHeapFreeClassPtr ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction ("jnc.UHeapFreeClassPtr", pType);
+}
+
+// void
+// jnc.GcAddObject (object.hdr* p);
+
+CFunction*
+CFunctionMgr::CreateGcAddObject ()
+{
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdrPtr),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
+	return CreateInternalFunction ("jnc.GcAddObject", pType);
 }
 
 // void
@@ -1348,12 +1392,6 @@ CFunctionMgr::CreateMarkGcRoot ()
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 
 	CFunction* pFunction = CreateInternalFunction ("jnc.MarkGcRoot", pType);
-
-	//pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
-	//	m_pModule->m_pLlvmModule,
-	//	llvm::Intrinsic::gcroot,
-	//	llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, countof (LlvmArgTypeArray))
-	//	);
 
 	pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
 		m_pModule->m_pLlvmModule,

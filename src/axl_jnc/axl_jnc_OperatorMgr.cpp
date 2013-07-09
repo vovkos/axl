@@ -318,7 +318,7 @@ COperatorMgr::GetConditionalOperatorResultType (
 	CType* pResultType = 
 		pTrueType->Cmp (pFalseType) == 0 ? pTrueType : 
 		(pTrueType->GetTypeKindFlags () & pFalseType->GetTypeKindFlags () & ETypeKindFlag_Numeric) ?
-			GetArithmeticOperatorResultTypeKind (pTrueType, pFalseType) :
+			GetArithmeticOperatorResultType (pTrueType, pFalseType) :
 			m_pModule->m_OperatorMgr.PrepareOperandType (pTrueType);
 
 	if ((pResultType->GetTypeKindFlags () & ETypeKindFlag_DataPtr) && 
@@ -394,12 +394,6 @@ COperatorMgr::CastOperator (
 
 	if (RawOpValue.GetValueKind () == EValue_Null)
 	{
-		if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr))
-		{
-			SetCastError (RawOpValue, pType);
-			return false;
-		}
-
 		*pResultValue = pType->GetZeroValue ();
 		return true;
 	}
@@ -459,7 +453,9 @@ COperatorMgr::GetCastKind (
 	)
 {
 	if (RawOpValue.GetValueKind () == EValue_Null)
-		return (pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) ? ECast_Implicit : ECast_None;
+		return 
+			(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) ? ECast_Implicit : 
+			(pType->GetTypeKindFlags () & ETypeKindFlag_Integer) ? ECast_Explicit : ECast_None;
 
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);

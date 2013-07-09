@@ -39,6 +39,10 @@ public:
 		);
 
 	static
+	jnc::TInterface* 
+	StrengthenClassPtr (jnc::TInterface* p);
+
+	static
 	void
 	MulticastClear (jnc::TMulticast* pMulticast);
 
@@ -105,6 +109,10 @@ public:
 	UHeapFreeClassPtr (jnc::TInterface* p);
 
 	static
+	void
+	GcAddObject (jnc::TObject* p);
+
+	static
 	dword_t
 	GetCurrentThreadId ();
 
@@ -115,10 +123,6 @@ public:
 	static
 	void
 	RunGc ();
-
-	static
-	void
-	PointerCheck (jnc::TDataPtr Ptr);
 
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)

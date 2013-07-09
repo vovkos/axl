@@ -84,6 +84,34 @@ CDataPtrType::PrepareLlvmType ()
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetLlvmType ();
 }
 
+void
+CDataPtrType::EnumGcRoots (
+	CGcHeap* pGcHeap,
+	void* p
+	)
+{
+	ASSERT (m_PtrTypeKind == EDataPtrType_Normal);
+
+	TDataPtr* pPtr = (TDataPtr*) p;
+	if (pPtr->m_pRangeBegin >= pPtr->m_pRangeEnd || !pGcHeap->ShouldMark (pPtr->m_pRangeBegin))
+		return;
+
+	size_t Size = (char*) pPtr->m_pRangeEnd - (char*) pPtr->m_pRangeBegin;
+	pGcHeap->MarkRange (pPtr->m_pRangeBegin, Size);
+
+	if (m_pTargetType->GetFlags () & ETypeFlag_GcRoot)
+	{
+		size_t ElementSize = m_pTargetType->GetSize ();
+		size_t Count = Size / ElementSize;
+
+		ASSERT (Size % ElementSize == 0); // should be an array
+
+		char* p = (char*) pPtr->m_pRangeBegin;
+		for (size_t i = 0; i < Count; i++, p += ElementSize)
+			pGcHeap->AddRoot (p, m_pTargetType);
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

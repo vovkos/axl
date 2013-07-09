@@ -70,6 +70,13 @@ public:
 		uint_t Flags
 		);
 
+	virtual 
+	void
+	EnumGcRoots (
+		CGcHeap* pGcHeap,
+		void* p
+		);	
+
 protected:
 	virtual 
 	void

@@ -7,6 +7,19 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+GetPtrCmpOperatorOperandType (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	)
+{
+	// TODO: check that we don't compare pointers of different typekinds
+
+	return OpValue1.GetType ()->GetModule ()->GetSimpleType (EType_Int_p);
+}
+
+//.............................................................................
+
 llvm::Value*
 CBinOp_Eq::LlvmOpInt (
 	const CValue& OpValue1,

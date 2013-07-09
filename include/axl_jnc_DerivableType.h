@@ -115,6 +115,11 @@ protected:
 	rtl::CStdListT <CBaseTypeSlot> m_BaseTypeList;
 	rtl::CArrayT <CBaseTypeSlot*> m_ImportBaseTypeArray;
 
+	// gc roots
+
+	rtl::CArrayT <CBaseTypeSlot*> m_GcRootBaseTypeArray;
+	rtl::CArrayT <CStructField*> m_GcRootMemberFieldArray;
+
 	// members
 
 	rtl::CArrayT <CStructField*> m_MemberFieldArray;
@@ -307,6 +312,13 @@ public:
 	virtual
 	bool
 	AddProperty (CProperty* pProperty);
+
+	virtual 
+	void
+	EnumGcRoots (
+		CGcHeap* pGcHeap,
+		void* p
+		);	
 
 protected:
 	virtual

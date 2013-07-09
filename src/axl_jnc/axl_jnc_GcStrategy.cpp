@@ -149,10 +149,14 @@ bool ShadowStackGC::initializeCustomLowering(Module &M)
 	{
 		// If the root chain does not exist, insert a new one with linkonce
 		// linkage!
-		Head = new GlobalVariable(M, StackEntryPtrTy, false,
-									GlobalValue::LinkOnceAnyLinkage,
-									Constant::getNullValue(StackEntryPtrTy),
-									"llvm_gc_root_chain");
+		Head = new GlobalVariable(
+			M, 
+			StackEntryPtrTy, 
+			false,
+			GlobalValue::LinkOnceAnyLinkage,
+			Constant::getNullValue(StackEntryPtrTy),
+			"llvm_gc_root_chain"
+			);
 	} 
 	else if (Head->hasExternalLinkage() && Head->isDeclaration()) 
 	{

@@ -611,6 +611,7 @@ enum EObjectFlag
 	EObjectFlag_Static = 0x02,
 	EObjectFlag_Stack  = 0x04,
 	EObjectFlag_UHeap  = 0x08,
+	EObjectFlag_GcMark = 0x10, // volatile flag
 	EObjectFlag_CallMemberDestructors = EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap,
 };
 
@@ -621,8 +622,19 @@ struct TObject
 	class CClassType* m_pType; // for GC tracing & QueryInterface
 	size_t m_ScopeLevel;
 	intptr_t m_Flags;
+	rtl::TListLink m_HeapLink; // objects allocated on managed heap get into a list
 
 	// followed by TInterface of object
+};
+
+class CObjectHeapLink
+{
+public:
+	rtl::TListLink*
+	operator () (TObject* pObject)
+	{
+		return &pObject->m_HeapLink;
+	}	
 };
 
 // header of class interface
@@ -662,7 +674,7 @@ struct TMcSnapshot: TInterface
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // structure backing up fat data pointer, e.g.:
-// int* p;int* p;
+// int* p;
 
 struct TDataPtr
 {

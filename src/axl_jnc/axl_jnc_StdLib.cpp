@@ -2,7 +2,6 @@
 #include "axl_jnc_StdLib.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Multicast.h"
-#include "axl_jnc_GcStrategy.h"
 
 namespace axl {
 namespace jnc {
@@ -17,10 +16,12 @@ CStdLib::Export (
 {
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_OnRuntimeError, (void*) OnRuntimeError);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_DynamicCastClassPtr, (void*) DynamicCastClassPtr);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrengthenClassPtr, (void*) StrengthenClassPtr);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapAlloc, (void*) HeapAlloc);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapAlloc, (void*) UHeapAlloc);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFree, (void*) UHeapFree);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFreeClassPtr, (void*) UHeapFreeClassPtr);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
 
 	// implementation for thin and unsafe is the same
 
@@ -134,6 +135,26 @@ CStdLib::DynamicCastClassPtr (
 	return p2;
 }
 
+jnc::TInterface* 
+CStdLib::StrengthenClassPtr (jnc::TInterface* p)
+{
+	if (!p)
+		return NULL;
+
+	EClassType ClassTypeKind = p->m_pObject->m_pType->GetClassTypeKind ();
+	switch (ClassTypeKind)
+	{
+	case EClassType_FunctionClosure:
+		return ((CFunctionClosureClassType*) p->m_pObject->m_pType)->Strengthen (p);
+
+	case EClassType_PropertyClosure:
+		return ((CPropertyClosureClassType*) p->m_pObject->m_pType)->Strengthen (p);
+
+	default:
+		return (p->m_pObject->m_Flags & EObjectFlag_Alive) ? p : NULL;
+	}
+}
+
 void
 CStdLib::MulticastClear (jnc::TMulticast* pMulticast)
 {
@@ -203,21 +224,10 @@ CStdLib::MulticastGetSnapshot (jnc::TMulticast* pMulticast)
 void*
 CStdLib::HeapAlloc (jnc::CType* pType)
 {
-	void* p = malloc (pType->GetSize ());
-	memset (p, 0, pType->GetSize ());
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
 
-	if (pType->GetTypeKind () == jnc::EType_Class)
-	{
-		jnc::CClassType* pClassType = (jnc::CClassType*) pType;
-		jnc::CFunction* pDestructor = pClassType->GetDestructor ();
-		
-		if (pDestructor)
-		{
-			// add to finalizer list
-		}
-	}
-
-	return p;
+	return pModule->m_GcHeap.Allocate (pType);
 }
 
 void*
@@ -238,6 +248,15 @@ void
 CStdLib::UHeapFreeClassPtr (jnc::TInterface* p)
 {
 	free (p->m_pObject);
+}
+
+void
+CStdLib::GcAddObject (jnc::TObject* p)
+{
+	CModule* pModule = GetCurrentThreadModule ();
+	ASSERT (pModule);
+
+	pModule->m_GcHeap.AddObject (p);
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -286,18 +305,6 @@ CStdLib::CreateThread (jnc::TFunctionPtr Ptr)
 }
 
 #endif
-
-void
-CStdLib::PointerCheck (jnc::TDataPtr Ptr)
-{
-	printf (
-		"PointerCheck (%p; range = %p:%p; scope = %d)\n", 
-		Ptr.m_p,
-		Ptr.m_pRangeBegin,
-		Ptr.m_pRangeEnd,
-		Ptr.m_ScopeLevel
-		);
-}
 
 void
 CStdLib::ExportMulticastMethods (
@@ -351,45 +358,10 @@ CStdLib::ExportMulticastMethods (
 void
 CStdLib::RunGc ()
 {
-	printf ("Running GC...\n");
-
-	/// @brief The head of the singly-linked list of StackEntries.  Functions push
-	///        and pop onto this in their prologue and epilogue.
-	///
-	/// Since there is only a global list, this technique is not threadsafe.
-	
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
-	StackEntry* llvm_gc_root_chain = NULL;
-
-	/// @brief Calls Visitor(root, meta) for each GC root on the stack.
-	///        root and meta are exactly the values passed to
-	///        @llvm.gcroot.
-	///
-	/// Visitor could be a function to recursively mark live objects.  Or it
-	/// might copy them to another heap or generation.
-	///
-	/// @param Visitor A function to invoke for every GC root on the stack.
-
-	for (StackEntry *R = llvm_gc_root_chain; R; R = R->Next) 
-	{
-		ASSERT (R->Map->NumMeta == R->Map->NumRoots); // all should have meta
-
-		unsigned e = R->Map->NumMeta;
-		unsigned i = 0;
-		
-		// For roots [0, NumMeta), the metadata pointer is in the FrameMap.
-		for (; i != e; ++i)
-		{
-			CType* pType = (CType*) R->Map->Meta[i];
-			void* p = R->Roots [i];
-
-			printf ("%08x: %s\n", p, pType->GetTypeString ().cc ());
-		}
-	}
-
-	printf ("Done.\n");
+	pModule->m_GcHeap.RunGc ();
 }
 
 //.............................................................................

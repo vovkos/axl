@@ -32,6 +32,19 @@ public:
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
+
+protected:
+	bool
+	ZeroCmpOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
+
+	bool
+	PtrOperator (
+		const CValue& OpValue,
+		CValue* pResultValue
+		);
 };
 
 //.............................................................................

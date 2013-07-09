@@ -8,7 +8,7 @@ namespace jnc {
 //.............................................................................
 
 CType*
-GetArithmeticOperatorResultTypeKind (CType* pOpType)
+GetArithmeticOperatorResultType (CType* pOpType)
 {
 	EType TypeKind = pOpType->GetTypeKind ();
 

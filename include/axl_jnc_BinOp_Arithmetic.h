@@ -29,7 +29,7 @@ public:
 		const CValue& OpValue2
 		)
 	{
-		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue1, OpValue2);
+		CType* pType = GetArithmeticOperatorResultType (OpValue1, OpValue2);
 		if (!pType || T::IsIntegerOnly && !(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 		{
 			SetOperatorError (OpValue1, OpValue2);

@@ -17,6 +17,7 @@ class CPropertyType;
 class CDataPtrType;
 class CFunctionArg;
 class CValue;
+class CGcHeap;
 
 struct TDataPtrTypeTuple;
 struct TSimplePropertyTypeTuple;
@@ -129,6 +130,7 @@ enum EStdType
 {
 	EStdType_BytePtr,
 	EStdType_ObjectHdr,
+	EStdType_ObjectHdrPtr,
 	EStdType_ObjectClass,
 	EStdType_ObjectPtr,
 	EStdType_SimpleFunction,
@@ -523,6 +525,16 @@ public:
 	CClassType* 
 	GetBoxClassType ();
 
+	virtual 
+	void
+	EnumGcRoots (
+		CGcHeap* pGcHeap,
+		void* p
+		)
+	{
+		ASSERT (false);
+	}
+
 protected:
 	virtual 
 	void
@@ -568,3 +580,4 @@ public:
 
 } // namespace jnc {
 } // namespace axl {
+

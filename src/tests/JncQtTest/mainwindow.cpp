@@ -461,6 +461,8 @@ MainWindow::run ()
 
 	writeOutput ("Running...\n");
 
+	module.m_GcHeap.Create (16, 1, 4);
+
 	jnc::CFunction* pConstructor = module.GetConstructor ();
 	if (pConstructor)
 	{

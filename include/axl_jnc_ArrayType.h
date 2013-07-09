@@ -62,6 +62,13 @@ public:
 			);  
 	}
 
+	virtual 
+	void
+	EnumGcRoots (
+		CGcHeap* pGcHeap,
+		void* p
+		);	
+
 protected:
 	virtual 
 	bool

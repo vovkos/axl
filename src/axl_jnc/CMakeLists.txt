@@ -70,11 +70,13 @@ source_group (
 
 set (
 	GC_H_LIST
+	${AXL_INC_DIR}/axl_jnc_GcHeap.h
 	axl_jnc_GcStrategy.h
 	)
 
 set (
 	GC_CPP_LIST
+	axl_jnc_GcHeap.cpp
 	axl_jnc_GcStrategy.cpp
 	)
 

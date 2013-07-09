@@ -12,6 +12,14 @@ namespace jnc {
 
 //.............................................................................
 
+CType*
+GetPtrCmpOperatorOperandType (
+	const CValue& OpValue1,
+	const CValue& OpValue2
+	);
+
+//.............................................................................
+
 template <typename T>
 class CBinOpT_Cmp: public IBinaryOperator
 {
@@ -34,7 +42,18 @@ public:
 		CValue* pResultValue
 		)
 	{
-		CType* pType = GetArithmeticOperatorResultTypeKind (RawOpValue1, RawOpValue2);
+		CType* pType;
+
+		if ((RawOpValue1.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Ptr) ||
+			(RawOpValue2.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Ptr))
+		{
+			pType = GetPtrCmpOperatorOperandType (RawOpValue1, RawOpValue2);
+		}
+		else
+		{
+			pType = GetArithmeticOperatorResultType (RawOpValue1, RawOpValue2);
+		}
+
 		if (!pType)
 		{
 			SetOperatorError (RawOpValue1, RawOpValue2);
@@ -121,6 +140,29 @@ public:
 			}
 		}
 
+		return true;
+	}
+
+	bool
+	PtrCmpOperator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		)
+	{
+		CValue PtrValue1;
+		CValue PtrValue2;
+
+		CType* p
+
+		bool Result = 
+			m_pModule->m_OperatorMgr.CastOperator (OpValue1, &PtrValue1) && 
+			ExtractIntPtr (m_pModule, OpValue2, &PtrValue2);
+
+		if (!Result)
+			return false;
+
+		static_cast <T*> (this)->LlvmOpInt (PtrValue1, PtrValue2, pResultValue, true);
 		return true;
 	}
 };

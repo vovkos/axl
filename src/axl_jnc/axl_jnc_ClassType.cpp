@@ -329,7 +329,7 @@ CClassType::CalcLayout ()
 				return false;
 			}
 
-			m_MemberPrimeArray.Append (pField);
+			m_ClassMemberFieldArray.Append (pField);
 
 			if (((CClassType*) pType)->GetDestructor ())
 				m_MemberFieldDestructArray.Append (pField);
@@ -857,12 +857,12 @@ CClassType::CompilePrimer ()
 
 	PrimeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
 
-	// prime members fields
+	// prime class members fields
 
-	size_t Count = pClassType->m_MemberPrimeArray.GetCount ();
+	size_t Count = pClassType->m_ClassMemberFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CStructField* pField = pClassType->m_MemberPrimeArray [i];
+		CStructField* pField = pClassType->m_ClassMemberFieldArray [i];
 		
 		ASSERT (pField->m_pType->GetTypeKind () == EType_Class);
 		CClassType* pClassType = (CClassType*) pField->m_pType;

@@ -13,23 +13,23 @@ namespace jnc {
 //.............................................................................
 
 CType*
-GetArithmeticOperatorResultTypeKind (CType* pOpType);
+GetArithmeticOperatorResultType (CType* pOpType);
 
 inline
 CType*
-GetArithmeticOperatorResultTypeKind (const CValue& OpValue)
+GetArithmeticOperatorResultType (const CValue& OpValue)
 {
-	return GetArithmeticOperatorResultTypeKind (OpValue.GetType ());
+	return GetArithmeticOperatorResultType (OpValue.GetType ());
 }
 
 inline 
 CType*
-GetArithmeticOperatorResultTypeKind (
+GetArithmeticOperatorResultType (
 	CType* pOpType1,
 	CType* pOpType2
 	)
 {
-	return GetArithmeticOperatorResultTypeKind (
+	return GetArithmeticOperatorResultType (
 		pOpType1->GetTypeKind () > pOpType2->GetTypeKind () ? 
 			pOpType1 : 
 			pOpType2
@@ -38,12 +38,12 @@ GetArithmeticOperatorResultTypeKind (
 
 inline
 CType*
-GetArithmeticOperatorResultTypeKind (
+GetArithmeticOperatorResultType (
 	const CValue& OpValue1,
 	const CValue& OpValue2
 	)
 {
-	return GetArithmeticOperatorResultTypeKind (OpValue1.GetType (), OpValue2.GetType ());
+	return GetArithmeticOperatorResultType (OpValue1.GetType (), OpValue2.GetType ());
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -62,7 +62,7 @@ public:
 	CType*
 	GetResultType (const CValue& OpValue)
 	{
-		CType* pType = GetArithmeticOperatorResultTypeKind (OpValue);
+		CType* pType = GetArithmeticOperatorResultType (OpValue);
 		if (!pType || T::IsIntegerOnly && !(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 		{
 			SetOperatorError (OpValue);

@@ -309,7 +309,7 @@ CCast_IntFromPtr::ConstCast (
 	void* pDst
 	)
 {
-	ASSERT (OpValue.GetType ()->GetSize () == sizeof (intptr_t));
+	ASSERT (OpValue.GetType ()->GetSize () >= sizeof (intptr_t));
 
 	size_t Size = pType->GetSize ();
 	if (Size > sizeof (intptr_t))
@@ -327,8 +327,15 @@ CCast_IntFromPtr::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreatePtrToInt (OpValue, pType, pResultValue);
-	return true;
+	CValue PtrValue;
+
+	if (OpValue.GetType ()->GetSize () > sizeof (intptr_t))
+		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+	else
+		PtrValue = OpValue;
+
+	m_pModule->m_LlvmBuilder.CreatePtrToInt (PtrValue, m_pModule->GetSimpleType (EType_Int_p), &PtrValue);
+	return m_pModule->m_OperatorMgr.CastOperator (PtrValue, pType, pResultValue);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

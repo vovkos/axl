@@ -40,7 +40,7 @@ CCast_ClassPtr::GetCastKind (
 bool
 CCast_ClassPtr::LlvmCast (
 	EStorage StorageKind,
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	CType* pType,
 	CValue* pResultValue
 	)
@@ -49,14 +49,34 @@ CCast_ClassPtr::LlvmCast (
 
 	bool Result;
 
-	if (OpValue.GetType ()->GetTypeKind () != EType_ClassPtr)
+	if (RawOpValue.GetType ()->GetTypeKind () != EType_ClassPtr)
 	{
-		SetCastError (OpValue, pType);
-		return false; // TODO: user conversions later via constructors
+		SetCastError (RawOpValue, pType);
+		return false; // TODO: user conversions via constructors -- only if target ptr is EPtrTypeFlag_Const
 	}
 
-	CClassPtrType* pSrcType = (CClassPtrType*) OpValue.GetType ();
+	CValue OpValue = RawOpValue;
+
+	CClassPtrType* pSrcType = (CClassPtrType*) RawOpValue.GetType ();
 	CClassPtrType* pDstType = (CClassPtrType*) pType;
+
+	if (pSrcType->GetPtrTypeKind () == EClassPtrType_Weak &&
+		pDstType->GetPtrTypeKind () != EClassPtrType_Weak)
+	{
+		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "strengthen class pointer");
+
+		CFunction* pStrengthen = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->GetSimpleType (EStdType_ObjectPtr), &OpValue);
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pStrengthen,
+			pStrengthen->GetType (),
+			OpValue,
+			&OpValue
+			);
+
+		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pSrcType, &OpValue);
+	}
 
 	CClassType* pSrcClassType = pSrcType->GetTargetType ();
 	CClassType* pDstClassType = pDstType->GetTargetType ();

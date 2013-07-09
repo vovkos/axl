@@ -88,6 +88,10 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateObjectHdrType ();
 		break;
 
+	case EStdType_ObjectHdrPtr:
+		pType = GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		break;
+
 	case EStdType_ObjectClass:
 		pType = CreateObjectType ();
 		break;
@@ -501,7 +505,7 @@ CTypeMgr::CreateClassType (
 	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceHdrStructType->m_Tag.Format ("%s.ifacehdr", pType->m_Tag.cc ());
 	pIfaceHdrStructType->CreateField (pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
-	pIfaceHdrStructType->CreateField (GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pIfaceHdrStructType->CreateField (GetStdType (EStdType_ObjectHdrPtr));
 
 	CStructType* pIfaceStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceStructType->m_StructTypeKind = EStructType_IfaceStruct;
@@ -1823,6 +1827,8 @@ CTypeMgr::CreateObjectHdrType ()
 	pType->CreateField (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
 	pType->CreateField (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
 	pType->CreateField (GetPrimitiveType (EType_Int_p)); // intptr_t m_Flags;
+	pType->CreateField (GetStdType (EStdType_BytePtr));  // rtl::TListLink* m_pNext;
+	pType->CreateField (GetStdType (EStdType_BytePtr));  // rtl::TListLink* m_pPrev;
 	pType->EnsureLayout ();
 	return pType;
 }
