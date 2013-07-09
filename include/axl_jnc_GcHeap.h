@@ -35,16 +35,17 @@ protected:
 		}
 	};
 
-protected:	
+protected:
+	CModule* m_pModule;
+
 	void* m_pHeap;
 	size_t m_HeapSize;
 	size_t m_BlockSize;
 	rtl::CBuddyAllocMap m_Map;
 	rtl::CAuxListT <TObject, CObjectHeapLink> m_ObjectList;	
+	rtl::CArrayT <TRoot> m_GlobalRootArray;
 	rtl::CArrayT <TRoot> m_RootArray [2];
 	size_t m_CurrentRootArrayIdx;
-
-public:
 	void* m_pShadowStack;
 
 public:
@@ -52,18 +53,27 @@ public:
 	
 	~CGcHeap ()
 	{
-		Clear ();
+		ClearHeap ();
+	}
+
+	bool 
+	InitializeRoots (llvm::ExecutionEngine* pExecutionEngine);	
+
+	void
+	DropGlobalRoots ()
+	{
+		m_GlobalRootArray.Clear ();
 	}
 
 	bool
-	Create (
+	CreateHeap (
 		size_t BlockSize,
 		size_t Width,
 		size_t Height
 		);
 
 	void 
-	Clear ();
+	ClearHeap ();
 
 	void*
 	Allocate (CType* pType);

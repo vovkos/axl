@@ -16,6 +16,8 @@ class C1
 	}
 }
 
+C1* g_p;
+
 int  
 main ()
 {
@@ -27,6 +29,8 @@ main ()
 	p0 = new C1 (1);
 	}
 
+	g_p = p0;
+
 	printf ("GC run 1\n");
 	RunGc ();
 
@@ -37,9 +41,15 @@ main ()
 		printf ("object C1 is dead x(\n");
 
 	printf ("GC run 2\n");
+
 	RunGc ();
 
 	return 10;
+}
+
+destruct ()
+{
+	printf ("module.destruct ()\n");
 }
 
 //.............................................................................

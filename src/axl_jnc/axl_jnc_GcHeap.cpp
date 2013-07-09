@@ -2,6 +2,7 @@
 #include "axl_jnc_GcHeap.h"
 #include "axl_jnc_GcStrategy.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -10,21 +11,54 @@ namespace jnc {
 
 CGcHeap::CGcHeap ()
 {
+	m_pModule = GetCurrentThreadModule ();
+	ASSERT (m_pModule);
+
 	m_pHeap = NULL;
 	m_HeapSize = 0;
 	m_BlockSize = 0;
-	m_pShadowStack = NULL;
 	m_CurrentRootArrayIdx = 0;
+	m_pShadowStack = NULL;
+}
+
+bool 
+CGcHeap::InitializeRoots (llvm::ExecutionEngine* pExecutionEngine)
+{
+	// global roots
+
+	rtl::CArrayT <CVariable*> GlobalRootArray = m_pModule->m_VariableMgr.GetGlobalGcRootArray ();
+	size_t Count = GlobalRootArray.GetCount ();
+
+	m_GlobalRootArray.SetCount (Count);
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = GlobalRootArray [i];
+		void* p = pExecutionEngine->getPointerToGlobal ((llvm::GlobalVariable*) pVariable->GetLlvmValue ());
+		ASSERT (p);
+
+		m_GlobalRootArray [i].m_p = p;
+		m_GlobalRootArray [i].m_pType = pVariable->GetType ();
+	}
+
+	// stack roots
+
+	llvm::GlobalVariable* pLlvmVariable = m_pModule->m_pLlvmModule->getGlobalVariable("llvm_gc_root_chain");
+	ASSERT (pLlvmVariable); 
+
+	m_pShadowStack = pExecutionEngine->getPointerToGlobal (pLlvmVariable);
+	ASSERT (m_pShadowStack);
+
+	return true;
 }
 
 bool
-CGcHeap::Create (
+CGcHeap::CreateHeap (
 	size_t BlockSize,
 	size_t Width,
 	size_t Height
 	)
 {
-	Clear ();
+	ClearHeap ();
 
 	bool Result = m_Map.Create (Width, Height);
 	if (!Result)
@@ -39,7 +73,7 @@ CGcHeap::Create (
 }
 
 void
-CGcHeap::Clear ()
+CGcHeap::ClearHeap ()
 {
 	if (!m_pHeap)
 		return;
@@ -48,10 +82,8 @@ CGcHeap::Clear ()
 
 	m_pHeap = NULL;
 	m_BlockSize = 0;
-
 	m_Map.Clear ();
 	m_ObjectList.Clear ();
-	m_CurrentRootArrayIdx = 0;
 }
 
 void*
@@ -116,6 +148,16 @@ CGcHeap::RunGc ()
 	// 1) suspend all threads at safe points
 	
 	// 2) enumerate global roots
+
+	size_t Count = m_GlobalRootArray.GetCount ();	
+	for (size_t i = 0; i < Count; i++)
+	{
+		ASSERT (m_GlobalRootArray [i].m_pType->GetFlags () & ETypeFlag_GcRoot);
+		AddRoot (
+			m_GlobalRootArray [i].m_p, 
+			m_GlobalRootArray [i].m_pType
+			);
+	}
 
 	// 3) enumerate stack roots 
 

@@ -48,6 +48,7 @@ protected:
 	rtl::CStdListT <CAlias> m_AliasList;
 
 	rtl::CArrayT <CVariable*> m_GlobalVariableArray;
+	rtl::CArrayT <CVariable*> m_GlobalGcRootArray;
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
 
 	rtl::CArrayT <CVariable*> m_GlobalDestructArray;
@@ -74,6 +75,12 @@ public:
 	GetGlobalVariableArray ()
 	{
 		return m_GlobalVariableArray;
+	}
+
+	rtl::CArrayT <CVariable*> 
+	GetGlobalGcRootArray ()
+	{
+		return m_GlobalGcRootArray;
 	}
 
 	rtl::CArrayT <CVariable*> 

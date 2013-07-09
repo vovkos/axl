@@ -395,7 +395,7 @@ bool MainWindow::compile ()
 	jnc::CStdLib::Export (&module, llvmExecutionEngine);
 	module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib_printf);
 
-	Result = module.m_FunctionMgr.JitFunctions (llvmExecutionEngine);
+	Result = module.m_FunctionMgr.JitFunctions (llvmExecutionEngine);	
 	if (!Result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
@@ -461,7 +461,14 @@ MainWindow::run ()
 
 	writeOutput ("Running...\n");
 
-	module.m_GcHeap.Create (16, 1, 4);
+	jnc::CScopeThreadModule ScopeModule (&module);
+
+	// create a new heap (actually, can re-use the old one)
+
+	module.m_GcHeap.CreateHeap (16, 1, 4);
+	module.m_GcHeap.InitializeRoots (llvmExecutionEngine);
+
+	// constructor
 
 	jnc::CFunction* pConstructor = module.GetConstructor ();
 	if (pConstructor)
@@ -471,12 +478,14 @@ MainWindow::run ()
 			return false;
 	}
 
-	jnc::CScopeThreadModule ScopeModule (&module);
+	// main
 
 	int ReturnValue;
 	Result = runFunction (pMainFunction, &ReturnValue);
 	if (!Result)
 		return false;
+
+	// destructor
 
 	jnc::CFunction* pDestructor = module.GetDestructor ();
 	if (pDestructor)
@@ -485,7 +494,12 @@ MainWindow::run ()
 		if (!Result)
 			return false;
 	}
-		
+
+	// final gc run
+
+	module.m_GcHeap.DropGlobalRoots ();
+	module.m_GcHeap.RunGc ();
+
 	writeOutput ("Done (retval = %d).\n", ReturnValue);
 	return true;
 }

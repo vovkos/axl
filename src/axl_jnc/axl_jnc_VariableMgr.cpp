@@ -22,6 +22,7 @@ CVariableMgr::Clear ()
 	m_VariableList.Clear ();
 	m_AliasList.Clear ();
 	m_GlobalVariableArray.Clear ();
+	m_GlobalGcRootArray.Clear ();
 	m_GlobalDestructArray.Clear ();
 	m_StaticDestructList.Clear ();
 
@@ -216,6 +217,9 @@ CVariableMgr::InitializeGlobalVariables ()
 		if (pVariable->m_pType->GetTypeKind () == EType_Class &&
 			((CClassType*) pVariable->m_pType)->GetDestructor ())
 			m_GlobalDestructArray.Append (pVariable);
+
+		if (pVariable->m_pType->GetFlags () & ETypeFlag_GcRoot)
+			m_GlobalGcRootArray.Append (pVariable);
 
 		if (!Result)
 			return false;

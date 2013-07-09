@@ -243,6 +243,10 @@ CAstDoc::Run ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Running...\n");
 
+	m_Module.m_GcHeap.CreateHeap (16, 1, 4);
+	m_Module.m_GcHeap.InitializeRoots (m_pLlvmExecutionEngine);
+
+
 	jnc::CFunction* pConstructor = m_Module.GetConstructor ();
 	if (pConstructor)
 	{
@@ -262,6 +266,9 @@ CAstDoc::Run ()
 		if (!Result)
 			return false;
 	}
+
+	m_Module.m_GcHeap.DropGlobalRoots ();
+	m_Module.m_GcHeap.RunGc ();
 		
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Done (retval = %d).\n", Result);
 	return true;

@@ -927,11 +927,6 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	}
 
 	pExecutionEngine->UnregisterJITEventListener (JitEventListener);
-
-	llvm::GlobalVariable* pLlvmVariable = m_pModule->m_pLlvmModule->getGlobalVariable("llvm_gc_root_chain");
-	ASSERT (pLlvmVariable); 
-
-	m_pModule->m_GcHeap.m_pShadowStack = pExecutionEngine->getPointerToGlobal (pLlvmVariable);
 	return true;
 }
  
