@@ -318,27 +318,27 @@ CStdLib::ExportMulticastMethods (
 	MethodTable [3] [5] = 
 	{
 		{
-			MulticastClear,
-			MulticastSet,
-			MulticastAdd,
-			MulticastRemove,
-			MulticastGetSnapshot,
+			(void*) MulticastClear,
+			(void*) MulticastSet,
+			(void*) MulticastAdd,
+			(void*) MulticastRemove,
+			(void*) MulticastGetSnapshot,
 		},
 
 		{
-			MulticastClear,
-			MulticastSet,
-			MulticastAdd,
-			MulticastRemove,
-			MulticastGetSnapshot,
+			(void*) MulticastClear,
+			(void*) MulticastSet,
+			(void*) MulticastAdd,
+			(void*) MulticastRemove,
+			(void*) MulticastGetSnapshot,
 		},
 
 		{
-			MulticastClear,
-			MulticastSet_t,
-			MulticastAdd_t,
-			MulticastRemove_t,
-			MulticastGetSnapshot,
+			(void*) MulticastClear,
+			(void*) MulticastSet_t,
+			(void*) MulticastAdd_t,
+			(void*) MulticastRemove_t,
+			(void*) MulticastGetSnapshot,
 		},
 	};
 

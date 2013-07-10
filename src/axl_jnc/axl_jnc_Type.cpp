@@ -505,5 +505,25 @@ CType::PrepareLlvmType ()
 
 //.............................................................................
 
+CType* 
+GetSimpleType (
+	CModule* pModule,
+	EType TypeKind
+	)
+{
+	return pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
+}
+
+CType* 
+GetSimpleType (
+	CModule* pModule,
+	EStdType StdTypeKind
+	)
+{
+	return pModule->m_TypeMgr.GetStdType (StdTypeKind);
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

@@ -86,7 +86,7 @@ CClassType::AddMethod (CFunction* pFunction)
 	case EStorage_Static:
 		if (ThisArgTypeFlags)
 		{
-			err::SetFormatStringError ("static method cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags));
+			err::SetFormatStringError ("static method cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags).cc ());
 			return false;
 		}
 

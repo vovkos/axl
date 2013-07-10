@@ -320,9 +320,6 @@ CFunction::CalcLayout ()
 		pDstArg->m_Tag = pSrcArg->m_Tag;
 	}
 
-	rtl::CIteratorT <CFunctionArg> SrcArg;
-
-	pOriginFunction->m_pType = m_pType;
 	return true;
 }
 

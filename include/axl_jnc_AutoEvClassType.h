@@ -117,7 +117,7 @@ protected:
 		m_TypeString.Format (
 			"autoev %s %s", 
 			m_QualifiedName.cc (),
-			m_MethodArray [EAutoEvMethod_Start]->GetType ()->GetShortType ()->GetArgString ()
+			m_MethodArray [EAutoEvMethod_Start]->GetType ()->GetShortType ()->GetArgString ().cc ()
 			);
 	}
 

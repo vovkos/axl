@@ -28,7 +28,7 @@ struct StackEntry
 
 //.............................................................................
 
-class ShadowStackGC : public llvm::GCStrategy 
+class ShadowStackGC : public llvm::GCStrategy
 {
 	/// RootChain - This is the global linked-list that contains the chain of GC
 	/// roots.

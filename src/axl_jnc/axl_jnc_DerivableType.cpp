@@ -171,7 +171,7 @@ CDerivableType::ResolveImportFields ()
 		CType* pType = pField->m_pType_i->GetActualType ();	
 		if (pField->m_pType->GetTypeKindFlags () & ETypeKindFlag_Code)
 		{
-			err::SetFormatStringError ("'%s': illegal type for a field", pType->GetTypeString ());
+			err::SetFormatStringError ("'%s': illegal type for a field", pType->GetTypeString ().cc ());
 			return false;
 		}
 
@@ -258,7 +258,7 @@ CDerivableType::AddMethod (CFunction* pFunction)
 	case EStorage_Static:
 		if (ThisArgTypeFlags)
 		{
-			err::SetFormatStringError ("static method cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags));
+			err::SetFormatStringError ("static method cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags).cc ());
 			return false;
 		}
 

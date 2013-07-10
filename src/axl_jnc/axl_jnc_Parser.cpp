@@ -135,7 +135,7 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 
 		if (pTypeSpecifier->GetTypeModifiers ())
 		{
-			err::SetFormatStringError ("unused modifier '%s'", GetTypeModifierString (pTypeSpecifier->GetTypeModifiers ()));
+			err::SetFormatStringError ("unused modifier '%s'", GetTypeModifierString (pTypeSpecifier->GetTypeModifiers ()).cc ());
 			return false;
 		}
 
@@ -320,13 +320,13 @@ CParser::Declare (CDeclarator* pDeclarator)
 
 	if (PostModifiers != 0 && TypeKind != EType_Function)
 	{
-		err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers));
+		err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
 		return false;
 	}
 
 	if (ItemFlags && m_StorageKind == EStorage_Typedef)
 	{
-		err::SetFormatStringError ("unused modifier '%s'", GetPtrTypeFlagString (ItemFlags));
+		err::SetFormatStringError ("unused modifier '%s'", GetPtrTypeFlagString (ItemFlags).cc ());
 		return false;
 	}
 
@@ -551,7 +551,7 @@ CParser::DeclareFunction (
 
 		if (PostModifiers)
 		{
-			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers));
+			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
 			return false;
 		}
 
@@ -654,7 +654,7 @@ CParser::DeclareFunction (
 	default:
 		if (PostModifiers)
 		{
-			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers));
+			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
 			return false;
 		}
 
@@ -842,7 +842,7 @@ CParser::DeclareAutoEv (
 
 	if (pParentType && pParentType->GetTypeKind () != EType_Class)
 	{
-		err::SetFormatStringError ("'%s' cannot contain autoev members", pParentType->GetTypeString ());
+		err::SetFormatStringError ("'%s' cannot contain autoev members", pParentType->GetTypeString ().cc ());
 		return false;
 	}
 
@@ -1075,14 +1075,14 @@ CParser::CreateFormalArg (
 		if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr))
 		{
 			err::SetFormatStringError ("'nullable' can only be applied to pointers");
-			return false;
+			return NULL;
 		}
 
 		break;
 
 	default:
 		err::SetFormatStringError ("invalid storage '%s' for argument", GetStorageKindString (m_StorageKind));
-		return false;
+		return NULL;
 	}
 
 	rtl::CString Name;
@@ -1401,7 +1401,7 @@ CParser::CallBaseTypeConstructor (
 
 	if (m_pConstructorProperty)
 	{
-		err::SetFormatStringError ("'%s.construct' cannot have base-type constructor calls", m_pConstructorProperty->m_Tag);
+		err::SetFormatStringError ("'%s.construct' cannot have base-type constructor calls", m_pConstructorProperty->m_Tag.cc ());
 		return false;
 	}
 
@@ -1586,7 +1586,7 @@ CParser::SetFunctionBody (rtl::CBoxListT <CToken>* pBody)
 
 	if (!IsClassType (pType, EClassType_AutoEv))
 	{
-		err::SetFormatStringError ("only functions and autoevs can have bodies, not '%s'", pType->GetTypeString ());
+		err::SetFormatStringError ("only functions and autoevs can have bodies, not '%s'", pType->GetTypeString ().cc ());
 		return false;
 	}
 	

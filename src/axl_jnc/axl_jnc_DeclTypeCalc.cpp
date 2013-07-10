@@ -190,7 +190,7 @@ CDeclTypeCalc::CheckUnusedModifiers ()
 {
 	if (m_TypeModifiers)
 	{
-		err::SetFormatStringError ("unused modifier '%s'", GetTypeModifierString (m_TypeModifiers));
+		err::SetFormatStringError ("unused modifier '%s'", GetTypeModifierString (m_TypeModifiers).cc ());
 		return false;
 	}
 
@@ -232,7 +232,7 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 	{
 		err::SetFormatStringError ("'%s' modifier cannot be applied to '%s'", 
-			GetTypeModifierString (m_TypeModifiers & ETypeModifierMask_Integer), 
+			GetTypeModifierString (m_TypeModifiers & ETypeModifierMask_Integer).cc (), 
 			pType->GetTypeString ().cc () 
 			);
 		return NULL;

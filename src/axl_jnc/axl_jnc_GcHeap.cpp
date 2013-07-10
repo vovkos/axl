@@ -186,7 +186,7 @@ CGcHeap::RunGc ()
 		}
 	}
 
-	// 4) keep enumerating breadth first until done
+	// 4) keep enumerating & marking (breadth first) until done
 		
 	while (!m_RootArray [m_CurrentRootArrayIdx].IsEmpty ())
 	{

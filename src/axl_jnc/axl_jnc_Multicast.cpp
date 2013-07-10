@@ -72,6 +72,12 @@ CMulticast::SetCount (
 	return true;
 }
 
+struct TMcSnapshotObject: 
+	TObject,
+	TMcSnapshot
+{
+};
+
 TFunctionPtr
 CMulticast::GetSnapshot ()
 {
@@ -80,12 +86,6 @@ CMulticast::GetSnapshot ()
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
 	
 	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
-
-	struct TMcSnapshotObject: 
-		TObject,
-		TMcSnapshot
-	{
-	};
 	
 	TMcSnapshotObject* pSnapshot = AXL_MEM_NEW (TMcSnapshotObject);
 	pSnapshot->m_pType = pSnapshotType;

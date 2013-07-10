@@ -110,7 +110,7 @@ protected:
 	void
 	PrepareTypeString ()
 	{
-		m_TypeString.Format ("import %s", GetQualifiedName ());
+		m_TypeString.Format ("import %s", GetQualifiedName ().cc ());
 	}
 };
 
@@ -163,7 +163,12 @@ public:
 		uint_t Flags
 		)
 	{
-		return rtl::CString::Format_s ("ZP%s:%d:%d", pImportType->GetQualifiedName (), TypeModifiers, Flags);
+		return rtl::CString::Format_s (
+			"ZP%s:%d:%d", 
+			pImportType->GetQualifiedName ().cc (), 
+			TypeModifiers, 
+			Flags
+			);
 	}
 
 protected:

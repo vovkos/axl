@@ -18,6 +18,7 @@
 namespace axl {
 namespace jnc {
 
+class CDerivableType;
 class CClassType;
 class CPropertyType;
 class CAutoEvClassType;

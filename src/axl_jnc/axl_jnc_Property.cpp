@@ -196,7 +196,7 @@ CProperty::CreateOnChange ()
 {
 	if (m_pOnChange)
 	{
-		err::SetFormatStringError ("'%s' already has 'onchange'", m_Tag);
+		err::SetFormatStringError ("'%s' already has 'onchange'", m_Tag.cc ());
 		return false;
 	}
 
@@ -239,7 +239,7 @@ CProperty::CreatePropValue (
 {
 	if (m_pPropValue)
 	{
-		err::SetFormatStringError ("'%s' already has 'propvalue'", m_Tag);
+		err::SetFormatStringError ("'%s' already has 'propvalue'", m_Tag.cc ());
 		return false;
 	}
 
@@ -296,7 +296,7 @@ CProperty::CreateField (
 	
 	if (m_pParentType->GetTypeKindFlags () & ETypeKindFlag_Derivable)
 	{
-		err::SetFormatStringError ("'%s' cannot have field members", m_pParentType->GetTypeString ());
+		err::SetFormatStringError ("'%s' cannot have field members", m_pParentType->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -339,7 +339,7 @@ CProperty::AddMethod (CFunction* pFunction)
 		case EStorage_Static:
 			if (ThisArgTypeFlags)
 			{
-				err::SetFormatStringError ("static method cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags));
+				err::SetFormatStringError ("static method cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags).cc ());
 				return false;
 			}
 
@@ -387,7 +387,7 @@ CProperty::AddMethod (CFunction* pFunction)
 
 		if (ThisArgTypeFlags)
 		{
-			err::SetFormatStringError ("global property methods cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags));
+			err::SetFormatStringError ("global property methods cannot be '%s'", GetPtrTypeFlagString (ThisArgTypeFlags).cc ());
 			return false;
 		}
 

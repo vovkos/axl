@@ -1042,7 +1042,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	CType* pReturnType = pFunctionPtrType->GetTargetType ()->GetReturnType ();
 	if (pReturnType->GetTypeKind () != EType_Void)
 	{
-		err::SetFormatStringError ("multicast cannot only return void, not '%s'", pReturnType->GetTypeString ());
+		err::SetFormatStringError ("multicast cannot only return void, not '%s'", pReturnType->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -1137,7 +1137,7 @@ CTypeMgr::GetAutoEvInterfaceType (CFunctionType* pStartMethodType)
 	CType* pReturnType = pStartMethodType->GetReturnType ();
 	if (pReturnType->GetTypeKind () != EType_Void)
 	{
-		err::SetFormatStringError ("autoev must return 'void', not '%s'", pReturnType->GetTypeString ());
+		err::SetFormatStringError ("autoev must return 'void', not '%s'", pReturnType->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -1542,7 +1542,7 @@ CTypeMgr::GetPropertyPtrType (
 	if (pTuple->m_PtrTypeArray [i1] [i2] [i3])
 		return pTuple->m_PtrTypeArray [i1] [i2] [i3];
 
-	size_t Size = PtrTypeKind == EFunctionPtrType_Thin ? sizeof (void*) : sizeof (TPropertyPtr);
+	size_t Size = PtrTypeKind == EPropertyPtrType_Thin ? sizeof (void*) : sizeof (TPropertyPtr);
 
 	CPropertyPtrType* pType = AXL_MEM_NEW (CPropertyPtrType);
 	pType->m_pModule = m_pModule;

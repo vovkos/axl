@@ -7,6 +7,18 @@
 project (axl)
 cmake_minimum_required (VERSION 2.8)
 
+# set (TARGET_CPU "x86")
+
+if (NOT TARGET_CPU)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set (TARGET_CPU "amd64")
+	else ()
+		set (TARGET_CPU "x86")
+	endif ()		
+endif ()
+
+message (STATUS "Target CPU: ${TARGET_CPU}")
+
 include (CMakeUtils.cmake)
 include (CMakePaths.cmake)
 
@@ -97,9 +109,15 @@ endif ()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 
+	if ("${TARGET_CPU}" STREQUAL "amd64")
+		set (DEFAULT_GCC_FLAG_CPU "-m64")
+	else ()
+		set (DEFAULT_GCC_FLAG_CPU "-m32")
+	endif ()
+	
 	create_flag_setting (
 		GCC_FLAG_CPU
-		""
+		"${DEFAULT_GCC_FLAG_CPU}"
 		CMAKE_CXX_FLAGS
 		"GNU C++ target CPU arch"
 		"-m32" "-m64"

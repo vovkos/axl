@@ -20,7 +20,7 @@ void
 CMulticastClassType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetTypeModifierString ();
-	m_TypeString.AppendFormat ("multicast %s", m_pTargetType->GetTargetType ()->GetArgString ());
+	m_TypeString.AppendFormat ("multicast %s", m_pTargetType->GetTargetType ()->GetArgString ().cc ());
 }
 
 bool

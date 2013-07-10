@@ -737,7 +737,7 @@ struct TVariant
 		double m_Double;
 
 		void* m_p;
-		intptr_t (__cdecl* m_pf) (...);
+		intptr_t (* m_pf) (...);
 
 		TDataPtr m_DataPtr;
 		TInterface* m_pClassPtr;

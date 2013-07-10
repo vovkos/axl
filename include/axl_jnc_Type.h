@@ -578,6 +578,20 @@ public:
 
 //.............................................................................
 
+CType* 
+GetSimpleType (
+	CModule* pModule,
+	EType TypeKind
+	);
+
+CType* 
+GetSimpleType (
+	CModule* pModule,
+	EStdType StdTypeKind
+	);
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {
 

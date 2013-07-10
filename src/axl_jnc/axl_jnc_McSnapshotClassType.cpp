@@ -19,7 +19,7 @@ void
 CMcSnapshotClassType::PrepareTypeString ()
 {
 	m_TypeString = m_pTargetType->GetTypeModifierString ();
-	m_TypeString.AppendFormat ("mcsnapshot %s", m_pTargetType->GetTargetType ()->GetArgString ());
+	m_TypeString.AppendFormat ("mcsnapshot %s", m_pTargetType->GetTargetType ()->GetArgString ().cc ());
 }
 
 bool

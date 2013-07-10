@@ -31,7 +31,7 @@ public:
 		const CValue& OpValue2
 		)
 	{
-		return m_pModule->GetSimpleType (EType_Bool);
+		return GetSimpleType (m_pModule, EType_Bool);
 	}
 
 	virtual
@@ -140,29 +140,6 @@ public:
 			}
 		}
 
-		return true;
-	}
-
-	bool
-	PtrCmpOperator (
-		const CValue& OpValue1,
-		const CValue& OpValue2,
-		CValue* pResultValue
-		)
-	{
-		CValue PtrValue1;
-		CValue PtrValue2;
-
-		CType* p
-
-		bool Result = 
-			m_pModule->m_OperatorMgr.CastOperator (OpValue1, &PtrValue1) && 
-			ExtractIntPtr (m_pModule, OpValue2, &PtrValue2);
-
-		if (!Result)
-			return false;
-
-		static_cast <T*> (this)->LlvmOpInt (PtrValue1, PtrValue2, pResultValue, true);
 		return true;
 	}
 };

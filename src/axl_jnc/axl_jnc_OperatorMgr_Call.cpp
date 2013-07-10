@@ -182,7 +182,7 @@ COperatorMgr::GetCallOperatorResultType (
 	{
 		Result = Closure->Apply (pArgList);
 		if (!Result)
-			return false;
+			return NULL;
 	}
 
 	if (RawOpValue.GetValueKind () == EValue_FunctionTypeOverload)
