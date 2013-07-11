@@ -76,5 +76,43 @@ public:
 
 //.............................................................................
 
+class CBinOp_RefAssign: public IBinaryOperator
+{
+public:
+	AXL_OBJ_CLASS_0 (CBinOp_RefAssign, IBinaryOperator)
+
+public:
+	CBinOp_RefAssign ()
+	{
+		m_OpKind = EBinOp_RefAssign;
+		m_OpFlags1 = EOpFlag_KeepRef;
+	}
+
+	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		err::SetFormatStringError ("'%s' has no overloaded ':=' operator", OpValue1.GetType ()->GetTypeString ().cc ());
+		return NULL;
+	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& OpValue1,
+		const CValue& OpValue2,
+		CValue* pResultValue
+		)
+	{
+		err::SetFormatStringError ("'%s' has no overloaded ':=' operator", OpValue1.GetType ()->GetTypeString ().cc ());
+		return false;
+	}
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

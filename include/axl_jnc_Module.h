@@ -13,13 +13,16 @@
 #include "axl_jnc_ControlFlowMgr.h"
 #include "axl_jnc_OperatorMgr.h"
 #include "axl_jnc_LlvmBuilder.h"
-#include "axl_jnc_ThreadModule.h"
-#include "axl_jnc_GcHeap.h"
+#include "axl_mt_TlsSlot.h"
 
 namespace axl {
 namespace jnc {
 
+class CModule;
+
 //.............................................................................
+
+// makes it convenient to initialize childs (especially operators)
 
 class CPreModule
 {
@@ -28,19 +31,19 @@ protected:
 
 	CPreModule ()
 	{
-		m_pPrevModule = SetCurrentThreadModule ((CModule*) this);
+		m_pPrevModule = mt::SetTlsSlotValue <CModule> ((CModule*) this);
 	}
 
 	void
 	RestorePrevModule ()
 	{
-		SetCurrentThreadModule (m_pPrevModule);
+		mt::SetTlsSlotValue <CModule> (m_pPrevModule);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
-class CModule: protected CPreModule
+class CModule: CPreModule
 {
 protected:
 	rtl::CString m_FilePath;
@@ -51,9 +54,9 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_CalcLayoutArray;
 	rtl::CArrayT <CModuleItem*> m_CompileArray;
 
-public:
 	llvm::Module* m_pLlvmModule;
 
+public:
 	CTypeMgr m_TypeMgr;
 	CAttributeMgr m_AttributeMgr;
 	CNamespaceMgr m_NamespaceMgr;
@@ -63,14 +66,22 @@ public:
 	CControlFlowMgr m_ControlFlowMgr;
 	COperatorMgr m_OperatorMgr;	
 	CLlvmBuilder m_LlvmBuilder;
-	CGcHeap m_GcHeap;
 
 public:
-	CModule ();
+	CModule ()
+	{
+		m_pLlvmModule = NULL;
+	}
 
 	~CModule ()
 	{
 		Clear ();
+	}
+
+	llvm::Module* 
+	GetLlvmModule ()
+	{
+		return m_pLlvmModule;
 	}
 
 	CType*
@@ -142,11 +153,14 @@ public:
 	void 
 	MarkForCompile (CModuleItem* pItem);
 
+	bool
+	Create (
+		const rtl::CString& FilePath,
+		llvm::Module* pLlvmModule
+		);
+
 	void
 	Clear ();
-
-	bool
-	Create (const rtl::CString& FilePath);
 
 	bool
 	Link (CModule* pModule);
@@ -161,6 +175,17 @@ protected:
 	void
 	CreateDefaultDestructor ();
 };
+
+//.............................................................................
+
+typedef mt::CScopeTlsSlotT <CModule> CScopeThreadModule;
+
+inline
+CModule*
+GetCurrentThreadModule ()
+{
+	return mt::GetTlsSlotValue <CModule> ();
+}
 
 //.............................................................................
 

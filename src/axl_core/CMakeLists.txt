@@ -152,6 +152,7 @@ set (
 	${AXL_INC_DIR}/axl_mt_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_Thread.h
 	${AXL_INC_DIR}/axl_mt_TlsMgr.h
+	${AXL_INC_DIR}/axl_mt_TlsSlot.h
 	)
 
 set (

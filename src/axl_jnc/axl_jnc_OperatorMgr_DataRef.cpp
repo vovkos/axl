@@ -132,7 +132,7 @@ COperatorMgr::GetThinDataPtrRange (
 	}
 
 	ASSERT (
-		ValidatorValue.GetType ()->GetTypeKind () == EType_DataPtr &&
+		(ValidatorValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr) &&
 		((CDataPtrType*) ValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
 
 	m_pModule->m_LlvmBuilder.CreateExtractValue (ValidatorValue, 1, pBytePtrType, pRangeBeginValue);

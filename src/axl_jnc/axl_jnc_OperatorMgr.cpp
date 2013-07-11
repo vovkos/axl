@@ -12,6 +12,7 @@ COperatorMgr::COperatorMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
+
 	// operator tables
 
 	memset (m_UnaryOperatorTable, 0, sizeof (m_UnaryOperatorTable));
@@ -91,6 +92,7 @@ COperatorMgr::COperatorMgr ()
 
 
 	m_BinaryOperatorTable [EBinOp_Assign]      = &m_BinOp_Assign;
+	m_BinaryOperatorTable [EBinOp_RefAssign]   = &m_BinOp_RefAssign;
 	m_BinaryOperatorTable [EBinOp_AddAssign]   = &m_BinOp_AddAssign;
 	m_BinaryOperatorTable [EBinOp_SubAssign]   = &m_BinOp_SubAssign;
 	m_BinaryOperatorTable [EBinOp_MulAssign]   = &m_BinOp_MulAssign;

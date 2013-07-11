@@ -11,6 +11,8 @@
 namespace axl {
 namespace jnc {
 
+class CRuntime;
+
 //.............................................................................
 
 class CGcHeap
@@ -36,8 +38,6 @@ protected:
 	};
 
 protected:
-	CModule* m_pModule;
-
 	void* m_pHeap;
 	size_t m_HeapSize;
 	size_t m_BlockSize;
@@ -53,27 +53,25 @@ public:
 	
 	~CGcHeap ()
 	{
-		ClearHeap ();
-	}
-
-	bool 
-	InitializeRoots (llvm::ExecutionEngine* pExecutionEngine);	
-
-	void
-	DropGlobalRoots ()
-	{
-		m_GlobalRootArray.Clear ();
+		Clear ();
 	}
 
 	bool
-	CreateHeap (
+	Create (
+		CRuntime* pRuntime,
 		size_t BlockSize,
 		size_t Width,
 		size_t Height
 		);
 
 	void 
-	ClearHeap ();
+	Clear ();
+
+	void
+	DropGlobalRoots ()
+	{
+		m_GlobalRootArray.Clear ();
+	}
 
 	void*
 	Allocate (CType* pType);

@@ -115,6 +115,7 @@ protected:
 	// assignment operators
 
 	CBinOp_Assign m_BinOp_Assign;
+	CBinOp_RefAssign m_BinOp_RefAssign;
 	CBinOp_OpAssign m_BinOp_AddAssign;
 	CBinOp_OpAssign m_BinOp_SubAssign;
 	CBinOp_OpAssign m_BinOp_MulAssign;

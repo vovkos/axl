@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_StdLib.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 #include "axl_jnc_Multicast.h"
 
 namespace axl {
@@ -224,10 +225,10 @@ CStdLib::MulticastGetSnapshot (jnc::TMulticast* pMulticast)
 void*
 CStdLib::HeapAlloc (jnc::CType* pType)
 {
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
 
-	return pModule->m_GcHeap.Allocate (pType);
+	return pRuntime->m_GcHeap.Allocate (pType);
 }
 
 void*
@@ -253,10 +254,19 @@ CStdLib::UHeapFreeClassPtr (jnc::TInterface* p)
 void
 CStdLib::GcAddObject (jnc::TObject* p)
 {
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
 
-	pModule->m_GcHeap.AddObject (p);
+	pRuntime->m_GcHeap.AddObject (p);
+}
+
+void
+CStdLib::RunGc ()
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	pRuntime->m_GcHeap.RunGc ();
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -306,6 +316,15 @@ CStdLib::CreateThread (jnc::TFunctionPtr Ptr)
 
 #endif
 
+void*
+CStdLib::GetThreadVariableData ()
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	return GetTlsMgr ()->GetThreadVariableData (pRuntime->GetTlsSlot (), pRuntime->GetTlsSize ());
+}
+
 void
 CStdLib::ExportMulticastMethods (
 	CModule* pModule,
@@ -353,15 +372,6 @@ CStdLib::ExportMulticastMethods (
 			MethodTable [PtrTypeKind] [i]
 			);
 	}
-}
-
-void
-CStdLib::RunGc ()
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	pModule->m_GcHeap.RunGc ();
 }
 
 //.............................................................................

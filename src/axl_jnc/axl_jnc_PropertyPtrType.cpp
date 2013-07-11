@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_PropertyPtrType.h"
+#include "axl_jnc_GcHeap.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {

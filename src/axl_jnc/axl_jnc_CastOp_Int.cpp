@@ -136,7 +136,7 @@ CCast_SwapByteOrder::LlvmCast (
 	llvm::Type* pLlvmType = pType->GetLlvmType ();
 
 	llvm::Function* pLlvmSwap = llvm::Intrinsic::getDeclaration (
-		m_pModule->m_pLlvmModule,
+		m_pModule->GetLlvmModule (),
 		llvm::Intrinsic::bswap,
 		llvm::ArrayRef <llvm::Type*> (pLlvmType)
 		);

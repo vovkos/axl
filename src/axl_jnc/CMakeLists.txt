@@ -65,30 +65,6 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# gc folder
-#
-
-set (
-	GC_H_LIST
-	${AXL_INC_DIR}/axl_jnc_GcHeap.h
-	axl_jnc_GcStrategy.h
-	)
-
-set (
-	GC_CPP_LIST
-	axl_jnc_GcHeap.cpp
-	axl_jnc_GcStrategy.cpp
-	)
-
-source_group (
-	gc
-	FILES 
-	${GC_H_LIST}
-	${GC_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # module folder
 #
 
@@ -99,7 +75,6 @@ set (
 	${AXL_INC_DIR}/axl_jnc_LlvmBuilder.h
 	${AXL_INC_DIR}/axl_jnc_Module.h
 	${AXL_INC_DIR}/axl_jnc_ModuleItem.h
-	${AXL_INC_DIR}/axl_jnc_ThreadModule.h
 	)
 
 set (
@@ -417,6 +392,30 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# gc folder
+#
+
+set (
+	GC_H_LIST
+	${AXL_INC_DIR}/axl_jnc_GcHeap.h
+	axl_jnc_GcStrategy.h
+	)
+
+set (
+	GC_CPP_LIST
+	axl_jnc_GcHeap.cpp
+	axl_jnc_GcStrategy.cpp
+	)
+
+source_group (
+	gc
+	FILES 
+	${GC_H_LIST}
+	${GC_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # stdlib folder
 #
 
@@ -439,6 +438,30 @@ source_group (
 	${STDLIB_CPP_LIST}
 	)
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# runtime folder
+#
+
+set (
+	RUNTIME_H_LIST
+	${AXL_INC_DIR}/axl_jnc_Runtime.h
+	${AXL_INC_DIR}/axl_jnc_TlsMgr.h
+	)
+
+set (
+	RUNTIME_CPP_LIST
+	axl_jnc_Runtime.cpp
+	axl_jnc_TlsMgr.cpp
+	)
+
+source_group (
+	runtime
+	FILES 
+	${RUNTIME_H_LIST}
+	${RUNTIME_CPP_LIST}
+	)
+	
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # jncc folder
@@ -489,8 +512,6 @@ add_library (
 	${CONTROLFLOW_CPP_LIST}
 	${FUNCTION_H_LIST}
 	${FUNCTION_CPP_LIST}
-	${GC_H_LIST}
-	${GC_CPP_LIST}
 	${MODULE_H_LIST}
 	${MODULE_CPP_LIST}
 	${NAMESPACE_H_LIST}
@@ -507,8 +528,12 @@ add_library (
 	${VALUE_CPP_LIST}
 	${VARIABLE_H_LIST}
 	${VARIABLE_CPP_LIST}
+	${GC_H_LIST}
+	${GC_CPP_LIST}
 	${STDLIB_H_LIST}
 	${STDLIB_CPP_LIST}
+	${RUNTIME_H_LIST}
+	${RUNTIME_CPP_LIST}
 	${PCH_H}
 	${PCH_CPP}
 	)

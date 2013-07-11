@@ -3,6 +3,7 @@
 #include "axl_jnc_GcStrategy.h"
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -11,9 +12,6 @@ namespace jnc {
 
 CGcHeap::CGcHeap ()
 {
-	m_pModule = GetCurrentThreadModule ();
-	ASSERT (m_pModule);
-
 	m_pHeap = NULL;
 	m_HeapSize = 0;
 	m_BlockSize = 0;
@@ -21,19 +19,44 @@ CGcHeap::CGcHeap ()
 	m_pShadowStack = NULL;
 }
 
-bool 
-CGcHeap::InitializeRoots (llvm::ExecutionEngine* pExecutionEngine)
+bool
+CGcHeap::Create (
+	CRuntime* pRuntime,
+	size_t BlockSize,
+	size_t Width,
+	size_t Height
+	)
 {
+	Clear ();
+
+	bool Result = m_Map.Create (Width, Height);
+	if (!Result)
+		return false;
+
+	size_t BlockCount = m_Map.GetTotalSize ();
+	size_t HeapSize = BlockCount * BlockSize;
+
+	void* pHeap = AXL_MEM_ALLOC (HeapSize);
+	if (!pHeap)
+		return false;
+
+	m_HeapSize = HeapSize;
+	m_pHeap = pHeap;
+	m_BlockSize = BlockSize;
+
+	CModule* pModule = pRuntime->GetModule ();
+	llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
+
 	// global roots
 
-	rtl::CArrayT <CVariable*> GlobalRootArray = m_pModule->m_VariableMgr.GetGlobalGcRootArray ();
+	rtl::CArrayT <CVariable*> GlobalRootArray = pModule->m_VariableMgr.GetGlobalGcRootArray ();
 	size_t Count = GlobalRootArray.GetCount ();
 
 	m_GlobalRootArray.SetCount (Count);
 	for (size_t i = 0; i < Count; i++)
 	{
 		CVariable* pVariable = GlobalRootArray [i];
-		void* p = pExecutionEngine->getPointerToGlobal ((llvm::GlobalVariable*) pVariable->GetLlvmValue ());
+		void* p = pLlvmExecutionEngine->getPointerToGlobal ((llvm::GlobalVariable*) pVariable->GetLlvmValue ());
 		ASSERT (p);
 
 		m_GlobalRootArray [i].m_p = p;
@@ -42,38 +65,17 @@ CGcHeap::InitializeRoots (llvm::ExecutionEngine* pExecutionEngine)
 
 	// stack roots
 
-	llvm::GlobalVariable* pLlvmVariable = m_pModule->m_pLlvmModule->getGlobalVariable("llvm_gc_root_chain");
+	llvm::GlobalVariable* pLlvmVariable = pModule->GetLlvmModule ()->getGlobalVariable ("llvm_gc_root_chain");
 	ASSERT (pLlvmVariable); 
 
-	m_pShadowStack = pExecutionEngine->getPointerToGlobal (pLlvmVariable);
+	m_pShadowStack = pLlvmExecutionEngine->getPointerToGlobal (pLlvmVariable);
 	ASSERT (m_pShadowStack);
 
 	return true;
 }
 
-bool
-CGcHeap::CreateHeap (
-	size_t BlockSize,
-	size_t Width,
-	size_t Height
-	)
-{
-	ClearHeap ();
-
-	bool Result = m_Map.Create (Width, Height);
-	if (!Result)
-		return false;
-
-	size_t BlockCount = m_Map.GetTotalSize ();
-	m_HeapSize = BlockCount * BlockSize;
-	m_pHeap = AXL_MEM_ALLOC (m_HeapSize);
-	m_BlockSize = BlockSize;
-
-	return m_pHeap != NULL;
-}
-
 void
-CGcHeap::ClearHeap ()
+CGcHeap::Clear ()
 {
 	if (!m_pHeap)
 		return;
@@ -84,6 +86,7 @@ CGcHeap::ClearHeap ()
 	m_BlockSize = 0;
 	m_Map.Clear ();
 	m_ObjectList.Clear ();
+	m_GlobalRootArray.Clear ();
 }
 
 void*

@@ -1,5 +1,5 @@
 //.............................................................................
-
+/*
 class C1
 {
 	int m_x;
@@ -17,13 +17,29 @@ class C1
 }
 
 C1* g_p;
+*/
+
+struct TPoint
+{
+	int x;
+	int y;
+}
 
 int  
 main ()
 {
 	printf ("main ()\n");
 
-	weak C1* p0;
+	TPoint Point;
+	TPoint* p = &Point;
+
+	p.x = 10;
+	p.y = 20;
+
+	printf ("Point = { %d, %d }\n", Point.x, Point.y);	
+
+
+/*	weak C1* p0;
 
 	{
 	p0 = new C1 (1);
@@ -42,7 +58,7 @@ main ()
 
 	printf ("GC run 2\n");
 
-	RunGc ();
+	RunGc (); */
 
 	return 10;
 }
@@ -50,6 +66,11 @@ main ()
 destruct ()
 {
 	printf ("module.destruct ()\n");
+}
+
+foo ()
+{
+	printf ("foo ()\n");
 }
 
 //.............................................................................

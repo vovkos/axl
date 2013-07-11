@@ -113,6 +113,10 @@ public:
 	GcAddObject (jnc::TObject* p);
 
 	static
+	void
+	RunGc ();
+
+	static
 	dword_t
 	GetCurrentThreadId ();
 
@@ -121,8 +125,8 @@ public:
 	CreateThread (jnc::TFunctionPtr Ptr);
 
 	static
-	void
-	RunGc ();
+	void*
+	GetThreadVariableData ();
 
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)

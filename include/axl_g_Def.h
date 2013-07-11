@@ -289,6 +289,7 @@ pvoid_cast (T x)
 #if (_AXL_CPP == AXL_CPP_MSC)
 #	pragma warning (disable: 4146)
 #	pragma warning (disable: 4267)
+#	pragma warning (disable: 4355)
 #endif
 
 #if (_AXL_CPP == AXL_CPP_GCC)

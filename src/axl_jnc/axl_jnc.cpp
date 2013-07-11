@@ -76,11 +76,10 @@ Compile (
 	)
 {
 	bool Result;
-	
-	pModule->Create (pFileName);
-	
+
 	llvm::Module* pLlvmModule = new llvm::Module (pFileName, llvm::getGlobalContext ());
-	pModule->m_pLlvmModule = pLlvmModule;
+
+	pModule->Create (pFileName, pLlvmModule);
 
 	CScopeThreadModule ScopeModule (pModule);
 	
@@ -112,7 +111,7 @@ Compile (
 bool 
 Jit (CModule* pModule)
 {
-	llvm::EngineBuilder EngineBuilder (pModule->m_pLlvmModule);	
+	llvm::EngineBuilder EngineBuilder (pModule->GetLlvmModule ());	
 	std::string ErrorString;
 	EngineBuilder.setErrorStr (&ErrorString);	
 	

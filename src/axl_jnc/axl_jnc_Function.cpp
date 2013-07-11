@@ -148,7 +148,7 @@ CFunction::GetLlvmFunction ()
 		pLlvmType, 
 		llvm::Function::ExternalLinkage, 
 		(const char*) m_Tag, 
-		m_pModule->m_pLlvmModule
+		m_pModule->GetLlvmModule ()
 		);
 
 	m_pLlvmFunction->setGC ("jnc-shadow-stack");

@@ -76,8 +76,8 @@ private:
 	QAction *compileAction;
 	QAction *runAction;
 
-	llvm::ExecutionEngine *llvmExecutionEngine;
 	jnc::CModule module;
+	jnc::CRuntime runtime;
 };
 
 inline MainWindow *GetMainWindow()

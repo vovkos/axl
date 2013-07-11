@@ -486,9 +486,9 @@ COperatorMgr::CallClosureFunctionPtr (
 	CValue* pResultValue
 	)
 {
-	CFunctionPtrType* pFunctionPointerType = (CFunctionPtrType*) OpValue.GetType ();
-	ASSERT (pFunctionPointerType->GetTypeKind () == EType_FunctionPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
 
+	CFunctionPtrType* pFunctionPointerType = (CFunctionPtrType*) OpValue.GetType ();
 	CFunctionType* pFunctionType = pFunctionPointerType->GetTargetType ();
 	CFunctionType* pAbstractMethodType = pFunctionType->GetStdObjectMemberMethodType ();
 

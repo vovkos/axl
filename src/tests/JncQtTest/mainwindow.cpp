@@ -27,8 +27,6 @@ StdLib_printf (
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags)
 {	
-	llvmExecutionEngine = 0;
-
 	createMdiArea();
 	setCentralWidget(mdiArea);
 
@@ -308,18 +306,11 @@ bool MainWindow::compile ()
 	if(!child->save())
 		return false;
 
-	if (llvmExecutionEngine)
-	{
-		delete llvmExecutionEngine;
-		llvmExecutionEngine = NULL;
-	}	
-
 	QByteArray filePathBytes = child->file().toUtf8 ();
-	module.Create (filePathBytes.data());
-	
 	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.data(), llvm::getGlobalContext ());
-	module.m_pLlvmModule = pLlvmModule;
 
+	module.Create (filePathBytes.data(), pLlvmModule);
+	
 	jnc::CScopeThreadModule ScopeModule (&module);
 
 	writeOutput("Parsing...\n");
@@ -380,17 +371,14 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting...\n");
 
-	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
-	std::string errorString;
-	EngineBuilder.setErrorStr (&errorString);
-	EngineBuilder.setUseMCJIT(true);
-
-	llvmExecutionEngine = EngineBuilder.create ();
-	if (!llvmExecutionEngine)
+	Result = runtime.Create (&module);
+	if (!Result)
 	{
-		writeOutput ("Error creating a JITter (%s)\n", errorString.c_str());
+		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
 	}
+
+	llvm::ExecutionEngine* llvmExecutionEngine = runtime.GetLlvmExecutionEngine ();
 
 	jnc::CStdLib::Export (&module, llvmExecutionEngine);
 	module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib_printf);
@@ -461,12 +449,11 @@ MainWindow::run ()
 
 	writeOutput ("Running...\n");
 
-	jnc::CScopeThreadModule ScopeModule (&module);
+	jnc::CScopeThreadRuntime ScopeRuntime (&runtime);
 
-	// create a new heap (actually, can re-use the old one)
+	// create a new heap 
 
-	module.m_GcHeap.CreateHeap (16, 1, 4);
-	module.m_GcHeap.InitializeRoots (llvmExecutionEngine);
+	runtime.m_GcHeap.Create (&runtime, 16, 1, 4);
 
 	// constructor
 
@@ -497,8 +484,9 @@ MainWindow::run ()
 
 	// final gc run
 
-	module.m_GcHeap.DropGlobalRoots ();
-	module.m_GcHeap.RunGc ();
+	runtime.m_GcHeap.DropGlobalRoots ();
+	runtime.m_GcHeap.RunGc ();
+	runtime.m_GcHeap.Clear ();
 
 	writeOutput ("Done (retval = %d).\n", ReturnValue);
 	return true;

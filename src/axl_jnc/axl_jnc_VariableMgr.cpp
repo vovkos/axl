@@ -12,7 +12,7 @@ CVariableMgr::CVariableMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
-	
+
 	memset (m_StdVariableArray, 0, sizeof (m_StdVariableArray));
 }
 
@@ -128,7 +128,7 @@ CVariableMgr::CreateLlvmGlobalVariable (
 	)
 {
 	llvm::GlobalVariable* pLlvmValue = new llvm::GlobalVariable (
-		*m_pModule->m_pLlvmModule,
+		*m_pModule->GetLlvmModule (),
 		pType->GetLlvmType (),
 		false,
 		llvm::GlobalVariable::ExternalLinkage,

@@ -93,11 +93,9 @@ CAstDoc::Compile ()
 	}	
 
 	rtl::CString FilePath = GetPathName ();
-	m_Module.Create (FilePath);
-	
 	llvm::Module* pLlvmModule = new llvm::Module (FilePath.cc (), llvm::getGlobalContext ());
-	m_Module.m_pLlvmModule = pLlvmModule;
-
+	m_Module.Create (FilePath, pLlvmModule);
+	
 	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
 	std::string ErrorString;
 	EngineBuilder.setErrorStr (&ErrorString);
@@ -243,10 +241,11 @@ CAstDoc::Run ()
 
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Running...\n");
 
-	m_Module.m_GcHeap.CreateHeap (16, 1, 4);
-	m_Module.m_GcHeap.InitializeRoots (m_pLlvmExecutionEngine);
+	jnc::CScopeThreadRuntime ScopeRuntime (&m_Runtime);
 
-
+	m_Runtime.m_GcHeap.CreateHeap (16, 1, 4);
+	m_Runtime.m_GcHeap.InitializeRoots (m_pLlvmExecutionEngine);
+	
 	jnc::CFunction* pConstructor = m_Module.GetConstructor ();
 	if (pConstructor)
 	{
@@ -267,8 +266,8 @@ CAstDoc::Run ()
 			return false;
 	}
 
-	m_Module.m_GcHeap.DropGlobalRoots ();
-	m_Module.m_GcHeap.RunGc ();
+	m_Runtime.m_GcHeap.DropGlobalRoots ();
+	m_Runtime.m_GcHeap.RunGc ();
 		
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Done (retval = %d).\n", Result);
 	return true;

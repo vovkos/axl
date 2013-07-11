@@ -10,9 +10,10 @@ namespace jnc {
 CLlvmBuilder::CLlvmBuilder ():
 	m_LlvmBuilder (llvm::getGlobalContext ())
 {
-	m_CommentMdKind = llvm::getGlobalContext().getMDKindID ("jnc.comment");
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
+
+	m_CommentMdKind = llvm::getGlobalContext().getMDKindID ("jnc.comment");
 }
 
 bool

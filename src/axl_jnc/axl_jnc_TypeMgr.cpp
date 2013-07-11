@@ -13,6 +13,7 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
+
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));

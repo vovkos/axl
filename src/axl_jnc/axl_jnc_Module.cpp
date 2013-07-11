@@ -1,18 +1,10 @@
 #include "pch.h"
 #include "axl_jnc_Module.h"
-#include "axl_jnc_GcStrategy.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
-
-CModule::CModule ()
-{
-	mt::CallOnce (RegisterGcStrategy, 0);
-	m_pLlvmModule = NULL;
-	RestorePrevModule ();
-}
 
 void
 CModule::Clear ()
@@ -33,12 +25,14 @@ CModule::Clear ()
 }
 
 bool
-CModule::Create (const rtl::CString& FilePath)
+CModule::Create (
+	const rtl::CString& FilePath,
+	llvm::Module* pLlvmModule
+	)
 {
 	Clear ();
 	m_FilePath = FilePath;
-	m_pLlvmModule = (llvm::Module*) AXL_MEM_ALLOC (sizeof (llvm::Module));
-	new (m_pLlvmModule) llvm::Module ((const char*) m_FilePath, llvm::getGlobalContext());
+	m_pLlvmModule = pLlvmModule;
 	return true;
 }
 

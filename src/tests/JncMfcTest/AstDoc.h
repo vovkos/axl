@@ -17,6 +17,7 @@
 class CAstDoc : public CDocument
 {
 protected:
+	jnc::CRuntime m_Runtime;
 	jnc::CModule m_Module;
 	llvm::ExecutionEngine* m_pLlvmExecutionEngine;
 

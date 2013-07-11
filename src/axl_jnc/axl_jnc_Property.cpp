@@ -626,7 +626,7 @@ CProperty::CreateVTablePtr ()
 	rtl::CString VariableTag;
 	VariableTag.Format ("%s.vtbl", GetQualifiedName ().cc ());
 	llvm::GlobalVariable* pLlvmVTableVariable = new llvm::GlobalVariable (
-			*m_pModule->m_pLlvmModule,
+			*m_pModule->GetLlvmModule (),
 			pVTableStructType->GetLlvmType (),
 			false,
 			llvm::GlobalVariable::ExternalLinkage,

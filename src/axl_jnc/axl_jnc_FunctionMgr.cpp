@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_FunctionMgr.h"
+#include "axl_jnc_GcStrategy.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -13,8 +14,9 @@ CFunctionMgr::CFunctionMgr ()
 	ASSERT (m_pModule);
 
 	m_pCurrentFunction = NULL;
-
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
+
+	mt::CallOnce (RegisterGcStrategy, 0);
 }
 
 void
@@ -1323,7 +1325,7 @@ CFunctionMgr::CreateMarkGcRoot ()
 	CFunction* pFunction = CreateInternalFunction ("jnc.MarkGcRoot", pType);
 
 	pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
-		m_pModule->m_pLlvmModule,
+		m_pModule->GetLlvmModule (),
 		llvm::Intrinsic::gcroot
 		);
 
