@@ -45,7 +45,7 @@ COperatorMgr::GetPropertyVTable (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
 	
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	EPropertyPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
@@ -84,9 +84,12 @@ COperatorMgr::GetPropertyVTable (
 }
 
 CType*
-COperatorMgr::GetPropertyGetterType (const CValue& OpValue)
+COperatorMgr::GetPropertyGetterType (const CValue& RawOpValue)
 {
 	CPropertyType* pPropertyType;
+
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
 
 	if (OpValue.GetValueKind () == EValue_Property)
 	{
@@ -94,7 +97,8 @@ COperatorMgr::GetPropertyGetterType (const CValue& OpValue)
 	}
 	else
 	{
-		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
+
 		CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 		pPropertyType = pPtrType->HasClosure () ? 
 			pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
@@ -120,20 +124,26 @@ COperatorMgr::GetPropertyGetterType (
 
 bool
 COperatorMgr::GetPropertyGetter (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
 	bool Result;
+
+	CValue OpValue;
+	Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
+	if (!Result)
+		return false;
 
 	if (OpValue.GetValueKind () == EValue_Property)
 	{
 		*pResultValue = OpValue.GetProperty ()->GetGetter ();
 		pResultValue->SetClosure (OpValue.GetClosure ());
 		return true;
-	}
+	}	
 
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);	
+
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
 		pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
@@ -160,10 +170,13 @@ COperatorMgr::GetPropertyGetter (
 
 CType*
 COperatorMgr::GetPropertySetterType (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	const CValue& ArgValue
 	)
 {
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
+
 	CPropertyType* pPropertyType;
 
 	if (OpValue.GetValueKind () == EValue_Property)
@@ -172,7 +185,8 @@ COperatorMgr::GetPropertySetterType (
 	}
 	else
 	{
-		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
+
 		CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 		pPropertyType = pPtrType->HasClosure () ? 
 			pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
@@ -214,14 +228,20 @@ COperatorMgr::GetPropertySetterType (
 
 bool
 COperatorMgr::GetPropertySetter (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	const CValue& ArgValue,
 	CValue* pResultValue
 	)
 {
 	bool Result;
 
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+	CValue OpValue;
+	Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
+	if (!Result)
+		return false;
+
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);	
+
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->HasClosure () ? 
 		pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
@@ -241,11 +261,22 @@ COperatorMgr::GetPropertySetter (
 	}
 
 	CFunctionTypeOverload* pSetterTypeOverload = pPropertyType->GetSetterType ();
-	size_t i = pSetterTypeOverload->ChooseSetterOverload (ArgValue);
-	if (i == -1)
+	size_t i = 0;
+
+	if (pSetterTypeOverload->IsOverloaded ())
 	{
-		err::SetFormatStringError ("cannot choose one of '%d' setter overloads", pSetterTypeOverload->GetOverloadCount ());
-		return false;
+		if (!ArgValue)
+		{
+			err::SetFormatStringError ("no argument value to help choose one of '%d' setter overloads", pSetterTypeOverload->GetOverloadCount ());
+			return false;
+		}
+		
+		i = pSetterTypeOverload->ChooseSetterOverload (ArgValue);
+		if (i == -1)
+		{
+			err::SetFormatStringError ("cannot choose one of '%d' setter overloads", pSetterTypeOverload->GetOverloadCount ());
+			return false;
+		}
 	}
 
 	CFunctionType* pSetterType = pSetterTypeOverload->GetOverload (i);
@@ -271,9 +302,12 @@ COperatorMgr::GetPropertySetter (
 }
 
 CType*
-COperatorMgr::GetPropertyBinderType (const CValue& OpValue)
+COperatorMgr::GetPropertyBinderType (const CValue& RawOpValue)
 {
 	CPropertyType* pPropertyType;
+
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
 
 	if (OpValue.GetValueKind () == EValue_Property)
 	{
@@ -281,7 +315,8 @@ COperatorMgr::GetPropertyBinderType (const CValue& OpValue)
 	}
 	else
 	{
-		ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);	
+
 		CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 		pPropertyType = pPtrType->HasClosure () ? 
 			pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
@@ -313,13 +348,19 @@ COperatorMgr::GetPropertyBinderType (
 
 bool
 COperatorMgr::GetPropertyBinder (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
 	bool Result;
 
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);	
+	CValue OpValue;
+	Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
+	if (!Result)
+		return false;
+
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);	
+
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType = pPtrType->GetTargetType ();
 
@@ -461,8 +502,11 @@ COperatorMgr::GetPropertyPropValue (
 }
 
 CType*
-COperatorMgr::GetPropertyOnChangeType (const CValue& OpValue)
+COperatorMgr::GetPropertyOnChangeType (const CValue& RawOpValue)
 {
+	CValue OpValue;
+	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
+
 	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr) || 
 		!(((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
@@ -489,10 +533,15 @@ COperatorMgr::GetPropertyOnChangeType (
 
 bool
 COperatorMgr::GetPropertyOnChange (
-	const CValue& OpValue,
+	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
+	if (!Result)
+		return false;
+
 	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr) || 
 		!(((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
 	{

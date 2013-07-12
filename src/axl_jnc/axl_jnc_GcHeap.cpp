@@ -47,20 +47,20 @@ CGcHeap::Create (
 	CModule* pModule = pRuntime->GetModule ();
 	llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
 
-	// global roots
+	// static roots
 
-	rtl::CArrayT <CVariable*> GlobalRootArray = pModule->m_VariableMgr.GetGlobalGcRootArray ();
-	size_t Count = GlobalRootArray.GetCount ();
+	rtl::CArrayT <CVariable*> StaticRootArray = pModule->m_VariableMgr.GetStaticGcRootArray ();
+	size_t Count = StaticRootArray.GetCount ();
 
-	m_GlobalRootArray.SetCount (Count);
+	m_StaticRootArray.SetCount (Count);
 	for (size_t i = 0; i < Count; i++)
 	{
-		CVariable* pVariable = GlobalRootArray [i];
+		CVariable* pVariable = StaticRootArray [i];
 		void* p = pLlvmExecutionEngine->getPointerToGlobal ((llvm::GlobalVariable*) pVariable->GetLlvmValue ());
 		ASSERT (p);
 
-		m_GlobalRootArray [i].m_p = p;
-		m_GlobalRootArray [i].m_pType = pVariable->GetType ();
+		m_StaticRootArray [i].m_p = p;
+		m_StaticRootArray [i].m_pType = pVariable->GetType ();
 	}
 
 	// stack roots
@@ -86,7 +86,7 @@ CGcHeap::Clear ()
 	m_BlockSize = 0;
 	m_Map.Clear ();
 	m_ObjectList.Clear ();
-	m_GlobalRootArray.Clear ();
+	m_StaticRootArray.Clear ();
 }
 
 void*
@@ -150,17 +150,19 @@ CGcHeap::RunGc ()
 
 	// 1) suspend all threads at safe points
 	
-	// 2) enumerate global roots
+	// 2) enumerate static roots
 
-	size_t Count = m_GlobalRootArray.GetCount ();	
+	size_t Count = m_StaticRootArray.GetCount ();	
 	for (size_t i = 0; i < Count; i++)
 	{
-		ASSERT (m_GlobalRootArray [i].m_pType->GetFlags () & ETypeFlag_GcRoot);
+		ASSERT (m_StaticRootArray [i].m_pType->GetFlags () & ETypeFlag_GcRoot);
 		AddRoot (
-			m_GlobalRootArray [i].m_p, 
-			m_GlobalRootArray [i].m_pType
+			m_StaticRootArray [i].m_p, 
+			m_StaticRootArray [i].m_pType
 			);
 	}
+
+	// 3) enumerate tls roots 
 
 	// 3) enumerate stack roots 
 
@@ -195,6 +197,7 @@ CGcHeap::RunGc ()
 	{
 		size_t PrevCurrentRootArrayIdx =  m_CurrentRootArrayIdx;
 		m_CurrentRootArrayIdx = !m_CurrentRootArrayIdx;
+		m_RootArray [m_CurrentRootArrayIdx].Clear ();		
 
 		size_t Count = m_RootArray [PrevCurrentRootArrayIdx].GetCount ();		
 		for (size_t i = 0; i < Count; i++)

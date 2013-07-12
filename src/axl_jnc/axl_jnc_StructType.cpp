@@ -264,7 +264,7 @@ CStructType::CalcLayout ()
 			m_pStaticOnceFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable ();
 
 		if (m_pStaticDestructor)
-			m_pModule->m_VariableMgr.AddToStaticDestructList (m_pStaticOnceFlagVariable, m_pStaticDestructor);
+			m_pModule->m_VariableMgr.AddToLazyStaticDestructList (m_pStaticOnceFlagVariable, m_pStaticDestructor);
 
 		if (!m_pPreConstructor && 
 			(m_pStaticConstructor ||

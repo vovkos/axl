@@ -14,6 +14,12 @@ public:
 
 	QSize sizeHint() const { return QSize(300, 300); }
 
+public slots:
+	void outputSlot (QString text)
+	{
+		appendString (text);
+	}
+
 protected:
 	void mouseDoubleClickEvent(QMouseEvent *e);
 

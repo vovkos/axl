@@ -259,7 +259,7 @@ CFunctionMgr::Prologue (
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
 	{
-		bool Result = m_pModule->m_VariableMgr.AllocatePrimeGlobalVariables ();
+		bool Result = m_pModule->m_VariableMgr.AllocatePrimeStaticVariables ();
 		if (!Result)
 			return false;
 	}
@@ -274,7 +274,7 @@ CFunctionMgr::Prologue (
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
 	{
-		Result = m_pModule->m_VariableMgr.InitializeGlobalVariables ();
+		Result = m_pModule->m_VariableMgr.InitializeGlobalStaticVariables ();
 		if (!Result)
 			return false;
 	}
@@ -468,8 +468,8 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleDestructor)
 	{
-		m_pModule->m_OperatorMgr.ProcessDestructArray (m_pModule->m_VariableMgr.GetGlobalDestructArray ());
-		m_pModule->m_OperatorMgr.ProcessStaticDestructList (m_pModule->m_VariableMgr.GetStaticDestructList ());
+		m_pModule->m_OperatorMgr.ProcessDestructArray (m_pModule->m_VariableMgr.GetGlobalStaticDestructArray ());
+		m_pModule->m_OperatorMgr.ProcessLazyStaticDestructList (m_pModule->m_VariableMgr.GetLazyStaticDestructList ());
 	}
 
 	// ensure return

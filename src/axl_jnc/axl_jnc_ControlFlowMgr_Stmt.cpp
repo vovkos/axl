@@ -317,7 +317,7 @@ CControlFlowMgr::OnceStmt_Create (
 		CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 		m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
 
-		m_pModule->m_VariableMgr.AllocatePrimeGlobalVariable (pFlagVariable);
+		m_pModule->m_VariableMgr.AllocatePrimeStaticVariable (pFlagVariable);
 
 		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 	}

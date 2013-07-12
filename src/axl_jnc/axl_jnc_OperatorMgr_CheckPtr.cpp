@@ -116,8 +116,12 @@ COperatorMgr::CheckDataPtrScopeLevel (
 	)
 {
 	ASSERT (SrcValue.GetType ()->GetTypeKind () == EType_DataPtr);
+	
 	CDataPtrType* pPtrType = (CDataPtrType*) SrcValue.GetType ();
 	EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
+
+	if (pPtrType->GetFlags () & EPtrTypeFlag_Unsafe)
+		return true;
 
 	if (SrcValue.GetValueKind () == EValue_Variable && DstValue.GetValueKind () == EValue_Variable)
 	{
@@ -187,6 +191,10 @@ COperatorMgr::CheckClassPtrScopeLevel (
 	const CValue& DstValue
 	)
 {
+	ASSERT (SrcValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr);
+	if (SrcValue.GetType ()->GetFlags () & EPtrTypeFlag_Unsafe)
+		return;
+
 	CValue DstScopeLevelValue;
 	GetDataRefScopeLevel (DstValue, &DstScopeLevelValue);
 
@@ -245,10 +253,9 @@ COperatorMgr::CheckFunctionPtrScopeLevel (
 	)
 {
 	ASSERT (SrcValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
-
 	CFunctionPtrType* pPtrType = (CFunctionPtrType*) SrcValue.GetType ();
 
-	if (!pPtrType->HasClosure ())
+	if (!pPtrType->HasClosure () || (pPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
 		return;
 
 	CValue ClosureValue;
@@ -297,7 +304,7 @@ COperatorMgr::CheckPropertyPtrScopeLevel (
 	ASSERT (SrcValue.GetType ()->GetTypeKind () == EType_PropertyPtr);
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) SrcValue.GetType ();
 
-	if (!pPtrType->HasClosure ())
+	if (!pPtrType->HasClosure () || (pPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
 		return;
 
 	CValue ClosureValue;

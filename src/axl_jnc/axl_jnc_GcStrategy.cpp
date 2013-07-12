@@ -184,6 +184,8 @@ void ShadowStackGC::CollectRoots(Function &F)
 
 	SmallVector<std::pair<CallInst*, AllocaInst*>, 16> MetaRoots;
 
+	// all the roots are in the entry block, so why iterate through
+
 	for (Function::iterator BB = F.begin(), E = F.end(); BB != E; ++BB)
 		for (BasicBlock::iterator II = BB->begin(), E = BB->end(); II != E;)
 			if (IntrinsicInst *CI = dyn_cast<IntrinsicInst>(II++))

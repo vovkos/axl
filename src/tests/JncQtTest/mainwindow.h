@@ -33,6 +33,9 @@ private slots:
 	bool compile();
 	bool run();
 
+signals:
+	void outputSignal (QString text);
+
 private:
 	void createActions();
 	void createMenu();

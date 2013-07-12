@@ -43,7 +43,7 @@ protected:
 	size_t m_BlockSize;
 	rtl::CBuddyAllocMap m_Map;
 	rtl::CAuxListT <TObject, CObjectHeapLink> m_ObjectList;	
-	rtl::CArrayT <TRoot> m_GlobalRootArray;
+	rtl::CArrayT <TRoot> m_StaticRootArray;
 	rtl::CArrayT <TRoot> m_RootArray [2];
 	size_t m_CurrentRootArrayIdx;
 	void* m_pShadowStack;
@@ -68,9 +68,9 @@ public:
 	Clear ();
 
 	void
-	DropGlobalRoots ()
+	DropStaticRoots ()
 	{
-		m_GlobalRootArray.Clear ();
+		m_StaticRootArray.Clear ();
 	}
 
 	void*

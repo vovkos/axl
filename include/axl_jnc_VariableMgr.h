@@ -15,10 +15,10 @@ class CFunction;
 
 //.............................................................................
 
-// for static variables and static destructors we need to check 
-// whether the item was actually created or not
+// for non-global static variables and static destructors we need to check 
+// whether the item was actually created or not (cause of lazy initialization)
 
-struct TStaticDestruct: rtl::TListLink 
+struct TLazyStaticDestruct: rtl::TListLink 
 {
 	CVariable* m_pFlagVariable;
 	CFunction* m_pDestructor;
@@ -47,12 +47,20 @@ protected:
 	rtl::CStdListT <CVariable> m_VariableList;
 	rtl::CStdListT <CAlias> m_AliasList;
 
-	rtl::CArrayT <CVariable*> m_GlobalVariableArray;
-	rtl::CArrayT <CVariable*> m_GlobalGcRootArray;
+	// static variables
+
+	rtl::CArrayT <CVariable*> m_StaticVariableArray;
+	rtl::CArrayT <CVariable*> m_StaticGcRootArray;
+	rtl::CArrayT <CVariable*> m_GlobalStaticVariableArray;
+	rtl::CArrayT <CVariable*> m_GlobalStaticDestructArray;
+	rtl::CStdListT <TLazyStaticDestruct> m_LazyStaticDestructList;
+
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
 
-	rtl::CArrayT <CVariable*> m_GlobalDestructArray;
-	rtl::CStdListT <TStaticDestruct> m_StaticDestructList;
+	// tls variables
+
+	rtl::CArrayT <CVariable*> m_TlsVariableArray;
+	rtl::CArrayT <CVariable*> m_TlsGcRootArray;
 
 	CVariable* m_StdVariableArray [EStdVariable__Count];
 
@@ -72,31 +80,37 @@ public:
 	GetStdVariable (EStdVariable Variable);
 	
 	rtl::CArrayT <CVariable*> 
-	GetGlobalVariableArray ()
+	GetStaticVariableArray ()
 	{
-		return m_GlobalVariableArray;
+		return m_StaticVariableArray;
 	}
 
 	rtl::CArrayT <CVariable*> 
-	GetGlobalGcRootArray ()
+	GetStaticGcRootArray ()
 	{
-		return m_GlobalGcRootArray;
+		return m_StaticGcRootArray;
 	}
 
 	rtl::CArrayT <CVariable*> 
-	GetGlobalDestructArray ()
+	GetGlobalStaticVariableArray ()
 	{
-		return m_GlobalDestructArray;
+		return m_GlobalStaticVariableArray;
 	}
 
-	rtl::CConstListT <TStaticDestruct>
-	GetStaticDestructList ()
+	rtl::CArrayT <CVariable*> 
+	GetGlobalStaticDestructArray ()
 	{
-		return m_StaticDestructList;
+		return m_GlobalStaticDestructArray;
+	}
+
+	rtl::CConstListT <TLazyStaticDestruct>
+	GetLazyStaticDestructList ()
+	{
+		return m_LazyStaticDestructList;
 	}
 
 	void
-	AddToStaticDestructList (
+	AddToLazyStaticDestructList (
 		CVariable* pFlagVariable,
 		CFunction* pDestructor,
 		CVariable* pVariable = NULL
@@ -131,13 +145,13 @@ public:
 		);
 
 	bool
-	AllocatePrimeGlobalVariable (CVariable* pVariable);
+	AllocatePrimeStaticVariable (CVariable* pVariable);
 
 	bool
-	AllocatePrimeGlobalVariables ();
+	AllocatePrimeStaticVariables ();
 
 	bool
-	InitializeGlobalVariables ();
+	InitializeGlobalStaticVariables ();
 
 	bool
 	AllocatePrimeInitializeVariable (CVariable* pVariable)

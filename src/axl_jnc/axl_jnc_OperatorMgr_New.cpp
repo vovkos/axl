@@ -501,12 +501,12 @@ COperatorMgr::ProcessDestructArray (
 }
 
 void
-COperatorMgr::ProcessStaticDestructList (const rtl::CConstListT <TStaticDestruct>& List)
+COperatorMgr::ProcessLazyStaticDestructList (const rtl::CConstListT <TLazyStaticDestruct>& List)
 {
-	rtl::CIteratorT <TStaticDestruct> Destruct = List.GetHead ();
+	rtl::CIteratorT <TLazyStaticDestruct> Destruct = List.GetHead ();
 	for (; Destruct; Destruct++)
 	{
-		TStaticDestruct* pDestruct = *Destruct;
+		TLazyStaticDestruct* pDestruct = *Destruct;
 
 		CBasicBlock* pDestructBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("destruct_block");
 		CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow_block");

@@ -173,8 +173,8 @@ CModule::Compile ()
 	// step 5: ensure module destructor (if needed)
 
 	if (!m_pDestructor && 
-		(!m_VariableMgr.GetGlobalDestructArray ().IsEmpty () ||
-		 !m_VariableMgr.GetStaticDestructList ().IsEmpty ()))
+		(!m_VariableMgr.GetGlobalStaticDestructArray ().IsEmpty () ||
+		 !m_VariableMgr.GetLazyStaticDestructList ().IsEmpty ()))
 	{
 		CreateDefaultDestructor ();
 	}
@@ -201,13 +201,13 @@ CModule::CreateDefaultConstructor ()
 	CBasicBlock* pBlock = m_ControlFlowMgr.GetCurrentBlock ();
 	m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
-	Result = m_VariableMgr.AllocatePrimeGlobalVariables ();
+	Result = m_VariableMgr.AllocatePrimeStaticVariables ();
 	if (!Result)
 		return false;
 
 	m_ControlFlowMgr.SetCurrentBlock (pBlock);
 
-	Result = m_VariableMgr.InitializeGlobalVariables ();
+	Result = m_VariableMgr.InitializeGlobalStaticVariables ();
 	if (!Result)
 		return false;
 
@@ -230,8 +230,8 @@ CModule::CreateDefaultDestructor ()
 
 	m_FunctionMgr.InternalPrologue (pFunction);
 
-	m_OperatorMgr.ProcessDestructArray (m_VariableMgr.GetGlobalDestructArray ());
-	m_OperatorMgr.ProcessStaticDestructList (m_VariableMgr.GetStaticDestructList ());
+	m_OperatorMgr.ProcessDestructArray (m_VariableMgr.GetGlobalStaticDestructArray ());
+	m_OperatorMgr.ProcessLazyStaticDestructList (m_VariableMgr.GetLazyStaticDestructList ());
 
 	m_FunctionMgr.InternalEpilogue ();
 }

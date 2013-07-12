@@ -80,8 +80,8 @@ CFunctionPtrType::GetTypeModifierString ()
 
 	if (m_Flags & EPtrTypeFlag__AllMask)
 	{
-		m_TypeModifierString += ' ';
 		m_TypeModifierString += GetPtrTypeFlagString (m_Flags);
+		m_TypeModifierString += ' ';
 	}
 
 	if (m_PtrTypeKind != EFunctionPtrType_Normal)

@@ -16,10 +16,15 @@ public:
 
 	int posFromLine(int line);
 
-	void appendText (const char* text)
+	void appendString (const QString &string)
 	{
 		moveCursor (QTextCursor::End);
-		insertPlainText (QString::fromUtf8 (text));
+		insertPlainText (string);
+	}
+
+	void appendText (const char* text)
+	{
+		appendString (QString::fromUtf8 (text));
 	}
 
 	void appendFormat_va (const char* format, va_list va)

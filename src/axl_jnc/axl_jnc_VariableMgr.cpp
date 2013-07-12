@@ -21,27 +21,32 @@ CVariableMgr::Clear ()
 {
 	m_VariableList.Clear ();
 	m_AliasList.Clear ();
-	m_GlobalVariableArray.Clear ();
-	m_GlobalGcRootArray.Clear ();
-	m_GlobalDestructArray.Clear ();
-	m_StaticDestructList.Clear ();
+
+	m_StaticVariableArray.Clear ();
+	m_StaticGcRootArray.Clear ();
+	m_GlobalStaticVariableArray.Clear ();
+	m_GlobalStaticDestructArray.Clear ();
+	m_LazyStaticDestructList.Clear ();
+
+	m_TlsVariableArray.Clear ();
+	m_TlsGcRootArray.Clear ();
 
 	memset (m_StdVariableArray, 0, sizeof (m_StdVariableArray));
 }
 
 void
-CVariableMgr::AddToStaticDestructList (
+CVariableMgr::AddToLazyStaticDestructList (
 	CVariable* pFlagVariable,
 	CFunction* pDestructor,
 	CVariable* pVariable
 	)
 {
-	TStaticDestruct* pDestruct = AXL_MEM_NEW (TStaticDestruct);
+	TLazyStaticDestruct* pDestruct = AXL_MEM_NEW (TLazyStaticDestruct);
 	pDestruct->m_pFlagVariable = pFlagVariable;
 	pDestruct->m_pDestructor = pDestructor;
 	pDestruct->m_pVariable = pVariable;
 
-	m_StaticDestructList.InsertTail (pDestruct);
+	m_LazyStaticDestructList.InsertTail (pDestruct);
 }
 
 CVariable*
@@ -97,9 +102,27 @@ CVariableMgr::CreateVariable (
 
 	m_VariableList.InsertTail (pVariable);
 
-	if (StorageKind == EStorage_Static)	
-		m_GlobalVariableArray.Append (pVariable);
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		m_StaticVariableArray.Append (pVariable);
 
+		if (m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->GetNamespaceKind () == ENamespace_Global)
+			m_GlobalStaticVariableArray.Append (pVariable);
+
+		break;
+
+	case EStorage_Thread:
+		m_TlsVariableArray.Append (pVariable);
+		break;
+
+	case EStorage_Stack:
+		break;
+
+	default:
+		ASSERT (false);
+	}
+	
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
 	{
 		pVariable->m_pType_i = (CImportType*) pType;
@@ -162,16 +185,16 @@ CVariableMgr::CreateAlias (
 }
 
 bool
-CVariableMgr::AllocatePrimeGlobalVariables ()
+CVariableMgr::AllocatePrimeStaticVariables ()
 {
 	bool Result;
 
-	size_t Count = m_GlobalVariableArray.GetCount ();
+	size_t Count = m_StaticVariableArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CVariable* pVariable = m_GlobalVariableArray [i];
+		CVariable* pVariable = m_StaticVariableArray [i];
 
-		Result = AllocatePrimeGlobalVariable (pVariable);
+		Result = AllocatePrimeStaticVariable (pVariable);
 		if (!Result)
 			return false;
 	}
@@ -180,7 +203,7 @@ CVariableMgr::AllocatePrimeGlobalVariables ()
 }
 
 bool
-CVariableMgr::AllocatePrimeGlobalVariable (CVariable* pVariable)
+CVariableMgr::AllocatePrimeStaticVariable (CVariable* pVariable)
 {
 	ASSERT (pVariable->m_StorageKind == EStorage_Static);
 	ASSERT (m_pModule->m_ControlFlowMgr.GetCurrentBlock () == m_pModule->GetConstructor ()->GetEntryBlock ());
@@ -195,18 +218,22 @@ CVariableMgr::AllocatePrimeGlobalVariable (CVariable* pVariable)
 		return false;
 
 	pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
+
+	if (pVariable->m_pType->GetFlags () & ETypeFlag_GcRoot)
+		m_StaticGcRootArray.Append (pVariable);
+
 	return true;
 }
 
 bool
-CVariableMgr::InitializeGlobalVariables ()
+CVariableMgr::InitializeGlobalStaticVariables ()
 {
 	bool Result;
 
-	size_t Count = m_GlobalVariableArray.GetCount ();
+	size_t Count = m_GlobalStaticVariableArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CVariable* pVariable = m_GlobalVariableArray [i];
+		CVariable* pVariable = m_GlobalStaticVariableArray [i];
 
 		Result = m_pModule->m_OperatorMgr.ParseInitializer (
 			pVariable, 
@@ -216,10 +243,7 @@ CVariableMgr::InitializeGlobalVariables ()
 
 		if (pVariable->m_pType->GetTypeKind () == EType_Class &&
 			((CClassType*) pVariable->m_pType)->GetDestructor ())
-			m_GlobalDestructArray.Append (pVariable);
-
-		if (pVariable->m_pType->GetFlags () & ETypeFlag_GcRoot)
-			m_GlobalGcRootArray.Append (pVariable);
+			m_GlobalStaticDestructArray.Append (pVariable);
 
 		if (!Result)
 			return false;
@@ -227,22 +251,6 @@ CVariableMgr::InitializeGlobalVariables ()
 
 	return true;
 }
-
-/*
-	if (pClassType->GetDestructor ())
-	{
-		switch (StorageKind)
-		{
-		case EStorage_Stack:
-			ASSERT (pScope);
-			pScope->AddToDestructList (*pResultValue);
-			break;
-
-		case EStorage_Static:
-			m_pModule->m_VariableMgr.AddToStaticDestructList (*pResultValue);
-			break;
-		}
-	} */
 
 bool
 CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
@@ -254,7 +262,7 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
 
-	AllocatePrimeGlobalVariable (pVariable);
+	AllocatePrimeStaticVariable (pVariable);
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 
@@ -275,7 +283,7 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 	if (pVariable->m_pType->GetTypeKind () == EType_Class &&
 		((CClassType*) pVariable->m_pType)->GetDestructor ())
 	{
-		AddToStaticDestructList (
+		AddToLazyStaticDestructList (
 			Stmt.m_pFlagVariable, 
 			((CClassType*) pVariable->m_pType)->GetDestructor (), 
 			pVariable
@@ -343,17 +351,29 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 CVariable*
 CVariableMgr::CreateScopeLevelVariable ()
 {
+	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+	
 	CVariable* pVariable = CreateVariable (
-		EStorage_Static, 
-		"ScopeLevel", 
-		"jnc.ScopeLevel", 
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
+		EStorage_Thread, 
+		"t_ScopeLevel", 
+		"jnc.t_ScopeLevel", 
+		pType
 		);	
 
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
 
-	AllocatePrimeGlobalVariable (pVariable);
+	llvm::GlobalVariable* pLlvmValue = new llvm::GlobalVariable (
+		*m_pModule->GetLlvmModule (),
+		pType->GetLlvmType (),
+		false,
+		llvm::GlobalVariable::ExternalLinkage,
+		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
+		pVariable->m_Tag.cc ()
+		);
+
+	pVariable->m_pLlvmAllocValue = pLlvmValue;
+	pVariable->m_pLlvmValue = pLlvmValue;
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 	return pVariable;

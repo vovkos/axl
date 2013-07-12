@@ -11,6 +11,7 @@ namespace axl {
 namespace jnc {
 
 class CScope;
+class CStructField;
 
 //.............................................................................
 
@@ -29,6 +30,7 @@ protected:
 	rtl::CString m_InitializerString;
 
 	CScope* m_pScope;
+	CStructField* m_pTlsField;
 	llvm::Value* m_pLlvmValue;
 	llvm::Value* m_pLlvmAllocValue;
 
@@ -84,6 +86,12 @@ public:
 	GetScopeLevel ()
 	{
 		return m_pScope ? m_pScope->GetLevel () : 0;
+	}
+
+	CStructField* 
+	GetTlsField ()
+	{
+		return m_pTlsField;
 	}
 
 	llvm::Value* 

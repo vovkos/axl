@@ -13,6 +13,7 @@ CVariable::CVariable ()
 	m_pType_i = NULL;
 	m_PtrTypeFlags = 0;
 	m_pScope = NULL;
+	m_pTlsField = NULL;
 	m_pLlvmValue = NULL;
 	m_pLlvmAllocValue = NULL;
 }

@@ -82,6 +82,13 @@ CDeclTypeCalc::CalcType (
 
 	m_TypeModifiers |= pDeclarator->GetTypeModifiers ();
 
+	if (m_TypeModifiers & ETypeModifierMask_Integer)
+	{
+		pType = GetIntegerType (pType);
+		if (!pType)
+			return NULL;
+	}
+	
 	if (m_TypeModifiers & ETypeModifier_Property)
 	{
 		pType = GetPropertyType (pType);

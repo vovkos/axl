@@ -21,6 +21,8 @@ StdLib_printf (
 
 	WriteOutput (Text, Length);
 
+	int x = errno;
+
 	return Length;
 }
 
@@ -37,6 +39,12 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 	createStatusBar();
 
 	readSettings();
+
+	connect(
+		this, SIGNAL (outputSignal (QString)),
+		output, SLOT (outputSlot (QString)), 
+		Qt::QueuedConnection
+		);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)
@@ -228,8 +236,19 @@ void MainWindow::writeStatus(const QString &text, int timeout)
 
 void MainWindow::writeOutput_va(const char* format, va_list va)
 {
-	output->appendFormat_va (format, va);
-	output->repaint ();
+	rtl::CString text;
+	text.Format_va (format, va);
+	QString string = QString::fromUtf8 (text, text.GetLength ());
+
+	if (QApplication::instance()->thread () == QThread::currentThread ())
+	{
+		output->appendString (string);
+		output->repaint ();
+	}
+	else
+	{
+		emit outputSignal (string);
+	}
 }
 
 void MainWindow::writeOutput(const char* format, ...)
@@ -484,7 +503,7 @@ MainWindow::run ()
 
 	// final gc run
 
-	runtime.m_GcHeap.DropGlobalRoots ();
+	runtime.m_GcHeap.DropStaticRoots ();
 	runtime.m_GcHeap.RunGc ();
 	runtime.m_GcHeap.Clear ();
 
@@ -502,7 +521,7 @@ MdiChild *MainWindow::createMdiChild()
 }
 
 MdiChild *MainWindow::activeMdiChild()
- {
+{
 	 QMdiSubWindow *activeSubWindow = mdiArea->activeSubWindow();
 		 
 	 if (!activeSubWindow && !mdiArea->subWindowList().empty())
@@ -512,7 +531,7 @@ MdiChild *MainWindow::activeMdiChild()
 		 return 0;
 
 	 return qobject_cast<MdiChild *>(activeSubWindow->widget());
- }
+}
 
 QMdiSubWindow *MainWindow::findMdiSubWindow(const QString &filePath)
 {

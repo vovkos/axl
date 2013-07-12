@@ -1186,7 +1186,7 @@ public:
 	}
 
 	void
-	ProcessStaticDestructList (const rtl::CConstListT <TStaticDestruct>& List);
+	ProcessLazyStaticDestructList (const rtl::CConstListT <TLazyStaticDestruct>& List);
 
 	void
 	NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List);

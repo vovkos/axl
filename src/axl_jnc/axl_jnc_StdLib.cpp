@@ -37,32 +37,9 @@ CStdLib::Export (
 			);
 	}
 
-
-/*	
-
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet,   (void*) MulticastSet);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet_w, (void*) MulticastSet_w);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet_t, (void*) MulticastSet_u);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSet_u, (void*) MulticastSet_u);
-
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastAdd,   (void*) MulticastAdd);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastAdd_w, (void*) MulticastAdd_w);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastAdd_t, (void*) MulticastAdd_u);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastAdd_u, (void*) MulticastAdd_u);
-
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastRemove,   (void*) MulticastRemove);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastRemove_w, (void*) MulticastRemove_w);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastRemove_t, (void*) MulticastRemove_u);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastRemove_u, (void*) MulticastRemove_u);
-
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSnapshot,   (void*) MulticastSnapshot);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSnapshot_w, (void*) MulticastSnapshot_w);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSnapshot_t, (void*) MulticastSnapshot_u);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_MulticastSnapshot_u, (void*) MulticastSnapshot_u);
-
-*/
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "GetCurrentThreadId", (void*) GetCurrentThreadId);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "CreateThread", (void*) CreateThread);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, "Sleep", (void*) Sleep);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, "RunGc", (void*) RunGc);
 }
 
@@ -300,6 +277,7 @@ CStdLib::CreateThread (jnc::TFunctionPtr Ptr)
 	return h != NULL;
 }
 
+
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 dword_t
@@ -315,6 +293,12 @@ CStdLib::CreateThread (jnc::TFunctionPtr Ptr)
 }
 
 #endif
+
+void
+CStdLib::Sleep (uint32_t MsCount)
+{
+	::Sleep (MsCount);
+}
 
 void*
 CStdLib::GetThreadVariableData ()

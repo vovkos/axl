@@ -125,6 +125,10 @@ public:
 	CreateThread (jnc::TFunctionPtr Ptr);
 
 	static
+	void
+	Sleep (uint32_t MsCount);
+
+	static
 	void*
 	GetThreadVariableData ();
 
