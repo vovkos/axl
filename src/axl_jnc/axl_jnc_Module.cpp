@@ -179,6 +179,15 @@ CModule::Compile ()
 		CreateDefaultDestructor ();
 	}
 
+	// step 6: deal with tls 
+
+	Result = 
+		m_VariableMgr.CreateTlsStructType () &&
+		m_FunctionMgr.InjectTlsPrologues ();
+
+	if (!Result)
+		return false;
+
 	return true;
 }
 

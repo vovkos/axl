@@ -17,29 +17,15 @@ ThreadProc ()
 }
 */
 
-int property sx_MyProp;
-
-int 
-sx_MyProp.get ()
-{
-	printf ("sx_MyProp.get ()\n");
-	return 100;
-}
-
-sx_MyProp.set (int x)
-{
-	printf ("sx_MyProp.set (%d)\n", x);
-}
+thread int t_TlsInt;
 
 int  
 main ()
 {
-	printf ("main ()\n");
+	printf ("main ()\n");	
 
-	int property thin* px = &sx_MyProp;
-
-	int x = px.get ();
-	px.set (200);
+	int x = t_TlsInt;
+	printf ("t_TlsInt = %d\n", x);	
 
 /*
 	CreateThread (ThreadProc);

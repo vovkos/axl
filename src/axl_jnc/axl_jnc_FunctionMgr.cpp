@@ -521,6 +521,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		return false;
 	}
 
+	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (pFunction->GetTlsVariableArray ());
 	m_pModule->m_NamespaceMgr.CloseScope (Pos);
 	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
@@ -583,6 +584,8 @@ CFunctionMgr::InternalEpilogue ()
 
 		m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 	}
+
+	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (pFunction->GetTlsVariableArray ());
 
 	RestoreEmissionContext ();
 }
@@ -784,6 +787,56 @@ CFunctionMgr::GetScheduleLauncherFunction (
 	return pLauncher;
 }
 
+bool
+CFunctionMgr::InjectTlsPrologues ()
+{
+	CFunction* pGetTls = GetStdFunction (EStdFunc_GetTls);
+
+	rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
+	for (; Function; Function++)
+	{
+		CFunction* pFunction = *Function;
+		CBasicBlock* pBlock = pFunction->GetEntryBlock ();
+		if (!pBlock)
+			continue;
+
+		rtl::CArrayT <TTlsVariable> TlsVariableArray = pFunction->GetTlsVariableArray ();
+		if (TlsVariableArray.IsEmpty ())
+			continue;
+
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+		m_pModule->m_LlvmBuilder.m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->begin ());
+
+		CValue TlsValue;
+		m_pModule->m_LlvmBuilder.CreateCall (
+			pGetTls,
+			pGetTls->GetType (),
+			&TlsValue
+			);
+
+		size_t Count = TlsVariableArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			CStructField* pField = TlsVariableArray [i].m_pVariable->GetTlsField ();
+			ASSERT (pField);
+
+			CValue PtrValue;
+			m_pModule->m_LlvmBuilder.CreateGep2 (TlsValue, pField->GetLlvmIndex (), NULL, &PtrValue);
+			
+			TlsVariableArray [i].m_pLlvmAlloca->replaceAllUsesWith (PtrValue.GetLlvmValue ());
+		}
+
+		// unfortunately, erasing could not be safely done inside the above loop (cause of InsertPoint)
+		// so just have a dedicated loop for erasing alloca's
+
+		Count = TlsVariableArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+			TlsVariableArray [i].m_pLlvmAlloca->eraseFromParent ();
+	}
+
+	return true;
+}
+
 class CJitEventListener: public llvm::JITEventListener
 {
 protected:
@@ -928,6 +981,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 
 	case EStdFunc_MarkGcRoot:
 		pFunction = CreateMarkGcRoot ();
+		break;
+
+	case EStdFunc_GetTls:
+		pFunction = CreateGetTls ();
 		break;
 
 	default:
@@ -1330,6 +1387,21 @@ CFunctionMgr::CreateMarkGcRoot ()
 		);
 
 	return pFunction;
+}
+
+// jnc.TTls*
+// jnc.GcTls ();
+
+CFunction*
+CFunctionMgr::CreateGetTls ()
+{
+	CType* pReturnType = m_pModule->m_VariableMgr.GetTlsStructType ()->GetDataPtrType (
+		EDataPtrType_Thin, 
+		EPtrTypeFlag_Unsafe
+		);
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
+	return CreateInternalFunction ("jnc.GetTls", pType);
 }
 
 //.............................................................................

@@ -130,7 +130,7 @@ public:
 
 	static
 	void*
-	GetThreadVariableData ();
+	GetTls ();
 
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)

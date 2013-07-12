@@ -748,7 +748,7 @@ CParser::CreateProperty (
 
 	if (NamespaceKind == ENamespace_PropertyTemplate)
 	{
-		err::SetFormatStringError ("property templates cannot have property memberts");
+		err::SetFormatStringError ("property templates cannot have property members");
 		return NULL;
 	}
 
@@ -932,6 +932,15 @@ CParser::DeclareData (
 			break;
 
 		case EStorage_Static:
+			break;
+
+		case EStorage_Thread:
+			if (!pConstructor->IsEmpty () || !pInitializer->IsEmpty ())
+			{
+				err::SetFormatStringError ("thread variables cannot have constructors or initializers");
+				return false;
+			}
+
 			break;
 
 		case EStorage_Heap:

@@ -26,9 +26,11 @@ class CLlvmBuilder
 protected:
 	CModule* m_pModule;
 
-	llvm::IRBuilder <> m_LlvmBuilder;
 	uint_t m_CommentMdKind;
 	uint_t m_EmptyLineMdKind;
+
+public:
+	llvm::IRBuilder <> m_LlvmBuilder;
 
 public:
 	CLlvmBuilder ();

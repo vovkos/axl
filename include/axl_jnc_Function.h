@@ -13,7 +13,7 @@
 #include "axl_jnc_Closure.h"
 #include "axl_jnc_UnOp.h"
 #include "axl_jnc_BinOp.h"
-#include "axl_llk_Ast.h"
+#include "axl_jnc_Variable.h"
 
 namespace axl {
 namespace jnc {
@@ -127,6 +127,8 @@ protected:
 
 	llvm::Function* m_pLlvmFunction;
 	
+	rtl::CArrayT <TTlsVariable> m_TlsVariableArray;
+
 	// native machine code
 
 	void* m_pfMachineCode;
@@ -289,6 +291,15 @@ public:
 	{
 		return m_MachineCodeSize;
 	}
+
+	rtl::CArrayT <TTlsVariable> 
+	GetTlsVariableArray ()
+	{
+		return m_TlsVariableArray;
+	}
+
+	void 
+	AddTlsVariable (CVariable* pVariable);
 
 	bool
 	IsOverloaded ()

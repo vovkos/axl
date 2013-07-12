@@ -105,6 +105,11 @@ enum EStdFunc
 
 	EStdFunc_MarkGcRoot,
 
+	// jnc.TTlsStruct*
+	// jnc.GetTls ();
+
+	EStdFunc_GetTls,
+
 	EStdFunc__Count
 };
 
@@ -294,6 +299,9 @@ public:
 	InternalEpilogue ();
 
 	bool
+	InjectTlsPrologues ();
+
+	bool
 	JitFunctions (llvm::ExecutionEngine* pExecutionEngine);
 
 	// std functions
@@ -391,6 +399,9 @@ protected:
 
 	CFunction*
 	CreateMarkGcRoot ();
+
+	CFunction*
+	CreateGetTls ();
 };
 
 //.............................................................................

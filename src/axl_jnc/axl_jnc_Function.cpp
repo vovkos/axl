@@ -182,6 +182,18 @@ CFunction::AddOverload (CFunction* pFunction)
 	return true;
 }
 
+void 
+CFunction::AddTlsVariable (CVariable* pVariable)
+{
+	llvm::AllocaInst* pLlvmAlloca = (llvm::AllocaInst*) pVariable->GetLlvmValue ();
+	ASSERT (pLlvmAlloca && llvm::isa <llvm::AllocaInst> (*pLlvmAlloca));
+
+	TTlsVariable TlsVariable;
+	TlsVariable.m_pVariable = pVariable;
+	TlsVariable.m_pLlvmAlloca = pLlvmAlloca;
+	m_TlsVariableArray.Append (TlsVariable);
+}
+
 CFunction*
 GetItemUnnamedMethod (
 	CModuleItem* pItem,

@@ -30,6 +30,7 @@ CVariableMgr::Clear ()
 
 	m_TlsVariableArray.Clear ();
 	m_TlsGcRootArray.Clear ();
+	m_pTlsStructType = NULL;
 
 	memset (m_StdVariableArray, 0, sizeof (m_StdVariableArray));
 }
@@ -62,7 +63,12 @@ CVariableMgr::GetStdVariable (EStdVariable Variable)
 	switch (Variable)
 	{
 	case EStdVariable_ScopeLevel:
-		pVariable = CreateScopeLevelVariable ();
+		pVariable = CreateVariable (
+			EStorage_Thread, 
+			"t_ScopeLevel", 
+			"jnc.t_ScopeLevel", 
+			m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
+			);	
 		break;
 
 	default:
@@ -182,6 +188,28 @@ CVariableMgr::CreateAlias (
 	m_AliasList.InsertTail (pAlias);
 
 	return pAlias;
+}
+
+bool 
+CVariableMgr::CreateTlsStructType ()
+{
+	bool Result;
+
+	CStructType* pType = m_pModule->m_TypeMgr.CreateStructType ("TTls", "jnc.TTls");
+
+	size_t Count = m_TlsVariableArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = m_TlsVariableArray [i];		
+		pVariable->m_pTlsField = pType->CreateField (pVariable->m_pType);
+	}
+
+	Result = pType->EnsureLayout ();
+	if (!Result)
+		return false;
+
+	m_pTlsStructType = pType;
+	return true;
 }
 
 bool
@@ -346,37 +374,48 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 	return true;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-CVariable*
-CVariableMgr::CreateScopeLevelVariable ()
+void
+CVariableMgr::AllocateTlsVariable (CVariable* pVariable)
 {
-	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-	
-	CVariable* pVariable = CreateVariable (
-		EStorage_Thread, 
-		"t_ScopeLevel", 
-		"jnc.t_ScopeLevel", 
-		pType
-		);	
+	ASSERT (m_pModule->m_FunctionMgr.GetCurrentFunction ());
+
+	// create alloca in function entry block
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
-	llvm::GlobalVariable* pLlvmValue = new llvm::GlobalVariable (
-		*m_pModule->GetLlvmModule (),
-		pType->GetLlvmType (),
-		false,
-		llvm::GlobalVariable::ExternalLinkage,
-		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
-		pVariable->m_Tag.cc ()
+	CValue PtrValue;
+	llvm::AllocaInst* pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (
+		pVariable->m_pType,
+		pVariable->m_QualifiedName,
+		NULL,
+		&PtrValue
 		);
 
-	pVariable->m_pLlvmAllocValue = pLlvmValue;
-	pVariable->m_pLlvmValue = pLlvmValue;
-
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
-	return pVariable;
+
+	pVariable->m_pLlvmAllocValue = pLlvmAlloca;
+	pVariable->m_pLlvmValue = pLlvmAlloca;	
+
+	pFunction->AddTlsVariable (pVariable);
+}
+
+void
+CVariableMgr::DeallocateTlsVariableArray (
+	const TTlsVariable* ppArray,
+	size_t Count
+	)
+{
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = ppArray [i].m_pVariable;
+		ASSERT (pVariable->m_pLlvmValue == ppArray [i].m_pLlvmAlloca);
+
+		pVariable->m_pLlvmValue = NULL;
+		pVariable->m_pLlvmAllocValue = NULL;
+	}
 }
 
 //.............................................................................

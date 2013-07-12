@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_Variable.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -25,6 +26,17 @@ CVariable::CalcLayout ()
 		m_pType = m_pType_i->GetActualType ();
 
 	return m_pType->EnsureLayout ();
+}
+
+llvm::Value* 
+CVariable::GetLlvmValue ()
+{
+	if (m_pLlvmValue)
+		return m_pLlvmValue;
+	
+	ASSERT (m_StorageKind == EStorage_Thread);
+	m_pModule->m_VariableMgr.AllocateTlsVariable (this);
+	return m_pLlvmValue;
 }
 
 //.............................................................................

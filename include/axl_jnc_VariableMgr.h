@@ -40,6 +40,7 @@ enum EStdVariable
 class CVariableMgr
 {
 	friend class CModule;
+	friend class CVariable;
 
 protected:
 	CModule* m_pModule;
@@ -61,6 +62,7 @@ protected:
 
 	rtl::CArrayT <CVariable*> m_TlsVariableArray;
 	rtl::CArrayT <CVariable*> m_TlsGcRootArray;
+	CStructType* m_pTlsStructType;
 
 	CVariable* m_StdVariableArray [EStdVariable__Count];
 
@@ -109,6 +111,25 @@ public:
 		return m_LazyStaticDestructList;
 	}
 
+	rtl::CArrayT <CVariable*> 
+	GetTlsVariableArray ()
+	{
+		return m_TlsVariableArray;
+	}
+
+	rtl::CArrayT <CVariable*> 
+	GetTlsGcRootArray ()
+	{
+		return m_TlsGcRootArray;
+	}
+
+	CStructType* 
+	GetTlsStructType ()
+	{
+		ASSERT (m_pTlsStructType);
+		return m_pTlsStructType;
+	}
+
 	void
 	AddToLazyStaticDestructList (
 		CVariable* pFlagVariable,
@@ -144,6 +165,9 @@ public:
 		rtl::CBoxListT <CToken>* pInitializer
 		);
 
+	bool 
+	CreateTlsStructType ();
+
 	bool
 	AllocatePrimeStaticVariable (CVariable* pVariable);
 
@@ -161,10 +185,22 @@ public:
 			AllocatePrimeInitializeNonStaticVariable (pVariable);
 	}
 
-protected:	
-	CVariable*
-	CreateScopeLevelVariable ();
+	void
+	AllocateTlsVariable (CVariable* pVariable);
 
+	void
+	DeallocateTlsVariableArray (
+		const TTlsVariable* ppArray,
+		size_t Count
+		);
+
+	void 
+	DeallocateTlsVariableArray (const rtl::CArrayT <TTlsVariable>& Array)
+	{
+		DeallocateTlsVariableArray (Array, Array.GetCount ());
+	}
+
+protected:	
 	bool
 	AllocatePrimeInitializeStaticVariable (CVariable* pVariable);
 

@@ -95,10 +95,7 @@ public:
 	}
 
 	llvm::Value* 
-	GetLlvmValue ()
-	{
-		return m_pLlvmValue;
-	}
+	GetLlvmValue ();
 
 	llvm::Value* 
 	GetLlvmAllocValue ()
@@ -110,6 +107,18 @@ protected:
 	virtual 
 	bool
 	CalcLayout ();
+};
+
+//.............................................................................
+
+// after compiling and generating LLVM IR, we need to calc layout of TLS struct type
+// then we can insert instructions to get TLS block in every function and then replace 
+// all alloca's temporarily representing TLS variables with GEPs into this TLS block
+
+struct TTlsVariable
+{
+	CVariable* m_pVariable;
+	llvm::AllocaInst* m_pLlvmAlloca;
 };
 
 //.............................................................................
