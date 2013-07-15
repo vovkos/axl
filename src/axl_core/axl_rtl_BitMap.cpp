@@ -247,7 +247,7 @@ FindBit (
 	{
 		size_t x = ~*p & GetHiBitmask (From);
 
-		if (!x)
+		if (x)
 			return i * _AXL_PTR_BITNESS + GetLoBitIdx (x);
 
 		for (i++, p++; i < PageCount; i++, p++)
