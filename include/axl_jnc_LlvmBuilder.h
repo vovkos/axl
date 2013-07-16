@@ -28,8 +28,6 @@ protected:
 
 	uint_t m_CommentMdKind;
 	uint_t m_EmptyLineMdKind;
-
-public:
 	llvm::IRBuilder <> m_LlvmBuilder;
 
 public:
@@ -68,8 +66,20 @@ public:
 
 	// branches
 
+	llvm::Instruction*
+	GetInsertPoint ()
+	{
+		return m_LlvmBuilder.GetInsertPoint ();
+	}
+
 	void
 	SetInsertPoint (CBasicBlock* pBlock);
+
+	void
+	SetInsertPoint (llvm::Instruction* pLlvmInst)
+	{
+		m_LlvmBuilder.SetInsertPoint (pLlvmInst);
+	}
 
 	llvm::UnreachableInst*
 	CreateUnreachable ()

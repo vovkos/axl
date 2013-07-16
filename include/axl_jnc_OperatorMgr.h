@@ -706,6 +706,9 @@ public:
 		return CallOperator (OpValue, &ArgList, pResultValue);
 	}
 
+	void
+	GcSafePoint ();
+
 	// closure operators
 
 	CType*

@@ -13,22 +13,23 @@ namespace mt {
 
 //.............................................................................
 
+enum EEvent
+{
+	EEvent_Synchronization = 0,
+	EEvent_Notification    = 1,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class CEvent
 {
-public:
-	enum EKind
-	{
-		EKind_Synchronization = 0,
-		EKind_Notification    = 1,
-	};
-
 public:
 	win::CEvent m_Event;
 
 public:
-	CEvent (EKind Kind = EKind_Synchronization)
+	CEvent (EEvent EventKind = EEvent_Synchronization)
 	{
-		Create (Kind);
+		Create (EventKind);
 	}
 
 	bool 
@@ -44,9 +45,9 @@ public:
 	}
 
 	bool 
-	Create (EKind Kind = EKind_Synchronization)
+	Create (EEvent EventKind = EEvent_Synchronization)
 	{
-		return m_Event.Create (NULL, Kind == EKind_Notification, false, NULL);
+		return m_Event.Create (NULL, EventKind == EEvent_Notification, false, NULL);
 	}
 
 	bool

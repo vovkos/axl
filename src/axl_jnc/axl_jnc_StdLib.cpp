@@ -23,6 +23,7 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFree, (void*) UHeapFree);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFreeClassPtr, (void*) UHeapFreeClassPtr);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
 
 	// implementation for thin and unsafe is the same
@@ -55,27 +56,27 @@ CStdLib::OnRuntimeError (
 
 	switch (Error)
 	{
-	case jnc::ERuntimeError_DataPtrOutOfRange:
+	case ERuntimeError_DataPtrOutOfRange:
 		pErrorString = "DATA_PTR_OOR";
 		break;
 
-	case jnc::ERuntimeError_ScopeMismatch:
+	case ERuntimeError_ScopeMismatch:
 		pErrorString = "SCOPE_MISMATCH";
 		break;
 
-	case jnc::ERuntimeError_NullClassPtr:
+	case ERuntimeError_NullClassPtr:
 		pErrorString = "NULL_CLASS_PTR";
 		break;
 
-	case jnc::ERuntimeError_NullFunctionPtr:
+	case ERuntimeError_NullFunctionPtr:
 		pErrorString = "NULL_FUNCTION_PTR";
 		break;
 
-	case jnc::ERuntimeError_NullPropertyPtr:
+	case ERuntimeError_NullPropertyPtr:
 		pErrorString = "NULL_PROPERTY_PTR";
 		break;
 
-	case jnc::ERuntimeError_AbstractFunction:
+	case ERuntimeError_AbstractFunction:
 		pErrorString = "ABSTRACT_FUNCTION";
 		break;
 
@@ -92,10 +93,10 @@ CStdLib::OnRuntimeError (
 		);
 }
 
-jnc::TInterface* 
+TInterface* 
 CStdLib::DynamicCastClassPtr (
-	jnc::TInterface* p,
-	jnc::CClassType* pType
+	TInterface* p,
+	CClassType* pType
 	)
 {
 	if (!p)
@@ -104,18 +105,18 @@ CStdLib::DynamicCastClassPtr (
 	if (p->m_pObject->m_pType->Cmp (pType) == 0)
 		return p;
 	
-	jnc::CBaseTypeCoord Coord;
+	CBaseTypeCoord Coord;
 	bool Result = p->m_pObject->m_pType->FindBaseTypeTraverse (pType, &Coord);
 	if (!Result)
 		return NULL;
 	
-	jnc::TInterface* p2 = (jnc::TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
+	TInterface* p2 = (TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
 	ASSERT (p2->m_pObject == p->m_pObject);
 	return p2;
 }
 
-jnc::TInterface* 
-CStdLib::StrengthenClassPtr (jnc::TInterface* p)
+TInterface* 
+CStdLib::StrengthenClassPtr (TInterface* p)
 {
 	if (!p)
 		return NULL;
@@ -135,15 +136,15 @@ CStdLib::StrengthenClassPtr (jnc::TInterface* p)
 }
 
 void
-CStdLib::MulticastClear (jnc::TMulticast* pMulticast)
+CStdLib::MulticastClear (TMulticast* pMulticast)
 {
 	return ((CMulticast*) pMulticast)->Clear ();
 }
 
 handle_t
 CStdLib::MulticastSet (
-	jnc::TMulticast* pMulticast,
-	jnc::TFunctionPtr Ptr
+	TMulticast* pMulticast,
+	TFunctionPtr Ptr
 	)
 {
 	return ((CMulticast*) pMulticast)->SetHandler (Ptr);
@@ -151,7 +152,7 @@ CStdLib::MulticastSet (
 
 handle_t
 CStdLib::MulticastSet_t (
-	jnc::TMulticast* pMulticast,
+	TMulticast* pMulticast,
 	void* pf
 	)
 {
@@ -160,8 +161,8 @@ CStdLib::MulticastSet_t (
 
 handle_t
 CStdLib::MulticastAdd (
-	jnc::TMulticast* pMulticast,
-	jnc::TFunctionPtr Ptr
+	TMulticast* pMulticast,
+	TFunctionPtr Ptr
 	)
 {
 	return ((CMulticast*) pMulticast)->AddHandler (Ptr);
@@ -169,16 +170,16 @@ CStdLib::MulticastAdd (
 
 handle_t
 CStdLib::MulticastAdd_t (
-	jnc::TMulticast* pMulticast,
+	TMulticast* pMulticast,
 	void* pf
 	)
 {
 	return ((CMulticast*) pMulticast)->AddHandler_t (pf);
 }
 
-jnc::TFunctionPtr
+TFunctionPtr
 CStdLib::MulticastRemove (
-	jnc::TMulticast* pMulticast,
+	TMulticast* pMulticast,
 	handle_t Handle
 	)
 {
@@ -187,30 +188,30 @@ CStdLib::MulticastRemove (
 
 void*
 CStdLib::MulticastRemove_t (
-	jnc::TMulticast* pMulticast,
+	TMulticast* pMulticast,
 	handle_t Handle
 	)
 {
 	return ((CMulticast*) pMulticast)->RemoveHandler_t (Handle);
 }
 
-jnc::TFunctionPtr
-CStdLib::MulticastGetSnapshot (jnc::TMulticast* pMulticast)
+TFunctionPtr
+CStdLib::MulticastGetSnapshot (TMulticast* pMulticast)
 {
 	return ((CMulticast*) pMulticast)->GetSnapshot ();
 }
 
 void*
-CStdLib::HeapAlloc (jnc::CType* pType)
+CStdLib::HeapAlloc (CType* pType)
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	return pRuntime->m_GcHeap.Allocate (pType);
+	return pRuntime->GcAllocate (pType);
 }
 
 void*
-CStdLib::UHeapAlloc (jnc::CType* pType)
+CStdLib::UHeapAlloc (CType* pType)
 {
 	void* p = malloc (pType->GetSize ());
 	memset (p, 0, pType->GetSize ());
@@ -224,18 +225,27 @@ CStdLib::UHeapFree (void* p)
 }
 
 void
-CStdLib::UHeapFreeClassPtr (jnc::TInterface* p)
+CStdLib::UHeapFreeClassPtr (TInterface* p)
 {
 	free (p->m_pObject);
 }
 
 void
-CStdLib::GcAddObject (jnc::TObject* p)
+CStdLib::GcAddObject (TObject* p)
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	pRuntime->m_GcHeap.AddObject (p);
+	pRuntime->GcAddObject (p);
+}
+
+void
+CStdLib::GcSafePoint ()
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	pRuntime->GcSafePoint ();
 }
 
 void
@@ -244,7 +254,7 @@ CStdLib::RunGc ()
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	pRuntime->m_GcHeap.RunGc ();
+	pRuntime->RunGc ();
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -255,29 +265,42 @@ CStdLib::GetCurrentThreadId ()
 	return ::GetCurrentThreadId ();
 }
 
+struct TThreadContext
+{
+	TFunctionPtr m_Ptr;
+	CRuntime* m_pRuntime;
+};
+
 DWORD 
 WINAPI
-CStdLib::ThreadProc (PVOID pContext)
+CStdLib::ThreadProc (PVOID pRawContext)
 {
-	jnc::TFunctionPtr* pPtr = (jnc::TFunctionPtr*) pContext;
-	jnc::TFunctionPtr Ptr = *pPtr;
-	AXL_MEM_DELETE (pPtr);
+	TThreadContext* pContext = (TThreadContext*) pRawContext;
+	TFunctionPtr Ptr = pContext->m_Ptr;
+	CRuntime* pRuntime = pContext->m_pRuntime;
+	AXL_MEM_DELETE (pContext);
 
-	((void (__cdecl*) (jnc::TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
+	CScopeThreadRuntime ScopeRuntime (pRuntime);
+	GetTlsMgr ()->GetTlsData (pRuntime); // register thread right away
+
+	((void (__cdecl*) (TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
 	return 0;
 }
 
 int
-CStdLib::CreateThread (jnc::TFunctionPtr Ptr)
+CStdLib::CreateThread (TFunctionPtr Ptr)
 {
-	jnc::TFunctionPtr* pPtr = AXL_MEM_NEW (jnc::TFunctionPtr);
-	*pPtr = Ptr;
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	TThreadContext* pContext = AXL_MEM_NEW (TThreadContext);
+	pContext->m_Ptr = Ptr;
+	pContext->m_pRuntime = pRuntime;
 
 	DWORD ThreadId;
-	HANDLE h = ::CreateThread (NULL, 0, CStdLib::ThreadProc, pPtr, 0, &ThreadId);
+	HANDLE h = ::CreateThread (NULL, 0, CStdLib::ThreadProc, pContext, 0, &ThreadId);
 	return h != NULL;
 }
-
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
@@ -288,7 +311,7 @@ CStdLib::GetCurrentThreadId ()
 }
 
 int
-CStdLib::CreateThread (jnc::TFunctionPtr Ptr)
+CStdLib::CreateThread (TFunctionPtr Ptr)
 {
 	return 0; // TODO
 }
@@ -307,7 +330,7 @@ CStdLib::GetTls ()
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	return GetTlsMgr ()->GetThreadVariableData (pRuntime->GetTlsSlot (), pRuntime->GetTlsSize ());
+	return pRuntime->GetTls ();
 }
 
 void

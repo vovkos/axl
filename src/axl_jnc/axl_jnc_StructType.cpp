@@ -161,6 +161,12 @@ CStructType::CalcLayout ()
 	{
 		CBaseTypeSlot* pSlot = *Slot;
 
+		if (pSlot->m_pType->GetTypeKind () == EType_Class)
+		{
+			err::SetFormatStringError ("'%s' cannot be a base type of a struct", pSlot->m_pType->GetTypeString ().cc ());
+			return false;
+		}
+
 		Result = pSlot->m_pType->EnsureLayout ();
 		if (!Result)
 			return false;
@@ -182,6 +188,12 @@ CStructType::CalcLayout ()
 	for (; Field; Field++)
 	{
 		CStructField* pField = *Field;
+
+		if (pField->m_pType->GetTypeKind () == EType_Class)
+		{
+			err::SetFormatStringError ("'%s' cannot be a field of a struct", pField->m_pType->GetTypeString ().cc ());
+			return false;
+		}
 
 		Result = pField->m_pType->EnsureLayout ();
 		if (!Result)

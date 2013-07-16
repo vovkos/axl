@@ -390,7 +390,7 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting...\n");
 
-	Result = runtime.Create (&module);
+	Result = runtime.Create (&module, 16, 1, 4);			
 	if (!Result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
@@ -470,9 +470,7 @@ MainWindow::run ()
 
 	jnc::CScopeThreadRuntime ScopeRuntime (&runtime);
 
-	// create a new heap 
-
-	runtime.m_GcHeap.Create (&runtime, 16, 1, 4);
+	runtime.Startup ();
 
 	// constructor
 
@@ -501,11 +499,7 @@ MainWindow::run ()
 			return false;
 	}
 
-	// final gc run
-
-	runtime.m_GcHeap.DropStaticRoots ();
-	runtime.m_GcHeap.RunGc ();
-	runtime.m_GcHeap.Clear ();
+	runtime.Shutdown ();
 
 	writeOutput ("Done (retval = %d).\n", ReturnValue);
 	return true;

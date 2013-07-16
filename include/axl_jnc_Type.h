@@ -17,7 +17,7 @@ class CPropertyType;
 class CDataPtrType;
 class CFunctionArg;
 class CValue;
-class CGcHeap;
+class CRuntime;
 
 struct TDataPtrTypeTuple;
 struct TSimplePropertyTypeTuple;
@@ -528,7 +528,7 @@ public:
 	virtual 
 	void
 	EnumGcRoots (
-		CGcHeap* pGcHeap,
+		CRuntime* pRuntime,
 		void* p
 		)
 	{

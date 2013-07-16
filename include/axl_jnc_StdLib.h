@@ -32,73 +32,73 @@ public:
 		);
 
 	static
-	jnc::TInterface* 
+	TInterface* 
 	DynamicCastClassPtr (
-		jnc::TInterface* p,
-		jnc::CClassType* pType
+		TInterface* p,
+		CClassType* pType
 		);
 
 	static
-	jnc::TInterface* 
-	StrengthenClassPtr (jnc::TInterface* p);
+	TInterface* 
+	StrengthenClassPtr (TInterface* p);
 
 	static
 	void
-	MulticastClear (jnc::TMulticast* pMulticast);
+	MulticastClear (TMulticast* pMulticast);
 
 	static
 	handle_t
 	MulticastSet (
-		jnc::TMulticast* pMulticast,
-		jnc::TFunctionPtr Ptr
+		TMulticast* pMulticast,
+		TFunctionPtr Ptr
 		);
 
 	static
 	handle_t
 	MulticastSet_t (
-		jnc::TMulticast* pMulticast,
+		TMulticast* pMulticast,
 		void* pf
 		);
 
 	static
 	handle_t
 	MulticastAdd (
-		jnc::TMulticast* pMulticast,
-		jnc::TFunctionPtr Ptr
+		TMulticast* pMulticast,
+		TFunctionPtr Ptr
 		);
 
 	static
 	handle_t
 	MulticastAdd_t (
-		jnc::TMulticast* pMulticast,
+		TMulticast* pMulticast,
 		void* pf
 		);
 
 	static
-	jnc::TFunctionPtr
+	TFunctionPtr
 	MulticastRemove (
-		jnc::TMulticast* pMulticast,
+		TMulticast* pMulticast,
 		handle_t Handle
 		);
 
 	static
 	void*
 	MulticastRemove_t (
-		jnc::TMulticast* pMulticast,
+		TMulticast* pMulticast,
 		handle_t Handle
 		);
 
 	static
-	jnc::TFunctionPtr
-	MulticastGetSnapshot (jnc::TMulticast* pMulticast);
+	TFunctionPtr
+	MulticastGetSnapshot (TMulticast* pMulticast);
 
 	static
 	void*
-	HeapAlloc (jnc::CType* pType);
+	HeapAlloc (CType* pType);
 
 	static
 	void*
-	UHeapAlloc (jnc::CType* pType);
+	UHeapAlloc (CType* pType);
 
 	static
 	void
@@ -106,11 +106,15 @@ public:
 
 	static
 	void
-	UHeapFreeClassPtr (jnc::TInterface* p);
+	UHeapFreeClassPtr (TInterface* p);
 
 	static
 	void
-	GcAddObject (jnc::TObject* p);
+	GcAddObject (TObject* p);
+
+	static
+	void
+	GcSafePoint ();
 
 	static
 	void
@@ -122,7 +126,7 @@ public:
 
 	static
 	int
-	CreateThread (jnc::TFunctionPtr Ptr);
+	CreateThread (TFunctionPtr Ptr);
 
 	static
 	void

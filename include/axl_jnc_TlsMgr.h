@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "axl_mem_Block.h"
 #include "axl_ref_RefCount.h"
 #include "axl_rtl_BitMap.h"
+#include "axl_rtl_List.h"
 
 namespace axl {
 namespace jnc {
@@ -17,17 +17,37 @@ struct TTlsPage;
 
 //.............................................................................
 
-class CTlsMgr
+struct TTlsData: public rtl::TListLink
+{
+	CRuntime* m_pRuntime;
+
+	// followed by TLS data
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CTlsDirectory: public ref::IRefCount
 {
 protected:
-	class CDirectory: public ref::IRefCount
-	{
-	public:
-		rtl::CArrayT <mem::TBlock> m_Table;
+	rtl::CArrayT <TTlsData*> m_Table;
 
-		~CDirectory ();
-	};
+public:
+	~CTlsDirectory ();
 
+	TTlsData*
+	FindTlsData (CRuntime* pRuntime);
+
+	TTlsData*
+	GetTlsData (CRuntime* pRuntime);
+
+	TTlsData*
+	NullifyTlsData (CRuntime* pRuntime);
+};
+
+//.............................................................................
+
+class CTlsMgr
+{
 protected:
 	uint_t m_MainThreadId;
 	size_t m_TlsSlot;
@@ -47,11 +67,14 @@ public:
 	void
 	DestroySlot (size_t Slot);
 
-	void*
-	GetThreadVariableData (
-		size_t Slot,
-		size_t Size
-		);
+	TTlsData*
+	FindTlsData (CRuntime* pRuntime);
+
+	TTlsData*
+	GetTlsData (CRuntime* pRuntime);
+
+	TTlsData*
+	NullifyTlsData (CRuntime* pRuntime);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -35,6 +35,13 @@ class CTypeMgr
 	friend class CModule;
 
 protected:
+	struct TGcShadowStackFrameTypePair
+	{
+		CStructType* m_pGcShadowStackFrameType;
+		CStructType* m_pGcShadowStackFrameMapType;
+	};
+
+protected:
 	CModule* m_pModule;
 
 	CType m_PrimitiveTypeArray [EType__PrimitiveTypeCount];
@@ -72,6 +79,7 @@ protected:
 	rtl::CStdListT <TPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
 
 	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
+	rtl::CArrayT <TGcShadowStackFrameTypePair> m_GcShadowStackFrameTypeArray;
 
 	size_t m_UnnamedEnumTypeCounter;
 	size_t m_UnnamedStructTypeCounter;
@@ -705,6 +713,12 @@ public:
 
 	CType*
 	GetCheckedPtrType (CType* pType);
+
+	CStructType*
+	GetGcShadowStackFrameMapType (size_t RootCount);
+
+	CStructType*
+	GetGcShadowStackFrameType (size_t RootCount);
 
 protected:
 	TSimplePropertyTypeTuple*

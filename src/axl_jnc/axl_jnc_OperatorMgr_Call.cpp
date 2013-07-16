@@ -529,6 +529,8 @@ COperatorMgr::CallImpl (
 		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pVariable);
 	}
 
+	GcSafePoint ();
+
 	m_pModule->m_LlvmBuilder.CreateCall (
 		PfnValue,
 		pFunctionType,
@@ -538,6 +540,19 @@ COperatorMgr::CallImpl (
 		);
 
 	return true;
+}
+
+void
+COperatorMgr::GcSafePoint ()
+{
+	CFunction* pGcSafePoint = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcSafePoint);
+
+	CValue ResultValue;
+	m_pModule->m_LlvmBuilder.CreateCall (
+		pGcSafePoint,
+		pGcSafePoint->GetType (),
+		&ResultValue
+		);
 }
 
 //.............................................................................

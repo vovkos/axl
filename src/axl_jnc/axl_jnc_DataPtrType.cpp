@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_DataPtrType.h"
-#include "axl_jnc_GcHeap.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -87,18 +87,18 @@ CDataPtrType::PrepareLlvmType ()
 
 void
 CDataPtrType::EnumGcRoots (
-	CGcHeap* pGcHeap,
+	CRuntime* pRuntime,
 	void* p
 	)
 {
 	ASSERT (m_PtrTypeKind == EDataPtrType_Normal);
 
 	TDataPtr* pPtr = (TDataPtr*) p;
-	if (pPtr->m_pRangeBegin >= pPtr->m_pRangeEnd || !pGcHeap->ShouldMark (pPtr->m_pRangeBegin))
+	if (pPtr->m_pRangeBegin >= pPtr->m_pRangeEnd || !pRuntime->ShouldMarkGcPtr (pPtr->m_pRangeBegin))
 		return;
 
 	size_t Size = (char*) pPtr->m_pRangeEnd - (char*) pPtr->m_pRangeBegin;
-	pGcHeap->MarkRange (pPtr->m_pRangeBegin, Size);
+	pRuntime->MarkGcRange (pPtr->m_pRangeBegin, Size);
 
 	if (m_pTargetType->GetFlags () & ETypeFlag_GcRoot)
 	{
@@ -109,7 +109,7 @@ CDataPtrType::EnumGcRoots (
 
 		char* p = (char*) pPtr->m_pRangeBegin;
 		for (size_t i = 0; i < Count; i++, p += ElementSize)
-			pGcHeap->AddRoot (p, m_pTargetType);
+			pRuntime->AddGcRoot (p, m_pTargetType);
 	}
 }
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_PropertyPtrType.h"
-#include "axl_jnc_GcHeap.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -103,25 +103,25 @@ CPropertyPtrType::PrepareLlvmType ()
 
 void
 CPropertyPtrType::EnumGcRoots (
-	CGcHeap* pGcHeap,
+	CRuntime* pRuntime,
 	void* p
 	)
 {
 	ASSERT (m_PtrTypeKind == EPropertyPtrType_Normal || EPropertyPtrType_Weak);
 
 	TPropertyPtr* pPtr = (TPropertyPtr*) p;
-	if (!pGcHeap->ShouldMark (pPtr->m_pClosure))
+	if (!pRuntime->ShouldMarkGcPtr (pPtr->m_pClosure))
 		return;
 
 	TObject* pObject = pPtr->m_pClosure->m_pObject;
 	
 	if (m_PtrTypeKind == EPropertyPtrType_Normal)
 	{
-		pGcHeap->MarkValue (pObject, pObject->m_pType);
+		pRuntime->MarkGcValue (pObject, pObject->m_pType);
 	}
 	else if (pObject->m_pType->GetClassTypeKind () != EClassType_PropertyClosure)
 	{
-		pGcHeap->MarkRange (pObject, pObject->m_pType->GetSize ());
+		pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ());
 	}
 	else
 	{
@@ -130,7 +130,7 @@ CPropertyPtrType::EnumGcRoots (
 		#pragma AXL_TODO ("special processing for weak property closure")
 		
 		// for now, keep everything strong
-		pGcHeap->MarkValue (pObject, pObject->m_pType);
+		pRuntime->MarkGcValue (pObject, pObject->m_pType);
 	}
 }
 

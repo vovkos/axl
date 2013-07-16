@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_TlsMgr.h"
+#include "axl_jnc_Runtime.h"
 #include "axl_mt_Thread.h"
 #include "axl_mt_TlsMgr.h"
 
@@ -8,18 +9,57 @@ namespace jnc {
 
 //.............................................................................
 
-CTlsMgr::CDirectory::~CDirectory ()
+CTlsDirectory::~CTlsDirectory ()
 {
 	size_t Count = m_Table.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		mem::TBlock* pBlock = &m_Table [i];
-		if (pBlock->m_p)
-			AXL_MEM_FREE (pBlock->m_p);
+		TTlsData* pTlsData = m_Table [i];
+		if (pTlsData)
+			pTlsData->m_pRuntime->DestroyTlsData (pTlsData);
 	}
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+TTlsData* 
+CTlsDirectory::FindTlsData (CRuntime* pRuntime)
+{
+	size_t Slot = pRuntime->GetTlsSlot ();
+	return Slot < m_Table.GetCount () ? m_Table [Slot] : NULL;
+}
+
+TTlsData* 
+CTlsDirectory::GetTlsData (CRuntime* pRuntime)
+{
+	size_t Slot = pRuntime->GetTlsSlot ();
+
+	if (Slot >= m_Table.GetCount ())
+		m_Table.SetCount (Slot + 1);
+
+	TTlsData* pTlsData = m_Table [Slot];
+	if (pTlsData)
+	{
+		ASSERT (pTlsData->m_pRuntime == pRuntime);
+		return pTlsData;
+	}
+
+	pTlsData = pRuntime->CreateTlsData ();
+	m_Table [Slot] = pTlsData;
+	return pTlsData;
+}
+
+TTlsData*
+CTlsDirectory::NullifyTlsData (CRuntime* pRuntime)
+{
+	size_t Slot = pRuntime->GetTlsSlot ();
+	if (Slot >= m_Table.GetCount ()) 
+		return NULL;
+	
+	TTlsData* pTlsData = m_Table [Slot];
+	m_Table [Slot] = NULL;
+	return pTlsData;
+}
+
+//.............................................................................
 
 CTlsMgr::CTlsMgr ()
 {
@@ -45,7 +85,7 @@ CTlsMgr::CreateSlot ()
 		Slot = m_SlotCount;
 	}
 
-	m_SlotMap.SetBit (Slot, true);
+	m_SlotMap.SetBitResize (Slot, true);
 	return Slot;
 }
 
@@ -58,32 +98,32 @@ CTlsMgr::DestroySlot (size_t Slot)
 	m_SlotMap.SetBit (Slot, false);
 }
 
-void*
-CTlsMgr::GetThreadVariableData (
-	size_t Slot,
-	size_t Size
-	)
+TTlsData*
+CTlsMgr::FindTlsData (CRuntime* pRuntime)
 {
-	CDirectory* pDirectory = (CDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
-	if (!pDirectory)
-	{
-		pDirectory = AXL_REF_NEW (CDirectory);
-		mt::GetTlsMgr ()->SetSlotValue (m_TlsSlot, pDirectory);
-	}	
+	CTlsDirectory* pDirectory = (CTlsDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
+	return pDirectory ? pDirectory->FindTlsData (pRuntime) : NULL;
+}
 
-	if (Slot >= pDirectory->m_Table.GetCount ())
-		pDirectory->m_Table.SetCount (Slot + 1);
+TTlsData*
+CTlsMgr::GetTlsData (CRuntime* pRuntime)
+{
+	CTlsDirectory* pDirectory = (CTlsDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
+	if (pDirectory)
+		return pDirectory->GetTlsData (pRuntime);
 
-	mem::TBlock* pBlock = &pDirectory->m_Table [Slot];
-	ASSERT (!pBlock->m_p || pBlock->m_Size == Size);
+	ref::CPtrT <CTlsDirectory> Directory = AXL_REF_NEW (CTlsDirectory);
+	mt::GetTlsMgr ()->SetSlotValue (m_TlsSlot, Directory);		
+	pDirectory = Directory;
 
-	if (!pBlock->m_p)
-	{
-		pBlock->m_p = AXL_MEM_ALLOC (Size);
-		pBlock->m_Size = Size;
-	}
+	return pDirectory->GetTlsData (pRuntime);
+}
 
-	return pBlock->m_p;
+TTlsData*
+CTlsMgr::NullifyTlsData (CRuntime* pRuntime)
+{
+	CTlsDirectory* pDirectory = (CTlsDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
+	return pDirectory ? pDirectory->NullifyTlsData (pRuntime) : NULL;
 }
 
 //.............................................................................

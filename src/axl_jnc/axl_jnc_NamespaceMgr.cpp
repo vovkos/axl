@@ -68,10 +68,15 @@ void
 CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 {
 	ASSERT (m_pCurrentScope);
-
+	
 	m_pCurrentScope->m_EndPos = Pos;
-	m_pModule->m_OperatorMgr.ProcessDestructArray (m_pCurrentScope->GetDestructArray ());
-	m_pModule->m_OperatorMgr.NullifyGcRootList (m_pCurrentScope->GetGcRootList ());
+	
+	if (!(m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Unreachable))
+	{
+		m_pModule->m_OperatorMgr.ProcessDestructArray (m_pCurrentScope->GetDestructArray ());
+		m_pModule->m_OperatorMgr.NullifyGcRootList (m_pCurrentScope->GetGcRootList ());
+	}
+
 	CloseNamespace ();
 }
 

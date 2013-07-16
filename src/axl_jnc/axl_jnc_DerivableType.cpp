@@ -684,7 +684,7 @@ CDerivableType::FindItemTraverseImpl (
 
 void
 CDerivableType::EnumGcRoots (
-	CGcHeap* pGcHeap,
+	CRuntime* pRuntime,
 	void* _p
 	)
 {
@@ -694,14 +694,14 @@ CDerivableType::EnumGcRoots (
 	for (size_t i = 0; i < Count; i++)
 	{
 		CBaseTypeSlot* pSlot = m_GcRootBaseTypeArray [i];
-		pSlot->GetType ()->EnumGcRoots (pGcHeap, p + pSlot->GetOffset ());
+		pSlot->GetType ()->EnumGcRoots (pRuntime, p + pSlot->GetOffset ());
 	}
 
 	Count = m_GcRootMemberFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = m_GcRootMemberFieldArray [i];
-		pField->GetType ()->EnumGcRoots (pGcHeap, p + pField->GetOffset ());
+		pField->GetType ()->EnumGcRoots (pRuntime, p + pField->GetOffset ());
 	}
 }
 

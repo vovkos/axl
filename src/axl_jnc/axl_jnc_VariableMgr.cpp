@@ -14,6 +14,7 @@ CVariableMgr::CVariableMgr ()
 	ASSERT (m_pModule);
 
 	memset (m_StdVariableArray, 0, sizeof (m_StdVariableArray));
+	CreateStdVariables ();
 }
 
 void
@@ -33,6 +34,14 @@ CVariableMgr::Clear ()
 	m_pTlsStructType = NULL;
 
 	memset (m_StdVariableArray, 0, sizeof (m_StdVariableArray));
+	CreateStdVariables ();
+}
+
+void
+CVariableMgr::CreateStdVariables ()
+{
+	for (size_t i = 0; i < EStdVariable__Count; i++)
+		GetStdVariable ((EStdVariable) i);
 }
 
 void
@@ -68,6 +77,15 @@ CVariableMgr::GetStdVariable (EStdVariable Variable)
 			"t_ScopeLevel", 
 			"jnc.t_ScopeLevel", 
 			m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
+			);	
+		break;
+
+	case EStdVariable_GcShadowStackTop:
+		pVariable = CreateVariable (
+			EStorage_Thread, 
+			"t_GcShadowStackTop", 
+			"jnc.t_GcShadowStackTop", 
+			m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)
 			);	
 		break;
 
@@ -123,6 +141,7 @@ CVariableMgr::CreateVariable (
 		break;
 
 	case EStorage_Stack:
+	case EStorage_Heap:
 		break;
 
 	default:

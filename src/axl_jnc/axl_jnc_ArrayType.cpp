@@ -63,7 +63,7 @@ CArrayType::CalcLayout ()
 
 void
 CArrayType::EnumGcRoots (
-	CGcHeap* pGcHeap,
+	CRuntime* pRuntime,
 	void* _p
 	)
 {
@@ -72,7 +72,7 @@ CArrayType::EnumGcRoots (
 	char* p = (char*) _p;
 	for (size_t i = 0; i < m_ElementCount; i++)
 	{
-		m_pElementType->EnumGcRoots (pGcHeap, p);
+		m_pElementType->EnumGcRoots (pRuntime, p);
 		p += m_pElementType->GetSize ();
 	}
 }

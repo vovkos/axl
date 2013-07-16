@@ -98,6 +98,11 @@ enum EStdFunc
 	EStdFunc_GcAddObject,
 
 	// void
+	// jnc.GetSafePoint ();
+
+	EStdFunc_GcSafePoint,
+
+	// void
 	// jnc.MarkGcRoot (
 	//		int8* p,
 	//		int8* pType
@@ -359,6 +364,9 @@ protected:
 	void
 	RestoreVTable ();
 
+	void
+	InjectTlsPrologue (CFunction* pFunction);
+
 	// LLVM code support functions
 
 	CFunction*
@@ -402,6 +410,9 @@ protected:
 
 	CFunction*
 	CreateGetTls ();
+
+	CFunction*
+	CreateGcSafePoint ();
 };
 
 //.............................................................................

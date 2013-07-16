@@ -140,25 +140,28 @@ CModule::Compile ()
 			return false;
 	}
 
-	// step 3: compile module constructor 
+	// step 3: ensure module constructor (if needed) and compile it before other functions
 
-	if (m_pConstructor)
+	if (!m_VariableMgr.GetStaticVariableArray ().IsEmpty ())
 	{
-		if (!m_pConstructor->HasBody ())
+		if (m_pConstructor)
 		{
-			err::SetFormatStringError ("unresolved module constructor");
-			return false;
-		}
+			if (!m_pConstructor->HasBody ())
+			{
+				err::SetFormatStringError ("unresolved module constructor");
+				return false;
+			}
 
-		Result = m_pConstructor->Compile ();
-		if (!Result)
-			return false;
-	}
-	else
-	{
-		Result = CreateDefaultConstructor ();
-		if (!Result)
-			return false;
+			Result = m_pConstructor->Compile ();
+			if (!Result)
+				return false;
+		}
+		else
+		{
+			Result = CreateDefaultConstructor ();
+			if (!Result)
+				return false;
+		}
 	}
 
 	// step 4: compile the rest 

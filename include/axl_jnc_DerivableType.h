@@ -316,7 +316,7 @@ public:
 	virtual 
 	void
 	EnumGcRoots (
-		CGcHeap* pGcHeap,
+		CRuntime* pRuntime,
 		void* p
 		);	
 

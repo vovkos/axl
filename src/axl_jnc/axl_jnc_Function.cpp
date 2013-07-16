@@ -108,6 +108,7 @@ CFunction::CFunction ()
 	m_pEntryBlock = NULL;
 	m_pScope = NULL;
 	m_pLlvmFunction = NULL;
+	m_pLlvmPostTlsPrologueInst = NULL;
 	m_pfMachineCode = NULL;
 	m_MachineCodeSize = 0;
 }

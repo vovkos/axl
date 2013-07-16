@@ -59,6 +59,7 @@ CTypeMgr::Clear ()
 	m_TypedefList.Clear ();
 
 	m_TypeMap.Clear ();
+	m_GcShadowStackFrameTypeArray.Clear ();
 
 	SetupAllPrimitiveTypes ();
 
@@ -1697,6 +1698,52 @@ CTypeMgr::GetCheckedPtrType (CType* pType)
 	}
 }
 
+CStructType*
+CTypeMgr::GetGcShadowStackFrameMapType (size_t RootCount)
+{
+	ASSERT (RootCount);
+
+	size_t Count = m_GcShadowStackFrameTypeArray.GetCount ();
+	if (RootCount >= Count)
+		m_GcShadowStackFrameTypeArray.SetCount (RootCount + 1);
+
+	TGcShadowStackFrameTypePair* pPair = &m_GcShadowStackFrameTypeArray [RootCount];
+	if (pPair->m_pGcShadowStackFrameMapType)
+		return pPair->m_pGcShadowStackFrameMapType;
+
+	CArrayType* pArrayType = GetArrayType (GetStdType (EStdType_BytePtr), RootCount);
+	CStructType* pType = CreateStructType ("TGcShadowStackFrameMap", "jnc.TGcShadowStackFrameMap");
+	pType->CreateField (GetPrimitiveType (EType_SizeT));
+	pType->CreateField (pArrayType);
+	pType->EnsureLayout ();
+	
+	pPair->m_pGcShadowStackFrameMapType = pType;
+	return pType;
+}
+
+CStructType*
+CTypeMgr::GetGcShadowStackFrameType (size_t RootCount)
+{
+	CStructType* pMapType = GetGcShadowStackFrameMapType (RootCount);
+
+	ASSERT (RootCount < m_GcShadowStackFrameTypeArray.GetCount ());
+
+	TGcShadowStackFrameTypePair* pPair = &m_GcShadowStackFrameTypeArray [RootCount];
+	if (pPair->m_pGcShadowStackFrameType)
+		return pPair->m_pGcShadowStackFrameType;
+
+	CStructType* pType = CreateStructType ("TGcShadowStackFrame", "jnc.TGcShadowStackFrame");
+
+	pType->CreateField (GetStdType (EStdType_BytePtr));
+	pType->CreateField (pMapType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->CreateField (GetArrayType (GetStdType (EStdType_BytePtr), RootCount));
+
+	pType->EnsureLayout ();
+	
+	pPair->m_pGcShadowStackFrameType = pType;
+	return pType;
+}
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 TSimplePropertyTypeTuple*
@@ -1823,8 +1870,7 @@ CTypeMgr::SetupPrimitiveType (
 CStructType*
 CTypeMgr::CreateObjectHdrType ()
 {
-	CStructType* pType = CreateUnnamedStructType ();
-	pType->m_Tag = "objhdr";
+	CStructType* pType = CreateStructType ("TObject", "jnc.TObject");
 	pType->CreateField (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
 	pType->CreateField (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
 	pType->CreateField (GetPrimitiveType (EType_Int_p)); // intptr_t m_Flags;
@@ -1847,8 +1893,7 @@ CTypeMgr::CreateObjectType ()
 CStructType*
 CTypeMgr::CreateAutoEvBindSiteType ()
 {
-	CStructType* pType = CreateUnnamedStructType ();
-	pType->m_Tag = "aevbindsite";
+	CStructType* pType = CreateStructType ("TAutoEvBindSite", "jnc.TAutoEvBindSite");
 	pType->CreateField (GetStdType (EStdType_SimpleEventPtr));
 	pType->CreateField (GetPrimitiveType (EType_Int_p));
 	pType->EnsureLayout ();
@@ -1858,7 +1903,7 @@ CTypeMgr::CreateAutoEvBindSiteType ()
 CClassType* 
 CTypeMgr::CreateISchedulerType ()
 {
-	CClassType* pType = CreateClassType ("IScheduler", "IScheduler");
+	CClassType* pType = CreateClassType ("IScheduler", "jnc.IScheduler");
 	CType* pReturnType = GetPrimitiveType (EType_Void);
 	CType* pArgType = ((CFunctionType*) GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType ();
 	CFunctionType* pScheduleType = GetFunctionType (pReturnType, &pArgType, 1);

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_ClassPtrType.h"
-#include "axl_jnc_GcHeap.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -79,20 +79,20 @@ CClassPtrType::PrepareLlvmType ()
 
 void
 CClassPtrType::EnumGcRoots (
-	CGcHeap* pGcHeap,
+	CRuntime* pRuntime,
 	void* p
 	)
 {
 	TInterface* pIface = *(TInterface**) p;
-	if (!pGcHeap->ShouldMark (pIface))
+	if (!pRuntime->ShouldMarkGcPtr (pIface))
 		return;
 
 	TObject* pObject = pIface->m_pObject;
 	
 	if (m_PtrTypeKind == EClassPtrType_Normal)
-		pGcHeap->MarkValue (pObject, pObject->m_pType);
+		pRuntime->MarkGcValue (pObject, pObject->m_pType);
 	else
-		pGcHeap->MarkRange (pObject, pObject->m_pType->GetSize ()); // actually can only keep headers. but whatever
+		pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ()); // actually can only keep headers. but whatever
 }
 
 //.............................................................................

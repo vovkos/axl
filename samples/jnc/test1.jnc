@@ -1,45 +1,30 @@
 //.............................................................................
 
-/*
-thread int t_TlsTest = 5;
+thread int t_TestInt;
 
-void
-ThreadProc ()
+class C1
 {
-	int Tid = GetCurrentThreadId ();
-	unsafe thin int* p = &t_TlsTest;
+	construct ()
+	{
+		printf ("C1.construct () { t_TestInt = %d }\n", t_TestInt);
+	}
 
-	printf ("+THREAD: TID = %x, t_TlsTest @%x = %d\n", Tid, p, t_TlsTest);
-
-	t_TlsTest *= 2;
-
-	printf ("-THREAD: TID = %x, t_TlsTest @%x = %d\n", Tid, p, t_TlsTest);
+	destruct ()
+	{
+		printf ("C1.destruct () { t_TestInt = %d }\n", t_TestInt);	
+	}
 }
-*/
 
-thread int t_TlsInt;
-
-int  
+int 
 main ()
 {
-	printf ("main ()\n");	
+	printf ("main ()\n");
 
-	int x = t_TlsInt;
-	printf ("t_TlsInt = %d\n", x);	
+	t_TestInt = 100;
 
-/*
-	CreateThread (ThreadProc);
-	Sleep (100);
+	C1 c;
 
-	CreateThread (ThreadProc);
-	Sleep (100);
-
-	CreateThread (ThreadProc);
-
-	Sleep (1000);
-*/
-
-	return 10;
+	return 10; 
 }
 
 //.............................................................................

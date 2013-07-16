@@ -206,6 +206,9 @@ protected:
 
 	bool
 	AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable);
+
+	void
+	CreateStdVariables ();
 };
 
 //.............................................................................

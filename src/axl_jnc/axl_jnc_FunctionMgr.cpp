@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "axl_jnc_FunctionMgr.h"
-#include "axl_jnc_GcStrategy.h"
+#include "axl_jnc_GcShadowStack.h"
 #include "axl_jnc_Module.h"
+
+// #define _AXL_JNC_NO_JIT
 
 namespace axl {
 namespace jnc {
@@ -16,7 +18,7 @@ CFunctionMgr::CFunctionMgr ()
 	m_pCurrentFunction = NULL;
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
 
-	mt::CallOnce (RegisterGcStrategy, 0);
+	mt::CallOnce (RegisterGcShadowStack, 0);
 }
 
 void
@@ -790,51 +792,74 @@ CFunctionMgr::GetScheduleLauncherFunction (
 bool
 CFunctionMgr::InjectTlsPrologues ()
 {
-	CFunction* pGetTls = GetStdFunction (EStdFunc_GetTls);
-
 	rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
 	for (; Function; Function++)
 	{
 		CFunction* pFunction = *Function;
-		CBasicBlock* pBlock = pFunction->GetEntryBlock ();
-		if (!pBlock)
-			continue;
+		if (pFunction->GetEntryBlock () && !pFunction->GetTlsVariableArray ().IsEmpty ())
+			InjectTlsPrologue (pFunction);
+	}
 
-		rtl::CArrayT <TTlsVariable> TlsVariableArray = pFunction->GetTlsVariableArray ();
-		if (TlsVariableArray.IsEmpty ())
-			continue;
-
-		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
-		m_pModule->m_LlvmBuilder.m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->begin ());
-
-		CValue TlsValue;
-		m_pModule->m_LlvmBuilder.CreateCall (
-			pGetTls,
-			pGetTls->GetType (),
-			&TlsValue
-			);
-
-		size_t Count = TlsVariableArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-		{
-			CStructField* pField = TlsVariableArray [i].m_pVariable->GetTlsField ();
-			ASSERT (pField);
-
-			CValue PtrValue;
-			m_pModule->m_LlvmBuilder.CreateGep2 (TlsValue, pField->GetLlvmIndex (), NULL, &PtrValue);
-			
-			TlsVariableArray [i].m_pLlvmAlloca->replaceAllUsesWith (PtrValue.GetLlvmValue ());
-		}
-
-		// unfortunately, erasing could not be safely done inside the above loop (cause of InsertPoint)
-		// so just have a dedicated loop for erasing alloca's
-
-		Count = TlsVariableArray.GetCount ();
-		for (size_t i = 0; i < Count; i++)
-			TlsVariableArray [i].m_pLlvmAlloca->eraseFromParent ();
+	rtl::CIteratorT <CThunkFunction> ThunkFunction = m_ThunkFunctionList.GetHead ();
+	for (; ThunkFunction; ThunkFunction++)
+	{
+		CFunction* pFunction = *ThunkFunction;
+		if (!pFunction->GetTlsVariableArray ().IsEmpty ())
+			InjectTlsPrologue (pFunction);
 	}
 
 	return true;
+}
+
+void
+CFunctionMgr::InjectTlsPrologue (CFunction* pFunction)
+{
+	CBasicBlock* pBlock = pFunction->GetEntryBlock ();
+	ASSERT (pBlock);
+
+	rtl::CArrayT <TTlsVariable> TlsVariableArray = pFunction->GetTlsVariableArray ();
+	ASSERT (!TlsVariableArray.IsEmpty ());
+		
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->begin ());
+
+	CFunction* pGetTls = GetStdFunction (EStdFunc_GetTls);
+
+	CValue TlsValue;
+	llvm::BasicBlock::iterator LlvmAnchor = m_pModule->m_LlvmBuilder.CreateCall (
+		pGetTls,
+		pGetTls->GetType (),
+		&TlsValue
+		);
+
+	// tls variables used in this function
+
+	size_t Count = TlsVariableArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = TlsVariableArray [i].m_pVariable->GetTlsField ();
+		ASSERT (pField);
+
+		CValue PtrValue;
+		m_pModule->m_LlvmBuilder.CreateGep2 (TlsValue, pField->GetLlvmIndex (), NULL, &PtrValue);
+			
+		TlsVariableArray [i].m_pLlvmAlloca->replaceAllUsesWith (PtrValue.GetLlvmValue ());
+	}
+
+	// unfortunately, erasing could not be safely done inside the above loop (cause of InsertPoint)
+	// so just have a dedicated loop for erasing alloca's
+
+	Count = TlsVariableArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+		TlsVariableArray [i].m_pLlvmAlloca->eraseFromParent ();
+
+	// skip all the gep's to get past tls prologue
+
+	LlvmAnchor++;
+	while (llvm::isa <llvm::GetElementPtrInst> (LlvmAnchor))
+		LlvmAnchor++;
+
+	pFunction->m_pLlvmPostTlsPrologueInst = LlvmAnchor;
 }
 
 class CJitEventListener: public llvm::JITEventListener
@@ -985,6 +1010,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 
 	case EStdFunc_GetTls:
 		pFunction = CreateGetTls ();
+		break;
+
+	case EStdFunc_GcSafePoint:
+		pFunction = CreateGcSafePoint ();
 		break;
 
 	default:
@@ -1402,6 +1431,16 @@ CFunctionMgr::CreateGetTls ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
 	return CreateInternalFunction ("jnc.GetTls", pType);
+}
+
+// jnc.TTls*
+// jnc.GcTls ();
+
+CFunction*
+CFunctionMgr::CreateGcSafePoint ()
+{
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
+	return CreateInternalFunction ("jnc.GcSafePoint", pType);
 }
 
 //.............................................................................

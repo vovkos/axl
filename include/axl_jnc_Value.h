@@ -748,6 +748,28 @@ struct TVariant
 
 //.............................................................................
 
+// structure backing up shadow stack frame map
+
+struct TGcShadowStackFrameMap 
+{
+	size_t m_Count;
+
+	// followed by array of type pointers
+};
+
+// structure backing up shadow stack frame
+
+struct TGcShadowStackFrame
+{
+	TGcShadowStackFrame* m_pNext;
+	TGcShadowStackFrameMap* m_pMap;
+
+	// followed by array of root pointers
+};
+
+
+//.............................................................................
+
 enum ERuntimeError
 {
 	ERuntimeError_ScopeMismatch,

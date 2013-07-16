@@ -623,16 +623,14 @@ CProperty::CreateVTablePtr ()
 		llvm::ArrayRef <llvm::Constant*> (LlvmVTable, Count)
 		);
 
-	rtl::CString VariableTag;
-	VariableTag.Format ("%s.vtbl", GetQualifiedName ().cc ());
 	llvm::GlobalVariable* pLlvmVTableVariable = new llvm::GlobalVariable (
-			*m_pModule->GetLlvmModule (),
-			pVTableStructType->GetLlvmType (),
-			false,
-			llvm::GlobalVariable::ExternalLinkage,
-			pLlvmVTableConstant,
-			(const char*) VariableTag
-			);
+		*m_pModule->GetLlvmModule (),
+		pVTableStructType->GetLlvmType (),
+		false,
+		llvm::GlobalVariable::InternalLinkage,
+		pLlvmVTableConstant,
+		(const char*) (m_Tag + ".vtbl")
+		);
 
 	m_VTablePtrValue.SetLlvmValue (
 		pLlvmVTableVariable, 

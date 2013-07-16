@@ -42,6 +42,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_PropertyVerifier.h
 	${AXL_INC_DIR}/axl_jnc_ThunkFunction.h
 	${AXL_INC_DIR}/axl_jnc_ThunkProperty.h
+	axl_jnc_GcShadowStack.h
 	)
 
 set (
@@ -54,6 +55,7 @@ set (
 	axl_jnc_PropertyVerifier.cpp
 	axl_jnc_ThunkFunction.cpp
 	axl_jnc_ThunkProperty.cpp
+	axl_jnc_GcShadowStack.cpp
 	)
 
 source_group (
@@ -392,67 +394,23 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# gc folder
-#
-
-set (
-	GC_H_LIST
-	${AXL_INC_DIR}/axl_jnc_GcHeap.h
-	axl_jnc_GcStrategy.h
-	)
-
-set (
-	GC_CPP_LIST
-	axl_jnc_GcHeap.cpp
-	axl_jnc_GcStrategy.cpp
-	)
-
-source_group (
-	gc
-	FILES 
-	${GC_H_LIST}
-	${GC_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# stdlib folder
-#
-
-set (
-	STDLIB_H_LIST
-	${AXL_INC_DIR}/axl_jnc_StdLib.h
-	axl_jnc_Multicast.h
-	)
-
-set (
-	STDLIB_CPP_LIST
-	axl_jnc_StdLib.cpp
-	axl_jnc_Multicast.cpp
-	)
-
-source_group (
-	stdlib 
-	FILES 
-	${STDLIB_H_LIST}
-	${STDLIB_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # runtime folder
 #
 
 set (
 	RUNTIME_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Runtime.h
+	${AXL_INC_DIR}/axl_jnc_StdLib.h
 	${AXL_INC_DIR}/axl_jnc_TlsMgr.h
+	axl_jnc_Multicast.h
 	)
 
 set (
 	RUNTIME_CPP_LIST
 	axl_jnc_Runtime.cpp
+	axl_jnc_StdLib.cpp
 	axl_jnc_TlsMgr.cpp
+	axl_jnc_Multicast.cpp
 	)
 
 source_group (
@@ -528,10 +486,6 @@ add_library (
 	${VALUE_CPP_LIST}
 	${VARIABLE_H_LIST}
 	${VARIABLE_CPP_LIST}
-	${GC_H_LIST}
-	${GC_CPP_LIST}
-	${STDLIB_H_LIST}
-	${STDLIB_CPP_LIST}
 	${RUNTIME_H_LIST}
 	${RUNTIME_CPP_LIST}
 	${PCH_H}
