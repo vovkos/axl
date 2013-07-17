@@ -419,25 +419,6 @@ source_group (
 	${RUNTIME_H_LIST}
 	${RUNTIME_CPP_LIST}
 	)
-	
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# jncc folder
-#
-
-set (JNCC_H_LIST)
-
-set (
-	JNCC_CPP_LIST
-	axl_jnc.cpp
-	)
-
-source_group (
-	jnc
-	FILES 
-	${JNCC_H_LIST}
-	${JNCC_CPP_LIST}
-	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -498,51 +479,6 @@ if (AXL_USE_PCH)
 		${PCH_H} 
 		${PCH_CPP}
 		)
-endif ()
-
-#..............................................................................
-#
-# axl_jncc command line compiler
-#
-
-if (AXL_BUILD_JNCC)
-
-	link_directories (${PATH_LLVM_LIB_DIR})
-
-	llvm_map_components_to_libraries (
-		LLVM_LIB_LIST 
-		jit 
-		native
-		MCDisassembler
-		)
-
-	add_executable (
-		axl_jncc
-		${JNCC_H_LIST}
-		${JNCC_CPP_LIST}
-		${PCH_H}
-		${PCH_CPP}
-		)
-
-	target_link_libraries (
-		axl_jncc
-		axl_jnc
-		axl_io
-		axl_core
-		axl_parse
-		${LLVM_LIB_LIST}
-		LLVMJIT
-		LLVMMCJIT
-		)
-
-	if (AXL_USE_PCH)
-		set_pch (
-			axl_jncc
-			${PCH_H} 
-			${PCH_CPP}
-			)
-	endif ()
-
 endif ()
 
 #..............................................................................

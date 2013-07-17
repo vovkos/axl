@@ -58,4 +58,22 @@
 
 //.............................................................................
 
+// AXL
+
+#include "../axl_jnc/axl_jnc_Parser.llk.h"
+#include "axl_jnc_StdLib.h"
+#include "axl_jnc_Disassembler.h"
+#include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
+#include "axl_io_FilePathUtils.h"
+#include "axl_io_File.h"
+#include "axl_io_MappedFile.h"
+#include "axl_err_Errno.h"
+#include "axl_mt_Thread.h"
+#include "axl_rtl_String.h"
+
+using namespace axl;
+
+//.............................................................................
+
 

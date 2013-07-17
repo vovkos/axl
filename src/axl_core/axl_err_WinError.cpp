@@ -9,9 +9,9 @@ namespace err {
 rtl::CString 
 CWinErrorProvider::GetErrorDescription (dword_t Error)
 {
-	char* pMessage = NULL;
+	wchar_t* pMessage = NULL;
 	
-	FormatMessage ( 
+	FormatMessageW ( 
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
 		FORMAT_MESSAGE_FROM_SYSTEM | 
 		FORMAT_MESSAGE_IGNORE_INSERTS |
@@ -19,7 +19,9 @@ CWinErrorProvider::GetErrorDescription (dword_t Error)
 		NULL,
 		Error,
 		MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR) &pMessage, 0, NULL
+		(LPWSTR) &pMessage, 
+		0, 
+		NULL
 		);
 
 	if (!pMessage)

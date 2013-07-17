@@ -286,6 +286,10 @@ pvoid_cast (T x)
 
 //.............................................................................
 
+// warning C4146: unary minus operator applied to unsigned type, result still unsigned
+// warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+// warning C4355: 'this' : used in base member initializer list
+
 #if (_AXL_CPP == AXL_CPP_MSC)
 #	pragma warning (disable: 4146)
 #	pragma warning (disable: 4267)

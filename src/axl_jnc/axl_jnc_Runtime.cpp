@@ -47,6 +47,10 @@ CRuntime::Create (
 	std::string errorString;
 	EngineBuilder.setErrorStr (&errorString);
 	EngineBuilder.setUseMCJIT(true);
+	
+#if (_AXL_CPU == AXL_CPU_X86)
+	EngineBuilder.setMArch ("x86");
+#endif
 
 	m_pLlvmExecutionEngine = EngineBuilder.create ();
 	if (!m_pLlvmExecutionEngine)
@@ -242,7 +246,7 @@ void
 CRuntime::RunGc ()
 {
 	printf ("Running GC...\n");
-
+	
 	WaitGcIdleAndLock ();
 
 	// 1) suspend all threads at safe points

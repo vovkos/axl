@@ -1,29 +1,9 @@
 //.............................................................................
 
-thread int t_TestInt;
-
-class C1
-{
-	construct ()
-	{
-		printf ("C1.construct () { t_TestInt = %d }\n", t_TestInt);
-	}
-
-	destruct ()
-	{
-		printf ("C1.destruct () { t_TestInt = %d }\n", t_TestInt);	
-	}
-}
-
 int 
 main ()
 {
 	printf ("main ()\n");
-
-	t_TestInt = 100;
-
-	C1 c;
-
 	return 10; 
 }
 

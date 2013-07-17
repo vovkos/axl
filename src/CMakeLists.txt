@@ -347,6 +347,10 @@ if (AXL_BUILD_JNC_LIB)
 	add_subdirectory (axl_jnc)
 endif ()
 
+if (AXL_BUILD_JNCC)
+	add_subdirectory (axl_jncc)
+endif ()
+
 if (AXL_BUILD_LOG_LIB)
 	add_subdirectory (axl_log)
 endif ()
