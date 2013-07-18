@@ -23,6 +23,12 @@ CParser::CParser ()
 	m_AutoEvBindSiteTotalCount = 0;
 	m_pConstructorType = NULL;
 	m_pConstructorProperty = NULL;
+
+
+	int n = 100;
+
+	int* p = new int [n];
+
 }
 
 bool
@@ -451,25 +457,25 @@ CParser::DeclareAlias (
 
 	if (pType->GetTypeKind () != EType_Void)
 	{
-		err::SetFormatStringError ("alias cannot have type");
+		err::SetFormatStringError ("'alias' cannot have type");
 		return false;
 	}
 
 	if (!pDeclarator->m_Constructor.IsEmpty ())
 	{
-		err::SetFormatStringError ("alias cannot have constructor");
+		err::SetFormatStringError ("'alias' cannot have constructor");
 		return false;
 	}
 
 	if (!pDeclarator->IsSimple ())
 	{
-		err::SetFormatStringError ("invalid alias declarator");
+		err::SetFormatStringError ("invalid 'alias' declarator");
 		return false;
 	}
 
 	if (pDeclarator->m_Initializer.IsEmpty ())
 	{
-		err::SetFormatStringError ("alias must have an initializer");
+		err::SetFormatStringError ("'alias' must have an initializer");
 		return false;
 	}
 
@@ -919,7 +925,11 @@ CParser::DeclareData (
 			pDataItem = pVariable;
 		}
 	}
-	else if (NamespaceKind != ENamespace_Type || m_StorageKind == EStorage_Static)
+	else if (
+		NamespaceKind != ENamespace_Type || 
+		m_StorageKind == EStorage_Static ||
+		m_StorageKind == EStorage_Thread
+		)
 	{
 		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 
@@ -936,9 +946,9 @@ CParser::DeclareData (
 			break;
 
 		case EStorage_Thread:
-			if (!pConstructor->IsEmpty () || !pInitializer->IsEmpty ())
+			if (!pScope && (!pConstructor->IsEmpty () || !pInitializer->IsEmpty ()))
 			{
-				err::SetFormatStringError ("thread variables cannot have constructors or initializers");
+				err::SetFormatStringError ("global 'thread' variables cannot have constructors or initializers");
 				return false;
 			}
 

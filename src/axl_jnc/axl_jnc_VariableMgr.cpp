@@ -302,6 +302,24 @@ CVariableMgr::InitializeGlobalStaticVariables ()
 }
 
 bool
+CVariableMgr::AllocatePrimeInitializeVariable (CVariable* pVariable)
+{
+	EStorage StorageKind = pVariable->m_StorageKind;
+
+	switch (StorageKind)
+	{
+	case EStorage_Static:
+		return AllocatePrimeInitializeStaticVariable (pVariable);
+
+	case EStorage_Thread:
+		return AllocatePrimeInitializeTlsVariable (pVariable);
+
+	default:
+		return AllocatePrimeInitializeNonStaticVariable (pVariable);
+	}	
+}
+
+bool
 CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 {
 	bool Result;
@@ -338,6 +356,32 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 			pVariable
 			);
 	}
+
+	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
+
+	return true;
+}
+
+bool
+CVariableMgr::AllocatePrimeInitializeTlsVariable (CVariable* pVariable)
+{
+	bool Result;
+
+	AllocateTlsVariable (pVariable);
+
+	// initialize within 'once' block
+
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, EStorage_Thread);
+	
+	CToken::CPos Pos;
+	
+	Result = 
+		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
+		m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
+
+	if (!Result)
+		return false;
 
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
 

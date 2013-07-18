@@ -17,9 +17,6 @@ COperatorMgr::Allocate (
 	CValue* pResultValue
 	)
 {
-	llvm::GlobalVariable* pLlvmGlobalVariable;
-	CFunction* pAlloc;
-
 	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 
 	bool IsNonConstSizeArray = SizeValue.GetValueKind () != EValue_Const;
@@ -33,34 +30,30 @@ COperatorMgr::Allocate (
 			pType = m_pModule->m_TypeMgr.GetArrayType (pType, ElementCount);
 		}
 	}
-	
+	else if (StorageKind != EStorage_Heap && StorageKind != EStorage_UHeap)
+	{
+		err::SetFormatStringError ("cannot create non-const-sized arrays with '%s new'", GetStorageKindString (StorageKind));
+		return false;
+	}
+
+	CVariable* pVariable;
+	CFunction* pAlloc;
+
 	CValue PtrValue;
 	switch (StorageKind)
 	{
 	case EStorage_Static:
-		if (IsNonConstSizeArray)
-		{
-			err::SetFormatStringError ("cannot create non-const-sized arrays with 'static new'");
-			return false;
-		}
+		pVariable = m_pModule->m_VariableMgr.CreateVariable (StorageKind, pTag, pTag, pType);
+		m_pModule->m_VariableMgr.AllocatePrimeStaticVariable (pVariable);
+		PtrValue.SetLlvmValue (pVariable->GetLlvmValue (), pPtrType);
+		break;
 
-		pLlvmGlobalVariable = m_pModule->m_VariableMgr.CreateLlvmGlobalVariable (pType, pTag);
-		PtrValue.SetLlvmValue (pLlvmGlobalVariable, pPtrType);
+	case EStorage_Thread:
+		pVariable = m_pModule->m_VariableMgr.CreateVariable (StorageKind, pTag, pTag, pType);
+		PtrValue.SetLlvmValue (pVariable->GetLlvmValue (), pPtrType);
 		break;
 
 	case EStorage_Stack:
-		if (IsNonConstSizeArray)
-		{
-			err::SetFormatStringError ("cannot create non-const-sized arrays with 'stack new'");
-			return false;
-		}
-
-		if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
-		{
-			err::SetFormatStringError ("'stack new' operator can only be called at local scope");
-			return false;
-		}
-
 		if (m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasJump)
 		{
 			err::SetFormatStringError ("'stack new' cannot be used in branched expression");

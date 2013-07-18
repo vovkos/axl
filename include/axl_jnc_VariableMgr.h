@@ -178,12 +178,7 @@ public:
 	InitializeGlobalStaticVariables ();
 
 	bool
-	AllocatePrimeInitializeVariable (CVariable* pVariable)
-	{
-		return pVariable->m_StorageKind == EStorage_Static ? 
-			AllocatePrimeInitializeStaticVariable (pVariable) :
-			AllocatePrimeInitializeNonStaticVariable (pVariable);
-	}
+	AllocatePrimeInitializeVariable (CVariable* pVariable);
 
 	void
 	AllocateTlsVariable (CVariable* pVariable);
@@ -215,6 +210,9 @@ public:
 protected:	
 	bool
 	AllocatePrimeInitializeStaticVariable (CVariable* pVariable);
+
+	bool
+	AllocatePrimeInitializeTlsVariable (CVariable* pVariable);
 
 	bool
 	AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable);

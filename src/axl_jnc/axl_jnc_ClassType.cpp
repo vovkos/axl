@@ -459,7 +459,7 @@ CClassType::CalcLayout ()
 			return false;
 	}
 
-	if (!(m_Flags & EClassTypeFlag_Abstract))
+	if (m_ClassTypeKind != EClassType_StdObject && !(m_Flags & EClassTypeFlag_Abstract))
 		CreatePrimer ();
 
 	m_Size = m_pClassStructType->GetSize ();
