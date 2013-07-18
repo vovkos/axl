@@ -159,11 +159,10 @@ CRuntime::Shutdown ()
 }
 
 void*
-CRuntime::GcAllocate (CType* pType)
+CRuntime::GcAllocate (size_t Size)
 {
 	ASSERT (m_pGcHeap);
 
-	size_t Size = pType->GetSize ();
 	size_t BlockCount = GetGcBlockCount (Size);
 
 	WaitGcIdleAndLock ();
@@ -185,7 +184,9 @@ CRuntime::GcAllocate (CType* pType)
 		}
 	}
 
-	return (char*) m_pGcHeap + Address * m_GcBlockSize;
+	void* p = (char*) m_pGcHeap + Address * m_GcBlockSize;
+	memset (p, 0, Size);
+	return p;
 }
 
 void

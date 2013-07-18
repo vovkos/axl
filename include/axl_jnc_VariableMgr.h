@@ -194,10 +194,22 @@ public:
 		size_t Count
 		);
 
+	void
+	RestoreTlsVariableArray (
+		const TTlsVariable* ppArray,
+		size_t Count
+		);
+
 	void 
 	DeallocateTlsVariableArray (const rtl::CArrayT <TTlsVariable>& Array)
 	{
 		DeallocateTlsVariableArray (Array, Array.GetCount ());
+	}
+
+	void 
+	RestoreTlsVariableArray (const rtl::CArrayT <TTlsVariable>& Array)
+	{
+		RestoreTlsVariableArray (Array, Array.GetCount ());
 	}
 
 protected:	

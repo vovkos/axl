@@ -29,7 +29,7 @@ CConstMgr::GetUnsafeThinDataPtrValidator ()
 	void* pRangeBegin = NULL;
 
 	m_UnsafeThinDataPtrValidator = AXL_REF_NEW (CThinDataPtrValidator);
-	m_UnsafeThinDataPtrValidator->m_Size = -1;
+	m_UnsafeThinDataPtrValidator->m_SizeValue.SetConstSizeT (-1);
 	m_UnsafeThinDataPtrValidator->m_ScopeValidatorValue.SetConstSizeT (0);
 	m_UnsafeThinDataPtrValidator->m_RangeBeginValue.CreateConst (&pRangeBegin, m_pModule->GetSimpleType (EStdType_BytePtr));
 

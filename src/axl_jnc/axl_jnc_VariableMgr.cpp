@@ -437,6 +437,22 @@ CVariableMgr::DeallocateTlsVariableArray (
 	}
 }
 
+void
+CVariableMgr::RestoreTlsVariableArray (
+	const TTlsVariable* ppArray,
+	size_t Count
+	)
+{
+	for (size_t i = 0; i < Count; i++)
+	{
+		CVariable* pVariable = ppArray [i].m_pVariable;
+		llvm::AllocaInst* pLlvmAlloca = ppArray [i].m_pLlvmAlloca;
+
+		pVariable->m_pLlvmValue = pLlvmAlloca;
+		pVariable->m_pLlvmAllocValue = pLlvmAlloca;
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

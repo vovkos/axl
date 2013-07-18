@@ -129,7 +129,7 @@ public:
 	GcSafePoint ();
 
 	void*
-	GcAllocate (CType* pType);
+	GcAllocate (size_t Size);
 
 	void
 	GcAddObject (TObject* pObject);

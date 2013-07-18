@@ -190,11 +190,7 @@ declaration_terminator <CTypeSpecifier* $pTypeSpecifier>
 
 // type names
 
-class
-{
-	CType* m_pType;
-} 
-type_name
+type_name_impl <CType** $ppType, CValue* $pCountValue>
 	local
 	{	
 		CDeclarator $Declarator;
@@ -206,8 +202,20 @@ type_name
 		declarator_prefix <&$Declarator>* 
 		declarator_suffix <&$Declarator>*
 			{
-				$.m_pType = $Declarator.CalcType ();
+				CType* pType = $Declarator.CalcType ($pCountValue);
+				if (!pType)
+					return false;
+
+				*$ppType = pType;
 			}
+	;
+
+class
+{
+	CType* m_pType;
+} 
+type_name
+	: type_name_impl <&$.m_pType, NULL>
 	;
 
 class

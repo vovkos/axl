@@ -328,7 +328,22 @@ public:
 	}
 
 	CType*
-	CalcType (uint_t* pFlags = NULL);
+	CalcType ()
+	{
+		return CalcTypeImpl (NULL, NULL);
+	}
+
+	CType*
+	CalcType (CValue* pElementCountValue)
+	{
+		return CalcTypeImpl (pElementCountValue, NULL);
+	}
+
+	CType*
+	CalcType (uint_t* pFlags)
+	{
+		return CalcTypeImpl (NULL, pFlags);
+	}
 
 	bool
 	AddName (rtl::CString Name);
@@ -365,6 +380,20 @@ public:
 
 	bool
 	AddBitFieldSuffix (size_t BitCount);
+
+	void
+	DeleteSuffix (CDeclSuffix* pSuffix)
+	{
+		m_SuffixList.Delete (pSuffix);
+	}
+
+protected:
+	CType*
+	CalcTypeImpl (
+		CValue* pElementCountValue,
+		uint_t* pFlags
+		);
+
 };
 
 //.............................................................................

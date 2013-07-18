@@ -12,6 +12,7 @@ bool
 COperatorMgr::Allocate (
 	EStorage StorageKind,
 	CType* pType,
+	const CValue& SizeValue,
 	const char* pTag,
 	CValue* pResultValue
 	)
@@ -20,17 +21,40 @@ COperatorMgr::Allocate (
 	CFunction* pAlloc;
 
 	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+
+	bool IsNonConstSizeArray = SizeValue.GetValueKind () != EValue_Const;
+	if (!IsNonConstSizeArray)
+	{
+		size_t Size = SizeValue.GetSizeT ();
+		if (Size != pType->GetSize ())
+		{
+			ASSERT (Size % pType->GetSize () == 0);
+			size_t ElementCount = Size / pType->GetSize ();
+			pType = m_pModule->m_TypeMgr.GetArrayType (pType, ElementCount);
+		}
+	}
 	
 	CValue PtrValue;
-
 	switch (StorageKind)
 	{
 	case EStorage_Static:
+		if (IsNonConstSizeArray)
+		{
+			err::SetFormatStringError ("cannot create non-const-sized arrays with 'static new'");
+			return false;
+		}
+
 		pLlvmGlobalVariable = m_pModule->m_VariableMgr.CreateLlvmGlobalVariable (pType, pTag);
 		PtrValue.SetLlvmValue (pLlvmGlobalVariable, pPtrType);
 		break;
 
 	case EStorage_Stack:
+		if (IsNonConstSizeArray)
+		{
+			err::SetFormatStringError ("cannot create non-const-sized arrays with 'stack new'");
+			return false;
+		}
+
 		if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
 		{
 			err::SetFormatStringError ("'stack new' operator can only be called at local scope");
@@ -52,31 +76,14 @@ COperatorMgr::Allocate (
 
 	case EStorage_Heap:
 		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAlloc);
-
-		m_pModule->m_LlvmBuilder.CreateCall (
-			pAlloc, 
-			pAlloc->GetType (), 
-			CValue (&pType, m_pModule->GetSimpleType (EStdType_BytePtr)), 
-			&PtrValue
-			);
-
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, &PtrValue);
-
+		m_pModule->m_LlvmBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
 		MarkGcRoot (PtrValue, pType);
 		break;
 
 
 	case EStorage_UHeap:
 		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
-
-		m_pModule->m_LlvmBuilder.CreateCall (
-			pAlloc, 
-			pAlloc->GetType (), 
-			CValue (&pType, m_pModule->GetSimpleType (EStdType_BytePtr)), 
-			&PtrValue
-			);
-
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, &PtrValue);
+		m_pModule->m_LlvmBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
 		break;
 
 	default:
@@ -84,7 +91,7 @@ COperatorMgr::Allocate (
 		return false;
 	}
 
-	*pResultValue = PtrValue;
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, pResultValue);
 	return true;
 }
 
@@ -93,6 +100,7 @@ COperatorMgr::Prime (
 	EStorage StorageKind,
 	const CValue& PtrValue,
 	CType* pType,
+	const CValue& ArraySizeValue,
 	CValue* pResultValue
 	)
 {
@@ -319,6 +327,26 @@ COperatorMgr::ParseInitializer (
 }
 
 bool
+COperatorMgr::ParseExpression (
+	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+	CValue* pResultValue
+	)
+{
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass2;
+
+	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
+
+	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, ExpressionTokenList);
+	if (!Result)
+		return false;
+
+	*pResultValue = Parser.m_ExpressionValue;
+	return true;
+}
+
+bool
 COperatorMgr::ParseConstExpression (
 	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 	CValue* pResultValue
@@ -384,6 +412,7 @@ bool
 COperatorMgr::NewOperator (
 	EStorage StorageKind,
 	CType* pType,
+	const CValue& ElementCountValue,
 	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
 	)
@@ -393,14 +422,25 @@ COperatorMgr::NewOperator (
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope);
 
+	CValue SizeValue (pType->GetSize (), GetSimpleType (m_pModule, EType_SizeT));
+	if (ElementCountValue)
+	{
+		Result = 
+			BinaryOperator (EBinOp_Mul, &SizeValue, ElementCountValue) &&
+			CastOperator (&SizeValue, EType_SizeT);
+		
+		if (!Result)
+			return false;
+	}
+
 	CValue PtrValue;
-	Result = Allocate (StorageKind, pType, "new", &PtrValue);
+	Result = Allocate (StorageKind, pType, SizeValue, "new", &PtrValue);
 	if (!Result)
 		return false;
 
 	if (StorageKind != EStorage_Static)
 		return 
-			Prime (StorageKind, PtrValue, pType, pResultValue) && 
+			Prime (StorageKind, PtrValue, pType, SizeValue, pResultValue) && 
 			Construct (*pResultValue, pArgList);
 
 	TOnceStmt Stmt;
@@ -412,7 +452,7 @@ COperatorMgr::NewOperator (
 		return false;
 
 	Result = 
-		Prime (StorageKind, PtrValue, pType, pResultValue) && 
+		Prime (StorageKind, PtrValue, pType, SizeValue, pResultValue) && 
 		Construct (*pResultValue, pArgList);
 
 	if (!Result)

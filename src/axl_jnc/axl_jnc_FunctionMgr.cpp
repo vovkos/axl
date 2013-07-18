@@ -35,9 +35,12 @@ CFunctionMgr::Clear ()
 	m_ThunkPropertyMap.Clear ();
 	m_ScheduleLauncherFunctionMap.Clear ();
 	m_EmissionContextStack.Clear ();
-	
-	ClearEmissionContext ();
+	m_ThisValue.Clear ();
+	m_ScopeLevelValue.Clear ();
+	m_VTablePtrPtrValue.Clear ();
+	m_VTablePtrValue.Clear ();
 
+	m_pCurrentFunction = NULL;
 	memset (m_StdFunctionArray, 0, sizeof (m_StdFunctionArray));
 }
 
@@ -123,7 +126,7 @@ CFunctionMgr::CreatePropertyTemplate ()
 }
 
 void
-CFunctionMgr::SaveEmissionContext ()
+CFunctionMgr::PushEmissionContext ()
 {
 	if (!m_pCurrentFunction)
 		return;
@@ -142,13 +145,31 @@ CFunctionMgr::SaveEmissionContext ()
 	pContext->m_ControlFlowMgrFlags = m_pModule->m_ControlFlowMgr.m_Flags;
 
 	m_EmissionContextStack.InsertTail (pContext);
+
+	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
+
+	m_pCurrentFunction = NULL;
+	m_ThisValue.Clear ();
+	m_ScopeLevelValue.Clear ();
+	m_VTablePtrPtrValue.Clear ();
+	m_VTablePtrValue.Clear ();
 }
 
 void
-CFunctionMgr::RestoreEmissionContext ()
+CFunctionMgr::PopEmissionContext ()
 {
+	ASSERT (m_pCurrentFunction);
+	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
+
 	if (m_EmissionContextStack.IsEmpty ())
+	{
+		m_pCurrentFunction = NULL;
+		m_ThisValue.Clear ();
+		m_ScopeLevelValue.Clear ();
+		m_VTablePtrPtrValue.Clear ();
+		m_VTablePtrValue.Clear ();
 		return;
+	}
 
 	TEmissionContext* pContext = m_EmissionContextStack.RemoveTail ();
 	m_pCurrentFunction = pContext->m_pCurrentFunction;
@@ -164,16 +185,8 @@ CFunctionMgr::RestoreEmissionContext ()
 	m_pModule->m_ControlFlowMgr.m_Flags = pContext->m_ControlFlowMgrFlags;
 
 	AXL_MEM_DELETE (pContext);
-}
 
-void
-CFunctionMgr::ClearEmissionContext ()
-{
-	m_pCurrentFunction = NULL;
-	m_ThisValue.Clear ();
-	m_ScopeLevelValue.Clear ();
-	m_VTablePtrPtrValue.Clear ();
-	m_VTablePtrValue.Clear ();
+	m_pModule->m_VariableMgr.RestoreTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 }
 
 void
@@ -239,8 +252,7 @@ CFunctionMgr::Prologue (
 {
 	bool Result;
 
-	SaveEmissionContext ();
-	ClearEmissionContext ();
+	PushEmissionContext ();
 
 	m_pCurrentFunction = pFunction;
 
@@ -523,11 +535,10 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		return false;
 	}
 
-	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (pFunction->GetTlsVariableArray ());
 	m_pModule->m_NamespaceMgr.CloseScope (Pos);
 	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
-	RestoreEmissionContext ();
+	PopEmissionContext ();
 	return true;
 }
 
@@ -538,8 +549,7 @@ CFunctionMgr::InternalPrologue (
 	size_t ArgCount
 	)
 {
-	SaveEmissionContext ();
-	ClearEmissionContext ();
+	PushEmissionContext ();
 	
 	m_pCurrentFunction = pFunction;
 
@@ -587,9 +597,7 @@ CFunctionMgr::InternalEpilogue ()
 		m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 	}
 
-	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (pFunction->GetTlsVariableArray ());
-
-	RestoreEmissionContext ();
+	PopEmissionContext ();
 }
 
 CFunction*
@@ -1304,7 +1312,7 @@ CFunctionMgr::CreateStrengthenClassPtr ()
 }
 
 // int8*
-// jnc.HeapAlloc (int8* pType);
+// jnc.HeapAlloc (size_t Size);
 
 CFunction*
 CFunctionMgr::CreateHeapAlloc ()
@@ -1313,7 +1321,7 @@ CFunctionMgr::CreateHeapAlloc ()
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
@@ -1321,7 +1329,7 @@ CFunctionMgr::CreateHeapAlloc ()
 }
 
 // int8*
-// jnc.UHeapAlloc (int8* pType);
+// jnc.UHeapAlloc (size_t Size);
 
 CFunction*
 CFunctionMgr::CreateUHeapAlloc ()
@@ -1330,7 +1338,7 @@ CFunctionMgr::CreateUHeapAlloc ()
 	
 	CType* ArgTypeArray [] =
 	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));

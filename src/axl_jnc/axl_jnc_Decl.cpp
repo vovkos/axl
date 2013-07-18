@@ -334,10 +334,13 @@ CDeclarator::AddBitFieldSuffix (size_t BitCount)
 }
 
 CType*
-CDeclarator::CalcType (uint_t* pFlags)
+CDeclarator::CalcTypeImpl (
+	CValue* pElementCountValue,
+	uint_t* pFlags
+	)
 {
 	CDeclTypeCalc TypeCalc;
-	return TypeCalc.CalcType (this, pFlags);
+	return TypeCalc.CalcType (this, pElementCountValue, pFlags);
 }
 
 //.............................................................................

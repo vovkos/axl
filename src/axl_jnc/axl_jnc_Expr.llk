@@ -601,7 +601,13 @@ unary_operator_expr <CValue* $pValue>
 	|	storage_specifier $s? EToken_New new_operator_type $t 
 			{
 				EStorage StorageKind = IsValidLocator ($s) ? $s.m_StorageKind : EStorage_Heap;
-				return m_pModule->m_OperatorMgr.NewOperator (StorageKind, $t.m_pType, &$t.m_ArgList, $pValue);
+				return m_pModule->m_OperatorMgr.NewOperator (
+					StorageKind, 
+					$t.m_pType, 
+					$t.m_ElementCountValue, 
+					&$t.m_ArgList, 
+					$pValue
+					);
 			}
 		new_operator_curly_initializer <$pValue>?
 	|	EToken_Delete unary_expr <$pValue> 
@@ -617,13 +623,11 @@ unary_operator_expr <CValue* $pValue>
 class
 {
 	CType* m_pType;
+	CValue m_ElementCountValue;
 	rtl::CBoxListT <CValue> m_ArgList;
 }
 new_operator_type
-	:	type_name
-			{
-				$.m_pType = $1.m_pType;
-			}
+	:	type_name_impl <&$.m_pType, &$.m_ElementCountValue>
 	|	resolver (type_name_w_constructor_rslv) priority (2) // set higher priority than type_specifier::qualified_name
 		qualified_type_name $t EToken_Construct? '(' expression_or_empty_list $a ')'
 			{

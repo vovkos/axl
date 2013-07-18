@@ -73,12 +73,12 @@ enum EStdFunc
 	EStdFunc_StrengthenClassPtr,
 
 	// int8*
-	// jnc.HeapAlloc (int8* pType);
+	// jnc.HeapAlloc (size_t Size);
 
 	EStdFunc_HeapAlloc,
 
 	// int8*
-	// jnc.UHeapAlloc (int8* pType);
+	// jnc.UHeapAlloc (size_t Size);
 
 	EStdFunc_UHeapAlloc,
 
@@ -350,13 +350,10 @@ protected:
 	CreateThisValue (const CValue& ThisArgValue);
 
 	void
-	SaveEmissionContext ();
+	PushEmissionContext ();
 
 	void
-	RestoreEmissionContext ();
-
-	void
-	ClearEmissionContext ();
+	PopEmissionContext ();
 
 	void
 	CutVTable (const CValue& ThisArgValue);

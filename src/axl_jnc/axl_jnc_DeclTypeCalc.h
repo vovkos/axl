@@ -36,6 +36,7 @@ public:
 	CType*
 	CalcType (
 		CDeclarator* pDeclarator,
+		CValue* pElementCountValue,
 		uint_t* pFlags
 		);
 

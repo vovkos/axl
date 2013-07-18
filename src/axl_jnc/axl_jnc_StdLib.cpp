@@ -202,19 +202,19 @@ CStdLib::MulticastGetSnapshot (TMulticast* pMulticast)
 }
 
 void*
-CStdLib::HeapAlloc (CType* pType)
+CStdLib::HeapAlloc (size_t Size)
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	return pRuntime->GcAllocate (pType);
+	return pRuntime->GcAllocate (Size);
 }
 
 void*
-CStdLib::UHeapAlloc (CType* pType)
+CStdLib::UHeapAlloc (size_t Size)
 {
-	void* p = malloc (pType->GetSize ());
-	memset (p, 0, pType->GetSize ());
+	void* p = malloc (Size);
+	memset (p, 0, Size);
 	return p;
 }
 

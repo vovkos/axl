@@ -116,7 +116,7 @@ COperatorMgr::GetThinDataPtrRange (
 	if (pValidator->GetValidatorKind () == EThinDataPtrValidator_Complex)
 	{
 		m_pModule->m_LlvmBuilder.CreateBitCast (pValidator->GetRangeBegin (), pBytePtrType, pRangeBeginValue);
-		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, pValidator->GetSize (), pBytePtrType, pRangeEndValue);
+		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, pValidator->GetSizeValue (), pBytePtrType, pRangeEndValue);
 		return;
 	}
 

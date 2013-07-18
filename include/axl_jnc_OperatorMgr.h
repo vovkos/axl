@@ -484,7 +484,28 @@ public:
 	Allocate (
 		EStorage StorageKind,
 		CType* pType,
+		const CValue& SizeValue,
 		const char* pTag,
+		CValue* pResultValue
+		);
+
+	bool
+	Allocate (
+		EStorage StorageKind,
+		CType* pType,
+		const char* pTag,
+		CValue* pResultValue
+		)
+	{
+		return Allocate (StorageKind, pType, CValue (pType->GetSize (), GetSimpleType (m_pModule, EType_SizeT)), pTag, pResultValue);
+	}
+
+	bool
+	Prime (
+		EStorage StorageKind,
+		const CValue& PtrValue,
+		CType* pType,
+		const CValue& SizeValue,
 		CValue* pResultValue
 		);
 
@@ -494,7 +515,10 @@ public:
 		const CValue& PtrValue,
 		CType* pType,
 		CValue* pResultValue
-		);
+		)
+	{
+		return Prime (StorageKind, PtrValue, pType, CValue (pType->GetSize (), GetSimpleType (m_pModule, EType_SizeT)), pResultValue);
+	}
 
 	bool
 	Construct (
@@ -507,6 +531,12 @@ public:
 		const CValue& Value,
 		const rtl::CConstBoxListT <CToken>& ConstructorTokenList,
 		const rtl::CConstBoxListT <CToken>& InitializerTokenList
+		);
+
+	bool
+	ParseExpression (
+		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+		CValue* pResultValue
 		);
 
 	bool
@@ -533,9 +563,42 @@ public:
 	NewOperator (
 		EStorage StorageKind,
 		CType* pType,
+		const CValue& ElementCountValue,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
 		);
+
+	bool
+	NewOperator (
+		EStorage StorageKind,
+		CType* pType,
+		CValue* pResultValue
+		)
+	{
+		return NewOperator (StorageKind, pType, CValue (), NULL, pResultValue);
+	}
+
+	bool
+	NewOperator (
+		EStorage StorageKind,
+		CType* pType,
+		const CValue& ElementCountValue,
+		CValue* pResultValue
+		)
+	{
+		return NewOperator (StorageKind, pType, ElementCountValue, NULL, pResultValue);
+	}
+
+	bool
+	NewOperator (
+		EStorage StorageKind,
+		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList,
+		CValue* pResultValue
+		)
+	{
+		return NewOperator (StorageKind, pType, CValue (), pArgList, pResultValue);
+	}
 
 	bool
 	DeleteOperator (const CValue& OpValue);

@@ -1,17 +1,12 @@
 //.............................................................................
 
-enum EConst
-{
-	Count = 40,
-}
-
-char g_a [EConst.Count];
-
 int 
 main ()
 {
 	printf ("main ()\n");
-	printf ("sizeof (g_a) = %d\n", sizeof (g_a));
+
+	int n = 100;
+ 	char* p = new char [n];
 
 	return 10; 
 }

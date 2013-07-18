@@ -16,14 +16,47 @@ CDeclTypeCalc::CDeclTypeCalc ()
 CType*
 CDeclTypeCalc::CalcType (
 	CDeclarator* pDeclarator,
+	CValue* pElementCountValue,
 	uint_t* pFlags
 	)
 {
+	bool Result;
+
 	CType* pType = pDeclarator->GetBaseType (); 
-	rtl::CArrayT <uint_t> PointerPrefixArray = pDeclarator->GetPointerPrefixArray ();
-	m_Suffix = pDeclarator->GetSuffixList ().GetTail ();
 	m_pModule = pType->GetModule ();
 
+	rtl::CConstListT <CDeclSuffix> SuffixList = pDeclarator->GetSuffixList ();
+	rtl::CIteratorT <CDeclSuffix> FirstSuffix = SuffixList.GetHead ();
+
+	// strip non-const array suffix if any
+
+	if (pElementCountValue &&		
+		FirstSuffix && 
+		FirstSuffix->GetSuffixKind () == EDeclSuffix_Array)
+	{
+		CDeclArraySuffix* pArraySuffix = (CDeclArraySuffix*) *FirstSuffix;
+		rtl::CBoxListT <CToken>* pElementCountInitializer = pArraySuffix->GetElementCountInitializer ();
+		
+		if (!pElementCountInitializer->IsEmpty ())
+		{
+			Result = m_pModule->m_OperatorMgr.ParseExpression (*pElementCountInitializer, pElementCountValue);
+			if (!Result)
+				return false;
+
+			pDeclarator->DeleteSuffix (pArraySuffix);			
+		}
+		else if (pArraySuffix->GetElementCount () != -1)
+		{
+			pElementCountValue->SetConstSizeT (pArraySuffix->GetElementCount ());
+			pDeclarator->DeleteSuffix (pArraySuffix);			
+		}
+	}
+
+	m_Suffix = SuffixList.GetTail ();
+
+	// pointer prefixes
+
+	rtl::CArrayT <uint_t> PointerPrefixArray = pDeclarator->GetPointerPrefixArray ();
 	size_t PointerPrefixCount = PointerPrefixArray.GetCount ();
 	for (size_t i = 0; i < PointerPrefixCount; i++)
 	{
@@ -294,8 +327,7 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 	}
 
 	rtl::CBoxListT <CToken>* pElementCountInitializer = pSuffix->GetElementCountInitializer ();
-
-	return pElementCountInitializer ? 
+	return !pElementCountInitializer->IsEmpty () ? 
 		m_pModule->m_TypeMgr.CreateArrayType (pElementType, pElementCountInitializer) : 
 		m_pModule->m_TypeMgr.GetArrayType (pElementType, pSuffix->GetElementCount ());
 }

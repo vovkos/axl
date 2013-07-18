@@ -449,8 +449,18 @@ public:
 	SetThinDataPtrValidator (		
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
-		size_t Size
+		const CValue& SizeValue
 		);
+
+	void
+	SetThinDataPtrValidator (		
+		const CValue& ScopeValidatorValue,
+		const CValue& RangeBeginValue,
+		size_t Size
+		)
+	{
+		SetThinDataPtrValidator (ScopeValidatorValue, RangeBeginValue, CValue (Size, EType_SizeT));
+	}
 
 	void
 	SetThinDataPtr (
@@ -480,11 +490,23 @@ public:
 		CDataPtrType* pType,
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
-		size_t Size
+		const CValue& SizeValue
 		)
 	{
 		SetLlvmValue (pLlvmValue, (CType*) pType);
-		SetThinDataPtrValidator (ScopeValidatorValue, RangeBeginValue, Size);
+		SetThinDataPtrValidator (ScopeValidatorValue, RangeBeginValue, SizeValue);
+	}
+
+	void
+	SetThinDataPtr (		
+		llvm::Value* pLlvmValue,
+		CDataPtrType* pType,
+		const CValue& ScopeValidatorValue,
+		const CValue& RangeBeginValue,
+		size_t Size
+		)
+	{
+		SetThinDataPtr (pLlvmValue, pType, ScopeValidatorValue, RangeBeginValue, CValue (Size, EType_SizeT));
 	}
 
 	bool

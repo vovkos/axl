@@ -94,11 +94,11 @@ public:
 
 	static
 	void*
-	HeapAlloc (CType* pType);
+	HeapAlloc (size_t Size);
 
 	static
 	void*
-	UHeapAlloc (CType* pType);
+	UHeapAlloc (size_t Size);
 
 	static
 	void

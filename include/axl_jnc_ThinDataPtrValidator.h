@@ -30,13 +30,12 @@ protected:
 
 	CValue m_ScopeValidatorValue;
 	CValue m_RangeBeginValue;
-	size_t m_Size;
+	CValue m_SizeValue;
 
 public:
 	CThinDataPtrValidator ()
 	{
 		m_ValidatorKind = EThinDataPtrValidator_Undefined;
-		m_Size = 0;
 	}
 
 	EThinDataPtrValidator 
@@ -57,10 +56,10 @@ public:
 		return m_RangeBeginValue;
 	}
 
-	size_t
-	GetSize ()
+	CValue
+	GetSizeValue ()
 	{
-		return m_Size;
+		return m_SizeValue;
 	}
 };
 
