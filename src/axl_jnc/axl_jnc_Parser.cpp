@@ -11,6 +11,7 @@ CParser::CParser ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	m_Stage = EStage_Pass1;
+	m_Flags = 0;
 	m_StructPackFactor = 8;
 	m_DefaultStructPackFactor = 8;
 	m_StorageKind = EStorage_Undefined;
@@ -1651,10 +1652,22 @@ CParser::LookupIdentifier (
 		return m_pModule->m_OperatorMgr.EvaluateAlias (((CAlias*) pItem)->GetInitializer (), pValue);
 
 	case EModuleItem_Variable:
+		if (m_Flags & EFlag_ConstExpression)
+		{
+			err::SetFormatStringError ("variable '%s' cannot be used in const expression", Name.cc ());
+			return false;
+		}
+
 		pValue->SetVariable ((CVariable*) pItem);
 		break;
 
 	case EModuleItem_Function:
+		if (m_Flags & EFlag_ConstExpression)
+		{
+			err::SetFormatStringError ("function '%s' cannot be used in const expression", Name.cc ());
+			return false;
+		}
+
 		pValue->SetFunction ((CFunction*) pItem);
 
 		if (((CFunction*) pItem)->IsMember ())
@@ -1667,6 +1680,12 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_Property:
+		if (m_Flags & EFlag_ConstExpression)
+		{
+			err::SetFormatStringError ("property '%s' cannot be used in const expression", Name.cc ());
+			return false;
+		}
+
 		pValue->SetProperty ((CProperty*) pItem);
 
 		if (((CProperty*) pItem)->IsMember ())
@@ -1686,6 +1705,12 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_StructField:
+		if (m_Flags & EFlag_ConstExpression)
+		{
+			err::SetFormatStringError ("field '%s' cannot be used in const expression", Name.cc ());
+			return false;
+		}
+
 		ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 		if (!ThisValue)
 		{

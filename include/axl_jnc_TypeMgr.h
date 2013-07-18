@@ -269,6 +269,12 @@ public:
 		);
 
 	CArrayType* 
+	CreateArrayType (
+		CType* pElementType,
+		rtl::CBoxListT <CToken>* pElementCountInitializer
+		);
+
+	CArrayType* 
 	GetArrayType (
 		CType* pElementType,
 		size_t ElementCount

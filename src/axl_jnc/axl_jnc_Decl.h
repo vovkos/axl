@@ -109,6 +109,7 @@ class CDeclArraySuffix: public CDeclSuffix
 
 protected:
 	size_t m_ElementCount;
+	rtl::CBoxListT <CToken> m_ElementCountInitializer;
 
 public:
 	CDeclArraySuffix ()
@@ -121,6 +122,12 @@ public:
 	GetElementCount ()
 	{
 		return m_ElementCount;
+	}
+
+	rtl::CBoxListT <CToken>*
+	GetElementCountInitializer ()
+	{
+		return &m_ElementCountInitializer;
 	}
 };
 
@@ -346,6 +353,9 @@ public:
 
 	void
 	AddPointerPrefix ();
+
+	CDeclArraySuffix*
+	AddArraySuffix (rtl::CBoxListT <CToken>* pElementCountInitializer);
 
 	CDeclArraySuffix*
 	AddArraySuffix (size_t ElementCount);

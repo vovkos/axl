@@ -20,6 +20,8 @@ protected:
 	CImportType* m_pElementType_i;
 	CType* m_pRootType;
 	size_t m_ElementCount;
+	
+	rtl::CBoxListT <CToken> m_ElementCountInitializer;
 
 public:
 	CArrayType ();
@@ -46,6 +48,12 @@ public:
 	GetElementCount ()
 	{
 		return m_ElementCount;
+	}
+
+	rtl::CConstBoxListT <CToken> 
+	GetElementCountInitializer ()
+	{
+		return m_ElementCountInitializer;
 	}
 
 	static
@@ -94,7 +102,7 @@ IsAutoSizeArrayType (CType* pType)
 {
 	return 
 		pType->GetTypeKind () == EType_Array &&
-		((CArrayType*) pType)->GetElementCount () == 0;
+		((CArrayType*) pType)->GetElementCount () == -1;
 }
 
 inline

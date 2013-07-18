@@ -327,6 +327,7 @@ COperatorMgr::ParseConstExpression (
 	CParser Parser;
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
+	Parser.m_Flags |= CParser::EFlag_ConstExpression;
 
 	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
 
@@ -334,12 +335,7 @@ COperatorMgr::ParseConstExpression (
 	if (!Result)
 		return false;
 
-	if (Parser.m_ExpressionValue.GetValueKind () != EValue_Const)
-	{
-		err::SetFormatStringError ("expression is not constant");
-		return false;
-	}
-
+	ASSERT (Parser.m_ExpressionValue.GetValueKind () == EValue_Const);
 	*pResultValue = Parser.m_ExpressionValue;
 	return true;
 }
@@ -361,6 +357,7 @@ COperatorMgr::ParseConstIntegerExpression (
 		return false;
 	}
 	
+	*pInteger = 0;
 	memcpy (pInteger, Value.GetConstData (), Value.GetType ()->GetSize ());
 	return true;
 }

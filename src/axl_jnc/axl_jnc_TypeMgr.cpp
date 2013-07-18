@@ -271,6 +271,41 @@ CTypeMgr::GetBitFieldType (
 }
 
 CArrayType* 
+CTypeMgr::CreateArrayType (
+	CType* pElementType,
+	rtl::CBoxListT <CToken>* pElementCountInitializer
+	)
+{
+	CType* pRootType = pElementType->m_TypeKind == EType_Array ? 
+		((CArrayType*) pElementType)->m_pRootType : 
+		pElementType;
+
+	CArrayType* pType = AXL_MEM_NEW (CArrayType);
+	pType->m_pModule = m_pModule;
+	pType->m_pElementType = pElementType;
+	pType->m_pRootType = pRootType;
+	pType->m_ElementCountInitializer.TakeOver (pElementCountInitializer);
+
+	m_ArrayTypeList.InsertTail (pType);
+	
+	if (pElementType->GetTypeKindFlags () & ETypeKindFlag_Import)
+		pType->m_pElementType_i = (CImportType*) pElementType;
+
+	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
+	{
+		m_pModule->MarkForLayout (pType);
+	}
+	else
+	{
+		bool Result = pType->EnsureLayout ();
+		if (!Result)
+			return NULL;
+	}
+
+	return pType;
+}
+
+CArrayType* 
 CTypeMgr::GetArrayType (
 	CType* pElementType,
 	size_t ElementCount

@@ -295,6 +295,15 @@ CDeclarator::AddPointerPrefix ()
 }
 
 CDeclArraySuffix*
+CDeclarator::AddArraySuffix (rtl::CBoxListT <CToken>* pElementCountInitializer)
+{
+	CDeclArraySuffix* pArraySuffix = AXL_MEM_NEW (CDeclArraySuffix);
+	pArraySuffix->m_ElementCountInitializer.TakeOver (pElementCountInitializer);
+	m_SuffixList.InsertTail (pArraySuffix);
+	return pArraySuffix;
+}
+
+CDeclArraySuffix*
 CDeclarator::AddArraySuffix (size_t ElementCount)
 {
 	CDeclArraySuffix* pArraySuffix = AXL_MEM_NEW (CDeclArraySuffix);

@@ -1,9 +1,18 @@
 //.............................................................................
 
+enum EConst
+{
+	Count = 40,
+}
+
+char g_a [EConst.Count];
+
 int 
 main ()
 {
 	printf ("main ()\n");
+	printf ("sizeof (g_a) = %d\n", sizeof (g_a));
+
 	return 10; 
 }
 
@@ -13,7 +22,7 @@ main ()
 
 int
 printf (
-	unsafe thin const char* pFormat,
+	unsafe const thin char* pFormat,
 	unsafe ...
 	);
 

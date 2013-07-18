@@ -308,13 +308,17 @@ declarator_suffix <CDeclarator* $pDeclarator>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 array_suffix <CDeclarator* $pDeclarator>
-	:	'[' EToken_Integer ']'
+	:	'[' expression_pass1 ']'
+			{
+				$pDeclarator->AddArraySuffix (&$2.m_TokenList);
+			}
+	|	'[' EToken_Integer ']' // avoid reparsing where possible
 			{
 				$pDeclarator->AddArraySuffix ($2.m_Data.m_Integer);
 			}
 	|	'[' ']'
 			{
-				$pDeclarator->AddArraySuffix (0);
+				$pDeclarator->AddArraySuffix (-1);
 			}
 	;
 

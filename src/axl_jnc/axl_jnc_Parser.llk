@@ -41,6 +41,11 @@ Members
 		EStage_AutoEvScan, // scan autoev body to build bind site map (after linkage but before calclayout)
 	};
 
+	enum EFlag
+	{
+		EFlag_ConstExpression = 0x01,
+	};
+
 	enum EAssign
 	{
 		EAssign_Normal,
@@ -57,6 +62,7 @@ Members
 
 	CModule* m_pModule;
 	EStage m_Stage;
+	uint_t m_Flags;
 	size_t m_StructPackFactor;
 	size_t m_DefaultStructPackFactor;	
 	EStorage m_StorageKind;

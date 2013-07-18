@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_ArrayType.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -56,8 +57,21 @@ CArrayType::CalcLayout ()
 	else if (RootTypeFlags & ETypeFlag_GcRoot)
 		m_Flags |= ETypeFlag_GcRoot;
 
-	m_Size = m_pElementType->GetSize () * m_ElementCount;
 	m_AlignFactor = m_pElementType->GetAlignFactor ();
+
+	// calculate size
+
+	if (!m_ElementCountInitializer.IsEmpty ())
+	{
+		intptr_t Value = 0;
+		Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (m_ElementCountInitializer, &Value);
+		if (!Result)
+			return false;
+
+		m_ElementCount = Value;
+	}
+
+	m_Size = m_pElementType->GetSize () * m_ElementCount;
 	return true;
 }
 

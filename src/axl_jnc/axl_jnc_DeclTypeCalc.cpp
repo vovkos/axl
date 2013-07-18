@@ -293,7 +293,11 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 		}
 	}
 
-	return m_pModule->m_TypeMgr.GetArrayType (pElementType, pSuffix->GetElementCount ());
+	rtl::CBoxListT <CToken>* pElementCountInitializer = pSuffix->GetElementCountInitializer ();
+
+	return pElementCountInitializer ? 
+		m_pModule->m_TypeMgr.CreateArrayType (pElementType, pElementCountInitializer) : 
+		m_pModule->m_TypeMgr.GetArrayType (pElementType, pSuffix->GetElementCount ());
 }
 
 CType*
