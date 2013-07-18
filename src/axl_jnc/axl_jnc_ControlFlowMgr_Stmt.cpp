@@ -310,24 +310,40 @@ CControlFlowMgr::ForStmt_PostBody (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+bool
+CControlFlowMgr::OnceStmt_Create (
+	TOnceStmt* pStmt,
+	EStorage StorageKind
+	)
+{
+	CVariable* pFlagVariable;
+
+	if (StorageKind != EStorage_Static && StorageKind != EStorage_Thread)
+	{
+		err::SetFormatStringError ("'%s once' is illegal (only 'static' or 'thread' is allowed)", GetStorageKindString (StorageKind));
+		return false;
+	}
+
+	pFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable (StorageKind);
+
+	if (StorageKind == EStorage_Static)
+	{
+		CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
+		m_pModule->m_VariableMgr.AllocatePrimeStaticVariable (pFlagVariable);
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+	}
+
+	OnceStmt_Create (pStmt, pFlagVariable);
+	return true;
+}
+
 void
 CControlFlowMgr::OnceStmt_Create (
 	TOnceStmt* pStmt,
 	CVariable* pFlagVariable
 	)
 {
-	if (!pFlagVariable)
-	{
-		pFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable ();
-
-		CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-		m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
-
-		m_pModule->m_VariableMgr.AllocatePrimeStaticVariable (pFlagVariable);
-
-		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
-	}
-
 	pStmt->m_pFlagVariable = pFlagVariable;
 	pStmt->m_pPreBodyBlock = CreateBlock ("once_prebody");
 	pStmt->m_pBodyBlock = CreateBlock ("once_body");
@@ -343,47 +359,62 @@ CControlFlowMgr::OnceStmt_PreBody (
 {
 	bool Result;
 
+	EStorage StorageKind = pStmt->m_pFlagVariable->GetStorageKind ();
+	ASSERT (StorageKind == EStorage_Static || StorageKind == EStorage_Thread);
+
 	CType* pType = pStmt->m_pFlagVariable->GetType ();
 
 	CValue Value;
 
-	Result = m_pModule->m_OperatorMgr.LoadDataRef (pStmt->m_pFlagVariable, &Value);	
-	if (!Result)
-		return false;
+	if (StorageKind == EStorage_Thread)
+	{
+		Result = 
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, pStmt->m_pFlagVariable, CValue ((int64_t) 0, pType), &Value) &&
+			ConditionalJump (Value, pStmt->m_pBodyBlock, pStmt->m_pFollowBlock);
 
-	intptr_t ConstArray [2] = { 0, 1 };
-	CBasicBlock* BlockArray [2] = { pStmt->m_pPreBodyBlock, pStmt->m_pLoopBlock };
+		if (!Result)
+			return false;
+	}
+	else
+	{
+		Result = m_pModule->m_OperatorMgr.LoadDataRef (pStmt->m_pFlagVariable, &Value);	
+		if (!Result)
+			return false;
 
-	m_pModule->m_LlvmBuilder.CreateSwitch (Value, pStmt->m_pFollowBlock, ConstArray, BlockArray, 2);
+		intptr_t ConstArray [2] = { 0, 1 };
+		CBasicBlock* BlockArray [2] = { pStmt->m_pPreBodyBlock, pStmt->m_pLoopBlock };
 
-	// loop
+		m_pModule->m_LlvmBuilder.CreateSwitch (Value, pStmt->m_pFollowBlock, ConstArray, BlockArray, 2);
 
-	SetCurrentBlock (pStmt->m_pLoopBlock);
+		// loop
 
-	Result = 
-		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, pStmt->m_pFlagVariable, CValue (2, pType), &Value) &&
-		ConditionalJump (Value, pStmt->m_pFollowBlock, pStmt->m_pLoopBlock, pStmt->m_pPreBodyBlock);
+		SetCurrentBlock (pStmt->m_pLoopBlock);
 
-	if (!Result)
-		return false;
+		Result = 
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, pStmt->m_pFlagVariable, CValue (2, pType), &Value) &&
+			ConditionalJump (Value, pStmt->m_pFollowBlock, pStmt->m_pLoopBlock, pStmt->m_pPreBodyBlock);
 
-	// pre body
+		if (!Result)
+			return false;
 
-	m_pModule->m_LlvmBuilder.CreateCmpXchg (
-		pStmt->m_pFlagVariable, 
-		CValue ((int64_t) 0, pType), 
-		CValue (1, pType), 
-		llvm::Acquire,
-		llvm::CrossThread,
-		&Value
-		);
+		// pre body
 
-	Result = 
-		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, Value, CValue ((int64_t) 0, pType), &Value) &&
-		ConditionalJump (Value, pStmt->m_pBodyBlock, pStmt->m_pLoopBlock);
+		m_pModule->m_LlvmBuilder.CreateCmpXchg (
+			pStmt->m_pFlagVariable, 
+			CValue ((int64_t) 0, pType), 
+			CValue (1, pType), 
+			llvm::Acquire,
+			llvm::CrossThread,
+			&Value
+			);
 
-	if (!Result)
-		return false;
+		Result = 
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, Value, CValue ((int64_t) 0, pType), &Value) &&
+			ConditionalJump (Value, pStmt->m_pBodyBlock, pStmt->m_pLoopBlock);
+
+		if (!Result)
+			return false;
+	}
 
 	m_pModule->m_NamespaceMgr.OpenScope (Pos);
 	return true;
@@ -395,17 +426,32 @@ CControlFlowMgr::OnceStmt_PostBody (
 	const CToken::CPos& Pos
 	)
 {
+	EStorage StorageKind = pStmt->m_pFlagVariable->GetStorageKind ();
+	ASSERT (StorageKind == EStorage_Static || StorageKind == EStorage_Thread);
+
+	CType* pType = pStmt->m_pFlagVariable->GetType ();
+
 	m_pModule->m_NamespaceMgr.CloseScope (Pos);
 
-	CValue TmpValue;
-	m_pModule->m_LlvmBuilder.CreateRmw (
-		llvm::AtomicRMWInst::Xchg,
-		pStmt->m_pFlagVariable, 
-		CValue ((int64_t) 2, EType_Int32), 
-		llvm::Release,
-		llvm::CrossThread,
-		&TmpValue
-		);
+	if (StorageKind == EStorage_Thread)
+	{
+		m_pModule->m_LlvmBuilder.CreateStore (
+			CValue ((int64_t) 2, pType), 
+			pStmt->m_pFlagVariable
+			);
+	}
+	else
+	{
+		CValue TmpValue;
+		m_pModule->m_LlvmBuilder.CreateRmw (
+			llvm::AtomicRMWInst::Xchg,
+			pStmt->m_pFlagVariable, 
+			CValue ((int64_t) 2, pType), 
+			llvm::Release,
+			llvm::CrossThread,
+			&TmpValue
+			);
+	}
 
 	Follow (pStmt->m_pFollowBlock);
 }

@@ -281,13 +281,12 @@ once_stmt
 	{
 		TOnceStmt $Stmt;
 	}
-	enter
-	{
-		m_pModule->m_ControlFlowMgr.OnceStmt_Create (&$Stmt);
-	}
-	:	EToken_Once
+	:	storage_specifier? EToken_Once
 			{
-				return m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&$Stmt, $1.m_Pos);
+				EStorage StorageKind = IsValidLocator ($1) ? $1.m_StorageKind : EStorage_Static;
+				return 
+					m_pModule->m_ControlFlowMgr.OnceStmt_Create (&$Stmt, StorageKind) &&				
+					m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&$Stmt, $2.m_Pos);
 			}
 		statement $s
 			{

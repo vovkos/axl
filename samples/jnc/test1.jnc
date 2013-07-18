@@ -5,10 +5,34 @@ main ()
 {
 	printf ("main ()\n");
 
-	int n = 100;
- 	char* p = new char [n];
+	foo (1);
+	foo (2);
+	foo (3);
+
+	CreateThread (ThreadProc);
+	CreateThread (ThreadProc);
+	CreateThread (ThreadProc);
+
+	Sleep (500);
 
 	return 10; 
+}
+
+ThreadProc ()
+{
+	foo (1);
+	foo (2);
+	foo (3);
+}
+
+foo (int x)
+{
+	printf ("TID %x: foo (%d)\n", GetCurrentThreadId (), x);
+
+	thread once
+	{
+		printf ("TID %x: foo (%d) once!\n", GetCurrentThreadId (), x);
+	}
 }
 
 //.............................................................................

@@ -438,16 +438,18 @@ COperatorMgr::NewOperator (
 	if (!Result)
 		return false;
 
-	if (StorageKind != EStorage_Static)
+	if (StorageKind != EStorage_Static && StorageKind != EStorage_Thread)
 		return 
 			Prime (StorageKind, PtrValue, pType, SizeValue, pResultValue) && 
 			Construct (*pResultValue, pArgList);
 
 	TOnceStmt Stmt;
-	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
-
 	CToken::CPos Pos;
-	Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
+
+	Result = 
+		m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, StorageKind) &&
+		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
+
 	if (!Result)
 		return false;
 

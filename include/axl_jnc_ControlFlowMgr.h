@@ -307,10 +307,16 @@ public:
 
 	// once stmt
 
+	bool
+	OnceStmt_Create (
+		TOnceStmt* pStmt,
+		EStorage StorageKind = EStorage_Static
+		);
+
 	void
 	OnceStmt_Create (
 		TOnceStmt* pStmt,
-		CVariable* pFlagVariable = NULL
+		CVariable* pFlagVariable
 		);
 
 	bool

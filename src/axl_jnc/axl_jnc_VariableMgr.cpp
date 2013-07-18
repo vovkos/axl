@@ -158,14 +158,16 @@ CVariableMgr::CreateVariable (
 }
 
 CVariable*
-CVariableMgr::CreateOnceFlagVariable ()
+CVariableMgr::CreateOnceFlagVariable (EStorage StorageKind)
 {
+	ASSERT (StorageKind == EStorage_Static || StorageKind == EStorage_Thread);
+
 	return CreateVariable (
-		EStorage_Static, 
+		StorageKind, 
 		"once_flag", 
 		"once_flag", 
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
-		EPtrTypeFlag_Volatile
+		StorageKind == EStorage_Static ? EPtrTypeFlag_Volatile : 0
 		);
 }
 

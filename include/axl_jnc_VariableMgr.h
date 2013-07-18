@@ -149,7 +149,7 @@ public:
 		);
 
 	CVariable*
-	CreateOnceFlagVariable ();		
+	CreateOnceFlagVariable (EStorage StorageKind = EStorage_Static);		
 
 	llvm::GlobalVariable*
 	CreateLlvmGlobalVariable (
