@@ -5,19 +5,23 @@ main ()
 {
 	printf ("main ()\n");
 
-//	CreateThread (ThreadProc);
-//	CreateThread (ThreadProc);
-//	CreateThread (ThreadProc);
+	char a [];
 
-//	Sleep (500);
+/*	CreateThread (ThreadProc);
+	Sleep (1000);
+
+	CreateThread (ThreadProc);
+	Sleep (1000);
+
+	CreateThread (ThreadProc);
+
+	Sleep (5000);*/
 	return 10; 
 }
-
+/*
 ThreadProc ()
 {
 	printf ("TID %x: ThreadProc ()\n", GetCurrentThreadId ());
-
-	int i = 0x"00 01 02 03";
 
 	foo (1);
 	foo (2);
@@ -34,7 +38,7 @@ foo (int n)
 		printf ("TID %x foo (%d): once!\n", GetCurrentThreadId (), n);
 	}
 }
-
+*/
 //.............................................................................
 
 // system functions

@@ -308,16 +308,16 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 	case EType_Void:
 	case EType_Function:
 	case EType_Property:
-		err::SetFormatStringError (
-			"cannot create array of '%s'", 
-			pElementType->GetTypeString ().cc () 
-			);
+		err::SetFormatStringError ("cannot create array of '%s'", pElementType->GetTypeString ().cc () );
 		return NULL;
 
-		pElementType = GetClassPtrType ((CClassType*) pElementType);
-		break;
-
 	default:
+		if (IsAutoSizeArrayType (pElementType))
+		{
+			err::SetFormatStringError ("cannot create array of auto-size-array '%s'", pElementType->GetTypeString ().cc () );
+			return NULL;
+		}
+
 		if (m_TypeModifiers & ETypeModifierMask_Integer)
 		{
 			pElementType = GetIntegerType (pElementType);
@@ -327,9 +327,13 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 	}
 
 	rtl::CBoxListT <CToken>* pElementCountInitializer = pSuffix->GetElementCountInitializer ();
-	return !pElementCountInitializer->IsEmpty () ? 
-		m_pModule->m_TypeMgr.CreateArrayType (pElementType, pElementCountInitializer) : 
-		m_pModule->m_TypeMgr.GetArrayType (pElementType, pSuffix->GetElementCount ());
+	if (!pElementCountInitializer->IsEmpty ())
+		return m_pModule->m_TypeMgr.CreateArrayType (pElementType, pElementCountInitializer);
+
+	size_t ElementCount = pSuffix->GetElementCount ();
+	return ElementCount == -1 ?  
+		m_pModule->m_TypeMgr.CreateAutoSizeArrayType (pElementType) :
+		m_pModule->m_TypeMgr.GetArrayType (pElementType, ElementCount);
 }
 
 CType*
@@ -355,8 +359,14 @@ CDeclTypeCalc::PrepareReturnType (CType* pType)
 		return NULL;
 
 	default:
+		if (IsAutoSizeArrayType (pType))
+		{
+			err::SetFormatStringError ("function cannot return auto-size-array '%s'", pType->GetTypeString ().cc () );
+			return NULL;
+		}
+
 		if (m_TypeModifiers & ETypeModifierMask_Integer)
-			pType = GetIntegerType (pType);
+			return GetIntegerType (pType);
 	}
 
 	return pType;

@@ -269,6 +269,9 @@ public:
 		);
 
 	CArrayType* 
+	CreateAutoSizeArrayType (CType* pElementType);
+
+	CArrayType* 
 	CreateArrayType (
 		CType* pElementType,
 		rtl::CBoxListT <CToken>* pElementCountInitializer

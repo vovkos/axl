@@ -13,7 +13,6 @@ CTypeMgr::CTypeMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
@@ -271,21 +270,32 @@ CTypeMgr::GetBitFieldType (
 }
 
 CArrayType* 
+CTypeMgr::CreateAutoSizeArrayType (CType* pElementType)
+{
+	CArrayType* pType = AXL_MEM_NEW (CArrayType);
+	pType->m_pModule = m_pModule;
+	pType->m_pElementType = pElementType;
+	m_ArrayTypeList.InsertTail (pType);
+	
+	if (pElementType->GetTypeKindFlags () & ETypeKindFlag_Import)
+		pType->m_pElementType_i = (CImportType*) pElementType;
+
+	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
+		m_pModule->MarkForLayout (pType); // can't calclayout yet
+
+	return pType;
+}
+
+CArrayType* 
 CTypeMgr::CreateArrayType (
 	CType* pElementType,
 	rtl::CBoxListT <CToken>* pElementCountInitializer
 	)
 {
-	CType* pRootType = pElementType->m_TypeKind == EType_Array ? 
-		((CArrayType*) pElementType)->m_pRootType : 
-		pElementType;
-
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
 	pType->m_pModule = m_pModule;
 	pType->m_pElementType = pElementType;
-	pType->m_pRootType = pRootType;
 	pType->m_ElementCountInitializer.TakeOver (pElementCountInitializer);
-
 	m_ArrayTypeList.InsertTail (pType);
 	
 	if (pElementType->GetTypeKindFlags () & ETypeKindFlag_Import)
@@ -317,17 +327,11 @@ CTypeMgr::GetArrayType (
 	if (It->m_Value)
 		return (CArrayType*) It->m_Value;
 
-	CType* pRootType = pElementType->m_TypeKind == EType_Array ? 
-		((CArrayType*) pElementType)->m_pRootType : 
-		pElementType;
-
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
 	pType->m_pElementType = pElementType;
-	pType->m_pRootType = pRootType;
 	pType->m_ElementCount = ElementCount;
-
 	m_ArrayTypeList.InsertTail (pType);
 	
 	if (pElementType->GetTypeKindFlags () & ETypeKindFlag_Import)

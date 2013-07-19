@@ -114,40 +114,54 @@ COperatorMgr::ClosureOperator (
 }
 
 CType*
-COperatorMgr::GetVarArgType (
-	CType* pType,
-	bool IsUnsafeVarArg
-	)
+COperatorMgr::GetUnsafeVarArgType (CType* pType)
 {
-	EType TypeKind = pType->GetTypeKind ();
-
-	switch (TypeKind)
+	for (;;)
 	{
-	case EType_PropertyRef:
-		return GetVarArgType (((CPropertyPtrType*) pType)->GetTargetType ()->GetReturnType (), IsUnsafeVarArg);
-
-	case EType_DataRef:
-		return GetVarArgType (((CDataPtrType*) pType)->GetTargetType (), IsUnsafeVarArg);
-
-	case EType_BitField:
-		return GetVarArgType (((CBitFieldType*) pType)->GetBaseType (), IsUnsafeVarArg);
-
-	case EType_Enum:
-		return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
-
-	case EType_Float:
-		return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
-
-	default:
-		if (pType->GetTypeKindFlags () & ETypeKindFlag_Integer)
+		CType* pPrevType = pType;
+		
+		EType TypeKind = pType->GetTypeKind ();
+		switch (TypeKind)
 		{
-			if (pType->GetSize () <= 4)
-				return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
-			else
-				return m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64);
+		case EType_PropertyRef:
+			pType = ((CPropertyPtrType*) pType)->GetTargetType ()->GetReturnType ();
+			break;
+
+		case EType_DataRef:
+			pType = ((CDataPtrType*) pType)->GetTargetType ();
+			break;
+
+		case EType_BitField:
+			pType = ((CBitFieldType*) pType)->GetBaseType ();
+			break;
+
+		case EType_Enum:
+			pType = ((CEnumType*) pType)->GetBaseType ();
+			break;
+
+		case EType_Float:
+			pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
+			break;
+
+		case EType_Array:
+			pType = ((CArrayType*) pType)->GetElementType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+			break;
+
+		case EType_DataPtr:
+			pType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+			break;
+
+		default:
+			if (pType->GetTypeKindFlags () & ETypeKindFlag_Integer)
+			{
+				pType = pType->GetSize () > 4 ?
+					m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64) :
+					m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
+			}
 		}
 
-		return pType;
+		if (pType == pPrevType)
+			return pType;
 	}
 }
 
@@ -465,8 +479,9 @@ COperatorMgr::CastArgList (
 			err::SetFormatStringError ("vararg arguments cannot be skipped");
 			return false;
 		}
-
-		CType* pFormalArgType = GetVarArgType (Arg->GetType (), IsUnsafeVarArg);
+		
+		ASSERT (IsUnsafeVarArg);
+		CType* pFormalArgType = GetUnsafeVarArgType (Arg->GetType ());
 
 		CValue ArgCast;
 		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);

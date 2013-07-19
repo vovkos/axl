@@ -5,6 +5,19 @@ main ()
 {
 	printf ("main ()\n");
 
+	char a [] = "hui" 0x"61 62 63 00";
+	char b [] = "govno";
+
+	printf ("a = %s; b = %s\n", a, b);
+
+	int d [] = { ,, 5 };
+
+	printf ("sizeof (d) = %d\n", sizeof (d));
+
+
+//  = 0x"61 62 63";
+//	printf ("a = { %x, %x, %x }\n", a [0], a [1], a [2]);
+
 /*
 	CreateThread (ThreadProc);
 	CreateThread (ThreadProc);

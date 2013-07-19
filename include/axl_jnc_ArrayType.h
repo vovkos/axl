@@ -14,6 +14,7 @@ namespace jnc {
 class CArrayType: public CType
 {
 	friend class CTypeMgr;
+	friend class CParser;
 
 protected:
 	CType* m_pElementType;
@@ -39,10 +40,7 @@ public:
 	}
 
 	CType* 
-	GetRootType ()
-	{
-		return m_pRootType;
-	}
+	GetRootType ();
 
 	size_t
 	GetElementCount ()
@@ -77,6 +75,7 @@ public:
 		void* p
 		);	
 
+
 protected:
 	virtual 
 	bool
@@ -90,6 +89,7 @@ protected:
 	void
 	PrepareLlvmType ()
 	{
+		ASSERT (m_ElementCount != -1);
 		m_pLlvmType = llvm::ArrayType::get (m_pElementType->GetLlvmType (), m_ElementCount);
 	}
 };

@@ -776,17 +776,24 @@ primary_expr <CValue* $pValue>
 class
 {
 	rtl::CArrayT <uchar_t> m_BinData;
+	EToken m_LastToken;
 }
 literal
 	:	(	EToken_Literal 
 				{			
-					$.m_BinData.Append ((const uchar_t*) $1.m_Data.m_String.cc (), $1.m_Data.m_String.GetLength () + 1);
+					$.m_BinData.Append ((const uchar_t*) $1.m_Data.m_String.cc (), $1.m_Data.m_String.GetLength ());
+					$.m_LastToken = EToken_Literal;
 				}
 		|	EToken_HexLiteral
 				{			
 					$.m_BinData.Append ($2.m_Data.m_BinData, $2.m_Data.m_BinData.GetCount ());
+					$.m_LastToken = EToken_HexLiteral;
 				}
 		)+
+			{
+				if ($.m_LastToken == EToken_Literal)
+					$.m_BinData.Append (0);
+			}
 	;
 
 //.............................................................................

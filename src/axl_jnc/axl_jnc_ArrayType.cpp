@@ -13,16 +13,28 @@ CArrayType::CArrayType ()
 	m_pElementType = NULL;
 	m_pElementType_i = NULL;
 	m_pRootType = NULL;
-	m_ElementCount = 0;
+	m_ElementCount = -1;
+}
+
+CType* 
+CArrayType::GetRootType ()
+{
+	if (!m_pRootType)
+		m_pRootType = m_pElementType->GetTypeKind () == EType_Array ? 
+			((CArrayType*) m_pElementType)->GetRootType () :	
+			m_pElementType;
+
+	return m_pRootType;
 }
 
 void
 CArrayType::PrepareTypeString ()
 {
 	rtl::CString String;
+
 	m_TypeString.Format (
-		"%s [%d]", 
-		m_pRootType->GetTypeString ().cc (), // thanks a lot gcc
+		m_ElementCount == -1 ? "%s []" : "%s [%d]", 
+		GetRootType ()->GetTypeString ().cc (), // thanks a lot gcc
 		m_ElementCount
 		);
 	
@@ -45,13 +57,12 @@ CArrayType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	m_pRootType = m_pElementType->GetTypeKind () == EType_Array ? 
-		((CArrayType*) m_pElementType)->GetRootType () :	
-		m_pElementType;
+	// ensure update
 
-	m_TypeString.Clear (); // ensure updated type string
+	m_pRootType = NULL;
+	m_TypeString.Clear (); 
 
-	uint_t RootTypeFlags = m_pRootType->GetFlags ();
+	uint_t RootTypeFlags = GetRootType ()->GetFlags ();
 	if (RootTypeFlags & ETypeFlag_Pod)
 		m_Flags |= ETypeFlag_Pod;
 	else if (RootTypeFlags & ETypeFlag_GcRoot)
@@ -71,6 +82,7 @@ CArrayType::CalcLayout ()
 		m_ElementCount = Value;
 	}
 
+	m_Signature = CreateSignature (m_pElementType, m_ElementCount);
 	m_Size = m_pElementType->GetSize () * m_ElementCount;
 	return true;
 }

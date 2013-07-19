@@ -76,7 +76,7 @@ Members
 	rtl::CBoxListT <CValue> m_AutoEvBindSiteList;
 	size_t m_AutoEvBindSiteCount;
 	size_t m_AutoEvBindSiteTotalCount;
-	
+
 	CDerivableType* m_pConstructorType;
 	CProperty* m_pConstructorProperty;
 

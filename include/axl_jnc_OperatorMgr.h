@@ -551,6 +551,17 @@ public:
 		intptr_t* pInteger
 		);
 
+	bool 
+	ParseAutoSizeArrayInitializer (
+		const rtl::CConstBoxListT <CToken>& InitializerTokenList,
+		size_t* pElementCount
+		);
+
+	size_t ParseAutoSizeArrayLiteralInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
+
+	size_t 
+	ParseAutoSizeArrayCurlyInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
+
 	CType* 
 	GetNewOperatorResultType (CType* pType)
 	{
@@ -1406,10 +1417,7 @@ protected:
 		);
 
 	CType*
-	GetVarArgType (
-		CType* pType,
-		bool IsUnsafeVarArg
-		);
+	GetUnsafeVarArgType (CType* pType);
 
 	bool
 	DeleteDataPtr (const CValue& OpValue);

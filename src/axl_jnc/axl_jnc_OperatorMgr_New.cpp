@@ -383,6 +383,108 @@ COperatorMgr::ParseConstIntegerExpression (
 	return true;
 }
 
+bool 
+COperatorMgr::ParseAutoSizeArrayInitializer (
+	const rtl::CConstBoxListT <CToken>& InitializerTokenList,
+	size_t* pElementCount
+	)
+{
+	int FirstToken = InitializerTokenList.GetHead ()->m_Token;
+	switch (FirstToken)
+	{
+	case EToken_Literal:
+	case EToken_HexLiteral:
+		*pElementCount = ParseAutoSizeArrayLiteralInitializer (InitializerTokenList);
+		break;
+
+	case '{':
+		*pElementCount = ParseAutoSizeArrayCurlyInitializer (InitializerTokenList);
+		break;
+
+	default:
+		err::SetFormatStringError ("invalid initializer for auto-size-array");
+		return false;
+	}
+
+	return true;
+}
+
+// it's both more efficient AND easier to parse these by hand
+
+size_t
+COperatorMgr::ParseAutoSizeArrayLiteralInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList)
+{
+	size_t ElementCount = 0;
+
+	rtl::CBoxIteratorT <CToken> Token = InitializerTokenList.GetHead ();
+	for (; Token; Token++)
+	{
+		switch (Token->m_Token)
+		{
+		case EToken_Literal:
+			ElementCount += Token->m_Data.m_String.GetLength ();
+			break;
+
+		case EToken_HexLiteral:
+			ElementCount += Token->m_Data.m_BinData.GetCount ();
+			break;
+		}
+	}
+
+	if (InitializerTokenList.GetTail ()->m_Token == EToken_Literal)
+		ElementCount++;
+
+	return ElementCount;
+}
+
+size_t 
+COperatorMgr::ParseAutoSizeArrayCurlyInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList)
+{
+	intptr_t Level = 0;
+	size_t ElementCount = 0;
+
+	bool IsElement = false;
+
+	rtl::CBoxIteratorT <CToken> Token = InitializerTokenList.GetHead ();
+	for (; Token; Token++)
+	{
+		switch (Token->m_Token)
+		{
+		case '{':
+			if (Level == 1)
+				IsElement = true;
+
+			Level++;
+			break;
+
+		case '}':
+			if (Level == 1 && IsElement)
+			{
+				ElementCount++;
+				IsElement = false;
+			}
+
+			Level--;
+			break;
+
+		case ',':
+			if (Level == 1)
+			{
+				ElementCount++;
+				IsElement = false;
+			}
+			
+			break;
+
+		default:
+			if (Level == 1)
+				IsElement = true;		
+		}
+	}
+
+	return ElementCount;
+}
+
 bool
 COperatorMgr::EvaluateAlias (
 	const rtl::CConstBoxListT <CToken> TokenList,

@@ -23,12 +23,6 @@ CParser::CParser ()
 	m_AutoEvBindSiteTotalCount = 0;
 	m_pConstructorType = NULL;
 	m_pConstructorProperty = NULL;
-
-
-	int n = 100;
-
-	int* p = new int [n];
-
 }
 
 bool
@@ -892,6 +886,27 @@ CParser::DeclareData (
 	size_t BitCount = pDeclarator->GetBitCount ();
 	rtl::CBoxListT <CToken>* pConstructor = &pDeclarator->m_Constructor;
 	rtl::CBoxListT <CToken>* pInitializer = &pDeclarator->m_Initializer;
+
+	if (IsAutoSizeArrayType (pType))
+	{
+		if (pInitializer->IsEmpty ())
+		{
+			err::SetFormatStringError ("auto-size array '%s' should have initializer", pType->GetTypeString ().cc ());
+			return false;
+		}
+
+		CArrayType* pArrayType = (CArrayType*) pType;
+		Result = m_pModule->m_OperatorMgr.ParseAutoSizeArrayInitializer (*pInitializer, &pArrayType->m_ElementCount);
+		if (!Result)
+			return false;
+
+		if (m_Stage == EStage_Pass2)
+		{
+			Result = pArrayType->EnsureLayout ();
+			if (!Result)
+				return false;
+		}
+	}
 
 	CModuleItem* pDataItem = NULL;
 
