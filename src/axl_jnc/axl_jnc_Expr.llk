@@ -756,7 +756,7 @@ primary_expr <CValue* $pValue>
 			}
 	|	literal 
 			{
-				$pValue->SetLiteral ($1.m_String);
+				$pValue->SetCharArray ($1.m_BinData, $1.m_BinData.GetCount ());
 			}
 	|	EToken_True
 			{
@@ -775,18 +775,18 @@ primary_expr <CValue* $pValue>
 
 class
 {
-	rtl::CString m_String;
+	rtl::CArrayT <uchar_t> m_BinData;
 }
 literal
-	:	EToken_Literal 
-			{
-				$.m_String = $1.m_Data.m_String;
-			}
-		(EToken_Literal 
-			{
-				$.m_String.Append ($2.m_Data.m_String);
-			}
-		)*
+	:	(	EToken_Literal 
+				{			
+					$.m_BinData.Append ((const uchar_t*) $1.m_Data.m_String.cc (), $1.m_Data.m_String.GetLength () + 1);
+				}
+		|	EToken_HexLiteral
+				{			
+					$.m_BinData.Append ($2.m_Data.m_BinData, $2.m_Data.m_BinData.GetCount ());
+				}
+		)+
 	;
 
 //.............................................................................

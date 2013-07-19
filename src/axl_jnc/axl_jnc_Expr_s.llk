@@ -429,7 +429,7 @@ primary_expr_s <CValue* $pValue>
 			}
 	|	literal 
 			{
-				$pValue->SetType (m_pModule->m_TypeMgr.GetLiteralType ($1.m_String.GetLength ()));
+				$pValue->SetType (m_pModule->m_TypeMgr.GetArrayType (EType_Char, $1.m_BinData.GetCount ()));
 			}
 	|	EToken_True
 			{

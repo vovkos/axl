@@ -11,7 +11,7 @@ CJnc::StdLib_Printf (
 {
 	AXL_VA_DECL (va, pFormat);
 
-	CJnc* pJnc = GetCurrentThreadJnc ();
+	CJnc* pJnc = CJnc::GetCurrentJnc ();
 	ASSERT (pJnc);
 
 	return pJnc->m_pOutStream->Printf_va (pFormat, va);

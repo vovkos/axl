@@ -34,6 +34,8 @@ PrintUsage (IOutStream* pOutStream);
 class CJnc
 {
 protected:
+	static CJnc* s_pCurrentJnc;
+
 	CCmdLine* m_pCmdLine;
 	IOutStream* m_pOutStream;
 
@@ -43,8 +45,16 @@ protected:
 public:
 	CJnc ()
 	{
+		s_pCurrentJnc = this;
 		m_pCmdLine = NULL;
 		m_pOutStream = NULL;
+	}
+
+	static
+	CJnc* 
+	GetCurrentJnc ()
+	{
+		return s_pCurrentJnc;
 	}
 
 	int
@@ -93,16 +103,5 @@ protected:
 		sockaddr_in* pSockAddr
 		);
 };
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef mt::CScopeTlsSlotT <CJnc> CScopeThreadJnc;
-
-inline
-CJnc*
-GetCurrentThreadJnc ()
-{
-	return mt::GetTlsSlotValue <CJnc> ();
-}
 
 //.............................................................................

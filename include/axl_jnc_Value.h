@@ -609,15 +609,15 @@ public:
 	}
 
 	void
-	SetLiteral (
-		const char* p,
-		size_t Length = -1
-		);
+	SetCharArray (const char* p)
+	{
+		SetCharArray (p, strlen (p) + 1);
+	}
 
 	void
-	SetLiteral_w (
-		const wchar_t* p,
-		size_t Length = -1
+	SetCharArray (
+		const void* p,
+		size_t Count
 		);
 
 protected:

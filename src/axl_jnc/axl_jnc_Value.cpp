@@ -478,35 +478,19 @@ CValue::CreateConst (
 }
 
 void
-CValue::SetLiteral (
-	const char* p,
-	size_t Length
+CValue::SetCharArray (
+	const void* p,
+	size_t Size
 	)
 {
 	CModule* pModule = GetCurrentThreadModule ();
 	ASSERT (pModule);
 
-	if (Length == -1)
-		Length = p ? strlen (p) : 0;
+	if (!Size)
+		Size = 1;
 
-	CreateConst (p, pModule->m_TypeMgr.GetLiteralType (Length));
-	((char*) GetConstData ()) [Length] = 0;
-}
-
-void
-CValue::SetLiteral_w (
-	const wchar_t* p,
-	size_t Length
-	)
-{
-	CModule* pModule = GetCurrentThreadModule ();
-	ASSERT (pModule);
-
-	if (Length == -1)
-		Length = p ? wcslen (p) : 0;
-
-	CreateConst (p, pModule->m_TypeMgr.GetLiteralType_w (Length));
-	((wchar_t*) GetConstData ()) [Length] = 0;
+	CType* pType = pModule->m_TypeMgr.GetArrayType (EType_Char, Size);
+	CreateConst (p, pType);
 }
 
 //.............................................................................

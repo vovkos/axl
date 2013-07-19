@@ -289,18 +289,6 @@ public:
 		return GetArrayType (GetPrimitiveType (ElementTypeKind), ElementCount);
 	}
 
-	CArrayType* 
-	GetLiteralType (size_t Length)
-	{
-		return GetArrayType (EType_Char, Length + 1);
-	}
-
-	CArrayType* 
-	GetLiteralType_w (size_t Length)
-	{
-		return GetArrayType (EType_WChar, Length + 1);
-	}
-
 	CTypedef*
 	CreateTypedef (
 		const rtl::CString& Name,

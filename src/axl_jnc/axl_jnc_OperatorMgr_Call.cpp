@@ -17,7 +17,7 @@ COperatorMgr::CallTraceFunction (
 	if (pItem && pItem->GetItemKind () == EModuleItem_Function)
 	{
 		CValue LiteralValue;
-		LiteralValue.SetLiteral (pString);
+		LiteralValue.SetCharArray (pString);
 		m_pModule->m_OperatorMgr.CallOperator ((CFunction*) pItem, LiteralValue);
 	}
 }

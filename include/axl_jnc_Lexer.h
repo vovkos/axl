@@ -22,6 +22,7 @@ enum EToken
 	EToken_Integer,
 	EToken_Fp,
 	EToken_Literal,
+	EToken_HexLiteral,
 
 	// global declarations & pragmas
 
@@ -180,6 +181,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Integer,      "integer-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Fp,           "floating-point-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Literal,      "string-literal")
+	AXL_PRS_TOKEN_NAME (EToken_HexLiteral,   "hex-literal")
 
 	// global declarations & pragmas
 
@@ -332,7 +334,13 @@ AXL_PRS_END_TOKEN_NAME_MAP ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef lex::CRagelTokenT <EToken, CTokenName> CToken;
+class CTokenData: public lex::CStdTokenData
+{
+public:
+	rtl::CArrayT <uchar_t> m_BinData;
+};
+
+typedef lex::CRagelTokenT <EToken, CTokenName, CTokenData> CToken;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -350,6 +358,15 @@ protected:
 	{
 		CToken* pToken = CreateToken (Token);
 		pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (ts + Left, pToken->m_Pos.m_Length - (Left + Right));
+		return pToken;
+	}
+
+	CToken*
+	CreateHexLiteralToken ()
+	{
+		CToken* pToken = CreateToken (EToken_HexLiteral);
+		ASSERT (pToken->m_Pos.m_Length >= 4);
+		pToken->m_Data.m_BinData = rtl::CHexEncoding::Decode (ts + 3, pToken->m_Pos.m_Length - 4);
 		return pToken;
 	}
 

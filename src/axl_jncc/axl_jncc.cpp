@@ -33,6 +33,8 @@ PrintUsage (IOutStream* pOutStream)
 
 //.............................................................................
 
+CJnc* CJnc::s_pCurrentJnc = NULL;
+
 int
 CJnc::Run (
 	CCmdLine* pCmdLine,
@@ -40,8 +42,6 @@ CJnc::Run (
 	)
 {
 	bool Result;
-
-	CScopeThreadJnc ScopeJnc (this);
 
 	m_pCmdLine = pCmdLine;
 	m_pOutStream = pOutStream;
