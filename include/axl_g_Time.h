@@ -147,5 +147,36 @@ protected:
 
 //.............................................................................
 
+#if (_AXL_ENV == AXL_ENV_POSIX)
+
+inline
+void
+GetTimespecFromTimeout (
+	uint_t Timeout, 
+	timespec* pTimespec
+	)
+{
+	pTimespec->tv_sec = Timeout / 1000;
+	pTimespec->tv_nsec = (Timeout % 1000) * 1000000;
+}
+
+inline
+void
+GetAbsTimespecFromTimeout (
+	uint_t Timeout, 
+	timespec* pTimespec
+	)
+{
+	int Result = clock_gettime (CLOCK_REALTIME, pTimespec);
+	ASSERT (Result == 0);
+
+	pTimespec->tv_sec += Timeout / 1000;
+	pTimespec->tv_nsec += (Timeout % 1000) * 1000000;
+}
+
+#endif
+
+//.............................................................................
+
 } // namespace g
 } // namespace axl

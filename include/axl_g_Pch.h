@@ -63,6 +63,7 @@
 #
 #	include <unistd.h> 
 #	include <pthread.h>
+#	include <semaphore.h>
 #	include <fcntl.h>
 #	include <limits.h>
 #	include <sys/stat.h>

@@ -6,48 +6,58 @@
 
 #define _AXL_MT_EVENT_H
 
-#include "axl_mt_win_Event.h"
+#include "axl_rtl_Func.h"
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include "axl_mt_win_Event.h"
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include "axl_mt_psx_Mutex.h"
+#	include "axl_mt_psx_Sem.h"
+#	include "axl_mt_psx_Cond.h"
+#endif
 
 namespace axl {
 namespace mt {
 
 //.............................................................................
 
-enum EEvent
-{
-	EEvent_Synchronization = 0,
-	EEvent_Notification    = 1,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#if (_AXL_ENV == AXL_ENV_WIN)
 
 class CEvent
 {
 public:
-	win::CEvent m_Event;
+	win::CEvent m_Event;	
 
 public:
-	CEvent (EEvent EventKind = EEvent_Synchronization)
+	CEvent ()
 	{
-		Create (EventKind);
+		m_Event.Create (NULL, false, false, NULL);
 	}
 
-	bool 
-	IsOpen ()
-	{
-		return m_Event.IsOpen ();
+	bool
+	Signal ()
+	{ 
+		return m_Event.Signal ();
 	}
 
-	void 
-	Close ()
+	bool
+	Wait (uint_t Timeout = -1)
 	{
-		m_Event.Close ();
+		return m_Event.Wait (Timeout) == win::EWaitResult_Object0;
 	}
+};
 
-	bool 
-	Create (EEvent EventKind = EEvent_Synchronization)
+//.............................................................................
+
+class CNotificationEvent
+{
+public:
+	win::CEvent m_Event;	
+
+public:
+	CNotificationEvent ()
 	{
-		return m_Event.Create (NULL, EventKind == EEvent_Notification, false, NULL);
+		m_Event.Create (NULL, true, false, NULL);
 	}
 
 	bool
@@ -68,6 +78,52 @@ public:
 		return m_Event.Wait (Timeout) == win::EWaitResult_Object0;
 	}
 };
+
+//.............................................................................
+
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+
+class CEvent
+{
+protected:
+	psx::CMutex m_Mutex;
+	psx::CSem m_Sem;
+
+public:
+	bool
+	Signal ();
+
+	bool
+	Wait (uint_t Timeout = -1)
+	{
+		return m_Sem.Wait (Timeout);
+	}
+};
+
+class CNotificationEvent
+{
+protected:
+	psx::CMutex m_Mutex;
+	psx::CCond m_Cond;
+	bool m_State;
+
+public:
+	CNotificationEvent ()
+	{
+		m_State = false;
+	}	
+	
+	bool
+	Signal ();
+	
+	bool
+	Reset ();
+
+	bool
+	Wait (uint_t Timeout = -1);
+};
+
+#endif
 
 //.............................................................................
 

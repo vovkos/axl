@@ -41,7 +41,7 @@ CJnc::Server ()
 
 	for (;;)
 	{
-		int SockAddrSize = sizeof (SockAddr);
+		socklen_t SockAddrSize = sizeof (SockAddr);
 		
 		SOCKET ConnSock = accept (ServerSock, (sockaddr*) &SockAddr, &SockAddrSize);
 		m_pOutStream->Printf (

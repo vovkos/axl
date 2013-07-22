@@ -121,11 +121,11 @@ public:
 	RunGc ();
 
 	static
-	dword_t
+	intptr_t
 	GetCurrentThreadId ();
 
 	static
-	int
+	bool
 	CreateThread (TFunctionPtr Ptr);
 
 	static
@@ -142,6 +142,10 @@ protected:
 	DWORD 
 	WINAPI
 	ThreadProc (PVOID pContext);
+#elif (_AXL_ENV == AXL_ENV_POSIX)	
+	static
+	void*
+	ThreadProc (void* pContext);
 #endif
 
 	static

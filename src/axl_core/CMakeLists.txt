@@ -174,10 +174,20 @@ source_group (
 
 set (
 	MT_PSX_H_LIST
+	${AXL_INC_DIR}/axl_mt_psx_Cond.h
 	${AXL_INC_DIR}/axl_mt_psx_Mutex.h
+	${AXL_INC_DIR}/axl_mt_psx_Sem.h
+	${AXL_INC_DIR}/axl_mt_psx_Thread.h
 	)
 
-set (MT_PSX_CPP_LIST)
+set (
+	MT_PSX_CPP_LIST
+	axl_mt_psx_Cond.cpp
+	axl_mt_psx_Event.cpp
+	axl_mt_psx_Mutex.cpp
+	axl_mt_psx_Sem.cpp
+	axl_mt_psx_Thread.cpp
+	)
 
 source_group (
 	mt_psx

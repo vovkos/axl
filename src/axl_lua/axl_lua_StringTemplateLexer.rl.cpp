@@ -1,5 +1,5 @@
 
-/* #line 1 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 1 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 #include "pch.h"
 #include "axl_lua_StringTemplateLexer.h"
 
@@ -13,7 +13,7 @@ namespace lua {
 //.............................................................................
 
 
-/* #line 2 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
+/* #line 17 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
 static const char _axl_lua_st_actions[] = {
 	0, 1, 1, 1, 2, 1, 3, 1, 
 	5, 1, 6, 1, 8, 1, 9, 1, 
@@ -79,7 +79,7 @@ static const int axl_lua_st_en_user_data = 5;
 static const int axl_lua_st_en_main = 0;
 
 
-/* #line 69 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 69 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 
 
 //.............................................................................
@@ -88,7 +88,7 @@ void
 CLexer::Init ()
 {
 	
-/* #line 66 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
+/* #line 92 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
 	{
 	cs = axl_lua_st_start;
 	ts = 0;
@@ -96,14 +96,14 @@ CLexer::Init ()
 	act = 0;
 	}
 
-/* #line 77 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 77 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 }
 
 bool
 CLexer::Exec ()
 {
 	
-/* #line 72 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
+/* #line 107 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
 	{
 	int _klen;
 	unsigned int _trans;
@@ -122,7 +122,7 @@ _resume:
 /* #line 1 "NONE" */
 	{ts = p;}
 	break;
-/* #line 89 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
+/* #line 126 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
 		}
 	}
 
@@ -188,58 +188,58 @@ _eof_trans:
 		switch ( *_acts++ )
 		{
 	case 0:
-/* #line 29 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 29 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{ NewLine (p + 1); }
 	break;
 	case 3:
-/* #line 41 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 41 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 4:
-/* #line 42 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 42 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;}
 	break;
 	case 5:
-/* #line 43 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 43 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;}
 	break;
 	case 6:
-/* #line 51 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 51 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;{ CreateToken (ts [0]); }}
 	break;
 	case 7:
-/* #line 52 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 52 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;}
 	break;
 	case 8:
-/* #line 53 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 53 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;}
 	break;
 	case 9:
-/* #line 61 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 61 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;{ CreateToken (EToken_OpenCode); }}
 	break;
 	case 10:
-/* #line 62 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 62 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;{ CreateToken (EToken_OpenData); }}
 	break;
 	case 11:
-/* #line 64 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 64 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;}
 	break;
 	case 12:
-/* #line 65 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 65 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p+1;}
 	break;
 	case 13:
-/* #line 63 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 63 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p;p--;{ CreateStringToken (EToken_Data, 1); }}
 	break;
 	case 14:
-/* #line 65 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 65 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 	{te = p;p--;}
 	break;
-/* #line 192 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
+/* #line 243 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
 		}
 	}
 
@@ -252,7 +252,7 @@ _again:
 /* #line 1 "NONE" */
 	{ts = 0;}
 	break;
-/* #line 203 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
+/* #line 256 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl.cpp" */
 		}
 	}
 
@@ -269,7 +269,7 @@ _again:
 
 	}
 
-/* #line 83 "D:/Prj/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
+/* #line 83 "/home/vladimir/Projects/Ninja/axl/src/axl_lua/axl_lua_StringTemplateLexer.rl" */
 
 	bool Result = cs != axl_lua_st_error;
 	if (!Result)

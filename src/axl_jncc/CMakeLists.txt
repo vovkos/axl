@@ -89,6 +89,11 @@ if (WIN32)
 		axl_jncc
 		ws2_32
 		)
+elseif (UNIX)
+	target_link_libraries (
+		axl_jncc
+		rt
+		)
 endif ()
 
 if (AXL_USE_PCH)

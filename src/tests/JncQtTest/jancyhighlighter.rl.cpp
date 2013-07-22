@@ -1,5 +1,5 @@
 
-/* #line 1 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 1 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 #include "pch.h"
 #include "jancyhighlighter.h"
 #include "moc_jancyhighlighter.cpp"
@@ -7,7 +7,7 @@
 //.............................................................................
 
 
-/* #line 2 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 11 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 static const char _jancy_lexer_actions[] = {
 	0, 1, 0, 1, 1, 1, 9, 1, 
 	10, 1, 11, 1, 12, 1, 13, 1, 
@@ -714,7 +714,7 @@ static const int jancy_lexer_en_main = 4;
 static const int jancy_lexer_en_comment = 221;
 
 
-/* #line 169 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 169 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 
 
 //.............................................................................
@@ -725,7 +725,7 @@ static const int jancy_lexer_en_comment = 221;
 void JancyHighlighter::ragelInit()
 {
 	
-/* #line 707 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 729 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 	{
 	cs = jancy_lexer_start;
 	ts = 0;
@@ -733,13 +733,13 @@ void JancyHighlighter::ragelInit()
 	act = 0;
 	}
 
-/* #line 179 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 179 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 }
 
 void JancyHighlighter::ragelExec()
 {
 	
-/* #line 713 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 743 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 	{
 	int _klen;
 	unsigned int _trans;
@@ -758,7 +758,7 @@ _resume:
 /* #line 1 "NONE" */
 	{ts = p;}
 	break;
-/* #line 730 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 762 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 		}
 	}
 
@@ -829,87 +829,87 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 3:
-/* #line 136 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 136 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 1;}
 	break;
 	case 4:
-/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 140 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 2;}
 	break;
 	case 5:
-/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 141 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 3;}
 	break;
 	case 6:
-/* #line 142 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 142 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 4;}
 	break;
 	case 7:
-/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 144 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 6;}
 	break;
 	case 8:
-/* #line 152 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 152 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 10;}
 	break;
 	case 9:
-/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 141 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 10:
-/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 144 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 11:
-/* #line 148 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 148 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); {cs = 221; goto _again;} }}
 	break;
 	case 12:
-/* #line 150 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 150 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;}
 	break;
 	case 13:
-/* #line 152 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 152 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{  }}
 	break;
 	case 14:
-/* #line 136 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 136 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::blue); }}
 	break;
 	case 15:
-/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 140 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{  }}
 	break;
 	case 16:
-/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 141 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 17:
-/* #line 142 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 142 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 18:
-/* #line 143 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 143 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 19:
-/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 144 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 20:
-/* #line 146 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 146 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 21:
-/* #line 150 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 150 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;}
 	break;
 	case 22:
-/* #line 152 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 152 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{  }}
 	break;
 	case 23:
-/* #line 142 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 142 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{{p = ((te))-1;}{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 24:
@@ -937,22 +937,22 @@ _eof_trans:
 	}
 	break;
 	case 25:
-/* #line 163 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 163 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 26:
-/* #line 164 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 164 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 27:
-/* #line 165 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 165 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); {cs = 4; goto _again;} }}
 	break;
 	case 28:
-/* #line 164 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 164 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
-/* #line 896 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 956 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 		}
 	}
 
@@ -965,7 +965,7 @@ _again:
 /* #line 1 "NONE" */
 	{ts = 0;}
 	break;
-/* #line 907 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 969 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 		}
 	}
 
@@ -982,7 +982,7 @@ _again:
 
 	}
 
-/* #line 184 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 184 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 }
 
 int JancyHighlighter::getRagelState(int blockState)

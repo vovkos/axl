@@ -6,12 +6,18 @@
 
 #define _AXL_MT_THREAD_H
 
-#include "axl_mt_win_Thread.h"
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include "axl_mt_win_Thread.h"
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include "axl_mt_psx_Thread.h"
+#endif
 
 namespace axl {
 namespace mt {
 
 //.............................................................................
+
+#if (_AXL_ENV == AXL_ENV_WIN)
 
 template <typename T>
 class CThreadImplT
@@ -25,18 +31,13 @@ public:
 		WaitAndClose ();
 	}
 
-	operator HANDLE ()
-	{ 
-		return m_Thread;
-	}
-
 	bool
 	IsOpen ()
 	{
 		return m_Thread.IsOpen ();
 	}
 
-	uint_t 
+	uint64_t 
 	GetThreadId ()
 	{
 		return m_Thread.GetThreadId ();
@@ -46,12 +47,6 @@ public:
 	Start ()
 	{
 		return m_Thread.Create (NULL, 0, ThreadProc, (T*) this, 0);
-	}
-
-	bool
-	Terminate (int ExitCode)
-	{
-		return m_Thread.Terminate (ExitCode);
 	}
 
 	void 
@@ -77,18 +72,83 @@ protected:
 	WINAPI
 	ThreadProc (void* pContext)
 	{
-		return ((T*) pContext)->ThreadProc ();
+		((T*) pContext)->ThreadProc ();
+		return 0;
 	}
 };
 
 //.............................................................................
 
 inline
-uint_t 
+uint64_t
 GetCurrentThreadId ()
 {
-	return win::CThread::GetCurrentThreadId ();
+	return ::GetCurrentThreadId ();
 }
+
+//.............................................................................
+
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+
+template <typename T>
+class CThreadImplT
+{
+public:
+	psx::CThread m_Thread;
+
+public:
+	~CThreadImplT ()
+	{
+		WaitAndClose ();
+	}
+
+	bool
+	IsOpen ()
+	{
+		return m_Thread.IsOpen ();
+	}
+
+	uint64_t 
+	GetThreadId ()
+	{
+		return m_Thread;
+	}
+
+	bool 
+	Start ()
+	{
+		return m_Thread.Create (ThreadProc, (T*) this);
+	}
+
+	void 
+	WaitAndClose (uint_t Timeout = -1)
+	{
+		if (!m_Thread.IsOpen ())
+			return;
+		
+		if (!m_Thread.Join (Timeout))
+			m_Thread.Detach ();
+	}	
+
+
+protected:
+	static 
+	void*
+	ThreadProc (void* pContext)
+	{
+		((T*) pContext)->ThreadProc ();
+		return NULL;
+	}
+};
+
+inline
+uint64_t
+GetCurrentThreadId ()
+{
+	return pthread_self ();
+}
+
+#endif
 
 //.............................................................................
 

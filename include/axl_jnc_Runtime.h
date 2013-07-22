@@ -58,7 +58,7 @@ protected:
 	// gc
 
 	EGcState m_GcState;
-	mt::CEvent m_GcIdleEvent;
+	mt::CNotificationEvent m_GcIdleEvent;
 	mt::CEvent m_WaitGcSafePointEvent;
 	size_t m_WaitGcSafePointCount;
 

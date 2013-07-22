@@ -27,29 +27,31 @@ public:
 		);
 
 	uint_t
-	GetThreadId ();
-
-	bool 
-	SetPriority (int Priority);
-
-	bool 
-	Terminate (uint_t ExitCode);
-
-	uint_t
-	GetExitCode ();
-
-	static
-	HANDLE
-	GetCurrentThread ()
+	GetThreadId ()
 	{
-		return ::GetCurrentThread ();
+		uint_t Id = ::GetThreadId (m_h);
+		return err::Complete (Id, (uint_t) -1);
 	}
 
-	static
-	uint_t 
-	GetCurrentThreadId ()
+	bool 
+	SetPriority (int Priority)
 	{
-		return ::GetCurrentThreadId ();
+		bool_t Result = ::SetThreadPriority (m_h, Priority);
+		return err::Complete (Result);
+	}
+
+	bool 
+	Terminate (dword_t ExitCode)
+	{
+		bool_t Result = ::TerminateThread (m_h, ExitCode);
+		return err::Complete (Result);
+	}
+
+	bool
+	GetExitCode (dword_t* pExitCode)
+	{
+		bool_t Result = ::GetExitCodeThread (m_h, pExitCode);
+		return err::Complete (Result);
 	}
 };
 

@@ -18,14 +18,13 @@ CRuntime::CRuntime ()
 	m_GcBlockSize = 0;
 	m_CurrentGcRootArrayIdx = 0;
 
-	m_GcIdleEvent.Create (mt::EEvent_Notification);
-	m_GcIdleEvent.Signal ();
-
 	m_GcDestructThread.m_pRuntime = this;
 	m_TerminateGcDestructThread = false;
 
 	m_TlsSlot = -1;
 	m_TlsSize = 0;
+
+	m_GcIdleEvent.Signal ();
 }
 
 bool

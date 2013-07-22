@@ -49,7 +49,7 @@ public:
 class CTlsMgr
 {
 protected:
-	uint_t m_MainThreadId;
+	uint64_t m_MainThreadId;
 	size_t m_TlsSlot;
 	rtl::CBitMap m_SlotMap;
 	size_t m_SlotCount;

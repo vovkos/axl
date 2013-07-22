@@ -3,6 +3,7 @@
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Runtime.h"
 #include "axl_jnc_Multicast.h"
+#include "axl_g_Time.h"
 
 namespace axl {
 namespace jnc {
@@ -259,7 +260,7 @@ CStdLib::RunGc ()
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-dword_t
+intptr_t
 CStdLib::GetCurrentThreadId ()
 {
 	return ::GetCurrentThreadId ();
@@ -287,7 +288,7 @@ CStdLib::ThreadProc (PVOID pRawContext)
 	return 0;
 }
 
-int
+bool
 CStdLib::CreateThread (TFunctionPtr Ptr)
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
@@ -304,16 +305,46 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-dword_t
+intptr_t
 CStdLib::GetCurrentThreadId ()
 {
-	return 0; // TODO
+	return (intptr_t) pthread_self ();
 }
 
-int
+struct TThreadContext
+{
+	TFunctionPtr m_Ptr;
+	CRuntime* m_pRuntime;
+};
+
+void*
+CStdLib::ThreadProc (void* pRawContext)
+{
+	TThreadContext* pContext = (TThreadContext*) pRawContext;
+	TFunctionPtr Ptr = pContext->m_Ptr;
+	CRuntime* pRuntime = pContext->m_pRuntime;
+	AXL_MEM_DELETE (pContext);
+
+	CScopeThreadRuntime ScopeRuntime (pRuntime);
+	GetTlsMgr ()->GetTlsData (pRuntime); // register thread right away
+
+	((void (*) (TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
+	return NULL;
+}
+
+bool
 CStdLib::CreateThread (TFunctionPtr Ptr)
 {
-	return 0; // TODO
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	TThreadContext* pContext = AXL_MEM_NEW (TThreadContext);
+	pContext->m_Ptr = Ptr;
+	pContext->m_pRuntime = pRuntime;
+
+	pthread_t Thread;
+	int Result = pthread_create (&Thread, NULL, CStdLib::ThreadProc, pContext);
+	return Result == 0;
 }
 
 #endif
@@ -321,7 +352,9 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 void
 CStdLib::Sleep (uint32_t MsCount)
 {
-	::Sleep (MsCount);
+	timespec Timespec;
+	g::GetTimespecFromTimeout (MsCount, &Timespec);	
+	nanosleep (&Timespec, NULL);
 }
 
 void*

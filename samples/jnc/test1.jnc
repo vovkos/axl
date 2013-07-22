@@ -14,24 +14,16 @@ main ()
 
 	printf ("sizeof (d) = %d\n", sizeof (d));
 
-
-//  = 0x"61 62 63";
-//	printf ("a = { %x, %x, %x }\n", a [0], a [1], a [2]);
-
-/*
 	CreateThread (ThreadProc);
 	CreateThread (ThreadProc);
 	CreateThread (ThreadProc);
 
-	Sleep (500); */
 	return 10; 
 }
-/*
+
 ThreadProc ()
 {
 	printf ("TID %x: ThreadProc ()\n", GetCurrentThreadId ());
-
-	int8 a [4] = 0x"00 01 02 03";
 
 	foo (1);
 	foo (2);
@@ -43,7 +35,7 @@ foo (int n)
 	thread int x = 5;
 	printf ("TID %x: foo (%d) x = %d\n", GetCurrentThreadId (), n, x++);
 }
-*/
+
 //.............................................................................
 
 // system functions

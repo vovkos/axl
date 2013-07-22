@@ -2,6 +2,18 @@
 
 #include "axl_g_Pch.h"
 
+#if (_AXL_ENV == AXL_ENV_POSIX)
+#	include <sys/socket.h>
+#	include <netinet/in.h>
+#	include <netinet/ip.h>
+#	include <arpa/inet.h>
+
+#	define SOCKET         int
+#	define INVALID_SOCKET (-1)
+#	define closesocket    close
+#	define WSAGetLastError() errno
+#endif
+
 //.............................................................................
 
 // LLVM

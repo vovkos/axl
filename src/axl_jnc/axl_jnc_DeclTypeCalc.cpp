@@ -38,10 +38,10 @@ CDeclTypeCalc::CalcType (
 		rtl::CBoxListT <CToken>* pElementCountInitializer = pArraySuffix->GetElementCountInitializer ();
 		
 		if (!pElementCountInitializer->IsEmpty ())
-		{
+		{			
 			Result = m_pModule->m_OperatorMgr.ParseExpression (*pElementCountInitializer, pElementCountValue);
 			if (!Result)
-				return false;
+				return NULL;			
 
 			pDeclarator->DeleteSuffix (pArraySuffix);			
 		}
