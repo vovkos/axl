@@ -303,6 +303,12 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 	return h != NULL;
 }
 
+void
+CStdLib::Sleep (uint32_t MsCount)
+{
+	::Sleep (MsCount);
+}
+
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 intptr_t
@@ -347,8 +353,6 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 	return Result == 0;
 }
 
-#endif
-
 void
 CStdLib::Sleep (uint32_t MsCount)
 {
@@ -356,6 +360,8 @@ CStdLib::Sleep (uint32_t MsCount)
 	g::GetTimespecFromTimeout (MsCount, &Timespec);	
 	nanosleep (&Timespec, NULL);
 }
+
+#endif
 
 void*
 CStdLib::GetTls ()

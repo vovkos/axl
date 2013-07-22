@@ -243,7 +243,7 @@ CAstDoc::Run ()
 
 	jnc::CScopeThreadRuntime ScopeRuntime (&m_Runtime);
 
-	m_Runtime.m_GcHeap.Create (&m_Runtime, 16, 1, 4);
+	m_Runtime.Startup ();
 	
 	jnc::CFunction* pConstructor = m_Module.GetConstructor ();
 	if (pConstructor)
@@ -265,9 +265,8 @@ CAstDoc::Run ()
 			return false;
 	}
 
-	m_Runtime.m_GcHeap.DropStaticRoots ();
-	m_Runtime.m_GcHeap.RunGc ();
-		
+	m_Runtime.Shutdown ();
+	
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Done (retval = %d).\n", Result);
 	return true;
 }

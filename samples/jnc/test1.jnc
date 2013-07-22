@@ -18,6 +18,8 @@ main ()
 	CreateThread (ThreadProc);
 	CreateThread (ThreadProc);
 
+	Sleep (100);
+
 	return 10; 
 }
 

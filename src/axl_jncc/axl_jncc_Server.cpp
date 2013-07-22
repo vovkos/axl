@@ -29,7 +29,7 @@ CJnc::Server ()
 		m_pOutStream->Printf (
 			"cannot open TCP port %d (%s)\n", 
 			m_pCmdLine->m_ServerPort, 
-			err::CError (WSAGetLastError ()).GetDescription ().cc ()
+			err::CError (getsockerror ()).GetDescription ().cc ()
 			);
 
 		return EJncError_IoFailure;

@@ -7,6 +7,7 @@
 #define _AXL_MT_WIN_THREAD_H
 
 #include "axl_mt_win_WaitableHandle.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace mt {

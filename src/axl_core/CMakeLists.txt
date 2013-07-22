@@ -197,7 +197,7 @@ source_group (
 	)
 
 if (NOT UNIX)
-	exclude_from_build (${AXL_MT_PSX_CPP_LIST})
+	exclude_from_build (${MT_PSX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

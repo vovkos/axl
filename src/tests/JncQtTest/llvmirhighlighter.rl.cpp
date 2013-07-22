@@ -1,5 +1,5 @@
 
-/* #line 1 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 1 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 #include "pch.h"
 #include "llvmirhighlighter.h"
 #include "moc_llvmirhighlighter.cpp"
@@ -7,7 +7,7 @@
 //.............................................................................
 
 
-/* #line 11 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
+/* #line 2 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
 static const char _llvmir_lexer_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	7, 1, 8, 1, 9, 1, 10, 1, 
@@ -535,7 +535,7 @@ static const int llvmir_lexer_error = -1;
 static const int llvmir_lexer_en_main = 3;
 
 
-/* #line 112 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 112 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 
 
 //.............................................................................
@@ -543,7 +543,7 @@ static const int llvmir_lexer_en_main = 3;
 void LlvmIrHighlighter::ragelInit()
 {
 	
-/* #line 547 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
+/* #line 528 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
 	{
 	cs = llvmir_lexer_start;
 	ts = 0;
@@ -551,13 +551,13 @@ void LlvmIrHighlighter::ragelInit()
 	act = 0;
 	}
 
-/* #line 119 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 119 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 }
 
 void LlvmIrHighlighter::ragelExec()
 {
 	
-/* #line 561 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
+/* #line 534 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
 	{
 	int _klen;
 	unsigned int _trans;
@@ -576,7 +576,7 @@ _resume:
 /* #line 1 "NONE" */
 	{ts = p;}
 	break;
-/* #line 580 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
+/* #line 551 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
 		}
 	}
 
@@ -647,63 +647,63 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 3:
-/* #line 95 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 95 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{act = 1;}
 	break;
 	case 4:
-/* #line 99 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 99 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{act = 2;}
 	break;
 	case 5:
-/* #line 100 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 100 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{act = 3;}
 	break;
 	case 6:
-/* #line 108 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 108 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{act = 8;}
 	break;
 	case 7:
-/* #line 100 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 100 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 8:
-/* #line 106 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 106 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p+1;}
 	break;
 	case 9:
-/* #line 108 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 108 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p+1;{  }}
 	break;
 	case 10:
-/* #line 99 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 99 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;{  }}
 	break;
 	case 11:
-/* #line 100 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 100 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 12:
-/* #line 101 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 101 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 13:
-/* #line 102 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 102 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 14:
-/* #line 104 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 104 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 15:
-/* #line 106 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 106 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;}
 	break;
 	case 16:
-/* #line 108 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 108 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{te = p;p--;{  }}
 	break;
 	case 17:
-/* #line 101 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 101 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 	{{p = ((te))-1;}{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 18:
@@ -724,7 +724,7 @@ _eof_trans:
 	}
 	}
 	break;
-/* #line 728 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
+/* #line 681 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
 		}
 	}
 
@@ -737,7 +737,7 @@ _again:
 /* #line 1 "NONE" */
 	{ts = 0;}
 	break;
-/* #line 741 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
+/* #line 692 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl.cpp" */
 		}
 	}
 
@@ -754,7 +754,7 @@ _again:
 
 	}
 
-/* #line 124 "/home/vladimir/Projects/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
+/* #line 124 "D:/Prj/Ninja/axl/src/tests/JncQtTest/llvmirhighlighter.rl" */
 }
 
 int LlvmIrHighlighter::getRagelState(int blockState)

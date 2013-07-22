@@ -59,7 +59,7 @@ public:
 		if (Result != win::EWaitResult_Object0)
 		{
 			ASSERT (false); // terminating thread
-			Terminate (err::EStatus_IoTimeout);
+			m_Thread.Terminate (err::EStatus_IoTimeout);
 		}
 
 		m_Thread.Close ();
