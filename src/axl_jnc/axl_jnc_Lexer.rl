@@ -48,6 +48,21 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# formatting literal machine 
+#
+
+lit_fmt := |*
+
+esc       ;
+'$' id    { CreateFmtLiteralToken (EToken_FmtLiteral); CreateStringToken (EToken_Identifier, 1, 0); PreCreateFmtLiteralToken (); };
+'$('      { CreateFmtLiteralToken (EToken_FmtLiteral); m_ParenthesesLevelStack.Append (1); fcall main; };
+'"' | nl  { CreateFmtLiteralToken (EToken_Literal); fret; };
+any       ;
+
+*|;
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # main machine 
 #
 
@@ -219,6 +234,8 @@ main := |*
 '@='           { CreateToken (EToken_AtAssign); };	
 '...'          { CreateToken (EToken_Ellipsis); };
 
+'$"'           { PreCreateFmtLiteralToken (); fcall lit_fmt; };
+
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 # common tokens
@@ -231,12 +248,15 @@ dec+            { CreateIntegerToken (10); };
 '0' [Xx] lit_dq { CreateHexLiteralToken (); };
 dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
 		        { CreateFpToken (); };
-
+				
 '//' [^\n]*    ;
 '/*' (any | nl)* :>> '*/' ;
 
-ws | nl        ;
-any            { CreateToken (ts [0]); };
+'('             { OnLeftParentheses (); };
+')'             { if (!OnRightParentheses ()) fret; };
+
+ws | nl         ;
+any             { CreateToken (ts [0]); };
 
 *|;
 
@@ -269,3 +289,5 @@ CLexer::Exec ()
 
 } // namespace jnc {
 } // namespace axl {
+
+

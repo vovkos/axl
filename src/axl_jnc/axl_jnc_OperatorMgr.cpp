@@ -12,7 +12,6 @@ COperatorMgr::COperatorMgr ()
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-
 	// operator tables
 
 	memset (m_UnaryOperatorTable, 0, sizeof (m_UnaryOperatorTable));

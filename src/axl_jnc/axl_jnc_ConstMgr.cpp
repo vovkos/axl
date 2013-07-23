@@ -36,6 +36,20 @@ CConstMgr::GetUnsafeThinDataPtrValidator ()
 	return m_UnsafeThinDataPtrValidator;
 }
 
+const CValue& 
+CConstMgr::SaveLiteral (
+	const char* p,
+	size_t Length
+	)
+{
+	if (Length == -1)
+		Length = strlen (p);
+
+	CValue Value;
+	Value.SetCharArray (p, Length + 1);
+	return SaveValue (Value);
+}
+
 //.............................................................................
 
 } // namespace jnc {

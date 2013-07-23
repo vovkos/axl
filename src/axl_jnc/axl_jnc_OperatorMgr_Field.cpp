@@ -171,7 +171,7 @@ COperatorMgr::GetUnionField (
 	{
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 
-		pPtrType = pField->GetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		pPtrType = pField->GetType ()->GetDataPtrType_c ();
 
 		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
 

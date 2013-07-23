@@ -170,7 +170,7 @@ CBinOp_Idx::ArrayIndexOperator (
 	{
 		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);
 
-		pPtrType = pElementType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		pPtrType = pElementType->GetDataPtrType_c ();
 
 		m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, OpValue2, NULL, &PtrValue);
 

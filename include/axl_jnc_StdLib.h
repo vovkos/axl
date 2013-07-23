@@ -136,6 +136,56 @@ public:
 	void*
 	GetTls ();
 
+	static
+	size_t
+	AppendFmtLiteral_a (
+		TFmtLiteral* pFmtLiteral,
+		const char* p,
+		size_t Length
+		);	
+
+	static
+	size_t
+	AppendFmtLiteral_p (
+		TFmtLiteral* pFmtLiteral,
+		TDataPtr Ptr
+		);
+
+	static
+	size_t
+	AppendFmtLiteral_i32 (
+		TFmtLiteral* pFmtLiteral,
+		int32_t x
+		);
+
+	static
+	size_t
+	AppendFmtLiteral_ui32 (
+		TFmtLiteral* pFmtLiteral,
+		uint32_t x
+		);
+
+	static
+	size_t
+	AppendFmtLiteral_i64 (
+		TFmtLiteral* pFmtLiteral,
+		int64_t x
+		);
+
+	static
+	size_t
+	AppendFmtLiteral_ui64 (
+		TFmtLiteral* pFmtLiteral,
+		uint64_t x
+		);
+
+	static
+	size_t
+	AppendFmtLiteral_f (
+		TFmtLiteral* pFmtLiteral,
+		double x
+		);
+
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
 	static

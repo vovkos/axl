@@ -758,6 +758,9 @@ protected:
 	CClassType* 
 	CreateISchedulerType ();
 
+	CStructType*
+	CreateFmtLiteralType ();
+
 	bool
 	CreateMulticastCallMethod (CClassType* pMulticastType);
 };

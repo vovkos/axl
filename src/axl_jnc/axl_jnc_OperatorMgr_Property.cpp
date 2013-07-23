@@ -50,7 +50,7 @@ COperatorMgr::GetPropertyVTable (
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	EPropertyPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	CType* pVTableType = pPtrType->GetTargetType ()->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CType* pVTableType = pPtrType->GetTargetType ()->GetVTableStructType ()->GetDataPtrType_c ();
 
 	switch (PtrTypeKind)
 	{

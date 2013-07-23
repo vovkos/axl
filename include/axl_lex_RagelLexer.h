@@ -286,7 +286,7 @@ protected:
 	}
 
 	TToken*
-	CreateToken (
+	PreCreateToken (
 		int Token,
 		size_t Channel = 0
 		)
@@ -302,11 +302,25 @@ protected:
 		pToken->m_Pos.m_Col = Offset - m_LineOffset;
 		pToken->m_Pos.m_Length = Length;
 		pToken->m_Pos.m_p = ts;
+		return pToken;
+	}
 
+	void
+	PostCreateToken ()
+	{
 		m_TokenizeCount++;
 		if (m_TokenizeCount >= m_TokenizeLimit)
 			Break ();
+	}
 
+	TToken*
+	CreateToken (
+		int Token,
+		size_t Channel = 0
+		)
+	{
+		TToken* pToken = PreCreateToken (Token, Channel);
+		PostCreateToken ();
 		return pToken;
 	}
 

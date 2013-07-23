@@ -45,7 +45,7 @@ CMcSnapshotClassType::CompileCallMethod ()
 	CValue PtrPfnEndValue;
 	CValue PtrPfnVariable;
 
-	CType* pPtrPfnType = m_pTargetType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CType* pPtrPfnType = m_pTargetType->GetDataPtrType_c ();
 	CType* pSizeType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
 	m_pModule->m_OperatorMgr.GetClassField (ArgValueArray [0], m_FieldArray [EMcSnapshotField_Count], NULL, &CountValue);

@@ -82,7 +82,7 @@ CTypeMgr::GetStdType (EStdType StdType)
 	switch (StdType)
 	{
 	case EStdType_BytePtr:
-		pType = GetPrimitiveType (EType_Int8_u)->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		pType = GetPrimitiveType (EType_Int8_u)->GetDataPtrType_c ();
 		break;
 
 	case EStdType_ObjectHdr:
@@ -90,7 +90,7 @@ CTypeMgr::GetStdType (EStdType StdType)
 		break;
 
 	case EStdType_ObjectHdrPtr:
-		pType = GetStdType (EStdType_ObjectHdr)->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		pType = GetStdType (EStdType_ObjectHdr)->GetDataPtrType_c ();
 		break;
 
 	case EStdType_ObjectClass:
@@ -127,6 +127,10 @@ CTypeMgr::GetStdType (EStdType StdType)
 
 	case EStdType_ISchedulerPtr:
 		pType = ((CClassType*) GetStdType (EStdType_IScheduler))->GetClassPtrType ();
+		break;
+
+	case EStdType_FmtLiteral:
+		pType = CreateFmtLiteralType ();
 		break;
 
 	default:
@@ -545,7 +549,7 @@ CTypeMgr::CreateClassType (
 
 	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceHdrStructType->m_Tag.Format ("%s.ifacehdr", pType->m_Tag.cc ());
-	pIfaceHdrStructType->CreateField (pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pIfaceHdrStructType->CreateField (pVTableStructType->GetDataPtrType_c ());
 	pIfaceHdrStructType->CreateField (GetStdType (EStdType_ObjectHdrPtr));
 
 	CStructType* pIfaceStructType = CreateUnnamedStructType (PackFactor);
@@ -1095,7 +1099,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	pType->m_FieldArray [EMulticastField_Lock] = pType->CreateField (GetPrimitiveType (EType_Int_p), 0, EPtrTypeFlag_Volatile);
 	pType->m_FieldArray [EMulticastField_MaxCount] = pType->CreateField (GetPrimitiveType (EType_SizeT));
 	pType->m_FieldArray [EMulticastField_Count] = pType->CreateField (GetPrimitiveType (EType_SizeT));
-	pType->m_FieldArray [EMulticastField_PtrArray] = pType->CreateField (pFunctionPtrType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->m_FieldArray [EMulticastField_PtrArray] = pType->CreateField (pFunctionPtrType->GetDataPtrType_c ());
 	pType->m_FieldArray [EMulticastField_HandleTable] = pType->CreateField (GetPrimitiveType (EType_Int_p));
 
 	CType* pArgType;
@@ -1141,7 +1145,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	// fields
 
 	pSnapshotType->m_FieldArray [EMcSnapshotField_Count] = pSnapshotType->CreateField (GetPrimitiveType (EType_SizeT));
-	pSnapshotType->m_FieldArray [EMcSnapshotField_PtrArray] = pSnapshotType->CreateField (pFunctionPtrType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pSnapshotType->m_FieldArray [EMcSnapshotField_PtrArray] = pSnapshotType->CreateField (pFunctionPtrType->GetDataPtrType_c ());
 
 	// call method
 
@@ -1433,7 +1437,7 @@ CTypeMgr::GetDataPtrStructType (CType* pDataType)
 
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format ("%s.ptr", pDataType->GetTypeString ().cc ());
-	pType->CreateField (pDataType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->CreateField (pDataType->GetDataPtrType_c ());
 	pType->CreateField (GetStdType (EStdType_BytePtr));
 	pType->CreateField (GetStdType (EStdType_BytePtr));
 	pType->CreateField (GetPrimitiveType (EType_SizeT));
@@ -1646,7 +1650,7 @@ CTypeMgr::GetPropertyPtrStructType (CPropertyType* pPropertyType)
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format ("%s.ptr", pPropertyType->GetTypeString ().cc ());
 	pType->m_Signature = Signature;
-	pType->CreateField (pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->CreateField (pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType_c ());
 	pType->CreateField (GetStdType (EStdType_ObjectPtr));
 	pType->EnsureLayout ();
 
@@ -1774,7 +1778,7 @@ CTypeMgr::GetGcShadowStackFrameType (size_t RootCount)
 	CStructType* pType = CreateStructType ("TGcShadowStackFrame", "jnc.TGcShadowStackFrame");
 
 	pType->CreateField (GetStdType (EStdType_BytePtr));
-	pType->CreateField (pMapType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->CreateField (pMapType->GetDataPtrType_c ());
 	pType->CreateField (GetArrayType (GetStdType (EStdType_BytePtr), RootCount));
 
 	pType->EnsureLayout ();
@@ -1947,6 +1951,17 @@ CTypeMgr::CreateISchedulerType ()
 	CType* pArgType = ((CFunctionType*) GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType ();
 	CFunctionType* pScheduleType = GetFunctionType (pReturnType, &pArgType, 1);
 	pType->CreateMethod (EStorage_Abstract, "Schedule", pScheduleType);
+	pType->EnsureLayout ();
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateFmtLiteralType ()
+{
+	CStructType* pType = CreateStructType ("TFmtLiteral", "jnc.TFmtLiteral");
+	pType->CreateField (GetPrimitiveType (EType_Char)->GetDataPtrType_c ());
+	pType->CreateField (GetPrimitiveType (EType_SizeT));
+	pType->CreateField (GetPrimitiveType (EType_SizeT));
 	pType->EnsureLayout ();
 	return pType;
 }

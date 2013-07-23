@@ -581,7 +581,7 @@ CClassType::CreateVTablePtr ()
 {
 	if (m_VTable.IsEmpty ())
 	{
-		m_VTablePtrValue = m_pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetZeroValue ();
+		m_VTablePtrValue = m_pVTableStructType->GetDataPtrType_c ()->GetZeroValue ();
 		return;
 	}
 
@@ -619,7 +619,7 @@ CClassType::CreateVTablePtr ()
 
 	m_VTablePtrValue.SetLlvmValue (
 		pLlvmVTableVariable, 
-		m_pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		m_pVTableStructType->GetDataPtrType_c (),
 		EValue_Const
 		);
 }
@@ -801,7 +801,7 @@ CClassType::CreatePrimer ()
 {
 	CType* ArgTypeArray [] =
 	{
-		GetClassStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		GetClassStructType ()->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
 	};
@@ -869,7 +869,7 @@ CClassType::CompilePrimer ()
 		m_pModule->m_LlvmBuilder.CreateGep2 (
 			IfacePtrValue, 
 			pField->GetLlvmIndex (), 
-			pClassType->GetClassStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe), 
+			pClassType->GetClassStructType ()->GetDataPtrType_c (), 
 			&FieldValue
 			);		
 
@@ -929,7 +929,7 @@ CClassType::PrimeInterface (
 
 		if (!pBaseClassType->HasVTable ())
 		{
-			BaseClassVTablePtrValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetZeroValue ();
+			BaseClassVTablePtrValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType_c ()->GetZeroValue ();
 		}
 		else
 		{
@@ -942,7 +942,7 @@ CClassType::PrimeInterface (
 
 			m_pModule->m_LlvmBuilder.CreateBitCast (
 				BaseClassVTablePtrValue, 
-				pBaseClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+				pBaseClassType->GetVTableStructType ()->GetDataPtrType_c (),
 				&BaseClassVTablePtrValue
 				);
 		}		

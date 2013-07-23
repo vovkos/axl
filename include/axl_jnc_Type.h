@@ -140,6 +140,7 @@ enum EStdType
 	EStdType_AutoEvBindSite,
 	EStdType_IScheduler,
 	EStdType_ISchedulerPtr,
+	EStdType_FmtLiteral,
 	EStdType__Count,
 };
 
@@ -517,6 +518,12 @@ public:
 		)
 	{
 		return GetDataPtrType (EType_DataPtr, PtrTypeKind, Flags);
+	}
+
+	CDataPtrType* 
+	GetDataPtrType_c ()
+	{
+		return GetDataPtrType (EType_DataPtr, EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
 	}
 
 	CFunctionArg* 

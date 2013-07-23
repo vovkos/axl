@@ -33,7 +33,7 @@ protected:
 public:
 	CNamespaceMgr ();
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;

@@ -300,7 +300,7 @@ CGcShadowStack::GetFrameMap (
 
 	pResultValue->SetLlvmValue (
 		pLlvmFrameMapVariable, 
-		pFrameMapType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		pFrameMapType->GetDataPtrType_c (),
 		EValue_Const
 		);
 

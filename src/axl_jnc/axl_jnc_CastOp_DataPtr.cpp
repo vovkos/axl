@@ -210,7 +210,7 @@ CCast_DataPtr_Normal2Normal::LlvmCast (
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, NULL, &RangeEndValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 3, NULL, &ScopeLevelValue);
 
-	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType_c ();
 	GetOffsetUnsafePtrValue (PtrValue, (CDataPtrType*) OpValue.GetType (), pUnsafePtrType, &PtrValue);
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "create safe data pointer");
@@ -265,7 +265,7 @@ CCast_DataPtr_Thin2Normal::LlvmCast (
 	ASSERT (SrcPtrTypeKind == EDataPtrType_Thin);
 
 	CValue PtrValue;
-	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType_c ();
 	GetOffsetUnsafePtrValue (OpValue, (CDataPtrType*) OpValue.GetType (), pUnsafePtrType, &PtrValue);
 
 	if (SrcPtrTypeKind == EDataPtrType_Thin)

@@ -261,7 +261,7 @@ CVariableMgr::AllocatePrimeStaticVariable (CVariable* pVariable)
 
 	pVariable->m_pLlvmAllocValue = CreateLlvmGlobalVariable (pType, pVariable->GetQualifiedName ());
 
-	CValue PtrValue (pVariable->m_pLlvmAllocValue, pType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	CValue PtrValue (pVariable->m_pLlvmAllocValue, pType->GetDataPtrType_c ());
 	bool Result = m_pModule->m_OperatorMgr.Prime (EStorage_Static, PtrValue, pType, &PtrValue);
 	if (!Result)
 		return false;

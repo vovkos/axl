@@ -758,6 +758,7 @@ primary_expr <CValue* $pValue>
 			{
 				$pValue->SetCharArray ($1.m_BinData, $1.m_BinData.GetCount ());
 			}
+	|	fmt_literal <$pValue>
 	|	EToken_True
 			{
 				$pValue->SetConstBool (true);
@@ -793,6 +794,35 @@ literal
 			{
 				if ($.m_LastToken == EToken_Literal)
 					$.m_BinData.Append (0);
+			}
+	;
+
+fmt_literal <CValue* $pValue>
+	local 
+	{
+		CValue $Value;
+	}
+	enter
+	{
+		return CreateFmtLiteral (&$Value);
+	}
+	:	(	EToken_FmtLiteral $l1
+				{
+					return AppendFmtLiteral ($Value, $l1.m_Data.m_String, $l1.m_Data.m_String.GetLength ());
+				}
+			expression $e
+				{
+					return AppendFmtLiteralValue ($Value, $e.m_Value);
+				}
+		)+
+		EToken_Literal $l2
+			{
+				return FinalizeFmtLiteral (
+					$Value,
+					$l2.m_Data.m_String, 
+					$l2.m_Data.m_String.GetLength (),
+					$pValue
+					);
 			}
 	;
 

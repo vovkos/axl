@@ -345,6 +345,30 @@ Members2
 
 	bool
 	SkipCurlyInitializerItem (TCurlyInitializer* pInitializer);
+
+	bool
+	CreateFmtLiteral (CValue* pValue);
+
+	bool
+	AppendFmtLiteral (
+		const CValue& Value,
+		const char* p,
+		size_t Length
+		);
+
+	bool
+	AppendFmtLiteralValue (
+		const CValue& DstValue,
+		const CValue& SrcValue
+		);
+
+	bool
+	FinalizeFmtLiteral (
+		const CValue& Value,
+		const char* p,
+		size_t Length,
+		CValue* pResultValue
+		);
 } 
 
 OpenNamespace

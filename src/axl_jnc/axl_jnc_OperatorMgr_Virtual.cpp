@@ -32,7 +32,7 @@ COperatorMgr::GetClassVTable (
 
 	// class.vtbl*
 
-	CDataPtrType* pResultType = pClassType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CDataPtrType* pResultType = pClassType->GetVTableStructType ()->GetDataPtrType_c ();
 	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pResultType, pResultValue);
 	return true;
 }
@@ -131,7 +131,7 @@ COperatorMgr::GetVirtualProperty (
 
 	m_pModule->m_LlvmBuilder.CreateBitCast (
 		PtrValue, 
-		pProperty->GetType ()->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		pProperty->GetType ()->GetVTableStructType ()->GetDataPtrType_c (),
 		&PtrValue
 		);
 

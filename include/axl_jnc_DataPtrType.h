@@ -97,5 +97,16 @@ struct TDataPtrTypeTuple: rtl::TListLink
 
 //.............................................................................
 
+inline
+bool 
+IsCharPtrType (CType* pType)
+{
+	return 
+		pType->GetTypeKind () == EType_DataPtr &&
+		((CDataPtrType*) pType)->GetTargetType ()->GetTypeKind () == EType_Char;
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

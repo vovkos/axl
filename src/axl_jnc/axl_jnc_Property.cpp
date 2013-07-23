@@ -634,7 +634,7 @@ CProperty::CreateVTablePtr ()
 
 	m_VTablePtrValue.SetLlvmValue (
 		pLlvmVTableVariable, 
-		pVTableStructType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		pVTableStructType->GetDataPtrType_c (),
 		EValue_Const
 		);
 }

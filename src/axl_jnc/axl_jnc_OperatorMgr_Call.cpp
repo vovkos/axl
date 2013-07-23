@@ -144,11 +144,11 @@ COperatorMgr::GetUnsafeVarArgType (CType* pType)
 			break;
 
 		case EType_Array:
-			pType = ((CArrayType*) pType)->GetElementType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+			pType = ((CArrayType*) pType)->GetElementType ()->GetDataPtrType_c ();
 			break;
 
 		case EType_DataPtr:
-			pType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+			pType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType_c ();
 			break;
 
 		default:

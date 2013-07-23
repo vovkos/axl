@@ -41,6 +41,12 @@ public:
 		return *It;
 	}
 
+	const CValue& 
+	SaveLiteral (
+		const char* p,
+		size_t Length = -1
+		);
+
 	CThinDataPtrValidator*
 	GetUnsafeThinDataPtrValidator ();
 };

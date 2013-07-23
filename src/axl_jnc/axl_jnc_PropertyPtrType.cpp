@@ -98,7 +98,7 @@ CPropertyPtrType::PrepareLlvmType ()
 {
 	m_pLlvmType = 
 		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmType () : 
-		m_pTargetType->GetVTableStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetLlvmType ();
+		m_pTargetType->GetVTableStructType ()->GetDataPtrType_c ()->GetLlvmType ();
 }
 
 void

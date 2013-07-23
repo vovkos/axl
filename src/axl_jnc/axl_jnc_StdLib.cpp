@@ -26,6 +26,13 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_a, (void*) AppendFmtLiteral_a);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_p, (void*) AppendFmtLiteral_p);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i32, (void*) AppendFmtLiteral_i32);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui32, (void*) AppendFmtLiteral_ui32);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i64, (void*) AppendFmtLiteral_i64);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui64, (void*) AppendFmtLiteral_ui64);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_f, (void*) AppendFmtLiteral_f);
 
 	// implementation for thin and unsafe is the same
 
@@ -370,6 +377,106 @@ CStdLib::GetTls ()
 	ASSERT (pRuntime);
 
 	return pRuntime->GetTls ();
+}
+
+size_t
+CStdLib::AppendFmtLiteral_a (
+	TFmtLiteral* pFmtLiteral,
+	const char* p,
+	size_t Length
+	)
+{
+	size_t NewLength = pFmtLiteral->m_Length + Length;
+	if (NewLength < 64) 
+		NewLength = 64;
+
+	if (pFmtLiteral->m_MaxLength < NewLength)
+	{
+		size_t NewMaxLength = rtl::GetMinPower2Ge (NewLength);
+		char* pNew = (char*) AXL_MEM_ALLOC (NewMaxLength + 1);
+		memcpy (pNew, pFmtLiteral->m_p, pFmtLiteral->m_Length);
+
+		pFmtLiteral->m_p = pNew;
+		pFmtLiteral->m_MaxLength = NewMaxLength;
+	}
+
+	memcpy (pFmtLiteral->m_p + pFmtLiteral->m_Length, p, Length);
+	pFmtLiteral->m_Length += Length;
+	pFmtLiteral->m_p [pFmtLiteral->m_Length] = 0;
+
+	return pFmtLiteral->m_Length;
+}
+
+size_t
+CStdLib::AppendFmtLiteral_p (
+	TFmtLiteral* pFmtLiteral,
+	TDataPtr Ptr
+	)
+{
+	if (!Ptr.m_p)
+		return AppendFmtLiteral_a (pFmtLiteral, "(null)", 6);
+
+	char* p = (char*) Ptr.m_p;
+	while (*p && p < Ptr.m_pRangeEnd)
+		p++;
+
+	size_t Length = p - (char*) Ptr.m_p;
+	return AppendFmtLiteral_a (pFmtLiteral, (char*) Ptr.m_p, Length);
+}
+
+size_t
+CStdLib::AppendFmtLiteral_i32 (
+	TFmtLiteral* pFmtLiteral,
+	int32_t x
+	)
+{
+	char Buffer [16];
+	_ltoa (x, Buffer, 10);
+	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
+}
+
+size_t
+CStdLib::AppendFmtLiteral_ui32 (
+	TFmtLiteral* pFmtLiteral,
+	uint32_t x
+	)
+{
+	char Buffer [16];
+	_ultoa (x, Buffer, 10);
+	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
+}
+
+size_t
+CStdLib::AppendFmtLiteral_i64 (
+	TFmtLiteral* pFmtLiteral,
+	int64_t x
+	)
+{
+	char Buffer [16];
+	_i64toa (x, Buffer, 10);
+	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
+}
+
+size_t
+CStdLib::AppendFmtLiteral_ui64 (
+	TFmtLiteral* pFmtLiteral,
+	uint64_t x
+	)
+{
+	char Buffer [16];
+	_ui64toa (x, Buffer, 10);
+	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
+}
+
+size_t
+CStdLib::AppendFmtLiteral_f (
+	TFmtLiteral* pFmtLiteral,
+	double x
+	)
+{
+	char Buffer [16];
+	sprintf (Buffer, "%f", x);
+	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
 }
 
 void

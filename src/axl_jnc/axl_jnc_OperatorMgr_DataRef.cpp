@@ -149,7 +149,7 @@ COperatorMgr::PrepareDataPtr (
 	CDataPtrType* pType = (CDataPtrType*) Value.GetType ();
 	EDataPtrType PtrTypeKind = pType->GetPtrTypeKind ();
 
-	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType_c ();
 
 	CValue PtrValue;
 	CValue RangeBeginValue;	

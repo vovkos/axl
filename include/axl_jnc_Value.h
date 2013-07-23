@@ -708,7 +708,7 @@ struct TDataPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up fat function pointers, e.g.:
+// structure backing up fat function pointers, e.g.:
 // int function* pfTest (int, int);
 // int function weak* pfTest (int, int);
 
@@ -720,7 +720,7 @@ struct TFunctionPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structures backing up property pointers, e.g.:
+// structure backing up property pointers, e.g.:
 // int property* pxTest;
 // int property weak* pxTest;
 
@@ -732,10 +732,23 @@ struct TPropertyPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// structure backing up autoev bind site in autoev class
+
 struct TAutoEvBindSite
 {
 	TInterface* m_pOnChange;
 	intptr_t m_Cookie;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structure backing up formatting literal
+
+struct TFmtLiteral
+{
+	char* m_p;
+	size_t m_MaxLength;
+	size_t m_Length;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

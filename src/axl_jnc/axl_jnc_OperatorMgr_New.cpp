@@ -17,7 +17,7 @@ COperatorMgr::Allocate (
 	CValue* pResultValue
 	)
 {
-	CType* pPtrType = pType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CType* pPtrType = pType->GetDataPtrType_c ();
 
 	bool IsNonConstSizeArray = SizeValue.GetValueKind () != EValue_Const;
 	if (!IsNonConstSizeArray)
@@ -713,7 +713,7 @@ COperatorMgr::MarkGcRoot (
 	m_pModule->m_LlvmBuilder.CreateAlloca (
 		pBytePtrType, 
 		"gc_root", 
-		pBytePtrType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe), 
+		pBytePtrType->GetDataPtrType_c (), 
 		&GcRootValue
 		);
 

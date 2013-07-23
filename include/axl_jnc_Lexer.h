@@ -23,6 +23,7 @@ enum EToken
 	EToken_Fp,
 	EToken_Literal,
 	EToken_HexLiteral,
+	EToken_FmtLiteral,
 
 	// global declarations & pragmas
 
@@ -182,6 +183,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Fp,           "floating-point-constant")
 	AXL_PRS_TOKEN_NAME (EToken_Literal,      "string-literal")
 	AXL_PRS_TOKEN_NAME (EToken_HexLiteral,   "hex-literal")
+	AXL_PRS_TOKEN_NAME (EToken_FmtLiteral,   "fmt-literal")
 
 	// global declarations & pragmas
 
@@ -349,14 +351,26 @@ class CLexer: public lex::CRagelLexerT <CLexer, CToken>
 	friend class lex::CRagelLexerT <CLexer, CToken>;
 
 protected:
+	CToken* m_pFmtLiteralToken;
+	rtl::CArrayT <intptr_t> m_ParenthesesLevelStack;
+
+public:
+	CLexer ()
+	{
+		m_pFmtLiteralToken = NULL;
+	}
+
+protected:
 	CToken*
 	CreateStringToken (
 		int Token,
-		int Left = 0,
-		int Right = 0
+		size_t Left = 0,
+		size_t Right = 0
 		)
 	{
 		CToken* pToken = CreateToken (Token);
+		ASSERT (pToken->m_Pos.m_Length >= Left + Right);
+
 		pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (ts + Left, pToken->m_Pos.m_Length - (Left + Right));
 		return pToken;
 	}
@@ -381,7 +395,7 @@ protected:
 	CToken*
 	CreateIntegerToken (
 		int Radix = 10,
-		int Left = 0
+		size_t Left = 0
 		)
 	{
 		CToken* pToken = CreateToken (EToken_Integer);
@@ -403,6 +417,65 @@ protected:
 		CToken* pToken = CreateToken (EToken_Integer);
 		pToken->m_Data.m_Integer = Value;
 		return pToken;
+	}
+
+	// formatting literals
+
+	CToken*
+	PreCreateFmtLiteralToken ()
+	{
+		ASSERT (!m_pFmtLiteralToken);
+		m_pFmtLiteralToken = PreCreateToken (EToken_FmtLiteral);
+		return m_pFmtLiteralToken;
+	}
+
+	CToken*
+	CreateFmtLiteralToken (int Token)
+	{
+		ASSERT (m_pFmtLiteralToken);
+		CToken* pToken = m_pFmtLiteralToken;
+		
+		size_t Left = pToken->m_Pos.m_Length;
+		size_t Right = te - ts;
+
+		m_pFmtLiteralToken = NULL;
+
+		pToken->m_Pos.m_Length = te - pToken->m_Pos.m_p;
+		ASSERT (pToken->m_Pos.m_Length >= Left + Right);
+
+		pToken->m_Token = Token;
+		pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (
+			pToken->m_Pos.m_p + Left, 
+			pToken->m_Pos.m_Length - (Left + Right));
+		return pToken;
+	}
+
+	void
+	OnLeftParentheses ()
+	{
+		if (!m_ParenthesesLevelStack.IsEmpty ())
+			m_ParenthesesLevelStack [m_ParenthesesLevelStack.GetCount () - 1]++;
+
+		CreateToken ('('); 
+	}
+
+	bool
+	OnRightParentheses ()
+	{
+		if (!m_ParenthesesLevelStack.IsEmpty ())
+		{
+			size_t i = m_ParenthesesLevelStack.GetCount () - 1;
+			m_ParenthesesLevelStack [i]--;
+			if (!m_ParenthesesLevelStack [i])
+			{
+				PreCreateFmtLiteralToken ();
+				m_ParenthesesLevelStack.Pop ();
+				return false;
+			}
+		}
+
+		CreateToken (')'); 
+		return true;
 	}
 
 	// implemented in *.rl

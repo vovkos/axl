@@ -2042,7 +2042,141 @@ CParser::SkipCurlyInitializerItem (TCurlyInitializer* pInitializer)
 	return true;
 }
 
+bool
+CParser::CreateFmtLiteral (CValue* pValue)
+{
+	ASSERT (m_pModule->m_NamespaceMgr.GetCurrentScope ());
+
+	return m_pModule->m_OperatorMgr.NewOperator (
+		EStorage_Stack, 
+		GetSimpleType (m_pModule, EStdType_FmtLiteral),
+		NULL,
+		pValue
+		);
+}
+
+bool
+CParser::AppendFmtLiteral (
+	const CValue& Value,
+	const char* p,
+	size_t Length
+	)
+{
+	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_AppendFmtLiteral_a);
+
+	CValue LiteralValue;
+	LiteralValue.SetCharArray (p, Length);
+	m_pModule->m_OperatorMgr.CastOperator (&LiteralValue, GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ());
+
+	CValue SizeValue;
+	SizeValue.SetConstSizeT (Length);
+
+	CValue ResultValue;
+	m_pModule->m_LlvmBuilder.CreateCall3 (
+		pAppend,
+		pAppend->GetType (),
+		Value,
+		LiteralValue,
+		SizeValue,
+		&ResultValue
+		);
+
+	return true;
+}
+
+bool
+CParser::AppendFmtLiteralValue (
+	const CValue& DstValue,
+	const CValue& RawSrcValue
+	)
+{
+	EStdFunc AppendFunc;
+
+	CValue SrcValue;
+	bool Result = m_pModule->m_OperatorMgr.PrepareOperand (RawSrcValue, &SrcValue);
+	if (!Result)
+		return false;
+	
+	CType* pType = SrcValue.GetType ();
+	if (pType->GetTypeKindFlags () & ETypeKindFlag_Integer)
+	{
+		static EStdFunc FuncTable [2] [2] = 
+		{
+			EStdFunc_AppendFmtLiteral_i32, EStdFunc_AppendFmtLiteral_ui32,
+			EStdFunc_AppendFmtLiteral_i64, EStdFunc_AppendFmtLiteral_ui64,
+		};
+
+		size_t i1 = pType->GetSize () <= 4;
+		size_t i2 = (pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0;
+
+		AppendFunc = FuncTable [i1] [i2];
+	}
+	else if (pType->GetTypeKindFlags () & ETypeKindFlag_Fp)
+	{
+		AppendFunc = EStdFunc_AppendFmtLiteral_f;
+	}
+	else if (IsCharArrayType (pType) || IsCharPtrType (pType))
+	{
+		AppendFunc = EStdFunc_AppendFmtLiteral_p;
+	}
+	else
+	{
+		err::SetFormatStringError ("don't know how to format '%s'", pType->GetTypeString ().cc ());
+		return false;
+	}
+
+	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (AppendFunc);	
+	CType* pArgType = pAppend->GetType ()->GetArgArray () [1]->GetType ();
+
+	CValue ArgValue;
+	Result = m_pModule->m_OperatorMgr.CastOperator (SrcValue, pArgType, &ArgValue);
+	if (!Result)
+		return false;
+
+	CValue ResultValue;
+	m_pModule->m_LlvmBuilder.CreateCall2 (
+		pAppend,
+		pAppend->GetType (),
+		DstValue,
+		ArgValue,
+		&ResultValue
+		);
+
+	return true;
+}
+
+bool
+CParser::FinalizeFmtLiteral (
+	const CValue& Value,
+	const char* p,
+	size_t Length,
+	CValue* pResultValue
+	)
+{
+	AppendFmtLiteral (Value, p, Length);
+
+	CValue PtrValue;
+	CValue SizeValue;
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (Value, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
+
+	m_pModule->m_LlvmBuilder.CreateGep2 (Value, 2, NULL, &SizeValue);
+	m_pModule->m_LlvmBuilder.CreateLoad (SizeValue, NULL, &SizeValue);
+
+	pResultValue->SetThinDataPtr (
+		PtrValue.GetLlvmValue (),
+		GetSimpleType (m_pModule, EType_Char)->GetDataPtrType (EDataPtrType_Thin),
+		CValue ((int64_t) 0, GetSimpleType (m_pModule, EType_SizeT)),
+		PtrValue,
+		SizeValue
+		);	 
+
+	return true;
+}
+
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
+

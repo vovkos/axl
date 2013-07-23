@@ -216,9 +216,14 @@ CModule::CreateDefaultConstructor ()
 
 	m_ControlFlowMgr.SetCurrentBlock (pBlock);
 
+	CToken::CPos Pos;
+	m_NamespaceMgr.OpenScope (Pos);
+
 	Result = m_VariableMgr.InitializeGlobalStaticVariables ();
 	if (!Result)
 		return false;
+
+	m_NamespaceMgr.CloseScope (Pos);
 
 	m_FunctionMgr.InternalEpilogue ();
 

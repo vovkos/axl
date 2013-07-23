@@ -115,6 +115,63 @@ enum EStdFunc
 
 	EStdFunc_GetTls,
 
+	// size_t
+	// jnc.AppendFmtLiteral_a (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		char* p,
+	//		size_t Length
+	//		);
+
+	EStdFunc_AppendFmtLiteral_a,
+
+	// size_t
+	// jnc.AppendFmtLiteral_p (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TPtr Ptr
+	//		);
+
+	EStdFunc_AppendFmtLiteral_p,
+
+	// size_t
+	// jnc.AppendFmtLiteral_i32 (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		i32 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_i32,
+
+	// size_t
+	// jnc.AppendFmtLiteral_ui32 (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		i32 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_ui32,
+
+	// size_t
+	// jnc.AppendFmtLiteral_i64 (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		i64 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_i64,
+
+	// size_t
+	// jnc.AppendFmtLiteral_ui64 (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		i64 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_ui64,
+
+	// size_t
+	// jnc.AppendFmtLiteral_f (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		double f
+	//		);
+
+	EStdFunc_AppendFmtLiteral_f,
+
 	EStdFunc__Count
 };
 
@@ -410,6 +467,27 @@ protected:
 
 	CFunction*
 	CreateGcSafePoint ();
+
+	CFunction*
+	CreateAppendFmtLiteral_a ();
+
+	CFunction*
+	CreateAppendFmtLiteral_p ();
+
+	CFunction*
+	CreateAppendFmtLiteral_i32 ();
+
+	CFunction*
+	CreateAppendFmtLiteral_ui32 ();
+
+	CFunction*
+	CreateAppendFmtLiteral_i64 ();
+
+	CFunction*
+	CreateAppendFmtLiteral_ui64 ();
+
+	CFunction*
+	CreateAppendFmtLiteral_f ();
 };
 
 //.............................................................................

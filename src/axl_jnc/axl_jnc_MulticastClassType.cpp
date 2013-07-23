@@ -78,7 +78,7 @@ CMulticastClassType::GetMulticastStructType ()
 	m_FieldArray [EMulticastField_Lock] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p));
 	m_FieldArray [EMulticastField_Count] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
 	m_FieldArray [EMulticastField_MaxCount] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT));
-	m_FieldArray [EMulticastField_PtrArray] = m_pMulticastStructType->CreateField (m_pTargetType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe));
+	m_FieldArray [EMulticastField_PtrArray] = m_pMulticastStructType->CreateField (m_pTargetType->GetDataPtrType_c ());
 	m_FieldArray [EMulticastField_HandleTable] = m_pMulticastStructType->CreateField (m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 	
 	m_pMulticastStructType->EnsureLayout ();
@@ -176,7 +176,7 @@ CMulticastClassType::CreateClearMethod_u ()
 
 	CType* ArgTypeArray [] =
 	{
-		GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		GetDataPtrType_c (),
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
@@ -240,7 +240,7 @@ CMulticastClassType::CreateSetMethod_u ()
 	
 	CType* ArgTypeArray [] =
 	{
-		GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		GetDataPtrType_c (),
 		m_pTargetType
 	};
 
@@ -321,7 +321,7 @@ CMulticastClassType::CreateAddMethod_u ()
 	
 	CType* ArgTypeArray [] =
 	{
-		GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		GetDataPtrType_c (),
 		m_pTargetType
 	};
 
@@ -402,7 +402,7 @@ CMulticastClassType::CreateRemoveMethod_u ()
 	
 	CType* ArgTypeArray [] =
 	{
-		GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
 	};
 
@@ -480,7 +480,7 @@ CMulticastClassType::CreateSnapshotMethod_u ()
 	
 	CType* ArgTypeArray [] =
 	{
-		GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe),
+		GetDataPtrType_c (),
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
@@ -518,7 +518,7 @@ CMulticastClassType::CreateSnapshotMethod_u ()
 
 	m_pModule->m_LlvmBuilder.CreateExtractValue (ReturnValue, 0, NULL, &CountValue);
 	m_pModule->m_LlvmBuilder.CreateExtractValue (ReturnValue, 1, NULL, &PtrPfnValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrPfnValue, m_pTargetType->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe), &PtrPfnValue);
+	m_pModule->m_LlvmBuilder.CreateBitCast (PtrPfnValue, m_pTargetType->GetDataPtrType_c (), &PtrPfnValue);
 	
 	ReturnValue = pReturnType->GetUndefValue ();
 	m_pModule->m_LlvmBuilder.CreateInsertValue (ReturnValue, CountValue, 0, pReturnType, &ReturnValue);
@@ -572,7 +572,7 @@ CMulticastClassType::CreateCallMethod ()
 CFunction* 
 CMulticastClassType::CreateCallMethod_u ()
 {
-	CFunctionArg* pThisArg = GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe)->GetSimpleFunctionArg ();
+	CFunctionArg* pThisArg = GetDataPtrType_c ()->GetSimpleFunctionArg ();
 
 	rtl::CArrayT <CFunctionArg*> ArgArray = m_pTargetType->GetTargetType ()->GetArgArray ();
 	ArgArray.Insert (0, pThisArg);
@@ -628,7 +628,7 @@ CMulticastClassType::ConvertToSimpleMulticastPtr (CValue* pMulticastPtrValue)
 	EFunctionPtrType PtrTypeKind = m_pTargetType->GetPtrTypeKind ();
 	CFunctionType* pFuncitonType = (CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 	CFunctionPtrType* pFuncitonPtrType = pFuncitonType->GetFunctionPtrType (PtrTypeKind);
-	CDataPtrType* pMulticastPtrType = pFuncitonPtrType->GetMulticastType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CDataPtrType* pMulticastPtrType = pFuncitonPtrType->GetMulticastType ()->GetDataPtrType_c ();
 
 	m_pModule->m_LlvmBuilder.CreateBitCast (*pMulticastPtrValue, pMulticastPtrType, pMulticastPtrValue);
 }
