@@ -352,21 +352,20 @@ Members2
 	bool
 	AppendFmtLiteral (
 		const CValue& Value,
-		const char* p,
-		size_t Length
+		const rtl::CString& String
 		);
 
 	bool
 	AppendFmtLiteralValue (
 		const CValue& DstValue,
-		const CValue& SrcValue
+		const CValue& SrcValue,
+		const rtl::CString& FmtSpecifierString
 		);
 
 	bool
 	FinalizeFmtLiteral (
 		const CValue& Value,
-		const char* p,
-		size_t Length,
+		const rtl::CString& String,
 		CValue* pResultValue
 		);
 } 

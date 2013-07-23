@@ -126,7 +126,8 @@ enum EStdFunc
 
 	// size_t
 	// jnc.AppendFmtLiteral_p (
-	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
 	//		jnc.TPtr Ptr
 	//		);
 
@@ -134,7 +135,8 @@ enum EStdFunc
 
 	// size_t
 	// jnc.AppendFmtLiteral_i32 (
-	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
 	//		i32 i
 	//		);
 
@@ -142,7 +144,8 @@ enum EStdFunc
 
 	// size_t
 	// jnc.AppendFmtLiteral_ui32 (
-	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
 	//		i32 i
 	//		);
 
@@ -150,7 +153,8 @@ enum EStdFunc
 
 	// size_t
 	// jnc.AppendFmtLiteral_i64 (
-	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
 	//		i64 i
 	//		);
 
@@ -158,7 +162,8 @@ enum EStdFunc
 
 	// size_t
 	// jnc.AppendFmtLiteral_ui64 (
-	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
 	//		i64 i
 	//		);
 
@@ -166,7 +171,8 @@ enum EStdFunc
 
 	// size_t
 	// jnc.AppendFmtLiteral_f (
-	//		jnc.TFmtLiteral* pLiteral,
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
 	//		double f
 	//		);
 

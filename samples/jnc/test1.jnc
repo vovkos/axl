@@ -5,10 +5,11 @@ main ()
 {
 	printf ("main ()\n");
 
-	char Name [] = "hui";
-	int Value = 23;
+	char Name [] = 0x"61 62 63" "_hui" ;
+	int Value1 = 0xdead;
+	int Value2 = 0xbeee;
 
-	printf ($"$(Name) = $(Value)\n");	
+	printf ($"--> $Name = { $(Value1:06x) $(Value2 + 1:08x) }\n");
 
 	return 10; 
 }

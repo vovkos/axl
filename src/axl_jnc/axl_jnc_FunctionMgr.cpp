@@ -1505,7 +1505,8 @@ CFunctionMgr::CreateAppendFmtLiteral_a ()
 
 // size_t
 // jnc.AppendFmtLiteral_p (
-//		jnc.TFmtLiteral* pLiteral,
+//		jnc.TFmtLiteral* pFmtLiteral,
+//		char* pFmtSpecifier,
 //		jnc.TPtr Ptr
 //		);
 
@@ -1517,6 +1518,7 @@ CFunctionMgr::CreateAppendFmtLiteral_p ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (),
 	};
 
@@ -1527,7 +1529,8 @@ CFunctionMgr::CreateAppendFmtLiteral_p ()
 
 // size_t
 // jnc.AppendFmtLiteral_i32 (
-//		jnc.TFmtLiteral* pLiteral,
+//		jnc.TFmtLiteral* pFmtLiteral,
+//		char* pFmtSpecifier,
 //		i32 i
 //		);
 
@@ -1539,6 +1542,7 @@ CFunctionMgr::CreateAppendFmtLiteral_i32 ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
 	};
 
@@ -1549,7 +1553,8 @@ CFunctionMgr::CreateAppendFmtLiteral_i32 ()
 
 // size_t
 // jnc.AppendFmtLiteral_ui32 (
-//		jnc.TFmtLiteral* pLiteral,
+//		jnc.TFmtLiteral* pFmtLiteral,
+//		char* pFmtSpecifier,
 //		i32 i
 //		);
 
@@ -1561,6 +1566,7 @@ CFunctionMgr::CreateAppendFmtLiteral_ui32 ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32_u),
 	};
 
@@ -1571,7 +1577,8 @@ CFunctionMgr::CreateAppendFmtLiteral_ui32 ()
 
 // size_t
 // jnc.AppendFmtLiteral_i64 (
-//		jnc.TFmtLiteral* pLiteral,
+//		jnc.TFmtLiteral* pFmtLiteral,
+//		char* pFmtSpecifier,
 //		i64 i
 //		);
 
@@ -1583,6 +1590,7 @@ CFunctionMgr::CreateAppendFmtLiteral_i64 ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64),
 	};
 
@@ -1593,7 +1601,8 @@ CFunctionMgr::CreateAppendFmtLiteral_i64 ()
 
 // size_t
 // jnc.AppendFmtLiteral_ui64 (
-//		jnc.TFmtLiteral* pLiteral,
+//		jnc.TFmtLiteral* pFmtLiteral,
+//		char* pFmtSpecifier,
 //		i64 i
 //		);
 
@@ -1605,6 +1614,7 @@ CFunctionMgr::CreateAppendFmtLiteral_ui64 ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u),
 	};
 
@@ -1615,7 +1625,8 @@ CFunctionMgr::CreateAppendFmtLiteral_ui64 ()
 
 // size_t
 // jnc.AppendFmtLiteral_f (
-//		jnc.TFmtLiteral* pLiteral,
+//		jnc.TFmtLiteral* pFmtLiteral,
+//		char* pFmtSpecifier,
 //		double f
 //		);
 
@@ -1627,6 +1638,7 @@ CFunctionMgr::CreateAppendFmtLiteral_f ()
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double),
 	};
 

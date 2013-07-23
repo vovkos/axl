@@ -48,7 +48,7 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# formatting literal machine 
+# formatting literal machines 
 #
 
 lit_fmt := |*
@@ -60,6 +60,14 @@ esc       ;
 any       ;
 
 *|;
+
+fmt_spec := |*
+
+':' [^")\n]*  { CreateStringToken (EToken_FmtSpecifier, 1); fret; };
+any           { ASSERT (false); fret; };
+
+*|;
+
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -254,6 +262,7 @@ dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
 
 '('             { OnLeftParentheses (); };
 ')'             { if (!OnRightParentheses ()) fret; };
+':'             { if (!OnColon ()) fcall fmt_spec; };
 
 ws | nl         ;
 any             { CreateToken (ts [0]); };

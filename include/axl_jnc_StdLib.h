@@ -148,6 +148,7 @@ public:
 	size_t
 	AppendFmtLiteral_p (
 		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
 		TDataPtr Ptr
 		);
 
@@ -155,36 +156,56 @@ public:
 	size_t
 	AppendFmtLiteral_i32 (
 		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
 		int32_t x
-		);
+		)
+	{
+		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'd', x);
+	}
 
 	static
 	size_t
 	AppendFmtLiteral_ui32 (
 		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
 		uint32_t x
-		);
+		)
+	{
+		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'u', x);
+	}
 
 	static
 	size_t
 	AppendFmtLiteral_i64 (
 		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
 		int64_t x
-		);
+		)
+	{
+		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'd', x);
+	}
 
 	static
 	size_t
 	AppendFmtLiteral_ui64 (
 		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
 		uint64_t x
-		);
+		)
+	{
+		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'u', x);
+	}
 
 	static
 	size_t
 	AppendFmtLiteral_f (
 		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
 		double x
-		);
+		)
+	{
+		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'f', x);
+	}
 
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -204,6 +225,23 @@ protected:
 		CModule* pModule,
 		llvm::ExecutionEngine* pLlvmExecutionEngine,
 		CMulticastClassType* pMulticastType
+		);
+
+	static
+	void
+	PrepareFormatString (
+		rtl::CString* pFormatString,
+		const char* pFmtSpecifier,
+		char DefaultType
+		);
+
+	static
+	size_t
+	AppendFmtLiteralImpl (
+		TFmtLiteral* pFmtLiteral,
+		const char* pFmtSpecifier,
+		char DefaultType,
+		...
 		);
 };
 

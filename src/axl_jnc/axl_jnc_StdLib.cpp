@@ -407,9 +407,36 @@ CStdLib::AppendFmtLiteral_a (
 	return pFmtLiteral->m_Length;
 }
 
+void
+CStdLib::PrepareFormatString (
+	rtl::CString* pFormatString,
+	const char* pFmtSpecifier,
+	char DefaultType
+	)
+{
+	if (!pFmtSpecifier)
+	{
+		char FormatBuffer [2] = { '%', DefaultType };
+		pFormatString->Copy (FormatBuffer, 2);
+		return;
+	}
+
+	pFormatString->Clear ();
+
+	if (pFmtSpecifier [0] != '%')
+		pFormatString->Copy ('%');
+
+	pFormatString->Append (pFmtSpecifier);
+
+	size_t Length = pFormatString->GetLength ();
+	if (!isalpha (pFormatString->cc () [Length - 1]))
+		pFormatString->Append (DefaultType);
+}	
+
 size_t
 CStdLib::AppendFmtLiteral_p (
 	TFmtLiteral* pFmtLiteral,
+	const char* pFmtSpecifier,
 	TDataPtr Ptr
 	)
 {
@@ -420,63 +447,53 @@ CStdLib::AppendFmtLiteral_p (
 	while (*p && p < Ptr.m_pRangeEnd)
 		p++;
 
-	size_t Length = p - (char*) Ptr.m_p;
-	return AppendFmtLiteral_a (pFmtLiteral, (char*) Ptr.m_p, Length);
+	if (!pFmtSpecifier || !*pFmtSpecifier)
+	{
+		size_t Length = p - (char*) Ptr.m_p;
+		return AppendFmtLiteral_a (pFmtLiteral, (char*) Ptr.m_p, Length);
+	}
+
+	char Buffer1 [256];
+	rtl::CString FormatString (ref::EBuf_Stack, Buffer1, sizeof (Buffer1));
+	PrepareFormatString (&FormatString, pFmtSpecifier, 's');
+
+	char Buffer2 [256];
+	rtl::CString String (ref::EBuf_Stack, Buffer2, sizeof (Buffer2));
+
+	if (p < Ptr.m_pRangeEnd) // null terminated
+	{
+		ASSERT (!*p);
+		String.Format (FormatString, Ptr.m_p);
+	}
+	else
+	{
+		char Buffer3 [256];
+		rtl::CString NullTermString (ref::EBuf_Stack, Buffer3, sizeof (Buffer3));
+		String.Format (FormatString, NullTermString.cc ());
+	}
+
+	return AppendFmtLiteral_a (pFmtLiteral, String, String.GetLength ());
 }
 
 size_t
-CStdLib::AppendFmtLiteral_i32 (
+CStdLib::AppendFmtLiteralImpl (
 	TFmtLiteral* pFmtLiteral,
-	int32_t x
+	const char* pFmtSpecifier,
+	char DefaultType,
+	...
 	)
 {
-	char Buffer [16];
-	_ltoa (x, Buffer, 10);
-	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
-}
+	AXL_VA_DECL (va, DefaultType);
+	
+	char Buffer1 [256];
+	rtl::CString FormatString (ref::EBuf_Stack, Buffer1, sizeof (Buffer1));
+	PrepareFormatString (&FormatString, pFmtSpecifier,  DefaultType);
 
-size_t
-CStdLib::AppendFmtLiteral_ui32 (
-	TFmtLiteral* pFmtLiteral,
-	uint32_t x
-	)
-{
-	char Buffer [16];
-	_ultoa (x, Buffer, 10);
-	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
-}
+	char Buffer2 [256];
+	rtl::CString String (ref::EBuf_Stack, Buffer2, sizeof (Buffer2));
+	String.Format_va (FormatString, va);
 
-size_t
-CStdLib::AppendFmtLiteral_i64 (
-	TFmtLiteral* pFmtLiteral,
-	int64_t x
-	)
-{
-	char Buffer [16];
-	_i64toa (x, Buffer, 10);
-	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
-}
-
-size_t
-CStdLib::AppendFmtLiteral_ui64 (
-	TFmtLiteral* pFmtLiteral,
-	uint64_t x
-	)
-{
-	char Buffer [16];
-	_ui64toa (x, Buffer, 10);
-	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
-}
-
-size_t
-CStdLib::AppendFmtLiteral_f (
-	TFmtLiteral* pFmtLiteral,
-	double x
-	)
-{
-	char Buffer [16];
-	sprintf (Buffer, "%f", x);
-	return AppendFmtLiteral_a (pFmtLiteral, Buffer, strlen (Buffer));
+	return AppendFmtLiteral_a (pFmtLiteral, String, String.GetLength ());
 }
 
 void

@@ -2058,18 +2058,17 @@ CParser::CreateFmtLiteral (CValue* pValue)
 bool
 CParser::AppendFmtLiteral (
 	const CValue& Value,
-	const char* p,
-	size_t Length
+	const rtl::CString& String
 	)
 {
 	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_AppendFmtLiteral_a);
 
 	CValue LiteralValue;
-	LiteralValue.SetCharArray (p, Length);
+	LiteralValue.SetCharArray (String, String.GetLength ());
 	m_pModule->m_OperatorMgr.CastOperator (&LiteralValue, GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ());
 
-	CValue SizeValue;
-	SizeValue.SetConstSizeT (Length);
+	CValue LengthValue;
+	LengthValue.SetConstSizeT (String.GetLength ());
 
 	CValue ResultValue;
 	m_pModule->m_LlvmBuilder.CreateCall3 (
@@ -2077,7 +2076,7 @@ CParser::AppendFmtLiteral (
 		pAppend->GetType (),
 		Value,
 		LiteralValue,
-		SizeValue,
+		LengthValue,
 		&ResultValue
 		);
 
@@ -2087,7 +2086,8 @@ CParser::AppendFmtLiteral (
 bool
 CParser::AppendFmtLiteralValue (
 	const CValue& DstValue,
-	const CValue& RawSrcValue
+	const CValue& RawSrcValue,
+	const rtl::CString& FmtSpecifierString
 	)
 {
 	EStdFunc AppendFunc;
@@ -2102,11 +2102,11 @@ CParser::AppendFmtLiteralValue (
 	{
 		static EStdFunc FuncTable [2] [2] = 
 		{
-			EStdFunc_AppendFmtLiteral_i32, EStdFunc_AppendFmtLiteral_ui32,
-			EStdFunc_AppendFmtLiteral_i64, EStdFunc_AppendFmtLiteral_ui64,
+			{ EStdFunc_AppendFmtLiteral_i32, EStdFunc_AppendFmtLiteral_ui32 }, 
+			{ EStdFunc_AppendFmtLiteral_i64, EStdFunc_AppendFmtLiteral_ui64 },
 		};
 
-		size_t i1 = pType->GetSize () <= 4;
+		size_t i1 = pType->GetSize () > 4;
 		size_t i2 = (pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned) != 0;
 
 		AppendFunc = FuncTable [i1] [i2];
@@ -2126,18 +2126,30 @@ CParser::AppendFmtLiteralValue (
 	}
 
 	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (AppendFunc);	
-	CType* pArgType = pAppend->GetType ()->GetArgArray () [1]->GetType ();
+	CType* pArgType = pAppend->GetType ()->GetArgArray () [2]->GetType ();
 
 	CValue ArgValue;
 	Result = m_pModule->m_OperatorMgr.CastOperator (SrcValue, pArgType, &ArgValue);
 	if (!Result)
 		return false;
 
+	CValue FmtSpecifierValue;
+	if (!FmtSpecifierString.IsEmpty ())
+	{
+		FmtSpecifierValue.SetCharArray (FmtSpecifierString, FmtSpecifierString.GetLength () + 1);
+		m_pModule->m_OperatorMgr.CastOperator (&FmtSpecifierValue, GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ());
+	}
+	else
+	{
+		FmtSpecifierValue = GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ()->GetZeroValue ();
+	}
+
 	CValue ResultValue;
-	m_pModule->m_LlvmBuilder.CreateCall2 (
+	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
 		DstValue,
+		FmtSpecifierValue,
 		ArgValue,
 		&ResultValue
 		);
@@ -2148,12 +2160,11 @@ CParser::AppendFmtLiteralValue (
 bool
 CParser::FinalizeFmtLiteral (
 	const CValue& Value,
-	const char* p,
-	size_t Length,
+	const rtl::CString& String,
 	CValue* pResultValue
 	)
 {
-	AppendFmtLiteral (Value, p, Length);
+	AppendFmtLiteral (Value, String);
 
 	CValue PtrValue;
 	CValue SizeValue;

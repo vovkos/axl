@@ -22,8 +22,12 @@ enum EToken
 	EToken_Integer,
 	EToken_Fp,
 	EToken_Literal,
+
+	// special literals
+
 	EToken_HexLiteral,
 	EToken_FmtLiteral,
+	EToken_FmtSpecifier,
 
 	// global declarations & pragmas
 
@@ -184,6 +188,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Literal,      "string-literal")
 	AXL_PRS_TOKEN_NAME (EToken_HexLiteral,   "hex-literal")
 	AXL_PRS_TOKEN_NAME (EToken_FmtLiteral,   "fmt-literal")
+	AXL_PRS_TOKEN_NAME (EToken_FmtSpecifier, "fmt-specifier")
 
 	// global declarations & pragmas
 
@@ -465,17 +470,51 @@ protected:
 		if (!m_ParenthesesLevelStack.IsEmpty ())
 		{
 			size_t i = m_ParenthesesLevelStack.GetCount () - 1;
-			m_ParenthesesLevelStack [i]--;
-			if (!m_ParenthesesLevelStack [i])
+			if (m_ParenthesesLevelStack [i] == 1)
 			{
-				PreCreateFmtLiteralToken ();
 				m_ParenthesesLevelStack.Pop ();
+				PreCreateFmtLiteralToken ();
 				return false;
 			}
+
+			m_ParenthesesLevelStack [i]--;
 		}
 
 		CreateToken (')'); 
 		return true;
+	}
+
+	bool
+	OnColon ()
+	{
+		if (!m_ParenthesesLevelStack.IsEmpty ())
+		{
+			size_t i = m_ParenthesesLevelStack.GetCount () - 1;
+			if (m_ParenthesesLevelStack [i] == 1)
+			{
+				ASSERT (*ts == ':'); 
+				p = ts - 1; // need to reparse colon with 'fmt_spec' machine
+				return false;
+			}
+		}
+
+		CreateToken (':'); 
+		return true;
+	}
+
+	void
+	TerminateFmtSpecifier ()
+	{
+		ASSERT (!m_ParenthesesLevelStack.IsEmpty () && m_pFmtLiteralToken == NULL);
+		m_ParenthesesLevelStack.Pop ();
+		PreCreateFmtLiteralToken ();
+	}
+
+	void
+	TerminateFmtLiteral ()
+	{
+		ASSERT (!m_ParenthesesLevelStack.IsEmpty () && m_pFmtLiteralToken == NULL);
+		m_ParenthesesLevelStack.Pop ();
 	}
 
 	// implemented in *.rl

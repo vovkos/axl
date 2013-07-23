@@ -800,29 +800,29 @@ literal
 fmt_literal <CValue* $pValue>
 	local 
 	{
-		CValue $Value;
+		CValue $FmtLiteralValue;
 	}
 	enter
 	{
-		return CreateFmtLiteral (&$Value);
+		return CreateFmtLiteral (&$FmtLiteralValue);
 	}
-	:	(	EToken_FmtLiteral $l1
-				{
-					return AppendFmtLiteral ($Value, $l1.m_Data.m_String, $l1.m_Data.m_String.GetLength ());
-				}
-			expression $e
-				{
-					return AppendFmtLiteralValue ($Value, $e.m_Value);
-				}
-		)+
+	:	fmt_literal_item <&$FmtLiteralValue>+
 		EToken_Literal $l2
 			{
-				return FinalizeFmtLiteral (
-					$Value,
-					$l2.m_Data.m_String, 
-					$l2.m_Data.m_String.GetLength (),
-					$pValue
-					);
+				return FinalizeFmtLiteral ($FmtLiteralValue, $l2.m_Data.m_String, $pValue);
+			}
+	;
+
+fmt_literal_item <CValue* $pFmtLiteralValue>
+	:	EToken_FmtLiteral $l1
+			{
+				return AppendFmtLiteral (*$pFmtLiteralValue, $l1.m_Data.m_String);
+			}
+		expression $e EToken_FmtSpecifier $f?				
+			{
+				return IsValidLocator ($f) ? 
+					AppendFmtLiteralValue (*$pFmtLiteralValue, $e.m_Value, $f.m_Data.m_String) :
+					AppendFmtLiteralValue (*$pFmtLiteralValue, $e.m_Value, NULL);
 			}
 	;
 
