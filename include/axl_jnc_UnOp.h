@@ -39,12 +39,17 @@ enum EOpFlag
 {
 	EOpFlag_KeepDataRef      = 0x01,
 	EOpFlag_KeepClassRef	 = 0x02,
-	EOpFlag_KeepPropertyRef  = 0x04,
-	EOpFlag_KeepArrayRef     = 0x08,
-	EOpFlag_KeepBool         = 0x10,
-	EOpFlag_KeepEnum         = 0x20,
+	EOpFlag_KeepFunctionRef  = 0x04,
+	EOpFlag_KeepPropertyRef  = 0x08,
+	EOpFlag_KeepArrayRef     = 0x10,
+	EOpFlag_KeepBool         = 0x20,
+	EOpFlag_KeepEnum         = 0x40,
 	
-	EOpFlag_KeepRef          = EOpFlag_KeepDataRef | EOpFlag_KeepClassRef | EOpFlag_KeepPropertyRef,
+	EOpFlag_KeepRef          = 
+		EOpFlag_KeepDataRef | 
+		EOpFlag_KeepClassRef | 
+		EOpFlag_KeepFunctionRef | 
+		EOpFlag_KeepPropertyRef,
 };
 
 //.............................................................................

@@ -430,7 +430,7 @@ protected:
 	PreCreateFmtLiteralToken ()
 	{
 		ASSERT (!m_pFmtLiteralToken);
-		m_pFmtLiteralToken = PreCreateToken (EToken_FmtLiteral);
+		m_pFmtLiteralToken = PreCreateToken (0);
 		return m_pFmtLiteralToken;
 	}
 
@@ -452,6 +452,24 @@ protected:
 		pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (
 			pToken->m_Pos.m_p + Left, 
 			pToken->m_Pos.m_Length - (Left + Right));
+		return pToken;
+	}
+
+	CToken*
+	CreateFmtSimpleIdentifierToken ()
+	{
+		CreateFmtLiteralToken (EToken_FmtLiteral); 
+
+		// important: prevent Break () -- otherwise we could feed half-created fmt-literal token to the parser
+
+		size_t PrevTokenizeLimit = m_TokenizeLimit; 
+		m_TokenizeLimit = -1;
+
+		CToken* pToken = CreateStringToken (EToken_Identifier, 1, 0); 
+
+		m_TokenizeLimit = PrevTokenizeLimit; 
+
+		PreCreateFmtLiteralToken (); 
 		return pToken;
 	}
 

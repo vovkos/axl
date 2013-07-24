@@ -54,7 +54,7 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 lit_fmt := |*
 
 esc       ;
-'$' id    { CreateFmtLiteralToken (EToken_FmtLiteral); CreateStringToken (EToken_Identifier, 1, 0); PreCreateFmtLiteralToken (); };
+'$' id    { CreateFmtSimpleIdentifierToken (); };
 '$('      { CreateFmtLiteralToken (EToken_FmtLiteral); m_ParenthesesLevelStack.Append (1); fcall main; };
 '"' | nl  { CreateFmtLiteralToken (EToken_Literal); fret; };
 any       ;

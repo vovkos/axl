@@ -678,6 +678,16 @@ COperatorMgr::PrepareOperandType (
 
 			break;
 
+		case EType_FunctionRef:
+			if (!(OpFlags & EOpFlag_KeepFunctionRef))
+			{
+				CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
+				CFunctionType* pTargetType = pPtrType->GetTargetType ();
+				Value = pTargetType->GetFunctionPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
+			}
+
+			break;
+
 		case EType_PropertyRef:
 			if (!(OpFlags & EOpFlag_KeepPropertyRef))
 			{
@@ -771,6 +781,16 @@ COperatorMgr::PrepareOperand (
 				CClassPtrType* pPtrType = (CClassPtrType*) pType;
 				CClassType* pTargetType = pPtrType->GetTargetType ();
 				Value.OverrideType (pTargetType->GetClassPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ()));
+			}
+
+			break;
+
+		case EType_FunctionRef:
+			if (!(OpFlags & EOpFlag_KeepFunctionRef))
+			{
+				CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
+				CFunctionType* pTargetType = pPtrType->GetTargetType ();
+				Value.OverrideType (pTargetType->GetFunctionPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ()));
 			}
 
 			break;

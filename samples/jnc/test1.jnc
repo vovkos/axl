@@ -8,7 +8,7 @@ class CMyScheduler: jnc.IScheduler
 		printf ("before call\n");
 		pf ();
 		printf ("after call\n");
-	}
+	} 
 }
 
 int 

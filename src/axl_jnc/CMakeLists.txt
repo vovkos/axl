@@ -40,6 +40,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_Property.h
 	${AXL_INC_DIR}/axl_jnc_PropertyTemplate.h
 	${AXL_INC_DIR}/axl_jnc_PropertyVerifier.h
+	${AXL_INC_DIR}/axl_jnc_ScheduleLauncherFunction.h
 	${AXL_INC_DIR}/axl_jnc_ThunkFunction.h
 	${AXL_INC_DIR}/axl_jnc_ThunkProperty.h
 	axl_jnc_GcShadowStack.h
@@ -53,6 +54,7 @@ set (
 	axl_jnc_Property.cpp
 	axl_jnc_PropertyTemplate.cpp
 	axl_jnc_PropertyVerifier.cpp
+	axl_jnc_ScheduleLauncherFunction.cpp
 	axl_jnc_ThunkFunction.cpp
 	axl_jnc_ThunkProperty.cpp
 	axl_jnc_GcShadowStack.cpp

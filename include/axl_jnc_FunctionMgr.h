@@ -6,9 +6,11 @@
 
 #include "axl_jnc_Function.h"
 #include "axl_jnc_Property.h"
+#include "axl_jnc_ScheduleLauncherFunction.h"
 #include "axl_jnc_ThunkFunction.h"
 #include "axl_jnc_ThunkProperty.h"
 #include "axl_jnc_PropertyTemplate.h"
+#include "axl_jnc_ClassType.h"
 
 namespace axl {
 namespace jnc {
@@ -241,6 +243,7 @@ protected:
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
 	rtl::CStdListT <CPropertyTemplate> m_PropertyTemplateList;
+	rtl::CStdListT <CScheduleLauncherFunction> m_ScheduleLauncherFunctionList;
 	rtl::CStdListT <CThunkFunction> m_ThunkFunctionList;
 	rtl::CStdListT <CThunkProperty> m_ThunkPropertyList;
 	rtl::CStdListT <CDataThunkProperty> m_DataThunkPropertyList;
@@ -433,8 +436,7 @@ public:
 	CFunction*
 	GetScheduleLauncherFunction (
 		CFunctionPtrType* pTargetFunctionPtrType,
-		CFunction* pTargetFunction, // could be NULL
-		CClassPtrType* pSchedulerType // could be weak
+		EClassPtrType SchedulerPtrTypeKind = EClassPtrType_Normal
 		);
 
 protected:

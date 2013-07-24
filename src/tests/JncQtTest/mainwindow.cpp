@@ -355,7 +355,12 @@ bool MainWindow::compile ()
 		const jnc::CToken* pToken = Lexer.GetToken ();
 		if (pToken->m_Token == jnc::EToken_Eof)
 			break;
-
+		
+/*		if (!pToken->m_Data.m_String.IsEmpty ())
+			printf ("%s: '%s'/'%s'\n", pToken->GetName (), pToken->GetText ().cc (), pToken->m_Data.m_String.cc ());
+		else
+			printf ("%s: '%s'\n", pToken->GetName (), pToken->GetText ().cc ());
+*/
 		Result = Parser.ParseToken (pToken);
 		if (!Result)
 		{
@@ -370,7 +375,7 @@ bool MainWindow::compile ()
 				);
 			return false;
 		}
-
+		
 		Lexer.NextToken ();
 	}
 

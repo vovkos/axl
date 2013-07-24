@@ -1273,7 +1273,7 @@ _eof_trans:
 	break;
 	case 8:
 /* #line 57 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Lexer.rl" */
-	{te = p;p--;{ CreateFmtLiteralToken (EToken_FmtLiteral); CreateStringToken (EToken_Identifier, 1, 0); PreCreateFmtLiteralToken (); }}
+	{te = p;p--;{ CreateFmtSimpleIdentifierToken (); }}
 	break;
 	case 9:
 /* #line 60 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Lexer.rl" */

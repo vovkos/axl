@@ -28,6 +28,7 @@ CFunctionMgr::Clear ()
 	m_FunctionList.Clear ();
 	m_PropertyList.Clear ();
 	m_PropertyTemplateList.Clear ();
+	m_ScheduleLauncherFunctionList.Clear ();
 	m_ThunkFunctionList.Clear ();
 	m_ThunkPropertyList.Clear ();
 	m_DataThunkPropertyList.Clear ();
@@ -56,6 +57,11 @@ CFunctionMgr::CreateFunction (
 	case EFunction_Thunk:
 		pFunction = AXL_MEM_NEW (CThunkFunction);
 		m_ThunkFunctionList.InsertTail ((CThunkFunction*) pFunction);
+		break;
+
+	case EFunction_ScheduleLauncher:
+		pFunction = AXL_MEM_NEW (CScheduleLauncherFunction);
+		m_ScheduleLauncherFunctionList.InsertTail ((CScheduleLauncherFunction*) pFunction);
 		break;
 
 	default:
@@ -752,80 +758,33 @@ CFunctionMgr::GetDirectDataThunkProperty (
 CFunction*
 CFunctionMgr::GetScheduleLauncherFunction (
 	CFunctionPtrType* pTargetFunctionPtrType,
-	CFunction* pTargetFunction, // could be NULL
-	CClassPtrType* pSchedulerType // could be weak
+	EClassPtrType SchedulerPtrTypeKind
 	)
 {
-	bool Result;
-
-	rtl::CString Signature;
-	Signature.Format (
-		"%s.%x.%s", 
-		pTargetFunctionPtrType->GetSignature ().cc (),
-		pTargetFunction, 
-		pSchedulerType->GetSignature ().cc ()
-		);
+	rtl::CString Signature = pTargetFunctionPtrType->GetSignature ();
+	if (SchedulerPtrTypeKind == EClassPtrType_Weak)
+		Signature += ".w";
 
 	rtl::CStringHashTableMapIteratorAT <CFunction*> Thunk = m_ScheduleLauncherFunctionMap.Goto (Signature);
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
 
-	size_t SchedulerIdx = 0;
+	CClassPtrType* pSchedulerPtrType = ((CClassType*) GetSimpleType (m_pModule, EStdType_IScheduler))->GetClassPtrType (SchedulerPtrTypeKind);
 
 	rtl::CArrayT <CFunctionArg*> ArgArray  = pTargetFunctionPtrType->GetTargetType ()->GetArgArray ();
-	if (!pTargetFunction)
-	{
-		ArgArray.Insert (0, pTargetFunctionPtrType->GetSimpleFunctionArg ());
-		ArgArray.Insert (1, pSchedulerType->GetSimpleFunctionArg ());
-		SchedulerIdx = 1;
-	}
-	else
-	{
-		ArgArray.Insert (0, pSchedulerType->GetSimpleFunctionArg ());
-		SchedulerIdx = 0;
-	}
+	ArgArray.Insert (0, pTargetFunctionPtrType->GetSimpleFunctionArg ());
+	ArgArray.Insert (1, pSchedulerPtrType->GetSimpleFunctionArg ());
 
 	CFunctionType* pLauncherType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
-	CFunction* pLauncher = CreateFunction (EFunction_ScheduleLauncher, pLauncherType);
-	pLauncher->m_Tag = "_schedule_launcher_function";
-	
-	size_t ArgCount = ArgArray.GetCount (); 
+	CScheduleLauncherFunction* pLauncherFunction = (CScheduleLauncherFunction*) CreateFunction (EFunction_ScheduleLauncher, pLauncherType);
+	pLauncherFunction->m_StorageKind = EStorage_Static;
+	pLauncherFunction->m_Tag = "_schedule_launcher_function";
+	pLauncherFunction->m_Signature = Signature;
 
-	char Buffer [256];
-	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgValueArray.SetCount (ArgCount);
+	Thunk->m_Value = pLauncherFunction;
 
-	InternalPrologue (pLauncher, ArgValueArray, ArgCount);
-
-	CValue ScheduleValue;
-	m_pModule->m_OperatorMgr.MemberOperator (ArgValueArray [SchedulerIdx], "Schedule", &ScheduleValue);
-
-	CValue FunctionPtrValue;
-
-	if (pTargetFunction)
-		FunctionPtrValue = pTargetFunction;
-	else
-		FunctionPtrValue = ArgValueArray [0];
-
-	if (ArgCount > SchedulerIdx + 1)
-	{
-		rtl::CBoxListT <CValue> ArgList;
-		for (size_t i = SchedulerIdx + 1; i < ArgCount; i++)
-			ArgList.InsertTail (ArgValueArray [i]);
-
-		Result = m_pModule->m_OperatorMgr.ClosureOperator (&FunctionPtrValue, &ArgList);
-		if (!Result)
-			return NULL;
-	}
-
-	Result = m_pModule->m_OperatorMgr.CallOperator (ScheduleValue, FunctionPtrValue);
-	if (!Result)
-		return NULL;
-	
-	InternalEpilogue ();
-
-	Thunk->m_Value = pLauncher;
-	return pLauncher;
+	m_pModule->MarkForCompile (pLauncherFunction);
+	return pLauncherFunction;
 }
 
 bool
@@ -843,6 +802,14 @@ CFunctionMgr::InjectTlsPrologues ()
 	for (; ThunkFunction; ThunkFunction++)
 	{
 		CFunction* pFunction = *ThunkFunction;
+		if (!pFunction->GetTlsVariableArray ().IsEmpty ())
+			InjectTlsPrologue (pFunction);
+	}
+
+	rtl::CIteratorT <CScheduleLauncherFunction> ScheduleLauncherFunction = m_ScheduleLauncherFunctionList.GetHead ();
+	for (; ScheduleLauncherFunction; ScheduleLauncherFunction++)
+	{
+		CFunction* pFunction = *ScheduleLauncherFunction;
 		if (!pFunction->GetTlsVariableArray ().IsEmpty ())
 			InjectTlsPrologue (pFunction);
 	}

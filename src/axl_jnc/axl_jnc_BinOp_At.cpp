@@ -43,23 +43,15 @@ CBinOp_At::Operator (
 	}
 
 	CFunctionPtrType* pTargetPtrType = (CFunctionPtrType*) OpValue1.GetClosureAwareType ();
-	CFunction* pTargetFunction = OpValue1.GetValueKind () == EValue_Function ? OpValue1.GetFunction () : NULL;
 
-	CFunction* pLauncher = m_pModule->m_FunctionMgr.GetScheduleLauncherFunction (
-		pTargetPtrType,
-		pTargetFunction,
-		(CClassPtrType*) SchedulerValue.GetType ()
-		);
-
+	CFunction* pLauncher = m_pModule->m_FunctionMgr.GetScheduleLauncherFunction (pTargetPtrType);
 	if (!pLauncher)
 		return false;
 		
 	pResultValue->SetFunction (pLauncher);
+
 	CClosure* pClosure = pResultValue->CreateClosure ();
-
-	if (!pTargetFunction)
-		pClosure->GetArgList ()->InsertTail (OpValue1);
-
+	pClosure->GetArgList ()->InsertTail (OpValue1);
 	pClosure->GetArgList ()->InsertTail (SchedulerValue);
 
 	if (OpValue1.GetClosure ())
