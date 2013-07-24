@@ -2043,38 +2043,48 @@ CParser::SkipCurlyInitializerItem (TCurlyInitializer* pInitializer)
 }
 
 bool
-CParser::CreateFmtLiteral (CValue* pValue)
-{
-	ASSERT (m_pModule->m_NamespaceMgr.GetCurrentScope ());
-
-	return m_pModule->m_OperatorMgr.NewOperator (
-		EStorage_Stack, 
-		GetSimpleType (m_pModule, EStdType_FmtLiteral),
-		NULL,
-		pValue
-		);
-}
-
-bool
 CParser::AppendFmtLiteral (
-	const CValue& Value,
-	const rtl::CString& String
+	TLiteral* pLiteral,
+	const void* p,
+	size_t Length
 	)
 {
+	bool Result;
+
+	if (!pLiteral->m_FmtLiteralValue)
+	{
+		Result = m_pModule->m_OperatorMgr.NewOperator (
+			EStorage_Stack, 
+			GetSimpleType (m_pModule, EStdType_FmtLiteral),
+			NULL,
+			&pLiteral->m_FmtLiteralValue
+			);
+
+		if (!Result)
+			return false;
+	}
+
 	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_AppendFmtLiteral_a);
 
+	pLiteral->m_BinData.Append ((uchar_t*) p, Length); 
+	Length = pLiteral->m_BinData.GetCount ();
+
 	CValue LiteralValue;
-	LiteralValue.SetCharArray (String, String.GetLength ());
-	m_pModule->m_OperatorMgr.CastOperator (&LiteralValue, GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ());
+	LiteralValue.SetCharArray (pLiteral->m_BinData, Length);
+	Result = m_pModule->m_OperatorMgr.CastOperator (&LiteralValue, GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ());
+	if (!Result)
+		return false;
+
+	pLiteral->m_BinData.Clear ();
 
 	CValue LengthValue;
-	LengthValue.SetConstSizeT (String.GetLength ());
+	LengthValue.SetConstSizeT (Length);
 
 	CValue ResultValue;
 	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
-		Value,
+		pLiteral->m_FmtLiteralValue,
 		LiteralValue,
 		LengthValue,
 		&ResultValue
@@ -2085,11 +2095,13 @@ CParser::AppendFmtLiteral (
 
 bool
 CParser::AppendFmtLiteralValue (
-	const CValue& DstValue,
+	TLiteral* pLiteral,
 	const CValue& RawSrcValue,
 	const rtl::CString& FmtSpecifierString
 	)
 {
+	ASSERT (pLiteral->m_FmtLiteralValue);
+
 	EStdFunc AppendFunc;
 
 	CValue SrcValue;
@@ -2148,7 +2160,7 @@ CParser::AppendFmtLiteralValue (
 	m_pModule->m_LlvmBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
-		DstValue,
+		pLiteral->m_FmtLiteralValue,
 		FmtSpecifierValue,
 		ArgValue,
 		&ResultValue
@@ -2158,21 +2170,29 @@ CParser::AppendFmtLiteralValue (
 }
 
 bool
-CParser::FinalizeFmtLiteral (
-	const CValue& Value,
-	const rtl::CString& String,
+CParser::FinalizeLiteral (
+	TLiteral* pLiteral,
 	CValue* pResultValue
 	)
 {
-	AppendFmtLiteral (Value, String);
+	if (!pLiteral->m_FmtLiteralValue)
+	{
+		if (pLiteral->m_LastToken == EToken_Literal)
+			pLiteral->m_BinData.Append (0);
 
+		pResultValue->SetCharArray (pLiteral->m_BinData, pLiteral->m_BinData.GetCount ());	
+		return true;
+	}
+	
+	AppendFmtLiteral (pLiteral, NULL, 0);
+	
 	CValue PtrValue;
 	CValue SizeValue;
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (Value, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 0, NULL, &PtrValue);
 	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (Value, 2, NULL, &SizeValue);
+	m_pModule->m_LlvmBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 2, NULL, &SizeValue);
 	m_pModule->m_LlvmBuilder.CreateLoad (SizeValue, NULL, &SizeValue);
 
 	pResultValue->SetThinDataPtr (
@@ -2183,6 +2203,32 @@ CParser::FinalizeFmtLiteral (
 		SizeValue
 		);	 
 
+	return true;
+}
+
+bool
+CParser::FinalizeLiteral_s (
+	TLiteral* pLiteral,
+	CValue* pResultValue
+	)
+{
+	CType* pType;
+
+	if (!pLiteral->m_FmtLiteralValue)
+	{
+		size_t Count = pLiteral->m_BinData.GetCount ();
+
+		if (pLiteral->m_LastToken == EToken_Literal)
+			Count++;
+
+		pType = m_pModule->m_TypeMgr.GetArrayType (EType_Char, Count);
+	}
+	else
+	{
+		pType = GetSimpleType (m_pModule, EType_Char)->GetDataPtrType ();
+	}
+
+	pResultValue->SetType (pType);
 	return true;
 }
 

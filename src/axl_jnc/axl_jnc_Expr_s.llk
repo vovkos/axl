@@ -427,10 +427,6 @@ primary_expr_s <CValue* $pValue>
 			{
 				$pValue->SetType (EType_Double);
 			}
-	|	literal 
-			{
-				$pValue->SetType (m_pModule->m_TypeMgr.GetArrayType (EType_Char, $1.m_BinData.GetCount ()));
-			}
 	|	EToken_True
 			{
 				$pValue->SetType (EType_Bool);
@@ -443,7 +439,36 @@ primary_expr_s <CValue* $pValue>
 			{
 				$pValue->SetNull ();
 			}
+	|	literal_s <$pValue> 
 	|	'(' conditional_expr_s <$pValue> ')'
+	;
+
+literal_s <CValue* $pValue>
+	local
+	{
+		TLiteral $Literal;
+	}
+	:	(	EToken_Literal 
+				{			
+					$Literal.m_BinData.Append ((const uchar_t*) $1.m_Data.m_String.cc (), $1.m_Data.m_String.GetLength ());
+					$Literal.m_LastToken = EToken_Literal;
+				}
+		|	EToken_HexLiteral
+				{			
+					$Literal.m_BinData.Append ($2.m_Data.m_BinData, $2.m_Data.m_BinData.GetCount ());
+					$Literal.m_LastToken = EToken_HexLiteral;
+				}
+		|	EToken_FmtLiteral expression $e EToken_FmtSpecifier $f?				
+				{
+					// mark we have a formatting literal from now on
+
+					if (!$Literal.m_FmtLiteralValue)
+						$Literal.m_FmtLiteralValue.SetConstBool (true); 
+				}
+		)+
+			{
+				return FinalizeLiteral_s (&$Literal, $pValue);
+			}
 	;
 
 //.............................................................................

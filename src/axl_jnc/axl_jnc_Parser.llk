@@ -60,6 +60,13 @@ Members
 		size_t m_Count;
 	};
 
+	struct TLiteral
+	{
+		CValue m_FmtLiteralValue;
+		rtl::CArrayT <uchar_t> m_BinData;
+		EToken m_LastToken;
+	};
+
 	CModule* m_pModule;
 	EStage m_Stage;
 	uint_t m_Flags;
@@ -347,25 +354,28 @@ Members2
 	SkipCurlyInitializerItem (TCurlyInitializer* pInitializer);
 
 	bool
-	CreateFmtLiteral (CValue* pValue);
-
-	bool
 	AppendFmtLiteral (
-		const CValue& Value,
-		const rtl::CString& String
+		TLiteral* pLiteral,
+		const void* p,
+		size_t Length
 		);
 
 	bool
 	AppendFmtLiteralValue (
-		const CValue& DstValue,
+		TLiteral* pLiteral,
 		const CValue& SrcValue,
 		const rtl::CString& FmtSpecifierString
 		);
 
 	bool
-	FinalizeFmtLiteral (
-		const CValue& Value,
-		const rtl::CString& String,
+	FinalizeLiteral (
+		TLiteral* pLiteral,
+		CValue* pResultValue
+		);
+
+	bool
+	FinalizeLiteral_s (
+		TLiteral* pLiteral,
 		CValue* pResultValue
 		);
 } 

@@ -754,11 +754,6 @@ primary_expr <CValue* $pValue>
 			{
 				$pValue->SetConstDouble ($1.m_Data.m_Double);
 			}
-	|	literal 
-			{
-				$pValue->SetCharArray ($1.m_BinData, $1.m_BinData.GetCount ());
-			}
-	|	fmt_literal <$pValue>
 	|	EToken_True
 			{
 				$pValue->SetConstBool (true);
@@ -771,58 +766,40 @@ primary_expr <CValue* $pValue>
 			{
 				$pValue->SetNull ();
 			}
+	|	literal <$pValue>
 	|	'(' conditional_expr <$pValue> ')'
 	;
 
-class
-{
-	rtl::CArrayT <uchar_t> m_BinData;
-	EToken m_LastToken;
-}
-literal
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+literal <CValue* $pValue>
+	local
+	{
+		TLiteral $Literal;
+	}
 	:	(	EToken_Literal 
 				{			
-					$.m_BinData.Append ((const uchar_t*) $1.m_Data.m_String.cc (), $1.m_Data.m_String.GetLength ());
-					$.m_LastToken = EToken_Literal;
+					$Literal.m_BinData.Append ((const uchar_t*) $1.m_Data.m_String.cc (), $1.m_Data.m_String.GetLength ());
+					$Literal.m_LastToken = EToken_Literal;
 				}
 		|	EToken_HexLiteral
 				{			
-					$.m_BinData.Append ($2.m_Data.m_BinData, $2.m_Data.m_BinData.GetCount ());
-					$.m_LastToken = EToken_HexLiteral;
+					$Literal.m_BinData.Append ($2.m_Data.m_BinData, $2.m_Data.m_BinData.GetCount ());
+					$Literal.m_LastToken = EToken_HexLiteral;
+				}
+		|	EToken_FmtLiteral
+				{
+					return AppendFmtLiteral (&$Literal, $3.m_Data.m_String.cc (), $3.m_Data.m_String.GetLength ());
+				}
+			expression $e EToken_FmtSpecifier $f?				
+				{
+					return IsValidLocator ($f) ? 
+						AppendFmtLiteralValue (&$Literal, $e.m_Value, $f.m_Data.m_String) :
+						AppendFmtLiteralValue (&$Literal, $e.m_Value, NULL);
 				}
 		)+
 			{
-				if ($.m_LastToken == EToken_Literal)
-					$.m_BinData.Append (0);
-			}
-	;
-
-fmt_literal <CValue* $pValue>
-	local 
-	{
-		CValue $FmtLiteralValue;
-	}
-	enter
-	{
-		return CreateFmtLiteral (&$FmtLiteralValue);
-	}
-	:	fmt_literal_item <&$FmtLiteralValue>+
-		EToken_Literal $l2
-			{
-				return FinalizeFmtLiteral ($FmtLiteralValue, $l2.m_Data.m_String, $pValue);
-			}
-	;
-
-fmt_literal_item <CValue* $pFmtLiteralValue>
-	:	EToken_FmtLiteral $l1
-			{
-				return AppendFmtLiteral (*$pFmtLiteralValue, $l1.m_Data.m_String);
-			}
-		expression $e EToken_FmtSpecifier $f?				
-			{
-				return IsValidLocator ($f) ? 
-					AppendFmtLiteralValue (*$pFmtLiteralValue, $e.m_Value, $f.m_Data.m_String) :
-					AppendFmtLiteralValue (*$pFmtLiteralValue, $e.m_Value, NULL);
+				return FinalizeLiteral (&$Literal, $pValue);
 			}
 	;
 
