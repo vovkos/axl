@@ -70,6 +70,21 @@ CFunctionMgr::CreateFunction (
 	return pFunction;
 }
 
+CFunction*
+CFunctionMgr::CreateFunction (
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
+	CFunctionType* pType
+	)
+{
+	CFunction* pFunction = CreateFunction (EFunction_Named, pType);
+	pFunction->m_Name = Name;
+	pFunction->m_QualifiedName = QualifiedName;
+	pFunction->m_Tag = QualifiedName;
+
+	return pFunction;
+}
+
 CProperty*
 CFunctionMgr::CreateProperty (
 	EProperty PropertyKind,
@@ -125,6 +140,8 @@ CFunctionMgr::CreatePropertyTemplate ()
 	return pPropertyTemplate;
 }
 
+#pragma AXL_TODO ("get rid of emission context stack: postpone compilation of nested function")
+
 void
 CFunctionMgr::PushEmissionContext ()
 {
@@ -137,7 +154,10 @@ CFunctionMgr::PushEmissionContext ()
 	pContext->m_ScopeLevelValue = m_ScopeLevelValue;
 	pContext->m_VTablePtrPtrValue = m_VTablePtrPtrValue;
 	pContext->m_VTablePtrValue = m_VTablePtrValue;
-	
+
+	pContext->m_pCurrentNamespace = m_pModule->m_NamespaceMgr.m_pCurrentNamespace;
+	pContext->m_pCurrentScope = m_pModule->m_NamespaceMgr.m_pCurrentScope;
+
 	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
 	pContext->m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock;
@@ -146,6 +166,8 @@ CFunctionMgr::PushEmissionContext ()
 
 	m_EmissionContextStack.InsertTail (pContext);
 
+	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = &m_pModule->m_NamespaceMgr.m_GlobalNamespace;
+	m_pModule->m_NamespaceMgr.m_pCurrentScope = NULL;
 	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 
 	m_pCurrentFunction = NULL;
@@ -177,6 +199,9 @@ CFunctionMgr::PopEmissionContext ()
 	m_ScopeLevelValue = pContext->m_ScopeLevelValue;
 	m_VTablePtrPtrValue = pContext->m_VTablePtrPtrValue;
 	m_VTablePtrValue = pContext->m_VTablePtrValue;
+
+	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = pContext->m_pCurrentNamespace;
+	m_pModule->m_NamespaceMgr.m_pCurrentScope = pContext->m_pCurrentScope;
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pContext->m_pCurrentBlock);
 	m_pModule->m_ControlFlowMgr.m_pReturnBlock = pContext->m_pReturnBlock;
@@ -553,6 +578,9 @@ CFunctionMgr::InternalPrologue (
 	
 	m_pCurrentFunction = pFunction;
 
+	CToken::CPos Pos;
+	m_pModule->m_NamespaceMgr.OpenScope (Pos);
+
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
 	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
 
@@ -596,6 +624,9 @@ CFunctionMgr::InternalEpilogue ()
 
 		m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 	}
+
+	CToken::CPos Pos;
+	m_pModule->m_NamespaceMgr.CloseScope (Pos);
 
 	PopEmissionContext ();
 }
@@ -787,7 +818,7 @@ CFunctionMgr::GetScheduleLauncherFunction (
 			return NULL;
 	}
 
-	m_pModule->m_OperatorMgr.CallOperator (ScheduleValue, FunctionPtrValue);
+	Result = m_pModule->m_OperatorMgr.CallOperator (ScheduleValue, FunctionPtrValue);
 	if (!Result)
 		return NULL;
 	
@@ -1022,6 +1053,22 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 
 	case EStdFunc_GcSafePoint:
 		pFunction = CreateGcSafePoint ();
+		break;
+
+	case EStdFunc_RunGc:
+		pFunction = CreateRunGc ();
+		break;
+
+	case EStdFunc_GetCurrentThreadId:
+		pFunction = CreateGetCurrentThreadId ();
+		break;
+
+	case EStdFunc_CreateThread:
+		pFunction = CreateCreateThread ();
+		break;
+
+	case EStdFunc_Sleep:
+		pFunction = CreateSleep ();
 		break;
 
 	case EStdFunc_AppendFmtLiteral_a:
@@ -1455,6 +1502,69 @@ CFunctionMgr::CreateMarkGcRoot ()
 }
 
 // jnc.TTls*
+// jnc.GcSafePoint ();
+
+CFunction*
+CFunctionMgr::CreateGcSafePoint ()
+{
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
+	return CreateInternalFunction ("jnc.GcSafePoint", pType);
+}
+
+// void
+// jnc.RunGc ();
+
+CFunction*
+CFunctionMgr::CreateRunGc ()
+{
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
+	return CreateFunction ("RunGc", "jnc.RunGc", pType);
+}
+
+// i64
+// jnc.GetCurrentThreadId ();
+
+CFunction*
+CFunctionMgr::CreateGetCurrentThreadId ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
+	return CreateFunction ("GetCurrentThreadId", "jnc.GetCurrentThreadId", pType);
+}
+
+// i64
+// jnc.CreateThread (function* pf ());
+
+CFunction*
+CFunctionMgr::CreateCreateThread ()
+{
+	CFunctionType* pFunctionType = ((CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction));
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+	CType* ArgTypeArray [] =
+	{
+		pFunctionType->GetFunctionPtrType (EFunctionPtrType_Normal, EPtrTypeFlag_Checked),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	return CreateFunction ("CreateThread", "jnc.CreateThread", pType);
+}
+
+// void
+// jnc.Sleep (uint_t MsCount);
+
+CFunction*
+CFunctionMgr::CreateSleep ()
+{
+	CType* ArgTypeArray [] =
+	{
+		((CFunctionType*) m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32_u)),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
+	return CreateFunction ("Sleep", "jnc.Sleep", pType);
+}
+
+// jnc.TTls*
 // jnc.GcTls ();
 
 CFunction*
@@ -1467,16 +1577,6 @@ CFunctionMgr::CreateGetTls ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
 	return CreateInternalFunction ("jnc.GetTls", pType);
-}
-
-// jnc.TTls*
-// jnc.GcTls ();
-
-CFunction*
-CFunctionMgr::CreateGcSafePoint ()
-{
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
-	return CreateInternalFunction ("jnc.GcSafePoint", pType);
 }
 
 // size_t

@@ -31,9 +31,11 @@ CModule::Create (
 	)
 {
 	Clear ();
+	
 	m_FilePath = FilePath;
 	m_pLlvmModule = pLlvmModule;
-	return true;
+	
+	return m_NamespaceMgr.AddStdItems ();
 }
 
 bool
@@ -216,14 +218,9 @@ CModule::CreateDefaultConstructor ()
 
 	m_ControlFlowMgr.SetCurrentBlock (pBlock);
 
-	CToken::CPos Pos;
-	m_NamespaceMgr.OpenScope (Pos);
-
 	Result = m_VariableMgr.InitializeGlobalStaticVariables ();
 	if (!Result)
 		return false;
-
-	m_NamespaceMgr.CloseScope (Pos);
 
 	m_FunctionMgr.InternalEpilogue ();
 

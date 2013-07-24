@@ -85,6 +85,7 @@ GetFunctionPtrTypeKindString (EFunctionPtrType PtrTypeKind);
 class CFunctionType: public CType
 {
 	friend class CTypeMgr;
+	friend class CClassType;
 
 protected:
 	CType* m_pReturnType;

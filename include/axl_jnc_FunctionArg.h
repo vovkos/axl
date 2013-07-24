@@ -18,6 +18,7 @@ class CFunctionArg: public CUserModuleItem
 {
 	friend class CTypeMgr;
 	friend class CFunction;
+	friend class CClassType;
 
 protected:
 	CType* m_pType;

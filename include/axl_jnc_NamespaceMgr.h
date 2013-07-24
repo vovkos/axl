@@ -19,6 +19,7 @@ class CNamespaceMgr
 {
 	friend class CModule;
 	friend class CParser;
+	friend class CFunctionMgr;
 
 protected:
 	CModule* m_pModule;
@@ -26,6 +27,7 @@ protected:
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
+
 	rtl::CArrayT <CNamespace*> m_NamespaceStack;
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
@@ -38,9 +40,12 @@ public:
 	{
 		return m_pModule;
 	}
-
+	
 	void
 	Clear ();
+
+	bool
+	AddStdItems ();
 
 	CGlobalNamespace*
 	GetGlobalNamespace ()
@@ -92,6 +97,8 @@ public:
 
 	CScope*
 	FindContinueScope (size_t Level);
+
+
 };
 
 //.............................................................................

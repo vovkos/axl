@@ -143,6 +143,7 @@ CCast_ClassPtr::LlvmCast (
 	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
 
 	m_pModule->m_LlvmBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, pResultValue);
+	pResultValue->OverrideType (pDstType);
 	return true;
 }
 

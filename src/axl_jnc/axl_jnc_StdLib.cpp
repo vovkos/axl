@@ -25,6 +25,10 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFreeClassPtr, (void*) UHeapFreeClassPtr);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGc, (void*) RunGc);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetCurrentThreadId, (void*) GetCurrentThreadId);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_CreateThread, (void*) CreateThread);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Sleep, (void*) Sleep);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_a, (void*) AppendFmtLiteral_a);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_p, (void*) AppendFmtLiteral_p);
@@ -46,11 +50,6 @@ CStdLib::Export (
 			*McType
 			);
 	}
-
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, "GetCurrentThreadId", (void*) GetCurrentThreadId);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, "CreateThread", (void*) CreateThread);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, "Sleep", (void*) Sleep);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, "RunGc", (void*) RunGc);
 }
 
 void

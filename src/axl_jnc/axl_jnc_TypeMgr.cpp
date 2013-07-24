@@ -1946,10 +1946,12 @@ CTypeMgr::CreateAutoEvBindSiteType ()
 CClassType* 
 CTypeMgr::CreateISchedulerType ()
 {
-	CClassType* pType = CreateClassType ("IScheduler", "jnc.IScheduler");
+	CFunctionType* pFunctionType = (CFunctionType*) GetStdType (EStdType_SimpleFunction);
 	CType* pReturnType = GetPrimitiveType (EType_Void);
-	CType* pArgType = ((CFunctionType*) GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType ();
+	CType* pArgType = pFunctionType->GetFunctionPtrType (EFunctionPtrType_Normal, EPtrTypeFlag_Checked);
 	CFunctionType* pScheduleType = GetFunctionType (pReturnType, &pArgType, 1);
+
+	CClassType* pType = CreateClassType ("IScheduler", "jnc.IScheduler");
 	pType->CreateMethod (EStorage_Abstract, "Schedule", pScheduleType);
 	pType->EnsureLayout ();
 	return pType;

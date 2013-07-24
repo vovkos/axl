@@ -27,6 +27,20 @@ CNamespaceMgr::Clear ()
 	m_pCurrentScope = NULL;
 }
 
+bool
+CNamespaceMgr::AddStdItems ()
+{
+	CGlobalNamespace* pJnc = CreateGlobalNamespace ("jnc", "jnc");
+
+	return 
+		m_GlobalNamespace.AddItem (pJnc) &&
+		pJnc->AddItem ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_IScheduler)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_RunGc)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_GetCurrentThreadId)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_CreateThread)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_Sleep));
+}
+
 void
 CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
 {

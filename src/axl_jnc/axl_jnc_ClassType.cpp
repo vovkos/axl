@@ -564,8 +564,11 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 
 	#pragma AXL_TODO ("virtual multipliers")
 
-	pFunction->m_pType = pOverridenFunction->m_pType;
-	pFunction->m_pThisArgType = pOverridenFunction->m_pThisArgType;
+	CClassPtrType* pThisArgType = (CClassPtrType*) pOverridenFunction->m_pType->GetThisArgType ();
+	ASSERT (pThisArgType->GetTypeKind () == EType_ClassPtr);
+
+	pFunction->m_pType->m_ArgArray [0]->m_pType = pThisArgType;
+	pFunction->m_pThisArgType = pThisArgType;
 	pFunction->m_ThisArgDelta = -BaseTypeCoord.m_Offset;
 	pFunction->m_pVirtualOriginClassType = pOverridenFunction->m_pVirtualOriginClassType;
 	pFunction->m_ClassVTableIndex = pOverridenFunction->m_ClassVTableIndex;

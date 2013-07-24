@@ -110,6 +110,26 @@ enum EStdFunc
 
 	EStdFunc_MarkGcRoot,
 
+	// void
+	// jnc.RunGc ();
+
+	EStdFunc_RunGc,
+
+	// i64
+	// jnc.GetCurrentThreadId ();
+
+	EStdFunc_GetCurrentThreadId,
+
+	// i64
+	// jnc.CreateThread (function* pf ());
+
+	EStdFunc_CreateThread,
+
+	// void
+	// jnc.Sleep (uint_t MsCount);
+
+	EStdFunc_Sleep,
+
 	// jnc.TTlsStruct*
 	// jnc.GetTls ();
 
@@ -195,11 +215,16 @@ protected:
 	struct TEmissionContext: rtl::TListLink
 	{
 		CFunction* m_pCurrentFunction;
+
+		CNamespace* m_pCurrentNamespace;
+		CScope* m_pCurrentScope;
+
 		CBasicBlock* m_pCurrentBlock;
 		CBasicBlock* m_pReturnBlock;
 		CBasicBlock* m_pSilentReturnBlock;
 		CBasicBlock* m_pUnreachableBlock;
 		uint_t m_ControlFlowMgrFlags;
+
 		CValue m_ThisValue;
 		CValue m_ScopeLevelValue;
 		CValue m_VTablePtrPtrValue; 
@@ -317,6 +342,13 @@ public:
 	CreateInternalFunction (
 		const char* pTag,
 		CFunctionType* pType 
+		);
+
+	CFunction*
+	CreateFunction (
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		CFunctionType* pType
 		);
 
 	CProperty*
@@ -467,6 +499,18 @@ protected:
 
 	CFunction*
 	CreateMarkGcRoot ();
+
+	CFunction*
+	CreateRunGc ();
+
+	CFunction*
+	CreateGetCurrentThreadId ();
+
+	CFunction*
+	CreateCreateThread ();
+
+	CFunction*
+	CreateSleep ();
 
 	CFunction*
 	CreateGetTls ();

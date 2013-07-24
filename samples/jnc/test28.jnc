@@ -1,30 +1,17 @@
 //.............................................................................
 
-class CMyScheduler: jnc.IScheduler
-{
-	override
-	Schedule (function* pf ())
-	{
-		printf ("before call\n");
-		pf ();
-		printf ("after call\n");
-	}
-}
-
 int 
 main ()
 {
 	printf ("main ()\n");
 
-	CMyScheduler Scheduler;
-	(foo @ Scheduler) (100);
+	char Name [] = 0x"61 62 63" "_hui" ;
+	int Value1 = 0xdead;
+	int Value2 = 0xbeee;
+
+	printf ($"--> $Name = { $(Value1:06x) $(Value2 + 1:08x) }\n");
 
 	return 10; 
-}
-
-foo (int x)
-{
-	printf ($"foo ($x)\n");
 }
 
 //.............................................................................
@@ -36,5 +23,17 @@ printf (
 	unsafe const thin char* pFormat,
 	unsafe ...
 	);
+
+void
+RunGc ();
+
+int
+GetCurrentThreadId ();
+
+bool
+CreateThread (function* pf ());
+
+void
+Sleep (unsigned int32 MsCount);
 
 //.............................................................................
