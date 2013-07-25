@@ -16,11 +16,11 @@ CSem::Wait (uint_t Timeout)
 	switch (Timeout)
 	{
 	case 0:
-		Result = sem_wait (&m_Sem);
+		Result = sem_trywait (&m_Sem);		
 		break;
 		
 	case -1:
-		Result = sem_trywait (&m_Sem);		
+		Result = sem_wait (&m_Sem);
 		break;
 		
 	default:		
