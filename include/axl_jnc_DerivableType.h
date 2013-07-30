@@ -111,7 +111,7 @@ class CDerivableType: public CNamedType
 protected:
 	// base types
 
-	rtl::CStringHashTableMapAT <CBaseTypeSlot*> m_BaseTypeMap;
+	rtl::CStringHashTableMapT <CBaseTypeSlot*> m_BaseTypeMap;
 	rtl::CStdListT <CBaseTypeSlot> m_BaseTypeList;
 	rtl::CArrayT <CBaseTypeSlot*> m_ImportBaseTypeArray;
 
@@ -146,7 +146,7 @@ protected:
 
 	rtl::CArrayT <CFunction*> m_UnaryOperatorTable;
 	rtl::CArrayT <CFunction*> m_BinaryOperatorTable;
-	rtl::CStringHashTableMapAT <CFunction*> m_CastOperatorMap;
+	rtl::CStringHashTableMapT <CFunction*> m_CastOperatorMap;
 	CFunction* m_pCallOperator;
 
 public:
@@ -164,7 +164,7 @@ public:
 	CBaseTypeSlot*
 	FindBaseType (CType* pType)
 	{
-		rtl::CStringHashTableMapIteratorAT <CBaseTypeSlot*> It = m_BaseTypeMap.Find (pType->GetSignature ());
+		rtl::CStringHashTableMapIteratorT <CBaseTypeSlot*> It = m_BaseTypeMap.Find (pType->GetSignature ());
 		return It ? It->m_Value : NULL;
 	}
 

@@ -18,6 +18,7 @@ CModule::Clear ()
 	m_ControlFlowMgr.Clear ();
 	m_CalcLayoutArray.Clear ();
 	m_CompileArray.Clear ();
+	m_LlvmDiBuilder.Clear ();
 
 	m_pConstructor = NULL;
 	m_pDestructor = NULL;
@@ -35,7 +36,9 @@ CModule::Create (
 	m_FilePath = FilePath;
 	m_pLlvmModule = pLlvmModule;
 	
-	return m_NamespaceMgr.AddStdItems ();
+	return 
+		m_LlvmDiBuilder.Create () &&
+		m_NamespaceMgr.AddStdItems ();
 }
 
 bool
@@ -43,13 +46,13 @@ CModule::SetConstructor (CFunction* pFunction)
 {
 	if (!pFunction->GetType ()->GetArgArray ().IsEmpty ())
 	{
-		err::SetFormatStringError ("module 'this' cannot have arguments");
+		err::SetFormatStringError ("module 'construct' cannot have arguments");
 		return false;
 	}
 
 	if (m_pConstructor)
 	{
-		err::SetFormatStringError ("module already has 'this' method");
+		err::SetFormatStringError ("module already has 'construct' method");
 		return false;
 	}
 
@@ -190,8 +193,12 @@ CModule::Compile ()
 	if (!Result)
 		return false;
 
+	// step 7: finalize debug information
+	
+	m_LlvmDiBuilder.Finalize ();	
+	
 	return true;
-}
+} 
 
 bool
 CModule::CreateDefaultConstructor ()
@@ -246,6 +253,16 @@ CModule::CreateDefaultDestructor ()
 
 	m_FunctionMgr.InternalEpilogue ();
 }
+
+rtl::CString
+CModule::GetLlvmIrString ()
+{	
+	std::string String;
+	llvm::raw_string_ostream Stream (String);	
+	m_pLlvmModule->print (Stream, NULL);
+	return String.c_str ();
+}
+
 
 //.............................................................................
 

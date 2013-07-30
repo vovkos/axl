@@ -63,19 +63,19 @@ CCast_ClassPtr::LlvmCast (
 	if (pSrcType->GetPtrTypeKind () == EClassPtrType_Weak &&
 		pDstType->GetPtrTypeKind () != EClassPtrType_Weak)
 	{
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "strengthen class pointer");
+		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "strengthen class pointer");
 
 		CFunction* pStrengthen = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
 
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->GetSimpleType (EStdType_ObjectPtr), &OpValue);
-		m_pModule->m_LlvmBuilder.CreateCall (
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->GetSimpleType (EStdType_ObjectPtr), &OpValue);
+		m_pModule->m_LlvmIrBuilder.CreateCall (
 			pStrengthen,
 			pStrengthen->GetType (),
 			OpValue,
 			&OpValue
 			);
 
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pSrcType, &OpValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pSrcType, &OpValue);
 	}
 
 	CClassType* pSrcClassType = pSrcType->GetTargetType ();
@@ -86,7 +86,7 @@ CCast_ClassPtr::LlvmCast (
 
 	if (pDstClassType->GetClassTypeKind () == EClassType_StdObject)
 	{
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pDstType, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pDstType, pResultValue);
 		return true;
 	}
 
@@ -101,12 +101,12 @@ CCast_ClassPtr::LlvmCast (
 	if (!Result)
 	{
 		CValue PtrValue;
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
 
 		CValue TypeValue (&pDstClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
 		CFunction* pDynamicCastClassPtr = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastClassPtr);
-		m_pModule->m_LlvmBuilder.CreateCall2 (
+		m_pModule->m_LlvmIrBuilder.CreateCall2 (
 			pDynamicCastClassPtr,
 			pDynamicCastClassPtr->GetType (),
 			PtrValue,
@@ -114,7 +114,7 @@ CCast_ClassPtr::LlvmCast (
 			&PtrValue
 			);
 
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pDstType, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pDstType, pResultValue);
 		return true;
 	}
 
@@ -126,13 +126,13 @@ CCast_ClassPtr::LlvmCast (
 	CBasicBlock* pNoNullBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("iface_nonull");
 
 	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateEq_i (OpValue, SrcNullValue, &CmpValue);
+	m_pModule->m_LlvmIrBuilder.CreateEq_i (OpValue, SrcNullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pPhiBlock, pNoNullBlock, pNoNullBlock);
 	
 	Coord.m_LlvmIndexArray.Insert (0, 0);
 
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateGep (
+	m_pModule->m_LlvmIrBuilder.CreateGep (
 		OpValue, 
 		Coord.m_LlvmIndexArray,
 		Coord.m_LlvmIndexArray.GetCount (),
@@ -142,7 +142,7 @@ CCast_ClassPtr::LlvmCast (
 
 	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
 
-	m_pModule->m_LlvmBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreatePhi (PtrValue, pNoNullBlock, DstNullValue, pCmpBlock, pResultValue);
 	pResultValue->OverrideType (pDstType);
 	return true;
 }

@@ -75,8 +75,8 @@ COperatorMgr::GetPropertyVTable (
 	CType* pClosureType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
 
 	CValue ClosureValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pVTableType, pResultValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, pClosureType, &ClosureValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, pVTableType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, pClosureType, &ClosureValue);
 
 	pResultValue->SetClosure (OpValue.GetClosure ());
 	pResultValue->InsertToClosureHead (ClosureValue);
@@ -157,8 +157,8 @@ COperatorMgr::GetPropertyGetter (
 	size_t Index = (pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable) ? 1 : 0;
 
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, Index, NULL, &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateLoad (
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (VTableValue, Index, NULL, &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (
 		PfnValue, 
 		pPropertyType->GetGetterType ()->GetFunctionPtrType (EFunctionPtrType_Thin, pPtrType->GetFlags ()), 
 		pResultValue
@@ -290,8 +290,8 @@ COperatorMgr::GetPropertySetter (
 	Index += i;
 
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, Index, NULL, &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateLoad (
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (VTableValue, Index, NULL, &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (
 		PfnValue, 
 		pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin, pPtrType->GetFlags ()), 
 		pResultValue
@@ -386,8 +386,8 @@ COperatorMgr::GetPropertyBinder (
 		return false;
 
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (VTableValue, 0, NULL, &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateLoad (
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (VTableValue, 0, NULL, &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (
 		PfnValue, 
 		pPropertyType->GetBinderType ()->GetFunctionPtrType (EFunctionPtrType_Thin, pPtrType->GetFlags ()), 
 		pResultValue

@@ -4,12 +4,15 @@
 
 enum EJncFlag
 {
-	EJncFlag_Help        = 0x01,
-	EJncFlag_Version     = 0x02,
-	EJncFlag_LlvmIr      = 0x04,
-	EJncFlag_Disassembly = 0x08,
-	EJncFlag_RunFunction = 0x10,
-	EJncFlag_Server      = 0x20,
+	EJncFlag_Help        = 0x0001,
+	EJncFlag_Version     = 0x0002,
+	EJncFlag_LlvmIr      = 0x0004,
+	EJncFlag_LlvmIr_c    = 0x0008,
+	EJncFlag_Jit         = 0x0010,
+	EJncFlag_Jit_mc      = 0x0020,
+	EJncFlag_Disassembly = 0x0040,
+	EJncFlag_RunFunction = 0x0080,
+	EJncFlag_Server      = 0x0100,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -72,6 +75,9 @@ protected:
 		const char* pValue,
 		size_t Length
 		);
+
+	bool
+	Verify ();
 };
 
 //.............................................................................

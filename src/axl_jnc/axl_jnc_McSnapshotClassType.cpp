@@ -51,11 +51,11 @@ CMcSnapshotClassType::CompileCallMethod ()
 	m_pModule->m_OperatorMgr.GetClassField (ArgValueArray [0], m_FieldArray [EMcSnapshotField_Count], NULL, &CountValue);
 	m_pModule->m_OperatorMgr.GetClassField (ArgValueArray [0], m_FieldArray [EMcSnapshotField_PtrArray], NULL, &PtrPfnValue);
 
-	m_pModule->m_LlvmBuilder.CreateAlloca (pPtrPfnType, "ppf", NULL, &PtrPfnVariable);
-	m_pModule->m_LlvmBuilder.CreateLoad (PtrPfnValue, PtrPfnValue.GetType (), &PtrPfnValue);
-	m_pModule->m_LlvmBuilder.CreateLoad (CountValue, CountValue.GetType (), &CountValue);
-	m_pModule->m_LlvmBuilder.CreateStore (PtrPfnValue, PtrPfnVariable);
-	m_pModule->m_LlvmBuilder.CreateGep (PtrPfnValue, CountValue, pPtrPfnType, &PtrPfnEndValue);
+	m_pModule->m_LlvmIrBuilder.CreateAlloca (pPtrPfnType, "ppf", NULL, &PtrPfnVariable);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (PtrPfnValue, PtrPfnValue.GetType (), &PtrPfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (CountValue, CountValue.GetType (), &CountValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (PtrPfnValue, PtrPfnVariable);
+	m_pModule->m_LlvmIrBuilder.CreateGep (PtrPfnValue, CountValue, pPtrPfnType, &PtrPfnEndValue);
 
 	CBasicBlock* pConditionBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("mccall_cond");
 	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("mccall_loop");
@@ -65,16 +65,16 @@ CMcSnapshotClassType::CompileCallMethod ()
 
 	CValue IdxValue;
 	CValue CmpValue;
-	m_pModule->m_LlvmBuilder.CreateLoad (PtrPfnVariable, NULL, &PtrPfnValue);
-	m_pModule->m_LlvmBuilder.CreateGe_u (PtrPfnValue, PtrPfnEndValue, &CmpValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (PtrPfnVariable, NULL, &PtrPfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateGe_u (PtrPfnValue, PtrPfnEndValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFollowBlock, pBodyBlock, pBodyBlock);
 
 	CValue PfnValue;
-	m_pModule->m_LlvmBuilder.CreateLoad (PtrPfnValue, m_pTargetType, &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (PtrPfnValue, m_pTargetType, &PfnValue);
 	m_pModule->m_OperatorMgr.CallOperator (PfnValue, &ArgValueList);
 
-	m_pModule->m_LlvmBuilder.CreateGep (PtrPfnValue, 1, pPtrPfnType, &PtrPfnValue);
-	m_pModule->m_LlvmBuilder.CreateStore (PtrPfnValue, PtrPfnVariable);
+	m_pModule->m_LlvmIrBuilder.CreateGep (PtrPfnValue, 1, pPtrPfnType, &PtrPfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (PtrPfnValue, PtrPfnVariable);
 	m_pModule->m_ControlFlowMgr.Jump (pConditionBlock, pFollowBlock);
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();

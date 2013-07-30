@@ -9,7 +9,6 @@
 machine jancy_lexer; 
 write data;
 
-
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # standard definitions
@@ -142,6 +141,7 @@ id								{  };
 dec+							{ colorize(ts, te, Qt::darkRed); };
 '0' [Xx] hex+					{ colorize(ts, te, Qt::darkRed); };
 '0' [Xx] lit_dq                 { colorize(ts, te, Qt::darkRed); };
+'$' lit_dq                      { colorize(ts, te, Qt::darkRed); };
 
 '//' [^\n]*						{ colorize(ts, te, Qt::darkGreen); };
 

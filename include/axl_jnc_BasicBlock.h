@@ -26,7 +26,7 @@ enum EBasicBlockFlag
 class CBasicBlock: public rtl::TListLink
 {
 	friend class CControlFlowMgr;
-	friend class CLlvmBuilder;
+	friend class CLlvmIrBuilder;
 
 protected:
 	rtl::CString m_Name;

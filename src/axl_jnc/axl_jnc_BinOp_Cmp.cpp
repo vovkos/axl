@@ -28,7 +28,7 @@ CBinOp_Eq::LlvmOpInt (
 	bool IsUnsigned
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateEq_i (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateEq_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
@@ -38,7 +38,7 @@ CBinOp_Eq::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateEq_f (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateEq_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -51,7 +51,7 @@ CBinOp_Ne::LlvmOpInt (
 	bool IsUnsigned
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateNe_i (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateNe_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
@@ -61,7 +61,7 @@ CBinOp_Ne::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateNe_f (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateNe_f (OpValue1, OpValue2, pResultValue);
 }
 	
 //.............................................................................
@@ -75,8 +75,8 @@ CBinOp_Lt::LlvmOpInt (
 	)
 {
 	return IsUnsigned ? 
-		m_pModule->m_LlvmBuilder.CreateLt_u (OpValue1, OpValue2, pResultValue) :
-		m_pModule->m_LlvmBuilder.CreateLt_i (OpValue1, OpValue2, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateLt_u (OpValue1, OpValue2, pResultValue) :
+		m_pModule->m_LlvmIrBuilder.CreateLt_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
@@ -86,7 +86,7 @@ CBinOp_Lt::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateLt_f (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateLt_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -100,8 +100,8 @@ CBinOp_Le::LlvmOpInt (
 	)
 {
 	return IsUnsigned ? 
-		m_pModule->m_LlvmBuilder.CreateLe_u (OpValue1, OpValue2, pResultValue) :
-		m_pModule->m_LlvmBuilder.CreateLe_i (OpValue1, OpValue2, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateLe_u (OpValue1, OpValue2, pResultValue) :
+		m_pModule->m_LlvmIrBuilder.CreateLe_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
@@ -111,7 +111,7 @@ CBinOp_Le::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateLe_f (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateLe_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -125,8 +125,8 @@ CBinOp_Gt::LlvmOpInt (
 	)
 {
 	return IsUnsigned ? 
-		m_pModule->m_LlvmBuilder.CreateGt_u (OpValue1, OpValue2, pResultValue) :
-		m_pModule->m_LlvmBuilder.CreateGt_i (OpValue1, OpValue2, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateGt_u (OpValue1, OpValue2, pResultValue) :
+		m_pModule->m_LlvmIrBuilder.CreateGt_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
@@ -136,7 +136,7 @@ CBinOp_Gt::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateGt_f (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateGt_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................
@@ -150,8 +150,8 @@ CBinOp_Ge::LlvmOpInt (
 	)
 {
 	return IsUnsigned ? 
-		m_pModule->m_LlvmBuilder.CreateGe_u (OpValue1, OpValue2, pResultValue) :
-		m_pModule->m_LlvmBuilder.CreateGe_i (OpValue1, OpValue2, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateGe_u (OpValue1, OpValue2, pResultValue) :
+		m_pModule->m_LlvmIrBuilder.CreateGe_i (OpValue1, OpValue2, pResultValue);
 }
 
 llvm::Value*
@@ -161,7 +161,7 @@ CBinOp_Ge::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateGe_f (OpValue1, OpValue2, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateGe_f (OpValue1, OpValue2, pResultValue);
 }
 
 //.............................................................................

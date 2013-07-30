@@ -181,7 +181,7 @@ CVariableMgr::CreateLlvmGlobalVariable (
 		*m_pModule->GetLlvmModule (),
 		pType->GetLlvmType (),
 		false,
-		llvm::GlobalVariable::ExternalLinkage,
+		llvm::GlobalVariable::InternalLinkage,
 		(llvm::Constant*) pType->GetZeroValue ().GetLlvmValue (),
 		pTag
 		);
@@ -271,6 +271,7 @@ CVariableMgr::AllocatePrimeStaticVariable (CVariable* pVariable)
 	if (pVariable->m_pType->GetFlags () & ETypeFlag_GcRoot)
 		m_StaticGcRootArray.Append (pVariable);
 
+	m_pModule->m_LlvmDiBuilder.CreateGlobalVariable (pVariable);
 	return true;
 }
 
@@ -428,7 +429,7 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 		if (pVariable->m_Initializer.IsEmpty () || 
 			pVariable->m_Initializer.GetHead ()->m_Token == '{') 
 		{
-			m_pModule->m_LlvmBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), PtrValue);
+			m_pModule->m_LlvmIrBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), PtrValue);
 		}
 	}
 
@@ -452,7 +453,7 @@ CVariableMgr::AllocateTlsVariable (CVariable* pVariable)
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
 	CValue PtrValue;
-	llvm::AllocaInst* pLlvmAlloca = m_pModule->m_LlvmBuilder.CreateAlloca (
+	llvm::AllocaInst* pLlvmAlloca = m_pModule->m_LlvmIrBuilder.CreateAlloca (
 		pVariable->m_pType,
 		pVariable->m_QualifiedName,
 		NULL,

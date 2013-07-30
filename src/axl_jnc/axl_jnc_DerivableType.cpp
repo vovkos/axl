@@ -72,7 +72,7 @@ CDerivableType::GetDefaultConstructor ()
 CBaseTypeSlot*
 CDerivableType::AddBaseType (CType* pType)
 {
-	rtl::CStringHashTableMapIteratorAT <CBaseTypeSlot*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
+	rtl::CStringHashTableMapIteratorT <CBaseTypeSlot*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
 	if (It->m_Value)
 	{
 		err::SetFormatStringError (
@@ -117,7 +117,7 @@ CDerivableType::ResolveImportBaseType (CBaseTypeSlot* pSlot)
 	ASSERT (pSlot->m_pType_i);
 
 	CType* pType = pSlot->m_pType_i->GetActualType ();
-	rtl::CStringHashTableMapIteratorAT <CBaseTypeSlot*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
+	rtl::CStringHashTableMapIteratorT <CBaseTypeSlot*> It = m_BaseTypeMap.Goto (pType->GetSignature ());
 	if (It->m_Value)
 	{
 		err::SetFormatStringError (
@@ -565,7 +565,7 @@ CDerivableType::FindBaseTypeTraverseImpl (
 	size_t Level
 	)
 {
-	rtl::CStringHashTableMapIteratorAT <CBaseTypeSlot*> It = m_BaseTypeMap.Find (pType->GetSignature ());
+	rtl::CStringHashTableMapIteratorT <CBaseTypeSlot*> It = m_BaseTypeMap.Find (pType->GetSignature ());
 	if (It)
 	{
 		if (!pCoord)

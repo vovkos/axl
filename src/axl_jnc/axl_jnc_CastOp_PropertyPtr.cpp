@@ -101,7 +101,7 @@ CCast_PropertyPtr_FromDataPtr::LlvmCast_FullClosure (
 	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_PropertyClosure));
 
 	CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
 	return true;
 }
 
@@ -146,8 +146,8 @@ CCast_PropertyPtr_FromNormal::LlvmCast (
 
 	CValue PfnValue;
 	CValue ClosureObjValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pThinPtrType, &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &ClosureObjValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, pThinPtrType, &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &ClosureObjValue);
 
 	PfnValue.SetClosure (OpValue.GetClosure ());
 	PfnValue.InsertToClosureHead (ClosureObjValue);
@@ -250,7 +250,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 	if (OpValue.GetValueKind () == EValue_Property)
 		return CreateClosurePropertyPtr (OpValue.GetProperty (), ThisArgValue, pDstPtrType, pResultValue);
 
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (OpValue, ThisArgValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosurePropertyPtr (OpValue, ThisArgValue, pDstPtrType, pResultValue);
 	return true;
 }
 
@@ -319,7 +319,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_FullClosure (
 	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_PropertyClosure));
 
 	CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
 	return true;
 }
 
@@ -336,7 +336,7 @@ CCast_PropertyPtr_Thin2Normal::CreateClosurePropertyPtr (
 	if (!Result)
 		return false;
 
-	m_pModule->m_LlvmBuilder.CreateClosurePropertyPtr (ThinPtrValue, ClosureValue, pPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosurePropertyPtr (ThinPtrValue, ClosureValue, pPtrType, pResultValue);
 	return true;
 }
 

@@ -24,7 +24,7 @@ COperatorMgr::GetClassPtrScopeLevel (
 		1, // TObject**
 	};
 
-	m_pModule->m_LlvmBuilder.CreateGep (
+	m_pModule->m_LlvmIrBuilder.CreateGep (
 		Value, 
 		LlvmIndexArray, 
 		countof (LlvmIndexArray), 
@@ -32,11 +32,11 @@ COperatorMgr::GetClassPtrScopeLevel (
 		&ObjPtrValue
 		);  
 
-	m_pModule->m_LlvmBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObject* 
+	m_pModule->m_LlvmIrBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObject* 
 
 	CValue ScopeLevelValue;
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
-	m_pModule->m_LlvmBuilder.CreateLoad (
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
+	m_pModule->m_LlvmIrBuilder.CreateLoad (
 		ScopeLevelValue, 
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
 		pResultValue
@@ -76,7 +76,7 @@ COperatorMgr::GetThinDataPtrScopeLevel (
 
 	case EType_DataPtr:
 		ASSERT (((CDataPtrType*) ScopeValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (ScopeValidatorValue, 3, m_pModule->GetSimpleType (EType_SizeT), pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (ScopeValidatorValue, 3, m_pModule->GetSimpleType (EType_SizeT), pResultValue);
 		break;
 
 	case EType_ClassPtr:
@@ -99,14 +99,14 @@ COperatorMgr::GetThinDataPtrRange (
 
 	CType* pBytePtrType = m_pModule->GetSimpleType (EStdType_BytePtr);
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "calc thin data pointer range");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "calc thin data pointer range");
 
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
 	{	
 		size_t Size =  Value.GetVariable ()->GetType ()->GetSize ();
-		m_pModule->m_LlvmBuilder.CreateBitCast (Value, pBytePtrType, pRangeBeginValue);
-		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, Size, pBytePtrType, pRangeEndValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (Value, pBytePtrType, pRangeBeginValue);
+		m_pModule->m_LlvmIrBuilder.CreateGep (*pRangeBeginValue, Size, pBytePtrType, pRangeEndValue);
 		return;
 	}
 
@@ -115,8 +115,8 @@ COperatorMgr::GetThinDataPtrRange (
 
 	if (pValidator->GetValidatorKind () == EThinDataPtrValidator_Complex)
 	{
-		m_pModule->m_LlvmBuilder.CreateBitCast (pValidator->GetRangeBegin (), pBytePtrType, pRangeBeginValue);
-		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, pValidator->GetSizeValue (), pBytePtrType, pRangeEndValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (pValidator->GetRangeBegin (), pBytePtrType, pRangeBeginValue);
+		m_pModule->m_LlvmIrBuilder.CreateGep (*pRangeBeginValue, pValidator->GetSizeValue (), pBytePtrType, pRangeEndValue);
 		return;
 	}
 
@@ -126,8 +126,8 @@ COperatorMgr::GetThinDataPtrRange (
 	if (ValidatorValue.GetValueKind () == EValue_Variable)
 	{
 		size_t Size = ValidatorValue.GetVariable ()->GetType ()->GetSize ();
-		m_pModule->m_LlvmBuilder.CreateBitCast (ValidatorValue, pBytePtrType, pRangeBeginValue);
-		m_pModule->m_LlvmBuilder.CreateGep (*pRangeBeginValue, Size, pBytePtrType, pRangeEndValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (ValidatorValue, pBytePtrType, pRangeBeginValue);
+		m_pModule->m_LlvmIrBuilder.CreateGep (*pRangeBeginValue, Size, pBytePtrType, pRangeEndValue);
 		return;
 	}
 
@@ -135,8 +135,8 @@ COperatorMgr::GetThinDataPtrRange (
 		(ValidatorValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr) &&
 		((CDataPtrType*) ValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
 
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ValidatorValue, 1, pBytePtrType, pRangeBeginValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (ValidatorValue, 2, pBytePtrType, pRangeEndValue);		
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (ValidatorValue, 1, pBytePtrType, pRangeBeginValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (ValidatorValue, 2, pBytePtrType, pRangeEndValue);		
 }
 
 bool
@@ -168,7 +168,7 @@ COperatorMgr::PrepareDataPtr (
 	}
 	else
 	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
 
 		if (pType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
 		{
@@ -176,8 +176,8 @@ COperatorMgr::PrepareDataPtr (
 			return true;
 		}
 
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 1, NULL, &RangeBeginValue);
-		m_pModule->m_LlvmBuilder.CreateExtractValue (Value, 2, NULL, &RangeEndValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 1, NULL, &RangeBeginValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 2, NULL, &RangeEndValue);
 	}
 
 	CheckDataPtrRange (PtrValue, pType->GetTargetType ()->GetSize (), RangeBeginValue, RangeEndValue);
@@ -204,7 +204,7 @@ COperatorMgr::LoadDataRef (
 	if (!Result)
 		return false;
 
-	m_pModule->m_LlvmBuilder.CreateLoad (
+	m_pModule->m_LlvmIrBuilder.CreateLoad (
 		PtrValue, 
 		pTargetType, 
 		pResultValue, 
@@ -285,7 +285,7 @@ COperatorMgr::StoreDataRef (
 		break;
 
 	case EType_BitField:
-		m_pModule->m_LlvmBuilder.CreateLoad (
+		m_pModule->m_LlvmIrBuilder.CreateLoad (
 			PtrValue, 
 			pCastType,
 			&BfShadowValue,
@@ -303,7 +303,7 @@ COperatorMgr::StoreDataRef (
 			return false;
 	}
 
-	m_pModule->m_LlvmBuilder.CreateStore (
+	m_pModule->m_LlvmIrBuilder.CreateStore (
 		SrcValue, 
 		PtrValue, 
 		(pDstType->GetFlags () & EPtrTypeFlag_Volatile) != 0

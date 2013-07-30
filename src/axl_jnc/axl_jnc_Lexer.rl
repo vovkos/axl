@@ -63,7 +63,7 @@ any       ;
 
 fmt_spec := |*
 
-':' [^")\n]*  { CreateStringToken (EToken_FmtSpecifier, 1); fret; };
+',' [^")\n]*  { CreateFmtSpecifierToken (); fret; };
 any           { ASSERT (false); fret; };
 
 *|;
@@ -250,7 +250,7 @@ main := |*
 
 id              { CreateStringToken (EToken_Identifier); };
 lit_sq          { CreateCharToken (EToken_Integer); };
-lit_dq          { CreateStringToken (EToken_Literal, 1, 1); };
+lit_dq          { CreateStringToken (EToken_Literal, 1, 1, true); };
 dec+            { CreateIntegerToken (10); };
 '0' [Xx] hex+   { CreateIntegerToken (16, 2); };
 '0' [Xx] lit_dq { CreateHexLiteralToken (); };
@@ -262,7 +262,7 @@ dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
 
 '('             { OnLeftParentheses (); };
 ')'             { if (!OnRightParentheses ()) fret; };
-':'             { if (!OnColon ()) fcall fmt_spec; };
+','             { if (!OnComma ()) fcall fmt_spec; };
 
 ws | nl         ;
 any             { CreateToken (ts [0]); };

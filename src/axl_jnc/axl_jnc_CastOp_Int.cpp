@@ -31,7 +31,7 @@ CCast_IntTrunc::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateTrunc_i (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateTrunc_i (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -68,7 +68,7 @@ CCast_IntExt::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateExt_i (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateExt_i (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -101,7 +101,7 @@ CCast_IntExt_u::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateExt_u (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateExt_u (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -143,7 +143,7 @@ CCast_SwapByteOrder::LlvmCast (
 
 	CValue SwapFunctionValue;
 	SwapFunctionValue.SetLlvmValue (pLlvmSwap, NULL);
-	m_pModule->m_LlvmBuilder.CreateCall (
+	m_pModule->m_LlvmIrBuilder.CreateCall (
 		SwapFunctionValue, 
 		ECallConv_Default,
 		&OpValue, 1,
@@ -218,7 +218,7 @@ CCast_IntFromFp::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateFpToInt (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateFpToInt (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -330,11 +330,11 @@ CCast_IntFromPtr::LlvmCast (
 	CValue PtrValue;
 
 	if (OpValue.GetType ()->GetSize () > sizeof (intptr_t))
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 	else
 		PtrValue = OpValue;
 
-	m_pModule->m_LlvmBuilder.CreatePtrToInt (PtrValue, m_pModule->GetSimpleType (EType_Int_p), &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreatePtrToInt (PtrValue, m_pModule->GetSimpleType (EType_Int_p), &PtrValue);
 	return m_pModule->m_OperatorMgr.CastOperator (PtrValue, pType, pResultValue);
 }
 
@@ -372,7 +372,7 @@ CCast_PtrFromInt::LlvmCast (
 	if (!Result)
 		return false;
 
-	m_pModule->m_LlvmBuilder.CreateIntToPtr (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateIntToPtr (OpValue, pType, pResultValue);
 	return true;
 }
 

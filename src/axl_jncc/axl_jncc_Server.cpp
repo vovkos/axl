@@ -109,7 +109,6 @@ CJnc::Client (
 	if (!Result)
 	{
 		SocketOut.Printf ("error parsing command line: %s\n", err::GetError ()->GetDescription ().cc ());
-		PrintUsage (&SocketOut);
 		return EJncError_InvalidCmdLine;
 	}
 

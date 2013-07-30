@@ -115,7 +115,7 @@ CFunctionType::Compile ()
 	ASSERT (m_pAbstractFunction);
 
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pAbstractFunction);
-	m_pModule->m_LlvmBuilder.RuntimeError (ERuntimeError_AbstractFunction);
+	m_pModule->m_LlvmIrBuilder.RuntimeError (ERuntimeError_AbstractFunction);
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	return true;

@@ -15,7 +15,7 @@ CCast_FpTrunc::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateTrunc_f (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateTrunc_f (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -29,7 +29,7 @@ CCast_FpExt::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateExt_f (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateExt_f (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -43,7 +43,7 @@ CCast_FpFromInt::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateIntToFp (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateIntToFp (OpValue, pType, pResultValue);
 	return true;
 }
 
@@ -146,7 +146,7 @@ CCast_FpFromInt_u::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateIntToFp_u (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateIntToFp_u (OpValue, pType, pResultValue);
 	return true;
 }
 

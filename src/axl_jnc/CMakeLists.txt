@@ -76,7 +76,8 @@ set (
 	MODULE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_AttributeBlock.h
 	${AXL_INC_DIR}/axl_jnc_AttributeMgr.h
-	${AXL_INC_DIR}/axl_jnc_LlvmBuilder.h
+	${AXL_INC_DIR}/axl_jnc_LlvmDiBuilder.h
+	${AXL_INC_DIR}/axl_jnc_LlvmIrBuilder.h
 	${AXL_INC_DIR}/axl_jnc_Module.h
 	${AXL_INC_DIR}/axl_jnc_ModuleItem.h
 	)
@@ -85,7 +86,8 @@ set (
 	MODULE_CPP_LIST
 	axl_jnc_AttributeBlock.cpp
 	axl_jnc_AttributeMgr.cpp
-	axl_jnc_LlvmBuilder.cpp
+	axl_jnc_LlvmDiBuilder.cpp
+	axl_jnc_LlvmIrBuilder.cpp
 	axl_jnc_Module.cpp
 	axl_jnc_ModuleItem.cpp
 	)

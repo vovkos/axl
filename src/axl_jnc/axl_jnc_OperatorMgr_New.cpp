@@ -60,7 +60,7 @@ COperatorMgr::Allocate (
 			return false;
 		}
 
-		m_pModule->m_LlvmBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
 
 		if (pType->GetFlags () & ETypeFlag_GcRoot)
 			MarkGcRoot (PtrValue, pType);
@@ -69,14 +69,14 @@ COperatorMgr::Allocate (
 
 	case EStorage_Heap:
 		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAlloc);
-		m_pModule->m_LlvmBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
 		MarkGcRoot (PtrValue, pType);
 		break;
 
 
 	case EStorage_UHeap:
 		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
-		m_pModule->m_LlvmBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
 		break;
 
 	default:
@@ -84,7 +84,7 @@ COperatorMgr::Allocate (
 		return false;
 	}
 
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pPtrType, pResultValue);
 	return true;
 }
 
@@ -110,7 +110,7 @@ COperatorMgr::Prime (
 
 	if (pType->GetTypeKind () != EType_Class)
 	{
-		m_pModule->m_LlvmBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
 
 		pResultValue->SetThinDataPtr (
 			PtrValue.GetLlvmValue (),
@@ -147,11 +147,11 @@ COperatorMgr::Prime (
 		return false;
 	}
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "prime object");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "prime object");
 
 	CFunction* pPrimer = pClassType->GetPrimer ();
 
-	m_pModule->m_LlvmBuilder.CreateCall3 (
+	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pPrimer,
 		pPrimer->GetType (),
 		PtrValue,
@@ -165,13 +165,13 @@ COperatorMgr::Prime (
 		CFunction* pAddObject = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcAddObject);
 
 		CValue ObjectPtrValue;
-		m_pModule->m_LlvmBuilder.CreateBitCast (
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (
 			PtrValue,
 			m_pModule->GetSimpleType (EStdType_ObjectHdrPtr),
 			&ObjectPtrValue
 			);
 
-		m_pModule->m_LlvmBuilder.CreateCall (
+		m_pModule->m_LlvmIrBuilder.CreateCall (
 			pAddObject,
 			pAddObject->GetType (),
 			ObjectPtrValue,
@@ -179,7 +179,7 @@ COperatorMgr::Prime (
 			);
 	}
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
 
 	return true;
 }
@@ -580,7 +580,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 			return false;
 
 		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFree);	
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 		break;
 
 	case EType_ClassPtr:
@@ -599,7 +599,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 		}
 
 		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFreeClassPtr);	
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
 		}
 		break;
 
@@ -609,7 +609,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 	}
 			
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
+	m_pModule->m_LlvmIrBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
 	return true;
 }
 
@@ -619,7 +619,7 @@ COperatorMgr::ProcessDestructArray (
 	size_t Count
 	)
 {
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "process destruct list");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "process destruct list");
 
 	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
@@ -630,7 +630,7 @@ COperatorMgr::ProcessDestructArray (
 		CFunction* pDestructor = pType->GetDestructor ();
 		ASSERT (pDestructor);
 
-		m_pModule->m_LlvmBuilder.CreateCall (pDestructor, pDestructor->GetType (), pVariable, NULL);		
+		m_pModule->m_LlvmIrBuilder.CreateCall (pDestructor, pDestructor->GetType (), pVariable, NULL);		
 	}
 }
 
@@ -665,7 +665,7 @@ COperatorMgr::ProcessLazyStaticDestructList (const rtl::CConstListT <TLazyStatic
 			ArgCount = 1;
 		}
 
-		m_pModule->m_LlvmBuilder.CreateCall (
+		m_pModule->m_LlvmIrBuilder.CreateCall (
 			pDestruct->m_pDestructor, 
 			pDestruct->m_pDestructor->GetType (), 
 			&ArgValue, ArgCount,
@@ -682,7 +682,7 @@ COperatorMgr::NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List)
 	if (List.IsEmpty ())
 		return;
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "nullify gcroot list");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "nullify gcroot list");
 
 	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
@@ -692,7 +692,7 @@ COperatorMgr::NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List)
 		CValue Value = *It;
 		ASSERT (Value.GetType ()->GetTypeKind () == EType_DataPtr);
 		
-		m_pModule->m_LlvmBuilder.CreateStore (NullValue, Value);
+		m_pModule->m_LlvmIrBuilder.CreateStore (NullValue, Value);
 	}
 }
 
@@ -710,7 +710,7 @@ COperatorMgr::MarkGcRoot (
 	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 	
 	CValue GcRootValue;
-	m_pModule->m_LlvmBuilder.CreateAlloca (
+	m_pModule->m_LlvmIrBuilder.CreateAlloca (
 		pBytePtrType, 
 		"gc_root", 
 		pBytePtrType->GetDataPtrType_c (), 
@@ -730,7 +730,7 @@ COperatorMgr::MarkGcRoot (
 	ArgValueArray [1].CreateConst (&pType, m_pModule->GetSimpleType (EStdType_BytePtr));
 		
 	CValue ResultValue;
-	m_pModule->m_LlvmBuilder.CreateCall (
+	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pMarkGcRoot, 
 		pMarkGcRoot->GetType (),
 		ArgValueArray, 2,
@@ -740,8 +740,8 @@ COperatorMgr::MarkGcRoot (
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 	
 	CValue BytePtrValue;
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pBytePtrType, &BytePtrValue);
-	m_pModule->m_LlvmBuilder.CreateStore (BytePtrValue, GcRootValue);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pBytePtrType, &BytePtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (BytePtrValue, GcRootValue);
 }
 
 //.............................................................................

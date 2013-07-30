@@ -41,7 +41,7 @@ CThunkFunction::Compile ()
 	if (TargetArgCount == ThunkArgCount)
 	{
 		CValue IfaceValue (LlvmArg, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr));
-		m_pModule->m_LlvmBuilder.CreateBitCast (IfaceValue, TargetArgArray [0]->GetType (), &IfaceValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (IfaceValue, TargetArgArray [0]->GetType (), &IfaceValue);
 		ArgArray [0] = IfaceValue;
 		i++;
 	}
@@ -63,7 +63,7 @@ CThunkFunction::Compile ()
 	}	
 
 	CValue ReturnValue;
-	m_pModule->m_LlvmBuilder.CreateCall (
+	m_pModule->m_LlvmIrBuilder.CreateCall (
 		m_pTargetFunction, 
 		m_pTargetFunction->GetType (),
 		ArgArray,

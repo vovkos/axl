@@ -726,7 +726,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 		};
 
 		CValue FlagsValue;
-		m_pModule->m_LlvmBuilder.CreateGep (
+		m_pModule->m_LlvmIrBuilder.CreateGep (
 			FieldValue, 
 			LlvmIndexArray, 
 			countof (LlvmIndexArray), 
@@ -834,27 +834,27 @@ CClassType::CompilePrimer ()
 	CValue IfacePtrValue;
 	CValue PtrValue;
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 0, NULL, &ObjectPtrValue);
-	m_pModule->m_LlvmBuilder.CreateGep2 (ArgValue1, 1, NULL, &IfacePtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue1, 0, NULL, &ObjectPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue1, 1, NULL, &IfacePtrValue);
 
 	// zero memory
 
-	m_pModule->m_LlvmBuilder.CreateStore (GetZeroValue (), ArgValue1);
+	m_pModule->m_LlvmIrBuilder.CreateStore (GetZeroValue (), ArgValue1);
 
 	// store CClassType*
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateStore (TypeValue, PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (TypeValue, PtrValue);
 
 	// store ScopeLevel
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 1, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateStore (ArgValue2, PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 1, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue2, PtrValue);
 
 	// store Flags
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateStore (ArgValue3, PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue3, PtrValue);
 
 	PrimeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
 
@@ -869,7 +869,7 @@ CClassType::CompilePrimer ()
 		CClassType* pClassType = (CClassType*) pField->m_pType;
 
 		CValue FieldValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (
 			IfacePtrValue, 
 			pField->GetLlvmIndex (), 
 			pClassType->GetClassStructType ()->GetDataPtrType_c (), 
@@ -904,11 +904,11 @@ CClassType::PrimeInterface (
 	CValue VTablePtrPtrValue;
 	CValue ObjectPtrPtrValue;
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
-	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &VTablePtrPtrValue);
-	m_pModule->m_LlvmBuilder.CreateGep2 (IfaceHdrPtrValue, 1, NULL, &ObjectPtrPtrValue);
-	m_pModule->m_LlvmBuilder.CreateStore (VTablePtrValue, VTablePtrPtrValue);
-	m_pModule->m_LlvmBuilder.CreateStore (ObjectPtrValue, ObjectPtrPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &VTablePtrPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfaceHdrPtrValue, 1, NULL, &ObjectPtrPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (VTablePtrValue, VTablePtrPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (ObjectPtrValue, ObjectPtrPtrValue);
 
 	// prime base types
 
@@ -921,7 +921,7 @@ CClassType::PrimeInterface (
 		CClassType* pBaseClassType = (CClassType*) pSlot->m_pType;
 
 		CValue BaseClassPtrValue;
-		m_pModule->m_LlvmBuilder.CreateGep2 (
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (
 			IfacePtrValue, 
 			pSlot->GetLlvmIndex (), 
 			NULL, 
@@ -936,14 +936,14 @@ CClassType::PrimeInterface (
 		}
 		else
 		{
-			m_pModule->m_LlvmBuilder.CreateGep2 (
+			m_pModule->m_LlvmIrBuilder.CreateGep2 (
 				VTablePtrValue, 
 				pSlot->GetVTableIndex (), 
 				NULL, 
 				&BaseClassVTablePtrValue
 				);
 
-			m_pModule->m_LlvmBuilder.CreateBitCast (
+			m_pModule->m_LlvmIrBuilder.CreateBitCast (
 				BaseClassVTablePtrValue, 
 				pBaseClassType->GetVTableStructType ()->GetDataPtrType_c (),
 				&BaseClassVTablePtrValue

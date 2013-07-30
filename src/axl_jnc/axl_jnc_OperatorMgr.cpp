@@ -379,7 +379,7 @@ COperatorMgr::ConditionalOperator (
 	pThenBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
 
 	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
-	m_pModule->m_LlvmBuilder.CreatePhi (TrueValue, pThenBlock, FalseValue, pElseBlock, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreatePhi (TrueValue, pThenBlock, FalseValue, pElseBlock, pResultValue);
 	return true;
 }
 

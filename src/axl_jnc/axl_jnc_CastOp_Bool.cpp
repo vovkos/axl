@@ -58,7 +58,7 @@ CCast_BoolFromPtr::LlvmCast (
 		return CCast_BoolFromZeroCmp::LlvmCast (StorageKind, OpValue, pType, pResultValue);
 
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 	return CCast_BoolFromZeroCmp::LlvmCast (StorageKind, PtrValue, pType, pResultValue);
 }
 

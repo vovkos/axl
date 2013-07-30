@@ -153,6 +153,7 @@ CFunction::GetLlvmFunction ()
 		);
 
 	m_pLlvmFunction->setGC ("jnc-shadow-stack");
+	m_pLlvmFunction->setDoesNotThrow ();
 
 	m_pModule->m_FunctionMgr.m_LlvmFunctionMap [m_pLlvmFunction] = this;
 	return m_pLlvmFunction;
@@ -394,7 +395,7 @@ CFunction::Compile ()
 		if (pStaticConstructor)
 		{
 			CValue ReturnValue;
-			m_pModule->m_LlvmBuilder.CreateCall (
+			m_pModule->m_LlvmIrBuilder.CreateCall (
 				pStaticConstructor,
 				pStaticConstructor->GetType (),
 				&ReturnValue

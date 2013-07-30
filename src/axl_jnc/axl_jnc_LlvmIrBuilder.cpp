@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_jnc_LlvmBuilder.h"
+#include "axl_jnc_LlvmIrBuilder.h"
 #include "axl_jnc_Module.h"
 
 namespace axl {
@@ -7,8 +7,8 @@ namespace jnc {
 
 //.............................................................................
 
-CLlvmBuilder::CLlvmBuilder ():
-	m_LlvmBuilder (llvm::getGlobalContext ())
+CLlvmIrBuilder::CLlvmIrBuilder ():
+	m_LlvmIrBuilder (llvm::getGlobalContext ())
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
@@ -17,7 +17,7 @@ CLlvmBuilder::CLlvmBuilder ():
 }
 
 bool
-CLlvmBuilder::CreateComment_va (
+CLlvmIrBuilder::CreateComment_va (
 	const char* pFormat,
 	axl_va_list va
 	)
@@ -30,7 +30,7 @@ CLlvmBuilder::CreateComment_va (
 }
 
 bool
-CLlvmBuilder::CreateComment_0 (const char* pText)
+CLlvmIrBuilder::CreateComment_0 (const char* pText)
 {
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	llvm::BasicBlock* pLlvmBlock = pBlock->GetLlvmBlock ();
@@ -48,8 +48,27 @@ CLlvmBuilder::CreateComment_0 (const char* pText)
 	return true;
 }
 
+bool
+CLlvmIrBuilder::CreateLineInfo (
+	int Line,
+	int Col
+	)
+{
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	llvm::BasicBlock* pLlvmBlock = pBlock->GetLlvmBlock ();
+
+	if (pLlvmBlock->getInstList ().empty ())
+		return false;
+
+	llvm::MDNode* pLlvmScopeNode = NULL;
+
+	llvm::Instruction* pInst = &pLlvmBlock->getInstList ().back ();
+	pInst->setDebugLoc (llvm::DebugLoc::get (Line, Col, pLlvmScopeNode));
+	return true;
+}
+
 llvm::SwitchInst*
-CLlvmBuilder::CreateSwitch (
+CLlvmIrBuilder::CreateSwitch (
 	const CValue& Value,
 	CBasicBlock* pDefaultBlock,
 	rtl::CHashTableMapIteratorT <intptr_t, CBasicBlock*> FirstCase,
@@ -59,7 +78,7 @@ CLlvmBuilder::CreateSwitch (
 	CType* pType = Value.GetType ();
 	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
-	llvm::SwitchInst* pInst = m_LlvmBuilder.CreateSwitch (
+	llvm::SwitchInst* pInst = m_LlvmIrBuilder.CreateSwitch (
 		Value.GetLlvmValue (), 
 		pDefaultBlock->GetLlvmBlock (), 
 		CaseCount
@@ -78,16 +97,16 @@ CLlvmBuilder::CreateSwitch (
 }
 
 void
-CLlvmBuilder::SetInsertPoint (CBasicBlock* pBlock)
+CLlvmIrBuilder::SetInsertPoint (CBasicBlock* pBlock)
 {
 	if (!(pBlock->GetFlags () & EBasicBlockFlag_Entry) || !pBlock->HasTerminator ())
-		m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
+		m_LlvmIrBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
 	else
-		m_LlvmBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->getTerminator ());
+		m_LlvmIrBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->getTerminator ());
 }
 
 llvm::SwitchInst*
-CLlvmBuilder::CreateSwitch (
+CLlvmIrBuilder::CreateSwitch (
 	const CValue& Value,
 	CBasicBlock* pDefaultBlock,
 	intptr_t* pConstArray,
@@ -98,7 +117,7 @@ CLlvmBuilder::CreateSwitch (
 	CType* pType = Value.GetType ();
 	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
-	llvm::SwitchInst* pInst = m_LlvmBuilder.CreateSwitch (
+	llvm::SwitchInst* pInst = m_LlvmIrBuilder.CreateSwitch (
 		Value.GetLlvmValue (), 
 		pDefaultBlock->GetLlvmBlock (), 
 		CaseCount
@@ -117,7 +136,7 @@ CLlvmBuilder::CreateSwitch (
 
 
 llvm::PHINode*
-CLlvmBuilder::CreatePhi (
+CLlvmIrBuilder::CreatePhi (
 	const CValue* pValueArray,
 	CBasicBlock** pBlockArray,
 	size_t Count,
@@ -130,7 +149,7 @@ CLlvmBuilder::CreatePhi (
 		return NULL;
 	}
 
-	llvm::PHINode* pPhiNode = m_LlvmBuilder.CreatePHI (pValueArray->GetType ()->GetLlvmType (), Count, "phi");
+	llvm::PHINode* pPhiNode = m_LlvmIrBuilder.CreatePHI (pValueArray->GetType ()->GetLlvmType (), Count, "phi");
 
 	for (size_t i = 0; i < Count; i++)
 		pPhiNode->addIncoming (pValueArray [i].GetLlvmValue (), pBlockArray [i]->GetLlvmBlock ());
@@ -140,7 +159,7 @@ CLlvmBuilder::CreatePhi (
 }
 
 llvm::PHINode*
-CLlvmBuilder::CreatePhi (
+CLlvmIrBuilder::CreatePhi (
 	const CValue& Value1,
 	CBasicBlock* pBlock1,
 	const CValue& Value2,
@@ -154,7 +173,7 @@ CLlvmBuilder::CreatePhi (
 		return NULL;
 	}
 
-	llvm::PHINode* pPhiNode = m_LlvmBuilder.CreatePHI (Value1.GetLlvmValue ()->getType (), 2,  "phi");
+	llvm::PHINode* pPhiNode = m_LlvmIrBuilder.CreatePHI (Value1.GetLlvmValue ()->getType (), 2,  "phi");
 	pPhiNode->addIncoming (Value1.GetLlvmValue (), pBlock1->GetLlvmBlock ());
 	pPhiNode->addIncoming (Value2.GetLlvmValue (), pBlock2->GetLlvmBlock ());
 	pResultValue->SetLlvmValue (pPhiNode, Value1.GetType ());
@@ -162,7 +181,7 @@ CLlvmBuilder::CreatePhi (
 }
 
 llvm::Value*
-CLlvmBuilder::CreateGep (
+CLlvmIrBuilder::CreateGep (
 	const CValue& Value,
 	const CValue* pIndexArray,
 	size_t IndexCount,
@@ -178,7 +197,7 @@ CLlvmBuilder::CreateGep (
 		LlvmIndexArray [i] = pIndexArray [i].GetLlvmValue ();
 
 	llvm::Value* pInst;
-	pInst = m_LlvmBuilder.CreateGEP (
+	pInst = m_LlvmIrBuilder.CreateGEP (
 			Value.GetLlvmValue (), 
 			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
 			"gep"
@@ -189,7 +208,7 @@ CLlvmBuilder::CreateGep (
 }
 
 llvm::Value*
-CLlvmBuilder::CreateGep (
+CLlvmIrBuilder::CreateGep (
 	const CValue& Value,
 	const int32_t* pIndexArray,
 	size_t IndexCount,
@@ -209,7 +228,7 @@ CLlvmBuilder::CreateGep (
 	}
 
 	llvm::Value* pInst;
-	pInst = m_LlvmBuilder.CreateGEP (
+	pInst = m_LlvmIrBuilder.CreateGEP (
 			Value.GetLlvmValue (), 
 			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
 			"gep"
@@ -220,7 +239,7 @@ CLlvmBuilder::CreateGep (
 }
 
 llvm::CallInst*
-CLlvmBuilder::CreateCall (
+CLlvmIrBuilder::CreateCall (
 	const CValue& CalleeValue,
 	ECallConv CallConv,
 	const CValue* pArgArray,
@@ -240,7 +259,7 @@ CLlvmBuilder::CreateCall (
 
 	if (pResultType && pResultType->GetTypeKind () != EType_Void)
 	{
-		pInst = m_LlvmBuilder.CreateCall (
+		pInst = m_LlvmIrBuilder.CreateCall (
 			CalleeValue.GetLlvmValue (), 
 			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount),
 			"call"
@@ -250,7 +269,7 @@ CLlvmBuilder::CreateCall (
 	}
 	else
 	{
-		pInst = m_LlvmBuilder.CreateCall (
+		pInst = m_LlvmIrBuilder.CreateCall (
 			CalleeValue.GetLlvmValue (), 
 			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount)
 			);
@@ -264,7 +283,7 @@ CLlvmBuilder::CreateCall (
 }
 
 bool
-CLlvmBuilder::CreateClosureFunctionPtr (
+CLlvmIrBuilder::CreateClosureFunctionPtr (
 	const CValue& RawPfnValue,
 	const CValue& RawIfaceValue,
 	CFunctionPtrType* pResultType,
@@ -288,7 +307,7 @@ CLlvmBuilder::CreateClosureFunctionPtr (
 }
 
 bool
-CLlvmBuilder::CreateClosurePropertyPtr (
+CLlvmIrBuilder::CreateClosurePropertyPtr (
 	const CValue& RawPfnValue,
 	const CValue& RawIfaceValue,
 	CPropertyPtrType* pResultType,
@@ -312,7 +331,7 @@ CLlvmBuilder::CreateClosurePropertyPtr (
 }
 
 bool
-CLlvmBuilder::RuntimeError (const CValue& ErrorValue)
+CLlvmIrBuilder::RuntimeError (const CValue& ErrorValue)
 {
 	CFunction* pOnRuntimeError = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_OnRuntimeError);
 

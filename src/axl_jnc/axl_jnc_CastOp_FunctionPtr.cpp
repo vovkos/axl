@@ -54,8 +54,8 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 
 	CValue PfnValue;
 	CValue ClosureObjValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pThinPtrType, &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &ClosureObjValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, pThinPtrType, &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &ClosureObjValue);
 
 	PfnValue.SetClosure (OpValue.GetClosure ());
 	PfnValue.InsertToClosureHead (ClosureObjValue);
@@ -166,7 +166,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 	if (!Result)
 		return false;
 
-	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (OpValue, ThisArgValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosureFunctionPtr (OpValue, ThisArgValue, pDstPtrType, pResultValue);
 	return true;
 }
 
@@ -184,7 +184,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkNoClosure (
 		);
 
 	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
-	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pThunkFunction, NullValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosureFunctionPtr (pThunkFunction, NullValue, pDstPtrType, pResultValue);
 	return true;
 }
 
@@ -209,7 +209,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 		m_pModule->m_TypeMgr.GetMemberMethodType (pThisTargetType, pDstPtrType->GetTargetType ())
 		);
 
-	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pThunkFunction, ThisArgValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosureFunctionPtr (pThunkFunction, ThisArgValue, pDstPtrType, pResultValue);
 	return true;
 }
 
@@ -236,7 +236,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_FunctionClosure));
 
 	CFunctionClosureClassType* pClosureType = (CFunctionClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
-	m_pModule->m_LlvmBuilder.CreateClosureFunctionPtr (pClosureType->GetThunkFunction (), ClosureValue, pDstPtrType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateClosureFunctionPtr (pClosureType->GetThunkFunction (), ClosureValue, pDstPtrType, pResultValue);
 	return true;
 }
 

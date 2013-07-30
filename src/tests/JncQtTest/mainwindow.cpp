@@ -9,7 +9,7 @@
 #include "qrc_jancyedit.cpp"
 
 int
-StdLib_printf (
+StdLib::Printf (
 	const char* pFormat,
 	...
 	)
@@ -393,21 +393,29 @@ bool MainWindow::compile ()
 		return false;
 	}
 
-	writeOutput("JITting...\n");
+#if (_AXL_ENV == AXL_ENV_WIN)
+	jnc::EJit JitKind = jnc::EJit_Normal;
+#else
+	jnc::EJit JitKind = jnc::EJit_McJit;
+#endif
 
-	Result = runtime.Create (&module, 16, 1, 4);			
+	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
+
+	Result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 4);			
 	if (!Result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
 	}
 
-	llvm::ExecutionEngine* llvmExecutionEngine = runtime.GetLlvmExecutionEngine ();
+	if (JitKind == jnc::EJit_Normal)
+	{
+		llvm::ExecutionEngine* llvmExecutionEngine = runtime.GetLlvmExecutionEngine ();
+		jnc::CStdLib::Export (&module, llvmExecutionEngine);
+		module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
+	}
 
-	jnc::CStdLib::Export (&module, llvmExecutionEngine);
-	module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib_printf);
-
-	Result = module.m_FunctionMgr.JitFunctions (llvmExecutionEngine);	
+	Result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());	
 	if (!Result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());

@@ -244,7 +244,7 @@ CTypeMgr::GetBitFieldType (
 {
 	rtl::CString Signature = CBitFieldType::CreateSignature (pBaseType, BitOffset, BitCount);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CBitFieldType*) It->m_Value;
 
@@ -327,7 +327,7 @@ CTypeMgr::GetArrayType (
 {
 	rtl::CString Signature = CArrayType::CreateSignature (pElementType, ElementCount);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CArrayType*) It->m_Value;
 
@@ -685,7 +685,7 @@ CTypeMgr::GetFunctionType (
 		Flags
 		);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CFunctionType*) It->m_Value;
 
@@ -746,7 +746,7 @@ CTypeMgr::GetFunctionType (
 		Flags
 		);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CFunctionType*) It->m_Value;
 
@@ -884,7 +884,7 @@ CTypeMgr::GetPropertyType (
 {
 	rtl::CString Signature = CPropertyType::CreateSignature (pGetterType, SetterType, Flags);
 	
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CPropertyType*) It->m_Value;
 
@@ -1105,26 +1105,33 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	CType* pArgType;
 	CFunctionType* pMethodType;	
 
+	bool IsThin = pFunctionPtrType->GetPtrTypeKind () == EFunctionPtrType_Thin;
+	
 	// methods
 
 	pMethodType = GetFunctionType (NULL, NULL, 0);
 	pType->m_MethodArray [EMulticastMethod_Clear] = pType->CreateMethod (EStorage_Member, "Clear", pMethodType);
+	pType->m_MethodArray [EMulticastMethod_Clear]->m_Tag = "jnc.MulticastClear";
 	
 	pReturnType = GetPrimitiveType (EType_Int_p);
 	pArgType = pFunctionPtrType;
 	pMethodType = GetFunctionType (pReturnType, &pArgType, 1);
 
 	pType->m_MethodArray [EMulticastMethod_Set] = pType->CreateMethod (EStorage_Member, "Set", pMethodType);
+	pType->m_MethodArray [EMulticastMethod_Set]->m_Tag = IsThin ? "jnc.MulticastSet_t" : "jnc.MulticastSet";
 	pType->m_MethodArray [EMulticastMethod_Add] = pType->CreateMethod (EStorage_Member, "Add", pMethodType);
+	pType->m_MethodArray [EMulticastMethod_Add]->m_Tag = IsThin ? "jnc.MulticastAdd_t" : "jnc.MulticastAdd";
 
 	pReturnType = pFunctionPtrType;
 	pArgType = GetPrimitiveType (EType_Int_p);
 	pMethodType = GetFunctionType (pReturnType, &pArgType, 1);
 	pType->m_MethodArray [EMulticastMethod_Remove] = pType->CreateMethod (EStorage_Member, "Remove", pMethodType);
+	pType->m_MethodArray [EMulticastMethod_Remove]->m_Tag = IsThin ? "jnc.MulticastRemove_t" : "jnc.MulticastRemove";
 
 	pReturnType = pFunctionPtrType->GetTargetType ()->GetFunctionPtrType ();
 	pMethodType = GetFunctionType (pReturnType, NULL, 0);
 	pType->m_MethodArray [EMulticastMethod_GetSnapshot] = pType->CreateMethod (EStorage_Member, "GetSnapshot", pMethodType);
+	pType->m_MethodArray [EMulticastMethod_GetSnapshot]->m_Tag = "jnc.MulticastGetSnapshot";
 
 	pMethodType = pFunctionPtrType->GetTargetType ();
 	pType->m_MethodArray [EMulticastMethod_Call] = pType->CreateMethod (EStorage_Member, "Call", pMethodType);
@@ -1279,7 +1286,7 @@ CTypeMgr::GetFunctionClosureClassType (
 		WeakMask
 		);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CFunctionClosureClassType*) It->m_Value;
 
@@ -1324,7 +1331,7 @@ CTypeMgr::GetPropertyClosureClassType (
 		WeakMask
 		);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CPropertyClosureClassType*) It->m_Value;
 
@@ -1358,7 +1365,7 @@ CTypeMgr::GetDataClosureClassType (
 {
 	rtl::CString Signature = CDataClosureClassType::CreateSignature (pTargetType, pThunkType);
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CDataClosureClassType*) It->m_Value;
 
@@ -1542,7 +1549,7 @@ CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
 	rtl::CString Signature;
 	Signature.Format ("SP%s", pFunctionType->GetSignature ().cc ());
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CStructType*) It->m_Value;
 
@@ -1641,7 +1648,7 @@ CTypeMgr::GetPropertyPtrStructType (CPropertyType* pPropertyType)
 	rtl::CString Signature;
 	Signature.Format ("SP%s", pPropertyType->GetSignature ().cc ());
 
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CStructType*) It->m_Value;
 
@@ -1667,7 +1674,7 @@ CTypeMgr::GetNamedImportType (
 {
 	rtl::CString Signature = CNamedImportType::CreateSignature (Name, pAnchorNamespace);
 	
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CNamedImportType*) It->m_Value;
 
@@ -1697,7 +1704,7 @@ CTypeMgr::GetImportPtrType (
 		Flags
 		);
 	
-	rtl::CStringHashTableMapIteratorAT <CType*> It = m_TypeMap.Goto (Signature);
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
 		return (CImportPtrType*) It->m_Value;
 

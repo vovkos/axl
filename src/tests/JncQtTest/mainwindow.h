@@ -7,6 +7,22 @@ class ModulePane;
 class Output;
 class MdiChild;
 
+class StdLib: public jnc::CStdLib
+{
+public:
+	StdLib ()
+	{
+		m_FunctionMap ["printf"] = (void*) Printf;
+	}
+	
+	static
+	int
+	Printf (
+		const char* pFormat,
+		...
+		);	
+};
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -81,6 +97,7 @@ private:
 
 	jnc::CModule module;
 	jnc::CRuntime runtime;
+	StdLib stdlib;
 };
 
 inline MainWindow *GetMainWindow()

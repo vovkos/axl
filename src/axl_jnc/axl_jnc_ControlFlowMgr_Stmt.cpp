@@ -147,7 +147,7 @@ CControlFlowMgr::SwitchStmt_Follow (
 
 	CBasicBlock* pDefaultBlock = pStmt->m_pDefaultBlock ? pStmt->m_pDefaultBlock : pStmt->m_pFollowBlock;
 
-	m_pModule->m_LlvmBuilder.CreateSwitch (
+	m_pModule->m_LlvmIrBuilder.CreateSwitch (
 		pStmt->m_Value, 
 		pDefaultBlock,
 		pStmt->m_CaseMap.GetHead (),
@@ -384,7 +384,7 @@ CControlFlowMgr::OnceStmt_PreBody (
 		intptr_t ConstArray [2] = { 0, 1 };
 		CBasicBlock* BlockArray [2] = { pStmt->m_pPreBodyBlock, pStmt->m_pLoopBlock };
 
-		m_pModule->m_LlvmBuilder.CreateSwitch (Value, pStmt->m_pFollowBlock, ConstArray, BlockArray, 2);
+		m_pModule->m_LlvmIrBuilder.CreateSwitch (Value, pStmt->m_pFollowBlock, ConstArray, BlockArray, 2);
 
 		// loop
 
@@ -399,7 +399,7 @@ CControlFlowMgr::OnceStmt_PreBody (
 
 		// pre body
 
-		m_pModule->m_LlvmBuilder.CreateCmpXchg (
+		m_pModule->m_LlvmIrBuilder.CreateCmpXchg (
 			pStmt->m_pFlagVariable, 
 			CValue ((int64_t) 0, pType), 
 			CValue (1, pType), 
@@ -435,7 +435,7 @@ CControlFlowMgr::OnceStmt_PostBody (
 
 	if (StorageKind == EStorage_Thread)
 	{
-		m_pModule->m_LlvmBuilder.CreateStore (
+		m_pModule->m_LlvmIrBuilder.CreateStore (
 			CValue ((int64_t) 2, pType), 
 			pStmt->m_pFlagVariable
 			);
@@ -443,7 +443,7 @@ CControlFlowMgr::OnceStmt_PostBody (
 	else
 	{
 		CValue TmpValue;
-		m_pModule->m_LlvmBuilder.CreateRmw (
+		m_pModule->m_LlvmIrBuilder.CreateRmw (
 			llvm::AtomicRMWInst::Xchg,
 			pStmt->m_pFlagVariable, 
 			CValue ((int64_t) 2, pType), 

@@ -247,9 +247,9 @@ protected:
 	rtl::CStdListT <CThunkFunction> m_ThunkFunctionList;
 	rtl::CStdListT <CThunkProperty> m_ThunkPropertyList;
 	rtl::CStdListT <CDataThunkProperty> m_DataThunkPropertyList;
-	rtl::CStringHashTableMapAT <CFunction*> m_ThunkFunctionMap;
-	rtl::CStringHashTableMapAT <CProperty*> m_ThunkPropertyMap;
-	rtl::CStringHashTableMapAT <CFunction*> m_ScheduleLauncherFunctionMap;
+	rtl::CStringHashTableMapT <CFunction*> m_ThunkFunctionMap;
+	rtl::CStringHashTableMapT <CProperty*> m_ThunkPropertyMap;
+	rtl::CStringHashTableMapT <CFunction*> m_ScheduleLauncherFunctionMap;
 
 	CFunction* m_pCurrentFunction;
 	

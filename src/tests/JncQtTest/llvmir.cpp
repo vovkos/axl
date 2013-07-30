@@ -23,7 +23,7 @@ void LlvmIr::addFunction(jnc::CFunction* function)
 		pFunctionType->GetArgString ().cc ()
 		);
 		
-	uint_t CommentMdKind = function->GetModule ()->m_LlvmBuilder.GetCommentMdKind ();
+	uint_t CommentMdKind = function->GetModule ()->m_LlvmIrBuilder.GetCommentMdKind ();
 
 	llvm::Function* pLlvmFunction = function->GetLlvmFunction ();
 	llvm::Function::BasicBlockListType& BlockList = pLlvmFunction->getBasicBlockList ();

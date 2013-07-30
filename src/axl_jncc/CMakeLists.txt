@@ -62,6 +62,7 @@ llvm_map_components_to_libraries (
 	LLVM_LIB_LIST 
 	jit 
 	native
+	MCJIT
 	MCDisassembler
 	)
 
@@ -80,8 +81,6 @@ target_link_libraries (
 	axl_core
 	axl_parse
 	${LLVM_LIB_LIST}
-	LLVMJIT
-	LLVMMCJIT
 	)
 
 if (WIN32)

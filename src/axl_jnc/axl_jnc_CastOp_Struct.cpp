@@ -71,7 +71,7 @@ CCast_Struct::LlvmCast (
 		return false;
 	}
 
-	m_pModule->m_LlvmBuilder.CreateExtractValue (
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (
 		OpValue, 
 		Coord.m_LlvmIndexArray, 
 		Coord.m_LlvmIndexArray.GetCount (), 

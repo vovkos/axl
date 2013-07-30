@@ -24,9 +24,10 @@ PrintUsage (IOutStream* pOutStream)
 		"Usage: jnc [<options>...] <source_file>\n"
 		"    -?, -h, -H     print this usage and exit\n"
 		"    -v             print version\n"
-		"    -l             print LLVM IR\n"
-		"    -d             print disassembly\n"
-		"    -r <function>  run function <function>\n"
+		"    -l[c]          print LLVM IR ('c' = manual mode w/ comments)\n"	
+		"    -d             print disassembly (implies -j)\n"
+		"    -j[m]          JIT functions ('m' = use MC-JITter)\n"
+		"    -r <function>  run function <function> (implies '-j')\n"
 		"    -s <port>      start compiler server on TCP <port>\n"
 		);
 }
@@ -80,9 +81,11 @@ CJnc::Run (
 		return EJncError_IoFailure;
 	}
 
+	if (pCmdLine->m_Flags & (EJncFlag_RunFunction | EJncFlag_Disassembly))
+		pCmdLine->m_Flags |= EJncFlag_Jit;
+
 	rtl::CString SrcFilePath = io::GetFullFilePath (pCmdLine->m_SrcFileName);
 
-	jnc::CModule Module;
 	Result = Compile (SrcFilePath, (const char*) p, (size_t) SrcFile.GetSize ());
 	if (!Result)
 	{
@@ -92,6 +95,16 @@ CJnc::Run (
 
 	if (pCmdLine->m_Flags & EJncFlag_LlvmIr)
 		PrintLlvmIr ();
+
+	if (m_pCmdLine->m_Flags & EJncFlag_Jit)
+	{
+		Result = Jit ();
+		if (!Result)
+		{
+			pOutStream->Printf ("%s\n", err::GetError ()->GetDescription ().cc ());
+			return EJncError_CompileFailure;
+		}
+	}
 
 	if (pCmdLine->m_Flags & EJncFlag_Disassembly)
 		PrintDisassembly ();
@@ -108,7 +121,7 @@ CJnc::Run (
 
 		pOutStream->Printf ("'%s' returned (%d).\n", pCmdLine->m_FunctionName.cc (), ReturnValue);
 	}
-	
+
 	return EJncError_Success;
 }
 
@@ -144,7 +157,6 @@ main (
 	if (!Result)
 	{
 		printf ("error parsing command line: %s\n", err::GetError ()->GetDescription ().cc ());
-		PrintUsage (&StdOut);
 		return EJncError_InvalidCmdLine;
 	}
 

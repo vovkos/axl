@@ -31,6 +31,24 @@ PrintUsage (IOutStream* pOutStream);
 
 //.............................................................................
 
+class CStdLib: public jnc::CStdLib
+{
+public:
+	CStdLib ()
+	{
+		m_FunctionMap ["printf"] = (void*) Printf;
+	}
+	
+	static
+	int
+	Printf (
+		const char* pFormat,
+		...
+		);	
+};
+
+//.............................................................................
+
 class CJnc
 {
 protected:
@@ -40,7 +58,8 @@ protected:
 	IOutStream* m_pOutStream;
 
 	jnc::CModule m_Module;
-	jnc::CRuntime m_Runtime;
+	jnc::CRuntime m_Runtime;	
+	CStdLib m_StdLib;
 
 public:
 	CJnc ()
@@ -57,6 +76,12 @@ public:
 		return s_pCurrentJnc;
 	}
 
+	IOutStream* 
+	GetOutStream ()
+	{
+		return m_pOutStream;
+	}
+	
 	int
 	Run (
 		CCmdLine* pCmdLine,
@@ -71,6 +96,9 @@ protected:
 		size_t Length
 		);
 
+	bool 
+	Jit ();
+
 	void
 	PrintLlvmIr ();
 
@@ -84,13 +112,6 @@ protected:
 	RunFunction (
 		jnc::CFunction* pFunction, 
 		int* pReturnValue = NULL
-		);
-
-	static
-	int
-	StdLib_Printf (
-		const char* pFormat,
-		...
 		);
 
 protected:

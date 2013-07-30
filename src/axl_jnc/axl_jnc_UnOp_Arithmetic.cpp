@@ -61,7 +61,7 @@ CUnOp_Minus::LlvmOpInt (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateNeg_i (OpValue, pResultType, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateNeg_i (OpValue, pResultType, pResultValue);
 }
 
 llvm::Value*
@@ -71,7 +71,7 @@ CUnOp_Minus::LlvmOpFp (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateNeg_f (OpValue, pResultType, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateNeg_f (OpValue, pResultType, pResultValue);
 }
 
 //.............................................................................
@@ -83,7 +83,7 @@ CUnOp_BwNot::LlvmOpInt (
 	CValue* pResultValue
 	)
 {
-	return m_pModule->m_LlvmBuilder.CreateNot (OpValue, pResultType, pResultValue);
+	return m_pModule->m_LlvmIrBuilder.CreateNot (OpValue, pResultType, pResultValue);
 }
 
 //.............................................................................

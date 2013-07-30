@@ -10,6 +10,39 @@ namespace jnc {
 
 //.............................................................................
 
+CStdLib::CStdLib ()
+{
+	m_FunctionMap ["jnc.OnRuntimeError"] = (void*) OnRuntimeError;
+	m_FunctionMap ["jnc.DynamicCastClassPtr"] = (void*) DynamicCastClassPtr;
+	m_FunctionMap ["jnc.StrengthenClassPtr"] = (void*) StrengthenClassPtr;
+	m_FunctionMap ["jnc.HeapAlloc"] = (void*) HeapAlloc;
+	m_FunctionMap ["jnc.UHeapAlloc"] = (void*) UHeapAlloc;
+	m_FunctionMap ["jnc.UHeapFree"] = (void*) UHeapFree;
+	m_FunctionMap ["jnc.UHeapFreeClassPtr"] = (void*) UHeapFreeClassPtr;
+	m_FunctionMap ["jnc.GcAddObject"] = (void*) GcAddObject;
+	m_FunctionMap ["jnc.GcSafePoint"] = (void*) GcSafePoint;
+	m_FunctionMap ["jnc.RunGc"] = (void*) RunGc;
+	m_FunctionMap ["jnc.GetCurrentThreadId"] = (void*) GetCurrentThreadId;
+	m_FunctionMap ["jnc.CreateThread"] = (void*) CreateThread;
+	m_FunctionMap ["jnc.Sleep"] = (void*) Sleep;
+	m_FunctionMap ["jnc.GetTls"] = (void*) GetTls;
+	m_FunctionMap ["jnc.AppendFmtLiteral_a"] = (void*) AppendFmtLiteral_a;
+	m_FunctionMap ["jnc.AppendFmtLiteral_p"] = (void*) AppendFmtLiteral_p;
+	m_FunctionMap ["jnc.AppendFmtLiteral_i32"] = (void*) AppendFmtLiteral_i32;
+	m_FunctionMap ["jnc.AppendFmtLiteral_ui32"] = (void*) AppendFmtLiteral_ui32;
+	m_FunctionMap ["jnc.AppendFmtLiteral_i64"] = (void*) AppendFmtLiteral_i64;
+	m_FunctionMap ["jnc.AppendFmtLiteral_ui64"] = (void*) AppendFmtLiteral_ui64;
+	m_FunctionMap ["jnc.AppendFmtLiteral_f"] = (void*) AppendFmtLiteral_f;	
+	m_FunctionMap ["jnc.MulticastClear"] = (void*) MulticastClear;	
+	m_FunctionMap ["jnc.MulticastSet"] = (void*) MulticastSet;	
+	m_FunctionMap ["jnc.MulticastSet_t"] = (void*) MulticastSet_t;	
+	m_FunctionMap ["jnc.MulticastAdd"] = (void*) MulticastAdd;	
+	m_FunctionMap ["jnc.MulticastAdd_t"] = (void*) MulticastAdd_t;	
+	m_FunctionMap ["jnc.MulticastRemove"] = (void*) MulticastRemove;	
+	m_FunctionMap ["jnc.MulticastRemove_t"] = (void*) MulticastRemove_t;	
+	m_FunctionMap ["jnc.MulticastGetSnapshot"] = (void*) MulticastGetSnapshot;	
+}
+
 void
 CStdLib::Export (
 	CModule* pModule,

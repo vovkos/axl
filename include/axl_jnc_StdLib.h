@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Value.h"
+#include "axl_rtl_StringHashTable.h"
 
 namespace axl {
 namespace jnc {
@@ -15,7 +16,19 @@ class CMulticastClassType;
 
 class CStdLib
 {
+protected:
+	rtl::CStringHashTableMapT <void*> m_FunctionMap;
+	
 public:
+	CStdLib ();
+	
+	void*
+	FindFunction (const char* pName)
+	{	
+		rtl::CStringHashTableMapIteratorT <void*> It = m_FunctionMap.Find (pName);
+		return It ? It->m_Value : NULL;
+	}
+	
 	static
 	void
 	Export (

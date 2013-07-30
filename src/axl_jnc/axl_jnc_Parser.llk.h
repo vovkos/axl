@@ -7949,7 +7949,7 @@ public:
 			
 					return IsValidLocator ((*GetTokenLocator (3))) ? 
 						AppendFmtLiteralValue (&__pSymbol->m_Local.Literal, (*(_cls7*) GetAstLocator (4)).m_Value, (*GetTokenLocator (3)).m_Data.m_String) :
-						AppendFmtLiteralValue (&__pSymbol->m_Local.Literal, (*(_cls7*) GetAstLocator (4)).m_Value, NULL);
+						AppendFmtLiteralValue (&__pSymbol->m_Local.Literal, (*(_cls7*) GetAstLocator (4)).m_Value, rtl::CString ());
 				;
 // #line 7955 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}

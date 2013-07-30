@@ -65,7 +65,7 @@ COperatorMgr::GetStructField (
 
 	if (OpValue.GetType ()->GetTypeKind () == EType_Struct)
 	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (
 			OpValue, 
 			pCoord->m_LlvmIndexArray, 
 			pCoord->m_LlvmIndexArray.GetCount (),
@@ -93,7 +93,7 @@ COperatorMgr::GetStructField (
 	{
 		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
-		m_pModule->m_LlvmBuilder.CreateGep (
+		m_pModule->m_LlvmIrBuilder.CreateGep (
 			OpValue, 
 			pCoord->m_LlvmIndexArray, 
 			pCoord->m_LlvmIndexArray.GetCount (), 
@@ -108,11 +108,11 @@ COperatorMgr::GetStructField (
 	}
 	else
 	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 
 		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
-		m_pModule->m_LlvmBuilder.CreateGep (
+		m_pModule->m_LlvmIrBuilder.CreateGep (
 			PtrValue, 
 			pCoord->m_LlvmIndexArray, 
 			pCoord->m_LlvmIndexArray.GetCount (), 
@@ -160,7 +160,7 @@ COperatorMgr::GetUnionField (
 	{
 		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pPtrType, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, pResultValue);
 
 		if (OpValue.GetValueKind () == EValue_Variable)
 			pResultValue->SetThinDataPtrValidator (OpValue);
@@ -169,11 +169,11 @@ COperatorMgr::GetUnionField (
 	}
 	else
 	{
-		m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 
 		pPtrType = pField->GetType ()->GetDataPtrType_c ();
 
-		m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
 
 		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 
@@ -218,7 +218,7 @@ COperatorMgr::GetClassField (
 		pCoord->m_LlvmIndexArray.Append (1);
 
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateGep (
+	m_pModule->m_LlvmIrBuilder.CreateGep (
 		OpValue, 
 		pCoord->m_LlvmIndexArray, 
 		pCoord->m_LlvmIndexArray.GetCount (), 

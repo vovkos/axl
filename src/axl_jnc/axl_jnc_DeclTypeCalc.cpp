@@ -4,7 +4,7 @@
 
 namespace axl {
 namespace jnc {
-
+		
 //.............................................................................
 
 CDeclTypeCalc::CDeclTypeCalc ()

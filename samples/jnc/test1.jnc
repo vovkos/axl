@@ -1,5 +1,7 @@
 //.............................................................................
 
+int g_x;
+
 class CMyScheduler: jnc.IScheduler
 {
 	override
@@ -17,14 +19,14 @@ main ()
 	printf ("main ()\n");
 
 	CMyScheduler Scheduler;
-	(foo @ Scheduler) (100);
+	(foo @ Scheduler) (100, 0x100);
 
 	return 10; 
 }
 
-foo (int x)
+foo (int x, int y)
 {
-	printf (0x"61 62 63 " "_" $"foo ($x)" 0x" 20 64 65 66" "\n");
+	printf (0x"61 62 63 " "_" $"foo ($x, $(y, 010))" 0x" 20 64 65 66" "\n");
 }
 
 //.............................................................................

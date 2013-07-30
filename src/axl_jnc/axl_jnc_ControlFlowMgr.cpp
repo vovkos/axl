@@ -56,7 +56,7 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 	if (!pBlock)
 		return pPrevCurrentBlock;
 
-	m_pModule->m_LlvmBuilder.SetInsertPoint (pBlock);
+	m_pModule->m_LlvmIrBuilder.SetInsertPoint (pBlock);
 
 	if (pBlock->m_pFunction)
 		return pPrevCurrentBlock;
@@ -89,7 +89,7 @@ CControlFlowMgr::MarkUnreachable (CBasicBlock* pBlock)
 	if (!pBlock->HasTerminator ())
 	{
 		CBasicBlock* pPrevCurrentBlock = SetCurrentBlock (pBlock);
-		m_pModule->m_LlvmBuilder.CreateUnreachable ();
+		m_pModule->m_LlvmIrBuilder.CreateUnreachable ();
 		SetCurrentBlock (pPrevCurrentBlock);
 	}
 }
@@ -103,7 +103,7 @@ CControlFlowMgr::Jump (
 	m_Flags |= EControlFlowFlag_HasJump;
 	pBlock->m_Flags |= EBasicBlockFlag_Jumped;
 
-	m_pModule->m_LlvmBuilder.CreateBr (pBlock);
+	m_pModule->m_LlvmIrBuilder.CreateBr (pBlock);
 
 	if (!pFollowBlock)
 		pFollowBlock = GetUnreachableBlock ();
@@ -116,7 +116,7 @@ CControlFlowMgr::Follow (CBasicBlock* pBlock)
 {
 	if (!m_pCurrentBlock->HasTerminator ())
 	{
-		m_pModule->m_LlvmBuilder.CreateBr (pBlock);
+		m_pModule->m_LlvmIrBuilder.CreateBr (pBlock);
 		pBlock->m_Flags |= EBasicBlockFlag_Jumped;
 	}
 
@@ -140,7 +140,7 @@ CControlFlowMgr::ConditionalJump (
 	pThenBlock->m_Flags |= EBasicBlockFlag_Jumped;
 	pElseBlock->m_Flags |= EBasicBlockFlag_Jumped;
 
-	m_pModule->m_LlvmBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
+	m_pModule->m_LlvmIrBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
 
 	if (!pFollowBlock)
 		pFollowBlock = pThenBlock;
@@ -201,9 +201,9 @@ CControlFlowMgr::RestoreScopeLevel ()
 	if (!ScopeLevelValue)
 		return;
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "restore scope level before return");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "restore scope level before return");
 	CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
-	m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pVariable);
+	m_pModule->m_LlvmIrBuilder.CreateStore (ScopeLevelValue, pVariable);
 }
 
 bool
@@ -242,7 +242,7 @@ CControlFlowMgr::Return (
 		if (m_pReturnBlock)
 			Jump (IsSilent ? m_pSilentReturnBlock : m_pReturnBlock);
 		else
-			m_pModule->m_LlvmBuilder.CreateRet ();
+			m_pModule->m_LlvmIrBuilder.CreateRet ();
 	}
 	else
 	{
@@ -253,7 +253,7 @@ CControlFlowMgr::Return (
 
 		OnLeaveScope ();
 		RestoreScopeLevel ();
-		m_pModule->m_LlvmBuilder.CreateRet (ReturnValue);
+		m_pModule->m_LlvmIrBuilder.CreateRet (ReturnValue);
 	}
 
 	m_Flags |= EControlFlowFlag_HasReturn;

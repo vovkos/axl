@@ -187,7 +187,7 @@ CAutoEvClassType::CompileStartMethod ()
 		if (!Result)
 			return false;
 			
-		m_pModule->m_LlvmBuilder.CreateStore (ArgValue, StoreValue);
+		m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue, StoreValue);
 	}
 
 	// compile start

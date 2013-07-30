@@ -47,7 +47,7 @@ CCmdLine::Parse (
 			return false;
 	}
 
-	return true;
+	return Verify ();
 }
 
 bool
@@ -104,7 +104,25 @@ CCmdLine::Parse (
 
 		Result = ParseArg (pArg, Length);
 		if (!Result)
-			return true;
+			return false;
+	}
+
+	return Verify ();
+}
+
+bool
+CCmdLine::Verify ()
+{
+	if ((m_Flags & EJncFlag_RunFunction) && m_FunctionName.IsEmpty ())
+	{
+		err::SetFormatStringError ("'-r' requires function name");
+		return false;
+	}
+
+	if ((m_Flags & EJncFlag_Server) && !m_ServerPort)
+	{
+		err::SetFormatStringError ("'-s' requires server port number");
+		return false;
 	}
 
 	return true;
@@ -163,8 +181,16 @@ CCmdLine::ParseSwitchArg (
 		m_Flags |= EJncFlag_Version;
 		break;
 
+	case 'j':
+		m_Flags |= EJncFlag_Jit;
+		if (Length && *pValue == 'm')
+			m_Flags |= EJncFlag_Jit_mc;
+		break;
+
 	case 'l':
 		m_Flags |= EJncFlag_LlvmIr;
+		if (Length && *pValue == 'c')
+			m_Flags |= EJncFlag_LlvmIr_c;
 		break;
 
 	case 'd':

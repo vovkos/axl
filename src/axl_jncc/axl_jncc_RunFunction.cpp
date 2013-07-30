@@ -4,7 +4,7 @@
 //.............................................................................
 
 int
-CJnc::StdLib_Printf (
+CStdLib::Printf (
 	const char* pFormat,
 	...
 	)
@@ -14,8 +14,10 @@ CJnc::StdLib_Printf (
 	CJnc* pJnc = CJnc::GetCurrentJnc ();
 	ASSERT (pJnc);
 
-	return pJnc->m_pOutStream->Printf_va (pFormat, va);
+	return pJnc->GetOutStream ()->Printf_va (pFormat, va);
 }
+
+//.............................................................................
 
 bool 
 CJnc::RunFunction (

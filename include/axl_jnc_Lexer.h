@@ -370,13 +370,19 @@ protected:
 	CreateStringToken (
 		int Token,
 		size_t Left = 0,
-		size_t Right = 0
+		size_t Right = 0,
+		bool UseEscapeEncoding = false
 		)
 	{
 		CToken* pToken = CreateToken (Token);
 		ASSERT (pToken->m_Pos.m_Length >= Left + Right);
 
-		pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (ts + Left, pToken->m_Pos.m_Length - (Left + Right));
+		size_t Length = pToken->m_Pos.m_Length - (Left + Right);
+		if (UseEscapeEncoding)
+			pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (ts + Left, Length);
+		else
+			pToken->m_Data.m_String.Copy (ts + Left, Length);
+
 		return pToken;
 	}
 
@@ -473,6 +479,18 @@ protected:
 		return pToken;
 	}
 
+	CToken*
+	CreateFmtSpecifierToken ()
+	{
+		ASSERT (*ts == ',');
+		ts++;
+
+		while (ts < te && (*ts == ' ' || *ts == '\t'))
+			ts++;
+
+		return ts < te ? CreateStringToken (EToken_FmtSpecifier) : NULL;
+	}
+
 	void
 	OnLeftParentheses ()
 	{
@@ -503,20 +521,20 @@ protected:
 	}
 
 	bool
-	OnColon ()
+	OnComma ()
 	{
 		if (!m_ParenthesesLevelStack.IsEmpty ())
 		{
 			size_t i = m_ParenthesesLevelStack.GetCount () - 1;
 			if (m_ParenthesesLevelStack [i] == 1)
 			{
-				ASSERT (*ts == ':'); 
+				ASSERT (*ts == ','); 
 				p = ts - 1; // need to reparse colon with 'fmt_spec' machine
 				return false;
 			}
 		}
 
-		CreateToken (':'); 
+		CreateToken (','); 
 		return true;
 	}
 

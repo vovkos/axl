@@ -18,6 +18,21 @@ class CModule;
 
 //.............................................................................
 
+enum EJit
+{
+	EJit_Normal = 0,
+	EJit_McJit,
+
+	EJit__Count
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const char*
+GetJitKindString (EJit JitKind);
+
+//.............................................................................
+
 class CRuntime
 {
 protected:
@@ -52,6 +67,7 @@ protected:
 protected:
 	CModule* m_pModule;
 	llvm::ExecutionEngine* m_pLlvmExecutionEngine;
+	EJit m_JitKind;
 
 	mt::CLock m_Lock;
 
@@ -91,9 +107,17 @@ public:
 		Destroy ();
 	}
 
+	EJit 
+	GetJitKind ()
+	{
+		return m_JitKind;
+	}
+
 	bool
 	Create (
 		CModule* pModule,
+		CStdLib* pStdLib,
+		EJit JitKind,
 		size_t HeapBlockSize,
 		size_t HeapWidth,
 		size_t HeapHeight

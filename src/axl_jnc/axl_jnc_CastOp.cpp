@@ -119,7 +119,7 @@ CCast_Copy::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	m_pModule->m_LlvmBuilder.CreateBitCast (OpValue, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pType, pResultValue);
 	return true;
 }
 

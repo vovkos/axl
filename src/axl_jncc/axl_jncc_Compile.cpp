@@ -40,24 +40,43 @@ CJnc::Compile (
 		Lexer.NextToken ();
 	}
 
-	Result = 
-		m_Module.Compile () &&
-		m_Runtime.Create (&m_Module, 16, 1, 4);
-
+	Result = m_Module.Compile ();
 	if (!Result)
 		return false;
 
-	llvm::ExecutionEngine* pLlvmExecutionEngine = m_Runtime.GetLlvmExecutionEngine ();
-	jnc::CStdLib::Export (&m_Module, pLlvmExecutionEngine);
-	m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) StdLib_Printf);
-
-	return m_Module.m_FunctionMgr.JitFunctions (pLlvmExecutionEngine);	
+	return true;
 }
+
+bool 
+CJnc::Jit ()
+{
+	jnc::EJit JitKind = (m_pCmdLine->m_Flags & EJncFlag_Jit_mc) ? jnc::EJit_McJit : jnc::EJit_Normal;
+
+	bool Result = m_Runtime.Create (&m_Module, &m_StdLib, JitKind, 16, 1, 4);
+	if (!Result)
+		return false;
+
+	if (JitKind == jnc::EJit_Normal)
+	{
+		llvm::ExecutionEngine* pLlvmExecutionEngine = m_Runtime.GetLlvmExecutionEngine ();
+		jnc::CStdLib::Export (&m_Module, pLlvmExecutionEngine);
+		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) CStdLib::Printf);
+	}
+
+	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());	
+}
+
 
 void
 CJnc::PrintLlvmIr ()
 {
-	uint_t CommentMdKind = m_Module.m_LlvmBuilder.GetCommentMdKind ();
+	if (!(m_pCmdLine->m_Flags & EJncFlag_LlvmIr_c))
+	{
+		m_pOutStream->Printf ("%s", m_Module.GetLlvmIrString ().cc ());
+		return;
+	}
+
+	uint_t CommentMdKind = m_Module.m_LlvmIrBuilder.GetCommentMdKind ();
 
 	rtl::CIteratorT <jnc::CFunction> Function = m_Module.m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)

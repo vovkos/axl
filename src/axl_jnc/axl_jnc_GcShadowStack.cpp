@@ -124,7 +124,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 
 	if (RootArray.IsEmpty ())
 		return false;
-
+	
 	size_t RootCount = RootArray.GetCount ();
 
 	CValue FrameMapValue;
@@ -156,8 +156,6 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 	CVariable* pGcShadowStackTopVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_GcShadowStackTop);
 	CStructField* pField = pGcShadowStackTopVariable->GetTlsField ();
 	llvm::Value* Head = CreateGEP (Context, AtEntry, pLlvmGetTls, pField->GetLlvmIndex (), "gc_stack_top");
-
-	rtl::CString s = GetLlvmTypeString (Head->getType ());
 
 	// Initialize the map pointer and load the current head of the shadow stack.
 	Instruction *CurrentHead = AtEntry.CreateLoad(Head, "gc_currhead");
@@ -356,7 +354,9 @@ EscapeEnumerator::Next ()
 		}
 
 		State = 2;
+		return 0;
 
+#ifdef AXL_JNC_EH // will only be relevant after exception handling is implemented
 		// Find all 'call' instructions.		
 		
 		SmallVector<Instruction*,16> Calls;
@@ -436,7 +436,8 @@ EscapeEnumerator::Next ()
 		}
 
 		Builder.SetInsertPoint(RI->getParent(), RI);
-		return &Builder;
+		return &Builder;		 
+#endif
 	}
 }
 

@@ -343,12 +343,12 @@ COperatorMgr::CalcScopeLevelValue (
 		return true;
 	}
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "calc scope level value");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "calc scope level value");
 	 
 	CValue ScopeBaseLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
 	CValue ScopeIncValue (pScope->GetLevel (), EType_SizeT);
 
-	m_pModule->m_LlvmBuilder.CreateAdd_i (
+	m_pModule->m_LlvmIrBuilder.CreateAdd_i (
 		ScopeBaseLevelValue, 
 		ScopeIncValue, 
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
@@ -511,8 +511,8 @@ COperatorMgr::CallClosureFunctionPtr (
 	
 	CValue PfnValue;
 	CValue IfaceValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, pAbstractMethodType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, pAbstractMethodType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
 	pArgList->InsertHead (IfaceValue);
 
 	return CallImpl (PfnValue, pAbstractMethodType, pArgList, pResultValue);
@@ -539,14 +539,14 @@ COperatorMgr::CallImpl (
 		CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 		CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
 
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "update scope level before call");
+		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "update scope level before call");
 		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
-		m_pModule->m_LlvmBuilder.CreateStore (ScopeLevelValue, pVariable);
+		m_pModule->m_LlvmIrBuilder.CreateStore (ScopeLevelValue, pVariable);
 	}
 
 	GcSafePoint ();
 
-	m_pModule->m_LlvmBuilder.CreateCall (
+	m_pModule->m_LlvmIrBuilder.CreateCall (
 		PfnValue,
 		pFunctionType,
 		ArgArray,
@@ -563,7 +563,7 @@ COperatorMgr::GcSafePoint ()
 	CFunction* pGcSafePoint = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcSafePoint);
 
 	CValue ResultValue;
-	m_pModule->m_LlvmBuilder.CreateCall (
+	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pGcSafePoint,
 		pGcSafePoint->GetType (),
 		&ResultValue

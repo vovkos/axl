@@ -78,7 +78,7 @@ protected:
 	rtl::CStdListT <TFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
 	rtl::CStdListT <TPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
 
-	rtl::CStringHashTableMapAT <CType*> m_TypeMap;
+	rtl::CStringHashTableMapT <CType*> m_TypeMap;
 	rtl::CArrayT <TGcShadowStackFrameTypePair> m_GcShadowStackFrameTypeArray;
 
 	size_t m_UnnamedEnumTypeCounter;

@@ -137,7 +137,7 @@ CCast_DataPtr_Base::GetOffsetUnsafePtrValue (
 	if (!Coord.m_LlvmIndexArray.IsEmpty ())
 	{
 		Coord.m_LlvmIndexArray.Insert (0, 0);
-		m_pModule->m_LlvmBuilder.CreateGep (
+		m_pModule->m_LlvmIrBuilder.CreateGep (
 			PtrValue, 
 			Coord.m_LlvmIndexArray,
 			Coord.m_LlvmIndexArray.GetCount (),
@@ -150,16 +150,16 @@ CCast_DataPtr_Base::GetOffsetUnsafePtrValue (
 
 	if (!Offset)
 	{
-		m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, pDstType, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pDstType, pResultValue);
 		return Offset;
 	}
 
 	ASSERT (Offset < 0);
 
 	CValue BytePtrValue;
-	m_pModule->m_LlvmBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &BytePtrValue);
-	m_pModule->m_LlvmBuilder.CreateGep (BytePtrValue, (int32_t) Offset, NULL, &BytePtrValue);
-	m_pModule->m_LlvmBuilder.CreateBitCast (BytePtrValue, pDstType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &BytePtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep (BytePtrValue, (int32_t) Offset, NULL, &BytePtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (BytePtrValue, pDstType, pResultValue);
 	return Offset;
 }
 
@@ -205,21 +205,21 @@ CCast_DataPtr_Normal2Normal::LlvmCast (
 	CValue RangeEndValue;
 	CValue ScopeLevelValue;
 
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 1, NULL, &RangeBeginValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 2, NULL, &RangeEndValue);
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 3, NULL, &ScopeLevelValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, NULL, &RangeBeginValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 2, NULL, &RangeEndValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 3, NULL, &ScopeLevelValue);
 
 	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType_c ();
 	GetOffsetUnsafePtrValue (PtrValue, (CDataPtrType*) OpValue.GetType (), pUnsafePtrType, &PtrValue);
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "create safe data pointer");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "create safe data pointer");
 
 	CValue ResultValue = pType->GetUndefValue ();
-	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
-	m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
 	return true;
 }
 
@@ -281,13 +281,13 @@ CCast_DataPtr_Thin2Normal::LlvmCast (
 
 		m_pModule->m_OperatorMgr.GetThinDataPtrScopeLevel (OpValue, &ScopeLevelValue);
 
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "create safe data pointer");
+		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "create safe data pointer");
 
 		CValue ResultValue = pType->GetUndefValue ();
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
 	}
 	else
 	{
@@ -300,13 +300,13 @@ CCast_DataPtr_Thin2Normal::LlvmCast (
 		CValue RangeEndValue (&pRangeEnd, pBytePtrType);
 		CValue ScopeLevelValue ((int64_t) 0, EType_SizeT);
 
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmBuilder, "create safe data pointer");
+		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "create safe data pointer");
 
 		CValue ResultValue = pType->GetUndefValue ();
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
-		m_pModule->m_LlvmBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
+		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
 	}
 
 	return true;
@@ -341,7 +341,7 @@ CCast_DataPtr_Normal2Thin::LlvmCast (
 	ASSERT (pType->GetTypeKind () == EType_DataPtr);
 
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 	GetOffsetUnsafePtrValue (PtrValue, (CDataPtrType*) OpValue.GetType (), (CDataPtrType*) pType, pResultValue);
 	return true;
 }

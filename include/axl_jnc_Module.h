@@ -12,7 +12,8 @@
 #include "axl_jnc_ConstMgr.h"
 #include "axl_jnc_ControlFlowMgr.h"
 #include "axl_jnc_OperatorMgr.h"
-#include "axl_jnc_LlvmBuilder.h"
+#include "axl_jnc_LlvmIrBuilder.h"
+#include "axl_jnc_LlvmDiBuilder.h"
 #include "axl_mt_TlsSlot.h"
 
 namespace axl {
@@ -65,7 +66,8 @@ public:
 	CConstMgr m_ConstMgr;
 	CControlFlowMgr m_ControlFlowMgr;
 	COperatorMgr m_OperatorMgr;	
-	CLlvmBuilder m_LlvmBuilder;
+	CLlvmIrBuilder m_LlvmIrBuilder;
+	CLlvmDiBuilder m_LlvmDiBuilder;
 
 public:
 	CModule ()
@@ -167,6 +169,9 @@ public:
 
 	bool
 	Compile ();
+	
+	rtl::CString
+	GetLlvmIrString ();
 
 protected:
 	bool

@@ -795,7 +795,7 @@ literal <CValue* $pValue>
 				{
 					return IsValidLocator ($f) ? 
 						AppendFmtLiteralValue (&$Literal, $e.m_Value, $f.m_Data.m_String) :
-						AppendFmtLiteralValue (&$Literal, $e.m_Value, NULL);
+						AppendFmtLiteralValue (&$Literal, $e.m_Value, rtl::CString ());
 				}
 		)+
 			{

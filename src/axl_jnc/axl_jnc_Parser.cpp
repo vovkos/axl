@@ -2081,7 +2081,7 @@ CParser::AppendFmtLiteral (
 	LengthValue.SetConstSizeT (Length);
 
 	CValue ResultValue;
-	m_pModule->m_LlvmBuilder.CreateCall3 (
+	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
 		pLiteral->m_FmtLiteralValue,
@@ -2157,7 +2157,7 @@ CParser::AppendFmtLiteralValue (
 	}
 
 	CValue ResultValue;
-	m_pModule->m_LlvmBuilder.CreateCall3 (
+	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
 		pLiteral->m_FmtLiteralValue,
@@ -2189,11 +2189,11 @@ CParser::FinalizeLiteral (
 	CValue PtrValue;
 	CValue SizeValue;
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 2, NULL, &SizeValue);
-	m_pModule->m_LlvmBuilder.CreateLoad (SizeValue, NULL, &SizeValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 2, NULL, &SizeValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (SizeValue, NULL, &SizeValue);
 
 	pResultValue->SetThinDataPtr (
 		PtrValue.GetLlvmValue (),

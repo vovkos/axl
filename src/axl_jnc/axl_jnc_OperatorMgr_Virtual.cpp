@@ -22,7 +22,7 @@ COperatorMgr::GetClassVTable (
 	};
 
 	CValue PtrValue;
-	m_pModule->m_LlvmBuilder.CreateGep (
+	m_pModule->m_LlvmIrBuilder.CreateGep (
 		OpValue, 
 		LlvmIndexArray, 
 		countof (LlvmIndexArray),
@@ -33,7 +33,7 @@ COperatorMgr::GetClassVTable (
 	// class.vtbl*
 
 	CDataPtrType* pResultType = pClassType->GetVTableStructType ()->GetDataPtrType_c ();
-	m_pModule->m_LlvmBuilder.CreateLoad (PtrValue, pResultType, pResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (PtrValue, pResultType, pResultValue);
 	return true;
 }
 
@@ -68,7 +68,7 @@ COperatorMgr::GetVirtualMethod (
 
 	// pf*
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (
 		PtrValue, 
 		VTableIndex,
 		NULL, 
@@ -77,7 +77,7 @@ COperatorMgr::GetVirtualMethod (
 
 	// pf
 
-	m_pModule->m_LlvmBuilder.CreateLoad (
+	m_pModule->m_LlvmIrBuilder.CreateLoad (
 		PtrValue, 
 		NULL,
 		&PtrValue
@@ -122,14 +122,14 @@ COperatorMgr::GetVirtualProperty (
 
 	// property.vtbl*
 
-	m_pModule->m_LlvmBuilder.CreateGep2 (
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (
 		PtrValue, 
 		VTableIndex,
 		NULL,
 		&PtrValue
 		);
 
-	m_pModule->m_LlvmBuilder.CreateBitCast (
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (
 		PtrValue, 
 		pProperty->GetType ()->GetVTableStructType ()->GetDataPtrType_c (),
 		&PtrValue
