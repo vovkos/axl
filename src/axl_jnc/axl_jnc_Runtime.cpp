@@ -237,7 +237,6 @@ CRuntime::Create (
 
 	// execution engine 
 
-
 	llvm::EngineBuilder EngineBuilder (pModule->GetLlvmModule ());	
 	
 	std::string errorString;

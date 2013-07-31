@@ -304,8 +304,6 @@ CParser::OpenTypeExtension (
 bool
 CParser::Declare (CDeclarator* pDeclarator)
 {
-	ASSERT (pDeclarator);
-
 	m_pLastDeclaredItem = NULL;
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
@@ -313,7 +311,7 @@ CParser::Declare (CDeclarator* pDeclarator)
 	uint_t PtrTypeFlags;
 	CType* pType = pDeclarator->CalcType (&PtrTypeFlags);
 	if (!pType)
-		return NULL;
+		return false;
 
 	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
 	uint_t PostModifiers = pDeclarator->GetPostDeclaratorModifiers ();

@@ -21,12 +21,17 @@ foo ()
 	sx_MyProp = 100;
 }
 
+pubconst int s_Int;
+
 }
 
 int 
 main ()
 {
 	printf ("main ()\n");
+
+	a.s_Int = 100;
+	a.sx_MyProp = 200;
 
 	int thin property* px = &a.sx_MyProp;
 	*px = 100;
