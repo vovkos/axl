@@ -286,11 +286,17 @@ COperatorMgr::BinaryOperator (
 	PrepareOperandType (RawOpValue1, &OpValue1);
 	if (OpValue1.GetType ()->GetTypeKind () == EType_ClassPtr)
 	{
-		CClassType* pClassType = ((CClassPtrType*) OpValue1.GetType ())->GetTargetType ();
-		CFunction* pFunction = pClassType->GetBinaryOperator (OpKind);
+		CClassPtrType* pPtrType = (CClassPtrType*) OpValue1.GetType ();
+		CFunction* pFunction = pPtrType->GetTargetType ()->GetBinaryOperator (OpKind);
 
 		if (pFunction)
 		{
+			if ((pFunction->GetFlags () & EMulticastMethodFlag_InaccessibleViaEventPtr) && pPtrType->IsEventPtrType ())
+			{
+				err::SetFormatStringError ("'%s' is inaccessible via 'event' pointer", GetBinOpKindString (OpKind));
+				return false;
+			}
+
 			rtl::CBoxListT <CValue> ArgList;
 			ArgList.InsertTail (RawOpValue1);
 			ArgList.InsertTail (RawOpValue2);
@@ -659,6 +665,7 @@ COperatorMgr::PrepareOperandType (
 				{
 					CArrayType* pArrayType = (CArrayType*) pTargetType;
 					Value = pArrayType->GetElementType ()->GetDataPtrType (
+						pPtrType->GetAnchorNamespace (), 
 						EType_DataPtr, 
 						pPtrType->GetPtrTypeKind (), 
 						pPtrType->GetFlags ()
@@ -673,7 +680,12 @@ COperatorMgr::PrepareOperandType (
 			{
 				CClassPtrType* pPtrType = (CClassPtrType*) pType;
 				CClassType* pTargetType = pPtrType->GetTargetType ();
-				Value = pTargetType->GetClassPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
+				Value = pTargetType->GetClassPtrType (
+					pPtrType->GetAnchorNamespace (), 
+					EType_ClassPtr,
+					pPtrType->GetPtrTypeKind (), 
+					pPtrType->GetFlags ()
+					);
 			}
 
 			break;
@@ -764,6 +776,7 @@ COperatorMgr::PrepareOperand (
 				{
 					CArrayType* pArrayType = (CArrayType*) pPtrType->GetTargetType ();
 					pType = pArrayType->GetElementType ()->GetDataPtrType (
+						pPtrType->GetAnchorNamespace (),
 						EType_DataPtr, 
 						pPtrType->GetPtrTypeKind (), 
 						pPtrType->GetFlags ()
@@ -780,7 +793,12 @@ COperatorMgr::PrepareOperand (
 			{
 				CClassPtrType* pPtrType = (CClassPtrType*) pType;
 				CClassType* pTargetType = pPtrType->GetTargetType ();
-				Value.OverrideType (pTargetType->GetClassPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ()));
+				Value.OverrideType (pTargetType->GetClassPtrType (
+					pPtrType->GetAnchorNamespace (), 
+					EType_ClassPtr,
+					pPtrType->GetPtrTypeKind (), 
+					pPtrType->GetFlags ())
+					);
 			}
 
 			break;

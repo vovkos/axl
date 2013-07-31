@@ -117,7 +117,7 @@ main := |*
 'bigendian'    { CreateToken (EToken_BigEndian); };
 'nullable'     { CreateToken (EToken_Nullable); };
 'const'        { CreateToken (EToken_Const); };
-'readonly'     { CreateToken (EToken_ReadOnly); };
+'pubconst'     { CreateToken (EToken_PubConst); };
 'mutable'      { CreateToken (EToken_Mutable); };
 'volatile'     { CreateToken (EToken_Volatile); };
 'weak'         { CreateToken (EToken_Weak); };
@@ -127,12 +127,13 @@ main := |*
 'stdcall'      { CreateToken (EToken_Stdcall); };
 'function'     { CreateToken (EToken_Function); };
 'property'     { CreateToken (EToken_Property); };
-'multicast'    { CreateToken (EToken_Multicast); };
-'event'        { CreateToken (EToken_Event); };
-'autoev'       { CreateToken (EToken_AutoEv); };
 'bindable'     { CreateToken (EToken_Bindable); };
 'autoget'      { CreateToken (EToken_AutoGet); };
 'indexed'      { CreateToken (EToken_Indexed); };
+'multicast'    { CreateToken (EToken_Multicast); };
+'event'        { CreateToken (EToken_Event); };
+'pubevent'     { CreateToken (EToken_PubEvent); };
+'autoev'       { CreateToken (EToken_AutoEv); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

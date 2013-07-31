@@ -62,7 +62,7 @@ enum EToken
 	EToken_BigEndian,
 	EToken_Nullable,
 	EToken_Const,
-	EToken_ReadOnly,
+	EToken_PubConst,
 	EToken_Mutable,
 	EToken_Volatile,
 	EToken_Weak,
@@ -72,12 +72,13 @@ enum EToken
 	EToken_Stdcall,
 	EToken_Function,
 	EToken_Property,
-	EToken_Multicast,
-	EToken_Event,
-	EToken_AutoEv,
 	EToken_Bindable,
 	EToken_AutoGet,
 	EToken_Indexed,
+	EToken_Multicast,
+	EToken_Event,
+	EToken_PubEvent,
+	EToken_AutoEv,
 
 	// type specifiers
 
@@ -227,7 +228,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_PRS_TOKEN_NAME (EToken_BigEndian,    "bigendian")
 	AXL_PRS_TOKEN_NAME (EToken_Const,        "const")
-	AXL_PRS_TOKEN_NAME (EToken_ReadOnly,     "readonly")
+	AXL_PRS_TOKEN_NAME (EToken_PubConst,     "pubconst")
 	AXL_PRS_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_PRS_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_PRS_TOKEN_NAME (EToken_Thin,         "thin")
@@ -236,11 +237,13 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Stdcall,      "stdcall")
 	AXL_PRS_TOKEN_NAME (EToken_Function,     "function")
 	AXL_PRS_TOKEN_NAME (EToken_Property,     "property")
-	AXL_PRS_TOKEN_NAME (EToken_Multicast,    "multicast")	
-	AXL_PRS_TOKEN_NAME (EToken_Event,        "event")	
 	AXL_PRS_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_PRS_TOKEN_NAME (EToken_AutoGet,      "autoget")
 	AXL_PRS_TOKEN_NAME (EToken_Indexed,      "indexed")
+	AXL_PRS_TOKEN_NAME (EToken_Multicast,    "multicast")	
+	AXL_PRS_TOKEN_NAME (EToken_Event,        "event")	
+	AXL_PRS_TOKEN_NAME (EToken_PubEvent,     "pubevent")	
+	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
 
 	// type specifiers
 
@@ -266,7 +269,6 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_PRS_TOKEN_NAME (EToken_Union,        "union")
 	AXL_PRS_TOKEN_NAME (EToken_Class,        "class")
-	AXL_PRS_TOKEN_NAME (EToken_AutoEv,       "autoev")
 
 	// special members
 

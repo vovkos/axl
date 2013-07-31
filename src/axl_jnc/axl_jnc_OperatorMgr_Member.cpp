@@ -21,6 +21,16 @@ COperatorMgr::GetNamespaceMember (
 		return false;
 	}
 
+	CModuleItemDecl* pDecl = pItem->GetItemDecl ();
+	ASSERT (pDecl);
+
+	if (pDecl->GetAccessKind () != EAccess_Public &&
+		m_pModule->m_NamespaceMgr.GetAccessKind (pNamespace) == EAccess_Public)
+	{
+		err::SetFormatStringError ("'%s.%s' is protected", pNamespace->GetQualifiedName ().cc (), pName);
+		return false;
+	}
+
 	bool Result = true;
 
 	EModuleItem ItemKind = pItem->GetItemKind ();
@@ -149,6 +159,8 @@ COperatorMgr::GetNamedTypeMember (
 	}
 
 	CModuleItemDecl* pDecl = pMember->GetItemDecl ();
+	ASSERT (pDecl);
+
 	if (pDecl->GetAccessKind () != EAccess_Public &&
 		m_pModule->m_NamespaceMgr.GetAccessKind (Coord.m_pType) == EAccess_Public)
 	{
@@ -177,13 +189,26 @@ COperatorMgr::GetNamedTypeMember (
 
 	if (pDecl->GetStorageKind () == EStorage_Static)
 		return true;
-	
+
+	#pragma AXL_TODO ("remove explicit addr operator and instead allow implicit cast names_type& -> named_type*")
+
 	CValue ThisArgValue = OpValue;
 	if (pNamedType->GetTypeKind () != EType_Class)
 	{
 		bool Result = UnaryOperator (EUnOp_Addr, &ThisArgValue);
 		if (!Result)
 			return false;
+	}
+
+	if (IsClassType (pNamedType, EClassType_Multicast))
+	{
+		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr);
+		if ((pMember->GetFlags () & EMulticastMethodFlag_InaccessibleViaEventPtr) &&
+			((CClassPtrType*) OpValue.GetType ())->IsEventPtrType ())
+		{
+			err::SetFormatStringError ("'%s' is inaccessible via 'event' pointer", pName);
+			return false;
+		}
 	}
 
 	pResultValue->InsertToClosureHead (ThisArgValue);

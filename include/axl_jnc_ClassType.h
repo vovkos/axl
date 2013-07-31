@@ -119,10 +119,21 @@ public:
 
 	CClassPtrType* 
 	GetClassPtrType (
+		CNamespace* pAnchorNamespace,	
 		EType TypeKind,
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		uint_t Flags = 0
 		);
+
+	CClassPtrType* 
+	GetClassPtrType (
+		EType TypeKind,
+		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetClassPtrType (NULL, TypeKind, PtrTypeKind, Flags);
+	}
 
 	CClassPtrType* 
 	GetClassPtrType (

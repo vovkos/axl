@@ -79,13 +79,21 @@ CDeclTypeCalc::CalcType (
 
 			pType = GetPropertyPtrType (pPropertyType);
 		}
-		else if (m_TypeModifiers & ETypeModifier_AutoEv)
+		else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_PubEvent))
 		{
-			CClassType* pAutoEvType = GetAutoEvType (pType);
-			if (!pAutoEvType)
+			CClassType* pClassType = GetMulticastType (pType);
+			if (!pClassType)
 				return NULL;
 
-			pType = GetClassPtrType (pAutoEvType);
+			pType = GetClassPtrType (pClassType);
+		}
+		else if (m_TypeModifiers & ETypeModifier_AutoEv)
+		{
+			CClassType* pClassType = GetAutoEvType (pType);
+			if (!pClassType)
+				return NULL;
+
+			pType = GetClassPtrType (pClassType);
 		}
 		else switch (TypeKind)
 		{
@@ -140,7 +148,7 @@ CDeclTypeCalc::CalcType (
 		if (pFlags)
 			*pFlags = EPropertyFlag_AutoGet | EPropertyFlag_AutoSet;
 	}
-	else if (m_TypeModifiers & ETypeModifier_Multicast)
+	else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_PubEvent))
 	{
 		pType = GetMulticastType (pType);
 		if (!pType)
@@ -183,7 +191,7 @@ CDeclTypeCalc::CalcType (
 	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code))
 	{
 		if (pFlags)
-			*pFlags = GetPtrTypeFlags ();
+			*pFlags = GetPtrTypeFlags (pType);
 	}
 
 	if (!CheckUnusedModifiers ())
@@ -238,17 +246,28 @@ CDeclTypeCalc::CheckUnusedModifiers ()
 }
 
 uint_t 
-CDeclTypeCalc::GetPtrTypeFlags ()
+CDeclTypeCalc::GetPtrTypeFlags (CType* pType)
 {
+	ASSERT (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code));
+
 	uint_t Flags = 0;
 
 	if (m_TypeModifiers & ETypeModifier_Const)
 		Flags |= EPtrTypeFlag_Const;
 
+	if (m_TypeModifiers & ETypeModifier_PubConst)
+		Flags |= EPtrTypeFlag_PubConst;
+
 	if (m_TypeModifiers & ETypeModifier_Volatile)
 		Flags |= EPtrTypeFlag_Volatile;
 
-	m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
+	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_PubEvent)) // convert 'event' to 'pubevent'
+	{
+		ASSERT (IsClassType (pType, EClassType_Multicast));
+		Flags |= EPtrTypeFlag_PubEvent; 
+	}
+
+	m_TypeModifiers &= ~ETypeModifierMask_DeclPtr;
 	return Flags;
 }
 
@@ -530,7 +549,12 @@ CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 	uint_t TypeFlags = GetPtrTypeFlagsFromModifiers (m_TypeModifiers);
 
 	m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
-	return pDataType->GetDataPtrType (PtrTypeKind, TypeFlags);
+	return pDataType->GetDataPtrType (
+		m_pModule->m_NamespaceMgr.GetCurrentNamespace (), 
+		EType_DataPtr, 
+		PtrTypeKind, 
+		TypeFlags
+		);
 }
 
 CClassPtrType*
@@ -540,7 +564,12 @@ CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 	uint_t TypeFlags = GetPtrTypeFlagsFromModifiers (m_TypeModifiers);
 
 	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;
-	return pClassType->GetClassPtrType (PtrTypeKind, TypeFlags);
+	return pClassType->GetClassPtrType (
+		m_pModule->m_NamespaceMgr.GetCurrentNamespace (), 
+		EType_ClassPtr,
+		PtrTypeKind, 
+		TypeFlags
+		);
 }
 
 CFunctionPtrType*

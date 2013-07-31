@@ -17,6 +17,8 @@ class CEnumConst;
 class CBaseTypeCoord;
 class CFunction;
 
+struct TDualPtrTypeTuple;
+
 //.............................................................................
 
 enum ENamespace
@@ -51,6 +53,7 @@ enum
 class CNamespace: public CModuleItemDecl
 {
 	friend class CNamespaceMgr;
+	friend class CTypeMgr;
 	friend class CParser;
 
 protected:
@@ -60,6 +63,7 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_ItemArray; 
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
 	rtl::CStringHashTable m_FriendSet; 
+	rtl::CStringHashTableMapT <TDualPtrTypeTuple*> m_DualPtrTypeTupleMap; 
 
 public:
 	CNamespace ();

@@ -35,6 +35,13 @@ enum EMulticastMethod
 	EMulticastMethod__Count,
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum EMulticastMethodFlag
+{
+	EMulticastMethodFlag_InaccessibleViaEventPtr = 0x0100,
+};
+
 //.............................................................................
 
 class CMulticastClassType: public CClassType
@@ -46,6 +53,8 @@ protected:
 	CMcSnapshotClassType* m_pSnapshotType;
 	CStructField* m_FieldArray [EMulticastField__Count];
 	CFunction* m_MethodArray [EMulticastMethod__Count];
+
+	TClassPtrTypeTuple* m_pEventClassPtrTypeTuple;
 
 public:
 	CMulticastClassType ();

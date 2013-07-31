@@ -236,9 +236,8 @@ COperatorMgr::StoreDataRef (
 
 	bool Result;
 
-	CDataPtrType* pDstType = (CDataPtrType*) DstValue.GetType ();
-	
-	if (pDstType->GetFlags () & EPtrTypeFlag_Const)
+	CDataPtrType* pDstType = (CDataPtrType*) DstValue.GetType ();	
+	if (pDstType->IsConstPtrType ())
 	{
 		err::SetFormatStringError ("cannot store into const location");
 		return false;

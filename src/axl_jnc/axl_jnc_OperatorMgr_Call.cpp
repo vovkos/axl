@@ -273,11 +273,19 @@ COperatorMgr::CallOperator (
 
 	if (OpValue.GetType ()->GetTypeKind () == EType_ClassPtr)
 	{
-		CFunction* pCallOperator = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ()->GetCallOperator ();
+		CClassPtrType* pPtrType = (CClassPtrType*) OpValue.GetType ();
+
+		CFunction* pCallOperator = pPtrType->GetTargetType ()->GetCallOperator ();
 		if (!pCallOperator)
 		{
-			err::SetFormatStringError ("cannot call '%s'", OpValue.GetType ()->GetTypeString ().cc ());
-			return NULL;
+			err::SetFormatStringError ("cannot call '%s'", pPtrType->GetTypeString ().cc ());
+			return false;
+		}
+
+		if ((pCallOperator->GetFlags () & EMulticastMethodFlag_InaccessibleViaEventPtr) && pPtrType->IsEventPtrType ())
+		{
+			err::SetFormatStringError ("'Call' is inaccessible via 'event' pointer");
+			return false;
 		}
 
 		CValue ObjValue = OpValue;

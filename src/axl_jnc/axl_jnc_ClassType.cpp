@@ -22,12 +22,13 @@ CClassType::CClassType ()
 
 CClassPtrType* 
 CClassType::GetClassPtrType (
+	CNamespace* pAnchorNamespace,
 	EType TypeKind,
 	EClassPtrType PtrTypeKind,
 	uint_t Flags
 	)
 {
-	return m_pModule->m_TypeMgr.GetClassPtrType (this, TypeKind, PtrTypeKind, Flags);
+	return m_pModule->m_TypeMgr.GetClassPtrType (pAnchorNamespace, this, TypeKind, PtrTypeKind, Flags);
 }
 
 CStructField*

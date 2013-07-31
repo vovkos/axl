@@ -151,7 +151,7 @@ enum ETypeModifier
 	ETypeModifier_Unsigned    = 0x00000001,
 	ETypeModifier_BigEndian   = 0x00000002,
 	ETypeModifier_Const       = 0x00000004,
-	ETypeModifier_ReadOnly    = 0x00000008,
+	ETypeModifier_PubConst    = 0x00000008,
 	ETypeModifier_Volatile    = 0x00000010,
 	ETypeModifier_Weak        = 0x00000020,
 	ETypeModifier_Thin        = 0x00000040,
@@ -165,7 +165,8 @@ enum ETypeModifier
 	ETypeModifier_Indexed     = 0x00004000,
 	ETypeModifier_Multicast   = 0x00008000,
 	ETypeModifier_Event       = 0x00010000,
-	ETypeModifier_AutoEv      = 0x00020000,
+	ETypeModifier_PubEvent    = 0x00020000,
+	ETypeModifier_AutoEv      = 0x00040000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -191,15 +192,17 @@ enum ETypeModifierMask
 
 	ETypeModifierMask_DataPtr = 
 		ETypeModifier_Const | 
-		ETypeModifier_ReadOnly | 
+		ETypeModifier_PubConst | 
 		ETypeModifier_Volatile |
 		ETypeModifier_Thin |
 		ETypeModifier_Unsafe,
 
 	ETypeModifierMask_ClassPtr = 
 		ETypeModifier_Const | 
-		ETypeModifier_ReadOnly | 
+		ETypeModifier_PubConst | 
 		ETypeModifier_Volatile |
+		ETypeModifier_Event | 
+		ETypeModifier_PubEvent | 
 		ETypeModifier_Weak |
 		ETypeModifier_Unsafe,
 	
@@ -219,9 +222,12 @@ enum ETypeModifierMask
 		ETypeModifierMask_FunctionPtr |
 		ETypeModifierMask_PropertyPtr,
 
-	ETypeModifierMask_Const = 
-		ETypeModifier_Const |
-		ETypeModifier_ReadOnly,
+	ETypeModifierMask_DeclPtr = 
+		ETypeModifier_Const | 
+		ETypeModifier_PubConst | 
+		ETypeModifier_Volatile |
+		ETypeModifier_Event | 
+		ETypeModifier_PubEvent,
 
 	ETypeModifierMask_CallConv = 
 		ETypeModifier_Cdecl |
@@ -236,6 +242,19 @@ enum ETypeModifierMask
 		ETypeModifier_Property |
 		ETypeModifier_Multicast |
 		ETypeModifier_AutoEv,
+
+	ETypeModifierMask_Const = 
+		ETypeModifier_Const |
+		ETypeModifier_PubConst |
+		ETypeModifier_Event |
+		ETypeModifier_PubEvent,
+
+	ETypeModifierMask_Event = 
+		ETypeModifier_Event |
+		ETypeModifier_PubEvent |
+		ETypeModifier_Const |
+		ETypeModifier_PubConst |
+		ETypeModifierMask_TypeKind,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -274,12 +293,15 @@ enum ETypeFlag
 
 enum EPtrTypeFlag
 {
-	EPtrTypeFlag_Unsafe    = 0x1000, // all ptr
-	EPtrTypeFlag_Checked   = 0x2000, // all ptr
-	EPtrTypeFlag_Const     = 0x4000, // class & data ptr
-	EPtrTypeFlag_Volatile  = 0x8000, // class & data ptr
+	EPtrTypeFlag_Unsafe    = 0x010000, // all ptr
+	EPtrTypeFlag_Checked   = 0x020000, // all ptr
+	EPtrTypeFlag_Const     = 0x040000, // class & data ptr
+	EPtrTypeFlag_PubConst  = 0x080000, // class & data ptr
+	EPtrTypeFlag_Volatile  = 0x100000, // class & data ptr
+	EPtrTypeFlag_Event     = 0x200000, // class only
+	EPtrTypeFlag_PubEvent  = 0x400000, // class only
 
-	EPtrTypeFlag__AllMask  = 0xf000,
+	EPtrTypeFlag__AllMask  = 0x0f0000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -506,10 +528,21 @@ public:
 
 	CDataPtrType* 
 	GetDataPtrType (
+		CNamespace* pAnchorNamespace,
 		EType TypeKind,
 		EDataPtrType PtrTypeKind = EDataPtrType_Normal,
 		uint_t Flags = 0
 		);
+
+	CDataPtrType* 
+	GetDataPtrType (
+		EType TypeKind,
+		EDataPtrType PtrTypeKind = EDataPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetDataPtrType (NULL, TypeKind, PtrTypeKind, Flags);
+	}
 
 	CDataPtrType* 
 	GetDataPtrType (

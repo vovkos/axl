@@ -51,7 +51,7 @@ protected:
 	CheckUnusedModifiers ();
 
 	uint_t 
-	GetPtrTypeFlags ();
+	GetPtrTypeFlags (CType* pType);
 
 	uint_t 
 	GetPropertyFlags ();

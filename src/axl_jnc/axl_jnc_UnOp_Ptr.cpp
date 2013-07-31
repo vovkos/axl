@@ -16,6 +16,7 @@ CUnOp_Addr::GetResultType (const CValue& OpValue)
 	{
 	case EType_DataRef:
 		return ((CDataPtrType*) pOpType)->GetTargetType ()->GetDataPtrType (
+			((CDataPtrType*) pOpType)->GetAnchorNamespace (),
 			EType_DataPtr, 
 			((CDataPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -23,6 +24,7 @@ CUnOp_Addr::GetResultType (const CValue& OpValue)
 
 	case EType_ClassRef:
 		return ((CClassPtrType*) pOpType)->GetTargetType ()->GetClassPtrType (
+			((CClassPtrType*) pOpType)->GetAnchorNamespace (),
 			EType_ClassPtr, 
 			((CClassPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -73,6 +75,7 @@ CUnOp_Indir::GetResultType (const CValue& OpValue)
 	{
 	case EType_DataPtr:
 		return ((CDataPtrType*) pOpType)->GetTargetType ()->GetDataPtrType (
+			((CDataPtrType*) pOpType)->GetAnchorNamespace (),
 			EType_DataRef, 
 			((CDataPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -80,6 +83,7 @@ CUnOp_Indir::GetResultType (const CValue& OpValue)
 
 	case EType_ClassPtr:
 		return ((CClassPtrType*) pOpType)->GetTargetType ()->GetClassPtrType (
+			((CClassPtrType*) pOpType)->GetAnchorNamespace (),
 			EType_ClassRef, 
 			((CClassPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()

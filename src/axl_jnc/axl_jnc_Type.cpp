@@ -203,7 +203,7 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"unsigned",     // ETypeModifier_Unsigned    = 0x00000001,
 		"bigendian",    // ETypeModifier_BigEndian   = 0x00000002,
 		"const",        // ETypeModifier_Const       = 0x00000004,
-		"readonly",     // ETypeModifier_ReadOnly    = 0x00000008,
+		"pubconst",     // ETypeModifier_PubConst    = 0x00000008,
 		"volatile",     // ETypeModifier_Volatile    = 0x00000010,
 		"weak",         // ETypeModifier_Weak        = 0x00000020,
 		"thin",         // ETypeModifier_Thin        = 0x00000040,
@@ -217,7 +217,8 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"indexed",      // ETypeModifier_Indexed     = 0x00004000,
 		"multicast",    // ETypeModifier_Multicast   = 0x00008000,
 		"event",        // ETypeModifier_Event       = 0x00010000,
-		"autoev",       // ETypeModifier_AutoEv      = 0x00020000,
+		"pubevent",     // ETypeModifier_PubEvent    = 0x00020000,
+		"autoev",       // ETypeModifier_AutoEv      = 0x00040000,
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
@@ -286,6 +287,13 @@ GetPtrTypeFlagString (uint_t Flags)
 
 		String += "const";
 	}
+	else if (Flags & EPtrTypeFlag_PubConst)
+	{
+		if (!String.IsEmpty ())
+			String += ' ';
+
+		String += "pubconst";
+	}
 
 	if (Flags & EPtrTypeFlag_Volatile)
 	{
@@ -293,6 +301,21 @@ GetPtrTypeFlagString (uint_t Flags)
 			String += ' ';
 
 		String += "volatile";
+	}
+
+	if (Flags & EPtrTypeFlag_Event)
+	{
+		if (!String.IsEmpty ())
+			String += ' ';
+
+		String += "event";
+	}
+	else if (Flags & EPtrTypeFlag_PubEvent)
+	{
+		if (!String.IsEmpty ())
+			String += ' ';
+
+		String += "pubevent";
 	}
 
 	return String;
@@ -310,9 +333,16 @@ GetPtrTypeFlagSignature (uint_t Flags)
 
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
+	else if (Flags & EPtrTypeFlag_PubConst)
+		Signature += "pc";
 
 	if (Flags & EPtrTypeFlag_Volatile)
 		Signature += 'v';
+
+	if (Flags & EPtrTypeFlag_Event)
+		Signature += 'e';
+	else if (Flags & EPtrTypeFlag_PubEvent)
+		Signature += "pe";
 
 	return Signature;
 }
@@ -327,9 +357,16 @@ GetPtrTypeFlagsFromModifiers (uint_t Modifiers)
 
 	if (Modifiers & ETypeModifier_Const)
 		Flags |= EPtrTypeFlag_Const;
+	else if (Modifiers & ETypeModifier_PubConst)
+		Flags |= EPtrTypeFlag_PubConst;
 
 	if (Modifiers & ETypeModifier_Volatile)
 		Flags |= EPtrTypeFlag_Volatile;
+
+	if (Modifiers & ETypeModifier_Event)
+		Flags |= EPtrTypeFlag_Event;
+	else if (Modifiers & ETypeModifier_PubEvent)
+		Flags |= EPtrTypeFlag_PubEvent;
 
 	return Flags;
 }
@@ -395,12 +432,13 @@ CType::GetArrayType (size_t ElementCount)
 
 CDataPtrType* 
 CType::GetDataPtrType (
+	CNamespace* pAnchorNamespace,
 	EType TypeKind,
 	EDataPtrType PtrTypeKind,
 	uint_t Flags
 	)
 {
-	return m_pModule->m_TypeMgr.GetDataPtrType (this, TypeKind, PtrTypeKind, Flags);
+	return m_pModule->m_TypeMgr.GetDataPtrType (pAnchorNamespace, this, TypeKind, PtrTypeKind, Flags);
 }
 
 CFunctionArg* 

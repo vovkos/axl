@@ -275,9 +275,9 @@ type_modifier
 			{
 				$.m_Modifier = ETypeModifier_Const;
 			}
-	|	EToken_ReadOnly
+	|	EToken_PubConst
 			{
-				$.m_Modifier = ETypeModifier_ReadOnly;
+				$.m_Modifier = ETypeModifier_PubConst;
 			}
 	|	EToken_Volatile
 			{
@@ -330,6 +330,10 @@ type_modifier
 	|	EToken_Event
 			{
 				$.m_Modifier = ETypeModifier_Event;
+			}
+	|	EToken_PubEvent
+			{
+				$.m_Modifier = ETypeModifier_PubEvent;
 			}
 	|	EToken_AutoEv
 			{

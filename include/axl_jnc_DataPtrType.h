@@ -18,6 +18,7 @@ class CDataPtrType: public CType
 protected:
 	EDataPtrType m_PtrTypeKind;
 	CType* m_pTargetType;
+	CNamespace* m_pAnchorNamespace; // for dual pointers
 
 public:
 	CDataPtrType ();
@@ -33,6 +34,15 @@ public:
 	{
 		return m_pTargetType;
 	}
+
+	CNamespace* 
+	GetAnchorNamespace ()
+	{
+		return m_pAnchorNamespace;
+	}
+
+	bool
+	IsConstPtrType ();
 
 	CDataPtrType*
 	GetCheckedPtrType ()

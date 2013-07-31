@@ -75,9 +75,11 @@ CCast_DataPtr_Base::GetCastKind (
 	CDataPtrType* pSrcType = (CDataPtrType*) OpValue.GetType ();
 	CDataPtrType* pDstType = (CDataPtrType*) pType;
 
-	if ((pSrcType->GetFlags () & EPtrTypeFlag_Const) != 0 && 
-		(pDstType->GetFlags () & (EPtrTypeFlag_Const | EPtrTypeFlag_Unsafe)) == 0)
-		return ECast_None;
+	if (!(pDstType->GetFlags () & EPtrTypeFlag_Unsafe))
+	{
+		if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ())
+			return ECast_None;
+	}
 
 	CType* pSrcDataType = pSrcType->GetTargetType ();
 	CType* pDstDataType = pDstType->GetTargetType ();

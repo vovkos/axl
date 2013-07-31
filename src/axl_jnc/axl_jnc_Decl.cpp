@@ -18,7 +18,7 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		0,                          // ETypeModifier_Unsigned         = 0x00000001,
 		0,                          // ETypeModifier_BigEndian        = 0x00000002,
 		ETypeModifierMask_Const,    // ETypeModifier_Const            = 0x00000004,
-		ETypeModifierMask_Const,    // ETypeModifier_ReadOnly         = 0x00000008,
+		ETypeModifierMask_Const,    // ETypeModifier_PubConst         = 0x00000008,
 		0,                          // ETypeModifier_Volatile         = 0x00000010,
 		ETypeModifierMask_PtrKind,  // ETypeModifier_Weak             = 0x00000020,
 		ETypeModifierMask_PtrKind,  // ETypeModifier_Thin             = 0x00000040,
@@ -31,8 +31,9 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifier_Indexed,      // ETypeModifier_AutoGet          = 0x00002000,
 		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00004000,
 		ETypeModifierMask_TypeKind, // ETypeModifier_Multicast        = 0x00008000,
-		ETypeModifierMask_TypeKind, // ETypeModifier_Event            = 0x00010000,
-		ETypeModifierMask_TypeKind, // ETypeModifier_AutoEv           = 0x00020000,
+		ETypeModifierMask_Event,    // ETypeModifier_Event            = 0x00010000,
+		ETypeModifierMask_Event,    // ETypeModifier_PubEvent         = 0x00020000,
+		ETypeModifierMask_TypeKind, // ETypeModifier_AutoEv           = 0x00040000,
 	};
 
 	// check duplicates

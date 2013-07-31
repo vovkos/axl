@@ -78,6 +78,7 @@ class CFunction: public CUserModuleItem
 {
 	friend class CModule;
 	friend class CFunctionMgr;
+	friend class CTypeMgr;
 	friend class CDerivableType;
 	friend class CClassType;
 	friend class CProperty;

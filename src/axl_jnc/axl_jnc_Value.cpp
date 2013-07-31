@@ -338,9 +338,19 @@ CValue::SetVariable (CVariable* pVariable)
 
 	CType* pType = pVariable->GetType ();
 	if (pType->GetTypeKind () == EType_Class)
-		m_pType = ((CClassType*) pType)->GetClassPtrType (EType_ClassRef, EClassPtrType_Normal, PtrTypeFlags);
+		m_pType = ((CClassType*) pType)->GetClassPtrType (
+			pVariable->GetParentNamespace (), 
+			EType_ClassRef, 
+			EClassPtrType_Normal, 
+			PtrTypeFlags
+			);
 	else
-		m_pType = pType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		m_pType = pType->GetDataPtrType (
+			pVariable->GetParentNamespace (), 
+			EType_DataRef, 
+			EDataPtrType_Thin, 
+			PtrTypeFlags
+			);
 }
 
 void

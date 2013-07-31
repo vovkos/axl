@@ -60,7 +60,7 @@ main := |*
 'bigendian'    |
 'nullable'     |
 'const'        |
-'readonly'     |
+'pubconst'     |
 'mutable'      |
 'volatile'     |
 'weak'         |
@@ -70,12 +70,13 @@ main := |*
 'stdcall'      |
 'function'     |
 'property'     |
-'multicast'    |
-'event'        |
-'autoev'       |
 'bindable'     |
 'autoget'      |
 'indexed'      |
+'multicast'    |
+'event'        |
+'pubevent'     |
+'autoev'       |
 
 'auto'         |
 'void'         |

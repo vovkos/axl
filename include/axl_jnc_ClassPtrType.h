@@ -18,6 +18,7 @@ class CClassPtrType: public CType
 protected:
 	EClassPtrType m_PtrTypeKind;
 	CClassType* m_pTargetType;
+	CNamespace* m_pAnchorNamespace; // for dual pointers
 
 public:
 	CClassPtrType ();
@@ -33,6 +34,18 @@ public:
 	{
 		return m_pTargetType;
 	}
+
+	CNamespace* 
+	GetAnchorNamespace ()
+	{
+		return m_pAnchorNamespace;
+	}
+
+	bool
+	IsConstPtrType ();
+
+	bool
+	IsEventPtrType ();
 
 	CClassPtrType*
 	GetCheckedPtrType ()

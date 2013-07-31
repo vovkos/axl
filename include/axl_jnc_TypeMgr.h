@@ -30,6 +30,19 @@ class CModule;
 
 //.............................................................................
 
+struct TDualPtrTypeTuple: rtl::TListLink
+{
+	union 
+	{
+		TDataPtrTypeTuple* m_pPubConstDataPtrTypeTuple;
+		TClassPtrTypeTuple* m_pPubConstClassPtrTypeTuple;
+	};
+
+	TClassPtrTypeTuple* m_pPubEventClassPtrTypeTuple;
+};
+
+//.............................................................................
+
 class CTypeMgr
 {
 	friend class CModule;
@@ -77,6 +90,7 @@ protected:
 	rtl::CStdListT <TClassPtrTypeTuple> m_ClassPtrTypeTupleList;
 	rtl::CStdListT <TFunctionPtrTypeTuple> m_FunctionPtrTypeTupleList;
 	rtl::CStdListT <TPropertyPtrTypeTuple> m_PropertyPtrTypeTupleList;
+	rtl::CStdListT <TDualPtrTypeTuple> m_DualPtrTypeTupleList;
 
 	rtl::CStringHashTableMapT <CType*> m_TypeMap;
 	rtl::CArrayT <TGcShadowStackFrameTypePair> m_GcShadowStackFrameTypeArray;
@@ -613,11 +627,24 @@ public:
 
 	CDataPtrType* 
 	GetDataPtrType (
+		CNamespace* pAnchorNamespace,
 		CType* pDataType,
 		EType TypeKind,
 		EDataPtrType PtrTypeKind = EDataPtrType_Normal,
 		uint_t Flags = 0
 		);
+
+	CDataPtrType* 
+	GetDataPtrType (
+		CType* pDataType,
+		EType TypeKind,
+		EDataPtrType PtrTypeKind = EDataPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetDataPtrType (NULL, pDataType, TypeKind, PtrTypeKind, Flags);
+
+	}
 
 	CDataPtrType* 
 	GetDataPtrType (
@@ -634,11 +661,23 @@ public:
 
 	CClassPtrType* 
 	GetClassPtrType (
+		CNamespace* pAnchorNamespace,
 		CClassType* pClassType,
 		EType TypeKind,
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		uint_t Flags = 0
 		);
+
+	CClassPtrType* 
+	GetClassPtrType (
+		CClassType* pClassType,
+		EType TypeKind,
+		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetClassPtrType (NULL, pClassType, TypeKind, PtrTypeKind, Flags);
+	}
 
 	CClassPtrType* 
 	GetClassPtrType (
@@ -718,6 +757,12 @@ public:
 	GetGcShadowStackFrameType (size_t RootCount);
 
 protected:
+	TDualPtrTypeTuple*
+	GetDualPtrTypeTuple (
+		CNamespace* pAnchorNamespace,
+		CType* pType
+		);
+
 	TSimplePropertyTypeTuple*
 	GetSimplePropertyTypeTuple (CType* pType);
 
@@ -727,8 +772,29 @@ protected:
 	TDataPtrTypeTuple*
 	GetDataPtrTypeTuple (CType* pType);
 
+	TDataPtrTypeTuple*
+	GetPubConstDataPtrTypeTuple (
+		CNamespace* pAnchorNamespace,
+		CType* pType
+		);
+
 	TClassPtrTypeTuple*
 	GetClassPtrTypeTuple (CClassType* pClassType);
+
+	TClassPtrTypeTuple*
+	GetPubConstClassPtrTypeTuple (
+		CNamespace* pAnchorNamespace,
+		CClassType* pClassType
+		);
+
+	TClassPtrTypeTuple*
+	GetEventClassPtrTypeTuple (CMulticastClassType* pClassType);
+
+	TClassPtrTypeTuple*
+	GetPubEventClassPtrTypeTuple (
+		CNamespace* pAnchorNamespace,
+		CMulticastClassType* pClassType
+		);
 
 	TFunctionPtrTypeTuple*
 	GetFunctionPtrTypeTuple (CFunctionType* pFunctionType);

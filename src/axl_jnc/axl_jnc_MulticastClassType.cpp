@@ -12,6 +12,7 @@ CMulticastClassType::CMulticastClassType ()
 	m_ClassTypeKind = EClassType_Multicast;
 	m_pTargetType = NULL;
 	m_pSnapshotType = NULL;
+	m_pEventClassPtrTypeTuple = NULL;
 	memset (m_FieldArray, 0, sizeof (m_FieldArray));
 	memset (m_MethodArray, 0, sizeof (m_MethodArray));
 }

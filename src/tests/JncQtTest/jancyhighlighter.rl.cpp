@@ -42,14 +42,14 @@ static const short _jancy_lexer_key_offsets[] = {
 	1116, 1124, 1132, 1143, 1151, 1159, 1167, 1175, 
 	1183, 1191, 1200, 1208, 1216, 1224, 1232, 1241, 
 	1250, 1258, 1266, 1274, 1282, 1290, 1298, 1306, 
-	1314, 1322, 1330, 1338, 1346, 1355, 1363, 1371, 
-	1379, 1387, 1395, 1403, 1414, 1424, 1432, 1440, 
-	1448, 1456, 1466, 1475, 1483, 1491, 1499, 1507, 
-	1515, 1523, 1531, 1541, 1550, 1559, 1567, 1575, 
-	1583, 1591, 1600, 1608, 1618, 1627, 1636, 1644, 
-	1652, 1660, 1668, 1676, 1686, 1694, 1702, 1710, 
-	1718, 1726, 1734, 1742, 1751, 1759, 1767, 1775, 
-	1784, 1786
+	1314, 1322, 1332, 1340, 1348, 1356, 1364, 1372, 
+	1380, 1388, 1396, 1407, 1417, 1425, 1433, 1441, 
+	1449, 1459, 1468, 1476, 1484, 1492, 1500, 1508, 
+	1516, 1524, 1534, 1543, 1552, 1560, 1568, 1576, 
+	1584, 1593, 1601, 1611, 1620, 1629, 1637, 1645, 
+	1653, 1661, 1669, 1679, 1687, 1695, 1703, 1711, 
+	1719, 1727, 1735, 1744, 1752, 1760, 1768, 1777, 
+	1779
 };
 
 static const char _jancy_lexer_trans_keys[] = {
@@ -218,65 +218,64 @@ static const char _jancy_lexer_trans_keys[] = {
 	97, 122, 95, 99, 48, 57, 65, 90, 
 	97, 122, 95, 116, 48, 57, 65, 90, 
 	97, 122, 95, 98, 48, 57, 65, 90, 
-	97, 122, 95, 108, 48, 57, 65, 90, 
-	97, 122, 95, 105, 48, 57, 65, 90, 
-	97, 122, 95, 101, 48, 57, 65, 90, 
-	97, 122, 95, 97, 116, 48, 57, 65, 
-	90, 98, 122, 95, 100, 48, 57, 65, 
-	90, 97, 122, 95, 111, 48, 57, 65, 
-	90, 97, 122, 95, 110, 48, 57, 65, 
-	90, 97, 122, 95, 108, 48, 57, 65, 
-	90, 97, 122, 95, 117, 48, 57, 65, 
-	90, 97, 122, 95, 114, 48, 57, 65, 
-	90, 97, 122, 95, 101, 105, 116, 119, 
-	48, 57, 65, 90, 97, 122, 95, 103, 
-	108, 122, 48, 57, 65, 90, 97, 121, 
-	95, 110, 48, 57, 65, 90, 97, 122, 
-	95, 101, 48, 57, 65, 90, 97, 122, 
-	95, 111, 48, 57, 65, 90, 97, 122, 
-	95, 102, 48, 57, 65, 90, 97, 122, 
-	95, 97, 100, 114, 48, 57, 65, 90, 
-	98, 122, 95, 99, 116, 48, 57, 65, 
-	90, 97, 122, 95, 99, 48, 57, 65, 
-	90, 97, 122, 95, 97, 48, 57, 65, 
-	90, 98, 122, 95, 108, 48, 57, 65, 
-	90, 97, 122, 95, 105, 48, 57, 65, 
-	90, 97, 122, 95, 116, 48, 57, 65, 
-	90, 97, 122, 95, 99, 48, 57, 65, 
-	90, 97, 122, 95, 104, 48, 57, 65, 
-	90, 97, 122, 95, 104, 114, 121, 48, 
-	57, 65, 90, 97, 122, 95, 105, 114, 
-	48, 57, 65, 90, 97, 122, 95, 110, 
-	115, 48, 57, 65, 90, 97, 122, 95, 
-	101, 48, 57, 65, 90, 97, 122, 95, 
-	97, 48, 57, 65, 90, 98, 122, 95, 
-	112, 48, 57, 65, 90, 97, 122, 95, 
-	101, 48, 57, 65, 90, 97, 122, 95, 
-	100, 111, 48, 57, 65, 90, 97, 122, 
-	95, 101, 48, 57, 65, 90, 97, 122, 
-	95, 104, 110, 115, 48, 57, 65, 90, 
-	97, 122, 95, 105, 115, 48, 57, 65, 
-	90, 97, 122, 95, 97, 105, 48, 57, 
-	65, 90, 98, 122, 95, 102, 48, 57, 
-	65, 90, 97, 122, 95, 103, 48, 57, 
-	65, 90, 97, 122, 95, 105, 48, 57, 
+	97, 122, 95, 99, 101, 108, 48, 57, 
+	65, 90, 97, 122, 95, 111, 48, 57, 
 	65, 90, 97, 122, 95, 110, 48, 57, 
-	65, 90, 97, 122, 95, 103, 48, 57, 
-	65, 90, 97, 122, 95, 97, 105, 111, 
-	48, 57, 65, 90, 98, 122, 95, 114, 
+	65, 90, 97, 122, 95, 118, 48, 57, 
+	65, 90, 97, 122, 95, 105, 48, 57, 
+	65, 90, 97, 122, 95, 101, 48, 57, 
+	65, 90, 97, 122, 95, 116, 48, 57, 
+	65, 90, 97, 122, 95, 117, 48, 57, 
+	65, 90, 97, 122, 95, 114, 48, 57, 
+	65, 90, 97, 122, 95, 101, 105, 116, 
+	119, 48, 57, 65, 90, 97, 122, 95, 
+	103, 108, 122, 48, 57, 65, 90, 97, 
+	121, 95, 110, 48, 57, 65, 90, 97, 
+	122, 95, 101, 48, 57, 65, 90, 97, 
+	122, 95, 111, 48, 57, 65, 90, 97, 
+	122, 95, 102, 48, 57, 65, 90, 97, 
+	122, 95, 97, 100, 114, 48, 57, 65, 
+	90, 98, 122, 95, 99, 116, 48, 57, 
+	65, 90, 97, 122, 95, 99, 48, 57, 
+	65, 90, 97, 122, 95, 97, 48, 57, 
+	65, 90, 98, 122, 95, 108, 48, 57, 
+	65, 90, 97, 122, 95, 105, 48, 57, 
+	65, 90, 97, 122, 95, 116, 48, 57, 
+	65, 90, 97, 122, 95, 99, 48, 57, 
+	65, 90, 97, 122, 95, 104, 48, 57, 
+	65, 90, 97, 122, 95, 104, 114, 121, 
 	48, 57, 65, 90, 97, 122, 95, 105, 
-	48, 57, 65, 90, 97, 122, 95, 97, 
-	48, 57, 65, 90, 98, 122, 95, 114, 
-	48, 57, 65, 90, 97, 122, 95, 116, 
-	48, 57, 65, 90, 97, 122, 95, 117, 
-	48, 57, 65, 90, 97, 122, 95, 97, 
-	48, 57, 65, 90, 98, 122, 95, 105, 
-	108, 48, 57, 65, 90, 97, 122, 95, 
-	97, 48, 57, 65, 90, 98, 122, 95, 
-	116, 48, 57, 65, 90, 97, 122, 95, 
+	114, 48, 57, 65, 90, 97, 122, 95, 
+	110, 115, 48, 57, 65, 90, 97, 122, 
+	95, 101, 48, 57, 65, 90, 97, 122, 
+	95, 97, 48, 57, 65, 90, 98, 122, 
+	95, 112, 48, 57, 65, 90, 97, 122, 
+	95, 101, 48, 57, 65, 90, 97, 122, 
+	95, 100, 111, 48, 57, 65, 90, 97, 
+	122, 95, 101, 48, 57, 65, 90, 97, 
+	122, 95, 104, 110, 115, 48, 57, 65, 
+	90, 97, 122, 95, 105, 115, 48, 57, 
+	65, 90, 97, 122, 95, 97, 105, 48, 
+	57, 65, 90, 98, 122, 95, 102, 48, 
+	57, 65, 90, 97, 122, 95, 103, 48, 
+	57, 65, 90, 97, 122, 95, 105, 48, 
+	57, 65, 90, 97, 122, 95, 110, 48, 
+	57, 65, 90, 97, 122, 95, 103, 48, 
+	57, 65, 90, 97, 122, 95, 97, 105, 
+	111, 48, 57, 65, 90, 98, 122, 95, 
+	114, 48, 57, 65, 90, 97, 122, 95, 
 	105, 48, 57, 65, 90, 97, 122, 95, 
-	101, 104, 48, 57, 65, 90, 97, 122, 
-	10, 42, 47, 0
+	97, 48, 57, 65, 90, 98, 122, 95, 
+	114, 48, 57, 65, 90, 97, 122, 95, 
+	116, 48, 57, 65, 90, 97, 122, 95, 
+	117, 48, 57, 65, 90, 97, 122, 95, 
+	97, 48, 57, 65, 90, 98, 122, 95, 
+	105, 108, 48, 57, 65, 90, 97, 122, 
+	95, 97, 48, 57, 65, 90, 98, 122, 
+	95, 116, 48, 57, 65, 90, 97, 122, 
+	95, 105, 48, 57, 65, 90, 97, 122, 
+	95, 101, 104, 48, 57, 65, 90, 97, 
+	122, 10, 42, 47, 0
 };
 
 static const char _jancy_lexer_single_lengths[] = {
@@ -301,14 +300,14 @@ static const char _jancy_lexer_single_lengths[] = {
 	2, 2, 5, 2, 2, 2, 2, 2, 
 	2, 3, 2, 2, 2, 2, 3, 3, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 2, 2, 2, 3, 2, 2, 2, 
-	2, 2, 2, 5, 4, 2, 2, 2, 
-	2, 4, 3, 2, 2, 2, 2, 2, 
-	2, 2, 4, 3, 3, 2, 2, 2, 
-	2, 3, 2, 4, 3, 3, 2, 2, 
-	2, 2, 2, 4, 2, 2, 2, 2, 
-	2, 2, 2, 3, 2, 2, 2, 3, 
-	2, 1
+	2, 4, 2, 2, 2, 2, 2, 2, 
+	2, 2, 5, 4, 2, 2, 2, 2, 
+	4, 3, 2, 2, 2, 2, 2, 2, 
+	2, 4, 3, 3, 2, 2, 2, 2, 
+	3, 2, 4, 3, 3, 2, 2, 2, 
+	2, 2, 4, 2, 2, 2, 2, 2, 
+	2, 2, 3, 2, 2, 2, 3, 2, 
+	1
 };
 
 static const char _jancy_lexer_range_lengths[] = {
@@ -339,8 +338,8 @@ static const char _jancy_lexer_range_lengths[] = {
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
-	3, 3, 3, 3, 3, 3, 3, 3, 
-	0, 0
+	3, 3, 3, 3, 3, 3, 3, 0, 
+	0
 };
 
 static const short _jancy_lexer_index_offsets[] = {
@@ -365,14 +364,14 @@ static const short _jancy_lexer_index_offsets[] = {
 	874, 880, 886, 895, 901, 907, 913, 919, 
 	925, 931, 938, 944, 950, 956, 962, 969, 
 	976, 982, 988, 994, 1000, 1006, 1012, 1018, 
-	1024, 1030, 1036, 1042, 1048, 1055, 1061, 1067, 
-	1073, 1079, 1085, 1091, 1100, 1108, 1114, 1120, 
-	1126, 1132, 1140, 1147, 1153, 1159, 1165, 1171, 
-	1177, 1183, 1189, 1197, 1204, 1211, 1217, 1223, 
-	1229, 1235, 1242, 1248, 1256, 1263, 1270, 1276, 
-	1282, 1288, 1294, 1300, 1308, 1314, 1320, 1326, 
-	1332, 1338, 1344, 1350, 1357, 1363, 1369, 1375, 
-	1382, 1385
+	1024, 1030, 1038, 1044, 1050, 1056, 1062, 1068, 
+	1074, 1080, 1086, 1095, 1103, 1109, 1115, 1121, 
+	1127, 1135, 1142, 1148, 1154, 1160, 1166, 1172, 
+	1178, 1184, 1192, 1199, 1206, 1212, 1218, 1224, 
+	1230, 1237, 1243, 1251, 1258, 1265, 1271, 1277, 
+	1283, 1289, 1295, 1303, 1309, 1315, 1321, 1327, 
+	1333, 1339, 1345, 1352, 1358, 1364, 1370, 1377, 
+	1380
 };
 
 static const unsigned char _jancy_lexer_indicies[] = {
@@ -505,51 +504,50 @@ static const unsigned char _jancy_lexer_indicies[] = {
 	23, 23, 23, 54, 23, 194, 23, 23, 
 	23, 54, 23, 135, 23, 23, 23, 54, 
 	23, 195, 23, 23, 23, 54, 23, 196, 
-	23, 23, 23, 54, 23, 197, 23, 23, 
-	23, 54, 23, 198, 23, 23, 23, 54, 
-	23, 199, 200, 23, 23, 23, 54, 23, 
-	201, 23, 23, 23, 54, 23, 202, 23, 
-	23, 23, 54, 23, 203, 23, 23, 23, 
-	54, 23, 191, 23, 23, 23, 54, 23, 
-	204, 23, 23, 23, 54, 23, 79, 23, 
-	23, 23, 54, 23, 62, 205, 206, 207, 
-	23, 23, 23, 54, 23, 208, 112, 209, 
-	23, 23, 23, 54, 23, 135, 23, 23, 
-	23, 54, 23, 210, 23, 23, 23, 54, 
-	23, 211, 23, 23, 23, 54, 23, 63, 
-	23, 23, 23, 54, 23, 212, 213, 99, 
-	23, 23, 23, 54, 23, 86, 196, 23, 
-	23, 23, 54, 23, 214, 23, 23, 23, 
-	54, 23, 215, 23, 23, 23, 54, 23, 
-	84, 23, 23, 23, 54, 23, 216, 23, 
-	23, 23, 54, 23, 217, 23, 23, 23, 
-	54, 23, 218, 23, 23, 23, 54, 23, 
-	63, 23, 23, 23, 54, 23, 219, 101, 
-	220, 23, 23, 23, 54, 23, 221, 222, 
-	23, 23, 23, 54, 23, 63, 63, 23, 
-	23, 23, 54, 23, 223, 23, 23, 23, 
-	54, 23, 119, 23, 23, 23, 54, 23, 
-	224, 23, 23, 23, 54, 23, 225, 23, 
-	23, 23, 54, 23, 226, 211, 23, 23, 
-	23, 54, 23, 211, 23, 23, 23, 54, 
-	23, 31, 227, 228, 23, 23, 23, 54, 
-	23, 128, 229, 23, 23, 23, 54, 23, 
-	230, 231, 23, 23, 23, 54, 23, 83, 
-	23, 23, 23, 54, 23, 208, 23, 23, 
-	23, 54, 23, 232, 23, 23, 23, 54, 
-	23, 233, 23, 23, 23, 54, 23, 63, 
-	23, 23, 23, 54, 23, 234, 235, 236, 
-	23, 23, 23, 54, 23, 237, 23, 23, 
-	23, 54, 23, 238, 23, 23, 23, 54, 
-	23, 116, 23, 23, 23, 54, 23, 239, 
-	23, 23, 23, 54, 23, 240, 23, 23, 
-	23, 54, 23, 241, 23, 23, 23, 54, 
-	23, 84, 23, 23, 23, 54, 23, 119, 
-	242, 23, 23, 23, 54, 23, 243, 23, 
-	23, 23, 54, 23, 244, 23, 23, 23, 
-	54, 23, 82, 23, 23, 23, 54, 23, 
-	85, 244, 23, 23, 23, 54, 246, 247, 
-	245, 249, 248, 0
+	197, 198, 23, 23, 23, 54, 23, 199, 
+	23, 23, 23, 54, 23, 145, 23, 23, 
+	23, 54, 23, 112, 23, 23, 23, 54, 
+	23, 200, 23, 23, 23, 54, 23, 201, 
+	23, 23, 23, 54, 23, 202, 23, 23, 
+	23, 54, 23, 203, 23, 23, 23, 54, 
+	23, 79, 23, 23, 23, 54, 23, 62, 
+	204, 205, 206, 23, 23, 23, 54, 23, 
+	207, 112, 208, 23, 23, 23, 54, 23, 
+	135, 23, 23, 23, 54, 23, 209, 23, 
+	23, 23, 54, 23, 210, 23, 23, 23, 
+	54, 23, 63, 23, 23, 23, 54, 23, 
+	211, 212, 99, 23, 23, 23, 54, 23, 
+	86, 198, 23, 23, 23, 54, 23, 213, 
+	23, 23, 23, 54, 23, 214, 23, 23, 
+	23, 54, 23, 84, 23, 23, 23, 54, 
+	23, 215, 23, 23, 23, 54, 23, 216, 
+	23, 23, 23, 54, 23, 217, 23, 23, 
+	23, 54, 23, 63, 23, 23, 23, 54, 
+	23, 218, 101, 219, 23, 23, 23, 54, 
+	23, 220, 221, 23, 23, 23, 54, 23, 
+	63, 63, 23, 23, 23, 54, 23, 222, 
+	23, 23, 23, 54, 23, 119, 23, 23, 
+	23, 54, 23, 223, 23, 23, 23, 54, 
+	23, 224, 23, 23, 23, 54, 23, 225, 
+	210, 23, 23, 23, 54, 23, 210, 23, 
+	23, 23, 54, 23, 31, 226, 227, 23, 
+	23, 23, 54, 23, 128, 228, 23, 23, 
+	23, 54, 23, 229, 230, 23, 23, 23, 
+	54, 23, 83, 23, 23, 23, 54, 23, 
+	207, 23, 23, 23, 54, 23, 231, 23, 
+	23, 23, 54, 23, 232, 23, 23, 23, 
+	54, 23, 63, 23, 23, 23, 54, 23, 
+	233, 234, 235, 23, 23, 23, 54, 23, 
+	236, 23, 23, 23, 54, 23, 237, 23, 
+	23, 23, 54, 23, 116, 23, 23, 23, 
+	54, 23, 238, 23, 23, 23, 54, 23, 
+	239, 23, 23, 23, 54, 23, 240, 23, 
+	23, 23, 54, 23, 84, 23, 23, 23, 
+	54, 23, 119, 241, 23, 23, 23, 54, 
+	23, 242, 23, 23, 23, 54, 23, 243, 
+	23, 23, 23, 54, 23, 82, 23, 23, 
+	23, 54, 23, 85, 243, 23, 23, 23, 
+	54, 245, 246, 244, 248, 247, 0
 };
 
 static const unsigned char _jancy_lexer_trans_targs[] = {
@@ -557,8 +555,8 @@ static const unsigned char _jancy_lexer_trans_targs[] = {
 	12, 5, 4, 18, 5, 17, 5, 6, 
 	5, 7, 9, 11, 13, 15, 16, 19, 
 	20, 35, 53, 69, 78, 88, 34, 98, 
-	101, 111, 118, 128, 146, 171, 179, 194, 
-	203, 211, 223, 5, 5, 5, 5, 5, 
+	101, 111, 118, 128, 146, 174, 178, 193, 
+	202, 210, 222, 5, 5, 5, 5, 5, 
 	14, 5, 5, 3, 5, 5, 5, 21, 
 	27, 30, 22, 23, 24, 25, 26, 19, 
 	28, 29, 31, 32, 5, 33, 36, 48, 
@@ -577,14 +575,14 @@ static const unsigned char _jancy_lexer_trans_targs[] = {
 	140, 142, 143, 144, 145, 147, 148, 153, 
 	168, 149, 150, 151, 152, 154, 158, 155, 
 	156, 157, 159, 165, 160, 163, 161, 162, 
-	164, 166, 167, 169, 170, 81, 172, 173, 
-	177, 174, 175, 176, 178, 180, 185, 190, 
-	181, 182, 183, 184, 186, 187, 188, 189, 
-	191, 192, 193, 195, 199, 196, 197, 198, 
-	200, 201, 202, 204, 208, 205, 206, 207, 
-	209, 210, 212, 215, 219, 213, 214, 216, 
-	217, 218, 220, 221, 222, 224, 224, 225, 
-	224, 224
+	164, 166, 167, 169, 170, 172, 173, 171, 
+	81, 175, 176, 177, 179, 184, 189, 180, 
+	181, 182, 183, 185, 186, 187, 188, 190, 
+	191, 192, 194, 198, 195, 196, 197, 199, 
+	200, 201, 203, 207, 204, 205, 206, 208, 
+	209, 211, 214, 218, 212, 213, 215, 216, 
+	217, 219, 220, 221, 223, 223, 224, 223, 
+	223
 };
 
 static const char _jancy_lexer_trans_actions[] = {
@@ -612,14 +610,14 @@ static const char _jancy_lexer_trans_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 52, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	52, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 43, 41, 0, 
-	47, 45
+	0, 0, 0, 0, 43, 41, 0, 47, 
+	45
 };
 
 static const char _jancy_lexer_to_state_actions[] = {
@@ -650,8 +648,8 @@ static const char _jancy_lexer_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	1, 0
+	0, 0, 0, 0, 0, 0, 0, 1, 
+	0
 };
 
 static const char _jancy_lexer_from_state_actions[] = {
@@ -682,8 +680,8 @@ static const char _jancy_lexer_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	3, 0
+	0, 0, 0, 0, 0, 0, 0, 3, 
+	0
 };
 
 static const short _jancy_lexer_eof_trans[] = {
@@ -714,8 +712,8 @@ static const short _jancy_lexer_eof_trans[] = {
 	55, 55, 55, 55, 55, 55, 55, 55, 
 	55, 55, 55, 55, 55, 55, 55, 55, 
 	55, 55, 55, 55, 55, 55, 55, 55, 
-	55, 55, 55, 55, 55, 55, 55, 55, 
-	0, 249
+	55, 55, 55, 55, 55, 55, 55, 0, 
+	248
 };
 
 static const int jancy_lexer_start = 5;
@@ -723,10 +721,10 @@ static const int jancy_lexer_first_final = 5;
 static const int jancy_lexer_error = -1;
 
 static const int jancy_lexer_en_main = 5;
-static const int jancy_lexer_en_comment = 224;
+static const int jancy_lexer_en_comment = 223;
 
 
-/* #line 169 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 170 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 
 
 //.............................................................................
@@ -737,7 +735,7 @@ static const int jancy_lexer_en_comment = 224;
 void JancyHighlighter::ragelInit()
 {
 	
-/* #line 719 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 717 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 	{
 	cs = jancy_lexer_start;
 	ts = 0;
@@ -745,13 +743,13 @@ void JancyHighlighter::ragelInit()
 	act = 0;
 	}
 
-/* #line 179 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 180 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 }
 
 void JancyHighlighter::ragelExec()
 {
 	
-/* #line 725 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 723 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 	{
 	int _klen;
 	unsigned int _trans;
@@ -770,7 +768,7 @@ _resume:
 /* #line 1 "NONE" */
 	{ts = p;}
 	break;
-/* #line 742 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 740 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 		}
 	}
 
@@ -841,99 +839,99 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 3:
-/* #line 135 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 136 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 1;}
 	break;
 	case 4:
-/* #line 139 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 2;}
 	break;
 	case 5:
-/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 3;}
 	break;
 	case 6:
-/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 142 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 4;}
 	break;
 	case 7:
-/* #line 143 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 6;}
 	break;
 	case 8:
-/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 145 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 7;}
 	break;
 	case 9:
-/* #line 152 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 153 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{act = 11;}
 	break;
 	case 10:
-/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 11:
-/* #line 143 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 12:
-/* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 145 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 13:
-/* #line 148 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
-	{te = p+1;{ colorize(ts, te, Qt::darkGreen); {cs = 224; goto _again;} }}
+/* #line 149 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+	{te = p+1;{ colorize(ts, te, Qt::darkGreen); {cs = 223; goto _again;} }}
 	break;
 	case 14:
-/* #line 150 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 151 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;}
 	break;
 	case 15:
-/* #line 152 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 153 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{  }}
 	break;
 	case 16:
-/* #line 135 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 136 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::blue); }}
 	break;
 	case 17:
-/* #line 139 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{  }}
 	break;
 	case 18:
-/* #line 140 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 19:
-/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
-	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
-	break;
-	case 20:
 /* #line 142 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
-	case 21:
+	case 20:
 /* #line 143 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
-	case 22:
+	case 21:
 /* #line 144 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
 	break;
+	case 22:
+/* #line 145 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+	{te = p;p--;{ colorize(ts, te, Qt::darkRed); }}
+	break;
 	case 23:
-/* #line 146 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 147 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 24:
-/* #line 150 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 151 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;}
 	break;
 	case 25:
-/* #line 152 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 153 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{  }}
 	break;
 	case 26:
-/* #line 141 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 142 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{{p = ((te))-1;}{ colorize(ts, te, Qt::darkRed); }}
 	break;
 	case 27:
@@ -964,22 +962,22 @@ _eof_trans:
 	}
 	break;
 	case 28:
-/* #line 163 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 164 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 29:
-/* #line 164 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 165 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
 	case 30:
-/* #line 165 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 166 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p+1;{ colorize(ts, te, Qt::darkGreen); {cs = 5; goto _again;} }}
 	break;
 	case 31:
-/* #line 164 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 165 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 	{te = p;p--;{ colorize(ts, te, Qt::darkGreen); }}
 	break;
-/* #line 920 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 918 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 		}
 	}
 
@@ -992,7 +990,7 @@ _again:
 /* #line 1 "NONE" */
 	{ts = 0;}
 	break;
-/* #line 931 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
+/* #line 929 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl.cpp" */
 		}
 	}
 
@@ -1009,7 +1007,7 @@ _again:
 
 	}
 
-/* #line 184 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
+/* #line 185 "D:/Prj/Ninja/axl/src/tests/JncQtTest/jancyhighlighter.rl" */
 }
 
 int JancyHighlighter::getRagelState(int blockState)

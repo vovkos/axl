@@ -53,6 +53,7 @@ CTypeMgr::Clear ()
 	m_ClassPtrTypeTupleList.Clear ();
 	m_FunctionPtrTypeTupleList.Clear ();
 	m_PropertyPtrTypeTupleList.Clear ();
+	m_DualPtrTypeTupleList.Clear ();
 
 	m_FunctionArgList.Clear ();
 	m_TypedefList.Clear ();
@@ -1103,6 +1104,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	pType->m_FieldArray [EMulticastField_HandleTable] = pType->CreateField (GetPrimitiveType (EType_Int_p));
 
 	CType* pArgType;
+	CFunction* pMethod;
 	CFunctionType* pMethodType;	
 
 	bool IsThin = pFunctionPtrType->GetPtrTypeKind () == EFunctionPtrType_Thin;
@@ -1110,31 +1112,43 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	// methods
 
 	pMethodType = GetFunctionType (NULL, NULL, 0);
-	pType->m_MethodArray [EMulticastMethod_Clear] = pType->CreateMethod (EStorage_Member, "Clear", pMethodType);
-	pType->m_MethodArray [EMulticastMethod_Clear]->m_Tag = "jnc.MulticastClear";
+	pMethod = pType->CreateMethod (EStorage_Member, "Clear", pMethodType);
+	pMethod->m_Tag = "jnc.MulticastClear";
+	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
+	pType->m_MethodArray [EMulticastMethod_Clear] = pMethod;
 	
 	pReturnType = GetPrimitiveType (EType_Int_p);
 	pArgType = pFunctionPtrType;
 	pMethodType = GetFunctionType (pReturnType, &pArgType, 1);
 
-	pType->m_MethodArray [EMulticastMethod_Set] = pType->CreateMethod (EStorage_Member, "Set", pMethodType);
-	pType->m_MethodArray [EMulticastMethod_Set]->m_Tag = IsThin ? "jnc.MulticastSet_t" : "jnc.MulticastSet";
-	pType->m_MethodArray [EMulticastMethod_Add] = pType->CreateMethod (EStorage_Member, "Add", pMethodType);
-	pType->m_MethodArray [EMulticastMethod_Add]->m_Tag = IsThin ? "jnc.MulticastAdd_t" : "jnc.MulticastAdd";
+	pMethod = pType->CreateMethod (EStorage_Member, "Set", pMethodType);
+	pMethod->m_Tag = IsThin ? "jnc.MulticastSet_t" : "jnc.MulticastSet";
+	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
+	pType->m_MethodArray [EMulticastMethod_Set] = pMethod;
+
+
+	pMethod = pType->CreateMethod (EStorage_Member, "Add", pMethodType);
+	pMethod->m_Tag = IsThin ? "jnc.MulticastAdd_t" : "jnc.MulticastAdd";
+	pType->m_MethodArray [EMulticastMethod_Add] = pMethod;
 
 	pReturnType = pFunctionPtrType;
 	pArgType = GetPrimitiveType (EType_Int_p);
 	pMethodType = GetFunctionType (pReturnType, &pArgType, 1);
-	pType->m_MethodArray [EMulticastMethod_Remove] = pType->CreateMethod (EStorage_Member, "Remove", pMethodType);
-	pType->m_MethodArray [EMulticastMethod_Remove]->m_Tag = IsThin ? "jnc.MulticastRemove_t" : "jnc.MulticastRemove";
+	pMethod = pType->CreateMethod (EStorage_Member, "Remove", pMethodType);
+	pMethod->m_Tag = IsThin ? "jnc.MulticastRemove_t" : "jnc.MulticastRemove";
+	pType->m_MethodArray [EMulticastMethod_Remove] = pMethod;
 
 	pReturnType = pFunctionPtrType->GetTargetType ()->GetFunctionPtrType ();
 	pMethodType = GetFunctionType (pReturnType, NULL, 0);
-	pType->m_MethodArray [EMulticastMethod_GetSnapshot] = pType->CreateMethod (EStorage_Member, "GetSnapshot", pMethodType);
-	pType->m_MethodArray [EMulticastMethod_GetSnapshot]->m_Tag = "jnc.MulticastGetSnapshot";
+	pMethod = pType->CreateMethod (EStorage_Member, "GetSnapshot", pMethodType);
+	pMethod->m_Tag = "jnc.MulticastGetSnapshot";
+	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
+	pType->m_MethodArray [EMulticastMethod_GetSnapshot] = pMethod;
 
 	pMethodType = pFunctionPtrType->GetTargetType ();
-	pType->m_MethodArray [EMulticastMethod_Call] = pType->CreateMethod (EStorage_Member, "Call", pMethodType);
+	pMethod = pType->CreateMethod (EStorage_Member, "Call", pMethodType);
+	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
+	pType->m_MethodArray [EMulticastMethod_Call] = pMethod;
 
 	// overloaded operators
 
@@ -1388,16 +1402,15 @@ CTypeMgr::GetDataClosureClassType (
 
 CDataPtrType* 
 CTypeMgr::GetDataPtrType (
+	CNamespace* pAnchorNamespace,
 	CType* pDataType,
 	EType TypeKind,
 	EDataPtrType PtrTypeKind,
 	uint_t Flags
 	)
 {
-	ASSERT (TypeKind == EType_DataPtr || TypeKind == EType_DataRef);
 	ASSERT ((size_t) PtrTypeKind < EDataPtrType__Count);
 	ASSERT (pDataType->GetTypeKind () != EType_NamedImport); // for imports, GetImportPtrType () should be called
-
 	ASSERT (TypeKind != EType_DataRef || pDataType->m_TypeKind != EType_DataRef); // dbl reference
 	
 	if (Flags & EPtrTypeFlag_Unsafe)
@@ -1405,9 +1418,19 @@ CTypeMgr::GetDataPtrType (
 	else if (TypeKind == EType_DataPtr && PtrTypeKind == EDataPtrType_Normal)
 		Flags |= ETypeFlag_GcRoot;
 
-	TDataPtrTypeTuple* pTuple = GetDataPtrTypeTuple (pDataType);
-	
-	// ref x ptrkind x volatile x const x checked
+	TDataPtrTypeTuple* pTuple;
+
+	if (Flags & EPtrTypeFlag_PubConst)
+	{
+		ASSERT (pAnchorNamespace != NULL);
+		pTuple = GetPubConstDataPtrTypeTuple (pAnchorNamespace, pDataType);
+	}
+	else
+	{
+		pTuple = GetDataPtrTypeTuple (pDataType);
+	}
+
+	// ref x ptrkind x const x volatile x unsafe / checked
 
 	size_t i1 = TypeKind == EType_DataRef;
 	size_t i2 = PtrTypeKind;
@@ -1428,6 +1451,7 @@ CTypeMgr::GetDataPtrType (
 	pType->m_Size = Size;
 	pType->m_AlignFactor = sizeof (void*);
 	pType->m_pTargetType = pDataType;
+	pType->m_pAnchorNamespace = (Flags & EPtrTypeFlag_PubConst) ? pAnchorNamespace : NULL;
 	pType->m_Flags = Flags;
 
 	m_DataPtrTypeList.InsertTail (pType);
@@ -1456,6 +1480,7 @@ CTypeMgr::GetDataPtrStructType (CType* pDataType)
 
 CClassPtrType* 
 CTypeMgr::GetClassPtrType (
+	CNamespace* pAnchorNamespace,
 	CClassType* pClassType,
 	EType TypeKind,
 	EClassPtrType PtrTypeKind,
@@ -1463,22 +1488,43 @@ CTypeMgr::GetClassPtrType (
 	)
 {
 	ASSERT ((size_t) PtrTypeKind < EClassPtrType__Count);
+	ASSERT (!(Flags & (EPtrTypeFlag_PubConst | EPtrTypeFlag_PubEvent)) || pAnchorNamespace != NULL);
 
 	if (Flags & EPtrTypeFlag_Unsafe)
 		Flags |= ETypeFlag_Pod;
 	else if (TypeKind == EType_ClassPtr)
 		Flags |= ETypeFlag_GcRoot;
 
-	TClassPtrTypeTuple* pTuple = GetClassPtrTypeTuple (pClassType);
+	TClassPtrTypeTuple* pTuple;
 
-	// ref x ptrkind x const x checked
+	if (Flags & EPtrTypeFlag_PubConst)
+	{
+		ASSERT (pAnchorNamespace != NULL);
+		pTuple = GetPubConstClassPtrTypeTuple (pAnchorNamespace, pClassType);
+	}
+	else if (Flags & EPtrTypeFlag_PubEvent)
+	{
+		ASSERT (pAnchorNamespace != NULL && pClassType->GetClassTypeKind () == EClassType_Multicast);
+		pTuple = GetPubEventClassPtrTypeTuple (pAnchorNamespace, (CMulticastClassType*) pClassType);
+	}
+	else if (Flags & EPtrTypeFlag_Event)
+	{
+		ASSERT (pClassType->GetClassTypeKind () == EClassType_Multicast);
+		pTuple = GetEventClassPtrTypeTuple ((CMulticastClassType*) pClassType);
+	}
+	else
+	{
+		pTuple = GetClassPtrTypeTuple (pClassType);
+	}
+
+	// ref x ptrkind x const x volatile x unsafe / checked
 
 	size_t i1 = TypeKind == EType_ClassRef;
 	size_t i2 = PtrTypeKind;
 	size_t i3 = (Flags & EPtrTypeFlag_Const) ? 0 : 1;
 	size_t i4 = (Flags & EPtrTypeFlag_Volatile) ? 0 : 1;
 	size_t i5 = (Flags & EPtrTypeFlag_Unsafe) ? 0 : (Flags & EPtrTypeFlag_Checked) ? 1 : 2;
-		
+
 	if (pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5])
 		return pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5];
 
@@ -1488,10 +1534,11 @@ CTypeMgr::GetClassPtrType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_PtrTypeKind = PtrTypeKind;
 	pType->m_pTargetType = pClassType;
+	pType->m_pAnchorNamespace = (Flags & (EPtrTypeFlag_PubConst | EPtrTypeFlag_PubEvent)) ? pAnchorNamespace : NULL;
 	pType->m_Flags = Flags;
 
 	m_ClassPtrTypeList.InsertTail (pType);
-	pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5] = pType;	
+	pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5] = pType;
 	return pType;
 }
 
@@ -1796,6 +1843,23 @@ CTypeMgr::GetGcShadowStackFrameType (size_t RootCount)
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+TDualPtrTypeTuple*
+CTypeMgr::GetDualPtrTypeTuple (
+	CNamespace* pAnchorNamespace,
+	CType* pType
+	)
+{
+	rtl::CString Signature = pType->GetSignature ();
+	rtl::CStringHashTableMapIteratorT <TDualPtrTypeTuple*> It = pAnchorNamespace->m_DualPtrTypeTupleMap.Goto (Signature);
+	if (It->m_Value)
+		return It->m_Value;
+
+	TDualPtrTypeTuple* pDualPtrTypeTuple = AXL_MEM_NEW (TDualPtrTypeTuple);
+	m_DualPtrTypeTupleList.InsertTail (pDualPtrTypeTuple);
+	It->m_Value = pDualPtrTypeTuple;
+	return pDualPtrTypeTuple;
+}
+
 TSimplePropertyTypeTuple*
 CTypeMgr::GetSimplePropertyTypeTuple (CType* pType)
 {
@@ -1832,6 +1896,22 @@ CTypeMgr::GetDataPtrTypeTuple (CType* pType)
 	return pTuple;
 }
 
+TDataPtrTypeTuple*
+CTypeMgr::GetPubConstDataPtrTypeTuple (
+	CNamespace* pAnchorNamespace,
+	CType* pType
+	)
+{
+	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pType);
+	if (pDualPtrTypeTuple->m_pPubConstDataPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pPubConstDataPtrTypeTuple;
+
+	TDataPtrTypeTuple* pTuple = AXL_MEM_NEW (TDataPtrTypeTuple);
+	pDualPtrTypeTuple->m_pPubConstDataPtrTypeTuple = pTuple;
+	m_DataPtrTypeTupleList.InsertTail (pTuple);
+	return pTuple;
+}
+
 TClassPtrTypeTuple*
 CTypeMgr::GetClassPtrTypeTuple (CClassType* pClassType)
 {
@@ -1840,6 +1920,50 @@ CTypeMgr::GetClassPtrTypeTuple (CClassType* pClassType)
 
 	TClassPtrTypeTuple* pTuple = AXL_MEM_NEW (TClassPtrTypeTuple);
 	pClassType->m_pClassPtrTypeTuple = pTuple;
+	m_ClassPtrTypeTupleList.InsertTail (pTuple);
+	return pTuple;
+}
+
+TClassPtrTypeTuple*
+CTypeMgr::GetPubConstClassPtrTypeTuple (
+	CNamespace* pAnchorNamespace,
+	CClassType* pClassType
+	)
+{
+	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pClassType);
+	if (pDualPtrTypeTuple->m_pPubConstClassPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pPubConstClassPtrTypeTuple;
+
+	TClassPtrTypeTuple* pTuple = AXL_MEM_NEW (TClassPtrTypeTuple);
+	pDualPtrTypeTuple->m_pPubConstClassPtrTypeTuple = pTuple;
+	m_ClassPtrTypeTupleList.InsertTail (pTuple);
+	return pTuple;
+}
+
+TClassPtrTypeTuple*
+CTypeMgr::GetEventClassPtrTypeTuple (CMulticastClassType* pClassType)
+{
+	if (pClassType->m_pEventClassPtrTypeTuple)
+		return pClassType->m_pEventClassPtrTypeTuple;
+
+	TClassPtrTypeTuple* pTuple = AXL_MEM_NEW (TClassPtrTypeTuple);
+	pClassType->m_pEventClassPtrTypeTuple = pTuple;
+	m_ClassPtrTypeTupleList.InsertTail (pTuple);
+	return pTuple;
+}
+
+TClassPtrTypeTuple*
+CTypeMgr::GetPubEventClassPtrTypeTuple (
+	CNamespace* pAnchorNamespace,
+	CMulticastClassType* pClassType
+	)
+{
+	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pClassType);
+	if (pDualPtrTypeTuple->m_pPubEventClassPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pPubEventClassPtrTypeTuple;
+
+	TClassPtrTypeTuple* pTuple = AXL_MEM_NEW (TClassPtrTypeTuple);
+	pDualPtrTypeTuple->m_pPubEventClassPtrTypeTuple = pTuple;
 	m_ClassPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }

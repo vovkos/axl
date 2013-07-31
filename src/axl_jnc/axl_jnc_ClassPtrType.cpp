@@ -29,8 +29,27 @@ CClassPtrType::CClassPtrType ()
 	m_TypeKind = EType_ClassPtr;
 	m_PtrTypeKind = EClassPtrType_Normal;
 	m_pTargetType = NULL;
+	m_pAnchorNamespace = NULL;
 	m_Size = sizeof (void*);
 	m_AlignFactor = sizeof (void*);
+}
+
+bool
+CClassPtrType::IsConstPtrType ()
+{
+	return 
+		(m_Flags & EPtrTypeFlag_Const) != 0 || 
+		(m_Flags & EPtrTypeFlag_PubConst) != 0 && 
+		m_pModule->m_NamespaceMgr.GetAccessKind (m_pAnchorNamespace) == EAccess_Public;
+}
+
+bool
+CClassPtrType::IsEventPtrType ()
+{
+	return 
+		(m_Flags & EPtrTypeFlag_Event) != 0 || 
+		(m_Flags & EPtrTypeFlag_PubEvent) != 0 && 
+		m_pModule->m_NamespaceMgr.GetAccessKind (m_pAnchorNamespace) == EAccess_Public;
 }
 
 rtl::CString
