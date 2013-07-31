@@ -2,12 +2,23 @@
 
 namespace a {
 
-event OnClick ();
+pubconst int property s_MyProp;
 
-bar ()
+int 
+s_MyProp.get ()
 {
+	printf ("s_MyProp.get ()\n");
+	return 0;
+}
 
-	OnClick.Call ();
+s_MyProp.set (int x)
+{
+	printf ("s_MyProp.get (%x)\n", x);
+}
+
+foo ()
+{
+	s_MyProp = 100;
 }
 
 }
@@ -17,7 +28,7 @@ main ()
 {
 	printf ("main ()\n");
 
-	a.OnClick.Call ();
+	a.s_MyProp = 100;
 
 	return 10; 
 }

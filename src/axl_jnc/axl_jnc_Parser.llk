@@ -196,7 +196,7 @@ Members2
 	DeclareProperty (
 		CPropertyType* pType,
 		CDeclarator* pDeclarator,
-		uint_t PropertyFlags
+		uint_t PtrTypeFlags
 		);
 
 	bool

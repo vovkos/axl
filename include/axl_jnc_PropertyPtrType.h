@@ -19,6 +19,7 @@ class CPropertyPtrType: public CType
 protected:
 	EPropertyPtrType m_PtrTypeKind;
 	CPropertyType* m_pTargetType;
+	CNamespace* m_pAnchorNamespace; // for dual pointers
 
 public:
 	CPropertyPtrType ();
@@ -34,6 +35,15 @@ public:
 	{
 		return m_pTargetType;
 	}
+
+	CNamespace* 
+	GetAnchorNamespace ()
+	{
+		return m_pAnchorNamespace;
+	}
+
+	bool
+	IsConstPtrType ();
 
 	bool
 	HasClosure ()

@@ -110,7 +110,8 @@ CProperty*
 CFunctionMgr::CreateProperty (
 	EProperty PropertyKind,
 	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
+	const rtl::CString& QualifiedName,
+	uint_t PtrTypeFlags
 	)
 {
 	CProperty* pProperty;
@@ -136,6 +137,7 @@ CFunctionMgr::CreateProperty (
 	pProperty->m_Name = Name;
 	pProperty->m_QualifiedName = QualifiedName;
 	pProperty->m_Tag = QualifiedName;
+	pProperty->m_PtrTypeFlags = PtrTypeFlags;
 	m_pModule->MarkForLayout (pProperty);
 	return pProperty;
 }

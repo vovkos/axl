@@ -1616,6 +1616,7 @@ CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
 
 CPropertyPtrType* 
 CTypeMgr::GetPropertyPtrType (
+	CNamespace* pAnchorNamespace,
 	CPropertyType* pPropertyType,
 	EType TypeKind,
 	EPropertyPtrType PtrTypeKind,
@@ -1630,7 +1631,17 @@ CTypeMgr::GetPropertyPtrType (
 	else if (TypeKind == EType_PropertyPtr && PtrTypeKind != EPropertyPtrType_Thin)
 		Flags |= ETypeFlag_GcRoot;
 
-	TPropertyPtrTypeTuple* pTuple = GetPropertyPtrTypeTuple (pPropertyType);
+	TPropertyPtrTypeTuple* pTuple;
+
+	if (Flags & EPtrTypeFlag_PubConst)
+	{
+		ASSERT (pAnchorNamespace != NULL);
+		pTuple = GetPubConstPropertyPtrTypeTuple (pAnchorNamespace, pPropertyType);
+	}
+	else
+	{
+		pTuple = GetPropertyPtrTypeTuple (pPropertyType);
+	}
 
 	// ref x kind x checked
 
@@ -1651,6 +1662,7 @@ CTypeMgr::GetPropertyPtrType (
 	pType->m_Size = Size;
 	pType->m_AlignFactor = sizeof (void*);
 	pType->m_pTargetType = pPropertyType;
+	pType->m_pAnchorNamespace = (Flags & EPtrTypeFlag_PubConst) ? pAnchorNamespace : NULL;
 	pType->m_Flags = Flags;
 
 	m_PropertyPtrTypeList.InsertTail (pType);
@@ -1991,6 +2003,23 @@ CTypeMgr::GetPropertyPtrTypeTuple (CPropertyType* pPropertyType)
 	m_PropertyPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }
+
+TPropertyPtrTypeTuple*
+CTypeMgr::GetPubConstPropertyPtrTypeTuple (
+	CNamespace* pAnchorNamespace,
+	CPropertyType* pPropertyType
+	)
+{
+	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pPropertyType);
+	if (pDualPtrTypeTuple->m_pPubConstPropertyPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pPubConstPropertyPtrTypeTuple;
+
+	TPropertyPtrTypeTuple* pTuple = AXL_MEM_NEW (TPropertyPtrTypeTuple);
+	pDualPtrTypeTuple->m_pPubConstPropertyPtrTypeTuple = pTuple;
+	m_PropertyPtrTypeTupleList.InsertTail (pTuple);
+	return pTuple;
+}
+
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

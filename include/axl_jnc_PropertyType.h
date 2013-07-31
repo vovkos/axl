@@ -143,10 +143,21 @@ public:
 
 	CPropertyPtrType* 
 	GetPropertyPtrType (
+		CNamespace* pNamespace,
 		EType TypeKind,
 		EPropertyPtrType PtrTypeKind = EPropertyPtrType_Normal,
 		uint_t Flags = 0
 		);
+
+	CPropertyPtrType* 
+	GetPropertyPtrType (
+		EType TypeKind,
+		EPropertyPtrType PtrTypeKind = EPropertyPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetPropertyPtrType (NULL, TypeKind, PtrTypeKind, Flags);
+	}
 
 	CPropertyPtrType* 
 	GetPropertyPtrType (

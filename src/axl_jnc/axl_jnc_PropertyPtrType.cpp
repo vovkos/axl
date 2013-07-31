@@ -31,6 +31,17 @@ CPropertyPtrType::CPropertyPtrType ()
 	m_PtrTypeKind = EPropertyPtrType_Normal;
 	m_Size = sizeof (TPropertyPtr);
 	m_pTargetType = NULL;
+	m_pAnchorNamespace = NULL;
+}
+
+bool
+CPropertyPtrType::IsConstPtrType ()
+{
+	return 
+		m_pTargetType->IsReadOnly () ||
+		(m_Flags & EPtrTypeFlag_Const) != 0 || 
+		(m_Flags & EPtrTypeFlag_PubConst) != 0 && 
+		m_pModule->m_NamespaceMgr.GetAccessKind (m_pAnchorNamespace) == EAccess_Public;
 }
 
 CStructType* 

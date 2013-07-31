@@ -188,10 +188,11 @@ CDeclTypeCalc::CalcType (
 			return NULL;
 	}
 
-	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code))
+	if (pType->GetTypeKind () != EType_Function && pFlags != NULL)
 	{
-		if (pFlags)
-			*pFlags = GetPtrTypeFlags (pType);
+		Result = GetPtrTypeFlags (pType, pFlags);
+		if (!Result)
+			return false;
 	}
 
 	if (!CheckUnusedModifiers ())
@@ -245,11 +246,12 @@ CDeclTypeCalc::CheckUnusedModifiers ()
 	return true;
 }
 
-uint_t 
-CDeclTypeCalc::GetPtrTypeFlags (CType* pType)
+bool 
+CDeclTypeCalc::GetPtrTypeFlags (
+	CType* pType,
+	uint_t* pFlags
+	)
 {
-	ASSERT (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code));
-
 	uint_t Flags = 0;
 
 	if (m_TypeModifiers & ETypeModifier_Const)
@@ -259,7 +261,15 @@ CDeclTypeCalc::GetPtrTypeFlags (CType* pType)
 		Flags |= EPtrTypeFlag_PubConst;
 
 	if (m_TypeModifiers & ETypeModifier_Volatile)
+	{
+		if (pType->GetTypeKindFlags () & ETypeKindFlag_Code)
+		{
+			err::SetFormatStringError ("'volatile' cannot be applied to '%s'", pType->GetTypeString ().cc ());
+			return false;
+		}
+
 		Flags |= EPtrTypeFlag_Volatile;
+	}
 
 	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_PubEvent)) // convert 'event' to 'pubevent'
 	{
@@ -268,7 +278,8 @@ CDeclTypeCalc::GetPtrTypeFlags (CType* pType)
 	}
 
 	m_TypeModifiers &= ~ETypeModifierMask_DeclPtr;
-	return Flags;
+	*pFlags = Flags;
+	return true;
 }
 
 uint_t 

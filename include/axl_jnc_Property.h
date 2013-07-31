@@ -46,6 +46,7 @@ protected:
 	EProperty m_PropertyKind;
 
 	CPropertyType* m_pType;
+	uint_t m_PtrTypeFlags;
 
 	// construction / destruction / accessors
 
@@ -95,6 +96,12 @@ public:
 	GetType ()
 	{
 		return m_pType;
+	}
+
+	uint_t 
+	GetPtrTypeFlags ()
+	{
+		return m_PtrTypeFlags;
 	}
 
 	CFunction* 

@@ -39,7 +39,7 @@ enum EMulticastMethod
 
 enum EMulticastMethodFlag
 {
-	EMulticastMethodFlag_InaccessibleViaEventPtr = 0x0100,
+	EMulticastMethodFlag_InaccessibleViaEventPtr = 0x010000,
 };
 
 //.............................................................................

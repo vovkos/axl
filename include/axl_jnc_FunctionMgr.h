@@ -358,16 +358,18 @@ public:
 	CreateProperty (
 		EProperty PropertyKind,
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
+		const rtl::CString& QualifiedName,
+		uint_t PtrTypeFlags = 0
 		);
 
 	CProperty*
 	CreateProperty (
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
+		const rtl::CString& QualifiedName,
+		uint_t PtrTypeFlags = 0
 		)
 	{
-		return CreateProperty (EProperty_Normal, Name, QualifiedName);
+		return CreateProperty (EProperty_Normal, Name, QualifiedName, PtrTypeFlags);
 	}
 
 	CProperty*

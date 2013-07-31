@@ -202,7 +202,7 @@ class_specifier
 property_specifier_rslv
 	:	EToken_Bindable?
 		EToken_Property 
-		(EToken_Pack | EToken_Identifier)
+		EToken_Identifier
 	;
 
 class

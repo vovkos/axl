@@ -310,8 +310,8 @@ CParser::Declare (CDeclarator* pDeclarator)
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
-	uint_t ItemFlags;
-	CType* pType = pDeclarator->CalcType (&ItemFlags);
+	uint_t PtrTypeFlags;
+	CType* pType = pDeclarator->CalcType (&PtrTypeFlags);
 	if (!pType)
 		return NULL;
 
@@ -325,9 +325,9 @@ CParser::Declare (CDeclarator* pDeclarator)
 		return false;
 	}
 
-	if (ItemFlags && m_StorageKind == EStorage_Typedef)
+	if (PtrTypeFlags && m_StorageKind == EStorage_Typedef)
 	{
-		err::SetFormatStringError ("unused modifier '%s'", GetPtrTypeFlagString (ItemFlags).cc ());
+		err::SetFormatStringError ("unused modifier '%s'", GetPtrTypeFlagString (PtrTypeFlags).cc ());
 		return false;
 	}
 
@@ -346,18 +346,18 @@ CParser::Declare (CDeclarator* pDeclarator)
 			return DeclareFunction ((CFunctionType*) pType, pDeclarator);
 
 		case EType_Property:
-			return DeclareProperty ((CPropertyType*) pType, pDeclarator, ItemFlags);
+			return DeclareProperty ((CPropertyType*) pType, pDeclarator, PtrTypeFlags);
 
 		default:
 			switch (DeclaratorKind)
 			{
 			case EDeclarator_PropValue:
-				return DeclarePropValue (pType, pDeclarator, ItemFlags);
+				return DeclarePropValue (pType, pDeclarator, PtrTypeFlags);
 
 			default:
 				return IsClassType (pType, EClassType_AutoEvIface) ?
-					DeclareAutoEv ((CAutoEvClassType*) pType, pDeclarator, ItemFlags) :				
-					DeclareData (pType, pDeclarator, ItemFlags);
+					DeclareAutoEv ((CAutoEvClassType*) pType, pDeclarator, PtrTypeFlags) :				
+					DeclareData (pType, pDeclarator, PtrTypeFlags);
 			}
 		}
 	}
@@ -701,7 +701,7 @@ bool
 CParser::DeclareProperty (
 	CPropertyType* pType,
 	CDeclarator* pDeclarator,
-	uint_t PropertyFlags
+	uint_t PtrTypeFlags
 	)
 {
 	if (!pDeclarator->IsSimple ())
@@ -718,7 +718,7 @@ CParser::DeclareProperty (
 	if (!pProperty)
 		return false;
 
-	pProperty->m_Flags |= PropertyFlags;
+	pProperty->m_PtrTypeFlags = PtrTypeFlags;
 	return pProperty->Create (pType);
 }
 

@@ -275,7 +275,7 @@ CFunction::CalcLayout ()
 		pOriginFunction = GetItemUnnamedMethod (pItem, m_FunctionKind);
 		if (!pOriginFunction)
 		{
-			err::SetFormatStringError ("'%s' has no %s", m_Tag.cc (), GetFunctionKindString (m_FunctionKind));
+			err::SetFormatStringError ("'%s' has no '%s'", pItem->m_Tag.cc (), GetFunctionKindString (m_FunctionKind));
 			return false;
 		}
 	}

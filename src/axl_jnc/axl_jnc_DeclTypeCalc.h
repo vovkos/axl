@@ -50,8 +50,11 @@ protected:
 	bool
 	CheckUnusedModifiers ();
 
-	uint_t 
-	GetPtrTypeFlags (CType* pType);
+	bool
+	GetPtrTypeFlags (
+		CType* pType,
+		uint_t* pFlags
+		);
 
 	uint_t 
 	GetPropertyFlags ();

@@ -36,6 +36,7 @@ struct TDualPtrTypeTuple: rtl::TListLink
 	{
 		TDataPtrTypeTuple* m_pPubConstDataPtrTypeTuple;
 		TClassPtrTypeTuple* m_pPubConstClassPtrTypeTuple;
+		TPropertyPtrTypeTuple* m_pPubConstPropertyPtrTypeTuple;
 	};
 
 	TClassPtrTypeTuple* m_pPubEventClassPtrTypeTuple;
@@ -712,11 +713,23 @@ public:
 
 	CPropertyPtrType* 
 	GetPropertyPtrType (
+		CNamespace* pAnchorNamespace,
 		CPropertyType* pPropertyType,
 		EType TypeKind,
 		EPropertyPtrType PtrTypeKind = EPropertyPtrType_Normal,
 		uint_t Flags = 0
 		);
+
+	CPropertyPtrType* 
+	GetPropertyPtrType (
+		CPropertyType* pPropertyType,
+		EType TypeKind,
+		EPropertyPtrType PtrTypeKind = EPropertyPtrType_Normal,
+		uint_t Flags = 0
+		)
+	{
+		return GetPropertyPtrType (NULL, pPropertyType, TypeKind, PtrTypeKind, Flags);	
+	}
 
 	CPropertyPtrType* 
 	GetPropertyPtrType (
@@ -801,6 +814,12 @@ protected:
 
 	TPropertyPtrTypeTuple*
 	GetPropertyPtrTypeTuple (CPropertyType* pPropertyType);
+
+	TPropertyPtrTypeTuple*
+	GetPubConstPropertyPtrTypeTuple (
+		CNamespace* pAnchorNamespace,
+		CPropertyType* pPropertyType
+		);
 
 	void
 	SetupAllPrimitiveTypes ();

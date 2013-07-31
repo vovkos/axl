@@ -76,12 +76,13 @@ CPropertyType::CPropertyType ()
 
 CPropertyPtrType* 
 CPropertyType::GetPropertyPtrType (
+	CNamespace* pNamespace,
 	EType TypeKind,
 	EPropertyPtrType PtrTypeKind,
 	uint_t Flags
 	)
 {
-	return m_pModule->m_TypeMgr.GetPropertyPtrType (this, TypeKind, PtrTypeKind, Flags);
+	return m_pModule->m_TypeMgr.GetPropertyPtrType (pNamespace, this, TypeKind, PtrTypeKind, Flags);
 }
 
 CPropertyType*

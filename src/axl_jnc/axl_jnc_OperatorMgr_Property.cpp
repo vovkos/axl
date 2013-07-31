@@ -177,6 +177,9 @@ COperatorMgr::GetPropertySetterType (
 	CValue OpValue;
 	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
 
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);	
+	
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pPropertyType;
 
 	if (OpValue.GetValueKind () == EValue_Property)
@@ -187,7 +190,6 @@ COperatorMgr::GetPropertySetterType (
 	{
 		ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
 
-		CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
 		pPropertyType = pPtrType->HasClosure () ? 
 			pPtrType->GetTargetType ()->GetStdObjectMemberPropertyType () :
 			pPtrType->GetTargetType ();
@@ -195,7 +197,12 @@ COperatorMgr::GetPropertySetterType (
 
 	if (pPropertyType->IsReadOnly ())
 	{
-		err::SetFormatStringError ("read-only '%s' has no setter", pPropertyType->GetTypeString ().cc ());
+		err::SetFormatStringError ("read-only '%s' has no 'set'", pPropertyType->GetTypeString ().cc ());
+		return NULL;
+	}
+	else if (pPtrType->IsConstPtrType ())
+	{
+		err::SetFormatStringError ("'set' is inaccessible via 'const' property pointer");
 		return NULL;
 	}
 
@@ -251,6 +258,11 @@ COperatorMgr::GetPropertySetter (
 	{
 		err::SetFormatStringError ("read-only '%s' has no setter", pPropertyType->GetTypeString ().cc ());
 		return false;
+	}
+	else if (pPtrType->IsConstPtrType ())
+	{
+		err::SetFormatStringError ("'set' is inaccessible via 'const' property pointer");
+		return NULL;
 	}
 
 	if (OpValue.GetValueKind () == EValue_Property)
