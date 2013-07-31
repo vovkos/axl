@@ -661,7 +661,8 @@ CFunctionMgr::GetDirectThunkFunction (
 	bool HasUnusedClosure
 	)
 {
-	ASSERT (HasUnusedClosure || pTargetFunction->m_pType->Cmp (pThunkFunctionType) != 0);
+	if (!HasUnusedClosure && pTargetFunction->m_pType->Cmp (pThunkFunctionType) == 0)
+		return pTargetFunction;
 
 	char SignatureChar = 'D';
 
@@ -702,7 +703,8 @@ CFunctionMgr::GetDirectThunkProperty (
 	bool HasUnusedClosure
 	)
 {
-	ASSERT (HasUnusedClosure || pTargetProperty->m_pType->Cmp (pThunkPropertyType) != 0);
+	if (!HasUnusedClosure && pTargetProperty->m_pType->Cmp (pThunkPropertyType) == 0)
+		return pTargetProperty;
 
 	rtl::CString Signature;
 	Signature.Format (

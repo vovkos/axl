@@ -269,9 +269,8 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
 	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
-
-	CClosure* pClosure = OpValue.GetClosure ();
-	if (pClosure)
+	
+	if (OpValue.GetClosure ())
 	{
 		err::SetFormatStringError ("cannot create thin function pointer to a closure");
 		return false;
@@ -283,18 +282,17 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 		return false;
 	}
 
-	CFunctionType* pTargetType = ((CFunctionPtrType*) pType)->GetTargetType ();
+	CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
+	CFunctionType* pTargetType = pPtrType->GetTargetType ();
+	CFunction* pFunction = OpValue.GetFunction ();
 
-	if (OpValue.GetFunction ()->GetType ()->Cmp (pTargetType) == 0)
+	if (pFunction->GetType ()->Cmp (pTargetType) == 0)
 	{
 		pResultValue->OverrideType (OpValue, pType);
 		return true;
 	}
 
-	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (
-		OpValue.GetFunction (), 
-		((CFunctionPtrType*) pType)->GetTargetType ()
-		);
+	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (pFunction, pTargetType);
 
 	pResultValue->SetFunction (pThunkFunction);
 	pResultValue->OverrideType (pType);

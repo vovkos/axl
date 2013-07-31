@@ -85,8 +85,8 @@ CPropertyPtrType::PrepareTypeString ()
 
 	if (m_Flags & EPtrTypeFlag__AllMask)
 	{
-		m_TypeString += ' ';
 		m_TypeString += GetPtrTypeFlagString (m_Flags);
+		m_TypeString += ' ';
 	}
 
 	if (m_PtrTypeKind != EPropertyPtrType_Normal)

@@ -39,6 +39,7 @@ CUnOp_Addr::GetResultType (const CValue& OpValue)
 
 	case EType_PropertyRef:
 		return ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetPropertyPtrType (
+			((CPropertyPtrType*) pOpType)->GetAnchorNamespace (),
 			EType_PropertyPtr, 
 			((CPropertyPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()
@@ -98,6 +99,7 @@ CUnOp_Indir::GetResultType (const CValue& OpValue)
 
 	case EType_PropertyPtr:
 		return ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetPropertyPtrType (
+			((CPropertyPtrType*) pOpType)->GetAnchorNamespace (),
 			EType_PropertyRef, 
 			((CPropertyPtrType*) pOpType)->GetPtrTypeKind (),
 			pOpType->GetFlags ()

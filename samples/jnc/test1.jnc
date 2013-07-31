@@ -2,23 +2,23 @@
 
 namespace a {
 
-pubconst int property s_MyProp;
+pubconst int property sx_MyProp;
 
 int 
-s_MyProp.get ()
+sx_MyProp.get ()
 {
 	printf ("s_MyProp.get ()\n");
 	return 0;
 }
 
-s_MyProp.set (int x)
+sx_MyProp.set (int x)
 {
-	printf ("s_MyProp.get (%x)\n", x);
+	printf ("s_MyProp.set (%d)\n", x);
 }
 
 foo ()
 {
-	s_MyProp = 100;
+	sx_MyProp = 100;
 }
 
 }
@@ -28,7 +28,8 @@ main ()
 {
 	printf ("main ()\n");
 
-	a.s_MyProp = 100;
+	int thin property* px = &a.sx_MyProp;
+	*px = 100;
 
 	return 10; 
 }

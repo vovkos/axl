@@ -121,6 +121,12 @@ CCast_PropertyPtr_Base::GetCastKind (
 	if (!pSrcPtrType)
 		return ECast_None;
 
+	if (!(pDstPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
+	{
+		if (pSrcPtrType->IsConstPtrType () && !pDstPtrType->IsConstPtrType ())
+			return ECast_None;
+	}
+
 	return m_pModule->m_OperatorMgr.GetPropertyCastKind (
 		pSrcPtrType->GetTargetType (), 
 		pDstPtrType->GetTargetType ()
@@ -366,8 +372,8 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
-	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (pType->GetTypeKind () == EType_PropertyPtr);
 
 	if (OpValue.GetClosure ())
 	{
@@ -381,15 +387,20 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 		return false;
 	}
 
+	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
+	CPropertyType* pTargetType = pPtrType->GetTargetType ();
 	CProperty* pProperty = OpValue.GetProperty ();
 
-	if (pPtrType->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable)
+	if (pProperty->GetType ()->Cmp (pTargetType) == 0)
+		return m_pModule->m_OperatorMgr.GetPropertyThinPtr (pProperty, NULL, pPtrType, pResultValue);
+
+	if (pProperty->GetFlags () & EPropertyTypeFlag_Bindable)
 	{
 		err::SetFormatStringError ("bindable properties are not supported yet");
 		return false;
 	}
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (pProperty, pPtrType->GetTargetType ());
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (pProperty, pTargetType);
 	return m_pModule->m_OperatorMgr.GetPropertyThinPtr (pThunkProperty, NULL, pPtrType, pResultValue);
 }
 

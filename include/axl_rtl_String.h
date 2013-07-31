@@ -522,7 +522,8 @@ public:
 		if (Length == -1)
 			Length = CDetails::CalcLength (p);
 
-		return CDetails::Cmp (m_p, p, AXL_MIN (Length, ThisLength));
+		int Result = CDetails::Cmp (m_p, p, AXL_MIN (Length, ThisLength));
+		return Result ? Result : rtl::CCmpT <size_t> () (ThisLength, Length);
 	}
 
 	int 
