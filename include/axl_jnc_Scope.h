@@ -32,6 +32,7 @@ protected:
 
 	rtl::CArrayT <CVariable*> m_DestructArray;
 	rtl::CBoxListT <CValue> m_GcRootList;
+	llvm::DIScope m_LlvmDiScope;
 
 public:
 	CBasicBlock* m_pBreakBlock;
@@ -94,6 +95,12 @@ public:
 	AddToGcRootList (const CValue& Value)
 	{
 		m_GcRootList.InsertTail (Value);
+	}
+
+	llvm::DIScope 
+	GetLlvmDiScope ()
+	{
+		return m_LlvmDiScope;
 	}
 };
 

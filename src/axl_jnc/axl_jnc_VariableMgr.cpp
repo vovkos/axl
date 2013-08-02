@@ -433,6 +433,9 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 		}
 	}
 
+	pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (pVariable);
+	m_pModule->m_LlvmDiBuilder.CreateDeclare (pVariable);
+	
 	Result = m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
 	if (!Result)
 		return false;

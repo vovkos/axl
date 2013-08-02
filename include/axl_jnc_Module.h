@@ -48,6 +48,8 @@ class CModule: CPreModule
 {
 protected:
 	rtl::CString m_FilePath;
+	rtl::CString m_FileName;
+	rtl::CString m_DirName;
 
 	CFunction* m_pConstructor;
 	CFunction* m_pDestructor;
@@ -56,6 +58,7 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_CompileArray;
 
 	llvm::Module* m_pLlvmModule;
+	llvm::DIFile m_LlvmDiFile;
 
 public:
 	CTypeMgr m_TypeMgr;
@@ -86,6 +89,12 @@ public:
 		return m_pLlvmModule;
 	}
 
+	llvm::DIFile 
+	GetLlvmDiFile ()
+	{
+		return m_LlvmDiFile;
+	}
+
 	CType*
 	GetSimpleType (EType TypeKind)
 	{
@@ -104,6 +113,18 @@ public:
 		return m_FilePath;
 	}
 
+	rtl::CString
+	GetFileName ()
+	{
+		return m_FileName;
+	}
+
+	rtl::CString
+	GetDirName ()
+	{
+		return m_DirName;
+	}
+			
 	CFunction* 
 	GetConstructor ()
 	{

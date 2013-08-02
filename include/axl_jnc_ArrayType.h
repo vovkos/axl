@@ -92,6 +92,10 @@ protected:
 		ASSERT (m_ElementCount != -1);
 		m_pLlvmType = llvm::ArrayType::get (m_pElementType->GetLlvmType (), m_ElementCount);
 	}
+	
+	virtual 
+	void
+	PrepareLlvmDiType ();	
 };
 
 //.............................................................................

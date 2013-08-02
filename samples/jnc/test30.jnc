@@ -43,7 +43,7 @@ main ()
 {
 	printf ("main ()\n");
 
-	char a [] = "12345";
+	char a [6] = "12345";
 	TPoint Point = { 100, 200, 300 };
 
 	int a0;

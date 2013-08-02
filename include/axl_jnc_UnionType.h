@@ -78,6 +78,10 @@ protected:
 	{
 		m_pLlvmType = GetStructType ()->GetLlvmType ();
 	}
+	
+	virtual 
+	void
+	PrepareLlvmDiType ();
 
 	virtual
 	bool

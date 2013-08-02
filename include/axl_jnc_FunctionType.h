@@ -251,6 +251,10 @@ protected:
 	PrepareLlvmType ();
 
 	virtual 
+	void
+	PrepareLlvmDiType ();
+
+	virtual 
 	bool
 	CalcLayout ();
 };

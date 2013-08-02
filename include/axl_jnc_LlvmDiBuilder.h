@@ -4,13 +4,19 @@
 
 #pragma once
 
-#include "axl_jnc_Value.h"
+#include "axl_jnc_Type.h"
 
 namespace axl {
 namespace jnc {
 
 class CModule;
 class CScope;
+class CFunctionType;
+class CStructType;
+class CUnionType;
+class CArrayType;
+class CVariable;
+class CFunction;
 
 //.............................................................................
 
@@ -28,7 +34,6 @@ class CLlvmDiBuilder
 protected:
 	CModule* m_pModule;
 	llvm::DIBuilder* m_pLlvmDiBuilder;
-	llvm::DIFile m_LlvmDiFile;
 
 public:
 	CLlvmDiBuilder ();
@@ -36,6 +41,18 @@ public:
 	~CLlvmDiBuilder ()
 	{
 		Clear ();
+	}
+
+	CModule* 
+	GetModule ()
+	{
+		return m_pModule;
+	}
+
+	llvm::DIBuilder*
+	GetLlvmDiBuilder ()
+	{
+		return m_pLlvmDiBuilder;
 	}
 
 	bool
@@ -49,9 +66,59 @@ public:
 	{
 		m_pLlvmDiBuilder->finalize ();
 	}
-	
-	bool	
+
+	llvm::DIFile
+	CreateFile (
+		const char* pFileName,
+		const char* pDirName
+		)
+	{
+		return m_pLlvmDiBuilder->createFile (pFileName, pDirName);
+	}
+
+	llvm::DIType
+	CreateBasicType (
+		const char* pName,
+		size_t Size,
+		size_t AlignFactor,
+		uint_t Code
+		)
+	{
+		return m_pLlvmDiBuilder->createBasicType (pName, Size * 8, AlignFactor * 8, Code);
+	}
+
+	llvm::DIType
+	CreateSubroutineType (CFunctionType* pFunctionType);
+
+	llvm::DIType
+	CreateStructType (CStructType* pStructType);
+
+	llvm::DIType
+	CreateUnionType (CUnionType* pUnionType);
+
+	llvm::DIType
+	CreateArrayType (CArrayType* pArrayType);
+		
+	llvm::DIGlobalVariable
 	CreateGlobalVariable (CVariable* pVariable);
+
+	llvm::DIVariable
+	CreateLocalVariable (
+		CVariable* pVariable,
+		uint_t Tag = llvm::dwarf::DW_TAG_auto_variable
+		);
+
+	llvm::DISubprogram
+	CreateFunction (CFunction* pFunction);
+
+	llvm::DILexicalBlock
+	CreateLexicalBlock (
+		CScope* pParentScope,
+		const CToken::CPos& Pos
+		);
+
+	llvm::Instruction*
+	CreateDeclare (CVariable* pVariable);
 };
 
 //.............................................................................

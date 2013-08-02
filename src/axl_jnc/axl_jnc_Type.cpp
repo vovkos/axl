@@ -410,6 +410,21 @@ CType::GetLlvmType ()
 	return m_pLlvmType;
 }
 
+llvm::DIType 
+CType::GetLlvmDiType ()
+{
+	if (m_LlvmDiType)
+		return m_LlvmDiType;
+
+	if (m_TypeKind == EType_Void)
+		return llvm::DIType ();
+
+	PrepareLlvmDiType ();
+	
+	ASSERT (m_LlvmDiType);
+	return m_LlvmDiType;
+}
+
 CValue 
 CType::GetUndefValue ()
 {
@@ -539,6 +554,155 @@ CType::PrepareLlvmType ()
 	default:
 		ASSERT (false);
 	}
+}
+
+void
+CType::PrepareLlvmDiType ()
+{
+	struct TLlvmDiType
+	{
+		const char* m_pName;
+		uint_t m_Code;
+		size_t m_Size;
+	};
+
+	TLlvmDiType LlvmDiTypeTable [EType__PrimitiveTypeCount] =
+	{		
+		{ 0 }, // EType_Void,		
+		{ 0 }, // EType_Variant,
+			
+		// EType_Bool,
+		{ 
+			"bool",
+			llvm::dwarf::DW_ATE_boolean,
+			1,
+		},
+
+		// EType_Int8,
+		{ 
+			"int8",
+			llvm::dwarf::DW_ATE_signed_char,
+			1,
+		},
+
+		// EType_Int8_u,
+		{ 
+			"unsigned int8",
+			llvm::dwarf::DW_ATE_unsigned_char,
+			1,
+		},
+
+		// EType_Int16,
+		{ 
+			"int16",
+			llvm::dwarf::DW_ATE_signed,
+			2,
+		},
+
+		// EType_Int16_u,
+		{ 
+			"unsigned int16",
+			llvm::dwarf::DW_ATE_unsigned,
+			2,
+		},
+
+		// EType_Int32,
+		{ 
+			"int32",
+			llvm::dwarf::DW_ATE_signed,
+			4,
+		},
+
+		// EType_Int32_u,
+		{ 
+			"unsigned int32",
+			llvm::dwarf::DW_ATE_unsigned,
+			4,
+		},
+
+		// EType_Int64,
+		{ 
+			"unsigned int64",
+			llvm::dwarf::DW_ATE_signed,
+			8,
+		},
+
+		// EType_Int64_u,
+		{ 
+			"unsigned int64",
+			llvm::dwarf::DW_ATE_unsigned,
+			8,
+		},
+
+		// EType_Int16_be,
+		{ 
+			"bigendian int16",
+			llvm::dwarf::DW_ATE_signed,
+			2,
+		},
+
+		// EType_Int16_beu,
+		{ 
+			"unsigned bigendian int16",
+			llvm::dwarf::DW_ATE_unsigned,
+			2,
+		},
+
+		// EType_Int32_be,
+		{ 
+			"bigendian int16",
+			llvm::dwarf::DW_ATE_signed,
+			4,
+		},
+
+		// EType_Int32_beu,
+		{ 
+			"unsigned bigendian int16",
+			llvm::dwarf::DW_ATE_unsigned,
+			4,
+		},
+
+		// EType_Int64_be,
+		{ 
+			"bigendian int16",
+			llvm::dwarf::DW_ATE_signed,
+			8,
+		},
+
+		// EType_Int64_beu,
+		{ 
+			"unsigned bigendian int64",
+			llvm::dwarf::DW_ATE_unsigned,
+			8,
+		},
+
+		// EType_Float,
+		{ 
+			"float",
+			llvm::dwarf::DW_ATE_float,
+			4,
+		},
+
+		// EType_Double,
+		{ 
+			"float",
+			llvm::dwarf::DW_ATE_float,
+			8,
+		},
+	};
+	
+	// temporarily default to 'int' (since not all the types are implemented)
+
+	size_t i = m_TypeKind < EType__PrimitiveTypeCount ? m_TypeKind : EType_Int;
+
+	TLlvmDiType* pDiType = &LlvmDiTypeTable [i];
+
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateBasicType (
+		pDiType->m_pName, 
+		pDiType->m_Size, 
+		pDiType->m_Size, 
+		pDiType->m_Code
+		);
 }
 
 //.............................................................................

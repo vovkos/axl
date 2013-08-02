@@ -192,7 +192,7 @@ CDeclTypeCalc::CalcType (
 	{
 		Result = GetPtrTypeFlags (pType, pFlags);
 		if (!Result)
-			return false;
+			return NULL;
 	}
 
 	if (!CheckUnusedModifiers ())

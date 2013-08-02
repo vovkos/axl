@@ -233,6 +233,12 @@ CUnionType::InitializeField (const CValue& ThisValue)
 			);
 }
 
+void
+CUnionType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateUnionType (this);
+}
+
 //.............................................................................
 
 } // namespace jnc {

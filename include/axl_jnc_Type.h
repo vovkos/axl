@@ -283,10 +283,10 @@ GetFirstTypeModifierString (uint_t Modifiers)
 
 enum ETypeFlag
 {
-	ETypeFlag_Named        = 0x0100,
-	ETypeFlag_Child        = 0x0200, // constructor has an implicit 'parent' arg
-	ETypeFlag_Pod          = 0x0400, // plain-old-data
-	ETypeFlag_GcRoot       = 0x0800, // is or contains gc-traceable pointers
+	ETypeFlag_Named        = 0x000100,
+	ETypeFlag_Child        = 0x000200, // constructor has an implicit 'parent' arg
+	ETypeFlag_Pod          = 0x000400, // plain-old-data
+	ETypeFlag_GcRoot       = 0x000800, // is or contains gc-traceable pointers
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -301,7 +301,7 @@ enum EPtrTypeFlag
 	EPtrTypeFlag_Event     = 0x200000, // class only
 	EPtrTypeFlag_PubEvent  = 0x400000, // class only
 
-	EPtrTypeFlag__AllMask  = 0x0f0000,
+	EPtrTypeFlag__AllMask  = 0x7f0000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -460,6 +460,7 @@ protected:
 	rtl::CString m_Signature;
 	rtl::CString m_TypeString;
 	llvm::Type* m_pLlvmType;
+	llvm::DIType m_LlvmDiType;
 
 	CClassType* m_pBoxClassType;
 	TSimplePropertyTypeTuple* m_pSimplePropertyTypeTuple;
@@ -510,6 +511,9 @@ public:
 
 	llvm::Type* 
 	GetLlvmType ();
+
+	llvm::DIType 
+	GetLlvmDiType ();
 
 	CValue 
 	GetUndefValue ();
@@ -583,6 +587,10 @@ protected:
 	virtual 
 	void
 	PrepareLlvmType ();
+
+	virtual 
+	void
+	PrepareLlvmDiType ();
 
 	virtual 
 	bool

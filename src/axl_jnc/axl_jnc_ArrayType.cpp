@@ -103,6 +103,12 @@ CArrayType::EnumGcRoots (
 	}
 }
 
+void
+CArrayType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateArrayType (this);
+}
+
 //.............................................................................
 
 } // namespace jnc {

@@ -64,11 +64,14 @@ public:
 		return CreateComment_0 (NULL);
 	}
 
-	bool
-	CreateLineInfo (
-		int Line,
-		int Col = 0
-		);
+	void
+	SetSourcePos (const CToken::CPos& Pos);
+
+	void
+	SetInstDebugLocation (llvm::Instruction* pLlvmInstruction)
+	{
+		m_LlvmIrBuilder.SetInstDebugLocation (pLlvmInstruction);
+	}
 
 	// branches
 

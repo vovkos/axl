@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_Module.h"
+#include "axl_io_FilePathUtils.h"
 
 namespace axl {
 namespace jnc {
@@ -10,6 +11,8 @@ void
 CModule::Clear ()
 {
 	m_FilePath.Clear ();
+	m_FileName.Clear ();
+	m_DirName.Clear ();
 	m_TypeMgr.Clear ();
 	m_NamespaceMgr.Clear ();
 	m_FunctionMgr.Clear ();
@@ -23,6 +26,7 @@ CModule::Clear ()
 	m_pConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pLlvmModule = NULL;
+	m_LlvmDiFile = llvm::DIFile ();
 }
 
 bool
@@ -34,11 +38,14 @@ CModule::Create (
 	Clear ();
 	
 	m_FilePath = FilePath;
+	m_FileName = io::GetFileName (FilePath);
+	m_DirName = io::GetDirName  (FilePath);
+
 	m_pLlvmModule = pLlvmModule;
-	
-	return 
-		m_LlvmDiBuilder.Create () &&
-		m_NamespaceMgr.AddStdItems ();
+	m_LlvmDiBuilder.Create ();
+	m_LlvmDiFile = m_LlvmDiBuilder.CreateFile (m_FileName, m_DirName);
+
+	return m_NamespaceMgr.AddStdItems ();
 }
 
 bool

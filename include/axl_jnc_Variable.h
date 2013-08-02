@@ -31,8 +31,9 @@ protected:
 
 	CScope* m_pScope;
 	CStructField* m_pTlsField;
-	llvm::Value* m_pLlvmValue;
+	llvm::Value* m_pLlvmValue; // AllocaInst* / GlobalVariable* / GEPInst*
 	llvm::Value* m_pLlvmAllocValue;
+	llvm::DIDescriptor m_LlvmDiDescriptor; // DIVariable / DIGlobalVariable / 
 
 public:
 	CVariable ();
@@ -95,18 +96,33 @@ public:
 	}
 
 	llvm::Value* 
-	GetLlvmValue ();
+	GetLlvmValue ()
+	{
+		EnsureLlvmValue ();
+		return m_pLlvmValue;
+	}
 
 	llvm::Value* 
 	GetLlvmAllocValue ()
 	{
+		EnsureLlvmValue ();
 		return m_pLlvmAllocValue;
+	}
+
+	llvm::DIDescriptor 
+	GetLlvmDiDescriptor ()
+	{
+		EnsureLlvmValue ();
+		return m_LlvmDiDescriptor;
 	}
 
 protected:
 	virtual 
 	bool
 	CalcLayout ();
+
+	void
+	EnsureLlvmValue ();
 };
 
 //.............................................................................

@@ -5,21 +5,6 @@
 
 // #define _AXL_JNC_NO_JIT
 
-/*
-
-Instruction does not dominate all uses!
-  %gc_frame = alloca %jnc.TGcShadowStackFrame
-  %gc_frame.next1730 = bitcast %jnc.TGcShadowStackFrame* %gc_frame to i8**
-Instruction does not dominate all uses!
-  %call8 = invoke %jnc.TTls* @jnc.GetTls()
-		  to label %prologue unwind label %gc_cleanup
-  %sunkaddr31 = ptrtoint %jnc.TTls* %call8 to i64
-Broken module found, compilation aborted!
-^C
- 
- 
-*/
-
 namespace axl {
 namespace jnc {
 
@@ -309,6 +294,8 @@ CFunctionMgr::Prologue (
 	m_pModule->m_NamespaceMgr.OpenNamespace (pFunction->m_pParentNamespace);
 	pFunction->m_pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 
+	pFunction->GetLlvmDiSubprogram ();
+	
 	// create entry block (gc roots come here)
 
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
@@ -466,8 +453,14 @@ CFunctionMgr::CreateShadowArgVariables ()
 			return false;
 
 		pArgVariable->m_pLlvmAllocValue = PtrValue.GetLlvmValue ();
-		pArgVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
-			
+		pArgVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();			
+		pArgVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (
+			pArgVariable, 
+			llvm::dwarf::DW_TAG_arg_variable
+			);
+		
+		m_pModule->m_LlvmDiBuilder.CreateDeclare (pArgVariable);
+		
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
 
 		m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue, pArgVariable);

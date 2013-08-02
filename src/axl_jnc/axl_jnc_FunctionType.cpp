@@ -317,6 +317,12 @@ CFunctionType::PrepareLlvmType ()
 		);
 }
 
+void
+CFunctionType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateSubroutineType (this);
+}
+
 bool
 CFunctionType::CalcLayout ()
 {

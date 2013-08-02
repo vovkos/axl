@@ -72,9 +72,16 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	pScope->m_BeginPos = Pos;
 	pScope->m_EndPos = Pos;
 	pScope->m_pParentNamespace = m_pCurrentNamespace;
+
+	pScope->m_LlvmDiScope = m_pCurrentScope ? 
+		(llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (m_pCurrentScope, Pos) :
+		(llvm::DIScope) pFunction->GetLlvmDiSubprogram ();
+
 	m_ScopeList.InsertTail (pScope);
 
 	OpenNamespace (pScope);
+
+	m_pModule->m_LlvmIrBuilder.SetSourcePos (Pos);
 	return pScope;
 }
 
@@ -84,6 +91,7 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 	ASSERT (m_pCurrentScope);
 	
 	m_pCurrentScope->m_EndPos = Pos;
+	m_pModule->m_LlvmIrBuilder.SetSourcePos (Pos);
 	
 	if (!(m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Unreachable))
 	{
@@ -106,7 +114,7 @@ CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 			if (pNamespace == pTargetNamespace)
 				return EAccess_Protected;
 		}
-
+		
 		return EAccess_Public;
 	}
 

@@ -93,6 +93,10 @@ class
 }
 start
 expression
+	enter 
+	{
+		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
+	}
 	:	conditional_expr <&$.m_Value>
 	;
 

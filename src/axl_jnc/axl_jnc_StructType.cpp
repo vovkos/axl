@@ -45,6 +45,7 @@ CStructType::CreateFieldImpl (
 	ASSERT (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code));
 
 	CStructField* pField = AXL_MEM_NEW (CStructField);
+	pField->m_pModule = m_pModule;
 	pField->m_StorageKind = m_StorageKind;
 	pField->m_pParentNamespace = this;
 	pField->m_Name = Name;
@@ -499,6 +500,12 @@ CStructType::InsertPadding (size_t Size)
 	CArrayType* pType = m_pModule->m_TypeMgr.GetArrayType (EType_Int8_u, Size);
 	m_LlvmFieldTypeArray.Append (pType->GetLlvmType ());
 	return pType;
+}
+
+void
+CStructType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateStructType (this);
 }
 
 //.............................................................................

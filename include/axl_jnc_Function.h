@@ -128,6 +128,7 @@ protected:
 
 	llvm::Function* m_pLlvmFunction;
 	llvm::Instruction* m_pLlvmPostTlsPrologueInst;
+	llvm::DISubprogram m_LlvmDiSubprogram;
 	
 	rtl::CArrayT <TTlsVariable> m_TlsVariableArray;
 
@@ -280,13 +281,16 @@ public:
 	}
 
 	llvm::Function* 
-	GetLlvmFunction ();
+	GetLlvmFunction ();		
 	
 	llvm::Instruction* 
 	GetLlvmPostTlsPrologueInst ()
 	{
 		return m_pLlvmPostTlsPrologueInst;
 	}
+
+	llvm::DISubprogram
+	GetLlvmDiSubprogram ();
 
 	void*
 	GetMachineCode ()

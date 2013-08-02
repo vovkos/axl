@@ -159,6 +159,16 @@ CFunction::GetLlvmFunction ()
 	return m_pLlvmFunction;
 }
 
+llvm::DISubprogram
+CFunction::GetLlvmDiSubprogram ()
+{
+	if (m_LlvmDiSubprogram)
+		return m_LlvmDiSubprogram;
+
+	m_LlvmDiSubprogram = m_pModule->m_LlvmDiBuilder.CreateFunction (this);
+	return m_LlvmDiSubprogram;
+}
+
 void
 CFunction::ConvertToMemberMethod (CNamedType* pParentType)
 {

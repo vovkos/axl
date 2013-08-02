@@ -28,15 +28,14 @@ CVariable::CalcLayout ()
 	return m_pType->EnsureLayout ();
 }
 
-llvm::Value* 
-CVariable::GetLlvmValue ()
+void
+CVariable::EnsureLlvmValue ()
 {
 	if (m_pLlvmValue)
-		return m_pLlvmValue;
-	
+		return;
+
 	ASSERT (m_StorageKind == EStorage_Thread);
 	m_pModule->m_VariableMgr.AllocateTlsVariable (this);
-	return m_pLlvmValue;
 }
 
 //.............................................................................

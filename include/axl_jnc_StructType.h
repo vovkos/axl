@@ -195,6 +195,10 @@ protected:
 		m_pLlvmType = llvm::StructType::create (llvm::getGlobalContext (), m_Tag.cc ());
 	}
 
+	virtual 
+	void
+	PrepareLlvmDiType ();
+	
 	virtual
 	bool
 	CalcLayout ();

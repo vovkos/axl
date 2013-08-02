@@ -48,23 +48,19 @@ CLlvmIrBuilder::CreateComment_0 (const char* pText)
 	return true;
 }
 
-bool
-CLlvmIrBuilder::CreateLineInfo (
-	int Line,
-	int Col
-	)
+void
+CLlvmIrBuilder::SetSourcePos (const CToken::CPos& Pos)
 {
-	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	llvm::BasicBlock* pLlvmBlock = pBlock->GetLlvmBlock ();
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope);
 
-	if (pLlvmBlock->getInstList ().empty ())
-		return false;
+	llvm::DebugLoc LlvmDebugLoc = llvm::DebugLoc::get (
+		Pos.m_Line + 1, 
+		Pos.m_Col + 1, 
+		pScope->GetLlvmDiScope ()
+		);
 
-	llvm::MDNode* pLlvmScopeNode = NULL;
-
-	llvm::Instruction* pInst = &pLlvmBlock->getInstList ().back ();
-	pInst->setDebugLoc (llvm::DebugLoc::get (Line, Col, pLlvmScopeNode));
-	return true;
+	m_LlvmIrBuilder.SetCurrentDebugLocation (LlvmDebugLoc);
 }
 
 llvm::SwitchInst*

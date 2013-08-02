@@ -39,6 +39,7 @@ local_declaration
 	enter
 	{
 		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
+		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
 	}
 	:	statement
 	|	using_declaration 
