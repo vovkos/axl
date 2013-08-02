@@ -92,15 +92,17 @@ CTracker::Trace ()
 		rtl::CIteratorT <TBlockHdr> It = m_BlockList.GetHead ();
 		for (; It; It++)
 		{
+			TBlockHdr* pBlockHdr = *It;
+
 			dbg::TraceEx (
 				AXL_SUBSYS_REF,
 				dbg::ETraceLevel_Info, 
 				"    %s(%d): %s seq: #%d size: %d B\n",
-				It->m_pFilePath,
-				It->m_Line,
-				It->m_pTag,
-				It->m_SeqNum,
-				It->m_Size
+				pBlockHdr->m_pFilePath,
+				pBlockHdr->m_Line,
+				pBlockHdr->m_pTag,
+				pBlockHdr->m_SeqNum,
+				pBlockHdr->m_Size
 				);
 		}
 	}

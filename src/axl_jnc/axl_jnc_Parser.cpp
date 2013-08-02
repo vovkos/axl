@@ -1889,6 +1889,23 @@ CParser::CreateMemberClosure (CValue* pValue)
 	return true;
 }
 
+
+bool
+CParser::GetCountOf (
+	CType* pType,
+	CValue* pValue
+	)
+{
+	if (pType->GetTypeKind () != EType_Array)
+	{
+		err::SetFormatStringError ("'countof' operator is only applicable to arrays, not to '%s'", pType->GetTypeString ().cc ());
+		return false;
+	}
+
+	pValue->SetConstSizeT (((CArrayType*) pType)->GetElementCount ());
+	return true;
+}
+
 bool
 CParser::GetThisValue (CValue* pValue)
 {

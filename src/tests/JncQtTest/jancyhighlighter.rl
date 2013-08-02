@@ -131,6 +131,7 @@ main := |*
 'new'          |
 'delete'       |
 'sizeof'       |
+'countof'      |
 'typeof'       
 
 )			   { colorize(ts, te, Qt::blue); };

@@ -217,8 +217,6 @@ CRuntime::CRuntime ()
 
 	m_TlsSlot = -1;
 	m_TlsSize = 0;
-
-	m_GcIdleEvent.Signal ();
 }
 
 bool
@@ -304,6 +302,7 @@ CRuntime::Create (
 
 	m_TlsSize = pModule->m_VariableMgr.GetTlsStructType ()->GetSize ();
 	m_TlsSlot = GetTlsMgr ()->CreateSlot ();
+
 	return true;
 }
 
@@ -313,15 +312,32 @@ CRuntime::Destroy ()
 	if (!m_pModule)
 		return;
 
+	if (m_GcDestructThread.IsOpen ())
+	{
+		m_TerminateGcDestructThread = true;
+		m_GcDestructEvent.Signal ();
+		m_GcDestructThread.WaitAndClose ();
+	}
+
 	if (m_TlsSlot != -1)
+	{
+		GetTlsMgr ()->NullifyTlsData (this);
 		GetTlsMgr ()->DestroySlot (m_TlsSlot);
+	}
 
 	if (m_pLlvmExecutionEngine)
 		delete m_pLlvmExecutionEngine;
 
 	m_pLlvmExecutionEngine = NULL;
+
 	m_TlsSlot = -1;
 	m_TlsSize = 0;
+
+	while (!m_TlsList.IsEmpty ())
+	{
+		TTlsData* pTlsData = m_TlsList.RemoveHead ();
+		AXL_MEM_FREE (pTlsData);
+	}
 
 	if (m_pGcHeap)
 		AXL_MEM_FREE (m_pGcHeap);
@@ -341,6 +357,7 @@ CRuntime::Startup ()
 {
 	m_TerminateGcDestructThread = false;
 	m_GcDestructThread.Start ();
+	m_GcIdleEvent.Signal ();
 	return true;
 }
 

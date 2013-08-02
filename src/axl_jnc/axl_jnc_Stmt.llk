@@ -97,6 +97,11 @@ btm_construct_name
 	;
 
 statement
+	enter
+	{
+		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
+		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
+	}
 	:	compound_stmt
 	|	expression_stmt
 	|	if_stmt

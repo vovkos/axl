@@ -186,6 +186,7 @@ main := |*
 'new'          { CreateToken (EToken_New); };
 'delete'       { CreateToken (EToken_Delete); };
 'sizeof'       { CreateToken (EToken_SizeOf); };
+'countof'      { CreateToken (EToken_CountOf); };
 'typeof'       { CreateToken (EToken_TypeOf); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

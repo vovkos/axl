@@ -587,13 +587,17 @@ unary_operator_expr <CValue* $pValue>
 			}
 	|	EToken_SizeOf '(' type_name_or_expr $t ')'
 			{
-				$pValue->SetConstSizeT ($t.m_pType->GetTypeKind () == EType_DataRef ? 
-					((CDataPtrType*) $t.m_pType)->GetTargetType ()->GetSize () : 
-					$t.m_pType->GetSize ()
-					);
+				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
+				$pValue->SetConstSizeT (pType->GetSize ());
+			}
+	|	EToken_CountOf '(' type_name_or_expr $t ')'
+			{
+				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
+				return GetCountOf (pType, $pValue);
 			}
 	|	EToken_TypeOf '(' type_name_or_expr $t ')' 
 			{
+				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
 				$pValue->SetType ($t.m_pType);
 			}
 	|	resolver (cast_operator_rslv) 

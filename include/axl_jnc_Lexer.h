@@ -145,6 +145,7 @@ enum EToken
 	EToken_New,
 	EToken_Delete,
 	EToken_SizeOf,
+	EToken_CountOf,
 	EToken_TypeOf,
 
 	// symbol tokens
@@ -310,6 +311,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_New,          "new")
 	AXL_PRS_TOKEN_NAME (EToken_Delete,       "delete")
 	AXL_PRS_TOKEN_NAME (EToken_SizeOf,       "sizeof")
+	AXL_PRS_TOKEN_NAME (EToken_CountOf,      "countof")
 	AXL_PRS_TOKEN_NAME (EToken_TypeOf,       "typeof")
 
 	// symbol tokens

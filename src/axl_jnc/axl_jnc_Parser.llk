@@ -324,6 +324,12 @@ Members2
 	CreateMemberClosure (CValue* pValue);
 
 	bool
+	GetCountOf (
+		CType* pType,
+		CValue* pValue
+		);
+
+	bool
 	GetThisValue (CValue* pValue);
 
 	bool
