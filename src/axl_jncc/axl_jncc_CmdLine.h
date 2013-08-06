@@ -13,6 +13,7 @@ enum EJncFlag
 	EJncFlag_Disassembly = 0x0040,
 	EJncFlag_RunFunction = 0x0080,
 	EJncFlag_Server      = 0x0100,
+	EJncFlag_DebugInfo   = 0x0200,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

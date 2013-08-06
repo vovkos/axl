@@ -98,7 +98,10 @@ public:
 
 	llvm::DIType
 	CreateArrayType (CArrayType* pArrayType);
-		
+
+	llvm::DIType
+	CreatePointerType (CType* pType);
+
 	llvm::DIGlobalVariable
 	CreateGlobalVariable (CVariable* pVariable);
 

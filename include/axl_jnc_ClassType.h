@@ -257,6 +257,13 @@ protected:
 		m_pLlvmType = GetClassStructType ()->GetLlvmType ();
 	}
 
+	virtual 
+	void
+	PrepareLlvmDiType ()
+	{
+		m_LlvmDiType = GetClassStructType ()->GetLlvmDiType ();
+	}
+
 	virtual
 	bool
 	CalcLayout ();

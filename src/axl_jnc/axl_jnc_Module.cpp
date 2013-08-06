@@ -23,6 +23,8 @@ CModule::Clear ()
 	m_CompileArray.Clear ();
 	m_LlvmDiBuilder.Clear ();
 
+	m_Flags = 0;
+
 	m_pConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pLlvmModule = NULL;
@@ -32,7 +34,8 @@ CModule::Clear ()
 bool
 CModule::Create (
 	const rtl::CString& FilePath,
-	llvm::Module* pLlvmModule
+	llvm::Module* pLlvmModule,
+	uint_t Flags
 	)
 {
 	Clear ();
@@ -40,10 +43,15 @@ CModule::Create (
 	m_FilePath = FilePath;
 	m_FileName = io::GetFileName (FilePath);
 	m_DirName = io::GetDirName  (FilePath);
+	m_Flags = Flags;
 
 	m_pLlvmModule = pLlvmModule;
-	m_LlvmDiBuilder.Create ();
-	m_LlvmDiFile = m_LlvmDiBuilder.CreateFile (m_FileName, m_DirName);
+	
+	if (Flags & EModuleFlag_DebugInfo)
+	{	
+		m_LlvmDiBuilder.Create ();
+		m_LlvmDiFile = m_LlvmDiBuilder.CreateFile (m_FileName, m_DirName);
+	}
 
 	return m_NamespaceMgr.AddStdItems ();
 }
@@ -202,7 +210,8 @@ CModule::Compile ()
 
 	// step 7: finalize debug information
 	
-	m_LlvmDiBuilder.Finalize ();	
+	if (m_Flags & EModuleFlag_DebugInfo)
+		m_LlvmDiBuilder.Finalize ();	
 	
 	return true;
 } 
@@ -223,8 +232,7 @@ CModule::CreateDefaultConstructor ()
 
 	m_FunctionMgr.InternalPrologue (pFunction);
 
-	CBasicBlock* pBlock = m_ControlFlowMgr.GetCurrentBlock ();
-	m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+	CBasicBlock* pBlock = m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
 	Result = m_VariableMgr.AllocatePrimeStaticVariables ();
 	if (!Result)

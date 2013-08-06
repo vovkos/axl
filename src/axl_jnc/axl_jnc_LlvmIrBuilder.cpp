@@ -51,6 +51,9 @@ CLlvmIrBuilder::CreateComment_0 (const char* pText)
 void
 CLlvmIrBuilder::SetSourcePos (const CToken::CPos& Pos)
 {
+	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo))
+		return;
+
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope);
 

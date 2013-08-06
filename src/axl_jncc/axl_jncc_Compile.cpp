@@ -14,7 +14,11 @@ CJnc::Compile (
 
 	llvm::Module* pLlvmModule = new llvm::Module (pFileName, llvm::getGlobalContext ());
 
-	m_Module.Create (pFileName, pLlvmModule);
+	uint_t ModuleFlags = 0;
+	if (m_pCmdLine->m_Flags & EJncFlag_DebugInfo)
+		ModuleFlags |= jnc::EModuleFlag_DebugInfo;
+
+	m_Module.Create (pFileName, pLlvmModule, ModuleFlags);
 
 	jnc::CScopeThreadModule ScopeModule (&m_Module);
 	
@@ -55,7 +59,7 @@ CJnc::Jit ()
 	bool Result = m_Runtime.Create (&m_Module, &m_StdLib, JitKind, 16, 1, 4);
 	if (!Result)
 		return false;
-
+		
 	if (JitKind == jnc::EJit_Normal)
 	{
 		llvm::ExecutionEngine* pLlvmExecutionEngine = m_Runtime.GetLlvmExecutionEngine ();
@@ -63,9 +67,10 @@ CJnc::Jit ()
 		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) CStdLib::Printf);
 	}
 
+	printf ("%s\n", m_Module.GetLlvmIrString ().cc ());
+
 	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());	
 }
-
 
 void
 CJnc::PrintLlvmIr ()

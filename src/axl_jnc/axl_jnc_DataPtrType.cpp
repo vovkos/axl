@@ -97,6 +97,15 @@ CDataPtrType::PrepareLlvmType ()
 }
 
 void
+CDataPtrType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = 
+		m_PtrTypeKind != EDataPtrType_Thin ? GetDataPtrStructType ()->GetLlvmDiType () :
+		m_pTargetType->GetTypeKind () != EType_Void ? m_pModule->m_LlvmDiBuilder.CreatePointerType (m_pTargetType) :
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetLlvmDiType ();
+}
+
+void
 CDataPtrType::EnumGcRoots (
 	CRuntime* pRuntime,
 	void* p

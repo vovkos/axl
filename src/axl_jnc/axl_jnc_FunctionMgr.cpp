@@ -294,7 +294,8 @@ CFunctionMgr::Prologue (
 	m_pModule->m_NamespaceMgr.OpenNamespace (pFunction->m_pParentNamespace);
 	pFunction->m_pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 
-	pFunction->GetLlvmDiSubprogram ();
+	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+		pFunction->GetLlvmDiSubprogram ();
 	
 	// create entry block (gc roots come here)
 

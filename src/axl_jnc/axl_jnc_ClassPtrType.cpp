@@ -97,6 +97,12 @@ CClassPtrType::PrepareLlvmType ()
 }
 
 void
+CClassPtrType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreatePointerType (m_pTargetType->GetIfaceStructType ());
+}
+
+void
 CClassPtrType::EnumGcRoots (
 	CRuntime* pRuntime,
 	void* p

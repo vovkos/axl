@@ -23,6 +23,13 @@ class CModule;
 
 //.............................................................................
 
+enum EModuleFlag
+{
+	EModuleFlag_DebugInfo = 0x0001,
+};
+
+//.............................................................................
+
 // makes it convenient to initialize childs (especially operators)
 
 class CPreModule
@@ -50,6 +57,8 @@ protected:
 	rtl::CString m_FilePath;
 	rtl::CString m_FileName;
 	rtl::CString m_DirName;
+
+	uint_t m_Flags;
 
 	CFunction* m_pConstructor;
 	CFunction* m_pDestructor;
@@ -124,7 +133,13 @@ public:
 	{
 		return m_DirName;
 	}
-			
+
+	uint_t 
+	GetFlags ()
+	{
+		return m_Flags;
+	}
+				
 	CFunction* 
 	GetConstructor ()
 	{
@@ -179,7 +194,8 @@ public:
 	bool
 	Create (
 		const rtl::CString& FilePath,
-		llvm::Module* pLlvmModule
+		llvm::Module* pLlvmModule,
+		uint_t Flags = 0
 		);
 
 	void

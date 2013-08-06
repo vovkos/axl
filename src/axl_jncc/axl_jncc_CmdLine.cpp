@@ -181,6 +181,10 @@ CCmdLine::ParseSwitchArg (
 		m_Flags |= EJncFlag_Version;
 		break;
 
+	case 'g':
+		m_Flags |= EJncFlag_DebugInfo;
+		break;
+
 	case 'j':
 		m_Flags |= EJncFlag_Jit;
 		if (Length && *pValue == 'm')

@@ -73,9 +73,12 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	pScope->m_EndPos = Pos;
 	pScope->m_pParentNamespace = m_pCurrentNamespace;
 
-	pScope->m_LlvmDiScope = m_pCurrentScope ? 
-		(llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (m_pCurrentScope, Pos) :
-		(llvm::DIScope) pFunction->GetLlvmDiSubprogram ();
+	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+	{
+		pScope->m_LlvmDiScope = m_pCurrentScope ? 
+			(llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (m_pCurrentScope, Pos) :
+			(llvm::DIScope) pFunction->GetLlvmDiSubprogram ();
+	}
 
 	m_ScopeList.InsertTail (pScope);
 

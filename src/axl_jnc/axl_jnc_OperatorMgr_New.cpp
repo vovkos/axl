@@ -37,7 +37,8 @@ COperatorMgr::Allocate (
 	}
 
 	CVariable* pVariable;
-	CFunction* pAlloc;
+	CFunction* pFunction;
+	CBasicBlock* pBlock;
 
 	CValue PtrValue;
 	switch (StorageKind)
@@ -60,23 +61,26 @@ COperatorMgr::Allocate (
 			return false;
 		}
 
+		pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+		pBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+
 		m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 
 		if (pType->GetFlags () & ETypeFlag_GcRoot)
 			MarkGcRoot (PtrValue, pType);
-
 		break;
 
 	case EStorage_Heap:
-		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAlloc);
-		m_pModule->m_LlvmIrBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
+		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAlloc);
+		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
 		MarkGcRoot (PtrValue, pType);
 		break;
 
 
 	case EStorage_UHeap:
-		pAlloc = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
-		m_pModule->m_LlvmIrBuilder.CreateCall (pAlloc, pAlloc->GetType (), SizeValue, &PtrValue);
+		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
+		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
 		break;
 
 	default:
@@ -702,10 +706,8 @@ COperatorMgr::MarkGcRoot (
 	CType* pType
 	)
 {
-	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
 	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 	

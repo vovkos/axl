@@ -81,9 +81,11 @@ CLlvmDiBuilder::CreateStructType (CStructType* pStructType)
 	for (size_t i = 0; Field; i++, Field++)
 	{
 		CStructField* pField = *Field;
+		rtl::CString Name = pField->GetName ();
+
 		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
 			pField->GetModule ()->GetLlvmDiFile (),
-			pField->GetName ().cc (),
+			!Name.IsEmpty () ? Name.cc () : "unnamed_field",
 			pField->GetModule ()->GetLlvmDiFile (),
 			pField->GetItemDecl ()->GetPos ()->m_Line,
 			pField->GetType ()->GetSize () * 8,
@@ -178,6 +180,17 @@ CLlvmDiBuilder::CreateArrayType (CArrayType* pArrayType)
 		pArrayType->GetAlignFactor () * 8,
 		pArrayType->GetRootType ()->GetLlvmDiType (),
 		LlvmDiArray		
+		);
+}
+
+llvm::DIType
+CLlvmDiBuilder::CreatePointerType (CType* pType)
+{
+	return m_pLlvmDiBuilder->createPointerType (
+		pType->GetLlvmDiType (),
+		pType->GetSize () * 8,
+		pType->GetAlignFactor () * 8,
+		pType->GetTypeString ().cc ()
 		);
 }
 

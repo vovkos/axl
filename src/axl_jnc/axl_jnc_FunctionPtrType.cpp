@@ -119,6 +119,14 @@ CFunctionPtrType::PrepareLlvmType ()
 }
 
 void
+CFunctionPtrType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = 
+		m_PtrTypeKind != EFunctionPtrType_Thin ? GetFunctionPtrStructType ()->GetLlvmDiType () :
+		m_pModule->m_LlvmDiBuilder.CreatePointerType (m_pTargetType);
+}
+
+void
 CFunctionPtrType::EnumGcRoots (
 	CRuntime* pRuntime,
 	void* p

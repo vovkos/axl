@@ -691,11 +691,8 @@ CType::PrepareLlvmDiType ()
 		},
 	};
 	
-	// temporarily default to 'int' (since not all the types are implemented)
-
-	size_t i = m_TypeKind < EType__PrimitiveTypeCount ? m_TypeKind : EType_Int;
-
-	TLlvmDiType* pDiType = &LlvmDiTypeTable [i];
+	ASSERT (m_TypeKind < EType__PrimitiveTypeCount);
+	TLlvmDiType* pDiType = &LlvmDiTypeTable [m_TypeKind];
 
 	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateBasicType (
 		pDiType->m_pName, 

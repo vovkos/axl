@@ -91,6 +91,10 @@ protected:
 	virtual 
 	void
 	PrepareLlvmType ();
+
+	virtual 
+	void
+	PrepareLlvmDiType ();
 };
 
 //.............................................................................

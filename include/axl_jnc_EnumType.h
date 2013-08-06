@@ -118,6 +118,13 @@ protected:
 	}
 
 	virtual 
+	void
+	PrepareLlvmDiType ()
+	{
+		m_LlvmDiType = m_pBaseType->GetLlvmDiType ();
+	}
+
+	virtual 
 	bool
 	CalcLayout ();
 };

@@ -36,7 +36,7 @@ COperatorMgr::COperatorMgr ()
 	m_UnOp_PreInc.m_OpKind  = EUnOp_PreInc;
 	m_UnOp_PreDec.m_OpKind  = EUnOp_PreDec;
 	m_UnOp_PostInc.m_OpKind = EUnOp_PostInc;
-	m_UnOp_PostDec.m_OpKind = EUnOp_PostInc;
+	m_UnOp_PostDec.m_OpKind = EUnOp_PostDec;
 
 	m_UnaryOperatorTable [EUnOp_PreInc]   = &m_UnOp_PreInc;
 	m_UnaryOperatorTable [EUnOp_PreDec]   = &m_UnOp_PreDec;
@@ -667,7 +667,7 @@ COperatorMgr::PrepareOperandType (
 					Value = pArrayType->GetElementType ()->GetDataPtrType (
 						pPtrType->GetAnchorNamespace (), 
 						EType_DataPtr, 
-						pPtrType->GetPtrTypeKind (), 
+						EDataPtrType_Thin, 
 						pPtrType->GetFlags ()
 						);
 				}
@@ -778,11 +778,25 @@ COperatorMgr::PrepareOperand (
 					pType = pArrayType->GetElementType ()->GetDataPtrType (
 						pPtrType->GetAnchorNamespace (),
 						EType_DataPtr, 
-						pPtrType->GetPtrTypeKind (), 
+						EDataPtrType_Thin, 
 						pPtrType->GetFlags ()
 						);
 
-					Value.OverrideType (pType);
+					CValue PrevValue = Value;
+					m_pModule->m_LlvmIrBuilder.CreateGep2 (Value, 0, pType, &Value);
+					
+					if (!(pPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
+					{
+						if (pPtrType->GetPtrTypeKind () == EDataPtrType_Thin)
+						{
+							if (PrevValue.GetValueKind () == EValue_Variable)
+								Value.SetThinDataPtrValidator (PrevValue);
+							else
+								Value.SetThinDataPtrValidator (PrevValue.GetThinDataPtrValidator ());
+						}
+						else
+							Value.SetThinDataPtrValidator (PrevValue);
+					}
 				}
 			}
 

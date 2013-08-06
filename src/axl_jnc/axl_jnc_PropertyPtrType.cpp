@@ -113,6 +113,14 @@ CPropertyPtrType::PrepareLlvmType ()
 }
 
 void
+CPropertyPtrType::PrepareLlvmDiType ()
+{
+	m_LlvmDiType = 
+		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmDiType () : 
+		m_pTargetType->GetVTableStructType ()->GetDataPtrType_c ()->GetLlvmDiType ();
+}
+
+void
 CPropertyPtrType::EnumGcRoots (
 	CRuntime* pRuntime,
 	void* p

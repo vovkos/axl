@@ -271,7 +271,9 @@ CVariableMgr::AllocatePrimeStaticVariable (CVariable* pVariable)
 	if (pVariable->m_pType->GetFlags () & ETypeFlag_GcRoot)
 		m_StaticGcRootArray.Append (pVariable);
 
-	m_pModule->m_LlvmDiBuilder.CreateGlobalVariable (pVariable);
+	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+		pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateGlobalVariable (pVariable);
+
 	return true;
 }
 
@@ -433,8 +435,11 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 		}
 	}
 
-	pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (pVariable);
-	m_pModule->m_LlvmDiBuilder.CreateDeclare (pVariable);
+	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+	{
+		pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (pVariable);
+		m_pModule->m_LlvmDiBuilder.CreateDeclare (pVariable);
+	}
 	
 	Result = m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
 	if (!Result)
@@ -451,9 +456,7 @@ CVariableMgr::AllocateTlsVariable (CVariable* pVariable)
 	// create alloca in function entry block
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-
-	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
 	CValue PtrValue;
 	llvm::AllocaInst* pLlvmAlloca = m_pModule->m_LlvmIrBuilder.CreateAlloca (

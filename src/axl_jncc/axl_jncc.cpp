@@ -27,6 +27,7 @@ PrintUsage (IOutStream* pOutStream)
 		"    -l[c]          print LLVM IR ('c' = manual mode w/ comments)\n"	
 		"    -d             print disassembly (implies -j)\n"
 		"    -j[m]          JIT functions ('m' = use MC-JITter)\n"
+		"    -g             emit debugging information\n"
 		"    -r <function>  run function <function> (implies '-j')\n"
 		"    -s <port>      start compiler server on TCP <port>\n"
 		);

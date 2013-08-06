@@ -3,12 +3,12 @@
 int 
 main ()
 {
-	printf ("main ()\n");
-
 	int a [] = { 10, 20, 30, 40, 50, 60 };
 
-	for (int i = 0; i < countof (a) + 1; i++)
-		printf ($"a [$i] = $(a [i])\n");
+	int* p = a;
+
+	for (int i = 0; i < countof (a) + 1; i++, p++)
+		printf ("a [%d] = %d\n", i, *p);
 
 	return 10; 
 }
