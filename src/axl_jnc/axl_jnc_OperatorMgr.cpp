@@ -319,8 +319,8 @@ COperatorMgr::GetConditionalOperatorResultType (
 	const CValue& FalseValue
 	)
 {
-	CType* pTrueType = TrueValue.GetType ();
-	CType* pFalseType = FalseValue.GetType ();
+	CType* pTrueType = PrepareOperandType (TrueValue.GetType (), EOpFlag_KeepBool | EOpFlag_KeepEnum);
+	CType* pFalseType = PrepareOperandType (FalseValue.GetType (), EOpFlag_KeepBool | EOpFlag_KeepEnum);
 
 	CType* pResultType = 
 		pTrueType->Cmp (pFalseType) == 0 ? pTrueType : 
@@ -328,15 +328,16 @@ COperatorMgr::GetConditionalOperatorResultType (
 			GetArithmeticOperatorResultType (pTrueType, pFalseType) :
 			m_pModule->m_OperatorMgr.PrepareOperandType (pTrueType);
 
-	if ((pResultType->GetTypeKindFlags () & ETypeKindFlag_DataPtr) && 
-		((CDataPtrType*) pResultType)->GetPtrTypeKind () == EDataPtrType_Thin)
-		pResultType = ((CDataPtrType*) pResultType)->GetTargetType ()->GetDataPtrType (
-			pResultType->GetTypeKind (),
-			EDataPtrType_Normal,
-			pResultType->GetFlags ()
-			);
+	// if it's a safe thin pointer, make fatten it
 
-	return pResultType;
+	if (IsSafeThinDataPtrType (pResultType))
+		pResultType = ((CDataPtrType*) pResultType)->GetUnThinPtrType ();
+
+	bool Result = 
+		CheckCastKind (TrueValue, pResultType) && 
+		CheckCastKind (FalseValue, pResultType);
+
+	return Result ? pResultType : NULL;
 }
 
 bool 
@@ -369,6 +370,8 @@ COperatorMgr::ConditionalOperator (
 	CValue FalseValue;
 
 	CType* pResultType = GetConditionalOperatorResultType (RawTrueValue, RawFalseValue);
+	if (!pResultType)
+		return false;
 
 	Result = CastOperator (RawFalseValue, pResultType, &FalseValue);
 	if (!Result)
@@ -401,7 +404,10 @@ COperatorMgr::CastOperator (
 
 	if (RawOpValue.GetValueKind () == EValue_Null)
 	{
-		*pResultValue = pType->GetZeroValue ();
+		if (pType->GetTypeKind () == EType_Void)
+			pResultValue->SetNull ();
+		else
+			*pResultValue = pType->GetZeroValue ();
 		return true;
 	}
 

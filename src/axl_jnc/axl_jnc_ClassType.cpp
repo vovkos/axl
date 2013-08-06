@@ -324,7 +324,7 @@ CClassType::CalcLayout ()
 
 		if (pType->GetTypeKind () == EType_Class)
 		{
-			if (pType->GetFlags () & EClassTypeFlag_Abstract)
+			if (((CClassType*) pType)->IsCreatable ())
 			{
 				err::SetFormatStringError ("cannot instantiate abstract '%s'", pType->GetTypeString ().cc ()); 
 				return false;
@@ -428,7 +428,7 @@ CClassType::CalcLayout ()
 		m_pStaticOnceFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable ();
 
 	if (m_pStaticDestructor)
-		m_pModule->m_VariableMgr.AddToLazyStaticDestructList (m_pStaticOnceFlagVariable, m_pStaticDestructor);
+		m_pModule->m_VariableMgr.m_StaticDestructList.AddStaticDestructor (m_pStaticDestructor, m_pStaticOnceFlagVariable);
 
 	if (!m_pPreConstructor && 
 		(m_pStaticConstructor ||
@@ -460,7 +460,7 @@ CClassType::CalcLayout ()
 			return false;
 	}
 
-	if (m_ClassTypeKind != EClassType_StdObject && !(m_Flags & EClassTypeFlag_Abstract))
+	if (IsCreatable ())
 		CreatePrimer ();
 
 	m_Size = m_pClassStructType->GetSize ();

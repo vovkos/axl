@@ -97,6 +97,12 @@ protected:
 public:
 	CClassType ();
 
+	bool
+	IsCreatable ()
+	{
+		return m_ClassTypeKind != EClassType_StdObject && !(m_Flags & EClassTypeFlag_Abstract);
+	}
+
 	EClassType 
 	GetClassTypeKind ()
 	{

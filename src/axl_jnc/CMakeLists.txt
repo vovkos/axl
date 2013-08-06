@@ -378,6 +378,7 @@ source_group (
 set (
 	VARIABLE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Alias.h
+	${AXL_INC_DIR}/axl_jnc_DestructList.h
 	${AXL_INC_DIR}/axl_jnc_Variable.h
 	${AXL_INC_DIR}/axl_jnc_VariableMgr.h
 	)
@@ -385,6 +386,7 @@ set (
 set (
 	VARIABLE_CPP_LIST
 	axl_jnc_Alias.cpp
+	axl_jnc_DestructList.cpp
 	axl_jnc_Variable.cpp
 	axl_jnc_VariableMgr.cpp
 	)

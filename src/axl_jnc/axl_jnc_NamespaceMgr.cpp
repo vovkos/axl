@@ -98,7 +98,7 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 	
 	if (!(m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Unreachable))
 	{
-		m_pModule->m_OperatorMgr.ProcessDestructArray (m_pCurrentScope->GetDestructArray ());
+		m_pCurrentScope->m_DestructList.RunDestructors ();
 		m_pModule->m_OperatorMgr.NullifyGcRootList (m_pCurrentScope->GetGcRootList ());
 	}
 

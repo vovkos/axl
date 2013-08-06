@@ -454,13 +454,17 @@ CFunctionMgr::CreateShadowArgVariables ()
 			return false;
 
 		pArgVariable->m_pLlvmAllocValue = PtrValue.GetLlvmValue ();
-		pArgVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();			
-		pArgVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (
-			pArgVariable, 
-			llvm::dwarf::DW_TAG_arg_variable
-			);
+		pArgVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
+
+		if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+		{
+			pArgVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (
+				pArgVariable, 
+				llvm::dwarf::DW_TAG_arg_variable
+				);
 		
-		m_pModule->m_LlvmDiBuilder.CreateDeclare (pArgVariable);
+			m_pModule->m_LlvmDiBuilder.CreateDeclare (pArgVariable);
+		}
 		
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
 
@@ -523,10 +527,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	}
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleDestructor)
-	{
-		m_pModule->m_OperatorMgr.ProcessDestructArray (m_pModule->m_VariableMgr.GetGlobalStaticDestructArray ());
-		m_pModule->m_OperatorMgr.ProcessLazyStaticDestructList (m_pModule->m_VariableMgr.GetLazyStaticDestructList ());
-	}
+		m_pModule->m_VariableMgr.m_StaticDestructList.RunDestructors ();
 
 	// ensure return
 

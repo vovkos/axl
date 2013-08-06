@@ -192,9 +192,7 @@ CModule::Compile ()
 
 	// step 5: ensure module destructor (if needed)
 
-	if (!m_pDestructor && 
-		(!m_VariableMgr.GetGlobalStaticDestructArray ().IsEmpty () ||
-		 !m_VariableMgr.GetLazyStaticDestructList ().IsEmpty ()))
+	if (!m_pDestructor && !m_VariableMgr.m_StaticDestructList.IsEmpty ())
 	{
 		CreateDefaultDestructor ();
 	}
@@ -262,10 +260,7 @@ CModule::CreateDefaultDestructor ()
 	m_pDestructor = pFunction;
 
 	m_FunctionMgr.InternalPrologue (pFunction);
-
-	m_OperatorMgr.ProcessDestructArray (m_VariableMgr.GetGlobalStaticDestructArray ());
-	m_OperatorMgr.ProcessLazyStaticDestructList (m_VariableMgr.GetLazyStaticDestructList ());
-
+	m_VariableMgr.m_StaticDestructList.RunDestructors ();
 	m_FunctionMgr.InternalEpilogue ();
 }
 

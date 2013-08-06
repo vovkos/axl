@@ -68,6 +68,14 @@ public:
 			this;			
 	}
 
+	CDataPtrType*
+	GetUnThinPtrType ()
+	{
+		return (m_PtrTypeKind == EDataPtrType_Thin) ?  
+			m_pTargetType->GetDataPtrType (m_TypeKind, EDataPtrType_Normal, m_Flags) : 
+			this;			
+	}
+
 	CStructType* 
 	GetDataPtrStructType ();
 
@@ -118,6 +126,18 @@ IsCharPtrType (CType* pType)
 	return 
 		pType->GetTypeKind () == EType_DataPtr &&
 		((CDataPtrType*) pType)->GetTargetType ()->GetTypeKind () == EType_Char;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool 
+IsSafeThinDataPtrType (CType* pType)
+{
+	return 
+		pType->GetTypeKind () == EType_DataPtr &&
+		!(pType->GetFlags () & EPtrTypeFlag_Unsafe) &&
+		((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin;		
 }
 
 //.............................................................................

@@ -38,7 +38,7 @@ COperatorMgr::Allocate (
 
 	CVariable* pVariable;
 	CFunction* pFunction;
-	CBasicBlock* pBlock;
+	CBasicBlock* pPrevBlock;
 
 	CValue PtrValue;
 	switch (StorageKind)
@@ -55,17 +55,11 @@ COperatorMgr::Allocate (
 		break;
 
 	case EStorage_Stack:
-		if (m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasJump)
-		{
-			err::SetFormatStringError ("'stack new' cannot be used in branched expression");
-			return false;
-		}
-
 		pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-		pBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+		pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
 		m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
-		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
 
 		if (pType->GetFlags () & ETypeFlag_GcRoot)
 			MarkGcRoot (PtrValue, pType);
@@ -145,7 +139,7 @@ COperatorMgr::Prime (
 		break;
 	}
 
-	if (pClassType->GetFlags () & EClassTypeFlag_Abstract)
+	if (!pClassType->IsCreatable ())
 	{
 		err::SetFormatStringError ("cannot instantiate abstract '%s'", pClassType->GetTypeString ().cc ()); 
 		return false;
@@ -183,7 +177,40 @@ COperatorMgr::Prime (
 			);
 	}
 
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+	CFunction* pDestructor = pClassType->GetDestructor ();
+	if (StorageKind != EStorage_Stack || !pDestructor)
+	{
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+		return true;
+	}
+
+	CVariable* pFlagVariable = NULL; 
+	if (m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasJump)
+	{
+		CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+		CBasicBlock* pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+
+		pFlagVariable = m_pModule->m_VariableMgr.CreateOnceFlagVariable (EStorage_Stack);
+		m_pModule->m_VariableMgr.AllocatePrimeInitializeVariable (pFlagVariable);
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
+
+		m_pModule->m_OperatorMgr.BinaryOperator (
+			EBinOp_Assign, 
+			pFlagVariable,
+			CValue ((int64_t) 1, pFlagVariable->GetType ())
+			);
+	}
+	else
+	{
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, 1, pClassType->GetClassPtrType (), pResultValue);
+	}
+
+	m_pModule->m_NamespaceMgr.GetCurrentScope ()->m_DestructList.AddDestructor (
+		pDestructor, 
+		*pResultValue,
+		pFlagVariable
+		);
 
 	return true;
 }
@@ -615,69 +642,6 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 	CValue ReturnValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
 	return true;
-}
-
-void
-COperatorMgr::ProcessDestructArray (
-	CVariable* const* ppDestructArray,
-	size_t Count
-	)
-{
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "process destruct list");
-
-	for (intptr_t i = Count - 1; i >= 0; i--)
-	{
-		CVariable* pVariable = ppDestructArray [i];
-		ASSERT (pVariable->GetType ()->GetTypeKind () == EType_Class);
-
-		CClassType* pType = (CClassType*) pVariable->GetType ();
-		CFunction* pDestructor = pType->GetDestructor ();
-		ASSERT (pDestructor);
-
-		m_pModule->m_LlvmIrBuilder.CreateCall (pDestructor, pDestructor->GetType (), pVariable, NULL);		
-	}
-}
-
-void
-COperatorMgr::ProcessLazyStaticDestructList (const rtl::CConstListT <TLazyStaticDestruct>& List)
-{
-	rtl::CIteratorT <TLazyStaticDestruct> Destruct = List.GetHead ();
-	for (; Destruct; Destruct++)
-	{
-		TLazyStaticDestruct* pDestruct = *Destruct;
-
-		CBasicBlock* pDestructBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("destruct_block");
-		CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow_block");
-
-		CValue CmpValue;
-
-		m_pModule->m_OperatorMgr.BinaryOperator (
-			EBinOp_Ne, 
-			pDestruct->m_pFlagVariable, 
-			pDestruct->m_pFlagVariable->GetType ()->GetZeroValue (),
-			&CmpValue
-			);
-
-		m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pDestructBlock, pFollowBlock);
-
-		CValue ArgValue;
-		size_t ArgCount = 0;
-
-		if (pDestruct->m_pVariable)
-		{
-			ArgValue.SetVariable (pDestruct->m_pVariable);
-			ArgCount = 1;
-		}
-
-		m_pModule->m_LlvmIrBuilder.CreateCall (
-			pDestruct->m_pDestructor, 
-			pDestruct->m_pDestructor->GetType (), 
-			&ArgValue, ArgCount,
-			NULL
-			);
-
-		m_pModule->m_ControlFlowMgr.Follow (pFollowBlock);
-	}
 }
 
 void

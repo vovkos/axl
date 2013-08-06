@@ -645,7 +645,7 @@ new_operator_type
 	;
 
 type_name_w_constructor_rslv
-	:	qualified_name '('
+	:	qualified_name EToken_Construct? '('
 	;
 
 new_operator_curly_initializer <CValue* $pValue>

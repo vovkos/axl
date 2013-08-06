@@ -188,7 +188,7 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	while (pScope && pScope != pTargetScope && pScope->GetFunction () == pFunction)
 	{	
-		m_pModule->m_OperatorMgr.ProcessDestructArray (pScope->GetDestructArray ());
+		pScope->m_DestructList.RunDestructors ();
 		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
 		pScope = pScope->GetParentScope ();
 	}

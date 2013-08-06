@@ -1251,21 +1251,6 @@ public:
 		);
 
 	void
-	ProcessDestructArray (
-		CVariable* const* ppDestructArray,
-		size_t Count
-		);
-
-	void
-	ProcessDestructArray (const rtl::CArrayT <CVariable*> DestructArray)
-	{
-		ProcessDestructArray (DestructArray, DestructArray.GetCount ());
-	}
-
-	void
-	ProcessLazyStaticDestructList (const rtl::CConstListT <TLazyStaticDestruct>& List);
-
-	void
 	NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List);
 	
 	// closures

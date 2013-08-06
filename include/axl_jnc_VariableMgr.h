@@ -6,24 +6,13 @@
 
 #include "axl_jnc_Variable.h"
 #include "axl_jnc_Alias.h"
+#include "axl_jnc_DestructList.h"
 
 namespace axl {
 namespace jnc {
 
 class CClassType;
 class CFunction;
-
-//.............................................................................
-
-// for non-global static variables and static destructors we need to check 
-// whether the item was actually created or not (cause of lazy initialization)
-
-struct TLazyStaticDestruct: rtl::TListLink 
-{
-	CVariable* m_pFlagVariable;
-	CFunction* m_pDestructor;
-	CVariable* m_pVariable; // could be null for static destructors
-};
 
 //.............................................................................
 
@@ -53,8 +42,6 @@ protected:
 	rtl::CArrayT <CVariable*> m_StaticVariableArray;
 	rtl::CArrayT <CVariable*> m_StaticGcRootArray;
 	rtl::CArrayT <CVariable*> m_GlobalStaticVariableArray;
-	rtl::CArrayT <CVariable*> m_GlobalStaticDestructArray;
-	rtl::CStdListT <TLazyStaticDestruct> m_LazyStaticDestructList;
 
 	rtl::CArrayT <llvm::GlobalVariable*> m_LlvmGlobalVariableArray;
 
@@ -65,6 +52,9 @@ protected:
 	CStructType* m_pTlsStructType;
 
 	CVariable* m_StdVariableArray [EStdVariable__Count];
+
+public:
+	CDestructList m_StaticDestructList;
 
 public:
 	CVariableMgr ();
@@ -100,18 +90,6 @@ public:
 	}
 
 	rtl::CArrayT <CVariable*> 
-	GetGlobalStaticDestructArray ()
-	{
-		return m_GlobalStaticDestructArray;
-	}
-
-	rtl::CConstListT <TLazyStaticDestruct>
-	GetLazyStaticDestructList ()
-	{
-		return m_LazyStaticDestructList;
-	}
-
-	rtl::CArrayT <CVariable*> 
 	GetTlsVariableArray ()
 	{
 		return m_TlsVariableArray;
@@ -129,13 +107,6 @@ public:
 		ASSERT (m_pTlsStructType);
 		return m_pTlsStructType;
 	}
-
-	void
-	AddToLazyStaticDestructList (
-		CVariable* pFlagVariable,
-		CFunction* pDestructor,
-		CVariable* pVariable = NULL
-		);
 
 	CVariable*
 	CreateVariable (

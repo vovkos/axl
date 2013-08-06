@@ -26,8 +26,7 @@ CVariableMgr::Clear ()
 	m_StaticVariableArray.Clear ();
 	m_StaticGcRootArray.Clear ();
 	m_GlobalStaticVariableArray.Clear ();
-	m_GlobalStaticDestructArray.Clear ();
-	m_LazyStaticDestructList.Clear ();
+	m_StaticDestructList.Clear ();
 
 	m_TlsVariableArray.Clear ();
 	m_TlsGcRootArray.Clear ();
@@ -42,21 +41,6 @@ CVariableMgr::CreateStdVariables ()
 {
 	for (size_t i = 0; i < EStdVariable__Count; i++)
 		GetStdVariable ((EStdVariable) i);
-}
-
-void
-CVariableMgr::AddToLazyStaticDestructList (
-	CVariable* pFlagVariable,
-	CFunction* pDestructor,
-	CVariable* pVariable
-	)
-{
-	TLazyStaticDestruct* pDestruct = AXL_MEM_NEW (TLazyStaticDestruct);
-	pDestruct->m_pFlagVariable = pFlagVariable;
-	pDestruct->m_pDestructor = pDestructor;
-	pDestruct->m_pVariable = pVariable;
-
-	m_LazyStaticDestructList.InsertTail (pDestruct);
 }
 
 CVariable*
@@ -160,8 +144,6 @@ CVariableMgr::CreateVariable (
 CVariable*
 CVariableMgr::CreateOnceFlagVariable (EStorage StorageKind)
 {
-	ASSERT (StorageKind == EStorage_Static || StorageKind == EStorage_Thread);
-
 	return CreateVariable (
 		StorageKind, 
 		"once_flag", 
@@ -293,9 +275,12 @@ CVariableMgr::InitializeGlobalStaticVariables ()
 			pVariable->m_Initializer
 			);
 
-		if (pVariable->m_pType->GetTypeKind () == EType_Class &&
-			((CClassType*) pVariable->m_pType)->GetDestructor ())
-			m_GlobalStaticDestructArray.Append (pVariable);
+		if (pVariable->m_pType->GetTypeKind () == EType_Class)
+		{
+			CFunction* pDestructor = ((CClassType*) pVariable->m_pType)->GetDestructor ();
+			if (pDestructor)
+				m_StaticDestructList.AddDestructor (pDestructor, pVariable);
+		}
 
 		if (!Result)
 			return false;
@@ -350,14 +335,11 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 	if (!Result)
 		return false;
 
-	if (pVariable->m_pType->GetTypeKind () == EType_Class &&
-		((CClassType*) pVariable->m_pType)->GetDestructor ())
+	if (pVariable->m_pType->GetTypeKind () == EType_Class)
 	{
-		AddToLazyStaticDestructList (
-			Stmt.m_pFlagVariable, 
-			((CClassType*) pVariable->m_pType)->GetDestructor (), 
-			pVariable
-			);
+		CFunction* pDestructor = ((CClassType*) pVariable->m_pType)->GetDestructor ();
+		if (pDestructor)
+			m_StaticDestructList.AddDestructor (pDestructor, pVariable, Stmt.m_pFlagVariable);
 	}
 
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
@@ -416,13 +398,6 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 			return false;
 
 		pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
-
-		if (pVariable->m_StorageKind == EStorage_Stack &&
-			pVariable->m_pType->GetTypeKind () == EType_Class &&
-			((CClassType*) pVariable->m_pType)->GetDestructor ())
-		{
-			m_pModule->m_NamespaceMgr.GetCurrentScope ()->AddToDestructArray (pVariable);
-		}
 	}
 	else
 	{

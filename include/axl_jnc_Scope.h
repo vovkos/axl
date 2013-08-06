@@ -5,7 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Namespace.h"
-#include "axl_jnc_Value.h"
+#include "axl_jnc_DestructList.h"
 
 namespace axl {
 namespace jnc {
@@ -30,15 +30,13 @@ protected:
 	CToken::CPos m_EndPos;
 	CFunction* m_pFunction;
 
-	rtl::CArrayT <CVariable*> m_DestructArray;
 	rtl::CBoxListT <CValue> m_GcRootList;
 	llvm::DIScope m_LlvmDiScope;
 
 public:
 	CBasicBlock* m_pBreakBlock;
 	CBasicBlock* m_pContinueBlock;
-
-	// local variable list for debugger
+	CDestructList m_DestructList;
 
 public:
 	CScope ();
@@ -71,18 +69,6 @@ public:
 	GetParentScope ()
 	{
 		return m_pParentNamespace && m_pParentNamespace->GetNamespaceKind () == ENamespace_Scope ? (CScope*) m_pParentNamespace : NULL;
-	}
-
-	rtl::CArrayT <CVariable*>
-	GetDestructArray ()
-	{
-		return m_DestructArray;
-	}
-
-	void
-	AddToDestructArray (CVariable* pVariable)
-	{
-		m_DestructArray.Append (pVariable);
 	}
 
 	rtl::CConstBoxListT <CValue>
