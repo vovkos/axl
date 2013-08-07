@@ -33,6 +33,13 @@ GetJitKindString (EJit JitKind);
 
 //.............................................................................
 
+enum EGcFlag
+{
+	EGcFlag_WaitForDestructors = 0x01,
+};
+
+//.............................................................................
+
 class CRuntime
 {
 protected:
@@ -57,7 +64,7 @@ protected:
 		dword_t	
 		ThreadProc ()
 		{
-			m_pRuntime->DestructThreadProc ();
+			m_pRuntime->GcDestructThreadProc ();
 			return 0;
 		}
 	};
@@ -83,9 +90,10 @@ protected:
 	size_t m_GcBlockSize;
 	rtl::CBuddyAllocMap m_GcMap;
 
-	rtl::CAuxListT <TObject, CObjectHeapLink> m_GcObjectList;	
-	rtl::CAuxListT <TObject, CObjectHeapLink> m_GcDestructList;	
+	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcObjectList;	
+	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcDestructList;	
 	mt::CEvent m_GcDestructEvent;
+	mt::CNotificationEvent m_GcDestructThreadIdleEvent;
 	CGcDestructThread m_GcDestructThread;
 	bool m_TerminateGcDestructThread;
 
@@ -147,8 +155,20 @@ public:
 	// gc heap 
 
 	void
-	RunGc ();
+	RunGcEx (uint_t Flags);
 
+	void
+	RunGc ()
+	{
+		RunGcEx (0);
+	}
+
+	void
+	RunGcWaitForDestructors ()
+	{
+		RunGcEx (EGcFlag_WaitForDestructors);
+	}
+		
 	void
 	GcSafePoint ();
 
@@ -236,7 +256,10 @@ protected:
 	}
 
 	void
-	DestructThreadProc ();
+	GcMarkCycle ();
+
+	void
+	GcDestructThreadProc ();
 };
 
 //.............................................................................

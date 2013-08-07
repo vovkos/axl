@@ -117,6 +117,11 @@ enum EStdFunc
 
 	EStdFunc_RunGc,
 
+	// void
+	// jnc.RunGcWaitForDestructors ();
+
+	EStdFunc_RunGcWaitForDestructors,
+
 	// i64
 	// jnc.GetCurrentThreadId ();
 
@@ -506,6 +511,9 @@ protected:
 
 	CFunction*
 	CreateRunGc ();
+
+	CFunction*
+	CreateRunGcWaitForDestructors ();
 
 	CFunction*
 	CreateGetCurrentThreadId ();

@@ -242,13 +242,10 @@ public:
 	CallMemberFieldConstructors (const CValue& ThisValue);
 
 	bool
-	CallMemberFieldDestructors (const CValue& ThisValue);
-
-	bool
 	CallMemberPropertyConstructors (const CValue& ThisValue);
 
 	bool
-	CallMemberPropertyDestructors (const CValue& ThisValue);
+	CallMemberDestructors (const CValue& ThisValue);
 
 	CValue
 	GetVTablePtrValue ()
@@ -279,6 +276,12 @@ protected:
 
 	bool 
 	CompileBinder ();
+
+	bool
+	CallMemberFieldDestructors (const CValue& ThisValue);
+
+	bool
+	CallMemberPropertyDestructors (const CValue& ThisValue);
 };
 
 //.............................................................................

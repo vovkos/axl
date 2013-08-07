@@ -134,6 +134,10 @@ public:
 	RunGc ();
 
 	static
+	void
+	RunGcWaitForDestructors ();
+
+	static
 	intptr_t
 	GetCurrentThreadId ();
 

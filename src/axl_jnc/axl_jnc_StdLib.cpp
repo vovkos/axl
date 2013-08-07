@@ -22,6 +22,7 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.GcAddObject"] = (void*) GcAddObject;
 	m_FunctionMap ["jnc.GcSafePoint"] = (void*) GcSafePoint;
 	m_FunctionMap ["jnc.RunGc"] = (void*) RunGc;
+	m_FunctionMap ["jnc.RunGcWaitForDestructors"] = (void*) RunGcWaitForDestructors;
 	m_FunctionMap ["jnc.GetCurrentThreadId"] = (void*) GetCurrentThreadId;
 	m_FunctionMap ["jnc.CreateThread"] = (void*) CreateThread;
 	m_FunctionMap ["jnc.Sleep"] = (void*) Sleep;
@@ -59,6 +60,7 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGc, (void*) RunGc);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGcWaitForDestructors, (void*) RunGcWaitForDestructors);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetCurrentThreadId, (void*) GetCurrentThreadId);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_CreateThread, (void*) CreateThread);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Sleep, (void*) Sleep);
@@ -295,6 +297,15 @@ CStdLib::RunGc ()
 	ASSERT (pRuntime);
 
 	pRuntime->RunGc ();
+}
+
+void
+CStdLib::RunGcWaitForDestructors ()
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	pRuntime->RunGcWaitForDestructors ();
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)

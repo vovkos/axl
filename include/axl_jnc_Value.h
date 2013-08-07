@@ -634,7 +634,6 @@ enum EObjectFlag
 	EObjectFlag_Stack  = 0x04,
 	EObjectFlag_UHeap  = 0x08,
 	EObjectFlag_GcMark = 0x10, // volatile flag
-	EObjectFlag_CallMemberDestructors = EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap,
 };
 
 // master header of class instance
@@ -644,18 +643,18 @@ struct TObject
 	class CClassType* m_pType; // for GC tracing & QueryInterface
 	size_t m_ScopeLevel;
 	intptr_t m_Flags;
-	rtl::TListLink m_HeapLink; // objects allocated on managed heap get into a list
+	rtl::TListLink m_GcHeapLink; // objects allocated on gc heap get into a list
 
 	// followed by TInterface of object
 };
 
-class CObjectHeapLink
+class CObjectGcHeapLink
 {
 public:
 	rtl::TListLink*
 	operator () (TObject* pObject)
 	{
-		return &pObject->m_HeapLink;
+		return &pObject->m_GcHeapLink;
 	}	
 };
 

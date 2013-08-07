@@ -324,7 +324,8 @@ CClassType::CalcLayout ()
 
 		if (pType->GetTypeKind () == EType_Class)
 		{
-			if (((CClassType*) pType)->IsCreatable ())
+			CClassType* pClassType = (CClassType*) pType;
+			if (!pClassType->IsCreatable ())
 			{
 				err::SetFormatStringError ("cannot instantiate abstract '%s'", pType->GetTypeString ().cc ()); 
 				return false;
@@ -332,7 +333,7 @@ CClassType::CalcLayout ()
 
 			m_ClassMemberFieldArray.Append (pField);
 
-			if (((CClassType*) pType)->GetDestructor ())
+			if (pClassType->GetDestructor ())
 				m_MemberFieldDestructArray.Append (pField);
 		}
 	}
@@ -716,25 +717,45 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 {
 	bool Result;
 
-	// TODO: only call member field destructors if class is allocated on stack
+	// only call member field destructors if storage is stack, static or uheap
 
-/*
-		static int32_t LlvmIndexArray [] = 
-		{
-			0, // TObjectHdr**
-			0, // TObjectHdr*
-			2, // intptr_t m_Flags
-		};
+	CBasicBlock* pCallBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("call_member_field_destructors");
+	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow");
 
-		CValue FlagsValue;
-		m_pModule->m_LlvmIrBuilder.CreateGep (
-			FieldValue, 
-			LlvmIndexArray, 
-			countof (LlvmIndexArray), 
-			NULL, 
-			&FlagsValue
-			);
-*/
+	static int32_t LlvmIndexArray [] = 
+	{
+		0, // TInterface**
+		0, // TInterface*
+		1, // TObject**
+	};
+
+	CValue ObjectPtrValue;
+	m_pModule->m_LlvmIrBuilder.CreateGep (
+		ThisValue, 
+		LlvmIndexArray, 
+		countof (LlvmIndexArray), 
+		NULL, 
+		&ObjectPtrValue
+		);
+
+	m_pModule->m_LlvmIrBuilder.CreateLoad (ObjectPtrValue, NULL, &ObjectPtrValue);
+
+	CType* pType = GetSimpleType (m_pModule, EType_Int_p);
+
+	CValue FlagsValue;
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &FlagsValue);
+	m_pModule->m_LlvmIrBuilder.CreateLoad (FlagsValue, pType, &FlagsValue);
+	
+	CValue MaskValue;
+	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap, EType_Int_p);
+	
+	CValue AndValue;
+	Result = 
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwAnd, FlagsValue, MaskValue, &AndValue) &&	
+		m_pModule->m_ControlFlowMgr.ConditionalJump (AndValue, pCallBlock, pFollowBlock);
+
+	if (!Result)
+		return false;
 
 	size_t Count = m_MemberFieldDestructArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
@@ -756,6 +777,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 			return false;
 	}
 
+	m_pModule->m_ControlFlowMgr.Follow (pFollowBlock);
 	return true;
 }
 

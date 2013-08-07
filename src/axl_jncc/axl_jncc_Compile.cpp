@@ -67,8 +67,6 @@ CJnc::Jit ()
 		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) CStdLib::Printf);
 	}
 
-	printf ("%s\n", m_Module.GetLlvmIrString ().cc ());
-
 	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());	
 }
 

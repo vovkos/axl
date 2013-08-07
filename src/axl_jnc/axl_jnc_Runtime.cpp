@@ -357,6 +357,7 @@ CRuntime::Startup ()
 {
 	m_TerminateGcDestructThread = false;
 	m_GcDestructThread.Start ();
+	m_GcDestructThreadIdleEvent.Wait (); // make sure GC destruct thread is running and registered with TLS mgr
 	m_GcIdleEvent.Signal ();
 	return true;
 }
@@ -429,16 +430,22 @@ CRuntime::GcAddObject_l (TObject* pObject)
 {
 	printf ("GcAddObject %08x: %s\n", pObject, pObject->m_pType->GetTypeString ().cc ());
 
-	m_GcObjectList.InsertTail (pObject);
+	// recursively add all the class fields
+
+	char* pBase = (char*) (pObject + 1);
 
 	rtl::CArrayT <CStructField*> ClassFieldArray = pObject->m_pType->GetClassMemberFieldArray ();
 	size_t Count = ClassFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = ClassFieldArray [i];
-		TObject* pChildObject = (TObject*) ((char*) pObject + pField->GetOffset ());
-		GcAddObject (pChildObject);
+		TObject* pChildObject = (TObject*) (pBase + pField->GetOffset ());
+		GcAddObject_l (pChildObject);
 	}
+
+	// and then add the object itself
+
+	m_GcObjectList.InsertTail (pObject);
 }
 
 void 
@@ -471,7 +478,7 @@ CRuntime::AddGcRoot (
 }
 
 void
-CRuntime::RunGc ()
+CRuntime::RunGcEx (uint_t Flags)
 {
 	printf ("Running GC...\n");
 	
@@ -500,7 +507,9 @@ CRuntime::RunGc ()
 	m_GcRootArray [0].Clear ();
 	m_CurrentGcRootArrayIdx = 0;
 
-	// 2) add static roots
+	// 2) mark
+
+	// 2.1) add static roots
 
 	size_t Count = m_StaticGcRootArray.GetCount ();	
 	for (size_t i = 0; i < Count; i++)
@@ -512,7 +521,7 @@ CRuntime::RunGc ()
 			);
 	}
 
-	// 3) add stack roots 
+	// 2.2) add stack roots 
 
 	CVariable* pGcShadowStackTop = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_GcShadowStackTop);
 	size_t GcShadowStackTopOffset = pGcShadowStackTop->GetTlsField ()->GetOffset ();
@@ -547,30 +556,18 @@ CRuntime::RunGc ()
 		}
 	}
 
-	// 4) keep enumerating & marking (breadth first) until done
+	// 2.3) run mark cycle
 
-	while (!m_GcRootArray [m_CurrentGcRootArrayIdx].IsEmpty ())
-	{
-		size_t PrevGcRootArrayIdx =  m_CurrentGcRootArrayIdx;
-		m_CurrentGcRootArrayIdx = !m_CurrentGcRootArrayIdx;
-		m_GcRootArray [m_CurrentGcRootArrayIdx].Clear ();		
+	GcMarkCycle ();
 
-		size_t Count = m_GcRootArray [PrevGcRootArrayIdx].GetCount ();		
-		for (size_t i = 0; i < Count; i++)
-		{
-			const TGcRoot* pRoot = &m_GcRootArray [PrevGcRootArrayIdx] [i];
-			pRoot->m_pType->EnumGcRoots (this, pRoot->m_p);
-		}
-	}
-		
 	// 4) remove 'alive' flag from unmarked objects and schedule destruction
 
-	rtl::CAuxListT <TObject, CObjectHeapLink> DestructList;	
+	rtl::CAuxListT <TObject, CObjectGcHeapLink> DestructList;	
 
-	rtl::CIteratorT <TObject, CObjectHeapLink> Object = m_GcObjectList.GetTail ();
+	rtl::CIteratorT <TObject, CObjectGcHeapLink> Object = m_GcObjectList.GetTail ();
 	while (Object)
 	{
-		rtl::CIteratorT <TObject, CObjectHeapLink> Next = Object.GetInc (-1);
+		rtl::CIteratorT <TObject, CObjectGcHeapLink> Next = Object.GetInc (-1);
 		
 		if (Object->m_Flags & EObjectFlag_GcMark)
 		{
@@ -589,44 +586,98 @@ CRuntime::RunGc ()
 		Object = Next;
 	}
 
-	if (!DestructList.IsEmpty ())
+	bool IsDestructListEmpty = DestructList.IsEmpty ();
+	if (!IsDestructListEmpty)
 	{
 		m_GcDestructList.InsertListTail (&DestructList);
-		m_GcDestructEvent.Signal ();
+		m_GcDestructThreadIdleEvent.Reset ();
 	}
 
-	// 5) resume all suspended threads
+	// 5) secondary mark (to prevent re-allocating the objects currently scheduled for destruction)
+	
+	Object = m_GcDestructList.GetHead ();
+	for (; Object; Object++)
+	{
+		TObject* pObject = *Object;
+
+		if (ShouldMarkGcPtr (pObject))
+			MarkGcRange (pObject, pObject->m_pType->GetSize ());
+
+		if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
+			AddGcRoot (pObject, pObject->m_pType);
+	}
+
+	GcMarkCycle ();
+
+	// 6) resume all suspended threads and wake up destruct thread (if needed)
 
 	m_GcState = EGcState_Idle;
 	m_GcIdleEvent.Signal ();
+
+	if (!IsDestructListEmpty)
+		m_GcDestructEvent.Signal ();
+
 	m_Lock.Unlock ();
+
+	// 7) wait for destructors
+
+	if (Flags & EGcFlag_WaitForDestructors)
+		m_GcDestructThreadIdleEvent.Wait ();
 }
 
 void
-CRuntime::DestructThreadProc ()
+CRuntime::GcMarkCycle ()
+{
+	// mark breadth first
+
+	while (!m_GcRootArray [m_CurrentGcRootArrayIdx].IsEmpty ())
+	{
+		size_t PrevGcRootArrayIdx =  m_CurrentGcRootArrayIdx;
+		m_CurrentGcRootArrayIdx = !m_CurrentGcRootArrayIdx;
+		m_GcRootArray [m_CurrentGcRootArrayIdx].Clear ();		
+
+		size_t Count = m_GcRootArray [PrevGcRootArrayIdx].GetCount ();		
+		for (size_t i = 0; i < Count; i++)
+		{
+			const TGcRoot* pRoot = &m_GcRootArray [PrevGcRootArrayIdx] [i];
+			pRoot->m_pType->EnumGcRoots (this, pRoot->m_p);
+		}
+	}
+}
+
+void
+CRuntime::GcDestructThreadProc ()
 {
 	CScopeThreadRuntime ScopeRuntime (this);
-	GetTlsMgr ()->GetTlsData (this); // register thread right away
+	GetTlsMgr ()->GetTlsData (this); // register thread with TLS mgr right away
+	m_GcDestructThreadIdleEvent.Signal ();
 
 	while (!m_TerminateGcDestructThread)
 	{
 		m_GcDestructEvent.Wait ();
 		
 		WaitGcIdleAndLock ();
-		while (!m_GcDestructList.IsEmpty ())
+		if (!m_GcDestructList.IsEmpty ())
 		{
-			rtl::CIteratorT <TObject, CObjectHeapLink> Object = m_GcDestructList.GetHead ();
-			m_Lock.Unlock ();
+			m_GcDestructThreadIdleEvent.Reset ();
 
-			CFunction* pDestructor = Object->m_pType->GetDestructor ();
-			ASSERT (pDestructor);
+			while (!m_GcDestructList.IsEmpty ())
+			{
+				rtl::CIteratorT <TObject, CObjectGcHeapLink> Object = m_GcDestructList.GetHead ();
+				m_Lock.Unlock ();
 
-			typedef void (*FDestructor) (void*);
-			FDestructor pf = (FDestructor) pDestructor->GetMachineCode ();
-			pf (*Object + 1);
+				CFunction* pDestructor = Object->m_pType->GetDestructor ();
+				ASSERT (pDestructor);
 
-			WaitGcIdleAndLock ();
-			m_GcDestructList.RemoveHead ();
+				typedef void (*FDestructor) (void*);
+				FDestructor pf = (FDestructor) pDestructor->GetMachineCode ();
+				pf (*Object + 1);
+
+				WaitGcIdleAndLock ();
+				m_GcDestructList.RemoveHead ();
+			}
+
+			m_GcDestructThreadIdleEvent.Signal ();
 		}
 
 		m_Lock.Unlock ();

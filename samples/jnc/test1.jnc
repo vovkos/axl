@@ -18,10 +18,14 @@ class C1
 
 class C2
 {
+	C1 m_c1;
+
 	int m_x;
 
 	construct (int x)
 	{
+		m_c1.construct (x * 2);
+
 		printf ("C2.construct (%d)\n", x);
 		m_x = x;
 	}
@@ -32,22 +36,22 @@ class C2
 	}
 }
 
+C1* g_p;
+
+foo ()
+{
+	stack C2 x construct (10);
+
+	C2* p = new C2 construct (100);
+	g_p = p.m_c1;
+}
+
 int 
 main ()
 {
-	int x = 10;
+	foo ();
 
-	{
-	x < 10 ? 
-		(object*) stack new C1 construct (10) : 
-		(object*) stack new C2 construct (20);
-	}
-
-/*	{
-		x < 10 ? 
-			stack new C1 (10) : 
-			stack new C2 (20);
-	} */
+	jnc.RunGcWaitForDestructors ();
 
 	printf ("main is done.\n");
 	return 10; 

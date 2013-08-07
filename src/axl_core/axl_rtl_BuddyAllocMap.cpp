@@ -86,13 +86,13 @@ CBuddyAllocMap::CLevel::SetBitRange (
 		if (To < _AXL_PTR_BITNESS)
 		{
 			Mask = GetBitmask (From, To);
-			ASSERT ((pPage->m_Map & Mask) == 0);
+			// ASSERT ((pPage->m_Map & Mask) == 0);
 			SetPageMap (pPage, pPage->m_Map | Mask);
 			return;
 		}
 
 		Mask = GetHiBitmask(From);
-		ASSERT ((pPage->m_Map & Mask) == 0);
+		// ASSERT ((pPage->m_Map & Mask) == 0);
 		SetPageMap (pPage, pPage->m_Map | Mask);
 
 		To -= _AXL_PTR_BITNESS;
@@ -100,7 +100,7 @@ CBuddyAllocMap::CLevel::SetBitRange (
 	
 		while (To >= _AXL_PTR_BITNESS)
 		{
-			ASSERT (pPage->m_Map == 0);
+			// ASSERT (pPage->m_Map == 0);
 			pPage->m_Map = -1;
 			To -= _AXL_PTR_BITNESS;
 			pPage++;
@@ -109,7 +109,7 @@ CBuddyAllocMap::CLevel::SetBitRange (
 		if (To)
 		{
 			Mask = GetLoBitmask(To);
-			ASSERT ((pPage->m_Map & Mask) == 0);
+			// ASSERT ((pPage->m_Map & Mask) == 0);
 			SetPageMap (pPage, pPage->m_Map | Mask);
 		}
 	}
@@ -118,13 +118,13 @@ CBuddyAllocMap::CLevel::SetBitRange (
 		if (To < _AXL_PTR_BITNESS)
 		{
 			Mask = GetBitmask(From, To);
-			ASSERT ((pPage->m_Map & Mask) == Mask);
+			// ASSERT ((pPage->m_Map & Mask) == Mask);
 			SetPageMap (pPage, pPage->m_Map & ~Mask);
 			return;
 		}
 
 		Mask = GetHiBitmask(From);
-		ASSERT ((pPage->m_Map & Mask) == Mask);
+		// ASSERT ((pPage->m_Map & Mask) == Mask);
 		SetPageMap (pPage, pPage->m_Map & ~Mask);
 
 		To -= _AXL_PTR_BITNESS;
@@ -132,7 +132,7 @@ CBuddyAllocMap::CLevel::SetBitRange (
 	
 		while (To >= _AXL_PTR_BITNESS)
 		{
-			ASSERT (pPage->m_Map == -1);
+			// ASSERT (pPage->m_Map == -1);
 			pPage->m_Map = 0;
 			To -= _AXL_PTR_BITNESS;
 			pPage++;
@@ -141,7 +141,7 @@ CBuddyAllocMap::CLevel::SetBitRange (
 		if (To)
 		{
 			Mask = GetLoBitmask(To);
-			ASSERT ((pPage->m_Map & Mask) == Mask);
+			// ASSERT ((pPage->m_Map & Mask) == Mask);
 			SetPageMap (pPage, pPage->m_Map & ~Mask);
 		}
 	}

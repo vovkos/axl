@@ -189,8 +189,8 @@ CStructType::CalcLayout ()
 	for (; Field; Field++)
 	{
 		CStructField* pField = *Field;
-
-		if (pField->m_pType->GetTypeKind () == EType_Class)
+				
+		if (m_StructTypeKind != EStructType_IfaceStruct && pField->m_pType->GetTypeKind () == EType_Class)
 		{
 			err::SetFormatStringError ("'%s' cannot be a field of a struct", pField->m_pType->GetTypeString ().cc ());
 			return false;

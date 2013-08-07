@@ -1049,6 +1049,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateRunGc ();
 		break;
 
+	case EStdFunc_RunGcWaitForDestructors:
+		pFunction = CreateRunGcWaitForDestructors ();
+		break;
+
 	case EStdFunc_GetCurrentThreadId:
 		pFunction = CreateGetCurrentThreadId ();
 		break;
@@ -1511,6 +1515,16 @@ CFunctionMgr::CreateRunGc ()
 	return CreateFunction ("RunGc", "jnc.RunGc", pType);
 }
 
+// void
+// jnc.RunGcWaitForDestructors ();
+
+CFunction*
+CFunctionMgr::CreateRunGcWaitForDestructors ()
+{
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
+	return CreateFunction ("RunGcWaitForDestructors", "jnc.RunGcWaitForDestructors", pType);
+}
+
 // i64
 // jnc.GetCurrentThreadId ();
 
@@ -1741,3 +1755,4 @@ CFunctionMgr::CreateAppendFmtLiteral_f ()
 
 } // namespace jnc {
 } // namespace axl {
+
