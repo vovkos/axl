@@ -162,24 +162,24 @@ CStructType::CalcLayout ()
 	{
 		CBaseTypeSlot* pSlot = *Slot;
 
+		Result = pSlot->m_pType->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		if (pSlot->m_pType->GetTypeKind () == EType_Class)
 		{
 			err::SetFormatStringError ("'%s' cannot be a base type of a struct", pSlot->m_pType->GetTypeString ().cc ());
 			return false;
 		}
 
-		Result = pSlot->m_pType->EnsureLayout ();
-		if (!Result)
-			return false;
-
 		if (pSlot->m_pType->GetConstructor ())
 			m_BaseTypeConstructArray.Append (pSlot);
 
 		Result = LayoutField (
-				pSlot->m_pType,
-				&pSlot->m_Offset,
-				&pSlot->m_LlvmIndex
-				);
+			pSlot->m_pType,
+			&pSlot->m_Offset,
+			&pSlot->m_LlvmIndex
+			);
 
 		if (!Result)
 			return false;
@@ -189,16 +189,16 @@ CStructType::CalcLayout ()
 	for (; Field; Field++)
 	{
 		CStructField* pField = *Field;
-				
+
+		Result = pField->m_pType->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		if (m_StructTypeKind != EStructType_IfaceStruct && pField->m_pType->GetTypeKind () == EType_Class)
 		{
 			err::SetFormatStringError ("'%s' cannot be a field of a struct", pField->m_pType->GetTypeString ().cc ());
 			return false;
 		}
-
-		Result = pField->m_pType->EnsureLayout ();
-		if (!Result)
-			return false;
 
 		Result = pField->m_BitCount ? 
 			LayoutBitField (

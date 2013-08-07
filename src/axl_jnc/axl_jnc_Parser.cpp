@@ -961,7 +961,7 @@ CParser::DeclareData (
 		case EStorage_Thread:
 			if (!pScope && (!pConstructor->IsEmpty () || !pInitializer->IsEmpty ()))
 			{
-				err::SetFormatStringError ("global 'thread' variables cannot have constructors or initializers");
+				err::SetFormatStringError ("global 'thread' variables cannot have initializers");
 				return false;
 			}
 

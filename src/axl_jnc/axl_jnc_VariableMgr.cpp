@@ -204,6 +204,13 @@ CVariableMgr::CreateTlsStructType ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CVariable* pVariable = m_TlsVariableArray [i];		
+
+		if (pVariable->m_pType->GetTypeKindFlags () & ETypeKindFlag_Aggregate)
+		{
+			err::SetFormatStringError ("'thread' variables cannot have aggregate type '%s'",  pVariable->m_pType->GetTypeString ().cc ());
+			return false;
+		}
+
 		pVariable->m_pTlsField = pType->CreateField (pVariable->m_pType);
 	}
 
