@@ -281,6 +281,12 @@ CClassType::CalcLayout ()
 		if (!Result)
 			return false;
 
+		if (pSlot->m_pType->GetFlags () & ETypeFlag_GcRoot)
+		{
+			m_GcRootBaseTypeArray.Append (pSlot);
+			m_Flags |= ETypeFlag_GcRoot;
+		}
+
 		if (pSlot->m_pType->GetConstructor ())
 			m_BaseTypeConstructArray.Append (pSlot);
 
@@ -308,7 +314,7 @@ CClassType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	// scan members for constructors & destructors 
+	// scan members for gcroots, constructors & destructors 
 
 	size_t Count = m_MemberFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
@@ -317,7 +323,10 @@ CClassType::CalcLayout ()
 		CType* pType = pField->GetType ();
 		
 		if (pType->GetFlags () & ETypeFlag_GcRoot)
+		{
+			m_GcRootMemberFieldArray.Append (pField);
 			m_Flags |= ETypeFlag_GcRoot;
+		}
 
 		if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
 			m_MemberFieldConstructArray.Append (pField);

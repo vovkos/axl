@@ -1127,31 +1127,31 @@ public:
 
 	// weakening
 
-	CType*
-	GetWeakenedType (const CValue& OpValue);
+	CClassPtrType*
+	GetWeakenOperatorResultType (const CValue& OpValue);
 
 	bool
-	GetWeakenedType (
+	GetWeakenOperatorResultType (
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
 	bool
-	GetWeakenedType (CValue* pValue)
+	GetWeakenOperatorResultType (CValue* pValue)
 	{
-		return GetWeakenedType (*pValue, pValue);
+		return GetWeakenOperatorResultType (*pValue, pValue);
 	}
 
 	bool
-	Weaken (
+	WeakenOperator (
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
 	bool
-	Weaken (CValue* pValue)
+	WeakenOperator (CValue* pValue)
 	{
-		return Weaken (*pValue, pValue);
+		return WeakenOperator (*pValue, pValue);
 	}
 
 	// fields
@@ -1260,6 +1260,7 @@ public:
 		EStorage StorageKind,
 		const CValue& OpValue, // thin function or property ptr with closure
 		CType* pThunkType, // function or property type
+		bool IsWeak,
 		CValue* pResultValue
 		);
 

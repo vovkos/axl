@@ -184,11 +184,20 @@ public:
 		return IsInGcHeap (p) && !IsMarkedGcPtr (p);
 	}
 
+	bool
+	ShouldMarkGcObject (TObject* pObject)
+	{
+		return IsInGcHeap (pObject) && !(pObject->m_Flags & EObjectFlag_GcMark);
+	}
+
+	bool
+	ShouldWeakMarkGcClosureObject (TObject* pObject)
+	{
+		return IsInGcHeap (pObject) && !(pObject->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcMark_wc));
+	}
+
 	void 
-	MarkGcValue (
-		void* p,
-		CType* pType
-		);
+	MarkGcObject (TObject* pObject);
 
 	void 
 	MarkGcRange (
@@ -196,7 +205,7 @@ public:
 		size_t Size
 		)
 	{
-		ASSERT (m_GcState == EGcState_Mark && ShouldMarkGcPtr (p));
+		ASSERT (m_GcState == EGcState_Mark && IsInGcHeap (p));
 		m_GcMap.Mark (GetGcAddress (p), GetGcBlockCount (Size));
 	}
 

@@ -71,6 +71,22 @@ public:
 			this;			
 	}
 
+	CClassPtrType*
+	GetWeakPtrType ()
+	{
+		return (m_PtrTypeKind != EClassPtrType_Weak) ?  
+			m_pTargetType->GetClassPtrType (EClassPtrType_Weak, m_Flags) : 
+			this;			
+	}
+
+	CClassPtrType*
+	GetStrongPtrType ()
+	{
+		return (m_PtrTypeKind == EClassPtrType_Weak) ?  
+			m_pTargetType->GetClassPtrType (EClassPtrType_Normal, m_Flags) : 
+			this;			
+	}
+
 	static
 	rtl::CString
 	CreateSignature (

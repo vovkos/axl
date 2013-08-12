@@ -315,7 +315,8 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_FullClosure (
 	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (
 		StorageKind, 
 		OpValue, 
-		pDstPtrType->GetTargetType (),
+		pDstPtrType->GetTargetType (), 
+		pDstPtrType->GetPtrTypeKind () == EFunctionPtrType_Weak,
 		&ClosureValue
 		);
 
@@ -356,11 +357,62 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
+	ASSERT (pType->GetTypeKind () == EType_PropertyPtr && ((CPropertyPtrType*) pType)->GetPtrTypeKind () == EPropertyPtrType_Normal);
 
-	err::SetFormatStringError ("CCast_PropertyPtr_Weak2Normal::LlvmCast not yet implemented");
-	return false;
-}
+	CBasicBlock* pInitialBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	CBasicBlock* pStrengthenBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("strengthen");
+	CBasicBlock* pAliveBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("alive");
+	CBasicBlock* pDeadBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("dead");
+	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("phi");
+
+	CType* pClosureType = GetSimpleType (m_pModule, EStdType_ObjectPtr);
+	CValue NullClosureValue = pClosureType->GetZeroValue ();
+
+	CValue ClosureValue;
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, pClosureType, &ClosureValue);
+
+	CValue CmpValue;
+	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, ClosureValue, NullClosureValue, &CmpValue);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pStrengthenBlock, pPhiBlock);
+
+	CFunction* pStrengthenFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
+
+	CValue StrengthenedClosureValue;
+	m_pModule->m_LlvmIrBuilder.CreateCall (
+		pStrengthenFunction,
+		pStrengthenFunction->GetType (),
+		ClosureValue,
+		&StrengthenedClosureValue
+		);
+
+	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, StrengthenedClosureValue, NullClosureValue, &CmpValue);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAliveBlock, pDeadBlock);
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pDeadBlock);
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
+
+	CValue ValueArray [3] = 
+	{
+		OpValue,
+		OpValue,
+		OpValue.GetType ()->GetZeroValue ()
+	};
+
+	CBasicBlock* BlockArray [3] =
+	{
+		pInitialBlock,
+		pAliveBlock,
+		pDeadBlock
+	};
+
+	CValue IntermediateValue;
+	m_pModule->m_LlvmIrBuilder.CreatePhi (ValueArray, BlockArray, 3, &IntermediateValue);
+
+	CPropertyPtrType* pIntermediateType = ((CPropertyPtrType*) OpValue.GetType ())->GetStrongPtrType ();
+	IntermediateValue.OverrideType (pIntermediateType);
+	return m_pModule->m_OperatorMgr.CastOperator (IntermediateValue, pType, pResultValue);}
 
 //.............................................................................
 
@@ -414,14 +466,24 @@ CCast_PropertyPtr_Thin2Weak::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
+	#pragma AXL_TODO ("will only work for simple closures. redesign Thin2Normal to support 'weak'")
+
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr);
+	ASSERT (pType->GetTypeKind () == EType_PropertyPtr);
+
+	if (OpValue.GetClosure () && !OpValue.GetClosure ()->IsSimpleClosure ())
+	{
+		err::SetFormatStringError ("full weak closures are not implemented yet");
+		return false;
+	}
 
 	CPropertyPtrType* pIntermediateType = ((CPropertyPtrType*) pType)->GetTargetType ()->GetPropertyPtrType (EPropertyPtrType_Normal);
+	bool Result = m_pModule->m_OperatorMgr.CastOperator (StorageKind, OpValue, pIntermediateType, pResultValue);
+	if (!Result)
+		return false;
 
-	CValue TmpValue;
-	return 
-		m_pModule->m_OperatorMgr.CastOperator (StorageKind, OpValue, pIntermediateType, pResultValue) &&
-		m_pModule->m_OperatorMgr.CastOperator (StorageKind, TmpValue, pType, pResultValue);
+	pResultValue->OverrideType (pType);
+	return true;
 }
 
 //.............................................................................

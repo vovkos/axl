@@ -449,18 +449,14 @@ CRuntime::GcAddObject_l (TObject* pObject)
 }
 
 void 
-CRuntime::MarkGcValue (
-	void* p,
-	CType* pType
-	)
+CRuntime::MarkGcObject (TObject* pObject)
 {
-	MarkGcRange (p, pType->GetSize ());
+	MarkGcRange (pObject, pObject->m_pType->GetSize ());
 
-	if (pType->GetTypeKind () == EType_Class)
-		((TObject*) p)->m_Flags |= EObjectFlag_GcMark;
-
-	if (pType->GetFlags () & ETypeFlag_GcRoot)
-		AddGcRoot (p, pType);
+	pObject->m_Flags |= EObjectFlag_GcMark;
+	
+	if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
+		AddGcRoot (pObject + 1, pObject->m_pType);
 }
 
 void
@@ -470,6 +466,7 @@ CRuntime::AddGcRoot (
 	)
 {
 	ASSERT (m_GcState == EGcState_Mark);
+	ASSERT (pType->GetFlags () & ETypeFlag_GcRoot);
 
 	TGcRoot Root;
 	Root.m_p = p;
@@ -569,9 +566,11 @@ CRuntime::RunGcEx (uint_t Flags)
 	{
 		rtl::CIteratorT <TObject, CObjectGcHeapLink> Next = Object.GetInc (-1);
 		
-		if (Object->m_Flags & EObjectFlag_GcMark)
+		// weakly-marked closures are saved as well
+
+		if (Object->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcMark_wc))
 		{
-			Object->m_Flags &= ~EObjectFlag_GcMark;
+			Object->m_Flags &= ~(EObjectFlag_GcMark | EObjectFlag_GcMark_wc);
 		}
 		else
 		{

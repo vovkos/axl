@@ -25,10 +25,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_FunctionPtr_FromNormal: public CCast_FunctionPtr_Base
+class CCast_FunctionPtr_FromFat: public CCast_FunctionPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_FromNormal, ICastOperator)
+	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_FromFat, ICastOperator)
 
 public:
 	virtual
@@ -43,10 +43,28 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_FunctionPtr_Thin2Normal: public CCast_FunctionPtr_Base
+class CCast_FunctionPtr_Weak2Normal: public CCast_FunctionPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Normal, ICastOperator)
+	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Weak2Normal, ICastOperator)
+
+public:
+	virtual
+	bool
+	LlvmCast (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_FunctionPtr_Thin2Fat: public CCast_FunctionPtr_Base
+{
+public:
+	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Fat, ICastOperator)
 
 public:
 	virtual
@@ -95,46 +113,10 @@ protected:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_FunctionPtr_Weak2Normal: public CCast_FunctionPtr_Base
-{
-public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Normal, ICastOperator)
-
-public:
-	virtual
-	bool
-	LlvmCast (
-		EStorage StorageKind,
-		const CValue& OpValue,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class CCast_FunctionPtr_Thin2Thin: public CCast_FunctionPtr_Base
 {
 public:
 	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Thin, ICastOperator)
-
-public:
-	virtual
-	bool
-	LlvmCast (
-		EStorage StorageKind,
-		const CValue& OpValue,
-		CType* pType,
-		CValue* pResultValue
-		);
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CCast_FunctionPtr_Thin2Weak: public CCast_FunctionPtr_Base
-{
-public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Weak, ICastOperator)
 
 public:
 	virtual
@@ -155,10 +137,9 @@ public:
 	AXL_OBJ_CLASS_0 (CCast_FunctionPtr, ICastOperator)
 
 protected:
-	CCast_FunctionPtr_FromNormal m_FromNormal;
+	CCast_FunctionPtr_FromFat m_FromFat;
 	CCast_FunctionPtr_Weak2Normal m_Weak2Normal;
-	CCast_FunctionPtr_Thin2Normal m_Thin2Normal;
-	CCast_FunctionPtr_Thin2Weak m_Thin2Weak;
+	CCast_FunctionPtr_Thin2Fat m_Thin2Fat;
 	CCast_FunctionPtr_Thin2Thin m_Thin2Thin;
 
 	ICastOperator* m_OperatorTable [EFunctionPtrType__Count] [EFunctionPtrType__Count];

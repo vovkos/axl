@@ -164,17 +164,9 @@ CStdLib::StrengthenClassPtr (TInterface* p)
 		return NULL;
 
 	EClassType ClassTypeKind = p->m_pObject->m_pType->GetClassTypeKind ();
-	switch (ClassTypeKind)
-	{
-	case EClassType_FunctionClosure:
-		return ((CFunctionClosureClassType*) p->m_pObject->m_pType)->Strengthen (p);
-
-	case EClassType_PropertyClosure:
-		return ((CPropertyClosureClassType*) p->m_pObject->m_pType)->Strengthen (p);
-
-	default:
-		return (p->m_pObject->m_Flags & EObjectFlag_Alive) ? p : NULL;
-	}
+	return ClassTypeKind == EClassType_FunctionClosure || ClassTypeKind == EClassType_PropertyClosure ? 
+		((CClosureClassType*) p->m_pObject->m_pType)->Strengthen (p) : 
+		(p->m_pObject->m_Flags & EObjectFlag_Alive) ? p : NULL;
 }
 
 void

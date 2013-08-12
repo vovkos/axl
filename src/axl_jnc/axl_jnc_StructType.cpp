@@ -172,6 +172,12 @@ CStructType::CalcLayout ()
 			return false;
 		}
 
+		if (pSlot->m_pType->GetFlags () & ETypeFlag_GcRoot)
+		{
+			m_GcRootBaseTypeArray.Append (pSlot);
+			m_Flags |= ETypeFlag_GcRoot;
+		}
+
 		if (pSlot->m_pType->GetConstructor ())
 			m_BaseTypeConstructArray.Append (pSlot);
 
@@ -237,7 +243,10 @@ CStructType::CalcLayout ()
 				m_Flags &= ~ETypeFlag_Pod;
 
 			if (FieldTypeFlags & ETypeFlag_GcRoot)
+			{
+				m_GcRootMemberFieldArray.Append (pField);
 				m_Flags |= ETypeFlag_GcRoot;
+			}
 		
 			if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
 				m_MemberFieldConstructArray.Append (pField);

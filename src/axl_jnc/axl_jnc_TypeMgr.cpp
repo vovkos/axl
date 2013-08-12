@@ -1138,7 +1138,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	pMethod->m_Tag = IsThin ? "jnc.MulticastRemove_t" : "jnc.MulticastRemove";
 	pType->m_MethodArray [EMulticastMethod_Remove] = pMethod;
 
-	pReturnType = pFunctionPtrType->GetTargetType ()->GetFunctionPtrType ();
+	pReturnType = pFunctionPtrType->GetStrongPtrType ();
 	pMethodType = GetFunctionType (pReturnType, NULL, 0);
 	pMethod = pType->CreateMethod (EStorage_Member, "GetSnapshot", pMethodType);
 	pMethod->m_Tag = "jnc.MulticastGetSnapshot";
@@ -1158,10 +1158,10 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	pType->m_BinaryOperatorTable [EBinOp_SubAssign] = pType->m_MethodArray [EMulticastMethod_Remove];
 	pType->m_pCallOperator = pType->m_MethodArray [EMulticastMethod_Call];
 
-	// snapshot closure
+	// snapshot closure (snapshot is shared between weak and normal multicasts)
 
 	CMcSnapshotClassType* pSnapshotType = (CMcSnapshotClassType*) CreateUnnamedClassType (EClassType_McSnapshot);
-	pSnapshotType->m_pTargetType = pFunctionPtrType;
+	pSnapshotType->m_pTargetType = pFunctionPtrType->GetStrongPtrType ();
 
 	// fields
 
@@ -1189,7 +1189,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 		if (!Result)
 			return NULL;
 	}
-
+	
 	m_pModule->MarkForCompile (pType);
 	m_pModule->MarkForCompile (pType->m_pSnapshotType);
 
@@ -1312,7 +1312,11 @@ CTypeMgr::GetFunctionClosureClassType (
 	pType->CreateField (pTargetType->GetFunctionPtrType (EFunctionPtrType_Thin));
 
 	for (size_t i = 0; i < ArgCount; i++)
-		pType->CreateField (ppArgTypeArray [i]);
+	{
+		CStructField* pField = pType->CreateField (ppArgTypeArray [i]);
+		if (WeakMask & (2 << i)) // account for field #0 function ptr
+			pField->m_Flags |= EStructFieldFlag_WeakMasked;
+	}
 
 	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.CreateInternalFunction ("thunk_function", pThunkType);
 	pType->AddMethod (pThunkFunction);
@@ -1357,7 +1361,11 @@ CTypeMgr::GetPropertyClosureClassType (
 	pType->CreateField (pTargetType->GetPropertyPtrType (EPropertyPtrType_Thin));
 
 	for (size_t i = 0; i < ArgCount; i++)
-		pType->CreateField (ppArgTypeArray [i]);
+	{
+		CStructField* pField = pType->CreateField (ppArgTypeArray [i]);
+		if (WeakMask & (2 << i)) // account for field #0 property ptr
+			pField->m_Flags |= EStructFieldFlag_WeakMasked;
+	}
 
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property", pThunkType);
 	pType->AddProperty (pThunkProperty);

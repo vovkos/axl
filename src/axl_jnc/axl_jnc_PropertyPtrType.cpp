@@ -126,30 +126,28 @@ CPropertyPtrType::EnumGcRoots (
 	void* p
 	)
 {
-	ASSERT (m_PtrTypeKind == EPropertyPtrType_Normal || EPropertyPtrType_Weak);
+	ASSERT (m_PtrTypeKind == EPropertyPtrType_Normal || m_PtrTypeKind == EPropertyPtrType_Weak);
 
 	TPropertyPtr* pPtr = (TPropertyPtr*) p;
-	if (!pRuntime->ShouldMarkGcPtr (pPtr->m_pClosure))
+	if (!pPtr->m_pClosure)
 		return;
 
 	TObject* pObject = pPtr->m_pClosure->m_pObject;
-	
+
 	if (m_PtrTypeKind == EPropertyPtrType_Normal)
 	{
-		pRuntime->MarkGcValue (pObject, pObject->m_pType);
+		if (pRuntime->ShouldMarkGcObject (pObject))
+			pRuntime->MarkGcObject (pObject);
 	}
-	else if (pObject->m_pType->GetClassTypeKind () != EClassType_PropertyClosure)
+	else if (pObject->m_pType->GetClassTypeKind () != EClassType_PropertyClosure) // simple weak closure
 	{
-		pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ());
+		if (pRuntime->ShouldMarkGcPtr (pObject))
+			pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ());
 	}
-	else
+	else // full weak closure
 	{
-		CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) pObject->m_pType;
-
-		#pragma AXL_TODO ("special processing for weak property closure")
-		
-		// for now, keep everything strong
-		pRuntime->MarkGcValue (pObject, pObject->m_pType);
+		if (pRuntime->ShouldWeakMarkGcClosureObject (pObject))
+			((CPropertyClosureClassType*) pObject->m_pType)->WeakMarkGcClosureObject (pRuntime, pObject);
 	}
 }
 

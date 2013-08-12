@@ -37,7 +37,7 @@ CCast_FunctionPtr_Base::GetCastKind (
 //.............................................................................
 
 bool
-CCast_FunctionPtr_FromNormal::LlvmCast (
+CCast_FunctionPtr_FromFat::LlvmCast (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
@@ -66,7 +66,75 @@ CCast_FunctionPtr_FromNormal::LlvmCast (
 //.............................................................................
 
 bool
-CCast_FunctionPtr_Thin2Normal::LlvmCast (
+CCast_FunctionPtr_Weak2Normal::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr && ((CFunctionPtrType*) pType)->GetPtrTypeKind () == EFunctionPtrType_Normal);
+
+	CBasicBlock* pInitialBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
+	CBasicBlock* pStrengthenBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("strengthen");
+	CBasicBlock* pAliveBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("alive");
+	CBasicBlock* pDeadBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("dead");
+	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("phi");
+
+	CType* pClosureType = GetSimpleType (m_pModule, EStdType_ObjectPtr);
+	CValue NullClosureValue = pClosureType->GetZeroValue ();
+
+	CValue ClosureValue;
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, pClosureType, &ClosureValue);
+
+	CValue CmpValue;
+	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, ClosureValue, NullClosureValue, &CmpValue);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pStrengthenBlock, pPhiBlock);
+
+	CFunction* pStrengthenFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
+
+	CValue StrengthenedClosureValue;
+	m_pModule->m_LlvmIrBuilder.CreateCall (
+		pStrengthenFunction,
+		pStrengthenFunction->GetType (),
+		ClosureValue,
+		&StrengthenedClosureValue
+		);
+
+	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, StrengthenedClosureValue, NullClosureValue, &CmpValue);
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAliveBlock, pDeadBlock);
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pDeadBlock);
+	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
+
+	CValue ValueArray [3] = 
+	{
+		OpValue,
+		OpValue,
+		OpValue.GetType ()->GetZeroValue ()
+	};
+
+	CBasicBlock* BlockArray [3] =
+	{
+		pInitialBlock,
+		pAliveBlock,
+		pDeadBlock
+	};
+
+	CValue IntermediateValue;
+	m_pModule->m_LlvmIrBuilder.CreatePhi (ValueArray, BlockArray, 3, &IntermediateValue);
+
+	CFunctionPtrType* pIntermediateType = ((CFunctionPtrType*) OpValue.GetType ())->GetStrongPtrType ();
+	IntermediateValue.OverrideType (pIntermediateType);
+	return m_pModule->m_OperatorMgr.CastOperator (IntermediateValue, pType, pResultValue);
+}
+
+//.............................................................................
+
+bool
+CCast_FunctionPtr_Thin2Fat::LlvmCast (
 	EStorage StorageKind,
 	const CValue& RawOpValue,
 	CType* pType,
@@ -151,7 +219,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast (
 }
 
 bool
-CCast_FunctionPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
+CCast_FunctionPtr_Thin2Fat::LlvmCast_NoThunkSimpleClosure (
 	const CValue& OpValue,
 	const CValue& SimpleClosureObjValue,
 	CFunctionType* pSrcFunctionType,
@@ -171,7 +239,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 }
 
 bool
-CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkNoClosure (
+CCast_FunctionPtr_Thin2Fat::LlvmCast_DirectThunkNoClosure (
 	CFunction* pFunction,
 	CFunctionPtrType* pDstPtrType,
 	CValue* pResultValue
@@ -189,7 +257,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkNoClosure (
 }
 
 bool
-CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
+CCast_FunctionPtr_Thin2Fat::LlvmCast_DirectThunkSimpleClosure (
 	CFunction* pFunction,
 	const CValue& SimpleClosureObjValue,
 	CFunctionPtrType* pDstPtrType,
@@ -214,7 +282,7 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 }
 
 bool
-CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
+CCast_FunctionPtr_Thin2Fat::LlvmCast_FullClosure (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CFunctionType* pSrcFunctionType,
@@ -226,7 +294,8 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (
 		StorageKind, 
 		OpValue, 
-		pDstPtrType->GetTargetType (),
+		pDstPtrType->GetTargetType (), 
+		pDstPtrType->GetPtrTypeKind () == EFunctionPtrType_Weak,
 		&ClosureValue
 		);
 
@@ -238,23 +307,6 @@ CCast_FunctionPtr_Thin2Normal::LlvmCast_FullClosure (
 	CFunctionClosureClassType* pClosureType = (CFunctionClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
 	m_pModule->m_LlvmIrBuilder.CreateClosureFunctionPtr (pClosureType->GetThunkFunction (), ClosureValue, pDstPtrType, pResultValue);
 	return true;
-}
-
-//.............................................................................
-
-bool
-CCast_FunctionPtr_Weak2Normal::LlvmCast (
-	EStorage StorageKind,
-	const CValue& OpValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
-	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
-
-	err::SetFormatStringError ("CCast_FunctionPtr_Weak2Normal::LlvmCast not yet implemented");
-	return false;
 }
 
 //.............................................................................
@@ -301,6 +353,7 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 
 //.............................................................................
 
+/*
 bool
 CCast_FunctionPtr_Thin2Weak::LlvmCast (
 	EStorage StorageKind,
@@ -309,16 +362,26 @@ CCast_FunctionPtr_Thin2Weak::LlvmCast (
 	CValue* pResultValue
 	)
 {
+	#pragma AXL_TODO ("will only work for simple closures. redesign Thin2Normal to support 'weak'")
+
 	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
 	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
 
-	CFunctionPtrType* pIntermediateType = ((CFunctionPtrType*) pType)->GetTargetType ()->GetFunctionPtrType (EFunctionPtrType_Normal);
+	if (OpValue.GetClosure () && !OpValue.GetClosure ()->IsSimpleClosure ())
+	{
+		err::SetFormatStringError ("full weak closures are not implemented yet");
+		return false;
+	}
 
-	CValue TmpValue;
-	return 
-		m_pModule->m_OperatorMgr.CastOperator (StorageKind, OpValue, pIntermediateType, pResultValue) &&
-		m_pModule->m_OperatorMgr.CastOperator (StorageKind, TmpValue, pType, pResultValue);
+	CFunctionPtrType* pIntermediateType = ((CFunctionPtrType*) pType)->GetStrongPtrType ();
+	bool Result = m_pModule->m_OperatorMgr.CastOperator (StorageKind, OpValue, pIntermediateType, pResultValue);
+	if (!Result)
+		return false;
+
+	pResultValue->OverrideType (pType);
+	return true;
 }
+*/
 
 //.............................................................................
 
@@ -326,11 +389,12 @@ CCast_FunctionPtr::CCast_FunctionPtr ()
 {
 	memset (m_OperatorTable, 0, sizeof (m_OperatorTable));
 
-	m_OperatorTable [EFunctionPtrType_Normal] [EFunctionPtrType_Normal] = &m_FromNormal;
-	m_OperatorTable [EFunctionPtrType_Normal] [EFunctionPtrType_Weak]   = &m_FromNormal;
+	m_OperatorTable [EFunctionPtrType_Normal] [EFunctionPtrType_Normal] = &m_FromFat;
+	m_OperatorTable [EFunctionPtrType_Normal] [EFunctionPtrType_Weak]   = &m_FromFat;
 	m_OperatorTable [EFunctionPtrType_Weak] [EFunctionPtrType_Normal]   = &m_Weak2Normal;
-	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Normal]   = &m_Thin2Normal;
-	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Weak]     = &m_Thin2Weak;
+	m_OperatorTable [EFunctionPtrType_Weak] [EFunctionPtrType_Weak]     = &m_FromFat;
+	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Normal]   = &m_Thin2Fat;
+	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Weak]     = &m_Thin2Fat;
 	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Thin]     = &m_Thin2Thin;
 }
 

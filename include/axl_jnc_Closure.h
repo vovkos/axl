@@ -33,7 +33,10 @@ public:
 	bool
 	IsMemberClosure ()
 	{
-		return !m_ArgList.IsEmpty () && m_ArgList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
+		return 
+			!m_ArgList.IsEmpty () && 
+			!m_ArgList.GetHead ()->IsEmpty () &&
+			m_ArgList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
 	}
 
 	bool

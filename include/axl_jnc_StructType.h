@@ -15,8 +15,16 @@ class CUnionType;
 
 //.............................................................................
 
+enum EStructFieldFlag
+{
+	EStructFieldFlag_WeakMasked = 0x010000, 
+};
+
+//.............................................................................
+
 class CStructField: public CUserModuleItem
 {
+	friend class CTypeMgr;
 	friend class CDerivableType;
 	friend class CProperty;
 	friend class CStructType;

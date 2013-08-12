@@ -368,10 +368,13 @@ postfix_operator_s <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PostDec, $pValue);
 			}
-	|	'.' EToken_Weak $w? member_operator_s <$pValue>
+	|	'.'
+		(EToken_Weak
 			{
-				return IsValidLocator ($w) ? m_pModule->m_OperatorMgr.GetWeakenedType ($pValue) : true;
+				return m_pModule->m_OperatorMgr.GetWeakenOperatorResultType ($pValue);
 			}
+		)?
+		member_operator_s <$pValue>
 	|	EToken_Ptr 
 			{
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Ptr, $pValue);

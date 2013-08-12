@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_Multicast.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -84,19 +85,43 @@ CMulticast::GetSnapshot ()
 	ASSERT (m_pObject->m_pType->GetClassTypeKind () == EClassType_Multicast);
 	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
-	
-	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
-	
+
 	TMcSnapshotObject* pSnapshot = AXL_MEM_NEW (TMcSnapshotObject);
 	pSnapshot->m_pType = pSnapshotType;
 	pSnapshot->m_pObject = pSnapshot;
 
+	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
 	if (Size)
 	{
 		pSnapshot->m_pPtrArray = AXL_MEM_ALLOC (Size);
-		pSnapshot->m_Count = m_Count;
 
-		memcpy (pSnapshot->m_pPtrArray, m_pPtrArray, Size);
+		if (pMulticastType->GetTargetType ()->GetPtrTypeKind () == EFunctionPtrType_Weak)
+		{
+			CRuntime* pRuntime = GetCurrentThreadRuntime ();
+			ASSERT (pRuntime);
+
+			TFunctionPtr* pDstPtr = (TFunctionPtr*) pSnapshot->m_pPtrArray;
+			TFunctionPtr* pSrcPtr = (TFunctionPtr*) m_pPtrArray;
+			TFunctionPtr* pSrcPtrEnd = pSrcPtr + m_Count;
+
+			size_t AliveCount = 0;
+			for (; pSrcPtr < pSrcPtrEnd; pSrcPtr++)
+			{
+				if (CStdLib::StrengthenClassPtr (pSrcPtr->m_pClosure))
+				{
+					*pDstPtr = *pSrcPtr;
+					pDstPtr++;
+					AliveCount++;
+				}
+			}
+
+			pSnapshot->m_Count = AliveCount;
+		}
+		else
+		{
+			pSnapshot->m_Count = m_Count;
+			memcpy (pSnapshot->m_pPtrArray, m_pPtrArray, Size);
+		}
 	}	
 
 	TFunctionPtr Ptr = { 0 };

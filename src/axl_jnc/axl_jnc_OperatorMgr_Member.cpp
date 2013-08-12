@@ -369,20 +369,27 @@ COperatorMgr::MemberOperator (
 	}
 }
 
-CType*
-COperatorMgr::GetWeakenedType (const CValue& OpValue)
+CClassPtrType*
+COperatorMgr::GetWeakenOperatorResultType (const CValue& OpValue)
 {
-	err::SetFormatStringError ("weakening is not implemented yet");
-	return NULL;
+	CType* pOpType = PrepareOperandType (OpValue);
+	if (pOpType->GetTypeKind () != EType_ClassPtr || (pOpType->GetFlags () & EPtrTypeFlag_Unsafe))
+	{
+		err::SetFormatStringError ("'weak member' operator cannot be applied to '%s'", pOpType->GetTypeString ().cc ());
+		return false;
+	}
+
+	CClassPtrType* pResultType = ((CClassPtrType*) pOpType)->GetWeakPtrType ();
+	return pResultType;
 }
 
 bool
-COperatorMgr::GetWeakenedType (
+COperatorMgr::GetWeakenOperatorResultType (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
 {
-	CType* pType = GetWeakenedType (OpValue);
+	CType* pType = GetWeakenOperatorResultType (OpValue);
 	if (!pType)
 		return false;
 
@@ -391,15 +398,27 @@ COperatorMgr::GetWeakenedType (
 }
 
 bool
-COperatorMgr::Weaken (
-	const CValue& OpValue,
+COperatorMgr::WeakenOperator (
+	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
 {
-	err::SetFormatStringError ("weakening is not implemented yet");
-	return false;
-}
+	CValue OpValue;
+	bool Result = PrepareOperand (RawOpValue, &OpValue);
+	if (!Result)
+		return false;
 
+	CType* pOpType = OpValue.GetType ();
+	if (pOpType->GetTypeKind () != EType_ClassPtr || (pOpType->GetFlags () & EPtrTypeFlag_Unsafe))
+	{
+		err::SetFormatStringError ("'weak member' operator cannot be applied to '%s'", pOpType->GetTypeString ().cc ());
+		return false;
+	}
+
+	CClassPtrType* pResultType = ((CClassPtrType*) pOpType)->GetWeakPtrType ();
+	pResultValue->OverrideType (OpValue, pResultType);
+	return true;
+}
 
 #if 0
 

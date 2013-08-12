@@ -13,6 +13,7 @@ COperatorMgr::CreateClosureObject (
 	EStorage StorageKind, 
 	const CValue& OpValue, // thin function or property ptr with closure
 	CType* pThunkType, // function or property type
+	bool IsWeak,
 	CValue* pResultValue
 	)
 {
@@ -41,7 +42,7 @@ COperatorMgr::CreateClosureObject (
 	rtl::CArrayT <CType*> ClosureArgTypeArray (ref::EBuf_Stack, Buffer1, sizeof (Buffer1));
 	rtl::CArrayT <size_t> ClosureMap (ref::EBuf_Stack, Buffer2, sizeof (Buffer2));
 	size_t ClosureArgCount = 0;
-	uint64_t WeakMask = 0; // TODO: fill the weak mask
+	uint64_t WeakMask = 0;
 
 	// build closure arg type array & closure map
 
@@ -63,16 +64,24 @@ COperatorMgr::CreateClosureObject (
 		ClosureMap.SetCount (ClosureArgCount);
 
 		rtl::CBoxIteratorT <CValue> ClosureArg = pClosure->GetArgList ()->GetHead ();
-		for (size_t i = 0, j = 0; i < ClosureArgCount; ClosureArg++, j++)
+
+		size_t j = 0;
+
+		for (size_t i = 0; i < ClosureArgCount; ClosureArg++, i++)
 		{
-			ASSERT (ClosureArg);
 			if (ClosureArg->IsEmpty ())
 				continue;
 
-			ClosureArgTypeArray [i] = SrcArgArray [j]->GetType ();
-			ClosureMap [i] = j;
-			i++;
+			CType* pType = ClosureArg->GetType ();
+			if (IsWeakPtrType (pType))
+				WeakMask |= (uint64_t) 2 << j; // account for function ptr field (at idx 0)
+
+			ClosureArgTypeArray [j] = SrcArgArray [i]->GetType ();
+			ClosureMap [j] = i;
+			j++;
 		}
+
+		ClosureArgCount = j; // account for possible skipped args
 	}
 
 	// find or create closure class type

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_ClosureClassType.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -83,34 +84,84 @@ CClosureClassType::Strengthen (jnc::TInterface* p)
 	if (!m_WeakMask)
 		return p;
 
+	size_t Count = m_pIfaceStructType->GetFieldList ().GetCount ();
+
 	uint64_t WeakMask = m_WeakMask;
 	while (WeakMask)
 	{
 		size_t Index = rtl::GetLoBitIdx64 (WeakMask);		
 		
 		CStructField* pField = GetFieldByIndex (Index);
-		if (!pField)
-			return NULL;
+		ASSERT (pField && (pField->GetFlags () & EStructFieldFlag_WeakMasked));
+
+		// only strengthen if source arg is weak, but target arg is strong
+
+		jnc::TInterface* pWeakPtr = NULL;
 
 		void* p2 = (char*) p + pField->GetOffset ();
 
-		EType TypeKind = pField->GetType ()->GetTypeKind ();
+		CType* pType = pField->GetType ();
+		EType TypeKind = pType->GetTypeKind ();
+
 		switch (TypeKind)
 		{
 		case EType_ClassPtr:
+			if (((CClassPtrType*) pType)->GetPtrTypeKind () == EClassPtrType_Normal) 
+				pWeakPtr = *(jnc::TInterface**) p2;
+
 			break;
 
 		case EType_FunctionPtr:
+			if (((CFunctionPtrType*) pType)->GetPtrTypeKind () == EFunctionPtrType_Normal)
+				pWeakPtr = ((jnc::TFunctionPtr*) p2)->m_pClosure;
+
 			break;
 
 		case EType_PropertyPtr:
+			if (((CPropertyPtrType*) pType)->GetPtrTypeKind () == EPropertyPtrType_Normal)
+				pWeakPtr = ((jnc::TPropertyPtr*) p2)->m_pClosure;
+
 			break;
 		}
+
+		if (pWeakPtr && !CStdLib::StrengthenClassPtr (pWeakPtr))
+			return NULL;
 
 		WeakMask &= ~(1 << Index);
 	}
 
 	return p;
+}
+
+void
+CClosureClassType::WeakMarkGcClosureObject (
+	CRuntime* pRuntime,
+	TObject* pObject
+	)
+{
+	if (!m_WeakMask)
+	{
+		pRuntime->MarkGcObject (pObject);
+		return;
+	}
+
+	pRuntime->MarkGcRange (pObject, m_Size);
+	pObject->m_Flags |= EObjectFlag_GcMark_wc;
+
+	char* p = (char*) (pObject + 1);
+
+	size_t Count = m_GcRootMemberFieldArray.GetCount ();
+
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_GcRootMemberFieldArray [i];
+		CType* pType = pField->GetType ();
+
+		if (pField->GetFlags () & EStructFieldFlag_WeakMasked)
+			pType = GetWeakPtrType (pType);
+
+		pType->EnumGcRoots (pRuntime, p + pField->GetOffset ());
+	}
 }
 
 //.............................................................................

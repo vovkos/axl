@@ -109,15 +109,21 @@ CClassPtrType::EnumGcRoots (
 	)
 {
 	TInterface* pIface = *(TInterface**) p;
-	if (!pRuntime->ShouldMarkGcPtr (pIface))
+	if (!pIface)
 		return;
 
 	TObject* pObject = pIface->m_pObject;
 	
 	if (m_PtrTypeKind == EClassPtrType_Normal)
-		pRuntime->MarkGcValue (pObject, pObject->m_pType);
-	else
-		pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ()); // actually can only keep headers. but whatever
+	{
+		if (pRuntime->ShouldMarkGcObject (pObject))
+			pRuntime->MarkGcObject (pObject);
+	}
+	else // weak
+	{
+		if (pRuntime->ShouldMarkGcPtr (pObject))
+			pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ()); // actually can only keep headers. but whatever
+	}
 }
 
 //.............................................................................

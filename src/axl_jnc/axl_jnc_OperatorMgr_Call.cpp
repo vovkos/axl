@@ -327,13 +327,14 @@ COperatorMgr::CallOperator (
 	}
 
 	CType* pOpType = OpValue.GetType ();
-	if (!(pOpType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr))
+	if (!(pOpType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr) || 
+		((CFunctionPtrType*) pOpType)->GetPtrTypeKind () == EFunctionPtrType_Weak)
 	{
 		err::SetFormatStringError ("cannot call '%s'", pOpType->GetTypeString ().cc ());
-		return NULL;
+		return false;
 	}
 
-	CFunctionPtrType* pFunctionPtrType = (CFunctionPtrType*) pOpType;
+	CFunctionPtrType* pFunctionPtrType = ((CFunctionPtrType*) pOpType);
 	return pFunctionPtrType->HasClosure () ? 
 		CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
 		CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);

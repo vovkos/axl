@@ -727,5 +727,47 @@ GetSimpleType (
 
 //.............................................................................
 
+bool
+IsWeakPtrType (CType* pType)
+{
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_ClassPtr:
+		return ((CClassPtrType*) pType)->GetPtrTypeKind () == EClassPtrType_Weak;
+
+	case EType_FunctionPtr:
+		return ((CFunctionPtrType*) pType)->GetPtrTypeKind () == EFunctionPtrType_Weak;
+
+	case EType_PropertyPtr:
+		return ((CPropertyPtrType*) pType)->GetPtrTypeKind () == EPropertyPtrType_Weak;
+
+	default:
+		return false;
+	}
+}
+
+CType*
+GetWeakPtrType (CType* pType)
+{
+	EType TypeKind = pType->GetTypeKind ();
+	switch (TypeKind)
+	{
+	case EType_ClassPtr:
+		return ((CClassPtrType*) pType)->GetWeakPtrType ();
+
+	case EType_FunctionPtr:
+		return ((CFunctionPtrType*) pType)->GetWeakPtrType ();
+
+	case EType_PropertyPtr:
+		return ((CPropertyPtrType*) pType)->GetWeakPtrType ();
+
+	default:
+		return pType;
+	}
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

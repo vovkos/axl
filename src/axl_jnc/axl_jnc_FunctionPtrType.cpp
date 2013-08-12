@@ -132,30 +132,28 @@ CFunctionPtrType::EnumGcRoots (
 	void* p
 	)
 {
-	ASSERT (m_PtrTypeKind == EFunctionPtrType_Normal || EFunctionPtrType_Weak);
+	ASSERT (m_PtrTypeKind == EFunctionPtrType_Normal || m_PtrTypeKind == EFunctionPtrType_Weak);
 
 	TFunctionPtr* pPtr = (TFunctionPtr*) p;
-	if (!pRuntime->ShouldMarkGcPtr (pPtr->m_pClosure))
+	if (!pPtr->m_pClosure)
 		return;
 
 	TObject* pObject = pPtr->m_pClosure->m_pObject;
-	
+
 	if (m_PtrTypeKind == EFunctionPtrType_Normal)
 	{
-		pRuntime->MarkGcValue (pObject, pObject->m_pType);
+		if (pRuntime->ShouldMarkGcObject (pObject))
+			pRuntime->MarkGcObject (pObject);
 	}
-	else if (pObject->m_pType->GetClassTypeKind () != EClassType_FunctionClosure)
+	else if (pObject->m_pType->GetClassTypeKind () != EClassType_FunctionClosure) // simple weak closure
 	{
-		pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ());
+		if (pRuntime->ShouldMarkGcPtr (pObject))
+			pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ());
 	}
-	else
+	else // full weak closure
 	{
-		CFunctionClosureClassType* pClosureType = (CFunctionClosureClassType*) pObject->m_pType;
-
-		#pragma AXL_TODO ("special processing for weak function closure")
-		
-		// for now, keep everything strong
-		pRuntime->MarkGcValue (pObject, pObject->m_pType);
+		if (pRuntime->ShouldWeakMarkGcClosureObject (pObject))
+			((CFunctionClosureClassType*) pObject->m_pType)->WeakMarkGcClosureObject (pRuntime, pObject);
 	}
 }
 

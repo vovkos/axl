@@ -641,6 +641,14 @@ GetSimpleType (
 
 //.............................................................................
 
+bool
+IsWeakPtrType (CType* pType);
+
+CType*
+GetWeakPtrType (CType* pType);
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {
 

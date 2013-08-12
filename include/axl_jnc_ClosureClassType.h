@@ -47,6 +47,12 @@ public:
 	jnc::TInterface* 
 	Strengthen (jnc::TInterface* p);
 
+	void
+	WeakMarkGcClosureObject (
+		CRuntime* pRuntime,
+		TObject* pObject
+		);	
+
 protected:
 	void
 	BuildArgValueList (

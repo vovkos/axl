@@ -58,6 +58,22 @@ public:
 			this;			
 	}
 
+	CFunctionPtrType*
+	GetWeakPtrType ()
+	{
+		return (m_PtrTypeKind != EFunctionPtrType_Weak) ?  
+			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Weak, m_Flags) : 
+			this;			
+	}
+
+	CFunctionPtrType*
+	GetStrongPtrType ()
+	{
+		return (m_PtrTypeKind == EFunctionPtrType_Weak) ?  
+			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Normal, m_Flags) : 
+			this;			
+	}
+
 	CClassType* 
 	GetMulticastType ();
 

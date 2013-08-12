@@ -629,11 +629,12 @@ protected:
 
 enum EObjectFlag
 {
-	EObjectFlag_Alive  = 0x01,
-	EObjectFlag_Static = 0x02,
-	EObjectFlag_Stack  = 0x04,
-	EObjectFlag_UHeap  = 0x08,
-	EObjectFlag_GcMark = 0x10, // volatile flag
+	EObjectFlag_Alive     = 0x01,
+	EObjectFlag_Static    = 0x02,
+	EObjectFlag_Stack     = 0x04,
+	EObjectFlag_UHeap     = 0x08,
+	EObjectFlag_GcMark    = 0x10, 
+	EObjectFlag_GcMark_wc = 0x20, // weak closure (function or property ptr)
 };
 
 // master header of class instance

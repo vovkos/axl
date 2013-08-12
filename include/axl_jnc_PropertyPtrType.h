@@ -67,6 +67,22 @@ public:
 			this;			
 	}
 
+	CPropertyPtrType*
+	GetWeakPtrType ()
+	{
+		return (m_PtrTypeKind != EPropertyPtrType_Weak) ?  
+			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Weak, m_Flags) : 
+			this;			
+	}
+
+	CPropertyPtrType*
+	GetStrongPtrType ()
+	{
+		return (m_PtrTypeKind == EPropertyPtrType_Weak) ?  
+			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Normal, m_Flags) : 
+			this;			
+	}
+
 	CStructType* 
 	GetPropertyPtrStructType ();
 
