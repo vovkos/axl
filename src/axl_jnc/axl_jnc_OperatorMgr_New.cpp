@@ -71,7 +71,6 @@ COperatorMgr::Allocate (
 		MarkGcRoot (PtrValue, pType);
 		break;
 
-
 	case EStorage_UHeap:
 		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
 		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);

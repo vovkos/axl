@@ -78,6 +78,13 @@ public:
 			CompileCallMethod ();
 	}
 
+	virtual 
+	void
+	EnumGcRoots (
+		CRuntime* pRuntime,
+		void* p
+		);	
+
 protected:
 	virtual 
 	void

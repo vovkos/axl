@@ -313,13 +313,6 @@ public:
 	bool
 	AddProperty (CProperty* pProperty);
 
-	virtual 
-	void
-	EnumGcRoots (
-		CRuntime* pRuntime,
-		void* p
-		);	
-
 protected:
 	virtual
 	CStructField*

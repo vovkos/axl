@@ -82,13 +82,19 @@ struct TMcSnapshotObject:
 TFunctionPtr
 CMulticast::GetSnapshot ()
 {
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
 	ASSERT (m_pObject->m_pType->GetClassTypeKind () == EClassType_Multicast);
 	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
-
-	TMcSnapshotObject* pSnapshot = AXL_MEM_NEW (TMcSnapshotObject);
+	
+	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocate (sizeof (TMcSnapshotObject));
 	pSnapshot->m_pType = pSnapshotType;
 	pSnapshot->m_pObject = pSnapshot;
+	pRuntime->GcAddObject (pSnapshot);
+
+	TMcSnapshot* p1 = pSnapshot;
 
 	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
 	if (Size)
@@ -97,9 +103,6 @@ CMulticast::GetSnapshot ()
 
 		if (pMulticastType->GetTargetType ()->GetPtrTypeKind () == EFunctionPtrType_Weak)
 		{
-			CRuntime* pRuntime = GetCurrentThreadRuntime ();
-			ASSERT (pRuntime);
-
 			TFunctionPtr* pDstPtr = (TFunctionPtr*) pSnapshot->m_pPtrArray;
 			TFunctionPtr* pSrcPtr = (TFunctionPtr*) m_pPtrArray;
 			TFunctionPtr* pSrcPtrEnd = pSrcPtr + m_Count;

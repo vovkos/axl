@@ -456,7 +456,7 @@ CRuntime::MarkGcObject (TObject* pObject)
 	pObject->m_Flags |= EObjectFlag_GcMark;
 	
 	if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
-		AddGcRoot (pObject + 1, pObject->m_pType);
+		AddGcRoot (pObject, pObject->m_pType);
 }
 
 void

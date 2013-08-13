@@ -1088,12 +1088,13 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	CType* pReturnType = pFunctionPtrType->GetTargetType ()->GetReturnType ();
 	if (pReturnType->GetTypeKind () != EType_Void)
 	{
-		err::SetFormatStringError ("multicast cannot only return void, not '%s'", pReturnType->GetTypeString ().cc ());
+		err::SetFormatStringError ("multicast cannot only return 'void', not '%s'", pReturnType->GetTypeString ().cc ());
 		return NULL;
 	}
 
 	CMulticastClassType* pType = (CMulticastClassType*) CreateUnnamedClassType (EClassType_Multicast);
 	pType->m_pTargetType = pFunctionPtrType;
+	pType->m_Flags |= (pFunctionPtrType->m_Flags & ETypeFlag_GcRoot);
 
 	// fields
 
@@ -1162,6 +1163,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 
 	CMcSnapshotClassType* pSnapshotType = (CMcSnapshotClassType*) CreateUnnamedClassType (EClassType_McSnapshot);
 	pSnapshotType->m_pTargetType = pFunctionPtrType->GetStrongPtrType ();
+	pSnapshotType->m_Flags |= (pFunctionPtrType->m_Flags & ETypeFlag_GcRoot);
 
 	// fields
 

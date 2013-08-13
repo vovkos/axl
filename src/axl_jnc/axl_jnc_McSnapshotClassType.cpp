@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_McSnapshotClassType.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -80,6 +81,26 @@ CMcSnapshotClassType::CompileCallMethod ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 
 	return true;
+}
+
+void
+CMcSnapshotClassType::EnumGcRoots (
+	CRuntime* pRuntime,
+	void* _p
+	)
+{
+	TObject* pObject = (TObject*) _p;
+	ASSERT (pObject->m_pType == this);
+
+	TMcSnapshot* pSnapshot = (TMcSnapshot*) (pObject + 1);
+	if (!(m_pTargetType->GetFlags () & ETypeFlag_GcRoot) || !pSnapshot->m_Count)
+		return;
+
+	char* p = (char*) pSnapshot->m_pPtrArray;
+	size_t Size = m_pTargetType->GetSize ();
+
+	for (size_t i = 0; i < pSnapshot->m_Count; i++, p += Size)
+		pRuntime->AddGcRoot (p, m_pTargetType);
 }
 
 //.............................................................................

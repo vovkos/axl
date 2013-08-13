@@ -53,6 +53,16 @@ public:
 	bool
 	Compile ();
 
+	virtual 
+	void
+	EnumGcRoots (
+		CRuntime* pRuntime,
+		void* p
+		)
+	{
+		ASSERT (false); // unions are POD and hence are never GC roots
+	}
+
 protected:
 	virtual
 	CStructField*

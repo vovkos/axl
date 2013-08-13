@@ -988,6 +988,48 @@ CClassType::PrimeInterface (
 	return true;
 }
 
+void
+CClassType::EnumGcRoots (
+	CRuntime* pRuntime,
+	void* p
+	)
+{
+	TObject* pObject = (TObject*) p;
+	ASSERT (pObject->m_pType == this);
+
+	EnumGcRootsImpl (pRuntime, (TInterface*) (pObject + 1));
+}
+
+void
+CClassType::EnumGcRootsImpl (
+	CRuntime* pRuntime,
+	TInterface* pInterface
+	)
+{
+	char* p = (char*) pInterface;
+
+	size_t Count = m_GcRootBaseTypeArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CBaseTypeSlot* pSlot = m_GcRootBaseTypeArray [i];
+		CType* pType = pSlot->GetType ();
+
+		if (pType->GetTypeKind () == EType_Class)
+			((CClassType*) pType)->EnumGcRootsImpl (pRuntime, (TInterface*) (p + pSlot->GetOffset ()));
+		else
+			pType->EnumGcRoots (pRuntime, p + pSlot->GetOffset ());
+	}
+
+	Count = m_GcRootMemberFieldArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = m_GcRootMemberFieldArray [i];
+		CType* pType = pField->GetType ();
+
+		pField->GetType ()->EnumGcRoots (pRuntime, p + pField->GetOffset ());
+	}
+}
+
 //.............................................................................
 
 } // namespace jnc {

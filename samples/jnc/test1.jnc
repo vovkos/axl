@@ -32,7 +32,7 @@ Foo (
 {
 	printf ("Foo (%d, %d)\n", x, y);
 }
-	
+
 int 
 main ()
 {
@@ -50,7 +50,7 @@ main ()
 	weak multicast wmc (int);
 	wmc += wpf;
 
-	function* pf (int) = wpf;
+	function* pf (int) = wmc.GetSnapshot ();
 
 	jnc.RunGc ();
 

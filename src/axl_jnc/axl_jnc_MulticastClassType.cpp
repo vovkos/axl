@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_MulticastClassType.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {
@@ -58,6 +59,26 @@ CMulticastClassType::CompileCallMethod ()
 	m_pModule->m_FunctionMgr.InternalEpilogue ();		
 
 	return true;
+}
+
+void
+CMulticastClassType::EnumGcRoots (
+	CRuntime* pRuntime,
+	void* _p
+	)
+{
+	TObject* pObject = (TObject*) _p;
+	ASSERT (pObject->m_pType == this);
+
+	TMulticast* pMulticast = (TMulticast*) (pObject + 1);
+	if (!(m_pTargetType->GetFlags () & ETypeFlag_GcRoot) || !pMulticast->m_Count)
+		return;
+
+	char* p = (char*) pMulticast->m_pPtrArray;
+	size_t Size = m_pTargetType->GetSize ();
+
+	for (size_t i = 0; i < pMulticast->m_Count; i++, p += Size)
+		pRuntime->AddGcRoot (p, m_pTargetType);
 }
 
 //.............................................................................

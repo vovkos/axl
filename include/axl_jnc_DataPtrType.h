@@ -93,7 +93,7 @@ public:
 	EnumGcRoots (
 		CRuntime* pRuntime,
 		void* p
-		);	
+		);
 
 protected:
 	virtual 

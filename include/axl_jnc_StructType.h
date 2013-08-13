@@ -177,6 +177,13 @@ public:
 	bool
 	Compile ();
 
+	virtual 
+	void
+	EnumGcRoots (
+		CRuntime* pRuntime,
+		void* p
+		);
+
 protected:
 	virtual
 	CStructField*

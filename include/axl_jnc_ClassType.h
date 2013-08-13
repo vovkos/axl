@@ -228,6 +228,13 @@ public:
 	bool
 	Compile ();
 
+	virtual 
+	void
+	EnumGcRoots (
+		CRuntime* pRuntime,
+		void* p
+		);
+
 	bool
 	CallBaseTypeDestructors (const CValue& ThisValue);
 
@@ -238,6 +245,12 @@ public:
 	CallMemberPropertyDestructors (const CValue& ThisValue);
 
 protected:
+	void
+	EnumGcRootsImpl (
+		CRuntime* pRuntime,
+		TInterface* pInterface
+		);
+
 	virtual
 	CStructField*
 	CreateFieldImpl (
