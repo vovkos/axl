@@ -62,6 +62,39 @@ CCast_BoolFromPtr::LlvmCast (
 	return CCast_BoolFromZeroCmp::LlvmCast (StorageKind, PtrValue, pType, pResultValue);
 }
 
+
+//.............................................................................
+
+bool
+CCast_IntFromBool::ConstCast (
+	const CValue& OpValue,
+	CType* pType,
+	void* pDst
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Bool);
+
+	memset (pDst, 0, pType->GetSize ());
+
+	if (*(bool*) OpValue.GetConstData ())
+		*(char*) pDst = 1;
+
+	return true;
+}
+
+bool
+CCast_IntFromBool::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Bool);
+	m_pModule->m_LlvmIrBuilder.CreateExt_u (OpValue, pType, pResultValue);
+	return true;
+}
+
 //.............................................................................
 
 ICastOperator*

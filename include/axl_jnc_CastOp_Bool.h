@@ -69,6 +69,44 @@ public:
 
 //.............................................................................
 
+// bool <-> int
+
+class CCast_IntFromBool: public ICastOperator
+{
+public:
+	AXL_OBJ_CLASS_0 (CCast_IntFromBool, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		)
+	{
+		return ECast_Implicit;
+	}
+
+	virtual
+	bool
+	ConstCast (
+		const CValue& OpValue,
+		CType* pType,
+		void* pDst
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 // bool master cast
 
 class CCast_Bool: public CCast_Master

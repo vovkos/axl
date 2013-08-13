@@ -65,14 +65,20 @@ ICastOperator::Cast (
 	)
 {
 	EValue OpValueKind = OpValue.GetValueKind ();
-	if (OpValueKind == EValue_Const)
-	{
-		return 
-			pResultValue->CreateConst (NULL, pType) &&
-			ConstCast (OpValue, pType, pResultValue->GetConstData ());
-	}
+	if (OpValueKind != EValue_Const)
+		return LlvmCast (StorageKind, OpValue, pType, pResultValue);
+	
+	CValue ResultValue;
+	
+	bool Result = 
+		ResultValue.CreateConst (NULL, pType) && 
+		ConstCast (OpValue, pType, ResultValue.GetConstData ());
 
-	return LlvmCast (StorageKind, OpValue, pType, pResultValue);
+	if (!Result)
+		return false;
+
+	*pResultValue = ResultValue;
+	return true;
 }
 
 bool

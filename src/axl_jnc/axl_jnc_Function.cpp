@@ -209,7 +209,9 @@ CFunction::AddTlsVariable (CVariable* pVariable)
 CFunction*
 GetItemUnnamedMethod (
 	CModuleItem* pItem,
-	EFunction FunctionKind
+	EFunction FunctionKind,
+	EUnOp UnOpKind, 
+	EBinOp BinOpKind
 	)
 {
 	if (pItem->GetItemKind () == EModuleItem_Property)
@@ -233,22 +235,33 @@ GetItemUnnamedMethod (
 			return pProperty->GetSetter ();
 		}
 	}
-	else if (pItem->GetItemKind () == EModuleItem_Type && ((CType*) pItem)->GetTypeKind () == EType_Class)
+	else if (
+		pItem->GetItemKind () == EModuleItem_Type && 
+		(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Derivable))
 	{
-		CClassType* pClassType = (CClassType*) pItem;
+		CDerivableType* pType = (CDerivableType*) pItem;
 		switch (FunctionKind)
 		{
 		case EFunction_PreConstructor:
-			return pClassType->GetPreConstructor ();
+			return pType->GetPreConstructor ();
 
 		case EFunction_Constructor:
-			return pClassType->GetConstructor ();
+			return pType->GetConstructor ();
 
 		case EFunction_StaticConstructor:
-			return pClassType->GetStaticConstructor ();
+			return pType->GetStaticConstructor ();
 
 		case EFunction_Destructor:
-			return pClassType->GetDestructor ();
+			return pType->GetTypeKind () == EType_Class ? ((CClassType*) pType)->GetDestructor () : NULL;
+
+		case EFunction_UnaryOperator:
+			return pType->GetUnaryOperator (UnOpKind);
+
+		case EFunction_BinaryOperator:
+			return pType->GetBinaryOperator (BinOpKind);
+
+		case EFunction_CallOperator:
+			return pType->GetCallOperator ();
 		}
 	}
 
@@ -270,6 +283,7 @@ CFunction::CalcLayout ()
 	CFunction* pOriginFunction = NULL;
 
 	EModuleItem ItemKind = pItem->GetItemKind ();
+
 	if (m_FunctionKind == EFunction_Named)
 	{
 		if (ItemKind != EModuleItem_Function)
@@ -280,9 +294,9 @@ CFunction::CalcLayout ()
 
 		pOriginFunction = (CFunction*) pItem;
 	}
-	else
+	else 
 	{
-		pOriginFunction = GetItemUnnamedMethod (pItem, m_FunctionKind);
+		pOriginFunction = GetItemUnnamedMethod (pItem, m_FunctionKind, m_UnOpKind, m_BinOpKind);
 		if (!pOriginFunction)
 		{
 			err::SetFormatStringError ("'%s' has no '%s'", pItem->m_Tag.cc (), GetFunctionKindString (m_FunctionKind));

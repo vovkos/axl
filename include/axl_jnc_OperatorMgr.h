@@ -135,6 +135,7 @@ protected:
 	CCast_SwapByteOrder m_Cast_SwapByteOrder;
 	CCast_PtrFromInt m_Cast_PtrFromInt;
 	CCast_Bool m_Cast_Bool;
+	CCast_IntFromBool m_CastIntFromBool;
 	CCast_Int m_Cast_Int;
 	CCast_BeInt m_Cast_BeInt;
 	CCast_Fp m_Cast_Fp;

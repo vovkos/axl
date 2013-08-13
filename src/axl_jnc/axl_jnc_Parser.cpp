@@ -512,10 +512,8 @@ CParser::DeclareFunction (
 
 	if (DeclaratorKind == EDeclarator_UnaryBinaryOperator)
 	{
-		ASSERT (!FunctionKind);
-		FunctionKind = HasArgs ? 
-			EFunction_BinaryOperator : 
-			EFunction_UnaryOperator;
+		ASSERT (FunctionKind == EFunction_UnaryOperator || FunctionKind == EFunction_BinaryOperator);
+		FunctionKind = HasArgs ? EFunction_BinaryOperator : EFunction_UnaryOperator;
 	}
 
 	ASSERT (FunctionKind);
@@ -651,25 +649,23 @@ CParser::DeclareFunction (
 		return ((CProperty*) pNamespace)->AddMethod (pFunction);
 
 	default:
-		if (PostModifiers)
-		{
-			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
-			return false;
-		}
-
-		if (m_StorageKind)
-		{
-			err::SetFormatStringError ("invalid storage specifier '%s' for a global function", GetStorageKindString (m_StorageKind));
-			return false;
-		}
-
-		if (pDeclarator->IsQualified ())
+		if (pDeclarator->IsQualified ()) // create orphan
 		{
 			pFunction->m_Flags |= EModuleItemFlag_Orphan;
 			return true;
 		}
 
-		pFunction->m_StorageKind = EStorage_Static;
+		if (PostModifiers)
+		{
+			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
+			return false;
+		}
+		
+		if (m_StorageKind && m_StorageKind != EStorage_Static)
+		{
+			err::SetFormatStringError ("invalid storage specifier '%s' for a global function", GetStorageKindString (m_StorageKind));
+			return false;
+		}
 	}
 
 	if (!pNamespace->GetParentNamespace ()) // module constructor / destructor

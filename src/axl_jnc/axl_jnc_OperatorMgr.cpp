@@ -246,7 +246,8 @@ COperatorMgr::GetBinaryOperatorResultType (
 	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
 	ASSERT (pOperator);
 
-	PrepareOperandType (RawOpValue2, &OpValue2);
+	PrepareOperandType (RawOpValue1, &OpValue1, pOperator->GetOpFlags1 ());
+	PrepareOperandType (RawOpValue2, &OpValue2, pOperator->GetOpFlags2 ());
 	return pOperator->GetResultType (OpValue1, OpValue2);
 }
 
@@ -854,7 +855,7 @@ COperatorMgr::PrepareOperand (
 		case EType_Bool:
 			if (!(OpFlags & EOpFlag_KeepBool))
 			{
-				Result = CastOperator (&Value, EType_Int8);
+				Result = m_CastIntFromBool.Cast (EStorage_Heap, Value, GetSimpleType (m_pModule, EType_Int8), &Value);
 				if (!Result)
 					return false;
 			}

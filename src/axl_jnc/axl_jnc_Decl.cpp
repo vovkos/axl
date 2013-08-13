@@ -256,6 +256,7 @@ CDeclarator::AddUnaryBinaryOperator (
 		return false;
 	}
 
+	m_FunctionKind = EFunction_UnaryOperator; // temp; will be adjusted later in CParser::DeclareFunction
 	m_DeclaratorKind = EDeclarator_UnaryBinaryOperator;
 	m_UnOpKind = UnOpKind;
 	m_BinOpKind = BinOpKind;
