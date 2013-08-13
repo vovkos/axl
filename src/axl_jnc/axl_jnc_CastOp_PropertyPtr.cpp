@@ -136,7 +136,7 @@ CCast_PropertyPtr_Base::GetCastKind (
 //.............................................................................
 
 bool
-CCast_PropertyPtr_FromNormal::LlvmCast (
+CCast_PropertyPtr_FromFat::LlvmCast (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
@@ -164,7 +164,7 @@ CCast_PropertyPtr_FromNormal::LlvmCast (
 //.............................................................................
 
 bool
-CCast_PropertyPtr_Thin2Normal::LlvmCast (
+CCast_PropertyPtr_Thin2Fat::LlvmCast (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
@@ -238,7 +238,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast (
 }
 
 bool
-CCast_PropertyPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
+CCast_PropertyPtr_Thin2Fat::LlvmCast_NoThunkSimpleClosure (
 	const CValue& OpValue,
 	const CValue& SimpleClosureObjValue,
 	CPropertyType* pSrcPropertyType,
@@ -261,7 +261,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_NoThunkSimpleClosure (
 }
 
 bool
-CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkNoClosure (
+CCast_PropertyPtr_Thin2Fat::LlvmCast_DirectThunkNoClosure (
 	CProperty* pProperty,
 	CPropertyPtrType* pDstPtrType,
 	CValue* pResultValue
@@ -279,7 +279,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkNoClosure (
 }
 
 bool
-CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
+CCast_PropertyPtr_Thin2Fat::LlvmCast_DirectThunkSimpleClosure (
 	CProperty* pProperty,
 	const CValue& SimpleClosureObjValue,
 	CPropertyPtrType* pDstPtrType,
@@ -303,7 +303,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_DirectThunkSimpleClosure (
 }
 
 bool
-CCast_PropertyPtr_Thin2Normal::LlvmCast_FullClosure (
+CCast_PropertyPtr_Thin2Fat::LlvmCast_FullClosure (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CPropertyType* pSrcPropertyType,
@@ -331,7 +331,7 @@ CCast_PropertyPtr_Thin2Normal::LlvmCast_FullClosure (
 }
 
 bool
-CCast_PropertyPtr_Thin2Normal::CreateClosurePropertyPtr (
+CCast_PropertyPtr_Thin2Fat::CreateClosurePropertyPtr (
 	CProperty* pProperty,
 	const CValue& ClosureValue,
 	CPropertyPtrType* pPtrType,
@@ -457,7 +457,7 @@ CCast_PropertyPtr_Thin2Thin::LlvmCast (
 }
 
 //.............................................................................
-
+/*
 bool
 CCast_PropertyPtr_Thin2Weak::LlvmCast (
 	EStorage StorageKind,
@@ -485,6 +485,7 @@ CCast_PropertyPtr_Thin2Weak::LlvmCast (
 	pResultValue->OverrideType (pType);
 	return true;
 }
+*/
 
 //.............................................................................
 
@@ -492,11 +493,12 @@ CCast_PropertyPtr::CCast_PropertyPtr ()
 {
 	memset (m_OperatorTable, 0, sizeof (m_OperatorTable));
 
-	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Normal] = &m_FromNormal;
-	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Weak]   = &m_FromNormal;
+	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Normal] = &m_FromFat;
+	m_OperatorTable [EPropertyPtrType_Normal] [EPropertyPtrType_Weak]   = &m_FromFat;
 	m_OperatorTable [EPropertyPtrType_Weak] [EPropertyPtrType_Normal]   = &m_Weak2Normal;
-	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Normal]   = &m_Thin2Normal;
-	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Weak]     = &m_Thin2Weak;
+	m_OperatorTable [EPropertyPtrType_Weak] [EPropertyPtrType_Weak]     = &m_FromFat;
+	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Normal]   = &m_Thin2Fat;
+	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Weak]     = &m_Thin2Fat;
 	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Thin]     = &m_Thin2Thin;
 }
 

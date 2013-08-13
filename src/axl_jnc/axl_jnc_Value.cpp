@@ -366,7 +366,7 @@ CValue::SetFunction (CFunction* pFunction)
 		EPtrTypeFlag_Checked
 		);
 
-	if (!pFunction->IsOverloaded () && !pFunction->IsVirtual ())
+	if (!pFunction->IsVirtual ())
 		m_pLlvmValue = pFunction->GetLlvmFunction ();
 }
 
