@@ -1,0 +1,92 @@
+//.............................................................................
+
+// simple property declaration syntax
+
+int autoget bindable property s_SimpleProp;
+
+s_SimpleProp.set (int x)
+{
+	printf ("s_SimpleProp.set (%d)\n", x);
+	propvalue = x;
+
+	if (x > 150)
+		silent return; // 'silent return' suppresses firing 'onchange' event
+
+	// normally, 'onchange' event fires upon return
+}
+
+//.............................................................................
+
+// similar property declared using full syntax
+
+bindable property s_Prop
+{	
+	int propvalue; // declaring a 'propvalue' field implicitly makes property 'autoget'
+
+	set (int x)
+	{
+		printf ("s_Prop.set (int %d)\n", x);
+		propvalue = x;
+	}
+
+	set (double x)
+	{
+		printf ("s_Prop.set (double %f)\n", x);
+		propvalue = (int) x;
+	}
+}
+
+//.............................................................................
+
+// bindable data: bindable property with compiler-generated getter & setter
+// since getter and setter are auto-generated, the purpose of
+// bindable data is purely to track data changes 
+
+int bindable s_Data;
+
+//.............................................................................
+
+OnSimplePropChange ()
+{
+	printf ("s_SimpleProp has changed (new value = %d)\n", s_SimpleProp);
+}
+
+OnPropChange ()
+{
+	printf ("s_Prop has changed (new value = %d)\n", s_Prop);
+}
+
+OnDataChange ()
+{
+	printf ("s_Data has changed (new value = %d)\n", s_Data);
+}
+
+int
+main ()
+{
+ 	s_SimpleProp.onchange += OnSimplePropChange;
+ 	s_Prop.onchange += OnPropChange;
+	s_Data.onchange += OnDataChange;
+
+	s_SimpleProp = 100;
+	s_SimpleProp = 200; // 'onchange' event will not fire 
+
+	s_Prop = 500;
+	s_Prop = 5.5;
+
+	s_Data = 1000;
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

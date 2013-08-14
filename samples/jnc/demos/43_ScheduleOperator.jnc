@@ -1,0 +1,46 @@
+//.............................................................................
+
+// schedulers are 
+
+class CLockScheduler: jnc.IScheduler
+{
+	override
+	Schedule (function* pf ())
+	{
+		printf ("lock...\n");
+		pf ();
+		printf ("unlock...\n");
+	}
+}
+
+Foo (
+	int a,
+	int b
+	)
+{
+	printf ("Foo (%d, %d)\n", a, b);
+}
+
+int
+main ()
+{
+	CLockScheduler LockScheduler;
+	
+	function* pf (int, int) = Foo @ LockScheduler;
+
+//	pf (10, 20);
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

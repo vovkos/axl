@@ -8,6 +8,12 @@
 #include "moc_mainwindow.cpp"
 #include "qrc_jancyedit.cpp"
 
+StdLib::StdLib ()
+{
+	m_FunctionMap ["printf"] = (void*) Printf;
+	m_FunctionMap ["rand"]   = (void*) rand;
+}
+
 int
 StdLib::Printf (
 	const char* pFormat,
@@ -41,8 +47,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 	readSettings();
 
 	connect(
-		this, SIGNAL (outputSignal (QString)),
-		output, SLOT (outputSlot (QString)), 
+		this, SIGNAL (outputSignal ()),
+		this, SLOT (outputSlot ()), 
 		Qt::QueuedConnection
 		);
 }
@@ -240,15 +246,37 @@ void MainWindow::writeOutput_va(const char* format, va_list va)
 	text.Format_va (format, va);
 	QString string = QString::fromUtf8 (text, text.GetLength ());
 
-	if (QApplication::instance()->thread () == QThread::currentThread ())
+	if (QApplication::instance()->thread () == QThread::currentThread () && outputQueue.empty ())
 	{
 		output->appendString (string);
 		output->repaint ();
 	}
 	else
 	{
-		emit outputSignal (string);
+		outputMutex.lock ();
+		outputQueue.append (string);
+		outputMutex.unlock ();
+
+		emit outputSignal ();
 	}
+}
+
+void MainWindow::outputSlot ()
+{
+	outputMutex.lock ();
+
+	while (!outputQueue.empty ())
+	{
+		QString string = outputQueue.takeFirst ();		
+		outputMutex.unlock ();
+
+		output->appendString (string);
+		output->repaint ();
+
+		outputMutex.lock ();
+	}
+
+	outputMutex.unlock ();
 }
 
 void MainWindow::writeOutput(const char* format, ...)
@@ -413,6 +441,7 @@ bool MainWindow::compile ()
 		llvm::ExecutionEngine* llvmExecutionEngine = runtime.GetLlvmExecutionEngine ();
 		jnc::CStdLib::Export (&module, llvmExecutionEngine);
 		module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
+		module.SetFunctionPointer (llvmExecutionEngine, "rand", (void*) rand);
 	}
 
 	Result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());	

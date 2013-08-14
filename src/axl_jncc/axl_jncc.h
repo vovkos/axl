@@ -34,10 +34,7 @@ PrintUsage (IOutStream* pOutStream);
 class CStdLib: public jnc::CStdLib
 {
 public:
-	CStdLib ()
-	{
-		m_FunctionMap ["printf"] = (void*) Printf;
-	}
+	CStdLib ();
 	
 	static
 	int

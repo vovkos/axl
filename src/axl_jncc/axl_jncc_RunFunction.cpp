@@ -3,6 +3,12 @@
 
 //.............................................................................
 
+CStdLib::CStdLib ()
+{
+	m_FunctionMap ["printf"] = (void*) Printf;
+	m_FunctionMap ["rand"]   = (void*) rand;
+}
+
 int
 CStdLib::Printf (
 	const char* pFormat,
@@ -66,6 +72,7 @@ CJnc::RunFunction (int* pReturnValue)
 	jnc::CFunction* pFunction = (jnc::CFunction*) pFunctionItem;
 
 	jnc::CScopeThreadRuntime ScopeRuntime (&m_Runtime);
+	
 	m_Runtime.Startup ();
 
 	jnc::CFunction* pConstructor = m_Module.GetConstructor ();

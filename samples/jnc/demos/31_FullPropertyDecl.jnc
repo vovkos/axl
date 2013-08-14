@@ -1,0 +1,72 @@
+//.............................................................................
+
+// full property declaration syntax allows declaring properties with
+// overloaded setters, members fields, helper methods, constructors / destructors etc
+
+property s_Prop
+{
+	int m_x = 5; // member field with in-place initializer
+
+	int 
+	get ()
+	{
+		printf ("s_Prop.get ()\n");
+		return m_x;
+	}
+
+	set (int x);
+		
+	set (double x); // overloaded setter
+
+	Update () // helper method
+	{
+		printf ("s_Prop.Update ()\n");	
+	}
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// like in case of classes, implementation could be placed outside of property declaration
+
+s_Prop.set (int x)
+{
+	printf ("s_Prop.set (int %d)\n", x);
+	m_x = x;
+
+	Update ();
+}	
+		
+s_Prop.set (double x)
+{
+	printf ("s_Prop.set (double %f)\n", x);
+	m_x = (int) x;
+
+	Update ();
+}	
+
+//.............................................................................
+
+// entry point
+
+int
+main ()
+{
+	int x = s_Prop;
+
+	s_Prop = 100;
+	s_Prop = 5.2;
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

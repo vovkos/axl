@@ -1,0 +1,63 @@
+//.............................................................................
+
+// simple property declaration syntax
+
+int autoget property s_SimpleProp;
+
+s_SimpleProp.set (int x)
+{
+	printf ("s_SimpleProp.set (%d)\n", x);
+	propvalue = x; // autoget properties use 'propvalue' field as a retval of getter
+}
+
+//.............................................................................
+
+// the same property declared using full syntax
+
+property s_Prop
+{	
+	int propvalue; // declaring a 'propvalue' field implicitly makes property 'autoget'
+
+	set (int x)
+	{
+		printf ("s_Prop.set (int %d)\n", x);
+		propvalue = x;
+	}
+
+	// setters of autoget property can surely be overloaded
+
+	set (double x)
+	{
+		printf ("s_Prop.set (double %f)\n", x);
+		propvalue = (int) x;
+	}
+}
+
+//.............................................................................
+
+int
+main ()
+{
+	s_SimpleProp = 100;
+	int x = s_SimpleProp;
+	printf ("x = %d\n", x);
+
+	s_Prop = 500;
+	s_Prop = 2.5;
+	x = s_Prop;
+	printf ("x = %d\n", x);
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

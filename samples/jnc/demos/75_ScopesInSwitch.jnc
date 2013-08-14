@@ -1,0 +1,49 @@
+//.............................................................................
+
+int
+main ()
+{
+	printf ("main ()\n");
+
+	int Result;
+
+	int Rand = rand () % 3;
+	switch (Rand)
+	{
+	case 0:
+		int i = 10;
+		Result = i * i;
+		break;
+
+	case 1:
+		int i = 20; // no problem: we are in different scope
+		Result = i * i;
+	
+	case 2:
+		int i = 30; // no problem even when we fall-through from previous case label
+		Result = i * i;
+		break;
+
+	default: // true programmers expect the unexpected! just kidding, this 'default' is utterly pointless
+		int i = 40; // still ok. you've got the idea
+		Result = i * i;
+	}
+
+	printf ("Rand = %d, Result = %d\n", Rand, Result);
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+int
+rand ();
+
+//.............................................................................

@@ -1,0 +1,85 @@
+//.............................................................................
+
+// class with a method to be called through function pointer
+
+class C1
+{
+	int m_x = -1;
+
+	construct ()
+	{
+		printf ("C1.construct ()\n");
+	}		
+
+	destruct ()
+	{
+		printf ("C1.destruct ()\n");
+	}		
+
+	Foo (
+		int a,
+		int b,
+		int c		
+		)
+	{
+		printf ("C1.Foo (%d, %d, %d) { m_x = %d }\n", a, b, c, m_x);
+	}
+}
+
+//.............................................................................
+
+// entry point
+
+int
+main ()
+{
+	C1* p;
+	weak C1* wp;
+	weak function* wpf (int, int);
+
+	{ 
+		// like normal classes, closure objects are protected by adding a gc-root
+		// so, to make sure no implicit roots are holding our objects, enclose everything in a scope
+
+		p = new C1;
+		wp = p;
+
+		// 'weak' in regard to function pointers is all about captured arguments:
+		// code pointer cannot be strong or weak in itself.
+		// so, to make function pointer weak, we must specify which of the captured arguments
+		// will be weakly referenced. to make 'this' argument weak, either use 
+		// weak-member operator '.weak' or apply member operator to weak class pointer		
+
+		wpf = p.weak Foo ~(,, 3); // 'p.weak Foo' is equivalent to 'wp.Foo'		
+	} 
+
+	// ok, only pointers keep object alive from now on
+
+	// p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
+
+	printf ("GC run...\n");
+	jnc.RunGcWaitForDestructors ();
+
+	function* pf (int, int) = wpf;
+	if (pf)
+	{
+		printf ("Object survived GC run\n");
+		pf (1, 2);
+	}
+	else
+		printf ("Object was collected during GC run\n");
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

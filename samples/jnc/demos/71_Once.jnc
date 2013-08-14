@@ -1,0 +1,59 @@
+//.............................................................................
+
+Foo (int n)
+{
+	printf ("Foo (%d): TID = %08x\n", n, jnc.GetCurrentThreadId ());
+
+	static int a [3];
+	once // 'once' block will be executed once per application run 
+	{
+		printf ("Foo.static once\n");
+		for (int i = 0; i < countof (a); i++)
+			a [i] = i * 10;
+	}
+
+	thread int64 t;
+
+	thread once // 'thread once' block will be executed once per thread
+	{			
+		printf ("Foo.thread once\n");
+		t = jnc.GetCurrentThreadId ();
+	}
+
+	printf ("t = %08x\na = { ", t);
+
+	for (int i = 0; i < countof (a); i++)
+		printf ("%d, ", a [i]);
+	
+	printf ("}\n");
+}
+
+ThreadProc ()
+{
+	for (int i = 0; i < 3; i++)
+		Foo (i);
+}
+
+int
+main ()
+{
+	for (int i = 0; i < 3; i++)
+		Foo (i);
+
+	jnc.CreateThread (ThreadProc);
+
+	jnc.Sleep (1000); // temp dirty solution. CreateThread should probably return some waitable object
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

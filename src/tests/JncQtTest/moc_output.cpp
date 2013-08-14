@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Output_t {
-    QByteArrayData data[4];
-    char stringdata[25];
+    QByteArrayData data[1];
+    char stringdata[8];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -29,12 +29,9 @@ struct qt_meta_stringdata_Output_t {
     )
 static const qt_meta_stringdata_Output_t qt_meta_stringdata_Output = {
     {
-QT_MOC_LITERAL(0, 0, 6),
-QT_MOC_LITERAL(1, 7, 10),
-QT_MOC_LITERAL(2, 18, 0),
-QT_MOC_LITERAL(3, 19, 4)
+QT_MOC_LITERAL(0, 0, 6)
     },
-    "Output\0outputSlot\0\0text\0"
+    "Output\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -44,31 +41,22 @@ static const uint qt_meta_data_Output[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       0,    0, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
 
- // slots: name, argc, parameters, tag, flags
-       1,    1,   19,    2, 0x0a,
-
- // slots: parameters
-    QMetaType::Void, QMetaType::QString,    3,
-
        0        // eod
 };
 
 void Output::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        Output *_t = static_cast<Output *>(_o);
-        switch (_id) {
-        case 0: _t->outputSlot((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        default: ;
-        }
-    }
+    Q_UNUSED(_o);
+    Q_UNUSED(_id);
+    Q_UNUSED(_c);
+    Q_UNUSED(_a);
 }
 
 const QMetaObject Output::staticMetaObject = {
@@ -95,15 +83,6 @@ int Output::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = Editor::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
-            qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
-            *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 1;
-    }
     return _id;
 }
 QT_END_MOC_NAMESPACE

@@ -150,6 +150,7 @@ main (
 	llvm::InitializeNativeTargetDisassembler ();
 
 	err::CParseErrorProvider::Register ();
+	srand ((int) axl::g::GetTimestamp ());
 
 	CFileOutStream StdOut;
 	CCmdLine CmdLine;

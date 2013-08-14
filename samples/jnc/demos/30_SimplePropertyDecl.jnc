@@ -1,0 +1,66 @@
+//.............................................................................
+
+// simple property declaration syntax
+// possible if getter return type and setter arg type match
+
+int property s_SimpleProp;
+
+// accessor implementation
+
+int
+s_SimpleProp.get ()
+{
+	printf ("s_SimpleProp.get ()\n");
+	return rand () % 3;
+}
+
+s_SimpleProp.set (int x)
+{
+	printf ("s_SimpleProp.set (%d)\n", x);
+}
+
+//.............................................................................
+
+// read-only property also can use simple declaration syntax
+
+const int property s_SimpleReadOnlyProp;
+
+int
+s_SimpleReadOnlyProp.get ()
+{
+	printf ("s_SimpleReadOnlyProp.get ()\n");
+	return rand () % 3;
+}
+
+//.............................................................................
+
+// entry point
+
+int
+main ()
+{
+	int x = s_SimpleProp;
+
+	s_SimpleProp = 100;
+
+	int y = s_SimpleReadOnlyProp;
+
+	// s_SimpleReadOnlyProp = 200; // <-- error: property is read-only
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+int
+rand ();
+
+//.............................................................................

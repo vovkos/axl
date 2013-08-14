@@ -100,6 +100,7 @@ getsockerror ()
 #include "axl_err_Errno.h"
 #include "axl_mt_Thread.h"
 #include "axl_rtl_String.h"
+#include "axl_g_Time.h"
 
 using namespace axl;
 

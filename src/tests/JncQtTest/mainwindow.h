@@ -10,10 +10,7 @@ class MdiChild;
 class StdLib: public jnc::CStdLib
 {
 public:
-	StdLib ()
-	{
-		m_FunctionMap ["printf"] = (void*) Printf;
-	}
+	StdLib ();
 	
 	static
 	int
@@ -48,9 +45,10 @@ private slots:
 	void clearOutput();
 	bool compile();
 	bool run();
+	void outputSlot ();
 
 signals:
-	void outputSignal (QString text);
+	void outputSignal ();
 
 private:
 	void createActions();
@@ -78,6 +76,9 @@ private:
 	ModulePane *modulePane;
 	LlvmIr *llvmIr;
 	Disassembly *disassembly;
+
+	QMutex outputMutex;
+	QStringList outputQueue;
 
 	QMenu *fileMenu;
 	QMenu *editMenu;

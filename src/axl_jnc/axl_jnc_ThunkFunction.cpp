@@ -34,25 +34,16 @@ CThunkFunction::Compile ()
 
 	llvm::Function::arg_iterator LlvmArg = GetLlvmFunction ()->arg_begin();
 
-	// handle the first thunk argument (it's either NULL or actual interface)
-
-	size_t i = 0;
-
-	if (TargetArgCount == ThunkArgCount)
-	{
-		CValue IfaceValue (LlvmArg, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr));
-		m_pModule->m_LlvmIrBuilder.CreateBitCast (IfaceValue, TargetArgArray [0]->GetType (), &IfaceValue);
-		ArgArray [0] = IfaceValue;
-		i++;
-	}
-	else
+	// skip the first thunk argument (if needed)
+	
+	if (ThunkArgCount != TargetArgCount)
 	{
 		ASSERT (ThunkArgCount == TargetArgCount + 1);
 		ThunkArgArray.Remove (0); 
 		LlvmArg++;
 	}
-
-	for (; i < TargetArgCount; i++, LlvmArg++)
+		
+	for (size_t i = 0; i < TargetArgCount; i++, LlvmArg++)
 	{
 		CValue ArgValue (LlvmArg, ThunkArgArray [i]->GetType ());
 		Result = m_pModule->m_OperatorMgr.CastOperator (&ArgValue, TargetArgArray [i]->GetType ());

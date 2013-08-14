@@ -443,7 +443,7 @@ COperatorMgr::SetProperty (
 		CProperty* pProperty = OpValue.GetProperty ();
 		if (pProperty->GetFlags () & EPropertyFlag_AutoSet)
 		{
-			ASSERT (pProperty->GetFlags () & EPropertyTypeFlag_Bindable);
+			ASSERT (pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable);
 
 			CValue PropValue;
 			CValue OnChangeValue;

@@ -1,0 +1,58 @@
+//.............................................................................
+
+class C1
+{
+	construct ()
+	{
+		printf ("C1.construct ()\n");
+	}
+
+	destruct ()
+	{
+		printf ("C1.destruct ()\n");
+	}
+}
+
+C1 s_c; // global static variable with constructor & destructor
+
+int s_x = Foo (); // global static variable with initializer
+
+int
+Foo ()
+{
+	printf ("Foo ()\n");
+	return 100;
+}
+
+int
+main ()
+{
+	printf ("main ()\n");
+	return 0;
+}
+
+// module constructor will be called after all global static variables have been initialized
+
+construct ()
+{
+	printf ("module.construct ()\n");
+}
+
+// module destructor will be called before global static variables have been destructed
+
+destruct ()
+{
+	printf ("module.destruct ()\n");
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

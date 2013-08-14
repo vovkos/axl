@@ -1,0 +1,59 @@
+//.............................................................................
+
+class C1
+{
+	construct ()
+	{
+		printf ("C1.construct ()\n");
+	}		
+
+	destruct ()
+	{
+		printf ("C1.destruct ()\n");
+	}		
+}
+
+//.............................................................................
+
+int
+main ()
+{
+	C1* p;
+	weak C1* wp;
+
+	{ 
+		// new operator adds a gc-root so newly created object 
+		// is guaranteed to stay alive until the end of the scope
+
+		p = new C1;
+	} 
+
+	// ok, only pointers keep object alive from now on
+
+	wp = p;
+
+	p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
+
+	printf ("GC run...\n");
+	jnc.RunGcWaitForDestructors ();
+
+	C1* p2 = wp;
+	if (p2)
+		printf ("Object survived GC run\n");
+	else
+		printf ("Object was collected during GC run\n");
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................
