@@ -451,32 +451,31 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 	if (m_TypeModifiers & ETypeModifier_Bindable)
 		TypeFlags |= EPropertyTypeFlag_Bindable;
 
+	bool IsIndexed = (m_TypeModifiers & ETypeModifier_Indexed) != 0;
 	m_TypeModifiers &= ~ETypeModifierMask_Property;
 
-	if (!(m_TypeModifiers & ETypeModifier_Indexed))
-	{
+	if (!IsIndexed)
 		return m_pModule->m_TypeMgr.GetSimplePropertyType (
 			CallConv, 
 			pReturnType, 
 			TypeFlags
 			);
-	}
-	else
-	{
-		if (!m_Suffix || m_Suffix->GetSuffixKind () != EDeclSuffix_Function)
-		{
-			err::SetFormatStringError ("missing indexed property suffix");
-			return NULL;
-		}
 
-		CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
-		return m_pModule->m_TypeMgr.CreateIndexedPropertyType (
-			CallConv, 
-			pReturnType, 
-			pSuffix->GetArgArray (),
-			TypeFlags
-			);
+	// indexed property
+
+	if (!m_Suffix || m_Suffix->GetSuffixKind () != EDeclSuffix_Function)
+	{
+		err::SetFormatStringError ("missing indexed property suffix");
+		return NULL;
 	}
+
+	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
+	return m_pModule->m_TypeMgr.CreateIndexedPropertyType (
+		CallConv, 
+		pReturnType, 
+		pSuffix->GetArgArray (),
+		TypeFlags
+		);
 }
 
 CPropertyType*
