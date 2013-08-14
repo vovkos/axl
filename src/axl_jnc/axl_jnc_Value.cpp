@@ -391,7 +391,7 @@ CValue::SetProperty (CProperty* pProperty)
 		pProperty->GetParentNamespace (),		
 		EType_PropertyRef, 
 		EPropertyPtrType_Thin,
-		pProperty->GetPtrTypeFlags () | EPtrTypeFlag_Checked
+		EPtrTypeFlag_Checked
 		);
 
 	// don't assign LlvmValue yet cause property LlvmValue is only needed for pointers

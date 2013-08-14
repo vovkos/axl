@@ -188,7 +188,7 @@ CDeclTypeCalc::CalcType (
 			return NULL;
 	}
 
-	if (pType->GetTypeKind () != EType_Function && pFlags != NULL)
+	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code) && pFlags != NULL)
 	{
 		Result = GetPtrTypeFlags (pType, pFlags);
 		if (!Result)

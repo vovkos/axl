@@ -13,7 +13,6 @@ CProperty::CProperty ()
 	m_NamespaceKind = ENamespace_Property;
 	m_pItemDecl = this;
 	m_pType = NULL;
-	m_PtrTypeFlags = 0;
 
 	m_pPreConstructor = NULL;
 	m_pConstructor = NULL;

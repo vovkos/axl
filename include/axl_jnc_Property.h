@@ -26,8 +26,8 @@ enum EProperty
 
 enum EPropertyFlag
 {
-	EPropertyFlag_AutoGet  = 0x020000,
-	EPropertyFlag_AutoSet  = 0x040000,
+	EPropertyFlag_AutoGet  = 0x0100,
+	EPropertyFlag_AutoSet  = 0x0200,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -46,7 +46,6 @@ protected:
 	EProperty m_PropertyKind;
 
 	CPropertyType* m_pType;
-	uint_t m_PtrTypeFlags;
 
 	// construction / destruction / accessors
 
@@ -96,12 +95,6 @@ public:
 	GetType ()
 	{
 		return m_pType;
-	}
-
-	uint_t 
-	GetPtrTypeFlags ()
-	{
-		return m_PtrTypeFlags;
 	}
 
 	CFunction* 
