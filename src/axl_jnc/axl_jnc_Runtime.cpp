@@ -291,7 +291,7 @@ CRuntime::Create (
 	for (size_t i = 0; i < Count; i++)
 	{
 		CVariable* pVariable = StaticRootArray [i];
-		void* p = m_pLlvmExecutionEngine->getPointerToGlobal ((llvm::GlobalVariable*) pVariable->GetLlvmValue ());
+		void* p = m_pLlvmExecutionEngine->getPointerToGlobal ((llvm::GlobalVariable*) pVariable->GetLlvmAllocValue ());
 		ASSERT (p);
 
 		m_StaticGcRootArray [i].m_p = p;
@@ -368,7 +368,7 @@ CRuntime::Shutdown ()
 	rtl::CArrayT <TGcRoot> SaveStaticGcRootArray = m_StaticGcRootArray;
 	m_StaticGcRootArray.Clear ();
 
-	RunGc ();
+	RunGcWaitForDestructors ();
 
 	m_TerminateGcDestructThread = true;
 	m_GcDestructEvent.Signal ();
