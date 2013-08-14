@@ -91,7 +91,12 @@ COperatorMgr::GetStructField (
 	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		pPtrType = pField->GetType ()->GetDataPtrType (
+			pField->GetParentNamespace (), 
+			EType_DataRef, 
+			EDataPtrType_Thin, 
+			PtrTypeFlags
+			);
 
 		m_pModule->m_LlvmIrBuilder.CreateGep (
 			OpValue, 
@@ -110,7 +115,12 @@ COperatorMgr::GetStructField (
 	{
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 
-		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		pPtrType = pField->GetType ()->GetDataPtrType (
+			pField->GetParentNamespace (), 
+			EType_DataRef, 
+			EDataPtrType_Thin, 
+			PtrTypeFlags
+			);
 
 		m_pModule->m_LlvmIrBuilder.CreateGep (
 			PtrValue, 
@@ -158,7 +168,12 @@ COperatorMgr::GetUnionField (
 	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		pPtrType = pField->GetType ()->GetDataPtrType (
+			pField->GetParentNamespace (), 
+			EType_DataRef, 
+			EDataPtrType_Thin, 
+			PtrTypeFlags
+			);
 
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, pResultValue);
 
@@ -175,7 +190,12 @@ COperatorMgr::GetUnionField (
 
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
 
-		pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		pPtrType = pField->GetType ()->GetDataPtrType (
+			pField->GetParentNamespace (), 
+			EType_DataRef, 
+			EDataPtrType_Thin, 
+			PtrTypeFlags
+			);
 
 		pResultValue->SetThinDataPtr (
 			PtrValue.GetLlvmValue (), 
@@ -235,12 +255,23 @@ COperatorMgr::GetClassField (
 
 	if (pField->GetType ()->GetTypeKind () == EType_Class)
 	{
-		CClassPtrType* pPtrType = ((CClassType*) pField->GetType ())->GetClassPtrType (EType_ClassRef, EClassPtrType_Normal, PtrTypeFlags);
+		CClassPtrType* pPtrType = ((CClassType*) pField->GetType ())->GetClassPtrType (
+			pField->GetParentNamespace (), 
+			EType_ClassRef, 
+			EClassPtrType_Normal, 
+			PtrTypeFlags
+			);
+
 		pResultValue->SetLlvmValue (PtrValue.GetLlvmValue (), pPtrType);
 	}
 	else
 	{
-		CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (
+			pField->GetParentNamespace (), 
+			EType_DataRef, 
+			EDataPtrType_Thin, 
+			PtrTypeFlags
+			);
 
 		pResultValue->SetThinDataPtr (
 			PtrValue.GetLlvmValue (), 
