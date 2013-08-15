@@ -328,23 +328,25 @@ CCast_FunctionPtr_Thin2Thin::LlvmCast (
 		return false;
 	}
 
+	CFunctionPtrType* pSrcPtrType = (CFunctionPtrType*) OpValue.GetType ();
+	CFunctionPtrType* pDstPtrType = (CFunctionPtrType*) pType;
+
+	if (pSrcPtrType->GetTargetType ()->Cmp (pDstPtrType->GetTargetType ()) == 0)
+	{
+		pResultValue->OverrideType (OpValue, pType);
+		return true;
+	}
+
 	if (OpValue.GetValueKind () != EValue_Function)
 	{
 		err::SetFormatStringError ("can only create thin pointer thunk to a function, not a function pointer");
 		return false;
 	}
 
-	CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
-	CFunctionType* pTargetType = pPtrType->GetTargetType ();
-	CFunction* pFunction = OpValue.GetFunction ();
-
-	if (pFunction->GetType ()->Cmp (pTargetType) == 0)
-	{
-		pResultValue->OverrideType (OpValue, pType);
-		return true;
-	}
-
-	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (pFunction, pTargetType);
+	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.GetDirectThunkFunction (
+		OpValue.GetFunction (), 
+		pDstPtrType->GetTargetType ()
+		);
 
 	pResultValue->SetFunction (pThunkFunction);
 	pResultValue->OverrideType (pType);

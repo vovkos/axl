@@ -1,15 +1,19 @@
 //.............................................................................
 
-// schedulers are 
+// schedulers are used to put execution of a function into proper context/environment
+// good examples would be: posting a request to a worker thread, sending message to a worker window,
+// calling a function with mutex held etc
 
 class CLockScheduler: jnc.IScheduler
 {
+	// note how Schedule () has no information about target function argument  signature
+
 	override
 	Schedule (function* pf ())
 	{
-		printf ("lock...\n");
+		printf ("lock before call...\n");
 		pf ();
-		printf ("unlock...\n");
+		printf ("unlock after call...\n");
 	}
 }
 
@@ -25,10 +29,17 @@ int
 main ()
 {
 	CLockScheduler LockScheduler;
-	
-	function* pf (int, int) = Foo @ LockScheduler;
 
-//	pf (10, 20);
+	function* pf (int, int) = Foo @ LockScheduler;  
+
+	// result function pointer has the same argument signature as target function
+	// after passing the result function pointer as, say, completion routine,
+	// developer can be sure target function will be called in proper environment
+	
+	// ...
+	
+	printf ("calling through scheduled function pointer...\n");
+	pf (10, 20); // Foo () will be called under lock
 
 	return 0;
 }
