@@ -6,6 +6,42 @@ namespace axl {
 namespace jnc {
 
 //.............................................................................
+	
+ECast
+CCast_FunctionPtr_FromMulticast::GetCastKind (
+	const CValue& OpValue,
+	CType* pType
+	)
+{
+	ASSERT (IsClassPtrType (OpValue.GetType (), EClassType_Multicast));
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
+	
+	if (OpValue.GetType ()->GetFlags () & EPtrTypeFlag_Event)
+		return ECast_None;
+
+	CMulticastClassType* pMcType = (CMulticastClassType*) ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
+	return m_pModule->m_OperatorMgr.GetCastKind (pMcType->GetTargetType (), pType);
+}
+
+bool
+CCast_FunctionPtr_FromMulticast::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (IsClassPtrType (OpValue.GetType (), EClassType_Multicast));
+	ASSERT (pType->GetTypeKind () == EType_FunctionPtr);
+
+	CValue CallValue;
+
+	return 	
+		m_pModule->m_OperatorMgr.MemberOperator (OpValue, "Call", &CallValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (CallValue, pType, pResultValue);
+}
+
+//.............................................................................
 
 ECast
 CCast_FunctionPtr_Base::GetCastKind (
@@ -425,6 +461,10 @@ CCast_FunctionPtr::GetCastOperator (
 		return DstPtrTypeKind == EFunctionPtrType_Thin && (pType->GetFlags () & EPtrTypeFlag_Unsafe) ? 
 			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
 			NULL;
+	}
+	else if (IsClassPtrType (pSrcType, EClassType_Multicast))
+	{
+		return &m_FromMulticast;
 	}
 	else if (!(pSrcType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr))
 	{

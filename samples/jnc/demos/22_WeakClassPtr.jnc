@@ -32,7 +32,7 @@ main ()
 
 	wp = p;
 
-	p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
+	// p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
 
 	printf ("GC run...\n");
 	jnc.RunGcWaitForDestructors ();

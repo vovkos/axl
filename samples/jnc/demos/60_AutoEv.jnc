@@ -1,8 +1,73 @@
+// autoev is a unique feature of jancy which hopefully will significally simplify UI programming 
+// !!! this demo is not funcitonal now!
+
 //.............................................................................
 
-int
+// update functions that need to be called when bindable properties change
+
+UpdatePurple (
+	int Red, 
+	int Blue,
+	int Alpha
+	)
+{
+	printf ("Purple (%d, %d, %d)\n", Red, Blue, Alpha);
+}
+
+UpdateYellow (
+	int Red, 
+	int Green,
+	int Alpha
+	)
+{
+	printf ("Yellow (%d, %d, %d)\n", Red, Green, Alpha);
+}
+
+UpdateCyan (
+	int Green, 
+	int Blue,
+	int Alpha
+	)
+{
+	printf ("Cyan (%d, %d, %d)\n", Green, Blue, Alpha);
+}
+
+//.............................................................................
+
+// declare 3 bindable properties
+
+int bindable s_Red;
+int bindable s_Green;
+int bindable s_Blue;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// and autoev which binds to them
+
+autoev ColorAutoEv (int Alpha)
+{
+	UpdatePurple (s_Red, s_Blue, Alpha);
+	UpdateYellow (s_Red, s_Green, Alpha);
+	UpdateCyan (s_Green, s_Blue, Alpha);
+}
+
+int 
 main ()
 {
+	// ColorAutoEv (5);
+	// c.ColorAutoEv (5);
+
+	// CMyClass c = stack new CMyClass (7);
+
+	// {
+	//stack new CColorAutoEv (5);
+	//printf ("autoev is active\n");
+	//Red = 10; 
+	//Green = 200;
+	//}
+
+	//Blue = 3000;
+
 	return 0;
 }
 

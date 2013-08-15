@@ -3,7 +3,85 @@
 int
 main ()
 {
+	// multicasts are compiler-generated classes capable of accumulating 
+	// function pointers and calling them at once
+	// like function pointes, multicasts could be normal, 'thin' or 'weak'
+
+	multicast Multicast (int);
+	Multicast += Foo;
+	Multicast += Bar ~(, 1000);
+	Multicast (5);
+
+	// events are just special pointers to multicasts with restricted access to 
+	// multicast methods 'Call', 'Set', 'Clear'
+
+	event* pEvent (int) = Multicast;
+	// pEvent (100); // <-- error: 'Call' is not accessible 
+
+	// u can only add and remove handlers through 'event' pointer
+	
+	pEvent += Goo;
+
+	printf ("Multicast call #2...\n");
+	Multicast (15);
+
+	// removal of pointers from multicast is done differently from C#
+	// this is because jancy can create dynamic closures and generate thunks when neccessary
+	// so simple lookup on the argument of 'Add' is not even always possible, let alone efficient
+	// therefore, 'handle-table' approach is used
+
+	Multicast.Clear (); // '= null' will work also
+
+	intptr Cookie1 = pEvent.Add (Foo); // 'Add' and '+=' could be used interchangeably
+	intptr Cookie2 = pEvent.Add (Bar ~(, 2000));
+
+	printf ("Multicast call #3...\n");
+	Multicast (25);
+	
+	pEvent -= Cookie1; // 'event' pointer can be used to remove entries from multicast
+
+	printf ("Multicast call #4...\n");
+	Multicast (35);
+	
+	// converting from multicast to function pointer is ambiguous: should it be 'live' or 'snapshot'?
+	// meaning, if after creating a function pointer we modify original multicast, should
+	// function pointers see the changes or not
+	// to deal with ambiguity, multicast class provides 'GetSnapshot' method
+	// while converting to a function pointer implicitly yields a 'live' pointer
+	
+	function* p1 (int) = Multicast; // live by default
+	function* p2 (int) = Multicast.GetSnapshot (); // obviously, a snapshot
+
+	Multicast += Foo;
+	Multicast += Goo;
+
+	printf ("Live pointer call...\n");
+	p1 (45);
+	
+	printf ("Snapshot pointer call...\n");
+	p2 (55);
+
 	return 0;
+}
+
+//.............................................................................
+
+Foo (int x)
+{
+	printf ("Foo (%d)\n", x);
+}
+
+Bar (
+	int x, 
+	int y	
+	)
+{
+	printf ("Bar (%d, %d)\n", x, y);
+}
+
+Goo (int x)
+{
+	printf ("Goo (%d)\n", x);
 }
 
 //.............................................................................

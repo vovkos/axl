@@ -12,6 +12,31 @@ namespace jnc {
 
 //.............................................................................
 
+class CCast_FunctionPtr_FromMulticast: public ICastOperator
+{
+public:
+	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_FromMulticast, ICastOperator)
+
+public:
+	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		);
+
+	virtual
+	bool
+	LlvmCast (
+		EStorage StorageKind,
+		const CValue& OpValue,
+		CType* pType,
+		CValue* pResultValue
+		);
+};
+
+//.............................................................................
+
 class CCast_FunctionPtr_Base: public ICastOperator
 {
 public:
@@ -137,6 +162,7 @@ public:
 	AXL_OBJ_CLASS_0 (CCast_FunctionPtr, ICastOperator)
 
 protected:
+	CCast_FunctionPtr_FromMulticast m_FromMulticast;
 	CCast_FunctionPtr_FromFat m_FromFat;
 	CCast_FunctionPtr_Weak2Normal m_Weak2Normal;
 	CCast_FunctionPtr_Thin2Fat m_Thin2Fat;

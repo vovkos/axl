@@ -7,6 +7,29 @@ namespace jnc {
 
 //.............................................................................
 
+bool
+IsMulticastToMulticast (
+	CClassPtrType* pSrcType,
+	CClassPtrType* pDstType
+	)
+{
+	if (pSrcType->GetTargetType ()->GetClassTypeKind () != EClassType_Multicast ||
+		pDstType->GetTargetType ()->GetClassTypeKind () != EClassType_Multicast)
+		return false;
+
+	// event -> multicast is never ok
+
+	if ((pSrcType->GetFlags () & EPtrTypeFlag_Event) && !(pDstType->GetFlags () & EPtrTypeFlag_Event))
+		return false;
+
+	CMulticastClassType* pSrcMcType = (CMulticastClassType*) pSrcType->GetTargetType ();
+	CMulticastClassType* pDstMcType = (CMulticastClassType*) pDstType->GetTargetType ();
+
+	return pSrcMcType->GetTargetType ()->Cmp (pDstMcType->GetTargetType ()) == 0;
+}
+
+//.............................................................................
+
 ECast
 CCast_ClassPtr::GetCastKind (
 	const CValue& OpValue,
@@ -29,9 +52,9 @@ CCast_ClassPtr::GetCastKind (
 	CClassType* pDstClassType = pDstType->GetTargetType ();
 
 	return 
-		(pSrcClassType->GetClassTypeKind () == EClassType_StdObject) ||
-		(pDstClassType->GetClassTypeKind () == EClassType_StdObject) ||
+		(pDstClassType->GetClassTypeKind () == EClassType_StdObject) ||	
 		pSrcClassType->Cmp (pDstClassType) == 0 || 
+		IsMulticastToMulticast (pSrcType, pDstType) ||
 		pSrcClassType->FindBaseType (pDstClassType) ? 
 		ECast_Implicit : 
 		ECast_Explicit;
@@ -84,7 +107,8 @@ CCast_ClassPtr::LlvmCast (
 	if (pDstType->GetFlags () & EPtrTypeFlag_Checked)
 		m_pModule->m_OperatorMgr.CheckClassPtrNull (OpValue);
 
-	if (pDstClassType->GetClassTypeKind () == EClassType_StdObject)
+	if (pDstClassType->GetClassTypeKind () == EClassType_StdObject ||
+		IsMulticastToMulticast (pSrcType, pDstType))
 	{
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pDstType, pResultValue);
 		return true;
@@ -126,10 +150,17 @@ CCast_ClassPtr::LlvmCast (
 	CBasicBlock* pNoNullBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("iface_nonull");
 
 	CValue CmpValue;
-	m_pModule->m_LlvmIrBuilder.CreateEq_i (OpValue, SrcNullValue, &CmpValue);
-	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pPhiBlock, pNoNullBlock, pNoNullBlock);
+	Result = 
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, OpValue, SrcNullValue, &CmpValue) &&
+		m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pPhiBlock, pNoNullBlock, pNoNullBlock);
+
+	if (!Result)
+		return false;
 	
 	Coord.m_LlvmIndexArray.Insert (0, 0);
+
+	int* p = Coord.m_LlvmIndexArray;
+	size_t n = Coord.m_LlvmIndexArray.GetCount ();
 
 	CValue PtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (
