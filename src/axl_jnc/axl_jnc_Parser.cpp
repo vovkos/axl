@@ -590,17 +590,15 @@ CParser::DeclareFunction (
 		pFunction->m_Tag.AppendFormat (".%s", GetFunctionKindString (FunctionKind));
 	}
 
-	EType TypeKind;
-	
+	if (pDeclarator->IsQualified ())
+	{
+		pFunction->m_Flags |= EModuleItemFlag_Orphan;
+		return true;
+	}
+
 	switch (NamespaceKind)
 	{
 	case ENamespace_TypeExtension:
-		if (!pDeclarator->IsSimple ())
-		{
-			err::SetFormatStringError ("invalid declarator '%s' in type extension", pFunction->m_Tag.cc ());
-			return false;
-		}
-
 		if (pFunction->IsVirtual ())
 		{
 			err::SetFormatStringError ("invalid storage '%s' in type extension", GetStorageKindString (pFunction->m_StorageKind));
@@ -610,12 +608,7 @@ CParser::DeclareFunction (
 		break;
 
 	case ENamespace_Type:
-		if (pDeclarator->IsQualified () && m_StorageKind != EStorage_Override)
-		{
-			err::SetFormatStringError ("only overrides could be qualified, '%s' is not an override", pFunction->m_Tag.cc ());
-			return false;
-		}
-
+		EType TypeKind;
 		TypeKind = ((CNamedType*) pNamespace)->GetTypeKind ();
 		switch (TypeKind)
 		{
@@ -634,21 +627,9 @@ CParser::DeclareFunction (
 		}
 
 	case ENamespace_Property:
-		if (pDeclarator->IsQualified ())
-		{
-			err::SetFormatStringError ("invalid qualified declarator '%s' in property", pFunction->m_Tag.cc ());
-			return false;
-		}
-
 		return ((CProperty*) pNamespace)->AddMethod (pFunction);
 
 	default:
-		if (pDeclarator->IsQualified ()) // create orphan
-		{
-			pFunction->m_Flags |= EModuleItemFlag_Orphan;
-			return true;
-		}
-
 		if (PostModifiers)
 		{
 			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
@@ -1377,7 +1358,7 @@ CParser::CallBaseTypeMemberConstructor (
 	ASSERT (m_pConstructorType || m_pConstructorProperty);
 
 	CNamespace* pNamespace = m_pModule->m_FunctionMgr.GetCurrentFunction ()->GetParentNamespace ();
-	CModuleItem* pItem = pNamespace->FindItem (Name);
+	CModuleItem* pItem = pNamespace->FindItemTraverse (Name, NULL, ETraverse_NoExtensionNamespace);
 	if (!pItem)
 	{
 		err::SetFormatStringError ("name '%s' is not found", Name.GetFullName ().cc ());
@@ -1927,7 +1908,9 @@ bool
 CParser::GetOnChange (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty)
+	CProperty* pProperty = pFunction->GetProperty ();
+
+	if (!pProperty)
 	{
 		err::SetFormatStringError (
 			"function '%s' has no 'onchange' field", 
@@ -1936,14 +1919,20 @@ CParser::GetOnChange (CValue* pValue)
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetPropertyOnChange (pFunction->m_pProperty, pValue);
+	CValue PropertyValue = pProperty;
+	if (pProperty->IsMember ())
+		PropertyValue.InsertToClosureHead (m_pModule->m_FunctionMgr.GetThisValue ());
+
+	return m_pModule->m_OperatorMgr.GetPropertyOnChange (PropertyValue, pValue);
 }
 
 bool
 CParser::GetOnChangeType (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty)
+	CProperty* pProperty = pFunction->GetProperty ();
+
+	if (!pProperty)
 	{
 		err::SetFormatStringError (
 			"function '%s' has no 'onchange' field", 
@@ -1952,14 +1941,16 @@ CParser::GetOnChangeType (CValue* pValue)
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetPropertyOnChangeType (pFunction->m_pProperty, pValue);
+	return m_pModule->m_OperatorMgr.GetPropertyOnChangeType (pProperty, pValue);
 }
 
 bool
 CParser::GetPropValue (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty)
+	CProperty* pProperty = pFunction->GetProperty ();
+
+	if (!pProperty)
 	{
 		err::SetFormatStringError (
 			"function '%s' has no 'propvalue' field", 
@@ -1968,7 +1959,11 @@ CParser::GetPropValue (CValue* pValue)
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetPropertyPropValue (pFunction->m_pProperty, pValue);
+	CValue PropertyValue = pProperty;
+	if (pProperty->IsMember ())
+		PropertyValue.InsertToClosureHead (m_pModule->m_FunctionMgr.GetThisValue ());
+
+	return m_pModule->m_OperatorMgr.GetPropertyPropValue (PropertyValue, pValue);
 }
 
 bool

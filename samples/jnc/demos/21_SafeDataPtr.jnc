@@ -1,8 +1,51 @@
+// safe pointers and safe pointer arithmetics is one of the biggest innovations of jancy language
+// normal data pointers carry validator which contains permitted address range and target scope level
+// checking the scope level is necessary cause jancy allows stack allocation of data, which means
+// data pointer can become invalid without actual modification, just by running out of scope.
+// simply put, approach adopted by jancy is: 
+// check data range on pointer access, check scope level on pointer assignment
+
 //.............................................................................
+
+Foo (int* p) // pointers arguments are checked before passing
+{
+	printf ("Foo (0x%x) { *p = %d }\n", p, *p);
+}
+
+Bar (nullable int* p) // ... unless they are marked as 'nullable'
+{
+	printf ("Bar (0x%x)\n", p);
+}
+
+Baz (unsafe thin int* p) // ... or they are unsafe
+{
+	printf ("Baz (0x%x)\n", p);
+}
+
+int* s_p;
 
 int
 main ()
 {
+	int* p;
+
+	Bar (p); // ok, 'nullable'
+	Baz (p); // also ok, 'unsafe'
+	// Foo (p); // <-- runtime error: pointer out of range
+
+	int a [] = { 10, 20, 30 };
+	// s_p = a; // <-- runtime error: storing pointer in location with lesser scope level 
+
+	int  i;
+	for (i = 0; i < countof (a); i++)
+		Foo (&a [i]);
+
+	Bar (&a [i]); // ok, 'nullable'
+	Baz (&a [i]); // also ok, 'unsafe'
+
+	// int x = a [i]; // <-- runtime error: pointer out of range
+	// Foo (&a [i]); // <-- runtime error: pointer out of range
+
 	return 0;
 }
 

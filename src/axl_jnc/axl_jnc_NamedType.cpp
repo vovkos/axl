@@ -79,16 +79,18 @@ CNamedType::ApplyExtensionNamespace ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CModuleItem* pItem = m_pExtensionNamespace->GetItem (i);
-		EModuleItem ItemKind = pItem->GetItemKind ();
 
+		EModuleItem ItemKind = pItem->GetItemKind ();
 		switch (ItemKind)
 		{
 		case EModuleItem_Function:
-			((CFunction*) pItem)->ConvertToMemberMethod (this);
+			if (((CFunction*) pItem)->GetStorageKind () != EStorage_Static)
+				((CFunction*) pItem)->ConvertToMemberMethod (this);
 			break;
 
 		case EModuleItem_Property:
-			((CProperty*) pItem)->ConvertToMemberProperty (this);
+			if (((CProperty*) pItem)->GetStorageKind () != EStorage_Static)
+				((CProperty*) pItem)->ConvertToMemberProperty (this);
 			break;
 		}
 	}

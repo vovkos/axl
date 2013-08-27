@@ -642,6 +642,12 @@ COperatorMgr::PrepareOperandType (
 	uint_t OpFlags
 	) 
 {
+	if (OpValue.IsEmpty ())
+	{
+		*pOpValue = OpValue;
+		return;
+	}
+
 	CValue Value = OpValue;
 	
 	for (;;)
@@ -700,7 +706,7 @@ COperatorMgr::PrepareOperandType (
 		case EType_FunctionRef:
 			if (!(OpFlags & EOpFlag_KeepFunctionRef))
 			{
-				CFunctionPtrType* pPtrType = (CFunctionPtrType*) pType;
+				CFunctionPtrType* pPtrType = (CFunctionPtrType*) Value.GetClosureAwareType (); // important: take closure into account!
 				CFunctionType* pTargetType = pPtrType->GetTargetType ();
 				Value = pTargetType->GetFunctionPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
 			}
@@ -760,6 +766,12 @@ COperatorMgr::PrepareOperand (
 	) 
 {
 	bool Result;
+
+	if (OpValue.IsEmpty ())
+	{
+		*pOpValue = OpValue;
+		return true;
+	}
 
 	CValue Value = OpValue;
 	for (;;)

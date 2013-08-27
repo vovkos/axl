@@ -393,6 +393,10 @@ CRuntime::GcAllocate (size_t Size)
 
 	size_t BlockCount = GetGcBlockCount (Size);
 
+	size_t n = m_GcMap.GetTotalSize ();
+	size_t f1 = m_GcMap.GetFreeSizeTop ();
+	size_t f2 = m_GcMap.GetFreeSizeBottom ();
+
 	WaitGcIdleAndLock ();
 	size_t Address = m_GcMap.Allocate (BlockCount);
 	m_Lock.Unlock ();

@@ -14,7 +14,7 @@ primary_expr_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 			{
 				$pTokenList->InsertTail ($1);
 			}
-		primary_expr_pass1 <$pTokenList>+ 
+		primary_expr_pass1 <$pTokenList>* 
 		'}'
 			{
 				$pTokenList->InsertTail ($3);
@@ -23,7 +23,7 @@ primary_expr_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 			{
 				$pTokenList->InsertTail ($1);
 			}
-		primary_expr_pass1 <$pTokenList>+ 
+		primary_expr_pass1 <$pTokenList>*
 		']'
 			{
 				$pTokenList->InsertTail ($3);
@@ -686,7 +686,7 @@ postfix_operator <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.ClosureOperator ($pValue, &$3.m_ValueList);
 			}		
-	|	'[' expression ']'
+	|	'[' expression_or_empty ']'
 			{
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, $pValue, $2.m_Value);
 			}	

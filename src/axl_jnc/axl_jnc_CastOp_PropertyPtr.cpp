@@ -326,8 +326,7 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast_FullClosure (
 	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_PropertyClosure));
 
 	CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
-	m_pModule->m_LlvmIrBuilder.CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
-	return true;
+	return CreateClosurePropertyPtr (pClosureType->GetThunkProperty (), ClosureValue, pDstPtrType, pResultValue);
 }
 
 bool

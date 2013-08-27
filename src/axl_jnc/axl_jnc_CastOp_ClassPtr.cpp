@@ -55,7 +55,7 @@ CCast_ClassPtr::GetCastKind (
 		(pDstClassType->GetClassTypeKind () == EClassType_StdObject) ||	
 		pSrcClassType->Cmp (pDstClassType) == 0 || 
 		IsMulticastToMulticast (pSrcType, pDstType) ||
-		pSrcClassType->FindBaseType (pDstClassType) ? 
+		pSrcClassType->FindBaseTypeTraverse (pDstClassType) ? 
 		ECast_Implicit : 
 		ECast_Explicit;
 }
@@ -158,9 +158,6 @@ CCast_ClassPtr::LlvmCast (
 		return false;
 	
 	Coord.m_LlvmIndexArray.Insert (0, 0);
-
-	int* p = Coord.m_LlvmIndexArray;
-	size_t n = Coord.m_LlvmIndexArray.GetCount ();
 
 	CValue PtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (

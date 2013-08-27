@@ -378,10 +378,7 @@ public:
 	}
 
 	CProperty*
-	CreateInternalProperty (
-		const char* pTag,
-		CPropertyType* pType
-		);
+	CreateInternalProperty (const char* pTag);
 
 	CPropertyTemplate*
 	CreatePropertyTemplate ();

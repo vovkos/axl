@@ -15,10 +15,13 @@ COperatorMgr::GetField (
 	CValue* pResultValue
 	)
 {
-	CNamespace* pNamespace = pField->GetParentNamespace ();
-	ASSERT (pNamespace->GetNamespaceKind () == ENamespace_Type);
+	CType* pType = OpValue.GetType ();
 
-	CNamedType* pType = (CNamedType*) pNamespace;
+	if (pType->GetTypeKindFlags () & ETypeKindFlag_DataPtr) 
+		pType = ((CDataPtrType*) pType)->GetTargetType ();
+	else if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr) 
+		pType = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
+
 	EType TypeKind = pType->GetTypeKind ();
 	switch (TypeKind)
 	{

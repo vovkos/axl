@@ -1,5 +1,10 @@
-// autoev is a unique feature of jancy which hopefully will significally simplify UI programming 
-// !!! this demo is not funcitonal now!
+// autoev is a unique feature of jancy which can significally simplify UI programming.
+// the idea is to automate execution of certain 'update' actions when properties change.
+// imagine a complicated setting dialog with lots of relations between items, where values of 
+// certain settings control visibility, availability, color, etc of other dialog items / groups of items.
+// with 'autoev' approach it is possible to write a single 'constraints' block where all the 
+// relations and dependencies are described in declarative style, and allow jancy runtime to 
+// automatically bind and execute corresponding actions
 
 //.............................................................................
 
@@ -11,7 +16,7 @@ UpdatePurple (
 	int Alpha
 	)
 {
-	printf ("Purple (%d, %d, %d)\n", Red, Blue, Alpha);
+	printf ("Purple (%x, %x, %x)\n", Red, Blue, Alpha);
 }
 
 UpdateYellow (
@@ -20,7 +25,7 @@ UpdateYellow (
 	int Alpha
 	)
 {
-	printf ("Yellow (%d, %d, %d)\n", Red, Green, Alpha);
+	printf ("Yellow (%x, %x, %x)\n", Red, Green, Alpha);
 }
 
 UpdateCyan (
@@ -29,44 +34,57 @@ UpdateCyan (
 	int Alpha
 	)
 {
-	printf ("Cyan (%d, %d, %d)\n", Green, Blue, Alpha);
+	printf ("Cyan (%x, %x, %x)\n", Green, Blue, Alpha);
 }
 
 //.............................................................................
 
-// declare 3 bindable properties
+// 3 bindable properties
 
 int bindable s_Red;
 int bindable s_Green;
 int bindable s_Blue;
 
+int s_Rgb; // this value will be automatically updated
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// and autoev which binds to them
+// inside 'autoev' block developer can write expressions which describe relations & constraints.
+// all the binding / unbinding to the bindable non-lvalue properties touched in the expressions 
+// will be done automatically. if the required logic cannot be expressed by simple expression,
+// 'onchange' statement could be used (see the next demo)
 
-autoev ColorAutoEv (int Alpha)
+autoev 
+s_ColorAutoEv (int Alpha)
 {
-	UpdatePurple (s_Red, s_Blue, Alpha);
+	UpdatePurple (s_Red, s_Blue, Alpha); 
 	UpdateYellow (s_Red, s_Green, Alpha);
 	UpdateCyan (s_Green, s_Blue, Alpha);
+
+	s_Rgb = (s_Red << 16) + (s_Green << 8) + s_Blue;
 }
+
+//.............................................................................
+
+// entry point
 
 int 
 main ()
 {
-	// ColorAutoEv (5);
-	// c.ColorAutoEv (5);
+	// starting autoev executes all the expressions in autoev block
 
-	// CMyClass c = stack new CMyClass (7);
+	s_ColorAutoEv.Start (5); // equivalent to s_ColorAutoEv (5);
 
-	// {
-	//stack new CColorAutoEv (5);
-	//printf ("autoev is active\n");
-	//Red = 10; 
-	//Green = 200;
-	//}
+	printf ("changing s_Red, s_Green, s_Blue results in automatic calls to UpdateXxx functions\n");	
 
-	//Blue = 3000;
+	s_Red = 0xab; 
+	s_Green = 0xcd;
+
+	// s_ColorAutoEv.Stop (); // <-- uncomment to unbind onchange handlers
+
+	s_Blue = 0xef; 
+
+	printf ("s_Rgb = 0x%06x\n", s_Rgb);
 
 	return 0;
 }

@@ -81,6 +81,84 @@ CAutoEvClassType::CalcLayout ()
 }
 
 bool
+CAutoEvClassType::BindHandlers (const rtl::CConstListT <TAutoEvHandler>& HandlerList)
+{
+	bool Result;
+
+	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
+	CStructField* pEventPtrField = *pBindSiteType->GetFieldList ().GetHead ();
+	CStructField* pCookieField = *pBindSiteType->GetFieldList ().GetTail ();
+
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	CValue BindSiteArrayValue;
+	Result = m_pModule->m_OperatorMgr.GetField (
+		ThisValue,
+		m_FieldArray [EAutoEvField_BindSiteArray], 
+		NULL, 
+		&BindSiteArrayValue
+		);
+
+	if (!Result)
+		return false;
+
+	rtl::CIteratorT <TAutoEvHandler> Handler = HandlerList.GetHead ();
+	size_t i = 0;
+	for (; Handler; Handler++)
+	{
+		CFunction* pFunction = Handler->m_pFunction;
+
+		rtl::CBoxIteratorT <CValue> Value = Handler->m_BindSiteList.GetHead (); 
+		for (; Value; Value++, i++)
+		{
+			CValue OnChangeValue;
+			Result = m_pModule->m_OperatorMgr.GetPropertyOnChange (*Value, &OnChangeValue);
+			if (!Result)
+				return false;
+	
+			CValue HandlerValue = pFunction;
+			HandlerValue.InsertToClosureHead (ThisValue);
+
+			CValue IdxValue (i, EType_SizeT);
+			CValue AddMethodValue;
+			CValue CookieValue;
+			CValue BindSiteValue;
+			CValue DstOnChangeValue;
+			CValue DstCookieValue;
+			
+			Result = 
+				m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "Add", &AddMethodValue) &&
+				m_pModule->m_OperatorMgr.CallOperator (AddMethodValue, HandlerValue, &CookieValue) &&
+				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
+				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &DstOnChangeValue) &&
+				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &DstCookieValue) &&
+				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &OnChangeValue) &&
+				m_pModule->m_OperatorMgr.StoreDataRef (DstOnChangeValue, OnChangeValue) &&
+				m_pModule->m_OperatorMgr.StoreDataRef (DstCookieValue, CookieValue);
+
+			if (!Result)
+				return false;
+		}
+	}
+
+	ASSERT (i == m_BindSiteCount);
+	return true;
+}
+
+
+bool
+CAutoEvClassType::CallStopMethod ()
+{
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	ASSERT (ThisValue);
+
+	CValue StopMethodValue = m_MethodArray [EAutoEvMethod_Stop];
+	StopMethodValue.InsertToClosureHead (ThisValue);
+	return m_pModule->m_OperatorMgr.CallOperator (StopMethodValue);
+}
+
+bool
 CAutoEvClassType::CompileConstructor ()
 {
 	ASSERT (m_pConstructor);
@@ -127,17 +205,6 @@ CAutoEvClassType::CompileDestructor ()
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
-}
-
-bool
-CAutoEvClassType::CallStopMethod ()
-{
-	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	ASSERT (ThisValue);
-
-	CValue StopMethodValue = m_MethodArray [EAutoEvMethod_Stop];
-	StopMethodValue.InsertToClosureHead (ThisValue);
-	return m_pModule->m_OperatorMgr.CallOperator (StopMethodValue);
 }
 
 bool
@@ -219,73 +286,6 @@ CAutoEvClassType::CompileStartMethod ()
 
 	return true;
 }
-
-bool
-CAutoEvClassType::BindHandlers (const rtl::CConstListT <TAutoEvHandler>& HandlerList)
-{
-	bool Result;
-
-	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
-	CStructField* pEventPtrField = *pBindSiteType->GetFieldList ().GetHead ();
-	CStructField* pCookieField = *pBindSiteType->GetFieldList ().GetTail ();
-
-	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	ASSERT (ThisValue);
-
-	CValue BindSiteArrayValue;
-	Result = m_pModule->m_OperatorMgr.GetField (
-		ThisValue,
-		m_FieldArray [EAutoEvField_BindSiteArray], 
-		NULL, 
-		&BindSiteArrayValue
-		);
-
-	if (!Result)
-		return false;
-
-	rtl::CIteratorT <TAutoEvHandler> Handler = HandlerList.GetHead ();
-	size_t i = 0;
-	for (; Handler; Handler++)
-	{
-		CFunction* pFunction = Handler->m_pFunction;
-
-		rtl::CBoxIteratorT <CValue> Value = Handler->m_BindSiteList.GetHead (); 
-		for (; Value; Value++, i++)
-		{
-			CValue OnChangeValue;
-			Result = m_pModule->m_OperatorMgr.GetPropertyOnChange (*Value, &OnChangeValue);
-			if (!Result)
-				return false;
-	
-			CValue HandlerValue = pFunction;
-			HandlerValue.InsertToClosureHead (ThisValue);
-
-			CValue IdxValue (i, EType_SizeT);
-			CValue AddMethodValue;
-			CValue CookieValue;
-			CValue BindSiteValue;
-			CValue DstOnChangeValue;
-			CValue DstCookieValue;
-
-			Result = 
-				m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "Add", &AddMethodValue) &&
-				m_pModule->m_OperatorMgr.CallOperator (AddMethodValue, HandlerValue, &CookieValue) &&
-				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
-				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &DstOnChangeValue) &&
-				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &DstCookieValue) &&
-				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &OnChangeValue) &&
-				m_pModule->m_OperatorMgr.StoreDataRef (DstOnChangeValue, OnChangeValue) &&
-				m_pModule->m_OperatorMgr.StoreDataRef (DstCookieValue, CookieValue);
-
-			if (!Result)
-				return false;
-		}
-	}
-
-	ASSERT (i == m_BindSiteCount);
-	return true;
-}
-
 bool
 CAutoEvClassType::CompileStopMethod ()
 {

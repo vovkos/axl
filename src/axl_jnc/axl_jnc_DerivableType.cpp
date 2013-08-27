@@ -574,6 +574,7 @@ CDerivableType::FindBaseTypeTraverseImpl (
 		CBaseTypeSlot* pSlot = It->m_Value;
 		pCoord->m_pType = pSlot->m_pType;
 		pCoord->m_Offset = pSlot->m_Offset;
+		pCoord->m_VTableIndex = pSlot->m_VTableIndex;
 		pCoord->m_LlvmIndexArray.SetCount (Level + 1);
 		pCoord->m_LlvmIndexArray [Level] = pSlot->m_LlvmIndex;
 		return true;
@@ -590,6 +591,7 @@ CDerivableType::FindBaseTypeTraverseImpl (
 			if (pCoord)
 			{
 				pCoord->m_Offset += pSlot->m_Offset;
+				pCoord->m_VTableIndex += pSlot->m_VTableIndex;
 				pCoord->m_LlvmIndexArray [Level] = pSlot->m_LlvmIndex;
 			}
 
@@ -666,14 +668,14 @@ CDerivableType::FindItemTraverseImpl (
 
 	if (!(Flags & ETraverse_NoParentNamespace) && m_pParentNamespace)
 	{
-		if (pCoord)
-			pCoord->m_ParentNamespaceLevel++;
-
 		pItem = m_pParentNamespace->FindItemTraverse (pName, NULL, Flags);
 		if (pItem)
 		{
 			if (pCoord)
+			{
 				pCoord->m_pType = NULL; // not this type
+				pCoord->m_ParentNamespaceLevel++;
+			}
 
 			return pItem;
 		}

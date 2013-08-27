@@ -14,7 +14,7 @@ COperatorMgr::GetNamespaceMember (
 	CValue* pResultValue
 	)
 {
-	CModuleItem* pItem = pNamespace->FindItem (pName);
+	CModuleItem* pItem = pNamespace->FindItemTraverse (pName, NULL, ETraverse_NoParentNamespace);
 	if (!pItem)
 	{
 		err::SetFormatStringError ("'%s' is not a member of '%s'", pName, pNamespace->GetQualifiedName ().cc ());

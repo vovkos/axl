@@ -1369,9 +1369,11 @@ CTypeMgr::GetPropertyClosureClassType (
 			pField->m_Flags |= EStructFieldFlag_WeakMasked;
 	}
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property", pThunkType);
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property");
 	pType->AddProperty (pThunkProperty);
 	pType->m_pThunkProperty = pThunkProperty;
+
+	pThunkProperty->Create (pThunkType);
 
 	pType->EnsureLayout ();
 	m_pModule->MarkForCompile (pType);
@@ -1398,9 +1400,11 @@ CTypeMgr::GetDataClosureClassType (
 
 	pType->CreateField (pTargetType->GetDataPtrType ());
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property", pThunkType);
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property");
 	pType->AddProperty (pThunkProperty);
 	pType->m_pThunkProperty = pThunkProperty;
+
+	pThunkProperty->Create (pThunkType);
 
 	pType->EnsureLayout ();
 	m_pModule->MarkForCompile (pType);

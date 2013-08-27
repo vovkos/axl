@@ -356,7 +356,7 @@ postfix_operator_s <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.GetClosureOperatorResultType ($pValue, &$3.m_ValueList);
 			}		
-	|	'[' expression_s ']'
+	|	'[' expression_or_empty_s ']'
 			{
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_Idx, $pValue, $2.m_Value);
 			}	

@@ -429,7 +429,7 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
 
-	Result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 4);			
+	Result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 8);			
 	if (!Result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());

@@ -294,7 +294,7 @@ CProperty::CreateField (
 {
 	ASSERT (m_pParentType);
 	
-	if (m_pParentType->GetTypeKindFlags () & ETypeKindFlag_Derivable)
+	if (!(m_pParentType->GetTypeKindFlags () & ETypeKindFlag_Derivable))
 	{
 		err::SetFormatStringError ("'%s' cannot have field members", m_pParentType->GetTypeString ().cc ());
 		return NULL;
@@ -379,11 +379,19 @@ CProperty::AddMethod (CFunction* pFunction)
 	}
 	else
 	{
-		if (StorageKind != EStorage_Static)
+		switch (StorageKind)
 		{
-			err::SetFormatStringError ("invalid storage specifier '%s' for global property member", GetStorageKindString (StorageKind));
+		case EStorage_Undefined:
+			pFunction->m_StorageKind = EStorage_Static;
+			// and fall through
+
+		case EStorage_Static:
+			break;
+
+		default:
+			err::SetFormatStringError ("invalid storage specifier '%s' for static property member", GetStorageKindString (StorageKind));
 			return false;
-		}
+		}	
 
 		if (ThisArgTypeFlags)
 		{

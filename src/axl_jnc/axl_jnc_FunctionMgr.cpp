@@ -128,14 +128,10 @@ CFunctionMgr::CreateProperty (
 }
 
 CProperty*
-CFunctionMgr::CreateInternalProperty (
-	const char* pTag,
-	CPropertyType* pType 
-	)
+CFunctionMgr::CreateInternalProperty (const char* pTag)
 {
 	CProperty* pProperty = CreateProperty (rtl::CString (), rtl::CString ());
 	pProperty->m_Tag = pTag;
-	pProperty->Create (pType);
 	return pProperty;
 }
 

@@ -45,7 +45,12 @@ COperatorMgr::Allocate (
 	{
 	case EStorage_Static:
 		pVariable = m_pModule->m_VariableMgr.CreateVariable (StorageKind, pTag, pTag, pType);
+		
+		pFunction = m_pModule->GetConstructor ();
+		pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 		m_pModule->m_VariableMgr.AllocatePrimeStaticVariable (pVariable);
+		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
+
 		PtrValue.SetLlvmValue (pVariable->GetLlvmValue (), pPtrType);
 		break;
 
@@ -57,7 +62,6 @@ COperatorMgr::Allocate (
 	case EStorage_Stack:
 		pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 		pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
-
 		m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, pTag, pPtrType, &PtrValue);
 		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
 

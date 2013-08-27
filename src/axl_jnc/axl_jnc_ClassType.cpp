@@ -104,7 +104,7 @@ CClassType::AddMethod (CFunction* pFunction)
 	case EStorage_Override:
 		m_OverrideMethodArray.Append (pFunction);
 		pFunction->ConvertToMemberMethod (this);
-		return true; // layout overrides later
+		break;
 
 	case EStorage_Abstract:
 	case EStorage_Virtual:
@@ -213,10 +213,12 @@ CClassType::AddMethod (CFunction* pFunction)
 bool
 CClassType::AddProperty (CProperty* pProperty)
 {
-	ASSERT (pProperty->IsNamed ());
-	bool Result = AddItem (pProperty);
-	if (!Result)
-		return false;
+	if (pProperty->IsNamed ())
+	{
+		bool Result = AddItem (pProperty);
+		if (!Result)
+			return false;
+	}
 
 	pProperty->m_pParentNamespace = this;
 
@@ -504,7 +506,7 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 	CModuleItem* pMember = FindItemTraverse (
 		pFunction->m_DeclaratorName, 
 		&BaseTypeCoord, 
-		ETraverse_NoExtensionNamespace | ETraverse_NoParentNamespace
+		ETraverse_NoExtensionNamespace | ETraverse_NoParentNamespace | ETraverse_NoThis
 		);
 
 	if (!pMember)
@@ -578,9 +580,28 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 	CClassPtrType* pThisArgType = (CClassPtrType*) pOverridenFunction->m_pType->GetThisArgType ();
 	ASSERT (pThisArgType->GetTypeKind () == EType_ClassPtr);
 
-	pFunction->m_pType->m_ArgArray [0]->m_pType = pThisArgType;
+	CFunctionArg* pOrigThisArg = pFunction->m_pType->m_ArgArray [0]; 
+	CFunctionArg* pThisArg = m_pModule->m_TypeMgr.GetSimpleFunctionArg (EStorage_This, pThisArgType, pOrigThisArg->GetPtrTypeFlags ());
+
+	if (pFunction->m_pType->GetFlags () & EModuleItemFlag_User)
+	{
+		pFunction->m_pType->m_ArgArray [0] = pThisArg;
+	}	
+	else
+	{
+		rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->m_pType->m_ArgArray;
+		ArgArray.EnsureExclusive ();
+		ArgArray [0] = pThisArg;
+
+		pFunction->m_pType = m_pModule->m_TypeMgr.GetFunctionType (
+			pFunction->m_pType->GetReturnType (),
+			ArgArray,
+			pFunction->m_pType->GetFlags ()
+			);
+	}
+
 	pFunction->m_pThisArgType = pThisArgType;
-	pFunction->m_ThisArgDelta = -BaseTypeCoord.m_Offset;
+	pFunction->m_ThisArgDelta = pOverridenFunction->m_ThisArgDelta - BaseTypeCoord.m_Offset;
 	pFunction->m_pVirtualOriginClassType = pOverridenFunction->m_pVirtualOriginClassType;
 	pFunction->m_ClassVTableIndex = pOverridenFunction->m_ClassVTableIndex;
 

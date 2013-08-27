@@ -1,8 +1,60 @@
+// sometimes, expressions don't quite cut it when it comes to describing what has to be done
+// in response to a property change: e.g. running a cycle, or executing a sequence of statements.
+// also, using expressions in 'autoev' block might be 'trying-to-be-too-smart' 
+// and therefore not providing enough control over which actions must be taken in response 
+// to which property change. 
+// 'onchange' statement in 'autoev' block gives developer fine-graned control over building dependencies
+// and at the same time frees him from manually binding / unbinding to events
+
 //.............................................................................
 
-int
+bool bindable s_UseDhcp;
+unsigned int32 bindable s_Ip4;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// 'onchange' statement will be executed in response to change of properties enumerated in parentheses
+
+autoev 
+s_IpAutoEv ()
+{
+	onchange (s_UseDhcp)
+	{
+		if (s_UseDhcp)
+		{		
+			printf ("using DHCP, disable IP-edit\n");
+		}
+		else
+		{
+			printf (
+				"using manual IP configuration (IP = %d.%d.%d.%d)\n",
+				(s_Ip4 & 0xff000000) >> 24,
+				(s_Ip4 & 0x00ff0000) >> 16,
+				(s_Ip4 & 0x0000ff00) >> 8,
+				(s_Ip4 & 0x000000ff)
+				);
+		}			
+	}
+
+	onchange (s_Ip4)
+	{
+		s_UseDhcp = false;
+	}
+}
+
+//.............................................................................
+
+// entry point
+
+int 
 main ()
 {
+	s_IpAutoEv.Start ();
+
+	s_UseDhcp = true;
+
+	s_Ip4 = 0xc0a80105;
+
 	return 0;
 }
 

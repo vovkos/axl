@@ -1,8 +1,77 @@
+// jancy brings back const-correctness: a great tool unjustly left behind in 
+// most of the modern managed languages
+
 //.............................................................................
+
+struct TPoint
+{
+	int m_x;
+	int m_y;
+}
+
+Transpose (
+	TPoint* pDst,
+	const TPoint* pSrc
+	)
+{
+	printf ("Transpose (%d, %d)\n", pSrc.m_x, pSrc.m_y);
+
+	int x = pSrc.m_x; // make it work when pDst and pSrc point to the same location
+
+	pDst.m_x = pSrc.m_y;
+	pDst.m_y = x;
+
+	// pSrc.m_x = 0; // <-- error: cannot store into const location
+}
+
+//.............................................................................
+
+class C1
+{
+	int m_Field;
+	mutable int m_MutableField;
+
+	Foo () const // jancy uses C++ syntax for declaring const methods
+	{
+		printf ("C1.Foo () { m_Field = %d }\n", m_Field);
+	}
+
+	Bar (int x)
+	{
+		printf ("C1.Bar (%d)\n", x);
+		m_Field = x;
+	}	
+}
+
+Baz (const C1* p)
+{
+	printf ("p.m_x = %d\n", p.m_Field);
+
+	p.Foo (); // ok, const method
+	p.m_MutableField = 100; // ok, mutable field
+
+	// p.m_Field = 200; // <-- error: cannot store to const location
+	// p.Bar (200); // <-- error: cannot convert 'const C1*' to 'C1*'
+}
+
+//.............................................................................
+
+// entry point
 
 int
 main ()
 {
+	printf ("main ()\n");
+
+	TPoint SrcPoint = { 10, 20 };
+
+	TPoint DstPoint;
+	Transpose (&DstPoint, &SrcPoint); // we can be sure 'SrcPoint' is not going to change
+
+	C1 c;
+	c.Bar (10); // no problem, we access C1 by non-const pointer
+	Baz (&c); // we can be sure 'c' is not going to change
+
 	return 0;
 }
 

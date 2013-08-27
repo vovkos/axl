@@ -328,8 +328,7 @@ CControlFlowMgr::OnceStmt_Create (
 
 	if (StorageKind == EStorage_Static)
 	{
-		CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-		m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
+		CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (m_pModule->GetConstructor ()->GetEntryBlock ());
 		m_pModule->m_VariableMgr.AllocatePrimeStaticVariable (pFlagVariable);
 		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 	}

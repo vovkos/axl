@@ -103,10 +103,10 @@ public:
 
 		return 
 			CompilePrimer () &&
-			CompileConstructor () &&
-			CompileDestructor () &&
 			CompileStartMethod () &&
-			CompileStopMethod ();
+			CompileStopMethod () &&
+			CompileConstructor () &&
+			CompileDestructor ();
 	}
 
 protected:
