@@ -801,7 +801,7 @@ CTypeMgr::CreateUserFunctionType (
 	pType->m_Signature = Signature;
 	pType->m_pReturnType = pReturnType;
 	pType->m_CallConv = CallConv;
-	pType->m_Flags = Flags | EFunctionTypeFlag_User;
+	pType->m_Flags = Flags | EModuleItemFlag_User;
 	pType->m_ArgArray = ArgArray;
 
 	m_FunctionTypeList.InsertTail (pType);
@@ -839,7 +839,7 @@ CTypeMgr::GetMemberMethodType (
 	
 	CFunctionType* pMemberMethodType;
 
-	if (pFunctionType->m_Flags & EFunctionTypeFlag_User)
+	if (pFunctionType->m_Flags & EModuleItemFlag_User)
 	{
 		pMemberMethodType = CreateUserFunctionType (
 			pFunctionType->m_CallConv,

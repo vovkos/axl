@@ -22,9 +22,8 @@ struct TFunctionPtrTypeTuple;
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_User         = 0x010000,
-	EFunctionTypeFlag_VarArg       = 0x020000,
-	EFunctionTypeFlag_UnsafeVarArg = 0x040000,
+	EFunctionTypeFlag_VarArg       = 0x010000,
+	EFunctionTypeFlag_UnsafeVarArg = 0x020000,
 };
 
 //.............................................................................

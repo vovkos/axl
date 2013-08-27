@@ -230,7 +230,7 @@ CFunctionType::GetArgString ()
 	if (!m_ArgString.IsEmpty ())
 		return m_ArgString;
 
-	bool IsUserType = (m_Flags & EFunctionTypeFlag_User) != 0;
+	bool IsUserType = (m_Flags & EModuleItemFlag_User) != 0;
 
 	m_ArgString = "(";
 
