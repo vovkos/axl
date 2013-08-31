@@ -5,227 +5,92 @@
 #..............................................................................
 
 project (axl)
+
 cmake_minimum_required (VERSION 2.8)
 
-# set (TARGET_CPU "x86")
+set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
 
-if (NOT TARGET_CPU)
-	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set (TARGET_CPU "amd64")
-	else ()
-		set (TARGET_CPU "x86")
-	endif ()		
-endif ()
-
-message (STATUS "Target CPU: ${TARGET_CPU}")
-
-include (CMakeUtils.cmake)
-include (CMakePaths.cmake)
+include (CMakeUtils)
 
 #..............................................................................
 #
-# Available configurations
+# Target CPU
 #
 
-set (
-	CMAKE_CONFIGURATION_TYPES 
-	Debug
-	Release
-	)
+# set (TARGET_CPU "x86") 
 
-# Microsoft Visual C++ is a multi-configuration generator
-# otherwise, create a setting for choosing current configuration
+if (NOT TARGET_CPU) 
+	detect_cpu (TARGET_CPU) 
+endif ()       
 
-if (NOT MSVC)
-	create_setting (
-		CMAKE_BUILD_TYPE
-		Debug
-		STRING
-		"Configuration type"
-		${CMAKE_CONFIGURATION_TYPES}
-		)
-endif ()
+message (STATUS "Target CPU:                 ${TARGET_CPU}")
 
 #..............................................................................
-#
-# Settings for Microsoft Visual C++ compiler flags 
-#
+# 
+# Standard settings
+# 
+
+include (CMakeStdSettings) 
+
+create_build_type_setting ()
+
+if (${CMAKE_BUILD_TYPE})
+	message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+endif ()
 
 if (MSVC)
-	create_flag_setting (
-		MSVC_FLAG_EH
-		"" # -- use default
-		CMAKE_CXX_FLAGS
-		"Microsoft Visual C++ EH (exception handling) model"
-		"/EHsc" "/EHs-c-"
-		)
+	create_msvc_flag_eh_setting ()
+	create_msvc_flag_rtti_setting ()
+	create_msvc_flag_crt_setting ()
+	create_msvc_flag_debug_info_setting ()
+	create_msvc_flag_unicode_setting ()
 
-	create_flag_setting (
-		MSVC_FLAG_RTTI
-		"/GR-" # -- use default
-		CMAKE_CXX_FLAGS
-		"Microsoft Visual C++ RTTI (run-time type information) support"
-		"/GR" "/GR-"
-		)
-
-	create_flag_setting (
-		MSVC_FLAG_CRT_DEBUG
-		"/MTd"
-		CMAKE_CXX_FLAGS_DEBUG
-		"Microsoft Visual C++ CRT (Debug configuration)"
-		"/MT" "/MTd" "/MD" "/MDd"
-		)
-
-	create_flag_setting (
-		MSVC_FLAG_CRT_RELEASE
-		"/MT"
-		CMAKE_CXX_FLAGS_RELEASE
-		"Microsoft Visual C++ CRT (Release configuration)"
-		"/MT" "/MTd" "/MD" "/MDd"
-		)
-
-	create_flag_setting (
-		MSVC_FLAG_DEBUG_INFO_DEBUG
-		"/Zi"
-		CMAKE_CXX_FLAGS_DEBUG
-		"Microsoft Visual C++ debug information format (Debug configuration)"
-		"/Z7" "/Zi" "/ZI"  
-		)
-
-	create_flag_setting (
-		MSVC_FLAG_DEBUG_INFO_RELEASE
-		"/Zi" 
-		CMAKE_CXX_FLAGS_RELEASE
-		"Microsoft Visual C++ debug information format (Release configuration)"
-		"/Z7" "/Zi" "/ZI"  
-		)
-
+	message (STATUS "C++ flags (Debug):         ${CMAKE_CXX_FLAGS}${CMAKE_CXX_FLAGS_DEBUG}")
+	message (STATUS "C++ flags (Release):       ${CMAKE_CXX_FLAGS}${CMAKE_CXX_FLAGS_RELEASE}")
 endif ()
-
-#..............................................................................
-#
-# Settings for GNU C++ compiler flags 
-#
 
 if (CMAKE_COMPILER_IS_GNUCXX)
+	create_gcc_flag_cpu_setting ()
+	create_gcc_flag_show_includes_setting ()
+	create_gcc_flag_format_warning_setting ()
+	create_gcc_flag_multichar_wharning_setting ()
 
-	if ("${TARGET_CPU}" STREQUAL "amd64")
-		set (DEFAULT_GCC_FLAG_CPU "-m64")
-	else ()
-		set (DEFAULT_GCC_FLAG_CPU "-m32")
-	endif ()
-	
-	create_flag_setting (
-		GCC_FLAG_CPU
-		"${DEFAULT_GCC_FLAG_CPU}"
-		CMAKE_CXX_FLAGS
-		"GNU C++ target CPU arch"
-		"-m32" "-m64"
-		)
+	message (STATUS "C++ flags: ${COMPILE_DEFINITIONS}${CMAKE_CXX_FLAGS}")
+endif ()
 
-	option (
-		GCC_SHOW_INCLUDES
-		"GNU C++ shows include stack during compilation"
-		OFF
-		)
+get_directory_property (_CXX_DEFINITIONS COMPILE_DEFINITIONS)
 
-	if (${GCC_SHOW_INCLUDES})
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -H")
-	endif ()
-
-	# forcefully disable some warnings	
-
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format -Wno-multichar")
+if (_CXX_DEFINITIONS)
+	message (STATUS "C++ definitions:            ${_CXX_DEFINITIONS}")
 endif ()
 
 #..............................................................................
 #
-# Ragel path
+# Paths to libs & tools 
 #
+                    
+include (CMakePaths)
 
-create_setting (
-	PATH_RAGEL_EXE
-	${DEFAULT_PATH_RAGEL_EXE}
-	FILEPATH
-	"Path to Ragel executable"
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# LUA path
-#
-
-create_setting (
-	PATH_LUA_INC_DIR
-	${DEFAULT_PATH_LUA_INC_DIR}
-	PATH
-	"Path to LUA include files directory"
-	)
-
-create_setting (
-	PATH_LUA_LIB_DIR
-	${DEFAULT_PATH_LUA_LIB_DIR}
-	PATH
-	"Path to LUA library files directory"
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# LLVM path
-#
-
-create_setting (
-	PATH_LLVM_CMAKE_DIR
-	${DEFAULT_PATH_LLVM_CMAKE_DIR}
-	PATH
-	"Path to LLVM CMake module files directory"
-	)
-
-create_setting (
-	PATH_LLVM_INC_DIR
-	${DEFAULT_PATH_LLVM_INC_DIR}
-	PATH
-	"Path to LLVM primary include files directory"
-	)
-
-create_setting (
-	PATH_LLVM_INC_DIR_2
-	${DEFAULT_PATH_LLVM_INC_DIR_2}
-	PATH
-	"Path to LLVM secondary (generated) include files directory"
-	)
-
-create_setting (
-	PATH_LLVM_LIB_DIR
-	${DEFAULT_PATH_LLVM_LIB_DIR}
-	PATH
-	"Path to LLVM library files directory"
-	)
+message (STATUS "Path to RAGEL executable:   ${PATH_RAGEL_EXE}")
+message (STATUS "Path to LUA includes:       ${PATH_LUA_INC_DIR}")
+message (STATUS "Path to LUA libraries:      ${PATH_LUA_LIB_DIR}")
+message (STATUS "Path to LLVM cmake modules: ${PATH_LLVM_CMAKE_DIR}")
+message (STATUS "Path to LLVM includes:      ${PATH_LLVM_INC_DIR}")
+message (STATUS "Path to LLVM includes (2):  ${PATH_LLVM_INC_DIR_2}")
+message (STATUS "Path to LLVM libraries:     ${PATH_LLVM_LIB_DIR}")
+message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
 
 include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# QT path
-#
-
-create_setting (
-	PATH_QT_CMAKE_DIR
-	${DEFAULT_PATH_QT_CMAKE_DIR}
-	PATH
-	"Path to QT CMake module files directory"
-	)
-
 include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
 
 #..............................................................................
 #
-# AXL-specific settings
+# Project-specific settings
 #
 
 option (
 	AXL_USE_PCH
-	"Use precompiled headers"
+	"Use precompiled headers when building AXL project"
 	ON
 	)
 
@@ -269,7 +134,7 @@ option (
 
 option (
 	AXL_BUILD_JNCC
-	"Build axl_jncc (Jancy compiler)"
+	"Build axl_jncc (Jancy command-line compiler)"
 	ON
 	)
 
@@ -298,36 +163,49 @@ option (
 	)
 
 option (
-	AXL_BUILD_TESTS
-	"Build tests (ConTest, QtTest, JncMfcTest, JncQtTest)"
-	ON
+	AXL_BUILD_CON_TEST
+	"Build ConTest"
+	OFF
 	)
 
-if (MSVC)
-	option (
-		AXL_UNICODE_CHARSET
-		"Compile for UNICODE character set rather than multibyte"
-		ON
-		)
+option (
+	AXL_BUILD_QT_TEST
+	"Build QtTest"
+	OFF
+	)
 
-	if (${AXL_UNICODE_CHARSET})
-		add_definitions(-DUNICODE -D_UNICODE)
-	endif ()
+if (WIN32)
+	option (
+		AXL_BUILD_JNC_MFC_TEST
+		"Build JncMfcTest"
+		OFF
+		)
 endif ()
+
+option (
+	AXL_BUILD_JNC_QT_TEST
+	"Build JncQtTest"
+	ON
+	)
 
 #..............................................................................
 #
 # main
 #
 
-set (AXL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set (AXL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 set (AXL_INC_DIR  ${AXL_ROOT_DIR}/include)
 set (AXL_SRC_DIR  ${AXL_ROOT_DIR}/src)
 set (AXL_PG_FRAME_DIR ${AXL_ROOT_DIR}/pgframe)
 
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
 include_directories (${AXL_INC_DIR})
 
-# libraries
+#
+# add targets
+#
 
 add_subdirectory (axl_core)
 
@@ -367,14 +245,19 @@ if (AXL_BUILD_PG)
 	add_subdirectory (axl_pg)
 endif ()
 
-if (AXL_BUILD_TESTS)
-	# add_subdirectory (tests/ConTest)
+if (AXL_BUILD_CON_TEST)
+	add_subdirectory (tests/ConTest)
+endif ()
 
-	if (WIN32)
-		add_subdirectory (tests/JncMfcTest)
-	endif ()
+if (AXL_BUILD_QT_TEST)
+	add_subdirectory (tests/QtTest)
+endif ()
 
-	# add_subdirectory (tests/QtTest)
+if (AXL_BUILD_JNC_MFC_TEST)
+	add_subdirectory (tests/JncMfcTest)
+endif ()
+
+if (AXL_BUILD_JNC_QT_TEST)
 	add_subdirectory (tests/JncQtTest)
 endif ()
 

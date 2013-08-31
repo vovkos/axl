@@ -384,9 +384,6 @@ add_library (
 	${RTL_CPP_LIST}
 	${PCH_H}
 	${PCH_CPP}
-
-	"../CMakeUtils.cmake"
-	"../CMakePaths.cmake"
 	)
 
 if (AXL_USE_PCH)
