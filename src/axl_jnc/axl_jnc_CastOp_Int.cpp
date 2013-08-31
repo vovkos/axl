@@ -405,6 +405,24 @@ CCast_IntFromEnum::GetCastOperators (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+ECast
+CCast_Enum::GetCastKind (
+	const CValue& OpValue,
+	CType* pType
+	)
+{
+	ASSERT (pType->GetTypeKind () == EType_Enum);
+	ASSERT (pType->Cmp (OpValue.GetType ()) != 0); // identity should have been handled earlier
+
+	// 0 could be put to flag enum
+
+	return 
+		((CEnumType*) pType)->GetEnumTypeKind () == EEnumType_Flag &&
+		OpValue.GetValueKind () == EValue_Const &&
+		OpValue.GetType ()->GetTypeKind () == EType_Int8_u &&
+		*(char*) OpValue.GetConstData () == 0 ? ECast_Implicit : ECast_Explicit;
+}
+
 bool
 CCast_Enum::GetCastOperators (
 	const CValue& OpValue,

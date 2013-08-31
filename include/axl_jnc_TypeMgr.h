@@ -316,6 +316,7 @@ public:
 
 	CEnumType* 
 	CreateEnumType (
+		EEnumType EnumTypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		CType* pBaseType = NULL,
@@ -323,9 +324,13 @@ public:
 		);
 
 	CEnumType* 
-	CreateUnnamedEnumType (CType* pBaseType = NULL)
+	CreateUnnamedEnumType (
+		EEnumType EnumTypeKind,
+		CType* pBaseType = NULL,
+		uint_t Flags = 0
+		)
 	{
-		return CreateEnumType (rtl::CString (), rtl::CString (), pBaseType = NULL);
+		return CreateEnumType (EnumTypeKind, rtl::CString (), rtl::CString (), pBaseType, Flags);
 	}
 
 	CStructType* 

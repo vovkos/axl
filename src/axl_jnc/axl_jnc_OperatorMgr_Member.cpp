@@ -80,7 +80,7 @@ COperatorMgr::GetNamespaceMember (
 	case EModuleItem_EnumConst:
 		pResultValue->SetConstInt64 (
 			((CEnumConst*) pItem)->GetValue (),
-			((CEnumConst*) pItem)->GetParentEnumType ()->GetBaseType ()
+			((CEnumConst*) pItem)->GetParentEnumType ()
 			);
 		break;
 

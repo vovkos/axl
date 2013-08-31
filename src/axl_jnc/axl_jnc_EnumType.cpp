@@ -10,6 +10,7 @@ namespace jnc {
 CEnumType::CEnumType ()
 {
 	m_TypeKind = EType_Enum;
+	m_EnumTypeKind = EEnumType_Normal;
 	m_Flags = ETypeFlag_Pod;
 	m_pBaseType = NULL;
 	m_pBaseType_i = NULL;
@@ -56,19 +57,42 @@ CEnumType::CalcLayout ()
 
 	// assign values to consts
 
-	intptr_t Value = 0;
-
-	rtl::CIteratorT <CEnumConst> Const = m_ConstList.GetHead ();
-	for (; Const; Const++, Value++)
+	if (m_EnumTypeKind == EEnumType_Flag)
 	{
-		if (!Const->m_Initializer.IsEmpty ())
-		{
-			Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (Const->m_Initializer, &Value);
-			if (!Result)
-				return false;
-		}
+		intptr_t Value = 1;
 
-		Const->m_Value = Value;
+		rtl::CIteratorT <CEnumConst> Const = m_ConstList.GetHead ();
+		for (; Const; Const++)
+		{
+			if (!Const->m_Initializer.IsEmpty ())
+			{
+				Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (Const->m_Initializer, &Value);
+				if (!Result)
+					return false;
+			}
+
+			Const->m_Value = Value;
+
+			uint8_t HiBitIdx = rtl::GetLoBitIdx (Value);
+			Value = HiBitIdx != -1 ? 2 << HiBitIdx : 1;
+		}
+	}
+	else
+	{
+		intptr_t Value = 0;
+
+		rtl::CIteratorT <CEnumConst> Const = m_ConstList.GetHead ();
+		for (; Const; Const++, Value++)
+		{
+			if (!Const->m_Initializer.IsEmpty ())
+			{
+				Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (Const->m_Initializer, &Value);
+				if (!Result)
+					return false;
+			}
+
+			Const->m_Value = Value;
+		}
 	}
 
 	return true;

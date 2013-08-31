@@ -94,6 +94,7 @@ main := |*
 'intptr'       |
 
 'enum'         |
+'enumf'        |
 'enumc'        |
 'struct'       |
 'union'        |

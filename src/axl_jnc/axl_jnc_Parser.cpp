@@ -1113,6 +1113,7 @@ CParser::CreateFormalArg (
 
 CEnumType*
 CParser::CreateEnumType (
+	EEnumType EnumTypeKind,
 	const rtl::CString& Name,
 	CType* pBaseType,
 	uint_t Flags
@@ -1123,13 +1124,13 @@ CParser::CreateEnumType (
 
 	if (Name.IsEmpty ())
 	{
-		pEnumType = m_pModule->m_TypeMgr.CreateUnnamedEnumType (pBaseType);
-		pEnumType->m_Flags = EEnumTypeFlag_Exposed;
+		Flags |= EEnumTypeFlag_Exposed;
+		pEnumType = m_pModule->m_TypeMgr.CreateUnnamedEnumType (EnumTypeKind, pBaseType, Flags);
 	}
 	else
 	{
 		rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pEnumType = m_pModule->m_TypeMgr.CreateEnumType (Name, QualifiedName, pBaseType, Flags);
+		pEnumType = m_pModule->m_TypeMgr.CreateEnumType (EnumTypeKind, Name, QualifiedName, pBaseType, Flags);
 		if (!pEnumType)
 			return NULL;
 
@@ -1694,7 +1695,7 @@ CParser::LookupIdentifier (
 	case EModuleItem_EnumConst:
 		pValue->SetConstInt64 (
 			((CEnumConst*) pItem)->GetValue (),
-			((CEnumConst*) pItem)->GetParentEnumType ()->GetBaseType ()
+			((CEnumConst*) pItem)->GetParentEnumType ()
 			);
 		break;
 

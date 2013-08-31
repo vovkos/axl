@@ -6,6 +6,7 @@
 
 #include "axl_jnc_BinOp.h"
 #include "axl_jnc_UnOp_Arithmetic.h"
+#include "axl_jnc_EnumType.h"
 
 namespace axl {
 namespace jnc {
@@ -29,14 +30,7 @@ public:
 		const CValue& OpValue2
 		)
 	{
-		CType* pType = GetArithmeticOperatorResultType (OpValue1, OpValue2);
-		if (!pType || T::IsIntegerOnly && !(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
-		{
-			SetOperatorError (OpValue1, OpValue2);
-			return NULL;
-		}
-
-		return pType;
+		return GetArithmeticResultType (OpValue1, OpValue2);
 	}
 
 	virtual
@@ -47,7 +41,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		CType* pType = GetResultType (RawOpValue1, RawOpValue2);
+		// BwOr overrides GetResultType, but here we need original one
+
+		CType* pType = GetArithmeticResultType (RawOpValue1, RawOpValue2); 
 		if (!pType)
 			return false;
 
@@ -140,6 +136,24 @@ public:
 
 		return true;
 	}
+
+protected:
+	CType*
+	GetArithmeticResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		CType* pType = GetArithmeticOperatorResultType (OpValue1, OpValue2);
+		if (!pType || T::IsIntegerOnly && !(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
+		{
+			SetOperatorError (OpValue1, OpValue2);
+			return NULL;
+		}
+
+		return pType;
+	}
+
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -683,10 +697,27 @@ public:
 	AXL_OBJ_CLASS_0 (CBinOp_BwOr, IBinaryOperator)
 
 public:
-	CBinOp_BwOr ()
+	CBinOp_BwOr ();
+
+	virtual
+	CType*
+	GetResultType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
 	{
-		m_OpKind = EBinOp_BwOr;
+		return IsFlagEnumOpType (OpValue1, OpValue2) ? 
+			OpValue1.GetType () : 
+			CBinOpT_IntegerOnly <CBinOp_BwOr>::GetResultType (OpValue1, OpValue2);
 	}
+
+	virtual
+	bool
+	Operator (
+		const CValue& RawOpValue1,
+		const CValue& RawOpValue2,
+		CValue* pResultValue
+		);
 
 	static
 	int32_t
@@ -718,6 +749,19 @@ public:
 		CValue* pResultValue,
 		bool IsUnsigned
 		);
+
+	bool
+	IsFlagEnumOpType (
+		const CValue& OpValue1,
+		const CValue& OpValue2
+		)
+	{
+		return 
+			OpValue1.GetType () == OpValue2.GetType () && 
+			OpValue1.GetType ()->GetTypeKind () == EType_Enum &&
+			((CEnumType*) OpValue1.GetType ())->GetEnumTypeKind () == EEnumType_Flag;
+	}
+
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

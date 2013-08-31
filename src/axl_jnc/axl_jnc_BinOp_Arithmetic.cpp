@@ -282,6 +282,37 @@ CBinOp_BwAnd::LlvmOpInt (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+CBinOp_BwOr::CBinOp_BwOr ()
+{
+	m_OpKind = EBinOp_BwOr;
+	m_OpFlags1 = EOpFlag_KeepEnum;
+	m_OpFlags2 = EOpFlag_KeepEnum;
+}
+
+bool
+CBinOp_BwOr::Operator (
+	const CValue& RawOpValue1,
+	const CValue& RawOpValue2,
+	CValue* pResultValue
+	)
+{
+	if (!IsFlagEnumOpType (RawOpValue1, RawOpValue1))
+		return CBinOpT_IntegerOnly <CBinOp_BwOr>::Operator (RawOpValue1, RawOpValue2, pResultValue);
+
+	CEnumType* pEnumType = (CEnumType*) RawOpValue1.GetType ();
+
+	CValue OpValue1;
+	CValue OpValue2;
+	CValue TmpValue;
+
+	OpValue1.OverrideType (RawOpValue1, pEnumType->GetBaseType ());
+	OpValue2.OverrideType (RawOpValue2, pEnumType->GetBaseType ());
+
+	return 
+		CBinOpT_IntegerOnly <CBinOp_BwOr>::Operator (OpValue1, OpValue2, &TmpValue) &&
+		m_pModule->m_OperatorMgr.CastOperator (TmpValue, pEnumType, pResultValue);
+}
+
 llvm::Value*
 CBinOp_BwOr::LlvmOpInt (
 	const CValue& OpValue1,

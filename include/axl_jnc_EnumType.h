@@ -14,6 +14,14 @@ class CEnumType;
 
 //.............................................................................
 
+enum EEnumType
+{
+	EEnumType_Normal,
+	EEnumType_Flag,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum EEnumTypeFlag
 {
 	EEnumTypeFlag_Exposed = 0x010000,
@@ -66,12 +74,20 @@ class CEnumType: public CNamedType
 	friend class CParser;
 	
 protected:
+	EEnumType m_EnumTypeKind;
+
 	CType* m_pBaseType;
 	CImportType* m_pBaseType_i;
 	rtl::CStdListT <CEnumConst> m_ConstList;
 
 public:
 	CEnumType ();
+
+	EEnumType 
+	GetEnumTypeKind ()
+	{
+		return m_EnumTypeKind;
+	}
 
 	CType*
 	GetBaseType ()

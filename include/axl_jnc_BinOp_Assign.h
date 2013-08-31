@@ -21,6 +21,7 @@ public:
 	{
 		m_OpKind = EBinOp_Assign;
 		m_OpFlags1 = EOpFlag_KeepRef;
+		m_OpFlags2 = EOpFlag_KeepEnum | EOpFlag_KeepBool;
 	}
 
 	virtual

@@ -1,0 +1,77 @@
+// jancy also brings a couple of enhancements for enumeration types.
+// in most languages enumerations expose member constant identifers to the parent namespace,
+// which i always thought was an inherently wrong design decision cause of namespace pollution.
+// enums in jancy conseal all member identifiers within enum namespace.
+// to simplify porting of existing C/C++ code jancy offers 'enumc' variation,
+// which behaves like a traditional C/C++ enum (exposing member identifiers).
+// yet another flavour of enums which i always wanted to have is flag enum, i.e. enum
+// dedicated to describe set of flags. 'enumf' differs from normal 'enum' in 2 key features:
+// - automatic value assignment goes 1, 2, 4, 8 etc (increments previous bit position)
+// - bitwise or operation on 2 operands of matching 'enumf' type yields the same 'enumf' type
+// - it's ok to assign '0' to 'enumf'
+// note that like normal 'enum', 'enumf' does not pollute parent namespace.
+
+//.............................................................................
+
+enum EColor
+{
+	Red,      // = 0 
+	Orange,
+	Yellow,
+	Green = 15, 
+	Blue,
+	Purple,
+}
+
+enumf EOpenFlag
+{
+	ReadOnly,      // = 0x01
+	Exclusive = 0x20,
+	DeleteOnClose, // = 0x40
+}
+
+enumc EState
+{
+	EState_Idle, // = 0
+	EState_Connecting,
+	EState_Connected,
+	EState_Disconnecting,
+}
+
+//.............................................................................
+
+// entry point
+
+int 
+main ()
+{
+	printf ("main ()\n");
+
+	EColor Color = EColor.Blue;
+	// Color = 0; // <-- error cast int->enum must be explicit
+	printf ("Color = %d\n", Color);
+
+	EState State = EState_Connecting; // EState.EState_Idle works also
+	// State = 100; // <-- error cast int->enum must be explicit
+	printf ("State = %d\n", State);
+
+	EOpenFlag Flags = 0; // 0 is ok to assign to 'enumf'
+	 
+	Flags = EOpenFlag.ReadOnly | EOpenFlag.Exclusive | EOpenFlag.DeleteOnClose;
+	// Flags = 200; // <-- error cast int->enum must be explicit
+	printf ("Flags = %x\n", Flags);
+
+	return 0;
+}
+
+//.............................................................................
+
+// system functions
+
+int
+printf (
+	unsafe const thin char* pFormat,
+	unsafe ...
+	);
+
+//.............................................................................

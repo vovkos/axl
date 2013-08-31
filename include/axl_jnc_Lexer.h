@@ -100,6 +100,7 @@ enum EToken
 	// named type specifiers
 
 	EToken_Enum,
+	EToken_EnumF,
 	EToken_EnumC,
 	EToken_Struct,
 	EToken_Union,
@@ -266,6 +267,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	// named type specifiers
 
 	AXL_PRS_TOKEN_NAME (EToken_Enum,         "enum")
+	AXL_PRS_TOKEN_NAME (EToken_EnumF,        "enumf")
 	AXL_PRS_TOKEN_NAME (EToken_EnumC,        "enumc")
 	AXL_PRS_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_PRS_TOKEN_NAME (EToken_Union,        "union")

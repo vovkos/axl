@@ -374,6 +374,7 @@ CTypeMgr::CreateTypedef (
 
 CEnumType* 
 CTypeMgr::CreateEnumType (
+	EEnumType EnumTypeKind,
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
 	CType* pBaseType,
@@ -401,8 +402,9 @@ CTypeMgr::CreateEnumType (
 
 	if (!pBaseType)
 		pBaseType = GetPrimitiveType (EType_Int);
-
+		
 	pType->m_pModule = m_pModule;
+	pType->m_EnumTypeKind = EnumTypeKind;
 	pType->m_pBaseType = pBaseType;
 	pType->m_Flags |= Flags;
 	m_EnumTypeList.InsertTail (pType);

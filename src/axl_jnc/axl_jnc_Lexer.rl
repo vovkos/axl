@@ -159,6 +159,7 @@ main := |*
 # named type specifiers
 
 'enum'         { CreateToken (EToken_Enum); };
+'enumf'        { CreateToken (EToken_EnumF); };
 'enumc'        { CreateToken (EToken_EnumC); };
 'struct'       { CreateToken (EToken_Struct); };
 'union'        { CreateToken (EToken_Union); };

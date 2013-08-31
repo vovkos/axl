@@ -228,6 +228,7 @@ Members2
 
 	CEnumType*
 	CreateEnumType (
+		EEnumType EnumTypeKind,
 		const rtl::CString& Name,
 		CType* pBaseType,
 		uint_t Flags

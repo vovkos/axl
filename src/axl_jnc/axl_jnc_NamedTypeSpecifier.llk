@@ -44,14 +44,15 @@ enum_specifier
 		if ($.m_pType->GetName ().IsEmpty () || ($.m_pType->GetFlags () & EEnumTypeFlag_Exposed))
 			return m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumConsts ($.m_pType);
 	}
-	:	(EToken_Enum | EToken_EnumC $c)
+	:	enum_type_kind $k
 		EToken_Identifier $n?
 		(':' type_name $b)?
 			{
 				$.m_pType = CreateEnumType (
+					$k.m_EnumTypeKind,
 					IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
 					IsValidLocator ($b) ? $b.m_pType : NULL,
-					IsValidLocator ($c) ? EEnumTypeFlag_Exposed : 0
+					$k.m_Flags
 					);
 
 				if (!$.m_pType)
@@ -59,6 +60,31 @@ enum_specifier
 			}	
 		enum_block <$.m_pType>
 	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class
+{
+	EEnumType m_EnumTypeKind;
+	uint_t m_Flags;
+}
+enum_type_kind 
+	:	EToken_Enum
+			{
+				$.m_EnumTypeKind = EEnumType_Normal;
+				$.m_Flags = 0;
+			}
+	|	EToken_EnumF
+			{
+				$.m_EnumTypeKind = EEnumType_Flag;
+				$.m_Flags = 0;
+			}
+	|	EToken_EnumC
+			{
+				$.m_EnumTypeKind = EEnumType_Normal;
+				$.m_Flags = EEnumTypeFlag_Exposed;
+			}
+	;		
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

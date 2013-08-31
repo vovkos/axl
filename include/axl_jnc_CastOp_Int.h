@@ -294,6 +294,13 @@ public:
 	}
 
 	virtual
+	ECast
+	GetCastKind (
+		const CValue& OpValue,
+		CType* pType
+		);
+
+	virtual
 	bool
 	GetCastOperators (
 		const CValue& OpValue,
