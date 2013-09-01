@@ -23,7 +23,7 @@ main ()
 		if (a [i] [j] < 0)
 		{
 			IsFound = true;
-			break 2; // exit from 2 loops at once
+			break2; // exit from 2 loops at once
 		}
 
 	if (IsFound)

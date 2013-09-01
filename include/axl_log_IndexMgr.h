@@ -49,6 +49,12 @@ public:
 	}
 
 	bool
+	IsOpen ()
+	{	
+		return m_IndexFile.IsOpen ();
+	}
+
+	bool
 	Create (
 		CPacketFile* pPacketFile,
 		IRepresentor* pRepresentor,

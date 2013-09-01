@@ -245,124 +245,126 @@ public:
 
 //.............................................................................
 
+// use QT naming conventions in this class
+
 template <typename T>
-class CQtWidgetT: public QAbstractScrollArea
+class QtWidget: public QAbstractScrollArea
 {
 protected:
-	CWidgetT <T> m_Widget;
+	CWidgetT <T> m_widget; 
 	
 public:
-	CQtWidgetT (QWidget* pQtParentWidget = NULL):
-		QAbstractScrollArea (pQtParentWidget)
+	QtWidget (QWidget* parent = 0):
+		QAbstractScrollArea (parent)
 	{
-		m_Widget.m_pQtScrollArea = this;
-		m_Widget.m_pQtWidget = viewport ();
-		m_Widget.m_pQtWidget->setMouseTracking (true);
+		m_widget.m_pQtScrollArea = this;
+		m_widget.m_pQtWidget = viewport ();
+		m_widget.m_pQtWidget->setMouseTracking (true);
 	}
 	
 	T* 
 	operator -> ()
 	{
-		return &m_Widget;
+		return &m_widget;
 	}
 	
 	T*
 	w ()
 	{
-		return &m_Widget;
+		return &m_widget;
 	}
 
 protected:	
 	virtual 
 	void 
-	mousePressEvent (QMouseEvent* pEvent)
+	mousePressEvent (QMouseEvent* e)
 	{
-		GetQtWidget ()->OnMouseEvent (pEvent, EWidgetMsg_MouseButtonDown);
+		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseButtonDown);
 	}
 
 	virtual 
 	void 
-	mouseReleaseEvent (QMouseEvent* pEvent)
+	mouseReleaseEvent (QMouseEvent* e)
 	{
-		GetQtWidget ()->OnMouseEvent (pEvent, EWidgetMsg_MouseButtonUp);
+		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseButtonUp);
 	}
 	
 	virtual 
 	void 
-	mouseDoubleClickEvent (QMouseEvent* pEvent)
+	mouseDoubleClickEvent (QMouseEvent* e)
 	{
-		GetQtWidget ()->OnMouseEvent (pEvent, EWidgetMsg_MouseButtonDoubleClick);
+		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseButtonDoubleClick);
 	}
 
 	virtual 
 	void 
-	mouseMoveEvent (QMouseEvent* pEvent)
+	mouseMoveEvent (QMouseEvent* e)
 	{
-		GetQtWidget ()->OnMouseEvent (pEvent, EWidgetMsg_MouseMove);
+		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseMove);
 	}
 	
 	virtual 
 	void 
-	wheelEvent (QWheelEvent* pEvent)
+	wheelEvent (QWheelEvent* e)
 	{	
-		GetQtWidget ()->OnMouseWheelEvent (pEvent);
+		getQtWidget ()->OnMouseWheelEvent (e);
 	}
 	
 	virtual 
 	void 
-	keyPressEvent (QKeyEvent* pEvent)
+	keyPressEvent (QKeyEvent* e)
 	{
-		GetQtWidget ()->OnKeyEvent (pEvent, EWidgetMsg_KeyDown);
+		getQtWidget ()->OnKeyEvent (e, EWidgetMsg_KeyDown);
 	}
 		
 	virtual 
 	void 
-	keyReleaseEvent (QKeyEvent* pEvent)
+	keyReleaseEvent (QKeyEvent* e)
 	{
-		GetQtWidget ()->OnKeyEvent (pEvent, EWidgetMsg_KeyUp);
+		getQtWidget ()->OnKeyEvent (e, EWidgetMsg_KeyUp);
 	}
 	
 	virtual 
 	void 
-	focusInEvent (QFocusEvent* pEvent)
+	focusInEvent (QFocusEvent* e)
 	{
-		GetQtWidget ()->OnEvent (pEvent, EWidgetMsg_SetFocus);
+		getQtWidget ()->OnEvent (e, EWidgetMsg_SetFocus);
 	}
 	
 	virtual 
 	void 
-	focusOutEvent (QFocusEvent* pEvent)
+	focusOutEvent (QFocusEvent* e)
 	{
-		GetQtWidget ()->OnEvent (pEvent, EWidgetMsg_KillFocus);
+		getQtWidget ()->OnEvent (e, EWidgetMsg_KillFocus);
 	}
 	
 	virtual 
 	void 
-	leaveEvent (QEvent* pEvent)
+	leaveEvent (QEvent* e)
 	{
-		GetQtWidget ()->OnEvent (pEvent, EWidgetMsg_MouseLeave);
+		getQtWidget ()->OnEvent (e, EWidgetMsg_MouseLeave);
 	}
 	
 	virtual 
 	void 
-	paintEvent (QPaintEvent* pEvent)
+	paintEvent (QPaintEvent* e)
 	{		
 		QPainter Painter (viewport ());
-		GetQtWidget ()->OnPaintEvent (pEvent, &Painter);
+		getQtWidget ()->OnPaintEvent (e, &Painter);
 	}
 
 	virtual 
 	void 
-	resizeEvent (QResizeEvent* pEvent)
+	resizeEvent (QResizeEvent* e)
 	{
-		GetQtWidget ()->OnResizeEvent (pEvent);
+		getQtWidget ()->OnResizeEvent (e);
 	}
 	
 	virtual 
 	void 
-	closeEvent (QCloseEvent* pEvent)
+	closeEvent (QCloseEvent* e)
 	{
-		GetQtWidget ()->OnEvent (pEvent, EWidgetMsg_Close);
+		getQtWidget ()->OnEvent (e, EWidgetMsg_Close);
 	}
 	
 	virtual void 
@@ -371,7 +373,7 @@ protected:
 		int dy 
 		)
 	{
-		GetQtWidget ()->OnScroll (
+		getQtWidget ()->OnScroll (
 			dy ? verticalScrollBar () : NULL,
 			dx ? horizontalScrollBar () : NULL
 			);
@@ -379,9 +381,9 @@ protected:
 	
 protected:
 	IQtWidget*
-	GetQtWidget ()
+	getQtWidget ()
 	{
-		return (IQtWidget*) (IWidget*) &m_Widget;
+		return (IQtWidget*) (IWidget*) &m_widget;
 	}
 };
 

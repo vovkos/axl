@@ -70,6 +70,27 @@ CDerivableType::GetDefaultConstructor ()
 }
 
 CBaseTypeSlot*
+CDerivableType::GetBaseTypeByIndex (size_t Index)
+{
+	size_t Count = m_BaseTypeList.GetCount ();
+	if (Index >= Count)
+	{
+		err::SetFormatStringError ("index '%d' is out of bounds", Index);
+		return NULL;
+	}
+
+	if (m_BaseTypeArray.GetCount () != Count)
+	{
+		m_BaseTypeArray.SetCount (Count);
+		rtl::CIteratorT <CBaseTypeSlot> Slot = m_BaseTypeList.GetHead ();
+		for (size_t i = 0; i < Count; i++, Slot++)
+			m_BaseTypeArray [i] = *Slot;	
+	}
+
+	return m_BaseTypeArray [Index];
+}
+
+CBaseTypeSlot*
 CDerivableType::AddBaseType (CType* pType)
 {
 	rtl::CStringHashTableMapIteratorT <CBaseTypeSlot*> It = m_BaseTypeMap.Goto (pType->GetSignature ());

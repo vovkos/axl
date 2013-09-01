@@ -35,124 +35,126 @@ main := |*
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 (
-'namespace'    |
-'using'        |
-'extend'       |
-'pack'         |
+'namespace'       |
+'using'           |
+'extend'          |
+'pack'            |
 
-'typedef'      |
-'alias'        |
-'static'       |
-'thread'       |
-'stack'        |
-'heap'         |
-'uheap'        |
-'abstract'     |
-'virtual'      |
-'override'     |
+'typedef'         |
+'alias'           |
+'static'          |
+'thread'          |
+'stack'           |
+'heap'            |
+'uheap'           |
+'abstract'        |
+'virtual'         |
+'override'        |
 
-'public'       |
-'protected'    |
-'friend'       |
+'public'          |
+'protected'       |
+'friend'          |
 
-'signed'       |
-'unsigned'     |
-'bigendian'    |
-'nullable'     |
-'const'        |
-'pubconst'     |
-'mutable'      |
-'volatile'     |
-'weak'         |
-'thin'         |
-'unsafe'       |
-'cdecl'        |
-'stdcall'      |
-'function'     |
-'property'     |
-'bindable'     |
-'autoget'      |
-'indexed'      |
-'multicast'    |
-'event'        |
-'pubevent'     |
-'autoev'       |
+'signed'          |
+'unsigned'        |
+'bigendian'       |
+'nullable'        |
+'const'           |
+'pubconst'        |
+'mutable'         |
+'volatile'        |
+'weak'            |
+'thin'            |
+'unsafe'          |
+'cdecl'           |
+'stdcall'         |
+'function'        |
+'property'        |
+'bindable'        |
+'autoget'         |
+'indexed'         |
+'multicast'       |
+'event'           |
+'pubevent'        |
+'autoev'          |
 
-'auto'         |
-'void'         |
-'object'       |
-'variant'      |
-'bool'         |
-'int8'         |
-'int16'        |
-'int32'        |
-'int64'        |
-'float'        |
-'double'       |
-'char'         |
-'int'          |
-'intptr'       |
+'auto'            |
+'void'            |
+'object'          |
+'variant'         |
+'bool'            |
+'int8'            |
+'int16'           |
+'int32'           |
+'int64'           |
+'float'           |
+'double'          |
+'char'            |
+'int'             |
+'intptr'          |
 
-'enum'         |
-'enumf'        |
-'enumc'        |
-'struct'       |
-'union'        |
-'class'        |
+'enum'            |
+'enumf'           |
+'enumc'           |
+'struct'          |
+'union'           |
+'class'           |
 
-'get'          |
-'set'          |
-'this'         |
-'preconstruct' |
-'construct'    |
-'destruct'     |
-'operator'     |
-'postfix'      |
-'propvalue'    |
-'onchange'     |
+'get'             |
+'set'             |
+'this'            |
+'basetype' [1-9]? |
+'preconstruct'    |
+'construct'       |
+'destruct'        |
+'operator'        |
+'postfix'         |
+'propvalue'       |
+'onchange'        |
 
-'if'           |
-'else'         |
-'for'          |
-'while'        |
-'do'           |
-'break'        |
-'continue'     |
-'return'       |
-'switch'       |
-'case'         |
-'default'      |
-'once'         |
-'silent'       |
+'if'              |
+'else'            |
+'for'             |
+'while'           |
+'do'              |
+'break'           |
+'break' [1-9]?    |
+'continue' [1-9]? |
+'return'          |
+'switch'          |
+'case'            |
+'default'         |
+'once'            |
+'silent'          |
 
-'true'         |
-'false'        |
-'null'         |
+'true'            |
+'false'           |
+'null'            |
 
-'new'          |
-'delete'       |
-'sizeof'       |
-'countof'      |
+'new'             |
+'delete'          |
+'sizeof'          |
+'countof'         |
 'typeof'       
 
-)			   { colorize(ts, te, Qt::blue); };
+)                   { colorize(ts, te, Qt::blue); };					
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-id								{  };
-(lit_sq | lit_dq)				{ colorize(ts, te, Qt::darkRed); };
-dec+							{ colorize(ts, te, Qt::darkRed); };
-'0' [Xx] hex+					{ colorize(ts, te, Qt::darkRed); };
-'0' [Xx] lit_dq                 { colorize(ts, te, Qt::darkRed); };
-'$' lit_dq                      { colorize(ts, te, Qt::darkRed); };
+id                  {  };
+(lit_sq | lit_dq)   { colorize(ts, te, Qt::darkRed); };
+dec+                { colorize(ts, te, Qt::darkRed); };
+'0' [Xx] hex+       { colorize(ts, te, Qt::darkRed); };
+'0' [Xx] lit_dq     { colorize(ts, te, Qt::darkRed); };
+'$' lit_dq          { colorize(ts, te, Qt::darkRed); };
 
-'//' [^\n]*						{ colorize(ts, te, Qt::darkGreen); };
+'//' [^\n]*         { colorize(ts, te, Qt::darkGreen); };
 
-'/*'							{ colorize(ts, te, Qt::darkGreen); fgoto comment; }; 
+'/*'                { colorize(ts, te, Qt::darkGreen); fgoto comment; }; 
 
-ws | nl							;
+ws | nl             ;
 
-any								{  };
+any                 {  };
 
 *|;
 
@@ -163,9 +165,9 @@ any								{  };
 
 comment := |*
 
-'\n'		   { colorize(ts, te, Qt::darkGreen); };
-any		       { colorize(ts, te, Qt::darkGreen); };
-'*/'		   { colorize(ts, te, Qt::darkGreen); fgoto main; };
+'\n'                { colorize(ts, te, Qt::darkGreen); };
+any                 { colorize(ts, te, Qt::darkGreen); };
+'*/'                { colorize(ts, te, Qt::darkGreen); fgoto main; };
 
 *|;
 

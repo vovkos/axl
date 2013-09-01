@@ -1396,13 +1396,32 @@ CParser::CallBaseTypeMemberConstructor (
 
 bool
 CParser::CallBaseTypeConstructor (
+	size_t BaseTypeIdx,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	ASSERT (m_pConstructorType || m_pConstructorProperty);
+
+	if (m_pConstructorProperty)
+	{
+		err::SetFormatStringError ("'%s.construct' cannot have base-type constructor calls", m_pConstructorProperty->m_Tag.cc ());
+		return false;
+	}
+
+	CBaseTypeSlot* pBaseTypeSlot = m_pConstructorType->GetBaseTypeByIndex (BaseTypeIdx);
+	if (!pBaseTypeSlot)
+		return false;
+
+	return CallBaseTypeConstructorImpl (pBaseTypeSlot, pArgList);
+}
+
+bool
+CParser::CallBaseTypeConstructor (
 	CType* pType,
 	rtl::CBoxListT <CValue>* pArgList
 	)
 {	
 	ASSERT (m_pConstructorType || m_pConstructorProperty);
-
-	bool Result;
 
 	if (m_pConstructorProperty)
 	{
@@ -1421,13 +1440,24 @@ CParser::CallBaseTypeConstructor (
 		return false;
 	}
 
+	return CallBaseTypeConstructorImpl (pBaseTypeSlot, pArgList);
+}
+
+bool
+CParser::CallBaseTypeConstructorImpl (
+	CBaseTypeSlot* pBaseTypeSlot,
+	rtl::CBoxListT <CValue>* pArgList
+	)
+{
+	CDerivableType* pType = pBaseTypeSlot->GetType ();
+
 	if (pBaseTypeSlot->m_Flags & EModuleItemFlag_Constructed)
 	{
 		err::SetFormatStringError ("'%s' is already constructed", pType->GetTypeString ().cc ());
 		return false;
 	}
 
-	CFunction* pConstructor = pBaseTypeSlot->GetType ()->GetConstructor ();
+	CFunction* pConstructor = pType->GetConstructor ();
 	if (!pConstructor)
 	{
 		err::SetFormatStringError ("'%s' has no constructor", pType->GetTypeString ().cc ());
@@ -1439,7 +1469,7 @@ CParser::CallBaseTypeConstructor (
 
 	pArgList->InsertHead (ThisValue);
 
-	Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, pArgList);
+	bool Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, pArgList);
 	if (!Result)
 		return false;
 

@@ -15,6 +15,9 @@ CWidget::GetHyperlinkFromMousePos (
 	rtl::CString* pHyperlink
 	)
 {
+	if (!m_IndexMgr.IsOpen ())
+		return false;
+
 	gui::TCursorPos Pos = GetCursorPosFromMousePos (x, y, false);
 
 	CLine* pLine = m_CacheMgr.GetLine (Pos.m_Line);

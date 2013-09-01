@@ -1,4 +1,4 @@
-// classes in jancy is a special kind of data, preceded with header containing type, 
+// class in jancy is a special kind of data, preceded with header containing type, 
 // virtual table pointer and other ancilliary information
 // also, contrary to most modern languages, default access is public
 

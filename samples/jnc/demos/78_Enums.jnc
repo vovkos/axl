@@ -5,9 +5,9 @@
 // to simplify porting of existing C/C++ code jancy offers 'enumc' variation,
 // which behaves like a traditional C/C++ enum (exposing member identifiers).
 // yet another flavour of enums which i always wanted to have is flag enum, i.e. enum
-// dedicated to describe set of flags. 'enumf' differs from normal 'enum' in 2 key features:
+// dedicated to describe set of flags. 'enumf' differs from normal 'enum' in 2 key aspects:
 // - automatic value assignment goes 1, 2, 4, 8 etc (increments previous bit position)
-// - bitwise or operation on 2 operands of matching 'enumf' type yields the same 'enumf' type
+// - bitwise or operator '|' on 2 operands of matching 'enumf' type yields the same 'enumf' type
 // - it's ok to assign '0' to 'enumf'
 // note that like normal 'enum', 'enumf' does not pollute parent namespace.
 
@@ -23,7 +23,7 @@ enum EColor
 	Purple,
 }
 
-enumf EOpenFlag
+enumf EOpenFlags
 {
 	ReadOnly,      // = 0x01
 	Exclusive = 0x20,
@@ -55,9 +55,9 @@ main ()
 	// State = 100; // <-- error cast int->enum must be explicit
 	printf ("State = %d\n", State);
 
-	EOpenFlag Flags = 0; // 0 is ok to assign to 'enumf'
+	EOpenFlags Flags = 0; // 0 is ok to assign to 'enumf'
 	 
-	Flags = EOpenFlag.ReadOnly | EOpenFlag.Exclusive | EOpenFlag.DeleteOnClose;
+	Flags = EOpenFlags.ReadOnly | EOpenFlags.Exclusive | EOpenFlags.DeleteOnClose;
 	// Flags = 200; // <-- error cast int->enum must be explicit
 	printf ("Flags = %x\n", Flags);
 

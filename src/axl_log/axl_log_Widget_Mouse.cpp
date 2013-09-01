@@ -66,7 +66,7 @@ CWidget::OnMouseButtonDown (
 	m_IsDragging = true;
 
 	SetFocus ();
- 	SetMouseCapture ();
+	SetMouseCapture ();
 }
 
 void

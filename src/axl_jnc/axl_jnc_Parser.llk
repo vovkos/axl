@@ -293,7 +293,19 @@ Members2
 
 	bool
 	CallBaseTypeConstructor (
+		size_t BaseTypeIdx,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	CallBaseTypeConstructor (
 		CType* pType,
+		rtl::CBoxListT <CValue>* pArgList
+		);
+
+	bool
+	CallBaseTypeConstructorImpl (
+		CBaseTypeSlot* pBaseTypeSlot,
 		rtl::CBoxListT <CValue>* pArgList
 		);
 

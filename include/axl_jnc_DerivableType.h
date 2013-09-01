@@ -113,6 +113,7 @@ protected:
 
 	rtl::CStringHashTableMapT <CBaseTypeSlot*> m_BaseTypeMap;
 	rtl::CStdListT <CBaseTypeSlot> m_BaseTypeList;
+	rtl::CArrayT <CBaseTypeSlot*> m_BaseTypeArray;
 	rtl::CArrayT <CBaseTypeSlot*> m_ImportBaseTypeArray;
 
 	// gc roots
@@ -159,6 +160,9 @@ public:
 	}
 
 	CBaseTypeSlot*
+	GetBaseTypeByIndex (size_t Index);
+
+	CBaseTypeSlot*
 	AddBaseType (CType* pType);
 
 	CBaseTypeSlot*
@@ -181,7 +185,7 @@ public:
 	GetMemberFieldArray ()
 	{
 		return m_MemberFieldArray;
-	}
+	} 
 
 	rtl::CArrayT <CFunction*>
 	GetMemberMethodArray ()

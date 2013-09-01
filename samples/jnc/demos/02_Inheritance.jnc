@@ -1,5 +1,7 @@
 // in jancy, simple multiple inheritance model is adopted
 // simple means no C++ virtual inheritance; multiple instances of shared bases (if any)
+// mulitple inheritance is extremely useful tool which allows natural implementation sharing
+// virtual methods are declared using keywords 'virtual' 'abstract' 'override'
 
 //.............................................................................
 
@@ -68,19 +70,19 @@ struct TPoint
 	int m_y;
 }
 
-// mulitple inheritance allows easy implementation sharing
-
 class C3:
 	C1,
 	C2,
-	TPoint // also ok to inherit from structs or unions
+	TPoint // ok to inherit from structs and even unions
 {
 	construct (int a)
 	{
-		// if base classes require construction, it must be done in the beginning of constructor		
+		// if base types require construction, it must be done in the beginning of constructor		
+		// keywords 'basetype1'..'basetype9' could be used to conveniently reference base types.
+		// 'basetype' is equivalent to 'basetype1', traditional referencing by a type name works also.
 
-		C1.construct (a * 10); 
-		C2.construct (a * 100);
+		basetype1.construct (a * 10);  // <-- eqivalent to C1.construct ()
+		basetype2.construct (a * 100); // <-- eqivalent to C2.construct ()
 
 		printf ("C3.construct (%d)\n", a);
 	}

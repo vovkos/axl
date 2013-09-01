@@ -72,6 +72,10 @@ btm_construct_stmt
 			{
 				return CallBaseTypeMemberConstructor ($n.m_Name, &$a.m_ValueList);
 			}
+	|	EToken_BaseType $b '.' EToken_Construct '(' expression_or_empty_list $a ')'
+			{
+				return CallBaseTypeConstructor ($b.m_Data.m_Integer - 1, &$a.m_ValueList);
+			}
 	|	';'
 	;
 
@@ -261,16 +265,16 @@ for_stmt
 	;
 
 break_stmt
-	:	EToken_Break constant_integer_expr $e? ';'
+	:	EToken_Break ';'
 			{
-				return m_pModule->m_ControlFlowMgr.Break (IsValidLocator ($e) ? $e.m_Value : 1);
+				return m_pModule->m_ControlFlowMgr.Break ($1.m_Data.m_Integer);
 			}
 	;
 
 continue_stmt 
-	:	EToken_Continue constant_integer_expr $e? ';'
+	:	EToken_Continue ';'
 			{
-				return m_pModule->m_ControlFlowMgr.Continue (IsValidLocator ($e) ? $e.m_Value : 1);
+				return m_pModule->m_ControlFlowMgr.Continue ($1.m_Data.m_Integer);
 			}
 	;
 

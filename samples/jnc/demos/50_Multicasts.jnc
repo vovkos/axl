@@ -1,11 +1,13 @@
+// multicasts are compiler-generated classes capable of accumulating 
+// function pointers and calling them at once.
+// like function pointes, multicasts could be normal, 'thin' or 'weak'
+
 //.............................................................................
 
 int
 main ()
 {
-	// multicasts are compiler-generated classes capable of accumulating 
-	// function pointers and calling them at once
-	// like function pointes, multicasts could be normal, 'thin' or 'weak'
+	// add 2 function pointers
 
 	multicast Multicast (int);
 	Multicast += Foo;

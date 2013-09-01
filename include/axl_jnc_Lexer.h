@@ -111,6 +111,7 @@ enum EToken
 	EToken_Get,
 	EToken_Set,
 	EToken_This,
+	EToken_BaseType,
 	EToken_PreConstruct,
 	EToken_Construct,
 	EToken_Destruct,
@@ -278,6 +279,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_PRS_TOKEN_NAME (EToken_Get,          "get")
 	AXL_PRS_TOKEN_NAME (EToken_Set,          "set")
 	AXL_PRS_TOKEN_NAME (EToken_This,         "this")
+	AXL_PRS_TOKEN_NAME (EToken_BaseType,     "basetype")
 	AXL_PRS_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
 	AXL_PRS_TOKEN_NAME (EToken_Construct,    "construct")
 	AXL_PRS_TOKEN_NAME (EToken_Destruct,     "destruct")
@@ -372,6 +374,17 @@ public:
 	}
 
 protected:
+	CToken*
+	CreateKeywordTokenEx (
+		int Token,
+		int Param
+		)
+	{
+		CToken* pToken = CreateToken (Token);
+		pToken->m_Data.m_Integer = Param;
+		return pToken;
+	}
+
 	CToken*
 	CreateStringToken (
 		int Token,
