@@ -78,10 +78,16 @@ message (STATUS "Path to LLVM cmake modules: ${PATH_LLVM_CMAKE_DIR}")
 message (STATUS "Path to LLVM includes:      ${PATH_LLVM_INC_DIR}")
 message (STATUS "Path to LLVM includes (2):  ${PATH_LLVM_INC_DIR_2}")
 message (STATUS "Path to LLVM libraries:     ${PATH_LLVM_LIB_DIR}")
-message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
 
 include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
-include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
+
+# QT is optional
+
+if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")	
+	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
+	include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
+	set (QT_FOUND true)
+endif ()
 
 #..............................................................................
 #
@@ -114,11 +120,13 @@ if (WIN32)
 		)
 endif ()
 
-option (
-	AXL_BUILD_GUI_QT
-	"Build QT drivers for axl_gui library"
-	ON
-	)
+if (${QT_FOUND})
+	option (
+		AXL_BUILD_GUI_QT
+		"Build QT drivers for axl_gui library"
+		ON
+		)
+endif ()
 
 option (
 	AXL_BUILD_IO_LIB
@@ -160,7 +168,7 @@ option (
 	AXL_BUILD_PG
 	"Build axl_pg (LL(k) parser generator)"
 	ON
-	)
+	) 
 
 option (
 	AXL_BUILD_CON_TEST
@@ -168,11 +176,13 @@ option (
 	OFF
 	)
 
-option (
-	AXL_BUILD_QT_TEST
-	"Build QtTest"
-	OFF
-	)
+if (${QT_FOUND})
+	option (
+		AXL_BUILD_QT_TEST
+		"Build QtTest"
+		OFF
+		)
+endif ()
 
 if (WIN32)
 	option (
@@ -182,11 +192,13 @@ if (WIN32)
 		)
 endif ()
 
-option (
-	AXL_BUILD_JNC_QT_TEST
-	"Build JncQtTest"
-	ON
-	)
+if (${QT_FOUND})
+	option (
+		AXL_BUILD_JNC_QT_TEST
+		"Build JncQtTest"
+		ON
+		)
+endif ()
 
 #..............................................................................
 #
