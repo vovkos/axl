@@ -188,7 +188,7 @@ CWidget::OnKeyDown_Left (
 
 		if (Pos.m_Col <= 0)
 		{
-			pLine = m_CacheMgr.GetPrevLine (pLine);
+			pLine = GetPrevLine (pLine);
 			if (!pLine)
 				return;
 
@@ -206,7 +206,7 @@ CWidget::OnKeyDown_Left (
 
 		if (Pos.m_Col_u <= m_FullOffsetWidth)
 		{
-			pLine = m_CacheMgr.GetPrevLine (pLine);
+			pLine = GetPrevLine (pLine);
 			if (!pLine)
 				return;
 
@@ -228,7 +228,7 @@ CWidget::OnKeyDown_Left (
 		{
 			if (Pos.m_Col == AsciiCol)
 			{
-				pLine = m_CacheMgr.GetPrevLine (pLine);
+				pLine = GetPrevLine (pLine);
 				if (!pLine)
 					return;
 
@@ -244,7 +244,7 @@ CWidget::OnKeyDown_Left (
 		{
 			if (Pos.m_Col_u <= m_FullOffsetWidth)
 			{
-				pLine = m_CacheMgr.GetPrevLine (pLine);
+				pLine = GetPrevLine (pLine);
 				if (!pLine)
 					return;
 
@@ -291,7 +291,7 @@ CWidget::OnKeyDown_Right (
 
 		if (Pos.m_Col_u >= LastCol)
 		{
-			pLine = m_CacheMgr.GetNextLine (pLine);
+			pLine = GetNextLine (pLine);
 			if (!pLine)
 				return;
 
@@ -306,11 +306,11 @@ CWidget::OnKeyDown_Right (
 
 	case ELine_BinText:
 		pBinTextLine = (CBinTextLine*) pLine;
-		LastCol = (m_FullOffsetWidth + pBinTextLine->FindColByOffset (-1));
+		LastCol = (m_FullOffsetWidth + pBinTextLine->FindBinTextColByOffset (-1));
 
 		if (Pos.m_Col_u >= LastCol)
 		{
-			pLine = m_CacheMgr.GetNextLine (pLine);
+			pLine = GetNextLine (pLine);
 			if (!pLine)
 				return;
 
@@ -333,7 +333,7 @@ CWidget::OnKeyDown_Right (
 		{
 			if (Pos.m_Col_u >= AsciiCol + LastCol)
 			{
-				pLine = m_CacheMgr.GetNextLine (pLine);
+				pLine = GetNextLine (pLine);
 				if (!pLine)
 					return;
 
@@ -357,7 +357,7 @@ CWidget::OnKeyDown_Right (
 
 			if (Pos.m_Col_u >= LastCol)
 			{
-				pLine = m_CacheMgr.GetNextLine (pLine);
+				pLine = GetNextLine (pLine);
 				if (!pLine)
 					return;
 

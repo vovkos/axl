@@ -86,6 +86,7 @@ include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
 if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")	
 	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
+	include ("${PATH_QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
 	set (QT_FOUND true)
 endif ()
 

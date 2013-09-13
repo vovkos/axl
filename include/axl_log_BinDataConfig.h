@@ -60,15 +60,7 @@ struct TBinDataConfig
 	}
 
 	void
-	SetDefaults ()
-	{
-		m_BinViewKind       = EBinView_Hex;
-		m_BinTextEnc        = EBinTextEnc_Ascii;
-		m_BinTextTabSize    = 4;
-		m_BinTextLineSize   = 80;
-		m_BinHexLineSize    = 16;
-		m_BinMergeThreshold = -1;
-	}
+	SetDefaults ();
 };
 
 //.............................................................................

@@ -4,8 +4,8 @@
 //.............................................................................
 
 bool 
-CMyLogRepresentor::Represent (
-	log::IRepresentorTarget* pTarget, 
+MyLogRepresenter::Represent (
+	log::IRepresenterTarget* pTarget, 
 	uint_t PacketCode, 
 	const void* p, 
 	size_t Size, 
@@ -21,7 +21,7 @@ CMyLogRepresentor::Represent (
 	switch (PacketCode)
 	{
 	case EMyLogPacket_DeviceOpened:
-		pTarget->m_LineAttr.m_Icon = 3;
+/*		pTarget->m_LineAttr.m_Icon = 3;
 
 		pTarget->AddHyperText(
 			log::EMergeFlag_MergeableForward,
@@ -37,8 +37,8 @@ CMyLogRepresentor::Represent (
 			log::EMergeFlag_Mergeable,
 			"Vot <+is>tak<> vot!!"
 			);
-
-		pTarget->AddBin(Data, sizeof(Data));
+			 */
+		pTarget->AddBin("123456789abc", 12);
 		break;
 
 	case EMyLogPacket_DeviceClosed:

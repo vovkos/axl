@@ -4,51 +4,51 @@
 
 #pragma once
 
-#define _AXL_LOG_CACHEREPRESENTORTARGET_H
+#define _AXL_LOG_PAGEREPRESENTERTARGET_H
 
-#include "axl_log_Represent.h"
+#include "axl_log_Representer.h"
 #include "axl_log_MergeCriteria.h"
-#include "axl_log_CachePage.h"
+#include "axl_log_Page.h"
 
 namespace axl {
 namespace log {
 
 //.............................................................................
 
-class CCacheRepresentorTarget: public IRepresentorTarget 
+class CPageRepresenterTarget: public IRepresenterTarget 
 {
-	friend class CCacheMgr;
+	friend class CServer;
 
 public:
-	AXL_OBJ_CLASS_0 (CCacheRepresentorTarget, IRepresentorTarget);
+	AXL_OBJ_CLASS_0 (CPageRepresenterTarget, IRepresenterTarget);
 
 protected:
-	CCachePage* m_pPage;
-	TCacheVolatilePacket* m_pVolatilePacket;
-	
-	TMergeCriteria m_MergeCriteria;
-	
+	CPage* m_pPage;
 	CLine* m_pPrevPageMergeLine;
-	bool_t m_IsFirstLineOfPacket;
+
+	TMergeCriteria m_MergeCriteria;
+
+	size_t m_VolatilePacketIdx;
+	bool m_IsFirstLineOfPacket;
 	
 	uint64_t m_Timestamp;
 
 	size_t m_PacketOffset;
 	size_t m_BinOffset;
-	size_t m_PartIndex;	
+	size_t m_PartIdx;	
 	size_t m_MergeId;
 	
-	size_t m_LongestTextLine;
-	size_t m_LongestBinHexLine;
-	size_t m_LongestBinTextLine;
+	size_t m_LongestTextLineLength;
+	size_t m_LongestBinHexLineSize;
+	size_t m_LongestBinTextLineSize;
 	bool_t m_IsFull;
-	size_t m_Line;
-	size_t m_EndLine;
+	size_t m_NextLineIdx;
+	size_t m_EndLineIdx;
 
 public:
-	CCacheRepresentorTarget ();
+	CPageRepresenterTarget ();
 
-	~CCacheRepresentorTarget ();
+	~CPageRepresenterTarget ();
 
 	virtual 
 	void 
@@ -71,12 +71,14 @@ protected:
 	bool
 	CanAddLines ()
 	{
-		return m_Line < m_EndLine;
+		return m_NextLineIdx < m_EndLineIdx;
 	}
 
 	CLine* GetCurrentLine () 
 	{
-		return m_Line ? m_pPage->GetLine (m_Line - 1) : m_pPrevPageMergeLine;
+		return m_NextLineIdx ? 
+			m_pPage->GetLineArray () [m_NextLineIdx - 1] : 
+			m_pPrevPageMergeLine;
 	}
 
 	void 

@@ -23,43 +23,17 @@ namespace mt {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-class CEvent
+class CEventRoot
 {
-public:
+protected:
 	win::CEvent m_Event;	
 
-public:
-	CEvent ()
+protected:
+	CEventRoot () // protected construction
 	{
-		m_Event.Create (NULL, false, false, NULL);
 	}
-
-	bool
-	Signal ()
-	{ 
-		return m_Event.Signal ();
-	}
-
-	bool
-	Wait (uint_t Timeout = -1)
-	{
-		return m_Event.Wait (Timeout) == win::EWaitResult_Object0;
-	}
-};
-
-//.............................................................................
-
-class CNotificationEvent
-{
-public:
-	win::CEvent m_Event;	
 
 public:
-	CNotificationEvent ()
-	{
-		m_Event.Create (NULL, true, false, NULL);
-	}
-
 	bool
 	Signal ()
 	{ 
@@ -79,6 +53,28 @@ public:
 	}
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CEvent: public CEventRoot
+{
+public:
+	CEvent ()
+	{
+		m_Event.Create (NULL, false, false, NULL);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+		
+class CNotificationEvent: public CEventRoot
+{
+public:
+	CNotificationEvent ()
+	{
+		m_Event.Create (NULL, true, false, NULL);
+	}
+};
+
 //.............................................................................
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
@@ -92,6 +88,9 @@ protected:
 public:
 	bool
 	Signal ();
+
+	bool
+	Reset ();
 
 	bool
 	Wait (uint_t Timeout = -1)

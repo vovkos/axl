@@ -11,13 +11,18 @@ namespace log {
 CWidget::CWidget (gui::IEngine* pEngine):
 	gui::IWidget (pEngine)
 {
+	m_pServer = NULL;
+
+	m_SyncId = -1;
+/*
 	m_CacheMgr.m_pWidget = this;
 	m_CacheMgr.m_pIndexMgr = &m_IndexMgr;
 	m_ColorizeMgr.m_pCacheMgr = &m_CacheMgr;
 
 	m_pHyperlinkHandler = NULL;
 	m_pVolatilePacketFilter = NULL;
-
+*/
+	m_CachePageCountLimit = 64;
 	m_MaxBinBlockBuffer = 1024;
 
 	m_IconGapSize = 1;
@@ -32,6 +37,10 @@ CWidget::CWidget (gui::IEngine* pEngine):
 	m_FirstVisibleCol = 0;
 	m_VisibleLineCount = 0;
 	m_VisibleColCount = 0;
+
+	m_LongestTextLineLength = 0;
+	m_LongestBinHexLineSize = 0;
+	m_LongestBinTextLineSize = 0;
 
 	m_IsIconVisible = true;
 	m_IsTimestampVisible = true;
@@ -67,6 +76,7 @@ CWidget::CWidget (gui::IEngine* pEngine):
 	m_ColorArray [~gui::EColorFlag_Index & EColor_DelimiterBold]   = 0x808080;
 	m_ColorArray [~gui::EColorFlag_Index & EColor_Timestamp]       = gui::EStdPalColor_GrayText;
 	m_ColorArray [~gui::EColorFlag_Index & EColor_Offset]          = gui::EStdPalColor_GrayText;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_CacheMissBack]   = gui::EStdPalColor_GrayText;
 
 	m_Palette.m_pColorArray = m_ColorArray;
 	m_Palette.m_Count = countof (m_ColorArray);
@@ -84,9 +94,33 @@ CWidget::CWidget (gui::IEngine* pEngine):
 }
 
 bool
+CWidget::Create (
+	IServer* pServer,
+	const char* pIndexFileName
+	)
+{
+	ClearCache (-1);
+
+	bool Result = m_IndexFile.Open (pIndexFileName, io::EFileFlag_Exclusive | io::EFileFlag_DeleteOnClose);
+	if (!Result)
+		return false;
+
+	m_pServer = pServer;
+	return true;
+}
+
+bool
+CWidget::Copy ()
+{
+	return true;
+}
+
+/*
+
+bool
 CWidget::SetPacketFile (
 	CPacketFile* pPacketFile,
-	IRepresentor* pRepresentor
+	IRepresenter* pRepresenter
 	)
 {
 	bool Result;
@@ -95,7 +129,7 @@ CWidget::SetPacketFile (
 	
 	Result = m_IndexMgr.Create (
 		pPacketFile, 
-		pRepresentor, 
+		pRepresenter, 
 		rtl::CString (IndexFileName), 
 		io::EFileFlag_DeleteOnClose | io::EFileFlag_Exclusive
 		);
@@ -115,6 +149,8 @@ CWidget::SetPacketFile (
 	ReRepresentAll ();
 	return true;
 }
+
+*/
 
 void 
 CWidget::SetImageList (gui::IImageList* pImageList)
@@ -217,9 +253,9 @@ CWidget::RecalcBaseCol ()
 void 
 CWidget::RecalcColCount ()
 {
-	size_t BinHexColCount = m_CacheMgr.GetLongestBinHexLine () * 4 + m_HexGapSize + m_FullOffsetWidth;
-	size_t BinTextColCount = m_CacheMgr.GetLongestBinTextLine () + m_FullOffsetWidth;
-	size_t ColCount = m_CacheMgr.GetLongestTextLine ();
+	size_t BinHexColCount = m_LongestBinHexLineSize * 4 + m_HexGapSize + m_FullOffsetWidth;
+	size_t BinTextColCount = m_LongestBinTextLineSize + m_FullOffsetWidth;
+	size_t ColCount = m_LongestTextLineLength;
 	
 	if (BinHexColCount > ColCount)
 		ColCount = BinHexColCount;
@@ -233,10 +269,10 @@ CWidget::RecalcColCount ()
 		RecalcHScroll ();
 	}
 }
-
+/*
 void
 CWidget::OnReRepresentPacket (
-	CCachePage* pPage,
+	CPage* pPage,
 	TReRepresent* pReRepresent
 	)
 {
@@ -272,7 +308,7 @@ CWidget::OnReRepresentPacket (
 
 bool
 CWidget::ModifyPacketVolatileFlags (
-	CCachePage* pPage,
+	CPage* pPage,
 	TCacheVolatilePacket* pVolatileMsg,
 	uint_t VolatileFlags
 	)
@@ -323,7 +359,7 @@ CWidget::IncrementalUpdateLog ()
 	TIndexNode* pNode = m_IndexMgr.GetIndexFile ()->FindLeafByLine (AnchorLine, NULL);
 	while (pNode)
 	{
-		CCachePage* pPage = m_CacheMgr.FindCachePageByIndexNode (pNode);
+		CPage* pPage = m_CacheMgr.FindCachePageByIndexNode (pNode);
 		if (pPage)
 		{
 			if (pPage->IsEmpty ())
@@ -364,6 +400,7 @@ CWidget::FullUpdateLog ()
 
 	Redraw ();
 }
+*/
 
 void
 CWidget::OnSetFocus (
@@ -411,395 +448,6 @@ CWidget::OnSize (
 		UpdateCaretPos ();
 	}
 }
-
-/*
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// message handlers
-
-LRESULT
-CWidget::NotifyParent (
-	uint_t Code,
-	NMHDR* pNotify
-	)
-{
-	HWND hWndParent = GetParent (m_hWnd);
-
-	NMHDR Notify;
-	if (!pNotify)
-		pNotify = &Notify;
-
-	pNotify->code = Code;
-	pNotify->hwndFrom = m_hWnd;
-	pNotify->idFrom = GetDlgCtrlID(m_hWnd);
-	
-	return SendPacket (hWndParent, WM_NOTIFY, pNotify->idFrom, (LPARAM) pNotify);
-}
-
-LRESULT 
-AXL_VFT
-CWidget::WindowProc (
-	TLogCtrl* 
-	UINT Msg,
-	WPARAM wParam,
-	LPARAM lParam,
-	bool_t* pIsHandled
-	)
-{
-	LRESULT Result = 0;
-
-	if (Msg >= WM_MOUSEFIRST && Msg <= WM_MOUSELAST)
-	{
-		MSG MsgStruct = { m_hWnd, Msg, wParam, lParam };
-		SendPacket (m_hWndToolTip, TTM_RELAYEVENT, 0, (LPARAM) &MsgStruct);
-	}
-
-	if (Msg >= WM_NCMOUSEFIRST && Msg <= WM_NCMOUSELAST)
-		SendPacket (m_hWndToolTip, TTM_ACTIVATE, false, 0);
-
-	switch (Msg)
-	{
-		// std windows msg
-
-	case WM_CREATE:
-		Result = OnCreate ();
-		break;
-
-	case WM_DESTROY:
-		Result = OnDestroy ();
-		break;
-
-	case WM_GETDLGCODE:
-		Result = DLGC_WANTTAB | DLGC_WANTARROWS | DLGC_WANTCHARS;
-		break;
-
-	case WM_SETFOCUS:
-		Result = OnSetFocus ();
-		break;
-
-	case WM_KILLFOCUS:
-		Result = OnKillFocus ();
-		break;
-
-	case WM_THEMECHANGED:
-		TStockCtrlPaint_CloseThemes (&m_StockCtrlPaint);
-		break;
-
-	case WM_NCPAINT:
-		TStockCtrlPaint_NcPaintEdge (&m_StockCtrlPaint, m_hWnd, (HRGN) wParam);
-		break;
-
-	case WM_PAINT:
-		Result = OnPaint ();
-		break;
-
-	case WM_SIZE:
-		Result = OnSize ();
-		break;
-
-	case WM_HSCROLL:
-		OnScroll (SB_HORZ, LOWORD(wParam));
-		break;
-
-	case WM_VSCROLL:
-		OnScroll (SB_VERT, LOWORD(wParam));
-		break;
-
-	case WM_SETCURSOR:
-		Result = OnSetCursor (wParam, lParam);
-		break;
-
-	case WM_LBUTTONDOWN:
-		Result = OnLButtonDown ((short) LOWORD(lParam), (short) HIWORD(lParam));
-		break;
-
-	case WM_RBUTTONDOWN:
-		Result = OnRButtonDown ((short) LOWORD(lParam), (short) HIWORD(lParam));
-		break;
-
-	case WM_MOUSEMOVE:
-		Result = OnMouseMove ((short) LOWORD(lParam), (short) HIWORD(lParam));
-		break;
-
-	case WM_MOUSEWHEEL:
-		Result = OnMouseWheel (HIWORD(wParam));
-		break;
-
-	case WM_LBUTTONUP:
-	case WM_RBUTTONUP:
-		m_IsDragging = false;
-		ReleaseCapture ();
-		break;
-
-	case WM_CAPTURECHANGED:
-		m_IsDragging = false;
-		break;
-
-	case WM_KEYDOWN:
-		OnKeyDown ((int) wParam);
-		break;
-
-	// log ctrl msg
-
-	case EMsg_GetPacketFile:
-		Result = (LRESULT) m_pPacketFile;
-		break;
-
-	case EMsg_SetPacketFile:
-		{
-		TMsgSetPacketFile* pSetPacketFile = (TMsgSetPacketFile*) lParam;
-		Result = SetPacketFile (pSetPacketFile->m_pFile, pSetPacketFile->m_pRepresentor);
-		break;
-		}
-
-	case EMsg_GetRepresentor:
-		Result = (LRESULT) m_pRepresentor;
-		break;
-
-	case EMsg_SetRepresentor:
-		SetRepresentor ((TRepresentor*) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetFilter:
-		Result = (LRESULT) m_pFilter;
-		break;
-
-	case EMsg_SetFilter:
-		SetFilter ((TFilter*) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetColorizer:
-		Result = (LRESULT) m_pFilter;
-		break;
-
-	case EMsg_SetColorizer:
-		SetColorizer ((TColorizer*) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetHyperlinkHandler:
-		Result = (LRESULT) m_pHyperlinkHandler;
-		break;
-
-	case EMsg_SetHyperlinkHandler:
-		SetHyperlinkHandler ((THyperlinkHandler*) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetImageList:
-		Result = (LRESULT) m_hImageList;
-		break;
-
-	case EMsg_SetImageList:
-		SetImageList ((HIMAGELIST) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_IsIconVisible:
-		Result = (LRESULT) m_IsIconVisible;
-		break;
-
-	case EMsg_ShowIcon:
-		ShowIcon ((BOOL) wParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetOffsetWidth:
-		Result = (LRESULT) m_OffsetWidth;
-		break;
-
-	case EMsg_SetOffsetWidth:
-		SetOffsetWidth ((size_t) wParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_IsTimestampVisible:
-		Result = (LRESULT) m_IsTimestampVisible;
-		break;
-
-	case EMsg_ShowTimestamp:
-		ShowTimestamp ((BOOL) wParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_SetTimestampFormat:
-		SetTimestampFormat ((const char*) lParam);
-		break;
-
-	case EMsg_GetTimestampFormat:
-		Result = (LRESULT) m_TimestampFormat.m_p;
-		break;
-
-	case EMsg_GetDefBinDataConfig:
-		Result = (LRESULT) TIndexMgr_GetDefBinDataConfig (&m_IndexMgr);
-		break;
-
-	case EMsg_SetDefBinDataConfig:
-		TIndexMgr_SetDefBinDataConfig (&m_IndexMgr, (const TBinDataConfig*) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_UpdateLog:
-		UpdateLog ();
-		Result = TRUE;
-		break;
-
-	case EMsg_ReRepresentAll:
-		ReRepresentAll ();
-		Result = TRUE;
-		break;
-
-	case EMsg_ReFilterAll:
-		ReFilterAll ();
-		Result = TRUE;
-		break;
-
-	case EMsg_ReColorizeAll:
-		ReColorizeAll ();
-		Result = TRUE;
-		break;
-
-	case EMsg_ModifyLineVolatileFlags:
-		Result = ModifyLineVolatileFlags ((CLine*) lParam, (size_t) wParam);
-		break;
-
-	case EMsg_GetLineCount:
-		Result = (LRESULT) m_LineCount;
-		break;
-
-	case EMsg_GetLine:
-		Result = (LRESULT) m_CacheMgr.GetLine ((size_t) wParam);
-		break;
-
-	case EMsg_GetNextLine:
-		Result = (LRESULT) m_CacheMgr.GetNextLine ((CLine*) lParam);
-		break;
-
-	case EMsg_GetPrevLine:
-		Result = (LRESULT) m_CacheMgr.GetPrevLine ((CLine*) lParam);
-		break;
-
-	case EMsg_GetLineString:
-		break;
-
-	case EMsg_GetCursorPos:
-		*(TCursorPos*) lParam = m_CursorPos;
-		Result = TRUE;
-		break;
-
-	case EMsg_SetCursorPos:
-		SetCursorPos ((TCursorPos*) lParam, false);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetSelection:
-		*(TCursorPos*) wParam = m_SelStart;
-		*(TCursorPos*) lParam = m_SelEnd;
-		Result = TRUE;
-		break;
-
-	case EMsg_IsSelectionEmpty:
-		Result = (LRESULT) IsSelectionEmpty ();
-		break;
-
-	case EMsg_SetSelection:
-		SetSelection ((TCursorPos*) wParam, (TCursorPos*) lParam);
-		Result = TRUE;
-		break;
-
-	case EMsg_GetHilite:
-		break;
-
-	case EMsg_SetHilite:
-		break;
-
-	case EMsg_SelectBinRange:
-		break;
-
-	case EMsg_HiliteBinRange:
-		break;
-
-	case EMsg_EnsureVisible:
-		break;
-
-	case EMsg_EnsureVisibleRange:
-		break;
-
-	case EMsg_GetRangeBinBlock:
-		break;
-
-	case EMsg_ProcessRange:
-		break;
-
-	case EMsg_ProcessRangeAsBinBlock:
-		break;
-
-	case EMsg_GetSelectionBinBlock:
-		Result = (LPARAM) GetSelectionBinBlock ((size_t*) wParam, (size_t*) lParam);
-		break;
-
-	case EMsg_ProcessSelection:
-		Result = (LPARAM) ProcessSelection ((FProcessLine) wParam, (void*) lParam);
-		break;
-
-	case EMsg_ProcessSelectionAsBinBlock:
-		Result = (LPARAM) ProcessSelectionAsBinBlock ((FProcessBinBlock) wParam, (void*) lParam);
-		break;
-
-	case EMsg_SetFindPattern:
-		{
-		TMsgSetFindPattern* pSetPattern = (TMsgSetFindPattern*) lParam;
-		Result = (LRESULT) axl_rtl_TBmhFind_SetPattern (
-			&m_Find, 
-			pSetPattern->m_p, 
-			pSetPattern->m_Size, 
-			pSetPattern->m_DoMatchCase
-			);
-		}
-		break;
-
-	case EMsg_CanFind:
-		Result = (LRESULT) axl_rtl_TBmhFind_CanFind (&m_Find);
-		break;
-
-	case EMsg_FindNext:
-		Result = (LRESULT) FindNext ();
-		break;
-
-	case EMsg_FindPrev:
-		Result = (LRESULT) FindPrev ();
-		break;
-
-	case EMsg_CanCopy:
-		Result = (LRESULT) !IsSelectionEmpty ();
-		break;
-
-	case EMsg_Copy:
-		Result = (LRESULT) Copy ();
-		break;
-
-	case EMsg_CopyString:
-		Result = (LRESULT) CopyString ((axl_rtl_TString*) lParam);
-		break;
-
-	case EMsg_SaveAsTextFile:
-		Result = (LRESULT) SaveAsTextFile ((const char*) lParam, (axl_rtl_TBinTree*) wParam);
-		break;
-
-	case EMsg_HitTest:
-		break;
-
-	default:
-		*pIsHandled = false;
-	}
- 
-	return Result;
-}
-
-*/
 
 //.............................................................................
 

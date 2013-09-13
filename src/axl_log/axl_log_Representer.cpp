@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_log_Represent.h"
+#include "axl_log_Representer.h"
 
 namespace axl {
 namespace log {
@@ -7,7 +7,7 @@ namespace log {
 //.............................................................................
 
 void
-IRepresentorTarget::AddText0 (
+IRepresenterTarget::AddText0 (
 	EPart PartKind,
 	uint_t PartCode,
 	uint_t MergeFlags,
@@ -28,7 +28,7 @@ IRepresentorTarget::AddText0 (
 }
 
 void
-IRepresentorTarget::AddText_va (
+IRepresenterTarget::AddText_va (
 	EPart PartKind,
 	uint_t PartCode,
 	uint_t MergeFlags,
@@ -44,8 +44,8 @@ IRepresentorTarget::AddText_va (
 //.............................................................................
 
 bool 
-CRepresentorStack::Represent (
-	IRepresentorTarget* pTarget, 
+CRepresenterStack::Represent (
+	IRepresenterTarget* pTarget, 
 	uint32_t PacketCode, 
 	const void* p, 
 	size_t Size, 
@@ -55,8 +55,8 @@ CRepresentorStack::Represent (
 	size_t Count = GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		IRepresentor* pRepresentor = m_p [i];
-		bool Result = pRepresentor->Represent (pTarget, PacketCode, p, Size, VolatileFlags);
+		IRepresenter* pRepresenter = m_p [i];
+		bool Result = pRepresenter->Represent (pTarget, PacketCode, p, Size, VolatileFlags);
 		if (Result)
 			return true;
 	}

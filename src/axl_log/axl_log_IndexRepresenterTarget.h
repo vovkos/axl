@@ -4,38 +4,39 @@
 
 #pragma once
 
-#define _AXL_LOG_REPRESENT_H
+#define _AXL_LOG_INDEXREPRESENTERTARGET_H
 
-#include "axl_log_Represent.h"
+#include "axl_log_Representer.h"
+#include "axl_log_MergeCriteria.h"
 
 namespace axl {
 namespace log {
 
 //.............................................................................
 
-struct TIndexRepresentorTargetData
+struct TIndexRepresenterTargetData
 {
 	size_t m_LineCount;
 	size_t m_Col;
 	size_t m_BinOffset;
-	size_t m_PartIndex;
+	size_t m_PartIdx;
 	size_t m_MergeId;
 
 	TMergeCriteria m_MergeCriteria;
 
-	TIndexRepresentorTargetData ();
+	TIndexRepresenterTargetData ();
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CIndexRepresentorTarget: 
-	public IRepresentorTarget,
-	public TIndexRepresentorTargetData
+class CIndexRepresenterTarget: 
+	public IRepresenterTarget,
+	public TIndexRepresenterTargetData
 {
-	friend class CIndexMgr;
+	friend class CServer;
 
 public:
-	AXL_OBJ_CLASS_0 (CIndexRepresentorTarget, IRepresentorTarget);
+	AXL_OBJ_CLASS_0 (CIndexRepresenterTarget, IRepresenterTarget);
 	
 public:
 	virtual 

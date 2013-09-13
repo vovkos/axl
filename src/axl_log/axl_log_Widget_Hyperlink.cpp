@@ -15,12 +15,9 @@ CWidget::GetHyperlinkFromMousePos (
 	rtl::CString* pHyperlink
 	)
 {
-	if (!m_IndexMgr.IsOpen ())
-		return false;
-
 	gui::TCursorPos Pos = GetCursorPosFromMousePos (x, y, false);
 
-	CLine* pLine = m_CacheMgr.GetLine (Pos.m_Line);
+	CLine* pLine = GetLine (Pos.m_Line);
 	if (!pLine || pLine->m_LineKind != ELine_Text)
 		return false;
 
@@ -45,7 +42,7 @@ CWidget::OnHyperlink (
 	const char* pHyperlink
 	)
 {
-	if (m_pHyperlinkHandler)
+/*	if (m_pHyperlinkHandler)
 	{
 		bool Result = m_pHyperlinkHandler->OnHyperlink (pLine, pHyperlink);
 		if (Result)
@@ -92,7 +89,7 @@ CWidget::OnHyperlink (
 		if (!pEnd)
 			break;
 
-		CBinLine* pBinLine = pLine->GetCachePage ()->ScanUntilBinLine (pLine);
+		CBinLine* pBinLine = pLine->GetCachePage ()->FindFirstBinLine (pLine);
 		if (pBinLine)
 			HiliteBinRange (pBinLine, Offset, Length);
 		break;
@@ -101,6 +98,7 @@ CWidget::OnHyperlink (
 	default:
 		mt::CreateProcess (pHyperlink);
 	}	
+*/
 }
 
 //.............................................................................

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_LOG_COLORIZE_H
+#define _AXL_LOG_COLORIZER_H
 
 #include "axl_log_BinLine.h"
 
@@ -54,7 +54,7 @@ public:
 struct TColorizeBlock
 {
 	uint_t m_PartCode;
-	size_t m_PartIndex;
+	size_t m_PartIdx;
 	uint64_t m_Timestamp;
 	size_t m_Offset;
 	const void* m_p;

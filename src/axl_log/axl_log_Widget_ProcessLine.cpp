@@ -15,7 +15,7 @@ CWidget::GetBinOffset (
 	size_t* pMergeId
 	)
 {
-	CLine* pLine = m_CacheMgr.GetLine (Pos.m_Line);
+	CLine* pLine = GetLine (Pos.m_Line);
 	return pLine && pLine->IsBin () ? 
 		((CBinLine*) pLine)->GetBinLineOffset (Pos.m_Col, pOffset, pLineOffset, pHexCol, pMergeId) : 
 		false;
@@ -126,7 +126,7 @@ CWidget::ProcessRangeAsBinBlock (
 
 	// first line
 
-	CBinLine* pLine = (CBinLine*) m_CacheMgr.GetLine (PosStart.m_Line);
+	CBinLine* pLine = (CBinLine*) GetLine (PosStart.m_Line);
 	ASSERT (pLine->IsBin ());
 
 	if (PosStart.m_Line == PosEnd.m_Line) // special case -- single line
@@ -146,7 +146,7 @@ CWidget::ProcessRangeAsBinBlock (
 
 	for (int i = PosStart.m_Line + 1; i < PosEnd.m_Line; i++)
 	{
-		pLine = (CBinLine*) m_CacheMgr.GetNextLine ((CLine*) pLine);
+		pLine = (CBinLine*) GetNextLine ((CLine*) pLine);
 		ASSERT (pLine->IsBin ());
 
 		LineSize = pLine->m_BinData.GetCount ();
@@ -155,7 +155,7 @@ CWidget::ProcessRangeAsBinBlock (
 
 	// last line
 
-	pLine = (CBinLine*) m_CacheMgr.GetNextLine ((CLine*) pLine);
+	pLine = (CBinLine*) GetNextLine ((CLine*) pLine);
 	ASSERT (pLine->IsBin ());
 	IncapsulateOrProcessBinBlock (pLine->m_BinData, EndLineOffset, pProcess);
 
@@ -184,7 +184,7 @@ CWidget::ProcessRange (
 
 	// first line
 
-	CLine* pLine = m_CacheMgr.GetLine (PosStart.m_Line);
+	CLine* pLine = GetLine (PosStart.m_Line);
 	if (PosStart.m_Line == PosEnd.m_Line) // special case -- single line
 	{
 		pProcess->Process (pLine, NULL, PosStart.m_Col, PosEnd.m_Col);
@@ -198,14 +198,14 @@ CWidget::ProcessRange (
 	for (int i = PosStart.m_Line + 1; i < PosEnd.m_Line; i++)
 	{
 		CLine* pPrevLine = pLine;
-		pLine = m_CacheMgr.GetNextLine ((CLine*) pLine);
+		pLine = GetNextLine ((CLine*) pLine);
 		pProcess->Process (pLine, pPrevLine, 0, -1);
 	}
 
 	// last line
 
 	CLine* pPrevLine = pLine;
-	pLine = m_CacheMgr.GetNextLine (pLine);
+	pLine = GetNextLine (pLine);
 	pProcess->Process (pLine, pPrevLine, 0, PosEnd.m_Col);
 
 	return PosEnd.m_Line - PosStart.m_Line + 1;
@@ -311,14 +311,14 @@ CWidget::SaveAsTextFile (
 	axl_sys_TFile_SetSize (&File, 0);
 	axl_rtl_TString_Construct (&String);
 
-	pLine = m_CacheMgr.GetLine (0);
+	pLine = GetLine (0);
 	while (pLine)
 	{
 		GetLineString (pLine, &String, pIconToCharMap);
 		Length = axl_rtl_TString_GetLength (&String);
 		axl_sys_TFile_Write (&File, String.m_p, Length * sizeof (char));
 		axl_sys_TFile_Write (&File, "\r\n", 2 * sizeof (char));
-		pLine = m_CacheMgr.GetNextLine (pLine);
+		pLine = GetNextLine (pLine);
 	}
 
 	axl_rtl_TString_Destruct (&String);

@@ -1,37 +1,37 @@
 #include "pch.h"
-#include "axl_log_CacheRepresentorTarget.h"
+#include "axl_log_PageRepresenterTarget.h"
 
 namespace axl {
 namespace log {
 
 //.............................................................................
 
-CCacheRepresentorTarget::CCacheRepresentorTarget ()
+CPageRepresenterTarget::CPageRepresenterTarget ()
 {
 	m_pPage = NULL;
-	m_pVolatilePacket = NULL;
 	m_pPrevPageMergeLine = NULL;
+	m_VolatilePacketIdx = -1;
 	m_PacketOffset = 0;
 	m_Timestamp = 0;
 	m_BinOffset = 0;
-	m_PartIndex = 0;
+	m_PartIdx = 0;
 	m_MergeId = 0;
-	m_Line = 0;
-	m_EndLine = 0;
-	m_LongestTextLine = 0;
-	m_LongestBinHexLine = 0;
-	m_LongestBinTextLine = 0;
+	m_NextLineIdx = 0;
+	m_EndLineIdx = 0;
+	m_LongestTextLineLength = 0;
+	m_LongestBinHexLineSize = 0;
+	m_LongestBinTextLineSize = 0;
 	m_IsFull = false;
 }
 
-CCacheRepresentorTarget::~CCacheRepresentorTarget ()
+CPageRepresenterTarget::~CPageRepresenterTarget ()
 {
 	if (m_pPrevPageMergeLine)
 		AXL_MEM_DELETE (m_pPrevPageMergeLine);
 }
 
 void 
-CCacheRepresentorTarget::AddPart (
+CPageRepresenterTarget::AddPart (
 	EPart PartKind,
 	uint_t PartCode,
 	uint_t MergeFlags,
@@ -56,7 +56,7 @@ CCacheRepresentorTarget::AddPart (
 	{
 		MergeFlags = 0;
 		m_BinOffset = 0;
-		m_PartIndex = 0;
+		m_PartIdx = 0;
 		m_MergeId++;
 	}
 	else
@@ -82,11 +82,11 @@ CCacheRepresentorTarget::AddPart (
 		break;
 	}
 
-	m_PartIndex++;
+	m_PartIdx++;
 }
 
 void 
-CCacheRepresentorTarget::AddText (
+CPageRepresenterTarget::AddText (
 	uint_t PartCode,
 	uint_t MergeFlags,
 	const char* pText,
@@ -116,8 +116,8 @@ CCacheRepresentorTarget::AddText (
 			pLine->m_HyperText.AppendHyperText (p, pCr ? pCr - p : pEnd - p) :
 			pLine->m_HyperText.AppendPlainText (p, pCr ? pCr - p : pEnd - p);
 
-		if (LineLength > m_LongestTextLine)
-			m_LongestTextLine = LineLength;
+		if (LineLength > m_LongestTextLineLength)
+			m_LongestTextLineLength = LineLength;
 
 		if (!pCr)
 			return;
@@ -139,8 +139,8 @@ CCacheRepresentorTarget::AddText (
 			pLine->m_HyperText.AppendHyperText (p, pCr ? pCr - p : pEnd - p) :
 			pLine->m_HyperText.AppendPlainText (p, pCr ? pCr - p : pEnd - p);
 
-		if (LineLength > m_LongestTextLine)
-			m_LongestTextLine = LineLength;
+		if (LineLength > m_LongestTextLineLength)
+			m_LongestTextLineLength = LineLength;
 
 		if (!pCr)
 			return;
@@ -150,7 +150,7 @@ CCacheRepresentorTarget::AddText (
 }
 
 void 
-CCacheRepresentorTarget::AddBinText (
+CPageRepresenterTarget::AddBinText (
 	uint_t PartCode,
 	uint_t MergeFlags,
 	const void* _p,
@@ -173,14 +173,14 @@ CCacheRepresentorTarget::AddBinText (
 		if (MergeFlags & EMergeFlag_OverrideLineAttr)
 			pLine->m_LineAttr = m_LineAttr;
 
-		ChunkSize = pLine->AddData (m_Timestamp, m_LineAttr, p, Size);
+		ChunkSize = pLine->AddBinData (m_Timestamp, m_LineAttr, p, Size);
 		p += ChunkSize;
 		Size -= ChunkSize;
 		m_BinOffset += ChunkSize;
 
 		Length = pLine->m_BinText.GetLength ();
-		if (Length > m_LongestTextLine)
-			m_LongestTextLine = Length;
+		if (Length > m_LongestTextLineLength)
+			m_LongestTextLineLength = Length;
 	}
 
 	while (p < pEnd)
@@ -189,14 +189,14 @@ CCacheRepresentorTarget::AddBinText (
 		if (!pLine)
 			break;
 
-		ChunkSize = pLine->AddData (m_Timestamp, m_LineAttr, p, Size);
+		ChunkSize = pLine->AddBinData (m_Timestamp, m_LineAttr, p, Size);
 		p += ChunkSize;
 		Size -= ChunkSize;
 		m_BinOffset += ChunkSize;
 
 		Length = pLine->m_BinText.GetLength ();
-		if (Length > m_LongestTextLine)
-			m_LongestTextLine = Length;
+		if (Length > m_LongestTextLineLength)
+			m_LongestTextLineLength = Length;
 	}
 
 	// special case: data block is ended on LF, have to add extra line
@@ -204,12 +204,12 @@ CCacheRepresentorTarget::AddBinText (
 	if (*(p - 1) == '\n')
 		AddBinTextLine (PartCode);
 
-	if (m_BinDataConfig.m_BinTextLineSize > m_LongestBinTextLine)
-		m_LongestBinTextLine = m_BinDataConfig.m_BinTextLineSize;
+	if (m_BinDataConfig.m_BinTextLineSize > m_LongestBinTextLineSize)
+		m_LongestBinTextLineSize = m_BinDataConfig.m_BinTextLineSize;
 }
 
 void 
-CCacheRepresentorTarget::AddBinHex (
+CPageRepresenterTarget::AddBinHex (
 	uint_t PartCode,
 	uint_t MergeFlags,
 	const void* _p,
@@ -239,7 +239,7 @@ CCacheRepresentorTarget::AddBinHex (
 		{
 			ChunkSize = m_BinDataConfig.m_BinHexLineSize - LastLineSize;
 			ChunkSize = AXL_MIN (ChunkSize, Size);
-			pLine->AddData (m_Timestamp, m_LineAttr, p, ChunkSize);
+			pLine->AddBinData (m_Timestamp, m_LineAttr, p, ChunkSize);
 			p += ChunkSize;
 			Size -= ChunkSize;
 			m_BinOffset += ChunkSize;
@@ -253,37 +253,36 @@ CCacheRepresentorTarget::AddBinHex (
 			break;
 
 		ChunkSize = AXL_MIN (m_BinDataConfig.m_BinHexLineSize, Size);
-		pLine->AddData (m_Timestamp, m_LineAttr, p, ChunkSize);
+		pLine->AddBinData (m_Timestamp, m_LineAttr, p, ChunkSize);
 		p += ChunkSize;
 		Size -= ChunkSize;
 		m_BinOffset += ChunkSize;
 	}
 
-	if (m_BinDataConfig.m_BinHexLineSize > m_LongestBinHexLine)
-		m_LongestBinHexLine = m_BinDataConfig.m_BinHexLineSize;
+	if (m_BinDataConfig.m_BinHexLineSize > m_LongestBinHexLineSize)
+		m_LongestBinHexLineSize = m_BinDataConfig.m_BinHexLineSize;
 }
 
 void
-CCacheRepresentorTarget::AddLine (
+CPageRepresenterTarget::AddLine (
 	CLine* pLine,
 	uint_t PartCode
 	)
 {
-	CLine** ppLine = (CLine**) m_pPage->m_LineArray + m_Line;
-
 	ASSERT (CanAddLines ());
-	ASSERT (m_Line < m_pPage->m_LineArray.GetCount ());
+
+	CLine** ppLine = &m_pPage->m_LineArray [m_NextLineIdx];
 	ASSERT (!*ppLine);
 
 	*ppLine = pLine;
 
 	pLine->m_pPage = m_pPage;
 	pLine->m_IsFirstLineOfPacket = m_IsFirstLineOfPacket;
-	pLine->m_pVolatilePacket = m_pVolatilePacket;
-	pLine->m_PageIndex = m_Line;
+	pLine->m_LineIdx = m_NextLineIdx;
+	pLine->m_VolatilePacketIdx = m_VolatilePacketIdx;
 	pLine->m_PartCode = PartCode;
 	pLine->m_MergeId = m_MergeId;
-	pLine->m_PartIndex = m_PartIndex;
+	pLine->m_PartIdx = m_PartIdx;
 	pLine->m_FirstPacketOffset = m_PacketOffset;
 	pLine->m_FirstTimestamp = m_Timestamp;
 	pLine->m_LastTimestamp = m_Timestamp;
@@ -292,21 +291,23 @@ CCacheRepresentorTarget::AddLine (
 		pLine->m_LineAttr.m_Icon = -1;
 
 	m_IsFirstLineOfPacket = false;
-	m_Line++;
 
 	// link line and volatile packet
 
-	if (pLine->m_pVolatilePacket)
+	if (pLine->m_VolatilePacketIdx != -1)
 	{
-		if (!pLine->m_pVolatilePacket->m_pFirstLine)
-			pLine->m_pVolatilePacket->m_pFirstLine = pLine;
+		TPageVolatilePacket* pVolatilePacket = &m_pPage->m_VolatilePacketArray [pLine->m_VolatilePacketIdx];
+		if (pVolatilePacket->m_FirstLineIdx == -1)
+			pVolatilePacket->m_FirstLineIdx = m_NextLineIdx;
 
-		pLine->m_pVolatilePacket->m_LineCount++;
+		pVolatilePacket->m_LineCount++;
 	}
+
+	m_NextLineIdx++;
 }
 
 CTextLine* 
-CCacheRepresentorTarget::AddTextLine (uint_t PartCode)
+CPageRepresenterTarget::AddTextLine (uint_t PartCode)
 {
 	if (!CanAddLines ())
 	{
@@ -320,7 +321,7 @@ CCacheRepresentorTarget::AddTextLine (uint_t PartCode)
 }
 
 CBinTextLine* 
-CCacheRepresentorTarget::AddBinTextLine (uint_t PartCode)
+CPageRepresenterTarget::AddBinTextLine (uint_t PartCode)
 {
 	if (!CanAddLines ())
 	{
@@ -330,13 +331,13 @@ CCacheRepresentorTarget::AddBinTextLine (uint_t PartCode)
 
 	CBinTextLine* pLine = AXL_MEM_NEW (CBinTextLine);
 	AddLine (pLine, PartCode);
-	pLine->m_Offset = m_BinOffset;
+	pLine->m_BinOffset = m_BinOffset;
 	pLine->m_BinDataConfig = m_BinDataConfig;
 	return pLine;
 }
 
 CBinLine* 
-CCacheRepresentorTarget::AddBinHexLine (uint_t PartCode)
+CPageRepresenterTarget::AddBinHexLine (uint_t PartCode)
 {
 	if (!CanAddLines ())
 	{
@@ -344,15 +345,15 @@ CCacheRepresentorTarget::AddBinHexLine (uint_t PartCode)
 		return NULL;
 	}
 
-	CBinLine* pLine = AXL_MEM_NEW (CBinLine);
+	CBinHexLine* pLine = AXL_MEM_NEW (CBinHexLine);
 	AddLine (pLine, PartCode);
-	pLine->m_Offset = m_BinOffset;	
+	pLine->m_BinOffset = m_BinOffset;	
 	pLine->m_BinDataConfig = m_BinDataConfig;
 	return pLine;
 }
 
 CLine* 
-CCacheRepresentorTarget::CreatePrevPageMergeLine (
+CPageRepresenterTarget::CreatePrevPageMergeLine (
 	const TMergeCriteria& MergeCriteria,
 	size_t MergeTrailCol
 	)
@@ -375,6 +376,7 @@ CCacheRepresentorTarget::CreatePrevPageMergeLine (
 	case ELine_BinText:
 		{
 		CBinTextLine* pLine = AXL_MEM_NEW (CBinTextLine);
+		pLine->m_BinData.SetCount (MergeTrailCol);
 		pLine->m_BinText.Copy ('.', MergeTrailCol);
 		m_pPrevPageMergeLine = pLine;
 		break;
@@ -382,7 +384,7 @@ CCacheRepresentorTarget::CreatePrevPageMergeLine (
 
 	case ELine_BinHex:
 		{
-		CBinLine* pLine = AXL_MEM_NEW (CBinLine);
+		CBinHexLine* pLine = AXL_MEM_NEW (CBinHexLine);
 		pLine->m_BinData.SetCount (MergeTrailCol);
 		m_pPrevPageMergeLine = pLine;
 		break;
@@ -393,7 +395,7 @@ CCacheRepresentorTarget::CreatePrevPageMergeLine (
 	}
 
 	m_pPrevPageMergeLine->m_pPage = m_pPage;
-	m_pPrevPageMergeLine->m_PageIndex = -1;
+	m_pPrevPageMergeLine->m_LineIdx = -1;
 	return m_pPrevPageMergeLine;
 }
 

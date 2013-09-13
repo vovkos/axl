@@ -1,5 +1,5 @@
 // jancy provides a way to extend functionality of existing classes with extension namespaces.
-// extension namespace provides additional methods which have access to all the members 
+// extension namespace declares additional methods which have access to all the members 
 // of the class they extend. there are certain limitations imposed on those extension methods 
 // in order to ensure that if some code runs without extension namespaces, it runs exactly the same 
 // with introduction of any extension namespace(s)

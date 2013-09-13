@@ -30,15 +30,6 @@ struct TIndexFileHdr
 	uint32_t m_Signature; // EIndexFile_FileSignature
 	uint32_t m_Version;
 
-	// log file <-> index file sync portion
-
-	uint32_t m_PacketCount;
-	uint32_t m_TotalPacketSize;
-	uint32_t m_LastPacketOffset;
-	uint32_t m_ClearCount;
-
-	// index file properties
-
 	uint32_t m_NodeCount;
 	uint32_t m_NodeEnd;
 	uint32_t m_RootNode;
@@ -57,34 +48,35 @@ struct TIndexNode
 	uint32_t m_Right;     // for a leaf, its next leaf; otherwise its right child
 	uint32_t m_Depth;     // 0 - it's a leaf, otherwise - it's a node
 	uint32_t m_LineCount;
-	uint32_t m_DataSize;  // leaf could be followed by leaf data
+	uint32_t m_LeafDataSize;  
 
 #ifdef _DEBUG
 	uint32_t m_RotationCount;
 #endif
 
+	// leaf nodes are followed by TIndexLeaf
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TIndexLeafData
+struct TIndexLeaf
 {
 	uint32_t m_PacketOffset;
 	uint32_t m_PacketCount;
 	uint32_t m_VolatilePacketCount;
 	uint32_t m_BinOffset;
-	uint32_t m_PartIndex;
+	uint32_t m_PartIdx;
 	uint32_t m_MergeId;
 	uint32_t m_Col;
 	TBinDataConfig m_DefBinDataConfig;
-	TMergeCriteria m_MergeCriteria;
+	TMergeCriteria m_MergeCriteria;	
+
+	// possibly followed by array of TIndexVolatilePacket
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// every volatile packet in the node has TVolatilePacketData
-
-struct TVolatilePacketData
+struct TIndexVolatilePacket
 {
 	uint32_t m_VolatileFlags; // hidden, expanded, etc.
 	uint32_t m_Offset;        // for effective re-filtering all packets (this way we can iterate through volatile msg array)
@@ -200,8 +192,8 @@ public:
 	GetLeafStartLine (TIndexNode* pNode) const;
 
 	TIndexNode* 
-	FindLeafByLine (
-		size_t Line, 
+	FindLeaf (
+		size_t LineIdx, 
 		size_t* pStartLine
 		) const;
 
@@ -212,13 +204,16 @@ public:
 	RemoveTailLeaf ();
 
 	size_t 
-	AddTailLeafData (
+	SetTailLeafData (
 		const void* p, 
 		size_t Size
 		);
 
 	size_t 
-	RemoveTailLeafData (size_t Size);
+	AddTailLeafData (
+		const void* p, 
+		size_t Size
+		);
 
 	void 
 	AddLeafLines (

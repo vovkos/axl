@@ -9,6 +9,7 @@ namespace gui {
 void
 CHyperText::Clear ()
 {
+	m_Source.Clear ();
 	m_Text.Clear ();
 	m_AttrArray.Clear ();
 	m_HyperlinkArray.Clear ();
@@ -25,13 +26,35 @@ CHyperText::Backspace (size_t BackLength)
 		return 0;
 	}
 
-	m_Text.ReduceLength (BackLength);
-
-	Length -= BackLength;
-
 	// TODO: backspace attributes and hyperlinks
 
-	return Length;
+	m_Source.ReduceLength (BackLength);
+	m_Text.ReduceLength (BackLength);
+
+	return Length - BackLength;
+}
+
+size_t 
+CHyperText::AppendPlainText (
+	const char* pText, 
+	size_t Length
+	)
+{
+	if (Length == -1)
+		Length = strlen (pText);
+
+	m_Source.Append (pText, Length);
+	return m_Text.Append (pText, Length);
+}
+
+size_t 
+CHyperText::AppendPlainText (
+	char Char, 
+	size_t Count
+	)
+{
+	m_Source.Append (Char, Count);
+	return m_Text.Append (Char, Count);
 }
 
 size_t
@@ -45,13 +68,15 @@ CHyperText::AppendHyperText (
 
 	const char* p = pText;
 	const char* pEnd;
-
+	
 	size_t LastLength = m_Text.GetLength ();
 	
 	if (Length == -1)
 		Length = strlen (pText);
 
 	pEnd = p + Length;
+
+	m_Source.Append (p, Length);
 
 	for (;;)
 	{

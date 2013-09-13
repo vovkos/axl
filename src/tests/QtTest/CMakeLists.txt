@@ -8,15 +8,10 @@
 #
 
 set (
-	SRC_MOC_H_LIST
-	mainwindow.h
-	)
-
-set (
 	SRC_H_LIST 
-	${SRC_MOC_H_LIST}
 	mylogrepresentor.h
 	mylogwidget.h
+	mainwindow.h
 	)
 
 set (
@@ -36,6 +31,31 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# moc folder
+#
+
+set (
+	MOC_SRC_H_LIST
+	mainwindow.h
+	${AXL_INC_DIR}/axl_gui_qt_Widget.h
+	)
+
+qt5_wrap_cpp_to (
+	MOC_CPP_LIST
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${MOC_SRC_H_LIST}
+	)
+
+exclude_from_build (${MOC_CPP_LIST}) # include "moc_*.cpp" manually
+
+source_group (
+	moc
+	FILES 
+	${MOC_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # res folder
 #
 
@@ -44,11 +64,22 @@ set (
 	mainwindow.ui
 	)
 
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+qt5_wrap_ui (
+	UI_H_LIST
+	${RES_UI_LIST}
+	)
+
+pop (CMAKE_CURRENT_BINARY_DIR)
+
 source_group (
 	res
 	FILES 
 	${RES_UI_LIST}
+	${UI_H_LIST}
 	)
+
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -69,23 +100,6 @@ source_group (
 #
 # QtTest compiler test
 #
-
-set (PREV_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
-qt5_wrap_cpp (
-	MOC_CPP_LIST
-	${SRC_MOC_H_LIST}
-	)
-
-exclude_from_build (${MOC_CPP_LIST})
-
-qt5_wrap_ui (
-	UI_H_LIST
-	${RES_UI_LIST}
-	)
-
-set (CMAKE_CURRENT_BINARY_DIR ${PREV_CMAKE_CURRENT_BINARY_DIR})
 
 add_executable (
 	QtTest 

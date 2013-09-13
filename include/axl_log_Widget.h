@@ -7,9 +7,8 @@
 #define _AXL_LOG_WIDGET_H
 
 #include "axl_g_Time.h"
-#include "axl_log_IndexMgr.h"
-#include "axl_log_CacheMgr.h"
-#include "axl_log_ColorizeMgr.h"
+#include "axl_log_Protocol.h"
+#include "axl_log_Page.h"
 #include "axl_gui_Widget.h"
 #include "axl_gui_TextPaint.h"
 #include "axl_rtl_BmhFind.h"
@@ -29,62 +28,6 @@ enum ENm
 
 //.............................................................................
 
-struct IHyperlinkHandler: public obj::IRoot
-{
-	// {3BB64985-06A6-4128-88D0-2BF6086D34B3}
-	AXL_OBJ_INTERFACE (
-		IHyperlinkHandler,
-		0x3bb64985, 0x06a6, 0x4128, 0x88, 0xd0, 0x2b, 0xf6, 0x08, 0x6d, 0x34, 0xb3
-		)
-
-	virtual 
-	bool 
-	OnHyperlink (
-		CLine* pLine, 
-		const char* pHyperlink
-		) = 0;
-};
-
-//.............................................................................
-
-struct IProcessLine: public obj::IRoot
-{
-	// {1484DEE4-2F12-4145-99B6-33853C734B3A}
-	AXL_OBJ_INTERFACE (
-		IProcessLine,
-		0x1484dee4, 0x2f12, 0x4145, 0x99, 0xb6, 0x33, 0x85, 0x3c, 0x73, 0x4b, 0x3a
-		)
-
-	virtual 
-	void 
-	Process (
-		CLine* pLine,
-		CLine* pPrevLine,
-		size_t StartCol, // if StartCol == -1 then it is NOT the first line in range
-		size_t EndCol    // if EndCol == -1 then it is NOT the last line in range
-		) = 0;
-};
-
-//.............................................................................
-
-struct IProcessBinBlock: public obj::IRoot
-{
-	// {E652545A-AA16-4A8E-953F-55D63A80A18F}
-	AXL_OBJ_INTERFACE (
-		IProcessBinBlock,
-		0xe652545a, 0xaa16, 0x4a8e, 0x95, 0x3f, 0x55, 0xd6, 0x3a, 0x80, 0xa1, 0x8f
-		)
-
-	virtual 
-	void 
-	Process (
-		const void* p,
-		size_t Size
-		) = 0;
-};
-
-//.............................................................................
-
 enum EColor
 {
 	EColor_HiliteBack = gui::EColorFlag_Index | gui::EStdPalColor__Count,
@@ -93,21 +36,37 @@ enum EColor
 	EColor_DelimiterBold,
 	EColor_Timestamp,
 	EColor_Offset,
-	
-	EColor__Count = ~gui::EColorFlag_Index & (EColor_Offset + 1)
+	EColor_CacheMissBack,
+	EColor_Last,
+
+	EColor__Count = ~gui::EColorFlag_Index & EColor_Last
 };
+
 
 //.............................................................................
 
-class CWidget: public gui::IWidget
+class CWidget: 
+	public gui::IWidget,
+	public IClient
 {
 	friend class CCacheMgr;
 	friend class CColorizeMgr;
 	
 protected:
-	CIndexMgr m_IndexMgr;
-	CCacheMgr m_CacheMgr;
-	CColorizeMgr m_ColorizeMgr;
+	IServer* m_pServer;
+		
+	// index
+
+	CIndexFile m_IndexFile;
+	size_t m_SyncId;
+	
+	// cache 
+
+	rtl::CStdListT <CPage> m_CachePageList;
+	rtl::CHashTableMapT <size_t, CPage*, rtl::CHashIdT <size_t> > m_CachePageMap;
+	size_t m_CachePageCountLimit;
+
+	// CColorizeMgr m_ColorizeMgr;
 
 	size_t m_MaxBinBlockBuffer;
 
@@ -126,6 +85,10 @@ protected:
 	size_t m_ColCount;
 	size_t m_VisibleLineCount;
 	size_t m_VisibleColCount;
+
+	size_t m_LongestTextLineLength;
+	size_t m_LongestBinHexLineSize;
+	size_t m_LongestBinTextLineSize;
 
 	size_t m_FirstVisibleLine;
 	size_t m_FirstVisibleCol;
@@ -157,7 +120,6 @@ protected:
 	rtl::CString m_StringBuffer;
 
 	rtl::CBmhFind m_Find; // Boyer-Moore-Horspool find
-
 /*
 	TStockCtrlPaint m_StockCtrlPaint;
 	TOffscreenBuffer m_OffscreenBuffer;
@@ -165,11 +127,63 @@ protected:
 */
 
 public:
-	IHyperlinkHandler* m_pHyperlinkHandler;
-	IVolatilePacketFilter* m_pVolatilePacketFilter;
-
-public:
 	CWidget (gui::IEngine* pEngine);
+
+	bool
+	Create (
+		IServer* pServer,
+		const char* pIndexFileName
+		);
+
+	void
+	ProcessCliMsg (
+		ECliMsg MsgKind,
+		const void* p,
+		size_t Size
+		);
+
+	virtual 
+	void 
+	ClearCache (size_t SyncId);
+
+	virtual 
+	void 
+	FilterProgress (uint_t Percentage); // -1 = complete
+
+	virtual 
+	void 
+	IndexProgress (uint_t Percentage); // -1 = complete
+
+	virtual 
+	void 
+	SetIndexTailLeaf (
+		bool IsNewLeaf,
+		size_t LineCount,
+		const TIndexLeaf* pLeaf,
+		const TIndexVolatilePacket* pVolatilePacketArray
+		);
+
+	virtual 
+	void 
+	RepresentComplete (
+		size_t SyncId,
+		size_t IndexNodeOffset,
+		size_t IndexNodeLineCount,
+		size_t LineIdx,
+		const void* p,
+		size_t Size
+		);
+
+	virtual 
+	void 
+	ColorizeComplete (
+		size_t SyncId,
+		size_t IndexNodeOffset,
+		size_t LineIdx,
+		size_t LineOffset,
+		const void* p,
+		size_t Size
+		);
 
 	size_t 
 	GetFullOffsetWidth ()
@@ -184,11 +198,11 @@ public:
 	}
 
 	// log engine
-
+/*
 	bool
 	SetPacketFile (
 		CPacketFile* pPacketFile,
-		IRepresentor* pRepresentor
+		IRepresenter* pRepresenter
 		);
 
 	CPacketFile* 
@@ -197,32 +211,35 @@ public:
 		return m_IndexMgr.GetPacketFile ();
 	}
 
-	IRepresentor* 
-	GetRepresentor ()
+	IRepresenter* 
+	GetRepresenter ()
 	{
-		return m_IndexMgr.GetRepresentor ();
+		return m_IndexMgr.GetRepresenter ();
 	}
 
 	void
-	SetRepresentor (IRepresentor* pRepresentor)
+	SetRepresenter (IRepresenter* pRepresenter)
 	{
-		m_IndexMgr.SetRepresentor (pRepresentor);
+		m_IndexMgr.SetRepresenter (pRepresenter);
 		FullUpdateLog ();
 	}
+*/
+
+	// cache
 
 	size_t 
 	GetLineCount ()
 	{
 		return m_LineCount;
 	}
-
+/*
 	void
 	UpdateLog ();
 
 	void
 	ReRepresentAll ()
 	{
-		m_IndexMgr.ClearIndex ();
+		m_IndexMgr.ClearIdx ();
 		m_IndexMgr.UpdateIndex ();
 		FullUpdateLog ();
 	}
@@ -233,9 +250,9 @@ public:
 		m_IndexMgr.FilterVolatilePackets ();
 		FullUpdateLog ();
 	}
-
+*/
 	// colorizer
-
+/*
 	IColorizer* 
 	GetColorizer ()
 	{
@@ -254,6 +271,43 @@ public:
 	{
 		m_CacheMgr.ClearCacheColorization ();
 		Redraw ();
+	}
+*/
+
+	CPage* 
+	FindCachePageByIndexNode (TIndexNode* pNode);
+
+	CPage* 
+	GetCachePageByIndexNode (TIndexNode* pNode);
+
+	CPage* 
+	GetCachePageByLineIdx (
+		size_t LineIdx,
+		size_t* pStartLineIndex
+		);
+
+	CPage* 
+	GetNextCachePage (CPage* pPage);
+
+	CPage* 
+	GetPrevCachePage (CPage* pPage);
+
+	size_t
+	GetCachePageStartLineIdx (CPage* pPage);
+
+	CLine* 
+	GetLine (size_t LineIdx);
+
+	CLine* 
+	GetNextLine (CLine* pLine);
+
+	CLine* 
+	GetPrevLine (CLine* pLine);
+
+	size_t
+	GetLineIdx (CLine* pLine)
+	{
+		return GetCachePageStartLineIdx (pLine->m_pPage) + pLine->m_LineIdx;
 	}
 
 	// icons
@@ -343,7 +397,7 @@ public:
 	CLine*
 	GetLineAtCursor ()
 	{
-		return m_CacheMgr.GetLine (m_CursorPos.m_Line);
+		return GetLine (m_CursorPos.m_Line);
 	}
 
 	gui::TCursorPos
@@ -464,7 +518,37 @@ public:
 	void 
 	KillHilite ();
 
+	void
+	UpdateCursorPosOnReRepresentPacket (
+		size_t AnchorLine,
+		size_t OldLineCount,
+		size_t NewLineCount
+		);
+
 	// bin line sel / hilite
+
+	size_t
+	GetBinHexLineOffsetFromCol (
+		CBinHexLine* pLine,
+		size_t Col,
+		size_t* pHexCol
+		);
+
+	size_t
+	GetBinTextLineOffsetFromCol (
+		CBinTextLine* pLine,
+		size_t Col
+		);
+
+	bool
+	GetBinLineOffset (
+		CBinLine* pLine,
+		size_t Col,
+		size_t* pOffset,
+		size_t* pLineOffset,
+		size_t* pHexCol,
+		size_t* pMergeId
+		);
 
 	bool
 	SelectBinRange (
@@ -481,7 +565,7 @@ public:
 		);
 
 	// selection processing
-
+/*
 	size_t
 	ProcessRange (
 		const gui::TCursorPos& PosStart,
@@ -507,7 +591,7 @@ public:
 	{
 		return ProcessRangeAsBinBlock (m_SelStart, m_SelEnd, pProcess);
 	}
-
+*/
 	// manual scroll
 
 	size_t
@@ -560,9 +644,50 @@ public:
 
 	bool
 	FindPrev ();
-
-
+	
 protected:
+	// protocol impl
+
+	CPage* 
+	GetOrCreateCachePage (size_t IndexNodeOffset);
+
+	void 
+	ClearCacheImpl (size_t SyncId);
+
+	void 
+	FilterProgressImpl (uint_t Percentage); // -1 = complete
+
+	void 
+	IndexProgressImpl (uint_t Percentage); // -1 = complete
+
+	void 
+	SetIndexTailLeafImpl (
+		bool IsNewLeaf,
+		size_t LineCount,
+		const TIndexLeaf* pLeaf,
+		const TIndexVolatilePacket* pVolatilePacketArray
+		);
+
+	void 
+	RepresentCompleteImpl (
+		size_t SyncId,
+		size_t IndexNodeOffset,
+		size_t IndexNodeLineCount,
+		size_t LineIdx,
+		const void* p,
+		size_t Size
+		);
+
+	void 
+	ColorizeCompleteImpl (
+		size_t SyncId,
+		size_t IndexNodeOffset,
+		size_t LineIdx,
+		size_t LineOffset,
+		const void* p,
+		size_t Size
+		);
+
 	void 
 	IncrementalUpdateLog ();
 
@@ -624,16 +749,16 @@ protected:
 		);
 
 	// re-represent
-
+/*
 	void
 	OnReRepresentPacket (
-		CCachePage* pPage,
+		CPage* pPage,
 		TReRepresent* pReRepresent
 		);
 
 	bool
 	ModifyPacketVolatileFlags (
-		CCachePage* pPage,
+		CPage* pPage,
 		TCacheVolatilePacket* pVolatileMsg,
 		uint_t VolatileFlags
 		);
@@ -650,7 +775,7 @@ protected:
 		size_t OldLineCount,
 		size_t NewLineCount
 		);
-	
+*/	
 	// bin ranges & offsets
 
 	bool
@@ -674,7 +799,7 @@ protected:
 	size_t
 	GetAsciiCol (CBinLine* pLine)
 	{
-		return m_FullOffsetWidth + 3 * pLine->m_BinDataConfig.m_BinHexLineSize + m_HexGapSize;
+		return m_FullOffsetWidth + 3 * pLine->GetBinDataConfig ()->m_BinHexLineSize + m_HexGapSize;
 	}
 
 	size_t 
@@ -741,7 +866,7 @@ protected:
 		);
 
 	void
-	PaintOffset (
+	PaintBinOffset (
 		gui::CTextPaint* pPaint,
 		size_t Offset
 		);
@@ -767,7 +892,7 @@ protected:
 	void
 	PaintBinHex (
 		gui::CTextPaint* pPaint,
-		CBinLine* pLine,
+		CBinHexLine* pLine,
 		size_t SelStart,
 		size_t SelEnd
 		);
@@ -775,7 +900,7 @@ protected:
 	void
 	PaintBinHexLine (
 		gui::CTextPaint* pPaint,
-		CBinLine* pLine,
+		CBinHexLine* pLine,
 		size_t Line,
 		const gui::TCursorPos* pSelStart,
 		const gui::TCursorPos* pSelEnd
@@ -799,14 +924,14 @@ protected:
 	{
 		return GetRangeBinBlock (m_SelStart, m_SelEnd, pOffset, pSize);
 	}
-
+/*
 	bool
 	IncapsulateOrProcessBinBlock (
 		const void* p,
 		size_t Size,
 		IProcessBinBlock* pProcess
 		);
-
+*/
 	// copy
 
 	size_t 
@@ -850,6 +975,7 @@ protected:
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_MouseWheel, OnMouseWheel)
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_MouseCaptureLost, OnMouseCaptureLost)
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, OnKeyDown)
+		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_ThreadMsg, OnThreadMsg)
 
 
 /*
@@ -941,6 +1067,12 @@ protected:
 
 	void
 	OnKeyDown (
+		gui::TWidgetMsg* pMsg,
+		bool* pIsHandled
+		);
+
+	void
+	OnThreadMsg (
 		gui::TWidgetMsg* pMsg,
 		bool* pIsHandled
 		);

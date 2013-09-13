@@ -6,6 +6,126 @@ namespace log {
 
 //.............................................................................
 
+size_t
+CWidget::GetBinHexLineOffsetFromCol (
+	CBinHexLine* pLine,
+	size_t Col,
+	size_t* pHexCol
+	)
+{
+	size_t Offset;
+	size_t HexCol;
+
+	size_t Size = pLine->m_BinData.GetCount ();
+
+	size_t FullOffsetWidth = GetFullOffsetWidth ();
+	size_t HexGapSize  = GetHexGapSize ();
+
+	if (Col < FullOffsetWidth)
+		Col = 0;
+	else
+		Col -= FullOffsetWidth;
+	
+	if (Col <= (size_t) pLine->m_BinDataConfig.m_BinHexLineSize * 3)
+	{
+		size_t End = (Size - 1) * 3 + 2;
+		
+		if (Col >= End)
+			Col = End;
+
+		Offset = Col / 3;
+		HexCol = Col % 3;
+	}
+	else
+	{
+		size_t AsciiCol = pLine->m_BinDataConfig.m_BinHexLineSize * 3 + HexGapSize;
+
+		if (Col < AsciiCol)
+			Col = AsciiCol;
+
+		if (Col - AsciiCol < Size)
+		{
+			Offset = Col - AsciiCol;
+			HexCol = 0;
+		}
+		else
+		{
+			Offset = Size - 1;
+			HexCol = 2;
+		}
+	}
+
+	if (pHexCol)
+		*pHexCol = HexCol;
+
+	return Offset;
+}
+
+size_t
+CWidget::GetBinTextLineOffsetFromCol (
+	CBinTextLine* pLine,
+	size_t Col
+	)
+{
+	size_t ColCount = pLine->m_BinTextMap.GetCount ();
+	if (!ColCount)
+		return 0;
+
+	size_t FullOffsetWidth = GetFullOffsetWidth ();
+
+	if (Col < FullOffsetWidth)
+		Col = 0;
+	else
+		Col -= FullOffsetWidth;
+
+	if (Col >= ColCount)
+		return pLine->m_BinData.GetCount ();
+
+	return pLine->m_BinTextMap [Col].m_Offset;
+}
+
+
+bool
+CWidget::GetBinLineOffset (
+	CBinLine* pLine,
+	size_t Col,
+	size_t* pOffset,
+	size_t* pLineOffset,
+	size_t* pHexCol,
+	size_t* pMergeId
+	)
+{
+	size_t LineOffset;
+
+	switch (pLine->m_LineKind)
+	{
+	case ELine_BinHex:
+		LineOffset = GetBinHexLineOffsetFromCol ((CBinHexLine*) pLine, Col, pHexCol);
+		break;
+
+	case ELine_BinText:
+		LineOffset = GetBinTextLineOffsetFromCol ((CBinTextLine*) pLine, Col);
+		if (pHexCol)
+			*pHexCol = 0;
+		break;
+
+	default:
+		ASSERT (false);
+		return false;
+	}
+
+	if (pLineOffset)
+		*pLineOffset = LineOffset;
+
+	if (pOffset)
+		*pOffset = pLine->m_BinOffset + LineOffset;
+
+	if (pMergeId)
+		*pMergeId = pLine->m_MergeId;
+
+	return true;
+}
+
 gui::TCursorPos
 CWidget::GetCursorPosFromMousePos (
 	int x, 
@@ -50,7 +170,7 @@ CWidget::ValidateCursorPos (
 	if (Col < 0)
 		Col = 0;
 
-	pLine = m_CacheMgr.GetLine (Line);
+	pLine = GetLine (Line);
 
 	switch (pLine->m_LineKind)
 	{
@@ -177,14 +297,14 @@ CWidget::SetCursorPos (
 		m_SelStart = Pos;
 		m_SelEnd = Pos;
 
-		pNewLine = m_CacheMgr.GetLine (Pos.m_Line);
+		pNewLine = GetLine (Pos.m_Line);
 		if (pNewLine && pNewLine->m_LineKind == ELine_BinHex)
 		{
 			gui::TCursorPos PosStart = m_CursorPos;
 			gui::TCursorPos PosEnd = m_CursorPos;
 
 			size_t HexCol;
-			size_t Offset = ((CBinLine*) pNewLine)->GetBinHexLineOffset (PosStart.m_Col, &HexCol);
+			size_t Offset = GetBinHexLineOffsetFromCol ((CBinHexLine*) pNewLine, PosStart.m_Col, &HexCol);
 
 			if (HexCol == 2)
 				PosStart.m_Col--;
@@ -406,7 +526,7 @@ CWidget::GetHiliteCol (
 {
 	return pLine->m_LineKind == ELine_BinHex ?
 		m_FullOffsetWidth + Offset * 3 :
-		m_FullOffsetWidth + ((CBinTextLine*) pLine)->FindColByOffset (Offset);
+		m_FullOffsetWidth + ((CBinTextLine*) pLine)->FindBinTextColByOffset (Offset);
 }
 
 bool
@@ -420,37 +540,37 @@ CWidget::GetBinRangePos (
 {
 	size_t Line;
 
-	CCachePage* pPage = pLine->m_pPage;
+	CPage* pPage = pLine->m_pPage;
 	size_t EndOffset = Offset + Length;
 	
 	size_t LineSize;
 
 	// scan backward 
 
-	while (pLine->m_Offset > Offset) 
+	while (pLine->m_BinOffset > Offset) 
 	{
-		CLine* pPrevLine = m_CacheMgr.GetPrevLine (pLine);
+		CLine* pPrevLine = GetPrevLine (pLine);
 		if (!pPrevLine || !pPrevLine->IsMerged (pLine))
 			return false;
 
 		pLine = (CBinLine*) pPrevLine;
 	} 
 
-	Line = m_CacheMgr.GetAbsoluteLine (pLine);
+	Line = GetLineIdx (pLine);
 
 	// scan forward to the beginning of the range (if anchor line was given properly, cycle will stop immediatly)
 
 	for (;;) 
 	{
 		LineSize = pLine->m_BinData.GetCount ();
-		if (Offset >= pLine->m_Offset && Offset <= pLine->m_Offset + LineSize)
+		if (Offset >= pLine->m_BinOffset && Offset <= pLine->m_BinOffset + LineSize)
 		{
 			pPosStart->m_Line = Line;
-			pPosStart->m_Col = GetHiliteCol (pLine, Offset - pLine->m_Offset);
+			pPosStart->m_Col = GetHiliteCol (pLine, Offset - pLine->m_BinOffset);
 			break;
 		}
 
-		CLine* pNextLine = m_CacheMgr.GetNextLine (pLine);
+		CLine* pNextLine = GetNextLine (pLine);
 		if (!pNextLine || !pLine->IsMerged (pNextLine))
 			return false;
 
@@ -463,14 +583,14 @@ CWidget::GetBinRangePos (
 	for (;;) 
 	{
 		LineSize = pLine->m_BinData.GetCount ();
-		if (EndOffset >= pLine->m_Offset && EndOffset <= pLine->m_Offset + LineSize)
+		if (EndOffset >= pLine->m_BinOffset && EndOffset <= pLine->m_BinOffset + LineSize)
 		{
 			pPosEnd->m_Line = Line;
-			pPosEnd->m_Col = GetHiliteCol (pLine, EndOffset - pLine->m_Offset);
+			pPosEnd->m_Col = GetHiliteCol (pLine, EndOffset - pLine->m_BinOffset);
 			break;
 		}
 
-		CLine* pNextLine = m_CacheMgr.GetNextLine (pLine);
+		CLine* pNextLine = GetNextLine (pLine);
 		if (!pNextLine || !pLine->IsMerged (pNextLine))
 			return false;
 

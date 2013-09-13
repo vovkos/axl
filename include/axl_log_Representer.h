@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_LOG_REPRESENT_H
+#define _AXL_LOG_REPRESENTER_H
 
 #include "axl_log_MergeCriteria.h"
 #include "axl_log_Line.h"
@@ -51,11 +51,11 @@ GetLineKindFromPartKind (
 
 //.............................................................................
 
-struct IRepresentorTarget: public obj::IRoot
+struct IRepresenterTarget: public obj::IRoot
 {
 	// {B33CEBA8-20EB-4EE5-ACE6-7AEA28C4EE0E}
 	AXL_OBJ_INTERFACE (
-		IRepresentorTarget,
+		IRepresenterTarget,
 		0xb33ceba8, 0x20eb, 0x4ee5, 0xac, 0xe6, 0x7a, 0xea, 0x28, 0xc4, 0xee, 0x0e
 		)
 
@@ -68,7 +68,7 @@ public:
 	TLineAttr m_LineAttr;
 	
 public:
-	IRepresentorTarget ()
+	IRepresenterTarget ()
 	{
 		m_PacketCode = 0;
 		m_Timestamp = 0;
@@ -458,18 +458,18 @@ protected:
 
 //.............................................................................
 
-struct IRepresentor: public obj::IRoot
+struct IRepresenter: public obj::IRoot
 {
 	// {037B9FE2-66CA-4628-B15F-AA867BBF62AE}
 	AXL_OBJ_INTERFACE (
-		IRepresentor,
+		IRepresenter,
 		0x037b9fe2, 0x66ca, 0x4628, 0xb1, 0x5f, 0xaa, 0x86, 0x7b, 0xbf, 0x62, 0xae
 		)
 
 	virtual 
 	bool 
 	Represent (
-		IRepresentorTarget* pTarget, 
+		IRepresenterTarget* pTarget, 
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 
@@ -479,15 +479,15 @@ struct IRepresentor: public obj::IRoot
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CRepresentorStack: 
-	public IRepresentor,
-	public rtl::CArrayT <IRepresentor*>
+class CRepresenterStack: 
+	public IRepresenter,
+	public rtl::CArrayT <IRepresenter*>
 {
 public:
 	virtual 
 	bool 
 	Represent (
-		IRepresentorTarget* pTarget, 
+		IRepresenterTarget* pTarget, 
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 

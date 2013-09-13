@@ -105,15 +105,15 @@ CWidget::PaintRect (
 	const gui::TRect& Rect
 	)
 {
-	size_t FirstLine = Rect.m_Top / m_CharSize.m_Height;
-	size_t LastLine = Rect.m_Bottom / m_CharSize.m_Height;
+	size_t FirstLineIdx = Rect.m_Top / m_CharSize.m_Height;
+	size_t LastLineIdx = Rect.m_Bottom / m_CharSize.m_Height;
 
 	if (Rect.m_Bottom % m_CharSize.m_Height)
-		LastLine++;
+		LastLineIdx++;
 
 	gui::TRect LineRect;
 	LineRect.m_Left = Rect.m_Left;
-	LineRect.m_Top = FirstLine * m_CharSize.m_Height;
+	LineRect.m_Top = FirstLineIdx * m_CharSize.m_Height;
 	LineRect.m_Right = Rect.m_Right;
 	LineRect.m_Bottom = LineRect.m_Top + m_CharSize.m_Height;
 
@@ -128,38 +128,72 @@ CWidget::PaintRect (
 	SetViewportOrgEx (hdcOffscreen, -pRect->left, 0, NULL);
 #endif
 
-	FirstLine += m_FirstVisibleLine;
-	LastLine += m_FirstVisibleLine;
+	FirstLineIdx += m_FirstVisibleLine;
+	LastLineIdx += m_FirstVisibleLine;
 
-	if (LastLine > m_LineCount)
-		LastLine = m_LineCount;
+	if (LastLineIdx > m_LineCount)
+		LastLineIdx = m_LineCount;
 
-	if (FirstLine < LastLine)
+	if (FirstLineIdx < LastLineIdx)
 	{
-		CLine* pLine = m_CacheMgr.GetLine (FirstLine);
-		for (size_t i = FirstLine; i < LastLine; i++)
-		{	
+		size_t LeafStartLine;
+		TIndexNode* pIndexNode = m_IndexFile.FindLeaf (FirstLineIdx, &LeafStartLine);
+		ASSERT (pIndexNode); // should be there, we already checked for m_LineCount
+
+		// cache pages and lines could be missing in cache, though
+
+		size_t i = FirstLineIdx;
+		while (pIndexNode && i < LastLineIdx)		
+		{
+			size_t PageLineIdx = i - LeafStartLine;
+			uint_t PageBottom = LineRect.m_Top + (pIndexNode->m_LineCount - PageLineIdx) * m_CharSize.m_Height;
+
+			CPage* pPage = GetCachePageByIndexNode (pIndexNode);
+			if (pPage)
+			{
+				size_t Count = pPage->m_LineArray.GetCount (); // might be smaller than pIndexNode->m_LineCount
+				for (size_t j = PageLineIdx; j < Count; j++)
+				{
+					CLine* pLine = pPage->m_LineArray [j];
+					if (!pLine)
+						break; // if line is missing, the rest of the lines is missing, too
+
+					LineRect.m_Bottom = LineRect.m_Top + m_CharSize.m_Height;
+
 #ifdef _AXL_USE_OFFSCREEN_BUFFER
-			PaintLine (pPaint, &OffscreenRect, pLine, i);
-			BitBlt (
-				hdc, 
-				LineRect.left, LineRect.top, 
-				LineRect.right - LineRect.left,
-				LineRect.bottom - LineRect.top,
-				hdcOffscreen,
-				OffscreenRect.left, OffscreenRect.top,
-				SRCCOPY
-				);
+					PaintLine (pPaint, &OffscreenRect, pLine, j);
+					BitBlt (
+						hdc, 
+						LineRect.left, LineRect.top, 
+						LineRect.right - LineRect.left,
+						LineRect.bottom - LineRect.top,
+						hdcOffscreen,
+						OffscreenRect.left, OffscreenRect.top,
+						SRCCOPY
+						);
 #else
-			PaintLine (pPaint, LineRect, pLine, i);
+					PaintLine (pPaint, LineRect, pLine, j);
 #endif
+					LineRect.m_Top += m_CharSize.m_Height;
+				}
+			}
+			
+			if (LineRect.m_Top != PageBottom) // fill the rest of the page as cache-miss-back
+			{
+				LineRect.m_Bottom = PageBottom;
+				pPaint->m_pCanvas->DrawRect (LineRect, EColor_CacheMissBack);
+				LineRect.m_Top = PageBottom;
+			}
 
-			LineRect.m_Top += m_CharSize.m_Height;
-			LineRect.m_Bottom += m_CharSize.m_Height;
+			// go to next leaf node
 
-			pLine = m_CacheMgr.GetNextLine (pLine);
+			LeafStartLine += pIndexNode->m_LineCount;
+			i = LeafStartLine;
+			pIndexNode = m_IndexFile.GetRightNode (pIndexNode);
 		}
 	}
+
+	// fill the rest of paint area as widget-back
 
 	if (Rect.m_Bottom > LineRect.m_Top)
 	{
@@ -200,8 +234,8 @@ CWidget::PaintLine (
 		pSelEnd = NULL;
 	}
 
-	if (pLine->IsBin ())
-		m_ColorizeMgr.EnsureColorized ((CBinLine*) pLine);
+	// if (pLine->IsBin ())
+	//	m_ColorizeMgr.EnsureColorized ((CBinLine*) pLine);
 
 	// reset 
 
@@ -226,7 +260,7 @@ CWidget::PaintLine (
 		PaintIcon (pPaint, pLine->m_LineAttr.m_Icon);
 
 	if (pLine->IsBin () && m_OffsetWidth)
-		PaintOffset (pPaint, ((CBinLine*) pLine)->m_Offset);
+		PaintBinOffset (pPaint, ((CBinLine*) pLine)->m_BinOffset);
 
 	pPaint->m_pCanvas->m_DefTextAttr.Clear ();
 
@@ -249,7 +283,7 @@ CWidget::PaintLine (
 	case ELine_BinHex:
 		PaintBinHexLine (			
 			pPaint,
-			(CBinLine*) pLine, 
+			(CBinHexLine*) pLine, 
 			Line,
 			pSelStart, 
 			pSelEnd
@@ -329,7 +363,7 @@ CWidget::FormatOffset (size_t Offset)
 }
 
 void
-CWidget::PaintOffset (
+CWidget::PaintBinOffset (
 	gui::CTextPaint* pPaint,
 	size_t Offset
 	)
@@ -350,7 +384,7 @@ CWidget::PaintDelimiter (
 {
 	int Left = LineRect.m_Left;
 
-	CLine* pNextLine = m_CacheMgr.GetNextLine (pLine);
+	CLine* pNextLine = GetNextLine (pLine);
 	ELineDelimiter Delimiter = 
 		!pNextLine ? pLine->m_LineAttr.m_LowerDelimiter :
 		pLine->IsMerged (pNextLine) ? ELineDelimiter_None :
@@ -421,7 +455,7 @@ CWidget::PaintText (
 void
 CWidget::PaintBinHex (
 	gui::CTextPaint* pPaint,
-	CBinLine* pLine,
+	CBinHexLine* pLine,
 	size_t SelStart,
 	size_t SelEnd
 	)
@@ -446,7 +480,7 @@ CWidget::PaintBinHex (
 void
 CWidget::PaintBinHexLine (
 	gui::CTextPaint* pPaint,
-	CBinLine* pLine,
+	CBinHexLine* pLine,
 	size_t Line,
 	const gui::TCursorPos* pSelStart,
 	const gui::TCursorPos* pSelEnd
@@ -467,7 +501,7 @@ CWidget::PaintBinHexLine (
 	}
 	else if (Line == pSelStart->m_Line && Line != pSelEnd->m_Line)
 	{
-		SelStartOffset = pLine->GetBinHexLineOffset (pSelStart->m_Col, &SelStartHexCol);
+		SelStartOffset = GetBinHexLineOffsetFromCol (pLine, pSelStart->m_Col, &SelStartHexCol);
 		if (SelStartHexCol == 2)
 			SelStartOffset++;
 
@@ -475,7 +509,7 @@ CWidget::PaintBinHexLine (
 	}
 	else if (Line == pSelEnd->m_Line && Line != pSelStart->m_Line)
 	{
-		SelEndOffset = pLine->GetBinHexLineOffset (pSelEnd->m_Col, &SelEndHexCol);
+		SelEndOffset = GetBinHexLineOffsetFromCol (pLine, pSelEnd->m_Col, &SelEndHexCol);
 		if (SelEndHexCol)
 			SelEndOffset++;
 
@@ -485,8 +519,8 @@ CWidget::PaintBinHexLine (
 	{
 		ASSERT (Line == pSelStart->m_Line && Line == pSelEnd->m_Line);
 
-		SelStartOffset = pLine->GetBinHexLineOffset (pSelStart->m_Col, &SelStartHexCol);
-		SelEndOffset = pLine->GetBinHexLineOffset (pSelEnd->m_Col, &SelEndHexCol);
+		SelStartOffset = GetBinHexLineOffsetFromCol (pLine, pSelStart->m_Col, &SelStartHexCol);
+		SelEndOffset = GetBinHexLineOffsetFromCol (pLine, pSelEnd->m_Col, &SelEndHexCol);
 
 		if (SelEndOffset < SelStartOffset || 
 			SelEndOffset == SelStartOffset && SelEndHexCol < SelStartHexCol)

@@ -25,12 +25,19 @@ protected:
 	};
 
 protected:
+	rtl::CString m_Source;
 	rtl::CString m_Text;
 	CTextAttrAnchorArray m_AttrArray;
 	CHyperlinkAnchorArray m_HyperlinkArray;
 	rtl::CArrayT <THyperlinkXMapEntry> m_HyperlinkXMap;
 
 public:
+	rtl::CString
+	GetSource () const 
+	{
+		return m_Source;
+	}
+
 	rtl::CString
 	GetText () const 
 	{
@@ -72,7 +79,8 @@ public:
 		size_t Length = -1
 		)
 	{
-		return m_Text.Copy (pText, Length);
+		Clear ();
+		return AppendPlainText (pText, Length);
 	}
 
 	size_t 
@@ -81,7 +89,8 @@ public:
 		size_t Count = 1
 		)
 	{
-		return m_Text.Copy (Char, Count);
+		Clear ();
+		return AppendPlainText (Char, Count);
 	}
 
 	size_t 
@@ -104,19 +113,13 @@ public:
 	AppendPlainText (
 		const char* pText, 
 		size_t Length = -1
-		)
-	{
-		return m_Text.Append (pText, Length);
-	}
+		);
 
 	size_t 
 	AppendPlainText (
 		char Char, 
 		size_t Count = 1
-		)
-	{
-		return m_Text.Append (Char, Count);
-	}
+		);
 
 	size_t
 	Backspace (size_t BackLength);

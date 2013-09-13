@@ -62,7 +62,9 @@ enum EWidgetMsg
 
 	EWidgetMsg_KeyDown,                 // TWidgetKeyMsg
 	EWidgetMsg_KeyUp,                   // TWidgetKeyMsg
-	
+
+	EWidgetMsg_ThreadMsg,               // TWidgetThreadMsg
+
 	EWidgetMsg_Gdi,                     // TWidgetGdiMsg
 	EWidgetMsg_Qt,                      // TWidgetQtMsg
 	EWidgetMsg_Gtk,                     // TWidgetGtkMsg
@@ -174,6 +176,14 @@ struct TWidgetKeyMsg: TWidgetMsg
 		m_Key = 0;
 		m_ModifierKeys = 0;
 	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TWidgetThreadMsg: TWidgetMsg
+{
+	uint_t m_Code;
+	ref::CPtrT <void> m_Params;
 };
 
 //.............................................................................
@@ -438,6 +448,13 @@ public:
 	NotifyParent (
 		intptr_t NotifyCode,
 		void* pParam = NULL
+		) = 0;
+
+	virtual
+	void
+	PostThreadMsg (
+		uint_t Code,
+		const ref::CPtrT <void>& Params
 		) = 0;
 
 	virtual

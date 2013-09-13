@@ -6,15 +6,12 @@
 
 #define _AXL_LOG_LINE_H
 
-#include "axl_log_BinDataConfig.h"
 #include "axl_gui_HyperText.h"
 
 namespace axl {
 namespace log {
 
-class CCachePage;
-class CWidget;
-struct TCacheVolatilePacket;
+class CPage;
 
 //.............................................................................
 
@@ -58,25 +55,27 @@ struct TLineAttr: gui::TTextAttr
 	TLineAttr ();
 };
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CLine
+struct TPageVolatilePacket
+{ 
+	size_t m_Offset;
+	uint_t m_Code;
+	uint64_t m_Timestamp;
+	size_t m_DataSize; 
+	size_t m_VolatileIdx;
+	uint_t m_VolatileFlags;
+	size_t m_FirstLineIdx;
+	size_t m_LineCount;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TLine
 {
-	friend class CColorizeMgr;
-	friend class CCacheMgr;
-	friend class CCachePage;
-	friend class CCacheRepresentorTarget;
-	friend class CWidget;
-
-protected:
 	ELine m_LineKind;
-
-	CCachePage* m_pPage;
-	size_t m_PageIndex;
-
-	TCacheVolatilePacket* m_pVolatilePacket;
-
 	TLineAttr m_LineAttr;
+	TPageVolatilePacket m_VolatilePacket;
 
 	bool_t m_IsFirstLineOfPacket;
 	size_t m_FirstPacketOffset;
@@ -84,7 +83,34 @@ protected:
 	uint64_t m_LastTimestamp;
 
 	uint_t m_PartCode; 
-	size_t m_PartIndex;
+	size_t m_PartIdx;
+	size_t m_MergeId; // all the lines in the same merged block have the same merge id
+};
+
+//.............................................................................
+
+class CLine
+{
+	friend class CPage;
+	friend class CPageRepresenterTarget;
+	friend class CWidget;
+
+protected:
+	ELine m_LineKind;
+
+	CPage* m_pPage;
+	size_t m_LineIdx;
+	size_t m_VolatilePacketIdx;
+
+	TLineAttr m_LineAttr;
+
+	bool m_IsFirstLineOfPacket;
+	size_t m_FirstPacketOffset;
+	uint64_t m_FirstTimestamp;
+	uint64_t m_LastTimestamp;
+
+	uint_t m_PartCode; 
+	size_t m_PartIdx;
 	size_t m_MergeId; // all the lines in the same merged block have the same merge id
 
 public:
@@ -93,7 +119,8 @@ public:
 public:
 	CLine ();
 
-	virtual ~CLine ()
+	virtual 
+	~CLine ()
 	{
 	}
 
@@ -103,19 +130,22 @@ public:
 		return m_LineKind;
 	}
 
-	CCachePage*
+	CPage*
 	GetCachePage ()
 	{
 		return m_pPage;
 	}
 
-	CWidget*
-	GetWidget ();
+	size_t
+	GetLineIdx ()
+	{
+		return m_LineIdx;
+	}
 
 	size_t
-	GetCachePageIndex ()
+	GetVolatilePacketIdx ()
 	{
-		return m_PageIndex;
+		return m_VolatilePacketIdx;
 	}
 
 	bool
@@ -127,33 +157,19 @@ public:
 	bool
 	IsMerged (CLine* pNextLine)
 	{
-		return 
-			m_pVolatilePacket == pNextLine->m_pVolatilePacket &&
-			m_MergeId == pNextLine->m_MergeId;
-	}
-};
-
-//.............................................................................
-
-class CTextLine: public CLine
-{
-	friend class CCacheRepresentorTarget;
-	friend class CWidget;
-
-protected:
-	gui::CHyperText m_HyperText;
-
-public:
-	CTextLine ()
-	{
-		m_LineKind = ELine_Text;
+		return m_MergeId != -1 && m_MergeId == pNextLine->m_MergeId;
 	}
 
-	const gui::CHyperText*
-	GetHyperText ()
-	{
-		return &m_HyperText;
-	}
+	virtual 
+	size_t
+	Load (
+		const void* p,
+		size_t Size
+		);
+
+	virtual 
+	size_t 
+	Save (rtl::CArrayT <uint8_t>* pBuffer);
 };
 
 //.............................................................................

@@ -17,6 +17,7 @@ namespace gui {
 namespace qt {
 
 class CEngine;
+class QtWidgetBase;
 
 CEngine*
 GetEngineSingleton (); // thanks a lot gcc
@@ -101,7 +102,7 @@ public:
 	AXL_OBJ_CLASS_0 (CWidgetT, IWidget);
 
 public:
-	QAbstractScrollArea* m_pQtScrollArea;
+	QtWidgetBase* m_pQtScrollArea;
 	QWidget* m_pQtWidget;
 	
 public:
@@ -241,21 +242,188 @@ public:
 		// TODO
 		return 0;
 	}
+
+	virtual
+	void
+	PostThreadMsg (
+		uint_t Code,
+		const ref::CPtrT <void>& Params
+		)
+	{
+		m_pQtScrollArea->postThreadMsg (Code, Params);
+	}
 };
 
 //.............................................................................
 
-// use QT naming conventions in this class
+// use QT naming conventions in this portion
+
+class QtWidgetBase: public QAbstractScrollArea
+{
+	Q_OBJECT
+
+protected:
+	IQtWidget* m_qtWidget;
+
+public:
+	QtWidgetBase (
+		IQtWidget* qtWidget,
+		QWidget* parent
+		):
+		QAbstractScrollArea (parent)
+	{
+		m_qtWidget = qtWidget;
+
+		connect(
+			this, &QtWidgetBase::threadMsgSignal,
+			this, &QtWidgetBase::threadMsgSlot, 
+			Qt::QueuedConnection
+			);
+	}
+
+	void
+	postThreadMsg (
+		uint_t code,
+		const ref::CPtrT <void>& params
+		)
+	{
+		TWidgetThreadMsg* msg = AXL_MEM_NEW (TWidgetThreadMsg);
+		msg->m_MsgKind = EWidgetMsg_ThreadMsg;
+		msg->m_Code = code;
+		msg->m_Params = params;
+
+		emit threadMsgSignal (msg);
+	}
+
+private slots:
+	void threadMsgSlot (TWidgetThreadMsg* msg)
+	{
+		bool IsHandled = true;
+		m_qtWidget->ProcessWidgetMsg (msg, &IsHandled);
+		AXL_MEM_DELETE (msg);
+	}
+
+signals:
+	void threadMsgSignal (TWidgetThreadMsg* msg);
+
+private:
+	virtual 
+	void 
+	mousePressEvent (QMouseEvent* e)
+	{
+		m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseButtonDown);
+	}
+
+	virtual 
+	void 
+	mouseReleaseEvent (QMouseEvent* e)
+	{
+		m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseButtonUp);
+	}
+	
+	virtual 
+	void 
+	mouseDoubleClickEvent (QMouseEvent* e)
+	{
+		m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseButtonDoubleClick);
+	}
+
+	virtual 
+	void 
+	mouseMoveEvent (QMouseEvent* e)
+	{
+		m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseMove);
+	}
+	
+	virtual 
+	void 
+	wheelEvent (QWheelEvent* e)
+	{	
+		m_qtWidget->OnMouseWheelEvent (e);
+	}
+	
+	virtual 
+	void 
+	keyPressEvent (QKeyEvent* e)
+	{
+		m_qtWidget->OnKeyEvent (e, EWidgetMsg_KeyDown);
+	}
+		
+	virtual 
+	void 
+	keyReleaseEvent (QKeyEvent* e)
+	{
+		m_qtWidget->OnKeyEvent (e, EWidgetMsg_KeyUp);
+	}
+	
+	virtual 
+	void 
+	focusInEvent (QFocusEvent* e)
+	{
+		m_qtWidget->OnEvent (e, EWidgetMsg_SetFocus);
+	}
+	
+	virtual 
+	void 
+	focusOutEvent (QFocusEvent* e)
+	{
+		m_qtWidget->OnEvent (e, EWidgetMsg_KillFocus);
+	}
+	
+	virtual 
+	void 
+	leaveEvent (QEvent* e)
+	{
+		m_qtWidget->OnEvent (e, EWidgetMsg_MouseLeave);
+	}
+	
+	virtual 
+	void 
+	paintEvent (QPaintEvent* e)
+	{		
+		QPainter Painter (viewport ());
+		m_qtWidget->OnPaintEvent (e, &Painter);
+	}
+
+	virtual 
+	void 
+	resizeEvent (QResizeEvent* e)
+	{
+		m_qtWidget->OnResizeEvent (e);
+	}
+	
+	virtual 
+	void 
+	closeEvent (QCloseEvent* e)
+	{
+		m_qtWidget->OnEvent (e, EWidgetMsg_Close);
+	}
+	
+	virtual 
+	void 
+	scrollContentsBy (
+		int dx, 
+		int dy 
+		)
+	{
+		m_qtWidget->OnScroll (
+			dy ? verticalScrollBar () : NULL,
+			dx ? horizontalScrollBar () : NULL
+			);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class QtWidget: public QAbstractScrollArea
+class QtWidget: public QtWidgetBase
 {
 protected:
 	CWidgetT <T> m_widget; 
 	
 public:
 	QtWidget (QWidget* parent = 0):
-		QAbstractScrollArea (parent)
+		QtWidgetBase ((IQtWidget*) (IWidget*) &m_widget, parent)
 	{
 		m_widget.m_pQtScrollArea = this;
 		m_widget.m_pQtWidget = viewport ();
@@ -272,118 +440,6 @@ public:
 	w ()
 	{
 		return &m_widget;
-	}
-
-protected:	
-	virtual 
-	void 
-	mousePressEvent (QMouseEvent* e)
-	{
-		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseButtonDown);
-	}
-
-	virtual 
-	void 
-	mouseReleaseEvent (QMouseEvent* e)
-	{
-		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseButtonUp);
-	}
-	
-	virtual 
-	void 
-	mouseDoubleClickEvent (QMouseEvent* e)
-	{
-		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseButtonDoubleClick);
-	}
-
-	virtual 
-	void 
-	mouseMoveEvent (QMouseEvent* e)
-	{
-		getQtWidget ()->OnMouseEvent (e, EWidgetMsg_MouseMove);
-	}
-	
-	virtual 
-	void 
-	wheelEvent (QWheelEvent* e)
-	{	
-		getQtWidget ()->OnMouseWheelEvent (e);
-	}
-	
-	virtual 
-	void 
-	keyPressEvent (QKeyEvent* e)
-	{
-		getQtWidget ()->OnKeyEvent (e, EWidgetMsg_KeyDown);
-	}
-		
-	virtual 
-	void 
-	keyReleaseEvent (QKeyEvent* e)
-	{
-		getQtWidget ()->OnKeyEvent (e, EWidgetMsg_KeyUp);
-	}
-	
-	virtual 
-	void 
-	focusInEvent (QFocusEvent* e)
-	{
-		getQtWidget ()->OnEvent (e, EWidgetMsg_SetFocus);
-	}
-	
-	virtual 
-	void 
-	focusOutEvent (QFocusEvent* e)
-	{
-		getQtWidget ()->OnEvent (e, EWidgetMsg_KillFocus);
-	}
-	
-	virtual 
-	void 
-	leaveEvent (QEvent* e)
-	{
-		getQtWidget ()->OnEvent (e, EWidgetMsg_MouseLeave);
-	}
-	
-	virtual 
-	void 
-	paintEvent (QPaintEvent* e)
-	{		
-		QPainter Painter (viewport ());
-		getQtWidget ()->OnPaintEvent (e, &Painter);
-	}
-
-	virtual 
-	void 
-	resizeEvent (QResizeEvent* e)
-	{
-		getQtWidget ()->OnResizeEvent (e);
-	}
-	
-	virtual 
-	void 
-	closeEvent (QCloseEvent* e)
-	{
-		getQtWidget ()->OnEvent (e, EWidgetMsg_Close);
-	}
-	
-	virtual void 
-	scrollContentsBy (
-		int dx, 
-		int dy 
-		)
-	{
-		getQtWidget ()->OnScroll (
-			dy ? verticalScrollBar () : NULL,
-			dx ? horizontalScrollBar () : NULL
-			);
-	}
-	
-protected:
-	IQtWidget*
-	getQtWidget ()
-	{
-		return (IQtWidget*) (IWidget*) &m_widget;
 	}
 };
 

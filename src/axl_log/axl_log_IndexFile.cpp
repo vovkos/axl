@@ -80,10 +80,6 @@ CIndexFile::Open (
 
 	m_pHdr->m_Signature = EIndexFile_FileSignature;
 	m_pHdr->m_Version = EIndexFile_CurrentVersion;
-	m_pHdr->m_PacketCount = 0;
-	m_pHdr->m_TotalPacketSize = 0;
-	m_pHdr->m_LastPacketOffset = 0;
-	m_pHdr->m_ClearCount = 0;
 	m_pHdr->m_NodeCount = 0;
 	m_pHdr->m_RootNode = 0;
 	m_pHdr->m_HeadLeaf = 0;
@@ -99,9 +95,6 @@ CIndexFile::Clear ()
 {
 	ASSERT (m_pHdr);
 
-	m_pHdr->m_PacketCount = 0;
-	m_pHdr->m_TotalPacketSize = 0;
-	m_pHdr->m_LastPacketOffset = 0;
 	m_pHdr->m_NodeCount = 0;
 	m_pHdr->m_RootNode = 0;
 	m_pHdr->m_HeadLeaf = 0;
@@ -132,8 +125,8 @@ CIndexFile::GetNode (size_t Offset) const
 		pNode->m_Signature == EIndexFile_NodeSignature && pNode->m_Depth != 0
 		);
 
-	if (pNode->m_DataSize) // make sure mapping covers leaf data as well
-		pNode = (TIndexNode*) m_File.View (Offset, sizeof (TIndexNode) + pNode->m_DataSize);
+	if (pNode->m_LeafDataSize) // make sure mapping covers leaf data as well
+		pNode = (TIndexNode*) m_File.View (Offset, sizeof (TIndexNode) + pNode->m_LeafDataSize);
 
 	return pNode;
 }
@@ -142,7 +135,7 @@ TIndexNode*
 CIndexFile::AddLeaf ()
 {
 	size_t Offset;
-	size_t Size = sizeof (TIndexNode) + sizeof (TIndexLeafData);	
+	size_t Size = sizeof (TIndexNode) + sizeof (TIndexLeaf);	
 
 	TIndexNode* pLeaf;
 	TIndexNode* pParent;
@@ -161,7 +154,7 @@ CIndexFile::AddLeaf ()
 
 		pLeaf->m_Signature = EIndexFile_LeafSignature;
 		pLeaf->m_Offset = (uint32_t) Offset;
-		pLeaf->m_DataSize  = sizeof (TIndexLeafData);
+		pLeaf->m_LeafDataSize  = sizeof (TIndexLeaf);
 
 		m_pHdr->m_RootNode  = (uint32_t) Offset;
 		m_pHdr->m_HeadLeaf  = (uint32_t) Offset;
@@ -186,7 +179,7 @@ CIndexFile::AddLeaf ()
 	pParent->m_Left      = pTail->m_Offset;
 	pParent->m_Right     = (uint32_t) Offset;
 	pParent->m_LineCount = pTail->m_LineCount;
-	pParent->m_DataSize  = 0;
+	pParent->m_LeafDataSize  = 0;
 	
 #ifdef _DEBUG
 	pParent->m_RotationCount = 0;
@@ -200,7 +193,7 @@ CIndexFile::AddLeaf ()
 	pLeaf->m_Left      = pTail->m_Offset;
 	pLeaf->m_Right     = 0;
 	pLeaf->m_LineCount = 0;
-	pLeaf->m_DataSize  = sizeof (TIndexLeafData);
+	pLeaf->m_LeafDataSize  = sizeof (TIndexLeaf);
 
 	pTail->m_Parent = pParent->m_Offset;
 	pTail->m_Right  = (uint32_t) Offset;
@@ -364,7 +357,7 @@ CIndexFile::RemoveTailLeaf ()
 	// delete 2 nodes
 
 	m_pHdr->m_TailLeaf  = pPrev->m_Offset;
-	m_pHdr->m_NodeEnd   = pPrev->m_Offset + sizeof (TIndexNode) + pPrev->m_DataSize;
+	m_pHdr->m_NodeEnd   = pPrev->m_Offset + sizeof (TIndexNode) + pPrev->m_LeafDataSize;
 	m_pHdr->m_NodeCount -= 2;
 
 	m_File.SetSize (m_pHdr->m_NodeEnd);
@@ -429,6 +422,29 @@ CIndexFile::RemoveTailLeaf ()
 	return true;
 }
 
+size_t 
+CIndexFile::SetTailLeafData (
+	const void* p, 
+	size_t DataSize
+	)
+{
+	TIndexNode* pNode = GetTailLeaf ();
+
+	pNode->m_LeafDataSize = (uint32_t) DataSize; 
+
+	pNode = GetTailLeaf (); // get it one more time to include added data
+	
+	if (p)
+		memcpy ((char*) (pNode + 1), p, DataSize);
+	else
+		memset ((char*) (pNode + 1), 0, DataSize);
+
+	m_pHdr->m_NodeEnd = pNode->m_Offset + sizeof (TIndexNode) + pNode->m_LeafDataSize;
+	m_File.SetSize (m_pHdr->m_NodeEnd);
+	
+	return DataSize;
+}
+
 size_t
 CIndexFile::AddTailLeafData (
 	const void* p,
@@ -437,10 +453,10 @@ CIndexFile::AddTailLeafData (
 {
 	TIndexNode* pNode = GetTailLeaf ();
 
-	size_t OldDataSize = pNode->m_DataSize;
-	size_t NewDataSize = pNode->m_DataSize + DataSize;
+	size_t OldDataSize = pNode->m_LeafDataSize;
+	size_t NewDataSize = pNode->m_LeafDataSize + DataSize;
 
-	pNode->m_DataSize = (uint32_t) NewDataSize; 
+	pNode->m_LeafDataSize = (uint32_t) NewDataSize; 
 
 	pNode = GetTailLeaf (); // get it one more time to include added data
 	
@@ -449,22 +465,7 @@ CIndexFile::AddTailLeafData (
 	else
 		memset ((char*) (pNode + 1) + OldDataSize, 0, DataSize);
 
-	m_pHdr->m_NodeEnd = pNode->m_Offset + sizeof (TIndexNode) + pNode->m_DataSize;
-	m_File.SetSize (m_pHdr->m_NodeEnd);
-	
-	return NewDataSize;
-}
-
-size_t
-CIndexFile::RemoveTailLeafData (size_t DataSize)
-{
-	TIndexNode* pNode = GetTailLeaf ();
-
-	size_t NewDataSize = pNode->m_DataSize > DataSize ? pNode->m_DataSize - DataSize : 0;
-
-	pNode->m_DataSize = (uint32_t) NewDataSize;
-
-	m_pHdr->m_NodeEnd = pNode->m_Offset + sizeof (TIndexNode) + pNode->m_DataSize;
+	m_pHdr->m_NodeEnd = pNode->m_Offset + sizeof (TIndexNode) + pNode->m_LeafDataSize;
 	m_File.SetSize (m_pHdr->m_NodeEnd);
 	
 	return NewDataSize;
@@ -517,9 +518,9 @@ CIndexFile::GetLeafStartLine (TIndexNode* pNode) const
 }
 
 TIndexNode* 
-CIndexFile::FindLeafByLine (
-	size_t Line,
-	size_t* pStartLine
+CIndexFile::FindLeaf (
+	size_t LineIdx,
+	size_t* pStartLineIdx
 	) const
 {
 	ASSERT (m_pHdr);
@@ -528,31 +529,31 @@ CIndexFile::FindLeafByLine (
 		return NULL;
 
 	TIndexNode* pNode = GetRootNode ();
-	if (Line >= pNode->m_LineCount)
+	if (LineIdx >= pNode->m_LineCount)
 		return NULL;
 
-	size_t StartLine = 0;
+	size_t StartLineIdx = 0;
 	while (pNode->m_Depth)
 	{
 		TIndexNode* pLeft = GetLeftNode (pNode);
 
 		ASSERT (pLeft != NULL);
-		ASSERT (Line < pNode->m_LineCount);
+		ASSERT (LineIdx < pNode->m_LineCount);
 
-		if (Line < pLeft->m_LineCount)
+		if (LineIdx < pLeft->m_LineCount)
 		{
 			pNode = pLeft;
 		}
 		else
 		{
 			pNode = GetRightNode (pNode);
-			Line -= pLeft->m_LineCount;
-			StartLine += pLeft->m_LineCount;
+			LineIdx -= pLeft->m_LineCount;
+			StartLineIdx += pLeft->m_LineCount;
 		}
 	}
 
-	if (pStartLine)
-		*pStartLine = StartLine;
+	if (pStartLineIdx)
+		*pStartLineIdx = StartLineIdx;
 
 	return pNode;
 }

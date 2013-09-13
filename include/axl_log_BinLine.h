@@ -7,6 +7,7 @@
 #define _AXL_LOG_BINLINE_H
 
 #include "axl_log_Line.h"
+#include "axl_log_BinDataConfig.h"
 #include "axl_rtl_Array.h"
 
 namespace axl {
@@ -18,56 +19,56 @@ struct TBinLinePart
 {
 	size_t m_Offset;
 	uint64_t m_Timestamp;
+};
 
-	TBinLinePart (
-		size_t Offset = 0,
-		uint64_t Timestamp = 0
-		)
-	{
-		m_Offset = Offset;
-		m_Timestamp = Timestamp;
-	}
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TBinLine
+{
+	size_t m_BinOffset;
+	TBinDataConfig m_BinDataConfig;
+	size_t m_BinSize;
+	size_t m_BinPartCount;
+	size_t m_AttrAnchorCount;
+
+	// followed by: 	
+	// uint8_t m_BinData [m_BinSize];
+	// TBinLinePart m_BinPartArray [m_BinPartCount];
+	// TTextAttrAnchor m_OriginalAttrArray [m_AttrAnchorCount];
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CBinLine: public CLine 
 {
-	friend class CColorizeMgr;
-	friend class CCachePage;
-	friend class CCacheRepresentorTarget;
+	friend class CPage;
+	friend class CPageRepresenterTarget;
 	friend class CWidget;
 
 protected:
-	size_t m_Offset;
-	rtl::CArrayT <uchar_t> m_BinData;
-	rtl::CArrayT <TBinLinePart> m_PartArray;
-	
+	size_t m_BinOffset;
 	TBinDataConfig m_BinDataConfig;
 
-	gui::CTextAttrAnchorArray m_RepresentorAttrArray; 
+	rtl::CArrayT <uchar_t> m_BinData;
+	rtl::CArrayT <TBinLinePart> m_BinPartArray;
+
+	gui::CTextAttrAnchorArray m_OriginalAttrArray; 
 	gui::CTextAttrAnchorArray m_AttrArray;
 
 public:
 	CBinLine ()
 	{
-		m_LineKind = ELine_BinHex;
-		m_Offset = 0;
+		m_BinOffset = 0;
 	}
 
 	size_t 
-	GetSize ()
+	GetBinOffset ()
 	{
-		return m_LineKind == ELine_BinText ? 
-			m_BinDataConfig.m_BinTextLineSize :
-			m_BinDataConfig.m_BinHexLineSize;
+		return m_BinOffset;
 	}
 
-	rtl::CArrayT <uchar_t> 
-	GetBinData ()
-	{
-		return m_BinData;
-	}
+	int
+	CmpBinOffset (size_t Offset); // full offset
 
 	const TBinDataConfig*
 	GetBinDataConfig ()
@@ -75,103 +76,47 @@ public:
 		return &m_BinDataConfig;
 	}
 
-	void 
-	AddData (
+	virtual
+	size_t 
+	GetBinLineSize () = 0;
+
+	rtl::CArrayT <uchar_t> 
+	GetBinData ()
+	{
+		return m_BinData;
+	}
+
+	const TBinLinePart* // if NULL, then it's first part
+	FindBinPart (size_t Offset); // line offset
+
+	virtual
+	size_t
+	AddBinData (
 		uint64_t Timestamp,
 		const gui::TTextAttr& Attr,
 		const void* p, 
 		size_t Size
-		);
+		) = 0;
 
+	virtual
 	void
 	Colorize (
 		const gui::TTextAttr& Attr,
 		size_t OffsetStart,
 		size_t OffsetEnd,
 		size_t Metric
-		);
+		) = 0;
 
-	int
-	CmpOffset (size_t Offset); // full offset
-
-	TBinLinePart* // if NULL, then it's first part
-	FindPart (size_t Offset); // full offset
-
+	virtual 
 	size_t
-	GetBinHexLineOffset (
-		size_t Col,
-		size_t* pHexCol
-		);
-
-	bool
-	GetBinLineOffset (
-		size_t Col,
-		size_t* pOffset,
-		size_t* pLineOffset,
-		size_t* pHexCol,
-		size_t* pMergeId
-		);
-};
-
-//.............................................................................
-
-// because of the tabs col<->offset mapping is not linear
-
-struct TLogBinTextMapEntry
-{
-	size_t m_Col;
-	size_t m_Offset;
-
-	TLogBinTextMapEntry (
-		size_t Col = 0,
-		size_t Offset = 0
-		)
-	{
-		m_Col = Col;
-		m_Offset = Offset;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CBinTextLine: public CBinLine 
-{
-	friend class CCachePage;
-	friend class CCacheRepresentorTarget;
-	friend class CWidget;
-
-protected:
-	rtl::CString m_BinText;
-	rtl::CArrayT <TLogBinTextMapEntry> m_BinTextMap;
-
-public:
-	CBinTextLine ()
-	{
-		m_LineKind = ELine_BinText;
-	}
-
-	rtl::CString 
-	GetBinText ()
-	{
-		return m_BinText;
-	}
-
-	size_t
-	AddData (
-		uint64_t Timestamp,
-		const gui::TTextAttr& Attr,
-		const void* p, 
+	Load (
+		const void* p,
 		size_t Size
 		);
 
+	virtual 
 	size_t 
-	FindOffsetByCol (size_t Col);
-
-	size_t 
-	FindColByOffset (size_t Offset);
-
-	size_t
-	GetBinTextLineOffset (size_t Col);
+	Save (rtl::CArrayT <uint8_t>* pBuffer);
 };
 
 //.............................................................................

@@ -7,6 +7,7 @@
 #define _AXL_LOG_PACKETFILE_H
 
 #include "axl_io_MappedFile.h"
+#include "axl_g_Time.h"
 
 namespace axl {
 namespace log {
@@ -44,8 +45,7 @@ struct TPacketFileHdr
 	uint32_t m_Version;
 	uint32_t m_PacketCount;
 	uint32_t m_TotalPacketSize;
-	uint32_t m_LastPacketOffset;
-	uint32_t m_ClearCount;
+	uint32_t m_SyncId;
 	
 	rtl::TGuid m_ClassGuid;
 
@@ -57,10 +57,6 @@ struct TPacketFileHdr
 struct TPacket
 {
 	uint32_t m_Signature;        // EPacketFile_PacketSignature
-	uint32_t m_PrevPacketOffset; // for walking back
-
-	// actual payload
-
 	uint64_t m_Timestamp;
 	uint32_t m_Code;
 	uint32_t m_DataSize; 
@@ -77,13 +73,9 @@ protected:
 	TPacketFileHdr* m_pHdr;
 
 public:
-	uint64_t m_TimestampOverride;
-
-public:
 	CPacketFile ()
 	{
 		m_pHdr = NULL;
-		m_TimestampOverride = 0;
 	}
 
 	bool 
@@ -122,10 +114,21 @@ public:
 
 	bool 
 	Write (
+		uint64_t Timestamp,	
 		uint_t Code, 
 		const void* p = NULL, 
 		size_t Size = 0
 		);
+
+	bool 
+	Write (
+		uint_t Code, 
+		const void* p = NULL, 
+		size_t Size = 0
+		)
+	{
+		return Write (g::GetTimestamp (), Code, p, Size);
+	}
 };
 
 //.............................................................................

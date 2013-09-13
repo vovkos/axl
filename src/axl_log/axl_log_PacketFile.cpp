@@ -50,8 +50,7 @@ CPacketFile::Open (
 	m_pHdr->m_Version = EPacketFile_CurrentVersion;
 	m_pHdr->m_PacketCount = 0;
 	m_pHdr->m_TotalPacketSize = 0;
-	m_pHdr->m_LastPacketOffset = 0;
-	m_pHdr->m_ClearCount = 0;
+	m_pHdr->m_SyncId = 0;
 	m_pHdr->m_ClassGuid = rtl::GUID_Null;
 
 	m_File.SetSize (sizeof (TPacketFileHdr));
@@ -63,7 +62,6 @@ CPacketFile::Close ()
 {
 	m_File.Close ();
 	m_pHdr = NULL;
-	m_TimestampOverride = 0;
 }
 
 void
@@ -73,10 +71,9 @@ CPacketFile::Clear ()
 
 	m_pHdr->m_PacketCount = 0;
 	m_pHdr->m_TotalPacketSize = 0;
-	m_pHdr->m_LastPacketOffset = 0;
-	m_pHdr->m_ClearCount++;
+	m_pHdr->m_SyncId++;
 
-	m_File. SetSize (sizeof (TPacketFileHdr));
+	m_File.SetSize (sizeof (TPacketFileHdr));
 }
 
 TPacket*
@@ -104,6 +101,7 @@ CPacketFile::GetPacket (size_t Offset) const
 
 bool
 CPacketFile::Write (
+	uint64_t Timestamp,
 	uint_t Code,
 	const void* p,
 	size_t Size
@@ -123,18 +121,13 @@ CPacketFile::Write (
 		return false;
 
 	pPacket->m_Signature = EPacketFile_PacketSignature;
-	pPacket->m_PrevPacketOffset = m_pHdr->m_LastPacketOffset;
 	pPacket->m_Code = Code;
 	pPacket->m_DataSize = (uint32_t) Size;
-
-	pPacket->m_Timestamp = m_TimestampOverride ? 
-		m_TimestampOverride :
-		g::GetTimestamp ();
+	pPacket->m_Timestamp = Timestamp;
 	
 	if (Size)
 		memcpy (pPacket + 1, p, Size);
 
-	m_pHdr->m_LastPacketOffset = m_pHdr->m_TotalPacketSize;
 	m_pHdr->m_PacketCount++;
 	m_pHdr->m_TotalPacketSize += (uint32_t) FullSize;
 

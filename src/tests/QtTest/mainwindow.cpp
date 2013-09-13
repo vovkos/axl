@@ -3,17 +3,20 @@
 #include "ui_mainwindow.h"
 #include "moc_mainwindow.cpp"
 
+#include "moc_axl_gui_qt_Widget.cpp"
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	
-	logWidget = new gui::qt::CQtWidgetT <CMyLogWidget> (ui->centralWidget);
-	
-	logPacketFile.Open ("test_log.nlog");
-	logWidget->w ()->SetPacketFile (&logPacketFile, &logRepresentor);
-	
+	m_logWidget = new gui::qt::QtWidget <CMyLogWidget> (ui->centralWidget);
+
+	bool Result = 
+		m_logWidget->w ()->Create (&m_logServer, "d:/test_log.njidx") &&
+		m_logServer.Create (m_logWidget->w (), &m_logRepresenter, "d:/test_log.njlog");
+
+	ASSERT (Result);
 }
 
 MainWindow::~MainWindow()
@@ -24,5 +27,5 @@ MainWindow::~MainWindow()
 void 
 MainWindow::resizeEvent (QResizeEvent* pEvent)
 {
-	logWidget->setGeometry (ui->centralWidget->geometry ());
+	m_logWidget->setGeometry (ui->centralWidget->geometry ());
 }

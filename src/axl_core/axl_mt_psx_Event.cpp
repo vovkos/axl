@@ -21,6 +21,21 @@ CEvent::Signal ()
 	return Result;
 }
 
+bool
+CEvent::Reset ()
+{
+	m_Mutex.Lock ();
+
+	int Value = 0;
+	bool Result = m_Sem.GetValue (&Value);
+	if (Result && Value > 0)
+		Result = m_Sem.Wait ();
+
+	m_Mutex.Unlock ();
+
+	return Result;
+}
+
 //.............................................................................
 
 bool

@@ -73,7 +73,7 @@ CWidget::FindNextImpl (
 
 	ASSERT (EndLine <= m_LineCount);
 
-	CLine* pLine = m_CacheMgr.GetLine (Line);
+	CLine* pLine = GetLine (Line);
 	while (Line < EndLine)
 	{
 		if (pLine->m_LineKind == ELine_Text)
@@ -100,7 +100,7 @@ CWidget::FindNextImpl (
 			size_t HexCol;
 			ASSERT (pLine->IsBin ());
 
-			((CBinLine*) pLine)->GetBinLineOffset (Col, &StartOffset, &StartLineOffset, &HexCol, NULL);
+			GetBinLineOffset ((CBinLine*) pLine, Col, &StartOffset, &StartLineOffset, &HexCol, NULL);
 			if (HexCol == 2)
 				StartOffset++;
 
@@ -119,7 +119,7 @@ CWidget::FindNextImpl (
 			{
 				CLine* pPrevLine = pLine;
 
-				pLine = m_CacheMgr.GetNextLine (pLine);
+				pLine = GetNextLine (pLine);
 				if (!pLine || !pPrevLine->IsMerged (pLine))
 					break;
 
@@ -134,7 +134,7 @@ CWidget::FindNextImpl (
 			} 			
 		}
 
-		pLine = m_CacheMgr.GetNextLine (pLine);
+		pLine = GetNextLine (pLine);
 		Line++;
 		Col = 0; // col is used for 1st line only
 	}
@@ -156,7 +156,7 @@ CWidget::FindPrevImpl (
 
 	ASSERT (EndLine >= 0);
 
-	CLine* pLine = m_CacheMgr.GetLine (Line);
+	CLine* pLine = GetLine (Line);
 	while (Line >= EndLine)
 	{
 /*		if (pLine->m_Type == ELine_Text)
@@ -228,7 +228,7 @@ CWidget::FindPrevImpl (
 			} 			
 		} */
 
-		pLine = m_CacheMgr.GetPrevLine (pLine);
+		pLine = GetPrevLine (pLine);
 		Line--;
 		Col = -1; // col is used for 1st line only
 	}

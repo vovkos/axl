@@ -1,24 +1,24 @@
 #include "pch.h"
-#include "axl_log_IndexRepresentorTarget.h"
+#include "axl_log_IndexRepresenterTarget.h"
 
 namespace axl {
 namespace log {
 
 //.............................................................................
 
-TIndexRepresentorTargetData::TIndexRepresentorTargetData ()
+TIndexRepresenterTargetData::TIndexRepresenterTargetData ()
 {
 	m_LineCount = 0;
 	m_Col = 0;
 	m_BinOffset = 0;
-	m_PartIndex = 0;
+	m_PartIdx = 0;
 	m_MergeId = 0;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void 
-CIndexRepresentorTarget::AddPart (
+CIndexRepresenterTarget::AddPart (
 	EPart PartKind,
 	uint_t PartCode,
 	uint_t MergeFlags,
@@ -43,7 +43,7 @@ CIndexRepresentorTarget::AddPart (
 	{
 		m_Col = 0;
 		m_BinOffset = 0;
-		m_PartIndex = 0;
+		m_PartIdx = 0;
 		m_MergeId++;
 		m_LineCount++;
 	}
@@ -67,11 +67,11 @@ CIndexRepresentorTarget::AddPart (
 		break;
 	}
 
-	m_PartIndex++;
+	m_PartIdx++;
 }
 
 void 
-CIndexRepresentorTarget::AddText (
+CIndexRepresenterTarget::AddText (
 	const char* pText,
 	size_t Length
 	)
@@ -85,7 +85,7 @@ CIndexRepresentorTarget::AddText (
 }
 
 void 
-CIndexRepresentorTarget::AddBinText (
+CIndexRepresenterTarget::AddBinText (
 	const TBinDataConfig& BinDataConfig,
 	const void* _p,
 	size_t Size
@@ -128,7 +128,7 @@ CIndexRepresentorTarget::AddBinText (
 }
 
 void 
-CIndexRepresentorTarget::AddBinHex (
+CIndexRepresenterTarget::AddBinHex (
 	const TBinDataConfig& BinDataConfig,
 	size_t Size
 	)

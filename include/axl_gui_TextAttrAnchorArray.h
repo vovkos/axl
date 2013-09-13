@@ -63,10 +63,25 @@ public:
 		return m_Array.GetCount ();
 	}
 
+	const TTextAttrAnchor*
+	ca () const
+	{
+		return m_Array.ca ();
+	}
+
 	void 
 	Clear ()
 	{
 		m_Array.Clear ();
+	}
+
+	void
+	Copy (
+		const TTextAttrAnchor* pAttrAnchorArray,
+		size_t AttrAnchorCount
+		)
+	{
+		m_Array.Copy (pAttrAnchorArray, AttrAnchorCount);
 	}
 
 	void 

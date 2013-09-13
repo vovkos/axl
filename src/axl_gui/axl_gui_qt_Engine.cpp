@@ -252,7 +252,7 @@ CEngine::ReadClipboard (rtl::CString* pString)
 	QClipboard* pQtClipboard = QApplication::clipboard ();
 	QByteArray StringUtf8 = pQtClipboard->text ().toUtf8 ();	
 	size_t Length = StringUtf8.size ();	
-	pString->Copy (StringUtf8.data (), Length ? Length - 1 : 0);
+	pString->Copy (StringUtf8.constData (), Length ? Length - 1 : 0);
 	return true;
 }
 

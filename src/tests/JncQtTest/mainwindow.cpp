@@ -354,7 +354,7 @@ bool MainWindow::compile ()
 		return false;
 
 	QByteArray filePathBytes = child->file().toUtf8 ();
-	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.data(), llvm::getGlobalContext ());
+	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.constData(), llvm::getGlobalContext ());
 
 	module.Create (filePathBytes.data(), pLlvmModule);
 	
@@ -370,8 +370,8 @@ bool MainWindow::compile ()
 
 	jnc::CLexer Lexer;
 	Lexer.Create (
-		filePathBytes.data (), 
-		sourceBytes.data (), 
+		filePathBytes.constData (), 
+		sourceBytes.constData (), 
 		sourceBytes.size ()
 		);
 

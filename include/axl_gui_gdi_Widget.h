@@ -15,6 +15,12 @@ namespace gdi {
 
 //.............................................................................
 
+enum EWm
+{
+	EWm_First = 0x0700, // WM_USER = 0x0400, reserve 512 codes just in case
+	EWm_ThreadMsg,
+};
+
 struct TNotify: NMHDR
 {
 	void* pParam;
@@ -273,7 +279,24 @@ public:
 		Notify.idFrom = ::GetDlgCtrlID (m_h);
 		Notify.pParam = pParam;
 
-		return ::SendMessageA (hWndParent, WM_NOTIFY, Notify.idFrom, (LPARAM) &Notify);
+		return ::SendMessageW (hWndParent, WM_NOTIFY, Notify.idFrom, (LPARAM) &Notify);
+	}
+
+	virtual
+	void
+	PostThreadMsg (
+		uint_t Code,
+		const ref::CPtrT <void>& Params
+		)
+	{
+		TWidgetThreadMsg* pMsg = AXL_MEM_NEW (TWidgetThreadMsg);
+		pMsg->m_MsgKind = EWidgetMsg_ThreadMsg;
+		pMsg->m_Code = Code;
+		pMsg->m_Params = Params;
+
+		bool_t Result = ::PostMessageW (m_h, EWm_ThreadMsg, Code, (LPARAM) pMsg);
+		if (!Result)
+			AXL_MEM_DELETE (pMsg);
 	}
 	
 protected:
