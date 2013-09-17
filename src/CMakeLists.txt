@@ -53,7 +53,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 	create_gcc_flag_cpu_setting ()
 	create_gcc_flag_show_includes_setting ()
 	create_gcc_flag_format_warning_setting ()
-	create_gcc_flag_multichar_wharning_setting ()
+	create_gcc_flag_multichar_warning_setting ()
 
 	message (STATUS "C++ flags: ${COMPILE_DEFINITIONS}${CMAKE_CXX_FLAGS}")
 endif ()
@@ -68,7 +68,12 @@ endif ()
 #
 # Paths to libs & tools 
 #
-                    
+
+ensure_file_exists (
+	${CMAKE_MODULE_PATH}/CMakePaths.cmake
+	${CMAKE_MODULE_PATH}/CMakePaths.template
+	)
+
 include (CMakePaths)
 
 message (STATUS "Path to RAGEL executable:   ${PATH_RAGEL_EXE}")
