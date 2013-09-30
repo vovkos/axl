@@ -12,17 +12,14 @@
 namespace axl {
 namespace log {
 
-// log file structure
-
-// log file is just a collection of Packets tagged with code, 
+// log packet file is a collection of packets tagged with code, 
 // timestamp and optionally carrying extra binary data
-//
 
 //.............................................................................
 
 enum
 {
-	EPacketFile_FileSignature   = ':gol', // log: signature for log files
+	EPacketFile_FileSignature   = ':gol', // log: signature for log packet files
 	EPacketFile_PacketSignature = ':kap', // msg: signature for log packets
 	EPacketFile_CurrentVersion  = MAKELONG (0, MAKEWORD (0, 3)), // 3.0.0
 };
@@ -31,10 +28,10 @@ enum
 
 enum
 {
-	EPacketCodeFlag_MergeableBackward = 0x80000000,
-	EPacketCodeFlag_MergeableForward  = 0x40000000,
-	EPacketCodeFlag_Mergeable         = 0xc0000000,
-	EPacketCodeFlag_Volatile          = 0x10000000,
+	EPacketCodeFlag_Foldable          = 0x80000000,
+	EPacketCodeFlag_MergeableBackward = 0x40000000,
+	EPacketCodeFlag_MergeableForward  = 0x20000000,
+	EPacketCodeFlag_Mergeable         = 0x60000000,
 };
 
 //.............................................................................
@@ -43,13 +40,12 @@ struct TPacketFileHdr
 {
 	uint32_t m_Signature; // EPacketFile_LogFileSignature
 	uint32_t m_Version;
-	uint32_t m_PacketCount;
-	uint32_t m_TotalPacketSize;
-	uint32_t m_SyncId;
-	
+	uint64_t m_PacketCount;
+	uint64_t m_TotalPacketSize;
+	uint64_t m_ClearCount; // to synchronize mutliple log servers working with the same packet file	
 	rtl::TGuid m_ClassGuid;
 
-	// followed by log data entries
+	// followed by log packets
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -57,9 +53,9 @@ struct TPacketFileHdr
 struct TPacket
 {
 	uint32_t m_Signature;        // EPacketFile_PacketSignature
-	uint64_t m_Timestamp;
 	uint32_t m_Code;
-	uint32_t m_DataSize; 
+	uint64_t m_Timestamp;
+	uint64_t m_DataSize; 
 
 	// followed by Packet data (if any)
 };
@@ -103,31 +99,31 @@ public:
 	void 
 	Clear ();
 
-	TPacketFileHdr* 
+	const TPacketFileHdr* 
 	GetHdr () const
 	{
 		return m_pHdr;
 	}
 
-	TPacket* 
-	GetPacket (size_t Offset) const;
+	const TPacket* 
+	GetPacket (uint64_t Offset) const;
 
-	bool 
-	Write (
+	const TPacket* 
+	AddPacket (
 		uint64_t Timestamp,	
 		uint_t Code, 
 		const void* p = NULL, 
 		size_t Size = 0
 		);
 
-	bool 
-	Write (
+	const TPacket* 
+	AddPacket (
 		uint_t Code, 
 		const void* p = NULL, 
 		size_t Size = 0
 		)
 	{
-		return Write (g::GetTimestamp (), Code, p, Size);
+		return AddPacket (g::GetTimestamp (), Code, p, Size);
 	}
 };
 

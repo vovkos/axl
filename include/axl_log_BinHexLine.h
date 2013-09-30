@@ -15,8 +15,9 @@ namespace log {
 
 class CBinHexLine: public CBinLine 
 {
-	friend class CPage;
-	friend class CPageRepresenterTarget;
+	friend class CCachePage;
+	friend class CCacheMgr;
+	friend class CLineRepresenterTarget;
 	friend class CWidget;
 
 public:
@@ -44,11 +45,14 @@ public:
 	virtual
 	void
 	Colorize (
-		const gui::TTextAttr& Attr,
-		size_t OffsetStart,
-		size_t OffsetEnd,
-		size_t Metric
+		uint64_t BeginOffset,
+		uint64_t EndOffset,
+		const gui::TTextAttr& Attr
 		);
+
+	virtual 
+	void
+	UpdateLongestLineLength (TLongestLineLength* pLength);
 };
 
 //.............................................................................

@@ -4,14 +4,16 @@
 
 //.............................................................................
 
-enum EMyLogPacket
+enum EMyLog
 {
-	EMyLogPacket_DeviceOpened    = 1 | log::EPacketCodeFlag_Mergeable,
-	EMyLogPacket_DeviceClosed    = 2 | log::EPacketCodeFlag_Volatile,
-	EMyLogPacket_Connect         = 3,
-	EMyLogPacket_ConnectComplete = 4,
-	EMyLogPacket_ConnectError    = 5,	
-	EMyLogPacket_Bin             = 6 | log::EPacketCodeFlag_Mergeable,
+	EMyLog_DeviceOpened    = 1,
+	EMyLog_DeviceClosed    = 2 | log::EPacketCodeFlag_Foldable,
+	EMyLog_Connect         = 4 | log::EPacketCodeFlag_MergeableForward,
+	EMyLog_ConnectComplete = 5 | log::EPacketCodeFlag_MergeableBackward,
+	EMyLog_ConnectError    = 6 | log::EPacketCodeFlag_MergeableBackward,	
+	EMyLog_Connect_m       = 7,
+	EMyLog_Bin             = 8 | log::EPacketCodeFlag_Mergeable,
+
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -28,7 +30,7 @@ public:
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 
-		uint_t VolatileFlags
+		uint64_t FoldFlags
 		);
 };
 

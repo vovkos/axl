@@ -45,6 +45,21 @@ CTextLine::Save (rtl::CArrayT <uint8_t>* pBuffer)
 	return pBuffer->GetCount ();
 }
 
+void
+CTextLine::Clear ()
+{
+	CLine::Clear ();
+	m_HyperText.Clear ();
+}
+
+void
+CTextLine::UpdateLongestLineLength (TLongestLineLength* pLength)
+{
+	size_t Length = m_HyperText.GetText ().GetLength ();
+	if (Length > pLength->m_TextLineLength)
+		pLength->m_TextLineLength = Length;
+}
+
 //.............................................................................
 
 } // namespace log {

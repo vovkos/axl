@@ -8,53 +8,45 @@
 
 #include "axl_log_Representer.h"
 #include "axl_log_MergeCriteria.h"
+#include "axl_log_PacketFile.h"
 
 namespace axl {
 namespace log {
-
+	
 //.............................................................................
 
-struct TIndexRepresenterTargetData
+class CIndexRepresenterTarget: public IRepresenterTarget
 {
-	size_t m_LineCount;
-	size_t m_Col;
-	size_t m_BinOffset;
-	size_t m_PartIdx;
-	size_t m_MergeId;
-
-	TMergeCriteria m_MergeCriteria;
-
-	TIndexRepresenterTargetData ();
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CIndexRepresenterTarget: 
-	public IRepresenterTarget,
-	public TIndexRepresenterTargetData
-{
-	friend class CServer;
+	friend class CIndexMgr;
 
 public:
 	AXL_OBJ_CLASS_0 (CIndexRepresenterTarget, IRepresenterTarget);
-	
+
+protected:
+	size_t m_LineCount;
+	size_t m_Col;
+	uint64_t m_PartIdx;
+	uint64_t m_FirstPartIdx;
+	uint64_t m_BinOffset;
+
+	TMergeCriteria m_MergeCriteria;
+
+	bool m_IsFirstPartMerged;
+
 public:
+	CIndexRepresenterTarget ();
+
+	void
+	StartPacket (const TPacket* pPacket);
+
 	virtual 
 	void 
 	AddPart (
 		EPart PartKind,
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const void* p,
 		size_t Size
 		);
-
-	virtual 
-	void 
-	OverrideLineAttr ()
-	{
-		// nothing to do here
-	}
 
 	virtual 
 	void 
@@ -72,16 +64,12 @@ protected:
 
 	void 
 	AddBinText (
-		const TBinDataConfig& BinDataConfig,
-		const void* _p,
+		const void* p,
 		size_t Size
 		);
 
 	void 
-	AddBinHex (
-		const TBinDataConfig& BinDataConfig,
-		size_t Size
-		);
+	AddBinHex (size_t Size);
 };
 
 //.............................................................................

@@ -8,7 +8,7 @@
 
 #include "axl_g_Time.h"
 #include "axl_log_Protocol.h"
-#include "axl_log_Page.h"
+#include "axl_log_CacheMgr.h"
 #include "axl_gui_Widget.h"
 #include "axl_gui_TextPaint.h"
 #include "axl_rtl_BmhFind.h"
@@ -31,9 +31,8 @@ enum ENm
 enum EColor
 {
 	EColor_HiliteBack = gui::EColorFlag_Index | gui::EStdPalColor__Count,
-	EColor_DelimiterLight,
-	EColor_DelimiterMedium,
-	EColor_DelimiterBold,
+	EColor_IntraPacketDelimiter,
+	EColor_InterPacketDelimiter,
 	EColor_Timestamp,
 	EColor_Offset,
 	EColor_CacheMissBack,
@@ -52,21 +51,38 @@ class CWidget:
 	friend class CCacheMgr;
 	friend class CColorizeMgr;
 	
+public:
+	AXL_OBJ_BEGIN_INTERFACE_MAP (CWidget)
+		AXL_OBJ_INTERFACE_ENTRY (gui::IWidget)
+		AXL_OBJ_INTERFACE_ENTRY (IClient)
+	AXL_OBJ_END_INTERFACE_MAP ()
+
 protected:
 	IServer* m_pServer;
-		
-	// index
 
-	CIndexFile m_IndexFile;
-	size_t m_SyncId;
-	
-	// cache 
+	CCacheMgr m_CacheMgr;
 
-	rtl::CStdListT <CPage> m_CachePageList;
-	rtl::CHashTableMapT <size_t, CPage*, rtl::CHashIdT <size_t> > m_CachePageMap;
-	size_t m_CachePageCountLimit;
 
+/*
 	// CColorizeMgr m_ColorizeMgr;
+
+	size_t m_PacketOffset;
+	size_t m_IndexNodeOffset;
+	TIndexLeaf m_IndexLeaf;
+
+	size_t m_LongestTextLineLength;
+	size_t m_LongestBinHexLineSize;
+	size_t m_LongestBinTextLineSize;
+
+	// last colorize final state
+
+	size_t m_ColorizedLineCount;
+	size_t m_ColorizerLine;
+	size_t m_ColorizerOffset;
+	intptr_t m_ColorizerState;
+	ref::CPtrT <void> m_ColorizerStateEx;
+
+ */
 
 	size_t m_MaxBinBlockBuffer;
 
@@ -85,10 +101,6 @@ protected:
 	size_t m_ColCount;
 	size_t m_VisibleLineCount;
 	size_t m_VisibleColCount;
-
-	size_t m_LongestTextLineLength;
-	size_t m_LongestBinHexLineSize;
-	size_t m_LongestBinTextLineSize;
 
 	size_t m_FirstVisibleLine;
 	size_t m_FirstVisibleCol;
@@ -132,59 +144,18 @@ public:
 	bool
 	Create (
 		IServer* pServer,
-		const char* pIndexFileName
+		const char* pIndexFileName,
+		const char* pColorFileName
 		);
 
+	// IServer
+
+	virtual
 	void
-	ProcessCliMsg (
-		ECliMsg MsgKind,
-		const void* p,
-		size_t Size
-		);
-
-	virtual 
-	void 
-	ClearCache (size_t SyncId);
-
-	virtual 
-	void 
-	FilterProgress (uint_t Percentage); // -1 = complete
-
-	virtual 
-	void 
-	IndexProgress (uint_t Percentage); // -1 = complete
-
-	virtual 
-	void 
-	SetIndexTailLeaf (
-		bool IsNewLeaf,
-		size_t LineCount,
-		const TIndexLeaf* pLeaf,
-		const TIndexVolatilePacket* pVolatilePacketArray
-		);
-
-	virtual 
-	void 
-	RepresentComplete (
-		size_t SyncId,
-		size_t IndexNodeOffset,
-		size_t IndexNodeLineCount,
-		size_t LineIdx,
-		const void* p,
-		size_t Size
-		);
-
-	virtual 
-	void 
-	ColorizeComplete (
-		size_t SyncId,
-		size_t IndexNodeOffset,
-		size_t LineIdx,
-		size_t LineOffset,
-		const void* p,
-		size_t Size
-		);
-
+	SendMsg (const TMsg* pMsg);
+	
+	// attributes
+	
 	size_t 
 	GetFullOffsetWidth ()
 	{
@@ -274,42 +245,6 @@ public:
 	}
 */
 
-	CPage* 
-	FindCachePageByIndexNode (TIndexNode* pNode);
-
-	CPage* 
-	GetCachePageByIndexNode (TIndexNode* pNode);
-
-	CPage* 
-	GetCachePageByLineIdx (
-		size_t LineIdx,
-		size_t* pStartLineIndex
-		);
-
-	CPage* 
-	GetNextCachePage (CPage* pPage);
-
-	CPage* 
-	GetPrevCachePage (CPage* pPage);
-
-	size_t
-	GetCachePageStartLineIdx (CPage* pPage);
-
-	CLine* 
-	GetLine (size_t LineIdx);
-
-	CLine* 
-	GetNextLine (CLine* pLine);
-
-	CLine* 
-	GetPrevLine (CLine* pLine);
-
-	size_t
-	GetLineIdx (CLine* pLine)
-	{
-		return GetCachePageStartLineIdx (pLine->m_pPage) + pLine->m_LineIdx;
-	}
-
 	// icons
 
 	gui::IImageList*
@@ -397,7 +332,7 @@ public:
 	CLine*
 	GetLineAtCursor ()
 	{
-		return GetLine (m_CursorPos.m_Line);
+		return m_CacheMgr.GetLine (m_CursorPos.m_Line);
 	}
 
 	gui::TCursorPos
@@ -546,8 +481,7 @@ public:
 		size_t Col,
 		size_t* pOffset,
 		size_t* pLineOffset,
-		size_t* pHexCol,
-		size_t* pMergeId
+		size_t* pHexCol
 		);
 
 	bool
@@ -646,53 +580,8 @@ public:
 	FindPrev ();
 	
 protected:
-	// protocol impl
-
-	CPage* 
-	GetOrCreateCachePage (size_t IndexNodeOffset);
-
-	void 
-	ClearCacheImpl (size_t SyncId);
-
-	void 
-	FilterProgressImpl (uint_t Percentage); // -1 = complete
-
-	void 
-	IndexProgressImpl (uint_t Percentage); // -1 = complete
-
-	void 
-	SetIndexTailLeafImpl (
-		bool IsNewLeaf,
-		size_t LineCount,
-		const TIndexLeaf* pLeaf,
-		const TIndexVolatilePacket* pVolatilePacketArray
-		);
-
-	void 
-	RepresentCompleteImpl (
-		size_t SyncId,
-		size_t IndexNodeOffset,
-		size_t IndexNodeLineCount,
-		size_t LineIdx,
-		const void* p,
-		size_t Size
-		);
-
-	void 
-	ColorizeCompleteImpl (
-		size_t SyncId,
-		size_t IndexNodeOffset,
-		size_t LineIdx,
-		size_t LineOffset,
-		const void* p,
-		size_t Size
-		);
-
-	void 
-	IncrementalUpdateLog ();
-
-	void 
-	FullUpdateLog ();
+	void
+	SetLineCount (size_t LineCount);
 
 	bool
 	FixupFirstVisibleLine ();
@@ -707,7 +596,7 @@ protected:
 	RecalcBaseCol ();
 
 	void 
-	RecalcColCount ();
+	RecalcColCount (const TLongestLineLength* pLength);
 
 	void 
 	RecalcHScroll ();
@@ -752,13 +641,13 @@ protected:
 /*
 	void
 	OnReRepresentPacket (
-		CPage* pPage,
+		CCachePage* pPage,
 		TReRepresent* pReRepresent
 		);
 
 	bool
 	ModifyPacketVolatileFlags (
-		CPage* pPage,
+		CCachePage* pPage,
 		TCacheVolatilePacket* pVolatileMsg,
 		uint_t VolatileFlags
 		);
@@ -781,16 +670,15 @@ protected:
 	bool
 	GetBinOffset (
 		const gui::TCursorPos& Pos,
-		size_t* pOffset,
+		uint64_t* pOffset,
 		size_t* pLineOffset,
-		size_t* pHexCol,
-		size_t* pMergeId
+		size_t* pHexCol
 		);
 
 	bool
 	GetBinRangePos (
 		CBinLine* pLine,
-		size_t Offset,
+		uint64_t Offset,
 		size_t Length,
 		gui::TCursorPos* pPosStart,
 		gui::TCursorPos* pPosEnd
@@ -821,7 +709,9 @@ protected:
 		size_t SelStartLine,
 		size_t SelEndLine,
 		size_t OldSelStartLine,
-		size_t OldSelEndLine
+		size_t OldSelEndLine,
+		bool IsStartPosChanged,
+		bool IsEndPosChanged
 		);
 
 	void

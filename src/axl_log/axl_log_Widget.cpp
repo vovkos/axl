@@ -2,6 +2,7 @@
 #include "axl_log_Widget.h"
 #include "axl_gui_Engine.h"
 #include "axl_io_FilePathUtils.h"
+#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace log {
@@ -13,7 +14,6 @@ CWidget::CWidget (gui::IEngine* pEngine):
 {
 	m_pServer = NULL;
 
-	m_SyncId = -1;
 /*
 	m_CacheMgr.m_pWidget = this;
 	m_CacheMgr.m_pIndexMgr = &m_IndexMgr;
@@ -22,11 +22,10 @@ CWidget::CWidget (gui::IEngine* pEngine):
 	m_pHyperlinkHandler = NULL;
 	m_pVolatilePacketFilter = NULL;
 */
-	m_CachePageCountLimit = 64;
 	m_MaxBinBlockBuffer = 1024;
 
 	m_IconGapSize = 1;
-	m_TimestampGapSize = 1;
+	m_TimestampGapSize = 2;
 	m_OffsetGapSize = 2;
 	m_HexGapSize = 1;
 	m_CaretWidth = 2;
@@ -37,10 +36,6 @@ CWidget::CWidget (gui::IEngine* pEngine):
 	m_FirstVisibleCol = 0;
 	m_VisibleLineCount = 0;
 	m_VisibleColCount = 0;
-
-	m_LongestTextLineLength = 0;
-	m_LongestBinHexLineSize = 0;
-	m_LongestBinTextLineSize = 0;
 
 	m_IsIconVisible = true;
 	m_IsTimestampVisible = true;
@@ -70,13 +65,12 @@ CWidget::CWidget (gui::IEngine* pEngine):
 
 	memcpy (m_ColorArray, gui::GetStdPalColorArray (), gui::EStdPalColor__Count * sizeof (uint_t));
 	
-	m_ColorArray [~gui::EColorFlag_Index & EColor_HiliteBack]      = 0xdcdcff;
-	m_ColorArray [~gui::EColorFlag_Index & EColor_DelimiterLight]  = 0xdcdcdc;
-	m_ColorArray [~gui::EColorFlag_Index & EColor_DelimiterMedium] = 0xc0c0c0;
-	m_ColorArray [~gui::EColorFlag_Index & EColor_DelimiterBold]   = 0x808080;
-	m_ColorArray [~gui::EColorFlag_Index & EColor_Timestamp]       = gui::EStdPalColor_GrayText;
-	m_ColorArray [~gui::EColorFlag_Index & EColor_Offset]          = gui::EStdPalColor_GrayText;
-	m_ColorArray [~gui::EColorFlag_Index & EColor_CacheMissBack]   = gui::EStdPalColor_GrayText;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_HiliteBack]           = 0xdcdcff;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_IntraPacketDelimiter] = 0xdcdcdc;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_InterPacketDelimiter] = 0xc0c0c0;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_Timestamp]            = gui::EStdPalColor_GrayText;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_Offset]               = gui::EStdPalColor_GrayText;
+	m_ColorArray [~gui::EColorFlag_Index & EColor_CacheMissBack]        = gui::EStdPalColor_GrayText;
 
 	m_Palette.m_pColorArray = m_ColorArray;
 	m_Palette.m_Count = countof (m_ColorArray);
@@ -96,17 +90,207 @@ CWidget::CWidget (gui::IEngine* pEngine):
 bool
 CWidget::Create (
 	IServer* pServer,
-	const char* pIndexFileName
+	const char* pIndexFileName,
+	const char* pColorFileName
 	)
 {
 	ClearCache (-1);
 
-	bool Result = m_IndexFile.Open (pIndexFileName, io::EFileFlag_Exclusive | io::EFileFlag_DeleteOnClose);
+	bool Result = m_CacheMgr.Create (this, pServer, pIndexFileName, pColorFileName);
 	if (!Result)
 		return false;
 
 	m_pServer = pServer;
 	return true;
+}
+
+void
+CWidget::SendMsg (const TMsg* pMsgHdr)
+{
+	switch (pMsgHdr->m_MsgKind)
+	{
+	case ECliMsg_ClearCache:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_ClearCache))
+		{
+			TCliMsg_ClearCache* pMsg = (TCliMsg_ClearCache*) pMsgHdr;
+			PostThreadMsg (ECliMsg_ClearCache, ref::CPtrT <void> ((void*) (size_t) pMsg->m_SyncId, (ref::IRefCount*) NULL));
+		}
+
+		break;
+
+	case ECliMsg_FilterProgress:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
+		{
+			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
+			PostThreadMsg (ECliMsg_FilterProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::IRefCount*) NULL));
+		}
+
+		break;
+
+	case ECliMsg_IndexProgress:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
+		{
+			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
+			PostThreadMsg (ECliMsg_IndexProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::IRefCount*) NULL));
+		}
+
+		break;
+
+	case ECliMsg_ColorizeProgress:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
+		{
+			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
+			PostThreadMsg (ECliMsg_ColorizeProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::IRefCount*) NULL));
+		}
+
+		break;
+
+	case ECliMsg_CreateIndexLeaf:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_CreateIndexLeaf))
+		{
+			TCliMsg_CreateIndexLeaf* pMsg = (TCliMsg_CreateIndexLeaf*) pMsgHdr;
+			ref::CPtrT <TCliMsg_CreateIndexLeaf> Params = AXL_REF_NEW (ref::CBoxT <TCliMsg_CreateIndexLeaf>);
+			*Params = *pMsg;
+			PostThreadMsg (ECliMsg_CreateIndexLeaf, Params);
+		}
+
+		break;
+
+	case ECliMsg_UpdateIndexTailLeaf:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_UpdateIndexTailLeaf))
+		{
+			TCliMsg_UpdateIndexTailLeaf* pMsg = (TCliMsg_UpdateIndexTailLeaf*) pMsgHdr;
+			ref::CPtrT <TCliMsg_UpdateIndexTailLeaf> Params = AXL_REF_NEW (ref::CBoxT <TCliMsg_UpdateIndexTailLeaf>);
+			*Params = *pMsg;
+			PostThreadMsg (ECliMsg_UpdateIndexTailLeaf, Params);
+		}
+
+		break;
+
+	case ECliMsg_RepresentPageComplete:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_RepresentPageComplete))
+		{
+			TCliMsg_RepresentPageComplete* pMsg = (TCliMsg_RepresentPageComplete*) pMsgHdr;
+			size_t ExtraSize = pMsg->m_FoldablePacketCount * sizeof (TFoldablePacket) + pMsg->m_LineBufferSize;
+			
+			if (pMsg->m_MsgSize < sizeof (TCliMsg_RepresentPageComplete) + ExtraSize)
+				break;
+
+			ref::CPtrT <TCliMsg_RepresentPageComplete> Params = AXL_REF_NEW_EXTRA (ref::CBoxT <TCliMsg_RepresentPageComplete>, ExtraSize);
+			*Params = *pMsg;
+			memcpy (Params + 1, pMsg + 1, ExtraSize);
+			PostThreadMsg (ECliMsg_RepresentPageComplete, Params);
+		}
+
+		break;
+
+	case ECliMsg_FoldPacketComplete:
+		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_FoldPacketComplete))
+		{
+			TCliMsg_FoldPacketComplete* pMsg = (TCliMsg_FoldPacketComplete*) pMsgHdr;
+			size_t ExtraSize = pMsg->m_LineBufferSize;
+
+			if (pMsg->m_MsgSize < sizeof (TCliMsg_RepresentPageComplete) + ExtraSize)
+				break;
+
+			ref::CPtrT <TCliMsg_FoldPacketComplete> Params = AXL_REF_NEW_EXTRA (ref::CBoxT <TCliMsg_FoldPacketComplete>, ExtraSize);
+			*Params = *pMsg;
+			memcpy (Params + 1, pMsg + 1, ExtraSize);
+			PostThreadMsg (ECliMsg_FoldPacketComplete, Params);
+		}
+
+		break;
+	}
+}
+
+void
+CWidget::OnThreadMsg (
+	gui::TWidgetMsg* pMsg,
+	bool* pIsHandled
+	)
+{
+	gui::TWidgetThreadMsg* pThreadMsg = (gui::TWidgetThreadMsg*) pMsg;
+	void* p = pThreadMsg->m_Params.p ();
+
+	switch (pThreadMsg->m_Code)
+	{
+	case ECliMsg_ClearCache:
+		m_CacheMgr.ClearCache ((size_t) p);
+		break;
+
+	case ECliMsg_FilterProgress:
+	case ECliMsg_IndexProgress:
+	case ECliMsg_ColorizeProgress:
+		// notify parent
+		break;
+
+	case ECliMsg_CreateIndexLeaf:
+		{
+		TCliMsg_CreateIndexLeaf* pMsg = (TCliMsg_CreateIndexLeaf*) p;
+		ASSERT (pMsg->m_LeafOffset == m_CacheMgr.GetIndexNextLeafOffset ()); 
+
+		if (pMsg->m_LeafOffset == m_CacheMgr.GetIndexNextLeafOffset ())
+			m_CacheMgr.CreateIndexLeaf (
+				&pMsg->m_BinDataConfig,
+				pMsg->m_LineCount,
+				pMsg->m_PacketOffset,
+				pMsg->m_PacketCount,
+				pMsg->m_FoldablePacketCount,
+				pMsg->m_MergePointIdx,
+				pMsg->m_FoldFlags
+				);
+		}
+		break;
+
+	case ECliMsg_UpdateIndexTailLeaf:
+		{
+		TCliMsg_UpdateIndexTailLeaf* pMsg = (TCliMsg_UpdateIndexTailLeaf*) p;
+		ASSERT (pMsg->m_LeafOffset == m_CacheMgr.GetIndexTailLeafOffset ()); 
+
+		if (pMsg->m_LeafOffset == m_CacheMgr.GetIndexTailLeafOffset ())
+			m_CacheMgr.UpdateIndexTailLeaf (
+				pMsg->m_LineCount,
+				pMsg->m_PacketCount,
+				pMsg->m_FoldablePacketCount,
+				pMsg->m_FoldFlags
+				);
+		}
+		break;
+
+	case ECliMsg_RepresentPageComplete:
+		{
+		TCliMsg_RepresentPageComplete* pMsg = (TCliMsg_RepresentPageComplete*) p;
+		if (pMsg->m_SyncId == m_CacheMgr.GetSyncId ())
+			m_CacheMgr.RepresentPageComplete (
+				pMsg->m_IndexLeafOffset,
+				pMsg->m_LineIdx,
+				pMsg->m_LineCount,
+				pMsg->m_FoldablePacketIdx,
+				(TFoldablePacket*) (pMsg + 1),
+				pMsg->m_FoldablePacketCount,
+				(TFoldablePacket*) (pMsg + 1) + pMsg->m_FoldablePacketCount,
+				pMsg->m_LineBufferSize
+				);
+		}
+		break;
+
+	case ECliMsg_FoldPacketComplete:
+		{
+		TCliMsg_FoldPacketComplete* pMsg = (TCliMsg_FoldPacketComplete*) p;
+		if (pMsg->m_SyncId == m_CacheMgr.GetSyncId ())
+			m_CacheMgr.FoldPacketComplete (
+				pMsg->m_IndexLeafOffset,
+				pMsg->m_LineIdx,
+				pMsg->m_OldLineCount,
+				pMsg->m_NewLineCount,
+				pMsg->m_FoldablePacketIdx,
+				pMsg->m_FoldFlags,
+				pMsg + 1,
+				pMsg->m_LineBufferSize
+				);
+		}
+		break;
+	}
 }
 
 bool
@@ -232,6 +416,16 @@ CWidget::CalcTimestampWidth (const char* pFormat)
 	return Length + m_TimestampGapSize;
 }
 
+void
+CWidget::SetLineCount (size_t LineCount)
+{
+	if (LineCount == m_LineCount)
+		return;
+
+	m_LineCount = LineCount;
+	RecalcVScroll ();
+}
+
 void 
 CWidget::RecalcBaseCol ()
 {
@@ -251,11 +445,11 @@ CWidget::RecalcBaseCol ()
 }
 
 void 
-CWidget::RecalcColCount ()
+CWidget::RecalcColCount (const TLongestLineLength* pLength)
 {
-	size_t BinHexColCount = m_LongestBinHexLineSize * 4 + m_HexGapSize + m_FullOffsetWidth;
-	size_t BinTextColCount = m_LongestBinTextLineSize + m_FullOffsetWidth;
-	size_t ColCount = m_LongestTextLineLength;
+	size_t BinHexColCount = pLength->m_BinHexLineSize * 4 + m_HexGapSize + m_FullOffsetWidth;
+	size_t BinTextColCount = pLength->m_BinTextLineSize + m_FullOffsetWidth;
+	size_t ColCount = pLength->m_TextLineLength;
 	
 	if (BinHexColCount > ColCount)
 		ColCount = BinHexColCount;
@@ -272,7 +466,7 @@ CWidget::RecalcColCount ()
 /*
 void
 CWidget::OnReRepresentPacket (
-	CPage* pPage,
+	CCachePage* pPage,
 	TReRepresent* pReRepresent
 	)
 {
@@ -308,7 +502,7 @@ CWidget::OnReRepresentPacket (
 
 bool
 CWidget::ModifyPacketVolatileFlags (
-	CPage* pPage,
+	CCachePage* pPage,
 	TCacheVolatilePacket* pVolatileMsg,
 	uint_t VolatileFlags
 	)
@@ -359,7 +553,7 @@ CWidget::IncrementalUpdateLog ()
 	TIndexNode* pNode = m_IndexMgr.GetIndexFile ()->FindLeafByLine (AnchorLine, NULL);
 	while (pNode)
 	{
-		CPage* pPage = m_CacheMgr.FindCachePageByIndexNode (pNode);
+		CCachePage* pPage = m_CacheMgr.FindCachePageByIndexNode (pNode);
 		if (pPage)
 		{
 			if (pPage->IsEmpty ())

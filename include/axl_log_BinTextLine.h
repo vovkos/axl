@@ -7,6 +7,7 @@
 #define _AXL_LOG_BINTEXTLINE_H
 
 #include "axl_log_BinLine.h"
+#include "axl_rtl_String.h"
 
 namespace axl {
 namespace log {
@@ -37,8 +38,9 @@ struct TBinTextLine
 
 class CBinTextLine: public CBinLine 
 {
-	friend class CPage;
-	friend class CPageRepresenterTarget;
+	friend class CCachePage;
+	friend class CCacheMgr;
+	friend class CLineRepresenterTarget;
 	friend class CWidget;
 
 protected:
@@ -82,10 +84,9 @@ public:
 	virtual
 	void
 	Colorize (
-		const gui::TTextAttr& Attr,
-		size_t OffsetStart,
-		size_t OffsetEnd,
-		size_t Metric
+		uint64_t BeginOffset,
+		uint64_t EndOffset,
+		const gui::TTextAttr& Attr
 		);
 
 	virtual 
@@ -98,6 +99,14 @@ public:
 	virtual 
 	size_t 
 	Save (rtl::CArrayT <uint8_t>* pBuffer);
+
+	virtual 
+	void
+	Clear ();
+
+	virtual 
+	void
+	UpdateLongestLineLength (TLongestLineLength* pLength);
 };
 
 //.............................................................................

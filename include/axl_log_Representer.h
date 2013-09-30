@@ -62,9 +62,9 @@ struct IRepresenterTarget: public obj::IRoot
 protected:
 	uint_t m_PacketCode;
 	uint64_t m_Timestamp;
+	TBinDataConfig m_BinDataConfig;
 
 public:
-	TBinDataConfig m_BinDataConfig;
 	TLineAttr m_LineAttr;
 	
 public:
@@ -79,7 +79,6 @@ public:
 	AddPart (
 		EPart PartKind,
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const void* p,
 		size_t Size
 		) = 0;
@@ -97,23 +96,6 @@ public:
 		AddText0 (
 			EPart_PlainText, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			pText, 
-			Length
-			);
-	}
-
-	void
-	AddPlainText0 (
-		uint_t MergeFlags,
-		const char* pText,
-		size_t Length = -1
-		)
-	{
-		AddText0 (
-			EPart_PlainText, 
-			m_PacketCode, 
-			MergeFlags, 
 			pText, 
 			Length
 			);
@@ -122,7 +104,6 @@ public:
 	void
 	AddPlainText0 (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pText,
 		size_t Length = -1
 		)
@@ -130,7 +111,6 @@ public:
 		AddText0 (
 			EPart_PlainText, 
 			PartCode, 
-			MergeFlags, 
 			pText, 
 			Length
 			);
@@ -147,25 +127,6 @@ public:
 		AddText_va (
 			EPart_PlainText, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			pFormat, 
-			va
-			);
-	}
-
-	void
-	AddPlainText (
-		uint_t MergeFlags,
-		const char* pFormat,
-		...
-		)
-	{
-		AXL_VA_DECL (va, pFormat);
-
-		AddText_va (
-			EPart_PlainText, 
-			m_PacketCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -174,7 +135,6 @@ public:
 	void
 	AddPlainText (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pFormat,
 		...
 		)
@@ -184,7 +144,6 @@ public:
 		AddText_va (
 			EPart_PlainText, 
 			PartCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -199,23 +158,6 @@ public:
 		AddText_va (
 			EPart_PlainText, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			pFormat, 
-			va
-			);
-	}
-
-	void
-	AddPlainText_va (
-		uint_t MergeFlags,
-		const char* pFormat,
-		axl_va_list va
-		)
-	{
-		AddText_va (
-			EPart_PlainText, 
-			m_PacketCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -224,7 +166,6 @@ public:
 	void
 	AddPlainText_va (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pFormat,
 		axl_va_list va
 		)
@@ -232,7 +173,6 @@ public:
 		AddText_va (
 			EPart_PlainText, 
 			PartCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -247,23 +187,6 @@ public:
 		AddText0 (
 			EPart_HyperText, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			pText, 
-			Length
-			);
-	}
-
-	void
-	AddHyperText0 (
-		uint_t MergeFlags,
-		const char* pText,
-		size_t Length = -1
-		)
-	{
-		AddText0 (
-			EPart_HyperText, 
-			m_PacketCode, 
-			MergeFlags, 
 			pText, 
 			Length
 			);
@@ -272,7 +195,6 @@ public:
 	void
 	AddHyperText0 (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pText,
 		size_t Length = -1
 		)
@@ -280,7 +202,6 @@ public:
 		AddText0 (
 			EPart_HyperText, 
 			PartCode, 
-			MergeFlags, 
 			pText, 
 			Length
 			);
@@ -297,25 +218,6 @@ public:
 		AddText_va (
 			EPart_HyperText, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			pFormat, 
-			va
-			);
-	}
-
-	void
-	AddHyperText (
-		uint_t MergeFlags,
-		const char* pFormat,
-		...
-		)
-	{
-		AXL_VA_DECL (va, pFormat);
-
-		AddText_va (
-			EPart_HyperText, 
-			m_PacketCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -324,7 +226,6 @@ public:
 	void
 	AddHyperText (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pFormat,
 		...
 		)
@@ -334,7 +235,6 @@ public:
 		AddText_va (
 			EPart_HyperText, 
 			PartCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -349,23 +249,6 @@ public:
 		AddText_va (
 			EPart_HyperText, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			pFormat, 
-			va
-			);
-	}
-
-	void
-	AddHyperText_va (
-		uint_t MergeFlags,
-		const char* pFormat,
-		axl_va_list va
-		)
-	{
-		AddText_va (
-			EPart_HyperText, 
-			m_PacketCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -374,7 +257,6 @@ public:
 	void
 	AddHyperText_va (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pFormat,
 		axl_va_list va
 		)
@@ -382,7 +264,6 @@ public:
 		AddText_va (
 			EPart_HyperText, 
 			PartCode, 
-			MergeFlags, 
 			pFormat, 
 			va
 			);
@@ -397,23 +278,6 @@ public:
 		AddPart (
 			EPart_Bin, 
 			m_PacketCode, 
-			GetMergeFlagsFromPacketCode (m_PacketCode), 
-			p, 
-			Size
-			);
-	}
-
-	void
-	AddBin (
-		uint_t MergeFlags,
-		const void* p,
-		size_t Size
-		)
-	{
-		AddPart (
-			EPart_Bin, 
-			m_PacketCode, 
-			MergeFlags, 
 			p, 
 			Size
 			);
@@ -422,7 +286,6 @@ public:
 	void
 	AddBin (
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const void* p,
 		size_t Size
 		)
@@ -430,7 +293,6 @@ public:
 		AddPart (
 			EPart_Bin, 
 			PartCode, 
-			MergeFlags, 
 			p, 
 			Size
 			);
@@ -441,7 +303,6 @@ protected:
 	AddText0 (
 		EPart PartKind,
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pText,
 		size_t Length
 		);
@@ -450,7 +311,6 @@ protected:
 	AddText_va (
 		EPart PartKind,
 		uint_t PartCode,
-		uint_t MergeFlags,
 		const char* pFormat,
 		axl_va_list va
 		);
@@ -473,26 +333,8 @@ struct IRepresenter: public obj::IRoot
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 
-		uint_t VolatileFlags
+		uint64_t FoldFlags
 		) = 0;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CRepresenterStack: 
-	public IRepresenter,
-	public rtl::CArrayT <IRepresenter*>
-{
-public:
-	virtual 
-	bool 
-	Represent (
-		IRepresenterTarget* pTarget, 
-		uint_t PacketCode, 
-		const void* p, 
-		size_t Size, 
-		uint_t VolatileFlags
-		);
 };
 
 //.............................................................................

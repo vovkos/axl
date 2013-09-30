@@ -497,8 +497,13 @@ ProcessWidgetMsg ( \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_GUI_WIDGET_MSG_MAP_CHAIN(Class) \
+#define AXL_GUI_WIDGET_MSG_MAP_END_CHAIN(Class) \
 	default: \
+		*pIsHandled = false; \
+	} \
+	if (!*pIsHandled) \
+	{ \
+		*pIsHandled = true; \
 		Class::ProcessWidgetMsg (pMsg, pIsHandled); \
 	} \
 } 

@@ -12,7 +12,11 @@
 #include "axl_log_Representer.h"
 #include "axl_log_Colorizer.h"
 #include "axl_log_HyperlinkHandler.h"
-#include "axl_log_Page.h"
+#include "axl_log_CachePage.h"
+#include "axl_log_FilterMgr.h"
+#include "axl_log_IndexMgr.h"
+#include "axl_log_ColorizeMgr.h"
+#include "axl_log_LineRepresentMgr.h"
 #include "axl_mt_Lock.h"
 #include "axl_mt_Thread.h"
 #include "axl_mt_Event.h"
@@ -31,16 +35,17 @@ class CServer: public IServer
 	friend class CIndexThread;
 	friend class CIndexThread;
 
+public:
+	AXL_OBJ_CLASS_0 (CServer, IServer)
+
 protected:
 	enum EFlag
 	{
-		EFlag_Running                  = 0x0001,
-		EFlag_TerminateIoThread        = 0x0002,
-		EFlag_TerminateColorizeThread  = 0x0004,
-		EFlag_TerminateAllThreads      = 0x0006,
-		EFlag_Update                   = 0x0010,
-		EFlag_Rebuild                  = 0x0020, 
-		EFlag_Clear                    = 0x0040,
+		EFlag_Running   = 0x0001,
+		EFlag_Terminate = 0x0002,
+		EFlag_Update    = 0x0010,
+		EFlag_Rebuild   = 0x0020, 
+		EFlag_Clear     = 0x0040,
 	};
 
 	class CIoThread: public mt::CThreadImplT <CIoThread>
@@ -55,25 +60,6 @@ protected:
 		}
 	};
 
-	class CColorizeThread: public mt::CThreadImplT <CColorizeThread>
-	{
-	public:
-		CServer* m_pServer;
-
-		void
-		ThreadProc ()
-		{
-			m_pServer->ColorizeThreadProc ();
-		}
-	};
-
-	struct TFilterEntry: rtl::TListLink
-	{
-		IFilter* m_pFilter;
-		CPacketFile m_PacketFile;
-		TPacketFileHdr m_PrevPacketFileHdrSnapshot;
-	};
-
 protected:
 	mt::CLock m_Lock;
 	uint_t m_Flags;
@@ -83,27 +69,24 @@ protected:
 	IColorizer* m_pColorizer;
 	IHyperlinkHandler* m_pHyperlinkHandler;
 
+	CPacketFile m_PacketFile;   // accessed from io thread only
 	CPacketFile m_PacketFile_w; // only for ESrvMsg_WritePacket
+	CMergeFile m_MergeFile; // shared between IndexMgr, ColorizeMgr & LineRepresentMgr
+	io::CMappedFile m_ColorizerStateFile; // shared between ColorizeMgr & LineRepresentMgr
+
+	CFilterMgr m_FilterMgr;
+	CIndexMgr m_IndexMgr;
+	CColorizeMgr m_ColorizeMgr;
+	CLineRepresentMgr m_LineRepresentMgr;
+
+	TBinDataConfig m_BinDataConfig;
+
+	// io thread
 
 	CIoThread m_IoThread;
 	mt::CEvent m_IoThreadEvent;
-	CPacketFile m_PacketFile; 
-	rtl::CStdListT <TFilterEntry> m_FilterStack;
-	TBinDataConfig m_DefBinDataConfig;
-	TPacketFileHdr m_IndexPrevPacketFileHdrSnapshot;
-	TIndexLeaf m_IndexLeaf;
-	size_t m_IndexLeafLineCount;
-	size_t m_IndexLeafLineCountLimit;
-	size_t m_IndexVolatilePacketCountLimit;
-	rtl::CArrayT <TIndexVolatilePacket> m_IndexVolatilePacketArray;
-	rtl::CBoxListT <TSrvMsg_Represent> m_RepresentMsgList;
-	CPage m_LastPage;
-	rtl::CArrayT <uchar_t> m_LineBuffer;
-
-	CColorizeThread m_ColorizeThread; 
-	mt::CEvent m_ColorizeThreadEvent;
-	rtl::CBoxListT <TSrvMsg_Colorize> m_ColorizeMsgList;
-		
+	rtl::CStdListT <rtl::TListLink> m_IoThreadMsgList;
+	
 public:
 	CServer ();
 
@@ -116,109 +99,22 @@ public:
 	Create (
 		IClient* pClient,
 		IRepresenter* pRepresenter,
-		const char* pPacketFilePath
+		IColorizer* pColorizer,
+		const char* pPacketFilePath,
+		const char* pMergeFilePath,
+		const char* pColorFilePath
 		);
 
 	void
 	Stop ();
 
+	virtual
 	void
-	ProcessSrvMsg (
-		ESrvMsg MsgKind,
-		const void* p,
-		size_t Size
-		);
-
-	virtual 
-	void 
-	Clear ();
-
-	virtual 
-	void 
-	Rebuild ();
-
-	virtual 
-	void 
-	SetDefBinDataConfig (const TBinDataConfig* pConfig);
-
-	virtual 
-	void 
-	Update ();
-
-	virtual 
-	void 
-	WritePacket (
-		uint64_t Timestamp,
-		uint_t Code,
-		const void* p,
-		size_t Size
-		);
-
-	virtual 
-	void 
-	Represent (
-		size_t SyncId,
-		size_t IndexNodeOffset,
-		size_t IndexNodeLineCount,
-		size_t LineIdx,
-		const TIndexLeaf* pIndexLeaf,
-		const TIndexLeaf* pPrevIndexLeaf,
-		const TIndexVolatilePacket* pVolatilePacketArray
-		);
-
-	virtual 
-	void 
-	Colorize (
-		size_t SyncId,
-		size_t IndexNodeOffset,
-		size_t LineIdx,
-		size_t LineOffset,
-		const void* p,
-		size_t Size
-		);
+	SendMsg (const TMsg* pMsg);
 
 protected:
 	void
 	IoThreadProc ();
-
-	void
-	RepresentThreadProc ();
-
-	void
-	ColorizeThreadProc ();
-
-	void
-	FilterFile (
-		TFilterEntry* pFilterEntry,
-		CPacketFile* pPacketFile,
-		const TPacketFileHdr* pPacketFileHdrSnapshot
-		);
-
-	void 
-	UpdateIndex (
-		CPacketFile* pPacketFile,
-		const TPacketFileHdr* pPacketFileHdrSnapshot,
-		const TBinDataConfig* pDefBinDataConfig
-		);
-
-	void
-	FinalizeIndexLeaf (
-		const TIndexRepresenterTargetData* pRepresenterTarget,
-		size_t PacketCount,
-		bool IsNewLeaf
-		);
-
-	void
-	RepresentImpl (
-		CPacketFile* pPacketFile,
-		const TPacketFileHdr* pPacketFileHdrSnapshot,
-		size_t IndexNodeOffset,
-		size_t IndexNodeLineCount,
-		size_t LineIdx,
-		const TIndexLeaf* pIndexLeaf,
-		const TIndexLeaf* pPrevIndexLeaf,
-		const TIndexVolatilePacket* pVolatilePacketArray
-		);
 };
 
 //.............................................................................

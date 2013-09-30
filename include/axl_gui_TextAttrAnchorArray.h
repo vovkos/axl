@@ -17,8 +17,8 @@ namespace gui {
 struct TTextAttrAnchor
 {
 	size_t m_Offset;
-	TTextAttr m_Attr;
 	size_t m_Metric; // attributes with higher metric overlay lower metric
+	TTextAttr m_Attr;
 
 	TTextAttrAnchor ()
 	{
@@ -86,9 +86,9 @@ public:
 
 	void 
 	SetAttr (
+		size_t BeginOffset, 
+		size_t EndOffset, 
 		const TTextAttr& Attr, 
-		size_t Begin, 
-		size_t End, 
 		size_t Metric = 0
 		);
 

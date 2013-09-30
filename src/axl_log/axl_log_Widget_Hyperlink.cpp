@@ -17,7 +17,7 @@ CWidget::GetHyperlinkFromMousePos (
 {
 	gui::TCursorPos Pos = GetCursorPosFromMousePos (x, y, false);
 
-	CLine* pLine = GetLine (Pos.m_Line);
+	CLine* pLine = m_CacheMgr.GetLine (Pos.m_Line);
 	if (!pLine || pLine->m_LineKind != ELine_Text)
 		return false;
 
@@ -47,28 +47,35 @@ CWidget::OnHyperlink (
 		bool Result = m_pHyperlinkHandler->OnHyperlink (pLine, pHyperlink);
 		if (Result)
 			return;
-	}
+	} */
 
 	switch (*pHyperlink)
 	{
 	case '+': // add/remove bits to volatile flags
 	case '-': 
 		{
-		uint_t Modify;
-		uint_t NewVolatileFlags;
-
-		if (!pLine->m_pVolatilePacket)
+		if (pLine->m_FoldablePacketIdx >= pLine->m_pPage->m_FoldablePacketArray.GetCount ())
 			break;
 
-		Modify = strtoul (pHyperlink + 1, NULL, 10);
+		TFoldablePacket* pFoldablePacket = &pLine->m_pPage->m_FoldablePacketArray [pLine->m_FoldablePacketIdx];
+
+		uint_t Modify = strtoul (pHyperlink + 1, NULL, 10);
 		if (!Modify)
 			break;
 
-		NewVolatileFlags = *pHyperlink == '+' ? 
-			pLine->m_pVolatilePacket->m_VolatileFlags | Modify :
-			pLine->m_pVolatilePacket->m_VolatileFlags & ~Modify;
+		uint64_t NewFoldFlags = *pHyperlink == '+' ? 
+			pFoldablePacket->m_FoldFlags | Modify :
+			pFoldablePacket->m_FoldFlags & ~Modify;
 
-		ModifyLineVolatileFlags (pLine, NewVolatileFlags);
+		m_pServer->FoldPacket (
+			m_CacheMgr.GetSyncId (), 
+			pLine->m_pPage->m_IndexLeaf.m_Offset,
+			pFoldablePacket->m_Offset,
+			pLine->m_FoldablePacketIdx,
+			pLine->m_LineIdx,
+			pFoldablePacket->m_LineCount,
+			NewFoldFlags
+			);
 		break;
 		}
 
@@ -98,7 +105,6 @@ CWidget::OnHyperlink (
 	default:
 		mt::CreateProcess (pHyperlink);
 	}	
-*/
 }
 
 //.............................................................................

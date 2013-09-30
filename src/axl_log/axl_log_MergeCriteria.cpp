@@ -1,27 +1,31 @@
 #include "pch.h"
 #include "axl_log_MergeCriteria.h"
-#include "axl_log_Line.h"
+#include "axl_log_PacketFile.h"
 
 namespace axl {
 namespace log {
 
 //.............................................................................
 
-TMergeCriteria::TMergeCriteria ()
+void 
+TMergeCriteria::Clear ()
 {
+	m_LineKind = ELine_Undefined;
 	m_PartCode = 0;
-	m_MergeFlags = 0;
-	m_LineKind = ELine_Text;
 	m_Timestamp = 0;
+	m_BinDataConfig.SetDefaults ();
 }
 
 bool 
 TMergeCriteria::ShouldMerge (const TMergeCriteria& Criteria2) const
 {
-	if (m_PartCode != Criteria2.m_PartCode ||
-		m_LineKind != Criteria2.m_LineKind ||
-		!(m_MergeFlags & EMergeFlag_MergeableForward) ||
-		!(Criteria2.m_MergeFlags & EMergeFlag_MergeableBackward))
+	if (m_Timestamp == -1) // forced merge
+		return true;
+
+	if (m_LineKind != Criteria2.m_LineKind ||
+		(m_PartCode & ~EPacketCodeFlag_Mergeable) != (Criteria2.m_PartCode & ~EPacketCodeFlag_Mergeable) ||
+		!(m_PartCode & EPacketCodeFlag_MergeableForward) ||
+		!(Criteria2.m_PartCode & EPacketCodeFlag_MergeableBackward))
 		return false;
 
 	if (m_LineKind == ELine_Text)

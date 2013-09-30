@@ -9,6 +9,7 @@
 
 set (
 	SRC_H_LIST 
+	jancycolorizer.h
 	mylogrepresentor.h
 	mylogwidget.h
 	mainwindow.h
@@ -16,17 +17,33 @@ set (
 
 set (
 	SRC_CPP_LIST
+	jancycolorizer.rl.cpp
 	mylogrepresentor.cpp
 	mylogwidget.cpp
 	main.cpp
 	mainwindow.cpp
 	)
 
+set (
+	SRC_RL_LIST
+	jancycolorizer.rl
+	)
+
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_ragel_step (
+	jancycolorizer.rl.cpp
+	jancycolorizer.rl
+	) 
+
+pop (CMAKE_CURRENT_BINARY_DIR)
+
 source_group (
 	src 
 	FILES 
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
+	${SRC_RL_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

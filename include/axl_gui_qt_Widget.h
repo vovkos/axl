@@ -42,16 +42,12 @@ struct IQtWidget: public IWidget
 	}
 
 	uint_t
-	GetKeyFromQtKey (int QtKey)
-	{
-		// TODO: implement table translation		
-		return QtKey;
-	}
+	GetKeyFromQtKey (int QtKey);
 
 	uint_t
 	GetModifierKeysFromQtModifiers (int QtModifiers)
 	{
-		return (QtModifiers >> 1) & 0x7;
+		return (QtModifiers >> 25) & 0x7;
 	}
 	
 	void 

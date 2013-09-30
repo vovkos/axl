@@ -34,7 +34,7 @@ CWidget::RedrawLineRange (
 	else
 		FirstLine = 0;
 
-	if (FirstLine >= m_VisibleLineCount)
+	if (FirstLine > m_VisibleLineCount)
 		return;
 
 	// last line validation
@@ -60,15 +60,17 @@ CWidget::RedrawSelChangeLineRange (
 	size_t SelStartLine,
 	size_t SelEndLine,
 	size_t OldSelStartLine,
-	size_t OldSelEndLine
+	size_t OldSelEndLine,
+	bool IsStartPosChanged,
+	bool IsEndPosChanged
 	)
 {
-	if (SelStartLine == OldSelStartLine)
+	if (!IsStartPosChanged)
 		RedrawLineRange (
 			AXL_MIN (m_SelEnd.m_Line_u, OldSelEndLine),
 			AXL_MAX (m_SelEnd.m_Line_u, OldSelEndLine)
 			);
-	else if (m_SelEnd.m_Line == OldSelEndLine)
+	else if (!IsEndPosChanged)
 		RedrawLineRange (
 			AXL_MIN (m_SelStart.m_Line_u, OldSelStartLine),
 			AXL_MAX (m_SelStart.m_Line_u, OldSelStartLine)
@@ -86,17 +88,14 @@ CWidget::GetTimestampString (
 	rtl::CString* pString
 	)
 {
-	uint64_t Timestamp = pLine->m_IsFirstLineOfPacket || pLine->m_FirstTimestamp != pLine->m_LastTimestamp ? 
-		pLine->m_LastTimestamp : 0;
-
-	if (!Timestamp)
+	if (!(pLine->GetFlags () & ELineFlag_FirstLineOfPacket))
 	{
 		pString->Clear ();
 		return 0;
 	}
 
 	ASSERT (!m_TimestampFormat.IsEmpty ());
-	return g::TTime (Timestamp).Format (pString, m_TimestampFormat);
+	return g::TTime (pLine->m_LastTimestamp).Format (pString, m_TimestampFormat);
 }
 
 void 
@@ -136,23 +135,25 @@ CWidget::PaintRect (
 
 	if (FirstLineIdx < LastLineIdx)
 	{
-		size_t LeafStartLine;
-		TIndexNode* pIndexNode = m_IndexFile.FindLeaf (FirstLineIdx, &LeafStartLine);
-		ASSERT (pIndexNode); // should be there, we already checked for m_LineCount
+		uint64_t LeafStartLine64;
+		const TIndexLeaf* pIndexLeaf = m_CacheMgr.FindIndexLeaf (FirstLineIdx, &LeafStartLine64);
+		ASSERT (pIndexLeaf); // should be there, we already checked for m_LineCount
+
+		size_t LeafStartLine = (size_t) LeafStartLine64;
 
 		// cache pages and lines could be missing in cache, though
 
 		size_t i = FirstLineIdx;
-		while (pIndexNode && i < LastLineIdx)		
+		while (pIndexLeaf && i < LastLineIdx)
 		{
 			size_t PageLineIdx = i - LeafStartLine;
-			uint_t PageBottom = LineRect.m_Top + (pIndexNode->m_LineCount - PageLineIdx) * m_CharSize.m_Height;
+			uint_t PageBottom = LineRect.m_Top + (size_t) (pIndexLeaf->m_LineCount - PageLineIdx) * m_CharSize.m_Height;
 
-			CPage* pPage = GetCachePageByIndexNode (pIndexNode);
+			CCachePage* pPage = m_CacheMgr.GetCachePageByIndexLeaf (pIndexLeaf);
 			if (pPage)
 			{
 				size_t Count = pPage->m_LineArray.GetCount (); // might be smaller than pIndexNode->m_LineCount
-				for (size_t j = PageLineIdx; j < Count; j++)
+				for (size_t j = PageLineIdx; j < Count; j++, i++)
 				{
 					CLine* pLine = pPage->m_LineArray [j];
 					if (!pLine)
@@ -172,7 +173,7 @@ CWidget::PaintRect (
 						SRCCOPY
 						);
 #else
-					PaintLine (pPaint, LineRect, pLine, j);
+					PaintLine (pPaint, LineRect, pLine, i);
 #endif
 					LineRect.m_Top += m_CharSize.m_Height;
 				}
@@ -187,9 +188,9 @@ CWidget::PaintRect (
 
 			// go to next leaf node
 
-			LeafStartLine += pIndexNode->m_LineCount;
+			LeafStartLine += (size_t) pIndexLeaf->m_LineCount;
 			i = LeafStartLine;
-			pIndexNode = m_IndexFile.GetRightNode (pIndexNode);
+			pIndexLeaf = m_CacheMgr.GetNextIndexLeaf (pIndexLeaf);
 		}
 	}
 
@@ -257,10 +258,10 @@ CWidget::PaintLine (
 		PaintTimestamp (pPaint, pLine);
 
 	if (m_IsIconVisible && m_IconWidth)
-		PaintIcon (pPaint, pLine->m_LineAttr.m_Icon);
+		PaintIcon (pPaint, pLine->m_LineAttr.m_IconIdx);
 
 	if (pLine->IsBin () && m_OffsetWidth)
-		PaintBinOffset (pPaint, ((CBinLine*) pLine)->m_BinOffset);
+		PaintBinOffset (pPaint, (size_t) ((CBinLine*) pLine)->m_BinOffset);
 
 	pPaint->m_pCanvas->m_DefTextAttr.Clear ();
 
@@ -382,21 +383,27 @@ CWidget::PaintDelimiter (
 	const gui::TRect& LineRect
 	)
 {
-	int Left = LineRect.m_Left;
-
-	CLine* pNextLine = GetNextLine (pLine);
-	ELineDelimiter Delimiter = 
-		!pNextLine ? pLine->m_LineAttr.m_LowerDelimiter :
-		pLine->IsMerged (pNextLine) ? ELineDelimiter_None :
-		AXL_MAX (pLine->m_LineAttr.m_LowerDelimiter, pNextLine->m_LineAttr.m_UpperDelimiter);
-	
-	if (!Delimiter)
+	if (pLine->m_Flags & ELineFlag_MergedForward)
 		return;
 
-	if (pNextLine && pLine->m_FirstPacketOffset == pNextLine->m_FirstPacketOffset)
-		Left = m_BaseCol * m_CharSize.m_Width;
+	int Left;
+	uint_t Color;
 
-	uint_t Color = EColor_DelimiterLight + Delimiter - 1;
+	if (pLine->m_Flags & ELineFlag_LastLineOfPacket)
+	{
+		Left = 0;
+		Color = EColor_InterPacketDelimiter;
+	}
+	else if (pLine->m_LineAttr.m_Flags & ELineAttrFlag_Delimiter)
+	{
+		Left = m_BaseCol * m_CharSize.m_Width;
+		Color = EColor_IntraPacketDelimiter;
+	}
+	else
+	{
+		return;
+	}
+	
 	pPaint->m_pCanvas->DrawRect (
 		Left, 
 		LineRect.m_Bottom - 1,

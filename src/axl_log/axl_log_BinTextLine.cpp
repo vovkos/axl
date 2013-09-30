@@ -139,24 +139,25 @@ CBinTextLine::AddBinData (
 	Offset = m_BinData.GetCount ();
 	m_BinData.Append ((uchar_t*) _p, ActualSize);
 	
-	m_OriginalAttrArray.SetAttr (Attr, Offset, Offset + ActualSize);
-	m_AttrArray.SetAttr (Attr, Offset, Offset + ActualSize);
+	m_AttrArray.SetAttr (Offset, Offset + ActualSize, Attr);
 
 	return ActualSize;
 }
 
 void
 CBinTextLine::Colorize (
-	const gui::TTextAttr& Attr,
-	size_t OffsetStart,
-	size_t OffsetEnd,
-	size_t Metric
+	uint64_t BeginOffset,
+	uint64_t EndOffset,
+	const gui::TTextAttr& Attr
 	)
 {
-	size_t ColStart = FindBinTextColByOffset (OffsetStart);
-	size_t ColEnd = FindBinTextColByOffset (OffsetEnd);
+	if (BeginOffset < m_BinOffset)
+		m_BinOffset = BeginOffset;
 
-	m_AttrArray.SetAttr (Attr, ColStart, ColEnd, Metric);
+	size_t ColStart = FindBinTextColByOffset ((size_t) (BeginOffset - m_BinOffset));
+	size_t ColEnd = FindBinTextColByOffset ((size_t) (EndOffset - m_BinOffset));
+
+	m_AttrArray.SetAttr (ColStart, ColEnd, Attr, 1);
 }
 
 size_t
@@ -198,6 +199,21 @@ CBinTextLine::Save (rtl::CArrayT <uint8_t>* pBuffer)
 	pBuffer->Append ((uint8_t*) m_BinTextMap.ca (), m_BinTextMap.GetCount () * sizeof (TBinTextMapEntry));
 
 	return pBuffer->GetCount ();
+}
+
+void
+CBinTextLine::Clear ()
+{
+	CBinLine::Clear ();
+	m_BinText.Clear ();
+	m_BinTextMap.Clear ();
+}
+
+void
+CBinTextLine::UpdateLongestLineLength (TLongestLineLength* pLength)
+{
+	if (m_BinDataConfig.m_BinTextLineSize > pLength->m_BinTextLineSize)
+		pLength->m_BinTextLineSize = m_BinDataConfig.m_BinTextLineSize;
 }
 
 //.............................................................................

@@ -8,6 +8,80 @@ namespace qt {
 
 //.............................................................................
 
+uint_t
+IQtWidget::GetKeyFromQtKey (int QtKey)
+{
+	if (!(QtKey & 0x01000000))
+		return QtKey;
+
+	size_t Index = QtKey & ~0x01000000;
+
+	static uint_t KeyTable [] = 
+	{
+		EKey_Esc,         // 0x00
+		EKey_Tab,         // 0x01
+		0,                // 0x02
+		EKey_Backspace,   // 0x03
+		EKey_Enter,       // 0x04
+		EKey_Enter,       // 0x05
+		EKey_Insert,      // 0x06
+		EKey_Delete,      // 0x07
+		EKey_Pause,       // 0x08
+		EKey_Print,       // 0x09
+		0,                // 0x0a
+		0,                // 0x0b
+		0,                // 0x0c
+		0,                // 0x0d
+		0,                // 0x0e
+		0,                // 0x0f
+		EKey_Home,        // 0x10
+		EKey_End,         // 0x11
+		EKey_Left,        // 0x12
+		EKey_Up,          // 0x13
+		EKey_Right,       // 0x14
+		EKey_Down,        // 0x15
+		EKey_PageUp,      // 0x16
+		EKey_PageDown,    // 0x17
+		0,                // 0x18
+		0,                // 0x19
+		0,                // 0x1a
+		0,                // 0x1b
+		0,                // 0x1c
+		0,                // 0x1d
+		0,                // 0x1e
+		0,                // 0x1f
+		EKey_Shift,       // 0x20
+		EKey_Ctrl,        // 0x21
+		0,                // 0x22
+		EKey_Alt,         // 0x23
+		EKey_CapsLock,    // 0x24
+		EKey_NumLock,     // 0x25
+		EKey_ScrollLock,  // 0x26
+		0,                // 0x27
+		0,                // 0x28
+		0,                // 0x29
+		0,                // 0x2a
+		0,                // 0x2b
+		0,                // 0x2c
+		0,                // 0x2e
+		0,                // 0x2f
+		EKey_F1,          // 0x30
+		EKey_F2,          // 0x31
+		EKey_F3,          // 0x32
+		EKey_F4,          // 0x33
+		EKey_F5,          // 0x34
+		EKey_F6,          // 0x35
+		EKey_F7,          // 0x36
+		EKey_F8,          // 0x37
+		EKey_F9,          // 0x38
+		EKey_F10,         // 0x39
+		EKey_F11,         // 0x3a
+		EKey_F12,         // 0x3b
+	};
+
+	return Index < countof (KeyTable) ? KeyTable [Index] : 0;
+}
+
 void 
 IQtWidget::OnEvent (
 	QEvent* pEvent,

@@ -14,21 +14,16 @@ CPacketFile::Open (
 	uint_t Flags
 	)
 {
-	bool Result;
-
-	uint64_t FileSize;
-	uint64_t ActualSize;
-
 	Close ();
 
-	Result = m_File.Open (pFileName, Flags);
+	bool Result = m_File.Open (pFileName, Flags);
 	if (!Result)
 		return false;
 
 	m_pHdr = (TPacketFileHdr*) m_File.View (0, sizeof (TPacketFileHdr), true);
 	
-	FileSize = sizeof (TPacketFileHdr) + m_pHdr->m_TotalPacketSize;
-	ActualSize = m_File.GetSize ();
+	uint64_t FileSize = sizeof (TPacketFileHdr) + m_pHdr->m_TotalPacketSize;
+	uint64_t ActualSize = m_File.GetSize ();
 
 	if (m_pHdr->m_Signature == EPacketFile_FileSignature && 
 		m_pHdr->m_Version == EPacketFile_CurrentVersion &&
@@ -50,7 +45,7 @@ CPacketFile::Open (
 	m_pHdr->m_Version = EPacketFile_CurrentVersion;
 	m_pHdr->m_PacketCount = 0;
 	m_pHdr->m_TotalPacketSize = 0;
-	m_pHdr->m_SyncId = 0;
+	m_pHdr->m_ClearCount = 0;
 	m_pHdr->m_ClassGuid = rtl::GUID_Null;
 
 	m_File.SetSize (sizeof (TPacketFileHdr));
@@ -71,16 +66,14 @@ CPacketFile::Clear ()
 
 	m_pHdr->m_PacketCount = 0;
 	m_pHdr->m_TotalPacketSize = 0;
-	m_pHdr->m_SyncId++;
+	m_pHdr->m_ClearCount++;
 
 	m_File.SetSize (sizeof (TPacketFileHdr));
 }
 
-TPacket*
-CPacketFile::GetPacket (size_t Offset) const
+const TPacket*
+CPacketFile::GetPacket (uint64_t Offset) const
 {
-	TPacket* pPacket;
-
 	ASSERT (m_pHdr);
 
 	if (Offset >= m_pHdr->m_TotalPacketSize)
@@ -88,37 +81,31 @@ CPacketFile::GetPacket (size_t Offset) const
 
 	Offset += sizeof (TPacketFileHdr);
 
-	pPacket = (TPacket*) m_File.View (Offset, sizeof (TPacket));
-
-	ASSERT (pPacket); 
-	ASSERT (pPacket->m_Signature == EPacketFile_PacketSignature); 
+	TPacket* pPacket = (TPacket*) m_File.View (Offset, sizeof (TPacket));
+	ASSERT (pPacket && pPacket->m_Signature == EPacketFile_PacketSignature); 
 
 	if (pPacket->m_DataSize) // make sure mapping covers data as well
-		pPacket = (TPacket*) m_File.View (Offset, sizeof (TPacket) + pPacket->m_DataSize);
+		pPacket = (TPacket*) m_File.View (Offset, sizeof (TPacket) + (size_t) pPacket->m_DataSize);
 	
 	return pPacket;
 }
 
-bool
-CPacketFile::Write (
+const TPacket*
+CPacketFile::AddPacket (
 	uint64_t Timestamp,
 	uint_t Code,
 	const void* p,
 	size_t Size
 	)
 {
-	TPacket* pPacket;
-
-	size_t Offset;
-	size_t FullSize;
-
 	ASSERT (m_pHdr);
 
-	Offset = sizeof (TPacketFileHdr) + m_pHdr->m_TotalPacketSize;
-	FullSize = sizeof (TPacket) + Size;
-	pPacket = (TPacket*) m_File.View (Offset, FullSize); 
+	uint64_t FileOffset = sizeof (TPacketFileHdr) + m_pHdr->m_TotalPacketSize;
+	size_t FullSize = sizeof (TPacket) + Size;
+
+	TPacket* pPacket = (TPacket*) m_File.View (FileOffset, FullSize); 
 	if (!pPacket)
-		return false;
+		return NULL;
 
 	pPacket->m_Signature = EPacketFile_PacketSignature;
 	pPacket->m_Code = Code;
@@ -129,10 +116,10 @@ CPacketFile::Write (
 		memcpy (pPacket + 1, p, Size);
 
 	m_pHdr->m_PacketCount++;
-	m_pHdr->m_TotalPacketSize += (uint32_t) FullSize;
+	m_pHdr->m_TotalPacketSize += FullSize;
 
-	m_File.SetSize (Offset + FullSize);
-	return true;
+	m_File.SetSize (FileOffset + FullSize);
+	return pPacket;
 }
 
 //.............................................................................

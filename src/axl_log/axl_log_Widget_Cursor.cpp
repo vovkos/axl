@@ -91,8 +91,7 @@ CWidget::GetBinLineOffset (
 	size_t Col,
 	size_t* pOffset,
 	size_t* pLineOffset,
-	size_t* pHexCol,
-	size_t* pMergeId
+	size_t* pHexCol
 	)
 {
 	size_t LineOffset;
@@ -118,10 +117,7 @@ CWidget::GetBinLineOffset (
 		*pLineOffset = LineOffset;
 
 	if (pOffset)
-		*pOffset = pLine->m_BinOffset + LineOffset;
-
-	if (pMergeId)
-		*pMergeId = pLine->m_MergeId;
+		*pOffset = (size_t) pLine->m_BinOffset + LineOffset;
 
 	return true;
 }
@@ -170,7 +166,7 @@ CWidget::ValidateCursorPos (
 	if (Col < 0)
 		Col = 0;
 
-	pLine = GetLine (Line);
+	pLine = m_CacheMgr.GetLine (Line);
 
 	switch (pLine->m_LineKind)
 	{
@@ -297,7 +293,7 @@ CWidget::SetCursorPos (
 		m_SelStart = Pos;
 		m_SelEnd = Pos;
 
-		pNewLine = GetLine (Pos.m_Line);
+		pNewLine = m_CacheMgr.GetLine (Pos.m_Line);
 		if (pNewLine && pNewLine->m_LineKind == ELine_BinHex)
 		{
 			gui::TCursorPos PosStart = m_CursorPos;
@@ -433,7 +429,10 @@ CWidget::SetSelection (
 
 	ValidateCursorPosRange (&SelStart, &SelEnd);
 
-	if (m_SelStart == SelStart && m_SelEnd == SelEnd)
+	bool IsStartPosChanged = m_SelStart != SelStart;
+	bool IsEndPosChanged = m_SelEnd != SelEnd;
+
+	if (!IsStartPosChanged && !IsEndPosChanged)
 		return;
 
 	size_t OldSelStartLine = m_SelStart.m_Line;
@@ -446,7 +445,9 @@ CWidget::SetSelection (
 		m_SelStart.m_Line, 
 		m_SelEnd.m_Line,
 		OldSelStartLine,
-		OldSelEndLine
+		OldSelEndLine,
+		IsStartPosChanged,
+		IsEndPosChanged
 		);
 }
 
@@ -488,7 +489,10 @@ CWidget::SetHilite (
 
 	ValidateCursorPosRange (&PosStart, &PosEnd);
 
-	if (m_HiliteStart == PosStart && m_HiliteEnd == PosEnd)
+	bool IsStartPosChanged = m_HiliteStart != PosStart;
+	bool IsEndPosChanged = m_HiliteEnd != PosEnd;
+
+	if (!IsStartPosChanged && !IsEndPosChanged)
 		return;
 
 	size_t OldHiliteStartLine = m_HiliteStart.m_Line;
@@ -501,7 +505,9 @@ CWidget::SetHilite (
 		m_HiliteStart.m_Line, 
 		m_HiliteEnd.m_Line,
 		OldHiliteStartLine,
-		OldHiliteEndLine
+		OldHiliteEndLine,
+		IsStartPosChanged,
+		IsEndPosChanged
 		);
 }
 
@@ -532,7 +538,7 @@ CWidget::GetHiliteCol (
 bool
 CWidget::GetBinRangePos (
 	CBinLine* pLine,
-	size_t Offset,
+	uint64_t Offset,
 	size_t Length,
 	gui::TCursorPos* pPosStart,
 	gui::TCursorPos* pPosEnd
@@ -540,8 +546,8 @@ CWidget::GetBinRangePos (
 {
 	size_t Line;
 
-	CPage* pPage = pLine->m_pPage;
-	size_t EndOffset = Offset + Length;
+	CCachePage* pPage = pLine->m_pPage;
+	uint64_t EndOffset = Offset + Length;
 	
 	size_t LineSize;
 
@@ -549,14 +555,14 @@ CWidget::GetBinRangePos (
 
 	while (pLine->m_BinOffset > Offset) 
 	{
-		CLine* pPrevLine = GetPrevLine (pLine);
-		if (!pPrevLine || !pPrevLine->IsMerged (pLine))
+		CLine* pPrevLine = m_CacheMgr.GetPrevLine (pLine);
+		if (!pPrevLine || !(pPrevLine->GetFlags () & ELineFlag_MergedForward))
 			return false;
 
 		pLine = (CBinLine*) pPrevLine;
 	} 
 
-	Line = GetLineIdx (pLine);
+	Line = (size_t) m_CacheMgr.GetLineIdx (pLine);
 
 	// scan forward to the beginning of the range (if anchor line was given properly, cycle will stop immediatly)
 
@@ -566,12 +572,12 @@ CWidget::GetBinRangePos (
 		if (Offset >= pLine->m_BinOffset && Offset <= pLine->m_BinOffset + LineSize)
 		{
 			pPosStart->m_Line = Line;
-			pPosStart->m_Col = GetHiliteCol (pLine, Offset - pLine->m_BinOffset);
+			pPosStart->m_Col = GetHiliteCol (pLine, (size_t) (Offset - pLine->m_BinOffset));
 			break;
 		}
 
-		CLine* pNextLine = GetNextLine (pLine);
-		if (!pNextLine || !pLine->IsMerged (pNextLine))
+		CLine* pNextLine = m_CacheMgr.GetNextLine (pLine);
+		if (!pNextLine || !(pLine->GetFlags () & ELineFlag_MergedForward))
 			return false;
 
 		pLine = (CBinLine*) pNextLine;
@@ -586,12 +592,12 @@ CWidget::GetBinRangePos (
 		if (EndOffset >= pLine->m_BinOffset && EndOffset <= pLine->m_BinOffset + LineSize)
 		{
 			pPosEnd->m_Line = Line;
-			pPosEnd->m_Col = GetHiliteCol (pLine, EndOffset - pLine->m_BinOffset);
+			pPosEnd->m_Col = GetHiliteCol (pLine, (size_t) (EndOffset - pLine->m_BinOffset));
 			break;
 		}
 
-		CLine* pNextLine = GetNextLine (pLine);
-		if (!pNextLine || !pLine->IsMerged (pNextLine))
+		CLine* pNextLine = m_CacheMgr.GetNextLine (pLine);
+		if (!pNextLine || !(pLine->GetFlags () & ELineFlag_MergedForward))
 			return false;
 
 		pLine = (CBinLine*) pNextLine;

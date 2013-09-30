@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_gui_TextAttrAnchorArray.h"
+#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace gui {
@@ -131,24 +132,37 @@ CTextAttrAnchorArray::Normalize (
 }
 
 void
+TraceAttrArray (const CTextAttrAnchorArray& Array)
+{
+	size_t Count = Array.GetCount ();
+	dbg::Trace ("--- CTextAttrAnchorArray {%d}---\n", Count);
+
+	for (size_t i = 0; i < Count; i++)
+	{
+		const gui::TTextAttrAnchor* pAnchor = &(Array [i]);
+		dbg::Trace ("[%d] ofs:%02x m:%d fc:%x\n", i, pAnchor->m_Offset, pAnchor->m_Metric, pAnchor->m_Attr.m_ForeColor);
+	}
+}
+
+void
 CTextAttrAnchorArray::SetAttr (
+	size_t BeginOffset, 
+	size_t EndOffset, 
 	const TTextAttr& Attr,
-	size_t Begin,
-	size_t End,
 	size_t Metric
 	)
 {
-	if (Begin >= End)
+	if (BeginOffset >= EndOffset)
 		return;
 
 	m_Array.EnsureExclusive ();
 
 	// important: END anchor first! otherwise the first anchor could "bleed" metric to the right
 
-	size_t EndIdx = GetEndAnchor (End, Metric);
+	size_t EndIdx = GetEndAnchor (EndOffset, Metric);
 
 	size_t OldCount = m_Array.GetCount ();
-	size_t StartIdx = GetStartAnchor (Begin, Metric);
+	size_t StartIdx = GetStartAnchor (BeginOffset, Metric);
 
 	// detect insertion
 
@@ -166,6 +180,7 @@ CTextAttrAnchorArray::SetAttr (
 	}
 
 	Normalize (StartIdx, EndIdx);
+	// TraceAttrArray (*this);
 }
 
 //.............................................................................

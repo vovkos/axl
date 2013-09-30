@@ -6,12 +6,36 @@
 
 #define _AXL_LOG_LINE_H
 
-#include "axl_gui_HyperText.h"
+#include "axl_gui_Font.h"
+#include "axl_rtl_Array.h"
 
 namespace axl {
 namespace log {
 
-class CPage;
+class CCachePage;
+
+//.............................................................................
+
+enum ELineAttrFlag
+{
+	ELineAttrFlag_TileIcon  = 0x01,
+	ELineAttrFlag_Delimiter = 0x02,
+	ELineAttrFlag_Override  = 0x04,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TLineAttr: gui::TTextAttr
+{
+	size_t m_IconIdx;
+	uint_t m_Flags;
+
+	TLineAttr ()
+	{
+		m_IconIdx = -1;
+		m_Flags = 0;
+	}
+};
 
 //.............................................................................
 
@@ -27,46 +51,12 @@ enum ELine
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ELineDelimiter
+enum ELineFlag
 {
-	ELineDelimiter_None = 0,
-	ELineDelimiter_Light,
-	ELineDelimiter_Normal,
-	ELineDelimiter_Bold,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum ELineAttrFlag
-{
-	ELineAttrFlag_TileIcon = 0x01,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct TLineAttr: gui::TTextAttr
-{
-	uint_t m_Flags;
-	size_t m_Icon;
-
-	ELineDelimiter m_UpperDelimiter;
-	ELineDelimiter m_LowerDelimiter;
-
-	TLineAttr ();
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct TPageVolatilePacket
-{ 
-	size_t m_Offset;
-	uint_t m_Code;
-	uint64_t m_Timestamp;
-	size_t m_DataSize; 
-	size_t m_VolatileIdx;
-	uint_t m_VolatileFlags;
-	size_t m_FirstLineIdx;
-	size_t m_LineCount;
+	ELineFlag_FirstLineOfPacket = 0x01,
+	ELineFlag_LastLineOfPacket  = 0x02,
+	ELineFlag_MergedBackward    = 0x04,
+	ELineFlag_MergedForward     = 0x08,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -74,44 +64,63 @@ struct TPageVolatilePacket
 struct TLine
 {
 	ELine m_LineKind;
-	TLineAttr m_LineAttr;
-	TPageVolatilePacket m_VolatilePacket;
-
-	bool_t m_IsFirstLineOfPacket;
-	size_t m_FirstPacketOffset;
+	uint_t m_Flags;
+	uint32_t m_FoldablePacketIdx;
+	TLineAttr m_LineAttr;	
+	uint_t m_PartCode;
+	uint64_t m_FirstPacketOffset;
 	uint64_t m_FirstTimestamp;
 	uint64_t m_LastTimestamp;
+	uint64_t m_PartIdx;
+};
 
-	uint_t m_PartCode; 
-	size_t m_PartIdx;
-	size_t m_MergeId; // all the lines in the same merged block have the same merge id
+//.............................................................................
+
+struct TLongestLineLength
+{
+	size_t m_TextLineLength;
+	size_t m_BinHexLineSize;
+	size_t m_BinTextLineSize;
+
+	TLongestLineLength ()
+	{
+		Clear ();
+	}
+
+	void
+	Clear ()
+	{
+		memset (this, 0, sizeof ( TLongestLineLength));
+	}
 };
 
 //.............................................................................
 
 class CLine
 {
-	friend class CPage;
-	friend class CPageRepresenterTarget;
+	friend class CCachePage;
+	friend class CCacheMgr;
+	friend class CLineRepresenterTarget;
+	friend class CLineRepresentMgr;
 	friend class CWidget;
 
 protected:
 	ELine m_LineKind;
 
-	CPage* m_pPage;
+	uint_t m_Flags;
+
+	CCachePage* m_pPage;
 	size_t m_LineIdx;
-	size_t m_VolatilePacketIdx;
+	size_t m_FoldablePacketIdx;
 
 	TLineAttr m_LineAttr;
 
-	bool m_IsFirstLineOfPacket;
-	size_t m_FirstPacketOffset;
+	uint_t m_PartCode; 
+
+	uint64_t m_FirstPacketOffset;
 	uint64_t m_FirstTimestamp;
 	uint64_t m_LastTimestamp;
-
-	uint_t m_PartCode; 
-	size_t m_PartIdx;
-	size_t m_MergeId; // all the lines in the same merged block have the same merge id
+	uint64_t m_PartIdx;
 
 public:
 	intptr_t m_UserParam;
@@ -130,7 +139,13 @@ public:
 		return m_LineKind;
 	}
 
-	CPage*
+	uint_t 
+	GetFlags ()
+	{
+		return m_Flags;
+	}
+
+	CCachePage*
 	GetCachePage ()
 	{
 		return m_pPage;
@@ -143,21 +158,15 @@ public:
 	}
 
 	size_t
-	GetVolatilePacketIdx ()
+	GetFoldablePacketIdx ()
 	{
-		return m_VolatilePacketIdx;
+		return m_FoldablePacketIdx;
 	}
 
 	bool
 	IsBin ()
 	{
 		return m_LineKind == ELine_BinHex || m_LineKind == ELine_BinText;
-	}
-
-	bool
-	IsMerged (CLine* pNextLine)
-	{
-		return m_MergeId != -1 && m_MergeId == pNextLine->m_MergeId;
 	}
 
 	virtual 
@@ -170,6 +179,14 @@ public:
 	virtual 
 	size_t 
 	Save (rtl::CArrayT <uint8_t>* pBuffer);
+
+	virtual 
+	void
+	Clear ();
+
+	virtual 
+	void
+	UpdateLongestLineLength (TLongestLineLength* pLength) = 0;
 };
 
 //.............................................................................

@@ -16,6 +16,17 @@
 namespace axl {
 namespace log {
 
+class CCacheMgr;
+
+//.............................................................................
+
+struct TFoldablePacket
+{ 
+	uint64_t m_FoldFlags;
+	uint64_t m_Offset;
+	size_t m_LineCount;
+};
+
 //.............................................................................
 
 enum EPageFlag
@@ -28,41 +39,30 @@ enum EPageFlag
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CPage: public rtl::TListLink
+class CCachePage: public rtl::TListLink
 {
 	friend class CServer;
+	friend class CCacheMgr;
 	friend class CWidget;
-	friend class CPageRepresenterTarget;
+	friend class CLineRepresenterTarget;
 
 	friend class CColorizeMgr;
 
 protected:
+	CCacheMgr* m_pCacheMgr;
+
 	uint_t m_Flags;
 
-	rtl::CArrayT <CLine*> m_LineArray;
-	rtl::CArrayT <TPageVolatilePacket> m_VolatilePacketArray;
-	
-	size_t m_PacketOffset;
-	size_t m_IndexNodeOffset;
 	TIndexLeaf m_IndexLeaf;
-	rtl::CArrayT <TIndexVolatilePacket> m_IndexVolatilePacketArray;
+	rtl::CArrayT <uint64_t> m_FoldFlagArray;
+	rtl::CArrayT <TFoldablePacket> m_FoldablePacketArray;
 
-	size_t m_LongestTextLineLength;
-	size_t m_LongestBinHexLineSize;
-	size_t m_LongestBinTextLineSize;
-
-	// last colorize final state
-
-	size_t m_ColorizedLineCount;
-	size_t m_ColorizerLine;
-	size_t m_ColorizerOffset;
-	intptr_t m_ColorizerState;
-	ref::CPtrT <void> m_ColorizerStateEx;
+	rtl::CArrayT <CLine*> m_LineArray;
 
 public:
-	CPage ();
+	CCachePage ();
 
-	~CPage ()
+	~CCachePage ()
 	{
 		Clear ();
 	}
@@ -85,14 +85,11 @@ public:
 		return m_LineArray;
 	}
 
-	rtl::CArrayT <TPageVolatilePacket>
-	GetVolatilePacketArray ()
+	rtl::CArrayT <TFoldablePacket>
+	GetFoldablePacketArray ()
 	{
-		return m_VolatilePacketArray;
+		return m_FoldablePacketArray;
 	}
-
-	size_t
-	GetVolatilePacketIdx (const TPageVolatilePacket* pPacket);
 
 	void
 	Clear ();
@@ -119,15 +116,13 @@ public:
 		);
 		
 	void
-	ClearColorization ();
-	
-	size_t 
-	GetVolatilePacketAnchorLineIdx (TPageVolatilePacket* pVolatilePacket);
-
-	bool 
-	SaveLines (
-		rtl::CArrayT <uchar_t>* pBuffer,
-		size_t LineIdx = 0
+	LoadLines (
+		size_t LineIdx,
+		size_t LineCount,
+		const void* pLineBuffer,
+		size_t LineBufferSize,
+		TLongestLineLength* pLength,
+		bool* pIsRetroColorized
 		);
 };
 

@@ -24,6 +24,7 @@
 #include "axl_g_Pch.h"
 #include "axl_log_Server.h"
 #include "axl_log_Widget.h"
+#include "axl_log_RagelColorizer.h"
 #include "axl_gui_qt_Engine.h"
 
 using namespace axl;

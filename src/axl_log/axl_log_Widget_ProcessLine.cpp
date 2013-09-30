@@ -11,13 +11,12 @@ CWidget::GetBinOffset (
 	const gui::TCursorPos& Pos,
 	size_t* pOffset,
 	size_t* pLineOffset,
-	size_t* pHexCol,
-	size_t* pMergeId
+	size_t* pHexCol
 	)
 {
 	CLine* pLine = GetLine (Pos.m_Line);
 	return pLine && pLine->IsBin () ? 
-		((CBinLine*) pLine)->GetBinLineOffset (Pos.m_Col, pOffset, pLineOffset, pHexCol, pMergeId) : 
+		((CBinLine*) pLine)->GetBinLineOffset (Pos.m_Col, pOffset, pLineOffset, pHexCol) : 
 		false;
 }
 
@@ -35,16 +34,13 @@ CWidget::GetRangeBinBlock (
 	bool IsNonEmpty = ValidateCursorPosRange (&PosStart, &PosEnd);
 
 	size_t StartOffset = -1;
-	size_t StartMergeId = 0;
-
 	size_t EndOffset = -1;
-	size_t EndMergeId = 0;
 	size_t EndHexCol = 0;
 
-	GetBinOffset (PosStart, &StartOffset, NULL, NULL, &StartMergeId);
-	GetBinOffset (PosEnd, &EndOffset, NULL, &EndHexCol, &EndMergeId);
+	GetBinOffset (PosStart, &StartOffset, NULL, NULL);
+	GetBinOffset (PosEnd, &EndOffset, NULL, &EndHexCol);
 
-	if (StartOffset == -1 || EndOffset == -1 || StartMergeId != EndMergeId)
+	if (StartOffset == -1 || EndOffset == -1)
 	{
 		if (pOffset)
 			*pOffset = -1;
@@ -104,18 +100,16 @@ CWidget::ProcessRangeAsBinBlock (
 
 	size_t StartFullOffset = -1;
 	size_t StartLineOffset = -1;
-	size_t StartMergeId = 0;
 	size_t StartHexCol;
 
 	size_t EndFullOffset = -1;
 	size_t EndLineOffset = -1;
-	size_t EndMergeId = 0;
 	size_t EndHexCol;
 
-	GetBinOffset (PosStart, &StartFullOffset, &StartLineOffset, &StartHexCol, &StartMergeId);
-	GetBinOffset (PosEnd, &EndFullOffset, &EndLineOffset, &EndHexCol, &EndMergeId);
+	GetBinOffset (PosStart, &StartFullOffset, &StartLineOffset, &StartHexCol);
+	GetBinOffset (PosEnd, &EndFullOffset, &EndLineOffset, &EndHexCol);
 
-	if (StartFullOffset == -1 || EndFullOffset == -1 || StartMergeId != EndMergeId)
+	if (StartFullOffset == -1 || EndFullOffset == -1)
 		return 0;
 
 	if (EndHexCol)

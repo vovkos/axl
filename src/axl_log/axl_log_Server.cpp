@@ -9,29 +9,21 @@ namespace log {
 CServer::CServer ()
 {
 	m_Flags = 0;
-
 	m_pClient = NULL;
 	m_pRepresenter = NULL;
 	m_pColorizer = NULL;
 	m_pHyperlinkHandler = NULL;
-
 	m_IoThread.m_pServer = this;
-	m_ColorizeThread.m_pServer = this;
-
-	memset (&m_IndexPrevPacketFileHdrSnapshot, 0, sizeof (m_IndexPrevPacketFileHdrSnapshot));
-	memset (&m_IndexLeaf, 0, sizeof (m_IndexLeaf));
-	m_IndexLeaf.m_DefBinDataConfig.SetDefaults ();
-
-	m_IndexLeafLineCount = 0;
-	m_IndexLeafLineCountLimit = 32;
-	m_IndexVolatilePacketCountLimit = 8;
 }
 
 bool
 CServer::Create (
 	IClient* pClient,
 	IRepresenter* pRepresenter,
-	const char* pPacketFilePath
+	IColorizer* pColorizer,
+	const char* pPacketFilePath,
+	const char* pMergeFilePath,
+	const char* pColorizerStateFilePath
 	)
 {
 	bool Result;
@@ -39,20 +31,28 @@ CServer::Create (
 	Stop ();
 
 	Result = 
+		m_PacketFile.Open (pPacketFilePath, axl::io::EFileFlag_ShareWrite) &&
 		m_PacketFile_w.Open (pPacketFilePath, axl::io::EFileFlag_ShareWrite) &&
-		m_PacketFile.Open (pPacketFilePath, axl::io::EFileFlag_ShareWrite);
+		m_MergeFile.Open (pMergeFilePath, io::EFileFlag_DeleteOnClose) &&
+		m_ColorizerStateFile.Open (pColorizerStateFilePath, io::EFileFlag_DeleteOnClose);
 
 	if (!Result)
 		return false;
-
+	
 	m_Flags = EFlag_Running | EFlag_Rebuild;
 	m_pClient = pClient;
 	m_pRepresenter = pRepresenter;
+	m_pColorizer = pColorizer;
+
+	CPacketFile* pPacketFile = &m_PacketFile;
+
+	m_FilterMgr.Setup (pPacketFile);
+	m_IndexMgr.Setup (pClient, pRepresenter, pPacketFile, &m_MergeFile);
+	m_ColorizeMgr.Setup (pRepresenter, pColorizer, pPacketFile, &m_MergeFile, &m_ColorizerStateFile);
+	m_LineRepresentMgr.Setup (pClient, pRepresenter, pColorizer, pPacketFile, &m_MergeFile, &m_ColorizerStateFile);
+
 	m_IoThreadEvent.Signal ();
-	
-	return 
-		m_IoThread.Start () &&
-		m_ColorizeThread.Start ();
+	return m_IoThread.Start ();
 }
 
 void
@@ -62,89 +62,108 @@ CServer::Stop ()
 		return;
 
 	m_Lock.Lock ();
-	m_Flags |= EFlag_TerminateAllThreads;
+	m_IoThreadMsgList.Clear ();
+	m_Flags |= EFlag_Terminate;
 	m_IoThreadEvent.Signal ();
-	m_ColorizeThreadEvent.Signal ();
 	m_Lock.Unlock ();
 
 	m_IoThread.WaitAndClose ();
 	m_IoThreadEvent.Reset ();
 
-	m_ColorizeThread.WaitAndClose ();
-	m_ColorizeThreadEvent.Reset ();
-
 	m_PacketFile.Close ();
 	m_PacketFile_w.Close ();
-	m_FilterStack.Clear ();
 
 	m_Flags = 0;
 }
 
 void
-CServer::ProcessSrvMsg (
-	ESrvMsg MsgKind,
-	const void* p,
-	size_t Size
-	)
+CServer::SendMsg (const TMsg* pMsgHdr)
 {
-	switch (MsgKind)
+	switch (pMsgHdr->m_MsgKind)
 	{
 	case ESrvMsg_Clear:
-		Clear ();
+		m_Lock.Lock ();
+		m_Flags |= EFlag_Clear;
+		m_IoThreadMsgList.Clear (); // not relevant anymore
+		m_IoThreadEvent.Signal ();
+		m_Lock.Unlock ();
 		break;
 
 	case ESrvMsg_Rebuild:
-		Rebuild ();
+		m_Lock.Lock ();
+		m_Flags |= EFlag_Rebuild;
+		m_IoThreadMsgList.Clear (); // not relevant anymore
+		m_IoThreadEvent.Signal ();
+		m_Lock.Unlock ();
 		break;
 
 	case ESrvMsg_Update:
-		Update ();
+		m_Lock.Lock ();
+		m_Flags |= EFlag_Update;
+		m_IoThreadEvent.Signal ();
+		m_Lock.Unlock ();
+		break;
+
+	case ESrvMsg_SetBinDataConfig:
+		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_SetBinDataConfig))
+		{
+			TSrvMsg_SetBinDataConfig* pMsg = (TSrvMsg_SetBinDataConfig*) pMsgHdr;
+
+			m_Lock.Lock ();
+			m_BinDataConfig = pMsg->m_BinDataConfig; 
+			m_Flags |= EFlag_Update;
+			m_IoThreadEvent.Signal ();
+			m_Lock.Unlock ();
+		}
+
 		break;
 
 	case ESrvMsg_WritePacket:
-		if (Size >= sizeof (TSrvMsg_WritePacket))
+		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_WritePacket))
 		{
-			TSrvMsg_WritePacket* pMsg = (TSrvMsg_WritePacket*) p;
+			TSrvMsg_WritePacket* pMsg = (TSrvMsg_WritePacket*) pMsgHdr;
+			if (pMsg->m_MsgSize < sizeof (TSrvMsg_WritePacket) + pMsg->m_DataSize)
+				break;
 
-			WritePacket (
-				pMsg->m_Timestamp, 
-				pMsg->m_Code, 
-				pMsg->m_DataSize ? pMsg + 1 : NULL, 
-				pMsg->m_DataSize
-				);
+			m_Lock.Lock ();
+			m_PacketFile_w.AddPacket (pMsg->m_Timestamp, pMsg->m_Code, pMsg + 1, pMsg->m_DataSize);
+			m_Flags |= EFlag_Update;
+			m_IoThreadEvent.Signal ();
+			m_Lock.Unlock ();
 		}
 
 		break;
 
-	case ESrvMsg_Represent:
-		if (Size >= sizeof (TSrvMsg_Represent))
+	case ESrvMsg_RepresentPage:
+		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
 		{
-			TSrvMsg_Represent* pMsg = (TSrvMsg_Represent*) p;
-			Represent (
-				pMsg->m_SyncId, 
-				pMsg->m_IndexNodeOffset, 
-				pMsg->m_IndexNodeLineCount,
-				pMsg->m_LineIdx,
-				&pMsg->m_IndexLeaf,
-				&pMsg->m_PrevIndexLeaf,
-				(TIndexVolatilePacket*) (pMsg + 1)
-				);
+			TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsgHdr;
+			size_t FoldFlagArraySize = pMsg->m_IndexLeaf.m_FoldablePacketCount * sizeof (uint64_t);
+			
+			if (pMsg->m_MsgSize < sizeof (TSrvMsg_RepresentPage) + FoldFlagArraySize)
+				break;
+
+			rtl::TListLink* pEntry = AXL_MEM_NEW_EXTRA (rtl::TListLink, pMsg->m_MsgSize);
+			memcpy (pEntry + 1, pMsg, pMsg->m_MsgSize);
+
+			m_Lock.Lock ();
+			m_IoThreadMsgList.InsertTail (pEntry);
+			m_IoThreadEvent.Signal ();
+			m_Lock.Unlock ();
 		}
 
 		break;
 
-	case ESrvMsg_Colorize:
-		if (Size > sizeof (TSrvMsg_Represent))
+	case ESrvMsg_FoldPacket:
+		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_FoldPacket))
 		{
-			TSrvMsg_Colorize* pMsg = (TSrvMsg_Colorize*) p;
-			Colorize (
-				pMsg->m_SyncId, 
-				pMsg->m_IndexNodeOffset, 
-				pMsg->m_LineIdx,
-				pMsg->m_LineOffset,
-				pMsg + 1,
-				pMsg->m_DataSize
-				);
+			rtl::TListLink* pEntry = AXL_MEM_NEW_EXTRA (rtl::TListLink, pMsgHdr->m_MsgSize);
+			memcpy (pEntry + 1, pMsgHdr, pMsgHdr->m_MsgSize);
+
+			m_Lock.Lock ();
+			m_IoThreadMsgList.InsertTail (pEntry);
+			m_IoThreadEvent.Signal ();
+			m_Lock.Unlock ();
 		}
 
 		break;
@@ -152,128 +171,130 @@ CServer::ProcessSrvMsg (
 }
 
 void
-CServer::Clear ()
+CServer::IoThreadProc ()
 {
-	m_Lock.Lock ();
-	m_Flags |= EFlag_Clear;
-	m_RepresentMsgList.Clear (); // not relevant anymore
-	m_ColorizeMsgList.Clear (); // not relevant anymore
-	m_IoThreadEvent.Signal ();
-	m_Lock.Unlock ();
-}
+	uint64_t RebuildCount = 0;
 
-void 
-CServer::Rebuild ()
-{
-	m_Lock.Lock ();
-	m_Flags |= EFlag_Rebuild;
-	m_RepresentMsgList.Clear (); // not relevant anymore
-	m_ColorizeMsgList.Clear (); // not relevant anymore
-	m_IoThreadEvent.Signal ();
-	m_Lock.Unlock ();
-}
+	for (;;)
+	{
+		m_IoThreadEvent.Wait ();
 
-void 
-CServer::SetDefBinDataConfig (const TBinDataConfig* pConfig)
-{
-	m_Lock.Lock ();
-	if (pConfig)
-		m_DefBinDataConfig = *pConfig; 
-	else
-		m_DefBinDataConfig.SetDefaults ();
+		m_Lock.Lock ();
 
-	m_Flags |= EFlag_Update;
-	m_IoThreadEvent.Signal ();
-	m_Lock.Unlock ();
-}
+		if (m_Flags & EFlag_Terminate)
+		{
+			m_Lock.Unlock ();
+			return;
+		}
 
-void 
-CServer::Update ()
-{
-	m_Lock.Lock ();
-	m_Flags |= EFlag_Update;
-	m_IoThreadEvent.Signal ();
-	m_Lock.Unlock ();
-}
+		if (m_Flags & EFlag_Clear)
+			m_PacketFile.Clear ();
+		else if (m_Flags & EFlag_Rebuild)
+			RebuildCount++;
 
-void 
-CServer::WritePacket (
-	uint64_t Timestamp,
-	uint_t Code,
-	const void* p,
-	size_t Size
-	)
-{
-	m_Lock.Lock ();
-	m_PacketFile_w.Write (Timestamp, Code, p, Size);
-	m_Flags |= EFlag_Update;
-	m_IoThreadEvent.Signal ();
-	m_Lock.Unlock ();
-}
+		// take snapshots
 
-void 
-CServer::Represent (
-	size_t SyncId,
-	size_t IndexNodeOffset,
-	size_t IndexNodeLineCount,
-	size_t LineIdx,
-	const TIndexLeaf* pIndexLeaf,
-	const TIndexLeaf* pPrevIndexLeaf,
-	const TIndexVolatilePacket* pVolatilePacketArray
-	)
-{
-	size_t ExtraSize = pIndexLeaf->m_VolatilePacketCount * sizeof (TIndexVolatilePacket);
+		uint_t FlagsSnapshot = m_Flags;
+		m_Flags &= ~(EFlag_Clear | EFlag_Rebuild | EFlag_Update);
 
-	rtl::CBoxListEntryT <TSrvMsg_Represent>* pEntry;
-	pEntry = AXL_MEM_NEW_EXTRA (rtl::CBoxListEntryT <TSrvMsg_Represent>, ExtraSize);
-	pEntry->m_Value.m_SyncId = SyncId;
-	pEntry->m_Value.m_IndexNodeOffset = IndexNodeOffset;
-	pEntry->m_Value.m_IndexNodeLineCount = IndexNodeLineCount;
-	pEntry->m_Value.m_LineIdx = LineIdx;
-	pEntry->m_Value.m_IndexLeaf = *pIndexLeaf;
+		TPacketFileHdr PacketFileHdrSnapshot = *m_PacketFile.GetHdr ();
+		
+		rtl::CStdListT <rtl::TListLink> MsgListSnapshot;
+		MsgListSnapshot.TakeOver (&m_IoThreadMsgList);
 
-	if (pPrevIndexLeaf)
-		pEntry->m_Value.m_PrevIndexLeaf = *pPrevIndexLeaf;
-	else
-		memset (&pEntry->m_Value.m_PrevIndexLeaf, 0, sizeof (pEntry->m_Value.m_PrevIndexLeaf));
+		m_Lock.Unlock ();
 
-	if (ExtraSize)
-		memcpy (pEntry + 1, pVolatilePacketArray, ExtraSize);
+		// filter & index
 
-	m_Lock.Lock ();
-	m_RepresentMsgList.InsertTailEntry (pEntry);
-	m_IoThreadEvent.Signal ();
-	m_Lock.Unlock ();
-}
+		uint64_t SyncId = PacketFileHdrSnapshot.m_ClearCount + RebuildCount;
+		uint64_t TotalPacketSize = PacketFileHdrSnapshot.m_TotalPacketSize;
 
-void 
-CServer::Colorize (
-	size_t SyncId,
-	size_t IndexNodeOffset,
-	size_t LineIdx,
-	size_t LineOffset,
-	const void* p,
-	size_t Size
-	)
-{
-	rtl::CBoxListEntryT <TSrvMsg_Colorize>* pEntry;
-	pEntry = AXL_MEM_NEW_EXTRA (rtl::CBoxListEntryT <TSrvMsg_Colorize>, Size);
-	pEntry->m_Value.m_SyncId = SyncId;
-	pEntry->m_Value.m_IndexNodeOffset = IndexNodeOffset;
-	pEntry->m_Value.m_LineIdx = LineIdx;
-	pEntry->m_Value.m_LineOffset = LineOffset;
-	pEntry->m_Value.m_DataSize = Size;
+		if (FlagsSnapshot & (EFlag_Clear | EFlag_Rebuild))
+		{
+			m_pClient->ClearCache (SyncId);
+			m_IndexMgr.ClearIndex ();
+			m_ColorizeMgr.Reset ();
+			m_LineRepresentMgr.ResetIncrementalRepresent ();
+			m_MergeFile.Clear ();
+			m_ColorizerStateFile.SetSize (0, true);
+		}
 
-	if (Size)
-		memcpy (pEntry + 1, p, Size);
+		if (FlagsSnapshot & (EFlag_Clear | EFlag_Rebuild | EFlag_Update))
+		{
+			if (!m_FilterMgr.IsEmpty ())
+			{
+				m_FilterMgr.Process (SyncId, TotalPacketSize);
+				CPacketFile* pPacketFile = m_FilterMgr.GetTargetPacketFile ();
+				TotalPacketSize = pPacketFile->GetHdr ()->m_TotalPacketSize;
+			}
 
-	m_Lock.Lock ();
-	m_ColorizeMsgList.InsertTailEntry (pEntry);
-	m_ColorizeThreadEvent.Signal ();
-	m_Lock.Unlock ();
+			m_IndexMgr.UpdateIndex (TotalPacketSize);
+		}
+		else if (!m_FilterMgr.IsEmpty ())
+		{
+			CPacketFile* pPacketFile = m_FilterMgr.GetTargetPacketFile ();
+			TotalPacketSize = pPacketFile->GetHdr ()->m_TotalPacketSize;
+		}
+
+		// update or recalc
+
+		m_ColorizeMgr.UpdateColorizerStateFile ();
+
+		// represent
+		
+		while (!MsgListSnapshot.IsEmpty ())
+		{
+			rtl::TListLink* pEntry = MsgListSnapshot.RemoveHead ();
+			TMsg* pMsgHdr = (TMsg*) (pEntry + 1);
+			switch (pMsgHdr->m_MsgKind)
+			{
+			case ESrvMsg_RepresentPage:
+				if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
+				{
+					TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsgHdr;
+					if (pMsg->m_SyncId == SyncId)
+						m_LineRepresentMgr.RepresentPage (
+							SyncId,
+							&pMsg->m_IndexLeaf,
+							(uint64_t*) (pMsg + 1)
+							);
+				}
+				break;
+
+			case ESrvMsg_FoldPacket:
+				if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_FoldPacket))
+				{
+					TSrvMsg_FoldPacket* pMsg = (TSrvMsg_FoldPacket*) pMsgHdr;
+					if (pMsg->m_SyncId == SyncId)
+					{
+						size_t NewLineCount = m_LineRepresentMgr.RepresentFoldablePacket (
+							&m_BinDataConfig,
+							pMsg->m_SyncId,
+							pMsg->m_IndexLeafOffset,
+							pMsg->m_PacketOffset,
+							pMsg->m_FoldablePacketIdx,
+							pMsg->m_FirstLineIdx,
+							pMsg->m_OldLineCount,
+							pMsg->m_FoldFlags
+							);
+
+						m_IndexMgr.FoldPacketComplete (
+							pMsg->m_IndexLeafOffset,
+							pMsg->m_OldLineCount,
+							NewLineCount
+							);
+					}
+				}
+				break;
+			}
+
+			AXL_MEM_DELETE (pEntry);
+		}
+	}
 }
 
 //.............................................................................
 
 } // namespace log 
 } // namespace axl
+

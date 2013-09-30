@@ -6,22 +6,30 @@ namespace log {
 
 //.............................................................................
 
-TIndexRepresenterTargetData::TIndexRepresenterTargetData ()
+CIndexRepresenterTarget::CIndexRepresenterTarget ()
 {
 	m_LineCount = 0;
 	m_Col = 0;
-	m_BinOffset = 0;
 	m_PartIdx = 0;
-	m_MergeId = 0;
+	m_FirstPartIdx = 0;
+	m_BinOffset = 0;
+
+	m_IsFirstPartMerged = false;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+void
+CIndexRepresenterTarget::StartPacket (const TPacket* pPacket)
+{
+	m_PacketCode = pPacket->m_Code;
+	m_Timestamp = pPacket->m_Timestamp;
+	m_FirstPartIdx = m_PartIdx;
+	m_IsFirstPartMerged = false;
+}
 
 void 
 CIndexRepresenterTarget::AddPart (
 	EPart PartKind,
 	uint_t PartCode,
-	uint_t MergeFlags,
 	const void* p,
 	size_t Size
 	)
@@ -33,7 +41,6 @@ CIndexRepresenterTarget::AddPart (
 
 	TMergeCriteria MergeCriteria;
 	MergeCriteria.m_PartCode = PartCode;
-	MergeCriteria.m_MergeFlags = MergeFlags;
 	MergeCriteria.m_BinDataConfig = m_BinDataConfig;
 	MergeCriteria.m_Timestamp = m_Timestamp;
 	MergeCriteria.m_LineKind = LineKind;
@@ -42,10 +49,13 @@ CIndexRepresenterTarget::AddPart (
 	if (!ShouldMerge)
 	{
 		m_Col = 0;
-		m_BinOffset = 0;
-		m_PartIdx = 0;
-		m_MergeId++;
 		m_LineCount++;
+		m_PartIdx = 0;
+		m_BinOffset = 0;
+	}
+	else if (m_PartIdx == m_FirstPartIdx)
+	{
+		m_IsFirstPartMerged = true;
 	}
 
 	m_MergeCriteria = MergeCriteria;
@@ -57,12 +67,12 @@ CIndexRepresenterTarget::AddPart (
 		break;
 
 	case ELine_BinHex:
-		AddBinHex (m_BinDataConfig, Size);
+		AddBinHex (Size);
 		m_BinOffset += Size;
 		break;
 
 	case ELine_BinText:
-		AddBinText (m_BinDataConfig, p, Size);
+		AddBinText (p, Size);
 		m_BinOffset += Size;
 		break;
 	}
@@ -86,7 +96,6 @@ CIndexRepresenterTarget::AddText (
 
 void 
 CIndexRepresenterTarget::AddBinText (
-	const TBinDataConfig& BinDataConfig,
 	const void* _p,
 	size_t Size
 	)
@@ -108,19 +117,19 @@ CIndexRepresenterTarget::AddBinText (
 			break;
 		
 		case '\t':
-			if (m_Col >= BinDataConfig.m_BinTextLineSize)
+			if (m_Col >= m_BinDataConfig.m_BinTextLineSize)
 				m_LineCount++, m_Col = 0;
 
-			TabSize = BinDataConfig.m_BinTextTabSize - m_Col % BinDataConfig.m_BinTextTabSize;
+			TabSize = m_BinDataConfig.m_BinTextTabSize - m_Col % m_BinDataConfig.m_BinTextTabSize;
 			
-			if (m_Col + TabSize > BinDataConfig.m_BinTextLineSize)
-				TabSize = BinDataConfig.m_BinTextLineSize - m_Col;
+			if (m_Col + TabSize > m_BinDataConfig.m_BinTextLineSize)
+				TabSize = m_BinDataConfig.m_BinTextLineSize - m_Col;
 
 			m_Col += TabSize;
 			break;
 
 		default:
-			if (m_Col >= BinDataConfig.m_BinTextLineSize)
+			if (m_Col >= m_BinDataConfig.m_BinTextLineSize)
 				m_LineCount++, m_Col = 0;
 
 			m_Col++;
@@ -128,14 +137,11 @@ CIndexRepresenterTarget::AddBinText (
 }
 
 void 
-CIndexRepresenterTarget::AddBinHex (
-	const TBinDataConfig& BinDataConfig,
-	size_t Size
-	)
+CIndexRepresenterTarget::AddBinHex (size_t Size)
 {
 	Size += m_Col - 1;
-	m_LineCount += (Size / BinDataConfig.m_BinHexLineSize);
-	m_Col = (Size % BinDataConfig.m_BinHexLineSize) + 1;
+	m_LineCount += (Size / m_BinDataConfig.m_BinHexLineSize);
+	m_Col = (Size % m_BinDataConfig.m_BinHexLineSize) + 1;
 }
 
 //.............................................................................

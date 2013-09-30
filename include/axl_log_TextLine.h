@@ -7,6 +7,7 @@
 #define _AXL_LOG_TEXTLINE_H
 
 #include "axl_log_Line.h"
+#include "axl_gui_HyperText.h"
 
 namespace axl {
 namespace log {
@@ -25,8 +26,9 @@ struct TTextLine
 
 class CTextLine: public CLine
 {
-	friend class CPage;
-	friend class CPageRepresenterTarget;
+	friend class CCachePage;
+	friend class CCacheMgr;
+	friend class CLineRepresenterTarget;
 	friend class CWidget;
 
 protected:
@@ -54,6 +56,14 @@ public:
 	virtual 
 	size_t 
 	Save (rtl::CArrayT <uint8_t>* pBuffer);
+
+	virtual 
+	void
+	Clear ();
+
+	virtual 
+	void
+	UpdateLongestLineLength (TLongestLineLength* pLength);
 };
 
 //.............................................................................

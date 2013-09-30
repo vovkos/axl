@@ -4,6 +4,7 @@
 
 #include "mylogwidget.h"
 #include "mylogrepresentor.h"
+#include "jancycolorizer.h"
 
 namespace Ui {
 class MainWindow;
@@ -14,9 +15,10 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:	
-	gui::qt::QtWidget <CMyLogWidget>* m_logWidget;
+	gui::qt::QtWidget <MyLogWidget>* m_logWidget;
 	
 	MyLogRepresenter m_logRepresenter;
+	JancyColorizer m_logColorizer;
 	log::CServer m_logServer;
 	
 public:

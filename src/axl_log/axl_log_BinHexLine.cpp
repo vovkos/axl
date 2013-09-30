@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_log_BinHexLine.h"
-#include "axl_log_Page.h"
+#include "axl_log_CachePage.h"
 
 namespace axl {
 namespace log { 
@@ -34,29 +34,38 @@ CBinHexLine::AddBinData (
 	size_t End = Offset + ChunkSize;
 
 	m_BinData.Append ((uchar_t*) p, ChunkSize);
-	
-	m_OriginalAttrArray.SetAttr (Attr, Offset, End);
-	m_AttrArray.SetAttr (Attr, Offset, End);
+	m_AttrArray.SetAttr (Offset, End, Attr);
 
 	return ChunkSize;
 }
 
 void
 CBinHexLine::Colorize (
-	const gui::TTextAttr& Attr,
-	size_t OffsetStart,
-	size_t OffsetEnd,
-	size_t Metric
+	uint64_t BeginOffset,
+	uint64_t EndOffset,
+	const gui::TTextAttr& Attr
 	)
 {
-	size_t Size = m_BinData.GetCount ();
-	if (OffsetStart > Size)
-		return;
+	uint64_t LineEndOffset = m_BinOffset + m_BinData.GetCount ();
 
-	if (OffsetEnd > Size)
-		OffsetEnd = Size;
+	if (BeginOffset < m_BinOffset)
+		BeginOffset = m_BinOffset;
 
-	m_AttrArray.SetAttr (Attr, OffsetStart, OffsetEnd, Metric);
+	if (EndOffset > LineEndOffset)
+		EndOffset = LineEndOffset;
+
+	m_AttrArray.SetAttr (
+		(size_t) (BeginOffset - m_BinOffset), 
+		(size_t) (EndOffset - m_BinOffset), 
+		Attr, 1
+		);
+}
+
+void
+CBinHexLine::UpdateLongestLineLength (TLongestLineLength* pLength)
+{
+	if (m_BinDataConfig.m_BinHexLineSize > pLength->m_BinHexLineSize)
+		pLength->m_BinHexLineSize = m_BinDataConfig.m_BinHexLineSize;
 }
 
 //.............................................................................

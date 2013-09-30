@@ -10,11 +10,22 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	m_logWidget = new gui::qt::QtWidget <CMyLogWidget> (ui->centralWidget);
+	m_logWidget = new gui::qt::QtWidget <MyLogWidget> (ui->centralWidget);
 
 	bool Result = 
-		m_logWidget->w ()->Create (&m_logServer, "d:/test_log.njidx") &&
-		m_logServer.Create (m_logWidget->w (), &m_logRepresenter, "d:/test_log.njlog");
+		m_logWidget->w ()->Create (
+			&m_logServer, 
+			"d:/test_log.njidx",
+			"d:/test_log.njcol"
+			) &&
+		m_logServer.Create (
+			m_logWidget->w (), 
+			&m_logRepresenter, 
+			&m_logColorizer,
+			"d:/test_log.njlog",
+			"d:/test_log.njmrg",
+			"d:/test_log.njcol"
+			);
 
 	ASSERT (Result);
 }

@@ -55,7 +55,7 @@ int s_Rgb; // this value will be automatically updated
 // 'onchange' statement could be used (see the next demo)
 
 autoev 
-s_ColorAutoEv (int Alpha)
+s_Color (int Alpha)
 {
 	UpdatePurple (s_Red, s_Blue, Alpha); 
 	UpdateYellow (s_Red, s_Green, Alpha);

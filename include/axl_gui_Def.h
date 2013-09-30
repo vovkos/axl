@@ -56,37 +56,47 @@ GetFirstModifierKey (uint_t ModifierKeys)
 
 enum EKey
 {
-	EKey_Backspace = 0x08,
-	EKey_Tab       = 0x09,
-	EKey_Enter     = 0x0d,	
+	EKey_Backspace   = 0x08,
+	EKey_Tab         = 0x09,
+	EKey_Enter       = 0x0d,	
+	EKey_Esc         = 0x1b,
 
-	EKey_Esc       = 0x1b,
+	EKey_Pause       = 0x13,	
+	EKey_Print       = 0x2a,	
 
-	EKey_PageUp    = 0x21,
-	EKey_PageDown  = 0x22,
-	EKey_End       = 0x23,
-	EKey_Home      = 0x24,
+	EKey_CapsLock    = 0x14,
+	EKey_NumLock     = 0x90,
+	EKey_ScrollLock  = 0x91,
 
-	EKey_Left      = 0x25,
-	EKey_Up        = 0x26,
-	EKey_Right     = 0x27,
-	EKey_Down      = 0x28,
+	EKey_Shift       = 0x10,
+	EKey_Ctrl        = 0x11,
+	EKey_Alt         = 0x12,
 
-	EKey_Insert    = 0x2d,
-	EKey_Delete    = 0x2e,
+	EKey_PageUp      = 0x21,
+	EKey_PageDown    = 0x22,
+	EKey_End         = 0x23,
+	EKey_Home        = 0x24,
 
-	EKey_F1        = 0x70,
-	EKey_F2        = 0x71,
-	EKey_F3        = 0x72,
-	EKey_F4        = 0x73,
-	EKey_F5        = 0x74,
-	EKey_F6        = 0x75,
-	EKey_F7        = 0x76,
-	EKey_F8        = 0x77,
-	EKey_F9        = 0x78,
-	EKey_F10       = 0x79,
-	EKey_F11       = 0x7a,
-	EKey_F12       = 0x7b,
+	EKey_Left        = 0x25,
+	EKey_Up          = 0x26,
+	EKey_Right       = 0x27,
+	EKey_Down        = 0x28,
+
+	EKey_Insert      = 0x2d,
+	EKey_Delete      = 0x2e,
+
+	EKey_F1          = 0x70,
+	EKey_F2          = 0x71,
+	EKey_F3          = 0x72,
+	EKey_F4          = 0x73,
+	EKey_F5          = 0x74,
+	EKey_F6          = 0x75,
+	EKey_F7          = 0x76,
+	EKey_F8          = 0x77,
+	EKey_F9          = 0x78,
+	EKey_F10         = 0x79,
+	EKey_F11         = 0x7a,
+	EKey_F12         = 0x7b,
 };
 
 //.............................................................................

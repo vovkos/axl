@@ -19,18 +19,18 @@ CHyperText::Clear ()
 size_t
 CHyperText::Backspace (size_t BackLength)
 {
-	size_t Length = m_Text.GetLength ();
-	if (BackLength >= Length)
-	{
-		Clear ();
-		return 0;
-	}
+	// don't touch m_Source!
 
 	// TODO: backspace attributes and hyperlinks
 
-	m_Source.ReduceLength (BackLength);
-	m_Text.ReduceLength (BackLength);
+	size_t Length = m_Text.GetLength ();
+	if (BackLength >= Length)
+	{
+		m_Text.Clear ();
+		return 0;
+	}
 
+	m_Text.ReduceLength (BackLength);
 	return Length - BackLength;
 }
 
@@ -98,7 +98,7 @@ CHyperText::AppendHyperText (
 			break;
 
 		Length = m_Text.GetLength ();
-		m_AttrArray.SetAttr (Attr, LastLength, Length);
+		m_AttrArray.SetAttr (LastLength, Length, Attr);
 		LastLength = Length;
 
 		pParam = strchr_e (pTag + 1, pTagEnd, '=');
@@ -122,7 +122,7 @@ CHyperText::AppendHyperText (
 	}
 
 	Length = m_Text.GetLength ();
-	m_AttrArray.SetAttr (Attr, LastLength, Length, 0);
+	m_AttrArray.SetAttr (LastLength, Length, Attr);
 	return Length;
 }
 

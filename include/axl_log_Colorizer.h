@@ -13,57 +13,24 @@ namespace log {
 
 //.............................................................................
 
-class CColorizeTarget
+struct IColorizerTarget: public obj::IRoot
 {
-	friend class CColorizeMgr;
+	// {05DCF2D1-3F09-453C-96A3-9F7B74BE9651}
+	AXL_OBJ_INTERFACE (
+		IColorizerTarget,
+		0x05dcf2d1, 0x3f09, 0x453c, 0x96, 0xa3, 0x9f, 0x7b, 0x74, 0xbe, 0x96, 0x51
+		)
 
-protected:
-	gui::CTextAttrAnchorArray m_AttrArray;
-	size_t m_Metric;
-
-public:
-	intptr_t m_ColorizerState;
-	ref::CPtrT <void> m_ColorizerStateEx;
-
-public:
-	CColorizeTarget ()
-	{
-		m_Metric = 0;
-		m_ColorizerState = 0;
-	}
-
+	virtual
 	void 
 	SetAttr (
-		const gui::TTextAttr& Attr, 
-		size_t Begin, 
-		size_t End
-		)
-	{
-		m_AttrArray.SetAttr (Attr, Begin, End, m_Metric);
-	}
-
-	void
-	IncrementMetric ()
-	{
-		m_Metric++;
-	}
+		uint64_t BeginOffset, 
+		uint64_t EndOffset, 
+		const gui::TTextAttr& Attr
+		) = 0;
 };
 
 //.............................................................................
-
-struct TColorizeBlock
-{
-	uint_t m_PartCode;
-	size_t m_PartIdx;
-	uint64_t m_Timestamp;
-	size_t m_Offset;
-	const void* m_p;
-	size_t m_Size;
-	TBinLinePart* m_pPartArray;
-	size_t m_PartCount;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct IColorizer: public obj::IRoot
 {
@@ -73,29 +40,41 @@ struct IColorizer: public obj::IRoot
 		0x883849c1, 0x3ed3, 0x47d0, 0x8d, 0x58, 0xed, 0x1f, 0xed, 0x54, 0xef, 0x3f
 		)
 
-	virtual 
-	void 
-	Colorize (
-		CColorizeTarget* pTarget, 
-		TColorizeBlock* pBlock, 
-		bool SaveStateHint
-		) = 0;
-};
+protected:
+	size_t m_StateSize;
 
-//.............................................................................
-
-class CColorizerStack: 
-	public IColorizer,
-	public rtl::CArrayT <IColorizer*>
-{
 public:
+	IColorizer ()
+	{
+		m_StateSize = 0;
+	}
+
+	size_t 
+	GetStateSize ()
+	{
+		return m_StateSize;
+	}
+
 	virtual 
 	void
 	Colorize (
-		CColorizeTarget* pTarget, 
-		TColorizeBlock* pBlock, 
-		bool SaveStateHint
-		);
+		IColorizerTarget* pTarget, 
+		const void* p,
+		size_t Size,
+		bool IsFinal,
+		void* pStateBuffer
+		) = 0;
+
+	void
+	Finalize (
+		IColorizerTarget* pTarget, 
+		void* pStateBuffer
+		)
+	{
+		Colorize (pTarget, NULL, 0, true, pStateBuffer);
+		if (pStateBuffer)
+			memset (pStateBuffer, 0, m_StateSize);
+	}
 };
 
 //.............................................................................

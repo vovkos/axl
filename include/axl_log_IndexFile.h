@@ -6,8 +6,8 @@
 
 #define _AXL_LOG_INDEXFILE_H
 
+#include "axl_log_Line.h"
 #include "axl_log_BinDataConfig.h"
-#include "axl_log_MergeCriteria.h"
 #include "axl_io_MappedFile.h"
 
 namespace axl {
@@ -20,7 +20,7 @@ enum
 	EIndexFile_FileSignature  = ':xdi', // idx: signature for index files
 	EIndexFile_NodeSignature  = ':don', // nod: signature for nodes
 	EIndexFile_LeafSignature  = ':fel', // lef: signature for leaves
-	EIndexFile_CurrentVersion = MAKELONG(0, MAKEWORD(1, 2)), // 2.1.0
+	EIndexFile_CurrentVersion = MAKELONG(0, MAKEWORD(0, 3)), // 3.0.0
 };
 
 //.............................................................................
@@ -29,12 +29,13 @@ struct TIndexFileHdr
 {
 	uint32_t m_Signature; // EIndexFile_FileSignature
 	uint32_t m_Version;
-
-	uint32_t m_NodeCount;
-	uint32_t m_NodeEnd;
-	uint32_t m_RootNode;
-	uint32_t m_HeadLeaf;
-	uint32_t m_TailLeaf;
+	uint64_t m_NodeCount;
+	uint64_t m_LeafCount;
+	uint64_t m_TotalNodeSize;
+	uint64_t m_RootNode;
+	uint64_t m_HeadLeaf;
+	uint64_t m_TailLeaf;
+	uint64_t m_LineCount;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -42,16 +43,15 @@ struct TIndexFileHdr
 struct TIndexNode
 {
 	uint32_t m_Signature; // EIndexFile_NodeSignature
-	uint32_t m_Offset;    // back translation
-	uint32_t m_Parent;
-	uint32_t m_Left;      // for a leaf, its previous leaf; otherwise its left child
-	uint32_t m_Right;     // for a leaf, its next leaf; otherwise its right child
-	uint32_t m_Depth;     // 0 - it's a leaf, otherwise - it's a node
-	uint32_t m_LineCount;
-	uint32_t m_LeafDataSize;  
+	uint32_t m_Depth;     // 0 for leaves
+	uint64_t m_Offset;    // not essential, but really makes code cleaner 
+	uint64_t m_Parent;
+	uint64_t m_Left;      // for a leaf, its previous leaf; otherwise its left child
+	uint64_t m_Right;     // for a leaf, its next leaf; otherwise its right child
+	uint64_t m_LineCount;
 
 #ifdef _DEBUG
-	uint32_t m_RotationCount;
+	uint64_t m_RotationCount;
 #endif
 
 	// leaf nodes are followed by TIndexLeaf
@@ -59,28 +59,16 @@ struct TIndexNode
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TIndexLeaf
+struct TIndexLeaf: TIndexNode
 {
-	uint32_t m_PacketOffset;
+	TBinDataConfig m_BinDataConfig;
+
+	uint64_t m_PacketOffset;
 	uint32_t m_PacketCount;
-	uint32_t m_VolatilePacketCount;
-	uint32_t m_BinOffset;
-	uint32_t m_PartIdx;
-	uint32_t m_MergeId;
-	uint32_t m_Col;
-	TBinDataConfig m_DefBinDataConfig;
-	TMergeCriteria m_MergeCriteria;	
+	uint32_t m_FoldablePacketCount;
+	uint64_t m_MergePointIdx;
 
-	// possibly followed by array of TIndexVolatilePacket
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct TIndexVolatilePacket
-{
-	uint32_t m_VolatileFlags; // hidden, expanded, etc.
-	uint32_t m_Offset;        // for effective re-filtering all packets (this way we can iterate through volatile msg array)
-	uint32_t m_LineCount;     // for effective re-representing of packets that are not in cache
+	// followed by uint64_t m_FoldFlagArray [m_FoldablePacketCount]
 };
 
 //.............................................................................
@@ -125,116 +113,121 @@ public:
 	void 
 	Clear ();
 
-	TIndexFileHdr* 
+	const TIndexFileHdr* 
 	GetHdr () const
 	{
+		ASSERT (m_pHdr);
 		return m_pHdr;
 	}
 
-	TIndexNode* 
-	GetNode (size_t Offset) const;
-
-	TIndexNode* 
-	GetRootNode () const
-	{
-		TIndexNode* pRoot = GetNode (m_pHdr->m_RootNode);
-		ASSERT (!pRoot || !pRoot->m_Parent);
-		return pRoot;
-	}
-
-	TIndexNode* 
-	GetHeadLeaf () const
-	{
-		TIndexNode* pHead = GetNode (m_pHdr->m_HeadLeaf);
-		ASSERT (!pHead || !pHead->m_Depth && !pHead->m_Left);
-		return pHead;
-	}
-
-	TIndexNode* 
-	GetTailLeaf () const
-	{
-		TIndexNode* pTail = GetNode (m_pHdr->m_TailLeaf);
-		ASSERT (!pTail || !pTail->m_Depth && !pTail->m_Right);
-		return pTail;
-	}
-
-	TIndexNode* 
-	GetParentNode (TIndexNode* pNode) const
-	{
-		TIndexNode* pParent = GetNode (pNode->m_Parent);
-		ASSERT (!pParent || pParent->m_Left == pNode->m_Offset || pParent->m_Right == pNode->m_Offset);
-		return pParent;
-	}
-
-	TIndexNode* 
-	GetLeftNode (TIndexNode* pNode) const
-	{
-		TIndexNode* pLeft = GetNode (pNode->m_Left);
-		ASSERT (!pNode->m_Depth || pLeft->m_Parent == pNode->m_Offset);
-		return pLeft;
-	}
-
-	TIndexNode* 
-	GetRightNode (TIndexNode* pNode) const
-	{
-		TIndexNode* pRight = GetNode (pNode->m_Right);
-		ASSERT (!pNode->m_Depth || pRight->m_Parent == pNode->m_Offset);
-		return pRight;
-	}
-
-	size_t 
+	uint64_t 
 	GetLineCount () const
 	{
-		return !IsEmpty () ? GetRootNode ()->m_LineCount : 0;
+		return m_pHdr->m_LineCount;
 	}
 
-	size_t
-	GetLeafStartLine (TIndexNode* pNode) const;
+	const TIndexLeaf* 
+	GetLeaf (uint64_t Offset) const;
 
-	TIndexNode* 
+	const TIndexLeaf* 
+	GetHeadLeaf () const
+	{
+		ASSERT (m_pHdr);
+		return m_pHdr->m_HeadLeaf != -1 ? GetLeaf (m_pHdr->m_HeadLeaf) : NULL;
+	}
+
+	const TIndexLeaf* 
+	GetTailLeaf () const
+	{
+		ASSERT (m_pHdr);
+		return m_pHdr->m_TailLeaf != -1 ? GetLeaf (m_pHdr->m_TailLeaf) : NULL;
+	}
+
+	const TIndexLeaf* 
+	GetNextLeaf (const TIndexLeaf* pLeaf) const
+	{
+		ASSERT (m_pHdr);
+		return pLeaf->m_Right != -1 ? GetLeaf (pLeaf->m_Right) : NULL;
+	}
+
+	const TIndexLeaf* 
+	GetPrevLeaf (const TIndexLeaf* pLeaf) const
+	{
+		ASSERT (m_pHdr);
+		return pLeaf->m_Left != -1 ? GetLeaf (pLeaf->m_Left) : NULL;
+	}
+
+	const TIndexLeaf* 
+	AddLeaf (
+		const TBinDataConfig* pBinDataConfig,
+		uint64_t PacketOffset,
+		uint64_t MergePointIdx = -1
+		);
+
+	uint64_t
+	GetLeafStartLine (const TIndexLeaf* pLeaf) const;
+
+	const TIndexLeaf* 
 	FindLeaf (
-		size_t LineIdx, 
-		size_t* pStartLine
+		uint64_t LineIdx, 
+		uint64_t* pStartLine
 		) const;
-
-	TIndexNode* 
-	AddLeaf ();
-
-	bool 
-	RemoveTailLeaf ();
-
-	size_t 
-	SetTailLeafData (
-		const void* p, 
-		size_t Size
-		);
-
-	size_t 
-	AddTailLeafData (
-		const void* p, 
-		size_t Size
-		);
 
 	void 
 	AddLeafLines (
-		TIndexNode* pNode, 
+		const TIndexLeaf* pLeaf, 
 		intptr_t LineCount
 		);
 
 	void 
 	SetLeafLineCount (
-		TIndexNode* pNode, 
+		const TIndexLeaf* pLeaf, 
 		size_t LineCount
 		)
 	{
-		AddLeafLines (pNode, LineCount - pNode->m_LineCount);
+		AddLeafLines (pLeaf, LineCount - (size_t) pLeaf->m_LineCount);
 	}
 
-protected:
 	void
-	CopyNode (
-		TIndexNode* pDst,
-		TIndexNode* pSrc
+	AddTailLeafPackets (
+		size_t PacketCount,
+		size_t FoldablePacketCount = 0,
+		uint64_t FoldFlags = 0
+		);		
+
+protected:
+	TIndexNode* 
+	GetNode (uint64_t Offset) const;
+
+	TIndexNode* 
+	GetRootNode () const;
+
+	TIndexNode* 
+	GetParentNode (const TIndexNode* pNode) const;
+
+	TIndexNode* 
+	GetLeftNode (const TIndexNode* pNode) const;
+
+	TIndexNode* 
+	GetRightNode (const TIndexNode* pNode) const;
+
+	TIndexNode* 
+	CreateNode (
+		uint32_t Signature,
+		size_t Size
+		);
+
+	TIndexNode* 
+	CreateNode ()
+	{
+		return CreateNode (EIndexFile_NodeSignature, sizeof (TIndexNode));
+	}
+
+	TIndexLeaf* 
+	CreateLeaf (
+		const TBinDataConfig* pBinDataConfig,
+		uint64_t PacketOffset,
+		uint64_t MergePointIdx
 		);
 };
 

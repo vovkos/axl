@@ -147,9 +147,13 @@ CTextPaint::PaintBinAsciiPart (size_t Size)
 		return m_Point.m_x;
 
 	m_BufferString.Copy ((char*) m_p, Size);
-	// m_BufferString.ReplaceUnprintable ('.');
-
 	size_t Length = m_BufferString.GetLength ();
+	char* p = m_BufferString.GetBuffer ();
+
+	for (size_t i = 0; i < Length; i++)
+		if (!isprint (p [i]))
+			p [i] = '.';
+
 	TRect Rect = CalcTextRect (m_BufferString, Length);
 	m_pCanvas->DrawText (m_Point, Rect, m_BufferString, Length);
 
@@ -432,7 +436,7 @@ CTextPaint::PaintSelHyperText (
 		Length = strlen (pText);
 
 	m_SelOverlay = *pAttrArray;
-	m_SelOverlay.SetAttr (m_SelAttr, SelStart, SelEnd, -1);
+	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
 	return PaintHyperText (&m_SelOverlay, pText, Length);
 }
 
@@ -449,7 +453,7 @@ CTextPaint::PaintSelHyperBinHex (
 		return PaintHyperBinHex (pAttrArray, p, Size);
 
 	m_SelOverlay = *pAttrArray;
-	m_SelOverlay.SetAttr (m_SelAttr, SelStart, SelEnd, -1);
+	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
 	return PaintHyperBinHex (&m_SelOverlay, p, Size);
 }
 
@@ -466,7 +470,7 @@ CTextPaint::PaintSelHyperBinAscii (
 		return PaintHyperBinAscii (pAttrArray, p, Size);
 
 	m_SelOverlay = *pAttrArray;
-	m_SelOverlay.SetAttr (m_SelAttr, SelStart, SelEnd, -1);
+	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
 	return PaintHyperBinAscii (&m_SelOverlay, p, Size);
 }
 

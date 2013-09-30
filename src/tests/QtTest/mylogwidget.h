@@ -4,10 +4,10 @@
 
 //.............................................................................
 
-class CMyLogWidget: public log::CWidget
+class MyLogWidget: public log::CWidget
 {
 public:
-	CMyLogWidget (gui::IEngine* pEngine):
+	MyLogWidget (gui::IEngine* pEngine):
 		log::CWidget (pEngine)
 	{
 	}
@@ -15,7 +15,7 @@ public:
 protected:
 	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, OnKeyDown)
-	AXL_GUI_WIDGET_MSG_MAP_CHAIN (log::CWidget)
+	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::CWidget)
 
 	void
 	OnKeyDown (
