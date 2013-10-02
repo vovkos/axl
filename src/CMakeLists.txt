@@ -159,6 +159,12 @@ option (
 	)
 
 option (
+	AXL_BUILD_LOG_JANCY
+	"Build Jancy plugin drivers for axl_log library"
+	ON
+	)
+
+option (
 	AXL_BUILD_LUA_LIB
 	"Build axl_lua library"
 	ON

@@ -108,7 +108,7 @@ CDerivableType::AddBaseType (CType* pType)
 	EType TypeKind = pType->GetTypeKind ();
 	if (TypeKind == EType_NamedImport)
 	{
-		pSlot->m_pType_i = (CImportType*) pType;
+		pSlot->m_pType_i = (CImportType*) pType;		
 		m_ImportBaseTypeArray.Append (pSlot);
 	}
 	else if (
@@ -605,6 +605,7 @@ CDerivableType::FindBaseTypeTraverseImpl (
 	for (; Slot; Slot++)
 	{
 		CBaseTypeSlot* pSlot = *Slot;
+		ASSERT (pSlot->m_pType);
 
 		bool Result = pSlot->m_pType->FindBaseTypeTraverseImpl (pType, pCoord, Level + 1);
 		if (Result)
@@ -672,7 +673,23 @@ CDerivableType::FindItemTraverseImpl (
 		{
 			CBaseTypeSlot* pSlot = *Slot;
 
-			pItem = pSlot->m_pType->FindItemTraverseImpl (pName, pCoord, Flags, Level + 1);
+			CDerivableType* pBaseType = NULL;
+
+			if (pSlot->m_pType)
+			{
+				pBaseType = pSlot->m_pType;
+			}
+			else if (pSlot->m_pType_i)
+			{
+				CType* pActualType = pSlot->m_pType_i->GetActualType ();
+				if (pActualType && (pActualType->GetTypeKindFlags () & ETypeKindFlag_Derivable))
+					pBaseType = (CDerivableType*) pActualType;
+			}
+
+			if (!pBaseType)
+				return NULL;
+
+			pItem = pBaseType->FindItemTraverseImpl (pName, pCoord, Flags, Level + 1);
 			if (pItem)
 			{
 				if (pCoord)

@@ -98,6 +98,7 @@ set (
 	${AXL_INC_DIR}/axl_gui_qt_Image.h
 	${AXL_INC_DIR}/axl_gui_qt_ImageList.h
 	${AXL_INC_DIR}/axl_gui_qt_Painter.h
+	${AXL_INC_DIR}/axl_gui_qt_Pch.h
 	${AXL_INC_DIR}/axl_gui_qt_Pixmap.h
 	${AXL_INC_DIR}/axl_gui_qt_Widget.h
 	)

@@ -54,6 +54,7 @@ public:
 	CBinOp_OpAssign ()
 	{
 		m_OpFlags1 = EOpFlag_KeepRef;
+		m_OpFlags2 = EOpFlag_KeepEnum;
 	}
 
 	virtual

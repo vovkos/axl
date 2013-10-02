@@ -296,13 +296,19 @@ CBinOp_BwOr::Operator (
 	CValue* pResultValue
 	)
 {
-	if (!IsFlagEnumOpType (RawOpValue1, RawOpValue1))
-		return CBinOpT_IntegerOnly <CBinOp_BwOr>::Operator (RawOpValue1, RawOpValue2, pResultValue);
+	CValue OpValue1;
+	CValue OpValue2;
+
+	if (!IsFlagEnumOpType (RawOpValue1, RawOpValue2))
+	{
+		return 
+			m_pModule->m_OperatorMgr.PrepareOperand (RawOpValue1, &OpValue1) &&
+			m_pModule->m_OperatorMgr.PrepareOperand (RawOpValue2, &OpValue2) &&
+			CBinOpT_IntegerOnly <CBinOp_BwOr>::Operator (OpValue1, OpValue2, pResultValue);
+	}
 
 	CEnumType* pEnumType = (CEnumType*) RawOpValue1.GetType ();
 
-	CValue OpValue1;
-	CValue OpValue2;
 	CValue TmpValue;
 
 	OpValue1.OverrideType (RawOpValue1, pEnumType->GetBaseType ());

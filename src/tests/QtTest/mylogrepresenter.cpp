@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "mylogrepresentor.h"
+#include "mylogrepresenter.h"
 
 //.............................................................................
 
@@ -45,7 +45,7 @@ MyLogRepresenter::Represent (
 
 	case EMyLog_Connect:
 		pTarget->m_LineAttr.m_IconIdx = 4;
-		pTarget->m_LineAttr.m_BackColor = gui::EStdColor_PastelGreen;
+		pTarget->m_LineAttr.m_BackColor = gui::EStdColor_PastelBlue;
 		pTarget->AddHyperText(
 			EMyLog_Connect_m | log::EPacketCodeFlag_MergeableForward,
 			"Connecting..."

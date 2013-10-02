@@ -74,18 +74,20 @@ CCast_DataPtr_Base::GetCastKind (
 
 	CDataPtrType* pSrcType = (CDataPtrType*) OpValue.GetType ();
 	CDataPtrType* pDstType = (CDataPtrType*) pType;
-
-	if (!(pDstType->GetFlags () & EPtrTypeFlag_Unsafe))
-	{
-		if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ())
-			return ECast_None;
-	}
-
 	CType* pSrcDataType = pSrcType->GetTargetType ();
 	CType* pDstDataType = pDstType->GetTargetType ();
 
-	if (pSrcDataType->Cmp (pDstDataType) == 0)
-		return ECast_Implicit;
+	if (!(pDstType->GetFlags () & EPtrTypeFlag_Unsafe))
+	{		
+		if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ()) 
+			return ECast_None; // const vs non-const mismatch
+
+		if ((pDstDataType->GetFlags () & ETypeFlag_Pod) != (pSrcDataType->GetFlags () & ETypeFlag_Pod))
+			return ECast_None; // pod vs non-pod mismatch
+	}
+
+	if (pSrcDataType->Cmp (pDstDataType) == 0 || pDstDataType->GetTypeKind () == EType_Void)
+		return ECast_Implicit;	
 
 	if (pSrcDataType->GetTypeKind () != EType_Struct)
 		return ECast_Explicit;

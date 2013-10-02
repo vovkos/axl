@@ -1061,6 +1061,14 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateSleep ();
 		break;
 
+	case EStdFunc_StrLen:
+		pFunction = CreateStrLen ();
+		break;
+
+	case EStdFunc_Rand:
+		pFunction = CreateRand ();
+		break;
+
 	case EStdFunc_AppendFmtLiteral_a:
 		pFunction = CreateAppendFmtLiteral_a ();
 		break;
@@ -1562,6 +1570,36 @@ CFunctionMgr::CreateSleep ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	return CreateFunction ("Sleep", "jnc.Sleep", pType);
+}
+
+// size_t
+// rtl.StrLen (nullable const char* p);
+
+CFunction*
+CFunctionMgr::CreateStrLen ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const),
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction ("StrLen", "jnc.StrLen", pType);
+	return pFunction;
+}
+
+// int
+// rtl.Rand ();
+
+CFunction*
+CFunctionMgr::CreateRand ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+	CFunction* pFunction = CreateFunction ("Rand", "jnc.Rand", pType);
+	return pFunction;
 }
 
 // jnc.TTls*

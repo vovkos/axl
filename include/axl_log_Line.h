@@ -27,13 +27,13 @@ enum ELineAttrFlag
 
 struct TLineAttr: gui::TTextAttr
 {
-	size_t m_IconIdx;
 	uint_t m_Flags;
+	uint_t m_IconIdx;
 
 	TLineAttr ()
 	{
-		m_IconIdx = -1;
 		m_Flags = 0;
+		m_IconIdx = -1;
 	}
 };
 

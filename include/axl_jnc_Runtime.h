@@ -215,6 +215,14 @@ public:
 		CType* pType
 		);
 
+	// creating objects on gc heap
+
+	TInterface*
+	CreateAndPinObject (CClassType* pType);
+
+	void
+	UnpinObject (TInterface* pObject);
+
 	// tls
 
 	size_t 

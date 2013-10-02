@@ -13,7 +13,6 @@ enum EMyLog
 	EMyLog_ConnectError    = 6 | log::EPacketCodeFlag_MergeableBackward,	
 	EMyLog_Connect_m       = 7,
 	EMyLog_Bin             = 8 | log::EPacketCodeFlag_Mergeable,
-
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

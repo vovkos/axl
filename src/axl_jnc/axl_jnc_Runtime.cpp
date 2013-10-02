@@ -768,6 +768,48 @@ CRuntime::DestroyTlsData (TTlsData* pTlsData)
 	AXL_MEM_FREE (pTlsData);
 }
 
+TInterface*
+CRuntime::CreateAndPinObject (CClassType* pType)
+{
+	CFunction* pPrimer = pType->GetPrimer ();
+	if (!pPrimer) // abstract
+	{
+		err::SetFormatStringError ("cannot create abstract '%s'", pType->m_Tag.cc ());
+		return NULL;
+	}
+
+	FObjectPrimer pfPrime = (FObjectPrimer) pPrimer->GetMachineCode ();
+	FObjectDefaultConstructor pfConstruct = NULL;
+
+	if (pType->GetConstructor ())
+	{
+		CFunction* pConstructor = pType->GetDefaultConstructor ();
+		if (!pConstructor)
+			return NULL;
+
+		FObjectDefaultConstructor pfConstruct = (FObjectDefaultConstructor) pConstructor->GetMachineCode ();
+	}
+
+	TObject* pObject = (TObject*) GcAllocate (pType->GetSize ());
+	if (!pObject)
+		return NULL;
+
+	CScopeThreadRuntime ScopeRuntime (this);
+
+	TInterface* pInterface = (TInterface*) (pObject + 1);
+	pfPrime (pObject);
+
+	if (pfConstruct)
+		pfConstruct (pInterface);
+
+	return pInterface;
+}
+
+void
+CRuntime::UnpinObject (TInterface* pObject)
+{
+}
+
 //.............................................................................
 
 } // namespace axl 

@@ -80,6 +80,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_LlvmIrBuilder.h
 	${AXL_INC_DIR}/axl_jnc_Module.h
 	${AXL_INC_DIR}/axl_jnc_ModuleItem.h
+	${AXL_INC_DIR}/axl_jnc_Pch.h
 	)
 
 set (

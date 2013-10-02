@@ -27,8 +27,6 @@ StdLib::Printf (
 
 	WriteOutput (Text, Length);
 
-	int x = errno;
-
 	return Length;
 }
 
@@ -409,17 +407,16 @@ bool MainWindow::compile ()
 
 	writeOutput("Compiling...\n");
 	Result = module.Compile ();
-
-	// show module contents nevetheless
-
-	modulePane->build (&module, child);
-	llvmIr->build (&module);
-
 	if (!Result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
 	}
+	
+	// TODO: still try to show LLVM IR if calclayout succeeded (and compilation failed somewhere down the road)
+
+	modulePane->build (&module, child);
+	llvmIr->build (&module);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	jnc::EJit JitKind = jnc::EJit_Normal;

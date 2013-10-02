@@ -10,9 +10,9 @@
 set (
 	LOG_FILE_H_LIST
 	${AXL_INC_DIR}/axl_log_BinDataConfig.h
-	${AXL_INC_DIR}/axl_log_IndexFile.h 
+	${AXL_INC_DIR}/axl_log_IndexFile.h
 	${AXL_INC_DIR}/axl_log_MergeCriteria.h
-	${AXL_INC_DIR}/axl_log_MergeFile.h 
+	${AXL_INC_DIR}/axl_log_MergeFile.h
 	${AXL_INC_DIR}/axl_log_PacketFile.h
 	)
 
@@ -92,6 +92,36 @@ source_group (
 	${LOG_PLUGIN_H_LIST}
 	${LOG_PLUGIN_CPP_LIST}
 	)
+
+#..............................................................................
+#
+# log_Jancy folder
+#
+
+set (
+	LOG_JANCY_H_LIST
+	${AXL_INC_DIR}/axl_log_JancyColorizer.h
+	${AXL_INC_DIR}/axl_log_JancyFilter.h
+	${AXL_INC_DIR}/axl_log_JancyRepresenter.h
+	)
+
+set (
+	LOG_JANCY_CPP_LIST
+	axl_log_JancyColorizer.cpp
+	axl_log_JancyFilter.cpp
+	axl_log_JancyRepresenter.cpp
+	)
+
+source_group (
+	log_Jancy
+	FILES 
+	${LOG_JANCY_H_LIST}
+	${LOG_JANCY_CPP_LIST}
+	)
+
+if (NOT AXL_BUILD_LOG_JANCY)
+	exclude_from_build (${LOG_JANCY_CPP_LIST})
+endif ()
 
 #..............................................................................
 #
@@ -192,6 +222,15 @@ source_group (
 # axl_log library
 #
 
+if (AXL_BUILD_LOG_JANCY)
+	include_directories (
+		${PATH_LLVM_INC_DIR}
+		${PATH_LLVM_INC_DIR_2}
+		)
+
+	add_definitions (-D_AXL_LOG_JANCY)
+endif ()
+
 add_library (
 	axl_log
 	${LOG_FILE_H_LIST}
@@ -200,6 +239,8 @@ add_library (
 	${LOG_PAGE_CPP_LIST}
 	${LOG_PLUGIN_H_LIST}
 	${LOG_PLUGIN_CPP_LIST}
+	${LOG_JANCY_H_LIST}
+	${LOG_JANCY_CPP_LIST}
 	${LOG_SERVER_H_LIST}
 	${LOG_SERVER_CPP_LIST}
 	${LOG_WIDGET_H_LIST}

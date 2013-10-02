@@ -663,11 +663,21 @@ public:
 
 struct TInterface
 {
-	void** m_pVTable; 
+	void* m_pVTable; 
 	TObject* m_pObject; // back pointer to master header
 
 	// followed by parents, then by interface data fields
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef 
+void 
+(*FObjectPrimer) (TObject* pObject);
+
+typedef 
+void 
+(*FObjectDefaultConstructor) (TInterface* pInterface);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

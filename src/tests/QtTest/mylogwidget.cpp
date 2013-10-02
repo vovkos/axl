@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "mylogwidget.h"
-#include "mylogrepresentor.h"
+#include "mylogrepresenter.h"
 
 //.............................................................................
 
@@ -50,7 +50,7 @@ MyLogWidget::OnKeyDown (
 
 			m_pServer->WritePacket (EMyLog_Bin, &Char, 1);
 		}
-		else if ((pCharMsg->m_Key == 0x20 || pCharMsg->m_Key > 0x30) && isprint (pCharMsg->m_Key))
+		else if (isprint (pCharMsg->m_Key))
 		{
 			m_pServer->WritePacket (EMyLog_Bin, &pCharMsg->m_Key, 1);
 		}

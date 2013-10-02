@@ -150,6 +150,17 @@ public:
 	Sleep (uint32_t MsCount);
 
 	static
+	size_t
+	StrLen (TDataPtr Ptr);
+
+	static
+	int
+	Rand ()
+	{
+		return rand ();
+	}
+
+	static
 	void*
 	GetTls ();
 

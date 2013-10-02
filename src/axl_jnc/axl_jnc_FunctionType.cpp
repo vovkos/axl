@@ -326,12 +326,44 @@ CFunctionType::PrepareLlvmDiType ()
 bool
 CFunctionType::CalcLayout ()
 {
+	bool Result;
+
 	if (m_pReturnType_i)
+	{
 		m_pReturnType = m_pReturnType_i->GetActualType ();
+		// TODO: check for valid return type
+	}
 
-	// TODO: check for valid return type
+	Result = m_pReturnType->EnsureLayout ();
+	if (!Result)
+		return false;
 
-	return m_pReturnType->EnsureLayout ();
+	size_t ArgCount = m_ArgArray.GetCount ();
+	for (size_t i = 0; i < ArgCount; i++)
+	{
+		Result = m_ArgArray [i]->EnsureLayout ();
+		if (!Result)
+			return false;
+	}
+
+	if (m_pShortType != this)
+	{
+		Result = m_pShortType->EnsureLayout ();
+		if (!Result)
+			return false;
+	}
+
+	// update signature
+
+	m_Signature = CreateSignature (
+		m_CallConv, 
+		m_pReturnType, 
+		m_ArgArray, 
+		m_ArgArray.GetCount (), 
+		m_Flags
+		);
+
+	return true;
 }
 
 //.............................................................................

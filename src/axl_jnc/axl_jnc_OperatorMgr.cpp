@@ -89,7 +89,6 @@ COperatorMgr::COperatorMgr ()
 	m_BinOp_OrAssign.m_OpKind  = EBinOp_OrAssign;
 	m_BinOp_AtAssign.m_OpKind  = EBinOp_AtAssign;
 
-
 	m_BinaryOperatorTable [EBinOp_Assign]      = &m_BinOp_Assign;
 	m_BinaryOperatorTable [EBinOp_RefAssign]   = &m_BinOp_RefAssign;
 	m_BinaryOperatorTable [EBinOp_AddAssign]   = &m_BinOp_AddAssign;

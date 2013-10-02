@@ -11,6 +11,8 @@
 #undef min
 #undef max
 
+// QT
+
 #include <QtGui>
 #include <QAction>
 #include <QApplication>

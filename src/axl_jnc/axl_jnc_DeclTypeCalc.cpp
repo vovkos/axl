@@ -207,6 +207,7 @@ CDeclTypeCalc::CalcPtrType (
 	uint_t TypeModifiers
 	)
 {
+	m_pModule = pType->GetModule ();
 	m_TypeModifiers = TypeModifiers;
 
 	EType TypeKind = pType->GetTypeKind ();

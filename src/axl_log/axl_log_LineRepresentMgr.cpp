@@ -240,10 +240,12 @@ CLineRepresentMgr::RepresentFoldablePacket (
 		FirstLineIdx + OldLineCount - 1 == m_LastLineIdx;
 
 	CLineRepresenterTarget RepresenterTarget;
+	RepresenterTarget.m_pColorizer = m_pColorizer;
 	RepresenterTarget.m_BinDataConfig = *pBinDataConfig;
 	RepresenterTarget.m_pLineBuffer = &m_LineBuffer;
 	RepresenterTarget.m_pPageBuffer = &m_PageBuffer;
 	RepresenterTarget.m_pLinePool = IsLastLine ? &m_LastLinePool : &m_LinePool;
+	RepresenterTarget.m_pColorizerState = IsLastLine ? m_LastLineColorizerState : m_ColorizerState;
 	RepresenterTarget.m_FoldablePacketIdx = FoldablePacketIdx;
 	RepresenterTarget.m_LineCount = -1;
 

@@ -629,7 +629,7 @@ CTypeMgr::CreateFunctionArg (
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
 	{
 		pFunctionArg->m_pType_i = (CImportType*) pType;
-		m_pModule->MarkForLayout (pFunctionArg);
+		// m_pModule->MarkForLayout (pFunctionArg); // <-- should be calculated during CFunctionType::CalcLayout
 	}
 	else
 	{
@@ -764,8 +764,10 @@ CTypeMgr::GetFunctionType (
 	m_FunctionTypeList.InsertTail (pType);
 	
 	if (pReturnType->GetTypeKindFlags () & ETypeKindFlag_Import)
-	{
 		pType->m_pReturnType_i = (CImportType*) pReturnType;
+
+	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
+	{
 		m_pModule->MarkForLayout (pType);
 	}
 	else
@@ -809,8 +811,10 @@ CTypeMgr::CreateUserFunctionType (
 	m_FunctionTypeList.InsertTail (pType);
 
 	if (pReturnType->GetTypeKindFlags () & ETypeKindFlag_Import)
-	{
 		pType->m_pReturnType_i = (CImportType*) pReturnType;
+
+	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
+	{
 		m_pModule->MarkForLayout (pType);
 	}
 	else

@@ -88,7 +88,9 @@ GetTypeKindFlags (EType TypeKind)
 		ETypeKindFlag_Aggregate,     // EType_Array
 		0,                           // EType_BitField
 
-		ETypeKindFlag_Named,         // EType_Enum
+		ETypeKindFlag_Named |        // EType_Enum
+		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Numeric,		         
 
 		ETypeKindFlag_Aggregate |    // EType_Struct
 		ETypeKindFlag_Derivable |

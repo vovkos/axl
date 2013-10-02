@@ -74,6 +74,24 @@ public:
 		m_Timestamp = 0;
 	}
 
+	uint_t 
+	GetPacketCode ()
+	{
+		return m_PacketCode;
+	}
+
+	uint64_t 
+	GetTimestamp ()
+	{
+		return m_Timestamp;
+	}
+
+	const TBinDataConfig*
+	GetBinDataConfig ()
+	{
+		return &m_BinDataConfig;
+	}
+
 	virtual 
 	void 
 	AddPart (

@@ -30,7 +30,7 @@ CBinHexLine::AddBinData (
 	ASSERT (Offset < BinLineSize);
 
 	size_t MaxSize = BinLineSize - Offset;
-	size_t ChunkSize = min (Size, MaxSize);
+	size_t ChunkSize = AXL_MIN (Size, MaxSize);
 	size_t End = Offset + ChunkSize;
 
 	m_BinData.Append ((uchar_t*) p, ChunkSize);

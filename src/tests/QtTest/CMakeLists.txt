@@ -10,7 +10,7 @@
 set (
 	SRC_H_LIST 
 	jancycolorizer.h
-	mylogrepresentor.h
+	mylogrepresenter.h
 	mylogwidget.h
 	mainwindow.h
 	)
@@ -18,7 +18,7 @@ set (
 set (
 	SRC_CPP_LIST
 	jancycolorizer.rl.cpp
-	mylogrepresentor.cpp
+	mylogrepresenter.cpp
 	mylogwidget.cpp
 	main.cpp
 	mainwindow.cpp
@@ -97,6 +97,24 @@ source_group (
 	${UI_H_LIST}
 	)
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# script folder
+#
+
+set (
+	SCRIPT_JNC_LIST
+	script/gui.jnc
+	script/log.jnc
+	script/mylogrepresenter.jnc
+	script/std.jnc
+	)
+
+source_group (
+	script
+	FILES 
+	${SCRIPT_JNC_LIST}
+	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -118,6 +136,26 @@ source_group (
 # QtTest compiler test
 #
 
+
+if (MSVC)
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm200")
+endif ()
+
+include_directories (
+	${PATH_LLVM_INC_DIR}
+	${PATH_LLVM_INC_DIR_2}
+	)
+
+link_directories (${PATH_LLVM_LIB_DIR})
+
+llvm_map_components_to_libraries (
+	LLVM_LIB_LIST 
+	jit 
+	native
+	MCJIT
+	MCDisassembler
+	)
+
 add_executable (
 	QtTest 
 	${SRC_H_LIST}
@@ -125,16 +163,20 @@ add_executable (
 	${RES_UI_LIST}
 	${MOC_CPP_LIST}
 	${UI_H_LIST}
+	${SCRIPT_JNC_LIST}
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 target_link_libraries (
 	QtTest
+	axl_parse
+	axl_jnc
 	axl_log
 	axl_gui
 	axl_io
 	axl_core
+	${LLVM_LIB_LIST}
 	)
 
 qt5_use_modules (QtTest Widgets)

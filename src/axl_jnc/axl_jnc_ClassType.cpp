@@ -407,6 +407,10 @@ CClassType::CalcLayout ()
 		CFunction* pFunction = m_VirtualMethodArray [i];
 		ASSERT (pFunction->m_StorageKind == EStorage_Abstract || pFunction->m_StorageKind == EStorage_Virtual);
 
+		Result = pFunction->GetType ()->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		AddVirtualFunction (pFunction);
 	}
 
@@ -415,6 +419,10 @@ CClassType::CalcLayout ()
 	{
 		CFunction* pFunction = m_OverrideMethodArray [i];
 		ASSERT (pFunction->m_StorageKind == EStorage_Override);
+
+		Result = pFunction->GetType ()->EnsureLayout ();
+		if (!Result)
+			return false;
 
 		Result = OverrideVirtualFunction (pFunction);
 		if (!Result)

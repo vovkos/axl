@@ -1,0 +1,115 @@
+//.............................................................................
+
+enum EMyLog
+{
+	DeviceOpened    = 1,
+	DeviceClosed    = 2 | log.EPacketCodeFlags.Foldable,
+	Connect         = 4 | log.EPacketCodeFlags.MergeableForward,
+	ConnectComplete = 5 | log.EPacketCodeFlags.MergeableBackward,
+	ConnectError    = 6 | log.EPacketCodeFlags.MergeableBackward,	
+	Connect_m       = 7,
+	Bin             = 8 | log.EPacketCodeFlags.Mergeable,
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CMyRepresenter: log.IRepresenter
+{
+	override
+	bool 
+	Represent (
+		log.IRepresenterTarget* pTarget, 
+		uint_t PacketCode, 
+		const void* p, 
+		size_t Size, 
+		uint64_t FoldFlags
+		);
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool 
+CMyRepresenter.Represent (
+	log.IRepresenterTarget* pTarget, 
+	uint_t PacketCode, 
+	const void* p, 
+	size_t Size, 
+	uint64_t FoldFlags
+	)
+{
+	char Data [] = "0123456789abcf01234";
+
+	switch (PacketCode)
+	{
+	case EMyLog.DeviceOpened:
+		pTarget->m_LineAttr.m_IconIdx = 3;
+		pTarget->m_LineAttr.m_BackColor = gui.EStdColor.PastelYellow;
+		pTarget->m_LineAttr.m_Flags = log.ELineAttrFlags.Delimiter;			 
+
+		pTarget->AddHyperText (
+			"Device <#0000ff>COM3<> is...<+b>opened<> <=!5,3>nahui!<>\n"
+			"Vot <+is>tak<> vot!!"
+			);
+
+		pTarget->m_LineAttr.m_BackColor = gui.EColorFlags.Transparent;
+		pTarget->AddBin (Data, sizeof (Data));
+		break;
+
+	case EMyLog.DeviceClosed:
+		pTarget->m_LineAttr.m_IconIdx = 2;
+
+		if (!(FoldFlags & 1))
+			pTarget->AddHyperText ("[<#0000ff=+1>+<>] Device is closed.");
+		else
+			pTarget->AddHyperText (
+				"[<#0000ff=-1>-<>] Device is closed.\n"
+				"  Some info...\n"
+				"  Some more info which makes a very long line..\n"
+				"  bla bla bla"
+				);
+		break;
+
+	case EMyLog.Connect:
+		pTarget->m_LineAttr.m_IconIdx = 4;
+		pTarget->m_LineAttr.m_BackColor = gui.EStdColor.PastelBlue;
+		pTarget->AddHyperText (
+			EMyLog.Connect_m | log.EPacketCodeFlags.MergeableForward,
+			"Connecting..."
+			);
+		break;
+
+	case EMyLog.ConnectComplete:
+		pTarget->m_LineAttr.m_Flags = log.ELineAttrFlags.Override;
+		pTarget->m_LineAttr.m_IconIdx = 1;
+		pTarget->m_LineAttr.m_BackColor = gui.EStdColor.PastelBlue;
+
+		pTarget->AddHyperText (
+			EMyLog.Connect_m | log.EPacketCodeFlags.MergeableBackward,
+			"OK!"
+			);
+		break;
+
+	case EMyLog.ConnectError:
+		pTarget->m_LineAttr.m_Flags = log.ELineAttrFlags.Override;
+		pTarget->m_LineAttr.m_IconIdx = 0;
+		pTarget->m_LineAttr.m_BackColor = gui.EStdColor.PastelRed;
+		pTarget->AddHyperText (
+			EMyLog.Connect_m | log.EPacketCodeFlags.MergeableBackward,
+			"<\b*>FAIL!"
+			);
+		break;
+
+	case EMyLog.Bin:
+		pTarget->m_LineAttr.m_IconIdx = 8;
+		pTarget->m_LineAttr.m_Flags |= log.ELineAttrFlags.TileIcon;
+		pTarget->AddBin (p, Size);
+		break;
+
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+//.............................................................................

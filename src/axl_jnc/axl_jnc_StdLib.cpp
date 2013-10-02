@@ -27,6 +27,8 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.CreateThread"] = (void*) CreateThread;
 	m_FunctionMap ["jnc.Sleep"] = (void*) Sleep;
 	m_FunctionMap ["jnc.GetTls"] = (void*) GetTls;
+	m_FunctionMap ["jnc.StrLen"] = (void*) StrLen;
+	m_FunctionMap ["jnc.Rand"] = (void*) Rand;
 	m_FunctionMap ["jnc.AppendFmtLiteral_a"] = (void*) AppendFmtLiteral_a;
 	m_FunctionMap ["jnc.AppendFmtLiteral_p"] = (void*) AppendFmtLiteral_p;
 	m_FunctionMap ["jnc.AppendFmtLiteral_i32"] = (void*) AppendFmtLiteral_i32;
@@ -42,6 +44,7 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.MulticastRemove"] = (void*) MulticastRemove;	
 	m_FunctionMap ["jnc.MulticastRemove_t"] = (void*) MulticastRemove_t;	
 	m_FunctionMap ["jnc.MulticastGetSnapshot"] = (void*) MulticastGetSnapshot;	
+
 }
 
 void
@@ -64,6 +67,8 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetCurrentThreadId, (void*) GetCurrentThreadId);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_CreateThread, (void*) CreateThread);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Sleep, (void*) Sleep);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrLen, (void*) StrLen);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Rand, (void*) Rand);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_a, (void*) AppendFmtLiteral_a);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_p, (void*) AppendFmtLiteral_p);
@@ -298,6 +303,21 @@ CStdLib::RunGcWaitForDestructors ()
 	ASSERT (pRuntime);
 
 	pRuntime->RunGcWaitForDestructors ();
+}
+
+size_t
+CStdLib::StrLen (TDataPtr Ptr)
+{
+	char* p = (char*) Ptr.m_p;
+	if (!p)
+		return 0;
+
+	char* p0 = p;
+	char* pEnd = (char*) Ptr.m_pRangeEnd;
+	while (*p && p < pEnd)
+		p++;
+
+	return p - p0;
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)
