@@ -7,6 +7,7 @@ main (
 	char *argv[]
 	)
 {	
+#ifdef _JANCY_REPRESENTER
 	atexit (llvm::llvm_shutdown);
 	
 	llvm::InitializeNativeTarget ();
@@ -16,6 +17,12 @@ main (
 
 	err::CParseErrorProvider::Register ();
 	srand ((int) axl::g::GetTimestamp ());
+#endif
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+	WSADATA WsaData;
+	WSAStartup (0x0202, &WsaData);
+#endif
 
 	QApplication ab (argc, argv);
 

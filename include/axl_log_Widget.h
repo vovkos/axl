@@ -144,8 +144,7 @@ public:
 	bool
 	Create (
 		IServer* pServer,
-		const char* pIndexFileName,
-		const char* pColorFileName
+		const char* pIndexFileName
 		);
 
 	// IServer

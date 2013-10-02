@@ -13,7 +13,6 @@ CServer::CServer ()
 	m_pRepresenter = NULL;
 	m_pColorizer = NULL;
 	m_pHyperlinkHandler = NULL;
-	m_IoThread.m_pServer = this;
 }
 
 bool

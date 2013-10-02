@@ -77,8 +77,7 @@ public:
 	Create (
 		CWidget* pWidget,
 		IServer* pServer,
-		const char* pIndexFileName,
-		const char* pColorFileName
+		const char* pIndexFileName
 		);
 
 	void 

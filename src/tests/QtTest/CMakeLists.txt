@@ -10,7 +10,9 @@
 set (
 	SRC_H_LIST 
 	jancycolorizer.h
+	mylogproxy.h
 	mylogrepresenter.h
+	mylogserver.h
 	mylogwidget.h
 	mainwindow.h
 	)
@@ -18,7 +20,9 @@ set (
 set (
 	SRC_CPP_LIST
 	jancycolorizer.rl.cpp
+	mylogproxy.cpp
 	mylogrepresenter.cpp
+	mylogserver.cpp
 	mylogwidget.cpp
 	main.cpp
 	mainwindow.cpp
@@ -170,12 +174,13 @@ add_executable (
 
 target_link_libraries (
 	QtTest
-	axl_parse
-	axl_jnc
+#	axl_parse
+#	axl_jnc
 	axl_log
 	axl_gui
 	axl_io
 	axl_core
+	ws2_32
 	${LLVM_LIB_LIST}
 	)
 

@@ -11,7 +11,7 @@ public:
 		log::CWidget (pEngine)
 	{
 	}
-		
+	
 protected:
 	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, OnKeyDown)

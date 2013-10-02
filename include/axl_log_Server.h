@@ -31,9 +31,7 @@ struct TIndexRepresenterTargetData;
 
 class CServer: public IServer
 {
-	friend class CIndexThread;
-	friend class CIndexThread;
-	friend class CIndexThread;
+	friend class CIoThread;
 
 public:
 	AXL_OBJ_CLASS_0 (CServer, IServer)
@@ -51,12 +49,10 @@ protected:
 	class CIoThread: public mt::CThreadImplT <CIoThread>
 	{
 	public:
-		CServer* m_pServer;
-
 		void
 		ThreadProc ()
 		{
-			m_pServer->IoThreadProc ();
+			CONTAINING_RECORD (this, CServer, m_IoThread)->IoThreadProc ();
 		}
 	};
 

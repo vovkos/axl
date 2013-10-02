@@ -18,8 +18,7 @@ bool
 CCacheMgr::Create (
 	CWidget* pWidget,
 	IServer* pServer,
-	const char* pIndexFileName,
-	const char* pColorFileName
+	const char* pIndexFileName
 	)
 {
 	bool Result = m_IndexFile.Open (pIndexFileName, io::EFileFlag_DeleteOnClose);

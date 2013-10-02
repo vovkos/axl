@@ -90,13 +90,12 @@ CWidget::CWidget (gui::IEngine* pEngine):
 bool
 CWidget::Create (
 	IServer* pServer,
-	const char* pIndexFileName,
-	const char* pColorFileName
+	const char* pIndexFileName
 	)
 {
 	ClearCache (-1);
 
-	bool Result = m_CacheMgr.Create (this, pServer, pIndexFileName, pColorFileName);
+	bool Result = m_CacheMgr.Create (this, pServer, pIndexFileName);
 	if (!Result)
 		return false;
 
