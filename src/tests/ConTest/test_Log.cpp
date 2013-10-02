@@ -9,7 +9,7 @@ namespace test_Log {
 enum EMsg
 {
 	EMsg_DeviceOpened     = 1,
-	EMsg_DeviceClosed     = 2 | log::EPacketCodeFlag_Volatile,
+	EMsg_DeviceClosed     = 2 | log::EPacketCodeFlag_Foldable,
 	EMsg_Connect          = 3,
 	EMsg_ConnectComplete  = 4,
 	EMsg_ConnectError     = 5,	
@@ -28,7 +28,7 @@ protected:
 	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_Close, OnClose)
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, OnKeyDown)
-	AXL_GUI_WIDGET_MSG_MAP_CHAIN (log::CWidget)
+	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::CWidget)
 
 	void
 	OnClose (

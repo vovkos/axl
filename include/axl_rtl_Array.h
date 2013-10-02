@@ -687,10 +687,23 @@ public:
 	{
 		CHdr* pOldHdr = GetHdr ();
 
-		if (pOldHdr && 
-			pOldHdr->m_Count == Count &&
-			pOldHdr->GetRefCount () == 1)
-			return true;
+		if (pOldHdr && pOldHdr->GetRefCount () == 1)
+		{
+			if (pOldHdr->m_Count == Count)
+				return true;
+
+			if (pOldHdr->m_MaxCount >= Count)
+			{
+				size_t OldCount = pOldHdr->m_Count;
+				if (Count > OldCount)
+					CDetails::Construct (m_p + OldCount, Count - OldCount);
+				else
+					CDetails::Destruct (m_p + Count, OldCount - Count);
+
+				pOldHdr->m_Count = Count;
+				return true;
+			}
+		}
 
 		if (Count == 0)
 		{
@@ -706,20 +719,6 @@ public:
 
 			CDetails::Construct (m_p, Count);
 			GetHdr ()->m_Count = Count;
-			return true;
-		}
-
-		if (pOldHdr->m_MaxCount >= Count &&
-			pOldHdr->GetRefCount () == 1)
-		{
-			size_t OldCount = pOldHdr->m_Count;
-
-			if (Count > OldCount)
-				CDetails::Construct (m_p + OldCount, Count - OldCount);
-			else
-				CDetails::Destruct (m_p + Count, OldCount - Count);
-
-			pOldHdr->m_Count = Count;
 			return true;
 		}
 

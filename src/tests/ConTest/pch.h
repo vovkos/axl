@@ -70,6 +70,7 @@ extern "C" {
 #include <axl_rtl_Packer.h>
 #include <axl_rtl_Unpacker.h>
 #include <axl_rtl_HandleTable.h>
+#include <axl_rtl_Packetizer.h>
 
 #include <axl_exe_WorkerThread.h>
 #include <axl_exe_WorkerWindow.h>
@@ -94,6 +95,7 @@ extern "C" {
 #include <axl_lua_StringTemplate.h>
 #include <axl_gui_gdi_Engine.h>
 
+#include <axl_log_PacketFile.h>
 #include <axl_log_Widget.h>
 
 #include <axl_rtl_Loop.h>

@@ -25,9 +25,7 @@ _tmain (
 	//test_HandleTable::Run ();
 	//test_HashTable::Run ();
 	//test_List::Run ();
-	
-	test_Log::Run ();
-	
+	//test_Log::Run ();	
 	//test_Packer::Run ();
 	//test_Parse::Run ();
 	//test_RbTree::Run ();
@@ -45,6 +43,8 @@ _tmain (
 	//test_Vso::Run ();
 	//test_Window::Run ();
 	//test_WorkerThread::Run ();
+
+	test_Packetizer::Run ();
 
 	return 0;
 }

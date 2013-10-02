@@ -438,7 +438,7 @@ public:
 	class _cls13: public CAstNode
 	{
 	public:
-// #line 203 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 200 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	CValue m_TrueValue;
 	CValue m_FalseValue;
@@ -452,7 +452,7 @@ public:
 	class _cls14: public CAstNode
 	{
 	public:
-// #line 317 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 314 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	EBinOp m_OpKind;
 ;
@@ -462,7 +462,7 @@ public:
 	class _cls15: public CAstNode
 	{
 	public:
-// #line 345 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 342 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	EBinOp m_OpKind;
 ;
@@ -472,7 +472,7 @@ public:
 	class _cls16: public CAstNode
 	{
 	public:
-// #line 381 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 378 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	EBinOp m_OpKind;
 ;
@@ -482,7 +482,7 @@ public:
 	class _cls17: public CAstNode
 	{
 	public:
-// #line 409 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 406 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	EBinOp m_OpKind;
 ;
@@ -492,7 +492,7 @@ public:
 	class _cls18: public CAstNode
 	{
 	public:
-// #line 437 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 434 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	EBinOp m_OpKind;
 ;
@@ -502,7 +502,7 @@ public:
 	class _cls19: public CAstNode
 	{
 	public:
-// #line 494 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 491 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	EBinOp m_OpKind;
 ;
@@ -512,7 +512,7 @@ public:
 	class _cls20: public CAstNode
 	{
 	public:
-// #line 635 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 632 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 		
 	CType* m_pType;
 	CValue m_ElementCountValue;
@@ -1116,7 +1116,7 @@ public:
 			
 		struct
 		{
-// #line 210 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 207 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1122 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1140,14 +1140,14 @@ public:
 			
 		struct
 		{
-// #line 238 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 235 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1146 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 240 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 237 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1169,14 +1169,14 @@ public:
 			
 		struct
 		{
-// #line 251 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 248 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1175 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 253 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 250 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1198,14 +1198,14 @@ public:
 			
 		struct
 		{
-// #line 264 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 261 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1204 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 266 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 263 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1227,14 +1227,14 @@ public:
 			
 		struct
 		{
-// #line 277 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 274 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1233 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 279 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 276 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1256,14 +1256,14 @@ public:
 			
 		struct
 		{
-// #line 290 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 287 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1262 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 292 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 289 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1285,14 +1285,14 @@ public:
 			
 		struct
 		{
-// #line 303 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 300 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1291 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 305 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 302 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1314,14 +1314,14 @@ public:
 			
 		struct
 		{
-// #line 331 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 328 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1320 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 333 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 330 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1344,14 +1344,14 @@ public:
 			
 		struct
 		{
-// #line 367 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 364 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1350 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 369 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 366 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1374,14 +1374,14 @@ public:
 			
 		struct
 		{
-// #line 395 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 392 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1380 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 397 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 394 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1404,14 +1404,14 @@ public:
 			
 		struct
 		{
-// #line 423 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 420 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1410 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 425 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 422 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1434,14 +1434,14 @@ public:
 			
 		struct
 		{
-// #line 455 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 452 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1440 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 457 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 454 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1464,7 +1464,7 @@ public:
 			
 		struct
 		{
-// #line 468 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 465 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1470 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1484,7 +1484,7 @@ public:
 			
 		struct
 		{
-// #line 548 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 545 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1490 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1504,14 +1504,14 @@ public:
 			
 		struct
 		{
-// #line 472 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 469 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1510 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 474 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 471 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue OpValue2;
 	;
@@ -1536,7 +1536,7 @@ public:
 			
 		struct
 		{
-// #line 825 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 822 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		TCurlyInitializer Initializer;
 	;
@@ -1560,7 +1560,7 @@ public:
 			
 		struct
 		{
-// #line 673 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 670 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1566 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1580,7 +1580,7 @@ public:
 			
 		struct
 		{
-// #line 553 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 550 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1586 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1602,7 +1602,7 @@ public:
 			
 		struct
 		{
-// #line 667 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 664 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CTypeSpecifier TypeSpecifier;
 	;
@@ -1626,7 +1626,7 @@ public:
 			
 		struct
 		{
-// #line 654 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 651 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1632 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1670,7 +1670,7 @@ public:
 			
 		struct
 		{
-// #line 741 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 738 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1676 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1692,7 +1692,7 @@ public:
 			
 		struct
 		{
-// #line 678 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 675 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1698 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1714,7 +1714,7 @@ public:
 			
 		struct
 		{
-// #line 718 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 715 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1720 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
@@ -1734,14 +1734,14 @@ public:
 			
 		struct
 		{
-// #line 789 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 786 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			CValue* pValue;
 // #line 1740 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 791 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 788 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		TLiteral Literal;
 	;
@@ -1763,14 +1763,14 @@ public:
 			
 		struct
 		{
-// #line 847 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 844 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			TCurlyInitializer* pInitializer;
 // #line 1769 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 		} m_Arg;	
 			
 		struct
 		{
-// #line 849 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 846 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 		CValue PrevCurlyInitializerTargetValue;
 	;
@@ -6957,11 +6957,8 @@ public:
 // #line 181 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 									
 				if ((*(_cls7*) GetAstLocator (0)).m_Value.GetValueKind () != EValue_Const || 
-					!((*(_cls7*) GetAstLocator (0)).m_Value.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Integer))				
+					!((*(_cls7*) GetAstLocator (0)).m_Value.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Integer))
 				{
-					CValue Value = (*(_cls7*) GetAstLocator (0)).m_Value;
-					_asm int 3;
-
 					err::SetFormatStringError ("not a constant integer expression");
 					return false;
 				}
@@ -6972,7 +6969,7 @@ public:
 
 				(*__pAstNode).m_Value = (*(_cls7*) GetAstLocator (0)).m_Value.GetInt32 ();
 			;
-// #line 6976 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 6973 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -6981,14 +6978,14 @@ public:
 			{
 			CSymbolNode_conditional_expr* __pSymbol = (CSymbolNode_conditional_expr*) GetSymbolTop ();
 			_cls13* __pAstNode = (_cls13*) __pSymbol->m_pAstNode;
-// #line 213 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 210 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 					(*__pAstNode).m_pThenBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("cond_then");
 					(*__pAstNode).m_pElseBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("cond_else");
 					(*__pAstNode).m_pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("cond_phi");			
 					m_pModule->m_ControlFlowMgr.ConditionalJump (*__pSymbol->m_Arg.pValue, (*__pAstNode).m_pThenBlock, (*__pAstNode).m_pElseBlock);
 				;
-// #line 6992 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 6989 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -6997,11 +6994,11 @@ public:
 			{
 			CSymbolNode_conditional_expr* __pSymbol = (CSymbolNode_conditional_expr*) GetSymbolTop ();
 			_cls13* __pAstNode = (_cls13*) __pSymbol->m_pAstNode;
-// #line 221 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 218 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 					(*__pAstNode).m_pThenBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock ((*__pAstNode).m_pElseBlock); // might have changed				
 				;
-// #line 7005 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7002 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7010,7 +7007,7 @@ public:
 			{
 			CSymbolNode_conditional_expr* __pSymbol = (CSymbolNode_conditional_expr*) GetSymbolTop ();
 			_cls13* __pAstNode = (_cls13*) __pSymbol->m_pAstNode;
-// #line 226 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 223 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 					return m_pModule->m_OperatorMgr.ConditionalOperator (
 						(*__pAstNode).m_TrueValue,
@@ -7020,7 +7017,7 @@ public:
 						__pSymbol->m_Arg.pValue
 						);
 				;
-// #line 7024 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7021 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7029,11 +7026,11 @@ public:
 			{
 			CSymbolNode_logical_or_expr* __pSymbol = (CSymbolNode_logical_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 245 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 242 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogAnd, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7037 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7034 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7042,11 +7039,11 @@ public:
 			{
 			CSymbolNode_logical_and_expr* __pSymbol = (CSymbolNode_logical_and_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 258 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 255 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogOr, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7050 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7047 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7055,11 +7052,11 @@ public:
 			{
 			CSymbolNode_inclusive_or_expr* __pSymbol = (CSymbolNode_inclusive_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 271 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 268 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwOr, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7063 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7060 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7068,11 +7065,11 @@ public:
 			{
 			CSymbolNode_exclusive_or_expr* __pSymbol = (CSymbolNode_exclusive_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 284 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 281 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwXor, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7076 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7073 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7081,11 +7078,11 @@ public:
 			{
 			CSymbolNode_and_expr* __pSymbol = (CSymbolNode_and_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 297 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 294 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwAnd, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7089 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7086 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7094,11 +7091,11 @@ public:
 			{
 			CSymbolNode_equality_expr* __pSymbol = (CSymbolNode_equality_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 310 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 307 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator ((*(_cls14*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7102 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7099 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7107,11 +7104,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls14* __pAstNode = (_cls14*) __pSymbol->m_pAstNode;
-// #line 322 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 319 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 			(*__pAstNode).m_OpKind = EBinOp_Eq;
 		;
-// #line 7115 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7112 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7120,11 +7117,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls14* __pAstNode = (_cls14*) __pSymbol->m_pAstNode;
-// #line 326 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 323 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 			(*__pAstNode).m_OpKind = EBinOp_Ne;
 		;
-// #line 7128 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7125 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7133,11 +7130,11 @@ public:
 			{
 			CSymbolNode_relational_expr* __pSymbol = (CSymbolNode_relational_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 338 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 335 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator ((*(_cls15*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7141 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7138 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7146,11 +7143,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls15* __pAstNode = (_cls15*) __pSymbol->m_pAstNode;
-// #line 350 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 347 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Lt;
 			;
-// #line 7154 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7151 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7159,11 +7156,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls15* __pAstNode = (_cls15*) __pSymbol->m_pAstNode;
-// #line 354 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 351 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Gt;
 			;
-// #line 7167 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7164 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7172,11 +7169,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls15* __pAstNode = (_cls15*) __pSymbol->m_pAstNode;
-// #line 358 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 355 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Le;
 			;
-// #line 7180 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7177 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7185,11 +7182,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls15* __pAstNode = (_cls15*) __pSymbol->m_pAstNode;
-// #line 362 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 359 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Ge;
 			;
-// #line 7193 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7190 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7198,11 +7195,11 @@ public:
 			{
 			CSymbolNode_shift_expr* __pSymbol = (CSymbolNode_shift_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 374 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 371 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator ((*(_cls16*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7206 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7203 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7211,11 +7208,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls16* __pAstNode = (_cls16*) __pSymbol->m_pAstNode;
-// #line 386 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 383 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Shl;
 			;
-// #line 7219 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7216 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7224,11 +7221,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls16* __pAstNode = (_cls16*) __pSymbol->m_pAstNode;
-// #line 390 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 387 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Shr;
 			;
-// #line 7232 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7229 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7237,11 +7234,11 @@ public:
 			{
 			CSymbolNode_additive_expr* __pSymbol = (CSymbolNode_additive_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 402 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 399 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator ((*(_cls17*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7245 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7242 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7250,11 +7247,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls17* __pAstNode = (_cls17*) __pSymbol->m_pAstNode;
-// #line 414 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 411 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Add;
 			;
-// #line 7258 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7255 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7263,11 +7260,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls17* __pAstNode = (_cls17*) __pSymbol->m_pAstNode;
-// #line 418 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 415 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Sub;
 			;
-// #line 7271 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7268 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7276,11 +7273,11 @@ public:
 			{
 			CSymbolNode_multiplicative_expr* __pSymbol = (CSymbolNode_multiplicative_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 430 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 427 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator ((*(_cls18*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7284 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7281 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7289,11 +7286,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls18* __pAstNode = (_cls18*) __pSymbol->m_pAstNode;
-// #line 442 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 439 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Mul;
 			;
-// #line 7297 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7294 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7302,11 +7299,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls18* __pAstNode = (_cls18*) __pSymbol->m_pAstNode;
-// #line 446 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 443 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Div;
 			;
-// #line 7310 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7307 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7315,11 +7312,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls18* __pAstNode = (_cls18*) __pSymbol->m_pAstNode;
-// #line 450 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 447 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Mod;
 			;
-// #line 7323 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7320 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7328,11 +7325,11 @@ public:
 			{
 			CSymbolNode_at_expr* __pSymbol = (CSymbolNode_at_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 462 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 459 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_At, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7336 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7333 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7341,11 +7338,11 @@ public:
 			{
 			CSymbolNode_assignment_operator_expr* __pSymbol = (CSymbolNode_assignment_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 483 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 480 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator ((*(_cls19*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 7349 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7346 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7354,11 +7351,11 @@ public:
 			{
 			CSymbolNode_assignment_operator_expr* __pSymbol = (CSymbolNode_assignment_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 487 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 484 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				m_CurlyInitializerTargetValue = *__pSymbol->m_Arg.pValue;
 			;
-// #line 7362 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7359 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7367,11 +7364,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 499 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 496 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_Assign;
 			;
-// #line 7375 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7372 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7380,11 +7377,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 503 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 500 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_RefAssign;
 			;
-// #line 7388 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7385 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7393,11 +7390,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 507 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 504 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_AddAssign;
 			;
-// #line 7401 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7398 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7406,11 +7403,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 511 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 508 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_SubAssign;
 			;
-// #line 7414 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7411 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7419,11 +7416,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 515 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 512 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_MulAssign;
 			;
-// #line 7427 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7424 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7432,11 +7429,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 519 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 516 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_DivAssign;
 			;
-// #line 7440 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7437 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7445,11 +7442,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 523 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 520 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_ModAssign;
 			;
-// #line 7453 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7450 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7458,11 +7455,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 527 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 524 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_ShlAssign;
 			;
-// #line 7466 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7463 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7471,11 +7468,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 531 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 528 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_ShrAssign;
 			;
-// #line 7479 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7476 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7484,11 +7481,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 535 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 532 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_AndAssign;
 			;
-// #line 7492 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7489 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7497,11 +7494,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 539 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 536 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_XorAssign;
 			;
-// #line 7505 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7502 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7510,11 +7507,11 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls19* __pAstNode = (_cls19*) __pSymbol->m_pAstNode;
-// #line 543 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 540 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_OpKind = EBinOp_OrAssign;
 			;
-// #line 7518 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7515 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7523,11 +7520,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 560 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 557 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Plus, __pSymbol->m_Arg.pValue);
 			;
-// #line 7531 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7528 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7536,11 +7533,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 564 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 561 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Minus, __pSymbol->m_Arg.pValue);
 			;
-// #line 7544 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7541 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7549,11 +7546,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 568 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 565 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_BwNot, __pSymbol->m_Arg.pValue);
 			;
-// #line 7557 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7554 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7562,11 +7559,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 572 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 569 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, __pSymbol->m_Arg.pValue);
 			;
-// #line 7570 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7567 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7575,11 +7572,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 576 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 573 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, __pSymbol->m_Arg.pValue);
 			;
-// #line 7583 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7580 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7588,11 +7585,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 580 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 577 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_LogNot, __pSymbol->m_Arg.pValue);
 			;
-// #line 7596 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7593 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7601,11 +7598,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 584 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 581 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreInc, __pSymbol->m_Arg.pValue);
 			;
-// #line 7609 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7606 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7614,11 +7611,11 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 588 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 585 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, __pSymbol->m_Arg.pValue);
 			;
-// #line 7622 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7619 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7627,12 +7624,12 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 592 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 589 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				CType* pType = (*(_cls4*) GetAstLocator (0)).m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) (*(_cls4*) GetAstLocator (0)).m_pType)->GetTargetType () : (*(_cls4*) GetAstLocator (0)).m_pType;
 				__pSymbol->m_Arg.pValue->SetConstSizeT (pType->GetSize ());
 			;
-// #line 7636 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7633 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7641,12 +7638,12 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 597 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 594 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				CType* pType = (*(_cls4*) GetAstLocator (0)).m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) (*(_cls4*) GetAstLocator (0)).m_pType)->GetTargetType () : (*(_cls4*) GetAstLocator (0)).m_pType;
 				return GetCountOf (pType, __pSymbol->m_Arg.pValue);
 			;
-// #line 7650 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7647 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7655,12 +7652,12 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 602 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 599 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				CType* pType = (*(_cls4*) GetAstLocator (0)).m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) (*(_cls4*) GetAstLocator (0)).m_pType)->GetTargetType () : (*(_cls4*) GetAstLocator (0)).m_pType;
 				__pSymbol->m_Arg.pValue->SetType ((*(_cls4*) GetAstLocator (0)).m_pType);
 			;
-// #line 7664 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7661 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7669,12 +7666,12 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 608 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 605 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				EStorage StorageKind = IsValidLocator ((*(_cls30*) GetAstLocator (0))) ? (*(_cls30*) GetAstLocator (0)).m_StorageKind : EStorage_Heap;
 				return m_pModule->m_OperatorMgr.CastOperator (StorageKind, __pSymbol->m_Arg.pValue, (*(_cls2*) GetAstLocator (1)).m_pType);
 			;
-// #line 7678 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7675 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7683,7 +7680,7 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 613 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 610 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				EStorage StorageKind = IsValidLocator ((*(_cls30*) GetAstLocator (0))) ? (*(_cls30*) GetAstLocator (0)).m_StorageKind : EStorage_Heap;
 				return m_pModule->m_OperatorMgr.NewOperator (
@@ -7694,7 +7691,7 @@ public:
 					__pSymbol->m_Arg.pValue
 					);
 			;
-// #line 7698 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7695 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7703,7 +7700,7 @@ public:
 			{
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 625 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 622 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				bool Result = m_pModule->m_OperatorMgr.DeleteOperator (*__pSymbol->m_Arg.pValue);
 				if (!Result)
@@ -7711,7 +7708,7 @@ public:
 
 				__pSymbol->m_Arg.pValue->SetVoid ();
 			;
-// #line 7715 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7712 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7720,12 +7717,12 @@ public:
 			{
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls20* __pAstNode = (_cls20*) __pSymbol->m_pAstNode;
-// #line 644 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 641 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				(*__pAstNode).m_pType = (*(_cls33*) GetAstLocator (0)).m_pType;
 				(*__pAstNode).m_ArgList.TakeOver (&(*(_cls10*) GetAstLocator (1)).m_ValueList);
 			;
-// #line 7729 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7726 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7734,11 +7731,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 685 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 682 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.CallOperator (__pSymbol->m_Arg.pValue, &(*(_cls10*) GetAstLocator (0)).m_ValueList);
 			;
-// #line 7742 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7739 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7747,11 +7744,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 689 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 686 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.ClosureOperator (__pSymbol->m_Arg.pValue, &(*(_cls10*) GetAstLocator (0)).m_ValueList);
 			;
-// #line 7755 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7752 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7760,11 +7757,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 693 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 690 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, __pSymbol->m_Arg.pValue, (*(_cls8*) GetAstLocator (0)).m_Value);
 			;
-// #line 7768 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7765 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7773,11 +7770,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 697 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 694 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostInc, __pSymbol->m_Arg.pValue);
 			;
-// #line 7781 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7778 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7786,11 +7783,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 701 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 698 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PostDec, __pSymbol->m_Arg.pValue);
 			;
-// #line 7794 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7791 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7799,11 +7796,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 706 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 703 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.WeakenOperator (__pSymbol->m_Arg.pValue);
 			;
-// #line 7807 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7804 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7812,11 +7809,11 @@ public:
 			{
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 712 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 709 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Ptr, __pSymbol->m_Arg.pValue);
 			;
-// #line 7820 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7817 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7825,11 +7822,11 @@ public:
 			{
 			CSymbolNode_member_operator* __pSymbol = (CSymbolNode_member_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 720 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 717 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.MemberOperator (__pSymbol->m_Arg.pValue, (*GetTokenLocator (0)).m_Data.m_String);
 			;
-// #line 7833 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7830 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7838,11 +7835,11 @@ public:
 			{
 			CSymbolNode_member_operator* __pSymbol = (CSymbolNode_member_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 724 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 721 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.GetPropertyOnChange (__pSymbol->m_Arg.pValue);
 			;
-// #line 7846 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7843 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7851,11 +7848,11 @@ public:
 			{
 			CSymbolNode_member_operator* __pSymbol = (CSymbolNode_member_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 728 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 725 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.GetPropertyPropValue (__pSymbol->m_Arg.pValue);
 			;
-// #line 7859 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7856 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7864,11 +7861,11 @@ public:
 			{
 			CSymbolNode_member_operator* __pSymbol = (CSymbolNode_member_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 732 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 729 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.GetPropertyGetter (__pSymbol->m_Arg.pValue);
 			;
-// #line 7872 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7869 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7877,11 +7874,11 @@ public:
 			{
 			CSymbolNode_member_operator* __pSymbol = (CSymbolNode_member_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 736 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 733 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.GetPropertySetter (__pSymbol->m_Arg.pValue);
 			;
-// #line 7885 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7882 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7890,11 +7887,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 748 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 745 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return LookupIdentifier ((*GetTokenLocator (0)).m_Data.m_String, __pSymbol->m_Arg.pValue);
 			;
-// #line 7898 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7895 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7903,11 +7900,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 752 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 749 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return GetThisValue (__pSymbol->m_Arg.pValue);
 			;
-// #line 7911 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7908 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7916,11 +7913,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 756 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 753 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return GetOnChange (__pSymbol->m_Arg.pValue);
 			;
-// #line 7924 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7921 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7929,11 +7926,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 760 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 757 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return GetPropValue (__pSymbol->m_Arg.pValue);
 			;
-// #line 7937 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7934 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7942,11 +7939,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 764 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 761 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				__pSymbol->m_Arg.pValue->SetConstInt64_u ((*GetTokenLocator (0)).m_Data.m_Int64_u);
 			;
-// #line 7950 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7947 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7955,11 +7952,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 768 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 765 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				__pSymbol->m_Arg.pValue->SetConstDouble ((*GetTokenLocator (0)).m_Data.m_Double);
 			;
-// #line 7963 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7960 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7968,11 +7965,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 772 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 769 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				__pSymbol->m_Arg.pValue->SetConstBool (true);
 			;
-// #line 7976 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7973 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7981,11 +7978,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 776 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 773 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				__pSymbol->m_Arg.pValue->SetConstBool (false);
 			;
-// #line 7989 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7986 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -7994,11 +7991,11 @@ public:
 			{
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 780 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 777 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				__pSymbol->m_Arg.pValue->SetNull ();
 			;
-// #line 8002 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 7999 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8007,12 +8004,12 @@ public:
 			{
 			CSymbolNode_literal* __pSymbol = (CSymbolNode_literal*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 795 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 792 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 						
 					__pSymbol->m_Local.Literal.m_BinData.Append ((const uchar_t*) (*GetTokenLocator (0)).m_Data.m_String.cc (), (*GetTokenLocator (0)).m_Data.m_String.GetLength ());
 					__pSymbol->m_Local.Literal.m_LastToken = EToken_Literal;
 				;
-// #line 8016 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8013 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8021,12 +8018,12 @@ public:
 			{
 			CSymbolNode_literal* __pSymbol = (CSymbolNode_literal*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 800 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 797 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 						
 					__pSymbol->m_Local.Literal.m_BinData.Append ((*GetTokenLocator (1)).m_Data.m_BinData, (*GetTokenLocator (1)).m_Data.m_BinData.GetCount ());
 					__pSymbol->m_Local.Literal.m_LastToken = EToken_HexLiteral;
 				;
-// #line 8030 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8027 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8035,11 +8032,11 @@ public:
 			{
 			CSymbolNode_literal* __pSymbol = (CSymbolNode_literal*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 805 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 802 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 					return AppendFmtLiteral (&__pSymbol->m_Local.Literal, (*GetTokenLocator (2)).m_Data.m_String.cc (), (*GetTokenLocator (2)).m_Data.m_String.GetLength ());
 				;
-// #line 8043 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8040 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8048,13 +8045,13 @@ public:
 			{
 			CSymbolNode_literal* __pSymbol = (CSymbolNode_literal*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 809 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 806 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 					return IsValidLocator ((*GetTokenLocator (3))) ? 
 						AppendFmtLiteralValue (&__pSymbol->m_Local.Literal, (*(_cls7*) GetAstLocator (4)).m_Value, (*GetTokenLocator (3)).m_Data.m_String) :
 						AppendFmtLiteralValue (&__pSymbol->m_Local.Literal, (*(_cls7*) GetAstLocator (4)).m_Value, rtl::CString ());
 				;
-// #line 8058 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8055 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8063,11 +8060,11 @@ public:
 			{
 			CSymbolNode_literal* __pSymbol = (CSymbolNode_literal*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 815 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 812 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return FinalizeLiteral (&__pSymbol->m_Local.Literal, __pSymbol->m_Arg.pValue);
 			;
-// #line 8071 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8068 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8076,7 +8073,7 @@ public:
 			{
 			CSymbolNode_curly_initializer* __pSymbol = (CSymbolNode_curly_initializer*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 837 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 834 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				if (!__pSymbol->m_Local.Initializer.m_Count)
 				{
@@ -8084,7 +8081,7 @@ public:
 					return false;
 				}
 			;
-// #line 8088 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8085 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8093,9 +8090,9 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 852 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 849 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			 return true; ;
-// #line 8099 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8096 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8104,11 +8101,11 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 854 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 851 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return PrepareCurlyInitializerNamedItem (__pSymbol->m_Arg.pInitializer, (*GetTokenLocator (0)).m_Data.m_String);
 			;
-// #line 8112 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8109 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8117,11 +8114,11 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 859 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 856 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 					return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, __pSymbol->m_Arg.pInitializer->m_MemberValue, (*(_cls7*) GetAstLocator (1)).m_Value);
 				;
-// #line 8125 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8122 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8130,11 +8127,11 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 863 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 860 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return PrepareCurlyInitializerIndexedItem (__pSymbol->m_Arg.pInitializer);
 			;
-// #line 8138 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8135 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8143,11 +8140,11 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 867 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 864 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Assign, __pSymbol->m_Arg.pInitializer->m_MemberValue, (*(_cls7*) GetAstLocator (0)).m_Value);
 			;
-// #line 8151 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8148 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8156,11 +8153,11 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 870 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 867 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return PrepareCurlyInitializerIndexedItem (__pSymbol->m_Arg.pInitializer);
 			;
-// #line 8164 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8161 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8169,11 +8166,11 @@ public:
 			{
 			CSymbolNode_curly_initializer_item* __pSymbol = (CSymbolNode_curly_initializer_item*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 875 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 872 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			
 				return SkipCurlyInitializerItem (__pSymbol->m_Arg.pInitializer);
 			;
-// #line 8177 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8174 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8186,7 +8183,7 @@ public:
 			
 				m_ExpressionValue = (*(_cls21*) GetAstLocator (0)).m_Value;
 			;
-// #line 8190 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8187 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8199,7 +8196,7 @@ public:
 			
 				(*__pAstNode).m_ValueList.InsertTail ((*(_cls21*) GetAstLocator (0)).m_Value);
 			;
-// #line 8203 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8200 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8212,7 +8209,7 @@ public:
 			
 				(*__pAstNode).m_ValueList.InsertTail ((*(_cls21*) GetAstLocator (1)).m_Value);
 			;
-// #line 8216 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8213 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8225,7 +8222,7 @@ public:
 			
 				(*__pAstNode).m_ValueList.InsertTail ((*(_cls21*) GetAstLocator (0)).m_Value);
 			;
-// #line 8229 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8226 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8238,7 +8235,7 @@ public:
 			
 				(*__pAstNode).m_ValueList.InsertTail ((*(_cls22*) GetAstLocator (1)).m_Value);
 			;
-// #line 8242 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8239 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8251,7 +8248,7 @@ public:
 			
 				(*__pAstNode).m_ValueList.InsertTail (CValue ());
 			;
-// #line 8255 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8252 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8264,7 +8261,7 @@ public:
 			
 				(*__pAstNode).m_ValueList.InsertTail ((*(_cls22*) GetAstLocator (0)).m_Value);
 			;
-// #line 8268 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8265 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8277,7 +8274,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetConditionalOperatorResultType (__pSymbol->m_Local.TrueValue, __pSymbol->m_Local.FalseValue, __pSymbol->m_Arg.pValue);
 			;
-// #line 8281 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8278 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8290,7 +8287,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_LogAnd, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8294 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8291 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8303,7 +8300,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_LogOr, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8307 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8304 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8316,7 +8313,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_BwOr, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8320 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8317 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8329,7 +8326,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_BwXor, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8333 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8330 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8342,7 +8339,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_BwAnd, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8346 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8343 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8355,7 +8352,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType ((*(_cls14*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8359 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8356 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8368,7 +8365,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType ((*(_cls15*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8372 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8369 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8381,7 +8378,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType ((*(_cls16*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8385 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8382 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8394,7 +8391,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType ((*(_cls17*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8398 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8395 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8407,7 +8404,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType ((*(_cls18*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8411 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8408 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8420,7 +8417,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_At, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 			;
-// #line 8424 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8421 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8434,7 +8431,7 @@ public:
 					if (IsAutoEv ())
 						m_AutoEvBindSiteCount = 0; // reset on assignment
 				;
-// #line 8438 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8435 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8447,7 +8444,7 @@ public:
 			
 					return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType ((*(_cls19*) GetAstLocator (0)).m_OpKind, __pSymbol->m_Arg.pValue, __pSymbol->m_Local.OpValue2);
 				;
-// #line 8451 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8448 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8460,7 +8457,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Plus, __pSymbol->m_Arg.pValue);
 			;
-// #line 8464 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8461 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8473,7 +8470,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Minus, __pSymbol->m_Arg.pValue);
 			;
-// #line 8477 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8474 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8486,7 +8483,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_BwNot, __pSymbol->m_Arg.pValue);
 			;
-// #line 8490 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8487 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8499,7 +8496,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Addr, __pSymbol->m_Arg.pValue);
 			;
-// #line 8503 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8500 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8512,7 +8509,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Indir, __pSymbol->m_Arg.pValue);
 			;
-// #line 8516 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8513 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8525,7 +8522,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_LogNot, __pSymbol->m_Arg.pValue);
 			;
-// #line 8529 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8526 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8538,7 +8535,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PreInc, __pSymbol->m_Arg.pValue);
 			;
-// #line 8542 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8539 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8551,7 +8548,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PreDec, __pSymbol->m_Arg.pValue);
 			;
-// #line 8555 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8552 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8564,7 +8561,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType (EType_SizeT);
 			;
-// #line 8568 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8565 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8577,7 +8574,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType (EType_SizeT);
 			;
-// #line 8581 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8578 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8591,7 +8588,7 @@ public:
 				CType* pType = (*(_cls4*) GetAstLocator (0)).m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) (*(_cls4*) GetAstLocator (0)).m_pType)->GetTargetType () : (*(_cls4*) GetAstLocator (0)).m_pType;
 				__pSymbol->m_Arg.pValue->SetType ((*(_cls4*) GetAstLocator (0)).m_pType);
 			;
-// #line 8595 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8592 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8604,7 +8601,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType ((*(_cls2*) GetAstLocator (0)).m_pType);
 			;
-// #line 8608 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8605 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8618,7 +8615,7 @@ public:
 				EStorage StorageKind = IsValidLocator ((*(_cls30*) GetAstLocator (0))) ? (*(_cls30*) GetAstLocator (0)).m_StorageKind : EStorage_Heap;
 				return NewOperator_s (StorageKind, (*(_cls25*) GetAstLocator (1)).m_pType, __pSymbol->m_Arg.pValue);			
 			;
-// #line 8622 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8619 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8631,7 +8628,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetVoid ();
 			;
-// #line 8635 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8632 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8644,7 +8641,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls2*) GetAstLocator (0)).m_pType;
 			;
-// #line 8648 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8645 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8657,7 +8654,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls33*) GetAstLocator (0)).m_pType;
 			;
-// #line 8661 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8658 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8670,7 +8667,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetCallOperatorResultType (__pSymbol->m_Arg.pValue, &(*(_cls24*) GetAstLocator (0)).m_ValueList);
 			;
-// #line 8674 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8671 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8683,7 +8680,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetClosureOperatorResultType (__pSymbol->m_Arg.pValue, &(*(_cls24*) GetAstLocator (0)).m_ValueList);
 			;
-// #line 8687 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8684 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8696,7 +8693,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetBinaryOperatorResultType (EBinOp_Idx, __pSymbol->m_Arg.pValue, (*(_cls22*) GetAstLocator (0)).m_Value);
 			;
-// #line 8700 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8697 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8709,7 +8706,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PostInc, __pSymbol->m_Arg.pValue);
 			;
-// #line 8713 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8710 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8722,7 +8719,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PostDec, __pSymbol->m_Arg.pValue);
 			;
-// #line 8726 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8723 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8735,7 +8732,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetWeakenOperatorResultType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8739 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8736 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8748,7 +8745,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_Ptr, __pSymbol->m_Arg.pValue);
 			;
-// #line 8752 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8749 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8761,7 +8758,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetMemberOperatorResultType (__pSymbol->m_Arg.pValue, (*GetTokenLocator (0)).m_Data.m_String);
 			;
-// #line 8765 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8762 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8774,7 +8771,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetPropertyOnChangeType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8778 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8775 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8787,7 +8784,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetPropertyPropValueType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8791 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8788 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8800,7 +8797,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetPropertyGetterType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8804 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8801 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8813,7 +8810,7 @@ public:
 			
 				return m_pModule->m_OperatorMgr.GetPropertySetterType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8817 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8814 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8826,7 +8823,7 @@ public:
 			
 				return LookupIdentifierType ((*GetTokenLocator (0)).m_Data.m_String, __pSymbol->m_Arg.pValue);
 			;
-// #line 8830 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8827 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8839,7 +8836,7 @@ public:
 			
 				return GetThisValueType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8843 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8840 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8852,7 +8849,7 @@ public:
 			
 				return GetOnChangeType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8856 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8853 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8865,7 +8862,7 @@ public:
 			
 				return GetPropValueType (__pSymbol->m_Arg.pValue);
 			;
-// #line 8869 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8866 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8878,7 +8875,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType (GetInt64TypeKind ((*GetTokenLocator (0)).m_Data.m_Int64));
 			;
-// #line 8882 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8879 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8891,7 +8888,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType (EType_Double);
 			;
-// #line 8895 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8892 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8904,7 +8901,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType (EType_Bool);
 			;
-// #line 8908 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8905 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8917,7 +8914,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetType (EType_Bool);
 			;
-// #line 8921 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8918 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8930,7 +8927,7 @@ public:
 			
 				__pSymbol->m_Arg.pValue->SetNull ();
 			;
-// #line 8934 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8931 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8944,7 +8941,7 @@ public:
 					__pSymbol->m_Local.Literal.m_BinData.Append ((const uchar_t*) (*GetTokenLocator (0)).m_Data.m_String.cc (), (*GetTokenLocator (0)).m_Data.m_String.GetLength ());
 					__pSymbol->m_Local.Literal.m_LastToken = EToken_Literal;
 				;
-// #line 8948 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8945 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8958,7 +8955,7 @@ public:
 					__pSymbol->m_Local.Literal.m_BinData.Append ((*GetTokenLocator (1)).m_Data.m_BinData, (*GetTokenLocator (1)).m_Data.m_BinData.GetCount ());
 					__pSymbol->m_Local.Literal.m_LastToken = EToken_HexLiteral;
 				;
-// #line 8962 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8959 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8974,7 +8971,7 @@ public:
 					if (!__pSymbol->m_Local.Literal.m_FmtLiteralValue)
 						__pSymbol->m_Local.Literal.m_FmtLiteralValue.SetConstBool (true); 
 				;
-// #line 8978 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8975 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -8987,7 +8984,7 @@ public:
 			
 				return FinalizeLiteral_s (&__pSymbol->m_Local.Literal, __pSymbol->m_Arg.pValue);
 			;
-// #line 8991 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 8988 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9000,7 +8997,7 @@ public:
 			
 				__pSymbol->m_Arg.pTokenList->InsertTail ((*GetTokenLocator (0)));
 			;
-// #line 9004 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9001 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9013,7 +9010,7 @@ public:
 			
 				__pSymbol->m_Arg.pTokenList->InsertTail ((*GetTokenLocator (1)));
 			;
-// #line 9017 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9014 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9026,7 +9023,7 @@ public:
 			
 				__pSymbol->m_Arg.pTokenList->InsertTail ((*GetTokenLocator (0)));
 			;
-// #line 9030 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9027 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9039,7 +9036,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.OpenScope ((*GetTokenLocator (0)).m_Pos);
 			;
-// #line 9043 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9040 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9052,7 +9049,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.CloseScope ((*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9056 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9053 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9065,7 +9062,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.OpenScope ((*GetTokenLocator (0)).m_Pos);
 			;
-// #line 9069 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9066 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9078,7 +9075,7 @@ public:
 			
 				return FinalizeBaseTypeMemberConstructBlock ();
 			;
-// #line 9082 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9079 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9091,7 +9088,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.CloseScope ((*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9095 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9092 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9104,7 +9101,7 @@ public:
 			
 				return CallBaseTypeMemberConstructor ((*(_cls27*) GetAstLocator (0)).m_Name, &(*(_cls10*) GetAstLocator (1)).m_ValueList);
 			;
-// #line 9108 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9105 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9117,7 +9114,7 @@ public:
 			
 				return CallBaseTypeConstructor ((*GetTokenLocator (0)).m_Data.m_Integer - 1, &(*(_cls10*) GetAstLocator (1)).m_ValueList);
 			;
-// #line 9121 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9118 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9130,7 +9127,7 @@ public:
 			  
 				(*__pAstNode).m_Name.AddName ((*GetTokenLocator (0)).m_Data.m_String); 
 			;
-// #line 9134 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9131 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9143,7 +9140,7 @@ public:
 			 
 				(*__pAstNode).m_Name.AddName ((*GetTokenLocator (1)).m_Data.m_String);
 			;
-// #line 9147 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9144 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9156,7 +9153,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.IfStmt_Condition (&__pSymbol->m_Local.Stmt, (*(_cls7*) GetAstLocator (0)).m_Value, (*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9160 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9157 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9169,7 +9166,7 @@ public:
 			
 					m_pModule->m_ControlFlowMgr.IfStmt_Else (&__pSymbol->m_Local.Stmt, (*GetTokenLocator (2)).m_Pos);
 				;
-// #line 9173 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9170 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9182,7 +9179,7 @@ public:
 				
 				m_pModule->m_ControlFlowMgr.IfStmt_Follow (&__pSymbol->m_Local.Stmt, IsValidLocator ((*GetAstLocator (3))) ? (*GetAstLocator (3)).m_LastToken.m_Pos : (*GetAstLocator (4)).m_LastToken.m_Pos);
 			;
-// #line 9186 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9183 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9195,7 +9192,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.SwitchStmt_Condition (&__pSymbol->m_Local.Stmt, (*(_cls7*) GetAstLocator (0)).m_Value, (*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9199 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9196 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9208,7 +9205,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.SwitchStmt_Follow (&__pSymbol->m_Local.Stmt, (*GetTokenLocator (2)).m_Pos);
 			;
-// #line 9212 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9209 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9221,7 +9218,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.SwitchStmt_Case (__pSymbol->m_Arg.pStmt, (*(_cls12*) GetAstLocator (0)).m_Value, (*GetTokenLocator (1)).m_Pos, (*GetTokenLocator (2)).m_Pos);
 			;
-// #line 9225 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9222 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9234,7 +9231,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.SwitchStmt_Default (__pSymbol->m_Arg.pStmt, (*GetTokenLocator (0)).m_Pos, (*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9238 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9235 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9247,7 +9244,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.WhileStmt_Condition (&__pSymbol->m_Local.Stmt, (*(_cls7*) GetAstLocator (0)).m_Value, (*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9251 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9248 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9260,7 +9257,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.WhileStmt_Follow (&__pSymbol->m_Local.Stmt, (*GetAstLocator (2)).m_LastToken.m_Pos);
 			;
-// #line 9264 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9261 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9273,7 +9270,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.DoStmt_PreBody (&__pSymbol->m_Local.Stmt, (*GetTokenLocator (0)).m_Pos);
 			;
-// #line 9277 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9274 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9286,7 +9283,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.DoStmt_PostBody (&__pSymbol->m_Local.Stmt, (*GetAstLocator (1)).m_LastToken.m_Pos);
 			;
-// #line 9290 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9287 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9299,7 +9296,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.DoStmt_Condition (&__pSymbol->m_Local.Stmt, (*(_cls7*) GetAstLocator (2)).m_Value);
 			;
-// #line 9303 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9300 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9312,7 +9309,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.ForStmt_PreInit (&__pSymbol->m_Local.Stmt, (*GetTokenLocator (0)).m_Pos);
 			;
-// #line 9316 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9313 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9325,7 +9322,7 @@ public:
 			
 					m_pModule->m_ControlFlowMgr.ForStmt_PreCondition (&__pSymbol->m_Local.Stmt);
 				;
-// #line 9329 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9326 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9338,7 +9335,7 @@ public:
 			
 					return m_pModule->m_ControlFlowMgr.ForStmt_PostCondition (&__pSymbol->m_Local.Stmt, (*(_cls7*) GetAstLocator (1)).m_Value);
 				;
-// #line 9342 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9339 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9351,7 +9348,7 @@ public:
 			
 					m_pModule->m_ControlFlowMgr.ForStmt_PreLoop (&__pSymbol->m_Local.Stmt);
 				;
-// #line 9355 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9352 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9364,7 +9361,7 @@ public:
 			
 					m_pModule->m_ControlFlowMgr.ForStmt_PostLoop (&__pSymbol->m_Local.Stmt);
 				;
-// #line 9368 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9365 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9377,7 +9374,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.ForStmt_PreBody (&__pSymbol->m_Local.Stmt);
 			;
-// #line 9381 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9378 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9390,7 +9387,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.ForStmt_PostBody (&__pSymbol->m_Local.Stmt, (*GetAstLocator (2)).m_LastToken.m_Pos);
 			;
-// #line 9394 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9391 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9403,7 +9400,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.Break ((*GetTokenLocator (0)).m_Data.m_Integer);
 			;
-// #line 9407 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9404 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9416,7 +9413,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.Continue ((*GetTokenLocator (0)).m_Data.m_Integer);
 			;
-// #line 9420 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9417 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9429,7 +9426,7 @@ public:
 			
 				return m_pModule->m_ControlFlowMgr.Return (IsValidLocator ((*(_cls7*) GetAstLocator (0))) ? (*(_cls7*) GetAstLocator (0)).m_Value : CValue (), IsValidLocator ((*GetTokenLocator (1))));
 			;
-// #line 9433 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9430 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9445,7 +9442,7 @@ public:
 					m_pModule->m_ControlFlowMgr.OnceStmt_Create (&__pSymbol->m_Local.Stmt, StorageKind) &&				
 					m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&__pSymbol->m_Local.Stmt, (*GetTokenLocator (1)).m_Pos);
 			;
-// #line 9449 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9446 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9458,7 +9455,7 @@ public:
 			
 				m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&__pSymbol->m_Local.Stmt, (*GetAstLocator (2)).m_LastToken.m_Pos);
 			;
-// #line 9462 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9459 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9471,7 +9468,7 @@ public:
 			
 			return FinalizeAutoEv ();
 		;
-// #line 9475 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9472 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9482,7 +9479,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 317 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Stmt.llk"
 			 return true; ;
-// #line 9486 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9483 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9495,7 +9492,7 @@ public:
 			
 				return FinalizeAutoEvOnChangeClause ();
 			;
-// #line 9499 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9496 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9508,7 +9505,7 @@ public:
 			
 				return FinalizeAutoEvOnChangeStmt ();
 			;
-// #line 9512 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9509 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9521,7 +9518,7 @@ public:
 			
 				return AutoEvExpressionStmt (&(*(_cls5*) GetAstLocator (0)).m_TokenList);
 			;
-// #line 9525 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9522 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9532,7 +9529,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 84 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Stmt_0.llk"
 			 return true; ;
-// #line 9536 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9533 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9545,7 +9542,7 @@ public:
 			
 				return CountAutoEvBindSites ();
 			;
-// #line 9549 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9546 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9558,7 +9555,7 @@ public:
 			
 				return CountAutoEvBindSites ();
 			;
-// #line 9562 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9559 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9571,7 +9568,7 @@ public:
 			
 				return SetStorageKind ((*(_cls30*) GetAstLocator (0)).m_StorageKind);
 			;
-// #line 9575 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9572 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9584,7 +9581,7 @@ public:
 			
 				return SetAccessKind ((*(_cls31*) GetAstLocator (0)).m_AccessKind);
 			;
-// #line 9588 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9585 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9597,7 +9594,7 @@ public:
 			
 				return __pSymbol->m_Arg.pTypeSpecifier->SetType ((*(_cls32*) GetAstLocator (0)).m_pType);
 			;
-// #line 9601 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9598 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9610,7 +9607,7 @@ public:
 			
 				return __pSymbol->m_Arg.pTypeSpecifier->SetTypeModifier ((*(_cls34*) GetAstLocator (0)).m_Modifier);
 			;
-// #line 9614 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9611 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9623,7 +9620,7 @@ public:
 			
 				return __pSymbol->m_Arg.pTypeSpecifier->SetType ((*(_cls32*) GetAstLocator (0)).m_pType);
 			;
-// #line 9627 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9624 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9636,7 +9633,7 @@ public:
 			
 				return __pSymbol->m_Arg.pTypeSpecifier->SetTypeModifier ((*(_cls34*) GetAstLocator (0)).m_Modifier);
 			;
-// #line 9640 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9637 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9649,7 +9646,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Typedef;
 			;
-// #line 9653 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9650 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9662,7 +9659,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Alias;
 			;
-// #line 9666 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9663 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9675,7 +9672,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Static;
 			;
-// #line 9679 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9676 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9688,7 +9685,7 @@ public:
 						
 				(*__pAstNode).m_StorageKind = EStorage_Thread;
 			;
-// #line 9692 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9689 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9701,7 +9698,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Stack;
 			;
-// #line 9705 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9702 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9714,7 +9711,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Heap;
 			;
-// #line 9718 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9715 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9727,7 +9724,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_UHeap;
 			;
-// #line 9731 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9728 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9740,7 +9737,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Abstract;
 			;
-// #line 9744 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9741 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9753,7 +9750,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Virtual;
 			;
-// #line 9757 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9754 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9766,7 +9763,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Override;
 			;
-// #line 9770 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9767 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9779,7 +9776,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Mutable;
 			;
-// #line 9783 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9780 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9792,7 +9789,7 @@ public:
 			
 				(*__pAstNode).m_StorageKind = EStorage_Nullable;
 			;
-// #line 9796 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9793 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9805,7 +9802,7 @@ public:
 			
 				(*__pAstNode).m_AccessKind = EAccess_Public;
 			;
-// #line 9809 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9806 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9818,7 +9815,7 @@ public:
 			
 				(*__pAstNode).m_AccessKind = EAccess_Protected;
 			;
-// #line 9822 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9819 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9831,7 +9828,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 			;
-// #line 9835 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9832 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9845,7 +9842,7 @@ public:
 				err::SetStringError ("'variant' type specifier is not yet supported");
 				return false; 
 			;
-// #line 9849 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9846 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9858,7 +9855,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass);
 			;
-// #line 9862 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9859 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9871,7 +9868,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetBoxClassType ((*(_cls2*) GetAstLocator (0)).m_pType);
 			;
-// #line 9875 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9872 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9884,7 +9881,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Bool);
 			;
-// #line 9888 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9885 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9897,7 +9894,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int8);
 			;
-// #line 9901 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9898 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9910,7 +9907,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int16);
 			;
-// #line 9914 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9911 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9923,7 +9920,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32);
 			;
-// #line 9927 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9924 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9936,7 +9933,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64);
 			;
-// #line 9940 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9937 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9949,7 +9946,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 			;
-// #line 9953 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9950 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9962,7 +9959,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
 			;
-// #line 9966 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9963 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9975,7 +9972,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char);
 			;
-// #line 9979 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9976 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -9988,7 +9985,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Float);
 			;
-// #line 9992 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 9989 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10001,7 +9998,7 @@ public:
 			
 				(*__pAstNode).m_pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double);
 			;
-// #line 10005 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10002 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10015,7 +10012,7 @@ public:
 				err::SetStringError ("'auto' type specifier is not yet supported");
 				return false; 
 			;
-// #line 10019 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10016 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10028,7 +10025,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls46*) GetAstLocator (0)).m_pType;
 			;
-// #line 10032 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10029 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10041,7 +10038,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls33*) GetAstLocator (0)).m_pType;
 			;
-// #line 10045 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10042 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10055,7 +10052,7 @@ public:
 				if (IsTypeSpecified ())
 					return false;
 			;
-// #line 10059 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10056 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10068,7 +10065,7 @@ public:
 			
 				return m_Stage == EStage_Pass1 || FindType ((*(_cls1*) GetAstLocator (0)).m_Name) != NULL;
 			;
-// #line 10072 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10069 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10081,7 +10078,7 @@ public:
 			
 				return false;
 			;
-// #line 10085 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10082 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10101,7 +10098,7 @@ public:
 
 				(*__pAstNode).m_pType = pType;
 			;
-// #line 10105 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10102 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10114,7 +10111,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Unsigned;
 			;
-// #line 10118 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10115 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10127,7 +10124,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_BigEndian;
 			;
-// #line 10131 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10128 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10140,7 +10137,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Const;
 			;
-// #line 10144 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10141 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10153,7 +10150,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_PubConst;
 			;
-// #line 10157 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10154 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10166,7 +10163,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Volatile;
 			;
-// #line 10170 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10167 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10179,7 +10176,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Weak;
 			;
-// #line 10183 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10180 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10192,7 +10189,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Thin;
 			;
-// #line 10196 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10193 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10205,7 +10202,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Unsafe;
 			;
-// #line 10209 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10206 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10218,7 +10215,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Cdecl;
 			;
-// #line 10222 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10219 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10231,7 +10228,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Stdcall;
 			;
-// #line 10235 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10232 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10244,7 +10241,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Function;
 			;
-// #line 10248 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10245 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10257,7 +10254,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Property;
 			;
-// #line 10261 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10258 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10270,7 +10267,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Bindable;
 			;
-// #line 10274 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10271 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10283,7 +10280,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_AutoGet;
 			;
-// #line 10287 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10284 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10296,7 +10293,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Indexed;
 			;
-// #line 10300 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10297 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10309,7 +10306,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Multicast;
 			;
-// #line 10313 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10310 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10322,7 +10319,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_Event;
 			;
-// #line 10326 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10323 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10335,7 +10332,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_PubEvent;
 			;
-// #line 10339 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10336 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10348,7 +10345,7 @@ public:
 			
 				(*__pAstNode).m_Modifier = ETypeModifier_AutoEv;
 			;
-// #line 10352 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10349 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10361,7 +10358,7 @@ public:
 			
 				(*(_cls35*) GetAstLocator (0)).m_Declarator.m_Constructor.TakeOver (&(*(_cls6*) GetAstLocator (1)).m_TokenList);
 			;
-// #line 10365 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10362 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10374,7 +10371,7 @@ public:
 			
 				(*(_cls35*) GetAstLocator (0)).m_Declarator.m_Initializer.TakeOver (&(*(_cls5*) GetAstLocator (2)).m_TokenList);
 			;
-// #line 10378 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10375 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10387,7 +10384,7 @@ public:
 			 
 				return Declare (&(*(_cls35*) GetAstLocator (0)).m_Declarator);
 			;
-// #line 10391 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10388 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10400,7 +10397,7 @@ public:
 			
 				__pSymbol->m_Arg.pDeclarator->m_Pos = (*GetAstLocator (0)).m_FirstToken.m_Pos;
 			;
-// #line 10404 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10401 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10413,7 +10410,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddName ((*GetTokenLocator (0)).m_Data.m_String);
 			;
-// #line 10417 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10414 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10426,7 +10423,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_Getter);
 			;
-// #line 10430 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10427 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10439,7 +10436,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_Setter);
 			;
-// #line 10443 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10440 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10452,7 +10449,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_PreConstructor);
 			;
-// #line 10456 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10453 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10465,7 +10462,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_Constructor);
 			;
-// #line 10469 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10466 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10478,7 +10475,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_Destructor);
 			;
-// #line 10482 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10479 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10491,7 +10488,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_StaticConstructor);
 			;
-// #line 10495 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10492 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10504,7 +10501,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_StaticDestructor);
 			;
-// #line 10508 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10505 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10517,7 +10514,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnnamedMethod (EFunction_CallOperator);
 			;
-// #line 10521 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10518 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10530,7 +10527,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddCastOperator ((*(_cls2*) GetAstLocator (0)).m_pType);
 			;
-// #line 10534 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10531 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10543,7 +10540,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddUnaryBinaryOperator ((*(_cls36*) GetAstLocator (0)).m_UnOpKind, (*(_cls36*) GetAstLocator (0)).m_BinOpKind);
 			;
-// #line 10547 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10544 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10556,7 +10553,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->SetPropValue ();
 			;
-// #line 10560 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10557 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10569,7 +10566,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_BwNot;
 			;
-// #line 10573 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10570 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10582,7 +10579,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_LogNot;
 			;
-// #line 10586 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10583 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10595,7 +10592,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_PreInc;
 			;
-// #line 10599 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10596 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10608,7 +10605,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_PreDec;
 			;
-// #line 10612 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10609 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10621,7 +10618,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_PostInc;
 			;
-// #line 10625 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10622 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10634,7 +10631,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_PostDec;
 			;
-// #line 10638 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10635 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10647,7 +10644,7 @@ public:
 			
 				(*__pAstNode).m_UnOpKind = EUnOp_Ptr;
 			;
-// #line 10651 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10648 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10661,7 +10658,7 @@ public:
 				(*__pAstNode).m_UnOpKind = EUnOp_Plus;
 				(*__pAstNode).m_BinOpKind = EBinOp_Add;
 			;
-// #line 10665 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10662 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10675,7 +10672,7 @@ public:
 				(*__pAstNode).m_UnOpKind = EUnOp_Minus;
 				(*__pAstNode).m_BinOpKind = EBinOp_Sub;
 			;
-// #line 10679 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10676 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10689,7 +10686,7 @@ public:
 				(*__pAstNode).m_UnOpKind = EUnOp_Indir;
 				(*__pAstNode).m_BinOpKind = EBinOp_Mul;
 			;
-// #line 10693 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10690 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10702,7 +10699,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Div;
 			;
-// #line 10706 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10703 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10715,7 +10712,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Mod;
 			;
-// #line 10719 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10716 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10728,7 +10725,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Shl;
 			;
-// #line 10732 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10729 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10741,7 +10738,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Shr;
 			;
-// #line 10745 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10742 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10755,7 +10752,7 @@ public:
 				(*__pAstNode).m_UnOpKind = EUnOp_Addr;
 				(*__pAstNode).m_BinOpKind = EBinOp_BwAnd;
 			;
-// #line 10759 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10756 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10768,7 +10765,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_BwXor;
 			;
-// #line 10772 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10769 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10781,7 +10778,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_BwOr;
 			;
-// #line 10785 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10782 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10794,7 +10791,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Eq;
 			;
-// #line 10798 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10795 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10807,7 +10804,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Ne;
 			;
-// #line 10811 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10808 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10820,7 +10817,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Lt;
 			;
-// #line 10824 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10821 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10833,7 +10830,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Le;
 			;
-// #line 10837 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10834 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10846,7 +10843,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Gt;
 			;
-// #line 10850 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10847 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10859,7 +10856,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Ge;
 			;
-// #line 10863 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10860 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10872,7 +10869,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Assign;
 			;
-// #line 10876 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10873 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10885,7 +10882,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_RefAssign;
 			;
-// #line 10889 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10886 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10898,7 +10895,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_AddAssign;
 			;
-// #line 10902 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10899 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10911,7 +10908,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_SubAssign;
 			;
-// #line 10915 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10912 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10924,7 +10921,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_MulAssign;
 			;
-// #line 10928 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10925 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10937,7 +10934,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_DivAssign;
 			;
-// #line 10941 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10938 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10950,7 +10947,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_ModAssign;
 			;
-// #line 10954 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10951 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10963,7 +10960,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_ShlAssign;
 			;
-// #line 10967 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10964 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10976,7 +10973,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_ShrAssign;
 			;
-// #line 10980 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10977 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -10989,7 +10986,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_AndAssign;
 			;
-// #line 10993 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 10990 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11002,7 +10999,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_XorAssign;
 			;
-// #line 11006 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11003 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11015,7 +11012,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_OrAssign;
 			;
-// #line 11019 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11016 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11028,7 +11025,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_AtAssign;
 			;
-// #line 11032 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11029 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11041,7 +11038,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_LogAnd;
 			;
-// #line 11045 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11042 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11054,7 +11051,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_LogOr;
 			;
-// #line 11058 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11055 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11067,7 +11064,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_Idx;
 			;
-// #line 11071 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11068 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11080,7 +11077,7 @@ public:
 			
 				(*__pAstNode).m_BinOpKind = EBinOp_At;
 			;
-// #line 11084 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11081 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11093,7 +11090,7 @@ public:
 			
 				__pSymbol->m_Arg.pDeclarator->AddPointerPrefix ();
 			;
-// #line 11097 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11094 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11106,7 +11103,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->SetTypeModifier ((*(_cls34*) GetAstLocator (0)).m_Modifier);
 			;
-// #line 11110 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11107 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11117,7 +11114,7 @@ public:
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 // #line 304 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			 return false; ;
-// #line 11121 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11118 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11130,7 +11127,7 @@ public:
 			
 				__pSymbol->m_Arg.pDeclarator->AddArraySuffix (&(*(_cls5*) GetAstLocator (0)).m_TokenList);
 			;
-// #line 11134 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11131 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11143,7 +11140,7 @@ public:
 			
 				__pSymbol->m_Arg.pDeclarator->AddArraySuffix ((*GetTokenLocator (0)).m_Data.m_Integer);
 			;
-// #line 11147 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11144 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11156,7 +11153,7 @@ public:
 			
 				__pSymbol->m_Arg.pDeclarator->AddArraySuffix (-1);
 			;
-// #line 11160 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11157 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11169,7 +11166,7 @@ public:
 			
 				__pSymbol->m_Local.Declarator.SetTypeSpecifier (&(*(_cls28*) GetAstLocator (0)).m_TypeSpecifier);
 			;
-// #line 11173 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11170 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11182,7 +11179,7 @@ public:
 			
 				__pSymbol->m_Local.Declarator.m_Initializer.TakeOver (&(*(_cls5*) GetAstLocator (1)).m_TokenList);
 			;
-// #line 11186 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11183 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11195,7 +11192,7 @@ public:
 			
 				return CreateFormalArg (__pSymbol->m_Arg.pFunctionSuffix, &__pSymbol->m_Local.Declarator) != NULL;
 			;
-// #line 11199 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11196 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11208,7 +11205,7 @@ public:
 			
 				__pSymbol->m_Local.Declarator.m_Initializer.TakeOver (&(*(_cls5*) GetAstLocator (0)).m_TokenList);
 			;
-// #line 11212 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11209 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11221,7 +11218,7 @@ public:
 			
 				return CreateFormalArg (__pSymbol->m_Arg.pFunctionSuffix, &__pSymbol->m_Local.Declarator) != NULL;
 			;
-// #line 11225 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11222 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11236,7 +11233,7 @@ public:
 				if (IsValidLocator ((*GetTokenLocator (0))))
 					__pSymbol->m_Arg.pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_UnsafeVarArg;
 			;
-// #line 11240 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11237 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11249,7 +11246,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->AddBitFieldSuffix ((*GetTokenLocator (0)).m_Data.m_Integer);
 			;
-// #line 11253 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11250 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11262,7 +11259,7 @@ public:
 			
 				return __pSymbol->m_Arg.pDeclarator->SetPostDeclaratorModifier (EPostDeclaratorModifier_Const);
 			;
-// #line 11266 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11263 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11275,7 +11272,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls38*) GetAstLocator (0)).m_pType;
 			;
-// #line 11279 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11276 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11288,7 +11285,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls40*) GetAstLocator (0)).m_pType;
 			;
-// #line 11292 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11289 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11301,7 +11298,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls43*) GetAstLocator (0)).m_pType;
 			;
-// #line 11305 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11302 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11314,7 +11311,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls44*) GetAstLocator (0)).m_pType;
 			;
-// #line 11318 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11315 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11327,7 +11324,7 @@ public:
 			
 				(*__pAstNode).m_pType = (*(_cls45*) GetAstLocator (0)).m_pProperty->GetType ();
 			;
-// #line 11331 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11328 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11348,7 +11345,7 @@ public:
 				if (!(*__pAstNode).m_pType)
 					return false;
 			;
-// #line 11352 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11349 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11362,7 +11359,7 @@ public:
 				(*__pAstNode).m_EnumTypeKind = EEnumType_Normal;
 				(*__pAstNode).m_Flags = 0;
 			;
-// #line 11366 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11363 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11376,7 +11373,7 @@ public:
 				(*__pAstNode).m_EnumTypeKind = EEnumType_Flag;
 				(*__pAstNode).m_Flags = 0;
 			;
-// #line 11380 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11377 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11390,7 +11387,7 @@ public:
 				(*__pAstNode).m_EnumTypeKind = EEnumType_Normal;
 				(*__pAstNode).m_Flags = EEnumTypeFlag_Exposed;
 			;
-// #line 11394 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11391 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11403,7 +11400,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.OpenNamespace (__pSymbol->m_Arg.pType);	
 			;
-// #line 11407 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11404 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11416,7 +11413,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.CloseNamespace ();	
 			;
-// #line 11420 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11417 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11437,7 +11434,7 @@ public:
 
 				pMember->m_Pos = (*GetTokenLocator (0)).m_Pos;
 			;
-// #line 11441 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11438 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11457,7 +11454,7 @@ public:
 				if (!(*__pAstNode).m_pType)
 					return false;
 			;
-// #line 11461 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11458 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11470,7 +11467,7 @@ public:
 			
 				(*__pAstNode).m_PackFactor = (*(_cls42*) GetAstLocator (0)).m_Value;
 			;
-// #line 11474 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11471 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11483,7 +11480,7 @@ public:
 			
 				(*__pAstNode).m_Value = (*GetTokenLocator (0)).m_Data.m_Integer;
 			;
-// #line 11487 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11484 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11496,7 +11493,7 @@ public:
 			
 				(*__pAstNode).m_Value = m_DefaultStructPackFactor;
 			;
-// #line 11500 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11497 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11511,7 +11508,7 @@ public:
 				if (!(*__pAstNode).m_pType)
 					return false;
 			;
-// #line 11515 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11512 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11531,7 +11528,7 @@ public:
 				if (!(*__pAstNode).m_pType)
 					return false;
 			;
-// #line 11535 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11532 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11552,7 +11549,7 @@ public:
 
 				return IsValidLocator ((*GetTokenLocator (1))) ? (*__pAstNode).m_pProperty->CreateOnChange () : true;
 			;
-// #line 11556 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11553 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11566,7 +11563,7 @@ public:
 				m_pLastDeclaredItem = (*__pAstNode).m_pProperty;
 				return (*__pAstNode).m_pProperty->CalcType () != NULL; 
 			;
-// #line 11570 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11567 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11579,7 +11576,7 @@ public:
 			
 				__pSymbol->m_Local.pTemplate = CreatePropertyTemplate ();
 			;
-// #line 11583 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11580 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11593,7 +11590,7 @@ public:
 				(*__pAstNode).m_pType = __pSymbol->m_Local.pTemplate->CalcType ();
 				return (*__pAstNode).m_pType != NULL;
 			;
-// #line 11597 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11594 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11606,7 +11603,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.OpenNamespace (__pSymbol->m_Arg.pNamespace);
 			;
-// #line 11610 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11607 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11619,7 +11616,7 @@ public:
 			
 				m_pModule->m_NamespaceMgr.CloseNamespace ();
 			;
-// #line 11623 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11620 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 
 			return true;
@@ -11647,7 +11644,7 @@ public:
 			
 // #line 100 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pName = &(*__pAstNode).m_Name;
-// #line 11651 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11648 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11660,7 +11657,7 @@ public:
 			
 // #line 126 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pTypeSpecifier = &(*(_cls28*) GetAstLocator (0)).m_TypeSpecifier;
-// #line 11664 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11661 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11673,7 +11670,7 @@ public:
 			
 // #line 127 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pTypeSpecifier = &(*(_cls28*) GetAstLocator (0)).m_TypeSpecifier;
-// #line 11677 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11674 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11686,7 +11683,7 @@ public:
 			
 // #line 143 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11690 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11687 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11699,7 +11696,7 @@ public:
 			
 // #line 144 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11703 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11700 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11712,7 +11709,7 @@ public:
 			
 // #line 145 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11716 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11713 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11725,7 +11722,7 @@ public:
 			
 // #line 145 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11729 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11726 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11738,7 +11735,7 @@ public:
 			
 // #line 146 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11742 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11739 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11751,7 +11748,7 @@ public:
 			
 // #line 150 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pTypeSpecifier = NULL;
-// #line 11755 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11752 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11764,7 +11761,7 @@ public:
 			
 // #line 164 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11768 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11765 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11777,7 +11774,7 @@ public:
 			
 // #line 203 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11781 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11778 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11790,7 +11787,7 @@ public:
 			
 // #line 204 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 11794 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11791 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11803,11 +11800,11 @@ public:
 			
 // #line 219 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.ppType = &(*__pAstNode).m_pType;
-// #line 11807 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11804 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 // #line 219 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Decl.llk"
 			__pTarget->m_Arg.pCountValue =  NULL;
-// #line 11811 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11808 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11820,7 +11817,7 @@ public:
 			
 // #line 8 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTokenList = &(*__pAstNode).m_TokenList;
-// #line 11824 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11821 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11833,7 +11830,7 @@ public:
 			
 // #line 17 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTokenList = __pSymbol->m_Arg.pTokenList;
-// #line 11837 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11834 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11846,7 +11843,7 @@ public:
 			
 // #line 26 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTokenList = __pSymbol->m_Arg.pTokenList;
-// #line 11850 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11847 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11859,7 +11856,7 @@ public:
 			
 // #line 35 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTokenList = __pSymbol->m_Arg.pTokenList;
-// #line 11863 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11860 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11872,7 +11869,7 @@ public:
 			
 // #line 55 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTokenList = &(*__pAstNode).m_TokenList;
-// #line 11876 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11873 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11885,7 +11882,7 @@ public:
 			
 // #line 61 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTokenList = __pSymbol->m_Arg.pTokenList;
-// #line 11889 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11886 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11898,7 +11895,7 @@ public:
 			
 // #line 100 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_Value;
-// #line 11902 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11899 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11911,7 +11908,7 @@ public:
 			
 // #line 109 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_Value;
-// #line 11915 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11912 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11924,7 +11921,7 @@ public:
 			
 // #line 164 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_Value;
-// #line 11928 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11925 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11935,9 +11932,9 @@ public:
 			CSymbolNode_conditional_expr* __pSymbol = (CSymbolNode_conditional_expr*) GetSymbolTop ();
 			_cls13* __pAstNode = (_cls13*) __pSymbol->m_pAstNode;
 			
-// #line 211 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 208 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 11941 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11938 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11948,9 +11945,9 @@ public:
 			CSymbolNode_conditional_expr* __pSymbol = (CSymbolNode_conditional_expr*) GetSymbolTop ();
 			_cls13* __pAstNode = (_cls13*) __pSymbol->m_pAstNode;
 			
-// #line 220 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 217 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_TrueValue;
-// #line 11954 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11951 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11961,9 +11958,9 @@ public:
 			CSymbolNode_conditional_expr* __pSymbol = (CSymbolNode_conditional_expr*) GetSymbolTop ();
 			_cls13* __pAstNode = (_cls13*) __pSymbol->m_pAstNode;
 			
-// #line 225 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 222 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_FalseValue;
-// #line 11967 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11964 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11974,9 +11971,9 @@ public:
 			CSymbolNode_logical_or_expr* __pSymbol = (CSymbolNode_logical_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 243 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 240 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 11980 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11977 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -11987,9 +11984,9 @@ public:
 			CSymbolNode_logical_or_expr* __pSymbol = (CSymbolNode_logical_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 244 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 241 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 11993 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 11990 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12000,9 +11997,9 @@ public:
 			CSymbolNode_logical_and_expr* __pSymbol = (CSymbolNode_logical_and_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 256 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 253 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12006 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12003 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12013,9 +12010,9 @@ public:
 			CSymbolNode_logical_and_expr* __pSymbol = (CSymbolNode_logical_and_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 257 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 254 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12019 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12016 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12026,9 +12023,9 @@ public:
 			CSymbolNode_inclusive_or_expr* __pSymbol = (CSymbolNode_inclusive_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 269 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 266 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12032 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12029 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12039,9 +12036,9 @@ public:
 			CSymbolNode_inclusive_or_expr* __pSymbol = (CSymbolNode_inclusive_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 270 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 267 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12045 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12042 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12052,9 +12049,9 @@ public:
 			CSymbolNode_exclusive_or_expr* __pSymbol = (CSymbolNode_exclusive_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 282 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 279 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12058 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12055 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12065,9 +12062,9 @@ public:
 			CSymbolNode_exclusive_or_expr* __pSymbol = (CSymbolNode_exclusive_or_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 283 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 280 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12071 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12068 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12078,9 +12075,9 @@ public:
 			CSymbolNode_and_expr* __pSymbol = (CSymbolNode_and_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 295 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 292 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12084 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12081 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12091,9 +12088,9 @@ public:
 			CSymbolNode_and_expr* __pSymbol = (CSymbolNode_and_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 296 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 293 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12097 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12094 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12104,9 +12101,9 @@ public:
 			CSymbolNode_equality_expr* __pSymbol = (CSymbolNode_equality_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 308 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 305 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12110 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12107 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12117,9 +12114,9 @@ public:
 			CSymbolNode_equality_expr* __pSymbol = (CSymbolNode_equality_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 309 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 306 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12123 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12120 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12130,9 +12127,9 @@ public:
 			CSymbolNode_relational_expr* __pSymbol = (CSymbolNode_relational_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 336 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 333 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12136 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12133 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12143,9 +12140,9 @@ public:
 			CSymbolNode_relational_expr* __pSymbol = (CSymbolNode_relational_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 337 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 334 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12149 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12146 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12156,9 +12153,9 @@ public:
 			CSymbolNode_shift_expr* __pSymbol = (CSymbolNode_shift_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 372 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 369 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12162 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12159 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12169,9 +12166,9 @@ public:
 			CSymbolNode_shift_expr* __pSymbol = (CSymbolNode_shift_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 373 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 370 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12175 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12172 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12182,9 +12179,9 @@ public:
 			CSymbolNode_additive_expr* __pSymbol = (CSymbolNode_additive_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 400 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 397 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12188 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12185 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12195,9 +12192,9 @@ public:
 			CSymbolNode_additive_expr* __pSymbol = (CSymbolNode_additive_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 401 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 398 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12201 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12198 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12208,9 +12205,9 @@ public:
 			CSymbolNode_multiplicative_expr* __pSymbol = (CSymbolNode_multiplicative_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 428 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 425 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12214 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12211 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12221,9 +12218,9 @@ public:
 			CSymbolNode_multiplicative_expr* __pSymbol = (CSymbolNode_multiplicative_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 429 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 426 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12227 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12224 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12234,9 +12231,9 @@ public:
 			CSymbolNode_at_expr* __pSymbol = (CSymbolNode_at_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 460 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 457 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12240 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12237 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12247,9 +12244,9 @@ public:
 			CSymbolNode_at_expr* __pSymbol = (CSymbolNode_at_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 461 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 458 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12253 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12250 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12260,9 +12257,9 @@ public:
 			CSymbolNode_assignment_expr* __pSymbol = (CSymbolNode_assignment_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 469 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 466 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12266 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12263 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12273,9 +12270,9 @@ public:
 			CSymbolNode_assignment_expr* __pSymbol = (CSymbolNode_assignment_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 469 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 466 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12279 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12276 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12286,9 +12283,9 @@ public:
 			CSymbolNode_assignment_operator_expr* __pSymbol = (CSymbolNode_assignment_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 482 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 479 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12292 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12289 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12299,9 +12296,9 @@ public:
 			CSymbolNode_unary_expr* __pSymbol = (CSymbolNode_unary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 549 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 546 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12305 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12302 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12312,9 +12309,9 @@ public:
 			CSymbolNode_unary_expr* __pSymbol = (CSymbolNode_unary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 550 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 547 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12318 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12315 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12325,9 +12322,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 559 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 556 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12331 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12328 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12338,9 +12335,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 563 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 560 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12344 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12341 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12351,9 +12348,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 567 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 564 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12357 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12354 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12364,9 +12361,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 571 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 568 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12370 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12367 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12377,9 +12374,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 575 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 572 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12383 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12380 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12390,9 +12387,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 579 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 576 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12396 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12393 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12403,9 +12400,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 583 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 580 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12409 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12406 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12416,9 +12413,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 587 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 584 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12422 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12419 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12429,9 +12426,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 607 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 604 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12435 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12432 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12442,9 +12439,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 623 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 620 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12448 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12445 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12455,9 +12452,9 @@ public:
 			CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 624 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 621 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12461 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12458 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12468,13 +12465,13 @@ public:
 			CSymbolNode* __pSymbol = GetSymbolTop ();
 			_cls20* __pAstNode = (_cls20*) __pSymbol->m_pAstNode;
 			
-// #line 641 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 638 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.ppType = &(*__pAstNode).m_pType;
-// #line 12474 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12471 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
-// #line 641 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 638 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pCountValue =  &(*__pAstNode).m_ElementCountValue;
-// #line 12478 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12475 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12485,9 +12482,9 @@ public:
 			CSymbolNode_cast_operator_rslv* __pSymbol = (CSymbolNode_cast_operator_rslv*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 670 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 667 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pTypeSpecifier = &__pSymbol->m_Local.TypeSpecifier;
-// #line 12491 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12488 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12498,9 +12495,9 @@ public:
 			CSymbolNode_postfix_expr* __pSymbol = (CSymbolNode_postfix_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 674 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 671 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12504 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12501 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12511,9 +12508,9 @@ public:
 			CSymbolNode_postfix_expr* __pSymbol = (CSymbolNode_postfix_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 675 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 672 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12517 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12514 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12524,9 +12521,9 @@ public:
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 710 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 707 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12530 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12527 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12537,9 +12534,9 @@ public:
 			CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 715 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 712 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12543 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12540 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12550,9 +12547,9 @@ public:
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 783 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 780 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12556 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12553 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12563,9 +12560,9 @@ public:
 			CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 784 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 781 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12569 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12566 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12576,9 +12573,9 @@ public:
 			CSymbolNode_curly_initializer* __pSymbol = (CSymbolNode_curly_initializer*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 836 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 833 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pInitializer = &__pSymbol->m_Local.Initializer;
-// #line 12582 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12579 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12589,9 +12586,9 @@ public:
 			CSymbolNode_curly_initializer* __pSymbol = (CSymbolNode_curly_initializer*) GetSymbolTop ();
 			CAstNode* __pAstNode = __pSymbol->m_pAstNode;
 			
-// #line 836 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 833 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 			__pTarget->m_Arg.pInitializer = &__pSymbol->m_Local.Initializer;
-// #line 12595 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12592 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12604,7 +12601,7 @@ public:
 			
 // #line 17 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_Value;
-// #line 12608 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12605 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12617,7 +12614,7 @@ public:
 			
 // #line 26 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &(*__pAstNode).m_Value;
-// #line 12621 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12618 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12630,7 +12627,7 @@ public:
 			
 // #line 83 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12634 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12631 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12643,7 +12640,7 @@ public:
 			
 // #line 84 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.TrueValue;
-// #line 12647 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12644 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12656,7 +12653,7 @@ public:
 			
 // #line 84 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.FalseValue;
-// #line 12660 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12657 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12669,7 +12666,7 @@ public:
 			
 // #line 96 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12673 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12670 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12682,7 +12679,7 @@ public:
 			
 // #line 97 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12686 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12683 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12695,7 +12692,7 @@ public:
 			
 // #line 109 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12699 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12696 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12708,7 +12705,7 @@ public:
 			
 // #line 110 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12712 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12709 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12721,7 +12718,7 @@ public:
 			
 // #line 122 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12725 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12722 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12734,7 +12731,7 @@ public:
 			
 // #line 123 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12738 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12735 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12747,7 +12744,7 @@ public:
 			
 // #line 135 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12751 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12748 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12760,7 +12757,7 @@ public:
 			
 // #line 136 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12764 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12761 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12773,7 +12770,7 @@ public:
 			
 // #line 148 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12777 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12774 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12786,7 +12783,7 @@ public:
 			
 // #line 149 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12790 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12787 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12799,7 +12796,7 @@ public:
 			
 // #line 161 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12803 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12800 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12812,7 +12809,7 @@ public:
 			
 // #line 162 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12816 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12813 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12825,7 +12822,7 @@ public:
 			
 // #line 174 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12829 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12826 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12838,7 +12835,7 @@ public:
 			
 // #line 175 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12842 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12839 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12851,7 +12848,7 @@ public:
 			
 // #line 187 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12855 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12852 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12864,7 +12861,7 @@ public:
 			
 // #line 188 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12868 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12865 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12877,7 +12874,7 @@ public:
 			
 // #line 200 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12881 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12878 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12890,7 +12887,7 @@ public:
 			
 // #line 201 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12894 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12891 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12903,7 +12900,7 @@ public:
 			
 // #line 213 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12907 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12904 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12916,7 +12913,7 @@ public:
 			
 // #line 214 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12920 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12917 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12929,7 +12926,7 @@ public:
 			
 // #line 226 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12933 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12930 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12942,7 +12939,7 @@ public:
 			
 // #line 227 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12946 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12943 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12955,7 +12952,7 @@ public:
 			
 // #line 239 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12959 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12956 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12968,7 +12965,7 @@ public:
 			
 // #line 245 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = &__pSymbol->m_Local.OpValue2;
-// #line 12972 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12969 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12981,7 +12978,7 @@ public:
 			
 // #line 253 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12985 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12982 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -12994,7 +12991,7 @@ public:
 			
 // #line 254 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 12998 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 12995 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13007,7 +13004,7 @@ public:
 			
 // #line 263 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13011 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13008 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13020,7 +13017,7 @@ public:
 			
 // #line 267 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13024 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13021 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13033,7 +13030,7 @@ public:
 			
 // #line 271 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13037 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13034 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13046,7 +13043,7 @@ public:
 			
 // #line 275 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13050 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13047 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13059,7 +13056,7 @@ public:
 			
 // #line 279 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13063 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13060 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13072,7 +13069,7 @@ public:
 			
 // #line 283 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13076 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13073 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13085,7 +13082,7 @@ public:
 			
 // #line 287 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13089 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13086 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13098,7 +13095,7 @@ public:
 			
 // #line 291 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13102 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13099 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13111,7 +13108,7 @@ public:
 			
 // #line 309 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13115 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13112 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13124,7 +13121,7 @@ public:
 			
 // #line 318 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13128 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13125 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13137,7 +13134,7 @@ public:
 			
 // #line 341 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13141 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13138 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13150,7 +13147,7 @@ public:
 			
 // #line 342 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13154 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13151 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13163,7 +13160,7 @@ public:
 			
 // #line 377 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13167 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13164 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13176,7 +13173,7 @@ public:
 			
 // #line 382 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13180 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13177 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13189,7 +13186,7 @@ public:
 			
 // #line 450 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13193 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13190 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13202,7 +13199,7 @@ public:
 			
 // #line 451 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr_s.llk"
 			__pTarget->m_Arg.pValue = __pSymbol->m_Arg.pValue;
-// #line 13206 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13203 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13215,7 +13212,7 @@ public:
 			
 // #line 8 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Stmt.llk"
 			__pTarget->m_Arg.pTokenList = &(*__pAstNode).m_TokenList;
-// #line 13219 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13216 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13228,7 +13225,7 @@ public:
 			
 // #line 17 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Stmt.llk"
 			__pTarget->m_Arg.pTokenList = __pSymbol->m_Arg.pTokenList;
-// #line 13232 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13229 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13241,7 +13238,7 @@ public:
 			
 // #line 26 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Stmt.llk"
 			__pTarget->m_Arg.pTokenList = __pSymbol->m_Arg.pTokenList;
-// #line 13245 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13242 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13254,7 +13251,7 @@ public:
 			
 // #line 166 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Stmt.llk"
 			__pTarget->m_Arg.pStmt = &__pSymbol->m_Local.Stmt;
-// #line 13258 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13255 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13267,7 +13264,7 @@ public:
 			
 // #line 16 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_DeclarationSpecifier.llk"
 			__pTarget->m_Arg.pTypeSpecifier = &(*__pAstNode).m_TypeSpecifier;
-// #line 13271 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13268 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13280,7 +13277,7 @@ public:
 			
 // #line 54 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_DeclarationSpecifier.llk"
 			__pTarget->m_Arg.pTypeSpecifier = &(*__pAstNode).m_TypeSpecifier;
-// #line 13284 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13281 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13293,7 +13290,7 @@ public:
 			
 // #line 4 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pTypeSpecifier = __pSymbol->m_Arg.pTypeSpecifier;
-// #line 13297 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13294 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13306,7 +13303,7 @@ public:
 			
 // #line 4 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pTypeSpecifier = __pSymbol->m_Arg.pTypeSpecifier;
-// #line 13310 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13307 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13319,7 +13316,7 @@ public:
 			
 // #line 8 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pTypeSpecifier = __pSymbol->m_Arg.pTypeSpecifier;
-// #line 13323 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13320 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13332,7 +13329,7 @@ public:
 			
 // #line 35 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &(*__pAstNode).m_Declarator;
-// #line 13336 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13333 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13345,7 +13342,7 @@ public:
 			
 // #line 36 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &(*__pAstNode).m_Declarator;
-// #line 13349 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13346 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13358,7 +13355,7 @@ public:
 			
 // #line 37 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &(*__pAstNode).m_Declarator;
-// #line 13362 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13359 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13371,7 +13368,7 @@ public:
 			
 // #line 38 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &(*__pAstNode).m_Declarator;
-// #line 13375 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13372 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13384,7 +13381,7 @@ public:
 			
 // #line 44 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = __pSymbol->m_Arg.pDeclarator;
-// #line 13388 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13385 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13397,7 +13394,7 @@ public:
 			
 // #line 48 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = __pSymbol->m_Arg.pDeclarator;
-// #line 13401 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13398 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13410,7 +13407,7 @@ public:
 			
 // #line 302 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = __pSymbol->m_Arg.pDeclarator;
-// #line 13414 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13411 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13423,7 +13420,7 @@ public:
 			
 // #line 303 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = __pSymbol->m_Arg.pDeclarator;
-// #line 13427 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13424 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13436,7 +13433,7 @@ public:
 			
 // #line 305 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = __pSymbol->m_Arg.pDeclarator;
-// #line 13440 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13437 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13449,7 +13446,7 @@ public:
 			
 // #line 342 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pFunctionSuffix = __pSymbol->m_Local.pFunctionSuffix;
-// #line 13453 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13450 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13462,7 +13459,7 @@ public:
 			
 // #line 347 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pFunctionSuffix = __pSymbol->m_Arg.pFunctionSuffix;
-// #line 13466 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13463 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13475,7 +13472,7 @@ public:
 			
 // #line 348 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pFunctionSuffix = __pSymbol->m_Arg.pFunctionSuffix;
-// #line 13479 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13476 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13488,7 +13485,7 @@ public:
 			
 // #line 352 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pFunctionSuffix = __pSymbol->m_Arg.pFunctionSuffix;
-// #line 13492 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13489 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13501,7 +13498,7 @@ public:
 			
 // #line 353 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pFunctionSuffix = __pSymbol->m_Arg.pFunctionSuffix;
-// #line 13505 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13502 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13514,7 +13511,7 @@ public:
 			
 // #line 354 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pFunctionSuffix = __pSymbol->m_Arg.pFunctionSuffix;
-// #line 13518 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13515 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13527,7 +13524,7 @@ public:
 			
 // #line 370 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 13531 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13528 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13540,7 +13537,7 @@ public:
 			
 // #line 371 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 13544 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13541 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13553,7 +13550,7 @@ public:
 			
 // #line 372 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 13557 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13554 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13566,7 +13563,7 @@ public:
 			
 // #line 393 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 13570 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13567 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13579,7 +13576,7 @@ public:
 			
 // #line 394 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 13583 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13580 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13592,7 +13589,7 @@ public:
 			
 // #line 395 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Declarator.llk"
 			__pTarget->m_Arg.pDeclarator = &__pSymbol->m_Local.Declarator;
-// #line 13596 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13593 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13605,7 +13602,7 @@ public:
 			
 // #line 61 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pType = (*__pAstNode).m_pType;
-// #line 13609 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13606 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13618,7 +13615,7 @@ public:
 			
 // #line 96 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pType = __pSymbol->m_Arg.pType;
-// #line 13622 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13619 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13631,7 +13628,7 @@ public:
 			
 // #line 105 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pType = __pSymbol->m_Arg.pType;
-// #line 13635 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13632 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13644,7 +13641,7 @@ public:
 			
 // #line 105 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pType = __pSymbol->m_Arg.pType;
-// #line 13648 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13645 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13657,7 +13654,7 @@ public:
 			
 // #line 148 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pNamespace = (*__pAstNode).m_pType;
-// #line 13661 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13658 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13670,7 +13667,7 @@ public:
 			
 // #line 195 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pNamespace = (*__pAstNode).m_pType;
-// #line 13674 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13671 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13683,7 +13680,7 @@ public:
 			
 // #line 221 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pNamespace = (*__pAstNode).m_pType;
-// #line 13687 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13684 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13696,7 +13693,7 @@ public:
 			
 // #line 253 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pNamespace = (*__pAstNode).m_pProperty;
-// #line 13700 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13697 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13709,7 +13706,7 @@ public:
 			
 // #line 277 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_NamedTypeSpecifier.llk"
 			__pTarget->m_Arg.pNamespace = __pSymbol->m_Local.pTemplate;
-// #line 13713 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13710 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			
 			}
 			break;
@@ -13744,7 +13741,7 @@ public:
 		m_StorageKind = EStorage_Undefined;
 		m_AccessKind = EAccess_Undefined;
 	;
-// #line 13748 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13745 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13760,7 +13757,7 @@ public:
 		m_AccessKind = EAccess_Undefined;
 		__pSymbol->m_Local.Declarator.SetTypeSpecifier (NULL);
 	;
-// #line 13764 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13761 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13775,7 +13772,7 @@ public:
 		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
 		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
 	;
-// #line 13779 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13776 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13789,7 +13786,7 @@ public:
 		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
 		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
 	;
-// #line 13793 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13790 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13805,7 +13802,7 @@ public:
 				
 		PushTypeSpecifier (&(*__pAstNode).m_TypeSpecifier);
 	;
-// #line 13809 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13806 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13823,7 +13820,7 @@ public:
 		__pSymbol->m_Local.pFunctionSuffix = __pSymbol->m_Arg.pDeclarator->AddFunctionSuffix ();
 		__pSymbol->m_Local.PrevStorageKind = m_StorageKind;
 	;
-// #line 13827 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13824 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13840,7 +13837,7 @@ public:
 				
 		PushTypeSpecifier (&(*__pAstNode).m_TypeSpecifier);
 	;
-// #line 13844 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13841 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13865,7 +13862,7 @@ public:
 				
 		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
 	;
-// #line 13869 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13866 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13899,12 +13896,12 @@ public:
 			{
 				CSymbolNode_assignment_operator_expr* __pSymbol = (CSymbolNode_assignment_operator_expr*) GetSymbolTop ();
 				CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 478 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 475 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 				
 		if (IsAutoEv ())  // reset on assignment
 			m_AutoEvBindSiteList.Clear (); 
 	;
-// #line 13908 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13905 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13914,7 +13911,7 @@ public:
 			{
 				CSymbolNode_curly_initializer* __pSymbol = (CSymbolNode_curly_initializer*) GetSymbolTop ();
 				CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 829 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 826 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 				
 		ASSERT (m_CurlyInitializerTargetValue);
 
@@ -13922,7 +13919,7 @@ public:
 		__pSymbol->m_Local.Initializer.m_Index = 0;
 		__pSymbol->m_Local.Initializer.m_Count = 0;
 	;
-// #line 13926 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13923 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13936,11 +13933,11 @@ public:
 			{
 				CSymbolNode_new_operator_curly_initializer* __pSymbol = (CSymbolNode_new_operator_curly_initializer*) GetSymbolTop ();
 				CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 656 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 653 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 				
 		m_CurlyInitializerTargetValue = *__pSymbol->m_Arg.pValue;
 	;
-// #line 13944 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13941 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -13994,7 +13991,7 @@ public:
 				
 		m_pModule->m_ControlFlowMgr.IfStmt_Create (&__pSymbol->m_Local.Stmt);
 	;
-// #line 13998 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 13995 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14007,7 +14004,7 @@ public:
 				
 		m_pModule->m_ControlFlowMgr.SwitchStmt_Create (&__pSymbol->m_Local.Stmt);
 	;
-// #line 14011 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14008 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14020,7 +14017,7 @@ public:
 				
 		m_pModule->m_ControlFlowMgr.WhileStmt_Create (&__pSymbol->m_Local.Stmt);
 	;
-// #line 14024 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14021 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14033,7 +14030,7 @@ public:
 				
 		m_pModule->m_ControlFlowMgr.DoStmt_Create (&__pSymbol->m_Local.Stmt);
 	;
-// #line 14037 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14034 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14046,7 +14043,7 @@ public:
 				
 		m_pModule->m_ControlFlowMgr.ForStmt_Create (&__pSymbol->m_Local.Stmt);
 	;
-// #line 14050 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14047 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14066,7 +14063,7 @@ public:
 				
 		m_AutoEvBindSiteList.Clear (); // clear bindsite list before processing expression list
 	;
-// #line 14070 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14067 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14095,7 +14092,7 @@ public:
 				
 		m_AutoEvBindSiteCount = 0;
 	;
-// #line 14099 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14096 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14116,7 +14113,7 @@ public:
 				
 		(*__pAstNode).m_Declarator.SetTypeSpecifier (__pSymbol->m_Arg.pTypeSpecifier);
 	;
-// #line 14120 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14117 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14131,7 +14128,7 @@ public:
 		(*__pAstNode).m_UnOpKind = EUnOp_Undefined;
 		(*__pAstNode).m_BinOpKind = EBinOp_Undefined;
 	;
-// #line 14135 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14132 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14148,7 +14145,7 @@ public:
 				
 		m_StorageKind = EStorage_Undefined;
 	;
-// #line 14152 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14149 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14162,7 +14159,7 @@ public:
 		m_StorageKind = EStorage_Undefined;
 		__pSymbol->m_Local.Declarator.SetTypeSpecifier (NULL);
 	;
-// #line 14166 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14163 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14218,7 +14215,7 @@ public:
 				
 		PopTypeSpecifier (&(*__pAstNode).m_TypeSpecifier);
 	;
-// #line 14222 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14219 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14238,7 +14235,7 @@ public:
 
 		m_pLastDeclaredItem = NULL;
 	;
-// #line 14242 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14239 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14253,7 +14250,7 @@ public:
 				
 		m_StorageKind = __pSymbol->m_Local.PrevStorageKind;
 	;
-// #line 14257 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14254 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14270,7 +14267,7 @@ public:
 				
 		PopTypeSpecifier (&(*__pAstNode).m_TypeSpecifier);
 	;
-// #line 14274 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14271 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14321,12 +14318,12 @@ public:
 			{
 				CSymbolNode_unary_operator_expr* __pSymbol = (CSymbolNode_unary_operator_expr*) GetSymbolTop ();
 				CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 555 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 552 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 				
 		if (IsAutoEv () && IsBindableType (__pSymbol->m_Arg.pValue->GetType ()))
 			m_AutoEvBindSiteList.InsertTail (*__pSymbol->m_Arg.pValue);
 	;
-// #line 14330 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14327 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14342,12 +14339,12 @@ public:
 			{
 				CSymbolNode_primary_expr* __pSymbol = (CSymbolNode_primary_expr*) GetSymbolTop ();
 				CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 743 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 740 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 				
 		if (IsAutoEv () && IsBindableType (__pSymbol->m_Arg.pValue->GetType ()))
 			m_AutoEvBindSiteList.InsertTail (*__pSymbol->m_Arg.pValue);
 	;
-// #line 14351 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14348 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14356,12 +14353,12 @@ public:
 			{
 				CSymbolNode_postfix_operator* __pSymbol = (CSymbolNode_postfix_operator*) GetSymbolTop ();
 				CAstNode* __pAstNode = __pSymbol->m_pAstNode;
-// #line 680 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
+// #line 677 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Expr.llk"
 				
 		if (IsAutoEv () && IsBindableType (__pSymbol->m_Arg.pValue->GetType ()))
 			m_AutoEvBindSiteList.InsertTail (*__pSymbol->m_Arg.pValue);
 	;
-// #line 14365 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14362 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14397,7 +14394,7 @@ public:
 		if (IsAutoEv () && IsBindableType (__pSymbol->m_Arg.pValue->GetType ()))
 			m_AutoEvBindSiteCount++;
 	;
-// #line 14401 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14398 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14412,7 +14409,7 @@ public:
 		if (IsAutoEv () && IsBindableType (__pSymbol->m_Arg.pValue->GetType ()))
 			m_AutoEvBindSiteCount++;
 	;
-// #line 14416 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14413 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14426,7 +14423,7 @@ public:
 		if (IsAutoEv () && IsBindableType (__pSymbol->m_Arg.pValue->GetType ()))
 			m_AutoEvBindSiteCount++;
 	;
-// #line 14430 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14427 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			
@@ -14498,7 +14495,7 @@ public:
 		if ((*__pAstNode).m_pType->GetName ().IsEmpty () || ((*__pAstNode).m_pType->GetFlags () & EEnumTypeFlag_Exposed))
 			return m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->ExposeEnumConsts ((*__pAstNode).m_pType);
 	;
-// #line 14502 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
+// #line 14499 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
 			return true;
 			

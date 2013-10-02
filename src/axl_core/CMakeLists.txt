@@ -306,6 +306,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_Loop.h
 	${AXL_INC_DIR}/axl_rtl_Pack.h
 	${AXL_INC_DIR}/axl_rtl_Packer.h
+	${AXL_INC_DIR}/axl_rtl_Packetizer.h
 	${AXL_INC_DIR}/axl_rtl_RbTree.h
 	${AXL_INC_DIR}/axl_rtl_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_rtl_Singleton.h
@@ -326,6 +327,7 @@ set (
 	axl_rtl_Guid.cpp
 	axl_rtl_HexEncoding.cpp
 	axl_rtl_Packer.cpp
+	axl_rtl_Packetizer.cpp
 	axl_rtl_Unpacker.cpp
 	axl_rtl_Utf.cpp
 	)

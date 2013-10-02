@@ -25,6 +25,7 @@ set (
 	test_Log.cpp
 	test_Loop.cpp
 	test_Packer.cpp
+	test_Packetizer.cpp
 	test_Parse.cpp
 	test_RbTree.cpp
 	test_Ref.cpp
@@ -43,6 +44,10 @@ source_group (
 	FILES 
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
+	)
+
+exclude_from_build (
+	test_Log.cpp
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -68,6 +73,7 @@ source_group (
 include_directories (${PATH_LUA_INC_DIR})
 
 link_directories (${PATH_LUA_LIB_DIR})
+link_directories (${PATH_AXL_LIB_DIR})
 
 add_executable (
 	ConTest 

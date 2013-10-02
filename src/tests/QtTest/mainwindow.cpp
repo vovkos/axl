@@ -64,7 +64,7 @@ bool MainWindow::initialize ()
 			);
 
 	ASSERT (result);
-
+	
 	return true;
 }
 
