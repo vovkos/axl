@@ -167,7 +167,7 @@ public:
 
 //.............................................................................
 
-#define AXL_PRS_BEGIN_TOKEN_NAME_MAP(Class) \
+#define AXL_LEX_BEGIN_TOKEN_NAME_MAP(Class) \
 class Class \
 { \
 public: \
@@ -177,19 +177,19 @@ public: \
 		switch (Token) \
 		{
 
-#define AXL_PRS_TOKEN_NAME(Token, Name) \
+#define AXL_LEX_TOKEN_NAME(Token, Name) \
 		case Token: \
 			return Name; 
 
-#define AXL_PRS_END_TOKEN_NAME_MAP_EX(Default) \
+#define AXL_LEX_END_TOKEN_NAME_MAP_EX(Default) \
 		default: \
 			return isprint (Token) ? axl::rtl::GetCharLiteral ((uchar_t) Token) : Default; \
 		} \
 	} \
 };
 
-#define AXL_PRS_END_TOKEN_NAME_MAP() \
-	AXL_PRS_END_TOKEN_NAME_MAP_EX("??") // to avoid confusion with '?'
+#define AXL_LEX_END_TOKEN_NAME_MAP() \
+	AXL_LEX_END_TOKEN_NAME_MAP_EX("??") // to avoid confusion with '?'
 
 //.............................................................................
 

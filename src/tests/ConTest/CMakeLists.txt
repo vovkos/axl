@@ -18,12 +18,13 @@ set (
 	test_Error.cpp
 	test_File.cpp
 	test_Finalizer.cpp
+	test_ForEach.cpp
 	test_Function.cpp
 	test_HandleTable.cpp
 	test_HashTable.cpp
+	test_IniParser.cpp
 	test_List.cpp
 	test_Log.cpp
-	test_Loop.cpp
 	test_Packer.cpp
 	test_Packetizer.cpp
 	test_Parse.cpp
@@ -87,6 +88,7 @@ target_link_libraries (
 	ConTest
 	axl_core
 	axl_gui
+	axl_ini
 	axl_io
 	axl_log
 	axl_lua

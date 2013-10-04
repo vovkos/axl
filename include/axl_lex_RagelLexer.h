@@ -350,10 +350,9 @@ protected:
 	bool
 	Tokenize ()
 	{
-		size_t Length = eof - p;
-		if (Length) 
+		if (p != eof) 
 		{
-			pe = p + Length;
+			pe = eof;
 			m_TokenizeCount = 0;
 			return static_cast <T*> (this)->Exec ();
 		}
@@ -377,36 +376,6 @@ protected:
 	// Exec ()
 	// {
 	// }
-};
-
-//.............................................................................
-
-
-template <
-	typename T,
-	typename TToken = CStdRagelToken
-	>
-class CBufferedRagelLexerT: public CRagelLexerT <T, TToken>
-{
-protected:
-	rtl::CString m_Source;
-
-public:
-	bool
-	Create (const rtl::CString& Source)
-	{
-		m_Source = Source;
-		return CRagelLexerT <T, TToken>::Create (m_Source, m_Source.GetLength ());
-	}
-
-	bool
-	Create (
-		const char* pSource,
-		size_t Length = -1
-		)
-	{
-		return Create (rtl::CString (pSource, Length));
-	}
 };
 
 //.............................................................................

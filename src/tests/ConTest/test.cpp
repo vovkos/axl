@@ -43,8 +43,9 @@ _tmain (
 	//test_Vso::Run ();
 	//test_Window::Run ();
 	//test_WorkerThread::Run ();
-
-	test_Packetizer::Run ();
+	//test_Packetizer::Run ();
+	
+	test_IniParser::Run ();
 
 	return 0;
 }

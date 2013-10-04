@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "mainwindow.h"
+#include "moc_axl_gui_qt_Widget.cpp"
 
 int
 main (

@@ -71,6 +71,7 @@ extern "C" {
 #include <axl_rtl_Unpacker.h>
 #include <axl_rtl_HandleTable.h>
 #include <axl_rtl_Packetizer.h>
+#include <axl_rtl_StringHashTable.h>
 
 #include <axl_exe_WorkerThread.h>
 #include <axl_exe_WorkerWindow.h>
@@ -98,6 +99,7 @@ extern "C" {
 #include <axl_log_PacketFile.h>
 #include <axl_log_Widget.h>
 
-#include <axl_rtl_Loop.h>
+#include <axl_rtl_ForEach.h>
+#include <axl_ini_Parser.h>
 
 //.............................................................................

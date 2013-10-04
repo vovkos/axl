@@ -296,6 +296,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_ByteOrder.h
 	${AXL_INC_DIR}/axl_rtl_CharLiteral.h
 	${AXL_INC_DIR}/axl_rtl_EscapeEncoding.h
+	${AXL_INC_DIR}/axl_rtl_ForEach.h
 	${AXL_INC_DIR}/axl_rtl_Func.h
 	${AXL_INC_DIR}/axl_rtl_Guid.h
 	${AXL_INC_DIR}/axl_rtl_Handle.h
@@ -303,7 +304,6 @@ set (
 	${AXL_INC_DIR}/axl_rtl_HashTable.h
 	${AXL_INC_DIR}/axl_rtl_HexEncoding.h
 	${AXL_INC_DIR}/axl_rtl_List.h
-	${AXL_INC_DIR}/axl_rtl_Loop.h
 	${AXL_INC_DIR}/axl_rtl_Pack.h
 	${AXL_INC_DIR}/axl_rtl_Packer.h
 	${AXL_INC_DIR}/axl_rtl_Packetizer.h

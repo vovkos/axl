@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "moc_mainwindow.cpp"
-#include "moc_axl_gui_qt_Widget.cpp"
 
 //.............................................................................
 

@@ -1,18 +1,13 @@
 #include "pch.h"
+#include "axl_ini_Parser.h"
 
-using namespace axl;
-
-namespace test_Loop {
-
-//.............................................................................
-
-void
-Run ()
-{
-	char Buffer [] = "hui govno i muravei";
-
-}
+namespace axl {
+namespace ini {
 
 //.............................................................................
 
-} // namespace test_List
+//.............................................................................
+
+} // namespace lua
+} // namespace axl
+

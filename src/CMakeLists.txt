@@ -39,6 +39,7 @@ if (${CMAKE_BUILD_TYPE})
 endif ()
 
 if (MSVC)
+	create_msvc_use_folders_setting ()
 	create_msvc_flag_eh_setting ()
 	create_msvc_flag_rtti_setting ()
 	create_msvc_flag_crt_setting ()
@@ -133,6 +134,12 @@ if (${QT_FOUND})
 		ON
 		)
 endif ()
+
+option (
+	AXL_BUILD_INI_LIB
+	"Build axl_ini library"
+	ON
+	)
 
 option (
 	AXL_BUILD_IO_LIB
@@ -239,6 +246,10 @@ endif ()
 
 if (AXL_BUILD_GUI_LIB)
 	add_subdirectory (axl_gui)
+endif ()
+
+if (AXL_BUILD_INI_LIB)
+	add_subdirectory (axl_ini)
 endif ()
 
 if (AXL_BUILD_IO_LIB)

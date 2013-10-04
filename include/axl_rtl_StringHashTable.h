@@ -7,6 +7,7 @@
 #define _AXL_RTL_STRINGHASHTABLE_H
 
 #include "axl_rtl_HashTable.h"
+#include "axl_rtl_Singleton.h"
 
 namespace axl {
 namespace rtl {
@@ -97,6 +98,42 @@ public:
 	}
 };
 
+//.............................................................................
+
+#define AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP(Class, ValueType) \
+	AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP_T(Class, ValueType, char)
+
+#define AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP_T(Class, ValueType, CharType) \
+class Class \
+{ \
+public: \
+	typedef axl::rtl::CStringHashTableMapIteratorT <ValueType, CharType> CIterator; \
+	static \
+	CIterator \
+	Find (const CharType* pKey) \
+	{ \
+		return axl::rtl::GetSingleton <CMap> ()->Find (pKey); \
+	} \
+	axl::rtl::CStringHashTableMapIteratorT <ValueType, CharType> \
+	operator () (const CharType* pKey) \
+	{ \
+		return Find (pKey); \
+	} \
+protected: \
+	class CMap: public axl::rtl::CStringHashTableMapT <ValueType, CharType> \
+	{ \
+	public: \
+		CMap () \
+		{
+
+#define AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY(String, Value) \
+			Goto (String)->m_Value = Value;
+
+#define AXL_RTL_END_STRING_HASH_TABLE_MAP() \
+		} \
+	}; \
+};
+	
 //.............................................................................
 
 } // namespace rtl
