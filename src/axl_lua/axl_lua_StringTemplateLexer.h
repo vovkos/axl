@@ -22,13 +22,13 @@ enum EToken
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
-	AXL_PRS_TOKEN_NAME (EToken_Eof,       "eof")
-	AXL_PRS_TOKEN_NAME (EToken_Error,     "error")
-	AXL_PRS_TOKEN_NAME (EToken_OpenCode,  "%{")
-	AXL_PRS_TOKEN_NAME (EToken_OpenData,  "%(")
-	AXL_PRS_TOKEN_NAME (EToken_Data,      "user-data")
-AXL_PRS_END_TOKEN_NAME_MAP ();
+AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
+	AXL_LEX_TOKEN_NAME (EToken_Eof,       "eof")
+	AXL_LEX_TOKEN_NAME (EToken_Error,     "error")
+	AXL_LEX_TOKEN_NAME (EToken_OpenCode,  "%{")
+	AXL_LEX_TOKEN_NAME (EToken_OpenData,  "%(")
+	AXL_LEX_TOKEN_NAME (EToken_Data,      "user-data")
+AXL_LEX_END_TOKEN_NAME_MAP ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

@@ -201,6 +201,16 @@ public:
 	void
 	Clear ();
 
+	bool 
+	Parse (
+		const char* pFilePath,
+		const char* pSource,
+		size_t Length = -1
+		);
+
+	bool 
+	ParseFile (const char* pFilePath);
+
 	bool
 	Link (CModule* pModule);
 

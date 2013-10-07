@@ -45,7 +45,7 @@ _tmain (
 	//test_WorkerThread::Run ();
 	//test_Packetizer::Run ();
 	
-	test_IniParser::Run ();
+	test_CmdLineParser::Run ();
 
 	return 0;
 }

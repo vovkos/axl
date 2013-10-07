@@ -344,6 +344,57 @@ public:
 
 //.............................................................................
 
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP(Class, TKey, TValue, THash, TCmp) \
+class Class \
+{ \
+public: \
+	typedef axl::rtl::CHashTableMapT <TKey, TValue, THash, TCmp> CMapBase; \
+	typedef CMapBase::CIterator CIterator; \
+	static \
+	CIterator \
+	Find (TKey Key) \
+	{ \
+		return axl::rtl::GetSingleton <CMap> ()->Find (Key); \
+	} \
+	CIterator \
+	operator () (TKey Key) \
+	{ \
+		return Find (Key); \
+	} \
+protected: \
+	class CMap: public CMapBase \
+	{ \
+	public: \
+		CMap () \
+		{
+
+#define AXL_RTL_HASH_TABLE_MAP_ENTRY(Key, Value) \
+			Goto (Key)->m_Value = Value;
+
+#define AXL_RTL_END_HASH_TABLE_MAP() \
+		} \
+	}; \
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT(Class, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, int, TValue)
+
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_CHAR(Class, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, char, TValue)
+
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, TKey, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
+		Class, \
+		TKey, \
+		TValue, \
+		axl::rtl::CHashIdT <TKey>, \
+		axl::rtl::CCmpT <TKey> \
+		)
+
+//.............................................................................
+
 } // namespace rtl
 } // namespace axl
 

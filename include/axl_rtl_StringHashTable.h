@@ -100,40 +100,18 @@ public:
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP(Class, ValueType) \
-	AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP_T(Class, ValueType, char)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING(Class, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T (Class, TValue, char)
 
-#define AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP_T(Class, ValueType, CharType) \
-class Class \
-{ \
-public: \
-	typedef axl::rtl::CStringHashTableMapIteratorT <ValueType, CharType> CIterator; \
-	static \
-	CIterator \
-	Find (const CharType* pKey) \
-	{ \
-		return axl::rtl::GetSingleton <CMap> ()->Find (pKey); \
-	} \
-	axl::rtl::CStringHashTableMapIteratorT <ValueType, CharType> \
-	operator () (const CharType* pKey) \
-	{ \
-		return Find (pKey); \
-	} \
-protected: \
-	class CMap: public axl::rtl::CStringHashTableMapT <ValueType, CharType> \
-	{ \
-	public: \
-		CMap () \
-		{
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T(Class, TValue, C) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
+		Class, \
+		const C*, \
+		TValue, \
+		rtl::CHashStringT <C>, \
+		rtl::CCmpStringT <C> \
+		)
 
-#define AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY(String, Value) \
-			Goto (String)->m_Value = Value;
-
-#define AXL_RTL_END_STRING_HASH_TABLE_MAP() \
-		} \
-	}; \
-};
-	
 //.............................................................................
 
 } // namespace rtl

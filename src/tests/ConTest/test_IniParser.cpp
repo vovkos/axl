@@ -27,30 +27,31 @@ protected:
 		EKey_SessionClass,
 	};
 
-	AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP (CSectionNameMap, ESection)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("session", ESection_Session)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("scripts", ESection_Scripts)
-	AXL_RTL_END_STRING_HASH_TABLE_MAP ()
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (CSectionNameMap, ESection)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session", ESection_Session)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("scripts", ESection_Scripts)
+	AXL_RTL_END_HASH_TABLE_MAP ()
 
-	AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP (CKeyNameMap, EKey)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("name", EKey_Name)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("description", EKey_Description)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("guid", EKey_Guid)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("icon", EKey_Icon)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("session-class", EKey_SessionClass)
-		AXL_RTL_STRING_HASH_TABLE_MAP_ENTRY ("log-representer-class", EKey_LogRepresenterClass)
-	AXL_RTL_END_STRING_HASH_TABLE_MAP ()
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (CKeyNameMap, EKey)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("name", EKey_Name)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("description", EKey_Description)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("guid", EKey_Guid)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("icon", EKey_Icon)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session-class", EKey_SessionClass)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("log-representer-class", EKey_LogRepresenterClass)
+	AXL_RTL_END_HASH_TABLE_MAP ()
 
 public:
-	void 
+	bool 
 	OnSection (const char* pName)
 	{
 		CSectionNameMap::CIterator It = CSectionNameMap::Find (pName);
 		ESection Section = It ? It->m_Value : ESection_Undefined;
 		printf ("OnSection '%s'\n", pName);
+		return true;
 	}
 
-	void 
+	bool
 	OnKeyValue (
 		const char* pName,
 		const char* pValue
@@ -59,6 +60,7 @@ public:
 		CKeyNameMap::CIterator It = CKeyNameMap::Find (pName);
 		EKey Key = It ? It->m_Value : EKey_Undefined;
 		printf ("OnKeyValue '%s' = '%s'\n", pName, pValue);
+		return true;
 	}
 };
 

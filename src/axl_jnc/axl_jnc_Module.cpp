@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_Parser.llk.h"
+#include "axl_io_MappedFile.h"
 #include "axl_io_FilePathUtils.h"
 
 namespace axl {
@@ -138,6 +140,56 @@ CModule::MarkForCompile (CModuleItem* pItem)
 
 	pItem->m_Flags |= EModuleItemFlag_NeedCompile;
 	m_CompileArray.Append (pItem);
+}
+
+bool 
+CModule::Parse (
+	const char* pFilePath,
+	const char* pSource,
+	size_t Length
+	)
+{
+	bool Result;
+
+	jnc::CScopeThreadModule ScopeModule (this);
+	
+	jnc::CLexer Lexer;
+	Lexer.Create (pFilePath, pSource, Length);
+
+	jnc::CParser Parser;
+	Parser.Create (jnc::CParser::StartSymbol, true);
+
+	for (;;)
+	{
+		const jnc::CToken* pToken = Lexer.GetToken ();
+		if (pToken->m_Token == jnc::EToken_Eof)
+			break;
+
+		Result = Parser.ParseToken (pToken);
+		if (!Result)
+		{			
+			err::PushSrcPosError (pFilePath, pToken->m_Pos);
+			return false;
+		}
+
+		Lexer.NextToken ();
+	}
+
+	return true;
+}
+
+bool 
+CModule::ParseFile (const char* pFilePath)
+{
+	io::CMappedFile File;
+	bool Result = File.Open (pFilePath, io::EFileFlag_ReadOnly);
+	if (!Result)
+		return false;
+
+	const char* p = (const char*) File.View ();
+	size_t Length = (size_t) File.GetSize ();
+
+	return p != NULL && Parse (pFilePath, p, Length);
 }
 
 bool

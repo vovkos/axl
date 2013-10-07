@@ -2,6 +2,13 @@
 
 //.............................................................................
 
+namespace test_CmdLineParser {
+
+void
+Run ();
+
+}
+
 namespace test_Error {
 
 void 

@@ -33,6 +33,8 @@ public:
 		size_t Length = -1
 		)
 	{
+		bool Result;
+
 		CLexer::Create (FilePath, pSource, Length);
 
 		for (;;)
@@ -40,23 +42,35 @@ public:
 			EScanResult ScanResult = ScanLine ();
 			switch (ScanResult)
 			{
-			case EScanResult_Section:
-				static_cast <T*> (this)->OnSection (m_SectionName);
-				break;
-
-			case EScanResult_KeyValue:
-				static_cast <T*> (this)->OnKeyValue (m_KeyName, m_Value);
-				break;
-
 			case EScanResult_Error:
 				return false;
 			
 			case EScanResult_Eof:
+				return Finalize ();
+
+			case EScanResult_Section:
+				Result = static_cast <T*> (this)->OnSection (m_SectionName);
+				if (!Result)
+					return false;
+
+				break;
+
+			case EScanResult_KeyValue:
+				Result = static_cast <T*> (this)->OnKeyValue (m_KeyName, m_Value);
+				if (!Result)
+					return false;
+
+				break;
+
 			default:
-				return true;
+				ASSERT (false);
 			}
 		}
+	}
 
+	bool
+	Finalize () // overridable
+	{
 		return true;
 	}
 };

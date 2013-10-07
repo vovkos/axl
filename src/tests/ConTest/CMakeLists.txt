@@ -15,6 +15,7 @@ set (
 set (
 	SRC_CPP_LIST
 	test.cpp
+	test_CmdLineParser.cpp
 	test_Error.cpp
 	test_File.cpp
 	test_Finalizer.cpp

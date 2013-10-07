@@ -101,5 +101,6 @@ extern "C" {
 
 #include <axl_rtl_ForEach.h>
 #include <axl_ini_Parser.h>
+#include <axl_rtl_CmdLineParser.h>
 
 //.............................................................................
