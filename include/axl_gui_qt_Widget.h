@@ -302,7 +302,7 @@ private slots:
 signals:
 	void threadMsgSignal (TWidgetThreadMsg* msg);
 
-private:
+protected:
 	virtual 
 	void 
 	mousePressEvent (QMouseEvent* e)

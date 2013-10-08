@@ -137,12 +137,36 @@ public:
 		return static_cast <T*> (this)->Finalize ();
 	}
 
+	// overridables
+
 	bool 
-	Finalize () // overridable
+	OnValue0 (const char* pValue)
 	{
 		return true;
 	}
-	
+
+	// bool 
+	// OnValue (const char* pValue);
+
+	// bool 
+	// OnSwitch (
+	//		const char* pSwitch,
+	//		const char* pValue
+	//		);
+
+	// bool 
+	// OnSwitch (
+	//		char Switch,
+	//		const char* pValue
+	//		);
+
+	bool 
+	Finalize ()
+	{
+		return true;
+	}
+
+
 protected:
 	bool
 	ProcessArg (
@@ -153,10 +177,13 @@ protected:
 	{	
 		T* pThis = static_cast <T*> (this);
 
-		return
-			SwitchName.IsEmpty () ? pThis->OnValue (i, Value) :
-			SwitchName.GetLength () == 1 ? pThis->OnSwitch (i, SwitchName [0], Value) :
-			pThis->OnSwitch (i, SwitchName, Value);
+		return SwitchName.IsEmpty () ? 
+			i == 0 ? 
+				pThis->OnValue0 (Value) : 
+				pThis->OnValue (Value) :
+			SwitchName.GetLength () == 1 ? 
+				pThis->OnSwitch (SwitchName [0], Value) :
+				pThis->OnSwitch (SwitchName, Value);
 	}
 };
 

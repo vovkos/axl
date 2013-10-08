@@ -191,6 +191,30 @@ public:
 	void 
 	MarkForCompile (CModuleItem* pItem);
 
+	CClassType*
+	FindClassType (const char* pName);
+
+	CClassType*
+	FindClassType (const rtl::CString& Name)
+	{
+		return FindClassType (Name.cc ());
+	}
+
+	CClassType*
+	FindClassType (const CQualifiedName& Name);
+
+	CFunction*
+	FindFunction (const char* pName);
+
+	CFunction*
+	FindFunction (const rtl::CString& Name)
+	{
+		return FindFunction (Name.cc ());
+	}
+
+	CFunction*
+	FindFunction (const CQualifiedName& Name);
+
 	bool
 	Create (
 		const rtl::CString& FilePath,

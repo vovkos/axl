@@ -123,6 +123,7 @@ main := |*
 'weak'           { CreateToken (EToken_Weak); };
 'thin'           { CreateToken (EToken_Thin); };
 'unsafe'         { CreateToken (EToken_Unsafe); };
+'unwinder'       { CreateToken (EToken_Unwinder); };
 'cdecl'          { CreateToken (EToken_Cdecl); };
 'stdcall'        { CreateToken (EToken_Stdcall); };
 'function'       { CreateToken (EToken_Function); };
@@ -211,6 +212,9 @@ main := |*
 'default'        { CreateToken (EToken_Default); };
 'once'           { CreateToken (EToken_Once); };
 'silent'         { CreateToken (EToken_Silent); };
+'try'            { CreateToken (EToken_Try); };
+'catch'          { CreateToken (EToken_Catch); };
+'finally'        { CreateToken (EToken_Finally); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

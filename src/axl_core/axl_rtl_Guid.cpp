@@ -26,10 +26,23 @@ TGuid::Parse (const char* pString)
 rtl::CString
 TGuid::GetGuidString (uint_t Flags) const
 {
-	return rtl::CString::Format_s (
-		(Flags & EGuidStringFlag_UpperCase) ? 
-			"%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" :
+	static const char* FormatTable [2] [2] = 
+	{
+		{ 
 			"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+			"%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+		},
+		{
+			"{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
+			"{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+		}
+	};
+
+	size_t i1 = (Flags & EGuidStringFlag_CurlyBraces) ? 1 : 0;
+	size_t i2 = (Flags & EGuidStringFlag_UpperCase) ? 1 : 0;
+
+	return rtl::CString::Format_s (
+		FormatTable [i1] [i2],
 		m_Data1, 
 		m_Data2, 
 		m_Data3, 

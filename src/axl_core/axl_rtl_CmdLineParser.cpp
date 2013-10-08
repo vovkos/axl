@@ -114,6 +114,10 @@ CCmdLineParserRoot::ParseArg (
 
 		pValue->Copy (p1, p - p1);
 	}
+	else
+	{
+		pValue->Clear ();
+	}
 
 	return true;
 }

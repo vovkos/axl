@@ -68,6 +68,7 @@ enum EToken
 	EToken_Weak,
 	EToken_Thin,
 	EToken_Unsafe,
+	EToken_Unwinder,
 	EToken_Cdecl,
 	EToken_Stdcall,
 	EToken_Function,
@@ -135,6 +136,9 @@ enum EToken
 	EToken_Default,
 	EToken_Once,
 	EToken_Silent,
+	EToken_Try,
+	EToken_Catch,
+	EToken_Finally,
 
 	// constants
 
@@ -236,6 +240,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_LEX_TOKEN_NAME (EToken_Thin,         "thin")
 	AXL_LEX_TOKEN_NAME (EToken_Unsafe,       "unsafe")
+	AXL_LEX_TOKEN_NAME (EToken_Unwinder,     "unwinder")
 	AXL_LEX_TOKEN_NAME (EToken_Cdecl,        "cdecl")
 	AXL_LEX_TOKEN_NAME (EToken_Stdcall,      "stdcall")
 	AXL_LEX_TOKEN_NAME (EToken_Function,     "function")
@@ -303,6 +308,9 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Default,      "default")
 	AXL_LEX_TOKEN_NAME (EToken_Once,         "once")
 	AXL_LEX_TOKEN_NAME (EToken_Silent,       "silent")
+	AXL_LEX_TOKEN_NAME (EToken_Try,          "try")
+	AXL_LEX_TOKEN_NAME (EToken_Catch,        "catch")
+	AXL_LEX_TOKEN_NAME (EToken_Finally,      "finally")
 
 	// constants
 

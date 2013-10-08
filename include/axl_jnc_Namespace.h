@@ -107,7 +107,7 @@ public:
 	CModuleItem*
 	FindItem (const rtl::CString& Name)
 	{
-		return FindItem (Name. cc ());
+		return FindItem (Name.cc ());
 	}
 
 	CModuleItem*

@@ -18,7 +18,8 @@ typedef CStringT <char> CString;
 
 enum EGuidStringFlag
 {
-	EGuidStringFlag_UpperCase = 0x01,
+	EGuidStringFlag_UpperCase   = 0x01,
+	EGuidStringFlag_CurlyBraces = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
