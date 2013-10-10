@@ -23,15 +23,23 @@ CPacketizerRoot::WriteImpl (
 		if (!Size)
 			return -1; // all is buffered
 
-		if (*p == Signature [BufferSize])
+		char c = *p;
+
+		if (c == Signature [BufferSize])
 		{
-			m_Buffer.Append (*p);
+			m_Buffer.Append (c);
 			BufferSize++;
 		}
-		else
+		else if (BufferSize)
 		{
 			m_Buffer.Clear ();
 			BufferSize = 0;
+
+			if (c == Signature [0])
+			{
+				m_Buffer.Copy (c);
+				BufferSize = 1;
+			}
 		}
 
 		p++;
@@ -41,7 +49,7 @@ CPacketizerRoot::WriteImpl (
 	if (BufferSize < sizeof (uint64_t)) // packet size
 	{
 		size_t ChunkSize = sizeof (uint64_t) - BufferSize;
-		if (ChunkSize > Size) 
+		if (Size < ChunkSize) 
 		{
 			m_Buffer.Append (p, Size);
 			return -1; // all is buffered
@@ -60,7 +68,7 @@ CPacketizerRoot::WriteImpl (
 	if (BufferSize < PacketSize)
 	{
 		size_t ChunkSize = PacketSize - BufferSize;
-		if (ChunkSize > Size)
+		if (Size < ChunkSize)
 		{
 			m_Buffer.Append (p, Size);
 			return -1; // all is buffered

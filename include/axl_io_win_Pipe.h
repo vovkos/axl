@@ -28,36 +28,14 @@ public:
 		dword_t RxBufferSize,
 		uint_t Timeout,
 		SECURITY_ATTRIBUTES* pSecAttr
-		)
-	{
-		Close ();
-
-		m_h = ::CreateNamedPipeW (
-			pName, 
-			OpenMode, 
-			PipeMode, 
-			MaxInstanceCount, 
-			TxBufferSize, 
-			RxBufferSize, 
-			Timeout, 
-			pSecAttr
-			);
-
-		return err::Complete (m_h != INVALID_HANDLE_VALUE);
-	}
+		);
 
 	bool 
 	Open (
 		const wchar_t* pName,
 		uint_t Access = GENERIC_READ | GENERIC_WRITE,
 		uint_t Flags = FILE_FLAG_OVERLAPPED
-		)
-	{
-		Close ();
-
-		m_h = ::CreateFileW (pName, Access, 0, NULL, OPEN_EXISTING, Flags, NULL);
-		return err::Complete (m_h != INVALID_HANDLE_VALUE);
-	}
+		);
 
 	bool 
 	Connect (OVERLAPPED* pOverlapped = NULL)

@@ -19,13 +19,7 @@ class CIocp: public g::win::CHandle
 {
 public:
 	bool 
-	Create (dword_t ThreadCount)
-	{
-		Close ();
-
-		m_h = ::CreateIoCompletionPort (INVALID_HANDLE_VALUE, NULL, 0, ThreadCount);
-		return err::Complete (m_h != NULL);
-	}
+	Create (dword_t ThreadCount);
 
 	bool 
 	Associate (

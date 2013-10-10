@@ -13,11 +13,13 @@ set (
 	${AXL_INC_DIR}/axl_io_DgramSock.h
 	${AXL_INC_DIR}/axl_io_File.h
 	${AXL_INC_DIR}/axl_io_FilePathUtils.h
+	${AXL_INC_DIR}/axl_io_FileTransport.h
 	${AXL_INC_DIR}/axl_io_ListenerSock.h
 	${AXL_INC_DIR}/axl_io_MappedFile.h
 	${AXL_INC_DIR}/axl_io_Pipe.h
 	${AXL_INC_DIR}/axl_io_Serial.h
 	${AXL_INC_DIR}/axl_io_SockAddr.h
+	${AXL_INC_DIR}/axl_io_SocketTransport.h
 	${AXL_INC_DIR}/axl_io_Transport.h
 	)
 

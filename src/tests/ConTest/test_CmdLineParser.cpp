@@ -34,10 +34,7 @@ protected:
 
 public:
 	bool
-	OnValue (
-		int i,
-		const char* pValue
-		)
+	OnValue (const char* pValue)
 	{
 		printf ("OnValue '%s'\n", pValue);
 		return true;
@@ -45,7 +42,6 @@ public:
 
 	bool 
 	OnSwitch (
-		int i,
 		const char* pSwitchName,
 		const char* pValue
 		)
@@ -58,7 +54,6 @@ public:
 
 	bool
 	OnSwitch (
-		int i,
 		const char SwitchChar,
 		const char* pValue
 		)

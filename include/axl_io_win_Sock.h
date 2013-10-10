@@ -35,13 +35,7 @@ public:
 		int AddressFamily,
 		int SockKind,
 		int Protocol
-		)
-	{
-		Close ();
-
-		m_h = ::WSASocket (AddressFamily, SockKind, Protocol, NULL, 0, WSA_FLAG_OVERLAPPED);
-		return err::Complete (m_h != INVALID_SOCKET);
-	}
+		);
 
 	bool
 	Bind (const SOCKADDR* pAddr)

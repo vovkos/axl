@@ -26,22 +26,7 @@ public:
 		SECURITY_ATTRIBUTES* pSecAttr,
 		uint_t CreationDisposition,
 		uint_t FlagsAttributes = 0
-		)
-	{
-		Close ();
-
-		m_h = ::CreateFileW (
-			pFileName, 
-			AccessMode,
-			ShareMode,
-			pSecAttr,
-			CreationDisposition,
-			FlagsAttributes, 
-			NULL
-			);
-
-		return err::Complete (m_h != INVALID_HANDLE_VALUE);
-	}
+		);
 
 	uint64_t 
 	GetSize () const;

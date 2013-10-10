@@ -17,11 +17,8 @@ namespace io {
 
 //.............................................................................
 
-class CConnectionSock: public io::ITransport
+class CConnectionSock
 {
-public:
-	AXL_OBJ_CLASS_0 (CConnectionSock, io::ITransport)
-
 public:
 	typedef exe::CArgObjPtrT <err::CError> COnConnectCompleteArg;
 	typedef exe::CArgObjPtrT <err::CError> COnDisconnectCompleteArg;
@@ -123,7 +120,6 @@ public:
 	bool 
 	SyncDisconnect (uint_t Timeout);
 
-	virtual
 	bool
 	Send (
 		const void* p,
@@ -131,7 +127,6 @@ public:
 		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 		);
 
-	virtual
 	bool
 	Recv (
 		void* p,

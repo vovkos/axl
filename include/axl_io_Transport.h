@@ -6,8 +6,8 @@
 
 #define _AXL_IO_TRANSPORT_H
 
-#include "axl_exe_Function.h"
-#include "axl_err_Error.h"
+#include "axl_obj_Root.h"
+// #include "axl_exe_Function.h"
 
 namespace axl {
 namespace io {
@@ -16,9 +16,37 @@ namespace io {
 
 struct ITransport: obj::IRoot
 {
-	// {A79E97FE-C6F7-4DD8-A900-D9360B9D42CE}
+	// {FA403A6C-0374-43ED-8AD7-44DD2664D78C}
+	
 	AXL_OBJ_INTERFACE (
 		ITransport,
+		0xfa403a6c, 0x0374, 0x43ed, 0x8a, 0xd7, 0x44, 0xdd, 0x26, 0x64, 0xd7, 0x8c
+		)
+		
+	virtual
+	size_t
+	Transmit (
+		const void* p,
+		size_t Size
+		) = 0;
+
+	virtual
+	size_t
+	Receive (
+		void* p,
+		size_t Size
+		) = 0;
+};
+
+/*
+
+//.............................................................................
+
+struct IAsyncTransport: ITransport
+{
+	// {A79E97FE-C6F7-4DD8-A900-D9360B9D42CE}
+	AXL_OBJ_INTERFACE (
+		IAsyncTransport,
 		0xa79e97fe, 0xc6f7, 0x4dd8, 0xa9, 0x00, 0xd9, 0x36, 0x0b, 0x9d, 0x42, 0xce
 		)
 		
@@ -53,6 +81,8 @@ struct ITransport: obj::IRoot
 		size_t Size
 		);
 };
+
+*/
 
 //.............................................................................
 

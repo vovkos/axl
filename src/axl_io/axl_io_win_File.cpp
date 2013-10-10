@@ -7,6 +7,31 @@ namespace win {
 
 //.............................................................................
 
+bool
+CFile::Create (
+	const wchar_t* pFileName, 
+	uint_t AccessMode,
+	uint_t ShareMode,
+	SECURITY_ATTRIBUTES* pSecAttr,
+	uint_t CreationDisposition,
+	uint_t FlagsAttributes
+	)
+{
+	Close ();
+
+	m_h = ::CreateFileW (
+		pFileName, 
+		AccessMode,
+		ShareMode,
+		pSecAttr,
+		CreationDisposition,
+		FlagsAttributes, 
+		NULL
+		);
+
+	return err::Complete (m_h != INVALID_HANDLE_VALUE);
+}
+
 uint64_t
 CFile::GetSize () const
 {
