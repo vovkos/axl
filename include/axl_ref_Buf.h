@@ -40,7 +40,7 @@ template <
 class CBufT
 {
 public:
-	class CHdr: public IRefCount
+	class CHdr: public CRefCount
 	{
 	public:
 		size_t m_BufferSize;

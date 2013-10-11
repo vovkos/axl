@@ -4,14 +4,13 @@
 
 #pragma once
 
-#define _AXL_GUI_GDI_WIDGET_H
+#define _AXL_GUI_GDIWIDGET_H
 
 #include "axl_gui_Widget.h"
 #include "axl_g_win_Window.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
@@ -55,10 +54,11 @@ GetScrollInfoFromScrollBar (
 
 //.............................................................................
 
-struct IGdiWidget: IWidget
+class CGdiWidgetImpl: public CWidget
 {
-	// this class is needed to get access to protected members in IWidget 
-	// also to put part of implementation into .cpp instead of having one huge CWidgetT <>
+public:
+	// this class is needed to get access to protected members in CWidget 
+	// also to put part of implementation into .cpp instead of having one huge CGdiWidgetT <>
 
 	LRESULT 
 	WindowProc (
@@ -70,7 +70,7 @@ struct IGdiWidget: IWidget
 		);
 
 	static
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	GetCanvas (HWND hWnd);
 
 protected:
@@ -127,15 +127,15 @@ protected:
 //.............................................................................
 
 template <typename T>
-class CWidgetT: 
+class CGdiWidgetT: 
 	public T,
-	public g::win::CWindowImplT <CWidgetT <T> >
+	public g::win::CWindowImplT <CGdiWidgetT <T> >
 {
-	friend class CEngine;
-	friend class g::win::CWindowImplT <CWidgetT <T> >;
+	friend class CGdiEngine;
+	friend class g::win::CWindowImplT <CGdiWidgetT <T> >;
 
 public:
-	CWidgetT (): T (CEngine::GetSingleton ())
+	CGdiWidgetT (): T (CGdiEngine::GetSingleton ())
 	{
 		m_BaseTextAttr.m_ForeColor = ::GetSysColor (COLOR_WINDOWTEXT);
 		m_BaseTextAttr.m_BackColor = ::GetSysColor (COLOR_WINDOW);
@@ -143,7 +143,7 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	GetCanvas ()
 	{
 		return GetGdiWidget ()->GetCanvas (m_h);
@@ -188,7 +188,7 @@ public:
 
 	virtual
 	bool
-	SetCursor (ICursor* pCursor)
+	SetCursor (CCursor* pCursor)
 	{
 		ASSERT (pCursor->GetEngine ()->GetEngineKind () == EEngine_Gdi);
 		::SetCursor (*(CCursor*) pCursor);
@@ -297,10 +297,10 @@ public:
 	}
 	
 protected:
-	IGdiWidget*
+	CGdiWidgetImpl*
 	GetGdiWidget ()
 	{
-		return (IGdiWidget*) (IWidget*) this;
+		return (CGdiWidgetImpl*) (CWidget*) this;
 	}
 	
 	LRESULT 
@@ -317,7 +317,6 @@ protected:
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl
 

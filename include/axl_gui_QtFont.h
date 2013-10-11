@@ -4,53 +4,54 @@
 
 #pragma once
 
-#define _AXL_GUI_GDI_IMAGELIST_H
+#define _AXL_GUI_QTFONT_H
 
-#include "axl_gui_ImageList.h"
-#include "axl_rtl_Handle.h"
+#include "axl_gui_Font.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-class CDestroyImageList
+bool
+GetFontDescFromFontInfo (
+	const QFontInfo& FontInfo,
+	TFontDesc* pFontDesc
+	);
+
+//.............................................................................
+
+class CQtFont: public CFont
 {
-public:
-	void
-	operator () (HIMAGELIST h)
-	{
-		ImageList_Destroy (h);
-	}
-};
+	friend class CQtEngine;
 
-//.............................................................................
+public:
+	QFont m_QtFont;
 	
-class CImageList: 
-	public IImageList,
-	public rtl::CHandleT <HIMAGELIST, CDestroyImageList>
-{
-	friend class CEngine;
-
 public:
-	CImageList ();
+	CQtFont ();
 
 	virtual
 	bool
-	InsertImage (
-		IImage* pImage,
-		size_t Index
+	IsMonospace ()
+	{
+		return QFontInfo (m_QtFont).fixedPitch ();
+	}
+
+	virtual
+	TSize
+	CalcTextSize (
+		const char* pText,
+		size_t Length = -1
 		);
-
-	virtual
-	bool
-	RemoveImage (size_t Index);
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef CFontTupleT <CQtFont> CQtFontTuple;
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl
 

@@ -13,8 +13,9 @@ namespace io {
 
 //.............................................................................
 
-struct ITransport
+class CTransport
 {
+public:
 	virtual
 	size_t
 	Transmit (
@@ -34,7 +35,7 @@ struct ITransport
 
 //.............................................................................
 
-struct IAsyncTransport: ITransport
+class CAsyncTransport: public CTransport
 {
 	typedef exe::CArgSeqExT_2 <exe::CArgObjPtrT <err::CError>, exe::CArgT <size_t> > COnSendCompleteArg;
 	typedef exe::CArgSeqExT_2 <exe::CArgObjPtrT <err::CError>, exe::CArgT <size_t> > COnRecvCompleteArg;
@@ -44,7 +45,7 @@ struct IAsyncTransport: ITransport
 	Send (
 		const void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
+		const exe::CFunction& OnComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
 		) = 0;
 
 	virtual
@@ -52,7 +53,7 @@ struct IAsyncTransport: ITransport
 	Recv (
 		void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
+		const exe::CFunction& OnComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
 		) = 0;
 
 	size_t

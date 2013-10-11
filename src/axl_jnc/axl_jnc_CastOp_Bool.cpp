@@ -97,7 +97,7 @@ CCast_IntFromBool::LlvmCast (
 
 //.............................................................................
 
-ICastOperator*
+CCastOperator*
 CCast_Bool::GetCastOperator (
 	const CValue& OpValue,
 	CType* pType

@@ -157,7 +157,7 @@ CHyperText::FindHyperlinkByX (int x) const
 }
 
 void
-CHyperText::CalcHyperlinkXMap (IFont* pBaseFont)
+CHyperText::CalcHyperlinkXMap (CFont* pBaseFont)
 {
 	int x = 0;
 	size_t Offset = 0;
@@ -170,7 +170,7 @@ CHyperText::CalcHyperlinkXMap (IFont* pBaseFont)
 	THyperlinkXMapEntry* pHyperlinkXMapEntry;
 	
 	uint_t FontFlags = 0;
-	IFont* pFont = pBaseFont->GetFontMod (FontFlags);
+	CFont* pFont = pBaseFont->GetFontMod (FontFlags);
 
 	m_HyperlinkXMap.SetCount (HyperlinkCount);
 	pHyperlinkXMapEntry = m_HyperlinkXMap;
@@ -209,7 +209,7 @@ CHyperText::CalcHyperlinkXMap (IFont* pBaseFont)
 }
 
 TSize
-CHyperText::CalcTextSize (IFont* pBaseFont) const
+CHyperText::CalcTextSize (CFont* pBaseFont) const
 {
 	TSize Size;
 
@@ -219,7 +219,7 @@ CHyperText::CalcTextSize (IFont* pBaseFont) const
 	size_t AttrCount = m_AttrArray.GetCount ();
 
 	uint_t FontFlags = 0;
-	IFont* pFont = pBaseFont->GetFontMod (FontFlags);
+	CFont* pFont = pBaseFont->GetFontMod (FontFlags);
 
 	for (size_t i = 0; i < AttrCount; i++)
 	{

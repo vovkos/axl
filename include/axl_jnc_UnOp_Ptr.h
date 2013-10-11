@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CUnOp_Addr: public IUnaryOperator
+class CUnOp_Addr: public CUnaryOperator
 {
 public:
 	CUnOp_Addr ()
@@ -34,7 +34,7 @@ public:
 
 //.............................................................................
 
-class CUnOp_Indir: public IUnaryOperator
+class CUnOp_Indir: public CUnaryOperator
 {
 public:
 	CUnOp_Indir ()

@@ -779,7 +779,7 @@ CFunctionMgr::GetScheduleLauncherFunction (
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
 
-	CClassPtrType* pSchedulerPtrType = ((CClassType*) GetSimpleType (m_pModule, EStdType_IScheduler))->GetClassPtrType (SchedulerPtrTypeKind);
+	CClassPtrType* pSchedulerPtrType = ((CClassType*) GetSimpleType (m_pModule, EStdType_Scheduler))->GetClassPtrType (SchedulerPtrTypeKind);
 
 	rtl::CArrayT <CFunctionArg*> ArgArray  = pTargetFunctionPtrType->GetTargetType ()->GetArgArray ();
 	ArgArray.Insert (0, pTargetFunctionPtrType->GetSimpleFunctionArg ());

@@ -48,7 +48,7 @@ CastOperator (
 
 //.............................................................................
 
-ICastOperator::ICastOperator()
+CCastOperator::CCastOperator()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
@@ -57,7 +57,7 @@ ICastOperator::ICastOperator()
 }
 
 bool
-ICastOperator::Cast (
+CCastOperator::Cast (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
@@ -82,7 +82,7 @@ ICastOperator::Cast (
 }
 
 bool
-ICastOperator::ConstCast (
+CCastOperator::ConstCast (
 	const CValue& OpValue,
 	CType* pType,
 	void* pDst
@@ -140,7 +140,7 @@ CCast_Master::GetCastKind (
 	if (!RawOpValue.GetType ())
 		return ECast_None;
 
-	ICastOperator* pOperator = GetCastOperator (RawOpValue, pType);
+	CCastOperator* pOperator = GetCastOperator (RawOpValue, pType);
 	if (!pOperator)
 		return ECast_None;
 
@@ -160,7 +160,7 @@ CCast_Master::ConstCast (
 	void* pDst
 	)
 {
-	ICastOperator* pOperator = GetCastOperator (RawOpValue, pType);
+	CCastOperator* pOperator = GetCastOperator (RawOpValue, pType);
 	if (!pOperator)
 	{
 		SetCastError (RawOpValue, pType);
@@ -188,7 +188,7 @@ CCast_Master::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ICastOperator* pOperator = GetCastOperator (RawOpValue, pType);
+	CCastOperator* pOperator = GetCastOperator (RawOpValue, pType);
 	if (!pOperator)
 	{
 		SetCastError (RawOpValue, pType);
@@ -219,8 +219,8 @@ CCast_SuperMaster::GetCastKind (
 	if (!RawOpValue.GetType ())
 		return ECast_None;
 
-	ICastOperator* pOperator1 = NULL;
-	ICastOperator* pOperator2 = NULL;
+	CCastOperator* pOperator1 = NULL;
+	CCastOperator* pOperator2 = NULL;
 	CType* pIntermediateType = NULL;
 
 	bool Result = GetCastOperators (
@@ -257,8 +257,8 @@ CCast_SuperMaster::ConstCast (
 	void* pDst
 	)
 {
-	ICastOperator* pOperator1 = NULL;
-	ICastOperator* pOperator2 = NULL;
+	CCastOperator* pOperator1 = NULL;
+	CCastOperator* pOperator2 = NULL;
 	CType* pIntermediateType = NULL;
 
 	bool Result = GetCastOperators (
@@ -305,8 +305,8 @@ CCast_SuperMaster::LlvmCast (
 	CValue* pResultValue
 	)
 {
-	ICastOperator* pOperator1 = NULL;
-	ICastOperator* pOperator2 = NULL;
+	CCastOperator* pOperator1 = NULL;
+	CCastOperator* pOperator2 = NULL;
 	CType* pIntermediateType = NULL;
 
 	bool Result = GetCastOperators (

@@ -4,7 +4,7 @@
 //.............................................................................
 
 void 
-PrintVersion (IOutStream* pOutStream)
+PrintVersion (COutStream* pOutStream)
 {
 	pOutStream->Printf (
 		"JANCY compiler (%s) v%d.%d.%d\n",
@@ -16,7 +16,7 @@ PrintVersion (IOutStream* pOutStream)
 }
 
 void 
-PrintUsage (IOutStream* pOutStream)
+PrintUsage (COutStream* pOutStream)
 {
 	PrintVersion (pOutStream);
 
@@ -40,7 +40,7 @@ CJnc* CJnc::s_pCurrentJnc = NULL;
 int
 CJnc::Run (
 	CCmdLine* pCmdLine,
-	IOutStream* pOutStream
+	COutStream* pOutStream
 	)
 {
 	bool Result;

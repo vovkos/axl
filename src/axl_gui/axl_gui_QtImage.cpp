@@ -1,22 +1,21 @@
 #include "pch.h"
-#include "axl_gui_qt_Pixmap.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_gui_QtImage.h"
+#include "axl_gui_QtEngine.h"
 #include "axl_err_Error.h"
 #include "axl_rtl_Array.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-CPixmap::CPixmap ()
+CQtImage::CQtImage ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CQtEngine::GetSingleton ();
 }
 
 bool
-CPixmap::GetData (
+CQtImage::GetData (
 	void* pData,
 	int Left,
 	int Top,
@@ -48,6 +47,5 @@ CPixmap::GetData (
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

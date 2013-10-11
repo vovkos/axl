@@ -2,8 +2,9 @@
 
 //.............................................................................
 
-struct IOutStream
+class COutStream
 {
+public:
 	virtual 
 	size_t
 	Printf_va (
@@ -24,7 +25,7 @@ struct IOutStream
 
 //.............................................................................
 
-class CFileOutStream: public IOutStream
+class CFileOutStream: public COutStream
 {
 public:
 	FILE* m_pFile;
@@ -48,7 +49,7 @@ public:
 
 //.............................................................................
 
-class CSocketOutStream: public IOutStream
+class CSocketOutStream: public COutStream
 {
 public:
 	SOCKET m_Socket;

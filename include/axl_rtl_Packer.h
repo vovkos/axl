@@ -15,8 +15,9 @@ namespace rtl {
 	
 //.............................................................................
 
-struct IPacker
+class CPacker
 {
+public:
 	virtual
 	axl_va_list
 	Pack_va (
@@ -86,7 +87,7 @@ struct IPacker
 //.............................................................................
 
 template <typename TPack>
-class IPackerImplT: public IPacker
+class CPackerImplT: public CPacker
 {
 public:
 	virtual
@@ -102,10 +103,10 @@ public:
 	}
 
 	static
-	IPackerImplT*
+	CPackerImplT*
 	GetSingleton ()
 	{
-		return rtl::GetSimpleSingleton <IPackerImplT> ();
+		return rtl::GetSimpleSingleton <CPackerImplT> ();
 	}
 };
 
@@ -113,10 +114,10 @@ public:
 
 // run-time sequencing
 
-class CPackerSeq: public IPacker
+class CPackerSeq: public CPacker
 {
 protected:
-	rtl::CArrayT <IPacker*> m_Sequence;
+	rtl::CArrayT <CPacker*> m_Sequence;
 
 public:
 	virtual
@@ -134,7 +135,7 @@ public:
 	}
 
 	size_t
-	Append (IPacker* pPacker)
+	Append (CPacker* pPacker)
 	{
 		m_Sequence.Append (pPacker);
 		return m_Sequence.GetCount ();
@@ -144,7 +145,7 @@ public:
 	size_t
 	Append ()
 	{
-		return Append (IPackerImplT <T>::GetSingleton ());
+		return Append (CPackerImplT <T>::GetSingleton ());
 	}
 
 	// often times it is more convenient to use printf-like format string for sequencing
@@ -189,9 +190,9 @@ FormatPackage (
 
 //.............................................................................
 
-// incremental packer
+// package: 
 
-class CPacker
+class CPackage
 {
 protected:
 	axl::rtl::CArrayT <uchar_t> m_Buffer;
@@ -217,7 +218,7 @@ public:
 
 	size_t
 	Append_va (
-		IPacker* pPack,
+		CPacker* pPack,
 		axl_va_list va
 		);
 
@@ -225,7 +226,7 @@ public:
 	size_t
 	Append_va (axl_va_list va)
 	{
-		IPacker* pPack = IPackerImplT <TPack>::GetSingleton ();
+		CPacker* pPack = CPackerImplT <TPack>::GetSingleton ();
 		return Append_va (pPack, va);
 	}
 
@@ -239,7 +240,7 @@ public:
 	size_t 
 	Append (const T& Data)
 	{
-		IPacker* pPack = IPackerImplT <CPackT <T> >::GetSingleton ();
+		CPacker* pPack = CPackerImplT <CPackT <T> >::GetSingleton ();
 		return Pack (&Data, sizeof (Data));
 	}
 */

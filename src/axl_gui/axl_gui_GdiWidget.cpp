@@ -1,10 +1,9 @@
 #include "pch.h"
-#include "axl_gui_gdi_Widget.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiWidget.h"
+#include "axl_gui_GdiEngine.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
@@ -65,18 +64,18 @@ GetMouseButtons ()
 
 //.............................................................................
 
-ref::CPtrT <ICanvas>
-IGdiWidget::GetCanvas (HWND hWnd)
+ref::CPtrT <ÑCanvas>
+CGdiWidgetImpl::GetCanvas (HWND hWnd)
 {
 	HDC hdc = ::GetDC (hWnd);
 
-	ref::CPtrT <CDc> Dc = AXL_REF_NEW (ref::CBoxT <CDc>);	
-	Dc->Attach (hdc, hWnd, CDc::EDestruct_ReleaseDc);
+	ref::CPtrT <CGdiCanvas> Dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);	
+	Dc->Attach (hdc, hWnd, CGdiCanvas::EDestruct_ReleaseDc);
 	return Dc;
 }
 
 LRESULT 
-IGdiWidget::WindowProc (
+CGdiWidgetImpl::WindowProc (
 	HWND hWnd,
 	UINT WmMsg, 
 	WPARAM wParam, 
@@ -376,7 +375,7 @@ IGdiWidget::WindowProc (
 }
 
 void
-IGdiWidget::ProcessWmMouse (
+CGdiWidgetImpl::ProcessWmMouse (
 	EWidgetMsg MsgKind,
 	int x,
 	int y,
@@ -396,7 +395,7 @@ IGdiWidget::ProcessWmMouse (
 };
 
 void
-IGdiWidget::ProcessWmKey (
+CGdiWidgetImpl::ProcessWmKey (
 	EWidgetMsg MsgKind,
 	int Key,
 	bool* pIsHandled
@@ -411,7 +410,7 @@ IGdiWidget::ProcessWmKey (
 }
 
 void
-IGdiWidget::ProcessWmMouseWheel (
+CGdiWidgetImpl::ProcessWmMouseWheel (
 	HWND hWnd,
 	int WheelDelta,
 	bool* pIsHandled
@@ -434,7 +433,7 @@ IGdiWidget::ProcessWmMouseWheel (
 };
 
 void
-IGdiWidget::ProcessWmSize (
+CGdiWidgetImpl::ProcessWmSize (
 	HWND hWnd,
 	bool* pIsHandled
 	)
@@ -457,7 +456,7 @@ IGdiWidget::ProcessWmSize (
 }
 
 void
-IGdiWidget::ProcessWmScroll (
+CGdiWidgetImpl::ProcessWmScroll (
 	HWND hWnd,
 	EWidgetOrientation Orientation,
 	int Code,
@@ -526,7 +525,7 @@ IGdiWidget::ProcessWmScroll (
 }
 
 void
-IGdiWidget::ProcessWmPaint (
+CGdiWidgetImpl::ProcessWmPaint (
 	HWND hWnd,
 	bool* pIsHandled
 	)
@@ -534,8 +533,8 @@ IGdiWidget::ProcessWmPaint (
 	PAINTSTRUCT PaintStruct;
 	HDC hdc = BeginPaint (hWnd, &PaintStruct);
 
-	CDc Dc;
-	Dc.Attach (hdc, NULL, CDc::EDestruct_None);
+	CGdiCanvas Dc;
+	Dc.Attach (hdc, NULL, CGdiCanvas::EDestruct_None);
 	Dc.m_pBaseFont = m_pBaseFont;
 	Dc.m_BaseTextAttr = m_BaseTextAttr;
 	Dc.m_Palette = m_Palette;
@@ -554,7 +553,7 @@ IGdiWidget::ProcessWmPaint (
 }
 
 LRESULT
-IGdiWidget::ProcessWmSetCursor (
+CGdiWidgetImpl::ProcessWmSetCursor (
 	HWND hWnd,
 	bool* pIsHandled
 	)
@@ -580,7 +579,7 @@ IGdiWidget::ProcessWmSetCursor (
 	else
 	{
 		ASSERT (m_pCursor->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-		::SetCursor (*(CCursor*) m_pCursor);
+		::SetCursor (*(CGdiCursor*) m_pCursor);
 	}
 
 	return TRUE;
@@ -588,6 +587,5 @@ IGdiWidget::ProcessWmSetCursor (
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CBinOp_LogAnd: public IBinaryOperator
+class CBinOp_LogAnd: public CBinaryOperator
 {
 public:
 	CBinOp_LogAnd ()
@@ -37,7 +37,7 @@ public:
 
 //.............................................................................
 
-class CBinOp_LogOr: public IBinaryOperator
+class CBinOp_LogOr: public CBinaryOperator
 {
 public:
 	CBinOp_LogOr ()

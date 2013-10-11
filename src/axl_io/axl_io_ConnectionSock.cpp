@@ -60,7 +60,7 @@ bool
 CConnectionSock::Connect (
 	const TSockAddr* pAddr,
 	uint_t Timeout,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	ASSERT (IsOpen ());
@@ -83,7 +83,7 @@ CConnectionSock::Connect (
 bool 
 CConnectionSock::Disconnect (
 	uint_t Timeout,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	ASSERT (IsOpen ());
@@ -167,7 +167,7 @@ bool
 CConnectionSock::Send (
 	const void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+	const exe::CFunction& OnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 	)
 {
 	ASSERT (IsOpen ());
@@ -191,7 +191,7 @@ bool
 CConnectionSock::Recv (
 	void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+	const exe::CFunction& OnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 	)
 {
 	ASSERT (IsOpen ());
@@ -237,7 +237,7 @@ bool
 CConnectionSock::Connect_wt (
 	const TSockAddr* pAddr,
 	uint_t Timeout,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	SOCKADDR Addr;
@@ -260,7 +260,7 @@ CConnectionSock::Connect_wt (
 bool 
 CConnectionSock::Disconnect_wt (
 	uint_t Timeout,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	bool Result = 
@@ -312,7 +312,7 @@ bool
 CConnectionSock::Send_wt (
 	const void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	TSendRecv* pSend = AXL_MEM_NEW (TSendRecv);
@@ -332,7 +332,7 @@ bool
 CConnectionSock::Recv_wt (
 	void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	TSendRecv* pRecv = AXL_MEM_NEW (TSendRecv);

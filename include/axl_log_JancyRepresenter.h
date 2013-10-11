@@ -39,7 +39,7 @@ struct TJancyRepresenterTarget: jnc::TInterface
 	uint64_t m_Timestamp;
 	TLineAttr m_LineAttr;
 
-	IRepresenterTarget* m_pActualTarget;
+	CRepresenterTarget* m_pActualTarget;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -66,7 +66,7 @@ struct TJancyRepresenter: jnc::TInterface
 
 //.............................................................................
 	
-class CJancyRepresenter: public IRepresenter
+class CJancyRepresenter: public CRepresenter
 {
 protected:
 	TJancyRepresenter* m_pJancyRepresenter;
@@ -95,7 +95,7 @@ public:
 	virtual 
 	bool 
 	Represent (
-		IRepresenterTarget* pTarget, 
+		CRepresenterTarget* pTarget, 
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 

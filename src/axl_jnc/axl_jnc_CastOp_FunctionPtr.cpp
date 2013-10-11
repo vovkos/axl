@@ -436,7 +436,7 @@ CCast_FunctionPtr::CCast_FunctionPtr ()
 	m_OperatorTable [EFunctionPtrType_Thin] [EFunctionPtrType_Thin]     = &m_Thin2Thin;
 }
 
-ICastOperator*
+CCastOperator*
 CCast_FunctionPtr::GetCastOperator (
 	const CValue& OpValue,
 	CType* pType

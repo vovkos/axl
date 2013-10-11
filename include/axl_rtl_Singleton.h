@@ -17,8 +17,8 @@ namespace rtl {
 
 template <class T>
 class CDestructSingletonT: 
-	public g::IFinalizer,
-	public ref::IRefCount
+	public g::CFinalizer,
+	public ref::CRefCount
 {
 public:
 	T* m_p;

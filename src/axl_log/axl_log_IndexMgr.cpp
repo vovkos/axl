@@ -35,8 +35,8 @@ CIndexMgr::CIndexMgr ()
 
 void
 CIndexMgr::Setup (
-	IClient* pClient,
-	IRepresenter* pRepresenter,
+	CClient* pClient,
+	CRepresenter* pRepresenter,
 	CPacketFile* pPacketFile,
 	CMergeFile* pMergeFile
 	)

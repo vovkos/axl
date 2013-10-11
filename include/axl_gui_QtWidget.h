@@ -4,30 +4,30 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_WIDGET_H
+#define _AXL_GUI_QTWIDGET_H
 
 #include "axl_gui_Engine.h"
 #include "axl_gui_Widget.h"
-#include "axl_gui_qt_Painter.h"
-#include "axl_gui_qt_Cursor.h"
+#include "axl_gui_QtCanvas.h"
+#include "axl_gui_QtCursor.h"
 #include "axl_err_Error.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
-class CEngine;
+class CQtEngine;
 class QtWidgetBase;
 
-CEngine*
-GetEngineSingleton (); // thanks a lot gcc
+CQtEngine*
+GetQtEngineSingleton (); // thanks a lot gcc
 
 //.............................................................................
 
-struct IQtWidget: public IWidget
+class CQtWidgetImpl: public CWidget
 {
-	// this class is needed to get access to protected members in IWidget 
-	// also to put part of implementation into .cpp instead of having one huge CWidgetT <>
+public:
+	// this class is needed to get access to protected members in CWidget 
+	// also to put part of implementation into .cpp instead of having one huge CQtWidgetT <>
 	
 	EMouseButton
 	GetMouseButtonFromQtButton (Qt::MouseButton QtButton)
@@ -90,28 +90,28 @@ struct IQtWidget: public IWidget
 //.............................................................................
 
 template <typename T>
-class CWidgetT: public T
+class CQtWidgetT: public T
 {
-	friend class CEngine;
+	friend class CQtEngine;
 
 public:
 	QtWidgetBase* m_pQtScrollArea;
 	QWidget* m_pQtWidget;
 	
 public:
-	CWidgetT (): T (GetEngineSingleton ())
+	CQtWidgetT (): T (GetQtEngineSingleton ())
 	{
 		m_pQtScrollArea = NULL;
 		m_pQtWidget = NULL;
 	}
 	
 	virtual
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	GetCanvas ()
 	{
-		ref::CPtrT <CPainter> Painter = AXL_REF_NEW (ref::CBoxT <CPainter>);
-		Painter->Attach (new QPainter (m_pQtWidget));
-		return Painter;
+		ref::CPtrT <CQtCanvas> Canvas = AXL_REF_NEW (ref::CBoxT <CQtCanvas>);
+		Canvas->Attach (new QPainter (m_pQtWidget));
+		return Canvas;
 	}
 
 	virtual
@@ -148,10 +148,10 @@ public:
 
 	virtual
 	bool
-	SetCursor (ICursor* pCursor)
+	SetCursor (CCursor* pCursor)
 	{
 		ASSERT (pCursor->GetEngine ()->GetEngineKind () == EEngine_Qt);
-		m_pQtWidget->setCursor (((CCursor*) pCursor)->m_QtCursor);
+		m_pQtWidget->setCursor (((CQtCursor*) pCursor)->m_QtCursor);
 		this->m_pCursor = pCursor; // thanks a lot gcc
 		return true;		
 	}
@@ -256,11 +256,11 @@ class QtWidgetBase: public QAbstractScrollArea
 	Q_OBJECT
 
 protected:
-	IQtWidget* m_qtWidget;
+	CQtWidgetImpl* m_qtWidget;
 
 public:
 	QtWidgetBase (
-		IQtWidget* qtWidget,
+		CQtWidgetImpl* qtWidget,
 		QWidget* parent
 		):
 		QAbstractScrollArea (parent)
@@ -412,11 +412,11 @@ template <typename T>
 class QtWidget: public QtWidgetBase
 {
 protected:
-	CWidgetT <T> m_widget; 
+	CQtWidgetT <T> m_widget; 
 	
 public:
 	QtWidget (QWidget* parent = 0):
-		QtWidgetBase ((IQtWidget*) (IWidget*) &m_widget, parent)
+		QtWidgetBase ((CQtWidgetImpl*) (CWidget*) &m_widget, parent)
 	{
 		m_widget.m_pQtScrollArea = this;
 		m_widget.m_pQtWidget = viewport ();
@@ -438,6 +438,5 @@ public:
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

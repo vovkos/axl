@@ -1,11 +1,9 @@
 #include "pch.h"
-#include "axl_gui_qt_Font.h"
-#include "axl_gui_qt_Engine.h"
-#include "axl_err_Error.h"
+#include "axl_gui_QtFont.h"
+#include "axl_gui_QtEngine.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
@@ -43,13 +41,13 @@ GetFontDescFromFontInfo (
 
 //.............................................................................
 
-CFont::CFont ()
+CQtFont::CQtFont ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CQtEngine::GetSingleton ();
 }
 
 TSize
-CFont::CalcTextSize (
+CQtFont::CalcTextSize (
 	const char* pText,
 	size_t Length
 	)
@@ -66,6 +64,5 @@ CFont::CalcTextSize (
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

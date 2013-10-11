@@ -74,7 +74,7 @@ GetBinOpKindString (EBinOp OpKind);
 
 //.............................................................................
 
-struct IBinaryOperator
+class CBinaryOperator
 {	
 	friend class COperatorMgr;
 
@@ -85,7 +85,7 @@ protected:
 	uint_t m_OpFlags2;
 
 public:
-	IBinaryOperator ();
+	CBinaryOperator ();
 
 	CModule*
 	GetModule ()

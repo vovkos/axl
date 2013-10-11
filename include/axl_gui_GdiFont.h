@@ -4,16 +4,15 @@
 
 #pragma once
 
-#define _AXL_GUI_GDI_FONT_H
+#define _AXL_GUI_GDIFONT_H
 
 #include "axl_gui_Font.h"
-#include "axl_gui_gdi_ObjectHandle.h"
+#include "axl_gui_GdiObjectHandle.h"
 #include "axl_ref_RefCount.h"
 #include "axl_rtl_String.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
@@ -54,14 +53,14 @@ GetFontDescFromLogFont (
 
 //.............................................................................
 
-class CFont: 
-	public IFont,
-	public CObjectHandleT <HFONT>
+class CGdiFont: 
+	public CFont,
+	public CGdiObjectHandleT <HFONT>
 {
-	friend class CEngine;
+	friend class CGdiEngine;
 
 public:
-	CFont ();
+	CGdiFont ();
 
 	bool
 	GetLogFont (LOGFONTW* pLogFont);
@@ -80,11 +79,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CFontTupleT <CFont> CFontTuple;
+typedef CFontTupleT <CGdiFont> CGdiFontTuple;
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl
 

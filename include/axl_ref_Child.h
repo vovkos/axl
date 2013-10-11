@@ -27,7 +27,7 @@ class CChildT
 protected:
 	struct THdr
 	{
-		IRefCount* m_pParent;
+		CRefCount* m_pParent;
 	};
 	
 	class CObject: 
@@ -40,7 +40,7 @@ protected:
 	char m_Buffer [sizeof (CObject) + Extra];
 
 public:
-	CChildT (IRefCount* pParent)
+	CChildT (CRefCount* pParent)
 	{ 
 		memset (m_Buffer, 0, sizeof (m_Buffer));
 		CObject* pObject = (CObject*) m_Buffer;

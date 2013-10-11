@@ -27,7 +27,7 @@ AXL_RTL_DEFINE_GUID (
 
 //.............................................................................
 	
-class CNtErrorProvider: public IErrorProvider
+class CNtErrorProvider: public CErrorProvider
 {
 public:
 	static

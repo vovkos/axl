@@ -17,9 +17,9 @@ CServer::CServer ()
 
 bool
 CServer::Create (
-	IClient* pClient,
-	IRepresenter* pRepresenter,
-	IColorizer* pColorizer,
+	CClient* pClient,
+	CRepresenter* pRepresenter,
+	CColorizer* pColorizer,
 	const char* pPacketFilePath,
 	const char* pMergeFilePath,
 	const char* pColorizerStateFilePath

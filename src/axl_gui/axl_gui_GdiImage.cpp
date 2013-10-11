@@ -1,22 +1,21 @@
 #include "pch.h"
-#include "axl_gui_gdi_Bitmap.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiImage.h"
+#include "axl_gui_GdiEngine.h"
 #include "axl_err_Error.h"
 #include "axl_rtl_Array.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-CBitmap::CBitmap ()
+CGdiImage::CGdiImage ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CGdiEngine::GetSingleton ();
 }
 
 bool
-CBitmap::GetData (
+CGdiImage::GetData (
 	void* pData,
 	int Left,
 	int Top,
@@ -64,6 +63,5 @@ CBitmap::GetData (
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

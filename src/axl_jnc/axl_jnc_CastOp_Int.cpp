@@ -160,8 +160,8 @@ bool
 CCast_IntFromBeInt::GetCastOperators (
 	const CValue& OpValue,
 	CType* pType,
-	ICastOperator** ppFirstOperator,
-	ICastOperator** ppSecondOperator,
+	CCastOperator** ppFirstOperator,
+	CCastOperator** ppSecondOperator,
 	CType** ppIntermediateType
 	)
 {
@@ -187,8 +187,8 @@ bool
 CCast_BeInt::GetCastOperators (
 	const CValue& OpValue,
 	CType* pType,
-	ICastOperator** ppFirstOperator,
-	ICastOperator** ppSecondOperator,
+	CCastOperator** ppFirstOperator,
+	CCastOperator** ppSecondOperator,
 	CType** ppIntermediateType
 	)
 {
@@ -382,8 +382,8 @@ bool
 CCast_IntFromEnum::GetCastOperators (
 	const CValue& OpValue,
 	CType* pType,
-	ICastOperator** ppFirstOperator,
-	ICastOperator** ppSecondOperator,
+	CCastOperator** ppFirstOperator,
+	CCastOperator** ppSecondOperator,
 	CType** ppIntermediateType
 	)
 {
@@ -427,8 +427,8 @@ bool
 CCast_Enum::GetCastOperators (
 	const CValue& OpValue,
 	CType* pType,
-	ICastOperator** ppFirstOperator,
-	ICastOperator** ppSecondOperator,
+	CCastOperator** ppFirstOperator,
+	CCastOperator** ppSecondOperator,
 	CType** ppIntermediateType
 	)
 {
@@ -450,7 +450,7 @@ CCast_Enum::GetCastOperators (
 
 //.............................................................................
 
-ICastOperator*
+CCastOperator*
 CCast_Int::GetCastOperator (
 	const CValue& OpValue,
 	CType* pType
@@ -481,10 +481,10 @@ CCast_Int::GetCastOperator (
 	case EType_Int64_u:
 		return 
 			SrcSize == DstSize ? m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_Copy) : 
-			SrcSize > DstSize ? (ICastOperator*) &m_Trunc : 
+			SrcSize > DstSize ? (CCastOperator*) &m_Trunc : 
 			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Unsigned) ?			
-				(ICastOperator*) &m_Ext_u : 
-				(ICastOperator*) &m_Ext;
+				(CCastOperator*) &m_Ext_u : 
+				(CCastOperator*) &m_Ext;
 
 	case EType_Int16_be:
 	case EType_Int16_beu:

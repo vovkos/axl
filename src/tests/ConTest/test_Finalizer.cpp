@@ -7,8 +7,8 @@ namespace test_Finalize {
 //.............................................................................
 
 class CMyFinalizer: 
-	public ref::IRefCount,
-	public g::IFinalizer
+	public ref::CRefCount,
+	public g::CFinalizer
 {
 public:
 	CMyFinalizer ()

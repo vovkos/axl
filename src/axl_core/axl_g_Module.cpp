@@ -48,7 +48,7 @@ CModule::~CModule ()
 }
 
 bool 
-CModule::AddFinalizer (const ref::CPtrT <IFinalizer>& Finalizer)
+CModule::AddFinalizer (const ref::CPtrT <CFinalizer>& Finalizer)
 {
 	CFinalizerEntry* pFinalizerEntry = AXL_MEM_NEW (CFinalizerEntry);
 	pFinalizerEntry->m_Finalizer = Finalizer;

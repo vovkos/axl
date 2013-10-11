@@ -912,8 +912,9 @@ Complete (int Result)
 
 // providers
 
-struct IErrorProvider
+class CErrorProvider
 {
+public:
 	virtual 
 	rtl::CString 
 	GetErrorDescription (const TError* pError) = 0;
@@ -921,7 +922,7 @@ struct IErrorProvider
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CStdErrorProvider: public IErrorProvider
+class CStdErrorProvider: public CErrorProvider
 {
 public:
 	virtual 

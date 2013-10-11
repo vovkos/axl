@@ -4,30 +4,42 @@
 
 #pragma once
 
-#define _AXL_GUI_GDI_CURSOR_H
+#define _AXL_GUI_GDIOBJECTHANDLE_H
 
-#include "axl_gui_Cursor.h"
 #include "axl_rtl_Handle.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-class CCursor: 
-	public ICursor,
-	public rtl::CHandleT <HCURSOR>
+class CDeleteGdiObject
 {
-	friend class CEngine;
-
 public:
-	CCursor ();
+	void
+	operator () (HGDIOBJ h)
+	{
+		::DeleteObject (h);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class CGdiObjectHandleT: public rtl::CHandleT <T, CDeleteGdiObject>
+{
+public:
+	CGdiObjectHandleT ()
+	{
+	}
+
+	CGdiObjectHandleT (T h):
+		rtl::CHandleT <T, CDeleteGdiObject> (h)
+	{
+	}
 };
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl
-

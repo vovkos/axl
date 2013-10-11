@@ -33,9 +33,9 @@ struct TLinePool
 class CLineRepresentMgr
 { 	
 protected:	
-	IClient* m_pClient;
-	IRepresenter* m_pRepresenter;
-	IColorizer* m_pColorizer;
+	CClient* m_pClient;
+	CRepresenter* m_pRepresenter;
+	CColorizer* m_pColorizer;
 	CPacketFile* m_pPacketFile;
 	CMergeFile* m_pMergeFile;
 	io::CMappedFile* m_pColorizerStateFile;
@@ -72,9 +72,9 @@ public:
 		
 	void
 	Setup (
-		IClient* pClient,
-		IRepresenter* pRepresenter,
-		IColorizer* pColorizer,
+		CClient* pClient,
+		CRepresenter* pRepresenter,
+		CColorizer* pColorizer,
 		CPacketFile* pPacketFile,
 		CMergeFile* pMergeFile,
 		io::CMappedFile* pColorizerStateFile

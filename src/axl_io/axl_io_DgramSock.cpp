@@ -56,7 +56,7 @@ CDgramSock::SendTo (
 	const void* p,
 	size_t Size,
 	const TSockAddr* pAddr,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	ASSERT (IsOpen ());
@@ -82,7 +82,7 @@ bool
 CDgramSock::RecvFrom (
 	void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	ASSERT (IsOpen ());
@@ -196,7 +196,7 @@ CDgramSock::SendTo_wt (
 	const void* p,
 	size_t Size,
 	const TSockAddr* pAddr,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	TSendRecv* pSend = AXL_MEM_NEW (TSendRecv);
@@ -219,7 +219,7 @@ bool
 CDgramSock::RecvFrom_wt (
 	void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	TSendRecv* pRecv = AXL_MEM_NEW (TSendRecv);

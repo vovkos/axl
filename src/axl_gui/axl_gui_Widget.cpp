@@ -7,7 +7,7 @@ namespace gui {
 
 //.............................................................................
 
-IWidget::IWidget (IEngine* pEngine)
+CWidget::CWidget (CEngine* pEngine)
 {
 	ASSERT (pEngine);
 

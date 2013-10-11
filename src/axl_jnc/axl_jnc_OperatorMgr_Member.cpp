@@ -190,7 +190,7 @@ COperatorMgr::GetNamedTypeMember (
 	if (pDecl->GetStorageKind () == EStorage_Static)
 		return true;
 
-	#pragma AXL_TODO ("remove explicit addr operator and instead allow implicit cast names_type& -> named_type*")
+	#pragma AXL_TODO ("remove explicit addr operator and instead allow implicit cast named_type& -> named_type*")
 
 	CValue ThisArgValue = OpValue;
 	if (pNamedType->GetTypeKind () != EType_Class)

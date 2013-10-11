@@ -15,12 +15,12 @@ namespace log {
 
 //.............................................................................
 
-class CLineRepresenterTarget: public IRepresenterTarget 
+class CLineRepresenterTarget: public CRepresenterTarget 
 {
 	friend class CLineRepresentMgr;
 
 protected:
-	IColorizer* m_pColorizer;
+	CColorizer* m_pColorizer;
 
 	TLinePool* m_pLinePool;
 	rtl::CArrayT <uchar_t>* m_pLineBuffer;

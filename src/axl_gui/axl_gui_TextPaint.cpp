@@ -8,7 +8,7 @@ namespace gui {
 //.............................................................................
 
 void
-CTextPaint::Init (ICanvas* pCanvas)
+CTextPaint::Init (ÑCanvas* pCanvas)
 {
 	m_pCanvas = pCanvas;
 	m_p = NULL;

@@ -530,7 +530,7 @@ CMulticastClassType::CreateSnapshotMethod_u ()
 		);
 
 	// stdfunc returns simple-funciton snapshot so we either 
-	// need a real ICastOperator or manually bitcast it to our type
+	// need a real CCastOperator or manually bitcast it to our type
 	// since casting to mcsnapshot is not needed anywhere just bitcast it here
 
 	ASSERT (ReturnValue.GetType ()->GetTypeKind () == EType_McSnapshot);

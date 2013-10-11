@@ -28,9 +28,9 @@ CLineRepresentMgr::CLineRepresentMgr ()
 
 void
 CLineRepresentMgr::Setup (
-	IClient* pClient,
-	IRepresenter* pRepresenter,
-	IColorizer* pColorizer,
+	CClient* pClient,
+	CRepresenter* pRepresenter,
+	CColorizer* pColorizer,
 	CPacketFile* pPacketFile,
 	CMergeFile* pMergeFile,
 	io::CMappedFile* pColorizerStateFile

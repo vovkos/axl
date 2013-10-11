@@ -50,7 +50,7 @@ GetLineKindFromPartKind (
 
 //.............................................................................
 
-struct IRepresenterTarget
+struct CRepresenterTarget
 {
 protected:
 	uint_t m_PacketCode;
@@ -61,7 +61,7 @@ public:
 	TLineAttr m_LineAttr;
 	
 public:
-	IRepresenterTarget ()
+	CRepresenterTarget ()
 	{
 		m_PacketCode = 0;
 		m_Timestamp = 0;
@@ -329,12 +329,12 @@ protected:
 
 //.............................................................................
 
-struct IRepresenter
+struct CRepresenter
 {
 	virtual 
 	bool 
 	Represent (
-		IRepresenterTarget* pTarget, 
+		CRepresenterTarget* pTarget, 
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 

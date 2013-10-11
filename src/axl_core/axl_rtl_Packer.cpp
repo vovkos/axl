@@ -127,8 +127,8 @@ CPackerSeq::AppendFormat (const char* pFormat)
 //.............................................................................
 	
 size_t
-CPacker::Append_va (
-	IPacker* pPacker,
+CPackage::Append_va (
+	CPacker* pPacker,
 	axl_va_list va
 	)
 {
@@ -149,7 +149,7 @@ CPacker::Append_va (
 }
 
 size_t
-CPacker::Append (
+CPackage::Append (
 	const void* p,
 	size_t Size
 	)

@@ -30,8 +30,8 @@ CColorizeMgr::Reset ()
 
 void
 CColorizeMgr::Setup (
-	IRepresenter* pRepresenter,
-	IColorizer* pColorizer,
+	CRepresenter* pRepresenter,
+	CColorizer* pColorizer,
 	CPacketFile* pPacketFile,
 	CMergeFile* pMergeFile,
 	io::CMappedFile* pColorizerStateFile

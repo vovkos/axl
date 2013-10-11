@@ -1,20 +1,18 @@
 #include "pch.h"
-#include "axl_gui_gdi_Cursor.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiCursor.h"
+#include "axl_gui_GdiEngine.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-CCursor::CCursor ()
+CGdiCursor::CGdiCursor ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CGdiEngine::GetSingleton ();
 }
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

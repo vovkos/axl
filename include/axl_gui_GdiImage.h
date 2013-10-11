@@ -4,28 +4,27 @@
 
 #pragma once
 
-#define _AXL_GUI_GDI_BITMAP_H
+#define _AXL_GUI_GDIIMAGE_H
 
 #include "axl_gui_Image.h"
-#include "axl_gui_gdi_ObjectHandle.h"
+#include "axl_gui_GdiObjectHandle.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-class CBitmap: 
-	public IImage,
-	public CObjectHandleT <HBITMAP>
+class CGdiImage: 
+	public CImage,
+	public CGdiObjectHandleT <HBITMAP>
 {
-	friend class CEngine;
+	friend class CGdiEngine;
 
 protected:
 	TSize m_Size;
 
 public:
-	CBitmap ();
+	CGdiImage ();
 
 	virtual
 	bool
@@ -40,7 +39,6 @@ public:
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl
 

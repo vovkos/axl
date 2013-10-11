@@ -33,7 +33,7 @@ class CWeakPtrT
 
 protected:
 	T* m_p;
-	IRefCount* m_pRefCount;
+	CRefCount* m_pRefCount;
 
 public:
 	CWeakPtrT (int i = 0)
@@ -71,7 +71,7 @@ public:
 
 	CWeakPtrT (
 		T* p, 
-		IRefCount* pRefCount
+		CRefCount* pRefCount
 		)
 	{ 
 		m_p = NULL, m_pRefCount = NULL;
@@ -93,7 +93,7 @@ public:
 	void 
 	Copy (
 		T* p, 
-		IRefCount* pRefCount
+		CRefCount* pRefCount
 		)
 	{
 		m_p = p;
@@ -113,7 +113,7 @@ public:
 	void 
 	Attach (
 		T* p, 
-		IRefCount* pRefCount
+		CRefCount* pRefCount
 		)
 	{
 		if (m_pRefCount)
@@ -126,7 +126,7 @@ public:
 	void 
 	Detach (
 		T** pp = NULL, 
-		IRefCount** ppRefCount = NULL
+		CRefCount** ppRefCount = NULL
 		)
 	{ 
 		if (pp)
@@ -149,7 +149,7 @@ public:
 		m_pRefCount = NULL;
 	}
 
-	IRefCount* 
+	CRefCount* 
 	GetRefCount () const
 	{
 		return m_pRefCount;

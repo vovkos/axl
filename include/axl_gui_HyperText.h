@@ -125,10 +125,10 @@ public:
 	Backspace (size_t BackLength);
 
 	TSize
-	CalcTextSize (IFont* pFont) const;
+	CalcTextSize (CFont* pFont) const;
 
 	void 
-	CalcHyperlinkXMap (IFont* pFont);
+	CalcHyperlinkXMap (CFont* pFont);
 
 	THyperlinkAnchor* 
 	FindHyperlinkByX (int x) const ;

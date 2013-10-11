@@ -58,7 +58,7 @@ CastOperator (
 
 //.............................................................................
 
-struct ICastOperator
+class CCastOperator
 {	
 	friend class COperatorMgr;
 
@@ -67,7 +67,7 @@ protected:
 	uint_t m_OpFlags;
 
 public:
-	ICastOperator ();
+	CCastOperator ();
 
 	CModule*
 	GetModule ()
@@ -118,7 +118,7 @@ public:
 
 // fail by default
 
-class CCast_Default: public ICastOperator
+class CCast_Default: public CCastOperator
 {
 public:
 	virtual
@@ -149,7 +149,7 @@ public:
 
 // simple copy
 
-class CCast_Copy: public ICastOperator
+class CCast_Copy: public CCastOperator
 {
 public:
 	virtual
@@ -184,7 +184,7 @@ public:
 
 // master cast chooses particular implementation
 
-class CCast_Master: public ICastOperator
+class CCast_Master: public CCastOperator
 {
 public:
 	virtual
@@ -212,7 +212,7 @@ public:
 		);
 
 	virtual
-	ICastOperator*
+	CCastOperator*
 	GetCastOperator (
 		const CValue& OpValue,
 		CType* pType
@@ -223,7 +223,7 @@ public:
 
 // master cast capable of performing superposition of casts
 
-class CCast_SuperMaster: public ICastOperator
+class CCast_SuperMaster: public CCastOperator
 {
 public:
 	virtual
@@ -255,8 +255,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppOperator1,
-		ICastOperator** ppOperator2,
+		CCastOperator** ppOperator1,
+		CCastOperator** ppOperator2,
 		CType** ppIntermediateType
 		) = 0;
 };

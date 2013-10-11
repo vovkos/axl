@@ -52,7 +52,7 @@ CJancyRepresenter::Destroy ()
 
 bool 
 CJancyRepresenter::Represent (
-	IRepresenterTarget* pTarget, 
+	CRepresenterTarget* pTarget, 
 	uint_t PacketCode, 
 	const void* p, 
 	size_t Size, 

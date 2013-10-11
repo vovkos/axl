@@ -16,7 +16,7 @@ class CLineRepresenterTarget;
 
 //.............................................................................
 
-class CLineColorizerTarget: public IColorizerTarget
+class CLineColorizerTarget: public CColorizerTarget
 {
 	friend class CLineRepresenterTarget;
 

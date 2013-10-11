@@ -13,7 +13,7 @@ namespace jnc {
 
 // floating point truncation
 
-class CCast_FpTrunc: public ICastOperator
+class CCast_FpTrunc: public CCastOperator
 {
 public:
 	virtual
@@ -52,7 +52,7 @@ public:
 
 // floating point extension
 
-class CCast_FpExt: public ICastOperator
+class CCast_FpExt: public CCastOperator
 {
 public:
 	virtual
@@ -91,7 +91,7 @@ public:
 
 // signed integer -> floating point
 
-class CCast_FpFromInt: public ICastOperator
+class CCast_FpFromInt: public CCastOperator
 {
 public:
 	virtual
@@ -139,7 +139,7 @@ protected:
 
 // unsigned integer -> floating point
 
-class CCast_FpFromInt_u: public ICastOperator
+class CCast_FpFromInt_u: public CCastOperator
 {
 public:
 	virtual
@@ -195,8 +195,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppFirstOperator,
-		ICastOperator** ppSecondOperator,
+		CCastOperator** ppFirstOperator,
+		CCastOperator** ppSecondOperator,
 		CType** ppIntermediateType
 		);
 };
@@ -213,8 +213,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppFirstOperator,
-		ICastOperator** ppSecondOperator,
+		CCastOperator** ppFirstOperator,
+		CCastOperator** ppSecondOperator,
 		CType** ppIntermediateType
 		);
 };
@@ -235,7 +235,7 @@ protected:
 
 public:
 	virtual
-	ICastOperator*
+	CCastOperator*
 	GetCastOperator (
 		const CValue& OpValue,
 		CType* pType

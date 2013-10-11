@@ -26,8 +26,9 @@ struct TSystemInfo
 
 //.............................................................................
 
-struct IFinalizer
+class CFinalizer
 {
+public:
 	virtual 
 	void 
 	Finalize () = 0;
@@ -41,7 +42,7 @@ protected:
 	class CFinalizerEntry: public rtl::TListLink
 	{
 	public:
-		ref::CPtrT <IFinalizer> m_Finalizer;
+		ref::CPtrT <CFinalizer> m_Finalizer;
 	};
 
 protected:
@@ -88,7 +89,7 @@ public:
 	}
 
 	bool 
-	AddFinalizer (const ref::CPtrT <IFinalizer>& Finalizer);
+	AddFinalizer (const ref::CPtrT <CFinalizer>& Finalizer);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

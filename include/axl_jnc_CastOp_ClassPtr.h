@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CCast_ClassPtr: public ICastOperator
+class CCast_ClassPtr: public CCastOperator
 {
 public:
 	virtual

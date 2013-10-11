@@ -53,7 +53,7 @@ CListenerSock::Close ()
 bool
 CListenerSock::Listen (
 	size_t BackLog,
-	exe::IFunction* pOnAccept
+	const exe::CFunction& OnAccept
 	)
 {
 	ASSERT (IsOpen ());
@@ -80,7 +80,7 @@ CListenerSock::Close_wt ()
 bool
 CListenerSock::Listen_wt (
 	size_t BackLog,
-	exe::IFunction* pOnAccept
+	const exe::CFunction& OnAccept
 	)
 {
 	bool Result = 

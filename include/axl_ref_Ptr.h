@@ -38,7 +38,7 @@ class CPtrT
 
 protected:
 	T* m_p;
-	IRefCount* m_pRefCount;
+	CRefCount* m_pRefCount;
 
 public:
 	CPtrT ()
@@ -84,7 +84,7 @@ public:
 
 	CPtrT (
 		T* p, 
-		IRefCount* pRefCount
+		CRefCount* pRefCount
 		)
 	{ 
 		m_p = NULL, m_pRefCount = NULL;
@@ -121,7 +121,7 @@ public:
 		return m_p;
 	}
 	
-	IRefCount* 
+	CRefCount* 
 	GetRefCount () const
 	{
 		return m_pRefCount;
@@ -130,7 +130,7 @@ public:
 	void 
 	Copy (
 		T* p, 
-		IRefCount* pRefCount
+		CRefCount* pRefCount
 		)
 	{
 		m_p = p;
@@ -150,7 +150,7 @@ public:
 	void 
 	Attach (
 		T* p, 
-		IRefCount* pRefCount
+		CRefCount* pRefCount
 		)
 	{
 		if (m_pRefCount)
@@ -163,7 +163,7 @@ public:
 	void 
 	Detach (
 		T** pp = NULL, 
-		IRefCount** ppRefCount = NULL
+		CRefCount** ppRefCount = NULL
 		)
 	{ 
 		if (pp)

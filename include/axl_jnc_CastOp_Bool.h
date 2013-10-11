@@ -13,7 +13,7 @@ namespace jnc {
 
 // comparison to zero -> bool (common for both integer & fp)
 
-class CCast_BoolFromZeroCmp: public ICastOperator
+class CCast_BoolFromZeroCmp: public CCastOperator
 {
 public:
 	virtual
@@ -65,7 +65,7 @@ public:
 
 // bool <-> int
 
-class CCast_IntFromBool: public ICastOperator
+class CCast_IntFromBool: public CCastOperator
 {
 public:
 	virtual
@@ -113,7 +113,7 @@ public:
 	}
 
 	virtual
-	ICastOperator*
+	CCastOperator*
 	GetCastOperator (
 		const CValue& OpValue,
 		CType* pType

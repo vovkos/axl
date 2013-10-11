@@ -1,11 +1,10 @@
 #include "pch.h"
-#include "axl_gui_gdi_Font.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiFont.h"
+#include "axl_gui_GdiEngine.h"
 #include "axl_err_Error.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
@@ -87,20 +86,20 @@ GetFontDescFromLogFont (
 
 //.............................................................................
 
-CFont::CFont ()
+CGdiFont::CGdiFont ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CGdiEngine::GetSingleton ();
 }
 
 bool
-CFont::GetLogFont (LOGFONTW* pLogFont)
+CGdiFont::GetLogFont (LOGFONTW* pLogFont)
 {
 	bool_t Result = ::GetObject (m_h, sizeof (LOGFONT), pLogFont);
 	return err::Complete (Result);
 }
 
 bool
-CFont::IsMonospace ()
+CGdiFont::IsMonospace ()
 {
 	LOGFONT LogFont;
 	GetLogFont (&LogFont);
@@ -108,7 +107,7 @@ CFont::IsMonospace ()
 }
 
 TSize
-CFont::CalcTextSize (
+CGdiFont::CalcTextSize (
 	const char* pText,
 	size_t Length
 	)
@@ -127,6 +126,5 @@ CFont::CalcTextSize (
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

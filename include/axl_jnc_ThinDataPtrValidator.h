@@ -20,7 +20,7 @@ enum EThinDataPtrValidator
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CThinDataPtrValidator: public ref::IRefCount
+class CThinDataPtrValidator: public ref::CRefCount
 {
 	friend class CValue;
 	friend class CConstMgr;

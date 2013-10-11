@@ -1,23 +1,22 @@
 #include "pch.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiEngine.h"
 #include "axl_ref_Factory.h"
 #include "axl_err_Error.h"
 #include "axl_gui_Widget.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-CEngine::~CEngine ()
+CGdiEngine::~CGdiEngine ()
 {
 	if (m_hWndClipboardOwner)
 		::DestroyWindow (m_hWndClipboardOwner);
 }
 
-IFont* 
-CEngine::GetDefaultGuiFont ()
+CFont* 
+CGdiEngine::GetDefaultGuiFont ()
 {
 	if (m_DefaultGuiFont)
 		return m_DefaultGuiFont;
@@ -26,8 +25,8 @@ CEngine::GetDefaultGuiFont ()
 	return m_DefaultGuiFont;
 }
 
-IFont*
-CEngine::GetDefaultMonospaceFont ()
+CFont*
+CGdiEngine::GetDefaultMonospaceFont ()
 {
 	if (m_DefaultMonospaceFont)
 		return m_DefaultMonospaceFont;
@@ -43,8 +42,8 @@ CEngine::GetDefaultMonospaceFont ()
 	return m_DefaultMonospaceFont;
 }
 
-ref::CPtrT <IFont>
-CEngine::CreateFont (
+ref::CPtrT <CFont>
+CGdiEngine::CreateFont (
 	const char* pFaceName,
 	size_t PointSize,
 	uint_t Flags
@@ -60,8 +59,8 @@ CEngine::CreateFont (
 	return CreateFont (hFont);
 }
 
-ref::CPtrT <IFont>
-CEngine::CreateStockFont (int StockFontKind)
+ref::CPtrT <CFont>
+CGdiEngine::CreateStockFont (int StockFontKind)
 {
 	HGDIOBJ h = ::GetStockObject (StockFontKind);
 	dword_t GdiObjectType = ::GetObjectType (h);
@@ -74,35 +73,35 @@ CEngine::CreateStockFont (int StockFontKind)
 	return CreateFont ((HFONT) h);
 }
 
-ref::CPtrT <IFont>
-CEngine::CreateFont (HFONT hFont)
+ref::CPtrT <CFont>
+CGdiEngine::CreateFont (HFONT hFont)
 {
-	CFont* pFont = AXL_MEM_NEW (CFont);
+	CGdiFont* pFont = AXL_MEM_NEW (CGdiFont);
 
 	LOGFONTW LogFont;
 	::GetObjectW (hFont, sizeof (LogFont), &LogFont);
 	GetFontDescFromLogFont (&LogFont, &pFont->m_FontDesc);
 
-	ref::CPtrT <CFontTuple> FontTuple = AXL_REF_NEW (CFontTuple);
+	ref::CPtrT <CGdiFontTuple> FontTuple = AXL_REF_NEW (CGdiFontTuple);
 	FontTuple->m_pBaseFont = pFont;
 	FontTuple->m_FontModArray [pFont->m_FontDesc.m_Flags] = pFont;
 
 	pFont->m_h = hFont;
 	pFont->m_pTuple = FontTuple;
 
-	return ref::CPtrT <IFont> (pFont, FontTuple);
+	return ref::CPtrT <CFont> (pFont, FontTuple);
 }
 
-IFont*
-CEngine::GetFontMod (
-	IFont* _pBaseFont,
+CFont*
+CGdiEngine::GetFontMod (
+	CFont* _pBaseFont,
 	uint_t Flags
 	)
 {
 	ASSERT (_pBaseFont->GetEngine () == this);
 
-	CFont* pBaseFont = (CFont*) _pBaseFont;
-	CFontTuple* pFontTuple = (CFontTuple*) pBaseFont->m_pTuple;
+	CGdiFont* pBaseFont = (CGdiFont*) _pBaseFont;
+	CGdiFontTuple* pFontTuple = (CGdiFontTuple*) pBaseFont->m_pTuple;
 
 	LOGFONTW LogFont;
 	GetLogFontFromFontDesc (*pFontTuple->m_pBaseFont->GetFontDesc (), &LogFont);
@@ -110,9 +109,9 @@ CEngine::GetFontMod (
 	
 	HFONT hFont = ::CreateFontIndirect (&LogFont);
 	if (!hFont)
-		return err::FailWithLastSystemError ((IFont*) NULL);
+		return err::FailWithLastSystemError ((CFont*) NULL);
 	
-	CFont* pFont = AXL_MEM_NEW (CFont);
+	CGdiFont* pFont = AXL_MEM_NEW (CGdiFont);
 	pFont->m_FontDesc = pBaseFont->m_FontDesc;
 	pFont->m_FontDesc.m_Flags = Flags;
 	pFont->m_h = hFont;
@@ -124,20 +123,20 @@ CEngine::GetFontMod (
 	return pFont;
 }
 
-ref::CPtrT <ICursor>
-CEngine::CreateStockCursor (LPCTSTR pStockCursorRes)
+ref::CPtrT <CCursor>
+CGdiEngine::CreateStockCursor (LPCTSTR pStockCursorRes)
 {
 	HCURSOR h = ::LoadCursor (NULL, pStockCursorRes);
 	if (!h)
 		return err::FailWithLastSystemError (ref::EPtr_Null);
 
-	ref::CPtrT <CCursor> Cursor = AXL_REF_NEW (ref::CBoxT <CCursor>);
+	ref::CPtrT <CGdiCursor> Cursor = AXL_REF_NEW (ref::CBoxT <CGdiCursor>);
 	Cursor->m_h = h;
 	return Cursor;
 }
 
-ICursor*
-CEngine::GetStdCursor (EStdCursor CursorKind)
+CCursor*
+CGdiEngine::GetStdCursor (EStdCursor CursorKind)
 {
 	static LPCTSTR StockCursorResTable [EStdCursor__Count] = 
 	{
@@ -156,13 +155,13 @@ CEngine::GetStdCursor (EStdCursor CursorKind)
 	if (m_StdCursorArray [CursorKind])
 		return m_StdCursorArray [CursorKind];
 	
-	ref::CPtrT <ICursor> Cursor = CreateStockCursor (StockCursorResTable [CursorKind]);
+	ref::CPtrT <CCursor> Cursor = CreateStockCursor (StockCursorResTable [CursorKind]);
 	m_StdCursorArray [CursorKind] = Cursor;
 	return Cursor;
 }
 
-ref::CPtrT <IImage>
-CEngine::CreateImage (
+ref::CPtrT <CImage>
+CGdiEngine::CreateImage (
 	int Width,
 	int Height,
 	EPixelFormat PixelFormat,
@@ -236,39 +235,39 @@ CEngine::CreateImage (
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 	}
 	
-	ref::CPtrT <CBitmap> Bitmap = AXL_REF_NEW (ref::CBoxT <CBitmap>);
-	Bitmap->m_h = hBitmap;
-	return Bitmap;
+	ref::CPtrT <CGdiImage> Image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
+	Image->m_h = hBitmap;
+	return Image;
 }
 
-ref::CPtrT <IImageList>
-CEngine::CreateImageList (
+ref::CPtrT <CImageList>
+CGdiEngine::CreateImageList (
 	int Width,
 	int Height
 	)
 {
 	HIMAGELIST hImageList = NULL;
 
-	ref::CPtrT <CImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CImageList>);
+	ref::CPtrT <CGdiImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CGdiImageList>);
 	ImageList->m_h = hImageList;
 	return ImageList;
 }
 
-ref::CPtrT <IImageList>
-CEngine::CreateImageList (
-	IImage* pStipImage,
+ref::CPtrT <CImageList>
+CGdiEngine::CreateImageList (
+	CImage* pStipImage,
 	int Width
 	)
 {
 	HIMAGELIST hImageList = NULL;
 
-	ref::CPtrT <CImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CImageList>);
+	ref::CPtrT <CGdiImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CGdiImageList>);
 	ImageList->m_h = hImageList;
 	return ImageList;
 }
 
-ref::CPtrT <ICanvas>
-CEngine::CreateOffscreenCanvas (
+ref::CPtrT <ÑCanvas>
+CGdiEngine::CreateOffscreenCanvas (
 	int Width,
 	int Height
 	)	
@@ -280,8 +279,8 @@ CEngine::CreateOffscreenCanvas (
 
 	HDC hdc = ::CreateCompatibleDC (ScreenDc);
 
-	ref::CPtrT <CDc> Dc = AXL_REF_NEW (ref::CBoxT <CDc>);	
-	Dc->Attach (hdc, NULL, CDc::EDestruct_DeleteDc);
+	ref::CPtrT <CGdiCanvas> Dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);	
+	Dc->Attach (hdc, NULL, CGdiCanvas::EDestruct_DeleteDc);
 	Dc->m_hBitmap = hBitmap;
 	Dc->m_hPrevBitmap = (HBITMAP) ::SelectObject (hdc, hBitmap);
 
@@ -289,7 +288,7 @@ CEngine::CreateOffscreenCanvas (
 }
 
 bool
-CEngine::ReadClipboard (rtl::CString* pString)
+CGdiEngine::ReadClipboard (rtl::CString* pString)
 {
 	bool Result = OpenClipboard ();
 	if (!Result)		
@@ -325,7 +324,7 @@ CEngine::ReadClipboard (rtl::CString* pString)
 }
 
 bool
-CEngine::WriteClipboard (
+CGdiEngine::WriteClipboard (
 	const char* pString,
 	size_t Length
 	)
@@ -347,7 +346,7 @@ CEngine::WriteClipboard (
 }
 
 bool
-CEngine::OpenClipboard ()
+CGdiEngine::OpenClipboard ()
 {
 	bool_t Result;
 
@@ -378,6 +377,5 @@ CEngine::OpenClipboard ()
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

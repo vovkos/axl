@@ -245,8 +245,8 @@ bool
 CCast_FpFromBeInt::GetCastOperators (
 	const CValue& OpValue,
 	CType* pType,
-	ICastOperator** ppFirstOperator,
-	ICastOperator** ppSecondOperator,
+	CCastOperator** ppFirstOperator,
+	CCastOperator** ppSecondOperator,
 	CType** ppIntermediateType
 	)
 {
@@ -266,8 +266,8 @@ bool
 CCast_FpFromEnum::GetCastOperators (
 	const CValue& OpValue,
 	CType* pType,
-	ICastOperator** ppFirstOperator,
-	ICastOperator** ppSecondOperator,
+	CCastOperator** ppFirstOperator,
+	CCastOperator** ppSecondOperator,
 	CType** ppIntermediateType
 	)
 {
@@ -283,7 +283,7 @@ CCast_FpFromEnum::GetCastOperators (
 
 //.............................................................................
 
-ICastOperator*
+CCastOperator*
 CCast_Fp::GetCastOperator (
 	const CValue& OpValue,
 	CType* pType
@@ -326,8 +326,8 @@ CCast_Fp::GetCastOperator (
 	case EType_Double:
 		return 
 			SrcSize == DstSize ? m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_Copy) : 
-			SrcSize > DstSize ? (ICastOperator*) &m_Trunc : 
-			(ICastOperator*) &m_Ext;
+			SrcSize > DstSize ? (CCastOperator*) &m_Trunc : 
+			(CCastOperator*) &m_Ext;
 
 	case EType_Enum:
 		return &m_FromEnum;

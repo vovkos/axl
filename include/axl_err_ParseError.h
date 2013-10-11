@@ -30,7 +30,7 @@ enum EParseError
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CParseErrorProvider: public IErrorProvider
+class CParseErrorProvider: public CErrorProvider
 {
 public:
 	virtual 

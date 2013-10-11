@@ -16,7 +16,7 @@ namespace io {
 //.............................................................................
 
 class CSocketTransport: 
-	public ITransport,
+	public CTransport,
 	public rtl::CHandleT <SOCKET>
 {
 public:

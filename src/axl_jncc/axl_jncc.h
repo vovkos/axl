@@ -24,10 +24,10 @@ enum EJncError
 //.............................................................................
 
 void 
-PrintVersion (IOutStream* pOutStream);
+PrintVersion (COutStream* pOutStream);
 
 void 
-PrintUsage (IOutStream* pOutStream);
+PrintUsage (COutStream* pOutStream);
 
 //.............................................................................
 
@@ -52,7 +52,7 @@ protected:
 	static CJnc* s_pCurrentJnc;
 
 	CCmdLine* m_pCmdLine;
-	IOutStream* m_pOutStream;
+	COutStream* m_pOutStream;
 
 	jnc::CModule m_Module;
 	jnc::CRuntime m_Runtime;	
@@ -73,7 +73,7 @@ public:
 		return s_pCurrentJnc;
 	}
 
-	IOutStream* 
+	COutStream* 
 	GetOutStream ()
 	{
 		return m_pOutStream;
@@ -82,7 +82,7 @@ public:
 	int
 	Run (
 		CCmdLine* pCmdLine,
-		IOutStream* pOutStream
+		COutStream* pOutStream
 		);
 
 protected:

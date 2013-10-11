@@ -67,7 +67,7 @@ bool
 CWidget::IncapsulateOrProcessBinBlock (
 	const void* p,
 	size_t Size,
-	IProcessBinBlock* pProcess
+	CProcessBinBlock* pProcess
 	)
 {
 	// normally Size (from a single line) should be much less than EDef_MaxBinBlockBuffer
@@ -88,7 +88,7 @@ size_t
 CWidget::ProcessRangeAsBinBlock (
 	const gui::TCursorPos& RawPosStart,
 	const gui::TCursorPos& RawPosEnd,
-	IProcessBinBlock* pProcess
+	CProcessBinBlock* pProcess
 	)
 {
 	gui::TCursorPos PosStart = RawPosStart;
@@ -166,7 +166,7 @@ size_t
 CWidget::ProcessRange (
 	const gui::TCursorPos& RawPosStart,
 	const gui::TCursorPos& RawPosEnd,
-	IProcessLine* pProcess
+	CProcessLine* pProcess
 	)
 {
 	gui::TCursorPos PosStart = RawPosStart;

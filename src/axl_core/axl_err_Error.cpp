@@ -28,7 +28,7 @@ TError::IsKind (
 rtl::CString
 TError::GetDescription () const
 {
-	IErrorProvider* pProvider = GetErrorMgr ()->FindProvider (m_Guid);
+	CErrorProvider* pProvider = GetErrorMgr ()->FindProvider (m_Guid);
 	
 	return pProvider ? 
 		pProvider->GetErrorDescription (this) : 
@@ -116,11 +116,11 @@ CError::Format_va (
 	axl_va_list va
 	)
 {
-	rtl::CPackerSeq Pack;
-	Pack.Format (pFormat);
+	rtl::CPackerSeq Packer;
+	Packer.Format (pFormat);
 
 	size_t PackSize;
-	Pack.Pack_va (NULL, &PackSize, va);
+	Packer.Pack_va (NULL, &PackSize, va);
 	
 	size_t Size = sizeof (TError) + PackSize;
 
@@ -132,7 +132,7 @@ CError::Format_va (
 	m_p->m_Guid = Guid;
 	m_p->m_Code = Code;
 
-	Pack.Pack_va (m_p + 1, &PackSize, va);
+	Packer.Pack_va (m_p + 1, &PackSize, va);
 	return m_p;
 }
 

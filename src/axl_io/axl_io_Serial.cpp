@@ -67,7 +67,7 @@ CSerial::GetStatusLines ()
 bool
 CSerial::SetEventHandler (
 	int Mask,
-	exe::IFunction* pOnEvent
+	const exe::CFunction& OnEvent
 	)
 {
 	return false;

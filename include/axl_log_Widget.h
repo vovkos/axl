@@ -45,14 +45,14 @@ enum EColor
 //.............................................................................
 
 class CWidget: 
-	public gui::IWidget,
-	public IClient
+	public gui::CWidget,
+	public CClient
 {
 	friend class CCacheMgr;
 	friend class CColorizeMgr;
 
 protected:
-	IServer* m_pServer;
+	ÑServer* m_pServer;
 
 	CCacheMgr m_CacheMgr;
 
@@ -109,7 +109,7 @@ protected:
 
 	rtl::CString m_TimestampFormat;
 
-	gui::IImageList* m_pImageList;	
+	gui::CImageList* m_pImageList;	
 	gui::TPoint m_IconOrigin;
 	gui::TSize m_CharSize;
 
@@ -133,15 +133,15 @@ protected:
 */
 
 public:
-	CWidget (gui::IEngine* pEngine);
+	CWidget (gui::CEngine* pEngine);
 
 	bool
 	Create (
-		IServer* pServer,
+		ÑServer* pServer,
 		const char* pIndexFileName
 		);
 
-	// IServer
+	// ÑServer
 
 	virtual
 	void
@@ -166,7 +166,7 @@ public:
 	bool
 	SetPacketFile (
 		CPacketFile* pPacketFile,
-		IRepresenter* pRepresenter
+		CRepresenter* pRepresenter
 		);
 
 	CPacketFile* 
@@ -175,14 +175,14 @@ public:
 		return m_IndexMgr.GetPacketFile ();
 	}
 
-	IRepresenter* 
+	CRepresenter* 
 	GetRepresenter ()
 	{
 		return m_IndexMgr.GetRepresenter ();
 	}
 
 	void
-	SetRepresenter (IRepresenter* pRepresenter)
+	SetRepresenter (CRepresenter* pRepresenter)
 	{
 		m_IndexMgr.SetRepresenter (pRepresenter);
 		FullUpdateLog ();
@@ -217,14 +217,14 @@ public:
 */
 	// colorizer
 /*
-	IColorizer* 
+	CColorizer* 
 	GetColorizer ()
 	{
 		return m_ColorizeMgr.GetColorizer ();
 	}
 
 	void
-	SetColorizer (IColorizer* pColorizer)
+	SetColorizer (CColorizer* pColorizer)
 	{
 		m_ColorizeMgr.SetColorizer (pColorizer);
 		Redraw ();
@@ -240,14 +240,14 @@ public:
 
 	// icons
 
-	gui::IImageList*
+	gui::CImageList*
 	GetImageList ()
 	{
 		return m_pImageList;
 	}
 
 	void
-	SetImageList (gui::IImageList* pImageList);
+	SetImageList (gui::CImageList* pImageList);
 
 	bool
 	IsIconVisible ()
@@ -497,24 +497,24 @@ public:
 	ProcessRange (
 		const gui::TCursorPos& PosStart,
 		const gui::TCursorPos& PosEnd,
-		IProcessLine* pProcess
+		CProcessLine* pProcess
 		);
 
 	size_t
 	ProcessRangeAsBinBlock (
 		const gui::TCursorPos& PosStart,
 		const gui::TCursorPos& PosEnd,
-		IProcessBinBlock* pProcess
+		CProcessBinBlock* pProcess
 		);
 
 	size_t
-	ProcessSelection (IProcessLine* pProcess)
+	ProcessSelection (CProcessLine* pProcess)
 	{
 		return ProcessRange (m_SelStart, m_SelEnd, pProcess);
 	}
 
 	size_t
-	ProcessSelectionAsBinBlock (IProcessBinBlock* pProcess)
+	ProcessSelectionAsBinBlock (CProcessBinBlock* pProcess)
 	{
 		return ProcessRangeAsBinBlock (m_SelStart, m_SelEnd, pProcess);
 	}
@@ -812,7 +812,7 @@ protected:
 	IncapsulateOrProcessBinBlock (
 		const void* p,
 		size_t Size,
-		IProcessBinBlock* pProcess
+		CProcessBinBlock* pProcess
 		);
 */
 	// copy

@@ -29,18 +29,18 @@ CErrorMgr::CErrorMgr ()
 void
 CErrorMgr::RegisterProvider (
 	const rtl::TGuid& Guid,
-	IErrorProvider* pProvider
+	CErrorProvider* pProvider
 	)
 {
 	mt::CScopeLock ScopeLock (&m_Lock);
 	m_ProviderMap.Goto (Guid)->m_Value = pProvider;
 }
 
-IErrorProvider* 
+CErrorProvider* 
 CErrorMgr::FindProvider (const rtl::TGuid& Guid)
 {
 	mt::CScopeLock ScopeLock (&m_Lock);
-	rtl::CHashTableMapIteratorT <rtl::TGuid, IErrorProvider*> It = m_ProviderMap.Find (Guid);
+	rtl::CHashTableMapIteratorT <rtl::TGuid, CErrorProvider*> It = m_ProviderMap.Find (Guid);
 	return It ? It->m_Value : NULL;
 }
 

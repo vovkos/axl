@@ -15,7 +15,7 @@
 namespace axl {
 namespace gui {
 
-struct IFont;
+class CFont;
 
 //.............................................................................
 
@@ -99,8 +99,8 @@ struct TFontTuple
 {
 	TFontDesc m_FontDesc;
 	
-	IFont* m_pBaseFont;
-	IFont* m_FontModArray [0x10];
+	CFont* m_pBaseFont;
+	CFont* m_FontModArray [0x10];
 
 	TFontTuple ()
 	{
@@ -113,7 +113,7 @@ struct TFontTuple
 
 template <typename T>
 class CFontTupleT: 
-	public ref::IRefCount,
+	public ref::CRefCount,
 	public TFontTuple
 {
 public:
@@ -130,14 +130,14 @@ public:
 
 //.............................................................................
 
-struct IFont: IGuiItem
+class CFont: public CGuiItem
 {
 protected:
 	TFontTuple* m_pTuple;
 	TFontDesc m_FontDesc;
 
 public:
-	IFont ()
+	CFont ()
 	{
 		m_pTuple = NULL;
 	}
@@ -148,7 +148,7 @@ public:
 		return &m_FontDesc;
 	}
 
-	IFont*
+	CFont*
 	GetFontMod (uint_t Flags);
 
 	virtual

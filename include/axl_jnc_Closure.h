@@ -16,7 +16,7 @@ class CPropertyPtrType;
 
 //.............................................................................
 
-class CClosure: public ref::IRefCount
+class CClosure: public ref::CRefCount
 {
 	friend class CValue;
 

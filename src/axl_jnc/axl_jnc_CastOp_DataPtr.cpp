@@ -394,7 +394,7 @@ CCast_DataPtr::CCast_DataPtr ()
 	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Thin]     = &m_Thin2Thin;
 }
 
-ICastOperator*
+CCastOperator*
 CCast_DataPtr::GetCastOperator (
 	const CValue& OpValue,
 	CType* pType

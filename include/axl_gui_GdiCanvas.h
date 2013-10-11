@@ -4,25 +4,78 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_PAINTER_H
+#define _AXL_GUI_GDICANVAS_H
 
 #include "axl_gui_Canvas.h"
 #include "axl_rtl_Handle.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-class CPainter: 
-	public ICanvas,
-	public rtl::CHandleT <QPainter*, rtl::CCppDeleteT <QPainter> >
+class CScreenDc
 {
-	friend class CEngine;
+protected:
+	HDC m_hdc;
 
 public:
-	CPainter ();
+	CScreenDc ()
+	{
+		m_hdc = ::GetDC (NULL);
+	};
+
+	~CScreenDc ()
+	{
+		::ReleaseDC (NULL, m_hdc);
+	};
+
+	operator HDC ()
+	{
+		return m_hdc;
+	}
+};
+
+//.............................................................................
+
+class CGdiCanvas: 
+	public ÑCanvas,
+	public rtl::CHandleT <HDC>
+{
+	friend class CGdiEngine;
+	friend class CGdiWidgetImpl;
+
+protected:
+	enum EDestruct
+	{
+		EDestruct_None = 0,
+		EDestruct_DeleteDc,
+		EDestruct_ReleaseDc
+	};
+
+protected:	
+	EDestruct m_DestructKind;
+
+	HWND m_hWnd;
+	HDC m_hCompatibleDc;
+	HBITMAP m_hBitmap;
+	HBITMAP m_hPrevBitmap;
+	HFONT m_hPrevFont;
+
+public:
+	CGdiCanvas ();
+
+	~CGdiCanvas ()
+	{
+		Release ();
+	}
+
+	void
+	Attach (
+		HDC hdc,
+		HWND hWnd,
+		EDestruct DestructKind
+		);
 
 	virtual
 	bool
@@ -55,7 +108,7 @@ public:
 	DrawImage (
 		int x,
 		int y,
-		IImage* pImage,
+		CImage* pImage,
 		int Left,
 		int Top,
 		int Right,
@@ -67,14 +120,14 @@ public:
 	DrawImage (
 		int x,
 		int y,
-		IImageList* pImageList,
+		CImageList* pImageList,
 		size_t Index
 		);
 
 	virtual
 	bool
 	CopyRect (
-		ICanvas* pSrcCanvas,
+		ÑCanvas* pSrcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
@@ -82,10 +135,13 @@ public:
 		int Width,
 		int Height
 		);
+
+protected:
+	void
+	Release ();
 };
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

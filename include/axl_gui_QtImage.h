@@ -4,25 +4,24 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_PIXMAP_H
+#define _AXL_GUI_QTIMAGE_H
 
 #include "axl_gui_Image.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-class CPixmap: public IImage
+class CQtImage: public CImage
 {
-	friend class CEngine;
+	friend class CQtEngine;
 
 public:
 	QPixmap m_QtPixmap;
 	
 public:
-	CPixmap ();
+	CQtImage ();
 
 	virtual
 	bool
@@ -37,7 +36,6 @@ public:
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl
 

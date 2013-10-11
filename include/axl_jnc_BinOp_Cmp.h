@@ -21,7 +21,7 @@ GetPtrCmpOperatorOperandType (
 //.............................................................................
 
 template <typename T>
-class CBinOpT_Cmp: public IBinaryOperator
+class CBinOpT_Cmp: public CBinaryOperator
 {
 public:
 	virtual

@@ -14,7 +14,7 @@ namespace jnc {
 //.............................................................................
 
 template <typename T>
-class CBinOpT_Arithmetic: public IBinaryOperator
+class CBinOpT_Arithmetic: public CBinaryOperator
 {
 public:
 	enum

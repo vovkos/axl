@@ -501,7 +501,7 @@ CCast_PropertyPtr::CCast_PropertyPtr ()
 	m_OperatorTable [EPropertyPtrType_Thin] [EPropertyPtrType_Thin]     = &m_Thin2Thin;
 }
 
-ICastOperator*
+CCastOperator*
 CCast_PropertyPtr::GetCastOperator (
 	const CValue& OpValue,
 	CType* pType

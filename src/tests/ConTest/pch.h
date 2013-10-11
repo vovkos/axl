@@ -93,7 +93,7 @@ extern "C" {
 #include <axl_llk_Parser.h>
 
 #include <axl_lua_StringTemplate.h>
-#include <axl_gui_gdi_Engine.h>
+#include <axl_gui_GdiEngine.h>
 
 #include <axl_log_PacketFile.h>
 #include <axl_log_Widget.h>

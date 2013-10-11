@@ -29,7 +29,7 @@ struct TIndexRepresenterTargetData;
 
 //.............................................................................
 
-class CServer: public IServer
+class CServer: public ÑServer
 {
 	friend class CIoThread;
 
@@ -57,10 +57,10 @@ protected:
 	mt::CLock m_Lock;
 	uint_t m_Flags;
 
-	IClient* m_pClient;
-	IRepresenter* m_pRepresenter;
-	IColorizer* m_pColorizer;
-	IHyperlinkHandler* m_pHyperlinkHandler;
+	CClient* m_pClient;
+	CRepresenter* m_pRepresenter;
+	CColorizer* m_pColorizer;
+	CHyperlinkHandler* m_pHyperlinkHandler;
 
 	CPacketFile m_PacketFile;   // accessed from io thread only
 	CPacketFile m_PacketFile_w; // only for ESrvMsg_WritePacket
@@ -90,9 +90,9 @@ public:
 
 	bool
 	Create (
-		IClient* pClient,
-		IRepresenter* pRepresenter,
-		IColorizer* pColorizer,
+		CClient* pClient,
+		CRepresenter* pRepresenter,
+		CColorizer* pColorizer,
 		const char* pPacketFilePath,
 		const char* pMergeFilePath,
 		const char* pColorFilePath

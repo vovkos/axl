@@ -26,7 +26,7 @@ CListenerPipe::Listen (
 	const char* pName,
 	SECURITY_DESCRIPTOR* pSd,
 	size_t BackLog,
-	exe::IFunction* pOnAccept
+	const exe::CFunction& OnAccept
 	)
 {
 	return false;
@@ -38,7 +38,7 @@ bool
 CConnectionPipe::Connect (
 	const char* pAddress,
 	uint_t Timeout,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	return false;
@@ -47,7 +47,7 @@ CConnectionPipe::Connect (
 bool 
 CConnectionPipe::Disconnect (
 	uint_t Timeout,
-	exe::IFunction* pOnComplete
+	const exe::CFunction& OnComplete
 	)
 {
 	return false;
@@ -78,7 +78,7 @@ bool
 CConnectionPipe::Send (
 	const void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete // void OnComplete (size_t ActualSize);
+	const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
 	)
 {
 	return false;
@@ -88,7 +88,7 @@ bool
 CConnectionPipe::Recv (
 	void* p,
 	size_t Size,
-	exe::IFunction* pOnComplete // void OnComplete (size_t ActualSize);
+	const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
 	)
 {
 	return false;

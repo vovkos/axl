@@ -14,24 +14,24 @@ namespace ref {
 
 //.............................................................................
 
-// IRefCount decouples destruction and freeing but not in a traditional vtable way
+// CRefCount decouples destruction and freeing but not in a traditional vtable way
 // this is done to allow overriding allocation at run-time.
 
-// IRefCount features:
+// CRefCount features:
 // -weak references and strong references
 // -using different allocators for creating ref-counted object
 // -creating ref-counted objects on member fields buffers (be sure to make container non-copiable)
 // -creating ref-counted objects on static/stack buffers
 
 // pfFree could be set to values -10..-1, NULL 
-// these constants result in no built-in deallocation in IRefCount::WeakRelease ()
+// these constants result in no built-in deallocation in CRefCount::WeakRelease ()
 // could be used as marker for special kinds of deallocation or reference counting
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class IRefCount
+class CRefCount
 {
-	AXL_DISABLE_COPY (IRefCount)
+	AXL_DISABLE_COPY (CRefCount)
 	
 protected:
 	volatile int32_t m_RefCount;
@@ -42,9 +42,9 @@ protected:
 	mem::FFree m_pfFree;
 
 public:
-	IRefCount ();
+	CRefCount ();
 
-	~IRefCount ()
+	~CRefCount ()
 	{ 
 		ASSERT (m_RefCount == 0 && m_WeakRefCount > 0);
 	}
@@ -112,7 +112,7 @@ public:
 
 template <typename T>
 class CBoxT: 
-	public IRefCount,
+	public CRefCount,
 	public T
 {
 };

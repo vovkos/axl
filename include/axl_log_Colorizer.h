@@ -13,7 +13,7 @@ namespace log {
 
 //.............................................................................
 
-struct IColorizerTarget
+struct CColorizerTarget
 {
 	virtual
 	void 
@@ -26,13 +26,13 @@ struct IColorizerTarget
 
 //.............................................................................
 
-struct IColorizer
+struct CColorizer
 {
 protected:
 	size_t m_StateSize;
 
 public:
-	IColorizer ()
+	CColorizer ()
 	{
 		m_StateSize = 0;
 	}
@@ -46,7 +46,7 @@ public:
 	virtual 
 	void
 	Colorize (
-		IColorizerTarget* pTarget, 
+		CColorizerTarget* pTarget, 
 		const void* p,
 		size_t Size,
 		bool IsFinal,
@@ -55,7 +55,7 @@ public:
 
 	void
 	Finalize (
-		IColorizerTarget* pTarget, 
+		CColorizerTarget* pTarget, 
 		void* pStateBuffer
 		)
 	{

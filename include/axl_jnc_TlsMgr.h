@@ -28,7 +28,7 @@ struct TTlsData: public rtl::TListLink
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CTlsDirectory: public ref::IRefCount
+class CTlsDirectory: public ref::CRefCount
 {
 protected:
 	rtl::CArrayT <TTlsData*> m_Table;

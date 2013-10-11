@@ -1,21 +1,20 @@
 #include "pch.h"
-#include "axl_gui_qt_ImageList.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_gui_QtImageList.h"
+#include "axl_gui_QtEngine.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-CImageList::CImageList ()
+CQtImageList::CQtImageList ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CQtEngine::GetSingleton ();
 }
 
 bool
-CImageList::InsertImage (
-	IImage* pImage,
+CQtImageList::InsertImage (
+	CImage* pImage,
 	size_t Index
 	)
 {
@@ -23,13 +22,12 @@ CImageList::InsertImage (
 }
 
 bool
-CImageList::RemoveImage (size_t Index)
+CQtImageList::RemoveImage (size_t Index)
 {
 	return true;
 }
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

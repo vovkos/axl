@@ -1,16 +1,15 @@
 #include "pch.h"
-#include "axl_gui_gdi_Dc.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiCanvas.h"
+#include "axl_gui_GdiEngine.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-CDc::CDc ()
+CGdiCanvas::CGdiCanvas ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CGdiEngine::GetSingleton ();
 	m_DestructKind = EDestruct_None;
 	m_hCompatibleDc = NULL;
 	m_hBitmap = NULL;
@@ -19,7 +18,7 @@ CDc::CDc ()
 }
 
 void
-CDc::Attach (
+CGdiCanvas::Attach (
 	HDC hdc,
 	HWND hWnd,
 	EDestruct DestructKind
@@ -33,7 +32,7 @@ CDc::Attach (
 }
 
 void
-CDc::Release ()
+CGdiCanvas::Release ()
 {
 	if (!m_h)
 		return;
@@ -70,7 +69,7 @@ CDc::Release ()
 }
 
 bool
-CDc::DrawRect (
+CGdiCanvas::DrawRect (
 	int Left,
 	int Top,
 	int Right,
@@ -95,7 +94,7 @@ CDc::DrawRect (
 }
 
 bool
-CDc::DrawText (
+CGdiCanvas::DrawText (
 	int x,
 	int y,
 	int Left,
@@ -113,12 +112,12 @@ CDc::DrawText (
 	BackColor = OverlayColor (m_BaseTextAttr.m_BackColor, BackColor);
 	FontFlags = OverlayFontFlags (m_BaseTextAttr.m_FontFlags, FontFlags);
 
-	IFont* pFont = m_pBaseFont->GetFontMod (FontFlags);
+	CFont* pFont = m_pBaseFont->GetFontMod (FontFlags);
 
 	if (m_pFont != pFont)
 	{
 		ASSERT (pFont->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-		CFont* pGdiFont = (CFont*) pFont;
+		CGdiFont* pGdiFont = (CGdiFont*) pFont;
 
 		m_pFont = pFont;
 		HFONT hPrevFont = (HFONT) ::SelectObject (m_h, *pGdiFont);
@@ -153,10 +152,10 @@ CDc::DrawText (
 }
 
 bool
-CDc::DrawImage (
+CGdiCanvas::DrawImage (
 	int x,
 	int y,
-	IImage* pImage,
+	CImage* pImage,
 	int Left,
 	int Top,
 	int Right,
@@ -164,7 +163,7 @@ CDc::DrawImage (
 	)
 {
 	ASSERT (pImage->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-	CBitmap* pBitmap = (CBitmap*) pImage;
+	CGdiImage* pGdiImage = (CGdiImage*) pImage;
 
 	if (!m_hCompatibleDc)
 	{
@@ -172,7 +171,7 @@ CDc::DrawImage (
 		m_hCompatibleDc = ::CreateCompatibleDC (ScreenDc);
 	}
 
-	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *pBitmap);
+	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *pGdiImage);
 	
 	::BitBlt (
 		m_h, 
@@ -191,22 +190,22 @@ CDc::DrawImage (
 }
 
 bool
-CDc::DrawImage (
+CGdiCanvas::DrawImage (
 	int x,
 	int y,
-	IImageList* pImageList,
+	CImageList* pImageList,
 	size_t Index
 	)
 {
 	ASSERT (pImageList->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-	CImageList* pGdiImageList = (CImageList*) pImageList;
+	CGdiImageList* pGdiImageList = (CGdiImageList*) pImageList;
 
 	return true;
 }
 
 bool
-CDc::CopyRect (
-	ICanvas* pSrcCanvas,
+CGdiCanvas::CopyRect (
+	ÑCanvas* pSrcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,
@@ -216,7 +215,7 @@ CDc::CopyRect (
 	)
 {
 	ASSERT (pSrcCanvas->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-	CDc* pDc = (CDc*) pSrcCanvas;
+	CGdiCanvas* pDc = (CGdiCanvas*) pSrcCanvas;
 
 	::BitBlt (
 		m_h, 
@@ -235,6 +234,5 @@ CDc::CopyRect (
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

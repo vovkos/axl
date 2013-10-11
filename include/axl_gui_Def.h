@@ -11,7 +11,7 @@
 namespace axl {
 namespace gui {
 
-struct IEngine;
+class CEngine;
 
 //.............................................................................
 
@@ -521,18 +521,18 @@ struct TCursorPos
 
 //.............................................................................
 
-struct IGuiItem
+class CGuiItem
 {
 protected:
-	IEngine* m_pEngine;
+	CEngine* m_pEngine;
 
 public:
-	IGuiItem ()
+	CGuiItem ()
 	{
 		m_pEngine = NULL;
 	}
 
-	IEngine* 
+	CEngine* 
 	GetEngine ()
 	{
 		return m_pEngine;

@@ -25,8 +25,9 @@ struct TMsg
 
 //.............................................................................
 
-struct IPeer
+class CPeer
 {
+public:
 	virtual
 	void
 	SendMsg (const TMsg* pMsg) = 0;
@@ -84,8 +85,9 @@ struct TSrvMsg_FoldPacket: TMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct IServer: IPeer
+class ÑServer: CPeer
 {
+public:
 	void 
 	Clear ();
 
@@ -220,8 +222,9 @@ struct TCliMsg_FoldPacketComplete: TMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct IClient: IPeer
+class CClient: public CPeer
 {
+public:
 	void 
 	ClearCache (uint64_t SyncId);
 

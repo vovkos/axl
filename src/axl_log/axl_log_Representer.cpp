@@ -8,7 +8,7 @@ namespace log {
 //.............................................................................
 
 void
-IRepresenterTarget::AddText0 (
+CRepresenterTarget::AddText0 (
 	EPart PartKind,
 	uint_t PartCode,
 	const char* pText,
@@ -27,7 +27,7 @@ IRepresenterTarget::AddText0 (
 }
 
 void
-IRepresenterTarget::AddText_va (
+CRepresenterTarget::AddText_va (
 	EPart PartKind,
 	uint_t PartCode,
 	const char* pFormat,

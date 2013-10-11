@@ -55,7 +55,7 @@ GetBinOpKindString (EBinOp OpKind)
 
 //.............................................................................
 
-IBinaryOperator::IBinaryOperator()
+CBinaryOperator::CBinaryOperator()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
@@ -65,7 +65,7 @@ IBinaryOperator::IBinaryOperator()
 }
 
 bool
-IBinaryOperator::GetResultType (
+CBinaryOperator::GetResultType (
 	const CValue& OpValue1,
 	const CValue& OpValue2,
 	CValue* pResultValue

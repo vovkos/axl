@@ -159,7 +159,7 @@ COperatorMgr::GetUnaryOperatorResultType (
 		}
 	}
 
-	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
+	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
 	ASSERT (pOperator);
 	return pOperator->GetResultType (OpValue);
 }
@@ -207,7 +207,7 @@ COperatorMgr::UnaryOperator (
 		}
 	}
 
-	IUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
+	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
 	ASSERT (pOperator);
 
 	return 
@@ -242,7 +242,7 @@ COperatorMgr::GetBinaryOperatorResultType (
 		}
 	}
 
-	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
+	CBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
 	ASSERT (pOperator);
 
 	PrepareOperandType (RawOpValue1, &OpValue1, pOperator->GetOpFlags1 ());
@@ -304,7 +304,7 @@ COperatorMgr::BinaryOperator (
 		}
 	}
 
-	IBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
+	CBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
 	ASSERT (pOperator);
 
 	return
@@ -414,7 +414,7 @@ COperatorMgr::CastOperator (
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 	
-	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
+	CCastOperator* pOperator = m_CastOperatorTable [TypeKind];
 	ASSERT (pOperator); // there is always a default
 
 	CValue OpValue;
@@ -473,7 +473,7 @@ COperatorMgr::GetCastKind (
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
 
-	ICastOperator* pOperator = m_CastOperatorTable [TypeKind];
+	CCastOperator* pOperator = m_CastOperatorTable [TypeKind];
 	ASSERT (pOperator); // there is always a default
 
 	CValue OpValue;

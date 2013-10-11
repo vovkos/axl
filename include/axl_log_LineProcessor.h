@@ -13,7 +13,7 @@ namespace log {
 
 //.............................................................................
 
-struct IProcessLine
+struct CProcessLine
 {
 	virtual 
 	void 
@@ -27,7 +27,7 @@ struct IProcessLine
 
 //.............................................................................
 
-struct IProcessBinBlock
+struct CProcessBinBlock
 {
 	virtual 
 	void 

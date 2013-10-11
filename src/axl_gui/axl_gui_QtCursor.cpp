@@ -1,20 +1,18 @@
 #include "pch.h"
-#include "axl_gui_qt_Cursor.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_gui_QtCursor.h"
+#include "axl_gui_QtEngine.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-CCursor::CCursor ()
+CQtCursor::CQtCursor ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CQtEngine::GetSingleton ();
 }
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

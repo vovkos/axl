@@ -30,7 +30,7 @@ enum EStdCursor
 
 //.............................................................................
 
-struct ICursor: IGuiItem
+class CCursor: public CGuiItem
 {
 };
 

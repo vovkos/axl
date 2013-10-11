@@ -13,7 +13,7 @@ namespace log {
 
 //.............................................................................
 
-struct IHyperlinkHandler
+struct CHyperlinkHandler
 {
 	virtual 
 	bool 

@@ -17,7 +17,7 @@ CCacheMgr::CCacheMgr ()
 bool
 CCacheMgr::Create (
 	CWidget* pWidget,
-	IServer* pServer,
+	ÑServer* pServer,
 	const char* pIndexFileName
 	)
 {

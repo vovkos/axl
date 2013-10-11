@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CBinOp_Assign: public IBinaryOperator
+class CBinOp_Assign: public CBinaryOperator
 {
 public:
 	CBinOp_Assign ()
@@ -42,7 +42,7 @@ public:
 
 //.............................................................................
 
-class CBinOp_OpAssign: public IBinaryOperator
+class CBinOp_OpAssign: public CBinaryOperator
 {
 public:
 	CBinOp_OpAssign ()
@@ -72,7 +72,7 @@ public:
 
 //.............................................................................
 
-class CBinOp_RefAssign: public IBinaryOperator
+class CBinOp_RefAssign: public CBinaryOperator
 {
 public:
 	CBinOp_RefAssign ()

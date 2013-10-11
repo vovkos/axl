@@ -138,8 +138,8 @@ enum EStdType
 	EStdType_SimpleEventPtr,
 	EStdType_Binder,
 	EStdType_AutoEvBindSite,
-	EStdType_IScheduler,
-	EStdType_ISchedulerPtr,
+	EStdType_Scheduler,
+	EStdType_SchedulerPtr,
 	EStdType_FmtLiteral,
 	EStdType__Count,
 };

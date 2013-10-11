@@ -24,8 +24,8 @@ GetEngineKindString (EEngine EngineKind)
 
 //.............................................................................
 
-ICanvas*
-IEngine::GetSharedOffscreenCanvas (
+ÑCanvas*
+CEngine::GetSharedOffscreenCanvas (
 	int Width,
 	int Height
 	)
@@ -50,7 +50,7 @@ IEngine::GetSharedOffscreenCanvas (
 }
 
 void 
-IEngine::DeleteAllSharedOffscreenCanvases ()
+CEngine::DeleteAllSharedOffscreenCanvases ()
 {
 	for (size_t i = 0; i < EFormFactor__Count; i++)
 	{

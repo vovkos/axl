@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CUnOp_PreInc: public IUnaryOperator
+class CUnOp_PreInc: public CUnaryOperator
 {
 public:
 	CUnOp_PreInc ()
@@ -33,7 +33,7 @@ public:
 
 //.............................................................................
 
-class CUnOp_PostInc: public IUnaryOperator
+class CUnOp_PostInc: public CUnaryOperator
 {
 public:
 	CUnOp_PostInc ()

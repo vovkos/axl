@@ -102,7 +102,7 @@ Run_Buf ()
 
 //.............................................................................
 
-class CMyClass2: public ref::IRefCount
+class CMyClass2: public ref::CRefCount
 {
 public:
 	CMyClass2 ()
@@ -144,7 +144,7 @@ void TempFunc (T* p)
 {
 }
 
-class CMyClass3: public ref::IRefCount
+class CMyClass3: public ref::CRefCount
 {
 public:
 	int m_x;
@@ -199,7 +199,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CMyContainer: 
-	public ref::IRefCount,
+	public ref::CRefCount,
 	public IMyInterface
 {
 public:
@@ -245,7 +245,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CMySuperContainer: 
-	public ref::IRefCount,
+	public ref::CRefCount,
 	public IMyInterface
 {
 public:

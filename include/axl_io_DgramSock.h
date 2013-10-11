@@ -33,7 +33,7 @@ protected:
 		SOCKADDR m_Address;
 		int m_AddressSize;
 		OVERLAPPED m_Overlapped;
-		ref::CPtrT <exe::IFunction> m_OnComplete;		
+		exe::CFunction m_OnComplete;		
 	};
 
 public:
@@ -90,14 +90,14 @@ public:
 		const void* p,
 		size_t Size,
 		const TSockAddr* pAddr,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	bool 
 	RecvFrom (
 		void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	size_t
@@ -132,7 +132,7 @@ protected:
 		const void* p,
 		size_t Size,
 		const TSockAddr* pAddr,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	bool 
@@ -140,7 +140,7 @@ protected:
 	RecvFrom_wt (
 		void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	static 

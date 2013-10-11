@@ -13,7 +13,7 @@ namespace log {
 
 //.............................................................................
 
-struct IFilter
+struct CFilter
 {
 	virtual 
 	bool

@@ -104,8 +104,8 @@ TFontDesc::Setup (
 
 //.............................................................................
 
-IFont*
-IFont::GetFontMod (uint_t Flags)
+CFont*
+CFont::GetFontMod (uint_t Flags)
 {
 	if (Flags & EFontFlag_Transparent)
 		return this;

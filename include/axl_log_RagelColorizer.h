@@ -14,7 +14,7 @@ namespace log {
 //.............................................................................
 
 template <typename T>
-class CRagelColorizerT: public log::IColorizer
+class CRagelColorizerT: public log::CColorizer
 {
 protected:
 	struct TState
@@ -27,7 +27,7 @@ protected:
 	};
 
 protected:
-	IColorizerTarget* m_pTarget;
+	CColorizerTarget* m_pTarget;
 	char* m_pBlockBegin;
 	uint64_t m_BlockOffset;
 
@@ -67,7 +67,7 @@ public:
 	virtual 
 	void
 	Colorize (
-		IColorizerTarget* pTarget, 
+		CColorizerTarget* pTarget, 
 		const void* pBlock,
 		size_t Size,
 		bool IsFinal,

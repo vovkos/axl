@@ -14,7 +14,7 @@ namespace jnc {
 
 // integer truncation
 
-class CCast_IntTrunc: public ICastOperator
+class CCast_IntTrunc: public CCastOperator
 {
 public:
 	virtual
@@ -49,7 +49,7 @@ public:
 
 // integer extensions
 
-class CCast_IntExt: public ICastOperator
+class CCast_IntExt: public CCastOperator
 {
 public:
 	virtual
@@ -82,7 +82,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_IntExt_u: public ICastOperator
+class CCast_IntExt_u: public CCastOperator
 {
 public:
 	virtual
@@ -117,7 +117,7 @@ public:
 
 // big endian <-> little endian
 
-class CCast_SwapByteOrder: public ICastOperator
+class CCast_SwapByteOrder: public CCastOperator
 {
 public:
 	virtual
@@ -158,8 +158,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppFirstOperator,
-		ICastOperator** ppSecondOperator,
+		CCastOperator** ppFirstOperator,
+		CCastOperator** ppSecondOperator,
 		CType** ppIntermediateType
 		);
 };
@@ -174,8 +174,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppFirstOperator,
-		ICastOperator** ppSecondOperator,
+		CCastOperator** ppFirstOperator,
+		CCastOperator** ppSecondOperator,
 		CType** ppIntermediateType
 		);
 };
@@ -184,7 +184,7 @@ public:
 
 // floating point -> integer
 
-class CCast_IntFromFp: public ICastOperator
+class CCast_IntFromFp: public CCastOperator
 {
 public:
 	virtual
@@ -247,8 +247,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppFirstOperator,
-		ICastOperator** ppSecondOperator,
+		CCastOperator** ppFirstOperator,
+		CCastOperator** ppSecondOperator,
 		CType** ppIntermediateType
 		);
 };
@@ -275,8 +275,8 @@ public:
 	GetCastOperators (
 		const CValue& OpValue,
 		CType* pType,
-		ICastOperator** ppFirstOperator,
-		ICastOperator** ppSecondOperator,
+		CCastOperator** ppFirstOperator,
+		CCastOperator** ppSecondOperator,
 		CType** ppIntermediateType
 		);
 };
@@ -285,7 +285,7 @@ public:
 
 // pointer <-> integer
 
-class CCast_IntFromPtr: public ICastOperator
+class CCast_IntFromPtr: public CCastOperator
 {
 public:
 	virtual
@@ -319,7 +319,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_PtrFromInt: public ICastOperator
+class CCast_PtrFromInt: public CCastOperator
 {
 public:
 	virtual
@@ -368,7 +368,7 @@ protected:
 
 public:
 	virtual
-	ICastOperator*
+	CCastOperator*
 	GetCastOperator (
 		const CValue& OpValue,
 		CType* pType

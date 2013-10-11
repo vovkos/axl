@@ -1,24 +1,23 @@
 #include "pch.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_gui_QtEngine.h"
 #include "axl_ref_Factory.h"
 #include "axl_err_Error.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-CEngine*
-GetEngineSingleton ()
+CQtEngine*
+GetQtEngineSingleton ()
 {
-	return CEngine::GetSingleton ();
+	return CQtEngine::GetSingleton ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-IFont* 
-CEngine::GetDefaultGuiFont ()
+CFont* 
+CQtEngine::GetDefaultGuiFont ()
 {
 	if (m_DefaultGuiFont)
 		return m_DefaultGuiFont;
@@ -27,8 +26,8 @@ CEngine::GetDefaultGuiFont ()
 	return m_DefaultGuiFont;
 }
 
-IFont*
-CEngine::GetDefaultMonospaceFont ()
+CFont*
+CQtEngine::GetDefaultMonospaceFont ()
 {
 	if (m_DefaultMonospaceFont)
 		return m_DefaultMonospaceFont;
@@ -41,7 +40,7 @@ CEngine::GetDefaultMonospaceFont ()
 }
 
 QFont
-CEngine::CreateQtFont (
+CQtEngine::CreateQtFont (
 	const char* pFaceName,
 	size_t PointSize,
 	uint_t Flags
@@ -63,37 +62,37 @@ CEngine::CreateQtFont (
 	return QtFont;
 }
 
-ref::CPtrT <IFont>
-CEngine::CreateFont (const QFont& QtFont)
+ref::CPtrT <CFont>
+CQtEngine::CreateFont (const QFont& QtFont)
 {
-	CFont* pFont = AXL_MEM_NEW (CFont);
+	CQtFont* pFont = AXL_MEM_NEW (CQtFont);
 	pFont->m_QtFont = QtFont;
 	
 	GetFontDescFromFontInfo (QFontInfo (QtFont), &pFont->m_FontDesc);
 
-	ref::CPtrT <CFontTuple> FontTuple = AXL_REF_NEW (CFontTuple);
+	ref::CPtrT <CQtFontTuple> FontTuple = AXL_REF_NEW (CQtFontTuple);
 	FontTuple->m_pBaseFont = pFont;
 	FontTuple->m_FontModArray [pFont->m_FontDesc.m_Flags] = pFont;
 
 	pFont->m_pTuple = FontTuple;
 
-	return ref::CPtrT <IFont> (pFont, FontTuple);
+	return ref::CPtrT <CFont> (pFont, FontTuple);
 }
 
-IFont*
-CEngine::GetFontMod (
-	IFont* _pBaseFont,
+CFont*
+CQtEngine::GetFontMod (
+	CFont* _pBaseFont,
 	uint_t Flags
 	)
 {
 	ASSERT (_pBaseFont->GetEngine () == this);
 
-	CFont* pBaseFont = (CFont*) _pBaseFont;
-	CFontTuple* pFontTuple = (CFontTuple*) pBaseFont->m_pTuple;
+	CQtFont* pBaseFont = (CQtFont*) _pBaseFont;
+	CQtFontTuple* pFontTuple = (CQtFontTuple*) pBaseFont->m_pTuple;
 
 	TFontDesc FontDesc = *pBaseFont->GetFontDesc ();
 
-	CFont* pFont = AXL_MEM_NEW (CFont);
+	CQtFont* pFont = AXL_MEM_NEW (CQtFont);
 	pFont->m_FontDesc = FontDesc;
 	pFont->m_FontDesc.m_Flags = Flags;
 	pFont->m_QtFont = CreateQtFont (FontDesc.m_FaceName, FontDesc.m_PointSize, Flags);
@@ -105,8 +104,8 @@ CEngine::GetFontMod (
 	return pFont;
 }
 
-ICursor*
-CEngine::GetStdCursor (EStdCursor CursorKind)
+CCursor*
+CQtEngine::GetStdCursor (EStdCursor CursorKind)
 {
 	static Qt::CursorShape StdCursorShapeTable [EStdCursor__Count] = 
 	{
@@ -125,21 +124,21 @@ CEngine::GetStdCursor (EStdCursor CursorKind)
 	if (m_StdCursorArray [CursorKind])
 		return m_StdCursorArray [CursorKind];
 	
-	ref::CPtrT <ICursor> Cursor = CreateCursor (StdCursorShapeTable [CursorKind]);
+	ref::CPtrT <CCursor> Cursor = CreateCursor (StdCursorShapeTable [CursorKind]);
 	m_StdCursorArray [CursorKind] = Cursor;
 	return Cursor;
 }
 
-ref::CPtrT <ICursor>
-CEngine::CreateCursor (const QCursor& QtCursor)
+ref::CPtrT <CCursor>
+CQtEngine::CreateCursor (const QCursor& QtCursor)
 {
-	ref::CPtrT <CCursor> Cursor = AXL_REF_NEW (ref::CBoxT <CCursor>);
+	ref::CPtrT <CQtCursor> Cursor = AXL_REF_NEW (ref::CBoxT <CQtCursor>);
 	Cursor->m_QtCursor = QtCursor;
 	return Cursor;
 }
 
-ref::CPtrT <IImage>
-CEngine::CreateImage (
+ref::CPtrT <CImage>
+CQtEngine::CreateImage (
 	int Width,
 	int Height,
 	EPixelFormat PixelFormat,
@@ -214,13 +213,13 @@ CEngine::CreateImage (
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 	} */
 	
-	ref::CPtrT <CPixmap> Pixmap = AXL_REF_NEW (ref::CBoxT <CPixmap>);
-	Pixmap->m_QtPixmap = QtPixmap;
-	return Pixmap;
+	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	Image->m_QtPixmap = QtPixmap;
+	return Image;
 }
 
-ref::CPtrT <IImageList>
-CEngine::CreateImageList (
+ref::CPtrT <CImageList>
+CQtEngine::CreateImageList (
 	int Width,
 	int Height
 	)
@@ -228,17 +227,17 @@ CEngine::CreateImageList (
 	return ref::EPtr_Null;
 }
 
-ref::CPtrT <IImageList>
-CEngine::CreateImageList (
-	IImage* pStipImage,
+ref::CPtrT <CImageList>
+CQtEngine::CreateImageList (
+	CImage* pStipImage,
 	int Width
 	)
 {
 	return ref::EPtr_Null;
 }
 
-ref::CPtrT <ICanvas>
-CEngine::CreateOffscreenCanvas (
+ref::CPtrT <ÑCanvas>
+CQtEngine::CreateOffscreenCanvas (
 	int Width,
 	int Height
 	)	
@@ -247,7 +246,7 @@ CEngine::CreateOffscreenCanvas (
 }
 
 bool
-CEngine::ReadClipboard (rtl::CString* pString)
+CQtEngine::ReadClipboard (rtl::CString* pString)
 {
 	QClipboard* pQtClipboard = QApplication::clipboard ();
 	QByteArray StringUtf8 = pQtClipboard->text ().toUtf8 ();	
@@ -257,7 +256,7 @@ CEngine::ReadClipboard (rtl::CString* pString)
 }
 
 bool
-CEngine::WriteClipboard (
+CQtEngine::WriteClipboard (
 	const char* pString,
 	size_t Length
 	)
@@ -271,6 +270,5 @@ CEngine::WriteClipboard (
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

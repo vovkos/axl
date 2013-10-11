@@ -11,7 +11,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CUnOp_LogNot: public IUnaryOperator
+class CUnOp_LogNot: public CUnaryOperator
 {
 public:
 	CUnOp_LogNot ()

@@ -19,8 +19,8 @@ namespace log {
 class CIndexMgr
 {
 protected:
-	IClient* m_pClient;
-	IRepresenter* m_pRepresenter;
+	CClient* m_pClient;
+	CRepresenter* m_pRepresenter;
 	CPacketFile* m_pPacketFile;
 	CMergeFile* m_pMergeFile;
 
@@ -50,8 +50,8 @@ public:
 
 	void
 	Setup (
-		IClient* pClient,
-		IRepresenter* pRepresenter,
+		CClient* pClient,
+		CRepresenter* pRepresenter,
 		CPacketFile* pPacketFile,
 		CMergeFile* pMergeFile
 		);

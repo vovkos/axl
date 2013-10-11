@@ -34,13 +34,13 @@ GetEngineKindString (EEngine EngineKind);
 
 //.............................................................................
 
-struct IEngine
+class CEngine
 {
 protected:
 	struct TSharedOffscreenCanvas
 	{
 		TSize m_Size;
-		ref::CPtrT <ICanvas> m_Canvas;
+		ref::CPtrT <ÑCanvas> m_Canvas;
 	};
 
 protected:
@@ -48,7 +48,7 @@ protected:
 	TSharedOffscreenCanvas m_SharedOffscreenCanvasArray [EFormFactor__Count];
 
 public:
-	IEngine ()
+	CEngine ()
 	{
 		m_EngineKind = EEngine_Undefined;
 	}
@@ -62,22 +62,22 @@ public:
 	// fonts
 
 	virtual
-	IFont*
+	CFont*
 	GetDefaultFont () = 0;
 
 	virtual
-	IFont*
+	CFont*
 	GetDefaultMonospaceFont () = 0;
 
 	virtual
-	ref::CPtrT <IFont>
+	ref::CPtrT <CFont>
 	CreateFont (
 		const char* pFaceName,
 		size_t PointSize,
 		uint_t Flags = 0
 		) = 0;
 
-	ref::CPtrT <IFont>
+	ref::CPtrT <CFont>
 	CreateFont (const TFontDesc& FontDesc)
 	{
 		return CreateFont (
@@ -90,11 +90,11 @@ public:
 	// images
 
 	virtual
-	ICursor*
+	CCursor*
 	GetStdCursor (EStdCursor CursorKind) = 0;
 
 	virtual
-	ref::CPtrT <IImage>
+	ref::CPtrT <CImage>
 	CreateImage (
 		int Width,
 		int Height,
@@ -103,7 +103,7 @@ public:
 		bool IsScreenCompatible = true
 		) = 0;
 
-	ref::CPtrT <IImage>
+	ref::CPtrT <CImage>
 	CreateImage (
 		const TImageDesc& ImageDesc,
 		bool IsScreenCompatible = true
@@ -118,35 +118,35 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <IImageList>
+	ref::CPtrT <CImageList>
 	CreateImageList (
 		int Width,
 		int Height
 		) = 0;
 
-	ref::CPtrT <IImageList>
+	ref::CPtrT <CImageList>
 	CreateImageList (const TSize& Size)
 	{
 		return CreateImageList (Size.m_Width, Size.m_Height);
 	}
 
 	virtual
-	ref::CPtrT <IImageList>
+	ref::CPtrT <CImageList>
 	CreateImageList (
-		IImage* pStipImage,
+		CImage* pStipImage,
 		int Width = 0 // if 0 then take pStripImage->GetSize ().m_Height
 		) = 0;
 
 	// offscreen canvas
 
 	virtual
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	CreateOffscreenCanvas (
 		int Width,
 		int Height
 		) = 0;
 
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	CreateOffscreenCanvas (const TSize& Size)
 	{
 		return CreateOffscreenCanvas (
@@ -155,13 +155,13 @@ public:
 			);
 	}
 
-	ICanvas*
+	ÑCanvas*
 	GetSharedOffscreenCanvas (
 		int Width,
 		int Height
 		);
 
-	ICanvas*
+	ÑCanvas*
 	GetSharedOffscreenCanvas (const TSize& Size)
 	{
 		return GetSharedOffscreenCanvas (
@@ -203,12 +203,12 @@ public:
 	}
 
 protected:
-	friend struct IFont;
+	friend class CFont;
 
 	virtual
-	IFont*
+	CFont*
 	GetFontMod (
-		IFont* pBaseFont,
+		CFont* pBaseFont,
 		uint_t Flags
 		) = 0;
 };

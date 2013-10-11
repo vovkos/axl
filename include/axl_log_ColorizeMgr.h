@@ -20,8 +20,8 @@ namespace log {
 class CColorizeMgr
 { 
 protected:
-	IRepresenter* m_pRepresenter;
-	IColorizer* m_pColorizer;
+	CRepresenter* m_pRepresenter;
+	CColorizer* m_pColorizer;
 
 	CPacketFile* m_pPacketFile;
 	CMergeFile* m_pMergeFile;
@@ -41,8 +41,8 @@ public:
 
 	void
 	Setup (
-		IRepresenter* pRepresenter,
-		IColorizer* pColorizer,
+		CRepresenter* pRepresenter,
+		CColorizer* pColorizer,
 		CPacketFile* pPacketFile,
 		CMergeFile* pMergeFile,
 		io::CMappedFile* pColorizerStateFile
@@ -64,7 +64,7 @@ class CColorizeMgr
 
 protected:
 	CMappedFile m_ColorFile;
-	IColorizer* m_pColorizer;
+	CColorizer* m_pColorizer;
 	CCacheMgr* m_pCacheMgr;
 
 	rtl::CArrayT <uchar_t> m_DataBuffer;	
@@ -75,14 +75,14 @@ protected:
 public:
 	CColorizeMgr ();
 
-	IColorizer* 
+	CColorizer* 
 	GetColorizer ()
 	{
 		return m_pColorizer;
 	}
 
 	void
-	SetColorizer (IColorizer* pColorizer);
+	SetColorizer (CColorizer* pColorizer);
 
 	bool 
 	EnsureColorized (CBinLine* pLine)

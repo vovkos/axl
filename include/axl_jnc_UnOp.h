@@ -54,7 +54,7 @@ enum EOpFlag
 
 //.............................................................................
 
-struct IUnaryOperator
+class CUnaryOperator
 {
 	friend class COperatorMgr;
 
@@ -64,7 +64,7 @@ protected:
 	uint_t m_OpFlags;
 
 public:
-	IUnaryOperator ();
+	CUnaryOperator ();
 
 	CModule*
 	GetModule ()

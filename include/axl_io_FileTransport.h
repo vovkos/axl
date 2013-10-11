@@ -15,7 +15,7 @@ namespace io {
 
 //.............................................................................
 
-class CFileTransport: public ITransport
+class CFileTransport: public CTransport
 {
 protected:
 	CFile* m_pTransmitFile;

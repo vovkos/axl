@@ -4,40 +4,28 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_PIXMAP_H
+#define _AXL_GUI_GDICURSOR_H
 
-#include "axl_gui_Image.h"
+#include "axl_gui_Cursor.h"
+#include "axl_rtl_Handle.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-class CPixmap: public IImage
+class CGdiCursor: 
+	public CCursor,
+	public rtl::CHandleT <HCURSOR>
 {
-	friend class CEngine;
+	friend class CGdiEngine;
 
 public:
-	QPixmap m_QtPixmap;
-
-public:
-	CPixmap ();
-
-	virtual
-	bool
-	GetData (
-		void* pData,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
-		);
+	CGdiCursor ();
 };
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl
 

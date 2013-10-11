@@ -846,7 +846,7 @@ protected:
 	CreateAutoEvBindSiteType ();
 
 	CClassType* 
-	CreateISchedulerType ();
+	CreateSchedulerType ();
 
 	CStructType*
 	CreateFmtLiteralType ();

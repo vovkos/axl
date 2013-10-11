@@ -16,15 +16,16 @@ namespace rtl {
 //.............................................................................
 
 template <typename T>
-struct CStringDetailsT 
+class CStringDetailsT 
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-struct CStringDetailsT <char>
+class CStringDetailsT <char>
 {
+public:
 	typedef char C;
 	typedef wchar_t C2;
 	typedef CStringDetailsT <wchar_t> CDetails2;
@@ -122,8 +123,9 @@ struct CStringDetailsT <char>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-struct CStringDetailsT <wchar_t>
+class CStringDetailsT <wchar_t>
 {
+public:
 	typedef wchar_t C;
 	typedef char C2;
 	typedef CStringDetailsT <char> CDetails2;
@@ -241,7 +243,7 @@ template <typename T>
 class CStringT
 {
 public:
-	class CHdr: public ref::IRefCount
+	class CHdr: public ref::CRefCount
 	{
 	public:
 		size_t m_MaxLength;

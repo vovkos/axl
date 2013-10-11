@@ -27,7 +27,7 @@ OnSyncSendRecvComplete (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-ITransport::SyncSend (
+CAsyncTransport::SyncSend (
 	const void* p,
 	size_t Size
 	)
@@ -54,7 +54,7 @@ ITransport::SyncSend (
 }
 
 size_t
-ITransport::SyncRecv (
+CAsyncTransport::SyncRecv (
 	void* p,
 	size_t Size
 	)

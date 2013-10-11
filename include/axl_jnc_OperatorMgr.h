@@ -152,10 +152,10 @@ protected:
 
 	// tables
 
-	IUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
-	IBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
-	ICastOperator* m_CastOperatorTable [EType__Count];
-	ICastOperator* m_StdCastOperatorTable [EStdCast__Count];
+	CUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
+	CBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
+	CCastOperator* m_CastOperatorTable [EType__Count];
+	CCastOperator* m_StdCastOperatorTable [EStdCast__Count];
 
 public:
 	COperatorMgr ();
@@ -352,7 +352,7 @@ public:
 
 	// cast operators
 
-	ICastOperator*
+	CCastOperator*
 	GetStdCastOperator (EStdCast CastKind)
 	{
 		ASSERT ((size_t) CastKind < EStdCast__Count);

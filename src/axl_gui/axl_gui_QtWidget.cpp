@@ -1,15 +1,14 @@
 #include "pch.h"
-#include "axl_gui_qt_Widget.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_gui_QtWidget.h"
+#include "axl_gui_QtEngine.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
 uint_t
-IQtWidget::GetKeyFromQtKey (int QtKey)
+CQtWidgetImpl::GetKeyFromQtKey (int QtKey)
 {
 	if (!(QtKey & 0x01000000))
 		return QtKey;
@@ -83,7 +82,7 @@ IQtWidget::GetKeyFromQtKey (int QtKey)
 }
 
 void 
-IQtWidget::OnEvent (
+CQtWidgetImpl::OnEvent (
 	QEvent* pEvent,
 	EWidgetMsg MsgKind
 	)
@@ -104,7 +103,7 @@ IQtWidget::OnEvent (
 }
 
 void 
-IQtWidget::OnMouseEvent (
+CQtWidgetImpl::OnMouseEvent (
 	QMouseEvent* pEvent,
 	EWidgetMsg MsgKind
 	)
@@ -130,7 +129,7 @@ IQtWidget::OnMouseEvent (
 }
 
 void 
-IQtWidget::OnMouseWheelEvent (QWheelEvent* pEvent)
+CQtWidgetImpl::OnMouseWheelEvent (QWheelEvent* pEvent)
 {	
 	if (!CheckMsgMask (EWidgetMsg_MouseWheel))
 	{
@@ -152,7 +151,7 @@ IQtWidget::OnMouseWheelEvent (QWheelEvent* pEvent)
 }
 
 void 
-IQtWidget::OnKeyEvent (
+CQtWidgetImpl::OnKeyEvent (
 	QKeyEvent* pEvent,
 	EWidgetMsg MsgKind
 	)
@@ -176,7 +175,7 @@ IQtWidget::OnKeyEvent (
 }
 
 void
-IQtWidget::OnPaintEvent (
+CQtWidgetImpl::OnPaintEvent (
 	QPaintEvent* pEvent,
 	QPainter* pQtPainter
 	)		
@@ -187,11 +186,11 @@ IQtWidget::OnPaintEvent (
 		return;
 	}
 	
-	CPainter Painter;
-	Painter.Attach (pQtPainter);
-	Painter.m_pBaseFont = m_pBaseFont;
-	Painter.m_BaseTextAttr = m_BaseTextAttr;
-	Painter.m_Palette = m_Palette;
+	CQtCanvas Canvas;
+	Canvas.Attach (pQtPainter);
+	Canvas.m_pBaseFont = m_pBaseFont;
+	Canvas.m_BaseTextAttr = m_BaseTextAttr;
+	Canvas.m_Palette = m_Palette;
 
 	QRect QtRect = pEvent->rect ();
 	TRect Rect (
@@ -201,19 +200,19 @@ IQtWidget::OnPaintEvent (
 		QtRect.y () + QtRect.height ()
 		);
 
-	TWidgetPaintMsg Msg (&Painter, Rect);
+	TWidgetPaintMsg Msg (&Canvas, Rect);
 
 	bool IsHandled = true;
 	ProcessWidgetMsg (&Msg, &IsHandled);	
 
-	Painter.Detach ();
+	Canvas.Detach ();
 
 	if (!IsHandled)
 		pEvent->ignore ();				
 }
 
 void
-IQtWidget::OnResizeEvent (QResizeEvent* pEvent)
+CQtWidgetImpl::OnResizeEvent (QResizeEvent* pEvent)
 {
 	if (!CheckMsgMask (EWidgetMsg_Size))
 	{
@@ -243,7 +242,7 @@ IQtWidget::OnResizeEvent (QResizeEvent* pEvent)
 }		
 
 void
-IQtWidget::OnScroll (
+CQtWidgetImpl::OnScroll (
 	QScrollBar* pVerticalScrollBar,
 	QScrollBar* pHorizontalScrollBar
 	)
@@ -273,6 +272,5 @@ IQtWidget::OnScroll (
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

@@ -4,30 +4,41 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_IMAGELIST_H
+#define _AXL_GUI_GDIIMAGELIST_H
 
 #include "axl_gui_ImageList.h"
+#include "axl_rtl_Handle.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
+
+//.............................................................................
+
+class CDestroyImageList
+{
+public:
+	void
+	operator () (HIMAGELIST h)
+	{
+		ImageList_Destroy (h);
+	}
+};
 
 //.............................................................................
 	
-class CImageList: public IImageList
+class CGdiImageList: 
+	public CImageList,
+	public rtl::CHandleT <HIMAGELIST, CDestroyImageList>
 {
-	friend class CEngine;
+	friend class CGdiEngine;
 
 public:
-	QImage m_QtImage;
-	
-public:
-	CImageList ();
+	CGdiImageList ();
 
 	virtual
 	bool
 	InsertImage (
-		IImage* pImage,
+		CImage* pImage,
 		size_t Index
 		);
 
@@ -38,7 +49,6 @@ public:
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl
 

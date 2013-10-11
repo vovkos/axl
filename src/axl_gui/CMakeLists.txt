@@ -54,24 +54,25 @@ source_group (
 
 set (
 	GUI_GDI_H_LIST
-	${AXL_INC_DIR}/axl_gui_gdi_Bitmap.h
-	${AXL_INC_DIR}/axl_gui_gdi_Cursor.h
-	${AXL_INC_DIR}/axl_gui_gdi_Dc.h
-	${AXL_INC_DIR}/axl_gui_gdi_Engine.h
-	${AXL_INC_DIR}/axl_gui_gdi_Font.h
-	${AXL_INC_DIR}/axl_gui_gdi_ImageList.h
-	${AXL_INC_DIR}/axl_gui_gdi_Widget.h
+	${AXL_INC_DIR}/axl_gui_GdiCanvas.h
+	${AXL_INC_DIR}/axl_gui_GdiCursor.h
+	${AXL_INC_DIR}/axl_gui_GdiEngine.h
+	${AXL_INC_DIR}/axl_gui_GdiFont.h
+	${AXL_INC_DIR}/axl_gui_GdiImage.h
+	${AXL_INC_DIR}/axl_gui_GdiImageList.h
+	${AXL_INC_DIR}/axl_gui_GdiObjectHandle.h
+	${AXL_INC_DIR}/axl_gui_GdiWidget.h
 	)
 
 set (
 	GUI_GDI_CPP_LIST
-	axl_gui_gdi_Bitmap.cpp
-	axl_gui_gdi_Cursor.cpp
-	axl_gui_gdi_Dc.cpp
-	axl_gui_gdi_Engine.cpp
-	axl_gui_gdi_Font.cpp
-	axl_gui_gdi_ImageList.cpp
-	axl_gui_gdi_Widget.cpp
+	axl_gui_GdiCanvas.cpp
+	axl_gui_GdiCursor.cpp
+	axl_gui_GdiEngine.cpp
+	axl_gui_GdiFont.cpp
+	axl_gui_GdiImage.cpp
+	axl_gui_GdiImageList.cpp
+	axl_gui_GdiWidget.cpp
 	)
 
 source_group (
@@ -92,27 +93,24 @@ endif ()
 
 set (
 	GUI_QT_H_LIST
-	${AXL_INC_DIR}/axl_gui_qt_Cursor.h
-	${AXL_INC_DIR}/axl_gui_qt_Engine.h
-	${AXL_INC_DIR}/axl_gui_qt_Font.h
-	${AXL_INC_DIR}/axl_gui_qt_Image.h
-	${AXL_INC_DIR}/axl_gui_qt_ImageList.h
-	${AXL_INC_DIR}/axl_gui_qt_Painter.h
-	${AXL_INC_DIR}/axl_gui_qt_Pch.h
-	${AXL_INC_DIR}/axl_gui_qt_Pixmap.h
-	${AXL_INC_DIR}/axl_gui_qt_Widget.h
+	${AXL_INC_DIR}/axl_gui_QtCanvas.h
+	${AXL_INC_DIR}/axl_gui_QtCursor.h
+	${AXL_INC_DIR}/axl_gui_QtEngine.h
+	${AXL_INC_DIR}/axl_gui_QtFont.h
+	${AXL_INC_DIR}/axl_gui_QtImage.h
+	${AXL_INC_DIR}/axl_gui_QtImageList.h
+	${AXL_INC_DIR}/axl_gui_QtWidget.h
 	)
 
 set (
 	GUI_QT_CPP_LIST
-	axl_gui_qt_Cursor.cpp
-	axl_gui_qt_Engine.cpp
-	axl_gui_qt_Font.cpp
-	axl_gui_qt_Image.cpp
-	axl_gui_qt_ImageList.cpp
-	axl_gui_qt_Painter.cpp
-	axl_gui_qt_Pixmap.cpp
-	axl_gui_qt_Widget.cpp
+	axl_gui_QtCanvas.cpp
+	axl_gui_QtCursor.cpp
+	axl_gui_QtEngine.cpp
+	axl_gui_QtFont.cpp
+	axl_gui_QtImage.cpp
+	axl_gui_QtImageList.cpp
+	axl_gui_QtWidget.cpp
 	)
 
 source_group (
@@ -123,8 +121,7 @@ source_group (
 	)
 
 exclude_from_build (
-	axl_gui_qt_Image.cpp
-	axl_gui_qt_ImageList.cpp
+	axl_gui_QtImageList.cpp
 	)
 
 if (NOT AXL_BUILD_GUI_QT)

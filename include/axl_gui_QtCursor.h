@@ -4,15 +4,28 @@
 
 #pragma once
 
-//.............................................................................
+#define _AXL_GUI_QTCURSOR_H
 
-#include <QAbstractScrollArea>
-#include <QApplication>
-#include <QClipboard>
-#include <QFont>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QScrollBar>
-#include <QWidget>
+#include "axl_gui_Cursor.h"
+
+namespace axl {
+namespace gui {
 
 //.............................................................................
+
+class CQtCursor: public CCursor
+{
+	friend class CQtEngine;
+	
+public:
+	QCursor m_QtCursor;
+
+public:	
+	CQtCursor ();
+};
+
+//.............................................................................
+
+} // namespace gui
+} // namespace axl
+

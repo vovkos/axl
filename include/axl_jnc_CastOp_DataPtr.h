@@ -16,7 +16,7 @@ class CBaseTypeCoord;
 
 // array -> ptr
 
-class CCast_DataPtr_FromArray: public ICastOperator
+class CCast_DataPtr_FromArray: public CCastOperator
 {
 public:
 	virtual
@@ -52,7 +52,7 @@ public:
 
 // data ptr -> data ptr
 
-class CCast_DataPtr_Base: public ICastOperator
+class CCast_DataPtr_Base: public CCastOperator
 {
 public:
 	virtual
@@ -184,13 +184,13 @@ protected:
 	CCast_DataPtr_Normal2Thin m_Normal2Thin;
 	CCast_DataPtr_Thin2Thin m_Thin2Thin;
 
-	ICastOperator* m_OperatorTable [EDataPtrType__Count] [EDataPtrType__Count];
+	CCastOperator* m_OperatorTable [EDataPtrType__Count] [EDataPtrType__Count];
 
 public:
 	CCast_DataPtr ();
 
 	virtual
-	ICastOperator*
+	CCastOperator*
 	GetCastOperator (
 		const CValue& OpValue,
 		CType* pType
@@ -201,7 +201,7 @@ public:
 
 // data ref (EUnOp_Indir => data ptr cast => EUnOp_Addr)
 
-class CCast_DataRef: public ICastOperator
+class CCast_DataRef: public CCastOperator
 {
 public:
 	CCast_DataRef ()

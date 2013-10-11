@@ -25,7 +25,7 @@ protected:
 	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
 	mt::CEvent m_Event;
 	handle_t m_hWorkerThreadEvent;
-	ref::CPtrT <exe::IFunction> m_OnAccept;
+	exe::CFunction m_OnAccept;
 
 public:
 	CListenerSock ()
@@ -65,7 +65,7 @@ public:
 	bool
 	Listen (
 		size_t BackLog,
-		exe::IFunction* pOnAccept // void OnAccept (ref::CPtrT <CConnectionSocket> Socket)
+		const exe::CFunction& OnAccept // void OnAccept (ref::CPtrT <CConnectionSocket> Socket)
 		);
 
 protected:
@@ -77,7 +77,7 @@ protected:
 	AXL_CDECL
 	Listen_wt (
 		size_t BackLog,
-		exe::IFunction* pOnAccept
+		const exe::CFunction& OnAccept
 		);
 
 	void

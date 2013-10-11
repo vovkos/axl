@@ -13,9 +13,8 @@
 namespace axl {
 namespace gui {
 
-struct IEngine;
-struct ICanvas;
-struct IWidget;
+class CEngine;
+class ÑCanvas;
 
 //.............................................................................
 
@@ -115,7 +114,7 @@ struct TWidgetMsgT: TWidgetMsg
 
 struct TWidgetPaintMsg: TWidgetMsg
 {
-	ICanvas* m_pCanvas;
+	ÑCanvas* m_pCanvas;
 	TRect m_Rect;
 
 	TWidgetPaintMsg ()
@@ -125,7 +124,7 @@ struct TWidgetPaintMsg: TWidgetMsg
 	}
 
 	TWidgetPaintMsg (
-		ICanvas* pCanvas,
+		ÑCanvas* pCanvas,
 		const TRect& Rect
 		)
 	{
@@ -296,14 +295,14 @@ struct TWidgetScrollBar
 
 //.............................................................................
 
-struct IWidget
+class CWidget
 {
 protected:
-	friend struct IEngine;
+	friend class CEngine;
 
-	IEngine* m_pEngine;
-	ICursor* m_pCursor;
-	IFont* m_pBaseFont;
+	CEngine* m_pEngine;
+	CCursor* m_pCursor;
+	CFont* m_pBaseFont;
 	TTextAttr m_BaseTextAttr;
 	TPalette m_Palette;
 	TSize m_Size;
@@ -313,9 +312,9 @@ protected:
 	TWidgetScrollBar m_ScrollBarArray [2];
 	
 public:
-	IWidget (IEngine* pEngine);
+	CWidget (CEngine* pEngine);
 
-	IEngine* 
+	CEngine* 
 	GetEngine ()
 	{
 		return m_pEngine;
@@ -346,7 +345,7 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	GetCanvas () = 0;
 
 	virtual
@@ -380,7 +379,7 @@ public:
 
 	virtual
 	bool
-	SetCursor (ICursor* pCursor) = 0;
+	SetCursor (CCursor* pCursor) = 0;
 
 	virtual
 	bool

@@ -4,30 +4,39 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_CURSOR_H
+#define _AXL_GUI_QTIMAGELIST_H
 
-#include "axl_gui_Cursor.h"
+#include "axl_gui_ImageList.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
-
-class CCursor: public ICursor
+	
+class CQtImageList: public CImageList
 {
-	friend class CEngine;
+	friend class CQtEngine;
+
+public:
+	QImage m_QtImage;
 	
 public:
-	QCursor m_QtCursor;
+	CQtImageList ();
 
-public:	
-	CCursor ();
+	virtual
+	bool
+	InsertImage (
+		CImage* pImage,
+		size_t Index
+		);
+
+	virtual
+	bool
+	RemoveImage (size_t Index);
 };
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl
 

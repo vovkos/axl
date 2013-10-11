@@ -795,7 +795,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-struct CHashStringT 
+class CHashStringT 
 {
 };
 

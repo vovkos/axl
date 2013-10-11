@@ -1,21 +1,20 @@
 #include "pch.h"
-#include "axl_gui_gdi_ImageList.h"
-#include "axl_gui_gdi_Engine.h"
+#include "axl_gui_GdiImageList.h"
+#include "axl_gui_GdiEngine.h"
 
 namespace axl {
 namespace gui {
-namespace gdi {
 
 //.............................................................................
 
-CImageList::CImageList ()
+CGdiImageList::CGdiImageList ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CGdiEngine::GetSingleton ();
 }
 
 bool
-CImageList::InsertImage (
-	IImage* pImage,
+CGdiImageList::InsertImage (
+	CImage* pImage,
 	size_t Index
 	)
 {
@@ -23,13 +22,12 @@ CImageList::InsertImage (
 }
 
 bool
-CImageList::RemoveImage (size_t Index)
+CGdiImageList::RemoveImage (size_t Index)
 {
 	return true;
 }
 
 //.............................................................................
 
-} // namespace gdi
 } // namespace gui
 } // namespace axl

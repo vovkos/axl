@@ -65,7 +65,7 @@ struct TImageDesc
 
 //.............................................................................
 
-struct IImage: IGuiItem
+class CImage: public CGuiItem
 {
 protected:
 	TSize m_Size;

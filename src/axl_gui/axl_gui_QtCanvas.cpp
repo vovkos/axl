@@ -1,20 +1,19 @@
 #include "pch.h"
-#include "axl_gui_qt_Painter.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_gui_QtCanvas.h"
+#include "axl_gui_QtEngine.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-CPainter::CPainter ()
+CQtCanvas::CQtCanvas ()
 {
-	m_pEngine = CEngine::GetSingleton ();
+	m_pEngine = CQtEngine::GetSingleton ();
 }
 
 bool
-CPainter::DrawRect (
+CQtCanvas::DrawRect (
 	int Left,
 	int Top,
 	int Right,
@@ -33,7 +32,7 @@ CPainter::DrawRect (
 }
 
 bool
-CPainter::DrawText (
+CQtCanvas::DrawText (
 	int x,
 	int y,
 	int Left,
@@ -51,12 +50,12 @@ CPainter::DrawText (
 	BackColor = OverlayColor (m_BaseTextAttr.m_BackColor, BackColor);
 	FontFlags = OverlayFontFlags (m_BaseTextAttr.m_FontFlags, FontFlags);
 
-	IFont* pFont = m_pBaseFont->GetFontMod (FontFlags);
+	CFont* pFont = m_pBaseFont->GetFontMod (FontFlags);
 
 	if (m_pFont != pFont)
 	{
 		ASSERT (pFont->GetEngine ()->GetEngineKind () == EEngine_Qt);
-		CFont* pQtFont = (CFont*) pFont;
+		CQtFont* pQtFont = (CQtFont*) pFont;
 
 		m_pFont = pFont;
 		m_h->setFont (pQtFont->m_QtFont);
@@ -79,10 +78,10 @@ CPainter::DrawText (
 }
 
 bool
-CPainter::DrawImage (
+CQtCanvas::DrawImage (
 	int x,
 	int y,
-	IImage* pImage,
+	CImage* pImage,
 	int Left,
 	int Top,
 	int Right,
@@ -117,10 +116,10 @@ CPainter::DrawImage (
 }
 
 bool
-CPainter::DrawImage (
+CQtCanvas::DrawImage (
 	int x,
 	int y,
-	IImageList* pImageList,
+	CImageList* pImageList,
 	size_t Index
 	)
 {
@@ -131,8 +130,8 @@ CPainter::DrawImage (
 }
 
 bool
-CPainter::CopyRect (
-	ICanvas* pSrcCanvas,
+CQtCanvas::CopyRect (
+	ÑCanvas* pSrcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,
@@ -161,6 +160,5 @@ CPainter::CopyRect (
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl

@@ -17,27 +17,27 @@ namespace gui {
 	
 //.............................................................................
 
-struct ICanvas: IGuiItem
+class ÑCanvas: public CGuiItem
 {
 protected:
-	IFont* m_pFont;
+	CFont* m_pFont;
 	TColorAttr m_ColorAttr;
 
 public:
-	IFont* m_pBaseFont;
+	CFont* m_pBaseFont;
 	TTextAttr m_BaseTextAttr;
 	TTextAttr m_DefTextAttr;
 	TPalette m_Palette;
 
 public:
-	ICanvas ()
+	ÑCanvas ()
 	{
 		m_pFont = NULL;
 		m_pBaseFont = NULL;
 		m_BaseTextAttr.Setup (EStdPalColor_WidgetText, EStdPalColor_WidgetBack, 0);
 	}
 
-	IFont*
+	CFont*
 	GetFont ()
 	{
 		return m_pFont;
@@ -192,7 +192,7 @@ public:
 	DrawImage (
 		int x,
 		int y,
-		IImage* pImage,
+		CImage* pImage,
 		int Left,
 		int Top,
 		int Right,
@@ -202,7 +202,7 @@ public:
 	bool
 	DrawImage (
 		const TPoint& Point,
-		IImage* pImage,
+		CImage* pImage,
 		const TRect& Rect = TRect ()
 		)
 	{
@@ -222,14 +222,14 @@ public:
 	DrawImage (
 		int x,
 		int y,
-		IImageList* pImageList,
+		CImageList* pImageList,
 		size_t Index
 		) = 0;
 
 	bool
 	DrawImage (
 		const TPoint& Point,
-		IImageList* pImageList,
+		CImageList* pImageList,
 		size_t Index
 		)
 	{
@@ -244,7 +244,7 @@ public:
 	virtual
 	bool
 	CopyRect (
-		ICanvas* pSrcCanvas,
+		ÑCanvas* pSrcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
@@ -255,7 +255,7 @@ public:
 
 	bool
 	CopyRect (
-		ICanvas* pSrcCanvas,
+		ÑCanvas* pSrcCanvas,
 		const TPoint& DstPoint,
 		const TPoint& SrcPoint,
 		const TSize& Size

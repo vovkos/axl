@@ -19,7 +19,7 @@ class CRtFactoryT
 {
 protected:
 	class CBox: 
-		public IRefCount,
+		public CRefCount,
 		public obj::ITypeSimpleImplT <CBox>
 	{
 	protected:
@@ -64,7 +64,7 @@ protected:
 		{
 			ASSERT (m_pType);
 
-			if (Guid == AXL_OBJ_GUIDOF (IRefCount))
+			if (Guid == AXL_OBJ_GUIDOF (CRefCount))
 				return 0;
 
 			size_t Offset = m_pType->GetInterfaceOffset (Guid);
@@ -88,13 +88,13 @@ public:
 			)
 		{
 			size_t Size = pType->GetSize () + Extra;			
-			size_t RefCountOffset = pType->GetInterfaceOffset (AXL_OBJ_GUIDOF (IRefCount));
+			size_t RefCountOffset = pType->GetInterfaceOffset (AXL_OBJ_GUIDOF (CRefCount));
 
 			if (RefCountOffset != -1)
 			{
 				void* p = TAlloc::Alloc (Size, pType->GetName (), pFilePath, Line);
 				pType->Construct (p);
-				IRefCount* pRefCount = (IRefCount*) ((uchar_t*) p + RefCountOffset);
+				CRefCount* pRefCount = (CRefCount*) ((uchar_t*) p + RefCountOffset);
 				pRefCount->SetFree (&TAlloc::Free);
 				return CPtrT <void> (p, pRefCount);
 			}
@@ -115,13 +115,13 @@ public:
 			)
 		{
 			size_t Size = pType->GetSize () + Extra;			
-			size_t RefCountOffset = pType->GetInterfaceOffset (AXL_OBJ_GUIDOF (IRefCount));
+			size_t RefCountOffset = pType->GetInterfaceOffset (AXL_OBJ_GUIDOF (CRefCount));
 
 			if (RefCountOffset != -1)
 			{
 				void* p = TAlloc::Alloc (Size);
 				pType->Construct (p);
-				IRefCount* pRefCount = (IRefCount*) ((uchar_t*) p + RefCountOffset);
+				CRefCount* pRefCount = (CRefCount*) ((uchar_t*) p + RefCountOffset);
 				pRefCount->SetFree (&TAlloc::Free);
 				return CPtrT <void> (p, pRefCount);
 			}

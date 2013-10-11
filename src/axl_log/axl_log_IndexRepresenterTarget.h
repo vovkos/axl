@@ -15,7 +15,7 @@ namespace log {
 	
 //.............................................................................
 
-class CIndexRepresenterTarget: public IRepresenterTarget
+class CIndexRepresenterTarget: public CRepresenterTarget
 {
 	friend class CIndexMgr;
 

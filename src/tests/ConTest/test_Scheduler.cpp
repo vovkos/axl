@@ -64,7 +64,7 @@ public:
 	virtual
 	EScheduleResult
 	Schedule_va (
-		exe::IFunction* pFunction, 
+		const exe::CFunction& Function, 
 		axl_va_list va
 		)
 	{
@@ -120,10 +120,6 @@ Run ()
 			int
 			>
 		> Function (Test, -1, -2);
-
-	ref::CPtrT<exe::IFunction> Clone = ref::Clone (&Function);
-	Clone.Detach ();
-
 
 	Function.Invoke (0, 100, 200, 300);
 }

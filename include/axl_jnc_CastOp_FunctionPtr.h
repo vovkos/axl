@@ -12,7 +12,7 @@ namespace jnc {
 
 //.............................................................................
 
-class CCast_FunctionPtr_FromMulticast: public ICastOperator
+class CCast_FunctionPtr_FromMulticast: public CCastOperator
 {
 public:
 	virtual
@@ -34,7 +34,7 @@ public:
 
 //.............................................................................
 
-class CCast_FunctionPtr_Base: public ICastOperator
+class CCast_FunctionPtr_Base: public CCastOperator
 {
 public:
 	virtual
@@ -150,13 +150,13 @@ protected:
 	CCast_FunctionPtr_Thin2Fat m_Thin2Fat;
 	CCast_FunctionPtr_Thin2Thin m_Thin2Thin;
 
-	ICastOperator* m_OperatorTable [EFunctionPtrType__Count] [EFunctionPtrType__Count];
+	CCastOperator* m_OperatorTable [EFunctionPtrType__Count] [EFunctionPtrType__Count];
 
 public:
 	CCast_FunctionPtr ();
 
 	virtual
-	ICastOperator*
+	CCastOperator*
 	GetCastOperator (
 		const CValue& OpValue,
 		CType* pType
@@ -167,7 +167,7 @@ public:
 
 // function ref (EUnOp_Indir => function ptr cast => EUnOp_Addr)
 
-class CCast_FunctionRef: public ICastOperator
+class CCast_FunctionRef: public CCastOperator
 {
 public:
 	virtual

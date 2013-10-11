@@ -33,7 +33,7 @@ protected:
 
 	rtl::CHashTableMapT <
 		rtl::TGuid, 
-		IErrorProvider*, 
+		CErrorProvider*, 
 		rtl::CHashDjb2T <rtl::TGuid>,
 		rtl::CCmpBinT <rtl::TGuid>
 		> m_ProviderMap;
@@ -44,10 +44,10 @@ public:
 	void
 	RegisterProvider (
 		const rtl::TGuid& Guid,
-		IErrorProvider* pProvider
+		CErrorProvider* pProvider
 		);
 
-	IErrorProvider* 
+	CErrorProvider* 
 	FindProvider (const rtl::TGuid& Guid);
 
 	EErrorMode

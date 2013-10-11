@@ -9,8 +9,8 @@ namespace log {
 
 //.............................................................................
 
-CWidget::CWidget (gui::IEngine* pEngine):
-	gui::IWidget (pEngine)
+CWidget::CWidget (gui::CEngine* pEngine):
+	gui::CWidget (pEngine)
 {
 	m_pServer = NULL;
 
@@ -89,7 +89,7 @@ CWidget::CWidget (gui::IEngine* pEngine):
 
 bool
 CWidget::Create (
-	IServer* pServer,
+	ÑServer* pServer,
 	const char* pIndexFileName
 	)
 {
@@ -112,7 +112,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_ClearCache))
 		{
 			TCliMsg_ClearCache* pMsg = (TCliMsg_ClearCache*) pMsgHdr;
-			PostThreadMsg (ECliMsg_ClearCache, ref::CPtrT <void> ((void*) (size_t) pMsg->m_SyncId, (ref::IRefCount*) NULL));
+			PostThreadMsg (ECliMsg_ClearCache, ref::CPtrT <void> ((void*) (size_t) pMsg->m_SyncId, (ref::CRefCount*) NULL));
 		}
 
 		break;
@@ -121,7 +121,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
 			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
-			PostThreadMsg (ECliMsg_FilterProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::IRefCount*) NULL));
+			PostThreadMsg (ECliMsg_FilterProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
@@ -130,7 +130,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
 			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
-			PostThreadMsg (ECliMsg_IndexProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::IRefCount*) NULL));
+			PostThreadMsg (ECliMsg_IndexProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
@@ -139,7 +139,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
 			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
-			PostThreadMsg (ECliMsg_ColorizeProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::IRefCount*) NULL));
+			PostThreadMsg (ECliMsg_ColorizeProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
@@ -303,7 +303,7 @@ CWidget::Copy ()
 bool
 CWidget::SetPacketFile (
 	CPacketFile* pPacketFile,
-	IRepresenter* pRepresenter
+	CRepresenter* pRepresenter
 	)
 {
 	bool Result;
@@ -336,7 +336,7 @@ CWidget::SetPacketFile (
 */
 
 void 
-CWidget::SetImageList (gui::IImageList* pImageList)
+CWidget::SetImageList (gui::CImageList* pImageList)
 {
 	m_pImageList = pImageList;
 

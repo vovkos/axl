@@ -246,7 +246,7 @@ template <typename T>
 class CArrayT
 {
 public:
-	class CHdr: public ref::IRefCount
+	class CHdr: public ref::CRefCount
 	{
 	public:
 		size_t m_MaxCount;

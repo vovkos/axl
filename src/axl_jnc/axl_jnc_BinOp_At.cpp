@@ -28,7 +28,7 @@ CBinOp_At::Operator (
 	CValue SchedulerValue;
 	Result = m_pModule->m_OperatorMgr.CastOperator (
 		OpValue2, 
-		m_pModule->m_TypeMgr.GetStdType (EStdType_ISchedulerPtr), 
+		m_pModule->m_TypeMgr.GetStdType (EStdType_SchedulerPtr), 
 		&SchedulerValue
 		);
 

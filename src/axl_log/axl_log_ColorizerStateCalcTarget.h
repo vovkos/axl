@@ -18,13 +18,13 @@ namespace log {
 //.............................................................................
 
 class CColorizerStateCalcTarget: 
-	public IColorizerTarget,
-	public IRepresenterTarget
+	public CColorizerTarget,
+	public CRepresenterTarget
 {
 	friend class CColorizeMgr;
 
 protected:
-	IColorizer* m_pColorizer;
+	CColorizer* m_pColorizer;
 	void* m_pColorizerState;
 	TMergeCriteria m_MergeCriteria;
 
@@ -34,7 +34,7 @@ public:
 	void
 	StartPacket (const TPacket* pPacket);
 
-	// IRepresenter
+	// CRepresenter
 
 	virtual 
 	void 
@@ -52,7 +52,7 @@ public:
 		m_MergeCriteria.Break ();
 	}
 
-	// IColorizer
+	// CColorizer
 
 	virtual
 	void 

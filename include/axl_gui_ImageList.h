@@ -13,14 +13,14 @@ namespace gui {
 
 //.............................................................................
 
-struct IImageList: IGuiItem
+class CImageList: public CGuiItem
 {
 protected:
 	size_t m_Count;
 	TSize m_Size;
 
 public:
-	IImageList ()
+	CImageList ()
 	{
 		m_Count = 0;
 	}
@@ -40,7 +40,7 @@ public:
 	virtual
 	bool
 	InsertImage (
-		IImage* pImage,
+		CImage* pImage,
 		size_t Index
 		) = 0;
 
@@ -49,7 +49,7 @@ public:
 	RemoveImage (size_t Index) = 0;
 
 	bool
-	AppendImage (IImage* pImage)
+	AppendImage (CImage* pImage)
 	{
 		return InsertImage (pImage, m_Count);
 	}

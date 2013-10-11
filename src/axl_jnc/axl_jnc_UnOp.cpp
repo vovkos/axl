@@ -33,7 +33,7 @@ GetUnOpKindString (EUnOp OpKind)
 
 //.............................................................................
 
-IUnaryOperator::IUnaryOperator ()
+CUnaryOperator::CUnaryOperator ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
@@ -43,7 +43,7 @@ IUnaryOperator::IUnaryOperator ()
 }
 
 bool
-IUnaryOperator::GetResultType (
+CUnaryOperator::GetResultType (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)

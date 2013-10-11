@@ -34,7 +34,7 @@ CNamespaceMgr::AddStdItems ()
 
 	return 
 		m_GlobalNamespace.AddItem (pJnc) &&
-		pJnc->AddItem ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_IScheduler)) &&
+		pJnc->AddItem ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_Scheduler)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_RunGc)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_RunGcWaitForDestructors)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_GetCurrentThreadId)) &&

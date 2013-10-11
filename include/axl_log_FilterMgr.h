@@ -20,7 +20,7 @@ class CFilterMgr
 protected:
 	struct TFilterEntry: rtl::TListLink
 	{
-		IFilter* m_pFilter;
+		CFilter* m_pFilter;
 		CPacketFile m_PacketFile;
 		uint64_t m_SyncId;
 		uint64_t m_LastOffset;

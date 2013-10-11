@@ -114,12 +114,12 @@ struct TSerialSettings
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CSerial: public io::ITransport
+class CSerial
 {
 protected:
 	g::win::CFileHandle m_Serial;
 	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
-	ref::CPtrT <exe::IFunction> m_OnEvent;
+	exe::CFunction m_OnEvent;
 
 public:
 	~CSerial ()
@@ -157,7 +157,7 @@ public:
 	bool
 	SetEventHandler (
 		int Mask,
-		exe::IFunction* pOnEvent
+		const exe::CFunction& OnEvent
 		);
 };
 

@@ -47,7 +47,7 @@ class CListenerPipe: public CPipe
 {
 protected:
 	rtl::CArrayT <CConnectionPipe*> m_BackLog;
-	ref::CPtrT <exe::IFunction> m_OnAccept;
+	exe::CFunction m_OnAccept;
 	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
 
 public:
@@ -56,32 +56,30 @@ public:
 		const char* pName,
 		SECURITY_DESCRIPTOR* pSecDescr,
 		size_t BackLog,
-		exe::IFunction* pOnAccept
+		const exe::CFunction& OnAccept
 		);
 };
 
 //.............................................................................
 
-class CConnectionPipe: 
-	public CPipe,
-	public io::ITransport
+class CConnectionPipe: public CPipe
 {
 protected:
-	ref::CPtrT <exe::IFunction> m_OnConnectComplete;
-	ref::CPtrT <exe::IFunction> m_OnDisconnectComplete;	
+	exe::CFunction m_OnConnectComplete;
+	exe::CFunction m_OnDisconnectComplete;	
 
 public:
 	bool 
 	Connect (
 		const char* pAddress,
 		uint_t Timeout,
-		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError)
+		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
 	Disconnect (
 		uint_t Timeout,
-		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError)
+		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
@@ -101,7 +99,7 @@ public:
 	Send (
 		const void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete // void OnComplete (size_t ActualSize);
+		const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
 		);
 
 	virtual
@@ -109,7 +107,7 @@ public:
 	Recv (
 		void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete // void OnComplete (size_t ActualSize);
+		const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
 		);
 };
 

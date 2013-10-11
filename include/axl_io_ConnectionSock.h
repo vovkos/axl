@@ -28,7 +28,7 @@ protected:
 	{
 		CConnectionSock* m_pSock;
 		OVERLAPPED m_Overlapped;
-		ref::CPtrT <exe::IFunction> m_OnComplete;		
+		exe::CFunction m_OnComplete;		
 	};
 
 public:
@@ -38,8 +38,8 @@ protected:
 	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
 	mt::CEvent m_Event;
 	handle_t m_hWorkerThreadEvent;
-	ref::CPtrT <exe::IFunction> m_OnConnectComplete;
-	ref::CPtrT <exe::IFunction> m_OnDisconnectComplete;	
+	exe::CFunction m_OnConnectComplete;
+	exe::CFunction m_OnDisconnectComplete;	
 	rtl::CStdListT <TSendRecv> m_SendRecvList;
 
 public:
@@ -102,13 +102,13 @@ public:
 	Connect (
 		const TSockAddr* pAddr,
 		uint_t Timeout,
-		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError)
+		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
 	Disconnect (
 		uint_t Timeout,
-		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError)
+		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
@@ -124,14 +124,14 @@ public:
 	Send (
 		const void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 		);
 
 	bool
 	Recv (
 		void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 		);
 
 protected:
@@ -151,14 +151,14 @@ protected:
 	Connect_wt (
 		const TSockAddr* pAddr,
 		uint_t Timeout,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	bool 
 	AXL_CDECL
 	Disconnect_wt (
 		uint_t Timeout,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	void
@@ -170,7 +170,7 @@ protected:
 	Send_wt (
 		const void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	bool
@@ -178,7 +178,7 @@ protected:
 	Recv_wt (
 		void* p,
 		size_t Size,
-		exe::IFunction* pOnComplete
+		const exe::CFunction& OnComplete
 		);
 
 	static 

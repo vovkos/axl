@@ -49,7 +49,7 @@ GetArithmeticOperatorResultType (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CUnOpT_Arithmetic: public IUnaryOperator
+class CUnOpT_Arithmetic: public CUnaryOperator
 {
 public:
 	enum

@@ -13,7 +13,7 @@ namespace jnc {
 
 // arr -> arr
 
-class CCast_Array: public ICastOperator
+class CCast_Array: public CCastOperator
 {
 public:
 	virtual

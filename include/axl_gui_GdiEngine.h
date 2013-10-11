@@ -4,89 +4,90 @@
 
 #pragma once
 
-#define _AXL_GUI_QT_ENGINE_H
+#define _AXL_GUI_GDIENGINE_H
 
 #include "axl_gui_Engine.h"
+#include "axl_gui_GdiCanvas.h"
+#include "axl_gui_GdiCursor.h"
+#include "axl_gui_GdiFont.h"
+#include "axl_gui_GdiImage.h"
+#include "axl_gui_GdiImageList.h"
+#include "axl_gui_GdiWidget.h"
 #include "axl_rtl_Singleton.h"
-
-#include "axl_gui_qt_Cursor.h"
-#include "axl_gui_qt_Font.h"
-// #include "axl_gui_qt_Image.h"
-// #include "axl_gui_qt_ImageList.h"
-#include "axl_gui_qt_Painter.h"
-#include "axl_gui_qt_Pixmap.h"
-#include "axl_gui_qt_Widget.h"
 
 namespace axl {
 namespace gui {
-namespace qt {
 
 //.............................................................................
 
-class CEngine: public IEngine
+class CGdiEngine: public CEngine
 {
 protected:
-	ref::CPtrT <IFont> m_DefaultGuiFont;
-	ref::CPtrT <IFont> m_DefaultMonospaceFont;
-	ref::CPtrT <ICursor> m_StdCursorArray [EStdCursor__Count];	
+	ref::CPtrT <CFont> m_DefaultGuiFont;
+	ref::CPtrT <CFont> m_DefaultMonospaceFont;
+	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];	
+	HWND m_hWndClipboardOwner;
 
 public:
-	CEngine ()
+	CGdiEngine ()
 	{
-		m_EngineKind = EEngine_Qt;
+		m_EngineKind = EEngine_Gdi;
+		m_hWndClipboardOwner = NULL;
 	}
+
+	~CGdiEngine ();
 
 	static
-	CEngine*
+	CGdiEngine*
 	GetSingleton ()
 	{
-		return rtl::GetSingleton <CEngine> ();
+		return rtl::GetSingleton <CGdiEngine> ();
 	}
 
-	IFont* 
+	CFont* 
 	GetDefaultGuiFont ();
 
 	virtual
-	IFont*
+	CFont*
 	GetDefaultFont ()
 	{
 		return GetDefaultGuiFont ();
 	}
 
 	virtual
-	IFont*
+	CFont*
 	GetDefaultMonospaceFont ();
 
 	virtual
-	ref::CPtrT <IFont>
+	ref::CPtrT <CFont>
 	CreateFont (
 		const char* pFaceName,
 		size_t PointSize = 0,
 		uint_t Flags = 0
-		)
-	{
-		return CreateFont (CreateQtFont (pFaceName, PointSize, Flags));
-	}
+		);
 
-	ref::CPtrT <IFont>
-	CreateFont (const QFont& QtFont);
-	
+	ref::CPtrT <CFont>
+	CreateStockFont (int StockFontKind);
+
+	ref::CPtrT <CFont>
+	CreateFont (HFONT hFont);
+
+	ref::CPtrT <CCursor>
+	CreateStockCursor (LPCTSTR pStockCursorRes);
+
 	virtual
-	ICursor*
+	CCursor*
 	GetStdCursor (EStdCursor CursorKind);
 
-	ref::CPtrT <ICursor>
-	CreateCursor (const QCursor& QtCursor);
-	
 	virtual
-	IFont*
+	CFont*
 	GetFontMod (
-		IFont* pBaseFont,
+		CFont* pBaseFont,
 		uint_t Flags
 		);
 
 	virtual
-	ref::CPtrT <IImage>
+	ref::CPtrT <CImage>
 	CreateImage (
 		int Width,
 		int Height,
@@ -96,21 +97,21 @@ public:
 		);
 
 	virtual
-	ref::CPtrT <IImageList>
+	ref::CPtrT <CImageList>
 	CreateImageList (
 		int Width,
 		int Height
 		);
 
 	virtual
-	ref::CPtrT <IImageList>
+	ref::CPtrT <CImageList>
 	CreateImageList (
-		IImage* pStipImage,
+		CImage* pStipImage,
 		int Width = 0
 		);
 
 	virtual
-	ref::CPtrT <ICanvas>
+	ref::CPtrT <ÑCanvas>
 	CreateOffscreenCanvas (
 		int Width,
 		int Height
@@ -128,16 +129,11 @@ public:
 		);
 
 protected:
-	QFont
-	CreateQtFont (
-		const char* pFaceName,
-		size_t PointSize,
-		uint_t Flags
-		);
+	bool
+	OpenClipboard ();
 };
 
 //.............................................................................
 
-} // namespace qt
 } // namespace gui
 } // namespace axl
