@@ -30,7 +30,7 @@ main ()
 	while (c.m_progress < 100)
 	{
 		c.work ();
-		printf ("Progress = %d%%\n", c.m_progress); // outsiders have read-access to C1.m_x
+		printf ("progress = %d%%\n", c.m_progress); // outsiders have read-access to C1.m_x
 	}
 
 	// c.m_progress = 100; // <-- error: outsiders have no write-access to C1.m_x

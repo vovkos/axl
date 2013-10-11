@@ -15,12 +15,12 @@ class C1
 
 C1 g_c; // global static variable with constructor & destructor
 
-int g_x = Foo (); // global static variable with initializer
+int g_x = foo (); // global static variable with initializer
 
 int
-Foo ()
+foo ()
 {
-	printf ("Foo ()\n");
+	printf ("foo ()\n");
 	return 100;
 }
 

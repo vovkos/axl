@@ -27,9 +27,9 @@ main ()
 		}
 
 	if (isFound)
-		printf ("Negative item found at [%d] [%d]: %d\n", i, j, a [i] [j]);
+		printf ("negative item found at [%d] [%d]: %d\n", i, j, a [i] [j]);
 	else
-		printf ("Negative item not found\n");
+		printf ("negative item not found\n");
 
 	return 0;
 }

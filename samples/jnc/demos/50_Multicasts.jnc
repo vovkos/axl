@@ -57,10 +57,10 @@ main ()
 	mc += foo;
 	mc += baz;
 
-	printf ("Live pointer call...\n");
+	printf ("live pointer call...\n");
 	p1 (45);
 	
-	printf ("Snapshot pointer call...\n");
+	printf ("snapshot pointer call...\n");
 	p2 (55);
 
 	return 0;

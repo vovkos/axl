@@ -45,7 +45,7 @@ int bindable g_red;
 int bindable g_green;
 int bindable g_blue;
 
-int g_Rgb; // this value will be automatically updated
+int g_rgb; // this value will be automatically updated
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -61,7 +61,7 @@ g_colorAutoEv (int Alpha)
 	updateYellow (g_red, g_green, Alpha);
 	updateCyan (g_green, g_blue, Alpha);
 
-	g_Rgb = (g_red << 16) + (g_green << 8) + g_blue;
+	g_rgb = (g_red << 16) + (g_green << 8) + g_blue;
 }
 
 //.............................................................................
@@ -84,7 +84,7 @@ main ()
 
 	g_blue = 0xef; 
 
-	printf ("g_Rgb = 0x%06x\n", g_Rgb);
+	printf ("g_rgb = 0x%06x\n", g_rgb);
 
 	return 0;
 }

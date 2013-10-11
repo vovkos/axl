@@ -16,40 +16,40 @@ class C1
 		m_x = x;
 	}
 
-	Foo ()
+	foo ()
 	{
-		printf ("C1.Foo () { m_x = %d }\n", m_x);
+		printf ("C1.foo () { m_x = %d }\n", m_x);
 	}
 }
 
 extend C1
 {
-	Bar ()
+	bar ()
 	{
-		printf ("C1 (extend).Bar () { m_x = %d }\n", m_x);
+		printf ("C1 (extend).bar () { m_x = %d }\n", m_x);
 	}
 
 	static 
-	Baz ()
+	baz ()
 	{
-		printf ("C1 (extend).Baz ()\n");
+		printf ("C1 (extend).baz ()\n");
 	}
 
 	// int 
 	// operator += (int x); // <-- error: operator methods cannot be part of extension namespace
 
 	// virtual // <-- error: virtual methods cannot be part of extension namespace
-	// Baz ();
+	// baz ();
 }
 
 int
 main ()
 {
 	C1 c construct (100);
-	c.Foo ();
-	c.Bar ();  // Bar () is extension method
+	c.foo ();
+	c.bar ();  // bar () is extension method
 
-	C1.Baz (); // Baz () is extension static method
+	C1.baz (); // baz () is extension static method
 
 	return 0;
 }
