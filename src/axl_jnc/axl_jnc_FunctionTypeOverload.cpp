@@ -200,6 +200,11 @@ CFunctionTypeOverload::AddOverload (CFunctionType* pType)
 		m_pType = pType;
 		return true;
 	}
+	else if (pType->GetArgSignature ().Cmp (m_pType->GetArgSignature ()) == 0)
+	{
+		err::SetFormatStringError ("illegal function overload: duplicate argument signature");
+		return false;
+	}
 
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)

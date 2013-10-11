@@ -2,34 +2,34 @@
 
 // simple property declaration syntax
 
-int s_x [2];
+int g_x [2];
 
-int indexed property s_SimpleProp (unsigned i);
+int indexed property g_simpleProp (unsigned i);
 
 // here index argument is really used as integer index into array; but both type and 
 // what index really means for the particular property is totally up to developer
 
 int 
-s_SimpleProp.get (unsigned i)
+g_simpleProp.get (unsigned i)
 {
-	printf ("s_SimpleProp.get (%d)\n", i);
-	return s_x [i];
+	printf ("g_simpleProp.get (%d)\n", i);
+	return g_x [i];
 }
 
-s_SimpleProp.set (
+g_simpleProp.set (
 	unsigned i,
 	int x
 	)
 {
-	printf ("s_SimpleProp.set (%d, %d)\n", i, x);
-	s_x [i] = x;
+	printf ("g_simpleProp.set (%d, %d)\n", i, x);
+	g_x [i] = x;
 }
 
 //.............................................................................
 
 // similar property declared using full syntax
 
-property s_Prop
+property g_prop
 {	
 	int m_x [2] [2];
 
@@ -41,7 +41,7 @@ property s_Prop
 		unsigned j
 		)
 	{
-		printf ("s_Prop.get (%d, %d)\n", i, j);
+		printf ("g_prop.get (%d, %d)\n", i, j);
 		return m_x [i] [j];
 	}
 
@@ -51,7 +51,7 @@ property s_Prop
 		int x
 		)
 	{
-		printf ("s_Prop.set (%d, %d, int %d)\n", i, j, x);
+		printf ("g_prop.set (%d, %d, int %d)\n", i, j, x);
 		m_x [i] [j] = x;
 	}
 
@@ -63,7 +63,7 @@ property s_Prop
 		double x
 		)
 	{
-		printf ("s_Prop.set (%d, %d, double %f)\n", i, j, x);
+		printf ("g_prop.set (%d, %d, double %f)\n", i, j, x);
 		m_x [i] [j] = (int) x;
 	}
 }
@@ -73,18 +73,18 @@ property s_Prop
 int
 main ()
 {
-	int x = s_SimpleProp [0];
+	int x = g_simpleProp [0];
 
-	s_SimpleProp [0] = 100;
-	s_SimpleProp [1] = 200;
-	// s_SimpleProp [2] = 300; // <-- runtime error: out-of-range store
+	g_simpleProp [0] = 100;
+	g_simpleProp [1] = 200;
+	// g_simpleProp [2] = 300; // <-- runtime error: out-of-range store
 
 	// to access multi-indexed property, use the same syntax
 	// as for accessing multi-dimensional array
 
-	x = s_Prop [1] [1];
-	s_Prop [0] [1] = 500;
-	s_Prop [1] [0] = 1.5;
+	x = g_prop [1] [1];
+	g_prop [0] [1] = 500;
+	g_prop [1] [0] = 1.5;
 
 	return 0;
 }
@@ -95,7 +95,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

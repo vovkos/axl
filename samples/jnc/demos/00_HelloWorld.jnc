@@ -15,7 +15,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

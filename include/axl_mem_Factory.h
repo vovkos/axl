@@ -39,7 +39,7 @@ public:
 			if (!p)
 				return NULL;
 
-			memset (p, 0, Size); // important -- some legacy functions rely on zeroed values
+			memset (p, 0, Size); // zero memory before construction
 			new (p) T;
 			return (T*) p;
 		}

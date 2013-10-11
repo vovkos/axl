@@ -16,13 +16,13 @@ class C1
 		printf ("C1.destruct ()\n");
 	}		
 
-	Foo (
+	foo (
 		int a,
 		int b,
 		int c		
 		)
 	{
-		printf ("C1.Foo (%d, %d, %d) { m_x = %d }\n", a, b, c, m_x);
+		printf ("C1.foo (%d, %d, %d) { m_x = %d }\n", a, b, c, m_x);
 	}
 }
 
@@ -50,24 +50,24 @@ main ()
 		// will be weakly referenced. to make 'this' argument weak, either use 
 		// weak-member operator '.weak' or apply member operator to weak class pointer		
 
-		wpf = p.weak Foo ~(,, 3); // 'p.weak Foo' is equivalent to 'wp.Foo'		
+		wpf = p.weak foo ~(,, 3); // 'p.weak foo' is equivalent to 'wp.foo'		
 	} 
 
 	// ok, only pointers keep object alive from now on
 
-	// p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
+	// p = null; // <-- uncomment to lose strong pointer, then object will get destructed next gc run
 
-	printf ("GC run...\n");
-	jnc.RunGcWaitForDestructors ();
+	printf ("gc run...\n");
+	jnc.runGcWaitForDestructors ();
 
 	function* pf (int, int) = wpf;
 	if (pf)
 	{
-		printf ("Object survived GC run\n");
+		printf ("object survived gc run\n");
 		pf (1, 2);
 	}
 	else
-		printf ("Object was collected during GC run\n");
+		printf ("object was collected during gc run\n");
 
 	return 0;
 }
@@ -78,7 +78,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

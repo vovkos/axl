@@ -198,7 +198,7 @@ CVariableMgr::CreateTlsStructType ()
 {
 	bool Result;
 
-	CStructType* pType = m_pModule->m_TypeMgr.CreateStructType ("TTls", "jnc.TTls");
+	CStructType* pType = m_pModule->m_TypeMgr.CreateStructType ("Tls", "jnc.Tls");
 
 	size_t Count = m_TlsVariableArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)

@@ -6,7 +6,6 @@
 CStdLib::CStdLib ()
 {
 	m_FunctionMap ["printf"] = (void*) Printf;
-	m_FunctionMap ["rand"]   = (void*) rand;
 }
 
 int

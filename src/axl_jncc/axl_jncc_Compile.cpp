@@ -65,7 +65,6 @@ CJnc::Jit ()
 		llvm::ExecutionEngine* pLlvmExecutionEngine = m_Runtime.GetLlvmExecutionEngine ();
 		jnc::CStdLib::Export (&m_Module, pLlvmExecutionEngine);
 		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) CStdLib::Printf);
-		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "rand", (void*) rand);
 	}
 
 	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());	

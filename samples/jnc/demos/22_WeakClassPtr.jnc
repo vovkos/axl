@@ -32,16 +32,16 @@ main ()
 
 	wp = p;
 
-	// p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
+	// p = null; // <-- uncomment to lose strong pointer, then object will get destructed next gc run
 
-	printf ("GC run...\n");
-	jnc.RunGcWaitForDestructors ();
+	printf ("gc run...\n");
+	jnc.runGcWaitForDestructors ();
 
 	C1* p2 = wp;
 	if (p2)
-		printf ("Object survived GC run\n");
+		printf ("object survived gc run\n");
 	else
-		printf ("Object was collected during GC run\n");
+		printf ("object was collected during gc run\n");
 
 	return 0;
 }
@@ -52,7 +52,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

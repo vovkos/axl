@@ -10,42 +10,42 @@
 
 // update functions that need to be called when bindable properties change
 
-UpdatePurple (
-	int Red, 
-	int Blue,
-	int Alpha
+updatePurple (
+	int red, 
+	int blue,
+	int alpha
 	)
 {
-	printf ("Purple (%x, %x, %x)\n", Red, Blue, Alpha);
+	printf ("updatePurple (%x, %x, %x)\n", red, blue, alpha);
 }
 
-UpdateYellow (
-	int Red, 
-	int Green,
-	int Alpha
+updateYellow (
+	int red, 
+	int green,
+	int alpha
 	)
 {
-	printf ("Yellow (%x, %x, %x)\n", Red, Green, Alpha);
+	printf ("updateYellow (%x, %x, %x)\n", red, green, alpha);
 }
 
-UpdateCyan (
-	int Green, 
-	int Blue,
-	int Alpha
+updateCyan (
+	int green, 
+	int blue,
+	int alpha
 	)
 {
-	printf ("Cyan (%x, %x, %x)\n", Green, Blue, Alpha);
+	printf ("updateCyan (%x, %x, %x)\n", green, blue, alpha);
 }
 
 //.............................................................................
 
 // 3 bindable properties
 
-int bindable s_Red;
-int bindable s_Green;
-int bindable s_Blue;
+int bindable g_red;
+int bindable g_green;
+int bindable g_blue;
 
-int s_Rgb; // this value will be automatically updated
+int g_Rgb; // this value will be automatically updated
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -55,13 +55,13 @@ int s_Rgb; // this value will be automatically updated
 // 'onchange' statement could be used (see the next demo)
 
 autoev 
-s_Color (int Alpha)
+g_colorAutoEv (int Alpha)
 {
-	UpdatePurple (s_Red, s_Blue, Alpha); 
-	UpdateYellow (s_Red, s_Green, Alpha);
-	UpdateCyan (s_Green, s_Blue, Alpha);
+	updatePurple (g_red, g_blue, Alpha); 
+	updateYellow (g_red, g_green, Alpha);
+	updateCyan (g_green, g_blue, Alpha);
 
-	s_Rgb = (s_Red << 16) + (s_Green << 8) + s_Blue;
+	g_Rgb = (g_red << 16) + (g_green << 8) + g_blue;
 }
 
 //.............................................................................
@@ -73,18 +73,18 @@ main ()
 {
 	// starting autoev executes all the expressions in autoev block
 
-	s_ColorAutoEv.Start (5); // equivalent to s_ColorAutoEv (5);
+	g_colorAutoEv.Start (5); // equivalent to g_colorAutoEv (5);
 
-	printf ("changing s_Red, s_Green, s_Blue results in automatic calls to UpdateXxx functions\n");	
+	printf ("changing g_red, g_green, g_blue results in automatic calls to updateXxx functions\n");	
 
-	s_Red = 0xab; 
-	s_Green = 0xcd;
+	g_red = 0xab; 
+	g_green = 0xcd;
 
-	// s_ColorAutoEv.Stop (); // <-- uncomment to unbind onchange handlers
+	// g_colorAutoEv.Stop (); // <-- uncomment to unbind onchange handlers
 
-	s_Blue = 0xef; 
+	g_blue = 0xef; 
 
-	printf ("s_Rgb = 0x%06x\n", s_Rgb);
+	printf ("g_Rgb = 0x%06x\n", g_Rgb);
 
 	return 0;
 }
@@ -95,7 +95,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

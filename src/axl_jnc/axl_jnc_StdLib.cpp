@@ -12,38 +12,38 @@ namespace jnc {
 
 CStdLib::CStdLib ()
 {
-	m_FunctionMap ["jnc.OnRuntimeError"] = (void*) OnRuntimeError;
-	m_FunctionMap ["jnc.DynamicCastClassPtr"] = (void*) DynamicCastClassPtr;
-	m_FunctionMap ["jnc.StrengthenClassPtr"] = (void*) StrengthenClassPtr;
-	m_FunctionMap ["jnc.HeapAlloc"] = (void*) HeapAlloc;
-	m_FunctionMap ["jnc.UHeapAlloc"] = (void*) UHeapAlloc;
-	m_FunctionMap ["jnc.UHeapFree"] = (void*) UHeapFree;
-	m_FunctionMap ["jnc.UHeapFreeClassPtr"] = (void*) UHeapFreeClassPtr;
-	m_FunctionMap ["jnc.GcAddObject"] = (void*) GcAddObject;
-	m_FunctionMap ["jnc.GcSafePoint"] = (void*) GcSafePoint;
-	m_FunctionMap ["jnc.RunGc"] = (void*) RunGc;
-	m_FunctionMap ["jnc.RunGcWaitForDestructors"] = (void*) RunGcWaitForDestructors;
-	m_FunctionMap ["jnc.GetCurrentThreadId"] = (void*) GetCurrentThreadId;
-	m_FunctionMap ["jnc.CreateThread"] = (void*) CreateThread;
-	m_FunctionMap ["jnc.Sleep"] = (void*) Sleep;
-	m_FunctionMap ["jnc.GetTls"] = (void*) GetTls;
-	m_FunctionMap ["jnc.StrLen"] = (void*) StrLen;
-	m_FunctionMap ["jnc.Rand"] = (void*) Rand;
-	m_FunctionMap ["jnc.AppendFmtLiteral_a"] = (void*) AppendFmtLiteral_a;
-	m_FunctionMap ["jnc.AppendFmtLiteral_p"] = (void*) AppendFmtLiteral_p;
-	m_FunctionMap ["jnc.AppendFmtLiteral_i32"] = (void*) AppendFmtLiteral_i32;
-	m_FunctionMap ["jnc.AppendFmtLiteral_ui32"] = (void*) AppendFmtLiteral_ui32;
-	m_FunctionMap ["jnc.AppendFmtLiteral_i64"] = (void*) AppendFmtLiteral_i64;
-	m_FunctionMap ["jnc.AppendFmtLiteral_ui64"] = (void*) AppendFmtLiteral_ui64;
-	m_FunctionMap ["jnc.AppendFmtLiteral_f"] = (void*) AppendFmtLiteral_f;	
-	m_FunctionMap ["jnc.MulticastClear"] = (void*) MulticastClear;	
-	m_FunctionMap ["jnc.MulticastSet"] = (void*) MulticastSet;	
-	m_FunctionMap ["jnc.MulticastSet_t"] = (void*) MulticastSet_t;	
-	m_FunctionMap ["jnc.MulticastAdd"] = (void*) MulticastAdd;	
-	m_FunctionMap ["jnc.MulticastAdd_t"] = (void*) MulticastAdd_t;	
-	m_FunctionMap ["jnc.MulticastRemove"] = (void*) MulticastRemove;	
-	m_FunctionMap ["jnc.MulticastRemove_t"] = (void*) MulticastRemove_t;	
-	m_FunctionMap ["jnc.MulticastGetSnapshot"] = (void*) MulticastGetSnapshot;	
+	m_FunctionMap ["jnc.onRuntimeError"] = (void*) OnRuntimeError;
+	m_FunctionMap ["jnc.dynamicCastClassPtr"] = (void*) DynamicCastClassPtr;
+	m_FunctionMap ["jnc.strengthenClassPtr"] = (void*) StrengthenClassPtr;
+	m_FunctionMap ["jnc.heapAlloc"] = (void*) HeapAlloc;
+	m_FunctionMap ["jnc.uheapAlloc"] = (void*) UHeapAlloc;
+	m_FunctionMap ["jnc.uheapFree"] = (void*) UHeapFree;
+	m_FunctionMap ["jnc.uheapFreeClassPtr"] = (void*) UHeapFreeClassPtr;
+	m_FunctionMap ["jnc.gcAddObject"] = (void*) GcAddObject;
+	m_FunctionMap ["jnc.gcSafePoint"] = (void*) GcSafePoint;
+	m_FunctionMap ["jnc.runGc"] = (void*) RunGc;
+	m_FunctionMap ["jnc.runGcWaitForDestructors"] = (void*) RunGcWaitForDestructors;
+	m_FunctionMap ["jnc.getCurrentThreadId"] = (void*) GetCurrentThreadId;
+	m_FunctionMap ["jnc.createThread"] = (void*) CreateThread;
+	m_FunctionMap ["jnc.sleep"] = (void*) Sleep;
+	m_FunctionMap ["jnc.getTls"] = (void*) GetTls;
+	m_FunctionMap ["jnc.strlen"] = (void*) StrLen;
+	m_FunctionMap ["jnc.rand"] = (void*) Rand;
+	m_FunctionMap ["jnc.appendFmtLiteral_a"] = (void*) AppendFmtLiteral_a;
+	m_FunctionMap ["jnc.appendFmtLiteral_p"] = (void*) AppendFmtLiteral_p;
+	m_FunctionMap ["jnc.appendFmtLiteral_i32"] = (void*) AppendFmtLiteral_i32;
+	m_FunctionMap ["jnc.appendFmtLiteral_ui32"] = (void*) AppendFmtLiteral_ui32;
+	m_FunctionMap ["jnc.appendFmtLiteral_i64"] = (void*) AppendFmtLiteral_i64;
+	m_FunctionMap ["jnc.appendFmtLiteral_ui64"] = (void*) AppendFmtLiteral_ui64;
+	m_FunctionMap ["jnc.appendFmtLiteral_f"] = (void*) AppendFmtLiteral_f;
+	m_FunctionMap ["jnc.multicastClear"] = (void*) MulticastClear;
+	m_FunctionMap ["jnc.multicastSet"] = (void*) MulticastSet;
+	m_FunctionMap ["jnc.multicastSet_t"] = (void*) MulticastSet_t;
+	m_FunctionMap ["jnc.multicastAdd"] = (void*) MulticastAdd;
+	m_FunctionMap ["jnc.multicastAdd_t"] = (void*) MulticastAdd_t;
+	m_FunctionMap ["jnc.multicastRemove"] = (void*) MulticastRemove;
+	m_FunctionMap ["jnc.multicastRemove_t"] = (void*) MulticastRemove_t;
+	m_FunctionMap ["jnc.multicastGetSnapshot"] = (void*) MulticastGetSnapshot;
 
 }
 

@@ -1841,7 +1841,7 @@ CTypeMgr::GetGcShadowStackFrameMapType (size_t RootCount)
 		return pPair->m_pGcShadowStackFrameMapType;
 
 	CArrayType* pArrayType = GetArrayType (GetStdType (EStdType_BytePtr), RootCount);
-	CStructType* pType = CreateStructType ("TGcShadowStackFrameMap", "jnc.TGcShadowStackFrameMap");
+	CStructType* pType = CreateStructType ("GcShadowStackFrameMap", "jnc.GcShadowStackFrameMap");
 	pType->CreateField (GetPrimitiveType (EType_SizeT));
 	pType->CreateField (pArrayType);
 	pType->EnsureLayout ();
@@ -1861,7 +1861,7 @@ CTypeMgr::GetGcShadowStackFrameType (size_t RootCount)
 	if (pPair->m_pGcShadowStackFrameType)
 		return pPair->m_pGcShadowStackFrameType;
 
-	CStructType* pType = CreateStructType ("TGcShadowStackFrame", "jnc.TGcShadowStackFrame");
+	CStructType* pType = CreateStructType ("GcShadowStackFrame", "jnc.GcShadowStackFrame");
 
 	pType->CreateField (GetStdType (EStdType_BytePtr));
 	pType->CreateField (pMapType->GetDataPtrType_c ());
@@ -2093,7 +2093,7 @@ CTypeMgr::SetupPrimitiveType (
 CStructType*
 CTypeMgr::CreateObjectHdrType ()
 {
-	CStructType* pType = CreateStructType ("TObject", "jnc.TObject");
+	CStructType* pType = CreateStructType ("Object", "jnc.Object");
 	pType->CreateField (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
 	pType->CreateField (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
 	pType->CreateField (GetPrimitiveType (EType_Int_p)); // intptr_t m_Flags;
@@ -2116,7 +2116,7 @@ CTypeMgr::CreateObjectType ()
 CStructType*
 CTypeMgr::CreateAutoEvBindSiteType ()
 {
-	CStructType* pType = CreateStructType ("TAutoEvBindSite", "jnc.TAutoEvBindSite");
+	CStructType* pType = CreateStructType ("AutoEvBindSite", "jnc.AutoEvBindSite");
 	pType->CreateField (GetStdType (EStdType_SimpleEventPtr));
 	pType->CreateField (GetPrimitiveType (EType_Int_p));
 	pType->EnsureLayout ();
@@ -2132,7 +2132,7 @@ CTypeMgr::CreateSchedulerType ()
 	CFunctionType* pScheduleType = GetFunctionType (pReturnType, &pArgType, 1);
 
 	CClassType* pType = CreateClassType ("Scheduler", "jnc.Scheduler");
-	pType->CreateMethod (EStorage_Abstract, "Schedule", pScheduleType);
+	pType->CreateMethod (EStorage_Abstract, "schedule", pScheduleType);
 	pType->EnsureLayout ();
 	return pType;
 }
@@ -2140,7 +2140,7 @@ CTypeMgr::CreateSchedulerType ()
 CStructType*
 CTypeMgr::CreateFmtLiteralType ()
 {
-	CStructType* pType = CreateStructType ("TFmtLiteral", "jnc.TFmtLiteral");
+	CStructType* pType = CreateStructType ("FmtLiteral", "jnc.FmtLiteral");
 	pType->CreateField (GetPrimitiveType (EType_Char)->GetDataPtrType_c ());
 	pType->CreateField (GetPrimitiveType (EType_SizeT));
 	pType->CreateField (GetPrimitiveType (EType_SizeT));

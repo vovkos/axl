@@ -8,7 +8,7 @@
 class I1
 {
 	abstract 
-	Foo ();
+	foo ();
 }
 
 class C1: I1
@@ -19,9 +19,9 @@ class C1: I1
 	}
 
 	override
-	Foo ()
+	foo ()
 	{
-		printf ("C1.Foo ()\n");		
+		printf ("C1.foo ()\n");		
 	}
 }
 
@@ -30,10 +30,10 @@ class C1: I1
 class I2
 {
 	abstract 
-	Bar ();
+	bar ();
 
 	abstract 
-	Baz (
+	baz (
 		int x,
 		int y
 		); 
@@ -47,24 +47,24 @@ class C2: I2
 	}
 
 	override
-	Bar ()
+	bar ()
 	{
-		printf ("C2.Bar ()\n");		
+		printf ("C2.bar ()\n");		
 	}
 
 	override
-	Baz (
+	baz (
 		int x,
 		int y
 		)
 	{
-		printf ("C2.Baz (%d, %d)\n", x, y);		
+		printf ("C2.baz (%d, %d)\n", x, y);		
 	}
 }
 
 //.............................................................................
 
-struct TPoint
+struct Point
 {
 	int m_x;
 	int m_y;
@@ -73,7 +73,7 @@ struct TPoint
 class C3:
 	C1,
 	C2,
-	TPoint // ok to inherit from structs and even unions
+	Point // ok to inherit from structs and even unions
 {
 	construct (int a)
 	{
@@ -88,14 +88,14 @@ class C3:
 	}
 
 	override
-	Baz (	
+	baz (	
 		int x,
 		int y
 		);
 }
 
 override // it's ok to use storage specifier (must match the original one, of course)
-C3.Baz (
+C3.baz (
 	int x,
 	int y
 	)
@@ -116,9 +116,9 @@ main ()
 
 	C3 c construct (7);
 
-	c.Foo ();
-	c.Bar ();
-	c.Baz (20, 30);
+	c.foo ();
+	c.bar ();
+	c.baz (20, 30);
 
 	printf ("c = { %d, %d }\n", c.m_x, c.m_y);
 
@@ -131,7 +131,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

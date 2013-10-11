@@ -1,13 +1,13 @@
 //.............................................................................
 
-Foo (int n)
+foo (int n)
 {
-	printf ("Foo (%d): TID = %08x\n", n, jnc.GetCurrentThreadId ());
+	printf ("foo (%d): TID = %08x\n", n, jnc.getCurrentThreadId ());
 
 	static int a [3];
 	once // 'once' block will be executed once per application run 
 	{
-		printf ("Foo.static once\n");
+		printf ("foo.static once\n");
 		for (int i = 0; i < countof (a); i++)
 			a [i] = i * 10;
 	}
@@ -16,8 +16,8 @@ Foo (int n)
 
 	thread once // 'thread once' block will be executed once per thread
 	{			
-		printf ("Foo.thread once\n");
-		t = jnc.GetCurrentThreadId ();
+		printf ("foo.thread once\n");
+		t = jnc.getCurrentThreadId ();
 	}
 
 	printf ("t = %08x\na = { ", t);
@@ -28,21 +28,21 @@ Foo (int n)
 	printf ("}\n");
 }
 
-ThreadProc ()
+threadProc ()
 {
 	for (int i = 0; i < 3; i++)
-		Foo (i);
+		foo (i);
 }
 
 int
 main ()
 {
 	for (int i = 0; i < 3; i++)
-		Foo (i);
+		foo (i);
 
-	jnc.CreateThread (ThreadProc);
+	jnc.createThread (threadProc);
 
-	jnc.Sleep (1000); // temp dirty solution. CreateThread should probably return some waitable object
+	jnc.sleep (1000); // temp dirty solution. createThread should probably return some waitable object
 	return 0;
 }
 
@@ -52,7 +52,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

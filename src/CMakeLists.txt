@@ -258,6 +258,11 @@ endif ()
 
 if (AXL_BUILD_JNC_LIB)
 	add_subdirectory (axl_jnc)
+
+	add_subdirectory (
+		${AXL_ROOT_DIR}/samples/jnc/demos
+		${CMAKE_CURRENT_BINARY_DIR}/jnc_demos
+		)
 endif ()
 
 if (AXL_BUILD_JNCC)

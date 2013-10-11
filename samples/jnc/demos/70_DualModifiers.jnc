@@ -2,16 +2,16 @@
 
 class C1
 {
-	pubconst int m_Progress;	
+	pubconst int m_progress;	
 
-	pubevent m_CompleteEvent ();
+	pubevent m_completeEvent ();
 
-	Work ()
+	work ()
 	{
-		m_Progress += 25; // insiders have write-access to m_Progress
+		m_progress += 25; // insiders have write-access to m_progress
 	
-		if (m_Progress >= 100)
-			m_CompleteEvent (); // insiders have multicast-access to m_CompleteEvent
+		if (m_progress >= 100)
+			m_completeEvent (); // insiders have multicast-access to m_completeEvent
 	}
 }
 
@@ -23,24 +23,24 @@ main ()
 	printf ("main ()\n");
 
 	C1 c;
-	c.m_CompleteEvent += OnComplete; // outsiders have event-access to C1.m_CompleteEvent
+	c.m_completeEvent += onComplete; // outsiders have event-access to C1.m_completeEvent
 
-	// c.m_CompleteEvent (); // <-- error: outsiders have no multicast-access to C1.m_CompleteEvent
+	// c.m_completeEvent (); // <-- error: outsiders have no multicast-access to C1.m_completeEvent
 
-	while (c.m_Progress < 100)
+	while (c.m_progress < 100)
 	{
-		c.Work ();
-		printf ("Progress = %d%%\n", c.m_Progress); // outsiders have read-access to C1.m_x
+		c.work ();
+		printf ("Progress = %d%%\n", c.m_progress); // outsiders have read-access to C1.m_x
 	}
 
-	// c.m_Progress = 100; // <-- error: outsiders have no write-access to C1.m_x
+	// c.m_progress = 100; // <-- error: outsiders have no write-access to C1.m_x
 
 	return 0;
 }
 
-OnComplete ()
+onComplete ()
 {
-	printf ("OnComplete () -- work is finished\n");
+	printf ("onComplete () -- work is finished\n");
 }
 
 //.............................................................................
@@ -49,7 +49,7 @@ OnComplete ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

@@ -2,11 +2,11 @@
 
 // simple property declaration syntax
 
-int autoget bindable property s_SimpleProp;
+int autoget bindable property g_simpleProp;
 
-s_SimpleProp.set (int x)
+g_simpleProp.set (int x)
 {
-	printf ("s_SimpleProp.set (%d)\n", x);
+	printf ("g_simpleProp.set (%d)\n", x);
 	propvalue = x;
 
 	if (x > 150)
@@ -19,19 +19,19 @@ s_SimpleProp.set (int x)
 
 // similar property declared using full syntax
 
-bindable property s_Prop
+bindable property g_prop
 {	
 	int propvalue; // declaring a 'propvalue' field implicitly makes property 'autoget'
 
 	set (int x)
 	{
-		printf ("s_Prop.set (int %d)\n", x);
+		printf ("g_prop.set (int %d)\n", x);
 		propvalue = x;
 	}
 
 	set (double x)
 	{
-		printf ("s_Prop.set (double %f)\n", x);
+		printf ("g_prop.set (double %f)\n", x);
 		propvalue = (int) x;
 	}
 }
@@ -42,39 +42,39 @@ bindable property s_Prop
 // since getter and setter are auto-generated, the purpose of
 // bindable data is purely to track data changes 
 
-int bindable s_Data;
+int bindable g_data;
 
 //.............................................................................
 
-OnSimplePropChange ()
+onSimplePropChange ()
 {
-	printf ("s_SimpleProp has changed (new value = %d)\n", s_SimpleProp);
+	printf ("g_simpleProp has changed (new value = %d)\n", g_simpleProp);
 }
 
-OnPropChange ()
+onPropChange ()
 {
-	printf ("s_Prop has changed (new value = %d)\n", s_Prop);
+	printf ("g_prop has changed (new value = %d)\n", g_prop);
 }
 
-OnDataChange ()
+onDataChange ()
 {
-	printf ("s_Data has changed (new value = %d)\n", s_Data);
+	printf ("g_data has changed (new value = %d)\n", g_data);
 }
 
 int
 main ()
 {
- 	s_SimpleProp.onchange += OnSimplePropChange;
- 	s_Prop.onchange += OnPropChange;
-	s_Data.onchange += OnDataChange;
+	g_simpleProp.onchange += onSimplePropChange;
+	g_prop.onchange += onPropChange;
+	g_data.onchange += onDataChange;
 
-	s_SimpleProp = 100;
-	s_SimpleProp = 200; // 'onchange' event will not fire 
+	g_simpleProp = 100;
+	g_simpleProp = 200; // 'onchange' event will not fire 
 
-	s_Prop = 500;
-	s_Prop = 5.5;
+	g_prop = 500;
+	g_prop = 5.5;
 
-	s_Data = 1000;
+	g_data = 1000;
 
 	return 0;
 }
@@ -85,7 +85,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

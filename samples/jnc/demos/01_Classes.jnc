@@ -1,13 +1,13 @@
 // class in jancy is a special kind of data, preceded with header containing type, 
 // virtual table pointer and other ancilliary information
-// also, contrary to most modern languages, default access is public
+// contrary to most modern languages, default access is public
 
 //.............................................................................
 
 class C1
 {
 protected: // member access could be specified using C++ style or Java style
-	static int s_Table [10];		
+	static int m_table [10];		
 
 	public int m_x = 10; // in-place field initialization
 	public int m_y = 20;
@@ -46,8 +46,8 @@ C1.static construct ()
 {
 	printf ("C1.static construct ()\n");
 
-	for (int i = 0; i < countof (s_Table); i++)
-		s_Table [i] = i;
+	for (int i = 0; i < countof (m_table); i++)
+		m_table [i] = i;
 }
 
 C1.construct (
@@ -90,7 +90,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* pFormat,
 	unsafe ...
 	);
 

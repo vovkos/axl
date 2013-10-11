@@ -1,3 +1,7 @@
+// jancy brings back the paradigm of RAII (resource-acquisition-is-initialization)
+// classes allocated on stack are destructed upon exiting the scope 
+// thus ensuring deterministic resource release
+
 //.............................................................................
 
 class C1
@@ -41,7 +45,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

@@ -30,18 +30,18 @@ CNamespaceMgr::Clear ()
 bool
 CNamespaceMgr::AddStdItems ()
 {
-	CGlobalNamespace* pJnc = CreateGlobalNamespace ("jnc", "jnc");
+	CGlobalNamespace* pJnc = CreateGlobalNamespace ("jnc", &m_GlobalNamespace);
 
 	return 
 		m_GlobalNamespace.AddItem (pJnc) &&
+		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrLen)) &&
+		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Rand)) &&
 		pJnc->AddItem ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_Scheduler)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_RunGc)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_RunGcWaitForDestructors)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_GetCurrentThreadId)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_CreateThread)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_Sleep)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_StrLen)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction(EStdFunc_Rand));
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGc)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGcWaitForDestructors)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetCurrentThreadId)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CreateThread)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Sleep));
 }
 
 void
@@ -171,14 +171,20 @@ CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 CGlobalNamespace*
 CNamespaceMgr::CreateGlobalNamespace (
 	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
+	CNamespace* pParentNamespace
 	)
 {
+	if (!pParentNamespace)
+		pParentNamespace = &m_GlobalNamespace;
+
+	rtl::CString QualifiedName = pParentNamespace->CreateQualifiedName (Name);
+
 	CGlobalNamespace* pNamespace = AXL_MEM_NEW (CGlobalNamespace);
 	pNamespace->m_pModule = m_pModule;
 	pNamespace->m_Name = Name;
 	pNamespace->m_QualifiedName = QualifiedName;
 	pNamespace->m_Tag = QualifiedName;
+	pNamespace->m_pParentNamespace = pParentNamespace;
 	m_NamespaceList.InsertTail (pNamespace);
 	return pNamespace;
 }

@@ -14,7 +14,7 @@ main ()
 		{ 9, 10, 11, 12 },
 	};
 
-	bool IsFound = false;
+	bool isFound = false;
 
 	int i, j;
 
@@ -22,11 +22,11 @@ main ()
 	for (j = 0; j < countof (a [0]); j++)
 		if (a [i] [j] < 0)
 		{
-			IsFound = true;
+			isFound = true;
 			break2; // exit from 2 loops at once
 		}
 
-	if (IsFound)
+	if (isFound)
 		printf ("Negative item found at [%d] [%d]: %d\n", i, j, a [i] [j]);
 	else
 		printf ("Negative item not found\n");
@@ -40,7 +40,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

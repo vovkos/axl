@@ -1133,7 +1133,7 @@ CFunctionMgr::CreateOnRuntimeError ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.OnRuntimeError", pType);
+	return CreateInternalFunction ("jnc.onRuntimeError", pType);
 }
 
 // void 
@@ -1152,7 +1152,7 @@ CFunctionMgr::CreateCheckNullPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.CheckNullPtr", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.checkNullPtr", pType);
 
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
@@ -1198,7 +1198,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.CheckScopeLevel", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.checkScopeLevel", pType);
 
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
@@ -1244,7 +1244,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.CheckDataPtrRange", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.checkDataPtrRange", pType);
 
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
@@ -1301,7 +1301,7 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	};
 	
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.CheckClassPtrScopeLevel", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.checkClassPtrScopeLevel", pType);
 
 	CValue ArgValueArray [countof (ArgTypeArray)];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
@@ -1364,7 +1364,7 @@ CFunctionMgr::CreateDynamicCastClassPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.DynamicCastClassPtr", pType);
+	return CreateInternalFunction ("jnc.dynamicCastClassPtr", pType);
 }
 
 // object*
@@ -1381,7 +1381,7 @@ CFunctionMgr::CreateStrengthenClassPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.StrengthenClassPtr", pType);
+	return CreateInternalFunction ("jnc.strengthenClassPtr", pType);
 }
 
 // int8*
@@ -1398,7 +1398,7 @@ CFunctionMgr::CreateHeapAlloc ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.HeapAlloc", pType);
+	return CreateInternalFunction ("jnc.heapAlloc", pType);
 }
 
 // int8*
@@ -1415,7 +1415,7 @@ CFunctionMgr::CreateUHeapAlloc ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.UHeapAlloc", pType);
+	return CreateInternalFunction ("jnc.uheapAlloc", pType);
 }
 
 // void
@@ -1430,7 +1430,7 @@ CFunctionMgr::CreateUHeapFree ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.UHeapFree", pType);
+	return CreateInternalFunction ("jnc.uheapFree", pType);
 }
 
 // void
@@ -1445,7 +1445,7 @@ CFunctionMgr::CreateUHeapFreeClassPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.UHeapFreeClassPtr", pType);
+	return CreateInternalFunction ("jnc.uheapFreeClassPtr", pType);
 }
 
 // void
@@ -1460,7 +1460,7 @@ CFunctionMgr::CreateGcAddObject ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.GcAddObject", pType);
+	return CreateInternalFunction ("jnc.gcAddObject", pType);
 }
 
 // void
@@ -1489,7 +1489,7 @@ CFunctionMgr::CreateMarkGcRoot ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 
-	CFunction* pFunction = CreateInternalFunction ("jnc.MarkGcRoot", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.markGcRoot", pType);
 
 	pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
 		m_pModule->GetLlvmModule (),
@@ -1506,7 +1506,7 @@ CFunction*
 CFunctionMgr::CreateGcSafePoint ()
 {
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
-	return CreateInternalFunction ("jnc.GcSafePoint", pType);
+	return CreateInternalFunction ("jnc.gcSafePoint", pType);
 }
 
 // void
@@ -1516,7 +1516,7 @@ CFunction*
 CFunctionMgr::CreateRunGc ()
 {
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
-	return CreateFunction ("RunGc", "jnc.RunGc", pType);
+	return CreateFunction ("runGc", "jnc.runGc", pType);
 }
 
 // void
@@ -1526,7 +1526,7 @@ CFunction*
 CFunctionMgr::CreateRunGcWaitForDestructors ()
 {
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, NULL, 0, 0);
-	return CreateFunction ("RunGcWaitForDestructors", "jnc.RunGcWaitForDestructors", pType);
+	return CreateFunction ("runGcWaitForDestructors", "jnc.runGcWaitForDestructors", pType);
 }
 
 // i64
@@ -1537,7 +1537,7 @@ CFunctionMgr::CreateGetCurrentThreadId ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
-	return CreateFunction ("GetCurrentThreadId", "jnc.GetCurrentThreadId", pType);
+	return CreateFunction ("getCurrentThreadId", "jnc.getCurrentThreadId", pType);
 }
 
 // i64
@@ -1554,7 +1554,7 @@ CFunctionMgr::CreateCreateThread ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction ("CreateThread", "jnc.CreateThread", pType);
+	return CreateFunction ("createThread", "jnc.createThread", pType);
 }
 
 // void
@@ -1569,7 +1569,7 @@ CFunctionMgr::CreateSleep ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction ("Sleep", "jnc.Sleep", pType);
+	return CreateFunction ("sleep", "jnc.sleep", pType);
 }
 
 // size_t
@@ -1586,7 +1586,7 @@ CFunctionMgr::CreateStrLen ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction ("StrLen", "jnc.StrLen", pType);
+	CFunction* pFunction = CreateFunction ("strlen", "strlen", pType);
 	return pFunction;
 }
 
@@ -1598,7 +1598,7 @@ CFunctionMgr::CreateRand ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
-	CFunction* pFunction = CreateFunction ("Rand", "jnc.Rand", pType);
+	CFunction* pFunction = CreateFunction ("rand", "rand", pType);
 	return pFunction;
 }
 
@@ -1614,7 +1614,7 @@ CFunctionMgr::CreateGetTls ()
 		);
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
-	return CreateInternalFunction ("jnc.GetTls", pType);
+	return CreateInternalFunction ("jnc.getTls", pType);
 }
 
 // size_t
@@ -1637,7 +1637,7 @@ CFunctionMgr::CreateAppendFmtLiteral_a ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_a", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_a", pType);
 	return pFunction;
 }
 
@@ -1661,7 +1661,7 @@ CFunctionMgr::CreateAppendFmtLiteral_p ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_p", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_p", pType);
 	return pFunction;
 }
 
@@ -1685,7 +1685,7 @@ CFunctionMgr::CreateAppendFmtLiteral_i32 ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_i32", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_i32", pType);
 	return pFunction;
 }
 
@@ -1709,7 +1709,7 @@ CFunctionMgr::CreateAppendFmtLiteral_ui32 ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_ui32", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_ui32", pType);
 	return pFunction;
 }
 
@@ -1733,7 +1733,7 @@ CFunctionMgr::CreateAppendFmtLiteral_i64 ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_i64", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_i64", pType);
 	return pFunction;
 }
 
@@ -1757,7 +1757,7 @@ CFunctionMgr::CreateAppendFmtLiteral_ui64 ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_ui64", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_ui64", pType);
 	return pFunction;
 }
 
@@ -1781,7 +1781,7 @@ CFunctionMgr::CreateAppendFmtLiteral_f ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.AppendFmtLiteral_f", pType);
+	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_f", pType);
 	return pFunction;
 }
 

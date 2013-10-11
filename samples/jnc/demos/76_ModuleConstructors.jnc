@@ -13,9 +13,9 @@ class C1
 	}
 }
 
-C1 s_c; // global static variable with constructor & destructor
+C1 g_c; // global static variable with constructor & destructor
 
-int s_x = Foo (); // global static variable with initializer
+int g_x = Foo (); // global static variable with initializer
 
 int
 Foo ()
@@ -51,7 +51,7 @@ destruct ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

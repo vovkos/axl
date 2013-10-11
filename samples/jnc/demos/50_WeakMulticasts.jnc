@@ -22,9 +22,9 @@ class C1
 		printf ("C1.destruct ()\n");
 	}		
 
-	Foo ()
+	foo ()
 	{
-		printf ("C1.Foo () { m_x = %d }\n", m_x);
+		printf ("C1.foo () { m_x = %d }\n", m_x);
 	}
 }
 
@@ -35,7 +35,7 @@ class C1
 int
 main ()
 {
-	weak multicast Multicast ();
+	weak multicast wmc ();
 
 	C1* p;
 	weak C1* wp;
@@ -45,26 +45,26 @@ main ()
 		p = new C1; 
 		wp = p;
 
-		Multicast += p.weak Foo;
+		wmc += p.weak foo;
 	} 
 
 	// ok, only pointers keep object alive from now on
 
 	// p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
 
-	printf ("GC run...\n");
-	jnc.RunGcWaitForDestructors ();
+	printf ("gc run...\n");
+	jnc.runGcWaitForDestructors ();
 
 	p = wp;
 	if (p)
-		printf ("Object survived GC run\n");
+		printf ("object survived gc run\n");
 	else
-		printf ("Object was collected during GC run\n");
+		printf ("object was collected during gc run\n");
 
 	// if object was collected during gc-run, entry in multicast will be automatically removed
-	// during getting a snapshot (which is implicitly done inside Multicast.Call ())
+	// during getting a snapshot (which is implicitly done inside wmc.Call ())
 
-	Multicast (); 	
+	wmc (); 	
 
 	return 0;
 }
@@ -75,7 +75,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

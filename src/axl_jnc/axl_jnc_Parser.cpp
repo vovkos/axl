@@ -226,9 +226,7 @@ CParser::GetGlobalNamespace (
 	CModuleItem* pItem = pParentNamespace->FindItem (Name);
 	if (!pItem)
 	{
-		rtl::CString QualifiedName = pParentNamespace->CreateQualifiedName (Name);
-
-		pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace (Name, QualifiedName);
+		pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace (Name, pParentNamespace);
 		pNamespace->m_Pos = Pos;
 		pNamespace->m_pParentNamespace = pParentNamespace;
 		pParentNamespace->AddItem (pNamespace);
@@ -287,11 +285,7 @@ CParser::OpenTypeExtension (
 		return true;
 	}
 	
-	CGlobalNamespace* pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace (
-		"extension", 
-		pNamedType->CreateQualifiedName ("extension")
-		);
-
+	CGlobalNamespace* pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace ("extension", pNamedType);
 	pNamespace->m_NamespaceKind = ENamespace_TypeExtension;
 	pNamespace->m_Pos = Pos;
 	pNamespace->m_pParentNamespace = pNamedType;

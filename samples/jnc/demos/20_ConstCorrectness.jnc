@@ -3,55 +3,55 @@
 
 //.............................................................................
 
-struct TPoint
+struct Point
 {
 	int m_x;
 	int m_y;
 }
 
-Transpose (
-	TPoint* pDst,
-	const TPoint* pSrc
+transpose (
+	Point* dst,
+	const Point* src
 	)
 {
-	printf ("Transpose (%d, %d)\n", pSrc.m_x, pSrc.m_y);
+	printf ("transpose (%d, %d)\n", src.m_x, src.m_y);
 
-	int x = pSrc.m_x; // make it work when pDst and pSrc point to the same location
+	int x = src.m_x; // make it work when pDst and pSrc point to the same location
 
-	pDst.m_x = pSrc.m_y;
-	pDst.m_y = x;
+	dst.m_x = src.m_y;
+	dst.m_y = x;
 
-	// pSrc.m_x = 0; // <-- error: cannot store into const location
+	// src.m_x = 0; // <-- error: cannot store into const location
 }
 
 //.............................................................................
 
 class C1
 {
-	int m_Field;
-	mutable int m_MutableField;
+	int m_field;
+	mutable int m_mutableField;
 
-	Foo () const // jancy uses C++ syntax for declaring const methods
+	foo () const // jancy uses C++ syntax for declaring const methods
 	{
-		printf ("C1.Foo () { m_Field = %d }\n", m_Field);
+		printf ("C1.foo () { m_field = %d }\n", m_field);
 	}
 
-	Bar (int x)
+	bar (int x)
 	{
-		printf ("C1.Bar (%d)\n", x);
-		m_Field = x;
+		printf ("C1.bar (%d)\n", x);
+		m_field = x;
 	}	
 }
 
-Baz (const C1* p)
+baz (const C1* p)
 {
-	printf ("p.m_x = %d\n", p.m_Field);
+	printf ("p.m_x = %d\n", p.m_field);
 
-	p.Foo (); // ok, const method
-	p.m_MutableField = 100; // ok, mutable field
+	p.foo (); // ok, const method
+	p.m_mutableField = 100; // ok, mutable field
 
-	// p.m_Field = 200; // <-- error: cannot store to const location
-	// p.Bar (200); // <-- error: cannot convert 'const C1*' to 'C1*'
+	// p.m_field = 200; // <-- error: cannot store to const location
+	// p.bar (200); // <-- error: cannot convert 'const C1*' to 'C1*'
 }
 
 //.............................................................................
@@ -63,14 +63,14 @@ main ()
 {
 	printf ("main ()\n");
 
-	TPoint SrcPoint = { 10, 20 };
+	Point srcPoint = { 10, 20 };
 
-	TPoint DstPoint;
-	Transpose (&DstPoint, &SrcPoint); // we can be sure 'SrcPoint' is not going to change
+	Point dstPoint;
+	transpose (&dstPoint, &srcPoint); // we can be sure 'srcPoint' is not going to change
 
 	C1 c;
-	c.Bar (10); // no problem, we access C1 by non-const pointer
-	Baz (&c); // we can be sure 'c' is not going to change
+	c.bar (10); // no problem, we access C1 by non-const pointer
+	baz (&c); // we can be sure 'c' is not going to change
 
 	return 0;
 }
@@ -81,7 +81,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

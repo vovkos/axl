@@ -4,12 +4,12 @@
 // good examples would be: posting a request to a worker thread, sending message to a worker window,
 // calling a function with mutex held etc
 
-class CLockScheduler: jnc.IScheduler
+class LockScheduler: jnc.Scheduler
 {
 	// note how Schedule () has no information about target function argument  signature
 
 	override
-	Schedule (function* pf ())
+	schedule (function* pf ())
 	{
 		printf ("lock before call...\n");
 		pf ();
@@ -17,20 +17,20 @@ class CLockScheduler: jnc.IScheduler
 	}
 }
 
-Foo (
+foo (
 	int a,
 	int b
 	)
 {
-	printf ("Foo (%d, %d)\n", a, b);
+	printf ("foo (%d, %d)\n", a, b);
 }
 
 int
 main ()
 {
-	CLockScheduler LockScheduler;
+	LockScheduler scheduler;
 
-	function* pf (int, int) = Foo @ LockScheduler;  
+	function* pf (int, int) = foo @ scheduler; 
 
 	// result function pointer has the same argument signature as target function
 	// after passing the result function pointer as, say, completion routine,
@@ -39,7 +39,7 @@ main ()
 	// ...
 	
 	printf ("calling through scheduled function pointer...\n");
-	pf (10, 20); // Foo () will be called under lock
+	pf (10, 20); // foo () will be called under lock
 
 	return 0;
 }
@@ -50,7 +50,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

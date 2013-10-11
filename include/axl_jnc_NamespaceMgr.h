@@ -89,7 +89,7 @@ public:
 	CGlobalNamespace*
 	CreateGlobalNamespace (
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
+		CNamespace* pParentNamespace = NULL
 		);
 
 	CScope*

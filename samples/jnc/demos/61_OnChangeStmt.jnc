@@ -8,19 +8,19 @@
 
 //.............................................................................
 
-bool bindable s_UseDhcp;
-unsigned int32 bindable s_Ip4;
+bool bindable g_useDhcp;
+unsigned int32 bindable g_ip4;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // 'onchange' statement will be executed in response to change of properties enumerated in parentheses
 
 autoev 
-s_IpAutoEv ()
+g_ipAutoEv ()
 {
-	onchange (s_UseDhcp)
+	onchange (g_useDhcp)
 	{
-		if (s_UseDhcp)
+		if (g_useDhcp)
 		{		
 			printf ("using DHCP, disable IP-edit\n");
 		}
@@ -28,17 +28,17 @@ s_IpAutoEv ()
 		{
 			printf (
 				"using manual IP configuration (IP = %d.%d.%d.%d)\n",
-				(s_Ip4 & 0xff000000) >> 24,
-				(s_Ip4 & 0x00ff0000) >> 16,
-				(s_Ip4 & 0x0000ff00) >> 8,
-				(s_Ip4 & 0x000000ff)
+				(g_ip4 & 0xff000000) >> 24,
+				(g_ip4 & 0x00ff0000) >> 16,
+				(g_ip4 & 0x0000ff00) >> 8,
+				(g_ip4 & 0x000000ff)
 				);
 		}			
 	}
 
-	onchange (s_Ip4)
+	onchange (g_ip4)
 	{
-		s_UseDhcp = false;
+		g_useDhcp = false;
 	}
 }
 
@@ -49,11 +49,11 @@ s_IpAutoEv ()
 int 
 main ()
 {
-	s_IpAutoEv.Start ();
+	g_ipAutoEv.Start ();
 
-	s_UseDhcp = true;
+	g_useDhcp = true;
 
-	s_Ip4 = 0xc0a80105;
+	g_ip4 = 0xc0a80105;
 
 	return 0;
 }
@@ -64,7 +64,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

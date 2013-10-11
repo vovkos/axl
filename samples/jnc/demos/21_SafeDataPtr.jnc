@@ -7,44 +7,44 @@
 
 //.............................................................................
 
-Foo (int* p) // pointers arguments are checked before passing
+foo (int* p) // pointers arguments are checked before passing
 {
-	printf ("Foo (0x%x) { *p = %d }\n", p, *p);
+	printf ("foo (0x%x) { *p = %d }\n", p, *p);
 }
 
-Bar (nullable int* p) // ... unless they are marked as 'nullable'
+bar (nullable int* p) // ... unless they are marked as 'nullable'
 {
-	printf ("Bar (0x%x)\n", p);
+	printf ("bar (0x%x)\n", p);
 }
 
-Baz (unsafe thin int* p) // ... or they are unsafe
+baz (unsafe thin int* p) // ... or they are unsafe
 {
-	printf ("Baz (0x%x)\n", p);
+	printf ("baz (0x%x)\n", p);
 }
 
-int* s_p;
+int* g_p;
 
 int
 main ()
 {
 	int* p;
 
-	Bar (p); // ok, 'nullable'
-	Baz (p); // also ok, 'unsafe'
-	// Foo (p); // <-- runtime error: pointer out of range
+	bar (p); // ok, 'nullable'
+	baz (p); // also ok, 'unsafe'
+	// foo (p); // <-- runtime error: pointer out of range
 
 	int a [] = { 10, 20, 30 };
-	// s_p = a; // <-- runtime error: storing pointer in location with lesser scope level 
+	// g_p = a; // <-- runtime error: storing pointer in location with lesser scope level 
 
 	int  i;
 	for (i = 0; i < countof (a); i++)
-		Foo (&a [i]);
+		foo (&a [i]);
 
-	Bar (&a [i]); // ok, 'nullable'
-	Baz (&a [i]); // also ok, 'unsafe'
+	bar (&a [i]); // ok, 'nullable'
+	baz (&a [i]); // also ok, 'unsafe'
 
 	// int x = a [i]; // <-- runtime error: pointer out of range
-	// Foo (&a [i]); // <-- runtime error: pointer out of range
+	// foo (&a [i]); // <-- runtime error: pointer out of range
 
 	return 0;
 }
@@ -55,7 +55,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

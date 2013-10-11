@@ -26,6 +26,8 @@ public:
 		size_t Count
 		)
 	{ 
+		memset (p, 0, Count * sizeof (T)); // zero memory before construction
+
 		T* pEnd = p + Count;
 		for (; p < pEnd; p++)
 			new (p) T;
@@ -39,6 +41,8 @@ public:
 		size_t Count
 		)
 	{ 
+		memset (pDst, 0, Count * sizeof (T)); // zero memory before construction
+
 		T* pEnd = pDst + Count;
 		for (; pDst < pEnd; pDst++, pSrc++)
 			new (pDst) T (*pSrc);

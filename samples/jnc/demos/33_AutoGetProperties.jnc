@@ -2,11 +2,11 @@
 
 // simple property declaration syntax
 
-int autoget property s_SimpleProp;
+int autoget property g_simpleProp;
 
-s_SimpleProp.set (int x)
+g_simpleProp.set (int x)
 {
-	printf ("s_SimpleProp.set (%d)\n", x);
+	printf ("g_simpleProp.set (%d)\n", x);
 	propvalue = x; // autoget properties use 'propvalue' field as a retval of getter
 }
 
@@ -14,13 +14,13 @@ s_SimpleProp.set (int x)
 
 // the same property declared using full syntax
 
-property s_Prop
+property g_prop
 {	
 	int propvalue; // declaring a 'propvalue' field implicitly makes property 'autoget'
 
 	set (int x)
 	{
-		printf ("s_Prop.set (int %d)\n", x);
+		printf ("g_prop.set (int %d)\n", x);
 		propvalue = x;
 	}
 
@@ -28,7 +28,7 @@ property s_Prop
 
 	set (double x)
 	{
-		printf ("s_Prop.set (double %f)\n", x);
+		printf ("g_prop.set (double %f)\n", x);
 		propvalue = (int) x;
 	}
 }
@@ -38,13 +38,13 @@ property s_Prop
 int
 main ()
 {
-	s_SimpleProp = 100;
-	int x = s_SimpleProp;
+	g_simpleProp = 100;
+	int x = g_simpleProp;
 	printf ("x = %d\n", x);
 
-	s_Prop = 500;
-	s_Prop = 2.5;
-	x = s_Prop;
+	g_prop = 500;
+	g_prop = 2.5;
+	x = g_prop;
 	printf ("x = %d\n", x);
 
 	return 0;
@@ -56,7 +56,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

@@ -13,7 +13,7 @@
 
 //.............................................................................
 
-enum EColor
+enum Color
 {
 	Red,      // = 0 
 	Orange,
@@ -23,19 +23,19 @@ enum EColor
 	Purple,
 }
 
-enumf EOpenFlags
+enumf OpenFlags
 {
 	ReadOnly,      // = 0x01
 	Exclusive = 0x20,
 	DeleteOnClose, // = 0x40
 }
 
-enumc EState
+enumc State
 {
-	EState_Idle, // = 0
-	EState_Connecting,
-	EState_Connected,
-	EState_Disconnecting,
+	State_Idle, // = 0
+	State_Connecting,
+	State_Connected,
+	State_Disconnecting,
 }
 
 //.............................................................................
@@ -47,19 +47,19 @@ main ()
 {
 	printf ("main ()\n");
 
-	EColor Color = EColor.Blue;
-	// Color = 0; // <-- error cast int->enum must be explicit
-	printf ("Color = %d\n", Color);
+	Color color = Color.Blue;
+	// color = 0; // <-- error cast int->enum must be explicit
+	printf ("color = %d\n", color);
 
-	EState State = EState_Connecting; // EState.EState_Idle works also
-	// State = 100; // <-- error cast int->enum must be explicit
-	printf ("State = %d\n", State);
+	State state = State_Connecting; // State.State_Connecting works also
+	// state = 100; // <-- error cast int->enum must be explicit
+	printf ("state = %d\n", state);
 
-	EOpenFlags Flags = 0; // 0 is ok to assign to 'enumf'
+	OpenFlags flags = 0; // 0 is ok to assign to 'enumf'
 	 
-	Flags = EOpenFlags.ReadOnly | EOpenFlags.Exclusive | EOpenFlags.DeleteOnClose;
-	// Flags = 200; // <-- error cast int->enum must be explicit
-	printf ("Flags = %x\n", Flags);
+	flags = OpenFlags.ReadOnly | OpenFlags.Exclusive | OpenFlags.DeleteOnClose;
+	// flags = 200; // <-- error cast int->enum must be explicit
+	printf ("flags = %x\n", flags);
 
 	return 0;
 }
@@ -70,7 +70,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

@@ -6,24 +6,24 @@ class C1
 {
 	int m_x = -1;
 
-	Foo (
+	foo (
 		int a,
 		int b,
 		int c		
 		)
 	{
-		printf ("C1.Foo (%d, %d, %d) { m_x = %d }\n", a, b, c, m_x);
+		printf ("C1.foo (%d, %d, %d) { m_x = %d }\n", a, b, c, m_x);
 	}
 }
 
 // simple global function to be called through function pointer
 
-Bar (
+bar (
 	int a,
 	int b
 	)
 {
-	printf ("Bar (%d, %d)\n", a, b);
+	printf ("bar (%d, %d)\n", a, b);
 }
 
 //.............................................................................
@@ -36,13 +36,13 @@ main ()
 	// 'thin' function pointer is like a function pointer in C/C++:
 	// it is purely a pointer to code
 
-	thin function* pf1 (int, int) = Bar;
+	thin function* pf1 (int, int) = bar;
 	pf1 (10, 20);
 
 	// unlike C/C++ however, argument conversion is automated (compiler generates thunks if needed)
 
-	typedef function FFpFunc (double, double);
-	FFpFunc thin* pf2 = (FFpFunc thin*) Bar;
+	typedef function FpFunc (double, double);
+	FpFunc thin* pf2 = (FpFunc thin*) bar;
 	pf2 (15.8, 7.1);
 
 	// the true power though comes with closure function pointers
@@ -50,19 +50,19 @@ main ()
 
 	C1 c;
 
-	function* pf3 (int, int, int) = c.Foo; // in this case, pointer to 'c' was captured
+	function* pf3 (int, int, int) = c.foo; // in this case, pointer to 'c' was captured
 	pf3 (100, 200, 300);
 
 	// it is also allowed to capture arbitrary arguments in the closure
 	// using closure operator '~()'
 
-	function* pf4 (int) = Bar ~(5);
+	function* pf4 (int) = bar ~(5);
 	pf4 (6);
 
 	// it is also ok to skip arguments when capturing, thus allowing any combinations
 	// like: args 1, 3, 4 come from closure, args 2 and 5 come from call
 	
-	function* pf5 (int, int) = c.Foo ~(,, 3);
+	function* pf5 (int, int) = c.foo ~(,, 3);
 	pf5 (1, 2);
 
 	return 0;
@@ -74,7 +74,7 @@ main ()
 
 int
 printf (
-	unsafe const thin char* pFormat,
+	unsafe thin const char* format,
 	unsafe ...
 	);
 

@@ -11,7 +11,6 @@
 StdLib::StdLib ()
 {
 	m_FunctionMap ["printf"] = (void*) Printf;
-	m_FunctionMap ["rand"]   = (void*) rand;
 }
 
 int
@@ -314,8 +313,7 @@ void MainWindow::writeSettings()
 		if(MdiChild *child = qobject_cast<MdiChild *>(subWindow->widget()))
 			files.append(child->file());
 
-	if(!files.isEmpty())
-		s.setValue("filesOpened", files);
+	s.setValue("filesOpened", files);
 }
 
 jnc::CFunction *MainWindow::findGlobalFunction(const QString &name)
@@ -438,7 +436,6 @@ bool MainWindow::compile ()
 		llvm::ExecutionEngine* llvmExecutionEngine = runtime.GetLlvmExecutionEngine ();
 		jnc::CStdLib::Export (&module, llvmExecutionEngine);
 		module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
-		module.SetFunctionPointer (llvmExecutionEngine, "rand", (void*) rand);
 	}
 
 	Result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());	
