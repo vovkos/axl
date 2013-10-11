@@ -77,6 +77,8 @@ public:
 
 class CBaseTypeCoord
 {
+	AXL_DISABLE_COPY (CBaseTypeCoord)
+
 protected:
 	char m_Buffer [256];
 
@@ -91,12 +93,6 @@ public:
 	CBaseTypeCoord ()
 	{
 		Init ();
-	}
-
-	CBaseTypeCoord (const CBaseTypeCoord& Coord)
-	{
-		Init ();
-		*this = Coord;
 	}
 
 protected:

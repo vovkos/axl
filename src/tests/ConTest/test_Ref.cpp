@@ -122,8 +122,8 @@ void
 Run_WeakRef ()
 {
 	ref::CPtrT <CMyClass2> p = AXL_REF_NEW (CMyClass2);
-	ref::CPtrT <CMyClass2> p2 = ref::GetPtrOrClone ((CMyClass2*) p);
-	ref::CPtrT <CMyClass2> p3 = ref::Clone (p);
+//	ref::CPtrT <CMyClass2> p2 = ref::GetPtrOrClone ((CMyClass2*) p);
+//	ref::CPtrT <CMyClass2> p3 = ref::Clone (p);
 	ref::CWeakPtrT <CMyClass2> w = p;
 	p = ref::EPtr_Null;
 	p = w;
@@ -163,7 +163,7 @@ Run_Clone ()
 	a->AddRef ();
 	a->AddWeakRef ();
 
-	b = ref::Clone (a);
+//	b = ref::Clone (a);
 }
 
 //.............................................................................

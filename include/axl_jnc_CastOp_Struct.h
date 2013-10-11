@@ -14,9 +14,6 @@ namespace jnc {
 class CCast_Struct: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_Struct, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (

@@ -17,9 +17,6 @@ namespace io {
 
 class CFileTransport: public ITransport
 {
-public:
-	AXL_OBJ_CLASS_0 (CFileTransport, ITransport)
-		
 protected:
 	CFile* m_pTransmitFile;
 	CFile* m_pReceiveFile;

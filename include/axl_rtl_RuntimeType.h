@@ -4,105 +4,14 @@
 
 #pragma once
 
-#define _AXL_OBJ_TYPE_H
+#define _AXL_G_RUNTIMETYPE_H
 
 #include "axl_rtl_SimpleSingleton.h"
 #include "axl_rtl_Guid.h"
-#include "axl_rtl_Func.h"
+#include "axl_rtl_Type.h"
 
 namespace axl {
-namespace obj {
-	
-//.............................................................................
-
-// compile-time type information
-
-template <typename T>
-class CTypeT
-{
-public:
-	static
-	size_t 
-	GetSize ()
-	{ 
-		return sizeof (T);
-	}
-
-	static
-	const char*
-	GetName ()
-	{ 
-		return typeid (T).name ();
-	}
-
-	static
-	void
-	Construct (void* p)
-	{
-		new (p) T;
-	}
-
-	static
-	void
-	Destruct (void* p)
-	{
-		((T*) p)->~T ();
-	}
-
-	static
-	void
-	Copy (
-		void* p,
-		const void* pSrc
-		)
-	{
-		*(T*) p = *(const T*) pSrc;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// specialization for void
-
-template <>
-class CTypeT <void>
-{
-public:
-	static
-	size_t 
-	GetSize ()
-	{ 
-		return 0;
-	}
-
-	static
-	const char*
-	GetName ()
-	{ 
-		return typeid (void).name ();
-	}
-
-	static
-	void
-	Construct (void* p)
-	{
-	}
-
-	static
-	void
-	Destruct (void* p)
-	{
-	}
-
-	static
-	void
-	Copy (
-		void* p,
-		const void* pSrc
-		)
-	{
-	}
-};
+namespace rtl {
 
 //.............................................................................
 
@@ -147,13 +56,6 @@ public:
 	Destruct (void* p) = 0;
 
 	virtual
-	void
-	Copy (
-		void* p,
-		const void* pSrc
-		) = 0;
-
-	virtual
 	size_t
 	GetInterfaceOffset (const rtl::TGuid& Guid) = 0;
 
@@ -161,6 +63,84 @@ public:
 	HasInterface (const rtl::TGuid& Guid)
 	{
 		return GetInterfaceOffset (Guid) != -1;
+	}
+};
+
+//.............................................................................
+
+// root interface
+
+struct IRoot
+{
+	// {430F1A01-517D-4AFA-AB46-B28E30479E59}	
+	AXL_OBJ_INTERFACE (
+		IRoot,
+		0x430f1a01, 0x517d, 0x4afa, 0xab, 0x46, 0xb2, 0x8e, 0x30, 0x47, 0x9e, 0x59
+		)
+
+	virtual
+	void*
+	GetObject (IType** ppType) = 0;
+
+	void* 
+	GetObject ()
+	{
+		return GetObject (NULL);
+	}	
+
+	IType* 
+	GetType ()
+	{
+		IType* pType;
+		GetObject (&pType);
+		return pType;
+	}
+	
+	void*
+	GetInterface (const rtl::TGuid& Guid)
+	{
+		IType* pType;
+		void* p = GetObject (&pType);
+		size_t Offset = pType->GetInterfaceOffset (Guid);
+		return Offset != -1 ? (uchar_t*) p + Offset : NULL;
+	}
+};
+
+//.............................................................................
+
+// pointer to interface, queries interface when necessary
+
+template <typename I>
+class CPtrT
+{
+protected:
+	I* m_p;
+
+public:
+	CPtrT ()
+	{
+		m_p = NULL;
+	}
+
+	CPtrT (I* p)
+	{
+		m_p = p;
+	}
+
+	CPtrT (IRoot* p)
+	{
+		m_p = (I*) p->GetInterface (AXL_OBJ_GUIDOF (I));
+	}
+
+	operator I* ()
+	{
+		return m_p;
+	}
+
+	I* 
+	operator -> ()
+	{
+		return m_p;
 	}
 };
 
@@ -190,16 +170,6 @@ public:
 	Destruct (void* p)
 	{
 		CType::Destruct (p);
-	}
-
-	virtual
-	void
-	Copy (
-		void* p,
-		const void* pSrc
-		)
-	{
-		CType::Copy (p, pSrc);
 	}
 
 	virtual
@@ -381,5 +351,5 @@ public:
 
 //.............................................................................
 
-} // namespace obj
+} // namespace rtl
 } // namespace axl

@@ -50,6 +50,7 @@ source_group (
 
 exclude_from_build (
 	test_Log.cpp
+	test_Packer.cpp
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

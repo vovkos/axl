@@ -149,9 +149,6 @@ public:
 class CBinOp_Eq: public CBinOpT_Cmp <CBinOp_Eq>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Eq, IBinaryOperator)
-
-public:
 	CBinOp_Eq ()
 	{
 		m_OpKind = EBinOp_Eq;
@@ -219,9 +216,6 @@ public:
 
 class CBinOp_Ne: public CBinOpT_Cmp <CBinOp_Ne>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_Ne, IBinaryOperator)
-
 public:
 	CBinOp_Ne ()
 	{
@@ -291,9 +285,6 @@ public:
 class CBinOp_Lt: public CBinOpT_Cmp <CBinOp_Lt>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Lt, IBinaryOperator)
-
-public:
 	CBinOp_Lt ()
 	{
 		m_OpKind = EBinOp_Lt;
@@ -361,9 +352,6 @@ public:
 
 class CBinOp_Le: public CBinOpT_Cmp <CBinOp_Le>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_Le, IBinaryOperator)
-
 public:
 	CBinOp_Le ()
 	{
@@ -433,9 +421,6 @@ public:
 class CBinOp_Gt: public CBinOpT_Cmp <CBinOp_Gt>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Gt, IBinaryOperator)
-
-public:
 	CBinOp_Gt ()
 	{
 		m_OpKind = EBinOp_Gt;
@@ -503,9 +488,6 @@ public:
 
 class CBinOp_Ge: public CBinOpT_Cmp <CBinOp_Ge>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_Ge, IBinaryOperator)
-
 public:
 	CBinOp_Ge ()
 	{

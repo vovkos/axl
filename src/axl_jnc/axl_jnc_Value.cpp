@@ -89,8 +89,6 @@ CValue::Init ()
 {
 	m_ValueKind = EValue_Void;
 	m_pType = NULL;
-	memset (m_ConstBuffer, 0, sizeof (m_ConstBuffer));
-	m_Const.SetBuffer (ref::EBuf_Field, m_ConstBuffer, sizeof (m_ConstBuffer));
 	m_pVariable = NULL;
 	m_pLlvmValue = NULL;
 }

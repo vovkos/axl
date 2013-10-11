@@ -19,9 +19,6 @@ class CPixmap: public IImage
 	friend class CEngine;
 
 public:
-	AXL_OBJ_CLASS_0 (CPixmap, IImage);
-
-public:
 	QPixmap m_QtPixmap;
 
 public:

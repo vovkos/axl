@@ -33,9 +33,6 @@ enum EParseError
 class CParseErrorProvider: public IErrorProvider
 {
 public:
-	AXL_OBJ_CLASS_0 (CParseErrorProvider, IErrorProvider)
-
-public:
 	virtual 
 	rtl::CString 
 	GetErrorDescription (const TError* pError);

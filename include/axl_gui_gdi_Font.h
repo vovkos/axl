@@ -61,9 +61,6 @@ class CFont:
 	friend class CEngine;
 
 public:
-	AXL_OBJ_CLASS_0 (CFont, IFont);
-
-public:
 	CFont ();
 
 	bool

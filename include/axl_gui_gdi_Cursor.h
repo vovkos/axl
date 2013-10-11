@@ -22,8 +22,6 @@ class CCursor:
 	friend class CEngine;
 
 public:
-	AXL_OBJ_CLASS_0 (CCursor, ICursor);
-
 	CCursor ();
 };
 

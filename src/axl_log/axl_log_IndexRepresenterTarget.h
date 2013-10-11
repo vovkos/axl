@@ -19,9 +19,6 @@ class CIndexRepresenterTarget: public IRepresenterTarget
 {
 	friend class CIndexMgr;
 
-public:
-	AXL_OBJ_CLASS_0 (CIndexRepresenterTarget, IRepresenterTarget);
-
 protected:
 	size_t m_LineCount;
 	size_t m_Col;

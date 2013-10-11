@@ -233,27 +233,6 @@ endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# obj folder
-#
-
-set (
-	OBJ_H_LIST
-	${AXL_INC_DIR}/axl_obj_Ptr.h
-	${AXL_INC_DIR}/axl_obj_Root.h
-	${AXL_INC_DIR}/axl_obj_Type.h
-	)
-
-set (OBJ_CPP_LIST)
-
-source_group (
-	obj 
-	FILES 	
-	${OBJ_H_LIST}
-	${OBJ_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # ref folder
 #
 
@@ -261,7 +240,6 @@ set (
 	REF_H_LIST
 	${AXL_INC_DIR}/axl_ref_Buf.h
 	${AXL_INC_DIR}/axl_ref_Child.h
-	${AXL_INC_DIR}/axl_ref_Clone.h
 	${AXL_INC_DIR}/axl_ref_Factory.h
 	${AXL_INC_DIR}/axl_ref_Ptr.h
 	${AXL_INC_DIR}/axl_ref_RefCount.h
@@ -269,7 +247,10 @@ set (
 	${AXL_INC_DIR}/axl_ref_WeakPtr.h	
 	)
 
-set (REF_CPP_LIST)
+set (
+	REF_CPP_LIST
+	axl_ref_RefCount.cpp
+	)
 
 source_group (
 	ref 
@@ -309,11 +290,13 @@ set (
 	${AXL_INC_DIR}/axl_rtl_Packer.h
 	${AXL_INC_DIR}/axl_rtl_Packetizer.h
 	${AXL_INC_DIR}/axl_rtl_RbTree.h
+	${AXL_INC_DIR}/axl_rtl_RuntimeType.h
 	${AXL_INC_DIR}/axl_rtl_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_rtl_Singleton.h
 	${AXL_INC_DIR}/axl_rtl_String.h
 	${AXL_INC_DIR}/axl_rtl_StringCache.h
 	${AXL_INC_DIR}/axl_rtl_StringHashTable.h
+	${AXL_INC_DIR}/axl_rtl_Type.h
 	${AXL_INC_DIR}/axl_rtl_Unpacker.h
 	${AXL_INC_DIR}/axl_rtl_Utf.h
 	)

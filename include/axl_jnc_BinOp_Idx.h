@@ -14,9 +14,6 @@ namespace jnc {
 class CBinOp_Idx: public IBinaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Idx, IBinaryOperator)
-
-public:
 	CBinOp_Idx ()
 	{
 		m_OpKind = EBinOp_Idx;

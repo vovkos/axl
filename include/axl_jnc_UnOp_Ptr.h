@@ -14,9 +14,6 @@ namespace jnc {
 class CUnOp_Addr: public IUnaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CUnOp_Addr, IUnaryOperator)
-
-public:
 	CUnOp_Addr ()
 	{
 		m_OpKind = EUnOp_Addr;
@@ -39,9 +36,6 @@ public:
 
 class CUnOp_Indir: public IUnaryOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CUnOp_Indir, IUnaryOperator)
-
 public:
 	CUnOp_Indir ()
 	{

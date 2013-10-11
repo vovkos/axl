@@ -16,9 +16,6 @@ namespace jnc {
 class CCast_FpTrunc: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FpTrunc, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -58,9 +55,6 @@ public:
 class CCast_FpExt: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FpExt, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -99,9 +93,6 @@ public:
 
 class CCast_FpFromInt: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_FpFromInt, ICastOperator)
-
 public:
 	virtual
 	ECast
@@ -151,9 +142,6 @@ protected:
 class CCast_FpFromInt_u: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FpFromInt_u, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -202,9 +190,6 @@ protected:
 class CCast_FpFromBeInt: public CCast_SuperMaster
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FpFromBeInt, ICastOperator)
-
-public:
 	virtual
 	bool
 	GetCastOperators (
@@ -223,9 +208,6 @@ public:
 class CCast_FpFromEnum: public CCast_SuperMaster
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FpFromEnum, ICastOperator)
-
-public:
 	virtual
 	bool
 	GetCastOperators (
@@ -243,9 +225,6 @@ public:
 
 class CCast_Fp: public CCast_Master
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_Fp, ICastOperator)
-
 protected:
 	CCast_FpTrunc m_Trunc;
 	CCast_FpExt m_Ext;

@@ -14,9 +14,6 @@ namespace jnc {
 class CBinOp_Assign: public IBinaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Assign, IBinaryOperator)
-
-public:
 	CBinOp_Assign ()
 	{
 		m_OpKind = EBinOp_Assign;
@@ -48,9 +45,6 @@ public:
 class CBinOp_OpAssign: public IBinaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_OpAssign, IBinaryOperator)
-
-public:
 	CBinOp_OpAssign ()
 	{
 		m_OpFlags1 = EOpFlag_KeepRef;
@@ -80,9 +74,6 @@ public:
 
 class CBinOp_RefAssign: public IBinaryOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_RefAssign, IBinaryOperator)
-
 public:
 	CBinOp_RefAssign ()
 	{

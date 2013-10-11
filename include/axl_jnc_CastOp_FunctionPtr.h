@@ -15,9 +15,6 @@ namespace jnc {
 class CCast_FunctionPtr_FromMulticast: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_FromMulticast, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -53,9 +50,6 @@ public:
 class CCast_FunctionPtr_FromFat: public CCast_FunctionPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_FromFat, ICastOperator)
-
-public:
 	virtual
 	bool
 	LlvmCast (
@@ -71,9 +65,6 @@ public:
 class CCast_FunctionPtr_Weak2Normal: public CCast_FunctionPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Weak2Normal, ICastOperator)
-
-public:
 	virtual
 	bool
 	LlvmCast (
@@ -88,9 +79,6 @@ public:
 
 class CCast_FunctionPtr_Thin2Fat: public CCast_FunctionPtr_Base
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Fat, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -141,9 +129,6 @@ protected:
 class CCast_FunctionPtr_Thin2Thin: public CCast_FunctionPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr_Thin2Thin, ICastOperator)
-
-public:
 	virtual
 	bool
 	LlvmCast (
@@ -158,9 +143,6 @@ public:
 
 class CCast_FunctionPtr: public CCast_Master
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionPtr, ICastOperator)
-
 protected:
 	CCast_FunctionPtr_FromMulticast m_FromMulticast;
 	CCast_FunctionPtr_FromFat m_FromFat;
@@ -187,9 +169,6 @@ public:
 
 class CCast_FunctionRef: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_FunctionRef, ICastOperator)
-
 public:
 	virtual
 	ECast

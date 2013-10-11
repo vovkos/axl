@@ -22,8 +22,6 @@ public:
 	QImage m_QtImage;
 	
 public:
-	AXL_OBJ_CLASS_0 (CImageList, IImageList);
-
 	CImageList ();
 
 	virtual

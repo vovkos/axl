@@ -236,7 +236,7 @@ CEngine::CreateImage (
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 	}
 	
-	ref::CPtrT <CBitmap> Bitmap = AXL_REF_NEW (ref::CClassBoxT <CBitmap>);
+	ref::CPtrT <CBitmap> Bitmap = AXL_REF_NEW (ref::CBoxT <CBitmap>);
 	Bitmap->m_h = hBitmap;
 	return Bitmap;
 }
@@ -249,7 +249,7 @@ CEngine::CreateImageList (
 {
 	HIMAGELIST hImageList = NULL;
 
-	ref::CPtrT <CImageList> ImageList = AXL_REF_NEW (ref::CClassBoxT <CImageList>);
+	ref::CPtrT <CImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CImageList>);
 	ImageList->m_h = hImageList;
 	return ImageList;
 }
@@ -262,7 +262,7 @@ CEngine::CreateImageList (
 {
 	HIMAGELIST hImageList = NULL;
 
-	ref::CPtrT <CImageList> ImageList = AXL_REF_NEW (ref::CClassBoxT <CImageList>);
+	ref::CPtrT <CImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CImageList>);
 	ImageList->m_h = hImageList;
 	return ImageList;
 }
@@ -280,7 +280,7 @@ CEngine::CreateOffscreenCanvas (
 
 	HDC hdc = ::CreateCompatibleDC (ScreenDc);
 
-	ref::CPtrT <CDc> Dc = AXL_REF_NEW (ref::CClassBoxT <CDc>);	
+	ref::CPtrT <CDc> Dc = AXL_REF_NEW (ref::CBoxT <CDc>);	
 	Dc->Attach (hdc, NULL, CDc::EDestruct_DeleteDc);
 	Dc->m_hBitmap = hBitmap;
 	Dc->m_hPrevBitmap = (HBITMAP) ::SelectObject (hdc, hBitmap);

@@ -80,8 +80,6 @@ protected:
 class CRepresentor: public log::IRepresentor
 {
 public:
-	AXL_OBJ_CLASS_0 (CRepresentor, log::IRepresentor)
-
 	virtual 
 	bool 
 	Represent (

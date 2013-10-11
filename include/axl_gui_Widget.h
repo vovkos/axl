@@ -296,14 +296,8 @@ struct TWidgetScrollBar
 
 //.............................................................................
 
-struct IWidget: obj::IRoot
+struct IWidget
 {
-	// {69997BBD-04F2-46CC-BC2D-8CB2074E0A6F}
-	AXL_OBJ_INTERFACE (
-		IWidget,
-		0x69997bbd, 0x04f2, 0x46cc, 0xbc, 0x2d, 0x8c, 0xb2, 0x07, 0x4e, 0x0a, 0x6f
-		)
-
 protected:
 	friend struct IEngine;
 

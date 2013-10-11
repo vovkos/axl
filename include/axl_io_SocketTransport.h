@@ -20,9 +20,6 @@ class CSocketTransport:
 	public rtl::CHandleT <SOCKET>
 {
 public:
-	AXL_OBJ_CLASS_0 (CSocketTransport, ITransport)
-		
-public:
 	virtual
 	size_t
 	Transmit (

@@ -50,12 +50,6 @@ class CWidget:
 {
 	friend class CCacheMgr;
 	friend class CColorizeMgr;
-	
-public:
-	AXL_OBJ_BEGIN_INTERFACE_MAP (CWidget)
-		AXL_OBJ_INTERFACE_ENTRY (gui::IWidget)
-		AXL_OBJ_INTERFACE_ENTRY (IClient)
-	AXL_OBJ_END_INTERFACE_MAP ()
 
 protected:
 	IServer* m_pServer;

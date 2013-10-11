@@ -20,9 +20,6 @@ class CLineColorizerTarget: public IColorizerTarget
 {
 	friend class CLineRepresenterTarget;
 
-public:
-	AXL_OBJ_CLASS_0 (CLineColorizerTarget, IColorizerTarget);
-
 protected:
 	CBinLine* m_pLine;
 

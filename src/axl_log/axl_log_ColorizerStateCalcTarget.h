@@ -23,12 +23,6 @@ class CColorizerStateCalcTarget:
 {
 	friend class CColorizeMgr;
 
-public:
-	AXL_OBJ_BEGIN_CLASS_0 (CColorizerStateCalcTarget)
-		AXL_OBJ_INTERFACE_ENTRY (IColorizerTarget)
-		AXL_OBJ_INTERFACE_ENTRY (IRepresenterTarget)
-	AXL_OBJ_END_CLASS ()
-
 protected:
 	IColorizer* m_pColorizer;
 	void* m_pColorizerState;

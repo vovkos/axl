@@ -22,9 +22,6 @@ class CPainter:
 	friend class CEngine;
 
 public:
-	AXL_OBJ_CLASS_0 (CPainter, ICanvas);
-
-public:
 	CPainter ();
 
 	virtual

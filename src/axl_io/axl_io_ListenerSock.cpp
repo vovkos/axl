@@ -114,7 +114,7 @@ CListenerSock::OnSocketEvent_wt ()
 	if (s == INVALID_SOCKET)
 		return;
 
-	ref::CPtrT <CConnectionSock> Socket = AXL_REF_NEW (ref::CClassBoxT <CConnectionSock>);
+	ref::CPtrT <CConnectionSock> Socket = AXL_REF_NEW (ref::CBoxT <CConnectionSock>);
 	Socket->m_Sock.Attach (s);
 
 	TSockAddrU Addr;

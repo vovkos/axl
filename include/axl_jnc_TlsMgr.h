@@ -5,8 +5,10 @@
 #pragma once
 
 #include "axl_ref_RefCount.h"
-#include "axl_rtl_BitMap.h"
 #include "axl_rtl_List.h"
+#include "axl_rtl_Array.h"
+#include "axl_rtl_BitMap.h"
+#include "axl_rtl_SimpleSingleton.h"
 
 namespace axl {
 namespace jnc {

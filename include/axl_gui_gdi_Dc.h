@@ -47,9 +47,6 @@ class CDc:
 	friend class CEngine;
 	friend struct IGdiWidget;
 
-public:
-	AXL_OBJ_CLASS_0 (CDc, ICanvas);
-
 protected:
 	enum EDestruct
 	{

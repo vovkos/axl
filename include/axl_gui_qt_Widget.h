@@ -95,9 +95,6 @@ class CWidgetT: public T
 	friend class CEngine;
 
 public:
-	AXL_OBJ_CLASS_0 (CWidgetT, IWidget);
-
-public:
 	QtWidgetBase* m_pQtScrollArea;
 	QWidget* m_pQtWidget;
 	

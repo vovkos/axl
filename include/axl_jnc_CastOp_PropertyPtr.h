@@ -15,9 +15,6 @@ namespace jnc {
 class CCast_PropertyPtr_FromDataPtr: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr_FromDataPtr, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -69,9 +66,6 @@ public:
 class CCast_PropertyPtr_FromFat: public CCast_PropertyPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr_FromFat, ICastOperator)
-
-public:
 	virtual
 	bool
 	LlvmCast (
@@ -86,9 +80,6 @@ public:
 
 class CCast_PropertyPtr_Thin2Fat: public CCast_PropertyPtr_Base
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr_Thin2Fat, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -147,9 +138,6 @@ protected:
 class CCast_PropertyPtr_Weak2Normal: public CCast_PropertyPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr_Weak2Normal, ICastOperator)
-
-public:
 	virtual
 	bool
 	LlvmCast (
@@ -164,9 +152,6 @@ public:
 
 class CCast_PropertyPtr_Thin2Thin: public CCast_PropertyPtr_Base
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr_Thin2Thin, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -184,9 +169,6 @@ public:
 
 class CCast_PropertyPtr: public CCast_Master
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyPtr, ICastOperator)
-
 protected:
 	CCast_PropertyPtr_FromDataPtr m_FromDataPtr;
 	CCast_PropertyPtr_FromFat m_FromFat;
@@ -213,9 +195,6 @@ public:
 
 class CCast_PropertyRef: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_PropertyRef, ICastOperator)
-
 public:
 	CCast_PropertyRef ()
 	{

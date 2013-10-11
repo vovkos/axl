@@ -21,10 +21,14 @@ namespace ref {
 
 enum EBuf
 {
-	EBuf_Private, // buffer is stack-allocated or an object field, cannot be shared
-	EBuf_Static,  // buffer is static or global, can be shared
-	EBuf_Stack = EBuf_Private, 
-	EBuf_Field = EBuf_Private, 
+	EBuf_Exclusive, // buffer cannot be shared (stack-allocated or object-field) 
+	EBuf_Shared,    // buffer can be shared (static or global)
+
+	// aliases
+
+	EBuf_Static = EBuf_Shared, 
+	EBuf_Stack  = EBuf_Exclusive,
+	EBuf_Field  = EBuf_Exclusive,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -192,10 +196,11 @@ public:
 		ASSERT (Size >= sizeof (CHdr) + sizeof (T));
 
 		CHdr* pOldHdr = GetHdr ();
-		
-		CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
+
+		mem::FFree pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1;
+		CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
 		NewHdr->m_BufferSize = Size - sizeof (CHdr);
-		NewHdr->SetFree (Kind == EBuf_Static ? NULL : (mem::FFree) -1);
+
 		m_p = (T*) (NewHdr + 1);
 		NewHdr.Detach ();
 
@@ -238,6 +243,8 @@ protected:
 				*m_p = *pSrc;
 				CopyExtra (m_p, pSrc);
 			}
+
+			CHdr* pSrcHdr = (CHdr*) pSrc - 1;
 
 			return m_p;
 		}

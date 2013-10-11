@@ -10,6 +10,7 @@
 #include "axl_gui_Color.h"
 #include "axl_rtl_BitIdx.h"
 #include "axl_ref_RefCount.h"
+#include "axl_mem_Factory.h"
 
 namespace axl {
 namespace gui {
@@ -131,12 +132,6 @@ public:
 
 struct IFont: IGuiItem
 {
-	// {1A3344B2-80EC-493D-A89F-1EB9ADBB157D}
-	AXL_OBJ_INTERFACE (
-		IFont,
-		0x1a3344b2, 0x80ec, 0x493d, 0xa8, 0x9f, 0x1e, 0xb9, 0xad, 0xbb, 0x15, 0x7d
-		)
-
 protected:
 	TFontTuple* m_pTuple;
 	TFontDesc m_FontDesc;

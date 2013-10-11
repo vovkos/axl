@@ -34,14 +34,8 @@ GetEngineKindString (EEngine EngineKind);
 
 //.............................................................................
 
-struct IEngine: public obj::IRoot
+struct IEngine
 {
-	// {BFBE1EF2-5632-4BFB-B4E2-A9E27D3375A2}
-	AXL_OBJ_INTERFACE (
-		IEngine,
-		0xbfbe1ef2, 0x5632, 0x4bfb, 0xb4, 0xe2, 0xa9, 0xe2, 0x7d, 0x33, 0x75, 0xa2
-		)
-
 protected:
 	struct TSharedOffscreenCanvas
 	{

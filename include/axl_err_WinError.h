@@ -24,9 +24,6 @@ AXL_RTL_DEFINE_GUID (
 class CWinErrorProvider: public IErrorProvider
 {
 public:
-	AXL_OBJ_CLASS_E (CWinErrorProvider, IErrorProvider, GUID_WinError)
-
-public:
 	static
 	rtl::CString 
 	GetErrorDescription (dword_t Error);

@@ -21,9 +21,6 @@ class CDestructSingletonT:
 	public ref::IRefCount
 {
 public:
-	AXL_REF_CLASS_0 (CDestructSingletonT, g::IFinalizer)
-
-public:
 	T* m_p;
 
 public:

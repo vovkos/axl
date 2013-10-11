@@ -14,9 +14,6 @@ namespace jnc {
 class CUnOp_LogNot: public IUnaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CUnOp_LogNot, IUnaryOperator)
-
-public:
 	CUnOp_LogNot ()
 	{
 		m_OpKind = EUnOp_LogNot;

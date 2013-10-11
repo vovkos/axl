@@ -32,12 +32,6 @@ enum EStdCursor
 
 struct ICursor: IGuiItem
 {
-	// {402C6FE5-1D7A-4CC5-9D80-00CCC399383B}
-	AXL_OBJ_INTERFACE (
-		ICursor,
-		0x402c6fe5, 0x1d7a, 0x4cc5, 0x9d, 0x80, 0x00, 0xcc, 0xc3, 0x99, 0x38, 0x3b
-		)
-		
 };
 
 //.............................................................................

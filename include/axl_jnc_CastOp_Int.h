@@ -17,9 +17,6 @@ namespace jnc {
 class CCast_IntTrunc: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_IntTrunc, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -55,9 +52,6 @@ public:
 class CCast_IntExt: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_IntExt, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -90,9 +84,6 @@ public:
 
 class CCast_IntExt_u: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_IntExt_u, ICastOperator)
-
 public:
 	virtual
 	ECast
@@ -129,9 +120,6 @@ public:
 class CCast_SwapByteOrder: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_SwapByteOrder, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -165,9 +153,6 @@ public:
 class CCast_IntFromBeInt: public CCast_SuperMaster
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_IntFromBeInt, ICastOperator)
-
-public:
 	virtual
 	bool
 	GetCastOperators (
@@ -183,9 +168,6 @@ public:
 
 class CCast_BeInt: public CCast_SuperMaster
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_BeInt, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -230,9 +212,6 @@ public:
 class CCast_IntFromFp32: public CCast_IntFromFp
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_IntFromFp32, ICastOperator)
-
-public:
 	virtual
 	bool
 	ConstCast (
@@ -246,9 +225,6 @@ public:
 
 class CCast_IntFromFp64: public CCast_IntFromFp
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_IntFromFp64, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -266,9 +242,6 @@ public:
 class CCast_IntFromEnum: public CCast_SuperMaster
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_IntFromEnum, ICastOperator)
-
-public:
 	virtual
 	bool
 	GetCastOperators (
@@ -284,9 +257,6 @@ public:
 
 class CCast_Enum: public CCast_SuperMaster
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_Enum, ICastOperator)
-
 public:
 	CCast_Enum ()
 	{
@@ -317,9 +287,6 @@ public:
 
 class CCast_IntFromPtr: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_IntFromPtr, ICastOperator)
-
 public:
 	virtual
 	ECast
@@ -355,9 +322,6 @@ public:
 class CCast_PtrFromInt: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_PtrFromInt, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -392,9 +356,6 @@ public:
 
 class CCast_Int: public CCast_Master
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_Int, ICastOperator)
-
 protected:
 	CCast_IntTrunc m_Trunc;
 	CCast_IntExt m_Ext;

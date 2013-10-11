@@ -58,15 +58,9 @@ CastOperator (
 
 //.............................................................................
 
-struct ICastOperator: obj::IRoot
+struct ICastOperator
 {	
 	friend class COperatorMgr;
-
-	// {3B565CAF-8BA0-408F-9108-D28ECDEF518D}
-	AXL_OBJ_INTERFACE (
-		ICastOperator,
-		0x3b565caf, 0x8ba0, 0x408f, 0x91, 0x08, 0xd2, 0x8e, 0xcd, 0xef, 0x51, 0x8d
-		)
 
 protected:
 	CModule* m_pModule;
@@ -127,9 +121,6 @@ public:
 class CCast_Default: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_Default, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -160,9 +151,6 @@ public:
 
 class CCast_Copy: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_Copy, ICastOperator)
-
 public:
 	virtual
 	ECast

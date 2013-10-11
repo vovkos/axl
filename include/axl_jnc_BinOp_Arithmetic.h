@@ -206,9 +206,6 @@ public:
 class CBinOp_Add: public CBinOpT_Arithmetic <CBinOp_Add>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Add, IBinaryOperator)
-
-public:
 	CBinOp_Add ()
 	{
 		m_OpKind = EBinOp_Add;
@@ -286,9 +283,6 @@ public:
 
 class CBinOp_Sub: public CBinOpT_Arithmetic <CBinOp_Sub>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_Sub, IBinaryOperator)
-
 public:
 	CBinOp_Sub ()
 	{
@@ -368,9 +362,6 @@ public:
 class CBinOp_Mul: public CBinOpT_Arithmetic <CBinOp_Mul>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Mul, IBinaryOperator)
-
-public:
 	CBinOp_Mul ()
 	{
 		m_OpKind = EBinOp_Mul;
@@ -440,9 +431,6 @@ public:
 
 class CBinOp_Div: public CBinOpT_Arithmetic <CBinOp_Div>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_Div, IBinaryOperator)
-
 public:
 	CBinOp_Div ()
 	{
@@ -514,9 +502,6 @@ public:
 class CBinOp_Mod: public CBinOpT_IntegerOnly <CBinOp_Mod>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Mod, IBinaryOperator)
-
-public:
 	CBinOp_Mod ()
 	{
 		m_OpKind = EBinOp_Mod;
@@ -558,9 +543,6 @@ public:
 
 class CBinOp_Shl: public CBinOpT_IntegerOnly <CBinOp_Shl>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_Shl, IBinaryOperator)
-
 public:
 	CBinOp_Shl ()
 	{
@@ -604,9 +586,6 @@ public:
 class CBinOp_Shr: public CBinOpT_IntegerOnly <CBinOp_Shr>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_Shr, IBinaryOperator)
-
-public:
 	CBinOp_Shr ()
 	{
 		m_OpKind = EBinOp_Shr;
@@ -649,9 +628,6 @@ public:
 class CBinOp_BwAnd: public CBinOpT_IntegerOnly <CBinOp_BwAnd>
 {	
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_BwAnd, IBinaryOperator)
-
-public:
 	CBinOp_BwAnd ()
 	{
 		m_OpKind = EBinOp_BwAnd;
@@ -693,9 +669,6 @@ public:
 
 class CBinOp_BwOr: public CBinOpT_IntegerOnly <CBinOp_BwOr>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_BwOr, IBinaryOperator)
-
 public:
 	CBinOp_BwOr ();
 
@@ -768,9 +741,6 @@ public:
 
 class CBinOp_BwXor: public CBinOpT_IntegerOnly <CBinOp_BwXor>
 {	
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_BwXor, IBinaryOperator)
-
 public:
 	CBinOp_BwXor ()
 	{

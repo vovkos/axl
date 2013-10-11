@@ -214,7 +214,7 @@ CEngine::CreateImage (
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 	} */
 	
-	ref::CPtrT <CPixmap> Pixmap = AXL_REF_NEW (ref::CClassBoxT <CPixmap>);
+	ref::CPtrT <CPixmap> Pixmap = AXL_REF_NEW (ref::CBoxT <CPixmap>);
 	Pixmap->m_QtPixmap = QtPixmap;
 	return Pixmap;
 }

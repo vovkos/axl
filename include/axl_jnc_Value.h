@@ -55,7 +55,7 @@ protected:
 		size_t m_Size;
 	};
 
-	class CGetBufSize 
+	class CGetBufSize
 	{
 	public:
 		size_t
@@ -65,14 +65,11 @@ protected:
 		}
 	};
 
-	typedef ref::CBufT <TBufHdr, CGetBufSize> CConstBuf;
-
 protected:
 	EValue m_ValueKind;
 	CType* m_pType;	
-
-	CConstBuf m_Const;
-	uchar_t m_ConstBuffer [CConstBuf::MinBufSize + 8];
+	
+	ref::CBufT <TBufHdr, CGetBufSize> m_Const;
 
 	union
 	{

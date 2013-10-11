@@ -12,7 +12,7 @@ int main (int argc, char* argv [])
 #endif
 
 	atexit (llvm::llvm_shutdown);
-	
+
 	llvm::InitializeNativeTarget ();
 	llvm::InitializeNativeTargetAsmParser ();
 	llvm::InitializeNativeTargetAsmPrinter ();

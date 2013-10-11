@@ -8,6 +8,7 @@
 
 #include "axl_ref_Ptr.h"
 #include "axl_mem_Factory.h"
+#include "axl_rtl_Type.h"
 
 namespace axl {
 namespace ref {
@@ -23,12 +24,6 @@ class CFactoryT
 public:
 	typedef TAlloc CAlloc;
 
-	class CClass: public T
-	{
-	public:
-		AXL_OBJ_IMPLEMENT_GET_OBJECT (CClass)
-	};
-
 	class CNew
 	{
 	public:
@@ -40,15 +35,15 @@ public:
 			size_t Extra = 0
 			)
 		{
-			CPtrT <T> Object = mem::CStdFactoryT <CClass, TAlloc>::New (pFilePath, Line, Extra);
-			Object->SetFree (&TAlloc::Free);
+			CPtrT <T> Object = mem::CStdFactoryT <T, TAlloc>::New (pFilePath, Line, Extra);
+			Object->SetTarget (Object, &rtl::CTypeT <T>::Destruct, &TAlloc::Free);
 			return Object;
 		}
 #else
 		CPtrT <T> 
 		operator () (size_t Extra = 0)
 		{
-			CPtrT <T> Object = mem::CStdFactoryT <CClass, TAlloc>::New (Extra);
+			CPtrT <T> Object = mem::CStdFactoryT <T, TAlloc>::New (Extra);
 			Object->SetFree (&TAlloc::Free);
 			return Object;
 		}
@@ -81,32 +76,33 @@ public:
 //.............................................................................
 
 template <typename T>
-class CStaticFactoryT
+class CInPlaceFactoryT
 {
 public:
-	class CClass: public T
-	{
-	public:
-		AXL_OBJ_IMPLEMENT_GET_OBJECT (CClass)
-	};
-
 	class CNew
 	{
 	public:
 		CPtrT <T> 
-		operator () (void* p)
+		operator () (
+			void* p,
+			mem::FFree pfFree
+			)
 		{
-			new (p) CClass;
-			return (CClass*) p;
+			new (p) T;
+			((T*) p)->SetTarget (p, &rtl::CTypeT <T>::Destruct, pfFree); 
+			return (T*) p;
 		}
 	};
 
 public:
 	static
 	CPtrT <T> 
-	New (void* p)
+	New (
+		void* p,
+		mem::FFree pfFree
+		)
 	{
-		return CNew () (p);
+		return CNew () (p, pfFree);
 	}
 };
 
@@ -130,8 +126,8 @@ public:
 
 #endif
 
-#define AXL_REF_NEW_STATIC(Class, p) \
-	axl::ref::CStaticFactoryT <Class>::New (p)
+#define AXL_REF_NEW_INPLACE(Class, p, pfFree) \
+	axl::ref::CInPlaceFactoryT <Class>::New (p, pfFree)
 
 //.............................................................................
 

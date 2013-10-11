@@ -26,14 +26,8 @@ struct TSystemInfo
 
 //.............................................................................
 
-struct IFinalizer: obj::IRoot
+struct IFinalizer
 {
-	// {DD222152-03D6-4D4E-8291-F48D36F4035E}
-	AXL_OBJ_INTERFACE (
-		IFinalizer,
-		0xdd222152, 0x03d6, 0x4d4e, 0x82, 0x91, 0xf4, 0x8d, 0x36, 0xf4, 0x03, 0x5e
-		)
-
 	virtual 
 	void 
 	Finalize () = 0;

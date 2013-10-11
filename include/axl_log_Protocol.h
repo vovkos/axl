@@ -8,7 +8,6 @@
 
 #include "axl_log_IndexFile.h"
 #include "axl_log_CachePage.h"
-#include "axl_obj_Root.h"
 #include "axl_g_Time.h"
 
 namespace axl {
@@ -26,14 +25,8 @@ struct TMsg
 
 //.............................................................................
 
-struct IPeer: obj::IRoot
+struct IPeer
 {
-	// {0D19A0D6-A26E-43BC-8CAC-815382420613}
-	AXL_OBJ_INTERFACE (
-		IPeer,
-		0x0d19a0d6, 0xa26e, 0x43bc, 0x8c, 0xac, 0x81, 0x53, 0x82, 0x42, 0x06, 0x13
-		)
-
 	virtual
 	void
 	SendMsg (const TMsg* pMsg) = 0;
@@ -93,12 +86,6 @@ struct TSrvMsg_FoldPacket: TMsg
 
 struct IServer: IPeer
 {
-	// {6902690F-93B0-4597-875F-3C99D5FED984}
-	AXL_OBJ_INTERFACE (
-		IServer,
-		0x6902690f, 0x93b0, 0x4597, 0x87, 0x5f, 0x3c, 0x99, 0xd5, 0xfe, 0xd9, 0x84
-		)
-
 	void 
 	Clear ();
 
@@ -235,12 +222,6 @@ struct TCliMsg_FoldPacketComplete: TMsg
 
 struct IClient: IPeer
 {
-	// {9BA0444A-1DEA-4E55-B401-A496C8109C6F}
-	AXL_OBJ_INTERFACE (
-		IClient,
-		0x9ba0444a, 0x1dea, 0x4e55, 0xb4, 0x01, 0xa4, 0x96, 0xc8, 0x10, 0x9c, 0x6f
-		)
-
 	void 
 	ClearCache (uint64_t SyncId);
 

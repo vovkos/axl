@@ -13,14 +13,8 @@ namespace log {
 
 //.............................................................................
 
-struct IColorizerTarget: public obj::IRoot
+struct IColorizerTarget
 {
-	// {05DCF2D1-3F09-453C-96A3-9F7B74BE9651}
-	AXL_OBJ_INTERFACE (
-		IColorizerTarget,
-		0x05dcf2d1, 0x3f09, 0x453c, 0x96, 0xa3, 0x9f, 0x7b, 0x74, 0xbe, 0x96, 0x51
-		)
-
 	virtual
 	void 
 	SetAttr (
@@ -32,14 +26,8 @@ struct IColorizerTarget: public obj::IRoot
 
 //.............................................................................
 
-struct IColorizer: public obj::IRoot
+struct IColorizer
 {
-	// {883849C1-3ED3-47D0-8D58-ED1FED54EF3F}
-	AXL_OBJ_INTERFACE (
-		IColorizer,
-		0x883849c1, 0x3ed3, 0x47d0, 0x8d, 0x58, 0xed, 0x1f, 0xed, 0x54, 0xef, 0x3f
-		)
-
 protected:
 	size_t m_StateSize;
 

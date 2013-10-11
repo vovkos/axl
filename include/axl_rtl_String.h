@@ -885,10 +885,10 @@ public:
 
 		CHdr* pOldHdr = GetHdr ();
 		
-		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_STATIC (CHdr, p);
+		mem::FFree pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1;
+		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
 		NewHdr->m_Length = 0;
 		NewHdr->m_MaxLength = (Size - sizeof (CHdr)) / sizeof (C) - 1;
-		NewHdr->SetFree (Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1);
 
 		if (pOldHdr)
 			pOldHdr->Release ();

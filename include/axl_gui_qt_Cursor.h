@@ -19,9 +19,6 @@ class CCursor: public ICursor
 	friend class CEngine;
 	
 public:
-	AXL_OBJ_CLASS_0 (CCursor, ICursor);
-
-public:
 	QCursor m_QtCursor;
 
 public:	

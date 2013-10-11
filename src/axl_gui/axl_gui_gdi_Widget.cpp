@@ -70,7 +70,7 @@ IGdiWidget::GetCanvas (HWND hWnd)
 {
 	HDC hdc = ::GetDC (hWnd);
 
-	ref::CPtrT <CDc> Dc = AXL_REF_NEW (ref::CClassBoxT <CDc>);	
+	ref::CPtrT <CDc> Dc = AXL_REF_NEW (ref::CBoxT <CDc>);	
 	Dc->Attach (hdc, hWnd, CDc::EDestruct_ReleaseDc);
 	return Dc;
 }

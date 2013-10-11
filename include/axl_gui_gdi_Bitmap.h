@@ -21,9 +21,6 @@ class CBitmap:
 {
 	friend class CEngine;
 
-public:
-	AXL_OBJ_CLASS_0 (CBitmap, IImage);
-
 protected:
 	TSize m_Size;
 

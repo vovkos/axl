@@ -257,6 +257,16 @@ pvoid_cast (T x)
 
 //.............................................................................
 
+// ensure class is never accidentally copied
+
+#define AXL_DISABLE_COPY(Class) \
+private: \
+	Class (const Class&);  \
+	void \
+	operator = (const Class&); \
+
+//.............................................................................
+
 // TODO messages 
 
 // usage: #pragma AXL_TODO ("implement something")

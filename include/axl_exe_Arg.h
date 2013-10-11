@@ -20,7 +20,7 @@ class CArgRootT
 {
 public:
 	typedef T CArg;
-	typedef obj::CTypeT <T> CType;
+	typedef g::CTypeT <T> CType;
 
 	enum
 	{
@@ -300,7 +300,7 @@ public:
 		typename TArg2::CArg m_Arg2;
 	};
 
-	typedef obj::CTypeT <CArg> CType;
+	typedef g::CTypeT <CArg> CType;
 
 	class CShadow
 	{

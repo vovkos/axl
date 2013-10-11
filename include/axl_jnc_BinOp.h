@@ -74,15 +74,9 @@ GetBinOpKindString (EBinOp OpKind);
 
 //.............................................................................
 
-struct IBinaryOperator: obj::IRoot
+struct IBinaryOperator
 {	
 	friend class COperatorMgr;
-
-	// {C0A84F09-9553-440D-B8CC-B7E1F27BFFAF}
-	AXL_OBJ_INTERFACE (
-		IBinaryOperator,
-		0xc0a84f09, 0x9553, 0x440d, 0xb8, 0xcc, 0xb7, 0xe1, 0xf2, 0x7b, 0xff, 0xaf
-		)
 
 protected:
 	CModule* m_pModule;

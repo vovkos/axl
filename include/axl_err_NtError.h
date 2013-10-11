@@ -30,9 +30,6 @@ AXL_RTL_DEFINE_GUID (
 class CNtErrorProvider: public IErrorProvider
 {
 public:
-	AXL_OBJ_CLASS_E (CNtErrorProvider, IErrorProvider, GUID_NtError)
-
-public:
 	static
 	rtl::CString 
 	GetErrorDescription (NTSTATUS Status);

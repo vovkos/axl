@@ -14,9 +14,6 @@ namespace jnc {
 class CUnOp_PreInc: public IUnaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CUnOp_PreInc, IUnaryOperator)
-
-public:
 	CUnOp_PreInc ()
 	{
 		m_OpFlags = EOpFlag_KeepRef;
@@ -38,9 +35,6 @@ public:
 
 class CUnOp_PostInc: public IUnaryOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CUnOp_PostInc, IUnaryOperator)
-
 public:
 	CUnOp_PostInc ()
 	{

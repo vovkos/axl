@@ -6,7 +6,6 @@
 
 #define _AXL_GUI_DEF_H
 
-#include "axl_obj_Root.h"
 #include "axl_rtl_BitIdx.h"
 
 namespace axl {
@@ -522,7 +521,7 @@ struct TCursorPos
 
 //.............................................................................
 
-struct IGuiItem: obj::IRoot
+struct IGuiItem
 {
 protected:
 	IEngine* m_pEngine;

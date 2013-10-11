@@ -27,9 +27,6 @@ class CFont: public IFont
 	friend class CEngine;
 
 public:
-	AXL_OBJ_CLASS_0 (CFont, IFont);
-
-public:
 	QFont m_QtFont;
 	
 public:

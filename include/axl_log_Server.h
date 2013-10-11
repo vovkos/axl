@@ -33,9 +33,6 @@ class CServer: public IServer
 {
 	friend class CIoThread;
 
-public:
-	AXL_OBJ_CLASS_0 (CServer, IServer)
-
 protected:
 	enum EFlag
 	{

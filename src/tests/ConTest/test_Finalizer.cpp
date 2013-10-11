@@ -11,8 +11,6 @@ class CMyFinalizer:
 	public g::IFinalizer
 {
 public:
-	AXL_REF_CLASS_0 (CMyFinalizer, g::IFinalizer)
-
 	CMyFinalizer ()
 	{
 		printf ("CMyFinalizer::CMyFinalizer (this = %x)\n", this);

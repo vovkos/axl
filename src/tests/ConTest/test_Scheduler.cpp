@@ -61,8 +61,6 @@ Test (
 class CMyScheduler: public exe::IScheduler
 {
 public:
-	AXL_OBJ_CLASS_0 (CMyScheduler, exe::IScheduler)
-
 	virtual
 	EScheduleResult
 	Schedule_va (

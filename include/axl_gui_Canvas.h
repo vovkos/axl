@@ -19,12 +19,6 @@ namespace gui {
 
 struct ICanvas: IGuiItem
 {
-	// {267AE64D-B609-41F9-8B40-1D883A75CB5A}
-	AXL_OBJ_INTERFACE (
-		ICanvas,
-		0x267ae64d, 0xb609, 0x41f9, 0x8b, 0x40, 0x1d, 0x88, 0x3a, 0x75, 0xcb, 0x5a
-		)
-
 protected:
 	IFont* m_pFont;
 	TColorAttr m_ColorAttr;

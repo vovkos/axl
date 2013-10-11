@@ -185,9 +185,6 @@ public:
 class CUnOp_Plus: public CUnOpT_Arithmetic <CUnOp_Plus>
 {
 public:
-	AXL_OBJ_CLASS_0 (CUnOp_Plus, IUnaryOperator)
-
-public:
 	CUnOp_Plus ()
 	{
 		m_OpKind = EUnOp_Plus;
@@ -251,9 +248,6 @@ public:
 class CUnOp_Minus: public CUnOpT_Arithmetic <CUnOp_Minus>
 {
 public:
-	AXL_OBJ_CLASS_0 (CUnOp_Minus, IUnaryOperator)
-
-public:
 	CUnOp_Minus ()
 	{
 		m_OpKind = EUnOp_Minus;
@@ -306,9 +300,6 @@ public:
 
 class CUnOp_BwNot: public CUnOpT_IntegerOnly <CUnOp_BwNot>
 {
-public:
-	AXL_OBJ_CLASS_0 (CUnOp_BwNot, IUnaryOperator)
-
 public:
 	CUnOp_BwNot ()
 	{

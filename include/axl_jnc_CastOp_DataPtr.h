@@ -19,9 +19,6 @@ class CBaseTypeCoord;
 class CCast_DataPtr_FromArray: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_FromArray, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -87,9 +84,6 @@ protected:
 class CCast_DataPtr_Normal2Normal: public CCast_DataPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_Normal2Normal, ICastOperator)
-
-public:
 	virtual
 	bool
 	ConstCast (
@@ -112,9 +106,6 @@ public:
 
 class CCast_DataPtr_Thin2Normal: public CCast_DataPtr_Base
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_Thin2Normal, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -139,9 +130,6 @@ public:
 class CCast_DataPtr_Normal2Thin: public CCast_DataPtr_Base
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_Normal2Thin, ICastOperator)
-
-public:
 	virtual
 	bool
 	ConstCast (
@@ -164,9 +152,6 @@ public:
 
 class CCast_DataPtr_Thin2Thin: public CCast_DataPtr_Base
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr_Thin2Thin, ICastOperator)
-
 public:
 	virtual
 	bool
@@ -192,9 +177,6 @@ public:
 
 class CCast_DataPtr: public CCast_Master
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_DataPtr, ICastOperator)
-
 protected:
 	CCast_DataPtr_FromArray m_FromArray;
 	CCast_DataPtr_Normal2Normal m_Normal2Normal;
@@ -221,9 +203,6 @@ public:
 
 class CCast_DataRef: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_DataRef, ICastOperator)
-
 public:
 	CCast_DataRef ()
 	{

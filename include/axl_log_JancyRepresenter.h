@@ -68,9 +68,6 @@ struct TJancyRepresenter: jnc::TInterface
 	
 class CJancyRepresenter: public IRepresenter
 {
-public:
-	AXL_OBJ_CLASS_0 (CJancyRepresenter, IRepresenter)
-
 protected:
 	TJancyRepresenter* m_pJancyRepresenter;
 	jnc::CClassType* m_pJancyRepresenterTargetType;

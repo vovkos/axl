@@ -24,9 +24,6 @@ AXL_RTL_DEFINE_GUID (
 class CErrnoProvider: public IErrorProvider
 {
 public:
-	AXL_OBJ_CLASS_E (CErrnoProvider, IErrorProvider, GUID_Errno)
-
-public:
 	static
 	rtl::CString 
 	GetErrorDescription (int Error)

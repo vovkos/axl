@@ -15,12 +15,6 @@ namespace gui {
 
 struct IImageList: IGuiItem
 {
-	// {51DBDE74-2992-4CD6-8BCA-893B9D9F2402}
-	AXL_OBJ_INTERFACE (
-		IImageList,
-		0x51dbde74, 0x2992, 0x4cd6, 0x8b, 0xca, 0x89, 0x3b, 0x9d, 0x9f, 0x24, 0x02
-		)
-
 protected:
 	size_t m_Count;
 	TSize m_Size;

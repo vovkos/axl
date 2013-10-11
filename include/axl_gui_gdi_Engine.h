@@ -23,9 +23,6 @@ namespace gdi {
 
 class CEngine: public IEngine
 {
-public:
-	AXL_OBJ_CLASS_0 (CEngine, IEngine);
-
 protected:
 	ref::CPtrT <IFont> m_DefaultGuiFont;
 	ref::CPtrT <IFont> m_DefaultMonospaceFont;

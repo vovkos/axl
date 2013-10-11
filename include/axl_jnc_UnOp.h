@@ -54,15 +54,9 @@ enum EOpFlag
 
 //.............................................................................
 
-struct IUnaryOperator: obj::IRoot
+struct IUnaryOperator
 {
 	friend class COperatorMgr;
-
-	// {6CB89F38-6712-4172-ACCD-DA8CD196EE6F}
-	AXL_OBJ_INTERFACE (
-		IUnaryOperator,
-		0x6cb89f38, 0x6712, 0x4172, 0xac, 0xcd, 0xda, 0x8c, 0xd1, 0x96, 0xee, 0x6f
-		)
 
 protected:
 	CModule* m_pModule;

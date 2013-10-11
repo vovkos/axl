@@ -16,9 +16,6 @@ namespace jnc {
 class CCast_BoolFromZeroCmp: public ICastOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_BoolFromZeroCmp, ICastOperator)
-
-public:
 	virtual
 	ECast
 	GetCastKind (
@@ -54,9 +51,6 @@ public:
 class CCast_BoolFromPtr: public CCast_BoolFromZeroCmp
 {
 public:
-	AXL_OBJ_CLASS_0 (CCast_BoolFromPtr, ICastOperator)
-
-public:
 	virtual
 	bool
 	LlvmCast (
@@ -73,9 +67,6 @@ public:
 
 class CCast_IntFromBool: public ICastOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_IntFromBool, ICastOperator)
-
 public:
 	virtual
 	ECast
@@ -111,9 +102,6 @@ public:
 
 class CCast_Bool: public CCast_Master
 {
-public:
-	AXL_OBJ_CLASS_0 (CCast_Bool, ICastOperator)
-
 protected:
 	CCast_BoolFromZeroCmp m_FromZeroCmp;
 	CCast_BoolFromPtr m_FromPtr;

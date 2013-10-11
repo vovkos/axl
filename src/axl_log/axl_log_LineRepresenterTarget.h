@@ -19,9 +19,6 @@ class CLineRepresenterTarget: public IRepresenterTarget
 {
 	friend class CLineRepresentMgr;
 
-public:
-	AXL_OBJ_CLASS_0 (CLineRepresenterTarget, IRepresenterTarget);
-
 protected:
 	IColorizer* m_pColorizer;
 

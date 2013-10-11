@@ -14,9 +14,6 @@ namespace jnc {
 class CBinOp_LogAnd: public IBinaryOperator
 {
 public:
-	AXL_OBJ_CLASS_0 (CBinOp_LogAnd, IBinaryOperator)
-
-public:
 	CBinOp_LogAnd ()
 	{
 		m_OpKind = EBinOp_LogAnd;
@@ -42,9 +39,6 @@ public:
 
 class CBinOp_LogOr: public IBinaryOperator
 {
-public:
-	AXL_OBJ_CLASS_0 (CBinOp_LogOr, IBinaryOperator)
-
 public:
 	CBinOp_LogOr ()
 	{

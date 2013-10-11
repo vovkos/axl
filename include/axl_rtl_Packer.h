@@ -8,20 +8,15 @@
 
 #include "axl_rtl_Pack.h"
 #include "axl_rtl_Array.h"
+#include "axl_rtl_SimpleSingleton.h"
 
 namespace axl {
 namespace rtl {
 	
 //.............................................................................
 
-struct IPacker: obj::IRoot
+struct IPacker
 {
-	// {6836FF28-78AB-483D-9CFF-6B1CB1ADD961}
-	AXL_OBJ_INTERFACE (
-		IPacker,
-		0x6836ff28, 0x78ab, 0x483d, 0x9c, 0xff, 0x6b, 0x1c, 0xb1, 0xad, 0xd9, 0x61
-		)
-
 	virtual
 	axl_va_list
 	Pack_va (
@@ -94,9 +89,6 @@ template <typename TPack>
 class IPackerImplT: public IPacker
 {
 public:
-	AXL_OBJ_CLASS_0 (IPackerImplT, IPacker)
-
-public:
 	virtual
 	axl_va_list
 	Pack_va (
@@ -123,9 +115,6 @@ public:
 
 class CPackerSeq: public IPacker
 {
-public:
-	AXL_OBJ_CLASS_0 (CPackerSeq, IPacker)
-
 protected:
 	rtl::CArrayT <IPacker*> m_Sequence;
 

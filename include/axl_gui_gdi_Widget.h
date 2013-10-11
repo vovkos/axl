@@ -135,9 +135,6 @@ class CWidgetT:
 	friend class g::win::CWindowImplT <CWidgetT <T> >;
 
 public:
-	AXL_OBJ_CLASS_0 (CWidgetT, IWidget);
-
-public:
 	CWidgetT (): T (CEngine::GetSingleton ())
 	{
 		m_BaseTextAttr.m_ForeColor = ::GetSysColor (COLOR_WINDOWTEXT);

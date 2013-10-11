@@ -6,7 +6,6 @@
 
 #define _AXL_GUI_IMAGE_H
 
-#include "axl_obj_Root.h"
 #include "axl_rtl_BitIdx.h"
 #include "axl_gui_Def.h"
 
@@ -68,12 +67,6 @@ struct TImageDesc
 
 struct IImage: IGuiItem
 {
-	// {87668125-3AE1-4040-A95D-243FD20771A5}
-	AXL_OBJ_INTERFACE (
-		IImage,
-		0x87668125, 0x3ae1, 0x4040, 0xa9, 0x5d, 0x24, 0x3f, 0xd2, 0x07, 0x71, 0xa5
-		)
-
 protected:
 	TSize m_Size;
 

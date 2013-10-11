@@ -912,14 +912,8 @@ Complete (int Result)
 
 // providers
 
-struct IErrorProvider: obj::IRoot
+struct IErrorProvider
 {
-	// {DEF23F97-BAE2-4B79-AB6A-593095CB767C}
-	AXL_OBJ_INTERFACE (
-		IErrorProvider, 
-		0xdef23f97, 0xbae2, 0x4b79, 0xab, 0x6a, 0x59, 0x30, 0x95, 0xcb, 0x76, 0x7c
-		)
-
 	virtual 
 	rtl::CString 
 	GetErrorDescription (const TError* pError) = 0;
@@ -929,9 +923,6 @@ struct IErrorProvider: obj::IRoot
 
 class CStdErrorProvider: public IErrorProvider
 {
-public:
-	AXL_OBJ_CLASS_E (CStdErrorProvider, IErrorProvider, GUID_StdError)
-
 public:
 	virtual 
 	rtl::CString 
