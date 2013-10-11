@@ -73,14 +73,14 @@ main ()
 {
 	// starting autoev executes all the expressions in autoev block
 
-	g_colorAutoEv.Start (5); // equivalent to g_colorAutoEv (5);
+	g_colorAutoEv.start (5); // equivalent to g_colorAutoEv (5);
 
 	printf ("changing g_red, g_green, g_blue results in automatic calls to updateXxx functions\n");	
 
 	g_red = 0xab; 
 	g_green = 0xcd;
 
-	// g_colorAutoEv.Stop (); // <-- uncomment to unbind onchange handlers
+	// g_colorAutoEv.stop (); // <-- uncomment to unbind onchange handlers
 
 	g_blue = 0xef; 
 

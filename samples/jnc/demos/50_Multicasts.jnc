@@ -15,14 +15,14 @@ main ()
 	mc (5);
 
 	// events are just special pointers to multicasts with restricted access to 
-	// multicast methods 'Call', 'Set', 'Clear'
+	// multicast methods 'call', 'set', 'clear'
 
-	event* pEvent (int) = mc;
-	// pEvent (100); // <-- error: 'Call' is not accessible 
+	event* pe (int) = mc;
+	// pe (100); // <-- error: 'Call' is not accessible 
 
 	// u can only add and remove handlers through 'event' pointer
 	
-	pEvent += baz;
+	pe += baz;
 
 	printf ("mc call #2...\n");
 	mc (15);
@@ -32,15 +32,15 @@ main ()
 	// so simple lookup on the argument of 'Add' is not even always possible, let alone efficient
 	// therefore, 'handle-table' approach is used
 
-	mc.Clear (); // '= null' will work also
+	mc.clear (); // '= null' will work also
 
-	intptr Cookie1 = pEvent.Add (foo); // 'Add' and '+=' could be used interchangeably
-	intptr Cookie2 = pEvent.Add (bar ~(, 2000));
+	intptr cookie1 = pe.add (foo); // 'Add' and '+=' could be used interchangeably
+	intptr cookie2 = pe.add (bar ~(, 2000));
 
 	printf ("mc call #3...\n");
 	mc (25);
 	
-	pEvent -= Cookie1; // 'event' pointer can be used to remove entries from multicast
+	pe -= cookie1; // 'event' pointer can be used to remove entries from multicast
 
 	printf ("mc call #4...\n");
 	mc (35);
@@ -52,7 +52,7 @@ main ()
 	// while converting to a function pointer implicitly yields a 'live' pointer
 	
 	function* p1 (int) = mc; // live by default
-	function* p2 (int) = mc.GetSnapshot (); // obviously, a snapshot
+	function* p2 (int) = mc.getSnapshot (); // obviously, a snapshot
 
 	mc += foo;
 	mc += baz;

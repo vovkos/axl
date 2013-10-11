@@ -1119,8 +1119,8 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	// methods
 
 	pMethodType = GetFunctionType (NULL, NULL, 0);
-	pMethod = pType->CreateMethod (EStorage_Member, "Clear", pMethodType);
-	pMethod->m_Tag = "jnc.MulticastClear";
+	pMethod = pType->CreateMethod (EStorage_Member, "clear", pMethodType);
+	pMethod->m_Tag = "jnc.multicastClear";
 	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
 	pType->m_MethodArray [EMulticastMethod_Clear] = pMethod;
 	
@@ -1128,32 +1128,32 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	pArgType = pFunctionPtrType;
 	pMethodType = GetFunctionType (pReturnType, &pArgType, 1);
 
-	pMethod = pType->CreateMethod (EStorage_Member, "Set", pMethodType);
-	pMethod->m_Tag = IsThin ? "jnc.MulticastSet_t" : "jnc.MulticastSet";
+	pMethod = pType->CreateMethod (EStorage_Member, "set", pMethodType);
+	pMethod->m_Tag = IsThin ? "jnc.multicastSet_t" : "jnc.multicastSet";
 	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
 	pType->m_MethodArray [EMulticastMethod_Set] = pMethod;
 
 
-	pMethod = pType->CreateMethod (EStorage_Member, "Add", pMethodType);
-	pMethod->m_Tag = IsThin ? "jnc.MulticastAdd_t" : "jnc.MulticastAdd";
+	pMethod = pType->CreateMethod (EStorage_Member, "add", pMethodType);
+	pMethod->m_Tag = IsThin ? "jnc.multicastAdd_t" : "jnc.multicastAdd";
 	pType->m_MethodArray [EMulticastMethod_Add] = pMethod;
 
 	pReturnType = pFunctionPtrType;
 	pArgType = GetPrimitiveType (EType_Int_p);
 	pMethodType = GetFunctionType (pReturnType, &pArgType, 1);
-	pMethod = pType->CreateMethod (EStorage_Member, "Remove", pMethodType);
-	pMethod->m_Tag = IsThin ? "jnc.MulticastRemove_t" : "jnc.MulticastRemove";
+	pMethod = pType->CreateMethod (EStorage_Member, "remove", pMethodType);
+	pMethod->m_Tag = IsThin ? "jnc.multicastRemove_t" : "jnc.multicastRemove";
 	pType->m_MethodArray [EMulticastMethod_Remove] = pMethod;
 
 	pReturnType = pFunctionPtrType->GetStrongPtrType ();
 	pMethodType = GetFunctionType (pReturnType, NULL, 0);
-	pMethod = pType->CreateMethod (EStorage_Member, "GetSnapshot", pMethodType);
-	pMethod->m_Tag = "jnc.MulticastGetSnapshot";
+	pMethod = pType->CreateMethod (EStorage_Member, "getSnapshot", pMethodType);
+	pMethod->m_Tag = "jnc.multicastGetSnapshot";
 	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
 	pType->m_MethodArray [EMulticastMethod_GetSnapshot] = pMethod;
 
 	pMethodType = pFunctionPtrType->GetTargetType ();
-	pMethod = pType->CreateMethod (EStorage_Member, "Call", pMethodType);
+	pMethod = pType->CreateMethod (EStorage_Member, "call", pMethodType);
 	pMethod->m_Flags |= EMulticastMethodFlag_InaccessibleViaEventPtr;
 	pType->m_MethodArray [EMulticastMethod_Call] = pMethod;
 
@@ -1179,7 +1179,7 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 	// call method
 
 	pMethodType = pFunctionPtrType->GetTargetType ();
-	pSnapshotType->m_MethodArray [EMcSnapshotMethod_Call] = pSnapshotType->CreateMethod (EStorage_Member, "Call", pMethodType);
+	pSnapshotType->m_MethodArray [EMcSnapshotMethod_Call] = pSnapshotType->CreateMethod (EStorage_Member, "call", pMethodType);
 
 	pType->m_pSnapshotType = pSnapshotType;
 	
@@ -1220,8 +1220,8 @@ CTypeMgr::GetAutoEvInterfaceType (CFunctionType* pStartMethodType)
 
 	CClassType* pType = CreateUnnamedClassType (EClassType_AutoEvIface);
 	pType->m_Signature.Format ("CA%s", pStartMethodType->GetTypeString ().cc ());
-	CFunction* pStarter = pType->CreateMethod (EStorage_Abstract, "Start", pStartMethodType);
-	pType->CreateMethod (EStorage_Abstract, "Stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
+	CFunction* pStarter = pType->CreateMethod (EStorage_Abstract, "start", pStartMethodType);
+	pType->CreateMethod (EStorage_Abstract, "stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
 	pType->m_pCallOperator = pStarter;
 	return pType;
 }
@@ -1283,8 +1283,8 @@ CTypeMgr::CreateAutoEvType (
 
 	// methods
 
-	pType->m_MethodArray [EAutoEvMethod_Start] = pType->CreateMethod (EStorage_Override, "Start", pStartMethodType);
-	pType->m_MethodArray [EAutoEvMethod_Stop]  = pType->CreateMethod (EStorage_Override, "Stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
+	pType->m_MethodArray [EAutoEvMethod_Start] = pType->CreateMethod (EStorage_Override, "start", pStartMethodType);
+	pType->m_MethodArray [EAutoEvMethod_Stop]  = pType->CreateMethod (EStorage_Override, "stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
 	pType->m_pCallOperator = pType->m_MethodArray [EAutoEvMethod_Start];
 	return pType;
 }
