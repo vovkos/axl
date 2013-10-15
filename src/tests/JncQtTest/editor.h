@@ -29,9 +29,9 @@ public:
 
 	void appendFormat_va (const char* format, va_list va)
 	{
-		rtl::CString Text;
-		Text.Format_va (format, va);
-		appendText (Text);
+		QString string;
+		string.vsprintf (format, va);
+		appendString (string);
 	}
 
 	void appendFormat (const char* format, ...)

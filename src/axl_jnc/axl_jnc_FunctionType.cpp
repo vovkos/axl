@@ -283,17 +283,32 @@ CFunctionType::GetArgString ()
 	return m_ArgString;
 }
 
+rtl::CString 
+CFunctionType::GetTypeModifierString ()
+{
+	if (!m_TypeModifierString.IsEmpty ())
+		return m_TypeModifierString;
+
+	if (!m_CallConv && !(m_Flags & EFunctionTypeFlag_Unwinder))
+		return rtl::CString ();
+
+	if (m_CallConv)
+	{
+		m_TypeModifierString = GetCallConvString (m_CallConv);
+		m_TypeModifierString += ' ';
+	}
+
+	if (m_Flags & EFunctionTypeFlag_Unwinder)
+		m_TypeModifierString.Append ("unwinder ");
+
+	return m_TypeModifierString;
+}
+
 void
 CFunctionType::PrepareTypeString ()
 {
-	m_TypeString = m_pReturnType->GetTypeString ();
-
-	if (m_CallConv != ECallConv_Default)
-	{
-		m_TypeString += ' ';
-		m_TypeString += GetCallConvString (m_CallConv);
-	}
-
+	m_TypeString = GetTypeModifierString ();
+	m_TypeString += m_pReturnType->GetTypeString ();
 	m_TypeString += ' ';
 	m_TypeString += GetArgString ();	
 }

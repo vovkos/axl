@@ -5,6 +5,7 @@ compound_stmt
 	:	'{' $l
 			{
 				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
+				PreCreateLandingPads ($l.m_Data.m_Integer);
 			}
 		local_declaration* 
 		'}' $r
@@ -18,6 +19,7 @@ constructor_compound_stmt
 	:	'{' $l
 			{
 				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
+				PreCreateLandingPads ($l.m_Data.m_Integer);
 			} 
 		btm_construct_stmt*
 			{
@@ -85,6 +87,7 @@ statement
 	|	continue_stmt
 	|	return_stmt
 	|	once_stmt
+	|	try_stmt
 	|	';'
 	;
 
@@ -129,7 +132,9 @@ switch_stmt
 	}
 	:	EToken_Switch '(' expression $e ')' '{' $l
 			{
-				return m_pModule->m_ControlFlowMgr.SwitchStmt_Condition (&$Stmt, $e.m_Value, $l.m_Pos);
+				return 
+					m_pModule->m_ControlFlowMgr.SwitchStmt_Condition (&$Stmt, $e.m_Value, $l.m_Pos) &&
+					PreCreateLandingPads ($l.m_Data.m_Integer);
 			}
 		switch_block_stmt <&$Stmt>* '}' $r
 			{
@@ -268,6 +273,36 @@ once_stmt
 		statement $s
 			{
 				m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&$Stmt, $s.m_LastToken.m_Pos);
+			}
+	;
+
+try_stmt
+	:	EToken_Try 
+		'{' $l
+			{
+				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
+				PreCreateLandingPads ($l.m_Data.m_Integer | ELandingPadFlag_Catch); // always catch
+			}
+		local_declaration* 
+		'}' $r
+			{
+				m_pModule->m_ControlFlowMgr.EndTry ();
+				m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
+			}
+	;
+
+
+catch_label
+	:	EToken_Catch ':'
+			{
+				return m_pModule->m_ControlFlowMgr.Catch ();
+			}
+	;
+
+finally_label
+	:	EToken_Finally ':'
+			{
+				return m_pModule->m_ControlFlowMgr.Finally ();
 			}
 	;
 

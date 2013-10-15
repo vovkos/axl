@@ -52,6 +52,12 @@ Members
 		EAssign_BinOp,
 	};
 
+	enum ELandingPadFlag
+	{
+		ELandingPadFlag_Catch   = 0x01,
+		ELandingPadFlag_Finally = 0x02,
+	};
+
 	struct TCurlyInitializer
 	{
 		CValue m_TargetValue;
@@ -109,6 +115,9 @@ Members2
 		bool IsBuildingAst = false
 		);
 
+	bool
+	PreCreateLandingPads (uint_t Flags);
+
 	CType*
 	FindType (const CQualifiedName& Name);
 
@@ -149,7 +158,7 @@ Members2
 	IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier);
 
 	bool
-	SetDeclarationBody (rtl::CBoxListT <CToken>* pBody);
+	SetDeclarationBody (rtl::CBoxListT <CToken>* pTokenList);
 
 	void
 	AssignDeclarationAttributes (

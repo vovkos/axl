@@ -15,6 +15,8 @@ CScope::CScope ()
 	m_pFunction = NULL;
 	m_pBreakBlock = NULL;
 	m_pContinueBlock = NULL;
+	m_pCatchBlock = NULL;
+	m_pFinallyBlock = NULL;
 }
 
 //.............................................................................

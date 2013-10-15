@@ -47,6 +47,8 @@ local_declaration
 	|	item_declaration_w_specifier
 	|	resolver ({ return false; }) priority (2) // set higher priority than type_specifier::qualified_name
 		item_declaration_no_specifier
+	|	catch_label
+	|	finally_label
 	;
 
 //.............................................................................
@@ -195,22 +197,36 @@ declaration_body_pass1
 	:	compound_stmt_pass1 <&$.m_TokenList>
 	;
 
-noast 
+class
+{
+	CToken* m_pAnchorToken;
+}
 compound_stmt_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	:	'{'
+	:	'{' $l
 			{
-				$pTokenList->InsertTail ($1);
+				$.m_pAnchorToken = &*$pTokenList->InsertTail ($l);
+				$.m_pAnchorToken->m_Data.m_Integer = 0; // tokens can be reused, ensure cleanup
 			}
-		statement_pass1 <$pTokenList>* 
-		'}'
+		statement_pass1 <$pTokenList, $.m_pAnchorToken>* 
+		'}' $r
 			{
-				$pTokenList->InsertTail ($3);
+				$pTokenList->InsertTail ($r);
 			}
 	;
 
 noast
-statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList, CToken* $pAnchorToken>
 	:	compound_stmt_pass1 <$pTokenList>
+	|	EToken_Catch
+			{
+				$pTokenList->InsertTail ($1);
+				$pAnchorToken->m_Data.m_Integer |= ELandingPadFlag_Catch;
+			}
+	|	EToken_Finally
+			{
+				$pTokenList->InsertTail ($1);
+				$pAnchorToken->m_Data.m_Integer |= ELandingPadFlag_Finally;
+			}
 	|	any
 			{
 				$pTokenList->InsertTail ($1);

@@ -80,10 +80,10 @@ public:
 		return !m_Body.IsEmpty ();
 	}
 
-	const rtl::CBoxListT <CToken>*
+	rtl::CConstBoxListT <CToken>
 	GetBody ()
 	{
-		return &m_Body;
+		return m_Body;
 	}
 
 	bool

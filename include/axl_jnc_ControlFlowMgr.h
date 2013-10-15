@@ -172,6 +172,18 @@ public:
 		return Return (CValue (), false);
 	}
 
+	bool
+	Unwind (const CValue& IndicatorValue);
+
+	bool
+	Catch ();
+
+	bool
+	Finally ();
+
+	bool
+	EndTry ();
+
 	// if stmt
 
 	void

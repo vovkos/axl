@@ -172,6 +172,9 @@ CDeclTypeCalc::CalcType (
 		{
 		case EDeclSuffix_Array:
 			pType = GetArrayType (pType);
+			if (!pType)
+				return NULL;
+
 			break;
 
 		case EDeclSuffix_Function:
@@ -180,14 +183,17 @@ CDeclTypeCalc::CalcType (
 			else
 				pType = GetFunctionType (pType);
 
+			if (!pType)
+				return NULL;
+
 			if (!CheckUnusedModifiers ())
 				return NULL;
 
 			break;
-		}
 
-		if (!pType)
-			return NULL;
+		default:
+			ASSERT (false);
+		}
 	}
 
 	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code) && pFlags != NULL)
@@ -466,8 +472,19 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	}
 
 	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
-
 	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
+	uint_t Flags = pSuffix->GetFunctionTypeFlags ();
+	
+	if (m_TypeModifiers & ETypeModifier_Unwinder)
+	{
+		if (pReturnType->GetTypeKind () == EType_Void)
+		{
+			err::SetFormatStringError ("'unwinder' cannot be applied to void function");
+			return NULL;
+		}
+
+		Flags |= EFunctionTypeFlag_Unwinder;
+	}
 
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
 
@@ -475,7 +492,7 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 		CallConv,
 		pReturnType, 
 		pSuffix->GetArgArray (),
-		pSuffix->GetFunctionTypeFlags ()
+		Flags		
 		);
 }
 

@@ -1390,11 +1390,17 @@ protected:
 		);
 
 	bool
+	GetUnwindIndicator (
+		const CValue& ReturnValue,
+		CValue* pResultValue
+		);
+
+	bool
 	CallClosureFunctionPtr (
 		const CValue& OpValue,
 		rtl::CBoxListT <CValue>* pArgList,
 		CValue* pResultValue
-		);
+		);	
 
 	bool
 	CastArgList (

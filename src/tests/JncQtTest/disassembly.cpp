@@ -43,8 +43,8 @@ void Disassembly::addFunction(jnc::CFunction* function)
 
 	appendFormat (
 		"%s %s %s %s\n", 
+		pFunctionType->GetTypeModifierString ().cc (),
 		pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-		jnc::GetCallConvString (pFunctionType->GetCallConv ()),
 		function->m_Tag.cc (), 
 		pFunctionType->GetArgString ().cc ()
 		);

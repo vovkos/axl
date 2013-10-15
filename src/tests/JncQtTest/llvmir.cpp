@@ -16,9 +16,9 @@ void LlvmIr::addFunction(jnc::CFunction* function)
 {
 	jnc::CFunctionType* pFunctionType = function->GetType (); 
 
-	appendFormat ("%s %s %s %s\n", 
+	appendFormat ("%s%s %s %s\n", 
+		pFunctionType->GetTypeModifierString ().cc (),
 		pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-		jnc::GetCallConvString (pFunctionType->GetCallConv ()),
 		function->m_Tag.cc (), 
 		pFunctionType->GetArgString ().cc ()
 		);

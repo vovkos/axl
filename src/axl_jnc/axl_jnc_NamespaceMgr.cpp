@@ -225,6 +225,19 @@ CNamespaceMgr::FindContinueScope (size_t Level)
 	return pScope;
 }
 
+CScope*
+CNamespaceMgr::FindCatchScope ()
+{
+	CScope* pScope = m_pCurrentScope;
+	for (; pScope; pScope = pScope->GetParentScope ())
+	{
+		if (pScope->m_pCatchBlock)
+			break;
+	}
+
+	return pScope;
+}
+
 //.............................................................................
 
 } // namespace jnc {

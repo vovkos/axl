@@ -98,11 +98,11 @@ public:
 	CScope*
 	FindContinueScope (size_t Level);
 
-
+	CScope*
+	FindCatchScope ();
 };
 
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
-

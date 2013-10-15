@@ -74,6 +74,29 @@ CParser::ParseTokenList (
 }
 
 bool
+CParser::PreCreateLandingPads (uint_t Flags)
+{
+	if (!Flags)
+		return true;
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+
+	if (Flags & ELandingPadFlag_Catch)
+	{
+		ASSERT (!pScope->m_pCatchBlock);
+		pScope->m_pCatchBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("catch_block");
+	}
+
+	if (Flags & ELandingPadFlag_Finally)
+	{
+		ASSERT (!pScope->m_pFinallyBlock);
+		pScope->m_pFinallyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("finally_block");
+	}
+
+	return true;
+}
+
+bool
 CParser::IsTypeSpecified ()
 {
 	if (m_TypeSpecifierStack.IsEmpty ())
@@ -163,7 +186,7 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 }
 
 bool
-CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pBody)
+CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pTokenList)
 {
 	if (!m_pLastDeclaredItem)
 	{
@@ -177,10 +200,10 @@ CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pBody)
 	switch (ItemKind)
 	{
 	case EModuleItem_Function:
-		return ((CFunction*) m_pLastDeclaredItem)->SetBody (pBody);
+		return ((CFunction*) m_pLastDeclaredItem)->SetBody (pTokenList);
 
 	case EModuleItem_Property:
-		return ParseLastPropertyBody (*pBody);
+		return ParseLastPropertyBody (*pTokenList);
 
 	case EModuleItem_Typedef:
 		pType = ((CTypedef*) m_pLastDeclaredItem)->GetType ();
@@ -209,7 +232,7 @@ CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pBody)
 		return false;
 	}
 	
-	return ((CReactorClassType*) pType)->SetBody (pBody);
+	return ((CReactorClassType*) pType)->SetBody (pTokenList);
 }
 
 bool

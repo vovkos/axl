@@ -93,6 +93,7 @@ protected:
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	ECallConv m_CallConv;
 	rtl::CString m_ArgSignature;
+	rtl::CString m_TypeModifierString;
 	rtl::CString m_ArgString;
 	CFunctionType* m_pShortType;
 	CFunctionType* m_pStdObjectMemberMethodType;
@@ -138,6 +139,9 @@ public:
 
 	rtl::CString 
 	GetArgString ();
+
+	rtl::CString 
+	GetTypeModifierString ();
 
 	bool
 	IsMemberMethodType ()

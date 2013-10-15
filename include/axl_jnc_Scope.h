@@ -15,11 +15,21 @@ class CFunction;
 
 //.............................................................................
 
+enum EScopeFlag
+{
+	EScopeFlag_Try            = 0x0100,
+	EScopeFlag_CatchDefined   = 0x0200,
+	EScopeFlag_FinallyDefined = 0x0400,
+};
+
+//.............................................................................
+
 class CScope: 
 	public CModuleItem,
 	public CNamespace
 {
 	friend class CNamespaceMgr;
+	friend class CControlFlowMgr;
 	friend class CFunctionMgr;
 	friend class CParser;
 
@@ -36,6 +46,9 @@ protected:
 public:
 	CBasicBlock* m_pBreakBlock;
 	CBasicBlock* m_pContinueBlock;
+	CBasicBlock* m_pCatchBlock;
+	CBasicBlock* m_pFinallyBlock;
+
 	CDestructList m_DestructList;
 
 public:

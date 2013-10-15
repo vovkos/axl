@@ -227,7 +227,7 @@ named_type_block <CNamespace* $pNamespace>
 	}
 	leave
 	{
-		m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
+		m_pModule->m_NamespaceMgr.CloseNamespace ();
 	}
 	:	named_type_block_impl
 	;

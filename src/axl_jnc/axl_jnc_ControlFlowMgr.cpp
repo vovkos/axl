@@ -262,6 +262,68 @@ CControlFlowMgr::Return (
 	return true;
 }
 
+bool
+CControlFlowMgr::Unwind (const CValue& IndicatorValue)
+{
+	bool Result;
+
+	CBasicBlock* pUnwindBlock = CreateBlock ("unwind_block");
+	CBasicBlock* pFollowBlock = CreateBlock ("follow_block");
+
+	Result = ConditionalJump (IndicatorValue, pUnwindBlock, pFollowBlock);
+	if (!Result)
+		return false;
+
+	CScope* pCatchScope = m_pModule->m_NamespaceMgr.FindCatchScope ();
+
+	if (pCatchScope)
+	{
+		OnLeaveScope (pCatchScope->GetParentScope ()); // run destructors of 'catch' scope
+		Jump (pCatchScope->m_pCatchBlock);
+	}
+	else
+	{
+		CType* pReturnType = m_pModule->m_FunctionMgr.GetCurrentFunction ()->GetType ()->GetReturnType ();
+		Return (pReturnType->GetZeroValue ());	
+	}
+
+	Follow (pFollowBlock);
+	return true;
+}
+
+bool
+CControlFlowMgr::Catch ()
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope && pScope->m_pCatchBlock);
+
+	Follow (pScope->m_pCatchBlock);
+	pScope->m_Flags |= EScopeFlag_CatchDefined;
+	pScope->m_DestructList.Clear ();
+	return true;
+}
+
+bool
+CControlFlowMgr::Finally ()
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope && pScope->m_pFinallyBlock);
+
+	Follow (pScope->m_pFinallyBlock);
+	pScope->m_Flags |= EScopeFlag_FinallyDefined;
+	pScope->m_DestructList.Clear ();
+	return true;
+}
+
+bool
+CControlFlowMgr::EndTry ()
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope && pScope->m_pCatchBlock);
+
+	return !(pScope->GetFlags () & EScopeFlag_CatchDefined) ? Catch () : true;
+}
+
 //.............................................................................
 
 } // namespace jnc {

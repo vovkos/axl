@@ -563,7 +563,33 @@ COperatorMgr::CallImpl (
 		pResultValue
 		);
 
+	if (pFunctionType->GetFlags () & EFunctionTypeFlag_Unwinder)
+	{
+		CValue IndicatorValue;
+
+		Result = 
+			GetUnwindIndicator (*pResultValue, &IndicatorValue) &&
+			m_pModule->m_ControlFlowMgr.Unwind (IndicatorValue);
+
+		if (!Result)
+			return false;
+	}
+
 	return true;
+}
+
+bool
+COperatorMgr::GetUnwindIndicator (
+	const CValue& ReturnValue,
+	CValue* pResultValue
+	)
+{
+	// todo: more logic here
+	// if function has unwinder specifier, check retval against unwinder expression
+	// else, for integers, compare to -1
+	// else, apply logical-not
+
+	return UnaryOperator (EUnOp_LogNot, ReturnValue, pResultValue);
 }
 
 void

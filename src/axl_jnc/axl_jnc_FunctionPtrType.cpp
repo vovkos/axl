@@ -90,12 +90,7 @@ CFunctionPtrType::GetTypeModifierString ()
 		m_TypeModifierString += ' ';
 	}
 
-	ECallConv CallConv = m_pTargetType->GetCallConv ();
-	if (CallConv)
-	{
-		m_TypeModifierString += GetCallConvString (CallConv);
-		m_TypeModifierString += ' ';
-	}
+	m_TypeModifierString += m_pTargetType->GetTypeModifierString ();
 
 	return m_TypeModifierString;
 }
