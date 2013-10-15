@@ -37,7 +37,7 @@ CCast_FunctionPtr_FromMulticast::LlvmCast (
 	CValue CallValue;
 
 	return 	
-		m_pModule->m_OperatorMgr.MemberOperator (OpValue, "Call", &CallValue) &&
+		m_pModule->m_OperatorMgr.MemberOperator (OpValue, "call", &CallValue) &&
 		m_pModule->m_OperatorMgr.CastOperator (CallValue, pType, pResultValue);
 }
 

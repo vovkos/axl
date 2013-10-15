@@ -32,7 +32,7 @@ CFunctionType::CFunctionType ()
 	m_pShortType = this;
 	m_pStdObjectMemberMethodType = NULL;
 	m_pFunctionPtrTypeTuple = NULL;
-	m_pAutoEvInterfaceType = NULL;
+	m_pReactorInterfaceType = NULL;
 }
 
 CNamedType*

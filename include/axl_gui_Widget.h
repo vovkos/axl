@@ -14,7 +14,7 @@ namespace axl {
 namespace gui {
 
 class CEngine;
-class ÑCanvas;
+class CCanvas;
 
 //.............................................................................
 
@@ -114,7 +114,7 @@ struct TWidgetMsgT: TWidgetMsg
 
 struct TWidgetPaintMsg: TWidgetMsg
 {
-	ÑCanvas* m_pCanvas;
+	CCanvas* m_pCanvas;
 	TRect m_Rect;
 
 	TWidgetPaintMsg ()
@@ -124,7 +124,7 @@ struct TWidgetPaintMsg: TWidgetMsg
 	}
 
 	TWidgetPaintMsg (
-		ÑCanvas* pCanvas,
+		CCanvas* pCanvas,
 		const TRect& Rect
 		)
 	{
@@ -345,7 +345,7 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	GetCanvas () = 0;
 
 	virtual

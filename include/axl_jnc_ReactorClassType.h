@@ -11,28 +11,28 @@ namespace jnc {
 
 //.............................................................................
 
-enum EAutoEvField
+enum EReactorField
 {
-	EAutoEvField_Parent,
-	EAutoEvField_Lock,
-	EAutoEvField_State,
-	EAutoEvField_BindSiteArray,
+	EReactorField_Parent,
+	EReactorField_Lock,
+	EReactorField_State,
+	EReactorField_BindSiteArray,
 
-	EAutoEvField__Count,
+	EReactorField__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum EAutoEvMethod
+enum EReactorMethod
 {
-	EAutoEvMethod_Start,
-	EAutoEvMethod_Stop,
-	EAutoEvMethod__Count,
+	EReactorMethod_Start,
+	EReactorMethod_Stop,
+	EReactorMethod__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TAutoEvHandler: rtl::TListLink
+struct TReaction: rtl::TListLink
 {
 	rtl::CBoxListT <CValue> m_BindSiteList;
 	CFunction* m_pFunction;
@@ -40,31 +40,31 @@ struct TAutoEvHandler: rtl::TListLink
 
 //.............................................................................
 
-class CAutoEvClassType: public CClassType
+class CReactorClassType: public CClassType
 {
 	friend class CTypeMgr;
 
 protected:
-	CStructField* m_FieldArray [EAutoEvField__Count];
-	CFunction* m_MethodArray [EAutoEvMethod__Count];
+	CStructField* m_FieldArray [EReactorField__Count];
+	CFunction* m_MethodArray [EReactorMethod__Count];
 	rtl::CIteratorT <CStructField> m_FirstArgField;
 	size_t m_BindSiteCount;
 	rtl::CBoxListT <CToken> m_Body;
 
 public:
-	CAutoEvClassType ();
+	CReactorClassType ();
 
 	CStructField* 
-	GetField (EAutoEvField Field)
+	GetField (EReactorField Field)
 	{
-		ASSERT (Field < EAutoEvField__Count);
+		ASSERT (Field < EReactorField__Count);
 		return m_FieldArray [Field];
 	}
 
 	CFunction* 
-	GetMethod (EAutoEvMethod Method)
+	GetMethod (EReactorMethod Method)
 	{
-		ASSERT (Method < EAutoEvMethod__Count);
+		ASSERT (Method < EReactorMethod__Count);
 		return m_MethodArray [Method];
 	}
 
@@ -93,7 +93,7 @@ public:
 	CreateHandler ();
 
 	bool
-	BindHandlers (const rtl::CConstListT <TAutoEvHandler>& HandlerList);
+	BindHandlers (const rtl::CConstListT <TReaction>& HandlerList);
 
 	virtual
 	bool
@@ -115,9 +115,9 @@ protected:
 	PrepareTypeString ()
 	{
 		m_TypeString.Format (
-			"autoev %s %s", 
+			"reactor %s %s", 
 			m_QualifiedName.cc (),
-			m_MethodArray [EAutoEvMethod_Start]->GetType ()->GetShortType ()->GetArgString ().cc ()
+			m_MethodArray [EReactorMethod_Start]->GetType ()->GetShortType ()->GetArgString ().cc ()
 			);
 	}
 

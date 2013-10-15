@@ -739,9 +739,9 @@ struct TPropertyPtr
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// structure backing up autoev bind site in autoev class
+// structure backing up reactor bind site in reactor class
 
-struct TAutoEvBindSite
+struct TReactorBindSite
 {
 	TInterface* m_pOnChange;
 	intptr_t m_Cookie;

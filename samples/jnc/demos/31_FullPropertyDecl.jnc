@@ -3,7 +3,7 @@
 // full property declaration syntax allows declaring properties with
 // overloaded setters, members fields, helper methods, constructors / destructors etc
 
-property g_prop
+int property g_prop
 {
 	int m_x = 5; // member field with in-place initializer
 

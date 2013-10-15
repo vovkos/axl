@@ -21,7 +21,7 @@ namespace jnc {
 class CDerivableType;
 class CClassType;
 class CPropertyType;
-class CAutoEvClassType;
+class CReactorClassType;
 class CProperty;
 class CJitEventListener;
 
@@ -48,7 +48,7 @@ enum EFunction
 	EFunction_BinaryOperator,
 	EFunction_Internal, 
 	EFunction_Thunk,
-	EFunction_AutoEvHandler,
+	EFunction_Reaction,
 	EFunction_ScheduleLauncher,
 	EFunction__Count
 };

@@ -111,7 +111,7 @@ public:
 		);
 
 	virtual
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	CreateOffscreenCanvas (
 		int Width,
 		int Height

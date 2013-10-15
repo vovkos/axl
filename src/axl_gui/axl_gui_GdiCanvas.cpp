@@ -205,7 +205,7 @@ CGdiCanvas::DrawImage (
 
 bool
 CGdiCanvas::CopyRect (
-	ÑCanvas* pSrcCanvas,
+	CCanvas* pSrcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,

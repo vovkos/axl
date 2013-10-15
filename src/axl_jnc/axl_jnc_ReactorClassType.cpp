@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_jnc_AutoEvClassType.h"
+#include "axl_jnc_ReactorClassType.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Parser.llk.h"
 
@@ -8,26 +8,26 @@ namespace jnc {
 
 //.............................................................................
 
-CAutoEvClassType::CAutoEvClassType ()
+CReactorClassType::CReactorClassType ()
 {
-	m_ClassTypeKind = EClassType_AutoEv;
+	m_ClassTypeKind = EClassType_Reactor;
 	m_BindSiteCount = 0;
 	memset (m_FieldArray, 0, sizeof (m_FieldArray));
 	memset (m_MethodArray, 0, sizeof (m_MethodArray));
 }
 
 CFunction*
-CAutoEvClassType::CreateHandler ()
+CReactorClassType::CreateHandler ()
 {
 	return CreateUnnamedMethod (
 		EStorage_Member,
-		EFunction_AutoEvHandler,
+		EFunction_Reaction,
 		(CFunctionType*) (CType*) m_pModule->GetSimpleType (EStdType_SimpleFunction)
 		);
 }
 
 bool
-CAutoEvClassType::SetBody (rtl::CBoxListT <CToken>* pTokenList)
+CReactorClassType::SetBody (rtl::CBoxListT <CToken>* pTokenList)
 {
 	if (!m_Body.IsEmpty ())
 	{
@@ -41,37 +41,37 @@ CAutoEvClassType::SetBody (rtl::CBoxListT <CToken>* pTokenList)
 }
 
 bool
-CAutoEvClassType::CalcLayout ()
+CReactorClassType::CalcLayout ()
 {
 	bool Result;
 
 	if (m_Body.IsEmpty ())
 	{
-		err::SetFormatStringError ("autoev '%s' has no body", m_Tag.cc ()); // thanks a lot gcc
+		err::SetFormatStringError ("reactor '%s' has no body", m_Tag.cc ()); // thanks a lot gcc
 		return false;
 	}
 
 	// scan
 
 	CParser Parser;
-	Parser.m_Stage = CParser::EStage_AutoEvScan;
+	Parser.m_Stage = CParser::EStage_ReactorScan;
 	Parser.m_pModule = m_pModule;
-	Parser.m_pAutoEvType = this;
+	Parser.m_pReactorType = this;
 
 	m_pModule->m_NamespaceMgr.OpenNamespace (this);
 
-	Result = Parser.ParseTokenList (ESymbol_autoev_body_0, m_Body, false);
+	Result = Parser.ParseTokenList (ESymbol_reactor_body_0, m_Body, false);
 	if (!Result)
 		return false;
 
 	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
-	ASSERT (Parser.m_AutoEvBindSiteTotalCount);
-	m_BindSiteCount = Parser.m_AutoEvBindSiteTotalCount;
+	ASSERT (Parser.m_ReactorBindSiteTotalCount);
+	m_BindSiteCount = Parser.m_ReactorBindSiteTotalCount;
 
-	CType* pBindSiteType = m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
+	CType* pBindSiteType = m_pModule->m_TypeMgr.GetStdType (EStdType_ReactorBindSite);
 	CArrayType* pBindSiteArrayType = pBindSiteType->GetArrayType (m_BindSiteCount);
-	m_FieldArray [EAutoEvField_BindSiteArray] = CreateField (pBindSiteArrayType);
+	m_FieldArray [EReactorField_BindSiteArray] = CreateField (pBindSiteArrayType);
 	
 	Result = CClassType::CalcLayout ();
 	if (!Result)
@@ -81,11 +81,11 @@ CAutoEvClassType::CalcLayout ()
 }
 
 bool
-CAutoEvClassType::BindHandlers (const rtl::CConstListT <TAutoEvHandler>& HandlerList)
+CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList)
 {
 	bool Result;
 
-	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
+	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_ReactorBindSite);
 	CStructField* pEventPtrField = *pBindSiteType->GetFieldList ().GetHead ();
 	CStructField* pCookieField = *pBindSiteType->GetFieldList ().GetTail ();
 
@@ -95,7 +95,7 @@ CAutoEvClassType::BindHandlers (const rtl::CConstListT <TAutoEvHandler>& Handler
 	CValue BindSiteArrayValue;
 	Result = m_pModule->m_OperatorMgr.GetField (
 		ThisValue,
-		m_FieldArray [EAutoEvField_BindSiteArray], 
+		m_FieldArray [EReactorField_BindSiteArray], 
 		NULL, 
 		&BindSiteArrayValue
 		);
@@ -103,7 +103,7 @@ CAutoEvClassType::BindHandlers (const rtl::CConstListT <TAutoEvHandler>& Handler
 	if (!Result)
 		return false;
 
-	rtl::CIteratorT <TAutoEvHandler> Handler = HandlerList.GetHead ();
+	rtl::CIteratorT <TReaction> Handler = HandlerList.GetHead ();
 	size_t i = 0;
 	for (; Handler; Handler++)
 	{
@@ -148,18 +148,18 @@ CAutoEvClassType::BindHandlers (const rtl::CConstListT <TAutoEvHandler>& Handler
 
 
 bool
-CAutoEvClassType::CallStopMethod ()
+CReactorClassType::CallStopMethod ()
 {
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
 
-	CValue StopMethodValue = m_MethodArray [EAutoEvMethod_Stop];
+	CValue StopMethodValue = m_MethodArray [EReactorMethod_Stop];
 	StopMethodValue.InsertToClosureHead (ThisValue);
 	return m_pModule->m_OperatorMgr.CallOperator (StopMethodValue);
 }
 
 bool
-CAutoEvClassType::CompileConstructor ()
+CReactorClassType::CompileConstructor ()
 {
 	ASSERT (m_pConstructor);
 
@@ -173,7 +173,7 @@ CAutoEvClassType::CompileConstructor ()
 
 	if (ArgCount == 2)
 	{
-		CStructField* pField = m_FieldArray [EAutoEvField_Parent];
+		CStructField* pField = m_FieldArray [EReactorField_Parent];
 		ASSERT (pField);
 		
 		CValue ParentFieldValue;
@@ -190,7 +190,7 @@ CAutoEvClassType::CompileConstructor ()
 }
 
 bool
-CAutoEvClassType::CompileDestructor ()
+CReactorClassType::CompileDestructor ()
 {
 	ASSERT (m_pDestructor);
 
@@ -208,12 +208,12 @@ CAutoEvClassType::CompileDestructor ()
 }
 
 bool
-CAutoEvClassType::CompileStartMethod ()
+CReactorClassType::CompileStartMethod ()
 {
 	bool Result;
 
-	CFunction* pStartMethod = m_MethodArray [EAutoEvMethod_Start];
-	CFunction* pStopMethod = m_MethodArray [EAutoEvMethod_Stop];
+	CFunction* pStartMethod = m_MethodArray [EReactorMethod_Start];
+	CFunction* pStopMethod = m_MethodArray [EReactorMethod_Stop];
 
 	Result = m_pModule->m_FunctionMgr.Prologue (pStartMethod, m_Body.GetHead ()->m_Pos);
 	if (!Result)
@@ -262,9 +262,9 @@ CAutoEvClassType::CompileStartMethod ()
 	CParser Parser;
 	Parser.m_Stage = CParser::EStage_Pass2;
 	Parser.m_pModule = m_pModule;
-	Parser.m_pAutoEvType = this;
+	Parser.m_pReactorType = this;
 
-	Result = Parser.ParseTokenList (ESymbol_autoev_body, m_Body, true);
+	Result = Parser.ParseTokenList (ESymbol_reactor_body, m_Body, true);
 	if (!Result)
 		return false;
 
@@ -272,7 +272,7 @@ CAutoEvClassType::CompileStartMethod ()
 
 	CValue StateValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EAutoEvField_State], NULL, &StateValue) &&
+		m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EReactorField_State], NULL, &StateValue) &&
 		m_pModule->m_OperatorMgr.StoreDataRef (StateValue, CValue ((int64_t) 1, EType_Int_p));
 
 	if (!Result)
@@ -287,15 +287,15 @@ CAutoEvClassType::CompileStartMethod ()
 	return true;
 }
 bool
-CAutoEvClassType::CompileStopMethod ()
+CReactorClassType::CompileStopMethod ()
 {
 	bool Result;
 
-	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_AutoEvBindSite);
+	CStructType* pBindSiteType = (CStructType*) m_pModule->m_TypeMgr.GetStdType (EStdType_ReactorBindSite);
 	CStructField* pEventPtrField = *pBindSiteType->GetFieldList ().GetHead ();
 	CStructField* pCookieField = *pBindSiteType->GetFieldList ().GetTail ();
 
-	m_pModule->m_FunctionMgr.InternalPrologue (m_MethodArray [EAutoEvMethod_Stop]);
+	m_pModule->m_FunctionMgr.InternalPrologue (m_MethodArray [EReactorMethod_Stop]);
 
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
@@ -308,13 +308,13 @@ CAutoEvClassType::CompileStopMethod ()
 	CValue BindSiteArrayValue;
 
 	Result = 
-		m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EAutoEvField_State], NULL, &StateValue) &&
+		m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EReactorField_State], NULL, &StateValue) &&
 		m_pModule->m_ControlFlowMgr.ConditionalJump (StateValue, pUnadviseBlock, pFollowBlock);
 
 	if (!Result)
 		return false;
 
-	Result = m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EAutoEvField_BindSiteArray], NULL, &BindSiteArrayValue);
+	Result = m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EReactorField_BindSiteArray], NULL, &BindSiteArrayValue);
 	if (!Result)
 		return false;
 
@@ -358,8 +358,8 @@ CAutoEvClassType::CompileStopMethod ()
 //.............................................................................
 
 bool
-CParser::DeclareAutoEv (
-	CAutoEvClassType* pType,
+CParser::DeclareReactor (
+	CReactorClassType* pType,
 	CDeclarator* pDeclarator
 	)
 {
@@ -371,19 +371,19 @@ CParser::DeclareAutoEv (
 
 	if (!pDeclarator->IsSimple ())
 	{
-		err::SetFormatStringError ("invalid autoev declarator (qualified autoev not supported yet)");
+		err::SetFormatStringError ("invalid reactor declarator (qualified reactor not supported yet)");
 		return false;
 	}
 
 	if (NamespaceKind == ENamespace_PropertyTemplate)
 	{
-		err::SetFormatStringError ("property templates cannot have autoev memberts");
+		err::SetFormatStringError ("property templates cannot have reactor memberts");
 		return false;
 	}
 
 	if (m_StorageKind && m_StorageKind != EStorage_Static)
 	{
-		err::SetFormatStringError ("invalid storage '%s' for autoev", GetStorageKindString (m_StorageKind));
+		err::SetFormatStringError ("invalid storage '%s' for reactor", GetStorageKindString (m_StorageKind));
 		return false;
 	}
 
@@ -393,15 +393,15 @@ CParser::DeclareAutoEv (
 	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
 
-	CAutoEv* pAutoEv = m_pModule->m_FunctionMgr.CreateAutoEv (Name, QualifiedName);
-	AssignDeclarationAttributes (pAutoEv, pNamespace, pDeclarator->GetPos ());
+	CReactor* pReactor = m_pModule->m_FunctionMgr.CreateReactor (Name, QualifiedName);
+	AssignDeclarationAttributes (pReactor, pNamespace, pDeclarator->GetPos ());
 
 	switch (NamespaceKind)
 	{
 	case ENamespace_TypeExtension:
 		if (!pDeclarator->IsSimple ())
 		{
-			err::SetFormatStringError ("invalid declarator '%s' in type extension", pAutoEv->m_Tag.cc ());
+			err::SetFormatStringError ("invalid declarator '%s' in type extension", pReactor->m_Tag.cc ());
 			return false;
 		}
 
@@ -416,11 +416,11 @@ CParser::DeclareAutoEv (
 
 		if (pDeclarator->IsQualified () && m_StorageKind != EStorage_Override)
 		{
-			err::SetFormatStringError ("only overrides could be qualified, '%s' is not an override", pAutoEv->m_Tag.cc ());
+			err::SetFormatStringError ("only overrides could be qualified, '%s' is not an override", pReactor->m_Tag.cc ());
 			return false;
 		}
 
-		Result = ((CClassType*) pNamespace)->AddAutoEv (pAutoEv);
+		Result = ((CClassType*) pNamespace)->AddReactor (pReactor);
 		if (!Result)
 			return false;
 
@@ -429,11 +429,11 @@ CParser::DeclareAutoEv (
 	case ENamespace_Property:
 		if (pDeclarator->IsQualified ())
 		{
-			err::SetFormatStringError ("invalid qualified declarator '%s' in property", pAutoEv->m_Tag.cc ());
+			err::SetFormatStringError ("invalid qualified declarator '%s' in property", pReactor->m_Tag.cc ());
 			return false;
 		}
 
-		Result = ((CProperty*) pNamespace)->AddAutoEv (pAutoEv);
+		Result = ((CProperty*) pNamespace)->AddReactor (pReactor);
 		if (!Result)
 			return false;
 
@@ -442,22 +442,22 @@ CParser::DeclareAutoEv (
 	default:
 		if (m_StorageKind)
 		{
-			err::SetFormatStringError ("invalid storage specifier '%s' for a global AutoEv", GetStorageKindString (m_StorageKind));
+			err::SetFormatStringError ("invalid storage specifier '%s' for a global Reactor", GetStorageKindString (m_StorageKind));
 			return false;
 		}
 
-		pAutoEv->m_StorageKind = EStorage_Static;
+		pReactor->m_StorageKind = EStorage_Static;
 
-		Result = pNamespace->AddItem (pAutoEv);
+		Result = pNamespace->AddItem (pReactor);
 		if (!Result)
 			return false;
 	}
 
-	return pAutoEv->Create (pType);
+	return pReactor->Create (pType);
 }
 
 CClassType*
-CParser::CreateAutoEvClassType (
+CParser::CreateReactorClassType (
 	const rtl::CString& Name,
 	CDeclFunctionSuffix* pFunctionSuffix,
 	rtl::CBoxListT <CToken>* pTokenList
@@ -467,7 +467,7 @@ CParser::CreateAutoEvClassType (
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-	CClassType* pClassType = m_pModule->m_TypeMgr.CreateClassType (EClassType_AutoEv, Name, QualifiedName);
+	CClassType* pClassType = m_pModule->m_TypeMgr.CreateClassType (EClassType_Reactor, Name, QualifiedName);
 
 	Result = pNamespace->AddItem (pClassType);
 	if (!Result)
@@ -482,19 +482,19 @@ CParser::CreateAutoEvClassType (
 		) : 
 		(CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
 
-	CAutoEvClassType* pAutoEvType = m_pModule->m_TypeMgr.GetAutoEvType (pStartMethodType);	
+	CReactorClassType* pReactorType = m_pModule->m_TypeMgr.GetReactorType (pStartMethodType);	
 
-	CAutoEv* pAutoEv = m_pModule->m_FunctionMgr.CreateUnnamedAutoEv ();
+	CReactor* pReactor = m_pModule->m_FunctionMgr.CreateUnnamedReactor ();
 	
 	Result = 
-		pClassType->AddAutoEv (pAutoEv) &&
-		pAutoEv->Create (pAutoEvType);
+		pClassType->AddReactor (pReactor) &&
+		pReactor->Create (pReactorType);
 
 	if (!Result)
 		return NULL;
 
 	if (pTokenList)
-		pAutoEv->SetBody (pTokenList);
+		pReactor->SetBody (pTokenList);
 
 	return pClassType;
 }

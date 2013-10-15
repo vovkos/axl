@@ -285,7 +285,6 @@ source_group (
 set (
 	TYPE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_ArrayType.h
-	${AXL_INC_DIR}/axl_jnc_AutoEvClassType.h
 	${AXL_INC_DIR}/axl_jnc_BitFieldType.h
 	${AXL_INC_DIR}/axl_jnc_ClassPtrType.h
 	${AXL_INC_DIR}/axl_jnc_ClassType.h
@@ -303,6 +302,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_NamedType.h
 	${AXL_INC_DIR}/axl_jnc_PropertyPtrType.h
 	${AXL_INC_DIR}/axl_jnc_PropertyType.h
+	${AXL_INC_DIR}/axl_jnc_ReactorClassType.h
 	${AXL_INC_DIR}/axl_jnc_StructType.h
 	${AXL_INC_DIR}/axl_jnc_Type.h
 	${AXL_INC_DIR}/axl_jnc_TypeMgr.h
@@ -312,7 +312,6 @@ set (
 set (
 	TYPE_CPP_LIST
 	axl_jnc_ArrayType.cpp
-	axl_jnc_AutoEvClassType.cpp
 	axl_jnc_BitFieldType.cpp
 	axl_jnc_ClassPtrType.cpp
 	axl_jnc_ClassType.cpp
@@ -330,6 +329,7 @@ set (
 	axl_jnc_NamedType.cpp
 	axl_jnc_PropertyPtrType.cpp
 	axl_jnc_PropertyType.cpp
+	axl_jnc_ReactorClassType.cpp
 	axl_jnc_StructType.cpp
 	axl_jnc_Type.cpp
 	axl_jnc_TypeMgr.cpp

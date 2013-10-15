@@ -60,12 +60,13 @@ main := |*
 'bigendian'       |
 'nullable'        |
 'const'           |
-'pubconst'        |
+'constd'          |
 'mutable'         |
 'volatile'        |
 'weak'            |
 'thin'            |
 'unsafe'          |
+'unwinder'        |
 'cdecl'           |
 'stdcall'         |
 'function'        |
@@ -75,8 +76,8 @@ main := |*
 'indexed'         |
 'multicast'       |
 'event'           |
-'pubevent'        |
-'autoev'          |
+'eventd'          |
+'reactor'         |
 
 'auto'            |
 'void'            |
@@ -102,15 +103,11 @@ main := |*
 
 'get'             |
 'set'             |
-'this'            |
-'basetype' [1-9]? |
 'preconstruct'    |
 'construct'       |
 'destruct'        |
 'operator'        |
 'postfix'         |
-'propvalue'       |
-'onchange'        |
 
 'if'              |
 'else'            |
@@ -125,8 +122,15 @@ main := |*
 'case'            |
 'default'         |
 'once'            |
+'onchange'        |
 'silent'          |
+'try'             |
+'catch'           |
+'finally'         |
 
+'basetype' [1-9]? |
+'this'            |
+'retval'          |
 'true'            |
 'false'           |
 'null'            |
@@ -135,13 +139,15 @@ main := |*
 'delete'          |
 'sizeof'          |
 'countof'         |
-'typeof'       
+'offsetof'        |
+'typeof'          |
+'bindingof'        
 
 )                   { colorize(ts, te, Qt::blue); };					
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-id                  {  };
+id                  ;
 (lit_sq | lit_dq)   { colorize(ts, te, Qt::darkRed); };
 dec+                { colorize(ts, te, Qt::darkRed); };
 '0' [Xx] hex+       { colorize(ts, te, Qt::darkRed); };
@@ -153,8 +159,7 @@ dec+                { colorize(ts, te, Qt::darkRed); };
 '/*'                { colorize(ts, te, Qt::darkGreen); fgoto comment; }; 
 
 ws | nl             ;
-
-any                 {  };
+any                 ;
 
 *|;
 

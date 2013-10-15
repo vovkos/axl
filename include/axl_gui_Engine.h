@@ -40,7 +40,7 @@ protected:
 	struct TSharedOffscreenCanvas
 	{
 		TSize m_Size;
-		ref::CPtrT <ÑCanvas> m_Canvas;
+		ref::CPtrT <CCanvas> m_Canvas;
 	};
 
 protected:
@@ -140,13 +140,13 @@ public:
 	// offscreen canvas
 
 	virtual
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	CreateOffscreenCanvas (
 		int Width,
 		int Height
 		) = 0;
 
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	CreateOffscreenCanvas (const TSize& Size)
 	{
 		return CreateOffscreenCanvas (
@@ -155,13 +155,13 @@ public:
 			);
 	}
 
-	ÑCanvas*
+	CCanvas*
 	GetSharedOffscreenCanvas (
 		int Width,
 		int Height
 		);
 
-	ÑCanvas*
+	CCanvas*
 	GetSharedOffscreenCanvas (const TSize& Size)
 	{
 		return GetSharedOffscreenCanvas (

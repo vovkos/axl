@@ -64,7 +64,7 @@ GetMouseButtons ()
 
 //.............................................................................
 
-ref::CPtrT <ÑCanvas>
+ref::CPtrT <CCanvas>
 CGdiWidgetImpl::GetCanvas (HWND hWnd)
 {
 	HDC hdc = ::GetDC (hWnd);

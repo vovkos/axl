@@ -17,7 +17,7 @@ namespace gui {
 	
 //.............................................................................
 
-class ÑCanvas: public CGuiItem
+class CCanvas: public CGuiItem
 {
 protected:
 	CFont* m_pFont;
@@ -30,7 +30,7 @@ public:
 	TPalette m_Palette;
 
 public:
-	ÑCanvas ()
+	CCanvas ()
 	{
 		m_pFont = NULL;
 		m_pBaseFont = NULL;
@@ -244,7 +244,7 @@ public:
 	virtual
 	bool
 	CopyRect (
-		ÑCanvas* pSrcCanvas,
+		CCanvas* pSrcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
@@ -255,7 +255,7 @@ public:
 
 	bool
 	CopyRect (
-		ÑCanvas* pSrcCanvas,
+		CCanvas* pSrcCanvas,
 		const TPoint& DstPoint,
 		const TPoint& SrcPoint,
 		const TSize& Size

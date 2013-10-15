@@ -247,7 +247,7 @@ void ModulePane::addValue (QTreeWidgetItem *parent, const char* name, jnc::CType
 	QTreeWidgetItem *item = insertItem(itemName, parent);
 	item->setData(0, Qt::UserRole, qVariantFromValue((void *) moduleItem));
 
-	if (jnc::IsClassType (type, jnc::EClassType_AutoEv))
+	if (jnc::IsClassType (type, jnc::EClassType_Reactor))
 		addClassTypeMembers (item, (jnc::CClassType*) type);
 }
 

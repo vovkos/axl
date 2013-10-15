@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_Parser.llk.h"
 #include "axl_jnc_Closure.h"
+#include "axl_jnc_DeclTypeCalc.h"
 
 namespace axl {
 namespace jnc {
@@ -18,9 +19,10 @@ CParser::CParser ()
 	m_AccessKind = EAccess_Undefined;
 	m_pAttributeBlock = NULL;
 	m_pLastDeclaredItem = NULL;
-	m_pAutoEvType = NULL;
-	m_AutoEvBindSiteCount = 0;
-	m_AutoEvBindSiteTotalCount = 0;
+	m_pLastPropertyGetterType = NULL;
+	m_pReactorType = NULL;
+	m_ReactorBindSiteCount = 0;
+	m_ReactorBindSiteTotalCount = 0;
 	m_pConstructorType = NULL;
 	m_pConstructorProperty = NULL;
 }
@@ -77,10 +79,15 @@ CParser::IsTypeSpecified ()
 	if (m_TypeSpecifierStack.IsEmpty ())
 		return false;
 
+	// if we seen 'unsigned' or 'bigendian', assume 'int' is implied.
+	// checking for 'property' is required for full property syntax e.g.:
+	// property foo { int get (); } 
+	// here 'foo' should be a declarator, not import-type-specifier
+
 	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
 	return 
 		pTypeSpecifier->GetType () != NULL ||
-		pTypeSpecifier->GetTypeModifiers () & ETypeModifierMask_Integer;
+		pTypeSpecifier->GetTypeModifiers () & (ETypeModifierMask_Integer | ETypeModifier_Property);
 }
 
 CType*
@@ -142,6 +149,10 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 
 		return true;
 	}
+	else if (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Property)
+	{
+		return FinalizeLastProperty (false);  
+	}
 	else if (m_pLastDeclaredItem->GetFlags () & EModuleItemFlag_Orphan)
 	{
 		err::SetFormatStringError ("orphan '%s' without a body", m_pLastDeclaredItem->m_Tag.cc ());
@@ -149,6 +160,56 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 	}
 
 	return true;
+}
+
+bool
+CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pBody)
+{
+	if (!m_pLastDeclaredItem)
+	{
+		err::SetFormatStringError ("declaration without declarator cannot have a body");
+		return false;
+	}
+
+	CType* pType;
+
+	EModuleItem ItemKind = m_pLastDeclaredItem->GetItemKind ();
+	switch (ItemKind)
+	{
+	case EModuleItem_Function:
+		return ((CFunction*) m_pLastDeclaredItem)->SetBody (pBody);
+
+	case EModuleItem_Property:
+		return ParseLastPropertyBody (*pBody);
+
+	case EModuleItem_Typedef:
+		pType = ((CTypedef*) m_pLastDeclaredItem)->GetType ();
+		break;
+
+	case EModuleItem_Type:
+		pType = (CType*) m_pLastDeclaredItem;
+		break;
+
+	case EModuleItem_Variable:
+		pType = ((CVariable*) m_pLastDeclaredItem)->GetType ();
+		break;
+
+	case EModuleItem_StructField:
+		pType = ((CStructField*) m_pLastDeclaredItem)->GetType ();
+		break;
+
+	default:
+		err::SetFormatStringError ("'%s' cannot have a body", GetModuleItemKindString (m_pLastDeclaredItem->GetItemKind ()));
+		return false;
+	}
+
+	if (!IsClassType (pType, EClassType_Reactor))
+	{
+		err::SetFormatStringError ("only functions and reactors can have bodies, not '%s'", pType->GetTypeString ().cc ());
+		return false;
+	}
+	
+	return ((CReactorClassType*) pType)->SetBody (pBody);
 }
 
 bool
@@ -296,11 +357,27 @@ CParser::OpenTypeExtension (
 }
 
 bool
+CParser::PreDeclare ()
+{
+	if (!m_pLastDeclaredItem || m_pLastDeclaredItem->GetItemKind () != EModuleItem_Property)
+		return true;
+
+	CProperty* pProperty = (CProperty*) m_pLastDeclaredItem;
+	return true;
+}
+
+bool
 CParser::Declare (CDeclarator* pDeclarator)
 {
 	m_pLastDeclaredItem = NULL;
 
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	if (pDeclarator->GetTypeModifiers () & ETypeModifier_Property)
+	{
+		// too early to calctype cause maybe this property has a body
+		// declare a typeless property for now
+
+		return DeclareProperty (pDeclarator, NULL, 0);
+	}
 
 	uint_t DeclFlags;
 	CType* pType = pDeclarator->CalcType (&DeclFlags);
@@ -320,31 +397,24 @@ CParser::Declare (CDeclarator* pDeclarator)
 	switch (m_StorageKind)
 	{
 	case EStorage_Typedef:
-		return DeclareTypedef (pType, pDeclarator);
+		return DeclareTypedef (pDeclarator, pType);
 
 	case EStorage_Alias:
-		return DeclareAlias (pType, pDeclarator);
+		return DeclareAlias (pDeclarator, pType);
 
 	default:
 		switch (TypeKind)
 		{
 		case EType_Function:
-			return DeclareFunction ((CFunctionType*) pType, pDeclarator);
+			return DeclareFunction (pDeclarator, (CFunctionType*) pType);
 
 		case EType_Property:
-			return DeclareProperty ((CPropertyType*) pType, pDeclarator, DeclFlags);
+			return DeclareProperty (pDeclarator, (CPropertyType*) pType, DeclFlags);
 
 		default:
-			switch (DeclaratorKind)
-			{
-			case EDeclarator_PropValue:
-				return DeclarePropValue (pType, pDeclarator, DeclFlags);
-
-			default:
-				return IsClassType (pType, EClassType_AutoEvIface) ?
-					DeclareAutoEv ((CAutoEvClassType*) pType, pDeclarator, DeclFlags) :				
-					DeclareData (pType, pDeclarator, DeclFlags);
-			}
+			return IsClassType (pType, EClassType_ReactorIface) ?
+				DeclareReactor (pDeclarator, (CReactorClassType*) pType, DeclFlags) :				
+				DeclareData (pDeclarator, pType, DeclFlags);
 		}
 	}
 }
@@ -381,8 +451,8 @@ CParser::AssignDeclarationAttributes (
 
 bool
 CParser::DeclareTypedef (
-	CType* pType,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	CType* pType
 	)
 {
 	ASSERT (m_StorageKind == EStorage_Typedef);
@@ -402,9 +472,9 @@ CParser::DeclareTypedef (
 
 	CModuleItem* pItem;
 
-	if (IsClassType (pType, EClassType_AutoEvIface))
+	if (IsClassType (pType, EClassType_ReactorIface))
 	{
-		pType = m_pModule->m_TypeMgr.CreateAutoEvType (Name, QualifiedName, (CClassType*) pType, NULL);
+		pType = m_pModule->m_TypeMgr.CreateReactorType (Name, QualifiedName, (CClassType*) pType, NULL);
 		pItem = pType;
 	}
 	else
@@ -427,8 +497,8 @@ CParser::DeclareTypedef (
 
 bool
 CParser::DeclareAlias (
-	CType* pType,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	CType* pType
 	)
 {
 	ASSERT (m_StorageKind == EStorage_Alias);
@@ -487,8 +557,8 @@ CParser::DeclareAlias (
 
 bool
 CParser::DeclareFunction (
-	CFunctionType* pType,
-	CDeclarator* pDeclarator
+	CDeclarator* pDeclarator,
+	CFunctionType* pType
 	)
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
@@ -662,8 +732,8 @@ CParser::DeclareFunction (
 
 bool
 CParser::DeclareProperty (
-	CPropertyType* pType,
 	CDeclarator* pDeclarator,
+	CPropertyType* pType,
 	uint_t Flags
 	)
 {
@@ -681,8 +751,27 @@ CParser::DeclareProperty (
 	if (!pProperty)
 		return false;
 
-	pProperty->m_Flags |= Flags;
-	return pProperty->Create (pType);
+	if (pType)
+	{
+		pProperty->m_Flags |= Flags;
+		return pProperty->Create (pType);
+	}
+
+	if (pDeclarator->GetBaseType ()->GetTypeKind () != EType_Void ||
+		!pDeclarator->GetPointerPrefixList ().IsEmpty () ||
+		!pDeclarator->GetSuffixList ().IsEmpty ())
+	{
+		CDeclTypeCalc TypeCalc;
+		m_pLastPropertyGetterType = TypeCalc.CalcPropertyGetterType (pDeclarator);
+		if (!m_pLastPropertyGetterType)
+			return false;
+	}
+
+	if (pDeclarator->GetTypeModifiers () & ETypeModifier_Const)
+		pProperty->m_Flags |= EPropertyFlag_Const;
+
+	m_LastPropertyTypeModifiers.TakeOver (pDeclarator);
+	return true;
 }
 
 CPropertyTemplate*
@@ -776,15 +865,141 @@ CParser::CreateProperty (
 }
 
 bool
-CParser::DeclareAutoEv (
-	CAutoEvClassType* pType,
+CParser::ParseLastPropertyBody (const rtl::CBoxListT <CToken>& Body)
+{
+	ASSERT (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Property);
+
+	bool Result;
+
+	CProperty* pProperty = (CProperty*) m_pLastDeclaredItem;
+
+	CParser Parser;
+	Parser.m_pModule = m_pModule;
+	Parser.m_Stage = CParser::EStage_Pass1;
+
+	m_pModule->m_NamespaceMgr.OpenNamespace (pProperty);
+
+	Result = Parser.ParseTokenList (ESymbol_named_type_block_impl, Body);
+	if (!Result)
+		return false;
+
+	m_pModule->m_NamespaceMgr.CloseNamespace ();
+
+	return FinalizeLastProperty (true);
+}
+
+bool
+CParser::FinalizeLastProperty (bool HasBody)
+{
+	ASSERT (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Property);
+
+	bool Result;
+
+	CProperty* pProperty = (CProperty*) m_pLastDeclaredItem;
+	if (pProperty->GetType ())
+		return true;
+
+	// finalize getter
+
+	if (!pProperty->m_pGetter)
+	{
+		if (!m_pLastPropertyGetterType)
+		{
+			err::SetFormatStringError ("incomplete property: no 'get' method or 'autoget' field");
+			return NULL;
+		}
+
+		CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (
+			EFunction_Getter, 
+			m_pLastPropertyGetterType, 
+			EModuleItemFlag_User
+			);
+
+		bool Result = pProperty->AddMethod (pGetter);
+		if (!Result)
+			return false;
+	}
+	else if (m_pLastPropertyGetterType && m_pLastPropertyGetterType->Cmp (pProperty->m_pGetter->GetType ()) != 0)
+	{
+		err::SetFormatStringError ("getter type '%s' does not match property declaration", pProperty->m_pGetter->GetType ()->GetTypeString ().cc ());
+		return NULL;
+	}
+
+	// finalize setter
+
+	if (!(m_LastPropertyTypeModifiers.GetTypeModifiers () & ETypeModifier_Const) && !HasBody)
+	{
+		CType* pReturnType = pProperty->m_pGetter->GetType ()->GetReturnType ();
+
+		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, &pReturnType, 1);
+		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (
+			EFunction_Setter, 
+			pSetterType, 
+			EModuleItemFlag_User
+			);
+
+		bool Result = pProperty->AddMethod (pSetter);
+		if (!Result)
+			return false;
+	}
+
+	// finalize binder
+
+	if (m_LastPropertyTypeModifiers.GetTypeModifiers () & ETypeModifier_Bindable)
+	{
+		if (!pProperty->m_pOnChange)
+		{
+			Result = pProperty->CreateOnChange ();
+			if (!Result)
+				return false;
+		}
+	}
+
+	// finalize auto-get value
+
+	if (m_LastPropertyTypeModifiers.GetTypeModifiers () & ETypeModifier_AutoGet)
+	{
+		if (!pProperty->m_pAutoGetValue)
+		{
+			Result = pProperty->CreateAutoGetValue (pProperty->m_pGetter->GetType ()->GetReturnType ());
+
+			if (!Result)
+				return false;
+		}
+	}
+
+	uint_t TypeFlags = 0;
+	if (pProperty->m_pOnChange)
+		TypeFlags |= EPropertyTypeFlag_Bindable;
+
+	pProperty->m_pType = pProperty->m_pSetter ?
+		m_pModule->m_TypeMgr.GetPropertyType (
+			pProperty->m_pGetter->GetType (), 
+			*pProperty->m_pSetter->GetTypeOverload (), 
+			TypeFlags
+			) :
+		m_pModule->m_TypeMgr.GetPropertyType (
+			pProperty->m_pGetter->GetType (), 
+			NULL, 
+			TypeFlags
+			);
+
+	if (pProperty->m_Flags & (EPropertyFlag_AutoGet | EPropertyFlag_AutoSet))
+		m_pModule->MarkForCompile (pProperty);
+		
+	return true;
+}
+
+bool
+CParser::DeclareReactor (
 	CDeclarator* pDeclarator,
+	CReactorClassType* pType,
 	uint_t PtrTypeFlags
 	)
 {
 	if (!pDeclarator->IsSimple ())
 	{
-		err::SetFormatStringError ("invalid autoev declarator");
+		err::SetFormatStringError ("invalid reactor declarator");
 		return false;
 	}
 
@@ -806,23 +1021,23 @@ CParser::DeclareAutoEv (
 
 	if (pParentType && pParentType->GetTypeKind () != EType_Class)
 	{
-		err::SetFormatStringError ("'%s' cannot contain autoev members", pParentType->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' cannot contain reactor members", pParentType->GetTypeString ().cc ());
 		return false;
 	}
 
 	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
 	
-	pType = m_pModule->m_TypeMgr.CreateAutoEvType (Name, QualifiedName, (CAutoEvClassType*) pType, (CClassType*) pParentType);
+	pType = m_pModule->m_TypeMgr.CreateReactorType (Name, QualifiedName, (CReactorClassType*) pType, (CClassType*) pParentType);
 	AssignDeclarationAttributes (pType, pNamespace, pDeclarator->GetPos ());
 
-	return DeclareData (pType, pDeclarator, PtrTypeFlags);
+	return DeclareData (pDeclarator, pType, PtrTypeFlags);
 }
 
 bool
 CParser::DeclareData (	
-	CType* pType,
 	CDeclarator* pDeclarator,
+	CType* pType,
 	uint_t PtrTypeFlags
 	)
 {
@@ -873,11 +1088,68 @@ CParser::DeclareData (
 
 	CModuleItem* pDataItem = NULL;
 
+	if (NamespaceKind != ENamespace_Property && (PtrTypeFlags & (EPtrTypeFlag_AutoGet | EPtrTypeFlag_Bindable)))
+	{
+		err::SetFormatStringError ("'%s' can only be used on property field", GetPtrTypeFlagString (PtrTypeFlags & (EPtrTypeFlag_AutoGet | EPtrTypeFlag_Bindable)).cc ());
+		return false;
+	}
+
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	switch (m_StorageKind)
+	{
+	case EStorage_Undefined:
+		switch (NamespaceKind)
+		{
+		case ENamespace_Scope:
+			m_StorageKind = pType->GetTypeKind () == EType_Class ? EStorage_Heap : EStorage_Stack;
+			break;
+
+		case ENamespace_Type:
+			m_StorageKind = EStorage_Member;
+			break;
+
+		case ENamespace_Property:
+			m_StorageKind = ((CProperty*) pNamespace)->GetParentType () ? EStorage_Member : EStorage_Static;
+			break;
+
+		default:
+			m_StorageKind = EStorage_Static;
+		}
+
+		break;
+
+	case EStorage_Static:
+		break;
+
+	case EStorage_Thread:
+		if (!pScope && (!pConstructor->IsEmpty () || !pInitializer->IsEmpty ()))
+		{
+			err::SetFormatStringError ("global 'thread' variables cannot have initializers");
+			return false;
+		}
+
+		break;
+
+	case EStorage_Heap:
+	case EStorage_Stack:
+		if (!pScope)
+		{
+			err::SetFormatStringError ("can only use '%s' storage specifier for local variables", GetStorageKindString (m_StorageKind));
+			return false;
+		}
+
+		break;
+
+	default:
+		err::SetFormatStringError ("invalid storage specifier '%s' for variable", GetStorageKindString (m_StorageKind));
+		return false;
+	}
+
 	if (NamespaceKind == ENamespace_Property)
 	{
 		CProperty* pProperty = (CProperty*) pNamespace;
 
-		if (pProperty->GetParentType ())
+		if (m_StorageKind == EStorage_Member)
 		{
 			pDataItem = pProperty->CreateField (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
 			AssignDeclarationAttributes (pDataItem, pNamespace, pDeclarator->GetPos ());
@@ -885,7 +1157,7 @@ CParser::DeclareData (
 		else
 		{
 			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
-				EStorage_Static,
+				m_StorageKind,
 				Name, 
 				pNamespace->CreateQualifiedName (Name),
 				pType, 
@@ -902,51 +1174,23 @@ CParser::DeclareData (
 
 			pDataItem = pVariable;
 		}
-	}
-	else if (
-		NamespaceKind != ENamespace_Type || 
-		m_StorageKind == EStorage_Static ||
-		m_StorageKind == EStorage_Thread
-		)
-	{
-		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 
-		switch (m_StorageKind)
+		if (PtrTypeFlags & EPtrTypeFlag_Bindable)
 		{
-		case EStorage_Undefined:
-			m_StorageKind = pScope ? pType->GetTypeKind () == EType_Class ? 
-				EStorage_Heap : 
-				EStorage_Stack : 
-				EStorage_Static;
-			break;
-
-		case EStorage_Static:
-			break;
-
-		case EStorage_Thread:
-			if (!pScope && (!pConstructor->IsEmpty () || !pInitializer->IsEmpty ()))
-			{
-				err::SetFormatStringError ("global 'thread' variables cannot have initializers");
+			Result = pProperty->SetOnChange (pDataItem);
+			if (!Result)
 				return false;
-			}
-
-			break;
-
-		case EStorage_Heap:
-		case EStorage_Stack:
-			if (!pScope)
-			{
-				err::SetFormatStringError ("can only use '%s' storage specifier for local variables", GetStorageKindString (m_StorageKind));
+		}
+		else if (PtrTypeFlags & EPtrTypeFlag_AutoGet)
+		{
+			Result = pProperty->SetAutoGetValue (pDataItem);
+			if (!Result)
 				return false;
-			}
-
-			break;
-
-		default:
-			err::SetFormatStringError ("invalid storage specifier '%s' for variable", GetStorageKindString (m_StorageKind));
-			return false;
 		}
 
+	}
+	else if (m_StorageKind != EStorage_Member)
+	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
 			m_StorageKind,
 			Name, 
@@ -1003,44 +1247,6 @@ CParser::DeclareData (
 		AssignDeclarationAttributes (pField, pNamespace, pDeclarator->GetPos ());
 	}
 
-	return true;
-}
-
-bool
-CParser::DeclarePropValue (	
-	CType* pType,
-	CDeclarator* pDeclarator,
-	uint_t PtrTypeFlags
-	)
-{
-	if (m_StorageKind)
-	{
-		err::SetFormatStringError ("'propvalue' cannot have a storage specifier");
-		return false;
-	}
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
-
-	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
-
-	if (NamespaceKind != ENamespace_Property)
-	{
-		err::SetFormatStringError ("'propvalue' is only allowed in property body");
-		return false;
-	}
-
-	size_t BitCount = pDeclarator->GetBitCount ();
-	rtl::CBoxListT <CToken>* pConstructor = &pDeclarator->m_Constructor;
-	rtl::CBoxListT <CToken>* pInitializer = &pDeclarator->m_Initializer;
-	
-	CProperty* pProperty = (CProperty*) pNamespace;
-	bool Result = pProperty->CreatePropValue (pType, PtrTypeFlags, BitCount, pConstructor, pInitializer);
-	if (!Result)
-		return false;
-
-	m_StorageKind = pProperty->GetStorageKind ();
-	AssignDeclarationAttributes (pProperty->GetPropValue (), pNamespace, m_LastMatchedToken.m_Pos);
 	return true;
 }
 
@@ -1256,81 +1462,81 @@ CParser::CreateClassType (
 }
 
 bool
-CParser::CountAutoEvBindSites ()
+CParser::CountReactorBindSites ()
 {
-	if (!m_AutoEvBindSiteCount)
+	if (!m_ReactorBindSiteCount)
 	{
 		err::SetFormatStringError ("no bindable sites found");
 		return false;
 	}
 
-	m_AutoEvBindSiteTotalCount += m_AutoEvBindSiteCount;
-	m_AutoEvBindSiteCount = 0;
+	m_ReactorBindSiteTotalCount += m_ReactorBindSiteCount;
+	m_ReactorBindSiteCount = 0;
 	return true;
 }
 
 bool
-CParser::FinalizeAutoEv ()
+CParser::FinalizeReactor ()
 {
-	ASSERT (m_pAutoEvType);
-	ASSERT (!m_AutoEvHandlerList.IsEmpty ());
+	ASSERT (m_pReactorType);
+	ASSERT (!m_ReactionList.IsEmpty ());
 
-	bool Result = m_pAutoEvType->BindHandlers (m_AutoEvHandlerList);
+	bool Result = m_pReactorType->BindHandlers (m_ReactionList);
 	if (!Result)
 		return false;
 
-	m_AutoEvHandlerList.Clear ();
+	m_ReactionList.Clear ();
 	return true;
 }
 
 bool
-CParser::FinalizeAutoEvOnChangeClause ()
+CParser::FinalizeReactorOnChangeClause ()
 {
-	ASSERT (m_pAutoEvType);
+	ASSERT (m_pReactorType);
 
-	if (m_AutoEvBindSiteList.IsEmpty ())
+	if (m_ReactorBindSiteList.IsEmpty ())
 	{
 		err::SetFormatStringError ("no bindable sites found");
 		return false;
 	}
 	
-	TAutoEvHandler* pHandler = AXL_MEM_NEW (TAutoEvHandler);
-	pHandler->m_pFunction = m_pAutoEvType->CreateHandler ();
-	pHandler->m_BindSiteList.TakeOver (&m_AutoEvBindSiteList);
-	m_AutoEvHandlerList.InsertTail (pHandler);
+	TReaction* pHandler = AXL_MEM_NEW (TReaction);
+	pHandler->m_pFunction = m_pReactorType->CreateHandler ();
+	pHandler->m_BindSiteList.TakeOver (&m_ReactorBindSiteList);
+	m_ReactionList.InsertTail (pHandler);
 
 	return m_pModule->m_FunctionMgr.Prologue (pHandler->m_pFunction, m_LastMatchedToken.m_Pos);
 }
 
 bool
-CParser::AutoEvExpressionStmt (rtl::CBoxListT <CToken>* pTokenList)
+CParser::ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList)
 {
-	ASSERT (m_pAutoEvType);
+	ASSERT (m_pReactorType);
 	ASSERT (!pTokenList->IsEmpty ());	
 
 	bool Result;
 
-	ASSERT (m_pAutoEvType);
+	ASSERT (m_pReactorType);
 
 	CParser Parser;
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = EStage_Pass2;
-	Parser.m_pAutoEvType = m_pAutoEvType;
+	Parser.m_pReactorType = m_pReactorType;
 
 	Result = Parser.ParseTokenList (ESymbol_expression, *pTokenList);
 	if (!Result)
 		return false;
 
-	if (Parser.m_AutoEvBindSiteList.IsEmpty ())
+	if (Parser.m_ReactorBindSiteList.IsEmpty ())
 	{
 		err::SetFormatStringError ("no bindable sites found");
 		return false;
 	}
 
-	TAutoEvHandler* pHandler = AXL_MEM_NEW (TAutoEvHandler);
-	pHandler->m_pFunction = m_pAutoEvType->CreateHandler ();
-	pHandler->m_BindSiteList.TakeOver (&Parser.m_AutoEvBindSiteList);
-	m_AutoEvHandlerList.InsertTail (pHandler);
+	TReaction* pHandler = AXL_MEM_NEW (TReaction);
+	pHandler->m_pFunction = m_pReactorType->CreateHandler ();
+	pHandler->m_BindSiteList.TakeOver (&Parser.m_ReactorBindSiteList);
+	m_ReactionList.InsertTail (pHandler);
 
 	Result = m_pModule->m_FunctionMgr.Prologue (pHandler->m_pFunction, pTokenList->GetHead ()->m_Pos);
 	if (!Result)
@@ -1576,53 +1782,6 @@ CParser::NewOperator_s (
 }
 
 bool
-CParser::SetFunctionBody (rtl::CBoxListT <CToken>* pBody)
-{
-	if (!m_pLastDeclaredItem)
-	{
-		err::SetFormatStringError ("declaration without declarator cannot have a body");
-		return false;
-	}
-
-	CType* pType;
-
-	EModuleItem ItemKind = m_pLastDeclaredItem->GetItemKind ();
-	switch (ItemKind)
-	{
-	case EModuleItem_Function:
-		return ((CFunction*) m_pLastDeclaredItem)->SetBody (pBody);
-
-	case EModuleItem_Typedef:
-		pType = ((CTypedef*) m_pLastDeclaredItem)->GetType ();
-		break;
-
-	case EModuleItem_Type:
-		pType = (CType*) m_pLastDeclaredItem;
-		break;
-
-	case EModuleItem_Variable:
-		pType = ((CVariable*) m_pLastDeclaredItem)->GetType ();
-		break;
-
-	case EModuleItem_StructField:
-		pType = ((CStructField*) m_pLastDeclaredItem)->GetType ();
-		break;
-
-	default:
-		err::SetFormatStringError ("'%s' cannot have a body", GetModuleItemKindString (m_pLastDeclaredItem->GetItemKind ()));
-		return false;
-	}
-
-	if (!IsClassType (pType, EClassType_AutoEv))
-	{
-		err::SetFormatStringError ("only functions and autoevs can have bodies, not '%s'", pType->GetTypeString ().cc ());
-		return false;
-	}
-	
-	return ((CAutoEvClassType*) pType)->SetBody (pBody);
-}
-
-bool
 CParser::LookupIdentifier (
 	const rtl::CString& Name,
 	CValue* pValue
@@ -1743,8 +1902,8 @@ CParser::LookupIdentifier (
 		if (Coord.m_ParentNamespaceLevel)
 		{
 			if (Coord.m_ParentNamespaceLevel > 1 ||				
-				!m_pAutoEvType || 
-				!m_pAutoEvType->GetField (EAutoEvField_Parent)
+				!m_pReactorType || 
+				!m_pReactorType->GetField (EReactorField_Parent)
 				)
 			{
 				err::SetFormatStringError (
@@ -1755,7 +1914,7 @@ CParser::LookupIdentifier (
 				return false;
 			}
 			
-			CStructField* pParentField = m_pAutoEvType->GetField (EAutoEvField_Parent);
+			CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
 			Result = m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField);
 			if (!Result)
 				return false;
@@ -1929,6 +2088,8 @@ CParser::GetThisValueType (CValue* pValue)
 	return true;
 }
 
+/*
+
 bool
 CParser::GetOnChange (CValue* pValue)
 {
@@ -1970,7 +2131,7 @@ CParser::GetOnChangeType (CValue* pValue)
 }
 
 bool
-CParser::GetPropValue (CValue* pValue)
+CParser::GetAutoGetValue (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	CProperty* pProperty = pFunction->GetProperty ();
@@ -1978,7 +2139,7 @@ CParser::GetPropValue (CValue* pValue)
 	if (!pProperty)
 	{
 		err::SetFormatStringError (
-			"function '%s' has no 'propvalue' field", 
+			"function '%s' has no 'autoget' field", 
 			pFunction->m_Tag.cc ()
 			);
 		return false;
@@ -1988,24 +2149,26 @@ CParser::GetPropValue (CValue* pValue)
 	if (pProperty->IsMember ())
 		PropertyValue.InsertToClosureHead (m_pModule->m_FunctionMgr.GetThisValue ());
 
-	return m_pModule->m_OperatorMgr.GetPropertyPropValue (PropertyValue, pValue);
+	return m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (PropertyValue, pValue);
 }
 
 bool
-CParser::GetPropValueType (CValue* pValue)
+CParser::GetAutoGetValueType (CValue* pValue)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	if (!pFunction->m_pProperty)
 	{
 		err::SetFormatStringError (
-			"function '%s' has no 'propvalue' field", 
+			"function '%s' has no 'autoget' field", 
 			pFunction->m_Tag.cc ()
 			);
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetPropertyPropValueType (pFunction->m_pProperty, pValue);
+	return m_pModule->m_OperatorMgr.GetPropertyAutoGetValueType (pFunction->m_pProperty, pValue);
 }
+
+*/
 
 bool
 CParser::PrepareCurlyInitializerNamedItem (

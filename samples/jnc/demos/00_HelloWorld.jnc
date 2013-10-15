@@ -2,8 +2,7 @@
 
 // entry point
 
-int 
-main ()
+int main ()
 {
 	printf ("hello world!\n");
 	return 0;
@@ -13,8 +12,7 @@ main ()
 
 // system functions
 
-int
-printf (
+int printf (
 	unsafe thin const char* format,
 	unsafe ...
 	);

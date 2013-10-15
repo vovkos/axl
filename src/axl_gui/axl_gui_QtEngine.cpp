@@ -236,7 +236,7 @@ CQtEngine::CreateImageList (
 	return ref::EPtr_Null;
 }
 
-ref::CPtrT <ÑCanvas>
+ref::CPtrT <CCanvas>
 CQtEngine::CreateOffscreenCanvas (
 	int Width,
 	int Height

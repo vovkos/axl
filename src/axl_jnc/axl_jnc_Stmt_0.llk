@@ -72,33 +72,33 @@ once_stmt_0
 //.............................................................................
 
 start
-autoev_body_0
-	:	'{' autoev_stmt_0+ '}'
+reactor_body_0
+	:	'{' reactor_stmt_0+ '}'
 	;
 	
-autoev_stmt_0
+reactor_stmt_0
 	enter
 	{
-		m_AutoEvBindSiteCount = 0;
+		m_ReactorBindSiteCount = 0;
 	}
-	:	resolver ({ return true; }) // within autoev_body prefer autoev_onchange_stmt 
-		autoev_onchange_stmt_0
-	|	autoev_expression_stmt_0
+	:	resolver ({ return true; }) // within reactor_body prefer reactor_onchange_stmt 
+		reactor_onchange_stmt_0
+	|	reactor_expression_stmt_0
 	|	';'
 	;
 
-autoev_onchange_stmt_0
+reactor_onchange_stmt_0
 	:	EToken_OnChange '(' expression_list_s ')' 
 			{
-				return CountAutoEvBindSites ();
+				return CountReactorBindSites ();
 			}
 		statement_0
 	;
 
-autoev_expression_stmt_0
+reactor_expression_stmt_0
 	:	expression_s ';'
 			{
-				return CountAutoEvBindSites ();
+				return CountReactorBindSites ();
 			}
 	;
 

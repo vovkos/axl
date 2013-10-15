@@ -15,7 +15,7 @@ namespace gui {
 //.............................................................................
 
 class CQtCanvas: 
-	public ÑCanvas,
+	public CCanvas,
 	public rtl::CHandleT <QPainter*, rtl::CCppDeleteT <QPainter> >
 {
 	friend class CQtEngine;
@@ -73,7 +73,7 @@ public:
 	virtual
 	bool
 	CopyRect (
-		ÑCanvas* pSrcCanvas,
+		CCanvas* pSrcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,

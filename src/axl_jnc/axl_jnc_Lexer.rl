@@ -117,7 +117,7 @@ main := |*
 'bigendian'      { CreateToken (EToken_BigEndian); };
 'nullable'       { CreateToken (EToken_Nullable); };
 'const'          { CreateToken (EToken_Const); };
-'pubconst'       { CreateToken (EToken_PubConst); };
+'constd'         { CreateToken (EToken_ConstD); };
 'mutable'        { CreateToken (EToken_Mutable); };
 'volatile'       { CreateToken (EToken_Volatile); };
 'weak'           { CreateToken (EToken_Weak); };
@@ -133,8 +133,8 @@ main := |*
 'indexed'        { CreateToken (EToken_Indexed); };
 'multicast'      { CreateToken (EToken_Multicast); };
 'event'          { CreateToken (EToken_Event); };
-'pubevent'       { CreateToken (EToken_PubEvent); };
-'autoev'         { CreateToken (EToken_AutoEv); };
+'eventd'         { CreateToken (EToken_EventD); };
+'reactor'        { CreateToken (EToken_Reactor); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -168,20 +168,15 @@ main := |*
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-# special members
+# special member methods
 
 'get'            { CreateToken (EToken_Get); };
 'set'            { CreateToken (EToken_Set); };
-'this'           { CreateToken (EToken_This); };
-'basetype'       { CreateKeywordTokenEx (EToken_BaseType, 1); };
-'basetype' [1-9] { CreateKeywordTokenEx (EToken_BaseType, te [-1] - '0'); };
 'preconstruct'   { CreateToken (EToken_PreConstruct); };
 'construct'      { CreateToken (EToken_Construct); };
 'destruct'       { CreateToken (EToken_Destruct); };
 'operator'       { CreateToken (EToken_Operator); };
 'postfix'        { CreateToken (EToken_Postfix); };
-'propvalue'      { CreateToken (EToken_PropValue); };
-'onchange'       { CreateToken (EToken_OnChange); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -191,7 +186,9 @@ main := |*
 'delete'         { CreateToken (EToken_Delete); };
 'sizeof'         { CreateToken (EToken_SizeOf); };
 'countof'        { CreateToken (EToken_CountOf); };
+'offsetof'       { CreateToken (EToken_OffsetOf); };
 'typeof'         { CreateToken (EToken_TypeOf); };
+'bindingof'      { CreateToken (EToken_BindingOf); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -211,6 +208,7 @@ main := |*
 'case'           { CreateToken (EToken_Case); };
 'default'        { CreateToken (EToken_Default); };
 'once'           { CreateToken (EToken_Once); };
+'onchange'       { CreateToken (EToken_OnChange); };
 'silent'         { CreateToken (EToken_Silent); };
 'try'            { CreateToken (EToken_Try); };
 'catch'          { CreateToken (EToken_Catch); };
@@ -218,8 +216,12 @@ main := |*
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-# constants
+# pre-defined values
 
+'basetype'       { CreateKeywordTokenEx (EToken_BaseType, 1); };
+'basetype' [1-9] { CreateKeywordTokenEx (EToken_BaseType, te [-1] - '0'); };
+'this'           { CreateToken (EToken_This); };
+'retval'         { CreateToken (EToken_RetVal); };
 'true'           { CreateToken (EToken_True); };
 'false'          { CreateToken (EToken_False); };
 'null'           { CreateToken (EToken_Null); };

@@ -1,37 +1,5 @@
 //............................................................................. 
 
-class
-{
-	rtl::CBoxListT <CToken> m_TokenList;
-}
-function_body_pass1
-	:	compound_stmt_pass1 <&$.m_TokenList>
-	;
-
-noast 
-compound_stmt_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	:	'{'
-			{
-				$pTokenList->InsertTail ($1);
-			}
-		statement_pass1 <$pTokenList>* 
-		'}'
-			{
-				$pTokenList->InsertTail ($3);
-			}
-	;
-
-noast
-statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
-	:	compound_stmt_pass1 <$pTokenList>
-	|	any
-			{
-				$pTokenList->InsertTail ($1);
-			}
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 start
 compound_stmt
 	:	'{' $l
@@ -306,39 +274,39 @@ once_stmt
 //.............................................................................
 
 start
-autoev_body
-	: '{' autoev_stmt+ '}'
+reactor_body
+	: '{' reactor_stmt+ '}'
 		{
-			return FinalizeAutoEv ();
+			return FinalizeReactor ();
 		}
 	;
 	
-autoev_stmt
-	:	resolver ({ return true; }) // within autoev_body prefer autoev_onchange_stmt 
-		autoev_onchange_stmt 
-	|	autoev_expression_stmt
+reactor_stmt
+	:	resolver ({ return true; }) // within reactor_body prefer reactor_onchange_stmt 
+		reactor_onchange_stmt 
+	|	reactor_expression_stmt
 	|	';'
 	;
 
-autoev_onchange_stmt
+reactor_onchange_stmt
 	enter
 	{
-		m_AutoEvBindSiteList.Clear (); // clear bindsite list before processing expression list
+		m_ReactorBindSiteList.Clear (); // clear bindsite list before processing expression list
 	}
 	:	EToken_OnChange '(' expression_list ')'
 			{
-				return FinalizeAutoEvOnChangeClause ();
+				return FinalizeReactorOnChangeClause ();
 			}
 		statement 
 			{
-				return FinalizeAutoEvOnChangeStmt ();
+				return FinalizeReactorOnChangeStmt ();
 			}
 	;
 
-autoev_expression_stmt
+reactor_expression_stmt
 	:	expression_pass1 ';'
 			{
-				return AutoEvExpressionStmt (&$1.m_TokenList);
+				return ReactorExpressionStmt (&$1.m_TokenList);
 			}
 	;
 

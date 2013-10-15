@@ -30,10 +30,11 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return $pTypeSpecifier->SetType ($1.m_pType);
 			}
-	|	type_modifier
+	|	type_modifier 
 			{
-				return $pTypeSpecifier->SetTypeModifier ($1.m_Modifier);
+				return $pTypeSpecifier->SetTypeModifier ($1.m_TypeModifier);
 			}
+	|	unwinder_modifier <$pTypeSpecifier>
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -61,7 +62,7 @@ type_specifier_modifier <CTypeSpecifier* $pTypeSpecifier>
 			}
 	|	type_modifier 
 			{
-				return $pTypeSpecifier->SetTypeModifier ($1.m_Modifier);
+				return $pTypeSpecifier->SetTypeModifier ($1.m_TypeModifier);
 			}
 	;
 
@@ -256,88 +257,121 @@ qualified_type_name
 			}
 	;
 
+class
+{
+	CPropertyType* m_pType;
+}
+property_template_specifier
+	local
+	{
+		CPropertyTemplate* $pTemplate;
+	}
+	:	EToken_Property 
+			{
+				$pTemplate = CreatePropertyTemplate ();
+			}
+		named_type_block <$pTemplate>		
+			{
+				$.m_pType = $pTemplate->CalcType ();
+				return $.m_pType != NULL;
+			}
+	;
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class 
+class
 {
-	ETypeModifier m_Modifier;
+	ETypeModifier m_TypeModifier;
 }
 type_modifier
 	:	EToken_Unsigned
 			{
-				$.m_Modifier = ETypeModifier_Unsigned;
+				$.m_TypeModifier = ETypeModifier_Unsigned;
 			}
 	|	EToken_BigEndian
 			{
-				$.m_Modifier = ETypeModifier_BigEndian;
+				$.m_TypeModifier = ETypeModifier_BigEndian;
 			}
 	|	EToken_Const
 			{
-				$.m_Modifier = ETypeModifier_Const;
+				$.m_TypeModifier = ETypeModifier_Const;
 			}
-	|	EToken_PubConst
+	|	EToken_ConstD
 			{
-				$.m_Modifier = ETypeModifier_PubConst;
+				$.m_TypeModifier = ETypeModifier_ConstD;
 			}
 	|	EToken_Volatile
 			{
-				$.m_Modifier = ETypeModifier_Volatile;
+				$.m_TypeModifier = ETypeModifier_Volatile;
 			}
 	|	EToken_Weak
 			{
-				$.m_Modifier = ETypeModifier_Weak;
+				$.m_TypeModifier = ETypeModifier_Weak;
 			}
 	|	EToken_Thin
 			{
-				$.m_Modifier = ETypeModifier_Thin;
+				$.m_TypeModifier = ETypeModifier_Thin;
 			}
 	|	EToken_Unsafe
 			{
-				$.m_Modifier = ETypeModifier_Unsafe;
+				$.m_TypeModifier = ETypeModifier_Unsafe;
+			}
+	|	EToken_Unwinder
+			{
+				$.m_TypeModifier = ETypeModifier_Unwinder;
 			}
 	|	EToken_Cdecl
 			{
-				$.m_Modifier = ETypeModifier_Cdecl;
+				$.m_TypeModifier = ETypeModifier_Cdecl;
 			}
 	|	EToken_Stdcall
 			{
-				$.m_Modifier = ETypeModifier_Stdcall;
+				$.m_TypeModifier = ETypeModifier_Stdcall;
 			}
 	|	EToken_Function
 			{
-				$.m_Modifier = ETypeModifier_Function;
+				$.m_TypeModifier = ETypeModifier_Function;
 			}
 	|	EToken_Property
 			{
-				$.m_Modifier = ETypeModifier_Property;
+				$.m_TypeModifier = ETypeModifier_Property;
 			}
 	|	EToken_Bindable
 			{
-				$.m_Modifier = ETypeModifier_Bindable;
+				$.m_TypeModifier = ETypeModifier_Bindable;
 			}
 	|	EToken_AutoGet
 			{
-				$.m_Modifier = ETypeModifier_AutoGet;
+				$.m_TypeModifier = ETypeModifier_AutoGet;
 			}
 	|	EToken_Indexed
 			{
-				$.m_Modifier = ETypeModifier_Indexed;
+				$.m_TypeModifier = ETypeModifier_Indexed;
 			}
 	|	EToken_Multicast
 			{
-				$.m_Modifier = ETypeModifier_Multicast;
+				$.m_TypeModifier = ETypeModifier_Multicast;
 			}
 	|	EToken_Event
 			{
-				$.m_Modifier = ETypeModifier_Event;
+				$.m_TypeModifier = ETypeModifier_Event;
 			}
-	|	EToken_PubEvent
+	|	EToken_EventD
 			{
-				$.m_Modifier = ETypeModifier_PubEvent;
+				$.m_TypeModifier = ETypeModifier_EventD;
 			}
-	|	EToken_AutoEv
+	|	EToken_Reactor
 			{
-				$.m_Modifier = ETypeModifier_AutoEv;
+				$.m_TypeModifier = ETypeModifier_Reactor;
+			}
+	;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+unwinder_modifier <CTypeSpecifier* $pTypeSpecifier>
+	:	EToken_Unwinder '(' expression_pass1 $u ')'
+			{
+				return $pTypeSpecifier->SetUnwinderExpression (&$u.m_TokenList);
 			}
 	;
 

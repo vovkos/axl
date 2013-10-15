@@ -18,12 +18,19 @@ class CTypeModifiers
 {
 protected:
 	uint_t m_TypeModifiers;
+	rtl::CBoxListT <CToken> m_UnwinderExpression;
 
 public:
 	CTypeModifiers ()
 	{
 		m_TypeModifiers = 0;
 	}
+
+	void
+	Clear ();
+
+	void
+	TakeOver (CTypeModifiers* pSrc);
 
 	int 
 	GetTypeModifiers ()
@@ -36,6 +43,15 @@ public:
 
 	int
 	ClearTypeModifiers (int ModifierMask);
+
+	rtl::CConstBoxListT <CToken>
+	GetUnwinderExpression ()
+	{
+		return m_UnwinderExpression;
+	}
+
+	bool
+	SetUnwinderExpression (rtl::CBoxListT <CToken>* pExpression);
 
 protected:
 	bool
@@ -63,6 +79,15 @@ public:
 
 	bool
 	SetType (CType* pType);
+};
+
+//.............................................................................
+
+class CDeclPointerPrefix:
+	public CTypeModifiers,
+	public rtl::TListLink
+{
+	friend class CDeclarator;
 };
 
 //.............................................................................
@@ -200,8 +225,7 @@ enum EDeclarator
 	EDeclarator_Name,
 	EDeclarator_UnnamedMethod,
 	EDeclarator_UnaryBinaryOperator,
-	EDeclarator_CastOperator,
-	EDeclarator_PropValue,
+	EDeclarator_CastOperator
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -222,7 +246,7 @@ protected:
 	uint_t m_PostDeclaratorModifiers;
 	CType* m_pBaseType;
 
-	rtl::CArrayT <uint_t> m_PointerPrefixArray;
+	rtl::CStdListT <CDeclPointerPrefix> m_PointerPrefixList;
 	rtl::CStdListT <CDeclSuffix> m_SuffixList;
 	rtl::CBoxListT <CToken> m_Constructor;
 	rtl::CBoxListT <CToken> m_Initializer;
@@ -305,10 +329,10 @@ public:
 		return m_pBaseType;
 	}
 
-	rtl::CArrayT <uint_t> 
-	GetPointerPrefixArray ()
+	rtl::CConstListT <CDeclPointerPrefix> 
+	GetPointerPrefixList ()
 	{
-		return m_PointerPrefixArray;
+		return m_PointerPrefixList;
 	}
 
 	rtl::CConstListT <CDeclSuffix> 
@@ -359,12 +383,6 @@ public:
 		EUnOp UnOpKind, 
 		EBinOp BinOpKind
 		);
-
-	bool
-	SetPropValue ();
-
-	bool
-	SetOnChange ();
 
 	void
 	AddPointerPrefix ();

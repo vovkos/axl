@@ -8,6 +8,22 @@ namespace jnc {
 
 //.............................................................................
 
+void
+CTypeModifiers::Clear ()
+{
+	m_TypeModifiers = 0;
+	m_UnwinderExpression.Clear ();	
+}
+
+void
+CTypeModifiers::TakeOver (CTypeModifiers* pSrc)
+{
+	m_TypeModifiers = pSrc->m_TypeModifiers;
+	m_UnwinderExpression.TakeOver (&pSrc->m_UnwinderExpression);
+
+	pSrc->Clear ();
+}
+
 bool
 CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 {
@@ -18,7 +34,7 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		0,                          // ETypeModifier_Unsigned         = 0x00000001,
 		0,                          // ETypeModifier_BigEndian        = 0x00000002,
 		ETypeModifierMask_Const,    // ETypeModifier_Const            = 0x00000004,
-		ETypeModifierMask_Const,    // ETypeModifier_PubConst         = 0x00000008,
+		ETypeModifierMask_Const,    // ETypeModifier_ConstD           = 0x00000008,
 		0,                          // ETypeModifier_Volatile         = 0x00000010,
 		ETypeModifierMask_PtrKind,  // ETypeModifier_Weak             = 0x00000020,
 		ETypeModifierMask_PtrKind,  // ETypeModifier_Thin             = 0x00000040,
@@ -32,8 +48,9 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifier_AutoGet,      // ETypeModifier_Indexed          = 0x00004000,
 		ETypeModifierMask_TypeKind, // ETypeModifier_Multicast        = 0x00008000,
 		ETypeModifierMask_Event,    // ETypeModifier_Event            = 0x00010000,
-		ETypeModifierMask_Event,    // ETypeModifier_PubEvent         = 0x00020000,
-		ETypeModifierMask_TypeKind, // ETypeModifier_AutoEv           = 0x00040000,
+		ETypeModifierMask_Event,    // ETypeModifier_EventD           = 0x00020000,
+		ETypeModifierMask_TypeKind, // ETypeModifier_Reactor          = 0x00040000,
+		0,                          // ETypeModifier_Unwinder         = 0x00080000,
 	};
 
 	// check duplicates
@@ -101,6 +118,17 @@ CTypeModifiers::CheckAntiTypeModifiers (int ModifierMask)
 		);
 
 	return false;
+}
+
+bool
+CTypeModifiers::SetUnwinderExpression (rtl::CBoxListT <CToken>* pExpression)
+{
+	bool Result = SetTypeModifier (ETypeModifier_Unwinder);
+	if (!Result)
+		return false;
+
+	m_UnwinderExpression.TakeOver (pExpression);
+	return true;
 }
 
 //.............................................................................
@@ -188,9 +216,9 @@ CDeclarator::SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 	}
 	else
 	{
-		m_pBaseType = pTypeSpecifier->GetType ();
-		m_TypeModifiers = pTypeSpecifier->GetTypeModifiers ();
-	
+		TakeOver (pTypeSpecifier);
+
+		m_pBaseType = pTypeSpecifier->GetType ();	
 		if (!m_pBaseType)
 		{
 			m_pBaseType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
@@ -276,24 +304,12 @@ CDeclarator::SetPostDeclaratorModifier (EPostDeclaratorModifier Modifier)
 	return true;
 }
 
-bool
-CDeclarator::SetPropValue ()
-{
-	if (m_DeclaratorKind)
-	{
-		err::SetFormatStringError ("cannot create qualified 'propvalue' declarator");
-		return false;
-	}
-
-	m_DeclaratorKind = EDeclarator_PropValue;
-	return true;
-}
-
 void
 CDeclarator::AddPointerPrefix ()
 {
-	m_PointerPrefixArray.Append (m_TypeModifiers);
-	m_TypeModifiers = 0;
+	CDeclPointerPrefix* pPrefix = AXL_MEM_NEW (CDeclPointerPrefix);
+	pPrefix->TakeOver (this);
+	m_PointerPrefixList.InsertTail (pPrefix);
 }
 
 CDeclArraySuffix*
@@ -325,7 +341,7 @@ CDeclarator::AddFunctionSuffix ()
 bool
 CDeclarator::AddBitFieldSuffix (size_t BitCount)
 {
-	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PointerPrefixArray.IsEmpty ())
+	if (m_BitCount || !m_SuffixList.IsEmpty () || !m_PointerPrefixList.IsEmpty ())
 	{
 		err::SetFormatStringError ("bit field can only be applied to integer type");
 		return false;

@@ -421,7 +421,7 @@ COperatorMgr::GetProperty (
 	{
 		CProperty* pProperty = OpValue.GetProperty ();
 		if (pProperty->GetFlags () & EPropertyFlag_AutoGet)
-			return GetPropertyPropValue (OpValue, pResultValue);
+			return GetPropertyAutoGetValue (OpValue, pResultValue);
 	}
 
 	CValue GetterValue;
@@ -445,14 +445,14 @@ COperatorMgr::SetProperty (
 		{
 			ASSERT (pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable);
 
-			CValue PropValue;
+			CValue AutoGetValue;
 			CValue OnChangeValue;
 		
 			return
-				GetPropertyPropValue (OpValue, &PropValue) &&
+				GetPropertyAutoGetValue (OpValue, &AutoGetValue) &&
 				GetPropertyOnChange (OpValue, &OnChangeValue) &&
-				StoreDataRef (PropValue, SrcValue) &&
-				MemberOperator (OnChangeValue, "Call", &OnChangeValue) &&
+				StoreDataRef (AutoGetValue, SrcValue) &&
+				MemberOperator (OnChangeValue, "call", &OnChangeValue) &&
 				CallOperator (OnChangeValue);
 		}
 	}
@@ -464,32 +464,32 @@ COperatorMgr::SetProperty (
 }
 
 CType*
-COperatorMgr::GetPropertyPropValueType (const CValue& OpValue)
+COperatorMgr::GetPropertyAutoGetValueType (const CValue& OpValue)
 {
 	if (OpValue.GetValueKind () != EValue_Property || 
 		!(OpValue.GetProperty ()->GetFlags () & EPropertyFlag_AutoGet))
 	{
-		err::SetFormatStringError ("'%s' has no 'propvalue' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no 'autoget' field", OpValue.GetType ()->GetTypeString ().cc ());
 		return NULL;
 	}
 
 	CType* pType;
 
-	CModuleItem* pPropValue = OpValue.GetProperty ()->GetPropValue ();
-	pType = pPropValue->GetItemKind () == EModuleItem_StructField ? 
-		((CStructField*) pPropValue)->GetType() :
-		((CVariable*) pPropValue)->GetType();
+	CModuleItem* pAutoGetValue = OpValue.GetProperty ()->GetAutoGetValue ();
+	pType = pAutoGetValue->GetItemKind () == EModuleItem_StructField ? 
+		((CStructField*) pAutoGetValue)->GetType() :
+		((CVariable*) pAutoGetValue)->GetType();
 
 	return pType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin);
 }
 
 bool
-COperatorMgr::GetPropertyPropValueType (
+COperatorMgr::GetPropertyAutoGetValueType (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
 {
-	CType* pType = GetPropertyPropValueType (OpValue);
+	CType* pType = GetPropertyAutoGetValueType (OpValue);
 	if (!pType)
 		return false;
 
@@ -498,7 +498,7 @@ COperatorMgr::GetPropertyPropValueType (
 }
 
 bool
-COperatorMgr::GetPropertyPropValue (
+COperatorMgr::GetPropertyAutoGetValue (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
@@ -506,11 +506,11 @@ COperatorMgr::GetPropertyPropValue (
 	if (OpValue.GetValueKind () != EValue_Property || 
 		!(OpValue.GetProperty ()->GetFlags () & EPropertyFlag_AutoGet))
 	{
-		err::SetFormatStringError ("'%s' has no 'propvalue' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no 'autoget' field", OpValue.GetType ()->GetTypeString ().cc ());
 		return false;
 	}
 
-	return GetPropertyField (OpValue, OpValue.GetProperty ()->GetPropValue (), pResultValue);
+	return GetPropertyField (OpValue, OpValue.GetProperty ()->GetAutoGetValue (), pResultValue);
 }
 
 CType*
@@ -535,7 +535,7 @@ COperatorMgr::GetPropertyOnChangeType (
 	CValue* pResultValue
 	)
 {
-	CType* pType = GetPropertyPropValueType (OpValue);
+	CType* pType = GetPropertyAutoGetValueType (OpValue);
 	if (!pType)
 		return false;
 
@@ -574,3 +574,4 @@ COperatorMgr::GetPropertyOnChange (
 
 } // namespace jnc {
 } // namespace axl {
+

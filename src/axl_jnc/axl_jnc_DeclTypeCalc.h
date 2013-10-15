@@ -17,7 +17,7 @@ class CFunctionType;
 class CFunctionPtrType;
 class CPropertyType;
 class CPropertyPtrType;
-class CAutoEvClassType;
+class CReactorClassType;
 class CImportType;
 class CImportPtrType;
 
@@ -38,6 +38,26 @@ public:
 		CDeclarator* pDeclarator,
 		CValue* pElementCountValue,
 		uint_t* pFlags
+		)
+	{
+		return CalcType (
+			pDeclarator->GetBaseType (),
+			pDeclarator->GetTypeModifiers (),
+			pDeclarator->GetPointerPrefixList (),
+			pDeclarator->GetSuffixList (),
+			pElementCountValue,
+			pFlags
+			);
+	}
+
+	CType*
+	CalcType (
+		CType* pBaseType,
+		uint_t TypeModifiers,
+		const rtl::CConstListT <CDeclPointerPrefix>& PointerPrefixList,
+		const rtl::CConstListT <CDeclSuffix>& SuffixList,
+		CValue* pElementCountValue,
+		uint_t* pFlags
 		);
 
 	CType*
@@ -45,6 +65,9 @@ public:
 		CType* pType,
 		uint_t TypeModifiers
 		);
+
+	CFunctionType*
+	CalcPropertyGetterType (CDeclarator* pDeclarator);
 
 protected:
 	bool
@@ -75,7 +98,7 @@ protected:
 	GetBindableDataType (CType* pDataType);
 
 	CClassType*
-	GetAutoEvType (CType* pReturnType);
+	GetReactorType (CType* pReturnType);
 
 	CClassType*
 	GetMulticastType (CType* pLeftType);

@@ -13,7 +13,7 @@ class CFunctionPtrType;
 class CNamedType;
 class CClassType;
 class CClassPtrType;
-class CAutoEvClassType;
+class CReactorClassType;
 class CFunction;
 
 struct TFunctionPtrTypeTuple;
@@ -24,6 +24,7 @@ enum EFunctionTypeFlag
 {
 	EFunctionTypeFlag_VarArg       = 0x010000,
 	EFunctionTypeFlag_UnsafeVarArg = 0x020000,
+	EFunctionTypeFlag_Unwinder     = 0x040000,
 };
 
 //.............................................................................
@@ -97,7 +98,7 @@ protected:
 	CFunctionType* m_pStdObjectMemberMethodType;
 	CFunction* m_pAbstractFunction;
 	TFunctionPtrTypeTuple* m_pFunctionPtrTypeTuple;
-	CAutoEvClassType* m_pAutoEvInterfaceType;
+	CReactorClassType* m_pReactorInterfaceType;
 
 public:
 	CFunctionType ();

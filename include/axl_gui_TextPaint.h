@@ -35,7 +35,7 @@ protected:
 	const TTextAttrAnchor* m_pAttrEnd;
 
 public:
-	ÑCanvas* m_pCanvas;
+	CCanvas* m_pCanvas;
 	TTextAttr m_SelAttr;
 	uint_t m_HexEncodingFlags;
 	char m_UnprintableChar;
@@ -51,7 +51,7 @@ public:
 		Init ();
 	}
 
-	CTextPaint (ÑCanvas* pCanvas)
+	CTextPaint (CCanvas* pCanvas)
 	{
 		Init (pCanvas);
 	}
@@ -180,7 +180,7 @@ public:
 
 protected:
 	void
-	Init (ÑCanvas* pCanvas = NULL);
+	Init (CCanvas* pCanvas = NULL);
 
 	TRect
 	CalcTextRect (

@@ -340,7 +340,7 @@ bool MainWindow::compile ()
 {
 	qApp->setCursorFlashTime (0);
 
-	bool Result;
+	bool result;
 
 	MdiChild *child = activeMdiChild();
 	if (!child)
@@ -364,48 +364,21 @@ bool MainWindow::compile ()
 
 	QByteArray sourceBytes = child->toPlainText().toUtf8();
 
-	jnc::CLexer Lexer;
-	Lexer.Create (
-		filePathBytes.constData (), 
+	result = module.Parse (
+		filePathBytes.constData (),
 		sourceBytes.constData (), 
 		sourceBytes.size ()
 		);
 
-	jnc::CParser Parser;
-	Parser.Create (jnc::CParser::StartSymbol, true);
-
-	for (;;)
+	if (!result)
 	{
-		const jnc::CToken* pToken = Lexer.GetToken ();
-		if (pToken->m_Token == jnc::EToken_Eof)
-			break;
-		
-/*		if (!pToken->m_Data.m_String.IsEmpty ())
-			printf ("%s: '%s'/'%s'\n", pToken->GetName (), pToken->GetText ().cc (), pToken->m_Data.m_String.cc ());
-		else
-			printf ("%s: '%s'\n", pToken->GetName (), pToken->GetText ().cc ());
-*/
-		Result = Parser.ParseToken (pToken);
-		if (!Result)
-		{
-			rtl::CString Text = err::GetError ()->GetDescription ();
-
-			writeOutput(
-				"%s(%d,%d): %s\n", 
-				filePathBytes.data (), 
-				pToken->m_Pos.m_Line + 1, 
-				pToken->m_Pos.m_Col + 1, 
-				Text.cc ()
-				);
-			return false;
-		}
-		
-		Lexer.NextToken ();
+		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
+		return false;
 	}
 
 	writeOutput("Compiling...\n");
-	Result = module.Compile ();
-	if (!Result)
+	result = module.Compile ();
+	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
@@ -424,8 +397,8 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
 
-	Result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 8);			
-	if (!Result)
+	result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 8);			
+	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
@@ -438,8 +411,8 @@ bool MainWindow::compile ()
 		module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
 	}
 
-	Result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());	
-	if (!Result)
+	result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());	
+	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;

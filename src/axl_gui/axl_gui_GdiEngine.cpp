@@ -266,7 +266,7 @@ CGdiEngine::CreateImageList (
 	return ImageList;
 }
 
-ref::CPtrT <ÑCanvas>
+ref::CPtrT <CCanvas>
 CGdiEngine::CreateOffscreenCanvas (
 	int Width,
 	int Height

@@ -106,7 +106,7 @@ public:
 	}
 	
 	virtual
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	GetCanvas ()
 	{
 		ref::CPtrT <CQtCanvas> Canvas = AXL_REF_NEW (ref::CBoxT <CQtCanvas>);

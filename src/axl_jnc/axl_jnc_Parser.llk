@@ -38,7 +38,7 @@ Members
 	{
 		EStage_Pass1, // global declarations (before linkage)
 		EStage_Pass2, // statements and expressions (after linkage & calclayout)		
-		EStage_AutoEvScan, // scan autoev body to build bind site map (after linkage but before calclayout)
+		EStage_ReactorScan, // scan reactor body to build bind site map (after linkage but before calclayout)
 	};
 
 	enum EFlag
@@ -77,12 +77,15 @@ Members
 	CAttributeBlock* m_pAttributeBlock;
 	CModuleItem* m_pLastDeclaredItem;
 	rtl::CArrayT <CTypeSpecifier*> m_TypeSpecifierStack;
+
+	CFunctionType* m_pLastPropertyGetterType;
+	CTypeModifiers m_LastPropertyTypeModifiers;
 	
-	CAutoEvClassType* m_pAutoEvType;
-	rtl::CStdListT <TAutoEvHandler> m_AutoEvHandlerList;
-	rtl::CBoxListT <CValue> m_AutoEvBindSiteList;
-	size_t m_AutoEvBindSiteCount;
-	size_t m_AutoEvBindSiteTotalCount;
+	CReactorClassType* m_pReactorType;
+	rtl::CStdListT <TReaction> m_ReactionList;
+	rtl::CBoxListT <CValue> m_ReactorBindSiteList;
+	size_t m_ReactorBindSiteCount;
+	size_t m_ReactorBindSiteTotalCount;
 
 	CDerivableType* m_pConstructorType;
 	CProperty* m_pConstructorProperty;
@@ -134,9 +137,9 @@ Members2
 	}
 
 	bool 
-	IsAutoEv ()
+	IsReactor ()
 	{
-		return m_pAutoEvType != NULL;
+		return m_pReactorType != NULL;
 	}
 
 	bool
@@ -144,6 +147,9 @@ Members2
 
 	bool
 	IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier);
+
+	bool
+	SetDeclarationBody (rtl::CBoxListT <CToken>* pBody);
 
 	void
 	AssignDeclarationAttributes (
@@ -170,53 +176,49 @@ Members2
 		const CQualifiedName& Name,
 		const CToken::CPos& Pos
 		);
+		
+	bool
+	PreDeclare ();
 
 	bool
 	Declare (CDeclarator* pDeclarator);
 		
 	bool
 	DeclareTypedef (
-		CType* pType,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		CType* pType
 		);
 
 	bool
 	DeclareAlias (
-		CType* pType,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		CType* pType
 		);
 
 	bool
 	DeclareFunction (
-		CFunctionType* pType,
-		CDeclarator* pDeclarator
+		CDeclarator* pDeclarator,
+		CFunctionType* pType
 		);
 
 	bool
 	DeclareProperty (
-		CPropertyType* pType,
 		CDeclarator* pDeclarator,
+		CPropertyType* pType,
 		uint_t Flags
 		);
 
 	bool
 	DeclareData (
-		CType* pType,
 		CDeclarator* pDeclarator,
+		CType* pType,
 		uint_t PtrTypeFlags
 		);
 
 	bool
-	DeclareAutoEv (
-		CAutoEvClassType* pType,
+	DeclareReactor (
 		CDeclarator* pDeclarator,
-		uint_t PtrTypeFlags
-		);
-
-	bool
-	DeclarePropValue (
-		CType* pType,
-		CDeclarator* pDeclarator,
+		CReactorClassType* pType,
 		uint_t PtrTypeFlags
 		);
 
@@ -261,6 +263,12 @@ Members2
 	CreatePropertyTemplate ();
 
 	bool
+	FinalizeLastProperty (bool HasBody);
+
+	bool
+	ParseLastPropertyBody (const rtl::CBoxListT <CToken>& Body);
+
+	bool
 	NewOperator_s (
 		EStorage StorageKind, 
 		CType* pType, 
@@ -268,22 +276,22 @@ Members2
 		);
 
 	bool
-	FinalizeAutoEv ();
+	FinalizeReactor ();
 
 	bool
-	FinalizeAutoEvOnChangeClause ();
+	FinalizeReactorOnChangeClause ();
 
 	bool
-	FinalizeAutoEvOnChangeStmt ()
+	FinalizeReactorOnChangeStmt ()
 	{
 		return m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
 	}
 
 	bool
-	AutoEvExpressionStmt (rtl::CBoxListT <CToken>* pTokenList);
+	ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList);
 
 	bool
-	CountAutoEvBindSites ();
+	CountReactorBindSites ();
 
 	bool
 	CallBaseTypeMemberConstructor (
@@ -319,9 +327,6 @@ Members2
 	FinalizeBaseTypeMemberConstructBlock ();
 
 	bool
-	SetFunctionBody (rtl::CBoxListT <CToken>* pBody);
-
-	bool
 	LookupIdentifier (
 		const rtl::CString& Name,
 		CValue* pValue
@@ -347,19 +352,26 @@ Members2
 
 	bool
 	GetThisValueType (CValue* pValue);
+/*
+	bool
+	DeclareAutoGetValue (
+		CType* pType,
+		CDeclarator* pDeclarator,
+		uint_t PtrTypeFlags
+		);
 
 	bool
-	GetPropValue (CValue* pValue);
+	GetAutoGetValue (CValue* pValue);
 
 	bool
-	GetPropValueType (CValue* pValue);
+	GetAutoGetValueType (CValue* pValue);
 
 	bool
 	GetOnChange (CValue* pValue);
 
 	bool
 	GetOnChangeType (CValue* pValue);
-
+*/
 	bool
 	PrepareCurlyInitializerNamedItem (
 		TCurlyInitializer* pInitializer, 

@@ -2,9 +2,9 @@
 
 class C1
 {
-	pubconst int m_progress;	
+	constd int m_progress;	
 
-	pubevent m_completeEvent ();
+	eventd m_completeEvent ();
 
 	work ()
 	{

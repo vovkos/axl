@@ -181,9 +181,39 @@ declaration_terminator <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return IsEmptyDeclarationTerminatorAllowed ($pTypeSpecifier);
 			}
-	|	function_body_pass1
+	|	declaration_body_pass1
 			{
-				return SetFunctionBody (&$1.m_TokenList);
+				return SetDeclarationBody (&$1.m_TokenList);
+			}
+	;
+
+class
+{
+	rtl::CBoxListT <CToken> m_TokenList;
+}
+declaration_body_pass1
+	:	compound_stmt_pass1 <&$.m_TokenList>
+	;
+
+noast 
+compound_stmt_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	:	'{'
+			{
+				$pTokenList->InsertTail ($1);
+			}
+		statement_pass1 <$pTokenList>* 
+		'}'
+			{
+				$pTokenList->InsertTail ($3);
+			}
+	;
+
+noast
+statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
+	:	compound_stmt_pass1 <$pTokenList>
+	|	any
+			{
+				$pTokenList->InsertTail ($1);
 			}
 	;
 

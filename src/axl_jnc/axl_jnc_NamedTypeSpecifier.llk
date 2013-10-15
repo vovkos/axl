@@ -1,4 +1,4 @@
-	//.............................................................................
+//.............................................................................
 
 // root
 
@@ -22,11 +22,6 @@ named_type_specifier
 	|	class_specifier
 			{
 				$.m_pType = $1.m_pType;
-			}
-	|	resolver (property_specifier_rslv) // prefer named_type_specifier over type_modifier
-		property_specifier
-			{
-				$.m_pType = $2.m_pProperty->GetType ();
 			}
 	;
 
@@ -223,78 +218,23 @@ class_specifier
 
 //.............................................................................
 
-// property
-
-property_specifier_rslv
-	:	EToken_Bindable?
-		EToken_Property 
-		EToken_Identifier
-	;
-
-class
-{
-	CProperty* m_pProperty;
-}
-property_specifier
-	:	EToken_Bindable $b?
-		EToken_Property 
-		EToken_Identifier $n
-			{
-				$.m_pProperty = CreateProperty (
-					$n.m_Data.m_String,
-					$n.m_Pos
-					);
-
-				if (!$.m_pProperty)
-					return false;
-
-				return IsValidLocator ($b) ? $.m_pProperty->CreateOnChange () : true;
-			}	  
-		named_type_block <$.m_pProperty>
-			{
-				m_pLastDeclaredItem = $.m_pProperty;
-				return $.m_pProperty->CalcType () != NULL; 
-			}
-	;
-
-//.............................................................................
-
-// property template
-
-class
-{
-	CPropertyType* m_pType;
-}
-property_template_specifier
-	local
-	{
-		CPropertyTemplate* $pTemplate;
-	}
-	:	EToken_Property 
-			{
-				$pTemplate = CreatePropertyTemplate ();
-			}
-		named_type_block <$pTemplate>		
-			{
-				$.m_pType = $pTemplate->CalcType ();
-				return $.m_pType != NULL;
-			}
-	;
-
-//.............................................................................
-
-// struct, union, class, interface, property
+// struct, union, class, property
 
 named_type_block <CNamespace* $pNamespace>
-	:	'{' 
-			{
-				m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
-			}
-		named_type_block_declaration*
-		'}'
-			{
-				m_pModule->m_NamespaceMgr.CloseNamespace ();
-			}
+	enter
+	{
+		m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
+	}
+	leave
+	{
+		m_pModule->m_NamespaceMgr.OpenNamespace ($pNamespace);
+	}
+	:	named_type_block_impl
+	;
+	
+start
+named_type_block_impl
+	:	'{' named_type_block_declaration* '}'
 	;
 
 //.............................................................................

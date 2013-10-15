@@ -26,8 +26,10 @@ enum EProperty
 
 enum EPropertyFlag
 {
-	EPropertyFlag_AutoGet  = 0x0100,
-	EPropertyFlag_AutoSet  = 0x0200,
+	EPropertyFlag_Const    = 0x010000,
+	EPropertyFlag_Bindable = 0x020000,
+	EPropertyFlag_AutoGet  = 0x040000,
+	EPropertyFlag_AutoSet  = 0x080000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -63,7 +65,7 @@ protected:
 	// member data is CStructField or CVariable
 	
 	CModuleItem* m_pOnChange;
-	CModuleItem* m_pPropValue;
+	CModuleItem* m_pAutoGetValue;
 
 	// parent type
 
@@ -154,11 +156,23 @@ public:
 		return m_pOnChange;
 	}
 
+	bool
+	SetOnChange (CModuleItem* pItem);
+
+	bool
+	CreateOnChange ();
+
 	CModuleItem*
-	GetPropValue ()
+	GetAutoGetValue ()
 	{
-		return m_pPropValue;
+		return m_pAutoGetValue;
 	}
+
+	bool
+	SetAutoGetValue (CModuleItem* pItem); // struct-field or variable
+
+	bool
+	CreateAutoGetValue (CType* pType);
 
 	CNamedType* 
 	GetParentType ()
@@ -184,26 +198,11 @@ public:
 		return m_ParentClassVTableIndex;
 	}
 
-	CPropertyType*
-	CalcType ();
-
 	bool
 	Create (CPropertyType* pType);
 
 	void
 	ConvertToMemberProperty (CNamedType* pParentType);
-
-	bool
-	CreateOnChange ();
-
-	bool
-	CreatePropValue (
-		CType* pType,
-		size_t BitCount = 0,
-		uint_t PtrTypeFlags = 0,
-		rtl::CBoxListT <CToken>* pConstructor = NULL,
-		rtl::CBoxListT <CToken>* pInitializer = NULL
-		);
 
 	CStructField*
 	CreateField (

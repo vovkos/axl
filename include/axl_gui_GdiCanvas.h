@@ -39,7 +39,7 @@ public:
 //.............................................................................
 
 class CGdiCanvas: 
-	public ÑCanvas,
+	public CCanvas,
 	public rtl::CHandleT <HDC>
 {
 	friend class CGdiEngine;
@@ -127,7 +127,7 @@ public:
 	virtual
 	bool
 	CopyRect (
-		ÑCanvas* pSrcCanvas,
+		CCanvas* pSrcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,

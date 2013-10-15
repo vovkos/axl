@@ -473,8 +473,8 @@ assignment_operator_expr <CValue* $pValue>
 	}
 	enter
 	{
-		if (IsAutoEv ())  // reset on assignment
-			m_AutoEvBindSiteList.Clear (); 
+		if (IsReactor ())  // reset on assignment
+			m_ReactorBindSiteList.Clear (); 
 	}
 	:	assignment_operator $o conditional_expr <&$OpValue2>
 			{
@@ -550,8 +550,8 @@ unary_expr <CValue* $pValue>
 unary_operator_expr <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
-			m_AutoEvBindSiteList.InsertTail (*$pValue);
+		if (IsReactor () && IsBindableType ($pValue->GetType ()))
+			m_ReactorBindSiteList.InsertTail (*$pValue);
 	}
 	:	'+' unary_expr <$pValue> 
 			{
@@ -581,24 +581,9 @@ unary_operator_expr <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreInc, $pValue);
 			}
-	|	EToken_Dec unary_expr <$pValue> 
+	|	EToken_Dec unary_expr <$pValue>
 			{
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, $pValue);
-			}
-	|	EToken_SizeOf '(' type_name_or_expr $t ')'
-			{
-				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
-				$pValue->SetConstSizeT (pType->GetSize ());
-			}
-	|	EToken_CountOf '(' type_name_or_expr $t ')'
-			{
-				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
-				return GetCountOf (pType, $pValue);
-			}
-	|	EToken_TypeOf '(' type_name_or_expr $t ')' 
-			{
-				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
-				$pValue->SetType ($t.m_pType);
 			}
 	|	resolver (cast_operator_rslv) 
 		'(' storage_specifier $s? type_name $t ')' unary_expr <$pValue> 
@@ -675,8 +660,8 @@ postfix_expr <CValue* $pValue>
 postfix_operator <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
-			m_AutoEvBindSiteList.InsertTail (*$pValue);
+		if (IsReactor () && IsBindableType ($pValue->GetType ()))
+			m_ReactorBindSiteList.InsertTail (*$pValue);
 	}
 	:	'(' expression_or_empty_list ')'
 			{
@@ -717,14 +702,6 @@ member_operator <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.MemberOperator ($pValue, $n.m_Data.m_String);
 			}
-	|	EToken_OnChange
-			{
-				return m_pModule->m_OperatorMgr.GetPropertyOnChange ($pValue);
-			}
-	|	EToken_PropValue
-			{
-				return m_pModule->m_OperatorMgr.GetPropertyPropValue ($pValue);
-			}
 	|	EToken_Get
 			{
 				return m_pModule->m_OperatorMgr.GetPropertyGetter ($pValue);
@@ -735,27 +712,24 @@ member_operator <CValue* $pValue>
 			}
 	;
 
+// sizeof typeof bindingof etc operators should be here and not in unary_operator
+// otherwise member operators could not be applied (typeof (int).m_size)
+
 primary_expr <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
-			m_AutoEvBindSiteList.InsertTail (*$pValue);
+		if (IsReactor () && IsBindableType ($pValue->GetType ()))
+			m_ReactorBindSiteList.InsertTail (*$pValue);
 	}
-	:	EToken_Identifier
+	:	'(' conditional_expr <$pValue> ')'
+	|	literal <$pValue>
+	|	EToken_Identifier
 			{
 				return LookupIdentifier ($1.m_Data.m_String, $pValue);
 			}
 	|	EToken_This
 			{
 				return GetThisValue ($pValue);
-			}
-	|	EToken_OnChange
-			{
-				return GetOnChange ($pValue);
-			}
-	|	EToken_PropValue
-			{
-				return GetPropValue ($pValue);
 			}
 	|	EToken_Integer
 			{
@@ -777,8 +751,28 @@ primary_expr <CValue* $pValue>
 			{
 				$pValue->SetNull ();
 			}
-	|	literal <$pValue>
-	|	'(' conditional_expr <$pValue> ')'
+	|	EToken_SizeOf '(' type_name_or_expr $t ')'
+			{
+				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
+				$pValue->SetConstSizeT (pType->GetSize ());
+			}
+	|	EToken_CountOf '(' type_name_or_expr $t ')'
+			{
+				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
+				return GetCountOf (pType, $pValue);
+			}
+	|	EToken_TypeOf '(' type_name_or_expr $t ')' 
+			{
+				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
+				$pValue->SetType ($t.m_pType);
+			}
+	|	EToken_OffsetOf '(' type_name $t ',' EToken_Identifier $n ')' 
+			{
+			}
+	|	EToken_BindingOf '(' conditional_expr <$pValue> ')' 
+			{
+				return m_pModule->m_OperatorMgr.GetPropertyOnChange ($pValue);
+			}
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

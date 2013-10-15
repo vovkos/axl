@@ -239,8 +239,8 @@ assignment_expr_s <CValue* $pValue>
 	:	unary_expr_s <$pValue> 
 		(
 				{
-					if (IsAutoEv ())
-						m_AutoEvBindSiteCount = 0; // reset on assignment
+					if (IsReactor ())
+						m_ReactorBindSiteCount = 0; // reset on assignment
 				}
 			assignment_operator $o conditional_expr_s <&$OpValue2>
 				{
@@ -257,8 +257,8 @@ unary_expr_s <CValue* $pValue>
 unary_operator_expr_s <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
-			m_AutoEvBindSiteCount++;
+		if (IsReactor () && IsBindableType ($pValue->GetType ()))
+			m_ReactorBindSiteCount++;
 	}
 	:	'+' unary_expr_s <$pValue> 
 			{
@@ -305,6 +305,13 @@ unary_operator_expr_s <CValue* $pValue>
 				CType* pType = $t.m_pType->GetTypeKind () == EType_DataRef ? ((CDataPtrType*) $t.m_pType)->GetTargetType () : $t.m_pType;
 				$pValue->SetType ($t.m_pType);
 			}
+	|	EToken_OffsetOf '(' type_name $t ',' EToken_Identifier $n ')' 
+			{
+			}
+	|	EToken_BindingOf '(' conditional_expr_s <$pValue> ')' 
+			{
+				return m_pModule->m_OperatorMgr.GetPropertyOnChangeType ($pValue);
+			}
 	|	resolver (cast_operator_rslv) 
 		'(' storage_specifier? type_name $t ')' unary_expr_s <$pValue> 
 			{
@@ -345,8 +352,8 @@ postfix_expr_s <CValue* $pValue>
 postfix_operator_s <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
-			m_AutoEvBindSiteCount++;
+		if (IsReactor () && IsBindableType ($pValue->GetType ()))
+			m_ReactorBindSiteCount++;
 	}
 	:	'(' expression_or_empty_list_s ')'
 			{
@@ -387,14 +394,6 @@ member_operator_s <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.GetMemberOperatorResultType ($pValue, $n.m_Data.m_String);
 			}
-	|	EToken_OnChange
-			{
-				return m_pModule->m_OperatorMgr.GetPropertyOnChangeType ($pValue);
-			}
-	|	EToken_PropValue
-			{
-				return m_pModule->m_OperatorMgr.GetPropertyPropValueType ($pValue);
-			}
 	|	EToken_Get
 			{
 				return m_pModule->m_OperatorMgr.GetPropertyGetterType ($pValue);
@@ -408,8 +407,8 @@ member_operator_s <CValue* $pValue>
 primary_expr_s <CValue* $pValue>
 	leave 
 	{
-		if (IsAutoEv () && IsBindableType ($pValue->GetType ()))
-			m_AutoEvBindSiteCount++;
+		if (IsReactor () && IsBindableType ($pValue->GetType ()))
+			m_ReactorBindSiteCount++;
 	}
 	:	EToken_Identifier
 			{
@@ -418,14 +417,6 @@ primary_expr_s <CValue* $pValue>
 	|	EToken_This
 			{
 				return GetThisValueType ($pValue);
-			}
-	|	EToken_OnChange
-			{
-				return GetOnChangeType ($pValue);
-			}
-	|	EToken_PropValue
-			{
-				return GetPropValueType ($pValue);
 			}
 	|	EToken_Integer
 			{
@@ -480,4 +471,3 @@ literal_s <CValue* $pValue>
 	;
 
 //.............................................................................
- 

@@ -14,7 +14,7 @@ int autoget property g_foo;
 g_foo.set (int x)
 {
 	printf ("g_foo.set (%d)\n", x);
-	propvalue = x;
+	autoget = x;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -26,7 +26,7 @@ class C1
 	m_bar.set (int x)
 	{
 		printf ("C1.m_bar.set (%d)\n", x);
-		propvalue = x;
+		autoget = x;
 	}
 }
 

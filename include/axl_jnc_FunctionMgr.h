@@ -354,20 +354,23 @@ public:
 	CFunction*
 	CreateFunction (
 		EFunction FunctionKind,
-		CFunctionType* pType
+		CFunctionType* pType,
+		uint_t Flags = 0
 		);
 
 	CFunction*
 	CreateInternalFunction (
 		const char* pTag,
-		CFunctionType* pType 
+		CFunctionType* pType,
+		uint_t Flags = 0
 		);
 
 	CFunction*
 	CreateFunction (
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		CFunctionType* pType
+		CFunctionType* pType,
+		uint_t Flags = 0
 		);
 
 	CProperty*

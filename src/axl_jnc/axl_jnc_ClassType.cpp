@@ -170,8 +170,8 @@ CClassType::AddMethod (CFunction* pFunction)
 		ppTarget = &m_pCallOperator;
 		break;
 
-	case EFunction_AutoEvHandler:
-		if (m_ClassTypeKind == EClassType_AutoEv)
+	case EFunction_Reaction:
+		if (m_ClassTypeKind == EClassType_Reactor)
 			return true;
 
 		// else fall through and fail

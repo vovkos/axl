@@ -68,7 +68,7 @@ enum EType
 	EType_Enum,                // E
 	EType_Struct,              // SS/SP (struct/pointer struct)
 	EType_Union,               // U
-	EType_Class,               // CC/CO/CB/CA/CF/CD (class/object/box/autoev-iface/f-closure/d-closure)
+	EType_Class,               // CC/CO/CB/CA/CF/CD (class/object/box/reactor-iface/f-closure/d-closure)
 	
 	// function types
 
@@ -137,7 +137,7 @@ enum EStdType
 	EStdType_SimpleMulticast,
 	EStdType_SimpleEventPtr,
 	EStdType_Binder,
-	EStdType_AutoEvBindSite,
+	EStdType_ReactorBindSite,
 	EStdType_Scheduler,
 	EStdType_SchedulerPtr,
 	EStdType_FmtLiteral,
@@ -151,7 +151,7 @@ enum ETypeModifier
 	ETypeModifier_Unsigned    = 0x00000001,
 	ETypeModifier_BigEndian   = 0x00000002,
 	ETypeModifier_Const       = 0x00000004,
-	ETypeModifier_PubConst    = 0x00000008,
+	ETypeModifier_ConstD      = 0x00000008,
 	ETypeModifier_Volatile    = 0x00000010,
 	ETypeModifier_Weak        = 0x00000020,
 	ETypeModifier_Thin        = 0x00000040,
@@ -165,8 +165,9 @@ enum ETypeModifier
 	ETypeModifier_Indexed     = 0x00004000,
 	ETypeModifier_Multicast   = 0x00008000,
 	ETypeModifier_Event       = 0x00010000,
-	ETypeModifier_PubEvent    = 0x00020000,
-	ETypeModifier_AutoEv      = 0x00040000,
+	ETypeModifier_EventD      = 0x00020000,
+	ETypeModifier_Reactor     = 0x00040000,
+	ETypeModifier_Unwinder    = 0x00080000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -180,29 +181,31 @@ enum ETypeModifierMask
 	ETypeModifierMask_Function = 
 		ETypeModifier_Function | 
 		ETypeModifier_Cdecl | 
-		ETypeModifier_Stdcall,
+		ETypeModifier_Stdcall |
+		ETypeModifier_Unwinder,
 
 	ETypeModifierMask_Property = 
 		ETypeModifier_Property | 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall |
+		ETypeModifier_Unwinder |
 		ETypeModifier_Const | 
 		ETypeModifier_Bindable | 
 		ETypeModifier_Indexed,
 
 	ETypeModifierMask_DataPtr = 
 		ETypeModifier_Const | 
-		ETypeModifier_PubConst | 
+		ETypeModifier_ConstD | 
 		ETypeModifier_Volatile |
 		ETypeModifier_Thin |
 		ETypeModifier_Unsafe,
 
 	ETypeModifierMask_ClassPtr = 
 		ETypeModifier_Const | 
-		ETypeModifier_PubConst | 
+		ETypeModifier_ConstD | 
 		ETypeModifier_Volatile |
 		ETypeModifier_Event | 
-		ETypeModifier_PubEvent | 
+		ETypeModifier_EventD | 
 		ETypeModifier_Weak |
 		ETypeModifier_Unsafe,
 	
@@ -224,10 +227,12 @@ enum ETypeModifierMask
 
 	ETypeModifierMask_DeclPtr = 
 		ETypeModifier_Const | 
-		ETypeModifier_PubConst | 
+		ETypeModifier_ConstD | 
 		ETypeModifier_Volatile |
 		ETypeModifier_Event | 
-		ETypeModifier_PubEvent,
+		ETypeModifier_EventD |
+		ETypeModifier_Bindable |
+		ETypeModifier_AutoGet,
 
 	ETypeModifierMask_CallConv = 
 		ETypeModifier_Cdecl |
@@ -241,19 +246,19 @@ enum ETypeModifierMask
 		ETypeModifier_Function |
 		ETypeModifier_Property |
 		ETypeModifier_Multicast |
-		ETypeModifier_AutoEv,
+		ETypeModifier_Reactor,
 
 	ETypeModifierMask_Const = 
 		ETypeModifier_Const |
-		ETypeModifier_PubConst |
+		ETypeModifier_ConstD |
 		ETypeModifier_Event |
-		ETypeModifier_PubEvent,
+		ETypeModifier_EventD,
 
 	ETypeModifierMask_Event = 
 		ETypeModifier_Event |
-		ETypeModifier_PubEvent |
+		ETypeModifier_EventD |
 		ETypeModifier_Const |
-		ETypeModifier_PubConst |
+		ETypeModifier_ConstD |
 		ETypeModifierMask_TypeKind,
 };
 
@@ -293,15 +298,17 @@ enum ETypeFlag
 
 enum EPtrTypeFlag
 {
-	EPtrTypeFlag_Unsafe    = 0x010000, // all ptr
-	EPtrTypeFlag_Checked   = 0x020000, // all ptr
-	EPtrTypeFlag_Const     = 0x040000, // class & data ptr
-	EPtrTypeFlag_PubConst  = 0x080000, // class & data ptr
-	EPtrTypeFlag_Volatile  = 0x100000, // class & data ptr
-	EPtrTypeFlag_Event     = 0x200000, // class only
-	EPtrTypeFlag_PubEvent  = 0x400000, // class only
+	EPtrTypeFlag_Unsafe    = 0x0010000, // all ptr
+	EPtrTypeFlag_Checked   = 0x0020000, // all ptr
+	EPtrTypeFlag_Const     = 0x0040000, // class & data ptr
+	EPtrTypeFlag_ConstD    = 0x0080000, // class & data ptr
+	EPtrTypeFlag_Volatile  = 0x0100000, // class & data ptr
+	EPtrTypeFlag_Event     = 0x0200000, // multicast-class only
+	EPtrTypeFlag_EventD    = 0x0400000, // multicast-class only
+	EPtrTypeFlag_Bindable  = 0x0800000, // multicast-class only
+	EPtrTypeFlag_AutoGet   = 0x1000000, // data ptr only
 
-	EPtrTypeFlag__AllMask  = 0x7f0000,
+	EPtrTypeFlag__AllMask  = 0x1ff0000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -638,6 +645,9 @@ GetSimpleType (
 	CModule* pModule,
 	EStdType StdTypeKind
 	);
+
+CType*
+GetModuleItemType (CModuleItem* pItem);
 
 //.............................................................................
 

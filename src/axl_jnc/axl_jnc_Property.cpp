@@ -24,7 +24,7 @@ CProperty::CProperty ()
 	m_pSetter = NULL;
 	m_pBinder = NULL;
 
-	m_pPropValue = NULL;
+	m_pAutoGetValue = NULL;
 	m_pOnChange = NULL;
 
 	m_pParentType = NULL;
@@ -89,31 +89,6 @@ CProperty::Compile ()
 	return true;
 }
 
-CPropertyType*
-CProperty::CalcType ()
-{
-	ASSERT (!m_pType);
-
-	if (!m_pGetter)
-	{
-		err::SetFormatStringError ("incomplete property: no 'get' method / 'propvalue' field");
-		return NULL;
-	}
-
-	uint_t TypeFlags = 0;
-	if (m_pOnChange)
-		TypeFlags |= EPropertyTypeFlag_Bindable;
-
-	m_pType = m_pSetter ?
-		m_pModule->m_TypeMgr.GetPropertyType (m_pGetter->GetType (), *m_pSetter->GetTypeOverload (), TypeFlags) :
-		m_pModule->m_TypeMgr.GetPropertyType (m_pGetter->GetType (), NULL, TypeFlags);
-
-	if (m_Flags & (EPropertyFlag_AutoGet | EPropertyFlag_AutoSet))
-		m_pModule->MarkForCompile (this);
-
-	return m_pType;
-}
-
 bool
 CProperty::Create (CPropertyType* pType)
 {
@@ -144,7 +119,7 @@ CProperty::Create (CPropertyType* pType)
 
 	if (m_Flags & EPropertyFlag_AutoGet)
 	{
-		Result = CreatePropValue (pGetterType->GetReturnType ());
+		Result = CreateAutoGetValue (pGetterType->GetReturnType ());
 		if (!Result)
 			return false;
 	}
@@ -192,29 +167,23 @@ CProperty::ConvertToMemberProperty (CNamedType* pParentType)
 }
 
 bool
-CProperty::CreateOnChange ()
+CProperty::SetOnChange (CModuleItem* pItem)
 {
 	if (m_pOnChange)
 	{
-		err::SetFormatStringError ("'%s' already has 'onchange'", m_Tag.cc ());
+		err::SetFormatStringError ("'%s' already has 'bindable %s'", m_Tag.cc (), m_pOnChange->m_Tag.cc ());
 		return false;
 	}
 
-	CType* pType = m_pModule->GetSimpleType (EStdType_SimpleMulticast);
-	
-	if (m_pParentType)
+	CType* pType = GetModuleItemType (pItem);
+	if (!pType)
 	{
-		m_pOnChange = CreateField (pType);
+		err::SetFormatStringError ("invalid bindable item");
+		return false;
 	}
-	else
-	{
-		m_pOnChange = m_pModule->m_VariableMgr.CreateVariable (
-			EStorage_Static, 
-			"onchange", 
-			CreateQualifiedName ("onchange"), 
-			pType
-			);
-	}
+
+	m_pOnChange = pItem;
+	m_Flags |= EPropertyFlag_Bindable;
 
 	CFunctionType* pBinderType = (CFunctionType*) m_pModule->GetSimpleType (EStdType_Binder);
 	CFunction* pBinder = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Binder, pBinderType);
@@ -229,47 +198,67 @@ CProperty::CreateOnChange ()
 }
 
 bool
-CProperty::CreatePropValue (
-	CType* pType,
-	size_t BitCount,
-	uint_t PtrTypeFlags,
-	rtl::CBoxListT <CToken>* pConstructor,
-	rtl::CBoxListT <CToken>* pInitializer
-	)
+CProperty::CreateOnChange ()
 {
-	if (m_pPropValue)
-	{
-		err::SetFormatStringError ("'%s' already has 'propvalue'", m_Tag.cc ());
-		return false;
-	}
+	rtl::CString Name = "m_onChange";
 
+	CType* pType = m_pModule->GetSimpleType (EStdType_SimpleMulticast);
+	
 	if (m_pParentType)
 	{
-		m_pPropValue = CreateField (
-			rtl::CString (), 
-			pType, 
-			BitCount, 
-			PtrTypeFlags, 
-			pConstructor, 
-			pInitializer
-			);
+		CStructField* pField = CreateField (Name, pType);
+		return 
+			pField != NULL &&
+			SetOnChange (pField);
 	}
 	else
 	{
-		m_pPropValue = m_pModule->m_VariableMgr.CreateVariable (
+		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
 			EStorage_Static, 
-			"propvalue", 
-			CreateQualifiedName ("propvalue"), 
-			pType,
-			PtrTypeFlags,
-			pConstructor,
-			pInitializer
+			Name, 
+			CreateQualifiedName (Name), 
+			pType
 			);
+
+		return
+			pVariable != NULL && 
+			AddItem (pVariable) &&
+			SetOnChange (pVariable);
+	}
+}
+
+bool
+CProperty::SetAutoGetValue (CModuleItem* pItem)
+{
+	if (m_pAutoGetValue)
+	{
+		err::SetFormatStringError ("'%s' already has 'autoget %s'", m_Tag.cc (), m_pAutoGetValue->m_Tag.cc ());
+		return false;
 	}
 
+	CType* pType = GetModuleItemType (pItem);
+	if (!pType)
+	{
+		err::SetFormatStringError ("invalid autoget item");
+		return false;
+	}
+
+	m_pAutoGetValue = pItem;
 	m_Flags |= EPropertyFlag_AutoGet;
 
 	CFunctionType* pGetterType = m_pModule->m_TypeMgr.GetFunctionType (pType, NULL, 0, 0);
+
+	if (m_pGetter)
+	{
+		if (m_pGetter->GetType ()->Cmp (pGetterType) != 0)
+		{
+			err::SetFormatStringError ("'autoget %s' does not match property declaration", pType->GetTypeString ().cc ());
+			return false;
+		}
+
+		return true;
+	}
+
 	CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, pGetterType);
 	pGetter->m_StorageKind = m_StorageKind == EStorage_Abstract ? EStorage_Virtual : m_StorageKind;
 
@@ -281,6 +270,34 @@ CProperty::CreatePropValue (
 	return AddMethod (pGetter);	
 }
 
+
+bool
+CProperty::CreateAutoGetValue (CType* pType)
+{
+	rtl::CString Name = "m_value";
+
+	if (m_pParentType)
+	{
+		CStructField* pField = CreateField (Name, pType);
+		return 
+			pField != NULL &&
+			SetAutoGetValue (pField);
+	}
+	else
+	{
+		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
+			EStorage_Static, 
+			Name, 
+			CreateQualifiedName (Name), 
+			pType
+			);
+
+		return
+			pVariable != NULL && 
+			AddItem (pVariable) &&
+			SetAutoGetValue (pVariable);
+	}
+}	
 
 CStructField*
 CProperty::CreateField (
@@ -429,6 +446,12 @@ CProperty::AddMethod (CFunction* pFunction)
 		break;
 
 	case EFunction_Setter:
+		if (m_Flags & EPropertyFlag_Const)
+		{
+			err::SetFormatStringError ("const property '%s' cannot have setters", m_Tag.cc ());
+			return false;
+		}
+
 		Result = m_Verifier.CheckSetter (pFunction->GetType ());
 		if (!Result)
 			return false;
@@ -656,10 +679,10 @@ CProperty::CompileAutoGetter ()
 
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pGetter);
 	
-	CValue PropValue;
+	CValue AutoGetValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetPropertyPropValue (GetAutoAccessorPropertyValue (), &PropValue) &&
-		m_pModule->m_ControlFlowMgr.Return (PropValue);
+		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
+		m_pModule->m_ControlFlowMgr.Return (AutoGetValue);
 
 	if (!Result)
 		return false;		
@@ -688,10 +711,10 @@ CProperty::CompileAutoSetter ()
 		m_pModule->m_FunctionMgr.InternalPrologue (m_pSetter, &SrcValue, 1);
 	}
 
-	CValue PropValue;
+	CValue AutoGetValue;
 	Result = 
-		m_pModule->m_OperatorMgr.GetPropertyPropValue (GetAutoAccessorPropertyValue (), &PropValue) &&
-		m_pModule->m_OperatorMgr.StoreDataRef (PropValue, SrcValue);
+		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
+		m_pModule->m_OperatorMgr.StoreDataRef (AutoGetValue, SrcValue);
 
 	if (!Result)
 		return false;		

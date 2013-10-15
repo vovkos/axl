@@ -5,6 +5,10 @@ declarator_list <CTypeSpecifier* $pTypeSpecifier>
 	;
 		
 full_declarator <CTypeSpecifier* $pTypeSpecifier>
+	enter
+	{
+		return PreDeclare ();
+	}
 	:	declarator $d <$pTypeSpecifier> 
 		(EToken_Construct arg_list_pass1 $c
 			{
@@ -92,10 +96,6 @@ declarator_qualifier <CDeclarator* $pDeclarator>
 	|	EToken_Operator operator_name
 			{
 				return $pDeclarator->AddUnaryBinaryOperator ($2.m_UnOpKind, $2.m_BinOpKind);
-			}
-	|	EToken_PropValue
-			{
-				return $pDeclarator->SetPropValue ();
 			}
 	;
 
@@ -290,7 +290,7 @@ declarator_prefix <CDeclarator* $pDeclarator>
 			}
 		(type_modifier $m
 			{
-				return $pDeclarator->SetTypeModifier ($m.m_Modifier);
+				return $pDeclarator->SetTypeModifier ($m.m_TypeModifier);
 			}
 		)*
 	;

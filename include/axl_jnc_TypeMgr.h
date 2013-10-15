@@ -18,7 +18,7 @@
 #include "axl_jnc_FunctionPtrType.h"
 #include "axl_jnc_PropertyPtrType.h"
 #include "axl_jnc_ImportType.h"
-#include "axl_jnc_AutoEvClassType.h"
+#include "axl_jnc_ReactorClassType.h"
 #include "axl_jnc_ClosureClassType.h"
 #include "axl_jnc_McSnapshotClassType.h"
 #include "axl_jnc_MulticastClassType.h"
@@ -34,12 +34,12 @@ struct TDualPtrTypeTuple: rtl::TListLink
 {
 	union 
 	{
-		TDataPtrTypeTuple* m_pPubConstDataPtrTypeTuple;
-		TClassPtrTypeTuple* m_pPubConstClassPtrTypeTuple;
-		TPropertyPtrTypeTuple* m_pPubConstPropertyPtrTypeTuple;
+		TDataPtrTypeTuple* m_pConstDDataPtrTypeTuple;
+		TClassPtrTypeTuple* m_pConstDClassPtrTypeTuple;
+		TPropertyPtrTypeTuple* m_pConstDPropertyPtrTypeTuple;
 	};
 
-	TClassPtrTypeTuple* m_pPubEventClassPtrTypeTuple;
+	TClassPtrTypeTuple* m_pEventDClassPtrTypeTuple;
 };
 
 //.............................................................................
@@ -75,7 +75,7 @@ protected:
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
 	rtl::CStdListT <CNamedImportType> m_NamedImportTypeList;
 	rtl::CStdListT <CImportPtrType> m_ImportPtrTypeList;
-	rtl::CStdListT <CAutoEvClassType> m_AutoEvClassTypeList;
+	rtl::CStdListT <CReactorClassType> m_ReactorClassTypeList;
 	rtl::CStdListT <CFunctionClosureClassType> m_FunctionClosureClassTypeList;
 	rtl::CStdListT <CPropertyClosureClassType> m_PropertyClosureClassTypeList;
 	rtl::CStdListT <CDataClosureClassType> m_DataClosureClassTypeList;
@@ -200,10 +200,10 @@ public:
 		return m_ImportPtrTypeList;
 	}
 
-	rtl::CConstListT <CAutoEvClassType> 
-	GetAutoEvClassTypeList ()
+	rtl::CConstListT <CReactorClassType> 
+	GetReactorClassTypeList ()
 	{
-		return m_AutoEvClassTypeList;
+		return m_ReactorClassTypeList;
 	}
 
 	rtl::CConstListT <CFunctionClosureClassType> 
@@ -595,10 +595,10 @@ public:
 	GetMulticastType (CFunctionPtrType* pFunctionPtrType);
 
 	CClassType* 
-	GetAutoEvInterfaceType (CFunctionType* pStartMethodType);
+	GetReactorInterfaceType (CFunctionType* pStartMethodType);
 	
-	CAutoEvClassType* 
-	CreateAutoEvType (
+	CReactorClassType* 
+	CreateReactorType (
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
 		CClassType* pIfaceType,
@@ -791,7 +791,7 @@ protected:
 	GetDataPtrTypeTuple (CType* pType);
 
 	TDataPtrTypeTuple*
-	GetPubConstDataPtrTypeTuple (
+	GetConstDDataPtrTypeTuple (
 		CNamespace* pAnchorNamespace,
 		CType* pType
 		);
@@ -800,7 +800,7 @@ protected:
 	GetClassPtrTypeTuple (CClassType* pClassType);
 
 	TClassPtrTypeTuple*
-	GetPubConstClassPtrTypeTuple (
+	GetConstDClassPtrTypeTuple (
 		CNamespace* pAnchorNamespace,
 		CClassType* pClassType
 		);
@@ -809,7 +809,7 @@ protected:
 	GetEventClassPtrTypeTuple (CMulticastClassType* pClassType);
 
 	TClassPtrTypeTuple*
-	GetPubEventClassPtrTypeTuple (
+	GetEventDClassPtrTypeTuple (
 		CNamespace* pAnchorNamespace,
 		CMulticastClassType* pClassType
 		);
@@ -821,7 +821,7 @@ protected:
 	GetPropertyPtrTypeTuple (CPropertyType* pPropertyType);
 
 	TPropertyPtrTypeTuple*
-	GetPubConstPropertyPtrTypeTuple (
+	GetConstDPropertyPtrTypeTuple (
 		CNamespace* pAnchorNamespace,
 		CPropertyType* pPropertyType
 		);
@@ -843,7 +843,7 @@ protected:
 	CreateObjectType ();
 
 	CStructType* 
-	CreateAutoEvBindSiteType ();
+	CreateReactorBindSiteType ();
 
 	CClassType* 
 	CreateSchedulerType ();

@@ -33,7 +33,7 @@ GetFunctionKindString (EFunction FunctionKind)
 		"binary-operator",          // EFunction_BinaryOperator,
 		"internal",                 // EFunction_Internal, 
 		"thunk",                    // EFunction_Thunk,
-		"autoev-handler",           // EFunction_AutoEvHandler,
+		"reaction",                 // EFunction_Reaction,
 		"schedule-launcher",        // EFunction_ScheduleLauncher,
 	};
 
@@ -82,7 +82,7 @@ GetFunctionKindFlags (EFunction FunctionKind)
 		0,                              // EFunction_BinaryOperator,
 		0,                              // EFunction_Internal, 
 		0,                              // EFunction_Thunk,
-		0,                              // EFunction_AutoEvHandler,
+		0,                              // EFunction_Reaction,
 		0,                              // EFunction_ScheduleLauncher,
 	};
 

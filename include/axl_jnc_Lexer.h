@@ -62,7 +62,7 @@ enum EToken
 	EToken_BigEndian,
 	EToken_Nullable,
 	EToken_Const,
-	EToken_PubConst,
+	EToken_ConstD,
 	EToken_Mutable,
 	EToken_Volatile,
 	EToken_Weak,
@@ -78,8 +78,8 @@ enum EToken
 	EToken_Indexed,
 	EToken_Multicast,
 	EToken_Event,
-	EToken_PubEvent,
-	EToken_AutoEv,
+	EToken_EventD,
+	EToken_Reactor,
 
 	// type specifiers
 
@@ -107,19 +107,15 @@ enum EToken
 	EToken_Union,
 	EToken_Class,
 
-	// special members
+	// special member methods
 
 	EToken_Get,
 	EToken_Set,
-	EToken_This,
-	EToken_BaseType,
 	EToken_PreConstruct,
 	EToken_Construct,
 	EToken_Destruct,
 	EToken_Operator,
 	EToken_Postfix,
-	EToken_PropValue,
-	EToken_OnChange,
 
 	// statements
 
@@ -135,13 +131,17 @@ enum EToken
 	EToken_Case,
 	EToken_Default,
 	EToken_Once,
+	EToken_OnChange,
 	EToken_Silent,
 	EToken_Try,
 	EToken_Catch,
 	EToken_Finally,
 
-	// constants
+	// pre-defined values
 
+	EToken_BaseType,
+	EToken_This,
+	EToken_RetVal,
 	EToken_True,
 	EToken_False,
 	EToken_Null,
@@ -152,7 +152,9 @@ enum EToken
 	EToken_Delete,
 	EToken_SizeOf,
 	EToken_CountOf,
+	EToken_OffsetOf,
 	EToken_TypeOf,
+	EToken_BindingOf,
 
 	// symbol tokens
 
@@ -235,7 +237,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_LEX_TOKEN_NAME (EToken_BigEndian,    "bigendian")
 	AXL_LEX_TOKEN_NAME (EToken_Const,        "const")
-	AXL_LEX_TOKEN_NAME (EToken_PubConst,     "pubconst")
+	AXL_LEX_TOKEN_NAME (EToken_ConstD,       "constd")
 	AXL_LEX_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_LEX_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_LEX_TOKEN_NAME (EToken_Thin,         "thin")
@@ -250,8 +252,8 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Indexed,      "indexed")
 	AXL_LEX_TOKEN_NAME (EToken_Multicast,    "multicast")	
 	AXL_LEX_TOKEN_NAME (EToken_Event,        "event")	
-	AXL_LEX_TOKEN_NAME (EToken_PubEvent,     "pubevent")	
-	AXL_LEX_TOKEN_NAME (EToken_AutoEv,       "autoev")
+	AXL_LEX_TOKEN_NAME (EToken_EventD,       "eventd")	
+	AXL_LEX_TOKEN_NAME (EToken_Reactor,      "reactor")
 
 	// type specifiers
 
@@ -283,15 +285,11 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 
 	AXL_LEX_TOKEN_NAME (EToken_Get,          "get")
 	AXL_LEX_TOKEN_NAME (EToken_Set,          "set")
-	AXL_LEX_TOKEN_NAME (EToken_This,         "this")
-	AXL_LEX_TOKEN_NAME (EToken_BaseType,     "basetype")
 	AXL_LEX_TOKEN_NAME (EToken_PreConstruct, "preconstruct")
 	AXL_LEX_TOKEN_NAME (EToken_Construct,    "construct")
 	AXL_LEX_TOKEN_NAME (EToken_Destruct,     "destruct")
 	AXL_LEX_TOKEN_NAME (EToken_Operator,     "operator")
 	AXL_LEX_TOKEN_NAME (EToken_Postfix,      "postfix")
-	AXL_LEX_TOKEN_NAME (EToken_PropValue,    "propvalue")
-	AXL_LEX_TOKEN_NAME (EToken_OnChange,     "onchange")
 
 	// statements
 
@@ -307,13 +305,17 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Case,         "case")
 	AXL_LEX_TOKEN_NAME (EToken_Default,      "default")
 	AXL_LEX_TOKEN_NAME (EToken_Once,         "once")
+	AXL_LEX_TOKEN_NAME (EToken_OnChange,     "onchange")
 	AXL_LEX_TOKEN_NAME (EToken_Silent,       "silent")
 	AXL_LEX_TOKEN_NAME (EToken_Try,          "try")
 	AXL_LEX_TOKEN_NAME (EToken_Catch,        "catch")
 	AXL_LEX_TOKEN_NAME (EToken_Finally,      "finally")
 
-	// constants
+	// pre-defined values
 
+	AXL_LEX_TOKEN_NAME (EToken_BaseType,     "basetype")
+	AXL_LEX_TOKEN_NAME (EToken_This,         "this")
+	AXL_LEX_TOKEN_NAME (EToken_RetVal,       "retval")
 	AXL_LEX_TOKEN_NAME (EToken_True,         "true")
 	AXL_LEX_TOKEN_NAME (EToken_False,        "false")
 	AXL_LEX_TOKEN_NAME (EToken_Null,         "null")
@@ -324,7 +326,9 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Delete,       "delete")
 	AXL_LEX_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_LEX_TOKEN_NAME (EToken_CountOf,      "countof")
+	AXL_LEX_TOKEN_NAME (EToken_OffsetOf,     "offsetof")
 	AXL_LEX_TOKEN_NAME (EToken_TypeOf,       "typeof")
+	AXL_LEX_TOKEN_NAME (EToken_BindingOf,    "bindingof")
 
 	// symbol tokens
 

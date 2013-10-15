@@ -208,7 +208,7 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"unsigned",     // ETypeModifier_Unsigned    = 0x00000001,
 		"bigendian",    // ETypeModifier_BigEndian   = 0x00000002,
 		"const",        // ETypeModifier_Const       = 0x00000004,
-		"pubconst",     // ETypeModifier_PubConst    = 0x00000008,
+		"constd",       // ETypeModifier_ConstD      = 0x00000008,
 		"volatile",     // ETypeModifier_Volatile    = 0x00000010,
 		"weak",         // ETypeModifier_Weak        = 0x00000020,
 		"thin",         // ETypeModifier_Thin        = 0x00000040,
@@ -222,8 +222,9 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"indexed",      // ETypeModifier_Indexed     = 0x00004000,
 		"multicast",    // ETypeModifier_Multicast   = 0x00008000,
 		"event",        // ETypeModifier_Event       = 0x00010000,
-		"pubevent",     // ETypeModifier_PubEvent    = 0x00020000,
-		"autoev",       // ETypeModifier_AutoEv      = 0x00040000,
+		"eventd",       // ETypeModifier_EventD      = 0x00020000,
+		"reactor",      // ETypeModifier_Reactor     = 0x00040000,
+		"unwinder",     // ETypeModifier_Unwinder    = 0x00080000,
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
@@ -262,10 +263,15 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 {
 	static const char* StringTable [] = 
 	{
-		"unsafe",   // EPtrTypeFlag_Unsafe   = 0x1000,
-		"checked",  // EPtrTypeFlag_Checked  = 0x2000,
-		"const",    // EPtrTypeFlag_Const    = 0x4000,
-		"volatile", // EPtrTypeFlag_Volatile = 0x8000,
+		"unsafe",   // EPtrTypeFlag_Unsafe    = 0x0010000
+		"checked",  // EPtrTypeFlag_Checked   = 0x0020000
+		"const",    // EPtrTypeFlag_Const     = 0x0040000
+		"constd",   // EPtrTypeFlag_ConstD    = 0x0080000
+		"volatile", // EPtrTypeFlag_Volatile  = 0x0100000
+		"event",    // EPtrTypeFlag_Event     = 0x0200000
+		"eventd",   // EPtrTypeFlag_EventD    = 0x0400000
+		"bindable", // EPtrTypeFlag_Bindable  = 0x0800000
+		"autoget",  // EPtrTypeFlag_AutoGet   = 0x1000000
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Flag >> 12);
@@ -281,47 +287,31 @@ GetPtrTypeFlagString (uint_t Flags)
 	rtl::CString String;
 
 	if (Flags & EPtrTypeFlag_Unsafe)
-		String = "unsafe";
+		String = "unsafe ";
 	else if (Flags & EPtrTypeFlag_Checked)
-		String = "checked";
+		String = "checked ";
 
 	if (Flags & EPtrTypeFlag_Const)
-	{
-		if (!String.IsEmpty ())
-			String += ' ';
-
-		String += "const";
-	}
-	else if (Flags & EPtrTypeFlag_PubConst)
-	{
-		if (!String.IsEmpty ())
-			String += ' ';
-
-		String += "pubconst";
-	}
+		String += "const ";
+	else if (Flags & EPtrTypeFlag_ConstD)
+		String += "constd ";
 
 	if (Flags & EPtrTypeFlag_Volatile)
-	{
-		if (!String.IsEmpty ())
-			String += ' ';
-
-		String += "volatile";
-	}
+		String += "volatile ";
 
 	if (Flags & EPtrTypeFlag_Event)
-	{
-		if (!String.IsEmpty ())
-			String += ' ';
+		String += "event ";
+	else if (Flags & EPtrTypeFlag_EventD)
+		String += "eventd ";
 
-		String += "event";
-	}
-	else if (Flags & EPtrTypeFlag_PubEvent)
-	{
-		if (!String.IsEmpty ())
-			String += ' ';
+	if (Flags & EPtrTypeFlag_Bindable)
+		String += "bindable ";
+	
+	if (Flags & EPtrTypeFlag_AutoGet)
+		String += "autoget ";
 
-		String += "pubevent";
-	}
+	if (!String.IsEmpty ())
+		String.ReduceLength (1);
 
 	return String;
 }
@@ -338,7 +328,7 @@ GetPtrTypeFlagSignature (uint_t Flags)
 
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
-	else if (Flags & EPtrTypeFlag_PubConst)
+	else if (Flags & EPtrTypeFlag_ConstD)
 		Signature += "pc";
 
 	if (Flags & EPtrTypeFlag_Volatile)
@@ -346,7 +336,7 @@ GetPtrTypeFlagSignature (uint_t Flags)
 
 	if (Flags & EPtrTypeFlag_Event)
 		Signature += 'e';
-	else if (Flags & EPtrTypeFlag_PubEvent)
+	else if (Flags & EPtrTypeFlag_EventD)
 		Signature += "pe";
 
 	return Signature;
@@ -362,16 +352,16 @@ GetPtrTypeFlagsFromModifiers (uint_t Modifiers)
 
 	if (Modifiers & ETypeModifier_Const)
 		Flags |= EPtrTypeFlag_Const;
-	else if (Modifiers & ETypeModifier_PubConst)
-		Flags |= EPtrTypeFlag_PubConst;
+	else if (Modifiers & ETypeModifier_ConstD)
+		Flags |= EPtrTypeFlag_ConstD;
 
 	if (Modifiers & ETypeModifier_Volatile)
 		Flags |= EPtrTypeFlag_Volatile;
 
 	if (Modifiers & ETypeModifier_Event)
 		Flags |= EPtrTypeFlag_Event;
-	else if (Modifiers & ETypeModifier_PubEvent)
-		Flags |= EPtrTypeFlag_PubEvent;
+	else if (Modifiers & ETypeModifier_EventD)
+		Flags |= EPtrTypeFlag_EventD;
 
 	return Flags;
 }
@@ -725,6 +715,44 @@ GetSimpleType (
 	)
 {
 	return pModule->m_TypeMgr.GetStdType (StdTypeKind);
+}
+
+CType*
+GetModuleItemType (CModuleItem* pItem)
+{
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	switch (ItemKind)
+	{
+	case EModuleItem_Type:
+		return (CType*) pItem;
+
+	case EModuleItem_Typedef:
+		return ((CTypedef*) pItem)->GetType ();
+
+	case EModuleItem_Alias:
+		return ((CAlias*) pItem)->GetType ();
+
+	case EModuleItem_Variable:
+		return ((CVariable*) pItem)->GetType ();
+
+	case EModuleItem_FunctionArg:
+		return ((CFunctionArg*) pItem)->GetType ();
+
+	case EModuleItem_Function:
+		return ((CFunction*) pItem)->GetType ();
+
+	case EModuleItem_Property:
+		return ((CProperty*) pItem)->GetType ();
+
+	case EModuleItem_EnumConst:
+		return ((CEnumConst*) pItem)->GetParentEnumType ();
+
+	case EModuleItem_StructField:
+		return ((CStructField*) pItem)->GetType ();
+
+	default:
+		return NULL;
+	}
 }
 
 //.............................................................................

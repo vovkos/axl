@@ -68,11 +68,13 @@ protected:
 	CFunctionType* m_pGetterType;
 	CFunctionTypeOverload m_SetterType;
 	CFunctionType* m_pBinderType;
-	rtl::CString m_TypeModifierString;
 	CPropertyType* m_pStdObjectMemberPropertyType;
 	CPropertyType* m_pShortType;
 	CStructType* m_pVTableStructType;
 	TPropertyPtrTypeTuple* m_pPropertyPtrTypeTuple;
+
+	rtl::CString m_BindableEventName;
+	rtl::CString m_TypeModifierString;
 
 public:
 	CPropertyType ();
@@ -170,6 +172,12 @@ public:
 
 	CStructType*
 	GetVTableStructType ();
+
+	rtl::CString
+	GetBindableEventName ()
+	{
+		return m_BindableEventName;
+	}
 
 	rtl::CString
 	GetTypeModifierString ();

@@ -70,7 +70,7 @@ public:
 		);
 
 	static
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	GetCanvas (HWND hWnd);
 
 protected:
@@ -143,7 +143,7 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <ÑCanvas>
+	ref::CPtrT <CCanvas>
 	GetCanvas ()
 	{
 		return GetGdiWidget ()->GetCanvas (m_h);

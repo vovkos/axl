@@ -48,7 +48,8 @@ CFunctionMgr::Clear ()
 CFunction*
 CFunctionMgr::CreateFunction (
 	EFunction FunctionKind,
-	CFunctionType* pType
+	CFunctionType* pType,
+	uint_t Flags
 	)
 {
 	CFunction* pFunction;
@@ -72,6 +73,7 @@ CFunctionMgr::CreateFunction (
 	pFunction->m_pModule = m_pModule;
 	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pType = pType;
+	pFunction->m_Flags = Flags;
 	pFunction->m_TypeOverload.AddOverload (pType);
 	return pFunction;
 }
@@ -80,10 +82,11 @@ CFunction*
 CFunctionMgr::CreateFunction (
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
-	CFunctionType* pType
+	CFunctionType* pType,
+	uint_t Flags
 	)
 {
-	CFunction* pFunction = CreateFunction (EFunction_Named, pType);
+	CFunction* pFunction = CreateFunction (EFunction_Named, pType, Flags);
 	pFunction->m_Name = Name;
 	pFunction->m_QualifiedName = QualifiedName;
 	pFunction->m_Tag = QualifiedName;
@@ -265,12 +268,12 @@ CFunctionMgr::FireOnChangeEvent ()
 		PropertyValue.InsertToClosureHead (m_ThisValue);
 	}
 
-	CValue OnChangeEventValue;
+	CValue OnChange;
 
 	return
-		m_pModule->m_OperatorMgr.GetPropertyOnChange (PropertyValue, &OnChangeEventValue) &&
-		m_pModule->m_OperatorMgr.MemberOperator (&OnChangeEventValue, "Call") &&
-		m_pModule->m_OperatorMgr.CallOperator (OnChangeEventValue);
+		m_pModule->m_OperatorMgr.GetPropertyOnChange (PropertyValue, &OnChange) &&
+		m_pModule->m_OperatorMgr.MemberOperator (&OnChange, "call") &&
+		m_pModule->m_OperatorMgr.CallOperator (OnChange);
 }
 
 bool
@@ -1109,10 +1112,11 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 CFunction*
 CFunctionMgr::CreateInternalFunction (
 	const char* pTag,
-	CFunctionType* pType 
+	CFunctionType* pType,
+	uint_t Flags
 	)
 {
-	CFunction* pFunction = CreateFunction (EFunction_Internal, pType);
+	CFunction* pFunction = CreateFunction (EFunction_Internal, pType, Flags);
 	pFunction->m_Tag = pTag;
 	return pFunction;
 }

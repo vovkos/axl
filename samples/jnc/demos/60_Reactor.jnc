@@ -1,8 +1,8 @@
-// autoev is a unique feature of jancy which can significally simplify UI programming.
+// reactor is a unique feature of jancy which can significally simplify UI programming.
 // the idea is to automate execution of certain 'update' actions when properties change.
 // imagine a complicated setting dialog with lots of relations between items, where values of 
 // certain settings control visibility, availability, color, etc of other dialog items / groups of items.
-// with 'autoev' approach it is possible to write a single 'constraints' block where all the 
+// with 'reactor' approach it is possible to write a single 'constraints' block where all the 
 // relations and dependencies are described in declarative style, and allow jancy runtime to 
 // automatically bind and execute corresponding actions
 
@@ -49,13 +49,13 @@ int g_rgb; // this value will be automatically updated
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// inside 'autoev' block developer can write expressions which describe relations & constraints.
+// inside 'reactor' block developer can write expressions which describe relations & constraints.
 // all the binding / unbinding to the bindable non-lvalue properties touched in the expressions 
 // will be done automatically. if the required logic cannot be expressed by simple expression,
 // 'onchange' statement could be used (see the next demo)
 
-autoev 
-g_colorAutoEv (int Alpha)
+reactor 
+g_colorReactor (int Alpha)
 {
 	updatePurple (g_red, g_blue, Alpha); 
 	updateYellow (g_red, g_green, Alpha);
@@ -71,16 +71,16 @@ g_colorAutoEv (int Alpha)
 int 
 main ()
 {
-	// starting autoev executes all the expressions in autoev block
+	// starting reactor executes all the expressions in reactor block
 
-	g_colorAutoEv.start (5); // equivalent to g_colorAutoEv (5);
+	g_colorReactor.start (5); // equivalent to g_colorReactor (5);
 
 	printf ("changing g_red, g_green, g_blue results in automatic calls to updateXxx functions\n");	
 
 	g_red = 0xab; 
 	g_green = 0xcd;
 
-	// g_colorAutoEv.stop (); // <-- uncomment to unbind onchange handlers
+	// g_colorReactor.stop (); // <-- uncomment to unbind onchange handlers
 
 	g_blue = 0xef; 
 

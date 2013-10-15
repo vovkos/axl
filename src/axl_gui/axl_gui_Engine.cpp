@@ -24,7 +24,7 @@ GetEngineKindString (EEngine EngineKind)
 
 //.............................................................................
 
-ÑCanvas*
+CCanvas*
 CEngine::GetSharedOffscreenCanvas (
 	int Width,
 	int Height

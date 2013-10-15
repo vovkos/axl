@@ -4,7 +4,7 @@
 
 namespace axl {
 namespace jnc {
-		
+	
 //.............................................................................
 
 CDeclTypeCalc::CDeclTypeCalc ()
@@ -15,18 +15,21 @@ CDeclTypeCalc::CDeclTypeCalc ()
 
 CType*
 CDeclTypeCalc::CalcType (
-	CDeclarator* pDeclarator,
+	CType* pBaseType,
+	uint_t TypeModifiers,
+	const rtl::CConstListT <CDeclPointerPrefix>& PointerPrefixList,
+	const rtl::CConstListT <CDeclSuffix>& SuffixList,
 	CValue* pElementCountValue,
 	uint_t* pFlags
 	)
 {
 	bool Result;
 
-	CType* pType = pDeclarator->GetBaseType (); 
+	CType* pType = pBaseType; 
 	m_pModule = pType->GetModule ();
 
-	rtl::CConstListT <CDeclSuffix> SuffixList = pDeclarator->GetSuffixList ();
 	rtl::CIteratorT <CDeclSuffix> FirstSuffix = SuffixList.GetHead ();
+	rtl::CIteratorT <CDeclSuffix> SuffixEnd;
 
 	// strip non-const array suffix if any
 
@@ -43,12 +46,12 @@ CDeclTypeCalc::CalcType (
 			if (!Result)
 				return NULL;			
 
-			pDeclarator->DeleteSuffix (pArraySuffix);			
+			SuffixEnd = pArraySuffix;
 		}
 		else if (pArraySuffix->GetElementCount () != -1)
 		{
 			pElementCountValue->SetConstSizeT (pArraySuffix->GetElementCount ());
-			pDeclarator->DeleteSuffix (pArraySuffix);			
+			SuffixEnd = pArraySuffix;
 		}
 	}
 
@@ -56,13 +59,12 @@ CDeclTypeCalc::CalcType (
 
 	// pointer prefixes
 
-	rtl::CArrayT <uint_t> PointerPrefixArray = pDeclarator->GetPointerPrefixArray ();
-	size_t PointerPrefixCount = PointerPrefixArray.GetCount ();
-	for (size_t i = 0; i < PointerPrefixCount; i++)
+	rtl::CIteratorT <CDeclPointerPrefix> PointerPrefix = PointerPrefixList.GetHead ();
+	for (; PointerPrefix; PointerPrefix++)
 	{
 		EType TypeKind = pType->GetTypeKind ();
 
-		m_TypeModifiers = PointerPrefixArray [i];
+		m_TypeModifiers = PointerPrefix->GetTypeModifiers ();
 		if (m_TypeModifiers & ETypeModifier_Function)
 		{
 			CFunctionType* pFunctionType = GetFunctionType (pType);
@@ -79,7 +81,7 @@ CDeclTypeCalc::CalcType (
 
 			pType = GetPropertyPtrType (pPropertyType);
 		}
-		else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_PubEvent))
+		else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_EventD))
 		{
 			CClassType* pClassType = GetMulticastType (pType);
 			if (!pClassType)
@@ -87,9 +89,9 @@ CDeclTypeCalc::CalcType (
 
 			pType = GetClassPtrType (pClassType);
 		}
-		else if (m_TypeModifiers & ETypeModifier_AutoEv)
+		else if (m_TypeModifiers & ETypeModifier_Reactor)
 		{
-			CClassType* pClassType = GetAutoEvType (pType);
+			CClassType* pClassType = GetReactorType (pType);
 			if (!pClassType)
 				return NULL;
 
@@ -121,7 +123,7 @@ CDeclTypeCalc::CalcType (
 			return NULL;
 	}
 
-	m_TypeModifiers |= pDeclarator->GetTypeModifiers ();
+	m_TypeModifiers |= TypeModifiers;
 
 	if (m_TypeModifiers & ETypeModifierMask_Integer)
 	{
@@ -139,6 +141,12 @@ CDeclTypeCalc::CalcType (
 		if (pFlags)
 			*pFlags = GetPropertyFlags ();
 	}
+	else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_EventD))
+	{
+		pType = GetMulticastType (pType);
+		if (!pType)
+			return NULL;
+	}
 	else if (m_TypeModifiers & ETypeModifier_Bindable)
 	{
 		pType = GetBindableDataType (pType);
@@ -148,20 +156,14 @@ CDeclTypeCalc::CalcType (
 		if (pFlags)
 			*pFlags = EPropertyFlag_AutoGet | EPropertyFlag_AutoSet;
 	}
-	else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_PubEvent))
+	else if (m_TypeModifiers & ETypeModifier_Reactor)
 	{
-		pType = GetMulticastType (pType);
-		if (!pType)
-			return NULL;
-	}
-	else if (m_TypeModifiers & ETypeModifier_AutoEv)
-	{
-		pType = GetAutoEvType (pType);
+		pType = GetReactorType (pType);
 		if (!pType)
 			return NULL;
 	}
 
-	while (m_Suffix)
+	while (m_Suffix != SuffixEnd)
 	{
 		CDeclSuffix* pSuffix = (CDeclSuffix*) *m_Suffix;
 		EDeclSuffix SuffixKind = pSuffix->GetSuffixKind ();
@@ -173,8 +175,8 @@ CDeclTypeCalc::CalcType (
 			break;
 
 		case EDeclSuffix_Function:
-			if (m_TypeModifiers & ETypeModifier_AutoEv)
-				pType = GetAutoEvType (pType);
+			if (m_TypeModifiers & ETypeModifier_Reactor)
+				pType = GetReactorType (pType);
 			else
 				pType = GetFunctionType (pType);
 
@@ -235,6 +237,39 @@ CDeclTypeCalc::CalcPtrType (
 	return pType;
 }
 
+CFunctionType*
+CDeclTypeCalc::CalcPropertyGetterType (CDeclarator* pDeclarator)
+{
+	uint_t TypeModifiers = pDeclarator->GetTypeModifiers ();
+	ASSERT (TypeModifiers & ETypeModifier_Property);
+
+	if (!(TypeModifiers & ETypeModifier_Indexed)) 
+		pDeclarator->AddFunctionSuffix ();
+
+	TypeModifiers &= ~(
+		ETypeModifier_Const |
+		ETypeModifier_Property |
+		ETypeModifier_Bindable |
+		ETypeModifier_AutoGet | 
+		ETypeModifier_Indexed
+		);
+
+	CType* pType = CalcType (
+		pDeclarator->GetBaseType (),
+		TypeModifiers,
+		pDeclarator->GetPointerPrefixList (),
+		pDeclarator->GetSuffixList (),
+		NULL,
+		NULL
+		);
+
+	if (!pType)
+		return NULL;
+
+	ASSERT (pType->GetTypeKind () == EType_Function);
+	return (CFunctionType*) pType;
+}
+
 bool
 CDeclTypeCalc::CheckUnusedModifiers ()
 {
@@ -258,8 +293,8 @@ CDeclTypeCalc::GetPtrTypeFlags (
 	if (m_TypeModifiers & ETypeModifier_Const)
 		Flags |= EPtrTypeFlag_Const;
 
-	if (m_TypeModifiers & ETypeModifier_PubConst)
-		Flags |= EPtrTypeFlag_PubConst;
+	if (m_TypeModifiers & ETypeModifier_ConstD)
+		Flags |= EPtrTypeFlag_ConstD;
 
 	if (m_TypeModifiers & ETypeModifier_Volatile)
 	{
@@ -272,11 +307,25 @@ CDeclTypeCalc::GetPtrTypeFlags (
 		Flags |= EPtrTypeFlag_Volatile;
 	}
 
-	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_PubEvent)) // convert 'event' to 'pubevent'
+	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_EventD)) // convert 'event' to 'eventd'
 	{
 		ASSERT (IsClassType (pType, EClassType_Multicast));
-		Flags |= EPtrTypeFlag_PubEvent; 
+		Flags |= EPtrTypeFlag_EventD; 
 	}
+
+	if (m_TypeModifiers & ETypeModifier_Bindable)
+	{
+		if (!IsClassType (pType, EClassType_Multicast))
+		{
+			err::SetFormatStringError ("'bindable' cannot be applied to '%s'", pType->GetTypeString ().cc ());
+			return false;
+		}
+
+		Flags |= EPtrTypeFlag_Bindable;
+	}
+
+	if (m_TypeModifiers & ETypeModifier_AutoGet)
+		Flags |= EPtrTypeFlag_AutoGet;
 
 	m_TypeModifiers &= ~ETypeModifierMask_DeclPtr;
 	*pFlags = Flags;
@@ -505,14 +554,14 @@ CDeclTypeCalc::GetBindableDataType (CType* pDataType)
 }
 
 CClassType*
-CDeclTypeCalc::GetAutoEvType (CType* pReturnType)
+CDeclTypeCalc::GetReactorType (CType* pReturnType)
 {
 	CFunctionType* pStartMethodType = GetFunctionType (pReturnType);
 	if (!pStartMethodType)
 		return NULL;
 
-	m_TypeModifiers &= ~ETypeModifier_AutoEv;
-	return m_pModule->m_TypeMgr.GetAutoEvInterfaceType (pStartMethodType);
+	m_TypeModifiers &= ~ETypeModifier_Reactor;
+	return m_pModule->m_TypeMgr.GetReactorInterfaceType (pStartMethodType);
 }
 
 CClassType*

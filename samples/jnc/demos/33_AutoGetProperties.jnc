@@ -7,7 +7,7 @@ int autoget property g_simpleProp;
 g_simpleProp.set (int x)
 {
 	printf ("g_simpleProp.set (%d)\n", x);
-	propvalue = x; // autoget properties use 'propvalue' field as a retval of getter
+	autoget = x; // autoget properties use 'autoget' field as a retval of getter
 }
 
 //.............................................................................
@@ -16,12 +16,12 @@ g_simpleProp.set (int x)
 
 property g_prop
 {	
-	int propvalue; // declaring a 'propvalue' field implicitly makes property 'autoget'
+	int autoget; // declaring a 'autoget' field implicitly makes property 'autoget'
 
 	set (int x)
 	{
 		printf ("g_prop.set (int %d)\n", x);
-		propvalue = x;
+		autoget = x;
 	}
 
 	// setters of autoget property can surely be overloaded
@@ -29,7 +29,7 @@ property g_prop
 	set (double x)
 	{
 		printf ("g_prop.set (double %f)\n", x);
-		propvalue = (int) x;
+		autoget = (int) x;
 	}
 }
 

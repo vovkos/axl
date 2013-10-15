@@ -244,7 +244,7 @@ CModule::Parse (
 		Result = Parser.ParseToken (pToken);
 		if (!Result)
 		{			
-			err::PushSrcPosError (pFilePath, pToken->m_Pos);
+			err::EnsureSrcPosError (pFilePath, pToken->m_Pos);
 			return false;
 		}
 

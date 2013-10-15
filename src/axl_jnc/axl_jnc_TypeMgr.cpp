@@ -40,7 +40,7 @@ CTypeMgr::Clear ()
 	m_PropertyPtrTypeList.Clear ();
 	m_NamedImportTypeList.Clear ();
 	m_ImportPtrTypeList.Clear ();
-	m_AutoEvClassTypeList.Clear ();
+	m_ReactorClassTypeList.Clear ();
 	m_FunctionClosureClassTypeList.Clear ();
 	m_PropertyClosureClassTypeList.Clear ();
 	m_DataClosureClassTypeList.Clear ();
@@ -114,8 +114,8 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = ((CClassType*) GetStdType (EStdType_SimpleMulticast))->GetClassPtrType (EClassPtrType_Normal);
 		break;
 
-	case EStdType_AutoEvBindSite:
-		pType = CreateAutoEvBindSiteType ();
+	case EStdType_ReactorBindSite:
+		pType = CreateReactorBindSiteType ();
 		break;
 
 	case EStdType_Binder:
@@ -495,9 +495,9 @@ CTypeMgr::CreateClassType (
 	
 	switch (ClassTypeKind)
 	{
-	case EClassType_AutoEv:
-		pType = AXL_MEM_NEW (CAutoEvClassType);
-		m_AutoEvClassTypeList.InsertTail ((CAutoEvClassType*) pType);
+	case EClassType_Reactor:
+		pType = AXL_MEM_NEW (CReactorClassType);
+		m_ReactorClassTypeList.InsertTail ((CReactorClassType*) pType);
 		break;
 
 	case EClassType_FunctionClosure:
@@ -1206,19 +1206,19 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 }
 
 CClassType* 
-CTypeMgr::GetAutoEvInterfaceType (CFunctionType* pStartMethodType)
+CTypeMgr::GetReactorInterfaceType (CFunctionType* pStartMethodType)
 {
 	CType* pReturnType = pStartMethodType->GetReturnType ();
 	if (pReturnType->GetTypeKind () != EType_Void)
 	{
-		err::SetFormatStringError ("autoev must return 'void', not '%s'", pReturnType->GetTypeString ().cc ());
+		err::SetFormatStringError ("reactor must return 'void', not '%s'", pReturnType->GetTypeString ().cc ());
 		return NULL;
 	}
 
-	if (pStartMethodType->m_pAutoEvInterfaceType)
-		return pStartMethodType->m_pAutoEvInterfaceType;
+	if (pStartMethodType->m_pReactorInterfaceType)
+		return pStartMethodType->m_pReactorInterfaceType;
 
-	CClassType* pType = CreateUnnamedClassType (EClassType_AutoEvIface);
+	CClassType* pType = CreateUnnamedClassType (EClassType_ReactorIface);
 	pType->m_Signature.Format ("CA%s", pStartMethodType->GetTypeString ().cc ());
 	CFunction* pStarter = pType->CreateMethod (EStorage_Abstract, "start", pStartMethodType);
 	pType->CreateMethod (EStorage_Abstract, "stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
@@ -1226,22 +1226,22 @@ CTypeMgr::GetAutoEvInterfaceType (CFunctionType* pStartMethodType)
 	return pType;
 }
 
-CAutoEvClassType* 
-CTypeMgr::CreateAutoEvType (
+CReactorClassType* 
+CTypeMgr::CreateReactorType (
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
 	CClassType* pIfaceType,
 	CClassType* pParentType
 	)
 {
-	CAutoEvClassType* pType = (CAutoEvClassType*) CreateClassType (EClassType_AutoEv, Name, QualifiedName);
+	CReactorClassType* pType = (CReactorClassType*) CreateClassType (EClassType_Reactor, Name, QualifiedName);
 	
 	pType->AddBaseType (pIfaceType);
 
 	// fields
 
-	pType->m_FieldArray [EAutoEvField_Lock]  = pType->CreateField (m_pModule->GetSimpleType (EType_Int_p));
-	pType->m_FieldArray [EAutoEvField_State] = pType->CreateField (m_pModule->GetSimpleType (EType_Int_p));
+	pType->m_FieldArray [EReactorField_Lock]  = pType->CreateField (m_pModule->GetSimpleType (EType_Int_p));
+	pType->m_FieldArray [EReactorField_State] = pType->CreateField (m_pModule->GetSimpleType (EType_Int_p));
 
 	rtl::CArrayT <CFunction*> VirtualMethodArray = pIfaceType->GetVirtualMethodArray ();
 	ASSERT (VirtualMethodArray.GetCount () == 2);
@@ -1268,7 +1268,7 @@ CTypeMgr::CreateAutoEvType (
 		CClassPtrType* pParentPtrType = pParentType->GetClassPtrType ();
 		
 		pType->m_Flags |= ETypeFlag_Child;
-		pType->m_FieldArray [EAutoEvField_Parent] = pType->CreateField (pParentPtrType);
+		pType->m_FieldArray [EReactorField_Parent] = pType->CreateField (pParentPtrType);
 
 		CFunctionType* pConstructorType = GetFunctionType (NULL, (CType**) &pParentPtrType, 1);
 		CFunction* pConstructor = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pConstructorType);
@@ -1283,9 +1283,9 @@ CTypeMgr::CreateAutoEvType (
 
 	// methods
 
-	pType->m_MethodArray [EAutoEvMethod_Start] = pType->CreateMethod (EStorage_Override, "start", pStartMethodType);
-	pType->m_MethodArray [EAutoEvMethod_Stop]  = pType->CreateMethod (EStorage_Override, "stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
-	pType->m_pCallOperator = pType->m_MethodArray [EAutoEvMethod_Start];
+	pType->m_MethodArray [EReactorMethod_Start] = pType->CreateMethod (EStorage_Override, "start", pStartMethodType);
+	pType->m_MethodArray [EReactorMethod_Stop]  = pType->CreateMethod (EStorage_Override, "stop", (CFunctionType*) GetStdType (EStdType_SimpleFunction));
+	pType->m_pCallOperator = pType->m_MethodArray [EReactorMethod_Start];
 	return pType;
 }
 
@@ -1440,10 +1440,10 @@ CTypeMgr::GetDataPtrType (
 
 	TDataPtrTypeTuple* pTuple;
 
-	if (Flags & EPtrTypeFlag_PubConst)
+	if (Flags & EPtrTypeFlag_ConstD)
 	{
 		ASSERT (pAnchorNamespace != NULL);
-		pTuple = GetPubConstDataPtrTypeTuple (pAnchorNamespace, pDataType);
+		pTuple = GetConstDDataPtrTypeTuple (pAnchorNamespace, pDataType);
 	}
 	else
 	{
@@ -1471,7 +1471,7 @@ CTypeMgr::GetDataPtrType (
 	pType->m_Size = Size;
 	pType->m_AlignFactor = sizeof (void*);
 	pType->m_pTargetType = pDataType;
-	pType->m_pAnchorNamespace = (Flags & EPtrTypeFlag_PubConst) ? pAnchorNamespace : NULL;
+	pType->m_pAnchorNamespace = (Flags & EPtrTypeFlag_ConstD) ? pAnchorNamespace : NULL;
 	pType->m_Flags = Flags;
 
 	m_DataPtrTypeList.InsertTail (pType);
@@ -1508,7 +1508,7 @@ CTypeMgr::GetClassPtrType (
 	)
 {
 	ASSERT ((size_t) PtrTypeKind < EClassPtrType__Count);
-	ASSERT (!(Flags & (EPtrTypeFlag_PubConst | EPtrTypeFlag_PubEvent)) || pAnchorNamespace != NULL);
+	ASSERT (!(Flags & (EPtrTypeFlag_ConstD | EPtrTypeFlag_EventD)) || pAnchorNamespace != NULL);
 
 	if (Flags & EPtrTypeFlag_Unsafe)
 		Flags |= ETypeFlag_Pod;
@@ -1517,15 +1517,15 @@ CTypeMgr::GetClassPtrType (
 
 	TClassPtrTypeTuple* pTuple;
 
-	if (Flags & EPtrTypeFlag_PubConst)
+	if (Flags & EPtrTypeFlag_ConstD)
 	{
 		ASSERT (pAnchorNamespace != NULL);
-		pTuple = GetPubConstClassPtrTypeTuple (pAnchorNamespace, pClassType);
+		pTuple = GetConstDClassPtrTypeTuple (pAnchorNamespace, pClassType);
 	}
-	else if (Flags & EPtrTypeFlag_PubEvent)
+	else if (Flags & EPtrTypeFlag_EventD)
 	{
 		ASSERT (pAnchorNamespace != NULL && pClassType->GetClassTypeKind () == EClassType_Multicast);
-		pTuple = GetPubEventClassPtrTypeTuple (pAnchorNamespace, (CMulticastClassType*) pClassType);
+		pTuple = GetEventDClassPtrTypeTuple (pAnchorNamespace, (CMulticastClassType*) pClassType);
 	}
 	else if (Flags & EPtrTypeFlag_Event)
 	{
@@ -1554,7 +1554,7 @@ CTypeMgr::GetClassPtrType (
 	pType->m_TypeKind = TypeKind;
 	pType->m_PtrTypeKind = PtrTypeKind;
 	pType->m_pTargetType = pClassType;
-	pType->m_pAnchorNamespace = (Flags & (EPtrTypeFlag_PubConst | EPtrTypeFlag_PubEvent)) ? pAnchorNamespace : NULL;
+	pType->m_pAnchorNamespace = (Flags & (EPtrTypeFlag_ConstD | EPtrTypeFlag_EventD)) ? pAnchorNamespace : NULL;
 	pType->m_Flags = Flags;
 
 	m_ClassPtrTypeList.InsertTail (pType);
@@ -1653,10 +1653,10 @@ CTypeMgr::GetPropertyPtrType (
 
 	TPropertyPtrTypeTuple* pTuple;
 
-	if (Flags & EPtrTypeFlag_PubConst)
+	if (Flags & EPtrTypeFlag_ConstD)
 	{
 		ASSERT (pAnchorNamespace != NULL);
-		pTuple = GetPubConstPropertyPtrTypeTuple (pAnchorNamespace, pPropertyType);
+		pTuple = GetConstDPropertyPtrTypeTuple (pAnchorNamespace, pPropertyType);
 	}
 	else
 	{
@@ -1682,7 +1682,7 @@ CTypeMgr::GetPropertyPtrType (
 	pType->m_Size = Size;
 	pType->m_AlignFactor = sizeof (void*);
 	pType->m_pTargetType = pPropertyType;
-	pType->m_pAnchorNamespace = (Flags & EPtrTypeFlag_PubConst) ? pAnchorNamespace : NULL;
+	pType->m_pAnchorNamespace = (Flags & EPtrTypeFlag_ConstD) ? pAnchorNamespace : NULL;
 	pType->m_Flags = Flags;
 
 	m_PropertyPtrTypeList.InsertTail (pType);
@@ -1929,17 +1929,17 @@ CTypeMgr::GetDataPtrTypeTuple (CType* pType)
 }
 
 TDataPtrTypeTuple*
-CTypeMgr::GetPubConstDataPtrTypeTuple (
+CTypeMgr::GetConstDDataPtrTypeTuple (
 	CNamespace* pAnchorNamespace,
 	CType* pType
 	)
 {
 	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pType);
-	if (pDualPtrTypeTuple->m_pPubConstDataPtrTypeTuple)
-		return pDualPtrTypeTuple->m_pPubConstDataPtrTypeTuple;
+	if (pDualPtrTypeTuple->m_pConstDDataPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pConstDDataPtrTypeTuple;
 
 	TDataPtrTypeTuple* pTuple = AXL_MEM_NEW (TDataPtrTypeTuple);
-	pDualPtrTypeTuple->m_pPubConstDataPtrTypeTuple = pTuple;
+	pDualPtrTypeTuple->m_pConstDDataPtrTypeTuple = pTuple;
 	m_DataPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }
@@ -1957,17 +1957,17 @@ CTypeMgr::GetClassPtrTypeTuple (CClassType* pClassType)
 }
 
 TClassPtrTypeTuple*
-CTypeMgr::GetPubConstClassPtrTypeTuple (
+CTypeMgr::GetConstDClassPtrTypeTuple (
 	CNamespace* pAnchorNamespace,
 	CClassType* pClassType
 	)
 {
 	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pClassType);
-	if (pDualPtrTypeTuple->m_pPubConstClassPtrTypeTuple)
-		return pDualPtrTypeTuple->m_pPubConstClassPtrTypeTuple;
+	if (pDualPtrTypeTuple->m_pConstDClassPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pConstDClassPtrTypeTuple;
 
 	TClassPtrTypeTuple* pTuple = AXL_MEM_NEW (TClassPtrTypeTuple);
-	pDualPtrTypeTuple->m_pPubConstClassPtrTypeTuple = pTuple;
+	pDualPtrTypeTuple->m_pConstDClassPtrTypeTuple = pTuple;
 	m_ClassPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }
@@ -1985,17 +1985,17 @@ CTypeMgr::GetEventClassPtrTypeTuple (CMulticastClassType* pClassType)
 }
 
 TClassPtrTypeTuple*
-CTypeMgr::GetPubEventClassPtrTypeTuple (
+CTypeMgr::GetEventDClassPtrTypeTuple (
 	CNamespace* pAnchorNamespace,
 	CMulticastClassType* pClassType
 	)
 {
 	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pClassType);
-	if (pDualPtrTypeTuple->m_pPubEventClassPtrTypeTuple)
-		return pDualPtrTypeTuple->m_pPubEventClassPtrTypeTuple;
+	if (pDualPtrTypeTuple->m_pEventDClassPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pEventDClassPtrTypeTuple;
 
 	TClassPtrTypeTuple* pTuple = AXL_MEM_NEW (TClassPtrTypeTuple);
-	pDualPtrTypeTuple->m_pPubEventClassPtrTypeTuple = pTuple;
+	pDualPtrTypeTuple->m_pEventDClassPtrTypeTuple = pTuple;
 	m_ClassPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }
@@ -2025,17 +2025,17 @@ CTypeMgr::GetPropertyPtrTypeTuple (CPropertyType* pPropertyType)
 }
 
 TPropertyPtrTypeTuple*
-CTypeMgr::GetPubConstPropertyPtrTypeTuple (
+CTypeMgr::GetConstDPropertyPtrTypeTuple (
 	CNamespace* pAnchorNamespace,
 	CPropertyType* pPropertyType
 	)
 {
 	TDualPtrTypeTuple* pDualPtrTypeTuple = GetDualPtrTypeTuple (pAnchorNamespace, pPropertyType);
-	if (pDualPtrTypeTuple->m_pPubConstPropertyPtrTypeTuple)
-		return pDualPtrTypeTuple->m_pPubConstPropertyPtrTypeTuple;
+	if (pDualPtrTypeTuple->m_pConstDPropertyPtrTypeTuple)
+		return pDualPtrTypeTuple->m_pConstDPropertyPtrTypeTuple;
 
 	TPropertyPtrTypeTuple* pTuple = AXL_MEM_NEW (TPropertyPtrTypeTuple);
-	pDualPtrTypeTuple->m_pPubConstPropertyPtrTypeTuple = pTuple;
+	pDualPtrTypeTuple->m_pConstDPropertyPtrTypeTuple = pTuple;
 	m_PropertyPtrTypeTupleList.InsertTail (pTuple);
 	return pTuple;
 }
@@ -2114,9 +2114,9 @@ CTypeMgr::CreateObjectType ()
 }
 
 CStructType*
-CTypeMgr::CreateAutoEvBindSiteType ()
+CTypeMgr::CreateReactorBindSiteType ()
 {
-	CStructType* pType = CreateStructType ("AutoEvBindSite", "jnc.AutoEvBindSite");
+	CStructType* pType = CreateStructType ("ReactorBindSite", "jnc.ReactorBindSite");
 	pType->CreateField (GetStdType (EStdType_SimpleEventPtr));
 	pType->CreateField (GetPrimitiveType (EType_Int_p));
 	pType->EnsureLayout ();
