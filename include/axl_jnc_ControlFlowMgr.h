@@ -95,6 +95,7 @@ protected:
 	CBasicBlock* m_pUnreachableBlock;
 
 	uint_t m_Flags;
+	intptr_t m_UnwindingLockCount;
 
 public:
 	CControlFlowMgr ();
@@ -104,7 +105,7 @@ public:
 	{
 		return m_pModule;
 	}
-
+	
 	void
 	Clear ();
 
@@ -112,6 +113,24 @@ public:
 	GetFlags ()
 	{
 		return m_Flags;
+	}
+
+	void
+	LockUnwinding ()
+	{
+		m_UnwindingLockCount++;
+	}
+
+	void
+	UnlockUnwinding ()
+	{
+		m_UnwindingLockCount--;
+	}
+
+	bool
+	IsUnwindingEnabled ()
+	{
+		return m_UnwindingLockCount == 0;
 	}
 
 	void

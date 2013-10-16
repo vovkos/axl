@@ -292,6 +292,10 @@ unary_operator_expr_s <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.GetUnaryOperatorResultType (EUnOp_PreDec, $pValue);
 			}
+	|	EToken_Try unary_expr_s <$pValue> 
+			{
+				// try operator does not change type of value				
+			}
 	|	EToken_SizeOf '(' type_name_or_expr $t ')'
 			{
 				$pValue->SetType (EType_SizeT);

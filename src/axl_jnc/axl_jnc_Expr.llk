@@ -585,6 +585,14 @@ unary_operator_expr <CValue* $pValue>
 			{
 				return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_PreDec, $pValue);
 			}
+	|	EToken_Try 
+			{
+				m_pModule->m_ControlFlowMgr.LockUnwinding ();
+			}
+		unary_expr <$pValue>
+			{
+				m_pModule->m_ControlFlowMgr.UnlockUnwinding ();
+			}
 	|	resolver (cast_operator_rslv) 
 		'(' storage_specifier $s? type_name $t ')' unary_expr <$pValue> 
 			{

@@ -12,7 +12,10 @@ bool bar ()
 
 	baz (10);
 	baz (20);
-	baz (-1);
+
+	bool result = try baz (-1);
+	printf ("baz returned %d\n", result);
+
 	baz (30);
 	return true;
 

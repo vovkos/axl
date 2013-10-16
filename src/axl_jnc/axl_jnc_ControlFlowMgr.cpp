@@ -13,6 +13,7 @@ CControlFlowMgr::CControlFlowMgr ()
 	ASSERT (m_pModule);
 
 	m_Flags = 0;
+	m_UnwindingLockCount = 0;
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
 	m_pSilentReturnBlock = NULL;
@@ -23,6 +24,7 @@ void
 CControlFlowMgr::Clear ()
 {
 	m_Flags = 0;
+	m_UnwindingLockCount = 0;
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;

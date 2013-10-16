@@ -563,7 +563,8 @@ COperatorMgr::CallImpl (
 		pResultValue
 		);
 
-	if (pFunctionType->GetFlags () & EFunctionTypeFlag_Unwinder)
+	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Unwinder) && 
+		m_pModule->m_ControlFlowMgr.IsUnwindingEnabled ())
 	{
 		CValue IndicatorValue;
 
