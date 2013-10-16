@@ -206,6 +206,9 @@ public:
 	bool
 	EndFinally ();
 
+	bool
+	CheckReturn ();
+
 	// if stmt
 
 	void

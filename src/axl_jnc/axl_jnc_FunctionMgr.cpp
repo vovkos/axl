@@ -528,39 +528,9 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	if (pFunction->m_FunctionKind == EFunction_ModuleDestructor)
 		m_pModule->m_VariableMgr.m_StaticDestructList.RunDestructors ();
 
-	// ensure return
-
-	CBasicBlock* pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	if (!pCurrentBlock->HasTerminator ()) 
-	{
-		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
-
-		if (!(pCurrentBlock->GetFlags () & EBasicBlockFlag_Reachable))
-		{
-			m_pModule->m_LlvmIrBuilder.CreateUnreachable (); // just to make LLVM happy
-		}
-		else if (pReturnType->GetTypeKind () == EType_Void)
-		{
-			m_pModule->m_ControlFlowMgr.Return ();
-		}
-		else if (!(m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasReturn))
-		{
-			err::SetFormatStringError (
-				"function '%s' must return a '%s' value",
-				pFunction->m_Tag.cc (),
-				pReturnType->GetTypeString ().cc ()
-				);
-			return false;
-		}
-		else 
-		{
-			err::SetFormatStringError (
-				"not all control paths in function '%s' return a value",
-				pFunction->m_Tag.cc ()
-				);
-			return false;
-		}
-	}
+	Result = m_pModule->m_ControlFlowMgr.CheckReturn ();
+	if (!Result)
+		return false;
 
 	try 
 	{

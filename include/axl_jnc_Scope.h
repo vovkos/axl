@@ -61,6 +61,12 @@ public:
 		return m_Level;
 	}
 
+	bool
+	IsFunctionScope ()
+	{
+		return m_Level == 2;
+	}
+
 	const CToken::CPos&
 	GetBeginPos ()
 	{

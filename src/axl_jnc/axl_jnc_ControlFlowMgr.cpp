@@ -201,7 +201,7 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 		pScope->m_DestructList.RunDestructors ();
 		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
 
-		if (pScope->m_pFinallyBlock)
+		if (pScope->m_pFinallyBlock && !(pScope->m_Flags & EScopeFlag_FinallyDefined))
 		{
 			CBasicBlock* pReturnBlock = CreateBlock ("finally_return_block");
 			AddBlock (pReturnBlock);
@@ -319,11 +319,21 @@ CControlFlowMgr::Unwind (const CValue& IndicatorValue)
 bool
 CControlFlowMgr::Catch ()
 {
+	bool Result;
+
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope && pScope->m_pCatchBlock);
 
-	pScope->m_DestructList.Clear ();
 	pScope->m_Flags |= EScopeFlag_CatchDefined;
+
+	if (pScope->IsFunctionScope ())
+	{
+		Result = CheckReturn ();
+		if (!Result)
+			return false;
+	}
+
+	pScope->m_DestructList.Clear ();
 
 	Follow (pScope->m_pCatchBlock);
 	return true;
@@ -332,12 +342,31 @@ CControlFlowMgr::Catch ()
 bool
 CControlFlowMgr::Finally ()
 {
+	bool Result;
+
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope && pScope->m_pFinallyBlock);
 
-	pScope->m_DestructList.RunDestructors (); // but don't nullify gc-root list
-	pScope->m_DestructList.Clear ();
+	if (pScope->m_FinallyReturnBlockArray.IsEmpty ())
+	{
+		err::SetFormatStringError ("useless 'finally'");
+		return false;
+	}
+
 	pScope->m_Flags |= EScopeFlag_FinallyDefined;
+
+	if (pScope->IsFunctionScope ())
+	{
+		Result = CheckReturn ();
+		if (!Result)
+			return false;
+	}
+	else
+	{
+		pScope->m_DestructList.RunDestructors (); // but don't nullify gc-root list
+	}
+
+	pScope->m_DestructList.Clear ();
 
 	Follow (pScope->m_pFinallyBlock);
 	return true;
@@ -364,6 +393,7 @@ CControlFlowMgr::EndFinally ()
 	#pragma AXL_TODO ("switch to indirect-branch as soon as LLVM supports it on Windows")
 
 	size_t BlockCount = pScope->m_FinallyReturnBlockArray.GetCount ();
+	ASSERT (BlockCount);
 	
 	char Buffer [256];
 	rtl::CArrayT <intptr_t> IntArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
@@ -379,6 +409,44 @@ CControlFlowMgr::EndFinally ()
 		pScope->m_FinallyReturnBlockArray,
 		BlockCount
 		);
+
+	return true;
+}
+
+bool
+CControlFlowMgr::CheckReturn ()
+{
+	if (m_pCurrentBlock->HasTerminator ()) 
+		return true;
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	CType* pReturnType = pFunction->GetType ()->GetReturnType ();
+
+	if (!(m_pCurrentBlock->GetFlags () & EBasicBlockFlag_Reachable))
+	{
+		m_pModule->m_LlvmIrBuilder.CreateUnreachable (); // just to make LLVM happy
+	}
+	else if (pReturnType->GetTypeKind () == EType_Void)
+	{
+		m_pModule->m_ControlFlowMgr.Return ();
+	}
+	else if (!(m_pModule->m_ControlFlowMgr.GetFlags () & EControlFlowFlag_HasReturn))
+	{
+		err::SetFormatStringError (
+			"function '%s' must return a '%s' value",
+			pFunction->m_Tag.cc (),
+			pReturnType->GetTypeString ().cc ()
+			);
+		return false;
+	}
+	else 
+	{
+		err::SetFormatStringError (
+			"not all control paths in function '%s' return a value",
+			pFunction->m_Tag.cc ()
+			);
+		return false;
+	}
 
 	return true;
 }
