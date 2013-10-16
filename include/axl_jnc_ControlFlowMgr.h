@@ -184,6 +184,9 @@ public:
 	bool
 	EndTry ();
 
+	bool
+	EndFinally ();
+
 	// if stmt
 
 	void
@@ -344,6 +347,9 @@ public:
 		);
 
 protected:
+	void
+	AddBlock (CBasicBlock* pBlock);
+
 	void
 	RestoreScopeLevel ();
 

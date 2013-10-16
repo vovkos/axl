@@ -34,6 +34,7 @@ CBasicBlock*
 CControlFlowMgr::CreateBlock (const rtl::CString& Name)
 {
 	CBasicBlock* pBlock = AXL_MEM_NEW (CBasicBlock);
+	pBlock->m_pModule = m_pModule;
 	pBlock->m_Name = Name;
 	pBlock->m_pLlvmBlock = llvm::BasicBlock::Create (
 		llvm::getGlobalContext (), 
@@ -58,21 +59,28 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 
 	m_pModule->m_LlvmIrBuilder.SetInsertPoint (pBlock);
 
-	if (pBlock->m_pFunction)
-		return pPrevCurrentBlock;
+	if (!pBlock->m_pFunction)
+		AddBlock (pBlock);
+	
+	return pPrevCurrentBlock;
+}
+
+void
+CControlFlowMgr::AddBlock (CBasicBlock* pBlock)
+{
+	ASSERT (!pBlock->m_pFunction);
 	
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
 
 	pFunction->GetLlvmFunction ()->getBasicBlockList ().push_back (pBlock->m_pLlvmBlock);
 	pBlock->m_pFunction = pFunction;
-	return pPrevCurrentBlock;
 }
 
 CBasicBlock*
 CControlFlowMgr::GetUnreachableBlock ()
 {
-	if (m_pUnreachableBlock)
+	if (m_pUnreachableBlock && m_pUnreachableBlock->GetInstructionCount () == 1)
 		return m_pUnreachableBlock;
 
 	m_pUnreachableBlock = CreateBlock ("unreachable_block");
@@ -83,15 +91,11 @@ CControlFlowMgr::GetUnreachableBlock ()
 void
 CControlFlowMgr::MarkUnreachable (CBasicBlock* pBlock)
 {
-	ASSERT (!(pBlock->m_Flags & EBasicBlockFlag_Jumped));
-	pBlock->m_Flags |= EBasicBlockFlag_Unreachable;
+	ASSERT (pBlock->IsEmpty () && pBlock->m_Flags == 0);
 
-	if (!pBlock->HasTerminator ())
-	{
-		CBasicBlock* pPrevCurrentBlock = SetCurrentBlock (pBlock);
-		m_pModule->m_LlvmIrBuilder.CreateUnreachable ();
-		SetCurrentBlock (pPrevCurrentBlock);
-	}
+	CBasicBlock* pPrevCurrentBlock = SetCurrentBlock (pBlock);
+	m_pModule->m_LlvmIrBuilder.CreateUnreachable ();
+	SetCurrentBlock (pPrevCurrentBlock);
 }
 
 void
@@ -100,8 +104,10 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
+	uint_t ReachableFlag = (m_pCurrentBlock->m_Flags & EBasicBlockFlag_Reachable);
+
 	m_Flags |= EControlFlowFlag_HasJump;
-	pBlock->m_Flags |= EBasicBlockFlag_Jumped;
+	pBlock->m_Flags |= EBasicBlockFlag_Jumped | ReachableFlag;
 
 	m_pModule->m_LlvmIrBuilder.CreateBr (pBlock);
 
@@ -136,9 +142,11 @@ CControlFlowMgr::ConditionalJump (
 	if (!Result)
 		return false;
 
+	uint_t ReachableFlag = (m_pCurrentBlock->m_Flags & EBasicBlockFlag_Reachable);
+
 	m_Flags |= EControlFlowFlag_HasJump;
-	pThenBlock->m_Flags |= EBasicBlockFlag_Jumped;
-	pElseBlock->m_Flags |= EBasicBlockFlag_Jumped;
+	pThenBlock->m_Flags |= EBasicBlockFlag_Jumped | ReachableFlag;
+	pElseBlock->m_Flags |= EBasicBlockFlag_Jumped | ReachableFlag;
 
 	m_pModule->m_LlvmIrBuilder.CreateCondBr (BoolValue, pThenBlock, pElseBlock);
 
@@ -190,6 +198,20 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 	{	
 		pScope->m_DestructList.RunDestructors ();
 		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
+
+		if (pScope->m_pFinallyBlock)
+		{
+			CBasicBlock* pReturnBlock = CreateBlock ("finally_return_block");
+			AddBlock (pReturnBlock);
+
+			size_t ReturnBlockId = pScope->m_FinallyReturnBlockArray.GetCount ();
+			CValue FinallyReturnValue;
+			FinallyReturnValue.SetConstInt32 ((uint32_t) ReturnBlockId);
+			m_pModule->m_OperatorMgr.StoreDataRef (pScope->m_pFinallyReturnAddress, FinallyReturnValue);
+			pScope->m_FinallyReturnBlockArray.Append (pReturnBlock);
+			Jump (pScope->m_pFinallyBlock, pReturnBlock);
+		}
+
 		pScope = pScope->GetParentScope ();
 	}
 }
@@ -278,7 +300,8 @@ CControlFlowMgr::Unwind (const CValue& IndicatorValue)
 
 	if (pCatchScope)
 	{
-		OnLeaveScope (pCatchScope->GetParentScope ()); // run destructors of 'catch' scope
+		OnLeaveScope (pCatchScope);
+		pCatchScope->m_DestructList.RunDestructors (); // but don't nullify gc-root list
 		Jump (pCatchScope->m_pCatchBlock);
 	}
 	else
@@ -297,9 +320,10 @@ CControlFlowMgr::Catch ()
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope && pScope->m_pCatchBlock);
 
-	Follow (pScope->m_pCatchBlock);
-	pScope->m_Flags |= EScopeFlag_CatchDefined;
 	pScope->m_DestructList.Clear ();
+	pScope->m_Flags |= EScopeFlag_CatchDefined;
+
+	Follow (pScope->m_pCatchBlock);
 	return true;
 }
 
@@ -309,9 +333,11 @@ CControlFlowMgr::Finally ()
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope && pScope->m_pFinallyBlock);
 
-	Follow (pScope->m_pFinallyBlock);
-	pScope->m_Flags |= EScopeFlag_FinallyDefined;
+	pScope->m_DestructList.RunDestructors (); // but don't nullify gc-root list
 	pScope->m_DestructList.Clear ();
+	pScope->m_Flags |= EScopeFlag_FinallyDefined;
+
+	Follow (pScope->m_pFinallyBlock);
 	return true;
 }
 
@@ -322,6 +348,37 @@ CControlFlowMgr::EndTry ()
 	ASSERT (pScope && pScope->m_pCatchBlock);
 
 	return !(pScope->GetFlags () & EScopeFlag_CatchDefined) ? Catch () : true;
+}
+
+bool
+CControlFlowMgr::EndFinally ()
+{
+	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+	ASSERT (pScope && pScope->m_pFinallyBlock && pScope->m_pFinallyReturnAddress);
+
+	CValue ReturnAddressValue;
+	m_pModule->m_OperatorMgr.LoadDataRef (pScope->m_pFinallyReturnAddress, &ReturnAddressValue);
+
+	#pragma AXL_TODO ("switch to indirect-branch as soon as LLVM supports it on Windows")
+
+	size_t BlockCount = pScope->m_FinallyReturnBlockArray.GetCount ();
+	
+	char Buffer [256];
+	rtl::CArrayT <intptr_t> IntArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	IntArray.SetCount (BlockCount);
+
+	for (size_t i = 0; i < BlockCount; i++)
+		IntArray [i] = i;
+
+	m_pModule->m_LlvmIrBuilder.CreateSwitch (
+		ReturnAddressValue,
+		pScope->m_FinallyReturnBlockArray [0], // something needs to be specified as default block
+		IntArray,
+		pScope->m_FinallyReturnBlockArray,
+		BlockCount
+		);
+
+	return true;
 }
 
 //.............................................................................

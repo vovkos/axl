@@ -94,16 +94,20 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 void
 CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 {
-	ASSERT (m_pCurrentScope);
-	
-	m_pCurrentScope->m_EndPos = Pos;
+	CScope* pScope = m_pCurrentScope;
+	ASSERT (pScope);
+
+	pScope->m_EndPos = Pos;
 	m_pModule->m_LlvmIrBuilder.SetSourcePos (Pos);
 	
-	if (!(m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Unreachable))
+	if (m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Reachable)
 	{
-		m_pCurrentScope->m_DestructList.RunDestructors ();
-		m_pModule->m_OperatorMgr.NullifyGcRootList (m_pCurrentScope->GetGcRootList ());
+		pScope->m_DestructList.RunDestructors ();
+		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
 	}
+
+	if (pScope->m_Flags & EScopeFlag_FinallyDefined)
+		m_pModule->m_ControlFlowMgr.EndFinally ();
 
 	CloseNamespace ();
 }

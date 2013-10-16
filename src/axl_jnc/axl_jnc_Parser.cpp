@@ -91,6 +91,16 @@ CParser::PreCreateLandingPads (uint_t Flags)
 	{
 		ASSERT (!pScope->m_pFinallyBlock);
 		pScope->m_pFinallyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("finally_block");
+		
+		rtl::CString Name = "finally_return_addr";
+		CType* pType = GetSimpleType (m_pModule, EType_Int);
+		CVariable* pVariable  = m_pModule->m_VariableMgr.CreateVariable (EStorage_Stack, Name, Name, pType);		
+		pVariable->m_pScope = pScope;
+		pScope->m_pFinallyReturnAddress = pVariable;
+
+		bool Result = m_pModule->m_VariableMgr.AllocatePrimeInitializeVariable (pVariable);
+		if (!Result)
+			return false;
 	}
 
 	return true;

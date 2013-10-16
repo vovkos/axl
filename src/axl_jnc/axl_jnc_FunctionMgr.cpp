@@ -535,7 +535,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	{
 		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
 
-		if (!(pCurrentBlock->GetFlags () & EBasicBlockFlag_Jumped))
+		if (!(pCurrentBlock->GetFlags () & EBasicBlockFlag_Reachable))
 		{
 			m_pModule->m_LlvmIrBuilder.CreateUnreachable (); // just to make LLVM happy
 		}

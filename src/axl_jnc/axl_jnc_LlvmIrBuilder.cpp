@@ -104,6 +104,21 @@ CLlvmIrBuilder::SetInsertPoint (CBasicBlock* pBlock)
 		m_LlvmIrBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->getTerminator ());
 }
 
+llvm::IndirectBrInst*
+CLlvmIrBuilder::CreateIndirectBr (
+	const CValue& Value,
+	CBasicBlock** ppBlockArray,
+	size_t BlockCount
+	)
+{
+	llvm::IndirectBrInst* pInst = m_LlvmIrBuilder.CreateIndirectBr (Value.GetLlvmValue (), BlockCount);
+
+	for (size_t i = 0; i < BlockCount; i++)
+		pInst->addDestination (ppBlockArray [i]->GetLlvmBlock ());
+
+	return pInst;
+}
+
 llvm::SwitchInst*
 CLlvmIrBuilder::CreateSwitch (
 	const CValue& Value,

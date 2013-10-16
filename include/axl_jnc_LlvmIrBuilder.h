@@ -116,6 +116,13 @@ public:
 			);
 	}
 
+	llvm::IndirectBrInst*
+	CreateIndirectBr (
+		const CValue& Value,
+		CBasicBlock** ppBlockArray,
+		size_t BlockCount
+		);
+
 	llvm::SwitchInst*
 	CreateSwitch (
 		const CValue& Value,

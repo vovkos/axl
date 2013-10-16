@@ -46,9 +46,10 @@ protected:
 public:
 	CBasicBlock* m_pBreakBlock;
 	CBasicBlock* m_pContinueBlock;
-	CBasicBlock* m_pCatchBlock;
+	CBasicBlock* m_pCatchBlock;	
 	CBasicBlock* m_pFinallyBlock;
-
+	CVariable* m_pFinallyReturnAddress;
+	rtl::CArrayT <CBasicBlock*> m_FinallyReturnBlockArray;
 	CDestructList m_DestructList;
 
 public:

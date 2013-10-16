@@ -6,6 +6,7 @@
 
 #include "axl_rtl_List.h"
 #include "axl_rtl_String.h"
+#include "axl_jnc_Value.h"
 
 namespace axl {
 namespace jnc {
@@ -16,9 +17,9 @@ class CFunction;
 
 enum EBasicBlockFlag
 {
-	EBasicBlockFlag_Unreachable = 0x10,
-	EBasicBlockFlag_Jumped      = 0x20,
-	EBasicBlockFlag_Entry       = 0x40,
+	EBasicBlockFlag_Reachable = 0x10,
+	EBasicBlockFlag_Jumped    = 0x20,
+	EBasicBlockFlag_Entry     = 0x40,
 };		
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -29,6 +30,8 @@ class CBasicBlock: public rtl::TListLink
 	friend class CLlvmIrBuilder;
 
 protected:
+	CModule* m_pModule;
+
 	rtl::CString m_Name;
 	rtl::CString m_LeadingComment;
 	CFunction* m_pFunction;
@@ -43,6 +46,18 @@ public:
 	GetFlags ()
 	{
 		return m_Flags;
+	}
+
+	bool
+	IsEmpty ()
+	{
+		return m_pLlvmBlock->getInstList ().empty ();
+	}
+
+	size_t
+	GetInstructionCount ()
+	{
+		return m_pLlvmBlock->getInstList ().size ();
 	}
 
 	bool
@@ -81,11 +96,14 @@ public:
 	{
 		return m_pLlvmBlock;
 	}
+	
+	CValue
+	GetBlockAddressValue ();
 
 	void
 	MarkEntry ()
 	{
-		m_Flags |= EBasicBlockFlag_Entry;
+		m_Flags |= (EBasicBlockFlag_Entry | EBasicBlockFlag_Reachable);
 	}
 };
 

@@ -1,50 +1,27 @@
 //.............................................................................
 
-class C1
+bool unwinder baz (int x)
 {
-	destruct ()
-	{
-		printf ("C1.destruct ()\n");
-	}
-}
-
-unwinder
-bool foo (int x)
-{
-	printf ("foo (%d)\n", x);
-	return x >= 0;
+	printf ("baz (%d)\n", x);
+	return x >= 0;	
 }
 
 bool bar ()
 {
 	printf ("bar ()\n");
 
-	try
-	{
-		stack C1 a;
-		foo (100);
-
-		stack C1 b;
-		foo (-200);
-
-		stack C1 c;
-		foo (250);
-	}
-
-	stack C1 d;
-	foo (300);
-
-	stack C1 e;
-	foo (-10);
-
-	stack C1 f;
-	foo (500);
-
+	baz (10);
+	baz (20);
+	baz (-1);
+	baz (30);
 	return true;
 
 catch:
-	printf ("exception caught in bar ()\n");
+	printf ("bar.catch\n");	
 	return false;
+
+finally:
+	printf ("bar.finally\n");	
 }
 
 //.............................................................................
@@ -56,7 +33,7 @@ int main ()
 	printf ("hello world!\n");
 
 	bool result = bar ();
-	printf ("bar () returned %d\n", result);		
+	printf ("bar returned %d\n", result);		
 	return 0;
 }
 
@@ -65,7 +42,7 @@ int main ()
 // system functions
 
 int printf (
-	unsafe thin const char* format,
+	const char unsafe thin* format,
 	unsafe ...
 	);
 

@@ -17,6 +17,7 @@ CScope::CScope ()
 	m_pContinueBlock = NULL;
 	m_pCatchBlock = NULL;
 	m_pFinallyBlock = NULL;
+	m_pFinallyReturnAddress = NULL;
 }
 
 //.............................................................................
