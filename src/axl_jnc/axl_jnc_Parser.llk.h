@@ -4455,7 +4455,7 @@ public:
 		case EToken_Heap:
 			return 100;
 		
-		case EToken_UHeap:
+		case EToken_HeapU:
 			return 101;
 		
 		case EToken_Abstract:
@@ -4727,7 +4727,7 @@ public:
 			EToken_Thread, 
 			EToken_Stack, 
 			EToken_Heap, 
-			EToken_UHeap, 
+			EToken_HeapU, 
 			EToken_Abstract, 
 			EToken_Virtual, 
 			EToken_Override, 
@@ -9881,7 +9881,7 @@ public:
 			_cls31* __pAstNode = (_cls31*) __pSymbol->m_pAstNode;
 // #line 101 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_DeclarationSpecifier.llk"
 			
-				(*__pAstNode).m_StorageKind = EStorage_UHeap;
+				(*__pAstNode).m_StorageKind = EStorage_HeapU;
 			;
 // #line 9887 "D:/Prj/Ninja/axl/src/axl_jnc/axl_jnc_Parser.llk.h"
 			}
@@ -14841,7 +14841,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -15231,7 +15231,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -15663,7 +15663,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -16053,7 +16053,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -16523,7 +16523,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -16919,7 +16919,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -17318,7 +17318,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -17714,7 +17714,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -18110,7 +18110,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -18506,7 +18506,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -18782,7 +18782,7 @@ public:
 			switch (LookaheadToken)
 			{
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 1748;
 				return ELaDfaResult_Production;
@@ -18902,7 +18902,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -19298,7 +19298,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -19694,7 +19694,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -20090,7 +20090,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -20486,7 +20486,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -20882,7 +20882,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -21431,7 +21431,7 @@ public:
 			switch (LookaheadToken)
 			{
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 1773;
 				return ELaDfaResult_Production;
@@ -21905,7 +21905,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 273;
 				return ELaDfaResult_Production;
@@ -22037,7 +22037,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 947;
 				return ELaDfaResult_Production;
@@ -22565,7 +22565,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 595;
 				return ELaDfaResult_Production;
@@ -24001,7 +24001,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 944;
 				return ELaDfaResult_Production;
@@ -24457,7 +24457,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 951;
 				return ELaDfaResult_Production;
@@ -24916,7 +24916,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -25306,7 +25306,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -25696,7 +25696,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -26086,7 +26086,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -26476,7 +26476,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -26866,7 +26866,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -27142,7 +27142,7 @@ public:
 			switch (LookaheadToken)
 			{
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 1828;
 				return ELaDfaResult_Production;
@@ -27256,7 +27256,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -27646,7 +27646,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -28036,7 +28036,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -28426,7 +28426,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -28816,7 +28816,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;
@@ -29206,7 +29206,7 @@ public:
 				return ELaDfaResult_Production;
 					
 			
-			case EToken_UHeap:
+			case EToken_HeapU:
 					
 				pTransition->m_ProductionIndex = 164;
 				return ELaDfaResult_Production;

@@ -44,7 +44,7 @@ enum EToken
 	EToken_Thread,
 	EToken_Stack,
 	EToken_Heap,
-	EToken_UHeap,
+	EToken_HeapU,
 	EToken_Abstract,
 	EToken_Virtual,
 	EToken_Override,
@@ -215,7 +215,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Thread,       "thread")
 	AXL_LEX_TOKEN_NAME (EToken_Stack,        "stack")
 	AXL_LEX_TOKEN_NAME (EToken_Heap,         "heap")
-	AXL_LEX_TOKEN_NAME (EToken_UHeap,        "uheap")
+	AXL_LEX_TOKEN_NAME (EToken_HeapU,        "heapu")
 	AXL_LEX_TOKEN_NAME (EToken_Abstract,     "abstract")
 	AXL_LEX_TOKEN_NAME (EToken_Virtual,      "virtual")
 	AXL_LEX_TOKEN_NAME (EToken_Override,     "override")

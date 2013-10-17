@@ -324,6 +324,18 @@ CControlFlowMgr::Catch ()
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope && pScope->m_pCatchBlock);
 
+	if (pScope->m_Flags & EScopeFlag_FinallyDefined)
+	{
+		err::SetFormatStringError ("'catch' cannot follow 'finally'");
+		return false;
+	}
+
+	if (!(pScope->m_pCatchBlock->GetFlags () & EBasicBlockFlag_Jumped))
+	{
+		err::SetFormatStringError ("useless 'catch'");
+		return false;
+	}
+
 	pScope->m_Flags |= EScopeFlag_CatchDefined;
 
 	if (pScope->IsFunctionScope ())
@@ -347,7 +359,7 @@ CControlFlowMgr::Finally ()
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope && pScope->m_pFinallyBlock);
 
-	if (pScope->m_FinallyReturnBlockArray.IsEmpty ())
+	if (!(pScope->m_pFinallyBlock->GetFlags () & EBasicBlockFlag_Jumped))
 	{
 		err::SetFormatStringError ("useless 'finally'");
 		return false;

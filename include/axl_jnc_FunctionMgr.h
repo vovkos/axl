@@ -80,19 +80,19 @@ enum EStdFunc
 	EStdFunc_HeapAlloc,
 
 	// int8*
-	// jnc.UHeapAlloc (size_t Size);
+	// jnc.HeapUAlloc (size_t Size);
 
-	EStdFunc_UHeapAlloc,
-
-	// void
-	// jnc.UHeapFree (int8* p);
-
-	EStdFunc_UHeapFree,
+	EStdFunc_HeapUAlloc,
 
 	// void
-	// jnc.UHeapFreeClassPtr (object* p);
+	// jnc.HeapUFree (int8* p);
 
-	EStdFunc_UHeapFreeClassPtr,
+	EStdFunc_HeapUFree,
+
+	// void
+	// jnc.HeapUFreeClassPtr (object* p);
+
+	EStdFunc_HeapUFreeClassPtr,
 
 	// void
 	// jnc.GcAddObject (object.hdr* p);
@@ -506,13 +506,13 @@ protected:
 	CreateHeapAlloc ();
 
 	CFunction*
-	CreateUHeapAlloc ();
+	CreateHeapUAlloc ();
 
 	CFunction*
-	CreateUHeapFree ();
+	CreateHeapUFree ();
 
 	CFunction*
-	CreateUHeapFreeClassPtr ();
+	CreateHeapUFreeClassPtr ();
 
 	CFunction*
 	CreateGcAddObject ();

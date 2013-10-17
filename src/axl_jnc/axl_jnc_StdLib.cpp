@@ -16,9 +16,9 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.dynamicCastClassPtr"] = (void*) DynamicCastClassPtr;
 	m_FunctionMap ["jnc.strengthenClassPtr"] = (void*) StrengthenClassPtr;
 	m_FunctionMap ["jnc.heapAlloc"] = (void*) HeapAlloc;
-	m_FunctionMap ["jnc.uheapAlloc"] = (void*) UHeapAlloc;
-	m_FunctionMap ["jnc.uheapFree"] = (void*) UHeapFree;
-	m_FunctionMap ["jnc.uheapFreeClassPtr"] = (void*) UHeapFreeClassPtr;
+	m_FunctionMap ["jnc.heapuAlloc"] = (void*) HeapUAlloc;
+	m_FunctionMap ["jnc.heapuFree"] = (void*) HeapUFree;
+	m_FunctionMap ["jnc.heapuFreeClassPtr"] = (void*) HeapUFreeClassPtr;
 	m_FunctionMap ["jnc.gcAddObject"] = (void*) GcAddObject;
 	m_FunctionMap ["jnc.gcSafePoint"] = (void*) GcSafePoint;
 	m_FunctionMap ["jnc.runGc"] = (void*) RunGc;
@@ -57,9 +57,9 @@ CStdLib::Export (
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_DynamicCastClassPtr, (void*) DynamicCastClassPtr);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrengthenClassPtr, (void*) StrengthenClassPtr);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapAlloc, (void*) HeapAlloc);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapAlloc, (void*) UHeapAlloc);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFree, (void*) UHeapFree);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_UHeapFreeClassPtr, (void*) UHeapFreeClassPtr);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUAlloc, (void*) HeapUAlloc);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFree, (void*) HeapUFree);
+	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFreeClassPtr, (void*) HeapUFreeClassPtr);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
 	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGc, (void*) RunGc);
@@ -250,7 +250,7 @@ CStdLib::HeapAlloc (size_t Size)
 }
 
 void*
-CStdLib::UHeapAlloc (size_t Size)
+CStdLib::HeapUAlloc (size_t Size)
 {
 	void* p = malloc (Size);
 	memset (p, 0, Size);
@@ -258,13 +258,13 @@ CStdLib::UHeapAlloc (size_t Size)
 }
 
 void
-CStdLib::UHeapFree (void* p)
+CStdLib::HeapUFree (void* p)
 {
 	free (p);
 }
 
 void
-CStdLib::UHeapFreeClassPtr (TInterface* p)
+CStdLib::HeapUFreeClassPtr (TInterface* p)
 {
 	free (p->m_pObject);
 }

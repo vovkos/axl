@@ -30,7 +30,7 @@ COperatorMgr::Allocate (
 			pType = m_pModule->m_TypeMgr.GetArrayType (pType, ElementCount);
 		}
 	}
-	else if (StorageKind != EStorage_Heap && StorageKind != EStorage_UHeap)
+	else if (StorageKind != EStorage_Heap && StorageKind != EStorage_HeapU)
 	{
 		err::SetFormatStringError ("cannot create non-const-sized arrays with '%s new'", GetStorageKindString (StorageKind));
 		return false;
@@ -75,8 +75,8 @@ COperatorMgr::Allocate (
 		MarkGcRoot (PtrValue, pType);
 		break;
 
-	case EStorage_UHeap:
-		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
+	case EStorage_HeapU:
+		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapUAlloc);
 		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
 		break;
 
@@ -137,8 +137,8 @@ COperatorMgr::Prime (
 		Flags |= EObjectFlag_Stack;
 		break;
 
-	case EStorage_UHeap:
-		Flags |= EObjectFlag_UHeap;
+	case EStorage_HeapU:
+		Flags |= EObjectFlag_HeapU;
 		break;
 	}
 
@@ -613,7 +613,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 		if (!Result)
 			return false;
 
-		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFree);	
+		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapUFree);	
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 		break;
 
@@ -632,7 +632,7 @@ COperatorMgr::DeleteOperator (const CValue& RawOpValue)
 			CheckClassPtrNull (OpValue);
 		}
 
-		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapFreeClassPtr);	
+		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapUFreeClassPtr);	
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
 		}
 		break;

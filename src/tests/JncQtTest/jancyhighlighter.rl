@@ -46,7 +46,7 @@ main := |*
 'thread'          |
 'stack'           |
 'heap'            |
-'uheap'           |
+'heapu'           |
 'abstract'        |
 'virtual'         |
 'override'        |

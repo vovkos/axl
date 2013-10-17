@@ -13,7 +13,7 @@ bool bar ()
 	baz (10);
 	baz (20);
 
-	bool result = try baz (-1);
+	bool result = baz (-1);
 	printf ("baz returned %d\n", result);
 
 	baz (30);
@@ -37,6 +37,7 @@ int main ()
 
 	bool result = bar ();
 	printf ("bar returned %d\n", result);		
+
 	return 0;
 }
 

@@ -986,16 +986,16 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateHeapAlloc ();
 		break;
 
-	case EStdFunc_UHeapAlloc:
-		pFunction = CreateUHeapAlloc ();
+	case EStdFunc_HeapUAlloc:
+		pFunction = CreateHeapUAlloc ();
 		break;
 
-	case EStdFunc_UHeapFree:
-		pFunction = CreateUHeapFree ();
+	case EStdFunc_HeapUFree:
+		pFunction = CreateHeapUFree ();
 		break;
 
-	case EStdFunc_UHeapFreeClassPtr:
-		pFunction = CreateUHeapFreeClassPtr ();
+	case EStdFunc_HeapUFreeClassPtr:
+		pFunction = CreateHeapUFreeClassPtr ();
 		break;
 
 	case EStdFunc_GcAddObject:
@@ -1376,10 +1376,10 @@ CFunctionMgr::CreateHeapAlloc ()
 }
 
 // int8*
-// jnc.UHeapAlloc (size_t Size);
+// jnc.HeapUAlloc (size_t Size);
 
 CFunction*
-CFunctionMgr::CreateUHeapAlloc ()
+CFunctionMgr::CreateHeapUAlloc ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 	
@@ -1389,14 +1389,14 @@ CFunctionMgr::CreateUHeapAlloc ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.uheapAlloc", pType);
+	return CreateInternalFunction ("jnc.heapuAlloc", pType);
 }
 
 // void
-// jnc.UHeapFree (int8* p);
+// jnc.HeapUFree (int8* p);
 
 CFunction*
-CFunctionMgr::CreateUHeapFree ()
+CFunctionMgr::CreateHeapUFree ()
 {
 	CType* ArgTypeArray [] =
 	{
@@ -1404,14 +1404,14 @@ CFunctionMgr::CreateUHeapFree ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.uheapFree", pType);
+	return CreateInternalFunction ("jnc.heapuFree", pType);
 }
 
 // void
-// jnc.UHeapFreeClassPtr (object* p);
+// jnc.HeapUFreeClassPtr (object* p);
 
 CFunction*
-CFunctionMgr::CreateUHeapFreeClassPtr ()
+CFunctionMgr::CreateHeapUFreeClassPtr ()
 {
 	CType* ArgTypeArray [] =
 	{
@@ -1419,7 +1419,7 @@ CFunctionMgr::CreateUHeapFreeClassPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.uheapFreeClassPtr", pType);
+	return CreateInternalFunction ("jnc.heapuFreeClassPtr", pType);
 }
 
 // void

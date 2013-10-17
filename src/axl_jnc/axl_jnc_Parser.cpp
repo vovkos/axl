@@ -85,6 +85,7 @@ CParser::PreCreateLandingPads (uint_t Flags)
 	{
 		ASSERT (!pScope->m_pCatchBlock);
 		pScope->m_pCatchBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("catch_block");
+		pScope->m_Flags |= EScopeFlag_Unwindable;
 	}
 
 	if (Flags & ELandingPadFlag_Finally)

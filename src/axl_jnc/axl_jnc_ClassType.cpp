@@ -755,7 +755,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 {
 	bool Result;
 
-	// only call member field destructors if storage is stack, static or uheap
+	// only call member field destructors if storage is stack, static or heapu
 
 	CBasicBlock* pCallBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("call_member_field_destructors");
 	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow");
@@ -785,7 +785,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 	m_pModule->m_LlvmIrBuilder.CreateLoad (FlagsValue, pType, &FlagsValue);
 	
 	CValue MaskValue;
-	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap, EType_Int_p);
+	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_HeapU, EType_Int_p);
 	
 	CValue AndValue;
 	Result = 

@@ -111,15 +111,15 @@ public:
 
 	static
 	void*
-	UHeapAlloc (size_t Size);
+	HeapUAlloc (size_t Size);
 
 	static
 	void
-	UHeapFree (void* p);
+	HeapUFree (void* p);
 
 	static
 	void
-	UHeapFreeClassPtr (TInterface* p);
+	HeapUFreeClassPtr (TInterface* p);
 
 	static
 	void

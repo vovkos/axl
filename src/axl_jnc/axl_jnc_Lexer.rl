@@ -95,7 +95,7 @@ main := |*
 'thread'         { CreateToken (EToken_Thread); };
 'stack'          { CreateToken (EToken_Stack); };
 'heap'           { CreateToken (EToken_Heap); };
-'uheap'          { CreateToken (EToken_UHeap); };
+'heapu'          { CreateToken (EToken_HeapU); };
 'abstract'       { CreateToken (EToken_Abstract); };
 'virtual'        { CreateToken (EToken_Virtual); };
 'override'       { CreateToken (EToken_Override); };

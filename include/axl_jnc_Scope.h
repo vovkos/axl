@@ -20,6 +20,7 @@ enum EScopeFlag
 	EScopeFlag_Try            = 0x0100,
 	EScopeFlag_CatchDefined   = 0x0200,
 	EScopeFlag_FinallyDefined = 0x0400,
+	EScopeFlag_Unwindable     = 0x0800, // function is unwinder, or parent has catch
 };
 
 //.............................................................................

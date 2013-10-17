@@ -545,8 +545,8 @@ COperatorMgr::CallImpl (
 	CValue ScopeLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
 	if (ScopeLevelValue)
 	{
-		CScope* pCurrentScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		CValue ScopeLevelValue = CalcScopeLevelValue (pCurrentScope);
+		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+		CValue ScopeLevelValue = CalcScopeLevelValue (pScope);
 
 		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "update scope level before call");
 		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
@@ -563,9 +563,19 @@ COperatorMgr::CallImpl (
 		pResultValue
 		);
 
-	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Unwinder) && 
+	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Unwinder) &&
 		m_pModule->m_ControlFlowMgr.IsUnwindingEnabled ())
 	{
+		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+		if (!(pScope->GetFlags () & EScopeFlag_Unwindable))
+		{
+			err::SetFormatStringError (
+				"cannot call 'unwinder' from here ('%s' is not 'unwinder' and there is no 'try' or 'catch')",
+				m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
+				);
+			return false;
+		}
+
 		CValue IndicatorValue;
 
 		Result = 
