@@ -63,12 +63,12 @@ public:
 			if (Length == -1)
 				return false;
 
-			if (ArgString.IsEmpty ())
+			if (Arg.IsEmpty ())
 				break;
 
 			Result = 
-				ParseArg (Arg, &Switch, &Value) &&
-				ProcessArg (i, Switch, &Value);
+				ParseArg (Arg, &SwitchName, &Value) &&
+				ProcessArg (i, SwitchName, &Value);
 
 			if (!Result)
 				return false;

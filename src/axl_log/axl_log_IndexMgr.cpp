@@ -9,7 +9,7 @@ namespace log {
 
 CIndexMgr::CIndexMgr ()
 {
-	m_pClient = NULL;
+	m_pClientPeer = NULL;
 	m_pRepresenter = NULL;
 	m_pPacketFile = NULL;
 	m_pMergeFile = NULL;
@@ -35,13 +35,13 @@ CIndexMgr::CIndexMgr ()
 
 void
 CIndexMgr::Setup (
-	CClient* pClient,
+	CClientPeer* pClientPeer,
 	CRepresenter* pRepresenter,
 	CPacketFile* pPacketFile,
 	CMergeFile* pMergeFile
 	)
 {
-	m_pClient = pClient;
+	m_pClientPeer = pClientPeer;
 	m_pRepresenter = pRepresenter;
 	m_pPacketFile = pPacketFile;
 	m_pMergeFile = pMergeFile;
@@ -276,7 +276,7 @@ CIndexMgr::UpdateLeaf (
 				);
 		}
 
-		m_pClient->CreateIndexLeaf (
+		m_pClientPeer->CreateIndexLeaf (
 			m_LeafOffset, 
 			&m_BinDataConfig,
 			LineCount,
@@ -293,7 +293,7 @@ CIndexMgr::UpdateLeaf (
 	}
 	else
 	{
-		m_pClient->UpdateIndexTailLeaf (
+		m_pClientPeer->UpdateIndexTailLeaf (
 			m_LeafOffset, 
 			LineCount,
 			PacketCount,

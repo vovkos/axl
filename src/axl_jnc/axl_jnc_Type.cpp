@@ -546,10 +546,6 @@ CType::PrepareLlvmType ()
 		m_pLlvmType = llvm::Type::getDoubleTy (llvm::getGlobalContext ());
 		break;
 
-	case -1:
-		m_pLlvmType = llvm::Type::getLabelTy (llvm::getGlobalContext ());
-		break;
-
 	default:
 		ASSERT (false);
 	}

@@ -33,7 +33,7 @@ struct TLinePool
 class CLineRepresentMgr
 { 	
 protected:	
-	CClient* m_pClient;
+	CClientPeer* m_pClientPeer;
 	CRepresenter* m_pRepresenter;
 	CColorizer* m_pColorizer;
 	CPacketFile* m_pPacketFile;
@@ -72,7 +72,7 @@ public:
 		
 	void
 	Setup (
-		CClient* pClient,
+		CClientPeer* pClientPeer,
 		CRepresenter* pRepresenter,
 		CColorizer* pColorizer,
 		CPacketFile* pPacketFile,

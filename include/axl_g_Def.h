@@ -250,12 +250,18 @@ pvoid_cast (T x)
 
 //.............................................................................
 
-// non-conflicting min / max macros
+// non-conflicting portable macro utilities
 
 #define AXL_MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define AXL_MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
-//.............................................................................
+#define AXL_OFFSETOF(Type, Field) \
+	((char*) &((Type*) 1)->Field - (char*) 1)
+
+#define AXL_CONTAINING_RECORD(Address, Type, Field) \
+	((Type*) ((char*) (Address) - AXL_OFFSETOF (Type, Field)))
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
 // ensure class is never accidentally copied
 

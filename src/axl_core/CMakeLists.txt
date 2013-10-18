@@ -14,7 +14,7 @@ set (
 
 set (DBG_CPP_LIST)
 
-source_group (
+source_group ( 
 	dbg 
 	FILES 
 	${DBG_H_LIST}

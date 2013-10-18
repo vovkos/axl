@@ -43,7 +43,7 @@ protected:
 
 public:
 	bool start (
-		log::IClient* client,
+		log::CClientPeer* client,
 		const char* logPacketFilePath,
 		const char* logMergeFilePath,
 		const char* logColorizerStateFilePath

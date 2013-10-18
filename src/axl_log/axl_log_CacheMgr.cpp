@@ -9,7 +9,7 @@ namespace log {
 
 CCacheMgr::CCacheMgr ()
 {
-	m_pServer = NULL;
+	m_pServerPeer = NULL;
 	m_CachePageCountLimit = 32;
 	m_SyncId = -1;
 }
@@ -17,7 +17,7 @@ CCacheMgr::CCacheMgr ()
 bool
 CCacheMgr::Create (
 	CWidget* pWidget,
-	ÑServer* pServer,
+	CServerPeer* pServerPeer,
 	const char* pIndexFileName
 	)
 {
@@ -26,7 +26,7 @@ CCacheMgr::Create (
 		return false;
 
 	m_pWidget = pWidget;
-	m_pServer = pServer;
+	m_pServerPeer = pServerPeer;
 
 	ClearCache (-1);
 	return true;
@@ -80,7 +80,7 @@ CCacheMgr::GetCachePageByIndexLeaf (const TIndexLeaf* pLeaf)
 
 	pPage->m_Flags |= EPageFlag_Representing;
 
-	m_pServer->RepresentPage (m_SyncId, pLeaf, (uint64_t*) (pLeaf + 1));
+	m_pServerPeer->RepresentPage (m_SyncId, pLeaf, (uint64_t*) (pLeaf + 1));
 
 	return !pPage->IsEmpty () ? pPage : NULL;
 }

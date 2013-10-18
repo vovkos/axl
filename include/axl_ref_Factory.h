@@ -44,7 +44,7 @@ public:
 		operator () (size_t Extra = 0)
 		{
 			CPtrT <T> Object = mem::CStdFactoryT <T, TAlloc>::New (Extra);
-			Object->SetFree (&TAlloc::Free);
+			Object->SetTarget (Object, &rtl::CTypeT <T>::Destruct, &TAlloc::Free);
 			return Object;
 		}
 #endif

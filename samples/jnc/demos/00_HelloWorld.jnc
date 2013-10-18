@@ -6,7 +6,7 @@ bool unwinder baz (int x)
 	return x >= 0;	
 }
 
-bool bar ()
+bool unwinder bar ()
 {
 	printf ("bar ()\n");
 
@@ -35,7 +35,7 @@ int main ()
 {
 	printf ("hello world!\n");
 
-	bool result = bar ();
+	bool result = try bar ();
 	printf ("bar returned %d\n", result);		
 
 	return 0;

@@ -85,7 +85,7 @@ struct TSrvMsg_FoldPacket: TMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ÑServer: CPeer
+class CServerPeer: CPeer
 {
 public:
 	void 
@@ -222,7 +222,7 @@ struct TCliMsg_FoldPacketComplete: TMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CClient: public CPeer
+class CClientPeer: public CPeer
 {
 public:
 	void 
