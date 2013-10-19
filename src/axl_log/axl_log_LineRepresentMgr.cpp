@@ -9,7 +9,7 @@ namespace log {
 
 CLineRepresentMgr::CLineRepresentMgr ()
 {
-	m_pClient = NULL;
+	m_pClientPeer = NULL;
 	m_pRepresenter = NULL;
 	m_pColorizer = NULL;
 	m_pPacketFile = NULL;
@@ -28,7 +28,7 @@ CLineRepresentMgr::CLineRepresentMgr ()
 
 void
 CLineRepresentMgr::Setup (
-	CClient* pClient,
+	CClientPeer* pClientPeer,
 	CRepresenter* pRepresenter,
 	CColorizer* pColorizer,
 	CPacketFile* pPacketFile,
@@ -36,7 +36,7 @@ CLineRepresentMgr::Setup (
 	io::CMappedFile* pColorizerStateFile
 	)
 {
-	m_pClient = pClient;
+	m_pClientPeer = pClientPeer;
 	m_pRepresenter = pRepresenter;
 	m_pColorizer = pColorizer;
 	m_pPacketFile = pPacketFile;
@@ -210,7 +210,7 @@ CLineRepresentMgr::RepresentPage (
 
 	size_t LineCount = (size_t) pIndexLeaf->m_LineCount - FirstLineIdx;
 
-	m_pClient->RepresentPageComplete (
+	m_pClientPeer->RepresentPageComplete (
 		SyncId,
 		pIndexLeaf->m_Offset,
 		FirstLineIdx,
@@ -271,7 +271,7 @@ CLineRepresentMgr::RepresentFoldablePacket (
 
 	size_t NewLineCount = RepresenterTarget.m_LineIdx;
 
-	m_pClient->FoldPacketComplete (
+	m_pClientPeer->FoldPacketComplete (
 		SyncId,
 		IndexLeafOffset,
 		FirstLineIdx,

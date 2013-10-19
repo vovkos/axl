@@ -29,7 +29,7 @@ struct TIndexRepresenterTargetData;
 
 //.............................................................................
 
-class CServer: public ÑServer
+class CServer: public CServerPeer
 {
 	friend class CIoThread;
 
@@ -48,16 +48,19 @@ protected:
 	public:
 		void
 		ThreadProc ()
-		{
-			CONTAINING_RECORD (this, CServer, m_IoThread)->IoThreadProc ();
+		{	
+			AXL_CONTAINING_RECORD (this, CServer, m_IoThread)->IoThreadProc ();
 		}
 	};
+	
+public:
+	int m_x;
 
 protected:
 	mt::CLock m_Lock;
 	uint_t m_Flags;
 
-	CClient* m_pClient;
+	CClientPeer* m_pClientPeer;
 	CRepresenter* m_pRepresenter;
 	CColorizer* m_pColorizer;
 	CHyperlinkHandler* m_pHyperlinkHandler;
@@ -90,7 +93,7 @@ public:
 
 	bool
 	Create (
-		CClient* pClient,
+		CClientPeer* pClientPeer,
 		CRepresenter* pRepresenter,
 		CColorizer* pColorizer,
 		const char* pPacketFilePath,

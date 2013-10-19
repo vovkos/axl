@@ -46,13 +46,13 @@ enum EColor
 
 class CWidget: 
 	public gui::CWidget,
-	public CClient
+	public CClientPeer
 {
 	friend class CCacheMgr;
 	friend class CColorizeMgr;
 
 protected:
-	ÑServer* m_pServer;
+	CServerPeer* m_pServerPeer;
 
 	CCacheMgr m_CacheMgr;
 
@@ -137,11 +137,11 @@ public:
 
 	bool
 	Create (
-		ÑServer* pServer,
+		CServerPeer* pServerPeer,
 		const char* pIndexFileName
 		);
 
-	// ÑServer
+	// ï¿½Server
 
 	virtual
 	void

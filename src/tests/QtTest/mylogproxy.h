@@ -18,7 +18,7 @@ protected:
 	public:
 		void ThreadProc ()
 		{
-			CONTAINING_RECORD (this, MyLogProxy, m_socketThread)->socketThreadProc ();
+			AXL_CONTAINING_RECORD (this, MyLogProxy, m_socketThread)->socketThreadProc ();
 		}
 	};
 
@@ -27,7 +27,7 @@ protected:
 	public:
 		void OnPacket (const void* p, size_t size)
 		{
-			CONTAINING_RECORD (this, MyLogProxy, m_packetizer)->onPacket (p, size);
+			AXL_CONTAINING_RECORD (this, MyLogProxy, m_packetizer)->onPacket (p, size);
 		}
 	};
 

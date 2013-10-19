@@ -67,7 +67,7 @@ CWidget::OnHyperlink (
 			pFoldablePacket->m_FoldFlags | Modify :
 			pFoldablePacket->m_FoldFlags & ~Modify;
 
-		m_pServer->FoldPacket (
+		m_pServerPeer->FoldPacket (
 			m_CacheMgr.GetSyncId (), 
 			pLine->m_pPage->m_IndexLeaf.m_Offset,
 			pFoldablePacket->m_Offset,

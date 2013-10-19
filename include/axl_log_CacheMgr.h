@@ -20,7 +20,7 @@ class CCacheMgr
 { 
 protected:
 	CWidget* m_pWidget;
-	ÑServer* m_pServer;
+	CServerPeer* m_pServerPeer;
 	uint64_t m_SyncId;
 
 	TLongestLineLength m_LongestLineLength;
@@ -76,7 +76,7 @@ public:
 	bool
 	Create (
 		CWidget* pWidget,
-		ÑServer* pServer,
+		CServerPeer* pServerPeer,
 		const char* pIndexFileName
 		);
 

@@ -376,7 +376,7 @@ COperatorMgr::GetWeakenOperatorResultType (const CValue& OpValue)
 	if (pOpType->GetTypeKind () != EType_ClassPtr || (pOpType->GetFlags () & EPtrTypeFlag_Unsafe))
 	{
 		err::SetFormatStringError ("'weak member' operator cannot be applied to '%s'", pOpType->GetTypeString ().cc ());
-		return false;
+		return NULL;
 	}
 
 	CClassPtrType* pResultType = ((CClassPtrType*) pOpType)->GetWeakPtrType ();

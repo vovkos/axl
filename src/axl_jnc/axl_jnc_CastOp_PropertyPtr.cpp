@@ -316,7 +316,7 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast_FullClosure (
 		StorageKind, 
 		OpValue, 
 		pDstPtrType->GetTargetType (), 
-		pDstPtrType->GetPtrTypeKind () == EFunctionPtrType_Weak,
+		pDstPtrType->GetPtrTypeKind () == EPropertyPtrType_Weak,
 		&ClosureValue
 		);
 

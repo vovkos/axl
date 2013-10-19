@@ -12,7 +12,7 @@ namespace log {
 CWidget::CWidget (gui::CEngine* pEngine):
 	gui::CWidget (pEngine)
 {
-	m_pServer = NULL;
+	m_pServerPeer = NULL;
 
 /*
 	m_CacheMgr.m_pWidget = this;
@@ -89,17 +89,17 @@ CWidget::CWidget (gui::CEngine* pEngine):
 
 bool
 CWidget::Create (
-	ÑServer* pServer,
+	CServerPeer* pServerPeer,
 	const char* pIndexFileName
 	)
 {
 	ClearCache (-1);
 
-	bool Result = m_CacheMgr.Create (this, pServer, pIndexFileName);
+	bool Result = m_CacheMgr.Create (this, pServerPeer, pIndexFileName);
 	if (!Result)
 		return false;
 
-	m_pServer = pServer;
+	m_pServerPeer = pServerPeer;
 	return true;
 }
 
@@ -121,7 +121,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
 			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
-			PostThreadMsg (ECliMsg_FilterProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::CRefCount*) NULL));
+			PostThreadMsg (ECliMsg_FilterProgress, ref::CPtrT <void> ((void*) (size_t) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
@@ -130,7 +130,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
 			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
-			PostThreadMsg (ECliMsg_IndexProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::CRefCount*) NULL));
+			PostThreadMsg (ECliMsg_IndexProgress, ref::CPtrT <void> ((void*) (size_t) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
@@ -139,7 +139,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
 			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
-			PostThreadMsg (ECliMsg_ColorizeProgress, ref::CPtrT <void> ((void*) pMsg->m_Percentage, (ref::CRefCount*) NULL));
+			PostThreadMsg (ECliMsg_ColorizeProgress, ref::CPtrT <void> ((void*) (size_t) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;

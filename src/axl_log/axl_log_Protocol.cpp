@@ -7,7 +7,7 @@ namespace log {
 //.............................................................................
 
 void 
-ÑServer::Clear ()
+CServerPeer::Clear ()
 {
 	TMsg Msg;
 	Msg.m_MsgKind = ESrvMsg_Clear;
@@ -17,7 +17,7 @@ void
 }
 
 void 
-ÑServer::Rebuild ()
+CServerPeer::Rebuild ()
 {
 	TMsg Msg;
 	Msg.m_MsgKind = ESrvMsg_Rebuild;
@@ -27,7 +27,7 @@ void
 }
 
 void 
-ÑServer::Update ()
+CServerPeer::Update ()
 {
 	TMsg Msg;
 	Msg.m_MsgKind = ESrvMsg_Update;
@@ -37,7 +37,7 @@ void
 }
 
 void 
-ÑServer::SetBinDataConfig (const TBinDataConfig* pConfig)
+CServerPeer::SetBinDataConfig (const TBinDataConfig* pConfig)
 {
 	TSrvMsg_SetBinDataConfig Msg;
 	Msg.m_MsgKind = ESrvMsg_SetBinDataConfig;
@@ -48,7 +48,7 @@ void
 }
 
 void 
-ÑServer::WritePacket (
+CServerPeer::WritePacket (
 	uint64_t Timestamp,
 	uint_t Code,
 	const void* p,
@@ -85,7 +85,7 @@ void
 }
 
 void 
-ÑServer::RepresentPage (
+CServerPeer::RepresentPage (
 	uint64_t SyncId,
 	const TIndexLeaf* pIndexLeaf,
 	const uint64_t* pFoldFlagArray
@@ -120,7 +120,7 @@ void
 }
 
 void 
-ÑServer::FoldPacket (
+CServerPeer::FoldPacket (
 	uint64_t SyncId,
 	uint64_t IndexLeafOffset,
 	uint64_t PacketOffset,
@@ -147,7 +147,7 @@ void
 //.............................................................................
 
 void 
-CClient::ClearCache (uint64_t SyncId)
+CClientPeer::ClearCache (uint64_t SyncId)
 {
 	TCliMsg_ClearCache Msg;
 	Msg.m_MsgKind = ECliMsg_ClearCache;
@@ -158,7 +158,7 @@ CClient::ClearCache (uint64_t SyncId)
 }
 
 void 
-CClient::FilterProgress (uint_t Percentage)
+CClientPeer::FilterProgress (uint_t Percentage)
 {
 	TCliMsg_Progress Msg;
 	Msg.m_MsgKind = ECliMsg_FilterProgress;
@@ -169,7 +169,7 @@ CClient::FilterProgress (uint_t Percentage)
 }
 
 void 
-CClient::IndexProgress (uint_t Percentage)
+CClientPeer::IndexProgress (uint_t Percentage)
 {
 	TCliMsg_Progress Msg;
 	Msg.m_MsgKind = ECliMsg_IndexProgress;
@@ -180,7 +180,7 @@ CClient::IndexProgress (uint_t Percentage)
 }
 
 void 
-CClient::ColorizeProgress (uint_t Percentage)
+CClientPeer::ColorizeProgress (uint_t Percentage)
 {
 	TCliMsg_Progress Msg;
 	Msg.m_MsgKind = ECliMsg_ColorizeProgress;
@@ -191,7 +191,7 @@ CClient::ColorizeProgress (uint_t Percentage)
 }
 
 void 
-CClient::CreateIndexLeaf (
+CClientPeer::CreateIndexLeaf (
 	uint64_t LeafOffset,
 	const TBinDataConfig* pBinDataConfig,
 	uint64_t LineCount,
@@ -218,7 +218,7 @@ CClient::CreateIndexLeaf (
 }
 
 void 
-CClient::UpdateIndexTailLeaf (
+CClientPeer::UpdateIndexTailLeaf (
 	uint64_t LeafOffset,
 	uint64_t LineCount,
 	uint32_t PacketCount,
@@ -239,7 +239,7 @@ CClient::UpdateIndexTailLeaf (
 }
 
 void 
-CClient::RepresentPageComplete (
+CClientPeer::RepresentPageComplete (
 	uint64_t SyncId,
 	uint64_t IndexLeafOffset,
 	size_t LineIdx,
@@ -275,7 +275,7 @@ CClient::RepresentPageComplete (
 }
 
 void 
-CClient::FoldPacketComplete (
+CClientPeer::FoldPacketComplete (
 	uint64_t SyncId,
 	uint64_t IndexLeafOffset,
 	size_t LineIdx,

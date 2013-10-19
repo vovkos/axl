@@ -41,7 +41,7 @@ enum EPageFlag
 
 class CCachePage: public rtl::TListLink
 {
-	friend class CServer;
+	friend class CServerPeer;
 	friend class CCacheMgr;
 	friend class CWidget;
 	friend class CLineRepresenterTarget;

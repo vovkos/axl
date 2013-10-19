@@ -9,7 +9,7 @@ namespace log {
 CServer::CServer ()
 {
 	m_Flags = 0;
-	m_pClient = NULL;
+	m_pClientPeer = NULL;
 	m_pRepresenter = NULL;
 	m_pColorizer = NULL;
 	m_pHyperlinkHandler = NULL;
@@ -17,7 +17,7 @@ CServer::CServer ()
 
 bool
 CServer::Create (
-	CClient* pClient,
+	CClientPeer* pClientPeer,
 	CRepresenter* pRepresenter,
 	CColorizer* pColorizer,
 	const char* pPacketFilePath,
@@ -39,16 +39,16 @@ CServer::Create (
 		return false;
 	
 	m_Flags = EFlag_Running | EFlag_Rebuild;
-	m_pClient = pClient;
+	m_pClientPeer = pClientPeer;
 	m_pRepresenter = pRepresenter;
 	m_pColorizer = pColorizer;
 
 	CPacketFile* pPacketFile = &m_PacketFile;
 
 	m_FilterMgr.Setup (pPacketFile);
-	m_IndexMgr.Setup (pClient, pRepresenter, pPacketFile, &m_MergeFile);
+	m_IndexMgr.Setup (pClientPeer, pRepresenter, pPacketFile, &m_MergeFile);
 	m_ColorizeMgr.Setup (pRepresenter, pColorizer, pPacketFile, &m_MergeFile, &m_ColorizerStateFile);
-	m_LineRepresentMgr.Setup (pClient, pRepresenter, pColorizer, pPacketFile, &m_MergeFile, &m_ColorizerStateFile);
+	m_LineRepresentMgr.Setup (pClientPeer, pRepresenter, pColorizer, pPacketFile, &m_MergeFile, &m_ColorizerStateFile);
 
 	m_IoThreadEvent.Signal ();
 	return m_IoThread.Start ();
@@ -210,7 +210,7 @@ CServer::IoThreadProc ()
 
 		if (FlagsSnapshot & (EFlag_Clear | EFlag_Rebuild))
 		{
-			m_pClient->ClearCache (SyncId);
+			m_pClientPeer->ClearCache (SyncId);
 			m_IndexMgr.ClearIndex ();
 			m_ColorizeMgr.Reset ();
 			m_LineRepresentMgr.ResetIncrementalRepresent ();
