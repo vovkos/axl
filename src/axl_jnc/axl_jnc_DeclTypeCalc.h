@@ -23,15 +23,17 @@ class CImportPtrType;
 
 //.............................................................................
 
-class CDeclTypeCalc
+class CDeclTypeCalc: protected CTypeModifiers
 {
 protected:
 	CModule* m_pModule;
 	rtl::CIteratorT <CDeclSuffix> m_Suffix;
-	uint_t m_TypeModifiers;
 
 public:
-	CDeclTypeCalc ();
+	CDeclTypeCalc ()
+	{
+		m_pModule = NULL;
+	}
 
 	CType*
 	CalcType (
@@ -42,7 +44,7 @@ public:
 	{
 		return CalcType (
 			pDeclarator->GetBaseType (),
-			pDeclarator->GetTypeModifiers (),
+			pDeclarator,
 			pDeclarator->GetPointerPrefixList (),
 			pDeclarator->GetSuffixList (),
 			pElementCountValue,
@@ -53,7 +55,7 @@ public:
 	CType*
 	CalcType (
 		CType* pBaseType,
-		uint_t TypeModifiers,
+		CTypeModifiers* pTypeModifiers,
 		const rtl::CConstListT <CDeclPointerPrefix>& PointerPrefixList,
 		const rtl::CConstListT <CDeclSuffix>& SuffixList,
 		CValue* pElementCountValue,

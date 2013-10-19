@@ -7,16 +7,10 @@ namespace jnc {
 	
 //.............................................................................
 
-CDeclTypeCalc::CDeclTypeCalc ()
-{
-	m_pModule = NULL;
-	m_TypeModifiers = 0;
-}
-
 CType*
 CDeclTypeCalc::CalcType (
 	CType* pBaseType,
-	uint_t TypeModifiers,
+	CTypeModifiers* pTypeModifiers,
 	const rtl::CConstListT <CDeclPointerPrefix>& PointerPrefixList,
 	const rtl::CConstListT <CDeclSuffix>& SuffixList,
 	CValue* pElementCountValue,
@@ -123,7 +117,7 @@ CDeclTypeCalc::CalcType (
 			return NULL;
 	}
 
-	m_TypeModifiers |= TypeModifiers;
+	TakeOver (pTypeModifiers);
 
 	if (m_TypeModifiers & ETypeModifierMask_Integer)
 	{
@@ -262,7 +256,7 @@ CDeclTypeCalc::CalcPropertyGetterType (CDeclarator* pDeclarator)
 
 	CType* pType = CalcType (
 		pDeclarator->GetBaseType (),
-		TypeModifiers,
+		pDeclarator,
 		pDeclarator->GetPointerPrefixList (),
 		pDeclarator->GetSuffixList (),
 		NULL,
@@ -475,15 +469,18 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
 	uint_t Flags = pSuffix->GetFunctionTypeFlags ();
 	
-	if (m_TypeModifiers & ETypeModifier_Unwinder)
+	rtl::CBoxListT <CToken>* pPitcherCondition = NULL;
+
+	if (m_TypeModifiers & ETypeModifier_Pitcher)
 	{
 		if (pReturnType->GetTypeKind () == EType_Void)
 		{
-			err::SetFormatStringError ("'unwinder' cannot be applied to void function");
+			err::SetFormatStringError ("'pitcher' cannot be applied to void function");
 			return NULL;
 		}
 
-		Flags |= EFunctionTypeFlag_Unwinder;
+		Flags |= EFunctionTypeFlag_Pitcher;
+		pPitcherCondition = &m_PitcherCondition;
 	}
 
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
@@ -491,6 +488,7 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	return m_pModule->m_TypeMgr.CreateUserFunctionType (
 		CallConv,
 		pReturnType, 
+		pPitcherCondition,
 		pSuffix->GetArgArray (),
 		Flags		
 		);

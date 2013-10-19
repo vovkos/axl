@@ -422,6 +422,10 @@ primary_expr_s <CValue* $pValue>
 			{
 				return GetThisValueType ($pValue);
 			}
+	|	EToken_RetVal
+			{
+				return GetPitcherReturnValueType ($pValue);
+			}
 	|	EToken_Integer
 			{
 				$pValue->SetType (GetInt64TypeKind ($1.m_Data.m_Int64));

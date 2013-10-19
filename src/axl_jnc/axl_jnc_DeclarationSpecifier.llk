@@ -34,7 +34,7 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return $pTypeSpecifier->SetTypeModifier ($1.m_TypeModifier);
 			}
-	|	unwinder_modifier <$pTypeSpecifier>
+	|	pitcher_modifier <$pTypeSpecifier>
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -228,7 +228,7 @@ qualified_type_name_rslv
 				if (IsTypeSpecified ())
 					return false;
 			}
-		qualified_name $n		
+		qualified_name $n
 			{
 				return m_Stage == EStage_Pass1 || FindType ($n.m_Name) != NULL;
 			}
@@ -316,9 +316,9 @@ type_modifier
 			{
 				$.m_TypeModifier = ETypeModifier_Unsafe;
 			}
-	|	EToken_Unwinder
+	|	EToken_Pitcher
 			{
-				$.m_TypeModifier = ETypeModifier_Unwinder;
+				$.m_TypeModifier = ETypeModifier_Pitcher;
 			}
 	|	EToken_Cdecl
 			{
@@ -368,10 +368,10 @@ type_modifier
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-unwinder_modifier <CTypeSpecifier* $pTypeSpecifier>
-	:	EToken_Unwinder '(' expression_pass1 $u ')'
+pitcher_modifier <CTypeSpecifier* $pTypeSpecifier>
+	:	EToken_Pitcher '(' expression_pass1 $u ')'
 			{
-				return $pTypeSpecifier->SetUnwinderExpression (&$u.m_TokenList);
+				return $pTypeSpecifier->SetPitcherCondition (&$u.m_TokenList);
 			}
 	;
 

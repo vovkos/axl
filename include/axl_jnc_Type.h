@@ -167,7 +167,7 @@ enum ETypeModifier
 	ETypeModifier_Event       = 0x00010000,
 	ETypeModifier_EventD      = 0x00020000,
 	ETypeModifier_Reactor     = 0x00040000,
-	ETypeModifier_Unwinder    = 0x00080000,
+	ETypeModifier_Pitcher     = 0x00080000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -182,13 +182,13 @@ enum ETypeModifierMask
 		ETypeModifier_Function | 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall |
-		ETypeModifier_Unwinder,
+		ETypeModifier_Pitcher,
 
 	ETypeModifierMask_Property = 
 		ETypeModifier_Property | 
 		ETypeModifier_Cdecl | 
 		ETypeModifier_Stdcall |
-		ETypeModifier_Unwinder |
+		ETypeModifier_Pitcher |
 		ETypeModifier_Const | 
 		ETypeModifier_Bindable | 
 		ETypeModifier_Indexed,

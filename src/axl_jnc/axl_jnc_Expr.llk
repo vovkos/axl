@@ -587,11 +587,11 @@ unary_operator_expr <CValue* $pValue>
 			}
 	|	EToken_Try 
 			{
-				m_pModule->m_ControlFlowMgr.LockUnwinding ();
+				m_pModule->m_ControlFlowMgr.LockThrow ();
 			}
 		unary_expr <$pValue>
 			{
-				m_pModule->m_ControlFlowMgr.UnlockUnwinding ();
+				m_pModule->m_ControlFlowMgr.UnlockThrow ();
 			}
 	|	resolver (cast_operator_rslv) 
 		'(' storage_specifier $s? type_name $t ')' unary_expr <$pValue> 
@@ -738,6 +738,10 @@ primary_expr <CValue* $pValue>
 	|	EToken_This
 			{
 				return GetThisValue ($pValue);
+			}
+	|	EToken_RetVal
+			{
+				return GetPitcherReturnValue ($pValue);
 			}
 	|	EToken_Integer
 			{

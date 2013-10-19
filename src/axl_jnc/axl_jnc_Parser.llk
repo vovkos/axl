@@ -97,6 +97,7 @@ Members
 	CProperty* m_pConstructorProperty;
 
 	CValue m_CurlyInitializerTargetValue;
+	CValue m_PitcherReturnValue;
 
 	// saved attributes
 
@@ -361,26 +362,13 @@ Members2
 
 	bool
 	GetThisValueType (CValue* pValue);
-/*
-	bool
-	DeclareAutoGetValue (
-		CType* pType,
-		CDeclarator* pDeclarator,
-		uint_t PtrTypeFlags
-		);
 
 	bool
-	GetAutoGetValue (CValue* pValue);
+	GetPitcherReturnValue (CValue* pValue);
 
 	bool
-	GetAutoGetValueType (CValue* pValue);
+	GetPitcherReturnValueType (CValue* pValue);
 
-	bool
-	GetOnChange (CValue* pValue);
-
-	bool
-	GetOnChangeType (CValue* pValue);
-*/
 	bool
 	PrepareCurlyInitializerNamedItem (
 		TCurlyInitializer* pInitializer, 

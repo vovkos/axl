@@ -57,6 +57,28 @@ CFunctionType::GetThisTargetType ()
 	}
 }
 
+bool
+CFunctionType::IsPitcherMatch (CFunctionType* pType)
+{
+	if (m_pReturnType->Cmp (pType->m_pReturnType) != 0 ||
+		(m_Flags & EFunctionTypeFlag_Pitcher) != (pType->m_Flags & EFunctionTypeFlag_Pitcher) ||
+		m_PitcherCondition.GetCount () != pType->m_PitcherCondition.GetCount ())
+		return false;
+
+	rtl::CBoxIteratorT <CToken> Token1 = m_PitcherCondition.GetHead ();
+	rtl::CBoxIteratorT <CToken> Token2 = pType->m_PitcherCondition.GetHead ();
+
+	for (; Token1 && Token2; Token1++, Token2++)
+	{
+		if (Token1->m_Token != Token2->m_Token)
+			return false;
+
+		#pragma AXL_TODO ("check token data also. in fact, need to come up with something smarter than token cmp")
+	}
+	
+	return true;
+}
+
 rtl::CString
 CFunctionType::GetArgSignature ()
 {
@@ -289,7 +311,7 @@ CFunctionType::GetTypeModifierString ()
 	if (!m_TypeModifierString.IsEmpty ())
 		return m_TypeModifierString;
 
-	if (!m_CallConv && !(m_Flags & EFunctionTypeFlag_Unwinder))
+	if (!m_CallConv && !(m_Flags & EFunctionTypeFlag_Pitcher))
 		return rtl::CString ();
 
 	if (m_CallConv)
@@ -298,8 +320,8 @@ CFunctionType::GetTypeModifierString ()
 		m_TypeModifierString += ' ';
 	}
 
-	if (m_Flags & EFunctionTypeFlag_Unwinder)
-		m_TypeModifierString.Append ("unwinder ");
+	if (m_Flags & EFunctionTypeFlag_Pitcher)
+		m_TypeModifierString.Append ("pitcher ");
 
 	return m_TypeModifierString;
 }

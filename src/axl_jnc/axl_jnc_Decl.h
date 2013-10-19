@@ -18,7 +18,7 @@ class CTypeModifiers
 {
 protected:
 	uint_t m_TypeModifiers;
-	rtl::CBoxListT <CToken> m_UnwinderExpression;
+	rtl::CBoxListT <CToken> m_PitcherCondition;
 
 public:
 	CTypeModifiers ()
@@ -45,13 +45,13 @@ public:
 	ClearTypeModifiers (int ModifierMask);
 
 	rtl::CConstBoxListT <CToken>
-	GetUnwinderExpression ()
+	GetPitcherCondition ()
 	{
-		return m_UnwinderExpression;
+		return m_PitcherCondition;
 	}
 
 	bool
-	SetUnwinderExpression (rtl::CBoxListT <CToken>* pExpression);
+	SetPitcherCondition (rtl::CBoxListT <CToken>* pExpression);
 
 protected:
 	bool

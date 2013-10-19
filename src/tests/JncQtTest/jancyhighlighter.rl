@@ -66,7 +66,7 @@ main := |*
 'weak'            |
 'thin'            |
 'unsafe'          |
-'unwinder'        |
+'pitcher'         |
 'cdecl'           |
 'stdcall'         |
 'function'        |

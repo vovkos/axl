@@ -123,7 +123,7 @@ main := |*
 'weak'           { CreateToken (EToken_Weak); };
 'thin'           { CreateToken (EToken_Thin); };
 'unsafe'         { CreateToken (EToken_Unsafe); };
-'unwinder'       { CreateToken (EToken_Unwinder); };
+'pitcher'        { CreateToken (EToken_Pitcher); };
 'cdecl'          { CreateToken (EToken_Cdecl); };
 'stdcall'        { CreateToken (EToken_Stdcall); };
 'function'       { CreateToken (EToken_Function); };

@@ -76,12 +76,10 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	pScope->m_EndPos = Pos;
 	pScope->m_pParentNamespace = m_pCurrentNamespace;
 
-	bool IsUnwindable = 
-		m_pCurrentScope ? (m_pCurrentScope->m_Flags & EScopeFlag_Unwindable) != 0 :
-		(pFunction->GetType ()->GetFlags () & EFunctionTypeFlag_Unwinder) != 0;
-
-	if (IsUnwindable)
-		pScope->m_Flags |= EScopeFlag_Unwindable;
+	if (m_pCurrentScope)
+		pScope->m_Flags |= m_pCurrentScope->m_Flags & (EScopeFlag_CanThrow | EScopeFlag_HasFinally);
+	else if (pFunction->GetType ()->GetFlags () & EFunctionTypeFlag_Pitcher)
+		pScope->m_Flags |= EScopeFlag_CanThrow;
 
 	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
 	{

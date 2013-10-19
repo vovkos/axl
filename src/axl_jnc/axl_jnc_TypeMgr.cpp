@@ -785,6 +785,7 @@ CFunctionType*
 CTypeMgr::CreateUserFunctionType (
 	ECallConv CallConv,
 	CType* pReturnType,
+	rtl::CBoxListT <CToken>* pPitcherCondition,
 	const rtl::CArrayT <CFunctionArg*>& ArgArray,
 	uint_t Flags
 	)
@@ -807,6 +808,9 @@ CTypeMgr::CreateUserFunctionType (
 	pType->m_CallConv = CallConv;
 	pType->m_Flags = Flags | EModuleItemFlag_User;
 	pType->m_ArgArray = ArgArray;
+
+	if (pPitcherCondition)
+		pType->m_PitcherCondition.TakeOver (pPitcherCondition);
 
 	m_FunctionTypeList.InsertTail (pType);
 

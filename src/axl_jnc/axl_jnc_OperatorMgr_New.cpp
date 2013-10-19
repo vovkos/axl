@@ -354,14 +354,18 @@ COperatorMgr::ParseInitializer (
 }
 
 bool
-COperatorMgr::ParseExpression (
+COperatorMgr::ParseExpressionEx (
 	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+	const CValue& PitcherReturnValue,
+	uint_t Flags,
 	CValue* pResultValue
 	)
 {
 	CParser Parser;
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
+	Parser.m_PitcherReturnValue = PitcherReturnValue;
+	Parser.m_Flags |= Flags;
 
 	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
 
@@ -379,19 +383,11 @@ COperatorMgr::ParseConstExpression (
 	CValue* pResultValue
 	)
 {
-	CParser Parser;
-	Parser.m_pModule = m_pModule;
-	Parser.m_Stage = CParser::EStage_Pass2;
-	Parser.m_Flags |= CParser::EFlag_ConstExpression;
-
-	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();
-
-	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, ExpressionTokenList);
+	bool Result = ParseExpression (ExpressionTokenList, CParser::EFlag_ConstExpression, pResultValue);
 	if (!Result)
 		return false;
 
-	ASSERT (Parser.m_ExpressionValue.GetValueKind () == EValue_Const);
-	*pResultValue = Parser.m_ExpressionValue;
+	ASSERT (pResultValue->GetValueKind () == EValue_Const);
 	return true;
 }
 

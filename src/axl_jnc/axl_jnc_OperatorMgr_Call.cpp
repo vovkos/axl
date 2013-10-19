@@ -563,44 +563,25 @@ COperatorMgr::CallImpl (
 		pResultValue
 		);
 
-	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Unwinder) &&
-		m_pModule->m_ControlFlowMgr.IsUnwindingEnabled ())
+	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) && 
+		!m_pModule->m_ControlFlowMgr.IsThrowLocked ())
 	{
 		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		if (!(pScope->GetFlags () & EScopeFlag_Unwindable))
+		if (!(pScope->GetFlags () & EScopeFlag_CanThrow))
 		{
 			err::SetFormatStringError (
-				"cannot call 'unwinder' from here ('%s' is not 'unwinder' and there is no 'try' or 'catch')",
+				"cannot call 'pitcher' from here ('%s' is not 'pitcher' and there is no 'try' or 'catch')",
 				m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
 				);
 			return false;
 		}
 
-		CValue IndicatorValue;
-
-		Result = 
-			GetUnwindIndicator (*pResultValue, &IndicatorValue) &&
-			m_pModule->m_ControlFlowMgr.Unwind (IndicatorValue);
-
+		Result = m_pModule->m_ControlFlowMgr.Throw (*pResultValue, pFunctionType);
 		if (!Result)
 			return false;
 	}
 
 	return true;
-}
-
-bool
-COperatorMgr::GetUnwindIndicator (
-	const CValue& ReturnValue,
-	CValue* pResultValue
-	)
-{
-	// todo: more logic here
-	// if function has unwinder specifier, check retval against unwinder expression
-	// else, for integers, compare to -1
-	// else, apply logical-not
-
-	return UnaryOperator (EUnOp_LogNot, ReturnValue, pResultValue);
 }
 
 void

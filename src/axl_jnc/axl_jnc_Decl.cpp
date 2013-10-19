@@ -12,14 +12,14 @@ void
 CTypeModifiers::Clear ()
 {
 	m_TypeModifiers = 0;
-	m_UnwinderExpression.Clear ();	
+	m_PitcherCondition.Clear ();	
 }
 
 void
 CTypeModifiers::TakeOver (CTypeModifiers* pSrc)
 {
 	m_TypeModifiers = pSrc->m_TypeModifiers;
-	m_UnwinderExpression.TakeOver (&pSrc->m_UnwinderExpression);
+	m_PitcherCondition.TakeOver (&pSrc->m_PitcherCondition);
 
 	pSrc->Clear ();
 }
@@ -50,7 +50,7 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		ETypeModifierMask_Event,    // ETypeModifier_Event            = 0x00010000,
 		ETypeModifierMask_Event,    // ETypeModifier_EventD           = 0x00020000,
 		ETypeModifierMask_TypeKind, // ETypeModifier_Reactor          = 0x00040000,
-		0,                          // ETypeModifier_Unwinder         = 0x00080000,
+		0,                          // ETypeModifier_Pitcher         = 0x00080000,
 	};
 
 	// check duplicates
@@ -121,13 +121,13 @@ CTypeModifiers::CheckAntiTypeModifiers (int ModifierMask)
 }
 
 bool
-CTypeModifiers::SetUnwinderExpression (rtl::CBoxListT <CToken>* pExpression)
+CTypeModifiers::SetPitcherCondition (rtl::CBoxListT <CToken>* pExpression)
 {
-	bool Result = SetTypeModifier (ETypeModifier_Unwinder);
+	bool Result = SetTypeModifier (ETypeModifier_Pitcher);
 	if (!Result)
 		return false;
 
-	m_UnwinderExpression.TakeOver (pExpression);
+	m_PitcherCondition.TakeOver (pExpression);
 	return true;
 }
 

@@ -68,7 +68,7 @@ enum EToken
 	EToken_Weak,
 	EToken_Thin,
 	EToken_Unsafe,
-	EToken_Unwinder,
+	EToken_Pitcher,
 	EToken_Cdecl,
 	EToken_Stdcall,
 	EToken_Function,
@@ -242,7 +242,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_LEX_TOKEN_NAME (EToken_Thin,         "thin")
 	AXL_LEX_TOKEN_NAME (EToken_Unsafe,       "unsafe")
-	AXL_LEX_TOKEN_NAME (EToken_Unwinder,     "unwinder")
+	AXL_LEX_TOKEN_NAME (EToken_Pitcher,     "pitcher")
 	AXL_LEX_TOKEN_NAME (EToken_Cdecl,        "cdecl")
 	AXL_LEX_TOKEN_NAME (EToken_Stdcall,      "stdcall")
 	AXL_LEX_TOKEN_NAME (EToken_Function,     "function")

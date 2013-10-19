@@ -535,10 +535,41 @@ public:
 		);
 
 	bool
+	ParseExpressionEx (
+		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+		const CValue& PitcherReturnValue,
+		uint_t ParserFlags,
+		CValue* pResultValue
+		);
+
+	bool
+	ParsePitcherCondition (
+		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+		const CValue& PitcherReturnValue,
+		CValue* pResultValue
+		)
+	{
+		return ParseExpressionEx (ExpressionTokenList, PitcherReturnValue, 0, pResultValue);
+	}
+
+	bool
+	ParseExpression (
+		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
+		uint_t ParserFlags,
+		CValue* pResultValue
+		)
+	{
+		return ParseExpressionEx (ExpressionTokenList, CValue (), ParserFlags, pResultValue);
+	}
+
+	bool
 	ParseExpression (
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		CValue* pResultValue
-		);
+		)
+	{
+		return ParseExpressionEx (ExpressionTokenList, CValue (), 0, pResultValue);
+	}
 
 	bool
 	ParseConstExpression (
@@ -1386,12 +1417,6 @@ protected:
 		const CValue& PfnValue,
 		CFunctionType* pFunctionType,
 		rtl::CBoxListT <CValue>* pArgList,
-		CValue* pResultValue
-		);
-
-	bool
-	GetUnwindIndicator (
-		const CValue& ReturnValue,
 		CValue* pResultValue
 		);
 

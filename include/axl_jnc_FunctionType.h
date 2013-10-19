@@ -24,7 +24,7 @@ enum EFunctionTypeFlag
 {
 	EFunctionTypeFlag_VarArg       = 0x010000,
 	EFunctionTypeFlag_UnsafeVarArg = 0x020000,
-	EFunctionTypeFlag_Unwinder     = 0x040000,
+	EFunctionTypeFlag_Pitcher      = 0x040000,
 };
 
 //.............................................................................
@@ -92,6 +92,7 @@ protected:
 	CImportType* m_pReturnType_i;
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
 	ECallConv m_CallConv;
+	rtl::CBoxListT <CToken> m_PitcherCondition;
 	rtl::CString m_ArgSignature;
 	rtl::CString m_TypeModifierString;
 	rtl::CString m_ArgString;
@@ -127,6 +128,15 @@ public:
 	{
 		return m_pReturnType_i;
 	}
+
+	rtl::CConstBoxListT <CToken> 
+	GetPitcherCondition ()
+	{
+		return m_PitcherCondition;
+	}
+
+	bool
+	IsPitcherMatch (CFunctionType* pType);
 
 	rtl::CArrayT <CFunctionArg*> 
 	GetArgArray ()

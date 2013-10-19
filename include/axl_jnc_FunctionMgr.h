@@ -268,7 +268,7 @@ protected:
 	rtl::CStringHashTableMapT <CFunction*> m_ScheduleLauncherFunctionMap;
 
 	CFunction* m_pCurrentFunction;
-	
+
 	CValue m_ThisValue;
 	CValue m_ScopeLevelValue;
 	CValue m_VTablePtrPtrValue; 

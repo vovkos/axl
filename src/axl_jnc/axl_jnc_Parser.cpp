@@ -85,13 +85,14 @@ CParser::PreCreateLandingPads (uint_t Flags)
 	{
 		ASSERT (!pScope->m_pCatchBlock);
 		pScope->m_pCatchBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("catch_block");
-		pScope->m_Flags |= EScopeFlag_Unwindable;
+		pScope->m_Flags |= EScopeFlag_CanThrow;
 	}
 
 	if (Flags & ELandingPadFlag_Finally)
 	{
 		ASSERT (!pScope->m_pFinallyBlock);
 		pScope->m_pFinallyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("finally_block");
+		pScope->m_Flags |= EScopeFlag_HasFinally;
 		
 		rtl::CString Name = "finally_return_addr";
 		CType* pType = GetSimpleType (m_pModule, EType_Int);
@@ -2122,87 +2123,31 @@ CParser::GetThisValueType (CValue* pValue)
 	return true;
 }
 
-/*
-
 bool
-CParser::GetOnChange (CValue* pValue)
+CParser::GetPitcherReturnValue (CValue* pValue)
 {
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	CProperty* pProperty = pFunction->GetProperty ();
-
-	if (!pProperty)
+	if (m_PitcherReturnValue.IsEmpty ())
 	{
-		err::SetFormatStringError (
-			"function '%s' has no 'onchange' field", 
-			pFunction->m_Tag.cc ()
-			);
+		err::SetFormatStringError ("'retval' can only be used in 'pitcher' condition");
 		return false;
 	}
 
-	CValue PropertyValue = pProperty;
-	if (pProperty->IsMember ())
-		PropertyValue.InsertToClosureHead (m_pModule->m_FunctionMgr.GetThisValue ());
-
-	return m_pModule->m_OperatorMgr.GetPropertyOnChange (PropertyValue, pValue);
+	*pValue = m_PitcherReturnValue;
+	return true;
 }
 
 bool
-CParser::GetOnChangeType (CValue* pValue)
+CParser::GetPitcherReturnValueType (CValue* pValue)
 {
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	CProperty* pProperty = pFunction->GetProperty ();
-
-	if (!pProperty)
+	if (m_PitcherReturnValue.IsEmpty ())
 	{
-		err::SetFormatStringError (
-			"function '%s' has no 'onchange' field", 
-			pFunction->m_Tag.cc ()
-			);
+		err::SetFormatStringError ("'retval' can only be used in 'pitcher' condition");
 		return false;
 	}
 
-	return m_pModule->m_OperatorMgr.GetPropertyOnChangeType (pProperty, pValue);
+	pValue->SetType (m_PitcherReturnValue.GetType ());
+	return true;
 }
-
-bool
-CParser::GetAutoGetValue (CValue* pValue)
-{
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	CProperty* pProperty = pFunction->GetProperty ();
-
-	if (!pProperty)
-	{
-		err::SetFormatStringError (
-			"function '%s' has no 'autoget' field", 
-			pFunction->m_Tag.cc ()
-			);
-		return false;
-	}
-
-	CValue PropertyValue = pProperty;
-	if (pProperty->IsMember ())
-		PropertyValue.InsertToClosureHead (m_pModule->m_FunctionMgr.GetThisValue ());
-
-	return m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (PropertyValue, pValue);
-}
-
-bool
-CParser::GetAutoGetValueType (CValue* pValue)
-{
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	if (!pFunction->m_pProperty)
-	{
-		err::SetFormatStringError (
-			"function '%s' has no 'autoget' field", 
-			pFunction->m_Tag.cc ()
-			);
-		return false;
-	}
-
-	return m_pModule->m_OperatorMgr.GetPropertyAutoGetValueType (pFunction->m_pProperty, pValue);
-}
-
-*/
 
 bool
 CParser::PrepareCurlyInitializerNamedItem (

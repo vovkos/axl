@@ -13,7 +13,7 @@ CControlFlowMgr::CControlFlowMgr ()
 	ASSERT (m_pModule);
 
 	m_Flags = 0;
-	m_UnwindingLockCount = 0;
+	m_ThrowLockCount = 0;
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
 	m_pSilentReturnBlock = NULL;
@@ -24,7 +24,7 @@ void
 CControlFlowMgr::Clear ()
 {
 	m_Flags = 0;
-	m_UnwindingLockCount = 0;
+	m_ThrowLockCount = 0;
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
@@ -275,7 +275,26 @@ CControlFlowMgr::Return (
 		if (!Result)
 			return false;
 
-		OnLeaveScope ();
+		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+		if (!(pScope->GetFlags () & EScopeFlag_HasFinally))
+		{
+			OnLeaveScope ();
+		}
+		else
+		{
+			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
+				EStorage_Stack, 
+				"savedReturnValue", 
+				"savedReturnValue",
+				pReturnType
+				);
+
+			m_pModule->m_VariableMgr.AllocatePrimeInitializeVariable (pVariable);
+			m_pModule->m_OperatorMgr.StoreDataRef (pVariable, ReturnValue);
+			OnLeaveScope ();
+			m_pModule->m_OperatorMgr.LoadDataRef (pVariable, &ReturnValue);
+		}
+
 		RestoreScopeLevel ();
 		m_pModule->m_LlvmIrBuilder.CreateRet (ReturnValue);
 	}
@@ -287,14 +306,47 @@ CControlFlowMgr::Return (
 }
 
 bool
-CControlFlowMgr::Unwind (const CValue& IndicatorValue)
+CControlFlowMgr::Throw (
+	const CValue& ReturnValue,
+	CFunctionType* pFunctionType
+	)
 {
+	ASSERT (pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher);
+
 	bool Result;
 
-	CBasicBlock* pUnwindBlock = CreateBlock ("unwind_block");
+	CBasicBlock* pThrowBlock = CreateBlock ("throw_block");
 	CBasicBlock* pFollowBlock = CreateBlock ("follow_block");
 
-	Result = ConditionalJump (IndicatorValue, pUnwindBlock, pFollowBlock);
+	CType* pPitcherReturnType = pFunctionType->GetReturnType ();
+	rtl::CConstBoxListT <CToken> PitcherCondition = pFunctionType->GetPitcherCondition ();
+	
+	CValue IndicatorValue;
+	if (!PitcherCondition.IsEmpty ())
+	{
+		Result = m_pModule->m_OperatorMgr.ParsePitcherCondition (PitcherCondition, ReturnValue, &IndicatorValue);
+		if (!Result)
+			return false;
+	}
+	else if (pPitcherReturnType->GetTypeKindFlags () & ETypeKindFlag_Integer)
+	{
+		uint64_t MinusOne = -1;
+
+		CValue MinusOneValue;
+		MinusOneValue.CreateConst (&MinusOne, pPitcherReturnType);
+
+		Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, ReturnValue, MinusOneValue, &IndicatorValue);
+		if (!Result)
+			return false;
+	}
+	else
+	{
+		Result = m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_LogNot, ReturnValue, &IndicatorValue);
+		if (!Result)
+			return false;
+	}
+
+	Result = ConditionalJump (IndicatorValue, pThrowBlock, pFollowBlock);
 	if (!Result)
 		return false;
 
@@ -308,8 +360,32 @@ CControlFlowMgr::Unwind (const CValue& IndicatorValue)
 	}
 	else
 	{
-		CType* pReturnType = m_pModule->m_FunctionMgr.GetCurrentFunction ()->GetType ()->GetReturnType ();
-		Return (pReturnType->GetZeroValue ());	
+		CFunctionType* pCurrentFunctionType = m_pModule->m_FunctionMgr.GetCurrentFunction ()->GetType ();
+		CType* pCurrentReturnType = pCurrentFunctionType->GetReturnType ();
+
+		CValue ThrowValue;
+		if (!pCurrentFunctionType->GetPitcherCondition ().IsEmpty ()) 
+		{
+			if (!pCurrentFunctionType->IsPitcherMatch (pFunctionType))
+			{
+				err::SetFormatStringError ("functions with pitcher conditions need to 'catch' and 'return' manually");
+				return false;
+			}
+
+			// but if pitcher condition matches, we can re-throw automatically
+			ThrowValue = ReturnValue;
+		}
+		else if (pCurrentReturnType->GetTypeKindFlags () & ETypeKindFlag_Integer)
+		{
+			uint64_t MinusOne = -1;
+			ThrowValue.CreateConst (&MinusOne, pCurrentReturnType);
+		}
+		else
+		{
+			ThrowValue = pCurrentReturnType->GetZeroValue ();
+		}
+
+		Return (ThrowValue);
 	}
 
 	Follow (pFollowBlock);

@@ -10,6 +10,8 @@
 namespace axl {
 namespace jnc {
 
+class CFunctionType;
+
 //.............................................................................
 
 struct TIfStmt
@@ -95,7 +97,7 @@ protected:
 	CBasicBlock* m_pUnreachableBlock;
 
 	uint_t m_Flags;
-	intptr_t m_UnwindingLockCount;
+	intptr_t m_ThrowLockCount;
 
 public:
 	CControlFlowMgr ();
@@ -116,21 +118,21 @@ public:
 	}
 
 	void
-	LockUnwinding ()
+	LockThrow ()
 	{
-		m_UnwindingLockCount++;
+		m_ThrowLockCount++;
 	}
 
 	void
-	UnlockUnwinding ()
+	UnlockThrow ()
 	{
-		m_UnwindingLockCount--;
+		m_ThrowLockCount--;
 	}
 
 	bool
-	IsUnwindingEnabled ()
+	IsThrowLocked ()
 	{
-		return m_UnwindingLockCount == 0;
+		return m_ThrowLockCount > 0;
 	}
 
 	void
@@ -192,7 +194,10 @@ public:
 	}
 
 	bool
-	Unwind (const CValue& IndicatorValue);
+	Throw (
+		const CValue& ReturnValue,
+		CFunctionType* pType
+		);
 
 	bool
 	Catch ();

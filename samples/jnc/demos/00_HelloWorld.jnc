@@ -1,28 +1,28 @@
 //.............................................................................
 
-bool unwinder baz (int x)
+int pitcher (retval < 0) baz (int a)
 {
-	printf ("baz (%d)\n", x);
-	return x >= 0;	
+	printf ("baz (%d)\n", a);
+	return a;
 }
 
-bool unwinder bar ()
+int pitcher (retval < 0) bar ()
 {
 	printf ("bar ()\n");
 
 	baz (10);
-	baz (20);
+	baz (0);
 
-	bool result = baz (-1);
+	int result = baz (-5);
 	printf ("baz returned %d\n", result);
 
 	baz (30);
 	return true;
-
+/*
 catch:
 	printf ("bar.catch\n");	
 	return false;
-
+*/
 finally:
 	printf ("bar.finally\n");	
 }
@@ -35,7 +35,7 @@ int main ()
 {
 	printf ("hello world!\n");
 
-	bool result = try bar ();
+	int result = try bar ();
 	printf ("bar returned %d\n", result);		
 
 	return 0;
