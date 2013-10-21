@@ -236,6 +236,27 @@ CTypeMgr::ResolveImportTypes ()
 	return true;
 }
 
+void
+CTypeMgr::UpdateTypeSignature (
+	CType* pType,
+	const rtl::CString& Signature
+	)
+{
+	if (pType->m_Signature == Signature)
+		return;
+
+	if (!pType->m_TypeMapIt)
+	{
+		pType->m_Signature = Signature;
+		return;
+	}
+
+	m_TypeMap.Delete (pType->m_TypeMapIt);
+	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = m_TypeMap.Goto (Signature);
+	pType->m_TypeMapIt->m_Value = pType;
+}
+
 CBitFieldType* 
 CTypeMgr::GetBitFieldType (
 	CType* pBaseType,
@@ -256,6 +277,7 @@ CTypeMgr::GetBitFieldType (
 	CBitFieldType* pType = AXL_MEM_NEW (CBitFieldType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_pBaseType = pBaseType;
 	pType->m_BitOffset = BitOffset;
 	pType->m_BitCount = BitCount;
@@ -343,6 +365,7 @@ CTypeMgr::GetArrayType (
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_pElementType = pElementType;
 	pType->m_ElementCount = ElementCount;
 	m_ArrayTypeList.InsertTail (pType);
@@ -700,6 +723,15 @@ CTypeMgr::GetFunctionType (
 	if (It->m_Value)
 	{
 		CFunctionType* pType = (CFunctionType*) It->m_Value;
+
+		size_t x = rtl::djb2 (Signature, Signature.GetLength ()) % m_TypeMap.GetBucketCount ();
+		size_t y = rtl::djb2 (pType->m_Signature, pType->m_Signature.GetLength ()) % m_TypeMap.GetBucketCount ();
+		if (pType->m_Signature != Signature)
+		{
+			_asm int 3;
+			m_TypeMap.Goto (Signature);
+		}
+
 		ASSERT (pType->m_Signature == Signature);
 		return pType;
 	}
@@ -707,6 +739,7 @@ CTypeMgr::GetFunctionType (
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_pReturnType = pReturnType;
 	pType->m_CallConv = CallConv;
 	pType->m_Flags = Flags;
@@ -772,6 +805,7 @@ CTypeMgr::GetFunctionType (
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_pReturnType = pReturnType;
 	pType->m_CallConv = CallConv;
 	pType->m_Flags = Flags;
@@ -925,6 +959,7 @@ CTypeMgr::GetPropertyType (
 	CPropertyType* pType = AXL_MEM_NEW (CPropertyType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_pGetterType = pGetterType;
 	pType->m_SetterType = SetterType;
 	pType->m_Flags = Flags;
@@ -1342,6 +1377,7 @@ CTypeMgr::GetFunctionClosureClassType (
 
 	CFunctionClosureClassType* pType = (CFunctionClosureClassType*) CreateUnnamedClassType (EClassType_FunctionClosure);
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_ClosureMap.Copy (pClosureMap, ArgCount);
 	pType->m_WeakMask = WeakMask;
 
@@ -1395,6 +1431,7 @@ CTypeMgr::GetPropertyClosureClassType (
 
 	CPropertyClosureClassType* pType = (CPropertyClosureClassType*) CreateUnnamedClassType (EClassType_PropertyClosure);
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_ClosureMap.Copy (pClosureMap, ArgCount);
 	pType->m_WeakMask = WeakMask;
 
@@ -1439,7 +1476,7 @@ CTypeMgr::GetDataClosureClassType (
 
 	CDataClosureClassType* pType = (CDataClosureClassType*) CreateUnnamedClassType (EClassType_DataClosure);
 	pType->m_Signature = Signature;
-
+	pType->m_TypeMapIt = It;
 	pType->CreateField (pTargetType->GetDataPtrType ());
 
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property");
@@ -1665,6 +1702,7 @@ CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format ("%s.ptr", pFunctionType->GetTypeString ().cc ());
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->CreateField (pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin, EPtrTypeFlag_Unsafe));
 	pType->CreateField (GetStdType (EStdType_ObjectPtr));
 	pType->EnsureLayout ();
@@ -1780,6 +1818,7 @@ CTypeMgr::GetPropertyPtrStructType (CPropertyType* pPropertyType)
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format ("%s.ptr", pPropertyType->GetTypeString ().cc ());
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->CreateField (pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType_c ());
 	pType->CreateField (GetStdType (EStdType_ObjectPtr));
 	pType->EnsureLayout ();
@@ -1808,6 +1847,7 @@ CTypeMgr::GetNamedImportType (
 	CNamedImportType* pType = AXL_MEM_NEW (CNamedImportType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_Name = Name;
 	pType->m_pAnchorNamespace = pAnchorNamespace;
 	pType->m_pModule = m_pModule;	
@@ -1842,6 +1882,7 @@ CTypeMgr::GetImportPtrType (
 	CImportPtrType* pType = AXL_MEM_NEW (CImportPtrType);
 	pType->m_pModule = m_pModule;
 	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
 	pType->m_pTargetType = pNamedImportType;
 	pType->m_TypeModifiers = TypeModifiers;
 	pType->m_Flags = Flags;

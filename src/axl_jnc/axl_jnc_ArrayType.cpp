@@ -82,7 +82,9 @@ CArrayType::CalcLayout ()
 		m_ElementCount = Value;
 	}
 
-	m_Signature = CreateSignature (m_pElementType, m_ElementCount);
+	rtl::CString Signature = CreateSignature (m_pElementType, m_ElementCount);
+	m_pModule->m_TypeMgr.UpdateTypeSignature (this, Signature);
+
 	m_Size = m_pElementType->GetSize () * m_ElementCount;
 	return true;
 }

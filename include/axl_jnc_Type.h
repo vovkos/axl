@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_ModuleItem.h"
+#include "axl_rtl_StringHashTable.h"
 
 namespace axl {
 namespace jnc {
@@ -465,6 +466,7 @@ protected:
 	EType m_TypeKind;
 	size_t m_Size;
 	size_t m_AlignFactor;
+	rtl::CStringHashTableMapIteratorT <CType*> m_TypeMapIt;
 	rtl::CString m_Signature;
 	rtl::CString m_TypeString;
 	llvm::Type* m_pLlvmType;

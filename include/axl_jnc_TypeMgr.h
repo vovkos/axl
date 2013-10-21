@@ -116,6 +116,12 @@ public:
 	bool
 	ResolveImportTypes ();
 
+	void
+	UpdateTypeSignature (
+		CType* pType,
+		const rtl::CString& Signature
+		);
+
 	rtl::CConstListT <CArrayType> 
 	GetArrayTypeList ()
 	{

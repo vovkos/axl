@@ -392,13 +392,14 @@ CFunctionType::CalcLayout ()
 
 	// update signature
 
-	m_Signature = CreateSignature (
+	rtl::CString Signature = CreateSignature (
 		m_CallConv, 
 		m_pReturnType, 
 		m_ArgArray, 
 		m_ArgArray.GetCount (), 
 		m_Flags
 		);
+	m_pModule->m_TypeMgr.UpdateTypeSignature (this, Signature);
 
 	return true;
 }
