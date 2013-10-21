@@ -1,14 +1,13 @@
-//.............................................................................
-
 // full property declaration syntax allows declaring properties with
 // overloaded setters, members fields, helper methods, constructors / destructors etc
+
+//.............................................................................
 
 int property g_prop
 {
 	int m_x = 5; // member field with in-place initializer
 
-	int 
-	get ()
+	int get ()
 	{
 		printf ("g_prop.get ()\n");
 		return m_x;
@@ -48,8 +47,7 @@ g_prop.set (double x)
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	int x = g_prop;
 
@@ -58,15 +56,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

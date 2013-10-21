@@ -1,7 +1,5 @@
 // jancy also brings a couple of enhancements for enumeration types.
-// in most languages enumerations expose member constant identifers to the parent namespace,
-// which i always thought was an inherently wrong design decision cause of namespace pollution.
-// enums in jancy conseal all member identifiers within enum namespace.
+// enums in jancy conseal member identifiers within enum namespace to prevent namespace pollution.
 // to simplify porting of existing C/C++ code jancy offers 'enumc' variation,
 // which behaves like a traditional C/C++ enum (exposing member identifiers).
 // yet another flavour of enums which i always wanted to have is flag enum, i.e. enum
@@ -42,8 +40,7 @@ enumc State
 
 // entry point
 
-int 
-main ()
+int main ()
 {
 	printf ("main ()\n");
 
@@ -63,15 +60,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

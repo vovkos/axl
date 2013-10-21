@@ -1,31 +1,5 @@
-//.............................................................................
-
-int pitcher (retval < 0) baz (int a)
-{
-	printf ("baz (%d)\n", a);
-	return a;
-}
-
-int pitcher (retval < 0) bar ()
-{
-	printf ("bar ()\n");
-
-	baz (10);
-	baz (0);
-
-	int result = baz (-5);
-	printf ("baz returned %d\n", result);
-
-	baz (30);
-	return true;
-/*
-catch:
-	printf ("bar.catch\n");	
-	return false;
-*/
-finally:
-	printf ("bar.finally\n");	
-}
+// the simpliest possible program in jancy
+// at this level jancy looks exactly like C/C++
 
 //.............................................................................
 
@@ -34,20 +8,7 @@ finally:
 int main ()
 {
 	printf ("hello world!\n");
-
-	int result = try bar ();
-	printf ("bar returned %d\n", result);		
-
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int printf (
-	const char unsafe thin* format,
-	unsafe ...
-	);
 
 //.............................................................................

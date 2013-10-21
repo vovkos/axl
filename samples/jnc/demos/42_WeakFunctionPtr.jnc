@@ -1,3 +1,7 @@
+// closure function pointer can be 'weak', meaning they do not retain selected objects in closure
+// of course it's up to developer to specify which closure members will be retained
+// and which ones will not
+
 //.............................................................................
 
 // class with a method to be called through function pointer
@@ -30,8 +34,7 @@ class C1
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	C1* p;
 	weak C1* wp;
@@ -71,15 +74,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

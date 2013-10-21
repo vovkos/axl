@@ -2,7 +2,7 @@
 // normal data pointers carry validator which contains permitted address range and target scope level
 // checking the scope level is necessary cause jancy allows stack allocation of data, which means
 // data pointer can become invalid without actual modification, just by running out of scope.
-// simply put, approach adopted by jancy is: 
+// simply put, approach used by jancy is: 
 // check data range on pointer access, check scope level on pointer assignment
 
 //.............................................................................
@@ -24,8 +24,11 @@ baz (unsafe thin int* p) // ... or they are unsafe
 
 int* g_p;
 
-int
-main ()
+//.............................................................................
+
+// entry point
+
+int main ()
 {
 	int* p;
 
@@ -48,15 +51,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

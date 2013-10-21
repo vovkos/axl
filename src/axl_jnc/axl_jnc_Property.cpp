@@ -250,7 +250,7 @@ CProperty::SetAutoGetValue (CModuleItem* pItem)
 
 	if (m_pGetter)
 	{
-		if (m_pGetter->GetType ()->Cmp (pGetterType) != 0)
+		if (m_pGetter->GetType ()->GetReturnType ()->Cmp (pType) != 0)
 		{
 			err::SetFormatStringError ("'autoget %s' does not match property declaration", pType->GetTypeString ().cc ());
 			return false;

@@ -7,11 +7,11 @@ class ModulePane;
 class Output;
 class MdiChild;
 
+//.............................................................................
+
 class StdLib: public jnc::CStdLib
 {
 public:
-	StdLib ();
-	
 	static
 	int
 	Printf (
@@ -19,6 +19,8 @@ public:
 		...
 		);	
 };
+
+//.............................................................................
 
 class MainWindow : public QMainWindow
 {

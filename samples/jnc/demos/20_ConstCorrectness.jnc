@@ -16,8 +16,7 @@ transpose (
 {
 	printf ("transpose (%d, %d)\n", src.m_x, src.m_y);
 
-	int x = src.m_x; // make it work when pDst and pSrc point to the same location
-
+	int x = src.m_x; // to ensure it works even when dst and src point to the same location
 	dst.m_x = src.m_y;
 	dst.m_y = x;
 
@@ -58,8 +57,7 @@ baz (const C1* p)
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	printf ("main ()\n");
 
@@ -74,15 +72,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

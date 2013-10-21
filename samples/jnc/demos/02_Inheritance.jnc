@@ -1,14 +1,13 @@
-// in jancy, simple multiple inheritance model is adopted
-// simple means no C++ virtual inheritance; multiple instances of shared bases (if any)
-// mulitple inheritance is extremely useful tool which allows natural implementation sharing
-// virtual methods are declared using keywords 'virtual' 'abstract' 'override'
+// jancy uses simple multiple inheritance model (multiple instances of shared bases -- if any)
+// virtual multiple inheritance model of C++ is not (and not planned to be) supported 
+// mulitple inheritance is an extremely useful tool which allows natural sharing of implementation
+// virtual methods are declared using keywords 'virtual', 'abstract' & 'override'
 
 //.............................................................................
 
 class I1
 {
-	abstract 
-	foo ();
+	abstract foo ();
 }
 
 class C1: I1
@@ -18,8 +17,7 @@ class C1: I1
 		printf ("C1.construct (%d)\n", a);
 	}
 
-	override
-	foo ()
+	override foo ()
 	{
 		printf ("C1.foo ()\n");		
 	}
@@ -29,11 +27,9 @@ class C1: I1
 
 class I2
 {
-	abstract 
-	bar ();
+	abstract bar ();
 
-	abstract 
-	baz (
+	abstract baz (
 		int x,
 		int y
 		); 
@@ -46,14 +42,12 @@ class C2: I2
 		printf ("C2.construct (%d)\n", a);
 	}
 
-	override
-	bar ()
+	override bar ()
 	{
 		printf ("C2.bar ()\n");		
 	}
 
-	override
-	baz (
+	override baz (
 		int x,
 		int y
 		)
@@ -87,15 +81,16 @@ class C3:
 		printf ("C3.construct (%d)\n", a);
 	}
 
-	override
-	baz (	
+	override baz (	
 		int x,
 		int y
 		);
 }
 
-override // it's ok to use storage specifier (must match the original one, of course)
-C3.baz (
+// it's ok to use storage specifier in out-of-class definition 
+// (must match the original one, of course)
+
+override C3.baz (
 	int x,
 	int y
 	)
@@ -109,8 +104,7 @@ C3.baz (
 
 // entry point
 
-int 
-main ()
+int main ()
 {
 	printf ("main ()\n");
 
@@ -124,15 +118,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

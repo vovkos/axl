@@ -36,6 +36,7 @@ CNamespaceMgr::AddStdItems ()
 		m_GlobalNamespace.AddItem (pJnc) &&
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrLen)) &&
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Rand)) &&
+		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Printf)) &&
 		pJnc->AddItem ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_Scheduler)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGc)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGcWaitForDestructors)) &&

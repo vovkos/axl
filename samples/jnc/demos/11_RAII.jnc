@@ -22,8 +22,9 @@ class C1
 
 //.............................................................................
 
-int
-main ()
+// entry point
+
+int main ()
 {
 	{
 	// classes are allocated on gc heap by default, so use explicit 'stack' specifier 
@@ -38,15 +39,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

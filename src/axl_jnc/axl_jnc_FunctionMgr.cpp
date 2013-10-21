@@ -1042,6 +1042,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateRand ();
 		break;
 
+	case EStdFunc_Printf:
+		pFunction = CreatePrintf ();
+		break;
+
 	case EStdFunc_AppendFmtLiteral_a:
 		pFunction = CreateAppendFmtLiteral_a ();
 		break;
@@ -1547,7 +1551,7 @@ CFunctionMgr::CreateSleep ()
 }
 
 // size_t
-// rtl.StrLen (nullable const char* p);
+// strlen (nullable const char* p);
 
 CFunction*
 CFunctionMgr::CreateStrLen ()
@@ -1565,7 +1569,7 @@ CFunctionMgr::CreateStrLen ()
 }
 
 // int
-// rtl.Rand ();
+// rand ();
 
 CFunction*
 CFunctionMgr::CreateRand ()
@@ -1573,6 +1577,25 @@ CFunctionMgr::CreateRand ()
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
 	CFunction* pFunction = CreateFunction ("rand", "rand", pType);
+	return pFunction;
+}
+
+// int
+// printf ();
+
+CFunction*
+CFunctionMgr::CreatePrintf ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+	CType* pFormatType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin, EPtrTypeFlag_Unsafe | EPtrTypeFlag_Const);
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (
+		pReturnType, 
+		&pFormatType, 1,
+		EFunctionTypeFlag_VarArg | EFunctionTypeFlag_UnsafeVarArg
+		);
+
+	CFunction* pFunction = CreateFunction ("printf", "printf", pType);
 	return pFunction;
 }
 

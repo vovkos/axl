@@ -23,15 +23,14 @@ class C1
 C1.m_foo.set (int x)
 {
 	printf ("C1.m_foo.set (%d)\n", x);
-	autoget = x;
+	m_value = x;
 }
 
 //.............................................................................
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	C1* p;
 	weak int property* wpp;
@@ -65,15 +64,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

@@ -1,14 +1,13 @@
-//.............................................................................
+// jancy provides a natural syntax for declaring simple properties
+// obviously it is only possible if property has no overloaded setters
 
-// simple property declaration syntax
-// possible if getter return type and setter arg type match
+//.............................................................................
 
 int property g_simpleProp;
 
 // accessor implementation
 
-int
-g_simpleProp.get ()
+int g_simpleProp.get ()
 {
 	printf ("g_simpleProp.get ()\n");
 	return rand () % 3;
@@ -25,8 +24,7 @@ g_simpleProp.set (int x)
 
 const int property g_simpleReadOnlyProp;
 
-int
-g_simpleReadOnlyProp.get ()
+int g_simpleReadOnlyProp.get ()
 {
 	printf ("g_simpleReadOnlyProp.get ()\n");
 	return rand () % 3;
@@ -36,8 +34,7 @@ g_simpleReadOnlyProp.get ()
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	int x = g_simpleProp;
 
@@ -49,16 +46,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
-
 
 //.............................................................................

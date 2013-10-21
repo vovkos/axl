@@ -1,15 +1,14 @@
-//.............................................................................
-
 // schedulers are used to put execution of a function into proper context/environment
 // good examples would be: posting a request to a worker thread, sending message to a worker window,
 // calling a function with mutex held etc
 
+//.............................................................................
+
 class LockScheduler: jnc.Scheduler
 {
-	// note how Schedule () has no information about target function argument  signature
+	// note how schedule () has no information about target function argument signature
 
-	override
-	schedule (function* pf ())
+	override schedule (function* pf ())
 	{
 		printf ("lock before call...\n");
 		pf ();
@@ -25,12 +24,18 @@ foo (
 	printf ("foo (%d, %d)\n", a, b);
 }
 
-int
-main ()
+//.............................................................................
+
+// entry point
+
+int main ()
 {
 	LockScheduler scheduler;
 
-	function* pf (int, int) = foo @ scheduler; 
+	function* pf (
+		int, 
+		int
+		) = foo @ scheduler; 
 
 	// result function pointer has the same argument signature as target function
 	// after passing the result function pointer as, say, completion routine,
@@ -43,15 +48,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

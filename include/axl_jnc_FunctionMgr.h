@@ -135,18 +135,22 @@ enum EStdFunc
 	// void
 	// jnc.Sleep (uint_t MsCount);
 
+	EStdFunc_Sleep,
+
 	// size_t
-	// jnc.StrLen (nullable const char* p);
+	// strlen (nullable const char* p);
 
 	EStdFunc_StrLen,
 
 	// int
-	// jnc.Rand ();
+	// rand ();
 
 	EStdFunc_Rand,
 
+	// int
+	// printf ();
 
-	EStdFunc_Sleep,
+	EStdFunc_Printf,
 
 	// jnc.TTlsStruct*
 	// jnc.GetTls ();
@@ -540,6 +544,9 @@ protected:
 
 	CFunction*
 	CreateRand ();
+
+	CFunction*
+	CreatePrintf ();
 
 	CFunction*
 	CreateGetTls ();

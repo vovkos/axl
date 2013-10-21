@@ -5,6 +5,7 @@ foo (int n)
 	printf ("foo (%d): TID = %08x\n", n, jnc.getCurrentThreadId ());
 
 	static int a [3];
+
 	once // 'once' block will be executed once per application run 
 	{
 		printf ("foo.static once\n");
@@ -34,26 +35,20 @@ threadProc ()
 		foo (i);
 }
 
-int
-main ()
+//.............................................................................
+
+// entry point
+
+int main ()
 {
 	for (int i = 0; i < 3; i++)
 		foo (i);
 
 	jnc.createThread (threadProc);
 
-	jnc.sleep (1000); // temp dirty solution. createThread should probably return some waitable object
+	// temp dirty solution. createThread () should probably return a waitable object
+	jnc.sleep (1000); 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

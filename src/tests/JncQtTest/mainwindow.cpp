@@ -8,10 +8,7 @@
 #include "moc_mainwindow.cpp"
 #include "qrc_jancyedit.cpp"
 
-StdLib::StdLib ()
-{
-	m_FunctionMap ["printf"] = (void*) Printf;
-}
+//.............................................................................
 
 int
 StdLib::Printf (
@@ -28,6 +25,8 @@ StdLib::Printf (
 
 	return Length;
 }
+
+//.............................................................................
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags)

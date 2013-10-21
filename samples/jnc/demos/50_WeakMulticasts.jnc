@@ -2,7 +2,7 @@
 // probably the most well known scenario in which weak pointers are extremely useful is
 // event-subscriber interaction model: usually developer does not want the pointer held by 
 // event to retain subscriber from being collected (which leads to subtle and hard to track leaks/bugs)
-// jancy fully addresses this issue by internally supporting 'weak' multicasts
+// jancy fully addresses this issue by out-of-the-box support of 'weak' multicasts
 
 //.............................................................................
 
@@ -32,8 +32,7 @@ class C1
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	weak multicast wmc ();
 
@@ -68,15 +67,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

@@ -1,6 +1,6 @@
 // class in jancy is a special kind of data, preceded with header containing type, 
 // virtual table pointer and other ancilliary information
-// contrary to most modern languages, default access is public
+// contrary to most modern languages though, default access is 'public'
 
 //.............................................................................
 
@@ -40,7 +40,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// implementation of member methods can be placed outside of class declaration, like in C++
+// implementation of member methods can be out-of-class (like in C++)
 
 C1.static construct ()
 {
@@ -72,10 +72,12 @@ C1.operator += (int d)
 
 // entry point
 
-int 
-main ()
+int main ()
 {
 	printf ("main ()\n");
+
+	// jancy does not implicitly convert class variables/field to pointer-to-class
+	// when programmer declares a class variable/field, he declares object, not a pointer-to-object
 
 	C1 c construct (100, 200); // equivalent to: C1* p = new C1 (100, 200);
 	c += 1;
@@ -83,15 +85,5 @@ main ()
 	printf ("C1 = { %d, %d }\n", c.m_x, c.m_y);
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* pFormat,
-	unsafe ...
-	);
 
 //.............................................................................

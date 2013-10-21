@@ -1,4 +1,8 @@
+// jancy provides a nice way of assigning aggregate values with curly initializers
+
 //.............................................................................
+
+// something to curly-initialize
 
 struct Point
 {
@@ -7,8 +11,11 @@ struct Point
 	int m_z;
 }
 
-int
-main ()
+//.............................................................................
+
+// entry point
+
+int main ()
 {
 	int a [] = { 1, 2, 3 };	 // classic C-style curly-intializers
 
@@ -39,15 +46,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

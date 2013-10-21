@@ -14,7 +14,7 @@ int autoget property g_foo;
 g_foo.set (int x)
 {
 	printf ("g_foo.set (%d)\n", x);
-	autoget = x;
+	m_value = x;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -26,7 +26,7 @@ class C1
 	m_bar.set (int x)
 	{
 		printf ("C1.m_bar.set (%d)\n", x);
-		autoget = x;
+		m_value = x;
 	}
 }
 
@@ -39,8 +39,7 @@ int indexed property g_baz (
 	unsigned int j
 	);
 
-int 
-g_baz.get (
+int g_baz.get (
 	unsigned int i,
 	unsigned int j
 	)
@@ -63,8 +62,7 @@ g_baz.set (
 
 // entry point
 
-int
-main ()
+int main ()
 {
 	// 'thin' property pointer is simply a pointer to property accessor table
 
@@ -97,15 +95,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

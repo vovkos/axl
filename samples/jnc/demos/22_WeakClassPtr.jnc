@@ -1,3 +1,7 @@
+// jancy provides built-in support of weak pointers to classes, i.e. pointers which
+// do not affect the lifetime of an object. weak pointer cannot be used to access an object
+// and can only be cast to strong pointer
+
 //.............................................................................
 
 class C1
@@ -15,8 +19,9 @@ class C1
 
 //.............................................................................
 
-int
-main ()
+// entry point
+
+int main ()
 {
 	C1* p;
 	weak C1* wp;
@@ -45,15 +50,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

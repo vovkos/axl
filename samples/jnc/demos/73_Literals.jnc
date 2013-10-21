@@ -1,7 +1,13 @@
+// jancy has 3 kinds of literals
+// good old c-style literal defines a const array of 'char's
+// hex literal is a nice and clean way of defining in-program const binary data blocks
+// formatting literal brings perl-style-formatting into a c-syntaxed language
+
 //.............................................................................
 
-int
-main ()
+// entry point
+
+int main ()
 {
 	// classic string literals produce const char array
 
@@ -29,15 +35,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

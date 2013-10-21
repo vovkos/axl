@@ -1,4 +1,4 @@
-// reactor is a unique feature of jancy which can significally simplify UI programming.
+// reactive programming support is a programming paradigm that significally simplifies UI programming.
 // the idea is to automate execution of certain 'update' actions when properties change.
 // imagine a complicated setting dialog with lots of relations between items, where values of 
 // certain settings control visibility, availability, color, etc of other dialog items / groups of items.
@@ -54,8 +54,7 @@ int g_rgb; // this value will be automatically updated
 // will be done automatically. if the required logic cannot be expressed by simple expression,
 // 'onchange' statement could be used (see the next demo)
 
-reactor 
-g_colorReactor (int Alpha)
+reactor g_colorReactor (int Alpha)
 {
 	updatePurple (g_red, g_blue, Alpha); 
 	updateYellow (g_red, g_green, Alpha);
@@ -68,8 +67,7 @@ g_colorReactor (int Alpha)
 
 // entry point
 
-int 
-main ()
+int main ()
 {
 	// starting reactor executes all the expressions in reactor block
 
@@ -88,15 +86,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

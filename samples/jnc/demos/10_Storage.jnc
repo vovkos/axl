@@ -42,11 +42,14 @@ class C2
 
 int g_staticGlobal; // for global variables, default storage is 'static'
 thread int g_threadGlobal;
-// thread int g_threadGlobal2 = 10; // <-- error: thread variables cannot be initialized
-// thread C1 g_threadGlobal3; // <-- error: thread variables cannot be aggregate
+// thread int g_threadGlobal2 = 10; // <-- error: global thread variables cannot be initialized
+// thread C1 g_threadGlobal3; // <-- error: global thread variables cannot be aggregate
 
-int
-main ()
+//.............................................................................
+
+// entry point
+
+int main ()
 {
 	printf ("main ()\n");
 
@@ -75,15 +78,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

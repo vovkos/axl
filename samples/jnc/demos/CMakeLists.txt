@@ -29,7 +29,7 @@ set (
 	45_WeakPropertyPtr.jnc
 	50_Multicasts.jnc
 	50_WeakMulticasts.jnc
-	60_Reactor.jnc
+	60_Reactors.jnc
 	61_OnChangeStmt.jnc
 	70_DualModifiers.jnc
 	71_Once.jnc
@@ -40,6 +40,7 @@ set (
 	76_ModuleConstructors.jnc
 	77_ExtensionNamespaces.jnc
 	78_Enums.jnc
+	80_Exceptions.jnc
 	)
 
 source_group (

@@ -15,8 +15,7 @@ unsigned int32 bindable g_ip4;
 
 // 'onchange' statement will be executed in response to change of properties enumerated in parentheses
 
-reactor 
-g_ipReactor ()
+reactor g_ipReactor ()
 {
 	onchange (g_useDhcp)
 	{
@@ -46,10 +45,9 @@ g_ipReactor ()
 
 // entry point
 
-int 
-main ()
+int main ()
 {
-	g_ipReactor.Start ();
+	g_ipReactor.start ();
 
 	g_useDhcp = true;
 
@@ -57,15 +55,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

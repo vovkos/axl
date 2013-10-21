@@ -27,8 +27,8 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.createThread"] = (void*) CreateThread;
 	m_FunctionMap ["jnc.sleep"] = (void*) Sleep;
 	m_FunctionMap ["jnc.getTls"] = (void*) GetTls;
-	m_FunctionMap ["jnc.strlen"] = (void*) StrLen;
-	m_FunctionMap ["jnc.rand"] = (void*) Rand;
+	m_FunctionMap ["strlen"] = (void*) StrLen;
+	m_FunctionMap ["rand"] = (void*) Rand;
 	m_FunctionMap ["jnc.appendFmtLiteral_a"] = (void*) AppendFmtLiteral_a;
 	m_FunctionMap ["jnc.appendFmtLiteral_p"] = (void*) AppendFmtLiteral_p;
 	m_FunctionMap ["jnc.appendFmtLiteral_i32"] = (void*) AppendFmtLiteral_i32;

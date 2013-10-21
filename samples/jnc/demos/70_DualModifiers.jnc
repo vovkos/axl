@@ -1,9 +1,17 @@
+// jancy introduces dual modifiers, i.e. modifiers which have different meaning
+// for 'aliens' and 'friends' of a namespace. 
+// dual modifier 'constd' allows declaring type of data which looks like 'const' for aliens, 
+// and 'non-const' for 'friends'.  designated to eliminate the routine of creating 
+// trivial properties whose only purpose is providing read-only access
+// dual modifier 'eventd' allows declaring events or event pointers. aliens can only 
+// subscribe/unsubscribe ('event' semantics) while friends must be also able 
+// to fire event ('multicast' semantics)
+
 //.............................................................................
 
 class C1
 {
-	constd int m_progress;	
-
+	constd int m_progress;
 	eventd m_completeEvent ();
 
 	work ()
@@ -15,10 +23,16 @@ class C1
 	}
 }
 
+onComplete ()
+{
+	printf ("onComplete () -- work is finished\n");
+}
+
 //.............................................................................
 
-int
-main ()
+// entry point
+
+int main ()
 {
 	printf ("main ()\n");
 
@@ -37,20 +51,5 @@ main ()
 
 	return 0;
 }
-
-onComplete ()
-{
-	printf ("onComplete () -- work is finished\n");
-}
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

@@ -1,7 +1,11 @@
+// jancy enclosed all the case blocks in switch statement into implicitly created scopes
+// this means freedom to create and use local variables in switch statement 
+
 //.............................................................................
 
-int
-main ()
+// entry point
+
+int main ()
 {
 	printf ("main ()\n");
 
@@ -32,15 +36,5 @@ main ()
 	printf ("x = %d, result = %d\n", x, result);
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................

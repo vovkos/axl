@@ -1,6 +1,8 @@
+// jancy supports 'indexed' properties: properties with semantics of arrays
+
 //.............................................................................
 
-// simple property declaration syntax
+// simple indexed property declaration syntax
 
 int g_x [2];
 
@@ -9,8 +11,7 @@ int indexed property g_simpleProp (unsigned i);
 // here index argument is really used as integer index into array; but both type and 
 // what index really means for the particular property is totally up to developer
 
-int 
-g_simpleProp.get (unsigned i)
+int g_simpleProp.get (unsigned i)
 {
 	printf ("g_simpleProp.get (%d)\n", i);
 	return g_x [i];
@@ -35,8 +36,7 @@ property g_prop
 
 	// more than one index argument could be used
 
-	int 
-	get (
+	int get (
 		unsigned i,
 		unsigned j
 		)
@@ -70,8 +70,9 @@ property g_prop
 
 //.............................................................................
 
-int
-main ()
+// entry point
+
+int main ()
 {
 	int x = g_simpleProp [0];
 
@@ -88,15 +89,5 @@ main ()
 
 	return 0;
 }
-
-//.............................................................................
-
-// system functions
-
-int
-printf (
-	unsafe thin const char* format,
-	unsafe ...
-	);
 
 //.............................................................................
