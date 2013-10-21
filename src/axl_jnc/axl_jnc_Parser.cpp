@@ -801,6 +801,10 @@ CParser::DeclareProperty (
 		if (!m_pLastPropertyGetterType)
 			return false;
 	}
+	else
+	{
+		m_pLastPropertyGetterType = NULL;
+	}
 
 	if (pDeclarator->GetTypeModifiers () & ETypeModifier_Const)
 		pProperty->m_Flags |= EPropertyFlag_Const;
@@ -965,8 +969,10 @@ CParser::FinalizeLastProperty (bool HasBody)
 	if (!(m_LastPropertyTypeModifiers.GetTypeModifiers () & ETypeModifier_Const) && !HasBody)
 	{
 		CType* pReturnType = pProperty->m_pGetter->GetType ()->GetReturnType ();
+		rtl::CArrayT <CFunctionArg*> ArgArray = pProperty->m_pGetter->GetType ()->GetArgArray ();
+		ArgArray.Append (pReturnType->GetSimpleFunctionArg ());
 
-		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, &pReturnType, 1);
+		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (
 			EFunction_Setter, 
 			pSetterType, 
