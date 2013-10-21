@@ -646,7 +646,7 @@ template <
 class CAuxListT: public CListT <T, rtl::CVoidT <T*>,  TLink>
 {
 public:
-	~CAuxListT ()
+	CAuxListT ()
 	{
 		this->Construct (); 
 	}
