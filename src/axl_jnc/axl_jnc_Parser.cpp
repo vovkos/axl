@@ -1175,6 +1175,23 @@ CParser::DeclareData (
 
 		break;
 
+	case EStorage_Mutable:
+		switch (NamespaceKind)
+		{
+		case ENamespace_Type:
+			break;
+
+		case ENamespace_Property:
+			if (((CProperty*) pNamespace)->GetParentType ())
+				break;
+
+		default:
+			err::SetFormatStringError ("'mutable' can only be applied to member fields");
+			return false;
+		}
+
+		break;
+
 	default:
 		err::SetFormatStringError ("invalid storage specifier '%s' for variable", GetStorageKindString (m_StorageKind));
 		return false;
@@ -1224,7 +1241,7 @@ CParser::DeclareData (
 		}
 
 	}
-	else if (m_StorageKind != EStorage_Member)
+	else if (m_StorageKind != EStorage_Member && m_StorageKind != EStorage_Mutable)
 	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
 			m_StorageKind,
@@ -1254,7 +1271,7 @@ CParser::DeclareData (
 	else
 	{
 		CStructField* pField;
-		CNamedType* pNamedType =  (CNamedType*) pNamespace;
+		CNamedType* pNamedType = (CNamedType*) pNamespace;
 		EType NamedTypeKind = pNamedType->GetTypeKind ();
 
 		switch (NamedTypeKind)
