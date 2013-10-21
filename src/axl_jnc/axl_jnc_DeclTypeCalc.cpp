@@ -243,10 +243,11 @@ CDeclTypeCalc::CalcPropertyGetterType (CDeclarator* pDeclarator)
 	uint_t TypeModifiers = pDeclarator->GetTypeModifiers ();
 	ASSERT (TypeModifiers & ETypeModifier_Property);
 
+	CDeclFunctionSuffix* pFunctionSuffix = NULL;
 	if (!(TypeModifiers & ETypeModifier_Indexed)) 
-		pDeclarator->AddFunctionSuffix ();
+		pFunctionSuffix = pDeclarator->AddFunctionSuffix ();
 
-	TypeModifiers &= ~(
+	pDeclarator->m_TypeModifiers &= ~(
 		ETypeModifier_Const |
 		ETypeModifier_Property |
 		ETypeModifier_Bindable |
@@ -262,6 +263,11 @@ CDeclTypeCalc::CalcPropertyGetterType (CDeclarator* pDeclarator)
 		NULL,
 		NULL
 		);
+
+	pDeclarator->m_TypeModifiers = TypeModifiers;
+
+	if (pFunctionSuffix)
+		pDeclarator->DeleteSuffix (pFunctionSuffix);
 
 	if (!pType)
 		return NULL;

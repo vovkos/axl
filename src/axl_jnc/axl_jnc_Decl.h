@@ -233,6 +233,7 @@ enum EDeclarator
 class CDeclarator: public CTypeModifiers
 {
 	friend class CParser;
+	friend class CDeclTypeCalc;
 
 protected:
 	EDeclarator m_DeclaratorKind;

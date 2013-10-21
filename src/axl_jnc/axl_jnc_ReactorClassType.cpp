@@ -128,7 +128,7 @@ CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList
 			CValue DstCookieValue;
 			
 			Result = 
-				m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "Add", &AddMethodValue) &&
+				m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "add", &AddMethodValue) &&
 				m_pModule->m_OperatorMgr.CallOperator (AddMethodValue, HandlerValue, &CookieValue) &&
 				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
 				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &DstOnChangeValue) &&
@@ -331,7 +331,7 @@ CReactorClassType::CompileStopMethod ()
 			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
 			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &CookieValue) &&
 			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangeValue) &&
-			m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "Remove", &RemoveMethodValue) &&
+			m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "remove", &RemoveMethodValue) &&
 			m_pModule->m_OperatorMgr.CallOperator (RemoveMethodValue, CookieValue);
 
 		if (!Result)
@@ -352,153 +352,3 @@ CReactorClassType::CompileStopMethod ()
 
 } // namespace jnc {
 } // namespace axl {
-
-/*
-
-//.............................................................................
-
-bool
-CParser::DeclareReactor (
-	CReactorClassType* pType,
-	CDeclarator* pDeclarator
-	)
-{
-	bool Result;
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	ENamespace NamespaceKind = pNamespace->GetNamespaceKind ();
-	EDeclarator DeclaratorKind = pDeclarator->GetDeclaratorKind ();
-
-	if (!pDeclarator->IsSimple ())
-	{
-		err::SetFormatStringError ("invalid reactor declarator (qualified reactor not supported yet)");
-		return false;
-	}
-
-	if (NamespaceKind == ENamespace_PropertyTemplate)
-	{
-		err::SetFormatStringError ("property templates cannot have reactor memberts");
-		return false;
-	}
-
-	if (m_StorageKind && m_StorageKind != EStorage_Static)
-	{
-		err::SetFormatStringError ("invalid storage '%s' for reactor", GetStorageKindString (m_StorageKind));
-		return false;
-	}
-
-	if (!m_StorageKind && NamespaceKind == ENamespace_Property)
-		m_StorageKind = ((CProperty*) pNamespace)->GetStorageKind ();
-		
-	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
-	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-
-	CReactor* pReactor = m_pModule->m_FunctionMgr.CreateReactor (Name, QualifiedName);
-	AssignDeclarationAttributes (pReactor, pNamespace, pDeclarator->GetPos ());
-
-	switch (NamespaceKind)
-	{
-	case ENamespace_TypeExtension:
-		if (!pDeclarator->IsSimple ())
-		{
-			err::SetFormatStringError ("invalid declarator '%s' in type extension", pReactor->m_Tag.cc ());
-			return false;
-		}
-
-		break;
-
-	case ENamespace_Type:
-		if (((CNamedType*) pNamespace)->GetTypeKind () != EType_Class)
-		{
-			err::SetFormatStringError ("method members are not allowed in '%s'", ((CNamedType*) pNamespace)->GetTypeString ().cc ());
-			return false;
-		}
-
-		if (pDeclarator->IsQualified () && m_StorageKind != EStorage_Override)
-		{
-			err::SetFormatStringError ("only overrides could be qualified, '%s' is not an override", pReactor->m_Tag.cc ());
-			return false;
-		}
-
-		Result = ((CClassType*) pNamespace)->AddReactor (pReactor);
-		if (!Result)
-			return false;
-
-		break;
-
-	case ENamespace_Property:
-		if (pDeclarator->IsQualified ())
-		{
-			err::SetFormatStringError ("invalid qualified declarator '%s' in property", pReactor->m_Tag.cc ());
-			return false;
-		}
-
-		Result = ((CProperty*) pNamespace)->AddReactor (pReactor);
-		if (!Result)
-			return false;
-
-		break;
-	
-	default:
-		if (m_StorageKind)
-		{
-			err::SetFormatStringError ("invalid storage specifier '%s' for a global Reactor", GetStorageKindString (m_StorageKind));
-			return false;
-		}
-
-		pReactor->m_StorageKind = EStorage_Static;
-
-		Result = pNamespace->AddItem (pReactor);
-		if (!Result)
-			return false;
-	}
-
-	return pReactor->Create (pType);
-}
-
-CClassType*
-CParser::CreateReactorClassType (
-	const rtl::CString& Name,
-	CDeclFunctionSuffix* pFunctionSuffix,
-	rtl::CBoxListT <CToken>* pTokenList
-	)
-{
-	bool Result;
-
-	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
-	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-	CClassType* pClassType = m_pModule->m_TypeMgr.CreateClassType (EClassType_Reactor, Name, QualifiedName);
-
-	Result = pNamespace->AddItem (pClassType);
-	if (!Result)
-		return NULL;
-
-	AssignDeclarationAttributes (pClassType, pNamespace, m_LastMatchedToken.m_Pos);
-
-	CFunctionType* pStartMethodType = pFunctionSuffix ? m_pModule->m_TypeMgr.GetFunctionType (
-		NULL, 
-		pFunctionSuffix->GetArgArray (),
-		pFunctionSuffix->GetFunctionTypeFlags ()
-		) : 
-		(CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction);
-
-	CReactorClassType* pReactorType = m_pModule->m_TypeMgr.GetReactorType (pStartMethodType);	
-
-	CReactor* pReactor = m_pModule->m_FunctionMgr.CreateUnnamedReactor ();
-	
-	Result = 
-		pClassType->AddReactor (pReactor) &&
-		pReactor->Create (pReactorType);
-
-	if (!Result)
-		return NULL;
-
-	if (pTokenList)
-		pReactor->SetBody (pTokenList);
-
-	return pClassType;
-}
-
-//.............................................................................
-
-*/

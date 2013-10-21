@@ -106,10 +106,8 @@ CControlFlowMgr::Jump (
 	CBasicBlock* pFollowBlock
 	)
 {
-	uint_t ReachableFlag = (m_pCurrentBlock->m_Flags & EBasicBlockFlag_Reachable);
-
 	m_Flags |= EControlFlowFlag_HasJump;
-	pBlock->m_Flags |= EBasicBlockFlag_Jumped | ReachableFlag;
+	pBlock->m_Flags |= EBasicBlockFlag_Jumped | (m_pCurrentBlock->m_Flags & EBasicBlockFlag_Reachable);
 
 	m_pModule->m_LlvmIrBuilder.CreateBr (pBlock);
 
@@ -125,7 +123,7 @@ CControlFlowMgr::Follow (CBasicBlock* pBlock)
 	if (!m_pCurrentBlock->HasTerminator ())
 	{
 		m_pModule->m_LlvmIrBuilder.CreateBr (pBlock);
-		pBlock->m_Flags |= EBasicBlockFlag_Jumped;
+		pBlock->m_Flags |= EBasicBlockFlag_Jumped | (m_pCurrentBlock->m_Flags & EBasicBlockFlag_Reachable);
 	}
 
 	SetCurrentBlock (pBlock);
