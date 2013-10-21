@@ -406,7 +406,7 @@ CParser::Declare (CDeclarator* pDeclarator)
 {
 	m_pLastDeclaredItem = NULL;
 
-	if (pDeclarator->GetTypeModifiers () & ETypeModifier_Property)
+	if ((pDeclarator->GetTypeModifiers () & ETypeModifier_Property) && m_StorageKind != EStorage_Typedef)
 	{
 		// too early to calctype cause maybe this property has a body
 		// declare a typeless property for now
@@ -954,7 +954,7 @@ CParser::FinalizeLastProperty (bool HasBody)
 			EModuleItemFlag_User
 			);
 
-		bool Result = pProperty->AddMethod (pGetter);
+		Result = pProperty->AddMethod (pGetter);
 		if (!Result)
 			return false;
 	}
@@ -968,8 +968,9 @@ CParser::FinalizeLastProperty (bool HasBody)
 
 	if (!(m_LastPropertyTypeModifiers.GetTypeModifiers () & ETypeModifier_Const) && !HasBody)
 	{
-		CType* pReturnType = pProperty->m_pGetter->GetType ()->GetReturnType ();
-		rtl::CArrayT <CFunctionArg*> ArgArray = pProperty->m_pGetter->GetType ()->GetArgArray ();
+		CFunctionType* pGetterType = pProperty->m_pGetter->GetType ()->GetShortType ();
+		CType* pReturnType = pGetterType->GetReturnType ();
+		rtl::CArrayT <CFunctionArg*> ArgArray = pGetterType->GetArgArray ();
 		ArgArray.Append (pReturnType->GetSimpleFunctionArg ());
 
 		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
@@ -979,7 +980,7 @@ CParser::FinalizeLastProperty (bool HasBody)
 			EModuleItemFlag_User
 			);
 
-		bool Result = pProperty->AddMethod (pSetter);
+		Result = pProperty->AddMethod (pSetter);
 		if (!Result)
 			return false;
 	}

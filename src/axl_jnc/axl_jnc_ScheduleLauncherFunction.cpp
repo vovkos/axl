@@ -21,7 +21,9 @@ CScheduleLauncherFunction::Compile ()
 	m_pModule->m_FunctionMgr.InternalPrologue (this, ArgValueArray, ArgCount);
 
 	CValue ScheduleValue;
-	m_pModule->m_OperatorMgr.MemberOperator (ArgValueArray [1], "Schedule", &ScheduleValue);
+	Result = m_pModule->m_OperatorMgr.MemberOperator (ArgValueArray [1], "schedule", &ScheduleValue);
+	if (!Result)
+		return false;
 
 	CValue FunctionPtrValue = ArgValueArray [0];
 	if (ArgCount > 2)
