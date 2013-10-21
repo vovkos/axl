@@ -247,7 +247,11 @@ CTypeMgr::GetBitFieldType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CBitFieldType*) It->m_Value;
+	{
+		CBitFieldType* pType = (CBitFieldType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CBitFieldType* pType = AXL_MEM_NEW (CBitFieldType);
 	pType->m_pModule = m_pModule;
@@ -330,7 +334,11 @@ CTypeMgr::GetArrayType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CArrayType*) It->m_Value;
+	{
+		CArrayType* pType = (CArrayType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
 	pType->m_pModule = m_pModule;
@@ -690,7 +698,11 @@ CTypeMgr::GetFunctionType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CFunctionType*) It->m_Value;
+	{
+		CFunctionType* pType = (CFunctionType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
@@ -751,7 +763,11 @@ CTypeMgr::GetFunctionType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CFunctionType*) It->m_Value;
+	{
+		CFunctionType* pType = (CFunctionType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CFunctionType* pType = AXL_MEM_NEW (CFunctionType);
 	pType->m_pModule = m_pModule;
@@ -897,7 +913,11 @@ CTypeMgr::GetPropertyType (
 	
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CPropertyType*) It->m_Value;
+	{
+		CPropertyType* pType = (CPropertyType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	if (SetterType.IsEmpty ())
 		Flags |= EPropertyTypeFlag_Const;
@@ -1314,7 +1334,11 @@ CTypeMgr::GetFunctionClosureClassType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CFunctionClosureClassType*) It->m_Value;
+	{
+		CFunctionClosureClassType* pType = (CFunctionClosureClassType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CFunctionClosureClassType* pType = (CFunctionClosureClassType*) CreateUnnamedClassType (EClassType_FunctionClosure);
 	pType->m_Signature = Signature;
@@ -1363,7 +1387,11 @@ CTypeMgr::GetPropertyClosureClassType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CPropertyClosureClassType*) It->m_Value;
+	{
+		CPropertyClosureClassType* pType = (CPropertyClosureClassType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CPropertyClosureClassType* pType = (CPropertyClosureClassType*) CreateUnnamedClassType (EClassType_PropertyClosure);
 	pType->m_Signature = Signature;
@@ -1403,7 +1431,11 @@ CTypeMgr::GetDataClosureClassType (
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CDataClosureClassType*) It->m_Value;
+	{
+		CDataClosureClassType* pType = (CDataClosureClassType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CDataClosureClassType* pType = (CDataClosureClassType*) CreateUnnamedClassType (EClassType_DataClosure);
 	pType->m_Signature = Signature;
@@ -1622,7 +1654,11 @@ CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CStructType*) It->m_Value;
+	{
+		CStructType* pType = (CStructType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CFunctionType* pStdObjectMemberMethodType = pFunctionType->GetStdObjectMemberMethodType ();
 
@@ -1733,7 +1769,11 @@ CTypeMgr::GetPropertyPtrStructType (CPropertyType* pPropertyType)
 
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CStructType*) It->m_Value;
+	{
+		CStructType* pType = (CStructType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CPropertyType* pStdObjectMemberPropertyType = pPropertyType->GetStdObjectMemberPropertyType ();
 
@@ -1759,7 +1799,11 @@ CTypeMgr::GetNamedImportType (
 	
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CNamedImportType*) It->m_Value;
+	{
+		CNamedImportType* pType = (CNamedImportType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CNamedImportType* pType = AXL_MEM_NEW (CNamedImportType);
 	pType->m_pModule = m_pModule;
@@ -1789,7 +1833,11 @@ CTypeMgr::GetImportPtrType (
 	
 	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
 	if (It->m_Value)
-		return (CImportPtrType*) It->m_Value;
+	{
+		CImportPtrType* pType = (CImportPtrType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
 
 	CImportPtrType* pType = AXL_MEM_NEW (CImportPtrType);
 	pType->m_pModule = m_pModule;
@@ -2087,9 +2135,12 @@ CTypeMgr::SetupPrimitiveType (
 	pType->m_Size = Size;
 	pType->m_AlignFactor = Size;
 	pType->m_Signature = pSignature;
+	pType->m_pLlvmType = NULL;
+	pType->m_LlvmDiType = llvm::DIType ();
 	pType->m_pSimplePropertyTypeTuple = NULL;
 	pType->m_pFunctionArgTuple = NULL;
 	pType->m_pDataPtrTypeTuple = NULL;
+	pType->m_pBoxClassType = NULL;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
