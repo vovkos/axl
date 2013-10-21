@@ -102,6 +102,7 @@ CControlFlowMgr::SwitchStmt_Case (
 	m_pModule->m_NamespaceMgr.CloseScope (Pos1);
 
 	CBasicBlock* pBlock = CreateBlock ("switch_case");
+	pBlock->m_Flags |= (pStmt->m_pSwitchBlock->m_Flags & EBasicBlockFlag_Reachable);
 	Follow (pBlock);
 	It->m_Value = pBlock;
 
@@ -126,6 +127,7 @@ CControlFlowMgr::SwitchStmt_Default (
 	m_pModule->m_NamespaceMgr.CloseScope (Pos1);
 
 	CBasicBlock* pBlock = CreateBlock ("switch_default");
+	pBlock->m_Flags |= (pStmt->m_pSwitchBlock->m_Flags & EBasicBlockFlag_Reachable);
 	Follow (pBlock);
 	pStmt->m_pDefaultBlock = pBlock;
 
@@ -344,9 +346,6 @@ CControlFlowMgr::OnceStmt_Create (
 	)
 {
 	pStmt->m_pFlagVariable = pFlagVariable;
-	pStmt->m_pPreBodyBlock = CreateBlock ("once_prebody");
-	pStmt->m_pBodyBlock = CreateBlock ("once_body");
-	pStmt->m_pLoopBlock = CreateBlock ("once_loop");
 	pStmt->m_pFollowBlock = CreateBlock ("once_follow");
 }
 
@@ -367,9 +366,11 @@ CControlFlowMgr::OnceStmt_PreBody (
 
 	if (StorageKind == EStorage_Thread)
 	{
+		CBasicBlock* pBodyBlock = CreateBlock ("once_body");
+
 		Result = 
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, pStmt->m_pFlagVariable, CValue ((int64_t) 0, pType), &Value) &&
-			ConditionalJump (Value, pStmt->m_pBodyBlock, pStmt->m_pFollowBlock);
+			ConditionalJump (Value, pBodyBlock, pStmt->m_pFollowBlock);
 
 		if (!Result)
 			return false;
@@ -380,18 +381,28 @@ CControlFlowMgr::OnceStmt_PreBody (
 		if (!Result)
 			return false;
 
+		uint_t Flags = EBasicBlockFlag_Jumped | (m_pCurrentBlock->m_Flags & EBasicBlockFlag_Reachable);
+
+		CBasicBlock* pPreBodyBlock = CreateBlock ("once_prebody");
+		CBasicBlock* pBodyBlock = CreateBlock ("once_body");
+		CBasicBlock* pLoopBlock = CreateBlock ("once_loop");
+
+		pPreBodyBlock->m_Flags |= Flags;
+		pBodyBlock->m_Flags |= Flags;
+		pLoopBlock->m_Flags |= Flags;
+
 		intptr_t ConstArray [2] = { 0, 1 };
-		CBasicBlock* BlockArray [2] = { pStmt->m_pPreBodyBlock, pStmt->m_pLoopBlock };
+		CBasicBlock* BlockArray [2] = { pPreBodyBlock, pLoopBlock };
 
 		m_pModule->m_LlvmIrBuilder.CreateSwitch (Value, pStmt->m_pFollowBlock, ConstArray, BlockArray, 2);
 
 		// loop
 
-		SetCurrentBlock (pStmt->m_pLoopBlock);
+		SetCurrentBlock (pLoopBlock);
 
 		Result = 
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, pStmt->m_pFlagVariable, CValue (2, pType), &Value) &&
-			ConditionalJump (Value, pStmt->m_pFollowBlock, pStmt->m_pLoopBlock, pStmt->m_pPreBodyBlock);
+			ConditionalJump (Value, pStmt->m_pFollowBlock, pLoopBlock, pPreBodyBlock);
 
 		if (!Result)
 			return false;
@@ -409,7 +420,7 @@ CControlFlowMgr::OnceStmt_PreBody (
 
 		Result = 
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, Value, CValue ((int64_t) 0, pType), &Value) &&
-			ConditionalJump (Value, pStmt->m_pBodyBlock, pStmt->m_pLoopBlock);
+			ConditionalJump (Value, pBodyBlock, pLoopBlock);
 
 		if (!Result)
 			return false;

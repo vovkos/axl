@@ -66,9 +66,6 @@ struct TForStmt
 struct TOnceStmt
 {
 	CVariable* m_pFlagVariable;
-	CBasicBlock* m_pPreBodyBlock;
-	CBasicBlock* m_pBodyBlock;
-	CBasicBlock* m_pLoopBlock;
 	CBasicBlock* m_pFollowBlock;
 };
 

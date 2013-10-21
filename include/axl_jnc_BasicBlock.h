@@ -17,9 +17,9 @@ class CFunction;
 
 enum EBasicBlockFlag
 {
-	EBasicBlockFlag_Reachable = 0x10,
-	EBasicBlockFlag_Jumped    = 0x20,
-	EBasicBlockFlag_Entry     = 0x40,
+	EBasicBlockFlag_Reachable = 0x01,
+	EBasicBlockFlag_Jumped    = 0x02,
+	EBasicBlockFlag_Entry     = 0x04,
 };		
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
