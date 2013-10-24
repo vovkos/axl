@@ -69,16 +69,16 @@ public:
 		return m_Level == 2;
 	}
 
-	const CToken::CPos&
+	const CToken::CPos*
 	GetBeginPos ()
 	{
-		return m_BeginPos;
+		return &m_BeginPos;
 	}
 
-	const CToken::CPos&
+	const CToken::CPos*
 	GetEndPos ()
 	{
-		return m_EndPos;
+		return &m_EndPos;
 	}
 
 	CFunction*

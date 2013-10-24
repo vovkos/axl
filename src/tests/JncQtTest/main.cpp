@@ -10,7 +10,7 @@ int main (int argc, char* argv [])
 		); // Memory leak detection.
 
 #endif
-
+	
 	atexit (llvm::llvm_shutdown);
 
 	llvm::InitializeNativeTarget ();
@@ -22,12 +22,12 @@ int main (int argc, char* argv [])
 	srand ((int) axl::g::GetTimestamp ());
 
 	QApplication app (argc, argv);
-	QCoreApplication::setOrganizationName("Tibbo");
-	QCoreApplication::setOrganizationDomain("tibbo.com");
-	QCoreApplication::setApplicationName("JancyEdit");
+	QCoreApplication::setOrganizationName ("Tibbo");
+	QCoreApplication::setOrganizationDomain ("tibbo.com");
+	QCoreApplication::setApplicationName ("JancyEdit");
 
 	MainWindow mainWindow;
 	mainWindow.showMaximized();
-	
-	return app.exec();
+
+	return app.exec ();
 }

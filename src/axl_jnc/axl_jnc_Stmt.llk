@@ -1,4 +1,4 @@
-//............................................................................. 
+//.............................................................................
 
 start
 compound_stmt
@@ -7,7 +7,7 @@ compound_stmt
 				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
 				PreCreateLandingPads ($l.m_Data.m_Integer);
 			}
-		local_declaration* 
+		local_declaration*
 		'}' $r
 			{
 				m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
@@ -20,12 +20,12 @@ constructor_compound_stmt
 			{
 				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
 				PreCreateLandingPads ($l.m_Data.m_Integer);
-			} 
+			}
 		btm_construct_stmt*
 			{
 				return FinalizeBaseTypeMemberConstructBlock ();
 			}
-		local_declaration* 
+		local_declaration*
 		'}' $r
 			{
 				m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
@@ -34,7 +34,7 @@ constructor_compound_stmt
 
 // conflict at qualified_name : '.' is a continue-vs-fold conflict, in which fold loses immediatly
 // this problem could be solved with double resolvers, but it looks really ugly
-// actually, LADFA should be modified to allow LL(k) lookup also in case of continue-vs-fold conflict 
+// actually, LADFA should be modified to allow LL(k) lookup also in case of continue-vs-fold conflict
 
 btm_construct_stmt
 	:	resolver (btm_construct_stmt_rslv)
@@ -53,17 +53,17 @@ btm_construct_stmt_rslv
 	: EToken_Identifier '.' (EToken_Identifier '.')* EToken_Construct
 	;
 
-class 
+class
 {
 	CQualifiedName m_Name;
 }
 btm_construct_name
-	:	EToken_Identifier '.' 
-			{  
-				$.m_Name.AddName ($1.m_Data.m_String); 
+	:	EToken_Identifier '.'
+			{
+				$.m_Name.AddName ($1.m_Data.m_String);
 			}
 		(EToken_Identifier $n2 '.'
-			{ 
+			{
 				$.m_Name.AddName ($n2.m_Data.m_String);
 			}
 		)*
@@ -74,7 +74,7 @@ statement
 	enter
 	{
 		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
-		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
+		m_pModule->m_NamespaceMgr.SetSourcePos (m_CurrentToken.m_Pos);
 	}
 	:	compound_stmt
 	|	expression_stmt
@@ -108,7 +108,7 @@ if_stmt
 			{
 				return m_pModule->m_ControlFlowMgr.IfStmt_Condition (&$Stmt, $e.m_Value, $a.m_Pos);
 			}
-		statement $t 
+		statement $t
 		(
 			EToken_Else $a2
 				{
@@ -116,7 +116,7 @@ if_stmt
 				}
 			statement $f
 		)?
-			{	
+			{
 				m_pModule->m_ControlFlowMgr.IfStmt_Follow (&$Stmt, IsValidLocator ($f) ? $f.m_LastToken.m_Pos : $t.m_LastToken.m_Pos);
 			}
 	;
@@ -132,7 +132,7 @@ switch_stmt
 	}
 	:	EToken_Switch '(' expression $e ')' '{' $l
 			{
-				return 
+				return
 					m_pModule->m_ControlFlowMgr.SwitchStmt_Condition (&$Stmt, $e.m_Value, $l.m_Pos) &&
 					PreCreateLandingPads ($l.m_Data.m_Integer);
 			}
@@ -166,11 +166,11 @@ while_stmt
 	:	EToken_While '(' expression $e ')' $a
 			{
 				m_pModule->m_ControlFlowMgr.WhileStmt_Condition (&$Stmt, $e.m_Value, $a.m_Pos);
-			}		
+			}
 		statement $s
 			{
 				m_pModule->m_ControlFlowMgr.WhileStmt_Follow (&$Stmt, $s.m_LastToken.m_Pos);
-			}		
+			}
 	;
 
 do_stmt
@@ -193,7 +193,7 @@ do_stmt
 		EToken_While '(' expression $e ')' ';'
 			{
 				return m_pModule->m_ControlFlowMgr.DoStmt_Condition (&$Stmt, $e.m_Value);
-			}	  
+			}
 	;
 
 for_stmt
@@ -205,11 +205,11 @@ for_stmt
 	{
 		m_pModule->m_ControlFlowMgr.ForStmt_Create (&$Stmt);
 	}
-	:	EToken_For '(' 
+	:	EToken_For '('
 			{
 				m_pModule->m_ControlFlowMgr.ForStmt_PreInit (&$Stmt, $1.m_Pos);
-			}	  
-		(item_declaration_w_specifier | expression_or_empty_list ';') 
+			}
+		(item_declaration_w_specifier | expression_or_empty_list ';')
 		(
 				{
 					m_pModule->m_ControlFlowMgr.ForStmt_PreCondition (&$Stmt);
@@ -218,7 +218,7 @@ for_stmt
 				{
 					return m_pModule->m_ControlFlowMgr.ForStmt_PostCondition (&$Stmt, $e.m_Value);
 				}
-		)? ';' 
+		)? ';'
 		(
 				{
 					m_pModule->m_ControlFlowMgr.ForStmt_PreLoop (&$Stmt);
@@ -244,7 +244,7 @@ break_stmt
 			}
 	;
 
-continue_stmt 
+continue_stmt
 	:	EToken_Continue ';'
 			{
 				return m_pModule->m_ControlFlowMgr.Continue ($1.m_Data.m_Integer);
@@ -266,8 +266,8 @@ once_stmt
 	:	storage_specifier? EToken_Once
 			{
 				EStorage StorageKind = IsValidLocator ($1) ? $1.m_StorageKind : EStorage_Static;
-				return 
-					m_pModule->m_ControlFlowMgr.OnceStmt_Create (&$Stmt, StorageKind) &&				
+				return
+					m_pModule->m_ControlFlowMgr.OnceStmt_Create (&$Stmt, StorageKind) &&
 					m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&$Stmt, $2.m_Pos);
 			}
 		statement $s
@@ -277,13 +277,13 @@ once_stmt
 	;
 
 try_stmt
-	:	EToken_Try 
+	:	EToken_Try
 		'{' $l
 			{
 				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
 				PreCreateLandingPads ($l.m_Data.m_Integer | ELandingPadFlag_Catch); // always catch
 			}
-		local_declaration* 
+		local_declaration*
 		'}' $r
 			{
 				m_pModule->m_ControlFlowMgr.EndTry ();
@@ -315,10 +315,10 @@ reactor_body
 			return FinalizeReactor ();
 		}
 	;
-	
+
 reactor_stmt
-	:	resolver ({ return true; }) // within reactor_body prefer reactor_onchange_stmt 
-		reactor_onchange_stmt 
+	:	resolver ({ return true; }) // within reactor_body prefer reactor_onchange_stmt
+		reactor_onchange_stmt
 	|	reactor_expression_stmt
 	|	';'
 	;
@@ -332,7 +332,7 @@ reactor_onchange_stmt
 			{
 				return FinalizeReactorOnChangeClause ();
 			}
-		statement 
+		statement
 			{
 				return FinalizeReactorOnChangeStmt ();
 			}

@@ -5,12 +5,12 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
+#include "axl_jnc_Scope.h"
 
 namespace axl {
 namespace jnc {
 
 class CModule;
-class CScope;
 class CFunctionType;
 class CStructType;
 class CUnionType;
@@ -67,6 +67,15 @@ public:
 		m_pLlvmDiBuilder->finalize ();
 	}
 
+	llvm::DebugLoc 
+	GetDebugLoc (
+		CScope* pScope,
+		const CToken::CPos& Pos
+		)
+	{
+		return llvm::DebugLoc::get (Pos.m_Line + 1, 0, pScope->GetLlvmDiScope ());
+	}
+
 	llvm::DIFile
 	CreateFile (
 		const char* pFileName,
@@ -75,7 +84,7 @@ public:
 	{
 		return m_pLlvmDiBuilder->createFile (pFileName, pDirName);
 	}
-
+	
 	llvm::DIType
 	CreateBasicType (
 		const char* pName,

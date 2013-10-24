@@ -32,7 +32,7 @@ CNamespaceMgr::AddStdItems ()
 {
 	CGlobalNamespace* pJnc = CreateGlobalNamespace ("jnc", &m_GlobalNamespace);
 
-	return 
+	return
 		m_GlobalNamespace.AddItem (pJnc) &&
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrLen)) &&
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Rand)) &&
@@ -43,6 +43,18 @@ CNamespaceMgr::AddStdItems ()
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetCurrentThreadId)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CreateThread)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Sleep));
+}
+
+void
+CNamespaceMgr::SetSourcePos (const CToken::CPos& Pos)
+{
+	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo))
+		return;
+
+	ASSERT (m_pCurrentScope);
+
+	llvm::DebugLoc LlvmDebugLoc = m_pModule->m_LlvmDiBuilder.GetDebugLoc (m_pCurrentScope, Pos);
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (LlvmDebugLoc);
 }
 
 void
@@ -83,17 +95,12 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 		pScope->m_Flags |= EScopeFlag_CanThrow;
 
 	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
-	{
-		pScope->m_LlvmDiScope = m_pCurrentScope ? 
-			(llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (m_pCurrentScope, Pos) :
-			(llvm::DIScope) pFunction->GetLlvmDiSubprogram ();
-	}
+		pScope->m_LlvmDiScope = (llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (m_pCurrentScope, Pos);
 
 	m_ScopeList.InsertTail (pScope);
 
 	OpenNamespace (pScope);
-
-	m_pModule->m_LlvmIrBuilder.SetSourcePos (Pos);
+	SetSourcePos (Pos);
 	return pScope;
 }
 
@@ -104,8 +111,8 @@ CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
 	ASSERT (pScope);
 
 	pScope->m_EndPos = Pos;
-	m_pModule->m_LlvmIrBuilder.SetSourcePos (Pos);
-	
+	SetSourcePos (Pos);
+
 	if (m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Reachable)
 	{
 		pScope->m_DestructList.RunDestructors ();
@@ -130,7 +137,7 @@ CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 			if (pNamespace == pTargetNamespace)
 				return EAccess_Protected;
 		}
-		
+
 		return EAccess_Public;
 	}
 
@@ -141,7 +148,7 @@ CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 			if (!pNamespace->IsNamed ())
 				continue;
 
-			if (pNamespace == pTargetNamespace || 
+			if (pNamespace == pTargetNamespace ||
 				pTargetNamespace->m_QualifiedName.Cmp (pNamespace->m_QualifiedName) == 0 ||
 				pTargetNamespace->m_FriendSet.Find (pNamespace->m_QualifiedName))
 				return EAccess_Protected;
@@ -157,7 +164,7 @@ CNamespaceMgr::GetAccessKind (CNamespace* pTargetNamespace)
 		if (!pNamespace->IsNamed ())
 			continue;
 
-		if (pNamespace == pTargetNamespace || 
+		if (pNamespace == pTargetNamespace ||
 			pTargetNamespace->m_QualifiedName.Cmp (pNamespace->m_QualifiedName) == 0 ||
 			pTargetNamespace->m_FriendSet.Find (pNamespace->m_QualifiedName))
 			return EAccess_Protected;

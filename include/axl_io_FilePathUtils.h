@@ -54,9 +54,6 @@ FindFilePath (
 	bool DoFindInCurrentDir = true
 	);
 
-rtl::CString
-CreateTempFileName ();
-
 //.............................................................................
 
 } // namespace io

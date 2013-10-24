@@ -723,15 +723,6 @@ CTypeMgr::GetFunctionType (
 	if (It->m_Value)
 	{
 		CFunctionType* pType = (CFunctionType*) It->m_Value;
-
-		size_t x = rtl::djb2 (Signature, Signature.GetLength ()) % m_TypeMap.GetBucketCount ();
-		size_t y = rtl::djb2 (pType->m_Signature, pType->m_Signature.GetLength ()) % m_TypeMap.GetBucketCount ();
-		if (pType->m_Signature != Signature)
-		{
-			_asm int 3;
-			m_TypeMap.Goto (Signature);
-		}
-
 		ASSERT (pType->m_Signature == Signature);
 		return pType;
 	}

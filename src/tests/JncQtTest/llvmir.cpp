@@ -42,14 +42,18 @@ void LlvmIr::addFunction(jnc::CFunction* function)
 			llvm::raw_string_ostream Stream (String);
 
 			llvm::Instruction* pInst = Inst;
-
+		
 			llvm::MDNode* pMdComment = pInst->getMetadata (CommentMdKind);
 			if (pMdComment)
 				pInst->setMetadata (CommentMdKind, NULL); // remove before print
 
 			pInst->print (Stream);
 
-			appendFormat ("%s\n", String.c_str ());
+			llvm::DebugLoc LlvmDebugLoc = pInst->getDebugLoc ();							
+			if (LlvmDebugLoc.isUnknown ())
+				appendFormat ("%s\n", String.c_str ());
+			else
+				appendFormat ("%s (line: %d)\n", String.c_str (), LlvmDebugLoc.getLine ());
 
 			if (pMdComment)
 			{

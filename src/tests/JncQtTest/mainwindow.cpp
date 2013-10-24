@@ -10,6 +10,11 @@
 
 //.............................................................................
 
+StdLib::StdLib ()
+{
+	m_FunctionMap ["printf"] = (void*) Printf;
+}
+
 int
 StdLib::Printf (
 	const char* pFormat,
@@ -351,8 +356,8 @@ bool MainWindow::compile ()
 	QByteArray filePathBytes = child->file().toUtf8 ();
 	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.constData(), llvm::getGlobalContext ());
 
-	module.Create (filePathBytes.data(), pLlvmModule);
-	
+	module.Create (filePathBytes.data(), pLlvmModule, jnc::EModuleFlag_DebugInfo);
+
 	jnc::CScopeThreadModule ScopeModule (&module);
 
 	writeOutput("Parsing...\n");

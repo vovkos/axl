@@ -25,7 +25,8 @@ class CModule;
 
 enum EModuleFlag
 {
-	EModuleFlag_DebugInfo = 0x0001,
+	EModuleFlag_DebugInfo  = 0x0001,
+	EModuleFlag_IrComments = 0x0002,
 };
 
 //.............................................................................

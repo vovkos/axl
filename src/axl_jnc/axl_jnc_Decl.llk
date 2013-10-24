@@ -7,21 +7,21 @@ pragma_pack
 			m_StructPackFactor = $v.m_Value;
 		}
 	;
-	 
+
 //.............................................................................
 
 // root declaration productions
 
 global_declaration
 	:	namespace_declaration
-	|	extend_declaration 
-	|	using_declaration 
-	|	friend_declaration 
-	|	access_declaration 
+	|	extend_declaration
+	|	using_declaration
+	|	friend_declaration
+	|	access_declaration
 	|	named_type_specifier
 	|	item_declaration_w_specifier
 	|	resolver (item_declaration_no_specifier_rslv) priority (2) // set higher priority than type_specifier::qualified_name
-		item_declaration_no_specifier	
+		item_declaration_no_specifier
 	|	';'
 	;
 
@@ -39,10 +39,10 @@ local_declaration
 	enter
 	{
 		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
-		m_pModule->m_LlvmIrBuilder.SetSourcePos (m_CurrentToken.m_Pos);
+		m_pModule->m_NamespaceMgr.SetSourcePos (m_CurrentToken.m_Pos);
 	}
 	:	statement
-	|	using_declaration 
+	|	using_declaration
 	|	named_type_specifier
 	|	item_declaration_w_specifier
 	|	resolver ({ return false; }) priority (2) // set higher priority than type_specifier::qualified_name
@@ -57,22 +57,22 @@ local_declaration
 
 namespace_declaration
 	:	EToken_Namespace qualified_name
-			{ 
+			{
 				return OpenGlobalNamespace ($2.m_Name, $2.m_FirstToken.m_Pos) != NULL;
 			}
-		'{' global_declaration* '}' 
-			{ 
+		'{' global_declaration* '}'
+			{
 				m_pModule->m_NamespaceMgr.CloseNamespace ();
 			}
 	;
 
 extend_declaration
-	:	EToken_Extend qualified_name 
-			{ 
+	:	EToken_Extend qualified_name
+			{
 				return OpenTypeExtension ($2.m_Name, $2.m_FirstToken.m_Pos);
 			}
-		'{' named_type_block_declaration* '}' 
-			{ 
+		'{' named_type_block_declaration* '}'
+			{
 				m_pModule->m_NamespaceMgr.CloseNamespace ();
 			}
 	;
@@ -100,19 +100,19 @@ class
 }
 qualified_name
 	:	qualified_name_impl <&$.m_Name>
-	; 
+	;
 
 qualified_name_impl <CQualifiedName* $pName>
-	:	EToken_Identifier       
-			{  
-				$pName->AddName ($1.m_Data.m_String); 
+	:	EToken_Identifier
+			{
+				$pName->AddName ($1.m_Data.m_String);
 			}
 		('.' EToken_Identifier $n2
-			{ 
+			{
 				$pName->AddName ($n2.m_Data.m_String);
 			}
 		)*
-	; 
+	;
 
 //.............................................................................
 
@@ -123,7 +123,7 @@ item_declaration_w_specifier
 	{
 		m_StorageKind = EStorage_Undefined;
 		m_AccessKind = EAccess_Undefined;
-	}	
+	}
 	:	declaration_specifier_list $s
 		declarator_list <&$s.m_TypeSpecifier>?
 		declaration_terminator <&$s.m_TypeSpecifier>
@@ -141,7 +141,7 @@ item_declaration_no_specifier
 		m_StorageKind = EStorage_Undefined;
 		m_AccessKind = EAccess_Undefined;
 		$Declarator.SetTypeSpecifier (NULL);
-	}	
+	}
 	:	declarator_prefix <&$Declarator>*
 		declarator_name <&$Declarator>
 		function_suffix <&$Declarator> declarator_suffix <&$Declarator>*
@@ -154,8 +154,8 @@ item_declaration_no_specifier
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// conflict at EToken_Identifier in global scope and in named type block 
-// between qualified_type_name and declarator_name 
+// conflict at EToken_Identifier in global scope and in named type block
+// between qualified_type_name and declarator_name
 // prefer declarator_name if and only if this is a function
 
 item_declaration_no_specifier_rslv
@@ -169,7 +169,7 @@ item_declaration_no_specifier_rslv
 //.............................................................................
 
 declaration_terminator <CTypeSpecifier* $pTypeSpecifier>
-	leave 
+	leave
 	{
 		if (m_pAttributeBlock)
 		{
@@ -207,7 +207,7 @@ compound_stmt_pass1 <rtl::CBoxListT <CToken>* $pTokenList>
 				$.m_pAnchorToken = &*$pTokenList->InsertTail ($l);
 				$.m_pAnchorToken->m_Data.m_Integer = 0; // tokens can be reused, ensure cleanup
 			}
-		statement_pass1 <$pTokenList, $.m_pAnchorToken>* 
+		statement_pass1 <$pTokenList, $.m_pAnchorToken>*
 		'}' $r
 			{
 				$pTokenList->InsertTail ($r);
@@ -239,14 +239,14 @@ statement_pass1 <rtl::CBoxListT <CToken>* $pTokenList, CToken* $pAnchorToken>
 
 type_name_impl <CType** $ppType, CValue* $pCountValue>
 	local
-	{	
+	{
 		CDeclarator $Declarator;
 	}
 	:	type_specifier_modifier_list
 			{
 				$Declarator.SetTypeSpecifier (&$1.m_TypeSpecifier);
 			}
-		declarator_prefix <&$Declarator>* 
+		declarator_prefix <&$Declarator>*
 		declarator_suffix <&$Declarator>*
 			{
 				CType* pType = $Declarator.CalcType ($pCountValue);
@@ -260,7 +260,7 @@ type_name_impl <CType** $ppType, CValue* $pCountValue>
 class
 {
 	CType* m_pType;
-} 
+}
 type_name
 	: type_name_impl <&$.m_pType, NULL>
 	;
@@ -286,7 +286,7 @@ class
 	CType* m_pType;
 }
 type_name_or_expr
-	:	type_name 
+	:	type_name
 			{
 				$.m_pType = $1.m_pType;
 			}
@@ -301,7 +301,7 @@ type_name_or_expr
 // attributes
 
 attribute_block
-	:	'[' 
+	:	'['
 			{
 				m_pAttributeBlock = m_pModule->m_AttributeMgr.CreateAttributeBlock ();
 			}

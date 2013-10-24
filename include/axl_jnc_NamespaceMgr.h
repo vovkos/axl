@@ -40,26 +40,29 @@ public:
 	{
 		return m_pModule;
 	}
-	
+
 	void
 	Clear ();
 
 	bool
 	AddStdItems ();
 
+	void
+	SetSourcePos (const CToken::CPos& Pos);
+
 	CGlobalNamespace*
 	GetGlobalNamespace ()
 	{
 		return &m_GlobalNamespace;
 	}
-	
-	CNamespace* 
+
+	CNamespace*
 	GetCurrentNamespace ()
 	{
 		return m_pCurrentNamespace;
 	}
 
-	CScope* 
+	CScope*
 	GetCurrentScope ()
 	{
 		return m_pCurrentScope;

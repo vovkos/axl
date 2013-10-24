@@ -32,14 +32,14 @@ CControlFlowMgr::Clear ()
 	m_pUnreachableBlock = NULL;
 }
 
-CBasicBlock* 
+CBasicBlock*
 CControlFlowMgr::CreateBlock (const rtl::CString& Name)
 {
 	CBasicBlock* pBlock = AXL_MEM_NEW (CBasicBlock);
 	pBlock->m_pModule = m_pModule;
 	pBlock->m_Name = Name;
 	pBlock->m_pLlvmBlock = llvm::BasicBlock::Create (
-		llvm::getGlobalContext (), 
+		llvm::getGlobalContext (),
 		(const char*) Name,
 		NULL
 		);
@@ -59,11 +59,11 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 	if (!pBlock)
 		return pPrevCurrentBlock;
 
-	m_pModule->m_LlvmIrBuilder.SetInsertPoint (pBlock);
-
 	if (!pBlock->m_pFunction)
 		AddBlock (pBlock);
-	
+
+	m_pModule->m_LlvmIrBuilder.SetInsertPoint (pBlock);
+
 	return pPrevCurrentBlock;
 }
 
@@ -71,7 +71,7 @@ void
 CControlFlowMgr::AddBlock (CBasicBlock* pBlock)
 {
 	ASSERT (!pBlock->m_pFunction);
-	
+
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
 
@@ -195,7 +195,7 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	while (pScope && pScope != pTargetScope && pScope->GetFunction () == pFunction)
-	{	
+	{
 		pScope->m_DestructList.RunDestructors ();
 		m_pModule->m_OperatorMgr.NullifyGcRootList (pScope->GetGcRootList ());
 
@@ -239,7 +239,7 @@ CControlFlowMgr::Return (
 
 	CFunctionType* pFunctionType = pFunction->GetType ();
 	CType* pReturnType = pFunctionType->GetReturnType ();
-	
+
 	if (IsSilent && !m_pSilentReturnBlock)
 	{
 		err::SetFormatStringError ("cannot 'silent return' from '%s'", pFunction->m_Tag.cc ());
@@ -251,13 +251,13 @@ CControlFlowMgr::Return (
 		if (pFunction->GetType ()->GetReturnType ()->GetTypeKind () != EType_Void)
 		{
 			err::SetFormatStringError (
-				"function '%s' must return a '%s' value", 
+				"function '%s' must return a '%s' value",
 				pFunction->m_Tag.cc (),  // thanks a lot gcc
 				pReturnType->GetTypeString ().cc ()
 				);
 			return false;
 		}
-		
+
 		OnLeaveScope ();
 		RestoreScopeLevel ();
 
@@ -281,8 +281,8 @@ CControlFlowMgr::Return (
 		else
 		{
 			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
-				EStorage_Stack, 
-				"savedReturnValue", 
+				EStorage_Stack,
+				"savedReturnValue",
 				"savedReturnValue",
 				pReturnType
 				);
@@ -318,7 +318,7 @@ CControlFlowMgr::Throw (
 
 	CType* pPitcherReturnType = pFunctionType->GetReturnType ();
 	rtl::CConstBoxListT <CToken> PitcherCondition = pFunctionType->GetPitcherCondition ();
-	
+
 	CValue IndicatorValue;
 	if (!PitcherCondition.IsEmpty ())
 	{
@@ -362,7 +362,7 @@ CControlFlowMgr::Throw (
 		CType* pCurrentReturnType = pCurrentFunctionType->GetReturnType ();
 
 		CValue ThrowValue;
-		if (!pCurrentFunctionType->GetPitcherCondition ().IsEmpty ()) 
+		if (!pCurrentFunctionType->GetPitcherCondition ().IsEmpty ())
 		{
 			if (!pCurrentFunctionType->IsPitcherMatch (pFunctionType))
 			{
@@ -480,7 +480,7 @@ CControlFlowMgr::EndFinally ()
 
 	size_t BlockCount = pScope->m_FinallyReturnBlockArray.GetCount ();
 	ASSERT (BlockCount);
-	
+
 	char Buffer [256];
 	rtl::CArrayT <intptr_t> IntArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	IntArray.SetCount (BlockCount);
@@ -502,7 +502,7 @@ CControlFlowMgr::EndFinally ()
 bool
 CControlFlowMgr::CheckReturn ()
 {
-	if (m_pCurrentBlock->HasTerminator ()) 
+	if (m_pCurrentBlock->HasTerminator ())
 		return true;
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
@@ -525,7 +525,7 @@ CControlFlowMgr::CheckReturn ()
 			);
 		return false;
 	}
-	else 
+	else
 	{
 		err::SetFormatStringError (
 			"not all control paths in function '%s' return a value",

@@ -55,6 +55,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 	create_gcc_flag_show_includes_setting ()
 	create_gcc_flag_format_warning_setting ()
 	create_gcc_flag_multichar_warning_setting ()
+	create_gcc_flag_deprecated_warning_setting ()
 
 	message (STATUS "C++ flags: ${COMPILE_DEFINITIONS}${CMAKE_CXX_FLAGS}")
 endif ()

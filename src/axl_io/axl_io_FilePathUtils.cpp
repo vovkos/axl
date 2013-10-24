@@ -161,23 +161,6 @@ FindFilePath (
 	return rtl::CString ();
 }
 
-rtl::CString
-CreateTempFileName ()
-{
-	rtl::CString FileName;
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-	wchar_t Buffer [1024];
-	::GetTempFileNameW (L".", L"idx", 0, Buffer);
-	FileName = Buffer;
-#elif (_AXL_ENV == AXL_ENV_POSIX) 
-	char Buffer [1024];
-	FileName = tmpnam (Buffer);
-#endif
-
-	return FileName;
-}
-
 //.............................................................................
 
 } // namespace io

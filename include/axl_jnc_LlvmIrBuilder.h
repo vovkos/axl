@@ -33,7 +33,7 @@ protected:
 public:
 	CLlvmIrBuilder ();
 
-	uint_t 
+	uint_t
 	GetCommentMdKind ()
 	{
 		return m_CommentMdKind;
@@ -45,7 +45,7 @@ public:
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
+		AXL_VA_DECL (va, pFormat); 
 		return CreateComment_va (pFormat, va);
 	}
 
@@ -64,13 +64,28 @@ public:
 		return CreateComment_0 (NULL);
 	}
 
-	void
-	SetSourcePos (const CToken::CPos& Pos);
+	llvm::DebugLoc
+	GetCurrentDebugLoc ()
+	{
+		return m_LlvmIrBuilder.getCurrentDebugLocation ();
+	}
 
 	void
-	SetInstDebugLocation (llvm::Instruction* pLlvmInstruction)
+	SetCurrentDebugLoc (const llvm::DebugLoc& LlvmDebugLoc)
 	{
-		m_LlvmIrBuilder.SetInstDebugLocation (pLlvmInstruction);
+		m_LlvmIrBuilder.SetCurrentDebugLocation (LlvmDebugLoc);
+	}
+
+	void
+	ClearCurrentDebugLoc ()
+	{
+		m_LlvmIrBuilder.SetCurrentDebugLocation (llvm::DebugLoc ());
+	}
+
+	void
+	SetInstDebugLoc (llvm::Instruction* pLlvmInst)
+	{
+		m_LlvmIrBuilder.SetInstDebugLocation (pLlvmInst);
 	}
 
 	// branches
@@ -110,7 +125,7 @@ public:
 		)
 	{
 		return m_LlvmIrBuilder.CreateCondBr (
-			Value.GetLlvmValue (), 
+			Value.GetLlvmValue (),
 			pTrueBlock->GetLlvmBlock (),
 			pFalseBlock->GetLlvmBlock ()
 			);
@@ -173,7 +188,7 @@ public:
 
 	llvm::AllocaInst*
 	CreateAlloca (
-		CType* pType, 
+		CType* pType,
 		const char* pName,
 		CType* pResultType,
 		CValue* pResultValue
@@ -339,8 +354,8 @@ public:
 		)
 	{
 		llvm::Value* pInst = m_LlvmIrBuilder.CreateExtractValue (
-			Value.GetLlvmValue (), 
-			llvm::ArrayRef <uint_t> ((uint_t*) pIndexArray, IndexCount), 
+			Value.GetLlvmValue (),
+			llvm::ArrayRef <uint_t> ((uint_t*) pIndexArray, IndexCount),
 			"extract"
 			);
 		pResultValue->SetLlvmValue (pInst, pResultType);
@@ -357,7 +372,7 @@ public:
 		)
 	{
 		llvm::Value* pInst = m_LlvmIrBuilder.CreateInsertValue (
-			AggregateValue.GetLlvmValue (), 
+			AggregateValue.GetLlvmValue (),
 			MemberValue.GetLlvmValue (),
 			Index,
 			"insert"
@@ -378,9 +393,9 @@ public:
 		)
 	{
 		llvm::Value* pInst = m_LlvmIrBuilder.CreateInsertValue (
-			AggregateValue.GetLlvmValue (), 
+			AggregateValue.GetLlvmValue (),
 			MemberValue.GetLlvmValue (),
-			llvm::ArrayRef <uint_t> ((uint_t*) pIndexArray, IndexCount), 
+			llvm::ArrayRef <uint_t> ((uint_t*) pIndexArray, IndexCount),
 			"insert"
 			);
 
@@ -841,13 +856,13 @@ public:
 		)
 	{
 		llvm::AtomicCmpXchgInst* pInst = m_LlvmIrBuilder.CreateAtomicCmpXchg (
-			PtrValue.GetLlvmValue (), 
-			CmpValue.GetLlvmValue (), 
+			PtrValue.GetLlvmValue (),
+			CmpValue.GetLlvmValue (),
 			NewValue.GetLlvmValue (),
-			OrderingKind, 
+			OrderingKind,
 			SyncKind
 			);
-		
+
 		pResultValue->SetLlvmValue (pInst, NewValue.GetType ());
 		return pInst;
 	}
@@ -864,12 +879,12 @@ public:
 	{
 		llvm::AtomicRMWInst* pInst = m_LlvmIrBuilder.CreateAtomicRMW (
 			OpKind,
-			PtrValue.GetLlvmValue (), 
+			PtrValue.GetLlvmValue (),
 			NewValue.GetLlvmValue (),
-			llvm::Acquire, 
+			llvm::Acquire,
 			llvm::CrossThread
 			);
-		
+
 		pResultValue->SetLlvmValue (pInst, NewValue.GetType ());
 		return pInst;
 	}
@@ -1030,7 +1045,7 @@ public:
 		)
 	{
 		return CreateCall (
-			CalleeValue, 
+			CalleeValue,
 			pFunctionType->GetCallConv (),
 			pArgArray,
 			ArgCount,

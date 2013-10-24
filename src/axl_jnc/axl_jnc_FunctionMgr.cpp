@@ -4,6 +4,7 @@
 #include "axl_jnc_Module.h"
 
 // #define _AXL_JNC_NO_JIT
+// #define _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 
 namespace axl {
 namespace jnc {
@@ -69,7 +70,7 @@ CFunctionMgr::CreateFunction (
 		pFunction = AXL_MEM_NEW (CFunction);
 		m_FunctionList.InsertTail (pFunction);
 	}
-	
+
 	pFunction->m_pModule = m_pModule;
 	pFunction->m_FunctionKind = FunctionKind;
 	pFunction->m_pType = pType;
@@ -230,11 +231,11 @@ CFunctionMgr::CutVTable (const CValue& ThisArgValue)
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "cut vtable ptr");
 
-	int32_t LlvmIndexArray [] = 
+	int32_t LlvmIndexArray [] =
 	{
 		0, // TInterface**
-		0, // TInterface* 
-		0, // vtable** 
+		0, // TInterface*
+		0, // vtable**
 	};
 
 	m_pModule->m_LlvmIrBuilder.CreateGep (ThisArgValue, LlvmIndexArray, countof (LlvmIndexArray), NULL, &m_VTablePtrPtrValue);
@@ -256,7 +257,7 @@ CFunctionMgr::FireOnChangeEvent ()
 
 	ASSERT (
 		pFunction->m_FunctionKind == EFunction_Setter &&
-		pFunction->m_pProperty && 
+		pFunction->m_pProperty &&
 		pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable
 		);
 
@@ -289,13 +290,11 @@ CFunctionMgr::Prologue (
 	m_pCurrentFunction = pFunction;
 
 	// create scope
-	
+
 	m_pModule->m_NamespaceMgr.OpenNamespace (pFunction->m_pParentNamespace);
+
 	pFunction->m_pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 
-	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
-		pFunction->GetLlvmDiSubprogram ();
-	
 	// create entry block (gc roots come here)
 
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
@@ -306,13 +305,23 @@ CFunctionMgr::Prologue (
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 
+#ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
+	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
+	m_pModule->m_LlvmIrBuilder.CreateCall (pGcSafePoint, pGcSafePoint->GetType (), NULL);
+#endif
+
+	// we gonna inject instructions to entry block later on.
+	// having them tagged with lineinfo confuses llvm and causes it to produce broken DWARF.
+
+	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc ();
+
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
 	{
 		bool Result = m_pModule->m_VariableMgr.AllocatePrimeStaticVariables ();
 		if (!Result)
 			return false;
 	}
-	
+
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0; // clear jump flag
@@ -332,7 +341,7 @@ CFunctionMgr::Prologue (
 		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
 		m_pModule->m_LlvmIrBuilder.CreateLoad (pVariable, NULL, &m_ScopeLevelValue);
 	}
-	
+
 	Result = CreateShadowArgVariables ();
 	if (!Result)
 		return false;
@@ -381,9 +390,9 @@ CFunctionMgr::CreateThisValue (const CValue& ThisArgValue)
 		else // make it thin
 		{
 			ASSERT (
-				ThisArgValue.GetType ()->GetTypeKind () == EType_DataPtr && 
+				ThisArgValue.GetType ()->GetTypeKind () == EType_DataPtr &&
 				((CDataPtrType*) ThisArgValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
-			
+
 			CDataPtrType* pPtrType = ((CDataPtrType*) ThisArgValue.GetType ());
 
 			CValue PtrValue;
@@ -435,17 +444,17 @@ CFunctionMgr::CreateShadowArgVariables ()
 
 		CVariable* pArgVariable = m_pModule->m_VariableMgr.CreateVariable (
 			EStorage_Stack,
-			pArg->GetName (), 
-			pArg->GetName (), 
-			pArg->GetType (), 
+			pArg->GetName (),
+			pArg->GetName (),
+			pArg->GetType (),
 			pArg->GetPtrTypeFlags ()
 			);
 
 		CValue PtrValue;
 		Result = m_pModule->m_OperatorMgr.Allocate (
-			EStorage_Stack, 
-			pArg->GetType (), 
-			pArg->GetName (), 
+			EStorage_Stack,
+			pArg->GetType (),
+			pArg->GetName (),
 			&PtrValue
 			);
 
@@ -458,13 +467,13 @@ CFunctionMgr::CreateShadowArgVariables ()
 		if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
 		{
 			pArgVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (
-				pArgVariable, 
+				pArgVariable,
 				llvm::dwarf::DW_TAG_arg_variable
 				);
-		
+
 			m_pModule->m_LlvmDiBuilder.CreateDeclare (pArgVariable);
 		}
-		
+
 		CValue ArgValue (pLlvmArg, pArg->GetType ());
 
 		m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue, pArgVariable);
@@ -509,14 +518,14 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 
 		m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
 	}
-	
+
 	if (pFunction->m_FunctionKind == EFunction_Destructor)
 	{
 		ASSERT (pFunction->GetParentType ()->GetTypeKind () == EType_Class && m_ThisValue);
 
 		CClassType* pClassType = (CClassType*) pFunction->GetParentType ();
 
-		Result = 
+		Result =
 			pClassType->CallMemberPropertyDestructors (m_ThisValue) &&
 			pClassType->CallMemberFieldDestructors (m_ThisValue) &&
 			pClassType->CallBaseTypeDestructors (m_ThisValue);
@@ -532,14 +541,14 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 	if (!Result)
 		return false;
 
-	try 
+	try
 	{
 		llvm::verifyFunction (*pFunction->GetLlvmFunction (), llvm::ReturnStatusAction);
 	}
 	catch (err::CError Error)
 	{
 		err::SetFormatStringError (
-			"LLVM verification fail for '%s': %s", 
+			"LLVM verification fail for '%s': %s",
 			pFunction->m_Tag.cc (),
 			Error->GetDescription ().cc ()
 			);
@@ -562,7 +571,7 @@ CFunctionMgr::InternalPrologue (
 	)
 {
 	PushEmissionContext ();
-	
+
 	m_pCurrentFunction = pFunction;
 
 	CToken::CPos Pos;
@@ -601,13 +610,13 @@ CFunctionMgr::InternalEpilogue ()
 	CFunction* pFunction = m_pCurrentFunction;
 
 	CBasicBlock* pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	if (!pCurrentBlock->HasTerminator ()) 
+	if (!pCurrentBlock->HasTerminator ())
 	{
 		CType* pReturnType = pFunction->GetType ()->GetReturnType ();
 
 		CValue ReturnValue;
 		if (pReturnType->GetTypeKind () != EType_Void)
-			ReturnValue = pReturnType->GetZeroValue (); 
+			ReturnValue = pReturnType->GetZeroValue ();
 
 		m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 	}
@@ -638,16 +647,16 @@ CFunctionMgr::GetDirectThunkFunction (
 
 	rtl::CString Signature;
 	Signature.Format (
-		"%c%x.%s", 
+		"%c%x.%s",
 		SignatureChar,
-		pTargetFunction, 
+		pTargetFunction,
 		pThunkFunctionType->GetSignature ().cc ()
 		);
 
 	rtl::CStringHashTableMapIteratorT <CFunction*> Thunk = m_ThunkFunctionMap.Goto (Signature);
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
-	
+
 	CThunkFunction* pThunkFunction = (CThunkFunction*) CreateFunction (EFunction_Thunk, pThunkFunctionType);
 	pThunkFunction->m_StorageKind = EStorage_Static;
 	pThunkFunction->m_Tag = "_direct_thunk_function";
@@ -672,16 +681,16 @@ CFunctionMgr::GetDirectThunkProperty (
 
 	rtl::CString Signature;
 	Signature.Format (
-		"%c%x.%s", 
+		"%c%x.%s",
 		HasUnusedClosure ? 'U' : 'D',
-		pTargetProperty, 
+		pTargetProperty,
 		pThunkPropertyType->GetSignature ().cc ()
 		);
 
 	rtl::CStringHashTableMapIteratorT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
-	
+
 	CThunkProperty* pThunkProperty = (CThunkProperty*) CreateProperty (EProperty_Thunk, rtl::CString (), rtl::CString ());
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Signature = Signature;
@@ -708,16 +717,16 @@ CFunctionMgr::GetDirectDataThunkProperty (
 
 	rtl::CString Signature;
 	Signature.Format (
-		"%c%x.%s", 
+		"%c%x.%s",
 		HasUnusedClosure ? 'U' : 'D',
-		pTargetVariable, 
+		pTargetVariable,
 		pThunkPropertyType->GetSignature ().cc ()
 		);
 
 	rtl::CStringHashTableMapIteratorT <CProperty*> Thunk = m_ThunkPropertyMap.Goto (Signature);
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
-	
+
 	CDataThunkProperty* pThunkProperty = (CDataThunkProperty*) CreateProperty (EProperty_DataThunk, rtl::CString (), rtl::CString ());
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Signature = Signature;
@@ -808,18 +817,21 @@ CFunctionMgr::InjectTlsPrologue (CFunction* pFunction)
 
 	rtl::CArrayT <TTlsVariable> TlsVariableArray = pFunction->GetTlsVariableArray ();
 	ASSERT (!TlsVariableArray.IsEmpty ());
-		
+
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
-	m_pModule->m_LlvmIrBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->begin ());
+
+	llvm::BasicBlock::iterator LlvmAnchor = pBlock->GetLlvmBlock ()->begin ();
+
+#ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
+	ASSERT (llvm::isa <llvm::CallInst> (LlvmAnchor));
+	LlvmAnchor++;
+#endif
+
+	m_pModule->m_LlvmIrBuilder.SetInsertPoint (LlvmAnchor);
 
 	CFunction* pGetTls = GetStdFunction (EStdFunc_GetTls);
-
 	CValue TlsValue;
-	llvm::BasicBlock::iterator LlvmAnchor = m_pModule->m_LlvmIrBuilder.CreateCall (
-		pGetTls,
-		pGetTls->GetType (),
-		&TlsValue
-		);
+	LlvmAnchor = m_pModule->m_LlvmIrBuilder.CreateCall (pGetTls, pGetTls->GetType (), &TlsValue);
 
 	// tls variables used in this function
 
@@ -831,7 +843,6 @@ CFunctionMgr::InjectTlsPrologue (CFunction* pFunction)
 
 		CValue PtrValue;
 		m_pModule->m_LlvmIrBuilder.CreateGep2 (TlsValue, pField->GetLlvmIndex (), NULL, &PtrValue);
-			
 		TlsVariableArray [i].m_pLlvmAlloca->replaceAllUsesWith (PtrValue.GetLlvmValue ());
 	}
 
@@ -855,19 +866,19 @@ class CJitEventListener: public llvm::JITEventListener
 {
 protected:
 	CFunctionMgr* m_pFunctionMgr;
-	
+
 public:
 	CJitEventListener (CFunctionMgr* pFunctionMgr)
 	{
 		m_pFunctionMgr = pFunctionMgr;
-	}	
-	
+	}
+
 	virtual
 	void
 	NotifyFunctionEmitted (
-		const llvm::Function& LlvmFunction, 
-		void* p, 
-		size_t Size, 
+		const llvm::Function& LlvmFunction,
+		void* p,
+		size_t Size,
 		const EmittedFunctionDetails& Details
 		)
 	{
@@ -886,7 +897,7 @@ public:
 		printf ("NotifyObjectEmitted\n");
 	}
 };
-void 
+void
 LlvmFatalErrorHandler (
 	void* pContext,
 	const std::string& ErrorString
@@ -904,10 +915,10 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 #endif
 
 	CJitEventListener JitEventListener (this);
-		
+
 	pExecutionEngine->RegisterJITEventListener (&JitEventListener);
 	// pExecutionEngine->finalizeObject ();
-	
+
 	CScopeThreadModule ScopeModule (m_pModule);
 	llvm::ScopedFatalErrorHandler ScopeErrorHandler (LlvmFatalErrorHandler);
 
@@ -919,17 +930,17 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 		if (!pFunction->GetEntryBlock ())
 			continue;
 
-		try 
-		{		
+		try
+		{
 			void* pf = pExecutionEngine->getPointerToFunction (pFunction->GetLlvmFunction ());
-			pFunction->m_pfMachineCode = pf; 
-			
+			pFunction->m_pfMachineCode = pf;
+
 			// ASSERT (pFunction->m_pfMachineCode == pf && pFunction->m_MachineCodeSize != 0);
 		}
 		catch (err::CError Error)
 		{
 			err::SetFormatStringError (
-				"LLVM jitting fail for '%s': %s", 
+				"LLVM jitting fail for '%s': %s",
 				pFunction->m_Tag.cc (),
 				Error->GetDescription ().cc ()
 				);
@@ -941,7 +952,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
 	return true;
 }
- 
+
 CFunction*
 CFunctionMgr::GetStdFunction (EStdFunc Func)
 {
@@ -1114,7 +1125,7 @@ CFunctionMgr::CreateOnRuntimeError ()
 	return CreateInternalFunction ("jnc.onRuntimeError", pType);
 }
 
-// void 
+// void
 // jnc.CheckNullPtr (
 //		int8* p,
 //		int Error
@@ -1140,7 +1151,7 @@ CFunctionMgr::CreateCheckNullPtr ()
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("iface_fail");
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("iface_success");
-	
+
 	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CValue CmpValue;
@@ -1157,7 +1168,7 @@ CFunctionMgr::CreateCheckNullPtr ()
 }
 
 
-// void 
+// void
 // jnc.CheckDataPtrScopeLevel (
 //		size_t SrcScopeLevel
 //		size_t DstScopeLevel
@@ -1174,7 +1185,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
-	
+
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction ("jnc.checkScopeLevel", pType);
 
@@ -1186,7 +1197,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 
 	CBasicBlock* pFailBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("scope_fail");
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("scope_success");
-	
+
 	CValue CmpValue;
 	m_pModule->m_LlvmIrBuilder.CreateGt_u (ArgValue1, ArgValue2, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pSuccessBlock);
@@ -1199,7 +1210,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 	return pFunction;
 }
 
-// void 
+// void
 // jnc.CheckDataPtrRange (
 //		int8* p,
 //		size_t Size,
@@ -1220,7 +1231,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)
 	};
-	
+
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction ("jnc.checkDataPtrRange", pType);
 
@@ -1236,7 +1247,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	CBasicBlock* pSuccessBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("sptr_success");
 	CBasicBlock* pCmp2Block = m_pModule->m_ControlFlowMgr.CreateBlock ("sptr_cmp2");
 	CBasicBlock* pCmp3Block = m_pModule->m_ControlFlowMgr.CreateBlock ("sptr_cmp3");
-	
+
 	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CValue CmpValue;
@@ -1244,7 +1255,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pCmp2Block, pCmp2Block);
 
 	m_pModule->m_LlvmIrBuilder.CreateLt_u (ArgValue1, ArgValue3, &CmpValue);
-	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pCmp3Block, pCmp3Block);	
+	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pCmp3Block, pCmp3Block);
 
 	CValue PtrEndValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (ArgValue1, ArgValue2, NULL ,&PtrEndValue);
@@ -1260,7 +1271,7 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	return pFunction;
 }
 
-// void 
+// void
 // jnc.CheckClassPtrScopeLevel (
 //		object* p,
 //		size_t DstScopeLevel
@@ -1277,7 +1288,7 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
-	
+
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
 	CFunction* pFunction = CreateInternalFunction ("jnc.checkClassPtrScopeLevel", pType);
 
@@ -1298,17 +1309,17 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	m_pModule->m_LlvmIrBuilder.CreateEq_i (ArgValue1, NullValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pSuccessBlock, pNoNullBlock, pNoNullBlock);
 
-	static int32_t LlvmIndexArray [] = 
+	static int32_t LlvmIndexArray [] =
 	{
 		0, // TInterface**
-		0, // TInterface* 
-		1, // TObject** 
+		0, // TInterface*
+		1, // TObject**
 	};
 
 	CValue ObjPtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (ArgValue1, LlvmIndexArray, countof (LlvmIndexArray), NULL, &ObjPtrValue); // TObject** ppObject
 	m_pModule->m_LlvmIrBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue);  // TObject* pObject
-	
+
 	CValue SrcScopeLevelValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &SrcScopeLevelValue);     // size_t* pScopeLevel
 	m_pModule->m_LlvmIrBuilder.CreateLoad (SrcScopeLevelValue, NULL, &SrcScopeLevelValue); // size_t ScopeLevel
@@ -1334,7 +1345,7 @@ CFunction*
 CFunctionMgr::CreateDynamicCastClassPtr ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
-	
+
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
@@ -1352,7 +1363,7 @@ CFunction*
 CFunctionMgr::CreateStrengthenClassPtr ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
-	
+
 	CType* ArgTypeArray [] =
 	{
 		((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass))->GetClassPtrType (EClassPtrType_Weak)
@@ -1369,7 +1380,7 @@ CFunction*
 CFunctionMgr::CreateHeapAlloc ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-	
+
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
@@ -1386,7 +1397,7 @@ CFunction*
 CFunctionMgr::CreateHeapUAlloc ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-	
+
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
@@ -1459,7 +1470,7 @@ CFunctionMgr::CreateMarkGcRoot ()
 		pBytePtrType,
 	};
 
-	llvm::Type* LlvmArgTypeArray [2] = 
+	llvm::Type* LlvmArgTypeArray [2] =
 	{
 		pBytePtrType->GetLlvmType (),
 		pBytePtrType->GetLlvmType (),
@@ -1590,7 +1601,7 @@ CFunctionMgr::CreatePrintf ()
 	CType* pFormatType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin, EPtrTypeFlag_Unsafe | EPtrTypeFlag_Const);
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (
-		pReturnType, 
+		pReturnType,
 		&pFormatType, 1,
 		EFunctionTypeFlag_VarArg | EFunctionTypeFlag_UnsafeVarArg
 		);
@@ -1606,7 +1617,7 @@ CFunction*
 CFunctionMgr::CreateGetTls ()
 {
 	CType* pReturnType = m_pModule->m_VariableMgr.GetTlsStructType ()->GetDataPtrType (
-		EDataPtrType_Thin, 
+		EDataPtrType_Thin,
 		EPtrTypeFlag_Unsafe
 		);
 

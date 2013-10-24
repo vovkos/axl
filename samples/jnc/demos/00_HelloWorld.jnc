@@ -5,9 +5,21 @@
 
 // entry point
 
+foo ()
+{
+
+}
+
 int main ()
 {
-	printf ("hello world!\n");
+//	printf ("hello world!\n");
+
+	int a = 10;
+	int b = 20;
+	int c = a + b;
+	
+	foo ();
+
 	return 0;
 }
 

@@ -64,7 +64,7 @@ CWidget::CWidget (gui::CEngine* pEngine):
 	m_IconOrigin.m_y = (m_CharSize.m_Height - 1 - 16) / 2;
 
 	memcpy (m_ColorArray, gui::GetStdPalColorArray (), gui::EStdPalColor__Count * sizeof (uint_t));
-	
+
 	m_ColorArray [~gui::EColorFlag_Index & EColor_HiliteBack]           = 0xdcdcff;
 	m_ColorArray [~gui::EColorFlag_Index & EColor_IntraPacketDelimiter] = 0xdcdcdc;
 	m_ColorArray [~gui::EColorFlag_Index & EColor_InterPacketDelimiter] = 0xc0c0c0;
@@ -171,7 +171,7 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		{
 			TCliMsg_RepresentPageComplete* pMsg = (TCliMsg_RepresentPageComplete*) pMsgHdr;
 			size_t ExtraSize = pMsg->m_FoldablePacketCount * sizeof (TFoldablePacket) + pMsg->m_LineBufferSize;
-			
+
 			if (pMsg->m_MsgSize < sizeof (TCliMsg_RepresentPageComplete) + ExtraSize)
 				break;
 
@@ -226,7 +226,7 @@ CWidget::OnThreadMsg (
 	case ECliMsg_CreateIndexLeaf:
 		{
 		TCliMsg_CreateIndexLeaf* pMsg = (TCliMsg_CreateIndexLeaf*) p;
-		ASSERT (pMsg->m_LeafOffset == m_CacheMgr.GetIndexNextLeafOffset ()); 
+		ASSERT (pMsg->m_LeafOffset == m_CacheMgr.GetIndexNextLeafOffset ());
 
 		if (pMsg->m_LeafOffset == m_CacheMgr.GetIndexNextLeafOffset ())
 			m_CacheMgr.CreateIndexLeaf (
@@ -244,7 +244,7 @@ CWidget::OnThreadMsg (
 	case ECliMsg_UpdateIndexTailLeaf:
 		{
 		TCliMsg_UpdateIndexTailLeaf* pMsg = (TCliMsg_UpdateIndexTailLeaf*) p;
-		ASSERT (pMsg->m_LeafOffset == m_CacheMgr.GetIndexTailLeafOffset ()); 
+		ASSERT (pMsg->m_LeafOffset == m_CacheMgr.GetIndexTailLeafOffset ());
 
 		if (pMsg->m_LeafOffset == m_CacheMgr.GetIndexTailLeafOffset ())
 			m_CacheMgr.UpdateIndexTailLeaf (
@@ -298,44 +298,7 @@ CWidget::Copy ()
 	return true;
 }
 
-/*
-
-bool
-CWidget::SetPacketFile (
-	CPacketFile* pPacketFile,
-	CRepresenter* pRepresenter
-	)
-{
-	bool Result;
-
-	rtl::CString IndexFileName = io::CreateTempFileName ();
-	
-	Result = m_IndexMgr.Create (
-		pPacketFile, 
-		pRepresenter, 
-		rtl::CString (IndexFileName), 
-		io::EFileFlag_DeleteOnClose | io::EFileFlag_Exclusive
-		);
-
-	if (!Result)
-		return false;
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-	::SetFileAttributesW (
-		IndexFileName.cc2 (), 
-		FILE_ATTRIBUTE_HIDDEN | 
-		FILE_ATTRIBUTE_TEMPORARY |
-		FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
-		);
-#endif
-
-	ReRepresentAll ();
-	return true;
-}
-
-*/
-
-void 
+void
 CWidget::SetImageList (gui::CImageList* pImageList)
 {
 	m_pImageList = pImageList;
@@ -358,7 +321,7 @@ CWidget::SetImageList (gui::CImageList* pImageList)
 	Redraw ();
 }
 
-void 
+void
 CWidget::ShowIcon (bool IsVisible)
 {
 	m_IsIconVisible = IsVisible;
@@ -366,7 +329,7 @@ CWidget::ShowIcon (bool IsVisible)
 	Redraw ();
 }
 
-void 
+void
 CWidget::SetTimestampFormat (const rtl::CString& Format)
 {
 	m_TimestampFormat = Format;
@@ -376,7 +339,7 @@ CWidget::SetTimestampFormat (const rtl::CString& Format)
 	Redraw ();
 }
 
-void 
+void
 CWidget::ShowTimestamp (bool IsVisible)
 {
 	m_IsTimestampVisible = IsVisible;
@@ -384,7 +347,7 @@ CWidget::ShowTimestamp (bool IsVisible)
 	Redraw ();
 }
 
-void 
+void
 CWidget::SetOffsetWidth (size_t Width)
 {
 	if (Width > 8)
@@ -396,7 +359,7 @@ CWidget::SetOffsetWidth (size_t Width)
 	Redraw ();
 }
 
-void 
+void
 CWidget::ShowOffset (bool IsVisible)
 {
 	m_IsOffsetVisible = IsVisible;
@@ -405,12 +368,12 @@ CWidget::ShowOffset (bool IsVisible)
 	Redraw ();
 }
 
-size_t 
+size_t
 CWidget::CalcTimestampWidth (const char* pFormat)
 {
 	if (!pFormat || !*pFormat)
 		return 0;
-	
+
 	size_t Length = g::TTime ().Format (&m_StringBuffer, m_TimestampFormat);
 	return Length + m_TimestampGapSize;
 }
@@ -425,14 +388,14 @@ CWidget::SetLineCount (size_t LineCount)
 	RecalcVScroll ();
 }
 
-void 
+void
 CWidget::RecalcBaseCol ()
 {
 	size_t BaseCol = 0;
 
 	if (m_IsTimestampVisible)
 		BaseCol += m_TimestampWidth;
-	
+
 	if (m_IsIconVisible)
 		BaseCol += m_IconWidth;
 
@@ -443,13 +406,13 @@ CWidget::RecalcBaseCol ()
 	}
 }
 
-void 
+void
 CWidget::RecalcColCount (const TLongestLineLength* pLength)
 {
 	size_t BinHexColCount = pLength->m_BinHexLineSize * 4 + m_HexGapSize + m_FullOffsetWidth;
 	size_t BinTextColCount = pLength->m_BinTextLineSize + m_FullOffsetWidth;
 	size_t ColCount = pLength->m_TextLineLength;
-	
+
 	if (BinHexColCount > ColCount)
 		ColCount = BinHexColCount;
 
@@ -475,7 +438,7 @@ CWidget::OnReRepresentPacket (
 	bool DidFirstVisibleColChange;
 
 	if (pReRepresent->m_NewLineCount)
-		m_ColorizeMgr.ReColorizeLineRange (pPage, pReRepresent->m_AnchorPageLine, pReRepresent->m_NewLineCount); 
+		m_ColorizeMgr.ReColorizeLineRange (pPage, pReRepresent->m_AnchorPageLine, pReRepresent->m_NewLineCount);
 
 	LineDelta = pReRepresent->m_NewLineCount - pReRepresent->m_OldLineCount;
 
@@ -522,7 +485,7 @@ CWidget::ModifyLineVolatileFlags (
 	uint_t VolatileFlags
 	)
 {
-	return pLine->m_pVolatilePacket ? 
+	return pLine->m_pVolatilePacket ?
 		ModifyPacketVolatileFlags (pLine->GetCachePage (), pLine->m_pVolatilePacket, VolatileFlags) :
 		false;
 }
@@ -538,7 +501,7 @@ CWidget::UpdateLog ()
 		FullUpdateLog ();
 }
 
-void 
+void
 CWidget::IncrementalUpdateLog ()
 {
 	bool ShouldScrollToBottom = m_ScrollBarArray [gui::EWidgetOrientation_Vertical].IsMaxed ();
@@ -574,14 +537,14 @@ CWidget::IncrementalUpdateLog ()
 		ScrollToBottom ();
 
 	if (ShouldPutCursorToEnd)
-		SetCursorPos (-1, -1, false); 
+		SetCursorPos (-1, -1, false);
 }
 
-void 
+void
 CWidget::FullUpdateLog ()
 {
 	m_CacheMgr.ClearCache ();
-	
+
 	m_LineCount = m_IndexMgr.GetIndexFile ()->GetLineCount ();
 	m_FirstVisibleLine = 0;
 	m_FirstVisibleCol = 0;
@@ -602,7 +565,7 @@ CWidget::OnSetFocus (
 	)
 {
 	ShowCaret (
-		GetMousePosFromCursorPos (m_CursorPos), 
+		GetMousePosFromCursorPos (m_CursorPos),
 		gui::TSize (m_CaretWidth, m_CharSize.m_Height)
 		);
 }
@@ -625,7 +588,7 @@ CWidget::OnSize (
 	m_VisibleLineCount = m_Size.m_Height / m_CharSize.m_Height;
 	m_VisibleColCount = m_Size.m_Width / m_CharSize.m_Width;
 
-	bool ShouldScrollToBottom = IsCursorAtLastLine (); 
+	bool ShouldScrollToBottom = IsCursorAtLastLine ();
 	bool DidFirstVisibleLineChange = FixupFirstVisibleLine ();
 	bool DidFirstVisibleColChange = FixupFirstVisibleCol ();
 

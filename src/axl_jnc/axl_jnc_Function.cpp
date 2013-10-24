@@ -12,7 +12,7 @@ namespace jnc {
 const char*
 GetFunctionKindString (EFunction FunctionKind)
 {
-	static const char* StringTable [EFunction__Count] = 
+	static const char* StringTable [EFunction__Count] =
 	{
 		"undefined-function-kind",  // EFunction_Undefined,
 		"named-function",           // EFunction_Named,
@@ -31,14 +31,14 @@ GetFunctionKindString (EFunction FunctionKind)
 		"cast-operator",            // EFunction_CastOperator,
 		"unary-operator",           // EFunction_UnaryOperator,
 		"binary-operator",          // EFunction_BinaryOperator,
-		"internal",                 // EFunction_Internal, 
+		"internal",                 // EFunction_Internal,
 		"thunk",                    // EFunction_Thunk,
 		"reaction",                 // EFunction_Reaction,
 		"schedule-launcher",        // EFunction_ScheduleLauncher,
 	};
 
-	return (size_t) FunctionKind < EFunction__Count ? 
-		StringTable [FunctionKind] : 
+	return (size_t) FunctionKind < EFunction__Count ?
+		StringTable [FunctionKind] :
 		StringTable [EFunction_Undefined];
 }
 
@@ -47,40 +47,40 @@ GetFunctionKindString (EFunction FunctionKind)
 int
 GetFunctionKindFlags (EFunction FunctionKind)
 {
-	static int FlagTable [EFunction__Count] = 
+	static int FlagTable [EFunction__Count] =
 	{
 		0,                              // EFunction_Undefined,
-		0,                              // EFunction_Named,		
+		0,                              // EFunction_Named,
 		EFunctionKindFlag_NoOverloads,  // EFunction_Getter,
 		0,                              // EFunction_Setter,
 		0,                              // EFunction_Binder,
 		0,                              // EFunction_Primer,
-		EFunctionKindFlag_NoStorage |   // EFunction_PreConstructor,
+		EFunctionKindFlag_NoStorage   | // EFunction_PreConstructor,
 		EFunctionKindFlag_NoOverloads |
-		EFunctionKindFlag_NoArgs,       
+		EFunctionKindFlag_NoArgs,
 		EFunctionKindFlag_NoStorage,    // EFunction_Constructor,
-		EFunctionKindFlag_NoStorage |   // EFunction_Destructor,
+		EFunctionKindFlag_NoStorage   | // EFunction_Destructor,
 		EFunctionKindFlag_NoOverloads |
-		EFunctionKindFlag_NoArgs,              
-		EFunctionKindFlag_NoStorage |   // EFunction_StaticConstructor,
+		EFunctionKindFlag_NoArgs,
+		EFunctionKindFlag_NoStorage   | // EFunction_StaticConstructor,
 		EFunctionKindFlag_NoOverloads |
-		EFunctionKindFlag_NoArgs,              
-		EFunctionKindFlag_NoStorage |   // EFunction_StaticDestructor,
+		EFunctionKindFlag_NoArgs,
+		EFunctionKindFlag_NoStorage   | // EFunction_StaticDestructor,
 		EFunctionKindFlag_NoOverloads |
-		EFunctionKindFlag_NoArgs,              
-		EFunctionKindFlag_NoStorage |   // EFunction_ModuleConstructor,
+		EFunctionKindFlag_NoArgs,
+		EFunctionKindFlag_NoStorage   | // EFunction_ModuleConstructor,
 		EFunctionKindFlag_NoOverloads |
-		EFunctionKindFlag_NoArgs,              
-		EFunctionKindFlag_NoStorage |   // EFunction_ModuleDestructor,
+		EFunctionKindFlag_NoArgs,
+		EFunctionKindFlag_NoStorage   | // EFunction_ModuleDestructor,
 		EFunctionKindFlag_NoOverloads |
-		EFunctionKindFlag_NoArgs,              
+		EFunctionKindFlag_NoArgs,
 		0,                              // EFunction_CallOperator,
 		EFunctionKindFlag_NoOverloads | // EFunction_CastOperator,
-		EFunctionKindFlag_NoArgs,       
+		EFunctionKindFlag_NoArgs,
 		EFunctionKindFlag_NoOverloads | // EFunction_UnaryOperator,
-		EFunctionKindFlag_NoArgs,       
+		EFunctionKindFlag_NoArgs,
 		0,                              // EFunction_BinaryOperator,
-		0,                              // EFunction_Internal, 
+		0,                              // EFunction_Internal,
 		0,                              // EFunction_Thunk,
 		0,                              // EFunction_Reaction,
 		0,                              // EFunction_ScheduleLauncher,
@@ -138,7 +138,7 @@ CFunction::SetBody (rtl::CBoxListT <CToken>* pTokenList)
 	return true;
 }
 
-llvm::Function* 
+llvm::Function*
 CFunction::GetLlvmFunction ()
 {
 	if (m_pLlvmFunction)
@@ -146,14 +146,14 @@ CFunction::GetLlvmFunction ()
 
 	llvm::FunctionType* pLlvmType = (llvm::FunctionType*) m_pType->GetLlvmType ();
 	m_pLlvmFunction = llvm::Function::Create (
-		pLlvmType, 
-		llvm::Function::ExternalLinkage, 
-		(const char*) m_Tag, 
+		pLlvmType,
+		llvm::Function::ExternalLinkage,
+		(const char*) m_Tag,
 		m_pModule->GetLlvmModule ()
 		);
 
-	m_pLlvmFunction->setGC ("jnc-shadow-stack");
-	m_pLlvmFunction->setDoesNotThrow ();
+	// m_pLlvmFunction->setGC ("jnc-shadow-stack");
+	// m_pLlvmFunction->setDoesNotThrow ();
 
 	m_pModule->m_FunctionMgr.m_LlvmFunctionMap [m_pLlvmFunction] = this;
 	return m_pLlvmFunction;
@@ -194,7 +194,7 @@ CFunction::AddOverload (CFunction* pFunction)
 	return true;
 }
 
-void 
+void
 CFunction::AddTlsVariable (CVariable* pVariable)
 {
 	llvm::AllocaInst* pLlvmAlloca = (llvm::AllocaInst*) pVariable->GetLlvmValue ();
@@ -210,7 +210,7 @@ CFunction*
 GetItemUnnamedMethod (
 	CModuleItem* pItem,
 	EFunction FunctionKind,
-	EUnOp UnOpKind, 
+	EUnOp UnOpKind,
 	EBinOp BinOpKind
 	)
 {
@@ -236,7 +236,7 @@ GetItemUnnamedMethod (
 		}
 	}
 	else if (
-		pItem->GetItemKind () == EModuleItem_Type && 
+		pItem->GetItemKind () == EModuleItem_Type &&
 		(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Derivable))
 	{
 		CDerivableType* pType = (CDerivableType*) pItem;
@@ -288,13 +288,13 @@ CFunction::CalcLayout ()
 	{
 		if (ItemKind != EModuleItem_Function)
 		{
-			err::SetFormatStringError ("'%s' is not a function", m_Tag.cc ()); 
+			err::SetFormatStringError ("'%s' is not a function", m_Tag.cc ());
 			return false;
 		}
 
 		pOriginFunction = (CFunction*) pItem;
 	}
-	else 
+	else
 	{
 		pOriginFunction = GetItemUnnamedMethod (pItem, m_FunctionKind, m_UnOpKind, m_BinOpKind);
 		if (!pOriginFunction)
@@ -307,13 +307,13 @@ CFunction::CalcLayout ()
 	pOriginFunction = pOriginFunction->FindShortOverload (m_pType);
 	if (!pOriginFunction)
 	{
-		err::SetFormatStringError ("'%s': overload not found", m_Tag.cc ()); 
+		err::SetFormatStringError ("'%s': overload not found", m_Tag.cc ());
 		return false;
 	}
 
 	if (!(pOriginFunction->m_Flags & EModuleItemFlag_User))
 	{
-		err::SetFormatStringError ("'%s' is a compiler-generated function", m_Tag.cc ()); 
+		err::SetFormatStringError ("'%s' is a compiler-generated function", m_Tag.cc ());
 		return false;
 	}
 
@@ -321,19 +321,19 @@ CFunction::CalcLayout ()
 
 	if (m_StorageKind && m_StorageKind != pOriginFunction->m_StorageKind)
 	{
-		err::SetFormatStringError ("storage specifier mismatch for orphan function '%s'", m_Tag.cc ()); 
+		err::SetFormatStringError ("storage specifier mismatch for orphan function '%s'", m_Tag.cc ());
 		return false;
 	}
 
 	bool Result = pOriginFunction->SetBody (&m_Body);
 	if (!Result)
 		return false;
-	
+
 	// copy arg names and make sure orphan funciton does not override default values
 
 	rtl::CArrayT <CFunctionArg*> DstArgArray = pOriginFunction->m_pType->GetArgArray ();
 	rtl::CArrayT <CFunctionArg*> SrcArgArray = m_pType->GetArgArray ();
-	
+
 	size_t ArgCount = DstArgArray.GetCount ();
 
 	size_t iDst = 0;
@@ -349,7 +349,7 @@ CFunction::CalcLayout ()
 
 		if (!pSrcArg->m_Initializer.IsEmpty ())
 		{
-			err::SetFormatStringError ("redefinition of default value for '%s'", pSrcArg->m_Name.cc ()); 
+			err::SetFormatStringError ("redefinition of default value for '%s'", pSrcArg->m_Name.cc ());
 			return false;
 		}
 
@@ -369,7 +369,7 @@ CFunction::Compile ()
 
 	bool Result;
 
-	if (m_pEntryBlock) // already compiled 
+	if (m_pEntryBlock) // already compiled
 		return true;
 
 	// prologue
@@ -401,7 +401,7 @@ CFunction::Compile ()
 		}
 
 		m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, pParentType->GetStaticOnceFlagVariable ());
-		
+
 		Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, BeginPos);
 		if (!Result)
 			return false;
@@ -429,7 +429,7 @@ CFunction::Compile ()
 		CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 		ASSERT (ThisValue);
 
-		EType TypeKind = pParentType->GetTypeKind ();		
+		EType TypeKind = pParentType->GetTypeKind ();
 		switch (TypeKind)
 		{
 		case EType_Struct:
@@ -439,7 +439,7 @@ CFunction::Compile ()
 		case EType_Union:
 			Result = ((CUnionType*) pParentType)->InitializeField (ThisValue);
 			break;
-		
+
 		case EType_Class:
 			Result = ((CClassType*) pParentType)->GetIfaceStructType ()->InitializeFields (ThisValue);
 			break;
@@ -448,7 +448,7 @@ CFunction::Compile ()
 	else if (m_FunctionKind == EFunction_Constructor)
 	{
 		StartSymbol = ESymbol_constructor_compound_stmt;
-		
+
 		ENamespace Namespace = m_pParentNamespace->GetNamespaceKind ();
 		ASSERT (Namespace == ENamespace_Type || Namespace == ENamespace_Property);
 

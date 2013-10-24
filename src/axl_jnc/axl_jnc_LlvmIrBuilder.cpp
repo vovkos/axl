@@ -22,16 +22,22 @@ CLlvmIrBuilder::CreateComment_va (
 	axl_va_list va
 	)
 {
+	if (!(m_pModule->GetFlags () & EModuleFlag_IrComments))
+		return false;
+
 	char Buffer [256];
 	rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	String.Format_va (pFormat, va);
 
 	return CreateComment_0 (String);
-}
+} 
 
 bool
 CLlvmIrBuilder::CreateComment_0 (const char* pText)
 {
+	if (!(m_pModule->GetFlags () & EModuleFlag_IrComments))
+		return false;
+
 	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	llvm::BasicBlock* pLlvmBlock = pBlock->GetLlvmBlock ();
 
@@ -48,24 +54,6 @@ CLlvmIrBuilder::CreateComment_0 (const char* pText)
 	return true;
 }
 
-void
-CLlvmIrBuilder::SetSourcePos (const CToken::CPos& Pos)
-{
-	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo))
-		return;
-
-	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	ASSERT (pScope);
-
-	llvm::DebugLoc LlvmDebugLoc = llvm::DebugLoc::get (
-		Pos.m_Line + 1, 
-		Pos.m_Col + 1, 
-		pScope->GetLlvmDiScope ()
-		);
-
-	m_LlvmIrBuilder.SetCurrentDebugLocation (LlvmDebugLoc);
-}
-
 llvm::SwitchInst*
 CLlvmIrBuilder::CreateSwitch (
 	const CValue& Value,
@@ -78,8 +66,8 @@ CLlvmIrBuilder::CreateSwitch (
 	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
 	llvm::SwitchInst* pInst = m_LlvmIrBuilder.CreateSwitch (
-		Value.GetLlvmValue (), 
-		pDefaultBlock->GetLlvmBlock (), 
+		Value.GetLlvmValue (),
+		pDefaultBlock->GetLlvmBlock (),
 		CaseCount
 		);
 
@@ -132,8 +120,8 @@ CLlvmIrBuilder::CreateSwitch (
 	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
 	llvm::SwitchInst* pInst = m_LlvmIrBuilder.CreateSwitch (
-		Value.GetLlvmValue (), 
-		pDefaultBlock->GetLlvmBlock (), 
+		Value.GetLlvmValue (),
+		pDefaultBlock->GetLlvmBlock (),
 		CaseCount
 		);
 
@@ -212,7 +200,7 @@ CLlvmIrBuilder::CreateGep (
 
 	llvm::Value* pInst;
 	pInst = m_LlvmIrBuilder.CreateGEP (
-			Value.GetLlvmValue (), 
+			Value.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
 			"gep"
 			);
@@ -243,7 +231,7 @@ CLlvmIrBuilder::CreateGep (
 
 	llvm::Value* pInst;
 	pInst = m_LlvmIrBuilder.CreateGEP (
-			Value.GetLlvmValue (), 
+			Value.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
 			"gep"
 			);
@@ -258,7 +246,7 @@ CLlvmIrBuilder::CreateCall (
 	ECallConv CallConv,
 	const CValue* pArgArray,
 	size_t ArgCount,
-	CType* pResultType, 
+	CType* pResultType,
 	CValue* pResultValue
 	)
 {
@@ -274,7 +262,7 @@ CLlvmIrBuilder::CreateCall (
 	if (pResultType && pResultType->GetTypeKind () != EType_Void)
 	{
 		pInst = m_LlvmIrBuilder.CreateCall (
-			CalleeValue.GetLlvmValue (), 
+			CalleeValue.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount),
 			"call"
 			);
@@ -284,7 +272,7 @@ CLlvmIrBuilder::CreateCall (
 	else
 	{
 		pInst = m_LlvmIrBuilder.CreateCall (
-			CalleeValue.GetLlvmValue (), 
+			CalleeValue.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount)
 			);
 
@@ -338,7 +326,7 @@ CLlvmIrBuilder::CreateClosurePropertyPtr (
 
 	CreateBitCast (RawPfnValue, pStdObjectMemberPropertyType->GetPropertyPtrType (EPropertyPtrType_Thin), &PfnValue);
 	CreateBitCast (RawIfaceValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
-	
+
 	CreateInsertValue (PropertyPtrValue, PfnValue, 0, NULL, &PropertyPtrValue);
 	CreateInsertValue (PropertyPtrValue, IfaceValue, 1, pResultType, pResultValue);
 	return true;
@@ -354,9 +342,9 @@ CLlvmIrBuilder::RuntimeError (const CValue& ErrorValue)
 	CValue CodeAddrValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CreateCall2 (
-		pOnRuntimeError, 
+		pOnRuntimeError,
 		pOnRuntimeError->GetType (),
-		ErrorValue, 
+		ErrorValue,
 		CodeAddrValue,
 		NULL
 		);

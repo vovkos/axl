@@ -14,18 +14,18 @@ BEGIN_MESSAGE_MAP(CModulePane, CDockablePane)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_DBLCLK, AFX_IDW_PANE_FIRST, OnDblClk)
-	ON_NOTIFY(TVN_GETINFOTIP, AFX_IDW_PANE_FIRST, OnGetInfoTip)	
+	ON_NOTIFY(TVN_GETINFOTIP, AFX_IDW_PANE_FIRST, OnGetInfoTip)
 END_MESSAGE_MAP()
 
-int CModulePane::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+int CModulePane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	VERIFY(m_TreeCtrl.Create(
-		WS_CHILD | WS_VISIBLE | TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS | TVS_INFOTIP, 
+		WS_CHILD | WS_VISIBLE | TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS | TVS_INFOTIP,
 		CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST));
-	
+
 	m_TreeCtrl.ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 
 	EnableDocking(CBRS_ALIGN_ANY);
@@ -33,7 +33,7 @@ int CModulePane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-void CModulePane::OnSize(UINT nType, int cx, int cy) 
+void CModulePane::OnSize(UINT nType, int cx, int cy)
 {
 	m_TreeCtrl.MoveWindow(0, 0, cx, cy);
 }
@@ -77,7 +77,7 @@ CModulePane::AddItemAttributes (
 	for (; Attribute; Attribute++)
 	{
 		jnc::CValue* pValue = Attribute->GetValue ();
-		
+
 		ItemName = Attribute->GetName ();
 		HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName, hAttributes);
 
@@ -95,7 +95,7 @@ CModulePane::AddNamespace (
 	)
 {
 	HTREEITEM hItem;
-		
+
 	jnc::EModuleItem ItemKind = pNamespace->GetItemKind ();
 
 	if (ItemKind == jnc::EModuleItem_Scope)
@@ -231,7 +231,7 @@ CModulePane::AddValue (
 {
 	rtl::CString ItemName;
 	ItemName.Format (
-		"%s %s", 
+		"%s %s",
 		pType->GetTypeString (),
 		pName
 		);
@@ -249,7 +249,7 @@ CModulePane::AddEnumTypeMembers (
 	rtl::CIteratorT <jnc::CEnumConst> Member = pType->GetConstList ().GetHead ();
 	for (; Member; Member++)
 		AddEnumConst (hParent, *Member);
-	
+
 	m_TreeCtrl.Expand (hParent, TVE_EXPAND);
 }
 /*
@@ -330,7 +330,7 @@ CModulePane::AddClassTypeMembers (
 	)
 {
 //	AddStructClassTypeMembers (hParent, pType);
-	
+
 	size_t Count = pType->GetItemCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
@@ -351,19 +351,19 @@ CModulePane::AddPropertyTypeMembers (
 
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName.cc2 (), hParent);
 	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) (jnc::CModuleItem*) pType);
-	
+
 	jnc::CFunctionType* pGetterType = pType->GetGetterType ();
 	jnc::CFunctionTypeOverload* pSetterType = pType->GetSetterType ();
 
 	AddType (hItem, pGetterType);
-	
+
 	size_t SetterOverloadCount = pSetterType->GetOverloadCount ();
 	for (size_t i = 0; i < SetterOverloadCount; i++)
 	{
 		jnc::CFunctionType* pOverload = pSetterType->GetOverload (i);
 		AddType (hItem, pOverload);
 	}
-	
+
 	m_TreeCtrl.Expand (hItem, TVE_EXPAND);
 }
 
@@ -376,7 +376,7 @@ CModulePane::AddTypedef (
 {
 	rtl::CString ItemName;
 	ItemName.Format (
-		"typedef %s %s", 
+		"typedef %s %s",
 		pTypedef->GetType ()->GetTypeString (),
 		pTypedef->GetName ()
 		);
@@ -393,7 +393,7 @@ CModulePane::AddVariable (
 {
 	rtl::CString ItemName;
 	ItemName.Format (
-		"%s %s", 
+		"%s %s",
 		pVariable->GetType ()->GetTypeString (),
 		pVariable->GetName ()
 		);
@@ -418,9 +418,9 @@ CModulePane::AddFunction (
 
 		rtl::CString ItemName;
 		ItemName.Format (
-			"function %s (%d overloads)", 
-			pFunction->m_Tag, 
-			Count		
+			"function %s (%d overloads)",
+			pFunction->m_Tag,
+			Count
 			);
 
 		HTREEITEM hItem = m_TreeCtrl.InsertItem (ItemName.cc2 (), hParent);
@@ -443,12 +443,12 @@ CModulePane::AddFunctionImpl (
 	jnc::CFunctionType* pType = pFunction->GetType ();
 
 	rtl::CString Name = pFunction->GetFunctionKind () == jnc::EFunction_Named ?
-		pFunction->GetName () : 
+		pFunction->GetName () :
 		jnc::GetFunctionKindString (pFunction->GetFunctionKind ());
 
 	rtl::CString ItemName;
 	ItemName.Format (
-		"%s %s %s", 
+		"%s %s %s",
 		pType->GetReturnType ()->GetTypeString (),
 		Name,
 		pFunction->GetType ()->GetArgString ()
@@ -466,15 +466,15 @@ CModulePane::AddProperty (
 {
 	HTREEITEM hItem = m_TreeCtrl.InsertItem (pProperty->GetName ().cc2 (), hParent);
 	m_TreeCtrl.SetItemData (hItem, (DWORD_PTR) (jnc::CModuleItem*) pProperty);
-	
+
 	jnc::CFunction* pGetter = pProperty->GetGetter ();
 	jnc::CFunction* pSetter = pProperty->GetSetter ();
 
 	AddFunction (hItem, pGetter);
-	
+
 	if (pSetter)
 		AddFunction (hItem, pSetter);
-	
+
 	m_TreeCtrl.Expand (hItem, TVE_EXPAND);
 }
 
@@ -488,10 +488,10 @@ rtl::CString
 GetVariableTip (jnc::CVariable* pVariable)
 {
 	jnc::CType* pType = pVariable->GetType ();
-	
+
 	return rtl::CString::Format_s (
-		"%s %s (%d bytes)", 
-		pType->GetTypeString (), 
+		"%s %s (%d bytes)",
+		pType->GetTypeString (),
 		pVariable->GetQualifiedName (),
 		pType->GetSize ()
 		);
@@ -504,7 +504,7 @@ GetFunctionTip (jnc::CFunction* pFunction)
 
 	rtl::CString TipText;
 	TipText.Format (
-		"%s %s", 
+		"%s %s",
 		pType->GetReturnType ()->GetTypeString (),
 		pFunction->GetType ()->GetArgString ()
 		);
@@ -513,14 +513,14 @@ GetFunctionTip (jnc::CFunction* pFunction)
 	if (!pScope)
 		return TipText;
 
-	jnc::CToken::CPos Pos = pScope->GetBeginPos ();
-	jnc::CToken::CPos PosEnd = pScope->GetEndPos ();
-	
+	jnc::CToken::CPos Pos = *pScope->GetBeginPos ();
+	jnc::CToken::CPos PosEnd = *pScope->GetEndPos ();
+
 	TipText.Append ("\n");
 	TipText.Append (
-		Pos.m_p, 
+		Pos.m_p,
 		PosEnd.m_p - Pos.m_p + PosEnd.m_Length
-		); 
+		);
 
 	return TipText;
 }
@@ -532,7 +532,7 @@ GetPropertyTip (jnc::CProperty* pProperty)
 
 	rtl::CString TipText;
 	TipText.Format (
-		"%s property %s", 
+		"%s property %s",
 		pType->GetReturnType ()->GetTypeString (),
 		pProperty->GetName ()
 		);
@@ -544,10 +544,10 @@ rtl::CString
 GetStructFieldTip (jnc::CStructField* pMember)
 {
 	jnc::CType* pType = pMember->GetType ();
-	
+
 	return rtl::CString::Format_s (
-		"%s %s.%s (%d bytes)", 
-		pType->GetTypeString (), 
+		"%s %s.%s (%d bytes)",
+		pType->GetTypeString (),
 		pMember->GetParentNamespace ()->GetQualifiedName (),
 		pMember->GetName (),
 		pType->GetSize ()
@@ -558,7 +558,7 @@ rtl::CString
 GetEnumConstTip (jnc::CEnumConst* pMember)
 {
 	rtl::CString TipText = pMember->GetName ();
-	
+
 	rtl::CConstBoxListT <jnc::CToken> Initializer = pMember->GetInitializer ();
 
 	if (Initializer.IsEmpty ())
@@ -569,9 +569,9 @@ GetEnumConstTip (jnc::CEnumConst* pMember)
 
 	TipText.Append (" = ");
 	TipText.Append (
-		First->m_Pos.m_p, 
+		First->m_Pos.m_p,
 		Last->m_Pos.m_p - First->m_Pos.m_p + Last->m_Pos.m_Length
-		); 
+		);
 
 	return TipText;
 }
@@ -608,12 +608,12 @@ CModulePane::GetItemTip (jnc::CModuleItem* pItem)
 	case jnc::EModuleItem_EnumConst:
 		return GetEnumConstTip ((jnc::CEnumConst*) pItem);
 
-	default:		
+	default:
 		return rtl::CString::Format_s ("item %x of kind %d", pItem, ItemKind);
 	}
 }
 
-void 
+void
 CModulePane::OnDblClk (NMHDR* pNMHDR, LRESULT* pResult)
 {
 	HTREEITEM hItem = m_TreeCtrl.GetSelectedItem ();
@@ -640,7 +640,7 @@ CModulePane::OnDblClk (NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void 
+void
 CModulePane::OnGetInfoTip(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMTVGETINFOTIP* pInfoTip = (NMTVGETINFOTIP*) pNMHDR;
@@ -655,12 +655,12 @@ CModulePane::OnGetInfoTip(NMHDR* pNMHDR, LRESULT* pResult)
 		CopyLength = pInfoTip->cchTextMax;
 
 	wcsncpy (
-		pInfoTip->pszText, 
+		pInfoTip->pszText,
 		Tip,
 		CopyLength
 		);
 
-	pInfoTip->pszText [CopyLength] = 0;	
+	pInfoTip->pszText [CopyLength] = 0;
 }
 
 //.............................................................................

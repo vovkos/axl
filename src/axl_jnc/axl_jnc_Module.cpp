@@ -41,21 +41,22 @@ CModule::Create (
 	)
 {
 	Clear ();
-	
+
 	m_FilePath = FilePath;
 	m_FileName = io::GetFileName (FilePath);
 	m_DirName = io::GetDirName  (FilePath);
 	m_Flags = Flags;
 
 	m_pLlvmModule = pLlvmModule;
-	
+
 	if (Flags & EModuleFlag_DebugInfo)
-	{	
+	{
 		m_LlvmDiBuilder.Create ();
 		m_LlvmDiFile = m_LlvmDiBuilder.CreateFile (m_FileName, m_DirName);
 	}
 
-	return m_NamespaceMgr.AddStdItems ();
+	return true;
+//	return m_NamespaceMgr.AddStdItems ();
 }
 
 CClassType*
@@ -198,7 +199,7 @@ CModule::Link (CModule* pModule)
 	return false;
 }
 
-void 
+void
 CModule::MarkForLayout (CModuleItem* pItem)
 {
 	if (pItem->m_Flags & EModuleItemFlag_NeedLayout)
@@ -208,7 +209,7 @@ CModule::MarkForLayout (CModuleItem* pItem)
 	m_CalcLayoutArray.Append (pItem);
 }
 
-void 
+void
 CModule::MarkForCompile (CModuleItem* pItem)
 {
 	if (pItem->m_Flags & EModuleItemFlag_NeedCompile)
@@ -218,7 +219,7 @@ CModule::MarkForCompile (CModuleItem* pItem)
 	m_CompileArray.Append (pItem);
 }
 
-bool 
+bool
 CModule::Parse (
 	const char* pFilePath,
 	const char* pSource,
@@ -228,7 +229,7 @@ CModule::Parse (
 	bool Result;
 
 	jnc::CScopeThreadModule ScopeModule (this);
-	
+
 	jnc::CLexer Lexer;
 	Lexer.Create (pFilePath, pSource, Length);
 
@@ -243,7 +244,7 @@ CModule::Parse (
 
 		Result = Parser.ParseToken (pToken);
 		if (!Result)
-		{			
+		{
 			err::EnsureSrcPosError (pFilePath, pToken->m_Pos);
 			return false;
 		}
@@ -254,7 +255,7 @@ CModule::Parse (
 	return true;
 }
 
-bool 
+bool
 CModule::ParseFile (const char* pFilePath)
 {
 	io::CMappedFile File;
@@ -288,7 +289,7 @@ CModule::Compile ()
 			return false;
 	}
 
-	// step 3: ensure module constructor (always! cause static variable might appear during compilation) 
+	// step 3: ensure module constructor (always! cause static variable might appear during compilation)
 
 	if (m_pConstructor)
 	{
@@ -309,7 +310,7 @@ CModule::Compile ()
 			return false;
 	}
 
-	// step 4: compile the rest 
+	// step 4: compile the rest
 
 	for (size_t i = 0; i < m_CompileArray.GetCount (); i++) // new items could be added in process
 	{
@@ -325,9 +326,9 @@ CModule::Compile ()
 		CreateDefaultDestructor ();
 	}
 
-	// step 6: deal with tls 
+	// step 6: deal with tls
 
-	Result = 
+	Result =
 		m_VariableMgr.CreateTlsStructType () &&
 		m_FunctionMgr.InjectTlsPrologues ();
 
@@ -335,12 +336,12 @@ CModule::Compile ()
 		return false;
 
 	// step 7: finalize debug information
-	
+
 	if (m_Flags & EModuleFlag_DebugInfo)
-		m_LlvmDiBuilder.Finalize ();	
-	
+		m_LlvmDiBuilder.Finalize ();
+
 	return true;
-} 
+}
 
 bool
 CModule::CreateDefaultConstructor ()
@@ -394,13 +395,12 @@ CModule::CreateDefaultDestructor ()
 
 rtl::CString
 CModule::GetLlvmIrString ()
-{	
+{
 	std::string String;
-	llvm::raw_string_ostream Stream (String);	
+	llvm::raw_string_ostream Stream (String);
 	m_pLlvmModule->print (Stream, NULL);
 	return String.c_str ();
 }
-
 
 //.............................................................................
 

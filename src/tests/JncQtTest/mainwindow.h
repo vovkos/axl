@@ -12,6 +12,8 @@ class MdiChild;
 class StdLib: public jnc::CStdLib
 {
 public:
+	StdLib ();
+
 	static
 	int
 	Printf (

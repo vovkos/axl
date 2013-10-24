@@ -20,7 +20,7 @@ enum EBasicBlockFlag
 	EBasicBlockFlag_Reachable = 0x01,
 	EBasicBlockFlag_Jumped    = 0x02,
 	EBasicBlockFlag_Entry     = 0x04,
-};		
+};
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -42,7 +42,7 @@ protected:
 public:
 	CBasicBlock ();
 
-	int 
+	int
 	GetFlags ()
 	{
 		return m_Flags;
@@ -73,19 +73,19 @@ public:
 		return pInst && pInst->getOpcode () == llvm::Instruction::Ret;
 	}
 
-	rtl::CString 
+	rtl::CString
 	GetName ()
 	{
 		return m_Name;
 	}
 
-	rtl::CString 
+	rtl::CString
 	GetLeadingComment ()
 	{
 		return m_LeadingComment;
 	}
 
-	CFunction* 
+	CFunction*
 	GetFunction ()
 	{
 		return m_pFunction;
@@ -96,7 +96,7 @@ public:
 	{
 		return m_pLlvmBlock;
 	}
-	
+
 	CValue
 	GetBlockAddressValue ();
 

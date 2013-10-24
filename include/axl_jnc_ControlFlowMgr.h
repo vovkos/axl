@@ -99,12 +99,12 @@ protected:
 public:
 	CControlFlowMgr ();
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;
 	}
-	
+
 	void
 	Clear ();
 
@@ -138,16 +138,16 @@ public:
 		m_Flags &= ~EControlFlowFlag_HasJump;
 	}
 
-	CBasicBlock* 
+	CBasicBlock*
 	CreateBlock (const rtl::CString& Name);
 
-	CBasicBlock* 
+	CBasicBlock*
 	GetCurrentBlock ()
 	{
 		return m_pCurrentBlock;
 	}
 
-	CBasicBlock* 
+	CBasicBlock*
 	SetCurrentBlock (CBasicBlock* pBlock); // returns prev
 
 	void
@@ -174,7 +174,7 @@ public:
 
 	bool
 	Break (size_t Level);
-	 
+
 	bool
 	Continue (size_t Level);
 
@@ -340,7 +340,7 @@ public:
 
 	void
 	ForStmt_PostBody (
-		TForStmt* pStmt, 
+		TForStmt* pStmt,
 		const CToken::CPos& Pos
 		);
 
@@ -360,13 +360,13 @@ public:
 
 	bool
 	OnceStmt_PreBody (
-		TOnceStmt* pStmt, 
+		TOnceStmt* pStmt,
 		const CToken::CPos& Pos
 		);
 
 	void
 	OnceStmt_PostBody (
-		TOnceStmt* pStmt, 
+		TOnceStmt* pStmt,
 		const CToken::CPos& Pos
 		);
 
