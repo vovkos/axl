@@ -5,7 +5,7 @@
 
 namespace axl {
 namespace err {
-	
+
 //.............................................................................
 
 bool
@@ -14,11 +14,8 @@ TError::IsKind (
 	uint_t Code
 	) const
 {
-	
-	int x = ENOMEM;
-	
 	const TError* pError = this;
-	
+
 	if (m_Guid == rtl::GUID_Null && m_Code == EStdError_Stack)
 		pError++;
 
@@ -29,9 +26,9 @@ rtl::CString
 TError::GetDescription () const
 {
 	CErrorProvider* pProvider = GetErrorMgr ()->FindProvider (m_Guid);
-	
-	return pProvider ? 
-		pProvider->GetErrorDescription (this) : 
+
+	return pProvider ?
+		pProvider->GetErrorDescription (this) :
 		rtl::CString::Format_s ("%s::%d", m_Guid.GetGuidString ().cc (), m_Code); // thanks a lot gcc
 }
 
@@ -40,7 +37,7 @@ TError::GetDescription () const
 rtl::CString
 CError::GetDescription () const
 {
-	return m_p ? 
+	return m_p ?
 		m_p->GetDescription () :
 		NoError.GetDescription ();
 }
@@ -121,7 +118,7 @@ CError::Format_va (
 
 	size_t PackSize;
 	Packer.Pack_va (NULL, &PackSize, va);
-	
+
 	size_t Size = sizeof (TError) + PackSize;
 
 	GetBuffer (Size);
@@ -198,7 +195,7 @@ SetError (const CError& Error)
 
 //.............................................................................
 
-rtl::CString 
+rtl::CString
 CStdErrorProvider::GetErrorDescription (const TError* pError)
 {
 	if (pError->m_Size <= sizeof (TError))
@@ -223,14 +220,14 @@ CStdErrorProvider::GetErrorDescription (const TError* pError)
 	}
 }
 
-rtl::CString 
+rtl::CString
 CStdErrorProvider::GetStackErrorDescription (const TError* pError)
 {
 	rtl::CString String;
 
 	void* pEnd = (uchar_t*) pError + (pError->m_Size);
 	const TError* p = pError + 1;
-	
+
 	while (p < pEnd)
 	{
 		ASSERT (p->m_Size >= sizeof (TError));

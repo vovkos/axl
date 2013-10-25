@@ -17,20 +17,20 @@ include (CMakeUtils)
 # Target CPU
 #
 
-# set (TARGET_CPU "x86") 
+# set (TARGET_CPU "x86")
 
-if (NOT TARGET_CPU) 
-	detect_cpu (TARGET_CPU) 
-endif ()       
+if (NOT TARGET_CPU)
+	detect_cpu (TARGET_CPU)
+endif ()
 
 message (STATUS "Target CPU:                 ${TARGET_CPU}")
 
 #..............................................................................
-# 
+#
 # Standard settings
-# 
+#
 
-include (CMakeStdSettings) 
+include (CMakeStdSettings)
 
 create_build_type_setting ()
 
@@ -68,7 +68,7 @@ endif ()
 
 #..............................................................................
 #
-# Paths to libs & tools 
+# Paths to libs & tools
 #
 
 ensure_file_exists (
@@ -90,7 +90,7 @@ include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
 
 # QT is optional
 
-if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")	
+if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")
 	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
@@ -188,7 +188,7 @@ option (
 	AXL_BUILD_PG
 	"Build axl_pg (LL(k) parser generator)"
 	ON
-	) 
+	)
 
 option (
 	AXL_BUILD_CON_TEST
@@ -232,6 +232,10 @@ set (AXL_PG_FRAME_DIR ${AXL_ROOT_DIR}/pgframe)
 
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
+set (VIRTUAL_FOLDER_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
+
+file (REMOVE_RECURSE ${VIRTUAL_FOLDER_ROOT_DIR})
 
 include_directories (${AXL_INC_DIR})
 

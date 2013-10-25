@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+project_virtual_folder (JncQtTest)
+
 #..............................................................................
 #
 # src folder
@@ -22,7 +24,7 @@ set (
 	)
 
 set (
-	SRC_H_LIST 
+	SRC_H_LIST
 	${SRC_MOC_H_LIST}
 	)
 
@@ -37,7 +39,7 @@ set (
 	main.cpp
 	mainwindow.cpp
 	mdichild.cpp
-	modulepane.cpp 
+	modulepane.cpp
 	output.cpp
 	)
 
@@ -52,18 +54,17 @@ push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_ragel_step (
 	jancyhighlighter.rl.cpp
 	jancyhighlighter.rl
-	) 
+	)
 
 add_ragel_step (
 	llvmirhighlighter.rl.cpp
 	llvmirhighlighter.rl
-	) 
+	)
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-source_group (
-	src 
-	FILES 
+source_virtual_folder (
+	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${SRC_RL_LIST}
@@ -99,9 +100,8 @@ pop (CMAKE_CURRENT_BINARY_DIR)
 
 exclude_from_build (${QRC_CPP_LIST}) # include "qrc_*.cpp" manually
 
-source_group (
+source_virtual_folder (
 	res
-	FILES 
 	${RES_PNG_LIST}
 	${RES_QRC_LIST}
 	${QRC_CPP_LIST}
@@ -123,9 +123,8 @@ pop (CMAKE_CURRENT_BINARY_DIR)
 
 exclude_from_build (${MOC_CPP_LIST}) # include "moc_*.cpp" manually
 
-source_group (
+source_virtual_folder (
 	moc
-	FILES 
 	${MOC_CPP_LIST}
 	)
 
@@ -137,9 +136,8 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -171,8 +169,8 @@ add_executable (
 	)
 
 llvm_map_components_to_libraries (
-	LLVM_LIB_LIST 
-	jit 
+	LLVM_LIB_LIST
+	jit
 	native
 	MCJIT
 	MCDisassembler
@@ -192,7 +190,7 @@ qt5_use_modules (JncQtTest Widgets)
 if (AXL_USE_PCH)
 	set_pch (
 		JncQtTest
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
 		)

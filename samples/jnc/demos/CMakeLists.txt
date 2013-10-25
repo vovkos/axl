@@ -1,14 +1,16 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-	   
+
+project_virtual_folder (axl_jnc_demos)
+
 #..............................................................................
 #
 # src folder
 #
 
 set (
-	DEMOS_JNC_LIST 
+	DEMOS_JNC_LIST
 	00_HelloWorld.jnc
 	01_Classes.jnc
 	02_Inheritance.jnc
@@ -43,9 +45,8 @@ set (
 	80_Exceptions.jnc
 	)
 
-source_group (
+source_virtual_folder (
 	src
-	FILES 
 	${DEMOS_JNC_LIST}
 	)
 
@@ -53,7 +54,7 @@ source_group (
 #
 # axl_jnc_demos library
 #
-  
+
 add_library (
 	axl_jnc_demos
 	EXCLUDE_FROM_ALL
@@ -62,7 +63,7 @@ add_library (
 
 set_target_properties (
 	axl_jnc_demos
-	PROPERTIES 
+	PROPERTIES
 	FOLDER samples
 	LINKER_LANGUAGE C
 	)

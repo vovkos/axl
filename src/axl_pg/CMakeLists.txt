@@ -2,6 +2,8 @@
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
 
+project_virtual_folder (axl_pg)
+
 #..............................................................................
 #
 # pg folder
@@ -49,13 +51,12 @@ push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_ragel_step (
 	axl_pg_Lexer.rl.cpp
 	axl_pg_Lexer.rl
-	) 
-	 
+	)
+
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-source_group (
-	pg 
-	FILES 
+source_virtual_folder (
+	pg
 	${PG_H_LIST}
 	${PG_CPP_LIST}
 	${PG_RL_LIST}
@@ -71,9 +72,8 @@ set (
 	${AXL_PG_FRAME_DIR}/axl_llk_ParserFrame.h.luaf
 	)
 
-source_group (
+source_virtual_folder (
 	pg_frames
-	FILES
 	${PG_FRAME_LIST}
 	)
 
@@ -85,16 +85,15 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
-	${PCH_CPP} 
+	${PCH_CPP}
 	)
 
 #..............................................................................
 #
-# till parser generator tool 
+# till parser generator tool
 #
 
 include_directories (${PATH_LUA_INC_DIR})
@@ -115,10 +114,10 @@ target_link_libraries (
 	axl_pg
 	axl_core
 	axl_io
-	axl_lua 
+	axl_lua
 	axl_parse
 	)
-	
+
 if (MSVC)
 	target_link_libraries (axl_pg lua)
 endif ()
@@ -135,7 +134,7 @@ endif ()
 if (AXL_USE_PCH)
 	set_pch (
 		axl_pg
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()

@@ -1,14 +1,16 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+set (VIRTUAL_FOLDER_SUB_DIR QtTest)
+
 #..............................................................................
 #
 # src folder
 #
 
 set (
-	SRC_H_LIST 
+	SRC_H_LIST
 	jancycolorizer.h
 	mylogproxy.h
 	mylogrepresenter.h
@@ -38,13 +40,12 @@ push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_ragel_step (
 	jancycolorizer.rl.cpp
 	jancycolorizer.rl
-	) 
+	)
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-source_group (
-	src 
-	FILES 
+virtual_folder (
+	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${SRC_RL_LIST}
@@ -69,9 +70,8 @@ qt5_wrap_cpp_to (
 
 exclude_from_build (${MOC_CPP_LIST}) # include "moc_*.cpp" manually
 
-source_group (
+virtual_folder (
 	moc
-	FILES 
 	${MOC_CPP_LIST}
 	)
 
@@ -94,9 +94,8 @@ qt5_wrap_ui (
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-source_group (
+virtual_folder (
 	res
-	FILES 
 	${RES_UI_LIST}
 	${UI_H_LIST}
 	)
@@ -114,9 +113,8 @@ set (
 	script/std.jnc
 	)
 
-source_group (
+virtual_folder (
 	script
-	FILES 
 	${SCRIPT_JNC_LIST}
 	)
 
@@ -128,11 +126,10 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
-	${PCH_CPP} 
+	${PCH_CPP}
 	)
 
 #..............................................................................
@@ -153,15 +150,15 @@ include_directories (
 link_directories (${PATH_LLVM_LIB_DIR})
 
 llvm_map_components_to_libraries (
-	LLVM_LIB_LIST 
-	jit 
+	LLVM_LIB_LIST
+	jit
 	native
 	MCJIT
 	MCDisassembler
 	)
 
 add_executable (
-	QtTest 
+	QtTest
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${RES_UI_LIST}
@@ -189,7 +186,7 @@ qt5_use_modules (QtTest Widgets)
 if (AXL_USE_PCH)
 	set_pch (
 		QtTest
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()

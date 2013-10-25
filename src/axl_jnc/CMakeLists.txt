@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-		   
+
+project_virtual_folder (axl_jnc)
+
 #..............................................................................
 #
 # controlflow folder
@@ -20,9 +22,8 @@ set (
 	axl_jnc_ControlFlowMgr_Stmt.cpp
 	)
 
-source_group (
-	controlflow 
-	FILES 
+source_virtual_folder (
+	controlflow
 	${CONTROLFLOW_H_LIST}
 	${CONTROLFLOW_CPP_LIST}
 	)
@@ -60,9 +61,8 @@ set (
 	axl_jnc_GcShadowStack.cpp
 	)
 
-source_group (
-	function 
-	FILES 
+source_virtual_folder (
+	function
 	${FUNCTION_H_LIST}
 	${FUNCTION_CPP_LIST}
 	)
@@ -93,9 +93,8 @@ set (
 	axl_jnc_ModuleItem.cpp
 	)
 
-source_group (
-	module 
-	FILES 
+source_virtual_folder (
+	module
 	${MODULE_H_LIST}
 	${MODULE_CPP_LIST}
 	)
@@ -121,9 +120,8 @@ set (
 	axl_jnc_Scope.cpp
 	)
 
-source_group (
-	namespace 
-	FILES 
+source_virtual_folder (
+	namespace
 	${NAMESPACE_H_LIST}
 	${NAMESPACE_CPP_LIST}
 	)
@@ -196,9 +194,8 @@ set (
 	axl_jnc_UnOp_Ptr.cpp
 	)
 
-source_group (
-	operator 
-	FILES 
+source_virtual_folder (
+	operator
 	${OPERATOR_H_LIST}
 	${OPERATOR_CPP_LIST}
 	)
@@ -247,7 +244,7 @@ push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_ragel_step (
 	axl_jnc_Lexer.rl.cpp
 	axl_jnc_Lexer.rl
-	) 
+	)
 
 add_till_step (
 	axl_jnc_Parser.llk.h
@@ -264,13 +261,12 @@ add_till_step (
 	axl_jnc_NamedTypeSpecifier.llk
 	axl_jnc_Stmt.llk
 	axl_jnc_Stmt_0.llk
-	)  
- 
+	)
+
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-source_group (
-	parser 
-	FILES 
+source_virtual_folder (
+	parser
 	${PARSER_H_LIST}
 	${PARSER_CPP_LIST}
 	${PARSER_RL_LIST}
@@ -336,9 +332,8 @@ set (
 	axl_jnc_UnionType.cpp
 	)
 
-source_group (
-	type 
-	FILES 
+source_virtual_folder (
+	type
 	${TYPE_H_LIST}
 	${TYPE_CPP_LIST}
 	)
@@ -364,9 +359,8 @@ set (
 	axl_jnc_Value.cpp
 	)
 
-source_group (
-	value 
-	FILES 
+source_virtual_folder (
+	value
 	${VALUE_H_LIST}
 	${VALUE_CPP_LIST}
 	)
@@ -392,9 +386,8 @@ set (
 	axl_jnc_VariableMgr.cpp
 	)
 
-source_group (
-	variable 
-	FILES 
+source_virtual_folder (
+	variable
 	${VARIABLE_H_LIST}
 	${VARIABLE_CPP_LIST}
 	)
@@ -420,9 +413,8 @@ set (
 	axl_jnc_Multicast.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	runtime
-	FILES 
 	${RUNTIME_H_LIST}
 	${RUNTIME_CPP_LIST}
 	)
@@ -435,9 +427,8 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -483,10 +474,10 @@ add_library (
 if (AXL_USE_PCH)
 	set_pch (
 		axl_jnc
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()
 
 #..............................................................................
- 
+

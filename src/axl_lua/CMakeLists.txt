@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+project_virtual_folder (axl_lua)
+
 #..............................................................................
 #
 # lua folder
@@ -31,13 +33,12 @@ push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_ragel_step (
 	axl_lua_StringTemplateLexer.rl.cpp
 	axl_lua_StringTemplateLexer.rl
-	) 
+	)
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-source_group (
+source_virtual_folder (
 	lua
-	FILES 
 	${LUA_H_LIST}
 	${LUA_CPP_LIST}
 	${LUA_RL_LIST}
@@ -51,9 +52,8 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -77,7 +77,7 @@ add_library (
 if (AXL_USE_PCH)
 	set_pch (
 		axl_lua
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()

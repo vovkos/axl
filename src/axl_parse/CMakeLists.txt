@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+project_virtual_folder (axl_parse)
+
 #..............................................................................
 #
 # err folder
@@ -17,9 +19,8 @@ set (
 	axl_err_ParseError.cpp
 	)
 
-source_group (
-	err 
-	FILES 
+source_virtual_folder (
+	err
 	${ERR_H_LIST}
 	${ERR_CPP_LIST}
 	)
@@ -38,9 +39,8 @@ set (
 
 set (LEX_CPP_LIST)
 
-source_group (
+source_virtual_folder (
 	lex
-	FILES
 	${LEX_H_LIST}
 	${LEX_CPP_LIST}
 	)
@@ -59,9 +59,8 @@ set (
 
 set (LLK_CPP_LIST)
 
-source_group (
+source_virtual_folder (
 	llk
-	FILES
 	${LLK_H_LIST}
 	${LLK_CPP_LIST}
 	)
@@ -74,9 +73,8 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -101,10 +99,10 @@ add_library (
 if (AXL_USE_PCH)
 	set_pch (
 		axl_parse
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()
 
 #..............................................................................
- 
+

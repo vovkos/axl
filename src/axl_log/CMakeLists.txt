@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+project_virtual_folder (axl_log)
+
 #..............................................................................
 #
 # log_File folder
@@ -25,9 +27,8 @@ set (
 	axl_log_PacketFile.cpp
 	)
 
-source_group (
-	log_File 
-	FILES 
+source_virtual_folder (
+	log_File
 	${LOG_FILE_H_LIST}
 	${LOG_FILE_CPP_LIST}
 	)
@@ -55,9 +56,8 @@ set (
 	axl_log_TextLine.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	log_Line
-	FILES 
 	${LOG_PAGE_H_LIST}
 	${LOG_PAGE_CPP_LIST}
 	)
@@ -86,9 +86,8 @@ set (
 	axl_log_Representer.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	log_Plugin
-	FILES 
 	${LOG_PLUGIN_H_LIST}
 	${LOG_PLUGIN_CPP_LIST}
 	)
@@ -112,9 +111,8 @@ set (
 	axl_log_JancyRepresenter.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	log_Jancy
-	FILES 
 	${LOG_JANCY_H_LIST}
 	${LOG_JANCY_CPP_LIST}
 	)
@@ -157,9 +155,8 @@ set (
 	axl_log_Server.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	log_Server
-	FILES 
 	${LOG_SERVER_H_LIST}
 	${LOG_SERVER_CPP_LIST}
 	)
@@ -191,9 +188,8 @@ set (
 	axl_log_Widget_Scroll.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	log_Widget
-	FILES
 	${LOG_WIDGET_H_LIST}
 	${LOG_WIDGET_CPP_LIST}
 	)
@@ -210,9 +206,8 @@ exclude_from_build (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -252,10 +247,10 @@ add_library (
 if (AXL_USE_PCH)
 	set_pch (
 		axl_log
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()
 
 #..............................................................................
- 
+

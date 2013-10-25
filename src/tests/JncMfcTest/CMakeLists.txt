@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+set (VIRTUAL_FOLDER_SUB_DIR JncMfcTest)
+
 #..............................................................................
 #
 # src folder
@@ -34,9 +36,8 @@ set (
 	test_ast.cpp
 	)
 
-source_group (
-	src 
-	FILES 
+virtual_folder (
+	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	)
@@ -82,9 +83,8 @@ set (
 	res/test_ast.rc2
 	)
 
-source_group (
+virtual_folder (
 	res
-	FILES
 	${RES_BMP_LIST}
 	${RES_ICO_LIST}
 	${RES_XML_LIST}
@@ -99,11 +99,10 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
-	${PCH_CPP} 
+	${PCH_CPP}
 	)
 
 #..............................................................................
@@ -145,8 +144,8 @@ add_executable (
 	)
 
 llvm_map_components_to_libraries (
-	LLVM_LIB_LIST 
-	jit 
+	LLVM_LIB_LIST
+	jit
 	native
 	MCDisassembler
 	)
@@ -163,7 +162,7 @@ target_link_libraries (
 if (AXL_USE_PCH)
 	set_pch (
 		JncMfcTest
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()

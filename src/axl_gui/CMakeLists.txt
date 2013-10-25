@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-  
+
+project_virtual_folder (axl_gui)
+
 #..............................................................................
 #
 # gui folder
@@ -40,9 +42,8 @@ set (
 	axl_gui_Widget.cpp
 	)
 
-source_group (
-	gui 
-	FILES 
+source_virtual_folder (
+	gui
 	${GUI_H_LIST}
 	${GUI_CPP_LIST}
 	)
@@ -75,9 +76,8 @@ set (
 	axl_gui_GdiWidget.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	gui_gdi
-	FILES 
 	${GUI_GDI_H_LIST}
 	${GUI_GDI_CPP_LIST}
 	)
@@ -113,9 +113,8 @@ set (
 	axl_gui_QtWidget.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	gui_qt
-	FILES 
 	${GUI_QT_H_LIST}
 	${GUI_QT_CPP_LIST}
 	)
@@ -136,9 +135,8 @@ endif ()
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -165,16 +163,16 @@ add_library (
 	)
 
 if (AXL_BUILD_GUI_QT)
-	qt5_use_modules (axl_gui Widgets)	
+	qt5_use_modules (axl_gui Widgets)
 endif ()
 
 if (AXL_USE_PCH)
 	set_pch (
 		axl_gui
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()
 
 #..............................................................................
- 
+

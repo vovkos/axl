@@ -1,7 +1,11 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+#..............................................................................
+
+project_virtual_folder (axl_core)
+
 #..............................................................................
 #
 # dbg folder
@@ -14,9 +18,8 @@ set (
 
 set (DBG_CPP_LIST)
 
-source_group ( 
-	dbg 
-	FILES 
+source_virtual_folder (
+	dbg
 	${DBG_H_LIST}
 	${DBG_CPP_LIST}
 	)
@@ -44,10 +47,9 @@ set (
 	axl_err_WinError.cpp
 	)
 
-source_group (
-	err 
-	FILES 	
-	${ERR_H_LIST} 
+source_virtual_folder (
+	err
+	${ERR_H_LIST}
 	${ERR_CPP_LIST}
 	)
 
@@ -77,9 +79,8 @@ set (
 	axl_g_Time.cpp
 	)
 
-source_group (
-	g 
-	FILES 
+source_virtual_folder (
+	g
 	${G_H_LIST}
 	${G_CPP_LIST}
 	)
@@ -98,9 +99,8 @@ set (
 
 set (G_WIN_CPP_LIST)
 
-source_group (
-	g_win 
-	FILES 
+source_virtual_folder (
+	g_win
 	${G_WIN_H_LIST}
 	${G_WIN_CPP_LIST}
 	)
@@ -130,9 +130,8 @@ set (
 	axl_mem_Tracker.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	mem
-	FILES 	
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
 	)
@@ -160,9 +159,8 @@ set (
 	axl_mt_TlsMgr.cpp
 	)
 
-source_group (
-	mt 
-	FILES 
+source_virtual_folder (
+	mt
 	${MT_H_LIST}
 	${MT_CPP_LIST}
 	)
@@ -189,9 +187,8 @@ set (
 	axl_mt_psx_Thread.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	mt_psx
-	FILES 
 	${MT_PSX_H_LIST}
 	${MT_PSX_CPP_LIST}
 	)
@@ -220,9 +217,8 @@ set (
 	axl_mt_win_WaitableHandle.cpp
 	)
 
-source_group (
-	mt_win 
-	FILES 	
+source_virtual_folder (
+	mt_win
 	${MT_WIN_H_LIST}
 	${MT_WIN_CPP_LIST}
 	)
@@ -244,7 +240,7 @@ set (
 	${AXL_INC_DIR}/axl_ref_Ptr.h
 	${AXL_INC_DIR}/axl_ref_RefCount.h
 	${AXL_INC_DIR}/axl_ref_RtFactory.h
-	${AXL_INC_DIR}/axl_ref_WeakPtr.h	
+	${AXL_INC_DIR}/axl_ref_WeakPtr.h
 	)
 
 set (
@@ -252,9 +248,8 @@ set (
 	axl_ref_RefCount.cpp
 	)
 
-source_group (
-	ref 
-	FILES 	
+source_virtual_folder (
+	ref
 	${REF_H_LIST}
 	${REF_CPP_LIST}
 	)
@@ -317,9 +312,8 @@ set (
 	axl_rtl_Utf.cpp
 	)
 
-source_group (
+source_virtual_folder (
 	rtl
-	FILES 	
 	${RTL_H_LIST}
 	${RTL_CPP_LIST}
 	)
@@ -332,9 +326,8 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+source_virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -376,7 +369,7 @@ add_library (
 if (AXL_USE_PCH)
 	set_pch (
 		axl_core
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()

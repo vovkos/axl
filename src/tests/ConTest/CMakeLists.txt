@@ -1,7 +1,9 @@
 # This file is part of AXL (R) Library
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
-			   
+
+set (VIRTUAL_FOLDER_SUB_DIR ConTest)
+
 #..............................................................................
 #
 # src folder
@@ -41,9 +43,8 @@ set (
 	test_WorkerThread.cpp
 	)
 
-source_group (
-	src 
-	FILES 
+virtual_folder (
+	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	)
@@ -61,11 +62,10 @@ exclude_from_build (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_group (
+virtual_folder (
 	pch
-	FILES 	
 	${PCH_H}
-	${PCH_CPP} 
+	${PCH_CPP}
 	)
 
 #..............................................................................
@@ -79,7 +79,7 @@ link_directories (${PATH_LUA_LIB_DIR})
 link_directories (${PATH_AXL_LIB_DIR})
 
 add_executable (
-	ConTest 
+	ConTest
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${PCH_H}
@@ -101,7 +101,7 @@ target_link_libraries (
 if (AXL_USE_PCH)
 	set_pch (
 		ConTest
-		${PCH_H} 
+		${PCH_H}
 		${PCH_CPP}
 		)
 endif ()
