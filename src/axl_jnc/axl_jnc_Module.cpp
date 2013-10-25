@@ -55,8 +55,7 @@ CModule::Create (
 		m_LlvmDiFile = m_LlvmDiBuilder.CreateFile (m_FileName, m_DirName);
 	}
 
-	return true;
-//	return m_NamespaceMgr.AddStdItems ();
+	return m_NamespaceMgr.AddStdItems ();
 }
 
 CClassType*

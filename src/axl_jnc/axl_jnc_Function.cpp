@@ -152,8 +152,8 @@ CFunction::GetLlvmFunction ()
 		m_pModule->GetLlvmModule ()
 		);
 
-	// m_pLlvmFunction->setGC ("jnc-shadow-stack");
-	// m_pLlvmFunction->setDoesNotThrow ();
+	m_pLlvmFunction->setGC ("jnc-shadow-stack");
+	m_pLlvmFunction->setDoesNotThrow ();
 
 	m_pModule->m_FunctionMgr.m_LlvmFunctionMap [m_pLlvmFunction] = this;
 	return m_pLlvmFunction;

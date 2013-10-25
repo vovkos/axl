@@ -179,9 +179,9 @@ llvm_map_components_to_libraries (
 target_link_libraries (
 	JncQtTest
 	axl_jnc
+	axl_parse
 	axl_io
 	axl_core
-	axl_parse
 	${LLVM_LIB_LIST}
 	)
 

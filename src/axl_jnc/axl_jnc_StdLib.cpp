@@ -85,8 +85,8 @@ CStdLib::Export (
 	for (; McType; McType++)
 	{
 		ExportMulticastMethods (
-			pModule, 
-			pLlvmExecutionEngine, 
+			pModule,
+			pLlvmExecutionEngine,
 			*McType
 			);
 	}
@@ -131,16 +131,16 @@ CStdLib::OnRuntimeError (
 		ASSERT (false);
 		pErrorString = "<UNDEF>";
 	}
-	
+
 	throw err::FormatStringError (
-		"RUNTIME ERROR: %s (code %x accessing data %x)", 
+		"RUNTIME ERROR: %s (code %x accessing data %x)",
 		pErrorString,
 		pCodeAddr,
 		pDataAddr
 		);
 }
 
-TInterface* 
+TInterface*
 CStdLib::DynamicCastClassPtr (
 	TInterface* p,
 	CClassType* pType
@@ -151,26 +151,26 @@ CStdLib::DynamicCastClassPtr (
 
 	if (p->m_pObject->m_pType->Cmp (pType) == 0)
 		return p;
-	
+
 	CBaseTypeCoord Coord;
 	bool Result = p->m_pObject->m_pType->FindBaseTypeTraverse (pType, &Coord);
 	if (!Result)
 		return NULL;
-	
+
 	TInterface* p2 = (TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
 	ASSERT (p2->m_pObject == p->m_pObject);
 	return p2;
 }
 
-TInterface* 
+TInterface*
 CStdLib::StrengthenClassPtr (TInterface* p)
 {
 	if (!p)
 		return NULL;
 
 	EClassType ClassTypeKind = p->m_pObject->m_pType->GetClassTypeKind ();
-	return ClassTypeKind == EClassType_FunctionClosure || ClassTypeKind == EClassType_PropertyClosure ? 
-		((CClosureClassType*) p->m_pObject->m_pType)->Strengthen (p) : 
+	return ClassTypeKind == EClassType_FunctionClosure || ClassTypeKind == EClassType_PropertyClosure ?
+		((CClosureClassType*) p->m_pObject->m_pType)->Strengthen (p) :
 		(p->m_pObject->m_Flags & EObjectFlag_Alive) ? p : NULL;
 }
 
@@ -334,7 +334,7 @@ struct TThreadContext
 	CRuntime* m_pRuntime;
 };
 
-DWORD 
+DWORD
 WINAPI
 CStdLib::ThreadProc (PVOID pRawContext)
 {
@@ -363,12 +363,6 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 	DWORD ThreadId;
 	HANDLE h = ::CreateThread (NULL, 0, CStdLib::ThreadProc, pContext, 0, &ThreadId);
 	return h != NULL;
-}
-
-void
-CStdLib::Sleep (uint32_t MsCount)
-{
-	::Sleep (MsCount);
 }
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
@@ -415,14 +409,6 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 	return Result == 0;
 }
 
-void
-CStdLib::Sleep (uint32_t MsCount)
-{
-	timespec Timespec;
-	g::GetTimespecFromTimeout (MsCount, &Timespec);	
-	nanosleep (&Timespec, NULL);
-}
-
 #endif
 
 void*
@@ -442,7 +428,7 @@ CStdLib::AppendFmtLiteral_a (
 	)
 {
 	size_t NewLength = pFmtLiteral->m_Length + Length;
-	if (NewLength < 64) 
+	if (NewLength < 64)
 		NewLength = 64;
 
 	if (pFmtLiteral->m_MaxLength < NewLength)
@@ -486,7 +472,7 @@ CStdLib::PrepareFormatString (
 	size_t Length = pFormatString->GetLength ();
 	if (!isalpha (pFormatString->cc () [Length - 1]))
 		pFormatString->Append (DefaultType);
-}	
+}
 
 size_t
 CStdLib::AppendFmtLiteral_p (
@@ -539,7 +525,7 @@ CStdLib::AppendFmtLiteralImpl (
 	)
 {
 	AXL_VA_DECL (va, DefaultType);
-	
+
 	char Buffer1 [256];
 	rtl::CString FormatString (ref::EBuf_Stack, Buffer1, sizeof (Buffer1));
 	PrepareFormatString (&FormatString, pFmtSpecifier,  DefaultType);
@@ -558,9 +544,9 @@ CStdLib::ExportMulticastMethods (
 	CMulticastClassType* pMulticastType
 	)
 {
-	static 
+	static
 	void*
-	MethodTable [3] [5] = 
+	MethodTable [3] [5] =
 	{
 		{
 			(void*) MulticastClear,
@@ -593,8 +579,8 @@ CStdLib::ExportMulticastMethods (
 	for (size_t i = 0; i < 5; i++)
 	{
 		pModule->SetFunctionPointer (
-			pLlvmExecutionEngine, 
-			pMulticastType->GetMethod ((EMulticastMethod) i), 
+			pLlvmExecutionEngine,
+			pMulticastType->GetMethod ((EMulticastMethod) i),
 			MethodTable [PtrTypeKind] [i]
 			);
 	}

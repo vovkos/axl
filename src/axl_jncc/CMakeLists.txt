@@ -92,6 +92,7 @@ elseif (UNIX)
 	target_link_libraries (
 		axl_jncc
 		rt
+		pthread
 		)
 endif ()
 

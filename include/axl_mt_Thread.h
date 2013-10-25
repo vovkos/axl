@@ -37,19 +37,19 @@ public:
 		return m_Thread.IsOpen ();
 	}
 
-	uint64_t 
+	uint64_t
 	GetThreadId ()
 	{
 		return m_Thread.GetThreadId ();
 	}
 
-	bool 
+	bool
 	Start ()
 	{
 		return m_Thread.Create (NULL, 0, ThreadProc, (T*) this, 0);
 	}
 
-	void 
+	void
 	WaitAndClose (uint_t Timeout = -1)
 	{
 		if (!m_Thread.IsOpen ())
@@ -63,11 +63,11 @@ public:
 		}
 
 		m_Thread.Close ();
-	}	
+	}
 
 
 protected:
-	static 
+	static
 	dword_t
 	WINAPI
 	ThreadProc (void* pContext)
@@ -108,31 +108,31 @@ public:
 		return m_Thread.IsOpen ();
 	}
 
-	uint64_t 
+	uint64_t
 	GetThreadId ()
 	{
 		return m_Thread;
 	}
 
-	bool 
+	bool
 	Start ()
 	{
 		return m_Thread.Create (ThreadProc, (T*) this);
 	}
 
-	void 
+	void
 	WaitAndClose (uint_t Timeout = -1)
 	{
 		if (!m_Thread.IsOpen ())
 			return;
-		
+
 		if (!m_Thread.Join (Timeout))
 			m_Thread.Detach ();
-	}	
+	}
 
 
 protected:
-	static 
+	static
 	void*
 	ThreadProc (void* pContext)
 	{

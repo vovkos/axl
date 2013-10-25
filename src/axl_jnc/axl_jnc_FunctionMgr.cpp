@@ -584,6 +584,12 @@ CFunctionMgr::InternalPrologue (
 	pEntryBlock->MarkEntry ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
+
+#ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
+	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
+	m_pModule->m_LlvmIrBuilder.CreateCall (pGcSafePoint, pGcSafePoint->GetType (), NULL);
+#endif
+
 	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
@@ -823,8 +829,8 @@ CFunctionMgr::InjectTlsPrologue (CFunction* pFunction)
 	llvm::BasicBlock::iterator LlvmAnchor = pBlock->GetLlvmBlock ()->begin ();
 
 #ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
-	ASSERT (llvm::isa <llvm::CallInst> (LlvmAnchor));
-	LlvmAnchor++;
+	if (llvm::isa <llvm::CallInst> (LlvmAnchor)) // skip gc-safe-point
+		LlvmAnchor++;
 #endif
 
 	m_pModule->m_LlvmIrBuilder.SetInsertPoint (LlvmAnchor);

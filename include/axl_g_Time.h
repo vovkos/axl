@@ -19,15 +19,18 @@ namespace g {
 uint64_t
 GetTimestamp ();
 
+void
+Sleep (uint32_t MsCount);
+
 //.............................................................................
 
 // time zone is given in ISO 8601 format e.g.: -930, +4, +800, +845
 
 inline
-int 
+int
 GetTimeZoneOffsetInMinutes (int TimeZone)
 {
-	return TimeZone <= -100 || TimeZone >= 100 ? 
+	return TimeZone <= -100 || TimeZone >= 100 ?
 		(TimeZone / 100) * 60 + TimeZone % 100 :
 		TimeZone * 60;
 }
@@ -46,13 +49,13 @@ struct TTime
 	uint16_t m_MilliSecond;
 	uint16_t m_MicroSecond;
 	uint16_t m_NanoSecond;
-	
+
 public:
 	TTime ()
 	{
 		memset (this, 0, sizeof (TTime));
 	}
-	
+
 	TTime (uint64_t Timestamp)
 	{
 		SetTimestampImpl (Timestamp, true, 0);
@@ -66,18 +69,18 @@ public:
 		SetTimestampImpl (Timestamp, false, TimeZone);
 	}
 
-	uint64_t 
+	uint64_t
 	GetTimestamp () const
 	{
 		return GetTimestampImpl (true, 0);
 	}
-	
-	uint64_t 
+
+	uint64_t
 	GetTimestamp (int TimeZone) const
 	{
 		return GetTimestampImpl (false, TimeZone);
 	}
-	
+
 	void
 	SetTimestamp (uint64_t Timestamp)
 	{
@@ -92,23 +95,23 @@ public:
 	{
 		SetTimestampImpl (Timestamp, false, TimeZone);
 	}
-	
+
 	size_t
 	Format (
 		rtl::CString* pString,
 		const char* pFormat = "%W %D %N %Y %h:%m:%s"
 		) const;
 
-	rtl::CString 
+	rtl::CString
 	Format (const char* pFormat = "%W %D %N %Y %h:%m:%s") const
 	{
 		rtl::CString String;
-		Format (&String, pFormat);		
+		Format (&String, pFormat);
 		return String;
 	}
 
 protected:
-	uint64_t 
+	uint64_t
 	GetTimestampImpl (
 		bool IsLocal,
 		int TimeZone
@@ -152,7 +155,7 @@ protected:
 inline
 void
 GetTimespecFromTimeout (
-	uint_t Timeout, 
+	uint_t Timeout,
 	timespec* pTimespec
 	)
 {
@@ -163,7 +166,7 @@ GetTimespecFromTimeout (
 inline
 void
 GetAbsTimespecFromTimeout (
-	uint_t Timeout, 
+	uint_t Timeout,
 	timespec* pTimespec
 	)
 {

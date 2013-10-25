@@ -11,7 +11,7 @@ void
 RegisterGcShadowStack (int)
 {
 	static llvm::GCRegistry::Add <CGcShadowStack> ShadowStack (
-		"jnc-shadow-stack", 
+		"jnc-shadow-stack",
 		"Re-engineered shadow stack for Jancy GC"
 		);
 }
@@ -27,7 +27,7 @@ RegisterGcShadowStack (int)
 /// It's wrapped up in a state machine using the same transform C# uses for
 /// 'yield return' enumerators, This transform allows it to be non-allocating.
 
-class EscapeEnumerator 
+class EscapeEnumerator
 {
 	llvm::Function& F;
 	const char* CleanupBBName;
@@ -53,8 +53,8 @@ CGcShadowStack::CGcShadowStack ()
 	CustomRoots = true;
 }
 
-bool 
-CGcShadowStack::initializeCustomLowering (llvm::Module& LlvmModule) 
+bool
+CGcShadowStack::initializeCustomLowering (llvm::Module& LlvmModule)
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule && m_pModule->GetLlvmModule () == &LlvmModule);
@@ -66,19 +66,19 @@ using namespace llvm;
 
 GetElementPtrInst *
 CreateGEP(
-	LLVMContext &Context, 
-	IRBuilder<> &B, 
+	LLVMContext &Context,
+	IRBuilder<> &B,
 	Value *BasePtr,
-	int Idx, 
-	int Idx2, 
+	int Idx,
+	int Idx2,
 	const char *Name
-	) 
+	)
 {
-	Value *Indices[] = 
-	{ 
+	Value *Indices[] =
+	{
 		ConstantInt::get(Type::getInt32Ty(Context), 0),
 		ConstantInt::get(Type::getInt32Ty(Context), Idx),
-		ConstantInt::get(Type::getInt32Ty(Context), Idx2) 
+		ConstantInt::get(Type::getInt32Ty(Context), Idx2)
 	};
 
 	Value* Val = B.CreateGEP(BasePtr, Indices, Name);
@@ -90,16 +90,16 @@ CreateGEP(
 
 GetElementPtrInst *
 CreateGEP (
-	LLVMContext &Context, 
-	IRBuilder<> &B, 
+	LLVMContext &Context,
+	IRBuilder<> &B,
 	Value *BasePtr,
-	int Idx, 
-	const char *Name) 
+	int Idx,
+	const char *Name)
 {
-	Value *Indices[] = 
-	{ 
+	Value *Indices[] =
+	{
 		ConstantInt::get(Type::getInt32Ty(Context), 0),
-		ConstantInt::get(Type::getInt32Ty(Context), Idx) 
+		ConstantInt::get(Type::getInt32Ty(Context), Idx)
 	};
 
 	Value *Val = B.CreateGEP(BasePtr, Indices, Name);
@@ -109,13 +109,13 @@ CreateGEP (
 	return dyn_cast<GetElementPtrInst>(Val);
 }
 
-bool 
-CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction) 
+bool
+CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 {
 	bool Result;
 
 	LLVMContext& Context = LlvmFunction.getContext();
- 
+
 	CFunction* pFunction = m_pModule->m_FunctionMgr.FindFunctionByLlvmFunction (&LlvmFunction);
 	ASSERT (pFunction && pFunction->GetLlvmFunction () == &LlvmFunction);
 
@@ -124,7 +124,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 
 	if (RootArray.IsEmpty ())
 		return false;
-	
+
 	size_t RootCount = RootArray.GetCount ();
 
 	CValue FrameMapValue;
@@ -133,12 +133,17 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 		return false;
 
 	CType* pFrameType = m_pModule->m_TypeMgr.GetGcShadowStackFrameType (RootCount);
-	
+
 	// Build the shadow stack entry after tls-related injected code
 
-	llvm::Instruction* pLlvmGetTls = LlvmFunction.getEntryBlock().begin();
-	ASSERT (llvm::isa <llvm::CallInst> (pLlvmGetTls));
-	
+	BasicBlock::iterator LlvmInst = LlvmFunction.getEntryBlock().begin();
+	ASSERT (llvm::isa <llvm::CallInst> (LlvmInst)); // gc-safe-point
+
+	LlvmInst++;
+	ASSERT (llvm::isa <llvm::CallInst> (LlvmInst)); // get-tls
+
+	llvm::Instruction* pLlvmGetTls = LlvmInst;
+
 	llvm::Instruction* pLlvmAnchor = pFunction->GetLlvmPostTlsPrologueInst ();
 	BasicBlock::iterator IP = pLlvmAnchor ? pLlvmAnchor : pLlvmGetTls;
 
@@ -146,7 +151,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 
 	Instruction *StackEntry = AtEntry.CreateAlloca(pFrameType->GetLlvmType (), 0, "gc_frame");
 
-	while (isa<AllocaInst>(IP)) 
+	while (isa<AllocaInst>(IP))
 		++IP;
 
 	AtEntry.SetInsertPoint(IP->getParent(), IP);
@@ -163,7 +168,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 	AtEntry.CreateStore (FrameMapValue.GetLlvmValue (), EntryMapPtr);
 
 	// After all the allocas...
-	for (size_t i = 0; i < RootCount; i++) 
+	for (size_t i = 0; i < RootCount; i++)
 	{
 		// For each root, find the corresponding slot in the aggregate...
 		Value *SlotPtr = CreateGEP(Context, AtEntry, StackEntry, 2, i, "gc_root");
@@ -178,7 +183,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 	// really necessary (the collector would never see the intermediate state at
 	// runtime), but it's nicer not to push the half-initialized entry onto the
 	// shadow stack.
-	while (isa<StoreInst>(IP)) 
+	while (isa<StoreInst>(IP))
 		++IP;
 
 	AtEntry.SetInsertPoint(IP->getParent(), IP);
@@ -193,7 +198,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 
 	// For each instruction that escapes...
 	EscapeEnumerator EE (LlvmFunction, "gc_cleanup");
-	while (IRBuilder<> *AtExit = EE.Next()) 
+	while (IRBuilder<> *AtExit = EE.Next())
 	{
 		// Pop the entry from the shadow stack. Don't reuse CurrentHead from
 		// AtEntry, since that would make the value live for the entire function.
@@ -206,7 +211,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 	// calls (which are no longer valid). Doing this last avoids invalidating
 	// iterators.
 
-	for (size_t i = 0; i < RootCount; i++) 
+	for (size_t i = 0; i < RootCount; i++)
 	{
 		RootArray [i].m_pLlvmGcRoot->eraseFromParent();
 		RootArray [i].m_pLlvmAlloca->eraseFromParent();
@@ -225,7 +230,7 @@ CGcShadowStack::CollectRoots (
 
 	llvm::Function::iterator LlvmBlock = pFunction->GetLlvmFunction ()->begin();
 	llvm::Function::iterator LlvmBlockEnd = pFunction->GetLlvmFunction ()->end ();
-	
+
 	if (LlvmBlock == LlvmBlockEnd)
 		return 0;
 
@@ -237,14 +242,14 @@ CGcShadowStack::CollectRoots (
 		llvm::IntrinsicInst* pLlvmInstinsicInst = llvm::dyn_cast <llvm::IntrinsicInst> (LlvmInst);
 
 		if (!pLlvmInstinsicInst ||
-			pLlvmInstinsicInst->getCalledFunction ()->getIntrinsicID() != llvm::Intrinsic::gcroot) 
+			pLlvmInstinsicInst->getCalledFunction ()->getIntrinsicID() != llvm::Intrinsic::gcroot)
 			continue;
 
 		TRoot Root;
 		Root.m_pLlvmGcRoot = pLlvmInstinsicInst;
 		Root.m_pLlvmAlloca = llvm::cast <llvm::AllocaInst> (pLlvmInstinsicInst->getArgOperand(0)->stripPointerCasts ());
 		Root.m_pLlvmType   = llvm::cast <llvm::Constant> (pLlvmInstinsicInst->getArgOperand(1));
-		
+
 		pRootArray->Append (Root);
 	}
 
@@ -260,7 +265,7 @@ CGcShadowStack::GetFrameMap (
 	)
 {
 	CStructType* pFrameMapType = m_pModule->m_TypeMgr.GetGcShadowStackFrameMapType (RootCount);
-	
+
 	CType* pTypeArrayType = pFrameMapType->GetFieldByIndex (1)->GetType ();
 	ASSERT (pTypeArrayType->GetTypeKind () == EType_Array);
 
@@ -271,19 +276,19 @@ CGcShadowStack::GetFrameMap (
 	for (size_t i = 0; i < RootCount; i++)
 		LlvmTypeArray [i] = pRootArray [i].m_pLlvmType;
 
-	llvm::Constant* 
-	LlvmFrameMap [2] = 
-	{	
-		(llvm::Constant*) CValue (RootCount, GetSimpleType (m_pModule, EType_SizeT)).GetLlvmValue (),		
-		
+	llvm::Constant*
+	LlvmFrameMap [2] =
+	{
+		(llvm::Constant*) CValue (RootCount, GetSimpleType (m_pModule, EType_SizeT)).GetLlvmValue (),
+
 		llvm::ConstantArray::get (
-			(llvm::ArrayType*) pTypeArrayType->GetLlvmType (), 
+			(llvm::ArrayType*) pTypeArrayType->GetLlvmType (),
 			llvm::ArrayRef <llvm::Constant*> (LlvmTypeArray, RootCount)
 			)
 	};
-	
+
 	llvm::Constant* pLlvmFrameMapConst = llvm::ConstantStruct::get (
-		(llvm::StructType*) pFrameMapType->GetLlvmType (), 
+		(llvm::StructType*) pFrameMapType->GetLlvmType (),
 		llvm::ArrayRef <llvm::Constant*> (LlvmFrameMap, 2)
 		);
 
@@ -297,7 +302,7 @@ CGcShadowStack::GetFrameMap (
 		);
 
 	pResultValue->SetLlvmValue (
-		pLlvmFrameMapVariable, 
+		pLlvmFrameMapVariable,
 		pFrameMapType->GetDataPtrType_c (),
 		EValue_Const
 		);
@@ -310,20 +315,20 @@ CGcShadowStack::GetFrameMap (
 using namespace llvm;
 
 EscapeEnumerator::EscapeEnumerator (
-	Function &F, 
-	const char* N 
-	): 
-	F (F), 
-	CleanupBBName (N), 
-	State (0), 
-	Builder (F.getContext()) 
+	Function &F,
+	const char* N
+	):
+	F (F),
+	CleanupBBName (N),
+	State (0),
+	Builder (F.getContext())
 {
 }
 
 llvm::IRBuilder<>*
 EscapeEnumerator::Next ()
 {
-	switch (State) 
+	switch (State)
 	{
 	default:
 		return 0;
@@ -335,7 +340,7 @@ EscapeEnumerator::Next ()
 
 	case 1:
 		// Find all 'return', 'resume', and 'unwind' instructions.
-		while (StateBB != StateE) 
+		while (StateBB != StateE)
 		{
 			BasicBlock *CurBB = StateBB++;
 
@@ -357,8 +362,8 @@ EscapeEnumerator::Next ()
 		return 0;
 
 #ifdef AXL_JNC_EH // will only be relevant after exception handling is implemented
-		// Find all 'call' instructions.		
-		
+		// Find all 'call' instructions.
+
 		SmallVector<Instruction*,16> Calls;
 
 		for (Function::iterator BB = F.begin(), E = F.end(); BB != E; ++BB)
@@ -378,7 +383,7 @@ EscapeEnumerator::Next ()
 		BasicBlock *CleanupBB = BasicBlock::Create(C, CleanupBBName, &F);
 		Type *ExnTy = StructType::get(
 			Type::getInt8PtrTy(C),
-			Type::getInt32Ty(C), 
+			Type::getInt32Ty(C),
 			NULL
 			);
 
@@ -386,10 +391,10 @@ EscapeEnumerator::Next ()
 			"__gcc_personality_v0",
 			FunctionType::get(Type::getInt32Ty(C), true)
 			);
-		
+
 		LandingPadInst *LPad = LandingPadInst::Create(
-			ExnTy, 
-			PersFn, 
+			ExnTy,
+			PersFn,
 			1,
 			"cleanup.lpad",
 			CleanupBB
@@ -401,8 +406,8 @@ EscapeEnumerator::Next ()
 		// Transform the 'call' instructions into 'invoke's branching to the
 		// cleanup block. Go in reverse order to make prettier BB names.
 		SmallVector<Value*,16> Args;
-		
-		for (unsigned I = Calls.size(); I != 0; ) 
+
+		for (unsigned I = Calls.size(); I != 0; )
 		{
 			CallInst *CI = cast<CallInst>(Calls[--I]);
 
@@ -422,10 +427,10 @@ EscapeEnumerator::Next ()
 
 			InvokeInst *II = InvokeInst::Create(
 				CI->getCalledValue(),
-				NewBB, 
+				NewBB,
 				CleanupBB,
-				Args, 
-				CI->getName(), 
+				Args,
+				CI->getName(),
 				CallBB
 				);
 
@@ -436,12 +441,12 @@ EscapeEnumerator::Next ()
 		}
 
 		Builder.SetInsertPoint(RI->getParent(), RI);
-		return &Builder;		 
+		return &Builder;
 #endif
 	}
 }
 
 //.............................................................................
 
-} // namespace axl 
-} // namespace jnc 
+} // namespace axl
+} // namespace jnc

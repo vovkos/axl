@@ -5,21 +5,15 @@
 
 // entry point
 
-foo ()
-{
-
-}
-
 int main ()
 {
-//	printf ("hello world!\n");
+	printf ("hello world!\n");
 
-	int a = 10;
-	int b = 20;
-	int c = a + b;
+	const char* p = "bzzz";
+
+	int64 x = strlen (p);
+	printf ("x = %d\n", x);
 	
-	foo ();
-
 	return 0;
 }
 

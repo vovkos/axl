@@ -10,7 +10,7 @@ uint64_t
 GetTimestamp ()
 {
 	uint64_t Timestamp;
-	
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 	GetSystemTimeAsFileTime ((FILETIME*) &Timestamp);
 #else
@@ -18,13 +18,27 @@ GetTimestamp ()
 	clock_gettime (CLOCK_REALTIME, &Time);
 	Timestamp = (uint64_t) Time.tv_sec * 10000000 + Time.tv_nsec / 100;
 #endif
-	
+
 	return Timestamp;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+Sleep (uint32_t MsCount)
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	::Sleep (MsCount);
+#else
+	timespec Timespec;
+	g::GetTimespecFromTimeout (MsCount, &Timespec);
+	nanosleep (&Timespec, NULL);
+#endif
 }
 
 //.............................................................................
 
-uint64_t 
+uint64_t
 TTime::GetTimestampImpl (
 	bool IsLocal,
 	int TimeZone
@@ -32,7 +46,7 @@ TTime::GetTimestampImpl (
 {
 	uint64_t Timestamp = 0;
 
-#if (_AXL_ENV == AXL_ENV_WIN)	
+#if (_AXL_ENV == AXL_ENV_WIN)
 	SYSTEMTIME SysTime = { 0 };
 	SysTime.wYear   = m_Year;
 	SysTime.wMonth  = m_Month;
@@ -40,7 +54,7 @@ TTime::GetTimestampImpl (
 	SysTime.wHour   = m_Hour;
 	SysTime.wMinute = m_Minute;
 	SysTime.wSecond = m_Second;
-	
+
 	SystemTimeToFileTime (&SysTime, (FILETIME*) &Timestamp);
 
 	if (IsLocal)
@@ -64,11 +78,11 @@ TTime::GetTimestampImpl (
 	Timestamp = (uint64_t) PosixTime * 10000000;
 #endif
 
-	return 
-		Timestamp + 
-		m_MilliSecond * 10000 + 
-		m_MicroSecond * 10 + 
-		m_NanoSecond / 100;		
+	return
+		Timestamp +
+		m_MilliSecond * 10000 +
+		m_MicroSecond * 10 +
+		m_NanoSecond / 100;
 }
 
 void
@@ -86,7 +100,7 @@ TTime::SetTimestampImpl (
 	else
 		Timestamp += (int64_t) GetTimeZoneOffsetInMinutes (TimeZone) * 60 * 10000000;
 
-	FileTimeToSystemTime ((const FILETIME*) &Timestamp, &SysTime);	
+	FileTimeToSystemTime ((const FILETIME*) &Timestamp, &SysTime);
 
 	m_Year        = SysTime.wYear;
 	m_Month       = SysTime.wMonth;
@@ -100,12 +114,12 @@ TTime::SetTimestampImpl (
 	tm* pTmStruct;
 
 	time_t PosixTime = Timestamp / 10000000;
-	
+
 	if (IsLocal)
 	{
 		pTmStruct = localtime (&PosixTime);
 	}
-	else	
+	else
 	{
 		PosixTime += GetTimeZoneOffsetInMinutes (TimeZone) * 60;
 		pTmStruct = gmtime (&PosixTime);
@@ -132,62 +146,62 @@ TTime::Format (
 	const char* pFormat
 	) const
 {
-	static const char* WeekDayShortNameTable [7] = 
-	{ 
-		"Sun", 
-		"Mon", 
-		"Tue", 
-		"Wed", 
-		"Thu", 
-		"Fri", 
+	static const char* WeekDayShortNameTable [7] =
+	{
+		"Sun",
+		"Mon",
+		"Tue",
+		"Wed",
+		"Thu",
+		"Fri",
 		"Sat",
 	};
 
-	static const char* WeekDayFullNameTable [7] = 
-	{ 
-		"Sunday", 
-		"Monday", 
-		"Tuesday", 
-		"Wednsday", 
-		"Thursday", 
-		"Friday", 
+	static const char* WeekDayFullNameTable [7] =
+	{
+		"Sunday",
+		"Monday",
+		"Tuesday",
+		"Wednsday",
+		"Thursday",
+		"Friday",
 		"Saturday",
 	};
-	
-	static const char* MonthShortNameTable [12] = 
+
+	static const char* MonthShortNameTable [12] =
 	{
-		"Jan", 
-		"Feb", 
-		"Mar", 
+		"Jan",
+		"Feb",
+		"Mar",
 		"Apr",
-		"May", 
-		"Jun", 
-		"Jul", 
+		"May",
+		"Jun",
+		"Jul",
 		"Aug",
-		"Sep", 
-		"Oct", 
-		"Nov", 
+		"Sep",
+		"Oct",
+		"Nov",
 		"Dec",
 	};
 
-	static const char* MonthFullNameTable [12] = 
+	static const char* MonthFullNameTable [12] =
 	{
-		"January", 
-		"February", 
-		"March", 
+		"January",
+		"February",
+		"March",
 		"April",
-		"May", 
-		"June", 
-		"July", 
+		"May",
+		"June",
+		"July",
 		"August",
-		"September", 
-		"October", 
-		"November", 
+		"September",
+		"October",
+		"November",
 		"December",
 	};
 
 	pString->Clear ();
-	
+
 	const char* p = pFormat;
 	const char* p0 = p;
 
@@ -201,9 +215,9 @@ TTime::Format (
 		p++;
 		if (!*p)
 			return pString->GetLength ();
-	
+
 		int h12;
-		
+
 		switch (*p)
 		{
 		case 'h':
@@ -254,7 +268,7 @@ TTime::Format (
 		case 'd':
 			pString->AppendFormat ("%d", m_MonthDay);
 			break;
-			
+
 		case 'M':
 			pString->AppendFormat ("%02d", m_Month);
 			break;
@@ -262,7 +276,7 @@ TTime::Format (
 		case 'o':
 			pString->AppendFormat ("%d", m_Month);
 			break;
-			
+
 		case 'n':
 			pString->Append (MonthShortNameTable [m_Month % 12]);
 			break;
@@ -270,7 +284,7 @@ TTime::Format (
 		case 'N':
 			pString->Append (MonthFullNameTable [m_Month % 12]);
 			break;
-			
+
 		case 'w':
 			pString->Append (WeekDayShortNameTable [m_DayOfWeek % 7]);
 			break;
@@ -282,11 +296,11 @@ TTime::Format (
 		default:
 			pString->Append (*p);
 		}
-		
+
 		p0 = p + 1;
 	}
 
-	pString->Append (p0, p - p0);	
+	pString->Append (p0, p - p0);
 	return pString->GetLength ();
 }
 

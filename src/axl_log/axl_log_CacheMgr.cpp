@@ -21,7 +21,7 @@ CCacheMgr::Create (
 	const char* pIndexFileName
 	)
 {
-	bool Result = m_IndexFile.Open (pIndexFileName, io::EFileFlag_DeleteOnClose);
+	bool Result = m_IndexFile.Open (pIndexFileName /*, io::EFileFlag_DeleteOnClose*/);
 	if (!Result)
 		return false;
 
@@ -32,7 +32,7 @@ CCacheMgr::Create (
 	return true;
 }
 
-void 
+void
 CCacheMgr::ClearCache (uint64_t SyncId)
 {
 	m_IndexFile.Clear ();
@@ -46,7 +46,7 @@ CCacheMgr::ClearCache (uint64_t SyncId)
 	m_pWidget->Redraw ();
 }
 
-CCachePage* 
+CCachePage*
 CCacheMgr::GetOrCreateCachePage (const TIndexLeaf* pLeaf)
 {
 	rtl::CHashTableMapIteratorT <uint64_t, CCachePage*> It = m_CachePageMap.Goto (pLeaf->m_Offset);
@@ -68,7 +68,7 @@ CCacheMgr::GetOrCreateCachePage (const TIndexLeaf* pLeaf)
 	return pPage;
 }
 
-CCachePage* 
+CCachePage*
 CCacheMgr::GetCachePageByIndexLeaf (const TIndexLeaf* pLeaf)
 {
 	CCachePage* pPage = GetOrCreateCachePage (pLeaf);
@@ -85,7 +85,7 @@ CCacheMgr::GetCachePageByIndexLeaf (const TIndexLeaf* pLeaf)
 	return !pPage->IsEmpty () ? pPage : NULL;
 }
 
-CCachePage* 
+CCachePage*
 CCacheMgr::GetCachePageByLineIdx (
 	uint64_t LineIdx,
 	uint64_t* pStartLineIdx
@@ -105,7 +105,7 @@ CCacheMgr::GetCachePageStartLineIdx (CCachePage* pPage)
 	return m_IndexFile.GetLeafStartLine (pIndexLeaf);
 }
 
-CCachePage* 
+CCachePage*
 CCacheMgr::GetNextCachePage (CCachePage* pPage)
 {
 	const TIndexLeaf* pIndexLeaf = m_IndexFile.GetLeaf (pPage->m_IndexLeaf.m_Offset);
@@ -114,7 +114,7 @@ CCacheMgr::GetNextCachePage (CCachePage* pPage)
 	return pNextIndexLeaf ? GetCachePageByIndexLeaf (pNextIndexLeaf) : NULL;
 }
 
-CCachePage* 
+CCachePage*
 CCacheMgr::GetPrevCachePage (CCachePage* pPage)
 {
 	const TIndexLeaf* pIndexLeaf = m_IndexFile.GetLeaf (pPage->m_IndexLeaf.m_Offset);
@@ -123,12 +123,12 @@ CCacheMgr::GetPrevCachePage (CCachePage* pPage)
 	return pPrevIndexLeaf ? GetCachePageByIndexLeaf (pPrevIndexLeaf) : NULL;
 }
 
-CLine* 
+CLine*
 CCacheMgr::GetLine (uint64_t LineIdx)
 {
 	uint64_t StartLineIdx;
 
-	CCachePage* pPage = GetCachePageByLineIdx (LineIdx, &StartLineIdx); 
+	CCachePage* pPage = GetCachePageByLineIdx (LineIdx, &StartLineIdx);
 	if (!pPage)
 		return NULL;
 
@@ -136,7 +136,7 @@ CCacheMgr::GetLine (uint64_t LineIdx)
 	return pPage->m_LineArray [LineIdx - StartLineIdx];
 }
 
-CLine* 
+CLine*
 CCacheMgr::GetNextLine (CLine* pLine)
 {
 	size_t PageLineCount = pLine->m_pPage->m_LineArray.GetCount ();
@@ -148,7 +148,7 @@ CCacheMgr::GetNextLine (CLine* pLine)
 	return pNextPage && !pNextPage->IsEmpty () ? pNextPage->m_LineArray [0] : NULL;
 }
 
-CLine* 
+CLine*
 CCacheMgr::GetPrevLine (CLine* pLine)
 {
 	if (pLine->m_LineIdx > 0)
@@ -158,7 +158,7 @@ CCacheMgr::GetPrevLine (CLine* pLine)
 	return pPrevPage && !pPrevPage->IsEmpty () ? pPrevPage->m_LineArray.GetBack () : NULL;
 }
 
-void 
+void
 CCacheMgr::CreateIndexLeaf (
 	const TBinDataConfig* pBinDataConfig,
 	uint64_t LineCount,
@@ -178,7 +178,7 @@ CCacheMgr::CreateIndexLeaf (
 	UpdateIndexTailLeaf (LineCount, PacketCount, FoldablePacketCount, FoldFlags);
 }
 
-void 
+void
 CCacheMgr::UpdateIndexTailLeaf (
 	uint64_t LineCount,
 	uint32_t PacketCount,
@@ -190,11 +190,11 @@ CCacheMgr::UpdateIndexTailLeaf (
 
 	if (PacketCount != pLeaf->m_PacketCount)
 		m_IndexFile.AddTailLeafPackets (
-			PacketCount - pLeaf->m_PacketCount, 
-			FoldablePacketCount - pLeaf->m_FoldablePacketCount, 
+			PacketCount - pLeaf->m_PacketCount,
+			FoldablePacketCount - pLeaf->m_FoldablePacketCount,
 			FoldFlags
 			);
-	
+
 	if (pLeaf->m_LineCount != LineCount)
 	{
 		m_IndexFile.AddLeafLines (pLeaf, (intptr_t) (LineCount - pLeaf->m_LineCount));
@@ -207,7 +207,7 @@ CCacheMgr::UpdateIndexTailLeaf (
 		pPage->m_IndexLeaf = *pLeaf;
 		pPage->m_Flags &= ~(EPageFlag_Represented | EPageFlag_Representing | EPageFlag_Colorized | EPageFlag_Colorizing);
 	}
-	
+
 	uint64_t StartLineIdx = m_IndexFile.GetLeafStartLine (pLeaf);
 	uint64_t EndLineIdx = StartLineIdx + pLeaf->m_LineCount;
 
@@ -217,7 +217,7 @@ CCacheMgr::UpdateIndexTailLeaf (
 	m_pWidget->RedrawLineRange ((size_t) StartLineIdx, (size_t) EndLineIdx);
 }
 
-void 
+void
 CCacheMgr::RepresentPageComplete (
 	uint64_t IndexLeafOffset,
 	size_t LineIdx,
@@ -232,7 +232,7 @@ CCacheMgr::RepresentPageComplete (
 	CCachePage* pPage = FindCachePageByIndexLeaf (IndexLeafOffset);
 	if (!pPage)
 		return;
-		
+
 	pPage->m_LineArray.SetCount ((size_t) pPage->m_IndexLeaf.m_LineCount);
 	pPage->m_FoldablePacketArray.SetCount (pPage->m_IndexLeaf.m_FoldablePacketCount);
 	pPage->m_Flags &= ~EPageFlag_Representing;
@@ -245,8 +245,8 @@ CCacheMgr::RepresentPageComplete (
 
 	ASSERT (FoldablePacketIdx + FoldablePacketCount <= pPage->m_IndexLeaf.m_FoldablePacketCount);
 	memcpy (
-		&pPage->m_FoldablePacketArray [FoldablePacketIdx], 
-		pFoldablePacketArray, 
+		&pPage->m_FoldablePacketArray [FoldablePacketIdx],
+		pFoldablePacketArray,
 		FoldablePacketCount * sizeof (TFoldablePacket)
 		);
 
@@ -264,7 +264,7 @@ CCacheMgr::RepresentPageComplete (
 	m_pWidget->RedrawLineRange ((size_t) StartLineIdx, (size_t) EndLineIdx);
 }
 
-void 
+void
 CCacheMgr::FoldPacketComplete (
 	uint64_t IndexLeafOffset,
 	size_t LineIdx,
@@ -300,7 +300,7 @@ CCacheMgr::FoldPacketComplete (
 
 		pPage->AddLines (LineIdx, LineCountDelta);
 	}
-	
+
 	pPage->LoadLines (LineIdx, NewLineCount, pLineBuffer, LineBufferSize, &m_LongestLineLength, NULL);
 
 	// redraw

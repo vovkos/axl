@@ -6,6 +6,7 @@
 
 #include "axl_jnc_Value.h"
 #include "axl_rtl_StringHashTable.h"
+#include "axl_g_Time.h"
 
 namespace axl {
 namespace jnc {
@@ -18,24 +19,24 @@ class CStdLib
 {
 protected:
 	rtl::CStringHashTableMapT <void*> m_FunctionMap;
-	
+
 public:
 	CStdLib ();
-	
+
 	void*
 	FindFunction (const char* pName)
-	{	
+	{
 		rtl::CStringHashTableMapIteratorT <void*> It = m_FunctionMap.Find (pName);
 		return It ? It->m_Value : NULL;
 	}
-	
+
 	static
 	void
 	Export (
 		CModule* pModule,
 		llvm::ExecutionEngine* pLlvmExecutionEngine
 		);
-	
+
 	static
 	void
 	OnRuntimeError (
@@ -45,14 +46,14 @@ public:
 		);
 
 	static
-	TInterface* 
+	TInterface*
 	DynamicCastClassPtr (
 		TInterface* p,
 		CClassType* pType
 		);
 
 	static
-	TInterface* 
+	TInterface*
 	StrengthenClassPtr (TInterface* p);
 
 	static
@@ -147,7 +148,10 @@ public:
 
 	static
 	void
-	Sleep (uint32_t MsCount);
+	Sleep (uint32_t MsCount)
+	{
+		g::Sleep (MsCount);
+	}
 
 	static
 	size_t
@@ -170,7 +174,7 @@ public:
 		TFmtLiteral* pFmtLiteral,
 		const char* p,
 		size_t Length
-		);	
+		);
 
 	static
 	size_t
@@ -238,10 +242,10 @@ public:
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
 	static
-	DWORD 
+	DWORD
 	WINAPI
 	ThreadProc (PVOID pContext);
-#elif (_AXL_ENV == AXL_ENV_POSIX)	
+#elif (_AXL_ENV == AXL_ENV_POSIX)
 	static
 	void*
 	ThreadProc (void* pContext);

@@ -12,9 +12,9 @@
 // warning C4244: 'return' : conversion from 'uint64_t' to 'unsigned int', possible loss of data
 // warning C4624: destructor could not be generated because a base class destructor is inaccessible
 
-#pragma warning (disable: 4800) 
-#pragma warning (disable: 4244) 
-#pragma warning (disable: 4624) 
+#pragma warning (disable: 4800)
+#pragma warning (disable: 4244)
+#pragma warning (disable: 4624)
 
 #undef min
 #undef max
@@ -40,14 +40,21 @@
 
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
-#include "llvm/ExecutionEngine/JIT.h"
-#include "llvm/ExecutionEngine/JITEventListener.h"
-#include "llvm/ExecutionEngine/JITMemoryManager.h"
-#include "llvm/ExecutionEngine/JITEventListener.h"
-#include "llvm/ExecutionEngine/MCJIT.h"
+
+// LLVM JIT forces linkage to LLVM libraries if JIT is merely included;
+// we want to be able avoid that (i.e. if a libraries defines LLVM-dependant classes, but
+// application does not use those classes -- then why link to LLVM?)
+
+#ifndef _AXL_LLVM_NO_JIT
+#	include "llvm/ExecutionEngine/JIT.h"
+#	include "llvm/ExecutionEngine/JITEventListener.h"
+#	include "llvm/ExecutionEngine/JITMemoryManager.h"
+#	include "llvm/ExecutionEngine/JITEventListener.h"
+#	include "llvm/ExecutionEngine/MCJIT.h"
+#endif
 
 #include "../lib/MC/MCDisassembler/EDDisassembler.h"
-#include "../lib/MC/MCDisassembler/EDInst.h" 
+#include "../lib/MC/MCDisassembler/EDInst.h"
 #include "../lib/MC/MCDisassembler/EDOperand.h"
 #include "../lib/MC/MCDisassembler/EDToken.h"
 
@@ -62,8 +69,8 @@
 #include "llvm/CodeGen/GCs.h"
 
 #pragma warning (default: 4800)
-#pragma warning (default: 4244) 
-#pragma warning (default: 4624) 
+#pragma warning (default: 4244)
+#pragma warning (default: 4624)
 
 //.............................................................................
 

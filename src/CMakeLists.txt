@@ -32,33 +32,14 @@ message (STATUS "Target CPU:                 ${TARGET_CPU}")
 
 include (CMakeStdSettings)
 
-create_build_type_setting ()
+create_std_settings ()
 
-if (${CMAKE_BUILD_TYPE})
-	message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+if (NOT MSVC)
+	message (STATUS "Build type:                 ${CMAKE_BUILD_TYPE}")
 endif ()
 
-if (MSVC)
-	create_msvc_use_folders_setting ()
-	create_msvc_flag_eh_setting ()
-	create_msvc_flag_rtti_setting ()
-	create_msvc_flag_crt_setting ()
-	create_msvc_flag_debug_info_setting ()
-	create_msvc_flag_unicode_setting ()
-
-	message (STATUS "C++ flags (Debug):         ${CMAKE_CXX_FLAGS}${CMAKE_CXX_FLAGS_DEBUG}")
-	message (STATUS "C++ flags (Release):       ${CMAKE_CXX_FLAGS}${CMAKE_CXX_FLAGS_RELEASE}")
-endif ()
-
-if (CMAKE_COMPILER_IS_GNUCXX)
-	create_gcc_flag_cpu_setting ()
-	create_gcc_flag_show_includes_setting ()
-	create_gcc_flag_format_warning_setting ()
-	create_gcc_flag_multichar_warning_setting ()
-	create_gcc_flag_deprecated_warning_setting ()
-
-	message (STATUS "C++ flags: ${COMPILE_DEFINITIONS}${CMAKE_CXX_FLAGS}")
-endif ()
+message (STATUS "C++ flags (Debug):         ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
+message (STATUS "C++ flags (Release):       ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
 
 get_directory_property (_CXX_DEFINITIONS COMPILE_DEFINITIONS)
 

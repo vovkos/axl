@@ -29,7 +29,7 @@ CParser::CParser ()
 
 bool
 CParser::ParseTokenList (
-	ESymbol Symbol, 
+	ESymbol Symbol,
 	const rtl::CConstBoxListT <CToken>& TokenList,
 	bool IsBuildingAst
 	)
@@ -93,10 +93,10 @@ CParser::PreCreateLandingPads (uint_t Flags)
 		ASSERT (!pScope->m_pFinallyBlock);
 		pScope->m_pFinallyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("finally_block");
 		pScope->m_Flags |= EScopeFlag_HasFinally;
-		
+
 		rtl::CString Name = "finally_return_addr";
 		CType* pType = GetSimpleType (m_pModule, EType_Int);
-		CVariable* pVariable  = m_pModule->m_VariableMgr.CreateVariable (EStorage_Stack, Name, Name, pType);		
+		CVariable* pVariable  = m_pModule->m_VariableMgr.CreateVariable (EStorage_Stack, Name, Name, pType);
 		pVariable->m_pScope = pScope;
 		pScope->m_pFinallyReturnAddress = pVariable;
 
@@ -116,11 +116,11 @@ CParser::IsTypeSpecified ()
 
 	// if we seen 'unsigned' or 'bigendian', assume 'int' is implied.
 	// checking for 'property' is required for full property syntax e.g.:
-	// property foo { int get (); } 
+	// property foo { int get (); }
 	// here 'foo' should be a declarator, not import-type-specifier
 
 	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
-	return 
+	return
 		pTypeSpecifier->GetType () != NULL ||
 		pTypeSpecifier->GetTypeModifiers () & (ETypeModifierMask_Integer | ETypeModifier_Property);
 }
@@ -140,10 +140,10 @@ CParser::FindType (const CQualifiedName& Name)
 		rtl::CString ShortName = Name.GetShortName ();
 		pItem = pNamespace->FindItem (ShortName);
 		if (!pItem)
-			return m_pModule->m_TypeMgr.GetNamedImportType (ShortName, pNamespace);				
+			return m_pModule->m_TypeMgr.GetNamedImportType (ShortName, pNamespace);
 	}
 	else
-	{	
+	{
 		pItem = pNamespace->FindItemTraverse (Name);
 		if (!pItem)
 			return NULL;
@@ -186,7 +186,7 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 	}
 	else if (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Property)
 	{
-		return FinalizeLastProperty (false);  
+		return FinalizeLastProperty (false);
 	}
 	else if (m_pLastDeclaredItem->GetFlags () & EModuleItemFlag_Orphan)
 	{
@@ -243,7 +243,7 @@ CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pTokenList)
 		err::SetFormatStringError ("only functions and reactors can have bodies, not '%s'", pType->GetTypeString ().cc ());
 		return false;
 	}
-	
+
 	return ((CReactorClassType*) pType)->SetBody (pTokenList);
 }
 
@@ -253,7 +253,7 @@ CParser::SetStorageKind (EStorage StorageKind)
 	if (m_StorageKind)
 	{
 		err::SetFormatStringError (
-			"more than one storage specifier specifiers ('%s' and '%s')", 
+			"more than one storage specifier specifiers ('%s' and '%s')",
 			GetStorageKindString (m_StorageKind),
 			GetStorageKindString (StorageKind)
 			);
@@ -270,7 +270,7 @@ CParser::SetAccessKind (EAccess AccessKind)
 	if (m_AccessKind)
 	{
 		err::SetFormatStringError (
-			"more than one access specifiers ('%s' and '%s')", 
+			"more than one access specifiers ('%s' and '%s')",
 			GetAccessKindString (m_AccessKind),
 			GetAccessKindString (AccessKind)
 			);
@@ -305,7 +305,7 @@ CParser::OpenGlobalNamespace (
 		if (!pNamespace)
 			return NULL;
 	}
-	
+
 	m_pModule->m_NamespaceMgr.OpenNamespace (pNamespace);
 	return pNamespace;
 }
@@ -324,7 +324,6 @@ CParser::GetGlobalNamespace (
 	{
 		pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace (Name, pParentNamespace);
 		pNamespace->m_Pos = Pos;
-		pNamespace->m_pParentNamespace = pParentNamespace;
 		pParentNamespace->AddItem (pNamespace);
 	}
 	else
@@ -380,7 +379,7 @@ CParser::OpenTypeExtension (
 		m_pModule->m_NamespaceMgr.OpenNamespace (pNamedType->m_pExtensionNamespace);
 		return true;
 	}
-	
+
 	CGlobalNamespace* pNamespace = m_pModule->m_NamespaceMgr.CreateGlobalNamespace ("extension", pNamedType);
 	pNamespace->m_NamespaceKind = ENamespace_TypeExtension;
 	pNamespace->m_Pos = Pos;
@@ -448,7 +447,7 @@ CParser::Declare (CDeclarator* pDeclarator)
 
 		default:
 			return IsClassType (pType, EClassType_ReactorIface) ?
-				DeclareReactor (pDeclarator, (CReactorClassType*) pType, DeclFlags) :				
+				DeclareReactor (pDeclarator, (CReactorClassType*) pType, DeclFlags) :
 				DeclareData (pDeclarator, pType, DeclFlags);
 		}
 	}
@@ -626,11 +625,11 @@ CParser::DeclareFunction (
 
 	if (!m_StorageKind)
 	{
-		m_StorageKind = 
+		m_StorageKind =
 			FunctionKind == EFunction_StaticConstructor || FunctionKind == EFunction_StaticDestructor ? EStorage_Static :
 			NamespaceKind == ENamespace_Property ? ((CProperty*) pNamespace)->GetStorageKind () : EStorage_Undefined;
 	}
-		
+
 	if (NamespaceKind == ENamespace_PropertyTemplate)
 	{
 		if (m_StorageKind)
@@ -734,7 +733,7 @@ CParser::DeclareFunction (
 			err::SetFormatStringError ("unused post-declarator modifier '%s'", GetPostDeclaratorModifierString (PostModifiers).cc ());
 			return false;
 		}
-		
+
 		if (m_StorageKind && m_StorageKind != EStorage_Static)
 		{
 			err::SetFormatStringError ("invalid storage specifier '%s' for a global function", GetStorageKindString (m_StorageKind));
@@ -755,7 +754,7 @@ CParser::DeclareFunction (
 	if (FunctionKind != EFunction_Named)
 	{
 		err::SetFormatStringError (
-			"invalid '%s' at '%s' namespace", 
+			"invalid '%s' at '%s' namespace",
 			GetFunctionKindString (FunctionKind),
 			GetNamespaceKindString (NamespaceKind)
 			);
@@ -779,7 +778,7 @@ CParser::DeclareProperty (
 	}
 
 	CProperty* pProperty = CreateProperty (
-		pDeclarator->GetName ()->GetShortName (), 
+		pDeclarator->GetName ()->GetShortName (),
 		pDeclarator->GetPos ()
 		);
 
@@ -846,7 +845,7 @@ CParser::CreateProperty (
 
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
 	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
-	
+
 	AssignDeclarationAttributes (pProperty, pNamespace, Pos);
 
 	EType TypeKind;
@@ -899,7 +898,7 @@ CParser::CreateProperty (
 
 		pProperty->m_StorageKind = EStorage_Static;
 	}
-	
+
 	return pProperty;
 }
 
@@ -949,8 +948,8 @@ CParser::FinalizeLastProperty (bool HasBody)
 		}
 
 		CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (
-			EFunction_Getter, 
-			m_pLastPropertyGetterType, 
+			EFunction_Getter,
+			m_pLastPropertyGetterType,
 			EModuleItemFlag_User
 			);
 
@@ -975,8 +974,8 @@ CParser::FinalizeLastProperty (bool HasBody)
 
 		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (
-			EFunction_Setter, 
-			pSetterType, 
+			EFunction_Setter,
+			pSetterType,
 			EModuleItemFlag_User
 			);
 
@@ -1016,19 +1015,19 @@ CParser::FinalizeLastProperty (bool HasBody)
 
 	pProperty->m_pType = pProperty->m_pSetter ?
 		m_pModule->m_TypeMgr.GetPropertyType (
-			pProperty->m_pGetter->GetType (), 
-			*pProperty->m_pSetter->GetTypeOverload (), 
+			pProperty->m_pGetter->GetType (),
+			*pProperty->m_pSetter->GetTypeOverload (),
 			TypeFlags
 			) :
 		m_pModule->m_TypeMgr.GetPropertyType (
-			pProperty->m_pGetter->GetType (), 
-			NULL, 
+			pProperty->m_pGetter->GetType (),
+			NULL,
 			TypeFlags
 			);
 
 	if (pProperty->m_Flags & (EPropertyFlag_AutoGet | EPropertyFlag_AutoSet))
 		m_pModule->MarkForCompile (pProperty);
-		
+
 	return true;
 }
 
@@ -1069,7 +1068,7 @@ CParser::DeclareReactor (
 
 	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-	
+
 	pType = m_pModule->m_TypeMgr.CreateReactorType (Name, QualifiedName, (CReactorClassType*) pType, (CClassType*) pParentType);
 	AssignDeclarationAttributes (pType, pNamespace, pDeclarator->GetPos ());
 
@@ -1077,7 +1076,7 @@ CParser::DeclareReactor (
 }
 
 bool
-CParser::DeclareData (	
+CParser::DeclareData (
 	CDeclarator* pDeclarator,
 	CType* pType,
 	uint_t PtrTypeFlags
@@ -1217,9 +1216,9 @@ CParser::DeclareData (
 		{
 			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
 				m_StorageKind,
-				Name, 
+				Name,
 				pNamespace->CreateQualifiedName (Name),
-				pType, 
+				pType,
 				PtrTypeFlags,
 				pConstructor,
 				pInitializer
@@ -1252,9 +1251,9 @@ CParser::DeclareData (
 	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
 			m_StorageKind,
-			Name, 
+			Name,
 			pNamespace->CreateQualifiedName (Name),
-			pType, 
+			pType,
 			PtrTypeFlags,
 			pConstructor,
 			pInitializer
@@ -1515,7 +1514,7 @@ CParser::CreateClassType (
 		if (!Result)
 			return NULL;
 	}
-	
+
 	AssignDeclarationAttributes (pClassType, pNamespace, m_LastMatchedToken.m_Pos);
 	return pClassType;
 }
@@ -1558,7 +1557,7 @@ CParser::FinalizeReactorOnChangeClause ()
 		err::SetFormatStringError ("no bindable sites found");
 		return false;
 	}
-	
+
 	TReaction* pHandler = AXL_MEM_NEW (TReaction);
 	pHandler->m_pFunction = m_pReactorType->CreateHandler ();
 	pHandler->m_BindSiteList.TakeOver (&m_ReactorBindSiteList);
@@ -1571,7 +1570,7 @@ bool
 CParser::ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList)
 {
 	ASSERT (m_pReactorType);
-	ASSERT (!pTokenList->IsEmpty ());	
+	ASSERT (!pTokenList->IsEmpty ());
 
 	bool Result;
 
@@ -1626,13 +1625,13 @@ CParser::CallBaseTypeMemberConstructor (
 	}
 
 	CType* pType = NULL;
-	
+
 	EModuleItem ItemKind = pItem->GetItemKind ();
 	switch (ItemKind)
 	{
 	case EModuleItem_Type:
 		return CallBaseTypeConstructor ((CType*) pItem, pArgList);
-	
+
 	case EModuleItem_Typedef:
 		return CallBaseTypeConstructor (((CTypedef*) pItem)->GetType (), pArgList);
 
@@ -1679,7 +1678,7 @@ CParser::CallBaseTypeConstructor (
 	CType* pType,
 	rtl::CBoxListT <CValue>* pArgList
 	)
-{	
+{
 	ASSERT (m_pConstructorType || m_pConstructorProperty);
 
 	if (m_pConstructorProperty)
@@ -1692,8 +1691,8 @@ CParser::CallBaseTypeConstructor (
 	if (!pBaseTypeSlot)
 	{
 		err::SetFormatStringError (
-			"'%s' is not a base type of '%s'", 
-			pType->GetTypeString ().cc (), 
+			"'%s' is not a base type of '%s'",
+			pType->GetTypeString ().cc (),
 			m_pConstructorType->GetTypeString ().cc ()
 			);
 		return false;
@@ -1758,7 +1757,7 @@ CParser::CallFieldConstructor (
 	if (pField->GetParentNamespace () != m_pConstructorType)
 	{
 		err::SetFormatStringError (
-			"'%s' is not an immediate field of '%s'", 
+			"'%s' is not an immediate field of '%s'",
 			pField->GetName ().cc (),
 			m_pConstructorType->GetTypeString ().cc ()
 			);
@@ -1781,7 +1780,7 @@ CParser::CallFieldConstructor (
 	CFunction* pConstructor = ((CDerivableType*) pField->GetType ())->GetConstructor ();
 
 	CValue FieldValue;
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetField (ThisValue, pField, NULL, &FieldValue) &&
 		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &FieldValue);
 
@@ -1808,31 +1807,31 @@ CParser::FinalizeBaseTypeMemberConstructBlock ()
 	bool Result;
 
 	if (m_pConstructorProperty)
-		return 
+		return
 			m_pConstructorProperty->CallMemberPropertyConstructors (ThisValue) &&
 			m_pConstructorProperty->CallMemberFieldConstructors (ThisValue);
-	
+
 	ASSERT (ThisValue);
 
-	Result = 
+	Result =
 		m_pConstructorType->CallBaseTypeConstructors (ThisValue) &&
 		m_pConstructorType->CallMemberPropertyConstructors (ThisValue) &&
 		m_pConstructorType->CallMemberFieldConstructors (ThisValue);
 
 	if (!Result)
 		return false;
-	
+
 	CFunction* pPreConstructor = m_pConstructorType->GetPreConstructor ();
 	if (!pPreConstructor)
 		return true;
-		
+
 	return m_pModule->m_OperatorMgr.CallOperator (pPreConstructor, ThisValue);
 }
 
 bool
 CParser::NewOperator_s (
-	EStorage StorageKind, 
-	CType* pType, 
+	EStorage StorageKind,
+	CType* pType,
 	CValue* pResultValue
 	)
 {
@@ -1847,10 +1846,10 @@ CParser::LookupIdentifier (
 	)
 {
 	bool Result;
-	
+
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
-	
+
 	CBaseTypeCoord Coord;
 	pItem = pNamespace->FindItemTraverse (Name, &Coord);
 	if (!pItem)
@@ -1875,7 +1874,7 @@ CParser::LookupIdentifier (
 		pItem = ((CTypedef*) pItem)->GetType ();
 		// and fall through
 
-	case EModuleItem_Type:	
+	case EModuleItem_Type:
 		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
 		{
 			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
@@ -1952,7 +1951,7 @@ CParser::LookupIdentifier (
 		if (!ThisValue)
 		{
 			err::SetFormatStringError (
-				"function '%s' has no 'this' pointer", 
+				"function '%s' has no 'this' pointer",
 				m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc () // thanks a lot gcc
 				);
 			return false;
@@ -1960,19 +1959,19 @@ CParser::LookupIdentifier (
 
 		if (Coord.m_ParentNamespaceLevel)
 		{
-			if (Coord.m_ParentNamespaceLevel > 1 ||				
-				!m_pReactorType || 
+			if (Coord.m_ParentNamespaceLevel > 1 ||
+				!m_pReactorType ||
 				!m_pReactorType->GetField (EReactorField_Parent)
 				)
 			{
 				err::SetFormatStringError (
-					"'%s' is not accessible from '%s'", 
+					"'%s' is not accessible from '%s'",
 					Name.cc (),
 					m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
 					);
 				return false;
 			}
-			
+
 			CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
 			Result = m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField);
 			if (!Result)
@@ -1981,15 +1980,15 @@ CParser::LookupIdentifier (
 
 		return m_pModule->m_OperatorMgr.GetField (
 			ThisValue,
-			(CStructField*) pItem, 
-			&Coord, 
+			(CStructField*) pItem,
+			&Coord,
 			pValue
 			);
 
 	default:
 		err::SetFormatStringError (
-			"%s '%s' cannot be used as expression", 
-			GetModuleItemKindString (pItem->GetItemKind ()), 
+			"%s '%s' cannot be used as expression",
+			GetModuleItemKindString (pItem->GetItemKind ()),
 			Name.cc ()
 			);
 		return false;
@@ -2008,7 +2007,7 @@ CParser::LookupIdentifierType (
 
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
-	
+
 	pItem = pNamespace->FindItemTraverse (Name);
 	if (!pItem)
 	{
@@ -2027,7 +2026,7 @@ CParser::LookupIdentifierType (
 		pItem = ((CTypedef*) pItem)->GetType ();
 		// and fall through
 
-	case EModuleItem_Type:	
+	case EModuleItem_Type:
 		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
 		{
 			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
@@ -2078,7 +2077,7 @@ CParser::LookupIdentifierType (
 	case EModuleItem_StructField:
 		pValue->SetType (((CStructField*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
 		break;
-		
+
 	default:
 		err::SetFormatStringError ("'%s' cannot be used as expression", Name.cc ());
 		return false;
@@ -2092,8 +2091,8 @@ CParser::CreateMemberClosure (CValue* pValue)
 {
 	CValue ThisValue;
 
-	bool Result = pValue->GetValueKind () == EValue_Type ? 
-		GetThisValueType (&ThisValue) : 
+	bool Result = pValue->GetValueKind () == EValue_Type ?
+		GetThisValueType (&ThisValue) :
 		GetThisValue (&ThisValue);
 
 	if (!Result)
@@ -2175,15 +2174,15 @@ CParser::GetPitcherReturnValueType (CValue* pValue)
 
 bool
 CParser::PrepareCurlyInitializerNamedItem (
-	TCurlyInitializer* pInitializer, 
+	TCurlyInitializer* pInitializer,
 	const char* pName
 	)
 {
 	CValue MemberValue;
 
 	bool Result = m_pModule->m_OperatorMgr.MemberOperator (
-		pInitializer->m_TargetValue, 
-		pName, 
+		pInitializer->m_TargetValue,
+		pName,
 		&pInitializer->m_MemberValue
 		);
 
@@ -2206,8 +2205,8 @@ CParser::PrepareCurlyInitializerIndexedItem (TCurlyInitializer* pInitializer)
 	}
 
 	bool Result = m_pModule->m_OperatorMgr.MemberOperator (
-		pInitializer->m_TargetValue, 
-		pInitializer->m_Index, 
+		pInitializer->m_TargetValue,
+		pInitializer->m_Index,
 		&pInitializer->m_MemberValue
 		);
 
@@ -2245,7 +2244,7 @@ CParser::AppendFmtLiteral (
 	if (!pLiteral->m_FmtLiteralValue)
 	{
 		Result = m_pModule->m_OperatorMgr.NewOperator (
-			EStorage_Stack, 
+			EStorage_Stack,
 			GetSimpleType (m_pModule, EStdType_FmtLiteral),
 			NULL,
 			&pLiteral->m_FmtLiteralValue
@@ -2257,7 +2256,7 @@ CParser::AppendFmtLiteral (
 
 	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_AppendFmtLiteral_a);
 
-	pLiteral->m_BinData.Append ((uchar_t*) p, Length); 
+	pLiteral->m_BinData.Append ((uchar_t*) p, Length);
 	Length = pLiteral->m_BinData.GetCount ();
 
 	CValue LiteralValue;
@@ -2299,13 +2298,13 @@ CParser::AppendFmtLiteralValue (
 	bool Result = m_pModule->m_OperatorMgr.PrepareOperand (RawSrcValue, &SrcValue);
 	if (!Result)
 		return false;
-	
+
 	CType* pType = SrcValue.GetType ();
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Integer)
 	{
-		static EStdFunc FuncTable [2] [2] = 
+		static EStdFunc FuncTable [2] [2] =
 		{
-			{ EStdFunc_AppendFmtLiteral_i32, EStdFunc_AppendFmtLiteral_ui32 }, 
+			{ EStdFunc_AppendFmtLiteral_i32, EStdFunc_AppendFmtLiteral_ui32 },
 			{ EStdFunc_AppendFmtLiteral_i64, EStdFunc_AppendFmtLiteral_ui64 },
 		};
 
@@ -2328,7 +2327,7 @@ CParser::AppendFmtLiteralValue (
 		return false;
 	}
 
-	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (AppendFunc);	
+	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (AppendFunc);
 	CType* pArgType = pAppend->GetType ()->GetArgArray () [2]->GetType ();
 
 	CValue ArgValue;
@@ -2371,12 +2370,12 @@ CParser::FinalizeLiteral (
 		if (pLiteral->m_LastToken == EToken_Literal)
 			pLiteral->m_BinData.Append (0);
 
-		pResultValue->SetCharArray (pLiteral->m_BinData, pLiteral->m_BinData.GetCount ());	
+		pResultValue->SetCharArray (pLiteral->m_BinData, pLiteral->m_BinData.GetCount ());
 		return true;
 	}
-	
+
 	AppendFmtLiteral (pLiteral, NULL, 0);
-	
+
 	CValue PtrValue;
 	CValue SizeValue;
 
@@ -2392,7 +2391,7 @@ CParser::FinalizeLiteral (
 		CValue ((int64_t) 0, GetSimpleType (m_pModule, EType_SizeT)),
 		PtrValue,
 		SizeValue
-		);	 
+		);
 
 	return true;
 }
