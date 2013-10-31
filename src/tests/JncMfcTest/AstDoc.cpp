@@ -1,9 +1,9 @@
-// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
-// (the "Fluent UI") and is provided only as referential material to supplement the 
-// Microsoft Foundation Classes Reference and related electronic documentation 
-// included with the MFC C++ library software.  
-// License terms to copy, use or distribute the Fluent UI are available separately.  
-// To learn more about our Fluent UI licensing program, please visit 
+// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface
+// (the "Fluent UI") and is provided only as referential material to supplement the
+// Microsoft Foundation Classes Reference and related electronic documentation
+// included with the MFC C++ library software.
+// License terms to copy, use or distribute the Fluent UI are available separately.
+// To learn more about our Fluent UI licensing program, please visit
 // http://msdn.microsoft.com/officeui.
 //
 // Copyright (C) Microsoft Corporation
@@ -52,8 +52,8 @@ StdLib_printf (
 IMPLEMENT_DYNCREATE(CAstDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CAstDoc, CDocument)
-	ON_COMMAND(ID_FILE_COMPILE, OnFileCompile) 
-	ON_COMMAND(ID_FILE_RUN, OnFileRun) 
+	ON_COMMAND(ID_FILE_COMPILE, OnFileCompile)
+	ON_COMMAND(ID_FILE_RUN, OnFileRun)
 END_MESSAGE_MAP()
 
 // CAstDoc construction/destruction
@@ -90,13 +90,15 @@ CAstDoc::Compile ()
 	{
 		delete m_pLlvmExecutionEngine;
 		m_pLlvmExecutionEngine = NULL;
-	}	
+	}
 
 	rtl::CString FilePath = GetPathName ();
-	llvm::Module* pLlvmModule = new llvm::Module (FilePath.cc (), llvm::getGlobalContext ());
+
+	llvm::LLVMContext* pLlvmContext = new llvm::LLVMContext;
+	llvm::Module* pLlvmModule = new llvm::Module (FilePath.cc (), *pLlvmContext);
 	m_Module.Create (FilePath, pLlvmModule);
-	
-	llvm::EngineBuilder EngineBuilder (pLlvmModule);	
+
+	llvm::EngineBuilder EngineBuilder (pLlvmModule);
 	std::string ErrorString;
 	EngineBuilder.setErrorStr (&ErrorString);
 	EngineBuilder.setUseMCJIT(true);
@@ -123,8 +125,8 @@ CAstDoc::Compile ()
 
 	jnc::CLexer Lexer;
 	Lexer.Create (
-		FilePath, 
-		SourceText, 
+		FilePath,
+		SourceText,
 		SourceText.GetLength ()
 		);
 
@@ -142,10 +144,10 @@ CAstDoc::Compile ()
 		{
 			rtl::CString Text = err::GetError ()->GetDescription ();
 			pMainFrame->m_OutputPane.m_LogCtrl.Trace (
-				"%s(%d,%d): %s\n", 
-				FilePath, 
-				pToken->m_Pos.m_Line + 1, 
-				pToken->m_Pos.m_Col + 1, 
+				"%s(%d,%d): %s\n",
+				FilePath,
+				pToken->m_Pos.m_Line + 1,
+				pToken->m_Pos.m_Col + 1,
 				Text
 				);
 			return false;
@@ -216,7 +218,7 @@ CAstDoc::RunFunction (
 	}
 
 	return Result;
-}	
+}
 
 bool
 CAstDoc::Run ()
@@ -244,7 +246,7 @@ CAstDoc::Run ()
 	jnc::CScopeThreadRuntime ScopeRuntime (&m_Runtime);
 
 	m_Runtime.Startup ();
-	
+
 	jnc::CFunction* pConstructor = m_Module.GetConstructor ();
 	if (pConstructor)
 	{
@@ -266,12 +268,12 @@ CAstDoc::Run ()
 	}
 
 	m_Runtime.Shutdown ();
-	
+
 	pMainFrame->m_OutputPane.m_LogCtrl.Trace ("Done (retval = %d).\n", Result);
 	return true;
 }
 
-jnc::CFunction* 
+jnc::CFunction*
 CAstDoc::FindGlobalFunction (const char* pName)
 {
 	jnc::CModuleItem* pItem = m_Module.m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
@@ -367,7 +369,7 @@ void CAstDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 void CAstDoc::InitializeSearchContent()
 {
 	CString strSearchContent;
-	// Set search contents from document's data. 
+	// Set search contents from document's data.
 	// The content parts should be separated by ";"
 
 	// For example:  strSearchContent = "point;rectangle;circle;ole object;";

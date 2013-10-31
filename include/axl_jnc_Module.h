@@ -35,7 +35,7 @@ enum EModuleFlag
 
 class CPreModule
 {
-protected: 
+protected:
 	CModule* m_pPrevModule;
 
 	CPreModule ()
@@ -78,7 +78,7 @@ public:
 	CVariableMgr m_VariableMgr;
 	CConstMgr m_ConstMgr;
 	CControlFlowMgr m_ControlFlowMgr;
-	COperatorMgr m_OperatorMgr;	
+	COperatorMgr m_OperatorMgr;
 	CLlvmIrBuilder m_LlvmIrBuilder;
 	CLlvmDiBuilder m_LlvmDiBuilder;
 
@@ -93,13 +93,19 @@ public:
 		Clear ();
 	}
 
-	llvm::Module* 
+	llvm::LLVMContext*
+	GetLlvmContext ()
+	{
+		return &m_pLlvmModule->getContext ();
+	}
+
+	llvm::Module*
 	GetLlvmModule ()
 	{
 		return m_pLlvmModule;
 	}
 
-	llvm::DIFile 
+	llvm::DIFile
 	GetLlvmDiFile ()
 	{
 		return m_LlvmDiFile;
@@ -135,13 +141,13 @@ public:
 		return m_DirName;
 	}
 
-	uint_t 
+	uint_t
 	GetFlags ()
 	{
 		return m_Flags;
 	}
-				
-	CFunction* 
+
+	CFunction*
 	GetConstructor ()
 	{
 		return m_pConstructor;
@@ -150,7 +156,7 @@ public:
 	bool
 	SetConstructor (CFunction* pFunction);
 
-	CFunction* 
+	CFunction*
 	GetDestructor ()
 	{
 		return m_pDestructor;
@@ -176,7 +182,7 @@ public:
 		void* pf
 		)
 	{
-		SetFunctionPointer (pLlvmExecutionEngine, m_FunctionMgr.GetStdFunction (FuncKind), pf);			
+		SetFunctionPointer (pLlvmExecutionEngine, m_FunctionMgr.GetStdFunction (FuncKind), pf);
 	}
 
 	bool
@@ -186,10 +192,10 @@ public:
 		void* pf
 		);
 
-	void 
+	void
 	MarkForLayout (CModuleItem* pItem);
 
-	void 
+	void
 	MarkForCompile (CModuleItem* pItem);
 
 	CClassType*
@@ -226,14 +232,14 @@ public:
 	void
 	Clear ();
 
-	bool 
+	bool
 	Parse (
 		const char* pFilePath,
 		const char* pSource,
 		size_t Length = -1
 		);
 
-	bool 
+	bool
 	ParseFile (const char* pFilePath);
 
 	bool
@@ -241,7 +247,7 @@ public:
 
 	bool
 	Compile ();
-	
+
 	rtl::CString
 	GetLlvmIrString ();
 

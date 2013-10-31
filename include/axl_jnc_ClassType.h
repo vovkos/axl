@@ -61,7 +61,7 @@ class CClassType: public CDerivableType
 	friend class CTypeMgr;
 	friend class CParser;
 	friend class CProperty;
-	
+
 protected:
 	EClassType m_ClassTypeKind;
 
@@ -91,7 +91,7 @@ protected:
 	CStructType* m_pVTableStructType;
 	rtl::CArrayT <CFunction*> m_VTable;
 	CValue m_VTablePtrValue;
-	
+
 	TClassPtrTypeTuple* m_pClassPtrTypeTuple;
 
 public:
@@ -103,35 +103,35 @@ public:
 		return m_ClassTypeKind != EClassType_StdObject && !(m_Flags & EClassTypeFlag_Abstract);
 	}
 
-	EClassType 
+	EClassType
 	GetClassTypeKind ()
 	{
 		return m_ClassTypeKind;
 	}
 
-	CStructType* 
+	CStructType*
 	GetIfaceStructType ()
 	{
 		ASSERT (m_pIfaceStructType);
 		return m_pIfaceStructType;
 	}
 
-	CStructType* 
+	CStructType*
 	GetClassStructType ()
 	{
 		ASSERT (m_pClassStructType);
 		return m_pClassStructType;
 	}
 
-	CClassPtrType* 
+	CClassPtrType*
 	GetClassPtrType (
-		CNamespace* pAnchorNamespace,	
+		CNamespace* pAnchorNamespace,
 		EType TypeKind,
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		uint_t Flags = 0
 		);
 
-	CClassPtrType* 
+	CClassPtrType*
 	GetClassPtrType (
 		EType TypeKind,
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
@@ -141,7 +141,7 @@ public:
 		return GetClassPtrType (NULL, TypeKind, PtrTypeKind, Flags);
 	}
 
-	CClassPtrType* 
+	CClassPtrType*
 	GetClassPtrType (
 		EClassPtrType PtrTypeKind = EClassPtrType_Normal,
 		uint_t Flags = 0
@@ -153,17 +153,17 @@ public:
 	virtual
 	CType*
 	GetThisArgType (uint_t PtrTypeFlags)
-	{		
+	{
 		return (CType*) GetClassPtrType (EClassPtrType_Normal, PtrTypeFlags);
 	}
 
-	CFunction* 
+	CFunction*
 	GetPrimer ()
 	{
 		return m_pPrimer;
 	}
 
-	CFunction* 
+	CFunction*
 	GetDestructor ()
 	{
 		return m_pDestructor;
@@ -193,25 +193,25 @@ public:
 		return !m_VTable.IsEmpty ();
 	}
 
-	rtl::CArrayT <CStructField*> 
+	rtl::CArrayT <CStructField*>
 	GetClassMemberFieldArray ()
 	{
 		return m_ClassMemberFieldArray;
 	}
 
-	rtl::CArrayT <CFunction*> 
+	rtl::CArrayT <CFunction*>
 	GetVirtualMethodArray ()
 	{
 		return m_VirtualMethodArray;
 	}
-	
-	rtl::CArrayT <CProperty*> 
+
+	rtl::CArrayT <CProperty*>
 	GetVirtualPropertyArray ()
 	{
 		return m_VirtualPropertyArray;
 	}
 
-	CStructType* 
+	CStructType*
 	GetVTableStructType ()
 	{
 		ASSERT (m_pVTableStructType);
@@ -224,11 +224,11 @@ public:
 		return m_VTablePtrValue;
 	}
 
-	virtual 
+	virtual
 	bool
 	Compile ();
 
-	virtual 
+	virtual
 	void
 	EnumGcRoots (
 		CRuntime* pRuntime,
@@ -262,21 +262,21 @@ protected:
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
-	virtual 
+	virtual
 	void
 	PrepareTypeString ()
 	{
 		m_TypeString.Format ("class %s", m_Tag.cc ()); // thanks a lot gcc
 	}
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ()
 	{
 		m_pLlvmType = GetClassStructType ()->GetLlvmType ();
 	}
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmDiType ()
 	{
@@ -322,11 +322,11 @@ protected:
 inline
 bool
 IsClassType (
-	CType* pType, 
+	CType* pType,
 	EClassType ClassTypeKind
 	)
 {
-	return 
+	return
 		pType->GetTypeKind () == EType_Class &&
 		((CClassType*) pType)->GetClassTypeKind () == ClassTypeKind;
 }

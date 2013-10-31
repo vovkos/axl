@@ -7,13 +7,31 @@ namespace jnc {
 
 //.............................................................................
 
-CLlvmIrBuilder::CLlvmIrBuilder ():
-	m_LlvmIrBuilder (llvm::getGlobalContext ())
+CLlvmIrBuilder::CLlvmIrBuilder ()
 {
 	m_pModule = GetCurrentThreadModule ();
 	ASSERT (m_pModule);
 
-	m_CommentMdKind = llvm::getGlobalContext().getMDKindID ("jnc.comment");
+	m_pLlvmIrBuilder = NULL;
+}
+
+void
+CLlvmIrBuilder::Create ()
+{
+	Clear ();
+
+	m_pLlvmIrBuilder = new llvm::IRBuilder <> (*m_pModule->GetLlvmContext ());
+	m_CommentMdKind = m_pModule->GetLlvmContext ()->getMDKindID ("jnc.comment");
+}
+
+void
+CLlvmIrBuilder::Clear ()
+{
+	if (!m_pLlvmIrBuilder)
+		return;
+
+	delete m_pLlvmIrBuilder;
+	m_pLlvmIrBuilder = NULL;
 }
 
 bool
@@ -48,8 +66,8 @@ CLlvmIrBuilder::CreateComment_0 (const char* pText)
 	}
 
 	llvm::Instruction* pInst = &pLlvmBlock->getInstList ().back ();
-	llvm::MDString* pMdString = llvm::MDString::get (llvm::getGlobalContext (), pText);
-	llvm::MDNode* pMdNode = llvm::MDNode::get (llvm::getGlobalContext (), llvm::ArrayRef <llvm::Value*> ((llvm::Value**) &pMdString, 1));
+	llvm::MDString* pMdString = llvm::MDString::get (*m_pModule->GetLlvmContext (), pText);
+	llvm::MDNode* pMdNode = llvm::MDNode::get (*m_pModule->GetLlvmContext (), llvm::ArrayRef <llvm::Value*> ((llvm::Value**) &pMdString, 1));
 	pInst->setMetadata (m_CommentMdKind, pMdNode);
 	return true;
 }
@@ -65,7 +83,7 @@ CLlvmIrBuilder::CreateSwitch (
 	CType* pType = Value.GetType ();
 	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
-	llvm::SwitchInst* pInst = m_LlvmIrBuilder.CreateSwitch (
+	llvm::SwitchInst* pInst = m_pLlvmIrBuilder->CreateSwitch (
 		Value.GetLlvmValue (),
 		pDefaultBlock->GetLlvmBlock (),
 		CaseCount
@@ -87,9 +105,9 @@ void
 CLlvmIrBuilder::SetInsertPoint (CBasicBlock* pBlock)
 {
 	if (!(pBlock->GetFlags () & EBasicBlockFlag_Entry) || !pBlock->HasTerminator ())
-		m_LlvmIrBuilder.SetInsertPoint (pBlock->GetLlvmBlock ());
+		m_pLlvmIrBuilder->SetInsertPoint (pBlock->GetLlvmBlock ());
 	else
-		m_LlvmIrBuilder.SetInsertPoint (pBlock->GetLlvmBlock ()->getTerminator ());
+		m_pLlvmIrBuilder->SetInsertPoint (pBlock->GetLlvmBlock ()->getTerminator ());
 }
 
 llvm::IndirectBrInst*
@@ -99,7 +117,7 @@ CLlvmIrBuilder::CreateIndirectBr (
 	size_t BlockCount
 	)
 {
-	llvm::IndirectBrInst* pInst = m_LlvmIrBuilder.CreateIndirectBr (Value.GetLlvmValue (), BlockCount);
+	llvm::IndirectBrInst* pInst = m_pLlvmIrBuilder->CreateIndirectBr (Value.GetLlvmValue (), BlockCount);
 
 	for (size_t i = 0; i < BlockCount; i++)
 		pInst->addDestination (ppBlockArray [i]->GetLlvmBlock ());
@@ -119,7 +137,7 @@ CLlvmIrBuilder::CreateSwitch (
 	CType* pType = Value.GetType ();
 	ASSERT (pType->GetTypeKindFlags () & ETypeKindFlag_Integer);
 
-	llvm::SwitchInst* pInst = m_LlvmIrBuilder.CreateSwitch (
+	llvm::SwitchInst* pInst = m_pLlvmIrBuilder->CreateSwitch (
 		Value.GetLlvmValue (),
 		pDefaultBlock->GetLlvmBlock (),
 		CaseCount
@@ -151,7 +169,7 @@ CLlvmIrBuilder::CreatePhi (
 		return NULL;
 	}
 
-	llvm::PHINode* pPhiNode = m_LlvmIrBuilder.CreatePHI (pValueArray->GetType ()->GetLlvmType (), Count, "phi");
+	llvm::PHINode* pPhiNode = m_pLlvmIrBuilder->CreatePHI (pValueArray->GetType ()->GetLlvmType (), Count, "phi");
 
 	for (size_t i = 0; i < Count; i++)
 		pPhiNode->addIncoming (pValueArray [i].GetLlvmValue (), pBlockArray [i]->GetLlvmBlock ());
@@ -175,7 +193,7 @@ CLlvmIrBuilder::CreatePhi (
 		return NULL;
 	}
 
-	llvm::PHINode* pPhiNode = m_LlvmIrBuilder.CreatePHI (Value1.GetLlvmValue ()->getType (), 2,  "phi");
+	llvm::PHINode* pPhiNode = m_pLlvmIrBuilder->CreatePHI (Value1.GetLlvmValue ()->getType (), 2,  "phi");
 	pPhiNode->addIncoming (Value1.GetLlvmValue (), pBlock1->GetLlvmBlock ());
 	pPhiNode->addIncoming (Value2.GetLlvmValue (), pBlock2->GetLlvmBlock ());
 	pResultValue->SetLlvmValue (pPhiNode, Value1.GetType ());
@@ -199,7 +217,7 @@ CLlvmIrBuilder::CreateGep (
 		LlvmIndexArray [i] = pIndexArray [i].GetLlvmValue ();
 
 	llvm::Value* pInst;
-	pInst = m_LlvmIrBuilder.CreateGEP (
+	pInst = m_pLlvmIrBuilder->CreateGEP (
 			Value.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
 			"gep"
@@ -230,7 +248,7 @@ CLlvmIrBuilder::CreateGep (
 	}
 
 	llvm::Value* pInst;
-	pInst = m_LlvmIrBuilder.CreateGEP (
+	pInst = m_pLlvmIrBuilder->CreateGEP (
 			Value.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (LlvmIndexArray, IndexCount),
 			"gep"
@@ -254,7 +272,7 @@ CLlvmIrBuilder::CreateCall (
 
 	if (pResultType->GetTypeKind () != EType_Void)
 	{
-		pInst = m_LlvmIrBuilder.CreateCall (
+		pInst = m_pLlvmIrBuilder->CreateCall (
 			CalleeValue.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (pLlvmArgValueArray, ArgCount),
 			"call"
@@ -265,7 +283,7 @@ CLlvmIrBuilder::CreateCall (
 	}
 	else
 	{
-		pInst = m_LlvmIrBuilder.CreateCall (
+		pInst = m_pLlvmIrBuilder->CreateCall (
 			CalleeValue.GetLlvmValue (),
 			llvm::ArrayRef <llvm::Value*> (pLlvmArgValueArray, ArgCount)
 			);

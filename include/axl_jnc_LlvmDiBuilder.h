@@ -43,7 +43,7 @@ public:
 		Clear ();
 	}
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;
@@ -55,7 +55,7 @@ public:
 		return m_pLlvmDiBuilder;
 	}
 
-	bool
+	void
 	Create ();
 
 	void
@@ -67,7 +67,7 @@ public:
 		m_pLlvmDiBuilder->finalize ();
 	}
 
-	llvm::DebugLoc 
+	llvm::DebugLoc
 	GetDebugLoc (
 		CScope* pScope,
 		const CToken::CPos& Pos
@@ -84,7 +84,7 @@ public:
 	{
 		return m_pLlvmDiBuilder->createFile (pFileName, pDirName);
 	}
-	
+
 	llvm::DIType
 	CreateBasicType (
 		const char* pName,
@@ -100,10 +100,16 @@ public:
 	CreateSubroutineType (CFunctionType* pFunctionType);
 
 	llvm::DIType
-	CreateStructType (CStructType* pStructType);
+	CreateEmptyStructType (CStructType* pStructType);
+
+	void
+	SetStructTypeBody (CStructType* pStructType);
 
 	llvm::DIType
-	CreateUnionType (CUnionType* pUnionType);
+	CreateEmptyUnionType (CUnionType* pUnionType);
+
+	void
+	SetUnionTypeBody (CUnionType* pUnionType);
 
 	llvm::DIType
 	CreateArrayType (CArrayType* pArrayType);

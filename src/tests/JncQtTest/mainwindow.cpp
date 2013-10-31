@@ -367,7 +367,8 @@ bool MainWindow::compile ()
 		return false;
 
 	QByteArray filePathBytes = child->file().toUtf8 ();
-	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.constData(), llvm::getGlobalContext ());
+	llvm::LLVMContext* pLlvmContext = new llvm::LLVMContext;
+	llvm::Module* pLlvmModule = new llvm::Module (filePathBytes.constData(), *pLlvmContext);
 
 	module.Create (filePathBytes.data(), pLlvmModule, jnc::EModuleFlag_DebugInfo);
 

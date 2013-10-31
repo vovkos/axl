@@ -32,6 +32,12 @@ CStructType::CStructType ()
 	m_LastBitFieldOffset = 0;
 }
 
+void
+CStructType::PrepareLlvmType ()
+{
+	m_pLlvmType = llvm::StructType::create (*m_pModule->GetLlvmContext (), m_Tag.cc ());
+}
+
 CStructField*
 CStructType::CreateFieldImpl (
 	const rtl::CString& Name,
@@ -514,7 +520,8 @@ CStructType::InsertPadding (size_t Size)
 void
 CStructType::PrepareLlvmDiType ()
 {
-	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateStructType (this);
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateEmptyStructType (this);
+	m_pModule->m_LlvmDiBuilder.SetStructTypeBody (this);
 }
 
 void

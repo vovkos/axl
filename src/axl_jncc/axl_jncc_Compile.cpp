@@ -12,7 +12,8 @@ CJnc::Compile (
 {
 	bool Result;
 
-	llvm::Module* pLlvmModule = new llvm::Module (pFileName, llvm::getGlobalContext ());
+	llvm::LLVMContext* pLlvmContext = new llvm::LLVMContext;
+	llvm::Module* pLlvmModule = new llvm::Module (pFileName, *pLlvmContext);
 
 	uint_t ModuleFlags = 0;
 	if (m_pCmdLine->m_Flags & EJncFlag_DebugInfo)

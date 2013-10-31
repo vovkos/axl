@@ -7,76 +7,76 @@ namespace jnc {
 
 //.............................................................................
 
-uint_t 
+uint_t
 GetTypeKindFlags (EType TypeKind)
 {
-	static uint_t FlagTable [EType__Count] = 
+	static uint_t FlagTable [EType__Count] =
 	{
 		0,                           // EType_Void
 		0,                           // EType_Variant
 
-		ETypeKindFlag_Numeric,       // EType_Bool		
-				
+		ETypeKindFlag_Numeric,       // EType_Bool
+
 		ETypeKindFlag_Signed |       // EType_Int8
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Unsigned |     // EType_Int8_u
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Signed |       // EType_Int16
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Unsigned |     // EType_Int16_u                
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Unsigned |     // EType_Int16_u
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Signed |       // EType_Int32
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Unsigned |     // EType_Int32_u                
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Unsigned |     // EType_Int32_u
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Signed |       // EType_Int64
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Unsigned |     // EType_Int64_u               
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Unsigned |     // EType_Int64_u
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Signed |       // EType_Int16_be
 		ETypeKindFlag_BigEndian |
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Unsigned |     // EType_Int16_beu
 		ETypeKindFlag_BigEndian |
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Signed |       // EType_Int32_be
 		ETypeKindFlag_BigEndian |
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Unsigned |     // EType_Int32_beu              
+		ETypeKindFlag_Unsigned |     // EType_Int32_beu
 		ETypeKindFlag_BigEndian |
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Signed |       // EType_Int64_be
 		ETypeKindFlag_BigEndian |
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Unsigned |     // EType_Int64_beu                
+		ETypeKindFlag_Unsigned |     // EType_Int64_beu
 		ETypeKindFlag_BigEndian |
-		ETypeKindFlag_Integer |  
+		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Fp |           // EType_Float
@@ -89,18 +89,18 @@ GetTypeKindFlags (EType TypeKind)
 		0,                           // EType_BitField
 
 		ETypeKindFlag_Named |        // EType_Enum
-		ETypeKindFlag_Integer |  
-		ETypeKindFlag_Numeric,		         
+		ETypeKindFlag_Integer |
+		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Aggregate |    // EType_Struct
 		ETypeKindFlag_Derivable |
 		ETypeKindFlag_Named,
 
-		ETypeKindFlag_Aggregate |    // EType_Union    
+		ETypeKindFlag_Aggregate |    // EType_Union
 		ETypeKindFlag_Derivable |
 		ETypeKindFlag_Named,
 
-		ETypeKindFlag_Aggregate |    // EType_Class    
+		ETypeKindFlag_Aggregate |    // EType_Class
 		ETypeKindFlag_Derivable |
 		ETypeKindFlag_Named,
 
@@ -152,8 +152,8 @@ GetInt32TypeKind (int32_t Integer)
 	return
 		Integer >= INT8_MIN && Integer <= INT8_MAX ? EType_Int8 :
 		(uint32_t) Integer <= UINT8_MAX ? EType_Int8_u :
-		Integer >= INT16_MIN && Integer <= INT16_MAX ? EType_Int16 : 
-		(uint32_t) Integer <= UINT16_MAX ? EType_Int16_u : 
+		Integer >= INT16_MIN && Integer <= INT16_MAX ? EType_Int16 :
+		(uint32_t) Integer <= UINT16_MAX ? EType_Int16_u :
 		Integer >= INT32_MIN && Integer <= INT32_MAX ? EType_Int32 : EType_Int32_u;
 }
 
@@ -171,10 +171,10 @@ GetInt64TypeKind (int64_t Integer)
 	return
 		Integer >= INT8_MIN && Integer <= INT8_MAX ? EType_Int8 :
 		(uint64_t) Integer <= UINT8_MAX ? EType_Int8_u :
-		Integer >= INT16_MIN && Integer <= INT16_MAX ? EType_Int16 : 
-		(uint64_t) Integer <= UINT16_MAX ? EType_Int16_u : 
-		Integer >= INT32_MIN && Integer <= INT32_MAX ? EType_Int32 : 
-		(uint64_t) Integer <= UINT32_MAX ? EType_Int32_u : 
+		Integer >= INT16_MIN && Integer <= INT16_MAX ? EType_Int16 :
+		(uint64_t) Integer <= UINT16_MAX ? EType_Int16_u :
+		Integer >= INT32_MIN && Integer <= INT32_MAX ? EType_Int32 :
+		(uint64_t) Integer <= UINT32_MAX ? EType_Int32_u :
 		Integer >= INT64_MIN && Integer <= INT64_MAX ? EType_Int64 : EType_Int64_u;
 }
 
@@ -183,13 +183,13 @@ GetInt64TypeKind_u (uint64_t Integer)
 {
 	return
 		Integer <= UINT8_MAX ? EType_Int8_u :
-		Integer <= UINT16_MAX ? EType_Int16_u : 
+		Integer <= UINT16_MAX ? EType_Int16_u :
 		Integer <= UINT32_MAX ? EType_Int32_u : EType_Int64_u;
 }
 
 //.............................................................................
 
-rtl::CString 
+rtl::CString
 GetLlvmTypeString (llvm::Type* pLlvmType)
 {
 	std::string s;
@@ -203,7 +203,7 @@ GetLlvmTypeString (llvm::Type* pLlvmType)
 const char*
 GetTypeModifierString (ETypeModifier Modifier)
 {
-	static const char* StringTable [] = 
+	static const char* StringTable [] =
 	{
 		"unsigned",     // ETypeModifier_Unsigned    = 0x00000001,
 		"bigendian",    // ETypeModifier_BigEndian   = 0x00000002,
@@ -228,8 +228,8 @@ GetTypeModifierString (ETypeModifier Modifier)
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
-	return i < countof (StringTable) ? 
-		StringTable [i] : 
+	return i < countof (StringTable) ?
+		StringTable [i] :
 		"undefined-type-modifier";
 }
 
@@ -258,10 +258,10 @@ GetTypeModifierString (uint_t Modifiers)
 
 //.............................................................................
 
-const char* 
+const char*
 GetPtrTypeFlagString (EPtrTypeFlag Flag)
 {
-	static const char* StringTable [] = 
+	static const char* StringTable [] =
 	{
 		"unsafe",   // EPtrTypeFlag_Unsafe    = 0x0010000
 		"checked",  // EPtrTypeFlag_Checked   = 0x0020000
@@ -276,8 +276,8 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 
 	size_t i = rtl::GetLoBitIdx32 (Flag >> 12);
 
-	return i < countof (StringTable) ? 
-		StringTable [i] : 
+	return i < countof (StringTable) ?
+		StringTable [i] :
 		"undefined-ptr-type-flag";
 }
 
@@ -306,7 +306,7 @@ GetPtrTypeFlagString (uint_t Flags)
 
 	if (Flags & EPtrTypeFlag_Bindable)
 		String += "bindable ";
-	
+
 	if (Flags & EPtrTypeFlag_AutoGet)
 		String += "autoget ";
 
@@ -381,31 +381,31 @@ CType::CType ()
 	m_pBoxClassType = NULL;
 }
 
-rtl::CString 
+rtl::CString
 CType::GetTypeString ()
 {
 	if (!m_TypeString.IsEmpty ())
 		return m_TypeString;
 
 	PrepareTypeString ();
-	
+
 	ASSERT (!m_TypeString.IsEmpty ());
 	return m_TypeString;
 }
 
-llvm::Type* 
+llvm::Type*
 CType::GetLlvmType ()
 {
 	if (m_pLlvmType)
 		return m_pLlvmType;
 
 	PrepareLlvmType ();
-	
+
 	ASSERT (m_pLlvmType);
 	return m_pLlvmType;
 }
 
-llvm::DIType 
+llvm::DIType
 CType::GetLlvmDiType ()
 {
 	if (m_LlvmDiType)
@@ -415,32 +415,32 @@ CType::GetLlvmDiType ()
 		return llvm::DIType ();
 
 	PrepareLlvmDiType ();
-	
+
 	ASSERT (m_LlvmDiType);
 	return m_LlvmDiType;
 }
 
-CValue 
+CValue
 CType::GetUndefValue ()
 {
 	llvm::Value* pLlvmValue = llvm::UndefValue::get (GetLlvmType ());
 	return CValue (pLlvmValue, this);
 }
 
-CValue 
+CValue
 CType::GetZeroValue ()
 {
 	llvm::Value* pLlvmValue = llvm::Constant::getNullValue (GetLlvmType ());
 	return CValue (pLlvmValue, this);
 }
 
-CArrayType* 
+CArrayType*
 CType::GetArrayType (size_t ElementCount)
 {
 	return m_pModule->m_TypeMgr.GetArrayType (this, ElementCount);
 }
 
-CDataPtrType* 
+CDataPtrType*
 CType::GetDataPtrType (
 	CNamespace* pAnchorNamespace,
 	EType TypeKind,
@@ -451,13 +451,13 @@ CType::GetDataPtrType (
 	return m_pModule->m_TypeMgr.GetDataPtrType (pAnchorNamespace, this, TypeKind, PtrTypeKind, Flags);
 }
 
-CFunctionArg* 
+CFunctionArg*
 CType::GetSimpleFunctionArg (uint_t PtrTypeFlags)
 {
 	return m_pModule->m_TypeMgr.GetSimpleFunctionArg (this, PtrTypeFlags);
 }
 
-CClassType* 
+CClassType*
 CType::GetBoxClassType ()
 {
 	return m_pModule->m_TypeMgr.GetBoxClassType (this);
@@ -466,7 +466,7 @@ CType::GetBoxClassType ()
 void
 CType::PrepareTypeString ()
 {
-	static const char* StringTable [EType__PrimitiveTypeCount] = 
+	static const char* StringTable [EType__PrimitiveTypeCount] =
 	{
 		"void",
 		"variant",
@@ -501,49 +501,49 @@ CType::PrepareLlvmType ()
 	switch (m_TypeKind)
 	{
 	case EType_Void:
-		m_pLlvmType = llvm::Type::getVoidTy (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getVoidTy (*m_pModule->GetLlvmContext ());
 		break;
-	
+
 	case EType_Variant:
 		ASSERT (false); // variants are not supported yet
 		break;
 
 	case EType_Bool:
-		m_pLlvmType = llvm::Type::getInt1Ty (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getInt1Ty (*m_pModule->GetLlvmContext ());
 		break;
 
 	case EType_Int8:
 	case EType_Int8_u:
-		m_pLlvmType = llvm::Type::getInt8Ty (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getInt8Ty (*m_pModule->GetLlvmContext ());
 		break;
-	
+
 	case EType_Int16:
 	case EType_Int16_u:
 	case EType_Int16_be:
 	case EType_Int16_beu:
-		m_pLlvmType = llvm::Type::getInt16Ty (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getInt16Ty (*m_pModule->GetLlvmContext ());
 		break;
-	
+
 	case EType_Int32:
 	case EType_Int32_u:
 	case EType_Int32_be:
 	case EType_Int32_beu:
-		m_pLlvmType = llvm::Type::getInt32Ty (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getInt32Ty (*m_pModule->GetLlvmContext ());
 		break;
-	
+
 	case EType_Int64:
 	case EType_Int64_u:
 	case EType_Int64_be:
 	case EType_Int64_beu:
-		m_pLlvmType = llvm::Type::getInt64Ty (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getInt64Ty (*m_pModule->GetLlvmContext ());
 		break;
-	
+
 	case EType_Float:
-		m_pLlvmType = llvm::Type::getFloatTy (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getFloatTy (*m_pModule->GetLlvmContext ());
 		break;
-	
+
 	case EType_Double:
-		m_pLlvmType = llvm::Type::getDoubleTy (llvm::getGlobalContext ());
+		m_pLlvmType = llvm::Type::getDoubleTy (*m_pModule->GetLlvmContext ());
 		break;
 
 	default:
@@ -562,144 +562,144 @@ CType::PrepareLlvmDiType ()
 	};
 
 	TLlvmDiType LlvmDiTypeTable [EType__PrimitiveTypeCount] =
-	{		
-		{ 0 }, // EType_Void,		
+	{
+		{ 0 }, // EType_Void,
 		{ 0 }, // EType_Variant,
-			
+
 		// EType_Bool,
-		{ 
+		{
 			"bool",
 			llvm::dwarf::DW_ATE_boolean,
 			1,
 		},
 
 		// EType_Int8,
-		{ 
+		{
 			"int8",
 			llvm::dwarf::DW_ATE_signed_char,
 			1,
 		},
 
 		// EType_Int8_u,
-		{ 
+		{
 			"unsigned int8",
 			llvm::dwarf::DW_ATE_unsigned_char,
 			1,
 		},
 
 		// EType_Int16,
-		{ 
+		{
 			"int16",
 			llvm::dwarf::DW_ATE_signed,
 			2,
 		},
 
 		// EType_Int16_u,
-		{ 
+		{
 			"unsigned int16",
 			llvm::dwarf::DW_ATE_unsigned,
 			2,
 		},
 
 		// EType_Int32,
-		{ 
+		{
 			"int32",
 			llvm::dwarf::DW_ATE_signed,
 			4,
 		},
 
 		// EType_Int32_u,
-		{ 
+		{
 			"unsigned int32",
 			llvm::dwarf::DW_ATE_unsigned,
 			4,
 		},
 
 		// EType_Int64,
-		{ 
+		{
 			"unsigned int64",
 			llvm::dwarf::DW_ATE_signed,
 			8,
 		},
 
 		// EType_Int64_u,
-		{ 
+		{
 			"unsigned int64",
 			llvm::dwarf::DW_ATE_unsigned,
 			8,
 		},
 
 		// EType_Int16_be,
-		{ 
+		{
 			"bigendian int16",
 			llvm::dwarf::DW_ATE_signed,
 			2,
 		},
 
 		// EType_Int16_beu,
-		{ 
+		{
 			"unsigned bigendian int16",
 			llvm::dwarf::DW_ATE_unsigned,
 			2,
 		},
 
 		// EType_Int32_be,
-		{ 
+		{
 			"bigendian int16",
 			llvm::dwarf::DW_ATE_signed,
 			4,
 		},
 
 		// EType_Int32_beu,
-		{ 
+		{
 			"unsigned bigendian int16",
 			llvm::dwarf::DW_ATE_unsigned,
 			4,
 		},
 
 		// EType_Int64_be,
-		{ 
+		{
 			"bigendian int16",
 			llvm::dwarf::DW_ATE_signed,
 			8,
 		},
 
 		// EType_Int64_beu,
-		{ 
+		{
 			"unsigned bigendian int64",
 			llvm::dwarf::DW_ATE_unsigned,
 			8,
 		},
 
 		// EType_Float,
-		{ 
+		{
 			"float",
 			llvm::dwarf::DW_ATE_float,
 			4,
 		},
 
 		// EType_Double,
-		{ 
+		{
 			"float",
 			llvm::dwarf::DW_ATE_float,
 			8,
 		},
 	};
-	
+
 	ASSERT (m_TypeKind < EType__PrimitiveTypeCount);
 	TLlvmDiType* pDiType = &LlvmDiTypeTable [m_TypeKind];
 
 	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateBasicType (
-		pDiType->m_pName, 
-		pDiType->m_Size, 
-		pDiType->m_Size, 
+		pDiType->m_pName,
+		pDiType->m_Size,
+		pDiType->m_Size,
 		pDiType->m_Code
 		);
 }
 
 //.............................................................................
 
-CType* 
+CType*
 GetSimpleType (
 	CModule* pModule,
 	EType TypeKind
@@ -708,7 +708,7 @@ GetSimpleType (
 	return pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
 }
 
-CType* 
+CType*
 GetSimpleType (
 	CModule* pModule,
 	EStdType StdTypeKind

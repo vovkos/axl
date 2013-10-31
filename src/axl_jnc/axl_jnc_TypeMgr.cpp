@@ -583,8 +583,8 @@ CTypeMgr::CreateClassType (
 
 	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceHdrStructType->m_Tag.Format ("%s.IfaceHdr", pType->m_Tag.cc ());
-	pIfaceHdrStructType->CreateField (pVTableStructType->GetDataPtrType_c ());
-	pIfaceHdrStructType->CreateField (GetStdType (EStdType_ObjectHdrPtr));
+	pIfaceHdrStructType->CreateField ("m_vtbl", pVTableStructType->GetDataPtrType_c ());
+	pIfaceHdrStructType->CreateField ("m_object", GetStdType (EStdType_ObjectHdrPtr));
 
 	CStructType* pIfaceStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceStructType->m_StructTypeKind = EStructType_IfaceStruct;
@@ -598,8 +598,8 @@ CTypeMgr::CreateClassType (
 	pClassStructType->m_StructTypeKind = EStructType_ClassStruct;
 	pClassStructType->m_Tag.Format ("%s.Class", pType->m_Tag.cc ());
 	pClassStructType->m_pParentNamespace = pType;
-	pClassStructType->CreateField (GetStdType (EStdType_ObjectHdr));
-	pClassStructType->CreateField (pIfaceStructType);
+	pClassStructType->CreateField ("m_objectHdr", GetStdType (EStdType_ObjectHdr));
+	pClassStructType->CreateField ("m_iface", pIfaceStructType);
 
 	pType->m_pModule = m_pModule;
 	pType->m_ClassTypeKind = ClassTypeKind;
@@ -629,7 +629,7 @@ CTypeMgr::GetBoxClassType (CType* pBaseType)
 	CClassType* pType = CreateUnnamedClassType (EClassType_Box);
 	pType->m_Tag.Format ("object <%s>", pBaseType->GetTypeString ().cc ());
 	pType->m_Signature.Format ("CB%s", pBaseType->GetSignature ().cc ());
-	pType->CreateField (pBaseType);
+	pType->CreateField ("m_value", pBaseType);
 	pType->EnsureLayout ();
 
 	pBaseType->m_pBoxClassType = pType;
@@ -1168,11 +1168,11 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 
 	// fields
 
-	pType->m_FieldArray [EMulticastField_Lock] = pType->CreateField (GetPrimitiveType (EType_Int_p), 0, EPtrTypeFlag_Volatile);
-	pType->m_FieldArray [EMulticastField_MaxCount] = pType->CreateField (GetPrimitiveType (EType_SizeT));
-	pType->m_FieldArray [EMulticastField_Count] = pType->CreateField (GetPrimitiveType (EType_SizeT));
-	pType->m_FieldArray [EMulticastField_PtrArray] = pType->CreateField (pFunctionPtrType->GetDataPtrType_c ());
-	pType->m_FieldArray [EMulticastField_HandleTable] = pType->CreateField (GetPrimitiveType (EType_Int_p));
+	pType->m_FieldArray [EMulticastField_Lock] = pType->CreateField ("m_lock", GetPrimitiveType (EType_Int_p), 0, EPtrTypeFlag_Volatile);
+	pType->m_FieldArray [EMulticastField_MaxCount] = pType->CreateField ("m_maxCount", GetPrimitiveType (EType_SizeT));
+	pType->m_FieldArray [EMulticastField_Count] = pType->CreateField ("m_count", GetPrimitiveType (EType_SizeT));
+	pType->m_FieldArray [EMulticastField_PtrArray] = pType->CreateField ("m_ptrArray", pFunctionPtrType->GetDataPtrType_c ());
+	pType->m_FieldArray [EMulticastField_HandleTable] = pType->CreateField ("m_handleTable", GetPrimitiveType (EType_Int_p));
 
 	CType* pArgType;
 	CFunction* pMethod;
@@ -1236,8 +1236,8 @@ CTypeMgr::GetMulticastType (CFunctionPtrType* pFunctionPtrType)
 
 	// fields
 
-	pSnapshotType->m_FieldArray [EMcSnapshotField_Count] = pSnapshotType->CreateField (GetPrimitiveType (EType_SizeT));
-	pSnapshotType->m_FieldArray [EMcSnapshotField_PtrArray] = pSnapshotType->CreateField (pFunctionPtrType->GetDataPtrType_c ());
+	pSnapshotType->m_FieldArray [EMcSnapshotField_Count] = pSnapshotType->CreateField ("m_count", GetPrimitiveType (EType_SizeT));
+	pSnapshotType->m_FieldArray [EMcSnapshotField_PtrArray] = pSnapshotType->CreateField ("m_ptrArray", pFunctionPtrType->GetDataPtrType_c ());
 
 	// call method
 
@@ -1303,8 +1303,8 @@ CTypeMgr::CreateReactorType (
 
 	// fields
 
-	pType->m_FieldArray [EReactorField_Lock]  = pType->CreateField (m_pModule->GetSimpleType (EType_Int_p));
-	pType->m_FieldArray [EReactorField_State] = pType->CreateField (m_pModule->GetSimpleType (EType_Int_p));
+	pType->m_FieldArray [EReactorField_Lock]  = pType->CreateField ("m_lock", m_pModule->GetSimpleType (EType_Int_p));
+	pType->m_FieldArray [EReactorField_State] = pType->CreateField ("m_state", m_pModule->GetSimpleType (EType_Int_p));
 
 	rtl::CArrayT <CFunction*> VirtualMethodArray = pIfaceType->GetVirtualMethodArray ();
 	ASSERT (VirtualMethodArray.GetCount () == 2);
@@ -1331,7 +1331,7 @@ CTypeMgr::CreateReactorType (
 		CClassPtrType* pParentPtrType = pParentType->GetClassPtrType ();
 
 		pType->m_Flags |= ETypeFlag_Child;
-		pType->m_FieldArray [EReactorField_Parent] = pType->CreateField (pParentPtrType);
+		pType->m_FieldArray [EReactorField_Parent] = pType->CreateField ("m_parent", pParentPtrType);
 
 		CFunctionType* pConstructorType = GetFunctionType (NULL, (CType**) &pParentPtrType, 1);
 		CFunction* pConstructor = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pConstructorType);
@@ -1385,11 +1385,15 @@ CTypeMgr::GetFunctionClosureClassType (
 	pType->m_ClosureMap.Copy (pClosureMap, ArgCount);
 	pType->m_WeakMask = WeakMask;
 
-	pType->CreateField (pTargetType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField ("m_target", pTargetType->GetFunctionPtrType (EFunctionPtrType_Thin));
+
+	rtl::CString ArgFieldName;
 
 	for (size_t i = 0; i < ArgCount; i++)
 	{
-		CStructField* pField = pType->CreateField (ppArgTypeArray [i]);
+		ArgFieldName.Format ("m_arg%d", i);
+
+		CStructField* pField = pType->CreateField (ArgFieldName, ppArgTypeArray [i]);
 		if (WeakMask & (2 << i)) // account for field #0 function ptr
 			pField->m_Flags |= EStructFieldFlag_WeakMasked;
 	}
@@ -1439,11 +1443,15 @@ CTypeMgr::GetPropertyClosureClassType (
 	pType->m_ClosureMap.Copy (pClosureMap, ArgCount);
 	pType->m_WeakMask = WeakMask;
 
-	pType->CreateField (pTargetType->GetPropertyPtrType (EPropertyPtrType_Thin));
+	pType->CreateField ("m_target", pTargetType->GetPropertyPtrType (EPropertyPtrType_Thin));
+
+	rtl::CString ArgFieldName;
 
 	for (size_t i = 0; i < ArgCount; i++)
 	{
-		CStructField* pField = pType->CreateField (ppArgTypeArray [i]);
+		ArgFieldName.Format ("m_arg%d", i);
+
+		CStructField* pField = pType->CreateField (ArgFieldName, ppArgTypeArray [i]);
 		if (WeakMask & (2 << i)) // account for field #0 property ptr
 			pField->m_Flags |= EStructFieldFlag_WeakMasked;
 	}
@@ -1481,7 +1489,7 @@ CTypeMgr::GetDataClosureClassType (
 	CDataClosureClassType* pType = (CDataClosureClassType*) CreateUnnamedClassType (EClassType_DataClosure);
 	pType->m_Signature = Signature;
 	pType->m_TypeMapIt = It;
-	pType->CreateField (pTargetType->GetDataPtrType ());
+	pType->CreateField ("m_target", pTargetType->GetDataPtrType ());
 
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("m_thunkProperty");
 	pType->AddProperty (pThunkProperty);
@@ -1565,10 +1573,10 @@ CTypeMgr::GetDataPtrStructType (CType* pDataType)
 
 	CStructType* pType = CreateUnnamedStructType ();
 	pType->m_Tag.Format ("DataPtr <%s>", pDataType->GetTypeString ().cc ());
-	pType->CreateField (pDataType->GetDataPtrType_c ());
-	pType->CreateField (GetStdType (EStdType_BytePtr));
-	pType->CreateField (GetStdType (EStdType_BytePtr));
-	pType->CreateField (GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_p", pDataType->GetDataPtrType_c ());
+	pType->CreateField ("m_rangeBegin", GetStdType (EStdType_BytePtr));
+	pType->CreateField ("m_rangeEnd", GetStdType (EStdType_BytePtr));
+	pType->CreateField ("m_scopeLevel", GetPrimitiveType (EType_SizeT));
 	pType->EnsureLayout ();
 
 	pTuple->m_pPtrStructType = pType;
@@ -1707,8 +1715,8 @@ CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
 	pType->m_Tag.Format ("FunctionPtr <%s>", pFunctionType->GetTypeString ().cc ());
 	pType->m_Signature = Signature;
 	pType->m_TypeMapIt = It;
-	pType->CreateField (pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin, EPtrTypeFlag_Unsafe));
-	pType->CreateField (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField ("m_p", pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->CreateField ("m_closure", GetStdType (EStdType_ObjectPtr));
 	pType->EnsureLayout ();
 
 	pTuple->m_pPtrStructType = pType;
@@ -1782,15 +1790,19 @@ CTypeMgr::GetPropertyVTableStructType (CPropertyType* pPropertyType)
 	pType->m_Tag.Format ("%s.Vtbl", pPropertyType->GetTypeString ().cc ());
 
 	if (pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable)
-		pType->CreateField (pPropertyType->m_pBinderType->GetFunctionPtrType (EFunctionPtrType_Thin));
+		pType->CreateField ("m_binder", pPropertyType->m_pBinderType->GetFunctionPtrType (EFunctionPtrType_Thin));
 
-	pType->CreateField (pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+	pType->CreateField ("m_getter", pPropertyType->m_pGetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+
+	rtl::CString SetterFieldName;
 
 	size_t SetterTypeOverloadCount = pPropertyType->m_SetterType.GetOverloadCount ();
 	for (size_t i = 0; i < SetterTypeOverloadCount; i++)
 	{
+		SetterFieldName.Format ("m_setter%d", i);
+
 		CFunctionType* pSetterType = pPropertyType->m_SetterType.GetOverload (i);
-		pType->CreateField (pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
+		pType->CreateField (SetterFieldName, pSetterType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	}
 
 	pType->EnsureLayout ();
@@ -1823,8 +1835,8 @@ CTypeMgr::GetPropertyPtrStructType (CPropertyType* pPropertyType)
 	pType->m_Tag.Format ("PropertyPtr <%s>", pPropertyType->GetTypeString ().cc ());
 	pType->m_Signature = Signature;
 	pType->m_TypeMapIt = It;
-	pType->CreateField (pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType_c ());
-	pType->CreateField (GetStdType (EStdType_ObjectPtr));
+	pType->CreateField ("m_p", pStdObjectMemberPropertyType->GetVTableStructType ()->GetDataPtrType_c ());
+	pType->CreateField ("m_closure", GetStdType (EStdType_ObjectPtr));
 	pType->EnsureLayout ();
 
 	pTuple->m_pPtrStructType = pType;
@@ -1939,8 +1951,8 @@ CTypeMgr::GetGcShadowStackFrameMapType (size_t RootCount)
 
 	CArrayType* pArrayType = GetArrayType (GetStdType (EStdType_BytePtr), RootCount);
 	CStructType* pType = CreateStructType ("GcShadowStackFrameMap", "jnc.GcShadowStackFrameMap");
-	pType->CreateField (GetPrimitiveType (EType_SizeT));
-	pType->CreateField (pArrayType);
+	pType->CreateField ("m_count", GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_gcRootTypeArray", pArrayType);
 	pType->EnsureLayout ();
 
 	pPair->m_pGcShadowStackFrameMapType = pType;
@@ -1958,12 +1970,11 @@ CTypeMgr::GetGcShadowStackFrameType (size_t RootCount)
 	if (pPair->m_pGcShadowStackFrameType)
 		return pPair->m_pGcShadowStackFrameType;
 
+	CArrayType* pArrayType = GetArrayType (GetStdType (EStdType_BytePtr), RootCount);
 	CStructType* pType = CreateStructType ("GcShadowStackFrame", "jnc.GcShadowStackFrame");
-
-	pType->CreateField (GetStdType (EStdType_BytePtr));
-	pType->CreateField (pMapType->GetDataPtrType_c ());
-	pType->CreateField (GetArrayType (GetStdType (EStdType_BytePtr), RootCount));
-
+	pType->CreateField ("m_prev", GetStdType (EStdType_BytePtr));
+	pType->CreateField ("m_map", pMapType->GetDataPtrType_c ());
+	pType->CreateField ("m_gcRootArray", pArrayType);
 	pType->EnsureLayout ();
 
 	pPair->m_pGcShadowStackFrameType = pType;
@@ -2209,11 +2220,11 @@ CStructType*
 CTypeMgr::CreateObjectHdrType ()
 {
 	CStructType* pType = CreateStructType ("Object", "jnc.Object");
-	pType->CreateField (GetStdType (EStdType_BytePtr));  // CClassType* m_pType;
-	pType->CreateField (GetPrimitiveType (EType_SizeT)); // size_t m_ScopeLevel;
-	pType->CreateField (GetPrimitiveType (EType_Int_p)); // intptr_t m_Flags;
-	pType->CreateField (GetStdType (EStdType_BytePtr));  // rtl::TListLink* m_pNext;
-	pType->CreateField (GetStdType (EStdType_BytePtr));  // rtl::TListLink* m_pPrev;
+	pType->CreateField ("m_type", GetStdType (EStdType_BytePtr));
+	pType->CreateField ("m_scopeLevel", GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_flags", GetPrimitiveType (EType_Int_p));
+	pType->CreateField ("m_gcHeapNext", GetStdType (EStdType_BytePtr));
+	pType->CreateField ("m_gcHeapPrev", GetStdType (EStdType_BytePtr));
 	pType->EnsureLayout ();
 	return pType;
 }
@@ -2232,8 +2243,8 @@ CStructType*
 CTypeMgr::CreateReactorBindSiteType ()
 {
 	CStructType* pType = CreateStructType ("ReactorBindSite", "jnc.ReactorBindSite");
-	pType->CreateField (GetStdType (EStdType_SimpleEventPtr));
-	pType->CreateField (GetPrimitiveType (EType_Int_p));
+	pType->CreateField ("m_event", GetStdType (EStdType_SimpleEventPtr));
+	pType->CreateField ("m_cookie", GetPrimitiveType (EType_Int_p));
 	pType->EnsureLayout ();
 	return pType;
 }
@@ -2256,9 +2267,9 @@ CStructType*
 CTypeMgr::CreateFmtLiteralType ()
 {
 	CStructType* pType = CreateStructType ("FmtLiteral", "jnc.FmtLiteral");
-	pType->CreateField (GetPrimitiveType (EType_Char)->GetDataPtrType_c ());
-	pType->CreateField (GetPrimitiveType (EType_SizeT));
-	pType->CreateField (GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_p", GetPrimitiveType (EType_Char)->GetDataPtrType_c ());
+	pType->CreateField ("m_maxLength", GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_length", GetPrimitiveType (EType_SizeT));
 	pType->EnsureLayout ();
 	return pType;
 }

@@ -25,19 +25,42 @@ class CLlvmIrBuilder
 
 protected:
 	CModule* m_pModule;
+	llvm::IRBuilder <>* m_pLlvmIrBuilder;
 
 	uint_t m_CommentMdKind;
 	uint_t m_EmptyLineMdKind;
-	llvm::IRBuilder <> m_LlvmIrBuilder;
 
 public:
 	CLlvmIrBuilder ();
+
+	~CLlvmIrBuilder ()
+	{
+		Clear ();
+	}
+
+	CModule*
+	GetModule ()
+	{
+		return m_pModule;
+	}
+
+	llvm::IRBuilder <>*
+	GetLlvmIrBuilder ()
+	{
+		return m_pLlvmIrBuilder;
+	}
 
 	uint_t
 	GetCommentMdKind ()
 	{
 		return m_CommentMdKind;
 	}
+
+	void
+	Create ();
+
+	void
+	Clear ();
 
 	bool
 	CreateComment (
@@ -67,25 +90,25 @@ public:
 	llvm::DebugLoc
 	GetCurrentDebugLoc ()
 	{
-		return m_LlvmIrBuilder.getCurrentDebugLocation ();
+		return m_pLlvmIrBuilder->getCurrentDebugLocation ();
 	}
 
 	void
 	SetCurrentDebugLoc (const llvm::DebugLoc& LlvmDebugLoc)
 	{
-		m_LlvmIrBuilder.SetCurrentDebugLocation (LlvmDebugLoc);
+		m_pLlvmIrBuilder->SetCurrentDebugLocation (LlvmDebugLoc);
 	}
 
 	void
 	ClearCurrentDebugLoc ()
 	{
-		m_LlvmIrBuilder.SetCurrentDebugLocation (llvm::DebugLoc ());
+		m_pLlvmIrBuilder->SetCurrentDebugLocation (llvm::DebugLoc ());
 	}
 
 	void
 	SetInstDebugLoc (llvm::Instruction* pLlvmInst)
 	{
-		m_LlvmIrBuilder.SetInstDebugLocation (pLlvmInst);
+		m_pLlvmIrBuilder->SetInstDebugLocation (pLlvmInst);
 	}
 
 	// branches
@@ -93,7 +116,7 @@ public:
 	llvm::Instruction*
 	GetInsertPoint ()
 	{
-		return m_LlvmIrBuilder.GetInsertPoint ();
+		return m_pLlvmIrBuilder->GetInsertPoint ();
 	}
 
 	void
@@ -102,19 +125,19 @@ public:
 	void
 	SetInsertPoint (llvm::Instruction* pLlvmInst)
 	{
-		m_LlvmIrBuilder.SetInsertPoint (pLlvmInst);
+		m_pLlvmIrBuilder->SetInsertPoint (pLlvmInst);
 	}
 
 	llvm::UnreachableInst*
 	CreateUnreachable ()
 	{
-		return m_LlvmIrBuilder.CreateUnreachable ();
+		return m_pLlvmIrBuilder->CreateUnreachable ();
 	}
 
 	llvm::BranchInst*
 	CreateBr (CBasicBlock* pBlock)
 	{
-		return m_LlvmIrBuilder.CreateBr (pBlock->GetLlvmBlock ());
+		return m_pLlvmIrBuilder->CreateBr (pBlock->GetLlvmBlock ());
 	}
 
 	llvm::BranchInst*
@@ -124,7 +147,7 @@ public:
 		CBasicBlock* pFalseBlock
 		)
 	{
-		return m_LlvmIrBuilder.CreateCondBr (
+		return m_pLlvmIrBuilder->CreateCondBr (
 			Value.GetLlvmValue (),
 			pTrueBlock->GetLlvmBlock (),
 			pFalseBlock->GetLlvmBlock ()
@@ -158,13 +181,13 @@ public:
 	llvm::ReturnInst*
 	CreateRet ()
 	{
-		return m_LlvmIrBuilder.CreateRetVoid ();
+		return m_pLlvmIrBuilder->CreateRetVoid ();
 	}
 
 	llvm::ReturnInst*
 	CreateRet (const CValue& Value)
 	{
-		return m_LlvmIrBuilder.CreateRet (Value.GetLlvmValue ());
+		return m_pLlvmIrBuilder->CreateRet (Value.GetLlvmValue ());
 	}
 
 	llvm::PHINode*
@@ -194,7 +217,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::AllocaInst* pInst = m_LlvmIrBuilder.CreateAlloca (pType->GetLlvmType (), 0, pName);
+		llvm::AllocaInst* pInst = m_pLlvmIrBuilder->CreateAlloca (pType->GetLlvmType (), 0, pName);
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -207,7 +230,7 @@ public:
 		bool IsVolatile = false
 		)
 	{
-		llvm::LoadInst* pInst = m_LlvmIrBuilder.CreateLoad (Value.GetLlvmValue (), IsVolatile, "loa");
+		llvm::LoadInst* pInst = m_pLlvmIrBuilder->CreateLoad (Value.GetLlvmValue (), IsVolatile, "loa");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -219,7 +242,7 @@ public:
 		bool IsVolatile = false
 		)
 	{
-		return m_LlvmIrBuilder.CreateStore (SrcValue.GetLlvmValue (), DstValue.GetLlvmValue (), IsVolatile);
+		return m_pLlvmIrBuilder->CreateStore (SrcValue.GetLlvmValue (), DstValue.GetLlvmValue (), IsVolatile);
 	}
 
 	// member access
@@ -251,7 +274,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateGEP (Value.GetLlvmValue (), IndexValue.GetLlvmValue (), "gep");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateGEP (Value.GetLlvmValue (), IndexValue.GetLlvmValue (), "gep");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -339,7 +362,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateExtractValue (Value.GetLlvmValue (), Index, "extract");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateExtractValue (Value.GetLlvmValue (), Index, "extract");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -353,7 +376,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateExtractValue (
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateExtractValue (
 			Value.GetLlvmValue (),
 			llvm::ArrayRef <uint_t> ((uint_t*) pIndexArray, IndexCount),
 			"extract"
@@ -371,7 +394,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateInsertValue (
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateInsertValue (
 			AggregateValue.GetLlvmValue (),
 			MemberValue.GetLlvmValue (),
 			Index,
@@ -392,7 +415,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateInsertValue (
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateInsertValue (
 			AggregateValue.GetLlvmValue (),
 			MemberValue.GetLlvmValue (),
 			llvm::ArrayRef <uint_t> ((uint_t*) pIndexArray, IndexCount),
@@ -412,7 +435,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateNeg (OpValue.GetLlvmValue (), "neg_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateNeg (OpValue.GetLlvmValue (), "neg_i");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -424,7 +447,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFNeg (OpValue.GetLlvmValue (), "neg_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFNeg (OpValue.GetLlvmValue (), "neg_f");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -436,7 +459,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateNot (OpValue.GetLlvmValue (), "not");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateNot (OpValue.GetLlvmValue (), "not");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -451,7 +474,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateAdd (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "add_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateAdd (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "add_i");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -464,7 +487,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFAdd (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "add_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFAdd (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "add_f");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -477,7 +500,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateSub (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "sub_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateSub (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "sub_i");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -490,7 +513,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFSub (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "sub_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFSub (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "sub_f");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -503,7 +526,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateMul (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mul_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateMul (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mul_i");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -516,7 +539,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFMul (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mul_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFMul (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mul_f");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -529,7 +552,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateSDiv (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "div_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateSDiv (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "div_i");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -542,7 +565,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateUDiv (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "div_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateUDiv (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "div_u");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -555,7 +578,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFDiv (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "div_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFDiv (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "div_f");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -568,7 +591,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateSRem (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mod_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateSRem (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mod_i");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -581,7 +604,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateURem (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mod_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateURem (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "mod_u");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -594,7 +617,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateShl (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "shl");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateShl (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "shl");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -607,7 +630,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateLShr (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "shr");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateLShr (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "shr");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -620,7 +643,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateAnd (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "and");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateAnd (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "and");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -633,7 +656,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateOr (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "or");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateOr (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "or");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -646,7 +669,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateXor (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "xor");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateXor (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "xor");
 		pResultValue->SetLlvmValue (pInst, pResultType);
 		return pInst;
 	}
@@ -660,7 +683,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpEQ (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "eq_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpEQ (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "eq_i");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -672,7 +695,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFCmpOEQ (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "eq_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFCmpOEQ (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "eq_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -684,7 +707,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpNE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ne_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpNE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ne_i");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -696,7 +719,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFCmpONE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ne_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFCmpONE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ne_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -708,7 +731,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpSLT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "lt_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpSLT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "lt_i");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -720,7 +743,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpULT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "lt_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpULT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "lt_u");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -732,7 +755,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFCmpOLT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "lt_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFCmpOLT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "lt_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -744,7 +767,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpSLE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpSLE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_i");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -756,7 +779,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpULE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpULE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_u");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -768,7 +791,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFCmpOLE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFCmpOLE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "le_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -780,7 +803,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpSGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpSGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_i");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -792,7 +815,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpUGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpUGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_u");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -804,7 +827,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFCmpOGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFCmpOGT (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "gt_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -816,7 +839,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpSGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpSGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_i");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -828,7 +851,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateICmpUGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateICmpUGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_u");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -840,7 +863,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFCmpOGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFCmpOGE (OpValue1.GetLlvmValue (), OpValue2.GetLlvmValue (), "ge_f");
 		pResultValue->SetLlvmValue (pInst, EType_Bool);
 		return pInst;
 	}
@@ -855,7 +878,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::AtomicCmpXchgInst* pInst = m_LlvmIrBuilder.CreateAtomicCmpXchg (
+		llvm::AtomicCmpXchgInst* pInst = m_pLlvmIrBuilder->CreateAtomicCmpXchg (
 			PtrValue.GetLlvmValue (),
 			CmpValue.GetLlvmValue (),
 			NewValue.GetLlvmValue (),
@@ -877,7 +900,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::AtomicRMWInst* pInst = m_LlvmIrBuilder.CreateAtomicRMW (
+		llvm::AtomicRMWInst* pInst = m_pLlvmIrBuilder->CreateAtomicRMW (
 			OpKind,
 			PtrValue.GetLlvmValue (),
 			NewValue.GetLlvmValue (),
@@ -898,7 +921,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateBitCast (OpValue.GetLlvmValue (), pType->GetLlvmType (), "bitcast");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateBitCast (OpValue.GetLlvmValue (), pType->GetLlvmType (), "bitcast");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -910,7 +933,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateIntToPtr (OpValue.GetLlvmValue (), pType->GetLlvmType (), "int2ptr");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateIntToPtr (OpValue.GetLlvmValue (), pType->GetLlvmType (), "int2ptr");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -922,7 +945,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreatePtrToInt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ptr2int");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreatePtrToInt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ptr2int");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -934,7 +957,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateTrunc (OpValue.GetLlvmValue (), pType->GetLlvmType (), "trunc_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateTrunc (OpValue.GetLlvmValue (), pType->GetLlvmType (), "trunc_i");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -946,7 +969,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFPTrunc (OpValue.GetLlvmValue (), pType->GetLlvmType (), "trunc_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFPTrunc (OpValue.GetLlvmValue (), pType->GetLlvmType (), "trunc_f");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -958,7 +981,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateSExt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ext_i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateSExt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ext_i");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -970,7 +993,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateZExt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ext_u");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateZExt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ext_u");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -982,7 +1005,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFPExt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ext_f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFPExt (OpValue.GetLlvmValue (), pType->GetLlvmType (), "ext_f");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -994,7 +1017,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateSIToFP (OpValue.GetLlvmValue (), pType->GetLlvmType (), "i2f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateSIToFP (OpValue.GetLlvmValue (), pType->GetLlvmType (), "i2f");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -1006,7 +1029,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateUIToFP (OpValue.GetLlvmValue (), pType->GetLlvmType (), "u2f");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateUIToFP (OpValue.GetLlvmValue (), pType->GetLlvmType (), "u2f");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}
@@ -1018,7 +1041,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		llvm::Value* pInst = m_LlvmIrBuilder.CreateFPToSI (OpValue.GetLlvmValue (), pType->GetLlvmType (), "f2i");
+		llvm::Value* pInst = m_pLlvmIrBuilder->CreateFPToSI (OpValue.GetLlvmValue (), pType->GetLlvmType (), "f2i");
 		pResultValue->SetLlvmValue (pInst, pType);
 		return pInst;
 	}

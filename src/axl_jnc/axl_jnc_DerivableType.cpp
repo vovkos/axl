@@ -42,7 +42,7 @@ CDerivableType::CDerivableType ()
 	m_pCallOperator = NULL;
 }
 
-CFunction* 
+CFunction*
 CDerivableType::GetDefaultConstructor ()
 {
 	ASSERT (m_pConstructor);
@@ -55,7 +55,7 @@ CDerivableType::GetDefaultConstructor ()
 
 	rtl::CBoxListEntryT <CValue> ThisArgValue;
 	ThisArgValue.m_Value.SetType (pThisArgType);
-	
+
 	rtl::CAuxListT <rtl::CBoxListEntryT <CValue> > ArgList;
 	ArgList.InsertTail (&ThisArgValue);
 
@@ -84,7 +84,7 @@ CDerivableType::GetBaseTypeByIndex (size_t Index)
 		m_BaseTypeArray.SetCount (Count);
 		rtl::CIteratorT <CBaseTypeSlot> Slot = m_BaseTypeList.GetHead ();
 		for (size_t i = 0; i < Count; i++, Slot++)
-			m_BaseTypeArray [i] = *Slot;	
+			m_BaseTypeArray [i] = *Slot;
 	}
 
 	return m_BaseTypeArray [Index];
@@ -97,22 +97,23 @@ CDerivableType::AddBaseType (CType* pType)
 	if (It->m_Value)
 	{
 		err::SetFormatStringError (
-			"'%s' is already a base type", 
+			"'%s' is already a base type",
 			pType->GetTypeString ().cc () // thanks a lot gcc
 			);
 		return NULL;
 	}
 
 	CBaseTypeSlot* pSlot = AXL_MEM_NEW (CBaseTypeSlot);
+	pSlot->m_pModule = m_pModule;
 
 	EType TypeKind = pType->GetTypeKind ();
 	if (TypeKind == EType_NamedImport)
 	{
-		pSlot->m_pType_i = (CImportType*) pType;		
+		pSlot->m_pType_i = (CImportType*) pType;
 		m_ImportBaseTypeArray.Append (pSlot);
 	}
 	else if (
-		(pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && 
+		(pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) &&
 		(TypeKind != EType_Class || m_TypeKind == EType_Class))
 	{
 		pSlot->m_pType = (CDerivableType*) pType;
@@ -120,8 +121,8 @@ CDerivableType::AddBaseType (CType* pType)
 	else
 	{
 		err::SetFormatStringError (
-			"'%s' cannot be inherited from '%s'", 
-			GetTypeString ().cc (), 
+			"'%s' cannot be inherited from '%s'",
+			GetTypeString ().cc (),
 			pType->GetTypeString ().cc ()
 			);
 		return NULL;
@@ -142,7 +143,7 @@ CDerivableType::ResolveImportBaseType (CBaseTypeSlot* pSlot)
 	if (It->m_Value)
 	{
 		err::SetFormatStringError (
-			"'%s' is already a base type", 
+			"'%s' is already a base type",
 			pType->GetTypeString ().cc () // thanks a lot gcc
 			);
 		return false;
@@ -152,8 +153,8 @@ CDerivableType::ResolveImportBaseType (CBaseTypeSlot* pSlot)
 		pType->GetTypeKind () == EType_Class && m_TypeKind != EType_Class)
 	{
 		err::SetFormatStringError (
-			"'%s' cannot be inherited from '%s'", 
-			GetTypeString ().cc (), 
+			"'%s' cannot be inherited from '%s'",
+			GetTypeString ().cc (),
 			pType->GetTypeString ().cc ()
 			);
 		return NULL;
@@ -188,8 +189,8 @@ CDerivableType::ResolveImportFields ()
 	{
 		CStructField* pField = m_ImportFieldArray [i];
 		ASSERT (pField->m_pType_i);
-	
-		CType* pType = pField->m_pType_i->GetActualType ();	
+
+		CType* pType = pField->m_pType_i->GetActualType ();
 		if (pField->m_pType->GetTypeKindFlags () & ETypeKindFlag_Code)
 		{
 			err::SetFormatStringError ("'%s': illegal type for a field", pType->GetTypeString ().cc ());
@@ -235,7 +236,7 @@ CDerivableType::CreateUnnamedMethod (
 	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pShortType);
 	pFunction->m_StorageKind = StorageKind;
 	pFunction->m_Tag.Format ("%s.%s", m_Tag.cc (), GetFunctionKindString (FunctionKind));
-	
+
 	bool Result = AddMethod (pFunction);
 	if (!Result)
 		return NULL;
@@ -254,13 +255,13 @@ CDerivableType::CreateProperty (
 
 	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
 
-	bool Result = 
+	bool Result =
 		AddProperty (pProperty) &&
 		pProperty->Create (pShortType);
 
 	if (!Result)
 		return NULL;
-	
+
 	return pProperty;
 }
 
@@ -346,14 +347,14 @@ CDerivableType::AddMethod (CFunction* pFunction)
 
 	default:
 		err::SetFormatStringError (
-			"invalid %s in '%s'", 
-			GetFunctionKindString (FunctionKind), 
-			GetTypeString ().cc () 
+			"invalid %s in '%s'",
+			GetFunctionKindString (FunctionKind),
+			GetTypeString ().cc ()
 			);
 		return false;
 	}
 
-	pFunction->m_Tag.Format ("%s.%s", m_Tag.cc (), GetFunctionKindString (FunctionKind)); 
+	pFunction->m_Tag.Format ("%s.%s", m_Tag.cc (), GetFunctionKindString (FunctionKind));
 
 	if (!*ppTarget)
 	{
@@ -362,8 +363,8 @@ CDerivableType::AddMethod (CFunction* pFunction)
 	else if (FunctionKindFlags & EFunctionKindFlag_NoOverloads)
 	{
 		err::SetFormatStringError (
-			"'%s' already has '%s' method", 
-			GetTypeString ().cc (), 
+			"'%s' already has '%s' method",
+			GetTypeString ().cc (),
 			GetFunctionKindString (FunctionKind)
 			);
 		return false;
@@ -438,7 +439,7 @@ CDerivableType::CompileDefaultStaticConstructor ()
 	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
 
 	CToken::CPos Pos;
-	
+
 	bool Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
 	if (!Result)
 		return false;
@@ -457,7 +458,7 @@ CDerivableType::CompileDefaultConstructor ()
 	CValue ThisValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pConstructor, &ThisValue, 1);
 
-	Result = 
+	Result =
 		CallBaseTypeConstructors (ThisValue) &&
 		CallMemberPropertyConstructors (ThisValue) &&
 		CallMemberFieldConstructors (ThisValue);
@@ -573,7 +574,7 @@ CDerivableType::CallMemberPropertyConstructors (const CValue& ThisValue)
 
 		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
 		if (!Result)
-			return false;				
+			return false;
 	}
 
 	return true;

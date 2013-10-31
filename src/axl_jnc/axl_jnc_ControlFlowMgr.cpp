@@ -39,7 +39,7 @@ CControlFlowMgr::CreateBlock (const rtl::CString& Name)
 	pBlock->m_pModule = m_pModule;
 	pBlock->m_Name = Name;
 	pBlock->m_pLlvmBlock = llvm::BasicBlock::Create (
-		llvm::getGlobalContext (),
+		*m_pModule->GetLlvmContext (),
 		(const char*) Name,
 		NULL
 		);

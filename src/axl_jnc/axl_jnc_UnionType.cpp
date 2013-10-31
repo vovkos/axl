@@ -39,14 +39,14 @@ CUnionType::CreateFieldImpl (
 	if (pInitializer)
 		pField->m_Initializer.TakeOver (pInitializer);
 
-	if (!pField->m_Constructor.IsEmpty () || 
+	if (!pField->m_Constructor.IsEmpty () ||
 		!pField->m_Initializer.IsEmpty ())
 	{
 		if (m_pInitializedField)
 		{
 			err::SetFormatStringError (
-				"'%s' already has initialized field '%s'", 
-				pType->GetTypeString ().cc (), 
+				"'%s' already has initialized field '%s'",
+				pType->GetTypeString ().cc (),
 				m_pInitializedField->GetName ().cc ()
 				);
 			return NULL;
@@ -82,7 +82,7 @@ CUnionType::GetFieldByIndex (size_t Index)
 		m_FieldArray.SetCount (Count);
 		rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
 		for (size_t i = 0; i < Count; i++, Field++)
-			m_FieldArray [i] = *Field;	
+			m_FieldArray [i] = *Field;
 	}
 
 	return m_FieldArray [Index];
@@ -150,7 +150,7 @@ CUnionType::CalcLayout ()
 	if (m_pStaticDestructor)
 		m_pModule->m_VariableMgr.m_StaticDestructList.AddStaticDestructor (m_pStaticDestructor, m_pStaticOnceFlagVariable);
 
-	if (!m_pPreConstructor && 
+	if (!m_pPreConstructor &&
 		(m_pStaticConstructor || m_pInitializedField))
 	{
 		Result = CreateDefaultMethod (EFunction_PreConstructor);
@@ -224,10 +224,10 @@ CUnionType::InitializeField (const CValue& ThisValue)
 	ASSERT (m_pInitializedField);
 
 	CValue FieldValue;
-	return 
+	return
 		m_pModule->m_OperatorMgr.GetField (ThisValue, m_pInitializedField, NULL, &FieldValue) &&
 		m_pModule->m_OperatorMgr.ParseInitializer (
-			FieldValue, 
+			FieldValue,
 			m_pInitializedField->m_Constructor,
 			m_pInitializedField->m_Initializer
 			);
@@ -236,7 +236,8 @@ CUnionType::InitializeField (const CValue& ThisValue)
 void
 CUnionType::PrepareLlvmDiType ()
 {
-	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateUnionType (this);
+	m_LlvmDiType = m_pModule->m_LlvmDiBuilder.CreateEmptyUnionType (this);
+	m_pModule->m_LlvmDiBuilder.SetUnionTypeBody (this);
 }
 
 //.............................................................................

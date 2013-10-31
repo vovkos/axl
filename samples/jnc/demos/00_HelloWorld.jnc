@@ -3,31 +3,41 @@
 
 //.............................................................................
 
-// entry point
+class C1
+{
+	construct ()
+	{
+		printf ("C1.construct ()\n");
+	}
 
-struct Point
+	destruct ()
+	{
+		printf ("C1.destruct ()\n");
+	}
+};
+
+struct A1
 {
 	int m_x;
 	int m_y;
 }
 
-Point testAbi1 (int x);
-
-Point foo (int x)
+struct A2: A1
 {
-	printf ("foo (%d)\n", x);
-
-	testAbi1 (x);
-
-	int array* p [100];
-
-	return *stack new Point { 100, 200 };
+	int m_z;
+	int m_w;
 }
 
 int main ()
 {
-	Point point = foo (500);
-	printf ("point = { %d, %d }\n", point.m_x, point.m_y);
+	printf ("main ()\n");
+
+	int x;
+
+	stack C1 c;
+
+	A1 a1 = { 10, 20 };
+	A2 a2 = { m_x = 1, m_y = 2, m_z = 3, m_w = 4 };
 
 	return 0;
 }

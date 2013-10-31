@@ -24,8 +24,8 @@ bool MyLogServer::start (
 #endif
 
 	return Create (
-		client, 
-		&m_logRepresenter, 
+		client,
+		&m_logRepresenter,
 		&m_logColorizer,
 		logPacketFilePath,
 		logMergeFilePath,
@@ -47,9 +47,10 @@ bool MyLogServer::compile (
 
 	bool result;
 
-	llvm::Module* llvmModule = new llvm::Module ("llvmMainModule", llvm::getGlobalContext ());
+	llvm::LLVMContext* llvmContext = new llvm::LLVMContext;
+	llvm::Module* llvmModule = new llvm::Module ("llvmMainModule", *llvmContext);
 	m_module.Create ("jncMainModule", llvmModule);
-	
+
 	jnc::CScopeThreadModule ScopeModule (&m_module);
 
 	for (size_t i = 0; i < FileCount; i++)
@@ -61,12 +62,12 @@ bool MyLogServer::compile (
 		io::CMappedFile file;
 		result = file.Open (filePath, io::EFileFlag_ReadOnly);
 		if (!result)
-			return false;	
+			return false;
 
 		jnc::CLexer Lexer;
 		Lexer.Create (
-			filePath, 
-			(const char*) file.View (), 
+			filePath,
+			(const char*) file.View (),
 			file.GetSize ()
 			);
 
@@ -78,22 +79,22 @@ bool MyLogServer::compile (
 			const jnc::CToken* pToken = Lexer.GetToken ();
 			if (pToken->m_Token == jnc::EToken_Eof)
 				break;
-		
+
 			result = Parser.ParseToken (pToken);
 			if (!result)
 			{
 				rtl::CString Text = err::GetError ()->GetDescription ();
 
 				printf(
-					"%s(%d,%d): %s\n", 
-					filePath, 
-					pToken->m_Pos.m_Line + 1, 
-					pToken->m_Pos.m_Col + 1, 
+					"%s(%d,%d): %s\n",
+					filePath,
+					pToken->m_Pos.m_Line + 1,
+					pToken->m_Pos.m_Col + 1,
 					Text.cc ()
 					);
 				return false;
 			}
-		
+
 			Lexer.NextToken ();
 		}
 	}
@@ -106,7 +107,7 @@ bool MyLogServer::compile (
 		printf("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
 	}
-	
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 	jnc::EJit JitKind = jnc::EJit_Normal;
 #else
@@ -138,7 +139,7 @@ bool MyLogServer::compile (
 	}
 
 	printf ("Creating representer '%s'...\n", representerClassName);
-	
+
 	jnc::CModuleItem* representerTypeItem = m_module.m_NamespaceMgr.GetGlobalNamespace ()->FindItem (representerClassName);
 	if (!representerTypeItem)
 	{

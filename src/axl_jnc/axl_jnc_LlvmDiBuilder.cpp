@@ -15,7 +15,7 @@ CLlvmDiBuilder::CLlvmDiBuilder ()
 	m_pLlvmDiBuilder = NULL;
 }
 
-bool
+void
 CLlvmDiBuilder::Create ()
 {
 	Clear ();
@@ -32,8 +32,6 @@ CLlvmDiBuilder::Create ()
 		"jnc-1.0.0",
 		false, "", 1
 		);
-
-	return true;
 }
 
 void
@@ -68,9 +66,100 @@ CLlvmDiBuilder::CreateSubroutineType (CFunctionType* pFunctionType)
 }
 
 llvm::DIType
-CLlvmDiBuilder::CreateStructType (CStructType* pStructType)
+CLlvmDiBuilder::CreateEmptyStructType (CStructType* pStructType)
 {
+	return m_pLlvmDiBuilder->createStructType (
+		pStructType->GetModule ()->GetLlvmDiFile (),
+		pStructType->m_Tag.cc (),
+		pStructType->GetModule ()->GetLlvmDiFile (),
+		pStructType->GetItemDecl ()->GetPos ()->m_Line + 1,
+		pStructType->GetSize () * 8,
+		pStructType->GetAlignFactor () * 8,
+		0,
+		llvm::DIType (), // derived from
+		llvm::DIArray () // elements -- set body later
+		);
+}
+
+void
+CLlvmDiBuilder::SetStructTypeBody (CStructType* pStructType)
+{
+	rtl::CConstListT <CBaseTypeSlot> BaseTypeList = pStructType->GetBaseTypeList ();
 	rtl::CConstListT <CStructField> FieldList = pStructType->GetFieldList ();
+
+	size_t Count = BaseTypeList.GetCount () + FieldList.GetCount ();
+
+	char Buffer [256];
+	rtl::CArrayT <llvm::Value*> FieldTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FieldTypeArray.SetCount (Count);
+
+	size_t i = 0;
+
+	rtl::CIteratorT <CBaseTypeSlot> BaseType = BaseTypeList.GetHead ();
+	for (; BaseType; i++, BaseType++)
+	{
+		CBaseTypeSlot* pBaseType = *BaseType;
+		rtl::CString Name = pBaseType->GetType ()->GetQualifiedName ();
+
+		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
+			pBaseType->GetModule ()->GetLlvmDiFile (),
+			!Name.IsEmpty () ? Name.cc () : "UnnamedBaseType",
+			pBaseType->GetModule ()->GetLlvmDiFile (),
+			pBaseType->GetItemDecl ()->GetPos ()->m_Line + 1,
+			pBaseType->GetType ()->GetSize () * 8,
+			pBaseType->GetType ()->GetAlignFactor () * 8,
+			pBaseType->GetOffset () * 8,
+			0,
+			pBaseType->GetType ()->GetLlvmDiType ()
+			);
+	}
+
+	rtl::CIteratorT <CStructField> Field = FieldList.GetHead ();
+	for (; Field; i++, Field++)
+	{
+		CStructField* pField = *Field;
+		rtl::CString Name = pField->GetName ();
+
+		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
+			pField->GetModule ()->GetLlvmDiFile (),
+			!Name.IsEmpty () ? Name.cc () : "m_unnamedField",
+			pField->GetModule ()->GetLlvmDiFile (),
+			pField->GetItemDecl ()->GetPos ()->m_Line + 1,
+			pField->GetType ()->GetSize () * 8,
+			pField->GetType ()->GetAlignFactor () * 8,
+			pField->GetOffset () * 8,
+			0,
+			pField->GetType ()->GetLlvmDiType ()
+			);
+	}
+
+	llvm::DIArray LlvmDiArray = m_pLlvmDiBuilder->getOrCreateArray (llvm::ArrayRef <llvm::Value*> (FieldTypeArray, Count));
+
+	llvm::DICompositeType LlvmDiType (pStructType->GetLlvmDiType ());
+	ASSERT (LlvmDiType);
+
+	LlvmDiType.setTypeArray (LlvmDiArray);
+}
+
+llvm::DIType
+CLlvmDiBuilder::CreateEmptyUnionType (CUnionType* pUnionType)
+{
+	return m_pLlvmDiBuilder->createUnionType (
+		pUnionType->GetModule ()->GetLlvmDiFile (),
+		pUnionType->m_Tag.cc (),
+		pUnionType->GetModule ()->GetLlvmDiFile (),
+		pUnionType->GetItemDecl ()->GetPos ()->m_Line + 1,
+		pUnionType->GetSize () * 8,
+		pUnionType->GetAlignFactor () * 8,
+		0,
+		llvm::DIArray () // elements -- set body later
+		);
+}
+
+void
+CLlvmDiBuilder::SetUnionTypeBody (CUnionType* pUnionType)
+{
+	rtl::CConstListT <CStructField> FieldList = pUnionType->GetFieldList ();
 	size_t Count = FieldList.GetCount ();
 
 	char Buffer [256];
@@ -85,7 +174,7 @@ CLlvmDiBuilder::CreateStructType (CStructType* pStructType)
 
 		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
 			pField->GetModule ()->GetLlvmDiFile (),
-			!Name.IsEmpty () ? Name.cc () : "unnamed_field",
+			!Name.IsEmpty () ? Name.cc () : "m_unnamedField",
 			pField->GetModule ()->GetLlvmDiFile (),
 			pField->GetItemDecl ()->GetPos ()->m_Line + 1,
 			pField->GetType ()->GetSize () * 8,
@@ -98,59 +187,10 @@ CLlvmDiBuilder::CreateStructType (CStructType* pStructType)
 
 	llvm::DIArray LlvmDiArray = m_pLlvmDiBuilder->getOrCreateArray (llvm::ArrayRef <llvm::Value*> (FieldTypeArray, Count));
 
-	return m_pLlvmDiBuilder->createStructType (
-		pStructType->GetModule ()->GetLlvmDiFile (),
-		pStructType->m_Tag.cc (),
-		pStructType->GetModule ()->GetLlvmDiFile (),
-		pStructType->GetItemDecl ()->GetPos ()->m_Line + 1,
-		pStructType->GetSize () * 8,
-		pStructType->GetAlignFactor () * 8,
-		0,
-		llvm::DIType (), // derived from
-		LlvmDiArray,
-		1
-		);
-}
+	llvm::DICompositeType LlvmDiType (pUnionType->GetLlvmDiType ());
+	ASSERT (LlvmDiType);
 
-llvm::DIType
-CLlvmDiBuilder::CreateUnionType (CUnionType* pUnionType)
-{
-	rtl::CConstListT <CStructField> FieldList = pUnionType->GetFieldList ();
-	size_t Count = FieldList.GetCount ();
-
-	char Buffer [256];
-	rtl::CArrayT <llvm::Value*> FieldTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FieldTypeArray.SetCount (Count);
-
-	rtl::CIteratorT <CStructField> Field = FieldList.GetHead ();
-	for (size_t i = 0; Field; i++, Field++)
-	{
-		CStructField* pField = *Field;
-		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
-			pField->GetModule ()->GetLlvmDiFile (),
-			pField->GetName ().cc (),
-			pField->GetModule ()->GetLlvmDiFile (),
-			pField->GetItemDecl ()->GetPos ()->m_Line + 1,
-			pField->GetType ()->GetSize () * 8,
-			pField->GetType ()->GetAlignFactor () * 8,
-			pField->GetOffset () * 8,
-			0,
-			pField->GetType ()->GetLlvmDiType ()
-			);
-	}
-
-	llvm::DIArray LlvmDiArray = m_pLlvmDiBuilder->getOrCreateArray (llvm::ArrayRef <llvm::Value*> (FieldTypeArray, Count));
-
-	return m_pLlvmDiBuilder->createUnionType (
-		pUnionType->GetModule ()->GetLlvmDiFile (),
-		pUnionType->m_Tag.cc (),
-		pUnionType->GetModule ()->GetLlvmDiFile (),
-		pUnionType->GetItemDecl ()->GetPos ()->m_Line + 1,
-		pUnionType->GetSize () * 8,
-		pUnionType->GetAlignFactor () * 8,
-		0,
-		LlvmDiArray
-		);
+	LlvmDiType.setTypeArray (LlvmDiArray);
 }
 
 llvm::DIType
@@ -238,7 +278,7 @@ CLlvmDiBuilder::CreateDeclare (CVariable* pVariable)
 	ASSERT (pBlock && pScope);
 
 	llvm::Instruction* pLlvmInstruction = m_pLlvmDiBuilder->insertDeclare (
-		pVariable->GetLlvmValue (),
+		pVariable->GetLlvmAllocValue (),
 		(llvm::DIVariable) pVariable->GetLlvmDiDescriptor (),
 		pBlock->GetLlvmBlock ()
 		);

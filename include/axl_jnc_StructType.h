@@ -17,7 +17,7 @@ class CUnionType;
 
 enum EStructFieldFlag
 {
-	EStructFieldFlag_WeakMasked = 0x010000, 
+	EStructFieldFlag_WeakMasked = 0x010000,
 };
 
 //.............................................................................
@@ -30,7 +30,7 @@ class CStructField: public CUserModuleItem
 	friend class CStructType;
 	friend class CUnionType;
 	friend class CClassType;
-	
+
 protected:
 	CType* m_pType;
 	CImportType* m_pType_i;
@@ -39,7 +39,7 @@ protected:
 	rtl::CBoxListT <CToken> m_Initializer;
 
 	CType* m_pBitFieldBaseType;
-	size_t m_BitCount;	
+	size_t m_BitCount;
 	size_t m_Offset;
 	uint_t m_LlvmIndex;
 
@@ -64,13 +64,13 @@ public:
 		return m_PtrTypeFlags;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetConstructor ()
 	{
 		return m_Constructor;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetInitializer ()
 	{
 		return m_Initializer;
@@ -124,25 +124,25 @@ protected:
 public:
 	CStructType ();
 
-	EStructType 
+	EStructType
 	GetStructTypeKind ()
 	{
 		return m_StructTypeKind;
 	}
 
-	size_t 
+	size_t
 	GetPackFactor ()
 	{
 		return m_PackFactor;
 	}
 
-	size_t 
+	size_t
 	GetFieldActualSize ()
 	{
 		return m_FieldActualSize;
 	}
 
-	size_t 
+	size_t
 	GetFieldAlignedSize ()
 	{
 		return m_FieldAlignedSize;
@@ -161,7 +161,7 @@ public:
 		return GetFieldByIndexImpl (Index, false);
 	}
 
-	rtl::CArrayT <CStructField*> 
+	rtl::CArrayT <CStructField*>
 	GetInitializedFieldArray ()
 	{
 		return m_InitializedFieldArray;
@@ -177,7 +177,7 @@ public:
 	bool
 	Compile ();
 
-	virtual 
+	virtual
 	void
 	EnumGcRoots (
 		CRuntime* pRuntime,
@@ -196,24 +196,21 @@ protected:
 		rtl::CBoxListT <CToken>* pInitializer = NULL
 		);
 
-	virtual 
+	virtual
 	void
 	PrepareTypeString ()
 	{
 		m_TypeString.Format ("struct %s", m_Tag.cc ()); // thanks a lot gcc
 	}
 
-	virtual 
+	virtual
 	void
-	PrepareLlvmType ()
-	{
-		m_pLlvmType = llvm::StructType::create (llvm::getGlobalContext (), m_Tag.cc ());
-	}
+	PrepareLlvmType ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmDiType ();
-	
+
 	virtual
 	bool
 	CalcLayout ();
@@ -258,7 +255,7 @@ protected:
 	size_t
 	GetFieldOffset (size_t AlignFactor);
 
-	size_t 
+	size_t
 	GetBitFieldBitOffset (
 		CType* pType,
 		size_t BitCount

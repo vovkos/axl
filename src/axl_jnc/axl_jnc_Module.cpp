@@ -46,8 +46,9 @@ CModule::Create (
 	m_FileName = io::GetFileName (FilePath);
 	m_DirName = io::GetDirName  (FilePath);
 	m_Flags = Flags;
-
 	m_pLlvmModule = pLlvmModule;
+
+	m_LlvmIrBuilder.Create ();
 
 	if (Flags & EModuleFlag_DebugInfo)
 	{
