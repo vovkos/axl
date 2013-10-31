@@ -308,16 +308,12 @@ CFunctionMgr::Prologue (
 	pEntryBlock->MarkEntry ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
+	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc (); // no line info in entry block
 
 #ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
 	m_pModule->m_LlvmIrBuilder.CreateCall (pGcSafePoint, pGcSafePoint->GetType (), NULL);
 #endif
-
-	// we gonna inject instructions to entry block later on.
-	// having them tagged with lineinfo confuses llvm and causes it to produce broken DWARF.
-
-	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc ();
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
 	{
