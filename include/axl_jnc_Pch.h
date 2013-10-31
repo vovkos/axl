@@ -19,20 +19,24 @@
 #undef min
 #undef max
 
-#include "llvm/DerivedTypes.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "llvm/Intrinsics.h"
-#include "llvm/IntrinsicInst.h"
-#include "llvm/PassManager.h"
-#include "llvm/IRBuilder.h"
-#include "llvm/DIBuilder.h"
-#include "llvm/DebugInfo.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/Intrinsics.h"
+#include "llvm/IR/IntrinsicInst.h"
+#include "llvm/IR/IRBuilder.h"
+
 #include "llvm/Support/Dwarf.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/CallSite.h"
 #include "llvm/Support/raw_ostream.h"
+
+#include "llvm/PassManager.h"
+#include "llvm/DIBuilder.h"
+#include "llvm/DebugInfo.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Analysis/Passes.h"
@@ -40,6 +44,8 @@
 
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
+#include "llvm/ExecutionEngine/SectionMemoryManager.h"
+#include "llvm/ExecutionEngine/ObjectImage.h"
 
 // LLVM JIT forces linkage to LLVM libraries if JIT is merely included;
 // we want to be able avoid that (i.e. if a libraries defines LLVM-dependant classes, but
@@ -52,11 +58,6 @@
 #	include "llvm/ExecutionEngine/JITEventListener.h"
 #	include "llvm/ExecutionEngine/MCJIT.h"
 #endif
-
-#include "../lib/MC/MCDisassembler/EDDisassembler.h"
-#include "../lib/MC/MCDisassembler/EDInst.h"
-#include "../lib/MC/MCDisassembler/EDOperand.h"
-#include "../lib/MC/MCDisassembler/EDToken.h"
 
 #include "llvm/MC/MCAsmInfo.h"
 #include "llvm/MC/MCDisassembler.h"

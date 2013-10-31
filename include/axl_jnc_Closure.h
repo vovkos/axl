@@ -21,35 +21,35 @@ class CClosure: public ref::CRefCount
 	friend class CValue;
 
 protected:
-	rtl::CBoxListT <CValue> m_ArgList;
+	rtl::CBoxListT <CValue> m_ArgValueList;
 
 public:
 	rtl::CBoxListT <CValue>*
-	GetArgList ()
+	GetArgValueList ()
 	{
-		return &m_ArgList;
+		return &m_ArgValueList;
 	}
 
 	bool
 	IsMemberClosure ()
 	{
-		return 
-			!m_ArgList.IsEmpty () && 
-			!m_ArgList.GetHead ()->IsEmpty () &&
-			m_ArgList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
+		return
+			!m_ArgValueList.IsEmpty () &&
+			!m_ArgValueList.GetHead ()->IsEmpty () &&
+			m_ArgValueList.GetHead ()->GetType ()->GetTypeKind () == EType_ClassPtr;
 	}
 
 	bool
 	IsSimpleClosure ()
 	{
-		return IsMemberClosure () && m_ArgList.GetCount () == 1;
+		return IsMemberClosure () && m_ArgValueList.GetCount () == 1;
 	}
 
 	size_t
-	Append (const rtl::CConstBoxListT <CValue>& ArgList);
+	Append (const rtl::CConstBoxListT <CValue>& ArgValueList);
 
 	bool
-	Apply (rtl::CBoxListT <CValue>* pArgList);
+	Apply (rtl::CBoxListT <CValue>* pArgValueList);
 
 	CType*
 	GetClosureType (CType* pType);

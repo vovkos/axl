@@ -12,190 +12,51 @@ using namespace llvm;
 const char*
 GetJitKindString (EJit JitKind)
 {
-	static const char* StringTable [EJit__Count] = 
+	static const char* StringTable [EJit__Count] =
 	{
 		"normal-jit", // EJit_Normal = 0,
 		"mc-jit",     // EJit_McJit,
 	};
 
-	return (size_t) JitKind < EJit__Count ? 
-		StringTable [JitKind] : 
+	return (size_t) JitKind < EJit__Count ?
+		StringTable [JitKind] :
 		"undefined-jit";
 }
 
 //.............................................................................
 
-// Memory manager for MCJIT (from lli)
-
-class CJitMemoryManager : public JITMemoryManager {
+class CJitMemoryManager: public llvm::SectionMemoryManager
+{
 public:
-  CStdLib* m_pStdLib;
-	
-  SmallVector<sys::MemoryBlock, 16> AllocatedDataMem;
-  SmallVector<sys::MemoryBlock, 16> AllocatedCodeMem;
-  SmallVector<sys::MemoryBlock, 16> FreeCodeMem;
+	CStdLib* m_pStdLib;
 
-  CJitMemoryManager() 
-  { 
-	  m_pStdLib = NULL;
-  }
-  
-  ~CJitMemoryManager();
+	CJitMemoryManager (CStdLib* pStdLib)
+	{
+		m_pStdLib = pStdLib;
+	}
 
-  virtual uint8_t *allocateCodeSection(uintptr_t Size, unsigned Alignment,
-									   unsigned SectionID);
-
-  virtual uint8_t *allocateDataSection(uintptr_t Size, unsigned Alignment,
-									   unsigned SectionID);
-
-  virtual void *getPointerToNamedFunction(const std::string &Name,
-										  bool AbortOnFailure = true);
-
-  // Invalidate instruction cache for code sections. Some platforms with
-  // separate data cache and instruction cache require explicit cache flush,
-  // otherwise JIT code manipulations (like resolved relocations) will get to
-  // the data cache but not to the instruction cache.
-  virtual void invalidateInstructionCache();
-
-  // The RTDyldMemoryManager doesn't use the following functions, so we don't
-  // need implement them.
-  virtual void setMemoryWritable() {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual void setMemoryExecutable() {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual void setPoisonMemory(bool poison) {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual void AllocateGOT() {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual uint8_t *getGOTBase() const {
-	llvm_unreachable("Unexpected call!");
-	return 0;
-  }
-  virtual uint8_t *startFunctionBody(const Function *F,
-									 uintptr_t &ActualSize){
-	llvm_unreachable("Unexpected call!");
-	return 0;
-  }
-  virtual uint8_t *allocateStub(const GlobalValue* F, unsigned StubSize,
-								unsigned Alignment) {
-	llvm_unreachable("Unexpected call!");
-	return 0;
-  }
-  virtual void endFunctionBody(const Function *F, uint8_t *FunctionStart,
-							   uint8_t *FunctionEnd) {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual uint8_t *allocateSpace(intptr_t Size, unsigned Alignment) {
-	llvm_unreachable("Unexpected call!");
-	return 0;
-  }
-  virtual uint8_t *allocateGlobal(uintptr_t Size, unsigned Alignment) {
-	llvm_unreachable("Unexpected call!");
-	return 0;
-  }
-  virtual void deallocateFunctionBody(void *Body) {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual uint8_t* startExceptionTable(const Function* F,
-									   uintptr_t &ActualSize) {
-	llvm_unreachable("Unexpected call!");
-	return 0;
-  }
-  virtual void endExceptionTable(const Function *F, uint8_t *TableStart,
-								 uint8_t *TableEnd, uint8_t* FrameRegister) {
-	llvm_unreachable("Unexpected call!");
-  }
-  virtual void deallocateExceptionTable(void *ET) {
-	llvm_unreachable("Unexpected call!");
-  }
+	virtual
+	void*
+	getPointerToNamedFunction (
+		const std::string &Name,
+		bool AbortOnFailure
+		);
 };
 
-uint8_t *CJitMemoryManager::allocateDataSection(uintptr_t Size,
-													unsigned Alignment,
-													unsigned SectionID) {
-  if (!Alignment)
-	Alignment = 16;
-  // Ensure that enough memory is requested to allow aligning.
-  size_t NumElementsAligned = 1 + (Size + Alignment - 1)/Alignment;
-  uint8_t *Addr = (uint8_t*)calloc(NumElementsAligned, Alignment);
-
-  // Honour the alignment requirement.
-  uint8_t *AlignedAddr = (uint8_t*)RoundUpToAlignment((uint64_t)Addr, Alignment);
-
-  // Store the original address from calloc so we can free it later.
-  AllocatedDataMem.push_back(sys::MemoryBlock(Addr, NumElementsAligned*Alignment));
-  return AlignedAddr;
-}
-
-uint8_t *CJitMemoryManager::allocateCodeSection(uintptr_t Size,
-													unsigned Alignment,
-													unsigned SectionID) {
-  if (!Alignment)
-	Alignment = 16;
-  unsigned NeedAllocate = Alignment * ((Size + Alignment - 1)/Alignment + 1);
-  uintptr_t Addr = 0;
-  // Look in the list of free code memory regions and use a block there if one
-  // is available.
-  for (int i = 0, e = FreeCodeMem.size(); i != e; ++i) {
-	sys::MemoryBlock &MB = FreeCodeMem[i];
-	if (MB.size() >= NeedAllocate) {
-	  Addr = (uintptr_t)MB.base();
-	  uintptr_t EndOfBlock = Addr + MB.size();
-	  // Align the address.
-	  Addr = (Addr + Alignment - 1) & ~(uintptr_t)(Alignment - 1);
-	  // Store cutted free memory block.
-	  FreeCodeMem[i] = sys::MemoryBlock((void*)(Addr + Size),
-										EndOfBlock - Addr - Size);
-	  return (uint8_t*)Addr;
-	}
-  }
-
-  // No pre-allocated free block was large enough. Allocate a new memory region.
-  sys::MemoryBlock MB = sys::Memory::AllocateRWX(NeedAllocate, 0, 0);
-
-  AllocatedCodeMem.push_back(MB);
-  Addr = (uintptr_t)MB.base();
-  uintptr_t EndOfBlock = Addr + MB.size();
-  // Align the address.
-  Addr = (Addr + Alignment - 1) & ~(uintptr_t)(Alignment - 1);
-  // The AllocateRWX may allocate much more memory than we need. In this case,
-  // we store the unused memory as a free memory block.
-  unsigned FreeSize = EndOfBlock-Addr-Size;
-  if (FreeSize > 16)
-	FreeCodeMem.push_back(sys::MemoryBlock((void*)(Addr + Size), FreeSize));
-
-  // Return aligned address
-  return (uint8_t*)Addr;
-}
-
-void CJitMemoryManager::invalidateInstructionCache() {
-  for (int i = 0, e = AllocatedCodeMem.size(); i != e; ++i)
-	sys::Memory::InvalidateInstructionCache(AllocatedCodeMem[i].base(),
-											AllocatedCodeMem[i].size());
-}
-
-void *CJitMemoryManager::getPointerToNamedFunction(const std::string &Name,
-													   bool AbortOnFailure) {
-
+void*
+CJitMemoryManager::getPointerToNamedFunction (
+	const std::string& Name,
+	bool AbortOnFailure
+	)
+{
 	void* pf = m_pStdLib->FindFunction (Name.c_str ());
 	if (pf)
 		return pf;
-	
-  if (AbortOnFailure)
-	report_fatal_error("Program used external function '" + Name +
-					  "' which could not be resolved!");
-  return 0;
-}
 
-CJitMemoryManager::~CJitMemoryManager() {
-  for (unsigned i = 0, e = AllocatedCodeMem.size(); i != e; ++i)
-	sys::Memory::ReleaseRWX(AllocatedCodeMem[i]);
-  for (unsigned i = 0, e = AllocatedDataMem.size(); i != e; ++i)
-	free(AllocatedDataMem[i].base());
+	if (AbortOnFailure)
+		report_fatal_error ("CJitMemoryManager::getPointerToNamedFunction: unresolved external function '" + Name + "'");
+
+	return 0;
 }
 
 //.............................................................................
@@ -233,27 +94,27 @@ CRuntime::Create (
 
 	m_pModule = pModule;
 
-	// execution engine 
+	// execution engine
 
-	llvm::EngineBuilder EngineBuilder (pModule->GetLlvmModule ());	
-	
+	llvm::EngineBuilder EngineBuilder (pModule->GetLlvmModule ());
+
 	std::string errorString;
 	EngineBuilder.setErrorStr (&errorString);
 	EngineBuilder.setEngineKind(llvm::EngineKind::JIT);
 
+	llvm::TargetOptions TargetOptions;
+	TargetOptions.JITExceptionHandling = true;
+	TargetOptions.JITEmitDebugInfo = true;
+
 	if (JitKind == EJit_McJit)
 	{
-		llvm::TargetOptions TargetOptions;
-		TargetOptions.JITEmitDebugInfo = true;
-	
-		CJitMemoryManager* pJitMemoryManager = new CJitMemoryManager;
-		pJitMemoryManager->m_pStdLib = pStdLib;
-
+		CJitMemoryManager* pJitMemoryManager = new CJitMemoryManager (pStdLib);
 		EngineBuilder.setUseMCJIT (true);
-		EngineBuilder.setTargetOptions (TargetOptions);
 		EngineBuilder.setJITMemoryManager (pJitMemoryManager);
 	}
-	
+
+	EngineBuilder.setTargetOptions (TargetOptions);
+
 #if (_AXL_CPU == AXL_CPU_X86)
 	EngineBuilder.setMArch ("x86");
 #endif
@@ -264,7 +125,7 @@ CRuntime::Create (
 		err::SetFormatStringError ("cannot create execution engine: %s\n", errorString.c_str());
 		return false;
 	}
-	
+
 	// gc heap
 
 	bool Result = m_GcMap.Create (HeapWidth, HeapHeight);
@@ -375,12 +236,12 @@ CRuntime::Shutdown ()
 	m_GcDestructThread.WaitAndClose ();
 
 	TTlsData* pTlsData = GetTlsMgr ()->NullifyTlsData (this);
-	if (pTlsData)	
+	if (pTlsData)
 	{
 		m_TlsList.Remove (pTlsData);
 		AXL_MEM_FREE (pTlsData);
 	}
-	
+
 	ASSERT (m_TlsList.IsEmpty ());
 
 	m_StaticGcRootArray = SaveStaticGcRootArray; // recover
@@ -452,13 +313,13 @@ CRuntime::GcAddObject_l (TObject* pObject)
 	m_GcObjectList.InsertTail (pObject);
 }
 
-void 
+void
 CRuntime::MarkGcObject (TObject* pObject)
 {
 	MarkGcRange (pObject, pObject->m_pType->GetSize ());
 
 	pObject->m_Flags |= EObjectFlag_GcMark;
-	
+
 	if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
 		AddGcRoot (pObject, pObject->m_pType);
 }
@@ -482,14 +343,14 @@ void
 CRuntime::RunGcEx (uint_t Flags)
 {
 	printf ("Running GC...\n");
-	
+
 	WaitGcIdleAndLock ();
 
 	// 1) suspend all threads at safe points
-	
+
 	m_GcState = EGcState_WaitSafePoint;
 	m_GcIdleEvent.Reset ();
-	m_WaitGcSafePointCount = m_TlsList.GetCount (); 
+	m_WaitGcSafePointCount = m_TlsList.GetCount ();
 
 	if (GetTlsMgr ()->FindTlsData (this)) // minus current
 		m_WaitGcSafePointCount--;
@@ -512,17 +373,17 @@ CRuntime::RunGcEx (uint_t Flags)
 
 	// 2.1) add static roots
 
-	size_t Count = m_StaticGcRootArray.GetCount ();	
+	size_t Count = m_StaticGcRootArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		ASSERT (m_StaticGcRootArray [i].m_pType->GetFlags () & ETypeFlag_GcRoot);
 		AddGcRoot (
-			m_StaticGcRootArray [i].m_p, 
+			m_StaticGcRootArray [i].m_p,
 			m_StaticGcRootArray [i].m_pType
 			);
 	}
 
-	// 2.2) add stack roots 
+	// 2.2) add stack roots
 
 	CVariable* pGcShadowStackTop = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_GcShadowStackTop);
 	size_t GcShadowStackTopOffset = pGcShadowStackTop->GetTlsField ()->GetOffset ();
@@ -533,7 +394,7 @@ CRuntime::RunGcEx (uint_t Flags)
 		TGcShadowStackFrame* pStackFrame = *(TGcShadowStackFrame**) ((char*) (*TlsData + 1) + GcShadowStackTopOffset);
 		for (; pStackFrame; pStackFrame = pStackFrame->m_pNext)
 		{
-			size_t Count = pStackFrame->m_pMap->m_Count;		
+			size_t Count = pStackFrame->m_pMap->m_Count;
 			void** ppRootArray = (void**) (pStackFrame + 1);
 			CType** ppTypeArray = (CType**) (pStackFrame->m_pMap + 1);
 
@@ -563,13 +424,13 @@ CRuntime::RunGcEx (uint_t Flags)
 
 	// 4) remove 'alive' flag from unmarked objects and schedule destruction
 
-	rtl::CAuxListT <TObject, CObjectGcHeapLink> DestructList;	
+	rtl::CAuxListT <TObject, CObjectGcHeapLink> DestructList;
 
 	rtl::CIteratorT <TObject, CObjectGcHeapLink> Object = m_GcObjectList.GetTail ();
 	while (Object)
 	{
 		rtl::CIteratorT <TObject, CObjectGcHeapLink> Next = Object.GetInc (-1);
-		
+
 		// weakly-marked closures are saved as well
 
 		if (Object->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcMark_wc))
@@ -597,7 +458,7 @@ CRuntime::RunGcEx (uint_t Flags)
 	}
 
 	// 5) secondary mark (to prevent re-allocating the objects currently scheduled for destruction)
-	
+
 	Object = m_GcDestructList.GetHead ();
 	for (; Object; Object++)
 	{
@@ -637,9 +498,9 @@ CRuntime::GcMarkCycle ()
 	{
 		size_t PrevGcRootArrayIdx =  m_CurrentGcRootArrayIdx;
 		m_CurrentGcRootArrayIdx = !m_CurrentGcRootArrayIdx;
-		m_GcRootArray [m_CurrentGcRootArrayIdx].Clear ();		
+		m_GcRootArray [m_CurrentGcRootArrayIdx].Clear ();
 
-		size_t Count = m_GcRootArray [PrevGcRootArrayIdx].GetCount ();		
+		size_t Count = m_GcRootArray [PrevGcRootArrayIdx].GetCount ();
 		for (size_t i = 0; i < Count; i++)
 		{
 			const TGcRoot* pRoot = &m_GcRootArray [PrevGcRootArrayIdx] [i];
@@ -658,7 +519,7 @@ CRuntime::GcDestructThreadProc ()
 	while (!m_TerminateGcDestructThread)
 	{
 		m_GcDestructEvent.Wait ();
-		
+
 		WaitGcIdleAndLock ();
 		if (!m_GcDestructList.IsEmpty ())
 		{
@@ -692,11 +553,11 @@ CRuntime::GcSafePoint ()
 {
 	if (m_GcState == EGcState_Idle)
 		return;
-	
+
 	m_Lock.Lock ();
 	switch (m_GcState)
 	{
-	case EGcState_Idle: // everything was finished between checking and locking 
+	case EGcState_Idle: // everything was finished between checking and locking
 		m_Lock.Unlock ();
 		break;
 
@@ -723,7 +584,7 @@ CRuntime::WaitGcIdleAndLock ()
 
 		if (m_GcState == EGcState_Idle)
 			break;
-		
+
 		if (m_GcState == EGcState_WaitSafePoint && --m_WaitGcSafePointCount == 0)
 			m_WaitGcSafePointEvent.Signal ();
 
@@ -754,7 +615,7 @@ CRuntime::CreateTlsData ()
 	WaitGcIdleAndLock ();
 	m_TlsList.InsertTail (pTlsData);
 	m_Lock.Unlock ();
-	
+
 	return pTlsData;
 }
 
@@ -812,5 +673,5 @@ CRuntime::UnpinObject (TInterface* pObject)
 
 //.............................................................................
 
-} // namespace axl 
-} // namespace jnc 
+} // namespace axl
+} // namespace jnc

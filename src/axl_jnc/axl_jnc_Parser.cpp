@@ -96,7 +96,7 @@ CParser::PreCreateLandingPads (uint_t Flags)
 
 		rtl::CString Name = "finally_return_addr";
 		CType* pType = GetSimpleType (m_pModule, EType_Int);
-		CVariable* pVariable  = m_pModule->m_VariableMgr.CreateVariable (EStorage_Stack, Name, Name, pType);
+		CVariable* pVariable  = m_pModule->m_VariableMgr.CreateStackVariable (Name, pType);
 		pVariable->m_pScope = pScope;
 		pScope->m_pFinallyReturnAddress = pVariable;
 
@@ -297,6 +297,12 @@ CParser::OpenGlobalNamespace (
 	CGlobalNamespace* pNamespace = GetGlobalNamespace ((CGlobalNamespace*) pCurrentNamespace, Name.GetFirstName (), Pos);
 	if (!pNamespace)
 		return NULL;
+
+	if (pNamespace->GetFlags () & EGlobalNamespaceFlag_Sealed)
+	{
+		err::SetFormatStringError ("cannot extend sealed namespace '%s'", pNamespace->GetQualifiedName ().cc ());
+		return NULL;
+	}
 
 	rtl::CBoxIteratorT <rtl::CString> It = Name.GetNameList ().GetHead ();
 	for (; It; It++)
@@ -972,7 +978,7 @@ CParser::FinalizeLastProperty (bool HasBody)
 		rtl::CArrayT <CFunctionArg*> ArgArray = pGetterType->GetArgArray ();
 		ArgArray.Append (pReturnType->GetSimpleFunctionArg ());
 
-		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgArray);
+		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (ArgArray);
 		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (
 			EFunction_Setter,
 			pSetterType,

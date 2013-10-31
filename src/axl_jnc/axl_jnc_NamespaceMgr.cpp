@@ -31,6 +31,7 @@ bool
 CNamespaceMgr::AddStdItems ()
 {
 	CGlobalNamespace* pJnc = CreateGlobalNamespace ("jnc", &m_GlobalNamespace);
+	pJnc->m_Flags |= EGlobalNamespaceFlag_Sealed;
 
 	return
 		m_GlobalNamespace.AddItem (pJnc) &&

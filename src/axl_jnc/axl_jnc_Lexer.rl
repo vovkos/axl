@@ -12,7 +12,7 @@ namespace jnc {
 
 %%{
 
-machine axl_jnc; 
+machine axl_jnc;
 write data;
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -20,7 +20,7 @@ write data;
 # prepush / postpop (for fcall/fret)
 #
 
-prepush 
+prepush
 {
 	stack = PrePush ();
 }
@@ -48,7 +48,7 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# formatting literal machines 
+# formatting literal machines
 #
 
 lit_fmt := |*
@@ -71,7 +71,7 @@ any          { ASSERT (false); fret; };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# main machine 
+# main machine
 #
 
 main := |*
@@ -126,6 +126,7 @@ main := |*
 'pitcher'        { CreateToken (EToken_Pitcher); };
 'cdecl'          { CreateToken (EToken_Cdecl); };
 'stdcall'        { CreateToken (EToken_Stdcall); };
+'array'          { CreateToken (EToken_Array); };
 'function'       { CreateToken (EToken_Function); };
 'property'       { CreateToken (EToken_Property); };
 'bindable'       { CreateToken (EToken_Bindable); };
@@ -232,16 +233,16 @@ main := |*
 
 '++'             { CreateToken (EToken_Inc); };
 '--'             { CreateToken (EToken_Dec); };
-'->'             { CreateToken (EToken_Ptr); };	
+'->'             { CreateToken (EToken_Ptr); };
 '<<'             { CreateToken (EToken_Shl); };
 '>>'             { CreateToken (EToken_Shr); };
-'&&'             { CreateToken (EToken_LogAnd); };	
+'&&'             { CreateToken (EToken_LogAnd); };
 '||'             { CreateToken (EToken_LogOr); };
 '=='             { CreateToken (EToken_Eq); };
 '!='             { CreateToken (EToken_Ne); };
 '<='             { CreateToken (EToken_Le); };
-'>='             { CreateToken (EToken_Ge); };	
-':='             { CreateToken (EToken_RefAssign); };	
+'>='             { CreateToken (EToken_Ge); };
+':='             { CreateToken (EToken_RefAssign); };
 '+='             { CreateToken (EToken_AddAssign); };
 '-='             { CreateToken (EToken_SubAssign); };
 '*='             { CreateToken (EToken_MulAssign); };
@@ -251,8 +252,8 @@ main := |*
 '>>='            { CreateToken (EToken_ShrAssign); };
 '&='             { CreateToken (EToken_AndAssign); };
 '^='             { CreateToken (EToken_XorAssign); };
-'|='             { CreateToken (EToken_OrAssign); };	
-'@='             { CreateToken (EToken_AtAssign); };	
+'|='             { CreateToken (EToken_OrAssign); };
+'@='             { CreateToken (EToken_AtAssign); };
 '...'            { CreateToken (EToken_Ellipsis); };
 
 '$"'             { PreCreateFmtLiteralToken (); fcall lit_fmt; };
@@ -269,9 +270,9 @@ dec+             { CreateIntegerToken (10); };
 '0' [Xx] lit_dq  { CreateHexLiteralToken (); };
 dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
 				 { CreateFpToken (); };
-				
+
 '//' [^\n]*      ;
-'/*' (any | nl)* :>> '*/' 
+'/*' (any | nl)* :>> '*/'
 				 ;
 
 '('              { OnLeftParentheses (); };
@@ -287,7 +288,7 @@ any              { CreateToken (ts [0]); };
 
 //.............................................................................
 
-void 
+void
 CLexer::Init ()
 {
 	%% write init;

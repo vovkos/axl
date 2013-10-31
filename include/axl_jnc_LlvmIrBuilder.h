@@ -45,7 +45,7 @@ public:
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat); 
+		AXL_VA_DECL (va, pFormat);
 		return CreateComment_va (pFormat, va);
 	}
 
@@ -1028,7 +1028,17 @@ public:
 	llvm::CallInst*
 	CreateCall (
 		const CValue& CalleeValue,
-		ECallConv CallConv,
+		CCallConv* pCallConv,
+		llvm::Value* const* pLlvmArgValueArray,
+		size_t ArgCount,
+		CType* pResultType,
+		CValue* pResultValue
+		);
+
+	llvm::CallInst*
+	CreateCall (
+		const CValue& CalleeValue,
+		CCallConv* pCallConv,
 		const CValue* pArgArray,
 		size_t ArgCount,
 		CType* pResultType,
@@ -1038,8 +1048,20 @@ public:
 	llvm::CallInst*
 	CreateCall (
 		const CValue& CalleeValue,
+		CCallConv* pCallConv,
+		const rtl::CBoxListT <CValue>& ArgValueList,
+		CType* pResultType,
+		CValue* pResultValue
+		);
+
+	// the following functions are convenient but be sure they don't need
+	// special handing by CallConv (e.g. struct-ret, arg splitting/reconstruction etc)
+
+	llvm::CallInst*
+	CreateCall (
+		const CValue& CalleeValue,
 		CFunctionType* pFunctionType,
-		const CValue* pArgArray,
+		const CValue* pArgValueArray,
 		size_t ArgCount,
 		CValue* pResultValue
 		)
@@ -1047,11 +1069,38 @@ public:
 		return CreateCall (
 			CalleeValue,
 			pFunctionType->GetCallConv (),
-			pArgArray,
+			pArgValueArray,
 			ArgCount,
 			pFunctionType->GetReturnType (),
 			pResultValue
 			);
+	}
+
+	llvm::CallInst*
+	CreateCall (
+		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
+		const rtl::CBoxListT <CValue>& ArgValueList,
+		CValue* pResultValue
+		)
+	{
+		return CreateCall (
+			CalleeValue,
+			pFunctionType->GetCallConv (),
+			ArgValueList,
+			pFunctionType->GetReturnType (),
+			pResultValue
+			);
+	}
+
+	llvm::CallInst*
+	CreateCall (
+		const CValue& CalleeValue,
+		CFunctionType* pFunctionType,
+		CValue* pResultValue
+		)
+	{
+		return CreateCall (CalleeValue, pFunctionType, NULL, 0, pResultValue);
 	}
 
 	llvm::CallInst*
@@ -1063,16 +1112,6 @@ public:
 		)
 	{
 		return CreateCall (CalleeValue, pFunctionType, &ArgValue, 1, pResultValue);
-	}
-
-	llvm::CallInst*
-	CreateCall (
-		const CValue& CalleeValue,
-		CFunctionType* pFunctionType,
-		CValue* pResultValue
-		)
-	{
-		return CreateCall (CalleeValue, pFunctionType, NULL, 0, pResultValue);
 	}
 
 	llvm::CallInst*

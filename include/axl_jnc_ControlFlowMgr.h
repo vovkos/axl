@@ -153,6 +153,9 @@ public:
 	void
 	MarkUnreachable (CBasicBlock* pBlock);
 
+	void
+	DeleteUnreachableBlocks ();
+
 	// jumps
 
 	void

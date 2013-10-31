@@ -2,7 +2,7 @@
 // normal data pointers carry validator which contains permitted address range and target scope level
 // checking the scope level is necessary cause jancy allows stack allocation of data, which means
 // data pointer can become invalid without actual modification, just by running out of scope.
-// simply put, approach used by jancy is: 
+// simply put, approach used by jancy is:
 // check data range on pointer access, check scope level on pointer assignment
 
 //.............................................................................
@@ -37,7 +37,7 @@ int main ()
 	// foo (p); // <-- runtime error: pointer out of range
 
 	int a [] = { 10, 20, 30 };
-	// g_p = a; // <-- runtime error: storing pointer in location with lesser scope level 
+	// g_p = a; // <-- runtime error: storing pointer in location with lesser scope level
 
 	int  i;
 	for (i = 0; i < countof (a); i++)

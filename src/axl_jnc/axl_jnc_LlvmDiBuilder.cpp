@@ -106,6 +106,7 @@ CLlvmDiBuilder::CreateStructType (CStructType* pStructType)
 		pStructType->GetSize () * 8,
 		pStructType->GetAlignFactor () * 8,
 		0,
+		llvm::DIType (), // derived from
 		LlvmDiArray,
 		1
 		);

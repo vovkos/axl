@@ -20,7 +20,7 @@ CClassType::CClassType ()
 	m_pClassPtrTypeTuple = NULL;
 }
 
-CClassPtrType* 
+CClassPtrType*
 CClassType::GetClassPtrType (
 	CNamespace* pAnchorNamespace,
 	EType TypeKind,
@@ -178,9 +178,9 @@ CClassType::AddMethod (CFunction* pFunction)
 
 	default:
 		err::SetFormatStringError (
-			"invalid %s in '%s'", 
-			GetFunctionKindString (FunctionKind), 
-			GetTypeString ().cc () 
+			"invalid %s in '%s'",
+			GetFunctionKindString (FunctionKind),
+			GetTypeString ().cc ()
 			);
 		return false;
 	}
@@ -194,8 +194,8 @@ CClassType::AddMethod (CFunction* pFunction)
 	else if (FunctionKindFlags & EFunctionKindFlag_NoOverloads)
 	{
 		err::SetFormatStringError (
-			"'%s' already has '%s' method", 
-			GetTypeString ().cc (), 
+			"'%s' already has '%s' method",
+			GetTypeString ().cc (),
 			GetFunctionKindString (FunctionKind)
 			);
 		return false;
@@ -258,7 +258,7 @@ CClassType::CalcLayout ()
 
 	// resolve imports
 
-	Result = 
+	Result =
 		ResolveImportBaseTypes () &&
 		ResolveImportFields ();
 
@@ -316,14 +316,14 @@ CClassType::CalcLayout ()
 	if (!Result)
 		return false;
 
-	// scan members for gcroots, constructors & destructors 
+	// scan members for gcroots, constructors & destructors
 
 	size_t Count = m_MemberFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = m_MemberFieldArray [i];
 		CType* pType = pField->GetType ();
-		
+
 		if (pType->GetFlags () & ETypeFlag_GcRoot)
 		{
 			m_GcRootMemberFieldArray.Append (pField);
@@ -338,7 +338,7 @@ CClassType::CalcLayout ()
 			CClassType* pClassType = (CClassType*) pType;
 			if (!pClassType->IsCreatable ())
 			{
-				err::SetFormatStringError ("cannot instantiate abstract '%s'", pType->GetTypeString ().cc ()); 
+				err::SetFormatStringError ("cannot instantiate abstract '%s'", pType->GetTypeString ().cc ());
 				return false;
 			}
 
@@ -450,7 +450,7 @@ CClassType::CalcLayout ()
 	if (m_pStaticDestructor)
 		m_pModule->m_VariableMgr.m_StaticDestructList.AddStaticDestructor (m_pStaticDestructor, m_pStaticOnceFlagVariable);
 
-	if (!m_pPreConstructor && 
+	if (!m_pPreConstructor &&
 		(m_pStaticConstructor ||
 		!m_pIfaceStructType->GetInitializedFieldArray ().IsEmpty ()))
 	{
@@ -459,8 +459,8 @@ CClassType::CalcLayout ()
 			return false;
 	}
 
-	if (!m_pConstructor && 
-		(m_pPreConstructor || 
+	if (!m_pConstructor &&
+		(m_pPreConstructor ||
 		!m_BaseTypeConstructArray.IsEmpty () ||
 		!m_MemberFieldConstructArray.IsEmpty () ||
 		!m_MemberPropertyConstructArray.IsEmpty ()))
@@ -470,8 +470,8 @@ CClassType::CalcLayout ()
 			return false;
 	}
 
-	if (!m_pDestructor && 
-		(!m_BaseTypeDestructArray.IsEmpty () || 
+	if (!m_pDestructor &&
+		(!m_BaseTypeDestructArray.IsEmpty () ||
 		!m_MemberFieldDestructArray.IsEmpty () ||
 		!m_MemberPropertyDestructArray.IsEmpty ()))
 	{
@@ -512,8 +512,8 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 
 	CBaseTypeCoord BaseTypeCoord;
 	CModuleItem* pMember = FindItemTraverse (
-		pFunction->m_DeclaratorName, 
-		&BaseTypeCoord, 
+		pFunction->m_DeclaratorName,
+		&BaseTypeCoord,
 		ETraverse_NoExtensionNamespace | ETraverse_NoParentNamespace | ETraverse_NoThis
 		);
 
@@ -532,8 +532,8 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 		if (FunctionKind != EFunction_Named)
 		{
 			err::SetFormatStringError (
-				"cannot override '%s': function kind mismatch", 
-				pFunction->m_Tag.cc () 
+				"cannot override '%s': function kind mismatch",
+				pFunction->m_Tag.cc ()
 				);
 			return false;
 		}
@@ -569,7 +569,7 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 		err::SetFormatStringError ("cannot override '%s': not a method or property", pFunction->m_Tag.cc ());
 		return false;
 	}
-	
+
 	pOverridenFunction = pOverridenFunction->FindShortOverload (pFunction->GetType ()->GetShortType ());
 	if (!pOverridenFunction)
 	{
@@ -588,13 +588,13 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 	CClassPtrType* pThisArgType = (CClassPtrType*) pOverridenFunction->m_pType->GetThisArgType ();
 	ASSERT (pThisArgType->GetTypeKind () == EType_ClassPtr);
 
-	CFunctionArg* pOrigThisArg = pFunction->m_pType->m_ArgArray [0]; 
+	CFunctionArg* pOrigThisArg = pFunction->m_pType->m_ArgArray [0];
 	CFunctionArg* pThisArg = m_pModule->m_TypeMgr.GetSimpleFunctionArg (EStorage_This, pThisArgType, pOrigThisArg->GetPtrTypeFlags ());
 
 	if (pFunction->m_pType->GetFlags () & EModuleItemFlag_User)
 	{
 		pFunction->m_pType->m_ArgArray [0] = pThisArg;
-	}	
+	}
 	else
 	{
 		rtl::CArrayT <CFunctionArg*> ArgArray = pFunction->m_pType->m_ArgArray;
@@ -657,11 +657,11 @@ CClassType::CreateVTablePtr ()
 		false,
 		llvm::GlobalVariable::InternalLinkage,
 		pLlvmVTableConstant,
-		(const char*) (m_Tag + ".vtbl")
+		(const char*) (m_Tag + ".m_vtbl")
 		);
 
 	m_VTablePtrValue.SetLlvmValue (
-		pLlvmVTableVariable, 
+		pLlvmVTableVariable,
 		m_pVTableStructType->GetDataPtrType_c (),
 		EValue_Const
 		);
@@ -734,11 +734,11 @@ CClassType::CompileDefaultDestructor ()
 	ASSERT (m_pDestructor);
 
 	bool Result;
-	
+
 	CValue ArgValue;
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pDestructor, &ArgValue, 1);
 
-	Result = 
+	Result =
 		CallMemberPropertyDestructors (ArgValue) &&
 		CallMemberFieldDestructors (ArgValue) &&
 		CallBaseTypeDestructors (ArgValue);
@@ -760,7 +760,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 	CBasicBlock* pCallBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("call_member_field_destructors");
 	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow");
 
-	static int32_t LlvmIndexArray [] = 
+	static int32_t LlvmIndexArray [] =
 	{
 		0, // TInterface**
 		0, // TInterface*
@@ -769,10 +769,10 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 
 	CValue ObjectPtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (
-		ThisValue, 
-		LlvmIndexArray, 
-		countof (LlvmIndexArray), 
-		NULL, 
+		ThisValue,
+		LlvmIndexArray,
+		countof (LlvmIndexArray),
+		NULL,
 		&ObjectPtrValue
 		);
 
@@ -783,13 +783,13 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 	CValue FlagsValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &FlagsValue);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (FlagsValue, pType, &FlagsValue);
-	
+
 	CValue MaskValue;
 	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_HeapU, EType_Int_p);
-	
+
 	CValue AndValue;
-	Result = 
-		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwAnd, FlagsValue, MaskValue, &AndValue) &&	
+	Result =
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_BwAnd, FlagsValue, MaskValue, &AndValue) &&
 		m_pModule->m_ControlFlowMgr.ConditionalJump (AndValue, pCallBlock, pFollowBlock);
 
 	if (!Result)
@@ -807,7 +807,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 		ASSERT (pDestructor);
 
 		CValue FieldValue;
-		Result = 
+		Result =
 			m_pModule->m_OperatorMgr.GetClassField (ThisValue, pField, NULL, &FieldValue) &&
 			m_pModule->m_OperatorMgr.CallOperator (pDestructor, FieldValue);
 
@@ -834,7 +834,7 @@ CClassType::CallMemberPropertyDestructors (const CValue& ThisValue)
 
 		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
 		if (!Result)
-			return false;				
+			return false;
 	}
 
 	return true;
@@ -849,14 +849,14 @@ CClassType::CallBaseTypeDestructors (const CValue& ThisValue)
 	for (size_t i = 0; i < Count; i++)
 	{
 		CClassType* pBaseClassType = m_BaseTypeDestructArray [i];
-		CFunction* pDestructor = pBaseClassType->GetDestructor ();		
+		CFunction* pDestructor = pBaseClassType->GetDestructor ();
 		ASSERT (pDestructor);
 
 		Result = m_pModule->m_OperatorMgr.CallOperator (pDestructor, ThisValue);
 		if (!Result)
 			return false;
 	}
-		
+
 	return true;
 }
 
@@ -870,7 +870,7 @@ CClassType::CreatePrimer ()
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (NULL, ArgTypeArray, countof (ArgTypeArray));
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
 	m_pPrimer = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Primer, pType);
 	m_pPrimer->m_Tag = m_Tag + ".prime";
 
@@ -925,17 +925,17 @@ CClassType::CompilePrimer ()
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = pClassType->m_ClassMemberFieldArray [i];
-		
+
 		ASSERT (pField->m_pType->GetTypeKind () == EType_Class);
 		CClassType* pClassType = (CClassType*) pField->m_pType;
 
 		CValue FieldValue;
 		m_pModule->m_LlvmIrBuilder.CreateGep2 (
-			IfacePtrValue, 
-			pField->GetLlvmIndex (), 
-			pClassType->GetClassStructType ()->GetDataPtrType_c (), 
+			IfacePtrValue,
+			pField->GetLlvmIndex (),
+			pClassType->GetClassStructType ()->GetDataPtrType_c (),
 			&FieldValue
-			);		
+			);
 
 		CFunction* pPrimer = pClassType->GetPrimer ();
 		ASSERT (pPrimer); // should have been checked during CalcLayout
@@ -983,9 +983,9 @@ CClassType::PrimeInterface (
 
 		CValue BaseClassPtrValue;
 		m_pModule->m_LlvmIrBuilder.CreateGep2 (
-			IfacePtrValue, 
-			pSlot->GetLlvmIndex (), 
-			NULL, 
+			IfacePtrValue,
+			pSlot->GetLlvmIndex (),
+			NULL,
 			&BaseClassPtrValue
 			);
 
@@ -998,18 +998,18 @@ CClassType::PrimeInterface (
 		else
 		{
 			m_pModule->m_LlvmIrBuilder.CreateGep2 (
-				VTablePtrValue, 
-				pSlot->GetVTableIndex (), 
-				NULL, 
+				VTablePtrValue,
+				pSlot->GetVTableIndex (),
+				NULL,
 				&BaseClassVTablePtrValue
 				);
 
 			m_pModule->m_LlvmIrBuilder.CreateBitCast (
-				BaseClassVTablePtrValue, 
+				BaseClassVTablePtrValue,
 				pBaseClassType->GetVTableStructType ()->GetDataPtrType_c (),
 				&BaseClassVTablePtrValue
 				);
-		}		
+		}
 
 		PrimeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
 	}

@@ -8,13 +8,13 @@ namespace jnc {
 //.............................................................................
 
 size_t
-CClosure::Append (const rtl::CConstBoxListT <CValue>& ArgList)
+CClosure::Append (const rtl::CConstBoxListT <CValue>& ArgValueList)
 {
-	ASSERT (!ArgList.IsEmpty ());
+	ASSERT (!ArgValueList.IsEmpty ());
 
-	rtl::CBoxIteratorT <CValue> InternalArg = m_ArgList.GetHead ();
-	rtl::CBoxIteratorT <CValue> ExternalArg = ArgList.GetHead ();
-	
+	rtl::CBoxIteratorT <CValue> InternalArg = m_ArgValueList.GetHead ();
+	rtl::CBoxIteratorT <CValue> ExternalArg = ArgValueList.GetHead ();
+
 	for (;;)
 	{
 		while (InternalArg && !InternalArg->IsEmpty ())
@@ -28,29 +28,29 @@ CClosure::Append (const rtl::CConstBoxListT <CValue>& ArgList)
 		ExternalArg++;
 
 		if (!ExternalArg)
-			return m_ArgList.GetCount ();
+			return m_ArgValueList.GetCount ();
 	}
 
 	for (; ExternalArg; ExternalArg++)
-		m_ArgList.InsertTail (*ExternalArg);
+		m_ArgValueList.InsertTail (*ExternalArg);
 
-	return m_ArgList.GetCount ();
+	return m_ArgValueList.GetCount ();
 }
 
 bool
-CClosure::Apply (rtl::CBoxListT <CValue>* pArgList)
+CClosure::Apply (rtl::CBoxListT <CValue>* pArgValueList)
 {
-	if (m_ArgList.IsEmpty ())
+	if (m_ArgValueList.IsEmpty ())
 		return true;
 
-	rtl::CBoxIteratorT <CValue> ClosureArg = m_ArgList.GetHead ();
-	rtl::CBoxIteratorT <CValue> TargetArg = pArgList->GetHead ();
-	
+	rtl::CBoxIteratorT <CValue> ClosureArg = m_ArgValueList.GetHead ();
+	rtl::CBoxIteratorT <CValue> TargetArg = pArgValueList->GetHead ();
+
 	for (size_t i = 0; ClosureArg; ClosureArg++, i++)
 	{
 		if (!ClosureArg->IsEmpty ())
 		{
-			pArgList->InsertBefore (*ClosureArg, TargetArg);
+			pArgValueList->InsertBefore (*ClosureArg, TargetArg);
 		}
 		else if (TargetArg)
 		{
@@ -104,7 +104,7 @@ CClosure::GetArgTypeArray (
 {
 	bool Result;
 
-	size_t ClosureArgCount = m_ArgList.GetCount ();
+	size_t ClosureArgCount = m_ArgValueList.GetCount ();
 	size_t ArgCount = pArgArray->GetCount ();
 
 	if (ClosureArgCount > ArgCount)
@@ -113,7 +113,7 @@ CClosure::GetArgTypeArray (
 		return NULL;
 	}
 
-	rtl::CBoxIteratorT <CValue> ClosureArg = m_ArgList.GetHead ();
+	rtl::CBoxIteratorT <CValue> ClosureArg = m_ArgValueList.GetHead ();
 	for (size_t i = 0; ClosureArg; ClosureArg++)
 	{
 		if (ClosureArg->IsEmpty ())
@@ -156,13 +156,13 @@ CClosure::GetFunctionClosureType (CFunctionPtrType* pPtrType)
 
 	CFunctionType* pClosureType = pModule->m_TypeMgr.GetFunctionType (
 		pType->GetCallConv (),
-		pType->GetReturnType (), 
+		pType->GetReturnType (),
 		ArgArray
 		);
-	
+
 	return pClosureType->GetFunctionPtrType (
 		pPtrType->GetTypeKind (),
-		pPtrType->GetPtrTypeKind (), 
+		pPtrType->GetPtrTypeKind (),
 		pPtrType->GetFlags ()
 		);
 }
@@ -181,10 +181,10 @@ CClosure::GetPropertyClosureType (CPropertyPtrType* pPtrType)
 	Result = GetArgTypeArray (pModule, &ArgArray);
 	if (!Result)
 		return NULL;
-	
+
 	CFunctionType* pClosureGetterType = pModule->m_TypeMgr.GetFunctionType (
 		pGetterType->GetCallConv (),
-		pGetterType->GetReturnType (), 
+		pGetterType->GetReturnType (),
 		ArgArray
 		);
 
@@ -200,7 +200,7 @@ CClosure::GetPropertyClosureType (CPropertyPtrType* pPtrType)
 
 		CFunctionType* pClosureOverloadType = pModule->m_TypeMgr.GetFunctionType (
 			pOverloadType->GetCallConv (),
-			pOverloadType->GetReturnType (), 
+			pOverloadType->GetReturnType (),
 			ArgArray
 			);
 
@@ -219,7 +219,7 @@ CClosure::GetPropertyClosureType (CPropertyPtrType* pPtrType)
 
 	return pClosureType->GetPropertyPtrType (
 		pPtrType->GetTypeKind (),
-		pPtrType->GetPtrTypeKind (), 
+		pPtrType->GetPtrTypeKind (),
 		pPtrType->GetFlags ()
 		);
 }

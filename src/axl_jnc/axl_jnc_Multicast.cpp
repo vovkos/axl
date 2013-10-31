@@ -55,11 +55,11 @@ CMulticast::SetCount (
 	if (m_MaxCount >= Count)
 	{
 		m_Count = Count;
-		return true;		
+		return true;
 	}
 
 	size_t MaxCount = rtl::GetMinPower2Ge (Count);
-	
+
 	void* p = AXL_MEM_ALLOC (MaxCount * PtrSize);
 	if (!p)
 		return false;
@@ -73,7 +73,7 @@ CMulticast::SetCount (
 	return true;
 }
 
-struct TMcSnapshotObject: 
+struct TMcSnapshotObject:
 	TObject,
 	TMcSnapshot
 {
@@ -88,13 +88,11 @@ CMulticast::GetSnapshot ()
 	ASSERT (m_pObject->m_pType->GetClassTypeKind () == EClassType_Multicast);
 	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
-	
+
 	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocate (sizeof (TMcSnapshotObject));
 	pSnapshot->m_pType = pSnapshotType;
 	pSnapshot->m_pObject = pSnapshot;
 	pRuntime->GcAddObject (pSnapshot);
-
-	TMcSnapshot* p1 = pSnapshot;
 
 	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
 	if (Size)
@@ -125,7 +123,7 @@ CMulticast::GetSnapshot ()
 			pSnapshot->m_Count = m_Count;
 			memcpy (pSnapshot->m_pPtrArray, m_pPtrArray, Size);
 		}
-	}	
+	}
 
 	TFunctionPtr Ptr = { 0 };
 	Ptr.m_pClosure = pSnapshot;

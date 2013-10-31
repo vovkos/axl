@@ -37,7 +37,7 @@ enum EToken
 	EToken_Pack,
 
 	// storage specifiers
-		
+
 	EToken_Typedef,
 	EToken_Alias,
 	EToken_Static,
@@ -71,6 +71,7 @@ enum EToken
 	EToken_Pitcher,
 	EToken_Cdecl,
 	EToken_Stdcall,
+	EToken_Array,
 	EToken_Function,
 	EToken_Property,
 	EToken_Bindable,
@@ -242,17 +243,18 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_LEX_TOKEN_NAME (EToken_Thin,         "thin")
 	AXL_LEX_TOKEN_NAME (EToken_Unsafe,       "unsafe")
-	AXL_LEX_TOKEN_NAME (EToken_Pitcher,     "pitcher")
+	AXL_LEX_TOKEN_NAME (EToken_Pitcher,      "pitcher")
 	AXL_LEX_TOKEN_NAME (EToken_Cdecl,        "cdecl")
 	AXL_LEX_TOKEN_NAME (EToken_Stdcall,      "stdcall")
+	AXL_LEX_TOKEN_NAME (EToken_Array,        "array")
 	AXL_LEX_TOKEN_NAME (EToken_Function,     "function")
 	AXL_LEX_TOKEN_NAME (EToken_Property,     "property")
 	AXL_LEX_TOKEN_NAME (EToken_Bindable,     "bindable")
 	AXL_LEX_TOKEN_NAME (EToken_AutoGet,      "autoget")
 	AXL_LEX_TOKEN_NAME (EToken_Indexed,      "indexed")
-	AXL_LEX_TOKEN_NAME (EToken_Multicast,    "multicast")	
-	AXL_LEX_TOKEN_NAME (EToken_Event,        "event")	
-	AXL_LEX_TOKEN_NAME (EToken_EventD,       "eventd")	
+	AXL_LEX_TOKEN_NAME (EToken_Multicast,    "multicast")
+	AXL_LEX_TOKEN_NAME (EToken_Event,        "event")
+	AXL_LEX_TOKEN_NAME (EToken_EventD,       "eventd")
 	AXL_LEX_TOKEN_NAME (EToken_Reactor,      "reactor")
 
 	// type specifiers
@@ -337,13 +339,13 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Ptr,          "->")
 	AXL_LEX_TOKEN_NAME (EToken_Shl,          "<<")
 	AXL_LEX_TOKEN_NAME (EToken_Shr,          ">>")
-	AXL_LEX_TOKEN_NAME (EToken_LogAnd,       "&&")	
+	AXL_LEX_TOKEN_NAME (EToken_LogAnd,       "&&")
 	AXL_LEX_TOKEN_NAME (EToken_LogOr,        "||")
 	AXL_LEX_TOKEN_NAME (EToken_Eq,           "==")
 	AXL_LEX_TOKEN_NAME (EToken_Ne,           "!=")
 	AXL_LEX_TOKEN_NAME (EToken_Le,           "<=")
 	AXL_LEX_TOKEN_NAME (EToken_Ge,           ">=")
-	AXL_LEX_TOKEN_NAME (EToken_RefAssign,    ":=")	
+	AXL_LEX_TOKEN_NAME (EToken_RefAssign,    ":=")
 	AXL_LEX_TOKEN_NAME (EToken_AddAssign,    "+=")
 	AXL_LEX_TOKEN_NAME (EToken_SubAssign,    "-=")
 	AXL_LEX_TOKEN_NAME (EToken_MulAssign,    "*=")
@@ -353,11 +355,11 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_ShrAssign,    ">>=")
 	AXL_LEX_TOKEN_NAME (EToken_AndAssign,    "&=")
 	AXL_LEX_TOKEN_NAME (EToken_XorAssign,    "^=")
-	AXL_LEX_TOKEN_NAME (EToken_OrAssign,     "|=")	
-	AXL_LEX_TOKEN_NAME (EToken_AtAssign,     "@=")	
+	AXL_LEX_TOKEN_NAME (EToken_OrAssign,     "|=")
+	AXL_LEX_TOKEN_NAME (EToken_AtAssign,     "@=")
 	AXL_LEX_TOKEN_NAME (EToken_Ellipsis,     "...")
-	
-AXL_LEX_END_TOKEN_NAME_MAP ();	
+
+AXL_LEX_END_TOKEN_NAME_MAP ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -476,7 +478,7 @@ protected:
 	{
 		ASSERT (m_pFmtLiteralToken);
 		CToken* pToken = m_pFmtLiteralToken;
-		
+
 		size_t Left = pToken->m_Pos.m_Length;
 		size_t Right = te - ts;
 
@@ -487,7 +489,7 @@ protected:
 
 		pToken->m_Token = Token;
 		pToken->m_Data.m_String = rtl::CEscapeEncoding::Decode (
-			pToken->m_Pos.m_p + Left, 
+			pToken->m_Pos.m_p + Left,
 			pToken->m_Pos.m_Length - (Left + Right));
 		return pToken;
 	}
@@ -495,18 +497,18 @@ protected:
 	CToken*
 	CreateFmtSimpleIdentifierToken ()
 	{
-		CreateFmtLiteralToken (EToken_FmtLiteral); 
+		CreateFmtLiteralToken (EToken_FmtLiteral);
 
 		// important: prevent Break () -- otherwise we could feed half-created fmt-literal token to the parser
 
-		size_t PrevTokenizeLimit = m_TokenizeLimit; 
+		size_t PrevTokenizeLimit = m_TokenizeLimit;
 		m_TokenizeLimit = -1;
 
-		CToken* pToken = CreateStringToken (EToken_Identifier, 1, 0); 
+		CToken* pToken = CreateStringToken (EToken_Identifier, 1, 0);
 
-		m_TokenizeLimit = PrevTokenizeLimit; 
+		m_TokenizeLimit = PrevTokenizeLimit;
 
-		PreCreateFmtLiteralToken (); 
+		PreCreateFmtLiteralToken ();
 		return pToken;
 	}
 
@@ -528,7 +530,7 @@ protected:
 		if (!m_ParenthesesLevelStack.IsEmpty ())
 			m_ParenthesesLevelStack [m_ParenthesesLevelStack.GetCount () - 1]++;
 
-		CreateToken ('('); 
+		CreateToken ('(');
 	}
 
 	bool
@@ -547,7 +549,7 @@ protected:
 			m_ParenthesesLevelStack [i]--;
 		}
 
-		CreateToken (')'); 
+		CreateToken (')');
 		return true;
 	}
 
@@ -559,13 +561,13 @@ protected:
 			size_t i = m_ParenthesesLevelStack.GetCount () - 1;
 			if (m_ParenthesesLevelStack [i] == 1)
 			{
-				ASSERT (*ts == ','); 
+				ASSERT (*ts == ',');
 				p = ts - 1; // need to reparse colon with 'fmt_spec' machine
 				return false;
 			}
 		}
 
-		CreateToken (','); 
+		CreateToken (',');
 		return true;
 	}
 
@@ -586,7 +588,7 @@ protected:
 
 	// implemented in *.rl
 
-	void 
+	void
 	Init ();
 
 	bool

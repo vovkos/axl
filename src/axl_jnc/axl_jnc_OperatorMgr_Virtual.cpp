@@ -14,7 +14,7 @@ COperatorMgr::GetClassVTable (
 	CValue* pResultValue
 	)
 {
-	int32_t LlvmIndexArray [] = 
+	int32_t LlvmIndexArray [] =
 	{
 		0, // class.iface*
 		0, // class.iface.hdr*
@@ -23,10 +23,10 @@ COperatorMgr::GetClassVTable (
 
 	CValue PtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (
-		OpValue, 
-		LlvmIndexArray, 
+		OpValue,
+		LlvmIndexArray,
 		countof (LlvmIndexArray),
-		NULL, 
+		NULL,
 		&PtrValue
 		);
 
@@ -51,16 +51,16 @@ COperatorMgr::GetVirtualMethod (
 		err::SetFormatStringError ("virtual method requires an object pointer");
 		return false;
 	}
-	
-	CValue Value = *pClosure->GetArgList ()->GetHead ();
+
+	CValue Value = *pClosure->GetArgValueList ()->GetHead ();
 	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 	CClassType* pVTableType = pFunction->GetVirtualOriginClassType ();
 	size_t VTableIndex = pFunction->GetClassVTableIndex ();
-	
+
 	CBaseTypeCoord Coord;
 	pClassType->FindBaseTypeTraverse (pVTableType, &Coord);
 	VTableIndex += Coord.m_VTableIndex;
-	
+
 	// class.vtbl*
 
 	CValue PtrValue;
@@ -69,22 +69,22 @@ COperatorMgr::GetVirtualMethod (
 	// pf*
 
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (
-		PtrValue, 
+		PtrValue,
 		VTableIndex,
-		NULL, 
+		NULL,
 		&PtrValue
 		);
 
 	// pf
 
 	m_pModule->m_LlvmIrBuilder.CreateLoad (
-		PtrValue, 
+		PtrValue,
 		NULL,
 		&PtrValue
 		);
 
 	pResultValue->SetLlvmValue (
-		PtrValue.GetLlvmValue (), 
+		PtrValue.GetLlvmValue (),
 		pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin)
 		);
 
@@ -100,14 +100,14 @@ COperatorMgr::GetVirtualProperty (
 	)
 {
 	ASSERT (pProperty->IsVirtual ());
-	
+
 	if (!pClosure || !pClosure->IsMemberClosure ())
 	{
 		err::SetFormatStringError ("virtual method requires an object pointer");
 		return false;
 	}
 
-	CValue Value = *pClosure->GetArgList ()->GetHead ();
+	CValue Value = *pClosure->GetArgValueList ()->GetHead ();
 	CClassType* pClassType = ((CClassPtrType*) Value.GetType ())->GetTargetType ();
 	size_t VTableIndex = pProperty->GetParentClassVTableIndex ();
 
@@ -123,14 +123,14 @@ COperatorMgr::GetVirtualProperty (
 	// property.vtbl*
 
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (
-		PtrValue, 
+		PtrValue,
 		VTableIndex,
 		NULL,
 		&PtrValue
 		);
 
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (
-		PtrValue, 
+		PtrValue,
 		pProperty->GetType ()->GetVTableStructType ()->GetDataPtrType_c (),
 		&PtrValue
 		);

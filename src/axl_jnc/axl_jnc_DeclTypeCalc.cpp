@@ -4,7 +4,7 @@
 
 namespace axl {
 namespace jnc {
-	
+
 //.............................................................................
 
 CType*
@@ -19,7 +19,7 @@ CDeclTypeCalc::CalcType (
 {
 	bool Result;
 
-	CType* pType = pBaseType; 
+	CType* pType = pBaseType;
 	m_pModule = pType->GetModule ();
 
 	rtl::CIteratorT <CDeclSuffix> FirstSuffix = SuffixList.GetHead ();
@@ -27,18 +27,18 @@ CDeclTypeCalc::CalcType (
 
 	// strip non-const array suffix if any
 
-	if (pElementCountValue &&		
-		FirstSuffix && 
+	if (pElementCountValue &&
+		FirstSuffix &&
 		FirstSuffix->GetSuffixKind () == EDeclSuffix_Array)
 	{
 		CDeclArraySuffix* pArraySuffix = (CDeclArraySuffix*) *FirstSuffix;
 		rtl::CBoxListT <CToken>* pElementCountInitializer = pArraySuffix->GetElementCountInitializer ();
-		
+
 		if (!pElementCountInitializer->IsEmpty ())
-		{			
+		{
 			Result = m_pModule->m_OperatorMgr.ParseExpression (*pElementCountInitializer, pElementCountValue);
 			if (!Result)
-				return NULL;			
+				return NULL;
 
 			SuffixEnd = pArraySuffix;
 		}
@@ -125,7 +125,7 @@ CDeclTypeCalc::CalcType (
 		if (!pType)
 			return NULL;
 	}
-	
+
 	if (m_TypeModifiers & ETypeModifier_Property)
 	{
 		pType = GetPropertyType (pType);
@@ -244,14 +244,14 @@ CDeclTypeCalc::CalcPropertyGetterType (CDeclarator* pDeclarator)
 	ASSERT (TypeModifiers & ETypeModifier_Property);
 
 	CDeclFunctionSuffix* pFunctionSuffix = NULL;
-	if (!(TypeModifiers & ETypeModifier_Indexed)) 
+	if (!(TypeModifiers & ETypeModifier_Indexed))
 		pFunctionSuffix = pDeclarator->AddFunctionSuffix ();
 
 	pDeclarator->m_TypeModifiers &= ~(
 		ETypeModifier_Const |
 		ETypeModifier_Property |
 		ETypeModifier_Bindable |
-		ETypeModifier_AutoGet | 
+		ETypeModifier_AutoGet |
 		ETypeModifier_Indexed
 		);
 
@@ -288,7 +288,7 @@ CDeclTypeCalc::CheckUnusedModifiers ()
 	return true;
 }
 
-bool 
+bool
 CDeclTypeCalc::GetPtrTypeFlags (
 	CType* pType,
 	uint_t* pFlags
@@ -316,7 +316,7 @@ CDeclTypeCalc::GetPtrTypeFlags (
 	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_EventD)) // convert 'event' to 'eventd'
 	{
 		ASSERT (IsClassType (pType, EClassType_Multicast));
-		Flags |= EPtrTypeFlag_EventD; 
+		Flags |= EPtrTypeFlag_EventD;
 	}
 
 	if (m_TypeModifiers & ETypeModifier_Bindable)
@@ -338,7 +338,7 @@ CDeclTypeCalc::GetPtrTypeFlags (
 	return true;
 }
 
-uint_t 
+uint_t
 CDeclTypeCalc::GetPropertyFlags ()
 {
 	uint_t Flags = 0;
@@ -357,9 +357,9 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 
 	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 	{
-		err::SetFormatStringError ("'%s' modifier cannot be applied to '%s'", 
-			GetTypeModifierString (m_TypeModifiers & ETypeModifierMask_Integer).cc (), 
-			pType->GetTypeString ().cc () 
+		err::SetFormatStringError ("'%s' modifier cannot be applied to '%s'",
+			GetTypeModifierString (m_TypeModifiers & ETypeModifierMask_Integer).cc (),
+			pType->GetTypeString ().cc ()
 			);
 		return NULL;
 	}
@@ -417,7 +417,7 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 		return m_pModule->m_TypeMgr.CreateArrayType (pElementType, pElementCountInitializer);
 
 	size_t ElementCount = pSuffix->GetElementCount ();
-	return ElementCount == -1 ?  
+	return ElementCount == -1 ?
 		m_pModule->m_TypeMgr.CreateAutoSizeArrayType (pElementType) :
 		m_pModule->m_TypeMgr.GetArrayType (pElementType, ElementCount);
 }
@@ -439,8 +439,8 @@ CDeclTypeCalc::PrepareReturnType (CType* pType)
 	case EType_Function:
 	case EType_Property:
 		err::SetFormatStringError (
-			"function cannot return '%s'", 
-			pType->GetTypeString ().cc () 
+			"function cannot return '%s'",
+			pType->GetTypeString ().cc ()
 			);
 		return NULL;
 
@@ -472,9 +472,28 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	}
 
 	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
-	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
 	uint_t Flags = pSuffix->GetFunctionTypeFlags ();
-	
+
+	ECallConv CallConvKind = GetCallConvKindFromModifiers (m_TypeModifiers);
+	CCallConv* pCallConv = m_pModule->m_TypeMgr.GetCallConv (CallConvKind);
+
+	if (Flags & EFunctionTypeFlag_VarArg)
+	{
+		uint_t CallConvFlags = pCallConv->GetFlags ();
+
+		if (CallConvFlags & ECallConvFlag_NoVarArg)
+		{
+			err::SetFormatStringError ("vararg cannot be used with '%s'", pCallConv->GetCallConvDisplayString ());
+			return NULL;
+		}
+
+		if (!(CallConvFlags & ECallConvFlag_UnsafeVarArg))
+		{
+			err::SetFormatStringError ("only 'cdecl' vararg is currently supported");
+			return NULL;
+		}
+	}
+
 	rtl::CBoxListT <CToken>* pPitcherCondition = NULL;
 
 	if (m_TypeModifiers & ETypeModifier_Pitcher)
@@ -492,11 +511,11 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
 
 	return m_pModule->m_TypeMgr.CreateUserFunctionType (
-		CallConv,
-		pReturnType, 
+		pCallConv,
+		pReturnType,
 		pPitcherCondition,
 		pSuffix->GetArgArray (),
-		Flags		
+		Flags
 		);
 }
 
@@ -513,7 +532,8 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 		return NULL;
 	}
 
-	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
+	ECallConv CallConvKind = GetCallConvKindFromModifiers (m_TypeModifiers);
+	CCallConv* pCallConv = m_pModule->m_TypeMgr.GetCallConv (CallConvKind);
 
 	uint_t TypeFlags = 0;
 	if (m_TypeModifiers & ETypeModifier_Const)
@@ -527,8 +547,8 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 
 	if (!IsIndexed)
 		return m_pModule->m_TypeMgr.GetSimplePropertyType (
-			CallConv, 
-			pReturnType, 
+			pCallConv,
+			pReturnType,
 			TypeFlags
 			);
 
@@ -542,8 +562,8 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 
 	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
 	return m_pModule->m_TypeMgr.CreateIndexedPropertyType (
-		CallConv, 
-		pReturnType, 
+		pCallConv,
+		pReturnType,
 		pSuffix->GetArgArray (),
 		TypeFlags
 		);
@@ -568,10 +588,11 @@ CDeclTypeCalc::GetBindableDataType (CType* pDataType)
 		return NULL;
 	}
 
-	ECallConv CallConv = GetCallConvFromModifiers (m_TypeModifiers);
-	
+	ECallConv CallConvKind = GetCallConvKindFromModifiers (m_TypeModifiers);
+	CCallConv* pCallConv = m_pModule->m_TypeMgr.GetCallConv (CallConvKind);
+
 	m_TypeModifiers &= ~ETypeModifierMask_Property;
-	return m_pModule->m_TypeMgr.GetSimplePropertyType (CallConv, pDataType, EPropertyTypeFlag_Bindable);
+	return m_pModule->m_TypeMgr.GetSimplePropertyType (pCallConv, pDataType, EPropertyTypeFlag_Bindable);
 }
 
 CClassType*
@@ -601,12 +622,12 @@ CDeclTypeCalc::GetMulticastType (CType* pLeftType)
 		if (!pPtrType)
 			return NULL;
 	}
-	else 
+	else
 	{
 		CFunctionType* pFunctionType = GetFunctionType (pLeftType);
 		if (!pFunctionType)
 			return NULL;
-		
+
 		pPtrType = GetFunctionPtrType (pFunctionType);
 		if (!pPtrType)
 			return NULL;
@@ -616,7 +637,7 @@ CDeclTypeCalc::GetMulticastType (CType* pLeftType)
 	return m_pModule->m_TypeMgr.GetMulticastType (pPtrType);
 }
 
-CDataPtrType* 
+CDataPtrType*
 CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 {
 	if (m_TypeModifiers & ETypeModifierMask_Integer)
@@ -631,9 +652,9 @@ CDeclTypeCalc::GetDataPtrType (CType* pDataType)
 
 	m_TypeModifiers &= ~ETypeModifierMask_DataPtr;
 	return pDataType->GetDataPtrType (
-		m_pModule->m_NamespaceMgr.GetCurrentNamespace (), 
-		EType_DataPtr, 
-		PtrTypeKind, 
+		m_pModule->m_NamespaceMgr.GetCurrentNamespace (),
+		EType_DataPtr,
+		PtrTypeKind,
 		TypeFlags
 		);
 }
@@ -646,9 +667,9 @@ CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 
 	m_TypeModifiers &= ~ETypeModifierMask_ClassPtr;
 	return pClassType->GetClassPtrType (
-		m_pModule->m_NamespaceMgr.GetCurrentNamespace (), 
+		m_pModule->m_NamespaceMgr.GetCurrentNamespace (),
 		EType_ClassPtr,
-		PtrTypeKind, 
+		PtrTypeKind,
 		TypeFlags
 		);
 }
@@ -656,8 +677,8 @@ CDeclTypeCalc::GetClassPtrType (CClassType* pClassType)
 CFunctionPtrType*
 CDeclTypeCalc::GetFunctionPtrType (CFunctionType* pFunctionType)
 {
-	EFunctionPtrType PtrTypeKind = 
-		(m_TypeModifiers & ETypeModifier_Weak) ? EFunctionPtrType_Weak : 
+	EFunctionPtrType PtrTypeKind =
+		(m_TypeModifiers & ETypeModifier_Weak) ? EFunctionPtrType_Weak :
 		(m_TypeModifiers & ETypeModifier_Thin) ? EFunctionPtrType_Thin : EFunctionPtrType_Normal;
 
 	uint_t TypeFlags = GetPtrTypeFlagsFromModifiers (m_TypeModifiers);
@@ -669,8 +690,8 @@ CDeclTypeCalc::GetFunctionPtrType (CFunctionType* pFunctionType)
 CPropertyPtrType*
 CDeclTypeCalc::GetPropertyPtrType (CPropertyType* pPropertyType)
 {
-	EPropertyPtrType PtrTypeKind = 
-		(m_TypeModifiers & ETypeModifier_Weak) ? EPropertyPtrType_Weak : 
+	EPropertyPtrType PtrTypeKind =
+		(m_TypeModifiers & ETypeModifier_Weak) ? EPropertyPtrType_Weak :
 		(m_TypeModifiers & ETypeModifier_Thin) ? EPropertyPtrType_Thin : EPropertyPtrType_Normal;
 
 	uint_t TypeFlags = GetPtrTypeFlagsFromModifiers (m_TypeModifiers);
@@ -681,9 +702,9 @@ CDeclTypeCalc::GetPropertyPtrType (CPropertyType* pPropertyType)
 
 CImportPtrType*
 CDeclTypeCalc::GetImportPtrType (CNamedImportType* pImportType)
-{	
+{
 	uint_t TypeModifiers = m_TypeModifiers & ETypeModifierMask_ImportPtr;
-	m_TypeModifiers &= ~ETypeModifierMask_ImportPtr;	
+	m_TypeModifiers &= ~ETypeModifierMask_ImportPtr;
 	return m_pModule->m_TypeMgr.GetImportPtrType (pImportType, TypeModifiers);
 }
 

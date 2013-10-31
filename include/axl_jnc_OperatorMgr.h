@@ -66,12 +66,12 @@ protected:
 	CUnOp_Plus m_UnOp_Plus;
 	CUnOp_Minus m_UnOp_Minus;
 	CUnOp_BwNot m_UnOp_BwNot;
-	CUnOp_LogNot m_UnOp_LogNot;	
-	
+	CUnOp_LogNot m_UnOp_LogNot;
+
 	// pointer operators
 
 	CUnOp_Addr m_UnOp_Addr;
-	CUnOp_Indir m_UnOp_Indir;	
+	CUnOp_Indir m_UnOp_Indir;
 
 	// increment operators
 
@@ -153,14 +153,14 @@ protected:
 	// tables
 
 	CUnaryOperator* m_UnaryOperatorTable [EUnOp__Count];
-	CBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];		
+	CBinaryOperator* m_BinaryOperatorTable [EBinOp__Count];
 	CCastOperator* m_CastOperatorTable [EType__Count];
 	CCastOperator* m_StdCastOperatorTable [EStdCast__Count];
 
 public:
 	COperatorMgr ();
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;
@@ -172,7 +172,7 @@ public:
 		CValue* pScopeLevelValue
 		);
 
-	CValue 
+	CValue
 	CalcScopeLevelValue (CScope* pScope)
 	{
 		CValue ScopeLevelValue;
@@ -188,14 +188,14 @@ public:
 
 	// load reference, get property, enum->int, bool->int, array->ptr -- unless specified otherwise with Flags
 
-	void 
+	void
 	PrepareOperandType (
 		const CValue& OpValue,
 		CValue* pOpValue,
 		uint_t OpFlags = 0
 		);
 
-	void 
+	void
 	PrepareOperandType (
 		CValue* pOpValue,
 		uint_t OpFlags = 0
@@ -210,14 +210,14 @@ public:
 		uint_t OpFlags = 0
 		);
 
-	bool 
+	bool
 	PrepareOperand (
 		const CValue& OpValue,
 		CValue* pOpValue,
 		uint_t OpFlags = 0
 		);
 
-	bool 
+	bool
 	PrepareOperand (
 		CValue* pOpValue,
 		uint_t OpFlags = 0
@@ -225,7 +225,7 @@ public:
 	{
 		return PrepareOperand (*pOpValue, pOpValue, OpFlags);
 	}
-	
+
 	bool
 	PrepareArgumentReturnValue (CValue* pValue);
 
@@ -255,7 +255,7 @@ public:
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
-	
+
 	bool
 	GetUnaryOperatorResultType (
 		EUnOp OpKind,
@@ -271,7 +271,7 @@ public:
 		const CValue& OpValue,
 		CValue* pResultValue = NULL
 		);
-	
+
 	bool
 	UnaryOperator (
 		EUnOp OpKind,
@@ -334,14 +334,14 @@ public:
 		const CValue& FalseValue
 		);
 
-	bool 
+	bool
 	GetConditionalOperatorResultType (
 		const CValue& TrueValue,
 		const CValue& FalseValue,
 		CValue* pResultValue
 		);
 
-	bool 
+	bool
 	ConditionalOperator (
 		const CValue& TrueValue,
 		const CValue& FalseValue,
@@ -390,7 +390,7 @@ public:
 	ECast
 	GetArgCastKind (
 		CFunctionType* pFunctionType,
-		const rtl::CConstBoxListT <CValue>& ArgList
+		const rtl::CConstBoxListT <CValue>& ArgValueList
 		);
 
 	ECast
@@ -422,7 +422,7 @@ public:
 	{
 		return CastOperator (EStorage_Heap, OpValue, pType, pResultValue);
 	}
-	
+
 	bool
 	CastOperator (
 		EStorage StorageKind,
@@ -459,7 +459,7 @@ public:
 	{
 		return CastOperator (EStorage_Heap, OpValue, TypeKind, pResultValue);
 	}
-		
+
 	bool
 	CastOperator (
 		EStorage StorageKind,
@@ -524,7 +524,7 @@ public:
 	bool
 	Construct (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList = NULL
+		rtl::CBoxListT <CValue>* pArgValueList = NULL
 		);
 
 	bool
@@ -583,7 +583,7 @@ public:
 		intptr_t* pInteger
 		);
 
-	bool 
+	bool
 	ParseAutoSizeArrayInitializer (
 		const rtl::CConstBoxListT <CToken>& InitializerTokenList,
 		size_t* pElementCount
@@ -591,14 +591,14 @@ public:
 
 	size_t ParseAutoSizeArrayLiteralInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
 
-	size_t 
+	size_t
 	ParseAutoSizeArrayCurlyInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
 
-	CType* 
+	CType*
 	GetNewOperatorResultType (CType* pType)
 	{
-		return pType->GetTypeKind () == EType_Class ? 
-			(CType*) ((CClassType*) pType)->GetClassPtrType () : 
+		return pType->GetTypeKind () == EType_Class ?
+			(CType*) ((CClassType*) pType)->GetClassPtrType () :
 			pType->GetDataPtrType ();
 	}
 
@@ -607,7 +607,7 @@ public:
 		EStorage StorageKind,
 		CType* pType,
 		const CValue& ElementCountValue,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
 		);
 
@@ -636,11 +636,11 @@ public:
 	NewOperator (
 		EStorage StorageKind,
 		CType* pType,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
 		)
 	{
-		return NewOperator (StorageKind, pType, CValue (), pArgList, pResultValue);
+		return NewOperator (StorageKind, pType, CValue (), pArgValueList, pResultValue);
 	}
 
 	bool
@@ -741,39 +741,39 @@ public:
 	CType*
 	GetCallOperatorResultType (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList
+		rtl::CBoxListT <CValue>* pArgValueList
 		);
 
 	bool
 	GetCallOperatorResultType (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
 		);
 
 	bool
 	GetCallOperatorResultType (
 		CValue* pValue,
-		rtl::CBoxListT <CValue>* pArgList
+		rtl::CBoxListT <CValue>* pArgValueList
 		)
 	{
-		return GetCallOperatorResultType (*pValue, pArgList, pValue);
+		return GetCallOperatorResultType (*pValue, pArgValueList, pValue);
 	}
 
 	bool
 	CallOperator (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue = NULL
 		);
 
 	bool
 	CallOperator (
 		CValue* pValue,
-		rtl::CBoxListT <CValue>* pArgList
+		rtl::CBoxListT <CValue>* pArgValueList
 		)
 	{
-		return CallOperator (*pValue, pArgList, pValue);
+		return CallOperator (*pValue, pArgValueList, pValue);
 	}
 
 	bool
@@ -782,8 +782,8 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		return CallOperator (OpValue, &ArgList, pResultValue);
+		rtl::CBoxListT <CValue> ArgValueList;
+		return CallOperator (OpValue, &ArgValueList, pResultValue);
 	}
 
 	bool
@@ -793,9 +793,9 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (ArgValue);
-		return CallOperator (OpValue, &ArgList, pResultValue);
+		rtl::CBoxListT <CValue> ArgValueList;
+		ArgValueList.InsertTail (ArgValue);
+		return CallOperator (OpValue, &ArgValueList, pResultValue);
 	}
 
 	bool
@@ -806,10 +806,10 @@ public:
 		CValue* pResultValue = NULL
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (ArgValue1);
-		ArgList.InsertTail (ArgValue2);
-		return CallOperator (OpValue, &ArgList, pResultValue);
+		rtl::CBoxListT <CValue> ArgValueList;
+		ArgValueList.InsertTail (ArgValue1);
+		ArgValueList.InsertTail (ArgValue2);
+		return CallOperator (OpValue, &ArgValueList, pResultValue);
 	}
 
 	void
@@ -820,39 +820,39 @@ public:
 	CType*
 	GetClosureOperatorResultType (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList
+		rtl::CBoxListT <CValue>* pArgValueList
 		);
 
 	bool
 	GetClosureOperatorResultType (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
 		);
 
 	bool
 	GetClosureOperatorResultType (
 		CValue* pValue,
-		rtl::CBoxListT <CValue>* pArgList
+		rtl::CBoxListT <CValue>* pArgValueList
 		)
 	{
-		return GetClosureOperatorResultType (*pValue,  pArgList, pValue);
+		return GetClosureOperatorResultType (*pValue,  pArgValueList, pValue);
 	}
 
 	bool
 	ClosureOperator (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
 		);
 
 	bool
 	ClosureOperator (
 		CValue* pValue,
-		rtl::CBoxListT <CValue>* pArgList
+		rtl::CBoxListT <CValue>* pArgValueList
 		)
 	{
-		return ClosureOperator (*pValue,  pArgList, pValue);
+		return ClosureOperator (*pValue,  pArgValueList, pValue);
 	}
 
 	bool
@@ -861,8 +861,8 @@ public:
 		CValue* pResultValue
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		return ClosureOperator (OpValue, &ArgList, pResultValue);
+		rtl::CBoxListT <CValue> ArgValueList;
+		return ClosureOperator (OpValue, &ArgValueList, pResultValue);
 	}
 
 	bool
@@ -872,9 +872,9 @@ public:
 		CValue* pResultValue
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (ArgValue);
-		return ClosureOperator (OpValue, &ArgList, pResultValue);
+		rtl::CBoxListT <CValue> ArgValueList;
+		ArgValueList.InsertTail (ArgValue);
+		return ClosureOperator (OpValue, &ArgValueList, pResultValue);
 	}
 
 	bool
@@ -885,10 +885,10 @@ public:
 		CValue* pResultValue
 		)
 	{
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (ArgValue1);
-		ArgList.InsertTail (ArgValue2);
-		return ClosureOperator (OpValue, &ArgList, pResultValue);
+		rtl::CBoxListT <CValue> ArgValueList;
+		ArgValueList.InsertTail (ArgValue1);
+		ArgValueList.InsertTail (ArgValue2);
+		return ClosureOperator (OpValue, &ArgValueList, pResultValue);
 	}
 
 	CType*
@@ -1117,13 +1117,13 @@ public:
 		)
 	{
 		return GetPropertyThinPtr (
-			pProperty, 
-			pClosure, 
-			pProperty->GetType ()->GetPropertyPtrType (EPropertyPtrType_Thin), 
+			pProperty,
+			pClosure,
+			pProperty->GetType ()->GetPropertyPtrType (EPropertyPtrType_Thin),
 			pResultValue
 			);
 	}
-	
+
 	bool
 	GetPropertyVTable (
 		CProperty* pProperty,
@@ -1284,7 +1284,7 @@ public:
 
 	void
 	NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List);
-	
+
 	// closures
 
 	bool
@@ -1323,7 +1323,7 @@ public:
 		const CValue& RangeEndValue
 		);
 
-	bool 
+	bool
 	CheckDataPtrScopeLevel (
 		const CValue& SrcValue,
 		const CValue& DstValue
@@ -1365,7 +1365,7 @@ protected:
 		CBitFieldType* pBitFieldType,
 		CValue* pResultValue
 		);
-	
+
 	bool
 	MergeBitField (
 		const CValue& Value,
@@ -1416,22 +1416,21 @@ protected:
 	CallImpl (
 		const CValue& PfnValue,
 		CFunctionType* pFunctionType,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
 		);
 
 	bool
 	CallClosureFunctionPtr (
 		const CValue& OpValue,
-		rtl::CBoxListT <CValue>* pArgList,
+		rtl::CBoxListT <CValue>* pArgValueList,
 		CValue* pResultValue
-		);	
+		);
 
 	bool
-	CastArgList (
+	CastArgValueList (
 		CFunctionType* pFunctionType,
-		rtl::CBoxListT <CValue>* pArgList,
-		rtl::CArrayT <CValue>* pArgArray
+		rtl::CBoxListT <CValue>* pArgValueList
 		);
 
 	CType*

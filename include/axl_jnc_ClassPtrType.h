@@ -23,19 +23,19 @@ protected:
 public:
 	CClassPtrType ();
 
-	EClassPtrType 
+	EClassPtrType
 	GetPtrTypeKind ()
 	{
 		return m_PtrTypeKind;
 	}
 
-	CClassType* 
+	CClassType*
 	GetTargetType ()
 	{
 		return m_pTargetType;
 	}
 
-	CNamespace* 
+	CNamespace*
 	GetAnchorNamespace ()
 	{
 		return m_pAnchorNamespace;
@@ -50,41 +50,49 @@ public:
 	CClassPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
-			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
-			this;			
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) :
+			this;
 	}
 
 	CClassPtrType*
 	GetUnCheckedPtrType ()
 	{
-		return (m_Flags & EPtrTypeFlag_Checked) ?  
-			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
-			this;			
+		return (m_Flags & EPtrTypeFlag_Checked) ?
+			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) :
+			this;
 	}
 
 	CClassPtrType*
 	GetUnConstPtrType ()
 	{
-		return (m_Flags & EPtrTypeFlag_Const) ?  
-			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Const) : 
-			this;			
+		return (m_Flags & EPtrTypeFlag_Const) ?
+			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Const) :
+			this;
+	}
+
+	CClassPtrType*
+	GetNormalPtrType ()
+	{
+		return (m_PtrTypeKind != EClassPtrType_Normal) ?
+			m_pTargetType->GetClassPtrType (EClassPtrType_Normal, m_Flags) :
+			this;
 	}
 
 	CClassPtrType*
 	GetWeakPtrType ()
 	{
-		return (m_PtrTypeKind != EClassPtrType_Weak) ?  
-			m_pTargetType->GetClassPtrType (EClassPtrType_Weak, m_Flags) : 
-			this;			
+		return (m_PtrTypeKind != EClassPtrType_Weak) ?
+			m_pTargetType->GetClassPtrType (EClassPtrType_Weak, m_Flags) :
+			this;
 	}
 
 	CClassPtrType*
-	GetStrongPtrType ()
+	GetUnWeakPtrType ()
 	{
-		return (m_PtrTypeKind == EClassPtrType_Weak) ?  
-			m_pTargetType->GetClassPtrType (EClassPtrType_Normal, m_Flags) : 
-			this;			
+		return (m_PtrTypeKind == EClassPtrType_Weak) ?
+			m_pTargetType->GetClassPtrType (EClassPtrType_Normal, m_Flags) :
+			this;
 	}
 
 	static
@@ -96,23 +104,23 @@ public:
 		uint_t Flags
 		);
 
-	virtual 
+	virtual
 	void
 	EnumGcRoots (
 		CRuntime* pRuntime,
 		void* p
-		);	
+		);
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmDiType ();
 };
@@ -129,11 +137,11 @@ struct TClassPtrTypeTuple: rtl::TListLink
 inline
 bool
 IsClassPtrType (
-	CType* pType, 
+	CType* pType,
 	EClassType ClassTypeKind
 	)
 {
-	return 
+	return
 		(pType->GetTypeKindFlags () & ETypeKindFlag_ClassPtr) &&
 		((CClassPtrType*) pType)->GetTargetType ()->GetClassTypeKind () == ClassTypeKind;
 }

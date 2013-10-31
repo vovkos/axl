@@ -3,24 +3,24 @@
 declarator_list <CTypeSpecifier* $pTypeSpecifier>
 	:	full_declarator <$pTypeSpecifier> (',' full_declarator <$pTypeSpecifier>)*
 	;
-		
+
 full_declarator <CTypeSpecifier* $pTypeSpecifier>
 	enter
 	{
 		return PreDeclare ();
 	}
-	:	declarator $d <$pTypeSpecifier> 
+	:	declarator $d <$pTypeSpecifier>
 		(EToken_Construct arg_list_pass1 $c
 			{
 				$d.m_Declarator.m_Constructor.TakeOver (&$c.m_TokenList);
-			}			
+			}
 		)?
 		('=' expression_pass1 $i
 			{
 				$d.m_Declarator.m_Initializer.TakeOver (&$i.m_TokenList);
-			}			
+			}
 		)?
-			{ 
+			{
 				return Declare (&$d.m_Declarator);
 			}
 	;
@@ -30,13 +30,13 @@ full_declarator <CTypeSpecifier* $pTypeSpecifier>
 class
 {
 	CDeclarator m_Declarator;
-}	
+}
 declarator <CTypeSpecifier* $pTypeSpecifier>
 	enter
 	{
 		$.m_Declarator.SetTypeSpecifier ($pTypeSpecifier);
 	}
-	:	declarator_prefix <&$.m_Declarator>* 
+	:	declarator_prefix <&$.m_Declarator>*
 		declarator_name <&$.m_Declarator>
 		declarator_suffix <&$.m_Declarator>*
 		post_declarator_modifier <&$.m_Declarator>*
@@ -45,7 +45,7 @@ declarator <CTypeSpecifier* $pTypeSpecifier>
 //.............................................................................
 
 declarator_name <CDeclarator* $pDeclarator>
-	:	declarator_qualifier <$pDeclarator> 
+	:	declarator_qualifier <$pDeclarator>
 			{
 				$pDeclarator->m_Pos = $1.m_FirstToken.m_Pos;
 			}
@@ -338,20 +338,23 @@ function_suffix <CDeclarator* $pDeclarator>
 	leave
 	{
 		m_StorageKind = $PrevStorageKind;
-	}	
+	}
 	:	'(' function_formal_argument_list <$pFunctionSuffix> ')'
 	|	'(' ')'
-	;	
+	;
 
 function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
-	:	function_formal_argument <$pFunctionSuffix> 
+	:	function_formal_argument <$pFunctionSuffix>
 		(',' function_formal_argument <$pFunctionSuffix>)*
 	;
 
 function_formal_argument <CDeclFunctionSuffix* $pFunctionSuffix>
 	:	function_formal_argument_w_specifier <$pFunctionSuffix>
 	|	function_formal_argument_no_specifier <$pFunctionSuffix>
-	|	function_formal_argument_ellipsis <$pFunctionSuffix>
+	|	EToken_Ellipsis
+			{
+				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_VarArg;
+			}
 	;
 
 function_formal_argument_w_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
@@ -362,7 +365,7 @@ function_formal_argument_w_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 	enter
 	{
 		m_StorageKind = EStorage_Undefined;
-	}	
+	}
 	:	declaration_specifier_list $s
 			{
 				$Declarator.SetTypeSpecifier (&$s.m_TypeSpecifier);
@@ -385,7 +388,7 @@ function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 	{
 		CDeclarator $Declarator;
 	}
-	enter 
+	enter
 	{
 		m_StorageKind = EStorage_Undefined;
 		$Declarator.SetTypeSpecifier (NULL);
@@ -400,15 +403,6 @@ function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 		)?
 			{
 				return CreateFormalArg ($pFunctionSuffix, &$Declarator) != NULL;
-			}
-	;
-
-function_formal_argument_ellipsis <CDeclFunctionSuffix* $pFunctionSuffix>
-	:	EToken_Unsafe $u? EToken_Ellipsis
-			{
-				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_VarArg;
-				if (IsValidLocator ($u))
-					$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_UnsafeVarArg;
 			}
 	;
 

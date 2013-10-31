@@ -30,7 +30,7 @@ CLlvmIrBuilder::CreateComment_va (
 	String.Format_va (pFormat, va);
 
 	return CreateComment_0 (String);
-} 
+}
 
 bool
 CLlvmIrBuilder::CreateComment_0 (const char* pText)
@@ -243,7 +243,73 @@ CLlvmIrBuilder::CreateGep (
 llvm::CallInst*
 CLlvmIrBuilder::CreateCall (
 	const CValue& CalleeValue,
-	ECallConv CallConv,
+	CCallConv* pCallConv,
+	llvm::Value* const* pLlvmArgValueArray,
+	size_t ArgCount,
+	CType* pResultType,
+	CValue* pResultValue
+	)
+{
+	llvm::CallInst* pInst;
+
+	if (pResultType->GetTypeKind () != EType_Void)
+	{
+		pInst = m_LlvmIrBuilder.CreateCall (
+			CalleeValue.GetLlvmValue (),
+			llvm::ArrayRef <llvm::Value*> (pLlvmArgValueArray, ArgCount),
+			"call"
+			);
+
+		ASSERT (pResultValue);
+		pResultValue->SetLlvmValue (pInst, pResultType);
+	}
+	else
+	{
+		pInst = m_LlvmIrBuilder.CreateCall (
+			CalleeValue.GetLlvmValue (),
+			llvm::ArrayRef <llvm::Value*> (pLlvmArgValueArray, ArgCount)
+			);
+
+		if (pResultValue)
+			pResultValue->SetVoid ();
+	}
+
+	llvm::CallingConv::ID LlvmCallConv = pCallConv->GetLlvmCallConv ();
+	if (LlvmCallConv)
+		pInst->setCallingConv (LlvmCallConv);
+
+	return pInst;
+}
+
+llvm::CallInst*
+CLlvmIrBuilder::CreateCall (
+	const CValue& CalleeValue,
+	CCallConv* pCallConv,
+	const rtl::CBoxListT <CValue>& ArgValueList,
+	CType* pResultType,
+	CValue* pResultValue
+	)
+{
+	size_t ArgCount = ArgValueList.GetCount ();
+
+	char Buffer [256];
+	rtl::CArrayT <llvm::Value*> LlvmArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	LlvmArgValueArray.SetCount (ArgCount);
+
+	rtl::CBoxIteratorT <CValue> It = ArgValueList.GetHead ();
+	for (size_t i = 0; i < ArgCount; i++, It++)
+	{
+		ASSERT (It);
+		LlvmArgValueArray [i] = It->GetLlvmValue ();
+	}
+
+	return CreateCall (CalleeValue, pCallConv, LlvmArgValueArray, ArgCount, pResultType, pResultValue);
+}
+
+llvm::CallInst*
+CLlvmIrBuilder::CreateCall (
+	const CValue& CalleeValue,
+	CCallConv* pCallConv,
 	const CValue* pArgArray,
 	size_t ArgCount,
 	CType* pResultType,
@@ -251,37 +317,13 @@ CLlvmIrBuilder::CreateCall (
 	)
 {
 	char Buffer [256];
-	rtl::CArrayT <llvm::Value*> LlvmArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	LlvmArgArray.SetCount (ArgCount);
+	rtl::CArrayT <llvm::Value*> LlvmArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	LlvmArgValueArray.SetCount (ArgCount);
 
 	for (size_t i = 0; i < ArgCount; i++)
-		LlvmArgArray [i] = pArgArray [i].GetLlvmValue ();
+		LlvmArgValueArray [i] = pArgArray [i].GetLlvmValue ();
 
-	llvm::CallInst* pInst;
-
-	if (pResultType && pResultType->GetTypeKind () != EType_Void)
-	{
-		pInst = m_LlvmIrBuilder.CreateCall (
-			CalleeValue.GetLlvmValue (),
-			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount),
-			"call"
-			);
-
-		pResultValue->SetLlvmValue (pInst, pResultType);
-	}
-	else
-	{
-		pInst = m_LlvmIrBuilder.CreateCall (
-			CalleeValue.GetLlvmValue (),
-			llvm::ArrayRef <llvm::Value*> (LlvmArgArray, ArgCount)
-			);
-
-		if (pResultValue)
-			pResultValue->SetVoid ();
-	}
-
-	pInst->setCallingConv (GetLlvmCallConv (CallConv));
-	return pInst;
+	return CreateCall (CalleeValue, pCallConv, LlvmArgValueArray, ArgCount, pResultType, pResultValue);
 }
 
 bool

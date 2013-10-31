@@ -18,8 +18,8 @@ class CAttributeBlock;
 enum EModuleItem
 {
 	EModuleItem_Undefined = 0,
-	EModuleItem_Namespace,	
-	EModuleItem_Scope,	
+	EModuleItem_Namespace,
+	EModuleItem_Scope,
 	EModuleItem_Type,
 	EModuleItem_Typedef,
 	EModuleItem_Alias,
@@ -50,7 +50,7 @@ enum EModuleItemFlag
 	EModuleItemFlag_NeedCompile  = 0x08,
 	EModuleItemFlag_InCalcLayout = 0x10,
 	EModuleItemFlag_LayoutReady  = 0x20,
-	EModuleItemFlag_Constructed  = 0x40, // fields, properties, base type slots	
+	EModuleItemFlag_Constructed  = 0x40, // fields, properties, base type slots
 };
 
 
@@ -129,7 +129,7 @@ public:
 
 	const CToken::CPos*
 	GetPos ()
-	{	
+	{
 		return &m_Pos;
 	}
 
@@ -145,19 +145,19 @@ public:
 		return m_Name;
 	}
 
-	rtl::CString 
+	rtl::CString
 	GetQualifiedName ()
 	{
 		return m_QualifiedName;
 	}
 
-	CNamespace* 
+	CNamespace*
 	GetParentNamespace ()
 	{
 		return m_pParentNamespace;
 	}
 
-	CAttributeBlock* 
+	CAttributeBlock*
 	GetAttributeBlock ()
 	{
 		return m_pAttributeBlock;
@@ -189,9 +189,9 @@ public:
 		return m_pModule;
 	}
 
-	EModuleItem 
+	EModuleItem
 	GetItemKind ()
-	{	
+	{
 		return m_ItemKind;
 	}
 
@@ -211,7 +211,7 @@ public:
 	EnsureLayout ();
 
 	virtual
-	bool 
+	bool
 	Compile ()
 	{
 		ASSERT (false);
@@ -220,7 +220,7 @@ public:
 
 protected:
 	virtual
-	bool 
+	bool
 	CalcLayout ()
 	{
 		ASSERT (false);

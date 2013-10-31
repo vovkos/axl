@@ -50,7 +50,7 @@ CCast_IntExt::ConstCast (
 	ASSERT (SrcSize < DstSize);
 
 	char* pSrc = (char*) OpValue.GetConstData ();
-	
+
 	if (pSrc [SrcSize - 1] < 0)
 		memset (pDst, -1, DstSize);
 	else
@@ -144,10 +144,10 @@ CCast_SwapByteOrder::LlvmCast (
 	CValue SwapFunctionValue;
 	SwapFunctionValue.SetLlvmValue (pLlvmSwap, NULL);
 	m_pModule->m_LlvmIrBuilder.CreateCall (
-		SwapFunctionValue, 
-		ECallConv_Default,
+		SwapFunctionValue,
+		NULL,
 		&OpValue, 1,
-		pType, 
+		pType,
 		pResultValue
 		);
 
@@ -234,7 +234,7 @@ CCast_IntFromFp32::ConstCast (
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Float);
 
 	float Fp32 = *(float*) OpValue.GetConstData ();
-	
+
 	size_t DstSize = pType->GetSize ();
 	switch (DstSize)
 	{
@@ -273,7 +273,7 @@ CCast_IntFromFp64::ConstCast (
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_Double);
 
 	double Fp64 = *(double*) OpValue.GetConstData ();
-	
+
 	size_t DstSize = pType->GetSize ();
 	switch (DstSize)
 	{
@@ -416,7 +416,7 @@ CCast_Enum::GetCastKind (
 
 	// 0 could be put to flag enum
 
-	return 
+	return
 		((CEnumType*) pType)->GetEnumTypeKind () == EEnumType_Flag &&
 		OpValue.GetValueKind () == EValue_Const &&
 		OpValue.GetType ()->GetTypeKind () == EType_Int8_u &&
@@ -479,11 +479,11 @@ CCast_Int::GetCastOperator (
 	case EType_Int32_u:
 	case EType_Int64:
 	case EType_Int64_u:
-		return 
-			SrcSize == DstSize ? m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_Copy) : 
-			SrcSize > DstSize ? (CCastOperator*) &m_Trunc : 
-			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Unsigned) ?			
-				(CCastOperator*) &m_Ext_u : 
+		return
+			SrcSize == DstSize ? m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_Copy) :
+			SrcSize > DstSize ? (CCastOperator*) &m_Trunc :
+			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Unsigned) ?
+				(CCastOperator*) &m_Ext_u :
 				(CCastOperator*) &m_Ext;
 
 	case EType_Int16_be:

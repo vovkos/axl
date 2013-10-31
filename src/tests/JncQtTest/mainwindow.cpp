@@ -12,7 +12,8 @@
 
 StdLib::StdLib ()
 {
-	m_FunctionMap ["printf"] = (void*) Printf;
+	m_FunctionMap ["printf"]   = (void*) Printf;
+	m_FunctionMap ["testAbi1"] = (void*) TestAbi1;
 }
 
 int
@@ -31,11 +32,21 @@ StdLib::Printf (
 	return Length;
 }
 
+TPoint
+StdLib::TestAbi1 (int x)
+{
+	printf ("MainWindow::TestAbi1 ()\n");
+
+	TPoint Point = { 100, 200 };
+
+	return Point;
+}
+
 //.............................................................................
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags)
-{	
+{
 	createMdiArea();
 	setCentralWidget(mdiArea);
 
@@ -49,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
 	connect(
 		this, SIGNAL (outputSignal ()),
-		this, SLOT (outputSlot ()), 
+		this, SLOT (outputSlot ()),
 		Qt::QueuedConnection
 		);
 }
@@ -103,7 +114,7 @@ void MainWindow::saveFile()
 	 if (MdiChild* mdiChild = activeMdiChild())
 		 if (mdiChild->save())
 			 writeStatus("File saved", 2000);
-} 
+}
 
 void MainWindow::saveAs()
 {
@@ -131,7 +142,7 @@ void MainWindow::createActions()
 	saveAsAction = new QAction("S&ave as...", this);
 	QObject::connect(saveAsAction, SIGNAL(triggered()),
 		this, SLOT(saveAs()));
-	
+
 	quitAction = new QAction("&Exit", this);
 	QObject::connect(quitAction, SIGNAL(triggered()),
 		qApp, SLOT(quit()));
@@ -190,14 +201,14 @@ void MainWindow::createStatusBar()
 	writeStatus("Ready");
 }
 
-void MainWindow::createMdiArea() 
+void MainWindow::createMdiArea()
 {
 	mdiArea = new QMdiArea(this);
 	mdiArea->setViewMode(QMdiArea::TabbedView);
 	mdiArea->setTabShape(QTabWidget::Triangular);
 	mdiArea->setTabsClosable(true);
 	mdiArea->setTabsMovable(true);
-	
+
 	QTabBar *tabBar = mdiArea->findChild<QTabBar *>();
 	if (tabBar)
 		tabBar->setExpanding(false);
@@ -268,7 +279,7 @@ void MainWindow::outputSlot ()
 
 	while (!outputQueue.empty ())
 	{
-		QString string = outputQueue.takeFirst ();		
+		QString string = outputQueue.takeFirst ();
 		outputMutex.unlock ();
 
 		output->appendString (string);
@@ -303,7 +314,7 @@ void MainWindow::readSettings()
 	QSettings s;
 
 	QStringList files = s.value("filesOpened").toStringList();
-	
+
 	foreach (QString file, files)
 		openFile(file);
 }
@@ -340,6 +351,8 @@ void MainWindow::clearOutput()
 	output->clear();
 }
 
+//.............................................................................
+
 bool MainWindow::compile ()
 {
 	qApp->setCursorFlashTime (0);
@@ -370,7 +383,7 @@ bool MainWindow::compile ()
 
 	result = module.Parse (
 		filePathBytes.constData (),
-		sourceBytes.constData (), 
+		sourceBytes.constData (),
 		sourceBytes.size ()
 		);
 
@@ -387,21 +400,21 @@ bool MainWindow::compile ()
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
 	}
-	
+
 	// TODO: still try to show LLVM IR if calclayout succeeded (and compilation failed somewhere down the road)
 
 	modulePane->build (&module, child);
 	llvmIr->build (&module);
 
-#if (_AXL_ENV == AXL_ENV_WIN)
-	jnc::EJit JitKind = jnc::EJit_Normal;
+#if (_AXL_ENV == AXL_ENV_POSIX)
+ 	jnc::EJit JitKind = jnc::EJit_McJit; // currently MCJIT only works on Linux
 #else
-	jnc::EJit JitKind = jnc::EJit_McJit;
+	jnc::EJit JitKind = jnc::EJit_Normal;
 #endif
 
 	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
 
-	result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 8);			
+	result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 8);
 	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
@@ -415,7 +428,7 @@ bool MainWindow::compile ()
 		module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
 	}
 
-	result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());	
+	result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());
 	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
@@ -441,6 +454,7 @@ bool MainWindow::runFunction (jnc::CFunction* pFunction, int* pReturnValue)
 		int ReturnValue = pf ();
 		if (pReturnValue)
 			*pReturnValue = ReturnValue;
+
 	}
 	catch (err::CError Error)
 	{
@@ -454,9 +468,9 @@ bool MainWindow::runFunction (jnc::CFunction* pFunction, int* pReturnValue)
 	}
 
 	return Result;
-}	
+}
 
-bool 
+bool
 MainWindow::run ()
 {
 	bool Result;
@@ -530,7 +544,7 @@ MdiChild *MainWindow::createMdiChild()
 MdiChild *MainWindow::activeMdiChild()
 {
 	 QMdiSubWindow *activeSubWindow = mdiArea->activeSubWindow();
-		 
+
 	 if (!activeSubWindow && !mdiArea->subWindowList().empty())
 		 activeSubWindow = mdiArea->subWindowList().at(0);
 

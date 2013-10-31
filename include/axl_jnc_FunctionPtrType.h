@@ -30,7 +30,7 @@ public:
 		return m_PtrTypeKind;
 	}
 
-	CFunctionType* 
+	CFunctionType*
 	GetTargetType ()
 	{
 		return m_pTargetType;
@@ -45,39 +45,47 @@ public:
 	CFunctionPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
-			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
-			this;			
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) :
+			this;
 	}
 
 	CFunctionPtrType*
 	GetUnCheckedPtrType ()
 	{
-		return (m_Flags & EPtrTypeFlag_Checked) ?  
-			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
-			this;			
+		return (m_Flags & EPtrTypeFlag_Checked) ?
+			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) :
+			this;
+	}
+
+	CFunctionPtrType*
+	GetNormalPtrType ()
+	{
+		return (m_PtrTypeKind != EFunctionPtrType_Normal) ?
+			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Normal, m_Flags) :
+			this;
 	}
 
 	CFunctionPtrType*
 	GetWeakPtrType ()
 	{
-		return (m_PtrTypeKind != EFunctionPtrType_Weak) ?  
-			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Weak, m_Flags) : 
-			this;			
+		return (m_PtrTypeKind != EFunctionPtrType_Weak) ?
+			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Weak, m_Flags) :
+			this;
 	}
 
 	CFunctionPtrType*
-	GetStrongPtrType ()
+	GetUnWeakPtrType ()
 	{
-		return (m_PtrTypeKind == EFunctionPtrType_Weak) ?  
-			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Normal, m_Flags) : 
-			this;			
+		return (m_PtrTypeKind == EFunctionPtrType_Weak) ?
+			m_pTargetType->GetFunctionPtrType (EFunctionPtrType_Normal, m_Flags) :
+			this;
 	}
 
-	CClassType* 
+	CClassType*
 	GetMulticastType ();
 
-	CStructType* 
+	CStructType*
 	GetFunctionPtrStructType ();
 
 	rtl::CString
@@ -92,23 +100,23 @@ public:
 		uint_t Flags
 		);
 
-	virtual 
+	virtual
 	void
 	EnumGcRoots (
 		CRuntime* pRuntime,
 		void* p
-		);	
+		);
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmDiType ();
 };

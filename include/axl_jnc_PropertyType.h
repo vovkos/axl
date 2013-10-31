@@ -32,14 +32,14 @@ GetFirstPropertyTypeFlag (uint_t Flags)
 	return (EPropertyTypeFlag) (1 << rtl::GetLoBitIdx (Flags));
 }
 
-const char* 
+const char*
 GetPropertyTypeFlagString (EPropertyTypeFlag Flag);
 
 rtl::CString
 GetPropertyTypeFlagString (uint_t Flags);
 
 inline
-const char* 
+const char*
 GetFirstPropertyTypeFlagString (uint_t Flags)
 {
 	return GetPropertyTypeFlagString (GetFirstPropertyTypeFlag (Flags));
@@ -97,7 +97,7 @@ public:
 		return m_pGetterType->IsMemberMethodType ();
 	}
 
-	CType* 
+	CType*
 	GetThisArgType ()
 	{
 		return m_pGetterType->GetThisArgType ();
@@ -143,7 +143,7 @@ public:
 	CPropertyType*
 	GetShortType  ();
 
-	CPropertyPtrType* 
+	CPropertyPtrType*
 	GetPropertyPtrType (
 		CNamespace* pNamespace,
 		EType TypeKind,
@@ -151,7 +151,7 @@ public:
 		uint_t Flags = 0
 		);
 
-	CPropertyPtrType* 
+	CPropertyPtrType*
 	GetPropertyPtrType (
 		EType TypeKind,
 		EPropertyPtrType PtrTypeKind = EPropertyPtrType_Normal,
@@ -161,7 +161,7 @@ public:
 		return GetPropertyPtrType (NULL, TypeKind, PtrTypeKind, Flags);
 	}
 
-	CPropertyPtrType* 
+	CPropertyPtrType*
 	GetPropertyPtrType (
 		EPropertyPtrType PtrTypeKind = EPropertyPtrType_Normal,
 		uint_t Flags = 0
@@ -191,11 +191,11 @@ public:
 		);
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ()
 	{
@@ -207,7 +207,7 @@ protected:
 
 struct TSimplePropertyTypeTuple: rtl::TListLink
 {
-	CPropertyType* m_PropertyTypeArray [ECallConv__Count] [2] [2]; // callconv x const x bindable
+	CPropertyType* m_PropertyTypeArray [3] [2] [2]; // call-conv-family x const x bindable
 };
 
 //.............................................................................

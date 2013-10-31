@@ -9,6 +9,12 @@ class MdiChild;
 
 //.............................................................................
 
+struct TPoint
+{
+	int m_x;
+	int m_y;
+};
+
 class StdLib: public jnc::CStdLib
 {
 public:
@@ -19,7 +25,11 @@ public:
 	Printf (
 		const char* pFormat,
 		...
-		);	
+		);
+
+	static
+	TPoint
+	TestAbi1 (int x);
 };
 
 //.............................................................................
@@ -37,7 +47,7 @@ public:
 	void writeOutput_va(const char* format, va_list va);
 	void writeOutput(const char* format, ...);
 	MdiChild *findMdiChild(const QString &filePath);
-	
+
 protected:
 	void closeEvent(QCloseEvent *e);
 

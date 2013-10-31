@@ -31,7 +31,7 @@ CProperty::CProperty ()
 	m_ParentClassVTableIndex = -1;
 }
 
-CFunction* 
+CFunction*
 CProperty::GetDefaultConstructor ()
 {
 	ASSERT (m_pConstructor);
@@ -98,8 +98,8 @@ CProperty::Create (CPropertyType* pType)
 
 	uint_t GetterFlags = 0;
 	uint_t SetterFlags = 0;
-	
-	if (m_Flags & EModuleItemFlag_User) 
+
+	if (m_Flags & EModuleItemFlag_User)
 	{
 		if (!(m_Flags & EPropertyFlag_AutoGet))
 			GetterFlags |= EModuleItemFlag_User;
@@ -193,7 +193,7 @@ CProperty::SetOnChange (CModuleItem* pItem)
 		pBinder->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 
 	m_pModule->MarkForCompile (this);
-	
+
 	return AddMethod (pBinder);
 }
 
@@ -203,25 +203,25 @@ CProperty::CreateOnChange ()
 	rtl::CString Name = "m_onChange";
 
 	CType* pType = m_pModule->GetSimpleType (EStdType_SimpleMulticast);
-	
+
 	if (m_pParentType)
 	{
 		CStructField* pField = CreateField (Name, pType);
-		return 
+		return
 			pField != NULL &&
 			SetOnChange (pField);
 	}
 	else
 	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EStorage_Static, 
-			Name, 
-			CreateQualifiedName (Name), 
+			EStorage_Static,
+			Name,
+			CreateQualifiedName (Name),
 			pType
 			);
 
 		return
-			pVariable != NULL && 
+			pVariable != NULL &&
 			AddItem (pVariable) &&
 			SetOnChange (pVariable);
 	}
@@ -267,7 +267,7 @@ CProperty::SetAutoGetValue (CModuleItem* pItem)
 
 	m_pModule->MarkForCompile (this);
 
-	return AddMethod (pGetter);	
+	return AddMethod (pGetter);
 }
 
 
@@ -279,25 +279,25 @@ CProperty::CreateAutoGetValue (CType* pType)
 	if (m_pParentType)
 	{
 		CStructField* pField = CreateField (Name, pType);
-		return 
+		return
 			pField != NULL &&
 			SetAutoGetValue (pField);
 	}
 	else
 	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
-			EStorage_Static, 
-			Name, 
-			CreateQualifiedName (Name), 
+			EStorage_Static,
+			Name,
+			CreateQualifiedName (Name),
 			pType
 			);
 
 		return
-			pVariable != NULL && 
+			pVariable != NULL &&
 			AddItem (pVariable) &&
 			SetAutoGetValue (pVariable);
 	}
-}	
+}
 
 CStructField*
 CProperty::CreateField (
@@ -310,7 +310,7 @@ CProperty::CreateField (
 	)
 {
 	ASSERT (m_pParentType);
-	
+
 	if (!(m_pParentType->GetTypeKindFlags () & ETypeKindFlag_Derivable))
 	{
 		err::SetFormatStringError ("'%s' cannot have field members", m_pParentType->GetTypeString ().cc ());
@@ -335,7 +335,7 @@ CProperty::CreateField (
 		if (!Result)
 			return NULL;
 	}
-	
+
 	return pField;
 }
 
@@ -365,7 +365,7 @@ CProperty::AddMethod (CFunction* pFunction)
 		case EStorage_Undefined:
 			pFunction->m_StorageKind = EStorage_Member;
 			// and fall through
-		
+
 		case EStorage_Member:
 			pFunction->ConvertToMemberMethod (m_pParentType);
 			break;
@@ -376,8 +376,8 @@ CProperty::AddMethod (CFunction* pFunction)
 			if (m_pParentType->GetTypeKind () != EType_Class)
 			{
 				err::SetFormatStringError (
-					"'%s' method cannot be part of '%s'", 
-					GetStorageKindString (StorageKind), 
+					"'%s' method cannot be part of '%s'",
+					GetStorageKindString (StorageKind),
 					m_pParentType->GetTypeString ().cc ()
 					);
 				return false;
@@ -408,7 +408,7 @@ CProperty::AddMethod (CFunction* pFunction)
 		default:
 			err::SetFormatStringError ("invalid storage specifier '%s' for static property member", GetStorageKindString (StorageKind));
 			return false;
-		}	
+		}
 
 		if (ThisArgTypeFlags)
 		{
@@ -420,7 +420,7 @@ CProperty::AddMethod (CFunction* pFunction)
 
 	pFunction->m_pParentNamespace = this;
 	pFunction->m_pProperty = this;
-	
+
 	CFunction** ppTarget = NULL;
 
 	switch (FunctionKind)
@@ -468,8 +468,8 @@ CProperty::AddMethod (CFunction* pFunction)
 
 	default:
 		err::SetFormatStringError (
-			"invalid %s in '%s'", 
-			GetFunctionKindString (FunctionKind), 
+			"invalid %s in '%s'",
+			GetFunctionKindString (FunctionKind),
 			m_Tag.cc ()
 			);
 		return false;
@@ -524,8 +524,8 @@ CProperty::AddProperty (CProperty* pProperty)
 		if (m_pParentType->GetTypeKind () != EType_Class)
 		{
 			err::SetFormatStringError (
-				"'%s' property cannot be part of '%s'", 
-				GetStorageKindString (StorageKind), 
+				"'%s' property cannot be part of '%s'",
+				GetStorageKindString (StorageKind),
 				m_pParentType->GetTypeString ().cc ()
 				);
 			return false;
@@ -566,7 +566,7 @@ CProperty::CallMemberFieldConstructors (const CValue& ThisValue)
 			return false;
 
 		CValue FieldValue;
-		Result = 
+		Result =
 			m_pModule->m_OperatorMgr.GetClassField (ThisValue, pField, NULL, &FieldValue) &&
 			m_pModule->m_OperatorMgr.CallOperator (pConstructor, FieldValue);
 
@@ -598,7 +598,7 @@ CProperty::CallMemberPropertyConstructors (const CValue& ThisValue)
 
 		Result = m_pModule->m_OperatorMgr.CallOperator (pConstructor, ThisValue);
 		if (!Result)
-			return false;				
+			return false;
 	}
 
 	return true;
@@ -646,7 +646,7 @@ CProperty::CreateVTablePtr ()
 
 		LlvmVTable [i] = pFunction->GetLlvmFunction ();
 	}
-	
+
 	CStructType* pVTableStructType = m_pType->GetVTableStructType ();
 
 	llvm::Constant* pLlvmVTableConstant = llvm::ConstantStruct::get (
@@ -660,17 +660,17 @@ CProperty::CreateVTablePtr ()
 		false,
 		llvm::GlobalVariable::InternalLinkage,
 		pLlvmVTableConstant,
-		(const char*) (m_Tag + ".vtbl")
+		(const char*) (m_Tag + ".Vtbl")
 		);
 
 	m_VTablePtrValue.SetLlvmValue (
-		pLlvmVTableVariable, 
+		pLlvmVTableVariable,
 		pVTableStructType->GetDataPtrType_c (),
 		EValue_Const
 		);
 }
 
-bool 
+bool
 CProperty::CompileAutoGetter ()
 {
 	ASSERT (m_pGetter);
@@ -678,20 +678,20 @@ CProperty::CompileAutoGetter ()
 	bool Result;
 
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pGetter);
-	
+
 	CValue AutoGetValue;
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
 		m_pModule->m_ControlFlowMgr.Return (AutoGetValue);
 
 	if (!Result)
-		return false;		
-	
+		return false;
+
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
 }
 
-bool 
+bool
 CProperty::CompileAutoSetter ()
 {
 	ASSERT (m_pSetter && !m_pSetter->IsOverloaded ());
@@ -712,12 +712,12 @@ CProperty::CompileAutoSetter ()
 	}
 
 	CValue AutoGetValue;
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
 		m_pModule->m_OperatorMgr.StoreDataRef (AutoGetValue, SrcValue);
 
 	if (!Result)
-		return false;		
+		return false;
 
 	if (m_pType->GetFlags () & EPropertyTypeFlag_Bindable)
 	{
@@ -730,7 +730,7 @@ CProperty::CompileAutoSetter ()
 	return true;
 }
 
-bool 
+bool
 CProperty::CompileBinder ()
 {
 	ASSERT (m_pBinder);
@@ -738,15 +738,15 @@ CProperty::CompileBinder ()
 	bool Result;
 
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pBinder);
-	
+
 	CValue OnChangeValue;
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetPropertyOnChange (GetAutoAccessorPropertyValue (), &OnChangeValue) &&
 		m_pModule->m_ControlFlowMgr.Return (OnChangeValue);
 
 	if (!Result)
-		return false;		
-	
+		return false;
+
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
 }

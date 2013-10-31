@@ -3,7 +3,7 @@
 
 //.............................................................................
 
-bool 
+bool
 CJnc::Compile (
 	const char* pFileName,
 	const char* pSource,
@@ -21,7 +21,7 @@ CJnc::Compile (
 	m_Module.Create (pFileName, pLlvmModule, ModuleFlags);
 
 	jnc::CScopeThreadModule ScopeModule (&m_Module);
-	
+
 	jnc::CLexer Lexer;
 	Lexer.Create (pFileName, pSource, Length);
 
@@ -36,7 +36,7 @@ CJnc::Compile (
 
 		Result = Parser.ParseToken (pToken);
 		if (!Result)
-		{			
+		{
 			err::PushSrcPosError (pFileName, pToken->m_Pos);
 			return false;
 		}
@@ -51,7 +51,7 @@ CJnc::Compile (
 	return true;
 }
 
-bool 
+bool
 CJnc::Jit ()
 {
 	jnc::EJit JitKind = (m_pCmdLine->m_Flags & EJncFlag_Jit_mc) ? jnc::EJit_McJit : jnc::EJit_Normal;
@@ -59,7 +59,7 @@ CJnc::Jit ()
 	bool Result = m_Runtime.Create (&m_Module, &m_StdLib, JitKind, 16, 1, 4);
 	if (!Result)
 		return false;
-		
+
 	if (JitKind == jnc::EJit_Normal)
 	{
 		llvm::ExecutionEngine* pLlvmExecutionEngine = m_Runtime.GetLlvmExecutionEngine ();
@@ -67,7 +67,7 @@ CJnc::Jit ()
 		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) CStdLib::Printf);
 	}
 
-	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());	
+	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());
 }
 
 void
@@ -87,12 +87,12 @@ CJnc::PrintLlvmIr ()
 		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
 			continue;
 
-		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+		jnc::CFunctionType* pFunctionType = Function->GetType ();
 
-		m_pOutStream->Printf ("%s %s %s %s\n", 
+		m_pOutStream->Printf ("%s %s %s %s\n",
 			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-			GetCallConvString (pFunctionType->GetCallConv ()),
-			Function->m_Tag.cc (), 
+			pFunctionType->GetCallConv ()->GetCallConvString (),
+			Function->m_Tag.cc (),
 			pFunctionType->GetArgString ().cc ()
 			);
 
@@ -133,7 +133,7 @@ CJnc::PrintLlvmIr ()
 	}
 }
 
-void 
+void
 CJnc::PrintDisassembly ()
 {
 	jnc::CDisassembler Dasm;
@@ -144,13 +144,13 @@ CJnc::PrintDisassembly ()
 		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
 			continue;
 
-		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+		jnc::CFunctionType* pFunctionType = Function->GetType ();
 
 		m_pOutStream->Printf (
-			"%s %s %s %s\n", 
+			"%s %s %s %s\n",
 			pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-			GetCallConvString (pFunctionType->GetCallConv ()),
-			Function->m_Tag.cc (), 
+			pFunctionType->GetCallConv ()->GetCallConvString (),
+			Function->m_Tag.cc (),
 			pFunctionType->GetArgString ().cc ()
 			);
 
@@ -162,7 +162,7 @@ CJnc::PrintDisassembly ()
 			rtl::CString s = Dasm.Disassemble (pf, Size);
 			m_pOutStream->Printf ("\n%s", s.cc ());
 		}
-		
+
 		m_pOutStream->Printf ("\n........................................\n\n");
 	}
 }

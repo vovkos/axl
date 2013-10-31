@@ -57,20 +57,20 @@ CVariableMgr::GetStdVariable (EStdVariable Variable)
 	{
 	case EStdVariable_ScopeLevel:
 		pVariable = CreateVariable (
-			EStorage_Thread, 
-			"t_ScopeLevel", 
-			"jnc.t_ScopeLevel", 
+			EStorage_Thread,
+			"g_scopeLevel",
+			"jnc.g_scopeLevel",
 			m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)
-			);	
+			);
 		break;
 
 	case EStdVariable_GcShadowStackTop:
 		pVariable = CreateVariable (
-			EStorage_Thread, 
-			"t_GcShadowStackTop", 
-			"jnc.t_GcShadowStackTop", 
+			EStorage_Thread,
+			"g_gcShadowStackTop",
+			"jnc.g_gcShadowStackTop",
 			m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)
-			);	
+			);
 		break;
 
 	default:
@@ -102,6 +102,14 @@ CVariableMgr::CreateVariable (
 	pVariable->m_StorageKind = StorageKind;
 	pVariable->m_PtrTypeFlags = PtrTypeFlags;
 
+	if (StorageKind == EStorage_Stack)
+	{
+		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+		ASSERT (pScope);
+
+		pVariable->m_pScope = pScope;
+	}
+
 	if (pConstructor)
 		pVariable->m_Constructor.TakeOver (pConstructor);
 
@@ -131,7 +139,7 @@ CVariableMgr::CreateVariable (
 	default:
 		ASSERT (false);
 	}
-	
+
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
 	{
 		pVariable->m_pType_i = (CImportType*) pType;
@@ -145,12 +153,53 @@ CVariable*
 CVariableMgr::CreateOnceFlagVariable (EStorage StorageKind)
 {
 	return CreateVariable (
-		StorageKind, 
-		"once_flag", 
-		"once_flag", 
+		StorageKind,
+		"once_flag",
+		"once_flag",
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
 		StorageKind == EStorage_Static ? EPtrTypeFlag_Volatile : 0
 		);
+}
+
+CVariable*
+CVariableMgr::CreateArgVariable (
+	CFunctionArg* pArg,
+	llvm::Value* pLlvmArgValue
+	)
+{
+	bool Result;
+
+	CVariable* pVariable = CreateStackVariable (
+		pArg->GetName (),
+		pArg->GetType (),
+		pArg->GetPtrTypeFlags ()
+		);
+
+	CValue PtrValue;
+	Result = m_pModule->m_OperatorMgr.Allocate (
+		EStorage_Stack,
+		pArg->GetType (),
+		pArg->GetName (),
+		&PtrValue
+		);
+
+	if (!Result)
+		return NULL;
+
+	pVariable->m_pLlvmAllocValue = PtrValue.GetLlvmValue ();
+	pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
+
+	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+	{
+		pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (
+			pVariable,
+			llvm::dwarf::DW_TAG_arg_variable
+			);
+
+		m_pModule->m_LlvmDiBuilder.CreateDeclare (pVariable);
+	}
+
+	return pVariable;
 }
 
 llvm::GlobalVariable*
@@ -193,7 +242,7 @@ CVariableMgr::CreateAlias (
 	return pAlias;
 }
 
-bool 
+bool
 CVariableMgr::CreateTlsStructType ()
 {
 	bool Result;
@@ -203,7 +252,7 @@ CVariableMgr::CreateTlsStructType ()
 	size_t Count = m_TlsVariableArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CVariable* pVariable = m_TlsVariableArray [i];		
+		CVariable* pVariable = m_TlsVariableArray [i];
 
 		if (pVariable->m_pType->GetTypeKindFlags () & ETypeKindFlag_Aggregate)
 		{
@@ -277,7 +326,7 @@ CVariableMgr::InitializeGlobalStaticVariables ()
 		CVariable* pVariable = m_GlobalStaticVariableArray [i];
 
 		Result = m_pModule->m_OperatorMgr.ParseInitializer (
-			pVariable, 
+			pVariable,
 			pVariable->m_Constructor,
 			pVariable->m_Initializer
 			);
@@ -311,7 +360,7 @@ CVariableMgr::AllocatePrimeInitializeVariable (CVariable* pVariable)
 
 	default:
 		return AllocatePrimeInitializeNonStaticVariable (pVariable);
-	}	
+	}
 }
 
 bool
@@ -334,8 +383,8 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
 
 	CToken::CPos Pos;
-	
-	Result = 
+
+	Result =
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
 		m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
 
@@ -365,10 +414,10 @@ CVariableMgr::AllocatePrimeInitializeTlsVariable (CVariable* pVariable)
 
 	TOnceStmt Stmt;
 	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, EStorage_Thread);
-	
+
 	CToken::CPos Pos;
-	
-	Result = 
+
+	Result =
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
 		m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
 
@@ -387,9 +436,9 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 
 	CValue PtrValue;
 	Result = m_pModule->m_OperatorMgr.Allocate (
-		pVariable->m_StorageKind, 
-		pVariable->m_pType, 
-		pVariable->m_Tag, 
+		pVariable->m_StorageKind,
+		pVariable->m_pType,
+		pVariable->m_Tag,
 		&PtrValue
 		);
 
@@ -410,8 +459,8 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 	{
 		pVariable->m_pLlvmValue = pVariable->m_pLlvmAllocValue;
 
-		if (pVariable->m_Initializer.IsEmpty () || 
-			pVariable->m_Initializer.GetHead ()->m_Token == '{') 
+		if (pVariable->m_Initializer.IsEmpty () ||
+			pVariable->m_Initializer.GetHead ()->m_Token == '{')
 		{
 			m_pModule->m_LlvmIrBuilder.CreateStore (pVariable->m_pType->GetZeroValue (), PtrValue);
 		}
@@ -422,7 +471,7 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 		pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (pVariable);
 		m_pModule->m_LlvmDiBuilder.CreateDeclare (pVariable);
 	}
-	
+
 	Result = m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
 	if (!Result)
 		return false;
@@ -451,7 +500,7 @@ CVariableMgr::AllocateTlsVariable (CVariable* pVariable)
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
 
 	pVariable->m_pLlvmAllocValue = pLlvmAlloca;
-	pVariable->m_pLlvmValue = pLlvmAlloca;	
+	pVariable->m_pLlvmValue = pLlvmAlloca;
 
 	pFunction->AddTlsVariable (pVariable);
 }

@@ -8,8 +8,8 @@ namespace axl {
 namespace jnc {
 
 //.............................................................................
-	
-class CLlvmPodArray: public llvm::ConstantDataSequential 
+
+class CLlvmPodArray: public llvm::ConstantDataSequential
 {
 public:
 	static
@@ -37,7 +37,7 @@ public:
 		)
 	{
 		llvm::Type* pLlvmType = pType->GetLlvmType ();
-		
+
 		char Buffer [256];
 		rtl::CArrayT <llvm::Constant*> LlvmMemberArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 
@@ -49,7 +49,7 @@ public:
 		}
 
 		return get (
-			(llvm::StructType*) pLlvmType, 
+			(llvm::StructType*) pLlvmType,
 			llvm::ArrayRef <llvm::Constant*> (LlvmMemberArray, LlvmMemberArray.GetCount ())
 			);
 	}
@@ -60,7 +60,7 @@ public:
 const char*
 GetValueKindString (EValue ValueKind)
 {
-	static const char* StringTable [EValue__Count] = 
+	static const char* StringTable [EValue__Count] =
 	{
 		"void",                   // EValue_Void = 0,
 		"null",                   // EValue_Null,
@@ -70,15 +70,15 @@ GetValueKindString (EValue ValueKind)
 		"variable",               // EValue_Variable,
 		"function",               // EValue_Function,
 		"function-type-overload", // EValue_FunctionTypeOverload,
-		"property",               // EValue_Property,	
+		"property",               // EValue_Property,
 		"llvm-register",          // EValue_LlvmRegister,
 		"bool-not",               // EValue_BoolNot,
 		"bool-and",               // EValue_BoolAnd,
 		"bool-or",                // EValue_BoolOr,
 	};
 
-	return (size_t) ValueKind < EValue__Count ? 
-		StringTable [ValueKind] : 
+	return (size_t) ValueKind < EValue__Count ?
+		StringTable [ValueKind] :
 		"undefined-value-kind";
 }
 
@@ -116,7 +116,7 @@ CValue::GetLlvmValue () const
 	return m_pLlvmValue;
 }
 
-llvm::Constant* 
+llvm::Constant*
 GetLlvmPtrConst (
 	CType* pType,
 	const void* p
@@ -226,7 +226,7 @@ CValue::InsertToClosureHead (const CValue& Value)
 	if (!m_Closure)
 		m_Closure = AXL_REF_NEW (CClosure);
 
-	m_Closure->GetArgList ()->InsertHead (Value);
+	m_Closure->GetArgValueList ()->InsertHead (Value);
 }
 
 void
@@ -235,7 +235,7 @@ CValue::InsertToClosureTail (const CValue& Value)
 	if (!m_Closure)
 		m_Closure = AXL_REF_NEW (CClosure);
 
-	m_Closure->GetArgList ()->InsertTail (Value);
+	m_Closure->GetArgValueList ()->InsertTail (Value);
 }
 
 CClosure*
@@ -337,16 +337,16 @@ CValue::SetVariable (CVariable* pVariable)
 	CType* pType = pVariable->GetType ();
 	if (pType->GetTypeKind () == EType_Class)
 		m_pType = ((CClassType*) pType)->GetClassPtrType (
-			pVariable->GetParentNamespace (), 
-			EType_ClassRef, 
-			EClassPtrType_Normal, 
+			pVariable->GetParentNamespace (),
+			EType_ClassRef,
+			EClassPtrType_Normal,
 			PtrTypeFlags
 			);
 	else
 		m_pType = pType->GetDataPtrType (
-			pVariable->GetParentNamespace (), 
-			EType_DataRef, 
-			EDataPtrType_Thin, 
+			pVariable->GetParentNamespace (),
+			EType_DataRef,
+			EDataPtrType_Thin,
 			PtrTypeFlags
 			);
 }
@@ -359,7 +359,7 @@ CValue::SetFunction (CFunction* pFunction)
 	m_ValueKind = EValue_Function;
 	m_pFunction = pFunction;
 	m_pType = pFunction->GetType ()->GetFunctionPtrType (
-		EType_FunctionRef, 
+		EType_FunctionRef,
 		EFunctionPtrType_Thin,
 		EPtrTypeFlag_Checked
 		);
@@ -386,8 +386,8 @@ CValue::SetProperty (CProperty* pProperty)
 	m_ValueKind = EValue_Property;
 	m_pProperty = pProperty;
 	m_pType = pProperty->GetType ()->GetPropertyPtrType (
-		pProperty->GetParentNamespace (),		
-		EType_PropertyRef, 
+		pProperty->GetParentNamespace (),
+		EType_PropertyRef,
 		EPropertyPtrType_Thin,
 		EPtrTypeFlag_Checked
 		);
@@ -442,7 +442,7 @@ CValue::SetThinDataPtrValidator (const CValue& ValidatorValue)
 }
 
 void
-CValue::SetThinDataPtrValidator (		
+CValue::SetThinDataPtrValidator (
 	const CValue& ScopeValidatorValue,
 	const CValue& RangeBeginValue,
 	const CValue& SizeValue
@@ -480,7 +480,7 @@ CValue::CreateConst (
 	else
 		memset (GetConstData (), 0, Size);
 
-	return true;	
+	return true;
 }
 
 bool
@@ -493,7 +493,7 @@ CValue::CreateConst (
 	ASSERT (pModule);
 
 	CType* pType = pModule->m_TypeMgr.GetPrimitiveType (TypeKind);
-	return CreateConst (p, pType);	
+	return CreateConst (p, pType);
 }
 
 void

@@ -59,7 +59,7 @@ public:
 public:
 	CVariableMgr ();
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;
@@ -70,38 +70,38 @@ public:
 
 	CVariable*
 	GetStdVariable (EStdVariable Variable);
-	
-	rtl::CArrayT <CVariable*> 
+
+	rtl::CArrayT <CVariable*>
 	GetStaticVariableArray ()
 	{
 		return m_StaticVariableArray;
 	}
 
-	rtl::CArrayT <CVariable*> 
+	rtl::CArrayT <CVariable*>
 	GetStaticGcRootArray ()
 	{
 		return m_StaticGcRootArray;
 	}
 
-	rtl::CArrayT <CVariable*> 
+	rtl::CArrayT <CVariable*>
 	GetGlobalStaticVariableArray ()
 	{
 		return m_GlobalStaticVariableArray;
 	}
 
-	rtl::CArrayT <CVariable*> 
+	rtl::CArrayT <CVariable*>
 	GetTlsVariableArray ()
 	{
 		return m_TlsVariableArray;
 	}
 
-	rtl::CArrayT <CVariable*> 
+	rtl::CArrayT <CVariable*>
 	GetTlsGcRootArray ()
 	{
 		return m_TlsGcRootArray;
 	}
 
-	CStructType* 
+	CStructType*
 	GetTlsStructType ()
 	{
 		ASSERT (m_pTlsStructType);
@@ -120,7 +120,33 @@ public:
 		);
 
 	CVariable*
-	CreateOnceFlagVariable (EStorage StorageKind = EStorage_Static);		
+	CreateStackVariable (
+		const rtl::CString& Name,
+		CType* pType,
+		uint_t PtrTypeFlags = 0,
+		rtl::CBoxListT <CToken>* pConstructor = NULL,
+		rtl::CBoxListT <CToken>* pInitializer = NULL
+		)
+	{
+		return CreateVariable (
+			EStorage_Stack,
+			Name,
+			Name,
+			pType,
+			PtrTypeFlags,
+			pConstructor,
+			pInitializer
+			);
+	}
+
+	CVariable*
+	CreateOnceFlagVariable (EStorage StorageKind = EStorage_Static);
+
+	CVariable*
+	CreateArgVariable (
+		CFunctionArg* pArg,
+		llvm::Value* pLlvmArgValue
+		);
 
 	llvm::GlobalVariable*
 	CreateLlvmGlobalVariable (
@@ -136,7 +162,7 @@ public:
 		rtl::CBoxListT <CToken>* pInitializer
 		);
 
-	bool 
+	bool
 	CreateTlsStructType ();
 
 	bool
@@ -166,19 +192,19 @@ public:
 		size_t Count
 		);
 
-	void 
+	void
 	DeallocateTlsVariableArray (const rtl::CArrayT <TTlsVariable>& Array)
 	{
 		DeallocateTlsVariableArray (Array, Array.GetCount ());
 	}
 
-	void 
+	void
 	RestoreTlsVariableArray (const rtl::CArrayT <TTlsVariable>& Array)
 	{
 		RestoreTlsVariableArray (Array, Array.GetCount ());
 	}
 
-protected:	
+protected:
 	bool
 	AllocatePrimeInitializeStaticVariable (CVariable* pVariable);
 

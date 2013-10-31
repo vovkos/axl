@@ -6,7 +6,7 @@ namespace axl {
 namespace jnc {
 
 //.............................................................................
-	
+
 CStructField::CStructField ()
 {
 	m_ItemKind = EModuleItem_StructField;
@@ -24,7 +24,7 @@ CStructField::CStructField ()
 CStructType::CStructType ()
 {
 	m_TypeKind = EType_Struct;
-	m_Flags = ETypeFlag_Pod;
+	m_Flags = ETypeFlag_Pod | ETypeFlag_StructRet;
 	m_PackFactor = 8;
 	m_FieldActualSize = 0;
 	m_FieldAlignedSize = 0;
@@ -55,12 +55,12 @@ CStructType::CreateFieldImpl (
 	pField->m_BitCount = BitCount;
 
 	if (pConstructor)
-		pField->m_Constructor.TakeOver (pConstructor);		
+		pField->m_Constructor.TakeOver (pConstructor);
 
 	if (pInitializer)
-		pField->m_Initializer.TakeOver (pInitializer);		
+		pField->m_Initializer.TakeOver (pInitializer);
 
-	if (!pField->m_Constructor.IsEmpty () || 
+	if (!pField->m_Constructor.IsEmpty () ||
 		!pField->m_Initializer.IsEmpty ())
 	{
 		m_InitializedFieldArray.Append (pField);
@@ -109,7 +109,7 @@ CStructType::GetFieldByIndexImpl (
 		m_FieldArray.SetCount (Count);
 		rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
 		for (size_t i = 0; i < Count; i++, Field++)
-			m_FieldArray [i] = *Field;	
+			m_FieldArray [i] = *Field;
 	}
 
 	return m_FieldArray [Index];
@@ -131,7 +131,7 @@ CStructType::Append (CStructType* pType)
 	rtl::CIteratorT <CStructField> Field = pType->m_FieldList.GetHead ();
 	for (; Field; Field++)
 	{
-		Result = Field->m_BitCount ? 
+		Result = Field->m_BitCount ?
 			CreateField (Field->m_Name, Field->m_pBitFieldBaseType, Field->m_BitCount, Field->m_PtrTypeFlags) != NULL:
 			CreateField (Field->m_Name, Field->m_pType, 0, Field->m_PtrTypeFlags) != NULL;
 
@@ -150,7 +150,7 @@ CStructType::CalcLayout ()
 	if (m_pExtensionNamespace)
 		ApplyExtensionNamespace ();
 
-	Result = 
+	Result =
 		ResolveImportBaseTypes () &&
 		ResolveImportFields ();
 
@@ -206,7 +206,7 @@ CStructType::CalcLayout ()
 			return false;
 		}
 
-		Result = pField->m_BitCount ? 
+		Result = pField->m_BitCount ?
 			LayoutBitField (
 				pField->m_pBitFieldBaseType,
 				pField->m_BitCount,
@@ -228,7 +228,7 @@ CStructType::CalcLayout ()
 		InsertPadding (m_FieldAlignedSize - m_FieldActualSize);
 
 	// scan members for gcroots and constructors (not for auxilary structs such as class iface)
-	
+
 	if (m_StructTypeKind == EStructType_Normal)
 	{
 		size_t Count = m_MemberFieldArray.GetCount ();
@@ -247,7 +247,7 @@ CStructType::CalcLayout ()
 				m_GcRootMemberFieldArray.Append (pField);
 				m_Flags |= ETypeFlag_GcRoot;
 			}
-		
+
 			if ((pType->GetTypeKindFlags () & ETypeKindFlag_Derivable) && ((CDerivableType*) pType)->GetConstructor ())
 				m_MemberFieldConstructArray.Append (pField);
 		}
@@ -288,7 +288,7 @@ CStructType::CalcLayout ()
 		if (m_pStaticDestructor)
 			m_pModule->m_VariableMgr.m_StaticDestructList.AddStaticDestructor (m_pStaticDestructor, m_pStaticOnceFlagVariable);
 
-		if (!m_pPreConstructor && 
+		if (!m_pPreConstructor &&
 			(m_pStaticConstructor ||
 			!m_InitializedFieldArray.IsEmpty ()))
 		{
@@ -297,8 +297,8 @@ CStructType::CalcLayout ()
 				return false;
 		}
 
-		if (!m_pConstructor && 
-			(m_pPreConstructor || 
+		if (!m_pConstructor &&
+			(m_pPreConstructor ||
 			!m_BaseTypeConstructArray.IsEmpty () ||
 			!m_MemberFieldConstructArray.IsEmpty () ||
 			!m_MemberPropertyConstructArray.IsEmpty ()))
@@ -364,7 +364,7 @@ CStructType::InitializeFields (const CValue& ThisValue)
 {
 	bool Result;
 
-	size_t Count = m_InitializedFieldArray.GetCount ();	
+	size_t Count = m_InitializedFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = m_InitializedFieldArray [i];
@@ -375,7 +375,7 @@ CStructType::InitializeFields (const CValue& ThisValue)
 			return false;
 
 		Result = m_pModule->m_OperatorMgr.ParseInitializer (
-			FieldValue, 
+			FieldValue,
 			pField->m_Constructor,
 			pField->m_Initializer
 			);
@@ -444,7 +444,7 @@ CStructType::LayoutBitField (
 	size_t Offset = GetFieldOffset (AlignFactor);
 	m_pLastBitFieldType = pType;
 	m_LastBitFieldOffset = Offset;
-	
+
 	if (Offset > m_FieldActualSize)
 		InsertPadding (Offset - m_FieldActualSize);
 
@@ -471,7 +471,7 @@ CStructType::GetFieldOffset (size_t AlignFactor)
 	return Offset;
 }
 
-size_t 
+size_t
 CStructType::GetBitFieldBitOffset (
 	CType* pType,
 	size_t BitCount
@@ -480,8 +480,8 @@ CStructType::GetBitFieldBitOffset (
 	if (!m_pLastBitFieldType || m_pLastBitFieldType->GetBaseType ()->Cmp (pType) != 0)
 		return 0;
 
-	size_t LastBitOffset = 
-		m_pLastBitFieldType->GetBitOffset () + 
+	size_t LastBitOffset =
+		m_pLastBitFieldType->GetBitOffset () +
 		m_pLastBitFieldType->GetBitCount ();
 
 	return LastBitOffset + BitCount <= pType->GetSize () * 8 ? LastBitOffset : 0;

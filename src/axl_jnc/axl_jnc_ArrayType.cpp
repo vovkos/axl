@@ -10,18 +10,19 @@ namespace jnc {
 CArrayType::CArrayType ()
 {
 	m_TypeKind = EType_Array;
+	m_Flags = ETypeFlag_StructRet;
 	m_pElementType = NULL;
 	m_pElementType_i = NULL;
 	m_pRootType = NULL;
 	m_ElementCount = -1;
 }
 
-CType* 
+CType*
 CArrayType::GetRootType ()
 {
 	if (!m_pRootType)
-		m_pRootType = m_pElementType->GetTypeKind () == EType_Array ? 
-			((CArrayType*) m_pElementType)->GetRootType () :	
+		m_pRootType = m_pElementType->GetTypeKind () == EType_Array ?
+			((CArrayType*) m_pElementType)->GetRootType () :
 			m_pElementType;
 
 	return m_pRootType;
@@ -33,11 +34,11 @@ CArrayType::PrepareTypeString ()
 	rtl::CString String;
 
 	m_TypeString.Format (
-		m_ElementCount == -1 ? "%s []" : "%s [%d]", 
+		m_ElementCount == -1 ? "%s []" : "%s [%d]",
 		GetRootType ()->GetTypeString ().cc (), // thanks a lot gcc
 		m_ElementCount
 		);
-	
+
 	CType* pElementType = m_pElementType;
 	while (pElementType->GetTypeKind () == EType_Array)
 	{
@@ -60,7 +61,7 @@ CArrayType::CalcLayout ()
 	// ensure update
 
 	m_pRootType = NULL;
-	m_TypeString.Clear (); 
+	m_TypeString.Clear ();
 
 	uint_t RootTypeFlags = GetRootType ()->GetFlags ();
 	if (RootTypeFlags & ETypeFlag_Pod)

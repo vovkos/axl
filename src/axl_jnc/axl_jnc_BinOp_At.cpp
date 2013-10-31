@@ -27,14 +27,14 @@ CBinOp_At::Operator (
 
 	CValue SchedulerValue;
 	Result = m_pModule->m_OperatorMgr.CastOperator (
-		OpValue2, 
-		m_pModule->m_TypeMgr.GetStdType (EStdType_SchedulerPtr), 
+		OpValue2,
+		m_pModule->m_TypeMgr.GetStdType (EStdType_SchedulerPtr),
 		&SchedulerValue
 		);
 
 	if (!Result)
 		return false;
-	
+
 	EType OpType1 = OpValue1.GetType ()->GetTypeKind ();
 	if (OpType1 != EType_FunctionPtr && OpType1 != EType_FunctionRef)
 	{
@@ -47,15 +47,15 @@ CBinOp_At::Operator (
 	CFunction* pLauncher = m_pModule->m_FunctionMgr.GetScheduleLauncherFunction (pTargetPtrType);
 	if (!pLauncher)
 		return false;
-		
+
 	pResultValue->SetFunction (pLauncher);
 
 	CClosure* pClosure = pResultValue->CreateClosure ();
-	pClosure->GetArgList ()->InsertTail (OpValue1);
-	pClosure->GetArgList ()->InsertTail (SchedulerValue);
+	pClosure->GetArgValueList ()->InsertTail (OpValue1);
+	pClosure->GetArgValueList ()->InsertTail (SchedulerValue);
 
 	if (OpValue1.GetClosure ())
-		pClosure->Append (*OpValue1.GetClosure ()->GetArgList ());
+		pClosure->Append (*OpValue1.GetClosure ()->GetArgValueList ());
 
 	return true;
 }

@@ -30,13 +30,13 @@ public:
 		return m_PtrTypeKind;
 	}
 
-	CPropertyType* 
+	CPropertyType*
 	GetTargetType ()
 	{
 		return m_pTargetType;
 	}
 
-	CNamespace* 
+	CNamespace*
 	GetAnchorNamespace ()
 	{
 		return m_pAnchorNamespace;
@@ -54,36 +54,44 @@ public:
 	CPropertyPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
-			m_pTargetType->GetPropertyPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
-			this;			
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+			m_pTargetType->GetPropertyPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) :
+			this;
 	}
 
 	CPropertyPtrType*
 	GetUnCheckedPtrType ()
 	{
-		return (m_Flags & EPtrTypeFlag_Checked) ?  
-			m_pTargetType->GetPropertyPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) : 
-			this;			
+		return (m_Flags & EPtrTypeFlag_Checked) ?
+			m_pTargetType->GetPropertyPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Checked) :
+			this;
+	}
+
+	CPropertyPtrType*
+	GetNormalPtrType ()
+	{
+		return (m_PtrTypeKind != EPropertyPtrType_Normal) ?
+			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Normal, m_Flags) :
+			this;
 	}
 
 	CPropertyPtrType*
 	GetWeakPtrType ()
 	{
-		return (m_PtrTypeKind != EPropertyPtrType_Weak) ?  
-			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Weak, m_Flags) : 
-			this;			
+		return (m_PtrTypeKind != EPropertyPtrType_Weak) ?
+			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Weak, m_Flags) :
+			this;
 	}
 
 	CPropertyPtrType*
-	GetStrongPtrType ()
+	GetUnWeakPtrType ()
 	{
-		return (m_PtrTypeKind == EPropertyPtrType_Weak) ?  
-			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Normal, m_Flags) : 
-			this;			
+		return (m_PtrTypeKind == EPropertyPtrType_Weak) ?
+			m_pTargetType->GetPropertyPtrType (EPropertyPtrType_Normal, m_Flags) :
+			this;
 	}
 
-	CStructType* 
+	CStructType*
 	GetPropertyPtrStructType ();
 
 	static
@@ -95,23 +103,23 @@ public:
 		uint_t Flags
 		);
 
-	virtual 
+	virtual
 	void
 	EnumGcRoots (
 		CRuntime* pRuntime,
 		void* p
-		);	
+		);
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmDiType ();
 };
@@ -130,7 +138,7 @@ inline
 bool
 IsBindableType (CType* pType)
 {
-	return 
+	return
 		pType->GetTypeKind () == EType_PropertyRef &&
 		(((CPropertyPtrType*) pType)->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable) != 0;
 }

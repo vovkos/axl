@@ -17,9 +17,9 @@ COperatorMgr::GetField (
 {
 	CType* pType = OpValue.GetType ();
 
-	if (pType->GetTypeKindFlags () & ETypeKindFlag_DataPtr) 
+	if (pType->GetTypeKindFlags () & ETypeKindFlag_DataPtr)
 		pType = ((CDataPtrType*) pType)->GetTargetType ();
-	else if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr) 
+	else if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr)
 		pType = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
 
 	EType TypeKind = pType->GetTypeKind ();
@@ -54,13 +54,13 @@ COperatorMgr::GetStructField (
 
 	pCoord->m_LlvmIndexArray.Append (pField->GetLlvmIndex ());
 	pCoord->m_Offset += pField->GetOffset ();
-	
+
 	EValue OpValueKind = OpValue.GetValueKind ();
 	if (OpValueKind == EValue_Const)
 	{
 		pResultValue->CreateConst (
 			(char*) OpValue.GetConstData () + pCoord->m_Offset,
-			pField->GetType () 
+			pField->GetType ()
 			);
 
 		return true;
@@ -69,8 +69,8 @@ COperatorMgr::GetStructField (
 	if (OpValue.GetType ()->GetTypeKind () == EType_Struct)
 	{
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (
-			OpValue, 
-			pCoord->m_LlvmIndexArray, 
+			OpValue,
+			pCoord->m_LlvmIndexArray,
 			pCoord->m_LlvmIndexArray.GetCount (),
 			pField->GetType (),
 			pResultValue
@@ -87,7 +87,7 @@ COperatorMgr::GetStructField (
 	uint_t PtrTypeFlags = pOpType->GetFlags () | pField->GetPtrTypeFlags ();
 	if (pField->GetStorageKind () == EStorage_Mutable)
 		PtrTypeFlags &= ~EPtrTypeFlag_Const;
-	
+
 	CDataPtrType* pPtrType;
 	CValue PtrValue;
 
@@ -95,17 +95,17 @@ COperatorMgr::GetStructField (
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
 		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (), 
-			EType_DataRef, 
-			EDataPtrType_Thin, 
+			pField->GetParentNamespace (),
+			EType_DataRef,
+			EDataPtrType_Thin,
 			PtrTypeFlags
 			);
 
 		m_pModule->m_LlvmIrBuilder.CreateGep (
-			OpValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (), 
-			pPtrType, 
+			OpValue,
+			pCoord->m_LlvmIndexArray,
+			pCoord->m_LlvmIndexArray.GetCount (),
+			pPtrType,
 			pResultValue
 			);
 
@@ -119,17 +119,17 @@ COperatorMgr::GetStructField (
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
 
 		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (), 
-			EType_DataRef, 
-			EDataPtrType_Thin, 
+			pField->GetParentNamespace (),
+			EType_DataRef,
+			EDataPtrType_Thin,
 			PtrTypeFlags
 			);
 
 		m_pModule->m_LlvmIrBuilder.CreateGep (
-			PtrValue, 
-			pCoord->m_LlvmIndexArray, 
-			pCoord->m_LlvmIndexArray.GetCount (), 
-			pPtrType, 
+			PtrValue,
+			pCoord->m_LlvmIndexArray,
+			pCoord->m_LlvmIndexArray.GetCount (),
+			pPtrType,
 			pResultValue
 			);
 
@@ -164,7 +164,7 @@ COperatorMgr::GetUnionField (
 	uint_t PtrTypeFlags = pOpType->GetFlags () | pField->GetPtrTypeFlags ();
 	if (pField->GetStorageKind () == EStorage_Mutable)
 		PtrTypeFlags &= ~EPtrTypeFlag_Const;
-	
+
 	CDataPtrType* pPtrType;
 	CValue PtrValue;
 
@@ -172,9 +172,9 @@ COperatorMgr::GetUnionField (
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
 		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (), 
-			EType_DataRef, 
-			EDataPtrType_Thin, 
+			pField->GetParentNamespace (),
+			EType_DataRef,
+			EDataPtrType_Thin,
 			PtrTypeFlags
 			);
 
@@ -194,14 +194,14 @@ COperatorMgr::GetUnionField (
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
 
 		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (), 
-			EType_DataRef, 
-			EDataPtrType_Thin, 
+			pField->GetParentNamespace (),
+			EType_DataRef,
+			EDataPtrType_Thin,
 			PtrTypeFlags
 			);
 
 		pResultValue->SetThinDataPtr (
-			PtrValue.GetLlvmValue (), 
+			PtrValue.GetLlvmValue (),
 			pPtrType,
 			OpValue
 			);
@@ -242,9 +242,9 @@ COperatorMgr::GetClassField (
 
 	CValue PtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep (
-		OpValue, 
-		pCoord->m_LlvmIndexArray, 
-		pCoord->m_LlvmIndexArray.GetCount (), 
+		OpValue,
+		pCoord->m_LlvmIndexArray,
+		pCoord->m_LlvmIndexArray.GetCount (),
 		NULL,
 		&PtrValue
 		);
@@ -253,15 +253,15 @@ COperatorMgr::GetClassField (
 	if (pField->GetStorageKind () == EStorage_Mutable)
 		PtrTypeFlags &= ~EPtrTypeFlag_Const;
 
-	// TODO: handle dual types 
+	// TODO: handle dual types
 	// (PtrTypeFlags & EPtrTypeFlag_ReadOnly) && m_pModule->m_NamespaceMgr.GetAccessKind (pCoord->m_pType) == EAccess_Public)
 
 	if (pField->GetType ()->GetTypeKind () == EType_Class)
 	{
 		CClassPtrType* pPtrType = ((CClassType*) pField->GetType ())->GetClassPtrType (
-			pField->GetParentNamespace (), 
-			EType_ClassRef, 
-			EClassPtrType_Normal, 
+			pField->GetParentNamespace (),
+			EType_ClassRef,
+			EClassPtrType_Normal,
 			PtrTypeFlags
 			);
 
@@ -270,14 +270,14 @@ COperatorMgr::GetClassField (
 	else
 	{
 		CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (), 
-			EType_DataRef, 
-			EDataPtrType_Thin, 
+			pField->GetParentNamespace (),
+			EType_DataRef,
+			EDataPtrType_Thin,
 			PtrTypeFlags
 			);
 
 		pResultValue->SetThinDataPtr (
-			PtrValue.GetLlvmValue (), 
+			PtrValue.GetLlvmValue (),
 			pPtrType,
 			OpValue,
 			PtrValue,
@@ -305,7 +305,7 @@ COperatorMgr::GetPropertyField (
 	CClosure* pClosure = OpValue.GetClosure ();
 	ASSERT (pClosure);
 
-	CValue ParentValue = *pClosure->GetArgList ()->GetHead ();
+	CValue ParentValue = *pClosure->GetArgValueList ()->GetHead ();
 	return GetField (ParentValue, (CStructField*) pMember, pResultValue);
 }
 
@@ -322,7 +322,7 @@ COperatorMgr::GetPropertyField (
 {
 	if (!pProperty->GetParentType ())
 		return GetClassField (
-			pProperty->GetStaticDataVariable (), 
+			pProperty->GetStaticDataVariable (),
 			pField,
 			pCoord,
 			pResultValue
@@ -332,7 +332,7 @@ COperatorMgr::GetPropertyField (
 	if (!ThisValue)
 	{
 		err::SetFormatStringError (
-			"function '%s' has no 'this' pointer", 
+			"function '%s' has no 'this' pointer",
 			m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
 			);
 		return false;
@@ -341,8 +341,8 @@ COperatorMgr::GetPropertyField (
 	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
 		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
 
-	CValue FieldValue;	
-	return 
+	CValue FieldValue;
+	return
 		GetClassField (ThisValue, pProperty->GetParentTypeField (),  NULL, &FieldValue) &&
 		GetClassField (FieldValue, pField, pCoord, pResultValue);
 }
@@ -350,7 +350,7 @@ COperatorMgr::GetPropertyField (
 bool
 COperatorMgr::GetPropertyField (
 	CProperty* pProperty,
-	CClosure* pClosure, 
+	CClosure* pClosure,
 	CStructField* pField,
 	CBaseTypeCoord* pCoord,
 	CValue* pResultValue
@@ -358,7 +358,7 @@ COperatorMgr::GetPropertyField (
 {
 	if (!pProperty->GetParentType ())
 		return GetClassField (
-			pProperty->GetStaticDataVariable (), 
+			pProperty->GetStaticDataVariable (),
 			pField,
 			pCoord,
 			pResultValue
@@ -368,7 +368,7 @@ COperatorMgr::GetPropertyField (
 	if (!ThisValue)
 	{
 		err::SetFormatStringError (
-			"function '%s' has no 'this' pointer", 
+			"function '%s' has no 'this' pointer",
 			m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
 			);
 		return false;
@@ -377,8 +377,8 @@ COperatorMgr::GetPropertyField (
 	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
 		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
 
-	CValue FieldValue;	
-	return 
+	CValue FieldValue;
+	return
 		GetClassField (ThisValue, pProperty->GetParentTypeField (),  NULL, &FieldValue) &&
 		GetClassField (FieldValue, pField, pCoord, pResultValue);
 }

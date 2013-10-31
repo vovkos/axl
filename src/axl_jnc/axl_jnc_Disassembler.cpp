@@ -7,11 +7,11 @@ namespace jnc {
 
 //.............................................................................
 
-static 
-int 
+static
+int
 ByteReader (
-	uint8_t* pByte, 
-	uint64_t Offset, 
+	uint8_t* pByte,
+	uint64_t Offset,
 	void* pContext
 	)
 {
@@ -28,19 +28,27 @@ ByteReader (
 
 CDisassembler::CDisassembler ()
 {
-	m_pDisassembler = llvm::EDDisassembler::getDisassembler (
+	m_pDisassembler = NULL;
+
+/*	llvm::Target* pTarget = NULL; // get target!
+
+	m_pDisassembler = pTarget->createMCDisassembler ();
+
+
+
 #if (_AXL_CPU == AXL_CPU_X86)
 		llvm::Triple::x86,
 #elif (_AXL_CPU == AXL_CPU_AMD64)
 		llvm::Triple::x86_64,
 #endif
-		llvm::EDDisassembler::kEDAssemblySyntaxX86ATT 
+		llvm::EDDisassembler::kEDAssemblySyntaxX86ATT
 		// llvm::EDDisassembler::kEDAssemblySyntaxX86Intel -- does not work!
 		);
-	ASSERT (m_pDisassembler);
+
+	ASSERT (m_pDisassembler); */
 }
 
-bool 
+bool
 CDisassembler::Disassemble (
 	const void* pCode,
 	size_t Size,
@@ -49,11 +57,11 @@ CDisassembler::Disassemble (
 {
 	if (!m_pDisassembler)
 		return false;
-
+/*
 	mem::TBlock Block ((void*) pCode, Size);
-	
+
 	size_t Address = 0;
-	while (Address < Size) 
+	while (Address < Size)
 	{
 		llvm::EDInst* pInst = m_pDisassembler->createInst (ByteReader, Address, &Block);
 		if (!pInst)
@@ -81,7 +89,7 @@ CDisassembler::Disassemble (
 		Address += (size_t) pInst->byteSize ();
 		delete pInst;
 	}
-
+*/
 	return true;
 }
 

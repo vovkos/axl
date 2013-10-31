@@ -15,16 +15,16 @@ BEGIN_MESSAGE_MAP(CDasmPane, CDockablePane)
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-int CDasmPane::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+int CDasmPane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	VERIFY(m_LogCtrl.Create(
 		WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL |
-		ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 
+		ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
 		CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST));
-	
+
 	m_LogCtrl.ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 	m_LogCtrl.SetFont (&theApp.m_Font);
 
@@ -33,7 +33,7 @@ int CDasmPane::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-void CDasmPane::OnSize(UINT nType, int cx, int cy) 
+void CDasmPane::OnSize(UINT nType, int cx, int cy)
 {
 	m_LogCtrl.MoveWindow(0, 0, cx, cy);
 }
@@ -49,13 +49,13 @@ CDasmPane::Build (jnc::CModule* pModule)
 		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
 			continue;
 
-		jnc::CFunctionType* pFunctionType = Function->GetType (); 
+		jnc::CFunctionType* pFunctionType = Function->GetType ();
 
 		m_LogCtrl.Trace (
-			"%s %s %s %s\r\n", 
+			"%s %s %s %s\r\n",
 			pFunctionType->GetReturnType ()->GetTypeString (),
-			jnc::GetCallConvString (pFunctionType->GetCallConv ()),
-			Function->m_Tag, 
+			pFunctionType->GetCallConv ()->GetCallConvString (),
+			Function->m_Tag,
 			pFunctionType->GetArgString ()
 			);
 
@@ -67,7 +67,7 @@ CDasmPane::Build (jnc::CModule* pModule)
 			rtl::CString s = Dasm.Disassemble (pf, Size).cc ();
 			m_LogCtrl.Trace ("\r\n%s", s);
 		}
-		
+
 
 		m_LogCtrl.Trace ("\r\n........................................\r\n\r\n");
 	}

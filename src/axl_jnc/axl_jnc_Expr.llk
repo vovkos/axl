@@ -644,7 +644,7 @@ type_name_w_constructor_rslv
 new_operator_curly_initializer <CValue* $pValue>
 	enter
 	{
-		m_CurlyInitializerTargetValue = *$pValue;
+		return m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, *$pValue, &m_CurlyInitializerTargetValue);
 	}
 	:	curly_initializer
 	;

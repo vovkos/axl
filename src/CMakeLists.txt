@@ -14,25 +14,14 @@ include (CMakeUtils)
 
 #..............................................................................
 #
-# Target CPU
-#
-
-# set (TARGET_CPU "x86")
-
-if (NOT TARGET_CPU)
-	detect_cpu (TARGET_CPU)
-endif ()
-
-message (STATUS "Target CPU:                 ${TARGET_CPU}")
-
-#..............................................................................
-#
 # Standard settings
 #
 
 include (CMakeStdSettings)
 
 create_std_settings ()
+
+message (STATUS "Target CPU:                 ${TARGET_CPU}")
 
 if (NOT MSVC)
 	message (STATUS "Build type:                 ${CMAKE_BUILD_TYPE}")
@@ -73,6 +62,11 @@ include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
 
 if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")
 	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
+
+	unset (Qt5Core_DIR    CACHE)
+	unset (Qt5Gui_DIR     CACHE)
+	unset (Qt5Widgets_DIR CACHE)
+
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
 	set (QT_FOUND true)
@@ -214,11 +208,9 @@ set (AXL_PG_FRAME_DIR ${AXL_ROOT_DIR}/pgframe)
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
-set (VIRTUAL_FOLDER_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
-
-file (REMOVE_RECURSE ${VIRTUAL_FOLDER_ROOT_DIR})
-
 include_directories (${AXL_INC_DIR})
+
+root_virtual_folder (${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
 
 #
 # add targets

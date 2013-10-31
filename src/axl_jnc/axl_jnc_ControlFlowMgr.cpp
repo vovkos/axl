@@ -79,6 +79,26 @@ CControlFlowMgr::AddBlock (CBasicBlock* pBlock)
 	pBlock->m_pFunction = pFunction;
 }
 
+void
+CControlFlowMgr::DeleteUnreachableBlocks ()
+{
+	rtl::CIteratorT <CBasicBlock> It = m_BlockList.GetHead ();
+	while (It)
+	{
+		if (It->m_Flags & EBasicBlockFlag_Reachable)
+		{
+			It++;
+			continue;
+		}
+
+		CBasicBlock* pBlock = *It;
+		It++;
+
+		pBlock->m_pLlvmBlock->eraseFromParent ();
+		m_BlockList.Delete (pBlock);
+	}
+}
+
 CBasicBlock*
 CControlFlowMgr::GetUnreachableBlock ()
 {
@@ -280,12 +300,7 @@ CControlFlowMgr::Return (
 		}
 		else
 		{
-			CVariable* pVariable = m_pModule->m_VariableMgr.CreateVariable (
-				EStorage_Stack,
-				"savedReturnValue",
-				"savedReturnValue",
-				pReturnType
-				);
+			CVariable* pVariable = m_pModule->m_VariableMgr.CreateStackVariable ("savedReturnValue", pReturnType);
 
 			m_pModule->m_VariableMgr.AllocatePrimeInitializeVariable (pVariable);
 			m_pModule->m_OperatorMgr.StoreDataRef (pVariable, ReturnValue);
@@ -294,7 +309,8 @@ CControlFlowMgr::Return (
 		}
 
 		RestoreScopeLevel ();
-		m_pModule->m_LlvmIrBuilder.CreateRet (ReturnValue);
+
+		pFunctionType->GetCallConv ()->Return (pFunction, ReturnValue);
 	}
 
 	m_Flags |= EControlFlowFlag_HasReturn;

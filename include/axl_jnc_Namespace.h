@@ -60,21 +60,21 @@ protected:
 	ENamespace m_NamespaceKind;
 	EAccess m_CurrentAccessKind;
 
-	rtl::CArrayT <CModuleItem*> m_ItemArray; 
-	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap; 
-	rtl::CStringHashTable m_FriendSet; 
-	rtl::CStringHashTableMapT <TDualPtrTypeTuple*> m_DualPtrTypeTupleMap; 
+	rtl::CArrayT <CModuleItem*> m_ItemArray;
+	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap;
+	rtl::CStringHashTable m_FriendSet;
+	rtl::CStringHashTableMapT <TDualPtrTypeTuple*> m_DualPtrTypeTupleMap;
 
 public:
 	CNamespace ();
 
-	ENamespace 
+	ENamespace
 	GetNamespaceKind ()
 	{
 		return m_NamespaceKind;
 	}
 
-	EAccess 
+	EAccess
 	GetCurrentAccessKind ()
 	{
 		return m_CurrentAccessKind;
@@ -150,7 +150,7 @@ public:
 	bool
 	AddFunction (CFunction* pFunction);
 
-	size_t 
+	size_t
 	GetItemCount ()
 	{
 		return m_ItemArray.GetCount ();
@@ -187,7 +187,14 @@ protected:
 
 //.............................................................................
 
-class CGlobalNamespace: 
+enum EGlobalNamespaceFlag
+{
+	EGlobalNamespaceFlag_Sealed = 0x0100
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CGlobalNamespace:
 	public CModuleItem,
 	public CNamespace
 {

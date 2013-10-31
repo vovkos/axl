@@ -6,6 +6,35 @@ project_virtual_folder (axl_jnc)
 
 #..............................................................................
 #
+# callconv folder
+#
+
+set (
+	CALLCONV_H_LIST
+	${AXL_INC_DIR}/axl_jnc_CallConv.h
+	${AXL_INC_DIR}/axl_jnc_CallConv_gcc32.h
+	${AXL_INC_DIR}/axl_jnc_CallConv_msc.h
+	${AXL_INC_DIR}/axl_jnc_CdeclCallConv_gcc64.h
+	${AXL_INC_DIR}/axl_jnc_JnccallCallConv.h
+	)
+
+set (
+	CALLCONV_CPP_LIST
+	axl_jnc_CallConv.cpp
+	axl_jnc_CallConv_gcc32.cpp
+	axl_jnc_CallConv_msc.cpp
+	axl_jnc_CdeclCallConv_gcc64.cpp
+	axl_jnc_JnccallCallConv.cpp
+	)
+
+source_virtual_folder (
+	callconv
+	${CALLCONV_H_LIST}
+	${CALLCONV_CPP_LIST}
+	)
+
+#..............................................................................
+#
 # controlflow folder
 #
 
@@ -445,6 +474,8 @@ include_directories (
 
 add_library (
 	axl_jnc
+	${CALLCONV_H_LIST}
+	${CALLCONV_CPP_LIST}
 	${CONTROLFLOW_H_LIST}
 	${CONTROLFLOW_CPP_LIST}
 	${FUNCTION_H_LIST}

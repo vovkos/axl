@@ -26,10 +26,10 @@ CType*
 COperatorMgr::GetFunctionType (
 	const CValue& OpValue,
 	CFunctionType* pFunctionType
-	)	
+	)
 {
 	CFunctionPtrType* pFunctionPtrType = pFunctionType->GetFunctionPtrType (
-		EType_FunctionRef, 
+		EType_FunctionRef,
 		EFunctionPtrType_Thin
 		);
 
@@ -37,13 +37,13 @@ COperatorMgr::GetFunctionType (
 	if (!pClosure)
 		return pFunctionPtrType;
 
-	return GetClosureOperatorResultType (pFunctionPtrType, pClosure->GetArgList ());
+	return GetClosureOperatorResultType (pFunctionPtrType, pClosure->GetArgValueList ());
 }
 
 CType*
 COperatorMgr::GetClosureOperatorResultType (
 	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList
+	rtl::CBoxListT <CValue>* pArgValueList
 	)
 {
 	CValue OpValue;
@@ -55,25 +55,25 @@ COperatorMgr::GetClosureOperatorResultType (
 	if (TypeKind != EType_FunctionRef && TypeKind != EType_FunctionPtr)
 	{
 		err::SetFormatStringError (
-			"closure operator cannot be applied to '%s'", 
+			"closure operator cannot be applied to '%s'",
 			OpValue.GetType ()->GetTypeString ().cc () // thanks a lot gcc
 			);
 		return NULL;
 	}
 
 	ref::CPtrT <CClosure> Closure = AXL_REF_NEW (CClosure);
-	Closure->Append (*pArgList);
+	Closure->Append (*pArgValueList);
 	return Closure->GetClosureType (OpValue.GetType ());
 }
 
 bool
 COperatorMgr::GetClosureOperatorResultType (
 	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList,
+	rtl::CBoxListT <CValue>* pArgValueList,
 	CValue* pResultValue
 	)
 {
-	CType* pResultType = GetClosureOperatorResultType (RawOpValue, pArgList);
+	CType* pResultType = GetClosureOperatorResultType (RawOpValue, pArgValueList);
 	if (!pResultType)
 		return false;
 
@@ -84,7 +84,7 @@ COperatorMgr::GetClosureOperatorResultType (
 bool
 COperatorMgr::ClosureOperator (
 	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList,
+	rtl::CBoxListT <CValue>* pArgValueList,
 	CValue* pResultValue
 	)
 {
@@ -97,19 +97,19 @@ COperatorMgr::ClosureOperator (
 	if (TypeKind != EType_FunctionRef && TypeKind != EType_FunctionPtr)
 	{
 		err::SetFormatStringError (
-			"closure operator cannot be applied to '%s'", 
+			"closure operator cannot be applied to '%s'",
 			OpValue.GetType ()->GetTypeString ().cc ()
 			);
 		return false;
 	}
 
 	*pResultValue = OpValue;
-	
+
 	CClosure* pClosure = pResultValue->GetClosure ();
 	if (!pClosure)
 		pClosure = pResultValue->CreateClosure ();
 
-	pClosure->Append (*pArgList);
+	pClosure->Append (*pArgValueList);
 	return true;
 }
 
@@ -119,7 +119,7 @@ COperatorMgr::GetUnsafeVarArgType (CType* pType)
 	for (;;)
 	{
 		CType* pPrevType = pType;
-		
+
 		EType TypeKind = pType->GetTypeKind ();
 		switch (TypeKind)
 		{
@@ -168,7 +168,7 @@ COperatorMgr::GetUnsafeVarArgType (CType* pType)
 CType*
 COperatorMgr::GetCallOperatorResultType (
 	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList
+	rtl::CBoxListT <CValue>* pArgValueList
 	)
 {
 	bool Result;
@@ -186,7 +186,7 @@ COperatorMgr::GetCallOperatorResultType (
 		}
 
 		CValue ObjValue = OpValue;
-		
+
 		OpValue.SetFunctionTypeOverload (pCallOperator->GetTypeOverload ());
 		OpValue.InsertToClosureTail (ObjValue);
 	}
@@ -194,23 +194,23 @@ COperatorMgr::GetCallOperatorResultType (
 	ref::CPtrT <CClosure> Closure = OpValue.GetClosure ();
 	if (Closure)
 	{
-		Result = Closure->Apply (pArgList);
+		Result = Closure->Apply (pArgValueList);
 		if (!Result)
 			return NULL;
 	}
 
 	if (RawOpValue.GetValueKind () == EValue_FunctionTypeOverload)
 	{
-		size_t i = RawOpValue.GetFunctionTypeOverload ()->ChooseOverload (*pArgList);
+		size_t i = RawOpValue.GetFunctionTypeOverload ()->ChooseOverload (*pArgValueList);
 		if (i == -1)
 			return NULL;
 
 		CFunctionType* pFunctionType = RawOpValue.GetFunctionTypeOverload ()->GetOverload (i);
 		return pFunctionType->GetReturnType ();
 	}
-		
+
 	CFunctionType* pFunctionType;
-		
+
 	CType* pOpType = OpValue.GetType ();
 	EType TypeKind = pOpType->GetTypeKind ();
 
@@ -236,11 +236,11 @@ COperatorMgr::GetCallOperatorResultType (
 bool
 COperatorMgr::GetCallOperatorResultType (
 	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList,
+	rtl::CBoxListT <CValue>* pArgValueList,
 	CValue* pResultValue
 	)
 {
-	CType* pResultType = GetCallOperatorResultType (RawOpValue, pArgList);
+	CType* pResultType = GetCallOperatorResultType (RawOpValue, pArgValueList);
 	if (!pResultType)
 		return false;
 
@@ -251,7 +251,7 @@ COperatorMgr::GetCallOperatorResultType (
 bool
 COperatorMgr::CallOperator (
 	const CValue& RawOpValue,
-	rtl::CBoxListT <CValue>* pArgList,
+	rtl::CBoxListT <CValue>* pArgValueList,
 	CValue* pResultValue
 	)
 {
@@ -259,13 +259,13 @@ COperatorMgr::CallOperator (
 
 	CValue OpValue;
 	CValue UnusedReturnValue;
-	rtl::CBoxListT <CValue> EmptyArgList;
+	rtl::CBoxListT <CValue> EmptyArgValueList;
 
 	if (!pResultValue)
 		pResultValue = &UnusedReturnValue;
 
-	if (!pArgList)
-		pArgList = &EmptyArgList;
+	if (!pArgValueList)
+		pArgValueList = &EmptyArgValueList;
 
 	Result = PrepareOperand (RawOpValue, &OpValue, 0);
 	if (!Result)
@@ -289,7 +289,7 @@ COperatorMgr::CallOperator (
 		}
 
 		CValue ObjValue = OpValue;
-		
+
 		OpValue.SetFunction (pCallOperator);
 		OpValue.InsertToClosureTail (ObjValue);
 	}
@@ -297,14 +297,14 @@ COperatorMgr::CallOperator (
 	ref::CPtrT <CClosure> Closure = OpValue.GetClosure ();
 	if (Closure)
 	{
-		Result = Closure->Apply (pArgList);
+		Result = Closure->Apply (pArgValueList);
 		if (!Result)
 			return false;
 	}
 
 	if (OpValue.GetValueKind () == EValue_Function && OpValue.GetFunction ()->IsOverloaded ())
 	{
-		CFunction* pFunction = OpValue.GetFunction ()->ChooseOverload (*pArgList);
+		CFunction* pFunction = OpValue.GetFunction ()->ChooseOverload (*pArgValueList);
 		if (!pFunction)
 			return false;
 
@@ -323,11 +323,11 @@ COperatorMgr::CallOperator (
 				return false;
 		}
 
-		return CallImpl (OpValue, pFunction->GetType (), pArgList, pResultValue);
+		return CallImpl (OpValue, pFunction->GetType (), pArgValueList, pResultValue);
 	}
 
 	CType* pOpType = OpValue.GetType ();
-	if (!(pOpType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr) || 
+	if (!(pOpType->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr) ||
 		((CFunctionPtrType*) pOpType)->GetPtrTypeKind () == EFunctionPtrType_Weak)
 	{
 		err::SetFormatStringError ("cannot call '%s'", pOpType->GetTypeString ().cc ());
@@ -335,9 +335,9 @@ COperatorMgr::CallOperator (
 	}
 
 	CFunctionPtrType* pFunctionPtrType = ((CFunctionPtrType*) pOpType);
-	return pFunctionPtrType->HasClosure () ? 
-		CallClosureFunctionPtr (OpValue, pArgList, pResultValue) : 
-		CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgList, pResultValue);
+	return pFunctionPtrType->HasClosure () ?
+		CallClosureFunctionPtr (OpValue, pArgValueList, pResultValue) :
+		CallImpl (OpValue, pFunctionPtrType->GetTargetType (), pArgValueList, pResultValue);
 }
 
 bool
@@ -353,14 +353,14 @@ COperatorMgr::CalcScopeLevelValue (
 	}
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "calc scope level value");
-	 
+
 	CValue ScopeBaseLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
 	CValue ScopeIncValue (pScope->GetLevel (), EType_SizeT);
 
 	m_pModule->m_LlvmIrBuilder.CreateAdd_i (
-		ScopeBaseLevelValue, 
-		ScopeIncValue, 
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
+		ScopeBaseLevelValue,
+		ScopeIncValue,
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		pScopeLevelValue
 		);
 
@@ -368,10 +368,9 @@ COperatorMgr::CalcScopeLevelValue (
 }
 
 bool
-COperatorMgr::CastArgList (
+COperatorMgr::CastArgValueList (
 	CFunctionType* pFunctionType,
-	rtl::CBoxListT <CValue>* pArgList,
-	rtl::CArrayT <CValue>* pArgArray
+	rtl::CBoxListT <CValue>* pArgValueList
 	)
 {
 	bool Result;
@@ -379,10 +378,10 @@ COperatorMgr::CastArgList (
 	rtl::CArrayT <CFunctionArg*> ArgArray = pFunctionType->GetArgArray ();
 
 	size_t FormalArgCount = ArgArray.GetCount ();
-	size_t ActualArgCount = pArgList->GetCount ();
+	size_t ActualArgCount = pArgValueList->GetCount ();
 
 	bool IsVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg) != 0;
-	bool IsUnsafeVarArg = (pFunctionType->GetFlags () & EFunctionTypeFlag_UnsafeVarArg) != 0;
+	bool IsUnsafeVarArg = (pFunctionType->GetCallConv ()->GetFlags () & ECallConvFlag_UnsafeVarArg) != 0;
 
 	size_t CommonArgCount;
 
@@ -400,17 +399,14 @@ COperatorMgr::CastArgList (
 		return false;
 	}
 
-	pArgArray->Clear ();
-	pArgArray->Reserve (ActualArgCount);
-	
 	size_t i = 0;
-	rtl::CBoxIteratorT <CValue> Arg = pArgList->GetHead ();
+	rtl::CBoxIteratorT <CValue> ArgValueIt = pArgValueList->GetHead ();
 
 	// common for both formal and actual
 
-	for (; i < CommonArgCount; Arg++, i++)
+	for (; i < CommonArgCount; ArgValueIt++, i++)
 	{
-		CValue ArgValue = *Arg;
+		CValue ArgValue = *ArgValueIt;
 
 		CFunctionArg* pArg = ArgArray [i];
 		if (ArgValue.IsEmpty ())
@@ -419,8 +415,8 @@ COperatorMgr::CastArgList (
 			if (Initializer.IsEmpty ())
 			{
 				err::SetFormatStringError (
-					"argument (%d) of '%s' has no default value", 
-					i + 1, 
+					"argument (%d) of '%s' has no default value",
+					i + 1,
 					pFunctionType->GetTypeString ().cc ()
 					);
 				return false;
@@ -432,16 +428,13 @@ COperatorMgr::CastArgList (
 		}
 
 		CType* pFormalArgType = pArg->GetType ();
-	
-		CValue ArgCast;
-		Result = 
+
+		Result =
 			CheckCastKind (ArgValue, pFormalArgType) &&
-			CastOperator (ArgValue, pFormalArgType, &ArgCast);
+			CastOperator (ArgValue, pFormalArgType, &*ArgValueIt); // store it in the same list entry
 
 		if (!Result)
 			return false;
-
-		pArgArray->Append (ArgCast);
 	}
 
 	// default formal arguments
@@ -455,8 +448,8 @@ COperatorMgr::CastArgList (
 		if (Initializer.IsEmpty ())
 		{
 			err::SetFormatStringError (
-				"argument (%d) of '%s' has no default value", 
-				i + 1, 
+				"argument (%d) of '%s' has no default value",
+				i + 1,
 				pFunctionType->GetTypeString ().cc ()
 				);
 			return false;
@@ -467,37 +460,43 @@ COperatorMgr::CastArgList (
 			return false;
 
 		CType* pFormalArgType = pArg->GetType ();
-	
-		CValue ArgCast;
-		Result = 
+
+		Result =
 			CheckCastKind (ArgValue, pFormalArgType) &&
-			CastOperator (ArgValue, pFormalArgType, &ArgCast);
+			CastOperator (&ArgValue, pFormalArgType);
 
 		if (!Result)
 			return false;
 
-		pArgArray->Append (ArgCast);
+		pArgValueList->InsertTail (ArgValue);
 	}
+
+	if (!IsVarArg)
+		return true;
 
 	// vararg arguments
 
-	for (; Arg; Arg++)
+	if (!IsUnsafeVarArg)
 	{
-		if (Arg->IsEmpty ())
+		err::SetFormatStringError ("only 'cdecl' vararg is currently supported");
+		return false;
+	}
+
+	for (; ArgValueIt; ArgValueIt++)
+	{
+		CValue ArgValue = *ArgValueIt;
+
+		if (ArgValue.IsEmpty ())
 		{
 			err::SetFormatStringError ("vararg arguments cannot be skipped");
 			return false;
 		}
-		
-		ASSERT (IsUnsafeVarArg);
-		CType* pFormalArgType = GetUnsafeVarArgType (Arg->GetType ());
 
-		CValue ArgCast;
-		Result = CastOperator (*Arg, pFormalArgType, &ArgCast);
+		CType* pFormalArgType = GetUnsafeVarArgType (ArgValue.GetType ());
+
+		Result = CastOperator (ArgValue, pFormalArgType, &*ArgValueIt); // store it in the same list entry
 		if (!Result)
 			return false;
-
-		pArgArray->Append (ArgCast);
 	}
 
 	return true;
@@ -506,7 +505,7 @@ COperatorMgr::CastArgList (
 bool
 COperatorMgr::CallClosureFunctionPtr (
 	const CValue& OpValue,
-	rtl::CBoxListT <CValue>* pArgList,
+	rtl::CBoxListT <CValue>* pArgValueList,
 	CValue* pResultValue
 	)
 {
@@ -517,28 +516,25 @@ COperatorMgr::CallClosureFunctionPtr (
 	CFunctionType* pAbstractMethodType = pFunctionType->GetStdObjectMemberMethodType ();
 
 	CheckFunctionPtrNull (OpValue);
-	
+
 	CValue PfnValue;
 	CValue IfaceValue;
 	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, pAbstractMethodType->GetFunctionPtrType (EFunctionPtrType_Thin), &PfnValue);
 	m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 1, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
-	pArgList->InsertHead (IfaceValue);
+	pArgValueList->InsertHead (IfaceValue);
 
-	return CallImpl (PfnValue, pAbstractMethodType, pArgList, pResultValue);
+	return CallImpl (PfnValue, pAbstractMethodType, pArgValueList, pResultValue);
 }
 
 bool
 COperatorMgr::CallImpl (
 	const CValue& PfnValue,
 	CFunctionType* pFunctionType,
-	rtl::CBoxListT <CValue>* pArgList,
+	rtl::CBoxListT <CValue>* pArgValueList,
 	CValue* pResultValue
 	)
 {
-	char Buffer [256];
-	rtl::CArrayT <CValue> ArgArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-
-	bool Result = CastArgList (pFunctionType, pArgList, &ArgArray);
+	bool Result = CastArgValueList (pFunctionType, pArgValueList);
 	if (!Result)
 		return false;
 
@@ -555,15 +551,14 @@ COperatorMgr::CallImpl (
 
 	GcSafePoint ();
 
-	m_pModule->m_LlvmIrBuilder.CreateCall (
+	pFunctionType->GetCallConv ()->Call (
 		PfnValue,
 		pFunctionType,
-		ArgArray,
-		ArgArray.GetCount (),
+		pArgValueList,
 		pResultValue
 		);
 
-	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) && 
+	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) &&
 		!m_pModule->m_ControlFlowMgr.IsThrowLocked ())
 	{
 		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();

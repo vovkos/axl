@@ -89,15 +89,15 @@ CCast_PropertyPtr_FromDataPtr::LlvmCast_FullClosure (
 {
 	CValue ClosureValue;
 	bool Result = m_pModule->m_OperatorMgr.CreateDataClosureObject (
-		StorageKind, 
-		OpValue, 
+		StorageKind,
+		OpValue,
 		pDstPtrType->GetTargetType (),
 		&ClosureValue
 		);
 
 	if (!Result)
 		return false;
-	
+
 	ASSERT (IsClassPtrType (ClosureValue.GetType (), EClassType_PropertyClosure));
 
 	CPropertyClosureClassType* pClosureType = (CPropertyClosureClassType*) ((CClassPtrType*) ClosureValue.GetType ())->GetTargetType ();
@@ -128,7 +128,7 @@ CCast_PropertyPtr_Base::GetCastKind (
 	}
 
 	return m_pModule->m_OperatorMgr.GetPropertyCastKind (
-		pSrcPtrType->GetTargetType (), 
+		pSrcPtrType->GetTargetType (),
 		pDstPtrType->GetTargetType ()
 		);
 }
@@ -147,7 +147,7 @@ CCast_PropertyPtr_FromFat::LlvmCast (
 
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();
-	
+
 	CPropertyPtrType* pThinPtrType = pSrcPropertyType->GetStdObjectMemberPropertyType ()->GetPropertyPtrType (EPropertyPtrType_Thin);
 
 	CValue PfnValue;
@@ -172,31 +172,31 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast (
 	)
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyPtr && pType->GetTypeKind () == EType_PropertyPtr);
-	
+
 	CPropertyPtrType* pSrcPtrType = (CPropertyPtrType*) OpValue.GetType ();
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
 
-	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();	
+	CPropertyType* pSrcPropertyType = pSrcPtrType->GetTargetType ();
 	CPropertyType* pDstPropertyType = pDstPtrType->GetTargetType ();
 
 	CClosure* pClosure = OpValue.GetClosure ();
-	
+
 	CValue SimpleClosureObjValue;
-	
+
 	bool IsSimpleClosure = pClosure && pClosure->IsSimpleClosure ();
 	if (IsSimpleClosure)
-		SimpleClosureObjValue = *pClosure->GetArgList ()->GetHead ();
+		SimpleClosureObjValue = *pClosure->GetArgValueList ()->GetHead ();
 
 	// case 1: no conversion required, no closure object needs to be created
 
-	if (IsSimpleClosure && 
+	if (IsSimpleClosure &&
 		pSrcPropertyType->IsMemberPropertyType () &&
 		pSrcPropertyType->GetShortType ()->Cmp (pDstPropertyType) == 0)
 	{
 		return LlvmCast_NoThunkSimpleClosure (
 			OpValue,
 			SimpleClosureObjValue,
-			pSrcPropertyType, 
+			pSrcPropertyType,
 			pDstPtrType,
 			pResultValue
 			);
@@ -207,8 +207,8 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast (
 		CProperty* pProperty = OpValue.GetProperty ();
 
 		// case 2.1: conversion is required, but no closure object needs to be created (closure arg is null)
-		
-		if (!pClosure) 			
+
+		if (!pClosure)
 			return LlvmCast_DirectThunkNoClosure (
 				pProperty,
 				pDstPtrType,
@@ -234,7 +234,7 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast (
 		pSrcPropertyType,
 		pDstPtrType,
 		pResultValue
-		); 
+		);
 }
 
 bool
@@ -268,13 +268,13 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast_DirectThunkNoClosure (
 	)
 {
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (
-		pProperty, 
+		pProperty,
 		((CPropertyPtrType*) pDstPtrType)->GetTargetType (),
 		true
 		);
 
 	CValue NullValue = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr)->GetZeroValue ();
-	
+
 	return CreateClosurePropertyPtr (pThunkProperty, NullValue, pDstPtrType, pResultValue);
 }
 
@@ -295,7 +295,7 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast_DirectThunkSimpleClosure (
 		return false;
 
 	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.GetDirectThunkProperty (
-		pProperty, 
+		pProperty,
 		m_pModule->m_TypeMgr.GetMemberPropertyType (pThisTargetType, pDstPtrType->GetTargetType ())
 		);
 
@@ -313,9 +313,9 @@ CCast_PropertyPtr_Thin2Fat::LlvmCast_FullClosure (
 {
 	CValue ClosureValue;
 	bool Result = m_pModule->m_OperatorMgr.CreateClosureObject (
-		StorageKind, 
-		OpValue, 
-		pDstPtrType->GetTargetType (), 
+		StorageKind,
+		OpValue,
+		pDstPtrType->GetTargetType (),
 		pDstPtrType->GetPtrTypeKind () == EPropertyPtrType_Weak,
 		&ClosureValue
 		);
@@ -392,7 +392,7 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pDeadBlock);
 	m_pModule->m_ControlFlowMgr.Follow (pPhiBlock);
 
-	CValue ValueArray [3] = 
+	CValue ValueArray [3] =
 	{
 		OpValue,
 		OpValue,
@@ -409,7 +409,7 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 	CValue IntermediateValue;
 	m_pModule->m_LlvmIrBuilder.CreatePhi (ValueArray, BlockArray, 3, &IntermediateValue);
 
-	CPropertyPtrType* pIntermediateType = ((CPropertyPtrType*) OpValue.GetType ())->GetStrongPtrType ();
+	CPropertyPtrType* pIntermediateType = ((CPropertyPtrType*) OpValue.GetType ())->GetUnWeakPtrType ();
 	IntermediateValue.OverrideType (pIntermediateType);
 	return m_pModule->m_OperatorMgr.CastOperator (IntermediateValue, pType, pResultValue);}
 
@@ -507,7 +507,7 @@ CCast_PropertyPtr::GetCastOperator (
 	CType* pType
 	)
 {
-	ASSERT (pType->GetTypeKind () == EType_PropertyPtr);	
+	ASSERT (pType->GetTypeKind () == EType_PropertyPtr);
 
 	CPropertyPtrType* pDstPtrType = (CPropertyPtrType*) pType;
 	EPropertyPtrType DstPtrTypeKind = pDstPtrType->GetPtrTypeKind ();
@@ -528,11 +528,11 @@ CCast_PropertyPtr::GetCastOperator (
 		}
 
 	default:
-		return 
-			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Integer) && 
+		return
+			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Integer) &&
 			DstPtrTypeKind == EPropertyPtrType_Thin &&
 			(pType->GetFlags () & EPtrTypeFlag_Unsafe) ?
-				m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
+				m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) :
 				NULL;
 	};
 }
@@ -570,7 +570,7 @@ CCast_PropertyRef::LlvmCast (
 	)
 {
 	ASSERT (pType->GetTypeKind () == EType_PropertyRef);
-	
+
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) pType;
 	CPropertyPtrType* pIntermediateType = pPtrType->GetTargetType ()->GetPropertyPtrType (
 		EType_PropertyPtr,

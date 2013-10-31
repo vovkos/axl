@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "axl_jnc_CallConv.h"
 #include "axl_jnc_FunctionArg.h"
 
 namespace axl {
@@ -22,48 +23,9 @@ struct TFunctionPtrTypeTuple;
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_VarArg       = 0x010000,
-	EFunctionTypeFlag_UnsafeVarArg = 0x020000,
-	EFunctionTypeFlag_Pitcher      = 0x040000,
+	EFunctionTypeFlag_VarArg    = 0x010000,
+	EFunctionTypeFlag_Pitcher   = 0x020000,
 };
-
-//.............................................................................
-
-enum ECallConv
-{
-	ECallConv_Cdecl = 0,
-	ECallConv_Stdcall,
-	ECallConv__Count,
-
-	ECallConv_Default = ECallConv_Cdecl,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const char*
-GetCallConvString (ECallConv CallConv);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-ECallConv
-GetCallConvFromModifiers (uint_t Modifiers)
-{
-	return 
-		(Modifiers & ETypeModifier_Cdecl) ? ECallConv_Cdecl :
-		(Modifiers & ETypeModifier_Stdcall) ? ECallConv_Stdcall : ECallConv_Default;
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-llvm::CallingConv::ID
-GetLlvmCallConv (ECallConv CallConv)
-{
-	return CallConv == ECallConv_Stdcall ?
-		llvm::CallingConv::X86_StdCall : 
-		llvm::CallingConv::C;
-}
 
 //.............................................................................
 
@@ -88,10 +50,10 @@ class CFunctionType: public CType
 	friend class CClassType;
 
 protected:
+	CCallConv* m_pCallConv;
 	CType* m_pReturnType;
 	CImportType* m_pReturnType_i;
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
-	ECallConv m_CallConv;
 	rtl::CBoxListT <CToken> m_PitcherCondition;
 	rtl::CString m_ArgSignature;
 	rtl::CString m_TypeModifierString;
@@ -105,18 +67,12 @@ protected:
 public:
 	CFunctionType ();
 
-	llvm::CallingConv::ID
-	GetLlvmCallConv ()
-	{
-		return jnc::GetLlvmCallConv (m_CallConv);
-	}
-
-	ECallConv 
+	CCallConv*
 	GetCallConv ()
 	{
-		return m_CallConv;
+		return m_pCallConv;
 	}
-	
+
 	CType*
 	GetReturnType ()
 	{
@@ -129,7 +85,7 @@ public:
 		return m_pReturnType_i;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetPitcherCondition ()
 	{
 		return m_PitcherCondition;
@@ -138,7 +94,7 @@ public:
 	bool
 	IsPitcherMatch (CFunctionType* pType);
 
-	rtl::CArrayT <CFunctionArg*> 
+	rtl::CArrayT <CFunctionArg*>
 	GetArgArray ()
 	{
 		return m_ArgArray;
@@ -147,10 +103,10 @@ public:
 	rtl::CString
 	GetArgSignature ();
 
-	rtl::CString 
+	rtl::CString
 	GetArgString ();
 
-	rtl::CString 
+	rtl::CString
 	GetTypeModifierString ();
 
 	bool
@@ -159,7 +115,7 @@ public:
 		return !m_ArgArray.IsEmpty () && m_ArgArray [0]->GetStorageKind () == EStorage_This;
 	}
 
-	CType* 
+	CType*
 	GetThisArgType ()
 	{
 		return IsMemberMethodType () ? m_ArgArray [0]->GetType () : NULL;
@@ -173,10 +129,10 @@ public:
 	{
 		return m_pShortType;
 	}
-	
+
 	CFunctionType*
 	GetMemberMethodType (
-		CNamedType* pType, 
+		CNamedType* pType,
 		uint_t ThisArgFlags = 0
 		);
 
@@ -186,14 +142,14 @@ public:
 	CFunction*
 	GetAbstractFunction ();
 
-	CFunctionPtrType* 
+	CFunctionPtrType*
 	GetFunctionPtrType (
 		EType TypeKind,
 		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal,
 		uint_t Flags = 0
 		);
 
-	CFunctionPtrType* 
+	CFunctionPtrType*
 	GetFunctionPtrType (
 		EFunctionPtrType PtrTypeKind = EFunctionPtrType_Normal,
 		uint_t Flags = 0
@@ -206,13 +162,9 @@ public:
 	GetMulticastType ();
 
 	static
-	rtl::CString 
-	CreateCallConvSignature (ECallConv CallConv);
-
-	static
 	rtl::CString
 	CreateSignature (
-		ECallConv CallConv,
+		CCallConv* pCallConv,
 		CType* pReturnType,
 		CType* const* pArgTypeArray,
 		size_t ArgCount,
@@ -222,7 +174,7 @@ public:
 	static
 	rtl::CString
 	CreateSignature (
-		ECallConv CallConv,
+		CCallConv* pCallConv,
 		CType* pReturnType,
 		CFunctionArg* const* pArgArray,
 		size_t ArgCount,
@@ -251,24 +203,24 @@ public:
 		return CreateArgSignature (m_ArgArray, m_ArgArray.GetCount (), m_Flags);
 	}
 
-	virtual 
+	virtual
 	bool
 	Compile ();
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmDiType ();
 
-	virtual 
+	virtual
 	bool
 	CalcLayout ();
 };

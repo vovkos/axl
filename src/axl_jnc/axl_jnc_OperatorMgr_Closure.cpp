@@ -10,7 +10,7 @@ namespace jnc {
 
 bool
 COperatorMgr::CreateClosureObject (
-	EStorage StorageKind, 
+	EStorage StorageKind,
 	const CValue& OpValue, // thin function or property ptr with closure
 	CType* pThunkType, // function or property type
 	bool IsWeak,
@@ -49,7 +49,7 @@ COperatorMgr::CreateClosureObject (
 	CClosure* pClosure = OpValue.GetClosure ();
 	if (pClosure)
 	{
-		ClosureArgCount = pClosure->GetArgList ()->GetCount ();
+		ClosureArgCount = pClosure->GetArgValueList ()->GetCount ();
 
 		rtl::CArrayT <CFunctionArg*> SrcArgArray = pSrcFunctionType->GetArgArray ();
 		size_t SrcArgCount = SrcArgArray.GetCount ();
@@ -63,16 +63,16 @@ COperatorMgr::CreateClosureObject (
 		ClosureArgTypeArray.SetCount (ClosureArgCount);
 		ClosureMap.SetCount (ClosureArgCount);
 
-		rtl::CBoxIteratorT <CValue> ClosureArg = pClosure->GetArgList ()->GetHead ();
+		rtl::CBoxIteratorT <CValue> ClosureArgValue = pClosure->GetArgValueList ()->GetHead ();
 
 		size_t j = 0;
 
-		for (size_t i = 0; i < ClosureArgCount; ClosureArg++, i++)
+		for (size_t i = 0; i < ClosureArgCount; ClosureArgValue++, i++)
 		{
-			if (ClosureArg->IsEmpty ())
+			if (ClosureArgValue->IsEmpty ())
 				continue;
 
-			CType* pType = ClosureArg->GetType ();
+			CType* pType = ClosureArgValue->GetType ();
 			if (IsWeakPtrType (pType))
 				WeakMask |= (uint64_t) 2 << j; // account for function ptr field (at idx 0)
 
@@ -128,31 +128,31 @@ COperatorMgr::CreateClosureObject (
 	PfnValue.ClearClosure ();
 
 	CValue FieldValue;
-	Result = 
+	Result =
 		GetClassField (ClosureValue, *Field, NULL, &FieldValue) &&
 		BinaryOperator (EBinOp_Assign, FieldValue, PfnValue);
 
 	if (!Result)
 		return false;
-		
+
 	Field++;
 
 	// save closure arguments (if any)
 
 	if (pClosure)
 	{
-		rtl::CBoxIteratorT <CValue> ClosureArg = pClosure->GetArgList ()->GetHead ();
-		for (; ClosureArg; ClosureArg++)
+		rtl::CBoxIteratorT <CValue> ClosureArgValue = pClosure->GetArgValueList ()->GetHead ();
+		for (; ClosureArgValue; ClosureArgValue++)
 		{
-			if (ClosureArg->IsEmpty ())
+			if (ClosureArgValue->IsEmpty ())
 				continue;
 
 			ASSERT (Field);
 
 			CValue FieldValue;
-			Result = 
+			Result =
 				GetClassField (ClosureValue, *Field, NULL, &FieldValue) &&
-				BinaryOperator (EBinOp_Assign, FieldValue, *ClosureArg);
+				BinaryOperator (EBinOp_Assign, FieldValue, *ClosureArgValue);
 
 			if (!Result)
 				return false;
@@ -196,13 +196,13 @@ COperatorMgr::CreateDataClosureObject (
 	// save data pointer
 
 	CValue FieldValue;
-	Result = 
+	Result =
 		GetClassField (ClosureValue, *Field, NULL, &FieldValue) &&
 		BinaryOperator (EBinOp_Assign, FieldValue, OpValue);
 
 	if (!Result)
 		return false;
-		
+
 	*pResultValue = ClosureValue;
 	return true;
 }

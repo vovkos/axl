@@ -3,10 +3,11 @@
 #define _CRT_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" string functions
 #define _SCL_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" iterators
 
-#define __STDC_LIMIT_MACROS 
+#define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
 
 #include "axl_g_Pch.h"
+#include "axl_jnc_Pch.h"
 
 #undef min
 #undef max
@@ -31,48 +32,6 @@
 #include <QToolBar>
 #include <QTreeWidget>
 #include <QWidget>
-
-// LLVM
-
-// warning C4146: unary minus operator applied to unsigned type, result still unsigned
-// warning C4355: 'this' : used in base member initializer list
-// warning C4800: 'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
-
-#pragma warning (disable: 4146)
-#pragma warning (disable: 4355)
-#pragma warning (disable: 4800) 
-
-#include "llvm/DerivedTypes.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "llvm/PassManager.h"
-#include "llvm/IRBuilder.h"
-#include "llvm/DIBuilder.h"
-#include "llvm/DebugInfo.h"
-#include "llvm/Support/Dwarf.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Support/ManagedStatic.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Analysis/Verifier.h"
-#include "llvm/Analysis/Passes.h"
-#include "llvm/Transforms/Scalar.h"
-
-#include "llvm/ExecutionEngine/JIT.h"
-#include "llvm/ExecutionEngine/JITEventListener.h"
-#include "llvm/ExecutionEngine/JITMemoryManager.h"
-#include "llvm/ExecutionEngine/JITEventListener.h"
-#include "llvm/ExecutionEngine/MCJIT.h"
-
-#include "../lib/MC/MCDisassembler/EDDisassembler.h"
-#include "../lib/MC/MCDisassembler/EDInst.h" 
-#include "../lib/MC/MCDisassembler/EDOperand.h"
-#include "../lib/MC/MCDisassembler/EDToken.h"
-
-#include "llvm/CodeGen/MachineCodeInfo.h"
-
-#pragma warning (default: 4146)
-#pragma warning (default: 4355)
-#pragma warning (default: 4800)
 
 // AXL
 

@@ -7,28 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
-const char*
-GetCallConvString (ECallConv CallConv)
-{
-	static const char* StringTable [] = 
-	{
-		"cdecl",    // ECallConv_Cdecl,
-		"stdcall",  // ECallConv_Stdcall,
-	};
-	
-	return (size_t) CallConv < countof (StringTable) ? 
-		StringTable [CallConv] : 
-		"undefined-calling-convention";
-}
-
-//.............................................................................
-
 CFunctionType::CFunctionType ()
 {
 	m_TypeKind = EType_Function;
+	m_pCallConv = NULL;
 	m_pReturnType = NULL;
 	m_pReturnType_i = NULL;
-	m_CallConv = ECallConv_Default;
 	m_pShortType = this;
 	m_pStdObjectMemberMethodType = NULL;
 	m_pFunctionPtrTypeTuple = NULL;
@@ -75,7 +59,7 @@ CFunctionType::IsPitcherMatch (CFunctionType* pType)
 
 		#pragma AXL_TODO ("check token data also. in fact, need to come up with something smarter than token cmp")
 	}
-	
+
 	return true;
 }
 
@@ -88,7 +72,7 @@ CFunctionType::GetArgSignature ()
 	return m_ArgSignature;
 }
 
-CFunctionPtrType* 
+CFunctionPtrType*
 CFunctionType::GetFunctionPtrType (
 	EType TypeKind,
 	EFunctionPtrType PtrTypeKind,
@@ -98,7 +82,7 @@ CFunctionType::GetFunctionPtrType (
 	return m_pModule->m_TypeMgr.GetFunctionPtrType (this, TypeKind, PtrTypeKind, Flags);
 }
 
-CClassType* 
+CClassType*
 CFunctionType::GetMulticastType ()
 {
 	return m_pModule->m_TypeMgr.GetMulticastType (this);
@@ -106,7 +90,7 @@ CFunctionType::GetMulticastType ()
 
 CFunctionType*
 CFunctionType::GetMemberMethodType (
-	CNamedType* pParentType, 
+	CNamedType* pParentType,
 	uint_t ThisArgTypeFlags
 	)
 {
@@ -155,15 +139,11 @@ CFunctionType::CreateArgSignature (
 	for (size_t i = 0; i < ArgCount; i++)
 	{
 		CType* pType = pArgTypeArray [i];
-		String.Append (pType->GetSignature ());
-		String.Append (",");
+		String += pType->GetSignature ();
+		String += ",";
 	}
 
-	String.Append (
-		(Flags & EFunctionTypeFlag_VarArg) ? 
-		(Flags & EFunctionTypeFlag_UnsafeVarArg) ? ".-)" : ".)" : ")"
-		);
-	
+	String += (Flags & EFunctionTypeFlag_VarArg) ? ".)" : ")";
 	return String;
 }
 
@@ -180,43 +160,17 @@ CFunctionType::CreateArgSignature (
 	{
 		CFunctionArg* pArg = pArgArray [i];
 
-		String.Append (pArg->GetType ()->GetSignature ());
-		String.Append (",");
+		String += pArg->GetType ()->GetSignature ();
+		String += ",";
 	}
 
-	String.Append (
-		(Flags & EFunctionTypeFlag_VarArg) ? 
-		(Flags & EFunctionTypeFlag_UnsafeVarArg) ? ".-)" : ".)" : ")"
-		);
-	
-	return String;
-}
-
-rtl::CString 
-CFunctionType::CreateCallConvSignature (ECallConv CallConv)
-{
-	rtl::CString String;
-
-	switch (CallConv)
-	{
-	case ECallConv_Cdecl:
-		String = 'C';
-		break;
-
-	case ECallConv_Stdcall:
-		String = 'S';
-		break;
-
-	default:
-		ASSERT (false);
-	}
-
+	String += (Flags & EFunctionTypeFlag_VarArg) ? ".)" : ")";
 	return String;
 }
 
 rtl::CString
 CFunctionType::CreateSignature (
-	ECallConv CallConv,
+	CCallConv* pCallConv,
 	CType* pReturnType,
 	CType* const* pArgTypeArray,
 	size_t ArgCount,
@@ -224,15 +178,15 @@ CFunctionType::CreateSignature (
 	)
 {
 	rtl::CString String = "F";
-	String.Append (CreateCallConvSignature (CallConv));
-	String.Append (pReturnType->GetSignature ());
-	String.Append (CreateArgSignature (pArgTypeArray, ArgCount, Flags));
+	String += GetCallConvSignature (pCallConv->GetCallConvKind ());
+	String += pReturnType->GetSignature ();
+	String += CreateArgSignature (pArgTypeArray, ArgCount, Flags);
 	return String;
 }
 
 rtl::CString
 CFunctionType::CreateSignature (
-	ECallConv CallConv,
+	CCallConv* pCallConv,
 	CType* pReturnType,
 	CFunctionArg* const* pArgArray,
 	size_t ArgCount,
@@ -240,9 +194,9 @@ CFunctionType::CreateSignature (
 	)
 {
 	rtl::CString String = "F";
-	String.Append (CreateCallConvSignature (CallConv));
-	String.Append (pReturnType->GetSignature ());
-	String.Append (CreateArgSignature (pArgArray, ArgCount, Flags));
+	String += GetCallConvSignature (pCallConv->GetCallConvKind ());
+	String += pReturnType->GetSignature ();
+	String += CreateArgSignature (pArgArray, ArgCount, Flags);
 	return String;
 }
 
@@ -263,7 +217,7 @@ CFunctionType::GetArgString ()
 
 		if (pArg->GetStorageKind () == EStorage_This)
 		{
-			m_ArgString.Append (" this");
+			m_ArgString += " this";
 		}
 		else if (IsUserType)
 		{
@@ -292,36 +246,31 @@ CFunctionType::GetArgString ()
 		}
 
 		if (m_Flags & EFunctionTypeFlag_VarArg)
-			m_ArgString.Append (", ");
+			m_ArgString += ", ";
 	}
 
 	if (!(m_Flags & EFunctionTypeFlag_VarArg))
-		m_ArgString.Append (")");
-	else if (m_Flags & EFunctionTypeFlag_UnsafeVarArg)
-		m_ArgString.Append ("unsafe ...)");
+		m_ArgString += ")";
 	else
-		m_ArgString.Append ("...)");
+		m_ArgString += "...)";
 
 	return m_ArgString;
 }
 
-rtl::CString 
+rtl::CString
 CFunctionType::GetTypeModifierString ()
 {
 	if (!m_TypeModifierString.IsEmpty ())
 		return m_TypeModifierString;
 
-	if (!m_CallConv && !(m_Flags & EFunctionTypeFlag_Pitcher))
-		return rtl::CString ();
-
-	if (m_CallConv)
+	if (!m_pCallConv->IsDefault ())
 	{
-		m_TypeModifierString = GetCallConvString (m_CallConv);
+		m_TypeModifierString = m_pCallConv->GetCallConvDisplayString ();
 		m_TypeModifierString += ' ';
 	}
 
 	if (m_Flags & EFunctionTypeFlag_Pitcher)
-		m_TypeModifierString.Append ("pitcher ");
+		m_TypeModifierString += "pitcher ";
 
 	return m_TypeModifierString;
 }
@@ -332,26 +281,13 @@ CFunctionType::PrepareTypeString ()
 	m_TypeString = GetTypeModifierString ();
 	m_TypeString += m_pReturnType->GetTypeString ();
 	m_TypeString += ' ';
-	m_TypeString += GetArgString ();	
+	m_TypeString += GetArgString ();
 }
 
 void
 CFunctionType::PrepareLlvmType ()
 {
-	size_t ArgCount = m_ArgArray.GetCount ();
-
-	char Buffer [256];
-	rtl::CArrayT <llvm::Type*> LlvmArgTypeArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	LlvmArgTypeArray.SetCount (ArgCount);
-
-	for (size_t i = 0; i < ArgCount; i++)
-		LlvmArgTypeArray [i] = m_ArgArray [i]->GetType ()->GetLlvmType ();
-
-	m_pLlvmType = llvm::FunctionType::get (
-		m_pReturnType->GetLlvmType (),
-		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, ArgCount),
-		(m_Flags & EFunctionTypeFlag_VarArg) != 0
-		);
+	m_pLlvmType = m_pCallConv->GetLlvmFunctionType (this);
 }
 
 void
@@ -393,14 +329,14 @@ CFunctionType::CalcLayout ()
 	// update signature
 
 	rtl::CString Signature = CreateSignature (
-		m_CallConv, 
-		m_pReturnType, 
-		m_ArgArray, 
-		m_ArgArray.GetCount (), 
+		m_pCallConv,
+		m_pReturnType,
+		m_ArgArray,
+		m_ArgArray.GetCount (),
 		m_Flags
 		);
-	m_pModule->m_TypeMgr.UpdateTypeSignature (this, Signature);
 
+	m_pModule->m_TypeMgr.UpdateTypeSignature (this, Signature);
 	return true;
 }
 

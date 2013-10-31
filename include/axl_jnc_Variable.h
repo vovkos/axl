@@ -18,7 +18,6 @@ class CStructField;
 class CVariable: public CUserModuleItem
 {
 	friend class CVariableMgr;
-	friend class CFunctionMgr;
 	friend class CParser;
 
 protected:
@@ -33,42 +32,42 @@ protected:
 	CStructField* m_pTlsField;
 	llvm::Value* m_pLlvmValue; // AllocaInst* / GlobalVariable* / GEPInst*
 	llvm::Value* m_pLlvmAllocValue;
-	llvm::DIDescriptor m_LlvmDiDescriptor; // DIVariable / DIGlobalVariable / 
+	llvm::DIDescriptor m_LlvmDiDescriptor; // DIVariable / DIGlobalVariable /
 
 public:
 	CVariable ();
 
-	CType* 
+	CType*
 	GetType ()
 	{
 		return m_pType;
 	}
 
-	CImportType* 
+	CImportType*
 	GetType_i ()
 	{
 		return m_pType_i;
 	}
 
-	uint_t 
+	uint_t
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetConstructor ()
 	{
 		return m_Constructor;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetInitializer ()
 	{
 		return m_Initializer;
 	}
 
-	rtl::CString 
+	rtl::CString
 	GetInitializerString ()
 	{
 		if (m_InitializerString.IsEmpty ())
@@ -89,27 +88,27 @@ public:
 		return m_pScope ? m_pScope->GetLevel () : 0;
 	}
 
-	CStructField* 
+	CStructField*
 	GetTlsField ()
 	{
 		return m_pTlsField;
 	}
 
-	llvm::Value* 
+	llvm::Value*
 	GetLlvmValue ()
 	{
 		EnsureLlvmValue ();
 		return m_pLlvmValue;
 	}
 
-	llvm::Value* 
+	llvm::Value*
 	GetLlvmAllocValue ()
 	{
 		EnsureLlvmValue ();
 		return m_pLlvmAllocValue;
 	}
 
-	llvm::DIDescriptor 
+	llvm::DIDescriptor
 	GetLlvmDiDescriptor ()
 	{
 		EnsureLlvmValue ();
@@ -117,7 +116,7 @@ public:
 	}
 
 protected:
-	virtual 
+	virtual
 	bool
 	CalcLayout ();
 
@@ -128,7 +127,7 @@ protected:
 //.............................................................................
 
 // after compiling and generating LLVM IR, we need to calc layout of TLS struct type
-// then we can insert instructions to get TLS block in every function and then replace 
+// then we can insert instructions to get TLS block in every function and then replace
 // all alloca's temporarily representing TLS variables with GEPs into this TLS block
 
 struct TTlsVariable

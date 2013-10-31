@@ -318,6 +318,8 @@ CModule::Compile ()
 			return false;
 	}
 
+	m_ControlFlowMgr.DeleteUnreachableBlocks ();
+
 	// step 5: ensure module destructor (if needed)
 
 	if (!m_pDestructor && !m_VariableMgr.m_StaticDestructList.IsEmpty ())

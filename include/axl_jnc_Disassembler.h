@@ -10,12 +10,12 @@ namespace jnc {
 class CDisassembler
 {
 protected:
-	llvm::EDDisassembler* m_pDisassembler;
+	llvm::MCDisassembler* m_pDisassembler;
 
 public:
 	CDisassembler ();
 
-	bool 
+	bool
 	Disassemble (
 		const void* pCode,
 		size_t Size,

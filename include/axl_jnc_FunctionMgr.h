@@ -27,7 +27,7 @@ enum EStdFunc
 
 	EStdFunc_OnRuntimeError,
 
-	// void 
+	// void
 	// jnc.CheckNullPtr (
 	//		int8* p,
 	//		int Error
@@ -35,7 +35,7 @@ enum EStdFunc
 
 	EStdFunc_CheckNullPtr,
 
-	// void 
+	// void
 	// jnc.CheckScopeLevel (
 	//		size_t SrcScopeLevel
 	//		size_t DstScopeLevel
@@ -43,7 +43,7 @@ enum EStdFunc
 
 	EStdFunc_CheckScopeLevel,
 
-	// void 
+	// void
 	// jnc.CheckDataPtrRange (
 	//		int8* p,
 	//		size_t Size,
@@ -53,7 +53,7 @@ enum EStdFunc
 
 	EStdFunc_CheckDataPtrRange,
 
-	// void 
+	// void
 	// jnc.CheckClassPtrScopeLevel (
 	//		object* p,
 	//		size_t DstScopeLevel
@@ -249,7 +249,7 @@ protected:
 
 		CValue m_ThisValue;
 		CValue m_ScopeLevelValue;
-		CValue m_VTablePtrPtrValue; 
+		CValue m_VTablePtrPtrValue;
 		CValue m_VTablePtrValue;
 	};
 
@@ -258,7 +258,7 @@ protected:
 
 	// unfortunately LLVM does not provide a slot for back-pointer from llvm::Function, hence the map
 
-	rtl::CHashTableMapT <llvm::Function*, CFunction*, rtl::CHashIdT <llvm::Function*> > m_LlvmFunctionMap; 
+	rtl::CHashTableMapT <llvm::Function*, CFunction*, rtl::CHashIdT <llvm::Function*> > m_LlvmFunctionMap;
 
 	rtl::CStdListT <CFunction> m_FunctionList;
 	rtl::CStdListT <CProperty> m_PropertyList;
@@ -275,7 +275,7 @@ protected:
 
 	CValue m_ThisValue;
 	CValue m_ScopeLevelValue;
-	CValue m_VTablePtrPtrValue; 
+	CValue m_VTablePtrPtrValue;
 	CValue m_VTablePtrValue;
 
 	rtl::CStdListT <TEmissionContext> m_EmissionContextStack;
@@ -285,7 +285,7 @@ protected:
 public:
 	CFunctionMgr ();
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;
@@ -310,13 +310,13 @@ public:
 		return m_pCurrentFunction ? m_pCurrentFunction->GetProperty () : NULL;
 	}
 
-	CValue 
+	CValue
 	GetThisValue ()
 	{
 		return m_ThisValue;
 	}
 
-	CValue 
+	CValue
 	GetScopeLevelValue ()
 	{
 		return m_ScopeLevelValue;
@@ -462,11 +462,8 @@ public:
 		);
 
 protected:
-	bool
-	CreateShadowArgVariables ();
-
 	void
-	CreateThisValue (const CValue& ThisArgValue);
+	CreateThisValue ();
 
 	void
 	PushEmissionContext ();
@@ -475,7 +472,7 @@ protected:
 	PopEmissionContext ();
 
 	void
-	CutVTable (const CValue& ThisArgValue);
+	CutVTable ();
 
 	void
 	RestoreVTable ();
