@@ -319,14 +319,10 @@ CModule::Compile ()
 			return false;
 	}
 
-	m_ControlFlowMgr.DeleteUnreachableBlocks ();
-
 	// step 5: ensure module destructor (if needed)
 
 	if (!m_pDestructor && !m_VariableMgr.m_StaticDestructList.IsEmpty ())
-	{
 		CreateDefaultDestructor ();
-	}
 
 	// step 6: deal with tls
 
@@ -337,7 +333,11 @@ CModule::Compile ()
 	if (!Result)
 		return false;
 
-	// step 7: finalize debug information
+	// step 7: delete unreachable blocks
+
+	m_ControlFlowMgr.DeleteUnreachableBlocks ();
+
+	// step 8: finalize debug information
 
 	if (m_Flags & EModuleFlag_DebugInfo)
 		m_LlvmDiBuilder.Finalize ();

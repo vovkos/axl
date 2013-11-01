@@ -94,7 +94,13 @@ CControlFlowMgr::DeleteUnreachableBlocks ()
 		CBasicBlock* pBlock = *It;
 		It++;
 
-		pBlock->m_pLlvmBlock->eraseFromParent ();
+		// check if block was never added (like silent-return)
+
+		if (pBlock->m_pFunction)
+			pBlock->m_pLlvmBlock->eraseFromParent ();
+		else
+			delete pBlock->m_pLlvmBlock;
+
 		m_BlockList.Delete (pBlock);
 	}
 
