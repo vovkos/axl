@@ -97,6 +97,8 @@ CControlFlowMgr::DeleteUnreachableBlocks ()
 		pBlock->m_pLlvmBlock->eraseFromParent ();
 		m_BlockList.Delete (pBlock);
 	}
+
+	SetCurrentBlock (NULL);
 }
 
 CBasicBlock*
