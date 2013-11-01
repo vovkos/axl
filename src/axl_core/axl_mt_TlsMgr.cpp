@@ -8,7 +8,7 @@ namespace mt {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-bool CTlsMgr::s_IsDead = false;
+bool CTlsMgr::m_IsDead = false;
 
 CTlsMgr::CTlsMgr ()
 {
@@ -34,14 +34,14 @@ NTAPI
 CTlsMgr::TlsCallback (
 	HANDLE hModule,
 	dword_t Reason,
-	void* pReserved		
+	void* pReserved
 	)
 {
-	if (Reason != DLL_THREAD_DETACH || s_IsDead)
+	if (Reason != DLL_THREAD_DETACH || m_IsDead)
 		return;
 
 	CTlsMgr* pThis = GetTlsMgr ();
-	
+
 	TPage* pPage = pThis->FindCurrentThreadPage ();
 	if (!pPage)
 		return;
@@ -72,7 +72,7 @@ CTlsMgr::~CTlsMgr ()
 }
 
 #endif
-		
+
 CTlsValue
 CTlsMgr::GetSlotValue (size_t Slot)
 {
@@ -98,13 +98,13 @@ CTlsMgr::SetSlotValue (
 	)
 {
 	TPage* pPage = GetCurrentThreadPage ();
-	
+
 	size_t Count = pPage->m_Array.GetCount ();
 	if (Slot >= Count)
 	{
 		if (!Value)
 			return CTlsValue ();
-		
+
 		pPage->m_Array.SetCount (Slot + 1);
 	}
 
@@ -115,7 +115,7 @@ CTlsMgr::SetSlotValue (
 	if (pEntry)
 	{
 		OldValue = pEntry->m_Value;
-		
+
 		if (Value)
 		{
 			pEntry->m_Value = Value;
@@ -129,13 +129,13 @@ CTlsMgr::SetSlotValue (
 	else if (Value)
 	{
 		pEntry = pPage->m_ValueList.InsertTail (Value).GetEntry ();
-		pPage->m_Array [Slot] = pEntry;		
+		pPage->m_Array [Slot] = pEntry;
 	}
 
 	return OldValue;
 }
 
-CTlsMgr::TPage* 
+CTlsMgr::TPage*
 CTlsMgr::GetCurrentThreadPage ()
 {
 	TPage* pPage = FindCurrentThreadPage ();
@@ -156,10 +156,10 @@ CTlsMgr::GetCurrentThreadPage ()
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-#pragma section (AXL_MT_TLS_CALLBACK_SECTION, long, read) 
+#pragma section (AXL_MT_TLS_CALLBACK_SECTION, long, read)
 
-extern "C" 
-__declspec(allocate (AXL_MT_TLS_CALLBACK_SECTION)) 
+extern "C"
+__declspec(allocate (AXL_MT_TLS_CALLBACK_SECTION))
 PIMAGE_TLS_CALLBACK g_axl_mt_pfTlsCallback = axl::mt::CTlsMgr::TlsCallback;
 
 #ifdef _WIN64

@@ -61,12 +61,7 @@ CJnc::Jit ()
 	if (!Result)
 		return false;
 
-	if (JitKind == jnc::EJit_Normal)
-	{
-		llvm::ExecutionEngine* pLlvmExecutionEngine = m_Runtime.GetLlvmExecutionEngine ();
-		jnc::CStdLib::Export (&m_Module, pLlvmExecutionEngine);
-		m_Module.SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) CStdLib::Printf);
-	}
+	m_StdLib.Export (&m_Module, &m_Runtime);
 
 	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());
 }

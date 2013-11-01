@@ -879,6 +879,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 				Error->GetDescription ().cc ()
 				);
 
+			pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
 			return false;
 		}
 	}

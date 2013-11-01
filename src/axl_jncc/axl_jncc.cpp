@@ -3,7 +3,7 @@
 
 //.............................................................................
 
-void 
+void
 PrintVersion (COutStream* pOutStream)
 {
 	pOutStream->Printf (
@@ -15,7 +15,7 @@ PrintVersion (COutStream* pOutStream)
 		);
 }
 
-void 
+void
 PrintUsage (COutStream* pOutStream)
 {
 	PrintVersion (pOutStream);
@@ -24,7 +24,7 @@ PrintUsage (COutStream* pOutStream)
 		"Usage: jnc [<options>...] <source_file>\n"
 		"    -?, -h, -H     print this usage and exit\n"
 		"    -v             print version\n"
-		"    -l[c]          print LLVM IR ('c' = manual mode w/ comments)\n"	
+		"    -l[c]          print LLVM IR ('c' = manual mode w/ comments)\n"
 		"    -d             print disassembly (implies -j)\n"
 		"    -j[m]          JIT functions ('m' = use MC-JITter)\n"
 		"    -g             emit debugging information\n"
@@ -35,7 +35,7 @@ PrintUsage (COutStream* pOutStream)
 
 //.............................................................................
 
-CJnc* CJnc::s_pCurrentJnc = NULL;
+CJnc* CJnc::m_pCurrentJnc = NULL;
 
 int
 CJnc::Run (
@@ -68,16 +68,16 @@ CJnc::Run (
 		PrintUsage (pOutStream);
 		return EJncError_InvalidCmdLine;
 	}
-	
+
 	io::CMappedFile SrcFile;
 	Result = SrcFile.Open (pCmdLine->m_SrcFileName, io::EFileFlag_ReadOnly);
 	const void* p = Result ? SrcFile.View () : NULL;
 	if (!p)
 	{
 		pOutStream->Printf (
-			"cannot open '%s': %s\n", 
+			"cannot open '%s': %s\n",
 			pCmdLine->m_SrcFileName.cc (), // thanks a lot gcc
-			err::GetError ()->GetDescription ().cc () 
+			err::GetError ()->GetDescription ().cc ()
 			);
 		return EJncError_IoFailure;
 	}
@@ -111,7 +111,7 @@ CJnc::Run (
 		PrintDisassembly ();
 
 	if (pCmdLine->m_Flags & EJncFlag_RunFunction)
-	{	
+	{
 		int ReturnValue;
 		Result = RunFunction (&ReturnValue);
 		if (!Result)
@@ -129,15 +129,15 @@ CJnc::Run (
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-int 
+int
 wmain (
-	int argc, 
+	int argc,
 	wchar_t* argv []
 	)
 #else
-int 
+int
 main (
-	int argc, 
+	int argc,
 	char* argv []
 	)
 #endif

@@ -20,6 +20,12 @@ class StdLib: public jnc::CStdLib
 public:
 	StdLib ();
 
+	void
+	Export (
+		jnc::CModule* pModule,
+		jnc::CRuntime* pRuntime
+		);
+
 	static
 	int
 	Printf (

@@ -18,10 +18,10 @@ struct TJancyRepresenter;
 
 //.............................................................................
 
-typedef 
+typedef
 void
 (*FJancyRepresenterTarget_AddPart) (
-	TJancyRepresenterTarget* pTarget, 
+	TJancyRepresenterTarget* pTarget,
 	EPart PartKind,
 	uint_t PartCode,
 	jnc::TDataPtr Ptr,
@@ -44,14 +44,14 @@ struct TJancyRepresenterTarget: jnc::TInterface
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef 
-bool 
+typedef
+bool
 (*FJancyRepresenter_Represent) (
 	TJancyRepresenter* pRepresenter,
-	TJancyRepresenterTarget* pTarget, 
-	uint_t PacketCode, 
+	TJancyRepresenterTarget* pTarget,
+	uint_t PacketCode,
 	jnc::TDataPtr Ptr,
-	size_t Size, 
+	size_t Size,
 	uint64_t FoldFlags
 	);
 
@@ -65,7 +65,7 @@ struct TJancyRepresenter: jnc::TInterface
 };
 
 //.............................................................................
-	
+
 class CJancyRepresenter: public CRepresenter
 {
 protected:
@@ -73,11 +73,11 @@ protected:
 	jnc::CClassType* m_pJancyRepresenterTargetType;
 	jnc::CRuntime* m_pRuntime;
 
-	static TJancyRepresenterTargetVTable s_JancyRepresenterTargetVTable;
+	static TJancyRepresenterTargetVTable m_JancyRepresenterTargetVTable;
 
 public:
 	CJancyRepresenter ();
-	
+
 	~CJancyRepresenter ()
 	{
 		Destroy ();
@@ -92,13 +92,13 @@ public:
 	void
 	Destroy ();
 
-	virtual 
-	bool 
+	virtual
+	bool
 	Represent (
-		CRepresenterTarget* pTarget, 
-		uint_t PacketCode, 
-		const void* p, 
-		size_t Size, 
+		CRepresenterTarget* pTarget,
+		uint_t PacketCode,
+		const void* p,
+		size_t Size,
 		uint64_t FoldFlags
 		);
 
@@ -106,7 +106,7 @@ protected:
 	static
 	void
 	JancyRepresenterTarget_AddPart (
-		TJancyRepresenterTarget* pTarget, 
+		TJancyRepresenterTarget* pTarget,
 		EPart PartKind,
 		uint_t PartCode,
 		jnc::TDataPtr Ptr,

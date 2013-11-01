@@ -6,7 +6,7 @@ namespace log {
 
 //.............................................................................
 
-TJancyRepresenterTargetVTable CJancyRepresenter::s_JancyRepresenterTargetVTable = 
+TJancyRepresenterTargetVTable CJancyRepresenter::m_JancyRepresenterTargetVTable =
 {
 	&CJancyRepresenter::JancyRepresenterTarget_AddPart,
 };
@@ -50,12 +50,12 @@ CJancyRepresenter::Destroy ()
 	m_pRuntime = NULL;
 }
 
-bool 
+bool
 CJancyRepresenter::Represent (
-	CRepresenterTarget* pTarget, 
-	uint_t PacketCode, 
-	const void* p, 
-	size_t Size, 
+	CRepresenterTarget* pTarget,
+	uint_t PacketCode,
+	const void* p,
+	size_t Size,
 	uint64_t FoldFlags
 	)
 {
@@ -69,7 +69,7 @@ CJancyRepresenter::Represent (
 
 	TJancyRepresenterTarget Target;
 	Target.m_pObject = &Object;
-	Target.m_pVTable = &s_JancyRepresenterTargetVTable;
+	Target.m_pVTable = &m_JancyRepresenterTargetVTable;
 	Target.m_PacketCode = pTarget->GetPacketCode ();
 	Target.m_Timestamp = pTarget->GetTimestamp ();
 	Target.m_LineAttr = pTarget->m_LineAttr;
@@ -84,12 +84,12 @@ CJancyRepresenter::Represent (
 	Ptr.m_pRangeEnd = (char*) p + Size;
 	Ptr.m_ScopeLevel = 0;
 
-	return pVTable->m_pfRepresent (m_pJancyRepresenter, &Target, PacketCode, Ptr, Size, FoldFlags);	
+	return pVTable->m_pfRepresent (m_pJancyRepresenter, &Target, PacketCode, Ptr, Size, FoldFlags);
 }
 
 void
 CJancyRepresenter::JancyRepresenterTarget_AddPart (
-	TJancyRepresenterTarget* pTarget, 
+	TJancyRepresenterTarget* pTarget,
 	EPart PartKind,
 	uint_t PartCode,
 	jnc::TDataPtr Ptr,
@@ -105,5 +105,5 @@ CJancyRepresenter::JancyRepresenterTarget_AddPart (
 
 //.............................................................................
 
-} // namespace log 
+} // namespace log
 } // namespace axl

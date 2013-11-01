@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Value.h"
+#include "axl_jnc_MulticastClassType.h"
 #include "axl_rtl_StringHashTable.h"
 #include "axl_g_Time.h"
 
@@ -19,6 +20,7 @@ class CStdLib
 {
 protected:
 	rtl::CStringHashTableMapT <void*> m_FunctionMap;
+	static void* m_MulticastMethodTable [EFunctionPtrType__Count] [EMulticastMethod__Count - 1];
 
 public:
 	CStdLib ();
@@ -30,11 +32,10 @@ public:
 		return It ? It->m_Value : NULL;
 	}
 
-	static
 	void
 	Export (
 		CModule* pModule,
-		llvm::ExecutionEngine* pLlvmExecutionEngine
+		CRuntime* pRuntime
 		);
 
 	static
@@ -250,6 +251,9 @@ protected:
 	void*
 	ThreadProc (void* pContext);
 #endif
+
+	void
+	MapMulticastMethods (CMulticastClassType* pMulticastType);
 
 	static
 	void

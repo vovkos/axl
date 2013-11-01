@@ -3,7 +3,7 @@
 
 //.............................................................................
 
-int property g_prop
+property g_prop
 {
 	int m_x = 5; // member field with in-place initializer
 

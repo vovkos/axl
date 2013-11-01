@@ -36,59 +36,61 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.appendFmtLiteral_i64"] = (void*) AppendFmtLiteral_i64;
 	m_FunctionMap ["jnc.appendFmtLiteral_ui64"] = (void*) AppendFmtLiteral_ui64;
 	m_FunctionMap ["jnc.appendFmtLiteral_f"] = (void*) AppendFmtLiteral_f;
-	m_FunctionMap ["jnc.multicastClear"] = (void*) MulticastClear;
-	m_FunctionMap ["jnc.multicastSet"] = (void*) MulticastSet;
-	m_FunctionMap ["jnc.multicastSet_t"] = (void*) MulticastSet_t;
-	m_FunctionMap ["jnc.multicastAdd"] = (void*) MulticastAdd;
-	m_FunctionMap ["jnc.multicastAdd_t"] = (void*) MulticastAdd_t;
-	m_FunctionMap ["jnc.multicastRemove"] = (void*) MulticastRemove;
-	m_FunctionMap ["jnc.multicastRemove_t"] = (void*) MulticastRemove_t;
-	m_FunctionMap ["jnc.multicastGetSnapshot"] = (void*) MulticastGetSnapshot;
 
 }
 
 void
 CStdLib::Export (
 	CModule* pModule,
-	llvm::ExecutionEngine* pLlvmExecutionEngine
+	CRuntime* pRuntime
 	)
 {
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_OnRuntimeError, (void*) OnRuntimeError);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_DynamicCastClassPtr, (void*) DynamicCastClassPtr);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrengthenClassPtr, (void*) StrengthenClassPtr);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapAlloc, (void*) HeapAlloc);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUAlloc, (void*) HeapUAlloc);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFree, (void*) HeapUFree);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFreeClassPtr, (void*) HeapUFreeClassPtr);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGc, (void*) RunGc);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGcWaitForDestructors, (void*) RunGcWaitForDestructors);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetCurrentThreadId, (void*) GetCurrentThreadId);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_CreateThread, (void*) CreateThread);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Sleep, (void*) Sleep);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrLen, (void*) StrLen);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Rand, (void*) Rand);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_a, (void*) AppendFmtLiteral_a);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_p, (void*) AppendFmtLiteral_p);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i32, (void*) AppendFmtLiteral_i32);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui32, (void*) AppendFmtLiteral_ui32);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i64, (void*) AppendFmtLiteral_i64);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui64, (void*) AppendFmtLiteral_ui64);
-	pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_f, (void*) AppendFmtLiteral_f);
-
-	// implementation for thin and unsafe is the same
+	EJit JitKind = pRuntime->GetJitKind ();
 
 	rtl::CConstListT <CMulticastClassType> McTypeList = pModule->m_TypeMgr.GetMulticastClassTypeList ();
 	rtl::CIteratorT <CMulticastClassType> McType = McTypeList.GetHead ();
 	for (; McType; McType++)
+		MapMulticastMethods (*McType);
+
+	if (JitKind == EJit_Normal)
 	{
-		ExportMulticastMethods (
-			pModule,
-			pLlvmExecutionEngine,
-			*McType
-			);
+		llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
+
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_OnRuntimeError, (void*) OnRuntimeError);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_DynamicCastClassPtr, (void*) DynamicCastClassPtr);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrengthenClassPtr, (void*) StrengthenClassPtr);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapAlloc, (void*) HeapAlloc);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUAlloc, (void*) HeapUAlloc);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFree, (void*) HeapUFree);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFreeClassPtr, (void*) HeapUFreeClassPtr);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGc, (void*) RunGc);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGcWaitForDestructors, (void*) RunGcWaitForDestructors);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetCurrentThreadId, (void*) GetCurrentThreadId);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_CreateThread, (void*) CreateThread);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Sleep, (void*) Sleep);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrLen, (void*) StrLen);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Rand, (void*) Rand);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_a, (void*) AppendFmtLiteral_a);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_p, (void*) AppendFmtLiteral_p);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i32, (void*) AppendFmtLiteral_i32);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui32, (void*) AppendFmtLiteral_ui32);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i64, (void*) AppendFmtLiteral_i64);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui64, (void*) AppendFmtLiteral_ui64);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_f, (void*) AppendFmtLiteral_f);
+
+		rtl::CConstListT <CMulticastClassType> McTypeList = pModule->m_TypeMgr.GetMulticastClassTypeList ();
+		rtl::CIteratorT <CMulticastClassType> McType = McTypeList.GetHead ();
+		for (; McType; McType++)
+		{
+			ExportMulticastMethods (
+				pModule,
+				pLlvmExecutionEngine,
+				*McType
+				);
+		}
 	}
 }
 
@@ -537,6 +539,50 @@ CStdLib::AppendFmtLiteralImpl (
 	return AppendFmtLiteral_a (pFmtLiteral, String, String.GetLength ());
 }
 
+void*
+CStdLib::m_MulticastMethodTable [EFunctionPtrType__Count] [EMulticastMethod__Count - 1] =
+{
+	{
+		(void*) MulticastClear,
+		(void*) MulticastSet,
+		(void*) MulticastAdd,
+		(void*) MulticastRemove,
+		(void*) MulticastGetSnapshot,
+	},
+
+	{
+		(void*) MulticastClear,
+		(void*) MulticastSet,
+		(void*) MulticastAdd,
+		(void*) MulticastRemove,
+		(void*) MulticastGetSnapshot,
+	},
+
+	{
+		(void*) MulticastClear,
+		(void*) MulticastSet_t,
+		(void*) MulticastAdd_t,
+		(void*) MulticastRemove_t,
+		(void*) MulticastGetSnapshot,
+	},
+};
+
+void
+CStdLib::MapMulticastMethods (CMulticastClassType* pMulticastType)
+{
+	EFunctionPtrType PtrTypeKind = pMulticastType->GetTargetType ()->GetPtrTypeKind ();
+	ASSERT (PtrTypeKind < EFunctionPtrType__Count);
+
+	for (size_t i = 0; i < EMulticastMethod__Count - 1; i++)
+	{
+		CFunction* pFunction = pMulticastType->GetMethod ((EMulticastMethod) i);
+		llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
+		const char* pName = pLlvmFunction->getName ().data ();
+
+		m_FunctionMap [pName] = m_MulticastMethodTable [PtrTypeKind] [i];
+	}
+}
+
 void
 CStdLib::ExportMulticastMethods (
 	CModule* pModule,
@@ -544,44 +590,15 @@ CStdLib::ExportMulticastMethods (
 	CMulticastClassType* pMulticastType
 	)
 {
-	static
-	void*
-	MethodTable [3] [5] =
-	{
-		{
-			(void*) MulticastClear,
-			(void*) MulticastSet,
-			(void*) MulticastAdd,
-			(void*) MulticastRemove,
-			(void*) MulticastGetSnapshot,
-		},
-
-		{
-			(void*) MulticastClear,
-			(void*) MulticastSet,
-			(void*) MulticastAdd,
-			(void*) MulticastRemove,
-			(void*) MulticastGetSnapshot,
-		},
-
-		{
-			(void*) MulticastClear,
-			(void*) MulticastSet_t,
-			(void*) MulticastAdd_t,
-			(void*) MulticastRemove_t,
-			(void*) MulticastGetSnapshot,
-		},
-	};
-
 	EFunctionPtrType PtrTypeKind = pMulticastType->GetTargetType ()->GetPtrTypeKind ();
 	ASSERT (PtrTypeKind < EFunctionPtrType__Count);
 
-	for (size_t i = 0; i < 5; i++)
+	for (size_t i = 0; i < EMulticastMethod__Count - 1; i++)
 	{
 		pModule->SetFunctionPointer (
 			pLlvmExecutionEngine,
 			pMulticastType->GetMethod ((EMulticastMethod) i),
-			MethodTable [PtrTypeKind] [i]
+			m_MulticastMethodTable [PtrTypeKind] [i]
 			);
 	}
 }

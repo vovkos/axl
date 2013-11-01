@@ -19,7 +19,7 @@ namespace axl {
 namespace mt {
 
 //.............................................................................
-	
+
 typedef ref::CPtrT <void> CTlsValue;
 
 class CTlsMgr
@@ -34,7 +34,7 @@ protected:
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
 	uint_t m_TlsIdx;
-	static bool s_IsDead;	
+	static bool m_IsDead;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	pthread_key_t m_TlsKey;
 #endif
@@ -46,12 +46,12 @@ public:
 
 	~CTlsMgr ();
 
-	size_t 
+	size_t
 	CreateSlot ()
 	{
 		return mt::AtomicInc (&m_SlotCount) - 1;
 	}
-	
+
 	CTlsValue
 	GetSlotValue (size_t Slot);
 
@@ -68,16 +68,16 @@ public:
 	TlsCallback (
 		HANDLE hModule,
 		dword_t Reason,
-		void* pReserved		
+		void* pReserved
 		);
 #endif
-	
+
 protected:
-	TPage* 
+	TPage*
 	GetCurrentThreadPage ();
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	TPage* 
+	TPage*
 	FindCurrentThreadPage ()
 	{
 		return (TPage*) TlsGetValue (m_TlsIdx);
@@ -87,25 +87,25 @@ protected:
 	SetCurrentThreadPage (TPage* pPage)
 	{
 		TlsSetValue (m_TlsIdx, pPage);
-	}	
+	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	TPage* 
+	TPage*
 	FindCurrentThreadPage ()
 	{
 		return (TPage*) pthread_getspecific (m_TlsKey);
 	}
-	
+
 	void
 	SetCurrentThreadPage (TPage* pPage)
 	{
 		pthread_setspecific (m_TlsKey, pPage);
 	}
-		
+
 	static
 	void
 	TlsDestructor (void* p)
 	{
-		ASSERT (p);	
+		ASSERT (p);
 		AXL_MEM_DELETE ((TPage*) p);
 	}
 #endif

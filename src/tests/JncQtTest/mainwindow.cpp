@@ -16,6 +16,23 @@ StdLib::StdLib ()
 	m_FunctionMap ["testAbi1"] = (void*) TestAbi1;
 }
 
+void
+StdLib::Export (
+	jnc::CModule* pModule,
+	jnc::CRuntime* pRuntime
+	)
+{
+	jnc::CStdLib::Export (pModule, pRuntime);
+
+	if (pRuntime->GetJitKind () == jnc::EJit_Normal)
+	{
+		llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
+
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) Printf);
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, "testAbi1", (void*) TestAbi1);
+	}
+}
+
 int
 StdLib::Printf (
 	const char* pFormat,
@@ -422,12 +439,7 @@ bool MainWindow::compile ()
 		return false;
 	}
 
-	if (JitKind == jnc::EJit_Normal)
-	{
-		llvm::ExecutionEngine* llvmExecutionEngine = runtime.GetLlvmExecutionEngine ();
-		jnc::CStdLib::Export (&module, llvmExecutionEngine);
-		module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
-	}
+	stdlib.Export (&module, &runtime);
 
 	result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());
 	if (!result)

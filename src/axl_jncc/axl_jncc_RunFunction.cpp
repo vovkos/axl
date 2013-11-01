@@ -8,6 +8,21 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["printf"] = (void*) Printf;
 }
 
+void
+CStdLib::Export (
+	jnc::CModule* pModule,
+	jnc::CRuntime* pRuntime
+	)
+{
+	jnc::CStdLib::Export (pModule, pRuntime);
+
+	if (pRuntime->GetJitKind () == jnc::EJit_Normal)
+	{
+		llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
+		pModule->SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) Printf);
+	}
+}
+
 int
 CStdLib::Printf (
 	const char* pFormat,
@@ -24,9 +39,9 @@ CStdLib::Printf (
 
 //.............................................................................
 
-bool 
+bool
 CJnc::RunFunction (
-	jnc::CFunction* pFunction, 
+	jnc::CFunction* pFunction,
 	int* pReturnValue
 	)
 {
@@ -54,9 +69,9 @@ CJnc::RunFunction (
 	}
 
 	return Result;
-}	
+}
 
-bool 
+bool
 CJnc::RunFunction (int* pReturnValue)
 {
 	bool Result;
@@ -71,7 +86,7 @@ CJnc::RunFunction (int* pReturnValue)
 	jnc::CFunction* pFunction = (jnc::CFunction*) pFunctionItem;
 
 	jnc::CScopeThreadRuntime ScopeRuntime (&m_Runtime);
-	
+
 	m_Runtime.Startup ();
 
 	jnc::CFunction* pConstructor = m_Module.GetConstructor ();
@@ -93,7 +108,7 @@ CJnc::RunFunction (int* pReturnValue)
 		if (!Result)
 			return false;
 	}
-		
+
 	m_Runtime.Shutdown ();
 
 	return true;

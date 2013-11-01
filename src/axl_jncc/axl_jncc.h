@@ -7,7 +7,7 @@
 
 enum
 {
-	EJnc_CompilerVersion = MAKELONG (0, MAKEWORD (0, 1)) 
+	EJnc_CompilerVersion = MAKELONG (0, MAKEWORD (0, 1))
 };
 
 //.............................................................................
@@ -23,10 +23,10 @@ enum EJncError
 
 //.............................................................................
 
-void 
+void
 PrintVersion (COutStream* pOutStream);
 
-void 
+void
 PrintUsage (COutStream* pOutStream);
 
 //.............................................................................
@@ -35,13 +35,19 @@ class CStdLib: public jnc::CStdLib
 {
 public:
 	CStdLib ();
-	
+
+	void
+	Export (
+		jnc::CModule* pModule,
+		jnc::CRuntime* pRuntime
+		);
+
 	static
 	int
 	Printf (
 		const char* pFormat,
 		...
-		);	
+		);
 };
 
 //.............................................................................
@@ -49,36 +55,36 @@ public:
 class CJnc
 {
 protected:
-	static CJnc* s_pCurrentJnc;
+	static CJnc* m_pCurrentJnc;
 
 	CCmdLine* m_pCmdLine;
 	COutStream* m_pOutStream;
 
 	jnc::CModule m_Module;
-	jnc::CRuntime m_Runtime;	
+	jnc::CRuntime m_Runtime;
 	CStdLib m_StdLib;
 
 public:
 	CJnc ()
 	{
-		s_pCurrentJnc = this;
+		m_pCurrentJnc = this;
 		m_pCmdLine = NULL;
 		m_pOutStream = NULL;
 	}
 
 	static
-	CJnc* 
+	CJnc*
 	GetCurrentJnc ()
 	{
-		return s_pCurrentJnc;
+		return m_pCurrentJnc;
 	}
 
-	COutStream* 
+	COutStream*
 	GetOutStream ()
 	{
 		return m_pOutStream;
 	}
-	
+
 	int
 	Run (
 		CCmdLine* pCmdLine,
@@ -86,33 +92,33 @@ public:
 		);
 
 protected:
-	bool 
+	bool
 	Compile (
 		const char* pFileName,
 		const char* pSource,
 		size_t Length
 		);
 
-	bool 
+	bool
 	Jit ();
 
 	void
 	PrintLlvmIr ();
 
-	void 
+	void
 	PrintDisassembly ();
 
-	bool 
+	bool
 	RunFunction (int* pReturnValue = NULL);
 
-	bool 
+	bool
 	RunFunction (
-		jnc::CFunction* pFunction, 
+		jnc::CFunction* pFunction,
 		int* pReturnValue = NULL
 		);
 
 protected:
-	int 
+	int
 	Server ();
 
 	int

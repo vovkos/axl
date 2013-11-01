@@ -9,7 +9,7 @@ class C1
 	int m_memberField;
 	static int m_staticField = 2;
 	thread int m_threadField;
-	// thread int m_threadField2 = 3; // <-- error: thread variables cannot be initialized
+	// thread int m_threadField2 = 3; // <-- error: thread fields cannot be initialized
 
 	construct (int x)
 	{
@@ -43,7 +43,7 @@ class C2
 int g_staticGlobal; // for global variables, default storage is 'static'
 thread int g_threadGlobal;
 // thread int g_threadGlobal2 = 10; // <-- error: global thread variables cannot be initialized
-// thread C1 g_threadGlobal3; // <-- error: global thread variables cannot be aggregate
+// thread C1 g_threadGlobal3; // <-- error: thread variables cannot be aggregate
 
 //.............................................................................
 
