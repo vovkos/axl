@@ -1009,7 +1009,8 @@ CTypeMgr::GetSimplePropertyType (
 	}
 	else
 	{
-		CFunctionType* pSetterType = GetFunctionType (pCallConv, NULL, &pReturnType, 1, 0);
+		CType* pVoidType = &m_PrimitiveTypeArray [EType_Void];
+		CFunctionType* pSetterType = GetFunctionType (pCallConv, pVoidType, &pReturnType, 1, 0);
 		pPropertyType = GetPropertyType (pGetterType, pSetterType, Flags);
 	}
 
@@ -1036,7 +1037,8 @@ CTypeMgr::GetIndexedPropertyType (
 	ArgTypeArray.Copy (pIndexArgTypeArray, IndexArgCount);
 	ArgTypeArray.Append (pReturnType);
 
-	CFunctionType* pSetterType = GetFunctionType (pCallConv, NULL, ArgTypeArray, IndexArgCount + 1, 0);
+	CType* pVoidType = &m_PrimitiveTypeArray [EType_Void];
+	CFunctionType* pSetterType = GetFunctionType (pCallConv, pVoidType, ArgTypeArray, IndexArgCount + 1, 0);
 	return GetPropertyType (pGetterType, pSetterType, Flags);
 }
 
@@ -1056,7 +1058,8 @@ CTypeMgr::GetIndexedPropertyType (
 	rtl::CArrayT <CFunctionArg*> SetterArgArray = ArgArray;
 	SetterArgArray.Append (pReturnType->GetSimpleFunctionArg ());
 
-	CFunctionType* pSetterType = GetFunctionType (pCallConv, NULL, SetterArgArray, 0);
+	CType* pVoidType = &m_PrimitiveTypeArray [EType_Void];
+	CFunctionType* pSetterType = GetFunctionType (pCallConv, pVoidType, SetterArgArray, 0);
 	return GetPropertyType (pGetterType, pSetterType, Flags);
 }
 
@@ -1333,7 +1336,8 @@ CTypeMgr::CreateReactorType (
 		pType->m_Flags |= ETypeFlag_Child;
 		pType->m_FieldArray [EReactorField_Parent] = pType->CreateField ("m_parent", pParentPtrType);
 
-		CFunctionType* pConstructorType = GetFunctionType (NULL, (CType**) &pParentPtrType, 1);
+		CType* pVoidType = &m_PrimitiveTypeArray [EType_Void];
+		CFunctionType* pConstructorType = GetFunctionType (pVoidType, (CType**) &pParentPtrType, 1);
 		CFunction* pConstructor = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Constructor, pConstructorType);
 		pType->AddMethod (pConstructor);
 	}
