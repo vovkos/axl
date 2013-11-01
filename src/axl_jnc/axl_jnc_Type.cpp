@@ -225,6 +225,8 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"eventd",       // ETypeModifier_EventD      = 0x00020000,
 		"reactor",      // ETypeModifier_Reactor     = 0x00040000,
 		"pitcher",      // ETypeModifier_Pitcher     = 0x00080000,
+		"array",        // ETypeModifier_Array       = 0x00100000,
+
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);

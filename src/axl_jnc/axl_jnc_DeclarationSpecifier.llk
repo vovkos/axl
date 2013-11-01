@@ -3,9 +3,9 @@
 class
 {
 	CTypeSpecifier m_TypeSpecifier;
-}	
+}
 declaration_specifier_list
-	enter 
+	enter
 	{
 		PushTypeSpecifier (&$.m_TypeSpecifier);
 	}
@@ -30,7 +30,7 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return $pTypeSpecifier->SetType ($1.m_pType);
 			}
-	|	type_modifier 
+	|	type_modifier
 			{
 				return $pTypeSpecifier->SetTypeModifier ($1.m_TypeModifier);
 			}
@@ -42,9 +42,9 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 class
 {
 	CTypeSpecifier m_TypeSpecifier;
-}	
+}
 type_specifier_modifier_list
-	enter 
+	enter
 	{
 		PushTypeSpecifier (&$.m_TypeSpecifier);
 	}
@@ -60,7 +60,7 @@ type_specifier_modifier <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return $pTypeSpecifier->SetType ($1.m_pType);
 			}
-	|	type_modifier 
+	|	type_modifier
 			{
 				return $pTypeSpecifier->SetTypeModifier ($1.m_TypeModifier);
 			}
@@ -81,12 +81,12 @@ storage_specifier
 			{
 				$.m_StorageKind = EStorage_Alias;
 			}
-	|	EToken_Static 
+	|	EToken_Static
 			{
 				$.m_StorageKind = EStorage_Static;
 			}
 	|	EToken_Thread
-			{			
+			{
 				$.m_StorageKind = EStorage_Thread;
 			}
 	|	EToken_Stack
@@ -154,7 +154,7 @@ type_specifier
 	|	EToken_Variant
 			{
 				err::SetStringError ("'variant' type specifier is not yet supported");
-				return false; 
+				return false;
 			}
 	|	EToken_Object
 			{
@@ -207,7 +207,7 @@ type_specifier
 	|	EToken_Auto
 			{
 				err::SetStringError ("'auto' type specifier is not yet supported");
-				return false; 
+				return false;
 			}
 	|	resolver (EToken_Property '{')
 		property_template_specifier $t
@@ -266,11 +266,11 @@ property_template_specifier
 	{
 		CPropertyTemplate* $pTemplate;
 	}
-	:	EToken_Property 
+	:	EToken_Property
 			{
 				$pTemplate = CreatePropertyTemplate ();
 			}
-		named_type_block <$pTemplate>		
+		named_type_block <$pTemplate>
 			{
 				$.m_pType = $pTemplate->CalcType ();
 				return $.m_pType != NULL;
@@ -327,6 +327,10 @@ type_modifier
 	|	EToken_Stdcall
 			{
 				$.m_TypeModifier = ETypeModifier_Stdcall;
+			}
+	|	EToken_Array
+			{
+				$.m_TypeModifier = ETypeModifier_Array;
 			}
 	|	EToken_Function
 			{

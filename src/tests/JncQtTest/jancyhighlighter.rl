@@ -69,6 +69,7 @@ main := |*
 'pitcher'         |
 'cdecl'           |
 'stdcall'         |
+'array'           |
 'function'        |
 'property'        |
 'bindable'        |

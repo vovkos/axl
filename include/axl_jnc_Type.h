@@ -169,6 +169,7 @@ enum ETypeModifier
 	ETypeModifier_EventD      = 0x00020000,
 	ETypeModifier_Reactor     = 0x00040000,
 	ETypeModifier_Pitcher     = 0x00080000,
+	ETypeModifier_Array       = 0x00100000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

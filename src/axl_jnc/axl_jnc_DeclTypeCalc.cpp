@@ -59,7 +59,15 @@ CDeclTypeCalc::CalcType (
 		EType TypeKind = pType->GetTypeKind ();
 
 		m_TypeModifiers = PointerPrefix->GetTypeModifiers ();
-		if (m_TypeModifiers & ETypeModifier_Function)
+		if (m_TypeModifiers & ETypeModifier_Array)
+		{
+			CArrayType* pArrayType = GetArrayType (pType);
+			if (!pArrayType)
+				return NULL;
+
+			pType = GetDataPtrType (pArrayType);
+		}
+		else if (m_TypeModifiers & ETypeModifier_Function)
 		{
 			CFunctionType* pFunctionType = GetFunctionType (pType);
 			if (!pFunctionType)
@@ -383,15 +391,19 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 CArrayType*
 CDeclTypeCalc::GetArrayType (CType* pElementType)
 {
-	ASSERT (m_Suffix && m_Suffix->GetSuffixKind () == EDeclSuffix_Array);
+	if (!m_Suffix || m_Suffix->GetSuffixKind () != EDeclSuffix_Array)
+	{
+		err::SetFormatStringError ("missing array suffix");
+		return NULL;
+	}
 
 	CDeclArraySuffix* pSuffix = (CDeclArraySuffix*) *m_Suffix--;
 
 	EType TypeKind = pElementType->GetTypeKind ();
 	switch (TypeKind)
 	{
-	case EType_Class:
 	case EType_Void:
+	case EType_Class:
 	case EType_Function:
 	case EType_Property:
 		err::SetFormatStringError ("cannot create array of '%s'", pElementType->GetTypeString ().cc () );
@@ -411,6 +423,8 @@ CDeclTypeCalc::GetArrayType (CType* pElementType)
 				return NULL;
 		}
 	}
+
+	m_TypeModifiers &= ~ETypeModifier_Array;
 
 	rtl::CBoxListT <CToken>* pElementCountInitializer = pSuffix->GetElementCountInitializer ();
 	if (!pElementCountInitializer->IsEmpty ())
