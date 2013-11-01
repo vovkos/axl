@@ -238,6 +238,11 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 			m_pModule->m_OperatorMgr.StoreDataRef (pScope->m_pFinallyReturnAddress, FinallyReturnValue);
 			pScope->m_FinallyReturnBlockArray.Append (pReturnBlock);
 			Jump (pScope->m_pFinallyBlock, pReturnBlock);
+
+			// return block will be jumped from 'finally', but we can mark it now:
+			// this way we can avoid extra loop in 'finally'
+
+			pReturnBlock->m_Flags |= EBasicBlockFlag_Jumped | EBasicBlockFlag_Reachable;
 		}
 
 		pScope = pScope->GetParentScope ();

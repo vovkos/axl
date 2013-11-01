@@ -5,7 +5,7 @@
 Highlighter::Highlighter(QTextDocument *parent)
 	: QSyntaxHighlighter(parent)
 {
-	
+
 }
 
 void Highlighter::highlightBlock(const QString &text)
@@ -26,18 +26,22 @@ void Highlighter::highlightBlock(const QString &text)
 	eof = pe;
 
 	ragelExecPreEvent(cs);
-	
+
 	ragelExec();
 
 	ragelExecPostEvent(cs);
 }
 
-void Highlighter::colorize(char *tokenStart, char *tokenEnd, Qt::GlobalColor color)
+void Highlighter::colorize(char *tokenStart, char *tokenEnd, Qt::GlobalColor color, bool bold)
 {
 	int index = tokenStart - const_p;
 	int length = tokenEnd - tokenStart;
 
 	QTextCharFormat format;
 	format.setForeground(color);
+
+	if (bold)
+		format.setFontWeight(QFont::Bold);
+
 	setFormat(index, length, format);
 }

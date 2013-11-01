@@ -10,7 +10,7 @@ public:
 
 protected:
 	void highlightBlock(const QString &text);
-	void colorize(char *tokenStart, char *tokenEnd, Qt::GlobalColor color);
+	void colorize(char *tokenStart, char *tokenEnd, Qt::GlobalColor color, bool bold = false);
 
 	virtual void ragelExecPreEvent(int &ragelState) { }
 	virtual void ragelExecPostEvent(int ragelState) { }
@@ -18,7 +18,7 @@ protected:
 	virtual void ragelInit() = 0;
 	virtual void ragelExec() = 0;
 	virtual int getRagelState(int blockState) = 0;
-	
+
 	int cs;
 	int act;
 	char *ts;

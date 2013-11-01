@@ -4,9 +4,9 @@
 
 Editor::Editor(QWidget *parent)
 	: QPlainTextEdit(parent)
-{	
-	QFont font ("Monospace", 10); 
-	font.setStyleHint (QFont::TypeWriter); 
+{
+	QFont font ("Monospace", 9);
+	font.setStyleHint (QFont::TypeWriter);
 
 	setFont(font);
 
@@ -43,7 +43,7 @@ void Editor::select(int startPos, int endPos)
 void Editor::selectLine(int line, bool isHighlighted)
 {
 	QTextCursor cursor = textCursor();
-	
+
 	cursor.setPosition(0);
 	cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line);
 
@@ -56,7 +56,7 @@ void Editor::selectLine(int line, bool isHighlighted)
 int Editor::posFromLine(int line)
 {
 	QTextCursor cursor = textCursor();
-	
+
 	cursor.setPosition(0);
 	cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line);
 

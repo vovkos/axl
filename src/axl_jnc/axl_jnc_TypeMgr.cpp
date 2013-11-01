@@ -1079,7 +1079,8 @@ CTypeMgr::CreateIndexedPropertyType (
 	rtl::CArrayT <CFunctionArg*> SetterArgArray = ArgArray;
 	SetterArgArray.Append (pReturnType->GetSimpleFunctionArg ());
 
-	CFunctionType* pSetterType = CreateUserFunctionType (pCallConv, NULL, SetterArgArray, 0);
+	CType* pVoidType = &m_PrimitiveTypeArray [EType_Void];
+	CFunctionType* pSetterType = CreateUserFunctionType (pCallConv, pVoidType, SetterArgArray, 0);
 	return GetPropertyType (pGetterType, pSetterType, Flags);
 }
 

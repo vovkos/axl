@@ -6,7 +6,7 @@
 
 %%{
 
-machine jancy_lexer; 
+machine jancy_lexer;
 write data;
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -27,11 +27,11 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# main machine 
+# main machine
 #
 
 main := |*
- 
+
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 (
@@ -141,9 +141,9 @@ main := |*
 'countof'         |
 'offsetof'        |
 'typeof'          |
-'bindingof'        
+'bindingof'
 
-)                   { colorize(ts, te, Qt::blue); };					
+)                   { colorize(ts, te, Qt::blue); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -154,9 +154,9 @@ dec+                { colorize(ts, te, Qt::darkRed); };
 '0' [Xx] lit_dq     { colorize(ts, te, Qt::darkRed); };
 '$' lit_dq          { colorize(ts, te, Qt::darkRed); };
 
-'//' [^\n]*         { colorize(ts, te, Qt::darkGreen); };
+'//' [^\n]*         { colorize(ts, te, Qt::darkGray); };
 
-'/*'                { colorize(ts, te, Qt::darkGreen); fgoto comment; }; 
+'/*'                { colorize(ts, te, Qt::darkGray); fgoto comment; };
 
 ws | nl             ;
 any                 ;
@@ -165,14 +165,14 @@ any                 ;
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# comment machine 
+# comment machine
 #
 
 comment := |*
 
-'\n'                { colorize(ts, te, Qt::darkGreen); };
-any                 { colorize(ts, te, Qt::darkGreen); };
-'*/'                { colorize(ts, te, Qt::darkGreen); fgoto main; };
+'\n'                { colorize(ts, te, Qt::darkGray); };
+any                 { colorize(ts, te, Qt::darkGray); };
+'*/'                { colorize(ts, te, Qt::darkGray); fgoto main; };
 
 *|;
 
