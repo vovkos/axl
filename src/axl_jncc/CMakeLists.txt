@@ -48,7 +48,7 @@ source_virtual_folder (
 
 #..............................................................................
 #
-# axl_jnc library
+# axl_jncc jancy compiler
 #
 
 include_directories (
@@ -106,3 +106,26 @@ endif ()
 
 #..............................................................................
 
+# macro for running jancy compiler on specified list of test source files
+
+macro (
+add_jncc_tests
+	_FLAGS
+	_DIR
+	# ...
+	)
+
+	set (_JNCC ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/axl_jncc)
+	set (_FILE_NAME_LIST ${ARGN})
+
+	foreach (_FILE_NAME ${_FILE_NAME_LIST})
+
+		add_test (
+			NAME ${_FILE_NAME}
+			WORKING_DIRECTORY ${_DIR}
+			COMMAND ${_JNCC} ${_FLAGS} ${_FILE_NAME}
+			)
+	endforeach ()
+endmacro ()
+
+#..............................................................................

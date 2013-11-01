@@ -68,4 +68,16 @@ set_target_properties (
 	LINKER_LANGUAGE C
 	)
 
+set (
+	AXL_JANCY_DEMOS_FILE_NAME_LIST
+	${DEMOS_JNC_LIST}
+	PARENT_SCOPE
+	)
+
+set (
+	AXL_JANCY_DEMOS_DIR
+	${CMAKE_CURRENT_LIST_DIR}
+	PARENT_SCOPE
+	)
+
 #..............................................................................

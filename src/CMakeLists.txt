@@ -208,8 +208,8 @@ set (AXL_PG_FRAME_DIR ${AXL_ROOT_DIR}/pgframe)
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+enable_testing ()
 include_directories (${AXL_INC_DIR})
-
 root_virtual_folder (${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
 
 #
@@ -245,6 +245,17 @@ endif ()
 
 if (AXL_BUILD_JNCC)
 	add_subdirectory (axl_jncc)
+
+	# test against official demos
+
+	add_jncc_tests (
+		"-jm -rmain"
+		${AXL_JANCY_DEMOS_DIR}
+		${AXL_JANCY_DEMOS_FILE_NAME_LIST}
+		)
+
+	# later add more test files
+
 endif ()
 
 if (AXL_BUILD_LOG_LIB)
