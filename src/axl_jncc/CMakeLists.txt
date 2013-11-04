@@ -68,10 +68,10 @@ llvm_map_components_to_libraries (
 
 add_executable (
 	axl_jncc
-	${JNCC_H_LIST}
-	${JNCC_CPP_LIST}
 	${PCH_H}
 	${PCH_CPP}
+	${JNCC_H_LIST}
+	${JNCC_CPP_LIST}
 	)
 
 target_link_libraries (

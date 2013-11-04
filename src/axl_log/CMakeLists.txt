@@ -228,6 +228,8 @@ endif ()
 
 add_library (
 	axl_log
+	${PCH_H}
+	${PCH_CPP}
 	${LOG_FILE_H_LIST}
 	${LOG_FILE_CPP_LIST}
 	${LOG_PAGE_H_LIST}
@@ -240,8 +242,6 @@ add_library (
 	${LOG_SERVER_CPP_LIST}
 	${LOG_WIDGET_H_LIST}
 	${LOG_WIDGET_CPP_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

@@ -160,6 +160,8 @@ link_directories (${PATH_LLVM_LIB_DIR})
 
 add_executable (
 	JncQtTest
+	${PCH_H}
+	${PCH_CPP}
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${SRC_RL_LIST}
@@ -168,8 +170,6 @@ add_executable (
 	${QRC_CPP_LIST}
 	${MOC_CPP_LIST}
 	${UI_H_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 llvm_map_components_to_libraries (

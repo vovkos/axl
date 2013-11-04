@@ -152,14 +152,14 @@ endif ()
 
 add_library (
 	axl_gui
+	${PCH_H}
+	${PCH_CPP}
 	${GUI_H_LIST}
 	${GUI_CPP_LIST}
 	${GUI_GDI_H_LIST}
 	${GUI_GDI_CPP_LIST}
 	${GUI_QT_H_LIST}
 	${GUI_QT_CPP_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_BUILD_GUI_QT)

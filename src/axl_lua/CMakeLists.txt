@@ -67,11 +67,11 @@ include_directories (${PATH_LUA_INC_DIR})
 
 add_library (
 	axl_lua
+	${PCH_H}
+	${PCH_CPP}
 	${LUA_H_LIST}
 	${LUA_CPP_LIST}
 	${LUA_RL_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

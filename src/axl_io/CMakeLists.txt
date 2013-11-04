@@ -138,14 +138,14 @@ source_virtual_folder (
 
 add_library (
 	axl_io
+	${PCH_H}
+	${PCH_CPP}
 	${IO_H_LIST}
 	${IO_CPP_LIST}
 	${IO_PSX_H_LIST}
 	${IO_PSX_CPP_LIST}
 	${IO_WIN_H_LIST}
 	${IO_WIN_CPP_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

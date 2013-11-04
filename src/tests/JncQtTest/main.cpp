@@ -3,14 +3,6 @@
 
 int main (int argc, char* argv [])
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
-	_CrtSetDbgFlag(
-		_CRTDBG_ALLOC_MEM_DF |
-		_CRTDBG_LEAK_CHECK_DF
-		); // Memory leak detection.
-
-#endif
-
 	atexit (llvm::llvm_shutdown);
 
 	llvm::InitializeNativeTarget ();

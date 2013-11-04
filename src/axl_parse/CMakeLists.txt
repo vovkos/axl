@@ -86,14 +86,14 @@ source_virtual_folder (
 
 add_library (
 	axl_parse
+	${PCH_H}
+	${PCH_CPP}
 	${ERR_H_LIST}
 	${ERR_CPP_LIST}
 	${LEX_H_LIST}
 	${LEX_CPP_LIST}
 	${LLK_H_LIST}
 	${LLK_CPP_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

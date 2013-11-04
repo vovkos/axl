@@ -102,12 +102,12 @@ link_directories (${PATH_LUA_LIB_DIR})
 
 add_executable (
 	axl_pg
+	${PCH_H}
+	${PCH_CPP}
 	${PG_H_LIST}
 	${PG_CPP_LIST}
 	${PG_RL_LIST}
 	${PG_FRAME_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 target_link_libraries (

@@ -340,6 +340,8 @@ source_virtual_folder (
 add_library (
 	axl_core
 
+	${PCH_H}
+	${PCH_CPP}
 	${DBG_H_LIST}
 	${DBG_CPP_LIST}
 	${ERR_H_LIST}
@@ -362,8 +364,6 @@ add_library (
 	${REF_CPP_LIST}
 	${RTL_H_LIST}
 	${RTL_CPP_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

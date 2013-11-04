@@ -63,11 +63,11 @@ source_virtual_folder (
 
 add_library (
 	axl_ini
+	${PCH_H}
+	${PCH_CPP}
 	${INI_H_LIST}
 	${INI_CPP_LIST}
 	${INI_RL_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

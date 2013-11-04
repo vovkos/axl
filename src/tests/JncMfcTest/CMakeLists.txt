@@ -119,24 +119,14 @@ link_directories (
 	${PATH_LLVM_LIB_DIR}/$(Configuation)
 	)
 
-set (
-	H_LIST
-	${SRC_H_LIST}
-	${PCH_H}
-	)
-
-set (
-	CPP_LIST
-	${SRC_CPP_LIST}
-	${PCH_CPP}
-	)
-
 set (CMAKE_MFC_FLAG 1)
 
 add_executable (
 	JncMfcTest WIN32
-	${H_LIST}
-	${CPP_LIST}
+	${PCH_H}
+	${PCH_CPP}
+	${SRC_H_LIST}
+	${SRC_CPP_LIST}
 	${RES_BMP_LIST}
 	${RES_ICO_LIST}
 	${RES_XML_LIST}

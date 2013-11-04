@@ -74,11 +74,11 @@ virtual_folder (
 
 add_library (
 	axl_exe
+	${PCH_H}
+	${PCH_CPP}
 	${EXE_H_LIST}
 	${EXE_CPP_LIST}
 	${EXE_ASM_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)

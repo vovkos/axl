@@ -23,7 +23,7 @@ create_std_settings ()
 
 message (STATUS "Target CPU:                 ${TARGET_CPU}")
 
-if (NOT MSVC)
+if (HAS_BUILD_TYPE_SETTING)
 	message (STATUS "Build type:                 ${CMAKE_BUILD_TYPE}")
 endif ()
 
@@ -69,7 +69,7 @@ if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")
 
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
 	include ("${PATH_QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
-	set (QT_FOUND true)
+	set (QT_FOUND TRUE)
 endif ()
 
 #..............................................................................
@@ -248,8 +248,14 @@ if (AXL_BUILD_JNCC)
 
 	# test against official demos
 
+	if (UNIX)
+		set (_FLAGS "-jm -rmain")
+	else ()
+		set (_FLAGS "-j -rmain")
+	endif ()
+
 	add_jncc_tests (
-		"-jm -rmain"
+		${_FLAGS}
 		${AXL_JANCY_DEMOS_DIR}
 		${AXL_JANCY_DEMOS_FILE_NAME_LIST}
 		)

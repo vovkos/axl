@@ -80,10 +80,10 @@ link_directories (${PATH_AXL_LIB_DIR})
 
 add_executable (
 	ConTest
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
 	${PCH_H}
 	${PCH_CPP}
+	${SRC_H_LIST}
+	${SRC_CPP_LIST}
 	)
 
 target_link_libraries (

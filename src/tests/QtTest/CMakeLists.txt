@@ -158,14 +158,14 @@ llvm_map_components_to_libraries (
 
 add_executable (
 	QtTest
+	${PCH_H}
+	${PCH_CPP}
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${RES_UI_LIST}
 	${MOC_CPP_LIST}
 	${UI_H_LIST}
 	${SCRIPT_JNC_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 target_link_libraries (

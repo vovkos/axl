@@ -474,6 +474,8 @@ include_directories (
 
 add_library (
 	axl_jnc
+	${PCH_H}
+	${PCH_CPP}
 	${CALLCONV_H_LIST}
 	${CALLCONV_CPP_LIST}
 	${CONTROLFLOW_H_LIST}
@@ -498,8 +500,6 @@ add_library (
 	${VARIABLE_CPP_LIST}
 	${RUNTIME_H_LIST}
 	${RUNTIME_CPP_LIST}
-	${PCH_H}
-	${PCH_CPP}
 	)
 
 if (AXL_USE_PCH)
