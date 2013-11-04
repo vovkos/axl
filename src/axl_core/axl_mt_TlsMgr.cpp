@@ -26,7 +26,7 @@ CTlsMgr::~CTlsMgr ()
 	}
 
 	TlsFree (m_TlsIdx);
-	s_IsDead = true;
+	m_IsDead = true;
 }
 
 void
