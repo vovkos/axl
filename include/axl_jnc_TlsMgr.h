@@ -8,7 +8,7 @@
 #include "axl_rtl_List.h"
 #include "axl_rtl_Array.h"
 #include "axl_rtl_BitMap.h"
-#include "axl_rtl_SimpleSingleton.h"
+#include "axl_rtl_Singleton.h"
 
 namespace axl {
 namespace jnc {
@@ -85,7 +85,7 @@ inline
 CTlsMgr*
 GetTlsMgr ()
 {
-	return rtl::GetSimpleSingleton <CTlsMgr> ();
+	return rtl::GetSingleton <CTlsMgr> ();
 }
 
 //.............................................................................
