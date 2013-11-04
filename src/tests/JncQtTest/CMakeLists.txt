@@ -147,6 +147,10 @@ source_virtual_folder (
 # JncQtTest compiler test
 #
 
+if (MSVC)
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm200")
+endif ()
+
 include_directories (
 	${PATH_LLVM_INC_DIR}
 	${PATH_LLVM_INC_DIR_2}
