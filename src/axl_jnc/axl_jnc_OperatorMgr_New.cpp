@@ -144,7 +144,7 @@ COperatorMgr::Prime (
 
 	if (!pClassType->IsCreatable ())
 	{
-		err::SetFormatStringError ("cannot instantiate abstract '%s'", pClassType->GetTypeString ().cc ());
+		err::SetFormatStringError ("cannot instantiate '%s'", pClassType->GetTypeString ().cc ());
 		return false;
 	}
 

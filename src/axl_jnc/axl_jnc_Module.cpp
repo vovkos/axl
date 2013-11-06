@@ -180,7 +180,33 @@ CModule::SetFunctionPointer (
 	void* pf
 	)
 {
+	if (strchr (pName, '.'))
+	{
+		CQualifiedName Name;
+		Name.Parse (pName);
+		return SetFunctionPointer (pLlvmExecutionEngine, Name, pf);
+	}
+
 	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
+	if (!pItem || pItem->GetItemKind () != EModuleItem_Function)
+		return false;
+
+	llvm::Function* pLlvmFunction = ((CFunction*) pItem)->GetLlvmFunction ();
+	if (!pLlvmFunction)
+		return false;
+
+	pLlvmExecutionEngine->addGlobalMapping (pLlvmFunction, pf);
+	return true;
+}
+
+bool
+CModule::SetFunctionPointer (
+	llvm::ExecutionEngine* pLlvmExecutionEngine,
+	const CQualifiedName& Name,
+	void* pf
+	)
+{
+	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (Name);
 	if (!pItem || pItem->GetItemKind () != EModuleItem_Function)
 		return false;
 

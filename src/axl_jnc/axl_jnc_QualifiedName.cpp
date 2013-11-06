@@ -33,6 +33,25 @@ CQualifiedName::GetFullName () const
 }
 
 void
+CQualifiedName::Parse (const char* pName)
+{
+	Clear ();
+
+	for (;;)
+	{
+		const char* pDot = strchr (pName, '.');
+		if (!pDot)
+		{
+			AddName (pName);
+			break;
+		}
+
+		AddName (rtl::CString (pName, pDot - pName));
+		pName = pDot + 1;
+	}
+}
+
+void
 CQualifiedName::Copy (const CQualifiedName& Name)
 {
 	m_First = Name.m_First;

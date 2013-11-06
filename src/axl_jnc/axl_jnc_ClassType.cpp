@@ -299,9 +299,9 @@ CClassType::CalcLayout ()
 		}
 
 		CClassType* pBaseClassType = (CClassType*) pSlot->m_pType;
-		if (pBaseClassType->m_Flags & EClassTypeFlag_Sealed)
+		if (pBaseClassType->m_Flags & EClassTypeFlag_Opaque)
 		{
-			err::SetFormatStringError ("cannot derive from sealed '%s'", pBaseClassType->GetTypeString ().cc ());
+			err::SetFormatStringError ("cannot derive from opaque '%s'", pBaseClassType->GetTypeString ().cc ());
 			return false;
 		}
 
@@ -344,7 +344,7 @@ CClassType::CalcLayout ()
 			CClassType* pClassType = (CClassType*) pType;
 			if (!pClassType->IsCreatable ())
 			{
-				err::SetFormatStringError ("cannot instantiate abstract '%s'", pType->GetTypeString ().cc ());
+				err::SetFormatStringError ("cannot instantiate '%s'", pType->GetTypeString ().cc ());
 				return false;
 			}
 

@@ -201,25 +201,17 @@ class
 	CClassType* m_pType;
 }
 class_specifier
-	:	EToken_Abstract $a?
-		EToken_Sealed $s?
+	:	EToken_Opaque $o?
 		EToken_Class
 		struct_pack_factor $p?
 		EToken_Identifier $n
 		(':' type_name_list $b)?			
 			{
-				uint_t Flags = 0;
-				if (IsValidLocator ($a))
-					Flags |= EClassTypeFlag_Abstract;
-
-				if (IsValidLocator ($s))
-					Flags |= EClassTypeFlag_Sealed;
-
 				$.m_pType = CreateClassType (
 					$n.m_Data.m_String,
 					IsValidLocator ($b) ? &$b.m_TypeList : NULL,
 					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor,
-					Flags
+					IsValidLocator ($o) ? EClassTypeFlag_Opaque : 0
 					);
 
 				if (!$.m_pType)

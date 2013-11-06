@@ -53,6 +53,9 @@ public:
 	}
 
 	void
+	Parse (const char* pName);
+
+	void
 	AddName (const rtl::CString& Name);
 
 	bool

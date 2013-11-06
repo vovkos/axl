@@ -192,6 +192,13 @@ public:
 		void* pf
 		);
 
+	bool
+	SetFunctionPointer (
+		llvm::ExecutionEngine* pLlvmExecutionEngine,
+		const CQualifiedName& Name,
+		void* pf
+		);
+
 	void
 	MarkForLayout (CModuleItem* pItem);
 
