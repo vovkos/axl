@@ -260,7 +260,8 @@ Members2
 	CreateClassType (
 		const rtl::CString& Name,
 		rtl::CBoxListT <CType*>* pBaseTypeList,
-		size_t PackFactor
+		size_t PackFactor,
+		uint_t Flags
 		);
 
 	CProperty*

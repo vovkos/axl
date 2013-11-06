@@ -394,32 +394,38 @@ public:
 		EClassType ClassTypeKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		size_t PackFactor = 8
+		size_t PackFactor = 8,
+		uint_t Flags = 0
 		);
 
 	CClassType*
 	CreateClassType (
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		size_t PackFactor = 8
+		size_t PackFactor = 8,
+		uint_t Flags = 0
 		)
 	{
-		return CreateClassType (EClassType_Normal, Name, QualifiedName, PackFactor);
+		return CreateClassType (EClassType_Normal, Name, QualifiedName, PackFactor, Flags);
 	}
 
 	CClassType*
 	CreateUnnamedClassType (
 		EClassType ClassTypeKind,
-		size_t PackFactor = 8
+		size_t PackFactor = 8,
+		uint_t Flags = 0
 		)
 	{
-		return CreateClassType (ClassTypeKind,	rtl::CString (), rtl::CString (), PackFactor);
+		return CreateClassType (ClassTypeKind,	rtl::CString (), rtl::CString (), PackFactor, Flags);
 	}
 
 	CClassType*
-	CreateUnnamedClassType (size_t PackFactor = 8)
+	CreateUnnamedClassType (
+		size_t PackFactor = 8,
+		uint_t Flags = 0
+		)
 	{
-		return CreateClassType (EClassType_Normal, rtl::CString (), rtl::CString (), PackFactor);
+		return CreateClassType (EClassType_Normal, rtl::CString (), rtl::CString (), PackFactor, Flags);
 	}
 
 	CClassType*

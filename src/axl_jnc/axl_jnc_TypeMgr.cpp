@@ -519,7 +519,8 @@ CTypeMgr::CreateClassType (
 	EClassType ClassTypeKind,
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
-	size_t PackFactor
+	size_t PackFactor,
+	uint_t Flags
 	)
 {
 	CClassType* pType;
@@ -602,6 +603,7 @@ CTypeMgr::CreateClassType (
 	pClassStructType->CreateField ("m_iface", pIfaceStructType);
 
 	pType->m_pModule = m_pModule;
+	pType->m_Flags |= Flags;
 	pType->m_ClassTypeKind = ClassTypeKind;
 	pType->m_pVTableStructType = pVTableStructType;
 	pType->m_pIfaceStructType = pIfaceStructType;

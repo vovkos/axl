@@ -199,7 +199,8 @@ class
 	CClassType* m_pType;
 }
 class_specifier
-	:	EToken_Class
+	:	EToken_Abstract $a?
+		EToken_Class
 		struct_pack_factor $p?
 		EToken_Identifier $n
 		(':' type_name_list $b)?
@@ -207,7 +208,8 @@ class_specifier
 				$.m_pType = CreateClassType (
 					$n.m_Data.m_String,
 					IsValidLocator ($b) ? &$b.m_TypeList : NULL,
-					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
+					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor,
+					IsValidLocator ($a) ? EClassTypeFlag_Abstract : 0
 					);
 
 				if (!$.m_pType)

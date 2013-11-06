@@ -1485,7 +1485,8 @@ CClassType*
 CParser::CreateClassType (
 	const rtl::CString& Name,
 	rtl::CBoxListT <CType*>* pBaseTypeList,
-	size_t PackFactor
+	size_t PackFactor,
+	uint_t Flags
 	)
 {
 	bool Result;
@@ -1495,12 +1496,12 @@ CParser::CreateClassType (
 
 	if (Name.IsEmpty ())
 	{
-		pClassType = m_pModule->m_TypeMgr.CreateUnnamedClassType (PackFactor);
+		pClassType = m_pModule->m_TypeMgr.CreateUnnamedClassType (PackFactor, Flags);
 	}
 	else
 	{
 		rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pClassType = m_pModule->m_TypeMgr.CreateClassType (Name, QualifiedName, PackFactor);
+		pClassType = m_pModule->m_TypeMgr.CreateClassType (Name, QualifiedName, PackFactor, Flags);
 	}
 
 	if (pBaseTypeList)
