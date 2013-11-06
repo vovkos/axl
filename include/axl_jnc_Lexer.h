@@ -107,6 +107,7 @@ enum EToken
 	EToken_Struct,
 	EToken_Union,
 	EToken_Class,
+	EToken_Sealed,
 
 	// special member methods
 
@@ -282,6 +283,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_LEX_TOKEN_NAME (EToken_Union,        "union")
 	AXL_LEX_TOKEN_NAME (EToken_Class,        "class")
+	AXL_LEX_TOKEN_NAME (EToken_Sealed,       "sealed")
 
 	// special members
 

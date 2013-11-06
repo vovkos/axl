@@ -299,6 +299,12 @@ CClassType::CalcLayout ()
 		}
 
 		CClassType* pBaseClassType = (CClassType*) pSlot->m_pType;
+		if (pBaseClassType->m_Flags & EClassTypeFlag_Sealed)
+		{
+			err::SetFormatStringError ("cannot derive from sealed '%s'", pBaseClassType->GetTypeString ().cc ());
+			return false;
+		}
+
 		IfaceBaseTypeArray [i] = m_pIfaceStructType->AddBaseType (pBaseClassType->GetIfaceStructType ());
 		pSlot->m_VTableIndex = m_VTable.GetCount ();
 		m_VTable.Append (pBaseClassType->m_VTable);

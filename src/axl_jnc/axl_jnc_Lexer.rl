@@ -166,6 +166,7 @@ main := |*
 'struct'         { CreateToken (EToken_Struct); };
 'union'          { CreateToken (EToken_Union); };
 'class'          { CreateToken (EToken_Class); };
+'sealed'         { CreateToken (EToken_Sealed); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

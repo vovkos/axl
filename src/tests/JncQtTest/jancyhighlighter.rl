@@ -101,6 +101,7 @@ main := |*
 'struct'          |
 'union'           |
 'class'           |
+'sealed'          |
 
 'get'             |
 'set'             |

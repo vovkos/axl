@@ -38,6 +38,7 @@ enum EClassType
 enum EClassTypeFlag
 {
 	EClassTypeFlag_Abstract = 0x010000,
+	EClassTypeFlag_Sealed   = 0x020000,
 };
 
 //.............................................................................
