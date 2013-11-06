@@ -23,7 +23,7 @@ struct TMsg
 	// followed by msg data
 };	
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CPeer
 {
@@ -85,7 +85,7 @@ struct TSrvMsg_FoldPacket: TMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CServerPeer: CPeer
+class CServerPeer: public CPeer
 {
 public:
 	void 

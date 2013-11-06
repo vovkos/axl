@@ -53,9 +53,6 @@ protected:
 		}
 	};
 	
-public:
-	int m_x;
-
 protected:
 	mt::CLock m_Lock;
 	uint_t m_Flags;

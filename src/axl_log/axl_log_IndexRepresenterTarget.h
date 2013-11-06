@@ -18,6 +18,7 @@ namespace log {
 class CIndexRepresenterTarget: public CRepresenterTarget
 {
 	friend class CIndexMgr;
+	friend class CMemoryServer;
 
 protected:
 	size_t m_LineCount;

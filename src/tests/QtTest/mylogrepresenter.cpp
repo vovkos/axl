@@ -5,7 +5,7 @@
 
 bool 
 MyLogRepresenter::Represent (
-	log::IRepresenterTarget* pTarget, 
+	log::CRepresenterTarget* pTarget, 
 	uint_t PacketCode, 
 	const void* p, 
 	size_t Size, 

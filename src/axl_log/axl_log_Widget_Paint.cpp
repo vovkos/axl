@@ -88,7 +88,7 @@ CWidget::GetTimestampString (
 	rtl::CString* pString
 	)
 {
-	if (!(pLine->GetFlags () & ELineFlag_FirstLineOfPacket))
+	if (!(pLine->GetFlags () & ELineFlag_FirstLineOfPacket) || !pLine->m_LastTimestamp)
 	{
 		pString->Clear ();
 		return 0;

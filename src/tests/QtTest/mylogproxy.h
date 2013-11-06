@@ -4,11 +4,8 @@
 
 //.............................................................................
 
-class MyLogProxy: public log::IPeer
+class MyLogProxy: public log::CPeer
 {
-public:
-	AXL_OBJ_CLASS_0 (MyLogProxy, log::IPeer)
-
 protected:
 	friend class SocketThread;
 	friend class Packetizer;
@@ -32,7 +29,7 @@ protected:
 	};
 
 protected:
-	log::IPeer* m_target;
+	log::CPeer* m_target;
 	SocketThread m_socketThread;
 	Packetizer m_packetizer;
 	SOCKET m_listenSocket;
@@ -51,8 +48,8 @@ public:
 
 	void close ();
 	
-	bool listen (log::IPeer* target, int port);
-	bool connect (log::IPeer* target, int ip, int port);
+	bool listen (log::CPeer* target, int port);
+	bool connect (log::CPeer* target, int ip, int port);
 
 	virtual void SendMsg (const log::TMsg* msg);
 

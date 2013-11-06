@@ -6,11 +6,11 @@ project_virtual_folder (JncQtTest)
 
 #..............................................................................
 #
-# src folder
+# app folder
 #
 
 set (
-	SRC_MOC_H_LIST
+	APP_H_LIST
 	disassembly.h
 	editor.h
 	highlighter.h
@@ -24,12 +24,7 @@ set (
 	)
 
 set (
-	SRC_H_LIST
-	${SRC_MOC_H_LIST}
-	)
-
-set (
-	SRC_CPP_LIST
+	APP_CPP_LIST
 	disassembly.cpp
 	editor.cpp
 	highlighter.cpp
@@ -44,7 +39,7 @@ set (
 	)
 
 set (
-	SRC_RL_LIST
+	APP_RL_LIST
 	jancyhighlighter.rl
 	llvmirhighlighter.rl
 	)
@@ -64,10 +59,10 @@ add_ragel_step (
 pop (CMAKE_CURRENT_BINARY_DIR)
 
 source_virtual_folder (
-	src
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
-	${SRC_RL_LIST}
+	app
+	${APP_H_LIST}
+	${APP_CPP_LIST}
+	${APP_RL_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -112,11 +107,25 @@ source_virtual_folder (
 # moc folder
 #
 
+set (
+	MOC_SRC_H_LIST
+	disassembly.h
+	editor.h
+	highlighter.h
+	jancyhighlighter.h
+	llvmir.h
+	llvmirhighlighter.h
+	mainwindow.h
+	mdichild.h
+	modulepane.h
+	output.h
+	)
+
 push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 qt5_wrap_cpp (
 	MOC_CPP_LIST
-	${SRC_MOC_H_LIST}
+	${MOC_SRC_H_LIST}
 	)
 
 pop (CMAKE_CURRENT_BINARY_DIR)
@@ -162,9 +171,9 @@ add_executable (
 	JncQtTest
 	${PCH_H}
 	${PCH_CPP}
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
-	${SRC_RL_LIST}
+	${APP_H_LIST}
+	${APP_CPP_LIST}
+	${APP_RL_LIST}
 	${RES_PNG_LIST}
 	${RES_QRC_LIST}
 	${QRC_CPP_LIST}

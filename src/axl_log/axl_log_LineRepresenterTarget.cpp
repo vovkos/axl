@@ -76,7 +76,9 @@ CLineRepresenterTarget::AddPart (
 	{
 		m_PartIdx = 0;
 		m_BinOffset = 0;
-		memset (m_pColorizerState, 0, m_pColorizer->GetStateSize ());
+
+		if (m_pColorizer)
+			memset (m_pColorizerState, 0, m_pColorizer->GetStateSize ());
 	}
 	else
 	{
@@ -396,6 +398,9 @@ CLineRepresenterTarget::ColorizeLine (
 	size_t Size
 	)
 {
+	if (!m_pColorizer)
+		return;
+
 	CLineColorizerTarget ColorizerTarget;
 	ColorizerTarget.m_pLine = pLine;
 	m_pColorizer->Colorize (&ColorizerTarget, p, Size, false, m_pColorizerState);

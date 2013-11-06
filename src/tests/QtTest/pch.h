@@ -7,8 +7,6 @@
 //.............................................................................
 
 #include "axl_g_Pch.h"
-// #include "axl_jnc_Pch.h"
-#include "axl_gui_qt_Pch.h"
 
 #undef min
 #undef max
@@ -35,6 +33,7 @@
 #include <QToolBar>
 #include <QTreeWidget>
 #include <QWidget>
+#include <QScrollBar>
 
 //.............................................................................
 
@@ -43,7 +42,8 @@
 #include "axl_log_Server.h"
 #include "axl_log_Widget.h"
 #include "axl_log_RagelColorizer.h"
-#include "axl_gui_qt_Engine.h"
+#include "axl_log_MemoryServer.h"
+#include "axl_gui_QtEngine.h"
 
 #ifdef _JANCY_REPRESENTER
 #	include "axl_log_JancyRepresenter.h"

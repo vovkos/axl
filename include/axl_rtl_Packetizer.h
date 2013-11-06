@@ -21,8 +21,8 @@ protected:
 		EPacketHdr_Signature = ':kap',
 	};
 
-public:
-	rtl::CArrayT <char> m_Buffer;	
+protected:
+	rtl::CArrayT <char> m_Buffer;
 
 public:
 	void

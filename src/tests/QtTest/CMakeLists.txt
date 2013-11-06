@@ -2,7 +2,7 @@
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
 
-set (VIRTUAL_FOLDER_SUB_DIR QtTest)
+project_virtual_folder (QtTest)
 
 #..............................................................................
 #
@@ -44,7 +44,7 @@ add_ragel_step (
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-virtual_folder (
+source_virtual_folder (
 	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
@@ -59,7 +59,7 @@ virtual_folder (
 set (
 	MOC_SRC_H_LIST
 	mainwindow.h
-	${AXL_INC_DIR}/axl_gui_qt_Widget.h
+	${AXL_INC_DIR}/axl_gui_QtWidget.h
 	)
 
 qt5_wrap_cpp_to (
@@ -70,7 +70,7 @@ qt5_wrap_cpp_to (
 
 exclude_from_build (${MOC_CPP_LIST}) # include "moc_*.cpp" manually
 
-virtual_folder (
+source_virtual_folder (
 	moc
 	${MOC_CPP_LIST}
 	)
@@ -94,7 +94,7 @@ qt5_wrap_ui (
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
-virtual_folder (
+source_virtual_folder (
 	res
 	${RES_UI_LIST}
 	${UI_H_LIST}
@@ -113,7 +113,7 @@ set (
 	script/std.jnc
 	)
 
-virtual_folder (
+source_virtual_folder (
 	script
 	${SCRIPT_JNC_LIST}
 	)
@@ -126,7 +126,7 @@ virtual_folder (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-virtual_folder (
+source_virtual_folder (
 	pch
 	${PCH_H}
 	${PCH_CPP}

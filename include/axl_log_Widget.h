@@ -141,7 +141,7 @@ public:
 		const char* pIndexFileName
 		);
 
-	// �Server
+	// CServer
 
 	virtual
 	void

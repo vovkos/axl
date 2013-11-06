@@ -24,7 +24,7 @@ void MyLogProxy::close ()
 	m_connectSocket = INVALID_SOCKET;
 }
 
-bool MyLogProxy::listen (log::IPeer* target, int port)
+bool MyLogProxy::listen (log::CPeer* target, int port)
 {
 	int result;
 
@@ -50,7 +50,7 @@ bool MyLogProxy::listen (log::IPeer* target, int port)
 	return m_socketThread.Start ();
 }
 
-bool MyLogProxy::connect (log::IPeer* target, int ip, int port)
+bool MyLogProxy::connect (log::CPeer* target, int ip, int port)
 {
 	int result;
 

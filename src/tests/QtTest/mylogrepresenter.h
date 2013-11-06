@@ -17,15 +17,13 @@ enum EMyLog
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyLogRepresenter: public log::IRepresenter
+class MyLogRepresenter: public log::CRepresenter
 {
 public:
-	AXL_OBJ_CLASS_0 (MyLogRepresenter, log::IRepresenter)
-
 	virtual 
 	bool 
 	Represent (
-		log::IRepresenterTarget* pTarget, 
+		log::CRepresenterTarget* pTarget, 
 		uint_t PacketCode, 
 		const void* p, 
 		size_t Size, 

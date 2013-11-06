@@ -18,6 +18,7 @@ namespace log {
 class CLineRepresenterTarget: public CRepresenterTarget 
 {
 	friend class CLineRepresentMgr;
+	friend class CMemoryServer;
 
 protected:
 	CColorizer* m_pColorizer;

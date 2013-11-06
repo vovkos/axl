@@ -6,18 +6,18 @@ project_virtual_folder (axl_jncc)
 
 #..............................................................................
 #
-# jncc folder
+# app folder
 #
 
 set (
-	JNCC_H_LIST
+	APP_H_LIST
 	axl_jncc.h
 	axl_jncc_CmdLine.h
 	axl_jncc_OutStream.h
 	)
 
 set (
-	JNCC_CPP_LIST
+	APP_CPP_LIST
 	axl_jncc.cpp
 	axl_jncc_CmdLine.cpp
 	axl_jncc_Compile.cpp
@@ -27,7 +27,7 @@ set (
 	)
 
 source_virtual_folder (
-	jncc
+	app
 	${JNCC_H_LIST}
 	${JNCC_CPP_LIST}
 	)
@@ -70,8 +70,8 @@ add_executable (
 	axl_jncc
 	${PCH_H}
 	${PCH_CPP}
-	${JNCC_H_LIST}
-	${JNCC_CPP_LIST}
+	${APP_H_LIST}
+	${APP_CPP_LIST}
 	)
 
 target_link_libraries (

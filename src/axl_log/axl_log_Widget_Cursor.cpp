@@ -167,6 +167,8 @@ CWidget::ValidateCursorPos (
 		Col = 0;
 
 	pLine = m_CacheMgr.GetLine (Line);
+	if (!pLine)
+		return gui::TCursorPos (Line, Col);
 
 	switch (pLine->m_LineKind)
 	{

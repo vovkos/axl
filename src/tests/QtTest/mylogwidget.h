@@ -7,7 +7,7 @@
 class MyLogWidget: public log::CWidget
 {
 public:
-	MyLogWidget (gui::IEngine* pEngine):
+	MyLogWidget (gui::CEngine* pEngine):
 		log::CWidget (pEngine)
 	{
 	}

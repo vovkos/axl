@@ -87,5 +87,3 @@ CPacketizerRoot::WriteImpl (
 
 } // namespace rtl
 } // namespace axl
-
- 

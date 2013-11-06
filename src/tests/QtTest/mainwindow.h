@@ -15,9 +15,11 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:	
-	gui::qt::QtWidget <MyLogWidget>* m_logWidget;
+	gui::QtWidget <MyLogWidget>* m_logWidget;
 	MyLogServer m_logServer;
 	
+	log::CMemoryServer m_memoryServer;
+
 	MyLogProxy m_logServerProxy;
 	MyLogProxy m_logWidgetProxy;
 

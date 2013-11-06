@@ -123,6 +123,28 @@ endif ()
 
 #..............................................................................
 #
+# log_Protocol folder
+#
+
+set (
+	LOG_PROTOCOL_H_LIST
+	${AXL_INC_DIR}/axl_log_Protocol.h
+	)
+
+
+set (
+	LOG_PROTOCOL_CPP_LIST
+	axl_log_Protocol.cpp
+	)
+
+source_virtual_folder (
+	log_Protocol
+	${LOG_PROTOCOL_H_LIST}
+	${LOG_PROTOCOL_CPP_LIST}
+	)
+
+#..............................................................................
+#
 # log_Server folder
 #
 
@@ -132,14 +154,13 @@ set (
 	${AXL_INC_DIR}/axl_log_FilterMgr.h
 	${AXL_INC_DIR}/axl_log_IndexMgr.h
 	${AXL_INC_DIR}/axl_log_LineRepresentMgr.h
-	${AXL_INC_DIR}/axl_log_Protocol.h
 	${AXL_INC_DIR}/axl_log_Server.h
+	${AXL_INC_DIR}/axl_log_MemoryServer.h
 	axl_log_ColorizerStateCalcTarget.h
 	axl_log_IndexRepresenterTarget.h
 	axl_log_LineColorizerTarget.h
 	axl_log_LineRepresenterTarget.h
 	)
-
 
 set (
 	LOG_SERVER_CPP_LIST
@@ -151,8 +172,8 @@ set (
 	axl_log_LineColorizerTarget.cpp
 	axl_log_LineRepresenterTarget.cpp
 	axl_log_LineRepresentMgr.cpp
-	axl_log_Protocol.cpp
 	axl_log_Server.cpp
+	axl_log_MemoryServer.cpp
 	)
 
 source_virtual_folder (
@@ -238,6 +259,8 @@ add_library (
 	${LOG_PLUGIN_CPP_LIST}
 	${LOG_JANCY_H_LIST}
 	${LOG_JANCY_CPP_LIST}
+	${LOG_PROTOCOL_H_LIST}
+	${LOG_PROTOCOL_CPP_LIST}
 	${LOG_SERVER_H_LIST}
 	${LOG_SERVER_CPP_LIST}
 	${LOG_WIDGET_H_LIST}
