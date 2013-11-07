@@ -38,6 +38,14 @@ enum EGcFlag
 	EGcFlag_WaitForDestructors = 0x01,
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum ECreateObjectFlag
+{
+	ECreateObjectFlag_Construct = 0x01,
+	ECreateObjectFlag_Pin       = 0x02,
+};
+
 //.............................................................................
 
 class CRuntime
@@ -218,7 +226,13 @@ public:
 	// creating objects on gc heap
 
 	TInterface*
-	CreateAndPinObject (CClassType* pType);
+	CreateObject (
+		CClassType* pType,
+		uint_t Flags = ECreateObjectFlag_Construct | ECreateObjectFlag_Pin
+		);
+
+	void
+	PinObject (TInterface* pObject);
 
 	void
 	UnpinObject (TInterface* pObject);

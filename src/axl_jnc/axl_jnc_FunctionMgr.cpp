@@ -4,7 +4,7 @@
 #include "axl_jnc_Module.h"
 
 // #define _AXL_JNC_NO_JIT
-// #define _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
+#define _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 
 namespace axl {
 namespace jnc {
@@ -176,6 +176,13 @@ CFunctionMgr::PushEmissionContext ()
 
 	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = &m_pModule->m_NamespaceMgr.m_GlobalNamespace;
 	m_pModule->m_NamespaceMgr.m_pCurrentScope = NULL;
+
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (NULL);
+	m_pModule->m_ControlFlowMgr.m_pReturnBlock = NULL;
+	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
+	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
+	m_pModule->m_ControlFlowMgr.m_Flags = 0;
+
 	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 
 	m_pCurrentFunction = NULL;
@@ -877,7 +884,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 				"LLVM jitting fail for '%s': %s",
 				pFunction->m_Tag.cc (),
 				Error->GetDescription ().cc ()
-				);
+				); 
 
 			pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
 			return false;

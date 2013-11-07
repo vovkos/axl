@@ -20,7 +20,7 @@ struct TJancyRepresenter;
 
 typedef
 void
-(*FJancyRepresenterTarget_AddPart) (
+FJancyRepresenterTarget_AddPart (
 	TJancyRepresenterTarget* pTarget,
 	EPart PartKind,
 	uint_t PartCode,
@@ -30,7 +30,7 @@ void
 
 struct TJancyRepresenterTargetVTable
 {
-	FJancyRepresenterTarget_AddPart m_pfAddPart;
+	FJancyRepresenterTarget_AddPart* m_pfAddPart;
 };
 
 struct TJancyRepresenterTarget: jnc::TInterface
@@ -46,7 +46,7 @@ struct TJancyRepresenterTarget: jnc::TInterface
 
 typedef
 bool
-(*FJancyRepresenter_Represent) (
+FJancyRepresenter_Represent (
 	TJancyRepresenter* pRepresenter,
 	TJancyRepresenterTarget* pTarget,
 	uint_t PacketCode,
@@ -57,7 +57,7 @@ bool
 
 struct TJancyRepresenterVTable
 {
-	FJancyRepresenter_Represent m_pfRepresent;
+	FJancyRepresenter_Represent* m_pfRepresent;
 };
 
 struct TJancyRepresenter: jnc::TInterface

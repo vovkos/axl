@@ -38,8 +38,8 @@ protected:
 	volatile int32_t m_WeakRefCount;
 
 	void* m_pObject;
-	mem::FFree m_pfDestruct;
-	mem::FFree m_pfFree;
+	mem::FFree* m_pfDestruct;
+	mem::FFree* m_pfFree;
 
 public:
 	CRefCount ();
@@ -52,8 +52,8 @@ public:
 	void
 	SetTarget (
 		void* pObject,
-		mem::FFree pfDestruct,
-		mem::FFree pfFree
+		mem::FFree* pfDestruct,
+		mem::FFree* pfFree
 		);
 
 	size_t
@@ -74,13 +74,13 @@ public:
 		return m_pObject;
 	}
 
-	mem::FFree
+	mem::FFree*
 	GetDestruct ()
 	{
 		return m_pfDestruct;
 	}
 
-	mem::FFree
+	mem::FFree*
 	GetFree ()
 	{
 		return m_pfFree;

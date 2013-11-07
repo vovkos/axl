@@ -533,9 +533,8 @@ CRuntime::GcDestructThreadProc ()
 				CFunction* pDestructor = Object->m_pType->GetDestructor ();
 				ASSERT (pDestructor);
 
-				typedef void (*FDestructor) (void*);
-				FDestructor pf = (FDestructor) pDestructor->GetMachineCode ();
-				pf (*Object + 1);
+				FObject_Destruct* pf = (FObject_Destruct*) pDestructor->GetMachineCode ();
+				pf ((jnc::TInterface*) (*Object + 1));
 
 				WaitGcIdleAndLock ();
 				m_GcDestructList.RemoveHead ();
@@ -630,7 +629,10 @@ CRuntime::DestroyTlsData (TTlsData* pTlsData)
 }
 
 TInterface*
-CRuntime::CreateAndPinObject (CClassType* pType)
+CRuntime::CreateObject (
+	CClassType* pType,
+	uint_t Flags
+	)
 {
 	CFunction* pPrimer = pType->GetPrimer ();
 	if (!pPrimer) // abstract
@@ -639,31 +641,36 @@ CRuntime::CreateAndPinObject (CClassType* pType)
 		return NULL;
 	}
 
-	FObjectPrimer pfPrime = (FObjectPrimer) pPrimer->GetMachineCode ();
-	FObjectDefaultConstructor pfConstruct = NULL;
-
-	if (pType->GetConstructor ())
-	{
-		CFunction* pConstructor = pType->GetDefaultConstructor ();
-		if (!pConstructor)
-			return NULL;
-
-		FObjectDefaultConstructor pfConstruct = (FObjectDefaultConstructor) pConstructor->GetMachineCode ();
-	}
-
 	TObject* pObject = (TObject*) GcAllocate (pType->GetSize ());
 	if (!pObject)
 		return NULL;
 
 	CScopeThreadRuntime ScopeRuntime (this);
 
-	TInterface* pInterface = (TInterface*) (pObject + 1);
+	FObject_Prime* pfPrime = (FObject_Prime*) pPrimer->GetMachineCode ();
 	pfPrime (pObject);
 
-	if (pfConstruct)
+	TInterface* pInterface = (TInterface*) (pObject + 1);
+
+	if ((Flags & ECreateObjectFlag_Construct) && pType->GetConstructor ())
+	{
+		CFunction* pConstructor = pType->GetDefaultConstructor ();
+		if (!pConstructor)
+			return NULL;
+
+		FObject_Construct* pfConstruct = (FObject_Construct*) pConstructor->GetMachineCode ();
 		pfConstruct (pInterface);
+	}
+
+	if (Flags & ECreateObjectFlag_Pin)
+		PinObject (pInterface);
 
 	return pInterface;
+}
+
+void
+CRuntime::PinObject (TInterface* pObject)
+{
 }
 
 void

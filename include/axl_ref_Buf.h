@@ -155,7 +155,7 @@ public:
 
 		if (Src.m_p)
 		{
-			if (Src.GetHdr ()->GetFree () == (mem::FFree) -1)
+			if (Src.GetHdr ()->GetFree () == (mem::FFree*) -1)
 				return Copy (*Src);
 
 			Src.GetHdr ()->AddRef ();
@@ -197,7 +197,7 @@ public:
 
 		CHdr* pOldHdr = GetHdr ();
 
-		mem::FFree pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1;
+		mem::FFree* pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
 		CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
 		NewHdr->m_BufferSize = Size - sizeof (CHdr);
 

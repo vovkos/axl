@@ -28,7 +28,7 @@ CJancyRepresenter::Create (
 
 	jnc::CModule* pModule = pType->GetModule ();
 
-	m_pJancyRepresenter = (TJancyRepresenter*) pRuntime->CreateAndPinObject (pType);
+	m_pJancyRepresenter = (TJancyRepresenter*) pRuntime->CreateObject (pType);
 	if (!m_pJancyRepresenter)
 		return false;
 

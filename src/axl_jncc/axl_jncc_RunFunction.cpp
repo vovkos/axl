@@ -45,8 +45,11 @@ CJnc::RunFunction (
 	int* pReturnValue
 	)
 {
-	typedef int (*FFunction) ();
-	FFunction pf = (FFunction) pFunction->GetMachineCode ();
+	typedef 
+	int 
+	FFunction ();
+
+	FFunction* pf = (FFunction*) pFunction->GetMachineCode ();
 	ASSERT (pf);
 
 	bool Result = true;

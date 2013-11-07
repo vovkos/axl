@@ -626,12 +626,13 @@ protected:
 
 enum EObjectFlag
 {
-	EObjectFlag_Alive     = 0x01,
-	EObjectFlag_Static    = 0x02,
-	EObjectFlag_Stack     = 0x04,
-	EObjectFlag_HeapU     = 0x08,
-	EObjectFlag_GcMark    = 0x10, 
-	EObjectFlag_GcMark_wc = 0x20, // weak closure (function or property ptr)
+	EObjectFlag_Alive     = 0x0001,
+	EObjectFlag_Static    = 0x0010,
+	EObjectFlag_Stack     = 0x0020,
+	EObjectFlag_HeapU     = 0x0040,
+	EObjectFlag_Extern    = 0x0080,
+	EObjectFlag_GcMark    = 0x0100, 
+	EObjectFlag_GcMark_wc = 0x0200, // weak closure (function or property ptr)
 };
 
 // master header of class instance
@@ -640,7 +641,7 @@ struct TObject
 {
 	class CClassType* m_pType; // for GC tracing & QueryInterface
 	size_t m_ScopeLevel;
-	intptr_t m_Flags;
+	uintptr_t m_Flags;
 	rtl::TListLink m_GcHeapLink; // objects allocated on gc heap get into a list
 
 	// followed by TInterface of object
@@ -666,15 +667,37 @@ struct TInterface
 	// followed by parents, then by interface data fields
 };
 
+// interface with master header
+
+template <typename T>
+class CObjectT: 
+	public TObject,
+	public T
+{
+public:
+	CObjectT ()
+	{
+		m_pType = NULL;
+		m_ScopeLevel = 0;
+		m_Flags = EObjectFlag_Alive | EObjectFlag_Extern;
+		m_pObject = this;
+		m_pVTable = NULL;
+	}
+};
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef 
 void 
-(*FObjectPrimer) (TObject* pObject);
+FObject_Prime (TObject* pObject);
 
 typedef 
 void 
-(*FObjectDefaultConstructor) (TInterface* pInterface);
+FObject_Construct (TInterface* pInterface);
+
+typedef 
+void 
+FObject_Destruct (TInterface* pInterface);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

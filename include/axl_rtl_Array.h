@@ -415,7 +415,7 @@ public:
 			return true; 
 		}
 
-		if (Src.GetHdr ()->GetFree () == (mem::FFree) -1)
+		if (Src.GetHdr ()->GetFree () == (mem::FFree*) -1)
 			return Copy (Src, Src.GetCount ()); 
 
 		if (Src.m_p)
@@ -773,7 +773,7 @@ public:
 
 		CHdr* pOldHdr = GetHdr ();
 		
-		mem::FFree pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree) -1;
+		mem::FFree* pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
 		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
 		NewHdr->m_Count = 0;
 		NewHdr->m_MaxCount = (Size - sizeof (CHdr)) / sizeof (T);

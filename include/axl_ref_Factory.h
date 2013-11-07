@@ -85,7 +85,7 @@ public:
 		CPtrT <T> 
 		operator () (
 			void* p,
-			mem::FFree pfFree
+			mem::FFree* pfFree
 			)
 		{
 			new (p) T;
@@ -99,7 +99,7 @@ public:
 	CPtrT <T> 
 	New (
 		void* p,
-		mem::FFree pfFree
+		mem::FFree* pfFree
 		)
 	{
 		return CNew () (p, pfFree);

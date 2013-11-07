@@ -397,6 +397,8 @@ bool MainWindow::compile ()
 	uint_t ModuleFlags = 0;
 #endif
 
+	ModuleFlags |= jnc::EModuleFlag_IrComments;
+
 	module.Create (filePathBytes.data(), pLlvmModule, ModuleFlags);
 
 	jnc::CScopeThreadModule ScopeModule (&module);
@@ -460,8 +462,8 @@ bool MainWindow::compile ()
 
 bool MainWindow::runFunction (jnc::CFunction* pFunction, int* pReturnValue)
 {
-	typedef int (*FFunction) ();
-	FFunction pf = (FFunction) pFunction->GetMachineCode ();
+	typedef int FFunction ();
+	FFunction* pf = (FFunction*) pFunction->GetMachineCode ();
 	ASSERT (pf);
 
 	bool Result = true;

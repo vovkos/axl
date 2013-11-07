@@ -21,8 +21,8 @@ CRefCount::CRefCount ()
 void
 CRefCount::SetTarget (
 	void* pObject,
-	mem::FFree pfDestruct,
-	mem::FFree pfFree
+	mem::FFree* pfDestruct,
+	mem::FFree* pfFree
 	)
 {
 	m_pObject = pObject;
