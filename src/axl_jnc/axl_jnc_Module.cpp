@@ -59,15 +59,37 @@ CModule::Create (
 	return m_NamespaceMgr.AddStdItems ();
 }
 
-CClassType*
-CModule::FindClassType (const char* pName)
+CModuleItem*
+CModule::GetItemByName (const char* pName)
 {
-	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
+	CModuleItem* pItem;
+
+	if (!strchr (pName, '.'))
+	{
+		pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
+	}
+	else
+	{
+		CQualifiedName Name;
+		Name.Parse (pName);
+		pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (Name);
+	}
+
 	if (!pItem)
 	{
 		err::SetFormatStringError ("'%s' not found", pName);
 		return NULL;
 	}
+
+	return pItem;
+}
+
+CClassType*
+CModule::GetClassTypeByName (const char* pName)
+{
+	CModuleItem* pItem = GetItemByName (pName);
+	if (!pItem)
+		return NULL;
 
 	if (pItem->GetItemKind () != EModuleItem_Type || ((CType*) pItem)->GetTypeKind () != EType_Class)
 	{
@@ -78,57 +100,16 @@ CModule::FindClassType (const char* pName)
 	return (CClassType*) pItem;
 }
 
-CClassType*
-CModule::FindClassType (const CQualifiedName& Name)
-{
-	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (Name);
-	if (!pItem)
-	{
-		err::SetFormatStringError ("'%s' not found", Name.GetFullName ().cc ());
-		return NULL;
-	}
-
-	if (pItem->GetItemKind () != EModuleItem_Type || ((CType*) pItem)->GetTypeKind () != EType_Class)
-	{
-		err::SetFormatStringError ("'%s' is not a class", Name.GetFullName ().cc ());
-		return NULL;
-	}
-
-	return (CClassType*) pItem;
-}
-
 CFunction*
-CModule::FindFunction (const char* pName)
+CModule::GetFunctionByName (const char* pName)
 {
-	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
+	CModuleItem* pItem = GetItemByName (pName);
 	if (!pItem)
-	{
-		err::SetFormatStringError ("'%s' not found", pName);
 		return NULL;
-	}
 
 	if (pItem->GetItemKind () != EModuleItem_Function)
 	{
 		err::SetFormatStringError ("'%s' is not a function", pName);
-		return NULL;
-	}
-
-	return (CFunction*) pItem;
-}
-
-CFunction*
-CModule::FindFunction (const CQualifiedName& Name)
-{
-	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (Name);
-	if (!pItem)
-	{
-		err::SetFormatStringError ("'%s' not found", Name.GetFullName ().cc ());
-		return NULL;
-	}
-
-	if (pItem->GetItemKind () != EModuleItem_Function)
-	{
-		err::SetFormatStringError ("'%s' is not a class", Name.GetFullName ().cc ());
 		return NULL;
 	}
 
@@ -180,18 +161,11 @@ CModule::SetFunctionPointer (
 	void* pf
 	)
 {
-	if (strchr (pName, '.'))
-	{
-		CQualifiedName Name;
-		Name.Parse (pName);
-		return SetFunctionPointer (pLlvmExecutionEngine, Name, pf);
-	}
-
-	CModuleItem* pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
-	if (!pItem || pItem->GetItemKind () != EModuleItem_Function)
+	CFunction* pFunction = GetFunctionByName (pName);
+	if (!pFunction)
 		return false;
 
-	llvm::Function* pLlvmFunction = ((CFunction*) pItem)->GetLlvmFunction ();
+	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
 	if (!pLlvmFunction)
 		return false;
 

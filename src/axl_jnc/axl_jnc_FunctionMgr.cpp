@@ -4,7 +4,7 @@
 #include "axl_jnc_Module.h"
 
 // #define _AXL_JNC_NO_JIT
-#define _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
+// #define _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 
 namespace axl {
 namespace jnc {

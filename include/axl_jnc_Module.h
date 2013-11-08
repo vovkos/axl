@@ -205,29 +205,14 @@ public:
 	void
 	MarkForCompile (CModuleItem* pItem);
 
-	CClassType*
-	FindClassType (const char* pName);
+	CModuleItem*
+	GetItemByName (const char* pName);
 
 	CClassType*
-	FindClassType (const rtl::CString& Name)
-	{
-		return FindClassType (Name.cc ());
-	}
-
-	CClassType*
-	FindClassType (const CQualifiedName& Name);
+	GetClassTypeByName (const char* pName);
 
 	CFunction*
-	FindFunction (const char* pName);
-
-	CFunction*
-	FindFunction (const rtl::CString& Name)
-	{
-		return FindFunction (Name.cc ());
-	}
-
-	CFunction*
-	FindFunction (const CQualifiedName& Name);
+	GetFunctionByName (const char* pName);
 
 	bool
 	Create (
