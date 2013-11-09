@@ -116,6 +116,22 @@ CModule::GetFunctionByName (const char* pName)
 	return (CFunction*) pItem;
 }
 
+CProperty*
+CModule::GetPropertyByName (const char* pName)
+{
+	CModuleItem* pItem = GetItemByName (pName);
+	if (!pItem)
+		return NULL;
+
+	if (pItem->GetItemKind () != EModuleItem_Property)
+	{
+		err::SetFormatStringError ("'%s' is not a property", pName);
+		return NULL;
+	}
+
+	return (CProperty*) pItem;
+}
+
 bool
 CModule::SetConstructor (CFunction* pFunction)
 {

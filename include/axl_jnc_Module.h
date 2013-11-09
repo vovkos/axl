@@ -214,6 +214,9 @@ public:
 	CFunction*
 	GetFunctionByName (const char* pName);
 
+	CProperty*
+	GetPropertyByName (const char* pName);
+
 	bool
 	Create (
 		const rtl::CString& FilePath,

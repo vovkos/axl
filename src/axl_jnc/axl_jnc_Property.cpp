@@ -321,7 +321,7 @@ CProperty::CreateField (
 
 	bool Result;
 
-	CStructField* pField = pParentType->CreateField (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
+	CStructField* pField = pParentType->CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
 	if (!pField)
 		return NULL;
 
