@@ -21,7 +21,7 @@ class CClosure;
 class CThinDataPtrValidator;
 
 //.............................................................................
-	
+
 enum EValue
 {
 	EValue_Void = 0,
@@ -32,7 +32,7 @@ enum EValue
 	EValue_Variable,
 	EValue_Function,
 	EValue_FunctionTypeOverload,
-	EValue_Property,	
+	EValue_Property,
 	EValue_LlvmRegister,
 	EValue_BoolNot,
 	EValue_BoolAnd,
@@ -67,8 +67,8 @@ protected:
 
 protected:
 	EValue m_ValueKind;
-	CType* m_pType;	
-	
+	CType* m_pType;
+
 	ref::CBufT <TBufHdr, CGetBufSize> m_Const;
 
 	union
@@ -198,19 +198,19 @@ public:
 		return !IsEmpty ();
 	}
 
-	EValue 
+	EValue
 	GetValueKind () const
 	{
 		return m_ValueKind;
 	}
-	
+
 	bool
 	IsEmpty () const
 	{
 		return m_ValueKind == EValue_Void;
 	}
 
-	CType* 
+	CType*
 	GetType () const
 	{
 		return m_pType;
@@ -230,21 +230,21 @@ public:
 		return m_pVariable;
 	}
 
-	CFunction* 
+	CFunction*
 	GetFunction () const
 	{
 		ASSERT (m_ValueKind == EValue_Function);
 		return m_pFunction;
 	}
 
-	CFunctionTypeOverload* 
+	CFunctionTypeOverload*
 	GetFunctionTypeOverload () const
 	{
 		ASSERT (m_ValueKind == EValue_FunctionTypeOverload);
 		return m_pFunctionTypeOverload;
 	}
 
-	CProperty* 
+	CProperty*
 	GetProperty () const
 	{
 		ASSERT (m_ValueKind == EValue_Property);
@@ -316,7 +316,7 @@ public:
 	llvm::Value*
 	GetLlvmValue () const;
 
-	rtl::CString 
+	rtl::CString
 	GetLlvmTypeString ()
 	{
 		llvm::Value* pLlvmValue = GetLlvmValue ();
@@ -385,7 +385,7 @@ public:
 		*this = Value;
 		OverrideType (TypeKind);
 	}
-	
+
 	void
 	Clear ();
 
@@ -417,7 +417,7 @@ public:
 	SetProperty (CProperty* pProperty);
 
 	void
-	SetLlvmValue (		
+	SetLlvmValue (
 		llvm::Value* pLlvmValue,
 		CType* pType,
 		EValue ValueKind = EValue_LlvmRegister
@@ -443,14 +443,14 @@ public:
 	SetThinDataPtrValidator (const CValue& ValidatorValue);
 
 	void
-	SetThinDataPtrValidator (		
+	SetThinDataPtrValidator (
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
 		const CValue& SizeValue
 		);
 
 	void
-	SetThinDataPtrValidator (		
+	SetThinDataPtrValidator (
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
 		size_t Size
@@ -482,7 +482,7 @@ public:
 	}
 
 	void
-	SetThinDataPtr (		
+	SetThinDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
 		const CValue& ScopeValidatorValue,
@@ -495,7 +495,7 @@ public:
 	}
 
 	void
-	SetThinDataPtr (		
+	SetThinDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
 		const CValue& ScopeValidatorValue,
@@ -586,7 +586,7 @@ public:
 
 	void
 	SetConstSizeT (
-		size_t Size, 
+		size_t Size,
 		EType TypeKind = EType_SizeT
 		)
 	{
@@ -631,7 +631,7 @@ enum EObjectFlag
 	EObjectFlag_Stack     = 0x0020,
 	EObjectFlag_HeapU     = 0x0040,
 	EObjectFlag_Extern    = 0x0080,
-	EObjectFlag_GcMark    = 0x0100, 
+	EObjectFlag_GcMark    = 0x0100,
 	EObjectFlag_GcMark_wc = 0x0200, // weak closure (function or property ptr)
 };
 
@@ -654,14 +654,14 @@ public:
 	operator () (TObject* pObject)
 	{
 		return &pObject->m_GcHeapLink;
-	}	
+	}
 };
 
 // header of class interface
 
 struct TInterface
 {
-	void* m_pVTable; 
+	void* m_pVTable;
 	TObject* m_pObject; // back pointer to master header
 
 	// followed by parents, then by interface data fields
@@ -670,7 +670,7 @@ struct TInterface
 // interface with master header
 
 template <typename T>
-class CObjectT: 
+class CObjectT:
 	public TObject,
 	public T
 {
@@ -680,23 +680,23 @@ public:
 		m_pType = NULL;
 		m_ScopeLevel = 0;
 		m_Flags = EObjectFlag_Alive | EObjectFlag_Extern;
-		m_pObject = this;
-		m_pVTable = NULL;
+		this->m_pObject = this; // thanks a log gcc
+		this->m_pVTable = NULL;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef 
-void 
+typedef
+void
 FObject_Prime (TObject* pObject);
 
-typedef 
-void 
+typedef
+void
 FObject_Construct (TInterface* pInterface);
 
-typedef 
-void 
+typedef
+void
 FObject_Destruct (TInterface* pInterface);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -745,7 +745,7 @@ struct TDataPtr
 struct TFunctionPtr
 {
 	void* m_pf;
-	TInterface* m_pClosure; 
+	TInterface* m_pClosure;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -757,7 +757,7 @@ struct TFunctionPtr
 struct TPropertyPtr
 {
 	void** m_pVTable;
-	TInterface* m_pClosure; 
+	TInterface* m_pClosure;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -815,7 +815,7 @@ struct TVariant
 
 // structure backing up shadow stack frame map
 
-struct TGcShadowStackFrameMap 
+struct TGcShadowStackFrameMap
 {
 	size_t m_Count;
 
