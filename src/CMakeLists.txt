@@ -4,84 +4,11 @@
 
 #..............................................................................
 
-project (axl)
+root_virtual_folder (${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
 
-cmake_minimum_required (VERSION 2.8)
-
-set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
-
-include (CMakeUtils)
+add_subdirectory (axl_core)
 
 #..............................................................................
-#
-# Standard settings
-#
-
-include (CMakeStdSettings)
-
-create_std_settings ()
-
-message (STATUS "Target CPU:                 ${TARGET_CPU}")
-
-if (HAS_BUILD_TYPE_SETTING)
-	message (STATUS "Build type:                 ${CMAKE_BUILD_TYPE}")
-endif ()
-
-message (STATUS "C++ flags (Debug):         ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
-message (STATUS "C++ flags (Release):       ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
-
-get_directory_property (_CXX_DEFINITIONS COMPILE_DEFINITIONS)
-
-if (_CXX_DEFINITIONS)
-	message (STATUS "C++ definitions:            ${_CXX_DEFINITIONS}")
-endif ()
-
-#..............................................................................
-#
-# Paths to libs & tools
-#
-
-ensure_file_exists (
-	${CMAKE_MODULE_PATH}/CMakePaths.cmake
-	${CMAKE_MODULE_PATH}/CMakePaths.template
-	)
-
-include (CMakePaths)
-
-message (STATUS "Path to RAGEL executable:   ${PATH_RAGEL_EXE}")
-message (STATUS "Path to LUA includes:       ${PATH_LUA_INC_DIR}")
-message (STATUS "Path to LUA libraries:      ${PATH_LUA_LIB_DIR}")
-message (STATUS "Path to LLVM cmake modules: ${PATH_LLVM_CMAKE_DIR}")
-message (STATUS "Path to LLVM includes:      ${PATH_LLVM_INC_DIR}")
-message (STATUS "Path to LLVM includes (2):  ${PATH_LLVM_INC_DIR_2}")
-message (STATUS "Path to LLVM libraries:     ${PATH_LLVM_LIB_DIR}")
-
-include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
-
-# QT is optional
-
-if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")
-	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
-
-	unset (Qt5Core_DIR    CACHE)
-	unset (Qt5Gui_DIR     CACHE)
-	unset (Qt5Widgets_DIR CACHE)
-
-	include ("${PATH_QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
-	include ("${PATH_QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
-	set (QT_FOUND TRUE)
-endif ()
-
-#..............................................................................
-#
-# Project-specific settings
-#
-
-option (
-	AXL_USE_PCH
-	"Use precompiled headers when building AXL project"
-	ON
-	)
 
 option (
 	AXL_BUILD_EXE_LIB
@@ -89,11 +16,23 @@ option (
 	OFF
 	)
 
+if (AXL_BUILD_EXE_LIB)
+	add_subdirectory (axl_exe)
+endif ()
+
+#..............................................................................
+
 option (
 	AXL_BUILD_GUI_LIB
 	"Build axl_gui library"
 	ON
 	)
+
+if (AXL_BUILD_GUI_LIB)
+	add_subdirectory (axl_gui)
+endif ()
+
+#..............................................................................
 
 if (WIN32)
 	option (
@@ -103,6 +42,8 @@ if (WIN32)
 		)
 endif ()
 
+#..............................................................................
+
 if (${QT_FOUND})
 	option (
 		AXL_BUILD_GUI_QT
@@ -111,11 +52,19 @@ if (${QT_FOUND})
 		)
 endif ()
 
+#..............................................................................
+
 option (
 	AXL_BUILD_INI_LIB
 	"Build axl_ini library"
 	ON
 	)
+
+if (AXL_BUILD_INI_LIB)
+	add_subdirectory (axl_ini)
+endif ()
+	
+#..............................................................................
 
 option (
 	AXL_BUILD_IO_LIB
@@ -123,116 +72,17 @@ option (
 	ON
 	)
 
+if (AXL_BUILD_IO_LIB)
+	add_subdirectory (axl_io)
+endif ()
+
+#..............................................................................
+
 option (
 	AXL_BUILD_JNC_LIB
 	"Build axl_jnc library"
 	ON
 	)
-
-option (
-	AXL_BUILD_JNCC
-	"Build axl_jncc (Jancy command-line compiler)"
-	ON
-	)
-
-option (
-	AXL_BUILD_LOG_LIB
-	"Build axl_log library"
-	ON
-	)
-
-option (
-	AXL_BUILD_LOG_JANCY
-	"Build Jancy plugin drivers for axl_log library"
-	ON
-	)
-
-option (
-	AXL_BUILD_LUA_LIB
-	"Build axl_lua library"
-	ON
-	)
-
-option (
-	AXL_BUILD_PARSE_LIB
-	"Build axl_parse library"
-	ON
-	)
-
-option (
-	AXL_BUILD_PG
-	"Build axl_pg (LL(k) parser generator)"
-	ON
-	)
-
-option (
-	AXL_BUILD_CON_TEST
-	"Build ConTest"
-	OFF
-	)
-
-if (${QT_FOUND})
-	option (
-		AXL_BUILD_QT_TEST
-		"Build QtTest"
-		OFF
-		)
-endif ()
-
-if (WIN32)
-	option (
-		AXL_BUILD_JNC_MFC_TEST
-		"Build JncMfcTest"
-		OFF
-		)
-endif ()
-
-if (${QT_FOUND})
-	option (
-		AXL_BUILD_JNC_QT_TEST
-		"Build JncQtTest"
-		ON
-		)
-endif ()
-
-#..............................................................................
-#
-# main
-#
-
-set (AXL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
-set (AXL_INC_DIR  ${AXL_ROOT_DIR}/include)
-set (AXL_SRC_DIR  ${AXL_ROOT_DIR}/src)
-set (AXL_PG_FRAME_DIR ${AXL_ROOT_DIR}/pgframe)
-
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-
-enable_testing ()
-include_directories (${AXL_INC_DIR})
-root_virtual_folder (${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
-
-#
-# add targets
-#
-
-add_subdirectory (axl_core)
-
-if (AXL_BUILD_EXE_LIB)
-	add_subdirectory (axl_exe)
-endif ()
-
-if (AXL_BUILD_GUI_LIB)
-	add_subdirectory (axl_gui)
-endif ()
-
-if (AXL_BUILD_INI_LIB)
-	add_subdirectory (axl_ini)
-endif ()
-
-if (AXL_BUILD_IO_LIB)
-	add_subdirectory (axl_io)
-endif ()
 
 if (AXL_BUILD_JNC_LIB)
 	add_subdirectory (axl_jnc)
@@ -242,6 +92,14 @@ if (AXL_BUILD_JNC_LIB)
 		${CMAKE_CURRENT_BINARY_DIR}/jnc_demos
 		)
 endif ()
+
+#..............................................................................
+
+option (
+	AXL_BUILD_JNCC
+	"Build axl_jncc (Jancy command-line compiler)"
+	ON
+	)
 
 if (AXL_BUILD_JNCC)
 	add_subdirectory (axl_jncc)
@@ -261,39 +119,60 @@ if (AXL_BUILD_JNCC)
 		)
 
 	# later add more test files
-
 endif ()
+
+#..............................................................................
+
+option (
+	AXL_BUILD_LOG_LIB
+	"Build axl_log library"
+	ON
+	)
+
+option (
+	AXL_BUILD_LOG_JANCY
+	"Build Jancy plugin drivers for axl_log library"
+	ON
+	)
 
 if (AXL_BUILD_LOG_LIB)
 	add_subdirectory (axl_log)
 endif ()
 
+#..............................................................................
+
+option (
+	AXL_BUILD_LUA_LIB
+	"Build axl_lua library"
+	ON
+	)
+
 if (AXL_BUILD_LUA_LIB)
 	add_subdirectory (axl_lua)
 endif ()
 
+#..............................................................................
+
+option (
+	AXL_BUILD_PARSE_LIB
+	"Build axl_parse library"
+	ON
+	)
+
 if (AXL_BUILD_PARSE_LIB)
 	add_subdirectory (axl_parse)
 endif ()
+	
+#..............................................................................
+
+option (
+	AXL_BUILD_PG
+	"Build axl_pg (LL(k) parser generator)"
+	ON
+	)
 
 if (AXL_BUILD_PG)
 	add_subdirectory (axl_pg)
-endif ()
-
-if (AXL_BUILD_CON_TEST)
-	add_subdirectory (tests/ConTest)
-endif ()
-
-if (AXL_BUILD_QT_TEST)
-	add_subdirectory (tests/QtTest)
-endif ()
-
-if (AXL_BUILD_JNC_MFC_TEST)
-	add_subdirectory (tests/JncMfcTest)
-endif ()
-
-if (AXL_BUILD_JNC_QT_TEST)
-	add_subdirectory (tests/JncQtTest)
 endif ()
 
 #..............................................................................

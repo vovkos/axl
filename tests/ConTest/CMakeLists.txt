@@ -2,7 +2,9 @@
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
 
-set (VIRTUAL_FOLDER_SUB_DIR ConTest)
+#..............................................................................
+
+project_virtual_folder (ConTest)
 
 #..............................................................................
 #
@@ -43,7 +45,7 @@ set (
 	test_WorkerThread.cpp
 	)
 
-virtual_folder (
+source_virtual_folder (
 	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
@@ -62,7 +64,7 @@ exclude_from_build (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-virtual_folder (
+source_virtual_folder (
 	pch
 	${PCH_H}
 	${PCH_CPP}

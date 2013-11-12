@@ -119,7 +119,7 @@
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Runtime.h"
 #include "axl_jnc_Disassembler.h"
-#include "../../axl_jnc/axl_jnc_Parser.llk.h"
+#include "../src/axl_jnc/axl_jnc_Parser.llk.h"
 
 
 #include "axl_rtl_HexEncoding.h"
