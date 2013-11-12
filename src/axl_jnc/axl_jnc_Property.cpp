@@ -321,6 +321,8 @@ CProperty::CreateField (
 
 	bool Result;
 
+	// don't add field to parent namespace
+
 	CStructField* pField = pParentType->CreateField (rtl::CString (), pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
 	if (!pField)
 		return NULL;
@@ -328,6 +330,7 @@ CProperty::CreateField (
 	// re-parent
 
 	pField->m_pParentNamespace = this;
+	pField->m_Name = Name;
 
 	if (!Name.IsEmpty ())
 	{
@@ -607,6 +610,8 @@ CProperty::CallMemberPropertyConstructors (const CValue& ThisValue)
 bool
 CProperty::CalcLayout ()
 {
+	bool Result;
+
 	ASSERT (m_StorageKind && m_VTable.IsEmpty ());
 
 	size_t SetterCount = m_pSetter ? m_pSetter->GetOverloadCount () : 0;
@@ -614,13 +619,27 @@ CProperty::CalcLayout ()
 	m_VTable.Reserve (2 + SetterCount);
 
 	if (m_pBinder)
+	{
+		Result = m_pBinder->GetType ()->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		m_VTable.Append (m_pBinder);
+	}
+
+	Result = m_pGetter->GetType ()->EnsureLayout ();
+	if (!Result)
+		return false;
 
 	m_VTable.Append (m_pGetter);
 
 	for (size_t i = 0; i < SetterCount; i++)
 	{
 		CFunction* pSetter = m_pSetter->GetOverload (i);
+		Result = pSetter->GetType ()->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		m_VTable.Append (pSetter);
 	}
 

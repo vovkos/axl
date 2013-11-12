@@ -200,7 +200,10 @@ public:
 		);
 
 	void
-	MarkForLayout (CModuleItem* pItem);
+	MarkForLayout (
+		CModuleItem* pItem,
+		bool IsForced = false
+		);
 
 	void
 	MarkForCompile (CModuleItem* pItem);

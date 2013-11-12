@@ -288,7 +288,7 @@ CTypeMgr::GetBitFieldType (
 	if (pBaseType->GetTypeKindFlags () & ETypeKindFlag_Import)
 	{
 		pType->m_pBaseType_i = (CImportType*) pBaseType;
-		m_pModule->MarkForLayout (pType);
+		m_pModule->MarkForLayout (pType, true);
 	}
 	else
 	{
@@ -312,7 +312,7 @@ CTypeMgr::CreateAutoSizeArrayType (CType* pElementType)
 		pType->m_pElementType_i = (CImportType*) pElementType;
 
 	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
-		m_pModule->MarkForLayout (pType); // can't calclayout yet
+		m_pModule->MarkForLayout (pType, true); // can't calclayout yet
 
 	return pType;
 }
@@ -334,7 +334,7 @@ CTypeMgr::CreateArrayType (
 
 	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
 	{
-		m_pModule->MarkForLayout (pType);
+		m_pModule->MarkForLayout (pType, true);
 	}
 	else
 	{
@@ -373,7 +373,7 @@ CTypeMgr::GetArrayType (
 	if (pElementType->GetTypeKindFlags () & ETypeKindFlag_Import)
 	{
 		pType->m_pElementType_i = (CImportType*) pElementType;
-		m_pModule->MarkForLayout (pType);
+		m_pModule->MarkForLayout (pType, true);
 	}
 	else
 	{
@@ -443,7 +443,7 @@ CTypeMgr::CreateEnumType (
 	if (pBaseType->GetTypeKindFlags () & ETypeKindFlag_Import)
 		pType->m_pBaseType_i = (CImportType*) pBaseType;
 
-	m_pModule->MarkForLayout (pType);
+	m_pModule->MarkForLayout (pType, true);
 	return pType;
 }
 
@@ -474,7 +474,7 @@ CTypeMgr::CreateStructType (
 	pType->m_pModule = m_pModule;
 	pType->m_PackFactor = PackFactor;
 	m_StructTypeList.InsertTail (pType);
-	m_pModule->MarkForLayout (pType);
+	m_pModule->MarkForLayout (pType, true);
 	return pType;
 }
 
@@ -501,7 +501,7 @@ CTypeMgr::CreateUnionType (
 		pType->m_Flags |= ETypeFlag_Named;
 	}
 
-	m_pModule->MarkForLayout (pType); // before child struct
+	m_pModule->MarkForLayout (pType, true); // before child struct
 
 	CStructType* pUnionStructType = CreateUnnamedStructType ();
 	pUnionStructType->m_pParentNamespace = pType;
@@ -577,7 +577,7 @@ CTypeMgr::CreateClassType (
 		pType->m_Flags |= ETypeFlag_Named;
 	}
 
-	m_pModule->MarkForLayout (pType); // before child structs
+	m_pModule->MarkForLayout (pType, true); // before child structs
 
 	CStructType* pVTableStructType = CreateUnnamedStructType ();
 	pVTableStructType->m_Tag.Format ("%s.Vtbl", pType->m_Tag.cc ());
@@ -660,16 +660,20 @@ CTypeMgr::CreateFunctionArg (
 	m_FunctionArgList.InsertTail (pFunctionArg);
 
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
-	{
 		pFunctionArg->m_pType_i = (CImportType*) pType;
-		// m_pModule->MarkForLayout (pFunctionArg); // <-- should be calculated during CFunctionType::CalcLayout
-	}
-	else
-	{
-		bool Result = pFunctionArg->EnsureLayout ();
-		if (!Result)
-			return NULL;
-	}
+		
+	// all this should be calculated during CFunctionType::CalcLayout
+
+	//if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
+	//{
+	//	m_pModule->MarkForLayout (pFunctionArg); 
+	//}
+	//else
+	//{
+	//	bool Result = pFunctionArg->EnsureLayout ();
+	//	if (!Result)
+	//		return NULL;
+	//}
 
 	return pFunctionArg;
 }
@@ -743,9 +747,11 @@ CTypeMgr::GetFunctionType (
 	m_FunctionTypeList.InsertTail (pType);
 
 	if (pReturnType->GetTypeKindFlags () & ETypeKindFlag_Import)
-	{
 		pType->m_pReturnType_i = (CImportType*) pReturnType;
-		m_pModule->MarkForLayout (pType);
+
+	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
+	{
+		m_pModule->MarkForLayout (pType, true);
 	}
 	else
 	{
@@ -815,7 +821,7 @@ CTypeMgr::GetFunctionType (
 
 	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
 	{
-		m_pModule->MarkForLayout (pType);
+		m_pModule->MarkForLayout (pType, true);
 	}
 	else
 	{
@@ -871,7 +877,7 @@ CTypeMgr::CreateUserFunctionType (
 
 	if (!m_pModule->m_NamespaceMgr.GetCurrentScope ())
 	{
-		m_pModule->MarkForLayout (pType);
+		m_pModule->MarkForLayout (pType, true);
 	}
 	else
 	{

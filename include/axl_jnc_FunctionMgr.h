@@ -220,6 +220,8 @@ enum EStdFunc
 
 	EStdFunc_AppendFmtLiteral_f,
 
+	EStdFunc_SimpleMulticastCall,
+
 	EStdFunc__Count
 };
 

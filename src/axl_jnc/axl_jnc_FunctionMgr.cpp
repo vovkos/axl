@@ -127,7 +127,7 @@ CFunctionMgr::CreateProperty (
 	pProperty->m_QualifiedName = QualifiedName;
 	pProperty->m_Tag = QualifiedName;
 	pProperty->m_Flags = Flags;
-	m_pModule->MarkForLayout (pProperty);
+	m_pModule->MarkForLayout (pProperty, true);
 	return pProperty;
 }
 
@@ -1028,6 +1028,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 
 	case EStdFunc_AppendFmtLiteral_f:
 		pFunction = CreateAppendFmtLiteral_f ();
+		break;
+
+	case EStdFunc_SimpleMulticastCall:
+		pFunction = ((CMulticastClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleMulticast))->GetMethod (EMulticastMethod_Call);
 		break;
 
 	default:

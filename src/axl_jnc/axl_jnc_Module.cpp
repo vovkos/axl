@@ -216,9 +216,12 @@ CModule::Link (CModule* pModule)
 }
 
 void
-CModule::MarkForLayout (CModuleItem* pItem)
+CModule::MarkForLayout (
+	CModuleItem* pItem, 
+	bool IsForced
+	)
 {
-	if (pItem->m_Flags & EModuleItemFlag_NeedLayout)
+	if (!IsForced && (pItem->m_Flags & EModuleItemFlag_NeedLayout))
 		return;
 
 	pItem->m_Flags |= EModuleItemFlag_NeedLayout;
