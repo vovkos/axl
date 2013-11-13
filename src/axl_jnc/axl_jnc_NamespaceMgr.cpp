@@ -49,10 +49,8 @@ CNamespaceMgr::AddStdItems ()
 void
 CNamespaceMgr::SetSourcePos (const CToken::CPos& Pos)
 {
-	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo))
+	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo) || !m_pCurrentScope)
 		return;
-
-	ASSERT (m_pCurrentScope);
 
 	llvm::DebugLoc LlvmDebugLoc = m_pModule->m_LlvmDiBuilder.GetDebugLoc (m_pCurrentScope, Pos);
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (LlvmDebugLoc);
