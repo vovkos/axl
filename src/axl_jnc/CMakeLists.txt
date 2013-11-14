@@ -109,6 +109,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_LlvmIrBuilder.h
 	${AXL_INC_DIR}/axl_jnc_Module.h
 	${AXL_INC_DIR}/axl_jnc_ModuleItem.h
+	${AXL_INC_DIR}/axl_jnc_UnitMgr.h
 	${AXL_INC_DIR}/axl_jnc_Pch.h
 	)
 
@@ -120,6 +121,7 @@ set (
 	axl_jnc_LlvmIrBuilder.cpp
 	axl_jnc_Module.cpp
 	axl_jnc_ModuleItem.cpp
+	axl_jnc_UnitMgr.cpp
 	)
 
 source_virtual_folder (

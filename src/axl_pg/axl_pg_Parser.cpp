@@ -21,7 +21,7 @@ CParser::ParseFile (
 	if (!Result)
 	{
 		err::SetFormatStringError (
-			"cannot open '%s': %s", 
+			"cannot open '%s': %s",
 			FilePath.cc (), // thanks a lot gcc
 			err::GetError ()->GetDescription ().cc ()
 			);
@@ -33,8 +33,8 @@ CParser::ParseFile (
 	if (!p)
 	{
 		err::SetFormatStringError (
-			"cannot open '%s': %s", 
-			FilePath.cc (), 
+			"cannot open '%s': %s",
+			FilePath.cc (),
 			err::GetError ()->GetDescription ().cc ()
 			);
 		return false;
@@ -56,7 +56,7 @@ CParser::Parse (
 
 	m_pModule = pModule;
 	m_pConfig = pConfig;
-	m_DirName = io::GetDirName (FilePath);
+	m_Dir = io::GetDir (FilePath);
 
 	m_DefaultProductionSpecifiers.Reset ();
 
@@ -191,7 +191,7 @@ CParser::ImportStatement ()
 
 	rtl::CString FilePath = io::FindFilePath (
 		pToken->m_Data.m_String,
-		m_DirName,
+		m_Dir,
 		m_pConfig ? &m_pConfig->m_ImportDirList : NULL,
 		true
 		);
@@ -199,8 +199,8 @@ CParser::ImportStatement ()
 	if (FilePath.IsEmpty ())
 	{
 		err::SetFormatStringError (
-			"cannot find import file '%s'", 
-			pToken->m_Data.m_String.cc () 
+			"cannot find import file '%s'",
+			pToken->m_Data.m_String.cc ()
 			);
 		return false;
 	}
@@ -287,7 +287,7 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 			break;
 
 		case EToken_NoAst:
-			if (IsClassSpecified) 
+			if (IsClassSpecified)
 			{
 				err::SetStringError ("multiple class specifiers");
 				return false;
@@ -342,8 +342,8 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 			case EToken_Class:
 			case EToken_Default:
 			case EToken_NoAst:
-			case EToken_Pragma: 
-			case EToken_Identifier:  
+			case EToken_Pragma:
+			case EToken_Identifier:
 				if (IsClassSpecified)
 				{
 					err::SetStringError ("multiple class specifiers");
@@ -358,7 +358,7 @@ CParser::ProductionSpecifiers (CProductionSpecifiers* pSpecifiers)
 			default:
 				NoMoreSpecifiers = true;
 			}
-			
+
 			break;
 
 		default:
@@ -404,8 +404,8 @@ CParser::ClassSpecifier ()
 		if (pClass->m_Flags & EClassFlag_Defined)
 		{
 			err::SetFormatStringError (
-				"redefinition of class '%s'", 
-				pClass->m_Name.cc () 
+				"redefinition of class '%s'",
+				pClass->m_Name.cc ()
 				);
 			return NULL;
 		}
@@ -428,7 +428,7 @@ CParser::ClassSpecifier ()
 	Result = UserCode ('{', &pClass->m_Members, &pClass->m_SrcPos);
 	if (!Result)
 		return NULL;
-	
+
 	pClass->m_Flags |= EClassFlag_Defined;
 	return pClass;
 }
@@ -476,8 +476,8 @@ CParser::DefineStatement ()
 
 		default:
 			err::SetFormatStringError (
-				"invalid define value for '%s'", 
-				pDefine->m_Name.cc () 
+				"invalid define value for '%s'",
+				pDefine->m_Name.cc ()
 				);
 			return false;
 		}
@@ -486,8 +486,8 @@ CParser::DefineStatement ()
 
 	default:
 		err::SetFormatStringError (
-			"invalid define syntax for '%s'", 
-			pDefine->m_Name.cc () 
+			"invalid define syntax for '%s'",
+			pDefine->m_Name.cc ()
 			);
 		return false;
 	}
@@ -517,7 +517,7 @@ CParser::UsingStatement ()
 	return true;
 }
 
-bool 
+bool
 CParser::CustomizeSymbol (CSymbolNode* pNode)
 {
 	bool Result;
@@ -561,8 +561,8 @@ CParser::CustomizeSymbol (CSymbolNode* pNode)
 		if (!pString->IsEmpty ())
 		{
 			err::SetFormatStringError (
-				"redefinition of '%s'::%s", 
-				pNode->m_Name.cc (), 
+				"redefinition of '%s'::%s",
+				pNode->m_Name.cc (),
 				pToken->GetName ()
 				);
 			return false;
@@ -605,7 +605,7 @@ CParser::CustomizeSymbol (CSymbolNode* pNode)
 	return true;
 }
 
-bool 
+bool
 CParser::ProcessFormalArgList (CSymbolNode* pNode)
 {
 	const CToken* pToken;
@@ -620,7 +620,7 @@ CParser::ProcessFormalArgList (CSymbolNode* pNode)
 	for (;;)
 	{
 		pToken = Lexer.GetToken ();
-		
+
 		if (!pToken->m_Token)
 			break;
 
@@ -665,7 +665,7 @@ CParser::ProcessFormalArgList (CSymbolNode* pNode)
 	return true;
 }
 
-bool 
+bool
 CParser::ProcessLocalList (CSymbolNode* pNode)
 {
 	const CToken* pToken;
@@ -682,7 +682,7 @@ CParser::ProcessLocalList (CSymbolNode* pNode)
 		pToken = Lexer.GetToken ();
 		if (pToken->m_Token <= 0)
 			break;
-		
+
 		if (pToken->m_Token != EToken_Identifier)
 		{
 			Lexer.NextToken ();
@@ -708,7 +708,7 @@ CParser::ProcessLocalList (CSymbolNode* pNode)
 	return true;
 }
 
-bool 
+bool
 CParser::ProcessSymbolEventHandler (
 	CSymbolNode* pNode,
 	rtl::CString* pString
@@ -728,7 +728,7 @@ CParser::ProcessSymbolEventHandler (
 		pToken = Lexer.GetToken ();
 		if (pToken->m_Token <= 0)
 			break;
-		
+
 		rtl::CHashTableIteratorT <const char*> It;
 
 		switch (pToken->m_Token)
@@ -739,8 +739,8 @@ CParser::ProcessSymbolEventHandler (
 			{
 				ResultString.Append (p, pToken->m_Pos.m_p - p);
 				ResultString.AppendFormat (
-					"$local.%s", 
-					pToken->m_Data.m_String.cc () 
+					"$local.%s",
+					pToken->m_Data.m_String.cc ()
 					);
 				break;
 			}
@@ -751,7 +751,7 @@ CParser::ProcessSymbolEventHandler (
 				ResultString.Append (p, pToken->m_Pos.m_p - p);
 				ResultString.AppendFormat (
 					"$arg.%s",
-					pToken->m_Data.m_String.cc () 
+					pToken->m_Data.m_String.cc ()
 					);
 				break;
 			}
@@ -786,7 +786,7 @@ CParser::ProcessSymbolEventHandler (
 	return true;
 }
 
-bool 
+bool
 CParser::ProcessActualArgList (
 	CArgumentNode* pNode,
 	const rtl::CString& String
@@ -809,13 +809,13 @@ CParser::ProcessActualArgList (
 
 		switch (pToken->m_Token)
 		{
-		case '(': 
+		case '(':
 		case '{':
 		case '[':
 			Level++;
 			break;
 
-		case ')': 
+		case ')':
 		case '}':
 		case ']':
 			Level--;
@@ -852,7 +852,7 @@ CParser::SetGrammarNodeSrcPos (
 	pNode->m_SrcPos.m_Col = LineCol.m_Col;
 }
 
-bool 
+bool
 CParser::Production (const CProductionSpecifiers* pSpecifiers)
 {
 	bool Result;
@@ -860,12 +860,12 @@ CParser::Production (const CProductionSpecifiers* pSpecifiers)
 	const CToken* pToken = GetToken ();
 	ASSERT (pToken->m_Token == EToken_Identifier);
 
-	CSymbolNode* pSymbol = m_pModule->m_NodeMgr.GetSymbolNode (pToken->m_Data.m_String);	
+	CSymbolNode* pSymbol = m_pModule->m_NodeMgr.GetSymbolNode (pToken->m_Data.m_String);
 	if (!pSymbol->m_ProductionArray.IsEmpty ())
 	{
 		err::SetFormatStringError (
-			"redefinition of symbol '%s'", 
-			pSymbol->m_Name.cc () 
+			"redefinition of symbol '%s'",
+			pSymbol->m_Name.cc ()
 			);
 		return false;
 	}
@@ -904,7 +904,7 @@ CParser::Production (const CProductionSpecifiers* pSpecifiers)
 	return true;
 }
 
-CGrammarNode* 
+CGrammarNode*
 CParser::Alternative ()
 {
 	CGrammarNode* pNode = Sequence ();
@@ -966,7 +966,7 @@ IsFirstOfPrimary (int Token)
 	}
 }
 
-CGrammarNode* 
+CGrammarNode*
 CParser::Sequence ()
 {
 	CGrammarNode* pNode = Quantifier ();
@@ -978,7 +978,7 @@ CParser::Sequence ()
 	for (;;)
 	{
 		const CToken* pToken = GetToken ();
-		
+
 		if (!IsFirstOfPrimary (pToken->m_Token))
 			break;
 
@@ -1043,7 +1043,7 @@ CParser::Primary ()
 	case '.':
 	case EToken_Any:
 	case EToken_Integer:
-		pNode = Beacon ();		
+		pNode = Beacon ();
 		if (!pNode)
 			return NULL;
 
@@ -1056,7 +1056,7 @@ CParser::Primary ()
 
 	case ';':
 	case '|':
-		pNode = &m_pModule->m_NodeMgr.m_EpsilonNode; 
+		pNode = &m_pModule->m_NodeMgr.m_EpsilonNode;
 		// and don't swallow token
 		break;
 
@@ -1071,7 +1071,7 @@ CParser::Primary ()
 			CBeaconNode* pBeacon = (CBeaconNode*) pNode;
 			CArgumentNode* pArgument = m_pModule->m_NodeMgr.CreateArgumentNode ();
 			CSequenceNode* pSequence = m_pModule->m_NodeMgr.CreateSequenceNode ();
-			
+
 			SetGrammarNodeSrcPos (pSequence, pNode->m_SrcPos);
 
 			rtl::CString String;
@@ -1129,7 +1129,7 @@ CParser::Primary ()
 		return NULL;
 	}
 
-	return pNode; 
+	return pNode;
 }
 
 CBeaconNode*
@@ -1155,7 +1155,7 @@ CParser::Beacon ()
 			err::SetFormatStringError ("cannot use a reserved eof token \\00");
 			return NULL;
 		}
-		
+
 		pNode = m_pModule->m_NodeMgr.GetTokenNode (pToken->m_Data.m_Integer);
 		break;
 
@@ -1169,7 +1169,7 @@ CParser::Beacon ()
 	NextToken ();
 
 	pToken = GetToken ();
-	if (pToken->m_Token != '$')	
+	if (pToken->m_Token != '$')
 		return pBeacon;
 
 	NextToken ();
@@ -1235,7 +1235,7 @@ CParser::Resolver ()
 
 		NextToken ();
 	}
-	
+
 	CGrammarNode* pProduction = Sequence ();
 	if (!pProduction)
 		return NULL;
@@ -1289,7 +1289,7 @@ CParser::UserCode (
 	case '{':
 		CloseBracket = '}';
 		break;
-		
+
 	case '(':
 		CloseBracket = ')';
 		break;
@@ -1317,7 +1317,7 @@ CParser::UserCode (
 	*pLineCol = pToken->m_Pos;
 
 	NextToken ();
-	
+
 	int Level = 1;
 
 	for (;;)
@@ -1328,7 +1328,7 @@ CParser::UserCode (
 		{
 			err::SetUnexpectedTokenError ("eof", "user-code");
 			return false;
-		} 
+		}
 		else if (pToken->m_Token == EToken_Error)
 		{
 			err::SetError (pToken->m_Data.m_Error);
@@ -1341,11 +1341,11 @@ CParser::UserCode (
 		else if (pToken->m_Token == CloseBracket)
 		{
 			Level--;
-		
+
 			if (Level <= 0)
 				break;
 		}
-		
+
 		NextToken ();
 	}
 

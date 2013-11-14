@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_LlvmDiBuilder.h"
 #include "axl_jnc_Module.h"
+#include "axl_io_FilePathUtils.h"
 
 namespace axl {
 namespace jnc {
@@ -27,8 +28,8 @@ CLlvmDiBuilder::Create ()
 
 	m_pLlvmDiBuilder->createCompileUnit (
 		llvm::dwarf::DW_LANG_C99,
-		m_pModule->GetFileName ().cc (),
-		m_pModule->GetDirName ().cc (),
+		m_pModule->GetName ().cc (),
+		io::GetCurrentDir ().cc (),
 		"jnc-1.0.0",
 		false, "", 1
 		);
@@ -47,6 +48,9 @@ CLlvmDiBuilder::Clear ()
 llvm::DIType
 CLlvmDiBuilder::CreateSubroutineType (CFunctionType* pFunctionType)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	rtl::CArrayT <CFunctionArg*> ArgArray = pFunctionType->GetArgArray ();
 	size_t Count = ArgArray.GetCount ();
 
@@ -62,16 +66,19 @@ CLlvmDiBuilder::CreateSubroutineType (CFunctionType* pFunctionType)
 		*ppDst = ArgArray [i]->GetType ()->GetLlvmDiType ();
 
 	llvm::DIArray LlvmDiArray = m_pLlvmDiBuilder->getOrCreateArray (llvm::ArrayRef <llvm::Value*> (ArgTypeArray, Count + 1));
-	return m_pLlvmDiBuilder->createSubroutineType (pFunctionType->GetModule ()->GetLlvmDiFile (), LlvmDiArray);
+	return m_pLlvmDiBuilder->createSubroutineType (pUnit->GetLlvmDiFile (), LlvmDiArray);
 }
 
 llvm::DIType
 CLlvmDiBuilder::CreateEmptyStructType (CStructType* pStructType)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	return m_pLlvmDiBuilder->createStructType (
-		pStructType->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pStructType->m_Tag.cc (),
-		pStructType->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pStructType->GetItemDecl ()->GetPos ()->m_Line + 1,
 		pStructType->GetSize () * 8,
 		pStructType->GetAlignFactor () * 8,
@@ -84,6 +91,9 @@ CLlvmDiBuilder::CreateEmptyStructType (CStructType* pStructType)
 void
 CLlvmDiBuilder::SetStructTypeBody (CStructType* pStructType)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	rtl::CConstListT <CBaseTypeSlot> BaseTypeList = pStructType->GetBaseTypeList ();
 	rtl::CConstListT <CStructField> FieldList = pStructType->GetFieldList ();
 
@@ -102,9 +112,9 @@ CLlvmDiBuilder::SetStructTypeBody (CStructType* pStructType)
 		rtl::CString Name = pBaseType->GetType ()->GetQualifiedName ();
 
 		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
-			pBaseType->GetModule ()->GetLlvmDiFile (),
+			pUnit->GetLlvmDiFile (),
 			!Name.IsEmpty () ? Name.cc () : "UnnamedBaseType",
-			pBaseType->GetModule ()->GetLlvmDiFile (),
+			pUnit->GetLlvmDiFile (),
 			pBaseType->GetItemDecl ()->GetPos ()->m_Line + 1,
 			pBaseType->GetType ()->GetSize () * 8,
 			pBaseType->GetType ()->GetAlignFactor () * 8,
@@ -121,9 +131,9 @@ CLlvmDiBuilder::SetStructTypeBody (CStructType* pStructType)
 		rtl::CString Name = pField->GetName ();
 
 		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
-			pField->GetModule ()->GetLlvmDiFile (),
+			pUnit->GetLlvmDiFile (),
 			!Name.IsEmpty () ? Name.cc () : "m_unnamedField",
-			pField->GetModule ()->GetLlvmDiFile (),
+			pUnit->GetLlvmDiFile (),
 			pField->GetItemDecl ()->GetPos ()->m_Line + 1,
 			pField->GetType ()->GetSize () * 8,
 			pField->GetType ()->GetAlignFactor () * 8,
@@ -144,10 +154,13 @@ CLlvmDiBuilder::SetStructTypeBody (CStructType* pStructType)
 llvm::DIType
 CLlvmDiBuilder::CreateEmptyUnionType (CUnionType* pUnionType)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	return m_pLlvmDiBuilder->createUnionType (
-		pUnionType->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pUnionType->m_Tag.cc (),
-		pUnionType->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pUnionType->GetItemDecl ()->GetPos ()->m_Line + 1,
 		pUnionType->GetSize () * 8,
 		pUnionType->GetAlignFactor () * 8,
@@ -159,6 +172,9 @@ CLlvmDiBuilder::CreateEmptyUnionType (CUnionType* pUnionType)
 void
 CLlvmDiBuilder::SetUnionTypeBody (CUnionType* pUnionType)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	rtl::CConstListT <CStructField> FieldList = pUnionType->GetFieldList ();
 	size_t Count = FieldList.GetCount ();
 
@@ -173,9 +189,9 @@ CLlvmDiBuilder::SetUnionTypeBody (CUnionType* pUnionType)
 		rtl::CString Name = pField->GetName ();
 
 		FieldTypeArray [i] = m_pLlvmDiBuilder->createMemberType (
-			pField->GetModule ()->GetLlvmDiFile (),
+			pUnit->GetLlvmDiFile (),
 			!Name.IsEmpty () ? Name.cc () : "m_unnamedField",
-			pField->GetModule ()->GetLlvmDiFile (),
+			pUnit->GetLlvmDiFile (),
 			pField->GetItemDecl ()->GetPos ()->m_Line + 1,
 			pField->GetType ()->GetSize () * 8,
 			pField->GetType ()->GetAlignFactor () * 8,
@@ -238,9 +254,12 @@ CLlvmDiBuilder::CreatePointerType (CType* pType)
 llvm::DIGlobalVariable
 CLlvmDiBuilder::CreateGlobalVariable (CVariable* pVariable)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	return m_pLlvmDiBuilder->createGlobalVariable (
 		pVariable->GetQualifiedName ().cc (),
-		pVariable->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pVariable->GetItemDecl ()->GetPos ()->m_Line + 1,
 		pVariable->GetType ()->GetLlvmDiType (),
 		true,
@@ -254,14 +273,15 @@ CLlvmDiBuilder::CreateLocalVariable (
 	uint_t Tag
 	)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	ASSERT (pScope);
+	ASSERT (pUnit && pScope);
 
 	return m_pLlvmDiBuilder->createLocalVariable (
 		Tag,
 		pScope->GetLlvmDiScope (),
 		pVariable->GetName ().cc (),
-		pVariable->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pVariable->GetItemDecl ()->GetPos ()->m_Line + 1,
 		pVariable->GetType ()->GetLlvmDiType (),
 		true,
@@ -295,14 +315,17 @@ CLlvmDiBuilder::CreateDeclare (CVariable* pVariable)
 llvm::DISubprogram
 CLlvmDiBuilder::CreateFunction (CFunction* pFunction)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	CToken::CPos DeclPos = *pFunction->GetItemDecl ()->GetPos ();
 	CToken::CPos ScopePos = pFunction->HasBody () ? pFunction->GetBody ().GetHead ()->m_Pos : DeclPos;
 
 	return m_pLlvmDiBuilder->createFunction (
-		pFunction->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		pFunction->m_Tag.cc (),
 		pFunction->m_Tag.cc (), // linkage name
-		pFunction->GetModule ()->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		DeclPos.m_Line + 1,
 		pFunction->GetType ()->GetLlvmDiType (),
 		false,
@@ -320,6 +343,9 @@ CLlvmDiBuilder::CreateLexicalBlock (
 	const CToken::CPos& Pos
 	)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	llvm::DIDescriptor LlvmParentBlock;
 	if (pParentScope)
 	{
@@ -335,7 +361,7 @@ CLlvmDiBuilder::CreateLexicalBlock (
 
 	return m_pLlvmDiBuilder->createLexicalBlock (
 		LlvmParentBlock,
-		m_pModule->GetLlvmDiFile (),
+		pUnit->GetLlvmDiFile (),
 		Pos.m_Line + 1, 0
 		);
 }

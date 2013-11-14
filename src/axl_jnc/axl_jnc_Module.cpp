@@ -2,7 +2,6 @@
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Parser.llk.h"
 #include "axl_io_MappedFile.h"
-#include "axl_io_FilePathUtils.h"
 
 namespace axl {
 namespace jnc {
@@ -12,15 +11,13 @@ namespace jnc {
 void
 CModule::Clear ()
 {
-	m_FilePath.Clear ();
-	m_FileName.Clear ();
-	m_DirName.Clear ();
 	m_TypeMgr.Clear ();
 	m_NamespaceMgr.Clear ();
 	m_FunctionMgr.Clear ();
 	m_VariableMgr.Clear ();
 	m_ConstMgr.Clear ();
 	m_ControlFlowMgr.Clear ();
+	m_UnitMgr.Clear ();
 	m_CalcLayoutArray.Clear ();
 	m_CompileArray.Clear ();
 	m_LlvmDiBuilder.Clear ();
@@ -30,31 +27,25 @@ CModule::Clear ()
 	m_pConstructor = NULL;
 	m_pDestructor = NULL;
 	m_pLlvmModule = NULL;
-	m_LlvmDiFile = llvm::DIFile ();
 }
 
 bool
 CModule::Create (
-	const rtl::CString& FilePath,
+	const rtl::CString& Name,
 	llvm::Module* pLlvmModule,
 	uint_t Flags
 	)
 {
 	Clear ();
 
-	m_FilePath = FilePath;
-	m_FileName = io::GetFileName (FilePath);
-	m_DirName = io::GetDirName  (FilePath);
 	m_Flags = Flags;
+	m_Name = Name;
 	m_pLlvmModule = pLlvmModule;
 
 	m_LlvmIrBuilder.Create ();
 
 	if (Flags & EModuleFlag_DebugInfo)
-	{
 		m_LlvmDiBuilder.Create ();
-		m_LlvmDiFile = m_LlvmDiBuilder.CreateFile (m_FileName, m_DirName);
-	}
 
 	return m_NamespaceMgr.AddStdItems ();
 }
@@ -217,7 +208,7 @@ CModule::Link (CModule* pModule)
 
 void
 CModule::MarkForLayout (
-	CModuleItem* pItem, 
+	CModuleItem* pItem,
 	bool IsForced
 	)
 {
@@ -248,6 +239,8 @@ CModule::Parse (
 	bool Result;
 
 	jnc::CScopeThreadModule ScopeModule (this);
+
+	m_UnitMgr.CreateUnit (pFilePath);
 
 	jnc::CLexer Lexer;
 	Lexer.Create (pFilePath, pSource, Length);

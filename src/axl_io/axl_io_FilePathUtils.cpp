@@ -5,10 +5,25 @@
 
 namespace axl {
 namespace io {
-		
+
 //.............................................................................
 
-bool 
+rtl::CString
+GetCurrentDir ()
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	char Dir [PATH_MAX] = { 0 };
+	GetCurrentDirectory (Dir, sizeof (Dir) - 1);
+	return Dir;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	char* p = get_current_dir_name ();
+	rtl::CString Dir = p;
+	free (p);
+	return Dir;
+#endif
+}
+
+bool
 DoesFileExist (const char* pFileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -40,24 +55,24 @@ GetFullFilePath (const char* pFileName)
 }
 
 rtl::CString
-GetDirName (const char* pFilePath)
+GetDir (const char* pFilePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	rtl::CString_w FilePath = pFilePath;
 
 	wchar_t Drive [4] = { 0 };
-	wchar_t DirName [1024] = { 0 };
+	wchar_t Dir [1024] = { 0 };
 
 	_wsplitpath_s (
-		FilePath, 
+		FilePath,
 		Drive, countof (Drive) - 1,
-		DirName, countof (DirName) - 1, 
+		Dir, countof (Dir) - 1,
 		NULL, 0,
 		NULL, 0
 		);
 
 	rtl::CString String = Drive;
-	String.Append (DirName);
+	String.Append (Dir);
 	return String;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	rtl::CString String = pFilePath;
@@ -74,9 +89,9 @@ GetFileName (const char* pFilePath)
 
 	wchar_t FileName [1024] = { 0 };
 	wchar_t Extension [1024] = { 0 };
-	
+
 	_wsplitpath_s (
-		FilePath, 
+		FilePath,
 		NULL, 0,
 		NULL, 0,
 		FileName, countof (FileName) - 1,
@@ -125,19 +140,19 @@ ConcatFilePath (
 	return *pFilePath;
 }
 
-rtl::CString 
+rtl::CString
 FindFilePath (
 	const char* pFileName,
-	const char* pFirstDirName,
-	const rtl::CBoxListT <rtl::CString>* pDirNameList,
+	const char* pFirstDir,
+	const rtl::CBoxListT <rtl::CString>* pDirList,
 	bool DoFindInCurrentDir
 	)
 {
 	rtl::CString FilePath;
 
-	if (pFirstDirName)
+	if (pFirstDir)
 	{
-		FilePath = ConcatFilePath (pFirstDirName, pFileName);
+		FilePath = ConcatFilePath (pFirstDir, pFileName);
 		if (DoesFileExist (FilePath))
 			return GetFullFilePath (FilePath);
 	}
@@ -146,12 +161,12 @@ FindFilePath (
 		if (DoesFileExist (pFileName))
 			return GetFullFilePath (pFileName);
 
-	if (pDirNameList)
+	if (pDirList)
 	{
-		rtl::CBoxIteratorT <rtl::CString> DirName = pDirNameList->GetHead ();
-		for (; DirName; DirName++)
+		rtl::CBoxIteratorT <rtl::CString> Dir = pDirList->GetHead ();
+		for (; Dir; Dir++)
 		{
-			FilePath.ForceCopy (*DirName);
+			FilePath.ForceCopy (*Dir);
 			ConcatFilePath (&FilePath, pFileName);
 			if (DoesFileExist (FilePath))
 				return GetFullFilePath (FilePath);

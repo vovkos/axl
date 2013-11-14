@@ -79,10 +79,10 @@ public:
 	llvm::DIFile
 	CreateFile (
 		const char* pFileName,
-		const char* pDirName
+		const char* pDir
 		)
 	{
-		return m_pLlvmDiBuilder->createFile (pFileName, pDirName);
+		return m_pLlvmDiBuilder->createFile (pFileName, pDir);
 	}
 
 	llvm::DIType

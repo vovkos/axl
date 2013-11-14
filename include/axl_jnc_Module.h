@@ -12,6 +12,7 @@
 #include "axl_jnc_ConstMgr.h"
 #include "axl_jnc_ControlFlowMgr.h"
 #include "axl_jnc_OperatorMgr.h"
+#include "axl_jnc_UnitMgr.h"
 #include "axl_jnc_LlvmIrBuilder.h"
 #include "axl_jnc_LlvmDiBuilder.h"
 #include "axl_mt_TlsSlot.h"
@@ -55,11 +56,9 @@ protected:
 class CModule: CPreModule
 {
 protected:
-	rtl::CString m_FilePath;
-	rtl::CString m_FileName;
-	rtl::CString m_DirName;
-
 	uint_t m_Flags;
+
+	rtl::CString m_Name;
 
 	CFunction* m_pConstructor;
 	CFunction* m_pDestructor;
@@ -68,7 +67,6 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_CompileArray;
 
 	llvm::Module* m_pLlvmModule;
-	llvm::DIFile m_LlvmDiFile;
 
 public:
 	CTypeMgr m_TypeMgr;
@@ -79,6 +77,7 @@ public:
 	CConstMgr m_ConstMgr;
 	CControlFlowMgr m_ControlFlowMgr;
 	COperatorMgr m_OperatorMgr;
+	CUnitMgr m_UnitMgr;
 	CLlvmIrBuilder m_LlvmIrBuilder;
 	CLlvmDiBuilder m_LlvmDiBuilder;
 
@@ -93,6 +92,12 @@ public:
 		Clear ();
 	}
 
+	rtl::CString
+	GetName ()
+	{
+		return m_Name;
+	}
+
 	llvm::LLVMContext*
 	GetLlvmContext ()
 	{
@@ -105,12 +110,6 @@ public:
 		return m_pLlvmModule;
 	}
 
-	llvm::DIFile
-	GetLlvmDiFile ()
-	{
-		return m_LlvmDiFile;
-	}
-
 	CType*
 	GetSimpleType (EType TypeKind)
 	{
@@ -121,24 +120,6 @@ public:
 	GetSimpleType (EStdType StdType)
 	{
 		return m_TypeMgr.GetStdType (StdType);
-	}
-
-	rtl::CString
-	GetFilePath ()
-	{
-		return m_FilePath;
-	}
-
-	rtl::CString
-	GetFileName ()
-	{
-		return m_FileName;
-	}
-
-	rtl::CString
-	GetDirName ()
-	{
-		return m_DirName;
 	}
 
 	uint_t
@@ -222,7 +203,7 @@ public:
 
 	bool
 	Create (
-		const rtl::CString& FilePath,
+		const rtl::CString& Name,
 		llvm::Module* pLlvmModule,
 		uint_t Flags = 0
 		);

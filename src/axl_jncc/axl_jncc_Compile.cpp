@@ -13,39 +13,20 @@ CJnc::Compile (
 	bool Result;
 
 	llvm::LLVMContext* pLlvmContext = new llvm::LLVMContext;
-	llvm::Module* pLlvmModule = new llvm::Module (pFileName, *pLlvmContext);
+	llvm::Module* pLlvmModule = new llvm::Module ("jncc_module", *pLlvmContext);
 
 	uint_t ModuleFlags = 0;
 	if (m_pCmdLine->m_Flags & EJncFlag_DebugInfo)
 		ModuleFlags |= jnc::EModuleFlag_DebugInfo;
 
-	m_Module.Create (pFileName, pLlvmModule, ModuleFlags);
+	m_Module.Create ("jncc_module", pLlvmModule, ModuleFlags);
 
 	jnc::CScopeThreadModule ScopeModule (&m_Module);
 
-	jnc::CLexer Lexer;
-	Lexer.Create (pFileName, pSource, Length);
+	Result =
+		m_Module.Parse (pFileName, pSource, Length) &&
+		m_Module.Compile ();
 
-	jnc::CParser Parser;
-	Parser.Create (jnc::CParser::StartSymbol, true);
-
-	for (;;)
-	{
-		const jnc::CToken* pToken = Lexer.GetToken ();
-		if (pToken->m_Token == jnc::EToken_Eof)
-			break;
-
-		Result = Parser.ParseToken (pToken);
-		if (!Result)
-		{
-			err::PushSrcPosError (pFileName, pToken->m_Pos);
-			return false;
-		}
-
-		Lexer.NextToken ();
-	}
-
-	Result = m_Module.Compile ();
 	if (!Result)
 		return false;
 

@@ -14,7 +14,7 @@ namespace pg {
 //.............................................................................
 
 class CParser: protected CLexer
-{	
+{
 protected:
 	class CProductionSpecifiers
 	{
@@ -36,7 +36,7 @@ protected:
 	};
 
 protected:
-	rtl::CString m_DirName;
+	rtl::CString m_Dir;
 	CModule* m_pModule;
 	const CConfig* m_pConfig;
 	CProductionSpecifiers m_DefaultProductionSpecifiers;
@@ -129,22 +129,22 @@ protected:
 		lex::CLineCol* pLineCol
 		);
 
-	bool 
+	bool
 	CustomizeSymbol (CSymbolNode* pNode);
 
-	bool 
+	bool
 	ProcessLocalList (CSymbolNode* pNode);
 
-	bool 
+	bool
 	ProcessFormalArgList (CSymbolNode* pNode);
 
-	bool 
+	bool
 	ProcessActualArgList (
 		CArgumentNode* pNode,
 		const rtl::CString& String
 		);
 
-	bool 
+	bool
 	ProcessSymbolEventHandler (
 		CSymbolNode* pNode,
 		rtl::CString* pString

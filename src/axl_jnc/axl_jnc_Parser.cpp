@@ -34,6 +34,9 @@ CParser::ParseTokenList (
 	bool IsBuildingAst
 	)
 {
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	ASSERT (pUnit);
+
 	ASSERT (!TokenList.IsEmpty ());
 
 	bool Result;
@@ -46,7 +49,7 @@ CParser::ParseTokenList (
 		Result = ParseToken (&*Token);
 		if (!Result)
 		{
-			err::EnsureSrcPosError (m_pModule->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
+			err::EnsureSrcPosError (pUnit->GetFilePath (), Token->m_Pos.m_Line, Token->m_Pos.m_Col);
 			return false;
 		}
 	}
@@ -66,7 +69,7 @@ CParser::ParseTokenList (
 	Result = ParseToken (&EofToken);
 	if (!Result)
 	{
-		err::EnsureSrcPosError (m_pModule->GetFilePath (), EofToken.m_Pos.m_Line, EofToken.m_Pos.m_Col);
+		err::EnsureSrcPosError (pUnit->GetFilePath (), EofToken.m_Pos.m_Line, EofToken.m_Pos.m_Col);
 		return false;
 	}
 

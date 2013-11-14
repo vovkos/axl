@@ -419,7 +419,7 @@ CTypeMgr::CreateEnumType (
 	if (Name.IsEmpty ())
 	{
 		m_UnnamedEnumTypeCounter++;
-		pType->m_Signature.Format ("%s%d:%s", pSignaturePrefix, m_UnnamedEnumTypeCounter, m_pModule->GetFilePath ().cc ());
+		pType->m_Signature.Format ("%s%d", pSignaturePrefix, m_UnnamedEnumTypeCounter);
 		pType->m_Tag.Format (".UnnamedEnum%d", m_UnnamedEnumTypeCounter);
 	}
 	else
@@ -459,7 +459,7 @@ CTypeMgr::CreateStructType (
 	if (Name.IsEmpty ())
 	{
 		m_UnnamedStructTypeCounter++;
-		pType->m_Signature.Format ("S%d:%s", m_UnnamedStructTypeCounter, m_pModule->GetFilePath ().cc ());
+		pType->m_Signature.Format ("S%d", m_UnnamedStructTypeCounter);
 		pType->m_Tag.Format (".UnnamedStruct%d", m_UnnamedStructTypeCounter);
 	}
 	else
@@ -489,7 +489,7 @@ CTypeMgr::CreateUnionType (
 	if (Name.IsEmpty ())
 	{
 		m_UnnamedUnionTypeCounter++;
-		pType->m_Signature.Format ("U%d:%s", m_UnnamedUnionTypeCounter, m_pModule->GetFilePath ().cc ());
+		pType->m_Signature.Format ("U%d", m_UnnamedUnionTypeCounter);
 		pType->m_Tag.Format (".UnamedUnion%d", m_UnnamedUnionTypeCounter);
 	}
 	else
@@ -565,7 +565,7 @@ CTypeMgr::CreateClassType (
 	if (Name.IsEmpty ())
 	{
 		m_UnnamedClassTypeCounter++;
-		pType->m_Signature.Format ("CC%d%s", m_UnnamedClassTypeCounter, m_pModule->GetFilePath ().cc ());
+		pType->m_Signature.Format ("CC%d", m_UnnamedClassTypeCounter);
 		pType->m_Tag.Format (".UnnamedClass%d", m_UnnamedClassTypeCounter);
 	}
 	else
@@ -661,12 +661,12 @@ CTypeMgr::CreateFunctionArg (
 
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
 		pFunctionArg->m_pType_i = (CImportType*) pType;
-		
+
 	// all this should be calculated during CFunctionType::CalcLayout
 
 	//if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
 	//{
-	//	m_pModule->MarkForLayout (pFunctionArg); 
+	//	m_pModule->MarkForLayout (pFunctionArg);
 	//}
 	//else
 	//{
