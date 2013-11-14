@@ -20,18 +20,9 @@ PrintUsage (COutStream* pOutStream)
 {
 	PrintVersion (pOutStream);
 
-	pOutStream->Printf (
-		"Usage: jnc [<options>...] <source_file>\n"
-		"    -?, -h, -H     print this usage and exit\n"
-		"    -v             print version\n"
-		"    -l[c]          print LLVM IR ('c' = manual mode w/ comments)\n"
-		"    -d             print disassembly (implies -j)\n"
-		"    -j[m]          JIT functions ('m' = use MC-JITter)\n"
-		"    -g             emit debugging information\n"
-		"    -r <function>  run function <function> (implies '-j')\n"
-		"    -s <port>      start compiler server on TCP <port>\n"
-		);
-}
+	rtl::CString HelpString = CCmdLineSwitchTable::GetHelpString ();
+	pOutStream->Printf ("Usage: jnc [<options>...] <source_file>\n%s", HelpString.cc ());
+ }
 
 //.............................................................................
 
@@ -39,7 +30,7 @@ CJnc* CJnc::m_pCurrentJnc = NULL;
 
 int
 CJnc::Run (
-	CCmdLine* pCmdLine,
+	TCmdLine* pCmdLine,
 	COutStream* pOutStream
 	)
 {
@@ -153,9 +144,10 @@ main (
 	srand ((int) axl::g::GetTimestamp ());
 
 	CFileOutStream StdOut;
-	CCmdLine CmdLine;
+	TCmdLine CmdLine;
+	CCmdLineParser Parser (&CmdLine);
 
-	Result = CmdLine.Parse (argc, argv);
+	Result = Parser.Parse (argc, argv);
 	if (!Result)
 	{
 		printf ("error parsing command line: %s\n", err::GetError ()->GetDescription ().cc ());

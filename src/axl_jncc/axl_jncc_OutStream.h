@@ -5,7 +5,7 @@
 class COutStream
 {
 public:
-	virtual 
+	virtual
 	size_t
 	Printf_va (
 		const char* pFormat,
@@ -36,15 +36,12 @@ public:
 		m_pFile = stdout;
 	}
 
-	virtual 
-	size_t 
+	virtual
+	size_t
 	Printf_va (
 		const char* pFormat,
 		axl_va_list va
-		)
-	{
-		return vfprintf (m_pFile, pFormat, va.m_va);
-	}
+		);
 };
 
 //.............................................................................
@@ -60,7 +57,7 @@ public:
 		m_Socket = INVALID_SOCKET;
 	}
 
-	virtual 
+	virtual
 	size_t
 	Printf_va (
 		const char* pFormat,

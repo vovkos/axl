@@ -4,7 +4,7 @@
 
 //.............................................................................
 
-int 
+int
 CJnc::Server ()
 {
 	int Result;
@@ -27,25 +27,25 @@ CJnc::Server ()
 	if (Result == -1)
 	{
 		m_pOutStream->Printf (
-			"cannot open TCP port %d (%s)\n", 
-			m_pCmdLine->m_ServerPort, 
+			"cannot open TCP port %d (%s)\n",
+			m_pCmdLine->m_ServerPort,
 			err::CError (getsockerror ()).GetDescription ().cc ()
 			);
 
 		return EJncError_IoFailure;
 	}
 
-	listen (ServerSock, 1);	
+	listen (ServerSock, 1);
 
 	m_pOutStream->Printf ("listening on TCP port %d...\n", m_pCmdLine->m_ServerPort);
 
 	for (;;)
 	{
 		socklen_t SockAddrSize = sizeof (SockAddr);
-		
+
 		SOCKET ConnSock = accept (ServerSock, (sockaddr*) &SockAddr, &SockAddrSize);
 		m_pOutStream->Printf (
-			"%s:%d: connection accepted\n", 
+			"%s:%d: connection accepted\n",
 			inet_ntoa (SockAddr.sin_addr),
 			ntohs (SockAddr.sin_port)
 			);
@@ -103,9 +103,10 @@ CJnc::Client (
 	CSocketOutStream SocketOut;
 	SocketOut.m_Socket = Socket;
 
-	CCmdLine CmdLine;
+	TCmdLine CmdLine;
+	CCmdLineParser Parser (&CmdLine);
 
-	Result = CmdLine.Parse (CmdLineString, CmdLineString.GetLength ());
+	Result = Parser.Parse (CmdLineString, CmdLineString.GetLength ());
 	if (!Result)
 	{
 		SocketOut.Printf ("error parsing command line: %s\n", err::GetError ()->GetDescription ().cc ());

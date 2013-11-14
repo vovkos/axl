@@ -57,7 +57,7 @@ class CJnc
 protected:
 	static CJnc* m_pCurrentJnc;
 
-	CCmdLine* m_pCmdLine;
+	TCmdLine* m_pCmdLine;
 	COutStream* m_pOutStream;
 
 	jnc::CModule m_Module;
@@ -87,7 +87,7 @@ public:
 
 	int
 	Run (
-		CCmdLine* pCmdLine,
+		TCmdLine* pCmdLine,
 		COutStream* pOutStream
 		);
 

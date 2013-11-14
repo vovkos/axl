@@ -63,7 +63,7 @@ option (
 if (AXL_BUILD_INI_LIB)
 	add_subdirectory (axl_ini)
 endif ()
-	
+
 #..............................................................................
 
 option (
@@ -103,22 +103,6 @@ option (
 
 if (AXL_BUILD_JNCC)
 	add_subdirectory (axl_jncc)
-
-	# test against official demos
-
-	if (UNIX)
-		set (_FLAGS "-jm -rmain")
-	else ()
-		set (_FLAGS "-j -rmain")
-	endif ()
-
-	add_jncc_tests (
-		${_FLAGS}
-		${AXL_JANCY_DEMOS_DIR}
-		${AXL_JANCY_DEMOS_FILE_NAME_LIST}
-		)
-
-	# later add more test files
 endif ()
 
 #..............................................................................
@@ -162,7 +146,7 @@ option (
 if (AXL_BUILD_PARSE_LIB)
 	add_subdirectory (axl_parse)
 endif ()
-	
+
 #..............................................................................
 
 option (

@@ -128,4 +128,22 @@ add_jncc_tests
 	endforeach ()
 endmacro ()
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# test against official demos
+
+if (UNIX)
+	set (_FLAGS "--mcjit --run")
+else ()
+	set (_FLAGS "--run")
+endif ()
+
+add_jncc_tests (
+	${_FLAGS}
+	${AXL_JANCY_DEMOS_DIR}
+	${AXL_JANCY_DEMOS_FILE_NAME_LIST}
+	)
+
+# later add more test files
+
 #..............................................................................
