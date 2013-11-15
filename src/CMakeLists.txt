@@ -22,18 +22,6 @@ endif ()
 
 #..............................................................................
 
-option (
-	AXL_BUILD_GUI_LIB
-	"Build axl_gui library"
-	ON
-	)
-
-if (AXL_BUILD_GUI_LIB)
-	add_subdirectory (axl_gui)
-endif ()
-
-#..............................................................................
-
 if (WIN32)
 	option (
 		AXL_BUILD_GUI_GDI
@@ -50,6 +38,18 @@ if (${QT_FOUND})
 		"Build QT drivers for axl_gui library"
 		ON
 		)
+endif ()
+
+#..............................................................................
+
+option (
+	AXL_BUILD_GUI_LIB
+	"Build axl_gui library"
+	ON
+	)
+
+if (AXL_BUILD_GUI_LIB)
+	add_subdirectory (axl_gui)
 endif ()
 
 #..............................................................................
