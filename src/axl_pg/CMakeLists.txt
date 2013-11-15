@@ -125,7 +125,7 @@ endif ()
 if (UNIX)
 	target_link_libraries (
 		axl_pg
-		lua52
+		lua
 		dl
 		pthread
 		)
