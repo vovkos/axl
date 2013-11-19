@@ -102,6 +102,7 @@ class CModuleItemDecl
 {
 	friend class CParser;
 	friend class CNamespace;
+	friend class CControlFlowMgr;
 
 protected:
 	EStorage m_StorageKind;

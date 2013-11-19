@@ -1,4 +1,4 @@
-import "axl_jnc_Decl.llk"; 
+import "axl_jnc_Decl.llk";
 import "axl_jnc_Expr.llk";
 import "axl_jnc_Expr_s.llk";
 import "axl_jnc_Stmt.llk";
@@ -17,11 +17,11 @@ nullable
 compilation_unit
 	: global_declaration*
 	;
-	 
+
 //.............................................................................
 
 ParserClassName = CParser;
- 
+
 Includes
 {
 	#define _AXL_JNC_PARSER_H
@@ -31,13 +31,13 @@ Includes
 	#include "axl_jnc_Decl.h"
 	#include "axl_llk_Parser.h"
 }
- 
+
 Members
 {
 	enum EStage
 	{
 		EStage_Pass1, // global declarations (before linkage)
-		EStage_Pass2, // statements and expressions (after linkage & calclayout)		
+		EStage_Pass2, // statements and expressions (after linkage & calclayout)
 		EStage_ReactorScan, // scan reactor body to build bind site map (after linkage but before calclayout)
 	};
 
@@ -77,7 +77,7 @@ Members
 	EStage m_Stage;
 	uint_t m_Flags;
 	size_t m_StructPackFactor;
-	size_t m_DefaultStructPackFactor;	
+	size_t m_DefaultStructPackFactor;
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
 	CAttributeBlock* m_pAttributeBlock;
@@ -86,7 +86,7 @@ Members
 
 	CFunctionType* m_pLastPropertyGetterType;
 	CTypeModifiers m_LastPropertyTypeModifiers;
-	
+
 	CReactorClassType* m_pReactorType;
 	rtl::CStdListT <TReaction> m_ReactionList;
 	rtl::CBoxListT <CValue> m_ReactorBindSiteList;
@@ -111,7 +111,7 @@ Members2
 
 	bool
 	ParseTokenList (
-		ESymbol Symbol, 
+		ESymbol Symbol,
 		const rtl::CConstBoxListT <CToken>& TokenList,
 		bool IsBuildingAst = false
 		);
@@ -146,7 +146,7 @@ Members2
 		m_TypeSpecifierStack.Pop ();
 	}
 
-	bool 
+	bool
 	IsReactor ()
 	{
 		return m_pReactorType != NULL;
@@ -186,13 +186,13 @@ Members2
 		const CQualifiedName& Name,
 		const CToken::CPos& Pos
 		);
-		
+
 	bool
 	PreDeclare ();
 
 	bool
 	Declare (CDeclarator* pDeclarator);
-		
+
 	bool
 	DeclareTypedef (
 		CDeclarator* pDeclarator,
@@ -281,8 +281,8 @@ Members2
 
 	bool
 	NewOperator_s (
-		EStorage StorageKind, 
-		CType* pType, 
+		EStorage StorageKind,
+		CType* pType,
 		CValue* pResultValue
 		);
 
@@ -295,7 +295,7 @@ Members2
 	bool
 	FinalizeReactorOnChangeStmt ()
 	{
-		return m_pModule->m_FunctionMgr.Epilogue (m_LastMatchedToken.m_Pos);
+		return m_pModule->m_FunctionMgr.Epilogue ();
 	}
 
 	bool
@@ -372,7 +372,7 @@ Members2
 
 	bool
 	PrepareCurlyInitializerNamedItem (
-		TCurlyInitializer* pInitializer, 
+		TCurlyInitializer* pInitializer,
 		const char* pName
 		);
 
@@ -407,7 +407,7 @@ Members2
 		TLiteral* pLiteral,
 		CValue* pResultValue
 		);
-} 
+}
 
 OpenNamespace
 {.

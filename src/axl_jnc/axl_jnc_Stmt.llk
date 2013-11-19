@@ -2,33 +2,33 @@
 
 start
 compound_stmt
-	:	'{' $l
+	:	'{'
 			{
-				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
-				PreCreateLandingPads ($l.m_Data.m_Integer);
+				m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+				PreCreateLandingPads ($1.m_Data.m_Integer);
 			}
 		local_declaration*
-		'}' $r
+		'}'
 			{
-				m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
+				m_pModule->m_NamespaceMgr.CloseScope ();
 			}
 	;
 
 start
 constructor_compound_stmt
-	:	'{' $l
+	:	'{'
 			{
-				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
-				PreCreateLandingPads ($l.m_Data.m_Integer);
+				m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+				PreCreateLandingPads ($1.m_Data.m_Integer);
 			}
 		btm_construct_stmt*
 			{
 				return FinalizeBaseTypeMemberConstructBlock ();
 			}
 		local_declaration*
-		'}' $r
+		'}'
 			{
-				m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
+				m_pModule->m_NamespaceMgr.CloseScope ();
 			}
 	;
 
@@ -117,7 +117,7 @@ if_stmt
 			statement $f
 		)?
 			{
-				m_pModule->m_ControlFlowMgr.IfStmt_Follow (&$Stmt, IsValidLocator ($f) ? $f.m_LastToken.m_Pos : $t.m_LastToken.m_Pos);
+				m_pModule->m_ControlFlowMgr.IfStmt_Follow (&$Stmt);
 			}
 	;
 
@@ -136,20 +136,20 @@ switch_stmt
 					m_pModule->m_ControlFlowMgr.SwitchStmt_Condition (&$Stmt, $e.m_Value, $l.m_Pos) &&
 					PreCreateLandingPads ($l.m_Data.m_Integer);
 			}
-		switch_block_stmt <&$Stmt>* '}' $r
+		switch_block_stmt <&$Stmt>* '}'
 			{
-				m_pModule->m_ControlFlowMgr.SwitchStmt_Follow (&$Stmt, $r.m_Pos);
+				m_pModule->m_ControlFlowMgr.SwitchStmt_Follow (&$Stmt);
 			}
 	;
 
 switch_block_stmt <TSwitchStmt* $pStmt>
-	:	EToken_Case constant_integer_expr $e ':' $a
+	:	EToken_Case constant_integer_expr $e ':'
 			{
-				return m_pModule->m_ControlFlowMgr.SwitchStmt_Case ($pStmt, $e.m_Value, $1.m_Pos, $a.m_Pos);
+				return m_pModule->m_ControlFlowMgr.SwitchStmt_Case ($pStmt, $e.m_Value, $1.m_Pos);
 			}
-	|	EToken_Default ':' $a
+	|	EToken_Default ':'
 			{
-				return m_pModule->m_ControlFlowMgr.SwitchStmt_Default ($pStmt, $1.m_Pos, $a.m_Pos);
+				return m_pModule->m_ControlFlowMgr.SwitchStmt_Default ($pStmt, $1.m_Pos);
 			}
 	|	local_declaration
 	;
@@ -167,9 +167,9 @@ while_stmt
 			{
 				m_pModule->m_ControlFlowMgr.WhileStmt_Condition (&$Stmt, $e.m_Value, $a.m_Pos);
 			}
-		statement $s
+		statement
 			{
-				m_pModule->m_ControlFlowMgr.WhileStmt_Follow (&$Stmt, $s.m_LastToken.m_Pos);
+				m_pModule->m_ControlFlowMgr.WhileStmt_Follow (&$Stmt);
 			}
 	;
 
@@ -186,9 +186,9 @@ do_stmt
 			{
 				m_pModule->m_ControlFlowMgr.DoStmt_PreBody (&$Stmt, $1.m_Pos);
 			}
-		statement $s
+		statement
 			{
-				m_pModule->m_ControlFlowMgr.DoStmt_PostBody (&$Stmt, $s.m_LastToken.m_Pos);
+				m_pModule->m_ControlFlowMgr.DoStmt_PostBody (&$Stmt);
 			}
 		EToken_While '(' expression $e ')' ';'
 			{
@@ -231,9 +231,9 @@ for_stmt
 			{
 				m_pModule->m_ControlFlowMgr.ForStmt_PreBody (&$Stmt);
 			}
-		statement $s
+		statement
 			{
-				m_pModule->m_ControlFlowMgr.ForStmt_PostBody (&$Stmt, $s.m_LastToken.m_Pos);
+				m_pModule->m_ControlFlowMgr.ForStmt_PostBody (&$Stmt);
 			}
 	;
 
@@ -267,7 +267,7 @@ once_stmt
 			{
 				EStorage StorageKind = IsValidLocator ($1) ? $1.m_StorageKind : EStorage_Static;
 				return
-					m_pModule->m_ControlFlowMgr.OnceStmt_Create (&$Stmt, StorageKind) &&
+					m_pModule->m_ControlFlowMgr.OnceStmt_Create (&$Stmt, $2.m_Pos, StorageKind) &&
 					m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&$Stmt, $2.m_Pos);
 			}
 		statement $s
@@ -278,16 +278,16 @@ once_stmt
 
 try_stmt
 	:	EToken_Try
-		'{' $l
+		'{'
 			{
-				m_pModule->m_NamespaceMgr.OpenScope ($l.m_Pos);
-				PreCreateLandingPads ($l.m_Data.m_Integer | ELandingPadFlag_Catch); // always catch
+				m_pModule->m_NamespaceMgr.OpenScope ($1.m_Pos);
+				PreCreateLandingPads ($1.m_Data.m_Integer | ELandingPadFlag_Catch); // always catch
 			}
 		local_declaration*
-		'}' $r
+		'}'
 			{
 				m_pModule->m_ControlFlowMgr.EndTry ();
-				m_pModule->m_NamespaceMgr.CloseScope ($r.m_Pos);
+				m_pModule->m_NamespaceMgr.CloseScope ();
 			}
 	;
 

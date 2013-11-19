@@ -1614,7 +1614,7 @@ CParser::ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList)
 	if (!Result)
 		return false;
 
-	m_pModule->m_FunctionMgr.Epilogue (pTokenList->GetTail ()->m_Pos);
+	m_pModule->m_FunctionMgr.Epilogue ();
 	return true;
 }
 

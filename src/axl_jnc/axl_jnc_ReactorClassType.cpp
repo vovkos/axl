@@ -72,7 +72,7 @@ CReactorClassType::CalcLayout ()
 	CType* pBindSiteType = m_pModule->m_TypeMgr.GetStdType (EStdType_ReactorBindSite);
 	CArrayType* pBindSiteArrayType = pBindSiteType->GetArrayType (m_BindSiteCount);
 	m_FieldArray [EReactorField_BindSiteArray] = CreateField (pBindSiteArrayType);
-	
+
 	Result = CClassType::CalcLayout ();
 	if (!Result)
 		return false;
@@ -95,8 +95,8 @@ CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList
 	CValue BindSiteArrayValue;
 	Result = m_pModule->m_OperatorMgr.GetField (
 		ThisValue,
-		m_FieldArray [EReactorField_BindSiteArray], 
-		NULL, 
+		m_FieldArray [EReactorField_BindSiteArray],
+		NULL,
 		&BindSiteArrayValue
 		);
 
@@ -109,14 +109,14 @@ CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList
 	{
 		CFunction* pFunction = Handler->m_pFunction;
 
-		rtl::CBoxIteratorT <CValue> Value = Handler->m_BindSiteList.GetHead (); 
+		rtl::CBoxIteratorT <CValue> Value = Handler->m_BindSiteList.GetHead ();
 		for (; Value; Value++, i++)
 		{
 			CValue OnChangeValue;
 			Result = m_pModule->m_OperatorMgr.GetPropertyOnChange (*Value, &OnChangeValue);
 			if (!Result)
 				return false;
-	
+
 			CValue HandlerValue = pFunction;
 			HandlerValue.InsertToClosureHead (ThisValue);
 
@@ -126,8 +126,8 @@ CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList
 			CValue BindSiteValue;
 			CValue DstOnChangeValue;
 			CValue DstCookieValue;
-			
-			Result = 
+
+			Result =
 				m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "add", &AddMethodValue) &&
 				m_pModule->m_OperatorMgr.CallOperator (AddMethodValue, HandlerValue, &CookieValue) &&
 				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
@@ -167,7 +167,7 @@ CReactorClassType::CompileConstructor ()
 
 	size_t ArgCount = m_pConstructor->GetType ()->GetArgArray ().GetCount ();
 	ASSERT (ArgCount == 1 || ArgCount == 2);
-	
+
 	CValue ArgValueArray [2];
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pConstructor, ArgValueArray, ArgCount);
 
@@ -175,9 +175,9 @@ CReactorClassType::CompileConstructor ()
 	{
 		CStructField* pField = m_FieldArray [EReactorField_Parent];
 		ASSERT (pField);
-		
+
 		CValue ParentFieldValue;
-		Result = 
+		Result =
 			m_pModule->m_OperatorMgr.GetClassField (ArgValueArray [0], pField, NULL, &ParentFieldValue) &&
 			m_pModule->m_OperatorMgr.StoreDataRef (ParentFieldValue, ArgValueArray [1]);
 
@@ -253,7 +253,7 @@ CReactorClassType::CompileStartMethod ()
 		Result = m_pModule->m_OperatorMgr.GetField (ThisValue, pArgField, NULL, &StoreValue);
 		if (!Result)
 			return false;
-			
+
 		m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue, StoreValue);
 	}
 
@@ -271,7 +271,7 @@ CReactorClassType::CompileStartMethod ()
 	// modify state
 
 	CValue StateValue;
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EReactorField_State], NULL, &StateValue) &&
 		m_pModule->m_OperatorMgr.StoreDataRef (StateValue, CValue ((int64_t) 1, EType_Int_p));
 
@@ -280,7 +280,7 @@ CReactorClassType::CompileStartMethod ()
 
 	// done
 
-	Result = m_pModule->m_FunctionMgr.Epilogue (m_Body.GetTail ()->m_Pos);
+	Result = m_pModule->m_FunctionMgr.Epilogue ();
 	if (!Result)
 		return false;
 
@@ -303,11 +303,11 @@ CReactorClassType::CompileStopMethod ()
 	CBasicBlock* pUnadviseBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("unadvise_block");
 	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow_block");
 
-	CValue StateValue; 
-	CValue StateCmpValue; 
+	CValue StateValue;
+	CValue StateCmpValue;
 	CValue BindSiteArrayValue;
 
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetField (ThisValue, m_FieldArray [EReactorField_State], NULL, &StateValue) &&
 		m_pModule->m_ControlFlowMgr.ConditionalJump (StateValue, pUnadviseBlock, pFollowBlock);
 
@@ -326,7 +326,7 @@ CReactorClassType::CompileStopMethod ()
 		CValue CookieValue;
 		CValue RemoveMethodValue;
 
-		Result = 
+		Result =
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
 			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
 			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &CookieValue) &&
@@ -340,7 +340,7 @@ CReactorClassType::CompileStopMethod ()
 
 	Result = m_pModule->m_OperatorMgr.StoreDataRef (StateValue, CValue ((int64_t) 0, EType_Int_p));
 	ASSERT (Result);
-	
+
 	m_pModule->m_ControlFlowMgr.Follow (pFollowBlock);
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();

@@ -435,10 +435,10 @@ CDerivableType::CompileDefaultStaticConstructor ()
 {
 	ASSERT (m_pStaticConstructor);
 
-	TOnceStmt Stmt;
-	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
-
 	CToken::CPos Pos;
+
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, Pos);
 
 	bool Result = m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
 	if (!Result)

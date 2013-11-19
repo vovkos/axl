@@ -253,6 +253,8 @@ protected:
 		CValue m_ScopeLevelValue;
 		CValue m_VTablePtrPtrValue;
 		CValue m_VTablePtrValue;
+
+		llvm::DebugLoc m_LlvmDebugLoc;
 	};
 
 protected:
@@ -410,7 +412,7 @@ public:
 		);
 
 	bool
-	Epilogue (const CToken::CPos& Pos);
+	Epilogue ();
 
 	bool
 	FireOnChangeEvent ();

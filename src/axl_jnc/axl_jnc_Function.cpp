@@ -459,7 +459,7 @@ CFunction::Compile ()
 
 	// epilogue
 
-	Result = m_pModule->m_FunctionMgr.Epilogue (EndPos);
+	Result = m_pModule->m_FunctionMgr.Epilogue ();
 	if (!Result)
 		return false;
 

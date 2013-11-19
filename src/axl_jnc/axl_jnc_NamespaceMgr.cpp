@@ -84,8 +84,7 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	pScope->m_pModule = m_pModule;
 	pScope->m_pFunction = pFunction;
 	pScope->m_Level = m_pCurrentScope ? m_pCurrentScope->GetLevel () + 1 : 1;
-	pScope->m_BeginPos = Pos;
-	pScope->m_EndPos = Pos;
+	pScope->m_Pos = Pos;
 	pScope->m_pParentNamespace = m_pCurrentNamespace;
 
 	if (m_pCurrentScope)
@@ -104,13 +103,10 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 }
 
 void
-CNamespaceMgr::CloseScope (const CToken::CPos& Pos)
+CNamespaceMgr::CloseScope ()
 {
 	CScope* pScope = m_pCurrentScope;
 	ASSERT (pScope);
-
-	pScope->m_EndPos = Pos;
-	SetSourcePos (Pos);
 
 	if (m_pModule->m_ControlFlowMgr.GetCurrentBlock ()->GetFlags () & EBasicBlockFlag_Reachable)
 	{

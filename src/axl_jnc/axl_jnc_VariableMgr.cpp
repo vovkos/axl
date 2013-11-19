@@ -379,10 +379,10 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 
 	// initialize within 'once' block
 
-	TOnceStmt Stmt;
-	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt);
+	CToken::CPos Pos = *pVariable->GetItemDecl ()->GetPos ();
 
-	CToken::CPos Pos;
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, Pos);
 
 	Result =
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
@@ -398,6 +398,11 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 			m_StaticDestructList.AddDestructor (pDestructor, pVariable, Stmt.m_pFlagVariable);
 	}
 
+	if (!pVariable->m_Initializer.IsEmpty ())
+		Pos = pVariable->m_Initializer.GetTail ()->m_Pos;
+	else if (!pVariable->m_Constructor.IsEmpty ())
+		Pos = pVariable->m_Constructor.GetTail ()->m_Pos;
+
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
 
 	return true;
@@ -412,10 +417,10 @@ CVariableMgr::AllocatePrimeInitializeTlsVariable (CVariable* pVariable)
 
 	// initialize within 'once' block
 
-	TOnceStmt Stmt;
-	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, EStorage_Thread);
+	CToken::CPos Pos = *pVariable->GetItemDecl ()->GetPos ();
 
-	CToken::CPos Pos;
+	TOnceStmt Stmt;
+	m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, Pos, EStorage_Thread);
 
 	Result =
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
@@ -423,6 +428,11 @@ CVariableMgr::AllocatePrimeInitializeTlsVariable (CVariable* pVariable)
 
 	if (!Result)
 		return false;
+
+	if (!pVariable->m_Initializer.IsEmpty ())
+		Pos = pVariable->m_Initializer.GetTail ()->m_Pos;
+	else if (!pVariable->m_Constructor.IsEmpty ())
+		Pos = pVariable->m_Constructor.GetTail ()->m_Pos;
 
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
 

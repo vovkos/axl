@@ -78,7 +78,7 @@ public:
 	OpenScope (const CToken::CPos& Pos);
 
 	void
-	CloseScope (const CToken::CPos& Pos);
+	CloseScope ();
 
 	EAccess
 	GetAccessKind (CNamespace* pNamespace);

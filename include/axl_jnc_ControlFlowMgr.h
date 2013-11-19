@@ -233,10 +233,7 @@ public:
 		);
 
 	void
-	IfStmt_Follow (
-		TIfStmt* pStmt,
-		const CToken::CPos& Pos
-		);
+	IfStmt_Follow (TIfStmt* pStmt);
 
 	// switch stmt
 
@@ -254,22 +251,17 @@ public:
 	SwitchStmt_Case (
 		TSwitchStmt* pStmt,
 		intptr_t Value,
-		const CToken::CPos& Pos1,
-		const CToken::CPos& Pos2
+		const CToken::CPos& Pos
 		);
 
 	bool
 	SwitchStmt_Default (
 		TSwitchStmt* pStmt,
-		const CToken::CPos& Pos1,
-		const CToken::CPos& Pos2
+		const CToken::CPos& Pos
 		);
 
 	void
-	SwitchStmt_Follow (
-		TSwitchStmt* pStmt,
-		const CToken::CPos& Pos
-		);
+	SwitchStmt_Follow (TSwitchStmt* pStmt);
 
 	// while stmt
 
@@ -284,10 +276,7 @@ public:
 		);
 
 	void
-	WhileStmt_Follow (
-		TWhileStmt* pStmt,
-		const CToken::CPos& Pos
-		);
+	WhileStmt_Follow (TWhileStmt* pStmt);
 
 	// do stmt
 
@@ -301,10 +290,7 @@ public:
 		);
 
 	void
-	DoStmt_PostBody (
-		TDoStmt* pStmt,
-		const CToken::CPos& Pos
-		);
+	DoStmt_PostBody (TDoStmt* pStmt);
 
 	bool
 	DoStmt_Condition (
@@ -342,16 +328,14 @@ public:
 	ForStmt_PreBody (TForStmt* pStmt);
 
 	void
-	ForStmt_PostBody (
-		TForStmt* pStmt,
-		const CToken::CPos& Pos
-		);
+	ForStmt_PostBody (TForStmt* pStmt);
 
 	// once stmt
 
 	bool
 	OnceStmt_Create (
 		TOnceStmt* pStmt,
+		const CToken::CPos& Pos,
 		EStorage StorageKind = EStorage_Static
 		);
 

@@ -572,7 +572,7 @@ COperatorMgr::NewOperator (
 	CToken::CPos Pos;
 
 	Result =
-		m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, StorageKind) &&
+		m_pModule->m_ControlFlowMgr.OnceStmt_Create (&Stmt, Pos, StorageKind) &&
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos);
 
 	if (!Result)

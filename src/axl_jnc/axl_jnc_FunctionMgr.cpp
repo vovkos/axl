@@ -171,6 +171,7 @@ CFunctionMgr::PushEmissionContext ()
 	pContext->m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock;
 	pContext->m_pUnreachableBlock = m_pModule->m_ControlFlowMgr.m_pUnreachableBlock;
 	pContext->m_ControlFlowMgrFlags = m_pModule->m_ControlFlowMgr.m_Flags;
+	pContext->m_LlvmDebugLoc = m_pModule->m_LlvmIrBuilder.GetCurrentDebugLoc ();
 
 	m_EmissionContextStack.InsertTail (pContext);
 
@@ -182,6 +183,7 @@ CFunctionMgr::PushEmissionContext ()
 	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
+	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc ();
 
 	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 
@@ -223,6 +225,7 @@ CFunctionMgr::PopEmissionContext ()
 	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = pContext->m_pSilentReturnBlock;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = pContext->m_pUnreachableBlock;
 	m_pModule->m_ControlFlowMgr.m_Flags = pContext->m_ControlFlowMgrFlags;
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (pContext->m_LlvmDebugLoc);
 
 	AXL_MEM_DELETE (pContext);
 
@@ -418,7 +421,7 @@ CFunctionMgr::CreateThisValue ()
 }
 
 bool
-CFunctionMgr::Epilogue (const CToken::CPos& Pos)
+CFunctionMgr::Epilogue ()
 {
 	bool Result;
 
@@ -488,7 +491,7 @@ CFunctionMgr::Epilogue (const CToken::CPos& Pos)
 		return false;
 	}
 
-	m_pModule->m_NamespaceMgr.CloseScope (Pos);
+	m_pModule->m_NamespaceMgr.CloseScope ();
 	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
 	PopEmissionContext ();
@@ -516,6 +519,7 @@ CFunctionMgr::InternalPrologue (
 	pEntryBlock->MarkEntry ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
+	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc (); // no line info in entry block
 
 #ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
@@ -562,8 +566,7 @@ CFunctionMgr::InternalEpilogue ()
 		m_pModule->m_ControlFlowMgr.Return (ReturnValue);
 	}
 
-	CToken::CPos Pos;
-	m_pModule->m_NamespaceMgr.CloseScope (Pos);
+	m_pModule->m_NamespaceMgr.CloseScope ();
 
 	PopEmissionContext ();
 }
@@ -818,7 +821,7 @@ public:
 	void
 	NotifyObjectEmitted (const llvm::ObjectImage& LLvmObjectImage)
 	{
-		printf ("NotifyObjectEmitted\n");
+		// printf ("NotifyObjectEmitted\n");
 	}
 
 	virtual
@@ -884,7 +887,7 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 				"LLVM jitting fail for '%s': %s",
 				pFunction->m_Tag.cc (),
 				Error->GetDescription ().cc ()
-				); 
+				);
 
 			pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
 			return false;

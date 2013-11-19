@@ -26,7 +26,7 @@ enum EScopeFlag
 
 //.............................................................................
 
-class CScope: 
+class CScope:
 	public CModuleItem,
 	public CNamespace
 {
@@ -38,8 +38,7 @@ class CScope:
 protected:
 	size_t m_Level;
 
-	CToken::CPos m_BeginPos;
-	CToken::CPos m_EndPos;
+	CToken::CPos m_Pos;
 	CFunction* m_pFunction;
 
 	rtl::CBoxListT <CValue> m_GcRootList;
@@ -48,7 +47,7 @@ protected:
 public:
 	CBasicBlock* m_pBreakBlock;
 	CBasicBlock* m_pContinueBlock;
-	CBasicBlock* m_pCatchBlock;	
+	CBasicBlock* m_pCatchBlock;
 	CBasicBlock* m_pFinallyBlock;
 	CVariable* m_pFinallyReturnAddress;
 	rtl::CArrayT <CBasicBlock*> m_FinallyReturnBlockArray;
@@ -70,15 +69,9 @@ public:
 	}
 
 	const CToken::CPos*
-	GetBeginPos ()
+	GetPos ()
 	{
-		return &m_BeginPos;
-	}
-
-	const CToken::CPos*
-	GetEndPos ()
-	{
-		return &m_EndPos;
+		return &m_Pos;
 	}
 
 	CFunction*
@@ -105,7 +98,7 @@ public:
 		m_GcRootList.InsertTail (Value);
 	}
 
-	llvm::DIScope 
+	llvm::DIScope
 	GetLlvmDiScope ()
 	{
 		return m_LlvmDiScope;
