@@ -8,12 +8,12 @@
 
 // C standard headers
 
-#define __STDC_LIMIT_MACROS 
+#define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
 
 #if (_WIN32)
 #	define _CRT_SECURE_NO_WARNINGS  // useless warnings about "unsafe" string functions
-#	define _SCL_SECURE_NO_WARNINGS  // useless warnings about "unsafe" iterator operations 
+#	define _SCL_SECURE_NO_WARNINGS  // useless warnings about "unsafe" iterator operations
 #endif
 
 #include <stddef.h>
@@ -61,11 +61,12 @@
 #	include <assert.h>
 #	define ASSERT assert
 #
-#	include <unistd.h> 
+#	include <unistd.h>
 #	include <pthread.h>
 #	include <semaphore.h>
 #	include <fcntl.h>
 #	include <limits.h>
+#	include <byteswap.h>
 #	include <sys/stat.h>
 #	include <sys/mman.h>
 #
@@ -94,9 +95,9 @@
 // strnchr / wcsnchr
 
 inline
-const char* 
+const char*
 strchr_e (
-	const char* p, 
+	const char* p,
 	const char* pEnd,
 	char c
 	)
@@ -105,7 +106,7 @@ strchr_e (
 	{
 		if (*p == c)
 			return p;
-		
+
 		p++;
 	}
 
@@ -113,9 +114,9 @@ strchr_e (
 }
 
 inline
-char* 
+char*
 strchr_e (
-	char* p, 
+	char* p,
 	char* pEnd,
 	char c
 	)
@@ -124,7 +125,7 @@ strchr_e (
 	{
 		if (*p == c)
 			return p;
-		
+
 		p++;
 	}
 
@@ -132,9 +133,9 @@ strchr_e (
 }
 
 inline
-const wchar_t* 
+const wchar_t*
 wcschr_e (
-	const wchar_t* p, 
+	const wchar_t* p,
 	const wchar_t* pEnd,
 	wchar_t c
 	)
@@ -143,7 +144,7 @@ wcschr_e (
 	{
 		if (*p == c)
 			return p;
-		
+
 		p++;
 	}
 
@@ -151,9 +152,9 @@ wcschr_e (
 }
 
 inline
-wchar_t* 
+wchar_t*
 wcschr_e (
-	wchar_t* p, 
+	wchar_t* p,
 	wchar_t* pEnd,
 	wchar_t c
 	)
@@ -162,7 +163,7 @@ wcschr_e (
 	{
 		if (*p == c)
 			return p;
-		
+
 		p++;
 	}
 
@@ -172,9 +173,9 @@ wcschr_e (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-const char* 
+const char*
 strnchr (
-	const char* p, 
+	const char* p,
 	size_t Length,
 	char c
 	)
@@ -183,9 +184,9 @@ strnchr (
 }
 
 inline
-char* 
+char*
 strnchr (
-	char* p, 
+	char* p,
 	size_t Length,
 	char c
 	)
@@ -194,9 +195,9 @@ strnchr (
 }
 
 inline
-const wchar_t* 
+const wchar_t*
 wcsnchr (
-	const wchar_t* p, 
+	const wchar_t* p,
 	size_t Length,
 	wchar_t c
 	)
@@ -205,9 +206,9 @@ wcsnchr (
 }
 
 inline
-wchar_t* 
+wchar_t*
 wcsnchr (
-	wchar_t* p, 
+	wchar_t* p,
 	size_t Length,
 	wchar_t c
 	)

@@ -18,7 +18,7 @@ class CMutexAttr
 {
 protected:
 	pthread_mutexattr_t m_Attr;
-	
+
 public:
 	CMutexAttr ()
 	{
@@ -29,7 +29,7 @@ public:
 	{
 		pthread_mutexattr_destroy (&m_Attr);
 	}
-	
+
 	operator const pthread_mutexattr_t* () const
 	{
 		return &m_Attr;
@@ -39,7 +39,7 @@ public:
 	{
 		return &m_Attr;
 	}
-	
+
 	int
 	GetType () const
 	{
@@ -47,14 +47,15 @@ public:
 		pthread_mutexattr_gettype (&m_Attr, &Type);
 		return Type;
 	}
-	
+
 	bool
 	SetType (int Type)
 	{
 		int Result = pthread_mutexattr_settype (&m_Attr, Type);
-		return Result == 0 ? true : err::Fail (Result);		
+		return Result == 0 ? true : err::Fail (Result);
 	}
 
+#if (0)
 	int
 	GetRobust () const
 	{
@@ -62,13 +63,14 @@ public:
 		pthread_mutexattr_getrobust (&m_Attr, &Robust);
 		return Robust;
 	}
-	
+
 	bool
 	SetRobust (int Robust)
 	{
 		int Result = pthread_mutexattr_setrobust (&m_Attr, Robust);
-		return Result == 0 ? true : err::Fail (Result);		
+		return Result == 0 ? true : err::Fail (Result);
 	}
+#endif
 };
 
 //.............................................................................
@@ -77,10 +79,10 @@ class CMutex
 {
 protected:
 	pthread_mutex_t m_Mutex;
-	
+
 public:
 	CMutex (pthread_mutexattr_t* pAttr = NULL)
-	{		
+	{
 		pthread_mutex_init (&m_Mutex, pAttr);
 	}
 
@@ -92,9 +94,9 @@ public:
 	operator pthread_mutex_t* ()
 	{
 		return &m_Mutex;
-	}	
-	
-	void 
+	}
+
+	void
 	Lock ()
 	{
 		pthread_mutex_lock (&m_Mutex);
@@ -102,8 +104,8 @@ public:
 
 	bool
 	Lock (uint_t Timeout);
-	
-	void 
+
+	void
 	Unlock ()
 	{
 		pthread_mutex_unlock (&m_Mutex);
@@ -113,5 +115,5 @@ public:
 //.............................................................................
 
 } // namespace psx
-} // namespace mt 
+} // namespace mt
 } // namespace axl
