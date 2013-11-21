@@ -312,7 +312,7 @@ CFunctionMgr::Prologue (
 	// create entry block (gc roots come here)
 
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
-	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
+	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_body");
 
 	pFunction->m_pEntryBlock = pEntryBlock;
 	pEntryBlock->MarkEntry ();
@@ -332,7 +332,7 @@ CFunctionMgr::Prologue (
 			return false;
 	}
 
-	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
+	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0; // clear jump flag
 
@@ -513,7 +513,7 @@ CFunctionMgr::InternalPrologue (
 	m_pModule->m_NamespaceMgr.OpenScope (Pos);
 
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
-	CBasicBlock* pPrologueBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("prologue");
+	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_body");
 
 	pFunction->m_pEntryBlock = pEntryBlock;
 	pEntryBlock->MarkEntry ();
@@ -526,7 +526,7 @@ CFunctionMgr::InternalPrologue (
 	m_pModule->m_LlvmIrBuilder.CreateCall (pGcSafePoint, pGcSafePoint->GetType (), NULL);
 #endif
 
-	m_pModule->m_ControlFlowMgr.Jump (pPrologueBlock, pPrologueBlock);
+	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 

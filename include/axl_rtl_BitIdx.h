@@ -50,7 +50,7 @@ inline
 uint8_t
 GetLoBitIdx64 (uint64_t x)
 {
-	return (x & 0x00000000ffffffff) ?
+	return (x & 0x00000000ffffffffLL) ?
 		GetLoBitIdx32 ((uint32_t) x) :
 		(32 + GetLoBitIdx32 ((uint32_t) (x >> 32)));
 }
@@ -94,7 +94,7 @@ inline
 uint8_t
 GetHiBitIdx64 (uint64_t x)
 {
-	return (x & 0xffffffff00000000L) ?
+	return (x & 0xffffffff00000000LL) ?
 		(32 + GetHiBitIdx32 ((uint32_t) (x >> 32))) :
 		GetHiBitIdx32 ((uint32_t) x);
 }

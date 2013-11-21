@@ -14,6 +14,7 @@ CNamespaceMgr::CNamespaceMgr ()
 
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
+	m_SourcePosLockCount = 0;
 }
 
 void
@@ -25,6 +26,7 @@ CNamespaceMgr::Clear ()
 	m_ScopeList.Clear ();
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
+	m_SourcePosLockCount = 0;
 }
 
 bool
@@ -49,7 +51,9 @@ CNamespaceMgr::AddStdItems ()
 void
 CNamespaceMgr::SetSourcePos (const CToken::CPos& Pos)
 {
-	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo) || !m_pCurrentScope)
+	if (!(m_pModule->GetFlags () & EModuleFlag_DebugInfo) ||
+		!m_pCurrentScope ||
+		m_SourcePosLockCount)
 		return;
 
 	llvm::DebugLoc LlvmDebugLoc = m_pModule->m_LlvmDiBuilder.GetDebugLoc (m_pCurrentScope, Pos);

@@ -32,6 +32,8 @@ protected:
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
 
+	intptr_t m_SourcePosLockCount;
+
 public:
 	CNamespaceMgr ();
 
@@ -46,6 +48,18 @@ public:
 
 	bool
 	AddStdItems ();
+
+	void
+	LockSourcePos ()
+	{
+		m_SourcePosLockCount++;
+	}
+
+	void
+	UnlockSourcePos ()
+	{
+		m_SourcePosLockCount--;
+	}
 
 	void
 	SetSourcePos (const CToken::CPos& Pos);

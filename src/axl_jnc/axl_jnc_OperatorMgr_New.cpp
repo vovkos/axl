@@ -525,9 +525,13 @@ COperatorMgr::EvaluateAlias (
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
 
+	m_pModule->m_NamespaceMgr.LockSourcePos ();
+
 	bool Result = Parser.ParseTokenList (ESymbol_expression_save_value, TokenList);
 	if (!Result)
 		return false;
+
+	m_pModule->m_NamespaceMgr.UnlockSourcePos ();
 
 	*pResultValue = Parser.m_ExpressionValue;
 	return true;
