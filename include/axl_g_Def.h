@@ -27,8 +27,8 @@
 // C++ compiler ids
 
 #define AXL_CPP_MSC  1  // Microsoft Visual C++ compiler (cl.exe)
-#define AXL_CPP_GCC  2  // GNU C++ compiler 
-#define AXL_CPP_ICC  3  // Intel C++ compiler 
+#define AXL_CPP_GCC  2  // GNU C++ compiler
+#define AXL_CPP_ICC  3  // Intel C++ compiler
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -36,7 +36,7 @@
 #	ifdef _MSC_VER
 #		define _AXL_CPP AXL_CPP_MSC
 #	elif (defined __GNUC__)
-#		define _AXL_CPP AXL_CPP_GCC 
+#		define _AXL_CPP AXL_CPP_GCC
 #	else
 #		error Unsupported compiler
 #	endif
@@ -84,8 +84,10 @@
 
 #if (_AXL_CPU == AXL_CPU_AMD64)
 #	define _AXL_PTR_BITNESS 64
+#	define _AXL_PTR_SIZE    8
 #else
 #	define _AXL_PTR_BITNESS 32
+#	define _AXL_PTR_SIZE    4
 #endif
 
 //.............................................................................
@@ -94,11 +96,11 @@
 
 #define AXL_ENV_WIN   1  // win32 / win64 user mode module
 #define AXL_ENV_NT    2  // NT native / kernel mode module
-#define AXL_ENV_POSIX 3  // Unix / Linux 
+#define AXL_ENV_POSIX 3  // Unix / Linux
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#ifndef _AXL_ENV 
+#ifndef _AXL_ENV
 #	if (_AXL_CPP == AXL_CPP_MSC)
 #		define _AXL_ENV AXL_ENV_WIN // default runtime environment is Win32 / Win64
 #	elif (_AXL_CPP == AXL_CPP_GCC)
@@ -119,7 +121,7 @@
 #	define AXL_CDECL      __attribute__ ((cdecl))
 #	define AXL_STDCALL    __attribute__ ((stdcall))
 #	define AXL_SELECT_ANY __attribute__ ((weak))
-#	define AXL_NO_VTABLE  
+#	define AXL_NO_VTABLE
 #endif
 
 //.............................................................................
@@ -182,7 +184,7 @@ typedef wchar_t          utf32_t;
 #endif
 
 // this struct wrap serves two purposes:
-// first, makes sure va_list isn't get modified if passed as argument 
+// first, makes sure va_list isn't get modified if passed as argument
 // second, makes it possible to simply assign one to another
 // thanks a lot gcc
 
@@ -227,7 +229,7 @@ struct axl_va_list
 // pvoid_cast is mostly used for casting member function pointers to void*
 
 template <typename T>
-void* 
+void*
 pvoid_cast (T x)
 {
 #ifdef _DEBUG
@@ -261,7 +263,7 @@ pvoid_cast (T x)
 #define AXL_CONTAINING_RECORD(Address, Type, Field) \
 	((Type*) ((char*) (Address) - AXL_OFFSETOF (Type, Field)))
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // ensure class is never accidentally copied
 
@@ -273,7 +275,7 @@ private: \
 
 //.............................................................................
 
-// TODO messages 
+// TODO messages
 
 // usage: #pragma AXL_TODO ("implement something")
 

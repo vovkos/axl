@@ -85,16 +85,16 @@ protected:
 public:
 	CBuddyAllocMap ();
 
-	bool 
+	bool
 	Create (
-		size_t Width, 
+		size_t Width,
 		size_t Height
 		);
 
-	void 
+	void
 	Close ();
 
-	void 
+	void
 	Clear ();
 
 	size_t
@@ -121,22 +121,22 @@ public:
 		return m_FreeSizeBottom == m_TotalSize; // can compare either (top or bottom)
 	}
 
-	size_t 
+	size_t
 	Allocate (size_t Size);
 
-	void 
+	void
 	Mark (
-		size_t Address, 
+		size_t Address,
 		size_t Size
 		);
 
-	void 
+	void
 	Free (
-		size_t Address, 
+		size_t Address,
 		size_t Size
 		);
 
-	bool 
+	bool
 	GetBit (size_t Address)
 	{
 		return Address < m_TotalSize ? GetBit (m_PageArray, Address) : false;

@@ -19,7 +19,7 @@ class C1: I1
 
 	override foo ()
 	{
-		printf ("C1.foo ()\n");		
+		printf ("C1.foo ()\n");
 	}
 }
 

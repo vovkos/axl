@@ -22,7 +22,7 @@ PrintUsage (COutStream* pOutStream)
 
 	rtl::CString HelpString = CCmdLineSwitchTable::GetHelpString ();
 	pOutStream->Printf ("Usage: jnc [<options>...] <source_file>\n%s", HelpString.cc ());
- }
+}
 
 //.............................................................................
 

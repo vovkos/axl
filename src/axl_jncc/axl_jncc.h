@@ -52,6 +52,38 @@ public:
 
 //.............................................................................
 
+// test object for playing with jancy export macros
+
+class CSerial: public jnc::TInterface
+{
+protected:
+
+public:
+	bool
+	AXL_CDECL
+	Open (jnc::TDataPtr Name);
+
+	void
+	AXL_CDECL
+	Close ();
+
+	size_t
+	AXL_CDECL
+	Read (
+		jnc::TDataPtr Ptr,
+		size_t Size
+		);
+
+	size_t
+	AXL_CDECL
+	Write (
+		jnc::TDataPtr Ptr,
+		size_t Size
+		);
+};
+
+//.............................................................................
+
 class CJnc
 {
 protected:

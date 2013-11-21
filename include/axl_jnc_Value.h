@@ -832,11 +832,11 @@ struct TGcShadowStackFrame
 	// followed by array of root pointers
 };
 
-
 //.............................................................................
 
 enum ERuntimeError
 {
+	ERuntimeError_OutOfMemory,
 	ERuntimeError_ScopeMismatch,
 	ERuntimeError_DataPtrOutOfRange,
 	ERuntimeError_NullClassPtr,

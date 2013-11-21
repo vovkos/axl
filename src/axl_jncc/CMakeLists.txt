@@ -117,13 +117,13 @@ add_jncc_tests
 
 	set (_JNCC ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/axl_jncc)
 	set (_FILE_NAME_LIST ${ARGN})
+	string (REPLACE " " ";" _FLAG_LIST ${_FLAGS})
 
 	foreach (_FILE_NAME ${_FILE_NAME_LIST})
-
 		add_test (
 			NAME ${_FILE_NAME}
 			WORKING_DIRECTORY ${_DIR}
-			COMMAND ${_JNCC} ${_FLAGS} ${_FILE_NAME}
+			COMMAND ${_JNCC} ${_FLAG_LIST} ${_FILE_NAME}
 			)
 	endforeach ()
 endmacro ()

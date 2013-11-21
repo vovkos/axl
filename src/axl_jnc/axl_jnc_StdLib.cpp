@@ -105,6 +105,10 @@ CStdLib::OnRuntimeError (
 
 	switch (Error)
 	{
+	case ERuntimeError_OutOfMemory:
+		pErrorString = "OUT_OF_MEMORY";
+		break;
+
 	case ERuntimeError_DataPtrOutOfRange:
 		pErrorString = "DATA_PTR_OOR";
 		break;

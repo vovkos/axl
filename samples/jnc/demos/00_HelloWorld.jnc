@@ -5,24 +5,7 @@
 
 int main ()
 {
-	int a = 10;
-
-	static char const* ItemTextArray [] =
-	{
-		"9600 bps",
-		"19200 bps",
-		"38400 bps",
-		"115200 bps",
-	};
-
-	static int ItemValueArray [] =
-	{
-		9600,
-		19200,
-		38400,
-		115200,
-	};
-
+	printf ("hello world!\n");
 	return 0;
 }
 

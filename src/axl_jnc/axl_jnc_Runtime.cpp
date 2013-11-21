@@ -85,9 +85,7 @@ CRuntime::Create (
 	CModule* pModule,
 	CStdLib* pStdLib,
 	EJit JitKind,
-	size_t HeapBlockSize,
-	size_t HeapWidth,
-	size_t HeapHeight
+	size_t HeapSize
 	)
 {
 	Destroy ();
@@ -128,12 +126,22 @@ CRuntime::Create (
 
 	// gc heap
 
-	bool Result = m_GcMap.Create (HeapWidth, HeapHeight);
+	size_t BlockSize = _AXL_PTR_SIZE * 4; // 1 block = 4 pointers
+	size_t PageSize = BlockSize * _AXL_PTR_BITNESS;
+	size_t PageCount = HeapSize / PageSize;
+	if (HeapSize & (PageSize - 1))
+		PageCount++;
+
+	size_t HeapHeight = rtl::GetHiBitIdx (PageCount);
+	if (PageCount & ((1 << HeapHeight) - 1))
+		HeapHeight++;
+
+	bool Result = m_GcMap.Create (1, HeapHeight + 1);
 	if (!Result)
 		return false;
 
 	size_t BlockCount = m_GcMap.GetTotalSize ();
-	size_t HeapSize = BlockCount * HeapBlockSize;
+	HeapSize = BlockCount * BlockSize; // update
 
 	void* pHeap = AXL_MEM_ALLOC (HeapSize);
 	if (!pHeap)
@@ -141,7 +149,7 @@ CRuntime::Create (
 
 	m_GcHeapSize = HeapSize;
 	m_pGcHeap = pHeap;
-	m_GcBlockSize = HeapBlockSize;
+	m_GcBlockSize = BlockSize;
 
 	// static gc roots
 
@@ -254,10 +262,6 @@ CRuntime::GcAllocate (size_t Size)
 
 	size_t BlockCount = GetGcBlockCount (Size);
 
-	size_t n = m_GcMap.GetTotalSize ();
-	size_t f1 = m_GcMap.GetFreeSizeTop ();
-	size_t f2 = m_GcMap.GetFreeSizeBottom ();
-
 	WaitGcIdleAndLock ();
 	size_t Address = m_GcMap.Allocate (BlockCount);
 	m_Lock.Unlock ();
@@ -272,8 +276,8 @@ CRuntime::GcAllocate (size_t Size)
 
 		if (Address == -1) // double fault
 		{
-			err::SetFormatStringError ("unable to allocate %d bytes", Size);
-			return NULL;
+			CStdLib::OnRuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
+			ASSERT (false);
 		}
 	}
 

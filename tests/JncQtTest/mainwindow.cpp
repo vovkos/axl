@@ -390,7 +390,7 @@ bool MainWindow::compile ()
 	// DebugInfo only works with MCJIT, MCJIT only works on Linux
 
 #if (_AXL_ENV == AXL_ENV_POSIX)
-	jnc::EJit JitKind = jnc::EJit_McJit; 
+	jnc::EJit JitKind = jnc::EJit_McJit;
 	uint_t ModuleFlags = jnc::EModuleFlag_DebugInfo;
 #else
 	jnc::EJit JitKind = jnc::EJit_Normal;
@@ -438,7 +438,7 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
 
-	result = runtime.Create (&module, &stdlib, JitKind, 16, 1, 8);
+	result = runtime.Create (&module, &stdlib, JitKind, 16 * 1024); // 16K gc heap
 	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());

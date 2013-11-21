@@ -65,11 +65,11 @@ protected:
 	};
 
 	class CGcDestructThread: public mt::CThreadImplT <CGcDestructThread>
-	{		
+	{
 	public:
 		CRuntime* m_pRuntime;
 
-		dword_t	
+		dword_t
 		ThreadProc ()
 		{
 			m_pRuntime->GcDestructThreadProc ();
@@ -98,8 +98,8 @@ protected:
 	size_t m_GcBlockSize;
 	rtl::CBuddyAllocMap m_GcMap;
 
-	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcObjectList;	
-	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcDestructList;	
+	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcObjectList;
+	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcDestructList;
 	mt::CEvent m_GcDestructEvent;
 	mt::CNotificationEvent m_GcDestructThreadIdleEvent;
 	CGcDestructThread m_GcDestructThread;
@@ -109,12 +109,12 @@ protected:
 	rtl::CArrayT <TGcRoot> m_GcRootArray [2];
 	size_t m_CurrentGcRootArrayIdx;
 
-	// tls 
+	// tls
 
 	size_t m_TlsSlot;
 	size_t m_TlsSize;
 	rtl::CAuxListT <TTlsData> m_TlsList;
-	
+
 public:
 	CRuntime ();
 
@@ -123,7 +123,7 @@ public:
 		Destroy ();
 	}
 
-	EJit 
+	EJit
 	GetJitKind ()
 	{
 		return m_JitKind;
@@ -134,9 +134,7 @@ public:
 		CModule* pModule,
 		CStdLib* pStdLib,
 		EJit JitKind,
-		size_t HeapBlockSize,
-		size_t HeapWidth,
-		size_t HeapHeight
+		size_t HeapSize
 		);
 
 	void
@@ -148,19 +146,19 @@ public:
 	void
 	Shutdown ();
 
-	CModule* 
+	CModule*
 	GetModule ()
 	{
 		return m_pModule;
 	}
 
-	llvm::ExecutionEngine* 
+	llvm::ExecutionEngine*
 	GetLlvmExecutionEngine ()
 	{
 		return m_pLlvmExecutionEngine;
 	}
 
-	// gc heap 
+	// gc heap
 
 	void
 	RunGcEx (uint_t Flags);
@@ -176,7 +174,7 @@ public:
 	{
 		RunGcEx (EGcFlag_WaitForDestructors);
 	}
-		
+
 	void
 	GcSafePoint ();
 
@@ -204,10 +202,10 @@ public:
 		return IsInGcHeap (pObject) && !(pObject->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcMark_wc));
 	}
 
-	void 
+	void
 	MarkGcObject (TObject* pObject);
 
-	void 
+	void
 	MarkGcRange (
 		void* p,
 		size_t Size
@@ -239,7 +237,7 @@ public:
 
 	// tls
 
-	size_t 
+	size_t
 	GetTlsSlot ()
 	{
 		return m_TlsSlot;
@@ -261,11 +259,11 @@ protected:
 	void
 	GcAddObject_l (TObject* pObject);
 
-	size_t 
+	size_t
 	GetGcAddress (void* p)
 	{
-		ASSERT (p >= m_pGcHeap);	
-		return ((char*) p - (char*) m_pGcHeap) / m_GcBlockSize;	
+		ASSERT (p >= m_pGcHeap);
+		return ((char*) p - (char*) m_pGcHeap) / m_GcBlockSize;
 	}
 
 	size_t
@@ -274,7 +272,7 @@ protected:
 		return Size % m_GcBlockSize ? Size / m_GcBlockSize + 1 : Size / m_GcBlockSize;
 	}
 
-	bool	
+	bool
 	IsInGcHeap (void* p)
 	{
 		return p >= m_pGcHeap && p < (char*) m_pGcHeap + m_GcHeapSize;
@@ -282,7 +280,7 @@ protected:
 
 	bool
 	IsMarkedGcPtr (void* p)
-	{	
+	{
 		return m_GcMap.GetBit (GetGcAddress (p));
 	}
 
@@ -306,5 +304,5 @@ GetCurrentThreadRuntime ()
 
 //.............................................................................
 
-} // namespace axl 
-} // namespace jnc 
+} // namespace axl
+} // namespace jnc

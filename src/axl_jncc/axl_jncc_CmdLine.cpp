@@ -3,6 +3,50 @@
 
 //.............................................................................
 
+TCmdLine::TCmdLine ()
+{
+	m_Flags = 0;
+	m_ServerPort = 0;
+	m_GcHeapSize = 16 * 1024;
+}
+
+//.............................................................................
+
+size_t
+ParseSizeString (const char* pString)
+{
+	if (!pString)
+		return 0;
+
+	size_t Length = strlen (pString);
+	if (!Length)
+		return 0;
+
+	size_t Multiplier = 1;
+
+	char c = pString [Length - 1];
+	if (isalpha (c))
+	{
+		switch (c)
+		{
+		case 'K':
+			Multiplier = 1024;
+			break;
+
+		case 'M':
+			Multiplier = 1024 * 1024;
+			break;
+
+		default:
+			return 0;
+		}
+	}
+
+	return strtoul (pString, NULL, 10) * Multiplier;
+}
+
+//.............................................................................
+
 bool
 CCmdLineParser::OnValue (const char* pValue)
 {
@@ -70,6 +114,16 @@ CCmdLineParser::OnSwitch (
 		if (!m_pCmdLine->m_ServerPort)
 		{
 			err::SetFormatStringError ("invalid server TCP port '%s'", pValue);
+			return false;
+		}
+
+		break;
+
+	case ECmdLineSwitch_HeapSize:
+		m_pCmdLine->m_GcHeapSize = ParseSizeString (pValue);
+		if (!m_pCmdLine->m_GcHeapSize)
+		{
+			err::SetFormatStringError ("invalid GC heap size '%s'", pValue);
 			return false;
 		}
 

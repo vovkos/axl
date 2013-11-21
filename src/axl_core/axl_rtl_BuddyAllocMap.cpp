@@ -97,7 +97,7 @@ CBuddyAllocMap::CLevel::SetBitRange (
 
 		To -= _AXL_PTR_BITNESS;
 		pPage++;
-	
+
 		while (To >= _AXL_PTR_BITNESS)
 		{
 			// ASSERT (pPage->m_Map == 0);
@@ -129,7 +129,7 @@ CBuddyAllocMap::CLevel::SetBitRange (
 
 		To -= _AXL_PTR_BITNESS;
 		pPage++;
-	
+
 		while (To >= _AXL_PTR_BITNESS)
 		{
 			// ASSERT (pPage->m_Map == -1);
@@ -172,7 +172,7 @@ CBuddyAllocMap::Create(
 
 	CLevel* pLevel;
 	CLevel* pEnd;
-	
+
 	TPage* pPage;
 
 	Close();
@@ -184,7 +184,7 @@ CBuddyAllocMap::Create(
 		Height = 1;
 
 	TotalPageCount = ((1 << Height) - 1) * Width;
-	
+
 	Result = m_PageArray.SetCount (TotalPageCount) && m_LevelArray.SetCount (Height);
 	if (!Result)
 	{
@@ -449,8 +449,8 @@ CBuddyAllocMap::Free (
 		if (Mod && !IsBlocked)
 		{
 			ASSERT (pPrevPage != NULL);
-			
-			if (GetBit(pPrevPage, PrevBit))		
+
+			if (GetBit(pPrevPage, PrevBit))
 			{
 				IsBlocked = true;
 			}
@@ -460,7 +460,7 @@ CBuddyAllocMap::Free (
 				To++;
 			}
 		}
-		
+
 		pLevel->SetBitRange(pPage, From, To, false);
 
 		pLevel++;
