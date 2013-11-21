@@ -7,7 +7,7 @@ void
 PrintVersion (COutStream* pOutStream)
 {
 	pOutStream->Printf (
-		"JANCY compiler (%s) v%d.%d.%d\n",
+		"Jancy compiler (%s) v%d.%d.%d\n",
 		_AXL_CPU_STRING,
 		HIBYTE (HIWORD (EJnc_CompilerVersion)),
 		LOBYTE (HIWORD (EJnc_CompilerVersion)),
@@ -54,31 +54,60 @@ CJnc::Run (
 	if (pCmdLine->m_Flags & EJncFlag_Server)
 		return Server ();
 
-	if (pCmdLine->m_SrcFileName.IsEmpty ())
-	{
-		PrintUsage (pOutStream);
-		return EJncError_InvalidCmdLine;
-	}
-
+	rtl::CArrayT <char> StdInBuffer;
 	io::CMappedFile SrcFile;
-	Result = SrcFile.Open (pCmdLine->m_SrcFileName, io::EFileFlag_ReadOnly);
-	const void* p = Result ? SrcFile.View () : NULL;
-	if (!p)
+
+	rtl::CString SrcName;
+	const char* pSrc;
+	size_t SrcSize;
+
+	if (pCmdLine->m_Flags & EJncFlag_StdInSrc)
 	{
-		pOutStream->Printf (
-			"cannot open '%s': %s\n",
-			pCmdLine->m_SrcFileName.cc (), // thanks a lot gcc
-			err::GetError ()->GetDescription ().cc ()
-			);
-		return EJncError_IoFailure;
+		for (;;)
+		{
+			char Buffer [1024];
+			int Result = read (STDIN_FILENO, Buffer, sizeof (Buffer));
+			if (Result <= 0)
+				break;
+
+			StdInBuffer.Append (Buffer, Result);
+		}
+
+		pSrc = StdInBuffer;
+		SrcSize = StdInBuffer.GetCount ();
+		SrcName = !m_pCmdLine->m_SrcNameOverride.IsEmpty () ?
+			m_pCmdLine->m_SrcNameOverride :
+			"stdin";
+	}
+	else if (!pCmdLine->m_SrcFileName.IsEmpty ())
+	{
+		Result = SrcFile.Open (pCmdLine->m_SrcFileName, io::EFileFlag_ReadOnly);
+		if (!Result)
+		{
+			pOutStream->Printf (
+				"cannot open '%s': %s\n",
+				pCmdLine->m_SrcFileName.cc (), // thanks a lot gcc
+				err::GetError ()->GetDescription ().cc ()
+				);
+			return EJncError_IoFailure;
+		}
+
+		pSrc = (const char*) SrcFile.View ();
+		SrcSize = (size_t) SrcFile.GetSize ();
+		SrcName = !m_pCmdLine->m_SrcNameOverride.IsEmpty () ?
+			m_pCmdLine->m_SrcNameOverride :
+			io::GetFullFilePath (pCmdLine->m_SrcFileName);
+	}
+	else
+	{
+		pOutStream->Printf ("missing input (required source-file-name or --stdin)\n");
+		return EJncError_InvalidCmdLine;
 	}
 
 	if (pCmdLine->m_Flags & (EJncFlag_RunFunction | EJncFlag_Disassembly))
 		pCmdLine->m_Flags |= EJncFlag_Jit;
 
-	rtl::CString SrcFilePath = io::GetFullFilePath (pCmdLine->m_SrcFileName);
-
-	Result = Compile (SrcFilePath, (const char*) p, (size_t) SrcFile.GetSize ());
+	Result = Compile (SrcName, pSrc, SrcSize);
 	if (!Result)
 	{
 		pOutStream->Printf ("%s\n", err::GetError ()->GetDescription ().cc ());

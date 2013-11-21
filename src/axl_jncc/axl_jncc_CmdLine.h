@@ -14,6 +14,7 @@ enum EJncFlag
 	EJncFlag_RunFunction = 0x0080,
 	EJncFlag_Server      = 0x0100,
 	EJncFlag_DebugInfo   = 0x0200,
+	EJncFlag_StdInSrc    = 0x0400,
 };
 
 struct TCmdLine
@@ -23,6 +24,7 @@ struct TCmdLine
 	size_t m_GcHeapSize;
 
 	rtl::CString m_SrcFileName;
+	rtl::CString m_SrcNameOverride;
 	rtl::CString m_FunctionName;
 
 	TCmdLine ();
@@ -35,6 +37,7 @@ enum ECmdLineSwitch
 	ECmdLineSwitch_Undefined = 0,
 	ECmdLineSwitch_Help,
 	ECmdLineSwitch_Version,
+	ECmdLineSwitch_StdInSrc,
 	ECmdLineSwitch_LlvmIr,
 	ECmdLineSwitch_LlvmIrComments,
 	ECmdLineSwitch_DebugInfo,
@@ -45,6 +48,7 @@ enum ECmdLineSwitch
 	ECmdLineSwitch_RunFunction = rtl::ECmdLineSwitchFlag_HasValue,
 	ECmdLineSwitch_Server,
 	ECmdLineSwitch_HeapSize,
+	ECmdLineSwitch_SrcNameOverride,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -65,6 +69,16 @@ AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE (CCmdLineSwitchTable, ECmdLineSwitch)
 		ECmdLineSwitch_Server,
 		"s", "server", "<port>",
 		"Run compiler server on TCP port <port>"
+		)
+	AXL_RTL_CMD_LINE_SWITCH (
+		ECmdLineSwitch_StdInSrc,
+		"stdin", NULL,
+		"Get source from STDIN rather than from the file"
+		)
+	AXL_RTL_CMD_LINE_SWITCH_2 (
+		ECmdLineSwitch_SrcNameOverride,
+		"n", "source-name", "<name>",
+		"Override source name (defaults to full-path/'stdin')"
 		)
 
 	AXL_RTL_CMD_LINE_SWITCH_GROUP ("LLVM IR options")

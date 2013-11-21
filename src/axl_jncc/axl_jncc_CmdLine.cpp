@@ -70,6 +70,14 @@ CCmdLineParser::OnSwitch (
 		m_pCmdLine->m_Flags |= EJncFlag_Version;
 		break;
 
+	case ECmdLineSwitch_StdInSrc:
+		m_pCmdLine->m_Flags |= EJncFlag_StdInSrc;
+		break;
+
+	case ECmdLineSwitch_SrcNameOverride:
+		m_pCmdLine->m_SrcNameOverride = pValue;
+		break;
+
 	case ECmdLineSwitch_DebugInfo:
 		m_pCmdLine->m_Flags |= EJncFlag_DebugInfo;
 		break;
