@@ -63,10 +63,16 @@ CJnc::Run (
 
 	if (pCmdLine->m_Flags & EJncFlag_StdInSrc)
 	{
+#if (_AXL_ENV == AXL_ENV_WIN)
+		int StdInFile = _fileno (stdin);
+#else
+		int StdInFile = STDIN_FILENO;
+#endif
+
 		for (;;)
 		{
 			char Buffer [1024];
-			int Result = read (STDIN_FILENO, Buffer, sizeof (Buffer));
+			int Result = _read (StdInFile, Buffer, sizeof (Buffer));
 			if (Result <= 0)
 				break;
 

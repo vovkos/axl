@@ -38,7 +38,14 @@ CJnc::Jit ()
 {
 	jnc::EJit JitKind = (m_pCmdLine->m_Flags & EJncFlag_Jit_mc) ? jnc::EJit_McJit : jnc::EJit_Normal;
 
-	bool Result = m_Runtime.Create (&m_Module, &m_StdLib, JitKind, m_pCmdLine->m_GcHeapSize);
+	bool Result = m_Runtime.Create (
+		&m_Module, 
+		&m_StdLib, 
+		JitKind, 
+		m_pCmdLine->m_GcHeapSize, 
+		m_pCmdLine->m_StackSize
+		);
+
 	if (!Result)
 		return false;
 

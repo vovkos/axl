@@ -12,8 +12,8 @@ rtl::CString
 GetCurrentDir ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	char Dir [PATH_MAX] = { 0 };
-	GetCurrentDirectory (Dir, sizeof (Dir) - 1);
+	wchar_t Dir [1024] = { 0 };
+	GetCurrentDirectoryW (countof (Dir) - 1, Dir);
 	return Dir;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	char* p = get_current_dir_name ();

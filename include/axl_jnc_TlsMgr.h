@@ -22,6 +22,7 @@ struct TTlsPage;
 struct TTlsData: public rtl::TListLink
 {
 	CRuntime* m_pRuntime;
+	void* m_pStackEpoch;
 
 	// followed by TLS data
 };

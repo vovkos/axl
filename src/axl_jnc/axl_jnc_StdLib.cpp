@@ -109,6 +109,10 @@ CStdLib::OnRuntimeError (
 		pErrorString = "OUT_OF_MEMORY";
 		break;
 
+	case ERuntimeError_StackOverflow:
+		pErrorString = "STACK_OVERFLOW";
+		break;
+
 	case ERuntimeError_DataPtrOutOfRange:
 		pErrorString = "DATA_PTR_OOR";
 		break;
@@ -259,6 +263,12 @@ void*
 CStdLib::HeapUAlloc (size_t Size)
 {
 	void* p = malloc (Size);
+	if (!p)
+	{
+		OnRuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
+		ASSERT (false);
+	}
+
 	memset (p, 0, Size);
 	return p;
 }

@@ -837,6 +837,7 @@ struct TGcShadowStackFrame
 enum ERuntimeError
 {
 	ERuntimeError_OutOfMemory,
+	ERuntimeError_StackOverflow,
 	ERuntimeError_ScopeMismatch,
 	ERuntimeError_DataPtrOutOfRange,
 	ERuntimeError_NullClassPtr,

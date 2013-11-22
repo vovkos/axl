@@ -5,6 +5,8 @@
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	define getsockerror WSAGetLastError
 #	define socklen_t    int
+#	include <io.h>
+#	include <fcntl.h>
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include <sys/socket.h>

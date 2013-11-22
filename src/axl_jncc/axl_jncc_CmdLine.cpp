@@ -136,6 +136,16 @@ CCmdLineParser::OnSwitch (
 		}
 
 		break;
+
+	case ECmdLineSwitch_StackSize:
+		m_pCmdLine->m_StackSize = ParseSizeString (pValue);
+		if (!m_pCmdLine->m_StackSize)
+		{
+			err::SetFormatStringError ("invalid stack size '%s'", pValue);
+			return false;
+		}
+
+		break;
 	}
 
 	return true;

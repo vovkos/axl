@@ -76,6 +76,7 @@ CRuntime::CRuntime ()
 	m_GcDestructThread.m_pRuntime = this;
 	m_TerminateGcDestructThread = false;
 
+	m_StackLimit = 0;
 	m_TlsSlot = -1;
 	m_TlsSize = 0;
 }
@@ -85,7 +86,8 @@ CRuntime::Create (
 	CModule* pModule,
 	CStdLib* pStdLib,
 	EJit JitKind,
-	size_t HeapSize
+	size_t HeapSize,
+	size_t StackLimit
 	)
 {
 	Destroy ();
@@ -169,6 +171,7 @@ CRuntime::Create (
 
 	// tls
 
+	m_StackLimit = StackLimit;
 	m_TlsSize = pModule->m_VariableMgr.GetTlsStructType ()->GetSize ();
 	m_TlsSlot = GetTlsMgr ()->CreateSlot ();
 
@@ -600,8 +603,29 @@ void*
 CRuntime::GetTls ()
 {
 	TTlsData* pTlsData = GetTlsMgr ()->GetTlsData (this);
-	if (!pTlsData)
-		throw err::GetError ();
+	ASSERT (pTlsData);
+
+	// check for stack overflow
+
+	char* p = (char*) _alloca (1);
+
+	if (!pTlsData->m_pStackEpoch) // first time call
+	{
+		pTlsData->m_pStackEpoch = p;
+	}
+	else
+	{
+		char* p0 = (char*) pTlsData->m_pStackEpoch;
+		if (p0 >= p) // the opposite could happen, but it's stack-overflow-safe 
+		{
+			size_t StackSize = p0 - p;
+			if (StackSize > m_StackLimit)
+			{
+				CStdLib::OnRuntimeError (ERuntimeError_StackOverflow, NULL, NULL);
+				ASSERT (false);
+			}
+		}
+	}
 
 	return pTlsData + 1;
 }
@@ -610,10 +634,11 @@ TTlsData*
 CRuntime::CreateTlsData ()
 {
 	size_t Size = sizeof (TTlsData) + m_TlsSize;
-
+	
 	TTlsData* pTlsData = (TTlsData*) AXL_MEM_ALLOC (Size);
 	memset (pTlsData, 0, Size);
 	pTlsData->m_pRuntime = this;
+	pTlsData->m_pStackEpoch = NULL;
 
 	WaitGcIdleAndLock ();
 	m_TlsList.InsertTail (pTlsData);

@@ -438,7 +438,7 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
 
-	result = runtime.Create (&module, &stdlib, JitKind, 16 * 1024); // 16K gc heap
+	result = runtime.Create (&module, &stdlib, JitKind, 16 * 1024, 16 * 1024); // 16K gc heap, 16K stack
 	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());

@@ -22,6 +22,7 @@ struct TCmdLine
 	uint_t m_Flags;
 	uint16_t m_ServerPort;
 	size_t m_GcHeapSize;
+	size_t m_StackSize;
 
 	rtl::CString m_SrcFileName;
 	rtl::CString m_SrcNameOverride;
@@ -48,6 +49,7 @@ enum ECmdLineSwitch
 	ECmdLineSwitch_RunFunction = rtl::ECmdLineSwitchFlag_HasValue,
 	ECmdLineSwitch_Server,
 	ECmdLineSwitch_HeapSize,
+	ECmdLineSwitch_StackSize,
 	ECmdLineSwitch_SrcNameOverride,
 };
 
@@ -124,11 +126,15 @@ AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE (CCmdLineSwitchTable, ECmdLineSwitch)
 		"run-function", "<function>",
 		"Run function <function> (implies JITting)"
 		)
-
 	AXL_RTL_CMD_LINE_SWITCH_2 (
 		ECmdLineSwitch_HeapSize,
 		"h", "heap-size", "<size>",
 		"Specify the size of GC heap (defaults to 16K)"
+		)
+	AXL_RTL_CMD_LINE_SWITCH (
+		ECmdLineSwitch_StackSize,
+		"stack-size", "<size>",
+		"Specify the limit of stack usage by jancy (defaults to 16K)"
 		)
 AXL_RTL_END_CMD_LINE_SWITCH_TABLE ()
 

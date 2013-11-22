@@ -111,6 +111,7 @@ protected:
 
 	// tls
 
+	size_t m_StackLimit;
 	size_t m_TlsSlot;
 	size_t m_TlsSize;
 	rtl::CAuxListT <TTlsData> m_TlsList;
@@ -134,7 +135,8 @@ public:
 		CModule* pModule,
 		CStdLib* pStdLib,
 		EJit JitKind,
-		size_t HeapSize
+		size_t HeapSize,
+		size_t StackLimit
 		);
 
 	void
