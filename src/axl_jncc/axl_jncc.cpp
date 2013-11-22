@@ -65,14 +65,15 @@ CJnc::Run (
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
 		int StdInFile = _fileno (stdin);
-#else
-		int StdInFile = STDIN_FILENO;
 #endif
-
 		for (;;)
 		{
 			char Buffer [1024];
+#if (_AXL_ENV == AXL_ENV_WIN)
 			int Result = _read (StdInFile, Buffer, sizeof (Buffer));
+#else
+			int Result = read (STDIN_FILENO, Buffer, sizeof (Buffer));
+#endif
 			if (Result <= 0)
 				break;
 
