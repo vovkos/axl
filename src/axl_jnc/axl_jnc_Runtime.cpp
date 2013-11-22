@@ -300,7 +300,7 @@ CRuntime::GcAddObject (TObject* pObject)
 void
 CRuntime::GcAddObject_l (TObject* pObject)
 {
-	printf ("GcAddObject %08x: %s\n", pObject, pObject->m_pType->GetTypeString ().cc ());
+	// printf ("GcAddObject %08x: %s\n", pObject, pObject->m_pType->GetTypeString ().cc ());
 
 	// recursively add all the class fields
 
@@ -349,7 +349,7 @@ CRuntime::AddGcRoot (
 void
 CRuntime::RunGcEx (uint_t Flags)
 {
-	printf ("Running GC...\n");
+	// printf ("Running GC...\n");
 
 	WaitGcIdleAndLock ();
 
@@ -616,7 +616,7 @@ CRuntime::GetTls ()
 	else
 	{
 		char* p0 = (char*) pTlsData->m_pStackEpoch;
-		if (p0 >= p) // the opposite could happen, but it's stack-overflow-safe 
+		if (p0 >= p) // the opposite could happen, but it's stack-overflow-safe
 		{
 			size_t StackSize = p0 - p;
 			if (StackSize > m_StackLimit)
@@ -634,7 +634,7 @@ TTlsData*
 CRuntime::CreateTlsData ()
 {
 	size_t Size = sizeof (TTlsData) + m_TlsSize;
-	
+
 	TTlsData* pTlsData = (TTlsData*) AXL_MEM_ALLOC (Size);
 	memset (pTlsData, 0, Size);
 	pTlsData->m_pRuntime = this;
