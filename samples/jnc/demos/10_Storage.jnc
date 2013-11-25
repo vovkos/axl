@@ -57,7 +57,7 @@ int main ()
 	static int s = 100; // 'static' can be surely used for local variables
 	thread int t = 200; // for local 'thread' variables, initialization is permitted
 	heap char a [256]; // 'heap' storage can be used to allocate local variables on gc-heap
-	// heapu char b [256];  // <-- error: 'heapu' storage cannot be used for variables
+	// uheap char b [256];  // <-- error: 'uheap' storage cannot be used for variables
 
 	heap C2 c1 construct (1000); // for local 'class' variables, default storage is 'heap'
 	static C2 c2 construct (2000); // 'static' and 'stack' can also be used for 'class' variables
@@ -65,8 +65,8 @@ int main ()
 
 	C2* p1 = new C2 (4000); // for 'new' operator, default storage is 'heap'
 
-	C2* p2 = heapu new C2 construct (5000); // equivalent to 'heapu new C2 (5000)' - both syntaxes are ok
-	delete p2; // objects allocated using 'heapu new' must be explicitly freed by 'delete' operator
+	C2* p2 = uheap new C2 construct (5000); // equivalent to 'uheap new C2 (5000)' - both syntaxes are ok
+	delete p2; // objects allocated using 'uheap new' must be explicitly freed by 'delete' operator
 
 	C2* p3 = static new C2 (6000); // 'static' also can be used
 

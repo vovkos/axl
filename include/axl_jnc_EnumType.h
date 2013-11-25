@@ -120,7 +120,7 @@ protected:
 	{
 		m_TypeString.Format (
 			(m_Flags & EEnumTypeFlag_Exposed) ? 
-				"enumc %s" : 
+				"cenum %s" : 
 				"enum %s", 
 			m_Tag.cc () // thanks a lot gcc
 			);

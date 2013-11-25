@@ -97,7 +97,7 @@ storage_specifier
 			{
 				$.m_StorageKind = EStorage_Heap;
 			}
-	|	EToken_HeapU
+	|	EToken_UHeap
 			{
 				$.m_StorageKind = EStorage_HeapU;
 			}
@@ -296,7 +296,7 @@ type_modifier
 			{
 				$.m_TypeModifier = ETypeModifier_Const;
 			}
-	|	EToken_ConstD
+	|	EToken_DConst
 			{
 				$.m_TypeModifier = ETypeModifier_ConstD;
 			}
@@ -360,7 +360,7 @@ type_modifier
 			{
 				$.m_TypeModifier = ETypeModifier_Event;
 			}
-	|	EToken_EventD
+	|	EToken_DEvent
 			{
 				$.m_TypeModifier = ETypeModifier_EventD;
 			}

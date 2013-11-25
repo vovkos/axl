@@ -761,7 +761,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 {
 	bool Result;
 
-	// only call member field destructors if storage is stack, static or heapu
+	// only call member field destructors if storage is stack, static or uheap
 
 	CBasicBlock* pCallBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("call_member_field_destructors");
 	CBasicBlock* pFollowBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("follow");

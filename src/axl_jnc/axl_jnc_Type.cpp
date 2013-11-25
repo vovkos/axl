@@ -208,7 +208,7 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"unsigned",     // ETypeModifier_Unsigned    = 0x00000001,
 		"bigendian",    // ETypeModifier_BigEndian   = 0x00000002,
 		"const",        // ETypeModifier_Const       = 0x00000004,
-		"constd",       // ETypeModifier_ConstD      = 0x00000008,
+		"dconst",       // ETypeModifier_ConstD      = 0x00000008,
 		"volatile",     // ETypeModifier_Volatile    = 0x00000010,
 		"weak",         // ETypeModifier_Weak        = 0x00000020,
 		"thin",         // ETypeModifier_Thin        = 0x00000040,
@@ -222,7 +222,7 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"indexed",      // ETypeModifier_Indexed     = 0x00004000,
 		"multicast",    // ETypeModifier_Multicast   = 0x00008000,
 		"event",        // ETypeModifier_Event       = 0x00010000,
-		"eventd",       // ETypeModifier_EventD      = 0x00020000,
+		"devent",       // ETypeModifier_EventD      = 0x00020000,
 		"reactor",      // ETypeModifier_Reactor     = 0x00040000,
 		"pitcher",      // ETypeModifier_Pitcher     = 0x00080000,
 		"array",        // ETypeModifier_Array       = 0x00100000,
@@ -268,10 +268,10 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 		"unsafe",   // EPtrTypeFlag_Unsafe    = 0x0010000
 		"checked",  // EPtrTypeFlag_Checked   = 0x0020000
 		"const",    // EPtrTypeFlag_Const     = 0x0040000
-		"constd",   // EPtrTypeFlag_ConstD    = 0x0080000
+		"dconst",   // EPtrTypeFlag_ConstD    = 0x0080000
 		"volatile", // EPtrTypeFlag_Volatile  = 0x0100000
 		"event",    // EPtrTypeFlag_Event     = 0x0200000
-		"eventd",   // EPtrTypeFlag_EventD    = 0x0400000
+		"devent",   // EPtrTypeFlag_EventD    = 0x0400000
 		"bindable", // EPtrTypeFlag_Bindable  = 0x0800000
 		"autoget",  // EPtrTypeFlag_AutoGet   = 0x1000000
 	};
@@ -296,7 +296,7 @@ GetPtrTypeFlagString (uint_t Flags)
 	if (Flags & EPtrTypeFlag_Const)
 		String += "const ";
 	else if (Flags & EPtrTypeFlag_ConstD)
-		String += "constd ";
+		String += "dconst ";
 
 	if (Flags & EPtrTypeFlag_Volatile)
 		String += "volatile ";
@@ -304,7 +304,7 @@ GetPtrTypeFlagString (uint_t Flags)
 	if (Flags & EPtrTypeFlag_Event)
 		String += "event ";
 	else if (Flags & EPtrTypeFlag_EventD)
-		String += "eventd ";
+		String += "devent ";
 
 	if (Flags & EPtrTypeFlag_Bindable)
 		String += "bindable ";

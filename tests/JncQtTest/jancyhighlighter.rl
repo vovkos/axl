@@ -46,7 +46,7 @@ main := |*
 'thread'          |
 'stack'           |
 'heap'            |
-'heapu'           |
+'uheap'           |
 'abstract'        |
 'virtual'         |
 'override'        |
@@ -60,7 +60,7 @@ main := |*
 'bigendian'       |
 'nullable'        |
 'const'           |
-'constd'          |
+'dconst'          |
 'mutable'         |
 'volatile'        |
 'weak'            |
@@ -77,7 +77,7 @@ main := |*
 'indexed'         |
 'multicast'       |
 'event'           |
-'eventd'          |
+'devent'          |
 'reactor'         |
 
 'auto'            |
@@ -96,8 +96,8 @@ main := |*
 'intptr'          |
 
 'enum'            |
-'enumf'           |
-'enumc'           |
+'fenum'           |
+'cenum'           |
 'struct'          |
 'union'           |
 'class'           |
@@ -138,6 +138,7 @@ main := |*
 'null'            |
 
 'new'             |
+'pnew'            |
 'delete'          |
 'sizeof'          |
 'countof'         |

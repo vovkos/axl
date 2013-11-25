@@ -69,12 +69,12 @@ enum_type_kind
 				$.m_EnumTypeKind = EEnumType_Normal;
 				$.m_Flags = 0;
 			}
-	|	EToken_EnumF
+	|	EToken_FEnum
 			{
 				$.m_EnumTypeKind = EEnumType_Flag;
 				$.m_Flags = 0;
 			}
-	|	EToken_EnumC
+	|	EToken_CEnum
 			{
 				$.m_EnumTypeKind = EEnumType_Normal;
 				$.m_Flags = EEnumTypeFlag_Exposed;

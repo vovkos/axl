@@ -162,6 +162,9 @@ protected:
 		ESwitch Switch,
 		const char* pValue
 		);
+
+	bool
+	Finalize ();
 };
 
 //.............................................................................

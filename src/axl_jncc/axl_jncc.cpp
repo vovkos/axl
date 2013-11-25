@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "axl_jncc.h"
 
+#define _AXL_JNCC_PRINT_USAGE_IF_NO_ARGUMENTS
+
 //.............................................................................
 
 void
@@ -182,6 +184,14 @@ main (
 	CFileOutStream StdOut;
 	TCmdLine CmdLine;
 	CCmdLineParser Parser (&CmdLine);
+
+#ifdef _AXL_JNCC_PRINT_USAGE_IF_NO_ARGUMENTS
+	if (argc < 2)
+	{
+		PrintUsage (&StdOut);
+		return 0;
+	}
+#endif
 
 	Result = Parser.Parse (argc, argv);
 	if (!Result)

@@ -321,7 +321,7 @@ CDeclTypeCalc::GetPtrTypeFlags (
 		Flags |= EPtrTypeFlag_Volatile;
 	}
 
-	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_EventD)) // convert 'event' to 'eventd'
+	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_EventD)) // convert 'event' to 'devent'
 	{
 		ASSERT (IsClassType (pType, EClassType_Multicast));
 		Flags |= EPtrTypeFlag_EventD;

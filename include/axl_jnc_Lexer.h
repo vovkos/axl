@@ -44,7 +44,7 @@ enum EToken
 	EToken_Thread,
 	EToken_Stack,
 	EToken_Heap,
-	EToken_HeapU,
+	EToken_UHeap,
 	EToken_Abstract,
 	EToken_Virtual,
 	EToken_Override,
@@ -62,7 +62,7 @@ enum EToken
 	EToken_BigEndian,
 	EToken_Nullable,
 	EToken_Const,
-	EToken_ConstD,
+	EToken_DConst,
 	EToken_Mutable,
 	EToken_Volatile,
 	EToken_Weak,
@@ -79,7 +79,7 @@ enum EToken
 	EToken_Indexed,
 	EToken_Multicast,
 	EToken_Event,
-	EToken_EventD,
+	EToken_DEvent,
 	EToken_Reactor,
 
 	// type specifiers
@@ -102,8 +102,8 @@ enum EToken
 	// named type specifiers
 
 	EToken_Enum,
-	EToken_EnumF,
-	EToken_EnumC,
+	EToken_FEnum,
+	EToken_CEnum,
 	EToken_Struct,
 	EToken_Union,
 	EToken_Class,
@@ -151,6 +151,7 @@ enum EToken
 	// keyword operators
 
 	EToken_New,
+	EToken_PNew,
 	EToken_Delete,
 	EToken_SizeOf,
 	EToken_CountOf,
@@ -217,7 +218,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Thread,       "thread")
 	AXL_LEX_TOKEN_NAME (EToken_Stack,        "stack")
 	AXL_LEX_TOKEN_NAME (EToken_Heap,         "heap")
-	AXL_LEX_TOKEN_NAME (EToken_HeapU,        "heapu")
+	AXL_LEX_TOKEN_NAME (EToken_UHeap,        "uheap")
 	AXL_LEX_TOKEN_NAME (EToken_Abstract,     "abstract")
 	AXL_LEX_TOKEN_NAME (EToken_Virtual,      "virtual")
 	AXL_LEX_TOKEN_NAME (EToken_Override,     "override")
@@ -239,7 +240,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Unsigned,     "unsigned")
 	AXL_LEX_TOKEN_NAME (EToken_BigEndian,    "bigendian")
 	AXL_LEX_TOKEN_NAME (EToken_Const,        "const")
-	AXL_LEX_TOKEN_NAME (EToken_ConstD,       "constd")
+	AXL_LEX_TOKEN_NAME (EToken_DConst,       "dconst")
 	AXL_LEX_TOKEN_NAME (EToken_Volatile,     "volatile")
 	AXL_LEX_TOKEN_NAME (EToken_Weak,         "weak")
 	AXL_LEX_TOKEN_NAME (EToken_Thin,         "thin")
@@ -255,7 +256,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Indexed,      "indexed")
 	AXL_LEX_TOKEN_NAME (EToken_Multicast,    "multicast")
 	AXL_LEX_TOKEN_NAME (EToken_Event,        "event")
-	AXL_LEX_TOKEN_NAME (EToken_EventD,       "eventd")
+	AXL_LEX_TOKEN_NAME (EToken_DEvent,       "devent")
 	AXL_LEX_TOKEN_NAME (EToken_Reactor,      "reactor")
 
 	// type specifiers
@@ -278,8 +279,8 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	// named type specifiers
 
 	AXL_LEX_TOKEN_NAME (EToken_Enum,         "enum")
-	AXL_LEX_TOKEN_NAME (EToken_EnumF,        "enumf")
-	AXL_LEX_TOKEN_NAME (EToken_EnumC,        "enumc")
+	AXL_LEX_TOKEN_NAME (EToken_FEnum,        "fenum")
+	AXL_LEX_TOKEN_NAME (EToken_CEnum,        "cenum")
 	AXL_LEX_TOKEN_NAME (EToken_Struct,       "struct")
 	AXL_LEX_TOKEN_NAME (EToken_Union,        "union")
 	AXL_LEX_TOKEN_NAME (EToken_Class,        "class")
@@ -327,6 +328,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	// keyword operators
 
 	AXL_LEX_TOKEN_NAME (EToken_New,          "new")
+	AXL_LEX_TOKEN_NAME (EToken_PNew,         "pnew")
 	AXL_LEX_TOKEN_NAME (EToken_Delete,       "delete")
 	AXL_LEX_TOKEN_NAME (EToken_SizeOf,       "sizeof")
 	AXL_LEX_TOKEN_NAME (EToken_CountOf,      "countof")

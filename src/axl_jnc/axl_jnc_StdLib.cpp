@@ -16,9 +16,9 @@ CStdLib::CStdLib ()
 	m_FunctionMap ["jnc.dynamicCastClassPtr"] = (void*) DynamicCastClassPtr;
 	m_FunctionMap ["jnc.strengthenClassPtr"] = (void*) StrengthenClassPtr;
 	m_FunctionMap ["jnc.heapAlloc"] = (void*) HeapAlloc;
-	m_FunctionMap ["jnc.heapuAlloc"] = (void*) HeapUAlloc;
-	m_FunctionMap ["jnc.heapuFree"] = (void*) HeapUFree;
-	m_FunctionMap ["jnc.heapuFreeClassPtr"] = (void*) HeapUFreeClassPtr;
+	m_FunctionMap ["jnc.uheapAlloc"] = (void*) HeapUAlloc;
+	m_FunctionMap ["jnc.uheapFree"] = (void*) HeapUFree;
+	m_FunctionMap ["jnc.uheapFreeClassPtr"] = (void*) HeapUFreeClassPtr;
 	m_FunctionMap ["jnc.gcAddObject"] = (void*) GcAddObject;
 	m_FunctionMap ["jnc.gcSafePoint"] = (void*) GcSafePoint;
 	m_FunctionMap ["jnc.runGc"] = (void*) RunGc;

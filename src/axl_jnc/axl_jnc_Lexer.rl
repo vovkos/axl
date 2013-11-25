@@ -95,7 +95,7 @@ main := |*
 'thread'         { CreateToken (EToken_Thread); };
 'stack'          { CreateToken (EToken_Stack); };
 'heap'           { CreateToken (EToken_Heap); };
-'heapu'          { CreateToken (EToken_HeapU); };
+'uheap'          { CreateToken (EToken_UHeap); };
 'abstract'       { CreateToken (EToken_Abstract); };
 'virtual'        { CreateToken (EToken_Virtual); };
 'override'       { CreateToken (EToken_Override); };
@@ -117,7 +117,7 @@ main := |*
 'bigendian'      { CreateToken (EToken_BigEndian); };
 'nullable'       { CreateToken (EToken_Nullable); };
 'const'          { CreateToken (EToken_Const); };
-'constd'         { CreateToken (EToken_ConstD); };
+'dconst'         { CreateToken (EToken_DConst); };
 'mutable'        { CreateToken (EToken_Mutable); };
 'volatile'       { CreateToken (EToken_Volatile); };
 'weak'           { CreateToken (EToken_Weak); };
@@ -134,7 +134,7 @@ main := |*
 'indexed'        { CreateToken (EToken_Indexed); };
 'multicast'      { CreateToken (EToken_Multicast); };
 'event'          { CreateToken (EToken_Event); };
-'eventd'         { CreateToken (EToken_EventD); };
+'devent'         { CreateToken (EToken_DEvent); };
 'reactor'        { CreateToken (EToken_Reactor); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -161,8 +161,8 @@ main := |*
 # named type specifiers
 
 'enum'           { CreateToken (EToken_Enum); };
-'enumf'          { CreateToken (EToken_EnumF); };
-'enumc'          { CreateToken (EToken_EnumC); };
+'fenum'          { CreateToken (EToken_FEnum); };
+'cenum'          { CreateToken (EToken_CEnum); };
 'struct'         { CreateToken (EToken_Struct); };
 'union'          { CreateToken (EToken_Union); };
 'class'          { CreateToken (EToken_Class); };
@@ -185,6 +185,7 @@ main := |*
 # operators
 
 'new'            { CreateToken (EToken_New); };
+'pnew'           { CreateToken (EToken_PNew); };
 'delete'         { CreateToken (EToken_Delete); };
 'sizeof'         { CreateToken (EToken_SizeOf); };
 'countof'        { CreateToken (EToken_CountOf); };

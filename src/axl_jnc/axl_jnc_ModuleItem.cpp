@@ -48,7 +48,7 @@ GetStorageKindString (EStorage StorageKind)
 		"thread",                   // EStorage_Thread,
 		"stack",                    // EStorage_Stack,
 		"heap",                     // EStorage_Heap,
-		"heapu",                    // EStorage_HeapU,
+		"uheap",                    // EStorage_HeapU,
 		"member",                   // EStorage_Member,
 		"abstract",                 // EStorage_Abstract,
 		"virtual",                  // EStorage_Virtual,

@@ -28,8 +28,8 @@ set (
 
 source_virtual_folder (
 	app
-	${JNCC_H_LIST}
-	${JNCC_CPP_LIST}
+	${APP_H_LIST}
+	${APP_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

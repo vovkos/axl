@@ -1356,7 +1356,7 @@ CFunctionMgr::CreateHeapUAlloc ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.heapuAlloc", pType);
+	return CreateInternalFunction ("jnc.uheapAlloc", pType);
 }
 
 // void
@@ -1371,7 +1371,7 @@ CFunctionMgr::CreateHeapUFree ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.heapuFree", pType);
+	return CreateInternalFunction ("jnc.uheapFree", pType);
 }
 
 // void
@@ -1386,7 +1386,7 @@ CFunctionMgr::CreateHeapUFreeClassPtr ()
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.heapuFreeClassPtr", pType);
+	return CreateInternalFunction ("jnc.uheapFreeClassPtr", pType);
 }
 
 // void
