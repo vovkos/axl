@@ -93,6 +93,7 @@ CRuntime::Create (
 	Destroy ();
 
 	m_pModule = pModule;
+	m_JitKind = JitKind;
 
 	// execution engine
 

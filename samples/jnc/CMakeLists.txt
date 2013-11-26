@@ -30,7 +30,7 @@ set (
 	44_PropertyPtr.jnc
 	45_WeakPropertyPtr.jnc
 	50_Multicasts.jnc
-	50_WeakMulticasts.jnc
+	51_WeakMulticasts.jnc
 	60_Reactors.jnc
 	61_OnChangeStmt.jnc
 	70_DualModifiers.jnc
