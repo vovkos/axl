@@ -312,7 +312,7 @@ public:
 	virtual
 	bool
 	AddProperty (CProperty* pProperty);
-
+	
 protected:
 	virtual
 	CStructField*

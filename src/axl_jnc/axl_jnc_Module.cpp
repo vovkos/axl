@@ -20,6 +20,7 @@ CModule::Clear ()
 	m_UnitMgr.Clear ();
 	m_CalcLayoutArray.Clear ();
 	m_CompileArray.Clear ();
+	m_ApiItemArray.Clear ();
 	m_LlvmDiBuilder.Clear ();
 
 	m_Flags = 0;
@@ -51,76 +52,22 @@ CModule::Create (
 }
 
 CModuleItem*
-CModule::GetItemByName (const char* pName)
+CModule::GetApiItem (
+	size_t Slot,
+	const char* pName
+	)
 {
-	CModuleItem* pItem;
+	size_t Count = m_ApiItemArray.GetCount ();
+	if (Count < Slot)
+		m_ApiItemArray.SetCount (Slot + 1);
 
-	if (!strchr (pName, '.'))
-	{
-		pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (pName);
-	}
-	else
-	{
-		CQualifiedName Name;
-		Name.Parse (pName);
-		pItem = m_NamespaceMgr.GetGlobalNamespace ()->FindItem (Name);
-	}
+	CModuleItem* pItem = m_ApiItemArray [Slot];
+	if (pItem)
+		return pItem;
 
-	if (!pItem)
-	{
-		err::SetFormatStringError ("'%s' not found", pName);
-		return NULL;
-	}
-
+	pItem = GetItemByName (pName);
+	m_ApiItemArray [Slot] = pItem;
 	return pItem;
-}
-
-CClassType*
-CModule::GetClassTypeByName (const char* pName)
-{
-	CModuleItem* pItem = GetItemByName (pName);
-	if (!pItem)
-		return NULL;
-
-	if (pItem->GetItemKind () != EModuleItem_Type || ((CType*) pItem)->GetTypeKind () != EType_Class)
-	{
-		err::SetFormatStringError ("'%s' is not a class", pName);
-		return NULL;
-	}
-
-	return (CClassType*) pItem;
-}
-
-CFunction*
-CModule::GetFunctionByName (const char* pName)
-{
-	CModuleItem* pItem = GetItemByName (pName);
-	if (!pItem)
-		return NULL;
-
-	if (pItem->GetItemKind () != EModuleItem_Function)
-	{
-		err::SetFormatStringError ("'%s' is not a function", pName);
-		return NULL;
-	}
-
-	return (CFunction*) pItem;
-}
-
-CProperty*
-CModule::GetPropertyByName (const char* pName)
-{
-	CModuleItem* pItem = GetItemByName (pName);
-	if (!pItem)
-		return NULL;
-
-	if (pItem->GetItemKind () != EModuleItem_Property)
-	{
-		err::SetFormatStringError ("'%s' is not a property", pName);
-		return NULL;
-	}
-
-	return (CProperty*) pItem;
 }
 
 bool

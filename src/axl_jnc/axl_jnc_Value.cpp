@@ -82,6 +82,17 @@ GetValueKindString (EValue ValueKind)
 		"undefined-value-kind";
 }
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+CClassType*
+GetCurrentThreadClassType (
+	size_t Slot,
+	const char* pName
+	)
+{
+	return GetCurrentThreadModule ()->GetApiClassType (Slot, pName);
+}
+
 //.............................................................................
 
 void

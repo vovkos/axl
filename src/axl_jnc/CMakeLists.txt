@@ -430,6 +430,8 @@ source_virtual_folder (
 
 set (
 	RUNTIME_H_LIST
+	${AXL_INC_DIR}/axl_jnc_Api.h
+	${AXL_INC_DIR}/axl_jnc_MulticastLib.h
 	${AXL_INC_DIR}/axl_jnc_Runtime.h
 	${AXL_INC_DIR}/axl_jnc_StdLib.h
 	${AXL_INC_DIR}/axl_jnc_TlsMgr.h
@@ -438,6 +440,7 @@ set (
 
 set (
 	RUNTIME_CPP_LIST
+	axl_jnc_MulticastLib.cpp
 	axl_jnc_Runtime.cpp
 	axl_jnc_StdLib.cpp
 	axl_jnc_TlsMgr.cpp

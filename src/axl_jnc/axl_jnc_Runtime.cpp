@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_Runtime.h"
 #include "axl_jnc_Module.h"
+#include "axl_jnc_StdLib.h"
 
 namespace axl {
 namespace jnc {
@@ -28,11 +29,11 @@ GetJitKindString (EJit JitKind)
 class CJitMemoryManager: public llvm::SectionMemoryManager
 {
 public:
-	CStdLib* m_pStdLib;
+	CRuntime* m_pRuntime;
 
-	CJitMemoryManager (CStdLib* pStdLib)
+	CJitMemoryManager (CRuntime* pRuntime)
 	{
-		m_pStdLib = pStdLib;
+		m_pRuntime = pRuntime;
 	}
 
 	virtual
@@ -49,7 +50,7 @@ CJitMemoryManager::getPointerToNamedFunction (
 	bool AbortOnFailure
 	)
 {
-	void* pf = m_pStdLib->FindFunction (Name.c_str ());
+	void* pf = m_pRuntime->FindFunctionMapping (Name.c_str ());
 	if (pf)
 		return pf;
 
@@ -84,7 +85,6 @@ CRuntime::CRuntime ()
 bool
 CRuntime::Create (
 	CModule* pModule,
-	CStdLib* pStdLib,
 	EJit JitKind,
 	size_t HeapSize,
 	size_t StackLimit
@@ -108,7 +108,7 @@ CRuntime::Create (
 
 	if (JitKind == EJit_McJit)
 	{
-		CJitMemoryManager* pJitMemoryManager = new CJitMemoryManager (pStdLib);
+		CJitMemoryManager* pJitMemoryManager = new CJitMemoryManager (this);
 		EngineBuilder.setUseMCJIT (true);
 		EngineBuilder.setJITMemoryManager (pJitMemoryManager);
 	}
@@ -220,8 +220,26 @@ CRuntime::Destroy ()
 	m_GcObjectList.Clear ();
 	m_GcDestructList.Clear ();
 	m_StaticGcRootArray.Clear ();
+	m_FunctionMap.Clear ();
 
 	m_pModule = NULL;
+}
+
+void
+CRuntime::MapFunction (
+	llvm::Function* pLlvmFunction,
+	void* pf
+	)
+{
+	if (m_JitKind == EJit_McJit)
+	{
+		m_FunctionMap [pLlvmFunction->getName ().data ()] = pf;
+	}
+	else
+	{
+		ASSERT (m_pLlvmExecutionEngine);
+		m_pLlvmExecutionEngine->addGlobalMapping (pLlvmFunction, pf);
+	}
 }
 
 bool

@@ -9,22 +9,13 @@ class MdiChild;
 
 //.............................................................................
 
-struct TPoint
-{
-	int m_x;
-	int m_y;
-};
-
 class StdLib: public jnc::CStdLib
 {
 public:
-	StdLib ();
-
-	void
-	Export (
-		jnc::CModule* pModule,
-		jnc::CRuntime* pRuntime
-		);
+	AXL_JNC_API_BEGIN_LIB ()
+		AXL_JNC_API_FUNCTION ("printf",  &Printf)
+		AXL_JNC_API_LIB (jnc::CStdLib)
+	AXL_JNC_API_END_LIB ()
 
 	static
 	int
@@ -32,10 +23,6 @@ public:
 		const char* pFormat,
 		...
 		);
-
-	static
-	TPoint
-	TestAbi1 (int x);
 };
 
 //.............................................................................
@@ -118,7 +105,6 @@ private:
 
 	jnc::CModule module;
 	jnc::CRuntime runtime;
-	StdLib stdlib;
 };
 
 inline MainWindow *GetMainWindow()

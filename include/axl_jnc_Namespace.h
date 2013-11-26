@@ -102,6 +102,27 @@ public:
 	}
 
 	CModuleItem*
+	GetItemByName (const char* pName);
+
+	CClassType*
+	GetClassTypeByName (const char* pName)
+	{
+		return VerifyModuleItemIsClassType (GetItemByName (pName), pName);
+	}
+
+	CFunction*
+	GetFunctionByName (const char* pName)
+	{
+		return VerifyModuleItemIsFunction (GetItemByName (pName), pName);
+	}
+
+	CProperty*
+	GetPropertyByName (const char* pName)
+	{
+		return VerifyModuleItemIsProperty (GetItemByName (pName), pName);
+	}
+
+	CModuleItem*
 	FindItem (const char* pName);
 
 	CModuleItem*

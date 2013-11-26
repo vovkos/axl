@@ -10,29 +10,6 @@
 
 //.............................................................................
 
-StdLib::StdLib ()
-{
-	m_FunctionMap ["printf"]   = (void*) Printf;
-	m_FunctionMap ["testAbi1"] = (void*) TestAbi1;
-}
-
-void
-StdLib::Export (
-	jnc::CModule* pModule,
-	jnc::CRuntime* pRuntime
-	)
-{
-	jnc::CStdLib::Export (pModule, pRuntime);
-
-	if (pRuntime->GetJitKind () == jnc::EJit_Normal)
-	{
-		llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
-
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) Printf);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, "testAbi1", (void*) TestAbi1);
-	}
-}
-
 int
 StdLib::Printf (
 	const char* pFormat,
@@ -47,16 +24,6 @@ StdLib::Printf (
 	WriteOutput (Text, Length);
 
 	return Length;
-}
-
-TPoint
-StdLib::TestAbi1 (int x)
-{
-	printf ("MainWindow::TestAbi1 ()\n");
-
-	TPoint Point = { 100, 200 };
-
-	return Point;
 }
 
 //.............................................................................
@@ -438,14 +405,14 @@ bool MainWindow::compile ()
 
 	writeOutput("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
 
-	result = runtime.Create (&module, &stdlib, JitKind, 16 * 1024, 16 * 1024); // 16K gc heap, 16K stack
+	result = runtime.Create (&module, JitKind, 16 * 1024, 16 * 1024); // 16K gc heap, 16K stack
 	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());
 		return false;
 	}
 
-	stdlib.Export (&module, &runtime);
+	StdLib::Export (&runtime);
 
 	result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());
 	if (!result)

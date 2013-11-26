@@ -639,7 +639,7 @@ enum EObjectFlag
 
 struct TObject
 {
-	class CClassType* m_pType; // for GC tracing & QueryInterface
+	CClassType* m_pType; // for GC tracing & QueryInterface
 	size_t m_ScopeLevel;
 	uintptr_t m_Flags;
 	rtl::TListLink m_GcHeapLink; // objects allocated on gc heap get into a list
@@ -667,6 +667,41 @@ struct TInterface
 	// followed by parents, then by interface data fields
 };
 
+// implementation of exported classes
+
+CClassType*
+GetCurrentThreadClassType (
+	size_t Slot,
+	const char* pName
+	);
+
+template <typename T>
+class CClassImplT: public jnc::TInterface
+{
+public:
+	CClassImplT ()
+	{
+		m_pObject = NULL;
+		m_pVTable = NULL;
+	}
+
+	CClassType*
+	GetType ()
+	{
+		GetCurrentThreadClassType (T::GetTypeSlot (), T::GetTypeName ());
+	}
+	
+	// override in derived class
+
+	// static
+	// size_t
+	// GetTypeSlot ();
+
+	// static
+	// const char*
+	// GetTypeName ();
+};
+
 // interface with master header
 
 template <typename T>
@@ -677,11 +712,10 @@ class CObjectT:
 public:
 	CObjectT ()
 	{
-		m_pType = NULL;
 		m_ScopeLevel = 0;
 		m_Flags = EObjectFlag_Alive | EObjectFlag_Extern;
+		this->m_pType = T::GetType ();
 		this->m_pObject = this; // thanks a log gcc
-		this->m_pVTable = NULL;
 	}
 };
 

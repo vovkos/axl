@@ -65,6 +65,7 @@ protected:
 
 	rtl::CArrayT <CModuleItem*> m_CalcLayoutArray;
 	rtl::CArrayT <CModuleItem*> m_CompileArray;
+	rtl::CArrayT <CModuleItem*> m_ApiItemArray;
 
 	llvm::Module* m_pLlvmModule;
 
@@ -190,16 +191,61 @@ public:
 	MarkForCompile (CModuleItem* pItem);
 
 	CModuleItem*
-	GetItemByName (const char* pName);
+	GetItemByName (const char* pName)
+	{
+		return m_NamespaceMgr.GetGlobalNamespace ()->GetItemByName (pName);
+	}
 
 	CClassType*
-	GetClassTypeByName (const char* pName);
+	GetClassTypeByName (const char* pName)
+	{
+		return VerifyModuleItemIsClassType (GetItemByName (pName), pName);
+	}
 
 	CFunction*
-	GetFunctionByName (const char* pName);
+	GetFunctionByName (const char* pName)
+	{
+		return VerifyModuleItemIsFunction (GetItemByName (pName), pName);
+	}
 
 	CProperty*
-	GetPropertyByName (const char* pName);
+	GetPropertyByName (const char* pName)
+	{
+		return VerifyModuleItemIsProperty (GetItemByName (pName), pName);
+	}
+
+	CModuleItem*
+	GetApiItem (
+		size_t Slot,
+		const char* pName
+		);
+
+	CClassType*
+	GetApiClassType (
+		size_t Slot,
+		const char* pName
+		)
+	{
+		return VerifyModuleItemIsClassType (GetApiItem (Slot, pName), pName);
+	}
+
+	CFunction*
+	GetApiFunction (
+		size_t Slot,
+		const char* pName
+		)
+	{
+		return VerifyModuleItemIsFunction (GetApiItem (Slot, pName), pName);
+	}
+
+	CProperty*
+	GetApiProperty (
+		size_t Slot,
+		const char* pName
+		)
+	{
+		return VerifyModuleItemIsProperty (GetApiItem (Slot, pName), pName);
+	}
 
 	bool
 	Create (
@@ -248,6 +294,14 @@ GetCurrentThreadModule ()
 {
 	return mt::GetTlsSlotValue <CModule> ();
 }
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+CModuleItem*
+GetStockModuleItem (
+	size_t Slot,
+	const char* pName
+	);
 
 //.............................................................................
 

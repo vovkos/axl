@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "axl_jnc_StdLib.h"
 #include "axl_jnc_TlsMgr.h"
+#include "axl_jnc_Value.h"
 #include "axl_mt_TlsSlot.h"
 #include "axl_mt_Event.h"
 #include "axl_mt_Thread.h"
@@ -81,8 +81,9 @@ protected:
 
 protected:
 	CModule* m_pModule;
-	llvm::ExecutionEngine* m_pLlvmExecutionEngine;
 	EJit m_JitKind;
+	llvm::ExecutionEngine* m_pLlvmExecutionEngine;
+	rtl::CStringHashTableMapT <void*> m_FunctionMap;
 
 	mt::CLock m_Lock;
 
@@ -133,7 +134,6 @@ public:
 	bool
 	Create (
 		CModule* pModule,
-		CStdLib* pStdLib,
 		EJit JitKind,
 		size_t HeapSize,
 		size_t StackLimit
@@ -141,6 +141,19 @@ public:
 
 	void
 	Destroy ();
+
+	void
+	MapFunction (
+		llvm::Function* pLlvmFunction,
+		void* pf
+		);
+
+	void*
+	FindFunctionMapping (const char* pName)
+	{
+		rtl::CStringHashTableMapIteratorT <void*> It = m_FunctionMap.Find (pName);
+		return It ? It->m_Value : NULL;
+	}
 
 	bool
 	Startup ();

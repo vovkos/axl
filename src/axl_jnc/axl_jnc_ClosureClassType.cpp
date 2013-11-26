@@ -2,6 +2,7 @@
 #include "axl_jnc_ClosureClassType.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Runtime.h"
+#include "axl_jnc_StdLib.h"
 
 namespace axl {
 namespace jnc {

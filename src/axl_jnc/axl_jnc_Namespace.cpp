@@ -96,6 +96,31 @@ CNamespace::CreateQualifiedName (const char* pName)
 }
 
 CModuleItem*
+CNamespace::GetItemByName (const char* pName)
+{
+	CModuleItem* pItem;
+
+	if (!strchr (pName, '.'))
+	{
+		pItem = FindItem (pName);
+	}
+	else
+	{
+		CQualifiedName Name;
+		Name.Parse (pName);
+		pItem = FindItem (Name);
+	}
+
+	if (!pItem)
+	{
+		err::SetFormatStringError ("'%s' not found", pName);
+		return NULL;
+	}
+
+	return pItem;
+}
+
+CModuleItem*
 CNamespace::FindItem (const char* pName)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName); 

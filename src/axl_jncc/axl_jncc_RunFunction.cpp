@@ -3,26 +3,6 @@
 
 //.............................................................................
 
-CStdLib::CStdLib ()
-{
-	m_FunctionMap ["printf"] = (void*) Printf;
-}
-
-void
-CStdLib::Export (
-	jnc::CModule* pModule,
-	jnc::CRuntime* pRuntime
-	)
-{
-	jnc::CStdLib::Export (pModule, pRuntime);
-
-	if (pRuntime->GetJitKind () == jnc::EJit_Normal)
-	{
-		llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, "printf", (void*) Printf);
-	}
-}
-
 int
 CStdLib::Printf (
 	const char* pFormat,

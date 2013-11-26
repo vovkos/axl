@@ -12,6 +12,9 @@ namespace jnc {
 class CModule;
 class CNamespace;
 class CAttributeBlock;
+class CClassType;
+class CFunction;
+class CProperty;
 
 //.............................................................................
 
@@ -241,6 +244,26 @@ public:
 		m_pItemDecl = this;
 	}
 };
+
+//.............................................................................
+
+CClassType*
+VerifyModuleItemIsClassType (
+	CModuleItem* pItem,
+	const char* pName
+	);
+
+CFunction*
+VerifyModuleItemIsFunction (
+	CModuleItem* pItem,
+	const char* pName
+	);
+
+CProperty*
+VerifyModuleItemIsProperty (
+	CModuleItem* pItem,
+	const char* pName
+	);
 
 //.............................................................................
 

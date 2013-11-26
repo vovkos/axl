@@ -38,20 +38,15 @@ CJnc::Jit ()
 {
 	jnc::EJit JitKind = (m_pCmdLine->m_Flags & EJncFlag_Jit_mc) ? jnc::EJit_McJit : jnc::EJit_Normal;
 
-	bool Result = m_Runtime.Create (
-		&m_Module, 
-		&m_StdLib, 
-		JitKind, 
-		m_pCmdLine->m_GcHeapSize, 
-		m_pCmdLine->m_StackSize
-		);
-
-	if (!Result)
-		return false;
-
-	m_StdLib.Export (&m_Module, &m_Runtime);
-
-	return m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());
+	return 
+		m_Runtime.Create (
+			&m_Module, 
+			JitKind, 
+			m_pCmdLine->m_GcHeapSize, 
+			m_pCmdLine->m_StackSize
+			) &&
+		CStdLib::Export (&m_Runtime) &&
+		m_Module.m_FunctionMgr.JitFunctions (m_Runtime.GetLlvmExecutionEngine ());
 }
 
 void

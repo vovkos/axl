@@ -5,6 +5,85 @@
 
 //.............................................................................
 
+bool
+AXL_CDECL
+CSerial::Open (jnc::TDataPtr Name)
+{
+	printf ("CSerial::Open (%s)\n", Name.m_p);
+	return true;
+}
+
+void
+AXL_CDECL
+CSerial::Close ()
+{
+	printf ("CSerial::Close ()\n");
+}
+
+size_t
+AXL_CDECL
+CSerial::Read (
+	jnc::TDataPtr Ptr,
+	size_t Size
+	)
+{
+	printf ("CSerial::Read (%d)\n", Size);
+	return true;
+}
+
+size_t
+AXL_CDECL
+CSerial::Write (
+	jnc::TDataPtr Ptr,
+	size_t Size
+	)
+{
+	printf ("CSerial::Write (%d)\n", Size);
+	return true;
+}
+
+bool
+AXL_CDECL
+CSerial::SetBaudRate (uint_t BaudRate)
+{
+	printf ("CSerial::SetBaudRate (%d)\n", BaudRate);
+	return true;
+}
+
+bool
+AXL_CDECL
+CSerial::SetParity (uint_t Parity)
+{
+	printf ("CSerial::SetParity (%d)\n", Parity);
+	return true;
+}
+
+bool
+AXL_CDECL
+CSerial::SetDataBits (uint_t DataBits)
+{
+	printf ("CSerial::SetDataBits (%d)\n", DataBits);
+	return true;
+}
+
+bool
+AXL_CDECL
+CSerial::SetStopBits (uint_t StopBits)
+{
+	printf ("CSerial::SetStopBits (%d)\n", StopBits);
+	return true;
+}
+
+bool
+AXL_CDECL
+CSerial::SetFlowControl (uint_t FlowControl)
+{
+	printf ("CSerial::SetFlowControl (%d)\n", FlowControl);
+	return true;
+}
+
+//.............................................................................
+
 void
 PrintVersion (COutStream* pOutStream)
 {

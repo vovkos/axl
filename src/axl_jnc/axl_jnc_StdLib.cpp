@@ -2,97 +2,12 @@
 #include "axl_jnc_StdLib.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_Runtime.h"
-#include "axl_jnc_Multicast.h"
 #include "axl_g_Time.h"
 
 namespace axl {
 namespace jnc {
 
 //.............................................................................
-
-CStdLib::CStdLib ()
-{
-	m_FunctionMap ["jnc.onRuntimeError"] = (void*) OnRuntimeError;
-	m_FunctionMap ["jnc.dynamicCastClassPtr"] = (void*) DynamicCastClassPtr;
-	m_FunctionMap ["jnc.strengthenClassPtr"] = (void*) StrengthenClassPtr;
-	m_FunctionMap ["jnc.heapAlloc"] = (void*) HeapAlloc;
-	m_FunctionMap ["jnc.uheapAlloc"] = (void*) HeapUAlloc;
-	m_FunctionMap ["jnc.uheapFree"] = (void*) HeapUFree;
-	m_FunctionMap ["jnc.uheapFreeClassPtr"] = (void*) HeapUFreeClassPtr;
-	m_FunctionMap ["jnc.gcAddObject"] = (void*) GcAddObject;
-	m_FunctionMap ["jnc.gcSafePoint"] = (void*) GcSafePoint;
-	m_FunctionMap ["jnc.runGc"] = (void*) RunGc;
-	m_FunctionMap ["jnc.runGcWaitForDestructors"] = (void*) RunGcWaitForDestructors;
-	m_FunctionMap ["jnc.getCurrentThreadId"] = (void*) GetCurrentThreadId;
-	m_FunctionMap ["jnc.createThread"] = (void*) CreateThread;
-	m_FunctionMap ["jnc.sleep"] = (void*) Sleep;
-	m_FunctionMap ["jnc.getTls"] = (void*) GetTls;
-	m_FunctionMap ["strlen"] = (void*) StrLen;
-	m_FunctionMap ["rand"] = (void*) Rand;
-	m_FunctionMap ["jnc.appendFmtLiteral_a"] = (void*) AppendFmtLiteral_a;
-	m_FunctionMap ["jnc.appendFmtLiteral_p"] = (void*) AppendFmtLiteral_p;
-	m_FunctionMap ["jnc.appendFmtLiteral_i32"] = (void*) AppendFmtLiteral_i32;
-	m_FunctionMap ["jnc.appendFmtLiteral_ui32"] = (void*) AppendFmtLiteral_ui32;
-	m_FunctionMap ["jnc.appendFmtLiteral_i64"] = (void*) AppendFmtLiteral_i64;
-	m_FunctionMap ["jnc.appendFmtLiteral_ui64"] = (void*) AppendFmtLiteral_ui64;
-	m_FunctionMap ["jnc.appendFmtLiteral_f"] = (void*) AppendFmtLiteral_f;
-
-}
-
-void
-CStdLib::Export (
-	CModule* pModule,
-	CRuntime* pRuntime
-	)
-{
-	EJit JitKind = pRuntime->GetJitKind ();
-
-	rtl::CConstListT <CMulticastClassType> McTypeList = pModule->m_TypeMgr.GetMulticastClassTypeList ();
-	rtl::CIteratorT <CMulticastClassType> McType = McTypeList.GetHead ();
-	for (; McType; McType++)
-		MapMulticastMethods (*McType);
-
-	if (JitKind == EJit_Normal)
-	{
-		llvm::ExecutionEngine* pLlvmExecutionEngine = pRuntime->GetLlvmExecutionEngine ();
-
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_OnRuntimeError, (void*) OnRuntimeError);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_DynamicCastClassPtr, (void*) DynamicCastClassPtr);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrengthenClassPtr, (void*) StrengthenClassPtr);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapAlloc, (void*) HeapAlloc);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUAlloc, (void*) HeapUAlloc);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFree, (void*) HeapUFree);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_HeapUFreeClassPtr, (void*) HeapUFreeClassPtr);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcAddObject, (void*) GcAddObject);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GcSafePoint, (void*) GcSafePoint);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGc, (void*) RunGc);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_RunGcWaitForDestructors, (void*) RunGcWaitForDestructors);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetCurrentThreadId, (void*) GetCurrentThreadId);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_CreateThread, (void*) CreateThread);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Sleep, (void*) Sleep);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_StrLen, (void*) StrLen);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_Rand, (void*) Rand);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_GetTls, (void*) GetTls);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_a, (void*) AppendFmtLiteral_a);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_p, (void*) AppendFmtLiteral_p);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i32, (void*) AppendFmtLiteral_i32);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui32, (void*) AppendFmtLiteral_ui32);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_i64, (void*) AppendFmtLiteral_i64);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_ui64, (void*) AppendFmtLiteral_ui64);
-		pModule->SetFunctionPointer (pLlvmExecutionEngine, EStdFunc_AppendFmtLiteral_f, (void*) AppendFmtLiteral_f);
-
-		rtl::CConstListT <CMulticastClassType> McTypeList = pModule->m_TypeMgr.GetMulticastClassTypeList ();
-		rtl::CIteratorT <CMulticastClassType> McType = McTypeList.GetHead ();
-		for (; McType; McType++)
-		{
-			ExportMulticastMethods (
-				pModule,
-				pLlvmExecutionEngine,
-				*McType
-				);
-		}
-	}
-}
 
 void
 CStdLib::OnRuntimeError (
@@ -182,72 +97,6 @@ CStdLib::StrengthenClassPtr (TInterface* p)
 	return ClassTypeKind == EClassType_FunctionClosure || ClassTypeKind == EClassType_PropertyClosure ?
 		((CClosureClassType*) p->m_pObject->m_pType)->Strengthen (p) :
 		(p->m_pObject->m_Flags & EObjectFlag_Alive) ? p : NULL;
-}
-
-void
-CStdLib::MulticastClear (TMulticast* pMulticast)
-{
-	return ((CMulticast*) pMulticast)->Clear ();
-}
-
-handle_t
-CStdLib::MulticastSet (
-	TMulticast* pMulticast,
-	TFunctionPtr Ptr
-	)
-{
-	return ((CMulticast*) pMulticast)->SetHandler (Ptr);
-}
-
-handle_t
-CStdLib::MulticastSet_t (
-	TMulticast* pMulticast,
-	void* pf
-	)
-{
-	return ((CMulticast*) pMulticast)->SetHandler_t (pf);
-}
-
-handle_t
-CStdLib::MulticastAdd (
-	TMulticast* pMulticast,
-	TFunctionPtr Ptr
-	)
-{
-	return ((CMulticast*) pMulticast)->AddHandler (Ptr);
-}
-
-handle_t
-CStdLib::MulticastAdd_t (
-	TMulticast* pMulticast,
-	void* pf
-	)
-{
-	return ((CMulticast*) pMulticast)->AddHandler_t (pf);
-}
-
-TFunctionPtr
-CStdLib::MulticastRemove (
-	TMulticast* pMulticast,
-	handle_t Handle
-	)
-{
-	return ((CMulticast*) pMulticast)->RemoveHandler (Handle);
-}
-
-void*
-CStdLib::MulticastRemove_t (
-	TMulticast* pMulticast,
-	handle_t Handle
-	)
-{
-	return ((CMulticast*) pMulticast)->RemoveHandler_t (Handle);
-}
-
-TFunctionPtr
-CStdLib::MulticastGetSnapshot (TMulticast* pMulticast)
-{
-	return ((CMulticast*) pMulticast)->GetSnapshot ();
 }
 
 void*
@@ -551,70 +400,6 @@ CStdLib::AppendFmtLiteralImpl (
 	String.Format_va (FormatString, va);
 
 	return AppendFmtLiteral_a (pFmtLiteral, String, String.GetLength ());
-}
-
-void*
-CStdLib::m_MulticastMethodTable [EFunctionPtrType__Count] [EMulticastMethod__Count - 1] =
-{
-	{
-		(void*) MulticastClear,
-		(void*) MulticastSet,
-		(void*) MulticastAdd,
-		(void*) MulticastRemove,
-		(void*) MulticastGetSnapshot,
-	},
-
-	{
-		(void*) MulticastClear,
-		(void*) MulticastSet,
-		(void*) MulticastAdd,
-		(void*) MulticastRemove,
-		(void*) MulticastGetSnapshot,
-	},
-
-	{
-		(void*) MulticastClear,
-		(void*) MulticastSet_t,
-		(void*) MulticastAdd_t,
-		(void*) MulticastRemove_t,
-		(void*) MulticastGetSnapshot,
-	},
-};
-
-void
-CStdLib::MapMulticastMethods (CMulticastClassType* pMulticastType)
-{
-	EFunctionPtrType PtrTypeKind = pMulticastType->GetTargetType ()->GetPtrTypeKind ();
-	ASSERT (PtrTypeKind < EFunctionPtrType__Count);
-
-	for (size_t i = 0; i < EMulticastMethod__Count - 1; i++)
-	{
-		CFunction* pFunction = pMulticastType->GetMethod ((EMulticastMethod) i);
-		llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
-		const char* pName = pLlvmFunction->getName ().data ();
-
-		m_FunctionMap [pName] = m_MulticastMethodTable [PtrTypeKind] [i];
-	}
-}
-
-void
-CStdLib::ExportMulticastMethods (
-	CModule* pModule,
-	llvm::ExecutionEngine* pLlvmExecutionEngine,
-	CMulticastClassType* pMulticastType
-	)
-{
-	EFunctionPtrType PtrTypeKind = pMulticastType->GetTargetType ()->GetPtrTypeKind ();
-	ASSERT (PtrTypeKind < EFunctionPtrType__Count);
-
-	for (size_t i = 0; i < EMulticastMethod__Count - 1; i++)
-	{
-		pModule->SetFunctionPointer (
-			pLlvmExecutionEngine,
-			pMulticastType->GetMethod ((EMulticastMethod) i),
-			m_MulticastMethodTable [PtrTypeKind] [i]
-			);
-	}
 }
 
 //.............................................................................

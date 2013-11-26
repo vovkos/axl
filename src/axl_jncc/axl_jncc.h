@@ -34,13 +34,10 @@ PrintUsage (COutStream* pOutStream);
 class CStdLib: public jnc::CStdLib
 {
 public:
-	CStdLib ();
-
-	void
-	Export (
-		jnc::CModule* pModule,
-		jnc::CRuntime* pRuntime
-		);
+	AXL_JNC_API_BEGIN_LIB ()
+		AXL_JNC_API_FUNCTION ("printf",  &Printf)
+		AXL_JNC_API_LIB (jnc::CStdLib)
+	AXL_JNC_API_END_LIB ()
 
 	static
 	int
@@ -52,11 +49,23 @@ public:
 
 //.............................................................................
 
-// test object for playing with jancy export macros
+enum EApi
+{
+	EApi_Serial,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CSerial: public jnc::TInterface
 {
 protected:
+	bool m_IsOpen;
+
+	uint_t m_BaudRate;
+	uint_t m_Parity;
+	uint_t m_DataBits;
+	uint_t m_StopBits;
+	uint_t m_FlowControl;
 
 public:
 	bool
@@ -80,6 +89,38 @@ public:
 		jnc::TDataPtr Ptr,
 		size_t Size
 		);
+
+	bool
+	AXL_CDECL
+	SetBaudRate (uint_t BaudRate);
+
+	bool
+	AXL_CDECL
+	SetParity (uint_t Parity);
+
+	bool
+	AXL_CDECL
+	SetDataBits (uint_t DataBits);
+
+	bool
+	AXL_CDECL
+	SetStopBits (uint_t StopBits);
+
+	bool
+	AXL_CDECL
+	SetFlowControl (uint_t FlowControl);
+
+	AXL_JNC_API_BEGIN_CLASS ("Serial", CSerial, EApi_Serial)
+		AXL_JNC_API_FUNCTION ("Open",  &CSerial::Open)
+		AXL_JNC_API_FUNCTION ("Close", &CSerial::Close)
+		AXL_JNC_API_FUNCTION ("Read",  &CSerial::Read)
+		AXL_JNC_API_FUNCTION ("Write", &CSerial::Write)
+		AXL_JNC_API_AUTOGET_PROPERTY ("BaudRate", &CSerial::SetBaudRate)
+		AXL_JNC_API_AUTOGET_PROPERTY ("Parity",   &CSerial::SetParity)
+		AXL_JNC_API_AUTOGET_PROPERTY ("DataBits", &CSerial::SetDataBits)
+		AXL_JNC_API_AUTOGET_PROPERTY ("StopBits", &CSerial::SetStopBits)
+		AXL_JNC_API_AUTOGET_PROPERTY ("FlowControl", &CSerial::SetFlowControl)
+	AXL_JNC_API_END_CLASS ()
 };
 
 //.............................................................................
@@ -94,7 +135,6 @@ protected:
 
 	jnc::CModule m_Module;
 	jnc::CRuntime m_Runtime;
-	CStdLib m_StdLib;
 
 public:
 	CJnc ()

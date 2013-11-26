@@ -129,5 +129,61 @@ CModuleItem::EnsureLayout ()
 
 //.............................................................................
 
+CClassType*
+VerifyModuleItemIsClassType (
+	CModuleItem* pItem,
+	const char* pName
+	)
+{
+	if (!pItem)
+		return NULL;
+		
+	if (pItem->GetItemKind () != EModuleItem_Type || ((CType*) pItem)->GetTypeKind () != EType_Class)
+	{
+		err::SetFormatStringError ("'%s' is not a class", pName);
+		return NULL;
+	}
+
+	return (CClassType*) pItem;
+}
+
+CFunction*
+VerifyModuleItemIsFunction (
+	CModuleItem* pItem,
+	const char* pName
+	)
+{
+	if (!pItem)
+		return NULL;
+		
+	if (pItem->GetItemKind () != EModuleItem_Function)
+	{
+		err::SetFormatStringError ("'%s' is not a function", pName);
+		return NULL;
+	}
+
+	return (CFunction*) pItem;
+}
+
+CProperty*
+VerifyModuleItemIsProperty (
+	CModuleItem* pItem,
+	const char* pName
+	)
+{
+	if (!pItem)
+		return NULL;
+		
+	if (pItem->GetItemKind () != EModuleItem_Property)
+	{
+		err::SetFormatStringError ("'%s' is not a property", pName);
+		return NULL;
+	}
+
+	return (CProperty*) pItem;
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_jnc_Multicast.h"
 #include "axl_jnc_Runtime.h"
+#include "axl_jnc_StdLib.h"
 
 namespace axl {
 namespace jnc {

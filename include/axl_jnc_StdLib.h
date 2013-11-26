@@ -4,40 +4,49 @@
 
 #pragma once
 
-#include "axl_jnc_Value.h"
-#include "axl_jnc_MulticastClassType.h"
-#include "axl_rtl_StringHashTable.h"
+#include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
+#include "axl_jnc_Api.h"
+#include "axl_jnc_MulticastLib.h"
 #include "axl_g_Time.h"
 
 namespace axl {
 namespace jnc {
 
-class CMulticastClassType;
-
 //.............................................................................
 
 class CStdLib
 {
-protected:
-	rtl::CStringHashTableMapT <void*> m_FunctionMap;
-	static void* m_MulticastMethodTable [EFunctionPtrType__Count] [EMulticastMethod__Count - 1];
+public:
+	AXL_JNC_API_BEGIN_LIB ()
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_OnRuntimeError, OnRuntimeError)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_DynamicCastClassPtr, DynamicCastClassPtr)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_StrengthenClassPtr, StrengthenClassPtr)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapAlloc, HeapAlloc)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUAlloc, HeapUAlloc)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUFree, HeapUFree)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUFreeClassPtr, HeapUFreeClassPtr)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcAddObject, GcAddObject)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcSafePoint, GcSafePoint)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_RunGc, RunGc)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_RunGcWaitForDestructors, RunGcWaitForDestructors)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetCurrentThreadId, GetCurrentThreadId)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_CreateThread, CreateThread)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_Sleep, Sleep)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_StrLen, StrLen)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_Rand, Rand)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetTls, GetTls)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_a, AppendFmtLiteral_a)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_p, AppendFmtLiteral_p)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_i32, AppendFmtLiteral_i32)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_ui32, AppendFmtLiteral_ui32)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_i64, AppendFmtLiteral_i64)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_ui64, AppendFmtLiteral_ui64)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_AppendFmtLiteral_f, AppendFmtLiteral_f)
+		AXL_JNC_API_LIB (CMulticastLib)
+	AXL_JNC_API_END_LIB ()
 
 public:
-	CStdLib ();
-
-	void*
-	FindFunction (const char* pName)
-	{
-		rtl::CStringHashTableMapIteratorT <void*> It = m_FunctionMap.Find (pName);
-		return It ? It->m_Value : NULL;
-	}
-
-	void
-	Export (
-		CModule* pModule,
-		CRuntime* pRuntime
-		);
-
 	static
 	void
 	OnRuntimeError (
@@ -56,56 +65,6 @@ public:
 	static
 	TInterface*
 	StrengthenClassPtr (TInterface* p);
-
-	static
-	void
-	MulticastClear (TMulticast* pMulticast);
-
-	static
-	handle_t
-	MulticastSet (
-		TMulticast* pMulticast,
-		TFunctionPtr Ptr
-		);
-
-	static
-	handle_t
-	MulticastSet_t (
-		TMulticast* pMulticast,
-		void* pf
-		);
-
-	static
-	handle_t
-	MulticastAdd (
-		TMulticast* pMulticast,
-		TFunctionPtr Ptr
-		);
-
-	static
-	handle_t
-	MulticastAdd_t (
-		TMulticast* pMulticast,
-		void* pf
-		);
-
-	static
-	TFunctionPtr
-	MulticastRemove (
-		TMulticast* pMulticast,
-		handle_t Handle
-		);
-
-	static
-	void*
-	MulticastRemove_t (
-		TMulticast* pMulticast,
-		handle_t Handle
-		);
-
-	static
-	TFunctionPtr
-	MulticastGetSnapshot (TMulticast* pMulticast);
 
 	static
 	void*
@@ -239,7 +198,7 @@ public:
 	{
 		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'f', x);
 	}
-
+	
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
 	static
@@ -251,17 +210,6 @@ protected:
 	void*
 	ThreadProc (void* pContext);
 #endif
-
-	void
-	MapMulticastMethods (CMulticastClassType* pMulticastType);
-
-	static
-	void
-	ExportMulticastMethods (
-		CModule* pModule,
-		llvm::ExecutionEngine* pLlvmExecutionEngine,
-		CMulticastClassType* pMulticastType
-		);
 
 	static
 	void
