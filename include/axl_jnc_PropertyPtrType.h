@@ -145,6 +145,20 @@ IsBindableType (CType* pType)
 
 //.............................................................................
 
+// structure backing up property pointers, e.g.:
+// int property* pxTest;
+// int property weak* pxTest;
+
+struct TInterface;
+
+struct TPropertyPtr
+{
+	void** m_pVTable;
+	TInterface* m_pClosure;
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {
 

@@ -58,7 +58,7 @@ CModule::GetApiItem (
 	)
 {
 	size_t Count = m_ApiItemArray.GetCount ();
-	if (Count < Slot)
+	if (Count <= Slot)
 		m_ApiItemArray.SetCount (Slot + 1);
 
 	CModuleItem* pItem = m_ApiItemArray [Slot];

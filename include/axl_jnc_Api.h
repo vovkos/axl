@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include "axl_jnc_Value.h"
+#include "axl_jnc_Module.h"
+#include "axl_jnc_Runtime.h"
+
 namespace axl {
 namespace jnc {
 
@@ -94,5 +98,64 @@ Export (axl::jnc::CRuntime* pRuntime) \
 
 //.............................................................................
 
+void
+Prime (
+	TInterface* pThis,
+	CClassType* pClassType	
+	);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class CApiClassT: public jnc::TInterface
+{
+public:
+	CApiClassT ()
+	{
+		m_pObject = NULL;
+		m_pVTable = NULL;
+	}
+
+	void
+	Prime ()
+	{
+		jnc::Prime (this, GetApiClassType ());
+	}
+	
+	static
+	CClassType*
+	GetApiClassType ()
+	{
+		CModule* pModule = GetCurrentThreadModule ();
+		return pModule->GetApiClassType (T::GetApiClassSlot (), T::GetApiClassName ());
+	}
+	
+	// override in derived class
+
+	// static
+	// size_t
+	// GetApiClassSlot ();
+
+	// static
+	// const char*
+	// GetApiClassName ();
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CSimpleMulticast: public jnc::TMulticast
+{
+public:
+	static
+	CMulticastClassType*
+	GetApiClassType ()
+	{		
+		CModule* pModule = GetCurrentThreadModule ();
+		return (CMulticastClassType*) pModule->m_TypeMgr.GetStdType (EStdType_SimpleMulticast);
+	}
+};
+
+//.............................................................................
+	
 } // namespace axl
 } // namespace jnc

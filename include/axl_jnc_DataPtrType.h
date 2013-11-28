@@ -142,5 +142,29 @@ IsSafeThinDataPtrType (CType* pType)
 
 //.............................................................................
 
+// structure backing up fat data pointer, e.g.:
+// int* p;
+
+struct TDataPtr
+{
+	void* m_p;
+	void* m_pRangeBegin;
+	void* m_pRangeEnd;
+	size_t m_ScopeLevel;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// structure backing up formatting literal
+
+struct TFmtLiteral
+{
+	char* m_p;
+	size_t m_MaxLength;
+	size_t m_Length;
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

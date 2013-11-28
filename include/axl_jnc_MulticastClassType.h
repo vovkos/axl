@@ -127,5 +127,37 @@ protected:
 
 //.............................................................................
 
+// structures backing up multicast, e.g.:
+// mutlicast OnFire ();
+
+struct TMulticast: TInterface
+{
+	volatile intptr_t m_Lock;
+	size_t m_MaxCount;
+	size_t m_Count;
+	void* m_pPtrArray; // array of function closure, weak or unsafe pointers
+	void* m_pHandleTable;
+	
+	CFunction* 
+	GetMethod (EMulticastMethod Method)
+	{
+		return ((CMulticastClassType*) m_pObject->m_pType)->GetMethod (Method);
+	}
+	
+	void
+	Call ();
+
+	void
+	Call (intptr_t a);
+
+	void
+	Call (
+		intptr_t a1,
+		intptr_t a2
+		);
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

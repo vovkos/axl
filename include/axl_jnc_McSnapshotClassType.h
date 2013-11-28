@@ -96,5 +96,15 @@ protected:
 
 //.............................................................................
 
+// multicast snapshot returns function pointer with this closure:
+
+struct TMcSnapshot: TInterface
+{
+	size_t m_Count;
+	void* m_pPtrArray; // array of function closure or unsafe pointers
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

@@ -131,5 +131,19 @@ struct TFunctionPtrTypeTuple: rtl::TListLink
 
 //.............................................................................
 
+// structure backing up fat function pointers, e.g.:
+// int function* pfTest (int, int);
+// int function weak* pfTest (int, int);
+
+struct TInterface;
+
+struct TFunctionPtr
+{
+	void* m_pf;
+	TInterface* m_pClosure;
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

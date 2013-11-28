@@ -2,7 +2,7 @@ namespace log {
 
 //.............................................................................
 
-enumf EPacketCodeFlags
+fenum EPacketCodeFlags
 {
 	Foldable          = 0x80000000,
 	MergeableBackward = 0x40000000,
@@ -12,7 +12,7 @@ enumf EPacketCodeFlags
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enumf ELineAttrFlags
+fenum ELineAttrFlags
 {
 	TileIcon,
 	Delimiter,

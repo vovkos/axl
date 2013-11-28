@@ -334,6 +334,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_Type.h
 	${AXL_INC_DIR}/axl_jnc_TypeMgr.h
 	${AXL_INC_DIR}/axl_jnc_UnionType.h
+	${AXL_INC_DIR}/axl_jnc_VariantType.h
 	)
 
 set (
@@ -440,6 +441,7 @@ set (
 
 set (
 	RUNTIME_CPP_LIST
+	axl_jnc_Api.cpp
 	axl_jnc_MulticastLib.cpp
 	axl_jnc_Runtime.cpp
 	axl_jnc_StdLib.cpp

@@ -143,5 +143,15 @@ protected:
 
 //.............................................................................
 
+// structure backing up reactor bind site in reactor class
+
+struct TReactorBindSite
+{
+	TInterface* m_pOnChange;
+	intptr_t m_Cookie;
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

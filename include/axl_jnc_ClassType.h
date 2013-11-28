@@ -16,6 +16,7 @@ namespace jnc {
 
 class CClassPtrType;
 struct TClassPtrTypeTuple;
+struct TInterface;
 
 //.............................................................................
 
@@ -196,6 +197,12 @@ public:
 		return !m_VTable.IsEmpty ();
 	}
 
+	rtl::CArrayT <CBaseTypeSlot*> 
+	GetBaseTypePrimeArray ()
+	{
+		return m_BaseTypePrimeArray;
+	}
+
 	rtl::CArrayT <CStructField*>
 	GetClassMemberFieldArray ()
 	{
@@ -333,6 +340,84 @@ IsClassType (
 		pType->GetTypeKind () == EType_Class &&
 		((CClassType*) pType)->GetClassTypeKind () == ClassTypeKind;
 }
+
+//.............................................................................
+
+enum EObjectFlag
+{
+	EObjectFlag_Alive     = 0x0001,
+	EObjectFlag_Static    = 0x0010,
+	EObjectFlag_Stack     = 0x0020,
+	EObjectFlag_HeapU     = 0x0040,
+	EObjectFlag_Extern    = 0x0080,
+	EObjectFlag_GcMark    = 0x0100,
+	EObjectFlag_GcMark_wc = 0x0200, // weak closure (function or property ptr)
+};
+
+// master header of class instance
+
+struct TObject
+{
+	CClassType* m_pType; // for GC tracing & QueryInterface
+	size_t m_ScopeLevel;
+	uintptr_t m_Flags;
+	rtl::TListLink m_GcHeapLink; // objects allocated on gc heap get into a list
+
+	// followed by TInterface of object
+};
+
+class CObjectGcHeapLink
+{
+public:
+	rtl::TListLink*
+	operator () (TObject* pObject)
+	{
+		return &pObject->m_GcHeapLink;
+	}
+};
+
+// header of class interface
+
+struct TInterface
+{
+	void* m_pVTable;
+	TObject* m_pObject; // back pointer to master header
+
+	// followed by parents, then by interface data fields
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// interface with master header
+
+template <typename T>
+class CObjectT:
+	public TObject,
+	public T
+{
+public:
+	CObjectT ()
+	{
+		m_ScopeLevel = 0;
+		m_Flags = EObjectFlag_Alive | EObjectFlag_Extern;
+		this->m_pType = NULL;   // should be primed later
+		this->m_pObject = this; // thanks a log gcc
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef
+void
+FObject_Prime (TObject* pObject);
+
+typedef
+void
+FObject_Construct (TInterface* pInterface);
+
+typedef
+void	
+FObject_Destruct (TInterface* pInterface);
 
 //.............................................................................
 

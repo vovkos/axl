@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "axl_jnc_Module.h"
 #include "axl_jnc_Runtime.h"
 #include "axl_jnc_Api.h"
 #include "axl_jnc_MulticastLib.h"

@@ -8,6 +8,7 @@
 
 #include "axl_log_Representer.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_DataPtrType.h"
 #include "axl_jnc_Runtime.h"
 
 namespace axl {

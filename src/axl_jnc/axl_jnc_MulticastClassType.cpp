@@ -82,5 +82,56 @@ CMulticastClassType::EnumGcRoots (
 
 //.............................................................................
 
+void
+TMulticast::Call ()
+{
+	jnc::CFunction* pMethod = GetMethod (jnc::EMulticastMethod_Call);
+	
+	typedef 
+	void 
+	FCall (jnc::TMulticast*);
+
+	FCall* pf = (FCall*) pMethod->GetMachineCode ();
+	pf (this);
+}
+
+void
+TMulticast::Call (intptr_t a)
+{
+	jnc::CFunction* pMethod = GetMethod (jnc::EMulticastMethod_Call);
+	
+	typedef 
+	void 
+	FCall (
+		jnc::TMulticast*, 
+		intptr_t
+		);
+
+	FCall* pf = (FCall*) pMethod->GetMachineCode ();
+	pf (this, a);
+}
+
+void
+TMulticast::Call (
+	intptr_t a1,
+	intptr_t a2
+	)
+{
+	jnc::CFunction* pMethod = GetMethod (jnc::EMulticastMethod_Call);
+	
+	typedef 
+	void 
+	FCall (
+		jnc::TMulticast*, 
+		intptr_t,
+		intptr_t
+		);
+
+	FCall* pf = (FCall*) pMethod->GetMachineCode ();
+	pf (this, a1, a2);	
+}
+
+//.............................................................................
+	
 } // namespace jnc {
 } // namespace axl {

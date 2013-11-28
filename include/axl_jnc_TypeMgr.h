@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
+#include "axl_jnc_VariantType.h"
 #include "axl_jnc_ArrayType.h"
 #include "axl_jnc_BitFieldType.h"
 #include "axl_jnc_EnumType.h"

@@ -6,6 +6,7 @@
 
 #include "axl_jnc_TlsMgr.h"
 #include "axl_jnc_Value.h"
+#include "axl_jnc_ClassType.h"
 #include "axl_mt_TlsSlot.h"
 #include "axl_mt_Event.h"
 #include "axl_mt_Thread.h"
