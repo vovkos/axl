@@ -119,6 +119,13 @@ protected:
 	virtual
 	void
 	PrepareLlvmDiType ();
+
+	virtual
+	bool
+	CalcLayout ()
+	{
+		return m_pTargetType->EnsureLayout ();	
+	}
 };
 
 //.............................................................................

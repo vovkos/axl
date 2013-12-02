@@ -852,7 +852,7 @@ curly_initializer_item <TCurlyInitializer* $pInitializer>
 	{
 		CValue PrevCurlyInitializerTargetValue;
 	}
-	:	resolver ({ return true; })
+	:	resolver (EToken_Identifier '=')
 		EToken_Identifier $n '='
 			{
 				return PrepareCurlyInitializerNamedItem ($pInitializer, $n.m_Data.m_String);

@@ -161,4 +161,3 @@ struct TPropertyPtr
 
 } // namespace jnc {
 } // namespace axl {
-

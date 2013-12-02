@@ -240,7 +240,15 @@ protected:
 		uint_t* pLlvmIndex
 		)
 	{
-		return LayoutField (pType->GetLlvmType (), pType->GetSize (), pType->GetAlignFactor (), pOffset, pLlvmIndex);
+		return 
+			pType->EnsureLayout () &&
+			LayoutField (
+				pType->GetLlvmType (), 
+				pType->GetSize (), 
+				pType->GetAlignFactor (), 
+				pOffset, 
+				pLlvmIndex
+				);
 	}
 
 	bool
