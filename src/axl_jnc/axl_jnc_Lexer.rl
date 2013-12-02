@@ -282,7 +282,8 @@ dec+ ('.' dec+) | ([Ee] [+\-]? dec+)
 ','              { if (!OnComma ()) fcall fmt_spec; };
 
 ws | nl          ;
-any              { CreateToken (ts [0]); };
+print            { CreateToken (ts [0]); };
+any              { CreateErrorToken (ts [0]); };
 
 *|;
 
@@ -296,19 +297,10 @@ CLexer::Init ()
 	%% write init;
 }
 
-bool
+void
 CLexer::Exec ()
 {
 	%% write exec;
-
-	bool Result = cs != axl_jnc_error;
-	if (!Result)
-	{
-		CToken* pToken = CreateToken (EToken_Error);
-		pToken->m_Data.m_Error.CreateStringError ("lexer error");
-	}
-
-	return Result;
 }
 
 //.............................................................................

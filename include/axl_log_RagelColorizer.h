@@ -138,7 +138,7 @@ protected:
 	// {
 	// }
 
-	// bool
+	// void
 	// Exec ()
 	// {
 	// }

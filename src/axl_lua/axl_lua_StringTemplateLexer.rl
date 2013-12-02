@@ -76,19 +76,10 @@ CLexer::Init ()
 	%% write init;
 }
 
-bool
+void
 CLexer::Exec ()
 {
 	%% write exec;
-
-	bool Result = cs != axl_lua_st_error;
-	if (!Result)
-	{
-		err::SetStringError ("lexer error");
-		return false;
-	}
-
-	return Result;
 }
 
 int

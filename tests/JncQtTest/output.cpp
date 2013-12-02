@@ -17,9 +17,10 @@ Output::Output(QWidget *parent)
 void Output::mouseDoubleClickEvent(QMouseEvent *e)
 {
 	int documentLine;
+	int documentCol;
 	QString filePath;
 
-	if(parseLine(textCursor(), documentLine, filePath))
+	if(parseLine(textCursor(), documentLine, documentCol, filePath))
 	{	
 		MdiChild *child = GetMainWindow()->findMdiChild(filePath);
 		if (child)
@@ -27,7 +28,7 @@ void Output::mouseDoubleClickEvent(QMouseEvent *e)
 			QColor foreColor(Qt::white);
 			highlightSingleLine(textCursor(), LINE_SELECTION_BACK, &foreColor);
 
-			child->selectLine(documentLine);
+			child->selectLineCol(documentLine, documentCol);
 			child->setFocus();
 
 			e->ignore();
@@ -40,24 +41,26 @@ void Output::mouseDoubleClickEvent(QMouseEvent *e)
 	}
 }
 
-bool Output::parseLine(const QTextCursor &cursor, int &documentLine,
-	QString &filePath)
+bool Output::parseLine(
+	const QTextCursor &cursor, 
+	int &documentLine,
+	int &documentCol,
+	QString &filePath
+	)
 {
 	QString text = cursor.block().text();
 
-	QRegExp regExp("\\((\\d)+,(\\d)+\\):");
+	QRegExp regExp("\\(([0-9]+),([0-9]+)\\):");
 	int pos = regExp.indexIn(text);
-
 	if(pos == -1)
 		return false;
 
 	filePath = text.left(pos);
-
-	QString matchedText = regExp.capturedTexts().first();
-	QString lineNumber = matchedText.left(matchedText.indexOf(','));
-	lineNumber.remove(0, 1);
-
+	QString lineNumber = regExp.capturedTexts ().at (1);
+	QString colNumber = regExp.capturedTexts ().at (2);
+	
 	documentLine = lineNumber.toInt() - 1;
+	documentCol = colNumber.toInt() - 1;
 
 	return true;
 }

@@ -1852,6 +1852,7 @@ CParser::NewOperator_s (
 bool
 CParser::LookupIdentifier (
 	const rtl::CString& Name,
+	const CToken::CPos& Pos,
 	CValue* pValue
 	)
 {
@@ -1864,13 +1865,14 @@ CParser::LookupIdentifier (
 	pItem = pNamespace->FindItemTraverse (Name, &Coord);
 	if (!pItem)
 	{
-		if (Name == "__ScopeLevel") // tmp
+		if (Name == "__scopeLevel") // tmp
 			return m_pModule->m_OperatorMgr.CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope (), pValue);
 
 		err::SetFormatStringError ("undeclared identifier '%s'", Name.cc ());
+		err::PushSrcPosError (m_pModule->m_UnitMgr.GetCurrentUnit ()->GetFilePath (), Pos);
 		return false;
 	}
-
+	
 	CValue ThisValue;
 
 	EModuleItem ItemKind = pItem->GetItemKind ();
@@ -2010,6 +2012,7 @@ CParser::LookupIdentifier (
 bool
 CParser::LookupIdentifierType (
 	const rtl::CString& Name,
+	const CToken::CPos& Pos,
 	CValue* pValue
 	)
 {
@@ -2022,6 +2025,7 @@ CParser::LookupIdentifierType (
 	if (!pItem)
 	{
 		err::SetFormatStringError ("undeclared identifier '%s'", Name.cc ());
+		err::PushSrcPosError (m_pModule->m_UnitMgr.GetCurrentUnit ()->GetFilePath (), Pos);
 		return false;
 	}
 

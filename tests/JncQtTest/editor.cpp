@@ -53,6 +53,17 @@ void Editor::selectLine(int line, bool isHighlighted)
 	setTextCursor(cursor);
 }
 
+void Editor::selectLineCol(int line, int col)
+{
+	QTextCursor cursor = textCursor();
+
+	cursor.setPosition(0);
+	cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line);
+	cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, col);
+
+	setTextCursor(cursor);
+}
+
 int Editor::posFromLine(int line)
 {
 	QTextCursor cursor = textCursor();

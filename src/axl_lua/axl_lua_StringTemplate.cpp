@@ -99,7 +99,7 @@ ExtractUserCode (
 		pToken = pLexer->GetToken ();
 		if (pToken->m_Token == EToken_Error)
 		{
-			err::SetError (pToken->m_Data.m_Error);
+			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
 			return false;
 		}
 		else if (pToken->m_Token == EToken_Eof)
@@ -158,7 +158,7 @@ CStringTemplate::ExtractLuaSource (
 		
 		if (pToken->m_Token == EToken_Error)
 		{
-			err::SetError (pToken->m_Data.m_Error);
+			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
 			return false;
 		}
 

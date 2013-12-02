@@ -340,12 +340,14 @@ Members2
 	bool
 	LookupIdentifier (
 		const rtl::CString& Name,
+		const CToken::CPos& Pos,
 		CValue* pValue
 		);
 
 	bool
 	LookupIdentifierType (
 		const rtl::CString& Name,
+		const CToken::CPos& Pos,
 		CValue* pValue
 		);
 

@@ -104,7 +104,6 @@ public:
 	};
 
 	rtl::CString m_String;
-	err::CError m_Error;
 
 public:
 	CStdTokenData ()

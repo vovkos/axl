@@ -18,8 +18,12 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent *e);
 
 private:
-	bool parseLine(const QTextCursor &cursor, int &documentLine,
-		QString &filePath);
+	bool parseLine(
+		const QTextCursor &cursor, 
+		int &documentLine,
+		int &documentCol,
+		QString &filePath
+		);
 };
 
 #endif

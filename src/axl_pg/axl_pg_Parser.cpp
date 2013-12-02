@@ -626,7 +626,7 @@ CParser::ProcessFormalArgList (CSymbolNode* pNode)
 
 		if (pToken->m_Token == EToken_Error)
 		{
-			err::SetError (pToken->m_Data.m_Error);
+			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
 			return false;
 		}
 
@@ -756,7 +756,7 @@ CParser::ProcessSymbolEventHandler (
 				break;
 			}
 
-			err::SetFormatStringError ("undeclared identifier '%s'", pToken->m_Token);
+			err::SetFormatStringError ("undeclared identifier '%s'", pToken->m_Data.m_String.cc ());
 			return false;
 
 		case EToken_Integer:
@@ -1331,7 +1331,7 @@ CParser::UserCode (
 		}
 		else if (pToken->m_Token == EToken_Error)
 		{
-			err::SetError (pToken->m_Data.m_Error);
+			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
 			return false;
 		}
 		else if (pToken->m_Token == OpenBracket)

@@ -98,21 +98,9 @@ public:
 			rtl::CBoxIteratorT <CToken> Tail = m_TokenList.GetTail ();
 
 			size_t OldCount = m_TokenList.GetCount ();
-
-			do
-			{
-				bool Result = ((T*) (this))->Tokenize ();
-				if (!Result)
-				{
-					if (m_TokenList.IsEmpty () || m_TokenList.GetTail ()->m_Token >= 0)
-					{
-						CToken* pToken = AllocateToken ();
-						pToken->m_Token = (EToken) -1;
-						pToken->m_Data.m_Error = err::GetError ();
-					}
-
-					break;
-				}
+			do 
+			{			
+				((T*) (this))->Tokenize ();
 			} while (m_TokenList.GetCount () == OldCount);
 
 			It = Tail ? Tail + 1 : m_TokenList.GetHead ();

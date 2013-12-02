@@ -285,6 +285,11 @@ protected:
 		pe = p + 1;
 	}
 
+	void 
+	OnLexerError ()
+	{	
+	}
+	
 	TToken*
 	PreCreateToken (
 		int Token,
@@ -324,6 +329,15 @@ protected:
 		return pToken;
 	}
 
+	TToken*
+	CreateErrorToken (int Char)
+	{
+		TToken* pToken = CreateToken (-1);
+		pToken->m_Data.m_Integer = Char;
+		PostCreateToken ();
+		return pToken;
+	}
+	
 	void 
 	OnReset ()
 	{
@@ -347,21 +361,21 @@ protected:
 		m_Stack.Clear ();
 	}
 
-	bool
+	void
 	Tokenize ()
 	{
 		if (p != eof) 
 		{
 			pe = eof;
 			m_TokenizeCount = 0;
-			return static_cast <T*> (this)->Exec ();
+			static_cast <T*> (this)->Exec ();
 		}
-
-		// add eof token
-
-		ts = te = p;
-		CreateToken (0);
-		return true;
+		else
+		{
+			// add eof token
+			ts = te = p;
+			CreateToken (0);
+		}
 	}
 
 
@@ -372,7 +386,7 @@ protected:
 	// {
 	// }
 
-	// bool
+	// void
 	// Exec ()
 	// {
 	// }

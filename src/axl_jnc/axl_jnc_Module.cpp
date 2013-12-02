@@ -185,21 +185,25 @@ CModule::Parse (
 {
 	bool Result;
 
-	jnc::CScopeThreadModule ScopeModule (this);
+	CScopeThreadModule ScopeModule (this);
 
 	m_UnitMgr.CreateUnit (pFilePath);
 
-	jnc::CLexer Lexer;
+	CLexer Lexer;
 	Lexer.Create (pFilePath, pSource, Length);
 
-	jnc::CParser Parser;
-	Parser.Create (jnc::CParser::StartSymbol, true);
+	CParser Parser;
+	Parser.Create (CParser::StartSymbol, true);
 
 	for (;;)
 	{
-		const jnc::CToken* pToken = Lexer.GetToken ();
-		if (pToken->m_Token == jnc::EToken_Eof)
-			break;
+		const CToken* pToken = Lexer.GetToken ();
+		if (pToken->m_Token == EToken_Error)
+		{
+			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
+			err::PushSrcPosError (pFilePath, pToken->m_Pos);
+			return false;			
+		}
 
 		Result = Parser.ParseToken (pToken);
 		if (!Result)
@@ -208,6 +212,9 @@ CModule::Parse (
 			return false;
 		}
 
+		if (pToken->m_Token == EToken_Eof) // EOF token must be parsed
+			break;		
+		
 		Lexer.NextToken ();
 	}
 

@@ -62,7 +62,8 @@ lit_dq         ;
 '.}'           { CreateToken (EToken_CloseBrace); };
 '<.'           { CreateToken (EToken_OpenChevron); };
 '.>'           { CreateToken (EToken_CloseChevron); };
-any | nl       ;
+nl             ;
+any            ;
 
 *|;
 
@@ -84,7 +85,8 @@ lit_dq         ;
 '.}'           { CreateToken (EToken_CloseBrace); };
 '<.'           { CreateToken (EToken_OpenChevron); };
 '.>'           { CreateToken (EToken_CloseChevron); };
-any | nl       ;
+nl             ;
+any            ;
 
 *|;
 
@@ -94,11 +96,6 @@ any | nl       ;
 #
 
 main := |*
-
-'//' [^\n]*    ;
-'/*' (any | nl)* :>> '*/' ;
-ws             ;
-nl             ;
 
 'LL'           { CreateToken (EToken_LL); };
 'import'       { CreateToken (EToken_Import); };
@@ -116,12 +113,19 @@ nl             ;
 'any'          { CreateToken (EToken_Any); };
 'epsilon'      { CreateToken (EToken_Epsilon); };
 'nullable'     { CreateToken (EToken_Nullable); };
+
 lit_sq         { CreateCharToken (EToken_Integer); };
 lit_dq         { CreateStringToken (EToken_Literal, 1, 1); };
 id             { CreateStringToken (EToken_Identifier); };
 dec+           { CreateIntegerToken (10); };
 '0' [Xx] hex+  { CreateIntegerToken (16, 2); };
-any            { CreateToken (ts [0]); };
+
+'//' [^\n]*    ;
+'/*' (any | nl)* :>> '*/' ;
+
+ws | nl        ;
+print          { CreateToken (ts [0]); };
+any            { CreateErrorToken (ts [0]); };
 
 *|;
 
@@ -135,19 +139,10 @@ CLexer::Init ()
 	%% write init;
 }
 
-bool
+void
 CLexer::Exec ()
 {
 	%% write exec;
-
-	bool Result = cs != axl_pg_error;
-	if (!Result)
-	{
-		CToken* pToken = CreateToken (EToken_Error);
-		pToken->m_Data.m_Error.CreateStringError ("lexer error");
-	}
-
-	return Result;
 }
 
 int

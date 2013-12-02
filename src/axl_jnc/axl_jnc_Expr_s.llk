@@ -416,7 +416,7 @@ primary_expr_s <CValue* $pValue>
 	}
 	:	EToken_Identifier
 			{
-				return LookupIdentifierType ($1.m_Data.m_String, $pValue);
+				return LookupIdentifierType ($1.m_Data.m_String, $1.m_Pos, $pValue);
 			}
 	|	EToken_This
 			{

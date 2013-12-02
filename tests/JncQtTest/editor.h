@@ -13,6 +13,7 @@ public:
 
 	void select(int startPos, int endPos);
 	void selectLine(int line, bool isHighlighted = false);	
+	void selectLineCol(int line, int col);	
 
 	int posFromLine(int line);
 

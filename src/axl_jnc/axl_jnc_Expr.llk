@@ -733,7 +733,7 @@ primary_expr <CValue* $pValue>
 	|	literal <$pValue>
 	|	EToken_Identifier
 			{
-				return LookupIdentifier ($1.m_Data.m_String, $pValue);
+				return LookupIdentifier ($1.m_Data.m_String, $1.m_Pos, $pValue);
 			}
 	|	EToken_This
 			{

@@ -595,7 +595,7 @@ protected:
 	void
 	Init ();
 
-	bool
+	void
 	Exec ();
 };
 
