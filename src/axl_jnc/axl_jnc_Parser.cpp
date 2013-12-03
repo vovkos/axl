@@ -1872,7 +1872,7 @@ CParser::LookupIdentifier (
 		err::PushSrcPosError (m_pModule->m_UnitMgr.GetCurrentUnit ()->GetFilePath (), Pos);
 		return false;
 	}
-	
+
 	CValue ThisValue;
 
 	EModuleItem ItemKind = pItem->GetItemKind ();
