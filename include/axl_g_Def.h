@@ -322,6 +322,4 @@ private: \
 #	pragma GCC diagnostic ignored "-Wmultichar"
 #endif
 
-
 //.............................................................................
-

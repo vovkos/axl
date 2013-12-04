@@ -34,10 +34,12 @@ struct TJancyRepresenterTargetVTable
 	FJancyRepresenterTarget_AddPart* m_pfAddPart;
 };
 
+#pragma pack (8)
+
 struct TJancyRepresenterTarget: jnc::TInterface
 {
-	uint_t m_PacketCode;
 	uint64_t m_Timestamp;
+	uint_t m_PacketCode;
 	TLineAttr m_LineAttr;
 
 	CRepresenterTarget* m_pActualTarget;

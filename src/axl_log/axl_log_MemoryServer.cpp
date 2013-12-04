@@ -37,9 +37,9 @@ CMemoryServer::Create (
 }
 
 void
-CMemoryServer::SendMsg (const TMsg* pMsgHdr)
+CMemoryServer::SendMsg (const TMsg* pMsg0)
 {
-	switch (pMsgHdr->m_MsgKind)
+	switch (pMsg0->m_MsgKind)
 	{
 	case ESrvMsg_Clear:
 	case ESrvMsg_WritePacket:
@@ -53,18 +53,18 @@ CMemoryServer::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ESrvMsg_SetBinDataConfig:
-		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_SetBinDataConfig))
+		if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_SetBinDataConfig))
 		{
-			TSrvMsg_SetBinDataConfig* pMsg = (TSrvMsg_SetBinDataConfig*) pMsgHdr;
+			TSrvMsg_SetBinDataConfig* pMsg = (TSrvMsg_SetBinDataConfig*) pMsg0;
 			m_BinDataConfig = pMsg->m_BinDataConfig; // wait until rebuild
 		}
 
 		break;
 
 	case ESrvMsg_RepresentPage:
-		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
+		if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
 		{
-			TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsgHdr;
+			TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsg0;
 
 			if (pMsg->m_SyncId == m_SyncId)
 				ProcessRepresentPage (&pMsg->m_IndexLeaf);
@@ -86,9 +86,9 @@ CMemoryServer::ProcessRebuild ()
 	RepresenterTarget.AddBin (m_p, m_Size);
 
 	m_pClientPeer->CreateIndexLeaf (
-		0, 
-		&m_BinDataConfig, 
-		RepresenterTarget.m_LineCount, 
+		0,
+		&m_BinDataConfig,
+		RepresenterTarget.m_LineCount,
 		0, 1, 0, 0, 0
 		);
 }
@@ -102,17 +102,17 @@ CMemoryServer::ProcessRepresentPage (const log::TIndexLeaf* pIndexLeaf)
 	RepresenterTarget.m_pLinePool = &m_LinePool;
 	RepresenterTarget.m_pLineBuffer = &m_LineBuffer;
 	RepresenterTarget.m_pPageBuffer = &m_PageBuffer;
-	
+
 	RepresenterTarget.m_IsFirstLineOfPacket = true;
 	RepresenterTarget.m_Timestamp = m_Timestamp;
 	RepresenterTarget.AddBin (m_p, m_Size);
 	RepresenterTarget.SaveCurrentLine ();
 
 	m_pClientPeer->RepresentPageComplete (
-		m_SyncId, 
-		0, 
-		0, 
-		(size_t) pIndexLeaf->m_LineCount, 
+		m_SyncId,
+		0,
+		0,
+		(size_t) pIndexLeaf->m_LineCount,
 		0, NULL, 0, // foldable packets
 		m_PageBuffer,
 		m_PageBuffer.GetCount ()
@@ -121,6 +121,6 @@ CMemoryServer::ProcessRepresentPage (const log::TIndexLeaf* pIndexLeaf)
 
 //.............................................................................
 
-} // namespace log 
+} // namespace log
 } // namespace axl
 

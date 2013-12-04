@@ -29,7 +29,7 @@ CServer::Create (
 
 	Stop ();
 
-	Result = 
+	Result =
 		m_PacketFile.Open (pPacketFilePath, axl::io::EFileFlag_ShareWrite) &&
 		m_PacketFile_w.Open (pPacketFilePath, axl::io::EFileFlag_ShareWrite) &&
 		m_MergeFile.Open (pMergeFilePath, io::EFileFlag_DeleteOnClose) &&
@@ -37,7 +37,7 @@ CServer::Create (
 
 	if (!Result)
 		return false;
-	
+
 	m_Flags = EFlag_Running | EFlag_Rebuild;
 	m_pClientPeer = pClientPeer;
 	m_pRepresenter = pRepresenter;
@@ -76,9 +76,9 @@ CServer::Stop ()
 }
 
 void
-CServer::SendMsg (const TMsg* pMsgHdr)
+CServer::SendMsg (const TMsg* pMsg0)
 {
-	switch (pMsgHdr->m_MsgKind)
+	switch (pMsg0->m_MsgKind)
 	{
 	case ESrvMsg_Clear:
 		m_Lock.Lock ();
@@ -104,12 +104,12 @@ CServer::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ESrvMsg_SetBinDataConfig:
-		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_SetBinDataConfig))
+		if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_SetBinDataConfig))
 		{
-			TSrvMsg_SetBinDataConfig* pMsg = (TSrvMsg_SetBinDataConfig*) pMsgHdr;
+			TSrvMsg_SetBinDataConfig* pMsg = (TSrvMsg_SetBinDataConfig*) pMsg0;
 
 			m_Lock.Lock ();
-			m_BinDataConfig = pMsg->m_BinDataConfig; 
+			m_BinDataConfig = pMsg->m_BinDataConfig;
 			m_Flags |= EFlag_Update;
 			m_IoThreadEvent.Signal ();
 			m_Lock.Unlock ();
@@ -118,9 +118,9 @@ CServer::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ESrvMsg_WritePacket:
-		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_WritePacket))
+		if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_WritePacket))
 		{
-			TSrvMsg_WritePacket* pMsg = (TSrvMsg_WritePacket*) pMsgHdr;
+			TSrvMsg_WritePacket* pMsg = (TSrvMsg_WritePacket*) pMsg0;
 			if (pMsg->m_MsgSize < sizeof (TSrvMsg_WritePacket) + pMsg->m_DataSize)
 				break;
 
@@ -134,11 +134,11 @@ CServer::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ESrvMsg_RepresentPage:
-		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
+		if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
 		{
-			TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsgHdr;
+			TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsg0;
 			size_t FoldFlagArraySize = pMsg->m_IndexLeaf.m_FoldablePacketCount * sizeof (uint64_t);
-			
+
 			if (pMsg->m_MsgSize < sizeof (TSrvMsg_RepresentPage) + FoldFlagArraySize)
 				break;
 
@@ -154,10 +154,10 @@ CServer::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ESrvMsg_FoldPacket:
-		if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_FoldPacket))
+		if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_FoldPacket))
 		{
-			rtl::TListLink* pEntry = AXL_MEM_NEW_EXTRA (rtl::TListLink, pMsgHdr->m_MsgSize);
-			memcpy (pEntry + 1, pMsgHdr, pMsgHdr->m_MsgSize);
+			rtl::TListLink* pEntry = AXL_MEM_NEW_EXTRA (rtl::TListLink, pMsg0->m_MsgSize);
+			memcpy (pEntry + 1, pMsg0, pMsg0->m_MsgSize);
 
 			m_Lock.Lock ();
 			m_IoThreadMsgList.InsertTail (pEntry);
@@ -197,7 +197,7 @@ CServer::IoThreadProc ()
 		m_Flags &= ~(EFlag_Clear | EFlag_Rebuild | EFlag_Update);
 
 		TPacketFileHdr PacketFileHdrSnapshot = *m_PacketFile.GetHdr ();
-		
+
 		rtl::CStdListT <rtl::TListLink> MsgListSnapshot;
 		MsgListSnapshot.TakeOver (&m_IoThreadMsgList);
 
@@ -240,17 +240,17 @@ CServer::IoThreadProc ()
 		m_ColorizeMgr.UpdateColorizerStateFile ();
 
 		// represent
-		
+
 		while (!MsgListSnapshot.IsEmpty ())
 		{
 			rtl::TListLink* pEntry = MsgListSnapshot.RemoveHead ();
-			TMsg* pMsgHdr = (TMsg*) (pEntry + 1);
-			switch (pMsgHdr->m_MsgKind)
+			TMsg* pMsg0 = (TMsg*) (pEntry + 1);
+			switch (pMsg0->m_MsgKind)
 			{
 			case ESrvMsg_RepresentPage:
-				if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
+				if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_RepresentPage))
 				{
-					TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsgHdr;
+					TSrvMsg_RepresentPage* pMsg = (TSrvMsg_RepresentPage*) pMsg0;
 					if (pMsg->m_SyncId == SyncId)
 						m_LineRepresentMgr.RepresentPage (
 							SyncId,
@@ -261,9 +261,9 @@ CServer::IoThreadProc ()
 				break;
 
 			case ESrvMsg_FoldPacket:
-				if (pMsgHdr->m_MsgSize >= sizeof (TSrvMsg_FoldPacket))
+				if (pMsg0->m_MsgSize >= sizeof (TSrvMsg_FoldPacket))
 				{
-					TSrvMsg_FoldPacket* pMsg = (TSrvMsg_FoldPacket*) pMsgHdr;
+					TSrvMsg_FoldPacket* pMsg = (TSrvMsg_FoldPacket*) pMsg0;
 					if (pMsg->m_SyncId == SyncId)
 					{
 						size_t NewLineCount = m_LineRepresentMgr.RepresentFoldablePacket (
@@ -294,6 +294,6 @@ CServer::IoThreadProc ()
 
 //.............................................................................
 
-} // namespace log 
+} // namespace log
 } // namespace axl
 

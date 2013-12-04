@@ -104,50 +104,50 @@ CWidget::Create (
 }
 
 void
-CWidget::SendMsg (const TMsg* pMsgHdr)
+CWidget::SendMsg (const TMsg* pMsg0)
 {
-	switch (pMsgHdr->m_MsgKind)
+	switch (pMsg0->m_MsgKind)
 	{
 	case ECliMsg_ClearCache:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_ClearCache))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_ClearCache))
 		{
-			TCliMsg_ClearCache* pMsg = (TCliMsg_ClearCache*) pMsgHdr;
+			TCliMsg_ClearCache* pMsg = (TCliMsg_ClearCache*) pMsg0;
 			PostThreadMsg (ECliMsg_ClearCache, ref::CPtrT <void> ((void*) (size_t) pMsg->m_SyncId, (ref::CRefCount*) NULL));
 		}
 
 		break;
 
 	case ECliMsg_FilterProgress:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
-			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
+			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsg0;
 			PostThreadMsg (ECliMsg_FilterProgress, ref::CPtrT <void> ((void*) (size_t) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
 
 	case ECliMsg_IndexProgress:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
-			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
+			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsg0;
 			PostThreadMsg (ECliMsg_IndexProgress, ref::CPtrT <void> ((void*) (size_t) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
 
 	case ECliMsg_ColorizeProgress:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_Progress))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_Progress))
 		{
-			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsgHdr;
+			TCliMsg_Progress* pMsg = (TCliMsg_Progress*) pMsg0;
 			PostThreadMsg (ECliMsg_ColorizeProgress, ref::CPtrT <void> ((void*) (size_t) pMsg->m_Percentage, (ref::CRefCount*) NULL));
 		}
 
 		break;
 
 	case ECliMsg_CreateIndexLeaf:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_CreateIndexLeaf))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_CreateIndexLeaf))
 		{
-			TCliMsg_CreateIndexLeaf* pMsg = (TCliMsg_CreateIndexLeaf*) pMsgHdr;
+			TCliMsg_CreateIndexLeaf* pMsg = (TCliMsg_CreateIndexLeaf*) pMsg0;
 			ref::CPtrT <TCliMsg_CreateIndexLeaf> Params = AXL_REF_NEW (ref::CBoxT <TCliMsg_CreateIndexLeaf>);
 			*Params = *pMsg;
 			PostThreadMsg (ECliMsg_CreateIndexLeaf, Params);
@@ -156,9 +156,9 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ECliMsg_UpdateIndexTailLeaf:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_UpdateIndexTailLeaf))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_UpdateIndexTailLeaf))
 		{
-			TCliMsg_UpdateIndexTailLeaf* pMsg = (TCliMsg_UpdateIndexTailLeaf*) pMsgHdr;
+			TCliMsg_UpdateIndexTailLeaf* pMsg = (TCliMsg_UpdateIndexTailLeaf*) pMsg0;
 			ref::CPtrT <TCliMsg_UpdateIndexTailLeaf> Params = AXL_REF_NEW (ref::CBoxT <TCliMsg_UpdateIndexTailLeaf>);
 			*Params = *pMsg;
 			PostThreadMsg (ECliMsg_UpdateIndexTailLeaf, Params);
@@ -167,9 +167,9 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ECliMsg_RepresentPageComplete:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_RepresentPageComplete))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_RepresentPageComplete))
 		{
-			TCliMsg_RepresentPageComplete* pMsg = (TCliMsg_RepresentPageComplete*) pMsgHdr;
+			TCliMsg_RepresentPageComplete* pMsg = (TCliMsg_RepresentPageComplete*) pMsg0;
 			size_t ExtraSize = pMsg->m_FoldablePacketCount * sizeof (TFoldablePacket) + pMsg->m_LineBufferSize;
 
 			if (pMsg->m_MsgSize < sizeof (TCliMsg_RepresentPageComplete) + ExtraSize)
@@ -184,9 +184,9 @@ CWidget::SendMsg (const TMsg* pMsgHdr)
 		break;
 
 	case ECliMsg_FoldPacketComplete:
-		if (pMsgHdr->m_MsgSize >= sizeof (TCliMsg_FoldPacketComplete))
+		if (pMsg0->m_MsgSize >= sizeof (TCliMsg_FoldPacketComplete))
 		{
-			TCliMsg_FoldPacketComplete* pMsg = (TCliMsg_FoldPacketComplete*) pMsgHdr;
+			TCliMsg_FoldPacketComplete* pMsg = (TCliMsg_FoldPacketComplete*) pMsg0;
 			size_t ExtraSize = pMsg->m_LineBufferSize;
 
 			if (pMsg->m_MsgSize < sizeof (TCliMsg_RepresentPageComplete) + ExtraSize)

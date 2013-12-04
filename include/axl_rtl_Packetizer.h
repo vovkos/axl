@@ -16,7 +16,7 @@ namespace rtl {
 class CPacketizerRoot
 {
 protected:
-	enum 
+	enum
 	{
 		EPacketHdr_Signature = ':kap',
 	};
@@ -63,7 +63,7 @@ public:
 			size_t Taken = WriteImpl (p, Size);
 			if (Taken == -1)
 				break;
-			
+
 			ASSERT (m_Buffer.GetCount () >= sizeof (uint64_t));
 			size_t DataSize = m_Buffer.GetCount () - sizeof (uint64_t);
 			if (DataSize)
