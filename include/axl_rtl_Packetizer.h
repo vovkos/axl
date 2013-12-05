@@ -18,7 +18,7 @@ class CPacketizerRoot
 protected:
 	enum
 	{
-		EPacketHdr_Signature = ':kap',
+		EPacketHdr_Signature = 'kap\x02',
 	};
 
 protected:

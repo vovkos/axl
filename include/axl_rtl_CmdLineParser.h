@@ -54,13 +54,21 @@ public:
 	typedef typename TSwitchTable::ESwitch ESwitch;
 
 protected:
+	enum EFlag
+	{
+		EFlag_Forward = 0x01,
+	};
+
+protected:
 	ESwitch m_ValueSwitch;
 	rtl::CString m_ValueSwitchName;
+	uint_t m_Flags;
 
 public:
 	CCmdLineParserT ()
 	{
 		m_ValueSwitch = (ESwitch) 0;
+		m_Flags = 0;
 	}
 
 	bool
@@ -92,7 +100,8 @@ public:
 			if (Arg.IsEmpty ())
 				break;
 
-			Result =
+			Result = (m_Flags & EFlag_Forward) ?
+				static_cast <T*> (this)->OnValue (Arg) :
 				ParseArg (Arg, &SwitchName, &Value) &&
 				ProcessArg (i, SwitchName, Value);
 
@@ -130,8 +139,11 @@ public:
 
 		for (int i = 0; i < argc; i++)
 		{
-			Result =
-				ParseArg (argv [i], &SwitchName, &Value) &&
+			const char* pArg = argv [i];
+
+			Result = (m_Flags & EFlag_Forward) ?
+				static_cast <T*> (this)->OnValue (pArg) :
+				ParseArg (pArg, &SwitchName, &Value) &&
 				ProcessArg (i, SwitchName, Value);
 
 			if (!Result)
@@ -154,8 +166,11 @@ public:
 
 		for (int i = 0; i < argc; i++)
 		{
-			Result =
-				ParseArg (rtl::CString (argv [i]), &SwitchName, &Value) &&
+			rtl::CString Arg = argv [i];
+
+			Result = (m_Flags & EFlag_Forward) ?
+				static_cast <T*> (this)->OnValue (Arg) :
+				ParseArg (Arg, &SwitchName, &Value) &&
 				ProcessArg (i, SwitchName, Value);
 
 			if (!Result)

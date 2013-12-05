@@ -15,7 +15,6 @@ namespace rtl {
 
 struct TProtoMsg
 {
-	uint32_t m_Size;
 	uint32_t m_Code;
 };
 
@@ -78,14 +77,18 @@ public:
 	void
 	SendMsg (
 		const TProtoMsg* pMsg,
-		const void* p,
-		size_t Size
+		size_t MsgSize,
+		const void* pExtra,
+		size_t ExtraSize
 		) = 0;
 
 	void
-	SendMsg (const TProtoMsg* pMsg)
+	SendMsg (
+		const TProtoMsg* pMsg,
+		size_t MsgSize
+		)
 	{
-		SendMsg (pMsg, NULL, 0);
+		SendMsg (pMsg, MsgSize, NULL, 0);
 	}
 };
 
@@ -98,9 +101,8 @@ public:
 	Sender () \
 	{ \
 		axl::rtl::TProtoMsg Msg; \
-		Msg.m_Size = sizeof (Msg); \
 		Msg.m_Code = Code; \
-		SendMsg (&Msg); \
+		SendMsg (&Msg, sizeof (Msg)); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_0_STR(Code, Sender, StrArg) \
@@ -109,9 +111,8 @@ public:
 	{ \
 		size_t Length = StrArg ? strlen (StrArg) : 0; \
 		axl::rtl::TProtoMsg Msg; \
-		Msg.m_Size = sizeof (Msg) + Length; \
 		Msg.m_Code = Code; \
-		SendMsg (&Msg, StrArg, Length); \
+		SendMsg (&Msg, sizeof (Msg), StrArg, Length); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_0_PTR(Code, Sender, PtrArg, SizeArg) \
@@ -122,9 +123,8 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsg Msg; \
-		Msg.m_Size = sizeof (Msg) + SizeArg; \
 		Msg.m_Code = Code; \
-		SendMsg (&Msg, PtrArg, SizeArg); \
+		SendMsg (&Msg, sizeof (Msg), PtrArg, SizeArg); \
 	}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -134,10 +134,9 @@ public:
 	Sender (T1 Arg1) \
 	{ \
 		axl::rtl::TProtoMsgT_1 <T1> Msg; \
-		Msg.m_Size = sizeof (Msg); \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
-		SendMsg (&Msg); \
+		SendMsg (&Msg, sizeof (Msg)); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_1_STR(Code, Sender, T1, Arg1, StrArg) \
@@ -149,10 +148,9 @@ public:
 	{ \
 		size_t Length = StrArg ? strlen (StrArg) : 0; \
 		axl::rtl::TProtoMsgT_1 <T1> Msg; \
-		Msg.m_Size = sizeof (Msg) + Length; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
-		SendMsg (&Msg, StrArg, Length); \
+		SendMsg (&Msg, sizeof (Msg), StrArg, Length); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_1_PTR(Code, Sender, T1, Arg1, PtrArg, SizeArg) \
@@ -164,10 +162,9 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_1 <T1> Msg; \
-		Msg.m_Size = sizeof (Msg) + SizeArg; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
-		SendMsg (&Msg, PtrArg, SizeArg); \
+		SendMsg (&Msg, sizeof (Msg), PtrArg, SizeArg); \
 	}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -180,11 +177,10 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_2 <T1, T2> Msg; \
-		Msg.m_Size = sizeof (Msg); \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
-		SendMsg (&Msg); \
+		SendMsg (&Msg, sizeof (Msg)); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_2_STR(Code, Sender, T1, Arg1, T2, Arg2, StrArg) \
@@ -197,11 +193,10 @@ public:
 	{ \
 		size_t Length = StrArg ? strlen (StrArg) : 0; \
 		axl::rtl::TProtoMsgT_2 <T1, T2> Msg; \
-		Msg.m_Size = sizeof (Msg) + Length; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
-		SendMsg (&Msg, StrArg, Length); \
+		SendMsg (&Msg, sizeof (Msg), StrArg, Length); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_2_PTR(Code, Sender, T1, Arg1, T2, Arg2, PtrArg, SizeArg) \
@@ -214,11 +209,10 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_2 <T1, T2> Msg; \
-		Msg.m_Size = sizeof (Msg) + SizeArg; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
-		SendMsg (&Msg, PtrArg, SizeArg); \
+		SendMsg (&Msg, sizeof (Msg), PtrArg, SizeArg); \
 	}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -232,12 +226,11 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_3 <T1, T2, T3> Msg; \
-		Msg.m_Size = sizeof (Msg); \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
 		Msg.m_Arg3 = Arg3; \
-		SendMsg (&Msg); \
+		SendMsg (&Msg, sizeof (Msg)); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_3_STR(Code, Sender, T1, Arg1, T2, Arg2, T3, Arg3, StrArg) \
@@ -251,12 +244,11 @@ public:
 	{ \
 		size_t Length = StrArg ? strlen (StrArg) : 0; \
 		axl::rtl::TProtoMsgT_3 <T1, T2, T3> Msg; \
-		Msg.m_Size = sizeof (Msg) + Length; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
 		Msg.m_Arg3 = Arg3; \
-		SendMsg (&Msg, StrArg, Length); \
+		SendMsg (&Msg, sizeof (Msg), StrArg, Length); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_3_PTR(Code, Sender, T1, Arg1, T2, Arg2, T3, Arg3, PtrArg, SizeArg) \
@@ -270,12 +262,11 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_3 <T1, T2, T3> Msg; \
-		Msg.m_Size = sizeof (Msg) + SizeArg; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
 		Msg.m_Arg3 = Arg3; \
-		SendMsg (&Msg, PtrArg, SizeArg); \
+		SendMsg (&Msg, sizeof (Msg), PtrArg, SizeArg); \
 	}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -290,13 +281,12 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> Msg; \
-		Msg.m_Size = sizeof (Msg); \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
 		Msg.m_Arg3 = Arg3; \
 		Msg.m_Arg4 = Arg4; \
-		SendMsg (&Msg); \
+		SendMsg (&Msg, sizeof (Msg)); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_4_STR(Code, Sender, T1, Arg1, T2, Arg2, T3, Arg3, T4, Arg4, StrArg) \
@@ -311,13 +301,12 @@ public:
 	{ \
 		size_t Length = StrArg ? strlen (StrArg) : 0; \
 		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> Msg; \
-		Msg.m_Size = sizeof (Msg) + Length; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
 		Msg.m_Arg3 = Arg3; \
 		Msg.m_Arg4 = Arg4; \
-		SendMsg (&Msg, StrArg, Length); \
+		SendMsg (&Msg, sizeof (Msg), StrArg, Length); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_4_PTR(Code, Sender, T1, Arg1, T2, Arg2, T3, Arg3, T4, Arg4, PtrArg, SizeArg) \
@@ -332,13 +321,12 @@ public:
 		) \
 	{ \
 		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> Msg; \
-		Msg.m_Size = sizeof (Msg) + SizeArg; \
 		Msg.m_Code = Code; \
 		Msg.m_Arg1 = Arg1; \
 		Msg.m_Arg2 = Arg2; \
 		Msg.m_Arg3 = Arg3; \
 		Msg.m_Arg4 = Arg4; \
-		SendMsg (&Msg, PtrArg, SizeArg); \
+		SendMsg (&Msg, sizeof (Msg), PtrArg, SizeArg); \
 	}
 
 //.............................................................................
@@ -352,9 +340,9 @@ public:
 		) \
 	{ \
 		char StringBuffer [256]; \
-		axl::rtl::TProtoMsg* pHdr = (axl::rtl::TProtoMsg*) p; \
-		if (Size < sizeof (axl::rtl::TProtoMsg) || Size < pHdr->m_Size) \
+		if (Size < sizeof (axl::rtl::TProtoMsg)) \
 			return; \
+		axl::rtl::TProtoMsg* pHdr = (axl::rtl::TProtoMsg*) p; \
 		switch (pHdr->m_Code) \
 		{ \
 
@@ -374,9 +362,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsg TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t Length = pMsg->m_Size - sizeof (TMsg); \
+		size_t Length = Size - sizeof (TMsg); \
 		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (String); \
@@ -388,9 +376,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsg TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t ExtraSize = pMsg->m_Size - sizeof (TMsg); \
+		size_t ExtraSize = Size - sizeof (TMsg); \
 		Handler (pMsg + 1, ExtraSize); \
 		break; \
 		}
@@ -402,7 +390,7 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
 		Handler (pMsg->m_Arg1); \
 		break; \
@@ -413,9 +401,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t Length = pMsg->m_Size - sizeof (TMsg); \
+		size_t Length = Size - sizeof (TMsg); \
 		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, String); \
@@ -427,9 +415,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t ExtraSize = pMsg->m_Size - sizeof (TMsg); \
+		size_t ExtraSize = Size - sizeof (TMsg); \
 		Handler (pMsg->m_Arg1, pMsg + 1, ExtraSize); \
 		break; \
 		}
@@ -441,7 +429,7 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2); \
 		break; \
@@ -452,9 +440,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t Length = pMsg->m_Size - sizeof (TMsg); \
+		size_t Length = Size - sizeof (TMsg); \
 		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, String); \
@@ -466,9 +454,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t ExtraSize = pMsg->m_Size - sizeof (TMsg); \
+		size_t ExtraSize = Size - sizeof (TMsg); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg + 1, ExtraSize); \
 		break; \
 		}
@@ -480,7 +468,7 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3); \
 		break; \
@@ -491,9 +479,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t Length = pMsg->m_Size - sizeof (TMsg); \
+		size_t Length = Size - sizeof (TMsg); \
 		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, String); \
@@ -505,9 +493,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t ExtraSize = pMsg->m_Size - sizeof (TMsg); \
+		size_t ExtraSize = Size - sizeof (TMsg); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, pMsg + 1, ExtraSize); \
 		break; \
 		}
@@ -519,7 +507,7 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, pMsg->m_Arg4); \
 		break; \
@@ -530,9 +518,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t Length = pMsg->m_Size - sizeof (TMsg); \
+		size_t Length = Size - sizeof (TMsg); \
 		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, pMsg->m_Arg4, String); \
@@ -544,9 +532,9 @@ public:
 		{ \
 		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
 		TMsg* pMsg = (TMsg*) p; \
-		if (pMsg->m_Size < sizeof (TMsg)) \
+		if (Size < sizeof (TMsg)) \
 			break; \
-		size_t ExtraSize = pMsg->m_Size - sizeof (TMsg); \
+		size_t ExtraSize = Size - sizeof (TMsg); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, pMsg->m_Arg4, pMsg + 1, ExtraSize); \
 		break; \
 		}
