@@ -102,8 +102,8 @@ public:
 	bool
 	IsCreatable ()
 	{
-		return 
-			m_ClassTypeKind != EClassType_StdObject && 
+		return
+			m_ClassTypeKind != EClassType_StdObject &&
 			!(m_Flags & (EClassTypeFlag_Abstract | EClassTypeFlag_Opaque));
 	}
 
@@ -197,7 +197,7 @@ public:
 		return !m_VTable.IsEmpty ();
 	}
 
-	rtl::CArrayT <CBaseTypeSlot*> 
+	rtl::CArrayT <CBaseTypeSlot*>
 	GetBaseTypePrimeArray ()
 	{
 		return m_BaseTypePrimeArray;
@@ -401,6 +401,7 @@ public:
 		m_ScopeLevel = 0;
 		m_Flags = EObjectFlag_Alive | EObjectFlag_Extern;
 		this->m_pType = NULL;   // should be primed later
+		this->m_pVTable = NULL; // should be primed later
 		this->m_pObject = this; // thanks a log gcc
 	}
 };
@@ -416,7 +417,7 @@ void
 FObject_Construct (TInterface* pInterface);
 
 typedef
-void	
+void
 FObject_Destruct (TInterface* pInterface);
 
 //.............................................................................

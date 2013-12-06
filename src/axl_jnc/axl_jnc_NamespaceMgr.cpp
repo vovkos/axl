@@ -45,7 +45,8 @@ CNamespaceMgr::AddStdItems ()
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGcWaitForDestructors)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetCurrentThreadId)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CreateThread)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Sleep));
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Sleep)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetTimestamp));
 }
 
 void

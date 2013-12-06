@@ -14,6 +14,7 @@ class StdLib: public jnc::CStdLib
 public:
 	AXL_JNC_API_BEGIN_LIB ()
 		AXL_JNC_API_FUNCTION ("printf",  &Printf)
+		AXL_JNC_API_FUNCTION ("test",  &Test)
 		AXL_JNC_API_LIB (jnc::CStdLib)
 	AXL_JNC_API_END_LIB ()
 
@@ -23,6 +24,13 @@ public:
 		const char* pFormat,
 		...
 		);
+
+	static
+	void
+	Test (jnc::TInterface* p)
+	{
+		printf ("...\n");
+	}
 };
 
 //.............................................................................

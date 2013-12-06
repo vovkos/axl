@@ -45,6 +45,24 @@ Export (axl::jnc::CRuntime* pRuntime) \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+#define AXL_JNC_API_BEGIN_VTABLE() \
+static \
+void* \
+GetApiClassVTable () \
+{ \
+	static void* VTable [] = \
+	{
+
+#define AXL_JNC_API_END_VTABLE() \
+	}; \
+	return VTable; \
+}
+
+#define AXL_JNC_API_VTABLE_FUNCTION(Function) \
+	pvoid_cast (Function),
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 #define AXL_JNC_API_BEGIN_LIB() \
 static \
 bool \
@@ -101,7 +119,8 @@ Export (axl::jnc::CRuntime* pRuntime) \
 void
 Prime (
 	TInterface* pThis,
-	CClassType* pClassType	
+	CClassType* pType,
+	void* pVTable
 	);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -119,9 +138,9 @@ public:
 	void
 	Prime ()
 	{
-		jnc::Prime (this, GetApiClassType ());
+		jnc::Prime (this, GetApiClassType (), T::GetApiClassVTable ());
 	}
-	
+
 	static
 	CClassType*
 	GetApiClassType ()
@@ -129,7 +148,7 @@ public:
 		CModule* pModule = GetCurrentThreadModule ();
 		return pModule->GetApiClassType (T::GetApiClassSlot (), T::GetApiClassName ());
 	}
-	
+
 	// override in derived class
 
 	// static
@@ -139,6 +158,13 @@ public:
 	// static
 	// const char*
 	// GetApiClassName ();
+
+	static
+	void*
+	GetApiClassVTable () // optional override
+	{
+		return NULL;
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -149,13 +175,13 @@ public:
 	static
 	CMulticastClassType*
 	GetApiClassType ()
-	{		
+	{
 		CModule* pModule = GetCurrentThreadModule ();
 		return (CMulticastClassType*) pModule->m_TypeMgr.GetStdType (EStdType_SimpleMulticast);
 	}
 };
 
 //.............................................................................
-	
+
 } // namespace axl
 } // namespace jnc

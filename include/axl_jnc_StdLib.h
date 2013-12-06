@@ -32,6 +32,7 @@ public:
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetCurrentThreadId, GetCurrentThreadId)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_CreateThread, CreateThread)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_Sleep, Sleep)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetTimestamp, GetTimestamp)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_StrLen, StrLen)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_Rand, Rand)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetTls, GetTls)
@@ -110,6 +111,13 @@ public:
 	Sleep (uint32_t MsCount)
 	{
 		g::Sleep (MsCount);
+	}
+
+	static
+	uint64_t
+	GetTimestamp ()
+	{
+		g::GetTimestamp ();
 	}
 
 	static
@@ -197,7 +205,7 @@ public:
 	{
 		return AppendFmtLiteralImpl (pFmtLiteral, pFmtSpecifier, 'f', x);
 	}
-	
+
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
 	static

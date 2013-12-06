@@ -202,7 +202,7 @@ CModule::Parse (
 		{
 			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
 			err::PushSrcPosError (pFilePath, pToken->m_Pos);
-			return false;			
+			return false;
 		}
 
 		Result = Parser.ParseToken (pToken);
@@ -213,8 +213,8 @@ CModule::Parse (
 		}
 
 		if (pToken->m_Token == EToken_Eof) // EOF token must be parsed
-			break;		
-		
+			break;
+
 		Lexer.NextToken ();
 	}
 

@@ -137,6 +137,11 @@ enum EStdFunc
 
 	EStdFunc_Sleep,
 
+	// uint64_t
+	// jnc.getTimestamp ();
+
+	EStdFunc_GetTimestamp,
+
 	// size_t
 	// strlen (nullable const char* p);
 
@@ -539,6 +544,9 @@ protected:
 
 	CFunction*
 	CreateSleep ();
+
+	CFunction*
+	CreateGetTimestamp ();
 
 	CFunction*
 	CreateStrLen ();

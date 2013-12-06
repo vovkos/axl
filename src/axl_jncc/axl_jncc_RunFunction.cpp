@@ -25,8 +25,8 @@ CJnc::RunFunction (
 	int* pReturnValue
 	)
 {
-	typedef 
-	int 
+	typedef
+	int
 	FFunction ();
 
 	FFunction* pf = (FFunction*) pFunction->GetMachineCode ();
@@ -43,11 +43,6 @@ CJnc::RunFunction (
 	catch (err::CError Error)
 	{
 		err::SetError (Error);
-		Result = false;
-	}
-	catch (...)
-	{
-		err::SetStringError ("unknown-exception");
 		Result = false;
 	}
 

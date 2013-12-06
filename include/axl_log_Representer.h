@@ -20,26 +20,26 @@ enum EPart
 	EPart_PlainText = 0,
 	EPart_HyperText,
 	EPart_Bin,
-}; 
+};
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ELine 
+ELine
 GetLineKindFromPartKind (
 	EPart PartKind,
 	EBinView BinViewKind
 	)
 {
-	return 
-		PartKind != EPart_Bin ? ELine_Text : 
+	return
+		PartKind != EPart_Bin ? ELine_Text :
 		BinViewKind == EBinView_Text ? ELine_BinText : ELine_BinHex;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ELine 
+ELine
 GetLineKindFromPartKind (
 	EPart PartKind,
 	const TBinDataConfig& BinDataConfig
@@ -50,7 +50,7 @@ GetLineKindFromPartKind (
 
 //.............................................................................
 
-struct CRepresenterTarget
+class CRepresenterTarget
 {
 protected:
 	uint_t m_PacketCode;
@@ -59,7 +59,7 @@ protected:
 
 public:
 	TLineAttr m_LineAttr;
-	
+
 public:
 	CRepresenterTarget ()
 	{
@@ -67,13 +67,13 @@ public:
 		m_Timestamp = 0;
 	}
 
-	uint_t 
+	uint_t
 	GetPacketCode ()
 	{
 		return m_PacketCode;
 	}
 
-	uint64_t 
+	uint64_t
 	GetTimestamp ()
 	{
 		return m_Timestamp;
@@ -85,8 +85,8 @@ public:
 		return &m_BinDataConfig;
 	}
 
-	virtual 
-	void 
+	virtual
+	void
 	AddPart (
 		EPart PartKind,
 		uint_t PartCode,
@@ -94,8 +94,8 @@ public:
 		size_t Size
 		) = 0;
 
-	virtual 
-	void 
+	virtual
+	void
 	Break () = 0;
 
 	void
@@ -105,9 +105,9 @@ public:
 		)
 	{
 		AddText0 (
-			EPart_PlainText, 
-			m_PacketCode, 
-			pText, 
+			EPart_PlainText,
+			m_PacketCode,
+			pText,
 			Length
 			);
 	}
@@ -120,9 +120,9 @@ public:
 		)
 	{
 		AddText0 (
-			EPart_PlainText, 
-			PartCode, 
-			pText, 
+			EPart_PlainText,
+			PartCode,
+			pText,
 			Length
 			);
 	}
@@ -136,9 +136,9 @@ public:
 		AXL_VA_DECL (va, pFormat);
 
 		AddText_va (
-			EPart_PlainText, 
-			m_PacketCode, 
-			pFormat, 
+			EPart_PlainText,
+			m_PacketCode,
+			pFormat,
 			va
 			);
 	}
@@ -153,9 +153,9 @@ public:
 		AXL_VA_DECL (va, pFormat);
 
 		AddText_va (
-			EPart_PlainText, 
-			PartCode, 
-			pFormat, 
+			EPart_PlainText,
+			PartCode,
+			pFormat,
 			va
 			);
 	}
@@ -167,9 +167,9 @@ public:
 		)
 	{
 		AddText_va (
-			EPart_PlainText, 
-			m_PacketCode, 
-			pFormat, 
+			EPart_PlainText,
+			m_PacketCode,
+			pFormat,
 			va
 			);
 	}
@@ -182,9 +182,9 @@ public:
 		)
 	{
 		AddText_va (
-			EPart_PlainText, 
-			PartCode, 
-			pFormat, 
+			EPart_PlainText,
+			PartCode,
+			pFormat,
 			va
 			);
 	}
@@ -196,9 +196,9 @@ public:
 		)
 	{
 		AddText0 (
-			EPart_HyperText, 
-			m_PacketCode, 
-			pText, 
+			EPart_HyperText,
+			m_PacketCode,
+			pText,
 			Length
 			);
 	}
@@ -211,9 +211,9 @@ public:
 		)
 	{
 		AddText0 (
-			EPart_HyperText, 
-			PartCode, 
-			pText, 
+			EPart_HyperText,
+			PartCode,
+			pText,
 			Length
 			);
 	}
@@ -227,9 +227,9 @@ public:
 		AXL_VA_DECL (va, pFormat);
 
 		AddText_va (
-			EPart_HyperText, 
-			m_PacketCode, 
-			pFormat, 
+			EPart_HyperText,
+			m_PacketCode,
+			pFormat,
 			va
 			);
 	}
@@ -244,9 +244,9 @@ public:
 		AXL_VA_DECL (va, pFormat);
 
 		AddText_va (
-			EPart_HyperText, 
-			PartCode, 
-			pFormat, 
+			EPart_HyperText,
+			PartCode,
+			pFormat,
 			va
 			);
 	}
@@ -258,9 +258,9 @@ public:
 		)
 	{
 		AddText_va (
-			EPart_HyperText, 
-			m_PacketCode, 
-			pFormat, 
+			EPart_HyperText,
+			m_PacketCode,
+			pFormat,
 			va
 			);
 	}
@@ -273,9 +273,9 @@ public:
 		)
 	{
 		AddText_va (
-			EPart_HyperText, 
-			PartCode, 
-			pFormat, 
+			EPart_HyperText,
+			PartCode,
+			pFormat,
 			va
 			);
 	}
@@ -287,9 +287,9 @@ public:
 		)
 	{
 		AddPart (
-			EPart_Bin, 
-			m_PacketCode, 
-			p, 
+			EPart_Bin,
+			m_PacketCode,
+			p,
 			Size
 			);
 	}
@@ -302,9 +302,9 @@ public:
 		)
 	{
 		AddPart (
-			EPart_Bin, 
-			PartCode, 
-			p, 
+			EPart_Bin,
+			PartCode,
+			p,
 			Size
 			);
 	}
@@ -331,18 +331,18 @@ protected:
 
 struct CRepresenter
 {
-	virtual 
-	bool 
+	virtual
+	bool
 	Represent (
-		CRepresenterTarget* pTarget, 
-		uint_t PacketCode, 
-		const void* p, 
-		size_t Size, 
+		CRepresenterTarget* pTarget,
+		uint_t PacketCode,
+		const void* p,
+		size_t Size,
 		uint64_t FoldFlags
 		) = 0;
 };
 
 //.............................................................................
 
-} // namespace log 
+} // namespace log
 } // namespace axl

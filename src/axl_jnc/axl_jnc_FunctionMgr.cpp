@@ -993,6 +993,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateSleep ();
 		break;
 
+	case EStdFunc_GetTimestamp:
+		pFunction = CreateGetTimestamp ();
+		break;
+
 	case EStdFunc_StrLen:
 		pFunction = CreateStrLen ();
 		break;
@@ -1511,6 +1515,17 @@ CFunctionMgr::CreateSleep ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
 	return CreateFunction ("sleep", "jnc.sleep", pType);
+}
+
+// uint64_t
+// jnc.getTimestamp ();
+
+CFunction*
+CFunctionMgr::CreateGetTimestamp ()
+{
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+	return CreateFunction ("getTimestamp", "jnc.getTimestamp", pType);
 }
 
 // size_t

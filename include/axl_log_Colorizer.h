@@ -13,13 +13,14 @@ namespace log {
 
 //.............................................................................
 
-struct CColorizerTarget
+class CColorizerTarget
 {
+public:
 	virtual
-	void 
+	void
 	SetAttr (
-		uint64_t BeginOffset, 
-		uint64_t EndOffset, 
+		uint64_t BeginOffset,
+		uint64_t EndOffset,
 		const gui::TTextAttr& Attr
 		) = 0;
 };
@@ -37,16 +38,16 @@ public:
 		m_StateSize = 0;
 	}
 
-	size_t 
+	size_t
 	GetStateSize ()
 	{
 		return m_StateSize;
 	}
 
-	virtual 
+	virtual
 	void
 	Colorize (
-		CColorizerTarget* pTarget, 
+		CColorizerTarget* pTarget,
 		const void* p,
 		size_t Size,
 		bool IsFinal,
@@ -55,7 +56,7 @@ public:
 
 	void
 	Finalize (
-		CColorizerTarget* pTarget, 
+		CColorizerTarget* pTarget,
 		void* pStateBuffer
 		)
 	{

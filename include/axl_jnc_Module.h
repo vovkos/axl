@@ -15,6 +15,7 @@
 #include "axl_jnc_UnitMgr.h"
 #include "axl_jnc_LlvmIrBuilder.h"
 #include "axl_jnc_LlvmDiBuilder.h"
+#include "axl_jnc_CallFunction.h"
 #include "axl_mt_TlsSlot.h"
 
 namespace axl {
@@ -275,6 +276,12 @@ public:
 
 	rtl::CString
 	GetLlvmIrString ();
+
+	bool
+	Construct ()
+	{
+		return jnc::CallVoidFunction (m_pConstructor);
+	}
 
 protected:
 	bool
