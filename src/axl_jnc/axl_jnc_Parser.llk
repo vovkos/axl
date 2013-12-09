@@ -164,7 +164,6 @@ Members2
 	void
 	AssignDeclarationAttributes (
 		CModuleItem* pItem,
-		CNamespace* pNamespace,
 		const CToken::CPos& Pos
 		);
 
@@ -396,6 +395,12 @@ Members2
 		TLiteral* pLiteral,
 		const CValue& SrcValue,
 		const rtl::CString& FmtSpecifierString
+		);
+
+	bool
+	AppendFmtLiteralBinValue (
+		TLiteral* pLiteral,
+		const CValue& SrcValue
 		);
 
 	bool

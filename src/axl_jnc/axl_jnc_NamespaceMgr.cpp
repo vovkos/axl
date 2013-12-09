@@ -14,6 +14,7 @@ CNamespaceMgr::CNamespaceMgr ()
 
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
+	m_CurrentAccessKind = EAccess_Public;
 	m_SourcePosLockCount = 0;
 }
 
@@ -41,6 +42,7 @@ CNamespaceMgr::AddStdItems ()
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Rand)) &&
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Printf)) &&
 		pJnc->AddItem ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_Scheduler)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetDataPtrSpan)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGc)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RunGcWaitForDestructors)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetCurrentThreadId)) &&
@@ -64,9 +66,16 @@ CNamespaceMgr::SetSourcePos (const CToken::CPos& Pos)
 void
 CNamespaceMgr::OpenNamespace (CNamespace* pNamespace)
 {
-	m_NamespaceStack.Append (m_pCurrentNamespace);
+	TNamespaceStackEntry Entry =
+	{
+		m_pCurrentNamespace,
+		m_CurrentAccessKind
+	};
+
+	m_NamespaceStack.Append (Entry);
 	m_pCurrentNamespace = pNamespace;
 	m_pCurrentScope = pNamespace->m_NamespaceKind == ENamespace_Scope ? (CScope*) pNamespace : NULL;
+	m_CurrentAccessKind = EAccess_Public; // always start with 'public'
 }
 
 void
@@ -75,12 +84,15 @@ CNamespaceMgr::CloseNamespace ()
 	if (m_NamespaceStack.IsEmpty ())
 		return;
 
-	m_pCurrentNamespace = m_NamespaceStack.GetBackAndPop ();
+	TNamespaceStackEntry Entry = m_NamespaceStack.GetBackAndPop ();
+
+	m_pCurrentNamespace = Entry.m_pNamespace;
 	m_pCurrentScope = m_pCurrentNamespace->m_NamespaceKind == ENamespace_Scope ? (CScope*) m_pCurrentNamespace : NULL;
+	m_CurrentAccessKind = Entry.m_AccessKind;
 }
 
 CScope*
-CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
+CNamespaceMgr::OpenInternalScope ()
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
@@ -89,7 +101,6 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	pScope->m_pModule = m_pModule;
 	pScope->m_pFunction = pFunction;
 	pScope->m_Level = m_pCurrentScope ? m_pCurrentScope->GetLevel () + 1 : 1;
-	pScope->m_Pos = Pos;
 	pScope->m_pParentNamespace = m_pCurrentNamespace;
 
 	if (m_pCurrentScope)
@@ -97,12 +108,22 @@ CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
 	else if (pFunction->GetType ()->GetFlags () & EFunctionTypeFlag_Pitcher)
 		pScope->m_Flags |= EScopeFlag_CanThrow;
 
-	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
-		pScope->m_LlvmDiScope = (llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (m_pCurrentScope, Pos);
-
 	m_ScopeList.InsertTail (pScope);
 
 	OpenNamespace (pScope);
+	return pScope;
+}
+
+CScope*
+CNamespaceMgr::OpenScope (const CToken::CPos& Pos)
+{
+	CScope* pParentScope = m_pCurrentScope;
+	CScope* pScope = OpenInternalScope ();
+	pScope->m_Pos = Pos;
+
+	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+		pScope->m_LlvmDiScope = (llvm::DIScope) m_pModule->m_LlvmDiBuilder.CreateLexicalBlock (pParentScope, Pos);
+
 	SetSourcePos (Pos);
 	return pScope;
 }

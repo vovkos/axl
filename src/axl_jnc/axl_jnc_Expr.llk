@@ -808,15 +808,19 @@ literal <CValue* $pValue>
 				{
 					return AppendFmtLiteral (&$Literal, $3.m_Data.m_String.cc (), $3.m_Data.m_String.GetLength ());
 				}
-			expression $e EToken_FmtSpecifier $f?
-				{
-					return IsValidLocator ($f) ?
-						AppendFmtLiteralValue (&$Literal, $e.m_Value, $f.m_Data.m_String) :
-						AppendFmtLiteralValue (&$Literal, $e.m_Value, rtl::CString ());
-				}
+			fmt_literal_value <&$Literal>
 		)+
 			{
 				return FinalizeLiteral (&$Literal, $pValue);
+			}
+	;
+
+fmt_literal_value <TLiteral* $pLiteral>
+	:	expression EToken_FmtSpecifier?
+			{
+				return IsValidLocator ($2) ?
+					AppendFmtLiteralValue ($pLiteral, $1.m_Value, $2.m_Data.m_String) :
+					AppendFmtLiteralValue ($pLiteral, $1.m_Value, rtl::CString ());
 			}
 	;
 

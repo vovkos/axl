@@ -530,12 +530,14 @@ public:
 	bool
 	ParseInitializer (
 		const CValue& Value,
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ConstructorTokenList,
 		const rtl::CConstBoxListT <CToken>& InitializerTokenList
 		);
 
 	bool
 	ParseExpressionEx (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		const CValue& PitcherReturnValue,
 		uint_t ParserFlags,
@@ -544,41 +546,46 @@ public:
 
 	bool
 	ParsePitcherCondition (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		const CValue& PitcherReturnValue,
 		CValue* pResultValue
 		)
 	{
-		return ParseExpressionEx (ExpressionTokenList, PitcherReturnValue, 0, pResultValue);
+		return ParseExpressionEx (pUnit, ExpressionTokenList, PitcherReturnValue, 0, pResultValue);
 	}
 
 	bool
 	ParseExpression (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		uint_t ParserFlags,
 		CValue* pResultValue
 		)
 	{
-		return ParseExpressionEx (ExpressionTokenList, CValue (), ParserFlags, pResultValue);
+		return ParseExpressionEx (pUnit, ExpressionTokenList, CValue (), ParserFlags, pResultValue);
 	}
 
 	bool
 	ParseExpression (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		CValue* pResultValue
 		)
 	{
-		return ParseExpressionEx (ExpressionTokenList, CValue (), 0, pResultValue);
+		return ParseExpressionEx (pUnit, ExpressionTokenList, CValue (), 0, pResultValue);
 	}
 
 	bool
 	ParseConstExpression (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		CValue* pResultValue
 		);
 
 	bool
 	ParseConstIntegerExpression (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 		intptr_t* pInteger
 		);
@@ -589,7 +596,8 @@ public:
 		size_t* pElementCount
 		);
 
-	size_t ParseAutoSizeArrayLiteralInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
+	size_t
+	ParseAutoSizeArrayLiteralInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
 
 	size_t
 	ParseAutoSizeArrayCurlyInitializer (const rtl::CConstBoxListT <CToken>& InitializerTokenList);
@@ -648,6 +656,7 @@ public:
 
 	bool
 	EvaluateAlias (
+		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken> TokenList,
 		CValue* pResultValue
 		);

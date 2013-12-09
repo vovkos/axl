@@ -36,7 +36,12 @@ CDeclTypeCalc::CalcType (
 
 		if (!pElementCountInitializer->IsEmpty ())
 		{
-			Result = m_pModule->m_OperatorMgr.ParseExpression (*pElementCountInitializer, pElementCountValue);
+			Result = m_pModule->m_OperatorMgr.ParseExpression (
+				NULL,
+				*pElementCountInitializer,
+				pElementCountValue
+				);
+
 			if (!Result)
 				return NULL;
 

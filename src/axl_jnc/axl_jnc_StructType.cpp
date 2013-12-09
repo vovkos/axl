@@ -382,6 +382,7 @@ CStructType::InitializeFields (const CValue& ThisValue)
 
 		Result = m_pModule->m_OperatorMgr.ParseInitializer (
 			FieldValue,
+			m_pParentUnit,
 			pField->m_Constructor,
 			pField->m_Initializer
 			);

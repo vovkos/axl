@@ -509,8 +509,7 @@ CFunctionMgr::InternalPrologue (
 
 	m_pCurrentFunction = pFunction;
 
-	CToken::CPos Pos;
-	m_pModule->m_NamespaceMgr.OpenScope (Pos);
+	m_pModule->m_NamespaceMgr.OpenInternalScope ();
 
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
 	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_body");
@@ -941,6 +940,10 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateStrengthenClassPtr ();
 		break;
 
+	case EStdFunc_GetDataPtrSpan:
+		pFunction = CreateGetDataPtrSpan ();
+		break;
+
 	case EStdFunc_HeapAlloc:
 		pFunction = CreateHeapAlloc ();
 		break;
@@ -1133,9 +1136,6 @@ CFunctionMgr::CreateCheckNullPtr ()
 CFunction*
 CFunctionMgr::CreateCheckScopeLevel ()
 {
-	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
-	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
@@ -1177,9 +1177,6 @@ CFunctionMgr::CreateCheckScopeLevel ()
 CFunction*
 CFunctionMgr::CreateCheckDataPtrRange ()
 {
-	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
-	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
@@ -1236,9 +1233,6 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 CFunction*
 CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 {
-	CFunction* pPrevCurrentFunction = m_pCurrentFunction;
-	CBasicBlock* pPrevCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-
 	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
@@ -1327,6 +1321,42 @@ CFunctionMgr::CreateStrengthenClassPtr ()
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
 	return CreateInternalFunction ("jnc.strengthenClassPtr", pType);
+}
+
+// size_t
+// jnc.GetDataPtrSpan (jnc.DataPtr Ptr);
+
+CFunction*
+CFunctionMgr::CreateGetDataPtrSpan ()
+{
+	CType* pIntPtrType = GetSimpleType (m_pModule, EType_Int_p);
+
+	CType* ArgTypeArray [] =
+	{
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const)
+	};
+
+	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pIntPtrType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction ("getDataPtrSpan", "jnc.getDataPtrSpan", pType);
+
+	CValue ArgValueArray [countof (ArgTypeArray)];
+	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
+
+	CValue ArgValue = ArgValueArray [0];
+
+	CValue PtrValue;
+	CValue RangeEndValue;
+	CValue SpanValue;
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (ArgValue, 0, NULL, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (ArgValue, 2, NULL, &RangeEndValue);
+	m_pModule->m_LlvmIrBuilder.CreatePtrToInt (PtrValue, pIntPtrType, &PtrValue);
+	m_pModule->m_LlvmIrBuilder.CreatePtrToInt (RangeEndValue, pIntPtrType, &RangeEndValue);
+	m_pModule->m_LlvmIrBuilder.CreateSub_i (RangeEndValue, PtrValue, pIntPtrType, &SpanValue);
+	m_pModule->m_LlvmIrBuilder.CreateRet (SpanValue);
+
+	InternalEpilogue ();
+
+	return pFunction;
 }
 
 // int8*

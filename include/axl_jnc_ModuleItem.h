@@ -10,6 +10,7 @@ namespace axl {
 namespace jnc {
 
 class CModule;
+class CUnit;
 class CNamespace;
 class CAttributeBlock;
 class CClassType;
@@ -113,6 +114,7 @@ protected:
 	CToken::CPos m_Pos;
 	rtl::CString m_Name;
 	rtl::CString m_QualifiedName;
+	CUnit* m_pParentUnit;
 	CNamespace* m_pParentNamespace;
 	CAttributeBlock* m_pAttributeBlock;
 
@@ -153,6 +155,12 @@ public:
 	GetQualifiedName ()
 	{
 		return m_QualifiedName;
+	}
+
+	CUnit*
+	GetParentUnit ()
+	{
+		return m_pParentUnit;
 	}
 
 	CNamespace*

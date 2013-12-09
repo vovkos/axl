@@ -86,6 +86,9 @@ public:
 	}
 
 	CUnit*
+	SetCurrentUnit (CUnit* pUnit);
+
+	CUnit*
 	CreateUnit (const rtl::CString& FilePath);
 };
 

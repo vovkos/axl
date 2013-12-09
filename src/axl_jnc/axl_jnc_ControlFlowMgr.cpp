@@ -351,7 +351,12 @@ CControlFlowMgr::Throw (
 	CValue IndicatorValue;
 	if (!PitcherCondition.IsEmpty ())
 	{
-		Result = m_pModule->m_OperatorMgr.ParsePitcherCondition (PitcherCondition, ReturnValue, &IndicatorValue);
+		Result = m_pModule->m_OperatorMgr.ParsePitcherCondition (
+			NULL, // TODO: fix
+			PitcherCondition,
+			ReturnValue,
+			&IndicatorValue
+			);
 		if (!Result)
 			return false;
 	}

@@ -7,6 +7,12 @@ class ModulePane;
 class Output;
 class MdiChild;
 
+struct TPoint
+{
+	int m_x;
+	int m_y;
+};
+
 //.............................................................................
 
 class StdLib: public jnc::CStdLib
@@ -14,7 +20,7 @@ class StdLib: public jnc::CStdLib
 public:
 	AXL_JNC_API_BEGIN_LIB ()
 		AXL_JNC_API_FUNCTION ("printf",  &Printf)
-		AXL_JNC_API_FUNCTION ("test",  &Test)
+//		AXL_JNC_API_FUNCTION ("foo",  &Foo)
 		AXL_JNC_API_LIB (jnc::CStdLib)
 	AXL_JNC_API_END_LIB ()
 
@@ -26,11 +32,8 @@ public:
 		);
 
 	static
-	void
-	Test (jnc::TInterface* p)
-	{
-		printf ("...\n");
-	}
+	TPoint
+	Foo ();
 };
 
 //.............................................................................

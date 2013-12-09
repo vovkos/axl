@@ -228,6 +228,7 @@ CUnionType::InitializeField (const CValue& ThisValue)
 		m_pModule->m_OperatorMgr.GetField (ThisValue, m_pInitializedField, NULL, &FieldValue) &&
 		m_pModule->m_OperatorMgr.ParseInitializer (
 			FieldValue,
+			m_pParentUnit,
 			m_pInitializedField->m_Constructor,
 			m_pInitializedField->m_Initializer
 			);

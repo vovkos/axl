@@ -22,15 +22,24 @@ class CNamespaceMgr
 	friend class CFunctionMgr;
 
 protected:
+	struct TNamespaceStackEntry
+	{
+		CNamespace* m_pNamespace;
+		EAccess m_AccessKind;
+	};
+
+protected:
 	CModule* m_pModule;
 
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
 
-	rtl::CArrayT <CNamespace*> m_NamespaceStack;
+	rtl::CArrayT <TNamespaceStackEntry> m_NamespaceStack;
+
 	CNamespace* m_pCurrentNamespace;
 	CScope* m_pCurrentScope;
+	EAccess m_CurrentAccessKind;
 
 	intptr_t m_SourcePosLockCount;
 
@@ -82,11 +91,20 @@ public:
 		return m_pCurrentScope;
 	}
 
+	EAccess
+	GetCurrentAccessKind ()
+	{
+		return m_CurrentAccessKind;
+	}
+
 	void
 	OpenNamespace (CNamespace* pNamespace);
 
 	void
 	CloseNamespace ();
+
+	CScope*
+	OpenInternalScope ();
 
 	CScope*
 	OpenScope (const CToken::CPos& Pos);

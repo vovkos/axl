@@ -108,6 +108,12 @@ Export (axl::jnc::CRuntime* pRuntime) \
 	pRuntime->MapFunction (pProperty->GetGetter ()->GetLlvmFunction (), pvoid_cast (Getter)); \
 	pRuntime->MapFunction (pProperty->GetSetter ()->GetLlvmFunction (), pvoid_cast (Setter));
 
+#define AXL_JNC_API_CONST_PROPERTY(Name, Getter) \
+	pProperty = pNamespace->GetPropertyByName (Name); \
+	if (!pProperty) \
+		return false; \
+	pRuntime->MapFunction (pProperty->GetGetter ()->GetLlvmFunction (), pvoid_cast (Getter));
+
 #define AXL_JNC_API_AUTOGET_PROPERTY(Name, Setter) \
 	pProperty = pNamespace->GetPropertyByName (Name); \
 	if (!pProperty) \

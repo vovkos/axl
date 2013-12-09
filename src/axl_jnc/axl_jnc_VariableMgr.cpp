@@ -189,7 +189,8 @@ CVariableMgr::CreateArgVariable (
 	pVariable->m_pLlvmAllocValue = PtrValue.GetLlvmValue ();
 	pVariable->m_pLlvmValue = PtrValue.GetLlvmValue ();
 
-	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+	if ((m_pModule->GetFlags () & EModuleFlag_DebugInfo) &&
+		(pVariable->GetFlags () & EModuleItemFlag_User))
 	{
 		pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (
 			pVariable,
@@ -327,6 +328,7 @@ CVariableMgr::InitializeGlobalStaticVariables ()
 
 		Result = m_pModule->m_OperatorMgr.ParseInitializer (
 			pVariable,
+			pVariable->m_pItemDecl->GetParentUnit (),
 			pVariable->m_Constructor,
 			pVariable->m_Initializer
 			);
@@ -386,7 +388,12 @@ CVariableMgr::AllocatePrimeInitializeStaticVariable (CVariable* pVariable)
 
 	Result =
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
-		m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
+		m_pModule->m_OperatorMgr.ParseInitializer (
+			pVariable,
+			pVariable->m_pItemDecl->GetParentUnit (),
+			pVariable->m_Constructor,
+			pVariable->m_Initializer
+			);
 
 	if (!Result)
 		return false;
@@ -424,7 +431,12 @@ CVariableMgr::AllocatePrimeInitializeTlsVariable (CVariable* pVariable)
 
 	Result =
 		m_pModule->m_ControlFlowMgr.OnceStmt_PreBody (&Stmt, Pos) &&
-		m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
+		m_pModule->m_OperatorMgr.ParseInitializer (
+			pVariable,
+			pVariable->m_pItemDecl->GetParentUnit (),
+			pVariable->m_Constructor,
+			pVariable->m_Initializer
+			);
 
 	if (!Result)
 		return false;
@@ -476,13 +488,20 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 		}
 	}
 
-	if (m_pModule->GetFlags () & EModuleFlag_DebugInfo)
+	if ((m_pModule->GetFlags () & EModuleFlag_DebugInfo) &&
+		(pVariable->GetFlags () & EModuleItemFlag_User))
 	{
 		pVariable->m_LlvmDiDescriptor = m_pModule->m_LlvmDiBuilder.CreateLocalVariable (pVariable);
 		m_pModule->m_LlvmDiBuilder.CreateDeclare (pVariable);
 	}
 
-	Result = m_pModule->m_OperatorMgr.ParseInitializer (pVariable, pVariable->m_Constructor, pVariable->m_Initializer);
+	Result = m_pModule->m_OperatorMgr.ParseInitializer (
+		pVariable,
+		pVariable->m_pItemDecl->GetParentUnit (),
+		pVariable->m_Constructor,
+		pVariable->m_Initializer
+		);
+
 	if (!Result)
 		return false;
 

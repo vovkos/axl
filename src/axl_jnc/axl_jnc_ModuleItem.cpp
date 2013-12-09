@@ -10,11 +10,11 @@ namespace jnc {
 const char*
 GetModuleItemKindString (EModuleItem ItemKind)
 {
-	static const char* StringTable [EModuleItem__Count] = 
+	static const char* StringTable [EModuleItem__Count] =
 	{
 		"undefined-module-item-kind",  // EModuleItem_Undefined = 0,
-		"namespace",                   // EModuleItem_Namespace,	
-		"scope",                       // EModuleItem_Scope,	
+		"namespace",                   // EModuleItem_Namespace,
+		"scope",                       // EModuleItem_Scope,
 		"type",                        // EModuleItem_Type,
 		"typedef",                     // EModuleItem_Typedef,
 		"alias",                       // EModuleItem_Alias,
@@ -29,8 +29,8 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		"base-type-slot",              // EModuleItem_BaseTypeSlot,
 	};
 
-	return (size_t) ItemKind < EModuleItem__Count ? 
-		StringTable [ItemKind] : 
+	return (size_t) ItemKind < EModuleItem__Count ?
+		StringTable [ItemKind] :
 		StringTable [EModuleItem_Undefined];
 }
 
@@ -39,7 +39,7 @@ GetModuleItemKindString (EModuleItem ItemKind)
 const char*
 GetStorageKindString (EStorage StorageKind)
 {
-	static const char* StringTable [EStorage__Count] = 
+	static const char* StringTable [EStorage__Count] =
 	{
 		"undefined-storage-class",  // EStorage_Undefined = 0,
 		"typedef",                  // EStorage_Typedef,
@@ -53,13 +53,13 @@ GetStorageKindString (EStorage StorageKind)
 		"abstract",                 // EStorage_Abstract,
 		"virtual",                  // EStorage_Virtual,
 		"override",                 // EStorage_Override,
-		"mutable",                  // EStorage_Mutable,		
+		"mutable",                  // EStorage_Mutable,
 		"nullable",                 // EStorage_Nullable,
 		"this",                     // EStorage_This,
 	};
 
-	return (size_t) StorageKind < EStorage__Count ? 
-		StringTable [StorageKind] : 
+	return (size_t) StorageKind < EStorage__Count ?
+		StringTable [StorageKind] :
 		StringTable [EStorage_Undefined];
 }
 
@@ -68,15 +68,15 @@ GetStorageKindString (EStorage StorageKind)
 const char*
 GetAccessKindString (EAccess AccessKind)
 {
-	static const char* StringTable [EAccess__Count] = 
+	static const char* StringTable [EAccess__Count] =
 	{
 		"undefined-access-kind", // EAccess_Undefined = 0,
 		"public",                // EAccess_Public,
 		"protected",             // EAccess_Protected,
 	};
 
-	return (size_t) AccessKind < EAccess__Count ? 
-		StringTable [AccessKind] : 
+	return (size_t) AccessKind < EAccess__Count ?
+		StringTable [AccessKind] :
 		StringTable [EAccess_Undefined];
 }
 
@@ -86,6 +86,7 @@ CModuleItemDecl::CModuleItemDecl ()
 {
 	m_StorageKind = EStorage_Undefined;
 	m_AccessKind = EAccess_Public; // public by default
+	m_pParentUnit = NULL;
 	m_pParentNamespace = NULL;
 	m_pAttributeBlock = NULL;
 }
@@ -107,7 +108,7 @@ CModuleItem::EnsureLayout ()
 
 	if (m_Flags & EModuleItemFlag_LayoutReady)
 		return true;
-		
+
 	if (m_Flags & EModuleItemFlag_InCalcLayout)
 	{
 		err::SetFormatStringError ("can't calculate layout of '%s' due to recursion", m_Tag.cc ());
@@ -115,9 +116,9 @@ CModuleItem::EnsureLayout ()
 	}
 
 	m_Flags |= EModuleItemFlag_InCalcLayout;
-	
+
 	Result = CalcLayout ();
-	
+
 	m_Flags &= ~EModuleItemFlag_InCalcLayout;
 
 	if (!Result)
@@ -137,7 +138,7 @@ VerifyModuleItemIsClassType (
 {
 	if (!pItem)
 		return NULL;
-		
+
 	if (pItem->GetItemKind () != EModuleItem_Type || ((CType*) pItem)->GetTypeKind () != EType_Class)
 	{
 		err::SetFormatStringError ("'%s' is not a class", pName);
@@ -155,7 +156,7 @@ VerifyModuleItemIsFunction (
 {
 	if (!pItem)
 		return NULL;
-		
+
 	if (pItem->GetItemKind () != EModuleItem_Function)
 	{
 		err::SetFormatStringError ("'%s' is not a function", pName);
@@ -173,7 +174,7 @@ VerifyModuleItemIsProperty (
 {
 	if (!pItem)
 		return NULL;
-		
+
 	if (pItem->GetItemKind () != EModuleItem_Property)
 	{
 		err::SetFormatStringError ("'%s' is not a property", pName);

@@ -44,7 +44,7 @@ COperatorMgr::GetNamespaceMember (
 		pItem = ((CTypedef*) pItem)->GetType ();
 		// and fall through
 
-	case EModuleItem_Type:	
+	case EModuleItem_Type:
 		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
 		{
 			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
@@ -55,7 +55,11 @@ COperatorMgr::GetNamespaceMember (
 		break;
 
 	case EModuleItem_Alias:
-		return m_pModule->m_OperatorMgr.EvaluateAlias (((CAlias*) pItem)->GetInitializer (), pResultValue);
+		return m_pModule->m_OperatorMgr.EvaluateAlias (
+			pItem->GetItemDecl ()->GetParentUnit (),
+			((CAlias*) pItem)->GetInitializer (),
+			pResultValue
+			);
 
 	case EModuleItem_Variable:
 		pResultValue->SetVariable ((CVariable*) pItem);
@@ -104,7 +108,7 @@ COperatorMgr::GetNamedTypeMemberType (
 	const char* pName
 	)
 {
-	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, NULL, ETraverse_NoParentNamespace);	
+	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, NULL, ETraverse_NoParentNamespace);
 	if (!pMember)
 	{
 		err::SetFormatStringError ("'%s' is not a member of '%s'", pName, pNamedType->GetTypeString ().cc ());
@@ -115,24 +119,24 @@ COperatorMgr::GetNamedTypeMemberType (
 	switch (MemberKind)
 	{
 	case EModuleItem_StructField:
-		return 
+		return
 			(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Ptr) ?
 				((CStructField*) pMember)->GetType ()->GetDataPtrType (
-					EType_DataRef, 
-					EDataPtrType_Thin, 
+					EType_DataRef,
+					EDataPtrType_Thin,
 					OpValue.GetType ()->GetFlags ()
 					) :
 				((CStructField*) pMember)->GetType ();
-		
+
 	case EModuleItem_Function:
 		return ((CFunction*) pMember)->GetType ()->GetShortType ()->GetFunctionPtrType (
-			EType_FunctionRef, 
+			EType_FunctionRef,
 			EFunctionPtrType_Thin
 			);
 
 	case EModuleItem_Property:
 		return ((CProperty*) pMember)->GetType ()->GetShortType ()->GetPropertyPtrType (
-			EType_PropertyRef, 
+			EType_PropertyRef,
 			EPropertyPtrType_Thin
 			);
 
@@ -151,7 +155,7 @@ COperatorMgr::GetNamedTypeMember (
 	)
 {
 	CBaseTypeCoord Coord;
-	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);	
+	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);
 	if (!pMember)
 	{
 		err::SetFormatStringError ("'%s' is not a member of '%s'", pName, pNamedType->GetTypeString ().cc ());
@@ -173,7 +177,7 @@ COperatorMgr::GetNamedTypeMember (
 	{
 	case EModuleItem_StructField:
 		return GetField (OpValue, (CStructField*) pMember, &Coord, pResultValue);
-	
+
 	case EModuleItem_Function:
 		pResultValue->SetFunction ((CFunction*) pMember);
 		break;
@@ -240,7 +244,7 @@ COperatorMgr::GetMemberOperatorResultType (
 
 	CValue OpValue;
 	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
-	
+
 	CType* pType = OpValue.GetType ();
 	if (pType->GetTypeKind () == EType_DataRef)
 		pType = ((CDataPtrType*) pType)->GetTargetType ();
@@ -299,11 +303,11 @@ COperatorMgr::MemberOperator (
 			return BinaryOperator (EBinOp_Idx, OpValue, CValue (Index, EType_SizeT), pResultValue);
 
 		case EType_Struct:
-			pField = ((CStructType*) pType)->GetFieldByIndex (Index);		
+			pField = ((CStructType*) pType)->GetFieldByIndex (Index);
 			return pField && GetStructField (OpValue, pField, NULL, pResultValue);
 
 		case EType_Union:
-			pField = ((CUnionType*) pType)->GetFieldByIndex (Index);		
+			pField = ((CUnionType*) pType)->GetFieldByIndex (Index);
 			return pField && GetUnionField (OpValue, pField, pResultValue);
 
 		default:
@@ -313,12 +317,12 @@ COperatorMgr::MemberOperator (
 
 	case EType_ClassRef:
 		pType = ((CClassPtrType*) pType)->GetTargetType ();
-		pField = ((CClassType*) pType)->GetFieldByIndex (Index);		
+		pField = ((CClassType*) pType)->GetFieldByIndex (Index);
 		return pField && GetClassField (OpValue, pField, NULL, pResultValue);
 
 	default:
 		err::SetFormatStringError ("indexed member operator cannot be applied to '%s'", pType->GetTypeString ().cc ());
-		return false;		
+		return false;
 	}
 }
 
@@ -338,7 +342,7 @@ COperatorMgr::MemberOperator (
 		return false;
 
 	CType* pType = OpValue.GetType ();
-	
+
 	if (pType->GetTypeKind () == EType_DataRef)
 		pType = ((CDataPtrType*) pType)->GetTargetType ();
 
@@ -359,7 +363,7 @@ COperatorMgr::MemberOperator (
 		return GetNamedTypeMember (OpValue, (CNamedType*) pType, pName, pResultValue);
 
 	case EType_ClassPtr:
-		return 
+		return
 			PrepareOperand (&OpValue) &&
 			GetNamedTypeMember (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName, pResultValue);
 
@@ -434,8 +438,8 @@ COperatorMgr::GetStdPropertyFieldType (
 	if (OpValue.GetValueKind () != EValue_Property)
 	{
 		err::SetFormatStringError (
-			"'%s' has no field '%s'", 
-			OpValue.GetType ()->GetTypeString ().cc (), 
+			"'%s' has no field '%s'",
+			OpValue.GetType ()->GetTypeString ().cc (),
 			GetStdPropertyFieldString (Field)
 			);
 		return NULL;
@@ -486,7 +490,7 @@ COperatorMgr::GetStdPropertyFieldType (
 bool
 COperatorMgr::GetStdPropertyField (
 	const CValue& RawOpValue,
-	EStdPropertyField Field, 
+	EStdPropertyField Field,
 	CValue* pResultValue
 	)
 {
@@ -502,8 +506,8 @@ COperatorMgr::GetStdPropertyField (
 	if (!pOpType->IsPropertyPtrType ())
 	{
 		err::SetFormatStringError (
-			"'%s' has no field '%s'", 
-			pOpType->GetTypeString ().cc (), 
+			"'%s' has no field '%s'",
+			pOpType->GetTypeString ().cc (),
 			GetStdPropertyFieldString (Field)
 			);
 		return false;

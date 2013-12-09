@@ -422,7 +422,7 @@ COperatorMgr::CastArgValueList (
 				return false;
 			}
 
-			Result = EvaluateAlias (Initializer, &ArgValue);
+			Result = EvaluateAlias (pArg->GetItemDecl ()->GetParentUnit (), Initializer, &ArgValue);
 			if (!Result)
 				return false;
 		}
@@ -455,7 +455,7 @@ COperatorMgr::CastArgValueList (
 			return false;
 		}
 
-		Result = EvaluateAlias (Initializer, &ArgValue);
+		Result = EvaluateAlias (pArg->GetItemDecl ()->GetParentUnit (), Initializer, &ArgValue);
 		if (!Result)
 			return false;
 

@@ -58,7 +58,6 @@ class CNamespace: public CModuleItemDecl
 
 protected:
 	ENamespace m_NamespaceKind;
-	EAccess m_CurrentAccessKind;
 
 	rtl::CArrayT <CModuleItem*> m_ItemArray;
 	rtl::CStringHashTableMapT <CModuleItem*> m_ItemMap;
@@ -66,18 +65,15 @@ protected:
 	rtl::CStringHashTableMapT <TDualPtrTypeTuple*> m_DualPtrTypeTupleMap;
 
 public:
-	CNamespace ();
+	CNamespace ()
+	{
+		m_NamespaceKind = ENamespace_Undefined;
+	}
 
 	ENamespace
 	GetNamespaceKind ()
 	{
 		return m_NamespaceKind;
-	}
-
-	EAccess
-	GetCurrentAccessKind ()
-	{
-		return m_CurrentAccessKind;
 	}
 
 	rtl::CString

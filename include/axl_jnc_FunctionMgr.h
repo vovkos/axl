@@ -74,6 +74,11 @@ enum EStdFunc
 
 	EStdFunc_StrengthenClassPtr,
 
+	// size_t
+	// jnc.GetDataPtrSpan (jnc.DataPtr Ptr);
+
+	EStdFunc_GetDataPtrSpan,
+
 	// int8*
 	// jnc.HeapAlloc (size_t Size);
 
@@ -511,6 +516,9 @@ protected:
 
 	CFunction*
 	CreateStrengthenClassPtr ();
+
+	CFunction*
+	CreateGetDataPtrSpan ();
 
 	CFunction*
 	CreateHeapAlloc ();

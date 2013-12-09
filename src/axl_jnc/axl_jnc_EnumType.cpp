@@ -30,7 +30,7 @@ CEnumType::CreateConst (
 		pConst->m_Initializer.TakeOver (pInitializer);
 
 	m_ConstList.InsertTail (pConst);
-	
+
 	bool Result = AddItem (pConst);
 	if (!Result)
 		return NULL;
@@ -57,6 +57,9 @@ CEnumType::CalcLayout ()
 
 	// assign values to consts
 
+	m_pModule->m_NamespaceMgr.OpenNamespace (this);
+	CUnit* pUnit = m_pItemDecl->GetParentUnit ();
+
 	if (m_EnumTypeKind == EEnumType_Flag)
 	{
 		intptr_t Value = 1;
@@ -66,7 +69,12 @@ CEnumType::CalcLayout ()
 		{
 			if (!Const->m_Initializer.IsEmpty ())
 			{
-				Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (Const->m_Initializer, &Value);
+				Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (
+					pUnit,
+					Const->m_Initializer,
+					&Value
+					);
+
 				if (!Result)
 					return false;
 			}
@@ -86,7 +94,12 @@ CEnumType::CalcLayout ()
 		{
 			if (!Const->m_Initializer.IsEmpty ())
 			{
-				Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (Const->m_Initializer, &Value);
+				Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (
+					pUnit,
+					Const->m_Initializer,
+					&Value
+					);
+
 				if (!Result)
 					return false;
 			}
@@ -94,6 +107,8 @@ CEnumType::CalcLayout ()
 			Const->m_Value = Value;
 		}
 	}
+
+	m_pModule->m_NamespaceMgr.CloseNamespace ();
 
 	return true;
 }

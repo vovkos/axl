@@ -24,6 +24,16 @@ CUnitMgr::Clear ()
 }
 
 CUnit*
+CUnitMgr::SetCurrentUnit (CUnit* pUnit)
+{
+	ASSERT (pUnit);
+
+	CUnit* pPrevUnit = m_pCurrentUnit;
+	m_pCurrentUnit = pUnit;
+	return pPrevUnit;
+}
+
+CUnit*
 CUnitMgr::CreateUnit (const rtl::CString& FilePath)
 {
 	CUnit* pUnit = AXL_MEM_NEW (CUnit);

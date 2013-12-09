@@ -16,6 +16,8 @@ StdLib::Printf (
 	...
 	)
 {
+	Foo ();
+
 	AXL_VA_DECL (va, pFormat);
 
 	rtl::CString Text;
@@ -24,6 +26,15 @@ StdLib::Printf (
 	WriteOutput (Text, Length);
 
 	return Length;
+}
+
+TPoint
+StdLib::Foo ()
+{
+	printf ("foo ()\n");
+
+	TPoint Point = { 100, 200 };
+	return Point;
 }
 
 //.............................................................................
@@ -412,9 +423,10 @@ bool MainWindow::compile ()
 		return false;
 	}
 
-	StdLib::Export (&runtime);
+	result =
+		StdLib::Export (&runtime) &&
+		module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());
 
-	result = module.m_FunctionMgr.JitFunctions (runtime.GetLlvmExecutionEngine ());
 	if (!result)
 	{
 		writeOutput("%s\n", err::GetError ()->GetDescription ().cc ());

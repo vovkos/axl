@@ -88,7 +88,7 @@ friend_declaration
 access_declaration
 	:	access_specifier ':'
 			{
-				m_pModule->m_NamespaceMgr.GetCurrentNamespace ()->m_CurrentAccessKind = $1.m_AccessKind;
+				m_pModule->m_NamespaceMgr.m_CurrentAccessKind = $1.m_AccessKind;
 			}
 	;
 

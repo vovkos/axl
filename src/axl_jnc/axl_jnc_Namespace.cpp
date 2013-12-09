@@ -12,7 +12,7 @@ namespace jnc {
 CNamespace*
 GetItemNamespace (CModuleItem* pItem)
 {
-	EModuleItem ItemKind = pItem->GetItemKind ();	
+	EModuleItem ItemKind = pItem->GetItemKind ();
 	switch (ItemKind)
 	{
 	case EModuleItem_Namespace:
@@ -32,7 +32,7 @@ GetItemNamespace (CModuleItem* pItem)
 		return NULL;
 	}
 
-	CType* pType = (CType*) pItem;	
+	CType* pType = (CType*) pItem;
 	EType TypeKind = pType->GetTypeKind ();
 	switch (TypeKind)
 	{
@@ -52,7 +52,7 @@ GetItemNamespace (CModuleItem* pItem)
 const char*
 GetNamespaceKindString (ENamespace NamespaceKind)
 {
-	static const char* StringTable [ENamespace__Count] = 
+	static const char* StringTable [ENamespace__Count] =
 	{
 		"undefined-namespace-kind",  // ENamespace_Undefined = 0,
 		"global",                    // ENamespace_Global,
@@ -63,24 +63,18 @@ GetNamespaceKindString (ENamespace NamespaceKind)
 		"property-template",         // ENamespace_PropertyTemplate,
 	};
 
-	return (size_t) NamespaceKind < ENamespace__Count ? 
-		StringTable [NamespaceKind] : 
+	return (size_t) NamespaceKind < ENamespace__Count ?
+		StringTable [NamespaceKind] :
 		StringTable [ENamespace_Undefined];
 }
 
 //.............................................................................
 
-CNamespace::CNamespace ()
-{
-	m_NamespaceKind = ENamespace_Undefined;
-	m_CurrentAccessKind = EAccess_Public;
-}
-
 void
 CNamespace::Clear ()
 {
-	m_ItemArray.Clear (); 
-	m_ItemMap.Clear (); 
+	m_ItemArray.Clear ();
+	m_ItemMap.Clear ();
 }
 
 rtl::CString
@@ -123,7 +117,7 @@ CNamespace::GetItemByName (const char* pName)
 CModuleItem*
 CNamespace::FindItem (const char* pName)
 {
-	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName); 
+	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
 	return It ? It->m_Value : NULL;
 }
 
@@ -205,7 +199,7 @@ bool
 CNamespace::AddItem (
 	CModuleItem* pItem,
 	CModuleItemDecl* pDecl
-	)	
+	)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Goto (pDecl->m_Name);
 	if (It->m_Value)
@@ -227,7 +221,7 @@ CNamespace::AddFunction (CFunction* pFunction)
 		return AddItem (pFunction);
 
 	if (pOldItem->GetItemKind () != EModuleItem_Function)
-	{	
+	{
 		SetRedefinitionError (pFunction->GetName ());
 		return false;
 	}
@@ -249,7 +243,7 @@ CNamespace::ExposeEnumConsts (CEnumType* pType)
 			return false;
 	}
 
-	return true;	
+	return true;
 }
 
 //.............................................................................

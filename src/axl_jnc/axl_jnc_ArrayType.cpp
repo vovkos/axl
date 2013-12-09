@@ -76,7 +76,7 @@ CArrayType::CalcLayout ()
 	if (!m_ElementCountInitializer.IsEmpty ())
 	{
 		intptr_t Value = 0;
-		Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (m_ElementCountInitializer, &Value);
+		Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (NULL, m_ElementCountInitializer, &Value);
 		if (!Result)
 			return false;
 

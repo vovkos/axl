@@ -321,6 +321,11 @@ CFunction::CalcLayout ()
 	if (!Result)
 		return false;
 
+	// copy src pos
+
+	pOriginFunction->m_pParentUnit = m_pParentUnit;
+	pOriginFunction->m_Pos = m_Pos;
+
 	// copy arg names and make sure orphan funciton does not override default values
 
 	rtl::CArrayT <CFunctionArg*> DstArgArray = pOriginFunction->m_pType->GetArgArray ();
@@ -363,6 +368,8 @@ CFunction::Compile ()
 
 	if (m_pEntryBlock) // already compiled
 		return true;
+
+	m_pModule->m_UnitMgr.SetCurrentUnit (m_pItemDecl->GetParentUnit ());
 
 	// prologue
 

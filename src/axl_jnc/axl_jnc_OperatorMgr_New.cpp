@@ -291,10 +291,14 @@ COperatorMgr::Construct (
 bool
 COperatorMgr::ParseInitializer (
 	const CValue& RawValue,
+	CUnit* pUnit,
 	const rtl::CConstBoxListT <CToken>& ConstructorTokenList,
 	const rtl::CConstBoxListT <CToken>& InitializerTokenList
 	)
 {
+	if (pUnit)
+		m_pModule->m_UnitMgr.SetCurrentUnit (pUnit);
+
 	bool Result;
 
 	CValue Value = RawValue;
@@ -355,12 +359,16 @@ COperatorMgr::ParseInitializer (
 
 bool
 COperatorMgr::ParseExpressionEx (
+	CUnit* pUnit,
 	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 	const CValue& PitcherReturnValue,
 	uint_t Flags,
 	CValue* pResultValue
 	)
 {
+	if (pUnit)
+		m_pModule->m_UnitMgr.SetCurrentUnit (pUnit);
+
 	CParser Parser;
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
@@ -379,11 +387,12 @@ COperatorMgr::ParseExpressionEx (
 
 bool
 COperatorMgr::ParseConstExpression (
+	CUnit* pUnit,
 	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 	CValue* pResultValue
 	)
 {
-	bool Result = ParseExpression (ExpressionTokenList, CParser::EFlag_ConstExpression, pResultValue);
+	bool Result = ParseExpression (pUnit, ExpressionTokenList, CParser::EFlag_ConstExpression, pResultValue);
 	if (!Result)
 		return false;
 
@@ -393,12 +402,13 @@ COperatorMgr::ParseConstExpression (
 
 bool
 COperatorMgr::ParseConstIntegerExpression (
+	CUnit* pUnit,
 	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
 	intptr_t* pInteger
 	)
 {
 	CValue Value;
-	bool Result = ParseConstExpression (ExpressionTokenList, &Value);
+	bool Result = ParseConstExpression (pUnit, ExpressionTokenList, &Value);
 	if (!Result)
 		return false;
 
@@ -517,6 +527,7 @@ COperatorMgr::ParseAutoSizeArrayCurlyInitializer (const rtl::CConstBoxListT <CTo
 
 bool
 COperatorMgr::EvaluateAlias (
+	CUnit* pUnit,
 	const rtl::CConstBoxListT <CToken> TokenList,
 	CValue* pResultValue
 	)

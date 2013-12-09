@@ -465,17 +465,15 @@ CParser::Declare (CDeclarator* pDeclarator)
 void
 CParser::AssignDeclarationAttributes (
 	CModuleItem* pItem,
-	CNamespace* pNamespace,
 	const CToken::CPos& Pos
 	)
 {
 	CModuleItemDecl* pDecl = pItem->GetItemDecl ();
 	ASSERT (pDecl);
 
-	if (!m_AccessKind)
-		m_AccessKind = pNamespace->GetCurrentAccessKind ();
-
-	pDecl->m_AccessKind = m_AccessKind;
+	pDecl->m_AccessKind = m_AccessKind ?
+		m_AccessKind :
+		m_pModule->m_NamespaceMgr.GetCurrentAccessKind ();
 
 	// don't overwrite storage unless explicit
 
@@ -483,7 +481,8 @@ CParser::AssignDeclarationAttributes (
 		pDecl->m_StorageKind = m_StorageKind;
 
 	pDecl->m_Pos = Pos;
-	pDecl->m_pParentNamespace = pNamespace;
+	pDecl->m_pParentUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	pDecl->m_pParentNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	pDecl->m_pAttributeBlock = m_pAttributeBlock;
 
 	pItem->m_Flags |= EModuleItemFlag_User;
@@ -529,7 +528,7 @@ CParser::DeclareTypedef (
 	if (!pItem)
 		return false;
 
-	AssignDeclarationAttributes (pItem, pNamespace, pDeclarator->GetPos ());
+	AssignDeclarationAttributes (pItem, pDeclarator->GetPos ());
 
 	Result = pNamespace->AddItem (pItem, pItem->GetItemDecl ());
 	if (!Result)
@@ -589,7 +588,7 @@ CParser::DeclareAlias (
 	pType = Parser.m_ExpressionValue.GetType ();
 
 	CAlias* pAlias = m_pModule->m_VariableMgr.CreateAlias (Name, QualifiedName, pType, pInitializer);
-	AssignDeclarationAttributes (pAlias, pNamespace, pDeclarator->GetPos ());
+	AssignDeclarationAttributes (pAlias, pDeclarator->GetPos ());
 
 	Result = pNamespace->AddItem (pAlias);
 	if (!Result)
@@ -665,7 +664,7 @@ CParser::DeclareFunction (
 	pFunction->m_DeclaratorName = *pDeclarator->GetName ();
 	pFunction->m_Tag = pNamespace->CreateQualifiedName (pFunction->m_DeclaratorName);
 
-	AssignDeclarationAttributes (pFunction, pNamespace, pDeclarator->GetPos ());
+	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
 
 	if (PostModifiers & EPostDeclaratorModifier_Const)
 		pFunction->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
@@ -855,7 +854,7 @@ CParser::CreateProperty (
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
 	CProperty* pProperty = m_pModule->m_FunctionMgr.CreateProperty (Name, QualifiedName);
 
-	AssignDeclarationAttributes (pProperty, pNamespace, Pos);
+	AssignDeclarationAttributes (pProperty, Pos);
 
 	EType TypeKind;
 
@@ -1079,7 +1078,7 @@ CParser::DeclareReactor (
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
 
 	pType = m_pModule->m_TypeMgr.CreateReactorType (Name, QualifiedName, (CReactorClassType*) pType, (CClassType*) pParentType);
-	AssignDeclarationAttributes (pType, pNamespace, pDeclarator->GetPos ());
+	AssignDeclarationAttributes (pType, pDeclarator->GetPos ());
 
 	return DeclareData (pDeclarator, pType, PtrTypeFlags);
 }
@@ -1219,7 +1218,7 @@ CParser::DeclareData (
 		if (m_StorageKind == EStorage_Member)
 		{
 			pDataItem = pProperty->CreateField (Name, pType, BitCount, PtrTypeFlags, pConstructor, pInitializer);
-			AssignDeclarationAttributes (pDataItem, pNamespace, pDeclarator->GetPos ());
+			AssignDeclarationAttributes (pDataItem, pDeclarator->GetPos ());
 		}
 		else
 		{
@@ -1233,7 +1232,7 @@ CParser::DeclareData (
 				pInitializer
 				);
 
-			AssignDeclarationAttributes (pVariable, pNamespace, pDeclarator->GetPos ());
+			AssignDeclarationAttributes (pVariable, pDeclarator->GetPos ());
 
 			Result = pNamespace->AddItem (pVariable);
 			if (!Result)
@@ -1268,7 +1267,7 @@ CParser::DeclareData (
 			pInitializer
 			);
 
-		AssignDeclarationAttributes (pVariable, pNamespace, pDeclarator->GetPos ());
+		AssignDeclarationAttributes (pVariable, pDeclarator->GetPos ());
 
 		Result = pNamespace->AddItem (pVariable);
 		if (!Result)
@@ -1311,7 +1310,7 @@ CParser::DeclareData (
 		if (!pField)
 			return false;
 
-		AssignDeclarationAttributes (pField, pNamespace, pDeclarator->GetPos ());
+		AssignDeclarationAttributes (pField, pDeclarator->GetPos ());
 	}
 
 	return true;
@@ -1371,7 +1370,7 @@ CParser::CreateFormalArg (
 	rtl::CBoxListT <CToken>* pInitializer = &pDeclarator->m_Initializer;
 
 	CFunctionArg* pArg = m_pModule->m_TypeMgr.CreateFunctionArg (Name, pType, PtrTypeFlags, pInitializer);
-	AssignDeclarationAttributes (pArg, pNamespace, pDeclarator->GetPos ());
+	AssignDeclarationAttributes (pArg, pDeclarator->GetPos ());
 
 	pArgSuffix->m_ArgArray.Append (pArg);
 
@@ -1406,7 +1405,7 @@ CParser::CreateEnumType (
 			return NULL;
 	}
 
-	AssignDeclarationAttributes (pEnumType, pNamespace, m_LastMatchedToken.m_Pos);
+	AssignDeclarationAttributes (pEnumType, m_LastMatchedToken.m_Pos);
 	return pEnumType;
 }
 
@@ -1452,7 +1451,7 @@ CParser::CreateStructType (
 			return NULL;
 	}
 
-	AssignDeclarationAttributes (pStructType, pNamespace, m_LastMatchedToken.m_Pos);
+	AssignDeclarationAttributes (pStructType, m_LastMatchedToken.m_Pos);
 	return pStructType;
 }
 
@@ -1480,7 +1479,7 @@ CParser::CreateUnionType (const rtl::CString& Name)
 			return NULL;
 	}
 
-	AssignDeclarationAttributes (pUnionType, pNamespace, m_LastMatchedToken.m_Pos);
+	AssignDeclarationAttributes (pUnionType, m_LastMatchedToken.m_Pos);
 	return pUnionType;
 }
 
@@ -1525,7 +1524,7 @@ CParser::CreateClassType (
 			return NULL;
 	}
 
-	AssignDeclarationAttributes (pClassType, pNamespace, m_LastMatchedToken.m_Pos);
+	AssignDeclarationAttributes (pClassType, m_LastMatchedToken.m_Pos);
 	return pClassType;
 }
 
@@ -1897,7 +1896,11 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_Alias:
-		return m_pModule->m_OperatorMgr.EvaluateAlias (((CAlias*) pItem)->GetInitializer (), pValue);
+		return m_pModule->m_OperatorMgr.EvaluateAlias (
+			pItem->GetItemDecl ()->GetParentUnit (),
+			((CAlias*) pItem)->GetInitializer (),
+			pValue
+			);
 
 	case EModuleItem_Variable:
 		if (m_Flags & EFlag_ConstExpression)
@@ -2306,12 +2309,15 @@ CParser::AppendFmtLiteralValue (
 {
 	ASSERT (pLiteral->m_FmtLiteralValue);
 
-	EStdFunc AppendFunc;
+	if (FmtSpecifierString == 'B') // binary format
+		return AppendFmtLiteralBinValue (pLiteral, RawSrcValue);
 
 	CValue SrcValue;
 	bool Result = m_pModule->m_OperatorMgr.PrepareOperand (RawSrcValue, &SrcValue);
 	if (!Result)
 		return false;
+
+	EStdFunc AppendFunc;
 
 	CType* pType = SrcValue.GetType ();
 	if (pType->GetTypeKindFlags () & ETypeKindFlag_Integer)
@@ -2374,6 +2380,40 @@ CParser::AppendFmtLiteralValue (
 }
 
 bool
+CParser::AppendFmtLiteralBinValue (
+	TLiteral* pLiteral,
+	const CValue& RawSrcValue
+	)
+{
+	CValue SrcValue;
+	bool Result = m_pModule->m_OperatorMgr.PrepareOperand (RawSrcValue, &SrcValue);
+	if (!Result)
+		return false;
+
+	CType* pType = SrcValue.GetType ();
+	CFunction* pAppend = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_AppendFmtLiteral_a);
+	CType* pArgType = GetSimpleType (m_pModule, EStdType_BytePtr);
+
+	CValue SizeValue (pType->GetSize (), EType_SizeT);
+
+	CValue TmpValue;
+	CValue ResultValue;
+	m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, "tmpFmtValue", NULL, &TmpValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (SrcValue, TmpValue);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (TmpValue, pArgType, &TmpValue);
+	m_pModule->m_LlvmIrBuilder.CreateCall3 (
+		pAppend,
+		pAppend->GetType (),
+		pLiteral->m_FmtLiteralValue,
+		TmpValue,
+		SizeValue,
+		&ResultValue
+		);
+
+	return true;
+}
+
+bool
 CParser::FinalizeLiteral (
 	TLiteral* pLiteral,
 	CValue* pResultValue
@@ -2398,6 +2438,7 @@ CParser::FinalizeLiteral (
 
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 2, NULL, &SizeValue);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (SizeValue, NULL, &SizeValue);
+	m_pModule->m_LlvmIrBuilder.CreateAdd_i (SizeValue, CValue (1, EType_SizeT), NULL, &SizeValue);
 
 	pResultValue->SetThinDataPtr (
 		PtrValue.GetLlvmValue (),
