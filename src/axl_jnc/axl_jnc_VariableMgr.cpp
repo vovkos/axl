@@ -175,6 +175,10 @@ CVariableMgr::CreateArgVariable (
 		pArg->GetPtrTypeFlags ()
 		);
 
+	pVariable->m_pParentUnit = pArg->GetParentUnit ();
+	pVariable->m_Pos = *pArg->GetPos ();
+	pVariable->m_Flags |= EModuleItemFlag_User;
+
 	CValue PtrValue;
 	Result = m_pModule->m_OperatorMgr.Allocate (
 		EStorage_Stack,
