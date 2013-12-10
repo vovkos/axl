@@ -183,7 +183,7 @@ CFunctionMgr::PushEmissionContext ()
 	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
-	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc ();
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
 
 	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 
@@ -317,8 +317,8 @@ CFunctionMgr::Prologue (
 	pFunction->m_pEntryBlock = pEntryBlock;
 	pEntryBlock->MarkEntry ();
 
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ()); // llvm magic
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
-	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc (); // no line info in entry block
 
 #ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
@@ -507,6 +507,8 @@ CFunctionMgr::InternalPrologue (
 {
 	PushEmissionContext ();
 
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
+
 	m_pCurrentFunction = pFunction;
 
 	m_pModule->m_NamespaceMgr.OpenInternalScope ();
@@ -518,7 +520,6 @@ CFunctionMgr::InternalPrologue (
 	pEntryBlock->MarkEntry ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
-	m_pModule->m_LlvmIrBuilder.ClearCurrentDebugLoc (); // no line info in entry block
 
 #ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);

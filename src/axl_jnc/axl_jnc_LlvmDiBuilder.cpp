@@ -45,6 +45,17 @@ CLlvmDiBuilder::Clear ()
 	m_pLlvmDiBuilder = NULL;
 }
 
+llvm::DebugLoc
+CLlvmDiBuilder::GetEmptyDebugLoc ()
+{
+	// llvm magic: unfortunately, simple llvm::DebugLoc () doesn't quit cut it
+
+	CUnit* pUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	return pUnit ?
+		llvm::DebugLoc::get (0, 0, pUnit->GetLlvmDiFile ()) :
+		llvm::DebugLoc ();
+}
+
 llvm::DIType
 CLlvmDiBuilder::CreateSubroutineType (CFunctionType* pFunctionType)
 {

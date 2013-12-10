@@ -100,12 +100,6 @@ public:
 	}
 
 	void
-	ClearCurrentDebugLoc ()
-	{
-		m_pLlvmIrBuilder->SetCurrentDebugLocation (llvm::DebugLoc ());
-	}
-
-	void
 	SetInstDebugLoc (llvm::Instruction* pLlvmInst)
 	{
 		m_pLlvmIrBuilder->SetInstDebugLocation (pLlvmInst);

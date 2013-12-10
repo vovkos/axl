@@ -76,6 +76,9 @@ public:
 		return llvm::DebugLoc::get (Pos.m_Line + 1, 0, pScope->GetLlvmDiScope ());
 	}
 
+	llvm::DebugLoc
+	GetEmptyDebugLoc ();
+
 	llvm::DIFile
 	CreateFile (
 		const char* pFileName,
