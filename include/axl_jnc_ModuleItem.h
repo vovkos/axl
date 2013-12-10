@@ -36,6 +36,7 @@ enum EModuleItem
 	EModuleItem_EnumConst,
 	EModuleItem_StructField,
 	EModuleItem_BaseTypeSlot,
+	EModuleItem_Orphan,
 	EModuleItem__Count,
 };
 
@@ -49,9 +50,8 @@ GetModuleItemKindString (EModuleItem ItemKind);
 enum EModuleItemFlag
 {
 	EModuleItemFlag_User         = 0x01,
-	EModuleItemFlag_Orphan       = 0x02,
-	EModuleItemFlag_NeedLayout   = 0x04,
-	EModuleItemFlag_NeedCompile  = 0x08,
+	EModuleItemFlag_NeedLayout   = 0x02,
+	EModuleItemFlag_NeedCompile  = 0x04,
 	EModuleItemFlag_InCalcLayout = 0x10,
 	EModuleItemFlag_LayoutReady  = 0x20,
 	EModuleItemFlag_Constructed  = 0x40, // fields, properties, base type slots
@@ -107,6 +107,7 @@ class CModuleItemDecl
 	friend class CParser;
 	friend class CNamespace;
 	friend class CControlFlowMgr;
+	friend class COrphan;
 
 protected:
 	EStorage m_StorageKind;

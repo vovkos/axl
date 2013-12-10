@@ -139,6 +139,7 @@ set (
 	NAMESPACE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Namespace.h
 	${AXL_INC_DIR}/axl_jnc_NamespaceMgr.h
+	${AXL_INC_DIR}/axl_jnc_Orphan.h
 	${AXL_INC_DIR}/axl_jnc_QualifiedName.h
 	${AXL_INC_DIR}/axl_jnc_Scope.h
 	)
@@ -147,6 +148,7 @@ set (
 	NAMESPACE_CPP_LIST
 	axl_jnc_Namespace.cpp
 	axl_jnc_NamespaceMgr.cpp
+	axl_jnc_Orphan.cpp
 	axl_jnc_QualifiedName.cpp
 	axl_jnc_Scope.cpp
 	)

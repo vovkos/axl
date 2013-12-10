@@ -16,8 +16,6 @@ StdLib::Printf (
 	...
 	)
 {
-	Foo ();
-
 	AXL_VA_DECL (va, pFormat);
 
 	rtl::CString Text;

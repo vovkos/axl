@@ -187,12 +187,14 @@ CParser::IsEmptyDeclarationTerminatorAllowed (CTypeSpecifier* pTypeSpecifier)
 
 		return true;
 	}
-	else if (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Property)
+
+	EModuleItem ItemKind = m_pLastDeclaredItem->GetItemKind ();
+	switch (ItemKind)
 	{
+	case EModuleItem_Property:
 		return FinalizeLastProperty (false);
-	}
-	else if (m_pLastDeclaredItem->GetFlags () & EModuleItemFlag_Orphan)
-	{
+
+	case EModuleItem_Orphan:
 		err::SetFormatStringError ("orphan '%s' without a body", m_pLastDeclaredItem->m_Tag.cc ());
 		return false;
 	}
@@ -235,6 +237,9 @@ CParser::SetDeclarationBody (rtl::CBoxListT <CToken>* pTokenList)
 	case EModuleItem_StructField:
 		pType = ((CStructField*) m_pLastDeclaredItem)->GetType ();
 		break;
+
+	case EModuleItem_Orphan:
+		return ((COrphan*) m_pLastDeclaredItem)->SetBody (pTokenList);
 
 	default:
 		err::SetFormatStringError ("'%s' cannot have a body", GetModuleItemKindString (m_pLastDeclaredItem->GetItemKind ()));
@@ -456,7 +461,7 @@ CParser::Declare (CDeclarator* pDeclarator)
 
 		default:
 			return IsClassType (pType, EClassType_ReactorIface) ?
-				DeclareReactor (pDeclarator, (CReactorClassType*) pType, DeclFlags) :
+				DeclareReactor (pDeclarator, (CClassType*) pType, DeclFlags) :
 				DeclareData (pDeclarator, pType, DeclFlags);
 		}
 	}
@@ -660,47 +665,63 @@ CParser::DeclareFunction (
 		return true;
 	}
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType);
-	pFunction->m_DeclaratorName = *pDeclarator->GetName ();
-	pFunction->m_Tag = pNamespace->CreateQualifiedName (pFunction->m_DeclaratorName);
+	CUserModuleItem* pFunctionItem;
+	CFunctionName* pFunctionName;
 
-	AssignDeclarationAttributes (pFunction, pDeclarator->GetPos ());
+	if (pDeclarator->IsQualified ())
+	{
+		COrphan* pOrphan = m_pModule->m_NamespaceMgr.CreateOrphan (EOrphan_Function, pType);
+		pOrphan->m_FunctionKind = FunctionKind;
+		pFunctionItem = pOrphan;
+		pFunctionName = pOrphan;
+	}
+	else
+	{
+		CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (FunctionKind, pType);
+		pFunctionItem = pFunction;
+		pFunctionName = pFunction;
+	}
+
+	pFunctionName->m_DeclaratorName = *pDeclarator->GetName ();
+	pFunctionItem->m_Tag = pNamespace->CreateQualifiedName (pFunctionName->m_DeclaratorName);
+
+	AssignDeclarationAttributes (pFunctionItem, pDeclarator->GetPos ());
 
 	if (PostModifiers & EPostDeclaratorModifier_Const)
-		pFunction->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
+		pFunctionName->m_ThisArgTypeFlags = EPtrTypeFlag_Const;
 
 	switch (FunctionKind)
 	{
 	case EFunction_Named:
-		pFunction->m_Name = pDeclarator->GetName ()->GetShortName ();
-		pFunction->m_QualifiedName = pNamespace->CreateQualifiedName (pFunction->m_Name);
-		pFunction->m_Tag = pFunction->m_QualifiedName;
+		pFunctionItem->m_Name = pDeclarator->GetName ()->GetShortName ();
+		pFunctionItem->m_QualifiedName = pNamespace->CreateQualifiedName (pFunctionItem->m_Name);
+		pFunctionItem->m_Tag = pFunctionItem->m_QualifiedName;
 		break;
 
 	case EFunction_UnaryOperator:
-		pFunction->m_UnOpKind = pDeclarator->GetUnOpKind ();
-		pFunction->m_Tag.AppendFormat (".unary operator %s", GetUnOpKindString (pFunction->m_UnOpKind));
+		pFunctionName->m_UnOpKind = pDeclarator->GetUnOpKind ();
+		pFunctionItem->m_Tag.AppendFormat (".unary operator %s", GetUnOpKindString (pFunctionName->m_UnOpKind));
 		break;
 
 	case EFunction_BinaryOperator:
-		pFunction->m_BinOpKind = pDeclarator->GetBinOpKind ();
-		pFunction->m_Tag.AppendFormat (".binary operator %s", GetBinOpKindString (pFunction->m_BinOpKind));
+		pFunctionName->m_BinOpKind = pDeclarator->GetBinOpKind ();
+		pFunctionItem->m_Tag.AppendFormat (".binary operator %s", GetBinOpKindString (pFunctionName->m_BinOpKind));
 		break;
 
 	case EFunction_CastOperator:
-		pFunction->m_pCastOpType = pDeclarator->GetCastOpType ();
-		pFunction->m_Tag.AppendFormat (".cast operator %s", pFunction->m_pCastOpType);
+		pFunctionName->m_pCastOpType = pDeclarator->GetCastOpType ();
+		pFunctionItem->m_Tag.AppendFormat (".cast operator %s", pFunctionName->m_pCastOpType);
 		break;
 
 	default:
-		pFunction->m_Tag.AppendFormat (".%s", GetFunctionKindString (FunctionKind));
+		pFunctionItem->m_Tag.AppendFormat (".%s", GetFunctionKindString (FunctionKind));
 	}
 
-	if (pDeclarator->IsQualified ())
-	{
-		pFunction->m_Flags |= EModuleItemFlag_Orphan;
+	if (pFunctionItem->GetItemKind () == EModuleItem_Orphan)
 		return true;
-	}
+
+	ASSERT (pFunctionItem->GetItemKind () == EModuleItem_Function);
+	CFunction* pFunction = (CFunction*) pFunctionItem;
 
 	switch (NamespaceKind)
 	{
@@ -1042,11 +1063,13 @@ CParser::FinalizeLastProperty (bool HasBody)
 bool
 CParser::DeclareReactor (
 	CDeclarator* pDeclarator,
-	CReactorClassType* pType,
+	CClassType* pType,
 	uint_t PtrTypeFlags
 	)
 {
-	if (!pDeclarator->IsSimple ())
+	bool Result;
+
+	if (pDeclarator->GetDeclaratorKind () != EDeclarator_Name)
 	{
 		err::SetFormatStringError ("invalid reactor declarator");
 		return false;
@@ -1077,10 +1100,25 @@ CParser::DeclareReactor (
 	rtl::CString Name = pDeclarator->GetName ()->GetShortName ();
 	rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
 
-	pType = m_pModule->m_TypeMgr.CreateReactorType (Name, QualifiedName, (CReactorClassType*) pType, (CClassType*) pParentType);
-	AssignDeclarationAttributes (pType, pDeclarator->GetPos ());
+	if (pDeclarator->IsQualified ())
+	{
+		CFunction* pStart = pType->GetMemberMethodArray () [0];
+		ASSERT (pStart->GetName () == "start");
 
-	return DeclareData (pDeclarator, pType, PtrTypeFlags);
+		COrphan* pOprhan = m_pModule->m_NamespaceMgr.CreateOrphan (EOrphan_Reactor, pStart->GetType ());
+		pOprhan->m_DeclaratorName = *pDeclarator->GetName ();
+		AssignDeclarationAttributes (pOprhan, pDeclarator->GetPos ());
+	}
+	else
+	{
+		pType = m_pModule->m_TypeMgr.CreateReactorType (Name, QualifiedName, (CReactorClassType*) pType, (CClassType*) pParentType);
+		AssignDeclarationAttributes (pType, pDeclarator->GetPos ());
+		Result = DeclareData (pDeclarator, pType, PtrTypeFlags);
+		if (!Result)
+			return false;
+	}
+
+	return true;
 }
 
 bool

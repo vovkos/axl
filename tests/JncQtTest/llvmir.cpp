@@ -9,20 +9,20 @@ LlvmIr::LlvmIr(QWidget *parent)
 	setReadOnly(true);
 	setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 	setLineWrapMode (QPlainTextEdit::NoWrap);
-	setupHighlighter();	
+	setupHighlighter();
 }
 
 void LlvmIr::addFunction(jnc::CFunction* function)
 {
-	jnc::CFunctionType* pFunctionType = function->GetType (); 
+	jnc::CFunctionType* pFunctionType = function->GetType ();
 
-	appendFormat ("%s%s %s %s\n", 
+	appendFormat ("%s%s %s %s\n",
 		pFunctionType->GetTypeModifierString ().cc (),
 		pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-		function->m_Tag.cc (), 
+		function->m_Tag.cc (),
 		pFunctionType->GetArgString ().cc ()
 		);
-		
+
 	uint_t CommentMdKind = function->GetModule ()->m_LlvmIrBuilder.GetCommentMdKind ();
 
 	llvm::Function* pLlvmFunction = function->GetLlvmFunction ();
@@ -42,14 +42,14 @@ void LlvmIr::addFunction(jnc::CFunction* function)
 			llvm::raw_string_ostream Stream (String);
 
 			llvm::Instruction* pInst = Inst;
-		
+
 			llvm::MDNode* pMdComment = pInst->getMetadata (CommentMdKind);
 			if (pMdComment)
 				pInst->setMetadata (CommentMdKind, NULL); // remove before print
 
 			pInst->print (Stream);
 
-			llvm::DebugLoc LlvmDebugLoc = pInst->getDebugLoc ();							
+			llvm::DebugLoc LlvmDebugLoc = pInst->getDebugLoc ();
 			if (LlvmDebugLoc.isUnknown ())
 				appendFormat ("%s\n", String.c_str ());
 			else
@@ -77,9 +77,6 @@ bool LlvmIr::build(jnc::CModule *module)
 	rtl::CIteratorT <jnc::CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
-			continue;
-
 		addFunction (*Function);
 		appendFormat ("\n;........................................\n\n");
 	}

@@ -19,6 +19,7 @@ class CFunctionArg: public CUserModuleItem
 	friend class CTypeMgr;
 	friend class CFunction;
 	friend class CClassType;
+	friend class COrphan;
 
 protected:
 	CType* m_pType;
@@ -30,31 +31,31 @@ protected:
 public:
 	CFunctionArg ();
 
-	CType* 
+	CType*
 	GetType ()
 	{
 		return m_pType;
 	}
 
-	CImportType* 
+	CImportType*
 	GetType_i ()
 	{
 		return m_pType_i;
 	}
 
-	uint_t 
+	uint_t
 	GetPtrTypeFlags ()
 	{
 		return m_PtrTypeFlags;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetInitializer ()
 	{
 		return m_Initializer;
 	}
 
-	rtl::CString 
+	rtl::CString
 	GetInitializerString ()
 	{
 		if (m_InitializerString.IsEmpty ())
@@ -64,7 +65,7 @@ public:
 	}
 
 protected:
-	virtual 
+	virtual
 	bool
 	CalcLayout ();
 };

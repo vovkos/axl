@@ -38,11 +38,11 @@ CJnc::Jit ()
 {
 	jnc::EJit JitKind = (m_pCmdLine->m_Flags & EJncFlag_Jit_mc) ? jnc::EJit_McJit : jnc::EJit_Normal;
 
-	return 
+	return
 		m_Runtime.Create (
-			&m_Module, 
-			JitKind, 
-			m_pCmdLine->m_GcHeapSize, 
+			&m_Module,
+			JitKind,
+			m_pCmdLine->m_GcHeapSize,
 			m_pCmdLine->m_StackSize
 			) &&
 		CStdLib::Export (&m_Runtime) &&
@@ -63,9 +63,6 @@ CJnc::PrintLlvmIr ()
 	rtl::CIteratorT <jnc::CFunction> Function = m_Module.m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
-			continue;
-
 		jnc::CFunctionType* pFunctionType = Function->GetType ();
 
 		m_pOutStream->Printf ("%s %s %s %s\n",
@@ -120,9 +117,6 @@ CJnc::PrintDisassembly ()
 	rtl::CIteratorT <jnc::CFunction> Function = m_Module.m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
-			continue;
-
 		jnc::CFunctionType* pFunctionType = Function->GetType ();
 
 		m_pOutStream->Printf (

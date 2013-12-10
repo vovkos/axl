@@ -13,14 +13,11 @@ Disassembly::Disassembly(QWidget *parent)
 bool Disassembly::build(jnc::CModule *module)
 {
 	clear();
-	
+
 	rtl::CIteratorT <jnc::CFunction> Function = module->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
-			continue;
-
-		addFunction (*Function);		
+		addFunction (*Function);
 		appendFormat ("\n;........................................\n\n");
 	}
 
@@ -30,7 +27,7 @@ bool Disassembly::build(jnc::CModule *module)
 
 	for (; Function; Function++)
 	{
-		addFunction (*Function);		
+		addFunction (*Function);
 		appendFormat ("\n;........................................\n\n");
 	}
 
@@ -39,13 +36,13 @@ bool Disassembly::build(jnc::CModule *module)
 
 void Disassembly::addFunction(jnc::CFunction* function)
 {
-	jnc::CFunctionType* pFunctionType = function->GetType (); 
+	jnc::CFunctionType* pFunctionType = function->GetType ();
 
 	appendFormat (
-		"%s %s %s %s\n", 
+		"%s %s %s %s\n",
 		pFunctionType->GetTypeModifierString ().cc (),
 		pFunctionType->GetReturnType ()->GetTypeString ().cc (),
-		function->m_Tag.cc (), 
+		function->m_Tag.cc (),
 		pFunctionType->GetArgString ().cc ()
 		);
 

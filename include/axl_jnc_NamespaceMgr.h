@@ -6,6 +6,7 @@
 
 #include "axl_jnc_Namespace.h"
 #include "axl_jnc_Scope.h"
+#include "axl_jnc_Orphan.h"
 
 namespace axl {
 namespace jnc {
@@ -34,6 +35,7 @@ protected:
 	CGlobalNamespace m_GlobalNamespace;
 	rtl::CStdListT <CGlobalNamespace> m_NamespaceList;
 	rtl::CStdListT <CScope> m_ScopeList;
+	rtl::CStdListT <COrphan> m_OrphanList;
 
 	rtl::CArrayT <TNamespaceStackEntry> m_NamespaceStack;
 
@@ -57,6 +59,15 @@ public:
 
 	bool
 	AddStdItems ();
+
+	COrphan*
+	CreateOrphan (
+		EOrphan OrphanKind,
+		CFunctionType* pFunctionType
+		);
+
+	bool
+	ResolveOrphans ();
 
 	void
 	LockSourcePos ()

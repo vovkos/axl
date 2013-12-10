@@ -23,8 +23,9 @@ CNamespaceMgr::Clear ()
 {
 	m_GlobalNamespace.Clear ();
 	m_NamespaceList.Clear ();
-	m_NamespaceStack.Clear ();
 	m_ScopeList.Clear ();
+	m_OrphanList.Clear ();
+	m_NamespaceStack.Clear ();
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
 	m_SourcePosLockCount = 0;
@@ -49,6 +50,35 @@ CNamespaceMgr::AddStdItems ()
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CreateThread)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_Sleep)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GetTimestamp));
+}
+
+COrphan*
+CNamespaceMgr::CreateOrphan (
+	EOrphan OrphanKind,
+	CFunctionType* pFunctionType
+	)
+{
+	COrphan* pOrphan = AXL_MEM_NEW (COrphan);
+	pOrphan->m_OrphanKind = OrphanKind;
+	pOrphan->m_pFunctionType = pFunctionType;
+	m_OrphanList.InsertTail (pOrphan);
+	return pOrphan;
+}
+
+bool
+CNamespaceMgr::ResolveOrphans ()
+{
+	bool Result;
+
+	rtl::CIteratorT <COrphan> It = m_OrphanList.GetHead ();
+	for (; It; It++)
+	{
+		Result = It->ResolveOrphan ();
+		if (!Result)
+			return false;
+	}
+
+	return true;
 }
 
 void

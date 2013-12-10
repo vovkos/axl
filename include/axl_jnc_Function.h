@@ -46,7 +46,7 @@ enum EFunction
 	EFunction_CastOperator,
 	EFunction_UnaryOperator,
 	EFunction_BinaryOperator,
-	EFunction_Internal, 
+	EFunction_Internal,
 	EFunction_Thunk,
 	EFunction_Reaction,
 	EFunction_ScheduleLauncher,
@@ -60,7 +60,7 @@ enum EFunctionKindFlag
 	EFunctionKindFlag_NoStorage   = 0x01,
 	EFunctionKindFlag_NoOverloads = 0x02,
 	EFunctionKindFlag_NoArgs      = 0x04,
-}; 
+};
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -74,20 +74,14 @@ GetFunctionKindFlags (EFunction FunctionKind);
 
 //.............................................................................
 
-class CFunction: public CUserModuleItem
+// shared between CFunction and COrphan
+
+class CFunctionName
 {
-	friend class CModule;
-	friend class CFunctionMgr;
-	friend class CTypeMgr;
-	friend class CDerivableType;
-	friend class CClassType;
-	friend class CProperty;
 	friend class CParser;
-	friend class CCast_FunctionPtr;
-	friend class CJitEventListener;
 
 protected:
-	EFunction m_FunctionKind;	
+	EFunction m_FunctionKind;
 
 	union
 	{
@@ -96,51 +90,17 @@ protected:
 		CType* m_pCastOpType;
 	};
 
-	CFunctionType* m_pType;
-	CFunctionTypeOverload m_TypeOverload;
-	rtl::CArrayT <CFunction*> m_OverloadArray;
-
-	// override & orphan functions
-
 	CQualifiedName m_DeclaratorName;
-
-	// for non-static member methods
-
-	CType* m_pThisArgType;
-	CType* m_pThisType;
-	intptr_t m_ThisArgDelta;
-	uint_t m_ThisArgTypeFlags; 
-
-	// for virtual member methods
-
-	CClassType* m_pVirtualOriginClassType; 
-	size_t m_ClassVTableIndex;
-
-	// for property gettes/setters
-
-	CProperty* m_pProperty;
-	size_t m_PropertyVTableIndex;
-
-	rtl::CBoxListT <CToken> m_Body;
-
-	CBasicBlock* m_pEntryBlock;
-	CScope* m_pScope;
-
-	llvm::Function* m_pLlvmFunction;
-	llvm::Instruction* m_pLlvmPostTlsPrologueInst;
-	llvm::DISubprogram m_LlvmDiSubprogram;
-	
-	rtl::CArrayT <TTlsVariable> m_TlsVariableArray;
-
-	// native machine code
-
-	void* m_pfMachineCode;
-	size_t m_MachineCodeSize;
+	uint_t m_ThisArgTypeFlags;
 
 public:
-	CFunction ();
+	CFunctionName ()
+	{
+		m_FunctionKind = EFunction_Undefined;
+		m_pCastOpType = NULL;
+	}
 
-	EFunction 
+	EFunction
 	GetFunctionKind ()
 	{
 		return m_FunctionKind;
@@ -160,7 +120,84 @@ public:
 		return m_BinOpKind;
 	}
 
-	CFunctionType* 
+	CType*
+	GetCastOpType ()
+	{
+		ASSERT (m_FunctionKind == EFunction_CastOperator);
+		return m_pCastOpType;
+	}
+
+	const CQualifiedName*
+	GetDeclaratorName ()
+	{
+		return &m_DeclaratorName;
+	}
+
+	uint_t
+	GetThisArgTypeFlags ()
+	{
+		return m_ThisArgTypeFlags;
+	}
+};
+
+//.............................................................................
+
+class CFunction:
+	public CUserModuleItem,
+	public CFunctionName
+{
+	friend class CModule;
+	friend class CFunctionMgr;
+	friend class CTypeMgr;
+	friend class CDerivableType;
+	friend class CClassType;
+	friend class CProperty;
+	friend class COrphan;
+	friend class CParser;
+	friend class CCast_FunctionPtr;
+	friend class CJitEventListener;
+
+protected:
+	CFunctionType* m_pType;
+	CFunctionTypeOverload m_TypeOverload;
+	rtl::CArrayT <CFunction*> m_OverloadArray;
+
+	// for non-static member methods
+
+	CType* m_pThisArgType;
+	CType* m_pThisType;
+	intptr_t m_ThisArgDelta;
+
+	// for virtual member methods
+
+	CClassType* m_pVirtualOriginClassType;
+	size_t m_ClassVTableIndex;
+
+	// for property gettes/setters
+
+	CProperty* m_pProperty;
+	size_t m_PropertyVTableIndex;
+
+	rtl::CBoxListT <CToken> m_Body;
+
+	CBasicBlock* m_pEntryBlock;
+	CScope* m_pScope;
+
+	llvm::Function* m_pLlvmFunction;
+	llvm::Instruction* m_pLlvmPostTlsPrologueInst;
+	llvm::DISubprogram m_LlvmDiSubprogram;
+
+	rtl::CArrayT <TTlsVariable> m_TlsVariableArray;
+
+	// native machine code
+
+	void* m_pfMachineCode;
+	size_t m_MachineCodeSize;
+
+public:
+	CFunction ();
+
+	CFunctionType*
 	GetType ()
 	{
 		return m_pType;
@@ -168,7 +205,7 @@ public:
 
 	CFunctionTypeOverload*
 	GetTypeOverload ()
-	{	
+	{
 		return &m_TypeOverload;
 	}
 
@@ -193,15 +230,15 @@ public:
 	bool
 	NeedsVTablePtrCut ()
 	{
-		return 
+		return
 			(m_FunctionKind == EFunction_PreConstructor ||
 			m_FunctionKind == EFunction_Constructor ||
 			m_FunctionKind == EFunction_Destructor) &&
-			m_pThisType && 
+			m_pThisType &&
 			m_pThisType->GetTypeKind () == EType_ClassPtr;
 	}
 
-	CClassType* 
+	CClassType*
 	GetVirtualOriginClassType ()
 	{
 		return m_pVirtualOriginClassType;
@@ -210,17 +247,17 @@ public:
 	CDerivableType*
 	GetParentType ()
 	{
-		return m_pParentNamespace->GetNamespaceKind () == ENamespace_Type ? 
+		return m_pParentNamespace->GetNamespaceKind () == ENamespace_Type ?
 			(CDerivableType*) (CNamedType*) m_pParentNamespace : NULL;
 	}
 
-	CType* 
+	CType*
 	GetThisArgType ()
 	{
 		return m_pThisArgType;
 	}
 
-	CType* 
+	CType*
 	GetThisType ()
 	{
 		return m_pThisType;
@@ -238,7 +275,7 @@ public:
 		return m_ClassVTableIndex;
 	}
 
-	CProperty* 
+	CProperty*
 	GetProperty ()
 	{
 		return m_pProperty;
@@ -280,10 +317,10 @@ public:
 		return m_pEntryBlock;
 	}
 
-	llvm::Function* 
-	GetLlvmFunction ();		
-	
-	llvm::Instruction* 
+	llvm::Function*
+	GetLlvmFunction ();
+
+	llvm::Instruction*
 	GetLlvmPostTlsPrologueInst ()
 	{
 		return m_pLlvmPostTlsPrologueInst;
@@ -298,19 +335,19 @@ public:
 		return m_pfMachineCode;
 	}
 
-	size_t 
+	size_t
 	GetMachineCodeSize ()
 	{
 		return m_MachineCodeSize;
 	}
 
-	rtl::CArrayT <TTlsVariable> 
+	rtl::CArrayT <TTlsVariable>
 	GetTlsVariableArray ()
 	{
 		return m_TlsVariableArray;
 	}
 
-	void 
+	void
 	AddTlsVariable (CVariable* pVariable);
 
 	bool
@@ -328,8 +365,8 @@ public:
 	CFunction*
 	GetOverload (size_t Overload = 0)
 	{
-		return 
-			Overload == 0 ? this : 
+		return
+			Overload == 0 ? this :
 			Overload <= m_OverloadArray.GetCount () ? m_OverloadArray [Overload - 1] : NULL;
 	}
 
@@ -404,11 +441,6 @@ public:
 	virtual
 	bool
 	Compile ();
-
-protected:
-	virtual
-	bool
-	CalcLayout ();
 };
 
 //.............................................................................

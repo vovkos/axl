@@ -43,6 +43,7 @@ struct TReaction: rtl::TListLink
 class CReactorClassType: public CClassType
 {
 	friend class CTypeMgr;
+	friend class CParser;
 
 protected:
 	CStructField* m_FieldArray [EReactorField__Count];
@@ -54,21 +55,21 @@ protected:
 public:
 	CReactorClassType ();
 
-	CStructField* 
+	CStructField*
 	GetField (EReactorField Field)
 	{
 		ASSERT (Field < EReactorField__Count);
 		return m_FieldArray [Field];
 	}
 
-	CFunction* 
+	CFunction*
 	GetMethod (EReactorMethod Method)
 	{
 		ASSERT (Method < EReactorMethod__Count);
 		return m_MethodArray [Method];
 	}
 
-	size_t 
+	size_t
 	GetBindSiteCount ()
 	{
 		return m_BindSiteCount;
@@ -101,7 +102,7 @@ public:
 	{
 		// do not call CClass::Compile (it compiles default-constructor and default-destructor)
 
-		return 
+		return
 			CompilePrimer () &&
 			CompileStartMethod () &&
 			CompileStopMethod () &&
@@ -110,18 +111,18 @@ public:
 	}
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ()
 	{
 		m_TypeString.Format (
-			"reactor %s %s", 
+			"reactor %s %s",
 			m_QualifiedName.cc (),
 			m_MethodArray [EReactorMethod_Start]->GetType ()->GetShortType ()->GetArgString ().cc ()
 			);
 	}
 
-	virtual 
+	virtual
 	bool
 	CalcLayout ();
 

@@ -46,9 +46,6 @@ CDasmPane::Build (jnc::CModule* pModule)
 	rtl::CIteratorT <jnc::CFunction> Function = pModule->m_FunctionMgr.GetFunctionList ().GetHead ();
 	for (; Function; Function++)
 	{
-		if (Function->GetFlags () & jnc::EModuleItemFlag_Orphan)
-			continue;
-
 		jnc::CFunctionType* pFunctionType = Function->GetType ();
 
 		m_LogCtrl.Trace (

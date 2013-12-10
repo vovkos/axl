@@ -240,9 +240,12 @@ CModule::Compile ()
 {
 	bool Result;
 
-	// step 1: resolve import types
+	// step 1: resolve imports & orphans
 
-	Result = m_TypeMgr.ResolveImportTypes ();
+	Result =
+		m_TypeMgr.ResolveImportTypes () &&
+		m_NamespaceMgr.ResolveOrphans ();
+
 	if (!Result)
 		return false;
 

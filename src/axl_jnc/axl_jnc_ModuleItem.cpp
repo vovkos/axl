@@ -27,6 +27,7 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		"enum-member",                 // EModuleItem_EnumConst,
 		"struct-member",               // EModuleItem_StructField,
 		"base-type-slot",              // EModuleItem_BaseTypeSlot,
+		"orphan",                      // EModuleItem_Orphan,
 	};
 
 	return (size_t) ItemKind < EModuleItem__Count ?
