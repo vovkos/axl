@@ -102,7 +102,36 @@ GetAccessKindString (EAccess AccessKind);
 
 //.............................................................................
 
-class CModuleItemDecl
+class CModuleItemPos
+{
+	friend class CParser;
+
+protected:
+	CUnit* m_pParentUnit;
+	CToken::CPos m_Pos;
+
+public:
+	CModuleItemPos ()
+	{
+		m_pParentUnit = NULL;
+	}
+
+	CUnit*
+	GetParentUnit ()
+	{
+		return m_pParentUnit;
+	}
+
+	const CToken::CPos*
+	GetPos ()
+	{
+		return &m_Pos;
+	}
+};
+
+//.............................................................................
+
+class CModuleItemDecl: public CModuleItemPos
 {
 	friend class CParser;
 	friend class CNamespace;
@@ -112,10 +141,8 @@ class CModuleItemDecl
 protected:
 	EStorage m_StorageKind;
 	EAccess m_AccessKind;
-	CToken::CPos m_Pos;
 	rtl::CString m_Name;
 	rtl::CString m_QualifiedName;
-	CUnit* m_pParentUnit;
 	CNamespace* m_pParentNamespace;
 	CAttributeBlock* m_pAttributeBlock;
 
@@ -134,12 +161,6 @@ public:
 		return m_AccessKind;
 	}
 
-	const CToken::CPos*
-	GetPos ()
-	{
-		return &m_Pos;
-	}
-
 	bool
 	IsNamed ()
 	{
@@ -156,12 +177,6 @@ public:
 	GetQualifiedName ()
 	{
 		return m_QualifiedName;
-	}
-
-	CUnit*
-	GetParentUnit ()
-	{
-		return m_pParentUnit;
 	}
 
 	CNamespace*

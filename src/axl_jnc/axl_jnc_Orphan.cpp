@@ -135,6 +135,13 @@ COrphan::AdoptOrphanFunction (CModuleItem* pItem)
 		}
 	}
 
+	bool Result =
+		m_pFunctionType->EnsureLayout () &&
+		pOriginFunction->GetTypeOverload ()->EnsureLayout ();
+
+	if (!Result)
+		return false;
+
 	pOriginFunction = pOriginFunction->FindShortOverload (m_pFunctionType);
 	if (!pOriginFunction)
 	{

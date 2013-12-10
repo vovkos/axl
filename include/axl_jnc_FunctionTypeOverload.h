@@ -16,12 +16,14 @@ namespace jnc {
 class CFunctionTypeOverload
 {
 protected:
+	uint_t m_Flags;
 	CFunctionType* m_pType;
 	rtl::CArrayT <CFunctionType*> m_OverloadArray;
 
 public:
 	CFunctionTypeOverload ()
 	{
+		m_Flags = 0;
 		m_pType = NULL;
 	}
 
@@ -43,7 +45,7 @@ public:
 		return m_pType;
 	}
 
-	CFunctionTypeOverload& 
+	CFunctionTypeOverload&
 	operator = (CFunctionType* pType)
 	{
 		m_pType = pType;
@@ -57,7 +59,7 @@ public:
 		return m_pType == NULL;
 	}
 
-	bool 
+	bool
 	IsOverloaded () const
 	{
 		return !m_OverloadArray.IsEmpty ();
@@ -72,8 +74,8 @@ public:
 	CFunctionType*
 	GetOverload (size_t Overload = 0) const
 	{
-		return 
-			Overload == 0 ? m_pType : 
+		return
+			Overload == 0 ? m_pType :
 			Overload <= m_OverloadArray.GetCount () ? m_OverloadArray [Overload - 1] : NULL;
 	}
 
@@ -128,6 +130,9 @@ public:
 		CFunctionType* const* ppTypeArray,
 		size_t Count
 		);
+
+	bool
+	EnsureLayout ();
 };
 
 //.............................................................................

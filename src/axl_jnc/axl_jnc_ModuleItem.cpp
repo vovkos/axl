@@ -87,7 +87,6 @@ CModuleItemDecl::CModuleItemDecl ()
 {
 	m_StorageKind = EStorage_Undefined;
 	m_AccessKind = EAccess_Public; // public by default
-	m_pParentUnit = NULL;
 	m_pParentNamespace = NULL;
 	m_pAttributeBlock = NULL;
 }

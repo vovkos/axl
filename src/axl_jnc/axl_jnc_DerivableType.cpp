@@ -408,6 +408,7 @@ CDerivableType::AddProperty (CProperty* pProperty)
 		return false;
 	}
 
+	m_MemberPropertyArray.Append (pProperty);
 	return true;
 }
 

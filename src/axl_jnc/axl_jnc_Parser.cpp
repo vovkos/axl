@@ -128,8 +128,29 @@ CParser::IsTypeSpecified ()
 		pTypeSpecifier->GetTypeModifiers () & (ETypeModifierMask_Integer | ETypeModifier_Property);
 }
 
+CNamedImportType*
+CParser::GetNamedImportType (
+	const CQualifiedName& Name,
+	const CToken::CPos& Pos
+	)
+{
+	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
+	CNamedImportType* pType = m_pModule->m_TypeMgr.GetNamedImportType (Name, pNamespace);
+
+	if (!pType->m_pParentUnit)
+	{
+		pType->m_pParentUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+		pType->m_Pos = Pos;
+	}
+
+	return pType;
+}
+
 CType*
-CParser::FindType (const CQualifiedName& Name)
+CParser::FindType (
+	const CQualifiedName& Name,
+	const CToken::CPos& Pos
+	)
 {
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 
@@ -138,12 +159,12 @@ CParser::FindType (const CQualifiedName& Name)
 	if (m_Stage == EStage_Pass1)
 	{
 		if (!Name.IsSimple ())
-			return m_pModule->m_TypeMgr.GetNamedImportType (Name, pNamespace);
+			return GetNamedImportType (Name, Pos);
 
 		rtl::CString ShortName = Name.GetShortName ();
 		pItem = pNamespace->FindItem (ShortName);
 		if (!pItem)
-			return m_pModule->m_TypeMgr.GetNamedImportType (ShortName, pNamespace);
+			return GetNamedImportType (Name, Pos);
 	}
 	else
 	{
@@ -360,7 +381,7 @@ CParser::OpenTypeExtension (
 	const CToken::CPos& Pos
 	)
 {
-	CType* pType = FindType (Name);
+	CType* pType = FindType (Name, Pos);
 	if (!pType)
 	{
 		err::SetFormatStringError ("'%s' is not a type", Name.GetFullName ().cc ());

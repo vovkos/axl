@@ -40,7 +40,7 @@ public:
 		return m_pActualType != NULL;
 	}
 
-	CType* 
+	CType*
 	GetActualType ()
 	{
 		ASSERT (m_pActualType);
@@ -48,7 +48,7 @@ public:
 	}
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ()
 	{
@@ -58,14 +58,16 @@ protected:
 
 //.............................................................................
 
-class CNamedImportType: public CImportType
+class CNamedImportType:
+	public CImportType,
+	public CModuleItemPos
 {
 	friend class CTypeMgr;
 
 protected:
+	CNamespace* m_pAnchorNamespace;
 	CQualifiedName m_Name;
 	rtl::CString m_QualifiedName;
-	CNamespace* m_pAnchorNamespace;
 
 public:
 	CNamedImportType ()
@@ -74,22 +76,25 @@ public:
 		m_pAnchorNamespace = NULL;
 	}
 
+	CNamespace*
+	GetAnchorNamespace ()
+	{
+		return m_pAnchorNamespace;
+	}
+
 	const CQualifiedName&
 	GetName ()
 	{
 		return m_Name;
 	}
 
-	CNamespace* 
-	GetAnchorNamespace ()
+	rtl::CString
+	GetQualifiedName ()
 	{
-		return m_pAnchorNamespace;
+		return m_QualifiedName;
 	}
 
-	rtl::CString
-	GetQualifiedName ();
-
-	CImportPtrType* 
+	CImportPtrType*
 	GetImportPtrType (
 		uint_t TypeModifiers = 0,
 		uint_t Flags = 0
@@ -106,7 +111,7 @@ public:
 	}
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ()
 	{
@@ -127,7 +132,7 @@ protected:
 public:
 	CImportPtrType ();
 
-	CNamedImportType* 
+	CNamedImportType*
 	GetTargetType ()
 	{
 		return m_pTargetType;
@@ -142,17 +147,17 @@ public:
 	CImportPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
-			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags | EPtrTypeFlag_Checked) : 
-			this;			
+		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags | EPtrTypeFlag_Checked) :
+			this;
 	}
 
 	CImportPtrType*
 	GetUnCheckedPtrType ()
 	{
-		return (m_Flags & EPtrTypeFlag_Checked) ?  
-			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags & ~EPtrTypeFlag_Checked) : 
-			this;			
+		return (m_Flags & EPtrTypeFlag_Checked) ?
+			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags & ~EPtrTypeFlag_Checked) :
+			this;
 	}
 
 	static
@@ -164,15 +169,15 @@ public:
 		)
 	{
 		return rtl::CString::Format_s (
-			"ZP%s:%d:%d", 
-			pImportType->GetQualifiedName ().cc (), 
-			TypeModifiers, 
+			"ZP%s:%d:%d",
+			pImportType->GetQualifiedName ().cc (),
+			TypeModifiers,
 			Flags
 			);
 	}
 
 protected:
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 };

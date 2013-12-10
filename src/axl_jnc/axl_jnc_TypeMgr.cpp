@@ -144,6 +144,15 @@ CTypeMgr::GetStdType (EStdType StdType)
 	return pType;
 }
 
+void
+PushImportSrcPosError (CNamedImportType* pImportType)
+{
+	err::PushSrcPosError (
+		pImportType->GetParentUnit ()->GetFilePath (),
+		*pImportType->GetPos ()
+		);
+}
+
 bool
 CTypeMgr::ResolveImportTypes ()
 {
@@ -158,6 +167,7 @@ CTypeMgr::ResolveImportTypes ()
 		if (!pItem)
 		{
 			err::SetFormatStringError ("unresolved import '%s'", pImportType->GetTypeString ().cc ());
+			PushImportSrcPosError (pImportType);
 			return false;
 		}
 
@@ -176,6 +186,7 @@ CTypeMgr::ResolveImportTypes ()
 
 		default:
 			err::SetFormatStringError ("'%s' is not a type", pImportType->GetTypeString ().cc ());
+			PushImportSrcPosError (pImportType);
 			return false;
 		}
 	}
@@ -195,6 +206,7 @@ CTypeMgr::ResolveImportTypes ()
 			if (pImportType->m_Flags & EImportTypeFlag_ImportLoop)
 			{
 				err::SetFormatStringError ("'%s': import loop detected", pImportType->GetTypeString ().cc ());
+				PushImportSrcPosError (pSuperImportType);
 				return false;
 			}
 
@@ -1878,6 +1890,7 @@ CTypeMgr::GetNamedImportType (
 	pType->m_Signature = Signature;
 	pType->m_TypeMapIt = It;
 	pType->m_Name = Name;
+	pType->m_QualifiedName = pAnchorNamespace->CreateQualifiedName (Name);
 	pType->m_pAnchorNamespace = pAnchorNamespace;
 	pType->m_pModule = m_pModule;
 

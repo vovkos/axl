@@ -230,7 +230,7 @@ qualified_type_name_rslv
 			}
 		qualified_name $n
 			{
-				return m_Stage == EStage_Pass1 || FindType ($n.m_Name) != NULL;
+				return m_Stage == EStage_Pass1 || FindType ($n.m_Name, $n.m_FirstToken.m_Pos) != NULL;
 			}
 		('(' // we need this check if we are already in type_specifier_modifier_list
 			{
@@ -246,7 +246,7 @@ class
 qualified_type_name
 	:	qualified_name
 			{
-				CType* pType = FindType ($1.m_Name);
+				CType* pType = FindType ($1.m_Name, $1.m_FirstToken.m_Pos);
 				if (!pType)
 				{
 					err::SetFormatStringError ("'%s' is not a type", $1.m_Name.GetFullName ().cc ());

@@ -7,17 +7,7 @@ namespace jnc {
 
 //.............................................................................
 
-rtl::CString
-CNamedImportType::GetQualifiedName ()
-{
-	if (!m_QualifiedName.IsEmpty ())
-		return m_QualifiedName;
-
-	m_QualifiedName = m_pAnchorNamespace->CreateQualifiedName (m_Name);
-	return m_QualifiedName;
-}
-
-CImportPtrType* 
+CImportPtrType*
 CNamedImportType::GetImportPtrType (
 	uint_t TypeModifiers,
 	uint_t Flags
@@ -47,7 +37,7 @@ CImportPtrType::PrepareTypeString ()
 	}
 
 	m_TypeString = "import ";
-	
+
 	if (m_TypeModifiers)
 	{
 		m_TypeString += GetTypeModifierString (m_TypeModifiers);

@@ -119,8 +119,17 @@ Members2
 	bool
 	PreCreateLandingPads (uint_t Flags);
 
+	CNamedImportType*
+	GetNamedImportType (
+		const CQualifiedName& Name,
+		const CToken::CPos& Pos
+		);
+
 	CType*
-	FindType (const CQualifiedName& Name);
+	FindType (
+		const CQualifiedName& Name,
+		const CToken::CPos& Pos
+		);
 
 	bool
 	SetStorageKind (EStorage StorageKind);

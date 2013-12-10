@@ -91,7 +91,7 @@ CFunctionTypeOverload::ChooseOverload (
 	if (pCastKind)
 		*pCastKind = BestCastKind;
 
-	return BestOverload; 
+	return BestOverload;
 }
 
 size_t
@@ -137,7 +137,7 @@ CFunctionTypeOverload::ChooseOverload (
 	if (pCastKind)
 		*pCastKind = BestCastKind;
 
-	return BestOverload; 
+	return BestOverload;
 }
 
 size_t
@@ -160,7 +160,7 @@ CFunctionTypeOverload::ChooseSetterOverload (
 	size_t Count = m_OverloadArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		CFunctionType* pOverloadType = m_OverloadArray [i];		
+		CFunctionType* pOverloadType = m_OverloadArray [i];
 		CType* pSetterValueArgType = pOverloadType->GetArgArray () [SetterValueIdx]->GetType ();
 
 		ECast CastKind = pModule->m_OperatorMgr.GetCastKind (Value, pSetterValueArgType);
@@ -189,7 +189,7 @@ CFunctionTypeOverload::ChooseSetterOverload (
 	if (pCastKind)
 		*pCastKind = BestCastKind;
 
-	return BestOverload; 
+	return BestOverload;
 }
 
 bool
@@ -210,7 +210,7 @@ CFunctionTypeOverload::AddOverload (CFunctionType* pType)
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunctionType* pOverloadType = m_OverloadArray [i];
-		
+
 		if (pType->GetArgSignature ().Cmp (pOverloadType->GetArgSignature ()) == 0)
 		{
 			err::SetFormatStringError ("illegal function overload: duplicate argument signature");
@@ -233,7 +233,31 @@ CFunctionTypeOverload::Copy (
 	m_OverloadArray.Copy (ppTypeArray + 1, Count - 1);
 }
 
-//.............................................................................
+bool
+CFunctionTypeOverload::EnsureLayout ()
+{
+	bool Result;
+
+	if (m_Flags & EModuleItemFlag_LayoutReady)
+		return true;
+
+	Result = m_pType->EnsureLayout ();
+	if (!Result)
+		return false;
+
+	size_t Count = m_OverloadArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		Result = m_OverloadArray [i]->EnsureLayout ();
+		if (!Result)
+			return false;
+	}
+
+	m_Flags |= EModuleItemFlag_LayoutReady;
+	return true;
+}
+
+//.....................................................	........................
 
 } // namespace jnc {
 } // namespace axl {
