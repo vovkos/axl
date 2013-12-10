@@ -1102,7 +1102,7 @@ CParser::DeclareReactor (
 
 	if (pDeclarator->IsQualified ())
 	{
-		CFunction* pStart = pType->GetMemberMethodArray () [0];
+		CFunction* pStart = pType->GetVirtualMethodArray () [0];
 		ASSERT (pStart->GetName () == "start");
 
 		COrphan* pOprhan = m_pModule->m_NamespaceMgr.CreateOrphan (EOrphan_Reactor, pStart->GetType ());
