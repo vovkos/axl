@@ -2021,39 +2021,9 @@ CParser::LookupIdentifier (
 			return false;
 		}
 
-		ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-		if (!ThisValue)
-		{
-			err::SetFormatStringError (
-				"function '%s' has no 'this' pointer",
-				m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc () // thanks a lot gcc
-				);
+		Result = GetThisValue (&ThisValue);
+		if (!Result)
 			return false;
-		}
-
-		if (Coord.m_ParentNamespaceLevel)
-		{
-			if (Coord.m_ParentNamespaceLevel > 1 ||
-				!m_pReactorType ||
-				!m_pReactorType->GetField (EReactorField_Parent)
-				)
-			{
-				err::SetFormatStringError (
-					"'%s' is not accessible from '%s'",
-					Name.cc (),
-					m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
-					);
-				return false;
-			}
-
-			CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
-			Result = 
-				m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField) &&
-				m_pModule->m_OperatorMgr.PrepareOperand (&ThisValue);
-
-			if (!Result)
-				return false;
-		}
 
 		return m_pModule->m_OperatorMgr.GetField (
 			ThisValue,
@@ -2181,7 +2151,6 @@ CParser::CreateMemberClosure (CValue* pValue)
 	return true;
 }
 
-
 bool
 CParser::GetCountOf (
 	CType* pType,
@@ -2201,13 +2170,25 @@ CParser::GetCountOf (
 bool
 CParser::GetThisValue (CValue* pValue)
 {
-	*pValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	if (pValue->IsEmpty ())
+	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
+	if (!ThisValue)
 	{
 		err::SetFormatStringError ("function '%s' has no 'this' pointer", m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ());
 		return false;
 	}
 
+	if (m_pReactorType && m_pReactorType->GetField (EReactorField_Parent))
+	{
+		CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
+		bool Result =
+			m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField) &&
+			m_pModule->m_OperatorMgr.PrepareOperand (&ThisValue);
+
+		if (!Result)
+			return false;
+	}
+
+	*pValue = ThisValue;
 	return true;
 }
 
@@ -2221,7 +2202,16 @@ CParser::GetThisValueType (CValue* pValue)
 		return false;
 	}
 
-	pValue->SetType (pFunction->GetThisType ());
+	if (m_pReactorType && m_pReactorType->GetField (EReactorField_Parent))
+	{
+		CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
+		pValue->SetType (pParentField->GetType ());
+	}
+	else
+	{
+		pValue->SetType (pFunction->GetThisType ());
+	}
+
 	return true;
 }
 

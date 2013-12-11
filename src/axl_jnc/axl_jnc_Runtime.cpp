@@ -342,7 +342,8 @@ CRuntime::GcAddObject_l (TObject* pObject)
 void
 CRuntime::MarkGcObject (TObject* pObject)
 {
-	MarkGcRange (pObject, pObject->m_pType->GetSize ());
+	if (ShouldMarkGcPtr (pObject)) // prevent re-marking of weakly marked objects
+		MarkGcRange (pObject, pObject->m_pType->GetSize ());
 
 	pObject->m_Flags |= EObjectFlag_GcMark;
 
