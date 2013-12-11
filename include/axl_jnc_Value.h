@@ -317,7 +317,7 @@ public:
 	GetLlvmValue () const;
 
 	rtl::CString
-	GetLlvmTypeString ()
+	GetLlvmTypeString () const
 	{
 		llvm::Value* pLlvmValue = GetLlvmValue ();
 		return pLlvmValue ? jnc::GetLlvmTypeString (pLlvmValue->getType ()) : rtl::CString ();

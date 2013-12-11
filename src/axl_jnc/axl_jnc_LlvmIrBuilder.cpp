@@ -240,12 +240,18 @@ CLlvmIrBuilder::CreateGep (
 	rtl::CArrayT <llvm::Value*> LlvmIndexArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	LlvmIndexArray.SetCount (IndexCount);
 
+	printf ("GEP %s (", Value.GetLlvmTypeString ().cc ());
+
 	for (size_t i = 0; i < IndexCount; i++)
 	{
+		printf ("%d, ", pIndexArray [i]);
+
 		CValue IndexValue;
 		IndexValue.SetConstInt32 (pIndexArray [i], EType_Int32_u);
 		LlvmIndexArray [i] = IndexValue.GetLlvmValue ();
 	}
+
+	printf (")\n");
 
 	llvm::Value* pInst;
 	pInst = m_pLlvmIrBuilder->CreateGEP (

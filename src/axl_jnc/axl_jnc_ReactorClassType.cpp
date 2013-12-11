@@ -58,6 +58,9 @@ CReactorClassType::CalcLayout ()
 	Parser.m_pModule = m_pModule;
 	Parser.m_pReactorType = this;
 
+	CFunction* pStart = m_MethodArray [EReactorMethod_Start];
+	CFunction* pPrevFunction = m_pModule->m_FunctionMgr.SetCurrentFunction (pStart);
+
 	m_pModule->m_NamespaceMgr.OpenNamespace (this);
 
 	Result = Parser.ParseTokenList (ESymbol_reactor_body_0, m_Body, false);
@@ -65,6 +68,7 @@ CReactorClassType::CalcLayout ()
 		return false;
 
 	m_pModule->m_NamespaceMgr.CloseNamespace ();
+	m_pModule->m_FunctionMgr.SetCurrentFunction (pPrevFunction);
 
 	ASSERT (Parser.m_ReactorBindSiteTotalCount);
 	m_BindSiteCount = Parser.m_ReactorBindSiteTotalCount;

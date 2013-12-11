@@ -149,8 +149,6 @@ CFunction::GetLlvmFunction ()
 llvm::DISubprogram
 CFunction::GetLlvmDiSubprogram ()
 {
-	ASSERT (m_Flags & EModuleItemFlag_User);
-
 	if (m_LlvmDiSubprogram)
 		return m_LlvmDiSubprogram;
 

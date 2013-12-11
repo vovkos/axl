@@ -312,6 +312,9 @@ public:
 	}
 
 	CFunction*
+	SetCurrentFunction (CFunction* pFunction);
+
+	CFunction*
 	FindFunctionByLlvmFunction (llvm::Function* pLlvmFunction)
 	{
 		rtl::CHashTableMapIteratorT <llvm::Function*, CFunction*> It = m_LlvmFunctionMap.Find (pLlvmFunction);

@@ -220,7 +220,7 @@ void ModulePane::addTypedef (QTreeWidgetItem *parent, jnc::CTypedef* typed)
 {
 	QString name;
 	name.sprintf (
-		"typedef %s %s", 
+		"typedef %s %s",
 		typed->GetType ()->GetTypeString ().cc (), // thanks a lot gcc
 		typed->GetName ().cc ()
 		);
@@ -256,7 +256,7 @@ void ModulePane::addEnumTypeMembers (QTreeWidgetItem *parent, jnc::CEnumType* ty
 	rtl::CIteratorT <jnc::CEnumConst> Member = type->GetConstList ().GetHead ();
 	for (; Member; Member++)
 		addEnumConst (parent, *Member);
-	
+
 	expandItem (parent);
 }
 
@@ -317,9 +317,9 @@ void ModulePane::addFunction (QTreeWidgetItem *parent, jnc::CFunction* pFunction
 
 		QString itemName;
 		itemName.sprintf (
-			"%s (%d overloads)", 
-			pFunction->m_Tag.cc (), 
-			count		
+			"%s (%d overloads)",
+			pFunction->m_Tag.cc (),
+			count
 			);
 
 		QTreeWidgetItem *item = insertItem (itemName, parent);
@@ -338,12 +338,12 @@ void ModulePane::addFunctionImpl (QTreeWidgetItem *parent, jnc::CFunction* pFunc
 	jnc::CFunctionType* pType = pFunction->GetType ();
 
 	rtl::CString Name = pFunction->GetFunctionKind () == jnc::EFunction_Named ?
-		pFunction->GetName () : 
+		pFunction->GetName () :
 		rtl::CString (jnc::GetFunctionKindString (pFunction->GetFunctionKind ()));
 
 	QString itemName;
 	itemName.sprintf (
-		"%s%s %s %s", 
+		"%s%s %s %s",
 		pType->GetTypeModifierString ().cc (),
 		pType->GetReturnType ()->GetTypeString ().cc (),
 		Name.cc (),
@@ -363,9 +363,9 @@ void ModulePane::addProperty (QTreeWidgetItem *parent, jnc::CProperty* pProperty
 	jnc::CFunction* pSetter = pProperty->GetSetter ();
 
 	addFunction (item, pGetter);
-	
+
 	if (pSetter)
 		addFunction (item, pSetter);
-	
+
 	expandItem (item);
 }

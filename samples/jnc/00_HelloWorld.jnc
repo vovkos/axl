@@ -3,6 +3,18 @@
 
 //.............................................................................
 
+class C1
+{
+	int bindable m_baudRate;
+
+	reactor m_uiReactor ()
+	{
+		onchange (m_baudRate)
+		{
+		}
+	}
+}
+
 int main ()
 {
 	printf ("hello world!\n");

@@ -291,6 +291,14 @@ CFunctionMgr::FireOnChangeEvent ()
 		m_pModule->m_OperatorMgr.CallOperator (OnChange);
 }
 
+CFunction*
+CFunctionMgr::SetCurrentFunction (CFunction* pFunction)
+{
+	CFunction* pPrevFunction = m_pCurrentFunction;
+	m_pCurrentFunction = pFunction;
+	return pPrevFunction;
+}
+
 bool
 CFunctionMgr::Prologue (
 	CFunction* pFunction,
