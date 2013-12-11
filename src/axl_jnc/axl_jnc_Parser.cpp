@@ -2177,15 +2177,20 @@ CParser::GetThisValue (CValue* pValue)
 		return false;
 	}
 
-	if (m_pReactorType && m_pReactorType->GetField (EReactorField_Parent))
+	if (IsClassPtrType (ThisValue.GetType (), EClassType_Reactor))
 	{
-		CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
-		bool Result =
-			m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField) &&
-			m_pModule->m_OperatorMgr.PrepareOperand (&ThisValue);
+		CClassType* pClassType = ((CClassPtrType*) ThisValue.GetType ())->GetTargetType ();
+		CReactorClassType* pReactorType = (CReactorClassType*) pClassType;
+		if (pReactorType->GetField (EReactorField_Parent))
+		{
+			CStructField* pParentField = pReactorType->GetField (EReactorField_Parent);
+			bool Result =
+				m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField) &&
+				m_pModule->m_OperatorMgr.PrepareOperand (&ThisValue);
 
-		if (!Result)
-			return false;
+			if (!Result)
+				return false;
+		}
 	}
 
 	*pValue = ThisValue;
@@ -2202,16 +2207,19 @@ CParser::GetThisValueType (CValue* pValue)
 		return false;
 	}
 
-	if (m_pReactorType && m_pReactorType->GetField (EReactorField_Parent))
+	CType* pThisType = pFunction->GetThisType ();
+	if (IsClassPtrType (pThisType, EClassType_Reactor))
 	{
-		CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
-		pValue->SetType (pParentField->GetType ());
-	}
-	else
-	{
-		pValue->SetType (pFunction->GetThisType ());
+		CClassType* pClassType = ((CClassPtrType*) pThisType)->GetTargetType ();
+		CReactorClassType* pReactorType = (CReactorClassType*) pClassType;
+		if (pReactorType->GetField (EReactorField_Parent))
+		{
+			CStructField* pParentField = pReactorType->GetField (EReactorField_Parent);
+			pThisType = pParentField->GetType ();
+		}
 	}
 
+	pValue->SetType (pThisType);
 	return true;
 }
 

@@ -491,8 +491,8 @@ CRuntime::RunGcEx (uint_t Flags)
 	{
 		TObject* pObject = *Object;
 
-		if (ShouldMarkGcPtr (pObject))
-			MarkGcRange (pObject, pObject->m_pType->GetSize ());
+		ASSERT (ShouldMarkGcObject (pObject));
+		MarkGcObject (pObject);
 
 		if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
 			AddGcRoot (pObject, pObject->m_pType);
