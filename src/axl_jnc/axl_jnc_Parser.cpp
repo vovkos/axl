@@ -2047,7 +2047,10 @@ CParser::LookupIdentifier (
 			}
 
 			CStructField* pParentField = m_pReactorType->GetField (EReactorField_Parent);
-			Result = m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField);
+			Result = 
+				m_pModule->m_OperatorMgr.GetField (&ThisValue, pParentField) &&
+				m_pModule->m_OperatorMgr.PrepareOperand (&ThisValue);
+
 			if (!Result)
 				return false;
 		}
