@@ -252,9 +252,9 @@ continue_stmt
 	;
 
 return_stmt
-	:	EToken_Silent? EToken_Return expression $e? ';'
+	:	EToken_Return expression $e? ';'
 			{
-				return m_pModule->m_ControlFlowMgr.Return (IsValidLocator ($e) ? $e.m_Value : CValue (), IsValidLocator ($1));
+				return m_pModule->m_ControlFlowMgr.Return (IsValidLocator ($e) ? $e.m_Value : CValue ());
 			}
 	;
 
@@ -328,13 +328,13 @@ reactor_onchange_stmt
 	{
 		m_ReactorBindSiteList.Clear (); // clear bindsite list before processing expression list
 	}
-	:	EToken_OnChange '(' expression_list ')'
+	:	EToken_OnChanged '(' expression_list ')'
 			{
-				return FinalizeReactorOnChangeClause ();
+				return FinalizeReactorOnChangedClause ();
 			}
 		statement
 			{
-				return FinalizeReactorOnChangeStmt ();
+				return FinalizeReactorOnChangedStmt ();
 			}
 	;
 

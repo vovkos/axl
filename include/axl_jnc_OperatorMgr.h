@@ -1040,7 +1040,7 @@ public:
 		return GetPropertyBinder (*pValue, pValue);
 	}
 
-	// autoget & onchange
+	// autoget & onchanged
 
 	CType*
 	GetPropertyAutoGetValueType (const CValue& OpValue);
@@ -1070,30 +1070,30 @@ public:
 	}
 
 	CType*
-	GetPropertyOnChangeType (const CValue& OpValue);
+	GetPropertyOnChangedType (const CValue& OpValue);
 
 	bool
-	GetPropertyOnChangeType (
+	GetPropertyOnChangedType (
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
 	bool
-	GetPropertyOnChangeType (CValue* pValue)
+	GetPropertyOnChangedType (CValue* pValue)
 	{
-		return GetPropertyOnChangeType (*pValue, pValue);
+		return GetPropertyOnChangedType (*pValue, pValue);
 	}
 
 	bool
-	GetPropertyOnChange (
+	GetPropertyOnChanged (
 		const CValue& OpValue,
 		CValue* pResultValue
 		);
 
 	bool
-	GetPropertyOnChange (CValue* pValue)
+	GetPropertyOnChanged (CValue* pValue)
 	{
-		return GetPropertyOnChange (*pValue, pValue);
+		return GetPropertyOnChanged (*pValue, pValue);
 	}
 
 	// misc property functions

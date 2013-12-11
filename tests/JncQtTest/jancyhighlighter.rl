@@ -124,8 +124,7 @@ main := |*
 'case'            |
 'default'         |
 'once'            |
-'onchange'        |
-'silent'          |
+'onchanged'       |
 'try'             |
 'catch'           |
 'finally'         |

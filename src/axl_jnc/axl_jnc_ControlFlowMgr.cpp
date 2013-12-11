@@ -16,7 +16,6 @@ CControlFlowMgr::CControlFlowMgr ()
 	m_ThrowLockCount = 0;
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
-	m_pSilentReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -28,7 +27,6 @@ CControlFlowMgr::Clear ()
 	m_BlockList.Clear ();
 	m_pCurrentBlock = NULL;
 	m_pReturnBlock = NULL;
-	m_pSilentReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -94,7 +92,7 @@ CControlFlowMgr::DeleteUnreachableBlocks ()
 		CBasicBlock* pBlock = *It;
 		It++;
 
-		// check if block was never added (like silent-return)
+		// check if block was never added
 
 		if (pBlock->m_pFunction)
 			pBlock->m_pLlvmBlock->eraseFromParent ();
@@ -262,22 +260,13 @@ CControlFlowMgr::RestoreScopeLevel ()
 }
 
 bool
-CControlFlowMgr::Return (
-	const CValue& Value,
-	bool IsSilent
-	)
+CControlFlowMgr::Return (const CValue& Value)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	ASSERT (pFunction);
 
 	CFunctionType* pFunctionType = pFunction->GetType ();
 	CType* pReturnType = pFunctionType->GetReturnType ();
-
-	if (IsSilent && !m_pSilentReturnBlock)
-	{
-		err::SetFormatStringError ("cannot 'silent return' from '%s'", pFunction->m_Tag.cc ());
-		return false;
-	}
 
 	if (!Value)
 	{
@@ -295,7 +284,7 @@ CControlFlowMgr::Return (
 		RestoreScopeLevel ();
 
 		if (m_pReturnBlock)
-			Jump (IsSilent ? m_pSilentReturnBlock : m_pReturnBlock);
+			Jump (m_pReturnBlock);
 		else
 			m_pModule->m_LlvmIrBuilder.CreateRet ();
 	}

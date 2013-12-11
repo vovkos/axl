@@ -25,7 +25,7 @@ CProperty::CProperty ()
 	m_pBinder = NULL;
 
 	m_pAutoGetValue = NULL;
-	m_pOnChange = NULL;
+	m_pOnChanged = NULL;
 
 	m_pParentType = NULL;
 	m_ParentClassVTableIndex = -1;
@@ -110,7 +110,7 @@ CProperty::Create (CPropertyType* pType)
 
 	if (pType->GetFlags () & EPropertyTypeFlag_Bindable)
 	{
-		Result = CreateOnChange ();
+		Result = CreateOnChanged ();
 		if (!Result)
 			return false;
 	}
@@ -167,11 +167,11 @@ CProperty::ConvertToMemberProperty (CNamedType* pParentType)
 }
 
 bool
-CProperty::SetOnChange (CModuleItem* pItem)
+CProperty::SetOnChanged (CModuleItem* pItem)
 {
-	if (m_pOnChange)
+	if (m_pOnChanged)
 	{
-		err::SetFormatStringError ("'%s' already has 'bindable %s'", m_Tag.cc (), m_pOnChange->m_Tag.cc ());
+		err::SetFormatStringError ("'%s' already has 'bindable %s'", m_Tag.cc (), m_pOnChanged->m_Tag.cc ());
 		return false;
 	}
 
@@ -182,7 +182,7 @@ CProperty::SetOnChange (CModuleItem* pItem)
 		return false;
 	}
 
-	m_pOnChange = pItem;
+	m_pOnChanged = pItem;
 	m_Flags |= EPropertyFlag_Bindable;
 
 	CFunctionType* pBinderType = (CFunctionType*) m_pModule->GetSimpleType (EStdType_Binder);
@@ -198,9 +198,9 @@ CProperty::SetOnChange (CModuleItem* pItem)
 }
 
 bool
-CProperty::CreateOnChange ()
+CProperty::CreateOnChanged ()
 {
-	rtl::CString Name = "m_onChange";
+	rtl::CString Name = "m_onChanged";
 
 	CType* pType = m_pModule->GetSimpleType (EStdType_SimpleMulticast);
 
@@ -209,7 +209,7 @@ CProperty::CreateOnChange ()
 		CStructField* pField = CreateField (Name, pType);
 		return
 			pField != NULL &&
-			SetOnChange (pField);
+			SetOnChanged (pField);
 	}
 	else
 	{
@@ -223,7 +223,7 @@ CProperty::CreateOnChange ()
 		return
 			pVariable != NULL &&
 			AddItem (pVariable) &&
-			SetOnChange (pVariable);
+			SetOnChanged (pVariable);
 	}
 }
 
@@ -714,6 +714,7 @@ bool
 CProperty::CompileAutoSetter ()
 {
 	ASSERT (m_pSetter && !m_pSetter->IsOverloaded ());
+	ASSERT (m_pType->GetFlags () & EPropertyTypeFlag_Bindable);
 
 	bool Result;
 
@@ -730,21 +731,23 @@ CProperty::CompileAutoSetter ()
 		m_pModule->m_FunctionMgr.InternalPrologue (m_pSetter, &SrcValue, 1);
 	}
 
-	CValue AutoGetValue;
-	Result =
-		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
-		m_pModule->m_OperatorMgr.StoreDataRef (AutoGetValue, SrcValue);
+	CBasicBlock* pAssignBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("assign_block");
+	CBasicBlock* pReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("return_block");
 
+	CValue AutoGetValue;
+	CValue CmpValue;
+
+	Result = 
+		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
+		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, AutoGetValue, SrcValue, &CmpValue) &&
+		m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAssignBlock, pReturnBlock) &&
+		m_pModule->m_OperatorMgr.StoreDataRef (AutoGetValue, SrcValue) &&
+		m_pModule->m_FunctionMgr.FireOnChanged ();
+	
 	if (!Result)
 		return false;
 
-	if (m_pType->GetFlags () & EPropertyTypeFlag_Bindable)
-	{
-		Result = m_pModule->m_FunctionMgr.FireOnChangeEvent ();
-		if (!Result)
-			return false;
-	}
-
+	m_pModule->m_ControlFlowMgr.Follow (pReturnBlock);
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
 }
@@ -758,10 +761,10 @@ CProperty::CompileBinder ()
 
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pBinder);
 
-	CValue OnChangeValue;
+	CValue OnChangedValue;
 	Result =
-		m_pModule->m_OperatorMgr.GetPropertyOnChange (GetAutoAccessorPropertyValue (), &OnChangeValue) &&
-		m_pModule->m_ControlFlowMgr.Return (OnChangeValue);
+		m_pModule->m_OperatorMgr.GetPropertyOnChanged (GetAutoAccessorPropertyValue (), &OnChangedValue) &&
+		m_pModule->m_ControlFlowMgr.Return (OnChangedValue);
 
 	if (!Result)
 		return false;

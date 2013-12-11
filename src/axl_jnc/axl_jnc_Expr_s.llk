@@ -314,7 +314,7 @@ unary_operator_expr_s <CValue* $pValue>
 			}
 	|	EToken_BindingOf '(' conditional_expr_s <$pValue> ')' 
 			{
-				return m_pModule->m_OperatorMgr.GetPropertyOnChangeType ($pValue);
+				return m_pModule->m_OperatorMgr.GetPropertyOnChangedType ($pValue);
 			}
 	|	resolver (cast_operator_rslv) 
 		'(' storage_specifier? type_name $t ')' unary_expr_s <$pValue> 

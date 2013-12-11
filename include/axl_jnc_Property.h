@@ -64,7 +64,7 @@ protected:
 
 	// member data is CStructField or CVariable
 	
-	CModuleItem* m_pOnChange;
+	CModuleItem* m_pOnChanged;
 	CModuleItem* m_pAutoGetValue;
 
 	// parent type
@@ -151,16 +151,16 @@ public:
 	}
 
 	CModuleItem*
-	GetOnChange ()
+	GetOnChanged ()
 	{
-		return m_pOnChange;
+		return m_pOnChanged;
 	}
 
 	bool
-	SetOnChange (CModuleItem* pItem);
+	SetOnChanged (CModuleItem* pItem);
 
 	bool
-	CreateOnChange ();
+	CreateOnChanged ();
 
 	CModuleItem*
 	GetAutoGetValue ()

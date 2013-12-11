@@ -14,11 +14,9 @@ g_simpleProp.set (int x)
 	m_value = x;
 
 	if (x > 150)
-		silent return; // 'silent return' suppresses auto-firing 'm_onChange' event
+		return;
 	
-	// by default, the name of compiler-generated event is 'm_onChange'
-	// normally, 'm_onChange' event fires upon return, but can be forced to fire at any moment
-	// m_onChange (); // <-- uncomment to manually fire event	
+	m_onChanged (); // by default, the name of compiler-generated event is 'm_onChanged'
 }
 
 //.............................................................................
@@ -27,8 +25,8 @@ g_simpleProp.set (int x)
 
 property g_prop
 {	
-	autoget int m_x; // declaring a 'autoget' field implicitly makes property 'autoget'
-	bindable event m_e (); // declaring 'bindable' event implicitly makes property 'bindable'
+	autoget int m_x; // declaring an 'autoget' field implicitly makes property 'autoget'
+	bindable event m_e (); // declaring a 'bindable' event implicitly makes property 'bindable'
 
 	set (int x)
 	{
@@ -81,7 +79,7 @@ int main ()
 	bindingof (g_data) += onDataChange;
 
 	g_simpleProp = 100;
-	g_simpleProp = 200; // 'onchange' event will not fire 
+	g_simpleProp = 200; // 'onchanged' event will not fire 
 
 	g_prop = 500;
 	g_prop = 5.5;

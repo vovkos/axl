@@ -62,7 +62,7 @@ continue_stmt_0
 	;
 
 return_stmt_0
-	:	EToken_Silent? EToken_Return expression_0? ';'
+	:	EToken_Return expression_0? ';'
 	;
 
 once_stmt_0
@@ -88,7 +88,7 @@ reactor_stmt_0
 	;
 
 reactor_onchange_stmt_0
-	:	EToken_OnChange '(' expression_list_s ')' 
+	:	EToken_OnChanged '(' expression_list_s ')' 
 			{
 				return CountReactorBindSites ();
 			}

@@ -1038,9 +1038,9 @@ CParser::FinalizeLastProperty (bool HasBody)
 
 	if (m_LastPropertyTypeModifiers.GetTypeModifiers () & ETypeModifier_Bindable)
 	{
-		if (!pProperty->m_pOnChange)
+		if (!pProperty->m_pOnChanged)
 		{
-			Result = pProperty->CreateOnChange ();
+			Result = pProperty->CreateOnChanged ();
 			if (!Result)
 				return false;
 		}
@@ -1060,7 +1060,7 @@ CParser::FinalizeLastProperty (bool HasBody)
 	}
 
 	uint_t TypeFlags = 0;
-	if (pProperty->m_pOnChange)
+	if (pProperty->m_pOnChanged)
 		TypeFlags |= EPropertyTypeFlag_Bindable;
 
 	pProperty->m_pType = pProperty->m_pSetter ?
@@ -1302,7 +1302,7 @@ CParser::DeclareData (
 
 		if (PtrTypeFlags & EPtrTypeFlag_Bindable)
 		{
-			Result = pProperty->SetOnChange (pDataItem);
+			Result = pProperty->SetOnChanged (pDataItem);
 			if (!Result)
 				return false;
 		}
@@ -1616,7 +1616,7 @@ CParser::FinalizeReactor ()
 }
 
 bool
-CParser::FinalizeReactorOnChangeClause ()
+CParser::FinalizeReactorOnChangedClause ()
 {
 	ASSERT (m_pReactorType);
 

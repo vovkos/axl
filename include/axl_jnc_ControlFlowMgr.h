@@ -90,7 +90,6 @@ protected:
 	rtl::CStdListT <CBasicBlock> m_BlockList;
 	CBasicBlock* m_pCurrentBlock;
 	CBasicBlock* m_pReturnBlock; // bindable setters & destructors return here
-	CBasicBlock* m_pSilentReturnBlock; // bindable setters
 	CBasicBlock* m_pUnreachableBlock;
 
 	uint_t m_Flags;
@@ -182,15 +181,12 @@ public:
 	Continue (size_t Level);
 
 	bool
-	Return (
-		const CValue& Value,
-		bool IsSilent = false
-		);
+	Return (const CValue& Value);
 
 	bool
 	Return ()
 	{
-		return Return (CValue (), false);
+		return Return (CValue ());
 	}
 
 	bool

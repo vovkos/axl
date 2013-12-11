@@ -3,7 +3,7 @@
 // also, using expressions in 'reactor' block might be 'trying-to-be-too-smart' 
 // and therefore not providing enough control over which actions must be taken in response 
 // to which property change. 
-// 'onchange' statement in 'reactor' block gives developer fine-graned control over building dependencies
+// 'onchanged' statement in 'reactor' block gives developer fine-graned control over building dependencies
 // and at the same time frees him from manually binding / unbinding to events
 
 //.............................................................................
@@ -13,11 +13,11 @@ unsigned int32 bindable g_ip4;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// 'onchange' statement will be executed in response to change of properties enumerated in parentheses
+// 'onchanged' statement will be executed in response to change of properties enumerated in parentheses
 
 reactor g_ipReactor ()
 {
-	onchange (g_useDhcp)
+	onchanged (g_useDhcp)
 	{
 		if (g_useDhcp)
 		{		
@@ -35,7 +35,7 @@ reactor g_ipReactor ()
 		}			
 	}
 
-	onchange (g_ip4)
+	onchanged (g_ip4)
 	{
 		g_useDhcp = false;
 	}

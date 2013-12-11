@@ -116,8 +116,8 @@ CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList
 		rtl::CBoxIteratorT <CValue> Value = Handler->m_BindSiteList.GetHead ();
 		for (; Value; Value++, i++)
 		{
-			CValue OnChangeValue;
-			Result = m_pModule->m_OperatorMgr.GetPropertyOnChange (*Value, &OnChangeValue);
+			CValue OnChangedValue;
+			Result = m_pModule->m_OperatorMgr.GetPropertyOnChanged (*Value, &OnChangedValue);
 			if (!Result)
 				return false;
 
@@ -128,17 +128,17 @@ CReactorClassType::BindHandlers (const rtl::CConstListT <TReaction>& HandlerList
 			CValue AddMethodValue;
 			CValue CookieValue;
 			CValue BindSiteValue;
-			CValue DstOnChangeValue;
+			CValue DstOnChangedValue;
 			CValue DstCookieValue;
 
 			Result =
-				m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "add", &AddMethodValue) &&
+				m_pModule->m_OperatorMgr.MemberOperator (OnChangedValue, "add", &AddMethodValue) &&
 				m_pModule->m_OperatorMgr.CallOperator (AddMethodValue, HandlerValue, &CookieValue) &&
 				m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
-				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &DstOnChangeValue) &&
+				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &DstOnChangedValue) &&
 				m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &DstCookieValue) &&
-				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &OnChangeValue) &&
-				m_pModule->m_OperatorMgr.StoreDataRef (DstOnChangeValue, OnChangeValue) &&
+				m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Addr, &OnChangedValue) &&
+				m_pModule->m_OperatorMgr.StoreDataRef (DstOnChangedValue, OnChangedValue) &&
 				m_pModule->m_OperatorMgr.StoreDataRef (DstCookieValue, CookieValue);
 
 			if (!Result)
@@ -326,16 +326,16 @@ CReactorClassType::CompileStopMethod ()
 	{
 		CValue IdxValue (i, EType_SizeT);
 		CValue BindSiteValue;
-		CValue OnChangeValue;
+		CValue OnChangedValue;
 		CValue CookieValue;
 		CValue RemoveMethodValue;
 
 		Result =
 			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Idx, BindSiteArrayValue, IdxValue, &BindSiteValue) &&
-			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &OnChangeValue) &&
+			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pEventPtrField, NULL, &OnChangedValue) &&
 			m_pModule->m_OperatorMgr.GetStructField (BindSiteValue, pCookieField, NULL, &CookieValue) &&
-			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangeValue) &&
-			m_pModule->m_OperatorMgr.MemberOperator (OnChangeValue, "remove", &RemoveMethodValue) &&
+			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &OnChangedValue) &&
+			m_pModule->m_OperatorMgr.MemberOperator (OnChangedValue, "remove", &RemoveMethodValue) &&
 			m_pModule->m_OperatorMgr.CallOperator (RemoveMethodValue, CookieValue);
 
 		if (!Result)

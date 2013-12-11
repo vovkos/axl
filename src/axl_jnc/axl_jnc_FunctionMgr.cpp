@@ -168,7 +168,6 @@ CFunctionMgr::PushEmissionContext ()
 
 	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
 	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
-	pContext->m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock;
 	pContext->m_pUnreachableBlock = m_pModule->m_ControlFlowMgr.m_pUnreachableBlock;
 	pContext->m_ControlFlowMgrFlags = m_pModule->m_ControlFlowMgr.m_Flags;
 	pContext->m_LlvmDebugLoc = m_pModule->m_LlvmIrBuilder.GetCurrentDebugLoc ();
@@ -180,7 +179,6 @@ CFunctionMgr::PushEmissionContext ()
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (NULL);
 	m_pModule->m_ControlFlowMgr.m_pReturnBlock = NULL;
-	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
@@ -222,7 +220,6 @@ CFunctionMgr::PopEmissionContext ()
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pContext->m_pCurrentBlock);
 	m_pModule->m_ControlFlowMgr.m_pReturnBlock = pContext->m_pReturnBlock;
-	m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = pContext->m_pSilentReturnBlock;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = pContext->m_pUnreachableBlock;
 	m_pModule->m_ControlFlowMgr.m_Flags = pContext->m_ControlFlowMgrFlags;
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (pContext->m_LlvmDebugLoc);
@@ -265,7 +262,7 @@ CFunctionMgr::RestoreVTable ()
 }
 
 bool
-CFunctionMgr::FireOnChangeEvent ()
+CFunctionMgr::FireOnChanged ()
 {
 	CFunction* pFunction = m_pCurrentFunction;
 
@@ -283,12 +280,12 @@ CFunctionMgr::FireOnChangeEvent ()
 		PropertyValue.InsertToClosureHead (m_ThisValue);
 	}
 
-	CValue OnChange;
+	CValue OnChanged;
 
 	return
-		m_pModule->m_OperatorMgr.GetPropertyOnChange (PropertyValue, &OnChange) &&
-		m_pModule->m_OperatorMgr.MemberOperator (&OnChange, "call") &&
-		m_pModule->m_OperatorMgr.CallOperator (OnChange);
+		m_pModule->m_OperatorMgr.GetPropertyOnChanged (PropertyValue, &OnChanged) &&
+		m_pModule->m_OperatorMgr.MemberOperator (&OnChanged, "call") &&
+		m_pModule->m_OperatorMgr.CallOperator (OnChanged);
 }
 
 CFunction*
@@ -377,14 +374,6 @@ CFunctionMgr::Prologue (
 		}
 	}
 
-	// return blocks for bindable setter
-
-	if (pFunction->m_FunctionKind == EFunction_Setter && (pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
-	{
-		m_pModule->m_ControlFlowMgr.m_pReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("return_block");
-		m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("silent_return_block");
-	}
-
 	return true;
 }
 
@@ -446,21 +435,6 @@ CFunctionMgr::Epilogue ()
 
 	if (pFunction->NeedsVTablePtrCut ())
 		RestoreVTable ();
-
-	if (pFunction->m_FunctionKind == EFunction_Setter &&
-		(pFunction->m_pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
-	{
-		Result = FireOnChangeEvent ();
-		if (!Result)
-			return false;
-
-		ASSERT (m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock);
-
-		if (m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock->GetFlags () & EBasicBlockFlag_Jumped)
-			m_pModule->m_ControlFlowMgr.Follow (m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock);
-
-		m_pModule->m_ControlFlowMgr.m_pSilentReturnBlock = NULL;
-	}
 
 	if (pFunction->m_FunctionKind == EFunction_Destructor)
 	{

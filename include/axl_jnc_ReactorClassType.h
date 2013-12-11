@@ -148,7 +148,7 @@ protected:
 
 struct TReactorBindSite
 {
-	TInterface* m_pOnChange;
+	TInterface* m_pOnChanged;
 	intptr_t m_Cookie;
 };
 

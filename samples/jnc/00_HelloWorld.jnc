@@ -3,21 +3,25 @@
 
 //.............................................................................
 
-class C1
-{
-	int bindable m_baudRate;
+int bindable g_baudRate;
 
-	reactor m_uiReactor ()
-	{
-		onchange (m_baudRate)
-		{
-		}
-	}
+onBaudRateChanged ()
+{
+	printf ("onBaudRateChanged (%d)\n", g_baudRate);	
 }
 
 int main ()
 {
 	printf ("hello world!\n");
+
+	bindingof (g_baudRate) += onBaudRateChanged;
+
+	printf ("changing baud rate...\n");
+	g_baudRate = 38400;
+
+	printf ("changing baud rate #2...\n");
+	g_baudRate = 38400;
+
 	return 0;
 }
 

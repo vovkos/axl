@@ -211,8 +211,7 @@ main := |*
 'case'           { CreateToken (EToken_Case); };
 'default'        { CreateToken (EToken_Default); };
 'once'           { CreateToken (EToken_Once); };
-'onchange'       { CreateToken (EToken_OnChange); };
-'silent'         { CreateToken (EToken_Silent); };
+'onchanged'       { CreateToken (EToken_OnChanged); };
 'try'            { CreateToken (EToken_Try); };
 'catch'          { CreateToken (EToken_Catch); };
 'finally'        { CreateToken (EToken_Finally); };

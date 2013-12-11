@@ -783,7 +783,7 @@ primary_expr <CValue* $pValue>
 			}
 	|	EToken_BindingOf '(' conditional_expr <$pValue> ')'
 			{
-				return m_pModule->m_OperatorMgr.GetPropertyOnChange ($pValue);
+				return m_pModule->m_OperatorMgr.GetPropertyOnChanged ($pValue);
 			}
 	;
 

@@ -337,7 +337,7 @@ COperatorMgr::GetPropertyBinderType (const CValue& RawOpValue)
 
 	if (!(pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
-		err::SetFormatStringError ("'%s' has no 'onchange' binder", pPropertyType->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no 'onchanged' binder", pPropertyType->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -378,7 +378,7 @@ COperatorMgr::GetPropertyBinder (
 
 	if (!(pPropertyType->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
-		err::SetFormatStringError ("'%s' has no 'onchange' binder", pPropertyType->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no 'onchanged' binder", pPropertyType->GetTypeString ().cc ());
 		return false;
 	}
 
@@ -438,25 +438,6 @@ COperatorMgr::SetProperty (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_PropertyRef);
 
-	if (OpValue.GetValueKind () == EValue_Property)
-	{
-		CProperty* pProperty = OpValue.GetProperty ();
-		if (pProperty->GetFlags () & EPropertyFlag_AutoSet)
-		{
-			ASSERT (pProperty->GetType ()->GetFlags () & EPropertyTypeFlag_Bindable);
-
-			CValue AutoGetValue;
-			CValue OnChangeValue;
-		
-			return
-				GetPropertyAutoGetValue (OpValue, &AutoGetValue) &&
-				GetPropertyOnChange (OpValue, &OnChangeValue) &&
-				StoreDataRef (AutoGetValue, SrcValue) &&
-				MemberOperator (OnChangeValue, "call", &OnChangeValue) &&
-				CallOperator (OnChangeValue);
-		}
-	}
-
 	CValue SetterValue;
 	return 
 		GetPropertySetter (OpValue, SrcValue, &SetterValue) &&
@@ -514,7 +495,7 @@ COperatorMgr::GetPropertyAutoGetValue (
 }
 
 CType*
-COperatorMgr::GetPropertyOnChangeType (const CValue& RawOpValue)
+COperatorMgr::GetPropertyOnChangedType (const CValue& RawOpValue)
 {
 	CValue OpValue;
 	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
@@ -522,7 +503,7 @@ COperatorMgr::GetPropertyOnChangeType (const CValue& RawOpValue)
 	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr) || 
 		!(((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
-		err::SetFormatStringError ("'%s' has no 'onchange' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no 'onchanged' field", OpValue.GetType ()->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -530,7 +511,7 @@ COperatorMgr::GetPropertyOnChangeType (const CValue& RawOpValue)
 }
 
 bool
-COperatorMgr::GetPropertyOnChangeType (
+COperatorMgr::GetPropertyOnChangedType (
 	const CValue& OpValue,
 	CValue* pResultValue
 	)
@@ -544,7 +525,7 @@ COperatorMgr::GetPropertyOnChangeType (
 }
 
 bool
-COperatorMgr::GetPropertyOnChange (
+COperatorMgr::GetPropertyOnChanged (
 	const CValue& RawOpValue,
 	CValue* pResultValue
 	)
@@ -557,12 +538,12 @@ COperatorMgr::GetPropertyOnChange (
 	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr) || 
 		!(((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
-		err::SetFormatStringError ("'%s' has no 'onchange' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no 'onchanged' field", OpValue.GetType ()->GetTypeString ().cc ());
 		return NULL;
 	}
 
 	if (OpValue.GetValueKind () == EValue_Property)
-		return GetPropertyField (OpValue, OpValue.GetProperty ()->GetOnChange (), pResultValue);
+		return GetPropertyField (OpValue, OpValue.GetProperty ()->GetOnChanged (), pResultValue);
 
 	CValue BinderValue;
 	return 

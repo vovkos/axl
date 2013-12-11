@@ -298,10 +298,10 @@ Members2
 	FinalizeReactor ();
 
 	bool
-	FinalizeReactorOnChangeClause ();
+	FinalizeReactorOnChangedClause ();
 
 	bool
-	FinalizeReactorOnChangeStmt ()
+	FinalizeReactorOnChangedStmt ()
 	{
 		return m_pModule->m_FunctionMgr.Epilogue ();
 	}

@@ -52,7 +52,7 @@ int g_rgb; // this value will be automatically updated
 // inside 'reactor' block developer can write expressions which describe relations & constraints.
 // all the binding / unbinding to the bindable non-lvalue properties touched in the expressions 
 // will be done automatically. if the required logic cannot be expressed by simple expression,
-// 'onchange' statement could be used (see the next demo)
+// 'onchanged' statement could be used (see the next demo)
 
 reactor g_colorReactor (int Alpha)
 {
@@ -78,7 +78,7 @@ int main ()
 	g_red = 0xab; 
 	g_green = 0xcd;
 
-	// g_colorReactor.stop (); // <-- uncomment to unbind onchange handlers
+	// g_colorReactor.stop (); // <-- uncomment to unbind onchanged handlers
 
 	g_blue = 0xef; 
 

@@ -255,7 +255,6 @@ protected:
 
 		CBasicBlock* m_pCurrentBlock;
 		CBasicBlock* m_pReturnBlock;
-		CBasicBlock* m_pSilentReturnBlock;
 		CBasicBlock* m_pUnreachableBlock;
 		uint_t m_ControlFlowMgrFlags;
 
@@ -428,7 +427,7 @@ public:
 	Epilogue ();
 
 	bool
-	FireOnChangeEvent ();
+	FireOnChanged ();
 
 	void
 	InternalPrologue (
