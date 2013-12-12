@@ -2021,16 +2021,14 @@ CParser::LookupIdentifier (
 			return false;
 		}
 
-		Result = GetThisValue (&ThisValue);
+		Result =
+			GetThisValue (&ThisValue) &&
+			m_pModule->m_OperatorMgr.GetField (ThisValue, (CStructField*) pItem, &Coord, pValue);
+
 		if (!Result)
 			return false;
 
-		return m_pModule->m_OperatorMgr.GetField (
-			ThisValue,
-			(CStructField*) pItem,
-			&Coord,
-			pValue
-			);
+		break;
 
 	default:
 		err::SetFormatStringError (

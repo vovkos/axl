@@ -708,14 +708,11 @@ CDerivableType::FindItemTraverseImpl (
 
 	if (!(Flags & ETraverse_NoParentNamespace) && m_pParentNamespace)
 	{
-		pItem = m_pParentNamespace->FindItemTraverse (pName, NULL, Flags);
+		pItem = m_pParentNamespace->FindItemTraverse (pName, pCoord, Flags);
 		if (pItem)
 		{
 			if (pCoord)
-			{
-				pCoord->m_pType = NULL; // not this type
 				pCoord->m_ParentNamespaceLevel++;
-			}
 
 			return pItem;
 		}
