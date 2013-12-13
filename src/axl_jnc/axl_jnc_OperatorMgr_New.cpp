@@ -562,7 +562,7 @@ COperatorMgr::NewOperator (
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope);
 
-	CValue SizeValue (pType->GetSize (), GetSimpleType (m_pModule, EType_SizeT));
+	CValue SizeValue (pType->GetSize (), m_pModule->GetSimpleType (EType_SizeT));
 	if (ElementCountValue)
 	{
 		Result =

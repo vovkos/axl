@@ -866,7 +866,7 @@ COperatorMgr::PrepareOperand (
 		case EType_Bool:
 			if (!(OpFlags & EOpFlag_KeepBool))
 			{
-				Result = m_CastIntFromBool.Cast (EStorage_Heap, Value, GetSimpleType (m_pModule, EType_Int8), &Value);
+				Result = m_CastIntFromBool.Cast (EStorage_Heap, Value, m_pModule->GetSimpleType (EType_Int8), &Value);
 				if (!Result)
 					return false;
 			}

@@ -143,6 +143,7 @@ main := |*
 'countof'         |
 'offsetof'        |
 'typeof'          |
+'dtypeof'         |
 'bindingof'
 
 )                   { colorize(ts, te, Qt::blue); };

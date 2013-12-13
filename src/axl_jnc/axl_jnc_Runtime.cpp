@@ -412,13 +412,12 @@ CRuntime::RunGcEx (uint_t Flags)
 
 	// 2.2) add stack roots
 
-	CVariable* pGcShadowStackTop = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_GcShadowStackTop);
-	size_t GcShadowStackTopOffset = pGcShadowStackTop->GetTlsField ()->GetOffset ();
-
 	rtl::CIteratorT <TTlsData> TlsData = m_TlsList.GetHead ();
 	for (; TlsData; TlsData++)
 	{
-		TGcShadowStackFrame* pStackFrame = *(TGcShadowStackFrame**) ((char*) (*TlsData + 1) + GcShadowStackTopOffset);
+		TTls* pTls = (TTls*) (*TlsData + 1);
+
+		TGcShadowStackFrame* pStackFrame = pTls->m_pGcShadowStackTop;
 		for (; pStackFrame; pStackFrame = pStackFrame->m_pNext)
 		{
 			size_t Count = pStackFrame->m_pMap->m_Count;

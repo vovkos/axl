@@ -167,7 +167,7 @@ CControlFlowMgr::WhileStmt_Condition (
 	const CToken::CPos& Pos
 	)
 {
-	m_pModule->m_OperatorMgr.GcSafePoint ();
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcPulse);
 
 	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 	pScope->m_pBreakBlock = pStmt->m_pFollowBlock;
@@ -199,7 +199,7 @@ CControlFlowMgr::DoStmt_PreBody (
 	const CToken::CPos& Pos
 	)
 {
-	m_pModule->m_OperatorMgr.GcSafePoint ();
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcPulse);
 
 	CScope* pScope = m_pModule->m_NamespaceMgr.OpenScope (Pos);
 	pScope->m_pBreakBlock = pStmt->m_pFollowBlock;
@@ -278,7 +278,7 @@ CControlFlowMgr::ForStmt_PreBody (TForStmt* pStmt)
 	pStmt->m_pScope->m_pBreakBlock = pStmt->m_pFollowBlock;
 	pStmt->m_pScope->m_pContinueBlock = pStmt->m_pConditionBlock;
 
-	m_pModule->m_OperatorMgr.GcSafePoint ();
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcPulse);
 }
 
 void

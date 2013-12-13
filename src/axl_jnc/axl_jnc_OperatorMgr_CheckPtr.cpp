@@ -259,7 +259,7 @@ COperatorMgr::CheckFunctionPtrScopeLevel (
 		return;
 
 	CValue ClosureValue;
-	m_pModule->m_LlvmIrBuilder.CreateExtractValue (SrcValue, 1, GetSimpleType (m_pModule, EStdType_ObjectPtr), &ClosureValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (SrcValue, 1, m_pModule->GetSimpleType (EStdType_ObjectPtr), &ClosureValue);
 	CheckClassPtrScopeLevel (ClosureValue, DstValue);
 }
 
@@ -308,7 +308,7 @@ COperatorMgr::CheckPropertyPtrScopeLevel (
 		return;
 
 	CValue ClosureValue;
-	m_pModule->m_LlvmIrBuilder.CreateExtractValue (SrcValue, 1, GetSimpleType (m_pModule, EStdType_ObjectPtr), &ClosureValue);
+	m_pModule->m_LlvmIrBuilder.CreateExtractValue (SrcValue, 1, m_pModule->GetSimpleType (EStdType_ObjectPtr), &ClosureValue);
 	CheckClassPtrScopeLevel (ClosureValue, DstValue);
 }
 

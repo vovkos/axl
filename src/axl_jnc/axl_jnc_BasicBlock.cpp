@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_BasicBlock.h"
-#include "axl_jnc_Function.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {
@@ -21,7 +21,7 @@ CBasicBlock::GetBlockAddressValue ()
 	llvm::BlockAddress* pLlvmAddress = llvm::BlockAddress::get (m_pFunction->GetLlvmFunction (), m_pLlvmBlock);
 	
 	CValue Value;
-	Value.SetLlvmValue (pLlvmAddress, GetSimpleType (m_pModule, EStdType_BytePtr));
+	Value.SetLlvmValue (pLlvmAddress, m_pModule->GetSimpleType (EStdType_BytePtr));
 	return Value;	
 }
 

@@ -26,7 +26,9 @@ public:
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUFree, HeapUFree)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUFreeClassPtr, HeapUFreeClassPtr)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcAddObject, GcAddObject)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcSafePoint, GcSafePoint)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcEnter, GcEnter)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcLeave, GcLeave)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcPulse, GcPulse)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_RunGc, RunGc)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_RunGcWaitForDestructors, RunGcWaitForDestructors)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetCurrentThreadId, GetCurrentThreadId)
@@ -88,7 +90,15 @@ public:
 
 	static
 	void
-	GcSafePoint ();
+	GcEnter ();
+
+	static
+	void
+	GcLeave ();
+
+	static
+	void
+	GcPulse ();
 
 	static
 	void

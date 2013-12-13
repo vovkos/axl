@@ -11,6 +11,7 @@ CProperty::CProperty ()
 {
 	m_ItemKind = EModuleItem_Property;
 	m_NamespaceKind = ENamespace_Property;
+	m_PropertyKind = EProperty_Normal;
 	m_pItemDecl = this;
 	m_pType = NULL;
 

@@ -105,9 +105,19 @@ enum EStdFunc
 	EStdFunc_GcAddObject,
 
 	// void
-	// jnc.GetSafePoint ();
+	// jnc.GcEnter ();
 
-	EStdFunc_GcSafePoint,
+	EStdFunc_GcEnter,
+
+	// void
+	// jnc.GcLeave ();
+
+	EStdFunc_GcLeave,
+
+	// void
+	// jnc.GcPulse ();
+
+	EStdFunc_GcPulse,
 
 	// void
 	// jnc.MarkGcRoot (
@@ -374,45 +384,72 @@ public:
 	CFunction*
 	CreateFunction (
 		EFunction FunctionKind,
-		CFunctionType* pType,
-		uint_t Flags = 0
+		const rtl::CString& Name,
+		const rtl::CString& QualifiedName,
+		const rtl::CString& Tag,
+		CFunctionType* pType
 		);
 
 	CFunction*
-	CreateInternalFunction (
-		const char* pTag,
-		CFunctionType* pType,
-		uint_t Flags = 0
-		);
+	CreateFunction (
+		EFunction FunctionKind,
+		CFunctionType* pType
+		)
+	{
+		return CreateFunction (FunctionKind, rtl::CString (), rtl::CString (), rtl::CString (), pType);
+	}
+
+	CFunction*
+	CreateFunction (
+		EFunction FunctionKind,
+		const rtl::CString& Tag,
+		CFunctionType* pType
+		)
+	{
+		return CreateFunction (FunctionKind, rtl::CString (), rtl::CString (), Tag, pType);
+	}
 
 	CFunction*
 	CreateFunction (
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		CFunctionType* pType,
-		uint_t Flags = 0
-		);
+		CFunctionType* pType
+		)
+	{
+		return CreateFunction (EFunction_Named, Name, QualifiedName, QualifiedName, pType);
+	}
 
 	CProperty*
 	CreateProperty (
 		EProperty PropertyKind,
 		const rtl::CString& Name,
 		const rtl::CString& QualifiedName,
-		uint_t Flags = 0
+		const rtl::CString& Tag
 		);
+
+	CProperty*
+	CreateProperty (EProperty PropertyKind)
+	{
+		return CreateProperty (PropertyKind, rtl::CString (), rtl::CString (), rtl::CString ());
+	}
+
+	CProperty*
+	CreateProperty (
+		EProperty PropertyKind,
+		const rtl::CString& Tag
+		)
+	{
+		return CreateProperty (PropertyKind, rtl::CString (), rtl::CString (), Tag);
+	}
 
 	CProperty*
 	CreateProperty (
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName,
-		uint_t Flags = 0
+		const rtl::CString& QualifiedName
 		)
 	{
-		return CreateProperty (EProperty_Normal, Name, QualifiedName, Flags);
+		return CreateProperty (EProperty_Normal, Name, QualifiedName, QualifiedName);
 	}
-
-	CProperty*
-	CreateInternalProperty (const char* pTag);
 
 	CPropertyTemplate*
 	CreatePropertyTemplate ();
@@ -499,9 +536,6 @@ protected:
 	// LLVM code support functions
 
 	CFunction*
-	CreateOnRuntimeError ();
-
-	CFunction*
 	CreateCheckNullPtr ();
 
 	CFunction*
@@ -514,85 +548,7 @@ protected:
 	CreateCheckClassPtrScopeLevel ();
 
 	CFunction*
-	CreateDynamicCastClassPtr ();
-
-	CFunction*
-	CreateStrengthenClassPtr ();
-
-	CFunction*
 	CreateGetDataPtrSpan ();
-
-	CFunction*
-	CreateHeapAlloc ();
-
-	CFunction*
-	CreateHeapUAlloc ();
-
-	CFunction*
-	CreateHeapUFree ();
-
-	CFunction*
-	CreateHeapUFreeClassPtr ();
-
-	CFunction*
-	CreateGcAddObject ();
-
-	CFunction*
-	CreateMarkGcRoot ();
-
-	CFunction*
-	CreateRunGc ();
-
-	CFunction*
-	CreateRunGcWaitForDestructors ();
-
-	CFunction*
-	CreateGetCurrentThreadId ();
-
-	CFunction*
-	CreateCreateThread ();
-
-	CFunction*
-	CreateSleep ();
-
-	CFunction*
-	CreateGetTimestamp ();
-
-	CFunction*
-	CreateStrLen ();
-
-	CFunction*
-	CreateRand ();
-
-	CFunction*
-	CreatePrintf ();
-
-	CFunction*
-	CreateGetTls ();
-
-	CFunction*
-	CreateGcSafePoint ();
-
-	CFunction*
-	CreateAppendFmtLiteral_a ();
-
-	CFunction*
-	CreateAppendFmtLiteral_p ();
-
-	CFunction*
-	CreateAppendFmtLiteral_i32 ();
-
-	CFunction*
-	CreateAppendFmtLiteral_ui32 ();
-
-	CFunction*
-	CreateAppendFmtLiteral_i64 ();
-
-	CFunction*
-	CreateAppendFmtLiteral_ui64 ();
-
-	CFunction*
-	CreateAppendFmtLiteral_f ();
 };
 
 //.............................................................................

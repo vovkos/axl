@@ -997,11 +997,8 @@ CParser::FinalizeLastProperty (bool HasBody)
 			return NULL;
 		}
 
-		CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (
-			EFunction_Getter,
-			m_pLastPropertyGetterType,
-			EModuleItemFlag_User
-			);
+		CFunction* pGetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Getter, m_pLastPropertyGetterType);
+		pGetter->m_Flags |= EModuleItemFlag_User;
 
 		Result = pProperty->AddMethod (pGetter);
 		if (!Result)
@@ -1023,11 +1020,8 @@ CParser::FinalizeLastProperty (bool HasBody)
 		ArgArray.Append (pReturnType->GetSimpleFunctionArg ());
 
 		CFunctionType* pSetterType = m_pModule->m_TypeMgr.GetFunctionType (ArgArray);
-		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (
-			EFunction_Setter,
-			pSetterType,
-			EModuleItemFlag_User
-			);
+		CFunction* pSetter = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Setter, pSetterType);
+		pSetter->m_Flags |= EModuleItemFlag_User;
 
 		Result = pProperty->AddMethod (pSetter);
 		if (!Result)

@@ -1423,7 +1423,7 @@ CTypeMgr::GetFunctionClosureClassType (
 			pField->m_Flags |= EStructFieldFlag_WeakMasked;
 	}
 
-	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.CreateInternalFunction ("thunkFunction", pThunkType);
+	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Internal, "thunkFunction", pThunkType); 
 	pType->AddMethod (pThunkFunction);
 	pType->m_pThunkFunction = pThunkFunction;
 
@@ -1481,7 +1481,7 @@ CTypeMgr::GetPropertyClosureClassType (
 			pField->m_Flags |= EStructFieldFlag_WeakMasked;
 	}
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("thunk_property");
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateProperty (EProperty_Normal, "m_thunkProperty");
 	pType->AddProperty (pThunkProperty);
 	pType->m_pThunkProperty = pThunkProperty;
 
@@ -1516,7 +1516,7 @@ CTypeMgr::GetDataClosureClassType (
 	pType->m_TypeMapIt = It;
 	pType->CreateField ("m_target", pTargetType->GetDataPtrType ());
 
-	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateInternalProperty ("m_thunkProperty");
+	CProperty* pThunkProperty = m_pModule->m_FunctionMgr.CreateProperty (EProperty_Normal, "m_thunkProperty");
 	pType->AddProperty (pThunkProperty);
 	pType->m_pThunkProperty = pThunkProperty;
 

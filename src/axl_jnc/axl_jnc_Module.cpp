@@ -353,9 +353,8 @@ CModule::CreateDefaultDestructor ()
 	ASSERT (!m_pDestructor);
 
 	CFunctionType* pType = (CFunctionType*) GetSimpleType (EStdType_SimpleFunction);
-	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleDestructor, pType);
+	CFunction* pFunction = m_FunctionMgr.CreateFunction (EFunction_ModuleDestructor, "module.destruct", pType);
 	pFunction->m_StorageKind = EStorage_Static;
-	pFunction->m_Tag = "module.destruct";
 
 	m_pDestructor = pFunction;
 

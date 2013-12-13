@@ -16,6 +16,7 @@ namespace jnc {
 class CRuntime;
 class CTlsMgr;
 struct TTlsPage;
+struct TGcShadowStackFrame;
 
 //.............................................................................
 
@@ -28,6 +29,16 @@ struct TTlsData: public rtl::TListLink
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TTls
+{
+	size_t m_ScopeLevel;
+	TGcShadowStackFrame* m_pGcShadowStackTop;
+
+	// followed by user TLS variables
+};
+
+//.............................................................................
 
 class CTlsDirectory: public ref::CRefCount
 {
@@ -60,9 +71,9 @@ protected:
 public:
 	CTlsMgr ();
 
-	// CreatePageSlot / DestroyPageSlot should only be called from the main thread;
+	// CreateSlot / DestroySlot should only be called from the main thread;
 	// all threads containing tls pages on particular slot (n) should be terminated by 
-	// the moment of calling DestroyPageSlot (n)
+	// the moment of calling DestroySlot (n)
 
 	size_t 
 	CreateSlot ();

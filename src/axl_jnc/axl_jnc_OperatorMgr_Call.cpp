@@ -549,7 +549,7 @@ COperatorMgr::CallImpl (
 		m_pModule->m_LlvmIrBuilder.CreateStore (ScopeLevelValue, pVariable);
 	}
 
-	GcSafePoint ();
+	GcCall (EStdFunc_GcLeave);
 
 	pFunctionType->GetCallConv ()->Call (
 		PfnValue,
@@ -557,6 +557,8 @@ COperatorMgr::CallImpl (
 		pArgValueList,
 		pResultValue
 		);
+
+	GcCall (EStdFunc_GcEnter);
 
 	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) &&
 		!m_pModule->m_ControlFlowMgr.IsThrowLocked ())
@@ -580,19 +582,14 @@ COperatorMgr::CallImpl (
 }
 
 void
-COperatorMgr::GcSafePoint ()
+COperatorMgr::GcCall (EStdFunc StdFuncKind)
 {
-	CFunction* pGcSafePoint = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcSafePoint);
-
-	CValue ResultValue;
-	m_pModule->m_LlvmIrBuilder.CreateCall (
-		pGcSafePoint,
-		pGcSafePoint->GetType (),
-		&ResultValue
-		);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (StdFuncKind);
+	m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), NULL);
 }
 
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
+

@@ -144,12 +144,30 @@ CStdLib::GcAddObject (TObject* p)
 }
 
 void
-CStdLib::GcSafePoint ()
+CStdLib::GcEnter ()
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	pRuntime->GcSafePoint ();
+	pRuntime->GcEnter ();
+}
+
+void
+CStdLib::GcLeave ()
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	pRuntime->GcLeave ();
+}
+
+void
+CStdLib::GcPulse ()
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	pRuntime->GcPulse ();
 }
 
 void
