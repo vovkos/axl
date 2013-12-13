@@ -191,6 +191,7 @@ main := |*
 'countof'        { CreateToken (EToken_CountOf); };
 'offsetof'       { CreateToken (EToken_OffsetOf); };
 'typeof'         { CreateToken (EToken_TypeOf); };
+'dtypeof'        { CreateToken (EToken_DTypeOf); };
 'bindingof'      { CreateToken (EToken_BindingOf); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -211,7 +212,7 @@ main := |*
 'case'           { CreateToken (EToken_Case); };
 'default'        { CreateToken (EToken_Default); };
 'once'           { CreateToken (EToken_Once); };
-'onchanged'       { CreateToken (EToken_OnChanged); };
+'onchanged'      { CreateToken (EToken_OnChanged); };
 'try'            { CreateToken (EToken_Try); };
 'catch'          { CreateToken (EToken_Catch); };
 'finally'        { CreateToken (EToken_Finally); };

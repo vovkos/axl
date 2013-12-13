@@ -282,6 +282,7 @@ CControlFlowMgr::Return (const CValue& Value)
 
 		OnLeaveScope ();
 		RestoreScopeLevel ();
+		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
 
 		if (m_pReturnBlock)
 			Jump (m_pReturnBlock);
@@ -311,6 +312,7 @@ CControlFlowMgr::Return (const CValue& Value)
 		}
 
 		RestoreScopeLevel ();
+		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
 
 		pFunctionType->GetCallConv ()->Return (pFunction, ReturnValue);
 	}

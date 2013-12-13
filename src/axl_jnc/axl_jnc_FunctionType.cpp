@@ -109,7 +109,7 @@ CFunctionType::GetAbstractFunction ()
 	if (m_pAbstractFunction)
 		return m_pAbstractFunction;
 
-	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateInternalFunction ("abstractFunction", this);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Internal, "abstractFunction", this);
 	m_pAbstractFunction = pFunction;
 	m_pModule->MarkForCompile (this);
 	return pFunction;

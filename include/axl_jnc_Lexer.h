@@ -156,6 +156,7 @@ enum EToken
 	EToken_CountOf,
 	EToken_OffsetOf,
 	EToken_TypeOf,
+	EToken_DTypeOf,
 	EToken_BindingOf,
 
 	// symbol tokens
@@ -332,6 +333,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_CountOf,      "countof")
 	AXL_LEX_TOKEN_NAME (EToken_OffsetOf,     "offsetof")
 	AXL_LEX_TOKEN_NAME (EToken_TypeOf,       "typeof")
+	AXL_LEX_TOKEN_NAME (EToken_DTypeOf,      "dtypeof")
 	AXL_LEX_TOKEN_NAME (EToken_BindingOf,    "bindingof")
 
 	// symbol tokens

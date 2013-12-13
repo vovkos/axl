@@ -4,7 +4,6 @@
 #include "axl_jnc_Module.h"
 
 // #define _AXL_JNC_NO_JIT
-// #define _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
 
 namespace axl {
 namespace jnc {
@@ -49,8 +48,10 @@ CFunctionMgr::Clear ()
 CFunction*
 CFunctionMgr::CreateFunction (
 	EFunction FunctionKind,
-	CFunctionType* pType,
-	uint_t Flags
+	const rtl::CString& Name,
+	const rtl::CString& QualifiedName,
+	const rtl::CString& Tag,
+	CFunctionType* pType
 	)
 {
 	CFunction* pFunction;
@@ -73,25 +74,11 @@ CFunctionMgr::CreateFunction (
 
 	pFunction->m_pModule = m_pModule;
 	pFunction->m_FunctionKind = FunctionKind;
-	pFunction->m_pType = pType;
-	pFunction->m_Flags = Flags;
-	pFunction->m_TypeOverload.AddOverload (pType);
-	return pFunction;
-}
-
-CFunction*
-CFunctionMgr::CreateFunction (
-	const rtl::CString& Name,
-	const rtl::CString& QualifiedName,
-	CFunctionType* pType,
-	uint_t Flags
-	)
-{
-	CFunction* pFunction = CreateFunction (EFunction_Named, pType, Flags);
 	pFunction->m_Name = Name;
 	pFunction->m_QualifiedName = QualifiedName;
-	pFunction->m_Tag = QualifiedName;
-
+	pFunction->m_Tag = Tag;
+	pFunction->m_pType = pType;
+	pFunction->m_TypeOverload.AddOverload (pType);
 	return pFunction;
 }
 
@@ -100,7 +87,7 @@ CFunctionMgr::CreateProperty (
 	EProperty PropertyKind,
 	const rtl::CString& Name,
 	const rtl::CString& QualifiedName,
-	uint_t Flags
+	const rtl::CString& Tag
 	)
 {
 	CProperty* pProperty;
@@ -123,19 +110,11 @@ CFunctionMgr::CreateProperty (
 	}
 
 	pProperty->m_pModule = m_pModule;
+	pProperty->m_PropertyKind = PropertyKind;
 	pProperty->m_Name = Name;
 	pProperty->m_QualifiedName = QualifiedName;
-	pProperty->m_Tag = QualifiedName;
-	pProperty->m_Flags = Flags;
+	pProperty->m_Tag = Tag;
 	m_pModule->MarkForLayout (pProperty, true);
-	return pProperty;
-}
-
-CProperty*
-CFunctionMgr::CreateInternalProperty (const char* pTag)
-{
-	CProperty* pProperty = CreateProperty (rtl::CString (), rtl::CString ());
-	pProperty->m_Tag = pTag;
 	return pProperty;
 }
 
@@ -325,10 +304,8 @@ CFunctionMgr::Prologue (
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ()); // llvm magic
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 
-#ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
-	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
-	m_pModule->m_LlvmIrBuilder.CreateCall (pGcSafePoint, pGcSafePoint->GetType (), NULL);
-#endif
+	CFunction* pGcEnter = GetStdFunction (EStdFunc_GcEnter);
+	m_pModule->m_LlvmIrBuilder.CreateCall (pGcEnter, pGcEnter->GetType (), NULL);
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
 	{
@@ -503,10 +480,8 @@ CFunctionMgr::InternalPrologue (
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 
-#ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
-	CFunction* pGcSafePoint = GetStdFunction (EStdFunc_GcSafePoint);
-	m_pModule->m_LlvmIrBuilder.CreateCall (pGcSafePoint, pGcSafePoint->GetType (), NULL);
-#endif
+	CFunction* pGcEnter = GetStdFunction (EStdFunc_GcEnter);
+	m_pModule->m_LlvmIrBuilder.CreateCall (pGcEnter, pGcEnter->GetType (), NULL);
 
 	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
@@ -617,7 +592,7 @@ CFunctionMgr::GetDirectThunkProperty (
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
 
-	CThunkProperty* pThunkProperty = (CThunkProperty*) CreateProperty (EProperty_Thunk, rtl::CString (), rtl::CString ());
+	CThunkProperty* pThunkProperty = (CThunkProperty*) CreateProperty (EProperty_Thunk);
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Signature = Signature;
 	pThunkProperty->m_Tag = "g_directThunkProperty";
@@ -653,7 +628,7 @@ CFunctionMgr::GetDirectDataThunkProperty (
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
 
-	CDataThunkProperty* pThunkProperty = (CDataThunkProperty*) CreateProperty (EProperty_DataThunk, rtl::CString (), rtl::CString ());
+	CDataThunkProperty* pThunkProperty = (CDataThunkProperty*) CreateProperty (EProperty_DataThunk);
 	pThunkProperty->m_StorageKind = EStorage_Static;
 	pThunkProperty->m_Signature = Signature;
 	pThunkProperty->m_pTargetVariable = pTargetVariable;
@@ -687,7 +662,7 @@ CFunctionMgr::GetScheduleLauncherFunction (
 	if (Thunk->m_Value)
 		return Thunk->m_Value;
 
-	CClassPtrType* pSchedulerPtrType = ((CClassType*) GetSimpleType (m_pModule, EStdType_Scheduler))->GetClassPtrType (SchedulerPtrTypeKind);
+	CClassPtrType* pSchedulerPtrType = ((CClassType*) m_pModule->GetSimpleType (EStdType_Scheduler))->GetClassPtrType (SchedulerPtrTypeKind);
 
 	rtl::CArrayT <CFunctionArg*> ArgArray  = pTargetFunctionPtrType->GetTargetType ()->GetArgArray ();
 	ArgArray.Insert (0, pTargetFunctionPtrType->GetSimpleFunctionArg ());
@@ -748,10 +723,8 @@ CFunctionMgr::InjectTlsPrologue (CFunction* pFunction)
 
 	llvm::BasicBlock::iterator LlvmAnchor = pBlock->GetLlvmBlock ()->begin ();
 
-#ifndef _AXL_JNC_NO_PROLOGUE_GC_SAFE_POINT
-	if (llvm::isa <llvm::CallInst> (LlvmAnchor)) // skip gc-safe-point
+	if (llvm::isa <llvm::CallInst> (LlvmAnchor)) // skip gc-enter
 		LlvmAnchor++;
-#endif
 
 	m_pModule->m_LlvmIrBuilder.SetInsertPoint (LlvmAnchor);
 
@@ -891,12 +864,20 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 	if (m_StdFunctionArray [Func])
 		return m_StdFunctionArray [Func];
 
-	CFunction* pFunction;
+	CType* ArgTypeArray [8] = { 0 }; // 8 is enough for all the std functions
 
+	CType* pReturnType;
+	CFunctionType* pFunctionType;
+	CFunction* pFunction;
+	
 	switch (Func)
 	{
 	case EStdFunc_OnRuntimeError:
-		pFunction = CreateOnRuntimeError ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 2);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.onRuntimeError", pFunctionType);
 		break;
 
 	case EStdFunc_CheckNullPtr:
@@ -916,11 +897,18 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		break;
 
 	case EStdFunc_DynamicCastClassPtr:
-		pFunction = CreateDynamicCastClassPtr ();
+		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 2);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.dynamicCastClassPtr", pFunctionType);
 		break;
 
 	case EStdFunc_StrengthenClassPtr:
-		pFunction = CreateStrengthenClassPtr ();
+		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+		ArgTypeArray [0] = ((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass))->GetClassPtrType (EClassPtrType_Weak);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.strengthenClassPtr", pFunctionType);
 		break;
 
 	case EStdFunc_GetDataPtrSpan:
@@ -928,99 +916,199 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		break;
 
 	case EStdFunc_HeapAlloc:
-		pFunction = CreateHeapAlloc ();
+		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.heapAlloc", pFunctionType);
 		break;
 
 	case EStdFunc_HeapUAlloc:
-		pFunction = CreateHeapUAlloc ();
+		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.uheapAlloc", pFunctionType);
 		break;
 
 	case EStdFunc_HeapUFree:
-		pFunction = CreateHeapUFree ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.uheapFree", pFunctionType);
 		break;
 
 	case EStdFunc_HeapUFreeClassPtr:
-		pFunction = CreateHeapUFreeClassPtr ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.uheapFreeClassPtr", pFunctionType);
 		break;
 
 	case EStdFunc_GcAddObject:
-		pFunction = CreateGcAddObject ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdrPtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.gcAddObject", pFunctionType);
 		break;
 
 	case EStdFunc_MarkGcRoot:
-		pFunction = CreateMarkGcRoot ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetDataPtrType_c ();
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 2);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.markGcRoot", pFunctionType);
+		pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (m_pModule->GetLlvmModule (), llvm::Intrinsic::gcroot);
 		break;
 
 	case EStdFunc_GetTls:
-		pFunction = CreateGetTls ();
+		pReturnType = m_pModule->m_VariableMgr.GetTlsStructType ()->GetDataPtrType (EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.getTls", pFunctionType);
 		break;
 
-	case EStdFunc_GcSafePoint:
-		pFunction = CreateGcSafePoint ();
+	case EStdFunc_GcEnter:
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.gcEnter", pFunctionType);
+		break;
+
+	case EStdFunc_GcLeave:
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.gcLeave", pFunctionType);
+		break;
+
+	case EStdFunc_GcPulse:
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.gcPulse", pFunctionType);
 		break;
 
 	case EStdFunc_RunGc:
-		pFunction = CreateRunGc ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("runGc", "jnc.runGc", pFunctionType);
 		break;
 
 	case EStdFunc_RunGcWaitForDestructors:
-		pFunction = CreateRunGcWaitForDestructors ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("runGcWaitForDestructors", "jnc.runGcWaitForDestructors", pFunctionType);
 		break;
 
 	case EStdFunc_GetCurrentThreadId:
-		pFunction = CreateGetCurrentThreadId ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("getCurrentThreadId", "jnc.getCurrentThreadId", pFunctionType);
 		break;
 
 	case EStdFunc_CreateThread:
-		pFunction = CreateCreateThread ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+		ArgTypeArray [0] = ((CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType (EFunctionPtrType_Normal, EPtrTypeFlag_Checked);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction ("createThread", "jnc.createThread", pFunctionType);
 		break;
 
 	case EStdFunc_Sleep:
-		pFunction = CreateSleep ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32_u);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction ("sleep", "jnc.sleep", pFunctionType);
 		break;
 
 	case EStdFunc_GetTimestamp:
-		pFunction = CreateGetTimestamp ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("getTimestamp", "jnc.getTimestamp", pFunctionType);
 		break;
 
 	case EStdFunc_StrLen:
-		pFunction = CreateStrLen ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
+		pFunction = CreateFunction ("strlen", "strlen", pFunctionType);
 		break;
 
 	case EStdFunc_Rand:
-		pFunction = CreateRand ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("rand", "rand", pFunctionType);
 		break;
 
 	case EStdFunc_Printf:
-		pFunction = CreatePrintf ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin, EPtrTypeFlag_Unsafe | EPtrTypeFlag_Const);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (
+			m_pModule->m_TypeMgr.GetCallConv (ECallConv_Cdecl),
+			pReturnType, 
+			ArgTypeArray, 1,
+			EFunctionTypeFlag_VarArg
+			);
+		pFunction = CreateFunction ("printf", "printf", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_a:
-		pFunction = CreateAppendFmtLiteral_a ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_a", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_p:
-		pFunction = CreateAppendFmtLiteral_p ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_p", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_i32:
-		pFunction = CreateAppendFmtLiteral_i32 ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_i32", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_ui32:
-		pFunction = CreateAppendFmtLiteral_ui32 ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32_u),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_ui32", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_i64:
-		pFunction = CreateAppendFmtLiteral_i64 ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_i64", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_ui64:
-		pFunction = CreateAppendFmtLiteral_ui64 ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_ui64", pFunctionType);
 		break;
 
 	case EStdFunc_AppendFmtLiteral_f:
-		pFunction = CreateAppendFmtLiteral_f ();
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
+		ArgTypeArray [2] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double),
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 3);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.appendFmtLiteral_f", pFunctionType);
 		break;
 
 	case EStdFunc_SimpleMulticastCall:
@@ -1037,55 +1125,19 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 }
 
 CFunction*
-CFunctionMgr::CreateInternalFunction (
-	const char* pTag,
-	CFunctionType* pType,
-	uint_t Flags
-	)
-{
-	CFunction* pFunction = CreateFunction (EFunction_Internal, pType, Flags);
-	pFunction->m_Tag = pTag;
-	return pFunction;
-}
-
-// void
-// jnc.OnRuntimeError (
-//		int Error,
-//		int8* pCodeAddr
-//		);
-
-CFunction*
-CFunctionMgr::CreateOnRuntimeError ()
-{
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.onRuntimeError", pType);
-}
-
-// void
-// jnc.CheckNullPtr (
-//		int8* p,
-//		int Error
-//		);
-
-CFunction*
 CFunctionMgr::CreateCheckNullPtr ()
 {
-	CType* ArgTypeArray [] =
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	CType* ArgTypeArray [] = 
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.checkNullPtr", pType);
+	CFunctionType* pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction (EFunction_Internal, "jnc.checkNullPtr", pFunctionType);
 
-	CValue ArgValueArray [countof (ArgTypeArray)];
+	CValue ArgValueArray [2];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
 	CValue ArgValue1 = ArgValueArray [0];
@@ -1109,26 +1161,20 @@ CFunctionMgr::CreateCheckNullPtr ()
 	return pFunction;
 }
 
-
-// void
-// jnc.CheckDataPtrScopeLevel (
-//		size_t SrcScopeLevel
-//		size_t DstScopeLevel
-//		);
-
 CFunction*
 CFunctionMgr::CreateCheckScopeLevel ()
 {
-	CType* ArgTypeArray [] =
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	CType* ArgTypeArray [] = 
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.checkScopeLevel", pType);
+	CFunctionType* pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction (EFunction_Internal, "jnc.checkScopeLevel", pFunctionType);
 
-	CValue ArgValueArray [countof (ArgTypeArray)];
+	CValue ArgValueArray [2];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
 	CValue ArgValue1 = ArgValueArray [0];
@@ -1149,29 +1195,22 @@ CFunctionMgr::CreateCheckScopeLevel ()
 	return pFunction;
 }
 
-// void
-// jnc.CheckDataPtrRange (
-//		int8* p,
-//		size_t Size,
-//		int8* pRangeBegin,
-//		int8* pRangeEnd
-//		);
-
 CFunction*
 CFunctionMgr::CreateCheckDataPtrRange ()
 {
-	CType* ArgTypeArray [] =
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	CType* ArgTypeArray [] = 
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)
+		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.checkDataPtrRange", pType);
+	CFunctionType* pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction (EFunction_Internal, "jnc.checkDataPtrRange", pFunctionType);
 
-	CValue ArgValueArray [countof (ArgTypeArray)];
+	CValue ArgValueArray [4];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
 	CValue ArgValue1 = ArgValueArray [0];
@@ -1207,25 +1246,20 @@ CFunctionMgr::CreateCheckDataPtrRange ()
 	return pFunction;
 }
 
-// void
-// jnc.CheckClassPtrScopeLevel (
-//		object* p,
-//		size_t DstScopeLevel
-//		);
-
 CFunction*
 CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 {
-	CType* ArgTypeArray [] =
+	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
+	CType* ArgTypeArray [] = 
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.checkClassPtrScopeLevel", pType);
+	CFunctionType* pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction (EFunction_Internal, "jnc.checkClassPtrScopeLevel", pFunctionType);
 
-	CValue ArgValueArray [countof (ArgTypeArray)];
+	CValue ArgValueArray [2];
 	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
 
 	CValue ArgValue1 = ArgValueArray [0];
@@ -1268,65 +1302,24 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	return pFunction;
 }
 
-// object*
-// jnc.DynamicCastClassPtr (
-//		object* p,
-//		int8* pType
-//		);
-
-CFunction*
-CFunctionMgr::CreateDynamicCastClassPtr ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.dynamicCastClassPtr", pType);
-}
-
-// object*
-// jnc.StrengthenClassPtr (weak object* p);
-
-CFunction*
-CFunctionMgr::CreateStrengthenClassPtr ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
-
-	CType* ArgTypeArray [] =
-	{
-		((CClassType*) m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectClass))->GetClassPtrType (EClassPtrType_Weak)
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.strengthenClassPtr", pType);
-}
-
 // size_t
 // jnc.GetDataPtrSpan (jnc.DataPtr Ptr);
 
 CFunction*
 CFunctionMgr::CreateGetDataPtrSpan ()
 {
-	CType* pIntPtrType = GetSimpleType (m_pModule, EType_Int_p);
-
-	CType* ArgTypeArray [] =
+	CType* pIntPtrType = m_pModule->GetSimpleType (EType_Int_p);
+	CType* ArgTypeArray [] = 
 	{
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const)
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const),
 	};
 
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pIntPtrType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction ("getDataPtrSpan", "jnc.getDataPtrSpan", pType);
+	CFunctionType* pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pIntPtrType, ArgTypeArray, countof (ArgTypeArray));
+	CFunction* pFunction = CreateFunction ("getDataPtrSpan", "jnc.getDataPtrSpan", pFunctionType);
 
-	CValue ArgValueArray [countof (ArgTypeArray)];
-	InternalPrologue (pFunction, ArgValueArray, countof (ArgValueArray));
-
-	CValue ArgValue = ArgValueArray [0];
-
+	CValue ArgValue;
+	InternalPrologue (pFunction, &ArgValue, 1);
+	
 	CValue PtrValue;
 	CValue RangeEndValue;
 	CValue SpanValue;
@@ -1339,439 +1332,6 @@ CFunctionMgr::CreateGetDataPtrSpan ()
 
 	InternalEpilogue ();
 
-	return pFunction;
-}
-
-// int8*
-// jnc.HeapAlloc (size_t Size);
-
-CFunction*
-CFunctionMgr::CreateHeapAlloc ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.heapAlloc", pType);
-}
-
-// int8*
-// jnc.HeapUAlloc (size_t Size);
-
-CFunction*
-CFunctionMgr::CreateHeapUAlloc ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.uheapAlloc", pType);
-}
-
-// void
-// jnc.HeapUFree (int8* p);
-
-CFunction*
-CFunctionMgr::CreateHeapUFree ()
-{
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.uheapFree", pType);
-}
-
-// void
-// jnc.HeapUFreeClassPtr (object* p);
-
-CFunction*
-CFunctionMgr::CreateHeapUFreeClassPtr ()
-{
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.uheapFreeClassPtr", pType);
-}
-
-// void
-// jnc.GcAddObject (object.hdr* p);
-
-CFunction*
-CFunctionMgr::CreateGcAddObject ()
-{
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdrPtr),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateInternalFunction ("jnc.gcAddObject", pType);
-}
-
-// void
-// jnc.MarkGcRoot (
-//		int8* p,
-//		int8* pType
-//		);
-
-CFunction*
-CFunctionMgr::CreateMarkGcRoot ()
-{
-	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-	CType* pBytePtrPtrType = pBytePtrType->GetDataPtrType_c ();
-
-	CType* ArgTypeArray [] =
-	{
-		pBytePtrPtrType,
-		pBytePtrType,
-	};
-
-	llvm::Type* LlvmArgTypeArray [2] =
-	{
-		pBytePtrType->GetLlvmType (),
-		pBytePtrType->GetLlvmType (),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-
-	CFunction* pFunction = CreateInternalFunction ("jnc.markGcRoot", pType);
-
-	pFunction->m_pLlvmFunction = llvm::Intrinsic::getDeclaration (
-		m_pModule->GetLlvmModule (),
-		llvm::Intrinsic::gcroot
-		);
-
-	return pFunction;
-}
-
-// void
-// jnc.GcSafePoint ();
-
-CFunction*
-CFunctionMgr::CreateGcSafePoint ()
-{
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType ();
-	return CreateInternalFunction ("jnc.gcSafePoint", pType);
-}
-
-// void
-// jnc.RunGc ();
-
-CFunction*
-CFunctionMgr::CreateRunGc ()
-{
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType ();
-	return CreateFunction ("runGc", "jnc.runGc", pType);
-}
-
-// void
-// jnc.RunGcWaitForDestructors ();
-
-CFunction*
-CFunctionMgr::CreateRunGcWaitForDestructors ()
-{
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType ();
-	return CreateFunction ("runGcWaitForDestructors", "jnc.runGcWaitForDestructors", pType);
-}
-
-// i64
-// jnc.GetCurrentThreadId ();
-
-CFunction*
-CFunctionMgr::CreateGetCurrentThreadId ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
-	return CreateFunction ("getCurrentThreadId", "jnc.getCurrentThreadId", pType);
-}
-
-// i64
-// jnc.CreateThread (function* pf ());
-
-CFunction*
-CFunctionMgr::CreateCreateThread ()
-{
-	CFunctionType* pFunctionType = ((CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction));
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
-	CType* ArgTypeArray [] =
-	{
-		pFunctionType->GetFunctionPtrType (EFunctionPtrType_Normal, EPtrTypeFlag_Checked),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction ("createThread", "jnc.createThread", pType);
-}
-
-// void
-// jnc.Sleep (uint_t MsCount);
-
-CFunction*
-CFunctionMgr::CreateSleep ()
-{
-	CType* ArgTypeArray [] =
-	{
-		((CFunctionType*) m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32_u)),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
-	return CreateFunction ("sleep", "jnc.sleep", pType);
-}
-
-// uint64_t
-// jnc.getTimestamp ();
-
-CFunction*
-CFunctionMgr::CreateGetTimestamp ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
-	return CreateFunction ("getTimestamp", "jnc.getTimestamp", pType);
-}
-
-// size_t
-// strlen (nullable const char* p);
-
-CFunction*
-CFunctionMgr::CreateStrLen ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateFunction ("strlen", "strlen", pType);
-	return pFunction;
-}
-
-// int
-// rand ();
-
-CFunction*
-CFunctionMgr::CreateRand ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
-	CFunction* pFunction = CreateFunction ("rand", "rand", pType);
-	return pFunction;
-}
-
-// int
-// printf ();
-
-CFunction*
-CFunctionMgr::CreatePrintf ()
-{
-	CCallConv* pCallConv = m_pModule->m_TypeMgr.GetCallConv (ECallConv_Cdecl);
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p);
-	CType* pFormatType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin, EPtrTypeFlag_Unsafe | EPtrTypeFlag_Const);
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (
-		pCallConv,
-		pReturnType,
-		&pFormatType, 1,
-		EFunctionTypeFlag_VarArg
-		);
-
-	CFunction* pFunction = CreateFunction ("printf", "printf", pType);
-	return pFunction;
-}
-
-// jnc.TTls*
-// jnc.GcTls ();
-
-CFunction*
-CFunctionMgr::CreateGetTls ()
-{
-	CType* pReturnType = m_pModule->m_VariableMgr.GetTlsStructType ()->GetDataPtrType (
-		EDataPtrType_Thin,
-		EPtrTypeFlag_Unsafe
-		);
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0, 0);
-	return CreateInternalFunction ("jnc.getTls", pType);
-}
-
-// size_t
-// jnc.AppendFmtLiteral_a (
-//		jnc.TFmtLiteral* pLiteral,
-//		char* p,
-//		size_t Length
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_a ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_a", pType);
-	return pFunction;
-}
-
-// size_t
-// jnc.AppendFmtLiteral_p (
-//		jnc.TFmtLiteral* pFmtLiteral,
-//		char* pFmtSpecifier,
-//		jnc.TPtr Ptr
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_p ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_p", pType);
-	return pFunction;
-}
-
-// size_t
-// jnc.AppendFmtLiteral_i32 (
-//		jnc.TFmtLiteral* pFmtLiteral,
-//		char* pFmtSpecifier,
-//		i32 i
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_i32 ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_i32", pType);
-	return pFunction;
-}
-
-// size_t
-// jnc.AppendFmtLiteral_ui32 (
-//		jnc.TFmtLiteral* pFmtLiteral,
-//		char* pFmtSpecifier,
-//		i32 i
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_ui32 ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int32_u),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_ui32", pType);
-	return pFunction;
-}
-
-// size_t
-// jnc.AppendFmtLiteral_i64 (
-//		jnc.TFmtLiteral* pFmtLiteral,
-//		char* pFmtSpecifier,
-//		i64 i
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_i64 ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_i64", pType);
-	return pFunction;
-}
-
-// size_t
-// jnc.AppendFmtLiteral_ui64 (
-//		jnc.TFmtLiteral* pFmtLiteral,
-//		char* pFmtSpecifier,
-//		i64 i
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_ui64 ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_ui64", pType);
-	return pFunction;
-}
-
-// size_t
-// jnc.AppendFmtLiteral_f (
-//		jnc.TFmtLiteral* pFmtLiteral,
-//		char* pFmtSpecifier,
-//		double f
-//		);
-
-CFunction*
-CFunctionMgr::CreateAppendFmtLiteral_f ()
-{
-	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-
-	CType* ArgTypeArray [] =
-	{
-		m_pModule->m_TypeMgr.GetStdType (EStdType_FmtLiteral)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Double),
-	};
-
-	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, countof (ArgTypeArray));
-	CFunction* pFunction = CreateInternalFunction ("jnc.appendFmtLiteral_f", pType);
 	return pFunction;
 }
 

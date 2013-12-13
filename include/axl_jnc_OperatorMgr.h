@@ -30,6 +30,7 @@
 #include "axl_jnc_UnionType.h"
 #include "axl_jnc_ClassType.h"
 #include "axl_jnc_VariableMgr.h"
+#include "axl_jnc_FunctionMgr.h"
 
 namespace axl {
 namespace jnc {
@@ -822,7 +823,7 @@ public:
 	}
 
 	void
-	GcSafePoint ();
+	GcCall (EStdFunc StdFuncKind);
 
 	// closure operators
 

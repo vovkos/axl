@@ -118,7 +118,7 @@ CCast_FunctionPtr_Weak2Normal::LlvmCast (
 	CBasicBlock* pDeadBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("dead");
 	CBasicBlock* pPhiBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("phi");
 
-	CType* pClosureType = GetSimpleType (m_pModule, EStdType_ObjectPtr);
+	CType* pClosureType = m_pModule->GetSimpleType (EStdType_ObjectPtr);
 	CValue NullClosureValue = pClosureType->GetZeroValue ();
 
 	CValue ClosureValue;

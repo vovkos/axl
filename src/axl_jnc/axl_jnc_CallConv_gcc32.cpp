@@ -27,7 +27,7 @@ CCallConv_gcc32::GetLlvmFunctionType (CFunctionType* pFunctionType)
 		LlvmArgTypeArray [j] = ArgArray [i]->GetType ()->GetLlvmType ();
 
 	return llvm::FunctionType::get (
-		GetSimpleType (m_pModule, EType_Void)->GetLlvmType (),
+		m_pModule->GetSimpleType (EType_Void)->GetLlvmType (),
 		llvm::ArrayRef <llvm::Type*> (LlvmArgTypeArray, ArgCount),
 		(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg) != 0
 		);
@@ -80,7 +80,7 @@ CCallConv_gcc32::Call (
 		CalleeValue,
 		pFunctionType->GetCallConv (),
 		*pArgValueList,
-		GetSimpleType (m_pModule, EType_Void),
+		m_pModule->GetSimpleType (EType_Void),
 		NULL
 		);
 

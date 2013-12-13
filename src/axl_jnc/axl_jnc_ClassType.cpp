@@ -784,7 +784,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 
 	m_pModule->m_LlvmIrBuilder.CreateLoad (ObjectPtrValue, NULL, &ObjectPtrValue);
 
-	CType* pType = GetSimpleType (m_pModule, EType_Int_p);
+	CType* pType = m_pModule->GetSimpleType (EType_Int_p);
 
 	CValue FlagsValue;
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &FlagsValue);

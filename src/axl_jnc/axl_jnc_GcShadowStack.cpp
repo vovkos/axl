@@ -226,7 +226,7 @@ CGcShadowStack::CollectRoots (
 	rtl::CArrayT <TRoot>* pRootArray
 	)
 {
-	CType* pBytePtrType = GetSimpleType (m_pModule, EStdType_BytePtr);
+	CType* pBytePtrType = m_pModule->GetSimpleType (EStdType_BytePtr);
 
 	llvm::Function::iterator LlvmBlock = pFunction->GetLlvmFunction ()->begin();
 	llvm::Function::iterator LlvmBlockEnd = pFunction->GetLlvmFunction ()->end ();
@@ -279,7 +279,7 @@ CGcShadowStack::GetFrameMap (
 	llvm::Constant*
 	LlvmFrameMap [2] =
 	{
-		(llvm::Constant*) CValue (RootCount, GetSimpleType (m_pModule, EType_SizeT)).GetLlvmValue (),
+		(llvm::Constant*) CValue (RootCount, m_pModule->GetSimpleType (EType_SizeT)).GetLlvmValue (),
 
 		llvm::ConstantArray::get (
 			(llvm::ArrayType*) pTypeArrayType->GetLlvmType (),

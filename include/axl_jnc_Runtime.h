@@ -192,6 +192,24 @@ public:
 	}
 
 	void
+	GcEnter ()
+	{
+		GcSafePoint ();
+	}
+
+	void
+	GcLeave ()
+	{
+		GcSafePoint ();
+	}
+
+	void
+	GcPulse ()
+	{
+		GcSafePoint ();
+	}
+
+	void
 	GcSafePoint ();
 
 	void*
