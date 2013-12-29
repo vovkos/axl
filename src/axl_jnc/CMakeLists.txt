@@ -381,6 +381,7 @@ set (
 	VALUE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Closure.h
 	${AXL_INC_DIR}/axl_jnc_ConstMgr.h
+	${AXL_INC_DIR}/axl_jnc_Object.h
 	${AXL_INC_DIR}/axl_jnc_ThinDataPtrValidator.h
 	${AXL_INC_DIR}/axl_jnc_Value.h
 	)
@@ -389,6 +390,7 @@ set (
 	VALUE_CPP_LIST
 	axl_jnc_Closure.cpp
 	axl_jnc_ConstMgr.cpp
+	axl_jnc_Object.cpp
 	axl_jnc_ThinDataPtrValidator.cpp
 	axl_jnc_Value.cpp
 	)
@@ -434,7 +436,6 @@ source_virtual_folder (
 set (
 	RUNTIME_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Api.h
-	${AXL_INC_DIR}/axl_jnc_GcHeap.h
 	${AXL_INC_DIR}/axl_jnc_MulticastLib.h
 	${AXL_INC_DIR}/axl_jnc_Runtime.h
 	${AXL_INC_DIR}/axl_jnc_StdLib.h
@@ -445,7 +446,6 @@ set (
 set (
 	RUNTIME_CPP_LIST
 	axl_jnc_Api.cpp
-	axl_jnc_GcHeap.cpp
 	axl_jnc_MulticastLib.cpp
 	axl_jnc_Runtime.cpp
 	axl_jnc_StdLib.cpp

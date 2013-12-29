@@ -526,7 +526,7 @@ CStructType::PrepareLlvmDiType ()
 }
 
 void
-CStructType::EnumGcRoots (
+CStructType::GcMark (
 	CRuntime* pRuntime,
 	void* _p
 	)
@@ -537,14 +537,14 @@ CStructType::EnumGcRoots (
 	for (size_t i = 0; i < Count; i++)
 	{
 		CBaseTypeSlot* pSlot = m_GcRootBaseTypeArray [i];
-		pSlot->GetType ()->EnumGcRoots (pRuntime, p + pSlot->GetOffset ());
+		pSlot->GetType ()->GcMark (pRuntime, p + pSlot->GetOffset ());
 	}
 
 	Count = m_GcRootMemberFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = m_GcRootMemberFieldArray [i];
-		pField->GetType ()->EnumGcRoots (pRuntime, p + pField->GetOffset ());
+		pField->GetType ()->GcMark (pRuntime, p + pField->GetOffset ());
 	}
 }
 

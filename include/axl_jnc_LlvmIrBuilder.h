@@ -10,6 +10,7 @@
 #include "axl_jnc_FunctionType.h"
 #include "axl_jnc_PropertyType.h"
 #include "axl_jnc_Variable.h"
+#include "axl_jnc_Runtime.h"
 
 namespace axl {
 namespace jnc {

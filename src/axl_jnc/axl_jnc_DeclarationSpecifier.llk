@@ -99,7 +99,7 @@ storage_specifier
 			}
 	|	EToken_UHeap
 			{
-				$.m_StorageKind = EStorage_HeapU;
+				$.m_StorageKind = EStorage_UHeap;
 			}
 	|	EToken_Abstract
 			{

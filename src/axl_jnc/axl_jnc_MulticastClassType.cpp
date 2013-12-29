@@ -61,7 +61,7 @@ CMulticastClassType::CompileCallMethod ()
 }
 
 void
-CMulticastClassType::EnumGcRoots (
+CMulticastClassType::GcMark (
 	CRuntime* pRuntime,
 	void* _p
 	)

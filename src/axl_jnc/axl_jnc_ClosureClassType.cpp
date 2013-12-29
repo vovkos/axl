@@ -134,37 +134,6 @@ CClosureClassType::Strengthen (jnc::TInterface* p)
 	return p;
 }
 
-void
-CClosureClassType::WeakMarkGcClosureObject (
-	CRuntime* pRuntime,
-	TObject* pObject
-	)
-{
-	if (!m_WeakMask)
-	{
-		pRuntime->MarkGcObject (pObject);
-		return;
-	}
-
-	pRuntime->MarkGcRange (pObject, m_Size);
-	pObject->m_Flags |= EObjectFlag_GcMark_wc;
-
-	char* p = (char*) (pObject + 1);
-
-	size_t Count = m_GcRootMemberFieldArray.GetCount ();
-
-	for (size_t i = 0; i < Count; i++)
-	{
-		CStructField* pField = m_GcRootMemberFieldArray [i];
-		CType* pType = pField->GetType ();
-
-		if (pField->GetFlags () & EStructFieldFlag_WeakMasked)
-			pType = GetWeakPtrType (pType);
-
-		pType->EnumGcRoots (pRuntime, p + pField->GetOffset ());
-	}
-}
-
 //.............................................................................
 
 CFunctionClosureClassType::CFunctionClosureClassType ()

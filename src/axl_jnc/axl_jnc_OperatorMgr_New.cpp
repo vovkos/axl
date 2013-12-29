@@ -30,7 +30,7 @@ COperatorMgr::Allocate (
 			pType = m_pModule->m_TypeMgr.GetArrayType (pType, ElementCount);
 		}
 	}
-	else if (StorageKind != EStorage_Heap && StorageKind != EStorage_HeapU)
+	else if (StorageKind != EStorage_Heap && StorageKind != EStorage_UHeap)
 	{
 		err::SetFormatStringError ("cannot create non-const-sized arrays with '%s new'", GetStorageKindString (StorageKind));
 		return false;
@@ -70,16 +70,16 @@ COperatorMgr::Allocate (
 		break;
 
 	case EStorage_Heap:
-		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapAlloc);
+		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcAllocate);
 		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
 		MarkGcRoot (PtrValue, pType);
 		break;
-
-	case EStorage_HeapU:
-		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapUAlloc);
+/*
+	case EStorage_UHeap:
+		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
 		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
 		break;
-
+ */
 	default:
 		err::SetFormatStringError ("invalid storage specifier '%s' in 'new' operator", GetStorageKindString (StorageKind));
 		return false;
@@ -126,7 +126,7 @@ COperatorMgr::Prime (
 
 	CClassType* pClassType = (CClassType*) pType;
 
-	uint_t Flags = EObjectFlag_Alive;
+	uint_t Flags = 0;
 	switch (StorageKind)
 	{
 	case EStorage_Static:
@@ -137,8 +137,8 @@ COperatorMgr::Prime (
 		Flags |= EObjectFlag_Stack;
 		break;
 
-	case EStorage_HeapU:
-		Flags |= EObjectFlag_HeapU;
+	case EStorage_UHeap:
+		Flags |= EObjectFlag_UHeap;
 		break;
 	}
 
@@ -160,25 +160,6 @@ COperatorMgr::Prime (
 		CValue (Flags, EType_Int_p),
 		NULL
 		);
-
-	if (StorageKind == EStorage_Heap)
-	{
-		CFunction* pAddObject = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcAddObject);
-
-		CValue ObjectPtrValue;
-		m_pModule->m_LlvmIrBuilder.CreateBitCast (
-			PtrValue,
-			m_pModule->GetSimpleType (EStdType_ObjectHdrPtr),
-			&ObjectPtrValue
-			);
-
-		m_pModule->m_LlvmIrBuilder.CreateCall (
-			pAddObject,
-			pAddObject->GetType (),
-			ObjectPtrValue,
-			NULL
-			);
-	}
 
 	CFunction* pDestructor = pClassType->GetDestructor ();
 	if (StorageKind != EStorage_Stack || !pDestructor)
@@ -602,59 +583,6 @@ COperatorMgr::NewOperator (
 
 	m_pModule->m_ControlFlowMgr.OnceStmt_PostBody (&Stmt, Pos);
 
-	return true;
-}
-
-bool
-COperatorMgr::DeleteOperator (const CValue& RawOpValue)
-{
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue);
-	if (!Result)
-		return false;
-
-	CFunction* pFree;
-
-	CValue PtrValue;
-	EType TypeKind = OpValue.GetType ()->GetTypeKind ();
-	switch (TypeKind)
-	{
-	case EType_DataPtr:
-		Result = PrepareDataPtr (&OpValue);
-		if (!Result)
-			return false;
-
-		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapUFree);
-		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
-		break;
-
-	case EType_ClassPtr:
-		{
-		CClassType* pClassType = ((CClassPtrType*) OpValue.GetType ())->GetTargetType ();
-		CFunction* pDestructor = pClassType->GetDestructor ();
-		if (pDestructor)
-		{
-			Result = CallOperator (pDestructor, OpValue);
-			if (!Result)
-				return false;
-		}
-		else
-		{
-			CheckClassPtrNull (OpValue);
-		}
-
-		pFree = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_HeapUFreeClassPtr);
-		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &PtrValue);
-		}
-		break;
-
-	default:
-		err::SetFormatStringError ("cannot delete '%s'", OpValue.GetType ()->GetTypeString ().cc ());
-		return false;
-	}
-
-	CValue ReturnValue;
-	m_pModule->m_LlvmIrBuilder.CreateCall (pFree, pFree->GetType (), PtrValue, &ReturnValue);
 	return true;
 }
 

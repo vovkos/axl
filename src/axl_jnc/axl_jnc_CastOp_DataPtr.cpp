@@ -56,7 +56,7 @@ CCast_DataPtr_FromArray::ConstCast (
 		pPtr->m_p = p;
 		pPtr->m_pRangeBegin = p;
 		pPtr->m_pRangeEnd = (char*) p + pSrcType->GetSize ();
-		pPtr->m_ScopeLevel = 0;
+		pPtr->m_pObject = GetStaticObject ();
 	}
 
 	return true;
@@ -186,7 +186,7 @@ CCast_DataPtr_Normal2Normal::ConstCast (
 	pDstPtr->m_p = (char*) pSrcPtr->m_p + Offset;
 	pDstPtr->m_pRangeBegin = pSrcPtr->m_pRangeBegin;
 	pDstPtr->m_pRangeEnd = pSrcPtr->m_pRangeEnd;
-	pDstPtr->m_ScopeLevel = pSrcPtr->m_ScopeLevel;
+	pDstPtr->m_pObject = pSrcPtr->m_pObject;
 	return true;
 }
 
@@ -246,10 +246,11 @@ CCast_DataPtr_Thin2Normal::ConstCast (
 
 	TDataPtr* pDstPtr = (TDataPtr*) pDst;
 	const void* pSrc = OpValue.GetConstData ();
+
 	pDstPtr->m_p = (char*) pSrc + Offset;
 	pDstPtr->m_pRangeBegin = NULL;
 	pDstPtr->m_pRangeEnd = (void*) -1;
-	pDstPtr->m_ScopeLevel = 0;
+	pDstPtr->m_pObject = GetStaticObject ();
 
 	return true;
 }

@@ -7,6 +7,7 @@
 #include "axl_jnc_TlsMgr.h"
 #include "axl_jnc_Value.h"
 #include "axl_jnc_ClassType.h"
+#include "axl_jnc_DataPtrType.h"
 #include "axl_mt_TlsSlot.h"
 #include "axl_mt_Event.h"
 #include "axl_mt_Thread.h"
@@ -34,13 +35,6 @@ GetJitKindString (EJit JitKind);
 
 //.............................................................................
 
-enum EGcFlag
-{
-	EGcFlag_WaitForDestructors = 0x01,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 enum ECreateObjectFlag
 {
 	ECreateObjectFlag_Construct = 0x01,
@@ -51,12 +45,15 @@ enum ECreateObjectFlag
 
 class CRuntime
 {
+	friend class CGcHeap;
+
 protected:
 	enum EGcState
 	{
 		EGcState_Idle = 0,
 		EGcState_WaitSafePoint,
 		EGcState_Mark,
+		EGcState_Sweep,
 	};
 
 	struct TGcRoot
@@ -65,20 +62,23 @@ protected:
 		CType* m_pType;
 	};
 
-	class CGcDestructThread: public mt::CThreadImplT <CGcDestructThread>
+	struct TGcDestructGuard: rtl::TListLink
 	{
-	public:
-		CRuntime* m_pRuntime;
+		rtl::CArrayT <TGcRoot> m_GcRootArray;
 
-		dword_t
-		ThreadProc ()
+		TGcDestructGuard ()
 		{
-			m_pRuntime->GcDestructThreadProc ();
-			return 0;
+		}
+
+		TGcDestructGuard (
+			ref::EBuf BufKind,
+			void* p,
+			size_t Size
+			):
+			m_GcRootArray (BufKind, p, Size)
+		{
 		}
 	};
-
-	friend class CGcDestructThread;
 
 protected:
 	CModule* m_pModule;
@@ -88,25 +88,24 @@ protected:
 
 	mt::CLock m_Lock;
 
-	// gc
+	// gc-heap
 
-	EGcState m_GcState;
+	volatile EGcState m_GcState;
+
+	size_t m_GcHeapLimit;
+	size_t m_TotalGcAllocSize;
+	size_t m_CurrentGcAllocSize;
+	size_t m_PeriodGcAllocLimit;
+	size_t m_PeriodGcAllocSize;
+
 	mt::CNotificationEvent m_GcIdleEvent;
-	mt::CEvent m_WaitGcSafePointEvent;
-	size_t m_WaitGcSafePointCount;
+	mt::CNotificationEvent m_GcSafePointEvent;
+	volatile intptr_t m_GcUnsafeThreadCount;
+	rtl::CArrayT <TObject*> m_GcMemBlockArray;
+	rtl::CArrayT <TObject*> m_GcObjectArray;
 
-	void* m_pGcHeap;
-	size_t m_GcHeapSize;
-	size_t m_GcBlockSize;
-	rtl::CBuddyAllocMap m_GcMap;
-
-	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcObjectList;
-	rtl::CAuxListT <TObject, CObjectGcHeapLink> m_GcDestructList;
-	mt::CEvent m_GcDestructEvent;
-	mt::CNotificationEvent m_GcDestructThreadIdleEvent;
-	CGcDestructThread m_GcDestructThread;
-	bool m_TerminateGcDestructThread;
-
+	rtl::CHashTableT <TInterface*, rtl::CHashIdT <TInterface*> > m_GcPinTable;
+	rtl::CAuxListT <TGcDestructGuard> m_GcDestructGuardList;
 	rtl::CArrayT <TGcRoot> m_StaticGcRootArray;
 	rtl::CArrayT <TGcRoot> m_GcRootArray [2];
 	size_t m_CurrentGcRootArrayIdx;
@@ -116,7 +115,7 @@ protected:
 	size_t m_StackLimit;
 	size_t m_TlsSlot;
 	size_t m_TlsSize;
-	rtl::CAuxListT <TTlsData> m_TlsList;
+	rtl::CAuxListT <TTlsHdr> m_TlsList;
 
 public:
 	CRuntime ();
@@ -136,8 +135,8 @@ public:
 	Create (
 		CModule* pModule,
 		EJit JitKind,
-		size_t HeapSize,
-		size_t StackLimit
+		size_t HeapLimit = -1,
+		size_t StackLimit = -1
 		);
 
 	void
@@ -174,80 +173,52 @@ public:
 		return m_pLlvmExecutionEngine;
 	}
 
-	// gc heap
-
+	static
 	void
-	RunGcEx (uint_t Flags);
+	RuntimeError (
+		int Error,
+		void* pCodeAddr,
+		void* pDataAddr
+		);
+
+	// gc heap
 
 	void
 	RunGc ()
 	{
-		RunGcEx (0);
+		WaitGcIdleAndLock ();
+		RunGc_l ();
 	}
 
 	void
-	RunGcWaitForDestructors ()
-	{
-		RunGcEx (EGcFlag_WaitForDestructors);
-	}
+	GcEnter ();
 
 	void
-	GcEnter ()
-	{
-		GcSafePoint ();
-	}
+	GcLeave ();
 
 	void
-	GcLeave ()
+	GcPulse ();
+
+	TObject*
+	GcAllocateObject (CClassType* pType);
+
+	TDataPtr
+	GcAllocateData (
+		CType* pType,
+		size_t Count
+		);
+
+	TObject*
+	GcTryAllocateObject (CClassType* pType)
 	{
-		GcSafePoint ();
+		return GcTryAllocate (pType, 1);
 	}
 
-	void
-	GcPulse ()
-	{
-		GcSafePoint ();
-	}
-
-	void
-	GcSafePoint ();
-
-	void*
-	GcAllocate (size_t Size);
-
-	void
-	GcAddObject (TObject* pObject);
-
-	bool
-	ShouldMarkGcPtr (void* p)
-	{
-		return IsInGcHeap (p) && !IsMarkedGcPtr (p);
-	}
-
-	bool
-	ShouldMarkGcObject (TObject* pObject)
-	{
-		return IsInGcHeap (pObject) && !(pObject->m_Flags & EObjectFlag_GcMark);
-	}
-
-	bool
-	ShouldWeakMarkGcClosureObject (TObject* pObject)
-	{
-		return IsInGcHeap (pObject) && !(pObject->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcMark_wc));
-	}
-
-	void
-	MarkGcObject (TObject* pObject);
-
-	void
-	MarkGcRange (
-		void* p,
-		size_t Size
-		)
-	{
-		ASSERT (m_GcState == EGcState_Mark && IsInGcHeap (p));
-		m_GcMap.Mark (GetGcAddress (p), GetGcBlockCount (Size));
-	}
+	TDataPtr
+	GcTryAllocateData (
+		CType* pType,
+		size_t Count
+		);
 
 	void
 	AddGcRoot (
@@ -277,52 +248,33 @@ public:
 		return m_TlsSlot;
 	}
 
-	void*
+	TTlsHdr*
 	GetTls ();
 
-	TTlsData*
-	CreateTlsData ();
+	TTlsHdr*
+	CreateTls ();
 
 	void
-	DestroyTlsData (TTlsData* pTlsData);
+	DestroyTls (TTlsHdr* pTls);
 
 protected:
 	void
 	WaitGcIdleAndLock ();
 
-	void
-	GcAddObject_l (TObject* pObject);
-
-	size_t
-	GetGcAddress (void* p)
-	{
-		ASSERT (p >= m_pGcHeap);
-		return ((char*) p - (char*) m_pGcHeap) / m_GcBlockSize;
-	}
-
-	size_t
-	GetGcBlockCount (size_t Size)
-	{
-		return Size % m_GcBlockSize ? Size / m_GcBlockSize + 1 : Size / m_GcBlockSize;
-	}
-
-	bool
-	IsInGcHeap (void* p)
-	{
-		return p >= m_pGcHeap && p < (char*) m_pGcHeap + m_GcHeapSize;
-	}
-
-	bool
-	IsMarkedGcPtr (void* p)
-	{
-		return m_GcMap.GetBit (GetGcAddress (p));
-	}
+	TObject*
+	GcTryAllocate (
+		CType* pType,
+		size_t Count
+		);
 
 	void
 	GcMarkCycle ();
 
 	void
-	GcDestructThreadProc ();
+	GcAddObject (TObject* pObject);
+
+	void
+	RunGc_l ();
 };
 
 //.............................................................................
@@ -335,6 +287,20 @@ GetCurrentThreadRuntime ()
 {
 	return mt::GetTlsSlotValue <CRuntime> ();
 }
+
+//.............................................................................
+
+enum ERuntimeError
+{
+	ERuntimeError_OutOfMemory,
+	ERuntimeError_StackOverflow,
+	ERuntimeError_ScopeMismatch,
+	ERuntimeError_DataPtrOutOfRange,
+	ERuntimeError_NullClassPtr,
+	ERuntimeError_NullFunctionPtr,
+	ERuntimeError_NullPropertyPtr,
+	ERuntimeError_AbstractFunction,
+};
 
 //.............................................................................
 

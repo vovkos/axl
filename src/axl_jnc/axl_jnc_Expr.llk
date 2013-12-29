@@ -613,11 +613,8 @@ unary_operator_expr <CValue* $pValue>
 		new_operator_curly_initializer <$pValue>?
 	|	EToken_Delete unary_expr <$pValue>
 			{
-				bool Result = m_pModule->m_OperatorMgr.DeleteOperator (*$pValue);
-				if (!Result)
-					return false;
-
-				$pValue->SetVoid ();
+				err::SetFormatStringError ("manual memory management is not supported yet");
+				return false;
 			}
 	;
 

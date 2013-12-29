@@ -177,6 +177,18 @@ public:
 		return FindBaseTypeTraverseImpl (pType, pCoord, 0);
 	}
 
+	rtl::CArrayT <CBaseTypeSlot*> 
+	GetGcRootBaseTypeArray ()
+	{
+		return m_GcRootBaseTypeArray;
+	}
+
+	rtl::CArrayT <CStructField*> 
+	GetGcRootMemberFieldArray ()
+	{
+		return m_GcRootMemberFieldArray;
+	}
+
 	rtl::CArrayT <CStructField*> 
 	GetMemberFieldArray ()
 	{

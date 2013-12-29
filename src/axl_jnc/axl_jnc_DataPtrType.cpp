@@ -106,31 +106,19 @@ CDataPtrType::PrepareLlvmDiType ()
 }
 
 void
-CDataPtrType::EnumGcRoots (
+CDataPtrType::GcMark (
 	CRuntime* pRuntime,
 	void* p
 	)
 {
 	ASSERT (m_PtrTypeKind == EDataPtrType_Normal);
 
-	TDataPtr* pPtr = (TDataPtr*) p;
-	if (pPtr->m_pRangeBegin >= pPtr->m_pRangeEnd || !pRuntime->ShouldMarkGcPtr (pPtr->m_pRangeBegin))
+	TDataPtr* pPtr = (TDataPtr*) p;		
+	TObject* pObject = pPtr->m_pObject;
+	if (!pObject || pObject->m_ScopeLevel)
 		return;
 
-	size_t Size = (char*) pPtr->m_pRangeEnd - (char*) pPtr->m_pRangeBegin;
-	pRuntime->MarkGcRange (pPtr->m_pRangeBegin, Size);
-
-	if (m_pTargetType->GetFlags () & ETypeFlag_GcRoot)
-	{
-		size_t ElementSize = m_pTargetType->GetSize ();
-		size_t Count = Size / ElementSize;
-
-		ASSERT (Size % ElementSize == 0); // should be an array
-
-		char* p = (char*) pPtr->m_pRangeBegin;
-		for (size_t i = 0; i < Count; i++, p += ElementSize)
-			pRuntime->AddGcRoot (p, m_pTargetType);
-	}
+	pObject->GcMarkData (pRuntime);
 }
 
 //.............................................................................

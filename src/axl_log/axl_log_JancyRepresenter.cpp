@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_log_JancyRepresenter.h"
+#include "axl_jnc_ConstMgr.h"
 
 namespace axl {
 namespace log {
@@ -65,7 +66,7 @@ CJancyRepresenter::Represent (
 	jnc::TObject Object = { 0 };
 	Object.m_pType = m_pJancyRepresenterTargetType;
 	Object.m_ScopeLevel = 0; // TODO: calc property scope level
-	Object.m_Flags = jnc::EObjectFlag_Alive | jnc::EObjectFlag_Stack;
+	Object.m_Flags = jnc::EObjectFlag_Stack;
 
 	TJancyRepresenterTarget Target;
 	Target.m_pObject = &Object;
@@ -82,7 +83,7 @@ CJancyRepresenter::Represent (
 	Ptr.m_p = (void*) p;
 	Ptr.m_pRangeBegin = (void*) p;
 	Ptr.m_pRangeEnd = (char*) p + Size;
-	Ptr.m_ScopeLevel = 0;
+	Ptr.m_pObject = jnc::GetStaticObject ();
 
 	return pVTable->m_pfRepresent (m_pJancyRepresenter, &Target, PacketCode, Ptr, Size, FoldFlags);
 }

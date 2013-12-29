@@ -14,49 +14,49 @@ CTlsDirectory::~CTlsDirectory ()
 	size_t Count = m_Table.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
-		TTlsData* pTlsData = m_Table [i];
-		if (pTlsData)
-			pTlsData->m_pRuntime->DestroyTlsData (pTlsData);
+		TTlsHdr* pTls = m_Table [i];
+		if (pTls)
+			pTls->m_pRuntime->DestroyTls (pTls);
 	}
 }
 
-TTlsData* 
-CTlsDirectory::FindTlsData (CRuntime* pRuntime)
+TTlsHdr* 
+CTlsDirectory::FindTls (CRuntime* pRuntime)
 {
 	size_t Slot = pRuntime->GetTlsSlot ();
 	return Slot < m_Table.GetCount () ? m_Table [Slot] : NULL;
 }
 
-TTlsData* 
-CTlsDirectory::GetTlsData (CRuntime* pRuntime)
+TTlsHdr* 
+CTlsDirectory::GetTls (CRuntime* pRuntime)
 {
 	size_t Slot = pRuntime->GetTlsSlot ();
 
 	if (Slot >= m_Table.GetCount ())
 		m_Table.SetCount (Slot + 1);
 
-	TTlsData* pTlsData = m_Table [Slot];
-	if (pTlsData)
+	TTlsHdr* pTls = m_Table [Slot];
+	if (pTls)
 	{
-		ASSERT (pTlsData->m_pRuntime == pRuntime);
-		return pTlsData;
+		ASSERT (pTls->m_pRuntime == pRuntime);
+		return pTls;
 	}
 
-	pTlsData = pRuntime->CreateTlsData ();
-	m_Table [Slot] = pTlsData;
-	return pTlsData;
+	pTls = pRuntime->CreateTls ();
+	m_Table [Slot] = pTls;
+	return pTls;
 }
 
-TTlsData*
-CTlsDirectory::NullifyTlsData (CRuntime* pRuntime)
+TTlsHdr*
+CTlsDirectory::NullifyTls (CRuntime* pRuntime)
 {
 	size_t Slot = pRuntime->GetTlsSlot ();
 	if (Slot >= m_Table.GetCount ()) 
 		return NULL;
 	
-	TTlsData* pTlsData = m_Table [Slot];
+	TTlsHdr* pTls = m_Table [Slot];
 	m_Table [Slot] = NULL;
-	return pTlsData;
+	return pTls;
 }
 
 //.............................................................................
@@ -98,32 +98,32 @@ CTlsMgr::DestroySlot (size_t Slot)
 	m_SlotMap.SetBit (Slot, false);
 }
 
-TTlsData*
-CTlsMgr::FindTlsData (CRuntime* pRuntime)
+TTlsHdr*
+CTlsMgr::FindTls (CRuntime* pRuntime)
 {
 	CTlsDirectory* pDirectory = (CTlsDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
-	return pDirectory ? pDirectory->FindTlsData (pRuntime) : NULL;
+	return pDirectory ? pDirectory->FindTls (pRuntime) : NULL;
 }
 
-TTlsData*
-CTlsMgr::GetTlsData (CRuntime* pRuntime)
+TTlsHdr*
+CTlsMgr::GetTls (CRuntime* pRuntime)
 {
 	CTlsDirectory* pDirectory = (CTlsDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
 	if (pDirectory)
-		return pDirectory->GetTlsData (pRuntime);
+		return pDirectory->GetTls (pRuntime);
 
 	ref::CPtrT <CTlsDirectory> Directory = AXL_REF_NEW (CTlsDirectory);
 	mt::GetTlsMgr ()->SetSlotValue (m_TlsSlot, Directory);		
 	pDirectory = Directory;
 
-	return pDirectory->GetTlsData (pRuntime);
+	return pDirectory->GetTls (pRuntime);
 }
 
-TTlsData*
-CTlsMgr::NullifyTlsData (CRuntime* pRuntime)
+TTlsHdr*
+CTlsMgr::NullifyTls (CRuntime* pRuntime)
 {
 	CTlsDirectory* pDirectory = (CTlsDirectory*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
-	return pDirectory ? pDirectory->NullifyTlsData (pRuntime) : NULL;
+	return pDirectory ? pDirectory->NullifyTls (pRuntime) : NULL;
 }
 
 //.............................................................................

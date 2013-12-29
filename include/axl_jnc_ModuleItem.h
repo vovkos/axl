@@ -69,7 +69,7 @@ enum EStorage
 	EStorage_Thread,
 	EStorage_Stack,
 	EStorage_Heap,
-	EStorage_HeapU,
+	EStorage_UHeap,
 	EStorage_Member,
 	EStorage_Abstract,
 	EStorage_Virtual,

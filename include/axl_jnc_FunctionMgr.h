@@ -20,12 +20,12 @@ namespace jnc {
 enum EStdFunc
 {
 	// void
-	// jnc.OnRuntimeError (
+	// jnc.RuntimeError (
 	//		int Error,
 	//		int8* pCodeAddr
 	//		);
 
-	EStdFunc_OnRuntimeError,
+	EStdFunc_RuntimeError,
 
 	// void
 	// jnc.CheckNullPtr (
@@ -80,29 +80,12 @@ enum EStdFunc
 	EStdFunc_GetDataPtrSpan,
 
 	// int8*
-	// jnc.HeapAlloc (size_t Size);
+	// jnc.GcAllocate (
+	//		int8* pType,
+	//		size_t Count
+	//		);
 
-	EStdFunc_HeapAlloc,
-
-	// int8*
-	// jnc.HeapUAlloc (size_t Size);
-
-	EStdFunc_HeapUAlloc,
-
-	// void
-	// jnc.HeapUFree (int8* p);
-
-	EStdFunc_HeapUFree,
-
-	// void
-	// jnc.HeapUFreeClassPtr (object* p);
-
-	EStdFunc_HeapUFreeClassPtr,
-
-	// void
-	// jnc.GcAddObject (object.hdr* p);
-
-	EStdFunc_GcAddObject,
+	EStdFunc_GcAllocate,
 
 	// void
 	// jnc.GcEnter ();
@@ -131,11 +114,6 @@ enum EStdFunc
 	// jnc.RunGc ();
 
 	EStdFunc_RunGc,
-
-	// void
-	// jnc.RunGcWaitForDestructors ();
-
-	EStdFunc_RunGcWaitForDestructors,
 
 	// i64
 	// jnc.GetCurrentThreadId ();

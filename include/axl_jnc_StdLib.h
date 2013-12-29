@@ -18,19 +18,14 @@ class CStdLib
 {
 public:
 	AXL_JNC_API_BEGIN_LIB ()
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_OnRuntimeError, OnRuntimeError)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_RuntimeError, RuntimeError)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_DynamicCastClassPtr, DynamicCastClassPtr)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_StrengthenClassPtr, StrengthenClassPtr)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapAlloc, HeapAlloc)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUAlloc, HeapUAlloc)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUFree, HeapUFree)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_HeapUFreeClassPtr, HeapUFreeClassPtr)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcAddObject, GcAddObject)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcAllocate, GcAllocate)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcEnter, GcEnter)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcLeave, GcLeave)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcPulse, GcPulse)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_RunGc, RunGc)
-		AXL_JNC_API_STD_FUNCTION (EStdFunc_RunGcWaitForDestructors, RunGcWaitForDestructors)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetCurrentThreadId, GetCurrentThreadId)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_CreateThread, CreateThread)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_Sleep, Sleep)
@@ -51,11 +46,14 @@ public:
 public:
 	static
 	void
-	OnRuntimeError (
+	RuntimeError (
 		int Error,
 		void* pCodeAddr,
 		void* pDataAddr
-		);
+		)
+	{
+		CRuntime::RuntimeError (Error, pCodeAddr, pDataAddr);
+	}
 
 	static
 	TInterface*
@@ -70,23 +68,10 @@ public:
 
 	static
 	void*
-	HeapAlloc (size_t Size);
-
-	static
-	void*
-	HeapUAlloc (size_t Size);
-
-	static
-	void
-	HeapUFree (void* p);
-
-	static
-	void
-	HeapUFreeClassPtr (TInterface* p);
-
-	static
-	void
-	GcAddObject (TObject* p);
+	GcAllocate (
+		CType* pType,
+		size_t Count
+		);
 
 	static
 	void
@@ -103,10 +88,6 @@ public:
 	static
 	void
 	RunGc ();
-
-	static
-	void
-	RunGcWaitForDestructors ();
 
 	static
 	intptr_t

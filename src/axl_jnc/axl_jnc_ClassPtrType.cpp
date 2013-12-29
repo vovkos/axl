@@ -103,27 +103,20 @@ CClassPtrType::PrepareLlvmDiType ()
 }
 
 void
-CClassPtrType::EnumGcRoots (
+CClassPtrType::GcMark (
 	CRuntime* pRuntime,
 	void* p
 	)
 {
 	TInterface* pIface = *(TInterface**) p;
-	if (!pIface)
+	if (!pIface || pIface->m_pObject->m_ScopeLevel)
 		return;
 
 	TObject* pObject = pIface->m_pObject;
-	
-	if (m_PtrTypeKind == EClassPtrType_Normal)
-	{
-		if (pRuntime->ShouldMarkGcObject (pObject))
-			pRuntime->MarkGcObject (pObject);
-	}
-	else // weak
-	{
-		if (pRuntime->ShouldMarkGcPtr (pObject))
-			pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ()); // actually can only keep headers. but whatever
-	}
+	if (m_PtrTypeKind == EClassPtrType_Weak)
+		pObject->GcWeakMarkObject ();
+	else
+		pObject->GcMarkObject (pRuntime);
 }
 
 //.............................................................................

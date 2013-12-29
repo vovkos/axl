@@ -86,14 +86,13 @@ CMulticast::GetSnapshot ()
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	ASSERT (m_pObject->m_pType->GetClassTypeKind () == EClassType_Multicast);
+	ASSERT (m_pObject->m_pClassType->GetClassTypeKind () == EClassType_Multicast);
 	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
 
-	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocate (sizeof (TMcSnapshotObject));
+	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocateObject (pSnapshotType);
 	pSnapshot->m_pType = pSnapshotType;
 	pSnapshot->m_pObject = pSnapshot;
-	pRuntime->GcAddObject (pSnapshot);
 
 	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
 	if (Size)

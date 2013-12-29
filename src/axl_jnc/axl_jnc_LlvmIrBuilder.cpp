@@ -395,15 +395,15 @@ CLlvmIrBuilder::CreateClosurePropertyPtr (
 bool
 CLlvmIrBuilder::RuntimeError (const CValue& ErrorValue)
 {
-	CFunction* pOnRuntimeError = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_OnRuntimeError);
+	CFunction* pRuntimeError = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_RuntimeError);
 
 	// TODO: calc real code address
 
 	CValue CodeAddrValue = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetZeroValue ();
 
 	CreateCall2 (
-		pOnRuntimeError,
-		pOnRuntimeError->GetType (),
+		pRuntimeError,
+		pRuntimeError->GetType (),
 		ErrorValue,
 		CodeAddrValue,
 		NULL

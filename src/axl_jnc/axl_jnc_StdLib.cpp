@@ -9,62 +9,6 @@ namespace jnc {
 
 //.............................................................................
 
-void
-CStdLib::OnRuntimeError (
-	int Error,
-	void* pCodeAddr,
-	void* pDataAddr
-	)
-{
-	const char* pErrorString;
-
-	switch (Error)
-	{
-	case ERuntimeError_OutOfMemory:
-		pErrorString = "OUT_OF_MEMORY";
-		break;
-
-	case ERuntimeError_StackOverflow:
-		pErrorString = "STACK_OVERFLOW";
-		break;
-
-	case ERuntimeError_DataPtrOutOfRange:
-		pErrorString = "DATA_PTR_OOR";
-		break;
-
-	case ERuntimeError_ScopeMismatch:
-		pErrorString = "SCOPE_MISMATCH";
-		break;
-
-	case ERuntimeError_NullClassPtr:
-		pErrorString = "NULL_CLASS_PTR";
-		break;
-
-	case ERuntimeError_NullFunctionPtr:
-		pErrorString = "NULL_FUNCTION_PTR";
-		break;
-
-	case ERuntimeError_NullPropertyPtr:
-		pErrorString = "NULL_PROPERTY_PTR";
-		break;
-
-	case ERuntimeError_AbstractFunction:
-		pErrorString = "ABSTRACT_FUNCTION";
-		break;
-
-	default:
-		ASSERT (false);
-		pErrorString = "<UNDEF>";
-	}
-
-	throw err::FormatStringError (
-		"RUNTIME ERROR: %s (code %x accessing data %x)",
-		pErrorString,
-		pCodeAddr,
-		pDataAddr
-		);
-}
-
 TInterface*
 CStdLib::DynamicCastClassPtr (
 	TInterface* p,
@@ -78,7 +22,7 @@ CStdLib::DynamicCastClassPtr (
 		return p;
 
 	CBaseTypeCoord Coord;
-	bool Result = p->m_pObject->m_pType->FindBaseTypeTraverse (pType, &Coord);
+	bool Result = p->m_pObject->m_pClassType->FindBaseTypeTraverse (pType, &Coord);
 	if (!Result)
 		return NULL;
 
@@ -93,54 +37,22 @@ CStdLib::StrengthenClassPtr (TInterface* p)
 	if (!p)
 		return NULL;
 
-	EClassType ClassTypeKind = p->m_pObject->m_pType->GetClassTypeKind ();
+	EClassType ClassTypeKind = p->m_pObject->m_pClassType->GetClassTypeKind ();
 	return ClassTypeKind == EClassType_FunctionClosure || ClassTypeKind == EClassType_PropertyClosure ?
 		((CClosureClassType*) p->m_pObject->m_pType)->Strengthen (p) :
-		(p->m_pObject->m_Flags & EObjectFlag_Alive) ? p : NULL;
+		(!(p->m_pObject->m_Flags & EObjectFlag_Dead)) ? p : NULL;
 }
 
 void*
-CStdLib::HeapAlloc (size_t Size)
+CStdLib::GcAllocate (
+	CType* pType,
+	size_t Count
+	)
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	return pRuntime->GcAllocate (Size);
-}
-
-void*
-CStdLib::HeapUAlloc (size_t Size)
-{
-	void* p = malloc (Size);
-	if (!p)
-	{
-		OnRuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
-		ASSERT (false);
-	}
-
-	memset (p, 0, Size);
-	return p;
-}
-
-void
-CStdLib::HeapUFree (void* p)
-{
-	free (p);
-}
-
-void
-CStdLib::HeapUFreeClassPtr (TInterface* p)
-{
-	free (p->m_pObject);
-}
-
-void
-CStdLib::GcAddObject (TObject* p)
-{
-	CRuntime* pRuntime = GetCurrentThreadRuntime ();
-	ASSERT (pRuntime);
-
-	pRuntime->GcAddObject (p);
+	return pRuntime->GcAllocateObject (NULL);
 }
 
 void
@@ -177,15 +89,6 @@ CStdLib::RunGc ()
 	ASSERT (pRuntime);
 
 	pRuntime->RunGc ();
-}
-
-void
-CStdLib::RunGcWaitForDestructors ()
-{
-	CRuntime* pRuntime = GetCurrentThreadRuntime ();
-	ASSERT (pRuntime);
-
-	pRuntime->RunGcWaitForDestructors ();
 }
 
 size_t
@@ -227,7 +130,7 @@ CStdLib::ThreadProc (PVOID pRawContext)
 	AXL_MEM_DELETE (pContext);
 
 	CScopeThreadRuntime ScopeRuntime (pRuntime);
-	GetTlsMgr ()->GetTlsData (pRuntime); // register thread right away
+	GetTlsMgr ()->GetTls (pRuntime); // register thread right away
 
 	((void (__cdecl*) (TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
 	return 0;
@@ -271,7 +174,7 @@ CStdLib::ThreadProc (void* pRawContext)
 	AXL_MEM_DELETE (pContext);
 
 	CScopeThreadRuntime ScopeRuntime (pRuntime);
-	GetTlsMgr ()->GetTlsData (pRuntime); // register thread right away
+	GetTlsMgr ()->GetTls (pRuntime); // register thread right away
 
 	((void (*) (TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
 	return NULL;
@@ -300,7 +203,7 @@ CStdLib::GetTls ()
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	return pRuntime->GetTls ();
+	return pRuntime->GetTls () + 1;
 }
 
 size_t

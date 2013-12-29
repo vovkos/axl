@@ -20,17 +20,23 @@ struct TGcShadowStackFrame;
 
 //.............................................................................
 
-struct TTlsData: public rtl::TListLink
+enum ETlsFlag
 {
-	CRuntime* m_pRuntime;
-	void* m_pStackEpoch;
-
-	// followed by TLS data
+	ETlsFlag_GcUnsafe = 0x01,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TTls
+struct TTlsHdr: public rtl::TListLink
+{
+	CRuntime* m_pRuntime;
+	void* m_pStackEpoch;
+	uintptr_t m_Flags; // modified from the current thread only
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct TTls // struct accessible from jancy
 {
 	size_t m_ScopeLevel;
 	TGcShadowStackFrame* m_pGcShadowStackTop;
@@ -43,19 +49,19 @@ struct TTls
 class CTlsDirectory: public ref::CRefCount
 {
 protected:
-	rtl::CArrayT <TTlsData*> m_Table;
+	rtl::CArrayT <TTlsHdr*> m_Table;
 
 public:
 	~CTlsDirectory ();
 
-	TTlsData*
-	FindTlsData (CRuntime* pRuntime);
+	TTlsHdr*
+	FindTls (CRuntime* pRuntime);
 
-	TTlsData*
-	GetTlsData (CRuntime* pRuntime);
+	TTlsHdr*
+	GetTls (CRuntime* pRuntime);
 
-	TTlsData*
-	NullifyTlsData (CRuntime* pRuntime);
+	TTlsHdr*
+	NullifyTls (CRuntime* pRuntime);
 };
 
 //.............................................................................
@@ -81,14 +87,14 @@ public:
 	void
 	DestroySlot (size_t Slot);
 
-	TTlsData*
-	FindTlsData (CRuntime* pRuntime);
+	TTlsHdr*
+	FindTls (CRuntime* pRuntime);
 
-	TTlsData*
-	GetTlsData (CRuntime* pRuntime);
+	TTlsHdr*
+	GetTls (CRuntime* pRuntime);
 
-	TTlsData*
-	NullifyTlsData (CRuntime* pRuntime);
+	TTlsHdr*
+	NullifyTls (CRuntime* pRuntime);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

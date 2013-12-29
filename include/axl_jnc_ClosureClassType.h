@@ -29,6 +29,12 @@ public:
 		m_WeakMask = 0;
 	}
 
+	uint64_t 
+	GetWeakMask ()
+	{
+		return m_WeakMask;
+	}
+
 	static
 	rtl::CString
 	CreateSignature (
@@ -46,12 +52,6 @@ public:
 
 	jnc::TInterface* 
 	Strengthen (jnc::TInterface* p);
-
-	void
-	WeakMarkGcClosureObject (
-		CRuntime* pRuntime,
-		TObject* pObject
-		);	
 
 protected:
 	void

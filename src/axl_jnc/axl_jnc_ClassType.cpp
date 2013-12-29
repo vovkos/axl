@@ -791,7 +791,7 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 	m_pModule->m_LlvmIrBuilder.CreateLoad (FlagsValue, pType, &FlagsValue);
 
 	CValue MaskValue;
-	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_HeapU, EType_Int_p);
+	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap, EType_Int_p);
 
 	CValue AndValue;
 	Result =
@@ -1024,7 +1024,7 @@ CClassType::PrimeInterface (
 }
 
 void
-CClassType::EnumGcRoots (
+CClassType::GcMark (
 	CRuntime* pRuntime,
 	void* p
 	)
@@ -1052,7 +1052,7 @@ CClassType::EnumGcRootsImpl (
 		if (pType->GetTypeKind () == EType_Class)
 			((CClassType*) pType)->EnumGcRootsImpl (pRuntime, (TInterface*) (p + pSlot->GetOffset ()));
 		else
-			pType->EnumGcRoots (pRuntime, p + pSlot->GetOffset ());
+			pType->GcMark (pRuntime, p + pSlot->GetOffset ());
 	}
 
 	Count = m_GcRootMemberFieldArray.GetCount ();
@@ -1061,7 +1061,7 @@ CClassType::EnumGcRootsImpl (
 		CStructField* pField = m_GcRootMemberFieldArray [i];
 		CType* pType = pField->GetType ();
 
-		pField->GetType ()->EnumGcRoots (pRuntime, p + pField->GetOffset ());
+		pField->GetType ()->GcMark (pRuntime, p + pField->GetOffset ());
 	}
 }
 

@@ -55,7 +55,7 @@ public:
 
 	virtual 
 	void
-	EnumGcRoots (
+	GcMark (
 		CRuntime* pRuntime,
 		void* p
 		)

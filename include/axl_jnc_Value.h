@@ -5,6 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
+#include "axl_jnc_Object.h"
 
 namespace axl {
 namespace jnc {
@@ -620,41 +621,6 @@ public:
 protected:
 	void
 	Init ();
-};
-
-//.............................................................................
-
-// structure backing up shadow stack frame map
-
-struct TGcShadowStackFrameMap
-{
-	size_t m_Count;
-
-	// followed by array of type pointers
-};
-
-// structure backing up shadow stack frame
-
-struct TGcShadowStackFrame
-{
-	TGcShadowStackFrame* m_pNext;
-	TGcShadowStackFrameMap* m_pMap;
-
-	// followed by array of root pointers
-};
-
-//.............................................................................
-
-enum ERuntimeError
-{
-	ERuntimeError_OutOfMemory,
-	ERuntimeError_StackOverflow,
-	ERuntimeError_ScopeMismatch,
-	ERuntimeError_DataPtrOutOfRange,
-	ERuntimeError_NullClassPtr,
-	ERuntimeError_NullFunctionPtr,
-	ERuntimeError_NullPropertyPtr,
-	ERuntimeError_AbstractFunction,
 };
 
 //.............................................................................

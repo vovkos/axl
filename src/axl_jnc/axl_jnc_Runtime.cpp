@@ -2,6 +2,7 @@
 #include "axl_jnc_Runtime.h"
 #include "axl_jnc_Module.h"
 #include "axl_jnc_StdLib.h"
+#include "axl_jnc_GcShadowStack.h"
 
 namespace axl {
 namespace jnc {
@@ -69,15 +70,15 @@ CRuntime::CRuntime ()
 	m_JitKind = EJit_Normal;
 
 	m_GcState = EGcState_Idle;
-	m_pGcHeap = NULL;
-	m_GcHeapSize = 0;
-	m_GcBlockSize = 0;
+	m_GcHeapLimit = -1;
+	m_TotalGcAllocSize = 0;
+	m_CurrentGcAllocSize = 0;
+	m_PeriodGcAllocSize = 0;
+	m_PeriodGcAllocLimit = 16 * 1024;
+	m_GcUnsafeThreadCount = 1;
 	m_CurrentGcRootArrayIdx = 0;
 
-	m_GcDestructThread.m_pRuntime = this;
-	m_TerminateGcDestructThread = false;
-
-	m_StackLimit = 0;
+	m_StackLimit = -1;
 	m_TlsSlot = -1;
 	m_TlsSize = 0;
 }
@@ -86,7 +87,7 @@ bool
 CRuntime::Create (
 	CModule* pModule,
 	EJit JitKind,
-	size_t HeapSize,
+	size_t HeapLimit,
 	size_t StackLimit
 	)
 {
@@ -94,6 +95,8 @@ CRuntime::Create (
 
 	m_pModule = pModule;
 	m_JitKind = JitKind;
+	m_GcHeapLimit = HeapLimit;
+	m_StackLimit = StackLimit;
 
 	// execution engine
 
@@ -127,33 +130,6 @@ CRuntime::Create (
 		return false;
 	}
 
-	// gc heap
-
-	size_t BlockSize = _AXL_PTR_SIZE * 4; // 1 block = 4 pointers
-	size_t PageSize = BlockSize * _AXL_PTR_BITNESS;
-	size_t PageCount = HeapSize / PageSize;
-	if (HeapSize & (PageSize - 1))
-		PageCount++;
-
-	size_t HeapHeight = rtl::GetHiBitIdx (PageCount);
-	if (PageCount & ((1 << HeapHeight) - 1))
-		HeapHeight++;
-
-	bool Result = m_GcMap.Create (1, HeapHeight + 1);
-	if (!Result)
-		return false;
-
-	size_t BlockCount = m_GcMap.GetTotalSize ();
-	HeapSize = BlockCount * BlockSize; // update
-
-	void* pHeap = AXL_MEM_ALLOC (HeapSize);
-	if (!pHeap)
-		return false;
-
-	m_GcHeapSize = HeapSize;
-	m_pGcHeap = pHeap;
-	m_GcBlockSize = BlockSize;
-
 	// static gc roots
 
 	rtl::CArrayT <CVariable*> StaticRootArray = pModule->m_VariableMgr.GetStaticGcRootArray ();
@@ -172,10 +148,8 @@ CRuntime::Create (
 
 	// tls
 
-	m_StackLimit = StackLimit;
 	m_TlsSize = pModule->m_VariableMgr.GetTlsStructType ()->GetSize ();
 	m_TlsSlot = GetTlsMgr ()->CreateSlot ();
-
 	return true;
 }
 
@@ -185,16 +159,9 @@ CRuntime::Destroy ()
 	if (!m_pModule)
 		return;
 
-	if (m_GcDestructThread.IsOpen ())
-	{
-		m_TerminateGcDestructThread = true;
-		m_GcDestructEvent.Signal ();
-		m_GcDestructThread.WaitAndClose ();
-	}
-
 	if (m_TlsSlot != -1)
 	{
-		GetTlsMgr ()->NullifyTlsData (this);
+		GetTlsMgr ()->NullifyTls (this);
 		GetTlsMgr ()->DestroySlot (m_TlsSlot);
 	}
 
@@ -208,18 +175,17 @@ CRuntime::Destroy ()
 
 	while (!m_TlsList.IsEmpty ())
 	{
-		TTlsData* pTlsData = m_TlsList.RemoveHead ();
-		AXL_MEM_FREE (pTlsData);
+		TTlsHdr* pTls = m_TlsList.RemoveHead ();
+		AXL_MEM_FREE (pTls);
 	}
 
-	if (m_pGcHeap)
-		AXL_MEM_FREE (m_pGcHeap);
-
-	m_pGcHeap = NULL;
+/*	m_GcHeap = NULL;
 	m_GcBlockSize = 0;
 	m_GcMap.Clear ();
 	m_GcObjectList.Clear ();
 	m_GcDestructList.Clear ();
+*/
+
 	m_StaticGcRootArray.Clear ();
 	m_FunctionMap.Clear ();
 
@@ -246,9 +212,6 @@ CRuntime::MapFunction (
 bool
 CRuntime::Startup ()
 {
-	m_TerminateGcDestructThread = false;
-	m_GcDestructThread.Start ();
-	m_GcDestructThreadIdleEvent.Wait (); // make sure GC destruct thread is running and registered with TLS mgr
 	m_GcIdleEvent.Signal ();
 	return true;
 }
@@ -259,17 +222,13 @@ CRuntime::Shutdown ()
 	rtl::CArrayT <TGcRoot> SaveStaticGcRootArray = m_StaticGcRootArray;
 	m_StaticGcRootArray.Clear ();
 
-	RunGcWaitForDestructors ();
+	RunGc ();
 
-	m_TerminateGcDestructThread = true;
-	m_GcDestructEvent.Signal ();
-	m_GcDestructThread.WaitAndClose ();
-
-	TTlsData* pTlsData = GetTlsMgr ()->NullifyTlsData (this);
-	if (pTlsData)
+	TTlsHdr* pTls = GetTlsMgr ()->NullifyTls (this);
+	if (pTls)
 	{
-		m_TlsList.Remove (pTlsData);
-		AXL_MEM_FREE (pTlsData);
+		m_TlsList.Remove (pTls);
+		AXL_MEM_FREE (pTls);
 	}
 
 	ASSERT (m_TlsList.IsEmpty ());
@@ -277,78 +236,182 @@ CRuntime::Shutdown ()
 	m_StaticGcRootArray = SaveStaticGcRootArray; // recover
 }
 
-void*
-CRuntime::GcAllocate (size_t Size)
+void
+CRuntime::RuntimeError (
+	int Error,
+	void* pCodeAddr,
+	void* pDataAddr
+	)
 {
-	ASSERT (m_pGcHeap);
+	const char* pErrorString;
 
-	size_t BlockCount = GetGcBlockCount (Size);
-
-	WaitGcIdleAndLock ();
-	size_t Address = m_GcMap.Allocate (BlockCount);
-	m_Lock.Unlock ();
-
-	if (Address == -1)
+	switch (Error)
 	{
-		RunGc ();
+	case ERuntimeError_OutOfMemory:
+		pErrorString = "OUT_OF_MEMORY";
+		break;
 
-		WaitGcIdleAndLock ();
-		Address = m_GcMap.Allocate (BlockCount);
-		m_Lock.Unlock ();
+	case ERuntimeError_StackOverflow:
+		pErrorString = "STACK_OVERFLOW";
+		break;
 
-		if (Address == -1) // double fault
-		{
-			CStdLib::OnRuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
-			ASSERT (false);
-		}
+	case ERuntimeError_DataPtrOutOfRange:
+		pErrorString = "DATA_PTR_OOR";
+		break;
+
+	case ERuntimeError_ScopeMismatch:
+		pErrorString = "SCOPE_MISMATCH";
+		break;
+
+	case ERuntimeError_NullClassPtr:
+		pErrorString = "NULL_CLASS_PTR";
+		break;
+
+	case ERuntimeError_NullFunctionPtr:
+		pErrorString = "NULL_FUNCTION_PTR";
+		break;
+
+	case ERuntimeError_NullPropertyPtr:
+		pErrorString = "NULL_PROPERTY_PTR";
+		break;
+
+	case ERuntimeError_AbstractFunction:
+		pErrorString = "ABSTRACT_FUNCTION";
+		break;
+
+	default:
+		ASSERT (false);
+		pErrorString = "<UNDEF>";
 	}
 
-	void* p = (char*) m_pGcHeap + Address * m_GcBlockSize;
-	memset (p, 0, Size);
-	return p;
+	throw err::FormatStringError (
+		"RUNTIME ERROR: %s (code %x accessing data %x)",
+		pErrorString,
+		pCodeAddr,
+		pDataAddr
+		);
+}
+
+TObject*
+CRuntime::GcAllocateObject (CClassType* pType)
+{
+	TObject* pObject = GcTryAllocateObject (pType);
+	if (!pObject)
+	{
+		RuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
+		ASSERT (false);
+	}
+
+	return pObject;
+}
+
+TDataPtr
+CRuntime::GcAllocateData (
+	CType* pType,
+	size_t Count
+	)
+{
+	TDataPtr Ptr = GcTryAllocateData (pType, Count);
+	if (!Ptr.m_p)
+	{
+		RuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
+		ASSERT (false);
+	}
+
+	return Ptr;
+}
+
+TDataPtr
+CRuntime::GcTryAllocateData (
+	CType* pType,
+	size_t Count
+	)
+{
+	TDataPtr Ptr = { 0 };
+	TObject* pObject = GcTryAllocate (pType, Count);
+	if (!pObject)
+		return Ptr;
+
+	char* p = Count > 1 ? 
+		(char*) ((TDynamicArray*) pObject + 1) : 
+		(char*) (pObject + 1);
+
+	Ptr.m_p = p;
+	Ptr.m_pRangeBegin = p;
+	Ptr.m_pRangeBegin = p + pType->GetSize () *  Count;
+	Ptr.m_pObject = pObject;
+	return Ptr;
+}
+
+TObject*
+CRuntime::GcTryAllocate (
+	CType* pType,
+	size_t Count
+	)
+{
+	size_t Size = Count > 1 ? 
+		sizeof (TDynamicArray) + pType->GetSize () * Count :
+		sizeof (TObject) + pType->GetSize ();
+			
+	WaitGcIdleAndLock ();	
+	if (m_PeriodGcAllocSize > m_PeriodGcAllocLimit)
+	{
+		RunGc_l ();
+		WaitGcIdleAndLock ();	
+	}
+
+	TObject* pObject = (TObject*) AXL_MEM_ALLOC (Size);
+	if (!pObject)
+	{
+		m_Lock.Unlock ();
+		return NULL;
+	}
+
+	pObject->m_ScopeLevel = 0;
+	pObject->m_pRoot = pObject;
+	pObject->m_pType = pType;
+	pObject->m_Flags = 0;
+
+	if (Count > 1)
+	{
+		TDynamicArray* pArray = (TDynamicArray*) pObject;
+
+		pArray->m_Flags |= EObjectFlag_DynamicArray;
+		pArray->m_Count = Count;
+	}
+	else if (pType->GetTypeKind () == EType_Class)
+	{
+		// TODO: Prime
+		GcAddObject (pObject);
+	}
+
+	m_PeriodGcAllocSize += Size;
+	m_GcMemBlockArray.Append (pObject);
+
+	// mark thread unsafe for gc-collection (until the user code saves pointer thus making it reachable)
+
+	GcEnter ();
+
+	m_Lock.Unlock ();
+	
+	return pObject;
 }
 
 void
 CRuntime::GcAddObject (TObject* pObject)
 {
-	WaitGcIdleAndLock ();
-	GcAddObject_l (pObject);
-	m_Lock.Unlock ();
-}
+	char* p = (char*) (pObject + 1);
 
-void
-CRuntime::GcAddObject_l (TObject* pObject)
-{
-	// printf ("GcAddObject %08x: %s\n", pObject, pObject->m_pType->GetTypeString ().cc ());
-
-	// recursively add all the class fields
-
-	char* pBase = (char*) (pObject + 1);
-
-	rtl::CArrayT <CStructField*> ClassFieldArray = pObject->m_pType->GetClassMemberFieldArray ();
+	rtl::CArrayT <CStructField*> ClassFieldArray = pObject->m_pClassType->GetClassMemberFieldArray ();
 	size_t Count = ClassFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = ClassFieldArray [i];
-		TObject* pChildObject = (TObject*) (pBase + pField->GetOffset ());
-		GcAddObject_l (pChildObject);
+		TObject* pChildObject = (TObject*) (p + pField->GetOffset ());
+		GcAddObject (pChildObject);
 	}
 
-	// and then add the object itself
-
-	m_GcObjectList.InsertTail (pObject);
-}
-
-void
-CRuntime::MarkGcObject (TObject* pObject)
-{
-	if (ShouldMarkGcPtr (pObject)) // prevent re-marking of weakly marked objects
-		MarkGcRange (pObject, pObject->m_pType->GetSize ());
-
-	pObject->m_Flags |= EObjectFlag_GcMark;
-
-	if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
-		AddGcRoot (pObject, pObject->m_pType);
+	m_GcObjectArray.Append (pObject);
 }
 
 void
@@ -360,43 +423,35 @@ CRuntime::AddGcRoot (
 	ASSERT (m_GcState == EGcState_Mark);
 	ASSERT (pType->GetFlags () & ETypeFlag_GcRoot);
 
-	TGcRoot Root;
-	Root.m_p = p;
-	Root.m_pType = pType;
+	TGcRoot Root = { p, pType };
 	m_GcRootArray [m_CurrentGcRootArrayIdx].Append (Root);
 }
 
 void
-CRuntime::RunGcEx (uint_t Flags)
+CRuntime::RunGc_l ()
 {
-	// printf ("Running GC...\n");
+	m_GcIdleEvent.Reset ();	
 
-	WaitGcIdleAndLock ();
-
-	// 1) suspend all threads at safe points
+	// 1) suspend all mutator threads at safe points
 
 	m_GcState = EGcState_WaitSafePoint;
-	m_GcIdleEvent.Reset ();
-	m_WaitGcSafePointCount = m_TlsList.GetCount ();
 
-	if (GetTlsMgr ()->FindTlsData (this)) // minus current
-		m_WaitGcSafePointCount--;
-
-	if (m_WaitGcSafePointCount)
+	ASSERT (m_GcUnsafeThreadCount); 
+	m_GcSafePointEvent.Reset ();	
+	intptr_t UnsafeCount = mt::AtomicDec (&m_GcUnsafeThreadCount);
+	if (UnsafeCount)
 	{
-		m_GcDestructEvent.Signal (); // the destruct thread
 		m_Lock.Unlock ();
-		m_WaitGcSafePointEvent.Wait ();
+		m_GcSafePointEvent.Wait ();
 		m_Lock.Lock ();
 	}
 
+	// 2) mark
+
 	m_GcState = EGcState_Mark;
 
-	m_GcMap.Clear ();
 	m_GcRootArray [0].Clear ();
 	m_CurrentGcRootArrayIdx = 0;
-
-	// 2) mark
 
 	// 2.1) add static roots
 
@@ -410,12 +465,14 @@ CRuntime::RunGcEx (uint_t Flags)
 			);
 	}
 
+	// 2.2) add destructible roots
+
 	// 2.2) add stack roots
 
-	rtl::CIteratorT <TTlsData> TlsData = m_TlsList.GetHead ();
-	for (; TlsData; TlsData++)
+	rtl::CIteratorT <TTlsHdr> Tls = m_TlsList.GetHead ();
+	for (; Tls; Tls++)
 	{
-		TTls* pTls = (TTls*) (*TlsData + 1);
+		TTls* pTls = (TTls*) (*Tls + 1);
 
 		TGcShadowStackFrame* pStackFrame = pTls->m_pGcShadowStackTop;
 		for (; pStackFrame; pStackFrame = pStackFrame->m_pNext)
@@ -429,16 +486,7 @@ CRuntime::RunGcEx (uint_t Flags)
 				void* p = ppRootArray [i];
 				CType* pType = ppTypeArray [i];
 
-				if (!p)
-					continue;
-
-				if (ShouldMarkGcPtr (p))
-					MarkGcRange (p, pType->GetSize ());
-
-				if (pType->GetTypeKind () == EType_Class)
-					((TObject*) p)->m_Flags |= EObjectFlag_GcMark;
-
-				if (pType->GetFlags () & ETypeFlag_GcRoot)
+				if (p) // check needed, stack roots could be nullified
 					AddGcRoot (p, pType);
 			}
 		}
@@ -448,71 +496,120 @@ CRuntime::RunGcEx (uint_t Flags)
 
 	GcMarkCycle ();
 
-	// 4) remove 'alive' flag from unmarked objects and schedule destruction
+	// 3) sweep
 
-	rtl::CAuxListT <TObject, CObjectGcHeapLink> DestructList;
+	m_GcState = EGcState_Sweep;
 
-	rtl::CIteratorT <TObject, CObjectGcHeapLink> Object = m_GcObjectList.GetTail ();
-	while (Object)
+	// 3.1) mark objects as dead and schedule destruction
+
+	char Buffer1 [256];
+	char Buffer2 [256];
+	rtl::CArrayT <TObject*> DestructArray (ref::EBuf_Stack, Buffer1, sizeof (Buffer1));
+	TGcDestructGuard DestructGuard (ref::EBuf_Stack, Buffer2, sizeof (Buffer2));
+
+	Count = m_GcObjectArray.GetCount ();
+	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
-		rtl::CIteratorT <TObject, CObjectGcHeapLink> Next = Object.GetInc (-1);
-
-		// weakly-marked closures are saved as well
-
-		if (Object->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcMark_wc))
+		jnc::TObject* pObject = m_GcObjectArray [i];
+		
+		if (!(pObject->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcWeakMark_c)))
 		{
-			Object->m_Flags &= ~(EObjectFlag_GcMark | EObjectFlag_GcMark_wc);
+			m_GcObjectArray.Remove (i);
+			pObject->m_Flags |= EObjectFlag_Dead;
+			
+			if (pObject->m_pClassType->GetDestructor ())
+			{
+				pObject->m_ScopeLevel = 1; // prevent resurrection
+				DestructArray.Append (pObject);
+
+				if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
+				{
+					TGcRoot GcRoot = { pObject, pObject->m_pType };
+					DestructGuard.m_GcRootArray.Append (GcRoot);
+				}
+			}
 		}
-		else
+	}
+	
+	if (!DestructGuard.m_GcRootArray.IsEmpty ())
+		m_GcDestructGuardList.InsertTail (&DestructGuard);
+
+	// 3.2) mark all destruct guard gc roots
+
+	rtl::CIteratorT <TGcDestructGuard> It = m_GcDestructGuardList.GetHead ();
+	for (; It; It++)
+	{
+		TGcDestructGuard* pDestructGuard = *It;
+
+		Count = pDestructGuard->m_GcRootArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
 		{
-			Object->m_Flags &= ~EObjectFlag_Alive;
-			Object->m_ScopeLevel = 1; // prevent resurrection
-			m_GcObjectList.Remove (Object);
-
-			if (Object->m_pType->GetDestructor ())
-				DestructList.InsertTail (*Object);
+			ASSERT (pDestructGuard->m_GcRootArray [i].m_pType->GetFlags () & ETypeFlag_GcRoot);
+			AddGcRoot (
+				pDestructGuard->m_GcRootArray [i].m_p,
+				pDestructGuard->m_GcRootArray [i].m_pType
+				);
 		}
-
-		Object = Next;
-	}
-
-	bool IsDestructListEmpty = DestructList.IsEmpty ();
-	if (!IsDestructListEmpty)
-	{
-		m_GcDestructList.InsertListTail (&DestructList);
-		m_GcDestructThreadIdleEvent.Reset ();
-	}
-
-	// 5) secondary mark (to prevent re-allocating the objects currently scheduled for destruction)
-
-	Object = m_GcDestructList.GetHead ();
-	for (; Object; Object++)
-	{
-		TObject* pObject = *Object;
-
-		ASSERT (ShouldMarkGcObject (pObject));
-		MarkGcObject (pObject);
-
-		if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
-			AddGcRoot (pObject, pObject->m_pType);
 	}
 
 	GcMarkCycle ();
 
-	// 6) resume all suspended threads and wake up destruct thread (if needed)
+	// 3.4) free memory blocks
 
+	Count = m_GcMemBlockArray.GetCount ();
+	for (intptr_t i = Count - 1; i >= 0; i--)
+	{
+		TObject* pObject = m_GcMemBlockArray [i];
+		if (!(pObject->m_Flags & EObjectFlag_GcWeakMark))
+		{
+			m_GcMemBlockArray.Remove (i);
+			AXL_MEM_FREE (pObject);
+		}
+		else
+		{
+			pObject->m_Flags &= ~EObjectFlag_GcMask; // unmark
+		}
+	}
+
+	// 3.5) unmark the remaining objects
+
+	Count = m_GcObjectArray.GetCount ();
+	for (intptr_t i = Count - 1; i >= 0; i--)
+	{
+		jnc::TObject* pObject = m_GcObjectArray [i];
+		pObject->m_Flags &= ~EObjectFlag_GcMask;
+	}
+
+	// 4) gc run is done, resume all suspended threads
+
+	mt::AtomicInc (&m_GcUnsafeThreadCount);
+	m_PeriodGcAllocSize = 0;
 	m_GcState = EGcState_Idle;
-	m_GcIdleEvent.Signal ();
-
-	if (!IsDestructListEmpty)
-		m_GcDestructEvent.Signal ();
-
+	m_GcIdleEvent.Signal ();	
 	m_Lock.Unlock ();
 
-	// 7) wait for destructors
+	// 5) run destructors 
 
-	if (Flags & EGcFlag_WaitForDestructors)
-		m_GcDestructThreadIdleEvent.Wait ();
+	if (!DestructArray.IsEmpty ())
+	{
+		Count = DestructArray.GetCount ();
+		for (size_t i = 0; i < Count; i++)
+		{
+			TObject* pObject = DestructArray [i];
+			CFunction* pDestructor = pObject->m_pClassType->GetDestructor ();
+			ASSERT (pDestructor);
+
+			FObject_Destruct* pf = (FObject_Destruct*) pDestructor->GetMachineCode ();
+			pf ((jnc::TInterface*) (pObject + 1));
+		}
+
+		if (!DestructGuard.m_GcRootArray.IsEmpty ())
+		{
+			m_Lock.Lock ();
+			m_GcDestructGuardList.Remove (&DestructGuard);
+			m_Lock.Unlock ();
+		}
+	}
 }
 
 void
@@ -530,79 +627,78 @@ CRuntime::GcMarkCycle ()
 		for (size_t i = 0; i < Count; i++)
 		{
 			const TGcRoot* pRoot = &m_GcRootArray [PrevGcRootArrayIdx] [i];
-			pRoot->m_pType->EnumGcRoots (this, pRoot->m_p);
+			pRoot->m_pType->GcMark (this, pRoot->m_p);
 		}
 	}
 }
 
 void
-CRuntime::GcDestructThreadProc ()
+CRuntime::GcEnter ()
 {
-	CScopeThreadRuntime ScopeRuntime (this);
-	GetTlsMgr ()->GetTlsData (this); // register thread with TLS mgr right away
-	m_GcDestructThreadIdleEvent.Signal ();
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls);
+	if (pTls->m_Flags & ETlsFlag_GcUnsafe) // already
+		return; 
 
-	while (!m_TerminateGcDestructThread)
+	// what we try to prevent here is entering an unsafe region when collector thread 
+	// thinks all the mutators are parked at safe regions and therefore moves on to mark/sweep
+
+	for (;;)
 	{
-		m_GcDestructEvent.Wait ();
+		if (m_GcState != EGcState_Idle)
+			m_GcIdleEvent.Wait ();
 
-		WaitGcIdleAndLock ();
-		if (!m_GcDestructList.IsEmpty ())
-		{
-			m_GcDestructThreadIdleEvent.Reset ();
+		intptr_t OldCount = m_GcUnsafeThreadCount;
+		if (OldCount == 0) // oh-oh -- we started gc run in between these two 'if's
+			continue;
 
-			while (!m_GcDestructList.IsEmpty ())
-			{
-				rtl::CIteratorT <TObject, CObjectGcHeapLink> Object = m_GcDestructList.GetHead ();
-				m_Lock.Unlock ();
-
-				CFunction* pDestructor = Object->m_pType->GetDestructor ();
-				ASSERT (pDestructor);
-
-				FObject_Destruct* pf = (FObject_Destruct*) pDestructor->GetMachineCode ();
-				pf ((jnc::TInterface*) (*Object + 1));
-
-				WaitGcIdleAndLock ();
-				m_GcDestructList.RemoveHead ();
-			}
-
-			m_GcDestructThreadIdleEvent.Signal ();
-		}
-
-		m_Lock.Unlock ();
+		intptr_t NewCount = OldCount + 1;
+		intptr_t PrevCount = mt::AtomicCmpXchg (&m_GcUnsafeThreadCount, OldCount, NewCount);
+		if (PrevCount == OldCount)
+			break;
 	}
+
+	pTls->m_Flags |= ETlsFlag_GcUnsafe;
 }
 
 void
-CRuntime::GcSafePoint ()
+CRuntime::GcLeave ()
 {
-	if (m_GcState == EGcState_Idle)
-		return;
+	ASSERT (m_GcState == EGcState_Idle || m_GcState == EGcState_WaitSafePoint);
 
-	m_Lock.Lock ();
-	switch (m_GcState)
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls && (pTls->m_Flags & ETlsFlag_GcUnsafe));
+
+	pTls->m_Flags &= ~ETlsFlag_GcUnsafe;
+	intptr_t Count = mt::AtomicDec (&m_GcUnsafeThreadCount);
+	
+	if (m_GcState == EGcState_WaitSafePoint)
 	{
-	case EGcState_Idle: // everything was finished between checking and locking
-		m_Lock.Unlock ();
-		break;
+		if (!Count)
+			m_GcSafePointEvent.Signal ();
 
-	case EGcState_WaitSafePoint:
-		if (--m_WaitGcSafePointCount == 0)
-			m_WaitGcSafePointEvent.Signal ();
-
-		m_Lock.Unlock ();
 		m_GcIdleEvent.Wait ();
-		break;
+	}
+}
 
-	default:
-		ASSERT (false); // execution of user code is only allowed during 'idle' or 'wait-gc-safe-point'
-		m_Lock.Unlock ();
+void
+CRuntime::GcPulse ()
+{
+	ASSERT (m_GcState == EGcState_Idle || m_GcState == EGcState_WaitSafePoint);
+
+	if (m_GcState == EGcState_WaitSafePoint)
+	{
+		GcLeave ();
+		GcEnter ();
 	}
 }
 
 void
 CRuntime::WaitGcIdleAndLock ()
 {
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls && !(pTls->m_Flags & ETlsFlag_GcUnsafe)); // unsafe == deadlock
+
 	for (;;)
 	{
 		m_Lock.Lock ();
@@ -610,70 +706,67 @@ CRuntime::WaitGcIdleAndLock ()
 		if (m_GcState == EGcState_Idle)
 			break;
 
-		if (m_GcState == EGcState_WaitSafePoint && --m_WaitGcSafePointCount == 0)
-			m_WaitGcSafePointEvent.Signal ();
-
 		m_Lock.Unlock ();
 		m_GcIdleEvent.Wait ();
 	}
 }
 
-void*
+TTlsHdr*
 CRuntime::GetTls ()
 {
-	TTlsData* pTlsData = GetTlsMgr ()->GetTlsData (this);
-	ASSERT (pTlsData);
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls);
 
 	// check for stack overflow
 
 	char* p = (char*) _alloca (1);
 
-	if (!pTlsData->m_pStackEpoch) // first time call
+	if (!pTls->m_pStackEpoch) // first time call
 	{
-		pTlsData->m_pStackEpoch = p;
+		pTls->m_pStackEpoch = p;
 	}
 	else
 	{
-		char* p0 = (char*) pTlsData->m_pStackEpoch;
+		char* p0 = (char*) pTls->m_pStackEpoch;
 		if (p0 >= p) // the opposite could happen, but it's stack-overflow-safe
 		{
 			size_t StackSize = p0 - p;
 			if (StackSize > m_StackLimit)
 			{
-				CStdLib::OnRuntimeError (ERuntimeError_StackOverflow, NULL, NULL);
+				CStdLib::RuntimeError (ERuntimeError_StackOverflow, NULL, NULL);
 				ASSERT (false);
 			}
 		}
 	}
 
-	return pTlsData + 1;
+	return pTls;
 }
 
-TTlsData*
-CRuntime::CreateTlsData ()
+TTlsHdr*
+CRuntime::CreateTls ()
 {
-	size_t Size = sizeof (TTlsData) + m_TlsSize;
+	size_t Size = sizeof (TTlsHdr) + m_TlsSize;
 
-	TTlsData* pTlsData = (TTlsData*) AXL_MEM_ALLOC (Size);
-	memset (pTlsData, 0, Size);
-	pTlsData->m_pRuntime = this;
-	pTlsData->m_pStackEpoch = NULL;
+	TTlsHdr* pTls = (TTlsHdr*) AXL_MEM_ALLOC (Size);
+	memset (pTls, 0, Size);
+	pTls->m_pRuntime = this;
+	pTls->m_pStackEpoch = NULL;
 
 	WaitGcIdleAndLock ();
-	m_TlsList.InsertTail (pTlsData);
+	m_TlsList.InsertTail (pTls);
 	m_Lock.Unlock ();
 
-	return pTlsData;
+	return pTls;
 }
 
 void
-CRuntime::DestroyTlsData (TTlsData* pTlsData)
+CRuntime::DestroyTls (TTlsHdr* pTls)
 {
 	WaitGcIdleAndLock ();
-	m_TlsList.Remove (pTlsData);
+	m_TlsList.Remove (pTls);
 	m_Lock.Unlock ();
 
-	AXL_MEM_FREE (pTlsData);
+	AXL_MEM_FREE (pTls);
 }
 
 TInterface*
@@ -689,7 +782,7 @@ CRuntime::CreateObject (
 		return NULL;
 	}
 
-	TObject* pObject = (TObject*) GcAllocate (pType->GetSize ());
+	TObject* pObject = (TObject*) GcAllocateObject (pType);
 	if (!pObject)
 		return NULL;
 

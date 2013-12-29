@@ -9,6 +9,8 @@
 namespace axl {
 namespace jnc {
 
+struct TObject;
+
 //.............................................................................
 	
 class CDataPtrType: public CType
@@ -90,7 +92,7 @@ public:
 
 	virtual 
 	void
-	EnumGcRoots (
+	GcMark (
 		CRuntime* pRuntime,
 		void* p
 		);
@@ -150,7 +152,7 @@ struct TDataPtr
 	void* m_p;
 	void* m_pRangeBegin;
 	void* m_pRangeEnd;
-	size_t m_ScopeLevel;
+	TObject* m_pObject;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

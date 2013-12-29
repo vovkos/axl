@@ -84,7 +84,7 @@ CMcSnapshotClassType::CompileCallMethod ()
 }
 
 void
-CMcSnapshotClassType::EnumGcRoots (
+CMcSnapshotClassType::GcMark (
 	CRuntime* pRuntime,
 	void* _p
 	)

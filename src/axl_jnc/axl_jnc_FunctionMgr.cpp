@@ -872,12 +872,12 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 	
 	switch (Func)
 	{
-	case EStdFunc_OnRuntimeError:
+	case EStdFunc_RuntimeError:
 		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int);
 		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 2);
-		pFunction = CreateFunction (EFunction_Internal, "jnc.onRuntimeError", pFunctionType);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.runtimeError", pFunctionType);
 		break;
 
 	case EStdFunc_CheckNullPtr:
@@ -915,39 +915,12 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateGetDataPtrSpan ();
 		break;
 
-	case EStdFunc_HeapAlloc:
+	case EStdFunc_GcAllocate:
 		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
-		pFunction = CreateFunction (EFunction_Internal, "jnc.heapAlloc", pFunctionType);
-		break;
-
-	case EStdFunc_HeapUAlloc:
-		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
-		pFunction = CreateFunction (EFunction_Internal, "jnc.uheapAlloc", pFunctionType);
-		break;
-
-	case EStdFunc_HeapUFree:
-		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
-		pFunction = CreateFunction (EFunction_Internal, "jnc.uheapFree", pFunctionType);
-		break;
-
-	case EStdFunc_HeapUFreeClassPtr:
-		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
-		pFunction = CreateFunction (EFunction_Internal, "jnc.uheapFreeClassPtr", pFunctionType);
-		break;
-
-	case EStdFunc_GcAddObject:
-		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectHdrPtr);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 1);
-		pFunction = CreateFunction (EFunction_Internal, "jnc.gcAddObject", pFunctionType);
+		ArgTypeArray [1] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, ArgTypeArray, 2);
+		pFunction = CreateFunction (EFunction_Internal, "jnc.gcAllocate", pFunctionType);
 		break;
 
 	case EStdFunc_MarkGcRoot:
@@ -987,12 +960,6 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
 		pFunction = CreateFunction ("runGc", "jnc.runGc", pFunctionType);
-		break;
-
-	case EStdFunc_RunGcWaitForDestructors:
-		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
-		pFunction = CreateFunction ("runGcWaitForDestructors", "jnc.runGcWaitForDestructors", pFunctionType);
 		break;
 
 	case EStdFunc_GetCurrentThreadId:

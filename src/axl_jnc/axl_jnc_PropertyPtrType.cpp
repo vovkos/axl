@@ -121,7 +121,7 @@ CPropertyPtrType::PrepareLlvmDiType ()
 }
 
 void
-CPropertyPtrType::EnumGcRoots (
+CPropertyPtrType::GcMark (
 	CRuntime* pRuntime,
 	void* p
 	)
@@ -129,26 +129,16 @@ CPropertyPtrType::EnumGcRoots (
 	ASSERT (m_PtrTypeKind == EPropertyPtrType_Normal || m_PtrTypeKind == EPropertyPtrType_Weak);
 
 	TPropertyPtr* pPtr = (TPropertyPtr*) p;
-	if (!pPtr->m_pClosure)
+	if (!pPtr->m_pClosure || pPtr->m_pClosure->m_pObject->m_ScopeLevel)
 		return;
 
 	TObject* pObject = pPtr->m_pClosure->m_pObject;
-
-	if (m_PtrTypeKind == EPropertyPtrType_Normal)
-	{
-		if (pRuntime->ShouldMarkGcObject (pObject))
-			pRuntime->MarkGcObject (pObject);
-	}
-	else if (pObject->m_pType->GetClassTypeKind () != EClassType_PropertyClosure) // simple weak closure
-	{
-		if (pRuntime->ShouldMarkGcPtr (pObject))
-			pRuntime->MarkGcRange (pObject, pObject->m_pType->GetSize ());
-	}
-	else // full weak closure
-	{
-		if (pRuntime->ShouldWeakMarkGcClosureObject (pObject))
-			((CPropertyClosureClassType*) pObject->m_pType)->WeakMarkGcClosureObject (pRuntime, pObject);
-	}
+	if (m_PtrTypeKind == EFunctionPtrType_Normal)
+		pObject->GcMarkObject (pRuntime);
+	else if (pObject->m_pClassType->GetClassTypeKind () == EClassType_FunctionClosure)
+		pObject->GcWeakMarkClosureObject (pRuntime);
+	else  // simple weak closure
+		pObject->GcWeakMarkObject ();
 }
 
 //.............................................................................

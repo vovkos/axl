@@ -91,7 +91,7 @@ CArrayType::CalcLayout ()
 }
 
 void
-CArrayType::EnumGcRoots (
+CArrayType::GcMark (
 	CRuntime* pRuntime,
 	void* _p
 	)
@@ -101,7 +101,7 @@ CArrayType::EnumGcRoots (
 	char* p = (char*) _p;
 	for (size_t i = 0; i < m_ElementCount; i++)
 	{
-		m_pElementType->EnumGcRoots (pRuntime, p);
+		m_pElementType->GcMark (pRuntime, p);
 		p += m_pElementType->GetSize ();
 	}
 }

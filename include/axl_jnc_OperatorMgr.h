@@ -653,9 +653,6 @@ public:
 	}
 
 	bool
-	DeleteOperator (const CValue& OpValue);
-
-	bool
 	EvaluateAlias (
 		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken> TokenList,
