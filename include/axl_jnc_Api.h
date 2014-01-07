@@ -97,9 +97,12 @@ Export (axl::jnc::CRuntime* pRuntime) \
 	pRuntime->MapFunction (pFunction->GetLlvmFunction (), pvoid_cast (Function));
 
 #define AXL_JNC_API_STD_FUNCTION(StdFunc, Function) \
-	pFunction = pModule->m_FunctionMgr.GetStdFunction (StdFunc); \
-	ASSERT (pFunction); \
-	pRuntime->MapFunction (pFunction->GetLlvmFunction (), pvoid_cast (Function));
+	if (pModule->m_FunctionMgr.IsStdFunctionUsed (StdFunc)) \
+	{ \
+		pFunction = pModule->m_FunctionMgr.GetStdFunction (StdFunc); \
+		ASSERT (pFunction); \
+		pRuntime->MapFunction (pFunction->GetLlvmFunction (), pvoid_cast (Function)); \
+	}
 
 #define AXL_JNC_API_PROPERTY(Name, Getter, Setter) \
 	pProperty = pNamespace->GetPropertyByName (Name); \
@@ -124,7 +127,7 @@ Export (axl::jnc::CRuntime* pRuntime) \
 
 void
 Prime (
-	TInterface* pThis,
+	TIfaceHdr* pThis,
 	CClassType* pType,
 	void* pVTable
 	);
@@ -132,7 +135,7 @@ Prime (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CApiClassT: public jnc::TInterface
+class CApiClassT: public jnc::TIfaceHdr
 {
 public:
 	CApiClassT ()

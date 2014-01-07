@@ -168,16 +168,16 @@ public:
 	}
 
 	bool
-	CalcScopeLevelValue (
+	CalcScopeLevel (
 		CScope* pScope,
 		CValue* pScopeLevelValue
 		);
 
 	CValue
-	CalcScopeLevelValue (CScope* pScope)
+	CalcScopeLevel (CScope* pScope)
 	{
 		CValue ScopeLevelValue;
-		CalcScopeLevelValue (pScope, &ScopeLevelValue);
+		CalcScopeLevel (pScope, &ScopeLevelValue);
 		return ScopeLevelValue;
 	}
 
@@ -486,7 +486,7 @@ public:
 	Allocate (
 		EStorage StorageKind,
 		CType* pType,
-		const CValue& SizeValue,
+		const CValue& ElementCountValue,
 		const char* pTag,
 		CValue* pResultValue
 		);
@@ -499,7 +499,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		return Allocate (StorageKind, pType, CValue (pType->GetSize (), GetSimpleType (m_pModule, EType_SizeT)), pTag, pResultValue);
+		return Allocate (StorageKind, pType, CValue (), pTag, pResultValue);
 	}
 
 	bool
@@ -507,7 +507,7 @@ public:
 		EStorage StorageKind,
 		const CValue& PtrValue,
 		CType* pType,
-		const CValue& SizeValue,
+		const CValue& ElementCountValue,
 		CValue* pResultValue
 		);
 
@@ -519,7 +519,7 @@ public:
 		CValue* pResultValue
 		)
 	{
-		return Prime (StorageKind, PtrValue, pType, CValue (pType->GetSize (), GetSimpleType (m_pModule, EType_SizeT)), pResultValue);
+		return Prime (StorageKind, PtrValue, pType, CValue (), pResultValue);
 	}
 
 	bool
@@ -1271,20 +1271,14 @@ public:
 		);
 
 	void
-	GetThinDataPtrRange (
+	GetLeanDataPtrRange (
 		const CValue& Value,
 		CValue* pRangeBeginValue,
 		CValue* pRangeEndValue
 		);
 
 	void
-	GetThinDataPtrScopeLevel (
-		const CValue& Value,
-		CValue* pResultValue
-		);
-
-	void
-	GetClassPtrScopeLevel (
+	GetLeanDataPtrObjHdr (
 		const CValue& Value,
 		CValue* pResultValue
 		);
@@ -1314,9 +1308,9 @@ public:
 	// checks
 
 	void
-	GetDataRefScopeLevel (
+	GetDataRefObjHdr (
 		const CValue& Value,
-		CValue* pScopeLevelValue
+		CValue* pResultValue
 		);
 
 	void

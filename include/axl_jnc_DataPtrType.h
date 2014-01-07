@@ -9,7 +9,7 @@
 namespace axl {
 namespace jnc {
 
-struct TObject;
+struct TObjHdr;
 
 //.............................................................................
 	
@@ -49,7 +49,7 @@ public:
 	CDataPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?  
+		return !(m_Flags & EPtrTypeFlag_Checked) ?  
 			m_pTargetType->GetDataPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) : 
 			this;			
 	}
@@ -67,14 +67,6 @@ public:
 	{
 		return (m_Flags & EPtrTypeFlag_Const) ?  
 			m_pTargetType->GetDataPtrType (m_TypeKind, m_PtrTypeKind, m_Flags & ~EPtrTypeFlag_Const) : 
-			this;			
-	}
-
-	CDataPtrType*
-	GetUnThinPtrType ()
-	{
-		return (m_PtrTypeKind == EDataPtrType_Thin) ?  
-			m_pTargetType->GetDataPtrType (m_TypeKind, EDataPtrType_Normal, m_Flags) : 
 			this;			
 	}
 
@@ -116,7 +108,7 @@ protected:
 struct TDataPtrTypeTuple: rtl::TListLink
 {
 	CStructType* m_pPtrStructType;
-	CDataPtrType* m_PtrTypeArray [2] [2] [2] [2] [3]; // ref x kind x const x volatile x unsafe / checked
+	CDataPtrType* m_PtrTypeArray [2] [3] [2] [2] [2]; // ref x kind x const x volatile x checked
 };
 
 //.............................................................................
@@ -130,18 +122,6 @@ IsCharPtrType (CType* pType)
 		((CDataPtrType*) pType)->GetTargetType ()->GetTypeKind () == EType_Char;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-bool 
-IsSafeThinDataPtrType (CType* pType)
-{
-	return 
-		pType->GetTypeKind () == EType_DataPtr &&
-		!(pType->GetFlags () & EPtrTypeFlag_Unsafe) &&
-		((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin;		
-}
-
 //.............................................................................
 
 // structure backing up fat data pointer, e.g.:
@@ -152,7 +132,7 @@ struct TDataPtr
 	void* m_p;
 	void* m_pRangeBegin;
 	void* m_pRangeEnd;
-	TObject* m_pObject;
+	TObjHdr* m_pObject;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

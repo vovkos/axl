@@ -212,7 +212,14 @@ CRuntime::MapFunction (
 bool
 CRuntime::Startup ()
 {
+	// ensure correct state
+
+	m_GcState = EGcState_Idle;
+	m_GcUnsafeThreadCount = 1;
 	m_GcIdleEvent.Signal ();
+
+	GetTlsMgr ()->NullifyTls (this);
+	m_TlsList.Clear ();
 	return true;
 }
 
@@ -292,66 +299,31 @@ CRuntime::RuntimeError (
 		);
 }
 
-TObject*
-CRuntime::GcAllocateObject (CClassType* pType)
+void*
+CRuntime::GcAllocate (
+	CType* pType,
+	size_t ElementCount
+	)
 {
-	TObject* pObject = GcTryAllocateObject (pType);
-	if (!pObject)
+	void* p = GcTryAllocate (pType, ElementCount);
+	if (!p)
 	{
 		RuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
 		ASSERT (false);
 	}
 
-	return pObject;
+	return p;
 }
 
-TDataPtr
-CRuntime::GcAllocateData (
-	CType* pType,
-	size_t Count
-	)
-{
-	TDataPtr Ptr = GcTryAllocateData (pType, Count);
-	if (!Ptr.m_p)
-	{
-		RuntimeError (ERuntimeError_OutOfMemory, NULL, NULL);
-		ASSERT (false);
-	}
-
-	return Ptr;
-}
-
-TDataPtr
-CRuntime::GcTryAllocateData (
-	CType* pType,
-	size_t Count
-	)
-{
-	TDataPtr Ptr = { 0 };
-	TObject* pObject = GcTryAllocate (pType, Count);
-	if (!pObject)
-		return Ptr;
-
-	char* p = Count > 1 ? 
-		(char*) ((TDynamicArray*) pObject + 1) : 
-		(char*) (pObject + 1);
-
-	Ptr.m_p = p;
-	Ptr.m_pRangeBegin = p;
-	Ptr.m_pRangeBegin = p + pType->GetSize () *  Count;
-	Ptr.m_pObject = pObject;
-	return Ptr;
-}
-
-TObject*
+void*
 CRuntime::GcTryAllocate (
 	CType* pType,
-	size_t Count
+	size_t ElementCount
 	)
 {
-	size_t Size = Count > 1 ? 
-		sizeof (TDynamicArray) + pType->GetSize () * Count :
-		sizeof (TObject) + pType->GetSize ();
+	size_t Size = sizeof (TObjHdr) + pType->GetSize ();	
+	if (ElementCount > 1)
+		Size += sizeof (size_t);
 			
 	WaitGcIdleAndLock ();	
 	if (m_PeriodGcAllocSize > m_PeriodGcAllocLimit)
@@ -360,31 +332,47 @@ CRuntime::GcTryAllocate (
 		WaitGcIdleAndLock ();	
 	}
 
-	TObject* pObject = (TObject*) AXL_MEM_ALLOC (Size);
-	if (!pObject)
+	void* pBlock = AXL_MEM_ALLOC (Size);
+	if (!pBlock)
 	{
 		m_Lock.Unlock ();
 		return NULL;
 	}
+	
+	TObjHdr* pObject;
+	void* p;
 
-	pObject->m_ScopeLevel = 0;
-	pObject->m_pRoot = pObject;
-	pObject->m_pType = pType;
-	pObject->m_Flags = 0;
-
-	if (Count > 1)
+	if (pType->GetTypeKind () == EType_Class)
 	{
-		TDynamicArray* pArray = (TDynamicArray*) pObject;
+		pObject = (TObjHdr*) pBlock;
+		GcAddObject (pObject, (CClassType*) pType);
 
-		pArray->m_Flags |= EObjectFlag_DynamicArray;
-		pArray->m_Count = Count;
+		// object will be primed by user code
+
+		p = pObject;
 	}
-	else if (pType->GetTypeKind () == EType_Class)
+	else
 	{
-		// TODO: Prime
-		GcAddObject (pObject);
-	}
+		if (ElementCount > 1)
+		{
+			size_t* pSize = (size_t*) pBlock;
+			*pSize = ElementCount;
+			pObject = (TObjHdr*) (pSize + 1);
+			pObject->m_Flags = EObjHdrFlag_DynamicArray;
+		}
+		else 
+		{
+			pObject = (TObjHdr*) pBlock;
+			pObject->m_Flags = 0;
+		}
 
+		pObject->m_ScopeLevel = 0;
+		pObject->m_pRoot = pObject;
+		pObject->m_pType = pType;
+
+		p = pObject + 1;
+	}
+	
 	m_PeriodGcAllocSize += Size;
 	m_GcMemBlockArray.Append (pObject);
 
@@ -394,21 +382,26 @@ CRuntime::GcTryAllocate (
 
 	m_Lock.Unlock ();
 	
-	return pObject;
+	return p;
 }
 
 void
-CRuntime::GcAddObject (TObject* pObject)
+CRuntime::GcAddObject (
+	TObjHdr* pObject,
+	CClassType* pType
+	)
 {
 	char* p = (char*) (pObject + 1);
 
-	rtl::CArrayT <CStructField*> ClassFieldArray = pObject->m_pClassType->GetClassMemberFieldArray ();
+	rtl::CArrayT <CStructField*> ClassFieldArray = pType->GetClassMemberFieldArray ();
 	size_t Count = ClassFieldArray.GetCount ();
 	for (size_t i = 0; i < Count; i++)
 	{
 		CStructField* pField = ClassFieldArray [i];
-		TObject* pChildObject = (TObject*) (p + pField->GetOffset ());
-		GcAddObject (pChildObject);
+		ASSERT (pField->GetType ()->GetTypeKind () == EType_Class);
+
+		TObjHdr* pChildObject = (TObjHdr*) (p + pField->GetOffset ());
+		GcAddObject (pChildObject, (CClassType*) pField->GetType ());
 	}
 
 	m_GcObjectArray.Append (pObject);
@@ -425,6 +418,21 @@ CRuntime::AddGcRoot (
 
 	TGcRoot Root = { p, pType };
 	m_GcRootArray [m_CurrentGcRootArrayIdx].Append (Root);
+}
+
+void
+CRuntime::MarkGcLocalHeapRoot (
+	void* p,
+	CType* pType
+	)
+{
+	if (pType->GetTypeKind () == EType_Class)
+		((TObjHdr*) p)->GcMarkObject (this);
+	else
+		((TObjHdr*) p - 1)->GcMarkData (this);
+
+	if (pType->GetFlags () & ETypeFlag_GcRoot)
+		AddGcRoot (p, pType);
 }
 
 void
@@ -487,7 +495,17 @@ CRuntime::RunGc_l ()
 				CType* pType = ppTypeArray [i];
 
 				if (p) // check needed, stack roots could be nullified
-					AddGcRoot (p, pType);
+				{
+					if (pType->GetTypeKind () == EType_DataPtr && 
+						((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin) // local-heap-root
+					{
+						MarkGcLocalHeapRoot (p, ((CDataPtrType*) pType)->GetTargetType ());
+					}
+					else
+					{
+						AddGcRoot (p, pType);
+					}
+				}
 			}
 		}
 	}
@@ -496,78 +514,75 @@ CRuntime::RunGc_l ()
 
 	GcMarkCycle ();
 
-	// 3) sweep
+	// 2.4) mark objects as dead and schedule destruction
 
-	m_GcState = EGcState_Sweep;
-
-	// 3.1) mark objects as dead and schedule destruction
-
-	char Buffer1 [256];
-	char Buffer2 [256];
-	rtl::CArrayT <TObject*> DestructArray (ref::EBuf_Stack, Buffer1, sizeof (Buffer1));
-	TGcDestructGuard DestructGuard (ref::EBuf_Stack, Buffer2, sizeof (Buffer2));
+	char Buffer [256];
+	rtl::CArrayT <TIfaceHdr*> DestructArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	TGcDestructGuard DestructGuard;
 
 	Count = m_GcObjectArray.GetCount ();
 	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
-		jnc::TObject* pObject = m_GcObjectArray [i];
+		jnc::TObjHdr* pObject = m_GcObjectArray [i];
 		
-		if (!(pObject->m_Flags & (EObjectFlag_GcMark | EObjectFlag_GcWeakMark_c)))
+		if (!(pObject->m_Flags & (EObjHdrFlag_GcMark | EObjHdrFlag_GcWeakMark_c)))
 		{
 			m_GcObjectArray.Remove (i);
-			pObject->m_Flags |= EObjectFlag_Dead;
+			pObject->m_Flags |= EObjHdrFlag_Dead;
 			
 			if (pObject->m_pClassType->GetDestructor ())
-			{
-				pObject->m_ScopeLevel = 1; // prevent resurrection
-				DestructArray.Append (pObject);
-
-				if (pObject->m_pType->GetFlags () & ETypeFlag_GcRoot)
-				{
-					TGcRoot GcRoot = { pObject, pObject->m_pType };
-					DestructGuard.m_GcRootArray.Append (GcRoot);
-				}
-			}
+				DestructArray.Append ((TIfaceHdr*) (pObject + 1));
 		}
 	}
 	
-	if (!DestructGuard.m_GcRootArray.IsEmpty ())
+	if (!DestructArray.IsEmpty ())
+	{
+		DestructGuard.m_pDestructArray = &DestructArray;
 		m_GcDestructGuardList.InsertTail (&DestructGuard);
+	}
 
-	// 3.2) mark all destruct guard gc roots
+	// 2.5) mark all destruct guard gc roots
 
 	rtl::CIteratorT <TGcDestructGuard> It = m_GcDestructGuardList.GetHead ();
 	for (; It; It++)
 	{
 		TGcDestructGuard* pDestructGuard = *It;
 
-		Count = pDestructGuard->m_GcRootArray.GetCount ();
+		Count = DestructArray.GetCount ();
 		for (size_t i = 0; i < Count; i++)
 		{
-			ASSERT (pDestructGuard->m_GcRootArray [i].m_pType->GetFlags () & ETypeFlag_GcRoot);
 			AddGcRoot (
-				pDestructGuard->m_GcRootArray [i].m_p,
-				pDestructGuard->m_GcRootArray [i].m_pType
+				&DestructArray [i],
+				DestructArray [i]->m_pObject->m_pClassType->GetClassPtrType ()
 				);
 		}
 	}
 
 	GcMarkCycle ();
 
+	// 3) sweep
+
+	m_GcState = EGcState_Sweep;
+
 	// 3.4) free memory blocks
 
 	Count = m_GcMemBlockArray.GetCount ();
 	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
-		TObject* pObject = m_GcMemBlockArray [i];
-		if (!(pObject->m_Flags & EObjectFlag_GcWeakMark))
+		TObjHdr* pObject = m_GcMemBlockArray [i];
+		if (!(pObject->m_Flags & EObjHdrFlag_GcWeakMark))
 		{
 			m_GcMemBlockArray.Remove (i);
-			AXL_MEM_FREE (pObject);
+
+			void* pBlock = (pObject->m_Flags & EObjHdrFlag_DynamicArray) ? 
+				(void*) ((size_t*) pObject - 1) : 
+				pObject;
+
+			AXL_MEM_FREE (pBlock);
 		}
 		else
 		{
-			pObject->m_Flags &= ~EObjectFlag_GcMask; // unmark
+			pObject->m_Flags &= ~EObjHdrFlag_GcMask; // unmark
 		}
 	}
 
@@ -576,8 +591,8 @@ CRuntime::RunGc_l ()
 	Count = m_GcObjectArray.GetCount ();
 	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
-		jnc::TObject* pObject = m_GcObjectArray [i];
-		pObject->m_Flags &= ~EObjectFlag_GcMask;
+		jnc::TObjHdr* pObject = m_GcObjectArray [i];
+		pObject->m_Flags &= ~EObjHdrFlag_GcMask;
 	}
 
 	// 4) gc run is done, resume all suspended threads
@@ -595,20 +610,17 @@ CRuntime::RunGc_l ()
 		Count = DestructArray.GetCount ();
 		for (size_t i = 0; i < Count; i++)
 		{
-			TObject* pObject = DestructArray [i];
-			CFunction* pDestructor = pObject->m_pClassType->GetDestructor ();
+			TIfaceHdr* pIface = DestructArray [i];
+			CFunction* pDestructor = pIface->m_pObject->m_pClassType->GetDestructor ();
 			ASSERT (pDestructor);
 
 			FObject_Destruct* pf = (FObject_Destruct*) pDestructor->GetMachineCode ();
-			pf ((jnc::TInterface*) (pObject + 1));
+			pf (pIface);
 		}
 
-		if (!DestructGuard.m_GcRootArray.IsEmpty ())
-		{
-			m_Lock.Lock ();
-			m_GcDestructGuardList.Remove (&DestructGuard);
-			m_Lock.Unlock ();
-		}
+		m_Lock.Lock ();
+		m_GcDestructGuardList.Remove (&DestructGuard);
+		m_Lock.Unlock ();
 	}
 }
 
@@ -752,7 +764,7 @@ CRuntime::CreateTls ()
 	pTls->m_pRuntime = this;
 	pTls->m_pStackEpoch = NULL;
 
-	WaitGcIdleAndLock ();
+	m_Lock.Lock ();
 	m_TlsList.InsertTail (pTls);
 	m_Lock.Unlock ();
 
@@ -762,14 +774,14 @@ CRuntime::CreateTls ()
 void
 CRuntime::DestroyTls (TTlsHdr* pTls)
 {
-	WaitGcIdleAndLock ();
+	m_Lock.Lock ();
 	m_TlsList.Remove (pTls);
 	m_Lock.Unlock ();
 
 	AXL_MEM_FREE (pTls);
 }
 
-TInterface*
+TIfaceHdr*
 CRuntime::CreateObject (
 	CClassType* pType,
 	uint_t Flags
@@ -782,7 +794,7 @@ CRuntime::CreateObject (
 		return NULL;
 	}
 
-	TObject* pObject = (TObject*) GcAllocateObject (pType);
+	TObjHdr* pObject = (TObjHdr*) GcAllocate (pType, 1);
 	if (!pObject)
 		return NULL;
 
@@ -791,7 +803,7 @@ CRuntime::CreateObject (
 	FObject_Prime* pfPrime = (FObject_Prime*) pPrimer->GetMachineCode ();
 	pfPrime (pObject);
 
-	TInterface* pInterface = (TInterface*) (pObject + 1);
+	TIfaceHdr* pInterface = (TIfaceHdr*) (pObject + 1);
 
 	if ((Flags & ECreateObjectFlag_Construct) && pType->GetConstructor ())
 	{
@@ -810,12 +822,12 @@ CRuntime::CreateObject (
 }
 
 void
-CRuntime::PinObject (TInterface* pObject)
+CRuntime::PinObject (TIfaceHdr* pObject)
 {
 }
 
 void
-CRuntime::UnpinObject (TInterface* pObject)
+CRuntime::UnpinObject (TIfaceHdr* pObject)
 {
 }
 

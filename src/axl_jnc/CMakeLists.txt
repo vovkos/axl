@@ -381,8 +381,8 @@ set (
 	VALUE_H_LIST
 	${AXL_INC_DIR}/axl_jnc_Closure.h
 	${AXL_INC_DIR}/axl_jnc_ConstMgr.h
-	${AXL_INC_DIR}/axl_jnc_Object.h
-	${AXL_INC_DIR}/axl_jnc_ThinDataPtrValidator.h
+	${AXL_INC_DIR}/axl_jnc_ObjHdr.h
+	${AXL_INC_DIR}/axl_jnc_LeanDataPtrValidator.h
 	${AXL_INC_DIR}/axl_jnc_Value.h
 	)
 
@@ -390,8 +390,8 @@ set (
 	VALUE_CPP_LIST
 	axl_jnc_Closure.cpp
 	axl_jnc_ConstMgr.cpp
-	axl_jnc_Object.cpp
-	axl_jnc_ThinDataPtrValidator.cpp
+	axl_jnc_ObjHdr.cpp
+	axl_jnc_LeanDataPtrValidator.cpp
 	axl_jnc_Value.cpp
 	)
 

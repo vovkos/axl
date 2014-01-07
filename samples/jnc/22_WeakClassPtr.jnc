@@ -40,7 +40,7 @@ int main ()
 	// p = null; // <-- uncomment to lose strong pointer, then object will get destructed next gc run
 
 	printf ("gc run...\n");
-	jnc.runGcWaitForDestructors ();
+	jnc.runGc ();
 
 	C1* p2 = wp;
 	if (p2)

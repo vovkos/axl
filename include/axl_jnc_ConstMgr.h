@@ -5,7 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Value.h"
-#include "axl_jnc_ThinDataPtrValidator.h"
+#include "axl_jnc_LeanDataPtrValidator.h"
 
 namespace axl {
 namespace jnc {
@@ -19,7 +19,7 @@ class CConstMgr
 protected:
 	CModule* m_pModule;
 
-	ref::CPtrT <CThinDataPtrValidator> m_UnsafeThinDataPtrValidator;
+	ref::CPtrT <CLeanDataPtrValidator> m_UnsafeLeanDataPtrValidator;
 	rtl::CBoxListT <CValue> m_ConstList;
 
 public:
@@ -47,8 +47,8 @@ public:
 		size_t Length = -1
 		);
 
-	CThinDataPtrValidator*
-	GetUnsafeThinDataPtrValidator ();
+	CLeanDataPtrValidator*
+	GetUnsafeLeanDataPtrValidator ();
 };
 
 //.............................................................................

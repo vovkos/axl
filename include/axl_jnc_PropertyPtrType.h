@@ -10,6 +10,8 @@
 namespace axl {
 namespace jnc {
 
+struct TIfaceHdr;
+
 //.............................................................................
 
 class CPropertyPtrType: public CType
@@ -54,7 +56,7 @@ public:
 	CPropertyPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+		return !(m_Flags & EPtrTypeFlag_Checked) ?
 			m_pTargetType->GetPropertyPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) :
 			this;
 	}
@@ -149,12 +151,10 @@ IsBindableType (CType* pType)
 // int property* pxTest;
 // int property weak* pxTest;
 
-struct TInterface;
-
 struct TPropertyPtr
 {
 	void** m_pVTable;
-	TInterface* m_pClosure;
+	TIfaceHdr* m_pClosure;
 };
 
 //.............................................................................

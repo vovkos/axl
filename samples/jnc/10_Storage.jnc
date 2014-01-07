@@ -65,9 +65,6 @@ int main ()
 
 	C2* p1 = new C2 (4000); // for 'new' operator, default storage is 'heap'
 
-	C2* p2 = uheap new C2 construct (5000); // equivalent to 'uheap new C2 (5000)' - both syntaxes are ok
-	delete p2; // objects allocated using 'uheap new' must be explicitly freed by 'delete' operator
-
 	C2* p3 = static new C2 (6000); // 'static' also can be used
 
 	{

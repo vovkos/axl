@@ -50,6 +50,8 @@ main := |*
 'abstract'        |
 'virtual'         |
 'override'        |
+'mutable'         |
+'nullable'        |
 
 'public'          |
 'protected'       |
@@ -58,14 +60,11 @@ main := |*
 'signed'          |
 'unsigned'        |
 'bigendian'       |
-'nullable'        |
 'const'           |
 'dconst'          |
-'mutable'         |
 'volatile'        |
 'weak'            |
 'thin'            |
-'unsafe'          |
 'pitcher'         |
 'cdecl'           |
 'stdcall'         |

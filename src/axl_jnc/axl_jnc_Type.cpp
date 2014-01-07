@@ -208,25 +208,23 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"unsigned",     // ETypeModifier_Unsigned    = 0x00000001,
 		"bigendian",    // ETypeModifier_BigEndian   = 0x00000002,
 		"const",        // ETypeModifier_Const       = 0x00000004,
-		"dconst",       // ETypeModifier_ConstD      = 0x00000008,
+		"dconst",       // ETypeModifier_DConst      = 0x00000008,
 		"volatile",     // ETypeModifier_Volatile    = 0x00000010,
 		"weak",         // ETypeModifier_Weak        = 0x00000020,
 		"thin",         // ETypeModifier_Thin        = 0x00000040,
-		"unsafe",       // ETypeModifier_Unsafe      = 0x00000080,
+		"pitcher",      // ETypeModifier_Pitcher     = 0x00000080,
 		"cdecl",        // ETypeModifier_Cdecl       = 0x00000100,
 		"stdcall",      // ETypeModifier_Stdcall     = 0x00000200,
-		"function",     // ETypeModifier_Function    = 0x00000400,
-		"property",     // ETypeModifier_Property    = 0x00000800,
-		"bindable",     // ETypeModifier_Bindable    = 0x00001000,
-		"autoget",      // ETypeModifier_AutoGet     = 0x00002000,
-		"indexed",      // ETypeModifier_Indexed     = 0x00004000,
-		"multicast",    // ETypeModifier_Multicast   = 0x00008000,
-		"event",        // ETypeModifier_Event       = 0x00010000,
-		"devent",       // ETypeModifier_EventD      = 0x00020000,
-		"reactor",      // ETypeModifier_Reactor     = 0x00040000,
-		"pitcher",      // ETypeModifier_Pitcher     = 0x00080000,
-		"array",        // ETypeModifier_Array       = 0x00100000,
-
+		"array",        // ETypeModifier_Array       = 0x00000400,
+		"function",     // ETypeModifier_Function    = 0x00000800,
+		"property",     // ETypeModifier_Property    = 0x00001000,
+		"bindable",     // ETypeModifier_Bindable    = 0x00002000,
+		"autoget",      // ETypeModifier_AutoGet     = 0x00004000,
+		"indexed",      // ETypeModifier_Indexed     = 0x00008000,
+		"multicast",    // ETypeModifier_Multicast   = 0x00010000,
+		"event",        // ETypeModifier_Event       = 0x00020000,
+		"devent",       // ETypeModifier_DEvent      = 0x00040000,
+		"reactor",      // ETypeModifier_Reactor     = 0x00080000,
 	};
 
 	size_t i = rtl::GetLoBitIdx32 (Modifier);
@@ -265,8 +263,8 @@ GetPtrTypeFlagString (EPtrTypeFlag Flag)
 {
 	static const char* StringTable [] =
 	{
-		"unsafe",   // EPtrTypeFlag_Unsafe    = 0x0010000
-		"checked",  // EPtrTypeFlag_Checked   = 0x0020000
+		"checked",  // EPtrTypeFlag_Checked   = 0x0010000
+		"markup",   // EPtrTypeFlag_Markup    = 0x0020000
 		"const",    // EPtrTypeFlag_Const     = 0x0040000
 		"dconst",   // EPtrTypeFlag_ConstD    = 0x0080000
 		"volatile", // EPtrTypeFlag_Volatile  = 0x0100000
@@ -288,10 +286,11 @@ GetPtrTypeFlagString (uint_t Flags)
 {
 	rtl::CString String;
 
-	if (Flags & EPtrTypeFlag_Unsafe)
-		String = "unsafe ";
-	else if (Flags & EPtrTypeFlag_Checked)
+	if (Flags & EPtrTypeFlag_Checked)
 		String = "checked ";
+
+	if (Flags & EPtrTypeFlag_Markup)
+		String = "markup ";
 
 	if (Flags & EPtrTypeFlag_Const)
 		String += "const ";
@@ -323,10 +322,11 @@ GetPtrTypeFlagSignature (uint_t Flags)
 {
 	rtl::CString Signature;
 
-	if (Flags & EPtrTypeFlag_Unsafe)
-		Signature = 'u';
-	else if (Flags & EPtrTypeFlag_Checked)
+	if (Flags & EPtrTypeFlag_Checked)
 		Signature = 's';
+
+	if (Flags & EPtrTypeFlag_Markup)
+		Signature = 'm';
 
 	if (Flags & EPtrTypeFlag_Const)
 		Signature += 'c';
@@ -349,20 +349,17 @@ GetPtrTypeFlagsFromModifiers (uint_t Modifiers)
 {
 	uint_t Flags = 0;
 
-	if (Modifiers & ETypeModifier_Unsafe)
-		Flags |= EPtrTypeFlag_Unsafe;
-
-	if (Modifiers & ETypeModifier_Const)
-		Flags |= EPtrTypeFlag_Const;
-	else if (Modifiers & ETypeModifier_ConstD)
-		Flags |= EPtrTypeFlag_ConstD;
-
 	if (Modifiers & ETypeModifier_Volatile)
 		Flags |= EPtrTypeFlag_Volatile;
 
+	if (Modifiers & ETypeModifier_Const)
+		Flags |= EPtrTypeFlag_Const;
+	else if (Modifiers & ETypeModifier_DConst)
+		Flags |= EPtrTypeFlag_ConstD;
+
 	if (Modifiers & ETypeModifier_Event)
 		Flags |= EPtrTypeFlag_Event;
-	else if (Modifiers & ETypeModifier_EventD)
+	else if (Modifiers & ETypeModifier_DEvent)
 		Flags |= EPtrTypeFlag_EventD;
 
 	return Flags;
@@ -697,6 +694,14 @@ CType::PrepareLlvmDiType ()
 		pDiType->m_Size,
 		pDiType->m_Code
 		);
+}
+
+//.............................................................................
+	
+CModuleItem*
+CLazyStdType::GetActualItem ()
+{
+	return m_pModule->m_TypeMgr.GetStdType (m_StdType);
 }
 
 //.............................................................................

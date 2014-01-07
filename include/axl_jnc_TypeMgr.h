@@ -66,6 +66,7 @@ protected:
 
 	CType m_PrimitiveTypeArray [EType__PrimitiveTypeCount];
 	CType* m_StdTypeArray [EStdType__Count];
+	CLazyStdType* m_LazyStdTypeArray [EStdType__Count];
 
 	CJnccallCallConv_msc32 m_JnccallCallConv_msc32;
 	CJnccallCallConv_msc64 m_JnccallCallConv_msc64;
@@ -102,6 +103,7 @@ protected:
 	rtl::CStdListT <CMcSnapshotClassType> m_McSnapshotClassTypeList;
 
 	rtl::CStdListT <CTypedef> m_TypedefList;
+	rtl::CStdListT <CLazyStdType> m_LazyStdTypeList;
 	rtl::CStdListT <CFunctionArg> m_FunctionArgList;
 
 	rtl::CStdListT <TSimplePropertyTypeTuple> m_SimplePropertyTypeTupleList;
@@ -274,8 +276,18 @@ public:
 		return &m_PrimitiveTypeArray [TypeKind];
 	}
 
+	bool
+	IsStdTypeUsed (EStdType StdType)
+	{
+		ASSERT (StdType < EStdType__Count);
+		return m_StdTypeArray [StdType] != NULL;
+	}
+
 	CType*
 	GetStdType (EStdType StdType);
+
+	CLazyStdType*
+	GetLazyStdType (EStdType StdType);
 
 	CType*
 	GetInt32Type (int32_t Integer)
@@ -952,7 +964,7 @@ protected:
 		);
 
 	CStructType*
-	CreateObjectHdrType ();
+	CreateObjHdrType ();
 
 	CClassType*
 	CreateObjectType ();

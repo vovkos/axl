@@ -104,7 +104,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_DataPtr_Thin2Normal: public CCast_DataPtr_Base
+class CCast_DataPtr_Lean2Normal: public CCast_DataPtr_Base
 {
 public:
 	virtual
@@ -150,7 +150,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CCast_DataPtr_Thin2Thin: public CCast_DataPtr_Base
+class CCast_DataPtr_Lean2Thin: public CCast_DataPtr_Base
 {
 public:
 	virtual
@@ -159,7 +159,11 @@ public:
 		const CValue& OpValue,
 		CType* pType,
 		void* pDst
-		);
+		)
+	{
+		ASSERT (false); // there are no lean pointer constants
+		return true;
+	}
 
 	virtual
 	bool
@@ -168,6 +172,20 @@ public:
 		const CValue& OpValue,
 		CType* pType,
 		CValue* pResultValue
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CCast_DataPtr_Thin2Thin: public CCast_DataPtr_Lean2Thin
+{
+public:
+	virtual
+	bool
+	ConstCast (
+		const CValue& OpValue,
+		CType* pType,
+		void* pDst
 		);
 };
 
@@ -180,8 +198,9 @@ class CCast_DataPtr: public CCast_Master
 protected:
 	CCast_DataPtr_FromArray m_FromArray;
 	CCast_DataPtr_Normal2Normal m_Normal2Normal;
-	CCast_DataPtr_Thin2Normal m_Thin2Normal;
+	CCast_DataPtr_Lean2Normal m_Lean2Normal;
 	CCast_DataPtr_Normal2Thin m_Normal2Thin;
+	CCast_DataPtr_Lean2Thin m_Lean2Thin;
 	CCast_DataPtr_Thin2Thin m_Thin2Thin;
 
 	CCastOperator* m_OperatorTable [EDataPtrType__Count] [EDataPtrType__Count];

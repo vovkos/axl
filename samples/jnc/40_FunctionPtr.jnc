@@ -68,12 +68,12 @@ int main ()
 	pf3 (100, 200, 300);
 
 	// it is also allowed to capture arbitrary arguments in the closure
-	// using closure operator '~()'
+	// using partial application operator '~()'
 
-	function* pf4 (int) = bar ~(5);
+	function* pf4 (int) = bar ~(,5);
 	pf4 (6);
 
-	// it is also ok to skip arguments when capturing, thus allowing any combinations
+	// it is also ok to skip arguments during parital application, thus allowing any combinations
 	// like: args 1, 3, 4 come from closure, args 2 and 5 come from call
 	
 	function* pf5 (

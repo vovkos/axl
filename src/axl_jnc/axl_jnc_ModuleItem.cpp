@@ -28,6 +28,7 @@ GetModuleItemKindString (EModuleItem ItemKind)
 		"struct-member",               // EModuleItem_StructField,
 		"base-type-slot",              // EModuleItem_BaseTypeSlot,
 		"orphan",                      // EModuleItem_Orphan,
+		"lazy",                        // EModuleItem_Lazy,
 	};
 
 	return (size_t) ItemKind < EModuleItem__Count ?

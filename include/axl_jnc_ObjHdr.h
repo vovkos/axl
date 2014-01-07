@@ -13,27 +13,27 @@ class CRuntime;
 
 //.............................................................................
 
-enum EObjectFlag
+enum EObjHdrFlag
 {
-	EObjectFlag_Dead         = 0x0001,
-	EObjectFlag_DynamicArray = 0x0002,	
-	EObjectFlag_Static       = 0x0010,
-	EObjectFlag_Stack        = 0x0020,
-	EObjectFlag_UHeap        = 0x0040,
-	EObjectFlag_Extern       = 0x0080,	
-	EObjectFlag_GcMark       = 0x0100,
-	EObjectFlag_GcWeakMark   = 0x0200,
-	EObjectFlag_GcWeakMark_c = 0x0400,
-	EObjectFlag_GcRootsAdded = 0x0800,
-	EObjectFlag_GcMask       = 0x0f00,
+	EObjHdrFlag_Dead         = 0x0001,
+	EObjHdrFlag_DynamicArray = 0x0002,	
+	EObjHdrFlag_Static       = 0x0010,
+	EObjHdrFlag_Stack        = 0x0020,
+	EObjHdrFlag_UHeap        = 0x0040,
+	EObjHdrFlag_Extern       = 0x0080,	
+	EObjHdrFlag_GcMark       = 0x0100,
+	EObjHdrFlag_GcWeakMark   = 0x0200,
+	EObjHdrFlag_GcWeakMark_c = 0x0400,
+	EObjHdrFlag_GcRootsAdded = 0x0800,
+	EObjHdrFlag_GcMask       = 0x0f00,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TObject
+struct TObjHdr
 {
 	size_t m_ScopeLevel; // if scope level != 0 and the object is not of class-type, then the rest can be omitted
-	TObject* m_pRoot;
+	TObjHdr* m_pRoot;
 
 	union
 	{
@@ -52,7 +52,7 @@ struct TObject
 	void 
 	GcWeakMarkObject ()
 	{
-		m_Flags |= EObjectFlag_GcWeakMark;
+		m_Flags |= EObjHdrFlag_GcWeakMark;
 	}
 
 	void 
@@ -61,19 +61,22 @@ struct TObject
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TDynamicArray: TObject
-{
-	size_t m_Count;
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 inline
-TObject*
-GetStaticObject ()
+TObjHdr*
+GetStaticObjHdr ()
 {
-	static TObject Object = { 0, &Object, NULL, EObjectFlag_GcMark | EObjectFlag_GcWeakMark };
-	return &Object;
+	static TObjHdr ObjHdr = 
+	{ 
+		0, 
+		&ObjHdr, 
+		NULL, 
+		EObjHdrFlag_Static | 
+		EObjHdrFlag_GcMark | 
+		EObjHdrFlag_GcWeakMark | 
+		EObjHdrFlag_GcRootsAdded
+	};
+
+	return &ObjHdr;
 }
 
 //.............................................................................

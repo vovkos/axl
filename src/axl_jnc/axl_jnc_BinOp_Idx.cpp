@@ -156,17 +156,23 @@ CBinOp_Idx::ArrayIndexOperator (
 	
 	CValue PtrValue;
 
-	if (pOpType1->GetPtrTypeKind () == EDataPtrType_Thin)
+	EDataPtrType PtrTypeKind = pOpType1->GetPtrTypeKind ();
+	if (PtrTypeKind == EDataPtrType_Thin)
 	{
 		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
 		m_pModule->m_LlvmIrBuilder.CreateGep2 (OpValue1, OpValue2, pPtrType, pResultValue);
+	}
+	else if (PtrTypeKind == EDataPtrType_Lean)
+	{
+		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Lean, PtrTypeFlags);
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (OpValue1, OpValue2, pPtrType, pResultValue);
 
 		if (OpValue1.GetValueKind () == EValue_Variable)
-			pResultValue->SetThinDataPtrValidator (OpValue1);
+			pResultValue->SetLeanDataPtrValidator (OpValue1);
 		else
-			pResultValue->SetThinDataPtrValidator (OpValue1.GetThinDataPtrValidator ());
+			pResultValue->SetLeanDataPtrValidator (OpValue1.GetLeanDataPtrValidator ());
 	}
-	else 
+	else // EDataPtrType_Normal
 	{
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);
 
@@ -174,9 +180,9 @@ CBinOp_Idx::ArrayIndexOperator (
 
 		m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, OpValue2, NULL, &PtrValue);
 
-		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin, PtrTypeFlags);
+		pPtrType = pElementType->GetDataPtrType (EType_DataRef, EDataPtrType_Lean, PtrTypeFlags);
 
-		pResultValue->SetThinDataPtr (
+		pResultValue->SetLeanDataPtr (
 			PtrValue.GetLlvmValue (), 
 			pPtrType,
 			OpValue1

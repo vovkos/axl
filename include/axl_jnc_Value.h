@@ -5,7 +5,7 @@
 #pragma once
 
 #include "axl_jnc_Type.h"
-#include "axl_jnc_Object.h"
+#include "axl_jnc_ObjHdr.h"
 
 namespace axl {
 namespace jnc {
@@ -19,7 +19,7 @@ class CProperty;
 class CStructField;
 class CClassType;
 class CClosure;
-class CThinDataPtrValidator;
+class CLeanDataPtrValidator;
 
 //.............................................................................
 
@@ -85,7 +85,7 @@ protected:
 	mutable llvm::Value* m_pLlvmValue;
 
 	ref::CPtrT <CClosure> m_Closure;
-	ref::CPtrT <CThinDataPtrValidator> m_ThinDataPtrValidator;
+	ref::CPtrT <CLeanDataPtrValidator> m_LeanDataPtrValidator;
 
 public:
 	CValue ()
@@ -431,59 +431,59 @@ public:
 		EValue ValueKind = EValue_LlvmRegister
 		);
 
-	CThinDataPtrValidator*
-	GetThinDataPtrValidator () const
+	CLeanDataPtrValidator*
+	GetLeanDataPtrValidator () const
 	{
-		return m_ThinDataPtrValidator;
+		return m_LeanDataPtrValidator;
 	}
 
 	void
-	SetThinDataPtrValidator (CThinDataPtrValidator* pValidator);
+	SetLeanDataPtrValidator (CLeanDataPtrValidator* pValidator);
 
 	void
-	SetThinDataPtrValidator (const CValue& ValidatorValue);
+	SetLeanDataPtrValidator (const CValue& ValidatorValue);
 
 	void
-	SetThinDataPtrValidator (
+	SetLeanDataPtrValidator (
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
 		const CValue& SizeValue
 		);
 
 	void
-	SetThinDataPtrValidator (
+	SetLeanDataPtrValidator (
 		const CValue& ScopeValidatorValue,
 		const CValue& RangeBeginValue,
 		size_t Size
 		)
 	{
-		SetThinDataPtrValidator (ScopeValidatorValue, RangeBeginValue, CValue (Size, EType_SizeT));
+		SetLeanDataPtrValidator (ScopeValidatorValue, RangeBeginValue, CValue (Size, EType_SizeT));
 	}
 
 	void
-	SetThinDataPtr (
+	SetLeanDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
-		CThinDataPtrValidator* pValidator
+		CLeanDataPtrValidator* pValidator
 		)
 	{
 		SetLlvmValue (pLlvmValue, (CType*) pType);
-		SetThinDataPtrValidator (pValidator);
+		SetLeanDataPtrValidator (pValidator);
 	}
 
 	void
-	SetThinDataPtr (
+	SetLeanDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
 		const CValue& ValidatorValue
 		)
 	{
 		SetLlvmValue (pLlvmValue, (CType*) pType);
-		SetThinDataPtrValidator (ValidatorValue);
+		SetLeanDataPtrValidator (ValidatorValue);
 	}
 
 	void
-	SetThinDataPtr (
+	SetLeanDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
 		const CValue& ScopeValidatorValue,
@@ -492,11 +492,11 @@ public:
 		)
 	{
 		SetLlvmValue (pLlvmValue, (CType*) pType);
-		SetThinDataPtrValidator (ScopeValidatorValue, RangeBeginValue, SizeValue);
+		SetLeanDataPtrValidator (ScopeValidatorValue, RangeBeginValue, SizeValue);
 	}
 
 	void
-	SetThinDataPtr (
+	SetLeanDataPtr (
 		llvm::Value* pLlvmValue,
 		CDataPtrType* pType,
 		const CValue& ScopeValidatorValue,
@@ -504,7 +504,7 @@ public:
 		size_t Size
 		)
 	{
-		SetThinDataPtr (pLlvmValue, pType, ScopeValidatorValue, RangeBeginValue, CValue (Size, EType_SizeT));
+		SetLeanDataPtr (pLlvmValue, pType, ScopeValidatorValue, RangeBeginValue, CValue (Size, EType_SizeT));
 	}
 
 	bool

@@ -99,7 +99,9 @@ storage_specifier
 			}
 	|	EToken_UHeap
 			{
-				$.m_StorageKind = EStorage_UHeap;
+				// $.m_StorageKind = EStorage_UHeap;
+				err::SetFormatStringError ("manual memory management is not supported yet");
+				return false;
 			}
 	|	EToken_Abstract
 			{
@@ -298,7 +300,7 @@ type_modifier
 			}
 	|	EToken_DConst
 			{
-				$.m_TypeModifier = ETypeModifier_ConstD;
+				$.m_TypeModifier = ETypeModifier_DConst;
 			}
 	|	EToken_Volatile
 			{
@@ -311,10 +313,6 @@ type_modifier
 	|	EToken_Thin
 			{
 				$.m_TypeModifier = ETypeModifier_Thin;
-			}
-	|	EToken_Unsafe
-			{
-				$.m_TypeModifier = ETypeModifier_Unsafe;
 			}
 	|	EToken_Pitcher
 			{
@@ -362,7 +360,7 @@ type_modifier
 			}
 	|	EToken_DEvent
 			{
-				$.m_TypeModifier = ETypeModifier_EventD;
+				$.m_TypeModifier = ETypeModifier_DEvent;
 			}
 	|	EToken_Reactor
 			{

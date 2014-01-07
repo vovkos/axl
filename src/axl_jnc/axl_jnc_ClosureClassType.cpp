@@ -79,8 +79,8 @@ CClosureClassType::BuildArgValueList (
 		pArgValueList->InsertTail (pThunkArgValueArray [iThunk]);
 }
 
-jnc::TInterface* 
-CClosureClassType::Strengthen (jnc::TInterface* p)
+jnc::TIfaceHdr* 
+CClosureClassType::Strengthen (jnc::TIfaceHdr* p)
 {
 	if (!m_WeakMask)
 		return p;
@@ -97,7 +97,7 @@ CClosureClassType::Strengthen (jnc::TInterface* p)
 
 		// only strengthen if source arg is weak, but target arg is strong
 
-		jnc::TInterface* pWeakPtr = NULL;
+		jnc::TIfaceHdr* pWeakPtr = NULL;
 
 		void* p2 = (char*) p + pField->GetOffset ();
 
@@ -108,7 +108,7 @@ CClosureClassType::Strengthen (jnc::TInterface* p)
 		{
 		case EType_ClassPtr:
 			if (((CClassPtrType*) pType)->GetPtrTypeKind () == EClassPtrType_Normal) 
-				pWeakPtr = *(jnc::TInterface**) p2;
+				pWeakPtr = *(jnc::TIfaceHdr**) p2;
 
 			break;
 

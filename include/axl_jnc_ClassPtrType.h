@@ -50,7 +50,7 @@ public:
 	CClassPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+		return !(m_Flags & EPtrTypeFlag_Checked) ?
 			m_pTargetType->GetClassPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) :
 			this;
 	}
@@ -129,7 +129,7 @@ protected:
 
 struct TClassPtrTypeTuple: rtl::TListLink
 {
-	CClassPtrType* m_PtrTypeArray [2] [2] [2] [2] [3]; // ref x kind x const x volatile x unsafe / checked
+	CClassPtrType* m_PtrTypeArray [2] [2] [2] [2] [2]; // ref x kind x const x volatile x checked
 };
 
 //.............................................................................

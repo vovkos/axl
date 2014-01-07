@@ -9,6 +9,8 @@
 namespace axl {
 namespace jnc {
 
+struct TIfaceHdr;
+
 //.............................................................................
 
 class CFunctionPtrType: public CType
@@ -45,7 +47,7 @@ public:
 	CFunctionPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+		return !(m_Flags & EPtrTypeFlag_Checked) ?
 			m_pTargetType->GetFunctionPtrType (m_TypeKind, m_PtrTypeKind, m_Flags | EPtrTypeFlag_Checked) :
 			this;
 	}
@@ -133,7 +135,7 @@ protected:
 struct TFunctionPtrTypeTuple: rtl::TListLink
 {
 	CStructType* m_pPtrStructType;
-	CFunctionPtrType* m_PtrTypeArray [2] [3] [3]; // ref x kind x unsafe/checked
+	CFunctionPtrType* m_PtrTypeArray [2] [3] [2]; // ref x kind x checked
 };
 
 //.............................................................................
@@ -142,12 +144,10 @@ struct TFunctionPtrTypeTuple: rtl::TListLink
 // int function* pfTest (int, int);
 // int function weak* pfTest (int, int);
 
-struct TInterface;
-
 struct TFunctionPtr
 {
 	void* m_pf;
-	TInterface* m_pClosure;
+	TIfaceHdr* m_pClosure;
 };
 
 //.............................................................................

@@ -64,20 +64,7 @@ protected:
 
 	struct TGcDestructGuard: rtl::TListLink
 	{
-		rtl::CArrayT <TGcRoot> m_GcRootArray;
-
-		TGcDestructGuard ()
-		{
-		}
-
-		TGcDestructGuard (
-			ref::EBuf BufKind,
-			void* p,
-			size_t Size
-			):
-			m_GcRootArray (BufKind, p, Size)
-		{
-		}
+		rtl::CArrayT <TIfaceHdr*>* m_pDestructArray;
 	};
 
 protected:
@@ -101,10 +88,10 @@ protected:
 	mt::CNotificationEvent m_GcIdleEvent;
 	mt::CNotificationEvent m_GcSafePointEvent;
 	volatile intptr_t m_GcUnsafeThreadCount;
-	rtl::CArrayT <TObject*> m_GcMemBlockArray;
-	rtl::CArrayT <TObject*> m_GcObjectArray;
+	rtl::CArrayT <TObjHdr*> m_GcObjectArray;
+	rtl::CArrayT <TObjHdr*> m_GcMemBlockArray;
 
-	rtl::CHashTableT <TInterface*, rtl::CHashIdT <TInterface*> > m_GcPinTable;
+	rtl::CHashTableT <TIfaceHdr*, rtl::CHashIdT <TIfaceHdr*> > m_GcPinTable;
 	rtl::CAuxListT <TGcDestructGuard> m_GcDestructGuardList;
 	rtl::CArrayT <TGcRoot> m_StaticGcRootArray;
 	rtl::CArrayT <TGcRoot> m_GcRootArray [2];
@@ -199,25 +186,16 @@ public:
 	void
 	GcPulse ();
 
-	TObject*
-	GcAllocateObject (CClassType* pType);
-
-	TDataPtr
-	GcAllocateData (
+	void*
+	GcAllocate (
 		CType* pType,
-		size_t Count
+		size_t ElementCount = 1
 		);
 
-	TObject*
-	GcTryAllocateObject (CClassType* pType)
-	{
-		return GcTryAllocate (pType, 1);
-	}
-
-	TDataPtr
-	GcTryAllocateData (
+	void*
+	GcTryAllocate (
 		CType* pType,
-		size_t Count
+		size_t ElementCount = 1
 		);
 
 	void
@@ -228,17 +206,17 @@ public:
 
 	// creating objects on gc heap
 
-	TInterface*
+	TIfaceHdr*
 	CreateObject (
 		CClassType* pType,
 		uint_t Flags = ECreateObjectFlag_Construct | ECreateObjectFlag_Pin
 		);
 
 	void
-	PinObject (TInterface* pObject);
+	PinObject (TIfaceHdr* pObject);
 
 	void
-	UnpinObject (TInterface* pObject);
+	UnpinObject (TIfaceHdr* pObject);
 
 	// tls
 
@@ -261,20 +239,23 @@ protected:
 	void
 	WaitGcIdleAndLock ();
 
-	TObject*
-	GcTryAllocate (
-		CType* pType,
-		size_t Count
+	void
+	GcAddObject (
+		TObjHdr* pObject,
+		CClassType* pType
 		);
+
+	void
+	RunGc_l ();
 
 	void
 	GcMarkCycle ();
 
 	void
-	GcAddObject (TObject* pObject);
-
-	void
-	RunGc_l ();
+	MarkGcLocalHeapRoot (
+		void* p,
+		CType* pType
+		);
 };
 
 //.............................................................................

@@ -10,218 +10,11 @@
 #include "axl_jnc_ThunkFunction.h"
 #include "axl_jnc_ThunkProperty.h"
 #include "axl_jnc_PropertyTemplate.h"
+#include "axl_jnc_NamespaceMgr.h"
 #include "axl_jnc_ClassType.h"
 
 namespace axl {
 namespace jnc {
-
-//.............................................................................
-
-enum EStdFunc
-{
-	// void
-	// jnc.RuntimeError (
-	//		int Error,
-	//		int8* pCodeAddr
-	//		);
-
-	EStdFunc_RuntimeError,
-
-	// void
-	// jnc.CheckNullPtr (
-	//		int8* p,
-	//		int Error
-	//		);
-
-	EStdFunc_CheckNullPtr,
-
-	// void
-	// jnc.CheckScopeLevel (
-	//		size_t SrcScopeLevel
-	//		size_t DstScopeLevel
-	//		);
-
-	EStdFunc_CheckScopeLevel,
-
-	// void
-	// jnc.CheckDataPtrRange (
-	//		int8* p,
-	//		size_t Size,
-	//		int8* pRangeBegin,
-	//		int8* pRangeEnd
-	//		);
-
-	EStdFunc_CheckDataPtrRange,
-
-	// void
-	// jnc.CheckClassPtrScopeLevel (
-	//		object* p,
-	//		size_t DstScopeLevel
-	//		);
-
-	EStdFunc_CheckClassPtrScopeLevel,
-
-	// object*
-	// jnc.DynamicCastClassPtr (
-	//		object* p,
-	//		int8* pType
-	//		);
-
-	EStdFunc_DynamicCastClassPtr,
-
-	// object*
-	// jnc.StrengthenClassPtr (weak object* p);
-
-	EStdFunc_StrengthenClassPtr,
-
-	// size_t
-	// jnc.GetDataPtrSpan (jnc.DataPtr Ptr);
-
-	EStdFunc_GetDataPtrSpan,
-
-	// int8*
-	// jnc.GcAllocate (
-	//		int8* pType,
-	//		size_t Count
-	//		);
-
-	EStdFunc_GcAllocate,
-
-	// void
-	// jnc.GcEnter ();
-
-	EStdFunc_GcEnter,
-
-	// void
-	// jnc.GcLeave ();
-
-	EStdFunc_GcLeave,
-
-	// void
-	// jnc.GcPulse ();
-
-	EStdFunc_GcPulse,
-
-	// void
-	// jnc.MarkGcRoot (
-	//		int8* p,
-	//		int8* pType
-	//		);
-
-	EStdFunc_MarkGcRoot,
-
-	// void
-	// jnc.RunGc ();
-
-	EStdFunc_RunGc,
-
-	// i64
-	// jnc.GetCurrentThreadId ();
-
-	EStdFunc_GetCurrentThreadId,
-
-	// i64
-	// jnc.CreateThread (function* pf ());
-
-	EStdFunc_CreateThread,
-
-	// void
-	// jnc.Sleep (uint_t MsCount);
-
-	EStdFunc_Sleep,
-
-	// uint64_t
-	// jnc.getTimestamp ();
-
-	EStdFunc_GetTimestamp,
-
-	// size_t
-	// strlen (nullable const char* p);
-
-	EStdFunc_StrLen,
-
-	// int
-	// rand ();
-
-	EStdFunc_Rand,
-
-	// int
-	// printf ();
-
-	EStdFunc_Printf,
-
-	// jnc.TTlsStruct*
-	// jnc.GetTls ();
-
-	EStdFunc_GetTls,
-
-	// size_t
-	// jnc.AppendFmtLiteral_a (
-	//		jnc.TFmtLiteral* pLiteral,
-	//		char* p,
-	//		size_t Length
-	//		);
-
-	EStdFunc_AppendFmtLiteral_a,
-
-	// size_t
-	// jnc.AppendFmtLiteral_p (
-	//		jnc.TFmtLiteral* pFmtLiteral,
-	//		char* pFmtSpecifier,
-	//		jnc.TPtr Ptr
-	//		);
-
-	EStdFunc_AppendFmtLiteral_p,
-
-	// size_t
-	// jnc.AppendFmtLiteral_i32 (
-	//		jnc.TFmtLiteral* pFmtLiteral,
-	//		char* pFmtSpecifier,
-	//		i32 i
-	//		);
-
-	EStdFunc_AppendFmtLiteral_i32,
-
-	// size_t
-	// jnc.AppendFmtLiteral_ui32 (
-	//		jnc.TFmtLiteral* pFmtLiteral,
-	//		char* pFmtSpecifier,
-	//		i32 i
-	//		);
-
-	EStdFunc_AppendFmtLiteral_ui32,
-
-	// size_t
-	// jnc.AppendFmtLiteral_i64 (
-	//		jnc.TFmtLiteral* pFmtLiteral,
-	//		char* pFmtSpecifier,
-	//		i64 i
-	//		);
-
-	EStdFunc_AppendFmtLiteral_i64,
-
-	// size_t
-	// jnc.AppendFmtLiteral_ui64 (
-	//		jnc.TFmtLiteral* pFmtLiteral,
-	//		char* pFmtSpecifier,
-	//		i64 i
-	//		);
-
-	EStdFunc_AppendFmtLiteral_ui64,
-
-	// size_t
-	// jnc.AppendFmtLiteral_f (
-	//		jnc.TFmtLiteral* pFmtLiteral,
-	//		char* pFmtSpecifier,
-	//		double f
-	//		);
-
-	EStdFunc_AppendFmtLiteral_f,
-
-	EStdFunc_SimpleMulticastCall,
-
-	EStdFunc__Count
-};
 
 //.............................................................................
 
@@ -240,6 +33,7 @@ protected:
 
 		CNamespace* m_pCurrentNamespace;
 		CScope* m_pCurrentScope;
+		CScopeLevelObjHdrStack m_ScopeLevelObjHdrArray;
 
 		CBasicBlock* m_pCurrentBlock;
 		CBasicBlock* m_pReturnBlock;
@@ -248,8 +42,6 @@ protected:
 
 		CValue m_ThisValue;
 		CValue m_ScopeLevelValue;
-		CValue m_VTablePtrPtrValue;
-		CValue m_VTablePtrValue;
 
 		llvm::DebugLoc m_LlvmDebugLoc;
 	};
@@ -268,6 +60,7 @@ protected:
 	rtl::CStdListT <CThunkFunction> m_ThunkFunctionList;
 	rtl::CStdListT <CThunkProperty> m_ThunkPropertyList;
 	rtl::CStdListT <CDataThunkProperty> m_DataThunkPropertyList;
+	rtl::CStdListT <CLazyStdFunction> m_LazyStdFunctionList;
 	rtl::CStringHashTableMapT <CFunction*> m_ThunkFunctionMap;
 	rtl::CStringHashTableMapT <CProperty*> m_ThunkPropertyMap;
 	rtl::CStringHashTableMapT <CFunction*> m_ScheduleLauncherFunctionMap;
@@ -276,12 +69,11 @@ protected:
 
 	CValue m_ThisValue;
 	CValue m_ScopeLevelValue;
-	CValue m_VTablePtrPtrValue;
-	CValue m_VTablePtrValue;
 
 	rtl::CStdListT <TEmissionContext> m_EmissionContextStack;
 
 	CFunction* m_StdFunctionArray [EStdFunc__Count];
+	CLazyStdFunction* m_LazyStdFunctionArray [EStdFunc__Count];
 
 public:
 	CFunctionMgr ();
@@ -462,8 +254,18 @@ public:
 
 	// std functions
 
+	bool
+	IsStdFunctionUsed (EStdFunc Func)
+	{
+		ASSERT (Func < EStdFunc__Count);
+		return m_StdFunctionArray [Func] != NULL;
+	}
+
 	CFunction*
 	GetStdFunction (EStdFunc Func);
+
+	CLazyStdFunction*
+	GetLazyStdFunction (EStdFunc Func);
 
 	CFunction*
 	GetDirectThunkFunction (
@@ -501,12 +303,6 @@ protected:
 
 	void
 	PopEmissionContext ();
-
-	void
-	CutVTable ();
-
-	void
-	RestoreVTable ();
 
 	void
 	InjectTlsPrologue (CFunction* pFunction);

@@ -191,8 +191,8 @@ COrphan::AdoptOrphanReactor (CModuleItem* pItem)
 	CReactorClassType* pOriginType = (CReactorClassType*) pItemType ;
 	CFunction* pOriginStart = pOriginType->GetMethod (EReactorMethod_Start);
 
- 	CopySrcPos (pOriginType);
- 	CopySrcPos (pOriginStart);
+	CopySrcPos (pOriginType);
+	CopySrcPos (pOriginStart);
 
 	return
 		CopyArgNames (pOriginStart->GetType ()) &&

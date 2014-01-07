@@ -9,9 +9,9 @@ namespace jnc {
 
 //.............................................................................
 
-TInterface*
+TIfaceHdr*
 CStdLib::DynamicCastClassPtr (
-	TInterface* p,
+	TIfaceHdr* p,
 	CClassType* pType
 	)
 {
@@ -26,13 +26,13 @@ CStdLib::DynamicCastClassPtr (
 	if (!Result)
 		return NULL;
 
-	TInterface* p2 = (TInterface*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
+	TIfaceHdr* p2 = (TIfaceHdr*) ((uchar_t*) (p->m_pObject + 1) + Coord.m_Offset);
 	ASSERT (p2->m_pObject == p->m_pObject);
 	return p2;
 }
 
-TInterface*
-CStdLib::StrengthenClassPtr (TInterface* p)
+TIfaceHdr*
+CStdLib::StrengthenClassPtr (TIfaceHdr* p)
 {
 	if (!p)
 		return NULL;
@@ -40,19 +40,31 @@ CStdLib::StrengthenClassPtr (TInterface* p)
 	EClassType ClassTypeKind = p->m_pObject->m_pClassType->GetClassTypeKind ();
 	return ClassTypeKind == EClassType_FunctionClosure || ClassTypeKind == EClassType_PropertyClosure ?
 		((CClosureClassType*) p->m_pObject->m_pType)->Strengthen (p) :
-		(!(p->m_pObject->m_Flags & EObjectFlag_Dead)) ? p : NULL;
+		(!(p->m_pObject->m_Flags & EObjHdrFlag_Dead)) ? p : NULL;
 }
 
 void*
 CStdLib::GcAllocate (
 	CType* pType,
-	size_t Count
+	size_t ElementCount
 	)
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
 
-	return pRuntime->GcAllocateObject (NULL);
+	return pRuntime->GcAllocate (pType, ElementCount);
+}
+
+void*
+CStdLib::GcTryAllocate (
+	CType* pType,
+	size_t ElementCount
+	)
+{
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
+	return pRuntime->GcTryAllocate (pType, ElementCount);
 }
 
 void
@@ -132,7 +144,7 @@ CStdLib::ThreadProc (PVOID pRawContext)
 	CScopeThreadRuntime ScopeRuntime (pRuntime);
 	GetTlsMgr ()->GetTls (pRuntime); // register thread right away
 
-	((void (__cdecl*) (TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
+	((void (__cdecl*) (TIfaceHdr*)) Ptr.m_pf) (Ptr.m_pClosure);
 	return 0;
 }
 
@@ -176,7 +188,7 @@ CStdLib::ThreadProc (void* pRawContext)
 	CScopeThreadRuntime ScopeRuntime (pRuntime);
 	GetTlsMgr ()->GetTls (pRuntime); // register thread right away
 
-	((void (*) (TInterface*)) Ptr.m_pf) (Ptr.m_pClosure);
+	((void (*) (TIfaceHdr*)) Ptr.m_pf) (Ptr.m_pClosure);
 	return NULL;
 }
 
@@ -213,6 +225,9 @@ CStdLib::AppendFmtLiteral_a (
 	size_t Length
 	)
 {
+	CRuntime* pRuntime = GetCurrentThreadRuntime ();
+	ASSERT (pRuntime);
+
 	size_t NewLength = pFmtLiteral->m_Length + Length;
 	if (NewLength < 64)
 		NewLength = 64;
@@ -220,7 +235,13 @@ CStdLib::AppendFmtLiteral_a (
 	if (pFmtLiteral->m_MaxLength < NewLength)
 	{
 		size_t NewMaxLength = rtl::GetMinPower2Ge (NewLength);
-		char* pNew = (char*) AXL_MEM_ALLOC (NewMaxLength + 1);
+		TObjHdr* pObjHdr = AXL_MEM_NEW_EXTRA (TObjHdr, NewMaxLength + 1);
+		pObjHdr->m_ScopeLevel = 0;
+		pObjHdr->m_pRoot = pObjHdr;
+		pObjHdr->m_pType = pRuntime->GetModule ()->m_TypeMgr.GetPrimitiveType (EType_Char);
+		pObjHdr->m_Flags = 0;
+
+		char* pNew = (char*) (pObjHdr + 1);
 		memcpy (pNew, pFmtLiteral->m_p, pFmtLiteral->m_Length);
 
 		pFmtLiteral->m_p = pNew;

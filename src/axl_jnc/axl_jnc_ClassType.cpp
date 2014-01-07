@@ -503,7 +503,7 @@ CClassType::AddVirtualFunction (CFunction* pFunction)
 	pFunction->m_pVirtualOriginClassType = this;
 	pFunction->m_ClassVTableIndex = m_VTable.GetCount ();
 
-	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin, EPtrTypeFlag_Unsafe);
+	CFunctionPtrType* pPointerType = pFunction->GetType ()->GetFunctionPtrType (EFunctionPtrType_Thin);
 	m_pVTableStructType->CreateField (pPointerType);
 	m_VTable.Append (pFunction);
 }
@@ -759,6 +759,9 @@ CClassType::CompileDefaultDestructor ()
 bool
 CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 {
+	if (m_MemberFieldDestructArray.IsEmpty ())
+		return true;
+
 	bool Result;
 
 	// only call member field destructors if storage is stack, static or uheap
@@ -768,9 +771,9 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 
 	static int32_t LlvmIndexArray [] =
 	{
-		0, // TInterface**
-		0, // TInterface*
-		1, // TObject**
+		0, // TIfaceHdr**
+		0, // TIfaceHdr*
+		1, // TObjHdr**
 	};
 
 	CValue ObjectPtrValue;
@@ -787,11 +790,11 @@ CClassType::CallMemberFieldDestructors (const CValue& ThisValue)
 	CType* pType = m_pModule->GetSimpleType (EType_Int_p);
 
 	CValue FlagsValue;
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &FlagsValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 3, NULL, &FlagsValue);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (FlagsValue, pType, &FlagsValue);
 
 	CValue MaskValue;
-	MaskValue.SetConstSizeT (EObjectFlag_Static | EObjectFlag_Stack | EObjectFlag_UHeap, EType_Int_p);
+	MaskValue.SetConstSizeT (EObjHdrFlag_Static | EObjHdrFlag_Stack | EObjHdrFlag_UHeap, EType_Int_p);
 
 	CValue AndValue;
 	Result =
@@ -872,8 +875,9 @@ CClassType::CreatePrimer ()
 	CType* ArgTypeArray [] =
 	{
 		GetClassStructType ()->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),     // scope level
+		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr), // root
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)      // flags
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));
@@ -888,94 +892,87 @@ CClassType::CompilePrimer ()
 {
 	ASSERT (m_pPrimer);
 
-	CValue ArgValueArray [3];
+	CValue ArgValueArray [4];
 	m_pModule->m_FunctionMgr.InternalPrologue (m_pPrimer, ArgValueArray, countof (ArgValueArray));
 
 	CValue ArgValue1 = ArgValueArray [0];
 	CValue ArgValue2 = ArgValueArray [1];
 	CValue ArgValue3 = ArgValueArray [2];
+	CValue ArgValue4 = ArgValueArray [3];
 
-	CClassType* pClassType = this;
-	CValue TypeValue (&pClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
-	CValue ObjectPtrValue;
-	CValue IfacePtrValue;
-	CValue PtrValue;
-
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue1, 0, NULL, &ObjectPtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue1, 1, NULL, &IfacePtrValue);
-
-	// zero memory
-
-	m_pModule->m_LlvmIrBuilder.CreateStore (GetZeroValue (), ArgValue1);
-
-	// store CClassType*
-
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 0, NULL, &PtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateStore (TypeValue, PtrValue);
-
-	// store ScopeLevel
-
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 1, NULL, &PtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue2, PtrValue);
-
-	// store Flags
-
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjectPtrValue, 2, NULL, &PtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateStore (ArgValue3, PtrValue);
-
-	PrimeInterface (this, ObjectPtrValue, IfacePtrValue, m_VTablePtrValue);
-
-	// prime class members fields
-
-	size_t Count = pClassType->m_ClassMemberFieldArray.GetCount ();
-	for (size_t i = 0; i < Count; i++)
-	{
-		CStructField* pField = pClassType->m_ClassMemberFieldArray [i];
-
-		ASSERT (pField->m_pType->GetTypeKind () == EType_Class);
-		CClassType* pClassType = (CClassType*) pField->m_pType;
-
-		CValue FieldValue;
-		m_pModule->m_LlvmIrBuilder.CreateGep2 (
-			IfacePtrValue,
-			pField->GetLlvmIndex (),
-			pClassType->GetClassStructType ()->GetDataPtrType_c (),
-			&FieldValue
-			);
-
-		CFunction* pPrimer = pClassType->GetPrimer ();
-		ASSERT (pPrimer); // should have been checked during CalcLayout
-
-		rtl::CBoxListT <CValue> ArgList;
-		ArgList.InsertTail (FieldValue);
-		ArgList.InsertTail (ArgValue2);
-		ArgList.InsertTail (ArgValue3);
-
-		bool Result = m_pModule->m_OperatorMgr.CallOperator (pPrimer, &ArgList);
-		ASSERT (Result);
-	}
+	PrimeObject (
+		this, 
+		ArgValueArray [0],
+		ArgValueArray [1],
+		ArgValueArray [2],
+		ArgValueArray [3]
+		);
 
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
 }
 
-bool
-CClassType::PrimeInterface (
+void
+CClassType::PrimeObject (
 	CClassType* pClassType,
-	const CValue& ObjectPtrValue,
-	const CValue& IfacePtrValue,
-	const CValue& VTablePtrValue
+	const CValue& OpValue,
+	const CValue& ScopeLevelValue,
+	const CValue& RootValue,
+	const CValue& FlagsValue
 	)
 {
-	CValue IfaceHdrPtrValue;
-	CValue VTablePtrPtrValue;
-	CValue ObjectPtrPtrValue;
+	CValue FieldValue;
+	CValue ObjHdrValue;
+	CValue IfaceValue;
+	CValue TypeValue (&pClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfacePtrValue, 0, NULL, &IfaceHdrPtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfaceHdrPtrValue, 0, NULL, &VTablePtrPtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfaceHdrPtrValue, 1, NULL, &ObjectPtrPtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateStore (VTablePtrValue, VTablePtrPtrValue);
-	m_pModule->m_LlvmIrBuilder.CreateStore (ObjectPtrValue, ObjectPtrPtrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (OpValue, 0, NULL, &ObjHdrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (OpValue, 1, NULL, &IfaceValue);
+
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjHdrValue, 0, NULL, &FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (ScopeLevelValue, FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjHdrValue, 1, NULL, &FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (RootValue, FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjHdrValue, 2, NULL, &FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (TypeValue, FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjHdrValue, 3, NULL, &FieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (FlagsValue, FieldValue);
+
+	PrimeInterface (
+		pClassType, 
+		IfaceValue, 
+		pClassType->m_VTablePtrValue,
+		ObjHdrValue, 
+		ScopeLevelValue,
+		RootValue,
+		FlagsValue
+		);
+}
+
+void
+CClassType::PrimeInterface (
+	CClassType* pClassType,
+	const CValue& OpValue,
+	const CValue& VTableValue,
+	const CValue& ObjectValue,
+	const CValue& ScopeLevelValue,
+	const CValue& RootValue,
+	const CValue& FlagsValue
+	)
+{
+	// zero memory
+
+	m_pModule->m_LlvmIrBuilder.CreateStore (pClassType->GetIfaceStructType ()->GetZeroValue (), OpValue);
+
+	CValue IfaceHdrValue;
+	CValue VTableFieldValue;
+	CValue ObjectFieldValue;
+
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (OpValue, 0, NULL, &IfaceHdrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfaceHdrValue, 0, NULL, &VTableFieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (IfaceHdrValue, 1, NULL, &ObjectFieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (VTableValue, VTableFieldValue);
+	m_pModule->m_LlvmIrBuilder.CreateStore (ObjectValue, ObjectFieldValue);
 
 	// prime base types
 
@@ -987,40 +984,82 @@ CClassType::PrimeInterface (
 
 		CClassType* pBaseClassType = (CClassType*) pSlot->m_pType;
 
-		CValue BaseClassPtrValue;
+		CValue BaseClassValue;
 		m_pModule->m_LlvmIrBuilder.CreateGep2 (
-			IfacePtrValue,
+			OpValue,
 			pSlot->GetLlvmIndex (),
 			NULL,
-			&BaseClassPtrValue
+			&BaseClassValue
 			);
 
-		CValue BaseClassVTablePtrValue;
+		CValue BaseClassVTableValue;
 
 		if (!pBaseClassType->HasVTable ())
 		{
-			BaseClassVTablePtrValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType_c ()->GetZeroValue ();
+			BaseClassVTableValue = pBaseClassType->GetVTableStructType ()->GetDataPtrType_c ()->GetZeroValue ();
 		}
 		else
 		{
 			m_pModule->m_LlvmIrBuilder.CreateGep2 (
-				VTablePtrValue,
+				VTableValue,
 				pSlot->GetVTableIndex (),
 				NULL,
-				&BaseClassVTablePtrValue
+				&BaseClassVTableValue
 				);
 
 			m_pModule->m_LlvmIrBuilder.CreateBitCast (
-				BaseClassVTablePtrValue,
+				BaseClassVTableValue,
 				pBaseClassType->GetVTableStructType ()->GetDataPtrType_c (),
-				&BaseClassVTablePtrValue
+				&BaseClassVTableValue
 				);
 		}
 
-		PrimeInterface (pBaseClassType, ObjectPtrValue, BaseClassPtrValue, BaseClassVTablePtrValue);
+		PrimeInterface (
+			pBaseClassType, 
+			BaseClassValue, 
+			BaseClassVTableValue,
+			ObjectValue, 
+			ScopeLevelValue,
+			RootValue,
+			FlagsValue
+			);
 	}
 
-	return true;
+	// prime class members fields
+
+	Count = pClassType->m_ClassMemberFieldArray.GetCount ();
+	for (size_t i = 0; i < Count; i++)
+	{
+		CStructField* pField = pClassType->m_ClassMemberFieldArray [i];
+
+		ASSERT (pField->m_pType->GetTypeKind () == EType_Class);
+		CClassType* pClassType = (CClassType*) pField->m_pType;
+
+		CValue FieldValue;
+		m_pModule->m_LlvmIrBuilder.CreateGep2 (
+			OpValue,
+			pField->GetLlvmIndex (),
+			pClassType->GetClassStructType ()->GetDataPtrType_c (),
+			&FieldValue
+			);
+
+		CFunction* pPrimer = pClassType->GetPrimer ();
+		ASSERT (pPrimer); // should have been checked during CalcLayout
+
+		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
+		m_pModule->m_LlvmIrBuilder.CreateCall4 (
+			pPrimer,
+			pPrimer->GetType (),
+			FieldValue,
+			ScopeLevelValue,
+			RootValue,
+			FlagsValue,
+			NULL
+			);
+
+		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
+	}
 }
 
 void
@@ -1029,16 +1068,16 @@ CClassType::GcMark (
 	void* p
 	)
 {
-	TObject* pObject = (TObject*) p;
+	TObjHdr* pObject = (TObjHdr*) p;
 	ASSERT (pObject->m_pType == this);
 
-	EnumGcRootsImpl (pRuntime, (TInterface*) (pObject + 1));
+	EnumGcRootsImpl (pRuntime, (TIfaceHdr*) (pObject + 1));
 }
 
 void
 CClassType::EnumGcRootsImpl (
 	CRuntime* pRuntime,
-	TInterface* pInterface
+	TIfaceHdr* pInterface
 	)
 {
 	char* p = (char*) pInterface;
@@ -1050,7 +1089,7 @@ CClassType::EnumGcRootsImpl (
 		CType* pType = pSlot->GetType ();
 
 		if (pType->GetTypeKind () == EType_Class)
-			((CClassType*) pType)->EnumGcRootsImpl (pRuntime, (TInterface*) (p + pSlot->GetOffset ()));
+			((CClassType*) pType)->EnumGcRootsImpl (pRuntime, (TIfaceHdr*) (p + pSlot->GetOffset ()));
 		else
 			pType->GcMark (pRuntime, p + pSlot->GetOffset ());
 	}

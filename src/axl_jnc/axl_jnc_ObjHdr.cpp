@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_jnc_Object.h"
+#include "axl_jnc_ObjHdr.h"
 #include "axl_jnc_ClosureClassType.h"
 #include "axl_jnc_Runtime.h"
 
@@ -9,19 +9,19 @@ namespace jnc {
 //.............................................................................
 
 void 
-TObject::GcMarkData (CRuntime* pRuntime)
+TObjHdr::GcMarkData (CRuntime* pRuntime)
 {
-	m_pRoot->m_Flags |= EObjectFlag_GcWeakMark;
+	m_pRoot->m_Flags |= EObjHdrFlag_GcWeakMark;
 
-	if (m_Flags & EObjectFlag_GcRootsAdded)
+	if (m_Flags & EObjHdrFlag_GcRootsAdded)
 		return;
 
-	m_Flags |= EObjectFlag_GcRootsAdded;
+	m_Flags |= EObjHdrFlag_GcRootsAdded;
 
 	if (!(m_pType->GetFlags () & ETypeFlag_GcRoot))
 		return;
 
-	if (!(m_Flags & EObjectFlag_DynamicArray))
+	if (!(m_Flags & EObjHdrFlag_DynamicArray))
 	{
 		if (m_pType->GetTypeKind () == EType_Class)
 			pRuntime->AddGcRoot (this, m_pType);
@@ -32,9 +32,9 @@ TObject::GcMarkData (CRuntime* pRuntime)
 	{
 		ASSERT (m_pType->GetTypeKind () != EType_Class);
 
-		TDynamicArray* pDynamicArray = (TDynamicArray*) this;
-		char* p = (char*) (pDynamicArray + 1);		
-		for (size_t i = 0; i < pDynamicArray->m_Count; i++)
+		char* p = (char*) (this + 1);		
+		size_t Count = *((size_t*) this - 1);
+		for (size_t i = 0; i < Count; i++)
 		{
 			pRuntime->AddGcRoot (p, m_pType);
 			p += m_pType->GetSize  ();
@@ -43,15 +43,15 @@ TObject::GcMarkData (CRuntime* pRuntime)
 }
 
 void 
-TObject::GcMarkObject (CRuntime* pRuntime)
+TObjHdr::GcMarkObject (CRuntime* pRuntime)
 {
-	m_pRoot->m_Flags |= EObjectFlag_GcWeakMark;
-	m_Flags |= EObjectFlag_GcMark;
+	m_pRoot->m_Flags |= EObjHdrFlag_GcWeakMark;
+	m_Flags |= EObjHdrFlag_GcMark;
 
-	if (m_Flags & EObjectFlag_GcRootsAdded)
+	if (m_Flags & EObjHdrFlag_GcRootsAdded)
 		return;
 
-	m_Flags |= EObjectFlag_GcRootsAdded;
+	m_Flags |= EObjHdrFlag_GcRootsAdded;
 
 	if (!(m_pType->GetFlags () & ETypeFlag_GcRoot))
 		return;
@@ -60,15 +60,15 @@ TObject::GcMarkObject (CRuntime* pRuntime)
 }
 
 void
-TObject::GcWeakMarkClosureObject (CRuntime* pRuntime)
+TObjHdr::GcWeakMarkClosureObject (CRuntime* pRuntime)
 {
-	m_pRoot->m_Flags |= EObjectFlag_GcWeakMark;
-	m_Flags |= EObjectFlag_GcMark;
+	m_pRoot->m_Flags |= EObjHdrFlag_GcWeakMark;
+	m_Flags |= EObjHdrFlag_GcMark;
 
-	if (m_Flags & (EObjectFlag_GcWeakMark_c | EObjectFlag_GcRootsAdded))
+	if (m_Flags & (EObjHdrFlag_GcWeakMark_c | EObjHdrFlag_GcRootsAdded))
 		return;
 
-	m_Flags |= EObjectFlag_GcWeakMark_c;
+	m_Flags |= EObjHdrFlag_GcWeakMark_c;
 
 	CClosureClassType* pClosureClassType = (CClosureClassType*) m_pClassType;
 	if (!pClosureClassType->GetWeakMask ())

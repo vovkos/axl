@@ -37,6 +37,7 @@ enum EModuleItem
 	EModuleItem_StructField,
 	EModuleItem_BaseTypeSlot,
 	EModuleItem_Orphan,
+	EModuleItem_Lazy,
 	EModuleItem__Count,
 };
 
@@ -267,6 +268,30 @@ public:
 	{
 		m_pItemDecl = this;
 	}
+};
+
+//.............................................................................
+
+enum ELazyModuleItemFlag
+{
+	ELazyModuleItemFlag_Touched = 0x010000,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CLazyModuleItem: public CUserModuleItem
+{
+	friend class CNamespace;
+
+public:
+	CLazyModuleItem ()
+	{
+		m_ItemKind = EModuleItem_Lazy;
+	}
+
+	virtual
+	CModuleItem*
+	GetActualItem () = 0;
 };
 
 //.............................................................................

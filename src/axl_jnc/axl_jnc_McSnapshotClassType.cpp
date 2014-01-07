@@ -89,7 +89,7 @@ CMcSnapshotClassType::GcMark (
 	void* _p
 	)
 {
-	TObject* pObject = (TObject*) _p;
+	TObjHdr* pObject = (TObjHdr*) _p;
 	ASSERT (pObject->m_pType == this);
 
 	TMcSnapshot* pSnapshot = (TMcSnapshot*) (pObject + 1);

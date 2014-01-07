@@ -118,7 +118,21 @@ CModuleItem*
 CNamespace::FindItem (const char* pName)
 {
 	rtl::CStringHashTableMapIteratorT <CModuleItem*> It = m_ItemMap.Find (pName);
-	return It ? It->m_Value : NULL;
+	if (!It)
+		return NULL;
+
+	CModuleItem* pItem = It->m_Value;
+	if (pItem->GetItemKind () != EModuleItem_Lazy)
+		return pItem;
+
+	CLazyModuleItem* pLazyItem = (CLazyModuleItem*) pItem;
+	ASSERT (!(pLazyItem->m_Flags & ELazyModuleItemFlag_Touched));
+
+	pLazyItem->m_Flags |= ELazyModuleItemFlag_Touched;
+	pItem = pLazyItem->GetActualItem ();
+	m_ItemArray.Append (pItem);
+	It->m_Value = pItem;
+	return pItem;
 }
 
 CModuleItem*
@@ -208,7 +222,9 @@ CNamespace::AddItem (
 		return false;
 	}
 
-	m_ItemArray.Append (pItem);
+	if (pItem->GetItemKind () != EModuleItem_Lazy)
+		m_ItemArray.Append (pItem);
+
 	It->m_Value = pItem;
 	return true;
 }

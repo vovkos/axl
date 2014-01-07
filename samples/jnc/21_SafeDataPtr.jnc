@@ -12,12 +12,12 @@ foo (int* p) // pointers arguments are checked before passing
 	printf ("foo (0x%x) { *p = %d }\n", p, *p);
 }
 
-bar (nullable int* p) // ... unless they are marked as 'nullable'
+bar (nullable int* p) // unless they are marked as 'nullable'
 {
 	printf ("bar (0x%x)\n", p);
 }
 
-baz (unsafe thin int* p) // ... or they are unsafe
+baz (int thin* p) // thin pointers are also not checked (cannot be checked in general case)
 {
 	printf ("baz (0x%x)\n", p);
 }
@@ -33,7 +33,7 @@ int main ()
 	int* p;
 
 	bar (p); // ok, 'nullable'
-	baz (p); // also ok, 'unsafe'
+	baz (p); // also ok, 'thin'
 	// foo (p); // <-- runtime error: pointer out of range
 
 	int a [] = { 10, 20, 30 };
@@ -43,8 +43,7 @@ int main ()
 	for (i = 0; i < countof (a); i++)
 		foo (&a [i]);
 
-	bar (&a [i]); // ok, 'nullable'
-	baz (&a [i]); // also ok, 'unsafe'
+	baz (&a [i]); // ok, 'thin'
 
 	// int x = a [i]; // <-- runtime error: pointer out of range
 	// foo (&a [i]); // <-- runtime error: pointer out of range

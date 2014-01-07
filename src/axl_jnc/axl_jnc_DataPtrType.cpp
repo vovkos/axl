@@ -13,7 +13,8 @@ GetDataPtrTypeKindString (EDataPtrType PtrTypeKind)
 {
 	static const char* StringTable [EDataPtrType__Count] = 
 	{
-		"fat",    // EDataPtrType_Normal = 0,
+		"normal", // EDataPtrType_Normal = 0,
+		"lean",   // EDataPtrType_Lean,
 		"thin",   // EDataPtrType_Thin,
 	};
 		
@@ -40,7 +41,6 @@ CDataPtrType::IsConstPtrType ()
 		(m_Flags & EPtrTypeFlag_Const) != 0 || 
 		(m_Flags & EPtrTypeFlag_ConstD) != 0 && 
 		m_pModule->m_NamespaceMgr.GetAccessKind (m_pAnchorNamespace) == EAccess_Public;
-
 }
 
 CStructType* 
@@ -59,8 +59,16 @@ CDataPtrType::CreateSignature (
 {
 	rtl::CString Signature = TypeKind == EType_DataRef ? "RD" : "PD";
 
-	if (PtrTypeKind == EDataPtrType_Thin)
+	switch (PtrTypeKind)
+	{
+	case EDataPtrType_Lean:
+		Signature += 'l';
+		break;
+
+	case EDataPtrType_Thin:
 		Signature += 't';
+		break;
+	}
 
 	Signature += GetPtrTypeFlagSignature (Flags);
 	Signature += pBaseType->GetSignature ();
@@ -91,7 +99,7 @@ void
 CDataPtrType::PrepareLlvmType ()
 {
 	m_pLlvmType = 
-		m_PtrTypeKind != EDataPtrType_Thin ? GetDataPtrStructType ()->GetLlvmType () :
+		m_PtrTypeKind == EDataPtrType_Normal ? GetDataPtrStructType ()->GetLlvmType () :
 		m_pTargetType->GetTypeKind () != EType_Void ? llvm::PointerType::get (m_pTargetType->GetLlvmType (), 0) :
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetLlvmType ();
 }
@@ -100,7 +108,7 @@ void
 CDataPtrType::PrepareLlvmDiType ()
 {
 	m_LlvmDiType = 
-		m_PtrTypeKind != EDataPtrType_Thin ? GetDataPtrStructType ()->GetLlvmDiType () :
+		m_PtrTypeKind == EDataPtrType_Normal ? GetDataPtrStructType ()->GetLlvmDiType () :
 		m_pTargetType->GetTypeKind () != EType_Void ? m_pModule->m_LlvmDiBuilder.CreatePointerType (m_pTargetType) :
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr)->GetLlvmDiType ();
 }
@@ -114,7 +122,7 @@ CDataPtrType::GcMark (
 	ASSERT (m_PtrTypeKind == EDataPtrType_Normal);
 
 	TDataPtr* pPtr = (TDataPtr*) p;		
-	TObject* pObject = pPtr->m_pObject;
+	TObjHdr* pObject = pPtr->m_pObject;
 	if (!pObject || pObject->m_ScopeLevel)
 		return;
 

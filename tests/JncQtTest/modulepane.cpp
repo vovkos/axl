@@ -142,6 +142,9 @@ void ModulePane::addItem(QTreeWidgetItem *parent, jnc::CModuleItem *item)
 {
 	jnc::EModuleItem itemKind = item->GetItemKind();
 
+	QString name;
+	QTreeWidgetItem* treeItem;
+
 	switch (itemKind)
 	{
 	case jnc::EModuleItem_Namespace:
@@ -176,13 +179,20 @@ void ModulePane::addItem(QTreeWidgetItem *parent, jnc::CModuleItem *item)
 		addStructField (parent, (jnc::CStructField*) item);
 		break;
 
+	case jnc::EModuleItem_Lazy:
+		name.sprintf("lazy: %s", ((jnc::CLazyModuleItem*) item)->GetName ().cc ());
+
+		treeItem = insertItem(name, parent);
+		treeItem->setText(0, name);
+		treeItem->setData(0, Qt::UserRole, qVariantFromValue((void*) item));
+		break;
+
 	default:
-		QString name;
 		name.sprintf("item %x of kind %d", item, itemKind);
 
-		QTreeWidgetItem *treeItem = insertItem(name, parent);
+		treeItem = insertItem(name, parent);
 		treeItem->setText(0, name);
-		treeItem->setData(0, Qt::UserRole, qVariantFromValue((void *)item));
+		treeItem->setData(0, Qt::UserRole, qVariantFromValue((void*) item));
 	}
 }
 

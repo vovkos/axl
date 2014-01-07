@@ -8,33 +8,26 @@ namespace jnc {
 //.............................................................................
 
 void
-COperatorMgr::GetDataRefScopeLevel (
+COperatorMgr::GetDataRefObjHdr (
 	const CValue& Value,
-	CValue* pScopeLevelValue
+	CValue* pResultValue
 	)
 {
-	static int32_t LlvmIndexArray [] =
-	{
-		1, // TDataPtrValidator m_Validator
-		2, // size_t m_ScopeLvel
-	};
-
 	ASSERT (Value.GetType ()->GetTypeKind () == EType_DataRef);
 	CDataPtrType* pPtrType = (CDataPtrType*) Value.GetType ();
 	EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (PtrTypeKind == EDataPtrType_Thin)
+	if (PtrTypeKind == EDataPtrType_Lean)
 	{
-		GetThinDataPtrScopeLevel (Value, pScopeLevelValue);
+		GetLeanDataPtrObjHdr (Value, pResultValue);
 	}
 	else
 	{
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (
 			Value,
-			LlvmIndexArray,
-			countof (LlvmIndexArray),
-			m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-			pScopeLevelValue
+			3,
+			m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr),
+			pResultValue
 			);
 	}
 }
@@ -64,6 +57,8 @@ COperatorMgr::CheckDataPtrRange (
 
 	CFunction* pCheckDataPtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckDataPtrRange);
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pCheckDataPtrRange,
 		pCheckDataPtrRange->GetType (),
@@ -71,6 +66,8 @@ COperatorMgr::CheckDataPtrRange (
 		countof (ArgValueArray),
 		NULL
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -80,24 +77,30 @@ COperatorMgr::CheckDataPtrRange (const CValue& Value)
 	CDataPtrType* pType = (CDataPtrType*) Value.GetType ();
 	EDataPtrType PtrTypeKind = pType->GetPtrTypeKind ();
 
-	CDataPtrType* pResultType = pType->GetTargetType ()->GetDataPtrType_c ();
+	if (pType->GetFlags () & EPtrTypeFlag_Checked)
+		return;
 
 	CValue PtrValue;
 	CValue RangeBeginValue;
 	CValue RangeEndValue;
 
-	if (pType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
-		return;
-
 	switch (PtrTypeKind)
 	{
 	case EDataPtrType_Thin:
+		return;
+
+	case EDataPtrType_Lean:
 		PtrValue = Value;
-		GetThinDataPtrRange (Value, &RangeBeginValue, &RangeEndValue);
+		GetLeanDataPtrRange (Value, &RangeBeginValue, &RangeEndValue);
 		break;
 
 	case EDataPtrType_Normal:
-		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (
+			Value, 0, 
+			pType->GetTargetType ()->GetDataPtrType_c (), 
+			&PtrValue
+			);
+
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 1, NULL, &RangeBeginValue);
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 2, NULL, &RangeEndValue);
 		break;
@@ -119,8 +122,8 @@ COperatorMgr::CheckDataPtrScopeLevel (
 
 	CDataPtrType* pPtrType = (CDataPtrType*) SrcValue.GetType ();
 	EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
-
-	if (pPtrType->GetFlags () & EPtrTypeFlag_Unsafe)
+		
+	if (PtrTypeKind == EDataPtrType_Thin) // in general case we can't deduce scope-level
 		return true;
 
 	if (SrcValue.GetValueKind () == EValue_Variable && DstValue.GetValueKind () == EValue_Variable)
@@ -134,29 +137,64 @@ COperatorMgr::CheckDataPtrScopeLevel (
 		return true;
 	}
 
-	CValue SrcScopeLevelValue;
+	CValue SrcObjHdrValue;
 
-	if (PtrTypeKind == EDataPtrType_Thin)
-		GetThinDataPtrScopeLevel (SrcValue, &SrcScopeLevelValue);
+	if (PtrTypeKind == EDataPtrType_Lean)
+		GetLeanDataPtrObjHdr (SrcValue, &SrcObjHdrValue);
 	else
-		m_pModule->m_LlvmIrBuilder.CreateExtractValue (SrcValue, 3, m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), &SrcScopeLevelValue);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (SrcValue, 3, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr), &SrcObjHdrValue);
 
-	CValue DstScopeLevelValue;
-	GetDataRefScopeLevel (DstValue, &DstScopeLevelValue);
+	CValue DstObjHdrValue;
+	GetDataRefObjHdr (DstValue, &DstObjHdrValue);
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "check data pointer scope level");
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
-		SrcScopeLevelValue,
-		DstScopeLevelValue,
+		SrcObjHdrValue,
+		DstObjHdrValue,
 		NULL
 		);
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
+
 	return true;
+}
+
+void
+COperatorMgr::CheckClassPtrScopeLevel (
+	const CValue& SrcValue,
+	const CValue& DstValue
+	)
+{
+	ASSERT (SrcValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr);
+
+	CValue DstObjHdrValue;
+	GetDataRefObjHdr (DstValue, &DstObjHdrValue);
+
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "check class scope level");
+
+	CValue IfaceValue;
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (SrcValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
+
+	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckClassPtrScopeLevel);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
+	m_pModule->m_LlvmIrBuilder.CreateCall2 (
+		pCheckFunction,
+		pCheckFunction->GetType (),
+		IfaceValue,
+		DstObjHdrValue,
+		NULL
+		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -167,7 +205,7 @@ COperatorMgr::CheckClassPtrNull (const CValue& Value)
 	CClassPtrType* pPtrType = (CClassPtrType*) Value.GetType ();
 	EClassPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (pPtrType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
+	if (pPtrType->GetFlags () & EPtrTypeFlag_Checked)
 		return;
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "check null class pointer");
@@ -176,6 +214,9 @@ COperatorMgr::CheckClassPtrNull (const CValue& Value)
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (Value, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -183,35 +224,8 @@ COperatorMgr::CheckClassPtrNull (const CValue& Value)
 		CValue (ERuntimeError_NullClassPtr, EType_Int),
 		NULL
 		);
-}
 
-void
-COperatorMgr::CheckClassPtrScopeLevel (
-	const CValue& SrcValue,
-	const CValue& DstValue
-	)
-{
-	ASSERT (SrcValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_ClassPtr);
-	if (SrcValue.GetType ()->GetFlags () & EPtrTypeFlag_Unsafe)
-		return;
-
-	CValue DstScopeLevelValue;
-	GetDataRefScopeLevel (DstValue, &DstScopeLevelValue);
-
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "check class scope level");
-
-	CValue IfaceValue;
-	m_pModule->m_LlvmIrBuilder.CreateBitCast (SrcValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr), &IfaceValue);
-
-	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckClassPtrScopeLevel);
-
-	m_pModule->m_LlvmIrBuilder.CreateCall2 (
-		pCheckFunction,
-		pCheckFunction->GetType (),
-		IfaceValue,
-		DstScopeLevelValue,
-		NULL
-		);
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -222,7 +236,7 @@ COperatorMgr::CheckFunctionPtrNull (const CValue& Value)
 	CFunctionPtrType* pPtrType = (CFunctionPtrType*) Value.GetType ();
 	EFunctionPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (pPtrType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
+	if (pPtrType->GetFlags () & EPtrTypeFlag_Checked)
 		return;
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "check null function pointer");
@@ -237,6 +251,9 @@ COperatorMgr::CheckFunctionPtrNull (const CValue& Value)
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -244,6 +261,8 @@ COperatorMgr::CheckFunctionPtrNull (const CValue& Value)
 		CValue (ERuntimeError_NullFunctionPtr, EType_Int),
 		NULL
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -255,7 +274,7 @@ COperatorMgr::CheckFunctionPtrScopeLevel (
 	ASSERT (SrcValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_FunctionPtr);
 	CFunctionPtrType* pPtrType = (CFunctionPtrType*) SrcValue.GetType ();
 
-	if (!pPtrType->HasClosure () || (pPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
+	if (!pPtrType->HasClosure ())
 		return;
 
 	CValue ClosureValue;
@@ -271,7 +290,7 @@ COperatorMgr::CheckPropertyPtrNull (const CValue& Value)
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) Value.GetType ();
 	EPropertyPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
 
-	if (pPtrType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
+	if (pPtrType->GetFlags () & EPtrTypeFlag_Checked)
 		return;
 
 	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "check null property pointer");
@@ -286,6 +305,9 @@ COperatorMgr::CheckPropertyPtrNull (const CValue& Value)
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr), &PtrValue);
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);
+	
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -293,6 +315,8 @@ COperatorMgr::CheckPropertyPtrNull (const CValue& Value)
 		CValue (ERuntimeError_NullPropertyPtr, EType_Int),
 		NULL
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -304,7 +328,7 @@ COperatorMgr::CheckPropertyPtrScopeLevel (
 	ASSERT (SrcValue.GetType ()->GetTypeKind () == EType_PropertyPtr);
 	CPropertyPtrType* pPtrType = (CPropertyPtrType*) SrcValue.GetType ();
 
-	if (!pPtrType->HasClosure () || (pPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
+	if (!pPtrType->HasClosure ())
 		return;
 
 	CValue ClosureValue;

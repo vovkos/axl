@@ -147,7 +147,7 @@ public:
 	CImportPtrType*
 	GetCheckedPtrType ()
 	{
-		return !(m_Flags & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe)) ?
+		return !(m_Flags & EPtrTypeFlag_Checked) ?
 			m_pTargetType->GetImportPtrType (m_TypeModifiers, m_Flags | EPtrTypeFlag_Checked) :
 			this;
 	}

@@ -8,7 +8,7 @@ namespace jnc {
 
 void
 Prime (
-	TInterface* pThis,
+	TIfaceHdr* pThis,
 	CClassType* pType,
 	void* pVTable
 	)
@@ -27,7 +27,7 @@ Prime (
 		CBaseTypeSlot* pSlot = BaseTypePrimeArray [i];
 		ASSERT (pSlot->GetType ()->GetTypeKind () == EType_Class);
 
-		jnc::TInterface* pInterface = (jnc::TInterface*) ((char*) pThis + pSlot->GetOffset ());
+		jnc::TIfaceHdr* pInterface = (jnc::TIfaceHdr*) ((char*) pThis + pSlot->GetOffset ());
 		pInterface->m_pObject = pThis->m_pObject;
 
 		Prime (
@@ -47,8 +47,8 @@ Prime (
 		ASSERT (pField->GetType ()->GetTypeKind () == EType_Class);
 		CClassType* pFieldType = (CClassType*) pField->GetType ();
 
-		jnc::TObject* pObject = (jnc::TObject*) ((char*) pThis + pField->GetOffset ());
-		jnc::TInterface* pInterface = (jnc::TInterface*) (pObject + 1);
+		jnc::TObjHdr* pObject = (jnc::TObjHdr*) ((char*) pThis + pField->GetOffset ());
+		jnc::TIfaceHdr* pInterface = (jnc::TIfaceHdr*) (pObject + 1);
 		pInterface->m_pObject = pObject;
 
 		Prime (pInterface, pFieldType, NULL);

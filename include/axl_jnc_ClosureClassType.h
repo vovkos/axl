@@ -50,8 +50,8 @@ public:
 	bool
 	Compile () = 0;
 
-	jnc::TInterface* 
-	Strengthen (jnc::TInterface* p);
+	jnc::TIfaceHdr* 
+	Strengthen (jnc::TIfaceHdr* p);
 
 protected:
 	void

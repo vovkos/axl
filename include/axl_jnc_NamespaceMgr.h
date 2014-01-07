@@ -16,6 +16,38 @@ class CClassType;
 
 //.............................................................................
 
+class CScopeLevelObjHdrStack
+{
+	friend class CNamespaceMgr;
+
+protected:
+	CModule* m_pModule;
+
+	rtl::CBoxListT <CValue> m_ValueList;
+	rtl::CArrayT <CValue*> m_ValueArray;
+
+public:
+	CScopeLevelObjHdrStack ()
+	{
+		m_pModule = NULL;
+	}
+
+	void
+	Clear ()
+	{
+		m_ValueList.Clear ();
+		m_ValueArray.Clear ();
+	}
+
+	void
+	TakeOver (CScopeLevelObjHdrStack* pSrcStack);
+
+	CValue
+	GetScopeLevelObjHdr (size_t ScopeLevel);
+};
+
+//.............................................................................
+
 class CNamespaceMgr
 {
 	friend class CModule;
@@ -45,8 +77,16 @@ protected:
 
 	intptr_t m_SourcePosLockCount;
 
+	CValue m_StaticObjectValue;
+	CScopeLevelObjHdrStack m_ScopeLevelObjHdrStack;
+
 public:
 	CNamespaceMgr ();
+	
+	~CNamespaceMgr ()
+	{
+		Clear ();
+	}
 
 	CModule*
 	GetModule ()
@@ -107,6 +147,27 @@ public:
 	{
 		return m_CurrentAccessKind;
 	}
+
+	CValue
+	GetCurrentScopeObjHdr ()
+	{
+		return GetScopeLevelObjHdr (m_pCurrentScope);
+	}
+
+	CValue
+	GetScopeLevelObjHdr (CScope* pScope)
+	{
+		return pScope ? m_ScopeLevelObjHdrStack.GetScopeLevelObjHdr (pScope->GetLevel ()) : GetStaticObjHdr ();
+	}
+
+	CValue
+	GetScopeLevelObjHdr (size_t ScopeLevel)
+	{
+		return ScopeLevel ? m_ScopeLevelObjHdrStack.GetScopeLevelObjHdr (ScopeLevel) : GetStaticObjHdr ();
+	}
+	
+	CValue
+	GetStaticObjHdr ();
 
 	void
 	OpenNamespace (CNamespace* pNamespace);

@@ -99,6 +99,8 @@ main := |*
 'abstract'       { CreateToken (EToken_Abstract); };
 'virtual'        { CreateToken (EToken_Virtual); };
 'override'       { CreateToken (EToken_Override); };
+'mutable'        { CreateToken (EToken_Mutable); };
+'nullable'       { CreateToken (EToken_Nullable); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -115,14 +117,11 @@ main := |*
 'signed'         { CreateToken (EToken_Signed); };
 'unsigned'       { CreateToken (EToken_Unsigned); };
 'bigendian'      { CreateToken (EToken_BigEndian); };
-'nullable'       { CreateToken (EToken_Nullable); };
 'const'          { CreateToken (EToken_Const); };
 'dconst'         { CreateToken (EToken_DConst); };
-'mutable'        { CreateToken (EToken_Mutable); };
 'volatile'       { CreateToken (EToken_Volatile); };
 'weak'           { CreateToken (EToken_Weak); };
 'thin'           { CreateToken (EToken_Thin); };
-'unsafe'         { CreateToken (EToken_Unsafe); };
 'pitcher'        { CreateToken (EToken_Pitcher); };
 'cdecl'          { CreateToken (EToken_Cdecl); };
 'stdcall'        { CreateToken (EToken_Stdcall); };

@@ -88,7 +88,7 @@ CDeclTypeCalc::CalcType (
 
 			pType = GetPropertyPtrType (pPropertyType);
 		}
-		else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_EventD))
+		else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_DEvent))
 		{
 			CClassType* pClassType = GetMulticastType (pType);
 			if (!pClassType)
@@ -148,7 +148,7 @@ CDeclTypeCalc::CalcType (
 		if (pFlags)
 			*pFlags = GetPropertyFlags ();
 	}
-	else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_EventD))
+	else if (m_TypeModifiers & (ETypeModifier_Multicast | ETypeModifier_Event | ETypeModifier_DEvent))
 	{
 		pType = GetMulticastType (pType);
 		if (!pType)
@@ -312,7 +312,7 @@ CDeclTypeCalc::GetPtrTypeFlags (
 	if (m_TypeModifiers & ETypeModifier_Const)
 		Flags |= EPtrTypeFlag_Const;
 
-	if (m_TypeModifiers & ETypeModifier_ConstD)
+	if (m_TypeModifiers & ETypeModifier_DConst)
 		Flags |= EPtrTypeFlag_ConstD;
 
 	if (m_TypeModifiers & ETypeModifier_Volatile)
@@ -326,7 +326,7 @@ CDeclTypeCalc::GetPtrTypeFlags (
 		Flags |= EPtrTypeFlag_Volatile;
 	}
 
-	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_EventD)) // convert 'event' to 'devent'
+	if (m_TypeModifiers & (ETypeModifier_Event | ETypeModifier_DEvent)) // convert 'event' to 'devent'
 	{
 		ASSERT (IsClassType (pType, EClassType_Multicast));
 		Flags |= EPtrTypeFlag_EventD;

@@ -35,7 +35,7 @@ struct TVariant
 		intptr_t (* m_pf) (...);
 
 		TDataPtr m_DataPtr;
-		TInterface* m_pClassPtr;
+		TIfaceHdr* m_pClassPtr;
 		TFunctionPtr m_FunctionPtr;
 		TPropertyPtr m_PropertyPtr;
 	};

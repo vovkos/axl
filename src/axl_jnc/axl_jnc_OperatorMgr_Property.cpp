@@ -461,7 +461,7 @@ COperatorMgr::GetPropertyAutoGetValueType (const CValue& OpValue)
 		((CStructField*) pAutoGetValue)->GetType() :
 		((CVariable*) pAutoGetValue)->GetType();
 
-	return pType->GetDataPtrType (EType_DataRef, EDataPtrType_Thin);
+	return pType->GetDataPtrType (EType_DataRef, EDataPtrType_Lean);
 }
 
 bool

@@ -19,15 +19,18 @@ DataPtrIncrementOperator (
 	
 	CDataPtrType* pOpType = (CDataPtrType*) OpValue1.GetType ();
 	CDataPtrType* pResultType = pOpType->GetUnCheckedPtrType ();
-	
-	if (pOpType->GetPtrTypeKind () == EDataPtrType_Thin)
+
+	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
+	if (PtrTypeKind == EDataPtrType_Thin)
 	{
 		pModule->m_LlvmIrBuilder.CreateGep (OpValue1, OpValue2, pResultType, pResultValue);
-		
-		if (!(pOpType->GetFlags () & EPtrTypeFlag_Unsafe))
-			pResultValue->SetThinDataPtr (pResultValue->GetLlvmValue (), pResultType, OpValue1.GetThinDataPtrValidator ());
 	}
-	else
+	else if (PtrTypeKind == EDataPtrType_Lean)
+	{
+		pModule->m_LlvmIrBuilder.CreateGep (OpValue1, OpValue2, pResultType, pResultValue);
+		pResultValue->SetLeanDataPtr (pResultValue->GetLlvmValue (), pResultType, OpValue1.GetLeanDataPtrValidator ());
+	}
+	else // EDataPtrType_Normal
 	{
 		CValue PtrValue;
 		pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue1, 0, NULL, &PtrValue);

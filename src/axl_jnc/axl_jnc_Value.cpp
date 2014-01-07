@@ -101,7 +101,7 @@ CValue::Clear ()
 	m_pItem = NULL;
 	m_pLlvmValue = NULL;
 	m_Closure = ref::EPtr_Null;
-	m_ThinDataPtrValidator = ref::EPtr_Null;
+	m_LeanDataPtrValidator = ref::EPtr_Null;
 }
 
 llvm::Value*
@@ -346,7 +346,7 @@ CValue::SetVariable (CVariable* pVariable)
 		m_pType = pType->GetDataPtrType (
 			pVariable->GetParentNamespace (),
 			EType_DataRef,
-			EDataPtrType_Thin,
+			EDataPtrType_Lean,
 			PtrTypeFlags
 			);
 }
@@ -424,37 +424,37 @@ CValue::SetLlvmValue (
 }
 
 void
-CValue::SetThinDataPtrValidator (CThinDataPtrValidator* pValidator)
+CValue::SetLeanDataPtrValidator (CLeanDataPtrValidator* pValidator)
 {
 	ASSERT (m_pType->GetTypeKindFlags () & ETypeKindFlag_DataPtr);
-	ASSERT (((CDataPtrType*) m_pType)->GetPtrTypeKind () == EDataPtrType_Thin);
+	ASSERT (((CDataPtrType*) m_pType)->GetPtrTypeKind () == EDataPtrType_Lean);
 
-	m_ThinDataPtrValidator = pValidator;
+	m_LeanDataPtrValidator = pValidator;
 }
 
 void
-CValue::SetThinDataPtrValidator (const CValue& ValidatorValue)
+CValue::SetLeanDataPtrValidator (const CValue& ValidatorValue)
 {
-	ref::CPtrT <CThinDataPtrValidator> Validator = AXL_REF_NEW (CThinDataPtrValidator);
-	Validator->m_ValidatorKind = EThinDataPtrValidator_Simple;
+	ref::CPtrT <CLeanDataPtrValidator> Validator = AXL_REF_NEW (CLeanDataPtrValidator);
+	Validator->m_ValidatorKind = ELeanDataPtrValidator_Simple;
 	Validator->m_ScopeValidatorValue = ValidatorValue;
-	SetThinDataPtrValidator (Validator);
+	SetLeanDataPtrValidator (Validator);
 }
 
 void
-CValue::SetThinDataPtrValidator (
+CValue::SetLeanDataPtrValidator (
 	const CValue& ScopeValidatorValue,
 	const CValue& RangeBeginValue,
 	const CValue& SizeValue
 	)
 {
-	ref::CPtrT <CThinDataPtrValidator> Validator = AXL_REF_NEW (CThinDataPtrValidator);
-	Validator->m_ValidatorKind = EThinDataPtrValidator_Complex;
+	ref::CPtrT <CLeanDataPtrValidator> Validator = AXL_REF_NEW (CLeanDataPtrValidator);
+	Validator->m_ValidatorKind = ELeanDataPtrValidator_Complex;
 	Validator->m_ScopeValidatorValue = ScopeValidatorValue;
 	Validator->m_RangeBeginValue = RangeBeginValue;
 	Validator->m_SizeValue = SizeValue;
 
-	SetThinDataPtrValidator (Validator);
+	SetLeanDataPtrValidator (Validator);
 }
 
 bool

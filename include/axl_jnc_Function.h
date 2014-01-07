@@ -74,6 +74,222 @@ GetFunctionKindFlags (EFunction FunctionKind);
 
 //.............................................................................
 
+enum EStdFunc
+{
+	// void
+	// jnc.RuntimeError (
+	//		int Error,
+	//		int8* pCodeAddr
+	//		);
+
+	EStdFunc_RuntimeError,
+
+	// void
+	// jnc.CheckNullPtr (
+	//		int8* p,
+	//		int Error
+	//		);
+
+	EStdFunc_CheckNullPtr,
+
+	// void
+	// jnc.CheckScopeLevel (
+	//		jnc.TObjHdr* pSrcObject
+	//		jnc.TObjHdr* pDstObject
+	//		);
+
+	EStdFunc_CheckScopeLevel,
+
+	// void
+	// jnc.CheckClassPtrScopeLevel (
+	//		object* p,
+	//		jnc.TObjHdr* pDstObject
+	//		);
+
+	EStdFunc_CheckClassPtrScopeLevel,
+
+	// void
+	// jnc.CheckDataPtrRange (
+	//		int8* p,
+	//		size_t Size,
+	//		int8* pRangeBegin,
+	//		int8* pRangeEnd
+	//		);
+
+	EStdFunc_CheckDataPtrRange,
+
+	// object*
+	// jnc.DynamicCastClassPtr (
+	//		object* p,
+	//		int8* pType
+	//		);
+
+	EStdFunc_DynamicCastClassPtr,
+
+	// object*
+	// jnc.StrengthenClassPtr (weak object* p);
+
+	EStdFunc_StrengthenClassPtr,
+
+	// size_t
+	// jnc.GetDataPtrSpan (jnc.TDataPtr Ptr);
+
+	EStdFunc_GetDataPtrSpan,
+
+	// int8*
+	// jnc.GcAllocate (
+	//		int8* pType,
+	//		size_t Count
+	//		);
+
+	EStdFunc_GcAllocate,
+
+	// int8*
+	// jnc.GcAllocate (
+	//		int8* pType,
+	//		size_t Count
+	//		);
+
+	EStdFunc_GcTryAllocate,
+
+	// void
+	// jnc.GcEnter ();
+
+	EStdFunc_GcEnter,
+
+	// void
+	// jnc.GcLeave ();
+
+	EStdFunc_GcLeave,
+
+	// void
+	// jnc.GcPulse ();
+
+	EStdFunc_GcPulse,
+
+	// void
+	// jnc.MarkGcRoot (
+	//		int8* p,
+	//		int8* pType
+	//		);
+
+	EStdFunc_MarkGcRoot,
+
+	// void
+	// jnc.RunGc ();
+
+	EStdFunc_RunGc,
+
+	// i64
+	// jnc.GetCurrentThreadId ();
+
+	EStdFunc_GetCurrentThreadId,
+
+	// i64
+	// jnc.CreateThread (function* pf ());
+
+	EStdFunc_CreateThread,
+
+	// void
+	// jnc.Sleep (uint_t MsCount);
+
+	EStdFunc_Sleep,
+
+	// uint64_t
+	// jnc.getTimestamp ();
+
+	EStdFunc_GetTimestamp,
+
+	// size_t
+	// strlen (nullable const char* p);
+
+	EStdFunc_StrLen,
+
+	// int
+	// rand ();
+
+	EStdFunc_Rand,
+
+	// int
+	// printf ();
+
+	EStdFunc_Printf,
+
+	// jnc.TTlsStruct*
+	// jnc.GetTls ();
+
+	EStdFunc_GetTls,
+
+	// size_t
+	// jnc.AppendFmtLiteral_a (
+	//		jnc.TFmtLiteral* pLiteral,
+	//		char* p,
+	//		size_t Length
+	//		);
+
+	EStdFunc_AppendFmtLiteral_a,
+
+	// size_t
+	// jnc.AppendFmtLiteral_p (
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
+	//		jnc.TPtr Ptr
+	//		);
+
+	EStdFunc_AppendFmtLiteral_p,
+
+	// size_t
+	// jnc.AppendFmtLiteral_i32 (
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
+	//		i32 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_i32,
+
+	// size_t
+	// jnc.AppendFmtLiteral_ui32 (
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
+	//		i32 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_ui32,
+
+	// size_t
+	// jnc.AppendFmtLiteral_i64 (
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
+	//		i64 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_i64,
+
+	// size_t
+	// jnc.AppendFmtLiteral_ui64 (
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
+	//		i64 i
+	//		);
+
+	EStdFunc_AppendFmtLiteral_ui64,
+
+	// size_t
+	// jnc.AppendFmtLiteral_f (
+	//		jnc.TFmtLiteral* pFmtLiteral,
+	//		char* pFmtSpecifier,
+	//		double f
+	//		);
+
+	EStdFunc_AppendFmtLiteral_f,
+
+	EStdFunc_SimpleMulticastCall,
+
+	EStdFunc__Count
+};
+
+//.............................................................................
+
 // shared between CFunction and COrphan
 
 class CFunctionName
@@ -225,17 +441,6 @@ public:
 	IsVirtual ()
 	{
 		return m_StorageKind >= EStorage_Abstract && m_StorageKind <= EStorage_Override;
-	}
-
-	bool
-	NeedsVTablePtrCut ()
-	{
-		return
-			(m_FunctionKind == EFunction_PreConstructor ||
-			m_FunctionKind == EFunction_Constructor ||
-			m_FunctionKind == EFunction_Destructor) &&
-			m_pThisType &&
-			m_pThisType->GetTypeKind () == EType_ClassPtr;
 	}
 
 	CClassType*
@@ -441,6 +646,26 @@ public:
 	virtual
 	bool
 	Compile ();
+};
+
+//.............................................................................
+
+class CLazyStdFunction: public CLazyModuleItem
+{
+	friend class CFunctionMgr;
+
+protected:
+	EStdFunc m_Func;
+
+public:
+	CLazyStdFunction ()
+	{
+		m_Func = (EStdFunc) -1;
+	}
+
+	virtual
+	CModuleItem*
+	GetActualItem ();
 };
 
 //.............................................................................

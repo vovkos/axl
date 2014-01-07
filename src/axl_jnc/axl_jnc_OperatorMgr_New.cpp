@@ -12,35 +12,38 @@ bool
 COperatorMgr::Allocate (
 	EStorage StorageKind,
 	CType* pType,
-	const CValue& SizeValue,
+	const CValue& ElementCountValue,
 	const char* pTag,
 	CValue* pResultValue
 	)
 {
+	ASSERT (!ElementCountValue || ElementCountValue.GetType ()->GetTypeKind () == EType_SizeT);
+
 	CType* pPtrType = pType->GetDataPtrType_c ();
 
-	bool IsNonConstSizeArray = SizeValue.GetValueKind () != EValue_Const;
-	if (!IsNonConstSizeArray)
+	bool IsNonConstSizeArray = ElementCountValue && ElementCountValue.GetValueKind () != EValue_Const;
+	if (IsNonConstSizeArray)
 	{
-		size_t Size = SizeValue.GetSizeT ();
-		if (Size != pType->GetSize ())
+		if (StorageKind != EStorage_Heap && StorageKind != EStorage_UHeap)
 		{
-			ASSERT (Size % pType->GetSize () == 0);
-			size_t ElementCount = Size / pType->GetSize ();
-			pType = m_pModule->m_TypeMgr.GetArrayType (pType, ElementCount);
+			err::SetFormatStringError ("cannot create non-const-sized arrays with '%s new'", GetStorageKindString (StorageKind));
+			return false;
 		}
 	}
-	else if (StorageKind != EStorage_Heap && StorageKind != EStorage_UHeap)
+	else if (ElementCountValue.GetValueKind () == EValue_Const)
 	{
-		err::SetFormatStringError ("cannot create non-const-sized arrays with '%s new'", GetStorageKindString (StorageKind));
-		return false;
+		size_t Count = ElementCountValue.GetSizeT ();
+		if (Count > 1)
+			pType = m_pModule->m_TypeMgr.GetArrayType (pType, Count);
 	}
 
 	CVariable* pVariable;
 	CFunction* pFunction;
 	CBasicBlock* pPrevBlock;
 
+	CValue TypeValue;
 	CValue PtrValue;
+
 	switch (StorageKind)
 	{
 	case EStorage_Static:
@@ -71,15 +74,31 @@ COperatorMgr::Allocate (
 
 	case EStorage_Heap:
 		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcAllocate);
-		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
-		MarkGcRoot (PtrValue, pType);
+
+		TypeValue.CreateConst (&pType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
+		
+		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+		m_pModule->m_LlvmIrBuilder.CreateCall2 (
+			pFunction, 
+			pFunction->GetType (), 
+			TypeValue,
+			IsNonConstSizeArray ? 
+				ElementCountValue : 
+				CValue (1, m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)),
+			&PtrValue
+			);
+
+		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter); // <-- in fact, redundant: gcAllocate calls gcEnter internally
+
+		// add local-heap-root (use thin-data-ptr to distinguish it from real gc-roots)
+
+		MarkGcRoot (PtrValue, pType->GetDataPtrType_c ());
 		break;
-/*
+
 	case EStorage_UHeap:
-		pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_UHeapAlloc);
-		m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), SizeValue, &PtrValue);
-		break;
- */
+		err::SetFormatStringError ("manual memory management is not supported yet");
+		return false;
+
 	default:
 		err::SetFormatStringError ("invalid storage specifier '%s' in 'new' operator", GetStorageKindString (StorageKind));
 		return false;
@@ -94,29 +113,42 @@ COperatorMgr::Prime (
 	EStorage StorageKind,
 	const CValue& PtrValue,
 	CType* pType,
-	const CValue& ArraySizeValue,
+	const CValue& ElementCountValue,
 	CValue* pResultValue
 	)
 {
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	CValue ScopeLevelValue;
-
-	if (StorageKind == EStorage_Stack)
-	{
-		ASSERT (pScope);
-		ScopeLevelValue = CalcScopeLevelValue (pScope);
-	}
-	else
-		ScopeLevelValue.SetConstSizeT (0);
 
 	if (pType->GetTypeKind () != EType_Class)
 	{
 		m_pModule->m_LlvmIrBuilder.CreateStore (pType->GetZeroValue (), PtrValue);
 
-		pResultValue->SetThinDataPtr (
+		CValue ObjHdrValue;
+		switch (StorageKind)
+		{
+		case EStorage_Static:
+		case EStorage_Thread:
+			ObjHdrValue = m_pModule->m_NamespaceMgr.GetStaticObjHdr ();
+			break;
+
+		case EStorage_Stack:
+			ObjHdrValue = m_pModule->m_NamespaceMgr.GetScopeLevelObjHdr (pScope);
+			break;
+
+		case EStorage_Heap:
+			m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr), &ObjHdrValue);
+			m_pModule->m_LlvmIrBuilder.CreateGep (ObjHdrValue, -1, ObjHdrValue.GetType (), &ObjHdrValue);
+			break;
+
+		default:
+			err::SetFormatStringError ("cannot prime '%s' value", GetStorageKindString (StorageKind));
+			return false;
+		}
+
+		pResultValue->SetLeanDataPtr (
 			PtrValue.GetLlvmValue (),
-			pType->GetDataPtrType (EDataPtrType_Thin),
-			ScopeLevelValue,
+			pType->GetDataPtrType (EDataPtrType_Lean),
+			ObjHdrValue,
 			PtrValue,
 			pType->GetSize ()
 			);
@@ -130,15 +162,15 @@ COperatorMgr::Prime (
 	switch (StorageKind)
 	{
 	case EStorage_Static:
-		Flags |= EObjectFlag_Static;
+		Flags |= EObjHdrFlag_Static;
 		break;
 
 	case EStorage_Stack:
-		Flags |= EObjectFlag_Stack;
+		Flags |= EObjHdrFlag_Stack;
 		break;
 
 	case EStorage_UHeap:
-		Flags |= EObjectFlag_UHeap;
+		Flags |= EObjHdrFlag_UHeap;
 		break;
 	}
 
@@ -152,14 +184,33 @@ COperatorMgr::Prime (
 
 	CFunction* pPrimer = pClassType->GetPrimer ();
 
-	m_pModule->m_LlvmIrBuilder.CreateCall3 (
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
+	CValue ScopeLevelValue;
+	if (StorageKind == EStorage_Stack)
+	{
+		ASSERT (pScope);
+		ScopeLevelValue = CalcScopeLevel (pScope);
+	}
+	else 
+	{
+		ScopeLevelValue.SetConstSizeT (0);
+	}
+
+	CValue RootValue;
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (PtrValue, 0, NULL, &RootValue);
+
+	m_pModule->m_LlvmIrBuilder.CreateCall4 (
 		pPrimer,
 		pPrimer->GetType (),
 		PtrValue,
 		ScopeLevelValue,
+		RootValue,
 		CValue (Flags, EType_Int_p),
 		NULL
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	CFunction* pDestructor = pClassType->GetDestructor ();
 	if (StorageKind != EStorage_Stack || !pDestructor)
@@ -533,7 +584,7 @@ bool
 COperatorMgr::NewOperator (
 	EStorage StorageKind,
 	CType* pType,
-	const CValue& ElementCountValue,
+	const CValue& RawElementCountValue,
 	rtl::CBoxListT <CValue>* pArgList,
 	CValue* pResultValue
 	)
@@ -543,25 +594,22 @@ COperatorMgr::NewOperator (
 	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 	ASSERT (pScope);
 
-	CValue SizeValue (pType->GetSize (), m_pModule->GetSimpleType (EType_SizeT));
-	if (ElementCountValue)
+	CValue ElementCountValue;
+	if (RawElementCountValue)
 	{
-		Result =
-			BinaryOperator (EBinOp_Mul, &SizeValue, ElementCountValue) &&
-			CastOperator (&SizeValue, EType_SizeT);
-
+		Result = CastOperator (RawElementCountValue, EType_SizeT, &ElementCountValue);
 		if (!Result)
 			return false;
 	}
 
 	CValue PtrValue;
-	Result = Allocate (StorageKind, pType, SizeValue, "new", &PtrValue);
+	Result = Allocate (StorageKind, pType, ElementCountValue, "new", &PtrValue);
 	if (!Result)
 		return false;
 
 	if (StorageKind != EStorage_Static && StorageKind != EStorage_Thread)
 		return
-			Prime (StorageKind, PtrValue, pType, SizeValue, pResultValue) &&
+			Prime (StorageKind, PtrValue, pType, ElementCountValue, pResultValue) &&
 			Construct (*pResultValue, pArgList);
 
 	TOnceStmt Stmt;
@@ -575,7 +623,7 @@ COperatorMgr::NewOperator (
 		return false;
 
 	Result =
-		Prime (StorageKind, PtrValue, pType, SizeValue, pResultValue) &&
+		Prime (StorageKind, PtrValue, pType, ElementCountValue, pResultValue) &&
 		Construct (*pResultValue, pArgList);
 
 	if (!Result)

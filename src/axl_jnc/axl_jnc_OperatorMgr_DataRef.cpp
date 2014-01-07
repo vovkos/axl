@@ -8,43 +8,7 @@ namespace jnc {
 //.............................................................................
 
 void
-COperatorMgr::GetClassPtrScopeLevel (
-	const CValue& Value,
-	CValue* pResultValue
-	)
-{
-	ASSERT (Value.GetType ()->GetTypeKind () == EType_ClassPtr);
-
-	CValue ObjPtrValue;
-	
-	static int32_t LlvmIndexArray [] = 
-	{
-		0, // iface* 
-		0, // iface.hdr*
-		1, // TObject**
-	};
-
-	m_pModule->m_LlvmIrBuilder.CreateGep (
-		Value, 
-		LlvmIndexArray, 
-		countof (LlvmIndexArray), 
-		NULL, 
-		&ObjPtrValue
-		);  
-
-	m_pModule->m_LlvmIrBuilder.CreateLoad (ObjPtrValue, NULL, &ObjPtrValue); // TObject* 
-
-	CValue ScopeLevelValue;
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjPtrValue, 1, NULL, &ScopeLevelValue);  // size_t* m_pScopeLevel
-	m_pModule->m_LlvmIrBuilder.CreateLoad (
-		ScopeLevelValue, 
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT), 
-		pResultValue
-		); 
-}
-
-void
-COperatorMgr::GetThinDataPtrScopeLevel (
+COperatorMgr::GetLeanDataPtrObjHdr (
 	const CValue& Value,
 	CValue* pResultValue
 	)
@@ -54,42 +18,43 @@ COperatorMgr::GetThinDataPtrScopeLevel (
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
 	{	
-		CalcScopeLevelValue (Value.GetVariable ()->GetScope (), pResultValue);
+		*pResultValue = m_pModule->m_NamespaceMgr.GetScopeLevelObjHdr (Value.GetVariable ()->GetScope ());
 		return;
 	}
 
-	ASSERT (Value.GetThinDataPtrValidator ());
-	CValue ScopeValidatorValue = Value.GetThinDataPtrValidator ()->GetScopeValidator ();
+	ASSERT (Value.GetLeanDataPtrValidator ());
+	CValue ScopeValidatorValue = Value.GetLeanDataPtrValidator ()->GetScopeValidator ();
 
 	if (ScopeValidatorValue.GetValueKind () == EValue_Variable)
 	{
-		CalcScopeLevelValue (ScopeValidatorValue.GetVariable ()->GetScope (), pResultValue);
+		*pResultValue = m_pModule->m_NamespaceMgr.GetScopeLevelObjHdr (ScopeValidatorValue.GetVariable ()->GetScope ());
 		return;
 	}
 	
-	EType TypeKind = ScopeValidatorValue.GetType ()->GetTypeKind ();
-	switch (TypeKind)
+	CType* pScopeValidatorType = ScopeValidatorValue.GetType ();
+	CType* pResultType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr);
+	if (pScopeValidatorType->Cmp (pResultType) == 0)
 	{
-	case EType_SizeT:
 		*pResultValue = ScopeValidatorValue;
-		break;
+	}
+	else if (pScopeValidatorType->GetTypeKind () == EType_ClassPtr)
+	{
+		static int LlvmIndexArray [] = { 0, 0, 1 }; // Iface*, IfaceHdr**, ObjHdr**
 
-	case EType_DataPtr:
-		ASSERT (((CDataPtrType*) ScopeValidatorValue.GetType ())->GetPtrTypeKind () == EDataPtrType_Normal);
-		m_pModule->m_LlvmIrBuilder.CreateExtractValue (ScopeValidatorValue, 3, m_pModule->GetSimpleType (EType_SizeT), pResultValue);
-		break;
-
-	case EType_ClassPtr:
-		GetClassPtrScopeLevel (ScopeValidatorValue, pResultValue);
-		break;
-
-	default:
-		ASSERT (false);
+		CValue ObjHdrValue;
+		m_pModule->m_LlvmIrBuilder.CreateGep (ScopeValidatorValue, LlvmIndexArray, 3, NULL, &ObjHdrValue);
+		m_pModule->m_LlvmIrBuilder.CreateLoad (ObjHdrValue, pResultType, pResultValue);
+	}
+	else
+	{
+		ASSERT (pScopeValidatorType->GetTypeKind () == EType_DataPtr);
+		ASSERT (((CDataPtrType*) pScopeValidatorType)->GetPtrTypeKind () == EDataPtrType_Normal);
+		m_pModule->m_LlvmIrBuilder.CreateExtractValue (ScopeValidatorValue, 3, pResultType, pResultValue);
 	}
 }
 
 void
-COperatorMgr::GetThinDataPtrRange (
+COperatorMgr::GetLeanDataPtrRange (
 	const CValue& Value,
 	CValue* pRangeBeginValue,
 	CValue* pRangeEndValue
@@ -99,7 +64,7 @@ COperatorMgr::GetThinDataPtrRange (
 
 	CType* pBytePtrType = m_pModule->GetSimpleType (EStdType_BytePtr);
 
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "calc thin data pointer range");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "calc lean data pointer range");
 
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
@@ -110,17 +75,17 @@ COperatorMgr::GetThinDataPtrRange (
 		return;
 	}
 
-	CThinDataPtrValidator* pValidator = Value.GetThinDataPtrValidator ();
+	CLeanDataPtrValidator* pValidator = Value.GetLeanDataPtrValidator ();
 	ASSERT (pValidator);
 
-	if (pValidator->GetValidatorKind () == EThinDataPtrValidator_Complex)
+	if (pValidator->GetValidatorKind () == ELeanDataPtrValidator_Complex)
 	{
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (pValidator->GetRangeBegin (), pBytePtrType, pRangeBeginValue);
 		m_pModule->m_LlvmIrBuilder.CreateGep (*pRangeBeginValue, pValidator->GetSizeValue (), pBytePtrType, pRangeEndValue);
 		return;
 	}
 
-	ASSERT (pValidator->GetValidatorKind () == EThinDataPtrValidator_Simple);
+	ASSERT (pValidator->GetValidatorKind () == ELeanDataPtrValidator_Simple);
 	CValue ValidatorValue = pValidator->GetScopeValidator ();
 
 	if (ValidatorValue.GetValueKind () == EValue_Variable)
@@ -157,20 +122,25 @@ COperatorMgr::PrepareDataPtr (
 
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-		if (pType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
+		pResultValue->OverrideType (Value, pResultType);
+		return true;
+	}
+	else if (PtrTypeKind == EDataPtrType_Lean)
+	{
+		if (pType->GetFlags () & EPtrTypeFlag_Checked)
 		{
 			pResultValue->OverrideType (Value, pResultType);
 			return true;
 		}
 
 		PtrValue.OverrideType (Value, pResultType);
-		GetThinDataPtrRange (Value, &RangeBeginValue, &RangeEndValue);
+		GetLeanDataPtrRange (Value, &RangeBeginValue, &RangeEndValue);
 	}
-	else
+	else // EDataPtrType_Normal
 	{
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (Value, 0, pResultType, &PtrValue);
 
-		if (pType->GetFlags () & (EPtrTypeFlag_Checked | EPtrTypeFlag_Unsafe))
+		if (pType->GetFlags () & EPtrTypeFlag_Checked)
 		{
 			*pResultValue = PtrValue;
 			return true;

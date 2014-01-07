@@ -341,7 +341,7 @@ COperatorMgr::CallOperator (
 }
 
 bool
-COperatorMgr::CalcScopeLevelValue (
+COperatorMgr::CalcScopeLevel (
 	CScope* pScope,
 	CValue* pScopeLevelValue
 	)
@@ -542,7 +542,7 @@ COperatorMgr::CallImpl (
 	if (ScopeLevelValue)
 	{
 		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		CValue ScopeLevelValue = CalcScopeLevelValue (pScope);
+		CValue ScopeLevelValue = CalcScopeLevel (pScope);
 
 		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "update scope level before call");
 		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);

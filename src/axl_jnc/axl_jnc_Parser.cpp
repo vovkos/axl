@@ -1382,6 +1382,10 @@ CParser::CreateFormalArg (
 	if (!pType)
 		return NULL;
 
+	bool IsThinDataPtr = 
+		pType->GetTypeKind () == EType_DataPtr && 
+		((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin;
+
 	switch (m_StorageKind)
 	{
 	case EStorage_Undefined:
@@ -1389,13 +1393,18 @@ CParser::CreateFormalArg (
 		// and fall through
 
 	case EStorage_Stack:
-		if (pType->GetTypeKindFlags () & ETypeKindFlag_Ptr)
+		if ((pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) && !IsThinDataPtr)
 			pType = m_pModule->m_TypeMgr.GetCheckedPtrType (pType);
 
 		break;
 
 	case EStorage_Nullable:
-		if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr))
+		if (IsThinDataPtr)
+		{
+			err::SetFormatStringError ("'nullable' is irrelevant when applied to '%s'", pType->GetTypeString ().cc ());
+			return NULL;
+		}
+		else if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr))
 		{
 			err::SetFormatStringError ("'nullable' can only be applied to pointers");
 			return NULL;
@@ -1918,7 +1927,7 @@ CParser::LookupIdentifier (
 	if (!pItem)
 	{
 		if (Name == "__scopeLevel") // tmp
-			return m_pModule->m_OperatorMgr.CalcScopeLevelValue (m_pModule->m_NamespaceMgr.GetCurrentScope (), pValue);
+			return m_pModule->m_OperatorMgr.CalcScopeLevel (m_pModule->m_NamespaceMgr.GetCurrentScope (), pValue);
 
 		err::SetFormatStringError ("undeclared identifier '%s'", Name.cc ());
 		err::PushSrcPosError (m_pModule->m_UnitMgr.GetCurrentUnit ()->GetFilePath (), Pos);
@@ -2078,7 +2087,7 @@ CParser::LookupIdentifierType (
 		break;
 
 	case EModuleItem_Variable:
-		pValue->SetType (((CVariable*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
+		pValue->SetType (((CVariable*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Lean));
 		break;
 
 	case EModuleItem_Alias:
@@ -2116,7 +2125,7 @@ CParser::LookupIdentifierType (
 		break;
 
 	case EModuleItem_StructField:
-		pValue->SetType (((CStructField*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Thin));
+		pValue->SetType (((CStructField*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Lean));
 		break;
 
 	default:
@@ -2339,6 +2348,8 @@ CParser::AppendFmtLiteral (
 	CValue LengthValue;
 	LengthValue.SetConstSizeT (Length);
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	CValue ResultValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
@@ -2348,6 +2359,8 @@ CParser::AppendFmtLiteral (
 		LengthValue,
 		&ResultValue
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }
@@ -2418,6 +2431,8 @@ CParser::AppendFmtLiteralValue (
 		FmtSpecifierValue = GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ()->GetZeroValue ();
 	}
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	CValue ResultValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
@@ -2427,6 +2442,8 @@ CParser::AppendFmtLiteralValue (
 		ArgValue,
 		&ResultValue
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }
@@ -2453,6 +2470,9 @@ CParser::AppendFmtLiteralBinValue (
 	m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, "tmpFmtValue", NULL, &TmpValue);
 	m_pModule->m_LlvmIrBuilder.CreateStore (SrcValue, TmpValue);
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (TmpValue, pArgType, &TmpValue);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
@@ -2461,6 +2481,8 @@ CParser::AppendFmtLiteralBinValue (
 		SizeValue,
 		&ResultValue
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }
@@ -2484,6 +2506,7 @@ CParser::FinalizeLiteral (
 
 	CValue PtrValue;
 	CValue SizeValue;
+	CValue ObjHdrValue;
 
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (pLiteral->m_FmtLiteralValue, 0, NULL, &PtrValue);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (PtrValue, NULL, &PtrValue);
@@ -2492,10 +2515,14 @@ CParser::FinalizeLiteral (
 	m_pModule->m_LlvmIrBuilder.CreateLoad (SizeValue, NULL, &SizeValue);
 	m_pModule->m_LlvmIrBuilder.CreateAdd_i (SizeValue, CValue (1, EType_SizeT), NULL, &SizeValue);
 
-	pResultValue->SetThinDataPtr (
+	CType* pObjHdrPtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr);
+	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pObjHdrPtrType, &ObjHdrValue);
+	m_pModule->m_LlvmIrBuilder.CreateGep (ObjHdrValue, -1, pObjHdrPtrType, &ObjHdrValue);
+
+	pResultValue->SetLeanDataPtr (
 		PtrValue.GetLlvmValue (),
-		GetSimpleType (m_pModule, EType_Char)->GetDataPtrType (EDataPtrType_Thin),
-		CValue ((int64_t) 0, GetSimpleType (m_pModule, EType_SizeT)),
+		GetSimpleType (m_pModule, EType_Char)->GetDataPtrType (EDataPtrType_Lean),
+		ObjHdrValue,
 		PtrValue,
 		SizeValue
 		);

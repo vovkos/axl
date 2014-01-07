@@ -46,17 +46,17 @@ CCast_DataPtr_FromArray::ConstCast (
 
 	// #pragma AXL_TODO ("create a global constant holding the array")
 
-	if (pDstType->GetPtrTypeKind () == EDataPtrType_Thin)
-	{
-		*(void**) pDst = p;
-	}
-	else
+	if (pDstType->GetPtrTypeKind () == EDataPtrType_Normal)
 	{
 		TDataPtr* pPtr = (TDataPtr*) pDst;
 		pPtr->m_p = p;
 		pPtr->m_pRangeBegin = p;
 		pPtr->m_pRangeEnd = (char*) p + pSrcType->GetSize ();
-		pPtr->m_pObject = GetStaticObject ();
+		pPtr->m_pObject = GetStaticObjHdr ();
+	}
+	else // thin or lean
+	{
+		*(void**) pDst = p;
 	}
 
 	return true;
@@ -77,14 +77,11 @@ CCast_DataPtr_Base::GetCastKind (
 	CType* pSrcDataType = pSrcType->GetTargetType ();
 	CType* pDstDataType = pDstType->GetTargetType ();
 
-	if (!(pDstType->GetFlags () & EPtrTypeFlag_Unsafe))
-	{		
-		if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ()) 
-			return ECast_None; // const vs non-const mismatch
+	if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ()) 
+		return ECast_None; // const vs non-const mismatch
 
-		if ((pDstDataType->GetFlags () & ETypeFlag_Pod) != (pSrcDataType->GetFlags () & ETypeFlag_Pod))
-			return ECast_None; // pod vs non-pod mismatch
-	}
+	if ((pDstDataType->GetFlags () & ETypeFlag_Pod) != (pSrcDataType->GetFlags () & ETypeFlag_Pod))
+		return ECast_None; // pod vs non-pod mismatch
 
 	if (pSrcDataType->Cmp (pDstDataType) == 0 || pDstDataType->GetTypeKind () == EType_Void)
 		return ECast_Implicit;	
@@ -230,7 +227,7 @@ CCast_DataPtr_Normal2Normal::LlvmCast (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
-CCast_DataPtr_Thin2Normal::ConstCast (
+CCast_DataPtr_Lean2Normal::ConstCast (
 	const CValue& OpValue,
 	CType* pType,
 	void* pDst
@@ -240,7 +237,7 @@ CCast_DataPtr_Thin2Normal::ConstCast (
 	ASSERT (pType->GetTypeKind () == EType_DataPtr);
 
 	EDataPtrType SrcPtrTypeKind = ((CDataPtrType*) OpValue.GetType ())->GetPtrTypeKind ();
-	ASSERT (SrcPtrTypeKind == EDataPtrType_Thin);
+	ASSERT (SrcPtrTypeKind == EDataPtrType_Lean);
 
 	intptr_t Offset = GetOffset ((CDataPtrType*) OpValue.GetType (), (CDataPtrType*) pType, NULL);
 
@@ -250,13 +247,12 @@ CCast_DataPtr_Thin2Normal::ConstCast (
 	pDstPtr->m_p = (char*) pSrc + Offset;
 	pDstPtr->m_pRangeBegin = NULL;
 	pDstPtr->m_pRangeEnd = (void*) -1;
-	pDstPtr->m_pObject = GetStaticObject ();
-
+	pDstPtr->m_pObject = GetStaticObjHdr ();
 	return true;
 }
 
 bool
-CCast_DataPtr_Thin2Normal::LlvmCast (
+CCast_DataPtr_Lean2Normal::LlvmCast (
 	EStorage StorageKind,
 	const CValue& OpValue,
 	CType* pType,
@@ -267,53 +263,30 @@ CCast_DataPtr_Thin2Normal::LlvmCast (
 	ASSERT (pType->GetTypeKind () == EType_DataPtr);
 
 	EDataPtrType SrcPtrTypeKind = ((CDataPtrType*) OpValue.GetType ())->GetPtrTypeKind ();
-	ASSERT (SrcPtrTypeKind == EDataPtrType_Thin);
+	ASSERT (SrcPtrTypeKind == EDataPtrType_Lean);
 
 	CValue PtrValue;
 	CDataPtrType* pUnsafePtrType = ((CDataPtrType*) pType)->GetTargetType ()->GetDataPtrType_c ();
 	GetOffsetUnsafePtrValue (OpValue, (CDataPtrType*) OpValue.GetType (), pUnsafePtrType, &PtrValue);
 
-	if (SrcPtrTypeKind == EDataPtrType_Thin)
-	{
-		CValue RangeBeginValue;
-		CValue RangeEndValue;
-		CValue ScopeLevelValue;
+	CValue RangeBeginValue;
+	CValue RangeEndValue;
+	CValue ObjHdrValue;
 
-		m_pModule->m_OperatorMgr.GetThinDataPtrRange (OpValue, &RangeBeginValue, &RangeEndValue);
+	m_pModule->m_OperatorMgr.GetLeanDataPtrRange (OpValue, &RangeBeginValue, &RangeEndValue);
 
-		if (pType->GetFlags () & EPtrTypeFlag_Checked)
-			m_pModule->m_OperatorMgr.CheckDataPtrRange (OpValue);
+	if (pType->GetFlags () & EPtrTypeFlag_Checked)
+		m_pModule->m_OperatorMgr.CheckDataPtrRange (OpValue);
 
-		m_pModule->m_OperatorMgr.GetThinDataPtrScopeLevel (OpValue, &ScopeLevelValue);
+	m_pModule->m_OperatorMgr.GetLeanDataPtrObjHdr (OpValue, &ObjHdrValue);
 
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "create safe data pointer");
+	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "create safe data pointer");
 
-		CValue ResultValue = pType->GetUndefValue ();
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
-	}
-	else
-	{
-		CType* pBytePtrType = m_pModule->GetSimpleType (EStdType_BytePtr);
-
-		void* pRangeBegin = NULL;
-		void* pRangeEnd = (void*) -1;
-
-		CValue RangeBeginValue (&pRangeBegin, pBytePtrType);
-		CValue RangeEndValue (&pRangeEnd, pBytePtrType);
-		CValue ScopeLevelValue ((int64_t) 0, EType_SizeT);
-
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "create safe data pointer");
-
-		CValue ResultValue = pType->GetUndefValue ();
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
-		m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, ScopeLevelValue, 3, pType, pResultValue);
-	}
-
+	CValue ResultValue = pType->GetUndefValue ();
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, PtrValue, 0, NULL, &ResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeBeginValue, 1, NULL, &ResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, RangeEndValue, 2, NULL, &ResultValue);
+	m_pModule->m_LlvmIrBuilder.CreateInsertValue (ResultValue, ObjHdrValue, 3, pType, pResultValue);
 	return true;
 }
 
@@ -354,6 +327,23 @@ CCast_DataPtr_Normal2Thin::LlvmCast (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
+CCast_DataPtr_Lean2Thin::LlvmCast (
+	EStorage StorageKind,
+	const CValue& OpValue,
+	CType* pType,
+	CValue* pResultValue
+	)
+{
+	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataPtr);
+	ASSERT (pType->GetTypeKind () == EType_DataPtr);
+
+	GetOffsetUnsafePtrValue (OpValue, (CDataPtrType*) OpValue.GetType (), (CDataPtrType*) pType, pResultValue);
+	return true;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
 CCast_DataPtr_Thin2Thin::ConstCast (
 	const CValue& OpValue,
 	CType* pType,
@@ -368,21 +358,6 @@ CCast_DataPtr_Thin2Thin::ConstCast (
 	return true;
 }
 
-bool
-CCast_DataPtr_Thin2Thin::LlvmCast (
-	EStorage StorageKind,
-	const CValue& OpValue,
-	CType* pType,
-	CValue* pResultValue
-	)
-{
-	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataPtr);
-	ASSERT (pType->GetTypeKind () == EType_DataPtr);
-
-	GetOffsetUnsafePtrValue (OpValue, (CDataPtrType*) OpValue.GetType (), (CDataPtrType*) pType, pResultValue);
-	return true;
-}
-
 //.............................................................................
 
 CCast_DataPtr::CCast_DataPtr ()
@@ -391,7 +366,8 @@ CCast_DataPtr::CCast_DataPtr ()
 
 	m_OperatorTable [EDataPtrType_Normal] [EDataPtrType_Normal] = &m_Normal2Normal;
 	m_OperatorTable [EDataPtrType_Normal] [EDataPtrType_Thin]   = &m_Normal2Thin;
-	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Normal]   = &m_Thin2Normal;
+	m_OperatorTable [EDataPtrType_Lean] [EDataPtrType_Normal]   = &m_Lean2Normal;
+	m_OperatorTable [EDataPtrType_Lean] [EDataPtrType_Thin]     = &m_Lean2Thin;
 	m_OperatorTable [EDataPtrType_Thin] [EDataPtrType_Thin]     = &m_Thin2Thin;
 }
 
@@ -408,13 +384,7 @@ CCast_DataPtr::GetCastOperator (
 
 	CType* pSrcType = OpValue.GetType ();
 
-	if (pSrcType->GetTypeKindFlags () & ETypeKindFlag_Integer)
-	{
-		return DstPtrTypeKind == EDataPtrType_Thin && (pType->GetFlags () & EPtrTypeFlag_Unsafe) ? 
-			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) : 
-			NULL;
-	}
-	else if (pSrcType->GetTypeKind () == EType_Array)
+	if (pSrcType->GetTypeKind () == EType_Array)
 	{
 		return &m_FromArray;
 	}

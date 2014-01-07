@@ -11,34 +11,34 @@ namespace jnc {
 
 //.............................................................................
 
-enum EThinDataPtrValidator
+enum ELeanDataPtrValidator
 {
-	EThinDataPtrValidator_Undefined,
-	EThinDataPtrValidator_Simple,
-	EThinDataPtrValidator_Complex,
+	ELeanDataPtrValidator_Undefined,
+	ELeanDataPtrValidator_Simple,
+	ELeanDataPtrValidator_Complex,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CThinDataPtrValidator: public ref::CRefCount
+class CLeanDataPtrValidator: public ref::CRefCount
 {
 	friend class CValue;
 	friend class CConstMgr;
 
 protected:
-	EThinDataPtrValidator m_ValidatorKind;
+	ELeanDataPtrValidator m_ValidatorKind;
 
 	CValue m_ScopeValidatorValue;
 	CValue m_RangeBeginValue;
 	CValue m_SizeValue;
 
 public:
-	CThinDataPtrValidator ()
+	CLeanDataPtrValidator ()
 	{
-		m_ValidatorKind = EThinDataPtrValidator_Undefined;
+		m_ValidatorKind = ELeanDataPtrValidator_Undefined;
 	}
 
-	EThinDataPtrValidator 
+	ELeanDataPtrValidator 
 	GetValidatorKind ()
 	{
 		return m_ValidatorKind;

@@ -328,10 +328,17 @@ COperatorMgr::GetConditionalOperatorResultType (
 			GetArithmeticOperatorResultType (pTrueType, pFalseType) :
 			m_pModule->m_OperatorMgr.PrepareOperandType (pTrueType);
 
-	// if it's a safe thin pointer, make fatten it
+	// if it's a lean data pointer, fatten it
 
-	if (IsSafeThinDataPtrType (pResultType))
-		pResultType = ((CDataPtrType*) pResultType)->GetUnThinPtrType ();
+	if (pResultType->GetTypeKind () == EType_DataPtr &&
+		((CDataPtrType*) pResultType)->GetPtrTypeKind () == EDataPtrType_Lean)
+	{
+		pResultType = ((CDataPtrType*) pResultType)->GetTargetType ()->GetDataPtrType (
+			pResultType->GetTypeKind (), 
+			EDataPtrType_Normal, 
+			pResultType->GetFlags ()
+			);
+	}
 
 	bool Result = 
 		CheckCastKind (TrueValue, pResultType) && 
@@ -404,6 +411,12 @@ COperatorMgr::CastOperator (
 
 	if (RawOpValue.GetValueKind () == EValue_Null)
 	{
+		if ((pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) && (pType->GetFlags () & EPtrTypeFlag_Checked))
+		{
+			SetCastError (RawOpValue, pType);
+			return false;
+		}
+
 		if (pType->GetTypeKind () == EType_Void)
 			pResultValue->SetNull ();
 		else
@@ -675,11 +688,13 @@ COperatorMgr::PrepareOperandType (
 				}
 				else if (!(OpFlags & EOpFlag_KeepArrayRef))
 				{
+					EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
+
 					CArrayType* pArrayType = (CArrayType*) pTargetType;
 					Value = pArrayType->GetElementType ()->GetDataPtrType (
 						pPtrType->GetAnchorNamespace (), 
 						EType_DataPtr, 
-						EDataPtrType_Thin, 
+						PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean, 
 						pPtrType->GetFlags ()
 						);
 				}
@@ -792,28 +807,27 @@ COperatorMgr::PrepareOperand (
 				}
 				else if (!(OpFlags & EOpFlag_KeepArrayRef))
 				{
+					EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
+
 					CArrayType* pArrayType = (CArrayType*) pPtrType->GetTargetType ();
 					pType = pArrayType->GetElementType ()->GetDataPtrType (
 						pPtrType->GetAnchorNamespace (),
 						EType_DataPtr, 
-						EDataPtrType_Thin, 
+						PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean, 
 						pPtrType->GetFlags ()
 						);
 
 					CValue PrevValue = Value;
 					m_pModule->m_LlvmIrBuilder.CreateGep2 (Value, 0, pType, &Value);
 					
-					if (!(pPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
+					if (PtrTypeKind != EDataPtrType_Thin)
 					{
-						if (pPtrType->GetPtrTypeKind () == EDataPtrType_Thin)
-						{
-							if (PrevValue.GetValueKind () == EValue_Variable)
-								Value.SetThinDataPtrValidator (PrevValue);
-							else
-								Value.SetThinDataPtrValidator (PrevValue.GetThinDataPtrValidator ());
-						}
+						if (PtrTypeKind == EDataPtrType_Normal)
+							Value.SetLeanDataPtrValidator (PrevValue);
+						else if (PrevValue.GetValueKind () == EValue_Variable) // EDataPtrType_Lean
+							Value.SetLeanDataPtrValidator (PrevValue);
 						else
-							Value.SetThinDataPtrValidator (PrevValue);
+							Value.SetLeanDataPtrValidator (PrevValue.GetLeanDataPtrValidator ());
 					}
 				}
 			}

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_jnc_Scope.h"
+#include "axl_jnc_Module.h"
 
 namespace axl {
 namespace jnc {

@@ -52,7 +52,7 @@ int main ()
 	// p = null; // <-- uncomment to loose strong pointer, then object will get destructed next gc run
 
 	printf ("gc run...\n");
-	jnc.runGcWaitForDestructors ();
+	jnc.runGc ();
 
 	p = wp;
 	if (p)

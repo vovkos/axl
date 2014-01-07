@@ -251,14 +251,7 @@ CFunction::Compile ()
 
 		CFunction* pStaticConstructor = pParentType->GetStaticConstructor ();
 		if (pStaticConstructor)
-		{
-			CValue ReturnValue;
-			m_pModule->m_LlvmIrBuilder.CreateCall (
-				pStaticConstructor,
-				pStaticConstructor->GetType (),
-				&ReturnValue
-				);
-		}
+			m_pModule->m_OperatorMgr.CallOperator (pStaticConstructor);
 
 		CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 		ASSERT (ThisValue);
@@ -306,6 +299,15 @@ CFunction::Compile ()
 		return false;
 
 	return true;
+}
+
+//.............................................................................
+
+
+CModuleItem*
+CLazyStdFunction::GetActualItem ()
+{
+	return m_pModule->m_FunctionMgr.GetStdFunction (m_Func);
 }
 
 //.............................................................................

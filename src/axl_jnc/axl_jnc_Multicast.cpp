@@ -75,7 +75,7 @@ CMulticast::SetCount (
 }
 
 struct TMcSnapshotObject:
-	TObject,
+	TObjHdr,
 	TMcSnapshot
 {
 };
@@ -90,9 +90,12 @@ CMulticast::GetSnapshot ()
 	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
 
-	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocateObject (pSnapshotType);
+	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocate (pSnapshotType);
+	pSnapshot->m_ScopeLevel = 0;
+	pSnapshot->m_pRoot = pSnapshot;
 	pSnapshot->m_pType = pSnapshotType;
 	pSnapshot->m_pObject = pSnapshot;
+	pSnapshot->m_Flags = 0;
 
 	size_t Size = pMulticastType->GetTargetType ()->GetSize () * m_Count;
 	if (Size)

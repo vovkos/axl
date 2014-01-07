@@ -119,14 +119,20 @@ COperatorMgr::GetNamedTypeMemberType (
 	switch (MemberKind)
 	{
 	case EModuleItem_StructField:
-		return
-			(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_Ptr) ?
-				((CStructField*) pMember)->GetType ()->GetDataPtrType (
-					EType_DataRef,
-					EDataPtrType_Thin,
-					OpValue.GetType ()->GetFlags ()
-					) :
-				((CStructField*) pMember)->GetType ();
+		if (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr)
+		{
+			CDataPtrType* pPtrType = (CDataPtrType*) OpValue.GetType ();
+			EDataPtrType PtrTypeKind = pPtrType->GetPtrTypeKind ();
+			return ((CStructField*) pMember)->GetType ()->GetDataPtrType (
+				EType_DataRef,
+				PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean,
+				OpValue.GetType ()->GetFlags ()
+				);
+		}
+		else
+		{
+			return ((CStructField*) pMember)->GetType ();
+		}			
 
 	case EModuleItem_Function:
 		return ((CFunction*) pMember)->GetType ()->GetShortType ()->GetFunctionPtrType (
@@ -377,7 +383,7 @@ CClassPtrType*
 COperatorMgr::GetWeakenOperatorResultType (const CValue& OpValue)
 {
 	CType* pOpType = PrepareOperandType (OpValue);
-	if (pOpType->GetTypeKind () != EType_ClassPtr || (pOpType->GetFlags () & EPtrTypeFlag_Unsafe))
+	if (pOpType->GetTypeKind () != EType_ClassPtr)
 	{
 		err::SetFormatStringError ("'weak member' operator cannot be applied to '%s'", pOpType->GetTypeString ().cc ());
 		return NULL;
@@ -413,7 +419,7 @@ COperatorMgr::WeakenOperator (
 		return false;
 
 	CType* pOpType = OpValue.GetType ();
-	if (pOpType->GetTypeKind () != EType_ClassPtr || (pOpType->GetFlags () & EPtrTypeFlag_Unsafe))
+	if (pOpType->GetTypeKind () != EType_ClassPtr)
 	{
 		err::SetFormatStringError ("'weak member' operator cannot be applied to '%s'", pOpType->GetTypeString ().cc ());
 		return false;
@@ -423,132 +429,6 @@ COperatorMgr::WeakenOperator (
 	pResultValue->OverrideType (OpValue, pResultType);
 	return true;
 }
-
-#if 0
-
-CType*
-COperatorMgr::GetStdPropertyFieldType (
-	const CValue& RawOpValue,
-	EStdPropertyField Field
-	)
-{
-	CValue OpValue;
-	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
-
-	if (OpValue.GetValueKind () != EValue_Property)
-	{
-		err::SetFormatStringError (
-			"'%s' has no field '%s'",
-			OpValue.GetType ()->GetTypeString ().cc (),
-			GetStdPropertyFieldString (Field)
-			);
-		return NULL;
-	}
-
-	CType* pOpType = OpValue.GetType ();
-	EType OpTypeKind = pOpType->GetTypeKind ();
-
-	CStructField* pField = NULL;
-
-/*
-	switch (OpTypeKind)
-	{
-	case EType_PropertyPtr:
-	case EType_PropertyRef:
-		pField = ((CPropertyPtrType*) pOpType)->GetTargetType ()->GetStdPropertyField (Field);
-		IsUnsafe = ((CPropertyPtrType*) pOpType)->GetPtrTypeKind () == EPropertyPtrType_Unsafe;
-		break;
-
-	default:
-	}
-*/
-	if (!pField)
-		return NULL;
-
-	return pField->GetType ()->GetDataPtrType (
-		EType_DataRef,
-		EDataPtrType_Thin,
-		pOpType->GetFlags ()
-		);
-}
-
-bool
-COperatorMgr::GetStdPropertyFieldType (
-	const CValue& OpValue,
-	EStdPropertyField Field,
-	CValue* pResultValue
-	)
-{
-	CType* pResultType = GetStdPropertyFieldType (OpValue, Field);
-	if (!pResultType)
-		return false;
-
-	pResultValue->SetType (pResultType);
-	return true;
-}
-
-bool
-COperatorMgr::GetStdPropertyField (
-	const CValue& RawOpValue,
-	EStdPropertyField Field,
-	CValue* pResultValue
-	)
-{
-	err::SetFormatStringError ("std property fields got to go");
-	return false;
-/*
-	CValue OpValue;
-	bool Result = PrepareOperand (RawOpValue, &OpValue, EOpFlag_KeepPropertyRef);
-	if (!Result)
-		return false;
-
-	CType* pOpType = OpValue.GetType ();
-	if (!pOpType->IsPropertyPtrType ())
-	{
-		err::SetFormatStringError (
-			"'%s' has no field '%s'",
-			pOpType->GetTypeString ().cc (),
-			GetStdPropertyFieldString (Field)
-			);
-		return false;
-	}
-
-	CPropertyPtrType* pPtrType = (CPropertyPtrType*) OpValue.GetType ();
-	CPropertyType* pPropertyType = pPtrType->GetTargetType ();
-	CStructField* pField = pPropertyType->GetStdPropertyField (Field);
-	if (!pField)
-		return false;
-
-	CValue DataValue;
-
-	if (OpValue.GetValueKind () != EValue_Property)
-	{
-		err::SetFormatStringError ("'%s' field for property pointers is not implemented yet", pField->GetName ().cc ());
-		return false;
-	}
-
-	CProperty* pProperty = OpValue.GetProperty ();
-	if (pProperty->GetStorageKind () == EStorage_Static)
-	{
-		CVariable* pStaticVariable = pProperty->GetStaticDataVariable ();
-		ASSERT (pStaticVariable);
-		DataValue = pStaticVariable;
-	}
-	else
-	{
-		bool Result = GetField (pProperty->GetParentTypeField (), NULL, &DataValue);
-		if (!Result)
-			return false;
-	}
-
-	CBaseTypeCoord Coord;
-	Coord.m_LlvmIndexArray = 0; // augmented fields go to the base type of field struct
-	return GetStructField (DataValue, pField, &Coord, pResultValue);
-
-*/
-}
-
-#endif
 
 //.............................................................................
 

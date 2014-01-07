@@ -108,11 +108,11 @@ CClassPtrType::GcMark (
 	void* p
 	)
 {
-	TInterface* pIface = *(TInterface**) p;
+	TIfaceHdr* pIface = *(TIfaceHdr**) p;
 	if (!pIface || pIface->m_pObject->m_ScopeLevel)
 		return;
 
-	TObject* pObject = pIface->m_pObject;
+	TObjHdr* pObject = pIface->m_pObject;
 	if (m_PtrTypeKind == EClassPtrType_Weak)
 		pObject->GcWeakMarkObject ();
 	else

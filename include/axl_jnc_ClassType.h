@@ -16,8 +16,8 @@ namespace jnc {
 
 class CClassPtrType;
 struct TClassPtrTypeTuple;
-struct TObject;
-struct TInterface;
+struct TObjHdr;
+struct TIfaceHdr;
 
 //.............................................................................
 
@@ -259,7 +259,7 @@ protected:
 	void
 	EnumGcRootsImpl (
 		CRuntime* pRuntime,
-		TInterface* pInterface
+		TIfaceHdr* pInterface
 		);
 
 	virtual
@@ -310,12 +310,24 @@ protected:
 	void
 	CreatePrimer ();
 
-	bool
+	void
+	PrimeObject (
+		CClassType* pClassType,
+		const CValue& OpValue,
+		const CValue& ScopeLevelValue,
+		const CValue& RootValue,
+		const CValue& FlagsValue
+		);
+
+	void
 	PrimeInterface (
 		CClassType* pClassType,
-		const CValue& ObjectPtrValue,
-		const CValue& IfacePtrValue,
-		const CValue& VTablePtrValue
+		const CValue& OpValue,
+		const CValue& VTableValue,
+		const CValue& ObjectValue,
+		const CValue& ScopeLevelValue,
+		const CValue& RootValue,
+		const CValue& FlagsValue
 		);
 
 	bool
@@ -346,10 +358,10 @@ IsClassType (
 
 // header of class interface
 
-struct TInterface
+struct TIfaceHdr
 {
 	void* m_pVTable;
-	TObject* m_pObject; // back pointer to master header
+	TObjHdr* m_pObject; // back pointer to master header
 
 	// followed by parents, then by interface data fields
 };
@@ -360,15 +372,16 @@ struct TInterface
 
 template <typename T>
 class CObjectT:
-	public TObject,
+	public TObjHdr,
 	public T
 {
 public:
 	CObjectT ()
 	{
 		m_ScopeLevel = 0;
-		m_Flags = EObjectFlag_Alive | EObjectFlag_Extern;
-		this->m_pType = NULL;   // should be primed later
+		m_pRoot = NULL;   // should be primed later
+		m_pType = NULL;   // should be primed later
+		m_Flags = EObjHdrFlag_Alive | EObjHdrFlag_Extern;
 		this->m_pVTable = NULL; // should be primed later
 		this->m_pObject = this; // thanks a log gcc
 	}
@@ -378,15 +391,15 @@ public:
 
 typedef
 void
-FObject_Prime (TObject* pObject);
+FObject_Prime (TObjHdr* pObject);
 
 typedef
 void
-FObject_Construct (TInterface* pInterface);
+FObject_Construct (TIfaceHdr* pInterface);
 
 typedef
 void
-FObject_Destruct (TInterface* pInterface);
+FObject_Destruct (TIfaceHdr* pInterface);
 
 //.............................................................................
 

@@ -88,19 +88,27 @@ COperatorMgr::GetStructField (
 	if (pField->GetStorageKind () == EStorage_Mutable)
 		PtrTypeFlags &= ~EPtrTypeFlag_Const;
 
-	CDataPtrType* pPtrType;
-	CValue PtrValue;
-
 	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
+
+	CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (
+		pField->GetParentNamespace (),
+		EType_DataRef,
+		PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean,
+		PtrTypeFlags
+		);
+
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (),
-			EType_DataRef,
-			EDataPtrType_Thin,
-			PtrTypeFlags
+		m_pModule->m_LlvmIrBuilder.CreateGep (
+			OpValue,
+			pCoord->m_LlvmIndexArray,
+			pCoord->m_LlvmIndexArray.GetCount (),
+			pPtrType,
+			pResultValue
 			);
-
+	}
+	else if (PtrTypeKind == EDataPtrType_Lean)
+	{
 		m_pModule->m_LlvmIrBuilder.CreateGep (
 			OpValue,
 			pCoord->m_LlvmIndexArray,
@@ -110,20 +118,14 @@ COperatorMgr::GetStructField (
 			);
 
 		if (OpValue.GetValueKind () == EValue_Variable)
-			pResultValue->SetThinDataPtrValidator (OpValue);
+			pResultValue->SetLeanDataPtrValidator (OpValue);
 		else
-			pResultValue->SetThinDataPtrValidator (OpValue.GetThinDataPtrValidator ());
+			pResultValue->SetLeanDataPtrValidator (OpValue.GetLeanDataPtrValidator ());
 	}
 	else
 	{
+		CValue PtrValue;
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-
-		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (),
-			EType_DataRef,
-			EDataPtrType_Thin,
-			PtrTypeFlags
-			);
 
 		m_pModule->m_LlvmIrBuilder.CreateGep (
 			PtrValue,
@@ -133,7 +135,7 @@ COperatorMgr::GetStructField (
 			pResultValue
 			);
 
-		pResultValue->SetThinDataPtrValidator (OpValue);
+		pResultValue->SetLeanDataPtrValidator (OpValue);
 	}
 
 	return true;
@@ -165,42 +167,35 @@ COperatorMgr::GetUnionField (
 	if (pField->GetStorageKind () == EStorage_Mutable)
 		PtrTypeFlags &= ~EPtrTypeFlag_Const;
 
-	CDataPtrType* pPtrType;
-	CValue PtrValue;
-
 	EDataPtrType PtrTypeKind = pOpType->GetPtrTypeKind ();
+
+	CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (
+		pField->GetParentNamespace (),
+		EType_DataRef,
+		PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean,
+		PtrTypeFlags
+		);
+
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (),
-			EType_DataRef,
-			EDataPtrType_Thin,
-			PtrTypeFlags
-			);
-
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, pResultValue);
+	}
+	else if (PtrTypeKind == EDataPtrType_Lean)
+	{
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, pResultValue);
 
 		if (OpValue.GetValueKind () == EValue_Variable)
-			pResultValue->SetThinDataPtrValidator (OpValue);
+			pResultValue->SetLeanDataPtrValidator (OpValue);
 		else
-			pResultValue->SetThinDataPtrValidator (OpValue.GetThinDataPtrValidator ());
+			pResultValue->SetLeanDataPtrValidator (OpValue.GetLeanDataPtrValidator ());
 	}
 	else
 	{
+		CValue PtrValue;
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pField->GetType ()->GetDataPtrType_c (), &PtrValue);
 
-		pPtrType = pField->GetType ()->GetDataPtrType_c ();
-
-		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pPtrType, &PtrValue);
-
-		pPtrType = pField->GetType ()->GetDataPtrType (
-			pField->GetParentNamespace (),
-			EType_DataRef,
-			EDataPtrType_Thin,
-			PtrTypeFlags
-			);
-
-		pResultValue->SetThinDataPtr (
+		pResultValue->SetLeanDataPtr (
 			PtrValue.GetLlvmValue (),
 			pPtrType,
 			OpValue
@@ -272,11 +267,11 @@ COperatorMgr::GetClassField (
 		CDataPtrType* pPtrType = pField->GetType ()->GetDataPtrType (
 			pField->GetParentNamespace (),
 			EType_DataRef,
-			EDataPtrType_Thin,
+			EDataPtrType_Lean,
 			PtrTypeFlags
 			);
 
-		pResultValue->SetThinDataPtr (
+		pResultValue->SetLeanDataPtr (
 			PtrValue.GetLlvmValue (),
 			pPtrType,
 			OpValue,

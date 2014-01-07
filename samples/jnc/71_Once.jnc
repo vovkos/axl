@@ -47,7 +47,7 @@ int main ()
 	jnc.createThread (threadProc);
 
 	// temp dirty solution. createThread () should probably return a waitable object
-	jnc.sleep (1000); 
+	jnc.sleep (500); 
 	return 0;
 }
 

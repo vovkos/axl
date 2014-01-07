@@ -130,7 +130,7 @@ protected:
 // structures backing up multicast, e.g.:
 // mutlicast OnFire ();
 
-struct TMulticast: TInterface
+struct TMulticast: TIfaceHdr
 {
 	volatile intptr_t m_Lock;
 	size_t m_MaxCount;

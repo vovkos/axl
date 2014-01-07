@@ -132,7 +132,7 @@ CPropertyPtrType::GcMark (
 	if (!pPtr->m_pClosure || pPtr->m_pClosure->m_pObject->m_ScopeLevel)
 		return;
 
-	TObject* pObject = pPtr->m_pClosure->m_pObject;
+	TObjHdr* pObject = pPtr->m_pClosure->m_pObject;
 	if (m_PtrTypeKind == EFunctionPtrType_Normal)
 		pObject->GcMarkObject (pRuntime);
 	else if (pObject->m_pClassType->GetClassTypeKind () == EClassType_FunctionClosure)

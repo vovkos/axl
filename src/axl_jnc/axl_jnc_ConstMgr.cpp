@@ -17,23 +17,23 @@ void
 CConstMgr::Clear ()
 {
 	m_ConstList.Clear ();
-	m_UnsafeThinDataPtrValidator = ref::EPtr_Null;
+	m_UnsafeLeanDataPtrValidator = ref::EPtr_Null;
 }
 
-CThinDataPtrValidator*
-CConstMgr::GetUnsafeThinDataPtrValidator ()
+CLeanDataPtrValidator*
+CConstMgr::GetUnsafeLeanDataPtrValidator ()
 {
-	if (m_UnsafeThinDataPtrValidator)
-		return m_UnsafeThinDataPtrValidator;
+	if (m_UnsafeLeanDataPtrValidator)
+		return m_UnsafeLeanDataPtrValidator;
 
 	void* pRangeBegin = NULL;
 
-	m_UnsafeThinDataPtrValidator = AXL_REF_NEW (CThinDataPtrValidator);
-	m_UnsafeThinDataPtrValidator->m_SizeValue.SetConstSizeT (-1);
-	m_UnsafeThinDataPtrValidator->m_ScopeValidatorValue.SetConstSizeT (0);
-	m_UnsafeThinDataPtrValidator->m_RangeBeginValue.CreateConst (&pRangeBegin, m_pModule->GetSimpleType (EStdType_BytePtr));
+	m_UnsafeLeanDataPtrValidator = AXL_REF_NEW (CLeanDataPtrValidator);
+	m_UnsafeLeanDataPtrValidator->m_SizeValue.SetConstSizeT (-1);
+	m_UnsafeLeanDataPtrValidator->m_ScopeValidatorValue.SetConstSizeT (0);
+	m_UnsafeLeanDataPtrValidator->m_RangeBeginValue.CreateConst (&pRangeBegin, m_pModule->GetSimpleType (EStdType_BytePtr));
 
-	return m_UnsafeThinDataPtrValidator;
+	return m_UnsafeLeanDataPtrValidator;
 }
 
 const CValue& 

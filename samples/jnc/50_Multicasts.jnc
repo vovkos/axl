@@ -73,7 +73,7 @@ int main ()
 	// function pointers see the changes or not
 	// to deal with ambiguity, multicast class provides 'getSnapshot' method
 	// while converting to a function pointer implicitly yields a 'live' pointer
-	
+
 	function* p1 (int) = mc; // live by default
 	function* p2 (int) = mc.getSnapshot (); // obviously, a snapshot
 

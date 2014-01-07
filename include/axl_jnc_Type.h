@@ -130,8 +130,8 @@ enum EType
 enum EStdType
 {
 	EStdType_BytePtr,
-	EStdType_ObjectHdr,
-	EStdType_ObjectHdrPtr,
+	EStdType_ObjHdr,
+	EStdType_ObjHdrPtr,
 	EStdType_ObjectClass,
 	EStdType_ObjectPtr,
 	EStdType_SimpleFunction,
@@ -152,24 +152,23 @@ enum ETypeModifier
 	ETypeModifier_Unsigned    = 0x00000001,
 	ETypeModifier_BigEndian   = 0x00000002,
 	ETypeModifier_Const       = 0x00000004,
-	ETypeModifier_ConstD      = 0x00000008,
+	ETypeModifier_DConst      = 0x00000008,
 	ETypeModifier_Volatile    = 0x00000010,
 	ETypeModifier_Weak        = 0x00000020,
 	ETypeModifier_Thin        = 0x00000040,
-	ETypeModifier_Unsafe      = 0x00000080,
+	ETypeModifier_Pitcher     = 0x00000080,
 	ETypeModifier_Cdecl       = 0x00000100,
 	ETypeModifier_Stdcall     = 0x00000200,
-	ETypeModifier_Function    = 0x00000400,
-	ETypeModifier_Property    = 0x00000800,
-	ETypeModifier_Bindable    = 0x00001000,
-	ETypeModifier_AutoGet     = 0x00002000,
-	ETypeModifier_Indexed     = 0x00004000,
-	ETypeModifier_Multicast   = 0x00008000,
-	ETypeModifier_Event       = 0x00010000,
-	ETypeModifier_EventD      = 0x00020000,
-	ETypeModifier_Reactor     = 0x00040000,
-	ETypeModifier_Pitcher     = 0x00080000,
-	ETypeModifier_Array       = 0x00100000,
+	ETypeModifier_Array       = 0x00000400,
+	ETypeModifier_Function    = 0x00000800,
+	ETypeModifier_Property    = 0x00001000,
+	ETypeModifier_Bindable    = 0x00002000,
+	ETypeModifier_AutoGet     = 0x00004000,
+	ETypeModifier_Indexed     = 0x00008000,
+	ETypeModifier_Multicast   = 0x00010000,
+	ETypeModifier_Event       = 0x00020000,
+	ETypeModifier_DEvent      = 0x00040000,
+	ETypeModifier_Reactor     = 0x00080000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -197,29 +196,25 @@ enum ETypeModifierMask
 
 	ETypeModifierMask_DataPtr =
 		ETypeModifier_Const |
-		ETypeModifier_ConstD |
+		ETypeModifier_DConst |
 		ETypeModifier_Volatile |
-		ETypeModifier_Thin |
-		ETypeModifier_Unsafe,
+		ETypeModifier_Thin,
 
 	ETypeModifierMask_ClassPtr =
 		ETypeModifier_Const |
-		ETypeModifier_ConstD |
+		ETypeModifier_DConst |
 		ETypeModifier_Volatile |
 		ETypeModifier_Event |
-		ETypeModifier_EventD |
-		ETypeModifier_Weak |
-		ETypeModifier_Unsafe,
+		ETypeModifier_DEvent |
+		ETypeModifier_Weak,
 
 	ETypeModifierMask_FunctionPtr =
 		ETypeModifier_Weak |
-		ETypeModifier_Thin |
-		ETypeModifier_Unsafe,
+		ETypeModifier_Thin,
 
 	ETypeModifierMask_PropertyPtr =
 		ETypeModifier_Weak |
-		ETypeModifier_Thin |
-		ETypeModifier_Unsafe,
+		ETypeModifier_Thin,
 
 	ETypeModifierMask_ImportPtr =
 		ETypeModifierMask_DataPtr |
@@ -229,10 +224,10 @@ enum ETypeModifierMask
 
 	ETypeModifierMask_DeclPtr =
 		ETypeModifier_Const |
-		ETypeModifier_ConstD |
+		ETypeModifier_DConst |
 		ETypeModifier_Volatile |
 		ETypeModifier_Event |
-		ETypeModifier_EventD |
+		ETypeModifier_DEvent |
 		ETypeModifier_Bindable |
 		ETypeModifier_AutoGet,
 
@@ -252,15 +247,15 @@ enum ETypeModifierMask
 
 	ETypeModifierMask_Const =
 		ETypeModifier_Const |
-		ETypeModifier_ConstD |
+		ETypeModifier_DConst |
 		ETypeModifier_Event |
-		ETypeModifier_EventD,
+		ETypeModifier_DEvent,
 
 	ETypeModifierMask_Event =
 		ETypeModifier_Event |
-		ETypeModifier_EventD |
+		ETypeModifier_DEvent |
 		ETypeModifier_Const |
-		ETypeModifier_ConstD |
+		ETypeModifier_DConst |
 		ETypeModifierMask_TypeKind,
 };
 
@@ -301,8 +296,8 @@ enum ETypeFlag
 
 enum EPtrTypeFlag
 {
-	EPtrTypeFlag_Unsafe    = 0x0010000, // all ptr
-	EPtrTypeFlag_Checked   = 0x0020000, // all ptr
+	EPtrTypeFlag_Checked   = 0x0010000, // all ptr
+	EPtrTypeFlag_Markup    = 0x0020000, // data ptr only
 	EPtrTypeFlag_Const     = 0x0040000, // class & data ptr
 	EPtrTypeFlag_ConstD    = 0x0080000, // class & data ptr
 	EPtrTypeFlag_Volatile  = 0x0100000, // class & data ptr
@@ -349,6 +344,7 @@ GetPtrTypeFlagsFromModifiers (uint_t Modifiers);
 enum EDataPtrType
 {
 	EDataPtrType_Normal = 0,
+	EDataPtrType_Lean,
 	EDataPtrType_Thin,
 	EDataPtrType__Count,
 };
@@ -570,9 +566,12 @@ public:
 	}
 
 	CDataPtrType*
-	GetDataPtrType_c (EType TypeKind = EType_DataPtr)
+	GetDataPtrType_c (
+		EType TypeKind = EType_DataPtr,
+		uint_t Flags = 0
+		)
 	{
-		return GetDataPtrType (TypeKind, EDataPtrType_Thin, EPtrTypeFlag_Unsafe);
+		return GetDataPtrType (TypeKind, EDataPtrType_Thin, Flags);
 	}
 
 	CFunctionArg*
@@ -634,6 +633,26 @@ public:
 	{
 		return m_pType;
 	}
+};
+
+//.............................................................................
+
+class CLazyStdType: public CLazyModuleItem
+{
+	friend class CTypeMgr;
+
+protected:
+	EStdType m_StdType;
+
+public:
+	CLazyStdType ()
+	{
+		m_StdType = (EStdType) -1;
+	}
+
+	virtual
+	CModuleItem*
+	GetActualItem ();
 };
 
 //.............................................................................

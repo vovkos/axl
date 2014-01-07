@@ -22,6 +22,7 @@ public:
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_DynamicCastClassPtr, DynamicCastClassPtr)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_StrengthenClassPtr, StrengthenClassPtr)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcAllocate, GcAllocate)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcTryAllocate, GcTryAllocate)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcEnter, GcEnter)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcLeave, GcLeave)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GcPulse, GcPulse)
@@ -56,21 +57,28 @@ public:
 	}
 
 	static
-	TInterface*
+	TIfaceHdr*
 	DynamicCastClassPtr (
-		TInterface* p,
+		TIfaceHdr* p,
 		CClassType* pType
 		);
 
 	static
-	TInterface*
-	StrengthenClassPtr (TInterface* p);
+	TIfaceHdr*
+	StrengthenClassPtr (TIfaceHdr* p);
 
 	static
 	void*
 	GcAllocate (
 		CType* pType,
-		size_t Count
+		size_t ElementCount
+		);
+
+	static
+	void*
+	GcTryAllocate (
+		CType* pType,
+		size_t ElementCount
 		);
 
 	static

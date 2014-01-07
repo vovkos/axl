@@ -121,11 +121,8 @@ CCast_PropertyPtr_Base::GetCastKind (
 	if (!pSrcPtrType)
 		return ECast_None;
 
-	if (!(pDstPtrType->GetFlags () & EPtrTypeFlag_Unsafe))
-	{
-		if (pSrcPtrType->IsConstPtrType () && !pDstPtrType->IsConstPtrType ())
-			return ECast_None;
-	}
+	if (pSrcPtrType->IsConstPtrType () && !pDstPtrType->IsConstPtrType ())
+		return ECast_None;
 
 	return m_pModule->m_OperatorMgr.GetPropertyCastKind (
 		pSrcPtrType->GetTargetType (),
@@ -377,6 +374,8 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 
 	CFunction* pStrengthenFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	CValue StrengthenedClosureValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pStrengthenFunction,
@@ -384,6 +383,8 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 		ClosureValue,
 		&StrengthenedClosureValue
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, StrengthenedClosureValue, NullClosureValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAliveBlock, pDeadBlock);
@@ -528,12 +529,7 @@ CCast_PropertyPtr::GetCastOperator (
 		}
 
 	default:
-		return
-			(GetTypeKindFlags (SrcTypeKind) & ETypeKindFlag_Integer) &&
-			DstPtrTypeKind == EPropertyPtrType_Thin &&
-			(pType->GetFlags () & EPtrTypeFlag_Unsafe) ?
-				m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) :
-				NULL;
+		return NULL;
 	};
 }
 

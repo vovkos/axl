@@ -36,7 +36,7 @@ struct TJancyRepresenterTargetVTable
 
 #pragma pack (8)
 
-struct TJancyRepresenterTarget: jnc::TInterface
+struct TJancyRepresenterTarget: jnc::TIfaceHdr
 {
 	uint64_t m_Timestamp;
 	uint_t m_PacketCode;
@@ -63,7 +63,7 @@ struct TJancyRepresenterVTable
 	FJancyRepresenter_Represent* m_pfRepresent;
 };
 
-struct TJancyRepresenter: jnc::TInterface
+struct TJancyRepresenter: jnc::TIfaceHdr
 {
 };
 

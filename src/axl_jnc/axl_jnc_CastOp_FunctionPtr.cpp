@@ -130,6 +130,8 @@ CCast_FunctionPtr_Weak2Normal::LlvmCast (
 
 	CFunction* pStrengthenFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
 
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
+
 	CValue StrengthenedClosureValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pStrengthenFunction,
@@ -137,6 +139,8 @@ CCast_FunctionPtr_Weak2Normal::LlvmCast (
 		ClosureValue,
 		&StrengthenedClosureValue
 		);
+
+	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, StrengthenedClosureValue, NullClosureValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAliveBlock, pDeadBlock);
@@ -424,13 +428,7 @@ CCast_FunctionPtr::GetCastOperator (
 		return m_OperatorTable [EFunctionPtrType_Thin] [DstPtrTypeKind];
 	}
 
-	if (pSrcType->GetTypeKindFlags () & ETypeKindFlag_Integer)
-	{
-		return DstPtrTypeKind == EFunctionPtrType_Thin && (pType->GetFlags () & EPtrTypeFlag_Unsafe) ?
-			m_pModule->m_OperatorMgr.GetStdCastOperator (EStdCast_PtrFromInt) :
-			NULL;
-	}
-	else if (IsClassPtrType (pSrcType, EClassType_Multicast))
+	if (IsClassPtrType (pSrcType, EClassType_Multicast))
 	{
 		return &m_FromMulticast;
 	}

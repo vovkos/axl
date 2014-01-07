@@ -17,6 +17,7 @@ CTypeMgr::CTypeMgr ()
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
+	memset (m_LazyStdTypeArray, 0, sizeof (m_LazyStdTypeArray));
 
 	m_UnnamedEnumTypeCounter = 0;
 	m_UnnamedStructTypeCounter = 0;
@@ -56,8 +57,9 @@ CTypeMgr::Clear ()
 	m_PropertyPtrTypeTupleList.Clear ();
 	m_DualPtrTypeTupleList.Clear ();
 
-	m_FunctionArgList.Clear ();
 	m_TypedefList.Clear ();
+	m_LazyStdTypeList.Clear ();
+	m_FunctionArgList.Clear ();
 
 	m_TypeMap.Clear ();
 	m_GcShadowStackFrameTypeArray.Clear ();
@@ -65,6 +67,7 @@ CTypeMgr::Clear ()
 	SetupAllPrimitiveTypes ();
 
 	memset (m_StdTypeArray, 0, sizeof (m_StdTypeArray));
+	memset (m_LazyStdTypeArray, 0, sizeof (m_LazyStdTypeArray));
 
 	m_UnnamedEnumTypeCounter = 0;
 	m_UnnamedStructTypeCounter = 0;
@@ -87,12 +90,12 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = GetPrimitiveType (EType_Int8_u)->GetDataPtrType_c ();
 		break;
 
-	case EStdType_ObjectHdr:
-		pType = CreateObjectHdrType ();
+	case EStdType_ObjHdr:
+		pType = CreateObjHdrType ();
 		break;
 
-	case EStdType_ObjectHdrPtr:
-		pType = GetStdType (EStdType_ObjectHdr)->GetDataPtrType_c ();
+	case EStdType_ObjHdrPtr:
+		pType = GetStdType (EStdType_ObjHdr)->GetDataPtrType_c ();
 		break;
 
 	case EStdType_ObjectClass:
@@ -141,6 +144,43 @@ CTypeMgr::GetStdType (EStdType StdType)
 	}
 
 	m_StdTypeArray [StdType] = pType;
+	return pType;
+}
+
+CLazyStdType*
+CTypeMgr::GetLazyStdType (EStdType StdType)
+{
+	ASSERT ((size_t) StdType < EStdType__Count);
+
+	if (m_LazyStdTypeArray [StdType])
+		return m_LazyStdTypeArray [StdType];
+
+	const char* NameTable [EStdType__Count] = 
+	{
+		NULL, // EStdType_BytePtr,
+		NULL, // EStdType_ObjHdr,
+		NULL, // EStdType_ObjHdrPtr,
+		NULL, // EStdType_ObjectClass,
+		NULL, // EStdType_ObjectPtr,
+		NULL, // EStdType_SimpleFunction,
+		NULL, // EStdType_SimpleMulticast,
+		NULL, // EStdType_SimpleEventPtr,
+		NULL, // EStdType_Binder,
+		NULL, // EStdType_ReactorBindSite,
+		"Scheduler", // EStdType_Scheduler,
+		NULL, // EStdType_SchedulerPtr,
+		NULL, // EStdType_FmtLiteral,
+	};
+
+	const char* pName = NameTable [StdType];
+	ASSERT (pName);
+
+	CLazyStdType* pType = AXL_MEM_NEW (CLazyStdType);
+	pType->m_pModule = m_pModule;
+	pType->m_Name = pName;
+	pType->m_StdType = StdType;
+	m_LazyStdTypeList.InsertTail (pType);
+	m_LazyStdTypeArray [StdType] = pType;
 	return pType;
 }
 
@@ -597,7 +637,7 @@ CTypeMgr::CreateClassType (
 	CStructType* pIfaceHdrStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceHdrStructType->m_Tag.Format ("%s.IfaceHdr", pType->m_Tag.cc ());
 	pIfaceHdrStructType->CreateField ("m_vtbl", pVTableStructType->GetDataPtrType_c ());
-	pIfaceHdrStructType->CreateField ("m_object", GetStdType (EStdType_ObjectHdrPtr));
+	pIfaceHdrStructType->CreateField ("m_object", GetStdType (EStdType_ObjHdrPtr));
 
 	CStructType* pIfaceStructType = CreateUnnamedStructType (PackFactor);
 	pIfaceStructType->m_StructTypeKind = EStructType_IfaceStruct;
@@ -611,7 +651,7 @@ CTypeMgr::CreateClassType (
 	pClassStructType->m_StructTypeKind = EStructType_ClassStruct;
 	pClassStructType->m_Tag.Format ("%s.Class", pType->m_Tag.cc ());
 	pClassStructType->m_pParentNamespace = pType;
-	pClassStructType->CreateField ("m_objectHdr", GetStdType (EStdType_ObjectHdr));
+	pClassStructType->CreateField ("m_objectHdr", GetStdType (EStdType_ObjHdr));
 	pClassStructType->CreateField ("m_iface", pIfaceStructType);
 
 	pType->m_pModule = m_pModule;
@@ -1543,9 +1583,7 @@ CTypeMgr::GetDataPtrType (
 	ASSERT (pDataType->GetTypeKind () != EType_NamedImport); // for imports, GetImportPtrType () should be called
 	ASSERT (TypeKind != EType_DataRef || pDataType->m_TypeKind != EType_DataRef); // dbl reference
 
-	if (Flags & EPtrTypeFlag_Unsafe)
-		Flags |= ETypeFlag_Pod;
-	else if (TypeKind == EType_DataPtr && PtrTypeKind == EDataPtrType_Normal)
+	if (TypeKind == EType_DataPtr && PtrTypeKind == EDataPtrType_Normal)
 		Flags |= ETypeFlag_GcRoot | ETypeFlag_StructRet;
 
 	TDataPtrTypeTuple* pTuple;
@@ -1560,18 +1598,18 @@ CTypeMgr::GetDataPtrType (
 		pTuple = GetDataPtrTypeTuple (pDataType);
 	}
 
-	// ref x ptrkind x const x volatile x unsafe / checked
+	// ref x ptrkind x const x volatile x checked/markup
 
 	size_t i1 = TypeKind == EType_DataRef;
 	size_t i2 = PtrTypeKind;
 	size_t i3 = (Flags & EPtrTypeFlag_Const) ? 0 : 1;
 	size_t i4 = (Flags & EPtrTypeFlag_Volatile) ? 0 : 1;
-	size_t i5 = (Flags & EPtrTypeFlag_Unsafe) ? 0 : (Flags & EPtrTypeFlag_Checked) ? 1 : 2;
+	size_t i5 = (Flags & EPtrTypeFlag_Markup) ? 2 : (Flags & EPtrTypeFlag_Checked) ? 1 : 0;
 
 	if (pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5])
 		return pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5];
 
-	size_t Size = PtrTypeKind == EDataPtrType_Thin ? sizeof (void*) : sizeof (TDataPtr);
+	size_t Size = PtrTypeKind == EDataPtrType_Normal ? sizeof (TDataPtr) : sizeof (void*);
 
 	CDataPtrType* pType = AXL_MEM_NEW (CDataPtrType);
 	pType->m_pModule = m_pModule;
@@ -1601,7 +1639,7 @@ CTypeMgr::GetDataPtrStructType (CType* pDataType)
 	pType->CreateField ("m_p", pDataType->GetDataPtrType_c ());
 	pType->CreateField ("m_rangeBegin", GetStdType (EStdType_BytePtr));
 	pType->CreateField ("m_rangeEnd", GetStdType (EStdType_BytePtr));
-	pType->CreateField ("m_scopeLevel", GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_object", GetStdType (EStdType_ObjHdrPtr));
 	pType->EnsureLayout ();
 
 	pTuple->m_pPtrStructType = pType;
@@ -1620,9 +1658,7 @@ CTypeMgr::GetClassPtrType (
 	ASSERT ((size_t) PtrTypeKind < EClassPtrType__Count);
 	ASSERT (!(Flags & (EPtrTypeFlag_ConstD | EPtrTypeFlag_EventD)) || pAnchorNamespace != NULL);
 
-	if (Flags & EPtrTypeFlag_Unsafe)
-		Flags |= ETypeFlag_Pod;
-	else if (TypeKind == EType_ClassPtr)
+	if (TypeKind == EType_ClassPtr)
 		Flags |= ETypeFlag_GcRoot;
 
 	TClassPtrTypeTuple* pTuple;
@@ -1647,13 +1683,13 @@ CTypeMgr::GetClassPtrType (
 		pTuple = GetClassPtrTypeTuple (pClassType);
 	}
 
-	// ref x ptrkind x const x volatile x unsafe / checked
+	// ref x ptrkind x const x volatile x checked
 
 	size_t i1 = TypeKind == EType_ClassRef;
 	size_t i2 = PtrTypeKind;
 	size_t i3 = (Flags & EPtrTypeFlag_Const) ? 0 : 1;
 	size_t i4 = (Flags & EPtrTypeFlag_Volatile) ? 0 : 1;
-	size_t i5 = (Flags & EPtrTypeFlag_Unsafe) ? 0 : (Flags & EPtrTypeFlag_Checked) ? 1 : 2;
+	size_t i5 = (Flags & EPtrTypeFlag_Checked) ? 0 : 1;
 
 	if (pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5])
 		return pTuple->m_PtrTypeArray [i1] [i2] [i3] [i4] [i5];
@@ -1683,9 +1719,7 @@ CTypeMgr::GetFunctionPtrType (
 	ASSERT (TypeKind == EType_FunctionPtr || TypeKind == EType_FunctionRef);
 	ASSERT ((size_t) PtrTypeKind < EFunctionPtrType__Count);
 
-	if (Flags & EPtrTypeFlag_Unsafe)
-		Flags |= ETypeFlag_Pod;
-	else if (TypeKind == EType_FunctionPtr && PtrTypeKind != EFunctionPtrType_Thin)
+	if (TypeKind == EType_FunctionPtr && PtrTypeKind != EFunctionPtrType_Thin)
 		Flags |= ETypeFlag_GcRoot | ETypeFlag_StructRet;
 
 	TFunctionPtrTypeTuple* pTuple = GetFunctionPtrTypeTuple (pFunctionType);
@@ -1694,7 +1728,7 @@ CTypeMgr::GetFunctionPtrType (
 
 	size_t i1 = TypeKind == EType_FunctionRef;
 	size_t i2 = PtrTypeKind;
-	size_t i3 = (Flags & EPtrTypeFlag_Unsafe) ? 0 : (Flags & EPtrTypeFlag_Checked) ? 1 : 2;
+	size_t i3 = (Flags & EPtrTypeFlag_Checked) ? 0 : 1;
 
 	if (pTuple->m_PtrTypeArray [i1] [i2] [i3])
 		return pTuple->m_PtrTypeArray [i1] [i2] [i3];
@@ -1740,7 +1774,7 @@ CTypeMgr::GetFunctionPtrStructType (CFunctionType* pFunctionType)
 	pType->m_Tag.Format ("FunctionPtr <%s>", pFunctionType->GetTypeString ().cc ());
 	pType->m_Signature = Signature;
 	pType->m_TypeMapIt = It;
-	pType->CreateField ("m_p", pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin, EPtrTypeFlag_Unsafe));
+	pType->CreateField ("m_p", pStdObjectMemberMethodType->GetFunctionPtrType (EFunctionPtrType_Thin));
 	pType->CreateField ("m_closure", GetStdType (EStdType_ObjectPtr));
 	pType->EnsureLayout ();
 
@@ -1761,9 +1795,7 @@ CTypeMgr::GetPropertyPtrType (
 	ASSERT (TypeKind == EType_PropertyPtr || TypeKind == EType_PropertyRef);
 	ASSERT ((size_t) PtrTypeKind < EPropertyPtrType__Count);
 
-	if (Flags & EPtrTypeFlag_Unsafe)
-		Flags |= ETypeFlag_Pod;
-	else if (TypeKind == EType_PropertyPtr && PtrTypeKind != EPropertyPtrType_Thin)
+	if (TypeKind == EType_PropertyPtr && PtrTypeKind != EPropertyPtrType_Thin)
 		Flags |= ETypeFlag_GcRoot | ETypeFlag_StructRet;
 
 	TPropertyPtrTypeTuple* pTuple;
@@ -1782,7 +1814,7 @@ CTypeMgr::GetPropertyPtrType (
 
 	size_t i1 = TypeKind == EType_PropertyRef;
 	size_t i2 = PtrTypeKind;
-	size_t i3 = (Flags & EPtrTypeFlag_Unsafe) ? 0 : (Flags & EPtrTypeFlag_Checked) ? 1 : 2;
+	size_t i3 = (Flags & EPtrTypeFlag_Checked) ? 0 : 1;
 
 	if (pTuple->m_PtrTypeArray [i1] [i2] [i3])
 		return pTuple->m_PtrTypeArray [i1] [i2] [i3];
@@ -2243,14 +2275,13 @@ CTypeMgr::SetupCallConvTable ()
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 CStructType*
-CTypeMgr::CreateObjectHdrType ()
+CTypeMgr::CreateObjHdrType ()
 {
-	CStructType* pType = CreateStructType ("Object", "jnc.Object");
-	pType->CreateField ("m_type", GetStdType (EStdType_BytePtr));
+	CStructType* pType = CreateStructType ("ObjHdr", "jnc.ObjHdr");
 	pType->CreateField ("m_scopeLevel", GetPrimitiveType (EType_SizeT));
+	pType->CreateField ("m_root", pType->GetDataPtrType_c ());
+	pType->CreateField ("m_type", GetStdType (EStdType_BytePtr));
 	pType->CreateField ("m_flags", GetPrimitiveType (EType_Int_p));
-	pType->CreateField ("m_gcHeapNext", GetStdType (EStdType_BytePtr));
-	pType->CreateField ("m_gcHeapPrev", GetStdType (EStdType_BytePtr));
 	pType->EnsureLayout ();
 	return pType;
 }
