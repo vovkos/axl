@@ -89,8 +89,6 @@ CCast_ClassPtr::LlvmCast (
 
 		CFunction* pStrengthen = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
 
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, m_pModule->GetSimpleType (EStdType_ObjectPtr), &OpValue);
 		m_pModule->m_LlvmIrBuilder.CreateCall (
 			pStrengthen,
@@ -98,8 +96,6 @@ CCast_ClassPtr::LlvmCast (
 			OpValue,
 			&OpValue
 			);
-
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pSrcType, &OpValue);
 	}
@@ -132,8 +128,6 @@ CCast_ClassPtr::LlvmCast (
 
 		CValue TypeValue (&pDstClassType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 		CFunction* pDynamicCastClassPtr = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_DynamicCastClassPtr);
 		m_pModule->m_LlvmIrBuilder.CreateCall2 (
 			pDynamicCastClassPtr,
@@ -142,8 +136,6 @@ CCast_ClassPtr::LlvmCast (
 			TypeValue,
 			&PtrValue
 			);
-
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 		m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pDstType, pResultValue);
 		return true;

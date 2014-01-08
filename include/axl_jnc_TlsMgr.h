@@ -20,18 +20,11 @@ struct TGcShadowStackFrame;
 
 //.............................................................................
 
-enum ETlsFlag
-{
-	ETlsFlag_GcUnsafe = 0x01,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 struct TTlsHdr: public rtl::TListLink
 {
 	CRuntime* m_pRuntime;
 	void* m_pStackEpoch;
-	uintptr_t m_Flags; // modified from the current thread only
+	size_t m_GcLevel;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

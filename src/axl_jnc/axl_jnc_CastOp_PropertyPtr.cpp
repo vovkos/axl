@@ -374,8 +374,6 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 
 	CFunction* pStrengthenFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_StrengthenClassPtr);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	CValue StrengthenedClosureValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pStrengthenFunction,
@@ -383,8 +381,6 @@ CCast_PropertyPtr_Weak2Normal::LlvmCast (
 		ClosureValue,
 		&StrengthenedClosureValue
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, StrengthenedClosureValue, NullClosureValue, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAliveBlock, pDeadBlock);

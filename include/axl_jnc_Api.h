@@ -96,12 +96,15 @@ Export (axl::jnc::CRuntime* pRuntime) \
 		return false; \
 	pRuntime->MapFunction (pFunction->GetLlvmFunction (), pvoid_cast (Function));
 
+#define AXL_JNC_API_STD_FUNCTION_FORCED(StdFunc, Function) \
+	pFunction = pModule->m_FunctionMgr.GetStdFunction (StdFunc); \
+	ASSERT (pFunction); \
+	pRuntime->MapFunction (pFunction->GetLlvmFunction (), pvoid_cast (Function));
+
 #define AXL_JNC_API_STD_FUNCTION(StdFunc, Function) \
 	if (pModule->m_FunctionMgr.IsStdFunctionUsed (StdFunc)) \
 	{ \
-		pFunction = pModule->m_FunctionMgr.GetStdFunction (StdFunc); \
-		ASSERT (pFunction); \
-		pRuntime->MapFunction (pFunction->GetLlvmFunction (), pvoid_cast (Function)); \
+		AXL_JNC_API_STD_FUNCTION_FORCED (StdFunc, Function); \
 	}
 
 #define AXL_JNC_API_PROPERTY(Name, Getter, Setter) \

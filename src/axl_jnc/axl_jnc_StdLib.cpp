@@ -72,7 +72,6 @@ CStdLib::GcEnter ()
 {
 	CRuntime* pRuntime = GetCurrentThreadRuntime ();
 	ASSERT (pRuntime);
-
 	pRuntime->GcEnter ();
 }
 

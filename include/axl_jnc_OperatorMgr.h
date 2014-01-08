@@ -167,20 +167,6 @@ public:
 		return m_pModule;
 	}
 
-	bool
-	CalcScopeLevel (
-		CScope* pScope,
-		CValue* pScopeLevelValue
-		);
-
-	CValue
-	CalcScopeLevel (CScope* pScope)
-	{
-		CValue ScopeLevelValue;
-		CalcScopeLevel (pScope, &ScopeLevelValue);
-		return ScopeLevelValue;
-	}
-
 	void
 	MarkGcRoot (
 		const CValue& PtrValue,
@@ -820,7 +806,7 @@ public:
 	}
 
 	void
-	GcCall (EStdFunc StdFuncKind);
+	GcPulse ();
 
 	// closure operators
 

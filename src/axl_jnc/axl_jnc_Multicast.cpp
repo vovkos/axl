@@ -90,6 +90,8 @@ CMulticast::GetSnapshot ()
 	CMulticastClassType* pMulticastType = (CMulticastClassType*) m_pObject->m_pType;
 	CMcSnapshotClassType* pSnapshotType = pMulticastType->GetSnapshotType ();
 
+	pRuntime->GcEnter ();
+
 	TMcSnapshotObject* pSnapshot = (TMcSnapshotObject*) pRuntime->GcAllocate (pSnapshotType);
 	pSnapshot->m_ScopeLevel = 0;
 	pSnapshot->m_pRoot = pSnapshot;
@@ -133,6 +135,8 @@ CMulticast::GetSnapshot ()
 	Ptr.m_pf = pSnapshotType->GetMethod (EMcSnapshotMethod_Call)->GetMachineCode ();
 
 	ASSERT (Ptr.m_pf);
+
+	pRuntime->GcLeave ();
 
 	return Ptr;
 }

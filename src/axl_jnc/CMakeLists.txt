@@ -142,6 +142,7 @@ set (
 	${AXL_INC_DIR}/axl_jnc_Orphan.h
 	${AXL_INC_DIR}/axl_jnc_QualifiedName.h
 	${AXL_INC_DIR}/axl_jnc_Scope.h
+	${AXL_INC_DIR}/axl_jnc_ScopeLevelStack.h
 	)
 
 set (
@@ -151,6 +152,7 @@ set (
 	axl_jnc_Orphan.cpp
 	axl_jnc_QualifiedName.cpp
 	axl_jnc_Scope.cpp
+	axl_jnc_ScopeLevelStack.cpp
 	)
 
 source_virtual_folder (

@@ -57,8 +57,6 @@ COperatorMgr::CheckDataPtrRange (
 
 	CFunction* pCheckDataPtrRange = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckDataPtrRange);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		pCheckDataPtrRange,
 		pCheckDataPtrRange->GetType (),
@@ -66,8 +64,6 @@ COperatorMgr::CheckDataPtrRange (
 		countof (ArgValueArray),
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -151,8 +147,6 @@ COperatorMgr::CheckDataPtrScopeLevel (
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckScopeLevel);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -160,8 +154,6 @@ COperatorMgr::CheckDataPtrScopeLevel (
 		DstObjHdrValue,
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }
@@ -184,8 +176,6 @@ COperatorMgr::CheckClassPtrScopeLevel (
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckClassPtrScopeLevel);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -193,8 +183,6 @@ COperatorMgr::CheckClassPtrScopeLevel (
 		DstObjHdrValue,
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -215,8 +203,6 @@ COperatorMgr::CheckClassPtrNull (const CValue& Value)
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -224,8 +210,6 @@ COperatorMgr::CheckClassPtrNull (const CValue& Value)
 		CValue (ERuntimeError_NullClassPtr, EType_Int),
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -252,8 +236,6 @@ COperatorMgr::CheckFunctionPtrNull (const CValue& Value)
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -261,8 +243,6 @@ COperatorMgr::CheckFunctionPtrNull (const CValue& Value)
 		CValue (ERuntimeError_NullFunctionPtr, EType_Int),
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void
@@ -306,8 +286,6 @@ COperatorMgr::CheckPropertyPtrNull (const CValue& Value)
 
 	CFunction* pCheckFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_CheckNullPtr);
 	
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall2 (
 		pCheckFunction,
 		pCheckFunction->GetType (),
@@ -315,8 +293,6 @@ COperatorMgr::CheckPropertyPtrNull (const CValue& Value)
 		CValue (ERuntimeError_NullPropertyPtr, EType_Int),
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 }
 
 void

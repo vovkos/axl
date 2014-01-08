@@ -20,6 +20,7 @@ enum EBasicBlockFlag
 	EBasicBlockFlag_Reachable = 0x01,
 	EBasicBlockFlag_Jumped    = 0x02,
 	EBasicBlockFlag_Entry     = 0x04,
+	EBasicBlockFlag_Return    = 0x08,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

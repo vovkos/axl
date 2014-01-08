@@ -228,8 +228,9 @@ CRuntime::Shutdown ()
 {
 	rtl::CArrayT <TGcRoot> SaveStaticGcRootArray = m_StaticGcRootArray;
 	m_StaticGcRootArray.Clear ();
-
+	
 	RunGc ();
+	RunGc (); // 2nd gc run is needed to clean up after destruction
 
 	TTlsHdr* pTls = GetTlsMgr ()->NullifyTls (this);
 	if (pTls)
@@ -321,6 +322,9 @@ CRuntime::GcTryAllocate (
 	size_t ElementCount
 	)
 {
+	size_t PrevGcLevel = GcMakeThreadSafe ();
+	ASSERT (PrevGcLevel); // otherwise there is risk of losing return value
+
 	size_t Size = sizeof (TObjHdr) + pType->GetSize ();	
 	if (ElementCount > 1)
 		Size += sizeof (size_t);
@@ -331,6 +335,8 @@ CRuntime::GcTryAllocate (
 		RunGc_l ();
 		WaitGcIdleAndLock ();	
 	}
+
+	RestoreGcLevel (PrevGcLevel); // restore before unlocking
 
 	void* pBlock = AXL_MEM_ALLOC (Size);
 	if (!pBlock)
@@ -375,13 +381,7 @@ CRuntime::GcTryAllocate (
 	
 	m_PeriodGcAllocSize += Size;
 	m_GcMemBlockArray.Append (pObject);
-
-	// mark thread unsafe for gc-collection (until the user code saves pointer thus making it reachable)
-
-	GcEnter ();
-
 	m_Lock.Unlock ();
-	
 	return p;
 }
 
@@ -433,6 +433,15 @@ CRuntime::MarkGcLocalHeapRoot (
 
 	if (pType->GetFlags () & ETypeFlag_GcRoot)
 		AddGcRoot (p, pType);
+}
+
+void
+CRuntime::RunGc ()
+{
+	size_t PrevGcLevel = GcMakeThreadSafe ();
+	WaitGcIdleAndLock ();
+	RunGc_l ();
+	RestoreGcLevel (PrevGcLevel);
 }
 
 void
@@ -649,9 +658,48 @@ CRuntime::GcEnter ()
 {
 	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
 	ASSERT (pTls);
-	if (pTls->m_Flags & ETlsFlag_GcUnsafe) // already
-		return; 
+	
+	pTls->m_GcLevel++;
+	if (pTls->m_GcLevel > 1) // was already unsafe
+		GcPulse (); // pulse on enter only, no pulse on leave: might lose retval gcroot
+	else
+		GcIncrementUnsafeThreadCount ();
+}
 
+void
+CRuntime::GcLeave ()
+{
+	ASSERT (m_GcState == EGcState_Idle || m_GcState == EGcState_WaitSafePoint);
+
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls && pTls->m_GcLevel);
+	
+	pTls->m_GcLevel--;
+	if (!pTls->m_GcLevel) // not unsafe anymore
+		GcDecrementUnsafeThreadCount ();
+}
+
+void
+CRuntime::GcPulse ()
+{
+	ASSERT (m_GcState == EGcState_Idle || m_GcState == EGcState_WaitSafePoint);
+
+	if (m_GcState != EGcState_WaitSafePoint)
+		return;
+
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls);
+		
+	if (pTls->m_GcLevel)
+	{
+		GcDecrementUnsafeThreadCount ();
+		GcIncrementUnsafeThreadCount ();
+	}
+}
+
+void
+CRuntime::GcIncrementUnsafeThreadCount ()
+{
 	// what we try to prevent here is entering an unsafe region when collector thread 
 	// thinks all the mutators are parked at safe regions and therefore moves on to mark/sweep
 
@@ -669,21 +717,12 @@ CRuntime::GcEnter ()
 		if (PrevCount == OldCount)
 			break;
 	}
-
-	pTls->m_Flags |= ETlsFlag_GcUnsafe;
 }
 
 void
-CRuntime::GcLeave ()
+CRuntime::GcDecrementUnsafeThreadCount ()
 {
-	ASSERT (m_GcState == EGcState_Idle || m_GcState == EGcState_WaitSafePoint);
-
-	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
-	ASSERT (pTls && (pTls->m_Flags & ETlsFlag_GcUnsafe));
-
-	pTls->m_Flags &= ~ETlsFlag_GcUnsafe;
-	intptr_t Count = mt::AtomicDec (&m_GcUnsafeThreadCount);
-	
+	intptr_t Count = mt::AtomicDec (&m_GcUnsafeThreadCount);	
 	if (m_GcState == EGcState_WaitSafePoint)
 	{
 		if (!Count)
@@ -693,23 +732,38 @@ CRuntime::GcLeave ()
 	}
 }
 
-void
-CRuntime::GcPulse ()
+size_t
+CRuntime::GcMakeThreadSafe ()
 {
-	ASSERT (m_GcState == EGcState_Idle || m_GcState == EGcState_WaitSafePoint);
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls);
 
-	if (m_GcState == EGcState_WaitSafePoint)
-	{
-		GcLeave ();
-		GcEnter ();
-	}
+	if (!pTls->m_GcLevel)
+		return 0;
+
+	size_t PrevGcLevel = pTls->m_GcLevel;
+	pTls->m_GcLevel = 0;
+	GcDecrementUnsafeThreadCount ();
+	return PrevGcLevel;
+}
+
+void
+CRuntime::RestoreGcLevel (size_t PrevGcLevel)
+{
+	if (!PrevGcLevel)
+		return;
+
+	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
+	ASSERT (pTls);
+
+	pTls->m_GcLevel = PrevGcLevel;
+	GcIncrementUnsafeThreadCount ();
 }
 
 void
 CRuntime::WaitGcIdleAndLock ()
 {
-	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
-	ASSERT (pTls && !(pTls->m_Flags & ETlsFlag_GcUnsafe)); // unsafe == deadlock
+	ASSERT (!GetTls ()->m_GcLevel); // otherwise we have a potential deadlock
 
 	for (;;)
 	{

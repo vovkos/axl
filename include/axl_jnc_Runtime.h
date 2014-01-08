@@ -171,11 +171,13 @@ public:
 	// gc heap
 
 	void
-	RunGc ()
-	{
-		WaitGcIdleAndLock ();
-		RunGc_l ();
-	}
+	RunGc ();
+
+	size_t
+	GcMakeThreadSafe (); // return prev gc level
+
+	void
+	RestoreGcLevel (size_t PrevGcLevel);
 
 	void
 	GcEnter ();
@@ -250,6 +252,12 @@ protected:
 
 	void
 	GcMarkCycle ();
+
+	void
+	GcIncrementUnsafeThreadCount ();
+
+	void
+	GcDecrementUnsafeThreadCount ();
 
 	void
 	MarkGcLocalHeapRoot (

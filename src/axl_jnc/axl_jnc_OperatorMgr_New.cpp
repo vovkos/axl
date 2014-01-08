@@ -77,7 +77,6 @@ COperatorMgr::Allocate (
 
 		TypeValue.CreateConst (&pType, m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr));
 		
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
 		m_pModule->m_LlvmIrBuilder.CreateCall2 (
 			pFunction, 
 			pFunction->GetType (), 
@@ -87,8 +86,6 @@ COperatorMgr::Allocate (
 				CValue (1, m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT)),
 			&PtrValue
 			);
-
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter); // <-- in fact, redundant: gcAllocate calls gcEnter internally
 
 		// add local-heap-root (use thin-data-ptr to distinguish it from real gc-roots)
 
@@ -184,13 +181,11 @@ COperatorMgr::Prime (
 
 	CFunction* pPrimer = pClassType->GetPrimer ();
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	CValue ScopeLevelValue;
 	if (StorageKind == EStorage_Stack)
 	{
 		ASSERT (pScope);
-		ScopeLevelValue = CalcScopeLevel (pScope);
+		ScopeLevelValue = m_pModule->m_NamespaceMgr.GetScopeLevel (pScope);
 	}
 	else 
 	{
@@ -209,8 +204,6 @@ COperatorMgr::Prime (
 		CValue (Flags, EType_Int_p),
 		NULL
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	CFunction* pDestructor = pClassType->GetDestructor ();
 	if (StorageKind != EStorage_Stack || !pDestructor)
@@ -698,6 +691,10 @@ COperatorMgr::MarkGcRoot (
 	CValue BytePtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pBytePtrType, &BytePtrValue);
 	m_pModule->m_LlvmIrBuilder.CreateStore (BytePtrValue, GcRootValue);
+	
+	llvm::Function* pLlvmFunction = pFunction->GetLlvmFunction ();
+	if (!pLlvmFunction->hasGC ())
+		pLlvmFunction->setGC ("jnc-shadow-stack");
 }
 
 //.............................................................................

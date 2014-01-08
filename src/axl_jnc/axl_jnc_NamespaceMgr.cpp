@@ -7,60 +7,6 @@ namespace jnc {
 
 //.............................................................................
 
-void
-CScopeLevelObjHdrStack::TakeOver (CScopeLevelObjHdrStack* pSrcStack)
-{
-	m_pModule = pSrcStack->m_pModule;
-	m_ValueList.TakeOver (&pSrcStack->m_ValueList);
-	m_ValueArray = pSrcStack->m_ValueArray;
-	pSrcStack->m_ValueArray.Clear ();
-}
-
-CValue
-CScopeLevelObjHdrStack::GetScopeLevelObjHdr (size_t ScopeLevel)
-{
-	ASSERT (ScopeLevel);
-
-	size_t Count = m_ValueArray.GetCount ();
-	if (ScopeLevel >= Count)
-		m_ValueArray.SetCount (ScopeLevel + 1);
-
-	if (m_ValueArray [ScopeLevel])
-		return *m_ValueArray [ScopeLevel];
-
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	CBasicBlock* pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
-
-	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
-	CValue ScopeObjectValue;
-	m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, "scope_level", pType, &ScopeObjectValue);
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
-		
-	CValue ScopeBaseLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
-	CValue ScopeIncValue (ScopeLevel, EType_SizeT);
-	CValue ScopeLevelValue;
-
-	m_pModule->m_LlvmIrBuilder.CreateAdd_i (
-		ScopeBaseLevelValue,
-		ScopeIncValue,
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-		&ScopeLevelValue
-		);
-
-	pType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr);
-
-	m_pModule->m_LlvmIrBuilder.CreateStore (ScopeLevelValue, ScopeObjectValue);
-	m_pModule->m_LlvmIrBuilder.CreateBitCast (ScopeObjectValue, pType, &ScopeObjectValue);
-
-	CValue* pValue = AXL_MEM_NEW (CValue);
-	*pValue = ScopeObjectValue;
-	m_ValueArray [ScopeLevel] = pValue;
-
-	return *pValue;
-}
-
-//.............................................................................
-
 CNamespaceMgr::CNamespaceMgr ()
 {
 	m_pModule = GetCurrentThreadModule ();
@@ -70,7 +16,7 @@ CNamespaceMgr::CNamespaceMgr ()
 	m_pCurrentScope = NULL;
 	m_CurrentAccessKind = EAccess_Public;
 	m_SourcePosLockCount = 0;
-	m_ScopeLevelObjHdrStack.m_pModule = m_pModule;
+	m_ScopeLevelStack.m_pModule = m_pModule;
 }
 
 void
@@ -84,7 +30,7 @@ CNamespaceMgr::Clear ()
 	m_pCurrentNamespace = &m_GlobalNamespace;
 	m_pCurrentScope = NULL;
 	m_SourcePosLockCount = 0;
-	m_ScopeLevelObjHdrStack.Clear ();
+	m_ScopeLevelStack.Clear ();
 	m_StaticObjectValue.Clear ();
 }
 

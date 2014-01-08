@@ -7,6 +7,7 @@
 #include "axl_jnc_Namespace.h"
 #include "axl_jnc_Scope.h"
 #include "axl_jnc_Orphan.h"
+#include "axl_jnc_ScopeLevelStack.h"
 
 namespace axl {
 namespace jnc {
@@ -14,37 +15,6 @@ namespace jnc {
 class CModule;
 class CClassType;
 
-//.............................................................................
-
-class CScopeLevelObjHdrStack
-{
-	friend class CNamespaceMgr;
-
-protected:
-	CModule* m_pModule;
-
-	rtl::CBoxListT <CValue> m_ValueList;
-	rtl::CArrayT <CValue*> m_ValueArray;
-
-public:
-	CScopeLevelObjHdrStack ()
-	{
-		m_pModule = NULL;
-	}
-
-	void
-	Clear ()
-	{
-		m_ValueList.Clear ();
-		m_ValueArray.Clear ();
-	}
-
-	void
-	TakeOver (CScopeLevelObjHdrStack* pSrcStack);
-
-	CValue
-	GetScopeLevelObjHdr (size_t ScopeLevel);
-};
 
 //.............................................................................
 
@@ -78,7 +48,7 @@ protected:
 	intptr_t m_SourcePosLockCount;
 
 	CValue m_StaticObjectValue;
-	CScopeLevelObjHdrStack m_ScopeLevelObjHdrStack;
+	CScopeLevelStack m_ScopeLevelStack;
 
 public:
 	CNamespaceMgr ();
@@ -133,7 +103,7 @@ public:
 	CNamespace*
 	GetCurrentNamespace ()
 	{
-		return m_pCurrentNamespace;
+		return m_pCurrentNamespace; 
 	}
 
 	CScope*
@@ -149,23 +119,29 @@ public:
 	}
 
 	CValue
-	GetCurrentScopeObjHdr ()
+	GetScopeLevel (CScope* pScope)
 	{
-		return GetScopeLevelObjHdr (m_pCurrentScope);
+		return pScope ? m_ScopeLevelStack.GetScopeLevel (pScope->GetLevel ()) : CValue ((int64_t) 0, EType_SizeT);
+	}
+
+	CValue
+	GetCurrentScopeLevel ()
+	{
+		return GetScopeLevel (m_pCurrentScope);
 	}
 
 	CValue
 	GetScopeLevelObjHdr (CScope* pScope)
 	{
-		return pScope ? m_ScopeLevelObjHdrStack.GetScopeLevelObjHdr (pScope->GetLevel ()) : GetStaticObjHdr ();
+		return pScope ? m_ScopeLevelStack.GetObjHdr (pScope->GetLevel ()) : GetStaticObjHdr ();
 	}
 
 	CValue
-	GetScopeLevelObjHdr (size_t ScopeLevel)
+	GetCurrentScopeObjHdr ()
 	{
-		return ScopeLevel ? m_ScopeLevelObjHdrStack.GetScopeLevelObjHdr (ScopeLevel) : GetStaticObjHdr ();
+		return GetScopeLevelObjHdr (m_pCurrentScope);
 	}
-	
+
 	CValue
 	GetStaticObjHdr ();
 

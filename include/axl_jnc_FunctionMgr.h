@@ -33,10 +33,10 @@ protected:
 
 		CNamespace* m_pCurrentNamespace;
 		CScope* m_pCurrentScope;
-		CScopeLevelObjHdrStack m_ScopeLevelObjHdrArray;
+		CScopeLevelStack m_ScopeLevelStack;
 
+		rtl::CArrayT <CBasicBlock*> m_ReturnBlockArray;
 		CBasicBlock* m_pCurrentBlock;
-		CBasicBlock* m_pReturnBlock;
 		CBasicBlock* m_pUnreachableBlock;
 		uint_t m_ControlFlowMgrFlags;
 
@@ -113,7 +113,7 @@ public:
 	}
 
 	CValue
-	GetScopeLevelValue ()
+	GetScopeLevel ()
 	{
 		return m_ScopeLevelValue;
 	}

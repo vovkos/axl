@@ -140,8 +140,6 @@ CFunction::GetLlvmFunction ()
 		return m_pLlvmFunction;
 
 	m_pLlvmFunction = m_pType->GetCallConv ()->CreateLlvmFunction (m_pType, m_Tag);
-	m_pLlvmFunction->setGC ("jnc-shadow-stack");
-
 	m_pModule->m_FunctionMgr.m_LlvmFunctionMap [m_pLlvmFunction] = this;
 	return m_pLlvmFunction;
 }

@@ -137,9 +137,6 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 	// Build the shadow stack entry after tls-related injected code
 
 	BasicBlock::iterator LlvmInst = LlvmFunction.getEntryBlock().begin();
-	ASSERT (llvm::isa <llvm::CallInst> (LlvmInst)); // gc-safe-point
-
-	LlvmInst++;
 	ASSERT (llvm::isa <llvm::CallInst> (LlvmInst)); // get-tls
 
 	llvm::Instruction* pLlvmGetTls = LlvmInst;
@@ -191,6 +188,11 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 	CType* pFramePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 
 	// Push the entry onto the shadow stack.
+
+	CFunction* pGcEnter = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcEnter);
+	CFunction* pGcLeave = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcLeave);
+	AtEntry.CreateCall (pGcEnter->GetLlvmFunction ());
+
 	Value* EntryNextPtr = CreateGEP(Context, AtEntry, StackEntry, 0, "gc_frame.next");
 	Value* NewHeadVal = AtEntry.CreateBitCast (StackEntry, pFramePtrType->GetLlvmType (), "gc_newhead");
 	AtEntry.CreateStore(CurrentHead, EntryNextPtr);
@@ -205,6 +207,7 @@ CGcShadowStack::performCustomLowering (llvm::Function& LlvmFunction)
 		Value* EntryNextPtr2 = CreateGEP(Context, *AtExit, StackEntry, 0, "gc_frame.next");
 		Value* SavedHead = AtExit->CreateLoad(EntryNextPtr2, "gc_savedhead");
 		AtExit->CreateStore(SavedHead, Head);
+		AtExit->CreateCall (pGcLeave->GetLlvmFunction ());
 	}
 
 	// Delete the original allocas (which are no longer used) and the intrinsic

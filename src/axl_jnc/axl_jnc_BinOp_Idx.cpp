@@ -29,11 +29,18 @@ CBinOp_Idx::GetResultType (
 		pOpType1 = pBaseType;
 	}
 
+	CDataPtrType* pPtrType;
+
 	EType TypeKind = pOpType1->GetTypeKind ();
 	switch (TypeKind)
 	{
 	case EType_DataPtr:
-		return pOpType1;
+		pPtrType = (CDataPtrType*) pOpType1;
+		return pPtrType->GetTargetType ()->GetDataPtrType (
+			EType_DataRef, 
+			pPtrType->GetPtrTypeKind (), 
+			pPtrType->GetFlags ()
+			);
 
 	case EType_Array:
 		return ((CArrayType*) pOpType1)->GetElementType ();
@@ -83,7 +90,8 @@ CBinOp_Idx::Operator (
 	case EType_DataPtr:
 		return 
 			m_pModule->m_OperatorMgr.CastOperator (&OpValue2, EType_Int_p) &&
-			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Add, OpValue1, OpValue2, pResultValue);
+			m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Add, OpValue1, OpValue2, &OpValue1) &&
+			m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, OpValue1, pResultValue);
 
 	case EType_Array:
 		return 

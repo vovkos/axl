@@ -341,33 +341,6 @@ COperatorMgr::CallOperator (
 }
 
 bool
-COperatorMgr::CalcScopeLevel (
-	CScope* pScope,
-	CValue* pScopeLevelValue
-	)
-{
-	if (!pScope)
-	{
-		pScopeLevelValue->SetConstSizeT (0);
-		return true;
-	}
-
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "calc scope level value");
-
-	CValue ScopeBaseLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
-	CValue ScopeIncValue (pScope->GetLevel (), EType_SizeT);
-
-	m_pModule->m_LlvmIrBuilder.CreateAdd_i (
-		ScopeBaseLevelValue,
-		ScopeIncValue,
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
-		pScopeLevelValue
-		);
-
-	return true;
-}
-
-bool
 COperatorMgr::CastArgValueList (
 	CFunctionType* pFunctionType,
 	rtl::CBoxListT <CValue>* pArgValueList
@@ -538,18 +511,12 @@ COperatorMgr::CallImpl (
 	if (!Result)
 		return false;
 
-	CValue ScopeLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
-	if (ScopeLevelValue)
+	if (m_pModule->m_FunctionMgr.GetScopeLevel ())
 	{
-		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-		CValue ScopeLevelValue = CalcScopeLevel (pScope);
-
-		CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "update scope level before call");
+		CValue ScopeLevelValue = m_pModule->m_NamespaceMgr.GetCurrentScopeLevel ();
 		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
 		m_pModule->m_LlvmIrBuilder.CreateStore (ScopeLevelValue, pVariable);
 	}
-
-	GcCall (EStdFunc_GcLeave);
 
 	pFunctionType->GetCallConv ()->Call (
 		PfnValue,
@@ -557,8 +524,6 @@ COperatorMgr::CallImpl (
 		pArgValueList,
 		pResultValue
 		);
-
-	GcCall (EStdFunc_GcEnter);
 
 	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) &&
 		!m_pModule->m_ControlFlowMgr.IsThrowLocked ())
@@ -582,9 +547,9 @@ COperatorMgr::CallImpl (
 }
 
 void
-COperatorMgr::GcCall (EStdFunc StdFuncKind)
+COperatorMgr::GcPulse ()
 {
-	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (StdFuncKind);
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_GcPulse);
 	m_pModule->m_LlvmIrBuilder.CreateCall (pFunction, pFunction->GetType (), NULL);
 }
 

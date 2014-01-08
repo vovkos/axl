@@ -39,8 +39,6 @@ CDestructList::RunDestructors ()
 		TEntry* pEntry = *Entry;
 		if (!pEntry->m_pFlagVariable) // unconditional destructor
 		{
-			m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 			m_pModule->m_LlvmIrBuilder.CreateCall (
 				pEntry->m_pDestructor, 
 				pEntry->m_pDestructor->GetType (), 
@@ -48,9 +46,6 @@ CDestructList::RunDestructors ()
 				pEntry->m_ArgValue ? 1 : 0,
 				NULL
 				);
-
-			m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
-
 			continue;
 		}
 
@@ -68,8 +63,6 @@ CDestructList::RunDestructors ()
 
 		m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pDestructBlock, pFollowBlock);
 
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 		m_pModule->m_LlvmIrBuilder.CreateCall (
 			pEntry->m_pDestructor, 
 			pEntry->m_pDestructor->GetType (), 
@@ -77,8 +70,6 @@ CDestructList::RunDestructors ()
 			pEntry->m_ArgValue ? 1 : 0,
 			NULL
 			);
-
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 		m_pModule->m_ControlFlowMgr.Follow (pFollowBlock);
 	}

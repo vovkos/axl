@@ -143,21 +143,22 @@ CFunctionMgr::PushEmissionContext ()
 
 	pContext->m_pCurrentNamespace = m_pModule->m_NamespaceMgr.m_pCurrentNamespace;
 	pContext->m_pCurrentScope = m_pModule->m_NamespaceMgr.m_pCurrentScope;
-	pContext->m_ScopeLevelObjHdrArray.TakeOver (&m_pModule->m_NamespaceMgr.m_ScopeLevelObjHdrStack);
+	pContext->m_ScopeLevelStack.TakeOver (&m_pModule->m_NamespaceMgr.m_ScopeLevelStack);
 
-	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock ();
-	pContext->m_pReturnBlock = m_pModule->m_ControlFlowMgr.m_pReturnBlock;
+	pContext->m_ReturnBlockArray = m_pModule->m_ControlFlowMgr.m_ReturnBlockArray;
+	pContext->m_pCurrentBlock = m_pModule->m_ControlFlowMgr.m_pCurrentBlock;
 	pContext->m_pUnreachableBlock = m_pModule->m_ControlFlowMgr.m_pUnreachableBlock;
 	pContext->m_ControlFlowMgrFlags = m_pModule->m_ControlFlowMgr.m_Flags;
 	pContext->m_LlvmDebugLoc = m_pModule->m_LlvmIrBuilder.GetCurrentDebugLoc ();
 
 	m_EmissionContextStack.InsertTail (pContext);
 
+	m_pModule->m_NamespaceMgr.m_ScopeLevelStack.Clear ();
 	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = &m_pModule->m_NamespaceMgr.m_GlobalNamespace;
 	m_pModule->m_NamespaceMgr.m_pCurrentScope = NULL;
 
+	m_pModule->m_ControlFlowMgr.m_ReturnBlockArray.Clear ();
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (NULL);
-	m_pModule->m_ControlFlowMgr.m_pReturnBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
@@ -180,6 +181,7 @@ CFunctionMgr::PopEmissionContext ()
 		m_pCurrentFunction = NULL;
 		m_ThisValue.Clear ();
 		m_ScopeLevelValue.Clear ();
+		m_pModule->m_NamespaceMgr.m_ScopeLevelStack.Clear ();
 		return;
 	}
 
@@ -190,10 +192,10 @@ CFunctionMgr::PopEmissionContext ()
 
 	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = pContext->m_pCurrentNamespace;
 	m_pModule->m_NamespaceMgr.m_pCurrentScope = pContext->m_pCurrentScope;
-	m_pModule->m_NamespaceMgr.m_ScopeLevelObjHdrStack.TakeOver (&pContext->m_ScopeLevelObjHdrArray);
+	m_pModule->m_NamespaceMgr.m_ScopeLevelStack.TakeOver (&pContext->m_ScopeLevelStack);
 
+	m_pModule->m_ControlFlowMgr.m_ReturnBlockArray = pContext->m_ReturnBlockArray;
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pContext->m_pCurrentBlock);
-	m_pModule->m_ControlFlowMgr.m_pReturnBlock = pContext->m_pReturnBlock;
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = pContext->m_pUnreachableBlock;
 	m_pModule->m_ControlFlowMgr.m_Flags = pContext->m_ControlFlowMgrFlags;
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (pContext->m_LlvmDebugLoc);
@@ -266,9 +268,6 @@ CFunctionMgr::Prologue (
 
 	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ()); // llvm magic
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
-
-	CFunction* pGcEnter = GetStdFunction (EStdFunc_GcEnter);
-	m_pModule->m_LlvmIrBuilder.CreateCall (pGcEnter, pGcEnter->GetType (), NULL);
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
 	{
@@ -357,12 +356,6 @@ CFunctionMgr::Epilogue ()
 
 	ASSERT (m_pCurrentFunction && pScope);
 
-	if (m_pModule->m_ControlFlowMgr.m_pReturnBlock)
-	{
-		m_pModule->m_ControlFlowMgr.Follow (m_pModule->m_ControlFlowMgr.m_pReturnBlock);
-		m_pModule->m_ControlFlowMgr.m_pReturnBlock = NULL;
-	}
-
 	if (pFunction->m_FunctionKind == EFunction_Destructor)
 	{
 		ASSERT (pFunction->GetParentType ()->GetTypeKind () == EType_Class && m_ThisValue);
@@ -429,9 +422,6 @@ CFunctionMgr::InternalPrologue (
 	pEntryBlock->MarkEntry ();
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
-
-	CFunction* pGcEnter = GetStdFunction (EStdFunc_GcEnter);
-	m_pModule->m_LlvmIrBuilder.CreateCall (pGcEnter, pGcEnter->GetType (), NULL);
 
 	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;

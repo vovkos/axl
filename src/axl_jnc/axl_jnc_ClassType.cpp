@@ -1046,8 +1046,6 @@ CClassType::PrimeInterface (
 		CFunction* pPrimer = pClassType->GetPrimer ();
 		ASSERT (pPrimer); // should have been checked during CalcLayout
 
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 		m_pModule->m_LlvmIrBuilder.CreateCall4 (
 			pPrimer,
 			pPrimer->GetType (),
@@ -1057,8 +1055,6 @@ CClassType::PrimeInterface (
 			FlagsValue,
 			NULL
 			);
-
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 	}
 }
 

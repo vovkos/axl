@@ -1926,9 +1926,6 @@ CParser::LookupIdentifier (
 	pItem = pNamespace->FindItemTraverse (Name, &Coord);
 	if (!pItem)
 	{
-		if (Name == "__scopeLevel") // tmp
-			return m_pModule->m_OperatorMgr.CalcScopeLevel (m_pModule->m_NamespaceMgr.GetCurrentScope (), pValue);
-
 		err::SetFormatStringError ("undeclared identifier '%s'", Name.cc ());
 		err::PushSrcPosError (m_pModule->m_UnitMgr.GetCurrentUnit ()->GetFilePath (), Pos);
 		return false;
@@ -2348,8 +2345,6 @@ CParser::AppendFmtLiteral (
 	CValue LengthValue;
 	LengthValue.SetConstSizeT (Length);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	CValue ResultValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
@@ -2359,8 +2354,6 @@ CParser::AppendFmtLiteral (
 		LengthValue,
 		&ResultValue
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }
@@ -2431,8 +2424,6 @@ CParser::AppendFmtLiteralValue (
 		FmtSpecifierValue = GetSimpleType (m_pModule, EType_Char)->GetDataPtrType_c ()->GetZeroValue ();
 	}
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	CValue ResultValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
@@ -2442,8 +2433,6 @@ CParser::AppendFmtLiteralValue (
 		ArgValue,
 		&ResultValue
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }
@@ -2471,8 +2460,6 @@ CParser::AppendFmtLiteralBinValue (
 	m_pModule->m_LlvmIrBuilder.CreateStore (SrcValue, TmpValue);
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (TmpValue, pArgType, &TmpValue);
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	m_pModule->m_LlvmIrBuilder.CreateCall3 (
 		pAppend,
 		pAppend->GetType (),
@@ -2481,8 +2468,6 @@ CParser::AppendFmtLiteralBinValue (
 		SizeValue,
 		&ResultValue
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	return true;
 }

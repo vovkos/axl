@@ -88,8 +88,8 @@ protected:
 	CModule* m_pModule;
 
 	rtl::CStdListT <CBasicBlock> m_BlockList;
+	rtl::CArrayT <CBasicBlock*> m_ReturnBlockArray;
 	CBasicBlock* m_pCurrentBlock;
-	CBasicBlock* m_pReturnBlock; // bindable setters & destructors return here
 	CBasicBlock* m_pUnreachableBlock;
 
 	uint_t m_Flags;

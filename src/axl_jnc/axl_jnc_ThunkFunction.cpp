@@ -53,8 +53,6 @@ CThunkFunction::Compile ()
 		ArgArray [i] = ArgValue;
 	}	
 
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 	CValue ReturnValue;
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		m_pTargetFunction, 
@@ -63,8 +61,6 @@ CThunkFunction::Compile ()
 		ArgArray.GetCount (),
 		&ReturnValue
 		);
-
-	m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcEnter);
 
 	if (m_pType->GetReturnType ()->GetTypeKind () != EType_Void)
 	{

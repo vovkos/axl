@@ -15,7 +15,6 @@ CControlFlowMgr::CControlFlowMgr ()
 	m_Flags = 0;
 	m_ThrowLockCount = 0;
 	m_pCurrentBlock = NULL;
-	m_pReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -25,8 +24,8 @@ CControlFlowMgr::Clear ()
 	m_Flags = 0;
 	m_ThrowLockCount = 0;
 	m_BlockList.Clear ();
+	m_ReturnBlockArray.Clear ();
 	m_pCurrentBlock = NULL;
-	m_pReturnBlock = NULL;
 	m_pUnreachableBlock = NULL;
 }
 
@@ -250,7 +249,7 @@ CControlFlowMgr::OnLeaveScope (CScope* pTargetScope)
 void
 CControlFlowMgr::RestoreScopeLevel ()
 {
-	CValue ScopeLevelValue = m_pModule->m_FunctionMgr.GetScopeLevelValue ();
+	CValue ScopeLevelValue = m_pModule->m_FunctionMgr.GetScopeLevel ();
 	if (!ScopeLevelValue)
 		return;
 
@@ -282,12 +281,7 @@ CControlFlowMgr::Return (const CValue& Value)
 
 		OnLeaveScope ();
 		RestoreScopeLevel ();
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
-		if (m_pReturnBlock)
-			Jump (m_pReturnBlock);
-		else
-			m_pModule->m_LlvmIrBuilder.CreateRet ();
+		m_pModule->m_LlvmIrBuilder.CreateRet ();
 	}
 	else
 	{
@@ -312,10 +306,12 @@ CControlFlowMgr::Return (const CValue& Value)
 		}
 
 		RestoreScopeLevel ();
-		m_pModule->m_OperatorMgr.GcCall (EStdFunc_GcLeave);
-
 		pFunctionType->GetCallConv ()->Return (pFunction, ReturnValue);
 	}
+
+	ASSERT (!(m_pCurrentBlock->m_Flags & EBasicBlockFlag_Return));
+	m_pCurrentBlock->m_Flags |= EBasicBlockFlag_Return;
+	m_ReturnBlockArray.Append (m_pCurrentBlock);
 
 	m_Flags |= EControlFlowFlag_HasReturn;
 
