@@ -11,15 +11,15 @@ namespace jnc {
 const char*
 GetPropertyPtrTypeKindString (EPropertyPtrType PtrTypeKind)
 {
-	static const char* StringTable [EPropertyPtrType__Count] = 
+	static const char* StringTable [EPropertyPtrType__Count] =
 	{
 		"closure",  // EPropertyPtrType_Normal = 0,
 		"weak",     // EPropertyPtrType_Weak,
 		"thin",     // EPropertyPtrType_Thin,
 	};
 
-	return (size_t) PtrTypeKind < EPropertyPtrType__Count ? 
-		StringTable [PtrTypeKind] : 
+	return (size_t) PtrTypeKind < EPropertyPtrType__Count ?
+		StringTable [PtrTypeKind] :
 		"undefined-property-ptr-kind";
 }
 
@@ -37,14 +37,14 @@ CPropertyPtrType::CPropertyPtrType ()
 bool
 CPropertyPtrType::IsConstPtrType ()
 {
-	return 
+	return
 		m_pTargetType->IsReadOnly () ||
-		(m_Flags & EPtrTypeFlag_Const) != 0 || 
-		(m_Flags & EPtrTypeFlag_ConstD) != 0 && 
+		(m_Flags & EPtrTypeFlag_Const) != 0 ||
+		(m_Flags & EPtrTypeFlag_ConstD) != 0 &&
 		m_pModule->m_NamespaceMgr.GetAccessKind (m_pAnchorNamespace) == EAccess_Public;
 }
 
-CStructType* 
+CStructType*
 CPropertyPtrType::GetPropertyPtrStructType ()
 {
 	return m_pModule->m_TypeMgr.GetPropertyPtrStructType (m_pTargetType);
@@ -107,16 +107,16 @@ CPropertyPtrType::PrepareTypeString ()
 void
 CPropertyPtrType::PrepareLlvmType ()
 {
-	m_pLlvmType = 
-		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmType () : 
+	m_pLlvmType =
+		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmType () :
 		m_pTargetType->GetVTableStructType ()->GetDataPtrType_c ()->GetLlvmType ();
 }
 
 void
 CPropertyPtrType::PrepareLlvmDiType ()
 {
-	m_LlvmDiType = 
-		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmDiType () : 
+	m_LlvmDiType =
+		m_PtrTypeKind != EPropertyPtrType_Thin ? GetPropertyPtrStructType ()->GetLlvmDiType () :
 		m_pTargetType->GetVTableStructType ()->GetDataPtrType_c ()->GetLlvmDiType ();
 }
 
@@ -133,7 +133,7 @@ CPropertyPtrType::GcMark (
 		return;
 
 	TObjHdr* pObject = pPtr->m_pClosure->m_pObject;
-	if (m_PtrTypeKind == EFunctionPtrType_Normal)
+	if (m_PtrTypeKind == EPropertyPtrType_Normal)
 		pObject->GcMarkObject (pRuntime);
 	else if (pObject->m_pClassType->GetClassTypeKind () == EClassType_FunctionClosure)
 		pObject->GcWeakMarkClosureObject (pRuntime);
