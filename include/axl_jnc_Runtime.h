@@ -37,8 +37,9 @@ GetJitKindString (EJit JitKind);
 
 enum ECreateObjectFlag
 {
-	ECreateObjectFlag_Construct = 0x01,
-	ECreateObjectFlag_Pin       = 0x02,
+	ECreateObjectFlag_Prime     = 0x01,
+	ECreateObjectFlag_Construct = 0x02,
+	ECreateObjectFlag_Pin       = 0x04,
 };
 
 //.............................................................................
@@ -211,7 +212,10 @@ public:
 	TIfaceHdr*
 	CreateObject (
 		CClassType* pType,
-		uint_t Flags = ECreateObjectFlag_Construct | ECreateObjectFlag_Pin
+		uint_t Flags =
+			ECreateObjectFlag_Prime | 
+			ECreateObjectFlag_Construct | 
+			ECreateObjectFlag_Pin
 		);
 
 	void

@@ -132,7 +132,8 @@ void
 Prime (
 	TIfaceHdr* pThis,
 	CClassType* pType,
-	void* pVTable
+	void* pVTable,
+	TObjHdr* pRoot = NULL
 	);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -148,7 +149,7 @@ public:
 	}
 
 	void
-	Prime ()
+	Prime (TObjHdr* pRoot = NULL)
 	{
 		jnc::Prime (this, GetApiClassType (), T::GetApiClassVTable ());
 	}

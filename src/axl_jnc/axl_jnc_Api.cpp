@@ -10,12 +10,18 @@ void
 Prime (
 	TIfaceHdr* pThis,
 	CClassType* pType,
-	void* pVTable
+	void* pVTable,
+	TObjHdr* pRoot
 	)
 {
 	ASSERT (pThis->m_pObject);
 
-	pThis->m_pObject->m_pType = pType;
+	if (!pThis->m_pObject->m_pType)
+		pThis->m_pObject->m_pType = pType;
+
+	if (!pRoot)
+		pRoot = pThis->m_pObject;
+
 	pThis->m_pVTable = pVTable;
 
 	// prime all the base types
@@ -33,7 +39,8 @@ Prime (
 		Prime (
 			pInterface,
 			(CClassType*) pSlot->GetType (),
-			(void**) pVTable + pSlot->GetVTableIndex ()
+			(void**) pVTable + pSlot->GetVTableIndex (),
+			pRoot
 			);
 	}
 
@@ -51,7 +58,7 @@ Prime (
 		jnc::TIfaceHdr* pInterface = (jnc::TIfaceHdr*) (pObject + 1);
 		pInterface->m_pObject = pObject;
 
-		Prime (pInterface, pFieldType, NULL);
+		Prime (pInterface, pFieldType, NULL, pRoot);
 	}
 }
 

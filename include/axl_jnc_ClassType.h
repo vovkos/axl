@@ -379,11 +379,16 @@ public:
 	CObjectT ()
 	{
 		m_ScopeLevel = 0;
-		m_pRoot = NULL;   // should be primed later
+		m_pRoot = this;   
 		m_pType = NULL;   // should be primed later
-		m_Flags = EObjHdrFlag_Alive | EObjHdrFlag_Extern;
+		m_Flags = 
+			EObjHdrFlag_Static | 
+			EObjHdrFlag_GcMark | 
+			EObjHdrFlag_GcWeakMark | 
+			EObjHdrFlag_GcRootsAdded;
+		
 		this->m_pVTable = NULL; // should be primed later
-		this->m_pObject = this; // thanks a log gcc
+		this->m_pObject = this;
 	}
 };
 
@@ -391,7 +396,12 @@ public:
 
 typedef
 void
-FObject_Prime (TObjHdr* pObject);
+FObject_Prime (
+	TObjHdr* pObject,
+	size_t ScopeLevel,
+	TObjHdr* pRoot,
+	uintptr_t Flags
+	);
 
 typedef
 void

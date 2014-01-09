@@ -20,7 +20,6 @@ enum EObjHdrFlag
 	EObjHdrFlag_Static       = 0x0010,
 	EObjHdrFlag_Stack        = 0x0020,
 	EObjHdrFlag_UHeap        = 0x0040,
-	EObjHdrFlag_Extern       = 0x0080,	
 	EObjHdrFlag_GcMark       = 0x0100,
 	EObjHdrFlag_GcWeakMark   = 0x0200,
 	EObjHdrFlag_GcWeakMark_c = 0x0400,

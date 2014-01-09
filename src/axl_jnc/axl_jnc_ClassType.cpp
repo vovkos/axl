@@ -875,9 +875,9 @@ CClassType::CreatePrimer ()
 	CType* ArgTypeArray [] =
 	{
 		GetClassStructType ()->GetDataPtrType_c (),
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),     // scope level
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),  // scope level
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr), // root
-		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)      // flags
+		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int_p)   // flags
 	};
 
 	CFunctionType* pType = m_pModule->m_TypeMgr.GetFunctionType (ArgTypeArray, countof (ArgTypeArray));

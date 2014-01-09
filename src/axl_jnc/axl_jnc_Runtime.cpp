@@ -332,8 +332,8 @@ CRuntime::GcTryAllocate (
 	WaitGcIdleAndLock ();	
 	if (m_PeriodGcAllocSize > m_PeriodGcAllocLimit)
 	{
-		RunGc_l ();
-		WaitGcIdleAndLock ();	
+	//	RunGc_l ();
+	//	WaitGcIdleAndLock ();	
 	}
 
 	RestoreGcLevel (PrevGcLevel); // restore before unlocking
@@ -848,14 +848,19 @@ CRuntime::CreateObject (
 		return NULL;
 	}
 
-	TObjHdr* pObject = (TObjHdr*) GcAllocate (pType, 1);
+	GcEnter ();
+
+	TObjHdr* pObject = (TObjHdr*) GcAllocate (pType);
 	if (!pObject)
 		return NULL;
 
 	CScopeThreadRuntime ScopeRuntime (this);
 
-	FObject_Prime* pfPrime = (FObject_Prime*) pPrimer->GetMachineCode ();
-	pfPrime (pObject);
+	if (Flags & ECreateObjectFlag_Prime)
+	{
+		FObject_Prime* pfPrime = (FObject_Prime*) pPrimer->GetMachineCode ();
+		pfPrime (pObject, 0, pObject, 0);
+	}
 
 	TIfaceHdr* pInterface = (TIfaceHdr*) (pObject + 1);
 
@@ -872,17 +877,25 @@ CRuntime::CreateObject (
 	if (Flags & ECreateObjectFlag_Pin)
 		PinObject (pInterface);
 
+	GcLeave ();
+
 	return pInterface;
 }
 
 void
 CRuntime::PinObject (TIfaceHdr* pObject)
 {
+	m_Lock.Lock ();
+	m_GcPinTable.Goto (pObject);
+	m_Lock.Unlock ();
 }
 
 void
 CRuntime::UnpinObject (TIfaceHdr* pObject)
 {
+	m_Lock.Lock ();
+	m_GcPinTable.DeleteByKey (pObject);
+	m_Lock.Unlock ();
 }
 
 //.............................................................................
