@@ -76,6 +76,10 @@ statement
 		m_pModule->m_ControlFlowMgr.ResetJumpFlag (); // 'stack new' is currently illegal in conditional expression
 		m_pModule->m_NamespaceMgr.SetSourcePos (m_CurrentToken.m_Pos);
 	}
+	leave
+	{
+		m_pModule->m_OperatorMgr.NullifyTmpStackGcRootList ();
+	}
 	:	compound_stmt
 	|	expression_stmt
 	|	if_stmt

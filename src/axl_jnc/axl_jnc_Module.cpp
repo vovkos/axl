@@ -17,6 +17,7 @@ CModule::Clear ()
 	m_VariableMgr.Clear ();
 	m_ConstMgr.Clear ();
 	m_ControlFlowMgr.Clear ();
+	m_OperatorMgr.Clear ();
 	m_UnitMgr.Clear ();
 	m_CalcLayoutArray.Clear ();
 	m_CompileArray.Clear ();

@@ -42,6 +42,7 @@ protected:
 
 		CValue m_ThisValue;
 		CValue m_ScopeLevelValue;
+		rtl::CBoxListT <CValue> m_TmpStackGcRootList;
 
 		llvm::DebugLoc m_LlvmDebugLoc;
 	};

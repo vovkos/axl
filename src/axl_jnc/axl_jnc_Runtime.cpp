@@ -506,7 +506,7 @@ CRuntime::RunGc_l ()
 				if (p) // check needed, stack roots could be nullified
 				{
 					if (pType->GetTypeKind () == EType_DataPtr && 
-						((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin) // local-heap-root
+						((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin) // local heap variable
 					{
 						MarkGcLocalHeapRoot (p, ((CDataPtrType*) pType)->GetTargetType ());
 					}

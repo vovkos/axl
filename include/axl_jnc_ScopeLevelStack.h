@@ -19,6 +19,7 @@ class CScopeLevelStack
 
 	struct TEntry: rtl::TListLink
 	{
+		CValue m_ScopeLevelValue;
 		CValue m_ObjHdrValue;
 	};
 

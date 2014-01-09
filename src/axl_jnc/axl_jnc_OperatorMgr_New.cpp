@@ -69,7 +69,7 @@ COperatorMgr::Allocate (
 		m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
 
 		if (pType->GetFlags () & ETypeFlag_GcRoot)
-			MarkGcRoot (PtrValue, pType);
+			MarkStackGcRoot (PtrValue, pType);
 		break;
 
 	case EStorage_Heap:
@@ -87,9 +87,6 @@ COperatorMgr::Allocate (
 			&PtrValue
 			);
 
-		// add local-heap-root (use thin-data-ptr to distinguish it from real gc-roots)
-
-		MarkGcRoot (PtrValue, pType->GetDataPtrType_c ());
 		break;
 
 	case EStorage_UHeap:
@@ -648,28 +645,51 @@ COperatorMgr::NullifyGcRootList (const rtl::CConstBoxListT <CValue>& List)
 }
 
 void
-COperatorMgr::MarkGcRoot (
+COperatorMgr::CreateTmpStackGcRoot (const CValue& Value)
+{
+	CType* pType = Value.GetType ();
+	ASSERT (pType->GetFlags () & ETypeFlag_GcRoot);
+
+	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
+	CBasicBlock* pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());	
+	CValue PtrValue;
+	m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, "tmpGcRoot", NULL, &PtrValue);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
+
+	m_pModule->m_LlvmIrBuilder.CreateStore (Value, PtrValue);
+	MarkStackGcRoot (PtrValue, pType, true);
+}
+
+void
+COperatorMgr::MarkStackGcRoot (
 	const CValue& PtrValue,
-	CType* pType
+	CType* pType,
+	bool IsTmpGcRoot
 	)
 {
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
-	CBasicBlock* pBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+	CBasicBlock* pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
 
 	CType* pBytePtrType = m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr);
 
 	CValue GcRootValue;
 	m_pModule->m_LlvmIrBuilder.CreateAlloca (
 		pBytePtrType,
-		"gc_root",
+		"gcRoot",
 		pBytePtrType->GetDataPtrType_c (),
 		&GcRootValue
 		);
 
-	CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
-	ASSERT (pScope);
-
-	pScope->AddToGcRootList (GcRootValue);
+	if (IsTmpGcRoot)
+	{
+		m_TmpStackGcRootList.InsertTail (GcRootValue);
+	}
+	else
+	{
+		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
+		ASSERT (pScope);
+		pScope->AddToGcRootList (GcRootValue);
+	}
 
 	CFunction* pMarkGcRoot = m_pModule->m_FunctionMgr.GetStdFunction (EStdFunc_MarkGcRoot);
 	ASSERT (pMarkGcRoot);
@@ -686,7 +706,7 @@ COperatorMgr::MarkGcRoot (
 		&ResultValue
 		);
 
-	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pBlock);
+	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
 
 	CValue BytePtrValue;
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (PtrValue, pBytePtrType, &BytePtrValue);

@@ -158,6 +158,8 @@ protected:
 	CCastOperator* m_CastOperatorTable [EType__Count];
 	CCastOperator* m_StdCastOperatorTable [EStdCast__Count];
 
+	rtl::CBoxListT <CValue> m_TmpStackGcRootList;
+
 public:
 	COperatorMgr ();
 
@@ -168,9 +170,26 @@ public:
 	}
 
 	void
-	MarkGcRoot (
+	Clear ()
+	{
+		m_TmpStackGcRootList.Clear ();
+	}
+
+	void
+	NullifyTmpStackGcRootList ()
+	{
+		NullifyGcRootList (m_TmpStackGcRootList);
+		m_TmpStackGcRootList.Clear ();
+	}
+
+	void
+	CreateTmpStackGcRoot (const CValue& Value);
+
+	void
+	MarkStackGcRoot (
 		const CValue& PtrValue,
-		CType* pType
+		CType* pType,
+		bool IsTmpGcRoot = false
 		);
 
 	// load reference, get property, enum->int, bool->int, array->ptr -- unless specified otherwise with Flags

@@ -140,6 +140,7 @@ CFunctionMgr::PushEmissionContext ()
 	pContext->m_pCurrentFunction = m_pCurrentFunction;
 	pContext->m_ThisValue = m_ThisValue;
 	pContext->m_ScopeLevelValue = m_ScopeLevelValue;
+	pContext->m_TmpStackGcRootList.TakeOver (&m_pModule->m_OperatorMgr.m_TmpStackGcRootList);
 
 	pContext->m_pCurrentNamespace = m_pModule->m_NamespaceMgr.m_pCurrentNamespace;
 	pContext->m_pCurrentScope = m_pModule->m_NamespaceMgr.m_pCurrentScope;
@@ -182,6 +183,7 @@ CFunctionMgr::PopEmissionContext ()
 		m_ThisValue.Clear ();
 		m_ScopeLevelValue.Clear ();
 		m_pModule->m_NamespaceMgr.m_ScopeLevelStack.Clear ();
+		m_pModule->m_OperatorMgr.m_TmpStackGcRootList.Clear ();
 		return;
 	}
 
@@ -189,6 +191,7 @@ CFunctionMgr::PopEmissionContext ()
 	m_pCurrentFunction = pContext->m_pCurrentFunction;
 	m_ThisValue = pContext->m_ThisValue;
 	m_ScopeLevelValue = pContext->m_ScopeLevelValue;
+	m_pModule->m_OperatorMgr.m_TmpStackGcRootList.TakeOver (&pContext->m_TmpStackGcRootList);
 
 	m_pModule->m_NamespaceMgr.m_pCurrentNamespace = pContext->m_pCurrentNamespace;
 	m_pModule->m_NamespaceMgr.m_pCurrentScope = pContext->m_pCurrentScope;
@@ -275,6 +278,11 @@ CFunctionMgr::Prologue (
 		if (!Result)
 			return false;
 	}
+	else // do not save / restore scope level in module constructor
+	{
+		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
+		m_pModule->m_LlvmIrBuilder.CreateLoad (pVariable, NULL, &m_ScopeLevelValue);
+	}
 
 	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
@@ -289,11 +297,6 @@ CFunctionMgr::Prologue (
 		Result = m_pModule->m_VariableMgr.InitializeGlobalStaticVariables ();
 		if (!Result)
 			return false;
-	}
-	else // do not save / restore scope level in module constructor
-	{
-		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
-		m_pModule->m_LlvmIrBuilder.CreateLoad (pVariable, NULL, &m_ScopeLevelValue);
 	}
 
 	pFunction->GetType ()->GetCallConv ()->CreateArgVariables (pFunction);
@@ -423,15 +426,15 @@ CFunctionMgr::InternalPrologue (
 
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 
-	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
-	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
-	m_pModule->m_ControlFlowMgr.m_Flags = 0;
-
 	if (pFunction->m_FunctionKind != EFunction_ModuleConstructor) // do not save / restore scope level in module constructor
 	{
 		CVariable* pVariable = m_pModule->m_VariableMgr.GetStdVariable (EStdVariable_ScopeLevel);
 		m_pModule->m_LlvmIrBuilder.CreateLoad (pVariable, NULL, &m_ScopeLevelValue);
 	}
+
+	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
+	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
+	m_pModule->m_ControlFlowMgr.m_Flags = 0;
 
 	if (pFunction->IsMember ())
 		CreateThisValue ();

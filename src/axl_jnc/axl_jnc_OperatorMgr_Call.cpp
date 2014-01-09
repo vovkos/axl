@@ -525,6 +525,9 @@ COperatorMgr::CallImpl (
 		pResultValue
 		);
 
+	if (pResultValue->GetType ()->GetFlags () & ETypeFlag_GcRoot)
+		CreateTmpStackGcRoot (*pResultValue);
+
 	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) &&
 		!m_pModule->m_ControlFlowMgr.IsThrowLocked ())
 	{

@@ -23,19 +23,8 @@ class C1
 
 int main ()
 {
-	C1* p;
-	weak C1* wp;
-
-	{ 
-		// new operator adds a gc-root so newly created object 
-		// is guaranteed to stay alive until the end of the scope
-
-		p = new C1;
-	} 
-
-	// ok, only pointers keep object alive from now on
-
-	wp = p;
+	C1* p = new C1;
+	weak C1* wp = p;
 
 	// p = null; // <-- uncomment to lose strong pointer, then object will get destructed next gc run
 

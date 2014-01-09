@@ -470,6 +470,12 @@ CVariableMgr::AllocatePrimeInitializeNonStaticVariable (CVariable* pVariable)
 
 	if (!Result)
 		return false;
+	
+	if (pVariable->m_StorageKind == EStorage_Heap) // local heap variable
+		m_pModule->m_OperatorMgr.MarkStackGcRoot (
+			PtrValue, 
+			pVariable->m_pType->GetDataPtrType_c ()
+			);
 
 	pVariable->m_pLlvmAllocValue = PtrValue.GetLlvmValue ();
 

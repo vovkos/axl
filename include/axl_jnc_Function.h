@@ -152,7 +152,7 @@ enum EStdFunc
 
 	EStdFunc_GcTryAllocate,
 
-	// void
+	// bool
 	// jnc.GcEnter ();
 
 	EStdFunc_GcEnter,
