@@ -3,9 +3,15 @@
 
 //.............................................................................
 
+char* g_p;
+
 int main ()
 {	
 	printf ("hello world!\n");
+
+	heap char buffer [256];
+	g_p = buffer;
+
 	return 0;
 }
 

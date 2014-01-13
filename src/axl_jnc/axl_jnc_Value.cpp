@@ -154,7 +154,7 @@ CValue::GetLlvmConst (
 		Integer = *(int8_t*) p != 0;
 		pLlvmConst = llvm::ConstantInt::get (
 			pType->GetLlvmType (),
-			llvm::APInt (1, Integer, (pType->GetTypeKindFlags () & ETypeKindFlag_Signed) != 0)
+			llvm::APInt (1, Integer, !(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned))
 			);
 		break;
 
@@ -175,7 +175,7 @@ CValue::GetLlvmConst (
 		Integer = *(int64_t*) p;
 		pLlvmConst = llvm::ConstantInt::get (
 			pType->GetLlvmType (),
-			llvm::APInt (pType->GetSize () * 8, Integer, (pType->GetTypeKindFlags () & ETypeKindFlag_Signed) != 0)
+			llvm::APInt (pType->GetSize () * 8, Integer, !(pType->GetTypeKindFlags () & ETypeKindFlag_Unsigned))
 			);
 		break;
 

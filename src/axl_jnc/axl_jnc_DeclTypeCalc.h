@@ -68,6 +68,12 @@ public:
 		uint_t TypeModifiers
 		);
 
+	CType*
+	CalcIntModType (
+		CType* pType,
+		uint_t TypeModifiers
+		);
+
 	CFunctionType*
 	CalcPropertyGetterType (CDeclarator* pDeclarator);
 
@@ -119,6 +125,9 @@ protected:
 
 	CImportPtrType*
 	GetImportPtrType (CNamedImportType* pImportType);
+
+	CImportIntModType*
+	GetImportIntModType (CNamedImportType* pImportType);
 
 	CType*
 	PrepareReturnType (CType* pType);

@@ -234,6 +234,9 @@ Members2
 		);
 
 	bool
+	DeclareUnnamedStructOrUnion (CDerivableType* pType);
+
+	bool
 	DeclareReactor (
 		CDeclarator* pDeclarator,
 		CClassType* pType,

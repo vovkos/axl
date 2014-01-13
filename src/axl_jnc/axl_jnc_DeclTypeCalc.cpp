@@ -250,6 +250,23 @@ CDeclTypeCalc::CalcPtrType (
 	return pType;
 }
 
+CType*
+CDeclTypeCalc::CalcIntModType (
+	CType* pType,
+	uint_t TypeModifiers
+	)
+{
+	m_pModule = pType->GetModule ();
+	m_TypeModifiers = TypeModifiers;
+
+	pType = GetIntegerType (pType);
+
+	if (!CheckUnusedModifiers ())
+		return NULL;
+
+	return pType;
+}
+
 CFunctionType*
 CDeclTypeCalc::CalcPropertyGetterType (CDeclarator* pDeclarator)
 {
@@ -368,6 +385,9 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 {
 	ASSERT (m_TypeModifiers & ETypeModifierMask_Integer);
 
+	if (pType->GetTypeKind () == EType_NamedImport)
+		return GetImportIntModType ((CNamedImportType*) pType);
+	
 	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 	{
 		err::SetFormatStringError ("'%s' modifier cannot be applied to '%s'",
@@ -725,6 +745,14 @@ CDeclTypeCalc::GetImportPtrType (CNamedImportType* pImportType)
 	uint_t TypeModifiers = m_TypeModifiers & ETypeModifierMask_ImportPtr;
 	m_TypeModifiers &= ~ETypeModifierMask_ImportPtr;
 	return m_pModule->m_TypeMgr.GetImportPtrType (pImportType, TypeModifiers);
+}
+
+CImportIntModType*
+CDeclTypeCalc::GetImportIntModType (CNamedImportType* pImportType)
+{
+	uint_t TypeModifiers = m_TypeModifiers & ETypeModifierMask_Integer;
+	m_TypeModifiers &= ~ETypeModifierMask_Integer;
+	return m_pModule->m_TypeMgr.GetImportIntModType (pImportType, TypeModifiers);
 }
 
 //.............................................................................

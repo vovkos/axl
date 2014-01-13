@@ -18,7 +18,7 @@ COperatorMgr::GetLeanDataPtrObjHdr (
 	EValue ValueKind = Value.GetValueKind ();
 	if (ValueKind == EValue_Variable)
 	{	
-		*pResultValue = m_pModule->m_NamespaceMgr.GetScopeLevelObjHdr (Value.GetVariable ()->GetScope ());
+		*pResultValue = Value.GetVariable ()->GetScopeLevelObjHdr ();
 		return;
 	}
 
@@ -27,7 +27,7 @@ COperatorMgr::GetLeanDataPtrObjHdr (
 
 	if (ScopeValidatorValue.GetValueKind () == EValue_Variable)
 	{
-		*pResultValue = m_pModule->m_NamespaceMgr.GetScopeLevelObjHdr (ScopeValidatorValue.GetVariable ()->GetScope ());
+		*pResultValue = ScopeValidatorValue.GetVariable ()->GetScopeLevelObjHdr ();
 		return;
 	}
 	
@@ -308,7 +308,7 @@ COperatorMgr::ExtractBitField (
 	if (!Result)
 		return false;
 
-	if (pBaseType->GetTypeKindFlags () & ETypeKindFlag_Signed) // extend with sign bit
+	if (!(pBaseType->GetTypeKindFlags () & ETypeKindFlag_Unsigned)) // extend with sign bit
 	{
 		int64_t SignBit = (int64_t) 1 << (BitCount - 1);
 

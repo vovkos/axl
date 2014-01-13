@@ -145,7 +145,7 @@ CCast_SwapByteOrder::LlvmCast (
 	SwapFunctionValue.SetLlvmValue (pLlvmSwap, NULL);
 	m_pModule->m_LlvmIrBuilder.CreateCall (
 		SwapFunctionValue,
-		NULL,
+		m_pModule->m_TypeMgr.GetCallConv (ECallConv_Default),
 		&OpValue, 1,
 		pType,
 		pResultValue

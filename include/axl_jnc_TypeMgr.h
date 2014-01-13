@@ -95,6 +95,7 @@ protected:
 	rtl::CStdListT <CPropertyPtrType> m_PropertyPtrTypeList;
 	rtl::CStdListT <CNamedImportType> m_NamedImportTypeList;
 	rtl::CStdListT <CImportPtrType> m_ImportPtrTypeList;
+	rtl::CStdListT <CImportIntModType> m_ImportIntModTypeList;
 	rtl::CStdListT <CReactorClassType> m_ReactorClassTypeList;
 	rtl::CStdListT <CFunctionClosureClassType> m_FunctionClosureClassTypeList;
 	rtl::CStdListT <CPropertyClosureClassType> m_PropertyClosureClassTypeList;
@@ -225,6 +226,12 @@ public:
 	GetImportPtrTypeList ()
 	{
 		return m_ImportPtrTypeList;
+	}
+
+	rtl::CConstListT <CImportIntModType>
+	GetImportIntModTypeList ()
+	{
+		return m_ImportIntModTypeList;
 	}
 
 	rtl::CConstListT <CReactorClassType>
@@ -884,6 +891,13 @@ public:
 
 	CImportPtrType*
 	GetImportPtrType (
+		CNamedImportType* pImportType,
+		uint_t TypeModifiers = 0,
+		uint_t Flags = 0
+		);
+
+	CImportIntModType*
+	GetImportIntModType (
 		CNamedImportType* pImportType,
 		uint_t TypeModifiers = 0,
 		uint_t Flags = 0

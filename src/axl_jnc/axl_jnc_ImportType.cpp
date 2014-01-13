@@ -50,6 +50,35 @@ CImportPtrType::PrepareTypeString ()
 
 //.............................................................................
 
+CImportIntModType::CImportIntModType ()
+{
+	m_TypeKind = EType_ImportPtr;
+	m_pImportType = NULL;
+	m_TypeModifiers = 0;
+}
+
+void
+CImportIntModType::PrepareTypeString ()
+{
+	if (m_pActualType)
+	{
+		m_TypeString = m_pActualType->GetTypeString ();
+		return;
+	}
+
+	m_TypeString = "import ";
+
+	if (m_TypeModifiers)
+	{
+		m_TypeString += GetTypeModifierString (m_TypeModifiers);
+		m_TypeString += ' ';
+	}
+
+	m_TypeString += m_pImportType->GetQualifiedName ();
+}
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {
 

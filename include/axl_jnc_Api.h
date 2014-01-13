@@ -13,7 +13,12 @@ namespace jnc {
 
 //.............................................................................
 
-#define AXL_JNC_API_BEGIN_CLASS(Name, Class, Slot) \
+#define AXL_JNC_API_BEGIN_CLASS(Name, Slot) \
+axl::jnc::TIfaceHdr* \
+GetRootIfaceHdr () \
+{ \
+	return (axl::jnc::TIfaceHdr*) (char*) this; \
+} \
 static \
 size_t \
 GetApiClassSlot () \
@@ -25,6 +30,13 @@ const char* \
 GetApiClassName () \
 { \
 	return Name; \
+} \
+static \
+axl::jnc::CClassType* \
+GetApiClassType () \
+{ \
+	axl::jnc::CModule* pModule = axl::jnc::GetCurrentThreadModule (); \
+	return pModule->GetApiClassType (GetApiClassSlot (), GetApiClassName ()); \
 } \
 static \
 bool \
@@ -41,11 +53,19 @@ Export (axl::jnc::CRuntime* pRuntime) \
 
 #define AXL_JNC_API_END_CLASS() \
 	return true; \
+} \
+static \
+void* \
+GetApiClassVTable () \
+{ \
+	return NULL; \
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#define AXL_JNC_API_BEGIN_VTABLE() \
+//.............................................................................
+	
+#define AXL_JNC_API_END_CLASS_BEGIN_VTABLE() \
+	return true; \
+} \
 static \
 void* \
 GetApiClassVTable () \
@@ -53,13 +73,13 @@ GetApiClassVTable () \
 	static void* VTable [] = \
 	{
 
+#define AXL_JNC_API_VTABLE_FUNCTION(Function) \
+	pvoid_cast (Function),
+
 #define AXL_JNC_API_END_VTABLE() \
 	}; \
 	return VTable; \
 }
-
-#define AXL_JNC_API_VTABLE_FUNCTION(Function) \
-	pvoid_cast (Function),
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -130,67 +150,40 @@ Export (axl::jnc::CRuntime* pRuntime) \
 
 void
 Prime (
-	TIfaceHdr* pThis,
 	CClassType* pType,
 	void* pVTable,
-	TObjHdr* pRoot = NULL
+	TObjHdr* pObject,
+	size_t ScopeLevel,
+	TObjHdr* pRoot,
+	uintptr_t Flags
 	);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <typename T>
-class CApiClassT: public jnc::TIfaceHdr
+class CApiObjBoxT:
+	public TObjHdr,
+	public T
 {
 public:
-	CApiClassT ()
+	void
+	Prime (
+		size_t ScopeLevel,
+		jnc::TObjHdr* pRoot,
+		uintptr_t Flags = 0
+		)
 	{
-		m_pObject = NULL;
-		m_pVTable = NULL;
+		jnc::Prime (T::GetApiClassType (), T::GetApiClassVTable (), this, ScopeLevel, pRoot, Flags);
 	}
 
 	void
-	Prime (TObjHdr* pRoot = NULL)
+	Prime (jnc::TObjHdr* pRoot)
 	{
-		jnc::Prime (this, GetApiClassType (), T::GetApiClassVTable ());
+		Prime (pRoot->m_ScopeLevel, pRoot, pRoot->m_Flags);
 	}
 
-	static
-	CClassType*
-	GetApiClassType ()
+	void
+	Prime () // most common primer with scope level 0
 	{
-		CModule* pModule = GetCurrentThreadModule ();
-		return pModule->GetApiClassType (T::GetApiClassSlot (), T::GetApiClassName ());
-	}
-
-	// override in derived class
-
-	// static
-	// size_t
-	// GetApiClassSlot ();
-
-	// static
-	// const char*
-	// GetApiClassName ();
-
-	static
-	void*
-	GetApiClassVTable () // optional override
-	{
-		return NULL;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class CSimpleMulticast: public jnc::TMulticast
-{
-public:
-	static
-	CMulticastClassType*
-	GetApiClassType ()
-	{
-		CModule* pModule = GetCurrentThreadModule ();
-		return (CMulticastClassType*) pModule->m_TypeMgr.GetStdType (EStdType_SimpleMulticast);
+		Prime (0, this, 0);
 	}
 };
 

@@ -7,22 +7,18 @@ namespace jnc {
 //.............................................................................
 
 void
-Prime (
-	TIfaceHdr* pThis,
+PrimeInterface (
 	CClassType* pType,
+	TIfaceHdr* pThis,
 	void* pVTable,
-	TObjHdr* pRoot
+	TObjHdr* pObject,
+	size_t ScopeLevel,
+	TObjHdr* pRoot,
+	uintptr_t Flags
 	)
 {
-	ASSERT (pThis->m_pObject);
-
-	if (!pThis->m_pObject->m_pType)
-		pThis->m_pObject->m_pType = pType;
-
-	if (!pRoot)
-		pRoot = pThis->m_pObject;
-
 	pThis->m_pVTable = pVTable;
+	pThis->m_pObject = pObject;
 
 	// prime all the base types
 
@@ -33,14 +29,14 @@ Prime (
 		CBaseTypeSlot* pSlot = BaseTypePrimeArray [i];
 		ASSERT (pSlot->GetType ()->GetTypeKind () == EType_Class);
 
-		jnc::TIfaceHdr* pInterface = (jnc::TIfaceHdr*) ((char*) pThis + pSlot->GetOffset ());
-		pInterface->m_pObject = pThis->m_pObject;
-
-		Prime (
-			pInterface,
+		PrimeInterface (
 			(CClassType*) pSlot->GetType (),
-			(void**) pVTable + pSlot->GetVTableIndex (),
-			pRoot
+			(TIfaceHdr*) ((char*) pThis + pSlot->GetOffset ()),
+			pVTable ? (void**) pVTable + pSlot->GetVTableIndex () : NULL,
+			pObject,
+			ScopeLevel,
+			pRoot,
+			Flags
 			);
 	}
 
@@ -52,14 +48,38 @@ Prime (
 	{
 		CStructField* pField = FieldPrimeArray [i];
 		ASSERT (pField->GetType ()->GetTypeKind () == EType_Class);
+
 		CClassType* pFieldType = (CClassType*) pField->GetType ();
+		TObjHdr* pFieldObjHdr = (TObjHdr*) ((char*) pThis + pField->GetOffset ());
+		void* pFieldVTable = NULL; // pFieldType->GetVTablePtrValue ()
 
-		jnc::TObjHdr* pObject = (jnc::TObjHdr*) ((char*) pThis + pField->GetOffset ());
-		jnc::TIfaceHdr* pInterface = (jnc::TIfaceHdr*) (pObject + 1);
-		pInterface->m_pObject = pObject;
-
-		Prime (pInterface, pFieldType, NULL, pRoot);
+		Prime (
+			pFieldType, 
+			pFieldVTable,
+			pFieldObjHdr,
+			ScopeLevel,
+			pRoot,
+			Flags
+			);
 	}
+}
+
+void
+Prime (
+	CClassType* pType,
+	void* pVTable,
+	TObjHdr* pObject,
+	size_t ScopeLevel,
+	TObjHdr* pRoot,
+	uintptr_t Flags
+	)
+{
+	pObject->m_ScopeLevel = ScopeLevel;
+	pObject->m_pRoot = pRoot;
+	pObject->m_pType = pType;
+	pObject->m_Flags = Flags;
+
+	PrimeInterface (pType, (TIfaceHdr*) (pObject + 1), pVTable, pObject, ScopeLevel, pRoot, Flags);
 }
 
 //.............................................................................

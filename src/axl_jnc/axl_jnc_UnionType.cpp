@@ -64,6 +64,13 @@ CUnionType::CreateFieldImpl (
 			return NULL;
 	}
 
+	if (pType->GetTypeKindFlags () & ETypeKindFlag_Import)
+	{
+		pField->m_pType_i = (CImportType*) pType;
+		m_ImportFieldArray.Append (pField);
+	}
+
+	m_MemberFieldArray.Append (pField);
 	return pField;
 }
 

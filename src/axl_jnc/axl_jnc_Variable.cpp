@@ -19,6 +19,14 @@ CVariable::CVariable ()
 	m_pLlvmAllocValue = NULL;
 }
 
+CValue
+CVariable::GetScopeLevelObjHdr ()
+{
+	return m_StorageKind == EStorage_Stack ? 
+		m_pModule->m_NamespaceMgr.GetScopeLevelObjHdr (m_pScope) :
+		m_pModule->m_NamespaceMgr.GetStaticObjHdr ();
+}
+
 bool
 CVariable::CalcLayout ()
 {

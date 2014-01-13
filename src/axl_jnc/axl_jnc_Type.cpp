@@ -17,40 +17,35 @@ GetTypeKindFlags (EType TypeKind)
 
 		ETypeKindFlag_Numeric,       // EType_Bool
 
-		ETypeKindFlag_Signed |       // EType_Int8
-		ETypeKindFlag_Integer |
+		ETypeKindFlag_Integer |      // EType_Int8
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Unsigned |     // EType_Int8_u
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Signed |       // EType_Int16
-		ETypeKindFlag_Integer |
+		ETypeKindFlag_Integer |      // EType_Int16
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Unsigned |     // EType_Int16_u
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Signed |       // EType_Int32
-		ETypeKindFlag_Integer |
+		ETypeKindFlag_Integer |      // EType_Int32
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Unsigned |     // EType_Int32_u
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
-
-		ETypeKindFlag_Signed |       // EType_Int64
-		ETypeKindFlag_Integer |
+				
+		ETypeKindFlag_Integer |      // EType_Int64
 		ETypeKindFlag_Numeric,
 
 		ETypeKindFlag_Unsigned |     // EType_Int64_u
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Signed |       // EType_Int16_be
-		ETypeKindFlag_BigEndian |
+		ETypeKindFlag_BigEndian |    // EType_Int16_be
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
@@ -59,8 +54,7 @@ GetTypeKindFlags (EType TypeKind)
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Signed |       // EType_Int32_be
-		ETypeKindFlag_BigEndian |
+		ETypeKindFlag_BigEndian |    // EType_Int32_be
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
@@ -69,8 +63,7 @@ GetTypeKindFlags (EType TypeKind)
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
-		ETypeKindFlag_Signed |       // EType_Int64_be
-		ETypeKindFlag_BigEndian |
+		ETypeKindFlag_BigEndian |    // EType_Int64_be
 		ETypeKindFlag_Integer |
 		ETypeKindFlag_Numeric,
 
@@ -139,6 +132,10 @@ GetTypeKindFlags (EType TypeKind)
 
 		ETypeKindFlag_Import |       // EType_ImportPtr
 		ETypeKindFlag_Ptr,
+
+		ETypeKindFlag_Import |       // EType_ImportIntMod
+		ETypeKindFlag_Integer | 
+		ETypeKindFlag_Numeric,
 	};
 
 	return TypeKind < EType__Count ? FlagTable [TypeKind] : 0;

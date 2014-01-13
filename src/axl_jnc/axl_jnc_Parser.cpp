@@ -117,7 +117,7 @@ CParser::IsTypeSpecified ()
 	if (m_TypeSpecifierStack.IsEmpty ())
 		return false;
 
-	// if we seen 'unsigned' or 'bigendian', assume 'int' is implied.
+	// if we've seen 'unsigned', assume 'int' is implied.
 	// checking for 'property' is required for full property syntax e.g.:
 	// property foo { int get (); }
 	// here 'foo' should be a declarator, not import-type-specifier
@@ -125,7 +125,7 @@ CParser::IsTypeSpecified ()
 	CTypeSpecifier* pTypeSpecifier = m_TypeSpecifierStack.GetBack ();
 	return
 		pTypeSpecifier->GetType () != NULL ||
-		pTypeSpecifier->GetTypeModifiers () & (ETypeModifierMask_Integer | ETypeModifier_Property);
+		pTypeSpecifier->GetTypeModifiers () & (ETypeModifier_Unsigned | ETypeModifier_Property);
 }
 
 CNamedImportType*
@@ -1367,6 +1367,18 @@ CParser::DeclareData (
 	}
 
 	return true;
+}
+
+bool
+CParser::DeclareUnnamedStructOrUnion (CDerivableType* pType)
+{
+	m_StorageKind = EStorage_Undefined;
+	m_AccessKind = EAccess_Undefined;
+
+	CDeclarator Declarator;
+	Declarator.m_DeclaratorKind = EDeclarator_Name;
+	Declarator.m_Pos = *pType->GetPos ();
+	return DeclareData (&Declarator, pType, 0);
 }
 
 CFunctionArg*

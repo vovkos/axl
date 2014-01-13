@@ -48,8 +48,6 @@ CStructType::CreateFieldImpl (
 	rtl::CBoxListT <CToken>* pInitializer
 	)
 {
-	ASSERT (!(pType->GetTypeKindFlags () & ETypeKindFlag_Code));
-
 	CStructField* pField = AXL_MEM_NEW (CStructField);
 	pField->m_pModule = m_pModule;
 	pField->m_StorageKind = m_StorageKind;

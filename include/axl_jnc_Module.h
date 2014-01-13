@@ -67,6 +67,8 @@ protected:
 	rtl::CArrayT <CModuleItem*> m_CalcLayoutArray;
 	rtl::CArrayT <CModuleItem*> m_CompileArray;
 	rtl::CArrayT <CModuleItem*> m_ApiItemArray;
+	
+	rtl::CBoxListT <rtl::CString> m_SourceList;
 
 	llvm::Module* m_pLlvmModule;
 

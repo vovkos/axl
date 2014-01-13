@@ -184,5 +184,52 @@ protected:
 
 //.............................................................................
 
+class CImportIntModType: public CImportType
+{
+	friend class CTypeMgr;
+
+protected:
+	CNamedImportType* m_pImportType;
+	uint_t m_TypeModifiers; // unsigned, bigendian
+
+public:
+	CImportIntModType ();
+
+	CNamedImportType*
+	GetImportType ()
+	{
+		return m_pImportType;
+	}
+
+	uint_t
+	GetTypeModifiers ()
+	{
+		return m_TypeModifiers;
+	}
+
+	static
+	rtl::CString
+	CreateSignature (
+		CNamedImportType* pImportType,
+		uint_t TypeModifiers,
+		uint_t Flags
+		)
+	{
+		return rtl::CString::Format_s (
+			"ZI%s:%d:%d",
+			pImportType->GetQualifiedName ().cc (),
+			TypeModifiers,
+			Flags
+			);
+	}
+
+protected:
+	virtual
+	void
+	PrepareTypeString ();
+};
+
+//.............................................................................
+
 } // namespace jnc {
 } // namespace axl {

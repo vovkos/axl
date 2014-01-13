@@ -88,6 +88,9 @@ public:
 		return m_pScope ? m_pScope->GetLevel () : 0;
 	}
 
+	CValue
+	GetScopeLevelObjHdr ();
+
 	CStructField*
 	GetTlsField ()
 	{

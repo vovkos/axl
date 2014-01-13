@@ -23,6 +23,7 @@ CModule::Clear ()
 	m_CompileArray.Clear ();
 	m_ApiItemArray.Clear ();
 	m_LlvmDiBuilder.Clear ();
+	m_SourceList.Clear ();
 
 	m_Flags = 0;
 
@@ -230,10 +231,14 @@ CModule::ParseFile (const char* pFilePath)
 	if (!Result)
 		return false;
 
-	const char* p = (const char*) File.View ();
 	size_t Length = (size_t) File.GetSize ();
+	const char* p = (const char*) File.View (0, Length);
+	if (!p)
+		return false;
 
-	return p != NULL && Parse (pFilePath, p, Length);
+	rtl::CString Source (p, Length);
+	m_SourceList.InsertTail (Source);
+	return p != NULL && Parse (pFilePath, Source, Length);
 }
 
 bool

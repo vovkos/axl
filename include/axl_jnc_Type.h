@@ -91,6 +91,7 @@ enum EType
 
 	EType_NamedImport,         // ZN
 	EType_ImportPtr,           // ZP
+	EType_ImportIntMod,        // ZI
 
 	EType__Count,
 	EType__EndianDelta = EType_Int16_be - EType_Int16,
@@ -361,13 +362,11 @@ GetDataPtrTypeKindString (EDataPtrType PtrTypeKind);
 enum ETypeKindFlag
 {
 	ETypeKindFlag_Integer      = 0x00000001,
-	ETypeKindFlag_Signed       = 0x00000002,
-	ETypeKindFlag_Unsigned     = 0x00000004,
-	ETypeKindFlag_LittleEndian = 0x00000008,
-	ETypeKindFlag_BigEndian    = 0x00000010,
-	ETypeKindFlag_Fp           = 0x00000020,
-	ETypeKindFlag_Numeric      = 0x00000040,
-	ETypeKindFlag_Aggregate    = 0x00000080,
+	ETypeKindFlag_Unsigned     = 0x00000002,
+	ETypeKindFlag_BigEndian    = 0x00000004,
+	ETypeKindFlag_Fp           = 0x00000008,
+	ETypeKindFlag_Numeric      = 0x00000010,
+	ETypeKindFlag_Aggregate    = 0x00000020,
 	ETypeKindFlag_Named        = 0x00000100,
 	ETypeKindFlag_Derivable    = 0x00000200,
 	ETypeKindFlag_DataPtr      = 0x00000400,
@@ -407,7 +406,7 @@ inline
 EType
 GetBigEndianIntegerTypeKind (EType TypeKind)
 {
-	return (GetTypeKindFlags (TypeKind) & ETypeKindFlag_LittleEndian) ?
+	return !(GetTypeKindFlags (TypeKind) & ETypeKindFlag_BigEndian) ?
 		(EType) (TypeKind + EType__EndianDelta) :
 		TypeKind;
 }
@@ -425,7 +424,7 @@ inline
 EType
 GetUnsignedIntegerTypeKind (EType TypeKind)
 {
-	return (GetTypeKindFlags (TypeKind) & ETypeKindFlag_Signed) ?
+	return !(GetTypeKindFlags (TypeKind) & ETypeKindFlag_Unsigned) ?
 		(EType) (TypeKind + 1) :
 		TypeKind;
 }

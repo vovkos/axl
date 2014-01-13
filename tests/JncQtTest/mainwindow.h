@@ -7,10 +7,35 @@ class ModulePane;
 class Output;
 class MdiChild;
 
-struct TPoint
+//.............................................................................
+
+enum EApiSlot
 {
+	EApiSlot_OpaqueTest = 0,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class OpaqueTest: public jnc::TIfaceHdr
+{
+public:
+	AXL_JNC_API_BEGIN_CLASS ("OpaqueTest", EApiSlot_OpaqueTest)
+		AXL_JNC_API_FUNCTION ("foo",  &OpaqueTest::foo)
+		AXL_JNC_API_FUNCTION ("bar",  &OpaqueTest::bar)
+	AXL_JNC_API_END_CLASS ()
+
+protected:
 	int m_x;
 	int m_y;
+
+public:
+	void
+	AXL_CDECL
+	foo (int x, int y);
+
+	void
+	AXL_CDECL
+	bar ();
 };
 
 //.............................................................................
@@ -20,7 +45,7 @@ class StdLib: public jnc::CStdLib
 public:
 	AXL_JNC_API_BEGIN_LIB ()
 		AXL_JNC_API_STD_FUNCTION (jnc::EStdFunc_Printf,  &Printf)
-//		AXL_JNC_API_FUNCTION ("foo",  &Foo)
+//		AXL_JNC_API_CLASS (OpaqueTest)
 		AXL_JNC_API_LIB (jnc::CStdLib)
 	AXL_JNC_API_END_LIB ()
 
@@ -30,10 +55,6 @@ public:
 		const char* pFormat,
 		...
 		);
-
-	static
-	TPoint
-	Foo ();
 };
 
 //.............................................................................

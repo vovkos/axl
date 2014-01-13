@@ -42,6 +42,7 @@ CTypeMgr::Clear ()
 	m_PropertyPtrTypeList.Clear ();
 	m_NamedImportTypeList.Clear ();
 	m_ImportPtrTypeList.Clear ();
+	m_ImportIntModTypeList.Clear ();
 	m_ReactorClassTypeList.Clear ();
 	m_FunctionClosureClassTypeList.Clear ();
 	m_PropertyClosureClassTypeList.Clear ();
@@ -262,6 +263,24 @@ CTypeMgr::ResolveImportTypes ()
 			pImportType->m_Flags &= ~EImportTypeFlag_ImportLoop;
 			pType = pImportType->m_pActualType;
 		}
+	}
+
+	rtl::CIteratorT <CImportIntModType> ImportIntModType = m_ImportIntModTypeList.GetHead ();
+	for (; ImportIntModType; ImportIntModType++)
+	{
+		CImportIntModType* pImportType = *ImportIntModType;
+
+		CDeclTypeCalc TypeCalc;
+
+		CType* pType = TypeCalc.CalcIntModType (
+			pImportType->m_pImportType->m_pActualType,
+			pImportType->m_TypeModifiers
+			);
+
+		if (!pType)
+			return false;
+
+		pImportType->m_pActualType = pType;
 	}
 
 	rtl::CIteratorT <CImportPtrType> ImportPtrType = m_ImportPtrTypeList.GetHead ();
@@ -1962,6 +1981,41 @@ CTypeMgr::GetImportPtrType (
 	pType->m_Flags = Flags;
 
 	m_ImportPtrTypeList.InsertTail (pType);
+	It->m_Value = pType;
+
+	return pType;
+}
+
+CImportIntModType*
+CTypeMgr::GetImportIntModType (
+	CNamedImportType* pNamedImportType,
+	uint_t TypeModifiers,
+	uint_t Flags
+	)
+{
+	rtl::CString Signature = CImportIntModType::CreateSignature (
+		pNamedImportType,
+		TypeModifiers,
+		Flags
+		);
+
+	rtl::CStringHashTableMapIteratorT <CType*> It = m_TypeMap.Goto (Signature);
+	if (It->m_Value)
+	{
+		CImportIntModType* pType = (CImportIntModType*) It->m_Value;
+		ASSERT (pType->m_Signature == Signature);
+		return pType;
+	}
+
+	CImportIntModType* pType = AXL_MEM_NEW (CImportIntModType);
+	pType->m_pModule = m_pModule;
+	pType->m_Signature = Signature;
+	pType->m_TypeMapIt = It;
+	pType->m_pImportType = pNamedImportType;
+	pType->m_TypeModifiers = TypeModifiers;
+	pType->m_Flags = Flags;
+
+	m_ImportIntModTypeList.InsertTail (pType);
 	It->m_Value = pType;
 
 	return pType;

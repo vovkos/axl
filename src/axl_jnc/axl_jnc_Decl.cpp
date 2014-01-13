@@ -221,7 +221,7 @@ CDeclarator::SetTypeSpecifier (CTypeSpecifier* pTypeSpecifier)
 		m_pBaseType = pTypeSpecifier->GetType ();	
 		if (!m_pBaseType)
 		{
-			m_pBaseType = (m_TypeModifiers & ETypeModifierMask_Integer) ? 
+			m_pBaseType = (m_TypeModifiers & ETypeModifier_Unsigned) ? 
 				pModule->m_TypeMgr.GetPrimitiveType (EType_Int) : 
 				pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
 		}

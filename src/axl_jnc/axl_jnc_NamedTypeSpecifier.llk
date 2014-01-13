@@ -126,6 +126,11 @@ class
 	CStructType* m_pType;
 }
 struct_specifier
+	leave
+	{
+		if ($.m_pType->GetName ().IsEmpty ())
+			return DeclareUnnamedStructOrUnion ($.m_pType);
+	}
 	:	EToken_Struct
 		struct_pack_factor $p?
 		EToken_Identifier $n?
@@ -180,6 +185,11 @@ class
 	CUnionType* m_pType;
 }
 union_specifier
+	leave
+	{
+		if ($.m_pType->GetName ().IsEmpty ())
+			return DeclareUnnamedStructOrUnion ($.m_pType);
+	}
 	:	EToken_Union
 		EToken_Identifier $n?
 			{

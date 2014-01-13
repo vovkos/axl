@@ -25,7 +25,7 @@ namespace mt {
 
 class CEventRoot
 {
-protected:
+public:
 	win::CEvent m_Event;	
 
 protected:

@@ -10,6 +10,25 @@
 
 //.............................................................................
 
+void
+AXL_CDECL
+OpaqueTest::foo (int x, int y)
+{
+	printf ("OpaqueTest::foo (%d, %d)\n", x, y);
+
+	m_x = x;
+	m_y = y;
+}
+
+void
+AXL_CDECL
+OpaqueTest::bar ()
+{
+	printf ("OpaqueTest::bar ()\n");
+}
+
+//.............................................................................
+
 int
 StdLib::Printf (
 	const char* pFormat,
@@ -24,15 +43,6 @@ StdLib::Printf (
 	WriteOutput (Text, Length);
 
 	return Length;
-}
-
-TPoint
-StdLib::Foo ()
-{
-	printf ("foo ()\n");
-
-	TPoint Point = { 100, 200 };
-	return Point;
 }
 
 //.............................................................................

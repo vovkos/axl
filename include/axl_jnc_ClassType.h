@@ -366,30 +366,22 @@ struct TIfaceHdr
 	// followed by parents, then by interface data fields
 };
 
+// TIfaceHdrT is a simple trick for allowing multiple inheritance in implementation classes
+
+template <typename T>
+struct TIfaceHdrT: TIfaceHdr
+{
+}; 
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // interface with master header
 
 template <typename T>
-class CObjectT:
+class CObjBoxT:
 	public TObjHdr,
 	public T
 {
-public:
-	CObjectT ()
-	{
-		m_ScopeLevel = 0;
-		m_pRoot = this;   
-		m_pType = NULL;   // should be primed later
-		m_Flags = 
-			EObjHdrFlag_Static | 
-			EObjHdrFlag_GcMark | 
-			EObjHdrFlag_GcWeakMark | 
-			EObjHdrFlag_GcRootsAdded;
-		
-		this->m_pVTable = NULL; // should be primed later
-		this->m_pObject = this;
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
