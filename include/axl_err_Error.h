@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2013. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_ERR_ERROR_H
 
@@ -15,8 +15,8 @@ namespace rtl {
 template <typename T> class CStringT;
 typedef CStringT <char> CString;
 
-} // namespace rtl 
-} // namespace axl 
+} // namespace rtl
+} // namespace axl
 
 
 namespace axl {
@@ -219,9 +219,9 @@ enum EStatus
 	EStatus_IoTimeout                = ERROR_SEM_TIMEOUT,
 	EStatus_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
 	EStatus_DataNotAccepted          = ERROR_INVALID_DATA,
-	EStatus_MoreProcessingRequired   = ERROR_MORE_DATA,
-	EStatus_InvalidDeviceState       = ERROR_BAD_COMMAND,
-	EStatus_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
+	EStatus_MoreProcessingRequired   = ERROR_MORE_DATA, */
+	EStatus_InvalidDeviceState       = EBUSY,
+/*	EStatus_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
 	EStatus_HostUnreachable          = ERROR_HOST_UNREACHABLE,
 	EStatus_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
 	EStatus_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
@@ -251,7 +251,7 @@ GetLastSystemErrorCode ()
 struct TError
 {
 	uint32_t m_Size;
-	rtl::TGuid m_Guid;	
+	rtl::TGuid m_Guid;
 	uint32_t m_Code;
 
 	// possibly followed by error data
@@ -270,8 +270,8 @@ struct TError
 
 extern
 AXL_SELECT_ANY
-const TError NoError = 
-{ 
+const TError NoError =
+{
 	sizeof (TError),
 	GUID_StdError,
 	EStatus_Success,
@@ -292,7 +292,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// ref-counted error buffer 
+// ref-counted error buffer
 
 class CError: public ref::CBufT <TError, CGetErrorSize>
 {
@@ -308,10 +308,10 @@ public:
 
 	CError (
 		ref::EBuf Kind,
-		void* p, 
+		void* p,
 		size_t Size
 		)
-	{ 
+	{
 		SetBuffer (Kind, p, Size);
 	}
 
@@ -322,7 +322,7 @@ public:
 		TError* p = (TError*) _alloca (MinBufSize),
 		size_t Size = MinBufSize
 		)
-	{ 
+	{
 		if (p)
 			SetBuffer (Kind, p, Size);
 
@@ -335,7 +335,7 @@ public:
 		TError* p = (TError*) _alloca (MinBufSize),
 		size_t Size = MinBufSize
 		)
-	{ 
+	{
 		if (p)
 			SetBuffer (Kind, p, Size);
 
@@ -358,21 +358,21 @@ public:
 	Copy (const TError& Src);
 
 	TError*
-	Push (const TError& Error); 
+	Push (const TError& Error);
 
 	// pack
 
 	template <typename TPack>
 	TError*
-	Pack_va (	
+	Pack_va (
 		const rtl::TGuid& Guid,
-		uint_t Code, 
+		uint_t Code,
 		axl_va_list va
 		)
 	{
 		size_t PackSize;
 		TPack () (NULL, &PackSize, va);
-	
+
 		size_t Size = sizeof (TError) + PackSize;
 		GetBuffer (Size);
 		if (!m_p)
@@ -390,7 +390,7 @@ public:
 	TError*
 	Pack (
 		const rtl::TGuid& Guid,
-		uint_t Code, 
+		uint_t Code,
 		...
 		)
 	{
@@ -400,9 +400,9 @@ public:
 
 	template <typename TPack>
 	TError*
-	PushPack_va (	
+	PushPack_va (
 		const rtl::TGuid& Guid,
-		uint_t Code, 
+		uint_t Code,
 		axl_va_list va
 		)
 	{
@@ -418,7 +418,7 @@ public:
 	TError*
 	PushPack (
 		const rtl::TGuid& Guid,
-		uint_t Code, 
+		uint_t Code,
 		...
 		)
 	{
@@ -429,9 +429,9 @@ public:
 	// format
 
 	TError*
-	Format_va (	
+	Format_va (
 		const rtl::TGuid& Guid,
-		uint_t Code, 
+		uint_t Code,
 		const char* pFormat,
 		axl_va_list va
 		);
@@ -449,9 +449,9 @@ public:
 	}
 
 	TError*
-	PushFormat_va (	
+	PushFormat_va (
 		const rtl::TGuid& Guid,
-		uint_t Code, 
+		uint_t Code,
 		const char* pFormat,
 		axl_va_list va
 		)
@@ -482,7 +482,7 @@ public:
 	CreateSimpleError (
 		const rtl::TGuid& Guid,
 		uint_t Code
-		);	
+		);
 
 	TError*
 	PushSimpleError (
@@ -497,7 +497,7 @@ public:
 		Error.CreateSimpleError (Guid, Code);
 		return Push (*Error);
 	}
-	
+
 	// system error (push is irrelevant for system errors)
 
 	TError*
@@ -508,13 +508,13 @@ public:
 
 	// string error
 
-	TError* 
+	TError*
 	CreateStringError (
 		const char* p,
 		size_t Length = -1
-		); 
+		);
 
-	TError* 
+	TError*
 	PushStringError (
 		const char* p,
 		size_t Length = -1
@@ -595,9 +595,9 @@ PushError (const CError& Error)
 
 template <typename TPack>
 CError
-SetPackError_va (	
+SetPackError_va (
 	const rtl::TGuid& Guid,
-	uint_t Code, 
+	uint_t Code,
 	axl_va_list va
 	)
 {
@@ -610,7 +610,7 @@ template <typename TPack>
 CError
 SetPackError (
 	const rtl::TGuid& Guid,
-	uint_t Code, 
+	uint_t Code,
 	...
 	)
 {
@@ -620,9 +620,9 @@ SetPackError (
 
 template <typename TPack>
 CError
-PushPackError_va (	
+PushPackError_va (
 	const rtl::TGuid& Guid,
-	uint_t Code, 
+	uint_t Code,
 	axl_va_list va
 	)
 {
@@ -635,7 +635,7 @@ template <typename TPack>
 CError
 PushPackError (
 	const rtl::TGuid& Guid,
-	uint_t Code, 
+	uint_t Code,
 	...
 	)
 {
@@ -649,9 +649,9 @@ PushPackError (
 
 inline
 CError
-SetFormatError_va (	
+SetFormatError_va (
 	const rtl::TGuid& Guid,
-	uint_t Code, 
+	uint_t Code,
 	const char* pFormat,
 	axl_va_list va
 	)
@@ -676,9 +676,9 @@ SetFormatError (
 
 inline
 CError
-PushFormatError_va (	
+PushFormatError_va (
 	const rtl::TGuid& Guid,
-	uint_t Code, 
+	uint_t Code,
 	const char* pFormat,
 	axl_va_list va
 	)
@@ -853,7 +853,7 @@ Fail (CError Error)
 	return Fail <bool> (false, Error);
 }
 
-inline 
+inline
 CError
 SetLastSystemError ()
 {
@@ -901,8 +901,8 @@ Complete (
 	return Result;
 }
 
-inline 
-bool 
+inline
+bool
 Complete (int Result)
 {
 	return Complete <bool> (Result != 0, false);
@@ -915,8 +915,8 @@ Complete (int Result)
 class CErrorProvider
 {
 public:
-	virtual 
-	rtl::CString 
+	virtual
+	rtl::CString
 	GetErrorDescription (const TError* pError) = 0;
 };
 
@@ -925,12 +925,12 @@ public:
 class CStdErrorProvider: public CErrorProvider
 {
 public:
-	virtual 
-	rtl::CString 
+	virtual
+	rtl::CString
 	GetErrorDescription (const TError* pError);
 
 protected:
-	rtl::CString 
+	rtl::CString
 	GetStackErrorDescription (const TError* pError);
 };
 
