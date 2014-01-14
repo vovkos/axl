@@ -642,7 +642,11 @@ public:
 		uint_t Flags = 0
 		)
 	{
-		return GetSimplePropertyType (NULL, pReturnType, Flags);
+		return GetSimplePropertyType (
+			m_CallConvTable [ECallConv_Default],
+			pReturnType,
+			Flags
+			);
 	}
 
 	CPropertyType*
@@ -991,6 +995,12 @@ protected:
 
 	CStructType*
 	CreateFmtLiteralType ();
+
+	CStructType*
+	CreateGuidType ();
+
+	CStructType*
+	CreateErrorType ();
 
 	bool
 	CreateMulticastCallMethod (CClassType* pMulticastType);

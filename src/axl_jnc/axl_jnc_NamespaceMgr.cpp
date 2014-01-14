@@ -46,12 +46,14 @@ CNamespaceMgr::AddStdItems ()
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_Rand)) &&
 		m_GlobalNamespace.AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_Printf)) &&
 		pJnc->AddItem (m_pModule->m_TypeMgr.GetLazyStdType (EStdType_Scheduler)) &&
+		pJnc->AddItem (m_pModule->m_TypeMgr.GetLazyStdType (EStdType_Error)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_GetDataPtrSpan)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_RunGc)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_GetCurrentThreadId)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_CreateThread)) &&
 		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_Sleep)) &&
-		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_GetTimestamp));
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_GetCurrentThreadId)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_GetTimestamp)) &&
+		pJnc->AddItem (m_pModule->m_FunctionMgr.GetLazyStdFunction (EStdFunc_GetLastError));
 }
 
 CValue

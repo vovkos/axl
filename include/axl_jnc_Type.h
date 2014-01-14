@@ -143,6 +143,8 @@ enum EStdType
 	EStdType_Scheduler,
 	EStdType_SchedulerPtr,
 	EStdType_FmtLiteral,
+	EStdType_Guid,
+	EStdType_Error,
 	EStdType__Count,
 };
 

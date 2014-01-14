@@ -45,6 +45,7 @@ class StdLib: public jnc::CStdLib
 public:
 	AXL_JNC_API_BEGIN_LIB ()
 		AXL_JNC_API_STD_FUNCTION (jnc::EStdFunc_Printf,  &Printf)
+		AXL_JNC_API_FUNCTION ("foo",  &foo)
 //		AXL_JNC_API_CLASS (OpaqueTest)
 		AXL_JNC_API_LIB (jnc::CStdLib)
 	AXL_JNC_API_END_LIB ()
@@ -55,6 +56,10 @@ public:
 		const char* pFormat,
 		...
 		);
+
+	static
+	int
+	foo (int x);
 };
 
 //.............................................................................

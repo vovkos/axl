@@ -139,6 +139,14 @@ CTypeMgr::GetStdType (EStdType StdType)
 		pType = CreateFmtLiteralType ();
 		break;
 
+	case EStdType_Guid:
+		pType = CreateGuidType ();
+		break;
+
+	case EStdType_Error:
+		pType = CreateErrorType ();
+		break;
+
 	default:
 		ASSERT (false);
 		return NULL;
@@ -156,7 +164,7 @@ CTypeMgr::GetLazyStdType (EStdType StdType)
 	if (m_LazyStdTypeArray [StdType])
 		return m_LazyStdTypeArray [StdType];
 
-	const char* NameTable [EStdType__Count] = 
+	const char* NameTable [EStdType__Count] =
 	{
 		NULL, // EStdType_BytePtr,
 		NULL, // EStdType_ObjHdr,
@@ -171,6 +179,8 @@ CTypeMgr::GetLazyStdType (EStdType StdType)
 		"Scheduler", // EStdType_Scheduler,
 		NULL, // EStdType_SchedulerPtr,
 		NULL, // EStdType_FmtLiteral,
+		"Guid",      // EStdType_Guid
+		"Error",     // EStdType_Error,
 	};
 
 	const char* pName = NameTable [StdType];
@@ -1169,7 +1179,11 @@ CTypeMgr::GetMemberPropertyType (
 	CPropertyType* pPropertyType
 	)
 {
-	CFunctionType* pGetterType = GetMemberMethodType (pParentType, pPropertyType->m_pGetterType);
+	CFunctionType* pGetterType = GetMemberMethodType (
+		pParentType,
+		pPropertyType->m_pGetterType,
+		EPtrTypeFlag_Const
+		);
 
 	size_t SetterTypeOverloadCount = pPropertyType->m_SetterType.GetOverloadCount ();
 
@@ -1482,7 +1496,7 @@ CTypeMgr::GetFunctionClosureClassType (
 			pField->m_Flags |= EStructFieldFlag_WeakMasked;
 	}
 
-	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Internal, "thunkFunction", pThunkType); 
+	CFunction* pThunkFunction = m_pModule->m_FunctionMgr.CreateFunction (EFunction_Internal, "thunkFunction", pThunkType);
 	pType->AddMethod (pThunkFunction);
 	pType->m_pThunkFunction = pThunkFunction;
 
@@ -2381,6 +2395,37 @@ CTypeMgr::CreateFmtLiteralType ()
 	pType->CreateField ("m_p", GetPrimitiveType (EType_Char)->GetDataPtrType_c ());
 	pType->CreateField ("m_maxLength", GetPrimitiveType (EType_SizeT));
 	pType->CreateField ("m_length", GetPrimitiveType (EType_SizeT));
+	pType->EnsureLayout ();
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateGuidType ()
+{
+	CStructType* pType = CreateStructType ("Guid", "jnc.Guid");
+	pType->CreateField ("m_data1", GetPrimitiveType (EType_Int32_u));
+	pType->CreateField ("m_data2", GetPrimitiveType (EType_Int16_u));
+	pType->CreateField ("m_data3", GetPrimitiveType (EType_Int16_u));
+	pType->CreateField ("m_data4", GetPrimitiveType (EType_Int8_u)->GetArrayType (8));
+	pType->EnsureLayout ();
+	return pType;
+}
+
+CStructType*
+CTypeMgr::CreateErrorType ()
+{
+	CStructType* pType = CreateStructType ("Error", "jnc.Error");
+	pType->CreateField ("m_size", GetPrimitiveType (EType_Int32_u));
+	pType->CreateField ("m_guid", GetStdType (EStdType_Guid));
+	pType->CreateField ("m_code", GetPrimitiveType (EType_Int32_u));
+
+	CProperty* pDescription = m_pModule->m_FunctionMgr.CreateProperty ("m_description", "jnc.Error.m_description");
+	pType->AddProperty (pDescription);
+
+	CType* pReturnType = GetPrimitiveType (EType_Char)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const);
+	CPropertyType* pPropertyType = GetSimplePropertyType (pReturnType, EPropertyTypeFlag_Const);
+	pDescription->Create (pPropertyType);
+
 	pType->EnsureLayout ();
 	return pType;
 }

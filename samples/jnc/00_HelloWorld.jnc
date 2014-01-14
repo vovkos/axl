@@ -3,14 +3,15 @@
 
 //.............................................................................
 
-char* g_p;
+foo (int x);
 
 int main ()
-{	
+{
 	printf ("hello world!\n");
 
-	heap char buffer [256];
-	g_p = buffer;
+	foo (rand () % 35);
+
+	printf ("last error = %s\n", jnc.getLastError ().m_description);
 
 	return 0;
 }

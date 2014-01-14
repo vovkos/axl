@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2013. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_RTL_GUID_H
 
@@ -26,17 +26,17 @@ enum EGuidStringFlag
 
 struct TGuid
 {
-	union 
+	union
 	{
-		struct 
+		struct
 		{
 			uint32_t m_Data1;
 			uint16_t m_Data2;
 			uint16_t m_Data3;
-			uint8_t m_Data4[8];
+			uint8_t m_Data4 [8];
 		};
 
-		struct 
+		struct
 		{
 			uint32_t m_Long1;
 			uint32_t m_Long2;
@@ -70,7 +70,7 @@ struct TGuid
 	bool
 	IsEqual (const TGuid& Guid) const
 	{
-		return 
+		return
 			m_Long1 == Guid.m_Long1 &&
 			m_Long2 == Guid.m_Long2 &&
 			m_Long3 == Guid.m_Long3 &&

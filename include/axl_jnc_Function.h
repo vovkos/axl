@@ -285,6 +285,11 @@ enum EStdFunc
 
 	EStdFunc_SimpleMulticastCall,
 
+	// jnc.Error*
+	// jnc.g_lastError.get ();
+
+	EStdFunc_GetLastError,
+
 	EStdFunc__Count
 };
 

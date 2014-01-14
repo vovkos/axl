@@ -228,9 +228,16 @@ CFunctionTypeOverload::Copy (
 	size_t Count
 	)
 {
-	ASSERT (Count);
-	m_pType = ppTypeArray [0];
-	m_OverloadArray.Copy (ppTypeArray + 1, Count - 1);
+	if (Count)
+	{
+		m_pType = ppTypeArray [0];
+		m_OverloadArray.Copy (ppTypeArray + 1, Count - 1);
+	}
+	else
+	{
+		m_pType = NULL;
+		m_OverloadArray.Clear ();
+	}
 }
 
 bool

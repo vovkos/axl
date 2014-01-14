@@ -812,7 +812,7 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 	CType* pReturnType;
 	CFunctionType* pFunctionType;
 	CFunction* pFunction;
-	
+
 	switch (Func)
 	{
 	case EStdFunc_RuntimeError:
@@ -913,12 +913,6 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateFunction ("runGc", "jnc.runGc", pFunctionType);
 		break;
 
-	case EStdFunc_GetCurrentThreadId:
-		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
-		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
-		pFunction = CreateFunction ("getCurrentThreadId", "jnc.getCurrentThreadId", pFunctionType);
-		break;
-
 	case EStdFunc_CreateThread:
 		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
 		ArgTypeArray [0] = ((CFunctionType*) m_pModule->m_TypeMgr.GetStdType (EStdType_SimpleFunction))->GetFunctionPtrType (EFunctionPtrType_Normal, EPtrTypeFlag_Checked);
@@ -941,6 +935,18 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		pFunction = CreateFunction ("getTimestamp", "jnc.getTimestamp", pFunctionType);
 		break;
 
+	case EStdFunc_GetCurrentThreadId:
+		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int64_u);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("getCurrentThreadId", "jnc.getCurrentThreadId", pFunctionType);
+		break;
+
+	case EStdFunc_GetLastError:
+		pReturnType = m_pModule->m_TypeMgr.GetStdType (EStdType_Error)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const);
+		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (pReturnType, NULL, 0);
+		pFunction = CreateFunction ("getLastError", "jnc.getLastError", pFunctionType);
+		break;
+
 	case EStdFunc_StrLen:
 		pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const);
@@ -959,7 +965,7 @@ CFunctionMgr::GetStdFunction (EStdFunc Func)
 		ArgTypeArray [0] = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Char)->GetDataPtrType (EType_DataPtr, EDataPtrType_Thin, EPtrTypeFlag_Const);
 		pFunctionType = m_pModule->m_TypeMgr.GetFunctionType (
 			m_pModule->m_TypeMgr.GetCallConv (ECallConv_Cdecl),
-			pReturnType, 
+			pReturnType,
 			ArgTypeArray, 1,
 			EFunctionTypeFlag_VarArg
 			);
@@ -1050,7 +1056,7 @@ CFunctionMgr::GetLazyStdFunction (EStdFunc Func)
 	if (m_LazyStdFunctionArray [Func])
 		return m_LazyStdFunctionArray [Func];
 
-	const char* NameTable [EStdFunc__Count] = 
+	const char* NameTable [EStdFunc__Count] =
 	{
 		NULL, // EStdFunc_RuntimeError,
 		NULL, // EStdFunc_CheckNullPtr,
@@ -1083,6 +1089,7 @@ CFunctionMgr::GetLazyStdFunction (EStdFunc Func)
 		NULL, // EStdFunc_AppendFmtLiteral_ui64,
 		NULL, // EStdFunc_AppendFmtLiteral_f,
 		NULL, // EStdFunc_SimpleMulticastCall,
+		"getLastError",       // EStdFunc_GetLastError,
 	};
 
 	const char* pName = NameTable [Func];
@@ -1101,7 +1108,7 @@ CFunction*
 CFunctionMgr::CreateCheckNullPtr ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	CType* ArgTypeArray [] = 
+	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Int),
@@ -1138,7 +1145,7 @@ CFunction*
 CFunctionMgr::CreateCheckScopeLevel ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	CType* ArgTypeArray [] = 
+	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr),
@@ -1165,7 +1172,7 @@ CFunctionMgr::CreateCheckScopeLevel ()
 
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue1, 0, NULL, &ArgValue1);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (ArgValue1, NULL, &ArgValue1);
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue2, 0, NULL, &ArgValue2);	
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue2, 0, NULL, &ArgValue2);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (ArgValue2, NULL, &ArgValue2);
 	m_pModule->m_LlvmIrBuilder.CreateGt_u (ArgValue1, ArgValue2, &CmpValue);
 	m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pFailBlock, pSuccessBlock);
@@ -1182,7 +1189,7 @@ CFunction*
 CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	CType* ArgTypeArray [] = 
+	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjectPtr),
 		m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr),
@@ -1222,7 +1229,7 @@ CFunctionMgr::CreateCheckClassPtrScopeLevel ()
 	m_pModule->m_LlvmIrBuilder.CreateGep2 (ObjPtrValue, 0, NULL, &SrcScopeLevelValue);     // size_t* pScopeLevel
 	m_pModule->m_LlvmIrBuilder.CreateLoad (SrcScopeLevelValue, NULL, &SrcScopeLevelValue); // size_t ScopeLevel
 
-	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue2, 0, NULL, &ArgValue2);	
+	m_pModule->m_LlvmIrBuilder.CreateGep2 (ArgValue2, 0, NULL, &ArgValue2);
 	m_pModule->m_LlvmIrBuilder.CreateLoad (ArgValue2, NULL, &ArgValue2);
 
 	m_pModule->m_LlvmIrBuilder.CreateGt_u (SrcScopeLevelValue, ArgValue2, &CmpValue); // SrcScopeLevel > DstScopeLevel
@@ -1240,7 +1247,7 @@ CFunction*
 CFunctionMgr::CreateCheckDataPtrRange ()
 {
 	CType* pReturnType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void);
-	CType* ArgTypeArray [] = 
+	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetStdType (EStdType_BytePtr),
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT),
@@ -1294,7 +1301,7 @@ CFunction*
 CFunctionMgr::CreateGetDataPtrSpan ()
 {
 	CType* pIntPtrType = m_pModule->GetSimpleType (EType_Int_p);
-	CType* ArgTypeArray [] = 
+	CType* ArgTypeArray [] =
 	{
 		m_pModule->m_TypeMgr.GetPrimitiveType (EType_Void)->GetDataPtrType (EDataPtrType_Normal, EPtrTypeFlag_Const),
 	};
@@ -1304,7 +1311,7 @@ CFunctionMgr::CreateGetDataPtrSpan ()
 
 	CValue ArgValue;
 	InternalPrologue (pFunction, &ArgValue, 1);
-	
+
 	CValue PtrValue;
 	CValue RangeEndValue;
 	CValue SpanValue;

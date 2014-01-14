@@ -371,12 +371,18 @@ CProperty::AddMethod (CFunction* pFunction)
 			// and fall through
 
 		case EStorage_Member:
+			if (FunctionKind == EFunction_Getter)
+				pFunction->m_ThisArgTypeFlags |= EPtrTypeFlag_Const;
+
 			pFunction->ConvertToMemberMethod (m_pParentType);
 			break;
 
 		case EStorage_Abstract:
 		case EStorage_Virtual:
 		case EStorage_Override:
+			if (FunctionKind == EFunction_Getter)
+				pFunction->m_ThisArgTypeFlags |= EPtrTypeFlag_Const;
+
 			if (m_pParentType->GetTypeKind () != EType_Class)
 			{
 				err::SetFormatStringError (
@@ -738,13 +744,13 @@ CProperty::CompileAutoSetter ()
 	CValue AutoGetValue;
 	CValue CmpValue;
 
-	Result = 
+	Result =
 		m_pModule->m_OperatorMgr.GetPropertyAutoGetValue (GetAutoAccessorPropertyValue (), &AutoGetValue) &&
 		m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Ne, AutoGetValue, SrcValue, &CmpValue) &&
 		m_pModule->m_ControlFlowMgr.ConditionalJump (CmpValue, pAssignBlock, pReturnBlock) &&
 		m_pModule->m_OperatorMgr.StoreDataRef (AutoGetValue, SrcValue) &&
 		m_pModule->m_FunctionMgr.FireOnChanged ();
-	
+
 	if (!Result)
 		return false;
 

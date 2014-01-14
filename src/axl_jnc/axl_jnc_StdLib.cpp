@@ -208,6 +208,39 @@ CStdLib::CreateThread (TFunctionPtr Ptr)
 
 #endif
 
+TDataPtr
+CStdLib::GetLastError ()
+{
+	err::TError* pError = err::GetError ();
+
+	jnc::TDataPtr Ptr = { 0 };
+	Ptr.m_p = pError;
+	Ptr.m_pRangeBegin = Ptr.m_p;
+	Ptr.m_pRangeEnd = (char*) Ptr.m_p + pError->m_Size;
+	Ptr.m_pObject = jnc::GetStaticObjHdr ();
+	return Ptr;
+}
+
+TDataPtr
+CStdLib::GetErrorDescription (TDataPtr Error)
+{
+	err::TError* pError = (err::TError*) Error.m_p;
+	rtl::CString String = pError->GetDescription ();
+	size_t Length = String.GetLength ();
+
+	char* pString = (char*) AXL_MEM_ALLOC (Length + 1);
+	memcpy (pString, String.cc (), Length);
+	pString [Length] = 0;
+
+	jnc::TDataPtr Ptr = { 0 };
+	Ptr.m_p = pString;
+	Ptr.m_pRangeBegin = Ptr.m_p;
+	Ptr.m_pRangeEnd = (char*) Ptr.m_p + Length + 1;
+	Ptr.m_pObject = jnc::GetStaticObjHdr ();
+
+	return Ptr;
+}
+
 void*
 CStdLib::GetTls ()
 {

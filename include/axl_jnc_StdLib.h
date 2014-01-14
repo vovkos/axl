@@ -31,6 +31,8 @@ public:
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_CreateThread, CreateThread)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_Sleep, Sleep)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetTimestamp, GetTimestamp)
+		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetLastError, GetLastError)
+		AXL_JNC_API_CONST_PROPERTY ("jnc.Error.m_description", GetErrorDescription)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_StrLen, StrLen)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_Rand, Rand)
 		AXL_JNC_API_STD_FUNCTION (EStdFunc_GetTls, GetTls)
@@ -118,6 +120,14 @@ public:
 	{
 		return g::GetTimestamp ();
 	}
+
+	static
+	TDataPtr
+	GetLastError ();
+
+	static
+	TDataPtr
+	GetErrorDescription (TDataPtr Error);
 
 	static
 	size_t

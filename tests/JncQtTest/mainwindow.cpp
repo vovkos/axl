@@ -45,6 +45,13 @@ StdLib::Printf (
 	return Length;
 }
 
+int
+StdLib::foo (int x)
+{
+	err::SetError (x);
+	return 0;
+}
+
 //.............................................................................
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
