@@ -402,7 +402,7 @@ CStructType::LayoutField (
 	)
 {
 	if (AlignFactor > m_AlignFactor)
-		m_AlignFactor = AlignFactor;
+		m_AlignFactor = AXL_MIN (AlignFactor, m_PackFactor);
 
 	size_t Offset = GetFieldOffset (AlignFactor);
 	if (Offset > m_FieldActualSize)
@@ -435,7 +435,7 @@ CStructType::LayoutBitField (
 
 	size_t AlignFactor = pType->GetAlignFactor ();
 	if (AlignFactor > m_AlignFactor)
-		m_AlignFactor = AlignFactor;
+		m_AlignFactor = AXL_MIN (AlignFactor, m_PackFactor);
 
 	*ppType = pType;
 

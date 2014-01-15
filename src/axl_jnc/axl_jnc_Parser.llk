@@ -265,7 +265,10 @@ Members2
 		);
 
 	CUnionType*
-	CreateUnionType (const rtl::CString& Name);
+	CreateUnionType (
+		const rtl::CString& Name,
+		size_t PackFactor
+		);
 
 	CClassType*
 	CreateClassType (

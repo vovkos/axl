@@ -105,6 +105,7 @@ class CStructType: public CDerivableType
 {
 	friend class CTypeMgr;
 	friend class CClassType;
+	friend class CUnionType;
 	friend class CProperty;
 
 protected:
@@ -240,13 +241,13 @@ protected:
 		uint_t* pLlvmIndex
 		)
 	{
-		return 
+		return
 			pType->EnsureLayout () &&
 			LayoutField (
-				pType->GetLlvmType (), 
-				pType->GetSize (), 
-				pType->GetAlignFactor (), 
-				pOffset, 
+				pType->GetLlvmType (),
+				pType->GetSize (),
+				pType->GetAlignFactor (),
+				pOffset,
 				pLlvmIndex
 				);
 	}

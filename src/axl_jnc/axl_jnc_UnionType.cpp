@@ -108,6 +108,7 @@ CUnionType::CalcLayout ()
 		return false;
 
 	CType* pLargestFieldType = NULL;
+	size_t LargestAlignFactor = 0;
 
 	rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
 	for (; Field; Field++)
@@ -119,6 +120,7 @@ CUnionType::CalcLayout ()
 			return false;
 
 		uint_t FieldTypeFlags = pField->m_pType->GetFlags ();
+		size_t FieldAlignFactor = pField->m_pType->GetAlignFactor ();
 
 		if (!(FieldTypeFlags & ETypeFlag_Pod))
 		{
@@ -135,11 +137,16 @@ CUnionType::CalcLayout ()
 
 		if (!pLargestFieldType || pField->m_pType->GetSize () > pLargestFieldType->GetSize ())
 			pLargestFieldType = pField->m_pType;
+
+		if (LargestAlignFactor < pField->m_pType->GetAlignFactor ())
+			LargestAlignFactor = pField->m_pType->GetAlignFactor ();
 	}
 
 	ASSERT (pLargestFieldType);
 
 	m_pStructType->CreateField (pLargestFieldType);
+	m_pStructType->m_AlignFactor = AXL_MIN (LargestAlignFactor, m_pStructType->m_PackFactor);
+
 	Result = m_pStructType->EnsureLayout ();
 	if (!Result)
 		return false;

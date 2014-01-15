@@ -46,9 +46,9 @@ StdLib::Printf (
 }
 
 int
-StdLib::foo (int x)
+StdLib::foo (jnc::TDataPtr addressPtr)
 {
-	err::SetError (x);
+	sockaddr_in* p = (sockaddr_in*) addressPtr.m_p;
 	return 0;
 }
 

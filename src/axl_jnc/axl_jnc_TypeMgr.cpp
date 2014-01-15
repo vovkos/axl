@@ -562,7 +562,8 @@ CTypeMgr::CreateStructType (
 CUnionType*
 CTypeMgr::CreateUnionType (
 	const rtl::CString& Name,
-	const rtl::CString& QualifiedName
+	const rtl::CString& QualifiedName,
+	size_t PackFactor
 	)
 {
 	CUnionType* pType = AXL_MEM_NEW (CUnionType);
@@ -587,6 +588,7 @@ CTypeMgr::CreateUnionType (
 	CStructType* pUnionStructType = CreateUnnamedStructType ();
 	pUnionStructType->m_pParentNamespace = pType;
 	pUnionStructType->m_StructTypeKind = EStructType_UnionStruct;
+	pUnionStructType->m_PackFactor = PackFactor;
 	pUnionStructType->m_Tag.Format ("%s.Struct", pType->m_Tag.cc ());
 
 	pType->m_pModule = m_pModule;

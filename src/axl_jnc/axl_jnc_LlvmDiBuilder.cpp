@@ -233,7 +233,8 @@ CLlvmDiBuilder::CreateArrayType (CArrayType* pArrayType)
 		size_t ElementCount = p->GetElementCount ();
 		ASSERT (ElementCount);
 
-		DimArray.Append (m_pLlvmDiBuilder->getOrCreateSubrange (0, ElementCount - 1));
+		#pragma AXL_TODO ("seems like a bug in LLVM DiBuilder (should be ElementCount - 1)")
+		DimArray.Append (m_pLlvmDiBuilder->getOrCreateSubrange (0, ElementCount));
 
 		if (pElementType->GetTypeKind () != EType_Array)
 			break;

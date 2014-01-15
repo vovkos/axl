@@ -191,9 +191,14 @@ union_specifier
 			return DeclareUnnamedStructOrUnion ($.m_pType);
 	}
 	:	EToken_Union
+		struct_pack_factor $p?
 		EToken_Identifier $n?
 			{
-				$.m_pType = CreateUnionType (IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString ());
+				$.m_pType = CreateUnionType (
+					IsValidLocator ($n) ? $n.m_Data.m_String : rtl::CString (),
+					IsValidLocator ($p) ? $p.m_PackFactor : m_StructPackFactor
+					);
+
 				if (!$.m_pType)
 					return false;
 			}

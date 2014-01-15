@@ -400,13 +400,14 @@ public:
 	CUnionType*
 	CreateUnionType (
 		const rtl::CString& Name,
-		const rtl::CString& QualifiedName
+		const rtl::CString& QualifiedName,
+		size_t PackFactor = 8
 		);
 
 	CUnionType*
-	CreateUnnamedUnionType ()
+	CreateUnnamedUnionType (size_t PackFactor = 8)
 	{
-		return CreateUnionType (rtl::CString (), rtl::CString ());
+		return CreateUnionType (rtl::CString (), rtl::CString (), PackFactor);
 	}
 
 	CClassType*

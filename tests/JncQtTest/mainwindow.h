@@ -59,7 +59,7 @@ public:
 
 	static
 	int
-	foo (int x);
+	foo (jnc::TDataPtr addressPtr);
 };
 
 //.............................................................................

@@ -58,15 +58,19 @@ using namespace axl;
 
 // Memory Leak Detection
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#	define _CRTDBG_MAP_ALLOC
+#	include <stdlib.h>
+#	include <crtdbg.h>
 
-#ifdef _DEBUG
-#ifndef DBG_NEW
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-#define new DBG_NEW
-#endif
-#endif
+#	ifdef _DEBUG
+#		ifndef DBG_NEW
+#			define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#			define new DBG_NEW
+#		endif
+#	endif
 
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include <sys/socket.h>
+#	include <netinet/in.h>
+#	include <netinet/ip.h>
 #endif

@@ -1394,8 +1394,8 @@ CParser::CreateFormalArg (
 	if (!pType)
 		return NULL;
 
-	bool IsThinDataPtr = 
-		pType->GetTypeKind () == EType_DataPtr && 
+	bool IsThinDataPtr =
+		pType->GetTypeKind () == EType_DataPtr &&
 		((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin;
 
 	switch (m_StorageKind)
@@ -1530,7 +1530,10 @@ CParser::CreateStructType (
 }
 
 CUnionType*
-CParser::CreateUnionType (const rtl::CString& Name)
+CParser::CreateUnionType (
+	const rtl::CString& Name,
+	size_t PackFactor
+	)
 {
 	bool Result;
 
@@ -1539,12 +1542,12 @@ CParser::CreateUnionType (const rtl::CString& Name)
 
 	if (Name.IsEmpty ())
 	{
-		pUnionType = m_pModule->m_TypeMgr.CreateUnnamedUnionType ();
+		pUnionType = m_pModule->m_TypeMgr.CreateUnnamedUnionType (PackFactor);
 	}
 	else
 	{
 		rtl::CString QualifiedName = pNamespace->CreateQualifiedName (Name);
-		pUnionType = m_pModule->m_TypeMgr.CreateUnionType (Name, QualifiedName);
+		pUnionType = m_pModule->m_TypeMgr.CreateUnionType (Name, QualifiedName, PackFactor);
 		if (!pUnionType)
 			return NULL;
 
