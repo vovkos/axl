@@ -7,12 +7,12 @@ namespace jnc {
 
 //.............................................................................
 
-bool 
+bool
 CScheduleLauncherFunction::Compile ()
 {
 	bool Result;
 
-	size_t ArgCount = m_pType->GetArgArray ().GetCount (); 
+	size_t ArgCount = m_pType->GetArgArray ().GetCount ();
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
@@ -40,7 +40,7 @@ CScheduleLauncherFunction::Compile ()
 	Result = m_pModule->m_OperatorMgr.CallOperator (ScheduleValue, FunctionPtrValue);
 	if (!Result)
 		return false;
-	
+
 	m_pModule->m_FunctionMgr.InternalEpilogue ();
 	return true;
 }
