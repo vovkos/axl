@@ -30,7 +30,7 @@ COperatorMgr::COperatorMgr ()
 	m_UnaryOperatorTable [EUnOp_Addr]     = &m_UnOp_Addr;
 	m_UnaryOperatorTable [EUnOp_Indir]    = &m_UnOp_Indir;
 	m_UnaryOperatorTable [EUnOp_Ptr]      = &m_UnOp_Indir;
-	
+
 	// increment operators
 
 	m_UnOp_PreInc.m_OpKind  = EUnOp_PreInc;
@@ -55,7 +55,7 @@ COperatorMgr::COperatorMgr ()
 	m_BinaryOperatorTable [EBinOp_BwAnd]  = &m_BinOp_BwAnd;
 	m_BinaryOperatorTable [EBinOp_BwXor]  = &m_BinOp_BwXor;
 	m_BinaryOperatorTable [EBinOp_BwOr]   = &m_BinOp_BwOr;
-	
+
 	// special operators
 
 	m_BinaryOperatorTable [EBinOp_At]     = &m_BinOp_At;
@@ -74,7 +74,7 @@ COperatorMgr::COperatorMgr ()
 	m_BinaryOperatorTable [EBinOp_Le]     = &m_BinOp_Le;
 	m_BinaryOperatorTable [EBinOp_Gt]     = &m_BinOp_Gt;
 	m_BinaryOperatorTable [EBinOp_Ge]     = &m_BinOp_Ge;
-	 
+
 	// assignment operators
 
 	m_BinOp_AddAssign.m_OpKind = EBinOp_AddAssign;
@@ -124,7 +124,7 @@ COperatorMgr::COperatorMgr ()
 
 	m_CastOperatorTable [EType_Float]       = &m_Cast_Fp;
 	m_CastOperatorTable [EType_Double]      = &m_Cast_Fp;
-	m_CastOperatorTable [EType_Array]       = &m_Cast_Array;	
+	m_CastOperatorTable [EType_Array]       = &m_Cast_Array;
 	m_CastOperatorTable [EType_Enum]        = &m_Cast_Enum;
 	m_CastOperatorTable [EType_Struct]      = &m_Cast_Struct;
 	m_CastOperatorTable [EType_DataPtr]     = &m_Cast_DataPtr;
@@ -159,7 +159,7 @@ COperatorMgr::GetUnaryOperatorResultType (
 		}
 	}
 
-	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
+	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];
 	ASSERT (pOperator);
 	return pOperator->GetResultType (OpValue);
 }
@@ -207,10 +207,10 @@ COperatorMgr::UnaryOperator (
 		}
 	}
 
-	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];	
+	CUnaryOperator* pOperator = m_UnaryOperatorTable [OpKind];
 	ASSERT (pOperator);
 
-	return 
+	return
 		PrepareOperand (RawOpValue, &OpValue, pOperator->GetOpFlags ()) &&
 		pOperator->Operator (OpValue, pResultValue);
 }
@@ -242,7 +242,7 @@ COperatorMgr::GetBinaryOperatorResultType (
 		}
 	}
 
-	CBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
+	CBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];
 	ASSERT (pOperator);
 
 	PrepareOperandType (RawOpValue1, &OpValue1, pOperator->GetOpFlags1 ());
@@ -304,7 +304,7 @@ COperatorMgr::BinaryOperator (
 		}
 	}
 
-	CBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];	
+	CBinaryOperator* pOperator = m_BinaryOperatorTable [OpKind];
 	ASSERT (pOperator);
 
 	return
@@ -322,8 +322,8 @@ COperatorMgr::GetConditionalOperatorResultType (
 	CType* pTrueType = PrepareOperandType (TrueValue.GetType (), EOpFlag_KeepBool | EOpFlag_KeepEnum);
 	CType* pFalseType = PrepareOperandType (FalseValue.GetType (), EOpFlag_KeepBool | EOpFlag_KeepEnum);
 
-	CType* pResultType = 
-		pTrueType->Cmp (pFalseType) == 0 ? pTrueType : 
+	CType* pResultType =
+		pTrueType->Cmp (pFalseType) == 0 ? pTrueType :
 		(pTrueType->GetTypeKindFlags () & pFalseType->GetTypeKindFlags () & ETypeKindFlag_Numeric) ?
 			GetArithmeticOperatorResultType (pTrueType, pFalseType) :
 			m_pModule->m_OperatorMgr.PrepareOperandType (pTrueType);
@@ -334,20 +334,20 @@ COperatorMgr::GetConditionalOperatorResultType (
 		((CDataPtrType*) pResultType)->GetPtrTypeKind () == EDataPtrType_Lean)
 	{
 		pResultType = ((CDataPtrType*) pResultType)->GetTargetType ()->GetDataPtrType (
-			pResultType->GetTypeKind (), 
-			EDataPtrType_Normal, 
+			pResultType->GetTypeKind (),
+			EDataPtrType_Normal,
 			pResultType->GetFlags ()
 			);
 	}
 
-	bool Result = 
-		CheckCastKind (TrueValue, pResultType) && 
+	bool Result =
+		CheckCastKind (TrueValue, pResultType) &&
 		CheckCastKind (FalseValue, pResultType);
 
 	return Result ? pResultType : NULL;
 }
 
-bool 
+bool
 COperatorMgr::GetConditionalOperatorResultType (
 	const CValue& TrueValue,
 	const CValue& FalseValue,
@@ -362,7 +362,7 @@ COperatorMgr::GetConditionalOperatorResultType (
 	return true;
 }
 
-bool 
+bool
 COperatorMgr::ConditionalOperator (
 	const CValue& RawTrueValue,
 	const CValue& RawFalseValue,
@@ -386,7 +386,7 @@ COperatorMgr::ConditionalOperator (
 
 	CBasicBlock* pElseBlock = m_pModule->m_ControlFlowMgr.GetCurrentBlock (); // might have changed
 
-	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pThenBlock);	
+	m_pModule->m_ControlFlowMgr.Jump (pPhiBlock, pThenBlock);
 
 	Result = CastOperator (RawTrueValue, pResultType, &TrueValue);
 	if (!Result)
@@ -426,7 +426,7 @@ COperatorMgr::CastOperator (
 
 	EType TypeKind = pType->GetTypeKind ();
 	ASSERT ((size_t) TypeKind < EType__Count);
-	
+
 	CCastOperator* pOperator = m_CastOperatorTable [TypeKind];
 	ASSERT (pOperator); // there is always a default
 
@@ -450,7 +450,7 @@ COperatorMgr::CastOperator (
 
 		if (OpValue.GetValueKind () == EValue_Property)
 		{
-			ASSERT (pType->GetTypeKind () == EType_PropertyPtr); 
+			ASSERT (pType->GetTypeKind () == EType_PropertyPtr);
 			return GetPropertyThinPtr (OpValue.GetProperty (), OpValue.GetClosure (), (CPropertyPtrType*) pType, pResultValue);
 		}
 
@@ -479,8 +479,8 @@ COperatorMgr::GetCastKind (
 	)
 {
 	if (RawOpValue.GetValueKind () == EValue_Null)
-		return 
-			(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) ? ECast_Implicit : 
+		return
+			(pType->GetTypeKindFlags () & ETypeKindFlag_Ptr) ? ECast_Implicit :
 			(pType->GetTypeKindFlags () & ETypeKindFlag_Integer) ? ECast_Explicit : ECast_None;
 
 	EType TypeKind = pType->GetTypeKind ();
@@ -491,8 +491,8 @@ COperatorMgr::GetCastKind (
 
 	CValue OpValue;
 	PrepareOperandType (
-		RawOpValue, 
-		&OpValue, 
+		RawOpValue,
+		&OpValue,
 		pOperator->GetOpFlags ()
 		);
 
@@ -512,7 +512,7 @@ COperatorMgr::GetArgCastKind (
 	rtl::CArrayT <CFunctionArg*> FormalArgArray = pFunctionType->GetArgArray ();
 	size_t FormalArgCount = FormalArgArray.GetCount ();
 
-	if (ActualArgCount < FormalArgCount || 
+	if (ActualArgCount < FormalArgCount ||
 		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
 	{
 		return ECast_None;
@@ -547,7 +547,7 @@ COperatorMgr::GetArgCastKind (
 	rtl::CArrayT <CFunctionArg*> FormalArgArray = pFunctionType->GetArgArray ();
 	size_t FormalArgCount = FormalArgArray.GetCount ();
 
-	if (ActualArgCount < FormalArgCount || 
+	if (ActualArgCount < FormalArgCount ||
 		ActualArgCount > FormalArgCount && !(pFunctionType->GetFlags () & EFunctionTypeFlag_VarArg))
 	{
 		return ECast_None;
@@ -583,7 +583,7 @@ COperatorMgr::GetFunctionCastKind (
 
 	CType* pSrcReturnType = pSrcType->GetReturnType ();
 	CType* pDstReturnType = pDstType->GetReturnType ();
-	
+
 	if (pDstReturnType->GetTypeKind () == EType_Void)
 		return ArgCastKind;
 
@@ -610,7 +610,7 @@ COperatorMgr::GetPropertyCastKind (
 	for (size_t i = 0; i < Count; i++)
 	{
 		CFunctionType* pDstOverload = pDstSetterType->GetOverload (i);
-		
+
 		size_t j = pSrcSetterType->ChooseOverload (pDstOverload->GetArgArray (), &CastKind);
 		if (j == -1)
 			return ECast_None;
@@ -647,12 +647,12 @@ COperatorMgr::CheckCastKind (
 	return true;
 }
 
-void 
+void
 COperatorMgr::PrepareOperandType (
 	const CValue& OpValue,
 	CValue* pOpValue,
 	uint_t OpFlags
-	) 
+	)
 {
 	if (OpValue.IsEmpty ())
 	{
@@ -661,7 +661,7 @@ COperatorMgr::PrepareOperandType (
 	}
 
 	CValue Value = OpValue;
-	
+
 	for (;;)
 	{
 		CType* pType = Value.GetType ();
@@ -669,7 +669,7 @@ COperatorMgr::PrepareOperandType (
 
 		EType TypeKind = pType->GetTypeKind ();
 		switch (TypeKind)
-		{			
+		{
 		case EType_DataRef:
 			if (!(OpFlags & EOpFlag_KeepDataRef))
 			{
@@ -692,9 +692,9 @@ COperatorMgr::PrepareOperandType (
 
 					CArrayType* pArrayType = (CArrayType*) pTargetType;
 					Value = pArrayType->GetElementType ()->GetDataPtrType (
-						pPtrType->GetAnchorNamespace (), 
-						EType_DataPtr, 
-						PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean, 
+						pPtrType->GetAnchorNamespace (),
+						EType_DataPtr,
+						PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean,
 						pPtrType->GetFlags ()
 						);
 				}
@@ -708,9 +708,9 @@ COperatorMgr::PrepareOperandType (
 				CClassPtrType* pPtrType = (CClassPtrType*) pType;
 				CClassType* pTargetType = pPtrType->GetTargetType ();
 				Value = pTargetType->GetClassPtrType (
-					pPtrType->GetAnchorNamespace (), 
+					pPtrType->GetAnchorNamespace (),
 					EType_ClassPtr,
-					pPtrType->GetPtrTypeKind (), 
+					pPtrType->GetPtrTypeKind (),
 					pPtrType->GetFlags ()
 					);
 			}
@@ -721,6 +721,9 @@ COperatorMgr::PrepareOperandType (
 			if (!(OpFlags & EOpFlag_KeepFunctionRef))
 			{
 				CFunctionPtrType* pPtrType = (CFunctionPtrType*) Value.GetClosureAwareType (); // important: take closure into account!
+				if (!pPtrType)
+					break;
+
 				CFunctionType* pTargetType = pPtrType->GetTargetType ();
 				Value = pTargetType->GetFunctionPtrType (pPtrType->GetPtrTypeKind (), pPtrType->GetFlags ());
 			}
@@ -772,12 +775,12 @@ COperatorMgr::PrepareOperandType (
 	return ResultValue.GetType ();
 }
 
-bool 
+bool
 COperatorMgr::PrepareOperand (
 	const CValue& OpValue,
 	CValue* pOpValue,
 	uint_t OpFlags
-	) 
+	)
 {
 	bool Result;
 
@@ -794,7 +797,7 @@ COperatorMgr::PrepareOperand (
 
 		EType TypeKind = pType->GetTypeKind ();
 		switch (TypeKind)
-		{			
+		{
 		case EType_DataRef:
 			if (!(OpFlags & EOpFlag_KeepDataRef))
 			{
@@ -812,14 +815,14 @@ COperatorMgr::PrepareOperand (
 					CArrayType* pArrayType = (CArrayType*) pPtrType->GetTargetType ();
 					pType = pArrayType->GetElementType ()->GetDataPtrType (
 						pPtrType->GetAnchorNamespace (),
-						EType_DataPtr, 
-						PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean, 
+						EType_DataPtr,
+						PtrTypeKind == EDataPtrType_Thin ? EDataPtrType_Thin : EDataPtrType_Lean,
 						pPtrType->GetFlags ()
 						);
 
 					CValue PrevValue = Value;
 					m_pModule->m_LlvmIrBuilder.CreateGep2 (Value, 0, pType, &Value);
-					
+
 					if (PtrTypeKind != EDataPtrType_Thin)
 					{
 						if (PtrTypeKind == EDataPtrType_Normal)
@@ -840,9 +843,9 @@ COperatorMgr::PrepareOperand (
 				CClassPtrType* pPtrType = (CClassPtrType*) pType;
 				CClassType* pTargetType = pPtrType->GetTargetType ();
 				Value.OverrideType (pTargetType->GetClassPtrType (
-					pPtrType->GetAnchorNamespace (), 
+					pPtrType->GetAnchorNamespace (),
 					EType_ClassPtr,
-					pPtrType->GetPtrTypeKind (), 
+					pPtrType->GetPtrTypeKind (),
 					pPtrType->GetFlags ())
 					);
 			}
@@ -865,7 +868,7 @@ COperatorMgr::PrepareOperand (
 				CPropertyPtrType* pPtrType = (CPropertyPtrType*) Value.GetClosureAwareType ();
 				if (!pPtrType)
 					return false;
-			
+
 				CPropertyType* pTargetType = pPtrType->GetTargetType ();
 				if (!pTargetType->IsIndexed ())
 				{

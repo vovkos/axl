@@ -42,7 +42,7 @@ CBinOp_At::Operator (
 		return false;
 	}
 
-	CFunctionPtrType* pTargetPtrType = (CFunctionPtrType*) OpValue1.GetClosureAwareType ();
+	CFunctionPtrType* pTargetPtrType = (CFunctionPtrType*) OpValue1.GetType (); // not closure-aware!
 
 	CFunction* pLauncher = m_pModule->m_FunctionMgr.GetScheduleLauncherFunction (pTargetPtrType);
 	if (!pLauncher)

@@ -25,14 +25,13 @@ CClosureClassType::CreateSignature (
 		Signature.AppendFormat ("W%x-", WeakMask);
 
 	Signature.AppendFormat (
-		"%s-%s(", 
-		pTargetType->GetTypeString ().cc (),
-		pThunkType->GetTypeString ().cc ()
+		"%s-%s(",
+		pTargetType->GetSignature ().cc (),
+		pThunkType->GetSignature ().cc ()
 		);
-	
-	ASSERT (ArgCount);
+
 	for (size_t i = 0; i < ArgCount; i++)
-		Signature.AppendFormat ("%d:%s", pClosureMap [i], ppArgTypeArray [i]->GetTypeString ().cc ());
+		Signature.AppendFormat ("%d:%s", pClosureMap [i], ppArgTypeArray [i]->GetSignature ().cc ());
 
 	Signature.Append (')');
 	return Signature;
@@ -59,7 +58,7 @@ CClosureClassType::BuildArgValueList (
 		CValue ArgValue;
 
 		if (i == m_ClosureMap [iClosure])
-		{		
+		{
 			m_pModule->m_OperatorMgr.GetClassField (ClosureValue, *Field, NULL, &ArgValue);
 			Field++;
 			iClosure++;
@@ -71,7 +70,7 @@ CClosureClassType::BuildArgValueList (
 		}
 
 		pArgValueList->InsertTail (ArgValue);
-	}	
+	}
 
 	// part 2 -- arguments come from thunk only
 
@@ -79,7 +78,7 @@ CClosureClassType::BuildArgValueList (
 		pArgValueList->InsertTail (pThunkArgValueArray [iThunk]);
 }
 
-jnc::TIfaceHdr* 
+jnc::TIfaceHdr*
 CClosureClassType::Strengthen (jnc::TIfaceHdr* p)
 {
 	if (!m_WeakMask)
@@ -90,8 +89,8 @@ CClosureClassType::Strengthen (jnc::TIfaceHdr* p)
 	uint64_t WeakMask = m_WeakMask;
 	while (WeakMask)
 	{
-		size_t Index = rtl::GetLoBitIdx64 (WeakMask);		
-		
+		size_t Index = rtl::GetLoBitIdx64 (WeakMask);
+
 		CStructField* pField = GetFieldByIndex (Index);
 		ASSERT (pField && (pField->GetFlags () & EStructFieldFlag_WeakMasked));
 
@@ -107,7 +106,7 @@ CClosureClassType::Strengthen (jnc::TIfaceHdr* p)
 		switch (TypeKind)
 		{
 		case EType_ClassPtr:
-			if (((CClassPtrType*) pType)->GetPtrTypeKind () == EClassPtrType_Normal) 
+			if (((CClassPtrType*) pType)->GetPtrTypeKind () == EClassPtrType_Normal)
 				pWeakPtr = *(jnc::TIfaceHdr**) p2;
 
 			break;
@@ -155,10 +154,10 @@ CFunctionClosureClassType::Compile ()
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgValueArray.SetCount (ArgCount);	
+	ArgValueArray.SetCount (ArgCount);
 
-	m_pModule->m_FunctionMgr.InternalPrologue (m_pThunkFunction, ArgValueArray, ArgCount);	
-	
+	m_pModule->m_FunctionMgr.InternalPrologue (m_pThunkFunction, ArgValueArray, ArgCount);
+
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
 
@@ -215,7 +214,7 @@ CPropertyClosureClassType::Compile ()
 	Result = CompileAccessor (pGetter);
 	if (!Result)
 		return false;
-	
+
 	if (pSetter)
 	{
 		size_t OverloadCount = pSetter->GetOverloadCount ();
@@ -244,10 +243,10 @@ CPropertyClosureClassType::CompileAccessor (CFunction* pAccessor)
 
 	char Buffer [256];
 	rtl::CArrayT <CValue> ArgValueArray (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ArgValueArray.SetCount (ArgCount);	
+	ArgValueArray.SetCount (ArgCount);
 
-	m_pModule->m_FunctionMgr.InternalPrologue (pAccessor, ArgValueArray, ArgCount);	
-	
+	m_pModule->m_FunctionMgr.InternalPrologue (pAccessor, ArgValueArray, ArgCount);
+
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
 
@@ -316,7 +315,7 @@ CDataClosureClassType::CreateSignature (
 	rtl::CString Signature = "CD";
 
 	Signature.AppendFormat (
-		"%s-%s", 
+		"%s-%s",
 		pTargetType->GetTypeString ().cc (),
 		pThunkType->GetTypeString ().cc ()
 		);
@@ -339,7 +338,7 @@ CDataClosureClassType::Compile ()
 	Result = CompileGetter (pGetter);
 	if (!Result)
 		return false;
-	
+
 	if (pSetter)
 	{
 		size_t OverloadCount = pSetter->GetOverloadCount ();
@@ -360,16 +359,16 @@ CDataClosureClassType::Compile ()
 bool
 CDataClosureClassType::CompileGetter (CFunction* pGetter)
 {
-	m_pModule->m_FunctionMgr.InternalPrologue (pGetter);	
-	
+	m_pModule->m_FunctionMgr.InternalPrologue (pGetter);
+
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
 
 	CValue PtrValue;
 
-	bool Result = 
+	bool Result =
 		m_pModule->m_OperatorMgr.GetClassField (ThisValue, *GetFieldList ().GetHead (), NULL, &PtrValue) &&
-		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &PtrValue) && 
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &PtrValue) &&
 		m_pModule->m_ControlFlowMgr.Return (PtrValue);
 
 	if (!Result)
@@ -383,16 +382,16 @@ bool
 CDataClosureClassType::CompileSetter (CFunction* pSetter)
 {
 	CValue ArgValue;
-	m_pModule->m_FunctionMgr.InternalPrologue (pSetter, &ArgValue, 1);	
-	
+	m_pModule->m_FunctionMgr.InternalPrologue (pSetter, &ArgValue, 1);
+
 	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
 	ASSERT (ThisValue);
 
 	CValue PtrValue;
 
-	bool Result = 
+	bool Result =
 		m_pModule->m_OperatorMgr.GetClassField (ThisValue, *GetFieldList ().GetHead (), NULL, &PtrValue) &&
-		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &PtrValue) && 
+		m_pModule->m_OperatorMgr.UnaryOperator (EUnOp_Indir, &PtrValue) &&
 		m_pModule->m_OperatorMgr.StoreDataRef (PtrValue, ArgValue);
 
 	if (!Result)
