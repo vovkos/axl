@@ -159,4 +159,11 @@ if (AXL_USE_PCH)
 		)
 endif ()
 
+set_target_properties (
+	JncMfcTest
+	PROPERTIES
+	FOLDER tests
+	LINKER_LANGUAGE C
+	)
+
 #..............................................................................

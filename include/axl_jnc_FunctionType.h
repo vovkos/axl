@@ -23,8 +23,8 @@ struct TFunctionPtrTypeTuple;
 
 enum EFunctionTypeFlag
 {
-	EFunctionTypeFlag_VarArg    = 0x010000,
-	EFunctionTypeFlag_Pitcher   = 0x020000,
+	EFunctionTypeFlag_VarArg   = 0x010000,
+	EFunctionTypeFlag_Throws   = 0x020000,
 };
 
 //.............................................................................
@@ -54,7 +54,7 @@ protected:
 	CType* m_pReturnType;
 	CImportType* m_pReturnType_i;
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
-	rtl::CBoxListT <CToken> m_PitcherCondition;
+	rtl::CBoxListT <CToken> m_ThrowCondition;
 	rtl::CString m_ArgSignature;
 	rtl::CString m_TypeModifierString;
 	rtl::CString m_ArgString;
@@ -86,13 +86,13 @@ public:
 	}
 
 	rtl::CConstBoxListT <CToken>
-	GetPitcherCondition ()
+	GetThrowCondition ()
 	{
-		return m_PitcherCondition;
+		return m_ThrowCondition;
 	}
 
 	bool
-	IsPitcherMatch (CFunctionType* pType);
+	IsThrowConditionMatch (CFunctionType* pType);
 
 	rtl::CArrayT <CFunctionArg*>
 	GetArgArray ()

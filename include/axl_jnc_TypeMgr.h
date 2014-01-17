@@ -561,7 +561,7 @@ public:
 	CreateUserFunctionType (
 		CCallConv* pCallConv,
 		CType* pReturnType,
-		rtl::CBoxListT <CToken>* pPitcherCondition,
+		rtl::CBoxListT <CToken>* pThrowCondition,
 		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		uint_t Flags = 0
 		);
@@ -580,12 +580,12 @@ public:
 	CFunctionType*
 	CreateUserFunctionType (
 		CType* pReturnType,
-		rtl::CBoxListT <CToken>* pPitcherCondition,
+		rtl::CBoxListT <CToken>* pThrowCondition,
 		const rtl::CArrayT <CFunctionArg*>& ArgArray,
 		uint_t Flags = 0
 		)
 	{
-		return CreateUserFunctionType (m_CallConvTable [ECallConv_Default], pReturnType, pPitcherCondition, ArgArray, Flags);
+		return CreateUserFunctionType (m_CallConvTable [ECallConv_Default], pReturnType, pThrowCondition, ArgArray, Flags);
 	}
 
 	CFunctionType*

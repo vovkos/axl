@@ -34,7 +34,6 @@ declaration_specifier <CTypeSpecifier* $pTypeSpecifier>
 			{
 				return $pTypeSpecifier->SetTypeModifier ($1.m_TypeModifier);
 			}
-	|	pitcher_modifier <$pTypeSpecifier>
 	;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -314,10 +313,6 @@ type_modifier
 			{
 				$.m_TypeModifier = ETypeModifier_Thin;
 			}
-	|	EToken_Pitcher
-			{
-				$.m_TypeModifier = ETypeModifier_Pitcher;
-			}
 	|	EToken_Cdecl
 			{
 				$.m_TypeModifier = ETypeModifier_Cdecl;
@@ -365,15 +360,6 @@ type_modifier
 	|	EToken_Reactor
 			{
 				$.m_TypeModifier = ETypeModifier_Reactor;
-			}
-	;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-pitcher_modifier <CTypeSpecifier* $pTypeSpecifier>
-	:	EToken_Pitcher '(' expression_pass1 $u ')'
-			{
-				return $pTypeSpecifier->SetPitcherCondition (&$u.m_TokenList);
 			}
 	;
 

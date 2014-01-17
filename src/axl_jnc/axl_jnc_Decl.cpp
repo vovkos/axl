@@ -12,15 +12,12 @@ void
 CTypeModifiers::Clear ()
 {
 	m_TypeModifiers = 0;
-	m_PitcherCondition.Clear ();	
 }
 
 void
 CTypeModifiers::TakeOver (CTypeModifiers* pSrc)
 {
 	m_TypeModifiers = pSrc->m_TypeModifiers;
-	m_PitcherCondition.TakeOver (&pSrc->m_PitcherCondition);
-
 	pSrc->Clear ();
 }
 
@@ -38,7 +35,7 @@ CTypeModifiers::SetTypeModifier (ETypeModifier Modifier)
 		0,                          // ETypeModifier_Volatile         = 0x00000010,
 		ETypeModifierMask_PtrKind,  // ETypeModifier_Weak             = 0x00000020,
 		ETypeModifierMask_PtrKind,  // ETypeModifier_Thin             = 0x00000040,
-		0,                          // ETypeModifier_Pitcher          = 0x00000080,
+		0,                          // ETypeModifier_Unused           = 0x00000080,
 		ETypeModifierMask_CallConv, // ETypeModifier_Cdecl            = 0x00000100,
 		ETypeModifierMask_CallConv, // ETypeModifier_Stdcall          = 0x00000200,
 		ETypeModifierMask_TypeKind, // ETypeModifier_Array            = 0x00000400,
@@ -120,17 +117,6 @@ CTypeModifiers::CheckAntiTypeModifiers (int ModifierMask)
 	return false;
 }
 
-bool
-CTypeModifiers::SetPitcherCondition (rtl::CBoxListT <CToken>* pExpression)
-{
-	bool Result = SetTypeModifier (ETypeModifier_Pitcher);
-	if (!Result)
-		return false;
-
-	m_PitcherCondition.TakeOver (pExpression);
-	return true;
-}
-
 //.............................................................................
 
 bool
@@ -158,7 +144,7 @@ GetPostDeclaratorModifierString (EPostDeclaratorModifier Modifier)
 {
 	static const char* StringTable [] = 
 	{
-		"const",    // EPostDeclaratorModifier_Const    = 0x01,
+		"const",    // EPostDeclaratorModifier_Const  = 0x01,
 	};
 
 	size_t i  = rtl::GetLoBitIdx32 (Modifier);

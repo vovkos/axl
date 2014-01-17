@@ -42,15 +42,15 @@ CFunctionType::GetThisTargetType ()
 }
 
 bool
-CFunctionType::IsPitcherMatch (CFunctionType* pType)
+CFunctionType::IsThrowConditionMatch (CFunctionType* pType)
 {
 	if (m_pReturnType->Cmp (pType->m_pReturnType) != 0 ||
-		(m_Flags & EFunctionTypeFlag_Pitcher) != (pType->m_Flags & EFunctionTypeFlag_Pitcher) ||
-		m_PitcherCondition.GetCount () != pType->m_PitcherCondition.GetCount ())
+		(m_Flags & EFunctionTypeFlag_Throws) != (pType->m_Flags & EFunctionTypeFlag_Throws) ||
+		m_ThrowCondition.GetCount () != pType->m_ThrowCondition.GetCount ())
 		return false;
 
-	rtl::CBoxIteratorT <CToken> Token1 = m_PitcherCondition.GetHead ();
-	rtl::CBoxIteratorT <CToken> Token2 = pType->m_PitcherCondition.GetHead ();
+	rtl::CBoxIteratorT <CToken> Token1 = m_ThrowCondition.GetHead ();
+	rtl::CBoxIteratorT <CToken> Token2 = pType->m_ThrowCondition.GetHead ();
 
 	for (; Token1 && Token2; Token1++, Token2++)
 	{
@@ -254,6 +254,14 @@ CFunctionType::GetArgString ()
 	else
 		m_ArgString += "...)";
 
+	if (m_Flags & EFunctionTypeFlag_Throws)
+	{
+		m_TypeModifierString += " throws";
+
+		if (!m_ThrowCondition.IsEmpty ())
+			m_TypeModifierString.AppendFormat (" if (%s)", CToken::GetTokenListString (m_ThrowCondition).cc ());
+	}
+
 	return m_ArgString;
 }
 
@@ -268,9 +276,6 @@ CFunctionType::GetTypeModifierString ()
 		m_TypeModifierString = m_pCallConv->GetCallConvDisplayString ();
 		m_TypeModifierString += ' ';
 	}
-
-	if (m_Flags & EFunctionTypeFlag_Pitcher)
-		m_TypeModifierString += "pitcher ";
 
 	return m_TypeModifierString;
 }

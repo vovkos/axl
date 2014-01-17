@@ -159,7 +159,7 @@ enum ETypeModifier
 	ETypeModifier_Volatile    = 0x00000010,
 	ETypeModifier_Weak        = 0x00000020,
 	ETypeModifier_Thin        = 0x00000040,
-	ETypeModifier_Pitcher     = 0x00000080,
+	ETypeModifier_Unused      = 0x00000080,
 	ETypeModifier_Cdecl       = 0x00000100,
 	ETypeModifier_Stdcall     = 0x00000200,
 	ETypeModifier_Array       = 0x00000400,
@@ -185,14 +185,12 @@ enum ETypeModifierMask
 	ETypeModifierMask_Function =
 		ETypeModifier_Function |
 		ETypeModifier_Cdecl |
-		ETypeModifier_Stdcall |
-		ETypeModifier_Pitcher,
+		ETypeModifier_Stdcall,
 
 	ETypeModifierMask_Property =
 		ETypeModifier_Property |
 		ETypeModifier_Cdecl |
 		ETypeModifier_Stdcall |
-		ETypeModifier_Pitcher |
 		ETypeModifier_Const |
 		ETypeModifier_Bindable |
 		ETypeModifier_Indexed,

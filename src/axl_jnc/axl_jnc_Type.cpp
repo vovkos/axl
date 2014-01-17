@@ -209,7 +209,7 @@ GetTypeModifierString (ETypeModifier Modifier)
 		"volatile",     // ETypeModifier_Volatile    = 0x00000010,
 		"weak",         // ETypeModifier_Weak        = 0x00000020,
 		"thin",         // ETypeModifier_Thin        = 0x00000040,
-		"pitcher",      // ETypeModifier_Pitcher     = 0x00000080,
+		"unused-0",     // ETypeModifier_Unused      = 0x00000080,
 		"cdecl",        // ETypeModifier_Cdecl       = 0x00000100,
 		"stdcall",      // ETypeModifier_Stdcall     = 0x00000200,
 		"array",        // ETypeModifier_Array       = 0x00000400,

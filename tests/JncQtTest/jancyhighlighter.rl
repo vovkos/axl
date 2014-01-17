@@ -65,7 +65,7 @@ main := |*
 'volatile'        |
 'weak'            |
 'thin'            |
-'pitcher'         |
+'throws'          |
 'cdecl'           |
 'stdcall'         |
 'array'           |

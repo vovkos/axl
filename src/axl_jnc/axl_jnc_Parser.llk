@@ -97,7 +97,7 @@ Members
 	CProperty* m_pConstructorProperty;
 
 	CValue m_CurlyInitializerTargetValue;
-	CValue m_PitcherReturnValue;
+	CValue m_ThrowReturnValue;
 
 	// saved attributes
 
@@ -381,10 +381,10 @@ Members2
 	GetThisValueType (CValue* pValue);
 
 	bool
-	GetPitcherReturnValue (CValue* pValue);
+	GetThrowReturnValue (CValue* pValue);
 
 	bool
-	GetPitcherReturnValueType (CValue* pValue);
+	GetThrowReturnValueType (CValue* pValue);
 
 	bool
 	PrepareCurlyInitializerNamedItem (

@@ -192,4 +192,11 @@ if (AXL_USE_PCH)
 		)
 endif ()
 
+set_target_properties (
+	QtTest
+	PROPERTIES
+	FOLDER tests
+	LINKER_LANGUAGE C
+	)
+
 #..............................................................................

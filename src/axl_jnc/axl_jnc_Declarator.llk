@@ -339,8 +339,7 @@ function_suffix <CDeclarator* $pDeclarator>
 	{
 		m_StorageKind = $PrevStorageKind;
 	}
-	:	'(' function_formal_argument_list <$pFunctionSuffix> ')'
-	|	'(' ')'
+	:	'(' function_formal_argument_list <$pFunctionSuffix>? ')' throw_clause <$pFunctionSuffix>?
 	;
 
 function_formal_argument_list <CDeclFunctionSuffix* $pFunctionSuffix>
@@ -406,6 +405,19 @@ function_formal_argument_no_specifier <CDeclFunctionSuffix* $pFunctionSuffix>
 			}
 	;
 
+throw_clause <CDeclFunctionSuffix* $pFunctionSuffix>
+	:	EToken_Throws
+			{
+				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_Throws;
+			}
+
+	|	EToken_Throws EToken_If '(' expression_pass1 $e ')'
+			{
+				$pFunctionSuffix->m_FunctionTypeFlags |= EFunctionTypeFlag_Throws;
+				$pFunctionSuffix->m_ThrowCondition.TakeOver (&$e.m_TokenList);
+			}
+	;
+	
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bitfield_suffix <CDeclarator* $pDeclarator>

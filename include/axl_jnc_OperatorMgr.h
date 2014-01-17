@@ -545,20 +545,20 @@ public:
 	ParseExpressionEx (
 		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
-		const CValue& PitcherReturnValue,
+		const CValue& ThrowReturnValue,
 		uint_t ParserFlags,
 		CValue* pResultValue
 		);
 
 	bool
-	ParsePitcherCondition (
+	ParseThrowCondition (
 		CUnit* pUnit,
 		const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
-		const CValue& PitcherReturnValue,
+		const CValue& ThrowReturnValue,
 		CValue* pResultValue
 		)
 	{
-		return ParseExpressionEx (pUnit, ExpressionTokenList, PitcherReturnValue, 0, pResultValue);
+		return ParseExpressionEx (pUnit, ExpressionTokenList, ThrowReturnValue, 0, pResultValue);
 	}
 
 	bool

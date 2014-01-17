@@ -20,7 +20,7 @@ enum EScopeFlag
 	EScopeFlag_Try            = 0x0100,
 	EScopeFlag_CatchDefined   = 0x0200,
 	EScopeFlag_FinallyDefined = 0x0400,
-	EScopeFlag_CanThrow       = 0x0800, // function is pitcher, or parent has catch
+	EScopeFlag_CanThrow       = 0x0800, // function throws, or parent has catch
 	EScopeFlag_HasFinally     = 0x1000, // this scope or its parent has finally
 };
 

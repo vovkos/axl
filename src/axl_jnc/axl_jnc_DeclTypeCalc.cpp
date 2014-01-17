@@ -533,18 +533,18 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 		}
 	}
 
-	rtl::CBoxListT <CToken>* pPitcherCondition = NULL;
+	rtl::CBoxListT <CToken>* pThrowCondition = NULL;
 
-	if (m_TypeModifiers & ETypeModifier_Pitcher)
+	if (Flags & EFunctionTypeFlag_Throws)
 	{
 		if (pReturnType->GetTypeKind () == EType_Void)
 		{
-			err::SetFormatStringError ("'pitcher' cannot be applied to void function");
+			err::SetFormatStringError ("void function cannot throw");
 			return NULL;
 		}
 
-		Flags |= EFunctionTypeFlag_Pitcher;
-		pPitcherCondition = &m_PitcherCondition;
+		Flags |= EFunctionTypeFlag_Throws;
+		pThrowCondition = pSuffix->GetThrowCondition ();
 	}
 
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
@@ -552,7 +552,7 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	return m_pModule->m_TypeMgr.CreateUserFunctionType (
 		pCallConv,
 		pReturnType,
-		pPitcherCondition,
+		pThrowCondition,
 		pSuffix->GetArgArray (),
 		Flags
 		);

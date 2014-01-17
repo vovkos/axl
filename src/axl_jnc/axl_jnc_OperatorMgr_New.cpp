@@ -383,7 +383,7 @@ bool
 COperatorMgr::ParseExpressionEx (
 	CUnit* pUnit,
 	const rtl::CConstBoxListT <CToken>& ExpressionTokenList,
-	const CValue& PitcherReturnValue,
+	const CValue& ThrowReturnValue,
 	uint_t Flags,
 	CValue* pResultValue
 	)
@@ -394,7 +394,7 @@ COperatorMgr::ParseExpressionEx (
 	CParser Parser;
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = CParser::EStage_Pass2;
-	Parser.m_PitcherReturnValue = PitcherReturnValue;
+	Parser.m_ThrowReturnValue = ThrowReturnValue;
 	Parser.m_Flags |= Flags;
 
 	m_pModule->m_ControlFlowMgr.ResetJumpFlag ();

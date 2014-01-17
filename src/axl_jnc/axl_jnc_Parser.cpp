@@ -2237,28 +2237,28 @@ CParser::GetThisValueType (CValue* pValue)
 }
 
 bool
-CParser::GetPitcherReturnValue (CValue* pValue)
+CParser::GetThrowReturnValue (CValue* pValue)
 {
-	if (m_PitcherReturnValue.IsEmpty ())
+	if (m_ThrowReturnValue.IsEmpty ())
 	{
-		err::SetFormatStringError ("'retval' can only be used in 'pitcher' condition");
+		err::SetFormatStringError ("'retval' can only be used in throw condition");
 		return false;
 	}
 
-	*pValue = m_PitcherReturnValue;
+	*pValue = m_ThrowReturnValue;
 	return true;
 }
 
 bool
-CParser::GetPitcherReturnValueType (CValue* pValue)
+CParser::GetThrowReturnValueType (CValue* pValue)
 {
-	if (m_PitcherReturnValue.IsEmpty ())
+	if (m_ThrowReturnValue.IsEmpty ())
 	{
-		err::SetFormatStringError ("'retval' can only be used in 'pitcher' condition");
+		err::SetFormatStringError ("'retval' can only be used in throw condition");
 		return false;
 	}
 
-	pValue->SetType (m_PitcherReturnValue.GetType ());
+	pValue->SetType (m_ThrowReturnValue.GetType ());
 	return true;
 }
 

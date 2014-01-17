@@ -10,7 +10,7 @@ struct Point
 
 class C
 {
-	bool pitcher foo (Point const* point)
+	bool foo (Point const* point) throws
 	{
 		printf ("foo ()\n");
 		return true;
@@ -33,7 +33,5 @@ int main ()
 
 	return 0;
 }
-
-Point* g_p;
 
 //.............................................................................

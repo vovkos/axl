@@ -528,14 +528,14 @@ COperatorMgr::CallImpl (
 	if (pResultValue->GetType ()->GetFlags () & ETypeFlag_GcRoot)
 		CreateTmpStackGcRoot (*pResultValue);
 
-	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher) &&
+	if ((pFunctionType->GetFlags () & EFunctionTypeFlag_Throws) &&
 		!m_pModule->m_ControlFlowMgr.IsThrowLocked ())
 	{
 		CScope* pScope = m_pModule->m_NamespaceMgr.GetCurrentScope ();
 		if (!(pScope->GetFlags () & EScopeFlag_CanThrow))
 		{
 			err::SetFormatStringError (
-				"cannot call 'pitcher' from here ('%s' is not 'pitcher' and there is no 'try' or 'catch')",
+				"cannot call throwing function from here ('%s' does not throw and there is no 'try' or 'catch')",
 				m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
 				);
 			return false;

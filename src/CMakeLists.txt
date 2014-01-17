@@ -91,6 +91,11 @@ if (AXL_BUILD_JNC_LIB)
 		${AXL_ROOT_DIR}/samples/jnc
 		${CMAKE_CURRENT_BINARY_DIR}/jnc_demos
 		)
+
+	add_subdirectory (
+		${AXL_ROOT_DIR}/tests/jnc
+		${CMAKE_CURRENT_BINARY_DIR}/jnc_tests
+		)
 endif ()
 
 #..............................................................................

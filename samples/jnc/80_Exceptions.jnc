@@ -6,26 +6,26 @@
 
 //.............................................................................
 
-// function marked by 'pitcher' modifier will have its return value interpreted as an error code
+// function marked by 'throws' clause will have its return value interpreted as an error code
 // intuitive defaults are assumed ('false' for bools, '-1' for integers, 'null' for pointers)
 
-bool pitcher foo (int a)
+bool foo (int a) throws
 {
 	printf ("foo (%d)\n", a);
 	return a > 0;
 }
 
-// if something more complex or non-standard is required, custom pitch conditions are supported
+// if something more complex or non-standard is required, custom throw conditions are supported
 
-int pitcher (retval < 0) baz (int a)
+int baz (int a) throws if (retval < 0)
 {
 	printf ("baz (%d)\n", a);
 	return a;
 }
 
-// if pitcher conditions match, error code can be automatically propagated
+// if throw conditions match, error code can be automatically propagated
 
-int pitcher (retval < 0) bar ()
+int bar () throws if (retval < 0)
 {
 	printf ("bar ()\n");
 
@@ -68,7 +68,7 @@ int main ()
 	int result = try bar (); // try is a must here
 	printf ("bar returned %d\n", result);		
 
-	// result = bar (); // <-- error: cannot call a 'pitcher' from non-pitcher without 'try' or 'catch'
+	// result = bar (); // <-- error: main does not throw and there is no 'try' or 'catch'
 
 	return 0;
 }

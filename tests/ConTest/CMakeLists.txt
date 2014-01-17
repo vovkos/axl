@@ -108,4 +108,11 @@ if (AXL_USE_PCH)
 		)
 endif ()
 
+set_target_properties (
+	ConTest
+	PROPERTIES
+	FOLDER tests
+	LINKER_LANGUAGE C
+	)
+
 #..............................................................................

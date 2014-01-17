@@ -18,7 +18,6 @@ class CTypeModifiers
 {
 protected:
 	uint_t m_TypeModifiers;
-	rtl::CBoxListT <CToken> m_PitcherCondition;
 
 public:
 	CTypeModifiers ()
@@ -43,15 +42,6 @@ public:
 
 	int
 	ClearTypeModifiers (int ModifierMask);
-
-	rtl::CConstBoxListT <CToken>
-	GetPitcherCondition ()
-	{
-		return m_PitcherCondition;
-	}
-
-	bool
-	SetPitcherCondition (rtl::CBoxListT <CToken>* pExpression);
 
 protected:
 	bool
@@ -165,6 +155,7 @@ class CDeclFunctionSuffix: public CDeclSuffix
 
 protected:
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
+	rtl::CBoxListT <CToken> m_ThrowCondition;
 	uint_t m_FunctionTypeFlags;
 
 public:
@@ -180,6 +171,12 @@ public:
 		return m_ArgArray;
 	}
 
+	rtl::CBoxListT <CToken>*
+	GetThrowCondition ()
+	{
+		return &m_ThrowCondition;
+	}
+
 	int 
 	GetFunctionTypeFlags ()
 	{
@@ -192,7 +189,6 @@ public:
 enum EPostDeclaratorModifier
 {
 	EPostDeclaratorModifier_Const    = 0x01,
-	EPostDeclaratorModifier_Volatile = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -412,12 +408,9 @@ protected:
 		CValue* pElementCountValue,
 		uint_t* pFlags
 		);
-
 };
 
 //.............................................................................
 
 } // namespace jnc {
 } // namespace axl {
-
-

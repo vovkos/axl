@@ -211,4 +211,10 @@ if (AXL_USE_PCH)
 		)
 endif ()
 
+set_target_properties (
+	JncQtTest
+	PROPERTIES
+	FOLDER tests
+	)
+
 #..............................................................................

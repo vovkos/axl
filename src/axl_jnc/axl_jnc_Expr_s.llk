@@ -424,7 +424,7 @@ primary_expr_s <CValue* $pValue>
 			}
 	|	EToken_RetVal
 			{
-				return GetPitcherReturnValueType ($pValue);
+				return GetThrowReturnValueType ($pValue);
 			}
 	|	EToken_Integer
 			{

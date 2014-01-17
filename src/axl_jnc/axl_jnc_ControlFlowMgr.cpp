@@ -331,34 +331,34 @@ CControlFlowMgr::Throw (
 	CFunctionType* pFunctionType
 	)
 {
-	ASSERT (pFunctionType->GetFlags () & EFunctionTypeFlag_Pitcher);
+	ASSERT (pFunctionType->GetFlags () & EFunctionTypeFlag_Throws);
 
 	bool Result;
 
 	CBasicBlock* pThrowBlock = CreateBlock ("throw_block");
 	CBasicBlock* pFollowBlock = CreateBlock ("follow_block");
 
-	CType* pPitcherReturnType = pFunctionType->GetReturnType ();
-	rtl::CConstBoxListT <CToken> PitcherCondition = pFunctionType->GetPitcherCondition ();
+	CType* pReturnType = pFunctionType->GetReturnType ();
+	rtl::CConstBoxListT <CToken> ThrowCondition = pFunctionType->GetThrowCondition ();
 
 	CValue IndicatorValue;
-	if (!PitcherCondition.IsEmpty ())
+	if (!ThrowCondition.IsEmpty ())
 	{
-		Result = m_pModule->m_OperatorMgr.ParsePitcherCondition (
+		Result = m_pModule->m_OperatorMgr.ParseThrowCondition (
 			NULL, // TODO: fix
-			PitcherCondition,
+			ThrowCondition,
 			ReturnValue,
 			&IndicatorValue
 			);
 		if (!Result)
 			return false;
 	}
-	else if (pPitcherReturnType->GetTypeKindFlags () & ETypeKindFlag_Integer)
+	else if (pReturnType->GetTypeKindFlags () & ETypeKindFlag_Integer)
 	{
 		uint64_t MinusOne = -1;
 
 		CValue MinusOneValue;
-		MinusOneValue.CreateConst (&MinusOne, pPitcherReturnType);
+		MinusOneValue.CreateConst (&MinusOne, pReturnType);
 
 		Result = m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_Eq, ReturnValue, MinusOneValue, &IndicatorValue);
 		if (!Result)
@@ -389,16 +389,15 @@ CControlFlowMgr::Throw (
 		CType* pCurrentReturnType = pCurrentFunctionType->GetReturnType ();
 
 		CValue ThrowValue;
-		if (!pCurrentFunctionType->GetPitcherCondition ().IsEmpty ())
+		if (!pCurrentFunctionType->GetThrowCondition ().IsEmpty ())
 		{
-			if (!pCurrentFunctionType->IsPitcherMatch (pFunctionType))
+			if (!pCurrentFunctionType->IsThrowConditionMatch (pFunctionType))
 			{
-				err::SetFormatStringError ("functions with pitcher conditions need to 'catch' and 'return' manually");
+				err::SetFormatStringError ("functions with throw conditions need to 'catch' and 'return' manually");
 				return false;
 			}
 
-			// but if pitcher condition matches, we can re-throw automatically
-			ThrowValue = ReturnValue;
+			ThrowValue = ReturnValue; // re-throw
 		}
 		else if (pCurrentReturnType->GetTypeKindFlags () & ETypeKindFlag_Integer)
 		{

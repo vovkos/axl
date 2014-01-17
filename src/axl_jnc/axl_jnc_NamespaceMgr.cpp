@@ -150,7 +150,7 @@ CNamespaceMgr::OpenInternalScope ()
 
 	if (m_pCurrentScope)
 		pScope->m_Flags |= m_pCurrentScope->m_Flags & (EScopeFlag_CanThrow | EScopeFlag_HasFinally);
-	else if (pFunction->GetType ()->GetFlags () & EFunctionTypeFlag_Pitcher)
+	else if (pFunction->GetType ()->GetFlags () & EFunctionTypeFlag_Throws)
 		pScope->m_Flags |= EScopeFlag_CanThrow;
 
 	m_ScopeList.InsertTail (pScope);
