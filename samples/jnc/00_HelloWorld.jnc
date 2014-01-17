@@ -3,39 +3,10 @@
 
 //.............................................................................
 
-struct Point
-{
-	int m_x;
-	int m_y;
-}
-
-foo (Point const* point)
-{
-	printf ("foo ()\n");
-}
-
 int main ()
 {
 	printf ("hello world!\n");
-
-	stack Point point;
-
-	Point* p = &point;
-
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-	foo (&point);
-
 	return 0;
 }
-
-Point* g_p;
 
 //.............................................................................

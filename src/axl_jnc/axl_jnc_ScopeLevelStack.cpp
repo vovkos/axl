@@ -4,7 +4,7 @@
 
 #if (_AXL_ENV == AXL_ENV_POSIX)
 #	pragma AXL_TODO ("MCJIT is atrocious with line info; disabling cache helps a bit - remove it when MCJIT improves")
-#	define _AXL_JNC_NO_SCOPE_LEVEL_CACHE
+#	// define _AXL_JNC_NO_SCOPE_LEVEL_CACHE // <-- doesn't help much really (just a few cases get better)
 #endif
 
 namespace axl {

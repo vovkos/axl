@@ -1,78 +1,39 @@
+// mcjit-dwarf line info test
+
 //.............................................................................
 
-class C1
+struct Point
 {
 	int m_x;
-
-	construct (int x)
-	{
-		printf ("C1.construct (%d)\n", x);
-		m_x = x;
-	}
-
-	destruct ()
-	{
-		printf ("C1.destruct () { m_x = %d }\n", m_x);
-	}
-
-	Foo (
-		int x,
-		int y
-		)
-	{
-		printf ("C1.Foo (%d, %d) { m_x = %d }\n", x, y, m_x);		
-	}
+	int m_y;
 }
 
-void
-Foo (
-	int x,
-	int y
-	)
+class C
 {
-	printf ("Foo (%d, %d)\n", x, y);
-}
-
-int 
-main ()
-{
-	printf ("main ()\n");
-
-	weak C1* wp;
-	weak function* wpf (int);
-
+	bool pitcher foo (Point const* point)
 	{
-	C1* p = new C1 (100);
-	wp = p;
-	wpf = p.weak Foo ~(, 7);
+		printf ("foo ()\n");
+		return true;
 	}
-
-	weak multicast wmc (int);
-	wmc += wpf;
-
-	function* pf (int) = wmc.GetSnapshot ();
-
-	jnc.RunGc ();
-
-	C1* p = wp;
-	if (p)
-		printf ("still alive!\n");
-	else
-		printf ("dead already...\n");
-
-	wmc (700);
-
-	return 10; 
 }
 
-//.............................................................................
+int main ()
+{
+	printf ("hello world!\n");
 
-// system functions
+	stack Point point;
 
-int
-printf (
-	unsafe const thin char* pFormat,
-	unsafe ...
-	);
+	C c;
+	try c.foo (&point);
+	try c.foo (&point);
+	try c.foo (&point);
+	try c.foo (&point);
+	try c.foo (&point);
+	try c.foo (&point);
+
+	return 0;
+}
+
+Point* g_p;
 
 //.............................................................................
