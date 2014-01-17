@@ -69,6 +69,10 @@
 #include "llvm/CodeGen/GCStrategy.h"
 #include "llvm/CodeGen/GCs.h"
 
+// make an easily comparable version like 0x0304
+
+#define LLVM_VERSION ((LLVM_VERSION_MAJOR << 8) | LLVM_VERSION_MINOR)
+
 #pragma warning (default: 4800)
 #pragma warning (default: 4244)
 #pragma warning (default: 4624)

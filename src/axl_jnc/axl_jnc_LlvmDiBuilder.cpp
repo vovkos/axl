@@ -339,7 +339,7 @@ CLlvmDiBuilder::CreateFunction (CFunction* pFunction)
 		pFunction->m_Tag.cc (), // linkage name
 		pUnit->GetLlvmDiFile (),
 		DeclPos.m_Line + 1,
-		pFunction->GetType ()->GetLlvmDiType (),
+		llvm::DICompositeType (pFunction->GetType ()->GetLlvmDiType ()),
 		false,
 		true,
 		ScopePos.m_Line + 1,

@@ -37,6 +37,7 @@ protected:
 	rtl::CString m_LeadingComment;
 	CFunction* m_pFunction;
 	llvm::BasicBlock* m_pLlvmBlock;
+	llvm::DebugLoc m_LlvmDebugLoc;
 
 	uint_t m_Flags;
 

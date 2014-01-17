@@ -2,6 +2,11 @@
 #include "axl_jnc_ScopeLevelStack.h"
 #include "axl_jnc_Module.h"
 
+#if (_AXL_ENV == AXL_ENV_POSIX)
+#	pragma AXL_TODO ("MCJIT is atrocious with line info; disabling cache helps a bit - remove it when MCJIT improves")
+#	define _AXL_JNC_NO_SCOPE_LEVEL_CACHE
+#endif
+
 namespace axl {
 namespace jnc {
 
@@ -19,12 +24,14 @@ CScopeLevelStack::TakeOver (CScopeLevelStack* pSrcStack)
 CValue
 CScopeLevelStack::GetScopeLevel (size_t Level)
 {
+#ifndef _AXL_JNC_NO_SCOPE_LEVEL_CACHE
 	TEntry* pEntry = GetEntry (Level);
 	if (pEntry->m_ScopeLevelValue)
 		return pEntry->m_ScopeLevelValue;
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	CBasicBlock* pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+#endif
 
 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
@@ -39,24 +46,28 @@ CScopeLevelStack::GetScopeLevel (size_t Level)
 		&ScopeLevelValue
 		);
 
+#ifndef _AXL_JNC_NO_SCOPE_LEVEL_CACHE
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
-
 	pEntry->m_ScopeLevelValue = ScopeLevelValue;
+#endif
 	return ScopeLevelValue;
 }
 
 CValue
 CScopeLevelStack::GetObjHdr (size_t Level)
 {
+#ifndef _AXL_JNC_NO_SCOPE_LEVEL_CACHE
 	TEntry* pEntry = GetEntry (Level);
 	if (pEntry->m_ObjHdrValue)
 		return pEntry->m_ObjHdrValue;
 
 	CFunction* pFunction = m_pModule->m_FunctionMgr.GetCurrentFunction ();
 	CBasicBlock* pPrevBlock = m_pModule->m_ControlFlowMgr.SetCurrentBlock (pFunction->GetEntryBlock ());
+#endif
 
-	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 	CValue ObjHdrValue;
+
+ 	CType* pType = m_pModule->m_TypeMgr.GetPrimitiveType (EType_SizeT);
 
 	m_pModule->m_LlvmIrBuilder.CreateAlloca (pType, "scopeLevel", pType, &ObjHdrValue);
 
@@ -66,9 +77,10 @@ CScopeLevelStack::GetObjHdr (size_t Level)
 	pType = m_pModule->m_TypeMgr.GetStdType (EStdType_ObjHdrPtr);
 	m_pModule->m_LlvmIrBuilder.CreateBitCast (ObjHdrValue, pType, &ObjHdrValue);
 
+#ifndef _AXL_JNC_NO_SCOPE_LEVEL_CACHE
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pPrevBlock);
-
 	pEntry->m_ObjHdrValue = ObjHdrValue;
+#endif
 	return ObjHdrValue;
 }
 

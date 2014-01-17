@@ -292,6 +292,8 @@ CFunction::Compile ()
 
 	// epilogue
 
+	m_pModule->m_NamespaceMgr.SetSourcePos (EndPos);
+
 	Result = m_pModule->m_FunctionMgr.Epilogue ();
 	if (!Result)
 		return false;

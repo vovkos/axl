@@ -21,9 +21,9 @@ CCast_DataPtr_FromArray::GetCastKind (
 
 	CType* pArrayElementType = pSrcType->GetElementType ();
 	CType* pPtrDataType = pDstType->GetTargetType ();
-	
-	return 
-		pArrayElementType->Cmp (pPtrDataType) == 0 ? ECast_Implicit : 
+
+	return
+		pArrayElementType->Cmp (pPtrDataType) == 0 ? ECast_Implicit :
 		(pArrayElementType->GetFlags () & ETypeFlag_Pod) &&
 		(pPtrDataType->GetFlags () & ETypeFlag_Pod) ? ECast_Explicit : ECast_None;
 }
@@ -77,14 +77,14 @@ CCast_DataPtr_Base::GetCastKind (
 	CType* pSrcDataType = pSrcType->GetTargetType ();
 	CType* pDstDataType = pDstType->GetTargetType ();
 
-	if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ()) 
+	if (pSrcType->IsConstPtrType () && !pDstType->IsConstPtrType ())
 		return ECast_None; // const vs non-const mismatch
 
 	if ((pDstDataType->GetFlags () & ETypeFlag_Pod) != (pSrcDataType->GetFlags () & ETypeFlag_Pod))
 		return ECast_None; // pod vs non-pod mismatch
 
 	if (pSrcDataType->Cmp (pDstDataType) == 0 || pDstDataType->GetTypeKind () == EType_Void)
-		return ECast_Implicit;	
+		return ECast_Implicit;
 
 	if (pSrcDataType->GetTypeKind () != EType_Struct)
 		return ECast_Explicit;
@@ -100,7 +100,7 @@ CCast_DataPtr_Base::GetOffset (
 	CDataPtrType* pDstType,
 	CBaseTypeCoord* pCoord
 	)
-{	
+{
 	CType* pSrcDataType = pSrcType->GetTargetType ();
 	CType* pDstDataType = pDstType->GetTargetType ();
 
@@ -126,7 +126,7 @@ CCast_DataPtr_Base::GetOffset (
 
 intptr_t
 CCast_DataPtr_Base::GetOffsetUnsafePtrValue (
-	const CValue& PtrValue, 
+	const CValue& PtrValue,
 	CDataPtrType* pSrcType,
 	CDataPtrType* pDstType,
 	CValue* pResultValue
@@ -139,10 +139,10 @@ CCast_DataPtr_Base::GetOffsetUnsafePtrValue (
 	{
 		Coord.m_LlvmIndexArray.Insert (0, 0);
 		m_pModule->m_LlvmIrBuilder.CreateGep (
-			PtrValue, 
+			PtrValue,
 			Coord.m_LlvmIndexArray,
 			Coord.m_LlvmIndexArray.GetCount (),
-			pDstType, 
+			pDstType,
 			pResultValue
 			);
 
@@ -197,7 +197,7 @@ CCast_DataPtr_Normal2Normal::LlvmCast (
 {
 	ASSERT (OpValue.GetType ()->GetTypeKind () == EType_DataPtr);
 	ASSERT (pType->GetTypeKind () == EType_DataPtr);
-	
+
 	if (pType->GetFlags () & EPtrTypeFlag_Checked)
 		m_pModule->m_OperatorMgr.CheckDataPtrRange (OpValue);
 
@@ -378,7 +378,7 @@ CCast_DataPtr::GetCastOperator (
 	)
 {
 	ASSERT (pType->GetTypeKind () == EType_DataPtr);
-	
+
 	CDataPtrType* pDstPtrType = (CDataPtrType*) pType;
 	EDataPtrType DstPtrTypeKind = pDstPtrType->GetPtrTypeKind ();
 
@@ -392,12 +392,12 @@ CCast_DataPtr::GetCastOperator (
 	{
 		return NULL;
 	}
-		
+
 	CDataPtrType* pSrcPtrType = (CDataPtrType*) pSrcType;
 	EDataPtrType SrcPtrTypeKind = pSrcPtrType->GetPtrTypeKind ();
 
 	if (DstPtrTypeKind == EDataPtrType_Normal &&
-		(pSrcPtrType->GetTargetType ()->GetFlags () & ETypeFlag_Pod) != 
+		(pSrcPtrType->GetTargetType ()->GetFlags () & ETypeFlag_Pod) !=
 		(pDstPtrType->GetTargetType ()->GetFlags () & ETypeFlag_Pod))
 	{
 		return NULL;
@@ -442,7 +442,7 @@ CCast_DataRef::LlvmCast (
 	)
 {
 	ASSERT (pType->GetTypeKind () == EType_DataRef);
-	
+
 	CDataPtrType* pPtrType = (CDataPtrType*) pType;
 	CDataPtrType* pIntermediateType = pPtrType->GetTargetType ()->GetDataPtrType (
 		EType_DataPtr,

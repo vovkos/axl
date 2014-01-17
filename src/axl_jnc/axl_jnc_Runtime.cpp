@@ -43,6 +43,10 @@ public:
 		const std::string &Name,
 		bool AbortOnFailure
 		);
+
+	virtual
+	uint64_t
+	getSymbolAddress (const std::string &Name);
 };
 
 void*
@@ -57,6 +61,16 @@ CJitMemoryManager::getPointerToNamedFunction (
 
 	if (AbortOnFailure)
 		report_fatal_error ("CJitMemoryManager::getPointerToNamedFunction: unresolved external function '" + Name + "'");
+
+	return NULL;
+}
+
+uint64_t
+CJitMemoryManager::getSymbolAddress (const std::string &Name)
+{
+	void* pf = m_pRuntime->FindFunctionMapping (Name.c_str ());
+	if (pf)
+		return (uint64_t) pf;
 
 	return 0;
 }
@@ -107,14 +121,21 @@ CRuntime::Create (
 	EngineBuilder.setEngineKind(llvm::EngineKind::JIT);
 
 	llvm::TargetOptions TargetOptions;
+#if (LLVM_VERSION < 0x0304) // they removed JITExceptionHandling in 3.4
 	TargetOptions.JITExceptionHandling = true;
-	TargetOptions.JITEmitDebugInfo = true;
+#endif
 
 	if (JitKind == EJit_McJit)
 	{
 		CJitMemoryManager* pJitMemoryManager = new CJitMemoryManager (this);
 		EngineBuilder.setUseMCJIT (true);
+#if (LLVM_VERSION < 0x0304) // they distinguish between JIT & MCJIT memory managers in 3.4
 		EngineBuilder.setJITMemoryManager (pJitMemoryManager);
+#else
+		EngineBuilder.setMCJITMemoryManager (pJitMemoryManager);
+#endif
+
+		TargetOptions.JITEmitDebugInfo = true;
 	}
 
 	EngineBuilder.setTargetOptions (TargetOptions);
@@ -228,7 +249,7 @@ CRuntime::Shutdown ()
 {
 	rtl::CArrayT <TGcRoot> SaveStaticGcRootArray = m_StaticGcRootArray;
 	m_StaticGcRootArray.Clear ();
-	
+
 	RunGc ();
 	RunGc (); // 2nd gc run is needed to clean up after destruction
 
@@ -325,15 +346,15 @@ CRuntime::GcTryAllocate (
 	size_t PrevGcLevel = GcMakeThreadSafe ();
 	ASSERT (PrevGcLevel); // otherwise there is risk of losing return value
 
-	size_t Size = sizeof (TObjHdr) + pType->GetSize ();	
+	size_t Size = sizeof (TObjHdr) + pType->GetSize ();
 	if (ElementCount > 1)
 		Size += sizeof (size_t);
-			
-	WaitGcIdleAndLock ();	
+
+	WaitGcIdleAndLock ();
 	if (m_PeriodGcAllocSize > m_PeriodGcAllocLimit)
 	{
 	//	RunGc_l ();
-	//	WaitGcIdleAndLock ();	
+	//	WaitGcIdleAndLock ();
 	}
 
 	RestoreGcLevel (PrevGcLevel); // restore before unlocking
@@ -344,7 +365,7 @@ CRuntime::GcTryAllocate (
 		m_Lock.Unlock ();
 		return NULL;
 	}
-	
+
 	TObjHdr* pObject;
 	void* p;
 
@@ -366,7 +387,7 @@ CRuntime::GcTryAllocate (
 			pObject = (TObjHdr*) (pSize + 1);
 			pObject->m_Flags = EObjHdrFlag_DynamicArray;
 		}
-		else 
+		else
 		{
 			pObject = (TObjHdr*) pBlock;
 			pObject->m_Flags = 0;
@@ -378,7 +399,7 @@ CRuntime::GcTryAllocate (
 
 		p = pObject + 1;
 	}
-	
+
 	m_PeriodGcAllocSize += Size;
 	m_GcMemBlockArray.Append (pObject);
 	m_Lock.Unlock ();
@@ -447,14 +468,14 @@ CRuntime::RunGc ()
 void
 CRuntime::RunGc_l ()
 {
-	m_GcIdleEvent.Reset ();	
+	m_GcIdleEvent.Reset ();
 
 	// 1) suspend all mutator threads at safe points
 
 	m_GcState = EGcState_WaitSafePoint;
 
-	ASSERT (m_GcUnsafeThreadCount); 
-	m_GcSafePointEvent.Reset ();	
+	ASSERT (m_GcUnsafeThreadCount);
+	m_GcSafePointEvent.Reset ();
 	intptr_t UnsafeCount = mt::AtomicDec (&m_GcUnsafeThreadCount);
 	if (UnsafeCount)
 	{
@@ -505,7 +526,7 @@ CRuntime::RunGc_l ()
 
 				if (p) // check needed, stack roots could be nullified
 				{
-					if (pType->GetTypeKind () == EType_DataPtr && 
+					if (pType->GetTypeKind () == EType_DataPtr &&
 						((CDataPtrType*) pType)->GetPtrTypeKind () == EDataPtrType_Thin) // local heap variable
 					{
 						MarkGcLocalHeapRoot (p, ((CDataPtrType*) pType)->GetTargetType ());
@@ -533,17 +554,17 @@ CRuntime::RunGc_l ()
 	for (intptr_t i = Count - 1; i >= 0; i--)
 	{
 		jnc::TObjHdr* pObject = m_GcObjectArray [i];
-		
+
 		if (!(pObject->m_Flags & (EObjHdrFlag_GcMark | EObjHdrFlag_GcWeakMark_c)))
 		{
 			m_GcObjectArray.Remove (i);
 			pObject->m_Flags |= EObjHdrFlag_Dead;
-			
+
 			if (pObject->m_pClassType->GetDestructor ())
 				DestructArray.Append ((TIfaceHdr*) (pObject + 1));
 		}
 	}
-	
+
 	if (!DestructArray.IsEmpty ())
 	{
 		DestructGuard.m_pDestructArray = &DestructArray;
@@ -583,8 +604,8 @@ CRuntime::RunGc_l ()
 		{
 			m_GcMemBlockArray.Remove (i);
 
-			void* pBlock = (pObject->m_Flags & EObjHdrFlag_DynamicArray) ? 
-				(void*) ((size_t*) pObject - 1) : 
+			void* pBlock = (pObject->m_Flags & EObjHdrFlag_DynamicArray) ?
+				(void*) ((size_t*) pObject - 1) :
 				pObject;
 
 			AXL_MEM_FREE (pBlock);
@@ -609,10 +630,10 @@ CRuntime::RunGc_l ()
 	mt::AtomicInc (&m_GcUnsafeThreadCount);
 	m_PeriodGcAllocSize = 0;
 	m_GcState = EGcState_Idle;
-	m_GcIdleEvent.Signal ();	
+	m_GcIdleEvent.Signal ();
 	m_Lock.Unlock ();
 
-	// 5) run destructors 
+	// 5) run destructors
 
 	if (!DestructArray.IsEmpty ())
 	{
@@ -658,7 +679,7 @@ CRuntime::GcEnter ()
 {
 	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
 	ASSERT (pTls);
-	
+
 	pTls->m_GcLevel++;
 	if (pTls->m_GcLevel > 1) // was already unsafe
 		GcPulse (); // pulse on enter only, no pulse on leave: might lose retval gcroot
@@ -673,7 +694,7 @@ CRuntime::GcLeave ()
 
 	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
 	ASSERT (pTls && pTls->m_GcLevel);
-	
+
 	pTls->m_GcLevel--;
 	if (!pTls->m_GcLevel) // not unsafe anymore
 		GcDecrementUnsafeThreadCount ();
@@ -689,7 +710,7 @@ CRuntime::GcPulse ()
 
 	TTlsHdr* pTls = GetTlsMgr ()->GetTls (this);
 	ASSERT (pTls);
-		
+
 	if (pTls->m_GcLevel)
 	{
 		GcDecrementUnsafeThreadCount ();
@@ -700,7 +721,7 @@ CRuntime::GcPulse ()
 void
 CRuntime::GcIncrementUnsafeThreadCount ()
 {
-	// what we try to prevent here is entering an unsafe region when collector thread 
+	// what we try to prevent here is entering an unsafe region when collector thread
 	// thinks all the mutators are parked at safe regions and therefore moves on to mark/sweep
 
 	for (;;)
@@ -722,7 +743,7 @@ CRuntime::GcIncrementUnsafeThreadCount ()
 void
 CRuntime::GcDecrementUnsafeThreadCount ()
 {
-	intptr_t Count = mt::AtomicDec (&m_GcUnsafeThreadCount);	
+	intptr_t Count = mt::AtomicDec (&m_GcUnsafeThreadCount);
 	if (m_GcState == EGcState_WaitSafePoint)
 	{
 		if (!Count)

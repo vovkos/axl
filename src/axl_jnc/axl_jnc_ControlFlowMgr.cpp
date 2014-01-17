@@ -52,6 +52,9 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 		return pBlock;
 
 	CBasicBlock* pPrevCurrentBlock = m_pCurrentBlock;
+	if (pPrevCurrentBlock)
+		pPrevCurrentBlock->m_LlvmDebugLoc = m_pModule->m_LlvmIrBuilder.GetCurrentDebugLoc ();
+
 	m_pCurrentBlock = pBlock;
 	if (!pBlock)
 		return pPrevCurrentBlock;
@@ -60,6 +63,9 @@ CControlFlowMgr::SetCurrentBlock (CBasicBlock* pBlock)
 		AddBlock (pBlock);
 
 	m_pModule->m_LlvmIrBuilder.SetInsertPoint (pBlock);
+
+	if (!pBlock->m_LlvmDebugLoc.isUnknown ())
+		m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (pBlock->m_LlvmDebugLoc);
 
 	return pPrevCurrentBlock;
 }

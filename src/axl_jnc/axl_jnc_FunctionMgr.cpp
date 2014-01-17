@@ -162,7 +162,8 @@ CFunctionMgr::PushEmissionContext ()
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (NULL);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
-	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ());
+	// m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc () /m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
 
 	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 
@@ -269,7 +270,6 @@ CFunctionMgr::Prologue (
 	pFunction->m_pEntryBlock = pEntryBlock;
 	pEntryBlock->MarkEntry ();
 
-	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ()); // llvm magic
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (pEntryBlock);
 
 	if (pFunction->m_FunctionKind == EFunction_ModuleConstructor)
@@ -287,8 +287,6 @@ CFunctionMgr::Prologue (
 	m_pModule->m_ControlFlowMgr.Jump (pBodyBlock, pBodyBlock);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0; // clear jump flag
-
-	CLlvmScopeComment Comment (&m_pModule->m_LlvmIrBuilder, "prologue");
 
 	// save scope level
 
@@ -412,11 +410,10 @@ CFunctionMgr::InternalPrologue (
 {
 	PushEmissionContext ();
 
-	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
-
 	m_pCurrentFunction = pFunction;
 
 	m_pModule->m_NamespaceMgr.OpenInternalScope ();
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ());
 
 	CBasicBlock* pEntryBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_entry");
 	CBasicBlock* pBodyBlock = m_pModule->m_ControlFlowMgr.CreateBlock ("function_body");
@@ -764,36 +761,31 @@ CFunctionMgr::JitFunctions (llvm::ExecutionEngine* pExecutionEngine)
 	CJitEventListener JitEventListener (this);
 	pExecutionEngine->RegisterJITEventListener (&JitEventListener);
 
-	rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
-	for (; Function; Function++)
+	try
 	{
-		CFunction* pFunction = *Function;
-
-		if (!pFunction->GetEntryBlock ())
-			continue;
-
-		try
+		rtl::CIteratorT <CFunction> Function = m_FunctionList.GetHead ();
+		for (; Function; Function++)
 		{
-			void* pf = pExecutionEngine->getPointerToFunction (pFunction->GetLlvmFunction ());
-			pFunction->m_pfMachineCode = pf;
+			CFunction* pFunction = *Function;
 
-			// ASSERT (pFunction->m_pfMachineCode == pf && pFunction->m_MachineCodeSize != 0);
-		}
-		catch (err::CError Error)
-		{
-			err::SetFormatStringError (
-				"LLVM jitting fail for '%s': %s",
-				pFunction->m_Tag.cc (),
-				Error->GetDescription ().cc ()
-				);
+			if (!pFunction->GetEntryBlock ())
+				continue;
 
-			pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
-			return false;
+				void* pf = pExecutionEngine->getPointerToFunction (pFunction->GetLlvmFunction ());
+				pFunction->m_pfMachineCode = pf;
+
+				// ASSERT (pFunction->m_pfMachineCode == pf && pFunction->m_MachineCodeSize != 0);
 		}
+
+		// for MC jitter this should do all the job
+		pExecutionEngine->finalizeObject ();
 	}
-
-	// for MC jitter this should do all the job
-	pExecutionEngine->finalizeObject ();
+	catch (err::CError Error)
+	{
+		err::SetFormatStringError ("LLVM jitting failed: %s", Error->GetDescription ().cc ());
+		pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
+		return false;
+	}
 
 	pExecutionEngine->UnregisterJITEventListener (&JitEventListener);
 	return true;
