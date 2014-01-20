@@ -267,11 +267,11 @@ set (
 	axl_jnc_DeclarationSpecifier.llk
 	axl_jnc_Declarator.llk
 	axl_jnc_Expr.llk
-	axl_jnc_Expr_s.llk
+	axl_jnc_Expr_0.llk
 	axl_jnc_NamedTypeSpecifier.llk
 	axl_jnc_Parser.llk
+	axl_jnc_Reactor.llk
 	axl_jnc_Stmt.llk
-	axl_jnc_Stmt_0.llk
 	)
 
 push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -292,10 +292,10 @@ add_till_step (
 	axl_jnc_DeclarationSpecifier.llk
 	axl_jnc_Declarator.llk
 	axl_jnc_Expr.llk
-	axl_jnc_Expr_s.llk
+	axl_jnc_Expr_0.llk
 	axl_jnc_NamedTypeSpecifier.llk
+	axl_jnc_Reactor.llk
 	axl_jnc_Stmt.llk
-	axl_jnc_Stmt_0.llk
 	)
 
 pop (CMAKE_CURRENT_BINARY_DIR)

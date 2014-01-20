@@ -185,6 +185,7 @@ CDeclTypeCalc::CalcType (
 			break;
 
 		case EDeclSuffix_Function:
+		case EDeclSuffix_Throw:
 			if (m_TypeModifiers & ETypeModifier_Reactor)
 				pType = GetReactorType (pType);
 			else
@@ -500,9 +501,26 @@ CDeclTypeCalc::PrepareReturnType (CType* pType)
 CFunctionType*
 CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 {
+	uint_t TypeFlags = 0;
+	rtl::CBoxListT <CToken>* pThrowCondition = NULL;
+
+	if (m_Suffix && m_Suffix->GetSuffixKind () == EDeclSuffix_Throw)
+	{
+		CDeclThrowSuffix* pSuffix = (CDeclThrowSuffix*) *m_Suffix--;
+
+		TypeFlags |= EFunctionTypeFlag_Throws;
+		pThrowCondition = pSuffix->GetThrowCondition ();
+	}
+
 	pReturnType = PrepareReturnType (pReturnType);
 	if (!pReturnType)
 		return NULL;
+
+	if ((TypeFlags & EFunctionTypeFlag_Throws) && pReturnType->GetTypeKind () == EType_Void)
+	{
+		err::SetFormatStringError ("void function cannot throw");
+		return NULL;
+	}
 
 	if (!m_Suffix || m_Suffix->GetSuffixKind () != EDeclSuffix_Function)
 	{
@@ -511,12 +529,12 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 	}
 
 	CDeclFunctionSuffix* pSuffix = (CDeclFunctionSuffix*) *m_Suffix--;
-	uint_t Flags = pSuffix->GetFunctionTypeFlags ();
+	TypeFlags |= pSuffix->GetFunctionTypeFlags ();
 
 	ECallConv CallConvKind = GetCallConvKindFromModifiers (m_TypeModifiers);
 	CCallConv* pCallConv = m_pModule->m_TypeMgr.GetCallConv (CallConvKind);
 
-	if (Flags & EFunctionTypeFlag_VarArg)
+	if (TypeFlags & EFunctionTypeFlag_VarArg)
 	{
 		uint_t CallConvFlags = pCallConv->GetFlags ();
 
@@ -533,20 +551,6 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 		}
 	}
 
-	rtl::CBoxListT <CToken>* pThrowCondition = NULL;
-
-	if (Flags & EFunctionTypeFlag_Throws)
-	{
-		if (pReturnType->GetTypeKind () == EType_Void)
-		{
-			err::SetFormatStringError ("void function cannot throw");
-			return NULL;
-		}
-
-		Flags |= EFunctionTypeFlag_Throws;
-		pThrowCondition = pSuffix->GetThrowCondition ();
-	}
-
 	m_TypeModifiers &= ~ETypeModifierMask_Function;
 
 	return m_pModule->m_TypeMgr.CreateUserFunctionType (
@@ -554,13 +558,26 @@ CDeclTypeCalc::GetFunctionType (CType* pReturnType)
 		pReturnType,
 		pThrowCondition,
 		pSuffix->GetArgArray (),
-		Flags
+		TypeFlags
 		);
 }
 
 CPropertyType*
 CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 {
+	uint_t TypeFlags = 0;
+	if (m_Suffix && m_Suffix->GetSuffixKind () == EDeclSuffix_Throw)
+	{
+		CDeclThrowSuffix* pSuffix = (CDeclThrowSuffix*) *m_Suffix--;
+		if (!pSuffix->GetThrowCondition ()->IsEmpty ())
+		{
+			err::SetFormatStringError ("property cannot have a throw condition");
+			return NULL;
+		}
+
+		TypeFlags |= EPropertyTypeFlag_Throws;
+	}
+
 	pReturnType = PrepareReturnType (pReturnType);
 	if (!pReturnType)
 		return NULL;
@@ -574,9 +591,16 @@ CDeclTypeCalc::GetPropertyType (CType* pReturnType)
 	ECallConv CallConvKind = GetCallConvKindFromModifiers (m_TypeModifiers);
 	CCallConv* pCallConv = m_pModule->m_TypeMgr.GetCallConv (CallConvKind);
 
-	uint_t TypeFlags = 0;
 	if (m_TypeModifiers & ETypeModifier_Const)
+	{
+		if (TypeFlags & EPropertyTypeFlag_Throws)
+		{
+			err::SetFormatStringError ("const property cannot throw");
+			return NULL;
+		}
+
 		TypeFlags |= EPropertyTypeFlag_Const;
+	}
 
 	if (m_TypeModifiers & ETypeModifier_Bindable)
 		TypeFlags |= EPropertyTypeFlag_Bindable;

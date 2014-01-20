@@ -91,7 +91,7 @@ public:
 	SetBody (rtl::CBoxListT <CToken>* pTokenList);
 
 	CFunction*
-	CreateHandler ();
+	CreateHandler (const rtl::CArrayT <CFunctionArg*>& ArgArray = rtl::CArrayT <CFunctionArg*> ());
 
 	bool
 	BindHandlers (const rtl::CConstListT <TReaction>& HandlerList);

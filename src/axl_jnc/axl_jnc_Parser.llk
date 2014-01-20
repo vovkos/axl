@@ -1,8 +1,8 @@
 import "axl_jnc_Decl.llk";
 import "axl_jnc_Expr.llk";
-import "axl_jnc_Expr_s.llk";
+import "axl_jnc_Expr_0.llk";
 import "axl_jnc_Stmt.llk";
-import "axl_jnc_Stmt_0.llk";
+import "axl_jnc_Reactor.llk";
 
 import "axl_jnc_DeclarationSpecifier.llk";
 import "axl_jnc_Declarator.llk";
@@ -89,8 +89,8 @@ Members
 
 	CReactorClassType* m_pReactorType;
 	rtl::CStdListT <TReaction> m_ReactionList;
-	rtl::CBoxListT <CValue> m_ReactorBindSiteList;
-	size_t m_ReactorBindSiteCount;
+	rtl::CBoxListT <CValue> m_ReactorBindableList;
+	size_t m_ReactorBindableTypeCount;
 	size_t m_ReactorBindSiteTotalCount;
 
 	CDerivableType* m_pConstructorType;
@@ -291,10 +291,10 @@ Members2
 	FinalizeLastProperty (bool HasBody);
 
 	bool
-	ParseLastPropertyBody (const rtl::CBoxListT <CToken>& Body);
+	ParseLastPropertyBody (const rtl::CConstBoxListT <CToken>& Body);
 
 	bool
-	NewOperator_s (
+	NewOperator_0 (
 		EStorage StorageKind,
 		CType* pType,
 		CValue* pResultValue
@@ -304,19 +304,22 @@ Members2
 	FinalizeReactor ();
 
 	bool
-	FinalizeReactorOnChangedClause ();
+	FinalizeReactorOnEventDeclaration (
+		rtl::CBoxListT <CValue>* pValueList,
+		CDeclarator* pDeclarator
+		);
 
 	bool
-	FinalizeReactorOnChangedStmt ()
+	FinalizeReactorOnEventBody ()
 	{
 		return m_pModule->m_FunctionMgr.Epilogue ();
 	}
 
 	bool
-	ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList);
+	ReactorExpressionStmt (const rtl::CConstBoxListT <CToken>& TokenList);
 
 	bool
-	CountReactorBindSites ();
+	CountReactorBindableTypes ();
 
 	bool
 	CallBaseTypeMemberConstructor (
@@ -425,7 +428,7 @@ Members2
 		);
 
 	bool
-	FinalizeLiteral_s (
+	FinalizeLiteral_0 (
 		TLiteral* pLiteral,
 		CValue* pResultValue
 		);

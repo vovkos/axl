@@ -21,6 +21,7 @@ enum EPropertyTypeFlag
 {
 	EPropertyTypeFlag_Const    = 0x010000,
 	EPropertyTypeFlag_Bindable = 0x020000,
+	EPropertyTypeFlag_Throws   = 0x040000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

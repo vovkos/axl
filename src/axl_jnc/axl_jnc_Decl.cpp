@@ -301,27 +301,37 @@ CDeclarator::AddPointerPrefix ()
 CDeclArraySuffix*
 CDeclarator::AddArraySuffix (rtl::CBoxListT <CToken>* pElementCountInitializer)
 {
-	CDeclArraySuffix* pArraySuffix = AXL_MEM_NEW (CDeclArraySuffix);
-	pArraySuffix->m_ElementCountInitializer.TakeOver (pElementCountInitializer);
-	m_SuffixList.InsertTail (pArraySuffix);
-	return pArraySuffix;
+	CDeclArraySuffix* pSuffix = AXL_MEM_NEW (CDeclArraySuffix);
+	pSuffix->m_ElementCountInitializer.TakeOver (pElementCountInitializer);
+	m_SuffixList.InsertTail (pSuffix);
+	return pSuffix;
 }
 
 CDeclArraySuffix*
 CDeclarator::AddArraySuffix (size_t ElementCount)
 {
-	CDeclArraySuffix* pArraySuffix = AXL_MEM_NEW (CDeclArraySuffix);
-	pArraySuffix->m_ElementCount = ElementCount;
-	m_SuffixList.InsertTail (pArraySuffix);
-	return pArraySuffix;
+	CDeclArraySuffix* pSuffix = AXL_MEM_NEW (CDeclArraySuffix);
+	pSuffix->m_ElementCount = ElementCount;
+	m_SuffixList.InsertTail (pSuffix);
+	return pSuffix;
 }
 
 CDeclFunctionSuffix*
 CDeclarator::AddFunctionSuffix ()
 {
-	CDeclFunctionSuffix* pFunctionSuffix = AXL_MEM_NEW (CDeclFunctionSuffix);
-	m_SuffixList.InsertTail (pFunctionSuffix);
-	return pFunctionSuffix;
+	CDeclFunctionSuffix* pSuffix = AXL_MEM_NEW (CDeclFunctionSuffix);
+	m_SuffixList.InsertTail (pSuffix);
+	return pSuffix;
+}
+
+CDeclThrowSuffix*
+CDeclarator::AddThrowSuffix (rtl::CBoxListT <CToken>* pThrowCondition)
+{
+	CDeclThrowSuffix* pSuffix = AXL_MEM_NEW (CDeclThrowSuffix);
+	if (pThrowCondition)
+		pSuffix->m_ThrowCondition.TakeOver (pThrowCondition);
+	m_SuffixList.InsertTail (pSuffix);
+	return pSuffix;
 }
 
 bool

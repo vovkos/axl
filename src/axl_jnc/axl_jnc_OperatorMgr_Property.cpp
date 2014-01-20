@@ -450,7 +450,7 @@ COperatorMgr::GetPropertyAutoGetValueType (const CValue& OpValue)
 	if (OpValue.GetValueKind () != EValue_Property || 
 		!(OpValue.GetProperty ()->GetFlags () & EPropertyFlag_AutoGet))
 	{
-		err::SetFormatStringError ("'%s' has no 'autoget' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no autoget field", OpValue.GetType ()->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -487,7 +487,7 @@ COperatorMgr::GetPropertyAutoGetValue (
 	if (OpValue.GetValueKind () != EValue_Property || 
 		!(OpValue.GetProperty ()->GetFlags () & EPropertyFlag_AutoGet))
 	{
-		err::SetFormatStringError ("'%s' has no 'autoget' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no autoget field", OpValue.GetType ()->GetTypeString ().cc ());
 		return false;
 	}
 
@@ -503,7 +503,7 @@ COperatorMgr::GetPropertyOnChangedType (const CValue& RawOpValue)
 	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr) || 
 		!(((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
-		err::SetFormatStringError ("'%s' has no 'onchanged' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no bindable event", OpValue.GetType ()->GetTypeString ().cc ());
 		return NULL;
 	}
 
@@ -516,7 +516,7 @@ COperatorMgr::GetPropertyOnChangedType (
 	CValue* pResultValue
 	)
 {
-	CType* pType = GetPropertyAutoGetValueType (OpValue);
+	CType* pType = GetPropertyOnChangedType (OpValue);
 	if (!pType)
 		return false;
 
@@ -538,7 +538,7 @@ COperatorMgr::GetPropertyOnChanged (
 	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_PropertyPtr) || 
 		!(((CPropertyPtrType*) OpValue.GetType ())->GetTargetType ()->GetFlags () & EPropertyTypeFlag_Bindable))
 	{
-		err::SetFormatStringError ("'%s' has no 'onchanged' field", OpValue.GetType ()->GetTypeString ().cc ());
+		err::SetFormatStringError ("'%s' has no bindable event", OpValue.GetType ()->GetTypeString ().cc ());
 		return NULL;
 	}
 

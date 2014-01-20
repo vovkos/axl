@@ -132,7 +132,7 @@ enum EToken
 	EToken_Case,
 	EToken_Default,
 	EToken_Once,
-	EToken_OnChanged,
+	EToken_OnEvent,
 	EToken_Try,
 	EToken_Catch,
 	EToken_Finally,
@@ -305,7 +305,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
 	AXL_LEX_TOKEN_NAME (EToken_Case,         "case")
 	AXL_LEX_TOKEN_NAME (EToken_Default,      "default")
 	AXL_LEX_TOKEN_NAME (EToken_Once,         "once")
-	AXL_LEX_TOKEN_NAME (EToken_OnChanged,    "onchanged")
+	AXL_LEX_TOKEN_NAME (EToken_OnEvent,      "onevent")
 	AXL_LEX_TOKEN_NAME (EToken_Try,          "try")
 	AXL_LEX_TOKEN_NAME (EToken_Catch,        "catch")
 	AXL_LEX_TOKEN_NAME (EToken_Finally,      "finally")

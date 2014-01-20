@@ -19,7 +19,7 @@ g_simpleProp.set (int x)
 
 property g_prop
 {	
-	autoget int m_x; // declaring an 'autoget' field implicitly makes property 'autoget'
+	int autoget m_x; // declaring an 'autoget' field implicitly makes property 'autoget'
 
 	set (int x)
 	{

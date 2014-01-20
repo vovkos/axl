@@ -24,7 +24,7 @@ struct TFunctionPtrTypeTuple;
 enum EFunctionTypeFlag
 {
 	EFunctionTypeFlag_VarArg   = 0x010000,
-	EFunctionTypeFlag_Throws   = 0x020000,
+	EFunctionTypeFlag_Throws   = 0x040000,
 };
 
 //.............................................................................

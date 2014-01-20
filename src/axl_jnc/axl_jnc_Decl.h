@@ -87,6 +87,7 @@ enum EDeclSuffix
 	EDeclSuffix_Undefined = 0,
 	EDeclSuffix_Array,
 	EDeclSuffix_Function,
+	EDeclSuffix_Throw,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -155,7 +156,6 @@ class CDeclFunctionSuffix: public CDeclSuffix
 
 protected:
 	rtl::CArrayT <CFunctionArg*> m_ArgArray;
-	rtl::CBoxListT <CToken> m_ThrowCondition;
 	uint_t m_FunctionTypeFlags;
 
 public:
@@ -171,16 +171,33 @@ public:
 		return m_ArgArray;
 	}
 
-	rtl::CBoxListT <CToken>*
-	GetThrowCondition ()
-	{
-		return &m_ThrowCondition;
-	}
-
 	int 
 	GetFunctionTypeFlags ()
 	{
 		return m_FunctionTypeFlags;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CDeclThrowSuffix: public CDeclSuffix
+{
+	friend class CDeclarator;
+	friend class CParser;
+
+protected:
+	rtl::CBoxListT <CToken> m_ThrowCondition;
+
+public:
+	CDeclThrowSuffix ()
+	{
+		m_SuffixKind = EDeclSuffix_Throw;
+	}
+
+	rtl::CBoxListT <CToken>*
+	GetThrowCondition ()
+	{
+		return &m_ThrowCondition;
 	}
 };
 
@@ -393,8 +410,19 @@ public:
 	CDeclFunctionSuffix*
 	AddFunctionSuffix ();
 
+	CDeclThrowSuffix*
+	AddThrowSuffix (rtl::CBoxListT <CToken>* pThrowCondition = NULL);
+	
 	bool
 	AddBitFieldSuffix (size_t BitCount);
+
+	CDeclThrowSuffix*
+	GetThrowSuffix ()
+	{
+		return !m_SuffixList.IsEmpty () && m_SuffixList.GetTail ()->GetSuffixKind () == EDeclSuffix_Throw ? 
+			(CDeclThrowSuffix*) *m_SuffixList.GetTail () : 
+			NULL;
+	}
 
 	void
 	DeleteSuffix (CDeclSuffix* pSuffix)

@@ -28,8 +28,9 @@ enum EPropertyFlag
 {
 	EPropertyFlag_Const    = 0x010000,
 	EPropertyFlag_Bindable = 0x020000,
-	EPropertyFlag_AutoGet  = 0x040000,
-	EPropertyFlag_AutoSet  = 0x080000,
+	EPropertyFlag_Throws   = 0x040000,
+	EPropertyFlag_AutoGet  = 0x100000,
+	EPropertyFlag_AutoSet  = 0x200000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

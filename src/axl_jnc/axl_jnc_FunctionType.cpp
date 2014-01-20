@@ -256,10 +256,10 @@ CFunctionType::GetArgString ()
 
 	if (m_Flags & EFunctionTypeFlag_Throws)
 	{
-		m_TypeModifierString += " throws";
+		m_ArgString += " throws";
 
 		if (!m_ThrowCondition.IsEmpty ())
-			m_TypeModifierString.AppendFormat (" if (%s)", CToken::GetTokenListString (m_ThrowCondition).cc ());
+			m_ArgString.AppendFormat (" if (%s)", CToken::GetTokenListString (m_ThrowCondition).cc ());
 	}
 
 	return m_ArgString;

@@ -17,6 +17,9 @@ int baz (int x) throws if (retval < 0)
 int main ()
 {
 	printf ("main ()\n");
+
+	foo (10);
+
 	return 0;
 }
 

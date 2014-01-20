@@ -474,7 +474,7 @@ assignment_operator_expr <CValue* $pValue>
 	enter
 	{
 		if (IsReactor ())  // reset on assignment
-			m_ReactorBindSiteList.Clear ();
+			m_ReactorBindableList.Clear ();
 	}
 	:	assignment_operator $o conditional_expr <&$OpValue2>
 			{
@@ -551,7 +551,7 @@ unary_operator_expr <CValue* $pValue>
 	leave
 	{
 		if (IsReactor () && IsBindableType ($pValue->GetType ()))
-			m_ReactorBindSiteList.InsertTail (*$pValue);
+			m_ReactorBindableList.InsertTail (*$pValue);
 	}
 	:	'+' unary_expr <$pValue>
 			{
@@ -666,7 +666,7 @@ postfix_operator <CValue* $pValue>
 	leave
 	{
 		if (IsReactor () && IsBindableType ($pValue->GetType ()))
-			m_ReactorBindSiteList.InsertTail (*$pValue);
+			m_ReactorBindableList.InsertTail (*$pValue);
 	}
 	:	'(' expression_or_empty_list ')'
 			{
@@ -724,7 +724,7 @@ primary_expr <CValue* $pValue>
 	leave
 	{
 		if (IsReactor () && IsBindableType ($pValue->GetType ()))
-			m_ReactorBindSiteList.InsertTail (*$pValue);
+			m_ReactorBindableList.InsertTail (*$pValue);
 	}
 	:	'(' conditional_expr <$pValue> ')'
 	|	literal <$pValue>

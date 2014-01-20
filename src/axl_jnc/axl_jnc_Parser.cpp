@@ -21,7 +21,7 @@ CParser::CParser ()
 	m_pLastDeclaredItem = NULL;
 	m_pLastPropertyGetterType = NULL;
 	m_pReactorType = NULL;
-	m_ReactorBindSiteCount = 0;
+	m_ReactorBindableTypeCount = 0;
 	m_ReactorBindSiteTotalCount = 0;
 	m_pConstructorType = NULL;
 	m_pConstructorProperty = NULL;
@@ -607,7 +607,7 @@ CParser::DeclareAlias (
 	Parser.m_pModule = m_pModule;
 	Parser.m_Stage = EStage_Pass2;
 
-	Result = Parser.ParseTokenList (ESymbol_expression_save_value_s, *pInitializer);
+	Result = Parser.ParseTokenList (ESymbol_expression_save_value_0, *pInitializer);
 	if (!Result)
 		return false;
 
@@ -841,6 +841,19 @@ CParser::DeclareProperty (
 		return pProperty->Create (pType);
 	}
 
+	CDeclThrowSuffix* pThrowSuffix = pDeclarator->GetThrowSuffix ();
+	if (pThrowSuffix)
+	{
+		pProperty->m_Flags |= EPropertyFlag_Throws;
+		if (!pThrowSuffix->GetThrowCondition ()->IsEmpty ())
+		{
+			err::SetFormatStringError ("property cannot have a throw condtion");
+			return false;
+		}
+
+		pDeclarator->DeleteSuffix (pThrowSuffix);
+	}
+
 	if (pDeclarator->GetBaseType ()->GetTypeKind () != EType_Void ||
 		!pDeclarator->GetPointerPrefixList ().IsEmpty () ||
 		!pDeclarator->GetSuffixList ().IsEmpty ())
@@ -856,7 +869,15 @@ CParser::DeclareProperty (
 	}
 
 	if (pDeclarator->GetTypeModifiers () & ETypeModifier_Const)
+	{
+		if (pProperty->m_Flags & EPropertyFlag_Throws)
+		{
+			err::SetFormatStringError ("const property cannot throw");
+			return false;
+		}
+
 		pProperty->m_Flags |= EPropertyFlag_Const;
+	}
 
 	m_LastPropertyTypeModifiers.TakeOver (pDeclarator);
 	return true;
@@ -953,7 +974,7 @@ CParser::CreateProperty (
 }
 
 bool
-CParser::ParseLastPropertyBody (const rtl::CBoxListT <CToken>& Body)
+CParser::ParseLastPropertyBody (const rtl::CConstBoxListT <CToken>& Body)
 {
 	ASSERT (m_pLastDeclaredItem->GetItemKind () == EModuleItem_Property);
 
@@ -993,7 +1014,7 @@ CParser::FinalizeLastProperty (bool HasBody)
 	{
 		if (!m_pLastPropertyGetterType)
 		{
-			err::SetFormatStringError ("incomplete property: no 'get' method or 'autoget' field");
+			err::SetFormatStringError ("incomplete property: no 'get' method or autoget field");
 			return NULL;
 		}
 
@@ -1606,16 +1627,16 @@ CParser::CreateClassType (
 }
 
 bool
-CParser::CountReactorBindSites ()
+CParser::CountReactorBindableTypes ()
 {
-	if (!m_ReactorBindSiteCount)
+	if (!m_ReactorBindableTypeCount)
 	{
-		err::SetFormatStringError ("no bindable sites found");
+		err::SetFormatStringError ("no bindable properties found");
 		return false;
 	}
 
-	m_ReactorBindSiteTotalCount += m_ReactorBindSiteCount;
-	m_ReactorBindSiteCount = 0;
+	m_ReactorBindSiteTotalCount += m_ReactorBindableTypeCount;
+	m_ReactorBindableTypeCount = 0;
 	return true;
 }
 
@@ -1634,29 +1655,29 @@ CParser::FinalizeReactor ()
 }
 
 bool
-CParser::FinalizeReactorOnChangedClause ()
+CParser::FinalizeReactorOnEventDeclaration (
+	rtl::CBoxListT <CValue>* pValueList,
+	CDeclarator* pDeclarator
+	)
 {
 	ASSERT (m_pReactorType);
-
-	if (m_ReactorBindSiteList.IsEmpty ())
-	{
-		err::SetFormatStringError ("no bindable sites found");
-		return false;
-	}
+	
+	CDeclFunctionSuffix* pSuffix = pDeclarator->GetFunctionSuffix ();
+	ASSERT (pSuffix);	
 
 	TReaction* pHandler = AXL_MEM_NEW (TReaction);
-	pHandler->m_pFunction = m_pReactorType->CreateHandler ();
-	pHandler->m_BindSiteList.TakeOver (&m_ReactorBindSiteList);
+	pHandler->m_pFunction = m_pReactorType->CreateHandler (pSuffix->GetArgArray ());
+	pHandler->m_BindSiteList.TakeOver (pValueList);
 	m_ReactionList.InsertTail (pHandler);
 
 	return m_pModule->m_FunctionMgr.Prologue (pHandler->m_pFunction, m_LastMatchedToken.m_Pos);
 }
 
 bool
-CParser::ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList)
+CParser::ReactorExpressionStmt (const rtl::CConstBoxListT <CToken>& TokenList)
 {
 	ASSERT (m_pReactorType);
-	ASSERT (!pTokenList->IsEmpty ());
+	ASSERT (!TokenList.IsEmpty ());
 
 	bool Result;
 
@@ -1667,26 +1688,38 @@ CParser::ReactorExpressionStmt (rtl::CBoxListT <CToken>* pTokenList)
 	Parser.m_Stage = EStage_Pass2;
 	Parser.m_pReactorType = m_pReactorType;
 
-	Result = Parser.ParseTokenList (ESymbol_expression, *pTokenList);
+	Result = Parser.ParseTokenList (ESymbol_expression, TokenList);
 	if (!Result)
 		return false;
 
-	if (Parser.m_ReactorBindSiteList.IsEmpty ())
+	if (Parser.m_ReactorBindableList.IsEmpty ())
 	{
-		err::SetFormatStringError ("no bindable sites found");
+		err::SetFormatStringError ("no bindable properties found");
 		return false;
+	}
+
+	rtl::CBoxListT <CValue> BindSiteList;
+	rtl::CBoxIteratorT <CValue> Value = Parser.m_ReactorBindableList.GetHead ();
+	for (; Value; Value++)
+	{
+		CValue OnChangedValue;
+		Result = m_pModule->m_OperatorMgr.GetPropertyOnChanged (*Value, &OnChangedValue);
+		if (!Result)
+			return false;
+
+		BindSiteList.InsertTail (OnChangedValue);
 	}
 
 	TReaction* pHandler = AXL_MEM_NEW (TReaction);
 	pHandler->m_pFunction = m_pReactorType->CreateHandler ();
-	pHandler->m_BindSiteList.TakeOver (&Parser.m_ReactorBindSiteList);
+	pHandler->m_BindSiteList.TakeOver (&BindSiteList);
 	m_ReactionList.InsertTail (pHandler);
 
-	Result = m_pModule->m_FunctionMgr.Prologue (pHandler->m_pFunction, pTokenList->GetHead ()->m_Pos);
+	Result = m_pModule->m_FunctionMgr.Prologue (pHandler->m_pFunction, TokenList.GetHead ()->m_Pos);
 	if (!Result)
 		return false;
 
-	Result = Parser.ParseTokenList (ESymbol_expression, *pTokenList);
+	Result = Parser.ParseTokenList (ESymbol_expression, TokenList);
 	if (!Result)
 		return false;
 
@@ -1915,7 +1948,7 @@ CParser::FinalizeBaseTypeMemberConstructBlock ()
 }
 
 bool
-CParser::NewOperator_s (
+CParser::NewOperator_0 (
 	EStorage StorageKind,
 	CType* pType,
 	CValue* pResultValue
@@ -2531,7 +2564,7 @@ CParser::FinalizeLiteral (
 }
 
 bool
-CParser::FinalizeLiteral_s (
+CParser::FinalizeLiteral_0 (
 	TLiteral* pLiteral,
 	CValue* pResultValue
 	)

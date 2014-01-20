@@ -123,7 +123,7 @@ main := |*
 'case'            |
 'default'         |
 'once'            |
-'onchanged'       |
+'onevent'         |
 'try'             |
 'catch'           |
 'finally'         |
