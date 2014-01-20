@@ -32,7 +32,7 @@ set (
 	50_Multicasts.jnc
 	51_WeakMulticasts.jnc
 	60_Reactors.jnc
-	61_OnChangedStmt.jnc
+	61_OnEventStmt.jnc
 	70_DualModifiers.jnc
 	71_Once.jnc
 	72_CurlyInitializers.jnc

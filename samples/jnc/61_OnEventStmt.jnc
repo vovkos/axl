@@ -3,21 +3,20 @@
 // also, using expressions in 'reactor' block might be 'trying-to-be-too-smart' 
 // and therefore not providing enough control over which actions must be taken in response 
 // to which property change. 
-// 'onchanged' statement in 'reactor' block gives developer fine-graned control over building dependencies
-// and at the same time frees him from manually binding / unbinding to events
+// 'onevent' declaration in 'reactor' block gives developer fine-graned control over building dependencies
+// and at the same time frees him from manually binding/unbinding to/from events
 
 //.............................................................................
 
 bool bindable g_useDhcp;
 unsigned int32 bindable g_ip4;
+event g_onApplyIpSettings ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// 'onchanged' statement will be executed in response to change of properties enumerated in parentheses
-
 reactor g_ipReactor ()
 {
-	onchanged (g_useDhcp)
+	onevent (bindingof (g_useDhcp)) ()
 	{
 		if (g_useDhcp)
 		{		
@@ -35,9 +34,16 @@ reactor g_ipReactor ()
 		}			
 	}
 
-	onchanged (g_ip4)
+	onevent (bindingof (g_ip4)) ()
 	{
 		g_useDhcp = false;
+	}
+
+	// onevent statement allows automatically binding to any events, not just 'onChanged'
+
+	onevent g_onApplyIpSettings ()
+	{
+		printf ("apply IP settings...\n");
 	}
 }
 
@@ -50,8 +56,8 @@ int main ()
 	g_ipReactor.start ();
 
 	g_useDhcp = true;
-
 	g_ip4 = 0xc0a80105;
+	g_onApplyIpSettings ();
 
 	return 0;
 }
