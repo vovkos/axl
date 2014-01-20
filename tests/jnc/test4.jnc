@@ -1,58 +1,17 @@
-//.............................................................................
-
-int
-printf (
-	char* unsafe pFormat,
-	unsafe ...
-	);
-
-void
-PointerCheck (int* p);
+// test for enum-sized arrays
 
 //.............................................................................
 
-class CTest
+int g_a [MyEnum.Count];
+
+enum MyEnum
 {
-	int m_x;
-	int m_y;
+	Count = 0,
+}
 
-	preconstruct ()
-	{
-		printf ("CTest.preconstruct ()\n");
-	}
-
-	this ()
-	{
-		printf ("CTest.this ()\n");
-	}
-
-	~this ()
-	{
-		printf ("CTest.~this ()\n");
-	}
-};
-
-int
-main ()
+int main ()
 {
-	printf ("hui\n");
-
-	for (int i = 0; i < 5; i++)
-	{
-		printf ("i = %d\n", i);
-		CTest t1 = stack new CTest;
-
-		for (int j = 0; j < 5; j++)
-		{
-			printf ("j = %d\n", j);
-			CTest t2 = stack new CTest;
-
-			if (j > 2)
-				break 2;
-		}
-	}
-
-	printf ("govno i muravei\n");
+	printf ("main ()\n");
 	return 0;
 }
 

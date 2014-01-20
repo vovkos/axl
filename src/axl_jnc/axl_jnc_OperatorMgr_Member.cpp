@@ -8,6 +8,94 @@ namespace jnc {
 //.............................................................................
 
 bool
+COperatorMgr::GetNamespaceMemberType (
+	CNamespace* pNamespace,
+	const char* pName,
+	CValue* pResultValue
+	)
+{
+	CModuleItem* pItem = pNamespace->FindItemTraverse (pName, NULL, ETraverse_NoParentNamespace);
+	if (!pItem)
+	{
+		err::SetFormatStringError ("'%s' is not a member of '%s'", pName, pNamespace->GetQualifiedName ().cc ());
+		return false;
+	}
+
+	CModuleItemDecl* pDecl = pItem->GetItemDecl ();
+	ASSERT (pDecl);
+
+	if (pDecl->GetAccessKind () != EAccess_Public &&
+		m_pModule->m_NamespaceMgr.GetAccessKind (pNamespace) == EAccess_Public)
+	{
+		err::SetFormatStringError ("'%s.%s' is protected", pNamespace->GetQualifiedName ().cc (), pName);
+		return false;
+	}
+
+	bool Result = true;
+
+	EModuleItem ItemKind = pItem->GetItemKind ();
+	switch (ItemKind)
+	{
+	case EModuleItem_Namespace:
+		pResultValue->SetNamespace ((CGlobalNamespace*) pItem);
+		break;
+
+	case EModuleItem_Typedef:
+		pItem = ((CTypedef*) pItem)->GetType ();
+		// and fall through
+
+	case EModuleItem_Type:
+		if (!(((CType*) pItem)->GetTypeKindFlags () & ETypeKindFlag_Named))
+		{
+			err::SetFormatStringError ("'%s' cannot be used as expression", ((CType*) pItem)->GetTypeString ().cc ());
+			return false;
+		}
+
+		pResultValue->SetNamespace ((CNamedType*) pItem);
+		break;
+
+	case EModuleItem_Alias:
+		pResultValue->SetType (((CAlias*) pItem)->GetType ());
+		break;
+
+	case EModuleItem_Variable:
+		pResultValue->SetType (((CVariable*) pItem)->GetType ()->GetDataPtrType (EType_DataRef, EDataPtrType_Lean));
+		break;
+
+	case EModuleItem_Function:
+		pResultValue->SetFunctionTypeOverload (((CFunction*) pItem)->GetTypeOverload ());
+
+		if (((CFunction*) pItem)->IsMember ())
+			Result = false;
+
+		break;
+
+	case EModuleItem_Property:
+		pResultValue->SetType (((CProperty*) pItem)->GetType ()->GetPropertyPtrType (EType_PropertyRef, EPropertyPtrType_Thin));
+
+		if (((CProperty*) pItem)->IsMember ())
+			Result = false;
+
+		break;
+
+	case EModuleItem_EnumConst:
+		pResultValue->SetType (((CEnumConst*) pItem)->GetParentEnumType ());
+		break;
+
+	default:
+		Result = false;
+	};
+
+	if (!Result)
+	{
+		err::SetFormatStringError ("'%s.%s' cannot be used as expression", pNamespace->GetQualifiedName ().cc (), pName);
+		return false;
+	}
+
+	return true;
+}
+
+bool
 COperatorMgr::GetNamespaceMember (
 	CNamespace* pNamespace,
 	const char* pName,
@@ -55,7 +143,7 @@ COperatorMgr::GetNamespaceMember (
 		break;
 
 	case EModuleItem_Alias:
-		return m_pModule->m_OperatorMgr.EvaluateAlias (
+		return EvaluateAlias (
 			pItem->GetItemDecl ()->GetParentUnit (),
 			((CAlias*) pItem)->GetInitializer (),
 			pResultValue
@@ -82,6 +170,10 @@ COperatorMgr::GetNamespaceMember (
 		break;
 
 	case EModuleItem_EnumConst:
+		Result = ((CEnumConst*) pItem)->GetParentEnumType ()->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		pResultValue->SetConstInt64 (
 			((CEnumConst*) pItem)->GetValue (),
 			((CEnumConst*) pItem)->GetParentEnumType ()
@@ -132,7 +224,7 @@ COperatorMgr::GetNamedTypeMemberType (
 		else
 		{
 			return ((CStructField*) pMember)->GetType ();
-		}			
+		}
 
 	case EModuleItem_Function:
 		return ((CFunction*) pMember)->GetType ()->GetShortType ()->GetFunctionPtrType (
@@ -232,21 +324,8 @@ COperatorMgr::GetMemberOperatorResultType (
 	CValue* pResultValue
 	)
 {
-	CType* pResultType = GetMemberOperatorResultType (RawOpValue, pName);
-	if (!pResultType)
-		return false;
-
-	pResultValue->SetType (pResultType);
-	return true;
-}
-
-CType*
-COperatorMgr::GetMemberOperatorResultType (
-	const CValue& RawOpValue,
-	const char* pName
-	)
-{
-	bool Result;
+	if (RawOpValue.GetValueKind () == EValue_Namespace)
+		return GetNamespaceMemberType (RawOpValue.GetNamespace (), pName, pResultValue);
 
 	CValue OpValue;
 	PrepareOperandType (RawOpValue, &OpValue, EOpFlag_KeepDataRef);
@@ -259,26 +338,32 @@ COperatorMgr::GetMemberOperatorResultType (
 	{
 		pType = ((CDataPtrType*) pType)->GetTargetType ();
 
-		Result = GetUnaryOperatorResultType (EUnOp_Indir, &OpValue);
+		bool Result = GetUnaryOperatorResultType (EUnOp_Indir, &OpValue);
 		if (!Result)
-			return NULL;
+			return false;
 	}
 
 	EType TypeKind = pType->GetTypeKind ();
+	CType* pResultType;
 	switch (TypeKind)
 	{
 	case EType_Struct:
 	case EType_Union:
-		return GetNamedTypeMemberType (OpValue, (CNamedType*) pType, pName);
+		pResultType = GetNamedTypeMemberType (OpValue, (CNamedType*) pType, pName);
+		break;
 
 	case EType_ClassPtr:
 		PrepareOperandType (&OpValue);
-		return GetNamedTypeMemberType (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName);
+		pResultType = GetNamedTypeMemberType (OpValue, ((CClassPtrType*) pType)->GetTargetType (), pName);
+		break;
 
 	default:
 		err::SetFormatStringError ("member operator cannot be applied to '%s'", pType->GetTypeString ().cc ());
-		return NULL;
+		return false;
 	}
+
+	pResultValue->SetType (pResultType);
+	return true;
 }
 
 bool

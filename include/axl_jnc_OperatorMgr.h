@@ -666,28 +666,6 @@ public:
 
 	// member operators
 
-	CType*
-	GetMemberOperatorResultType (
-		const CValue& OpValue,
-		size_t Index
-		);
-
-	bool
-	GetMemberOperatorResultType (
-		const CValue& OpValue,
-		size_t Index,
-		CValue* pResultValue
-		);
-
-	bool
-	GetMemberOperatorResultType (
-		CValue* pValue,
-		size_t Index
-		)
-	{
-		return GetMemberOperatorResultType (*pValue, Index, pValue);
-	}
-
 	bool
 	MemberOperator (
 		const CValue& OpValue,
@@ -703,12 +681,6 @@ public:
 	{
 		return MemberOperator (*pValue, Index, pValue);
 	}
-
-	CType*
-	GetMemberOperatorResultType (
-		const CValue& OpValue,
-		const char* pName
-		);
 
 	bool
 	GetMemberOperatorResultType (

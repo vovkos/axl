@@ -388,7 +388,7 @@ CDeclTypeCalc::GetIntegerType (CType* pType)
 
 	if (pType->GetTypeKind () == EType_NamedImport)
 		return GetImportIntModType ((CNamedImportType*) pType);
-	
+
 	if (!(pType->GetTypeKindFlags () & ETypeKindFlag_Integer))
 	{
 		err::SetFormatStringError ("'%s' modifier cannot be applied to '%s'",

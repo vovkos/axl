@@ -15,6 +15,8 @@ CArrayType::CArrayType ()
 	m_pElementType_i = NULL;
 	m_pRootType = NULL;
 	m_ElementCount = -1;
+	m_pParentUnit = NULL;
+	m_pParentNamespace = NULL;
 }
 
 CType*
@@ -75,12 +77,32 @@ CArrayType::CalcLayout ()
 
 	if (!m_ElementCountInitializer.IsEmpty ())
 	{
+		ASSERT (m_pParentUnit && m_pParentNamespace);
+		m_pModule->m_NamespaceMgr.OpenNamespace (m_pParentNamespace);
+
 		intptr_t Value = 0;
-		Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (NULL, m_ElementCountInitializer, &Value);
+		Result = m_pModule->m_OperatorMgr.ParseConstIntegerExpression (
+			m_pParentUnit,
+			m_ElementCountInitializer,
+			&Value
+			);
+
 		if (!Result)
 			return false;
 
+		if (Value <= 0)
+		{
+			err::SetFormatStringError ("invalid array size '%d'\n", Value);
+			err::PushSrcPosError (
+				m_pParentUnit->GetFilePath (),
+				m_ElementCountInitializer.GetHead ()->m_Pos
+				);
+			
+			return false;
+		}
+
 		m_ElementCount = Value;
+		m_pModule->m_NamespaceMgr.CloseNamespace ();
 	}
 
 	rtl::CString Signature = CreateSignature (m_pElementType, m_ElementCount);
@@ -116,4 +138,3 @@ CArrayType::PrepareLlvmDiType ()
 
 } // namespace jnc {
 } // namespace axl {
-

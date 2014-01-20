@@ -11,6 +11,13 @@ namespace jnc {
 
 //.............................................................................
 
+enum EArrayTypeFlag
+{
+	EArrayTypeFlag_AutoSize = 0x010000,
+};
+
+//.............................................................................
+
 class CArrayType: public CType
 {
 	friend class CTypeMgr;
@@ -21,8 +28,10 @@ protected:
 	CImportType* m_pElementType_i;
 	CType* m_pRootType;
 	size_t m_ElementCount;
-	
+
 	rtl::CBoxListT <CToken> m_ElementCountInitializer;
+	CUnit* m_pParentUnit;
+	CNamespace* m_pParentNamespace;
 
 public:
 	CArrayType ();
@@ -39,7 +48,7 @@ public:
 		return m_pElementType_i;
 	}
 
-	CType* 
+	CType*
 	GetRootType ();
 
 	size_t
@@ -48,7 +57,7 @@ public:
 		return m_ElementCount;
 	}
 
-	rtl::CConstBoxListT <CToken> 
+	rtl::CConstBoxListT <CToken>
 	GetElementCountInitializer ()
 	{
 		return m_ElementCountInitializer;
@@ -60,60 +69,60 @@ public:
 		CType* pElementType,
 		size_t ElementCount
 		)
-	{ 
+	{
 		return rtl::CString::Format_s (
-			"A%d%s", 
-			ElementCount, 
+			"A%d%s",
+			ElementCount,
 			pElementType->GetSignature ().cc () // thanks a lot gcc
-			);  
+			);
 	}
 
-	virtual 
+	virtual
 	void
 	GcMark (
 		CRuntime* pRuntime,
 		void* p
-		);	
+		);
 
 
 protected:
-	virtual 
+	virtual
 	bool
 	CalcLayout ();
 
-	virtual 
+	virtual
 	void
 	PrepareTypeString ();
 
-	virtual 
+	virtual
 	void
 	PrepareLlvmType ()
 	{
 		ASSERT (m_ElementCount != -1);
 		m_pLlvmType = llvm::ArrayType::get (m_pElementType->GetLlvmType (), m_ElementCount);
 	}
-	
-	virtual 
+
+	virtual
 	void
-	PrepareLlvmDiType ();	
+	PrepareLlvmDiType ();
 };
 
 //.............................................................................
 
 inline
-bool 
+bool
 IsAutoSizeArrayType (CType* pType)
 {
-	return 
+	return
 		pType->GetTypeKind () == EType_Array &&
-		((CArrayType*) pType)->GetElementCount () == -1;
+		(pType->GetFlags () & EArrayTypeFlag_AutoSize) != 0;
 }
 
 inline
-bool 
+bool
 IsCharArrayType (CType* pType)
 {
-	return 
+	return
 		pType->GetTypeKind () == EType_Array &&
 		((CArrayType*) pType)->GetElementType ()->GetTypeKind () == EType_Char;
 }

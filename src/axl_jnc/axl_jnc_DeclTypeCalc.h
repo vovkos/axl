@@ -87,7 +87,7 @@ protected:
 		uint_t* pFlags
 		);
 
-	uint_t 
+	uint_t
 	GetPropertyFlags ();
 
 	CType*

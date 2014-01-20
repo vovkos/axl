@@ -1661,9 +1661,9 @@ CParser::FinalizeReactorOnEventDeclaration (
 	)
 {
 	ASSERT (m_pReactorType);
-	
+
 	CDeclFunctionSuffix* pSuffix = pDeclarator->GetFunctionSuffix ();
-	ASSERT (pSuffix);	
+	ASSERT (pSuffix);
 
 	TReaction* pHandler = AXL_MEM_NEW (TReaction);
 	pHandler->m_pFunction = m_pReactorType->CreateHandler (pSuffix->GetArgArray ());
@@ -2056,6 +2056,10 @@ CParser::LookupIdentifier (
 		break;
 
 	case EModuleItem_EnumConst:
+		Result = ((CEnumConst*) pItem)->GetParentEnumType ()->EnsureLayout ();
+		if (!Result)
+			return false;
+
 		pValue->SetConstInt64 (
 			((CEnumConst*) pItem)->GetValue (),
 			((CEnumConst*) pItem)->GetParentEnumType ()

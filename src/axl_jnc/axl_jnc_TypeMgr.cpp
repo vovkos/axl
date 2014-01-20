@@ -385,6 +385,7 @@ CArrayType*
 CTypeMgr::CreateAutoSizeArrayType (CType* pElementType)
 {
 	CArrayType* pType = AXL_MEM_NEW (CArrayType);
+	pType->m_Flags |= EArrayTypeFlag_AutoSize;
 	pType->m_pModule = m_pModule;
 	pType->m_pElementType = pElementType;
 	m_ArrayTypeList.InsertTail (pType);
@@ -408,6 +409,8 @@ CTypeMgr::CreateArrayType (
 	pType->m_pModule = m_pModule;
 	pType->m_pElementType = pElementType;
 	pType->m_ElementCountInitializer.TakeOver (pElementCountInitializer);
+	pType->m_pParentUnit = m_pModule->m_UnitMgr.GetCurrentUnit ();
+	pType->m_pParentNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	m_ArrayTypeList.InsertTail (pType);
 
 	if (pElementType->GetTypeKindFlags () & ETypeKindFlag_Import)
