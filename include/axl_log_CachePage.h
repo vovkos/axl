@@ -21,7 +21,7 @@ class CCacheMgr;
 //.............................................................................
 
 struct TFoldablePacket
-{ 
+{
 	uint64_t m_FoldFlags;
 	uint64_t m_Offset;
 	size_t m_LineCount;
@@ -72,7 +72,7 @@ public:
 	{
 		return m_Flags;
 	}
-	
+
 	bool
 	IsEmpty ()
 	{
@@ -114,7 +114,7 @@ public:
 		size_t LineIdx,
 		size_t LineCount
 		);
-		
+
 	void
 	LoadLines (
 		size_t LineIdx,

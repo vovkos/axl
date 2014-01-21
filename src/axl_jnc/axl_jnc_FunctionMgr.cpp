@@ -162,8 +162,7 @@ CFunctionMgr::PushEmissionContext ()
 	m_pModule->m_ControlFlowMgr.SetCurrentBlock (NULL);
 	m_pModule->m_ControlFlowMgr.m_pUnreachableBlock = NULL;
 	m_pModule->m_ControlFlowMgr.m_Flags = 0;
-	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc ());
-	// m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (llvm::DebugLoc () /m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
+	m_pModule->m_LlvmIrBuilder.SetCurrentDebugLoc (m_pModule->m_LlvmDiBuilder.GetEmptyDebugLoc ());
 
 	m_pModule->m_VariableMgr.DeallocateTlsVariableArray (m_pCurrentFunction->m_TlsVariableArray);
 

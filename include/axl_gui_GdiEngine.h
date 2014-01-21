@@ -11,7 +11,6 @@
 #include "axl_gui_GdiCursor.h"
 #include "axl_gui_GdiFont.h"
 #include "axl_gui_GdiImage.h"
-#include "axl_gui_GdiImageList.h"
 #include "axl_gui_GdiWidget.h"
 #include "axl_rtl_Singleton.h"
 
@@ -25,7 +24,7 @@ class CGdiEngine: public CEngine
 protected:
 	ref::CPtrT <CFont> m_DefaultGuiFont;
 	ref::CPtrT <CFont> m_DefaultMonospaceFont;
-	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];	
+	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
 	HWND m_hWndClipboardOwner;
 
 public:
@@ -44,7 +43,7 @@ public:
 		return rtl::GetSingleton <CGdiEngine> ();
 	}
 
-	CFont* 
+	CFont*
 	GetDefaultGuiFont ();
 
 	virtual
@@ -94,20 +93,6 @@ public:
 		EPixelFormat PixelFormat,
 		const void* pData,
 		bool IsScreenCompatible = true
-		);
-
-	virtual
-	ref::CPtrT <CImageList>
-	CreateImageList (
-		int Width,
-		int Height
-		);
-
-	virtual
-	ref::CPtrT <CImageList>
-	CreateImageList (
-		CImage* pStipImage,
-		int Width = 0
 		);
 
 	virtual

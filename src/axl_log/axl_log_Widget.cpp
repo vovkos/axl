@@ -55,13 +55,10 @@ CWidget::CWidget (gui::CEngine* pEngine):
 	ASSERT (m_pBaseFont->IsMonospace ());
 
 	m_CharSize = m_pBaseFont->CalcTextSize ('X');
-
 	m_CharSize.m_Height += 1; // separator line
 
-	m_pImageList = NULL;
-	m_IconWidth = 0;
-	m_IconOrigin.m_x = (2 * m_CharSize.m_Width - 16) / 2;
-	m_IconOrigin.m_y = (m_CharSize.m_Height - 1 - 16) / 2;
+	m_IsIconVisible = false;
+	SetIconSize (16, 16);
 
 	memcpy (m_ColorArray, gui::GetStdPalColorArray (), gui::EStdPalColor__Count * sizeof (uint_t));
 
@@ -299,26 +296,55 @@ CWidget::Copy ()
 }
 
 void
-CWidget::SetImageList (gui::CImageList* pImageList)
+CWidget::SetIcon (
+	size_t i,
+	gui::CImage* pImage
+	)
 {
-	m_pImageList = pImageList;
+	if (m_IconTable.GetCount () <= i)
+		m_IconTable.SetCount (i + 1);
 
-	if (pImageList)
+	m_IconTable [i] = pImage;
+
+	if (m_IsIconVisible)
+		Redraw ();
+}
+
+void
+CWidget::SetIconTable (
+	gui::CImage* const* ppImageArray,
+	size_t Count
+	)
+{
+	m_IconTable.Copy (ppImageArray, Count);
+
+	if (m_IsIconVisible)
+		Redraw ();
+}
+
+void
+CWidget::SetIconSize (
+	uint_t Width,
+	uint_t Height
+	)
+{
+	m_IconSize.m_Width = Width;
+	m_IconSize.m_Height = Height;
+
+	size_t IconColCount = Width / m_CharSize.m_Width;
+	if (Width % m_CharSize.m_Width)
+		IconColCount++;
+
+	m_IconOrigin.m_x = (IconColCount * m_CharSize.m_Width - Width) / 2;
+	m_IconOrigin.m_y = (m_CharSize.m_Height - Height) / 2;
+
+	m_IconWidth = IconColCount + m_IconGapSize;
+
+	if (m_IsIconVisible)
 	{
-		gui::TSize Size = pImageList->GetImageSize ();
-		size_t IconColCount = Size.m_Width / m_CharSize.m_Width;
-		if (Size.m_Width % m_CharSize.m_Width)
-			IconColCount++;
-
-		m_IconWidth = IconColCount + m_IconGapSize;
+		RecalcBaseCol ();
+		Redraw ();
 	}
-	else
-	{
-		m_IconWidth = 0;
-	}
-
-	RecalcBaseCol ();
-	Redraw ();
 }
 
 void

@@ -10,7 +10,6 @@
 #include "axl_gui_Font.h"
 #include "axl_gui_Cursor.h"
 #include "axl_gui_Image.h"
-#include "axl_gui_ImageList.h"
 #include "axl_gui_Canvas.h"
 #include "axl_rtl_String.h"
 
@@ -29,7 +28,7 @@ enum EEngine
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char* 
+const char*
 GetEngineKindString (EEngine EngineKind);
 
 //.............................................................................
@@ -53,7 +52,7 @@ public:
 		m_EngineKind = EEngine_Undefined;
 	}
 
-	EEngine 
+	EEngine
 	GetEngineKind ()
 	{
 		return m_EngineKind;
@@ -95,6 +94,10 @@ public:
 
 	virtual
 	ref::CPtrT <CImage>
+	CreateImage () = 0;
+
+	virtual
+	ref::CPtrT <CImage>
 	CreateImage (
 		int Width,
 		int Height,
@@ -113,29 +116,10 @@ public:
 			ImageDesc.m_Size.m_Width,
 			ImageDesc.m_Size.m_Height,
 			ImageDesc.m_PixelFormat,
-			ImageDesc.m_pData
+			ImageDesc.m_pData,
+			IsScreenCompatible
 			);
 	}
-
-	virtual
-	ref::CPtrT <CImageList>
-	CreateImageList (
-		int Width,
-		int Height
-		) = 0;
-
-	ref::CPtrT <CImageList>
-	CreateImageList (const TSize& Size)
-	{
-		return CreateImageList (Size.m_Width, Size.m_Height);
-	}
-
-	virtual
-	ref::CPtrT <CImageList>
-	CreateImageList (
-		CImage* pStipImage,
-		int Width = 0 // if 0 then take pStripImage->GetSize ().m_Height
-		) = 0;
 
 	// offscreen canvas
 
@@ -170,7 +154,7 @@ public:
 			);
 	}
 
-	void 
+	void
 	DeleteAllSharedOffscreenCanvases ();
 
 	// clipboard

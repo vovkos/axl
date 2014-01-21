@@ -20,7 +20,6 @@ set (
 	${AXL_INC_DIR}/axl_gui_HyperlinkAnchorArray.h
 	${AXL_INC_DIR}/axl_gui_HyperText.h
 	${AXL_INC_DIR}/axl_gui_Image.h
-	${AXL_INC_DIR}/axl_gui_ImageList.h
 	${AXL_INC_DIR}/axl_gui_TextAttrAnchorArray.h
 	${AXL_INC_DIR}/axl_gui_TextPaint.h
 	${AXL_INC_DIR}/axl_gui_Widget.h
@@ -36,7 +35,6 @@ set (
 	axl_gui_HyperlinkAnchorArray.cpp
 	axl_gui_HyperText.cpp
 	axl_gui_Image.cpp
-	axl_gui_ImageList.cpp
 	axl_gui_TextAttrAnchorArray.cpp
 	axl_gui_TextPaint.cpp
 	axl_gui_Widget.cpp
@@ -60,7 +58,6 @@ set (
 	${AXL_INC_DIR}/axl_gui_GdiEngine.h
 	${AXL_INC_DIR}/axl_gui_GdiFont.h
 	${AXL_INC_DIR}/axl_gui_GdiImage.h
-	${AXL_INC_DIR}/axl_gui_GdiImageList.h
 	${AXL_INC_DIR}/axl_gui_GdiObjectHandle.h
 	${AXL_INC_DIR}/axl_gui_GdiWidget.h
 	)
@@ -72,7 +69,6 @@ set (
 	axl_gui_GdiEngine.cpp
 	axl_gui_GdiFont.cpp
 	axl_gui_GdiImage.cpp
-	axl_gui_GdiImageList.cpp
 	axl_gui_GdiWidget.cpp
 	)
 
@@ -98,7 +94,6 @@ set (
 	${AXL_INC_DIR}/axl_gui_QtEngine.h
 	${AXL_INC_DIR}/axl_gui_QtFont.h
 	${AXL_INC_DIR}/axl_gui_QtImage.h
-	${AXL_INC_DIR}/axl_gui_QtImageList.h
 	${AXL_INC_DIR}/axl_gui_QtWidget.h
 	)
 
@@ -109,7 +104,6 @@ set (
 	axl_gui_QtEngine.cpp
 	axl_gui_QtFont.cpp
 	axl_gui_QtImage.cpp
-	axl_gui_QtImageList.cpp
 	axl_gui_QtWidget.cpp
 	)
 
@@ -117,10 +111,6 @@ source_virtual_folder (
 	gui_qt
 	${GUI_QT_H_LIST}
 	${GUI_QT_CPP_LIST}
-	)
-
-exclude_from_build (
-	axl_gui_QtImageList.cpp
 	)
 
 if (NOT AXL_BUILD_GUI_QT)

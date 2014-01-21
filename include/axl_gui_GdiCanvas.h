@@ -38,7 +38,7 @@ public:
 
 //.............................................................................
 
-class CGdiCanvas: 
+class CGdiCanvas:
 	public CCanvas,
 	public rtl::CHandleT <HDC>
 {
@@ -53,7 +53,7 @@ protected:
 		EDestruct_ReleaseDc
 	};
 
-protected:	
+protected:
 	EDestruct m_DestructKind;
 
 	HWND m_hWnd;
@@ -113,15 +113,6 @@ public:
 		int Top,
 		int Right,
 		int Bottom
-		);
-
-	virtual
-	bool
-	DrawImage (
-		int x,
-		int y,
-		CImageList* pImageList,
-		size_t Index
 		);
 
 	virtual

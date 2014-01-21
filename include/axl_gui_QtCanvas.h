@@ -14,7 +14,7 @@ namespace gui {
 
 //.............................................................................
 
-class CQtCanvas: 
+class CQtCanvas:
 	public CCanvas,
 	public rtl::CHandleT <QPainter*, rtl::CCppDeleteT <QPainter> >
 {
@@ -59,15 +59,6 @@ public:
 		int Top,
 		int Right,
 		int Bottom
-		);
-
-	virtual
-	bool
-	DrawImage (
-		int x,
-		int y,
-		CImageList* pImageList,
-		size_t Index
 		);
 
 	virtual

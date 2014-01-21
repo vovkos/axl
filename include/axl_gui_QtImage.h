@@ -19,7 +19,7 @@ class CQtImage: public CImage
 
 public:
 	QPixmap m_QtPixmap;
-	
+
 public:
 	CQtImage ();
 

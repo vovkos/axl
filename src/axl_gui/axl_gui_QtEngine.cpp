@@ -16,7 +16,7 @@ GetQtEngineSingleton ()
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CFont* 
+CFont*
 CQtEngine::GetDefaultGuiFont ()
 {
 	if (m_DefaultGuiFont)
@@ -32,9 +32,9 @@ CQtEngine::GetDefaultMonospaceFont ()
 	if (m_DefaultMonospaceFont)
 		return m_DefaultMonospaceFont;
 
-	QFont QtFont ("Monospace", 10); 
-	QtFont.setStyleHint (QFont::TypeWriter); 
-	
+	QFont QtFont ("Monospace", 10);
+	QtFont.setStyleHint (QFont::TypeWriter);
+
 	m_DefaultMonospaceFont = CreateFont (QtFont);
 	return m_DefaultMonospaceFont;
 }
@@ -47,18 +47,18 @@ CQtEngine::CreateQtFont (
 	)
 {
 	QString FamilyName = QString::fromUtf8 (pFaceName);
-	
+
 	int Weight = (Flags & EFontFlag_Bold) ? QFont::Bold : QFont::Normal;
 	bool IsItalic = (Flags & EFontFlag_Italic) != 0;
-	
-	QFont QtFont (FamilyName, PointSize, Weight, IsItalic);		
+
+	QFont QtFont (FamilyName, PointSize, Weight, IsItalic);
 
 	if (Flags & EFontFlag_Underline)
 		QtFont.setUnderline (true);
 
 	if (Flags & EFontFlag_Strikeout)
 		QtFont.setStrikeOut (true);
-	
+
 	return QtFont;
 }
 
@@ -67,7 +67,7 @@ CQtEngine::CreateFont (const QFont& QtFont)
 {
 	CQtFont* pFont = AXL_MEM_NEW (CQtFont);
 	pFont->m_QtFont = QtFont;
-	
+
 	GetFontDescFromFontInfo (QFontInfo (QtFont), &pFont->m_FontDesc);
 
 	ref::CPtrT <CQtFontTuple> FontTuple = AXL_REF_NEW (CQtFontTuple);
@@ -107,7 +107,7 @@ CQtEngine::GetFontMod (
 CCursor*
 CQtEngine::GetStdCursor (EStdCursor CursorKind)
 {
-	static Qt::CursorShape StdCursorShapeTable [EStdCursor__Count] = 
+	static Qt::CursorShape StdCursorShapeTable [EStdCursor__Count] =
 	{
 		Qt::ArrowCursor,         // EStdCursor_Arrow = 0,
 		Qt::WaitCursor,          // EStdCursor_Wait,
@@ -123,7 +123,7 @@ CQtEngine::GetStdCursor (EStdCursor CursorKind)
 	ASSERT (CursorKind < EStdCursor__Count);
 	if (m_StdCursorArray [CursorKind])
 		return m_StdCursorArray [CursorKind];
-	
+
 	ref::CPtrT <CCursor> Cursor = CreateCursor (StdCursorShapeTable [CursorKind]);
 	m_StdCursorArray [CursorKind] = Cursor;
 	return Cursor;
@@ -168,7 +168,7 @@ CQtEngine::CreateImage (
 	if (!IsScreenCompatible)
 	{
 		hBitmap = ::CreateBitmap (
-			Width, 
+			Width,
 			Height,
 			1,
 			BitCount,
@@ -187,12 +187,12 @@ CQtEngine::CreateImage (
 		BitmapInfo.bmiHeader.biCompression = BI_RGB;
 		BitmapInfo.bmiHeader.biWidth = Width;
 		BitmapInfo.bmiHeader.biHeight = Height;
-		
+
 		CScreenDc ScreenDc;
 
 		hBitmap = ::CreateCompatibleBitmap (
-			ScreenDc, 
-			Width, 
+			ScreenDc,
+			Width,
 			Height
 			);
 
@@ -200,8 +200,8 @@ CQtEngine::CreateImage (
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 
 		bool_t Result = SetDIBits (
-			ScreenDc, 
-			hBitmap, 
+			ScreenDc,
+			hBitmap,
 			0,
 			Height,
 			pData,
@@ -212,35 +212,24 @@ CQtEngine::CreateImage (
 		if (!Result)
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 	} */
-	
+
 	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
 	Image->m_QtPixmap = QtPixmap;
 	return Image;
 }
 
-ref::CPtrT <CImageList>
-CQtEngine::CreateImageList (
-	int Width,
-	int Height
-	)
+ref::CPtrT <CImage>
+CQtEngine::CreateImage ()
 {
-	return ref::EPtr_Null;
-}
-
-ref::CPtrT <CImageList>
-CQtEngine::CreateImageList (
-	CImage* pStipImage,
-	int Width
-	)
-{
-	return ref::EPtr_Null;
+	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	return Image;
 }
 
 ref::CPtrT <CCanvas>
 CQtEngine::CreateOffscreenCanvas (
 	int Width,
 	int Height
-	)	
+	)
 {
 	return ref::EPtr_Null;
 }
@@ -249,8 +238,8 @@ bool
 CQtEngine::ReadClipboard (rtl::CString* pString)
 {
 	QClipboard* pQtClipboard = QApplication::clipboard ();
-	QByteArray StringUtf8 = pQtClipboard->text ().toUtf8 ();	
-	size_t Length = StringUtf8.size ();	
+	QByteArray StringUtf8 = pQtClipboard->text ().toUtf8 ();
+	size_t Length = StringUtf8.size ();
 	pString->Copy (StringUtf8.constData (), Length ? Length - 1 : 0);
 	return true;
 }
@@ -264,7 +253,7 @@ CQtEngine::WriteClipboard (
 	QString String = QString::fromUtf8 (pString, Length);
 
 	QClipboard* pQtClipboard = QApplication::clipboard ();
-	pQtClipboard->setText (String);	
+	pQtClipboard->setText (String);
 	return true;
 }
 

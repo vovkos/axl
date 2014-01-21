@@ -10,11 +10,10 @@
 #include "axl_gui_Color.h"
 #include "axl_gui_Font.h"
 #include "axl_gui_Image.h"
-#include "axl_gui_ImageList.h"
 
 namespace axl {
 namespace gui {
-	
+
 //.............................................................................
 
 class CCanvas: public CGuiItem
@@ -77,10 +76,10 @@ public:
 		)
 	{
 		return DrawRect (
-			Rect.m_Left, 
-			Rect.m_Top, 
-			Rect.m_Right, 
-			Rect.m_Bottom, 
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
 			Color
 			);
 	}
@@ -89,10 +88,10 @@ public:
 	DrawRect (const TRect& Rect)
 	{
 		return DrawRect (
-			Rect.m_Left, 
-			Rect.m_Top, 
-			Rect.m_Right, 
-			Rect.m_Bottom, 
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
 			m_DefTextAttr.m_BackColor
 			);
 	}
@@ -152,14 +151,14 @@ public:
 		return DrawText (
 			Point.m_x,
 			Point.m_y,
-			Rect.m_Left, 
-			Rect.m_Top, 
-			Rect.m_Right, 
-			Rect.m_Bottom, 
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
 			TextAttr.m_ForeColor,
 			TextAttr.m_BackColor,
 			TextAttr.m_FontFlags,
-			pText, 
+			pText,
 			Length
 			);
 	}
@@ -175,14 +174,14 @@ public:
 		return DrawText (
 			Point.m_x,
 			Point.m_y,
-			Rect.m_Left, 
-			Rect.m_Top, 
-			Rect.m_Right, 
-			Rect.m_Bottom, 
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
 			m_DefTextAttr.m_ForeColor,
 			m_DefTextAttr.m_BackColor,
 			m_DefTextAttr.m_FontFlags,
-			pText, 
+			pText,
 			Length
 			);
 	}
@@ -207,37 +206,13 @@ public:
 		)
 	{
 		return DrawImage (
-			Point.m_x, 
-			Point.m_y, 
-			pImage, 
-			Rect.m_Left, 
-			Rect.m_Top, 
-			Rect.m_Right, 
+			Point.m_x,
+			Point.m_y,
+			pImage,
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
 			Rect.m_Bottom
-			);
-	}
-
-	virtual
-	bool
-	DrawImage (
-		int x,
-		int y,
-		CImageList* pImageList,
-		size_t Index
-		) = 0;
-
-	bool
-	DrawImage (
-		const TPoint& Point,
-		CImageList* pImageList,
-		size_t Index
-		)
-	{
-		return DrawImage (
-			Point.m_x, 
-			Point.m_y, 
-			pImageList, 
-			Index
 			);
 	}
 
@@ -262,12 +237,12 @@ public:
 		)
 	{
 		return CopyRect (
-			pSrcCanvas, 
+			pSrcCanvas,
 			DstPoint.m_x,
 			DstPoint.m_y,
 			SrcPoint.m_x,
 			SrcPoint.m_y,
-			Size.m_Width, 
+			Size.m_Width,
 			Size.m_Height
 			);
 	}

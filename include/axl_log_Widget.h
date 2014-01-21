@@ -44,7 +44,7 @@ enum EColor
 
 //.............................................................................
 
-class CWidget: 
+class CWidget:
 	public gui::CWidget,
 	public CClientPeer
 {
@@ -109,8 +109,9 @@ protected:
 
 	rtl::CString m_TimestampFormat;
 
-	gui::CImageList* m_pImageList;	
+	rtl::CArrayT <gui::CImage*> m_IconTable;
 	gui::TPoint m_IconOrigin;
+	gui::TSize m_IconSize;
 	gui::TSize m_CharSize;
 
 	gui::TCursorPos m_CursorPos;
@@ -119,10 +120,10 @@ protected:
 	gui::TCursorPos m_SelEnd;
 	gui::TCursorPos m_HiliteStart;
 	gui::TCursorPos m_HiliteEnd;
-	
+
 	uint_t m_ColorArray [EColor__Count];
 
-	rtl::CArrayT <uchar_t> m_BinBlockBuffer;	
+	rtl::CArrayT <uchar_t> m_BinBlockBuffer;
 	rtl::CString m_StringBuffer;
 
 	rtl::CBmhFind m_Find; // Boyer-Moore-Horspool find
@@ -146,16 +147,16 @@ public:
 	virtual
 	void
 	SendMsg (const TMsg* pMsg);
-	
+
 	// attributes
-	
-	size_t 
+
+	size_t
 	GetFullOffsetWidth ()
 	{
 		return m_FullOffsetWidth;
 	}
 
-	size_t 
+	size_t
 	GetHexGapSize ()
 	{
 		return m_HexGapSize;
@@ -169,13 +170,13 @@ public:
 		CRepresenter* pRepresenter
 		);
 
-	CPacketFile* 
+	CPacketFile*
 	GetPacketFile ()
 	{
 		return m_IndexMgr.GetPacketFile ();
 	}
 
-	CRepresenter* 
+	CRepresenter*
 	GetRepresenter ()
 	{
 		return m_IndexMgr.GetRepresenter ();
@@ -191,7 +192,7 @@ public:
 
 	// cache
 
-	size_t 
+	size_t
 	GetLineCount ()
 	{
 		return m_LineCount;
@@ -217,7 +218,7 @@ public:
 */
 	// colorizer
 /*
-	CColorizer* 
+	CColorizer*
 	GetColorizer ()
 	{
 		return m_ColorizeMgr.GetColorizer ();
@@ -240,14 +241,41 @@ public:
 
 	// icons
 
-	gui::CImageList*
-	GetImageList ()
+	gui::CImage*
+	GetIcon (size_t i)
 	{
-		return m_pImageList;
+		return i < m_IconTable.GetCount () ? m_IconTable [i] : NULL;
 	}
 
 	void
-	SetImageList (gui::CImageList* pImageList);
+	SetIcon (
+		size_t i,
+		gui::CImage* pImage
+		);
+
+	void
+	SetIconTable (
+		gui::CImage* const* ppImageArray,
+		size_t Count
+		);
+
+	gui::TSize
+	GetIconSize ()
+	{
+		return m_IconSize;
+	}
+
+	void
+	SetIconSize (const gui::TSize& Size)
+	{
+		SetIconSize (Size.m_Width, Size.m_Height);
+	}
+
+	void
+	SetIconSize (
+		uint_t Width,
+		uint_t Height
+		);
 
 	bool
 	IsIconVisible ()
@@ -255,18 +283,18 @@ public:
 		return m_IsIconVisible;
 	}
 
-	void 
+	void
 	ShowIcon (bool IsVisible);
 
 	// timestamp
 
-	const rtl::CString& 
+	const rtl::CString&
 	GetTimestampFormat ()
 	{
 		return m_TimestampFormat;
 	}
 
-	void 
+	void
 	SetTimestampFormat (const rtl::CString& Format);
 
 	bool
@@ -275,18 +303,18 @@ public:
 		return m_IsTimestampVisible;
 	}
 
-	void 
+	void
 	ShowTimestamp (bool IsVisible);
 
 	// binary offset
 
-	size_t 
+	size_t
 	GetOffsetWidth ()
 	{
 		return m_OffsetWidth;
 	}
 
-	void 
+	void
 	SetOffsetWidth (size_t Width);
 
 	bool
@@ -295,25 +323,25 @@ public:
 		return m_IsOffsetVisible;
 	}
 
-	void 
+	void
 	ShowOffset (bool IsVisible);
 
 	// cursor & selection
 
-	gui::TCursorPos 
+	gui::TCursorPos
 	GetCursorPos ()
 	{
 		return m_CursorPos;
 	}
 
-	void 
+	void
 	SetCursorPos (
 		uint_t Line,
 		uint_t Col,
 		bool Select = false
 		);
 
-	void 
+	void
 	SetCursorPos (
 		gui::TCursorPos& Pos,
 		bool Select = false
@@ -330,7 +358,7 @@ public:
 
 	gui::TCursorPos
 	GetCursorPosFromMousePos (
-		int x, 
+		int x,
 		int y,
 		bool AdjustX = true
 		);
@@ -374,7 +402,7 @@ public:
 		return ValidateCursorPos (Pos.m_Line, Pos.m_Col);
 	}
 
-	void 
+	void
 	ValidateCursorPos (gui::TCursorPos* pPos)
 	{
 		*pPos = ValidateCursorPos (*pPos);
@@ -386,19 +414,19 @@ public:
 		gui::TCursorPos* pPosEnd
 		);
 
-	void 
+	void
 	EnsureVisible (
 		uint_t Line,
 		uint_t Col
 		);
 
-	void 
+	void
 	EnsureVisible (const gui::TCursorPos& Pos)
 	{
 		EnsureVisible (Pos.m_Line, Pos.m_Col);
 	}
 
-	void 
+	void
 	EnsureVisibleRange (
 		const gui::TCursorPos& PosStart,
 		const gui::TCursorPos& PosEnd
@@ -418,32 +446,32 @@ public:
 
 	bool
 	GetSelection (
-		gui::TCursorPos* pSelStart, 
+		gui::TCursorPos* pSelStart,
 		gui::TCursorPos* pSelEnd
 		);
 
 	void
 	SetSelection (
-		const gui::TCursorPos& SelStart, 
+		const gui::TCursorPos& SelStart,
 		const gui::TCursorPos& SelEnd
 		);
 
-	void 
+	void
 	KillSelection ();
-	
+
 	bool
 	GetHilite (
-		gui::TCursorPos* pHiliteStart, 
+		gui::TCursorPos* pHiliteStart,
 		gui::TCursorPos* pHiliteEnd
 		);
 
-	void 
+	void
 	SetHilite (
 		const gui::TCursorPos& PosStart,
 		const gui::TCursorPos& PosEnd
 		);
 
-	void 
+	void
 	KillHilite ();
 
 	void
@@ -552,8 +580,8 @@ public:
 
 	bool
 	SetFindPattern (
-		const void* p, 
-		size_t Size, 
+		const void* p,
+		size_t Size,
 		bool DoMatchCase
 		)
 	{
@@ -571,7 +599,7 @@ public:
 
 	bool
 	FindPrev ();
-	
+
 protected:
 	void
 	SetLineCount (size_t LineCount);
@@ -585,16 +613,16 @@ protected:
 	size_t
 	CalcTimestampWidth (const char* pFormat);
 
-	void 
+	void
 	RecalcBaseCol ();
 
-	void 
+	void
 	RecalcColCount (const TLongestLineLength* pLength);
 
-	void 
+	void
 	RecalcHScroll ();
 
-	void 
+	void
 	RecalcVScroll ();
 
 	void
@@ -657,7 +685,7 @@ protected:
 		size_t OldLineCount,
 		size_t NewLineCount
 		);
-*/	
+*/
 	// bin ranges & offsets
 
 	bool
@@ -683,7 +711,7 @@ protected:
 		return m_FullOffsetWidth + 3 * pLine->GetBinDataConfig ()->m_BinHexLineSize + m_HexGapSize;
 	}
 
-	size_t 
+	size_t
 	GetHiliteCol (
 		CBinLine* pLine,
 		size_t Offset
@@ -712,17 +740,17 @@ protected:
 	{
 		RedrawLineRange (Line, Line);
 	}
-	
-	const char* 
+
+	const char*
 	FormatOffset (size_t Offset);
 
-	size_t 
+	size_t
 	GetTimestampString (
 		CLine* pLine,
 		rtl::CString* pString
 		);
 
-	void 
+	void
 	PaintRect (
 		gui::CTextPaint* pPaint,
 		const gui::TRect& Rect
@@ -731,8 +759,8 @@ protected:
 	void
 	PaintLine (
 		gui::CTextPaint* pPaint,
-		const gui::TRect& LineRect, 
-		CLine* pLine, 
+		const gui::TRect& LineRect,
+		CLine* pLine,
 		size_t Line
 		);
 
@@ -817,7 +845,7 @@ protected:
 */
 	// copy
 
-	size_t 
+	size_t
 	CopyString (rtl::CString* pString);
 
 	// find
@@ -833,20 +861,20 @@ protected:
 
 	bool
 	FindNextImpl (
-		size_t Line, 
-		size_t Col, 
+		size_t Line,
+		size_t Col,
 		size_t EndLine
 		);
 
 	bool
 	FindPrevImpl (
-		size_t Line, 
-		size_t Col, 
+		size_t Line,
+		size_t Col,
 		size_t EndLine
 		);
 
 protected:
-	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()		
+	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_SetFocus, OnSetFocus)
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KillFocus, OnKillFocus)
 		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_Paint, OnPaint)
@@ -961,57 +989,57 @@ protected:
 		);
 
 protected:
-	void 
+	void
 	OnKeyDown_Tab (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_Home (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_End (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_Left (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_Right (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_Up (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_Down (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_PageUp (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 
-	void 
+	void
 	OnKeyDown_PageDown (
-		bool Shift, 
+		bool Shift,
 		bool Ctrl
 		);
 };

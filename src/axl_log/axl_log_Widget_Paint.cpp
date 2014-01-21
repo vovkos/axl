@@ -82,7 +82,7 @@ CWidget::RedrawSelChangeLineRange (
 			);
 }
 
-size_t 
+size_t
 CWidget::GetTimestampString (
 	CLine* pLine,
 	rtl::CString* pString
@@ -98,7 +98,7 @@ CWidget::GetTimestampString (
 	return g::TTime (pLine->m_LastTimestamp).Format (pString, m_TimestampFormat);
 }
 
-void 
+void
 CWidget::PaintRect (
 	gui::CTextPaint* pPaint,
 	const gui::TRect& Rect
@@ -164,8 +164,8 @@ CWidget::PaintRect (
 #ifdef _AXL_USE_OFFSCREEN_BUFFER
 					PaintLine (pPaint, &OffscreenRect, pLine, j);
 					BitBlt (
-						hdc, 
-						LineRect.left, LineRect.top, 
+						hdc,
+						LineRect.left, LineRect.top,
 						LineRect.right - LineRect.left,
 						LineRect.bottom - LineRect.top,
 						hdcOffscreen,
@@ -178,7 +178,7 @@ CWidget::PaintRect (
 					LineRect.m_Top += m_CharSize.m_Height;
 				}
 			}
-			
+
 			if (LineRect.m_Top != PageBottom) // fill the rest of the page as cache-miss-back
 			{
 				LineRect.m_Bottom = PageBottom;
@@ -206,8 +206,8 @@ CWidget::PaintRect (
 void
 CWidget::PaintLine (
 	gui::CTextPaint* pPaint,
-	const gui::TRect& LineRect, 
-	CLine* pLine, 
+	const gui::TRect& LineRect,
+	CLine* pLine,
 	size_t Line
 	)
 {
@@ -225,20 +225,20 @@ CWidget::PaintLine (
 	}
 	else if (m_HiliteStart != m_HiliteEnd)
 	{
-		pSelStart = &m_HiliteStart; 
+		pSelStart = &m_HiliteStart;
 		pSelEnd = &m_HiliteEnd;
 		pPaint->m_SelAttr.m_BackColor = EColor_HiliteBack;
 	}
 	else
 	{
-		pSelStart = NULL; 
+		pSelStart = NULL;
 		pSelEnd = NULL;
 	}
 
 	// if (pLine->IsBin ())
 	//	m_ColorizeMgr.EnsureColorized ((CBinLine*) pLine);
 
-	// reset 
+	// reset
 
 	pPaint->m_pCanvas->m_BaseTextAttr.Setup (gui::EStdPalColor_WidgetText, gui::EStdPalColor_WidgetBack, 0);
 	pPaint->m_pCanvas->m_BaseTextAttr.Overlay (pLine->m_LineAttr);
@@ -272,21 +272,21 @@ CWidget::PaintLine (
 		CTextLine* pTextLine = (CTextLine*) pLine;
 		PaintText (
 			pPaint,
-			pTextLine->m_HyperText.GetText (), 
-			pTextLine->m_HyperText.GetAttrArray (), 
+			pTextLine->m_HyperText.GetText (),
+			pTextLine->m_HyperText.GetAttrArray (),
 			Line, 0,
-			pSelStart, 
+			pSelStart,
 			pSelEnd
 			);
 		break;
 		}
 
 	case ELine_BinHex:
-		PaintBinHexLine (			
+		PaintBinHexLine (
 			pPaint,
-			(CBinHexLine*) pLine, 
+			(CBinHexLine*) pLine,
 			Line,
-			pSelStart, 
+			pSelStart,
 			pSelEnd
 			);
 		break;
@@ -296,11 +296,11 @@ CWidget::PaintLine (
 		CBinTextLine* pBinTextLine = (CBinTextLine*) pLine;
 		PaintText (
 			pPaint,
-			pBinTextLine->m_BinText, 
+			pBinTextLine->m_BinText,
 			&pBinTextLine->m_AttrArray,
 			Line,
 			m_FullOffsetWidth,
-			pSelStart, 
+			pSelStart,
 			pSelEnd
 			);
 		break;
@@ -334,32 +334,26 @@ CWidget::PaintIcon (
 	size_t Icon
 	)
 {
-	ASSERT (m_pImageList);
-
 	gui::TPoint Point = pPaint->GetPoint ();
-
 	pPaint->PaintSpace (m_IconWidth);
 
-	if (Icon != -1)
-		pPaint->m_pCanvas->DrawImage (
-			Point + m_IconOrigin,
-			m_pImageList,
-			Icon
-			);
+	gui::CImage* pIcon = GetIcon (Icon);
+	if (pIcon)
+		pPaint->m_pCanvas->DrawImage (Point + m_IconOrigin, pIcon);
 }
 
-const char* 
+const char*
 CWidget::FormatOffset (size_t Offset)
 {
 	ASSERT (m_OffsetWidth);
 
 	m_StringBuffer.Format ("%08x", Offset);
-		
+
 	const char* pOffset = m_StringBuffer;
 
 	if (m_OffsetWidth < 8)
 		pOffset += 8 - m_OffsetWidth;
-	
+
 	return pOffset;
 }
 
@@ -403,9 +397,9 @@ CWidget::PaintDelimiter (
 	{
 		return;
 	}
-	
+
 	pPaint->m_pCanvas->DrawRect (
-		Left, 
+		Left,
 		LineRect.m_Bottom - 1,
 		LineRect.m_Right,
 		LineRect.m_Bottom,
@@ -522,14 +516,14 @@ CWidget::PaintBinHexLine (
 
 		PaintBinHex (pPaint, pLine, 0, SelEndOffset);
 	}
-	else 
+	else
 	{
 		ASSERT (Line == pSelStart->m_Line && Line == pSelEnd->m_Line);
 
 		SelStartOffset = GetBinHexLineOffsetFromCol (pLine, pSelStart->m_Col, &SelStartHexCol);
 		SelEndOffset = GetBinHexLineOffsetFromCol (pLine, pSelEnd->m_Col, &SelEndHexCol);
 
-		if (SelEndOffset < SelStartOffset || 
+		if (SelEndOffset < SelStartOffset ||
 			SelEndOffset == SelStartOffset && SelEndHexCol < SelStartHexCol)
 		{
 			size_t TempOffset = SelStartOffset;

@@ -7,8 +7,11 @@
 #	include <QApplication>
 #	include <QClipboard>
 #	include <QFont>
+#	include <QIcon>
+#	include <QImage>
 #	include <QMouseEvent>
 #	include <QPainter>
+#	include <QPixmap>
 #	include <QScrollBar>
 #	include <QWidget>
 #endif

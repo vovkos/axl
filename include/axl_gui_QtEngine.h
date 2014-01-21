@@ -13,8 +13,7 @@
 #include "axl_gui_QtCursor.h"
 #include "axl_gui_QtFont.h"
 #include "axl_gui_QtImage.h"
-// #include "axl_gui_QtImageList.h"
-#include "axl_gui_QtWidget.h"
+ #include "axl_gui_QtWidget.h"
 
 namespace axl {
 namespace gui {
@@ -26,7 +25,7 @@ class CQtEngine: public CEngine
 protected:
 	ref::CPtrT <CFont> m_DefaultGuiFont;
 	ref::CPtrT <CFont> m_DefaultMonospaceFont;
-	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];	
+	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
 
 public:
 	CQtEngine ()
@@ -41,7 +40,7 @@ public:
 		return rtl::GetSingleton <CQtEngine> ();
 	}
 
-	CFont* 
+	CFont*
 	GetDefaultGuiFont ();
 
 	virtual
@@ -68,14 +67,14 @@ public:
 
 	ref::CPtrT <CFont>
 	CreateFont (const QFont& QtFont);
-	
+
 	virtual
 	CCursor*
 	GetStdCursor (EStdCursor CursorKind);
 
 	ref::CPtrT <CCursor>
 	CreateCursor (const QCursor& QtCursor);
-	
+
 	virtual
 	CFont*
 	GetFontMod (
@@ -94,18 +93,8 @@ public:
 		);
 
 	virtual
-	ref::CPtrT <CImageList>
-	CreateImageList (
-		int Width,
-		int Height
-		);
-
-	virtual
-	ref::CPtrT <CImageList>
-	CreateImageList (
-		CImage* pStipImage,
-		int Width = 0
-		);
+	ref::CPtrT <CImage>
+	CreateImage ();
 
 	virtual
 	ref::CPtrT <CCanvas>

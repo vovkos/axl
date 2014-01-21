@@ -15,7 +15,7 @@ CGdiEngine::~CGdiEngine ()
 		::DestroyWindow (m_hWndClipboardOwner);
 }
 
-CFont* 
+CFont*
 CGdiEngine::GetDefaultGuiFont ()
 {
 	if (m_DefaultGuiFont)
@@ -106,11 +106,11 @@ CGdiEngine::GetFontMod (
 	LOGFONTW LogFont;
 	GetLogFontFromFontDesc (*pFontTuple->m_pBaseFont->GetFontDesc (), &LogFont);
 	ModifyLogFont (&LogFont, Flags);
-	
+
 	HFONT hFont = ::CreateFontIndirect (&LogFont);
 	if (!hFont)
 		return err::FailWithLastSystemError ((CFont*) NULL);
-	
+
 	CGdiFont* pFont = AXL_MEM_NEW (CGdiFont);
 	pFont->m_FontDesc = pBaseFont->m_FontDesc;
 	pFont->m_FontDesc.m_Flags = Flags;
@@ -138,7 +138,7 @@ CGdiEngine::CreateStockCursor (LPCTSTR pStockCursorRes)
 CCursor*
 CGdiEngine::GetStdCursor (EStdCursor CursorKind)
 {
-	static LPCTSTR StockCursorResTable [EStdCursor__Count] = 
+	static LPCTSTR StockCursorResTable [EStdCursor__Count] =
 	{
 		IDC_ARROW,    // EStdCursor_Arrow = 0,
 		IDC_WAIT,     // EStdCursor_Wait,
@@ -154,7 +154,7 @@ CGdiEngine::GetStdCursor (EStdCursor CursorKind)
 	ASSERT (CursorKind < EStdCursor__Count);
 	if (m_StdCursorArray [CursorKind])
 		return m_StdCursorArray [CursorKind];
-	
+
 	ref::CPtrT <CCursor> Cursor = CreateStockCursor (StockCursorResTable [CursorKind]);
 	m_StdCursorArray [CursorKind] = Cursor;
 	return Cursor;
@@ -190,7 +190,7 @@ CGdiEngine::CreateImage (
 	if (!IsScreenCompatible)
 	{
 		hBitmap = ::CreateBitmap (
-			Width, 
+			Width,
 			Height,
 			1,
 			BitCount,
@@ -209,12 +209,12 @@ CGdiEngine::CreateImage (
 		BitmapInfo.bmiHeader.biCompression = BI_RGB;
 		BitmapInfo.bmiHeader.biWidth = Width;
 		BitmapInfo.bmiHeader.biHeight = Height;
-		
+
 		CScreenDc ScreenDc;
 
 		hBitmap = ::CreateCompatibleBitmap (
-			ScreenDc, 
-			Width, 
+			ScreenDc,
+			Width,
 			Height
 			);
 
@@ -222,8 +222,8 @@ CGdiEngine::CreateImage (
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 
 		bool_t Result = SetDIBits (
-			ScreenDc, 
-			hBitmap, 
+			ScreenDc,
+			hBitmap,
 			0,
 			Height,
 			pData,
@@ -234,43 +234,17 @@ CGdiEngine::CreateImage (
 		if (!Result)
 			return err::FailWithLastSystemError (ref::EPtr_Null);
 	}
-	
+
 	ref::CPtrT <CGdiImage> Image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
 	Image->m_h = hBitmap;
 	return Image;
-}
-
-ref::CPtrT <CImageList>
-CGdiEngine::CreateImageList (
-	int Width,
-	int Height
-	)
-{
-	HIMAGELIST hImageList = NULL;
-
-	ref::CPtrT <CGdiImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CGdiImageList>);
-	ImageList->m_h = hImageList;
-	return ImageList;
-}
-
-ref::CPtrT <CImageList>
-CGdiEngine::CreateImageList (
-	CImage* pStipImage,
-	int Width
-	)
-{
-	HIMAGELIST hImageList = NULL;
-
-	ref::CPtrT <CGdiImageList> ImageList = AXL_REF_NEW (ref::CBoxT <CGdiImageList>);
-	ImageList->m_h = hImageList;
-	return ImageList;
 }
 
 ref::CPtrT <CCanvas>
 CGdiEngine::CreateOffscreenCanvas (
 	int Width,
 	int Height
-	)	
+	)
 {
 	CScreenDc ScreenDc;
 	HBITMAP hBitmap = ::CreateCompatibleBitmap (ScreenDc, Width, Height);
@@ -279,7 +253,7 @@ CGdiEngine::CreateOffscreenCanvas (
 
 	HDC hdc = ::CreateCompatibleDC (ScreenDc);
 
-	ref::CPtrT <CGdiCanvas> Dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);	
+	ref::CPtrT <CGdiCanvas> Dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);
 	Dc->Attach (hdc, NULL, CGdiCanvas::EDestruct_DeleteDc);
 	Dc->m_hBitmap = hBitmap;
 	Dc->m_hPrevBitmap = (HBITMAP) ::SelectObject (hdc, hBitmap);
@@ -291,9 +265,9 @@ bool
 CGdiEngine::ReadClipboard (rtl::CString* pString)
 {
 	bool Result = OpenClipboard ();
-	if (!Result)		
+	if (!Result)
 		return false;
-	
+
 	HANDLE hData = ::GetClipboardData (CF_TEXT);
 	if (!hData)
 	{
@@ -319,7 +293,7 @@ CGdiEngine::ReadClipboard (rtl::CString* pString)
 
 	GlobalUnlock(pData);
 
-	::CloseClipboard (); 
+	::CloseClipboard ();
 	return true;
 }
 
@@ -330,7 +304,7 @@ CGdiEngine::WriteClipboard (
 	)
 {
 	bool Result = OpenClipboard ();
-	if (!Result)		
+	if (!Result)
 		return false;
 
 	::EmptyClipboard ();
@@ -339,9 +313,9 @@ CGdiEngine::WriteClipboard (
 	HGLOBAL hData = GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, Size);
 	void* p = GlobalLock (hData);
 	memcpy (p, pString, Length * sizeof (char));
-	
+
 	::SetClipboardData (CF_TEXT, hData);
-	::CloseClipboard (); 
+	::CloseClipboard ();
 	return true;
 }
 
@@ -353,20 +327,20 @@ CGdiEngine::OpenClipboard ()
 	if (!m_hWndClipboardOwner)
 	{
 		m_hWndClipboardOwner = ::CreateWindowExW (
-			0, 
-			L"STATIC", 
-			NULL, 
-			WS_OVERLAPPEDWINDOW, 
-			CW_USEDEFAULT, 
-			CW_USEDEFAULT, 
-			CW_USEDEFAULT, 
-			CW_USEDEFAULT, 
+			0,
+			L"STATIC",
+			NULL,
+			WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
 			NULL,
 			NULL,
 			g::GetModule ()->GetModuleHandle (),
 			NULL
 			);
-		
+
 		if (!m_hWndClipboardOwner)
 			return err::FailWithLastSystemError ();
 	}

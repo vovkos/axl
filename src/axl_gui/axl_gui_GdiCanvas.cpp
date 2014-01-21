@@ -172,34 +172,20 @@ CGdiCanvas::DrawImage (
 	}
 
 	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *pGdiImage);
-	
+
 	::BitBlt (
-		m_h, 
-		x, 
-		y, 
-		Right - Left, 
-		Bottom - Top, 
-		m_hCompatibleDc, 
-		Left, 
-		Top, 
+		m_h,
+		x,
+		y,
+		Right - Left,
+		Bottom - Top,
+		m_hCompatibleDc,
+		Left,
+		Top,
 		SRCCOPY
 		);
 
 	::SelectObject (m_hCompatibleDc, hPrevBitmap);
-	return true;
-}
-
-bool
-CGdiCanvas::DrawImage (
-	int x,
-	int y,
-	CImageList* pImageList,
-	size_t Index
-	)
-{
-	ASSERT (pImageList->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-	CGdiImageList* pGdiImageList = (CGdiImageList*) pImageList;
-
 	return true;
 }
 
@@ -218,14 +204,14 @@ CGdiCanvas::CopyRect (
 	CGdiCanvas* pDc = (CGdiCanvas*) pSrcCanvas;
 
 	::BitBlt (
-		m_h, 
-		xDst, 
-		yDst, 
-		Width, 
-		Height, 
-		pDc->m_h, 
-		xSrc, 
-		ySrc, 
+		m_h,
+		xDst,
+		yDst,
+		Width,
+		Height,
+		pDc->m_h,
+		xSrc,
+		ySrc,
 		SRCCOPY
 		);
 

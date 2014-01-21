@@ -27,7 +27,7 @@ CQtCanvas::DrawRect (
 
 	if (!(Rgb & EColorFlag_Transparent))
 		m_h->fillRect (Left, Top, Right - Left, Bottom - Top, Rgb);
-	
+
 	return true;
 }
 
@@ -89,6 +89,9 @@ CQtCanvas::DrawImage (
 	)
 {
 	ASSERT (pImage->GetEngine ()->GetEngineKind () == EEngine_Qt);
+	CQtImage* pQtImage = (CQtImage*) pImage;
+	m_h->drawPixmap (x, y, pQtImage->m_QtPixmap);
+
 /*	CBitmap* pBitmap = (CBitmap*) pImage;
 
 	if (!m_hCompatibleDc)
@@ -98,34 +101,20 @@ CQtCanvas::DrawImage (
 	}
 
 	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *pBitmap);
-	
+
 	::BitBlt (
-		m_h, 
-		x, 
-		y, 
-		Right - Left, 
-		Bottom - Top, 
-		m_hCompatibleDc, 
-		Left, 
-		Top, 
+		m_h,
+		x,
+		y,
+		Right - Left,
+		Bottom - Top,
+		m_hCompatibleDc,
+		Left,
+		Top,
 		SRCCOPY
 		);
 
 	::SelectObject (m_hCompatibleDc, hPrevBitmap); */
-	return true;
-}
-
-bool
-CQtCanvas::DrawImage (
-	int x,
-	int y,
-	CImageList* pImageList,
-	size_t Index
-	)
-{
-	ASSERT (pImageList->GetEngine ()->GetEngineKind () == EEngine_Qt);
-//	CImageList* pqtImageList = (CImageList*) pImageList;
-
 	return true;
 }
 
@@ -144,14 +133,14 @@ CQtCanvas::CopyRect (
 /*	CPainter* pDc = (CPainter*) pSrcCanvas;
 
 	::BitBlt (
-		m_h, 
-		xDst, 
-		yDst, 
-		Width, 
-		Height, 
-		pDc->m_h, 
-		xSrc, 
-		ySrc, 
+		m_h,
+		xDst,
+		yDst,
+		Width,
+		Height,
+		pDc->m_h,
+		xSrc,
+		ySrc,
 		SRCCOPY
 		);
 */
