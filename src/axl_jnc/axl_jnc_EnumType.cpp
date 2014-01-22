@@ -81,7 +81,7 @@ CEnumType::CalcLayout ()
 
 			Const->m_Value = Value;
 
-			uint8_t HiBitIdx = rtl::GetLoBitIdx (Value);
+			uint8_t HiBitIdx = rtl::GetHiBitIdx (Value);
 			Value = HiBitIdx != -1 ? 2 << HiBitIdx : 1;
 		}
 	}
