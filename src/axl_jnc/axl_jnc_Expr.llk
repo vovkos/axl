@@ -240,7 +240,7 @@ logical_or_expr <CValue* $pValue>
 	:	logical_and_expr <$pValue>
 		(EToken_LogOr logical_and_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogAnd, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogOr, $pValue, $OpValue2);
 			}
 		)*
 	;
@@ -253,7 +253,7 @@ logical_and_expr <CValue* $pValue>
 	:	inclusive_or_expr <$pValue>
 		(EToken_LogAnd inclusive_or_expr <&$OpValue2>
 			{
-				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogOr, $pValue, $OpValue2);
+				return m_pModule->m_OperatorMgr.BinaryOperator (EBinOp_LogAnd, $pValue, $OpValue2);
 			}
 		)*
 	;
