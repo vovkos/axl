@@ -25,7 +25,7 @@ CWidget::CWidget (gui::CEngine* pEngine):
 	m_MaxBinBlockBuffer = 1024;
 
 	m_IconGapSize = 1;
-	m_TimestampGapSize = 2;
+	m_TimestampGapSize = 1;
 	m_OffsetGapSize = 2;
 	m_HexGapSize = 1;
 	m_CaretWidth = 2;
