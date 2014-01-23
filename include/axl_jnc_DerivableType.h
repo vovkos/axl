@@ -13,6 +13,7 @@ namespace jnc {
 
 class CDerivableType;
 class CStructType;
+class CUnionType;
 class CClassType;
 class CFunction;
 class CProperty;
@@ -54,7 +55,7 @@ public:
 		return m_pType_i;
 	}
 
-	size_t 
+	size_t
 	GetOffset ()
 	{
 		return m_Offset;
@@ -87,17 +88,36 @@ public:
 	size_t m_Offset;
 	rtl::CArrayT <int32_t> m_LlvmIndexArray;
 	size_t m_VTableIndex;
-	size_t m_ParentNamespaceLevel;
 
 public:
-	CBaseTypeCoord ()
-	{
-		Init ();
-	}
+	CBaseTypeCoord ();
+};
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// unfortunately, LLVM does not natively support unions
+// therefore, unnamed unions on the way to a member need special handling
+
+struct TUnionCoord
+{
+	CUnionType* m_pType;
+	intptr_t m_Level; // signed for simplier comparisons
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CMemberCoord: public CBaseTypeCoord
+{
 protected:
-	void
-	Init ();
+	char m_Buffer [256];
+
+public:
+	rtl::CArrayT <TUnionCoord> m_UnionCoordArray;
+
+	CMemberCoord ():
+		m_UnionCoordArray (ref::EBuf_Field, m_Buffer, sizeof (m_Buffer))
+	{
+	}
 };
 
 //.............................................................................
@@ -123,7 +143,8 @@ protected:
 	rtl::CArrayT <CFunction*> m_MemberMethodArray;
 	rtl::CArrayT <CProperty*> m_MemberPropertyArray;
 	rtl::CArrayT <CStructField*> m_ImportFieldArray;
-	
+	rtl::CArrayT <CStructField*> m_UnnamedFieldArray;
+
 	// construction
 
 	CFunction* m_pPreConstructor;
@@ -177,23 +198,23 @@ public:
 		return FindBaseTypeTraverseImpl (pType, pCoord, 0);
 	}
 
-	rtl::CArrayT <CBaseTypeSlot*> 
+	rtl::CArrayT <CBaseTypeSlot*>
 	GetGcRootBaseTypeArray ()
 	{
 		return m_GcRootBaseTypeArray;
 	}
 
-	rtl::CArrayT <CStructField*> 
+	rtl::CArrayT <CStructField*>
 	GetGcRootMemberFieldArray ()
 	{
 		return m_GcRootMemberFieldArray;
 	}
 
-	rtl::CArrayT <CStructField*> 
+	rtl::CArrayT <CStructField*>
 	GetMemberFieldArray ()
 	{
 		return m_MemberFieldArray;
-	} 
+	}
 
 	rtl::CArrayT <CFunction*>
 	GetMemberMethodArray ()
@@ -206,7 +227,7 @@ public:
 	{
 		return m_MemberPropertyArray;
 	}
-	
+
 	bool
 	CallBaseTypeConstructors (const CValue& ThisValue);
 
@@ -216,28 +237,28 @@ public:
 	bool
 	CallMemberPropertyConstructors (const CValue& ThisValue);
 
-	CFunction* 
+	CFunction*
 	GetPreConstructor ()
 	{
 		return m_pPreConstructor;
 	}
 
-	CFunction* 
+	CFunction*
 	GetConstructor ()
 	{
 		return m_pConstructor;
 	}
 
-	CFunction* 
+	CFunction*
 	GetDefaultConstructor ();
 
-	CFunction* 
+	CFunction*
 	GetStaticConstructor ()
 	{
 		return m_pStaticConstructor;
 	}
 
-	CFunction* 
+	CFunction*
 	GetStaticDestructor ()
 	{
 		return m_pStaticDestructor;
@@ -324,7 +345,7 @@ public:
 	virtual
 	bool
 	AddProperty (CProperty* pProperty);
-	
+
 protected:
 	virtual
 	CStructField*
@@ -369,7 +390,7 @@ protected:
 	CModuleItem*
 	FindItemTraverseImpl (
 		const char* pName,
-		CBaseTypeCoord* pCoord = NULL,
+		CMemberCoord* pCoord = NULL,
 		uint_t Flags = 0
 		)
 	{
@@ -379,7 +400,7 @@ protected:
 	CModuleItem*
 	FindItemTraverseImpl (
 		const char* pName,
-		CBaseTypeCoord* pCoord,
+		CMemberCoord* pCoord,
 		uint_t Flags,
 		size_t BaseTypeLevel
 		);

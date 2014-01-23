@@ -252,7 +252,7 @@ COperatorMgr::GetNamedTypeMember (
 	CValue* pResultValue
 	)
 {
-	CBaseTypeCoord Coord;
+	CMemberCoord Coord;
 	CModuleItem* pMember = pNamedType->FindItemTraverse (pName, &Coord, ETraverse_NoParentNamespace);
 	if (!pMember)
 	{

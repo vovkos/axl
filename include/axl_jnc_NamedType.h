@@ -17,7 +17,7 @@ class CVariable;
 
 //.............................................................................
 
-class CNamedType: 
+class CNamedType:
 	public CType,
 	public CNamespace
 {
@@ -29,7 +29,7 @@ protected:
 public:
 	CNamedType ();
 
-	CNamespace* 
+	CNamespace*
 	GetExtensionNamespace ()
 	{
 		return m_pExtensionNamespace;
@@ -42,13 +42,13 @@ public:
 		return (CType*) GetDataPtrType (EDataPtrType_Normal, PtrTypeFlags);
 	}
 
-	CFunctionType* 
+	CFunctionType*
 	GetMemberMethodType (
 		CFunctionType* pShortType,
 		uint_t ThisArgTypeFlags = 0
 		);
 
-	CPropertyType* 
+	CPropertyType*
 	GetMemberPropertyType (CPropertyType* pShortType);
 
 protected:
@@ -63,7 +63,7 @@ protected:
 	CModuleItem*
 	FindItemTraverseImpl (
 		const char* pName,
-		CBaseTypeCoord* pCoord,
+		CMemberCoord* pCoord,
 		uint_t Flags
 		);
 };

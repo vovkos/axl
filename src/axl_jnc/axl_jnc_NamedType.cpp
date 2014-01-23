@@ -13,7 +13,7 @@ CNamedType::CNamedType ()
 	m_pItemDecl = this;
 }
 
-CFunctionType* 
+CFunctionType*
 CNamedType::GetMemberMethodType (
 	CFunctionType* pShortType,
 	uint_t ThisArgTypeFlags
@@ -22,7 +22,7 @@ CNamedType::GetMemberMethodType (
 	return m_pModule->m_TypeMgr.GetMemberMethodType (this, pShortType, ThisArgTypeFlags);
 }
 
-CPropertyType* 
+CPropertyType*
 CNamedType::GetMemberPropertyType (CPropertyType* pShortType)
 {
 	return m_pModule->m_TypeMgr.GetMemberPropertyType (this, pShortType);
@@ -31,7 +31,7 @@ CNamedType::GetMemberPropertyType (CPropertyType* pShortType)
 CModuleItem*
 CNamedType::FindItemTraverseImpl (
 	const char* pName,
-	CBaseTypeCoord* pCoord,
+	CMemberCoord* pCoord,
 	uint_t Flags
 	)
 {

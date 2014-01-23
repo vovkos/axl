@@ -57,7 +57,11 @@ CUnionType::CreateFieldImpl (
 
 	m_FieldList.InsertTail (pField);
 
-	if (!Name.IsEmpty ())
+	if (Name.IsEmpty ())
+	{
+		m_UnnamedFieldArray.Append (pField);
+	}
+	else
 	{
 		bool Result = AddItem (pField);
 		if (!Result)
@@ -111,7 +115,7 @@ CUnionType::CalcLayout ()
 	size_t LargestAlignFactor = 0;
 
 	rtl::CIteratorT <CStructField> Field = m_FieldList.GetHead ();
-	for (; Field; Field++)
+	for (size_t i = 0; Field; Field++, i++)
 	{
 		CStructField* pField = *Field;
 
@@ -140,6 +144,8 @@ CUnionType::CalcLayout ()
 
 		if (LargestAlignFactor < pField->m_pType->GetAlignFactor ())
 			LargestAlignFactor = pField->m_pType->GetAlignFactor ();
+
+		pField->m_LlvmIndex = i;
 	}
 
 	ASSERT (pLargestFieldType);

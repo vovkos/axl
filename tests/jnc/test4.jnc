@@ -2,11 +2,14 @@
 
 //.............................................................................
 
-int g_a [MyEnum.Count];
+char g_a [Color.Count];
 
-enum MyEnum
+enum Color
 {
-	Count = 0,
+	Red,
+	Green,
+	Blue,
+	Count
 }
 
 int main ()

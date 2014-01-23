@@ -1176,7 +1176,7 @@ public:
 	GetField (
 		const CValue& OpValue,
 		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
+		CMemberCoord* pCoord,
 		CValue* pResultValue
 		);
 
@@ -1202,10 +1202,18 @@ public:
 	// impl
 
 	bool
-	GetStructField  (
+	GetFieldPtrImpl (
+		const CValue& OpValue,
+		CMemberCoord* pCoord,
+		CType* pResultType,
+		CValue* pResultValue
+		);
+
+	bool
+	GetStructField (
 		const CValue& OpValue,
 		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
+		CMemberCoord* pCoord,
 		CValue* pResultValue
 		);
 
@@ -1220,7 +1228,7 @@ public:
 	GetClassField (
 		const CValue& OpValue,
 		CStructField* pMember,
-		CBaseTypeCoord* pCoord,
+		CMemberCoord* pCoord,
 		CValue* pResultValue
 		);
 

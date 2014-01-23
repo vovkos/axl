@@ -19,14 +19,12 @@ CBaseTypeSlot::CBaseTypeSlot ()
 
 //.............................................................................
 
-void
-CBaseTypeCoord::Init ()
+CBaseTypeCoord::CBaseTypeCoord ():
+	m_LlvmIndexArray (ref::EBuf_Field, m_Buffer, sizeof (m_Buffer))
 {
 	m_pType = NULL;
 	m_Offset = 0;
 	m_VTableIndex = 0;
-	m_ParentNamespaceLevel = 0;
-	m_LlvmIndexArray.SetBuffer (ref::EBuf_Field, m_Buffer, sizeof (m_Buffer));
 }
 
 //.............................................................................
@@ -629,7 +627,7 @@ CDerivableType::FindBaseTypeTraverseImpl (
 CModuleItem*
 CDerivableType::FindItemTraverseImpl (
 	const char* pName,
-	CBaseTypeCoord* pCoord,
+	CMemberCoord* pCoord,
 	uint_t Flags,
 	size_t Level
 	)
@@ -648,6 +646,35 @@ CDerivableType::FindItemTraverseImpl (
 			}
 
 			return pItem;
+		}
+
+		size_t Count = m_UnnamedFieldArray.GetCount ();
+		for	(size_t i = 0; i < Count; i++)
+		{
+			CStructField* pField = m_UnnamedFieldArray [i];
+			if (pField->GetType ()->GetTypeKindFlags () & ETypeKindFlag_Derivable)
+			{
+				CDerivableType* pType = (CDerivableType*) pField->GetType ();
+				pItem = pType->FindItemTraverseImpl (pName, pCoord, Flags | ETraverse_NoParentNamespace, Level + 1);
+				if (pItem)
+				{
+					if (pCoord)
+					{
+						pCoord->m_Offset += pField->m_Offset;
+						pCoord->m_LlvmIndexArray [Level] = pField->m_LlvmIndex;
+
+						if (pType->GetTypeKind () == EType_Union)
+						{
+							TUnionCoord UnionCoord;
+							UnionCoord.m_pType = (CUnionType*) pType;
+							UnionCoord.m_Level = Level + 1; // union logic applied to the next level!
+							pCoord->m_UnionCoordArray.Insert (0, UnionCoord);
+						}
+					}
+
+					return pItem;
+				}
+			}
 		}
 	}
 
@@ -710,12 +737,7 @@ CDerivableType::FindItemTraverseImpl (
 	{
 		pItem = m_pParentNamespace->FindItemTraverse (pName, pCoord, Flags);
 		if (pItem)
-		{
-			if (pCoord)
-				pCoord->m_ParentNamespaceLevel++;
-
 			return pItem;
-		}
 	}
 
 	return NULL;

@@ -61,7 +61,11 @@ CClassType::CreateFieldImpl (
 
 	pField->m_pParentNamespace = this;
 
-	if (!Name.IsEmpty ())
+	if (Name.IsEmpty ())
+	{
+		m_UnnamedFieldArray.Append (pField);
+	}
+	else
 	{
 		bool Result = AddItem (pField);
 		if (!Result)
@@ -516,10 +520,10 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 
 	EFunction FunctionKind = pFunction->GetFunctionKind ();
 
-	CBaseTypeCoord BaseTypeCoord;
+	CMemberCoord Coord;
 	CModuleItem* pMember = FindItemTraverse (
 		pFunction->m_DeclaratorName,
-		&BaseTypeCoord,
+		&Coord,
 		ETraverse_NoExtensionNamespace | ETraverse_NoParentNamespace | ETraverse_NoThis
 		);
 
@@ -615,11 +619,11 @@ CClassType::OverrideVirtualFunction (CFunction* pFunction)
 	}
 
 	pFunction->m_pThisArgType = pThisArgType;
-	pFunction->m_ThisArgDelta = pOverridenFunction->m_ThisArgDelta - BaseTypeCoord.m_Offset;
+	pFunction->m_ThisArgDelta = pOverridenFunction->m_ThisArgDelta - Coord.m_Offset;
 	pFunction->m_pVirtualOriginClassType = pOverridenFunction->m_pVirtualOriginClassType;
 	pFunction->m_ClassVTableIndex = pOverridenFunction->m_ClassVTableIndex;
 
-	size_t VTableIndex = BaseTypeCoord.m_VTableIndex + pOverridenFunction->m_ClassVTableIndex;
+	size_t VTableIndex = Coord.m_VTableIndex + pOverridenFunction->m_ClassVTableIndex;
 	ASSERT (VTableIndex < m_VTable.GetCount ());
 	m_VTable [VTableIndex] = pFunction;
 	return true;
@@ -901,7 +905,7 @@ CClassType::CompilePrimer ()
 	CValue ArgValue4 = ArgValueArray [3];
 
 	PrimeObject (
-		this, 
+		this,
 		ArgValueArray [0],
 		ArgValueArray [1],
 		ArgValueArray [2],
@@ -939,10 +943,10 @@ CClassType::PrimeObject (
 	m_pModule->m_LlvmIrBuilder.CreateStore (FlagsValue, FieldValue);
 
 	PrimeInterface (
-		pClassType, 
-		IfaceValue, 
+		pClassType,
+		IfaceValue,
 		pClassType->m_VTablePtrValue,
-		ObjHdrValue, 
+		ObjHdrValue,
 		ScopeLevelValue,
 		RootValue,
 		FlagsValue
@@ -1015,10 +1019,10 @@ CClassType::PrimeInterface (
 		}
 
 		PrimeInterface (
-			pBaseClassType, 
-			BaseClassValue, 
+			pBaseClassType,
+			BaseClassValue,
 			BaseClassVTableValue,
-			ObjectValue, 
+			ObjectValue,
 			ScopeLevelValue,
 			RootValue,
 			FlagsValue

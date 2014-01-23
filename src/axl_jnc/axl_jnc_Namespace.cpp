@@ -160,7 +160,7 @@ CNamespace::FindItem (const CQualifiedName& Name)
 CModuleItem*
 CNamespace::FindItemTraverse (
 	const CQualifiedName& Name,
-	CBaseTypeCoord* pCoord,
+	CMemberCoord* pCoord,
 	uint_t Flags
 	)
 {
@@ -186,7 +186,7 @@ CNamespace::FindItemTraverse (
 CModuleItem*
 CNamespace::FindItemTraverseImpl (
 	const char* pName,
-	CBaseTypeCoord* pCoord,
+	CMemberCoord* pCoord,
 	uint_t Flags
 	)
 {

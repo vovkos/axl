@@ -72,7 +72,11 @@ CStructType::CreateFieldImpl (
 
 	m_FieldList.InsertTail (pField);
 
-	if (!Name.IsEmpty ())
+	if (Name.IsEmpty ())
+	{
+		m_UnnamedFieldArray.Append (pField);
+	}
+	else
 	{
 		bool Result = AddItem (pField);
 		if (!Result)

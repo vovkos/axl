@@ -1970,7 +1970,7 @@ CParser::LookupIdentifier (
 	CNamespace* pNamespace = m_pModule->m_NamespaceMgr.GetCurrentNamespace ();
 	CModuleItem* pItem = NULL;
 
-	CBaseTypeCoord Coord;
+	CMemberCoord Coord;
 	pItem = pNamespace->FindItemTraverse (Name, &Coord);
 	if (!pItem)
 	{

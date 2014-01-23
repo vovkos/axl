@@ -14,7 +14,7 @@ namespace jnc {
 class CNamespace;
 class CEnumType;
 class CEnumConst;
-class CBaseTypeCoord;
+class CMemberCoord;
 class CFunction;
 
 struct TDualPtrTypeTuple;
@@ -133,7 +133,7 @@ public:
 	CModuleItem*
 	FindItemTraverse (
 		const rtl::CString& Name,
-		CBaseTypeCoord* pCoord = NULL,
+		CMemberCoord* pCoord = NULL,
 		uint_t Flags = 0
 		)
 	{
@@ -143,7 +143,7 @@ public:
 	CModuleItem*
 	FindItemTraverse (
 		const char* pName,
-		CBaseTypeCoord* pCoord = NULL,
+		CMemberCoord* pCoord = NULL,
 		uint_t Flags = 0
 		)
 	{
@@ -153,7 +153,7 @@ public:
 	CModuleItem*
 	FindItemTraverse (
 		const CQualifiedName& Name,
-		CBaseTypeCoord* pCoord = NULL,
+		CMemberCoord* pCoord = NULL,
 		uint_t Flags = 0
 		);
 
@@ -197,7 +197,7 @@ protected:
 	CModuleItem*
 	FindItemTraverseImpl (
 		const char* pName,
-		CBaseTypeCoord* pCoord = NULL,
+		CMemberCoord* pCoord = NULL,
 		uint_t Flags = 0
 		);
 };

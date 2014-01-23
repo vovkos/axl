@@ -11,7 +11,7 @@ bool
 COperatorMgr::GetField (
 	const CValue& OpValue,
 	CStructField* pField,
-	CBaseTypeCoord* pCoord,
+	CMemberCoord* pCoord,
 	CValue* pResultValue
 	)
 {
@@ -29,7 +29,9 @@ COperatorMgr::GetField (
 		return GetStructField (OpValue, pField, pCoord,	pResultValue);
 
 	case EType_Union:
-		return GetUnionField (OpValue, pField, pResultValue);
+		return pCoord ?
+			GetStructField (OpValue, pField, pCoord, pResultValue) :
+			GetUnionField (OpValue, pField, pResultValue);
 
 	case EType_Class:
 		return GetClassField (OpValue, pField, pCoord, pResultValue);
@@ -41,14 +43,88 @@ COperatorMgr::GetField (
 }
 
 bool
-COperatorMgr::GetStructField (
-	const CValue& OpValue,
-	CStructField* pField,
-	CBaseTypeCoord* pCoord,
+COperatorMgr::GetFieldPtrImpl (
+	const CValue& OpValueRaw,
+	CMemberCoord* pCoord,
+	CType* pResultType,
 	CValue* pResultValue
 	)
 {
-	CBaseTypeCoord Coord;
+	if (pCoord->m_UnionCoordArray.IsEmpty ())
+	{
+		m_pModule->m_LlvmIrBuilder.CreateGep (
+			OpValueRaw,
+			pCoord->m_LlvmIndexArray,
+			pCoord->m_LlvmIndexArray.GetCount (),
+			pResultType,
+			pResultValue
+			);
+
+		return true;
+	}
+
+	// if LLVM were to support unions natively, the following would be not needed
+
+	CValue OpValue = OpValueRaw;
+
+	int32_t* pLlvmIndex = pCoord->m_LlvmIndexArray;
+	int32_t* pLlvmIndexEnd = pLlvmIndex + pCoord->m_LlvmIndexArray.GetCount ();
+	intptr_t UnionLevel = -1; // take into account initial 0 in LlvmIndexArray
+
+	size_t UnionCount = pCoord->m_UnionCoordArray.GetCount ();
+	TUnionCoord* pUnionCoord = pCoord->m_UnionCoordArray;
+	for (size_t i = 0; i < UnionCount; i++, pUnionCoord++)
+	{
+		ASSERT (pUnionCoord->m_Level >= UnionLevel);
+		size_t LlvmIndexDelta = pUnionCoord->m_Level - UnionLevel;
+
+		if (LlvmIndexDelta)
+		{
+			m_pModule->m_LlvmIrBuilder.CreateGep (
+				OpValue,
+				pLlvmIndex,
+				LlvmIndexDelta,
+				NULL,
+				&OpValue
+				);
+		}
+
+		CStructField* pField = pUnionCoord->m_pType->GetFieldByIndex (pLlvmIndex [LlvmIndexDelta]);
+		CType* pType = pField->GetType ()->GetDataPtrType_c ();
+
+		m_pModule->m_LlvmIrBuilder.CreateBitCast (OpValue, pType, &OpValue);
+
+		pLlvmIndex += LlvmIndexDelta + 1;
+		UnionLevel = pUnionCoord->m_Level + 1;
+	}
+
+	if (pLlvmIndexEnd > pLlvmIndex)
+	{
+		m_pModule->m_LlvmIrBuilder.CreateGep (
+			OpValue,
+			pLlvmIndex,
+			pLlvmIndexEnd - pLlvmIndex,
+			pResultType,
+			pResultValue
+			);
+	}
+	else
+	{
+		pResultValue->OverrideType (OpValue, pResultType);
+	}
+
+	return true;
+}
+
+bool
+COperatorMgr::GetStructField (
+	const CValue& OpValue,
+	CStructField* pField,
+	CMemberCoord* pCoord,
+	CValue* pResultValue
+	)
+{
+	CMemberCoord Coord;
 	if (!pCoord)
 		pCoord = &Coord;
 
@@ -66,8 +142,14 @@ COperatorMgr::GetStructField (
 		return true;
 	}
 
-	if (OpValue.GetType ()->GetTypeKind () == EType_Struct)
+	if (!(OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr))
 	{
+		if (!pCoord->m_UnionCoordArray.IsEmpty ())
+		{
+			err::SetFormatStringError ("union member operator on registers is not implemented yet");
+			return false;
+		}
+
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (
 			OpValue,
 			pCoord->m_LlvmIndexArray,
@@ -79,9 +161,7 @@ COperatorMgr::GetStructField (
 		return true;
 	}
 
-	ASSERT (OpValue.GetType ()->GetTypeKindFlags () & ETypeKindFlag_DataPtr);
 	CDataPtrType* pOpType = (CDataPtrType*) OpValue.GetType ();
-
 	pCoord->m_LlvmIndexArray.Insert (0, 0);
 
 	uint_t PtrTypeFlags = pOpType->GetFlags () | pField->GetPtrTypeFlags ();
@@ -99,23 +179,11 @@ COperatorMgr::GetStructField (
 
 	if (PtrTypeKind == EDataPtrType_Thin)
 	{
-		m_pModule->m_LlvmIrBuilder.CreateGep (
-			OpValue,
-			pCoord->m_LlvmIndexArray,
-			pCoord->m_LlvmIndexArray.GetCount (),
-			pPtrType,
-			pResultValue
-			);
+		GetFieldPtrImpl (OpValue, pCoord, pPtrType, pResultValue);
 	}
 	else if (PtrTypeKind == EDataPtrType_Lean)
 	{
-		m_pModule->m_LlvmIrBuilder.CreateGep (
-			OpValue,
-			pCoord->m_LlvmIndexArray,
-			pCoord->m_LlvmIndexArray.GetCount (),
-			pPtrType,
-			pResultValue
-			);
+		GetFieldPtrImpl (OpValue, pCoord, pPtrType, pResultValue);
 
 		if (OpValue.GetValueKind () == EValue_Variable)
 			pResultValue->SetLeanDataPtrValidator (OpValue);
@@ -126,15 +194,7 @@ COperatorMgr::GetStructField (
 	{
 		CValue PtrValue;
 		m_pModule->m_LlvmIrBuilder.CreateExtractValue (OpValue, 0, NULL, &PtrValue);
-
-		m_pModule->m_LlvmIrBuilder.CreateGep (
-			PtrValue,
-			pCoord->m_LlvmIndexArray,
-			pCoord->m_LlvmIndexArray.GetCount (),
-			pPtrType,
-			pResultValue
-			);
-
+		GetFieldPtrImpl (PtrValue, pCoord, pPtrType, pResultValue);
 		pResultValue->SetLeanDataPtrValidator (OpValue);
 	}
 
@@ -209,7 +269,7 @@ bool
 COperatorMgr::GetClassField (
 	const CValue& RawOpValue,
 	CStructField* pField,
-	CBaseTypeCoord* pCoord,
+	CMemberCoord* pCoord,
 	CValue* pResultValue
 	)
 {
@@ -225,7 +285,7 @@ COperatorMgr::GetClassField (
 
 	CClassType* pClassType = (CClassType*) pField->GetParentNamespace ();
 
-	CBaseTypeCoord Coord;
+	CMemberCoord Coord;
 	if (!pCoord)
 		pCoord = &Coord;
 
@@ -303,82 +363,6 @@ COperatorMgr::GetPropertyField (
 	CValue ParentValue = *pClosure->GetArgValueList ()->GetHead ();
 	return GetField (ParentValue, (CStructField*) pMember, pResultValue);
 }
-
-/*
-
-bool
-COperatorMgr::GetPropertyField (
-	const CValue& OpValue,
-	CProperty* pProperty,
-	CStructField* pField,
-	CBaseTypeCoord* pCoord,
-	CValue* pResultValue
-	)
-{
-	if (!pProperty->GetParentType ())
-		return GetClassField (
-			pProperty->GetStaticDataVariable (),
-			pField,
-			pCoord,
-			pResultValue
-			);
-
-	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	if (!ThisValue)
-	{
-		err::SetFormatStringError (
-			"function '%s' has no 'this' pointer",
-			m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
-			);
-		return false;
-	}
-
-	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
-		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
-
-	CValue FieldValue;
-	return
-		GetClassField (ThisValue, pProperty->GetParentTypeField (),  NULL, &FieldValue) &&
-		GetClassField (FieldValue, pField, pCoord, pResultValue);
-}
-
-bool
-COperatorMgr::GetPropertyField (
-	CProperty* pProperty,
-	CClosure* pClosure,
-	CStructField* pField,
-	CBaseTypeCoord* pCoord,
-	CValue* pResultValue
-	)
-{
-	if (!pProperty->GetParentType ())
-		return GetClassField (
-			pProperty->GetStaticDataVariable (),
-			pField,
-			pCoord,
-			pResultValue
-			);
-
-	CValue ThisValue = m_pModule->m_FunctionMgr.GetThisValue ();
-	if (!ThisValue)
-	{
-		err::SetFormatStringError (
-			"function '%s' has no 'this' pointer",
-			m_pModule->m_FunctionMgr.GetCurrentFunction ()->m_Tag.cc ()
-			);
-		return false;
-	}
-
-	if (ThisValue.GetType ()->GetTypeKind () == EType_DataPtr)
-		ThisValue = m_pModule->m_FunctionMgr.GetThinThisValue ();
-
-	CValue FieldValue;
-	return
-		GetClassField (ThisValue, pProperty->GetParentTypeField (),  NULL, &FieldValue) &&
-		GetClassField (FieldValue, pField, pCoord, pResultValue);
-}
-
-*/
 
 //.............................................................................
 
