@@ -138,6 +138,13 @@ CQtEngine::CreateCursor (const QCursor& QtCursor)
 }
 
 ref::CPtrT <CImage>
+CQtEngine::CreateImage ()
+{
+	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	return Image;
+}
+
+ref::CPtrT <CImage>
 CQtEngine::CreateImage (
 	int Width,
 	int Height,
@@ -215,13 +222,6 @@ CQtEngine::CreateImage (
 
 	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
 	Image->m_QtPixmap = QtPixmap;
-	return Image;
-}
-
-ref::CPtrT <CImage>
-CQtEngine::CreateImage ()
-{
-	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
 	return Image;
 }
 

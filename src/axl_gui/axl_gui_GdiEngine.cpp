@@ -161,6 +161,13 @@ CGdiEngine::GetStdCursor (EStdCursor CursorKind)
 }
 
 ref::CPtrT <CImage>
+CGdiEngine::CreateImage ()
+{
+	ref::CPtrT <CGdiImage> Image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
+	return Image;
+}
+
+ref::CPtrT <CImage>
 CGdiEngine::CreateImage (
 	int Width,
 	int Height,

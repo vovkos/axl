@@ -84,6 +84,10 @@ public:
 
 	virtual
 	ref::CPtrT <CImage>
+	CreateImage ();
+
+	virtual
+	ref::CPtrT <CImage>
 	CreateImage (
 		int Width,
 		int Height,
@@ -91,10 +95,6 @@ public:
 		const void* pData,
 		bool IsScreenCompatible = true
 		);
-
-	virtual
-	ref::CPtrT <CImage>
-	CreateImage ();
 
 	virtual
 	ref::CPtrT <CCanvas>

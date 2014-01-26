@@ -87,6 +87,10 @@ public:
 
 	virtual
 	ref::CPtrT <CImage>
+	CreateImage ();
+
+	virtual
+	ref::CPtrT <CImage>
 	CreateImage (
 		int Width,
 		int Height,

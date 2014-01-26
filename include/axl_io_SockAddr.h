@@ -53,16 +53,10 @@ GetProtocolString (ESockProto Protocol)
 
 //.............................................................................
 
-struct TSockAddr
+union TSockAddr
 {
-	uint32_t m_Size;
-	uint32_t m_Kind;
-
-	bool
-	ToWinSockAddr (SOCKADDR* pAddr) const;
-
-	rtl::CString
-	ToString () const;
+	sockaddr_in m_Ip4;
+	sockaddr_in6 m_Ip6;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

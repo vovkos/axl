@@ -94,7 +94,7 @@ set (
 	${AXL_INC_DIR}/axl_io_win_Mapping.h
 	${AXL_INC_DIR}/axl_io_win_Pipe.h
 	${AXL_INC_DIR}/axl_io_win_Serial.h
-	${AXL_INC_DIR}/axl_io_win_Sock.h
+	${AXL_INC_DIR}/axl_io_win_Socket.h
 	)
 
 set (
@@ -104,7 +104,7 @@ set (
 	axl_io_win_Mapping.cpp
 	axl_io_win_Pipe.cpp
 	axl_io_win_Serial.cpp
-	axl_io_win_Sock.cpp
+	axl_io_win_Socket.cpp
 	)
 
 source_virtual_folder (
