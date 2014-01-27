@@ -62,31 +62,31 @@ public:
 		m_File.Close ();
 	}
 
-	bool 
+	bool
 	Open (
-		const char* pFileName, 
+		const char* pFileName,
 		uint_t Flags = 0
 		);
 
-	uint64_t 
+	uint64_t
 	GetSize () const
 	{
 		return m_File.GetSize ();
 	}
 
-	bool 
+	bool
 	SetSize (uint64_t Size)
 	{
 		return m_File.SetSize (Size);
 	}
 
-	uint64_t 
+	uint64_t
 	GetPosition () const
 	{
 		return m_File.GetPosition ();
 	}
 
-	bool 
+	bool
 	SetPosition (uint64_t Offset) const
 	{
 		return m_File.SetPosition (Offset);
@@ -94,7 +94,7 @@ public:
 
 	size_t
 	Read (
-		void* p, 
+		void* p,
 		size_t Size
 		) const
 	{
@@ -105,7 +105,7 @@ public:
 
 	size_t
 	Write (
-		const void* p, 
+		const void* p,
 		size_t Size
 		)
 	{
@@ -116,8 +116,8 @@ public:
 
 	size_t
 	ReadAt (
-		uint64_t Offset, 
-		void* p, 
+		uint64_t Offset,
+		void* p,
 		size_t Size
 		) const
 	{
@@ -126,8 +126,8 @@ public:
 
 	size_t
 	WriteAt	(
-		uint64_t Offset, 
-		const void* p, 
+		uint64_t Offset,
+		const void* p,
 		size_t Size
 		)
 	{
@@ -139,7 +139,6 @@ public:
 
 } // namespace io
 } // namespace axl
-
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
@@ -176,31 +175,31 @@ public:
 		m_File.Close ();
 	}
 
-	bool 
+	bool
 	Open (
-		const char* pFileName, 
+		const char* pFileName,
 		uint_t Flags = 0
 		);
 
-	uint64_t 
+	uint64_t
 	GetSize () const
 	{
 		return m_File.GetSize ();
 	}
 
-	bool 
+	bool
 	SetSize (uint64_t Size)
 	{
 		return m_File.SetSize (Size);
 	}
 
-	uint64_t 
+	uint64_t
 	GetPosition () const
 	{
 		return m_File.GetPosition ();
 	}
 
-	bool 
+	bool
 	SetPosition (uint64_t Offset) const
 	{
 		return m_File.SetPosition (Offset);
@@ -208,7 +207,7 @@ public:
 
 	size_t
 	Read (
-		void* p, 
+		void* p,
 		size_t Size
 		) const
 	{
@@ -217,7 +216,7 @@ public:
 
 	size_t
 	Write (
-		const void* p, 
+		const void* p,
 		size_t Size
 		)
 	{
@@ -226,8 +225,8 @@ public:
 
 	size_t
 	ReadAt (
-		uint64_t Offset, 
-		void* p, 
+		uint64_t Offset,
+		void* p,
 		size_t Size
 		) const
 	{
@@ -236,8 +235,8 @@ public:
 
 	size_t
 	WriteAt	(
-		uint64_t Offset, 
-		const void* p, 
+		uint64_t Offset,
+		const void* p,
 		size_t Size
 		)
 	{

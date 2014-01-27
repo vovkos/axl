@@ -69,7 +69,12 @@
 #	include <byteswap.h>
 #	include <sys/stat.h>
 #	include <sys/mman.h>
-#
+#	include <sys/socket.h>
+#	include <sys/ioctl.h>
+#	include <netinet/in.h>
+#	include <netinet/ip.h>
+#	include <arpa/inet.h>
+#	include <termios.h>
 #	include <libgen.h>
 #	undef basename
 #

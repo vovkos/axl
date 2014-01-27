@@ -35,6 +35,7 @@ set (
 	axl_io_MappedFile.cpp
 	axl_io_Pipe.cpp
 	axl_io_Serial.cpp
+	axl_io_Socket.cpp
 	axl_io_Transport.cpp
 	)
 
@@ -64,12 +65,18 @@ set (
 	IO_PSX_H_LIST
 	${AXL_INC_DIR}/axl_io_psx_File.h
 	${AXL_INC_DIR}/axl_io_psx_Mapping.h
+	${AXL_INC_DIR}/axl_io_psx_Pipe.h
+	${AXL_INC_DIR}/axl_io_psx_Serial.h
+	${AXL_INC_DIR}/axl_io_psx_Socket.h
 	)
 
 set (
 	IO_PSX_CPP_LIST
 	axl_io_psx_File.cpp
 	axl_io_psx_Mapping.cpp
+	axl_io_psx_Pipe.cpp
+	axl_io_psx_Serial.cpp
+	axl_io_psx_Socket.cpp
 	)
 
 source_virtual_folder (

@@ -79,6 +79,18 @@ endif ()
 #..............................................................................
 
 option (
+	AXL_BUILD_PCAP_LIB
+	"Build axl_pcap library"
+	ON
+	)
+
+if (AXL_BUILD_PCAP_LIB)
+	add_subdirectory (axl_pcap)
+endif ()
+
+#..............................................................................
+
+option (
 	AXL_BUILD_JNC_LIB
 	"Build axl_jnc library"
 	ON

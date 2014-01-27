@@ -7,7 +7,7 @@ namespace win {
 
 //.............................................................................
 
-bool 
+bool
 CSocket::Open (
 	int AddressFamily,
 	int SockKind,
@@ -18,7 +18,37 @@ CSocket::Open (
 	m_h = ::socket (AddressFamily, SockKind, Protocol);
 	return err::Complete (m_h != INVALID_SOCKET);
 }
-	
+
+int
+CSocket::GetError ()
+{
+	int Error;
+	GetOption (SOL_SOCKET, SO_ERROR, &Error, sizeof (int));
+	return Error;
+}
+
+bool
+CSocket::SetBlockingMode (bool IsBlocking)
+{
+	int Value = IsBlocking;
+	int Result = ::ioctl (m_h, FIONBIO, &Value);
+	return err::Complete (m_h != -1);
+}
+
+size_t
+CSocket::GetIncomingDataSize ()
+{
+	int Value;
+	int Result = ::ioctl (m_h, FIONREAD, &Value);
+	if (Result == -1)
+	{
+		err::SetLastSystemError ();
+		return -1;
+	}
+
+	return Value;
+}
+
 bool
 CSocket::GetAddress (sockaddr* pAddr)
 {
@@ -39,8 +69,8 @@ SOCKET
 CSocket::Accept (sockaddr* pAddr)
 {
 	int Size = sizeof (sockaddr);
-	SOCKET s = ::accept (m_h, pAddr, &Size);
-	return err::Complete (s, INVALID_SOCKET);
+	SOCKET Socket = ::accept (m_h, pAddr, &Size);
+	return err::Complete (Socket, INVALID_SOCKET);
 }
 
 size_t
@@ -74,7 +104,7 @@ CSocket::CompleteAsyncRequest (
 	return true;
 }
 
-bool 
+bool
 CSocket::WsaOpen (
 	int AddressFamily,
 	int SockKind,
@@ -85,7 +115,7 @@ CSocket::WsaOpen (
 	m_h = ::WSASocket (AddressFamily, SockKind, Protocol, NULL, 0, WSA_FLAG_OVERLAPPED);
 	return err::Complete (m_h != INVALID_SOCKET);
 }
-	
+
 SOCKET
 CSocket::WsaAccept (sockaddr* pAddr)
 {

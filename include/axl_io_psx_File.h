@@ -6,51 +6,39 @@
 
 #define _AXL_IO_PSX_FILE_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_io_psx_Fd.h"
 #include "axl_err_Error.h"
 
 namespace axl {
 namespace io {
 namespace psx {
-	
-//.............................................................................
-	
-class CCloseFd
-{
-public:
-	void
-	operator () (int fd)
-	{
-		close (fd);
-	}
-};
-	
+
 //.............................................................................
 
-class CFile: public rtl::CHandleT <int, CCloseFd, rtl::CMinusOneT <int> >
+class CFile: public CFd
 {
 public:
 	bool
 	Open (
-		const char* pFileName, 
+		const char* pFileName,
 		uint_t OpenFlags = O_RDWR | O_CREAT,
 		mode_t Mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
 
-	uint64_t 
+	uint64_t
 	GetSize () const;
 
-	bool 
+	bool
 	SetSize (uint64_t Size)
 	{
 		int Result = ftruncate64 (m_h, Size);
 		return err::Complete (Result != -1);
 	}
 
-	uint64_t 
+	uint64_t
 	GetPosition () const;
 
-	bool 
+	bool
 	SetPosition (off64_t Offset) const
 	{
 		uint64_t ActualOffset = lseek64 (m_h, Offset, SEEK_SET);
@@ -59,13 +47,13 @@ public:
 
 	size_t
 	Read (
-		void* p, 
+		void* p,
 		size_t Size
 		) const;
 
-	size_t 
+	size_t
 	Write (
-		const void* p, 
+		const void* p,
 		size_t Size
 		);
 };

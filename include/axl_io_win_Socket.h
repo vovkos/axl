@@ -30,7 +30,7 @@ public:
 class CSocket: public rtl::CHandleT <SOCKET, CCloseSocket, rtl::CMinusOneT <SOCKET> >
 {
 public:
-	bool 
+	bool
 	Open (
 		int AddressFamily,
 		int SockKind,
@@ -38,19 +38,15 @@ public:
 		);
 
 	bool
-	Bind (const sockaddr* pAddr)
-	{	
-		int Result = ::bind (m_h, pAddr, sizeof (sockaddr));
-		return err::Complete (Result != SOCKET_ERROR);
-	}
+	SetBlockingMode (bool IsBlocking);
+
+	size_t
+	GetIncomingDataSize ();
 
 	bool
-	Ioctl (
-		int Code, 
-		ulong_t Value
-		)
+	Bind (const sockaddr* pAddr)
 	{
-		int Result = ::ioctlsocket (m_h, Code, &Value);
+		int Result = ::bind (m_h, pAddr, sizeof (sockaddr));
 		return err::Complete (Result != SOCKET_ERROR);
 	}
 
@@ -59,8 +55,20 @@ public:
 
 	bool
 	GetPeerAddress (sockaddr* pAddr);
-	
-	bool 
+
+	bool
+	GetOption (
+		int Level,
+		int Option,
+		void* p,
+		size_t Size
+		)
+	{
+		int Result = ::getsockopt (m_h, Level, Option, (char*) p, (int*) &Size);
+		return err::Complete (Result != SOCKET_ERROR);
+	}
+
+	bool
 	SetOption (
 		int Level,
 		int Option,
@@ -72,7 +80,7 @@ public:
 		return err::Complete (Result != SOCKET_ERROR);
 	}
 
-	bool 
+	bool
 	EnableBroadcast (bool IsEnabled)
 	{
 		int Option = IsEnabled;
@@ -103,7 +111,7 @@ public:
 		return err::Complete (Result);
 	}
 
-	size_t 
+	size_t
 	Send (
 		const void* p,
 		size_t Size
@@ -142,14 +150,14 @@ public:
 		);
 
 public:
-	bool 
+	bool
 	WsaOpen (
 		int AddressFamily,
 		int SockKind,
 		int Protocol
 		);
 
-	bool 
+	bool
 	WsaEventSelect (
 		HANDLE hEvent,
 		int Mask
@@ -159,7 +167,7 @@ public:
 		return err::Complete (Result != SOCKET_ERROR);
 	}
 
-	bool 
+	bool
 	WsaEnumEvents (
 		WSANETWORKEVENTS* pEvents,
 		HANDLE hEvent = NULL
