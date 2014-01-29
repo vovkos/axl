@@ -40,7 +40,7 @@ CPCap::SetFilter (const char* pFilter)
 {
 	bpf_program Program;
 
-	int Result = pcap_compile (m_h, &Program, (char*) pFilter, true, PCAP_NETMASK_UNKNOWN);
+	int Result = pcap_compile (m_h, &Program, (char*) pFilter, true, 0);
 	if (Result == -1)
 	{
 		char ErrorBuffer [PCAP_ERRBUF_SIZE];

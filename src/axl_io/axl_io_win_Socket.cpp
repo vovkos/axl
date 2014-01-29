@@ -30,16 +30,16 @@ CSocket::GetError ()
 bool
 CSocket::SetBlockingMode (bool IsBlocking)
 {
-	int Value = IsBlocking;
-	int Result = ::ioctl (m_h, FIONBIO, &Value);
+	ulong_t Value = IsBlocking;
+	int Result = ::ioctlsocket (m_h, FIONBIO, &Value);
 	return err::Complete (m_h != -1);
 }
 
 size_t
 CSocket::GetIncomingDataSize ()
 {
-	int Value;
-	int Result = ::ioctl (m_h, FIONREAD, &Value);
+	ulong_t Value;
+	int Result = ::ioctlsocket (m_h, FIONREAD, &Value);
 	if (Result == -1)
 	{
 		err::SetLastSystemError ();

@@ -37,6 +37,9 @@ public:
 		int Protocol
 		);
 
+	int
+	GetError ();
+
 	bool
 	SetBlockingMode (bool IsBlocking);
 
