@@ -55,6 +55,8 @@ message (STATUS "Path to LLVM cmake modules: ${PATH_LLVM_CMAKE_DIR}")
 message (STATUS "Path to LLVM includes:      ${PATH_LLVM_INC_DIR}")
 message (STATUS "Path to LLVM includes (2):  ${PATH_LLVM_INC_DIR_2}")
 message (STATUS "Path to LLVM libraries:     ${PATH_LLVM_LIB_DIR}")
+message (STATUS "Path to PCap includes:      ${PATH_PCAP_INC_DIR}")
+message (STATUS "Path to PCap libraries:     ${PATH_PCAP_LIB_DIR}")
 
 include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
 

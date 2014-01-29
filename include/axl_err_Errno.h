@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2013. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_ERR_ERRORNO_H
 
@@ -25,7 +25,7 @@ class CErrnoProvider: public CErrorProvider
 {
 public:
 	static
-	rtl::CString 
+	rtl::CString
 	GetErrorDescription (int Error)
 	{
 		char Buffer [512] = { 0 };
@@ -37,8 +37,8 @@ public:
 #endif
 	}
 
-	virtual 
-	rtl::CString 
+	virtual
+	rtl::CString
 	GetErrorDescription (const TError* pError)
 	{
 		return GetErrorDescription (pError->m_Code);
@@ -59,7 +59,7 @@ public:
 		Create (Error);
 	}
 
-	TError* 
+	TError*
 	Create (int Error);
 };
 
