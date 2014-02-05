@@ -43,9 +43,7 @@ CPCap::SetFilter (const char* pFilter)
 	int Result = pcap_compile (m_h, &Program, (char*) pFilter, true, 0);
 	if (Result == -1)
 	{
-		char ErrorBuffer [PCAP_ERRBUF_SIZE];
-		pcap_perror (m_h, ErrorBuffer);
-		err::SetStringError (ErrorBuffer);
+		err::SetStringError (pcap_geterr (m_h));
 		return false;
 	}
 
@@ -80,9 +78,7 @@ CPCap::Read (
 	int Result = pcap_next_ex (m_h, &pHdr, &pData);
 	if (Result == -1)
 	{
-		char ErrorBuffer [PCAP_ERRBUF_SIZE];
-		pcap_perror (m_h, ErrorBuffer);
-		err::SetStringError (ErrorBuffer);
+		err::SetStringError (pcap_geterr (m_h));
 		return -1;
 	}
 
@@ -107,9 +103,7 @@ CPCap::Write (
 #endif
 	if (Result == -1)
 	{
-		char ErrorBuffer [PCAP_ERRBUF_SIZE];
-		pcap_perror (m_h, ErrorBuffer);
-		err::SetStringError (ErrorBuffer);
+		err::SetStringError (pcap_geterr (m_h));
 		return -1;
 	}
 
