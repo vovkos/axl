@@ -33,31 +33,3 @@ if (${QT_FOUND})
 endif ()
 
 #..............................................................................
-
-if (WIN32)
-	option (
-		AXL_BUILD_JNC_MFC_TEST
-		"Build JncMfcTest"
-		OFF
-		)
-
-	if (AXL_BUILD_JNC_MFC_TEST)
-		add_subdirectory (JncMfcTest)
-	endif ()
-endif ()
-
-#..............................................................................
-
-if (${QT_FOUND})
-	option (
-		AXL_BUILD_JNC_QT_TEST
-		"Build JncQtTest"
-		ON
-		)
-
-	if (AXL_BUILD_JNC_QT_TEST)
-		add_subdirectory (JncQtTest)
-	endif ()
-endif ()
-
-#..............................................................................

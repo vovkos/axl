@@ -100,7 +100,11 @@ CPCap::Write (
 	size_t Size
 	)
 {
+#if (_AXL_ENV == AXL_ENV_WIN)
+	int Result = pcap_sendpacket (m_h, (const u_char*) p, (int) Size);
+#else
 	int Result = pcap_inject (m_h, p, (int) Size);
+#endif
 	if (Result == -1)
 	{
 		char ErrorBuffer [PCAP_ERRBUF_SIZE];
@@ -109,7 +113,7 @@ CPCap::Write (
 		return -1;
 	}
 
-	return Result;
+	return Size;
 }
 
 //.............................................................................

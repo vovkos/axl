@@ -68,6 +68,17 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum EBinTreeFindEx
+{
+	EBinTreeFindEx_Eq = 0,
+	EBinTreeFindEx_Lt,
+	EBinTreeFindEx_Le,
+	EBinTreeFindEx_Gt,
+	EBinTreeFindEx_Ge,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <
 	typename T,
 	typename TKey,
@@ -134,30 +145,50 @@ public:
 		return NULL;
 	}
 
-	template <class R>
 	CIterator 
-	FindEx (const CKey& Key) const
+	FindEx (
+		const CKey& Key,
+		EBinTreeFindEx FindExKind
+		) const
 	{
-		CNode* pResult = NULL;
 		CNode* pNode = m_pRoot;
+		CNode* pPrevNode;
+		int PrevCmp;
 
 		if (IsEmpty ())
 			return NULL;
 
 		while (pNode) 
 		{
-			int Cmp = CCmp () (pNode->m_Key, Key); // invert arg key and node key!
-			
-			if (R () (Cmp, 0))
-				pResult = pNode;
-
+			int Cmp = CCmp () (Key, pNode->m_Key);			
 			if (Cmp == 0) 
 				break; // exact match
 
-			pNode = Cmp < 0 ? pNode->m_pRight : pNode->m_pLeft; // invert arg key and node key!
+			pPrevNode = pNode;
+			PrevCmp = Cmp;
+
+			pNode = Cmp < 0 ? pNode->m_pLeft : pNode->m_pRight;
 		}
 
-		return pResult;
+		ASSERT (pNode || pPrevNode);
+		switch (FindExKind)
+		{
+		case EBinTreeFindEx_Lt:
+			return pNode ? pNode->m_pLeft : PrevCmp > 0 ? pPrevNode : CIterator (pPrevNode).GetPrev ();
+
+		case EBinTreeFindEx_Le:
+			return pNode ? pNode : PrevCmp > 0 ? pPrevNode : CIterator (pPrevNode).GetPrev ();
+
+		case EBinTreeFindEx_Gt:
+			return pNode ? pNode->m_pRight : PrevCmp < 0 ? pPrevNode : CIterator (pPrevNode).GetNext ();
+
+		case EBinTreeFindEx_Ge:
+			return pNode ? pNode : PrevCmp < 0 ? pPrevNode : CIterator (pPrevNode).GetNext ();
+		
+		case EBinTreeFindEx_Eq:
+		default:
+			return pNode;
+		}		
 	}
 
 	CIterator 

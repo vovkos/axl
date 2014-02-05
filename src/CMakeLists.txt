@@ -72,72 +72,16 @@ option (
 	ON
 	)
 
+if (${PCAP_FOUND})
+	option (
+		AXL_BUILD_IO_PCAP
+		"Build PCap wrappers for axl_io library"
+		ON
+		)
+endif ()
+
 if (AXL_BUILD_IO_LIB)
 	add_subdirectory (axl_io)
-endif ()
-
-#..............................................................................
-
-option (
-	AXL_BUILD_PCAP_LIB
-	"Build axl_pcap library"
-	ON
-	)
-
-if (AXL_BUILD_PCAP_LIB)
-	add_subdirectory (axl_pcap)
-endif ()
-
-#..............................................................................
-
-option (
-	AXL_BUILD_JNC_LIB
-	"Build axl_jnc library"
-	ON
-	)
-
-if (AXL_BUILD_JNC_LIB)
-	add_subdirectory (axl_jnc)
-
-	add_subdirectory (
-		${AXL_ROOT_DIR}/samples/jnc
-		${CMAKE_CURRENT_BINARY_DIR}/jnc_demos
-		)
-
-	add_subdirectory (
-		${AXL_ROOT_DIR}/tests/jnc
-		${CMAKE_CURRENT_BINARY_DIR}/jnc_tests
-		)
-endif ()
-
-#..............................................................................
-
-option (
-	AXL_BUILD_JNCC
-	"Build axl_jncc (Jancy command-line compiler)"
-	ON
-	)
-
-if (AXL_BUILD_JNCC)
-	add_subdirectory (axl_jncc)
-endif ()
-
-#..............................................................................
-
-option (
-	AXL_BUILD_LOG_LIB
-	"Build axl_log library"
-	ON
-	)
-
-option (
-	AXL_BUILD_LOG_JANCY
-	"Build Jancy plugin drivers for axl_log library"
-	ON
-	)
-
-if (AXL_BUILD_LOG_LIB)
-	add_subdirectory (axl_log)
 endif ()
 
 #..............................................................................
@@ -150,30 +94,6 @@ option (
 
 if (AXL_BUILD_LUA_LIB)
 	add_subdirectory (axl_lua)
-endif ()
-
-#..............................................................................
-
-option (
-	AXL_BUILD_PARSE_LIB
-	"Build axl_parse library"
-	ON
-	)
-
-if (AXL_BUILD_PARSE_LIB)
-	add_subdirectory (axl_parse)
-endif ()
-
-#..............................................................................
-
-option (
-	AXL_BUILD_PG
-	"Build axl_pg (LL(k) parser generator)"
-	ON
-	)
-
-if (AXL_BUILD_PG)
-	add_subdirectory (axl_pg)
 endif ()
 
 #..............................................................................

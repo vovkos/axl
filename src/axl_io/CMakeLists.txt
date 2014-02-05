@@ -18,6 +18,7 @@ set (
 	${AXL_INC_DIR}/axl_io_FileTransport.h
 	${AXL_INC_DIR}/axl_io_ListenerSock.h
 	${AXL_INC_DIR}/axl_io_MappedFile.h
+	${AXL_INC_DIR}/axl_io_PCap.h
 	${AXL_INC_DIR}/axl_io_Pipe.h
 	${AXL_INC_DIR}/axl_io_Serial.h
 	${AXL_INC_DIR}/axl_io_SockAddr.h
@@ -33,11 +34,16 @@ set (
 	axl_io_FilePathUtils.cpp
 	axl_io_ListenerSock.cpp
 	axl_io_MappedFile.cpp
+	axl_io_PCap.cpp
 	axl_io_Pipe.cpp
 	axl_io_Serial.cpp
 	axl_io_Socket.cpp
 	axl_io_Transport.cpp
 	)
+
+if (NOT AXL_BUILD_IO_PCAP)
+	exclude_from_build (axl_io_PCap.cpp)
+endif ()
 
 # temporarily exclude until i port axl_exe
 
@@ -142,6 +148,11 @@ source_virtual_folder (
 #
 # axl_io library
 #
+
+if (AXL_BUILD_IO_PCAP)
+	include_directories (${PATH_PCAP_INC_DIR})
+	add_definitions (-D_AXL_IO_PCAP)
+endif ()
 
 add_library (
 	axl_io

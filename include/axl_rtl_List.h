@@ -49,26 +49,20 @@ public:
 	T& 
 	operator ++ ()
 	{ 
-		if (m_p) 
-			m_p = m_p->m_pNext; 
-
-		return *(T*) this;
+		return Next ();
 	}
 
 	T& 
 	operator -- ()
 	{ 
-		if (m_p) 
-			m_p = m_p->m_pPrev; 
-
-		return *(T*) this;
+		return Prev ();
 	}
 
 	T
 	operator ++ (int) // post increment
 	{ 
 		T Old = *(T*) this;
-		operator ++ ();
+		Next ();
 		return Old;
 	}
 
@@ -76,7 +70,7 @@ public:
 	operator -- (int) // post decrement
 	{ 
 		T Old = *(T*) this;
-		operator -- ();
+		Prev ();
 		return Old;
 	}
 
@@ -105,6 +99,24 @@ public:
 	}
 
 	T& 
+	Next ()
+	{	
+		if (m_p) 
+			m_p = m_p->m_pNext; 
+
+		return *(T*) this;
+	}
+
+	T& 
+	Prev ()
+	{	
+		if (m_p) 
+			m_p = m_p->m_pPrev; 
+
+		return *(T*) this;
+	}
+
+	T& 
 	Inc (intptr_t Count)
 	{	
 		intptr_t i;
@@ -117,6 +129,18 @@ public:
 				m_p = m_p->m_pPrev;
 
 		return *(T*) this;
+	}
+
+	T 
+	GetNext () const
+	{ 
+		return CIteratorBaseT (*this).Next (); 
+	}
+
+	T 
+	GetPrev () const
+	{ 
+		return CIteratorBaseT (*this).Prev (); 
 	}
 
 	T 

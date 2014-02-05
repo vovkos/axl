@@ -13,6 +13,7 @@ namespace mt {
 
 //.............................................................................
 
+inline
 bool
 CreateProcess (const char* pCommandLine)
 {	

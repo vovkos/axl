@@ -182,7 +182,7 @@ public: \
 
 #define AXL_LEX_END_TOKEN_NAME_MAP_EX(Default) \
 		default: \
-			return isprint (Token) ? axl::rtl::GetCharLiteral ((uchar_t) Token) : Default; \
+			return isprint ((uchar_t) Token) ? axl::rtl::GetCharLiteral ((uchar_t) Token) : Default; \
 		} \
 	} \
 };

@@ -2,6 +2,7 @@
 #include "axl_io_MappedFile.h"
 #include "axl_g_Module.h"
 #include "axl_err_Error.h"
+#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace io {
@@ -25,7 +26,7 @@ CMappedViewMgr::Find (
 
 	// ok, now try to find existing view using the view map...
 
-	CViewMap::CIterator It = m_ViewMap.FindEx <rtl::CLeT <size_t> > (Begin);
+	CViewMap::CIterator It = m_ViewMap.FindEx (Begin, rtl::EBinTreeFindEx_Le);
 	if (!It)
 		return NULL;
 
@@ -43,7 +44,9 @@ CMappedViewMgr::Find (
 void*
 CMappedViewMgr::View (
 	uint64_t Begin,
-	uint64_t End
+	uint64_t End,
+	uint64_t OrigBegin,
+	uint64_t OrigEnd
 	)
 {
 	TViewEntry* pViewEntry = AXL_MEM_NEW (TViewEntry);
@@ -71,7 +74,7 @@ CMappedViewMgr::View (
 			Begin
 			);
 #endif
-
+	
 	if (!p)
 	{
 		AXL_MEM_DELETE (pViewEntry);
@@ -324,11 +327,11 @@ CMappedFile::ViewImpl (
 
 	if (IsPermanent)
 	{
-		p = m_PermanentViewMgr.View (ViewBegin, ViewEnd);
+		p = m_PermanentViewMgr.View (ViewBegin, ViewEnd, Offset, End);
 	}
 	else
 	{
-		p = m_DynamicViewMgr.View (ViewBegin, ViewEnd);
+		p = m_DynamicViewMgr.View (ViewBegin, ViewEnd, Offset, End);
 		m_DynamicViewMgr.LimitViewCount (m_MaxDynamicViewCount);
 	}
 

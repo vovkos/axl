@@ -151,7 +151,7 @@ CTextPaint::PaintBinAsciiPart (size_t Size)
 	char* p = m_BufferString.GetBuffer ();
 
 	for (size_t i = 0; i < Length; i++)
-		if (!isprint (p [i]))
+		if (!isprint ((uchar_t) p [i]))
 			p [i] = '.';
 
 	TRect Rect = CalcTextRect (m_BufferString, Length);

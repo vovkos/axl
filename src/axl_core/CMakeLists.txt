@@ -35,6 +35,7 @@ set (
 	${AXL_INC_DIR}/axl_err_Error.h
 	${AXL_INC_DIR}/axl_err_ErrorMgr.h
 	${AXL_INC_DIR}/axl_err_NtError.h
+	${AXL_INC_DIR}/axl_err_ParseError.h
 	${AXL_INC_DIR}/axl_err_WinError.h
 	)
 
@@ -44,6 +45,7 @@ set (
 	axl_err_Error.cpp
 	axl_err_ErrorMgr.cpp
 	axl_err_NtError.cpp
+	axl_err_ParseError.cpp
 	axl_err_WinError.cpp
 	)
 
@@ -108,6 +110,26 @@ source_virtual_folder (
 if (NOT WIN32)
 	exclude_from_build (${G_WIN_CPP_LIST})
 endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# lex folder
+#
+
+set (
+	LEX_H_LIST
+	${AXL_INC_DIR}/axl_lex_Lexer.h
+	${AXL_INC_DIR}/axl_lex_RagelLexer.h
+	${AXL_INC_DIR}/axl_lex_Token.h
+	)
+
+set (LEX_CPP_LIST)
+
+source_virtual_folder (
+	lex
+	${LEX_H_LIST}
+	${LEX_CPP_LIST}
+	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -350,6 +372,8 @@ add_library (
 	${G_CPP_LIST}
 	${G_WIN_H_LIST}
 	${G_WIN_CPP_LIST}
+	${LEX_H_LIST}
+	${LEX_CPP_LIST}
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
 	${MT_H_LIST}

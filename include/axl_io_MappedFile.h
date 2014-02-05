@@ -68,7 +68,9 @@ public:
 	void*
 	View (
 		uint64_t Begin,
-		uint64_t End
+		uint64_t End,
+		uint64_t OrigBegin,
+		uint64_t OrigEnd
 		);	
 
 	void

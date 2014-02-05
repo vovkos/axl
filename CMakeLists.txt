@@ -51,16 +51,12 @@ include (CMakePaths)
 message (STATUS "Path to RAGEL executable:   ${PATH_RAGEL_EXE}")
 message (STATUS "Path to LUA includes:       ${PATH_LUA_INC_DIR}")
 message (STATUS "Path to LUA libraries:      ${PATH_LUA_LIB_DIR}")
-message (STATUS "Path to LLVM cmake modules: ${PATH_LLVM_CMAKE_DIR}")
-message (STATUS "Path to LLVM includes:      ${PATH_LLVM_INC_DIR}")
-message (STATUS "Path to LLVM includes (2):  ${PATH_LLVM_INC_DIR_2}")
-message (STATUS "Path to LLVM libraries:     ${PATH_LLVM_LIB_DIR}")
-message (STATUS "Path to PCap includes:      ${PATH_PCAP_INC_DIR}")
-message (STATUS "Path to PCap libraries:     ${PATH_PCAP_LIB_DIR}")
 
-include ("${PATH_LLVM_CMAKE_DIR}/LLVMConfig.cmake")
-
-# QT is optional
+if (NOT "${PATH_PCAP_INC_DIR}" STREQUAL "")
+	message (STATUS "Path to PCap includes:      ${PATH_PCAP_INC_DIR}")
+	message (STATUS "Path to PCap libraries:     ${PATH_PCAP_LIB_DIR}")
+	set (PCAP_FOUND TRUE)
+endif ()
 
 if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")
 	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
@@ -81,8 +77,6 @@ endif ()
 
 set (AXL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set (AXL_INC_DIR  ${AXL_ROOT_DIR}/include)
-set (AXL_SRC_DIR  ${AXL_ROOT_DIR}/src)
-set (AXL_PG_FRAME_DIR ${AXL_ROOT_DIR}/pgframe)
 
 option (
 	AXL_USE_PCH
