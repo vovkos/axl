@@ -140,6 +140,27 @@ TTime::SetTimestampImpl (
 
 }
 
+/*
+	%h	24-hour
+	%H	12-hour
+	%m	minute
+	%s	second
+	%l	millisecond
+	%c	microsecond
+	%p	p/a (lower-case pm/am)
+	%P	P/A (upper-case PM/AM)
+	%y	2-digit year
+	%Y	4-digit year
+	%D	day of month (leading zero if one-digit)
+	%d	day of month (no leading-zero)
+	%M	month number (leading zero if one-digit)
+	%o	month number (no leading-zero)
+	%n	month name (short)
+	%N	month name (full)
+	%w	day of week (short)
+	%W	day of week (full)
+*/
+
 size_t
 TTime::Format (
 	rtl::CString* pString,
