@@ -17,8 +17,8 @@ CPipe::Create ()
 	if (Result == -1)
 		return err::FailWithLastSystemError ();
 
-	m_FileA.Attach (fd [0]);
-	m_FileB.Attach (fd [1]);
+	m_ReadFile.Attach (fd [0]);
+	m_WriteFile.Attach (fd [1]);
 	return true;
 }
 

@@ -17,8 +17,8 @@ namespace psx {
 class CPipe
 {
 public:
-	CFile m_FileA;
-	CFile m_FileB;
+	CFile m_ReadFile;
+	CFile m_WriteFile;
 
 public:
 	bool
@@ -27,8 +27,26 @@ public:
 	void
 	Close ()
 	{
-		m_FileA.Close ();
-		m_FileB.Close ();
+		m_ReadFile.Close ();
+		m_WriteFile.Close ();
+	}
+
+	size_t
+	Read (
+		void* p,
+		size_t Size
+		) const
+	{
+		return m_ReadFile.Read (p, Size);
+	}
+
+	size_t
+	Write (
+		const void* p,
+		size_t Size
+		)
+	{
+		return m_WriteFile.Write (p, Size);
 	}
 };
 
