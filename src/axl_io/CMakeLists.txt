@@ -22,6 +22,7 @@ set (
 	${AXL_INC_DIR}/axl_io_Pipe.h
 	${AXL_INC_DIR}/axl_io_Serial.h
 	${AXL_INC_DIR}/axl_io_SockAddr.h
+	${AXL_INC_DIR}/axl_io_Socket.h
 	${AXL_INC_DIR}/axl_io_SocketTransport.h
 	${AXL_INC_DIR}/axl_io_Transport.h
 	)
@@ -52,7 +53,6 @@ exclude_from_build (
 	axl_io_DgramSock.cpp
 	axl_io_ListenerSock.cpp
 	axl_io_Pipe.cpp
-	axl_io_Serial.cpp
 	axl_io_Transport.cpp
 	)
 

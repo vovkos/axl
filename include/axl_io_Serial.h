@@ -6,10 +6,11 @@
 
 #define _AXL_IO_SERIAL_H
 
-#include "axl_io_Transport.h"
-#include "axl_exe_WorkerThread.h"
-
-#include "axl_io_win_Serial.h"
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include "axl_io_win_Serial.h"
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include "axl_io_psx_Serial.h"
+#endif
 
 namespace axl {
 namespace io {
@@ -37,10 +38,19 @@ enum ESerialBaud
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialFlow
+enum ESerialDataBits
 {
-	ESerialFlow_None = 0,
-	ESerialFlow_RtsCts,
+	ESerialDataBits_7 = 7,
+	ESerialDataBits_8 = 8,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum ESerialStopBits
+{
+	ESerialStopBits_1  = 0,
+	ESerialStopBits_15 = 1,
+	ESerialStopBits_2  = 2,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -56,87 +66,81 @@ enum ESerialParity
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialData
+enum ESerialFlowControl
 {
-	ESerialData_7 = 7,
-	ESerialData_8 = 8,
+	ESerialFlowControl_None = 0,
+	ESerialFlowControl_RtsCts,
+	ESerialFlowControl_XonXoff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialStop
+enum ESerialLine
 {
-	ESerialStop_1  = 0,
-	ESerialStop_15 = 1,
-	ESerialStop_2  = 2,
+	ESerialLine_Rts  = 0x01,
+	ESerialLine_Dtr  = 0x02,
+	ESerialLine_Cts  = 0x10,
+	ESerialLine_Dsr  = 0x20,
+	ESerialLine_Ring = 0x40,
+	ESerialLine_Dcd  = 0x80,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialLines
+enum ESerialSetting
 {
-	ESerialLines_Dtr     = 0x01,
-	ESerialLines_Rts     = 0x02,
-	ESerialLines_Dsr     = 0x04,
-	ESerialLines_Cts     = 0x08,
-	ESerialLines_Dcd     = 0x10,
-	ESerialLines_Ring    = 0x20,
-
-	ESerialLines_Control = 0x03,
-	ESerialLines_Status  = 0x3c,
-	ESerialLines_All     = 0xff,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum ESerialSettings
-{
-	ESerialSettings_BaudRate        = 0x01,
-	ESerialSettings_FlowControl     = 0x02,
-	ESerialSettings_Parity          = 0x04,
-	ESerialSettings_DataBits        = 0x08,
-	ESerialSettings_StopBits        = 0x10,
-	ESerialSettings_IntervalTimeout = 0x20,
-	ESerialSettings_All             = 0xff,
+	ESerialSetting_BaudRate        = 0x01,
+	ESerialSetting_DataBits        = 0x02,
+	ESerialSetting_StopBits        = 0x04,
+	ESerialSetting_Parity          = 0x08,
+	ESerialSetting_FlowControl     = 0x10,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct TSerialSettings
 {
-	ESerialBaud m_BaudRate;
-	ESerialFlow m_FlowControl;
+	uint_t m_BaudRate;
+	uint_t m_DataBits;
+	ESerialStopBits m_StopBits;
 	ESerialParity m_Parity;
-	ESerialData m_DataBits;
-	ESerialStop m_StopBits;
-	uint_t m_IntervalTimeout;
+	ESerialFlowControl m_FlowControl;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CSerial
 {
-protected:
-	g::win::CFileHandle m_Serial;
-	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
-	exe::CFunction m_OnEvent;
+public:
+#if (_AXL_ENV == AXL_ENV_WIN)
+	win::CSerial m_Serial;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	psx::CSerial m_Serial;
+#endif
 
 public:
-	~CSerial ()
+	bool
+	IsOpen ()
 	{
-		Close ();
+		return m_Serial.IsOpen ();
 	}
 
 	bool 
-	Open (const char* pName);
+	Open (const char* pName)
+	{
+		return m_Serial.Open (pName, FILE_FLAG_OVERLAPPED);
+	}
 
 	void 
-	Close ();
+	Close ()
+	{
+		return m_Serial.Close ();
+	}
 
 	bool 
 	SetSettings (
 		const TSerialSettings* pSettings,
-		int Mask = 0
+		uint_t Mask = -1
 		);
 
 	bool 
@@ -144,20 +148,26 @@ public:
 
 	bool
 	SetControlLines (
-		int Lines,
-		int Mask
+		uint_t Lines,
+		uint_t Mask = -1
 		);
 
-	int
+	uint_t 
 	GetControlLines ();
 
-	int
+	uint_t 
 	GetStatusLines ();
 
-	bool
-	SetEventHandler (
-		int Mask,
-		const exe::CFunction& OnEvent
+	size_t 
+	Read (
+		void* p,
+		size_t Size
+		);
+
+	size_t 
+	Write (
+		const void* p,
+		size_t Size
 		);
 };
 

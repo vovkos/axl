@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_io_win_Serial.h"
+#include "axl_rtl_String.h"
 
 namespace axl {
 namespace io {
@@ -8,22 +9,26 @@ namespace win {
 //.............................................................................
 
 bool 
-CSerial::Open (const char* pName)
+CSerial::Open (
+	const char* pName,
+	uint_t Flags
+	)
 {
 	Close ();
 
 	if (strncmp (pName, "\\\\.\\", 4) == 0)
 		pName += 4;
 	
-	wchar_t DeviceName [128] = { 0 }; 
-	_snwprintf (DeviceName, countof (DeviceName), L"\\\\.\\%S", pName);
+	wchar_t Buffer [256];
+	rtl::CStringT <wchar_t> DeviceName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	DeviceName.Format (L"\\\\.\\%S", pName);
 
 	m_h = ::CreateFileW (
 		DeviceName, 
 		GENERIC_READ | GENERIC_WRITE, 
 		0, NULL, 
 		OPEN_EXISTING, 
-		FILE_FLAG_OVERLAPPED, 
+		Flags, 
 		NULL
 		);
 
@@ -54,6 +59,47 @@ CSerial::GetWaitMask ()
 		return err::FailWithLastSystemError (-1);
 
 	return Mask;
+}
+
+dword_t
+CSerial::Read (
+	void* p, 
+	dword_t Size 
+	)
+{
+	dword_t ActualSize;
+	bool_t Result = Read (p, Size, &ActualSize, NULL);
+	return Result ? ActualSize : -1;
+}
+
+dword_t
+CSerial::Write (
+	const void* p, 
+	dword_t Size
+	)
+{
+	dword_t ActualSize;
+	bool_t Result = Write (p, Size, &ActualSize, NULL);
+	return Result ? ActualSize : -1;
+}
+
+bool
+CSerial::CompleteAsyncRequest (
+	bool_t Result,
+	OVERLAPPED* pOverlapped
+	)
+{
+	if (!Result)
+	{
+		dword_t Error = ::GetLastError ();
+		if (!pOverlapped || Error != ERROR_IO_PENDING)
+		{
+			err::SetError (Error);
+			return false;
+		}
+	}
+
+	return true;
 }
 
 //.............................................................................

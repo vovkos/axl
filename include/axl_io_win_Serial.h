@@ -19,19 +19,22 @@ class CSerial: public g::win::CFileHandle
 {
 public:
 	bool 
-	Open (const char* pName);
-
-	bool 
-	SetSettings (const DCB* pDcb)
-	{
-		bool_t Result = SetCommState (m_h, (DCB*) pDcb);
-		return err::Complete (Result);
-	}
+	Open (
+		const char* pName,
+		uint_t Flags = 0
+		);
 
 	bool 
 	GetSettings (DCB* pDcb)
 	{
-		bool_t Result = GetCommState (m_h, pDcb);
+		bool_t Result = ::GetCommState (m_h, pDcb);
+		return err::Complete (Result);
+	}
+
+	bool 
+	SetSettings (const DCB* pDcb)
+	{
+		bool_t Result = ::SetCommState (m_h, (DCB*) pDcb);
 		return err::Complete (Result);
 	}
 
@@ -74,8 +77,20 @@ public:
 		)
 	{
 		bool_t Result = ::WaitCommEvent (m_h, pEvent, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
+
+	dword_t
+	Read (
+		void* p, 
+		dword_t Size
+		);
+
+	dword_t
+	Write (
+		const void* p, 
+		dword_t Size
+		);
 
 	bool 
 	Read (
@@ -86,7 +101,7 @@ public:
 		)
 	{
 		bool_t Result = ::ReadFile (m_h, p, Size, pActualSize, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool 
@@ -98,9 +113,17 @@ public:
 		)
 	{
 		bool_t Result = ::WriteFile (m_h, p, Size, pActualSize, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
+
+protected:
+	bool
+	CompleteAsyncRequest (
+		bool_t Result,
+		OVERLAPPED* pOverlapped
+		);
 };
+
 
 //.............................................................................
 
