@@ -76,41 +76,11 @@ CSerial::GetSettings (TSerialSettings* pSettings)
 	return true;
 }
 
-bool
-CSerial::SetControlLines (
-	uint_t Lines,
-	uint_t Mask
-	)
-{
-	bool Result;
-
-	if (Mask & ESerialLine_Dtr)
-	{
-		Result = m_Serial.SetDtr ((Lines & ESerialLine_Dtr) != 0);
-		if (!Result)
-			return false;
-	}
-
-	if (Mask & ESerialLine_Rts)
-	{
-		Result = m_Serial.SetRts ((Lines & ESerialLine_Rts) != 0);
-		if (!Result)
-			return false;
-	}
-
-	return true;
-}
-
-uint_t 
-CSerial::GetControlLines ()
-{
-	return 0;
-} 
-
 uint_t 
 CSerial::GetStatusLines ()
 {
-	return m_Serial.GetStatusLines ();
+	uint_t Lines = m_Serial.GetStatusLines ();
+	return Lines != -1 ? (Lines & 0xf0) >> 4 : -1;
 }
 
 size_t 

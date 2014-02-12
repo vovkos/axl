@@ -75,14 +75,12 @@ enum ESerialFlowControl
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialLine
+enum ESerialStatusLine
 {
-	ESerialLine_Rts  = 0x01,
-	ESerialLine_Dtr  = 0x02,
-	ESerialLine_Cts  = 0x10,
-	ESerialLine_Dsr  = 0x20,
-	ESerialLine_Ring = 0x40,
-	ESerialLine_Dcd  = 0x80,
+	ESerialStatusLine_Cts  = 0x01,
+	ESerialStatusLine_Dsr  = 0x02,
+	ESerialStatusLine_Ring = 0x04,
+	ESerialStatusLine_Dcd  = 0x08,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -146,14 +144,17 @@ public:
 	bool 
 	GetSettings (TSerialSettings* pSettings);
 
-	bool
-	SetControlLines (
-		uint_t Lines,
-		uint_t Mask = -1
-		);
+	bool 
+	SetDtr (bool IsSet)
+	{
+		return m_Serial.SetDtr (IsSet);
+	}
 
-	uint_t 
-	GetControlLines ();
+	bool 
+	SetRts (bool IsSet)
+	{
+		return m_Serial.SetRts (IsSet);
+	}
 
 	uint_t 
 	GetStatusLines ();
