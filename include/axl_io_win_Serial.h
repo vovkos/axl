@@ -14,31 +14,31 @@ namespace io {
 namespace win {
 
 //.............................................................................
-	
+
 class CSerial: public g::win::CFileHandle
 {
 public:
-	bool 
+	bool
 	Open (
 		const char* pName,
 		uint_t Flags = 0
 		);
 
-	bool 
+	bool
 	GetSettings (DCB* pDcb)
 	{
 		bool_t Result = ::GetCommState (m_h, pDcb);
 		return err::Complete (Result);
 	}
 
-	bool 
+	bool
 	SetSettings (const DCB* pDcb)
 	{
 		bool_t Result = ::SetCommState (m_h, (DCB*) pDcb);
 		return err::Complete (Result);
 	}
 
-	bool 
+	bool
 	Escape (uint_t Function)
 	{
 		bool_t Result = ::EscapeCommFunction (m_h, Function);
@@ -48,13 +48,13 @@ public:
 	dword_t
 	GetStatusLines ();
 
-	bool 
+	bool
 	SetDtr (bool IsSet)
 	{
 		return Escape (IsSet ? SETDTR : CLRDTR);
 	}
 
-	bool 
+	bool
 	SetRts (bool IsSet)
 	{
 		return Escape (IsSet ? SETRTS : CLRRTS);
@@ -82,20 +82,20 @@ public:
 
 	dword_t
 	Read (
-		void* p, 
+		void* p,
 		dword_t Size
 		);
 
 	dword_t
 	Write (
-		const void* p, 
+		const void* p,
 		dword_t Size
 		);
 
-	bool 
+	bool
 	Read (
-		void* p, 
-		dword_t Size, 
+		void* p,
+		dword_t Size,
 		dword_t* pActualSize,
 		OVERLAPPED* pOverlapped
 		)
@@ -104,9 +104,9 @@ public:
 		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
-	bool 
+	bool
 	Write (
-		const void* p, 
+		const void* p,
 		dword_t Size,
 		dword_t* pActualSize,
 		OVERLAPPED* pOverlapped
@@ -123,7 +123,6 @@ protected:
 		OVERLAPPED* pOverlapped
 		);
 };
-
 
 //.............................................................................
 

@@ -9,7 +9,7 @@ namespace psx {
 
 bool
 CFile::Open (
-	const char* pFileName, 
+	const char* pFileName,
 	uint_t OpenFlags,
 	mode_t Mode
 	)
@@ -20,7 +20,7 @@ CFile::Open (
 	return err::Complete (m_h != -1);
 }
 
-uint64_t 
+uint64_t
 CFile::GetSize () const
 {
 	struct stat64 Stat;
@@ -34,7 +34,7 @@ CFile::GetSize () const
 	return Stat.st_size;
 }
 
-uint64_t 
+uint64_t
 CFile::GetPosition () const
 {
 	uint64_t Offset = lseek64 (m_h, 0, SEEK_CUR);
@@ -46,7 +46,7 @@ CFile::GetPosition () const
 
 size_t
 CFile::Read (
-	void* p, 
+	void* p,
 	size_t Size
 	) const
 {
@@ -57,9 +57,9 @@ CFile::Read (
 	return ActualSize;
 }
 
-size_t 
+size_t
 CFile::Write (
-	const void* p, 
+	const void* p,
 	size_t Size
 	)
 {
@@ -69,6 +69,7 @@ CFile::Write (
 
 	return ActualSize;
 }
+
 //.............................................................................
 
 } // namespace psx

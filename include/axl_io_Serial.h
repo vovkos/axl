@@ -123,53 +123,78 @@ public:
 		return m_Serial.IsOpen ();
 	}
 
-	bool 
+	bool
 	Open (const char* pName)
 	{
+#if (_AXL_ENV == AXL_ENV_WIN)
 		return m_Serial.Open (pName, FILE_FLAG_OVERLAPPED);
+#else
+		return m_Serial.Open (pName);
+#endif
 	}
 
-	void 
+	void
 	Close ()
 	{
 		return m_Serial.Close ();
 	}
 
-	bool 
+	bool
 	SetSettings (
 		const TSerialSettings* pSettings,
 		uint_t Mask = -1
 		);
 
-	bool 
+	bool
 	GetSettings (TSerialSettings* pSettings);
 
-	bool 
+	bool
 	SetDtr (bool IsSet)
 	{
 		return m_Serial.SetDtr (IsSet);
 	}
 
-	bool 
+	bool
 	SetRts (bool IsSet)
 	{
 		return m_Serial.SetRts (IsSet);
 	}
 
-	uint_t 
+	uint_t
 	GetStatusLines ();
 
-	size_t 
+#if (_AXL_ENV == AXL_ENV_WIN)
+	size_t
 	Read (
 		void* p,
 		size_t Size
 		);
 
-	size_t 
+	size_t
 	Write (
 		const void* p,
 		size_t Size
 		);
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	size_t
+	Read (
+		void* p,
+		size_t Size
+		)
+	{
+		return m_Serial.Read (p, Size);
+	}
+
+	size_t
+	Write (
+		const void* p,
+		size_t Size
+		)
+	{
+		return m_Serial.Write (p, Size);
+	}
+#endif
+
 };
 
 //.............................................................................
