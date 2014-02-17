@@ -35,20 +35,6 @@ CSocket::SetBlockingMode (bool IsBlocking)
 	return err::Complete (m_h != -1);
 }
 
-size_t
-CSocket::GetIncomingDataSize ()
-{
-	int Value;
-	int Result = ::ioctl (m_h, FIONREAD, &Value);
-	if (Result == -1)
-	{
-		err::SetLastSystemError ();
-		return -1;
-	}
-
-	return Value;
-}
-
 bool
 CSocket::GetAddress (sockaddr* pAddr)
 {

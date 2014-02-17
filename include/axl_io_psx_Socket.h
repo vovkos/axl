@@ -25,14 +25,11 @@ public:
 		int Protocol
 		);
 
+	bool
+	SetBlockingMode (bool IsBlocking); // blocking mode is set a bit differently
+
 	int
 	GetError ();
-
-	bool
-	SetBlockingMode (bool IsBlocking);
-
-	size_t
-	GetIncomingDataSize ();
 
 	bool
 	Bind (const sockaddr* pAddr)

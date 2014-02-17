@@ -20,7 +20,7 @@ class CFile: public g::win::CFileHandle
 public:
 	bool
 	Create (
-		const wchar_t* pFileName, 
+		const wchar_t* pFileName,
 		uint_t AccessMode,
 		uint_t ShareMode,
 		SECURITY_ATTRIBUTES* pSecAttr,
@@ -28,22 +28,34 @@ public:
 		uint_t FlagsAttributes = 0
 		);
 
-	uint64_t 
+	uint64_t
 	GetSize () const;
 
-	bool 
+	bool
 	SetSize (uint64_t Size);
 
-	uint64_t 
+	uint64_t
 	GetPosition () const;
 
-	bool 
+	bool
 	SetPosition (uint64_t Offset) const;
 
-	bool 
+	dword_t
 	Read (
-		void* p, 
-		dword_t Size, 
+		void* p,
+		dword_t Size
+		) const;
+
+	dword_t
+	Write (
+		const void* p,
+		dword_t Size
+		);
+
+	bool
+	Read (
+		void* p,
+		dword_t Size,
 		dword_t* pActualSize,
 		OVERLAPPED* pOverlapped = NULL
 		) const
@@ -52,9 +64,9 @@ public:
 		return err::Complete (Result);
 	}
 
-	bool 
+	bool
 	Write (
-		const void* p, 
+		const void* p,
 		dword_t Size,
 		dword_t* pActualSize,
 		OVERLAPPED* pOverlapped = NULL
@@ -64,10 +76,10 @@ public:
 		return err::Complete (Result);
 	}
 
-	bool 
+	bool
 	ReadEx (
-		void* p, 
-		dword_t Size, 
+		void* p,
+		dword_t Size,
 		OVERLAPPED* pOverlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		) const
@@ -76,9 +88,9 @@ public:
 		return err::Complete (Result);
 	}
 
-	bool 
+	bool
 	WriteEx (
-		const void* p, 
+		const void* p,
 		dword_t Size,
 		OVERLAPPED* pOverlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
@@ -90,7 +102,7 @@ public:
 };
 
 //.............................................................................
-	
+
 } // namespace win
 } // namespace io {
 } // namespace axl

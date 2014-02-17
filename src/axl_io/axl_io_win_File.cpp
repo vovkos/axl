@@ -9,7 +9,7 @@ namespace win {
 
 bool
 CFile::Create (
-	const wchar_t* pFileName, 
+	const wchar_t* pFileName,
 	uint_t AccessMode,
 	uint_t ShareMode,
 	SECURITY_ATTRIBUTES* pSecAttr,
@@ -20,12 +20,12 @@ CFile::Create (
 	Close ();
 
 	m_h = ::CreateFileW (
-		pFileName, 
+		pFileName,
 		AccessMode,
 		ShareMode,
 		pSecAttr,
 		CreationDisposition,
-		FlagsAttributes, 
+		FlagsAttributes,
 		NULL
 		);
 
@@ -36,7 +36,7 @@ uint64_t
 CFile::GetSize () const
 {
 	ULARGE_INTEGER Size;
-	
+
 	Size.LowPart = ::GetFileSize (m_h, &Size.HighPart);
 	if (Size.LowPart == INVALID_FILE_SIZE)
 		return err::FailWithLastSystemError (-1);
@@ -81,6 +81,28 @@ CFile::SetPosition (uint64_t _Offset) const
 
 	dword_t Result = ::SetFilePointer (m_h, Offset.LowPart, &Offset.HighPart, FILE_BEGIN);
 	return err::Complete (Result != INVALID_SET_FILE_POINTER);
+}
+
+dword_t
+CFile::Read (
+	void* p,
+	dword_t Size
+	)
+{
+	dword_t ActualSize;
+	bool_t Result = Read (p, Size, &ActualSize, NULL);
+	return Result ? ActualSize : -1;
+}
+
+dword_t
+CFile::Write (
+	const void* p,
+	dword_t Size
+	)
+{
+	dword_t ActualSize;
+	bool_t Result = Write (p, Size, &ActualSize, NULL);
+	return Result ? ActualSize : -1;
 }
 
 //.............................................................................

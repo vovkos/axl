@@ -78,6 +78,7 @@ set (
 
 set (
 	IO_PSX_CPP_LIST
+	axl_io_psx_Fd.cpp
 	axl_io_psx_File.cpp
 	axl_io_psx_Mapping.cpp
 	axl_io_psx_Pipe.cpp

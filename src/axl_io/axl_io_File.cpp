@@ -9,27 +9,27 @@ namespace io {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-bool 
+bool
 CFile::Open (
-	const char* pFileName, 
+	const char* pFileName,
 	uint_t Flags
 	)
 {
-	uint_t AccessMode = (Flags & EFileFlag_ReadOnly) ? 
-		GENERIC_READ : 
+	uint_t AccessMode = (Flags & EFileFlag_ReadOnly) ?
+		GENERIC_READ :
 		GENERIC_READ | GENERIC_WRITE;
 
-	uint_t ShareMode = (Flags & EFileFlag_Exclusive) ? 
-		0 : 
-		(Flags & EFileFlag_ShareWrite) ? 
-			FILE_SHARE_READ | FILE_SHARE_WRITE : 
+	uint_t ShareMode = (Flags & EFileFlag_Exclusive) ?
+		0 :
+		(Flags & EFileFlag_ShareWrite) ?
+			FILE_SHARE_READ | FILE_SHARE_WRITE :
 			FILE_SHARE_READ;
 
-	uint_t CreationDisposition = (Flags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)) ? 
-		OPEN_EXISTING : 
+	uint_t CreationDisposition = (Flags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)) ?
+		OPEN_EXISTING :
 		OPEN_ALWAYS;
 
-	uint_t FlagsAttributes = (Flags & EFileFlag_DeleteOnClose) ? 
+	uint_t FlagsAttributes = (Flags & EFileFlag_DeleteOnClose) ?
 		FILE_FLAG_DELETE_ON_CLOSE :
 		0;
 
@@ -38,26 +38,34 @@ CFile::Open (
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-bool 
+uint_t
+GetPosixOpenFlags (uint_t FileFlags)
+{
+	uint_t PosixFlags = (FileFlags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+
+	if (!(FileFlags & EFileFlag_OpenExisting))
+		PosixFlags |= O_CREAT;
+
+	return PosixFlags;
+}
+
+bool
 CFile::Open (
-	const char* pFileName, 
+	const char* pFileName,
 	uint_t Flags
 	)
 {
-	uint_t PosixFlags = (Flags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
-
-	if (!(Flags & EFileFlag_OpenExisting))
-		PosixFlags |= O_CREAT;
+	uint_t PosixFlags = GetPosixOpenFlags (Flags);
 
 	// TODO: handle exclusive and share write flags with fcntl locks
 
 	bool Result = m_File.Open (pFileName, PosixFlags);
 	if (!Result)
 		return false;
-	
+
 	if (Flags & EFileFlag_DeleteOnClose)
 		unlink (pFileName);
-			
+
 	return true;
 }
 

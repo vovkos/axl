@@ -19,10 +19,12 @@ class CSerial: public CFd
 {
 public:
 	bool
-	Open (const char* pName);
-
-	bool
-	SetBlockingMode (bool IsBlocking);
+	Open (const char* pName)
+	{
+		return
+			CFd::Open (pName, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&
+			SetBlockingMode (true);
+	}
 
 	bool
 	GetAttr (termios* pAttr) const
@@ -77,18 +79,6 @@ public:
 		int Result = ioctl (m_h, TIOCMIWAIT, Mask);
 		return err::Complete (Result != -1);
 	}
-
-	size_t
-	Read (
-		void* p,
-		size_t Size
-		) const;
-
-	size_t
-	Write (
-		const void* p,
-		size_t Size
-		);
 };
 
 //.............................................................................
