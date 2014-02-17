@@ -24,6 +24,7 @@ enum EFileFlag
 	EFileFlag_Exclusive     = 0x04,
 	EFileFlag_ShareWrite    = 0x08,
 	EFileFlag_DeleteOnClose = 0x10,
+	EFileFlag_Asynchronous  = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

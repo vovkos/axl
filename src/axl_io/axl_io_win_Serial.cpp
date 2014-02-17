@@ -83,25 +83,6 @@ CSerial::Write (
 	return Result ? ActualSize : -1;
 }
 
-bool
-CSerial::CompleteAsyncRequest (
-	bool_t Result,
-	OVERLAPPED* pOverlapped
-	)
-{
-	if (!Result)
-	{
-		dword_t Error = ::GetLastError ();
-		if (!pOverlapped || Error != ERROR_IO_PENDING)
-		{
-			err::SetError (Error);
-			return false;
-		}
-	}
-
-	return true;
-}
-
 //.............................................................................
 
 } // namespace win

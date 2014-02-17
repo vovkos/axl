@@ -33,7 +33,17 @@ CFile::Open (
 		FILE_FLAG_DELETE_ON_CLOSE :
 		0;
 
-	return m_File.Create (rtl::CString_w (pFileName), AccessMode, ShareMode, NULL, CreationDisposition, FlagsAttributes);
+	if (Flags & EFileFlag_Asynchronous)
+		FlagsAttributes |= FILE_FLAG_OVERLAPPED;
+
+	return m_File.Create (
+		rtl::CString_w (pFileName), 
+		AccessMode, 
+		ShareMode, 
+		NULL, 
+		CreationDisposition, 
+		FlagsAttributes
+		);
 }
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
@@ -45,6 +55,9 @@ GetPosixOpenFlags (uint_t FileFlags)
 
 	if (!(FileFlags & EFileFlag_OpenExisting))
 		PosixFlags |= O_CREAT;
+
+	if (FileFlags & EFileFlag_Asynchronous)
+		PosixFlags |= O_NONBLOCK;
 
 	return PosixFlags;
 }

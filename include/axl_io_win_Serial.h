@@ -115,13 +115,6 @@ public:
 		bool_t Result = ::WriteFile (m_h, p, Size, pActualSize, pOverlapped);
 		return CompleteAsyncRequest (Result, pOverlapped);
 	}
-
-protected:
-	bool
-	CompleteAsyncRequest (
-		bool_t Result,
-		OVERLAPPED* pOverlapped
-		);
 };
 
 //.............................................................................

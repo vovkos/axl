@@ -7,6 +7,7 @@
 #define _AXL_G_WIN_HANDLE_H
 
 #include "axl_rtl_Handle.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace g {
@@ -27,7 +28,22 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef rtl::CHandleT <HANDLE, CCloseHandle> CHandle;
-typedef rtl::CHandleT <HANDLE, CCloseHandle, rtl::CMinusOneT <HANDLE> > CFileHandle;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CFileHandle: public rtl::CHandleT <HANDLE, CCloseHandle, rtl::CMinusOneT <HANDLE> >
+{
+public:
+	static
+	bool
+	CompleteAsyncRequest (
+		bool_t Result,
+		OVERLAPPED* pOverlapped
+		);
+
+	size_t
+	GetOverlappedResult (OVERLAPPED* pOverlapped);
+};
 
 //.............................................................................
 

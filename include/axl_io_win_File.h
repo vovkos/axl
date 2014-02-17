@@ -61,7 +61,7 @@ public:
 		) const
 	{
 		bool_t Result = ::ReadFile (m_h, p, Size, pActualSize, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool
@@ -73,7 +73,7 @@ public:
 		)
 	{
 		bool_t Result = ::WriteFile (m_h, p, Size, pActualSize, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool
@@ -85,7 +85,7 @@ public:
 		) const
 	{
 		bool_t Result = ::ReadFileEx (m_h, p, Size, pOverlapped, pfOnComplete);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool
@@ -97,7 +97,7 @@ public:
 		)
 	{
 		bool_t Result = ::WriteFileEx (m_h, p, Size, pOverlapped, pfOnComplete);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 };
 

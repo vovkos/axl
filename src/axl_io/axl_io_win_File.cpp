@@ -87,7 +87,7 @@ dword_t
 CFile::Read (
 	void* p,
 	dword_t Size
-	)
+	) const
 {
 	dword_t ActualSize;
 	bool_t Result = Read (p, Size, &ActualSize, NULL);

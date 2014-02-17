@@ -99,7 +99,10 @@ set (
 	${AXL_INC_DIR}/axl_g_win_Window.h
 	)
 
-set (G_WIN_CPP_LIST)
+set (
+	G_WIN_CPP_LIST
+	axl_g_win_Handle.cpp
+	)
 
 source_virtual_folder (
 	g_win
