@@ -214,8 +214,8 @@ CTextPaint::PaintHyperText (
 	size_t Length
 	)
 {
-	const TTextAttrAnchor* pAttr = *pAttrArray;
-	size_t AttrCount = pAttrArray->GetCount ();
+	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
+	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
 
 	const char* p = pText;
 	const char* pEnd; 
@@ -286,8 +286,8 @@ CTextPaint::PaintHyperBinHex (
 	size_t Size
 	)
 {
-	const TTextAttrAnchor* pAttr = *pAttrArray;
-	size_t AttrCount = pAttrArray->GetCount ();
+	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
+	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
 
 	const uchar_t* p = (uchar_t*) _p;
 	const uchar_t* pEnd; 
@@ -355,8 +355,8 @@ CTextPaint::PaintHyperBinAscii (
 	size_t Size
 	)
 {
-	const TTextAttrAnchor* pAttr = *pAttrArray;
-	size_t AttrCount = pAttrArray->GetCount ();
+	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
+	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
 
 	const uchar_t* p = (uchar_t*) _p;
 	const uchar_t* pEnd; 
@@ -426,16 +426,17 @@ CTextPaint::PaintSelHyperText (
 	size_t Length
 	)
 {
-	size_t Count = pAttrArray->GetCount ();
-	const TTextAttrAnchor* p = *pAttrArray;
-
 	if (SelStart >= SelEnd) 
 		return PaintHyperText (pAttrArray, pText, Length);
 
 	if (Length == -1)
 		Length = strlen (pText);
 
-	m_SelOverlay = *pAttrArray;
+	if (pAttrArray)
+		m_SelOverlay = *pAttrArray;
+	else
+		m_SelOverlay.Clear ();
+
 	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
 	return PaintHyperText (&m_SelOverlay, pText, Length);
 }
@@ -452,7 +453,11 @@ CTextPaint::PaintSelHyperBinHex (
 	if (SelStart >= SelEnd) 
 		return PaintHyperBinHex (pAttrArray, p, Size);
 
-	m_SelOverlay = *pAttrArray;
+	if (pAttrArray)
+		m_SelOverlay = *pAttrArray;
+	else
+		m_SelOverlay.Clear ();
+
 	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
 	return PaintHyperBinHex (&m_SelOverlay, p, Size);
 }
@@ -469,7 +474,11 @@ CTextPaint::PaintSelHyperBinAscii (
 	if (SelStart >= SelEnd) 
 		return PaintHyperBinAscii (pAttrArray, p, Size);
 
-	m_SelOverlay = *pAttrArray;
+	if (pAttrArray)
+		m_SelOverlay = *pAttrArray;
+	else
+		m_SelOverlay.Clear ();
+
 	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
 	return PaintHyperBinAscii (&m_SelOverlay, p, Size);
 }

@@ -19,6 +19,9 @@ CWidget::CWidget (CEngine* pEngine)
 	m_BaseTextAttr.m_ForeColor = EStdPalColor_WidgetText;
 	m_BaseTextAttr.m_BackColor = EStdPalColor_WidgetBack;
 	m_BaseTextAttr.m_FontFlags = 0;
+	m_CaretSize.m_Width = 2;
+	m_CaretSize.m_Height = 16;
+	m_IsCaretVisible = false;
 }
 
 //.............................................................................

@@ -55,27 +55,27 @@ void
 UpdateStdPalSystemColors ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]     = GetSysColor (COLOR_WINDOWTEXT);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]     = GetSysColor (COLOR_WINDOW);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]       = GetSysColor (COLOR_GRAYTEXT);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText]  = GetSysColor (COLOR_HIGHLIGHTTEXT);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack]  = GetSysColor (COLOR_HIGHLIGHT);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]         = GetSysColor (COLOR_3DFACE);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]       = GetSysColor (COLOR_3DSHADOW);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]   = GetSysColor (COLOR_3DDKSHADOW);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]        = GetSysColor (COLOR_3DLIGHT);
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]      = GetSysColor (COLOR_3DHILIGHT);
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]    = InverseRgb (GetSysColor (COLOR_WINDOWTEXT));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]    = InverseRgb (GetSysColor (COLOR_WINDOW));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]      = InverseRgb (GetSysColor (COLOR_GRAYTEXT));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText] = InverseRgb (GetSysColor (COLOR_HIGHLIGHTTEXT));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack] = InverseRgb (GetSysColor (COLOR_HIGHLIGHT));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]        = InverseRgb (GetSysColor (COLOR_3DFACE));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]      = InverseRgb (GetSysColor (COLOR_3DSHADOW));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]  = InverseRgb (GetSysColor (COLOR_3DDKSHADOW));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]       = InverseRgb (GetSysColor (COLOR_3DLIGHT));
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]     = InverseRgb (GetSysColor (COLOR_3DHILIGHT));
 #else
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]     = 0x000000;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]     = 0xffffff;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]       = 0x808080;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText]  = 0xffffff;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack]  = 0x000080;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]         = 0xc0c0c0;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]       = 0x808080;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]   = 0x000000;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]        = 0xe0e0e0;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]      = 0xffffff;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]    = 0x000000;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]    = 0xffffff;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]      = 0x808080;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText] = 0xffffff;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack] = 0x000080;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]        = 0xc0c0c0;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]      = 0x808080;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]  = 0x000000;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]       = 0xe0e0e0;
+	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]     = 0xffffff;
 #endif
 }
 

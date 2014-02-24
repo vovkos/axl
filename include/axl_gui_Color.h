@@ -1,5 +1,5 @@
 // This file is part of AXL (R) Library
-// Tibbo Technology Inc (C) 2004-2013. All rights reserved
+// Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
 #pragma once
@@ -109,6 +109,13 @@ enum EStdPalColor
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+inline
+uint_t 
+InverseRgb (uint_t Rgb)
+{
+	return ((Rgb & 0x0000ff) << 16) | ((Rgb & 0xff0000) >> 16) | Rgb & 0x00ff00;
+}
+
 const uint_t*
 GetStdPalColorArray ();
 
@@ -140,20 +147,19 @@ struct TPalette
 	uint_t
 	GetColorRgb (uint_t Color)
 	{
-		if (Color & EColorFlag_Transparent)
-			return EColorFlag_Transparent;
+		ASSERT (!(Color & EColorFlag_Transparent));
 		
-		if (Color & EColorFlag_Index)
-		{
-			size_t i = Color & EColorFlag_IndexMask;
-			Color = i < m_Count ? m_pColorArray [i] : EColorFlag_Transparent;
+		if (!(Color & EColorFlag_Index))
+			return Color;
+
+		size_t i = Color & EColorFlag_IndexMask;
+		Color = i < m_Count ? m_pColorArray [i] : EColorFlag_Transparent;
 			
-			if (Color & EColorFlag_Index) // allow two-staged index lookup
-			{
-				i = Color & EColorFlag_IndexMask;
-				Color = i < m_Count ? m_pColorArray [i] : EColorFlag_Transparent;
-				ASSERT (!(Color & EColorFlag_Index)); // bad palette!
-			}
+		if (Color & EColorFlag_Index) // allow two-staged index lookup
+		{
+			i = Color & EColorFlag_IndexMask;
+			Color = i < m_Count ? m_pColorArray [i] : EColorFlag_Transparent;
+			ASSERT (!(Color & EColorFlag_Index)); // bad palette!
 		}
 
 		return Color;

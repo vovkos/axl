@@ -1,5 +1,5 @@
 // This file is part of AXL (R) Library
-// Tibbo Technology Inc (C) 2004-2013. All rights reserved
+// Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
 #pragma once
@@ -97,6 +97,7 @@ class QtWidgetBase: public QAbstractScrollArea
 
 protected:
 	CQtWidgetImpl* m_qtWidget;
+	bool m_mouseMoveEventFlag;
 
 public:
 	QtWidgetBase (
@@ -106,6 +107,7 @@ public:
 		QAbstractScrollArea (parent)
 	{
 		m_qtWidget = qtWidget;
+		m_mouseMoveEventFlag = false;
 
 		connect(
 			this, &QtWidgetBase::threadMsgSignal,
@@ -165,6 +167,14 @@ protected:
 	void 
 	mouseMoveEvent (QMouseEvent* e)
 	{
+		if (!m_mouseMoveEventFlag)
+		{	
+			CCursor* cursor = m_qtWidget->GetCursor ();
+			if (cursor)
+				setCursor (((CQtCursor*) cursor)->m_QtCursor);
+			m_mouseMoveEventFlag = true;
+		}
+
 		m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseMove);
 	}
 	
@@ -256,12 +266,14 @@ class CQtWidgetT: public T
 public:
 	QtWidgetBase* m_pQtScrollArea;
 	QWidget* m_pQtWidget;
+	bool m_MouseMoveFlag;
 	
 public:
 	CQtWidgetT (): T (GetQtEngineSingleton ())
 	{
 		m_pQtScrollArea = NULL;
 		m_pQtWidget = NULL;
+		m_MouseMoveFlag = false;
 	}
 	
 	virtual
@@ -333,22 +345,9 @@ public:
 
 	virtual
 	bool
-	ShowCaret (	
-		int x, 
-		int y,
-		int Width,
-		int Height
-		)
+	SetCaretVisible (bool IsVisible)
 	{
-		// TODO
 		return true;
-	}
-
-	virtual
-	void
-	HideCaret ()
-	{
-		// TODO
 	}
 
 	virtual
@@ -358,7 +357,16 @@ public:
 		int y
 		)
 	{
-		// TODO
+		return true;
+	}
+
+	virtual
+	bool
+	SetCaretSize (
+		uint_t Width, 
+		uint_t Height
+		)
+	{
 		return true;
 	}
 

@@ -1,5 +1,5 @@
 // This file is part of AXL (R) Library
-// Tibbo Technology Inc (C) 2004-2013. All rights reserved
+// Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
 #pragma once
@@ -306,10 +306,12 @@ protected:
 	TTextAttr m_BaseTextAttr;
 	TPalette m_Palette;
 	TSize m_Size;
+	TPoint m_CaretPos;
 	TSize m_CaretSize;
+	bool m_IsCaretVisible;
 	uint_t m_Style;
 	uint_t m_MsgMask;	
-	TWidgetScrollBar m_ScrollBarArray [2];
+	TWidgetScrollBar m_ScrollBarArray [2];	
 	
 public:
 	CWidget (CEngine* pEngine);
@@ -318,6 +320,18 @@ public:
 	GetEngine ()
 	{
 		return m_pEngine;
+	}
+
+	CCursor* 
+	GetCursor ()
+	{
+		return m_pCursor;
+	}
+
+	CFont* 
+	GetBaseFont ()
+	{
+		return m_pBaseFont;
 	}
 
 	TSize
@@ -389,27 +403,40 @@ public:
 	bool
 	ReleaseMouseCapture () = 0;
 
-	virtual
 	bool
-	ShowCaret (	
-		int x, 
-		int y,
-		int Width,
-		int Height
-		) = 0;
-
-	bool
-	ShowCaret (
-		const gui::TPoint& Point,
-		const gui::TSize& Size
-		)
+	IsCaretVisible ()
 	{
-		return ShowCaret (Point.m_x, Point.m_y, Size.m_Width, Size.m_Height);
+		return m_IsCaretVisible;
 	}
 
 	virtual
-	void
-	HideCaret () = 0;
+	bool
+	SetCaretVisible (bool IsVisible) = 0;
+
+	bool
+	SetCaretWidth (uint_t Width)
+	{
+		return SetCaretSize (Width, m_CaretSize.m_Height);
+	}
+
+	bool
+	SetCaretHeight (uint_t Height)
+	{
+		return SetCaretSize (m_CaretSize.m_Width, Height);
+	}
+
+	virtual
+	bool
+	SetCaretSize (
+		uint_t Width,
+		uint_t Height
+		) = 0;
+
+	bool
+	SetCaretSize (const TSize& Size)
+	{
+		return SetCaretSize (Size.m_Width, Size.m_Height);
+	}
 
 	virtual
 	bool

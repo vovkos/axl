@@ -23,10 +23,8 @@ CQtCanvas::DrawRect (
 {
 	Color = OverlayColor (m_BaseTextAttr.m_BackColor, Color);
 
-	uint_t Rgb = m_Palette.GetColorRgb (Color);
-
-	if (!(Rgb & EColorFlag_Transparent))
-		m_h->fillRect (Left, Top, Right - Left, Bottom - Top, Rgb);
+	if (!(Color & EColorFlag_Transparent))
+		m_h->fillRect (Left, Top, Right - Left, Bottom - Top, m_Palette.GetColorRgb (Color));
 
 	return true;
 }
@@ -65,9 +63,8 @@ CQtCanvas::DrawText (
 	{
 		m_ColorAttr.m_ForeColor = TextColor;
 
-		uint_t Rgb = m_Palette.GetColorRgb (TextColor);
-		if (!(Rgb & EColorFlag_Transparent))
-			m_h->setPen (Rgb);
+		if (!(TextColor & EColorFlag_Transparent))
+			m_h->setPen (m_Palette.GetColorRgb (TextColor));
 	}
 
 	DrawRect (Left, Top, Right, Bottom, BackColor);

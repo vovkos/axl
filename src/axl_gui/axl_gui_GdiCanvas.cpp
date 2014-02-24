@@ -83,9 +83,8 @@ CGdiCanvas::DrawRect (
 	{
 		m_ColorAttr.m_BackColor = Color;
 
-		uint_t Rgb = m_Palette.GetColorRgb (Color);
-		if (!(Rgb & EColorFlag_Transparent))
-			::SetBkColor (m_h, Rgb);
+		if (!(Color & EColorFlag_Transparent))
+			::SetBkColor (m_h, m_Palette.GetColorRgb (Color));
 	}
 
 	RECT GdiRect = { Left, Top, Right, Bottom };
@@ -130,18 +129,16 @@ CGdiCanvas::DrawText (
 	{
 		m_ColorAttr.m_ForeColor = TextColor;
 
-		uint_t Rgb = m_Palette.GetColorRgb (TextColor);
-		if (!(Rgb & EColorFlag_Transparent))
-			::SetTextColor (m_h, Rgb);
+		if (!(TextColor & EColorFlag_Transparent))
+			::SetTextColor (m_h, m_Palette.GetColorRgb (TextColor));
 	}
 
 	if (m_ColorAttr.m_BackColor != BackColor)
 	{
 		m_ColorAttr.m_BackColor = BackColor;
 
-		uint_t Rgb = m_Palette.GetColorRgb (BackColor);
-		if (!(Rgb & EColorFlag_Transparent))
-			::SetBkColor (m_h, Rgb);
+		if (!(BackColor & EColorFlag_Transparent))
+			::SetBkColor (m_h, m_Palette.GetColorRgb (BackColor));
 	}
 
 	rtl::CString_w Text (pText, Length);

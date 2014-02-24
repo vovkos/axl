@@ -1,5 +1,5 @@
 // This file is part of AXL (R) Library
-// Tibbo Technology Inc (C) 2004-2013. All rights reserved
+// Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
 #pragma once
@@ -214,26 +214,9 @@ public:
 
 	virtual
 	bool
-	ShowCaret (	
-		int x, 
-		int y,
-		int Width,
-		int Height
-		)
+	SetCaretVisible (bool IsVisible)
 	{
-		bool_t Result = 
-			::CreateCaret (m_h, NULL, Width, Height) &&
-			::SetCaretPos (x, y) &&
-			::ShowCaret (m_h);
-		return err::Complete (Result);
-	}
-
-	virtual
-	void
-	HideCaret ()
-	{
-		::HideCaret (m_h);
-		::DestroyCaret ();
+		return true;
 	}
 
 	virtual
@@ -243,8 +226,17 @@ public:
 		int y
 		)
 	{
-		bool_t Result = ::SetCaretPos (x, y);
-		return err::Complete (Result);
+		return true;
+	}
+
+	virtual
+	bool
+	SetCaretSize (
+		uint_t Width, 
+		uint_t Height
+		)
+	{
+		return true;
 	}
 
 	virtual
