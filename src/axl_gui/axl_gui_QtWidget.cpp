@@ -272,5 +272,28 @@ CQtWidgetImpl::OnScroll (
 
 //.............................................................................
 
+void 
+QtWidgetBase::mouseMoveEvent (QMouseEvent* e)
+{
+	if (!m_mouseMoveEventFlag)
+	{	
+		CCursor* cursor = m_qtWidget->GetCursor ();
+		if (cursor)
+		{
+			setCursor (((CQtCursor*) cursor)->m_QtCursor);
+
+			QCursor arrowCurosr (Qt::ArrowCursor);
+			horizontalScrollBar ()->setCursor (arrowCurosr);
+			horizontalScrollBar ()->setCursor (arrowCurosr);
+		}
+
+		m_mouseMoveEventFlag = true;
+	}
+
+	m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseMove);
+}
+
+//.............................................................................
+
 } // namespace gui
 } // namespace axl

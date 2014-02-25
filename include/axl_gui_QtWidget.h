@@ -165,18 +165,7 @@ protected:
 
 	virtual 
 	void 
-	mouseMoveEvent (QMouseEvent* e)
-	{
-		if (!m_mouseMoveEventFlag)
-		{	
-			CCursor* cursor = m_qtWidget->GetCursor ();
-			if (cursor)
-				setCursor (((CQtCursor*) cursor)->m_QtCursor);
-			m_mouseMoveEventFlag = true;
-		}
-
-		m_qtWidget->OnMouseEvent (e, EWidgetMsg_MouseMove);
-	}
+	mouseMoveEvent (QMouseEvent* e);
 	
 	virtual 
 	void 
