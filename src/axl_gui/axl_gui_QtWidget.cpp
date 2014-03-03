@@ -207,8 +207,17 @@ CQtWidgetImpl::OnPaintEvent (
 
 	Canvas.Detach ();
 
-	if (!IsHandled)
-		pEvent->ignore ();				
+	if (m_IsCaretVisible && ((CQtEngine*) m_pEngine)->IsCaretVisible ())
+	{
+		pQtPainter->setCompositionMode (QPainter::RasterOp_SourceXorDestination);
+		pQtPainter->fillRect (
+			m_CaretPos.m_x, 
+			m_CaretPos.m_y, 
+			m_CaretSize.m_Width, 
+			m_CaretSize.m_Height,
+			Qt::white
+			);
+	}
 }
 
 void
@@ -284,7 +293,7 @@ QtWidgetBase::mouseMoveEvent (QMouseEvent* e)
 
 			QCursor arrowCurosr (Qt::ArrowCursor);
 			horizontalScrollBar ()->setCursor (arrowCurosr);
-			horizontalScrollBar ()->setCursor (arrowCurosr);
+			verticalScrollBar ()->setCursor (arrowCurosr);
 		}
 
 		m_mouseMoveEventFlag = true;

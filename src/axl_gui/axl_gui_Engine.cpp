@@ -24,6 +24,30 @@ GetEngineKindString (EEngine EngineKind)
 
 //.............................................................................
 
+CFont*
+CEngine::GetStdFont (EStdFont FontKind)
+{
+	if (FontKind < 0 || FontKind >= EStdFont__Count)
+		return NULL;
+
+	if (!m_StdFontArray [FontKind])
+		m_StdFontArray [FontKind] = CreateStdFont (FontKind);	
+		
+	return m_StdFontArray [FontKind];
+}
+
+CCursor*
+CEngine::GetStdCursor (EStdCursor CursorKind)
+{
+	if (CursorKind < 0 || CursorKind >= EStdCursor__Count)
+		return NULL;
+
+	if (!m_StdCursorArray [CursorKind])
+		m_StdCursorArray [CursorKind] = CreateStdCursor (CursorKind);	
+		
+	return m_StdCursorArray [CursorKind];
+}
+
 CCanvas*
 CEngine::GetSharedOffscreenCanvas (
 	int Width,

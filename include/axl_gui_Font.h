@@ -19,6 +19,16 @@ class CFont;
 
 //.............................................................................
 
+enum EStdFont
+{
+	EStdFont_Gui = 0,
+	EStdFont_Monospace,
+	
+	EStdFont__Count
+};
+
+//.............................................................................
+
 enum EFontFlag
 {
 	EFontFlag_Bold        = 0x01,

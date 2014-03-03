@@ -270,7 +270,7 @@ public:
 	GetCanvas ()
 	{
 		ref::CPtrT <CQtCanvas> Canvas = AXL_REF_NEW (ref::CBoxT <CQtCanvas>);
-		Canvas->Attach (new QPainter (m_pQtWidget));
+		Canvas->Attach (new QPainter (m_pQtScrollArea->viewport ()));
 		return Canvas;
 	}
 

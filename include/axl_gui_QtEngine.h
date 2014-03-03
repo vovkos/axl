@@ -20,12 +20,48 @@ namespace gui {
 
 //.............................................................................
 
+class CQtCaret: public QTimer
+{
+protected:
+	CWidget* m_pWidget;
+	bool m_IsVisible;
+	TRect m_Rect;
+
+public:
+	CQtCaret ()
+	{
+		m_IsVisible = false;
+		m_pWidget = NULL;
+	}
+
+	bool
+	IsVisible ()
+	{
+		return m_IsVisible;
+	}
+
+	bool
+	Show (
+		CWidget* pWidget,
+		const TRect& Rect
+		);
+
+	virtual
+	void
+	Hide ();
+
+protected:
+	virtual void timerEvent (QTimerEvent* e);
+};
+
+//.............................................................................
+
 class CQtEngine: public CEngine
 {
 protected:
-	ref::CPtrT <CFont> m_DefaultGuiFont;
-	ref::CPtrT <CFont> m_DefaultMonospaceFont;
+	ref::CPtrT <CFont> m_StdFontArray [EStdFont__Count];
 	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
+	CQtCaret m_QtCaret;
 
 public:
 	CQtEngine ()
@@ -33,26 +69,14 @@ public:
 		m_EngineKind = EEngine_Qt;
 	}
 
+	// font
+
 	static
 	CQtEngine*
 	GetSingleton ()
 	{
 		return rtl::GetSingleton <CQtEngine> ();
 	}
-
-	CFont*
-	GetDefaultGuiFont ();
-
-	virtual
-	CFont*
-	GetDefaultFont ()
-	{
-		return GetDefaultGuiFont ();
-	}
-
-	virtual
-	CFont*
-	GetDefaultMonospaceFont ();
 
 	virtual
 	ref::CPtrT <CFont>
@@ -68,19 +92,12 @@ public:
 	ref::CPtrT <CFont>
 	CreateFont (const QFont& QtFont);
 
-	virtual
-	CCursor*
-	GetStdCursor (EStdCursor CursorKind);
+	// cursors
 
 	ref::CPtrT <CCursor>
 	CreateCursor (const QCursor& QtCursor);
 
-	virtual
-	CFont*
-	GetFontMod (
-		CFont* pBaseFont,
-		uint_t Flags
-		);
+	// image
 
 	virtual
 	ref::CPtrT <CImage>
@@ -103,6 +120,8 @@ public:
 		int Height
 		);
 
+	// clipboard
+
 	virtual
 	bool
 	ReadClipboard (rtl::CString* pString);
@@ -114,6 +133,35 @@ public:
 		size_t Length = -1
 		);
 
+	// caret
+
+	virtual
+	bool
+	ShowCaret (
+		CWidget* pWidget,
+		const TRect& Rect
+		)
+	{
+		return m_QtCaret.Show (pWidget, Rect);
+	}
+
+	virtual
+	void
+	HideCaret ()
+	{
+		m_QtCaret.Hide ();
+	}
+
+	bool
+	IsCaretVisible ()
+	{
+		return m_QtCaret.IsVisible ();
+	}
+
+private slots:
+	void
+	CaretTimer_Timeout ();
+
 protected:
 	QFont
 	CreateQtFont (
@@ -121,6 +169,21 @@ protected:
 		size_t PointSize,
 		uint_t Flags
 		);
+
+	virtual
+	CFont*
+	GetFontMod (
+		CFont* pBaseFont,
+		uint_t Flags
+		);
+
+	virtual
+	ref::CPtrT <CFont>
+	CreateStdFont (EStdFont FontKind);
+
+	virtual
+	ref::CPtrT <CCursor>
+	CreateStdCursor (EStdCursor CursorKind);
 };
 
 //.............................................................................

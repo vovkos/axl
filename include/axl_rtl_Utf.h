@@ -292,7 +292,7 @@ public:
 	size_t
 	GetDecodeCodePointLength (C c)
 	{
-		return GetTrailSurrogate (c) ? 2 : 1;
+		return IsTrailSurrogate (c) ? 2 : 1;
 	}
 
 	static

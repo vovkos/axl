@@ -22,9 +22,6 @@ namespace gui {
 class CGdiEngine: public CEngine
 {
 protected:
-	ref::CPtrT <CFont> m_DefaultGuiFont;
-	ref::CPtrT <CFont> m_DefaultMonospaceFont;
-	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
 	HWND m_hWndClipboardOwner;
 
 public:
@@ -43,15 +40,10 @@ public:
 		return rtl::GetSingleton <CGdiEngine> ();
 	}
 
+	// fonts
+
 	CFont*
 	GetDefaultGuiFont ();
-
-	virtual
-	CFont*
-	GetDefaultFont ()
-	{
-		return GetDefaultGuiFont ();
-	}
 
 	virtual
 	CFont*
@@ -71,19 +63,12 @@ public:
 	ref::CPtrT <CFont>
 	CreateFont (HFONT hFont);
 
+	// cursors
+
 	ref::CPtrT <CCursor>
 	CreateStockCursor (LPCTSTR pStockCursorRes);
 
-	virtual
-	CCursor*
-	GetStdCursor (EStdCursor CursorKind);
-
-	virtual
-	CFont*
-	GetFontMod (
-		CFont* pBaseFont,
-		uint_t Flags
-		);
+	// images
 
 	virtual
 	ref::CPtrT <CImage>
@@ -106,6 +91,8 @@ public:
 		int Height
 		);
 
+	// clipboard
+
 	virtual
 	bool
 	ReadClipboard (rtl::CString* pString);
@@ -117,9 +104,37 @@ public:
 		size_t Length = -1
 		);
 
+	// caret
+
+	virtual
+	bool
+	ShowCaret (
+		CWidget* pWidget,
+		const TRect& Rect
+		);
+
+	virtual
+	void
+	HideCaret ();
+
 protected:
 	bool
 	OpenClipboard ();
+
+	virtual
+	CFont*
+	GetFontMod (
+		CFont* pBaseFont,
+		uint_t Flags
+		);
+
+	virtual
+	ref::CPtrT <CFont>
+	CreateStdFont (EStdFont FontKind);
+
+	virtual
+	ref::CPtrT <CCursor>
+	CreateStdCursor (EStdCursor CursorKind);
 };
 
 //.............................................................................

@@ -159,6 +159,7 @@ struct TWidgetMouseWheelMsg: TWidgetMouseMsg
 
 	TWidgetMouseWheelMsg ()
 	{
+		m_MsgKind = EWidgetMsg_MouseWheel;
 		m_WheelDelta = 0;
 	}
 };
@@ -409,9 +410,8 @@ public:
 		return m_IsCaretVisible;
 	}
 
-	virtual
 	bool
-	SetCaretVisible (bool IsVisible) = 0;
+	SetCaretVisible (bool IsVisible);
 
 	bool
 	SetCaretWidth (uint_t Width)
@@ -430,7 +430,7 @@ public:
 	SetCaretSize (
 		uint_t Width,
 		uint_t Height
-		) = 0;
+		);
 
 	bool
 	SetCaretSize (const TSize& Size)
@@ -438,12 +438,11 @@ public:
 		return SetCaretSize (Size.m_Width, Size.m_Height);
 	}
 
-	virtual
 	bool
 	SetCaretPos (
 		int x, 
 		int y
-		) = 0;
+		);
 
 	bool
 	SetCaretPos (const gui::TPoint& Point)

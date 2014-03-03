@@ -39,7 +39,6 @@ public:
 	TTextAttr m_SelAttr;
 	uint_t m_HexEncodingFlags;
 	char m_UnprintableChar;
-	TSize m_MonospaceCharSize; 
 
 	TPoint m_Point;
 	int m_Top;

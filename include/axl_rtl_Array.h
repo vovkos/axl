@@ -466,7 +466,16 @@ public:
 	T*
 	Append (T e)
 	{ 
-		return Insert (-1, &e, 1); 
+		return Insert (-1, e); 
+	}
+
+	T*
+	AppendMultiply (
+		T e,
+		size_t Count
+		)
+	{ 
+		return InsertMultiply (-1, e, Count); 
 	}
 
 	T*
@@ -476,9 +485,8 @@ public:
 	}
 
 	T*
-	Insert (
+	InsertSpace (
 		size_t Index, 
-		const T* p, 
 		size_t Count
 		)
 	{
@@ -492,11 +500,20 @@ public:
 
 		T* pDst = m_p + Index;
 
-		if (Count == 0)
-			return pDst;
-
-		if (Index < OldCount)
+		if (Count && Index < OldCount)
 			CDetails::Copy (pDst + Count, pDst, OldCount - Index);
+
+		return pDst;
+	}
+
+	T*
+	Insert (
+		size_t Index, 
+		const T* p, 
+		size_t Count
+		)
+	{
+		T* pDst = InsertSpace (Index, Count);
 
 		if (p)
 			CDetails::Copy (pDst, p, Count);
@@ -512,7 +529,25 @@ public:
 		T e
 		)
 	{
-		return Insert (Index, &e, 1);
+		T* pDst = InsertSpace (Index, 1);
+		*pDst = e;
+		return pDst;
+	}
+
+	T*
+	InsertMultiply (
+		size_t Index, 
+		T e, 
+		size_t Count
+		)
+	{
+		T* pDst = InsertSpace (Index, Count);
+		T* pEnd = pDst + Count;
+
+		for (; pDst < pEnd; pDst++)
+			*pDst = e;
+
+		return pDst;
 	}
 
 	T* 

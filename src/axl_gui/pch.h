@@ -14,4 +14,5 @@
 #	include <QPixmap>
 #	include <QScrollBar>
 #	include <QWidget>
+#	include <QTimer>
 #endif

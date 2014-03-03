@@ -16,6 +16,8 @@
 namespace axl {
 namespace gui {
 
+class CWidget;
+
 //.............................................................................
 
 enum EEngine
@@ -44,6 +46,8 @@ protected:
 
 protected:
 	EEngine m_EngineKind;
+	ref::CPtrT <CFont> m_StdFontArray [EStdFont__Count];
+	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
 	TSharedOffscreenCanvas m_SharedOffscreenCanvasArray [EFormFactor__Count];
 
 public:
@@ -60,13 +64,8 @@ public:
 
 	// fonts
 
-	virtual
 	CFont*
-	GetDefaultFont () = 0;
-
-	virtual
-	CFont*
-	GetDefaultMonospaceFont () = 0;
+	GetStdFont (EStdFont FontKind);
 
 	virtual
 	ref::CPtrT <CFont>
@@ -86,11 +85,12 @@ public:
 			);
 	}
 
-	// images
+	// cursors
 
-	virtual
 	CCursor*
-	GetStdCursor (EStdCursor CursorKind) = 0;
+	GetStdCursor (EStdCursor CursorKind);
+
+	// images
 
 	virtual
 	ref::CPtrT <CImage>
@@ -163,7 +163,6 @@ public:
 	bool
 	ReadClipboard (rtl::CString* pString) = 0;
 
-	virtual
 	rtl::CString
 	ReadClipboard ()
 	{
@@ -179,12 +178,24 @@ public:
 		size_t Length = -1
 		) = 0;
 
-	virtual
 	bool
 	WriteClipboard (const rtl::CString& String)
 	{
 		return WriteClipboard (String, String.GetLength ());
 	}
+
+	// caret
+
+	virtual
+	bool
+	ShowCaret (
+		CWidget* pWidget,
+		const TRect& Rect
+		) = 0;
+
+	virtual
+	void
+	HideCaret () = 0;
 
 protected:
 	friend class CFont;
@@ -195,6 +206,14 @@ protected:
 		CFont* pBaseFont,
 		uint_t Flags
 		) = 0;
+
+	virtual
+	ref::CPtrT <CFont>
+	CreateStdFont (EStdFont FontKind) = 0;
+
+	virtual
+	ref::CPtrT <CCursor>
+	CreateStdCursor (EStdCursor CursorKind) = 0;
 };
 
 //.............................................................................

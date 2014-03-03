@@ -36,18 +36,6 @@ public:
 		m_BaseTextAttr.Setup (EStdPalColor_WidgetText, EStdPalColor_WidgetBack, 0);
 	}
 
-	CFont*
-	GetFont ()
-	{
-		return m_pFont;
-	}
-
-	TColorAttr
-	GetColorAttr ()
-	{
-		return m_ColorAttr;
-	}
-
 	virtual
 	bool
 	DrawRect (

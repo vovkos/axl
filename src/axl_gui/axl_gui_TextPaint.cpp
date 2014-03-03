@@ -19,8 +19,6 @@ CTextPaint::Init (CCanvas* pCanvas)
 	m_pAttrEnd = NULL;
 	m_Top = 0;
 	m_Bottom = 0;
-	m_MonospaceCharSize.m_Width = 0;
-	m_MonospaceCharSize.m_Height = 0;
 	m_HexEncodingFlags = 0; 
 	m_UnprintableChar = '.';
 }
@@ -39,16 +37,9 @@ CTextPaint::CalcTextRect (
 	Rect.m_Top = m_Top;
 	Rect.m_Bottom = m_Bottom;
 
-	if (m_MonospaceCharSize.m_Width)
-	{
-		Rect.m_Right = m_Point.m_x + Length * m_MonospaceCharSize.m_Width;
-	}
-	else
-	{
-		TSize Size = m_pCanvas->GetFont ()->CalcTextSize (pText, Length);
-		Rect.m_Right = m_Point.m_x + Size.m_Width;
-	}
-
+	CFont* pFont = m_pCanvas->m_pBaseFont->GetFontMod (m_pCanvas->m_DefTextAttr.m_FontFlags);
+	TSize Size = pFont->CalcTextSize (pText, Length);
+	Rect.m_Right = m_Point.m_x + Size.m_Width;
 	return Rect;
 }
 
@@ -69,7 +60,6 @@ CTextPaint::PaintSpace_p (
 	m_pCanvas->DrawRect (Rect, Color);
 
 	m_Point.m_x = Rect.m_Right;
-
 	return m_Point.m_x;
 }
 
@@ -79,11 +69,9 @@ CTextPaint::PaintSpace (
 	uint_t Color
 	)
 {
-	if (m_MonospaceCharSize.m_Width)
-		return PaintSpace_p (Length * m_MonospaceCharSize.m_Width, Color);
-
-	TRect Rect = CalcTextRect (' ');
-	return PaintSpace_p (Length * (Rect.m_Right - Rect.m_Left), Color);
+	CFont* pFont = m_pCanvas->m_pBaseFont->GetFontMod (m_pCanvas->m_DefTextAttr.m_FontFlags);
+	TSize Size = pFont->CalcTextSize (" ", 1);
+	return PaintSpace_p (Length * Size.m_Width, Color);
 }
 
 // text
@@ -152,7 +140,7 @@ CTextPaint::PaintBinAsciiPart (size_t Size)
 
 	for (size_t i = 0; i < Length; i++)
 		if (!isprint ((uchar_t) p [i]))
-			p [i] = '.';
+			p [i] = m_UnprintableChar;
 
 	TRect Rect = CalcTextRect (m_BufferString, Length);
 	m_pCanvas->DrawText (m_Point, Rect, m_BufferString, Length);

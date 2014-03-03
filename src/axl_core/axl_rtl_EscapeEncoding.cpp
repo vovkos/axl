@@ -31,7 +31,10 @@ CEscapeEncoding::FindEscapeChar (char x)
 
 	case '\r':
 		return 'r';
-		
+
+	case '\x1b':
+		return 'e';
+
 	default:
 		return x;
 	};
@@ -62,7 +65,10 @@ CEscapeEncoding::FindEscapeReplaceChar (char x)
 
 	case 'r':
 		return '\r';
-		
+
+	case 'e':
+		return '\x1b';
+
 	default:
 		return x;
 	};

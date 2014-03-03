@@ -15,31 +15,29 @@ CGdiEngine::~CGdiEngine ()
 		::DestroyWindow (m_hWndClipboardOwner);
 }
 
-CFont*
-CGdiEngine::GetDefaultGuiFont ()
+ref::CPtrT <CFont>
+CGdiEngine::CreateStdFont (EStdFont FontKind)
 {
-	if (m_DefaultGuiFont)
-		return m_DefaultGuiFont;
-
-	m_DefaultGuiFont = CreateStockFont (DEFAULT_GUI_FONT);
-	return m_DefaultGuiFont;
-}
-
-CFont*
-CGdiEngine::GetDefaultMonospaceFont ()
-{
-	if (m_DefaultMonospaceFont)
-		return m_DefaultMonospaceFont;
-
 	LOGFONTW LogFont;
-	BuildLogFont (&LogFont, L"Courier New", 10);
-	LogFont.lfPitchAndFamily = FIXED_PITCH;
+	HFONT hFont;
 
-	HFONT hFont = ::CreateFontIndirectW (&LogFont);
-	ASSERT (hFont);
+	switch (FontKind)
+	{
+	case EStdFont_Gui:
+		return CreateStockFont (DEFAULT_GUI_FONT);
 
-	m_DefaultMonospaceFont = CreateFont (hFont);
-	return m_DefaultMonospaceFont;
+	case EStdFont_Monospace:
+		BuildLogFont (&LogFont, L"Courier New", 10);
+		LogFont.lfPitchAndFamily = FIXED_PITCH;
+
+		hFont = ::CreateFontIndirectW (&LogFont);
+		ASSERT (hFont);
+		
+		return CreateFont (hFont);
+
+	default:
+		return ref::EPtr_Null;
+	}
 }
 
 ref::CPtrT <CFont>
@@ -135,8 +133,8 @@ CGdiEngine::CreateStockCursor (LPCTSTR pStockCursorRes)
 	return Cursor;
 }
 
-CCursor*
-CGdiEngine::GetStdCursor (EStdCursor CursorKind)
+ref::CPtrT <CCursor>
+CGdiEngine::CreateStdCursor (EStdCursor CursorKind)
 {
 	static LPCTSTR StockCursorResTable [EStdCursor__Count] =
 	{
@@ -152,12 +150,7 @@ CGdiEngine::GetStdCursor (EStdCursor CursorKind)
 	};
 
 	ASSERT (CursorKind < EStdCursor__Count);
-	if (m_StdCursorArray [CursorKind])
-		return m_StdCursorArray [CursorKind];
-
-	ref::CPtrT <CCursor> Cursor = CreateStockCursor (StockCursorResTable [CursorKind]);
-	m_StdCursorArray [CursorKind] = Cursor;
-	return Cursor;
+	return CreateStockCursor (StockCursorResTable [CursorKind]);
 }
 
 ref::CPtrT <CImage>
@@ -354,6 +347,20 @@ CGdiEngine::OpenClipboard ()
 
 	Result = ::OpenClipboard (m_hWndClipboardOwner);
 	return err::Complete (Result);
+}
+
+bool
+CGdiEngine::ShowCaret (
+	CWidget* pWidget,
+	const TRect& Rect
+	)
+{
+	return true;
+}
+
+void
+CGdiEngine::HideCaret ()
+{
 }
 
 //.............................................................................

@@ -8,6 +8,54 @@ namespace gui {
 
 //.............................................................................
 
+bool
+CQtCaret::Show (
+	CWidget* pWidget,
+	const TRect& Rect
+	)
+{
+	ASSERT (pWidget);
+
+	if (m_pWidget && m_IsVisible)
+		m_pWidget->Redraw (m_Rect);
+
+	m_pWidget = pWidget;
+	m_Rect = Rect;
+	m_IsVisible = true;
+	
+	pWidget->Redraw (Rect);
+	
+	setSingleShot (false);
+	start (500);
+	return true;
+}
+
+void
+CQtCaret::Hide ()
+{
+	if (!m_pWidget)
+		return;
+
+	if (m_IsVisible)
+		m_pWidget->Redraw (m_Rect);
+
+	m_pWidget = NULL;
+	m_IsVisible = false;
+	stop ();
+}
+
+void
+CQtCaret::timerEvent  (QTimerEvent* e)
+{
+	if (!m_pWidget)
+		return;
+
+	m_IsVisible = !m_IsVisible;
+	m_pWidget->Redraw (m_Rect);
+}
+
+//.............................................................................
+
 CQtEngine*
 GetQtEngineSingleton ()
 {
@@ -16,27 +64,24 @@ GetQtEngineSingleton ()
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CFont*
-CQtEngine::GetDefaultGuiFont ()
+ref::CPtrT <CFont>
+CQtEngine::CreateStdFont (EStdFont FontKind)
 {
-	if (m_DefaultGuiFont)
-		return m_DefaultGuiFont;
+	switch (FontKind)
+	{
+	case EStdFont_Gui:
+		return CreateFont (QApplication::font ());
 
-	m_DefaultGuiFont = CreateFont (QApplication::font ());
-	return m_DefaultGuiFont;
-}
+	case EStdFont_Monospace:
+		{
+		QFont QtFont ("Monospace", 10);
+		QtFont.setStyleHint (QFont::TypeWriter);
+		return CreateFont (QtFont);
+		}
 
-CFont*
-CQtEngine::GetDefaultMonospaceFont ()
-{
-	if (m_DefaultMonospaceFont)
-		return m_DefaultMonospaceFont;
-
-	QFont QtFont ("Monospace", 10);
-	QtFont.setStyleHint (QFont::TypeWriter);
-
-	m_DefaultMonospaceFont = CreateFont (QtFont);
-	return m_DefaultMonospaceFont;
+	default:
+		return ref::EPtr_Null;
+	}
 }
 
 QFont
@@ -104,8 +149,8 @@ CQtEngine::GetFontMod (
 	return pFont;
 }
 
-CCursor*
-CQtEngine::GetStdCursor (EStdCursor CursorKind)
+ref::CPtrT <CCursor>
+CQtEngine::CreateStdCursor (EStdCursor CursorKind)
 {
 	static Qt::CursorShape StdCursorShapeTable [EStdCursor__Count] =
 	{
@@ -121,12 +166,7 @@ CQtEngine::GetStdCursor (EStdCursor CursorKind)
 	};
 
 	ASSERT (CursorKind < EStdCursor__Count);
-	if (m_StdCursorArray [CursorKind])
-		return m_StdCursorArray [CursorKind];
-
-	ref::CPtrT <CCursor> Cursor = CreateCursor (StdCursorShapeTable [CursorKind]);
-	m_StdCursorArray [CursorKind] = Cursor;
-	return Cursor;
+	return CreateCursor (StdCursorShapeTable [CursorKind]);
 }
 
 ref::CPtrT <CCursor>
