@@ -106,7 +106,7 @@ set (
 	${AXL_INC_DIR}/axl_io_win_File.h
 	${AXL_INC_DIR}/axl_io_win_Iocp.h
 	${AXL_INC_DIR}/axl_io_win_Mapping.h
-	${AXL_INC_DIR}/axl_io_win_Pipe.h
+	${AXL_INC_DIR}/axl_io_win_NamedPipe.h
 	${AXL_INC_DIR}/axl_io_win_Serial.h
 	${AXL_INC_DIR}/axl_io_win_Socket.h
 	)
@@ -116,7 +116,7 @@ set (
 	axl_io_win_File.cpp
 	axl_io_win_Iocp.cpp
 	axl_io_win_Mapping.cpp
-	axl_io_win_Pipe.cpp
+	axl_io_win_NamedPipe.cpp
 	axl_io_win_Serial.cpp
 	axl_io_win_Socket.cpp
 	)

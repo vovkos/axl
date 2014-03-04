@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_WIN_PIPE_H
+#define _AXL_WIN_NAMEDPIPE_H
 
 #include "axl_g_win_Handle.h"
 #include "axl_err_Error.h"
@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 	
-class CPipe: public g::win::CFileHandle
+class CNamedPipe: public g::win::CFileHandle
 {
 public:
 	bool 
@@ -41,7 +41,7 @@ public:
 	Connect (OVERLAPPED* pOverlapped = NULL)
 	{
 		bool_t Result = ::ConnectNamedPipe (m_h, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool 
@@ -50,10 +50,10 @@ public:
 		dword_t Size, 
 		dword_t* pActualSize,
 		OVERLAPPED* pOverlapped = NULL
-		)
+		) const
 	{
 		bool_t Result = ::ReadFile (m_h, p, Size, pActualSize, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool 
@@ -65,7 +65,7 @@ public:
 		)
 	{
 		bool_t Result = ::WriteFile (m_h, p, Size, pActualSize, pOverlapped);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool 
@@ -74,10 +74,10 @@ public:
 		dword_t Size, 
 		OVERLAPPED* pOverlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
-		)
+		) const
 	{
 		bool_t Result = ::ReadFileEx (m_h, p, Size, pOverlapped, pfOnComplete);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
 	bool 
@@ -89,7 +89,7 @@ public:
 		)
 	{
 		bool_t Result = ::WriteFileEx (m_h, p, Size, pOverlapped, pfOnComplete);
-		return err::Complete (Result);
+		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 };
 

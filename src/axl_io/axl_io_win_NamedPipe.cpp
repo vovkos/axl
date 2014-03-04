@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_io_win_Pipe.h"
+#include "axl_io_win_NamedPipe.h"
 
 namespace axl {
 namespace io {
@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool 
-CPipe::Create (
+CNamedPipe::Create (
 	const wchar_t* pName,
 	uint_t OpenMode,
 	uint_t PipeMode,
@@ -36,7 +36,7 @@ CPipe::Create (
 }
 
 bool 
-CPipe::Open (
+CNamedPipe::Open (
 	const wchar_t* pName,
 	uint_t Access,
 	uint_t Flags
@@ -53,5 +53,3 @@ CPipe::Open (
 } // namespace win
 } // namespace io
 } // namespace axl
-
- 
