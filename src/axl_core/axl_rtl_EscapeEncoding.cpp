@@ -178,7 +178,7 @@ CEscapeEncoding::Decode (
 			if (pHexCodeEnd != &HexCodeString [HexCodeLen])
 				HexCode = '?';
 
-			pString->Append ((uint8_t) HexCode);
+			pString->Append ((char const*) &HexCode, 1);
 			State = EState_Normal;
 			pBase = p + 1;
 			break;

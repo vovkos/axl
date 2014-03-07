@@ -22,6 +22,10 @@ CSerial::SetSettings (
 	if (!Result)
 		return false;
 
+	Dcb.fBinary = TRUE;
+	Dcb.fDsrSensitivity = FALSE;
+	Dcb.fDtrControl = DTR_CONTROL_DISABLE;
+
 	if (Mask & ESerialSetting_BaudRate)
 		Dcb.BaudRate = pSettings->m_BaudRate;
 
@@ -52,8 +56,19 @@ CSerial::SetSettings (
 			Dcb.fInX = TRUE;
 			break;
 		}
+	
+	if (!(Mask & ESerialSetting_ReadInterval))
+		return m_Serial.SetSettings (&Dcb);
 
-	return m_Serial.SetSettings (&Dcb);
+	COMMTIMEOUTS Timeouts = { 0 };
+	Timeouts.ReadIntervalTimeout = 
+		pSettings->m_ReadInterval == 0 ? -1 :
+		pSettings->m_ReadInterval == -1 ? 0 :
+		pSettings->m_ReadInterval;
+
+	return 
+		m_Serial.SetSettings (&Dcb) &&
+		m_Serial.SetTimeouts (&Timeouts);
 }
 
 bool

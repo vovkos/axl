@@ -39,6 +39,20 @@ public:
 	}
 
 	bool
+	GetTimeouts (COMMTIMEOUTS* pTimeouts)
+	{
+		bool_t Result = ::GetCommTimeouts (m_h, pTimeouts);
+		return err::Complete (Result);
+	}
+
+	bool
+	SetTimeouts (const COMMTIMEOUTS* pTimeouts)
+	{
+		bool_t Result = ::SetCommTimeouts (m_h, (COMMTIMEOUTS*) pTimeouts);
+		return err::Complete (Result);
+	}
+
+	bool
 	Escape (uint_t Function)
 	{
 		bool_t Result = ::EscapeCommFunction (m_h, Function);

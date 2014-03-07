@@ -17,31 +17,11 @@ namespace io {
 
 //.............................................................................
 
-enum ESerialBaud
+enum ESerialFlowControl
 {
-	ESerialBaud_110    = 110,
-	ESerialBaud_300    = 300,
-	ESerialBaud_600    = 600,
-	ESerialBaud_1200   = 1200,
-	ESerialBaud_2400   = 2400,
-	ESerialBaud_4800   = 4800,
-	ESerialBaud_9600   = 9600,
-	ESerialBaud_14400  = 14400,
-	ESerialBaud_19200  = 19200,
-	ESerialBaud_38400  = 38400,
-	ESerialBaud_56000  = 56000,
-	ESerialBaud_57600  = 57600,
-	ESerialBaud_115200 = 115200,
-	ESerialBaud_128000 = 128000,
-	ESerialBaud_256000 = 256000,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum ESerialDataBits
-{
-	ESerialDataBits_7 = 7,
-	ESerialDataBits_8 = 8,
+	ESerialFlowControl_None = 0,
+	ESerialFlowControl_RtsCts,
+	ESerialFlowControl_XonXoff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,6 +33,7 @@ enum ESerialStopBits
 	ESerialStopBits_2  = 2,
 };
 
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ESerialParity
@@ -62,15 +43,6 @@ enum ESerialParity
 	ESerialParity_Even  = 2,
 	ESerialParity_Mark  = 3,
 	ESerialParity_Space = 4,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum ESerialFlowControl
-{
-	ESerialFlowControl_None = 0,
-	ESerialFlowControl_RtsCts,
-	ESerialFlowControl_XonXoff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -87,11 +59,12 @@ enum ESerialStatusLine
 
 enum ESerialSetting
 {
-	ESerialSetting_BaudRate        = 0x01,
-	ESerialSetting_DataBits        = 0x02,
-	ESerialSetting_StopBits        = 0x04,
-	ESerialSetting_Parity          = 0x08,
-	ESerialSetting_FlowControl     = 0x10,
+	ESerialSetting_BaudRate     = 0x01,
+	ESerialSetting_FlowControl  = 0x02,
+	ESerialSetting_DataBits     = 0x04,
+	ESerialSetting_StopBits     = 0x08,
+	ESerialSetting_Parity       = 0x10,
+	ESerialSetting_ReadInterval = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -99,10 +72,48 @@ enum ESerialSetting
 struct TSerialSettings
 {
 	uint_t m_BaudRate;
+	ESerialFlowControl m_FlowControl;
 	uint_t m_DataBits;
 	ESerialStopBits m_StopBits;
 	ESerialParity m_Parity;
-	ESerialFlowControl m_FlowControl;
+	uint_t m_ReadInterval; // inverse of COMMTIMEOUTS.ReadIntervalTimeout (which always makes me confused):
+	                       // 0  -- return immediatly
+	                       // -1 -- wait for the buffer to fill completely
+
+	TSerialSettings ()
+	{
+		Setup (38400);
+	}
+
+	TSerialSettings (
+		uint_t BaudRate,
+		ESerialFlowControl FlowControl = ESerialFlowControl_None,
+		uint_t DataBits = 8,
+		ESerialStopBits StopBits = ESerialStopBits_1,
+		ESerialParity Parity = ESerialParity_None,
+		uint_t ReadInterval = 10 // 10ms can be used in general case
+		)
+	{
+		Setup (BaudRate, FlowControl, DataBits, StopBits, Parity, ReadInterval);
+	}
+
+	void 
+	Setup (
+		uint_t BaudRate,
+		ESerialFlowControl FlowControl = ESerialFlowControl_None,
+		uint_t DataBits = 8,
+		ESerialStopBits StopBits = ESerialStopBits_1,
+		ESerialParity Parity = ESerialParity_None,
+		uint_t ReadInterval = 10
+		)
+	{
+		m_BaudRate = BaudRate;
+		m_FlowControl = FlowControl;
+		m_DataBits = DataBits;
+		m_StopBits = StopBits;
+		m_Parity = Parity;
+		m_ReadInterval = ReadInterval;
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
