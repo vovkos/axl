@@ -8,10 +8,9 @@ namespace gui {
 //.............................................................................
 
 uint_t
-CQtWidgetImpl::GetKeyFromQtKey (int QtKey)
+GetKeyFromQtKey (int QtKey)
 {
-	if (!(QtKey & 0x01000000))
-		return QtKey;
+	ASSERT (QtKey & 0x01000000);
 
 	size_t Index = QtKey & ~0x01000000;
 
@@ -164,9 +163,20 @@ CQtWidgetImpl::OnKeyEvent (
 
 	TWidgetKeyMsg Msg;
 	Msg.m_MsgKind = MsgKind;
-	Msg.m_Key = GetKeyFromQtKey (pEvent->key ());
-	Msg.m_ModifierKeys = GetModifierKeysFromQtModifiers (pEvent->modifiers ());
 
+	int QtKey = pEvent->key ();
+	if (QtKey & 0x01000000)
+	{
+		Msg.m_Key = GetKeyFromQtKey (QtKey);
+	}
+	else 
+	{
+		Msg.m_Key = QtKey;
+		Msg.m_Char = pEvent->text ().at (0).unicode ();
+	}
+
+	Msg.m_ModifierKeys = GetModifierKeysFromQtModifiers (pEvent->modifiers ());
+	
 	bool IsHandled = true;
 	ProcessWidgetMsg (&Msg, &IsHandled);			
 

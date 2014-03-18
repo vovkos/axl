@@ -309,6 +309,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_Pack.h
 	${AXL_INC_DIR}/axl_rtl_Packer.h
 	${AXL_INC_DIR}/axl_rtl_Packetizer.h
+	${AXL_INC_DIR}/axl_rtl_Protocol.h
 	${AXL_INC_DIR}/axl_rtl_RbTree.h
 	${AXL_INC_DIR}/axl_rtl_RuntimeType.h
 	${AXL_INC_DIR}/axl_rtl_SimpleSingleton.h

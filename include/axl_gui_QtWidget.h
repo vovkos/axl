@@ -42,9 +42,6 @@ public:
 	}
 
 	uint_t
-	GetKeyFromQtKey (int QtKey);
-
-	uint_t
 	GetModifierKeysFromQtModifiers (int QtModifiers)
 	{
 		return (QtModifiers >> 25) & 0x7;
@@ -329,33 +326,6 @@ public:
 	ReleaseMouseCapture ()
 	{
 		m_pQtWidget->releaseMouse ();
-		return true;
-	}
-
-	virtual
-	bool
-	SetCaretVisible (bool IsVisible)
-	{
-		return true;
-	}
-
-	virtual
-	bool
-	SetCaretPos (
-		int x, 
-		int y
-		)
-	{
-		return true;
-	}
-
-	virtual
-	bool
-	SetCaretSize (
-		uint_t Width, 
-		uint_t Height
-		)
-	{
 		return true;
 	}
 

@@ -170,11 +170,13 @@ struct TWidgetKeyMsg: TWidgetMsg
 {
 	uint_t m_Key;
 	uint_t m_ModifierKeys;
+	utf32_t m_Char;
 
 	TWidgetKeyMsg ()
 	{
 		m_Key = 0;
 		m_ModifierKeys = 0;
+		m_Char = 0;
 	}
 };
 
