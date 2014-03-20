@@ -169,6 +169,14 @@ public:
 		);
 
 	int
+	PaintHyperBinHex4BitCursor (
+		const CTextAttrAnchorArray* pAttrArray, 
+		size_t CursorPos, 
+		const void* p, 
+		size_t Size
+		);
+
+	int
 	PaintSelHyperBinAscii (
 		const CTextAttrAnchorArray* pAttrArray, 
 		size_t SelStart, 

@@ -451,6 +451,53 @@ CTextPaint::PaintSelHyperBinHex (
 }
 
 int
+CTextPaint::PaintHyperBinHex4BitCursor (
+	const CTextAttrAnchorArray* pAttrArray, 
+	size_t CursorPos, 
+	const void* p, 
+	size_t Size
+	)
+{
+	if (CursorPos >= Size) 
+		return PaintHyperBinHex (pAttrArray, p, Size);
+
+	PaintHyperBinHex (pAttrArray, p, CursorPos);
+
+	uchar_t* pCursor = (uchar_t*) p + CursorPos;
+	
+	gui::TTextAttr Attr = m_pCanvas->m_DefTextAttr;
+
+	char Char = rtl::CHexEncoding::GetHexChar_l (*pCursor & 0xf);
+	char CharBuffer [8] = { Char, ' ', ' ', 0 };
+	TRect Rect = CalcTextRect (CharBuffer, 3);
+	m_pCanvas->m_DefTextAttr.Overlay (m_SelAttr);
+	m_pCanvas->DrawText (m_Point, Rect, CharBuffer, 3);
+
+	m_Point.m_x = Rect.m_Right;
+
+	if (CursorPos + 1 < Size)
+	{
+		size_t Leftover = Size - CursorPos - 1;
+
+		m_p = (uchar_t*) m_p + CursorPos + 1;
+		m_pCanvas->m_DefTextAttr = Attr;
+
+		if (!pAttrArray)
+		{
+			PaintHyperBinHex (NULL, pCursor + 1, Leftover);
+		}
+		else
+		{
+			m_SelOverlay = *pAttrArray;
+			m_SelOverlay.ClearBefore (CursorPos);
+			PaintHyperBinHex (&m_SelOverlay, pCursor + 1, Leftover);
+		}		
+	}
+
+	return m_Point.m_x;
+}
+
+int
 CTextPaint::PaintSelHyperBinAscii (
 	const CTextAttrAnchorArray* pAttrArray,
 	size_t SelStart,

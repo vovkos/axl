@@ -8,7 +8,7 @@ namespace gui {
 //.............................................................................
 
 size_t
-CTextAttrAnchorArray::FindAnchor (size_t Offset)
+CTextAttrAnchorArray::FindAnchor (size_t Offset) const
 {
 	size_t Index = -1;
 	size_t Count = m_Array.GetCount ();
@@ -18,7 +18,7 @@ CTextAttrAnchorArray::FindAnchor (size_t Offset)
 	while (Begin < End)
 	{
 		size_t Mid = (Begin + End) / 2;
-		TTextAttrAnchor* pAnchor = &m_Array [Mid];
+		const TTextAttrAnchor* pAnchor = &m_Array [Mid];
 
 		ASSERT (Mid < Count);
 			
@@ -129,6 +129,14 @@ CTextAttrAnchorArray::Normalize (
 
 	if (RemoveCount)
 		m_Array.Remove (RemoveIndex, RemoveCount);
+}
+
+void 
+CTextAttrAnchorArray::ClearBefore (size_t Offset)
+{
+	size_t Anchor = FindAnchor (Offset);
+	if (Anchor != -1)
+		m_Array.Remove (0, Anchor + 1);
 }
 
 void

@@ -75,6 +75,9 @@ public:
 		m_Array.Clear ();
 	}
 
+	void 
+	ClearBefore (size_t Offset);
+
 	void
 	Copy (
 		const TTextAttrAnchor* pAttrAnchorArray,
@@ -82,6 +85,13 @@ public:
 		)
 	{
 		m_Array.Copy (pAttrAnchorArray, AttrAnchorCount);
+	}
+
+	TTextAttr
+	GetAttr (size_t Offset) const
+	{
+		size_t Anchor = FindAnchor (Offset);
+		return Anchor == -1 ? m_Array [Anchor].m_Attr : TTextAttr ();
 	}
 
 	void 
@@ -94,7 +104,7 @@ public:
 
 protected:
 	size_t
-	FindAnchor (size_t Offset);
+	FindAnchor (size_t Offset) const;
 
 	size_t
 	GetStartAnchor (
