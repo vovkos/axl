@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_rtl_EscapeEncoding.h"
+#include "axl_rtl_HexEncoding.h"
 
 namespace axl {
 namespace rtl {
@@ -89,16 +90,28 @@ CEscapeEncoding::Encode (
 	const char* pEnd = p + Length;
 	for (; p < pEnd; p++)
 	{
-		char Escape = FindEscapeChar (*p);
-		
+		if (isprint (*p))
+			continue;
+
+		char EscapeSequence [4] = { '\\' };
+
+		pString->Append (pBase, p - pBase);
+
+		char Escape = FindEscapeChar (*p);		
 		if (Escape != *p)
 		{
-			char EscapeSequence [2] = { '\\', Escape };
-
-			pString->Append (pBase, p - pBase);
+			EscapeSequence [1] = Escape;
 			pString->Append (EscapeSequence, 2);
-			pBase = p + 1;
 		}
+		else
+		{
+			EscapeSequence [1] = 'x';
+			EscapeSequence [2] = CHexEncoding::GetHexChar_l (*p >> 4);
+			EscapeSequence [3] = CHexEncoding::GetHexChar_l (*p);
+			pString->Append (EscapeSequence, 4);
+		}
+
+		pBase = p + 1;
 	}
 
 	pString->Append (pBase, p - pBase);
