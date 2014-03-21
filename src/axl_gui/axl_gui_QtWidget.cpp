@@ -168,6 +168,8 @@ CQtWidgetImpl::OnKeyEvent (
 	if (QtKey & 0x01000000)
 	{
 		Msg.m_Key = GetKeyFromQtKey (QtKey);
+		if (QtKey <= Qt::Key_Enter)
+			Msg.m_Char = Msg.m_Key;
 	}
 	else 
 	{
