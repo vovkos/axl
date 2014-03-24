@@ -73,6 +73,13 @@ public:
 	{
 		return true;
 	}
+
+	static 
+	bool
+	ParseBoolValue (const char* pValue)
+	{
+		return _stricmp (pValue, "true") == 0 || atoi (pValue) != 0;
+	}
 };
 
 //.............................................................................
