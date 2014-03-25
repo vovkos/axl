@@ -30,7 +30,7 @@ CSocket::GetError ()
 bool
 CSocket::SetBlockingMode (bool IsBlocking)
 {
-	int Value = IsBlocking;
+	int Value = !IsBlocking;
 	int Result = ::ioctl (m_h, FIONBIO, &Value);
 	return err::Complete (m_h != -1);
 }

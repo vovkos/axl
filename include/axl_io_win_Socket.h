@@ -157,7 +157,8 @@ public:
 	WsaOpen (
 		int AddressFamily,
 		int SockKind,
-		int Protocol
+		int Protocol,
+		dword_t Flags = WSA_FLAG_OVERLAPPED
 		);
 
 	bool

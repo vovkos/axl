@@ -30,7 +30,7 @@ CSocket::GetError ()
 bool
 CSocket::SetBlockingMode (bool IsBlocking)
 {
-	ulong_t Value = IsBlocking;
+	ulong_t Value = !IsBlocking;
 	int Result = ::ioctlsocket (m_h, FIONBIO, &Value);
 	return err::Complete (m_h != -1);
 }
@@ -108,11 +108,12 @@ bool
 CSocket::WsaOpen (
 	int AddressFamily,
 	int SockKind,
-	int Protocol
+	int Protocol,
+	dword_t Flags
 	)
 {
 	Close ();
-	m_h = ::WSASocket (AddressFamily, SockKind, Protocol, NULL, 0, WSA_FLAG_OVERLAPPED);
+	m_h = ::WSASocket (AddressFamily, SockKind, Protocol, NULL, 0, Flags);
 	return err::Complete (m_h != INVALID_SOCKET);
 }
 
