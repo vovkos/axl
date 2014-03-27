@@ -27,6 +27,31 @@ enum EUtf
 const char*
 GetUtfKindString (EUtf UtfKind);
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+size_t
+CalcUtfCodePointCount (
+	const typename T::C* p,
+	size_t Length
+	)
+{
+	const T::C* pEnd = p + Length;
+
+	size_t Count = 0;
+	while (p < pEnd)
+	{
+		size_t SrcCodePointLength = T::GetDecodeCodePointLength (*p);
+		if (p + SrcCodePointLength > pEnd)
+			break;
+
+		p += SrcCodePointLength;
+		Count++;
+	}
+
+	return Count;
+}
+
 //.............................................................................
 
 class CUtf8
@@ -133,22 +158,32 @@ public:
 			p [0] = -1;
 		}
 	}
+
+	static
+	size_t
+	CalcCodePointCount (
+		const C* p,
+		size_t Length
+		)
+	{
+		return CalcUtfCodePointCount <CUtf8> (p, Length);
+	}
 };
 
 //.............................................................................
 		
-enum EUtf16Surrogate
-{
-	EUtf16Surrogate_MinLead  = 0xd800,
-	EUtf16Surrogate_MaxLead  = 0xdbff,
-	EUtf16Surrogate_MinTrail = 0xdc00,
-	EUtf16Surrogate_MaxTrail = 0xdfff,
-};
-
 class CUtf16
 {
 public:
 	typedef utf16_t C;
+
+	enum ESurrogate
+	{
+		ESurrogate_MinLead  = 0xd800,
+		ESurrogate_MaxLead  = 0xdbff,
+		ESurrogate_MinTrail = 0xdc00,
+		ESurrogate_MaxTrail = 0xdfff,
+	};
 
 	static
 	EUtf 
@@ -255,6 +290,16 @@ public:
 			p [1] = GetTrailSurrogate (x);
 		}
 	}
+
+	static
+	size_t
+	CalcCodePointCount (
+		const C* p,
+		size_t Length
+		)
+	{
+		return CalcUtfCodePointCount <CUtf16> (p, Length);
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -307,6 +352,16 @@ public:
 			p [0] = GetTrailSurrogate (x);
 			p [1] = GetLeadSurrogate (x);
 		}
+	}
+
+	static
+	size_t
+	CalcCodePointCount (
+		const C* p,
+		size_t Length
+		)
+	{
+		return CalcUtfCodePointCount <CUtf16_be> (p, Length);
 	}
 };
 
@@ -368,6 +423,16 @@ public:
 		)
 	{
 		*p = x;
+	}
+
+	static
+	size_t
+	CalcCodePointCount (
+		const C* p,
+		size_t Length
+		)
+	{
+		return Length;
 	}
 };
 
@@ -443,56 +508,23 @@ public:
 			utf32_t x = CSrcEncoding::DecodeCodePoint (p);		
 			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
 			
+			ResultLength += DstCodePointLength;			
 			p += SrcCodePointLength;
-			ResultLength += DstCodePointLength;
 		}
 
 		return ResultLength;
 	}
 
 	static
-	size_t 
+	void
 	Convert (
 		CDstUnit* pDst,
 		size_t DstLength,
 		const CSrcUnit* pSrc,
-		size_t SrcLength
-		) // returns number of dst units written
-	{
-		CDstUnit* pDst0 = pDst;
-		CDstUnit* pDstEnd = pDst + DstLength;
-		const CSrcUnit* pSrcEnd = pSrc + SrcLength;
-
-		while (pSrc < pSrcEnd)
-		{
-			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*pSrc);
-			if (pSrc + SrcCodePointLength > pSrcEnd)
-				break;
-
-			utf32_t x = CSrcEncoding::DecodeCodePoint (pSrc);
-			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
-			if (pDst + DstCodePointLength > pDstEnd)
-				break;
-
-			CDstEncoding::EncodeCodePoint (pDst, x);
-
-			pSrc += SrcCodePointLength;
-			pDst += DstCodePointLength;
-		}
-
-		return pDst - pDst0;
-	}
-
-	static
-	void
-	IncrementalConvert (
-		CDstUnit* pDst,
-		size_t DstLength,
-		const CSrcUnit* pSrc,
 		size_t SrcLength,
-		size_t* pTakenDstLength,
-		size_t* pTakenSrcLength,
-		size_t* pExpectedSrcLength
+		size_t* pTakenDstLength = NULL,
+		size_t* pTakenSrcLength = NULL,
+		size_t* pExpectedSrcLength = NULL
 		)
 	{
 		CDstUnit* pDst0 = pDst;
@@ -500,14 +532,14 @@ public:
 		const CSrcUnit* pSrc0 = pSrc;
 		const CSrcUnit* pSrcEnd = pSrc + SrcLength;
 
-		*pExpectedSrcLength = 0;
+		size_t ExpectedSrcLength = 0;
 
 		while (pSrc < pSrcEnd)
 		{
 			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*pSrc);
 			if (pSrc + SrcCodePointLength > pSrcEnd)
 			{
-				*pExpectedSrcLength = SrcCodePointLength;
+				ExpectedSrcLength = SrcCodePointLength;
 				break;
 			}
 
@@ -518,12 +550,173 @@ public:
 
 			CDstEncoding::EncodeCodePoint (pDst, x);
 
-			pSrc += SrcCodePointLength;
 			pDst += DstCodePointLength;
+			pSrc += SrcCodePointLength;
 		}
 
-		*pTakenDstLength = pDst - pDst0;
-		*pTakenSrcLength = pSrc - pSrc0;
+		if (pTakenDstLength)
+			*pTakenDstLength = pDst - pDst0;
+		
+		if (pTakenSrcLength)
+			*pTakenSrcLength = pSrc - pSrc0;
+
+		if (pExpectedSrcLength)
+			*pExpectedSrcLength = ExpectedSrcLength;
+	}
+};
+
+//.............................................................................
+
+template <typename TSrcEncoding>
+class CUtfToAsciiConvertT 
+{
+public:
+	typedef TSrcEncoding CSrcEncoding;
+	typedef typename CSrcEncoding::C CSrcUnit;
+
+public:
+	static
+	size_t
+	CalcRequiredLength (
+		const CSrcUnit* p,
+		size_t Length
+		)
+	{
+		const CSrcUnit* pEnd = p + Length;
+
+		size_t ResultLength = 0;
+		while (p < pEnd)
+		{
+			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*p);
+			if (p + SrcCodePointLength > pEnd)
+				break;
+
+			ResultLength++;
+			p += SrcCodePointLength;
+		}
+
+		return ResultLength;
+	}
+
+	static
+	void
+	Convert (
+		char* pDst,
+		size_t DstLength,
+		const CSrcUnit* pSrc,
+		size_t SrcLength,
+		size_t* pTakenDstLength = NULL,
+		size_t* pTakenSrcLength = NULL,
+		size_t* pExpectedSrcLength = NULL
+		)
+	{
+		char* pDst0 = pDst;
+		char* pDstEnd = pDst + DstLength;
+		const CSrcUnit* pSrc0 = pSrc;
+		const CSrcUnit* pSrcEnd = pSrc + SrcLength;
+
+		size_t ExpectedSrcLength = 0;
+
+		while (pSrc < pSrcEnd && pDst < pDstEnd)
+		{
+			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*pSrc);
+			if (pSrc + SrcCodePointLength > pSrcEnd)
+			{
+				ExpectedSrcLength = SrcCodePointLength;
+				break;
+			}
+
+			utf32_t x = CSrcEncoding::DecodeCodePoint (pSrc);
+			*pDst = (char) x;
+
+			pDst++;
+			pSrc += SrcCodePointLength;
+		}
+
+		if (pTakenDstLength)
+			*pTakenDstLength = pDst - pDst0;
+
+		if (pTakenSrcLength)
+			*pTakenSrcLength = pSrc - pSrc0;
+
+		if (pExpectedSrcLength)
+			*pExpectedSrcLength = ExpectedSrcLength;
+
+	}
+};
+
+//.............................................................................
+
+template <typename TDstEncoding>
+class CAsciiToUtfConvertT 
+{
+public:
+	typedef TDstEncoding CDstEncoding;
+	typedef typename CDstEncoding::C CDstUnit;
+
+public:
+	static
+	size_t
+	CalcRequiredLength (
+		const char* p,
+		size_t Length
+		)
+	{
+		const char* pEnd = p + Length;
+
+		size_t ResultLength = 0;
+		while (p < pEnd)
+		{
+			utf32_t x = (uchar_t) *pSrc; // don't propagate sign bit
+
+			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
+			
+			ResultLength += DstCodePointLength;
+			p++;
+		}
+
+		return ResultLength;
+	}
+
+	static
+	void
+	Convert (
+		CDstUnit* pDst,
+		size_t DstLength,
+		const char* pSrc,
+		size_t SrcLength,
+		size_t* pTakenDstLength = NULL,
+		size_t* pTakenSrcLength = NULL,
+		size_t* pExpectedSrcLength = NULL
+		)
+	{
+		CDstUnit* pDst0 = pDst;
+		CDstUnit* pDstEnd = pDst + DstLength;
+		const char* pSrc0 = pSrc;
+		const char* pSrcEnd = pSrc + SrcLength;
+
+		while (pSrc < pSrcEnd)
+		{
+			utf32_t x = (uchar_t) *pSrc; // don't propagate sign bit
+
+			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
+			if (pDst + DstCodePointLength > pDstEnd)
+				break;
+
+			CDstEncoding::EncodeCodePoint (pDst, x);
+
+			pDst += DstCodePointLength;
+			pSrc++;
+		}
+
+		if (pTakenDstLength)
+			*pTakenDstLength = pDst - pDst0;
+
+		if (pTakenSrcLength)
+			*pTakenSrcLength = pSrc - pSrc0;
+
+		if (pExpectedSrcLength)
+			*pExpectedSrcLength = 0;
 	}
 };
 
