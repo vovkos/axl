@@ -7,7 +7,6 @@
 #define _AXL_RTL_UTF_H
 
 #include "axl_rtl_ByteOrder.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace rtl {
@@ -34,7 +33,7 @@ class CUtf8
 {
 public:
 	typedef utf8_t C;
-
+	
 	static
 	EUtf 
 	GetUtfKind ()
@@ -59,35 +58,31 @@ public:
 
 	static
 	size_t
-	GetDecodeCodePointLength (C c)
+	GetDecodeCodePointLength (utf8_t c)
 	{
-		size_t Length = 
+		return 
 			(c & 0x80) == 0    ? 1 :     // 0xxxxxxx
 			(c & 0xe0) == 0xc0 ? 2 :     // 110xxxxx 10xxxxxx 
 			(c & 0xf0) == 0xe0 ? 3 :     // 1110xxxx 10xxxxxx 10xxxxxx
-			(c & 0xf8) == 0xf0 ? 4 : -1; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-
-		return err::CompleteWithSystemError (Length, (size_t) -1, err::EStatus_InvalidParameter);
+			(c & 0xf8) == 0xf0 ? 4 : 1;  // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 	}
 
 	static
 	size_t
 	GetEncodeCodePointLength (utf32_t x)
 	{
-		size_t Length = 
+		return 
 			x < 0x80 ? 1 :               // 0xxxxxxx
 			x < 0x800 ? 2 :              // 110xxxxx 10xxxxxx 
 			x < 0x10000 ? 3 :            // 1110xxxx 10xxxxxx 10xxxxxx
-			x < 0x200000 ? 4 : -1;       // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-
-		return err::CompleteWithSystemError (Length, (size_t) -1, err::EStatus_InvalidParameter);
+			x < 0x200000 ? 4 : 1;        // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 	}	
 
 	static
 	utf32_t
-	DecodeCodePoint (const C* p)
+	DecodeCodePoint (const utf8_t* p)
 	{
-		utf32_t x = 
+		return
 			((*p & 0x80) == 0)    ?      // 0xxxxxxx
 				*p :         
 			((*p & 0xe0) == 0xc0) ?      // 110xxxxx 10xxxxxx 
@@ -101,15 +96,13 @@ public:
 				((p [0] & 0x07) << 18) | 
 				((p [1] & 0x3f) << 12) |
 				((p [2] & 0x3f) << 6)  |
-				 (p [3] & 0x3f) : -1;
-
-		return err::CompleteWithSystemError (x, (utf32_t) -1, err::EStatus_InvalidParameter);
+				 (p [3] & 0x3f) : 0xffff; // use non-character U+FFFF (needs no surrogate in UTF-16)
 	}
 
 	static
-	bool
+	void
 	EncodeCodePoint (
-		C* p,
+		utf8_t* p,
 		utf32_t x
 		)
 	{
@@ -137,10 +130,8 @@ public:
 		}
 		else
 		{
-			return err::Fail (err::EStatus_InvalidParameter);
+			p [0] = -1;
 		}
-
-		return true;
 	}
 };
 
@@ -228,7 +219,7 @@ public:
 
 	static
 	size_t
-	GetDecodeCodePointLength (C c)
+	GetDecodeCodePointLength (utf16_t c)
 	{
 		return IsLeadSurrogate (c) ? 2 : 1;
 	}
@@ -242,29 +233,27 @@ public:
 
 	static
 	utf32_t
-	DecodeCodePoint (const C* p)
+	DecodeCodePoint (const utf16_t* p)
 	{
 		return IsLeadSurrogate (*p) ? GetSurrogateCodePoint (p [0], p [1]) : (uint16_t) *p;
 	}
 
 	static
-	bool
+	void
 	EncodeCodePoint (
-		C* p,
+		utf16_t* p,
 		utf32_t x
 		)
 	{
 		if (!NeedSurrogate (x))
 		{
-			*p = (C) x;
+			*p = (utf16_t) x;
 		}
 		else
 		{
 			p [0] = GetLeadSurrogate (x);
 			p [1] = GetTrailSurrogate (x);
 		}
-
-		return true;
 	}
 };
 
@@ -290,36 +279,34 @@ public:
 
 	static
 	size_t
-	GetDecodeCodePointLength (C c)
+	GetDecodeCodePointLength (utf16_t c)
 	{
 		return IsTrailSurrogate (c) ? 2 : 1;
 	}
 
 	static
 	utf32_t
-	DecodeCodePoint (const C* p)
+	DecodeCodePoint (const utf16_t* p)
 	{
 		return IsTrailSurrogate (*p) ? GetSurrogateCodePoint (p [1], p [0]) : (uint16_t) *p;
 	}
 
 	static
-	bool
+	void
 	EncodeCodePoint (
-		C* p,
+		utf16_t* p,
 		utf32_t x
 		)
 	{
 		if (!NeedSurrogate (x))
 		{
-			*p = (C) x;
+			*p = (utf16_t) x;
 		}
 		else
 		{
 			p [0] = GetTrailSurrogate (x);
 			p [1] = GetLeadSurrogate (x);
 		}
-
-		return true;
 	}
 };
 
@@ -354,7 +341,7 @@ public:
 
 	static
 	size_t
-	GetDecodeCodePointLength (C c)
+	GetDecodeCodePointLength (utf32_t c)
 	{
 		return 1;
 	}
@@ -368,23 +355,21 @@ public:
 
 	static
 	utf32_t
-	DecodeCodePoint (const C* p)
+	DecodeCodePoint (const utf32_t* p)
 	{
 		return *p;
 	}
 
 	static
-	bool
+	void
 	EncodeCodePoint (
-		C* p,
+		utf32_t* p,
 		utf32_t x
 		)
 	{
 		*p = x;
-		return true;
 	}
 };
-
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -408,20 +393,19 @@ public:
 
 	static
 	utf32_t
-	DecodeCodePoint (const C* p)
+	DecodeCodePoint (const utf32_t* p)
 	{
 		return rtl::SwapByteOrder32 (*p);
 	}
 
 	static
-	bool
+	void
 	EncodeCodePoint (
-		C* p,
+		utf32_t* p,
 		utf32_t x
 		)
 	{
 		*p = rtl::SwapByteOrder32 (x);
-		return true;
 	}
 };
 
@@ -453,17 +437,11 @@ public:
 		while (p < pEnd)
 		{
 			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*p);
-			if (SrcCodePointLength == -1)
-				return -1;
-
 			if (p + SrcCodePointLength > pEnd)
 				break;
 
 			utf32_t x = CSrcEncoding::DecodeCodePoint (p);		
-
 			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
-			if (DstCodePointLength == -1)
-				return -1;
 			
 			p += SrcCodePointLength;
 			ResultLength += DstCodePointLength;
@@ -481,36 +459,71 @@ public:
 		size_t SrcLength
 		) // returns number of dst units written
 	{
+		CDstUnit* pDst0 = pDst;
 		CDstUnit* pDstEnd = pDst + DstLength;
 		const CSrcUnit* pSrcEnd = pSrc + SrcLength;
 
-		size_t ResultLength = 0;
 		while (pSrc < pSrcEnd)
 		{
 			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*pSrc);
-			if (SrcCodePointLength == -1)
-				return -1;
-
 			if (pSrc + SrcCodePointLength > pSrcEnd)
 				break;
 
 			utf32_t x = CSrcEncoding::DecodeCodePoint (pSrc);
-
 			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
-			if (DstCodePointLength == -1)
-				break;
-
 			if (pDst + DstCodePointLength > pDstEnd)
-				return -1;
+				break;
 
 			CDstEncoding::EncodeCodePoint (pDst, x);
 
 			pSrc += SrcCodePointLength;
 			pDst += DstCodePointLength;
-			ResultLength += DstCodePointLength;
 		}
 
-		return ResultLength;
+		return pDst - pDst0;
+	}
+
+	static
+	void
+	IncrementalConvert (
+		CDstUnit* pDst,
+		size_t DstLength,
+		const CSrcUnit* pSrc,
+		size_t SrcLength,
+		size_t* pTakenDstLength,
+		size_t* pTakenSrcLength,
+		size_t* pExpectedSrcLength
+		)
+	{
+		CDstUnit* pDst0 = pDst;
+		CDstUnit* pDstEnd = pDst + DstLength;
+		const CSrcUnit* pSrc0 = pSrc;
+		const CSrcUnit* pSrcEnd = pSrc + SrcLength;
+
+		*pExpectedSrcLength = 0;
+
+		while (pSrc < pSrcEnd)
+		{
+			size_t SrcCodePointLength = CSrcEncoding::GetDecodeCodePointLength (*pSrc);
+			if (pSrc + SrcCodePointLength > pSrcEnd)
+			{
+				*pExpectedSrcLength = SrcCodePointLength;
+				break;
+			}
+
+			utf32_t x = CSrcEncoding::DecodeCodePoint (pSrc);
+			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
+			if (pDst + DstCodePointLength > pDstEnd)
+				break;
+
+			CDstEncoding::EncodeCodePoint (pDst, x);
+
+			pSrc += SrcCodePointLength;
+			pDst += DstCodePointLength;
+		}
+
+		*pTakenDstLength = pDst - pDst0;
+		*pTakenSrcLength = pSrc - pSrc0;
 	}
 };
 
