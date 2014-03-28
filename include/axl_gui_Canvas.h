@@ -36,6 +36,8 @@ public:
 		m_BaseTextAttr.Setup (EStdPalColor_WidgetText, EStdPalColor_WidgetBack, 0);
 	}
 
+	// rect drawing
+
 	virtual
 	bool
 	DrawRect (
@@ -84,7 +86,8 @@ public:
 			);
 	}
 
-	virtual
+	// default to utf8 
+
 	bool
 	DrawText (
 		int x,
@@ -98,7 +101,22 @@ public:
 		uint_t FontFlags,
 		const char* pText,
 		size_t Length = -1
-		) = 0;
+		)
+	{
+		return DrawText_utf8 (
+			x,
+			y,
+			Left,
+			Top,
+			Right,
+			Bottom,
+			TextColor,
+			BackColor,
+			FontFlags,
+			pText,
+			Length
+			);
+	}
 
 	bool
 	DrawText (
@@ -112,7 +130,63 @@ public:
 		size_t Length = -1
 		)
 	{
-		return DrawText (
+		return DrawText_utf8 (x, y, Left, Top, Right, Bottom, pText, Length);
+	}
+
+	bool
+	DrawText (
+		const TPoint& Point,
+		const TRect& Rect,
+		const TTextAttr& TextAttr,
+		const char* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf8 (Point, Rect, TextAttr, pText, Length);
+	}
+
+	bool
+	DrawText (
+		const TPoint& Point,
+		const TRect& Rect,
+		const char* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf8 (Point, Rect, pText, Length);
+	}
+
+	// utf8 text drawing
+
+	virtual
+	bool
+	DrawText_utf8 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf8_t* pText,
+		size_t Length = -1
+		) = 0;
+
+	bool
+	DrawText_utf8 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		const utf8_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf8 (
 			x,
 			y,
 			Left,
@@ -128,15 +202,15 @@ public:
 	}
 
 	bool
-	DrawText (
+	DrawText_utf8 (
 		const TPoint& Point,
 		const TRect& Rect,
 		const TTextAttr& TextAttr,
-		const char* pText,
+		const utf8_t* pText,
 		size_t Length = -1
 		)
 	{
-		return DrawText (
+		return DrawText_utf8 (
 			Point.m_x,
 			Point.m_y,
 			Rect.m_Left,
@@ -152,14 +226,14 @@ public:
 	}
 
 	bool
-	DrawText (
+	DrawText_utf8 (
 		const TPoint& Point,
 		const TRect& Rect,
-		const char* pText,
+		const utf8_t* pText,
 		size_t Length = -1
 		)
 	{
-		return DrawText (
+		return DrawText_utf8 (
 			Point.m_x,
 			Point.m_y,
 			Rect.m_Left,
@@ -173,6 +247,192 @@ public:
 			Length
 			);
 	}
+
+	// utf16 text drawing
+
+	virtual
+	bool
+	DrawText_utf16 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf16_t* pText,
+		size_t Length = -1
+		) = 0;
+
+	bool
+	DrawText_utf16 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		const utf16_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf16 (
+			x,
+			y,
+			Left,
+			Top,
+			Right,
+			Bottom,
+			m_DefTextAttr.m_ForeColor,
+			m_DefTextAttr.m_BackColor,
+			m_DefTextAttr.m_FontFlags,
+			pText,
+			Length
+			);
+	}
+
+	bool
+	DrawText_utf16 (
+		const TPoint& Point,
+		const TRect& Rect,
+		const TTextAttr& TextAttr,
+		const utf16_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf16 (
+			Point.m_x,
+			Point.m_y,
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
+			TextAttr.m_ForeColor,
+			TextAttr.m_BackColor,
+			TextAttr.m_FontFlags,
+			pText,
+			Length
+			);
+	}
+
+	bool
+	DrawText_utf16 (
+		const TPoint& Point,
+		const TRect& Rect,
+		const utf16_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf16 (
+			Point.m_x,
+			Point.m_y,
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
+			m_DefTextAttr.m_ForeColor,
+			m_DefTextAttr.m_BackColor,
+			m_DefTextAttr.m_FontFlags,
+			pText,
+			Length
+			);
+	}
+
+	// utf32 text drawing
+
+	virtual
+	bool
+	DrawText_utf32 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf32_t* pText,
+		size_t Length = -1
+		) = 0;
+
+	bool
+	DrawText_utf32 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		const utf32_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf32 (
+			x,
+			y,
+			Left,
+			Top,
+			Right,
+			Bottom,
+			m_DefTextAttr.m_ForeColor,
+			m_DefTextAttr.m_BackColor,
+			m_DefTextAttr.m_FontFlags,
+			pText,
+			Length
+			);
+	}
+
+	bool
+	DrawText_utf32 (
+		const TPoint& Point,
+		const TRect& Rect,
+		const TTextAttr& TextAttr,
+		const utf32_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf32 (
+			Point.m_x,
+			Point.m_y,
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
+			TextAttr.m_ForeColor,
+			TextAttr.m_BackColor,
+			TextAttr.m_FontFlags,
+			pText,
+			Length
+			);
+	}
+
+	bool
+	DrawText_utf32 (
+		const TPoint& Point,
+		const TRect& Rect,
+		const utf32_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_utf32 (
+			Point.m_x,
+			Point.m_y,
+			Rect.m_Left,
+			Rect.m_Top,
+			Rect.m_Right,
+			Rect.m_Bottom,
+			m_DefTextAttr.m_ForeColor,
+			m_DefTextAttr.m_BackColor,
+			m_DefTextAttr.m_FontFlags,
+			pText,
+			Length
+			);
+	}
+
+	// image drawing
 
 	virtual
 	bool
@@ -203,6 +463,8 @@ public:
 			Rect.m_Bottom
 			);
 	}
+
+	// bitblt
 
 	virtual
 	bool

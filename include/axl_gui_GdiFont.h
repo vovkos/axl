@@ -71,8 +71,22 @@ public:
 
 	virtual
 	TSize
-	CalcTextSize (
-		const char* pText,
+	CalcTextSize_utf8 (
+		const utf8_t* pText,
+		size_t Length = -1
+		);
+
+	virtual
+	TSize
+	CalcTextSize_utf16 (
+		const utf16_t* pText,
+		size_t Length = -1
+		);
+
+	virtual
+	TSize
+	CalcTextSize_utf32 (
+		const utf32_t* pText,
 		size_t Length = -1
 		);
 };

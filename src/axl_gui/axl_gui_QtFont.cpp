@@ -47,17 +47,12 @@ CQtFont::CQtFont ()
 }
 
 TSize
-CQtFont::CalcTextSize (
-	const char* pText,
-	size_t Length
-	)
+CQtFont::CalcTextSize_qt (const QString& String)
 {
 	QFontMetrics QtFontMetrics (m_QtFont);
-	
-	QString QtText = QString::fromUtf8 (pText, Length);
 		
 	TSize Size;
-	Size.m_Width = QtFontMetrics.width (QtText);
+	Size.m_Width = QtFontMetrics.width (String);
 	Size.m_Height = QtFontMetrics.height ();
 	return Size;
 }

@@ -74,7 +74,7 @@ CQtEngine::CreateStdFont (EStdFont FontKind)
 
 	case EStdFont_Monospace:
 		{
-		QFont QtFont ("Monospace", 10);
+		QFont QtFont ("Courier", 10);
 		QtFont.setStyleHint (QFont::TypeWriter);
 		return CreateFont (QtFont);
 		}

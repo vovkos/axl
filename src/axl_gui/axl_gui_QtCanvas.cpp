@@ -30,7 +30,7 @@ CQtCanvas::DrawRect (
 }
 
 bool
-CQtCanvas::DrawText (
+CQtCanvas::DrawText_qt (
 	int x,
 	int y,
 	int Left,
@@ -40,8 +40,7 @@ CQtCanvas::DrawText (
 	uint_t TextColor,
 	uint_t BackColor,
 	uint_t FontFlags,
-	const char* pText,
-	size_t Length
+	const QString& String
 	)
 {
 	TextColor = OverlayColor (m_BaseTextAttr.m_ForeColor, TextColor);
@@ -69,10 +68,10 @@ CQtCanvas::DrawText (
 
 	DrawRect (Left, Top, Right, Bottom, BackColor);
 
-	QString QtText = QString::fromUtf8 (pText, Length);
-	m_h->drawText (x, y, Right - x, Bottom - y, 0, QtText);
+	m_h->drawText (x, y, Right - x, Bottom - y, 0, String);
 	return true;
 }
+
 
 bool
 CQtCanvas::DrawImage (
@@ -88,30 +87,6 @@ CQtCanvas::DrawImage (
 	ASSERT (pImage->GetEngine ()->GetEngineKind () == EEngine_Qt);
 	CQtImage* pQtImage = (CQtImage*) pImage;
 	m_h->drawPixmap (x, y, pQtImage->m_QtPixmap);
-
-/*	CBitmap* pBitmap = (CBitmap*) pImage;
-
-	if (!m_hCompatibleDc)
-	{
-		CScreenDc ScreenDc;
-		m_hCompatibleDc = ::CreateCompatibleDC (ScreenDc);
-	}
-
-	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *pBitmap);
-
-	::BitBlt (
-		m_h,
-		x,
-		y,
-		Right - Left,
-		Bottom - Top,
-		m_hCompatibleDc,
-		Left,
-		Top,
-		SRCCOPY
-		);
-
-	::SelectObject (m_hCompatibleDc, hPrevBitmap); */
 	return true;
 }
 

@@ -295,6 +295,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_BoxList.h
 	${AXL_INC_DIR}/axl_rtl_BuddyAllocMap.h
 	${AXL_INC_DIR}/axl_rtl_ByteOrder.h
+	${AXL_INC_DIR}/axl_rtl_CharCodec.h
 	${AXL_INC_DIR}/axl_rtl_CharLiteral.h
 	${AXL_INC_DIR}/axl_rtl_CmdLineParser.h
 	${AXL_INC_DIR}/axl_rtl_EscapeEncoding.h
@@ -327,6 +328,7 @@ set (
 	axl_rtl_BitMap.cpp
 	axl_rtl_BmhFind.cpp
 	axl_rtl_BuddyAllocMap.cpp
+	axl_rtl_CharCodec.cpp
 	axl_rtl_CmdLineParser.cpp
 	axl_rtl_djb2.cpp
 	axl_rtl_EscapeEncoding.cpp

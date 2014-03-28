@@ -38,12 +38,38 @@ public:
 		return QFontInfo (m_QtFont).fixedPitch ();
 	}
 
+	TSize
+	CalcTextSize_qt (const QString& String);
+
 	virtual
 	TSize
-	CalcTextSize (
-		const char* pText,
+	CalcTextSize_utf8 (
+		const utf8_t* pText,
 		size_t Length = -1
-		);
+		)
+	{
+		return CalcTextSize_qt (QString::fromUtf8 (pText, Length));
+	}
+
+	virtual
+	TSize
+	CalcTextSize_utf16 (
+		const utf16_t* pText,
+		size_t Length = -1
+		)
+	{
+		return CalcTextSize_qt (QString::fromUtf16 ((ushort*) pText, Length));
+	}
+
+	virtual
+	TSize
+	CalcTextSize_utf32 (
+		const utf32_t* pText,
+		size_t Length = -1
+		)
+	{
+		return CalcTextSize_qt (QString::fromUcs4 ((const uint*) pText, Length));
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

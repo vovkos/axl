@@ -9,6 +9,7 @@
 #include "axl_gui_Canvas.h"
 #include "axl_gui_TextAttrAnchorArray.h"
 #include "axl_rtl_String.h"
+#include "axl_rtl_CharCodec.h"
 
 namespace axl {
 namespace gui {
@@ -20,9 +21,10 @@ class CTextPaint
 protected:
 	CTextAttrAnchorArray m_SelOverlay;
 	
-	// for binhex / binascii
+	// for bin-hex / bin-text
 	
-	rtl::CString m_BufferString; 
+	rtl::CString m_StringBuffer; 
+	rtl::CArrayT <utf32_t> m_BinTextBuffer; 
 
 	const void* m_p;
 	const void* m_pBegin;
@@ -104,7 +106,8 @@ public:
 		);
 
 	int
-	PaintBinAscii (
+	PaintBinText (
+		rtl::CCharCodec* pCodec,
 		const void* p, 
 		size_t Size
 		);
@@ -133,7 +136,8 @@ public:
 		);
 
 	int
-	PaintHyperBinAscii (
+	PaintHyperBinText (
+		rtl::CCharCodec* pCodec,
 		const CTextAttrAnchorArray* pAttrArray,
 		const void* p, 
 		size_t Size
@@ -177,7 +181,8 @@ public:
 		);
 
 	int
-	PaintSelHyperBinAscii (
+	PaintSelHyperBinText (
+		rtl::CCharCodec* pCodec,
 		const CTextAttrAnchorArray* pAttrArray, 
 		size_t SelStart, 
 		size_t SelEnd, 
@@ -193,12 +198,27 @@ protected:
 	CalcTextRect (
 		const char* pText,
 		size_t Length = -1
+		)
+	{
+		return CalcTextRect_utf8 (pText, Length);
+	}
+
+	TRect
+	CalcTextRect_utf8 (
+		const utf8_t* pText,
+		size_t Length = -1
 		);
 
 	TRect
-	CalcTextRect (char Char)
+	CalcTextRect_utf32 (
+		const utf32_t* pText,
+		size_t Length = -1
+		);
+
+	TRect
+	CalcTextRect (utf32_t Char)
 	{
-		return CalcTextRect (&Char, 1);
+		return CalcTextRect_utf32 (&Char, 1);
 	}
 
 	int
@@ -208,8 +228,10 @@ protected:
 	PaintBinHexPart (size_t Size);
 
 	int
-	PaintBinAsciiPart (size_t Size);
-
+	PaintBinTextPart (
+		rtl::CCharCodec* pCodec,
+		size_t Size
+		);
 };
 
 //.............................................................................

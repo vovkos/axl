@@ -165,17 +165,40 @@ public:
 	bool
 	IsMonospace () = 0;
 
-	virtual
 	TSize
 	CalcTextSize (
 		const char* pText,
 		size_t Length = -1
+		)
+	{
+		return CalcTextSize_utf8 (pText, Length);
+	}
+
+	virtual
+	TSize
+	CalcTextSize_utf8 (
+		const utf8_t* pText,
+		size_t Length = -1
+		) = 0;
+
+	virtual
+	TSize
+	CalcTextSize_utf16 (
+		const utf16_t* pText,
+		size_t Length = -1
+		) = 0;
+
+	virtual
+	TSize
+	CalcTextSize_utf32 (
+		const utf32_t* pText,
+		size_t Length = -1
 		) = 0;
 
 	TSize
-	CalcTextSize (char Char)
+	CalcTextSize (utf32_t Char)
 	{
-		return CalcTextSize (&Char, 1);
+		return CalcTextSize_utf32 (&Char, 1);
 	}
 };
 

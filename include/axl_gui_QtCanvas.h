@@ -33,9 +33,8 @@ public:
 		uint_t Color
 		);
 
-	virtual
 	bool
-	DrawText (
+	DrawText_qt (
 		int x,
 		int y,
 		int Left,
@@ -45,9 +44,98 @@ public:
 		uint_t TextColor,
 		uint_t BackColor,
 		uint_t FontFlags,
-		const char* pText,
-		size_t Length = -1
+		const QString& String
 		);
+
+	virtual
+	bool
+	DrawText_utf8 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf8_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_qt (
+			x,
+			y,
+			Left,
+			Top,
+			Right,
+			Bottom,
+			TextColor,
+			BackColor,
+			FontFlags,
+			QString::fromUtf8 (pText, Length)
+			);
+	}
+
+	virtual
+	bool
+	DrawText_utf16 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf16_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_qt (
+			x,
+			y,
+			Left,
+			Top,
+			Right,
+			Bottom,
+			TextColor,
+			BackColor,
+			FontFlags,
+			QString::fromUtf16 ((const ushort*) pText, Length)
+			);
+	}
+
+	virtual
+	bool
+	DrawText_utf32 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf32_t* pText,
+		size_t Length = -1
+		)
+	{
+		return DrawText_qt (
+			x,
+			y,
+			Left,
+			Top,
+			Right,
+			Bottom,
+			TextColor,
+			BackColor,
+			FontFlags,
+			QString::fromUcs4 ((const uint*) pText, Length)
+			);
+	}
 
 	virtual
 	bool

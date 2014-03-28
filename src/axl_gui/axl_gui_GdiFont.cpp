@@ -2,6 +2,7 @@
 #include "axl_gui_GdiFont.h"
 #include "axl_gui_GdiEngine.h"
 #include "axl_err_Error.h"
+#include "axl_rtl_Array.h"
 
 namespace axl {
 namespace gui {
@@ -107,21 +108,57 @@ CGdiFont::IsMonospace ()
 }
 
 TSize
-CGdiFont::CalcTextSize (
-	const char* pText,
+CGdiFont::CalcTextSize_utf8 (
+	const utf8_t* pText,
 	size_t Length
 	)
 {
+	wchar_t Buffer [256];
+	rtl::CString_w String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Copy (pText, Length);
+
+	return CalcTextSize_utf16 (String, String.GetLength ());
+}
+
+TSize
+CGdiFont::CalcTextSize_utf16 (
+	const utf16_t* pText,
+	size_t Length
+	)
+{
+	if (Length == -1)
+		Length = wcslen (pText);
+
 	CScreenDc ScreenDc;
 	HFONT hOldFont = (HFONT) ::SelectObject (ScreenDc, m_h);
 
-	rtl::CString_w Text (pText, Length);
-
 	SIZE Size;
-	::GetTextExtentPoint32W (ScreenDc, Text, Text.GetLength (), &Size);
+	::GetTextExtentPoint32W (ScreenDc, pText, Length, &Size);
 	::SelectObject (ScreenDc, hOldFont);
 
 	return TSize (Size.cx, Size.cy);
+}
+
+TSize
+CGdiFont::CalcTextSize_utf32 (
+	const utf32_t* pText,
+	size_t Length
+	)
+{
+	typedef rtl::CUtfConvertT <rtl::CUtf16, rtl::CUtf32> CConvert;
+
+	if (Length == -1)
+		Length = strlen_utf32 (pText);
+
+	size_t Length_utf16 = CConvert::CalcRequiredLength (pText, Length);
+	
+	utf16_t Buffer [256];
+	rtl::CArrayT <utf16_t> String_utf16 (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String_utf16.SetCount (Length_utf16);
+
+	CConvert::Convert (String_utf16, Length_utf16, pText, Length);
+
+	return CalcTextSize_utf16 (String_utf16, Length_utf16);
 }
 
 //.............................................................................

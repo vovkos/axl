@@ -89,7 +89,7 @@ public:
 
 	virtual
 	bool
-	DrawText (
+	DrawText_utf8 (
 		int x,
 		int y,
 		int Left,
@@ -99,7 +99,39 @@ public:
 		uint_t TextColor,
 		uint_t BackColor,
 		uint_t FontFlags,
-		const char* pText,
+		const utf8_t* pText,
+		size_t Length = -1
+		);
+
+	virtual
+	bool
+	DrawText_utf16 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf16_t* pText,
+		size_t Length = -1
+		);
+
+	virtual
+	bool
+	DrawText_utf32 (
+		int x,
+		int y,
+		int Left,
+		int Top,
+		int Right,
+		int Bottom,
+		uint_t TextColor,
+		uint_t BackColor,
+		uint_t FontFlags,
+		const utf32_t* pText,
 		size_t Length = -1
 		);
 
