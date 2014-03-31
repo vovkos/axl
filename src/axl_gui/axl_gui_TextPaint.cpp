@@ -83,19 +83,17 @@ CTextPaint::PaintSpace (
 int
 CTextPaint::PaintTextPart (size_t Length)
 {
-	char* p = (char*) m_p;
-
-	size_t MaxLength = (char*) m_pEnd - p;
+	size_t MaxLength = m_pEnd - m_p;
 	if (Length > MaxLength)
 		Length = MaxLength;
 
 	if (!Length)
 		return m_Point.m_x;
 
-	TRect Rect = CalcTextRect (p, Length);
-	m_pCanvas->DrawText (m_Point, Rect, p, Length);
+	TRect Rect = CalcTextRect (m_p, Length);
+	m_pCanvas->DrawText (m_Point, Rect, m_p, Length);
 	
-	m_p = p + Length;
+	m_p += Length;
 	m_Point.m_x = Rect.m_Right;
 
 	return m_Point.m_x;
@@ -106,7 +104,7 @@ CTextPaint::PaintTextPart (size_t Length)
 int
 CTextPaint::PaintBinHexPart (size_t Size)
 {
-	size_t MaxSize = (uchar_t*) m_pEnd - (uchar_t*) m_p;
+	size_t MaxSize = m_pEnd - m_p;
 	if (Size > MaxSize)
 		Size = MaxSize;
 
@@ -120,7 +118,7 @@ CTextPaint::PaintBinHexPart (size_t Size)
 	TRect Rect = CalcTextRect (m_StringBuffer, Length);
 	m_pCanvas->DrawText (m_Point, Rect, m_StringBuffer, Length);
 
-	m_p = (uchar_t*) m_p + Size;
+	m_p += Size;
 	m_Point.m_x = Rect.m_Right;
 
 	return m_Point.m_x;
@@ -134,7 +132,7 @@ CTextPaint::PaintBinTextPart (
 	size_t Size
 	)
 {
-	size_t MaxSize = (uchar_t*) m_pEnd - (uchar_t*) m_p;
+	size_t MaxSize = m_pEnd - m_p;
 	if (Size > MaxSize)
 		Size = MaxSize;
 
@@ -143,31 +141,53 @@ CTextPaint::PaintBinTextPart (
 
 	m_BinTextBuffer.SetCount (Size);
 
+	size_t UnitSize = pCodec->GetUnitSize ();
 	size_t i = 0;
-	const char* p = (char*) m_p;
+
+	const char* p = m_p;
 	const char* pEnd = p + Size;
+
+	size_t UnitSizeMod = (p - m_pBegin) % UnitSize;
+	if (UnitSizeMod)
+	{
+		size_t IncompleteSize = UnitSize - UnitSizeMod;
+
+		if (IncompleteSize > Size)
+			IncompleteSize = Size;
+
+		for (; i < IncompleteSize; i++)
+			m_BinTextBuffer [i] = m_UnprintableChar;
+
+		p += IncompleteSize;
+	}
+
 	while (p < pEnd)
 	{
 		utf32_t CodePoint;
-		size_t TakenBufferLength;
-		size_t TakenSize;
+		size_t TakenBufferLength = 0;
+		size_t TakenSize = 0;
 		size_t ExpectedSize;
 
 		size_t Leftover = pEnd - p;
+		if (Leftover < UnitSize)
+			ExpectedSize = UnitSize;
+		else
+			pCodec->DecodeToUtf32 (&CodePoint, 1, p, Leftover, &TakenBufferLength, &TakenSize, &ExpectedSize);
 
-		pCodec->DecodeToUtf32 (&CodePoint, 1, p, Leftover, &TakenBufferLength, &TakenSize, &ExpectedSize);
 		if (!TakenSize)
 		{
 			size_t End = i + Leftover;
 
-			Leftover = (char*) m_pEnd - p;
+			Leftover = m_pEnd - p;
 			if (ExpectedSize <= Leftover)
 			{
 				pCodec->DecodeToUtf32 (&CodePoint, 1, p, Leftover, &TakenBufferLength);
-				ASSERT (TakenBufferLength == 1);
-
-				m_BinTextBuffer [i] = iswprint (CodePoint) ? CodePoint : m_UnprintableChar;
-				i++;
+				
+				if (TakenBufferLength == 1) // might still be not enough (e.g. UTF-16)
+				{
+					m_BinTextBuffer [i] = iswprint (CodePoint) ? CodePoint : m_UnprintableChar;
+					i++;
+				}
 			}
 
 			for (; i < End; i++)
@@ -190,7 +210,7 @@ CTextPaint::PaintBinTextPart (
 	TRect Rect = CalcTextRect_utf32 (m_BinTextBuffer, Size);
 	m_pCanvas->DrawText_utf32 (m_Point, Rect, m_BinTextBuffer, Size);
 
-	m_p = (uchar_t*) m_p + Size;
+	m_p = m_p + Size;
 	m_Point.m_x = Rect.m_Right;
 
 	return m_Point.m_x;
@@ -220,9 +240,9 @@ CTextPaint::PaintBinHex (
 	size_t Size
 	)
 {
-	m_p = p;
-	m_pBegin = p;
-	m_pEnd = (uchar_t*) p + Size;
+	m_p = (const char*) p;
+	m_pBegin = m_p;
+	m_pEnd = m_p + Size;
 
 	return PaintBinHexPart (-1);
 }
@@ -234,9 +254,9 @@ CTextPaint::PaintBinText (
 	size_t Size
 	)
 {
-	m_p = p;
-	m_pBegin = p;
-	m_pEnd = (uchar_t*) p + Size;
+	m_p = (const char*) p;
+	m_pBegin = m_p;
+	m_pEnd = m_p + Size;
 
 	return PaintBinTextPart (pCodec, -1);
 }
@@ -250,9 +270,6 @@ CTextPaint::PaintHyperText (
 {
 	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
 	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
-
-	const char* p = pText;
-	const char* pEnd; 
 
 	size_t Offset = 0;
 
@@ -288,7 +305,9 @@ CTextPaint::PaintHyperText (
 		pNextAttr = m_pAttr;
 	}
 
-	pEnd = p + Length;
+	const char* p = pText;
+	const char* pEnd = p + Length;
+
 	while (p < pEnd && pNextAttr < m_pAttrEnd)
 	{	
 		size_t MaxLength = pEnd - p;
@@ -303,8 +322,8 @@ CTextPaint::PaintHyperText (
 		m_pAttr = pNextAttr;
 		pNextAttr++;
 
-		p = (char*) m_p;
-		Offset = p - (char*) m_pBegin;
+		p = m_p;
+		Offset = p - m_pBegin;
 	}
 
 	if (p < pEnd)
@@ -323,8 +342,8 @@ CTextPaint::PaintHyperBinHex (
 	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
 	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
 
-	const uchar_t* p = (uchar_t*) _p;
-	const uchar_t* pEnd; 
+	const char* p = (char*) _p;
+	const char* pEnd; 
 
 	size_t Offset = 0;
 
@@ -368,8 +387,8 @@ CTextPaint::PaintHyperBinHex (
 
 		PaintBinHexPart (Size);
 
-		p = (uchar_t*) m_p;
-		Offset = p - (uchar_t*) m_pBegin;
+		p = m_p;
+		Offset = p - m_pBegin;
 
 		m_pCanvas->m_DefTextAttr = pNextAttr->m_Attr;
 		m_pAttr = pNextAttr;
@@ -393,8 +412,8 @@ CTextPaint::PaintHyperBinText (
 	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
 	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
 
-	const uchar_t* p = (uchar_t*) _p;
-	const uchar_t* pEnd; 
+	const char* p = (const char*) _p;
+	const char* pEnd; 
 
 	size_t Offset = 0;
 
@@ -438,8 +457,8 @@ CTextPaint::PaintHyperBinText (
 
 		PaintBinTextPart (pCodec, Size);
 
-		p = (uchar_t*) m_p;
-		Offset = p - (uchar_t*) m_pBegin;
+		p = m_p;
+		Offset = p - m_pBegin;
 
 		m_pCanvas->m_DefTextAttr = pNextAttr->m_Attr;
 		m_pAttr = pNextAttr;
@@ -510,7 +529,7 @@ CTextPaint::PaintHyperBinHex4BitCursor (
 
 	PaintHyperBinHex (pAttrArray, p, CursorPos);
 
-	uchar_t* pCursor = (uchar_t*) p + CursorPos;
+	char* pCursor = (char*) p + CursorPos;
 	
 	gui::TTextAttr Attr = m_pCanvas->m_DefTextAttr;
 
@@ -526,7 +545,7 @@ CTextPaint::PaintHyperBinHex4BitCursor (
 	{
 		size_t Leftover = Size - CursorPos - 1;
 
-		m_p = (uchar_t*) m_p + CursorPos + 1;
+		m_p = m_p + CursorPos + 1;
 		m_pCanvas->m_DefTextAttr = Attr;
 
 		if (!pAttrArray)

@@ -26,9 +26,9 @@ protected:
 	rtl::CString m_StringBuffer; 
 	rtl::CArrayT <utf32_t> m_BinTextBuffer; 
 
-	const void* m_p;
-	const void* m_pBegin;
-	const void* m_pEnd;
+	const char* m_p;
+	const char* m_pBegin;
+	const char* m_pEnd;
 	
 	// hyper text
 

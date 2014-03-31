@@ -448,6 +448,8 @@ public:
 		)
 	{
 		size_t Length = Size / sizeof (T::C);
+		ASSERT (Length || !Size); // don't pass less than one unit
+
 		size_t TakenLength;
 		size_t ExpectedLength;
 
@@ -481,6 +483,8 @@ public:
 		)
 	{
 		size_t Length = Size / sizeof (T::C);
+		ASSERT (Length || !Size); // don't pass less than one unit
+
 		size_t TakenLength;
 		size_t ExpectedLength;
 
@@ -514,6 +518,8 @@ public:
 		)
 	{
 		size_t Length = Size / sizeof (T::C);
+		ASSERT (Length || !Size); // don't pass less than one unit
+
 		size_t TakenLength;
 		size_t ExpectedLength;
 
