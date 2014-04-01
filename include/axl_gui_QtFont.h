@@ -58,7 +58,7 @@ public:
 		size_t Length = -1
 		)
 	{
-		return CalcTextSize_qt (QString::fromUtf16 ((ushort*) pText, Length));
+		return CalcTextSize_qt (QString ((const QChar*) pText, Length));
 	}
 
 	virtual

@@ -103,7 +103,7 @@ public:
 			TextColor,
 			BackColor,
 			FontFlags,
-			QString::fromUtf16 ((const ushort*) pText, Length)
+			QString ((const QChar*) pText, Length)
 			);
 	}
 
