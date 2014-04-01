@@ -13,12 +13,14 @@ set (
 	INI_H_LIST
 	${AXL_INC_DIR}/axl_ini_Lexer.h
 	${AXL_INC_DIR}/axl_ini_Parser.h
+	${AXL_INC_DIR}/axl_ini_GenericParser.h
 	)
 
 set (
 	INI_CPP_LIST
 	axl_ini_Lexer.rl.cpp
 	axl_ini_Parser.cpp
+	axl_ini_GenericParser.cpp
 	)
 
 set (
