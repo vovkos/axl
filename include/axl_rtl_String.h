@@ -9,6 +9,7 @@
 #include "axl_ref_Buf.h"
 #include "axl_rtl_BitIdx.h"
 #include "axl_rtl_Utf.h"
+#include "axl_rtl_CharCodec.h"
 
 namespace axl {
 namespace rtl {
@@ -23,16 +24,19 @@ class CStringDetailsT
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CStringDetailsT <char>
+class CStringDetailsT <utf8_t>
 {
 public:
-	typedef char C;
-	typedef wchar_t C2;
-	typedef CStringDetailsT <wchar_t> CDetails2;
-	typedef CUtf8 CEncoding;
+	typedef utf8_t  C;
+	typedef utf16_t C2;
+	typedef utf32_t C3;
 
+	typedef CUtf8 CEncoding;
+	typedef CStringDetailsT <C2> CDetails2;
+	typedef CStringDetailsT <C3> CDetails3;
+	
 	static
-	const char*
+	const C*
 	GetCrLf ()
 	{
 		return "\r\n";
@@ -40,7 +44,7 @@ public:
 
 	static
 	size_t
-	CalcLength (const char* p)
+	CalcLength (const C* p)
 	{
 		return strlen (p);
 	}
@@ -48,8 +52,8 @@ public:
 	static
 	int
 	Cmp (
-		const char* p1,
-		const char* p2,
+		const C* p1,
+		const C* p2,
 		size_t Length
 		)
 	{
@@ -59,8 +63,8 @@ public:
 	static
 	void
 	Fill (
-		char* p,
-		char c,
+		C* p,
+		C c,
 		size_t Count
 		)
 	{
@@ -70,8 +74,8 @@ public:
 	static
 	void
 	Copy (
-		char* pDst,
-		const char* pSrc,
+		C* pDst,
+		const C* pSrc,
 		size_t Count
 		)
 	{
@@ -82,7 +86,7 @@ public:
 	static
 	size_t
 	CalcFormatLength_va (
-		const char* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -92,9 +96,9 @@ public:
 	static
 	void
 	Format_va (
-		char* pBuffer,
+		C* pBuffer,
 		size_t BufferLength,
-		const char* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -106,7 +110,7 @@ public:
 	static
 	size_t
 	CalcFormatLength_va (
-		const char* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -116,9 +120,9 @@ public:
 	static
 	size_t
 	Format_va (
-		char* pBuffer,
+		C* pBuffer,
 		size_t BufferLength,
-		const char* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -129,72 +133,91 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <>
-class CStringDetailsT <wchar_t>
+template <typename T>
+class CStringDetailsImplT
 {
 public:
-	typedef wchar_t C;
-	typedef char C2;
-	typedef CStringDetailsT <char> CDetails2;
-
-#if (WCHAR_MAX <= 0xffff)
-	typedef CUtf16 CEncoding;
-#else
-	typedef CUtf32 CEncoding;
-#endif
-
 	static
-	const wchar_t*
+	const T*
 	GetCrLf ()
 	{
-		return L"\r\n";
+		static T CrLf [2] = { '\r', '\n' };
+		return CrLf;
 	}
 
 	static
 	size_t
-	CalcLength (const wchar_t* p)
+	CalcLength (const T* p)
 	{
-		return wcslen (p);
+		const T* p0 = p;
+		while (*p)
+			p++;
+	
+		return p - p0;
 	}
 
 	static
 	int
 	Cmp (
-		const wchar_t* p1,
-		const wchar_t* p2,
+		const T* p1,
+		const T* p2,
 		size_t Length
 		)
 	{
-		return wmemcmp (p1, p2, Length);
+		const T* pEnd = p1 + Length;
+		for (; p1 < pEnd; p1++, p2++)
+			if (*p1 < *p2)
+				return -1;
+			else if (*p1 > *p2)
+				return 1;
+	
+		return 0;
 	}
 
 	static
 	void
 	Fill (
-		wchar_t* p,
-		wchar_t c,
+		T* p,
+		T c,
 		size_t Count
 		)
 	{
-		memset (p, c, Count);
+		const T* pEnd = p + Count;
+		for (; p < pEnd; p++)
+			*p = (C) c;
 	}
 
 	static
 	void
 	Copy (
-		wchar_t* pDst,
-		const wchar_t* pSrc,
+		T* pDst,
+		const T* pSrc,
 		size_t Count
 		)
 	{
-		wmemcpy (pDst, pSrc, Count);
+		memcpy (pDst, pSrc, Count * sizeof (T));
 	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+	
+template <>
+class CStringDetailsT <utf16_t>: public CStringDetailsImplT <utf16_t>
+{
+public:
+	typedef utf16_t C;
+	typedef utf8_t  C2;
+	typedef utf32_t C3;
+
+	typedef CUtf16 CEncoding;
+	typedef CStringDetailsT <C2> CDetails2;
+	typedef CStringDetailsT <C3> CDetails3;
 
 #if (_AXL_CPP == AXL_CPP_MSC)
 	static
 	size_t
 	CalcFormatLength_va (
-		const wchar_t* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -204,9 +227,9 @@ public:
 	static
 	void
 	Format_va (
-		wchar_t* pBuffer,
+		C* pBuffer,
 		size_t BufferLength,
-		const wchar_t* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -218,7 +241,70 @@ public:
 	static
 	size_t
 	CalcFormatLength_va (
-		const wchar_t* pFormat,
+		const C* pFormat,
+		axl_va_list va
+		)
+	{
+		ASSERT (false);
+		return 0;
+	}
+
+	static
+	void
+	Format_va (
+		C* pBuffer,
+		size_t BufferLength,
+		const C* pFormat,
+		axl_va_list va
+		)
+	{
+		ASSERT (false);
+	}
+#endif
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <>
+class CStringDetailsT <utf32_t>: public CStringDetailsImplT <utf32_t>
+{
+public:
+	typedef utf32_t C;
+	typedef utf8_t  C2;
+	typedef utf16_t C3;
+
+	typedef CUtf32 CEncoding;
+	typedef CStringDetailsT <C2> CDetails2;
+	typedef CStringDetailsT <C3> CDetails3;
+
+#if (_AXL_CPP == AXL_CPP_MSC)
+	static
+	size_t
+	CalcFormatLength_va (
+		const C* pFormat,
+		axl_va_list va
+		)
+	{
+		ASSERT (false);
+		return 0;
+	}
+
+	static
+	void
+	Format_va (
+		C* pBuffer,
+		size_t BufferLength,
+		const C* pFormat,
+		axl_va_list va
+		)
+	{
+		ASSERT (false);
+	}
+#else
+	static
+	size_t
+	CalcFormatLength_va (
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -228,9 +314,9 @@ public:
 	static
 	void
 	Format_va (
-		wchar_t* pBuffer,
+		C* pBuffer,
 		size_t BufferLength,
-		const wchar_t* pFormat,
+		const C* pFormat,
 		axl_va_list va
 		)
 	{
@@ -243,6 +329,9 @@ public:
 
 typedef CStringDetailsT <char>    CStringDetails;
 typedef CStringDetailsT <wchar_t> CStringDetails_w;
+typedef CStringDetailsT <utf8_t>  CStringDetails_utf8;
+typedef CStringDetailsT <utf16_t> CStringDetails_utf16;
+typedef CStringDetailsT <utf32_t> CStringDetails_utf32;
 
 //.............................................................................
 
@@ -267,11 +356,13 @@ public:
 	typedef CStringDetailsT <T> CDetails;
 	typedef typename CDetails::C C;
 	typedef typename CDetails::C2 C2;
-	typedef typename CDetails::CDetails2 CDetails2;
+	typedef typename CDetails::C3 C3;
+
 	typedef typename CDetails::CEncoding CEncoding;
-	typedef typename CDetails2::CEncoding CEncoding2;
-	typedef CUtfConvertT <CEncoding, CEncoding2> CUtfConvert;
+	typedef typename CDetails::CDetails2 CDetails2;
+	typedef typename CDetails::CDetails3 CDetails3;
 	typedef CStringT <C2> CString2;
+	typedef CStringT <C3> CString3;
 
 protected:
 	C* m_p;
@@ -300,6 +391,12 @@ public:
 		Copy (Src);
 	}
 
+	CStringT (const CString3& Src)
+	{
+		m_p = NULL;
+		Copy (Src);
+	}
+
 	CStringT (
 		const C* p,
 		size_t Length = -1
@@ -311,6 +408,15 @@ public:
 
 	CStringT (
 		const C2* p,
+		size_t Length = -1
+		)
+	{
+		m_p = NULL;
+		Copy (p, Length);
+	}
+
+	CStringT (
+		const C3* p,
 		size_t Length = -1
 		)
 	{
@@ -399,6 +505,13 @@ public:
 	}
 
 	CStringT&
+	operator = (const CString3& Src)
+	{
+		Copy (Src);
+		return *this;
+	}
+
+	CStringT&
 	operator = (const C* p)
 	{
 		Copy (p, -1);
@@ -407,6 +520,13 @@ public:
 
 	CStringT&
 	operator = (const C2* p)
+	{
+		Copy (p, -1);
+		return *this;
+	}
+
+	CStringT&
+	operator = (const C3* p)
 	{
 		Copy (p, -1);
 		return *this;
@@ -428,6 +548,13 @@ public:
 
 	CStringT&
 	operator += (const C2* p)
+	{
+		Append (p, -1);
+		return *this;
+	}
+
+	CStringT&
+	operator += (const C3* p)
 	{
 		Append (p, -1);
 		return *this;
@@ -457,6 +584,22 @@ public:
 	}
 
 	CStringT
+	operator + (const C2* p) const
+	{
+		CStringT Result = *this;
+		Result.Append (p);
+		return Result;
+	}
+
+	CStringT
+	operator + (const C3* p) const
+	{
+		CStringT Result = *this;
+		Result.Append (p);
+		return Result;
+	}
+
+	CStringT
 	operator + (const CString2& String) const
 	{
 		CStringT Result = *this;
@@ -465,10 +608,10 @@ public:
 	}
 
 	CStringT
-	operator + (const C2* p) const
+	operator + (const CString3& String) const
 	{
 		CStringT Result = *this;
-		Result.Append (p);
+		Result.Append (String);
 		return Result;
 	}
 
@@ -488,6 +631,12 @@ public:
 	cc2 () const
 	{
 		return CString2 (m_p, GetLength ());
+	}
+
+	CString3
+	cc3 () const
+	{
+		return CString3 (m_p, GetLength ());
 	}
 
 	size_t
@@ -582,6 +731,12 @@ public:
 	}
 
 	size_t
+	Copy (const CString3& Src)
+	{
+		return Copy (Src, Src.GetLength ());
+	}
+
+	size_t
 	Copy (
 		const C* p,
 		size_t Length = -1
@@ -623,14 +778,40 @@ public:
 		if (Length == -1)
 			Length = CDetails2::CalcLength (p);
 
-		size_t NewLength = CUtfConvert::CalcRequiredLength (p, Length);
+		size_t NewLength = CUtfConvertT <CEncoding, CDetails2::CEncoding>::CalcRequiredLength (p, Length);
 		if (NewLength == -1)
 			return -1;
 
 		if (!SetLength (NewLength, false))
 			return -1;
 
-		CUtfConvert::Convert (m_p, NewLength, p, Length);
+		CUtfConvertT <CEncoding, CDetails2::CEncoding>::Convert (m_p, NewLength, p, Length);
+		return Length;
+	}
+
+	size_t
+	Copy (
+		const C3* p,
+		size_t Length = -1
+		)
+	{
+		if (!p)
+		{
+			Clear ();
+			return 0;
+		}
+
+		if (Length == -1)
+			Length = CDetails3::CalcLength (p);
+
+		size_t NewLength = CUtfConvertT <CEncoding, CDetails3::CEncoding>::CalcRequiredLength (p, Length);
+		if (NewLength == -1)
+			return -1;
+
+		if (!SetLength (NewLength, false))
+			return -1;
+
+		CUtfConvertT <CEncoding, CDetails3::CEncoding>::Convert (m_p, NewLength, p, Length);
 		return Length;
 	}
 
@@ -665,11 +846,17 @@ public:
 	size_t
 	Append (const CStringT& Src)
 	{
-		return Append (Src, Src.GetLength ());
+		return IsEmpty () ? Copy (Src) : Append (Src, Src.GetLength ());
 	}
 
 	size_t
 	Append (const CString2& Src)
+	{
+		return Append (Src, Src.GetLength ());
+	}
+
+	size_t
+	Append (const CString3& Src)
 	{
 		return Append (Src, Src.GetLength ());
 	}
@@ -716,7 +903,7 @@ public:
 		if (Length == 0)
 			return OldLength;
 
-		size_t AppendLength = CUtfConvert::CalcRequiredLength (p, Length);
+		size_t AppendLength = CUtfConvertT <CEncoding, CDetails2::CEncoding>::CalcRequiredLength (p, Length);
 		if (AppendLength == -1)
 			return -1;
 
@@ -724,7 +911,36 @@ public:
 		if (!SetLength (NewLength, true))
 			return -1;
 
-		CUtfConvert::Convert (m_p + OldLength, AppendLength, p, Length);
+		CUtfConvertT <CEncoding, CDetails2::CEncoding>::Convert (m_p + OldLength, AppendLength, p, Length);
+		return NewLength;
+	}
+
+	size_t
+	Append (
+		const C3* p,
+		size_t Length = -1
+		)
+	{
+		size_t OldLength = GetLength ();
+
+		if (!p)
+			return OldLength;
+
+		if (Length == -1)
+			Length = CDetails3::CalcLength (p);
+
+		if (Length == 0)
+			return OldLength;
+
+		size_t AppendLength = CUtfConvertT <CEncoding, CDetails3::CEncoding>::CalcRequiredLength (p, Length);
+		if (AppendLength == -1)
+			return -1;
+
+		size_t NewLength = OldLength + AppendLength;
+		if (!SetLength (NewLength, true))
+			return -1;
+
+		CUtfConvertT <CEncoding, CDetails3::CEncoding>::Convert (m_p + OldLength, AppendLength, p, Length);
 		return NewLength;
 	}
 
@@ -1010,6 +1226,9 @@ protected:
 
 typedef CStringT <char>    CString;
 typedef CStringT <wchar_t> CString_w;
+typedef CStringT <utf8_t>  CString_utf8;
+typedef CStringT <utf16_t> CString_utf16;
+typedef CStringT <utf32_t> CString_utf32;
 
 //.............................................................................
 
@@ -1032,29 +1251,6 @@ FormatString (
 {
 	AXL_VA_DECL (va, pFormat);
 	return CString::Format_sva (pFormat, va);
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-CString_w
-FormatString_wva (
-	const wchar_t* pFormat,
-	axl_va_list va
-	)
-{
-	return CString_w::Format_sva (pFormat, va);
-}
-
-inline
-CString_w
-FormatString_w (
-	const wchar_t* pFormat,
-	...
-	)
-{
-	AXL_VA_DECL (va, pFormat);
-	return CString_w::Format_sva (pFormat, va);
 }
 
 //.............................................................................

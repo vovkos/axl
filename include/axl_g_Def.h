@@ -177,47 +177,6 @@ typedef wchar_t          utf32_t;
 
 //.............................................................................
 
-// portable utf strlen routines
-
-inline
-size_t
-strlen_utf8 (const utf8_t* p)
-{
-	return strlen (p);
-}
-
-inline
-size_t
-strlen_utf16 (const utf16_t* p)
-{
-#if (WCHAR_MAX <= 0xffff)
-	return wcslen (p);
-#else
-	const utf16_t* p0 = p;
-	while (*p)
-		p++;
-	
-	return p - p0;
-#endif
-}
-
-inline
-size_t
-strlen_utf32 (const utf32_t* p)
-{
-#if (WCHAR_MAX <= 0xffff)
-	const utf32_t* p0 = p;
-	while (*p)
-		p++;
-	
-	return p - p0;
-#else
-	return wcslen (p);
-#endif
-}
-
-//.............................................................................
-
 // vararg routines
 
 #ifndef va_start

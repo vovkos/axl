@@ -145,20 +145,11 @@ CGdiFont::CalcTextSize_utf32 (
 	size_t Length
 	)
 {
-	typedef rtl::CUtfConvertT <rtl::CUtf16, rtl::CUtf32> CConvert;
+	wchar_t Buffer [256];
+	rtl::CString_w String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Copy (pText, Length);
 
-	if (Length == -1)
-		Length = strlen_utf32 (pText);
-
-	size_t Length_utf16 = CConvert::CalcRequiredLength (pText, Length);
-	
-	utf16_t Buffer [256];
-	rtl::CArrayT <utf16_t> String_utf16 (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String_utf16.SetCount (Length_utf16);
-
-	CConvert::Convert (String_utf16, Length_utf16, pText, Length);
-
-	return CalcTextSize_utf16 (String_utf16, Length_utf16);
+	return CalcTextSize_utf16 (String, String.GetLength ());
 }
 
 //.............................................................................
