@@ -49,7 +49,7 @@ TTime::GetTimestampImpl (
 #if (_AXL_ENV == AXL_ENV_WIN)
 	SYSTEMTIME SysTime = { 0 };
 	SysTime.wYear   = m_Year;
-	SysTime.wMonth  = m_Month;
+	SysTime.wMonth  = m_Month + 1;
 	SysTime.wDay    = m_MonthDay;
 	SysTime.wHour   = m_Hour;
 	SysTime.wMinute = m_Minute;
@@ -64,7 +64,7 @@ TTime::GetTimestampImpl (
 
 #else
 	tm TmStruct = { 0 };
-	TmStruct.tm_year = m_Year;
+	TmStruct.tm_year = m_Year - 1900;
 	TmStruct.tm_mon  = m_Month;
 	TmStruct.tm_mday = m_MonthDay;
 	TmStruct.tm_hour = m_Hour;
@@ -103,7 +103,7 @@ TTime::SetTimestampImpl (
 	FileTimeToSystemTime ((const FILETIME*) &Timestamp, &SysTime);
 
 	m_Year        = SysTime.wYear;
-	m_Month       = SysTime.wMonth;
+	m_Month       = SysTime.wMonth - 1;
 	m_MonthDay    = SysTime.wDay;
 	m_DayOfWeek   = SysTime.wDayOfWeek;
 	m_Hour        = SysTime.wHour;
@@ -125,7 +125,7 @@ TTime::SetTimestampImpl (
 		pTmStruct = gmtime (&PosixTime);
 	}
 
-	m_Year        = pTmStruct->tm_year;
+	m_Year        = pTmStruct->tm_year + 1900;
 	m_Month       = pTmStruct->tm_mon;
 	m_MonthDay    = pTmStruct->tm_mday;
 	m_DayOfWeek   = pTmStruct->tm_wday;
@@ -275,11 +275,11 @@ TTime::Format (
 			break;
 
 		case 'y':
-			pString->AppendFormat ("%02d", (m_Year + 1900) % 100);
+			pString->AppendFormat ("%02d", m_Year % 100);
 			break;
 
 		case 'Y':
-			pString->AppendFormat ("%04d", m_Year + 1900);
+			pString->AppendFormat ("%04d", m_Year);
 			break;
 
 		case 'D':
