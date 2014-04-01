@@ -84,6 +84,19 @@ CFile::Open (
 
 #endif
 
+size_t
+CFile::WriteFormat_va (
+	const char* pFormat,
+	axl_va_list va
+	)
+{
+	char Buffer [256];
+	rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Format_va (pFormat, va);
+
+	return Write (String, String.GetLength ());
+}
+
 //.............................................................................
 
 } // namespace io

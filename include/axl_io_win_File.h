@@ -40,6 +40,13 @@ public:
 	bool
 	SetPosition (uint64_t Offset) const;
 
+	bool
+	Flush ()
+	{
+		bool_t Result = ::FlushFileBuffers (m_h);
+		return err::Complete (Result);
+	}
+
 	dword_t
 	Read (
 		void* p,

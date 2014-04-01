@@ -27,17 +27,80 @@ bool
 DoesFileExist (const char* pFileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	return GetFileAttributesW (rtl::CString_w (pFileName)) != INVALID_FILE_ATTRIBUTES;
+	char Buffer [256];
+	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FileName = pFileName;
+	dword_t Attributes = GetFileAttributesW (FileName);
+	return Attributes != INVALID_FILE_ATTRIBUTES;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	return access (pFileName, F_OK) != -1;
 #endif
+}
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+inline
+bool 
+IsDir (const wchar_t* pFileName)
+{
+	dword_t Attributes = GetFileAttributesW (pFileName);
+	return Attributes != INVALID_FILE_ATTRIBUTES && (Attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+}
+#endif
+
+bool
+EnsureDirExists (const char* pFileName)
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	char Buffer [256] = { 0 };
+	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FileName = pFileName;
+
+	if (FileName.IsEmpty () || IsDir (FileName))
+		return true;
+
+	wchar_t* p = FileName;
+	if (p [1] == ':')
+		p += 2;
+
+	while (*p == '\\' || *p == '/') // skip root
+		p++;
+
+	while (*p)
+	{
+		wchar_t* p2 = p + 1;
+		while (*p2 && *p2 != '\\' && *p2 != '/')
+			p2++;
+
+		wchar_t c = *p2; // save
+		*p2 = 0;
+
+		if (!IsDir (FileName))
+		{
+			bool_t Result = CreateDirectoryW (FileName, NULL);
+			if (!Result)
+				return err::FailWithLastSystemError ();
+		}
+
+		*p2 = c; // restore
+
+		p = p2 + 1;
+		while (*p == '\\' || *p == '/') // skip separators
+			p++;
+	}
+
+	return true;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	error POSIX IsDir () is not yet implemented
+#endif	
 }
 
 rtl::CString
 GetFullFilePath (const char* pFileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	rtl::CString_w FileName = pFileName;
+	char Buffer [256];
+	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FileName = pFileName;
 
 	size_t Length = GetFullPathNameW (FileName, 0, NULL, NULL);
 	if (!Length)
@@ -58,7 +121,9 @@ rtl::CString
 GetDir (const char* pFilePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	rtl::CString_w FilePath = pFilePath;
+	char Buffer [256];
+	rtl::CString_w FilePath (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FilePath = pFilePath;
 
 	wchar_t Drive [4] = { 0 };
 	wchar_t Dir [1024] = { 0 };
@@ -85,7 +150,9 @@ rtl::CString
 GetFileName (const char* pFilePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	rtl::CString_w FilePath = pFilePath;
+	char Buffer [256];
+	rtl::CString_w FilePath (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FilePath = pFilePath;
 
 	wchar_t FileName [1024] = { 0 };
 	wchar_t Extension [1024] = { 0 };

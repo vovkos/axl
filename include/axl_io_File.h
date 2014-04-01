@@ -118,6 +118,28 @@ public:
 	{
 		return SetPosition (Offset) ? Write (p, Size) : -1;
 	}
+
+	size_t
+	WriteFormat_va (
+		const char* pFormat,
+		axl_va_list va
+		);
+
+	size_t
+	WriteFormat (
+		const char* pFormat,
+		...
+		)
+	{
+		AXL_VA_DECL (va, pFormat);
+		return WriteFormat_va (pFormat, va);
+	}
+
+	bool
+	Flush ()
+	{
+		return m_File.Flush ();
+	}
 };
 
 //.............................................................................

@@ -20,6 +20,9 @@ GetCurrentDir ();
 bool
 DoesFileExist (const char* pFileName);
 
+bool
+EnsureDirExists (const char* pFileName);
+
 rtl::CString
 GetFullFilePath (const char* pFileName);
 
