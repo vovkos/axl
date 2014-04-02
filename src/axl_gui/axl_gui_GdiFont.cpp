@@ -113,7 +113,7 @@ CGdiFont::CalcTextSize_utf8 (
 	size_t Length
 	)
 {
-	wchar_t Buffer [256];
+	char Buffer [256];
 	rtl::CString_w String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	String.Copy (pText, Length);
 
@@ -145,7 +145,7 @@ CGdiFont::CalcTextSize_utf32 (
 	size_t Length
 	)
 {
-	wchar_t Buffer [256];
+	char Buffer [256];
 	rtl::CString_w String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	String.Copy (pText, Length);
 

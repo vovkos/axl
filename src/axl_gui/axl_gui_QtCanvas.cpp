@@ -72,6 +72,72 @@ CQtCanvas::DrawText_qt (
 	return true;
 }
 
+bool
+CQtCanvas::DrawText_utf8 (
+	int x,
+	int y,
+	int Left,
+	int Top,
+	int Right,
+	int Bottom,
+	uint_t TextColor,
+	uint_t BackColor,
+	uint_t FontFlags,
+	const utf8_t* pText,
+	size_t Length
+	)
+{
+	char Buffer [256];
+	rtl::CString_utf16 String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Copy (pText, Length);
+
+	return DrawText_qt (
+		x,
+		y,
+		Left,
+		Top,
+		Right,
+		Bottom,
+		TextColor,
+		BackColor,
+		FontFlags,
+		QString ((const QChar*) String.cc (), String.GetLength ())
+		);
+}
+
+bool
+CQtCanvas::DrawText_utf32 (
+	int x,
+	int y,
+	int Left,
+	int Top,
+	int Right,
+	int Bottom,
+	uint_t TextColor,
+	uint_t BackColor,
+	uint_t FontFlags,
+	const utf32_t* pText,
+	size_t Length
+	)
+{
+	char Buffer [256];
+	rtl::CString_utf16 String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Copy (pText, Length);
+
+	return DrawText_qt (
+		x,
+		y,
+		Left,
+		Top,
+		Right,
+		Bottom,
+		TextColor,
+		BackColor,
+		FontFlags,
+		QString ((const QChar*) String.cc (), String.GetLength ())
+		);
+}
+
 
 bool
 CQtCanvas::DrawImage (

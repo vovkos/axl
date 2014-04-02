@@ -57,6 +57,33 @@ CQtFont::CalcTextSize_qt (const QString& String)
 	return Size;
 }
 
+TSize
+CQtFont::CalcTextSize_utf8 (
+	const utf8_t* pText,
+	size_t Length
+	)
+{
+	char Buffer [256];
+	rtl::CString_utf16 String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Copy (pText, Length);
+
+	return CalcTextSize_qt (QString ((const QChar*) String.cc (), String.GetLength ()));
+}
+
+TSize
+CQtFont::CalcTextSize_utf32 (
+	const utf32_t* pText,
+	size_t Length
+	)
+{
+	char Buffer [256];
+	rtl::CString_utf16 String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	String.Copy (pText, Length);
+
+	return CalcTextSize_qt (QString ((const QChar*) String.cc (), String.GetLength ()));
+}
+
+
 //.............................................................................
 
 } // namespace gui

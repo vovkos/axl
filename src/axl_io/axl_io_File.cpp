@@ -36,8 +36,12 @@ CFile::Open (
 	if (Flags & EFileFlag_Asynchronous)
 		FlagsAttributes |= FILE_FLAG_OVERLAPPED;
 
+	char Buffer [256];
+	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	FileName = pFileName;
+
 	return m_File.Create (
-		rtl::CString_w (pFileName), 
+		FileName,
 		AccessMode, 
 		ShareMode, 
 		NULL, 

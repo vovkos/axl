@@ -9,7 +9,6 @@
 #include "axl_ref_Buf.h"
 #include "axl_rtl_BitIdx.h"
 #include "axl_rtl_Utf.h"
-#include "axl_rtl_CharCodec.h"
 
 namespace axl {
 namespace rtl {

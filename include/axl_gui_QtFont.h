@@ -46,10 +46,7 @@ public:
 	CalcTextSize_utf8 (
 		const utf8_t* pText,
 		size_t Length = -1
-		)
-	{
-		return CalcTextSize_qt (QString::fromUtf8 (pText, Length));
-	}
+		);
 
 	virtual
 	TSize
@@ -66,10 +63,7 @@ public:
 	CalcTextSize_utf32 (
 		const utf32_t* pText,
 		size_t Length = -1
-		)
-	{
-		return CalcTextSize_qt (QString::fromUcs4 ((const uint*) pText, Length));
-	}
+		);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

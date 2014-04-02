@@ -19,8 +19,8 @@ CSerial::Open (
 	if (strncmp (pName, "\\\\.\\", 4) == 0)
 		pName += 4;
 	
-	wchar_t Buffer [256];
-	rtl::CStringT <wchar_t> DeviceName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
+	char Buffer [256];
+	rtl::CString_w DeviceName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	DeviceName.Format (L"\\\\.\\%S", pName);
 
 	m_h = ::CreateFileW (

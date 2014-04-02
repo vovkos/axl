@@ -61,21 +61,7 @@ public:
 		uint_t FontFlags,
 		const utf8_t* pText,
 		size_t Length = -1
-		)
-	{
-		return DrawText_qt (
-			x,
-			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			TextColor,
-			BackColor,
-			FontFlags,
-			QString::fromUtf8 (pText, Length)
-			);
-	}
+		);
 
 	virtual
 	bool
@@ -121,21 +107,7 @@ public:
 		uint_t FontFlags,
 		const utf32_t* pText,
 		size_t Length = -1
-		)
-	{
-		return DrawText_qt (
-			x,
-			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			TextColor,
-			BackColor,
-			FontFlags,
-			QString::fromUcs4 ((const uint*) pText, Length)
-			);
-	}
+		);
 
 	virtual
 	bool
