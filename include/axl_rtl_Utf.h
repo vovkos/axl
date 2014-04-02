@@ -222,35 +222,36 @@ public:
 	}
 
 	static	
-	utf32_t
-	GetSurrogateCodePoint (
-		uint16_t Lead,
-		uint16_t Trail
-		)
-	{
-		return (Lead - 0xd800) * 0x400 + (Trail - 0xdc00) + 0x10000;
-	}	
-
-	static	
 	bool
 	NeedSurrogate (uint32_t x)
 	{
-		return x > 0xffff;
+		return x >= 0x10000;
 	}
 
 	static
 	utf16_t
 	GetLeadSurrogate (uint32_t x)
 	{
-		return (x - 0x10000) / 0x400 + 0xd800;
+		return 0xd800 + (((x - 0x10000) >> 10) & 0x3ff);
 	}
 
 	static
 	utf16_t
 	GetTrailSurrogate (uint32_t x)
 	{
-		return (x - 0x10000) % 0x400 + 0xdc00;
+		return 0xdc00 + (x & 0x3ff);
 	}
+
+	static	
+	utf32_t
+	GetSurrogateCodePoint (
+		uint16_t Lead,
+		uint16_t Trail
+		)
+	{
+		ASSERT (IsLeadSurrogate (Lead) && IsTrailSurrogate (Trail));
+		return 0x10000 - (0xd800 << 10) - 0xdc00 + (Lead << 10) + Trail;
+	}	
 
 	static
 	size_t
