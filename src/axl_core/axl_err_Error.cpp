@@ -198,7 +198,7 @@ SetError (const CError& Error)
 rtl::CString
 CStdErrorProvider::GetErrorDescription (const TError* pError)
 {
-	if (pError->m_Size <= sizeof (TError))
+	if (pError->m_Size < sizeof (TError))
 		return rtl::CString ();
 
 	size_t Length;
