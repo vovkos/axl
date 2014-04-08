@@ -19,8 +19,8 @@ set (
 set (
 	LUA_CPP_LIST
 	axl_lua_LuaState.cpp
-	axl_lua_StringTemplateLexer.rl.cpp
 	axl_lua_StringTemplate.cpp
+	axl_lua_StringTemplateLexer.cpp
 	)
 
 set (
@@ -28,7 +28,21 @@ set (
 	axl_lua_StringTemplateLexer.rl
 	)
 
-push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+source_virtual_folder (
+	lua
+	${LUA_H_LIST}
+	${LUA_CPP_LIST}
+	${LUA_RL_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# gen folder
+#
+
+set (LUA_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${LUA_GEN_DIR})
 
 add_ragel_step (
 	axl_lua_StringTemplateLexer.rl.cpp
@@ -37,11 +51,16 @@ add_ragel_step (
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
+set (
+	GEN_RL_CPP_LIST
+	${LUA_GEN_DIR}/axl_lua_StringTemplateLexer.rl.cpp
+	)
+
+exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+
 source_virtual_folder (
-	lua
-	${LUA_H_LIST}
-	${LUA_CPP_LIST}
-	${LUA_RL_LIST}
+	gen
+	${GEN_RL_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -63,7 +82,10 @@ source_virtual_folder (
 # axl_lua library
 #
 
-include_directories (${PATH_LUA_INC_DIR})
+include_directories (
+	${PATH_LUA_INC_DIR}
+	${LUA_GEN_DIR}
+	)
 
 add_library (
 	axl_lua
@@ -72,6 +94,7 @@ add_library (
 	${LUA_H_LIST}
 	${LUA_CPP_LIST}
 	${LUA_RL_LIST}
+	${GEN_RL_CPP_LIST}
 	)
 
 if (AXL_USE_PCH)

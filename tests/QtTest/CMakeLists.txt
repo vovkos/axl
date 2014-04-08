@@ -23,7 +23,7 @@ set (
 
 set (
 	SRC_CPP_LIST
-	jancycolorizer.rl.cpp
+	jancycolorizer.cpp
 	mylogproxy.cpp
 	mylogrepresenter.cpp
 	mylogserver.cpp
@@ -37,46 +37,13 @@ set (
 	jancycolorizer.rl
 	)
 
-push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
-add_ragel_step (
-	jancycolorizer.rl.cpp
-	jancycolorizer.rl
-	)
-
-pop (CMAKE_CURRENT_BINARY_DIR)
-
 source_virtual_folder (
 	src
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${SRC_RL_LIST}
 	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# moc folder
-#
-
-set (
-	MOC_SRC_H_LIST
-	mainwindow.h
-	${AXL_INC_DIR}/axl_gui_QtWidget.h
-	)
-
-qt5_wrap_cpp_to (
-	MOC_CPP_LIST
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${MOC_SRC_H_LIST}
-	)
-
-exclude_from_build (${MOC_CPP_LIST}) # include "moc_*.cpp" manually
-
-source_virtual_folder (
-	moc
-	${MOC_CPP_LIST}
-	)
-
+ 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # res folder
@@ -89,17 +56,59 @@ set (
 
 push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-qt5_wrap_ui (
-	UI_H_LIST
-	${RES_UI_LIST}
-	)
-
 pop (CMAKE_CURRENT_BINARY_DIR)
 
 source_virtual_folder (
 	res
 	${RES_UI_LIST}
-	${UI_H_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# gen folder
+#
+
+set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+
+set (
+	MOC_H_LIST
+	mainwindow.h
+	${AXL_INC_DIR}/axl_gui_QtWidget.h
+	)
+
+qt5_wrap_cpp_to (
+	GEN_MOC_CPP_LIST
+	${GEN_DIR}
+	${MOC_H_LIST}
+	)
+
+qt5_wrap_ui (
+	GEN_UI_H_LIST
+	${RES_UI_LIST}
+	)
+
+add_ragel_step (
+	jancycolorizer.rl.cpp
+	jancycolorizer.rl
+	)
+
+set (
+	GEN_RL_CPP
+	${GEN_DIR}/jancycolorizer.rl.cpp
+	)
+
+pop (CMAKE_CURRENT_BINARY_DIR)
+
+exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+exclude_from_build (${GEN_MOC_CPP_LIST}) # include "moc_*.cpp" manually
+
+source_virtual_folder (
+	gen
+	${GEN_MOC_CPP_LIST}
+	${GEN_UI_H_LIST}
+	${GEN_RL_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -143,20 +152,7 @@ if (MSVC)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm200")
 endif ()
 
-include_directories (
-	${PATH_LLVM_INC_DIR}
-	${PATH_LLVM_INC_DIR_2}
-	)
-
-link_directories (${PATH_LLVM_LIB_DIR})
-
-llvm_map_components_to_libraries (
-	LLVM_LIB_LIST
-	jit
-	native
-	MCJIT
-	MCDisassembler
-	)
+include_directories (${GEN_DIR})
 
 add_executable (
 	QtTest
@@ -165,21 +161,19 @@ add_executable (
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${RES_UI_LIST}
-	${MOC_CPP_LIST}
-	${UI_H_LIST}
+	${GEN_MOC_CPP_LIST}
+	${GEN_UI_H_LIST}
+	${GEN_RL_CPP_LIST}
 	${SCRIPT_JNC_LIST}
 	)
 
 target_link_libraries (
 	QtTest
-#	axl_parse
-#	axl_jnc
 	axl_log
 	axl_gui
 	axl_io
 	axl_core
 	ws2_32
-	${LLVM_LIB_LIST}
 	)
 
 qt5_use_modules (QtTest Widgets)
