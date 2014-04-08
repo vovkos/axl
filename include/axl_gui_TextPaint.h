@@ -57,6 +57,13 @@ public:
 		Init (pCanvas);
 	}
 
+	static inline
+	bool
+	IsPrintable (utf32_t c)
+	{
+		return c >= 0x20 && iswprint (c);
+	}
+
 	TPoint
 	GetPoint ()
 	{

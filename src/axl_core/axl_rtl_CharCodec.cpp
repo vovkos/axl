@@ -262,5 +262,93 @@ CCharCodec::DecodeToUtf32 (
 
 //.............................................................................
 
+size_t
+CCodePointDecoder::Decode (
+	utf32_t* pCodePoint,
+	const void* p,
+	size_t Size
+	)
+{
+	size_t UnitSize = m_pCharCodec->GetUnitSize ();
+	ASSERT (UnitSize <= sizeof (m_Accumulator));
+
+	size_t TakenBufferLength;
+	size_t TakenSize;
+	size_t ExpectedSize;
+
+	if (m_AccumulatorExpectedSize)
+	{
+		size_t AccumulatorMissingSize = m_AccumulatorExpectedSize - m_AccumulatorCurrentSize;		
+
+		if (Size < AccumulatorMissingSize) // not yet
+		{
+			memcpy (m_Accumulator + m_AccumulatorCurrentSize, p, Size);
+			m_AccumulatorCurrentSize += Size;
+			return -1;
+		}
+
+		memcpy (m_Accumulator + m_AccumulatorCurrentSize, p, AccumulatorMissingSize);
+
+		m_pCharCodec->DecodeToUtf32 (
+			pCodePoint, 
+			1, 
+			m_Accumulator, 
+			m_AccumulatorExpectedSize, 
+			&TakenBufferLength,
+			&TakenSize,
+			&ExpectedSize
+			);
+
+		if (!TakenBufferLength) // still not yet (rare, but might actually happen with UTF-16)
+		{
+			ASSERT (
+				m_AccumulatorCurrentSize == 1 && 
+				m_AccumulatorExpectedSize == 2 && 
+				ExpectedSize == 4
+				);
+
+			m_AccumulatorCurrentSize += AccumulatorMissingSize;
+			m_AccumulatorExpectedSize = ExpectedSize;
+			return -1;
+		}
+
+		m_AccumulatorExpectedSize = 0;
+		m_AccumulatorCurrentSize = 0;
+		return AccumulatorMissingSize;
+	}
+
+	if (Size < UnitSize) // wait for the whole unit
+	{
+		memcpy (m_Accumulator, p, Size);
+		m_AccumulatorCurrentSize = Size;
+		m_AccumulatorExpectedSize = UnitSize;
+		return -1;
+	}
+
+	m_pCharCodec->DecodeToUtf32 (
+		pCodePoint, 
+		1, 
+		p, 
+		Size,
+		&TakenBufferLength,
+		&TakenSize,
+		&ExpectedSize
+		);
+
+	if (!TakenBufferLength)
+	{
+		ASSERT (!TakenSize && Size < ExpectedSize);
+
+		memcpy (m_Accumulator, p, Size);
+		m_AccumulatorCurrentSize = Size;
+		m_AccumulatorExpectedSize = ExpectedSize;
+		return -1;
+	}
+
+	return TakenSize;
+}
+
+//.............................................................................
+
 } // namespace rtl
 } // namespace axl

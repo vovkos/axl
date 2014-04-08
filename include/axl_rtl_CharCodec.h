@@ -543,5 +543,58 @@ public:
 
 //.............................................................................
 
+class CCodePointDecoder
+{
+protected:
+	CCharCodec* m_pCharCodec;
+
+	char m_Accumulator [8];
+	size_t m_AccumulatorCurrentSize;
+	size_t m_AccumulatorExpectedSize;
+
+public:
+	CCodePointDecoder (ECharCodec CodecKind = ECharCodec_Utf8)
+	{
+		SetCharCodec (CodecKind);
+	}
+
+	CCharCodec*
+	GetCharCodec ()
+	{
+		return m_pCharCodec;
+	}
+
+	void
+	SetCharCodec (ECharCodec CodecKind)
+	{
+		SetCharCodec (rtl::GetCharCodec (CodecKind));
+	}
+
+	void
+	SetCharCodec (CCharCodec* pCodec)
+	{
+		m_pCharCodec = pCodec;
+		ResetAccumulator ();
+	}
+
+	void
+	ResetAccumulator ()
+	{
+		m_AccumulatorCurrentSize = 0;
+		m_AccumulatorExpectedSize = 0;
+	}
+
+	// Decode () returns taken size or -1 if code point is incomplete yet
+
+	size_t
+	Decode (
+		utf32_t* pCodePoint,
+		const void* p,
+		size_t Size
+		); 
+};
+
+//.............................................................................
+
 } // namespace rtl
 } // namespace axl

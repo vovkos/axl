@@ -183,7 +183,7 @@ public:
 	{
 		const T* pEnd = p + Count;
 		for (; p < pEnd; p++)
-			*p = (C) c;
+			*p = c;
 	}
 
 	static

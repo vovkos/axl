@@ -574,7 +574,7 @@ CTextPaint::PaintBinTextPart (
 				
 				if (TakenBufferLength == 1) // might still be not enough (e.g. UTF-16)
 				{
-					m_BinTextBuffer [i] = iswprint (CodePoint) ? CodePoint : m_UnprintableChar;
+					m_BinTextBuffer [i] = IsPrintable (CodePoint) ? CodePoint : m_UnprintableChar;
 					i++;
 				}
 			}
@@ -585,7 +585,7 @@ CTextPaint::PaintBinTextPart (
 			break;
 		}
 
-		m_BinTextBuffer [i] = iswprint (CodePoint) ? CodePoint : m_UnprintableChar;
+		m_BinTextBuffer [i] = IsPrintable (CodePoint) ? CodePoint : m_UnprintableChar;
 
 		size_t End = i + TakenSize;
 		for (i++; i < End; i++)
