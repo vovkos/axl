@@ -18,7 +18,7 @@ set (
 
 set (
 	INI_CPP_LIST
-	axl_ini_Lexer.rl.cpp
+	axl_ini_Lexer.cpp
 	axl_ini_Parser.cpp
 	axl_ini_GenericParser.cpp
 	)
@@ -28,7 +28,21 @@ set (
 	axl_ini_Lexer.rl
 	)
 
-push_and_set (CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+source_virtual_folder (
+	ini
+	${INI_H_LIST}
+	${INI_CPP_LIST}
+	${INI_RL_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# gen folder
+#
+
+set (INI_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${INI_GEN_DIR})
 
 add_ragel_step (
 	axl_ini_Lexer.rl.cpp
@@ -37,11 +51,16 @@ add_ragel_step (
 
 pop (CMAKE_CURRENT_BINARY_DIR)
 
+set (
+	GEN_RL_CPP_LIST
+	${INI_GEN_DIR}/axl_ini_Lexer.rl.cpp
+	)
+
+exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+
 source_virtual_folder (
-	ini
-	${INI_H_LIST}
-	${INI_CPP_LIST}
-	${INI_RL_LIST}
+	gen
+	${GEN_RL_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -63,6 +82,8 @@ source_virtual_folder (
 # axl_ini library
 #
 
+include_directories (${INI_GEN_DIR})
+
 add_library (
 	axl_ini
 	${PCH_H}
@@ -70,6 +91,7 @@ add_library (
 	${INI_H_LIST}
 	${INI_CPP_LIST}
 	${INI_RL_LIST}
+	${GEN_RL_CPP_LIST}
 	)
 
 if (AXL_USE_PCH)
