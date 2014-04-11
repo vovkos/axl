@@ -553,9 +553,12 @@ protected:
 	size_t m_AccumulatorExpectedSize;
 
 public:
-	CCodePointDecoder (ECharCodec CodecKind = ECharCodec_Utf8)
+	CCodePointDecoder (
+		ECharCodec CodecKind = ECharCodec_Utf8,
+		uint32_t State = 0
+		)
 	{
-		SetCharCodec (CodecKind);
+		Setup (CodecKind, State);
 	}
 
 	CCharCodec*
@@ -565,16 +568,22 @@ public:
 	}
 
 	void
-	SetCharCodec (ECharCodec CodecKind)
+	Setup (
+		ECharCodec CodecKind,
+		uint32_t State = 0
+		)
 	{
-		SetCharCodec (rtl::GetCharCodec (CodecKind));
+		Setup (rtl::GetCharCodec (CodecKind), State);
 	}
 
 	void
-	SetCharCodec (CCharCodec* pCodec)
+	Setup (
+		CCharCodec* pCodec,
+		uint32_t State = 0
+		)
 	{
 		m_pCharCodec = pCodec;
-		ResetAccumulator ();
+		LoadState (State);
 	}
 
 	void
@@ -583,6 +592,19 @@ public:
 		m_AccumulatorCurrentSize = 0;
 		m_AccumulatorExpectedSize = 0;
 	}
+
+	void
+	Clear ()
+	{
+		m_pCharCodec = NULL;
+		ResetAccumulator ();
+	}
+
+	void
+	LoadState (uint32_t State);
+
+	uint32_t
+	SaveState ();
 
 	// Decode () returns taken size or -1 if code point is incomplete yet
 

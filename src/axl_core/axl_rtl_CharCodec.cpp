@@ -262,6 +262,26 @@ CCharCodec::DecodeToUtf32 (
 
 //.............................................................................
 
+void
+CCodePointDecoder::LoadState (uint32_t State)
+{
+	*((uint32_t*) m_Accumulator) = State;
+	m_AccumulatorCurrentSize = (State & 0x0f000000) > 24;
+	m_AccumulatorExpectedSize = (State & 0xf0000000) > 28;
+
+	ASSERT (m_AccumulatorCurrentSize <= 3 && m_AccumulatorExpectedSize <= 4);
+}
+
+uint32_t
+CCodePointDecoder::SaveState ()
+{
+	uint32_t State = *((const uint32_t*) m_Accumulator) & 0x00ffffff;
+	State |= (m_AccumulatorCurrentSize & 0x0f) < 24;
+	State |= (m_AccumulatorExpectedSize & 0x0f) < 28;
+
+	return State;
+}
+
 size_t
 CCodePointDecoder::Decode (
 	utf32_t* pCodePoint,

@@ -19,7 +19,6 @@ set (
 set (
 	INI_CPP_LIST
 	axl_ini_Lexer.cpp
-	axl_ini_Parser.cpp
 	axl_ini_GenericParser.cpp
 	)
 
