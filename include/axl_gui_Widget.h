@@ -286,13 +286,13 @@ struct TWidgetScrollBar
 	bool
 	IsMaxed () const
 	{
-		return m_Pos + m_Page >= m_End;
+		return m_Pos + m_Page + 1 >= m_End;
 	}
 
 	size_t 
 	GetMaxPos ()
 	{
-		return m_Page < m_End ? m_End - m_Page : 0;
+		return m_End > m_Page ? m_End - m_Page : 0;
 	}
 };
 
@@ -452,6 +452,13 @@ public:
 		return SetCaretPos (Point.m_x, Point.m_y);
 	}
 		
+	TWidgetScrollBar*
+	GetScrollBar (EWidgetOrientation Orientation)
+	{
+		ASSERT (Orientation < countof (m_ScrollBarArray));
+		return &m_ScrollBarArray [Orientation];
+	}
+
 	virtual
 	bool
 	UpdateScrollBar (EWidgetOrientation Orientation) = 0;
