@@ -281,9 +281,9 @@ public:
 		)
 	{
 		if (Left == Right || Top == Bottom)
-			m_pQtWidget->repaint ();
+			m_pQtWidget->update ();
 		else
-			m_pQtWidget->repaint (Left, Top, Right - Left, Bottom - Top);
+			m_pQtWidget->update (Left, Top, Right - Left, Bottom - Top);
 
 		return true;
 	}
