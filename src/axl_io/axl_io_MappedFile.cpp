@@ -2,7 +2,6 @@
 #include "axl_io_MappedFile.h"
 #include "axl_g_Module.h"
 #include "axl_err_Error.h"
-#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace io {
@@ -293,7 +292,7 @@ CMappedFile::ViewImpl (
 #if (_AXL_ENV == AXL_ENV_WIN)
 	// ensure mapping covers the view
 
-	if (!m_Mapping.IsOpen () || End > m_MappedSize)
+	if (!m_Mapping.IsOpen () || ViewEnd > m_MappedSize)
 	{
 		uint_t Protection;
 
@@ -357,4 +356,3 @@ CMappedFile::UnmapAllViews ()
 
 } // namespace io
 } // namespace axl
-
