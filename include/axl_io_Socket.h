@@ -95,6 +95,17 @@ public:
 	}
 
 	bool
+	GetOption (
+		int Level,
+		int Option,
+		void* p,
+		size_t Size
+		)
+	{
+		return m_Socket.GetOption (Level, Option, p, Size);
+	}
+
+	bool
 	SetOption (
 		int Level,
 		int Option,
@@ -103,12 +114,6 @@ public:
 		)
 	{
 		return m_Socket.SetOption (Level, Option, p, Size);
-	}
-
-	bool
-	EnableBroadcast (bool IsEnabled)
-	{
-		return m_Socket.EnableBroadcast (IsEnabled);
 	}
 
 	bool

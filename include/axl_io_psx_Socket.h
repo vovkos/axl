@@ -69,13 +69,6 @@ public:
 	}
 
 	bool
-	EnableBroadcast (bool IsEnabled)
-	{
-		int Option = IsEnabled;
-		return SetOption (SOL_SOCKET, SO_BROADCAST, &Option, sizeof (int));
-	}
-
-	bool
 	Listen (size_t BackLog)
 	{
 		int Result = ::listen (m_h, (int) BackLog);
