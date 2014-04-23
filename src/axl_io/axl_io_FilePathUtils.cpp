@@ -58,7 +58,7 @@ EnsureDirExists (const char* pFileName)
 	if (FileName.IsEmpty () || IsDir (FileName))
 		return true;
 
-	wchar_t* p = FileName;
+	const wchar_t* p = FileName;
 	if (p [1] == ':')
 		p += 2;
 
@@ -67,12 +67,12 @@ EnsureDirExists (const char* pFileName)
 
 	while (*p)
 	{
-		wchar_t* p2 = p + 1;
+		const wchar_t* p2 = p + 1;
 		while (*p2 && *p2 != '\\' && *p2 != '/')
 			p2++;
 
 		wchar_t c = *p2; // save
-		*p2 = 0;
+		*(wchar_t*) p2 = 0;
 
 		if (!IsDir (FileName))
 		{
@@ -81,7 +81,7 @@ EnsureDirExists (const char* pFileName)
 				return err::FailWithLastSystemError ();
 		}
 
-		*p2 = c; // restore
+		*(wchar_t*) p2 = c; // restore
 
 		p = p2 + 1;
 		while (*p == '\\' || *p == '/') // skip separators

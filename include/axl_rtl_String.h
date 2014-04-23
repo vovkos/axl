@@ -33,7 +33,14 @@ public:
 	typedef CUtf8 CEncoding;
 	typedef CStringDetailsT <C2> CDetails2;
 	typedef CStringDetailsT <C3> CDetails3;
-	
+
+	static
+	const C*
+	GetEmptyString ()
+	{
+		return "";
+	}
+
 	static
 	const C*
 	GetCrLf ()
@@ -136,6 +143,14 @@ template <typename T>
 class CStringDetailsImplT
 {
 public:
+	static
+	const T*
+	GetEmptyString ()
+	{
+		static T EmptyString [1] = { 0 };
+		return EmptyString;
+	}
+
 	static
 	const T*
 	GetCrLf ()
@@ -449,12 +464,7 @@ public:
 
 	operator const C* () const
 	{
-		return m_p;
-	}
-
-	operator C* ()
-	{
-		return m_p;
+		return cc ();
 	}
 
 	bool
@@ -617,13 +627,7 @@ public:
 	const C*
 	cc () const
 	{
-		return m_p;
-	}
-
-	C*
-	c ()
-	{
-		return m_p;
+		return m_p ? m_p : CDetails::GetEmptyString ();
 	}
 
 	CString2
