@@ -762,7 +762,13 @@ typedef CCmpStringT_i <wchar_t> CCmpString_wi;
 
 size_t
 djb2 (
-	const void* _p,
+	const void* p,
+	size_t Size
+	);
+
+uint16_t
+crc16(
+	const void* p, 
 	size_t Size
 	);
 
@@ -776,6 +782,19 @@ public:
 	operator () (const T& Key) const
 	{ 
 		return djb2 (&Key, sizeof (Key)); 
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class CHashCrc16T
+{
+public:
+	size_t 
+	operator () (const T& Key) const
+	{ 
+		return crc16 (&Key, sizeof (Key)); 
 	}
 };
 

@@ -79,5 +79,77 @@ public:
 
 //.............................................................................
 
+// old AXL used different format of header
+
+class CLegacyPacketizerRoot
+{
+protected:
+	enum
+	{
+		EPacketHdr_Signature = '.GSM',
+	};
+
+	struct TPacketHdr
+	{
+		uint32_t m_Signature;
+		uint16_t m_DataSize;
+		uint16_t m_Checksum; // CRC16
+	};
+
+protected:
+	rtl::CArrayT <char> m_Buffer;
+
+public:
+	void
+	Reset ()
+	{
+		m_Buffer.Clear ();
+	}
+
+	static
+	uint64_t
+	CreateHdr (size_t Size);
+
+protected:
+	size_t
+	WriteImpl (
+		const void* p,
+		size_t Size
+		);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class CLegacyPacketizerT: public CLegacyPacketizerRoot
+{
+public:
+	void
+	Write (
+		const void* p,
+		size_t Size
+		)
+	{
+		while (Size)
+		{
+			size_t Taken = WriteImpl (p, Size);
+			if (Taken == -1)
+				break;
+
+			ASSERT (m_Buffer.GetCount () >= sizeof (uint64_t));
+			size_t DataSize = m_Buffer.GetCount () - sizeof (uint64_t);
+			if (DataSize)
+				static_cast <T*> (this)->OnPacket (m_Buffer.a () + sizeof (uint64_t), DataSize);
+
+			Reset ();
+
+			p = (char*) p + Taken;
+			Size -= Taken;
+		}
+	}
+};
+
+//.............................................................................
+
 } // namespace rtl
 } // namespace axl

@@ -330,8 +330,8 @@ set (
 	axl_rtl_BuddyAllocMap.cpp
 	axl_rtl_CharCodec.cpp
 	axl_rtl_CmdLineParser.cpp
-	axl_rtl_djb2.cpp
 	axl_rtl_EscapeEncoding.cpp
+	axl_rtl_Func.cpp
 	axl_rtl_Guid.cpp
 	axl_rtl_HexEncoding.cpp
 	axl_rtl_Packer.cpp
