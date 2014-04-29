@@ -47,6 +47,22 @@ public:
 
 //.............................................................................
 
+class CCloseRegKey
+{
+public:
+	void
+	operator () (HKEY h)
+	{
+		::RegCloseKey (h);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef rtl::CHandleT <HKEY, CCloseRegKey, rtl::CMinusOneT <HKEY> > CRegKeyHandle;
+
+//.............................................................................
+
 } // namespace win
 } // namespace g
 } // namespace axl
