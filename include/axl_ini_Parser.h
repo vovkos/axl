@@ -46,7 +46,7 @@ public:
 				return false;
 			
 			case EScanResult_Eof:
-				return Finalize ();
+				return static_cast <T*> (this)->Finalize ();
 
 			case EScanResult_Section:
 				Result = static_cast <T*> (this)->OnSection (m_SectionName);
