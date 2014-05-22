@@ -62,7 +62,7 @@ CBmhFind::Find (
 	uchar_t* pEnd;
 	size_t m;
 
-	if (!CanFind () || Size < m_PatternSize)
+	if (!m_PatternSize || Size < m_PatternSize)
 		return -1;
 
 	p = (uchar_t*) _p;
@@ -90,7 +90,7 @@ CBmhFind::ReverseFind (
 {
 	uchar_t* p;
 
-	if (!CanFind () || Size < m_PatternSize)
+	if (!m_PatternSize || Size < m_PatternSize)
 		return -1;
 
 	p = (uchar_t*) _p + Size - m_PatternSize;
@@ -121,7 +121,7 @@ CBmhFind::IncrementalFind (
 	size_t iEnd;
 	size_t n;
 
-	if (!CanFind ())
+	if (!m_PatternSize)
 		return -1;
 
 	if (TestSize < m_PatternSize)
@@ -173,7 +173,7 @@ CBmhFind::ReverseIncrementalFind (
 
 	size_t i;
 
-	if (!CanFind ())
+	if (!m_PatternSize)
 		return -1;
 
 	if (TestSize < m_PatternSize)
