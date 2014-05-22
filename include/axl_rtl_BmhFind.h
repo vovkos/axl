@@ -37,9 +37,9 @@ public:
 	Clear ();
 
 	bool 
-	CanFind ()
+	IsEmpty ()
 	{
-		return m_PatternSize != 0;
+		return m_PatternSize == 0;
 	}
 
 	size_t 
