@@ -307,12 +307,11 @@ CGdiEngine::WriteClipboard (
 	if (!Result)
 		return false;
 
-	::EmptyClipboard ();
-
-	size_t Size = (Length + 1) * sizeof (char);
-	HGLOBAL hData = GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, Size);
+	HGLOBAL hData = GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, Length + 1);
 	void* p = GlobalLock (hData);
-	memcpy (p, pString, Length * sizeof (char));
+	memcpy (p, pString, Length);
+	((char*) p) [Length] = 0;
+	GlobalUnlock (hData);
 
 	::SetClipboardData (CF_TEXT, hData);
 	::CloseClipboard ();
