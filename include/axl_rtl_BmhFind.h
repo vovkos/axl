@@ -85,10 +85,23 @@ public:
 		size_t Size
 		);
 
-	void ResetIncrementalFind (size_t IncFindOffset = 0)
+	void 
+	ResetIncrementalFind (size_t IncFindOffset = 0)
 	{
 		m_IncFindOffset = IncFindOffset;
 		m_IncFindTailSize = 0;
+	}
+
+	size_t
+	GetIncrementalFindOffset ()
+	{
+		return m_IncFindOffset;
+	}
+
+	size_t
+	GetIncrementalFindTailSize ()
+	{
+		return m_IncFindTailSize;
 	}
 
 protected:
