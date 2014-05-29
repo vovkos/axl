@@ -16,7 +16,7 @@ namespace gui {
 
 enum EWm
 {
-	EWm_First = 0x0700, // WM_USER = 0x0400, reserve 512 codes just in case
+	EWm_First = 0x0600, // WM_USER = 0x0400, reserve 512 codes just in case
 	EWm_ThreadMsg,
 };
 

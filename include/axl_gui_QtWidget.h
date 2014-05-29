@@ -23,6 +23,41 @@ GetQtEngineSingleton (); // thanks a lot gcc
 
 //.............................................................................
 
+class QtNotifyEvent: public QEvent
+{
+public:
+	enum
+	{
+		QtType = QEvent::User + 0x200, // reserve 512 codes just in case
+	};
+
+public:
+	QtNotifyEvent (
+		uint_t code,
+		const void* params
+		): QEvent ((QEvent::Type) QtType)
+	{
+		m_code = code;
+		m_params = params;
+	}
+
+	uint_t code ()
+	{
+		return m_code;
+	}
+
+	const void* params ()
+	{
+		return m_params;
+	}
+
+private:
+	uint_t m_code;
+	const void* m_params;
+};
+
+//.............................................................................
+
 class CQtWidgetImpl: public CWidget
 {
 public:
@@ -138,7 +173,25 @@ private slots:
 signals:
 	void threadMsgSignal (TWidgetThreadMsg* msg);
 
+public:
+	virtual 
+	bool 
+	event (QEvent* e)
+	{
+		if (e->type () != QtNotifyEvent::QtType)
+			return QAbstractScrollArea::event (e);
+	
+		notifyEvent ((QtNotifyEvent*) e);
+		return e->isAccepted ();
+	}
+
 protected:
+	virtual 
+	void 
+	notifyEvent (QtNotifyEvent* e)
+	{
+	}
+
 	virtual 
 	void 
 	mousePressEvent (QMouseEvent* e)
@@ -358,8 +411,8 @@ public:
 		void* pParam = NULL
 		)
 	{
-		// TODO
-		return 0;
+		QtNotifyEvent e (NotifyCode, pParam);		
+		return m_pQtScrollArea->event (&e);
 	}
 
 	virtual
