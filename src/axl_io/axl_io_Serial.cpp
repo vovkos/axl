@@ -56,17 +56,17 @@ CSerial::SetSettings (
 			Dcb.fInX = TRUE;
 			break;
 		}
-	
+
 	if (!(Mask & ESerialSetting_ReadInterval))
 		return m_Serial.SetSettings (&Dcb);
 
 	COMMTIMEOUTS Timeouts = { 0 };
-	Timeouts.ReadIntervalTimeout = 
+	Timeouts.ReadIntervalTimeout =
 		pSettings->m_ReadInterval == 0 ? -1 :
 		pSettings->m_ReadInterval == -1 ? 0 :
 		pSettings->m_ReadInterval;
 
-	return 
+	return
 		m_Serial.SetSettings (&Dcb) &&
 		m_Serial.SetTimeouts (&Timeouts);
 }
@@ -171,47 +171,47 @@ CSerial::SetSettings (
 
 		switch (pSettings->m_BaudRate)
 		{
-		case ESerialBaud_110:
+		case 110:
 			Speed = B110;
 			break;
 
-		case ESerialBaud_300:
+		case 300:
 			Speed = B300;
 			break;
 
-		case ESerialBaud_600:
+		case 600:
 			Speed = B600;
 			break;
 
-		case ESerialBaud_1200:
+		case 1200:
 			Speed = B1200;
 			break;
 
-		case ESerialBaud_2400:
+		case 2400:
 			Speed = B2400;
 			break;
 
-		case ESerialBaud_4800:
+		case 4800:
 			Speed = B4800;
 			break;
 
-		case ESerialBaud_9600:
+		case 9600:
 			Speed = B9600;
 			break;
 
-		case ESerialBaud_19200:
+		case 19200:
 			Speed = B19200;
 			break;
 
-		case ESerialBaud_38400:
+		case 38400:
 			Speed = B38400;
 			break;
 
-		case ESerialBaud_57600:
+		case 57600:
 			Speed = B57600;
 			break;
 
-		case ESerialBaud_115200:
+		case 115200:
 			Speed = B115200;
 			break;
 
@@ -335,52 +335,52 @@ CSerial::GetSettings (TSerialSettings* pSettings)
 	switch (Speed)
 	{
 	case B110:
-		pSettings->m_BaudRate = ESerialBaud_110;
+		pSettings->m_BaudRate = 110;
 		break;
 
 	case B300:
-		pSettings->m_BaudRate = ESerialBaud_300;
+		pSettings->m_BaudRate = 300;
 		break;
 
 	case B600:
-		pSettings->m_BaudRate = ESerialBaud_600;
+		pSettings->m_BaudRate = 600;
 		break;
 
 	case B1200:
-		pSettings->m_BaudRate = ESerialBaud_1200;
+		pSettings->m_BaudRate = 1200;
 		break;
 
 	case B2400:
-		pSettings->m_BaudRate = ESerialBaud_2400;
+		pSettings->m_BaudRate = 2400;
 		break;
 
 	case B4800:
-		pSettings->m_BaudRate = ESerialBaud_4800;
+		pSettings->m_BaudRate = 4800;
 		break;
 
 	case B9600:
-		pSettings->m_BaudRate = ESerialBaud_9600;
+		pSettings->m_BaudRate = 9600;
 		break;
 
 	case B19200:
-		pSettings->m_BaudRate = ESerialBaud_19200;
+		pSettings->m_BaudRate = 19200;
 		break;
 
 	case B38400:
-		pSettings->m_BaudRate = ESerialBaud_38400;
+		pSettings->m_BaudRate = 38400;
 		break;
 
 	case B57600:
-		pSettings->m_BaudRate = ESerialBaud_57600;
+		pSettings->m_BaudRate = 57600;
 		break;
 
 	case B115200:
-		pSettings->m_BaudRate = ESerialBaud_115200;
+		pSettings->m_BaudRate = 115200;
 		break;
 
 	default:
 		// TODO: custom baud rate (currently fall back to 38400)
-		pSettings->m_BaudRate = ESerialBaud_38400;
+		pSettings->m_BaudRate = 38400;
 	}
 
 	uint_t ByteSize = Attr.c_cflag & CSIZE;

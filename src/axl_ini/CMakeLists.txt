@@ -42,6 +42,7 @@ source_virtual_folder (
 set (INI_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
 push_and_set (CMAKE_CURRENT_BINARY_DIR ${INI_GEN_DIR})
+file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_ragel_step (
 	axl_ini_Lexer.rl.cpp

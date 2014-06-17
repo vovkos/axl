@@ -166,7 +166,7 @@ public:
 		const T* p0 = p;
 		while (*p)
 			p++;
-	
+
 		return p - p0;
 	}
 
@@ -184,7 +184,7 @@ public:
 				return -1;
 			else if (*p1 > *p2)
 				return 1;
-	
+
 		return 0;
 	}
 
@@ -214,7 +214,7 @@ public:
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-	
+
 template <>
 class CStringDetailsT <utf16_t>: public CStringDetailsImplT <utf16_t>
 {
@@ -368,13 +368,17 @@ public:
 	};
 
 	typedef CStringDetailsT <T> CDetails;
+	typedef typename CDetails::CDetails2 CDetails2;
+	typedef typename CDetails::CDetails3 CDetails3;
+
 	typedef typename CDetails::C C;
 	typedef typename CDetails::C2 C2;
 	typedef typename CDetails::C3 C3;
 
 	typedef typename CDetails::CEncoding CEncoding;
-	typedef typename CDetails::CDetails2 CDetails2;
-	typedef typename CDetails::CDetails3 CDetails3;
+	typedef typename CDetails2::CEncoding CEncoding2;
+	typedef typename CDetails3::CEncoding CEncoding3;
+
 	typedef CStringT <C2> CString2;
 	typedef CStringT <C3> CString3;
 
@@ -781,14 +785,14 @@ public:
 		if (Length == -1)
 			Length = CDetails2::CalcLength (p);
 
-		size_t NewLength = CUtfConvertT <CEncoding, CDetails2::CEncoding>::CalcRequiredLength (p, Length);
+		size_t NewLength = CUtfConvertT <CEncoding, CEncoding2>::CalcRequiredLength (p, Length);
 		if (NewLength == -1)
 			return -1;
 
 		if (!SetLength (NewLength, false))
 			return -1;
 
-		CUtfConvertT <CEncoding, CDetails2::CEncoding>::Convert (m_p, NewLength, p, Length);
+		CUtfConvertT <CEncoding, CEncoding2>::Convert (m_p, NewLength, p, Length);
 		return Length;
 	}
 
@@ -807,14 +811,14 @@ public:
 		if (Length == -1)
 			Length = CDetails3::CalcLength (p);
 
-		size_t NewLength = CUtfConvertT <CEncoding, CDetails3::CEncoding>::CalcRequiredLength (p, Length);
+		size_t NewLength = CUtfConvertT <CEncoding, CEncoding3>::CalcRequiredLength (p, Length);
 		if (NewLength == -1)
 			return -1;
 
 		if (!SetLength (NewLength, false))
 			return -1;
 
-		CUtfConvertT <CEncoding, CDetails3::CEncoding>::Convert (m_p, NewLength, p, Length);
+		CUtfConvertT <CEncoding, CEncoding3>::Convert (m_p, NewLength, p, Length);
 		return Length;
 	}
 
@@ -906,7 +910,7 @@ public:
 		if (Length == 0)
 			return OldLength;
 
-		size_t AppendLength = CUtfConvertT <CEncoding, CDetails2::CEncoding>::CalcRequiredLength (p, Length);
+		size_t AppendLength = CUtfConvertT <CEncoding, CEncoding2>::CalcRequiredLength (p, Length);
 		if (AppendLength == -1)
 			return -1;
 
@@ -914,7 +918,7 @@ public:
 		if (!SetLength (NewLength, true))
 			return -1;
 
-		CUtfConvertT <CEncoding, CDetails2::CEncoding>::Convert (m_p + OldLength, AppendLength, p, Length);
+		CUtfConvertT <CEncoding, CEncoding2>::Convert (m_p + OldLength, AppendLength, p, Length);
 		return NewLength;
 	}
 
@@ -935,7 +939,7 @@ public:
 		if (Length == 0)
 			return OldLength;
 
-		size_t AppendLength = CUtfConvertT <CEncoding, CDetails3::CEncoding>::CalcRequiredLength (p, Length);
+		size_t AppendLength = CUtfConvertT <CEncoding, CEncoding3>::CalcRequiredLength (p, Length);
 		if (AppendLength == -1)
 			return -1;
 
@@ -943,7 +947,7 @@ public:
 		if (!SetLength (NewLength, true))
 			return -1;
 
-		CUtfConvertT <CEncoding, CDetails3::CEncoding>::Convert (m_p + OldLength, AppendLength, p, Length);
+		CUtfConvertT <CEncoding, CEncoding3>::Convert (m_p + OldLength, AppendLength, p, Length);
 		return NewLength;
 	}
 

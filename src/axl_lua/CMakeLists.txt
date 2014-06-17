@@ -43,6 +43,7 @@ source_virtual_folder (
 set (LUA_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
 push_and_set (CMAKE_CURRENT_BINARY_DIR ${LUA_GEN_DIR})
+file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_ragel_step (
 	axl_lua_StringTemplateLexer.rl.cpp
@@ -85,6 +86,7 @@ source_virtual_folder (
 include_directories (
 	${PATH_LUA_INC_DIR}
 	${LUA_GEN_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
 	)
 
 add_library (

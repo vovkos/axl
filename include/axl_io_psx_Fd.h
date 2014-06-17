@@ -29,6 +29,15 @@ public:
 class CFd: public rtl::CHandleT <int, CCloseFd, rtl::CMinusOneT <int> >
 {
 public:
+	CFd ()
+	{
+	}
+
+	CFd (int h):
+		rtl::CHandleT <int, CCloseFd, rtl::CMinusOneT <int> > (h)
+	{
+	}
+
 	bool
 	Open (
 		const char* pFileName,

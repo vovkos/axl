@@ -37,6 +37,13 @@ public:
 		uint64_t ActualOffset = lseek64 (m_h, Offset, SEEK_SET);
 		return err::Complete (ActualOffset != -1);
 	}
+
+	bool
+	Flush ()
+	{
+		int Result = fdatasync (m_h);
+		return err::Complete (Result != -1);
+	}
 };
 
 //.............................................................................

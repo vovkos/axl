@@ -197,7 +197,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CCharCodec* 
+CCharCodec*
 GetCharCodec (ECharCodec CodecKind);
 
 //.............................................................................
@@ -222,11 +222,11 @@ public:
 		)
 	{
 		rtl::CUtfToAsciiConvertT <rtl::CUtf8>::Convert (
-			(char*) pBuffer, 
-			BufferSize, 
-			p, 
-			Length, 
-			pTakenBufferSize, 
+			(char*) pBuffer,
+			BufferSize,
+			p,
+			Length,
+			pTakenBufferSize,
 			pTakenLength
 			);
 	}
@@ -243,11 +243,11 @@ public:
 		)
 	{
 		rtl::CUtfToAsciiConvertT <rtl::CUtf16>::Convert (
-			(char*) pBuffer, 
-			BufferSize, 
-			p, 
-			Length, 
-			pTakenBufferSize, 
+			(char*) pBuffer,
+			BufferSize,
+			p,
+			Length,
+			pTakenBufferSize,
 			pTakenLength
 			);
 	}
@@ -264,11 +264,11 @@ public:
 		)
 	{
 		rtl::CUtfToAsciiConvertT <rtl::CUtf32>::Convert (
-			(char*) pBuffer, 
-			BufferSize, 
-			p, 
-			Length, 
-			pTakenBufferSize, 
+			(char*) pBuffer,
+			BufferSize,
+			p,
+			Length,
+			pTakenBufferSize,
 			pTakenLength
 			);
 	}
@@ -286,12 +286,12 @@ public:
 		)
 	{
 		rtl::CAsciiToUtfConvertT <rtl::CUtf8>::Convert (
-			pBuffer, 
-			BufferLength, 
-			(const char*) p, 
+			pBuffer,
+			BufferLength,
+			(const char*) p,
 			Size,
-			pTakenBufferLength, 
-			pTakenSize, 
+			pTakenBufferLength,
+			pTakenSize,
 			pExpectedSize
 			);
 	}
@@ -309,12 +309,12 @@ public:
 		)
 	{
 		rtl::CAsciiToUtfConvertT <rtl::CUtf16>::Convert (
-			pBuffer, 
-			BufferLength, 
-			(const char*) p, 
+			pBuffer,
+			BufferLength,
+			(const char*) p,
 			Size,
-			pTakenBufferLength, 
-			pTakenSize, 
+			pTakenBufferLength,
+			pTakenSize,
 			pExpectedSize
 			);
 	}
@@ -332,12 +332,12 @@ public:
 		)
 	{
 		rtl::CAsciiToUtfConvertT <rtl::CUtf32>::Convert (
-			pBuffer, 
-			BufferLength, 
-			(const char*) p, 
+			pBuffer,
+			BufferLength,
+			(const char*) p,
 			Size,
-			pTakenBufferLength, 
-			pTakenSize, 
+			pTakenBufferLength,
+			pTakenSize,
 			pExpectedSize
 			);
 	}
@@ -349,9 +349,12 @@ template <typename T>
 class CUtfCodecT: public CCharCodec
 {
 public:
+	typedef typename T::C C;
+
+public:
 	CUtfCodecT ()
 	{
-		m_UnitSize = sizeof (T::C);
+		m_UnitSize = sizeof (C);
 	}
 
 	virtual
@@ -365,20 +368,20 @@ public:
 		size_t* pTakenLength = NULL
 		)
 	{
-		size_t BufferLength = BufferSize / sizeof (T::C);
+		size_t BufferLength = BufferSize / sizeof (C);
 		size_t TakenDstLength;
 
 		rtl::CUtfConvertT <T, rtl::CUtf8>::Convert (
-			(T::C*) pBuffer, 
-			BufferLength, 
-			p, 
-			Length, 
-			&TakenDstLength, 
+			(C*) pBuffer,
+			BufferLength,
+			p,
+			Length,
+			&TakenDstLength,
 			pTakenLength
 			);
 
 		if (pTakenBufferSize)
-			*pTakenBufferSize = TakenDstLength * sizeof (T::C);
+			*pTakenBufferSize = TakenDstLength * sizeof (C);
 	}
 
 	virtual
@@ -392,20 +395,20 @@ public:
 		size_t* pTakenLength = NULL
 		)
 	{
-		size_t BufferLength = BufferSize / sizeof (T::C);
+		size_t BufferLength = BufferSize / sizeof (C);
 		size_t TakenDstLength;
 
 		rtl::CUtfConvertT <T, rtl::CUtf16>::Convert (
-			(T::C*) pBuffer, 
-			BufferLength, 
-			p, 
-			Length, 
-			&TakenDstLength, 
+			(C*) pBuffer,
+			BufferLength,
+			p,
+			Length,
+			&TakenDstLength,
 			pTakenLength
 			);
 
 		if (pTakenBufferSize)
-			*pTakenBufferSize = TakenDstLength * sizeof (T::C);
+			*pTakenBufferSize = TakenDstLength * sizeof (C);
 	}
 
 	virtual
@@ -419,20 +422,20 @@ public:
 		size_t* pTakenLength = NULL
 		)
 	{
-		size_t BufferLength = BufferSize / sizeof (T::C);
+		size_t BufferLength = BufferSize / sizeof (C);
 		size_t TakenDstLength;
 
 		rtl::CUtfConvertT <T, rtl::CUtf32>::Convert (
-			(T::C*) pBuffer, 
-			BufferLength, 
-			p, 
-			Length, 
-			&TakenDstLength, 
+			(C*) pBuffer,
+			BufferLength,
+			p,
+			Length,
+			&TakenDstLength,
 			pTakenLength
 			);
 
 		if (pTakenBufferSize)
-			*pTakenBufferSize = TakenDstLength * sizeof (T::C);
+			*pTakenBufferSize = TakenDstLength * sizeof (C);
 	}
 
 	virtual
@@ -447,27 +450,27 @@ public:
 		size_t* pExpectedSize = NULL
 		)
 	{
-		size_t Length = Size / sizeof (T::C);
+		size_t Length = Size / sizeof (C);
 		ASSERT (Length || !Size); // don't pass less than one unit
 
 		size_t TakenLength;
 		size_t ExpectedLength;
 
 		rtl::CUtfConvertT <rtl::CUtf8, T>::Convert (
-			pBuffer, 
-			BufferLength, 
-			(T::C*) p, 
-			Length, 
-			pTakenBufferLength, 
-			&TakenLength, 
+			pBuffer,
+			BufferLength,
+			(C*) p,
+			Length,
+			pTakenBufferLength,
+			&TakenLength,
 			&ExpectedLength
 			);
 
 		if (pTakenSize)
-			*pTakenSize = TakenLength * sizeof (T::C);
+			*pTakenSize = TakenLength * sizeof (C);
 
 		if (pExpectedSize)
-			*pExpectedSize = ExpectedLength * sizeof (T::C);
+			*pExpectedSize = ExpectedLength * sizeof (C);
 	}
 
 	virtual
@@ -482,27 +485,27 @@ public:
 		size_t* pExpectedSize = NULL
 		)
 	{
-		size_t Length = Size / sizeof (T::C);
+		size_t Length = Size / sizeof (C);
 		ASSERT (Length || !Size); // don't pass less than one unit
 
 		size_t TakenLength;
 		size_t ExpectedLength;
 
 		rtl::CUtfConvertT <rtl::CUtf16, T>::Convert (
-			pBuffer, 
-			BufferLength, 
-			(T::C*) p, 
-			Length, 
-			pTakenBufferLength, 
-			&TakenLength, 
+			pBuffer,
+			BufferLength,
+			(C*) p,
+			Length,
+			pTakenBufferLength,
+			&TakenLength,
 			&ExpectedLength
 			);
 
 		if (pTakenSize)
-			*pTakenSize = TakenLength * sizeof (T::C);
+			*pTakenSize = TakenLength * sizeof (C);
 
 		if (pExpectedSize)
-			*pExpectedSize = ExpectedLength * sizeof (T::C);
+			*pExpectedSize = ExpectedLength * sizeof (C);
 	}
 
 	virtual
@@ -517,27 +520,27 @@ public:
 		size_t* pExpectedSize = NULL
 		)
 	{
-		size_t Length = Size / sizeof (T::C);
+		size_t Length = Size / sizeof (C);
 		ASSERT (Length || !Size); // don't pass less than one unit
 
 		size_t TakenLength;
 		size_t ExpectedLength;
 
 		rtl::CUtfConvertT <rtl::CUtf32, T>::Convert (
-			pBuffer, 
-			BufferLength, 
-			(T::C*) p, 
-			Length, 
-			pTakenBufferLength, 
-			&TakenLength, 
+			pBuffer,
+			BufferLength,
+			(C*) p,
+			Length,
+			pTakenBufferLength,
+			&TakenLength,
 			&ExpectedLength
 			);
 
 		if (pTakenSize)
-			*pTakenSize = TakenLength * sizeof (T::C);
+			*pTakenSize = TakenLength * sizeof (C);
 
 		if (pExpectedSize)
-			*pExpectedSize = ExpectedLength * sizeof (T::C);
+			*pExpectedSize = ExpectedLength * sizeof (C);
 	}
 };
 
@@ -613,7 +616,7 @@ public:
 		utf32_t* pCodePoint,
 		const void* p,
 		size_t Size
-		); 
+		);
 };
 
 //.............................................................................

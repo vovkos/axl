@@ -39,18 +39,16 @@ DoesFileExist (const char* pFileName)
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 inline
-bool 
+bool
 IsDir (const wchar_t* pFileName)
 {
 	dword_t Attributes = GetFileAttributesW (pFileName);
 	return Attributes != INVALID_FILE_ATTRIBUTES && (Attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
-#endif
 
 bool
 EnsureDirExists (const char* pFileName)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
 	char Buffer [256] = { 0 };
 	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
 	FileName = pFileName;
@@ -89,10 +87,57 @@ EnsureDirExists (const char* pFileName)
 	}
 
 	return true;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-#	error POSIX IsDir () is not yet implemented
-#endif	
 }
+
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+
+inline
+bool
+IsDir (const char* pFileName)
+{
+	struct stat Stat;
+
+	int Result = stat (pFileName, &Stat);
+	return Result == 0 && S_ISDIR (Stat.st_mode);
+}
+
+bool
+EnsureDirExists (const char* pFileName)
+{
+	if (IsDir (pFileName))
+		return true;
+
+	const char* p = pFileName;
+	while (*p == '/') // skip root
+		p++;
+
+	while (*p)
+	{
+		const char* p2 = p + 1;
+		while (*p2 && *p2 != '/')
+			p2++;
+
+		char c = *p2; // save
+		*(char*) p2 = 0;
+
+		if (!IsDir (pFileName))
+		{
+			int Result = mkdir (pFileName, S_IRWXU);
+			if (Result != 0)
+				return err::FailWithLastSystemError ();
+		}
+
+		*(char*) p2 = c; // restore
+
+		p = p2 + 1;
+		while (*p == '/') // skip separators
+			p++;
+	}
+
+	return true;
+}
+
+#endif
 
 rtl::CString
 GetFullFilePath (const char* pFileName)
@@ -139,9 +184,11 @@ GetDir (const char* pFilePath)
 	rtl::CString String = Drive;
 	String.Append (Dir);
 	return String;
+
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	rtl::CString String = pFilePath;
 	dirname (String.GetBuffer ());
+	String.UpdateLength ();
 	return String;
 #endif
 }

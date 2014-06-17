@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_RTL_UTF_H
 
@@ -36,7 +36,7 @@ CalcUtfCodePointCount (
 	size_t Length
 	)
 {
-	const T::C* pEnd = p + Length;
+	const typename T::C* pEnd = p + Length;
 
 	size_t Count = 0;
 	while (p < pEnd)
@@ -58,9 +58,9 @@ class CUtf8
 {
 public:
 	typedef utf8_t C;
-	
+
 	static
-	EUtf 
+	EUtf
 	GetUtfKind ()
 	{
 		return EUtf_Utf8;
@@ -71,10 +71,10 @@ public:
 	GetBom ()
 	{
 		static uint8_t Bom [] = { 0xef, 0xbb, 0xbf };
-		return Bom; 
+		return Bom;
 	}
 
-	static	
+	static
 	size_t
 	GetBomLength ()
 	{
@@ -85,9 +85,9 @@ public:
 	size_t
 	GetDecodeCodePointLength (utf8_t c)
 	{
-		return 
+		return
 			(c & 0x80) == 0    ? 1 :     // 0xxxxxxx
-			(c & 0xe0) == 0xc0 ? 2 :     // 110xxxxx 10xxxxxx 
+			(c & 0xe0) == 0xc0 ? 2 :     // 110xxxxx 10xxxxxx
 			(c & 0xf0) == 0xe0 ? 3 :     // 1110xxxx 10xxxxxx 10xxxxxx
 			(c & 0xf8) == 0xf0 ? 4 : 1;  // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 	}
@@ -96,12 +96,12 @@ public:
 	size_t
 	GetEncodeCodePointLength (utf32_t x)
 	{
-		return 
+		return
 			x < 0x80 ? 1 :               // 0xxxxxxx
-			x < 0x800 ? 2 :              // 110xxxxx 10xxxxxx 
+			x < 0x800 ? 2 :              // 110xxxxx 10xxxxxx
 			x < 0x10000 ? 3 :            // 1110xxxx 10xxxxxx 10xxxxxx
 			x < 0x200000 ? 4 : 1;        // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-	}	
+	}
 
 	static
 	utf32_t
@@ -109,16 +109,16 @@ public:
 	{
 		return
 			((*p & 0x80) == 0)    ?      // 0xxxxxxx
-				*p :         
-			((*p & 0xe0) == 0xc0) ?      // 110xxxxx 10xxxxxx 
-				((p [0] & 0x1f) << 6)  | 
+				*p :
+			((*p & 0xe0) == 0xc0) ?      // 110xxxxx 10xxxxxx
+				((p [0] & 0x1f) << 6)  |
 				 (p [1] & 0x3f) :
 			((*p & 0xf0) == 0xe0) ?      // 1110xxxx 10xxxxxx 10xxxxxx
-				((p [0] & 0x0f) << 12) | 
+				((p [0] & 0x0f) << 12) |
 				((p [1] & 0x3f) << 6)  |
 				 (p [2] & 0x3f) :
 			((*p & 0xf8) == 0xf0) ?      // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-				((p [0] & 0x07) << 18) | 
+				((p [0] & 0x07) << 18) |
 				((p [1] & 0x3f) << 12) |
 				((p [2] & 0x3f) << 6)  |
 				 (p [3] & 0x3f) : 0xffff; // use non-character U+FFFF (needs no surrogate in UTF-16)
@@ -132,11 +132,11 @@ public:
 		)
 	{
 		if (x < 0x80)                    // 0xxxxxxx
-		{		
-			p [0] = (uint8_t) x;  
+		{
+			p [0] = (uint8_t) x;
 		}
-		else if (x < 0x800)              // 110xxxxx 10xxxxxx 
-		{                
+		else if (x < 0x800)              // 110xxxxx 10xxxxxx
+		{
 			p [0] = (uint8_t) (x >> 6)          | 0xc0;
 			p [1] = (uint8_t) (x & 0x3f)        | 0x80;
 		}
@@ -171,7 +171,7 @@ public:
 };
 
 //.............................................................................
-		
+
 class CUtf16
 {
 public:
@@ -186,7 +186,7 @@ public:
 	};
 
 	static
-	EUtf 
+	EUtf
 	GetUtfKind ()
 	{
 		return EUtf_Utf16;
@@ -197,31 +197,31 @@ public:
 	GetBom ()
 	{
 		static uint8_t Bom [] = { 0xff, 0xfe };
-		return Bom; 
+		return Bom;
 	}
 
-	static	
+	static
 	size_t
 	GetBomLength ()
 	{
 		return 2;
 	}
 
-	static	
+	static
 	bool
 	IsLeadSurrogate (uint16_t c)
 	{
 		return c >= 0xd800 && c <= 0xdbff;
 	}
 
-	static	
+	static
 	bool
 	IsTrailSurrogate (uint16_t c)
 	{
 		return c >= 0xdc00 && c <= 0xdfff;
 	}
 
-	static	
+	static
 	bool
 	NeedSurrogate (uint32_t x)
 	{
@@ -242,7 +242,7 @@ public:
 		return 0xdc00 + (x & 0x3ff);
 	}
 
-	static	
+	static
 	utf32_t
 	GetSurrogateCodePoint (
 		uint16_t Lead,
@@ -251,7 +251,7 @@ public:
 	{
 		ASSERT (IsLeadSurrogate (Lead) && IsTrailSurrogate (Trail));
 		return 0x10000 - (0xd800 << 10) - 0xdc00 + (Lead << 10) + Trail;
-	}	
+	}
 
 	static
 	size_t
@@ -309,7 +309,7 @@ class CUtf16_be: public CUtf16
 {
 public:
 	static
-	EUtf 
+	EUtf
 	GetUtfKind ()
 	{
 		return EUtf_Utf16_be;
@@ -320,7 +320,7 @@ public:
 	GetBom ()
 	{
 		static uint8_t Bom [] = { 0xfe, 0xff };
-		return Bom; 
+		return Bom;
 	}
 
 	static
@@ -374,7 +374,7 @@ public:
 	typedef utf32_t C;
 
 	static
-	EUtf 
+	EUtf
 	GetUtfKind ()
 	{
 		return EUtf_Utf32;
@@ -385,10 +385,10 @@ public:
 	GetBom ()
 	{
 		static uint8_t Bom [] = { 0xff, 0xfe, 0x00, 0x00 };
-		return Bom; 
+		return Bom;
 	}
 
-	static	
+	static
 	size_t
 	GetBomLength ()
 	{
@@ -443,7 +443,7 @@ class CUtf32_be: public CUtf32
 {
 public:
 	static
-	EUtf 
+	EUtf
 	GetUtfKind ()
 	{
 		return EUtf_Utf32_be;
@@ -454,7 +454,7 @@ public:
 	GetBom ()
 	{
 		static uint8_t Bom [] = { 0x00, 0x00, 0xfe, 0xff };
-		return Bom; 
+		return Bom;
 	}
 
 	static
@@ -481,7 +481,7 @@ template <
 	typename TDstEncoding,
 	typename TSrcEncoding
 	>
-class CUtfConvertT 
+class CUtfConvertT
 {
 public:
 	typedef TDstEncoding CDstEncoding;
@@ -506,10 +506,10 @@ public:
 			if (p + SrcCodePointLength > pEnd)
 				break;
 
-			utf32_t x = CSrcEncoding::DecodeCodePoint (p);		
+			utf32_t x = CSrcEncoding::DecodeCodePoint (p);
 			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
-			
-			ResultLength += DstCodePointLength;			
+
+			ResultLength += DstCodePointLength;
 			p += SrcCodePointLength;
 		}
 
@@ -557,7 +557,7 @@ public:
 
 		if (pTakenDstLength)
 			*pTakenDstLength = pDst - pDst0;
-		
+
 		if (pTakenSrcLength)
 			*pTakenSrcLength = pSrc - pSrc0;
 
@@ -569,7 +569,7 @@ public:
 //.............................................................................
 
 template <typename TSrcEncoding>
-class CUtfToAsciiConvertT 
+class CUtfToAsciiConvertT
 {
 public:
 	typedef TSrcEncoding CSrcEncoding;
@@ -649,7 +649,7 @@ public:
 //.............................................................................
 
 template <typename TDstEncoding>
-class CAsciiToUtfConvertT 
+class CAsciiToUtfConvertT
 {
 public:
 	typedef TDstEncoding CDstEncoding;
@@ -668,10 +668,10 @@ public:
 		size_t ResultLength = 0;
 		while (p < pEnd)
 		{
-			utf32_t x = (uchar_t) *pSrc; // don't propagate sign bit
+			utf32_t x = (uchar_t) *p; // don't propagate sign bit
 
 			size_t DstCodePointLength = CDstEncoding::GetEncodeCodePointLength (x);
-			
+
 			ResultLength += DstCodePointLength;
 			p++;
 		}

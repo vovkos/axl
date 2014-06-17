@@ -43,8 +43,8 @@ public:
 	}
 
 	operator H () const
-	{ 
-		return m_h; 
+	{
+		return m_h;
 	}
 
 	const CHandleT&
@@ -54,13 +54,13 @@ public:
 		return *this;
 	}
 
-	bool 
+	bool
 	IsOpen () const
 	{
 		return m_h != TGetInvalidHandle () ();
 	}
 
-	void 
+	void
 	Close ()
 	{
 		if (IsOpen ())
@@ -70,19 +70,25 @@ public:
 		}
 	}
 
-	void 
+	void
 	Attach (H h)
 	{
 		Close ();
 		m_h = h;
 	}
 
-	H 
+	H
 	Detach ()
 	{
 		H h = m_h;
 		m_h = TGetInvalidHandle () ();
 		return h;
+	}
+
+	H*
+	GetHandlePtr ()
+	{
+		return &m_h;
 	}
 };
 
