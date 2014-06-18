@@ -1,3 +1,5 @@
+#include <asm-generic/errno.h>
+
 #include "pch.h"
 #include "axl_io_psx_Socket.h"
 
@@ -58,7 +60,7 @@ CSocket::Connect (const sockaddr* pAddr)
 	if (Result != -1)
 		return true;
 
-	if (errno != EWOULDBLOCK)
+	if (errno != EINPROGRESS)
 	{
 		err::SetError (errno);
 		return false;
