@@ -12,7 +12,12 @@ CSocket::Accept (
 	sockaddr* pAddr
 	)
 {
+#if (_AXL_ENV == AXL_ENV_WIN)
+	SOCKET Socket = m_Socket.Accept (pAddr);
+#else 
 	int Socket = m_Socket.Accept (pAddr);
+#endif
+
 	if (Socket == -1)
 		return false;
 
