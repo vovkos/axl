@@ -94,8 +94,19 @@ public:
 	// clipboard
 
 	virtual
+	uintptr_t 
+	RegisterClipboardFormat (const rtl::CString& FormatName);
+
+	virtual
 	bool
 	ReadClipboard (rtl::CString* pString);
+
+	virtual
+	bool
+	ReadClipboard (
+		uintptr_t Format,
+		rtl::CArrayT <char>* pData
+		);
 
 	virtual
 	bool
@@ -103,6 +114,21 @@ public:
 		const char* pString,
 		size_t Length = -1
 		);
+
+	virtual
+	bool
+	WriteClipboard (
+		uint_t Format,
+		const void* pData,
+		size_t Size
+		);
+
+	virtual
+	bool
+	CommitClipboard ()
+	{
+		return true;
+	}
 
 	// caret
 

@@ -274,6 +274,19 @@ CQtEngine::CreateOffscreenCanvas (
 	return ref::EPtr_Null;
 }
 
+uintptr_t 
+CQtEngine::RegisterClipboardFormat (const rtl::CString& FormatName)
+{
+	rtl::CStringHashTableMapIteratorT <uintptr_t> It = m_ClipboardFormatNameMap.Find (FormatName);
+	if (It)
+		return It->m_Value;
+
+	size_t Count = m_ClipboardFormatTable.GetCount ();
+	m_ClipboardFormatTable.Append (FormatName);
+	m_ClipboardFormatNameMap [FormatName] = Count;
+	return Count;
+}
+
 bool
 CQtEngine::ReadClipboard (rtl::CString* pString)
 {
@@ -285,6 +298,30 @@ CQtEngine::ReadClipboard (rtl::CString* pString)
 }
 
 bool
+CQtEngine::ReadClipboard (
+	uintptr_t Format,
+	rtl::CArrayT <char>* pData
+	)
+{
+	size_t Count = m_ClipboardFormatTable.GetCount ();
+	if (Format >= Count)
+	{
+		err::SetError (err::EStatus_InvalidParameter);
+		return false;
+	}
+
+	const char* pFormat = m_ClipboardFormatTable [Format];
+
+	QClipboard* pQtClipboard = QApplication::clipboard ();
+	const QMimeData* mimeData = pQtClipboard->mimeData ();
+
+	QByteArray data = mimeData->data (pFormat);
+	size_t Size = data.size ();	
+	pData->Copy (data.constData (), Size);
+	return true;
+}
+
+bool
 CQtEngine::WriteClipboard (
 	const char* pString,
 	size_t Length
@@ -292,8 +329,46 @@ CQtEngine::WriteClipboard (
 {
 	QString String = QString::fromUtf8 (pString, Length);
 
+	if (!m_pQtClipboardMimeData)
+		m_pQtClipboardMimeData = new QMimeData;
+
+	m_pQtClipboardMimeData->setText (String);
+	return true;
+}
+
+bool
+CQtEngine::WriteClipboard (
+	uint_t Format,
+	const void* pData,
+	size_t Size
+	)
+{
+	size_t Count = m_ClipboardFormatTable.GetCount ();
+	if (Format >= Count)
+	{
+		err::SetError (err::EStatus_InvalidParameter);
+		return false;
+	}
+
+	const char* pFormat = m_ClipboardFormatTable [Format];
+
+	if (!m_pQtClipboardMimeData)
+		m_pQtClipboardMimeData = new QMimeData;
+
+	m_pQtClipboardMimeData->setData (pFormat, QByteArray ((const char*) pData, Size));
+	return true;
+}
+
+bool
+CQtEngine::CommitClipboard ()
+{
+	if (!m_pQtClipboardMimeData)
+		return false;
+
 	QClipboard* pQtClipboard = QApplication::clipboard ();
-	pQtClipboard->setText (String);
+	pQtClipboard->setMimeData (m_pQtClipboardMimeData);
+
+	m_pQtClipboardMimeData = NULL;
 	return true;
 }
 

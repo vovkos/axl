@@ -12,6 +12,7 @@
 #include "axl_gui_Image.h"
 #include "axl_gui_Canvas.h"
 #include "axl_rtl_String.h"
+#include "axl_rtl_Array.h"
 
 namespace axl {
 namespace gui {
@@ -160,8 +161,19 @@ public:
 	// clipboard
 
 	virtual
+	uintptr_t 
+	RegisterClipboardFormat (const rtl::CString& FormatName) = 0;
+
+	virtual
 	bool
 	ReadClipboard (rtl::CString* pString) = 0;
+
+	virtual
+	bool
+	ReadClipboard (
+		uintptr_t Format,
+		rtl::CArrayT <char>* pData
+		) = 0;
 
 	rtl::CString
 	ReadClipboard ()
@@ -171,6 +183,14 @@ public:
 		return String;
 	}
 
+	rtl::CArrayT <char>
+	ReadClipboard (uint_t Format)
+	{
+		rtl::CArrayT <char> Data;
+		ReadClipboard (Format, &Data);
+		return Data;
+	}
+
 	virtual
 	bool
 	WriteClipboard (
@@ -178,11 +198,32 @@ public:
 		size_t Length = -1
 		) = 0;
 
+	virtual
+	bool
+	WriteClipboard (
+		uint_t Format,
+		const void* pData,
+		size_t Size
+		) = 0;
+
 	bool
 	WriteClipboard (const rtl::CString& String)
 	{
 		return WriteClipboard (String, String.GetLength ());
 	}
+
+	bool
+	WriteClipboard (
+		uint_t Format,
+		const rtl::CArrayT <char>& Data
+		)
+	{
+		return WriteClipboard (Format, Data, Data.GetCount ());
+	}
+
+	virtual
+	bool
+	CommitClipboard () = 0;
 
 	// caret
 

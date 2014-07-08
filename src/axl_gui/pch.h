@@ -10,6 +10,7 @@
 #	include <QIcon>
 #	include <QImage>
 #	include <QMouseEvent>
+#	include <QMimeData>
 #	include <QPainter>
 #	include <QPixmap>
 #	include <QScrollBar>

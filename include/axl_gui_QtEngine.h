@@ -8,12 +8,12 @@
 
 #include "axl_gui_Engine.h"
 #include "axl_rtl_Singleton.h"
-
+#include "axl_rtl_StringHashTable.h"
 #include "axl_gui_QtCanvas.h"
 #include "axl_gui_QtCursor.h"
 #include "axl_gui_QtFont.h"
 #include "axl_gui_QtImage.h"
- #include "axl_gui_QtWidget.h"
+#include "axl_gui_QtWidget.h"
 
 namespace axl {
 namespace gui {
@@ -63,10 +63,21 @@ protected:
 	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
 	CQtCaret m_QtCaret;
 
+	rtl::CStringHashTableMapT <uintptr_t> m_ClipboardFormatNameMap;
+	rtl::CArrayT <rtl::CString> m_ClipboardFormatTable;
+	QMimeData* m_pQtClipboardMimeData;
+
 public:
 	CQtEngine ()
 	{
 		m_EngineKind = EEngine_Qt;
+		m_pQtClipboardMimeData = NULL;
+	}
+
+	~CQtEngine ()
+	{
+		if (m_pQtClipboardMimeData)
+			delete m_pQtClipboardMimeData;
 	}
 
 	// font
@@ -123,8 +134,19 @@ public:
 	// clipboard
 
 	virtual
+	uintptr_t 
+	RegisterClipboardFormat (const rtl::CString& FormatName);
+
+	virtual
 	bool
 	ReadClipboard (rtl::CString* pString);
+
+	virtual
+	bool
+	ReadClipboard (
+		uintptr_t Format,
+		rtl::CArrayT <char>* pData
+		);
 
 	virtual
 	bool
@@ -132,6 +154,18 @@ public:
 		const char* pString,
 		size_t Length = -1
 		);
+
+	virtual
+	bool
+	WriteClipboard (
+		uint_t Format,
+		const void* pData,
+		size_t Size
+		);
+
+	virtual
+	bool
+	CommitClipboard ();
 
 	// caret
 

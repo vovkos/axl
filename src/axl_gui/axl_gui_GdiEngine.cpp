@@ -261,6 +261,13 @@ CGdiEngine::CreateOffscreenCanvas (
 	return Dc;
 }
 
+uintptr_t 
+CGdiEngine::RegisterClipboardFormat (const rtl::CString& FormatName)
+{
+	err::SetError (err::EStatus_NotImplemented);
+	return -1;
+}
+
 bool
 CGdiEngine::ReadClipboard (rtl::CString* pString)
 {
@@ -298,6 +305,16 @@ CGdiEngine::ReadClipboard (rtl::CString* pString)
 }
 
 bool
+CGdiEngine::ReadClipboard (
+	uintptr_t Format,
+	rtl::CArrayT <char>* pData
+	)
+{
+	err::SetError (err::EStatus_NotImplemented);
+	return false;
+}
+
+bool
 CGdiEngine::WriteClipboard (
 	const char* pString,
 	size_t Length
@@ -316,6 +333,17 @@ CGdiEngine::WriteClipboard (
 	::SetClipboardData (CF_TEXT, hData);
 	::CloseClipboard ();
 	return true;
+}
+
+bool
+CGdiEngine::WriteClipboard (
+	uint_t Format,
+	const void* pData,
+	size_t Size
+	)
+{
+	err::SetError (err::EStatus_NotImplemented);
+	return false;
 }
 
 bool
