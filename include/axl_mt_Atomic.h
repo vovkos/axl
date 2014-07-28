@@ -180,8 +180,6 @@ AtomicUpdatePeak (
 	}
 }
 
-//.............................................................................
-	
 inline
 void
 YieldProcessor ()
@@ -191,6 +189,29 @@ YieldProcessor ()
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	sched_yield ();
 #endif
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void 
+AtomicLock (volatile int32_t* pLock)
+{
+	for (;;)
+	{
+		uint32_t Lock = mt::AtomicCmpXchg (pLock, 0, 1);
+		if (Lock == 0)
+			break;
+
+		mt::YieldProcessor ();
+	}
+}
+
+inline
+void 
+AtomicUnlock (volatile int32_t* pLock)
+{
+	*pLock = 0;
 }
 
 //.............................................................................

@@ -17,8 +17,9 @@ set (
 	${AXL_INC_DIR}/axl_io_FilePathUtils.h
 	${AXL_INC_DIR}/axl_io_FileTransport.h
 	${AXL_INC_DIR}/axl_io_ListenerSock.h
+	${AXL_INC_DIR}/axl_io_Mapping.h
 	${AXL_INC_DIR}/axl_io_MappedFile.h
-	${AXL_INC_DIR}/axl_io_MappedFileTransport.h
+	${AXL_INC_DIR}/axl_io_SharedMemoryTransport.h
 	${AXL_INC_DIR}/axl_io_PCap.h
 	${AXL_INC_DIR}/axl_io_Pipe.h
 	${AXL_INC_DIR}/axl_io_Serial.h
@@ -35,11 +36,12 @@ set (
 	axl_io_File.cpp
 	axl_io_FilePathUtils.cpp
 	axl_io_ListenerSock.cpp
+	axl_io_Mapping.cpp
 	axl_io_MappedFile.cpp
-	axl_io_MappedFileTransport.cpp
 	axl_io_PCap.cpp
 	axl_io_Pipe.cpp
 	axl_io_Serial.cpp
+	axl_io_SharedMemoryTransport.cpp
 	axl_io_Socket.cpp
 	axl_io_Transport.cpp
 	)
@@ -71,6 +73,7 @@ source_virtual_folder (
 
 set (
 	IO_PSX_H_LIST
+	${AXL_INC_DIR}/axl_io_psx_Fd.h
 	${AXL_INC_DIR}/axl_io_psx_File.h
 	${AXL_INC_DIR}/axl_io_psx_Mapping.h
 	${AXL_INC_DIR}/axl_io_psx_Pipe.h

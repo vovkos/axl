@@ -1,0 +1,89 @@
+// This file is part of AXL (R) Library
+// Tibbo Technology Inc (C) 2004-2014. All rights reserved
+// Author: Vladimir Gladkov
+
+#pragma once
+
+#define _AXL_IO_MAPPING_H
+
+#include "axl_io_File.h"
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include "axl_io_win_Mapping.h"
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include "axl_io_psx_Mapping.h"
+#endif
+
+namespace axl {
+namespace io {
+
+//.............................................................................
+
+class CMapping
+{
+protected:
+	void* m_p;
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+	win::CMapping m_Mapping;
+	win::CMappedView m_View;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	psx::CMapping m_Mapping;
+	psx::CFd m_MappingName;
+#endif
+
+public:
+	CMapping ()
+	{
+		m_p = NULL;
+	}
+
+	bool
+	IsOpen ()
+	{
+		return m_p != NULL;
+	}
+
+	void* 
+	p ()
+	{
+		return m_p;
+	}
+
+	operator void* () 
+	{
+		return m_p;
+	}
+
+	void*
+	Open (
+		CFile* pFile,
+		uint64_t Offset,
+		size_t Size,
+		uint_t Flags = 0 // EFileFlag 
+		);
+
+	void*
+	Open (
+		CFile* pFile,
+		uint_t Flags = 0 // EFileFlag 
+		)
+	{
+		return Open (pFile, 0, -1, Flags);
+	}
+
+	void*
+	Open (
+		const char* pName,
+		size_t Size,
+		uint_t Flags = 0 // EFileFlag 
+		);
+
+	void
+	Close ();
+};
+
+//.............................................................................
+
+} // namespace io
+} // namespace axl

@@ -354,5 +354,21 @@ CMappedFile::UnmapAllViews ()
 
 //.............................................................................
 
+void*
+CSimpleMappedFile::Open (
+	const char* pFileName, 
+	uint64_t Offset,
+	size_t Size,
+	uint_t Flags
+	)
+{
+	Close ();
+
+	bool Result = m_File.Open (pFileName, Flags);
+	return Result ? m_Mapping.Open (&m_File, Offset, Size, Flags) : NULL;
+}
+
+//.............................................................................
+
 } // namespace io
 } // namespace axl

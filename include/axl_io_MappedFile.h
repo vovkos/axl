@@ -9,18 +9,13 @@
 #include "axl_rtl_List.h"
 #include "axl_rtl_RbTree.h"
 #include "axl_io_File.h"
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-#	include "axl_io_win_Mapping.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include "axl_io_psx_Mapping.h"
-#endif
+#include "axl_io_Mapping.h"
 
 namespace axl {
 namespace io {
 
 class CMappedFile;
-	
+
 //.............................................................................
 
 class CMappedViewMgr
@@ -182,6 +177,45 @@ protected:
 		uint64_t End,
 		bool IsPermanent
 		) const;	
+};
+
+//.............................................................................
+
+class CSimpleMappedFile
+{
+protected:
+	CFile m_File;
+	CMapping m_Mapping;
+
+	bool
+	IsOpen ()
+	{
+		return m_Mapping.IsOpen ();
+	}
+
+	void*
+	Open (
+		const char* pFileName, 
+		uint64_t Offset,
+		size_t Size,
+		uint_t Flags = 0 // EFileFlag 
+		);
+
+	void*
+	Open (
+		const char* pFileName, 
+		uint_t Flags = 0 // EFileFlag 
+		)
+	{
+		return Open (pFileName, 0, -1, Flags);
+	}
+
+	void 
+	Close ()
+	{
+		m_File.Close ();
+		m_Mapping.Close ();
+	}
 };
 
 //.............................................................................
