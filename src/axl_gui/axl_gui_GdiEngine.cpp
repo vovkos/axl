@@ -337,7 +337,7 @@ CGdiEngine::WriteClipboard (
 
 bool
 CGdiEngine::WriteClipboard (
-	uint_t Format,
+	uintptr_t Format,
 	const void* pData,
 	size_t Size
 	)

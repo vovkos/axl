@@ -109,7 +109,7 @@ CHyperText::AppendHyperText (
 		}
 		else if (pTag[1] == '\b') // backspace
 		{
-			size_t BackLength = pTag[2] != '*' ? strtoul (pTag + 2, NULL, 10) : -1;
+			size_t BackLength = pTag[2] != '*' ? (size_t) strtoul (pTag + 2, NULL, 10) : -1;
 			Backspace (BackLength ? BackLength : 1);
 		}
 		else 

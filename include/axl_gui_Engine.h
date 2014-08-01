@@ -184,7 +184,7 @@ public:
 	}
 
 	rtl::CArrayT <char>
-	ReadClipboard (uint_t Format)
+	ReadClipboard (uintptr_t Format)
 	{
 		rtl::CArrayT <char> Data;
 		ReadClipboard (Format, &Data);
@@ -201,7 +201,7 @@ public:
 	virtual
 	bool
 	WriteClipboard (
-		uint_t Format,
+		uintptr_t Format,
 		const void* pData,
 		size_t Size
 		) = 0;
@@ -214,7 +214,7 @@ public:
 
 	bool
 	WriteClipboard (
-		uint_t Format,
+		uintptr_t Format,
 		const rtl::CArrayT <char>& Data
 		)
 	{
