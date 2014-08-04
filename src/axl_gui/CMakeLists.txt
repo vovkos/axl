@@ -29,7 +29,6 @@ set (
 	GUI_CPP_LIST
 	axl_gui_Canvas.cpp
 	axl_gui_Color.cpp
-	axl_gui_Cursor.cpp
 	axl_gui_Engine.cpp
 	axl_gui_Font.cpp
 	axl_gui_HyperlinkAnchorArray.cpp
