@@ -100,13 +100,13 @@ public:
 		T* pBegin = p;
 		T* pEnd = p + Count;
 
-		for (; p > pEnd; p++)
+		for (; p < pEnd; p++)
 			p->~T ();
 		
 		p = pBegin; 
 		memset (p, 0, Count * sizeof (T)); 
 		
-		for (; p > pEnd; p++)
+		for (; p < pEnd; p++)
 			new (p) T;
 	}	
 };
@@ -246,10 +246,15 @@ class CArrayDetailsT <T*>: public CSimpleArrayDetailsT <T*>
 
 //.............................................................................
 
-template <typename T>
+template <
+	typename T,
+	typename TDetails = CArrayDetailsT <T>
+	>
 class CArrayT
 {
 public:
+	typedef TDetails CDetails;
+	
 	class CHdr: public ref::CRefCount
 	{
 	public:
@@ -258,11 +263,9 @@ public:
 
 		~CHdr ()
 		{
-			CArrayDetailsT <T>::Destruct ((T*) (this + 1), m_Count);
+			CDetails::Destruct ((T*) (this + 1), m_Count);
 		}
 	};
-
-	typedef CArrayDetailsT <T> CDetails;
 
 protected:
 	T* m_p;
@@ -295,13 +298,13 @@ public:
 	}
 
 	CArrayT (
-		ref::EBuf Kind,
+		ref::EBuf BufKind,
 		void* p, 
 		size_t Size
 		)
 	{
 		m_p = NULL;
-		SetBuffer (Kind, p, Size);
+		SetBuffer (BufKind, p, Size);
 	}
 
 	~CArrayT ()
@@ -799,7 +802,7 @@ public:
 
 	void
 	SetBuffer (
-		ref::EBuf Kind,
+		ref::EBuf BufKind,
 		void* p,
 		size_t Size
 		)
@@ -808,7 +811,7 @@ public:
 
 		CHdr* pOldHdr = GetHdr ();
 		
-		mem::FFree* pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
+		mem::FFree* pfFree = BufKind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
 		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
 		NewHdr->m_Count = 0;
 		NewHdr->m_MaxCount = (Size - sizeof (CHdr)) / sizeof (T);

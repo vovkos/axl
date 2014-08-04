@@ -288,6 +288,7 @@ set (
 	RTL_H_LIST
 	${AXL_INC_DIR}/axl_rtl_Array.h
 	${AXL_INC_DIR}/axl_rtl_ArrayList.h
+	${AXL_INC_DIR}/axl_rtl_AutoPtrArray.h
 	${AXL_INC_DIR}/axl_rtl_BinTree.h
 	${AXL_INC_DIR}/axl_rtl_BitIdx.h
 	${AXL_INC_DIR}/axl_rtl_BitMap.h
