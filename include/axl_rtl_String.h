@@ -613,6 +613,14 @@ public:
 	}
 
 	CStringT
+	operator + (utf32_t x) const
+	{
+		CStringT Result = *this;
+		Result.Append (x);
+		return Result;
+	}
+
+	CStringT
 	operator + (const CString2& String) const
 	{
 		CStringT Result = *this;
