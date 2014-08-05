@@ -187,6 +187,7 @@ protected:
 	CFile m_File;
 	CMapping m_Mapping;
 
+public:
 	bool
 	IsOpen ()
 	{
@@ -194,6 +195,23 @@ protected:
 	}
 
 	void*
+	p ()
+	{
+		return m_Mapping.p ();
+	}
+
+	operator void* ()
+	{
+		return m_Mapping;
+	}
+
+	size_t 
+	GetSize ()
+	{
+		return m_Mapping.GetSize ();
+	}
+
+	bool
 	Open (
 		const char* pFileName, 
 		uint64_t Offset,
@@ -201,7 +219,7 @@ protected:
 		uint_t Flags = 0 // EFileFlag 
 		);
 
-	void*
+	bool
 	Open (
 		const char* pFileName, 
 		uint_t Flags = 0 // EFileFlag 

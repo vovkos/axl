@@ -354,7 +354,7 @@ CMappedFile::UnmapAllViews ()
 
 //.............................................................................
 
-void*
+bool
 CSimpleMappedFile::Open (
 	const char* pFileName, 
 	uint64_t Offset,
@@ -364,8 +364,9 @@ CSimpleMappedFile::Open (
 {
 	Close ();
 
-	bool Result = m_File.Open (pFileName, Flags);
-	return Result ? m_Mapping.Open (&m_File, Offset, Size, Flags) : NULL;
+	return 
+		m_File.Open (pFileName, Flags) &&
+		m_Mapping.Open (&m_File, Offset, Size, Flags);
 }
 
 //.............................................................................

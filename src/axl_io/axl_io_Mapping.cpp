@@ -19,7 +19,7 @@ CMapping::Open (
 	Close ();
 
 	if (Size == -1)
-		Size = (size_t) pFile->GetSize ();
+		Size = (size_t) (pFile->GetSize () - Offset);
 
 	g::TSystemInfo* pSystemInfo = g::GetModule ()->GetSystemInfo ();
 	uint64_t ViewBegin = Offset - Offset % pSystemInfo->m_MappingAlignFactor;
@@ -40,6 +40,7 @@ CMapping::Open (
 	}
 
 	m_p = (char*) p + Offset - ViewBegin;
+	m_Size = Size;
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	error POSIX CMapping not implemented yet
@@ -98,6 +99,7 @@ CMapping::Close ()
 #endif
 
 	m_p = NULL;
+	m_Size = 0;
 }
 
 //.............................................................................

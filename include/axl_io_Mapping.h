@@ -23,6 +23,7 @@ class CMapping
 {
 protected:
 	void* m_p;
+	size_t m_Size;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	win::CMapping m_Mapping;
@@ -36,6 +37,12 @@ public:
 	CMapping ()
 	{
 		m_p = NULL;
+		m_Size = 0;
+	}
+
+	operator void* () 
+	{
+		return m_p;
 	}
 
 	bool
@@ -50,9 +57,10 @@ public:
 		return m_p;
 	}
 
-	operator void* () 
+	size_t 
+	GetSize ()
 	{
-		return m_p;
+		return m_Size;
 	}
 
 	void*
