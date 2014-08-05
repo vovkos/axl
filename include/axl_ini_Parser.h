@@ -7,6 +7,7 @@
 #define _AXL_INI_PARSER_H
 
 #include "axl_ini_Lexer.h"
+#include "axl_io_MappedFile.h"
 
 namespace axl {
 namespace ini {
@@ -17,6 +18,15 @@ template <typename T>
 class CParserT: protected CLexer
 {
 public:
+	bool
+	ParseFile (const rtl::CString& FilePath)
+	{
+		io::CSimpleMappedFile File;
+		return 
+			File.Open (FilePath, io::EFileFlag_ReadOnly) &&
+			Parse (FilePath, (const char*) File.p (), (size_t) File.GetSize ());
+	}
+
 	bool
 	Parse (
 		const char* pSource,
@@ -66,6 +76,12 @@ public:
 				ASSERT (false);
 			}
 		}
+	}
+
+	bool 
+	OnSection (const char* pSectionName) // overridable
+	{
+		return true;
 	}
 
 	bool
