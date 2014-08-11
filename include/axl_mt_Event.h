@@ -14,6 +14,7 @@
 #	include "axl_mt_psx_Mutex.h"
 #	include "axl_mt_psx_Sem.h"
 #	include "axl_mt_psx_Cond.h"
+#	include "axl_io_psx_Mapping.h"
 #endif
 
 namespace axl {
@@ -26,7 +27,7 @@ namespace mt {
 class CEventRoot
 {
 public:
-	win::CEvent m_Event;	
+	win::CEvent m_Event;
 
 protected:
 	CEventRoot () // protected construction
@@ -36,13 +37,13 @@ protected:
 public:
 	bool
 	Signal ()
-	{ 
+	{
 		return m_Event.Signal ();
 	}
 
 	bool
 	Reset ()
-	{ 
+	{
 		return m_Event.Reset ();
 	}
 
@@ -65,7 +66,7 @@ public:
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-		
+
 class CNotificationEvent: public CEventRoot
 {
 public:
@@ -110,11 +111,11 @@ public:
 	CNotificationEvent ()
 	{
 		m_State = false;
-	}	
-	
+	}
+
 	bool
 	Signal ();
-	
+
 	bool
 	Reset ();
 
@@ -126,5 +127,5 @@ public:
 
 //.............................................................................
 
-} // namespace mt 
+} // namespace mt
 } // namespace axl

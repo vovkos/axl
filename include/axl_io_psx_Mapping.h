@@ -6,7 +6,8 @@
 
 #define _AXL_IO_PSX_MAPPING_H
 
-#include "axl_g_Def.h"
+#include "axl_io_psx_Fd.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {
@@ -19,37 +20,37 @@ class CMapping
 protected:
 	void* m_p;
 	size_t m_Size;
-	
+
 public:
 	CMapping ()
 	{
 		m_p = NULL;
 		m_Size = 0;
 	}
-	
+
 	~CMapping ()
 	{
 		Close ();
 	}
-	
+
 	operator void* () const
-	{ 
-		return m_p; 
+	{
+		return m_p;
 	}
 
-	bool 
+	bool
 	IsOpen () const
 	{
 		return m_p != NULL;
 	}
 
-	void 
+	void
 	Close ()
 	{
 		Unmap ();
 	}
 
-	void* 
+	void*
 	Map (
 		void* pAddrHint,
 		size_t Size,
@@ -58,14 +59,35 @@ public:
 		int fd,
 		size_t Offset = 0
 		);
-	
+
 	void
 	Unmap (size_t Size = -1);
 };
 
 //.............................................................................
 
+class CSharedMemory: public CFd
+{
+public:
+	bool
+	Open (
+		const char* pName,
+		uint_t Flags = O_RDWR,
+		mode_t Mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
+		);
+
+	static
+	bool
+	Unlink (const char* pName)
+	{
+		int Result = shm_unlink (pName);
+		return err::Complete (Result != -1);
+	}
+};
+
+//.............................................................................
+
 } // namespace psx
-} // namespace io 
+} // namespace io
 } // namespace axl
 

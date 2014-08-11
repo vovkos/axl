@@ -896,7 +896,7 @@ Complete (
 	)
 {
 	if (Result == FailResult)
-		SetError (GetLastSystemErrorCode ());
+		SetLastSystemError ();
 
 	return Result;
 }

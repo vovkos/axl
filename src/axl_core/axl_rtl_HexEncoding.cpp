@@ -9,7 +9,7 @@ namespace rtl {
 size_t
 CHexEncoding::Encode (
 	CString* pString,
-	const void* p, 
+	const void* p,
 	size_t Size,
 	uint_t Flags
 	)
@@ -44,7 +44,7 @@ CHexEncoding::Encode (
 			Encode_u (pDst, pSrc, pSrcEnd);
 		else
 			Encode_l (pDst, pSrc, pSrcEnd);
-	}	
+	}
 
 	return Length;
 }
@@ -52,7 +52,7 @@ CHexEncoding::Encode (
 void
 CHexEncoding::Encode_l (
 	char* pDst,
-	const uchar_t* pSrc, 
+	const uchar_t* pSrc,
 	const uchar_t* pSrcEnd
 	)
 {
@@ -73,7 +73,7 @@ CHexEncoding::Encode_l (
 void
 CHexEncoding::Encode_u (
 	char* pDst,
-	const uchar_t* pSrc, 
+	const uchar_t* pSrc,
 	const uchar_t* pSrcEnd
 	)
 {
@@ -94,7 +94,7 @@ CHexEncoding::Encode_u (
 void
 CHexEncoding::Encode_nsl (
 	char* pDst,
-	const uchar_t* pSrc, 
+	const uchar_t* pSrc,
 	const uchar_t* pSrcEnd
 	)
 {
@@ -110,7 +110,7 @@ CHexEncoding::Encode_nsl (
 void
 CHexEncoding::Encode_nsu (
 	char* pDst,
-	const uchar_t* pSrc, 
+	const uchar_t* pSrc,
 	const uchar_t* pSrcEnd
 	)
 {
@@ -126,7 +126,7 @@ CHexEncoding::Encode_nsu (
 size_t
 CHexEncoding::Decode (
 	CArrayT <uchar_t>* pBuffer,
-	const char* p, 
+	const char* p,
 	size_t Length
 	)
 {
@@ -136,7 +136,7 @@ CHexEncoding::Decode (
 		EState_Hex
 	};
 
-	EState State = EState_Normal;	
+	EState State = EState_Normal;
 
 	if (Length == -1)
 		Length = CStringDetails::CalcLength (p);
@@ -165,7 +165,7 @@ CHexEncoding::Decode (
 			State = EState_Hex;
 			break;
 
-		case EState_Hex:	
+		case EState_Hex:
 			if (!IsSpace)
 			{
 				HexCodeString [HexCodeLen++] = *p;

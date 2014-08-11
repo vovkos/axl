@@ -17,7 +17,7 @@ CSharedMemoryTransportBase::CSharedMemoryTransportBase ()
 	m_PendingReqCount = 0;
 }
 
-bool 
+bool
 CSharedMemoryTransportBase::Open (
 	const char* pFileName,
 	const char* pReadEventName,
@@ -34,7 +34,7 @@ CSharedMemoryTransportBase::Open (
 	Result = EnsureMappingSize (ESharedMemoryTransport_DefMappingSize);
 	if (!Result)
 	{
-		Close ();
+		m_File.Close ();
 		return false;
 	}
 
@@ -48,9 +48,21 @@ CSharedMemoryTransportBase::Open (
 		m_pHdr->m_EndOffset = 0;
 		m_pHdr->m_DataSize = 0;
 
-		Result = 
-			m_ReadEvent.m_Event.Create (NULL, false, false, rtl::CString_utf16 (pReadEventName)) &&
-			m_WriteEvent.m_Event.Create (NULL, false, false, rtl::CString_utf16 (pWriteEventName));
+#if (_AXL_ENV == AXL_ENV_WIN)
+		Result =
+			m_ReadEvent.Create (NULL, false, false, rtl::CString_utf16 (pReadEventName)) &&
+			m_WriteEvent.Create (NULL, false, false, rtl::CString_utf16 (pWriteEventName));
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+		Result = m_ReadEvent.Open (pReadEventName, O_CREAT);
+		if (Result)
+		{
+			m_ReadEventName = pReadEventName;
+
+			Result = m_WriteEvent.Open (pWriteEventName, O_CREAT);
+			if (Result)
+				m_WriteEventName = pWriteEventName;
+		}
+#endif
 	}
 	else
 	{
@@ -73,13 +85,22 @@ CSharedMemoryTransportBase::Open (
 
 		mt::AtomicUnlock (&m_pHdr->m_Lock);
 
-		Result = 
-			m_ReadEvent.m_Event.Open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (pReadEventName)) &&
-			m_WriteEvent.m_Event.Open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (pWriteEventName));
+#if (_AXL_ENV == AXL_ENV_WIN)
+		Result =
+			m_ReadEvent.Open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (pReadEventName)) &&
+			m_WriteEvent.Open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (pWriteEventName));
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+		Result =
+			m_ReadEvent.Open (pReadEventName, 0) &&
+			m_WriteEvent.Open (pWriteEventName, 0);
+#endif
 	}
 
 	if (!Result)
+	{
+		Close ();
 		return false;
+	}
 
 	m_Flags = Flags;
 	return true;
@@ -92,12 +113,28 @@ CSharedMemoryTransportBase::Close ()
 		return;
 
 	Disconnect ();
-	
+
 	m_File.Close ();
+	m_ReadEvent.Close ();
+	m_WriteEvent.Close ();
 	m_pHdr = NULL;
 	m_pData = NULL;
 	m_MappingSize = 0;
 	m_PendingReqCount = 0;
+
+#if (_AXL_ENV == AXL_ENV_POSIX)
+	if (!m_ReadEventName.IsEmpty ())
+	{
+		mt::psx::CSem::Unlink (m_ReadEventName);
+		m_ReadEventName.Clear ();
+	}
+
+	if (!m_WriteEventName.IsEmpty ())
+	{
+		mt::psx::CSem::Unlink (m_WriteEventName);
+		m_WriteEventName.Clear ();
+	}
+#endif
 }
 
 void
@@ -105,8 +142,15 @@ CSharedMemoryTransportBase::Disconnect ()
 {
 	mt::AtomicLock (&m_pHdr->m_Lock);
 	m_pHdr->m_State = ESharedMemoryTransportState_Disconnected;
+
+#if (_AXL_ENV == AXL_ENV_WIN)
 	m_ReadEvent.Signal ();
 	m_WriteEvent.Signal ();
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	m_ReadEvent.Post ();
+	m_WriteEvent.Post ();
+#endif
+
 	mt::AtomicUnlock (&m_pHdr->m_Lock);
 }
 
@@ -146,7 +190,7 @@ CSharedMemoryReader::Read (rtl::CArrayT <char>* pBuffer)
 	// if buffer is empty, then wait until we have any data
 
 	while (
-		!m_pHdr->m_DataSize && 
+		!m_pHdr->m_DataSize &&
 		m_pHdr->m_State != ESharedMemoryTransportState_Disconnected)
 	{
 		mt::AtomicUnlock (&m_pHdr->m_Lock);
@@ -163,7 +207,7 @@ CSharedMemoryReader::Read (rtl::CArrayT <char>* pBuffer)
 
 	size_t ReadOffset = m_pHdr->m_ReadOffset;
 	size_t WriteOffset = m_pHdr->m_WriteOffset;
-	size_t EndOffset = m_pHdr->m_EndOffset;	
+	size_t EndOffset = m_pHdr->m_EndOffset;
 	mt::AtomicUnlock (&m_pHdr->m_Lock);
 
 	bool Result = EnsureOffsetMapped (EndOffset);
@@ -189,8 +233,8 @@ CSharedMemoryReader::Read (rtl::CArrayT <char>* pBuffer)
 		mt::AtomicLock (&m_pHdr->m_Lock);
 		ASSERT (ReadEndOffset <= m_pHdr->m_EndOffset);
 
-		m_pHdr->m_ReadOffset = m_pHdr->m_EndOffset != m_pHdr->m_WriteOffset && ReadEndOffset >= m_pHdr->m_EndOffset ? 
-			0 : ReadEndOffset ; // wrap : no wrap
+		m_pHdr->m_ReadOffset = m_pHdr->m_EndOffset != m_pHdr->m_WriteOffset && ReadEndOffset >= m_pHdr->m_EndOffset ?
+			0 : ReadEndOffset; // wrap : no wrap
 	}
 	else
 	{
@@ -206,28 +250,33 @@ CSharedMemoryReader::Read (rtl::CArrayT <char>* pBuffer)
 			ReadSize = Size1 + Size2;
 
 			pBuffer->SetCount (ReadSize);
-			
+
 			if (Size1)
 				memcpy (*pBuffer, m_pData + ReadOffset, Size1);
-	
+
 			if (Size2)
 				memcpy (*pBuffer + Size1, m_pData + 1, Size2);
 		}
 
-		mt::AtomicLock (&m_pHdr->m_Lock);	
+		mt::AtomicLock (&m_pHdr->m_Lock);
 		m_pHdr->m_ReadOffset = WriteOffset;
 	}
 
-	m_pHdr->m_DataSize -= ReadSize;	
+	m_pHdr->m_DataSize -= ReadSize;
 	mt::AtomicUnlock (&m_pHdr->m_Lock);
 
+#if (_AXL_ENV == AXL_ENV_WIN)
 	m_ReadEvent.Signal ();
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	m_ReadEvent.Post ();
+#endif
+
 	return ReadSize;
 }
 
 //.............................................................................
 
-bool 
+bool
 CSharedMemoryWriter::Open (
 	const char* pFileName,
 	const char* pReadEventName,
@@ -270,7 +319,7 @@ CSharedMemoryWriter::Write_va (
 		m_pHdr->m_WriteOffset <= m_pHdr->m_ReadOffset && m_pHdr->m_DataSize && // wrapped
 		m_pHdr->m_WriteOffset + WriteSize > m_pHdr->m_ReadOffset &&
 		m_pHdr->m_State != ESharedMemoryTransportState_Disconnected
-		) 
+		)
 	{
 		mt::AtomicUnlock (&m_pHdr->m_Lock);
 		m_ReadEvent.Wait ();
@@ -312,7 +361,7 @@ CSharedMemoryWriter::Write_va (
 	{
 		m_pHdr->m_WriteOffset = WriteEndOffset;
 	}
-	else 
+	else
 	{
 		m_pHdr->m_WriteOffset = m_pHdr->m_DataSize > m_SizeLimitHint ? 0 : WriteEndOffset;
 		m_pHdr->m_EndOffset = WriteEndOffset;
@@ -321,7 +370,12 @@ CSharedMemoryWriter::Write_va (
 	m_pHdr->m_DataSize += ChainSize;
 	mt::AtomicUnlock (&m_pHdr->m_Lock);
 
+#if (_AXL_ENV == AXL_ENV_WIN)
 	m_WriteEvent.Signal ();
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	m_WriteEvent.Post ();
+#endif
+
 	return Size;
 }
 
@@ -329,7 +383,7 @@ size_t
 CSharedMemoryWriter::CalcWriteChainSize_va (
 	const void* p,
 	size_t Size,
-	size_t ExtraBlockCount, 
+	size_t ExtraBlockCount,
 	axl_va_list va
 	)
 {
@@ -340,7 +394,7 @@ CSharedMemoryWriter::CalcWriteChainSize_va (
 
 	for (size_t i = 0; i < ExtraBlockCount; i++)
 	{
-		AXL_VA_ARG (va, void*); // skip 
+		AXL_VA_ARG (va, void*); // skip
 		Size = AXL_VA_ARG (va, size_t);
 		ChainSize += Size;
 	}

@@ -44,7 +44,7 @@ struct TSharedMemoryTransportHdr
 {
 	uint32_t m_Signature;
 	int32_t m_Lock;
-	uint32_t m_State;         
+	uint32_t m_State;
 	uint32_t m_ReadOffset;   // only modified by reader
 	uint32_t m_WriteOffset;  // only modified by writer
 	uint32_t m_EndOffset;    // only modified by writer
@@ -68,9 +68,17 @@ protected:
 	TSharedMemoryTransportHdr* m_pHdr;
 	char* m_pData;
 	size_t m_MappingSize;
-	mt::CEvent m_ReadEvent;
-	mt::CEvent m_WriteEvent;
 	int32_t m_PendingReqCount;
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+	mt::win::CEvent m_ReadEvent;
+	mt::win::CEvent m_WriteEvent;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	mt::psx::CSem m_ReadEvent;
+	mt::psx::CSem m_WriteEvent;
+	rtl::CString m_ReadEventName;
+	rtl::CString m_WriteEventName;
+#endif
 
 protected:
 	CSharedMemoryTransportBase ();
@@ -85,13 +93,13 @@ public:
 	bool
 	IsOpen ()
 	{
-		return m_File.IsOpen ();
+		return m_pHdr != NULL;
 	}
 
 	void
 	Close ();
 
-	bool 
+	bool
 	Open (
 		const char* pFileName,
 		const char* pReadEventName,
@@ -139,7 +147,7 @@ public:
 		m_SizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint;
 	}
 
-	bool 
+	bool
 	Open (
 		const char* pFileName,
 		const char* pReadEventName,

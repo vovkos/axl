@@ -12,6 +12,7 @@
 #	include "axl_io_win_Mapping.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_Mapping.h"
+#	include "axl_rtl_String.h"
 #endif
 
 namespace axl {
@@ -30,7 +31,8 @@ protected:
 	win::CMappedView m_View;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	psx::CMapping m_Mapping;
-	psx::CFd m_MappingName;
+	psx::CSharedMemory m_SharedMemory;
+	rtl::CString m_SharedMemoryName;
 #endif
 
 public:
@@ -40,7 +42,7 @@ public:
 		m_Size = 0;
 	}
 
-	operator void* () 
+	operator void* ()
 	{
 		return m_p;
 	}
@@ -51,13 +53,13 @@ public:
 		return m_p != NULL;
 	}
 
-	void* 
+	void*
 	p ()
 	{
 		return m_p;
 	}
 
-	size_t 
+	size_t
 	GetSize ()
 	{
 		return m_Size;
@@ -68,13 +70,13 @@ public:
 		CFile* pFile,
 		uint64_t Offset,
 		size_t Size,
-		uint_t Flags = 0 // EFileFlag 
+		uint_t Flags = 0 // EFileFlag
 		);
 
 	void*
 	Open (
 		CFile* pFile,
-		uint_t Flags = 0 // EFileFlag 
+		uint_t Flags = 0 // EFileFlag
 		)
 	{
 		return Open (pFile, 0, -1, Flags);
@@ -84,7 +86,7 @@ public:
 	Open (
 		const char* pName,
 		size_t Size,
-		uint_t Flags = 0 // EFileFlag 
+		uint_t Flags = 0 // EFileFlag
 		);
 
 	void

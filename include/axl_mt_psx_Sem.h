@@ -17,48 +17,75 @@ namespace psx {
 class CSem
 {
 protected:
-	sem_t m_Sem;
-	
+	sem_t* m_pSem;
+	sem_t m_UnnamedSem;
+
 public:
 	CSem (
 		bool IsShared = false,
 		uint_t Value = 0
 		)
-	{		
-		sem_init (&m_Sem, IsShared, Value);
+	{
+		m_pSem = NULL;
+		Init (IsShared, Value);
 	}
 
 	~CSem ()
 	{
-		sem_destroy (&m_Sem);
+		Close ();
 	}
 
 	operator sem_t* ()
 	{
-		return &m_Sem;
+		return m_pSem;
 	}
-	
-	bool 
+
+	bool
+	Init (
+		bool IsShared = false,
+		uint_t Value = 0
+		);
+
+	bool
+	Open (
+		const char* pName,
+		int Flags = O_CREAT,
+		mode_t Mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH,
+		uint_t Value = 0
+		);
+
+	void
+	Close ();
+
+	static
+	bool
+	Unlink (const char* pName)
+	{
+		int Result = sem_unlink (pName);
+		return err::Complete (Result == 0);
+	}
+
+	bool
 	Post ()
 	{
-		int Result = sem_post (&m_Sem);
-		return Result == 0 ? true : err::Fail (Result);
+		int Result = sem_post (m_pSem);
+		return err::Complete (Result == 0);
 	}
 
 	bool
 	Wait ()
 	{
-		int Result = sem_wait (&m_Sem);
-		return Result == 0 ? true : err::Fail (Result);
+		int Result = sem_wait (m_pSem);
+		return err::Complete (Result == 0);
 	}
-	
+
 	bool
 	GetValue (int* pValue)
 	{
-		int Result = sem_getvalue (&m_Sem, pValue);
-		return Result == 0 ? true : err::Fail (Result);
-	}	
-	
+		int Result = sem_getvalue (m_pSem, pValue);
+		return err::Complete (Result == 0);
+	}
+
 	bool
 	Wait (uint_t Timeout);
 };
@@ -66,5 +93,5 @@ public:
 //.............................................................................
 
 } // namespace psx
-} // namespace mt 
+} // namespace mt
 } // namespace axl

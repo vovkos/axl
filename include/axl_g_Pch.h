@@ -224,3 +224,4 @@ wcsnchr (
 //.............................................................................
 
 #include "axl_g_Def.h"
+#include "axl_g_WarningSuppression.h"

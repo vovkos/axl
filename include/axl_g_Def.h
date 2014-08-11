@@ -118,8 +118,13 @@
 #	define AXL_SELECT_ANY __declspec (selectany)
 #	define AXL_NO_VTABLE  __declspec (novtable)
 #elif (_AXL_CPP == AXL_CPP_GCC)
-#	define AXL_CDECL      __attribute__ ((cdecl))
-#	define AXL_STDCALL    __attribute__ ((stdcall))
+#	if (_AXL_CPU == AXL_CPU_X86)
+#		define AXL_CDECL      __attribute__ ((cdecl))
+#		define AXL_STDCALL    __attribute__ ((stdcall))
+#	else
+#		define AXL_CDECL
+#		define AXL_STDCALL
+#	endif
 #	define AXL_SELECT_ANY __attribute__ ((weak))
 #	define AXL_NO_VTABLE
 #endif
@@ -220,12 +225,6 @@ struct axl_va_list
 
 //.............................................................................
 
-// number of elements in array
-
-#ifndef countof
-#	define countof(a) (sizeof (a) / sizeof (a [0]))
-#endif
-
 // pvoid_cast is mostly used for casting member function pointers to void*
 
 template <typename T>
@@ -254,11 +253,19 @@ pvoid_cast (T x)
 
 // non-conflicting portable macro utilities
 
+#ifndef countof
+#	define countof(a) (sizeof (a) / sizeof (a [0]))
+#endif
+
+#ifndef offsetof
+#	define offsetof(Type, Field) ((size_t) &((Type*) 0)->Field)
+#endif
+
 #define AXL_MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define AXL_MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
 #define AXL_OFFSETOF(Type, Field) \
-	((char*) &((Type*) 1)->Field - (char*) 1)
+	((size_t) &((Type*) 1)->Field - 1)
 
 #define AXL_CONTAINING_RECORD(Address, Type, Field) \
 	((Type*) ((char*) (Address) - AXL_OFFSETOF (Type, Field)))
@@ -301,25 +308,5 @@ private: \
 
 #define AXL_SUBSYS_MASK(SubSys) (1 << (SubSys))
 #define AXL_SUBSYS_MASK_ALL (-1)
-
-//.............................................................................
-
-// warning C4146: unary minus operator applied to unsigned type, result still unsigned
-// warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
-// warning C4355: 'this' : used in base member initializer list
-
-#if (_AXL_CPP == AXL_CPP_MSC)
-#	pragma warning (disable: 4146)
-#	pragma warning (disable: 4267)
-#	pragma warning (disable: 4355)
-#endif
-
-#if (_AXL_CPP == AXL_CPP_GCC)
-#	pragma GCC diagnostic ignored "-Wunused-parameter"
-#	pragma GCC diagnostic ignored "-Wparentheses"
-#	pragma GCC diagnostic ignored "-Wsign-compare"
-#	pragma GCC diagnostic ignored "-Wformat"
-#	pragma GCC diagnostic ignored "-Wmultichar"
-#endif
 
 //.............................................................................

@@ -73,6 +73,7 @@ set (
 	${AXL_INC_DIR}/axl_g_Module.h
 	${AXL_INC_DIR}/axl_g_Pch.h
 	${AXL_INC_DIR}/axl_g_Time.h
+	${AXL_INC_DIR}/axl_g_WarningSuppression.h
 	)
 
 set (

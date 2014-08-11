@@ -44,6 +44,21 @@ CMapping::Unmap (size_t Size)
 
 //.............................................................................
 
+bool
+CSharedMemory::Open (
+	const char* pName,
+	uint_t Flags,
+	mode_t Mode
+	)
+{
+	Close ();
+
+	m_h = shm_open (pName, Flags, Mode);
+	return err::Complete (m_h != -1);
+}
+
+//.............................................................................
+
 } // namespace psx
 } // namespace io
 } // namespace axl
