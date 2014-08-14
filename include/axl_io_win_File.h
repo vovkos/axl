@@ -47,16 +47,16 @@ public:
 		return err::Complete (Result);
 	}
 
-	dword_t
+	size_t
 	Read (
 		void* p,
-		dword_t Size
+		size_t Size
 		) const;
 
-	dword_t
+	size_t
 	Write (
 		const void* p,
-		dword_t Size
+		size_t Size
 		);
 
 	bool

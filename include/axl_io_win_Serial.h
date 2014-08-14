@@ -94,16 +94,16 @@ public:
 		return CompleteAsyncRequest (Result, pOverlapped);
 	}
 
-	dword_t
+	size_t
 	Read (
 		void* p,
-		dword_t Size
+		size_t Size
 		);
 
-	dword_t
+	size_t
 	Write (
 		const void* p,
-		dword_t Size
+		size_t Size
 		);
 
 	bool

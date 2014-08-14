@@ -61,25 +61,25 @@ CSerial::GetWaitMask ()
 	return Mask;
 }
 
-dword_t
+size_t
 CSerial::Read (
 	void* p, 
-	dword_t Size 
+	size_t Size 
 	)
 {
 	dword_t ActualSize;
-	bool_t Result = Read (p, Size, &ActualSize, NULL);
+	bool_t Result = Read (p, (dword_t) Size, &ActualSize, NULL);
 	return Result ? ActualSize : -1;
 }
 
-dword_t
+size_t
 CSerial::Write (
 	const void* p, 
-	dword_t Size
+	size_t Size
 	)
 {
 	dword_t ActualSize;
-	bool_t Result = Write (p, Size, &ActualSize, NULL);
+	bool_t Result = Write (p, (dword_t) Size, &ActualSize, NULL);
 	return Result ? ActualSize : -1;
 }
 

@@ -83,25 +83,25 @@ CFile::SetPosition (uint64_t _Offset) const
 	return err::Complete (Result != INVALID_SET_FILE_POINTER);
 }
 
-dword_t
+size_t
 CFile::Read (
 	void* p,
-	dword_t Size
+	size_t Size
 	) const
 {
 	dword_t ActualSize;
-	bool_t Result = Read (p, Size, &ActualSize, NULL);
+	bool_t Result = Read (p, (dword_t) Size, &ActualSize, NULL);
 	return Result ? ActualSize : -1;
 }
 
-dword_t
+size_t
 CFile::Write (
 	const void* p,
-	dword_t Size
+	size_t Size
 	)
 {
 	dword_t ActualSize;
-	bool_t Result = Write (p, Size, &ActualSize, NULL);
+	bool_t Result = Write (p, (dword_t) Size, &ActualSize, NULL);
 	return Result ? ActualSize : -1;
 }
 
