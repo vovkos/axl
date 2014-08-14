@@ -69,7 +69,7 @@ CSerial::Read (
 {
 	dword_t ActualSize;
 	bool_t Result = Read (p, (dword_t) Size, &ActualSize, NULL);
-	return Result ? ActualSize : -1;
+	return Result ? (size_t) ActualSize : -1;
 }
 
 size_t
@@ -80,7 +80,7 @@ CSerial::Write (
 {
 	dword_t ActualSize;
 	bool_t Result = Write (p, (dword_t) Size, &ActualSize, NULL);
-	return Result ? ActualSize : -1;
+	return Result ? (size_t) ActualSize : -1;
 }
 
 //.............................................................................
