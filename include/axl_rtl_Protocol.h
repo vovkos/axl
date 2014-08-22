@@ -13,6 +13,60 @@ namespace rtl {
 
 //.............................................................................
 
+template <typename T>
+class CProtoPeerT
+{
+public:
+	void
+	SendMsg (
+		const void* p,
+		size_t Size
+		)
+	{
+		static_cast <T*> (this)->SendMsgEx (&p, &Size, 1);
+	}
+
+	void
+	SendMsg (
+		const void* p,
+		size_t Size,
+		const void* pExtra,
+		size_t ExtraSize
+		)
+	{
+		const void* BlockArray [] = { p, pExtra };
+		size_t SizeArray [] = { Size, ExtraSize };
+
+		static_cast <T*> (this)->SendMsgEx (BlockArray, SizeArray, 2);
+	}
+
+	// T must implement:
+
+	//	void
+	//	SendMsgEx (
+	//		const void* const* pBlockArray,
+	// 		size_t const* pSizeArray,
+	// 		size_t Count
+	// 		);
+
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CAbstractProtoPeer: public CProtoPeerT <CAbstractProtoPeer>
+{
+public:
+	virtual
+	void
+	SendMsgEx (
+		const void* const* pBlockArray,
+		size_t const* pSizeArray,
+		size_t Count
+		) = 0;
+};
+
+//.............................................................................
+
 struct TProtoMsg
 {
 	uint32_t m_Code;
@@ -66,30 +120,6 @@ struct TProtoMsgT_4: TProtoMsg
 	T2 m_Arg2;
 	T3 m_Arg3;
 	T4 m_Arg4;
-};
-
-//.............................................................................
-
-class CProtoPeer
-{
-public:
-	virtual
-	void
-	SendMsg (
-		const TProtoMsg* pMsg,
-		size_t MsgSize,
-		const void* pExtra,
-		size_t ExtraSize
-		) = 0;
-
-	void
-	SendMsg (
-		const TProtoMsg* pMsg,
-		size_t MsgSize
-		)
-	{
-		SendMsg (pMsg, MsgSize, NULL, 0);
-	}
 };
 
 //.............................................................................
@@ -412,7 +442,6 @@ public:
 		size_t Size \
 		) \
 	{ \
-		char StringBuffer [256]; \
 		if (Size < sizeof (axl::rtl::TProtoMsg)) \
 			return; \
 		axl::rtl::TProtoMsg* pHdr = (axl::rtl::TProtoMsg*) p; \
@@ -438,7 +467,8 @@ public:
 		if (Size < sizeof (TMsg)) \
 			break; \
 		size_t Length = Size - sizeof (TMsg); \
-		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
+		char Buffer [256]; \
+		axl::rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (String); \
 		break; \
@@ -488,7 +518,8 @@ public:
 		if (Size < sizeof (TMsg)) \
 			break; \
 		size_t Length = Size - sizeof (TMsg); \
-		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
+		char Buffer [256]; \
+		axl::rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, String); \
 		break; \
@@ -538,7 +569,8 @@ public:
 		if (Size < sizeof (TMsg)) \
 			break; \
 		size_t Length = Size - sizeof (TMsg); \
-		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
+		char Buffer [256]; \
+		axl::rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, String); \
 		break; \
@@ -588,7 +620,8 @@ public:
 		if (Size < sizeof (TMsg)) \
 			break; \
 		size_t Length = Size - sizeof (TMsg); \
-		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
+		char Buffer [256]; \
+		axl::rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, String); \
 		break; \
@@ -639,7 +672,8 @@ public:
 		if (Size < sizeof (TMsg)) \
 			break; \
 		size_t Length = Size - sizeof (TMsg); \
-		axl::rtl::CString String(ref::EBuf_Stack, StringBuffer, sizeof (StringBuffer)); \
+		char Buffer [256]; \
+		axl::rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer)); \
 		String.Copy ((char*) (pMsg + 1), Length); \
 		Handler (pMsg->m_Arg1, pMsg->m_Arg2, pMsg->m_Arg3, pMsg->m_Arg4, String); \
 		break; \

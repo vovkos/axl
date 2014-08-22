@@ -162,47 +162,24 @@ public:
 		size_t Size
 		)
 	{
-		return Write (p, Size, 0);
+		return Write (&p, &Size, 1);
 	}
 
 	size_t
 	Write (
-		const void* p,
-		size_t Size,
-		size_t ExtraBlockCount,
-		...
-		)
-	{
-		AXL_VA_DECL (va, ExtraBlockCount);
-		return Write_va (p, Size, ExtraBlockCount, va);
-	}
-
-	size_t
-	Write_va (
-		const void* p,
-		size_t Size,
-		size_t ExtraBlockCount,
-		axl_va_list va
+		const void* const* pBlockArray,
+		const size_t* pSizeArray,
+		size_t Count
 		);
 
 protected:
 	static
-	size_t
-	CalcWriteChainSize_va (
-		const void* p,
-		size_t Size,
-		size_t ExtraBlockCount,
-		axl_va_list va
-		);
-
-	static
 	void
-	CopyWriteChain_va (
+	CopyWriteChain (
 		void* pDst,
-		const void* p,
-		size_t Size,
-		size_t ExtraBlockCount,
-		axl_va_list va
+		const void* const* pBlockArray,
+		const size_t* pSizeArray,
+		size_t Count
 		);
 };
 //.............................................................................

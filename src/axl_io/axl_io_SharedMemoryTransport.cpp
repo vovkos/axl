@@ -291,19 +291,22 @@ CSharedMemoryWriter::Open (
 }
 
 size_t
-CSharedMemoryWriter::Write_va (
-	const void* p,
-	size_t Size,
-	size_t ExtraBlockCount,
-	axl_va_list va
+CSharedMemoryWriter::Write (
+	const void* const* pBlockArray,
+	const size_t* pSizeArray,
+	size_t Count
 	)
 {
 	ASSERT (IsOpen ());
 
-	if (!Size)
+	size_t ChainSize = 0;
+
+	for (size_t i = 0; i < Count; i++)
+		ChainSize += pSizeArray [i];
+
+	if (!ChainSize)
 		return 0;
 
-	size_t ChainSize = CalcWriteChainSize_va (p, Size, ExtraBlockCount, va);
 	size_t WriteSize = ChainSize;
 
 	if (m_Flags & ESharedMemoryTransportFlag_Message)
@@ -348,11 +351,11 @@ CSharedMemoryWriter::Write_va (
 		TSharedMemoryTransportMessageHdr* pMsgHdr = (TSharedMemoryTransportMessageHdr*) (m_pData + WriteOffset);
 		pMsgHdr->m_Signature = ESharedMemoryTransport_MessageSignature;
 		pMsgHdr->m_Size = ChainSize;
-		CopyWriteChain_va (pMsgHdr + 1, p, Size, ExtraBlockCount, va);
+		CopyWriteChain (pMsgHdr + 1, pBlockArray, pSizeArray, Count);
 	}
 	else
 	{
-		CopyWriteChain_va (m_pData + WriteOffset, p, Size, ExtraBlockCount, va);
+		CopyWriteChain (m_pData + WriteOffset, pBlockArray, pSizeArray, Count);
 	}
 
 	mt::AtomicLock (&m_pHdr->m_Lock);
@@ -376,52 +379,25 @@ CSharedMemoryWriter::Write_va (
 	m_WriteEvent.Post ();
 #endif
 
-	return Size;
-}
-
-size_t
-CSharedMemoryWriter::CalcWriteChainSize_va (
-	const void* p,
-	size_t Size,
-	size_t ExtraBlockCount,
-	axl_va_list va
-	)
-{
-	if (!ExtraBlockCount)
-		return Size;
-
-	size_t ChainSize = Size;
-
-	for (size_t i = 0; i < ExtraBlockCount; i++)
-	{
-		AXL_VA_ARG (va, void*); // skip
-		Size = AXL_VA_ARG (va, size_t);
-		ChainSize += Size;
-	}
-
 	return ChainSize;
 }
 
 void
-CSharedMemoryWriter::CopyWriteChain_va (
+CSharedMemoryWriter::CopyWriteChain (
 	void* _pDst,
-	const void* p,
-	size_t Size,
-	size_t ExtraBlockCount,
-	axl_va_list va
+	const void* const* pBlockArray,
+	const size_t* pSizeArray,
+	size_t Count
 	)
 {
-	memcpy (_pDst, p, Size);
-	if (!ExtraBlockCount)
-		return;
+	char* pDst = (char*) _pDst;
 
-	char* pDst = (char*) _pDst + Size;
-
-	for (size_t i = 0; i < ExtraBlockCount; i++)
+	for (size_t i = 0; i < Count; i++)
 	{
-		p = AXL_VA_ARG (va, void*);
-		Size = AXL_VA_ARG (va, size_t);
-		memcpy (pDst, p, Size);
+		const void* pSrc = pBlockArray [i];
+		size_t Size = pSizeArray [i];
+
+		memcpy (pDst, pSrc, Size);
 		pDst += Size;
 	}
 }
