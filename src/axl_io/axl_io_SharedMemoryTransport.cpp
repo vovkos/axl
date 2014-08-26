@@ -27,7 +27,11 @@ CSharedMemoryTransportBase::Open (
 {
 	Close ();
 
-	bool Result = m_File.Open (pFileName, io::EFileFlag_ShareWrite);
+	uint_t FileFlags = io::EFileFlag_ShareWrite;
+	if (Flags & ESharedMemoryTransportFlag_Create)
+		FileFlags |= io::EFileFlag_DeleteOnClose;
+
+	bool Result = m_File.Open (pFileName, FileFlags);
 	if (!Result)
 		return false;
 
