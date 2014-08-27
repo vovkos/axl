@@ -21,9 +21,9 @@ CFile::Open (
 
 	uint_t ShareMode = (Flags & EFileFlag_Exclusive) ?
 		0 :
-		(Flags & EFileFlag_ShareWrite) ?
+		(Flags & EFileFlag_ReadOnly) || (Flags & EFileFlag_ShareWrite) ?
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE :
-			FILE_SHARE_READ | FILE_SHARE_DELETE;
+			FILE_SHARE_READ;
 
 	uint_t CreationDisposition = (Flags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)) ?
 		OPEN_EXISTING :
