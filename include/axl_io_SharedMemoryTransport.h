@@ -20,7 +20,7 @@ namespace io {
 enum ESharedMemoryTransport
 {
 	ESharedMemoryTransport_FileSignature    = ':mhs',
-	ESharedMemoryTransport_MessageSignature = ':gsm',
+	ESharedMemoryTransport_MessageSignature = ':sm\n',
 	ESharedMemoryTransport_DefMappingSize   = 64 * 1024,   // 64 KB
 	ESharedMemoryTransport_DefSizeLimitHint = 1024 * 1024, // 1 MB
 };
