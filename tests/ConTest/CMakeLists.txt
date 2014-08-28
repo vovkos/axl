@@ -40,6 +40,7 @@ set (
 	test_String.cpp
 	test_StringTemplate.cpp
 	test_Timer.cpp
+	test_Usb.cpp
 	test_Vso.cpp
 	test_Window.cpp
 	test_WorkerThread.cpp
@@ -75,10 +76,15 @@ source_virtual_folder (
 # ConTest compiler test
 #
 
-include_directories (${PATH_LUA_INC_DIR})
+include_directories (
+	${PATH_LUA_INC_DIR}
+	${PATH_USB_INC_DIR}
+	)
 
-link_directories (${PATH_LUA_LIB_DIR})
-link_directories (${PATH_AXL_LIB_DIR})
+link_directories (
+	${PATH_LUA_LIB_DIR}
+	${PATH_USB_LIB_DIR}
+	)
 
 add_executable (
 	ConTest
@@ -94,9 +100,7 @@ target_link_libraries (
 	axl_gui
 	axl_ini
 	axl_io
-	axl_log
 	axl_lua
-	axl_parse
 	lua
 	)
 
@@ -112,7 +116,6 @@ set_target_properties (
 	ConTest
 	PROPERTIES
 	FOLDER tests
-	LINKER_LANGUAGE C
 	)
 
 #..............................................................................

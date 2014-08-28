@@ -58,6 +58,12 @@ if (NOT "${PATH_PCAP_INC_DIR}" STREQUAL "")
 	set (PCAP_FOUND TRUE)
 endif ()
 
+if (NOT "${PATH_USB_INC_DIR}" STREQUAL "")
+	message (STATUS "Path to LibUSB includes:    ${PATH_USB_INC_DIR}")
+	message (STATUS "Path to LibUSB libraries:   ${PATH_USB_LIB_DIR}")
+	set (USB_FOUND TRUE)
+endif ()
+
 if (NOT "${PATH_QT_CMAKE_DIR}" STREQUAL "")
 	message (STATUS "Path to QT cmake modules:   ${PATH_QT_CMAKE_DIR}")
 

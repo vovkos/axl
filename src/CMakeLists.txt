@@ -80,6 +80,14 @@ if (${PCAP_FOUND})
 		)
 endif ()
 
+if (${USB_FOUND})
+	option (
+		AXL_BUILD_IO_USB
+		"Build LibUSB wrappers for axl_io library"
+		ON
+		)
+endif ()
+
 if (AXL_BUILD_IO_LIB)
 	add_subdirectory (axl_io)
 endif ()

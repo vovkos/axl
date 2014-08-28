@@ -167,13 +167,6 @@ Run ();
 
 }
 
-namespace test_WorkerThread {
-
-void 
-Run ();
-
-}
-
 namespace test_Packetizer {
 
 void 
@@ -182,6 +175,13 @@ Run ();
 }
 
 namespace test_IniParser {
+
+void 
+Run ();
+
+}
+
+namespace test_Usb {
 
 void 
 Run ();

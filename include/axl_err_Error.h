@@ -18,7 +18,6 @@ typedef CStringT <char> CString;
 } // namespace rtl
 } // namespace axl
 
-
 namespace axl {
 namespace err {
 

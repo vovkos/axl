@@ -6,32 +6,27 @@ namespace test_CmdLineParser {
 
 //.............................................................................
 
-class CMyParser: public rtl::CCmdLineParserT <CMyParser>
+enum ESwitch
 {
-protected:
-	enum ESwitch
-	{
-		ESwitch_Undefined,
-		ESwitch_Help,
-		ESwitch_SessionProvider,
-		ESwitch_SessionFile,
-		ESwitch_LogFile,
-	};
+	ESwitch_Help,
+	ESwitch_SessionProvider,
+	ESwitch_SessionFile,
+	ESwitch_LogFile,
+};
 
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (CSwitchNameMap, ESwitch)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("help", ESwitch_Help)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session-provider", ESwitch_SessionProvider)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session-file", ESwitch_SessionFile)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("log-file", ESwitch_LogFile)
-	AXL_RTL_END_HASH_TABLE_MAP ()
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_CHAR (CSwitchCharMap, ESwitch)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ('h', ESwitch_Help)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ('s', ESwitch_SessionProvider)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ('f', ESwitch_SessionFile)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ('l', ESwitch_LogFile)
-	AXL_RTL_END_HASH_TABLE_MAP ()
+AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE (CSwitchTable, ESwitch)
+	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_Help, "h", "help", NULL, "Display help")
+	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
+	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_SessionFile, "f", "session-file", "<file>", "Specify session file")
+	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_LogFile, "l", "log-file", "<file>", "Specify log file")
+AXL_RTL_END_CMD_LINE_SWITCH_TABLE ()
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CMyParser: public rtl::CCmdLineParserT <CMyParser, CSwitchTable>
+{
 public:
 	bool
 	OnValue (const char* pValue)
@@ -42,25 +37,11 @@ public:
 
 	bool 
 	OnSwitch (
-		const char* pSwitchName,
+		ESwitch Switch,
 		const char* pValue
 		)
 	{
-		CSwitchNameMap::CIterator It = CSwitchNameMap::Find (pSwitchName);
-		ESwitch Switch = It ? It->m_Value : ESwitch_Undefined;
-		printf ("OnSwitch '%s' = '%s'\n", pSwitchName, pValue);
-		return true;
-	}
-
-	bool
-	OnSwitch (
-		const char SwitchChar,
-		const char* pValue
-		)
-	{
-		CSwitchCharMap::CIterator It = CSwitchCharMap::Find (SwitchChar);
-		ESwitch Switch = It ? It->m_Value : ESwitch_Undefined;
-		printf ("OnSwitch '%c' = '%s'\n", SwitchChar, pValue);
+		printf ("OnSwitch #%d = '%s'\n", Switch, pValue);
 		return true;
 	}
 };

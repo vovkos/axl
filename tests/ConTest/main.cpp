@@ -5,11 +5,19 @@ using namespace axl;
 
 //.............................................................................
 
-int 
-_tmain (
-	int argc, 
-	_TCHAR* argv []
+#if (_AXL_ENV == AXL_ENV_WIN)
+int
+wmain (
+	int argc,
+	wchar_t* argv []
 	)
+#else
+int
+main (
+	int argc,
+	char* argv []
+	)
+#endif
 {
 	WSADATA WsaData;
 	WORD VersionRequested = MAKEWORD (2, 2);
@@ -44,8 +52,9 @@ _tmain (
 	//test_Window::Run ();
 	//test_WorkerThread::Run ();
 	//test_Packetizer::Run ();
-	
-	test_CmdLineParser::Run ();
+	//test_CmdLineParser::Run ();
+
+	test_Usb::Run ();
 
 	return 0;
 }

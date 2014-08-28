@@ -6,7 +6,8 @@
 
 #define _AXL_ERR_WINERROR_H
 
-#include "axl_err_ErrorMgr.h"
+#include "axl_err_Error.h"
+#include "axl_rtl_String.h"
 
 namespace axl {
 namespace err {

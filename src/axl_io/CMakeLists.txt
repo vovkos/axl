@@ -20,7 +20,6 @@ set (
 	${AXL_INC_DIR}/axl_io_Mapping.h
 	${AXL_INC_DIR}/axl_io_MappedFile.h
 	${AXL_INC_DIR}/axl_io_SharedMemoryTransport.h
-	${AXL_INC_DIR}/axl_io_PCap.h
 	${AXL_INC_DIR}/axl_io_Pipe.h
 	${AXL_INC_DIR}/axl_io_Serial.h
 	${AXL_INC_DIR}/axl_io_SockAddr.h
@@ -38,17 +37,12 @@ set (
 	axl_io_ListenerSock.cpp
 	axl_io_Mapping.cpp
 	axl_io_MappedFile.cpp
-	axl_io_PCap.cpp
 	axl_io_Pipe.cpp
 	axl_io_Serial.cpp
 	axl_io_SharedMemoryTransport.cpp
 	axl_io_Socket.cpp
 	axl_io_Transport.cpp
 	)
-
-if (NOT AXL_BUILD_IO_PCAP)
-	exclude_from_build (axl_io_PCap.cpp)
-endif ()
 
 # temporarily exclude until i port axl_exe
 
@@ -64,6 +58,52 @@ source_virtual_folder (
 	io
 	${IO_H_LIST}
 	${IO_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# io_pcap folder
+#
+
+set (
+	IO_PCAP_H_LIST
+	${AXL_INC_DIR}/axl_io_PCap.h
+	)
+
+set (
+	IO_PCAP_CPP_LIST
+	axl_io_PCap.cpp
+	)
+
+source_virtual_folder (
+	io_pcap
+	${IO_PCAP_H_LIST}
+	${IO_PCAP_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# io_usb folder
+#
+
+set (
+	IO_USB_H_LIST
+	${AXL_INC_DIR}/axl_io_UsbDevice.h
+	${AXL_INC_DIR}/axl_io_UsbTransfer.h
+	${AXL_INC_DIR}/axl_io_UsbError.h
+	)
+
+set (
+	IO_USB_CPP_LIST
+	axl_io_UsbDevice.cpp
+	axl_io_UsbTransfer.cpp
+	axl_io_UsbError.cpp
+	)
+
+source_virtual_folder (
+	io_usb
+	${IO_USB_H_LIST}
+	${IO_USB_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -158,6 +198,15 @@ source_virtual_folder (
 if (AXL_BUILD_IO_PCAP)
 	include_directories (${PATH_PCAP_INC_DIR})
 	add_definitions (-D_AXL_IO_PCAP)
+else ()
+	exclude_from_build (${IO_PCAP_CPP_LIST})
+endif ()
+
+if (AXL_BUILD_IO_USB)
+	include_directories (${PATH_USB_INC_DIR})
+	add_definitions (-D_AXL_IO_USB)
+else ()
+	exclude_from_build (${IO_USB_CPP_LIST})
 endif ()
 
 add_library (
@@ -166,6 +215,10 @@ add_library (
 	${PCH_CPP}
 	${IO_H_LIST}
 	${IO_CPP_LIST}
+	${IO_PCAP_H_LIST}
+	${IO_PCAP_CPP_LIST}
+	${IO_USB_H_LIST}
+	${IO_USB_CPP_LIST}
 	${IO_PSX_H_LIST}
 	${IO_PSX_CPP_LIST}
 	${IO_WIN_H_LIST}

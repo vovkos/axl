@@ -12,9 +12,10 @@
 #define _WIN32_WINNT 0x0600     // Change this to the appropriate value to target other versions of Windows.
 #endif
 
-
 #define _CRT_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" string functions
 #define _SCL_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" iterators
+
+#include "axl_g_Pch.h"
 
 #include <new>
 #include <typeinfo>
@@ -36,9 +37,6 @@
 #pragma comment (lib, "ws2_32.lib")
 #pragma comment (lib, "comctl32.lib")
 
-#include <string>
-#include <vector>
-
 //.............................................................................
 
 // atl
@@ -55,6 +53,18 @@ extern "C" {
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+
+} // extern "C" {
+
+//.............................................................................
+
+// USB
+
+extern "C" {
+
+#pragma warning (disable: 4200)
+#include <libusb.h>
+#pragma comment (lib, "libusb-1.0.lib")
 
 } // extern "C" {
 
@@ -90,16 +100,14 @@ extern "C" {
 // #include <axl_io_DgramSock.h>
 
 #include <axl_lex_RagelLexer.h>
-#include <axl_llk_Parser.h>
 
 #include <axl_lua_StringTemplate.h>
 #include <axl_gui_GdiEngine.h>
 
-#include <axl_log_PacketFile.h>
-#include <axl_log_Widget.h>
-
 #include <axl_rtl_ForEach.h>
 #include <axl_ini_Parser.h>
 #include <axl_rtl_CmdLineParser.h>
+
+#include <axl_io_UsbDevice.h>
 
 //.............................................................................

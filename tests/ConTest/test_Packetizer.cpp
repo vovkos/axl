@@ -53,8 +53,6 @@ Run ()
 	rtl::CString s = "dsjsdljsdkl";
 	s.Clear ();
 
-	size_t x = Packetizer.m_Buffer.GetReservedCount ();
-
 	printf ("done.\n");
 }
 
