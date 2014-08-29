@@ -24,6 +24,7 @@
 #	pragma GCC diagnostic ignored "-Wmultichar"
 #	pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #	pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#	pragma GCC diagnostic ignored "-Wunused-result"
 #endif
 
 //.............................................................................
