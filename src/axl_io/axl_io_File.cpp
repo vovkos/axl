@@ -42,10 +42,10 @@ CFile::Open (
 
 	return m_File.Create (
 		FileName,
-		AccessMode, 
-		ShareMode, 
-		NULL, 
-		CreationDisposition, 
+		AccessMode,
+		ShareMode,
+		NULL,
+		CreationDisposition,
 		FlagsAttributes
 		);
 }
@@ -80,8 +80,8 @@ CFile::Open (
 	if (!Result)
 		return false;
 
-	if (Flags & EFileFlag_DeleteOnClose)
-		unlink (pFileName);
+	// if (Flags & EFileFlag_DeleteOnClose)
+	//	unlink (pFileName);
 
 	return true;
 }
