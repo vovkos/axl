@@ -2,8 +2,6 @@
 # Tibbo Technology Inc (C) 2004-2014. All rights reserved
 # Author: Vladimir Gladkov
 
-project_virtual_folder (axl_lua)
-
 #..............................................................................
 #
 # lua folder
@@ -28,8 +26,9 @@ set (
 	axl_lua_StringTemplateLexer.rl
 	)
 
-source_virtual_folder (
+source_group (
 	lua
+	FILES
 	${LUA_H_LIST}
 	${LUA_CPP_LIST}
 	${LUA_RL_LIST}
@@ -40,10 +39,10 @@ source_virtual_folder (
 # gen folder
 #
 
-set (LUA_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+file (MAKE_DIRECTORY ${GEN_DIR})
 
-push_and_set (CMAKE_CURRENT_BINARY_DIR ${LUA_GEN_DIR})
-file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 
 add_ragel_step (
 	axl_lua_StringTemplateLexer.rl.cpp
@@ -54,13 +53,14 @@ pop (CMAKE_CURRENT_BINARY_DIR)
 
 set (
 	GEN_RL_CPP_LIST
-	${LUA_GEN_DIR}/axl_lua_StringTemplateLexer.rl.cpp
+	${GEN_DIR}/axl_lua_StringTemplateLexer.rl.cpp
 	)
 
 exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
 
-source_virtual_folder (
+source_group (
 	gen
+	FILES
 	${GEN_RL_CPP_LIST}
 	)
 
@@ -72,8 +72,9 @@ source_virtual_folder (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_virtual_folder (
+source_group (
 	pch
+	FILES
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -84,9 +85,8 @@ source_virtual_folder (
 #
 
 include_directories (
-	${PATH_LUA_INC_DIR}
-	${LUA_GEN_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}
+	${LUA_INC_DIR}
+	${GEN_DIR}
 	)
 
 add_library (
@@ -99,13 +99,11 @@ add_library (
 	${GEN_RL_CPP_LIST}
 	)
 
-if (AXL_USE_PCH)
-	set_pch (
-		axl_lua
-		${PCH_H}
-		${PCH_CPP}
-		)
-endif ()
+set_pch (
+	axl_lua
+	${PCH_H}
+	${PCH_CPP}
+	)
 
 #..............................................................................
 

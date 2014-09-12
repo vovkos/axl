@@ -2,8 +2,6 @@
 # Tibbo Technology Inc (C) 2004-2014. All rights reserved
 # Author: Vladimir Gladkov
 
-project_virtual_folder (axl_io)
-
 #..............................................................................
 #
 # io folder
@@ -54,8 +52,9 @@ exclude_from_build (
 	axl_io_Transport.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	io
+	FILES
 	${IO_H_LIST}
 	${IO_CPP_LIST}
 	)
@@ -75,8 +74,9 @@ set (
 	axl_io_PCap.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	io_pcap
+	FILES
 	${IO_PCAP_H_LIST}
 	${IO_PCAP_CPP_LIST}
 	)
@@ -100,8 +100,9 @@ set (
 	axl_io_UsbError.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	io_usb
+	FILES
 	${IO_USB_H_LIST}
 	${IO_USB_CPP_LIST}
 	)
@@ -131,8 +132,9 @@ set (
 	axl_io_psx_Socket.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	io_psx
+	FILES
 	${IO_PSX_H_LIST}
 	${IO_PSX_CPP_LIST}
 	)
@@ -166,8 +168,9 @@ set (
 	axl_io_win_Socket.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	io_win
+	FILES
 	${IO_WIN_H_LIST}
 	${IO_WIN_CPP_LIST}
 	)
@@ -184,8 +187,9 @@ endif ()
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_virtual_folder (
+source_group (
 	pch
+	FILES
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -196,14 +200,14 @@ source_virtual_folder (
 #
 
 if (AXL_BUILD_IO_PCAP)
-	include_directories (${PATH_PCAP_INC_DIR})
+	include_directories (${PCAP_INC_DIR})
 	add_definitions (-D_AXL_IO_PCAP)
 else ()
 	exclude_from_build (${IO_PCAP_CPP_LIST})
 endif ()
 
 if (AXL_BUILD_IO_USB)
-	include_directories (${PATH_USB_INC_DIR})
+	include_directories (${LIBUSB_INC_DIR})
 	add_definitions (-D_AXL_IO_USB)
 else ()
 	exclude_from_build (${IO_USB_CPP_LIST})
@@ -225,12 +229,10 @@ add_library (
 	${IO_WIN_CPP_LIST}
 	)
 
-if (AXL_USE_PCH)
-	set_pch (
-		axl_io
-		${PCH_H}
-		${PCH_CPP}
-		)
-endif ()
+set_pch (
+	axl_io
+	${PCH_H}
+	${PCH_CPP}
+	)
 
 #..............................................................................

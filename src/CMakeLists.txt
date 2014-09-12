@@ -4,8 +4,6 @@
 
 #..............................................................................
 
-root_virtual_folder (${CMAKE_CURRENT_BINARY_DIR}/src.virtual)
-
 add_subdirectory (axl_core)
 
 #..............................................................................
@@ -30,8 +28,6 @@ if (WIN32)
 		)
 endif ()
 
-#..............................................................................
-
 if (${QT_FOUND})
 	option (
 		AXL_BUILD_GUI_QT
@@ -39,8 +35,6 @@ if (${QT_FOUND})
 		ON
 		)
 endif ()
-
-#..............................................................................
 
 option (
 	AXL_BUILD_GUI_LIB
@@ -80,7 +74,7 @@ if (${PCAP_FOUND})
 		)
 endif ()
 
-if (${USB_FOUND})
+if (${LIBUSB_FOUND})
 	option (
 		AXL_BUILD_IO_USB
 		"Build LibUSB wrappers for axl_io library"

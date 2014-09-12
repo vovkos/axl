@@ -77,13 +77,13 @@ source_virtual_folder (
 #
 
 include_directories (
-	${PATH_LUA_INC_DIR}
-	${PATH_USB_INC_DIR}
+	${LUA_INC_DIR}
+	${LIBUSB_INC_DIR}
 	)
 
 link_directories (
-	${PATH_LUA_LIB_DIR}
-	${PATH_USB_LIB_DIR}
+	${LUA_LIB_DIR}
+	${LIBUSB_LIB_DIR}
 	)
 
 add_executable (
@@ -104,13 +104,11 @@ target_link_libraries (
 	lua
 	)
 
-if (AXL_USE_PCH)
-	set_pch (
-		ConTest
-		${PCH_H}
-		${PCH_CPP}
-		)
-endif ()
+set_pch (
+	ConTest
+	${PCH_H}
+	${PCH_CPP}
+	)
 
 set_target_properties (
 	ConTest

@@ -1,5 +1,3 @@
-#include "axl_ini_Lexer.h"
-
 // warning C4065: switch statement contains 'default' but no 'case' labels
 
 #pragma warning (disable: 4065)

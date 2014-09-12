@@ -81,12 +81,10 @@ add_library (
 	${EXE_ASM_LIST}
 	)
 
-if (AXL_USE_PCH)
-	set_pch (
-		axl_exe
-		${PCH_H}
-		${PCH_CPP}
-		)
-endif ()
+set_pch (
+	axl_exe
+	${PCH_H}
+	${PCH_CPP}
+	)
 
 #..............................................................................

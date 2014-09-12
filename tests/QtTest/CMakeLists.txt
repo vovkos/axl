@@ -79,9 +79,8 @@ set (
 	${AXL_INC_DIR}/axl_gui_QtWidget.h
 	)
 
-qt5_wrap_cpp_to (
+qt5_wrap_cpp_alt (
 	GEN_MOC_CPP_LIST
-	${GEN_DIR}
 	${MOC_H_LIST}
 	)
 
@@ -179,13 +178,11 @@ target_link_libraries (
 
 qt5_use_modules (QtTest Widgets)
 
-if (AXL_USE_PCH)
-	set_pch (
-		QtTest
-		${PCH_H}
-		${PCH_CPP}
-		)
-endif ()
+set_pch (
+	QtTest
+	${PCH_H}
+	${PCH_CPP}
+	)
 
 set_target_properties (
 	QtTest

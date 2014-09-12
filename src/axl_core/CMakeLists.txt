@@ -3,10 +3,6 @@
 # Author: Vladimir Gladkov
 
 #..............................................................................
-
-project_virtual_folder (axl_core)
-
-#..............................................................................
 #
 # dbg folder
 #
@@ -18,8 +14,9 @@ set (
 
 set (DBG_CPP_LIST)
 
-source_virtual_folder (
+source_group (
 	dbg
+	FILES
 	${DBG_H_LIST}
 	${DBG_CPP_LIST}
 	)
@@ -49,8 +46,9 @@ set (
 	axl_err_WinError.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	err
+	FILES
 	${ERR_H_LIST}
 	${ERR_CPP_LIST}
 	)
@@ -82,8 +80,9 @@ set (
 	axl_g_Time.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	g
+	FILES
 	${G_H_LIST}
 	${G_CPP_LIST}
 	)
@@ -105,8 +104,9 @@ set (
 	axl_g_win_Handle.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	g_win
+	FILES
 	${G_WIN_H_LIST}
 	${G_WIN_CPP_LIST}
 	)
@@ -129,8 +129,9 @@ set (
 
 set (LEX_CPP_LIST)
 
-source_virtual_folder (
+source_group (
 	lex
+	FILES
 	${LEX_H_LIST}
 	${LEX_CPP_LIST}
 	)
@@ -156,8 +157,9 @@ set (
 	axl_mem_Tracker.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	mem
+	FILES
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
 	)
@@ -185,8 +187,9 @@ set (
 	axl_mt_TlsMgr.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	mt
+	FILES
 	${MT_H_LIST}
 	${MT_CPP_LIST}
 	)
@@ -213,8 +216,9 @@ set (
 	axl_mt_psx_Thread.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	mt_psx
+	FILES
 	${MT_PSX_H_LIST}
 	${MT_PSX_CPP_LIST}
 	)
@@ -243,8 +247,9 @@ set (
 	axl_mt_win_WaitableHandle.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	mt_win
+	FILES
 	${MT_WIN_H_LIST}
 	${MT_WIN_CPP_LIST}
 	)
@@ -274,8 +279,9 @@ set (
 	axl_ref_RefCount.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	ref
+	FILES
 	${REF_H_LIST}
 	${REF_CPP_LIST}
 	)
@@ -342,8 +348,9 @@ set (
 	axl_rtl_Utf.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	rtl
+	FILES
 	${RTL_H_LIST}
 	${RTL_CPP_LIST}
 	)
@@ -356,8 +363,9 @@ source_virtual_folder (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_virtual_folder (
+source_group (
 	pch
+	FILES
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -398,12 +406,10 @@ add_library (
 	${RTL_CPP_LIST}
 	)
 
-if (AXL_USE_PCH)
-	set_pch (
-		axl_core
-		${PCH_H}
-		${PCH_CPP}
-		)
-endif ()
+set_pch (
+	axl_core
+	${PCH_H}
+	${PCH_CPP}
+	)
 
 #..............................................................................
