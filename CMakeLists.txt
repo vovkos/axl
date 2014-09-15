@@ -35,8 +35,13 @@ configure_file (
 	)
 
 configure_file (
-	cmake/latest/axl-cpu.cmake.in
+	cmake/axl.cmake.in
 	${CMAKE_CURRENT_LIST_DIR}/cmake/latest/axl-${TARGET_CPU}.cmake
+	)
+
+configure_file (
+	cmake/axl-latest.cmake.in
+	${CMAKE_CURRENT_LIST_DIR}/cmake/latest/axl.cmake
 	)
 
 include (${CMAKE_CURRENT_BINARY_DIR}/cmake/axl.cmake)

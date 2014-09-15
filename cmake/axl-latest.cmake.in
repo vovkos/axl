@@ -4,6 +4,6 @@
 
 #..............................................................................
 
-include (${CMAKE_CURRENT_BINARY_DIR}/cmake/axl.cmake)
+include (${CMAKE_CURRENT_LIST_DIR}/cmake/latest/axl-${TARGET_CPU}.cmake)
 
 #..............................................................................
