@@ -67,11 +67,11 @@ CLuaState::Trace ()
 		case LUA_TSTRING:
 			TRACE ("%08x %s\n", p, GetString(i));
 			break;
-    
+	
 		case LUA_TBOOLEAN:
 			TRACE ("%08x %s\n", p, GetBoolean (i) ? "true" : "false");
 			break;
-    
+	
 		case LUA_TNUMBER:
 			TRACE ("%08x %g\n", p, GetNumber (i));
 			break;
@@ -79,7 +79,7 @@ CLuaState::Trace ()
 		default:
 			TRACE ("%08x %s\n", p, GetTypeName (Type));
 			break;
-    
+	
 		}
 	}
 }
