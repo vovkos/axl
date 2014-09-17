@@ -32,11 +32,13 @@ endif ()
 configure_file (
 	cmake/axl.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/cmake/axl.cmake
+	@ONLY
 	)
 
 configure_file (
 	cmake/axl.cmake.in
 	${CMAKE_CURRENT_LIST_DIR}/cmake/latest/axl-${TARGET_CPU}.cmake
+	@ONLY
 	)
 
 configure_file (
