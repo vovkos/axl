@@ -57,7 +57,7 @@ GetPosixOpenFlags (uint_t FileFlags)
 {
 	uint_t PosixFlags = (FileFlags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
 
-	if (!(FileFlags & EFileFlag_OpenExisting))
+	if (!(FileFlags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)))
 		PosixFlags |= O_CREAT;
 
 	if (FileFlags & EFileFlag_Asynchronous)
