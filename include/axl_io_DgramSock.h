@@ -16,35 +16,35 @@ namespace io {
 
 //.............................................................................
 
-class CDgramSock
+class DgramSock
 {
 public:
 	typedef 
-	exe::CArgSeqExT_3 <
-		exe::CArgObjPtrT <err::CError>, 
-		exe::CArgObjPtrT <TSockAddrU>,
-		exe::CArgT <size_t> 
-		> COnSendRecvCompleteArg;
+	exe::ArgSeqEx_3 <
+		exe::ArgObjPtr <err::Error>, 
+		exe::ArgObjPtr <SockAddrU>,
+		exe::Arg <size_t> 
+		> OnSendRecvCompleteArg;
 
 protected:
-	struct TSendRecv: rtl::TListLink
+	struct SendRecv: rtl::ListLink
 	{
-		CDgramSock* m_sock;
+		DgramSock* m_sock;
 		SOCKADDR m_address;
 		int m_addressSize;
 		OVERLAPPED m_overlapped;
-		exe::CFunction m_onComplete;		
+		exe::Function m_onComplete;		
 	};
 
 public:
-	win::CSock m_sock;
+	win::Sock m_sock;
 
 protected:
-	ref::CPtrT <exe::CWorkerThread> m_workerThread;
-	rtl::CStdListT <TSendRecv> m_sendRecvList;
+	ref::Ptr <exe::Workerhread> m_workerThread;
+	rtl::StdList <SendRecv> m_sendRecvList;
 
 public:
-	~CDgramSock ()
+	~DgramSock ()
 	{
 		close ();
 	}
@@ -59,7 +59,7 @@ public:
 	close ();
 
 	bool
-	getLocalAddress (TSockAddrU* addr)
+	getLocalAddress (SockAddrU* addr)
 	{
 		SOCKADDR addr;
 		return 
@@ -69,17 +69,17 @@ public:
 
 	bool
 	open (
-		ESockProto protocol,
-		const TSockAddr* addr
+		SockProtoKind protocol,
+		const SockAddr* addr
 		)
 	{
-		return open (protocol, (ESockAddr) addr->m_kind, addr);
+		return open (protocol, (SockAddrKind) addr->m_kind, addr);
 	}
 
 	bool
 	open (
-		ESockProto protocol,
-		ESockAddr addrKind
+		SockProtoKind protocol,
+		SockAddrKind addrKind
 		)
 	{
 		return open (protocol, addrKind, NULL);
@@ -89,37 +89,37 @@ public:
 	sendTo (
 		const void* p,
 		size_t size,
-		const TSockAddr* addr,
-		const exe::CFunction& onComplete
+		const SockAddr* addr,
+		const exe::Function& onComplete
 		);
 
 	bool 
 	recvFrom (
 		void* p,
 		size_t size,
-		const exe::CFunction& onComplete
+		const exe::Function& onComplete
 		);
 
 	size_t
 	syncSendTo (
 		const void* p,
 		size_t size,
-		const TSockAddr* addr
+		const SockAddr* addr
 		);
 
 	size_t 
 	syncRecvFrom (
 		void* p,
 		size_t size,
-		TSockAddrU* from
+		SockAddrU* from
 		);
 
 protected:
 	bool
 	open (
-		ESockProto protocol,
-		ESockAddr addrKind,
-		const TSockAddr* addr
+		SockProtoKind protocol,
+		SockAddrKind addrKind,
+		const SockAddr* addr
 		);
 
 	void
@@ -131,8 +131,8 @@ protected:
 	sendTo_wt (
 		const void* p,
 		size_t size,
-		const TSockAddr* addr,
-		const exe::CFunction& onComplete
+		const SockAddr* addr,
+		const exe::Function& onComplete
 		);
 
 	bool 
@@ -140,7 +140,7 @@ protected:
 	recvFrom_wt (
 		void* p,
 		size_t size,
-		const exe::CFunction& onComplete
+		const exe::Function& onComplete
 		);
 
 	static 
@@ -153,14 +153,14 @@ protected:
 		dword_t flags
 		)
 	{
-		TSendRecv* sendRecv = (TSendRecv*) overlapped->hEvent;
+		SendRecv* sendRecv = (SendRecv*) overlapped->hEvent;
 		sendRecv->m_sock->completeSendRecv_wt (sendRecv, error, actualSize);
 	}
 	
 	void
 	completeSendRecv_wt (
-		TSendRecv* sendRecv,
-		const err::CError& error,
+		SendRecv* sendRecv,
+		const err::Error& error,
 		size_t actualSize
 		);
 };

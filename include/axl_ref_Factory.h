@@ -17,34 +17,34 @@ namespace ref {
 
 template <
 	typename T,
-	typename TAlloc = mem::CStdAlloc
+	typename Alloc = mem::StdAlloc
 	>
-class CFactoryT
+class Factory
 {
 public:
-	typedef TAlloc CAlloc;
+	typedef Alloc Alloc;
 
-	class COperatorNew
+	class OperatorNew
 	{
 	public:
 #ifdef _DEBUG
-		CPtrT <T> 
+		Ptr <T> 
 		operator () (
 			const char* filePath,
 			int line,
 			size_t extra = 0
 			)
 		{
-			CPtrT <T> object = mem::CStdFactoryT <T, TAlloc>::operatorNew (filePath, line, extra);
-			object->setTarget (object, &rtl::CTypeT <T>::destruct, &TAlloc::free);
+			Ptr <T> object = mem::StdFactory <T, Alloc>::operatorNew (filePath, line, extra);
+			object->setTarget (object, &rtl::Type <T>::destruct, &Alloc::free);
 			return object;
 		}
 #else
-		CPtrT <T> 
+		Ptr <T> 
 		operator () (size_t extra = 0)
 		{
-			CPtrT <T> object = mem::CStdFactoryT <T, TAlloc>::operatorNew (extra);
-			object->setTarget (object, &rtl::CTypeT <T>::destruct, &TAlloc::free);
+			Ptr <T> object = mem::StdFactory <T, Alloc>::operatorNew (extra);
+			object->setTarget (object, &rtl::Type <T>::destruct, &Alloc::free);
 			return object;
 		}
 #endif
@@ -54,21 +54,21 @@ public:
 
 #ifdef _DEBUG
 	static
-	CPtrT <T> 
+	Ptr <T> 
 	operatorNew (
 		const char* filePath,
 		int line,
 		size_t extra = 0
 		)
 	{
-		return COperatorNew () (filePath, line, extra);
+		return OperatorNew () (filePath, line, extra);
 	}
 #else
 	static
-	CPtrT <T> 
+	Ptr <T> 
 	operatorNew (size_t extra = 0)
 	{
-		return COperatorNew () (extra);
+		return OperatorNew () (extra);
 	}
 #endif
 };
@@ -76,33 +76,33 @@ public:
 //.............................................................................
 
 template <typename T>
-class CInPlaceFactoryT
+class InPlaceFactory
 {
 public:
-	class COperatorNew
+	class OperatorNew
 	{
 	public:
-		CPtrT <T> 
+		Ptr <T> 
 		operator () (
 			void* p,
 			mem::FFree* pfFree
 			)
 		{
 			new (p) T;
-			((T*) p)->setTarget (p, &rtl::CTypeT <T>::destruct, pfFree); 
+			((T*) p)->setTarget (p, &rtl::Type <T>::destruct, pfFree); 
 			return (T*) p;
 		}
 	};
 
 public:
 	static
-	CPtrT <T> 
+	Ptr <T> 
 	operatorNew (
 		void* p,
 		mem::FFree* pfFree
 		)
 	{
-		return COperatorNew () (p, pfFree);
+		return OperatorNew () (p, pfFree);
 	}
 };
 
@@ -111,23 +111,23 @@ public:
 #ifdef _DEBUG
 
 #define AXL_REF_NEW(class) \
-	axl::ref::CFactoryT <class>::operatorNew (__FILE__, __LINE__)
+	axl::ref::Factory <class>::operatorNew (__FILE__, __LINE__)
 
 #define AXL_REF_NEW_EXTRA(class, extra) \
-	axl::ref::CFactoryT <class>::operatorNew (__FILE__, __LINE__, extra)
+	axl::ref::Factory <class>::operatorNew (__FILE__, __LINE__, extra)
 
 #else
 
 #define AXL_REF_NEW(class) \
-	axl::ref::CFactoryT <class>::operatorNew ()
+	axl::ref::Factory <class>::operatorNew ()
 
 #define AXL_REF_NEW_EXTRA(class, extra) \
-	axl::ref::CFactoryT <class>::operatorNew (extra)
+	axl::ref::Factory <class>::operatorNew (extra)
 
 #endif
 
 #define AXL_REF_NEW_INPLACE(class, p, pfFree) \
-	axl::ref::CInPlaceFactoryT <class>::operatorNew (p, pfFree)
+	axl::ref::InPlaceFactory <class>::operatorNew (p, pfFree)
 
 //.............................................................................
 

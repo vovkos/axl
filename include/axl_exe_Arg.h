@@ -16,18 +16,18 @@ namespace exe {
 //.............................................................................
 
 template <typename T>
-class CArgRootT
+class ArgRoot
 {
 public:
-	typedef T CArg;
-	typedef g::CTypeT <T> CType;
+	typedef T Arg;
+	typedef g::Type <T> Type;
 
 	enum
 	{
 		hasShadow = false
 	};
 
-	class CShadow
+	class Shadow
 	{
 	};
 
@@ -49,14 +49,14 @@ public:
 #if (_AXL_CPU == AXL_CPU_X86)
 
 template <typename T>
-class CArgT: public CArgRootT <T>
+class Arg: public ArgRoot <T>
 {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
-		CShadow* shadow,
+		Shadow* shadow,
 		axl_va_list va
 		)
 	{
@@ -81,7 +81,7 @@ public:
 // specialization for void
 
 template <>
-class CArgT <void>: public CArgRootT <void>
+class Arg <void>: public ArgRoot <void>
 {
 public:
 	axl_va_list
@@ -102,7 +102,7 @@ public:
 // pack string pointer and back up string in the shadow buffer
 
 template <typename T>
-class CArgStringT: public CArgRootT <T*>
+class ArgString: public ArgRoot <T*>
 {
 public:
 	enum
@@ -110,10 +110,10 @@ public:
 		hasShadow = true
 	};
 
-	class CShadow
+	class Shadow
 	{
 	public:
-		rtl::CStringT <T> m_string;
+		rtl::String <T> m_string;
 	};
 
 public:
@@ -121,7 +121,7 @@ public:
 	operator () (
 		void* p,
 		size_t* size,
-		CShadow* shadow,
+		Shadow* shadow,
 		axl_va_list va
 		)
 	{
@@ -140,9 +140,9 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CArgStringT <char>    CArgStringA;
-typedef CArgStringT <wchar_t> CArgStringW;
-typedef CArgStringT <char> CArgString;
+typedef ArgString <char>    ArgStringA;
+typedef ArgString <wchar_t> ArgStringW;
+typedef ArgString <char> ArgString;
 
 
 //.............................................................................
@@ -150,22 +150,22 @@ typedef CArgStringT <char> CArgString;
 // specialization for const char*, const wchar_t*, Error
 
 template <>
-class CArgT <const char*>: public CArgStringT <char>
+class Arg <const char*>: public ArgString <char>
 {
 };
 
 template <>
-class CArgT <char*>: public CArgStringT <char>
+class Arg <char*>: public ArgString <char>
 {
 };
 
 template <>
-class CArgT <const wchar_t*>: public CArgStringT <wchar_t>
+class Arg <const wchar_t*>: public ArgString <wchar_t>
 {
 };
 
 template <>
-class CArgT <wchar_t*>: public CArgStringT <wchar_t>
+class Arg <wchar_t*>: public ArgString <wchar_t>
 {
 };
 
@@ -174,7 +174,7 @@ class CArgT <wchar_t*>: public CArgStringT <wchar_t>
 // pack object pointer and back up object in the shadow buffer
 
 template <typename T>
-class CArgObjPtrT: public CArgRootT <T*>
+class ArgObjPtr: public ArgRoot <T*>
 {
 public:
 	enum
@@ -182,7 +182,7 @@ public:
 		hasShadow = true
 	};
 
-	class CShadow
+	class Shadow
 	{
 	public:
 		T m_object;
@@ -193,7 +193,7 @@ public:
 	operator () (
 		void* p,
 		size_t* size,
-		CShadow* shadow,
+		Shadow* shadow,
 		axl_va_list va
 		)
 	{
@@ -223,9 +223,9 @@ public:
 
 template <
 	typename T,
-	typename TGetSize = rtl::CGetSizeT <T>
+	typename GetSize = rtl::GetSize <T>
 	>
-class CArgVsoPtrT: public CArgRootT <T*>
+class ArgVsoPtr: public ArgRoot <T*>
 {
 public:
 	enum
@@ -233,10 +233,10 @@ public:
 		hasShadow = true
 	};
 
-	class CShadow
+	class Shadow
 	{
 	public:
-		ref::CBufT <T, TGetSize> m_object;
+		ref::Buf <T, GetSize> m_object;
 	};
 
 public:
@@ -244,7 +244,7 @@ public:
 	operator () (
 		void* p,
 		size_t* size,
-		CShadow* shadow,
+		Shadow* shadow,
 		axl_va_list va
 		)
 	{
@@ -273,12 +273,12 @@ public:
 // specialization for TError
 
 template <>
-class CArgT <const err::TError*>: public CArgVsoPtrT <err::TError, err::CGetErrorSize>
+class Arg <const err::Error*>: public ArgVsoPtr <err::Error, err::GetErrorSize>
 {
 };
 
 template <>
-class CArgT <err::TError*>: public CArgVsoPtrT <err::TError, err::CGetErrorSize>
+class Arg <err::Error*>: public ArgVsoPtr <err::Error, err::GetErrorSize>
 {
 };
 
@@ -287,31 +287,31 @@ class CArgT <err::TError*>: public CArgVsoPtrT <err::TError, err::CGetErrorSize>
 // compile-time sequencing
 
 template <
-	typename TArg1, 
-	typename TArg2
+	typename Arg1, 
+	typename Arg2
 	>
-class CArgSeqExT
+class ArgSeqEx
 {
 public:
-	class CArg
+	class Arg
 	{
 	public:
-		typename TArg1::CArg m_arg1;
-		typename TArg2::CArg m_arg2;
+		typename Arg1::Arg m_arg1;
+		typename Arg2::Arg m_arg2;
 	};
 
-	typedef g::CTypeT <CArg> CType;
+	typedef g::Type <Arg> Type;
 
-	class CShadow
+	class Shadow
 	{
 	public:
-		typename TArg1::CShadow m_shadow1;
-		typename TArg2::CShadow m_shadow2;
+		typename Arg1::Shadow m_shadow1;
+		typename Arg2::Shadow m_shadow2;
 	};
 
 	enum
 	{
-		hasShadow = TArg1::hasShadow || TArg2::hasShadow
+		hasShadow = Arg1::hasShadow || Arg2::hasShadow
 	};
 
 public:
@@ -319,7 +319,7 @@ public:
 	operator () (
 		void* p,
 		size_t* size,
-		CShadow* shadow,
+		Shadow* shadow,
 		axl_va_list va
 		)
 	{
@@ -328,13 +328,13 @@ public:
 
 		if (!p)
 		{
-			va = TArg1 () (NULL, &size1, NULL, va);
-			va = TArg2 () (NULL, &size2, NULL, va);
+			va = Arg1 () (NULL, &size1, NULL, va);
+			va = Arg2 () (NULL, &size2, NULL, va);
 		}
 		else
 		{
-			va = TArg1 () (p, &size1, &shadow->m_shadow1, va);
-			va = TArg2 () ((uchar_t*) p + size1, &size2, &shadow->m_shadow2, va);
+			va = Arg1 () (p, &size1, &shadow->m_shadow1, va);
+			va = Arg2 () ((uchar_t*) p + size1, &size2, &shadow->m_shadow2, va);
 		}
 
 		*size = size1 + size2;
@@ -348,60 +348,60 @@ public:
 //  helper typedefs for packing up to 6 arguments
 
 template <
-	typename TArg1, 
-	typename TArg2
+	typename Arg1, 
+	typename Arg2
 	>
-class CArgSeqExT_2: public CArgSeqExT <TArg1, TArg2>
+class ArgSeqEx_2: public ArgSeqEx <Arg1, Arg2>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TArg1, 
-	typename TArg2, 
-	typename TArg3
+	typename Arg1, 
+	typename Arg2, 
+	typename Arg3
 	>
-class CArgSeqExT_3: public CArgSeqExT <CArgSeqExT <TArg1, TArg2>, TArg3>
+class ArgSeqEx_3: public ArgSeqEx <ArgSeqEx <Arg1, Arg2>, Arg3>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TArg1, 
-	typename TArg2, 
-	typename TArg3, 
-	typename TArg4
+	typename Arg1, 
+	typename Arg2, 
+	typename Arg3, 
+	typename Arg4
 	>
-class CArgSeqExT_4: public CArgSeqExT <CArgSeqExT_3 <TArg1, TArg2, TArg3>, TArg4>
+class ArgSeqEx_4: public ArgSeqEx <ArgSeqEx_3 <Arg1, Arg2, Arg3>, Arg4>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TArg1, 
-	typename TArg2, 
-	typename TArg3, 
-	typename TArg4, 
-	typename TArg5
+	typename Arg1, 
+	typename Arg2, 
+	typename Arg3, 
+	typename Arg4, 
+	typename Arg5
 	>
-class CArgSeqExT_5: public CArgSeqExT <CArgSeqExT_4 <TArg1, TArg2, TArg3, TArg4>, TArg5>
+class ArgSeqEx_5: public ArgSeqEx <ArgSeqEx_4 <Arg1, Arg2, Arg3, Arg4>, Arg5>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TArg1, 
-	typename TArg2, 
-	typename TArg3, 
-	typename TArg4, 
-	typename TArg5, 
-	typename TArg6
+	typename Arg1, 
+	typename Arg2, 
+	typename Arg3, 
+	typename Arg4, 
+	typename Arg5, 
+	typename Arg6
 	>
-class CArgSeqExT_6: public CArgSeqExT <CArgSeqExT_5 <TArg1, TArg2, TArg3, TArg4, TArg5>, TArg6>
+class ArgSeqEx_6: public ArgSeqEx <ArgSeqEx_5 <Arg1, Arg2, Arg3, Arg4, Arg5>, Arg6>
 {
 };
 
@@ -413,9 +413,9 @@ template <
 	typename T1, 
 	typename T2
 	>
-class CArgSeqT_2: public CArgSeqExT <
-	CArgT <T1>, 
-	CArgT <T2>
+class ArgSeq_2: public ArgSeqEx <
+	Arg <T1>, 
+	Arg <T2>
 	>
 {
 };
@@ -427,10 +427,10 @@ template <
 	typename T2, 
 	typename T3
 	>
-class CArgSeqT_3: public CArgSeqExT_3 <
-	CArgT <T1>, 
-	CArgT <T2>,
-	CArgT <T3>
+class ArgSeq_3: public ArgSeqEx_3 <
+	Arg <T1>, 
+	Arg <T2>,
+	Arg <T3>
 	>
 {
 };
@@ -443,11 +443,11 @@ template <
 	typename T3, 
 	typename T4
 	>
-class CArgSeqT_4: public CArgSeqExT_4 <
-	CArgT <T1>, 
-	CArgT <T2>,
-	CArgT <T3>,
-	CArgT <T4>
+class ArgSeq_4: public ArgSeqEx_4 <
+	Arg <T1>, 
+	Arg <T2>,
+	Arg <T3>,
+	Arg <T4>
 	>
 {
 };
@@ -461,12 +461,12 @@ template <
 	typename T4, 
 	typename T5
 	>
-class CArgSeqT_5: public CArgSeqExT_5 <
-	CArgT <T1>, 
-	CArgT <T2>,
-	CArgT <T3>,
-	CArgT <T4>,
-	CArgT <T5>
+class ArgSeq_5: public ArgSeqEx_5 <
+	Arg <T1>, 
+	Arg <T2>,
+	Arg <T3>,
+	Arg <T4>,
+	Arg <T5>
 	>
 {
 };
@@ -481,27 +481,27 @@ template <
 	typename T5, 
 	typename T6
 	>
-class CArgSeqT_6: public CArgSeqExT_6 <
-	CArgT <T1>, 
-	CArgT <T2>,
-	CArgT <T3>,
-	CArgT <T4>,
-	CArgT <T5>,
-	CArgT <T6>
+class ArgSeq_6: public ArgSeqEx_6 <
+	Arg <T1>, 
+	Arg <T2>,
+	Arg <T3>,
+	Arg <T4>,
+	Arg <T5>,
+	Arg <T6>
 	>
 {
 };
 
 //.............................................................................
 
-class CArgBlock: 
+class ArgBlock: 
 	public ref::IRefCount,
-	public mem::TBlock
+	public mem::Block
 {
 public:
-	ref::CPtrT <obj::IType> m_agent;
+	ref::Ptr <obj::IType> m_agent;
 
-	~CArgBlock ()
+	~ArgBlock ()
 	{
 		if (m_agent && m_p)
 			m_agent->destruct (m_p);
@@ -511,22 +511,22 @@ public:
 //.............................................................................
 
 template <typename T>
-ref::CPtrT <CArgBlock> 
+ref::Ptr <ArgBlock> 
 createArgBlockV (axl_va_list va)
 {
 	size_t size = 0;
 	T () (NULL, &size, NULL, va);
 
-	ref::CPtrT <CArgBlock> package = AXL_REF_NEW_EXTRA (CArgBlock, size);
+	ref::Ptr <ArgBlock> package = AXL_REF_NEW_EXTRA (ArgBlock, size);
 	package->m_p = package + 1;
 	package->m_size = size;
 
-	obj::IType* type = AXL_OBJ_TYPEOF (T::CType);
+	obj::IType* type = AXL_OBJ_TYPEOF (T::Type);
 
 	if (T::hasShadow)
 	{
-		typedef ref::CBoxT <typename T::CShadow> CShadow;
-		ref::CPtrT <CShadow> shadow = AXL_REF_NEW (CShadow);		
+		typedef ref::Box <typename T::Shadow> Shadow;
+		ref::Ptr <Shadow> shadow = AXL_REF_NEW (Shadow);		
 		T () (package + 1, &size, shadow, va);
 		package->m_agent.copy (type, shadow.getRefCount ());
 	}
@@ -542,7 +542,7 @@ createArgBlockV (axl_va_list va)
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-ref::CPtrT <CArgBlock> 
+ref::Ptr <ArgBlock> 
 createArgBlock (
 	int unused,
 	...

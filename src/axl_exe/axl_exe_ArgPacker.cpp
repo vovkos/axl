@@ -7,7 +7,7 @@ namespace exe {
 //.............................................................................
 	
 void
-CArgPackerSeq::CAgent::construct (void* _p)
+ArgPackerSeq::Agent::construct (void* _p)
 {
 	size_t count = m_sequence.getCount ();
 
@@ -21,7 +21,7 @@ CArgPackerSeq::CAgent::construct (void* _p)
 }
 
 void
-CArgPackerSeq::CAgent::destruct (void* _p)
+ArgPackerSeq::Agent::destruct (void* _p)
 {
 	size_t count = m_sequence.getCount ();
 
@@ -35,7 +35,7 @@ CArgPackerSeq::CAgent::destruct (void* _p)
 }
 
 void
-CArgPackerSeq::CAgent::copy (
+ArgPackerSeq::Agent::copy (
 	void* _p,
 	const void* _pSrc
 	)
@@ -57,10 +57,10 @@ CArgPackerSeq::CAgent::copy (
 //.............................................................................
 
 axl_va_list
-CArgPackerSeq::packV (
+ArgPackerSeq::packV (
 	void* _p,
 	size_t* size,
-	ref::CPtrT <obj::IType>* agent,
+	ref::Ptr <obj::IType>* agent,
 	axl_va_list va
 	)
 {
@@ -79,13 +79,13 @@ CArgPackerSeq::packV (
 	}
 	else
 	{
-		ref::CPtrT <CAgent> agent = AXL_REF_NEW (CAgent);
+		ref::Ptr <Agent> agent = AXL_REF_NEW (Agent);
 		agent->m_sequence.reserve (count);
 
 		for (size_t i = 0; i < count; i++)
 		{
 			size_t size = 0;
-			ref::CPtrT <obj::IType> subAgent;
+			ref::Ptr <obj::IType> subAgent;
 
 			va = m_sequence [i]->packV (p, &size, &subAgent, va);
 
@@ -103,7 +103,7 @@ CArgPackerSeq::packV (
 }
 
 size_t
-CArgPackerSeq::appendFormat (const char* format)
+ArgPackerSeq::appendFormat (const char* format)
 {
 	const char* pF = format;
 	
@@ -122,7 +122,7 @@ CArgPackerSeq::appendFormat (const char* format)
 		case 'u':
 		case 'x':
 		case 'X':
-			append <CArgT <intptr_t> > ();
+			append <Arg <intptr_t> > ();
 			break;
 
 		case 'e': 
@@ -130,47 +130,47 @@ CArgPackerSeq::appendFormat (const char* format)
 		case 'f':
 		case 'g':
 		case 'G':
-			append <CArgT <double> > ();
+			append <Arg <double> > ();
 			break;
 
 		case 'p':
-			append <CArgT <void*> > ();
+			append <Arg <void*> > ();
 			break;
 			
 #ifdef _UNICODE
 
 		case 's': 
-			append <CArgStringW> ();
+			append <ArgStringW> ();
 			break;
 
 		case 'S': 
-			append <CArgStringA> ();
+			append <ArgStringA> ();
 			break;
 
 		case 'c': 
-			append <CArgT <wchar_t> > ();
+			append <Arg <wchar_t> > ();
 			break;
 
 		case 'C': 
-			append <CArgT <char> > ();
+			append <Arg <char> > ();
 			break;
 
 #else // _UNICODE
 
 		case 's': 
-			append <CArgStringA> ();
+			append <ArgStringA> ();
 			break;
 
 		case 'S': 
-			append <CArgStringW> ();
+			append <ArgStringW> ();
 			break;
 
 		case 'c': 
-			append <CArgT <char> > ();
+			append <Arg <char> > ();
 			break;
 
 		case 'C': 
-			append <CArgT <wchar_t> > ();
+			append <Arg <wchar_t> > ();
 			break;
 
 #endif // _UNICODE

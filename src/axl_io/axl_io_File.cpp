@@ -10,34 +10,34 @@ namespace io {
 #if (_AXL_ENV == AXL_ENV_WIN)
 
 bool
-CFile::open (
+File::open (
 	const char* fileName,
 	uint_t flags
 	)
 {
-	uint_t accessMode = (flags & EFileFlag_ReadOnly) ?
+	uint_t accessMode = (flags & FileFlagKind_ReadOnly) ?
 		GENERIC_READ :
 		GENERIC_READ | GENERIC_WRITE;
 
-	uint_t shareMode = (flags & EFileFlag_Exclusive) ?
+	uint_t shareMode = (flags & FileFlagKind_Exclusive) ?
 		0 :
-		(flags & EFileFlag_ReadOnly) || (flags & EFileFlag_ShareWrite) ?
+		(flags & FileFlagKind_ReadOnly) || (flags & FileFlagKind_ShareWrite) ?
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE :
 			FILE_SHARE_READ;
 
-	uint_t creationDisposition = (flags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)) ?
+	uint_t creationDisposition = (flags & (FileFlagKind_ReadOnly | FileFlagKind_OpenExisting)) ?
 		OPEN_EXISTING :
 		OPEN_ALWAYS;
 
-	uint_t flagsAttributes = (flags & EFileFlag_DeleteOnClose) ?
+	uint_t flagsAttributes = (flags & FileFlagKind_DeleteOnClose) ?
 		FILE_FLAG_DELETE_ON_CLOSE :
 		0;
 
-	if (flags & EFileFlag_Asynchronous)
+	if (flags & FileFlagKind_Asynchronous)
 		flagsAttributes |= FILE_FLAG_OVERLAPPED;
 
 	char buffer [256];
-	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
 	return m_file.create (
@@ -55,19 +55,19 @@ CFile::open (
 uint_t
 getPosixOpenFlags (uint_t fileFlags)
 {
-	uint_t posixFlags = (fileFlags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+	uint_t posixFlags = (fileFlags & FileFlagKind_ReadOnly) ? O_RDONLY : O_RDWR;
 
-	if (!(fileFlags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)))
+	if (!(fileFlags & (FileFlagKind_ReadOnly | FileFlagKind_OpenExisting)))
 		posixFlags |= O_CREAT;
 
-	if (fileFlags & EFileFlag_Asynchronous)
+	if (fileFlags & FileFlagKind_Asynchronous)
 		posixFlags |= O_NONBLOCK;
 
 	return posixFlags;
 }
 
 bool
-CFile::open (
+File::open (
 	const char* fileName,
 	uint_t flags
 	)
@@ -89,13 +89,13 @@ CFile::open (
 #endif
 
 size_t
-CFile::writeFormat_va (
+File::writeFormat_va (
 	const char* formatString,
 	axl_va_list va
 	)
 {
 	char buffer [256];
-	rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.format_va (formatString, va);
 
 	return write (string, string.getLength ());

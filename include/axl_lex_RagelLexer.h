@@ -13,7 +13,7 @@ namespace lex {
 
 //.............................................................................
 	
-class CRagelTokenPos: public CLineCol
+class RagelokenPos: public LineCol
 {
 public:
 	size_t m_offset;
@@ -22,7 +22,7 @@ public:
 	char* m_p;
 
 public:
-	CRagelTokenPos ()
+	RagelokenPos ()
 	{
 		m_offset = 0;
 		m_length = 0;
@@ -33,28 +33,28 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TEnum,
-	typename TGetName,
-	typename TData = CStdTokenData
+	typename Enum,
+	typename GetName,
+	typename Data = StdokenData
 	>
-class CRagelTokenT: public CTokenT <TEnum, TGetName, TData, CRagelTokenPos>
+class RagelToken: public Token <Enum, GetName, Data, RagelokenPos>
 {
 public:
-	rtl::CString
+	rtl::String
 	getText () const
 	{
-		return rtl::CString (this->m_pos.m_p, this->m_pos.m_length); // thanks a lot gcc
+		return rtl::String (this->m_pos.m_p, this->m_pos.m_length); // thanks a lot gcc
 	}
 
 	static
-	rtl::CString 
-	getTokenListString (const rtl::CConstBoxListT <CRagelTokenT>& list)
+	rtl::String 
+	getTokenListString (const rtl::ConstBoxList <RagelToken>& list)
 	{
 		if (list.isEmpty ())
-			return rtl::CString ();
+			return rtl::String ();
 
-		rtl::CBoxIteratorT <CRagelTokenT> token = list.getHead ();
-		rtl::CString string (token->m_pos.m_p, token->m_pos.m_length);
+		rtl::BoxIterator <RagelToken> token = list.getHead ();
+		rtl::String string (token->m_pos.m_p, token->m_pos.m_length);
 		for (token++; token; token++)
 		{
 			string.append (' ');
@@ -67,29 +67,29 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CRagelTokenT <int, CStdTokenData> CStdRagelToken;
+typedef RagelToken <int, StdokenData> StdRageloken;
 
 //.............................................................................
 
 template <
 	typename T,
-	typename TToken = CStdRagelToken
+	typename Token = StdRageloken
 	>
-class CRagelLexerT: public CLexerT <T, TToken>
+class RagelLexer: public Lexer <T, Token>
 {
-	friend class CLexerT <T, TToken>;
+	friend class Lexer <T, Token>;
 
 protected:
 	size_t m_tokenizeLimit;
 	size_t m_tokenizeCount;
 
-	rtl::CString m_filePath;
+	rtl::String m_filePath;
 
 	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
 
-	rtl::CArrayT <int> m_stack; // stack of states
+	rtl::Array <int> m_stack; // stack of states
 
 	// ragel interface variables
 
@@ -104,7 +104,7 @@ protected:
 	int* stack;
 
 public:
-	CRagelLexerT ()
+	RagelLexer ()
 	{
 		onReset ();
 	}
@@ -125,8 +125,8 @@ public:
 	bool
 	create (
 		int state,
-		const rtl::CString& filePath,
-		const rtl::CString& source
+		const rtl::String& filePath,
+		const rtl::String& source
 		)
 	{
 		return create (state, filePath, source, source.getLength ());
@@ -134,8 +134,8 @@ public:
 
 	bool
 	create (
-		const rtl::CString& filePath,
-		const rtl::CString& source
+		const rtl::String& filePath,
+		const rtl::String& source
 		)
 	{
 		return create (filePath, source, source.getLength ());
@@ -144,7 +144,7 @@ public:
 	bool
 	create (
 		int state,
-		const rtl::CString& filePath,
+		const rtl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)
@@ -156,7 +156,7 @@ public:
 
 	bool
 	create (
-		const rtl::CString& filePath,
+		const rtl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)
@@ -174,22 +174,22 @@ public:
 		return true;
 	}
 
-	const TToken*
+	const Token*
 	expectToken (int tokenKind)
 	{
-		const TToken* token = this->getToken (); 
+		const Token* token = this->getToken (); 
 		if (token->m_token == tokenKind)
 			return token;
 
-		err::setExpectedTokenError (TToken::getName (token), token->getName ());
+		err::setExpectedTokenError (Token::getName (token), token->getName ());
 		return NULL;
 	}
 
 	void
 	ensureSrcPosError ()
 	{
-		err::CError error = err::getError ();
-		if (!error->isKind (err::GUID_ParseError, err::EParseError_SrcPos))
+		err::Error error = err::getError ();
+		if (!error->isKind (err::GUID_ParseError, err::ParseErrorKind_SrcPos))
 			err::pushSrcPosError (
 				m_filePath, 
 				this->m_lastTokenPos.m_line, 
@@ -197,22 +197,22 @@ public:
 				);
 	}
 
-	enum EGotoState
+	enum GotoStateKind
 	{
-		EGotoState_ReparseToken,
-		EGotoState_EatToken,
+		GotoStateKind_ReparseToken,
+		GotoStateKind_EatToken,
 	};
 
 	void 
 	gotoState (
 		int state,
-		const TToken* token,
-		EGotoState kind
+		const Token* token,
+		GotoStateKind kind
 		)
 	{
 		p = m_begin + token->m_pos.m_offset;
 
-		if (kind == EGotoState_EatToken)
+		if (kind == GotoStateKind_EatToken)
 			p += token->m_pos.m_length;
 
 		m_lineOffset = token->m_pos.m_offset - token->m_pos.m_col;
@@ -243,7 +243,7 @@ public:
 	}
 
 	void
-	setLineCol (const CLineCol& lineCol)
+	setLineCol (const LineCol& lineCol)
 	{
 		setLineCol (lineCol.m_line, lineCol.m_col);
 	}
@@ -290,7 +290,7 @@ protected:
 	{	
 	}
 	
-	TToken*
+	Token*
 	preCreateToken (
 		int tokenKind,
 		size_t channel = 0
@@ -299,7 +299,7 @@ protected:
 		size_t offset = ts - m_begin;
 		size_t length = te - ts;
 
-		TToken* token = this->allocateToken (); 
+		Token* token = this->allocateToken (); 
 		token->m_token = tokenKind;
 		token->m_channel = channel;
 		token->m_pos.m_offset = offset;
@@ -318,21 +318,21 @@ protected:
 			stop ();
 	}
 
-	TToken*
+	Token*
 	createToken (
 		int tokenKind,
 		size_t channel = 0
 		)
 	{
-		TToken* token = preCreateToken (tokenKind, channel);
+		Token* token = preCreateToken (tokenKind, channel);
 		postCreateToken ();
 		return token;
 	}
 
-	TToken*
+	Token*
 	createErrorToken (int c)
 	{
-		TToken* token = createToken (-1);
+		Token* token = createToken (-1);
 		token->m_data.m_integer = c;
 		postCreateToken ();
 		return token;

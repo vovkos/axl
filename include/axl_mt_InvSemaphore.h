@@ -14,15 +14,15 @@ namespace mt {
 
 //.............................................................................
 
-class CInvSemaphore: public CEvent
+class InvSemaphore: public Event
 {
 protected:
-	CLock m_lock;
+	Lock m_lock;
 	intptr_t m_count;
 
 public:
-	CInvSemaphore (intptr_t count = 0):
-		CEvent (CEvent::EKind_Notification)
+	InvSemaphore (intptr_t count = 0):
+		Event (Event::KindKind_Notification)
 	{
 		setImpl (count);
 	}

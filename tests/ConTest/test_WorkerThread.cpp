@@ -21,45 +21,45 @@ void onEvent (int i)
 void 
 run ()
 {
-	ref::CPtrT <exe::CWorkerThread> workerThread = exe::getWorkerThread (2);
+	ref::Ptr <exe::Workerhread> workerThread = exe::getWorkerThread (2);
 
 	printf ("Main thread TID: %x\n", getCurrentThreadId ());
 
-	workerThread->schedule <exe::CArgSeqT_3 < 
+	workerThread->schedule <exe::ArgSeq_3 < 
 		char,
 		char,
 		const char*
-		> > (foo, 100, 101, rtl::CString ("hui"));
+		> > (foo, 100, 101, rtl::String ("hui"));
 
-	workerThread->schedule <exe::CArgSeqT_3 < 
+	workerThread->schedule <exe::ArgSeq_3 < 
 		short,
 		short,
 		const char*
-		> > (foo, 200, 201, rtl::CString ("govno"));
+		> > (foo, 200, 201, rtl::String ("govno"));
 
-	workerThread->schedule <exe::CArgSeqT_3 < 
+	workerThread->schedule <exe::ArgSeq_3 < 
 		int,
 		int,
 		const char*
-		> > (foo, 300, 301, rtl::CString ("muravei"));
+		> > (foo, 300, 301, rtl::String ("muravei"));
 
-	mt::CEvent event1;
+	mt::Event event1;
 
 	workerThread->addEvent (
 		&event1, 
-		&exe::CFunctionT <
-			exe::CArgT <int>,  
-			exe::CArgT <void>
+		&exe::Function <
+			exe::Arg <int>,  
+			exe::Arg <void>
 			> (onEvent, 1)
 		);
 
-	mt::CEvent event2;
+	mt::Event event2;
 
 	workerThread->addEvent (
 		&event2, 
-		&exe::CFunctionT <
-			exe::CArgT <int>,  
-			exe::CArgT <void>
+		&exe::Function <
+			exe::Arg <int>,  
+			exe::Arg <void>
 			> (onEvent, 2)
 		);
 

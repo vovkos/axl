@@ -15,20 +15,20 @@ namespace lex {
 
 //.............................................................................
 
-class CLineCol
+class LineCol
 {
 public:
 	int m_line;
 	int m_col;
 
 public:
-	CLineCol ()
+	LineCol ()
 	{
 		m_line = 0;
 		m_col = 0;
 	}
 
-	CLineCol (
+	LineCol (
 		int line,
 		int col
 		)
@@ -47,37 +47,37 @@ public:
 
 //.............................................................................
 
-class CSrcPos: public CLineCol
+class SrcPos: public LineCol
 {
 public:
-	rtl::CString m_filePath;
+	rtl::String m_filePath;
 
 public:
-	CSrcPos ()
+	SrcPos ()
 	{
 	}
 
-	CSrcPos (
-		const rtl::CString& filePath,
-		const CLineCol& lineCol
+	SrcPos (
+		const rtl::String& filePath,
+		const LineCol& lineCol
 		):
-		CLineCol (lineCol)
+		LineCol (lineCol)
 	{
 		m_filePath = filePath;
 	}
 
-	CSrcPos (
-		const rtl::CString& filePath,
+	SrcPos (
+		const rtl::String& filePath,
 		int line,
 		int col
 		):
-		CLineCol (line, col)
+		LineCol (line, col)
 	{
 		m_filePath = filePath;
 	}
 
-	CSrcPos&
-	operator = (const CLineCol& lineCol)
+	SrcPos&
+	operator = (const LineCol& lineCol)
 	{
 		m_line = lineCol.m_line;
 		m_col = lineCol.m_col;
@@ -89,7 +89,7 @@ public:
 
 // std token should be enough for most implementations
 
-class CStdTokenData
+class StdokenData
 {
 public:
 	union
@@ -103,10 +103,10 @@ public:
 		double m_double;
 	};
 
-	rtl::CString m_string;
+	rtl::String m_string;
 
 public:
-	CStdTokenData ()
+	StdokenData ()
 	{ 
 		m_int64 = 0;
 	}
@@ -115,36 +115,36 @@ public:
 //.............................................................................
 
 template <
-	typename TEnum,
-	typename TName,
-	typename TData = CStdTokenData,
-	typename TPos = CLineCol
+	typename Enum,
+	typename Name,
+	typename Data = StdokenData,
+	typename Pos = LineCol
 	>
-class CTokenT
+class Token
 {
 public:
-	typedef TEnum EToken;
-	typedef TName CName;
-	typedef TData CData;
-	typedef TPos CPos;
+	typedef Enum TokenKind;
+	typedef Name Name;
+	typedef Data Data;
+	typedef Pos Pos;
 
 public:
 	union // it's nice to see it in debugger
 	{
 		int m_token;
-		EToken m_enumToken;
+		TokenKind m_enumToken;
 		char m_charToken;
 		wchar_t m_WCharToken;
 	};
 
 	size_t m_channel;
-	CData m_data;
-	CPos m_pos;
+	Data m_data;
+	Pos m_pos;
 	
 	// define token value in derived class
 
 public:
-	CTokenT ()
+	Token ()
 	{ 
 		m_token = 0;
 		m_channel = 0;
@@ -154,7 +154,7 @@ public:
 	const char*
 	getName (int token)
 	{
-		return CName () (token);
+		return Name () (token);
 	}
 
 	const char*
@@ -166,8 +166,8 @@ public:
 
 //.............................................................................
 
-#define AXL_LEX_BEGIN_TOKEN_NAME_MAP(CClass) \
-class CClass \
+#define AXL_LEX_BEGIN_TOKEN_NAME_MAP(Class) \
+class Class \
 { \
 public: \
 	const char* \

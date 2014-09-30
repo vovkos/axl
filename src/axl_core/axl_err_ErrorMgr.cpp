@@ -13,73 +13,73 @@ namespace err {
 
 //.............................................................................
 
-CErrorMgr::CErrorMgr ()
+ErrorMgr::ErrorMgr ()
 {
 	m_tlsSlot = mt::getTlsMgr ()->createSlot ();
 
-	registerProvider (GUID_StdError, rtl::getSimpleSingleton <CStdErrorProvider> ());
-	registerProvider (GUID_Errno, rtl::getSimpleSingleton <CErrnoProvider> ());
+	registerProvider (GUID_StdError, rtl::getSimpleSingleton <StdErrorProvider> ());
+	registerProvider (GUID_Errno, rtl::getSimpleSingleton <ErrnoProvider> ());
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	registerProvider (GUID_WinError, rtl::getSimpleSingleton <CWinErrorProvider> ());
-	registerProvider (GUID_NtError, rtl::getSimpleSingleton <CNtErrorProvider> ());
+	registerProvider (GUID_WinError, rtl::getSimpleSingleton <WinErrorProvider> ());
+	registerProvider (GUID_NtError, rtl::getSimpleSingleton <NtErrorProvider> ());
 #endif
 }
 
 void
-CErrorMgr::registerProvider (
-	const rtl::TGuid& guid,
-	CErrorProvider* provider
+ErrorMgr::registerProvider (
+	const rtl::Guid& guid,
+	ErrorProvider* provider
 	)
 {
-	mt::CScopeLock scopeLock (&m_lock);
+	mt::ScopeLock scopeLock (&m_lock);
 	m_providerMap.visit (guid)->m_value = provider;
 }
 
-CErrorProvider* 
-CErrorMgr::findProvider (const rtl::TGuid& guid)
+ErrorProvider* 
+ErrorMgr::findProvider (const rtl::Guid& guid)
 {
-	mt::CScopeLock scopeLock (&m_lock);
-	rtl::CHashTableMapIteratorT <rtl::TGuid, CErrorProvider*> it = m_providerMap.find (guid);
+	mt::ScopeLock scopeLock (&m_lock);
+	rtl::HashTableMapIterator <rtl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
 	return it ? it->m_value : NULL;
 }
 
-EErrorMode
-CErrorMgr::setErrorMode (EErrorMode mode)
+ErrorModeKind
+ErrorMgr::setErrorMode (ErrorModeKind mode)
 {
-	TThreadEntry* entry = getThreadEntry ();
-	EErrorMode oldMode = entry->m_mode;
+	ThreadEntry* entry = getThreadEntry ();
+	ErrorModeKind oldMode = entry->m_mode;
 	entry->m_mode = mode;
 	return oldMode;
 }
 
-CError
-CErrorMgr::getError ()
+Error
+ErrorMgr::getError ()
 {
-	TThreadEntry* entry = findThreadEntry ();
+	ThreadEntry* entry = findThreadEntry ();
 	if (entry && entry->m_error)
 		return entry->m_error;
 
-	return noError;
+	return g_noError;
 }
 
 void
-CErrorMgr::setError (const CError& error)
+ErrorMgr::setError (const Error& error)
 {	
-	TThreadEntry* entry = getThreadEntry ();
+	ThreadEntry* entry = getThreadEntry ();
 	entry->m_error = error;
-	TThreadEntry* entry2 = findThreadEntry ();
+	ThreadEntry* entry2 = findThreadEntry ();
 	
 	switch (entry->m_mode)
 	{
-	case EErrorMode_NoThrow:
+	case ErrorModeKind_NoThrow:
 		break;
 
-	case EErrorMode_CppException:
+	case ErrorModeKind_CppException:
 		throw error;
 
-	case EErrorMode_SehException:
-	case EErrorMode_SetJmpLongJmp:
+	case ErrorModeKind_SehException:
+	case ErrorModeKind_SetJmpLongJmp:
 		TRACE ("*** unsupported error mode\n");
 
 	default:
@@ -87,14 +87,14 @@ CErrorMgr::setError (const CError& error)
 	}
 }
 
-CErrorMgr::TThreadEntry*
-CErrorMgr::getThreadEntry ()
+ErrorMgr::ThreadEntry*
+ErrorMgr::getThreadEntry ()
 {
-	TThreadEntry* entry = findThreadEntry ();
+	ThreadEntry* entry = findThreadEntry ();
 	if (entry)
 		return entry;
 
-	ref::CPtrT <TThreadEntry> newEntry = AXL_REF_NEW (ref::CBoxT <TThreadEntry>);
+	ref::Ptr <ThreadEntry> newEntry = AXL_REF_NEW (ref::Box <ThreadEntry>);
 	mt::getTlsMgr ()->setSlotValue (m_tlsSlot, newEntry);
 	return newEntry;
 }

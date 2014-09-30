@@ -14,7 +14,7 @@ namespace rtl {
 //.............................................................................
 
 template <typename T>
-class CUnpackStringT
+class UnpackStringBase
 {
 public:
 	size_t
@@ -24,7 +24,7 @@ public:
 		const T** value
 		)
 	{
-		size_t length = CStringDetailsT <T>::calcLength ((T*) p);
+		size_t length = StringDetailsBase <T>::calcLength ((T*) p);
 		size_t stringSize = (length + 1) * sizeof (T);
 
 		if (size < stringSize)
@@ -48,7 +48,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CUnpackPtrT
+class UnpackPtr
 {
 public:
 	size_t
@@ -69,15 +69,18 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CUnpackStringT <char>    CUnpackString;
-typedef CUnpackStringT <wchar_t> CUnpackString_w;
+typedef UnpackStringBase <char>    UnpackString;
+typedef UnpackStringBase <wchar_t> UnpackString_w;
+typedef UnpackStringBase <utf8_t>  UnpackString_utf8;
+typedef UnpackStringBase <utf16_t> UnpackString_utf16;
+typedef UnpackStringBase <utf32_t> UnpackString_utf32;
 
 //.............................................................................
 
 // most common case
 
 template <typename T>
-class CUnpackT
+class Unpack
 {
 public:
 	size_t
@@ -100,22 +103,22 @@ public:
 // specialization for strings
 
 template <>
-class CUnpackT <char*>: public CUnpackStringT <char>
+class Unpack <char*>: public UnpackStringBase <char>
 {
 };
 
 template <>
-class CUnpackT <const char*>: public CUnpackStringT <char>
+class Unpack <const char*>: public UnpackStringBase <char>
 {
 };
 
 template <>
-class CUnpackT <wchar_t*>: public CUnpackStringT <wchar_t>
+class Unpack <wchar_t*>: public UnpackStringBase <wchar_t>
 {
 };
 
 template <>
-class CUnpackT <const wchar_t*>: public CUnpackStringT <wchar_t>
+class Unpack <const wchar_t*>: public UnpackStringBase <wchar_t>
 {
 };
 
@@ -124,13 +127,13 @@ class CUnpackT <const wchar_t*>: public CUnpackStringT <wchar_t>
 // specialization for pointers
 
 template <typename T>
-class CUnpackT <T*>: public CUnpackPtrT <T>
+class Unpack <T*>: public UnpackPtr <T>
 {
 };
 
 //.............................................................................
 
-class CUnpacker
+class Unpacker
 {
 protected:
 	const void* m_begin;
@@ -138,12 +141,12 @@ protected:
 	size_t m_size;
 
 public:
-	CUnpacker ()
+	Unpacker ()
 	{
 		setup (NULL, 0);
 	}
 
-	CUnpacker (
+	Unpacker (
 		const void* p,
 		size_t size
 		)
@@ -188,13 +191,13 @@ public:
 
 	template <
 		typename T,
-		typename TUnpack
+		typename Unpack
 		>
 	bool
 	unpack (T* value)
 	{
 		size_t leftoverSize = getLeftoverSize ();
-		size_t size = TUnpack () (m_current, leftoverSize, value);
+		size_t size = Unpack () (m_current, leftoverSize, value);
 		if (size > leftoverSize)
 			return false;
 
@@ -206,7 +209,7 @@ public:
 	bool
 	unpack (T* value)
 	{
-		return unpack <T, CUnpackT <T> > (value);
+		return unpack <T, Unpack <T> > (value);
 	}
 
 	size_t

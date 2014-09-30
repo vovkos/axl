@@ -55,9 +55,9 @@ any          ;
 
 main := |*
 
-'%{'         { createToken (EToken_OpenCode); };
-'$('         { createToken (EToken_OpenData); };
-'$' id       { createStringToken (EToken_Data, 1); };
+'%{'         { createToken (TokenKind_OpenCode); };
+'$('         { createToken (TokenKind_OpenData); };
+'$' id       { createStringToken (TokenKind_Data, 1); };
 nl           ;
 any          ;
 
@@ -68,29 +68,29 @@ any          ;
 //.............................................................................
 
 void 
-CLexer::init ()
+Lexer::init ()
 {
 	%% write init;
 }
 
 void
-CLexer::exec ()
+Lexer::exec ()
 {
 	%% write exec;
 }
 
 int
-CLexer::getMachineState (ELexerMachine machine)
+Lexer::getMachineState (LexerMachineKind machine)
 {
 	switch (machine)
 	{
-	case ELexerMachine_Main:
+	case LexerMachineKind_Main:
 		return axl_lua_st_en_main;
 
-	case ELexerMachine_UserCode:
+	case LexerMachineKind_UserCode:
 		return axl_lua_st_en_user_code;
 
-	case ELexerMachine_UserData:
+	case LexerMachineKind_UserData:
 		return axl_lua_st_en_user_data;
 
 	default:

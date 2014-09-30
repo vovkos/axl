@@ -9,13 +9,13 @@ namespace gui {
 
 //.............................................................................
 
-CGdiImage::CGdiImage ()
+GdiImage::GdiImage ()
 {
-	m_engine = CGdiEngine::getSingleton ();
+	m_engine = GdiEngine::getSingleton ();
 }
 
 bool
-CGdiImage::getData (
+GdiImage::getData (
 	void* data,
 	int left,
 	int top,
@@ -36,7 +36,7 @@ CGdiImage::getData (
 	bitmapInfo.bmiHeader.biWidth = m_size.m_width;
 	bitmapInfo.bmiHeader.biHeight = m_size.m_height;
 
-	CScreenDc screenDc;
+	ScreenDc screenDc;
 
 	if (width == m_size.m_width)
 	{
@@ -45,7 +45,7 @@ CGdiImage::getData (
 	}
 	
 	char buffer [1024];
-	rtl::CArrayT <uint_t> colorBuffer (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::Array <uint_t> colorBuffer (ref::BufKind_Stack, buffer, sizeof (buffer));
 	colorBuffer.setCount (m_size.m_width * height);
 
 	result = ::GetDIBits (screenDc, m_h, top, height, colorBuffer, &bitmapInfo, DIB_RGB_COLORS);

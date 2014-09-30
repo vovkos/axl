@@ -18,36 +18,36 @@ namespace exe {
 
 //.............................................................................
 
-class CWorkerThread: 
-	public mt::CThreadImplT <CWorkerThread>,
+class Workerhread: 
+	public mt::ThreadImpl <Workerhread>,
 	public exe::IScheduler
 { 
 public:
-	AXL_OBJ_CLASS_0 (CWorkerThread, exe::IScheduler)
+	AXL_OBJ_CLASS_0 (Workerhread, exe::IScheduler)
 
 protected:
-	struct TUserEvent: rtl::TListLink
+	struct UserEvent: rtl::ListLink
 	{
-		mt::CEvent* m_event;
-		ref::CPtrT <exe::IFunction> m_onEvent;
+		mt::Event* m_event;
+		ref::Ptr <exe::IFunction> m_onEvent;
 	};
 
 protected:
-	mt::CLock m_lock;
-	mt::CEvent m_event; 
-	exe::CInvokeList m_invokeList;
+	mt::Lock m_lock;
+	mt::Event m_event; 
+	exe::InvokeList m_invokeList;
 	bool m_terminateFlag;
 
 	// these are touched only within the worker thread
 
-	rtl::CStdListT <TUserEvent> m_userEventList;
-	rtl::CArrayT <mt::CEvent*> m_waitArray;
-	rtl::CArrayT <exe::IFunction*> m_functionArray;
+	rtl::StdList <UserEvent> m_userEventList;
+	rtl::Array <mt::Event*> m_waitArray;
+	rtl::Array <exe::IFunction*> m_functionArray;
 
 public:
-	CWorkerThread ();
+	Workerhread ();
 	
-	~CWorkerThread ()
+	~Workerhread ()
 	{
 		stop ();
 	}
@@ -63,7 +63,7 @@ public:
 
 	handle_t
 	addEvent (
-		mt::CEvent* event, 
+		mt::Event* event, 
 		exe::IFunction* onEvent
 		);
 
@@ -73,7 +73,7 @@ public:
 	// IScheduler
 
 	virtual 
-	EScheduleResult
+	ScheduleResultKind
 	scheduleV (
 		exe::IFunction* function, 
 		axl_va_list va
@@ -85,22 +85,22 @@ public:
 	threadProc ();
 
 protected:
-	TUserEvent*
+	UserEvent*
 	AXL_CDECL
 	addEvent_wt (
-		mt::CEvent* event,
+		mt::Event* event,
 		exe::IFunction* onEvent
 		);
 
 	void
 	AXL_CDECL
-	removeEvent_wt (TUserEvent* userEvent);
+	removeEvent_wt (UserEvent* userEvent);
 
 	bool
 	process_wt ();
 
 	bool 
-	CWorkerThread::canInvokeNow ();
+	Workerhread::canInvokeNow ();
 
 	void
 	signalStop ();
@@ -108,12 +108,12 @@ protected:
 
 //.............................................................................
 
-ref::CPtrT <CWorkerThread>
+ref::Ptr <Workerhread>
 getWorkerThread (size_t reserveEventCount = 0);
 
-ref::CPtrT <CWorkerThread>
+ref::Ptr <Workerhread>
 getWorkerThread (
-	mt::CEvent* event,
+	mt::Event* event,
 	exe::IFunction* onEvent,
 	handle_t* phEvent
 	);

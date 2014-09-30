@@ -14,14 +14,14 @@ namespace psx {
 
 //.............................................................................
 
-class CSem
+class Sem
 {
 protected:
 	sem_t* m_sem;
 	sem_t m_unnamedSem;
 
 public:
-	CSem (
+	Sem (
 		bool isShared = false,
 		uint_t value = 0
 		)
@@ -30,7 +30,7 @@ public:
 		init (isShared, value);
 	}
 
-	~CSem ()
+	~Sem ()
 	{
 		close ();
 	}

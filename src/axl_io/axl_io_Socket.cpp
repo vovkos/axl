@@ -7,8 +7,8 @@ namespace io {
 //.............................................................................
 
 bool
-CSocket::accept (
-	CSocket* socket,
+Socket::accept (
+	Socket* socket,
 	sockaddr* addr
 	)
 {

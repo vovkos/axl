@@ -5,7 +5,7 @@
 
 bool 
 myLogRepresenter::represent (
-	log::CRepresenterTarget* target, 
+	log::Representerarget* target, 
 	uint_t packetCode, 
 	const void* p, 
 	size_t size, 
@@ -16,21 +16,21 @@ myLogRepresenter::represent (
 
 	switch (packetCode)
 	{
-	case EMyLog_DeviceOpened:
+	case MyLogKind_DeviceOpened:
 		target->m_lineAttr.m_iconIdx = 3;
-		target->m_lineAttr.m_backColor = gui::EStdColor_PastelYellow;
-		target->m_lineAttr.m_flags = log::ELineAttrFlag_Delimiter;			 
+		target->m_lineAttr.m_backColor = gui::StdColorKind_PastelYellow;
+		target->m_lineAttr.m_flags = log::LineAttrFlagKind_Delimiter;			 
 
 		target->addHyperText(
 			"Device <#0000ff>COM3<> is...<+b>opened<> <=!5,3>nahui!<>\n"
 			"Vot <+is>tak<> vot!!"
 			);
 
-		target->m_lineAttr.m_backColor = gui::EColorFlag_Transparent;
+		target->m_lineAttr.m_backColor = gui::ColorFlagKind_Transparent;
 		target->addBin (data, sizeof (data));
 		break;
 
-	case EMyLog_DeviceClosed:
+	case MyLogKind_DeviceClosed:
 		target->m_lineAttr.m_iconIdx = 2;
 
 		if (!(foldFlags & 1))
@@ -43,39 +43,39 @@ myLogRepresenter::represent (
 				"  bla bla bla");
 		break;
 
-	case EMyLog_Connect:
+	case MyLogKind_Connect:
 		target->m_lineAttr.m_iconIdx = 4;
-		target->m_lineAttr.m_backColor = gui::EStdColor_PastelBlue;
+		target->m_lineAttr.m_backColor = gui::StdColorKind_PastelBlue;
 		target->addHyperText(
-			EMyLog_Connect_m | log::EPacketCodeFlag_MergeableForward,
+			MyLogKind_Connect_m | log::PacketCodeFlagKind_MergeableForward,
 			"Connecting..."
 			);
 		break;
 
-	case EMyLog_ConnectComplete:
-		target->m_lineAttr.m_flags = log::ELineAttrFlag_Override;
+	case MyLogKind_ConnectComplete:
+		target->m_lineAttr.m_flags = log::LineAttrFlagKind_Override;
 		target->m_lineAttr.m_iconIdx = 1;
-		target->m_lineAttr.m_backColor = gui::EStdColor_PastelBlue;
+		target->m_lineAttr.m_backColor = gui::StdColorKind_PastelBlue;
 
 		target->addHyperText(
-			EMyLog_Connect_m | log::EPacketCodeFlag_MergeableBackward,
+			MyLogKind_Connect_m | log::PacketCodeFlagKind_MergeableBackward,
 			"OK!"
 			);
 		break;
 
-	case EMyLog_ConnectError:
-		target->m_lineAttr.m_flags = log::ELineAttrFlag_Override;
+	case MyLogKind_ConnectError:
+		target->m_lineAttr.m_flags = log::LineAttrFlagKind_Override;
 		target->m_lineAttr.m_iconIdx = 0;
-		target->m_lineAttr.m_backColor = gui::EStdColor_PastelRed;
+		target->m_lineAttr.m_backColor = gui::StdColorKind_PastelRed;
 		target->addHyperText(
-			EMyLog_Connect_m | log::EPacketCodeFlag_MergeableBackward,
+			MyLogKind_Connect_m | log::PacketCodeFlagKind_MergeableBackward,
 			"<\b*>FAIL!"
 			);
 		break;
 
-	case EMyLog_Bin:
+	case MyLogKind_Bin:
 		target->m_lineAttr.m_iconIdx = 8;
-		target->m_lineAttr.m_flags |= log::ELineAttrFlag_TileIcon;
+		target->m_lineAttr.m_flags |= log::LineAttrFlagKind_TileIcon;
 		target->addBin(p, size);
 		break;
 

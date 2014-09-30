@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class CCloseHandle
+class CloseHandle
 {
 public:
 	void
@@ -27,11 +27,11 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef rtl::CHandleT <HANDLE, CCloseHandle> CHandle;
+typedef rtl::Handle <HANDLE, CloseHandle> Handle;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CFileHandle: public rtl::CHandleT <HANDLE, CCloseHandle, rtl::CMinusOneT <HANDLE> >
+class FileHandle: public rtl::Handle <HANDLE, CloseHandle, rtl::MinusOne <HANDLE> >
 {
 public:
 	static
@@ -47,7 +47,7 @@ public:
 
 //.............................................................................
 
-class CCloseRegKey
+class CloseRegKey
 {
 public:
 	void
@@ -59,7 +59,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef rtl::CHandleT <HKEY, CCloseRegKey, rtl::CMinusOneT <HKEY> > CRegKeyHandle;
+typedef rtl::Handle <HKEY, CloseRegKey, rtl::MinusOne <HKEY> > RegKeyHandle;
 
 //.............................................................................
 

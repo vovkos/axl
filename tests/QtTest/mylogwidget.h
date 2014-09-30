@@ -4,22 +4,22 @@
 
 //.............................................................................
 
-class myLogWidget: public log::CWidget
+class myLogWidget: public log::Widget
 {
 public:
-	myLogWidget (gui::CEngine* engine):
-		log::CWidget (engine)
+	myLogWidget (gui::Engine* engine):
+		log::Widget (engine)
 	{
 	}
 	
 protected:
 	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
-		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, onKeyDown)
-	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::CWidget)
+		AXL_GUI_WIDGET_MSG_HANDLER (gui::WidgetMsgKind_KeyDown, onKeyDown)
+	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::Widget)
 
 	void
 	onKeyDown (
-		gui::TWidgetMsg* msg,
+		gui::WidgetMsg* msg,
 		bool* isHandled
 		);
 };

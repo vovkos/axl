@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class CSerial: public g::win::CFileHandle
+class Serial: public g::win::FileHandle
 {
 public:
 	bool

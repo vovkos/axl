@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class CEvent: public CWaitableHandle
+class Event: public WaitableHandle
 {
 public:
 	bool 

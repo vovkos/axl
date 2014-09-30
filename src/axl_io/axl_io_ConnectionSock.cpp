@@ -8,10 +8,10 @@ namespace io {
 //.............................................................................
 
 bool
-CConnectionSock::open (
-	ESockProto protocol,
-	ESockAddr addrKind,
-	const TSockAddr* addr
+ConnectionSock::open (
+	SockProtoKind protocol,
+	SockAddrKind addrKind,
+	const SockAddr* addr
 	)
 {
 	close ();
@@ -32,8 +32,8 @@ CConnectionSock::open (
 			return false;
 	}
 
-	exe::CFunctionT <exe::CArgT <CConnectionSock*>, exe::CArgT <void> > onEvent (
-		pvoid_cast (&CConnectionSock::onSocketEvent_wt), 
+	exe::Function <exe::Arg <ConnectionSock*>, exe::Arg <void> > onEvent (
+		pvoid_cast (&ConnectionSock::onSocketEvent_wt), 
 		this
 		);
 
@@ -45,34 +45,34 @@ CConnectionSock::open (
 }
 
 void
-CConnectionSock::close ()
+ConnectionSock::close ()
 {
 	if (!isOpen ())
 		return;
 
-	m_workerThread->syncSchedule <exe::CArgT <CConnectionSock*> > (
-		pvoid_cast (&CConnectionSock::close_wt),
+	m_workerThread->syncSchedule <exe::Arg <ConnectionSock*> > (
+		pvoid_cast (&ConnectionSock::close_wt),
 		this
 		);
 }
 
 bool 
-CConnectionSock::connect (
-	const TSockAddr* addr,
+ConnectionSock::connect (
+	const SockAddr* addr,
 	uint_t timeout,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
-		CConnectionSock*,
-		TSockAddr*,
+	return m_workerThread->syncSchedule <exe::ArgSeq_4 <
+		ConnectionSock*,
+		SockAddr*,
 		uint_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::connect_wt),
+		pvoid_cast (&ConnectionSock::connect_wt),
 		this,
 		addr,
 		timeout,
@@ -81,20 +81,20 @@ CConnectionSock::connect (
 }
 
 bool 
-CConnectionSock::disconnect (
+ConnectionSock::disconnect (
 	uint_t timeout,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_3 <
-		CConnectionSock*,
+	return m_workerThread->syncSchedule <exe::ArgSeq_3 <
+		ConnectionSock*,
 		uint_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::disconnect_wt),
+		pvoid_cast (&ConnectionSock::disconnect_wt),
 		this,
 		timeout,
 		onComplete
@@ -103,9 +103,9 @@ CConnectionSock::disconnect (
 
 void 
 onSyncConnectDisconnectComplete (
-	mt::CEvent* event,
-	err::CError* error,
-	const err::CError& error
+	mt::Event* event,
+	err::Error* error,
+	const err::Error& error
 	)
 {
 	if (error)
@@ -115,17 +115,17 @@ onSyncConnectDisconnectComplete (
 }
 
 bool 
-CConnectionSock::syncConnect (
-	const TSockAddr* addr,
+ConnectionSock::syncConnect (
+	const SockAddr* addr,
 	uint_t timeout
 	)
 {
-	mt::CEvent event;
-	err::CError error;
+	mt::Event event;
+	err::Error error;
 	
-	exe::CFunctionT <
-		exe::CArgSeqT_2 <mt::CEvent*, err::CError*>,
-		COnConnectCompleteArg
+	exe::Function <
+		exe::ArgSeq_2 <mt::Event*, err::Error*>,
+		OnConnectCompleteArg
 		> onComplete (onSyncConnectDisconnectComplete, &event, &error);
 
 	connect (addr, timeout, &onComplete);
@@ -141,14 +141,14 @@ CConnectionSock::syncConnect (
 }
 
 bool 
-CConnectionSock::syncDisconnect (uint_t timeout)
+ConnectionSock::syncDisconnect (uint_t timeout)
 {
-	mt::CEvent event;
-	err::CError error;
+	mt::Event event;
+	err::Error error;
 
-	exe::CFunctionT <
-		exe::CArgSeqT_2 <mt::CEvent*, err::CError*>,
-		COnDisconnectCompleteArg
+	exe::Function <
+		exe::ArgSeq_2 <mt::Event*, err::Error*>,
+		OnDisconnectCompleteArg
 		> onComplete (onSyncConnectDisconnectComplete, &event, &error);
 
 	disconnect (timeout, &onComplete);
@@ -164,22 +164,22 @@ CConnectionSock::syncDisconnect (uint_t timeout)
 }
 
 bool
-CConnectionSock::send (
+ConnectionSock::send (
 	const void* p,
 	size_t size,
-	const exe::CFunction& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+	const exe::Function& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
-		CConnectionSock*,
+	return m_workerThread->syncSchedule <exe::ArgSeq_4 <
+		ConnectionSock*,
 		void*,
 		size_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::send_wt),
+		pvoid_cast (&ConnectionSock::send_wt),
 		this,
 		p,
 		size,
@@ -188,22 +188,22 @@ CConnectionSock::send (
 }
 
 bool
-CConnectionSock::recv (
+ConnectionSock::recv (
 	void* p,
 	size_t size,
-	const exe::CFunction& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+	const exe::Function& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
-		CConnectionSock*,
+	return m_workerThread->syncSchedule <exe::ArgSeq_4 <
+		ConnectionSock*,
 		void*,
 		size_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::recv_wt),
+		pvoid_cast (&ConnectionSock::recv_wt),
 		this,
 		p,
 		size,
@@ -212,32 +212,32 @@ CConnectionSock::recv (
 }
 
 void
-CConnectionSock::close_wt ()
+ConnectionSock::close_wt ()
 {
 	m_sock.close ();
 	
 	if (m_onConnectComplete)
-		m_onConnectComplete->invoke (0, &err::CError (err::EStatus_Cancelled));
+		m_onConnectComplete->invoke (0, &err::Error (err::StatusKind_Cancelled));
 
 	if (m_onDisconnectComplete)
-		m_onDisconnectComplete->invoke (0, &err::CError (err::EStatus_Cancelled));
+		m_onDisconnectComplete->invoke (0, &err::Error (err::StatusKind_Cancelled));
 
 	while (!m_sendRecvList.isEmpty ())
 		::SleepEx (0, true);
 
-	m_onConnectComplete = ref::EPtr_Null;
-	m_onDisconnectComplete = ref::EPtr_Null;
+	m_onConnectComplete = ref::PtrKind_Null;
+	m_onDisconnectComplete = ref::PtrKind_Null;
 	m_event.reset ();
 	m_workerThread->removeEvent (m_hWorkerThreadEvent);
-	m_workerThread = ref::EPtr_Null;
+	m_workerThread = ref::PtrKind_Null;
 	m_hWorkerThreadEvent = NULL;
 }
 
 bool 
-CConnectionSock::connect_wt (
-	const TSockAddr* addr,
+ConnectionSock::connect_wt (
+	const SockAddr* addr,
 	uint_t timeout,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	SOCKADDR addr;
@@ -258,9 +258,9 @@ CConnectionSock::connect_wt (
 }
 
 bool 
-CConnectionSock::disconnect_wt (
+ConnectionSock::disconnect_wt (
 	uint_t timeout,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	bool result = 
@@ -278,7 +278,7 @@ CConnectionSock::disconnect_wt (
 }
 
 void
-CConnectionSock::onSocketEvent_wt ()
+ConnectionSock::onSocketEvent_wt ()
 {
 	WSANETWORKEVENTS events = { 0 };
 
@@ -290,32 +290,32 @@ CConnectionSock::onSocketEvent_wt ()
 	{
 		result = events.iErrorCode [FD_CONNECT_BIT];
 
-		err::CError e (result);
+		err::Error e (result);
 
 		m_onConnectComplete->invoke (0, result ? &e : NULL);
 
 		memset (&e, -1, sizeof (e));
 
-		m_onConnectComplete = ref::EPtr_Null;
+		m_onConnectComplete = ref::PtrKind_Null;
 	}
 
 	if (events.lNetworkEvents & FD_CLOSE)
 	{
 		result = events.iErrorCode [FD_CLOSE_BIT];
 
-		m_onDisconnectComplete->invoke (0, result ? &err::CError (result) : NULL);
-		m_onDisconnectComplete = ref::EPtr_Null;
+		m_onDisconnectComplete->invoke (0, result ? &err::Error (result) : NULL);
+		m_onDisconnectComplete = ref::PtrKind_Null;
 	}
 }
 
 bool
-CConnectionSock::send_wt (
+ConnectionSock::send_wt (
 	const void* p,
 	size_t size,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
-	TSendRecv* send = AXL_MEM_NEW (TSendRecv);
+	SendRecv* send = AXL_MEM_NEW (SendRecv);
 	send->m_sock = this;
 	send->m_onComplete = ref::getPtrOrClone (onComplete);
 	send->m_overlapped.hEvent = send;
@@ -329,13 +329,13 @@ CConnectionSock::send_wt (
 }
 
 bool
-CConnectionSock::recv_wt (
+ConnectionSock::recv_wt (
 	void* p,
 	size_t size,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
-	TSendRecv* recv = AXL_MEM_NEW (TSendRecv);
+	SendRecv* recv = AXL_MEM_NEW (SendRecv);
 	recv->m_sock = this;
 	recv->m_onComplete = ref::getPtrOrClone (onComplete);
 	recv->m_overlapped.hEvent = recv;
@@ -349,9 +349,9 @@ CConnectionSock::recv_wt (
 }
 
 void
-CConnectionSock::completeSendRecv_wt (
-	TSendRecv* sendRecv,
-	const err::CError& error,
+ConnectionSock::completeSendRecv_wt (
+	SendRecv* sendRecv,
+	const err::Error& error,
 	size_t actualSize
 	)
 {

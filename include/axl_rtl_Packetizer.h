@@ -13,16 +13,16 @@ namespace rtl {
 
 //.............................................................................
 
-class CPacketizerRoot
+class PacketizerRoot
 {
 protected:
 	enum
 	{
-		EPacketHdr_Signature = 'kap\x02',
+		PacketHdrKind_Signature = 'kap\x02',
 	};
 
 protected:
-	rtl::CArrayT <char> m_buffer;
+	rtl::Array <char> m_buffer;
 
 public:
 	void
@@ -35,7 +35,7 @@ public:
 	uint64_t
 	createHdr (size_t size)
 	{
-		return ((uint64_t) size << 32) | EPacketHdr_Signature;
+		return ((uint64_t) size << 32) | PacketHdrKind_Signature;
 	}
 
 protected:
@@ -49,7 +49,7 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CPacketizerT: public CPacketizerRoot
+class Packetizer: public PacketizerRoot
 {
 public:
 	void
@@ -81,15 +81,15 @@ public:
 
 // old AXL used different format of header
 
-class CLegacyPacketizerRoot
+class LegacyPacketizerRoot
 {
 protected:
 	enum
 	{
-		EPacketHdr_Signature = '.GSM',
+		PacketHdrKind_Signature = '.GSM',
 	};
 
-	struct TPacketHdr
+	struct PacketHdr
 	{
 		uint32_t m_signature;
 		uint16_t m_dataSize;
@@ -97,7 +97,7 @@ protected:
 	};
 
 protected:
-	rtl::CArrayT <char> m_buffer;
+	rtl::Array <char> m_buffer;
 
 public:
 	void
@@ -121,7 +121,7 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CLegacyPacketizerT: public CLegacyPacketizerRoot
+class LegacyPacketizer: public LegacyPacketizerRoot
 {
 public:
 	void

@@ -15,14 +15,14 @@ namespace rtl {
 //.............................................................................
 
 template <typename T>
-class CStdArrayListT
+class StdArrayList
 {
 public:
-	typedef CIteratorT <T> CIterator;
+	typedef Iterator <T> Iterator;
 
 protected:
-	rtl::CStdListT <T> m_list;
-	rtl::CArrayT <T*> m_array;
+	rtl::StdList <T> m_list;
+	rtl::Array <T*> m_array;
 
 public:
 	bool
@@ -38,13 +38,13 @@ public:
 		return m_list.getCount ();
 	}
 
-	CIterator
+	Iterator
 	getHead () const
 	{
 		return m_list.getHead ();
 	}
 
-	CIterator
+	Iterator
 	getTail () const
 	{
 		return m_list.getTail ();

@@ -7,7 +7,7 @@ namespace gui {
 //.............................................................................
 
 const char* 
-getEngineKindString (EEngine engineKind)
+getEngineKindString (EngineKind engineKind)
 {
 	static const char* stringTable [] = 
 	{
@@ -19,15 +19,15 @@ getEngineKindString (EEngine engineKind)
 
 	return engineKind < countof (stringTable) ? 
 		stringTable [engineKind] : 
-		stringTable [EEngine_Undefined];
+		stringTable [EngineKind_Undefined];
 }
 
 //.............................................................................
 
-CFont*
-CEngine::getStdFont (EStdFont fontKind)
+Font*
+Engine::getStdFont (StdFontKind fontKind)
 {
-	if (fontKind < 0 || fontKind >= EStdFont__Count)
+	if (fontKind < 0 || fontKind >= StdFontKind__Count)
 		return NULL;
 
 	if (!m_stdFontArray [fontKind])
@@ -36,10 +36,10 @@ CEngine::getStdFont (EStdFont fontKind)
 	return m_stdFontArray [fontKind];
 }
 
-CCursor*
-CEngine::getStdCursor (EStdCursor cursorKind)
+Cursor*
+Engine::getStdCursor (StdCursorKind cursorKind)
 {
-	if (cursorKind < 0 || cursorKind >= EStdCursor__Count)
+	if (cursorKind < 0 || cursorKind >= StdCursorKind__Count)
 		return NULL;
 
 	if (!m_stdCursorArray [cursorKind])
@@ -48,16 +48,16 @@ CEngine::getStdCursor (EStdCursor cursorKind)
 	return m_stdCursorArray [cursorKind];
 }
 
-CCanvas*
-CEngine::getSharedOffscreenCanvas (
+Canvas*
+Engine::getSharedOffscreenCanvas (
 	int width,
 	int height
 	)
 {
-	EFormFactor formFactor = getFormFactor (width, height);
+	FormFactorKind formFactor = getFormFactor (width, height);
 	ASSERT (formFactor < countof (m_sharedOffscreenCanvasArray));
 	
-	TSharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [formFactor];
+	SharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [formFactor];
 	if (offscreenCanvas->m_canvas &&
 		offscreenCanvas->m_size.m_width >= width && 
 		offscreenCanvas->m_size.m_height >= height)
@@ -74,12 +74,12 @@ CEngine::getSharedOffscreenCanvas (
 }
 
 void 
-CEngine::deleteAllSharedOffscreenCanvases ()
+Engine::deleteAllSharedOffscreenCanvases ()
 {
-	for (size_t i = 0; i < EFormFactor__Count; i++)
+	for (size_t i = 0; i < FormFactorKind__Count; i++)
 	{
-		TSharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [i];
-		offscreenCanvas->m_canvas = ref::EPtr_Null;
+		SharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [i];
+		offscreenCanvas->m_canvas = ref::PtrKind_Null;
 		offscreenCanvas->m_size.setup (0, 0);
 	}
 }

@@ -50,67 +50,67 @@ main := |*
 # keywords
 #
 
-'integer'i       { createToken (EToken_SHORT); };
-'string'i        { createToken (EToken_STRING); };
-'wstring'i       { createToken (EToken_WSTRING); };
-'boolean'i       { createToken (EToken_BOOLEAN); };
-'byte'i          { createToken (EToken_BYTE); };
-'char'i          { createToken (EToken_CHAR); };
-'word'i          { createToken (EToken_WORD); };
-'short'i         { createToken (EToken_SHORT); };
-'dword'i         { createToken (EToken_DWORD); };
-'long'i          { createToken (EToken_LONG); };
-'real'i          { createToken (EToken_REAL); };
-'float'i         { createToken (EToken_REAL); };
-'enum'i          { createToken (EToken_ENUM); };
-'type'i          { createToken (EToken_STRUCT); };
-'doevents'i      { createToken (EToken_DOEVENTS); };
-'const'i         { createToken (EToken_CONST); };
-'dim'i           { createToken (EToken_DIM); };
-'as'i            { createToken (EToken_AS); };
-'end'i           { createToken (EToken_END); };
-'declare'i       { createToken (EToken_DECLARE); };
-'function'i      { createToken (EToken_FUNCTION); };
-'sub'i           { createToken (EToken_SUB); };
-'goto'i          { createToken (EToken_GOTO); };
-'gosub'i         { createToken (EToken_GOSUB); };
-'return'i        { createToken (EToken_RETURN); };
-'select'i        { createToken (EToken_SELECT); };
-'case'i          { createToken (EToken_CASE); };
-'if'i            { createToken (EToken_IF); };
-'then'i          { createToken (EToken_THEN); };
-'else'i          { createToken (EToken_ELSE); };
-'for'i           { createToken (EToken_FOR); };
-'to'i            { createToken (EToken_TO); };
-'step'i          { createToken (EToken_STEP); };
-'next'i          { createToken (EToken_NEXT); };
-'exit'i          { createToken (EToken_EXIT); };
-'while'i         { createToken (EToken_WHILE); };
-'wend'i          { createToken (EToken_WEND); };
-'do'i            { createToken (EToken_DO); };
-'loop'i          { createToken (EToken_LOOP); };
-'until'i         { createToken (EToken_UNTIL); };
-'byref'i         { createToken (EToken_BYREF); };
-'byval'i         { createToken (EToken_BYVAL); };
-'xor'i           { createToken (EToken_XOR); };
-'or'i            { createToken (EToken_OR); };
-'and'i           { createToken (EToken_AND); };
-'not'i           { createToken (EToken_NOT); };
-'mod'i           { createToken (EToken_MOD); };
-'object'i        { createToken (EToken_OBJECT); };
-'syscall'i       { createToken (EToken_SYSCALL); };
-'event'i         { createToken (EToken_EVENT); };
-'property'i      { createToken (EToken_PROPERTY); };
-'get'i           { createToken (EToken_GET); };
-'set'i           { createToken (EToken_SET); };
-'ref'i           { createToken (EToken_REF); };
-'sizeof'i        { createToken (EToken_SIZEOF); };
-'include'i       { createToken (EToken_INCLUDE); };
-'public'i        { createToken (EToken_PUBLIC); };
-'static'i        { createToken (EToken_STATIC); };
-'library'i       { createToken (EToken_LIBRARY); };
+'integer'i       { createToken (TokenKind_SHORT); };
+'string'i        { createToken (TokenKind_STRING); };
+'wstring'i       { createToken (TokenKind_WSTRING); };
+'boolean'i       { createToken (TokenKind_BOOLEAN); };
+'byte'i          { createToken (TokenKind_BYTE); };
+'char'i          { createToken (TokenKind_CHAR); };
+'word'i          { createToken (TokenKind_WORD); };
+'short'i         { createToken (TokenKind_SHORT); };
+'dword'i         { createToken (TokenKind_DWORD); };
+'long'i          { createToken (TokenKind_LONG); };
+'real'i          { createToken (TokenKind_REAL); };
+'float'i         { createToken (TokenKind_REAL); };
+'enum'i          { createToken (TokenKind_ENUM); };
+'type'i          { createToken (TokenKind_STRUCT); };
+'doevents'i      { createToken (TokenKind_DOEVENTS); };
+'const'i         { createToken (TokenKind_CONST); };
+'dim'i           { createToken (TokenKind_DIM); };
+'as'i            { createToken (TokenKind_AS); };
+'end'i           { createToken (TokenKind_END); };
+'declare'i       { createToken (TokenKind_DECLARE); };
+'function'i      { createToken (TokenKind_FUNCTION); };
+'sub'i           { createToken (TokenKind_SUB); };
+'goto'i          { createToken (TokenKind_GOTO); };
+'gosub'i         { createToken (TokenKind_GOSUB); };
+'return'i        { createToken (TokenKind_RETURN); };
+'select'i        { createToken (TokenKind_SELECT); };
+'case'i          { createToken (TokenKind_CASE); };
+'if'i            { createToken (TokenKind_IF); };
+'then'i          { createToken (TokenKind_THEN); };
+'else'i          { createToken (TokenKind_ELSE); };
+'for'i           { createToken (TokenKind_FOR); };
+'to'i            { createToken (TokenKind_TO); };
+'step'i          { createToken (TokenKind_STEP); };
+'next'i          { createToken (TokenKind_NEXT); };
+'exit'i          { createToken (TokenKind_EXIT); };
+'while'i         { createToken (TokenKind_WHILE); };
+'wend'i          { createToken (TokenKind_WEND); };
+'do'i            { createToken (TokenKind_DO); };
+'loop'i          { createToken (TokenKind_LOOP); };
+'until'i         { createToken (TokenKind_UNTIL); };
+'byref'i         { createToken (TokenKind_BYREF); };
+'byval'i         { createToken (TokenKind_BYVAL); };
+'xor'i           { createToken (TokenKind_XOR); };
+'or'i            { createToken (TokenKind_OR); };
+'and'i           { createToken (TokenKind_AND); };
+'not'i           { createToken (TokenKind_NOT); };
+'mod'i           { createToken (TokenKind_MOD); };
+'object'i        { createToken (TokenKind_OBJECT); };
+'syscall'i       { createToken (TokenKind_SYSCALL); };
+'event'i         { createToken (TokenKind_EVENT); };
+'property'i      { createToken (TokenKind_PROPERTY); };
+'get'i           { createToken (TokenKind_GET); };
+'set'i           { createToken (TokenKind_SET); };
+'ref'i           { createToken (TokenKind_REF); };
+'sizeof'i        { createToken (TokenKind_SIZEOF); };
+'include'i       { createToken (TokenKind_INCLUDE); };
+'public'i        { createToken (TokenKind_PUBLIC); };
+'static'i        { createToken (TokenKind_STATIC); };
+'library'i       { createToken (TokenKind_LIBRARY); };
 
-'message'i       { createToken (EToken_Message); };
+'message'i       { createToken (TokenKind_Message); };
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -118,12 +118,12 @@ main := |*
 # operators
 #
 
-'<>'   { createToken (EToken_Ne); };
-'<='   { createToken (EToken_Le); };
-'>='   { createToken (EToken_Ge); };	
-'or'i  { createToken (EToken_Or); };
-'and'i { createToken (EToken_And); };	
-'xor'i { createToken (EToken_Xor); };	
+'<>'   { createToken (TokenKind_Ne); };
+'<='   { createToken (TokenKind_Le); };
+'>='   { createToken (TokenKind_Ge); };	
+'or'i  { createToken (TokenKind_Or); };
+'and'i { createToken (TokenKind_And); };	
+'xor'i { createToken (TokenKind_Xor); };	
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -139,13 +139,13 @@ dec+           { createIntegerToken (0, 10); };
 dec+ ('.' dec+) | ([ee] [+\-]? dec+)
 		       { createDoubleToken (); };
 
-"'" [^\n]*     { createStringToken (1, 0, EToken_Comment, 1); };
-lit_dq         { createStringToken (1, 1, EToken_Literal); };
+"'" [^\n]*     { createStringToken (1, 0, TokenKind_Comment, 1); };
+lit_dq         { createStringToken (1, 1, TokenKind_Literal); };
 lit_sq         { createCharConstToken(1, 1); };
-id             { createStringToken (0, 0, EToken_Identifier); };
+id             { createStringToken (0, 0, TokenKind_Identifier); };
 ws             ;
 nl             ;
-any            { createToken ((EToken) ts [0]); };
+any            { createToken ((TokenKind) ts [0]); };
 	
 *|;
 
@@ -154,20 +154,20 @@ any            { createToken ((EToken) ts [0]); };
 //.............................................................................
 
 void 
-CLexer::init ()
+Lexer::init ()
 {
 	%% write init;
 }
 
 bool
-CLexer::exec ()
+Lexer::exec ()
 {
 	%% write exec;
 
 	bool result = cs != parse_test_error;
 	if (!result)
 	{
-		CToken* token = createToken (EToken_Error);
+		Token* token = createToken (TokenKind_Error);
 		token->m_data.m_error.createStringError ("lexer error");
 	}
 

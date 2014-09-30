@@ -13,15 +13,15 @@ namespace gui {
 
 //.............................................................................
 
-class CQtCursor: public CCursor
+class QtCursor: public Cursor
 {
-	friend class CQtEngine;
+	friend class QtEngine;
 	
 public:
 	QCursor m_qtCursor;
 
 public:	
-	CQtCursor ();
+	QtCursor ();
 };
 
 //.............................................................................

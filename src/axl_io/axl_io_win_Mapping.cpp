@@ -9,7 +9,7 @@ namespace win {
 //.............................................................................
 
 bool
-CMapping::create (
+Mapping::create (
 	HANDLE hFile,
 	SECURITY_ATTRIBUTES* secAttr,
 	uint_t pageProtection,
@@ -35,7 +35,7 @@ CMapping::create (
 }
 
 bool
-CMapping::open (
+Mapping::open (
 	uint_t access,
 	bool doInheritHandle,
 	const wchar_t* name
@@ -50,7 +50,7 @@ CMapping::open (
 //.............................................................................
 
 void*
-CMappedView::view (
+MappedView::view (
 	HANDLE hMapping,
 	uint_t access,
 	uint64_t _Offset,

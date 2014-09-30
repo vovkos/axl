@@ -16,20 +16,20 @@ namespace gui {
 bool
 getFontDescFromFontInfo (
 	const QFontInfo& fontInfo,
-	TFontDesc* fontDesc
+	FontDesc* fontDesc
 	);
 
 //.............................................................................
 
-class CQtFont: public CFont
+class QtFont: public Font
 {
-	friend class CQtEngine;
+	friend class QtEngine;
 
 public:
 	QFont m_qtFont;
 	
 public:
-	CQtFont ();
+	QtFont ();
 
 	virtual
 	bool
@@ -38,18 +38,18 @@ public:
 		return QFontInfo (m_qtFont).fixedPitch ();
 	}
 
-	TSize
+	Size
 	calcTextSize_qt (const QString& string);
 
 	virtual
-	TSize
+	Size
 	calcTextSize_utf8 (
 		const utf8_t* text,
 		size_t length = -1
 		);
 
 	virtual
-	TSize
+	Size
 	calcTextSize_utf16 (
 		const utf16_t* text,
 		size_t length = -1
@@ -59,7 +59,7 @@ public:
 	}
 
 	virtual
-	TSize
+	Size
 	calcTextSize_utf32 (
 		const utf32_t* text,
 		size_t length = -1
@@ -68,7 +68,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CFontTupleT <CQtFont> CQtFontTuple;
+typedef FontTuple <QtFont> QtFontuple;
 
 //.............................................................................
 

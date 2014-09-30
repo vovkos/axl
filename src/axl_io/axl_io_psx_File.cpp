@@ -8,7 +8,7 @@ namespace psx {
 //.............................................................................
 
 uint64_t
-CFile::getSize () const
+File::getSize () const
 {
 	struct stat64 stat;
 	int result = fstat64 (m_h, &stat);
@@ -22,7 +22,7 @@ CFile::getSize () const
 }
 
 uint64_t
-CFile::getPosition () const
+File::getPosition () const
 {
 	uint64_t offset = lseek64 (m_h, 0, SEEK_CUR);
 	if (offset == -1)

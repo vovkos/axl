@@ -9,13 +9,13 @@ namespace gui {
 
 //.............................................................................
 
-CQtImage::CQtImage ()
+QtImage::QtImage ()
 {
-	m_engine = CQtEngine::getSingleton ();
+	m_engine = QtEngine::getSingleton ();
 }
 
 bool
-CQtImage::getData (
+QtImage::getData (
 	void* data,
 	int left,
 	int top,

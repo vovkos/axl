@@ -39,7 +39,7 @@ sleep (uint32_t msCount)
 //.............................................................................
 
 uint64_t
-TTime::getTimestampImpl (
+Time::getTimestampImpl (
 	bool isLocal,
 	int timeZone
 	) const
@@ -86,7 +86,7 @@ TTime::getTimestampImpl (
 }
 
 void
-TTime::setTimestampImpl (
+Time::setTimestampImpl (
 	uint64_t timestamp,
 	bool isLocal,
 	int timeZone
@@ -162,8 +162,8 @@ TTime::setTimestampImpl (
 */
 
 size_t
-TTime::format (
-	rtl::CString* string,
+Time::format (
+	rtl::String* string,
 	const char* formatString
 	) const
 {

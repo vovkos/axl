@@ -163,7 +163,7 @@ mergeBitMaps (
 	size_t* map,
 	const size_t* map2,
 	size_t pageCount,
-	EBitOp op
+	BitOpKind op
 	)
 {
 	bool hasChanged = false;
@@ -176,7 +176,7 @@ mergeBitMaps (
 
 	switch (op)
 	{
-	case EBitOp_Or:
+	case BitOpKind_Or:
 		for (; p < end; p++, p2++)
 		{
 			old = *p;
@@ -187,7 +187,7 @@ mergeBitMaps (
 
 		break;
 
-	case EBitOp_And:
+	case BitOpKind_And:
 		{
 			old = *p;
 			*p &= *p2;
@@ -197,7 +197,7 @@ mergeBitMaps (
 
 		break;
 
-	case EBitOp_Xor:
+	case BitOpKind_Xor:
 		{
 			old = *p;
 			*p ^= *p2;
@@ -263,7 +263,7 @@ findBit (
 //.............................................................................
 
 bool
-CBitMap::create (size_t bitCount)
+BitMap::create (size_t bitCount)
 {
 	bool result = setBitCount (bitCount);
 	if (!result)
@@ -274,7 +274,7 @@ CBitMap::create (size_t bitCount)
 }
 
 bool 
-CBitMap::setBitCount (size_t bitCount)
+BitMap::setBitCount (size_t bitCount)
 {
 	size_t pageCount = bitCount / _AXL_PTR_BITNESS;
 	if (bitCount & (_AXL_PTR_BITNESS - 1))
@@ -284,7 +284,7 @@ CBitMap::setBitCount (size_t bitCount)
 }
 
 void 
-CBitMap::copy (const CBitMap& src)
+BitMap::copy (const BitMap& src)
 {
 	size_t count = src.m_map.getCount ();
 	m_map.setCount (count);
@@ -292,7 +292,7 @@ CBitMap::copy (const CBitMap& src)
 }
 
 int
-CBitMap::cmp (const CBitMap& src)
+BitMap::cmp (const BitMap& src)
 {
 	size_t count = m_map.getCount ();
 	size_t count2 = src.m_map.getCount ();
@@ -304,9 +304,9 @@ CBitMap::cmp (const CBitMap& src)
 }
 
 bool 
-CBitMap::merge (
-	const CBitMap& bitMap2, 
-	EBitOp op
+BitMap::merge (
+	const BitMap& bitMap2, 
+	BitOpKind op
 	)
 {
 	size_t pageCount = m_map.getCount ();
@@ -316,9 +316,9 @@ CBitMap::merge (
 }
 
 bool
-CBitMap::mergeResize (
-	const CBitMap& bitMap2, 
-	EBitOp op
+BitMap::mergeResize (
+	const BitMap& bitMap2, 
+	BitOpKind op
 	)
 {
 	size_t pageCount2 = bitMap2.m_map.getCount ();

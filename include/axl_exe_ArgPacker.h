@@ -27,7 +27,7 @@ struct IArgPacker: obj::IRoot
 	packV (
 		void* p,
 		size_t* size,
-		ref::CPtrT <obj::IType>* agent,
+		ref::Ptr <obj::IType>* agent,
 		axl_va_list va
 		) = 0;
 	
@@ -35,7 +35,7 @@ struct IArgPacker: obj::IRoot
 	pack (
 		void* p,
 		size_t* size,
-		ref::CPtrT <obj::IType>* agent,
+		ref::Ptr <obj::IType>* agent,
 		...
 		)
 	{
@@ -61,12 +61,12 @@ struct IArgPacker: obj::IRoot
 		return countV (va);
 	}
 
-	ref::CPtrT <CArgBlock>
+	ref::Ptr <ArgBlock>
 	createArgBlockV (axl_va_list va)
 	{
 		size_t size = countV (va);
 
-		ref::CPtrT <CArgBlock> block = AXL_REF_NEW_EXTRA (CArgBlock, size);
+		ref::Ptr <ArgBlock> block = AXL_REF_NEW_EXTRA (ArgBlock, size);
 		block->m_p = block + 1;
 		block->m_size = size;
 
@@ -75,7 +75,7 @@ struct IArgPacker: obj::IRoot
 		return block;
 	}
 
-	ref::CPtrT <CArgBlock>
+	ref::Ptr <ArgBlock>
 	createArgBlock (
 		int unused,
 		...
@@ -95,7 +95,7 @@ public:
 	AXL_OBJ_CLASS_0 (IArgPackerImplT, IArgPacker)
 
 protected:
-	typedef ref::CBoxT <typename T::CShadow> CShadow;
+	typedef ref::Box <typename T::Shadow> Shadow;
 
 public:
 	virtual
@@ -103,15 +103,15 @@ public:
 	packV (
 		void* p,
 		size_t* size,
-		ref::CPtrT <obj::IType>* agent,
+		ref::Ptr <obj::IType>* agent,
 		axl_va_list va
 		)
 	{
 		if (!p || !T::hasShadow)
 			return T () (p, size, NULL, va);
 	
-		obj::IType* type = AXL_OBJ_TYPEOF (T::CType);
-		ref::CPtrT <CShadow> shadow = AXL_REF_NEW (CShadow);		
+		obj::IType* type = AXL_OBJ_TYPEOF (T::Type);
+		ref::Ptr <Shadow> shadow = AXL_REF_NEW (Shadow);		
 		agent->copy (type, shadow.getRefCount ());
 
 		return T () (p, size, shadow, va);
@@ -129,18 +129,18 @@ public:
 
 // run-time sequencing
 
-class CArgPackerSeq: public IArgPacker
+class ArgPackerSeq: public IArgPacker
 {
 public:
-	AXL_OBJ_CLASS_0 (CArgPackerSeq, IArgPacker)
+	AXL_OBJ_CLASS_0 (ArgPackerSeq, IArgPacker)
 
 protected:
-	class CAgent: 
+	class Agent: 
 		public ref::IRefCount,
 		public obj::IType
 	{
 	public:
-		rtl::CArrayT <ref::CPtrT <obj::IType> > m_sequence;
+		rtl::Array <ref::Ptr <obj::IType> > m_sequence;
 
 	public:
 		virtual
@@ -160,14 +160,14 @@ protected:
 
 		virtual
 		size_t
-		getInterfaceOffset (const rtl::TGuid& guid)
+		getInterfaceOffset (const rtl::Guid& guid)
 		{
 			return -1; // not used in packing
 		}
 	};
 
 protected:
-	rtl::CArrayT <IArgPacker*> m_sequence;
+	rtl::Array <IArgPacker*> m_sequence;
 
 public:
 	virtual
@@ -175,7 +175,7 @@ public:
 	packV (
 		void* p,
 		size_t* size,
-		ref::CPtrT <obj::IType>* agent,
+		ref::Ptr <obj::IType>* agent,
 		axl_va_list va
 		);
 
@@ -215,13 +215,13 @@ public:
 //.............................................................................
 
 inline
-ref::CPtrT <CArgBlock> 
+ref::Ptr <ArgBlock> 
 formatArgBlockV (
 	const char* format, 
 	axl_va_list va
 	)
 {
-	CArgPackerSeq packer;
+	ArgPackerSeq packer;
 	packer.format (format);
 	return packer.createArgBlockV (va);
 }
@@ -229,7 +229,7 @@ formatArgBlockV (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ref::CPtrT <CArgBlock> 
+ref::Ptr <ArgBlock> 
 formatArgBlock (
 	const char* format, 
 	...

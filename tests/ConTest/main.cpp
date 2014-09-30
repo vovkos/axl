@@ -24,7 +24,7 @@ main (
 
 	WSAStartup (versionRequested, &wsaData);
 
-	err::CParseErrorProvider::register ();
+	err::ParseErrorProvider::register ();
 		
 	//test_Error::Run ();
 	//test_File::Run ();

@@ -9,8 +9,8 @@ namespace rtl {
 //.............................................................................
 
 void
-CBuddyAllocMap::CLevel::format (
-	TPage* page,
+BuddyAllocMap::Level::format (
+	Page* page,
 	size_t count
 	)
 {
@@ -28,8 +28,8 @@ CBuddyAllocMap::CLevel::format (
 }
 
 void
-CBuddyAllocMap::CLevel::setPageMap (
-	TPage* page,
+BuddyAllocMap::Level::setPageMap (
+	Page* page,
 	size_t map
 	)
 {
@@ -42,8 +42,8 @@ CBuddyAllocMap::CLevel::setPageMap (
 }
 
 void
-CBuddyAllocMap::CLevel::setBit (
-	TPage* page,
+BuddyAllocMap::Level::setBit (
+	Page* page,
 	size_t bit,
 	bool value
 	)
@@ -67,8 +67,8 @@ CBuddyAllocMap::CLevel::setBit (
 }
 
 void
-CBuddyAllocMap::CLevel::setBitRange (
-	TPage* page,
+BuddyAllocMap::Level::setBitRange (
+	Page* page,
 	size_t from,
 	size_t to,
 	bool value
@@ -149,7 +149,7 @@ CBuddyAllocMap::CLevel::setBitRange (
 
 //.............................................................................
 
-CBuddyAllocMap::CBuddyAllocMap ()
+BuddyAllocMap::BuddyAllocMap ()
 {
 	m_width = 0;
 	m_height = 0;
@@ -160,7 +160,7 @@ CBuddyAllocMap::CBuddyAllocMap ()
 }
 
 bool
-CBuddyAllocMap::create(
+BuddyAllocMap::create(
 	size_t width,
 	size_t height
 	)
@@ -170,10 +170,10 @@ CBuddyAllocMap::create(
 	size_t totalPageCount;
 	size_t pageCount;
 
-	CLevel* level;
-	CLevel* end;
+	Level* level;
+	Level* end;
 
-	TPage* page;
+	Page* page;
 
 	close();
 
@@ -217,7 +217,7 @@ CBuddyAllocMap::create(
 }
 
 void
-CBuddyAllocMap::close ()
+BuddyAllocMap::close ()
 {
 	m_pageArray.clear();
 	m_levelArray.clear();
@@ -229,11 +229,11 @@ CBuddyAllocMap::close ()
 }
 
 void
-CBuddyAllocMap::clear ()
+BuddyAllocMap::clear ()
 {
-	TPage* page = m_pageArray;
-	CLevel* level = m_levelArray;
-	CLevel* end = level + m_height;
+	Page* page = m_pageArray;
+	Level* level = m_levelArray;
+	Level* end = level + m_height;
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level
 
@@ -250,10 +250,10 @@ CBuddyAllocMap::clear ()
 }
 
 size_t
-CBuddyAllocMap::allocate (size_t size)
+BuddyAllocMap::allocate (size_t size)
 {
-	CLevel* level;
-	TPage* page;
+	Level* level;
+	Page* page;
 
 	size_t pageCount;
 	size_t bitSize;
@@ -266,7 +266,7 @@ CBuddyAllocMap::allocate (size_t size)
 
 	if (size > m_maxAllocSize)
 	{
-		err::setError (err::EStatus_InvalidParameter);
+		err::setError (err::StatusKind_InvalidParameter);
 		return -1;
 	}
 
@@ -281,7 +281,7 @@ CBuddyAllocMap::allocate (size_t size)
 	page = level->getFirstAvailablePage ();
 	if (!page)
 	{
-		err::setError(err::EStatus_InsufficientResources);
+		err::setError(err::StatusKind_InsufficientResources);
 		return -1;
 	}
 
@@ -349,13 +349,13 @@ CBuddyAllocMap::allocate (size_t size)
 }
 
 void
-CBuddyAllocMap::mark (
+BuddyAllocMap::mark (
 	size_t address,
 	size_t size
 	)
 {
-	CLevel* level = m_levelArray;
-	TPage* page = m_pageArray;
+	Level* level = m_levelArray;
+	Page* page = m_pageArray;
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level
 	size_t bitSize = 1;
@@ -411,14 +411,14 @@ CBuddyAllocMap::mark (
 }
 
 void
-CBuddyAllocMap::free (
+BuddyAllocMap::free (
 	size_t address,
 	size_t size
 	)
 {
-	CLevel* level = m_levelArray;
-	TPage* page = m_pageArray;
-	TPage* prevPage = NULL;
+	Level* level = m_levelArray;
+	Page* page = m_pageArray;
+	Page* prevPage = NULL;
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level
 	size_t bitSize = 1;

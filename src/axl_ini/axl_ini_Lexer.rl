@@ -41,13 +41,13 @@ ws | nl               ;
 //.............................................................................
 
 void 
-CLexer::init ()
+Lexer::init ()
 {
 	%% write init;
 }
 
 bool
-CLexer::exec ()
+Lexer::exec ()
 {
 	%% write exec;
 	return cs != axl_ini_error;

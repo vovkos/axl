@@ -20,36 +20,36 @@ template <
 	typename T,
 	size_t extra = 0
 	>
-class CChildT
+class Child
 {
-	AXL_DISABLE_COPY (CChildT)
+	AXL_DISABLE_COPY (Child)
 
 protected:
-	struct THdr
+	struct Hdr
 	{
-		CRefCount* m_parent;
+		RefCount* m_parent;
 	};
 	
-	class CObject: 
-		public THdr,
+	class Object: 
+		public Hdr,
 		public T
 	{
 	};
 
 protected:
-	char m_buffer [sizeof (CObject) + extra];
+	char m_buffer [sizeof (Object) + extra];
 
 public:
-	CChildT (CRefCount* parent)
+	Child (RefCount* parent)
 	{ 
 		memset (m_buffer, 0, sizeof (m_buffer));
-		CObject* object = (CObject*) m_buffer;
-		object->setTarget (object, &rtl::CTypeT <CObject>::destruct, &free);
+		Object* object = (Object*) m_buffer;
+		object->setTarget (object, &rtl::Type <Object>::destruct, &free);
 		object->addRef ();
 		parent->addWeakRef ();
 	}
 
-	~CChildT ()
+	~Child ()
 	{ 
 		getObject ()->release (); 
 	}
@@ -73,7 +73,7 @@ public:
 
 	T* getObject ()
 	{
-		return (CObject*) m_buffer; 
+		return (Object*) m_buffer; 
 	}
 
 protected:
@@ -81,7 +81,7 @@ protected:
 	void 
 	free (void* p)
 	{ 			
-		((CObject*) p)->m_parent->weakRelease (); 
+		((Object*) p)->m_parent->weakRelease (); 
 	}
 };
 

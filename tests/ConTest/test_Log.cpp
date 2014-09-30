@@ -6,33 +6,33 @@ namespace test_Log {
 
 //.............................................................................
 
-enum EMsg
+enum MsgKind
 {
-	EMsg_DeviceOpened     = 1,
-	EMsg_DeviceClosed     = 2 | log::EPacketCodeFlag_Foldable,
-	EMsg_Connect          = 3,
-	EMsg_ConnectComplete  = 4,
-	EMsg_ConnectError     = 5,	
-	EMsg_Bin              = 6 | log::EPacketCodeFlag_Mergeable,
+	MsgKind_DeviceOpened     = 1,
+	MsgKind_DeviceClosed     = 2 | log::PacketCodeFlagKind_Foldable,
+	MsgKind_Connect          = 3,
+	MsgKind_ConnectComplete  = 4,
+	MsgKind_ConnectError     = 5,	
+	MsgKind_Bin              = 6 | log::PacketCodeFlagKind_Mergeable,
 };
 
-class CLogWidget: public log::CWidget
+class LogWidget: public log::Widget
 {
 public:
-	CLogWidget (gui::IEngine* engine):
-		log::CWidget (engine)
+	LogWidget (gui::IEngine* engine):
+		log::Widget (engine)
 	{
 	}
 
 protected:
 	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
-		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_Close, onClose)
-		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, onKeyDown)
-	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::CWidget)
+		AXL_GUI_WIDGET_MSG_HANDLER (gui::WidgetMsgKind_Close, onClose)
+		AXL_GUI_WIDGET_MSG_HANDLER (gui::WidgetMsgKind_KeyDown, onKeyDown)
+	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::Widget)
 
 	void
 	onClose (
-		gui::TWidgetMsg* msg,
+		gui::WidgetMsg* msg,
 		bool* isHandled
 		)
 	{
@@ -41,43 +41,43 @@ protected:
 
 	void
 	onKeyDown (
-		gui::TWidgetMsg* msg,
+		gui::WidgetMsg* msg,
 		bool* isHandled
 		)
 	{
-		gui::TWidgetKeyMsg* keyMsg = (gui::TWidgetKeyMsg*) msg;
+		gui::WidgetKeyMsg* keyMsg = (gui::WidgetKeyMsg*) msg;
 
 		switch (keyMsg->m_key)
 		{
 		case '1':
-			getPacketFile ()->write (EMsg_DeviceOpened);
+			getPacketFile ()->write (MsgKind_DeviceOpened);
 			break;
 
 		case '2':
-			getPacketFile ()->write (EMsg_DeviceClosed);
+			getPacketFile ()->write (MsgKind_DeviceClosed);
 			break;
 
 		case '3':
-			getPacketFile ()->write (EMsg_Connect);
+			getPacketFile ()->write (MsgKind_Connect);
 			break;
 
 		case '4':
-			getPacketFile ()->write (EMsg_ConnectComplete);
+			getPacketFile ()->write (MsgKind_ConnectComplete);
 			break;
 
 		case '5':
-			getPacketFile ()->write (EMsg_ConnectError);
+			getPacketFile ()->write (MsgKind_ConnectError);
 			break;
 
 		default:
-			getPacketFile ()->write (EMsg_Bin, &keyMsg->m_key, 1);
+			getPacketFile ()->write (MsgKind_Bin, &keyMsg->m_key, 1);
 		}
 
 		updateLog ();
 	}
 };
 
-class CRepresentor: public log::IRepresentor
+class Representor: public log::IRepresentor
 {
 public:
 	virtual 
@@ -98,28 +98,28 @@ public:
 
 		switch (packetCode)
 		{
-		case EMsg_DeviceOpened:
+		case MsgKind_DeviceOpened:
 			target->m_lineAttr.m_icon = 3;
 
 			target->addHyperText(
-				log::EMergeFlag_MergeableForward,
+				log::MergeFlagKind_MergeableForward,
 				"Device <#0000ff>COM3<> is..."
 				);
 
 			target->addHyperText(
-				log::EMergeFlag_Mergeable,
+				log::MergeFlagKind_Mergeable,
 				"<+b>opened<> <=!5,3>nahui!<>\n"
 				);
 
 			target->addHyperText(
-				log::EMergeFlag_Mergeable,
+				log::MergeFlagKind_Mergeable,
 				"Vot <+is>tak<> vot!!"
 				);
 
 			target->addBin(data, sizeof(data));
 			break;
 
-		case EMsg_DeviceClosed:
+		case MsgKind_DeviceClosed:
 			target->m_lineAttr.m_icon = 2;
 
 			if (!(volatileFlags & 1))
@@ -132,40 +132,40 @@ public:
 					"  bla bla bla");
 			break;
 
-		case EMsg_Connect:
+		case MsgKind_Connect:
 			target->m_lineAttr.m_icon = 4;
-			target->m_lineAttr.m_backColor = gui::EStdColor_PastelGreen;
+			target->m_lineAttr.m_backColor = gui::StdColorKind_PastelGreen;
 
 			target->addHyperText(
-				log::EMergeFlag_MergeableForward,
+				log::MergeFlagKind_MergeableForward,
 				"Connecting..."
 				);
 			break;
 
-		case EMsg_ConnectComplete:
+		case MsgKind_ConnectComplete:
 			target->m_lineAttr.m_icon = 1;
-			target->m_lineAttr.m_backColor = gui::EStdColor_PastelBlue;
+			target->m_lineAttr.m_backColor = gui::StdColorKind_PastelBlue;
 
 			target->addHyperText(
-				EMsg_Connect,
-				log::EMergeFlag_MergeableBackward,
+				MsgKind_Connect,
+				log::MergeFlagKind_MergeableBackward,
 				"OK!"
 				);
 			break;
 
-		case EMsg_ConnectError:
+		case MsgKind_ConnectError:
 			target->m_lineAttr.m_icon = 0;
-			target->m_lineAttr.m_backColor = gui::EStdColor_PastelRed;
+			target->m_lineAttr.m_backColor = gui::StdColorKind_PastelRed;
 			target->addHyperText(
-				EMsg_Connect,
-				log::EMergeFlag_MergeableBackward,
+				MsgKind_Connect,
+				log::MergeFlagKind_MergeableBackward,
 				"<\b*>FAIL!"
 				);
 			break;
 
-		case EMsg_Bin:
+		case MsgKind_Bin:
 			target->m_lineAttr.m_icon = 8;
-			target->m_lineAttr.m_flags |= log::ELineAttrFlag_TileIcon;
+			target->m_lineAttr.m_flags |= log::LineAttrFlagKind_TileIcon;
 			target->addBin(p, size);
 			break;
 
@@ -181,7 +181,7 @@ void
 run ()
 {
 /*
-	io::CMappedFile f;
+	io::MappedFile f;
 	f.open ("d:\\c.txt");
 	uchar_t* p = (uchar_t*) f.view ();
 	uchar_t* end = p + f.getSize ();
@@ -201,12 +201,12 @@ run ()
 */
 	printf ("hui govno i muravei\n");
 
-	log::CPacketFile packetFile;
+	log::PacketFile packetFile;
 	packetFile.open ("test_log.nlog");
 	
-	CRepresentor representor;
+	Representor representor;
 
-	gui::gdi::CWidgetT <CLogWidget> widget;
+	gui::gdi::Widget <LogWidget> widget;
 	widget.create (NULL, NULL, L"Test", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 	widget.setPacketFile (&packetFile, &representor);
 

@@ -14,7 +14,7 @@ namespace win {
 
 //.............................................................................
 
-class CMapping: public g::win::CHandle
+class Mapping: public g::win::Handle
 {
 public:
 	bool
@@ -36,7 +36,7 @@ public:
 
 //.............................................................................
 
-class CUnmapViewOfFile 
+class UnmapViewOfFile 
 {
 public:
 	void
@@ -48,7 +48,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMappedView: public rtl::CHandleT <void*, CUnmapViewOfFile>
+class MappedView: public rtl::Handle <void*, UnmapViewOfFile>
 {
 public:
 	void* 

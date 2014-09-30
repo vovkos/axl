@@ -15,7 +15,7 @@ namespace psx {
 
 //.............................................................................
 
-class CFile: public CFd
+class File: public Fd
 {
 public:
 	uint64_t

@@ -6,12 +6,12 @@ namespace test_RbTree {
 
 //.............................................................................
 
-struct TBase: rtl::TListLink
+struct Base: rtl::ListLink
 {
 	int a, b;
 };
 
-struct TDerived: TBase
+struct Derived: Base
 {
 	int c, d;
 };
@@ -19,13 +19,13 @@ struct TDerived: TBase
 void 
 run ()
 {
-	rtl::CIteratorT <TDerived> itDerived;
-	rtl::CIteratorT <TBase> itBase;
+	rtl::Iterator <Derived> itDerived;
+	rtl::Iterator <Base> itBase;
 
 	itBase = itDerived;
 
-	rtl::CRbTreeMapT <int, int> tree;
-	rtl::CRbTreeMapT <int, int>::CIterator it;
+	rtl::RbTreeMap <int, int> tree;
+	rtl::RbTreeMap <int, int>::Iterator it;
 
 	srand (getTickCount ());
 

@@ -14,41 +14,41 @@
 namespace axl {
 namespace io {
 
-class CMappedFile;
+class MappedFile;
 
 //.............................................................................
 
-class CMappedViewMgr
+class MappedViewMgr
 {
-	friend class CMappedFile;
+	friend class MappedFile;
 
 protected:
 	// interval trees are not needed here, because views never overlap COMPLETELY
 	// therefore, for any 2 views in the map: (Begin1 < Begin2 && End1 < End2)
 
-	struct TViewEntry;
+	struct ViewEntry;
 
-	typedef rtl::CRbTreeMapT <uint64_t, TViewEntry*> CViewMap;
+	typedef rtl::RbTreeMap <uint64_t, ViewEntry*> ViewMap;
 
-	struct TViewEntry: rtl::TListLink 
+	struct ViewEntry: rtl::ListLink 
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
-		win::CMappedView m_view;
+		win::MappedView m_view;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-		psx::CMapping m_view;
+		psx::Mapping m_view;
 #endif
 		uint64_t m_begin;
 		uint64_t m_end;
-		CViewMap::CIterator m_mapIt; // to optimize deletion
+		ViewMap::Iterator m_mapIt; // to optimize deletion
 	};
 
 protected:	
-	CMappedFile* m_mappedFile;
-	rtl::CStdListT <TViewEntry> m_viewList;
-	CViewMap m_viewMap; 
+	MappedFile* m_mappedFile;
+	rtl::StdList <ViewEntry> m_viewList;
+	ViewMap m_viewMap; 
 
 protected:
-	CMappedViewMgr () // protected construction only
+	MappedViewMgr () // protected construction only
 	{		
 		m_mappedFile = NULL;
 	}
@@ -81,27 +81,27 @@ public:
 
 //.............................................................................
 
-class CMappedFile
+class MappedFile
 {
-	friend class CMappedViewMgr;
+	friend class MappedViewMgr;
 	
 public:
-	enum EDefaults
+	enum DefaultsKind
 	{
-		EDefaults_MaxDynamicViewCount = 32,
-		EDefaults_ReadAheadSize       = 16 * 1024,
+		DefaultsKind_MaxDynamicViewCount = 32,
+		DefaultsKind_ReadAheadSize       = 16 * 1024,
 	};
 
 protected:
-	CFile m_file;
+	File m_file;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	mutable win::CMapping m_mapping;
+	mutable win::Mapping m_mapping;
 	mutable uint64_t m_mappedSize;
 #endif
 	
-	mutable CMappedViewMgr m_dynamicViewMgr;
-	mutable CMappedViewMgr m_permanentViewMgr;
+	mutable MappedViewMgr m_dynamicViewMgr;
+	mutable MappedViewMgr m_permanentViewMgr;
 	
 	size_t m_readAheadSize;
 	size_t m_maxDynamicViewCount;
@@ -110,9 +110,9 @@ protected:
 	uint64_t m_fileSize;
 
 public:
-	CMappedFile ();
+	MappedFile ();
 
-	~CMappedFile ()
+	~MappedFile ()
 	{
 		close ();
 	}
@@ -181,11 +181,11 @@ protected:
 
 //.............................................................................
 
-class CSimpleMappedFile
+class SimpleMappedFile
 {
 protected:
-	CFile m_file;
-	CMapping m_mapping;
+	File m_file;
+	Mapping m_mapping;
 
 public:
 	bool

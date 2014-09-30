@@ -15,7 +15,7 @@ namespace rtl {
 
 //.............................................................................
 
-class CCmdLineParserRoot
+class CmdLineParserRoot
 {
 protected:
 	static
@@ -23,51 +23,51 @@ protected:
 	extractArg (
 		const char* p,
 		const char* end,
-		rtl::CString* arg
+		rtl::String* arg
 		);
 
 	static
 	bool
 	parseArg (
 		const char* p,
-		rtl::CString* switchName,
-		rtl::CString* value
+		rtl::String* switchName,
+		rtl::String* value
 		);
 };
 
 //.............................................................................
 
-enum ECmdLineSwitchFlag
+enum CmdLineSwitchFlagKind
 {
-	ECmdLineSwitchFlag_HasValue = 0x80000000,
+	CmdLineSwitchFlagKind_HasValue = 0x80000000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
-	typename TSwitchTable
+	typename Switchable
 	>
-class CCmdLineParserT: protected CCmdLineParserRoot
+class CmdLineParser: protected CmdLineParserRoot
 {
 public:
-	typedef typename TSwitchTable::ESwitch ESwitch;
+	typedef typename Switchable::SwitchKind SwitchKind;
 
 protected:
-	enum EFlag
+	enum FlagKind
 	{
-		EFlag_Forward = 0x01,
+		FlagKind_Forward = 0x01,
 	};
 
 protected:
-	ESwitch m_valueSwitch;
-	rtl::CString m_valueSwitchName;
+	SwitchKind m_valueSwitch;
+	rtl::String m_valueSwitchName;
 	uint_t m_flags;
 
 public:
-	CCmdLineParserT ()
+	CmdLineParser ()
 	{
-		m_valueSwitch = (ESwitch) 0;
+		m_valueSwitch = (SwitchKind) 0;
 		m_flags = 0;
 	}
 
@@ -85,11 +85,11 @@ public:
 		const char* p = cmdLine;
 		const char* end = p + length;
 
-		rtl::CString arg;
-		rtl::CString switchName;
-		rtl::CString value;
+		rtl::String arg;
+		rtl::String switchName;
+		rtl::String value;
 
-		m_valueSwitch = (ESwitch) 0;
+		m_valueSwitch = (SwitchKind) 0;
 
 		for (int i = 0; p < end; i++)
 		{
@@ -100,7 +100,7 @@ public:
 			if (arg.isEmpty ())
 				break;
 
-			result = (m_flags & EFlag_Forward) ?
+			result = (m_flags & FlagKind_Forward) ?
 				static_cast <T*> (this)->onValue (arg) :
 				parseArg (arg, &switchName, &value) &&
 				processArg (i, switchName, value);
@@ -122,7 +122,7 @@ public:
 		size_t length = -1
 		)
 	{
-		rtl::CString cmdLine (cmdLine, length);
+		rtl::String cmdLine (cmdLine, length);
 		return parse (cmdLine, cmdLine.getLength ());
 	}
 
@@ -134,14 +134,14 @@ public:
 	{
 		bool result;
 
-		rtl::CString switchName;
-		rtl::CString value;
+		rtl::String switchName;
+		rtl::String value;
 
 		for (int i = 0; i < argc; i++)
 		{
 			const char* arg = argv [i];
 
-			result = (m_flags & EFlag_Forward) ?
+			result = (m_flags & FlagKind_Forward) ?
 				static_cast <T*> (this)->onValue (arg) :
 				parseArg (arg, &switchName, &value) &&
 				processArg (i, switchName, value);
@@ -161,14 +161,14 @@ public:
 	{
 		bool result;
 
-		rtl::CString switchName;
-		rtl::CString value;
+		rtl::String switchName;
+		rtl::String value;
 
 		for (int i = 0; i < argc; i++)
 		{
-			rtl::CString arg = argv [i];
+			rtl::String arg = argv [i];
 
-			result = (m_flags & EFlag_Forward) ?
+			result = (m_flags & FlagKind_Forward) ?
 				static_cast <T*> (this)->onValue (arg) :
 				parseArg (arg, &switchName, &value) &&
 				processArg (i, switchName, value);
@@ -217,8 +217,8 @@ protected:
 	bool
 	processArg (
 		int i,
-		const rtl::CString& switchName,
-		const rtl::CString& value
+		const rtl::String& switchName,
+		const rtl::String& value
 		)
 	{
 		bool result;
@@ -234,7 +234,7 @@ protected:
 			if (!result)
 				return false;
 
-			m_valueSwitch = (ESwitch) 0;
+			m_valueSwitch = (SwitchKind) 0;
 			return true;
 		}
 
@@ -242,14 +242,14 @@ protected:
 		if (!result)
 			return false;
 
-		ESwitch switch = TSwitchTable::findSwitch (switchName);
+		SwitchKind switch = Switchable::findSwitch (switchName);
 		if (!switch)
 		{
 			err::setFormatStringError ("unknown switch '%s'", switchName.cc ());
 			return false;
 		}
 
-		if ((switch & ECmdLineSwitchFlag_HasValue) && value.isEmpty ())
+		if ((switch & CmdLineSwitchFlagKind_HasValue) && value.isEmpty ())
 		{
 			m_valueSwitch = switch;
 			m_valueSwitchName = switchName;
@@ -262,7 +262,7 @@ protected:
 
 //.............................................................................
 
-struct TSwitchInfo: rtl::TListLink
+struct SwitchInfo: rtl::ListLink
 {
 	int m_switch;
 	const char* m_nameTable [4]; // up to 4 alternative names
@@ -272,8 +272,8 @@ struct TSwitchInfo: rtl::TListLink
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CString
-getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList);
+String
+getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList);
 
 //.............................................................................
 
@@ -281,25 +281,25 @@ getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList);
 class class \
 { \
 public: \
-	typedef switch ESwitch; \
-	typedef axl::rtl::CHashTableMapT <char, ESwitch, axl::rtl::CHashIdT <char> > CCharMap; \
-	typedef axl::rtl::CStringHashTableMapT <ESwitch> CStringMap; \
+	typedef switch SwitchKind; \
+	typedef axl::rtl::HashTableMap <char, SwitchKind, axl::rtl::HashId <char> > CharMap; \
+	typedef axl::rtl::StringHashTableMap <SwitchKind> StringMap; \
 protected: \
-	axl::rtl::CAuxListT <axl::rtl::TSwitchInfo> m_switchInfoList; \
-	CCharMap m_codeMap; \
-	CStringMap m_nameMap; \
+	axl::rtl::AuxList <axl::rtl::SwitchInfo> m_switchInfoList; \
+	CharMap m_codeMap; \
+	StringMap m_nameMap; \
 protected: \
-	ESwitch \
+	SwitchKind \
 	findSwitchImpl (char code) \
 	{ \
-		CCharMap::CIterator it = m_codeMap.find (code); \
-		return it ? it->m_value : (ESwitch) 0; \
+		CharMap::Iterator it = m_codeMap.find (code); \
+		return it ? it->m_value : (SwitchKind) 0; \
 	} \
-	ESwitch \
+	SwitchKind \
 	findSwitchImpl (const char* name) \
 	{ \
-		CStringMap::CIterator it = m_nameMap.find (name); \
-		return it ? it->m_value : (ESwitch) 0; \
+		StringMap::Iterator it = m_nameMap.find (name); \
+		return it ? it->m_value : (SwitchKind) 0; \
 	} \
 public: \
 	static \
@@ -309,13 +309,13 @@ public: \
 		return axl::rtl::getSingleton <class> (); \
 	} \
 	static \
-	const axl::rtl::CConstListT <axl::rtl::TSwitchInfo> \
+	const axl::rtl::ConstList <axl::rtl::SwitchInfo> \
 	getSwitchInfoList () \
 	{ \
 		return getSingleton ()->m_switchInfoList; \
 	} \
 	static \
-	ESwitch \
+	SwitchKind \
 	findSwitch (const char* name) \
 	{ \
 		return name [1] ? \
@@ -323,7 +323,7 @@ public: \
 			getSingleton ()->findSwitchImpl (name [0]); \
 	} \
 	static \
-	axl::rtl::CString \
+	axl::rtl::String \
 	getHelpString () \
 	{ \
 		return axl::rtl::getCmdLineHelpString (getSingleton ()->m_switchInfoList); \
@@ -333,7 +333,7 @@ public: \
 
 #define AXL_RTL_CMD_LINE_ADD_SWITCH_INFO(switch, name0, name1, name2, name3, value, description) \
 		{ \
-			static axl::rtl::TSwitchInfo switchInfo; \
+			static axl::rtl::SwitchInfo switchInfo; \
 			switchInfo.m_switch = switch; \
 			switchInfo.m_nameTable [0] = name0; \
 			switchInfo.m_nameTable [1] = name1; \

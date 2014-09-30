@@ -14,7 +14,7 @@ namespace psx {
 
 //.............................................................................
 
-class CCloseFd
+class CloseFd
 {
 public:
 	void
@@ -26,15 +26,15 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CFd: public rtl::CHandleT <int, CCloseFd, rtl::CMinusOneT <int> >
+class Fd: public rtl::Handle <int, CloseFd, rtl::MinusOne <int> >
 {
 public:
-	CFd ()
+	Fd ()
 	{
 	}
 
-	CFd (int h):
-		rtl::CHandleT <int, CCloseFd, rtl::CMinusOneT <int> > (h)
+	Fd (int h):
+		rtl::Handle <int, CloseFd, rtl::MinusOne <int> > (h)
 	{
 	}
 

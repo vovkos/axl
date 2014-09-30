@@ -8,8 +8,8 @@ namespace test_HashTable {
 
 void run ()
 {
-	rtl::CHashTableMapT <int, int, rtl::CHashIdT <int> > map;
-	rtl::CIteratorT <rtl::CHashTableMapEntryT <int, int> > it;
+	rtl::HashTableMap <int, int, rtl::HashId <int> > map;
+	rtl::Iterator <rtl::HashTableMapEntry <int, int> > it;
 
 	srand (getTickCount ());
 

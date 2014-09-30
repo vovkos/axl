@@ -24,10 +24,10 @@ namespace io {
 
 //.............................................................................
 
-class CPipe
+class Pipe
 {
 protected:
-	g::win::CFileHandle m_socket;
+	g::win::FileHandle m_socket;
 
 protected:
 	bool open (
@@ -41,14 +41,14 @@ protected:
 
 //.............................................................................
 
-class CConnectionPipe;
+class ConnectionPipe;
 
-class CListenerPipe: public CPipe
+class ListenerPipe: public Pipe
 {
 protected:
-	rtl::CArrayT <CConnectionPipe*> m_backLog;
-	exe::CFunction m_onAccept;
-	ref::CPtrT <exe::CWorkerThread> m_workerThread;
+	rtl::Array <ConnectionPipe*> m_backLog;
+	exe::Function m_onAccept;
+	ref::Ptr <exe::Workerhread> m_workerThread;
 
 public:
 	bool
@@ -56,30 +56,30 @@ public:
 		const char* name,
 		SECURITY_DESCRIPTOR* secDescr,
 		size_t backLog,
-		const exe::CFunction& onAccept
+		const exe::Function& onAccept
 		);
 };
 
 //.............................................................................
 
-class CConnectionPipe: public CPipe
+class ConnectionPipe: public Pipe
 {
 protected:
-	exe::CFunction m_onConnectComplete;
-	exe::CFunction m_onDisconnectComplete;	
+	exe::Function m_onConnectComplete;
+	exe::Function m_onDisconnectComplete;	
 
 public:
 	bool 
 	connect (
 		const char* address,
 		uint_t timeout,
-		const exe::CFunction& onComplete // void OnComplete (err::CError* pError)
+		const exe::Function& onComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
 	disconnect (
 		uint_t timeout,
-		const exe::CFunction& onComplete // void OnComplete (err::CError* pError)
+		const exe::Function& onComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
@@ -99,7 +99,7 @@ public:
 	send (
 		const void* p,
 		size_t size,
-		const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
+		const exe::Function& onComplete // void OnComplete (size_t ActualSize);
 		);
 
 	virtual
@@ -107,7 +107,7 @@ public:
 	recv (
 		void* p,
 		size_t size,
-		const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
+		const exe::Function& onComplete // void OnComplete (size_t ActualSize);
 		);
 };
 

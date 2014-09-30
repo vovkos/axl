@@ -7,8 +7,8 @@ namespace rtl {
 //.............................................................................
 
 size_t
-CHexEncoding::encode (
-	CString* string,
+HexEncoding::encode (
+	String* string,
 	const void* p,
 	size_t size,
 	uint_t flags
@@ -21,14 +21,14 @@ CHexEncoding::encode (
 	const uchar_t* srcEnd = src + size;
 
 	size_t length;
-	if ((flags & EHexEncode_NoSpace))
+	if ((flags & HexEncodeKind_NoSpace))
 	{
 		length = size * 2;
 		char* dst = string->getBuffer (length, false);
 		if (!dst)
 			return -1;
 
-		if (flags & EHexEncode_UpperCase)
+		if (flags & HexEncodeKind_UpperCase)
 			encode_nsu (dst, src, srcEnd);
 		else
 			encode_nsl (dst, src, srcEnd);
@@ -40,7 +40,7 @@ CHexEncoding::encode (
 		if (!dst)
 			return -1;
 
-		if (flags & EHexEncode_UpperCase)
+		if (flags & HexEncodeKind_UpperCase)
 			encode_u (dst, src, srcEnd);
 		else
 			encode_l (dst, src, srcEnd);
@@ -50,7 +50,7 @@ CHexEncoding::encode (
 }
 
 void
-CHexEncoding::encode_l (
+HexEncoding::encode_l (
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
@@ -71,7 +71,7 @@ CHexEncoding::encode_l (
 }
 
 void
-CHexEncoding::encode_u (
+HexEncoding::encode_u (
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
@@ -92,7 +92,7 @@ CHexEncoding::encode_u (
 }
 
 void
-CHexEncoding::encode_nsl (
+HexEncoding::encode_nsl (
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
@@ -108,7 +108,7 @@ CHexEncoding::encode_nsl (
 }
 
 void
-CHexEncoding::encode_nsu (
+HexEncoding::encode_nsu (
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
@@ -124,22 +124,22 @@ CHexEncoding::encode_nsu (
 }
 
 size_t
-CHexEncoding::decode (
-	CArrayT <uchar_t>* buffer,
+HexEncoding::decode (
+	Array <uchar_t>* buffer,
 	const char* p,
 	size_t length
 	)
 {
-	enum EState
+	enum StateKind
 	{
-		EState_Normal = 0,
-		EState_Hex
+		StateKind_Normal = 0,
+		StateKind_Hex
 	};
 
-	EState state = EState_Normal;
+	StateKind state = StateKind_Normal;
 
 	if (length == -1)
-		length = CStringDetails::calcLength (p);
+		length = StringDetails::calcLength (p);
 
 	buffer->reserve (length / 2);
 
@@ -156,16 +156,16 @@ CHexEncoding::decode (
 
 		switch (state)
 		{
-		case EState_Normal:
+		case StateKind_Normal:
 			if (isSpace)
 				break;
 
 			hexCodeLen = 0;
 			hexCodeString [hexCodeLen++] = *p;
-			state = EState_Hex;
+			state = StateKind_Hex;
 			break;
 
-		case EState_Hex:
+		case StateKind_Hex:
 			if (!isSpace)
 			{
 				hexCodeString [hexCodeLen++] = *p;
@@ -181,12 +181,12 @@ CHexEncoding::decode (
 			else
 				p = end; // not a hex string anymore, break the loop
 
-			state = EState_Normal;
+			state = StateKind_Normal;
 			break;
 		}
 	}
 
-	if (state == EState_Hex)
+	if (state == StateKind_Hex)
 	{
 		hexCodeString [hexCodeLen] = 0;
 		x = (uchar_t) strtoul (hexCodeString, &hexCodeEnd, 16);

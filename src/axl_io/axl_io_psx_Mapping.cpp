@@ -9,7 +9,7 @@ namespace psx {
 //.............................................................................
 
 void*
-CMapping::map (
+Mapping::map (
 	void* addrHint,
 	size_t size,
 	int protection,
@@ -32,7 +32,7 @@ CMapping::map (
 }
 
 void
-CMapping::unmap (size_t size)
+Mapping::unmap (size_t size)
 {
 	if (!isOpen ())
 		return;
@@ -45,7 +45,7 @@ CMapping::unmap (size_t size)
 //.............................................................................
 
 bool
-CSharedMemory::open (
+SharedMemory::open (
 	const char* name,
 	uint_t flags,
 	mode_t mode

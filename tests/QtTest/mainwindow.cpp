@@ -56,11 +56,11 @@ bool mainWindow::initialize ()
 #if 0
 	result = 
 		m_logWidget->w ()->create (
-			(log::CServerPeer*) &m_logServerProxy, 
+			(log::ServerPeer*) &m_logServerProxy, 
 			"d:/test_log.njidx"
 			) &&
 		m_logServer.start (
-			(log::CClientPeer*) &m_logWidgetProxy, 
+			(log::ClientPeer*) &m_logWidgetProxy, 
 			"d:/test_log.njlog",
 			"d:/test_log.njmrg",
 			"d:/test_log.njcol"
@@ -71,8 +71,8 @@ bool mainWindow::initialize ()
 		"d:/test_log.njidx"
 		);
 
-	log::TBinDataConfig binDataConfig;
-	binDataConfig.m_binViewKind = log::EBinView_Text;
+	log::BinDataConfig binDataConfig;
+	binDataConfig.m_binViewKind = log::BinViewKind_Text;
 
 	static const char data [] = 
 		"suka bla\n"
@@ -81,7 +81,7 @@ bool mainWindow::initialize ()
 		"pidaras\n";
 
 	m_memoryServer.create (
-		(log::CClientPeer*) &m_logWidgetProxy, 
+		(log::ClientPeer*) &m_logWidgetProxy, 
 		&binDataConfig,
 		data, sizeof (data) - 1,
 		g::getTimestamp ()

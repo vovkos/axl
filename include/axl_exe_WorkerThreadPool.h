@@ -14,37 +14,37 @@ namespace exe {
 
 //.............................................................................
 
-class CWorkerThreadPool
+class WorkerhreadPool
 {
 protected:
-	struct TThreadEntry: rtl::TListLink
+	struct ThreadEntry: rtl::ListLink
 	{
-		CWorkerThread m_thread;
+		Workerhread m_thread;
 		size_t m_reserveEventCount;
 		size_t m_pinCount;
 	};
 
-	class CThreadPin: public ref::IRefCount
+	class ThreadPin: public ref::IRefCount
 	{
 	public:
-		CWorkerThreadPool* m_threadPool;
-		TThreadEntry* m_threadEntry;
+		WorkerhreadPool* m_threadPool;
+		ThreadEntry* m_threadEntry;
 		size_t m_reserveEventCount;
 
 	public:
-		CThreadPin ();
+		ThreadPin ();
 
-		~CThreadPin ();
+		~ThreadPin ();
 	};
 
 protected:
-	friend class CThreadPin;
+	friend class ThreadPin;
 
-	mt::CLock m_lock;
-	rtl::CStdListT <TThreadEntry> m_threadList;
+	mt::Lock m_lock;
+	rtl::StdList <ThreadEntry> m_threadList;
 
 public:
-	~CWorkerThreadPool ()
+	~WorkerhreadPool ()
 	{
 		stop ();
 	}
@@ -58,7 +58,7 @@ public:
 	void 
 	stop (ulong_t timeout = -1);
 
-	ref::CPtrT <CWorkerThread> 
+	ref::Ptr <Workerhread> 
 	getThread (size_t reserveEventCount = 0);
 };
 

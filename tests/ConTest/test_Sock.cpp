@@ -9,10 +9,10 @@ namespace test_Sock {
 /*
 
 void 
-onAccept (ref::CPtrT <io::CConnectionSock> connectionSock)
+onAccept (ref::Ptr <io::ConnectionSock> connectionSock)
 {
-	io::TSockAddrU localAddr;
-	io::TSockAddrU peerAddr;
+	io::SockAddrU localAddr;
+	io::SockAddrU peerAddr;
 
 	connectionSock->getLocalAddress (&localAddr);
 	connectionSock->getPeerAddress (&peerAddr);
@@ -22,15 +22,15 @@ onAccept (ref::CPtrT <io::CConnectionSock> connectionSock)
 
 void run_Listen ()
 {
-	io::CListenerSock sock;	
+	io::ListenerSock sock;	
 
-	io::CSockAddrIp addr (1001);
+	io::SockAddrIp addr (1001);
 
 	bool result = 
-		sock.open (io::ESockProto_Tcp, addr) &&
-		sock.listen (32, &exe::CFunctionT <
-			exe::CArgT <void>, 
-			exe::CArgT <ref::CPtrT <io::CConnectionSock> > > (onAccept));;
+		sock.open (io::SockProtoKind_Tcp, addr) &&
+		sock.listen (32, &exe::Function <
+			exe::Arg <void>, 
+			exe::Arg <ref::Ptr <io::ConnectionSock> > > (onAccept));;
 	
 	if (!result)
 	{
@@ -48,12 +48,12 @@ void run_Listen ()
 
 void 
 onConnect (
-	io::CConnectionSock* sock,
-	const err::CError& error
+	io::ConnectionSock* sock,
+	const err::Error& error
 	)
 {
-	io::TSockAddrU localAddr;
-	io::TSockAddrU peerAddr;
+	io::SockAddrU localAddr;
+	io::SockAddrU peerAddr;
 
 	sock->getLocalAddress (&localAddr);
 	sock->getPeerAddress (&peerAddr);
@@ -67,20 +67,20 @@ onConnect (
 void 
 run_Connect ()
 {
-	exe::CWorkerThread workerThread;
+	exe::Workerhread workerThread;
 	workerThread.start ();
 
-	io::CConnectionSock sock;	
+	io::ConnectionSock sock;	
 
-	io::CSockAddrIp addr (0x7f000001, 1001);
+	io::SockAddrIp addr (0x7f000001, 1001);
 
-	exe::CScheduledFunctionT <
-		exe::CArgT <io::CConnectionSock*>, 
-		io::CConnectionSock::COnConnectCompleteArg> 
+	exe::ScheduledFunction <
+		exe::Arg <io::ConnectionSock*>, 
+		io::ConnectionSock::OnConnectCompleteArg> 
 		onComplete (&workerThread, onConnect, &sock);
 
 	bool result = 
-		sock.open (io::ESockProto_Tcp, io::ESockAddr_Ip) &&
+		sock.open (io::SockProtoKind_Tcp, io::SockAddrKind_Ip) &&
 		sock.syncConnect (&addr, 1000);
 	
 	if (!result)
@@ -99,9 +99,9 @@ char buffer [1024] = { 0 };
 
 void 
 onRecvFrom (
-	io::CDgramSock* sock,
-	const err::CError& error,
-	io::TSockAddr* addr,
+	io::DgramSock* sock,
+	const err::Error& error,
+	io::SockAddr* addr,
 	size_t actualSize
 	)
 {
@@ -113,9 +113,9 @@ onRecvFrom (
 
 	printf ("received %d bytes from %s: %s\n", actualSize, addr->toString (), buffer);
 
-	exe::CFunctionT <
-		exe::CArgT <io::CDgramSock*>, 
-		io::CDgramSock::COnSendRecvCompleteArg> 
+	exe::Function <
+		exe::Arg <io::DgramSock*>, 
+		io::DgramSock::OnSendRecvCompleteArg> 
 		onComplete (onRecvFrom, sock);
 
 	sock->recvFrom (buffer, 1023, &onComplete);
@@ -124,11 +124,11 @@ onRecvFrom (
 void 
 run_Dgram ()
 {
-	io::CDgramSock sock;	
+	io::DgramSock sock;	
 
-	io::CSockAddrIp addr (0, 1001);
+	io::SockAddrIp addr (0, 1001);
 
-	bool result = sock.open (io::ESockProto_Udp, &addr);
+	bool result = sock.open (io::SockProtoKind_Udp, &addr);
 	if (!result)
 	{
 		printf ("cannot open %s: %s\n", addr.toString (), err::getError ()->getDescription ());
@@ -140,9 +140,9 @@ run_Dgram ()
 //	io::CSockAddrIp AddrTo (0x7f000001, 1002);
 //	size_t x = Sock.SyncSendTo ("hui!", 4, &AddrTo);
 
-	exe::CFunctionT <
-		exe::CArgT <io::CDgramSock*>, 
-		io::CDgramSock::COnSendRecvCompleteArg> 
+	exe::Function <
+		exe::Arg <io::DgramSock*>, 
+		io::DgramSock::OnSendRecvCompleteArg> 
 		onComplete (onRecvFrom, &sock);
 
 	sock.recvFrom (buffer, 1023, &onComplete);

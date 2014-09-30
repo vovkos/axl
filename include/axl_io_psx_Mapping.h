@@ -15,20 +15,20 @@ namespace psx {
 
 //.............................................................................
 
-class CMapping
+class Mapping
 {
 protected:
 	void* m_p;
 	size_t m_size;
 
 public:
-	CMapping ()
+	Mapping ()
 	{
 		m_p = NULL;
 		m_size = 0;
 	}
 
-	~CMapping ()
+	~Mapping ()
 	{
 		close ();
 	}
@@ -66,7 +66,7 @@ public:
 
 //.............................................................................
 
-class CSharedMemory: public CFd
+class SharedMemory: public Fd
 {
 public:
 	bool

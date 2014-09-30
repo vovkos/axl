@@ -16,24 +16,24 @@ namespace gui {
 
 //.............................................................................
 
-class CCanvas: public CGuiItem
+class Canvas: public GuiItem
 {
 protected:
-	CFont* m_font;
-	TColorAttr m_colorAttr;
+	Font* m_font;
+	ColorAttr m_colorAttr;
 
 public:
-	CFont* m_baseFont;
-	TTextAttr m_baseTextAttr;
-	TTextAttr m_defTextAttr;
-	TPalette m_palette;
+	Font* m_baseFont;
+	TextAttr m_baseTextAttr;
+	TextAttr m_defTextAttr;
+	Palette m_palette;
 
 public:
-	CCanvas ()
+	Canvas ()
 	{
 		m_font = NULL;
 		m_baseFont = NULL;
-		m_baseTextAttr.setup (EStdPalColor_WidgetText, EStdPalColor_WidgetBack, 0);
+		m_baseTextAttr.setup (StdPalColorKind_WidgetText, StdPalColorKind_WidgetBack, 0);
 	}
 
 	// rect drawing
@@ -61,7 +61,7 @@ public:
 
 	bool
 	drawRect (
-		const TRect& rect,
+		const Rect& rect,
 		uint_t color
 		)
 	{
@@ -75,7 +75,7 @@ public:
 	}
 
 	bool
-	drawRect (const TRect& rect)
+	drawRect (const Rect& rect)
 	{
 		return drawRect (
 			rect.m_left,
@@ -135,9 +135,9 @@ public:
 
 	bool
 	drawText (
-		const TPoint& point,
-		const TRect& rect,
-		const TTextAttr& textAttr,
+		const Point& point,
+		const Rect& rect,
+		const TextAttr& textAttr,
 		const char* text,
 		size_t length = -1
 		)
@@ -147,8 +147,8 @@ public:
 
 	bool
 	drawText (
-		const TPoint& point,
-		const TRect& rect,
+		const Point& point,
+		const Rect& rect,
 		const char* text,
 		size_t length = -1
 		)
@@ -203,9 +203,9 @@ public:
 
 	bool
 	drawText_utf8 (
-		const TPoint& point,
-		const TRect& rect,
-		const TTextAttr& textAttr,
+		const Point& point,
+		const Rect& rect,
+		const TextAttr& textAttr,
 		const utf8_t* text,
 		size_t length = -1
 		)
@@ -227,8 +227,8 @@ public:
 
 	bool
 	drawText_utf8 (
-		const TPoint& point,
-		const TRect& rect,
+		const Point& point,
+		const Rect& rect,
 		const utf8_t* text,
 		size_t length = -1
 		)
@@ -295,9 +295,9 @@ public:
 
 	bool
 	drawText_utf16 (
-		const TPoint& point,
-		const TRect& rect,
-		const TTextAttr& textAttr,
+		const Point& point,
+		const Rect& rect,
+		const TextAttr& textAttr,
 		const utf16_t* text,
 		size_t length = -1
 		)
@@ -319,8 +319,8 @@ public:
 
 	bool
 	drawText_utf16 (
-		const TPoint& point,
-		const TRect& rect,
+		const Point& point,
+		const Rect& rect,
 		const utf16_t* text,
 		size_t length = -1
 		)
@@ -387,9 +387,9 @@ public:
 
 	bool
 	drawText_utf32 (
-		const TPoint& point,
-		const TRect& rect,
-		const TTextAttr& textAttr,
+		const Point& point,
+		const Rect& rect,
+		const TextAttr& textAttr,
 		const utf32_t* text,
 		size_t length = -1
 		)
@@ -411,8 +411,8 @@ public:
 
 	bool
 	drawText_utf32 (
-		const TPoint& point,
-		const TRect& rect,
+		const Point& point,
+		const Rect& rect,
 		const utf32_t* text,
 		size_t length = -1
 		)
@@ -439,7 +439,7 @@ public:
 	drawImage (
 		int x,
 		int y,
-		CImage* image,
+		Image* image,
 		int left,
 		int top,
 		int right,
@@ -448,9 +448,9 @@ public:
 
 	bool
 	drawImage (
-		const TPoint& point,
-		CImage* image,
-		const TRect& rect = TRect ()
+		const Point& point,
+		Image* image,
+		const Rect& rect = Rect ()
 		)
 	{
 		return drawImage (
@@ -469,7 +469,7 @@ public:
 	virtual
 	bool
 	copyRect (
-		CCanvas* srcCanvas,
+		Canvas* srcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
@@ -480,10 +480,10 @@ public:
 
 	bool
 	copyRect (
-		CCanvas* srcCanvas,
-		const TPoint& dstPoint,
-		const TPoint& srcPoint,
-		const TSize& size
+		Canvas* srcCanvas,
+		const Point& dstPoint,
+		const Point& srcPoint,
+		const Size& size
 		)
 	{
 		return copyRect (

@@ -7,7 +7,7 @@ namespace gui {
 //.............................................................................
 
 void
-CHyperText::clear ()
+Hyperext::clear ()
 {
 	m_source.clear ();
 	m_text.clear ();
@@ -17,7 +17,7 @@ CHyperText::clear ()
 }
 
 size_t
-CHyperText::backspace (size_t backLength)
+Hyperext::backspace (size_t backLength)
 {
 	// don't touch m_Source!
 
@@ -35,7 +35,7 @@ CHyperText::backspace (size_t backLength)
 }
 
 size_t 
-CHyperText::appendPlainText (
+Hyperext::appendPlainText (
 	const char* text, 
 	size_t length
 	)
@@ -48,7 +48,7 @@ CHyperText::appendPlainText (
 }
 
 size_t 
-CHyperText::appendPlainText (
+Hyperext::appendPlainText (
 	char c, 
 	size_t count
 	)
@@ -58,13 +58,13 @@ CHyperText::appendPlainText (
 }
 
 size_t
-CHyperText::appendHyperText (
-	const TTextAttr& baseAttr,
+Hyperext::appendHyperText (
+	const TextAttr& baseAttr,
 	const char* text,
 	size_t length
 	)
 {
-	TTextAttr attr = baseAttr;
+	TextAttr attr = baseAttr;
 
 	const char* p = text;
 	const char* end;
@@ -126,10 +126,10 @@ CHyperText::appendHyperText (
 	return length;
 }
 
-THyperlinkAnchor*
-CHyperText::findHyperlinkByX (int x) const
+HyperlinkAnchor*
+Hyperext::findHyperlinkByX (int x) const
 {
-	THyperlinkAnchor* result = NULL;
+	HyperlinkAnchor* result = NULL;
 
 	size_t begin = 0;
 	size_t end = m_hyperlinkXMap.getCount ();
@@ -138,7 +138,7 @@ CHyperText::findHyperlinkByX (int x) const
 	{
 		size_t mid = (begin + end) / 2;
 
-		const THyperlinkXMapEntry* mapEntry = &m_hyperlinkXMap [mid];
+		const HyperlinkXMapEntry* mapEntry = &m_hyperlinkXMap [mid];
 		if (mapEntry->m_x == x)
 			return mapEntry->m_anchor;
 
@@ -157,7 +157,7 @@ CHyperText::findHyperlinkByX (int x) const
 }
 
 void
-CHyperText::calcHyperlinkXMap (CFont* baseFont)
+Hyperext::calcHyperlinkXMap (Font* baseFont)
 {
 	int x = 0;
 	size_t offset = 0;
@@ -165,21 +165,21 @@ CHyperText::calcHyperlinkXMap (CFont* baseFont)
 	size_t attrCount = m_attrArray.getCount ();
 	size_t hyperlinkCount = m_hyperlinkArray.getCount ();
 
-	const TTextAttrAnchor* attrAnchor = m_attrArray;
-	const TTextAttrAnchor* attrEnd = attrAnchor + attrCount;
-	THyperlinkXMapEntry* hyperlinkXMapEntry;
+	const TextAttrAnchor* attrAnchor = m_attrArray;
+	const TextAttrAnchor* attrEnd = attrAnchor + attrCount;
+	HyperlinkXMapEntry* hyperlinkXMapEntry;
 	
 	uint_t fontFlags = 0;
-	CFont* font = baseFont->getFontMod (fontFlags);
+	Font* font = baseFont->getFontMod (fontFlags);
 
 	m_hyperlinkXMap.setCount (hyperlinkCount);
 	hyperlinkXMapEntry = m_hyperlinkXMap;
 
-	rtl::CIteratorT <THyperlinkAnchor> it = m_hyperlinkArray.getHead ();
+	rtl::Iterator <HyperlinkAnchor> it = m_hyperlinkArray.getHead ();
 	for (; it; it++)
 	{
-		THyperlinkAnchor* hyperlinkAnchor = *it;
-		TSize size;
+		HyperlinkAnchor* hyperlinkAnchor = *it;
+		Size size;
 
 		for (; attrAnchor < attrEnd && attrAnchor->m_offset < hyperlinkAnchor->m_offset; attrAnchor++)
 		{
@@ -208,10 +208,10 @@ CHyperText::calcHyperlinkXMap (CFont* baseFont)
 	}
 }
 
-TSize
-CHyperText::calcTextSize (CFont* baseFont) const
+Size
+Hyperext::calcTextSize (Font* baseFont) const
 {
-	TSize size;
+	Size size;
 
 	int x = 0;
 	size_t offset = 0;
@@ -219,11 +219,11 @@ CHyperText::calcTextSize (CFont* baseFont) const
 	size_t attrCount = m_attrArray.getCount ();
 
 	uint_t fontFlags = 0;
-	CFont* font = baseFont->getFontMod (fontFlags);
+	Font* font = baseFont->getFontMod (fontFlags);
 
 	for (size_t i = 0; i < attrCount; i++)
 	{
-		const TTextAttrAnchor* attrAnchor = &m_attrArray [i];
+		const TextAttrAnchor* attrAnchor = &m_attrArray [i];
 
 		if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 			continue;

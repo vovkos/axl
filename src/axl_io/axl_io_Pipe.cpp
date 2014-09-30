@@ -6,7 +6,7 @@ namespace io {
 
 //.............................................................................
 
-bool CPipe::open (
+bool Pipe::open (
 	const char* name,
 	SECURITY_DESCRIPTOR* sd
 	)
@@ -15,18 +15,18 @@ bool CPipe::open (
 }
 
 void 
-CPipe::close ()
+Pipe::close ()
 {
 }
 
 //.............................................................................
 
 bool
-CListenerPipe::listen (
+ListenerPipe::listen (
 	const char* name,
 	SECURITY_DESCRIPTOR* sd,
 	size_t backLog,
-	const exe::CFunction& onAccept
+	const exe::Function& onAccept
 	)
 {
 	return false;
@@ -35,26 +35,26 @@ CListenerPipe::listen (
 //.............................................................................
 
 bool 
-CConnectionPipe::connect (
+ConnectionPipe::connect (
 	const char* address,
 	uint_t timeout,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	return false;
 }
 
 bool 
-CConnectionPipe::disconnect (
+ConnectionPipe::disconnect (
 	uint_t timeout,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	return false;
 }
 
 bool 
-CConnectionPipe::syncConnect (
+ConnectionPipe::syncConnect (
 	const char* address,
 	uint_t timeout
 	)
@@ -63,32 +63,32 @@ CConnectionPipe::syncConnect (
 }
 
 bool 
-CConnectionPipe::syncDisconnect (uint_t timeout)
+ConnectionPipe::syncDisconnect (uint_t timeout)
 {
 	return false;
 }
 
 bool
-CConnectionPipe::isConnected ()
+ConnectionPipe::isConnected ()
 {
 	return false;
 }
 
 bool
-CConnectionPipe::send (
+ConnectionPipe::send (
 	const void* p,
 	size_t size,
-	const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
+	const exe::Function& onComplete // void OnComplete (size_t ActualSize);
 	)
 {
 	return false;
 }
 
 bool
-CConnectionPipe::recv (
+ConnectionPipe::recv (
 	void* p,
 	size_t size,
-	const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
+	const exe::Function& onComplete // void OnComplete (size_t ActualSize);
 	)
 {
 	return false;

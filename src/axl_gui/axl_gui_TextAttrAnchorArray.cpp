@@ -8,7 +8,7 @@ namespace gui {
 //.............................................................................
 
 size_t
-CTextAttrAnchorArray::findAnchor (size_t offset) const
+TextAttrAnchorArray::findAnchor (size_t offset) const
 {
 	size_t index = -1;
 	size_t count = m_array.getCount ();
@@ -18,7 +18,7 @@ CTextAttrAnchorArray::findAnchor (size_t offset) const
 	while (begin < end)
 	{
 		size_t mid = (begin + end) / 2;
-		const TTextAttrAnchor* anchor = &m_array [mid];
+		const TextAttrAnchor* anchor = &m_array [mid];
 
 		ASSERT (mid < count);
 			
@@ -40,7 +40,7 @@ CTextAttrAnchorArray::findAnchor (size_t offset) const
 }
 
 size_t
-CTextAttrAnchorArray::getStartAnchor (
+TextAttrAnchorArray::getStartAnchor (
 	size_t offset,
 	size_t metric
 	)
@@ -48,23 +48,23 @@ CTextAttrAnchorArray::getStartAnchor (
 	size_t index = findAnchor (offset);
 	if (index == -1)
 	{
-		m_array.insert (0, TTextAttrAnchor (offset, TTextAttr (), metric));
+		m_array.insert (0, TextAttrAnchor (offset, TextAttr (), metric));
 		return 0;
 	}
 
-	TTextAttrAnchor* anchor = &m_array [index];
+	TextAttrAnchor* anchor = &m_array [index];
 	if (anchor->m_metric > metric || anchor->m_offset == offset)
 		return index;
 
-	TTextAttr lastAttr = anchor->m_attr;
+	TextAttr lastAttr = anchor->m_attr;
 	index++;
 
-	m_array.insert (index, TTextAttrAnchor (offset, lastAttr, metric));
+	m_array.insert (index, TextAttrAnchor (offset, lastAttr, metric));
 	return index;
 }
 
 size_t
-CTextAttrAnchorArray::getEndAnchor (
+TextAttrAnchorArray::getEndAnchor (
 	size_t offset,
 	size_t metric
 	)
@@ -72,24 +72,24 @@ CTextAttrAnchorArray::getEndAnchor (
 	size_t index = findAnchor (offset);
 	if (index == -1)
 	{
-		m_array.insert (0, TTextAttrAnchor (offset, TTextAttr (), 0));
+		m_array.insert (0, TextAttrAnchor (offset, TextAttr (), 0));
 		return 0;
 	}
 
-	TTextAttrAnchor* anchor = &m_array [index];
+	TextAttrAnchor* anchor = &m_array [index];
 	if (anchor->m_metric > metric || anchor->m_offset == offset)
 		return index;
 
-	TTextAttr lastAttr = anchor->m_attr;
+	TextAttr lastAttr = anchor->m_attr;
 	size_t lastMetric = anchor->m_metric;
 	index++;
 
-	m_array.insert (index, TTextAttrAnchor (offset, lastAttr, lastMetric));
+	m_array.insert (index, TextAttrAnchor (offset, lastAttr, lastMetric));
 	return index;
 }
 
 void
-CTextAttrAnchorArray::normalize (
+TextAttrAnchorArray::normalize (
 	size_t start,
 	size_t end
 	)
@@ -97,14 +97,14 @@ CTextAttrAnchorArray::normalize (
 	size_t removeIndex = -1;
 	size_t removeCount = 0;
 		
-	TTextAttrAnchor lastAnchor;
+	TextAttrAnchor lastAnchor;
 
 	if (start)
 		lastAnchor = m_array [start - 1];
 
 	for (size_t i = start; i <= end; i++)
 	{
-		TTextAttrAnchor* anchor = &m_array [i];
+		TextAttrAnchor* anchor = &m_array [i];
 		
 		if (anchor->m_metric >= lastAnchor.m_metric && anchor->m_attr.cmp (lastAnchor.m_attr) == 0)
 		{
@@ -132,7 +132,7 @@ CTextAttrAnchorArray::normalize (
 }
 
 void 
-CTextAttrAnchorArray::clearBefore (size_t offset)
+TextAttrAnchorArray::clearBefore (size_t offset)
 {
 	size_t anchor = findAnchor (offset);
 	if (anchor != -1)
@@ -140,23 +140,23 @@ CTextAttrAnchorArray::clearBefore (size_t offset)
 }
 
 void
-traceAttrArray (const CTextAttrAnchorArray& array)
+traceAttrArray (const TextAttrAnchorArray& array)
 {
 	size_t count = array.getCount ();
 	dbg::trace ("--- CTextAttrAnchorArray {%d}---\n", count);
 
 	for (size_t i = 0; i < count; i++)
 	{
-		const gui::TTextAttrAnchor* anchor = &(array [i]);
+		const gui::TextAttrAnchor* anchor = &(array [i]);
 		dbg::trace ("[%d] ofs:%02x m:%d fc:%x\n", i, anchor->m_offset, anchor->m_metric, anchor->m_attr.m_foreColor);
 	}
 }
 
 void
-CTextAttrAnchorArray::setAttr (
+TextAttrAnchorArray::setAttr (
 	size_t beginOffset, 
 	size_t endOffset, 
-	const TTextAttr& attr,
+	const TextAttr& attr,
 	size_t metric
 	)
 {
@@ -179,7 +179,7 @@ CTextAttrAnchorArray::setAttr (
 
 	for (size_t i = startIdx; i < endIdx; i++)
 	{
-		TTextAttrAnchor* anchor = &m_array [i];
+		TextAttrAnchor* anchor = &m_array [i];
 		if (anchor->m_metric <= metric)
 		{
 			anchor->m_metric = metric;

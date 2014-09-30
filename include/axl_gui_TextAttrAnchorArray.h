@@ -14,21 +14,21 @@ namespace gui {
 	
 //.............................................................................
 
-struct TTextAttrAnchor
+struct TextAttrAnchor
 {
 	size_t m_offset;
 	size_t m_metric; // attributes with higher metric overlay lower metric
-	TTextAttr m_attr;
+	TextAttr m_attr;
 
-	TTextAttrAnchor ()
+	TextAttrAnchor ()
 	{
 		m_offset = 0;
 		m_metric = 0;
 	}
 
-	TTextAttrAnchor (
+	TextAttrAnchor (
 		size_t offset,
-		const TTextAttr& attr,
+		const TextAttr& attr,
 		size_t metric = 0
 		)
 	{
@@ -40,13 +40,13 @@ struct TTextAttrAnchor
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CTextAttrAnchorArray
+class TextAttrAnchorArray
 {
 protected:
-	rtl::CArrayT <TTextAttrAnchor> m_array;
+	rtl::Array <TextAttrAnchor> m_array;
 
 public:
-	operator const TTextAttrAnchor* () const
+	operator const TextAttrAnchor* () const
 	{
 		return m_array;
 	}
@@ -63,7 +63,7 @@ public:
 		return m_array.getCount ();
 	}
 
-	const TTextAttrAnchor*
+	const TextAttrAnchor*
 	ca () const
 	{
 		return m_array.ca ();
@@ -80,25 +80,25 @@ public:
 
 	void
 	copy (
-		const TTextAttrAnchor* attrAnchorArray,
+		const TextAttrAnchor* attrAnchorArray,
 		size_t attrAnchorCount
 		)
 	{
 		m_array.copy (attrAnchorArray, attrAnchorCount);
 	}
 
-	TTextAttr
+	TextAttr
 	getAttr (size_t offset) const
 	{
 		size_t anchor = findAnchor (offset);
-		return anchor == -1 ? m_array [anchor].m_attr : TTextAttr ();
+		return anchor == -1 ? m_array [anchor].m_attr : TextAttr ();
 	}
 
 	void 
 	setAttr (
 		size_t beginOffset, 
 		size_t endOffset, 
-		const TTextAttr& attr, 
+		const TextAttr& attr, 
 		size_t metric = 0
 		);
 

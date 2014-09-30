@@ -13,7 +13,7 @@ void
 invokeAndSignalV (
 	IFunction* function,
 	intptr_t* invokeResult,
-	mt::CEvent* event,
+	mt::Event* event,
 	axl_va_list va
 	)
 {
@@ -30,16 +30,16 @@ IScheduler::syncScheduleV (
 	)
 {
 	intptr_t invokeResult = -1;
-	mt::CEvent event;
+	mt::Event event;
 	
-	int result = schedule <exe::CArgSeqT_4 <
+	int result = schedule <exe::ArgSeq_4 <
 		IFunction*,
 		intptr_t*,
-		mt::CEvent*,
+		mt::Event*,
 		axl_va_list
 		> > (invokeAndSignalV, function, &invokeResult, &event, va); 
 
-	if (result == EScheduleResult_Pending)
+	if (result == ScheduleResultKind_Pending)
 		event.wait ();
 
 	return invokeResult;

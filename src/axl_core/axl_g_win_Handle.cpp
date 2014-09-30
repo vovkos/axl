@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool
-CFileHandle::completeAsyncRequest (
+FileHandle::completeAsyncRequest (
 	bool_t result,
 	OVERLAPPED* overlapped
 	)
@@ -27,7 +27,7 @@ CFileHandle::completeAsyncRequest (
 }
 
 size_t
-CFileHandle::getOverlappedResult (OVERLAPPED* overlapped)
+FileHandle::getOverlappedResult (OVERLAPPED* overlapped)
 {
 	dword_t actualSize;
 	bool_t result = ::GetOverlappedResult (m_h, overlapped, &actualSize, true);

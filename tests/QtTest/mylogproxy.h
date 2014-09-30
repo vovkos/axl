@@ -4,13 +4,13 @@
 
 //.............................................................................
 
-class myLogProxy: public log::CPeer
+class myLogProxy: public log::Peer
 {
 protected:
 	friend class socketThread;
 	friend class packetizer;
 
-	class socketThread: public mt::CThreadImplT <socketThread>
+	class socketThread: public mt::ThreadImpl <socketThread>
 	{
 	public:
 		void threadProc ()
@@ -19,7 +19,7 @@ protected:
 		}
 	};
 
-	class packetizer: public rtl::CPacketizerT <packetizer>
+	class packetizer: public rtl::Packetizer <packetizer>
 	{
 	public:
 		void onPacket (const void* p, size_t size)
@@ -29,14 +29,14 @@ protected:
 	};
 
 protected:
-	log::CPeer* m_target;
+	log::Peer* m_target;
 	socketThread m_socketThread;
 	packetizer m_packetizer;
 	SOCKET m_listenSocket;
 	SOCKET m_connectSocket;
 	
 public:
-	rtl::CString m_tag;
+	rtl::String m_tag;
 
 public:
 	myLogProxy ();
@@ -48,10 +48,10 @@ public:
 
 	void close ();
 	
-	bool listen (log::CPeer* target, int port);
-	bool connect (log::CPeer* target, int ip, int port);
+	bool listen (log::Peer* target, int port);
+	bool connect (log::Peer* target, int ip, int port);
 
-	virtual void sendMsg (const log::TMsg* msg);
+	virtual void sendMsg (const log::Msg* msg);
 
 protected:
 	void onPacket (const void* p, size_t size);

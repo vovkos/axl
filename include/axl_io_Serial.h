@@ -17,80 +17,80 @@ namespace io {
 
 //.............................................................................
 
-enum ESerialFlowControl
+enum SerialFlowControlKind
 {
-	ESerialFlowControl_None = 0,
-	ESerialFlowControl_RtsCts,
-	ESerialFlowControl_XonXoff,
+	SerialFlowControlKind_None = 0,
+	SerialFlowControlKind_RtsCts,
+	SerialFlowControlKind_XonXoff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialStopBits
+enum SerialStopBitsKind
 {
-	ESerialStopBits_1  = 0,
-	ESerialStopBits_15 = 1,
-	ESerialStopBits_2  = 2,
+	SerialStopBitsKind_1  = 0,
+	SerialStopBitsKind_15 = 1,
+	SerialStopBitsKind_2  = 2,
 };
 
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialParity
+enum SerialParityKind
 {
-	ESerialParity_None  = 0,
-	ESerialParity_Odd   = 1,
-	ESerialParity_Even  = 2,
-	ESerialParity_Mark  = 3,
-	ESerialParity_Space = 4,
+	SerialParityKind_None  = 0,
+	SerialParityKind_Odd   = 1,
+	SerialParityKind_Even  = 2,
+	SerialParityKind_Mark  = 3,
+	SerialParityKind_Space = 4,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialStatusLine
+enum SerialStatusLineKind
 {
-	ESerialStatusLine_Cts  = 0x01,
-	ESerialStatusLine_Dsr  = 0x02,
-	ESerialStatusLine_Ring = 0x04,
-	ESerialStatusLine_Dcd  = 0x08,
+	SerialStatusLineKind_Cts  = 0x01,
+	SerialStatusLineKind_Dsr  = 0x02,
+	SerialStatusLineKind_Ring = 0x04,
+	SerialStatusLineKind_Dcd  = 0x08,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ESerialSetting
+enum SerialSettingKind
 {
-	ESerialSetting_BaudRate     = 0x01,
-	ESerialSetting_FlowControl  = 0x02,
-	ESerialSetting_DataBits     = 0x04,
-	ESerialSetting_StopBits     = 0x08,
-	ESerialSetting_Parity       = 0x10,
-	ESerialSetting_ReadInterval = 0x20,
+	SerialSettingKind_BaudRate     = 0x01,
+	SerialSettingKind_FlowControl  = 0x02,
+	SerialSettingKind_DataBits     = 0x04,
+	SerialSettingKind_StopBits     = 0x08,
+	SerialSettingKind_Parity       = 0x10,
+	SerialSettingKind_ReadInterval = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TSerialSettings
+struct SerialSettings
 {
 	uint_t m_baudRate;
-	ESerialFlowControl m_flowControl;
+	SerialFlowControlKind m_flowControl;
 	uint_t m_dataBits;
-	ESerialStopBits m_stopBits;
-	ESerialParity m_parity;
+	SerialStopBitsKind m_stopBits;
+	SerialParityKind m_parity;
 	uint_t m_readInterval; // inverse of COMMTIMEOUTS.ReadIntervalTimeout (which always makes me confused):
 	                       // 0  -- return immediatly
 	                       // -1 -- wait for the buffer to fill completely
 
-	TSerialSettings ()
+	SerialSettings ()
 	{
 		setup (38400);
 	}
 
-	TSerialSettings (
+	SerialSettings (
 		uint_t baudRate,
-		ESerialFlowControl flowControl = ESerialFlowControl_None,
+		SerialFlowControlKind flowControl = SerialFlowControlKind_None,
 		uint_t dataBits = 8,
-		ESerialStopBits stopBits = ESerialStopBits_1,
-		ESerialParity parity = ESerialParity_None,
+		SerialStopBitsKind stopBits = SerialStopBitsKind_1,
+		SerialParityKind parity = SerialParityKind_None,
 		uint_t readInterval = 10 // 10ms can be used in general case
 		)
 	{
@@ -100,10 +100,10 @@ struct TSerialSettings
 	void 
 	setup (
 		uint_t baudRate,
-		ESerialFlowControl flowControl = ESerialFlowControl_None,
+		SerialFlowControlKind flowControl = SerialFlowControlKind_None,
 		uint_t dataBits = 8,
-		ESerialStopBits stopBits = ESerialStopBits_1,
-		ESerialParity parity = ESerialParity_None,
+		SerialStopBitsKind stopBits = SerialStopBitsKind_1,
+		SerialParityKind parity = SerialParityKind_None,
 		uint_t readInterval = 10
 		)
 	{
@@ -118,13 +118,13 @@ struct TSerialSettings
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CSerial
+class Serial
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CSerial m_serial;
+	win::Serial m_serial;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CSerial m_serial;
+	psx::Serial m_serial;
 #endif
 
 public:
@@ -152,12 +152,12 @@ public:
 
 	bool
 	setSettings (
-		const TSerialSettings* settings,
+		const SerialSettings* settings,
 		uint_t mask = -1
 		);
 
 	bool
-	getSettings (TSerialSettings* settings);
+	getSettings (SerialSettings* settings);
 
 	bool
 	setDtr (bool isSet)

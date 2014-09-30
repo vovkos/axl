@@ -23,19 +23,19 @@ AXL_RTL_DEFINE_GUID (
 
 //.............................................................................
 
-class CUsbErrorProvider: public err::CErrorProvider
+class UsbErrorProvider: public err::ErrorProvider
 {
 public:
 	static
-	rtl::CString 
+	rtl::String 
 	getErrorDescription (int code)
 	{
 		return libusb_error_name (code);
 	}
 
 	virtual 
-	rtl::CString 
-	getErrorDescription (const err::TError* error)
+	rtl::String 
+	getErrorDescription (const err::ErrorData* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -43,29 +43,29 @@ public:
 
 //.............................................................................
 
-class CUsbError: public err::CError
+class UsbError: public err::Error
 {
 public:
-	CUsbError ()
+	UsbError ()
 	{
 	}
 
-	CUsbError (int code)
+	UsbError (int code)
 	{
 		create (code);
 	}
 
-	err::TError* 
+	err::ErrorData* 
 	create (int code);
 };
 
 //.............................................................................
 
 inline
-err::CError
+err::Error
 setUsbError (int code)
 {
-	setError (CUsbError (code));
+	setError (UsbError (code));
 }
 
 //.............................................................................

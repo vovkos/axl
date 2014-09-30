@@ -11,58 +11,58 @@ namespace lua {
 
 //.............................................................................
 
-enum EToken
+enum TokenKind
 {
-	EToken_Eof = 0,
-	EToken_Error = -1,
-	EToken_OpenCode = 256,
-	EToken_OpenData,
-	EToken_Data,
+	TokenKind_Eof = 0,
+	TokenKind_Error = -1,
+	TokenKind_OpenCode = 256,
+	TokenKind_OpenData,
+	TokenKind_Data,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_LEX_BEGIN_TOKEN_NAME_MAP (CTokenName)
-	AXL_LEX_TOKEN_NAME (EToken_Eof,       "eof")
-	AXL_LEX_TOKEN_NAME (EToken_Error,     "error")
-	AXL_LEX_TOKEN_NAME (EToken_OpenCode,  "%{")
-	AXL_LEX_TOKEN_NAME (EToken_OpenData,  "%(")
-	AXL_LEX_TOKEN_NAME (EToken_Data,      "user-data")
+AXL_LEX_BEGIN_TOKEN_NAME_MAP (TokenName)
+	AXL_LEX_TOKEN_NAME (TokenKind_Eof,       "eof")
+	AXL_LEX_TOKEN_NAME (TokenKind_Error,     "error")
+	AXL_LEX_TOKEN_NAME (TokenKind_OpenCode,  "%{")
+	AXL_LEX_TOKEN_NAME (TokenKind_OpenData,  "%(")
+	AXL_LEX_TOKEN_NAME (TokenKind_Data,      "user-data")
 AXL_LEX_END_TOKEN_NAME_MAP ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef lex::CRagelTokenT <EToken, CTokenName> CToken;
+typedef lex::RagelToken <TokenKind, TokenName> Token;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ELexerMachine
+enum LexerMachineKind
 {
-	ELexerMachine_Main,
-	ELexerMachine_UserCode,
-	ELexerMachine_UserData,
+	LexerMachineKind_Main,
+	LexerMachineKind_UserCode,
+	LexerMachineKind_UserData,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CLexer: public lex::CRagelLexerT <CLexer, CToken>
+class Lexer: public lex::RagelLexer <Lexer, Token>
 {
-	friend class lex::CRagelLexerT <CLexer, CToken>;
+	friend class lex::RagelLexer <Lexer, Token>;
 
 public:
 	static
 	int
-	getMachineState (ELexerMachine machine);
+	getMachineState (LexerMachineKind machine);
 
 protected:
-	CToken*
+	Token*
 	createStringToken (
 		int tokenKind,
 		int left = 0,
 		int right = 0
 		)
 	{
-		CToken* token = createToken (tokenKind);
+		Token* token = createToken (tokenKind);
 		token->m_data.m_string.copy (ts + left, token->m_pos.m_length - (left + right));
 		return token;
 	}

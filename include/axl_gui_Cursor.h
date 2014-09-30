@@ -13,24 +13,24 @@ namespace gui {
 
 //.............................................................................
 
-enum EStdCursor
+enum StdCursorKind
 {
-	EStdCursor_Arrow = 0,
-	EStdCursor_Wait,
-	EStdCursor_IBeam,
-	EStdCursor_Hyperlink,
-	EStdCursor_SizeNS,
-	EStdCursor_SizeWE,
-	EStdCursor_SizeNWSE,
-	EStdCursor_SizeNESW,
-	EStdCursor_SizeAll,
+	StdCursorKind_Arrow = 0,
+	StdCursorKind_Wait,
+	StdCursorKind_IBeam,
+	StdCursorKind_Hyperlink,
+	StdCursorKind_SizeNS,
+	StdCursorKind_SizeWE,
+	StdCursorKind_SizeNWSE,
+	StdCursorKind_SizeNESW,
+	StdCursorKind_SizeAll,
 	
-	EStdCursor__Count
+	StdCursorKind__Count
 };
 
 //.............................................................................
 
-class CCursor: public CGuiItem
+class Cursor: public GuiItem
 {
 };
 

@@ -11,7 +11,7 @@ namespace psx {
 //.............................................................................
 
 bool
-CThread::create (
+Thread::create (
 	const pthread_attr_t* attr,
 	FThreadProc pfThreadProc,
 	void* context
@@ -28,7 +28,7 @@ CThread::create (
 }
 
 bool
-CThread::join (
+Thread::join (
 	uint_t timeout,
 	void** retVal
 	)
@@ -62,7 +62,7 @@ CThread::join (
 }
 
 bool
-CThread::detach ()
+Thread::detach ()
 {
 	if (!m_isOpen)
 		return true;

@@ -14,13 +14,13 @@ namespace mt {
 //.............................................................................
 
 template <typename T>
-class CTlsSlotT
+class TlsSlot
 {
 protected:
 	size_t m_tlsSlot;
 	
 public:	
-	CTlsSlotT ()
+	TlsSlot ()
 	{
 		m_tlsSlot = getTlsMgr ()->createSlot ();
 	}
@@ -34,7 +34,7 @@ public:
 	T* 
 	setValue (T* p)
 	{
-		return (T*) getTlsMgr ()->setSlotValue (m_tlsSlot, mt::CTlsValue (p, NULL)).p ();
+		return (T*) getTlsMgr ()->setSlotValue (m_tlsSlot, mt::TlsValue (p, NULL)).p ();
 	}
 };
 
@@ -44,7 +44,7 @@ template <typename T>
 T*
 getTlsSlotValue ()
 {
-	return rtl::getSimpleSingleton <CTlsSlotT <T> > ()->getValue ();
+	return rtl::getSimpleSingleton <TlsSlot <T> > ()->getValue ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,24 +53,24 @@ template <typename T>
 T*
 setTlsSlotValue (T* p)
 {
-	return rtl::getSimpleSingleton <CTlsSlotT <T> > ()->setValue (p);
+	return rtl::getSimpleSingleton <TlsSlot <T> > ()->setValue (p);
 }
 
 //.............................................................................
 
 template <typename T>
-class CScopeTlsSlotT
+class ScopeTlsSlot
 {
 protected:
 	T* m_prevValue;
 
 public:
-	CScopeTlsSlotT (T* p)
+	ScopeTlsSlot (T* p)
 	{
 		m_prevValue = setTlsSlotValue <T> (p);
 	}
 
-	~CScopeTlsSlotT ()
+	~ScopeTlsSlot ()
 	{
 		setTlsSlotValue <T> (m_prevValue);
 	}

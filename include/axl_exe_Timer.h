@@ -14,22 +14,22 @@ namespace mt {
 
 //.............................................................................
 
-class CTimer
+class Timer
 {
 public:
-	enum ETimer
+	enum TimerKind
 	{
-		ETimer_ManualReset = 1,
-		ETimer_Periodic    = 2
+		TimerKind_ManualReset = 1,
+		TimerKind_Periodic    = 2
 	};
 
 protected:
-	win::CTimer m_timer;
-	ref::CPtrT <exe::IFunction> m_onTimer;
-	ref::CPtrT <exe::CWorkerThread> m_workerThread;
+	win::Timer m_timer;
+	ref::Ptr <exe::IFunction> m_onTimer;
+	ref::Ptr <exe::Workerhread> m_workerThread;
 
 public:
-	~CTimer ()
+	~Timer ()
 	{
 		cancel ();
 	}
@@ -71,7 +71,7 @@ inline
 ulong_t
 getCurrentTime ()
 {
-	return win::CTimer::getTickCount ();
+	return win::Timer::getTickCount ();
 }
 
 //.............................................................................

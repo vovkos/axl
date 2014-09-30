@@ -11,8 +11,8 @@ run (const char* fileName)
 {
 	bool result;
 
-	io::CMappedFile file;
-	result = file.open (fileName, io::EFileFlag_ReadOnly);
+	io::MappedFile file;
+	result = file.open (fileName, io::FileFlagKind_ReadOnly);
 	if (!result)
 	{
 		printf ("%s\n", err::getError ()->getDescription ());
@@ -22,9 +22,9 @@ run (const char* fileName)
 	char* p = (char*) file.view ();
 	size_t size = (size_t) file.getSize ();
 	
-	lua::CStringTemplate st;
+	lua::Stringemplate st;
 
-	rtl::CString resultString;
+	rtl::String resultString;
 	result = st.process (&resultString, fileName, p, size);
 	if (!result)
 	{

@@ -14,18 +14,18 @@ namespace psx {
 
 //.............................................................................
 
-class CMutexAttr
+class MutexAttr
 {
 protected:
 	pthread_mutexattr_t m_attr;
 
 public:
-	CMutexAttr ()
+	MutexAttr ()
 	{
 		pthread_mutexattr_init (&m_attr);
 	}
 
-	~CMutexAttr ()
+	~MutexAttr ()
 	{
 		pthread_mutexattr_destroy (&m_attr);
 	}
@@ -75,18 +75,18 @@ public:
 
 //.............................................................................
 
-class CMutex
+class Mutex
 {
 protected:
 	pthread_mutex_t m_mutex;
 
 public:
-	CMutex (pthread_mutexattr_t* attr = NULL)
+	Mutex (pthread_mutexattr_t* attr = NULL)
 	{
 		pthread_mutex_init (&m_mutex, attr);
 	}
 
-	~CMutex ()
+	~Mutex ()
 	{
 		pthread_mutex_destroy (&m_mutex);
 	}

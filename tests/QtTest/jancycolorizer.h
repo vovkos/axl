@@ -1,7 +1,7 @@
 #ifndef JANCYCOLORIZER_H
 #define JANCYCOLORIZER_H
 
-class jancyColorizer: public log::CRagelColorizerT <jancyColorizer>
+class jancyColorizer: public log::RagelColorizer <jancyColorizer>
 {
 public:
 	void init();

@@ -9,9 +9,9 @@ namespace test_File {
 void
 run ()
 {
-	io::CFile f;
-	f.open ("d:\\hui", io::EFileFlag_ReadOnly);
-	rtl::CString text = err::getError ()->getDescription ();
+	io::File f;
+	f.open ("d:\\hui", io::FileFlagKind_ReadOnly);
+	rtl::String text = err::getError ()->getDescription ();
 	printf ("error: %s\n", text);
 }
 

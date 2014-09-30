@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool
-CFile::create (
+File::create (
 	const wchar_t* fileName,
 	uint_t accessMode,
 	uint_t shareMode,
@@ -33,7 +33,7 @@ CFile::create (
 }
 
 uint64_t
-CFile::getSize () const
+File::getSize () const
 {
 	ULARGE_INTEGER size;
 
@@ -45,7 +45,7 @@ CFile::getSize () const
 }
 
 bool
-CFile::setSize (uint64_t size)
+File::setSize (uint64_t size)
 {
 	uint64_t position = getPosition ();
 
@@ -62,7 +62,7 @@ CFile::setSize (uint64_t size)
 }
 
 uint64_t
-CFile::getPosition () const
+File::getPosition () const
 {
 	LARGE_INTEGER offset = { 0 };
 
@@ -74,7 +74,7 @@ CFile::getPosition () const
 }
 
 bool
-CFile::setPosition (uint64_t _Offset) const
+File::setPosition (uint64_t _Offset) const
 {
 	LARGE_INTEGER offset;
 	offset.QuadPart = _Offset;
@@ -84,7 +84,7 @@ CFile::setPosition (uint64_t _Offset) const
 }
 
 size_t
-CFile::read (
+File::read (
 	void* p,
 	size_t size
 	) const
@@ -95,7 +95,7 @@ CFile::read (
 }
 
 size_t
-CFile::write (
+File::write (
 	const void* p,
 	size_t size
 	)

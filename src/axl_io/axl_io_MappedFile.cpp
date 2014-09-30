@@ -9,14 +9,14 @@ namespace io {
 //.............................................................................
 
 void*
-CMappedViewMgr::find (
+MappedViewMgr::find (
 	uint64_t begin,
 	uint64_t end
 	)
 {
 	// first check the last view
 
-	TViewEntry* viewEntry = *m_viewList.getHead ();
+	ViewEntry* viewEntry = *m_viewList.getHead ();
 	if (!viewEntry)
 		return NULL;
 		
@@ -25,7 +25,7 @@ CMappedViewMgr::find (
 
 	// ok, now try to find existing view using the view map...
 
-	CViewMap::CIterator it = m_viewMap.findEx (begin, rtl::EBinTreeFindEx_Le);
+	ViewMap::Iterator it = m_viewMap.findEx (begin, rtl::BinTreeFindExKind_Le);
 	if (!it)
 		return NULL;
 
@@ -41,26 +41,26 @@ CMappedViewMgr::find (
 }
 
 void*
-CMappedViewMgr::view (
+MappedViewMgr::view (
 	uint64_t begin,
 	uint64_t end,
 	uint64_t origBegin,
 	uint64_t origEnd
 	)
 {
-	TViewEntry* viewEntry = AXL_MEM_NEW (TViewEntry);
+	ViewEntry* viewEntry = AXL_MEM_NEW (ViewEntry);
 
 	void* p;
 	size_t size = (size_t) (end - begin);
 	
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t access = (m_mappedFile->m_fileFlags & EFileFlag_ReadOnly) ? 
+	uint_t access = (m_mappedFile->m_fileFlags & FileFlagKind_ReadOnly) ? 
 		FILE_MAP_READ : 
 		FILE_MAP_READ | FILE_MAP_WRITE;	
 
 	p = viewEntry->m_view.view (m_mappedFile->m_mapping, access, begin, size);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int protection = (m_mappedFile->m_fileFlags & EFileFlag_ReadOnly) ? 
+	int protection = (m_mappedFile->m_fileFlags & FileFlagKind_ReadOnly) ? 
 		PROT_READ : 
 		PROT_READ | PROT_WRITE;	
 	
@@ -87,10 +87,10 @@ CMappedViewMgr::view (
 
 	// update viewmap
 
-	CViewMap::CIterator it = m_viewMap.visit (begin);
+	ViewMap::Iterator it = m_viewMap.visit (begin);
 	if (it->m_value) 
 	{
-		TViewEntry* oldViewEntry = it->m_value;
+		ViewEntry* oldViewEntry = it->m_value;
 		
 		ASSERT (oldViewEntry->m_mapIt == it);
 		ASSERT (oldViewEntry->m_end < end); // otherwise, we should have just used this view!
@@ -107,7 +107,7 @@ CMappedViewMgr::view (
 	it++;
 	while (it)
 	{
-		TViewEntry* oldViewEntry = it->m_value;
+		ViewEntry* oldViewEntry = it->m_value;
 		if (oldViewEntry->m_end > end) // nope, not overlapped
 			break;
 
@@ -116,7 +116,7 @@ CMappedViewMgr::view (
 		// this view is completely overlapped and is not needed for new view requests
 		// remove it from map but do not delete it to make sure last N view request are still valid
 
-		CViewMap::CIterator next = it.getInc (1);
+		ViewMap::Iterator next = it.getInc (1);
 		m_viewMap.erase (it);
 		oldViewEntry->m_mapIt = NULL;
 
@@ -127,11 +127,11 @@ CMappedViewMgr::view (
 }
 
 void
-CMappedViewMgr::limitViewCount (size_t maxViewCount)
+MappedViewMgr::limitViewCount (size_t maxViewCount)
 {
 	while (m_viewList.getCount () > maxViewCount)
 	{
-		TViewEntry* view = m_viewList.removeTail ();
+		ViewEntry* view = m_viewList.removeTail ();
 	
 		if (view->m_mapIt)
 			m_viewMap.erase (view->m_mapIt);
@@ -142,12 +142,12 @@ CMappedViewMgr::limitViewCount (size_t maxViewCount)
 
 //.............................................................................
 
-CMappedFile::CMappedFile ()
+MappedFile::MappedFile ()
 {
 	m_fileFlags = 0;
 	m_fileSize = 0;
-	m_readAheadSize = EDefaults_ReadAheadSize;
-	m_maxDynamicViewCount = EDefaults_MaxDynamicViewCount;
+	m_readAheadSize = DefaultsKind_ReadAheadSize;
+	m_maxDynamicViewCount = DefaultsKind_MaxDynamicViewCount;
 	m_dynamicViewMgr.m_mappedFile = this;
 	m_permanentViewMgr.m_mappedFile = this;
 
@@ -157,7 +157,7 @@ CMappedFile::CMappedFile ()
 }
 
 bool
-CMappedFile::open (
+MappedFile::open (
 	const char* fileName,
 	uint_t flags
 	)
@@ -174,7 +174,7 @@ CMappedFile::open (
 }
 
 void
-CMappedFile::close ()
+MappedFile::close ()
 {
 	if (!isOpen ())
 		return;
@@ -193,13 +193,13 @@ CMappedFile::close ()
 }
 
 bool
-CMappedFile::setSize (
+MappedFile::setSize (
 	uint64_t size,
 	bool unmapAndApplyNow
 	)
 {
-	if (m_fileFlags & EFileFlag_ReadOnly)
-		return err::fail (err::EStatus_InvalidDeviceRequest);
+	if (m_fileFlags & FileFlagKind_ReadOnly)
+		return err::fail (err::StatusKind_InvalidDeviceRequest);
 
 	m_fileSize = size;
 
@@ -211,13 +211,13 @@ CMappedFile::setSize (
 }
 
 bool
-CMappedFile::setup (
+MappedFile::setup (
 	size_t maxDynamicViewCount,
 	size_t readAheadSize
 	)
 {
 	if (!maxDynamicViewCount)
-		return err::fail (err::EStatus_InvalidParameter);
+		return err::fail (err::StatusKind_InvalidParameter);
 
 	m_maxDynamicViewCount = maxDynamicViewCount;
 	m_readAheadSize = readAheadSize;
@@ -227,7 +227,7 @@ CMappedFile::setup (
 }
 
 void*
-CMappedFile::view (
+MappedFile::view (
 	uint64_t offset,
 	size_t size,
 	bool isPermanent
@@ -237,8 +237,8 @@ CMappedFile::view (
 
 	if (end > m_fileSize)
 	{	
-		if (m_fileFlags & EFileFlag_ReadOnly)
-			return err::fail ((void*) NULL, err::EStatus_InvalidDeviceRequest);
+		if (m_fileFlags & FileFlagKind_ReadOnly)
+			return err::fail ((void*) NULL, err::StatusKind_InvalidDeviceRequest);
 		
 		m_fileSize = end;
 		
@@ -253,7 +253,7 @@ CMappedFile::view (
 }
 
 void*
-CMappedFile::viewImpl (
+MappedFile::viewImpl (
 	uint64_t offset,
 	uint64_t end,
 	bool isPermanent
@@ -279,7 +279,7 @@ CMappedFile::viewImpl (
 
 	// align view base on system allocation granularity
 
-	g::TSystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 
 	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
 	uint64_t viewEnd = end + m_readAheadSize;
@@ -296,11 +296,11 @@ CMappedFile::viewImpl (
 	{
 		uint_t protection;
 
-		if (m_fileFlags & EFileFlag_ReadOnly)
+		if (m_fileFlags & FileFlagKind_ReadOnly)
 		{
 			if (end > m_fileSize)
 			{
-				err::setError (err::EStatus_InvalidAddress);
+				err::setError (err::StatusKind_InvalidAddress);
 				return NULL;
 			}
 
@@ -341,7 +341,7 @@ CMappedFile::viewImpl (
 }
 
 void
-CMappedFile::unmapAllViews ()
+MappedFile::unmapAllViews ()
 {
 	m_permanentViewMgr.clear ();
 	m_dynamicViewMgr.clear ();
@@ -355,7 +355,7 @@ CMappedFile::unmapAllViews ()
 //.............................................................................
 
 bool
-CSimpleMappedFile::open (
+SimpleMappedFile::open (
 	const char* fileName, 
 	uint64_t offset,
 	size_t size,

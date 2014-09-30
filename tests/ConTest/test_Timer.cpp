@@ -11,15 +11,15 @@ namespace test_Timer {
 void 
 run ()
 {
-	mt::CTimer timer;
+	mt::Timer timer;
 
 	timer.setTimer (
 		1000, 
-		&exe::CFunctionT <
-			exe::CArgT <int>,  
-			exe::CArgT <void>
+		&exe::Function <
+			exe::Arg <int>,  
+			exe::Arg <void>
 			> (onEvent, 5),
-		mt::CTimer::ETimer_Periodic
+		mt::Timer::TimerKind_Periodic
 		);
 
 	sleep (10000);

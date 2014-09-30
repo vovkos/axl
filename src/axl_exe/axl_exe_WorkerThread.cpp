@@ -8,7 +8,7 @@ namespace exe {
 
 //.............................................................................
 
-CWorkerThread::CWorkerThread ()
+Workerhread::Workerhread ()
 {
 	m_terminateFlag = false;
 
@@ -17,16 +17,16 @@ CWorkerThread::CWorkerThread ()
 }
 
 bool 
-CWorkerThread::start ()
+Workerhread::start ()
 {
 	ASSERT (!isOpen ());
 
 	m_terminateFlag = false;
-	return CThreadImplT <CWorkerThread>::start ();
+	return ThreadImpl <Workerhread>::start ();
 }
 
 void 
-CWorkerThread::stop (
+Workerhread::stop (
 	bool doWaitAndClose,
 	ulong_t timeout
 	)
@@ -38,7 +38,7 @@ CWorkerThread::stop (
 }
 
 void 
-CWorkerThread::signalStop ()
+Workerhread::signalStop ()
 {
 	if (m_terminateFlag)
 		return;
@@ -52,34 +52,34 @@ CWorkerThread::signalStop ()
 // AddEvent / RemoveEvent should only be called once the thread is running
 
 handle_t
-CWorkerThread::addEvent (
-	mt::CEvent* event, 
+Workerhread::addEvent (
+	mt::Event* event, 
 	exe::IFunction* onEvent
 	)
 {
 	ASSERT (isOpen ());
 
-	return (handle_t) syncSchedule <exe::CArgSeqT_3 <
-		CWorkerThread*,
-		mt::CEvent*, 
+	return (handle_t) syncSchedule <exe::ArgSeq_3 <
+		Workerhread*,
+		mt::Event*, 
 		exe::IFunction*
-		> > (pvoid_cast (&CWorkerThread::addEvent_wt), this, event, onEvent);
+		> > (pvoid_cast (&Workerhread::addEvent_wt), this, event, onEvent);
 }
 
 void 
-CWorkerThread::removeEvent (handle_t hEvent)
+Workerhread::removeEvent (handle_t hEvent)
 {
 	ASSERT (isOpen ());
 
-	syncSchedule <exe::CArgSeqT_2 <
-		CWorkerThread*,
-		mt::CEvent*
-		> > (pvoid_cast (&CWorkerThread::removeEvent_wt), this, hEvent);
+	syncSchedule <exe::ArgSeq_2 <
+		Workerhread*,
+		mt::Event*
+		> > (pvoid_cast (&Workerhread::removeEvent_wt), this, hEvent);
 }
 
 inline
 bool 
-CWorkerThread::canInvokeNow ()
+Workerhread::canInvokeNow ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	return getThreadId () == mt::getCurrentThreadId ();
@@ -88,8 +88,8 @@ CWorkerThread::canInvokeNow ()
 #endif
 }
 
-CWorkerThread::EScheduleResult
-CWorkerThread::scheduleV (
+Workerhread::ScheduleResultKind
+Workerhread::scheduleV (
 	exe::IFunction* function, 
 	axl_va_list va
 	)
@@ -99,7 +99,7 @@ CWorkerThread::scheduleV (
 	if (canInvokeNow ())
 	{
 		function->invokeV (va);
-		return EScheduleResult_Invoke;
+		return ScheduleResultKind_Invoke;
 	}
 
 	m_lock.lock ();
@@ -107,7 +107,7 @@ CWorkerThread::scheduleV (
 	m_event.signal ();
 	m_lock.unlock ();
 
-	return EScheduleResult_Pending;
+	return ScheduleResultKind_Pending;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -115,7 +115,7 @@ CWorkerThread::scheduleV (
 // everything below runs in worker thread
 
 ulong_t 
-CWorkerThread::threadProc ()
+Workerhread::threadProc ()
 {
 	bool terminateFlag = false;
 
@@ -129,7 +129,7 @@ CWorkerThread::threadProc ()
 		for (size_t i = 0; i < count; i++)
 			waitArray [i] = *m_waitArray [i];
 
-		ulong_t result = win::CWaitableHandle::multiWait (waitArray, count, false, -1, true);
+		ulong_t result = win::WaitableHandle::multiWait (waitArray, count, false, -1, true);
 		switch (result)
 		{
 		case 0: 
@@ -149,9 +149,9 @@ CWorkerThread::threadProc ()
 	return 0;
 }
 
-CWorkerThread::TUserEvent*
-CWorkerThread::addEvent_wt (
-	mt::CEvent* event,
+Workerhread::UserEvent*
+Workerhread::addEvent_wt (
+	mt::Event* event,
 	exe::IFunction* onEvent
 	)
 {
@@ -159,7 +159,7 @@ CWorkerThread::addEvent_wt (
 	if (count >= MAXIMUM_WAIT_OBJECTS)
 		return NULL;
 
-	TUserEvent* userEvent = AXL_MEM_NEW (TUserEvent);
+	UserEvent* userEvent = AXL_MEM_NEW (UserEvent);
 	userEvent->m_event = event;
 	userEvent->m_onEvent = ref::clone (onEvent);
 	m_userEventList.insertTail (userEvent);
@@ -171,7 +171,7 @@ CWorkerThread::addEvent_wt (
 }
 
 void
-CWorkerThread::removeEvent_wt (TUserEvent* userEvent)
+Workerhread::removeEvent_wt (UserEvent* userEvent)
 {
 	m_userEventList.delete (userEvent);
 
@@ -180,8 +180,8 @@ CWorkerThread::removeEvent_wt (TUserEvent* userEvent)
 	m_waitArray.setCount (count + 1);
 	m_functionArray.setCount (count);
 
-	rtl::CIteratorT <TUserEvent> it = m_userEventList.getHead ();
-	mt::CEvent** event = m_waitArray.getBuffer () + 1;
+	rtl::Iterator <UserEvent> it = m_userEventList.getHead ();
+	mt::Event** event = m_waitArray.getBuffer () + 1;
 	exe::IFunction** onEvent = m_functionArray.getBuffer ();
 
 	for (; it; it++, event++, onEvent++)
@@ -192,9 +192,9 @@ CWorkerThread::removeEvent_wt (TUserEvent* userEvent)
 }
 
 bool
-CWorkerThread::process_wt ()
+Workerhread::process_wt ()
 {
-	exe::CInvokeList invokeList;
+	exe::InvokeList invokeList;
 
 	m_lock.lock ();
 	invokeList.takeOver (&m_invokeList);
@@ -207,28 +207,28 @@ CWorkerThread::process_wt ()
 
 //.............................................................................
 
-ref::CPtrT <CWorkerThread>
+ref::Ptr <Workerhread>
 getWorkerThread (size_t reserveEventCount)
 {
-	exe::CWorkerThreadPool* pool = rtl::getSingleton <exe::CWorkerThreadPool> ();
+	exe::WorkerhreadPool* pool = rtl::getSingleton <exe::WorkerhreadPool> ();
 	return pool->getThread (reserveEventCount);
 }
 
-ref::CPtrT <CWorkerThread>
+ref::Ptr <Workerhread>
 getWorkerThread (
-	mt::CEvent* event,
+	mt::Event* event,
 	exe::IFunction* onEvent,
 	handle_t* phEvent
 	)
 {
-	exe::CWorkerThreadPool* pool = rtl::getSingleton <exe::CWorkerThreadPool> ();
-	ref::CPtrT <CWorkerThread> thread = pool->getThread (1);
+	exe::WorkerhreadPool* pool = rtl::getSingleton <exe::WorkerhreadPool> ();
+	ref::Ptr <Workerhread> thread = pool->getThread (1);
 	if (!thread)
-		return ref::EPtr_Null;
+		return ref::PtrKind_Null;
 
 	handle_t hEvent = thread->addEvent (event, onEvent);
 	if (!hEvent)
-		return ref::EPtr_Null;
+		return ref::PtrKind_Null;
 
 	*phEvent = hEvent;
 	return thread;

@@ -20,13 +20,13 @@ namespace mt {
 #if (_AXL_ENV == AXL_ENV_WIN)
 
 template <typename T>
-class CThreadImplT
+class ThreadImpl
 {
 public:
-	win::CThread m_thread;
+	win::Thread m_thread;
 
 public:
-	~CThreadImplT ()
+	~ThreadImpl ()
 	{
 		waitAndClose ();
 	}
@@ -55,11 +55,11 @@ public:
 		if (!m_thread.isOpen ())
 			return;
 
-		win::EWaitResult result = m_thread.wait (timeout);
-		if (result != win::EWaitResult_Object0)
+		win::WaitResultKind result = m_thread.wait (timeout);
+		if (result != win::WaitResultKind_Object0)
 		{
 			ASSERT (false); // terminating thread
-			m_thread.terminate (err::EStatus_IoTimeout);
+			m_thread.terminate (err::StatusKind_IoTimeout);
 		}
 
 		m_thread.close ();
@@ -91,13 +91,13 @@ getCurrentThreadId ()
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 template <typename T>
-class CThreadImplT
+class ThreadImpl
 {
 public:
-	psx::CThread m_thread;
+	psx::Thread m_thread;
 
 public:
-	~CThreadImplT ()
+	~ThreadImpl ()
 	{
 		waitAndClose ();
 	}

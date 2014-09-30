@@ -14,15 +14,15 @@ namespace win {
 
 //.............................................................................
 
-class CCriticalSection: public CRITICAL_SECTION
+class CriticalSection: public CRITICAL_SECTION
 {
 public:
-	CCriticalSection ()
+	CriticalSection ()
 	{
 		::InitializeCriticalSection (this);
 	}
 
-	~CCriticalSection ()
+	~CriticalSection ()
 	{
 		::DeleteCriticalSection (this);
 	}

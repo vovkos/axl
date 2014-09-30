@@ -17,38 +17,38 @@ namespace io {
 
 //.............................................................................
 
-class CConnectionSock
+class ConnectionSock
 {
 public:
-	typedef exe::CArgObjPtrT <err::CError> COnConnectCompleteArg;
-	typedef exe::CArgObjPtrT <err::CError> COnDisconnectCompleteArg;
+	typedef exe::ArgObjPtr <err::Error> OnConnectCompleteArg;
+	typedef exe::ArgObjPtr <err::Error> OnDisconnectCompleteArg;
 
 protected:
-	struct TSendRecv: rtl::TListLink
+	struct SendRecv: rtl::ListLink
 	{
-		CConnectionSock* m_sock;
+		ConnectionSock* m_sock;
 		OVERLAPPED m_overlapped;
-		exe::CFunction m_onComplete;		
+		exe::Function m_onComplete;		
 	};
 
 public:
-	win::CSock m_sock;
+	win::Sock m_sock;
 
 protected:
-	ref::CPtrT <exe::CWorkerThread> m_workerThread;
-	mt::CEvent m_event;
+	ref::Ptr <exe::Workerhread> m_workerThread;
+	mt::Event m_event;
 	handle_t m_hWorkerThreadEvent;
-	exe::CFunction m_onConnectComplete;
-	exe::CFunction m_onDisconnectComplete;	
-	rtl::CStdListT <TSendRecv> m_sendRecvList;
+	exe::Function m_onConnectComplete;
+	exe::Function m_onDisconnectComplete;	
+	rtl::StdList <SendRecv> m_sendRecvList;
 
 public:
-	CConnectionSock ()
+	ConnectionSock ()
 	{
 		m_hWorkerThreadEvent = NULL;
 	}
 
-	~CConnectionSock ()
+	~ConnectionSock ()
 	{
 		close ();
 	}
@@ -61,17 +61,17 @@ public:
 
 	bool
 	open (
-		ESockProto protocol,
-		const TSockAddr* addr
+		SockProtoKind protocol,
+		const SockAddr* addr
 		)
 	{
-		return open (protocol, (ESockAddr) addr->m_kind, addr);
+		return open (protocol, (SockAddrKind) addr->m_kind, addr);
 	}
 
 	bool
 	open (
-		ESockProto protocol,
-		ESockAddr addrKind
+		SockProtoKind protocol,
+		SockAddrKind addrKind
 		)
 	{
 		return open (protocol, addrKind, NULL);
@@ -81,7 +81,7 @@ public:
 	close ();
 
 	bool
-	getLocalAddress (TSockAddrU* addr)
+	getLocalAddress (SockAddrU* addr)
 	{
 		SOCKADDR addr;
 		return 
@@ -90,7 +90,7 @@ public:
 	}
 
 	bool
-	getPeerAddress (TSockAddrU* addr)
+	getPeerAddress (SockAddrU* addr)
 	{
 		SOCKADDR addr;
 		return 
@@ -100,20 +100,20 @@ public:
 
 	bool 
 	connect (
-		const TSockAddr* addr,
+		const SockAddr* addr,
 		uint_t timeout,
-		const exe::CFunction& onComplete // void OnComplete (err::CError* pError)
+		const exe::Function& onComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
 	disconnect (
 		uint_t timeout,
-		const exe::CFunction& onComplete // void OnComplete (err::CError* pError)
+		const exe::Function& onComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
 	syncConnect (
-		const TSockAddr* addr,
+		const SockAddr* addr,
 		uint_t timeout
 		);
 
@@ -124,22 +124,22 @@ public:
 	send (
 		const void* p,
 		size_t size,
-		const exe::CFunction& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+		const exe::Function& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 		);
 
 	bool
 	recv (
 		void* p,
 		size_t size,
-		const exe::CFunction& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+		const exe::Function& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 		);
 
 protected:
 	bool
 	open (
-		ESockProto protocol,
-		ESockAddr addKind,
-		const TSockAddr* addr
+		SockProtoKind protocol,
+		SockAddrKind addKind,
+		const SockAddr* addr
 		);
 
 	void
@@ -149,16 +149,16 @@ protected:
 	bool 
 	AXL_CDECL
 	connect_wt (
-		const TSockAddr* addr,
+		const SockAddr* addr,
 		uint_t timeout,
-		const exe::CFunction& onComplete
+		const exe::Function& onComplete
 		);
 
 	bool 
 	AXL_CDECL
 	disconnect_wt (
 		uint_t timeout,
-		const exe::CFunction& onComplete
+		const exe::Function& onComplete
 		);
 
 	void
@@ -170,7 +170,7 @@ protected:
 	send_wt (
 		const void* p,
 		size_t size,
-		const exe::CFunction& onComplete
+		const exe::Function& onComplete
 		);
 
 	bool
@@ -178,7 +178,7 @@ protected:
 	recv_wt (
 		void* p,
 		size_t size,
-		const exe::CFunction& onComplete
+		const exe::Function& onComplete
 		);
 
 	static 
@@ -191,14 +191,14 @@ protected:
 		dword_t flags
 		)
 	{
-		TSendRecv* sendRecv = (TSendRecv*) overlapped->hEvent;
+		SendRecv* sendRecv = (SendRecv*) overlapped->hEvent;
 		sendRecv->m_sock->completeSendRecv_wt (sendRecv, error, actualSize);
 	}
 
 	void
 	completeSendRecv_wt (
-		TSendRecv* sendRecv,
-		const err::CError& error,
+		SendRecv* sendRecv,
+		const err::Error& error,
 		size_t actualSize
 		);
 };

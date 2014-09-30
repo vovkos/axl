@@ -19,33 +19,33 @@ namespace ref {
 // could be also used for fixed-sized object as single-writer multiple reader accessor
 // can use external buffer (e.g. static or allocated on stack)
 
-enum EBuf
+enum BufKind
 {
-	EBuf_Exclusive, // buffer cannot be shared (stack-allocated or object-field) 
-	EBuf_Shared,    // buffer can be shared (static or global)
+	BufKind_Exclusive, // buffer cannot be shared (stack-allocated or object-field) 
+	BufKind_Shared,    // buffer can be shared (static or global)
 
 	// aliases
 
-	EBuf_Static = EBuf_Shared, 
-	EBuf_Stack  = EBuf_Exclusive,
-	EBuf_Field  = EBuf_Exclusive,
+	BufKind_Static = BufKind_Shared, 
+	BufKind_Stack  = BufKind_Exclusive,
+	BufKind_Field  = BufKind_Exclusive,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
-	typename TGetSize = rtl::CGetSizeT <T>
+	typename GetSize = rtl::GetSize <T>
 	>
-class CBufT
+class Buf
 {
 public:
-	class CHdr: public CRefCount
+	class Hdr: public RefCount
 	{
 	public:
 		size_t m_bufferSize;
 
-		~CHdr ()
+		~Hdr ()
 		{
 			((T*) (this + 1))->~T ();
 		}
@@ -53,32 +53,32 @@ public:
 
 	enum
 	{
-		minBufSize = sizeof (CHdr) + sizeof (T)
+		MinBufSize = sizeof (Hdr) + sizeof (T)
 	};
 
 protected:
 	T* m_p;
 
 public:
-	CBufT ()
+	Buf ()
 	{
 		m_p = NULL;
 	}
 
-	CBufT (const CBufT& src)
+	Buf (const Buf& src)
 	{
 		m_p = NULL;
 		copy (src);
 	}
 
-	CBufT (const T& src)
+	Buf (const T& src)
 	{
 		m_p = NULL;
 		copy (src);
 	}
 	
-	CBufT (
-		EBuf kind,
+	Buf (
+		BufKind kind,
 		void* p, 
 		size_t size
 		)
@@ -87,7 +87,7 @@ public:
 		setBuffer (kind, p, size);
 	}
 
-	~CBufT ()
+	~Buf ()
 	{
 		release ();
 	}
@@ -116,14 +116,14 @@ public:
 		return m_p; 
 	}
 
-	CBufT& 
-	operator = (const CBufT& src)
+	Buf& 
+	operator = (const Buf& src)
 	{ 
 		copy (src);
 		return *this;
 	}
 
-	CBufT& 
+	Buf& 
 	operator = (const T& src)
 	{
 		copy (src);
@@ -148,7 +148,7 @@ public:
 	}
 
 	bool
-	copy (const CBufT& src)
+	copy (const Buf& src)
 	{
 		if (m_p == src.m_p)
 			return true;
@@ -171,35 +171,38 @@ public:
 	bool
 	copy (const T& src)
 	{
-		return m_p == &src ? true : allocateBuffer (TGetSize () (src), &src) != NULL;
+		return m_p == &src ? true : allocateBuffer (GetSize () (src), &src) != NULL;
 	}
 
 	T* 
 	getBuffer ()
 	{
-		return allocateBuffer (m_p ? TGetSize () (*m_p) : sizeof (T), m_p);
+		return allocateBuffer (m_p ? GetSize () (*m_p) : sizeof (T), m_p);
 	}
 
 	T* 
-	getBuffer (size_t size, bool saveContents = false)
+	getBuffer (
+		size_t size, 
+		bool saveContents = false
+		)
 	{
 		return allocateBuffer (size, saveContents ? m_p : NULL);
 	}
 
 	void
 	setBuffer (
-		EBuf kind,
+		BufKind kind,
 		void* p,
 		size_t size
 		)
 	{
-		ASSERT (size >= sizeof (CHdr) + sizeof (T));
+		ASSERT (size >= sizeof (Hdr) + sizeof (T));
 
-		CHdr* oldHdr = getHdr ();
+		Hdr* oldHdr = getHdr ();
 
-		mem::FFree* pfFree = kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
-		CPtrT <CHdr> newHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
-		newHdr->m_bufferSize = size - sizeof (CHdr);
+		mem::FFree* pfFree = kind == ref::BufKind_Static ? NULL : (mem::FFree*) -1;
+		Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, pfFree);
+		newHdr->m_bufferSize = size - sizeof (Hdr);
 
 		m_p = (T*) (newHdr + 1);
 		newHdr.detach ();
@@ -217,10 +220,10 @@ public:
 	}
 
 protected:
-	CHdr*
+	Hdr*
 	getHdr () const
 	{
-		return m_p ? (CHdr*) m_p - 1 : NULL;
+		return m_p ? (Hdr*) m_p - 1 : NULL;
 	}
 
 	T* 
@@ -231,7 +234,7 @@ protected:
 	{
 		ASSERT (size >= sizeof (T));
 
-		CHdr* oldHdr = getHdr ();
+		Hdr* oldHdr = getHdr ();
 		
 		if (oldHdr && 
 			oldHdr->m_bufferSize >= size &&
@@ -244,14 +247,14 @@ protected:
 				copyExtra (m_p, src);
 			}
 
-			CHdr* srcHdr = (CHdr*) src - 1;
+			Hdr* srcHdr = (Hdr*) src - 1;
 
 			return m_p;
 		}
 
 		size_t bufferSize = rtl::getMinPower2Ge (size);
 
-		CPtrT <CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, bufferSize);
+		Ptr <Hdr> newHdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
 		if (!newHdr)
 			return NULL;
 
@@ -282,7 +285,7 @@ protected:
 		const T* src
 		)
 	{
-		size_t size = TGetSize () (*src);
+		size_t size = GetSize () (*src);
 		if (size > sizeof (T))
 			memcpy (dst + 1, src + 1, size - sizeof (T));
 	}

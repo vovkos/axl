@@ -15,7 +15,7 @@ namespace psx {
 
 //.............................................................................
 
-class CSocket: public CFd
+class Socket: public Fd
 {
 public:
 	bool

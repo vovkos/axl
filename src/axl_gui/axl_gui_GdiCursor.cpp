@@ -7,9 +7,9 @@ namespace gui {
 
 //.............................................................................
 
-CGdiCursor::CGdiCursor ()
+GdiCursor::GdiCursor ()
 {
-	m_engine = CGdiEngine::getSingleton ();
+	m_engine = GdiEngine::getSingleton ();
 }
 
 //.............................................................................

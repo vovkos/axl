@@ -15,7 +15,7 @@ namespace rtl {
 	
 //.............................................................................
 
-class CPacker
+class Packer
 {
 public:
 	virtual
@@ -55,17 +55,17 @@ public:
 		return count_va (va);
 	}
 
-	ref::CPtrT <mem::TBlock> 
+	ref::Ptr <mem::Block> 
 	createPackage_va (axl_va_list va)
 	{
 		size_t size = 0;
 		pack_va (NULL, &size, va);
 
 		if (size == -1)
-			return ref::EPtr_Null;
+			return ref::PtrKind_Null;
 
-		typedef ref::CBoxT <mem::TBlock> CPackage;
-		ref::CPtrT <CPackage> package = AXL_REF_NEW_EXTRA (CPackage, size);
+		typedef ref::Box <mem::Block> Package;
+		ref::Ptr <Package> package = AXL_REF_NEW_EXTRA (Package, size);
 		pack_va (package + 1, &size, va);
 		package->m_p = package + 1;
 		package->m_size = size;
@@ -73,7 +73,7 @@ public:
 		return package;			
 	}
 
-	ref::CPtrT <mem::TBlock> 
+	ref::Ptr <mem::Block> 
 	createPackage (
 		int unused,
 		...
@@ -86,8 +86,8 @@ public:
 
 //.............................................................................
 
-template <typename TPack>
-class CPackerImplT: public CPacker
+template <typename Pack>
+class PackerImpl: public Packer
 {
 public:
 	virtual
@@ -98,14 +98,14 @@ public:
 		axl_va_list va
 		)
 	{
-		return TPack () (p, size, va);
+		return Pack () (p, size, va);
 	}
 
 	static
-	CPackerImplT*
+	PackerImpl*
 	getSingleton ()
 	{
-		return rtl::getSimpleSingleton <CPackerImplT> ();
+		return rtl::getSimpleSingleton <PackerImpl> ();
 	}
 };
 
@@ -113,10 +113,10 @@ public:
 
 // run-time sequencing
 
-class CPackerSeq: public CPacker
+class PackerSeq: public Packer
 {
 protected:
-	rtl::CArrayT <CPacker*> m_sequence;
+	rtl::Array <Packer*> m_sequence;
 
 public:
 	virtual
@@ -134,7 +134,7 @@ public:
 	}
 
 	size_t
-	append (CPacker* packer)
+	append (Packer* packer)
 	{
 		m_sequence.append (packer);
 		return m_sequence.getCount ();
@@ -144,7 +144,7 @@ public:
 	size_t
 	append ()
 	{
-		return append (CPackerImplT <T>::getSingleton ());
+		return append (PackerImpl <T>::getSingleton ());
 	}
 
 	// often times it is more convenient to use printf-like format string for sequencing
@@ -163,13 +163,13 @@ public:
 //.............................................................................
 
 inline
-ref::CPtrT <mem::TBlock> 
+ref::Ptr <mem::Block> 
 formatPackage_va (
 	const char* formatString, 
 	axl_va_list va
 	)
 {
-	CPackerSeq packer;
+	PackerSeq packer;
 	packer.format (formatString);
 	return packer.createPackage_va (va);
 }
@@ -177,7 +177,7 @@ formatPackage_va (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ref::CPtrT <mem::TBlock> 
+ref::Ptr <mem::Block> 
 formatPackage (
 	const char* formatString, 
 	...
@@ -191,10 +191,10 @@ formatPackage (
 
 // package: 
 
-class CPackage
+class Package
 {
 protected:
-	axl::rtl::CArrayT <uchar_t> m_buffer;
+	axl::rtl::Array <uchar_t> m_buffer;
 
 public:
 	void 
@@ -217,15 +217,15 @@ public:
 
 	size_t
 	append_va (
-		CPacker* pack,
+		Packer* pack,
 		axl_va_list va
 		);
 
-	template <typename TPack>
+	template <typename Pack>
 	size_t
 	append_va (axl_va_list va)
 	{
-		CPacker* pack = CPackerImplT <TPack>::getSingleton ();
+		Packer* pack = PackerImpl <Pack>::getSingleton ();
 		return append_va (pack, va);
 	}
 
@@ -239,7 +239,7 @@ public:
 	size_t 
 	append (const T& data)
 	{
-		CPacker* pack = CPackerImplT <CPackT <T> >::getSingleton ();
+		Packer* pack = PackerImpl <Pack <T> >::getSingleton ();
 		return pack (&data, sizeof (data));
 	}
 */
@@ -249,7 +249,7 @@ public:
 		axl_va_list va
 		)
 	{
-		CPackerSeq packer;
+		PackerSeq packer;
 		packer.format (formatString);
 		return append_va (&packer, va);
 	}

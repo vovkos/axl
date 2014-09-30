@@ -21,10 +21,10 @@ namespace mt {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-class CLock
+class Lock
 {
 public:
-	win::CCriticalSection m_criticalSection;
+	win::CriticalSection m_criticalSection;
 
 public:
 	void 
@@ -42,10 +42,10 @@ public:
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-class CLock
+class Lock
 {
 public:
-	psx::CMutex m_mutex;
+	psx::Mutex m_mutex;
 
 public:
 	void 
@@ -65,19 +65,19 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CScopeLock 
+class ScopeLock 
 {
 protected:
-	CLock* m_lock;
+	Lock* m_lock;
 
 public:
-	CScopeLock (CLock* lock)
+	ScopeLock (Lock* lock)
 	{
 		m_lock = lock;		
 		lock->lock ();
 	}
 
-	~CScopeLock ()
+	~ScopeLock ()
 	{
 		m_lock->unlock ();
 	}

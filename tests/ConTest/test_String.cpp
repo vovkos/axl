@@ -18,30 +18,30 @@ namespace test_String {
 //}
 //
 
-class CPoint: public POINT
+class Point: public POINT
 {
 public:
-	CPoint ()
+	Point ()
 	{
 		printf ("CPoint::CPoint ()\n");
 		x = 10;
 		y = 20;
 	}
 
-	~CPoint ()
+	~Point ()
 	{
 		printf ("CPoint::~CPoint ()\n");
 	}
 };
 
-typedef ref::CBufT <CPoint> CPointBuf;
+typedef ref::Buf <Point> PointBuf;
 
 void 
 run ()
 {
-	size_t bufSize = sizeof (CPoint) + sizeof (CPointBuf::CHdr);
-	CPointBuf point (ref::EBuf_Stack, _alloca (bufSize), bufSize);
-	CPointBuf point2 = point;
+	size_t bufSize = sizeof (Point) + sizeof (PointBuf::Hdr);
+	PointBuf point (ref::BufKind_Stack, _alloca (bufSize), bufSize);
+	PointBuf point2 = point;
 
 	printf ("point: %d, %d\n", point->x, point->y);
 	printf ("point2: %d, %d\n", point2->x, point2->y);
@@ -53,7 +53,7 @@ run ()
 	printf ("point2: %d, %d\n", point2->x, point2->y);
 
 	char buf [80];
-	rtl::CString string (ref::EBuf_Stack, buf, sizeof (buf));
+	rtl::String string (ref::BufKind_Stack, buf, sizeof (buf));
 
 	string.format ("hui %d %d %d", 1, 2, 3);
 	string.append ("govno");

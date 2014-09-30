@@ -8,10 +8,10 @@ namespace gui {
 
 //.............................................................................
 
-CGdiCanvas::CGdiCanvas ()
+GdiCanvas::GdiCanvas ()
 {
-	m_engine = CGdiEngine::getSingleton ();
-	m_destructKind = EDestruct_None;
+	m_engine = GdiEngine::getSingleton ();
+	m_destructKind = DestructKind_None;
 	m_hCompatibleDc = NULL;
 	m_hBitmap = NULL;
 	m_hPrevBitmap = NULL;
@@ -19,10 +19,10 @@ CGdiCanvas::CGdiCanvas ()
 }
 
 void
-CGdiCanvas::attach (
+GdiCanvas::attach (
 	HDC hdc,
 	HWND hWnd,
-	EDestruct destructKind
+	DestructKind destructKind
 	)
 {
 	release ();
@@ -33,7 +33,7 @@ CGdiCanvas::attach (
 }
 
 void
-CGdiCanvas::release ()
+GdiCanvas::release ()
 {
 	if (!m_h)
 		return;
@@ -52,16 +52,16 @@ CGdiCanvas::release ()
 
 	switch (m_destructKind)
 	{
-	case EDestruct_DeleteDc:
+	case DestructKind_DeleteDc:
 		::DeleteDC (m_h);
 		break;
 
-	case EDestruct_ReleaseDc:
+	case DestructKind_ReleaseDc:
 		::ReleaseDC (m_hWnd, m_h);
 		break;
 	}
 
-	m_destructKind = EDestruct_None;
+	m_destructKind = DestructKind_None;
 	m_h = NULL;
 	m_hCompatibleDc = NULL;
 	m_hBitmap = NULL;
@@ -70,7 +70,7 @@ CGdiCanvas::release ()
 }
 
 bool
-CGdiCanvas::drawRect (
+GdiCanvas::drawRect (
 	int left,
 	int top,
 	int right,
@@ -84,7 +84,7 @@ CGdiCanvas::drawRect (
 	{
 		m_colorAttr.m_backColor = color;
 
-		if (!(color & EColorFlag_Transparent))
+		if (!(color & ColorFlagKind_Transparent))
 			::SetBkColor (m_h, m_palette.getColorRgb (color));
 	}
 
@@ -94,7 +94,7 @@ CGdiCanvas::drawRect (
 }
 
 bool
-CGdiCanvas::drawText_utf8 (
+GdiCanvas::drawText_utf8 (
 	int x,
 	int y,
 	int left,
@@ -109,7 +109,7 @@ CGdiCanvas::drawText_utf8 (
 	)
 {
 	char buffer [256];
-	rtl::CString_w string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_utf16 (
@@ -128,7 +128,7 @@ CGdiCanvas::drawText_utf8 (
 }
 
 bool
-CGdiCanvas::drawText_utf16 (
+GdiCanvas::drawText_utf16 (
 	int x,
 	int y,
 	int left,
@@ -146,12 +146,12 @@ CGdiCanvas::drawText_utf16 (
 	backColor = overlayColor (m_baseTextAttr.m_backColor, backColor);
 	fontFlags = overlayFontFlags (m_baseTextAttr.m_fontFlags, fontFlags);
 
-	CFont* font = m_baseFont->getFontMod (fontFlags);
+	Font* font = m_baseFont->getFontMod (fontFlags);
 
 	if (m_font != font)
 	{
-		ASSERT (font->getEngine ()->getEngineKind () == EEngine_Gdi);
-		CGdiFont* gdiFont = (CGdiFont*) font;
+		ASSERT (font->getEngine ()->getEngineKind () == EngineKind_Gdi);
+		GdiFont* gdiFont = (GdiFont*) font;
 
 		m_font = font;
 		HFONT hPrevFont = (HFONT) ::SelectObject (m_h, *gdiFont);
@@ -164,7 +164,7 @@ CGdiCanvas::drawText_utf16 (
 	{
 		m_colorAttr.m_foreColor = textColor;
 
-		if (!(textColor & EColorFlag_Transparent))
+		if (!(textColor & ColorFlagKind_Transparent))
 			::SetTextColor (m_h, m_palette.getColorRgb (textColor));
 	}
 
@@ -172,7 +172,7 @@ CGdiCanvas::drawText_utf16 (
 	{
 		m_colorAttr.m_backColor = backColor;
 
-		if (!(backColor & EColorFlag_Transparent))
+		if (!(backColor & ColorFlagKind_Transparent))
 			::SetBkColor (m_h, m_palette.getColorRgb (backColor));
 	}
 
@@ -185,7 +185,7 @@ CGdiCanvas::drawText_utf16 (
 }
 
 bool
-CGdiCanvas::drawText_utf32 (
+GdiCanvas::drawText_utf32 (
 	int x,
 	int y,
 	int left,
@@ -200,7 +200,7 @@ CGdiCanvas::drawText_utf32 (
 	)
 {
 	char buffer [256];
-	rtl::CString_w string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_utf16 (
@@ -219,22 +219,22 @@ CGdiCanvas::drawText_utf32 (
 }
 
 bool
-CGdiCanvas::drawImage (
+GdiCanvas::drawImage (
 	int x,
 	int y,
-	CImage* image,
+	Image* image,
 	int left,
 	int top,
 	int right,
 	int bottom
 	)
 {
-	ASSERT (image->getEngine ()->getEngineKind () == EEngine_Gdi);
-	CGdiImage* gdiImage = (CGdiImage*) image;
+	ASSERT (image->getEngine ()->getEngineKind () == EngineKind_Gdi);
+	GdiImage* gdiImage = (GdiImage*) image;
 
 	if (!m_hCompatibleDc)
 	{
-		CScreenDc screenDc;
+		ScreenDc screenDc;
 		m_hCompatibleDc = ::CreateCompatibleDC (screenDc);
 	}
 
@@ -257,8 +257,8 @@ CGdiCanvas::drawImage (
 }
 
 bool
-CGdiCanvas::copyRect (
-	CCanvas* srcCanvas,
+GdiCanvas::copyRect (
+	Canvas* srcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,
@@ -267,8 +267,8 @@ CGdiCanvas::copyRect (
 	int height
 	)
 {
-	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EEngine_Gdi);
-	CGdiCanvas* dc = (CGdiCanvas*) srcCanvas;
+	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EngineKind_Gdi);
+	GdiCanvas* dc = (GdiCanvas*) srcCanvas;
 
 	::BitBlt (
 		m_h,

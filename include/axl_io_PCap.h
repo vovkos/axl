@@ -13,7 +13,7 @@ namespace io {
 
 //.............................................................................
 
-class CClosePCap
+class ClosePCap
 {
 public:
 	void
@@ -25,7 +25,7 @@ public:
 
 //.............................................................................
 
-class CPCap: public rtl::CHandleT <pcap_t*, CClosePCap>
+class CPCap: public rtl::Handle <pcap_t*, ClosePCap>
 {
 public:
 	bool

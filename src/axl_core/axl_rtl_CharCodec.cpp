@@ -6,17 +6,17 @@ namespace rtl {
 
 //.............................................................................
 
-CCharCodec* 
-getCharCodec (ECharCodec codecKind)
+CharCodec* 
+getCharCodec (CharCodecKind codecKind)
 {
-	static CAsciiCodec asciiCodec; 
-	static CUtfCodecT <rtl::CUtf8>     utf8Codec; 
-	static CUtfCodecT <rtl::CUtf16>    utf16Codec; 
-	static CUtfCodecT <rtl::CUtf16_be> utf16Codec_be; 
-	static CUtfCodecT <rtl::CUtf32>    utf32Codec; 
-	static CUtfCodecT <rtl::CUtf32_be> utf32Codec_be; 
+	static AsciiCodec asciiCodec; 
+	static UtfCodec <rtl::Utf8>     utf8Codec; 
+	static UtfCodec <rtl::Utf16>    utf16Codec; 
+	static UtfCodec <rtl::Utf16_be> utf16Codec_be; 
+	static UtfCodec <rtl::Utf32>    utf32Codec; 
+	static UtfCodec <rtl::Utf32_be> utf32Codec_be; 
 	
-	static CCharCodec* codecTable [] = 
+	static CharCodec* codecTable [] = 
 	{
 		&asciiCodec,
 		&utf8Codec,
@@ -32,8 +32,8 @@ getCharCodec (ECharCodec codecKind)
 //.............................................................................
 
 void
-CCharCodec::encodeFromUtf8 (
-	rtl::CArrayT <char>* buffer,
+CharCodec::encodeFromUtf8 (
+	rtl::Array <char>* buffer,
 	const utf8_t* p,
 	size_t length
 	)
@@ -58,8 +58,8 @@ CCharCodec::encodeFromUtf8 (
 }
 
 void
-CCharCodec::encodeFromUtf16 (
-	rtl::CArrayT <char>* buffer,
+CharCodec::encodeFromUtf16 (
+	rtl::Array <char>* buffer,
 	const utf16_t* p,
 	size_t length
 	)
@@ -84,8 +84,8 @@ CCharCodec::encodeFromUtf16 (
 }
 
 void
-CCharCodec::encodeFromUtf32 (
-	rtl::CArrayT <char>* buffer,
+CharCodec::encodeFromUtf32 (
+	rtl::Array <char>* buffer,
 	const utf32_t* p,
 	size_t length
 	)
@@ -111,35 +111,35 @@ CCharCodec::encodeFromUtf32 (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-rtl::CArrayT <char>
-CCharCodec::encodeFromUtf8 (
+rtl::Array <char>
+CharCodec::encodeFromUtf8 (
 	const utf8_t* p,
 	size_t length
 	)
 {
-	rtl::CArrayT <char> buffer;
+	rtl::Array <char> buffer;
 	encodeFromUtf8 (&buffer, p, length);
 	return buffer;
 }
 
-rtl::CArrayT <char>
-CCharCodec::encodeFromUtf16 (
+rtl::Array <char>
+CharCodec::encodeFromUtf16 (
 	const utf16_t* p,
 	size_t length
 	)
 {
-	rtl::CArrayT <char> buffer;
+	rtl::Array <char> buffer;
 	encodeFromUtf16 (&buffer, p, length);
 	return buffer;
 }
 
-rtl::CArrayT <char>
-CCharCodec::encodeFromUtf32 (
+rtl::Array <char>
+CharCodec::encodeFromUtf32 (
 	const utf32_t* p,
 	size_t length
 	)
 {
-	rtl::CArrayT <char> buffer;
+	rtl::Array <char> buffer;
 	encodeFromUtf32 (&buffer, p, length);
 	return buffer;
 }
@@ -147,8 +147,8 @@ CCharCodec::encodeFromUtf32 (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-CCharCodec::decodeToUtf8 (
-	rtl::CArrayT <utf8_t>* buffer,
+CharCodec::decodeToUtf8 (
+	rtl::Array <utf8_t>* buffer,
 	const void* _p,
 	size_t size
 	)
@@ -174,8 +174,8 @@ CCharCodec::decodeToUtf8 (
 }
 
 void
-CCharCodec::decodeToUtf16 (
-	rtl::CArrayT <utf16_t>* buffer,
+CharCodec::decodeToUtf16 (
+	rtl::Array <utf16_t>* buffer,
 	const void* _p,
 	size_t size
 	)
@@ -201,8 +201,8 @@ CCharCodec::decodeToUtf16 (
 }
 
 void
-CCharCodec::decodeToUtf32 (
-	rtl::CArrayT <utf32_t>* buffer,
+CharCodec::decodeToUtf32 (
+	rtl::Array <utf32_t>* buffer,
 	const void* _p,
 	size_t size
 	)
@@ -227,35 +227,35 @@ CCharCodec::decodeToUtf32 (
 	}
 }
 
-rtl::CArrayT <utf8_t>
-CCharCodec::decodeToUtf8 (
+rtl::Array <utf8_t>
+CharCodec::decodeToUtf8 (
 	const void* p,
 	size_t size
 	)
 {
-	rtl::CArrayT <utf8_t> buffer;
+	rtl::Array <utf8_t> buffer;
 	decodeToUtf8 (&buffer, p, size);
 	return buffer;
 }
 
-rtl::CArrayT <utf16_t>
-CCharCodec::decodeToUtf16 (
+rtl::Array <utf16_t>
+CharCodec::decodeToUtf16 (
 	const void* p,
 	size_t size
 	)
 {
-	rtl::CArrayT <utf16_t> buffer;
+	rtl::Array <utf16_t> buffer;
 	decodeToUtf16 (&buffer, p, size);
 	return buffer;
 }
 
-rtl::CArrayT <utf32_t>
-CCharCodec::decodeToUtf32 (
+rtl::Array <utf32_t>
+CharCodec::decodeToUtf32 (
 	const void* p,
 	size_t size
 	)
 {
-	rtl::CArrayT <utf32_t> buffer;
+	rtl::Array <utf32_t> buffer;
 	decodeToUtf32 (&buffer, p, size);
 	return buffer;
 }
@@ -263,7 +263,7 @@ CCharCodec::decodeToUtf32 (
 //.............................................................................
 
 void
-CCodePointDecoder::loadState (uint32_t state)
+CodePointDecoder::loadState (uint32_t state)
 {
 	*((uint32_t*) m_accumulator) = state;
 	m_accumulatorCurrentSize = (state & 0x0f000000) >> 24;
@@ -273,7 +273,7 @@ CCodePointDecoder::loadState (uint32_t state)
 }
 
 uint32_t
-CCodePointDecoder::saveState ()
+CodePointDecoder::saveState ()
 {
 	uint32_t state = *((const uint32_t*) m_accumulator) & 0x00ffffff;
 	state |= (m_accumulatorCurrentSize & 0x0f) << 24;
@@ -283,7 +283,7 @@ CCodePointDecoder::saveState ()
 }
 
 size_t
-CCodePointDecoder::decode (
+CodePointDecoder::decode (
 	utf32_t* codePoint,
 	const void* p,
 	size_t size

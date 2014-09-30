@@ -52,43 +52,43 @@ namespace gc {
 
 //.............................................................................
 
-class CCollector: public mt::CThreadImplT <CCollector>
+class Collector: public mt::ThreadImpl <Collector>
 {
 protected:
-	enum EState
+	enum StateKind
 	{
-		EState_Idle = 0,
-		EState_Mark,  
+		StateKind_Idle = 0,
+		StateKind_Mark,  
 	};
 
-	enum EDef
+	enum DefKind
 	{
-		EDef_ClusterSize = sizeof(void*)
+		DefKind_ClusterSize = sizeof(void*)
 	};
 
 protected:
 	IMutator* m_mutator;
 	
-	mt::CLock m_lock;
-	mt::CEvent m_idleEvent;
-	mt::CEvent m_wakeUpEvent;
+	mt::Lock m_lock;
+	mt::Event m_idleEvent;
+	mt::Event m_wakeUpEvent;
 
-	volatile EState m_state;
+	volatile StateKind m_state;
 	volatile bool m_terminateThread;
 
-	rtl::CStdListT <axl_gc_TValueEntry> m_valueFreeList;
-	rtl::CStdListT <axl_gc_TValueEntry> m_destructList;
-	rtl::CStdListT <axl_gc_TValueEntry> m_greenList; 
-	rtl::CStdListT <axl_gc_TValueEntry> m_mutatorGrayList; 
+	rtl::StdList <axl_gc_TValueEntry> m_valueFreeList;
+	rtl::StdList <axl_gc_TValueEntry> m_destructList;
+	rtl::StdList <axl_gc_TValueEntry> m_greenList; 
+	rtl::StdList <axl_gc_TValueEntry> m_mutatorGrayList; 
 
-	rtl::CArrayT <axl_gc_TValue> m_traceSetArray [2]; // array of axl_gc_TValue
+	rtl::Array <axl_gc_TValue> m_traceSetArray [2]; // array of axl_gc_TValue
 	size_t m_currentTraceSet;
 
-	rtl::CBuddyAllocMap m_mapArray [2];
+	rtl::BuddyAllocMap m_mapArray [2];
 	size_t m_allocateMap; 
 
-	rtl::CBitMap m_mutatorGrayMap;
-	rtl::CBitMap m_collectorGrayMap;
+	rtl::BitMap m_mutatorGrayMap;
+	rtl::BitMap m_collectorGrayMap;
 		 
 	ulong_t m_greenSlotTls;
 
@@ -105,9 +105,9 @@ protected:
 #endif
 
 public:
-	CCollector ();
+	Collector ();
 
-	~CCollector ()
+	~Collector ()
 	{
 		close ();
 	}
@@ -161,24 +161,24 @@ protected:
 	getClusterCount (const axl_gc_TValue* value);
 
 	void
-	CCollector::startCycle_l ();
+	Collector::startCycle_l ();
 
 	void*
 	tryAllocate_l (const axl_gc_TType* type);
 
-	rtl::CArrayT <axl_gc_TValue>*
+	rtl::Array <axl_gc_TValue>*
 	getCurrentTraceSet ()
 	{
 		return &m_traceSetArray [m_currentTraceSet];
 	}
 
-	rtl::CArrayT <axl_gc_TValue>*
+	rtl::Array <axl_gc_TValue>*
 	flipTraceSet ();
 
-	rtl::CArrayT <axl_gc_TValue>*
-	mark (rtl::CBuddyAllocMap* blackMap);
+	rtl::Array <axl_gc_TValue>*
+	mark (rtl::BuddyAllocMap* blackMap);
 
-	rtl::CArrayT <axl_gc_TValue>*
+	rtl::Array <axl_gc_TValue>*
 	trace ();
 
 	void
@@ -186,14 +186,14 @@ protected:
 
 	void
 	getUnmarkedDestructors_l (
-		rtl::CBuddyAllocMap* blackMap,
-		rtl::CStdListT <axl_gc_TValueEntry>* list
+		rtl::BuddyAllocMap* blackMap,
+		rtl::StdList <axl_gc_TValueEntry>* list
 		);
 
 	axl_gc_TValueEntry* 
 	allocateValueEntry ();
 
-	friend class mt::CThreadImplT <CCollector>;
+	friend class mt::ThreadImpl <Collector>;
 
 	ulong_t
 	threadProc ();

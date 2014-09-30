@@ -24,13 +24,13 @@ namespace mt {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-class CEventRoot
+class EventRoot
 {
 public:
-	win::CEvent m_event;
+	win::Event m_event;
 
 protected:
-	CEventRoot () // protected construction
+	EventRoot () // protected construction
 	{
 	}
 
@@ -50,16 +50,16 @@ public:
 	bool
 	wait (uint_t timeout = -1)
 	{
-		return m_event.wait (timeout) == win::EWaitResult_Object0;
+		return m_event.wait (timeout) == win::WaitResultKind_Object0;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CEvent: public CEventRoot
+class Event: public EventRoot
 {
 public:
-	CEvent ()
+	Event ()
 	{
 		m_event.create (NULL, false, false, NULL);
 	}
@@ -67,10 +67,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CNotificationEvent: public CEventRoot
+class NotificationEvent: public EventRoot
 {
 public:
-	CNotificationEvent ()
+	NotificationEvent ()
 	{
 		m_event.create (NULL, true, false, NULL);
 	}
@@ -80,11 +80,11 @@ public:
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-class CEvent
+class Event
 {
 protected:
-	psx::CMutex m_mutex;
-	psx::CSem m_sem;
+	psx::Mutex m_mutex;
+	psx::Sem m_sem;
 
 public:
 	bool
@@ -100,15 +100,15 @@ public:
 	}
 };
 
-class CNotificationEvent
+class NotificationEvent
 {
 protected:
-	psx::CMutex m_mutex;
-	psx::CCond m_cond;
+	psx::Mutex m_mutex;
+	psx::Cond m_cond;
 	bool m_state;
 
 public:
-	CNotificationEvent ()
+	NotificationEvent ()
 	{
 		m_state = false;
 	}

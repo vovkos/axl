@@ -135,19 +135,19 @@ main := |*
 'countof'         |
 'typeof'       
 
-)                   { setAttr (ts, te, gui::EStdColor_LightBlue); };		
+)                   { setAttr (ts, te, gui::StdColorKind_LightBlue); };		
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 id                  {  };
-(lit_sq | lit_dq)   { setAttr (ts, te, gui::EStdColor_Red); };
-dec+                { setAttr (ts, te, gui::EStdColor_Red); };
-'0' [xx] hex+       { setAttr (ts, te, gui::EStdColor_Red); };
-'0' [xx] lit_dq     { setAttr (ts, te, gui::EStdColor_Red); };
-'$' lit_dq          { setAttr (ts, te, gui::EStdColor_Red); };
+(lit_sq | lit_dq)   { setAttr (ts, te, gui::StdColorKind_Red); };
+dec+                { setAttr (ts, te, gui::StdColorKind_Red); };
+'0' [xx] hex+       { setAttr (ts, te, gui::StdColorKind_Red); };
+'0' [xx] lit_dq     { setAttr (ts, te, gui::StdColorKind_Red); };
+'$' lit_dq          { setAttr (ts, te, gui::StdColorKind_Red); };
 
 '//'                { SetAttr (ts, te, gui::EStdColor_Green); fgoto comment_sl; };
-'/*'                { setAttr (ts, te, gui::EStdColor_Green); fgoto comment_ml; };
+'/*'                { setAttr (ts, te, gui::StdColorKind_Green); fgoto comment_ml; };
 
 any                 ;
 
@@ -160,8 +160,8 @@ any                 ;
 
 comment_sl := |*
 
-nl                  { setAttr (ts, te, gui::EStdColor_Green); fgoto main; };
-any                 { setAttr (ts, te, gui::EStdColor_Green); };
+nl                  { setAttr (ts, te, gui::StdColorKind_Green); fgoto main; };
+any                 { setAttr (ts, te, gui::StdColorKind_Green); };
 
 *|;
 
@@ -172,8 +172,8 @@ any                 { setAttr (ts, te, gui::EStdColor_Green); };
 
 comment_ml := |*
 
-'*/'                { setAttr (ts, te, gui::EStdColor_Green); fgoto main; };
-any                 { setAttr (ts, te, gui::EStdColor_Green); };
+'*/'                { setAttr (ts, te, gui::StdColorKind_Green); fgoto main; };
+any                 { setAttr (ts, te, gui::StdColorKind_Green); };
 
 *|;
 

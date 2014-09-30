@@ -16,7 +16,7 @@ main (
 	llvm::initializeNativeTargetAsmPrinter ();
 	llvm::initializeNativeTargetDisassembler ();
 
-	err::CParseErrorProvider::register ();
+	err::ParseErrorProvider::register ();
 	srand ((int) axl::g::getTimestamp ());
 #endif
 

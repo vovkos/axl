@@ -13,77 +13,77 @@
 namespace axl {
 namespace gui {
 
-class CEngine;
-class CCanvas;
+class Engine;
+class Canvas;
 
 //.............................................................................
 
-enum EWidgetStyle
+enum WidgetStyleKind
 {
-	EWidgetStyle_Disabled      = 0x0001,	
-	EWidgetStyle_HSizeRepaint  = 0x0010,
-	EWidgetStyle_VSizeRepaint  = 0x0020,	
-	EWidgetStyle_HScrollAlways = 0x0040,
-	EWidgetStyle_VScrollAlways = 0x0080,
+	WidgetStyleKind_Disabled      = 0x0001,	
+	WidgetStyleKind_HSizeRepaint  = 0x0010,
+	WidgetStyleKind_VSizeRepaint  = 0x0020,	
+	WidgetStyleKind_HScrollAlways = 0x0040,
+	WidgetStyleKind_VScrollAlways = 0x0080,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum EWidgetOrientation
+enum WidgetOrientationKind
 {
-	EWidgetOrientation_Vertical = 0,
-	EWidgetOrientation_Horizontal,
-	EWidgetOrientation__Count
+	WidgetOrientationKind_Vertical = 0,
+	WidgetOrientationKind_Horizontal,
+	WidgetOrientationKind__Count
 };
 
 //.............................................................................
 
 // master message structure
 
-enum EWidgetMsg
+enum WidgetMsgKind
 {
-	EWidgetMsg_Undefined = 0,
+	WidgetMsgKind_Undefined = 0,
 
-	EWidgetMsg_Close,                   // TWidgetMsg
-	EWidgetMsg_SetFocus,                // TWidgetMsg
-	EWidgetMsg_KillFocus,               // TWidgetMsg
-	EWidgetMsg_Size,                    // TWidgetMsgT <uint_t OrientationMask> 
-	EWidgetMsg_Scroll,                  // TWidgetMsgT <uint_t OrientationMask>
-	EWidgetMsg_Paint,                   // TWidgetPaintMsg
+	WidgetMsgKind_Close,                   // TWidgetMsg
+	WidgetMsgKind_SetFocus,                // TWidgetMsg
+	WidgetMsgKind_KillFocus,               // TWidgetMsg
+	WidgetMsgKind_Size,                    // TWidgetMsgParamT <uint_t OrientationMask> 
+	WidgetMsgKind_Scroll,                  // TWidgetMsgParamT <uint_t OrientationMask>
+	WidgetMsgKind_Paint,                   // TWidgetPaintMsg
 
-	EWidgetMsg_MouseMove,               // TWidgetMouseMsg
-	EWidgetMsg_MouseLeave,              // TWidgetMsg
-	EWidgetMsg_MouseButtonDown,         // TWidgetMouseButtonMsg
-	EWidgetMsg_MouseButtonUp,           // TWidgetMouseButtonMsg
-	EWidgetMsg_MouseButtonDoubleClick,  // TWidgetMouseButtonMsg
-	EWidgetMsg_MouseWheel,              // TWidgetMouseWheelMsg
-	EWidgetMsg_MouseCaptureLost,        // TWidgetMsg
+	WidgetMsgKind_MouseMove,               // TWidgetMouseMsg
+	WidgetMsgKind_MouseLeave,              // TWidgetMsg
+	WidgetMsgKind_MouseButtonDown,         // TWidgetMouseButtonMsg
+	WidgetMsgKind_MouseButtonUp,           // TWidgetMouseButtonMsg
+	WidgetMsgKind_MouseButtonDoubleClick,  // TWidgetMouseButtonMsg
+	WidgetMsgKind_MouseWheel,              // TWidgetMouseWheelMsg
+	WidgetMsgKind_MouseCaptureLost,        // TWidgetMsg
 
-	EWidgetMsg_KeyDown,                 // TWidgetKeyMsg
-	EWidgetMsg_KeyUp,                   // TWidgetKeyMsg
+	WidgetMsgKind_KeyDown,                 // TWidgetKeyMsg
+	WidgetMsgKind_KeyUp,                   // TWidgetKeyMsg
 
-	EWidgetMsg_ThreadMsg,               // TWidgetThreadMsg
+	WidgetMsgKind_ThreadMsg,               // TWidgetThreadMsg
 
-	EWidgetMsg_Gdi,                     // TWidgetGdiMsg
-	EWidgetMsg_Qt,                      // TWidgetQtMsg
-	EWidgetMsg_Gtk,                     // TWidgetGtkMsg
-	EWidgetMsg_User,                    // TWidgetMsg
+	WidgetMsgKind_Gdi,                     // TWidgetGdiMsg
+	WidgetMsgKind_Qt,                      // TWidgetQtMsg
+	WidgetMsgKind_Gtk,                     // TWidgetGtkMsg
+	WidgetMsgKind_User,                    // TWidgetMsg
 
-	EWidgetMsg__Count,
+	WidgetMsgKind__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TWidgetMsg
+struct WidgetMsg
 {
-	EWidgetMsg m_msgKind;
+	WidgetMsgKind m_msgKind;
 
-	TWidgetMsg ()
+	WidgetMsg ()
 	{
-		m_msgKind = EWidgetMsg_Undefined;
+		m_msgKind = WidgetMsgKind_Undefined;
 	}
 	
-	TWidgetMsg (EWidgetMsg msgKind)
+	WidgetMsg (WidgetMsgKind msgKind)
 	{
 		m_msgKind = msgKind;
 	}
@@ -92,16 +92,16 @@ struct TWidgetMsg
 //.............................................................................
 
 template <typename T>
-struct TWidgetMsgT: TWidgetMsg
+struct WidgetMsgParam: WidgetMsg
 {
 	T m_param;
 
-	TWidgetMsgT ()
+	WidgetMsgParam ()
 	{
 	}
 	
-	TWidgetMsgT (
-		EWidgetMsg msgKind,
+	WidgetMsgParam (
+		WidgetMsgKind msgKind,
 		const T& param	
 		)
 	{
@@ -112,23 +112,23 @@ struct TWidgetMsgT: TWidgetMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TWidgetPaintMsg: TWidgetMsg
+struct WidgetPaintMsg: WidgetMsg
 {
-	CCanvas* m_canvas;
-	TRect m_rect;
+	Canvas* m_canvas;
+	Rect m_rect;
 
-	TWidgetPaintMsg ()
+	WidgetPaintMsg ()
 	{		
-		m_msgKind = EWidgetMsg_Paint;
+		m_msgKind = WidgetMsgKind_Paint;
 		m_canvas = NULL;
 	}
 
-	TWidgetPaintMsg (
-		CCanvas* canvas,
-		const TRect& rect
+	WidgetPaintMsg (
+		Canvas* canvas,
+		const Rect& rect
 		)
 	{
-		m_msgKind = EWidgetMsg_Paint;
+		m_msgKind = WidgetMsgKind_Paint;
 		m_canvas = canvas;
 		m_rect = rect;
 	}
@@ -136,43 +136,43 @@ struct TWidgetPaintMsg: TWidgetMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TWidgetMouseMsg: TWidgetMsg
+struct WidgetMouseMsg: WidgetMsg
 {
-	TPoint m_point;
+	Point m_point;
 	uint_t m_buttons;
 	uint_t m_modifierKeys;
-	EMouseButton m_button;
+	MouseButtonKind m_button;
 
-	TWidgetMouseMsg ()
+	WidgetMouseMsg ()
 	{
 		m_buttons = 0;
 		m_modifierKeys = 0;		
-		m_button = EMouseButton_None;
+		m_button = MouseButtonKind_None;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TWidgetMouseWheelMsg: TWidgetMouseMsg
+struct WidgetMouseWheelMsg: WidgetMouseMsg
 {
 	int m_wheelDelta;	
 
-	TWidgetMouseWheelMsg ()
+	WidgetMouseWheelMsg ()
 	{
-		m_msgKind = EWidgetMsg_MouseWheel;
+		m_msgKind = WidgetMsgKind_MouseWheel;
 		m_wheelDelta = 0;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TWidgetKeyMsg: TWidgetMsg
+struct WidgetKeyMsg: WidgetMsg
 {
 	uint_t m_key;
 	uint_t m_modifierKeys;
 	utf32_t m_char;
 
-	TWidgetKeyMsg ()
+	WidgetKeyMsg ()
 	{
 		m_key = 0;
 		m_modifierKeys = 0;
@@ -182,10 +182,10 @@ struct TWidgetKeyMsg: TWidgetMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TWidgetThreadMsg: TWidgetMsg
+struct WidgethreadMsg: WidgetMsg
 {
 	uint_t m_code;
-	ref::CPtrT <void> m_params;
+	ref::Ptr <void> m_params;
 };
 
 //.............................................................................
@@ -194,19 +194,19 @@ struct TWidgetThreadMsg: TWidgetMsg
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-struct TWidgetGdiMsg: TWidgetMsg
+struct WidgetGdiMsg: WidgetMsg
 {
 	intptr_t m_wmMsg;
 	intptr_t m_wParam;
 	intptr_t m_lParam;
 	intptr_t m_lResult;
 
-	TWidgetGdiMsg (
+	WidgetGdiMsg (
 		intptr_t wmMsg,
 		intptr_t wParam = 0,
 		intptr_t lParam = 0
 		):
-		TWidgetMsg (EWidgetMsg_Gdi)
+		WidgetMsg (WidgetMsgKind_Gdi)
 	{
 		m_wmMsg = wmMsg;
 		m_wParam = wParam;
@@ -221,12 +221,12 @@ struct TWidgetGdiMsg: TWidgetMsg
 
 #if (_AXL_GUI_QT)
 
-struct TWidgetQtMsg: TWidgetMsg
+struct WidgetQtMsg: WidgetMsg
 {
 	QEvent* m_event;
 
-	TWidgetQtMsg ():
-		TWidgetMsg (EWidgetMsg_Qt)
+	WidgetQtMsg ():
+		WidgetMsg (WidgetMsgKind_Qt)
 	{
 	}
 };
@@ -237,12 +237,12 @@ struct TWidgetQtMsg: TWidgetMsg
 
 #if (_AXL_GTK)
 
-struct TWidgetGtkMsg: TWidgetMsg
+struct WidgetGtkMsg: WidgetMsg
 {
 	// not yet
 
-	TWidgetGtkMsg ():
-		TWidgetMsg (EWidgetMsg_Gtk)
+	WidgetGtkMsg ():
+		WidgetMsg (WidgetMsgKind_Gtk)
 	{
 	}
 };
@@ -253,20 +253,20 @@ struct TWidgetGtkMsg: TWidgetMsg
 
 // scroll bars
 
-struct TWidgetScrollBar
+struct WidgetScrollBar
 {
 	size_t m_end;
 	size_t m_page;
 	size_t m_pos;
 
-	TWidgetScrollBar ()
+	WidgetScrollBar ()
 	{
 		m_end = 0;
 		m_page = 0;
 		m_pos = 0;
 	}
 
-	TWidgetScrollBar (
+	WidgetScrollBar (
 		size_t end,
 		size_t page,
 		size_t pos = 0
@@ -298,46 +298,46 @@ struct TWidgetScrollBar
 
 //.............................................................................
 
-class CWidget
+class Widget
 {
 protected:
-	friend class CEngine;
+	friend class Engine;
 
-	CEngine* m_engine;
-	CCursor* m_cursor;
-	CFont* m_baseFont;
-	TTextAttr m_baseTextAttr;
-	TPalette m_palette;
-	TSize m_size;
-	TPoint m_caretPos;
-	TSize m_caretSize;
+	Engine* m_engine;
+	Cursor* m_cursor;
+	Font* m_baseFont;
+	TextAttr m_baseTextAttr;
+	Palette m_palette;
+	Size m_size;
+	Point m_caretPos;
+	Size m_caretSize;
 	bool m_isCaretVisible;
 	uint_t m_style;
 	uint_t m_msgMask;	
-	TWidgetScrollBar m_scrollBarArray [2];	
+	WidgetScrollBar m_scrollBarArray [2];	
 	
 public:
-	CWidget (CEngine* engine);
+	Widget (Engine* engine);
 
-	CEngine* 
+	Engine* 
 	getEngine ()
 	{
 		return m_engine;
 	}
 
-	CCursor* 
+	Cursor* 
 	getCursor ()
 	{
 		return m_cursor;
 	}
 
-	CFont* 
+	Font* 
 	getBaseFont ()
 	{
 		return m_baseFont;
 	}
 
-	TSize
+	Size
 	getSize ()
 	{
 		return m_size;
@@ -356,13 +356,13 @@ public:
 	}
 	
 	bool
-	checkMsgMask (EWidgetMsg msgKind)
+	checkMsgMask (WidgetMsgKind msgKind)
 	{
 		return (m_msgMask & (1 << msgKind)) != 0;
 	}
 
 	virtual
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	getCanvas () = 0;
 
 	virtual
@@ -375,7 +375,7 @@ public:
 		) = 0;
 
 	bool
-	redraw (const TRect& rect)
+	redraw (const Rect& rect)
 	{
 		return redraw (rect.m_left, rect.m_top, rect.m_right, rect.m_bottom);
 	}
@@ -396,7 +396,7 @@ public:
 
 	virtual
 	bool
-	setCursor (CCursor* cursor) = 0;
+	setCursor (Cursor* cursor) = 0;
 
 	virtual
 	bool
@@ -435,7 +435,7 @@ public:
 		);
 
 	bool
-	setCaretSize (const TSize& size)
+	setCaretSize (const Size& size)
 	{
 		return setCaretSize (size.m_width, size.m_height);
 	}
@@ -447,13 +447,13 @@ public:
 		);
 
 	bool
-	setCaretPos (const gui::TPoint& point)
+	setCaretPos (const gui::Point& point)
 	{
 		return setCaretPos (point.m_x, point.m_y);
 	}
 		
-	TWidgetScrollBar*
-	getScrollBar (EWidgetOrientation orientation)
+	WidgetScrollBar*
+	getScrollBar (WidgetOrientationKind orientation)
 	{
 		ASSERT (orientation < countof (m_scrollBarArray));
 		return &m_scrollBarArray [orientation];
@@ -461,14 +461,14 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (EWidgetOrientation orientation) = 0;
+	updateScrollBar (WidgetOrientationKind orientation) = 0;
 
 	bool
 	updateScrollBars ()
 	{
 		return 
-			updateScrollBar (EWidgetOrientation_Vertical) &&
-			updateScrollBar (EWidgetOrientation_Horizontal);
+			updateScrollBar (WidgetOrientationKind_Vertical) &&
+			updateScrollBar (WidgetOrientationKind_Horizontal);
 	}
 
 	virtual
@@ -482,13 +482,13 @@ public:
 	void
 	postThreadMsg (
 		uint_t code,
-		const ref::CPtrT <void>& params
+		const ref::Ptr <void>& params
 		) = 0;
 
 	virtual
 	void
 	processWidgetMsg (
-		TWidgetMsg* msg,
+		WidgetMsg* msg,
 		bool* isHandled_o
 		)
 	{
@@ -501,7 +501,7 @@ public:
 virtual \
 void \
 processWidgetMsg ( \
-	axl::gui::TWidgetMsg* msg, \
+	axl::gui::WidgetMsg* msg, \
 	bool* isHandled_o \
 	) \
 { \

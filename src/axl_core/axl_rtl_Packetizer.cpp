@@ -7,7 +7,7 @@ namespace rtl {
 //.............................................................................
 
 size_t
-CPacketizerRoot::writeImpl (
+PacketizerRoot::writeImpl (
 	const void* p0,
 	size_t size0
 	)
@@ -16,7 +16,7 @@ CPacketizerRoot::writeImpl (
 	size_t size = size0;
 	size_t bufferSize = m_buffer.getCount ();
 
-	static uint32_t signatureBuffer = EPacketHdr_Signature;
+	static uint32_t signatureBuffer = PacketHdrKind_Signature;
 	const char* signature = (char*) &signatureBuffer;
 
 	while (bufferSize < sizeof (uint32_t)) // append signature byte-by-byte
@@ -87,10 +87,10 @@ CPacketizerRoot::writeImpl (
 //.............................................................................
 
 uint64_t
-CLegacyPacketizerRoot::createHdr (size_t size)
+LegacyPacketizerRoot::createHdr (size_t size)
 {
-	TPacketHdr hdr;
-	hdr.m_signature = EPacketHdr_Signature;
+	PacketHdr hdr;
+	hdr.m_signature = PacketHdrKind_Signature;
 	hdr.m_dataSize = (uint16_t) size;
 	hdr.m_checksum = 0;	
 	hdr.m_checksum = crc16 (&hdr, sizeof (hdr));
@@ -99,7 +99,7 @@ CLegacyPacketizerRoot::createHdr (size_t size)
 }
 
 size_t
-CLegacyPacketizerRoot::writeImpl (
+LegacyPacketizerRoot::writeImpl (
 	const void* p0,
 	size_t size0
 	)
@@ -108,7 +108,7 @@ CLegacyPacketizerRoot::writeImpl (
 	size_t size = size0;
 	size_t bufferSize = m_buffer.getCount ();
 
-	static uint32_t signatureBuffer = EPacketHdr_Signature;
+	static uint32_t signatureBuffer = PacketHdrKind_Signature;
 	const char* signature = (char*) &signatureBuffer;
 
 	while (bufferSize < sizeof (uint32_t)) // append signature byte-by-byte
@@ -159,7 +159,7 @@ CLegacyPacketizerRoot::writeImpl (
 		bufferSize = sizeof (uint64_t);
 	}
 
-	uint32_t dataSize = ((const TPacketHdr*) m_buffer.ca ())->m_dataSize;
+	uint32_t dataSize = ((const PacketHdr*) m_buffer.ca ())->m_dataSize;
 	uint32_t packetSize = sizeof (uint64_t) + dataSize;
 
 	if (bufferSize < packetSize)

@@ -9,9 +9,9 @@ namespace io {
 //.............................................................................
 
 bool
-CListenerSock::open (
-	ESockProto protocol,
-	const TSockAddr* addr
+ListenerSock::open (
+	SockProtoKind protocol,
+	const SockAddr* addr
 	)
 {
 	close ();
@@ -26,8 +26,8 @@ CListenerSock::open (
 	if (!result)
 		return false;
 
-	exe::CFunctionT <exe::CArgT <CListenerSock*>, exe::CArgT <void> > onEvent (
-		pvoid_cast (&CListenerSock::onSocketEvent_wt), 
+	exe::Function <exe::Arg <ListenerSock*>, exe::Arg <void> > onEvent (
+		pvoid_cast (&ListenerSock::onSocketEvent_wt), 
 		this
 		);
 
@@ -39,27 +39,27 @@ CListenerSock::open (
 }
 
 void
-CListenerSock::close ()
+ListenerSock::close ()
 {
 	if (!isOpen ())
 		return;
 
-	m_workerThread->syncSchedule <exe::CArgT <CListenerSock*> > (
-		pvoid_cast (&CListenerSock::close_wt),
+	m_workerThread->syncSchedule <exe::Arg <ListenerSock*> > (
+		pvoid_cast (&ListenerSock::close_wt),
 		this
 		);
 }
 
 bool
-CListenerSock::listen (
+ListenerSock::listen (
 	size_t backLog,
-	const exe::CFunction& onAccept
+	const exe::Function& onAccept
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_3 <CListenerSock*, size_t, exe::IFunction*> > (
-		pvoid_cast (&CListenerSock::listen_wt),
+	return m_workerThread->syncSchedule <exe::ArgSeq_3 <ListenerSock*, size_t, exe::IFunction*> > (
+		pvoid_cast (&ListenerSock::listen_wt),
 		this,
 		backLog,
 		onAccept
@@ -67,20 +67,20 @@ CListenerSock::listen (
 }
 
 void
-CListenerSock::close_wt ()
+ListenerSock::close_wt ()
 {
 	m_sock.close ();
 	m_onAccept.clear ();
 	m_event.reset ();
 	m_workerThread->removeEvent (m_hWorkerThreadEvent);
-	m_workerThread = ref::EPtr_Null;
+	m_workerThread = ref::PtrKind_Null;
 	m_hWorkerThreadEvent = NULL;
 }
 
 bool
-CListenerSock::listen_wt (
+ListenerSock::listen_wt (
 	size_t backLog,
-	const exe::CFunction& onAccept
+	const exe::Function& onAccept
 	)
 {
 	bool result = 
@@ -95,7 +95,7 @@ CListenerSock::listen_wt (
 }
 
 void
-CListenerSock::onSocketEvent_wt ()
+ListenerSock::onSocketEvent_wt ()
 {
 	WSANETWORKEVENTS events = { 0 };
 
@@ -114,10 +114,10 @@ CListenerSock::onSocketEvent_wt ()
 	if (s == INVALID_SOCKET)
 		return;
 
-	ref::CPtrT <CConnectionSock> socket = AXL_REF_NEW (ref::CBoxT <CConnectionSock>);
+	ref::Ptr <ConnectionSock> socket = AXL_REF_NEW (ref::Box <ConnectionSock>);
 	socket->m_sock.attach (s);
 
-	TSockAddrU addr;
+	SockAddrU addr;
 	socket->getPeerAddress (&addr);
 
 	m_onAccept->invoke (0, socket);

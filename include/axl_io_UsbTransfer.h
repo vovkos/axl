@@ -14,7 +14,7 @@ namespace io {
 
 //.............................................................................
 
-class CFreeUsbTransfer
+class FreeUsbransfer
 {
 public:
 	void
@@ -26,7 +26,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUsbTransfer: public rtl::CHandleT <libusb_transfer*, CFreeUsbTransfer>
+class Usbransfer: public rtl::Handle <libusb_transfer*, FreeUsbransfer>
 {
 };
 

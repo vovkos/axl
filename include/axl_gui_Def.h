@@ -11,96 +11,96 @@
 namespace axl {
 namespace gui {
 
-class CEngine;
+class Engine;
 
 //.............................................................................
 
-enum EMouseButton
+enum MouseButtonKind
 {
-	EMouseButton_None   = 0x00,
-	EMouseButton_Left   = 0x01,
-	EMouseButton_Right  = 0x02,
-	EMouseButton_Medium = 0x04,
+	MouseButtonKind_None   = 0x00,
+	MouseButtonKind_Left   = 0x01,
+	MouseButtonKind_Right  = 0x02,
+	MouseButtonKind_Medium = 0x04,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-EMouseButton
+MouseButtonKind
 getFirstMouseButton (uint_t buttons)
 {
-	return (EMouseButton) rtl::getLoBitIdx32 (buttons);
+	return (MouseButtonKind) rtl::getLoBitIdx32 (buttons);
 }
 
 //.............................................................................
 
-enum EModifierKey
+enum ModifierKeyKind
 {
-	EModifierKey_None   = 0x00,
-	EModifierKey_Shift  = 0x01,
-	EModifierKey_Ctrl   = 0x02,
-	EModifierKey_Alt    = 0x04,
+	ModifierKeyKind_None   = 0x00,
+	ModifierKeyKind_Shift  = 0x01,
+	ModifierKeyKind_Ctrl   = 0x02,
+	ModifierKeyKind_Alt    = 0x04,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-EModifierKey
+ModifierKeyKind
 getFirstModifierKey (uint_t modifierKeys)
 {
-	return (EModifierKey) rtl::getLoBitIdx32 (modifierKeys);
+	return (ModifierKeyKind) rtl::getLoBitIdx32 (modifierKeys);
 }
 
 //.............................................................................
 
-enum EKey
+enum KeyKind
 {
-	EKey_Backspace   = 0x08,
-	EKey_Tab         = 0x09,
-	EKey_Enter       = 0x0d,	
-	EKey_Esc         = 0x1b,
+	KeyKind_Backspace   = 0x08,
+	KeyKind_Tab         = 0x09,
+	KeyKind_Enter       = 0x0d,	
+	KeyKind_Esc         = 0x1b,
 
-	EKey_Pause       = 0x10000013,	
-	EKey_Print       = 0x1000002a,	
+	KeyKind_Pause       = 0x10000013,	
+	KeyKind_Print       = 0x1000002a,	
 
-	EKey_CapsLock    = 0x10000014,
-	EKey_NumLock     = 0x10000090,
-	EKey_ScrollLock  = 0x10000091,
+	KeyKind_CapsLock    = 0x10000014,
+	KeyKind_NumLock     = 0x10000090,
+	KeyKind_ScrollLock  = 0x10000091,
 
-	EKey_Shift       = 0x10000010,
-	EKey_Ctrl        = 0x10000011,
-	EKey_Alt         = 0x10000012,
+	KeyKind_Shift       = 0x10000010,
+	KeyKind_Ctrl        = 0x10000011,
+	KeyKind_Alt         = 0x10000012,
 
-	EKey_PageUp      = 0x10000021,
-	EKey_PageDown    = 0x10000022,
-	EKey_End         = 0x10000023,
-	EKey_Home        = 0x10000024,
+	KeyKind_PageUp      = 0x10000021,
+	KeyKind_PageDown    = 0x10000022,
+	KeyKind_End         = 0x10000023,
+	KeyKind_Home        = 0x10000024,
 
-	EKey_Left        = 0x10000025,
-	EKey_Up          = 0x10000026,
-	EKey_Right       = 0x10000027,
-	EKey_Down        = 0x10000028,
+	KeyKind_Left        = 0x10000025,
+	KeyKind_Up          = 0x10000026,
+	KeyKind_Right       = 0x10000027,
+	KeyKind_Down        = 0x10000028,
 
-	EKey_Insert      = 0x1000002d,
-	EKey_Delete      = 0x1000002e,
+	KeyKind_Insert      = 0x1000002d,
+	KeyKind_Delete      = 0x1000002e,
 
-	EKey_F1          = 0x10000070,
-	EKey_F2          = 0x10000071,
-	EKey_F3          = 0x10000072,
-	EKey_F4          = 0x10000073,
-	EKey_F5          = 0x10000074,
-	EKey_F6          = 0x10000075,
-	EKey_F7          = 0x10000076,
-	EKey_F8          = 0x10000077,
-	EKey_F9          = 0x10000078,
-	EKey_F10         = 0x10000079,
-	EKey_F11         = 0x1000007a,
-	EKey_F12         = 0x1000007b,
+	KeyKind_F1          = 0x10000070,
+	KeyKind_F2          = 0x10000071,
+	KeyKind_F3          = 0x10000072,
+	KeyKind_F4          = 0x10000073,
+	KeyKind_F5          = 0x10000074,
+	KeyKind_F6          = 0x10000075,
+	KeyKind_F7          = 0x10000076,
+	KeyKind_F8          = 0x10000077,
+	KeyKind_F9          = 0x10000078,
+	KeyKind_F10         = 0x10000079,
+	KeyKind_F11         = 0x1000007a,
+	KeyKind_F12         = 0x1000007b,
 };
 
 //.............................................................................
 
-struct TPoint
+struct Point
 {
 	union
 	{
@@ -117,13 +117,13 @@ struct TPoint
 		};
 	};
 
-	TPoint ()
+	Point ()
 	{
 		m_x = 0;
 		m_y = 0;
 	}
 
-	TPoint (
+	Point (
 		int x,
 		int y
 		)
@@ -132,16 +132,16 @@ struct TPoint
 		m_y = y;
 	}
 
-	TPoint 
-	operator + (const TPoint& point2)
+	Point 
+	operator + (const Point& point2)
 	{
-		return TPoint (m_x + point2.m_x, m_y + point2.m_y);
+		return Point (m_x + point2.m_x, m_y + point2.m_y);
 	}
 
-	TPoint 
-	operator - (const TPoint& point2)
+	Point 
+	operator - (const Point& point2)
 	{
-		return TPoint (m_x - point2.m_x, m_y - point2.m_y);
+		return Point (m_x - point2.m_x, m_y - point2.m_y);
 	}
 
 	void
@@ -167,7 +167,7 @@ struct TPoint
 
 //.............................................................................
 
-struct TSize
+struct Size
 {
 	union
 	{
@@ -184,13 +184,13 @@ struct TSize
 		};
 	};
 
-	TSize ()
+	Size ()
 	{
 		m_width = 0;
 		m_height = 0;
 	}
 
-	TSize (
+	Size (
 		int width,
 		int height
 		)
@@ -199,16 +199,16 @@ struct TSize
 		m_height = height;
 	}
 
-	TSize 
-	operator + (const TSize& size2)
+	Size 
+	operator + (const Size& size2)
 	{
-		return TSize (m_width + size2.m_width, m_height + size2.m_height);
+		return Size (m_width + size2.m_width, m_height + size2.m_height);
 	}
 
-	TSize 
-	operator - (const TSize& size2)
+	Size 
+	operator - (const Size& size2)
 	{
-		return TSize (m_width - size2.m_width, m_height - size2.m_height);
+		return Size (m_width - size2.m_width, m_height - size2.m_height);
 	}
 
 	void
@@ -234,19 +234,19 @@ struct TSize
 
 //.............................................................................
 
-enum EFormFactor
+enum FormFactorKind
 {
-	EFormFactor_Landscape,
-	EFormFactor_Portrait,
-	EFormFactor_LineStrip,
-	EFormFactor_ColumnStrip,
-	EFormFactor__Count,
+	FormFactorKind_Landscape,
+	FormFactorKind_Portrait,
+	FormFactorKind_LineStrip,
+	FormFactorKind_ColumnStrip,
+	FormFactorKind__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-EFormFactor
+FormFactorKind
 getFormFactor (
 	int width,
 	int height, 
@@ -254,15 +254,15 @@ getFormFactor (
 	)
 {
 	return 
-		height > width * stripThreshold ? EFormFactor_LineStrip :
-		width > height * stripThreshold ? EFormFactor_ColumnStrip :
-		height > width ? EFormFactor_Portrait : EFormFactor_Landscape;
+		height > width * stripThreshold ? FormFactorKind_LineStrip :
+		width > height * stripThreshold ? FormFactorKind_ColumnStrip :
+		height > width ? FormFactorKind_Portrait : FormFactorKind_Landscape;
 }
 
 inline
-EFormFactor
+FormFactorKind
 getFormFactor (
-	const TSize& size, 
+	const Size& size, 
 	int stripThreshold = 32
 	)
 {
@@ -271,7 +271,7 @@ getFormFactor (
 
 //.............................................................................
 
-struct TRect
+struct Rect
 {
 	union 
 	{
@@ -292,7 +292,7 @@ struct TRect
 		};
 	};
 
-	TRect ()
+	Rect ()
 	{
 		m_left = 0;
 		m_top = 0;
@@ -300,7 +300,7 @@ struct TRect
 		m_bottom = 0;
 	}
 
-	TRect (
+	Rect (
 		int left,
 		int top,
 		int right,
@@ -313,7 +313,7 @@ struct TRect
 		m_bottom = bottom;
 	}
 
-	TRect (
+	Rect (
 		int left,
 		int top
 		)
@@ -324,9 +324,9 @@ struct TRect
 		m_bottom = top;
 	}
 
-	TRect (
-		const TPoint& leftTop,
-		const TPoint& rightBottom
+	Rect (
+		const Point& leftTop,
+		const Point& rightBottom
 		)
 	{
 		m_left = leftTop.m_x;
@@ -335,7 +335,7 @@ struct TRect
 		m_bottom = rightBottom.m_y;
 	}
 
-	TRect (const TPoint& leftTop)
+	Rect (const Point& leftTop)
 	{
 		m_left = leftTop.m_x;
 		m_top = leftTop.m_y;
@@ -343,9 +343,9 @@ struct TRect
 		m_bottom = leftTop.m_y;
 	}
 
-	TRect (
-		const TPoint& leftTop,
-		const TSize& size
+	Rect (
+		const Point& leftTop,
+		const Size& size
 		)
 	{
 		m_left = leftTop.m_x;
@@ -372,10 +372,10 @@ struct TRect
 		return m_bottom - m_top;
 	}
 
-	TSize
+	Size
 	getSize () const
 	{
-		return TSize (getWidth (), getHeight ());
+		return Size (getWidth (), getHeight ());
 	}
 
 	void
@@ -411,7 +411,7 @@ struct TRect
 
 //.............................................................................
 
-struct TCursorPos
+struct CursorPos
 {
 	union
 	{
@@ -428,13 +428,13 @@ struct TCursorPos
 		};
 	};
 
-	TCursorPos ()
+	CursorPos ()
 	{
 		m_line = 0;
 		m_col = 0;
 	}
 
-	TCursorPos (
+	CursorPos (
 		int line,
 		int col
 		)
@@ -443,43 +443,43 @@ struct TCursorPos
 	}
 
 	bool
-	operator == (const TCursorPos& pos2) const
+	operator == (const CursorPos& pos2) const
 	{
 		return cmp (pos2) == 0;
 	}
 
 	bool
-	operator != (const TCursorPos& pos2) const
+	operator != (const CursorPos& pos2) const
 	{
 		return cmp (pos2) != 0;
 	}
 
 	bool
-	operator < (const TCursorPos& pos2) const
+	operator < (const CursorPos& pos2) const
 	{
 		return cmp (pos2) < 0;
 	}
 
 	bool
-	operator <= (const TCursorPos& pos2) const
+	operator <= (const CursorPos& pos2) const
 	{
 		return cmp (pos2) <= 0;
 	}
 
 	bool
-	operator > (const TCursorPos& pos2) const
+	operator > (const CursorPos& pos2) const
 	{
 		return cmp (pos2) > 0;
 	}
 
 	bool
-	operator >= (const TCursorPos& pos2) const
+	operator >= (const CursorPos& pos2) const
 	{
 		return cmp (pos2) >= 0;
 	}
 
 	int
-	cmp (const TCursorPos& pos2) const
+	cmp (const CursorPos& pos2) const
 	{
 		return 
 			m_line < pos2.m_line ? -1 : 
@@ -489,7 +489,7 @@ struct TCursorPos
 	}
 
 	int
-	cmp_u (const TCursorPos& pos2) const
+	cmp_u (const CursorPos& pos2) const
 	{
 		return 
 			m_line_u < pos2.m_line_u ? -1 : 
@@ -521,18 +521,18 @@ struct TCursorPos
 
 //.............................................................................
 
-class CGuiItem
+class GuiItem
 {
 protected:
-	CEngine* m_engine;
+	Engine* m_engine;
 
 public:
-	CGuiItem ()
+	GuiItem ()
 	{
 		m_engine = NULL;
 	}
 
-	CEngine* 
+	Engine* 
 	getEngine ()
 	{
 		return m_engine;

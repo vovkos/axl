@@ -15,12 +15,12 @@ namespace rtl {
 //.............................................................................
 
 template <typename T>
-class CHandleTableT 
+class HandleTable 
 {
 public:
-	class CEntry: public rtl::TListLink
+	class Entry: public rtl::ListLink
 	{
-		friend class CHandleTableT;
+		friend class HandleTable;
 
 	protected:
 		handle_t m_handle;
@@ -34,21 +34,21 @@ public:
 		}
 	};
 
-	typedef CIteratorT <CEntry> CListIterator;
-	typedef CHashTableMapIteratorT <handle_t, CListIterator> CMapIterator;
+	typedef Iterator <Entry> ListIterator;
+	typedef HashTableMapIterator <handle_t, ListIterator> MapIterator;
 	
 protected:
-	CStdListT <CEntry> m_list;
-	CHashTableMapT <handle_t, CListIterator, CHashIdT <handle_t> > m_hashTable;
+	StdList <Entry> m_list;
+	HashTableMap <handle_t, ListIterator, HashId <handle_t> > m_hashTable;
 	uintptr_t m_seed;
 
 public:
-	CHandleTableT ()
+	HandleTable ()
 	{
 		m_seed = 1;
 	}
 
-	CHandleTableT (uintptr_t seed)
+	HandleTable (uintptr_t seed)
 	{
 		m_seed = seed ? seed : 1; // never 0
 	}
@@ -59,7 +59,7 @@ public:
 		return m_list.isEmpty ();
 	}
 
-	CConstListT <CEntry> 
+	ConstList <Entry> 
 	getList () const
 	{
 		return m_list;
@@ -79,7 +79,7 @@ public:
 		m_hashTable.clear ();
 	}
 
-	CMapIterator
+	MapIterator
 	find (handle_t handle) const
 	{
 		return m_hashTable.find (handle);
@@ -91,7 +91,7 @@ public:
 		T* value
 		) const
 	{
-		CMapIterator it = m_hashTable.find (handle);
+		MapIterator it = m_hashTable.find (handle);
 		if (!it)
 			return false;
 
@@ -105,11 +105,11 @@ public:
 		ASSERT (m_seed);
 		handle_t handle = (handle_t) m_seed;
 
-		CEntry* entry = AXL_MEM_NEW (CEntry);
+		Entry* entry = AXL_MEM_NEW (Entry);
 		entry->m_handle = handle;
 		entry->m_value = value;
 		
-		CListIterator it = m_list.insertTail (entry);
+		ListIterator it = m_list.insertTail (entry);
 		m_hashTable [handle] = it;
 
 		m_seed++;
@@ -120,7 +120,7 @@ public:
 	}
 
 	void
-	remove (CMapIterator it)
+	remove (MapIterator it)
 	{
 		m_list.erase (it->m_value);
 		m_hashTable.erase (it);
@@ -129,7 +129,7 @@ public:
 	bool
 	remove (handle_t handle)
 	{
-		CMapIterator it = m_hashTable.find (handle);
+		MapIterator it = m_hashTable.find (handle);
 		if (!it)
 			return false;
 

@@ -17,25 +17,25 @@ namespace io {
 
 //.............................................................................
 
-enum EFileFlag
+enum FileFlagKind
 {
-	EFileFlag_ReadOnly      = 0x01,
-	EFileFlag_OpenExisting  = 0x02,
-	EFileFlag_Exclusive     = 0x04,
-	EFileFlag_ShareWrite    = 0x08,
-	EFileFlag_DeleteOnClose = 0x10,
-	EFileFlag_Asynchronous  = 0x20,
+	FileFlagKind_ReadOnly      = 0x01,
+	FileFlagKind_OpenExisting  = 0x02,
+	FileFlagKind_Exclusive     = 0x04,
+	FileFlagKind_ShareWrite    = 0x08,
+	FileFlagKind_DeleteOnClose = 0x10,
+	FileFlagKind_Asynchronous  = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CFile
+class File
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CFile m_file;
+	win::File m_file;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CFile m_file;
+	psx::File m_file;
 #endif
 
 public:

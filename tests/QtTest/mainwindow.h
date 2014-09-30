@@ -18,7 +18,7 @@ public:
 	gui::qtWidget <myLogWidget>* m_logWidget;
 	myLogServer m_logServer;
 	
-	log::CMemoryServer m_memoryServer;
+	log::MemoryServer m_memoryServer;
 
 	myLogProxy m_logServerProxy;
 	myLogProxy m_logWidgetProxy;

@@ -8,17 +8,17 @@ namespace mt {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-bool CTlsMgr::m_isDead = false;
+bool TlsMgr::m_isDead = false;
 
-CTlsMgr::CTlsMgr ()
+TlsMgr::TlsMgr ()
 {
 	m_tlsIdx = ::TlsAlloc ();
 	m_slotCount = 0;
 }
 
-CTlsMgr::~CTlsMgr ()
+TlsMgr::~TlsMgr ()
 {
-	TPage* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage ();
 	if (page)
 	{
 		AXL_MEM_DELETE (page);
@@ -31,7 +31,7 @@ CTlsMgr::~CTlsMgr ()
 
 void
 NTAPI
-CTlsMgr::tlsCallback (
+TlsMgr::tlsCallback (
 	HANDLE hModule,
 	dword_t reason,
 	void* reserved
@@ -40,9 +40,9 @@ CTlsMgr::tlsCallback (
 	if (reason != DLL_THREAD_DETACH || m_isDead)
 		return;
 
-	CTlsMgr* self = getTlsMgr ();
+	TlsMgr* self = getTlsMgr ();
 
-	TPage* page = self->findCurrentThreadPage ();
+	Page* page = self->findCurrentThreadPage ();
 	if (!page)
 		return;
 
@@ -53,15 +53,15 @@ CTlsMgr::tlsCallback (
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-CTlsMgr::CTlsMgr ()
+TlsMgr::TlsMgr ()
 {
 	pthread_key_create (&m_tlsKey, tlsDestructor);
 	m_slotCount = 0;
 }
 
-CTlsMgr::~CTlsMgr ()
+TlsMgr::~TlsMgr ()
 {
-	TPage* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage ();
 	if (page)
 	{
 		AXL_MEM_DELETE (page);
@@ -73,44 +73,44 @@ CTlsMgr::~CTlsMgr ()
 
 #endif
 
-CTlsValue
-CTlsMgr::getSlotValue (size_t slot)
+TlsValue
+TlsMgr::getSlotValue (size_t slot)
 {
-	TPage* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage ();
 	if (!page)
-		return ref::EPtr_Null;
+		return ref::PtrKind_Null;
 
 	size_t count = page->m_array.getCount ();
 	if (slot >= count)
-		return ref::EPtr_Null;
+		return ref::PtrKind_Null;
 
-	rtl::CBoxListEntryT <CTlsValue>* entry = page->m_array [slot];
+	rtl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
 	if (!entry)
-		return ref::EPtr_Null;
+		return ref::PtrKind_Null;
 
 	return entry->m_value;
 }
 
-CTlsValue
-CTlsMgr::setSlotValue (
+TlsValue
+TlsMgr::setSlotValue (
 	size_t slot,
-	const CTlsValue& value
+	const TlsValue& value
 	)
 {
-	TPage* page = getCurrentThreadPage ();
+	Page* page = getCurrentThreadPage ();
 
 	size_t count = page->m_array.getCount ();
 	if (slot >= count)
 	{
 		if (!value)
-			return CTlsValue ();
+			return TlsValue ();
 
 		page->m_array.setCount (slot + 1);
 	}
 
-	rtl::CBoxListEntryT <CTlsValue>* entry = page->m_array [slot];
+	rtl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
 
-	CTlsValue oldValue;
+	TlsValue oldValue;
 
 	if (entry)
 	{
@@ -135,14 +135,14 @@ CTlsMgr::setSlotValue (
 	return oldValue;
 }
 
-CTlsMgr::TPage*
-CTlsMgr::getCurrentThreadPage ()
+TlsMgr::Page*
+TlsMgr::getCurrentThreadPage ()
 {
-	TPage* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage ();
 	if (page)
 		return page;
 
-	page = AXL_MEM_NEW (TPage);
+	page = AXL_MEM_NEW (Page);
 	setCurrentThreadPage (page);
 	return page;
 }
@@ -160,7 +160,7 @@ CTlsMgr::getCurrentThreadPage ()
 
 extern "C"
 __declspec(allocate (AXL_MT_TLS_CALLBACK_SECTION))
-PIMAGE_TLS_CALLBACK g_axl_mt_pfTlsCallback = axl::mt::CTlsMgr::tlsCallback;
+PIMAGE_TLS_CALLBACK g_axl_mt_pfTlsCallback = axl::mt::TlsMgr::tlsCallback;
 
 #ifdef _WIN64
 #	pragma comment (linker, "/INCLUDE:_tls_used")

@@ -15,9 +15,9 @@ namespace gui {
 
 enum
 {
-	EColorFlag_Transparent = 0x80000000,
-	EColorFlag_Index       = 0x40000000,
-	EColorFlag_IndexMask   = 0x0fffffff,
+	ColorFlagKind_Transparent = 0x80000000,
+	ColorFlagKind_Index       = 0x40000000,
+	ColorFlagKind_IndexMask   = 0x0fffffff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -26,85 +26,85 @@ inline
 uint_t 
 getColorIndex (uint_t color)
 { 
-	ASSERT ((color & EColorFlag_Index) && !(color & EColorFlag_Transparent));
+	ASSERT ((color & ColorFlagKind_Index) && !(color & ColorFlagKind_Transparent));
 	
-	return color & EColorFlag_IndexMask;
+	return color & ColorFlagKind_IndexMask;
 }
 
 //.............................................................................
 
-enum EStdColor
+enum StdColorKind
 {
-	EStdColor_Black        = 0x000000,
-	EStdColor_White        = 0xffffff,
-	EStdColor_Gray         = 0x808080,
-	EStdColor_Red          = 0x800000,
-	EStdColor_Green        = 0x008000,
-	EStdColor_Blue         = 0x000080,
-	EStdColor_Purple       = 0x800080,
-	EStdColor_Cyan         = 0x008080,
+	StdColorKind_Black        = 0x000000,
+	StdColorKind_White        = 0xffffff,
+	StdColorKind_Gray         = 0x808080,
+	StdColorKind_Red          = 0x800000,
+	StdColorKind_Green        = 0x008000,
+	StdColorKind_Blue         = 0x000080,
+	StdColorKind_Purple       = 0x800080,
+	StdColorKind_Cyan         = 0x008080,
 
-	EStdColor_LightRed     = 0xff0000,
-	EStdColor_LightGreen   = 0x00ff00,
-	EStdColor_LightBlue    = 0x0000ff,
-	EStdColor_LightPurple  = 0xff00ff,
-	EStdColor_LightCyan    = 0x00ffff,
+	StdColorKind_LightRed     = 0xff0000,
+	StdColorKind_LightGreen   = 0x00ff00,
+	StdColorKind_LightBlue    = 0x0000ff,
+	StdColorKind_LightPurple  = 0xff00ff,
+	StdColorKind_LightCyan    = 0x00ffff,
 
-	EStdColor_PastelGray   = 0xefefef,
-	EStdColor_PastelRed    = 0xffe4e1,
-	EStdColor_PastelOrange = 0xfffacd,
-	EStdColor_PastelYellow = 0xffffc0,
-	EStdColor_PastelGreen  = 0xe1fada,
-	EStdColor_PastelCyan   = 0xcdfaff,
-	EStdColor_PastelBlue   = 0xe2edff,
-	EStdColor_PastelPurple = 0xe2dafd,
+	StdColorKind_PastelGray   = 0xefefef,
+	StdColorKind_PastelRed    = 0xffe4e1,
+	StdColorKind_PastelOrange = 0xfffacd,
+	StdColorKind_PastelYellow = 0xffffc0,
+	StdColorKind_PastelGreen  = 0xe1fada,
+	StdColorKind_PastelCyan   = 0xcdfaff,
+	StdColorKind_PastelBlue   = 0xe2edff,
+	StdColorKind_PastelPurple = 0xe2dafd,
 };
 
 //.............................................................................
 
-enum EStdPalColor
+enum StdPalColorKind
 {
 	// system widget colors
 
-	EStdPalColor_WidgetText = EColorFlag_Index | 0,
-	EStdPalColor_WidgetBack,     // 1
-	EStdPalColor_GrayText,       // 2
-	EStdPalColor_SelectionText,  // 3
-	EStdPalColor_SelectionBack,  // 4
-	EStdPalColor_3DFace,         // 5
-	EStdPalColor_3DShadow,       // 6
-	EStdPalColor_3DDarkShadow,   // 7
-	EStdPalColor_3DLight,        // 8
-	EStdPalColor_3DHiLight,      // 9
+	StdPalColorKind_WidgetText = ColorFlagKind_Index | 0,
+	StdPalColorKind_WidgetBack,     // 1
+	StdPalColorKind_GrayText,       // 2
+	StdPalColorKind_SelectionText,  // 3
+	StdPalColorKind_SelectionBack,  // 4
+	StdPalColorKind_3DFace,         // 5
+	StdPalColorKind_3DShadow,       // 6
+	StdPalColorKind_3DDarkShadow,   // 7
+	StdPalColorKind_3DLight,        // 8
+	StdPalColorKind_3DHiLight,      // 9
 
 	// std colors
 
-	EStdPalColor_Black,          // 10
-	EStdPalColor_White,          // 11
-	EStdPalColor_Gray,           // 12
-	EStdPalColor_Red,            // 13
-	EStdPalColor_Green,          // 14
-	EStdPalColor_Blue,           // 15
-	EStdPalColor_Purple,         // 16
-	EStdPalColor_Cyan,           // 17
+	StdPalColorKind_Black,          // 10
+	StdPalColorKind_White,          // 11
+	StdPalColorKind_Gray,           // 12
+	StdPalColorKind_Red,            // 13
+	StdPalColorKind_Green,          // 14
+	StdPalColorKind_Blue,           // 15
+	StdPalColorKind_Purple,         // 16
+	StdPalColorKind_Cyan,           // 17
 
-	EStdPalColor_LightRed,       // 18
-	EStdPalColor_LightGreen,     // 19
-	EStdPalColor_LightBlue,      // 20
-	EStdPalColor_LightPurple,    // 21
-	EStdPalColor_LightCyan,      // 22
+	StdPalColorKind_LightRed,       // 18
+	StdPalColorKind_LightGreen,     // 19
+	StdPalColorKind_LightBlue,      // 20
+	StdPalColorKind_LightPurple,    // 21
+	StdPalColorKind_LightCyan,      // 22
 	
-	EStdPalColor_PastelGray,     // 23
-	EStdPalColor_PastelRed,      // 24
-	EStdPalColor_PastelOrange,   // 25
-	EStdPalColor_PastelYellow,   // 26
-	EStdPalColor_PastelGreen,    // 27
-	EStdPalColor_PastelCyan,     // 28
-	EStdPalColor_PastelBlue,     // 29
-	EStdPalColor_PastelPurple,   // 30
+	StdPalColorKind_PastelGray,     // 23
+	StdPalColorKind_PastelRed,      // 24
+	StdPalColorKind_PastelOrange,   // 25
+	StdPalColorKind_PastelYellow,   // 26
+	StdPalColorKind_PastelGreen,    // 27
+	StdPalColorKind_PastelCyan,     // 28
+	StdPalColorKind_PastelBlue,     // 29
+	StdPalColorKind_PastelPurple,   // 30
 
-	EStdPalColor__SystemColorCount = ~EColorFlag_Index & (EStdPalColor_3DHiLight + 1),
-	EStdPalColor__Count            = ~EColorFlag_Index & (EStdPalColor_PastelPurple + 1)
+	StdPalColorKind__SystemColorCount = ~ColorFlagKind_Index & (StdPalColorKind_3DHiLight + 1),
+	StdPalColorKind__Count            = ~ColorFlagKind_Index & (StdPalColorKind_PastelPurple + 1)
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -124,18 +124,18 @@ updateStdPalSystemColors (); // call this upon theme change
 
 //.............................................................................
 
-struct TPalette
+struct Palette
 {
 	const uint_t* m_colorArray;
 	size_t m_count;
 
-	TPalette ()
+	Palette ()
 	{
 		m_colorArray = getStdPalColorArray ();
-		m_count = EStdPalColor__Count;
+		m_count = StdPalColorKind__Count;
 	}
 
-	TPalette (
+	Palette (
 		const uint_t* colorArray,
 		size_t count
 		)
@@ -147,19 +147,19 @@ struct TPalette
 	uint_t
 	getColorRgb (uint_t color)
 	{
-		ASSERT (!(color & EColorFlag_Transparent));
+		ASSERT (!(color & ColorFlagKind_Transparent));
 		
-		if (!(color & EColorFlag_Index))
+		if (!(color & ColorFlagKind_Index))
 			return color;
 
-		size_t i = color & EColorFlag_IndexMask;
-		color = i < m_count ? m_colorArray [i] : EColorFlag_Transparent;
+		size_t i = color & ColorFlagKind_IndexMask;
+		color = i < m_count ? m_colorArray [i] : ColorFlagKind_Transparent;
 			
-		if (color & EColorFlag_Index) // allow two-staged index lookup
+		if (color & ColorFlagKind_Index) // allow two-staged index lookup
 		{
-			i = color & EColorFlag_IndexMask;
-			color = i < m_count ? m_colorArray [i] : EColorFlag_Transparent;
-			ASSERT (!(color & EColorFlag_Index)); // bad palette!
+			i = color & ColorFlagKind_IndexMask;
+			color = i < m_count ? m_colorArray [i] : ColorFlagKind_Transparent;
+			ASSERT (!(color & ColorFlagKind_Index)); // bad palette!
 		}
 
 		return color;
@@ -175,7 +175,7 @@ overlayColor (
 	uint_t overlayColor
 	)
 {
-	return (overlayColor & EColorFlag_Transparent) ? baseColor : overlayColor;
+	return (overlayColor & ColorFlagKind_Transparent) ? baseColor : overlayColor;
 }
 
 uint_t
@@ -186,41 +186,41 @@ parseColorString (
 
 //.............................................................................
 
-struct TColorAttr
+struct ColorAttr
 {
 	uint_t m_foreColor;
 	uint_t m_backColor;
 
-	TColorAttr ()
+	ColorAttr ()
 	{
-		m_foreColor = EColorFlag_Transparent;
-		m_backColor = EColorFlag_Transparent;
+		m_foreColor = ColorFlagKind_Transparent;
+		m_backColor = ColorFlagKind_Transparent;
 	}
 
-	TColorAttr (
+	ColorAttr (
 		uint_t foreColor,
-		uint_t backColor = EColorFlag_Transparent
+		uint_t backColor = ColorFlagKind_Transparent
 		)
 	{
 		setup (foreColor, backColor);
 	}
 
-	TColorAttr (const char* string)
+	ColorAttr (const char* string)
 	{
 		parse (string);
 	}
 
 	int 
-	cmp (const TColorAttr& attr)
+	cmp (const ColorAttr& attr)
 	{
-		return memcmp (this, &attr, sizeof (TColorAttr));
+		return memcmp (this, &attr, sizeof (ColorAttr));
 	}
 
 	void
 	clear ()
 	{
-		m_foreColor = EColorFlag_Transparent;
-		m_backColor = EColorFlag_Transparent;
+		m_foreColor = ColorFlagKind_Transparent;
+		m_backColor = ColorFlagKind_Transparent;
 	}
 
 	void
@@ -235,8 +235,8 @@ struct TColorAttr
 
 	void
 	overlay (
-		const TColorAttr& baseAttr,
-		const TColorAttr& overlayAttr
+		const ColorAttr& baseAttr,
+		const ColorAttr& overlayAttr
 		)
 	{
 		m_foreColor = overlayColor (baseAttr.m_foreColor, overlayAttr.m_foreColor);
@@ -244,7 +244,7 @@ struct TColorAttr
 	}
 
 	void
-	overlay (const TColorAttr& overlayAttr)
+	overlay (const ColorAttr& overlayAttr)
 	{
 		overlay (*this, overlayAttr);
 	}
@@ -257,7 +257,7 @@ struct TColorAttr
 
 	void
 	parseOverlay (
-		const TColorAttr& baseAttr,
+		const ColorAttr& baseAttr,
 		const char* string,
 		const char** end = NULL
 		);

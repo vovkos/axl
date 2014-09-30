@@ -14,14 +14,14 @@ namespace gui {
 
 //.............................................................................
 
-class CQtCanvas:
-	public CCanvas,
-	public rtl::CHandleT <QPainter*, rtl::CCppDeleteT <QPainter> >
+class QtCanvas:
+	public Canvas,
+	public rtl::Handle <QPainter*, rtl::CppDelete <QPainter> >
 {
-	friend class CQtEngine;
+	friend class QtEngine;
 
 public:
-	CQtCanvas ();
+	QtCanvas ();
 
 	virtual
 	bool
@@ -114,7 +114,7 @@ public:
 	drawImage (
 		int x,
 		int y,
-		CImage* image,
+		Image* image,
 		int left,
 		int top,
 		int right,
@@ -124,7 +124,7 @@ public:
 	virtual
 	bool
 	copyRect (
-		CCanvas* srcCanvas,
+		Canvas* srcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,

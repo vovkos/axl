@@ -7,13 +7,13 @@ namespace gui {
 
 //.............................................................................
 
-CQtCanvas::CQtCanvas ()
+QtCanvas::QtCanvas ()
 {
-	m_engine = CQtEngine::getSingleton ();
+	m_engine = QtEngine::getSingleton ();
 }
 
 bool
-CQtCanvas::drawRect (
+QtCanvas::drawRect (
 	int left,
 	int top,
 	int right,
@@ -23,14 +23,14 @@ CQtCanvas::drawRect (
 {
 	color = overlayColor (m_baseTextAttr.m_backColor, color);
 
-	if (!(color & EColorFlag_Transparent))
+	if (!(color & ColorFlagKind_Transparent))
 		m_h->fillRect (left, top, right - left, bottom - top, m_palette.getColorRgb (color));
 
 	return true;
 }
 
 bool
-CQtCanvas::drawText_qt (
+QtCanvas::drawText_qt (
 	int x,
 	int y,
 	int left,
@@ -47,12 +47,12 @@ CQtCanvas::drawText_qt (
 	backColor = overlayColor (m_baseTextAttr.m_backColor, backColor);
 	fontFlags = overlayFontFlags (m_baseTextAttr.m_fontFlags, fontFlags);
 
-	CFont* font = m_baseFont->getFontMod (fontFlags);
+	Font* font = m_baseFont->getFontMod (fontFlags);
 
 	if (m_font != font)
 	{
-		ASSERT (font->getEngine ()->getEngineKind () == EEngine_Qt);
-		CQtFont* qtFont = (CQtFont*) font;
+		ASSERT (font->getEngine ()->getEngineKind () == EngineKind_Qt);
+		QtFont* qtFont = (QtFont*) font;
 
 		m_font = font;
 		m_h->setFont (qtFont->m_qtFont);
@@ -62,7 +62,7 @@ CQtCanvas::drawText_qt (
 	{
 		m_colorAttr.m_foreColor = textColor;
 
-		if (!(textColor & EColorFlag_Transparent))
+		if (!(textColor & ColorFlagKind_Transparent))
 			m_h->setPen (m_palette.getColorRgb (textColor));
 	}
 
@@ -73,7 +73,7 @@ CQtCanvas::drawText_qt (
 }
 
 bool
-CQtCanvas::drawText_utf8 (
+QtCanvas::drawText_utf8 (
 	int x,
 	int y,
 	int left,
@@ -88,7 +88,7 @@ CQtCanvas::drawText_utf8 (
 	)
 {
 	char buffer [256];
-	rtl::CString_utf16 string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_qt (
@@ -106,7 +106,7 @@ CQtCanvas::drawText_utf8 (
 }
 
 bool
-CQtCanvas::drawText_utf32 (
+QtCanvas::drawText_utf32 (
 	int x,
 	int y,
 	int left,
@@ -121,7 +121,7 @@ CQtCanvas::drawText_utf32 (
 	)
 {
 	char buffer [256];
-	rtl::CString_utf16 string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_qt (
@@ -140,25 +140,25 @@ CQtCanvas::drawText_utf32 (
 
 
 bool
-CQtCanvas::drawImage (
+QtCanvas::drawImage (
 	int x,
 	int y,
-	CImage* image,
+	Image* image,
 	int left,
 	int top,
 	int right,
 	int bottom
 	)
 {
-	ASSERT (image->getEngine ()->getEngineKind () == EEngine_Qt);
-	CQtImage* qtImage = (CQtImage*) image;
+	ASSERT (image->getEngine ()->getEngineKind () == EngineKind_Qt);
+	QtImage* qtImage = (QtImage*) image;
 	m_h->drawPixmap (x, y, qtImage->m_qtPixmap);
 	return true;
 }
 
 bool
-CQtCanvas::copyRect (
-	CCanvas* srcCanvas,
+QtCanvas::copyRect (
+	Canvas* srcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,
@@ -167,8 +167,8 @@ CQtCanvas::copyRect (
 	int height
 	)
 {
-	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EEngine_Qt);
-/*	CPainter* dc = (CPainter*) srcCanvas;
+	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EngineKind_Qt);
+/*	Painter* dc = (Painter*) srcCanvas;
 
 	::BitBlt (
 		m_h,

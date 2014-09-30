@@ -16,7 +16,7 @@ namespace rtl {
 //.............................................................................
 
 template <typename T>
-class CPackT
+class Pack
 {
 public:
 	axl_va_list
@@ -40,7 +40,7 @@ public:
 // thanks a lot gcc
 
 template <typename T>
-class CPackIntTruncT
+class PackIntTrunc
 {
 public:
 	axl_va_list
@@ -62,32 +62,32 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CPackT <char>: public CPackIntTruncT <char>
+class Pack <char>: public PackIntTrunc <char>
 {
 };
 
 template <>
-class CPackT <wchar_t>: public CPackIntTruncT <wchar_t>
+class Pack <wchar_t>: public PackIntTrunc <wchar_t>
 {
 };
 
 template <>
-class CPackT <int8_t>: public CPackIntTruncT <int8_t>
+class Pack <int8_t>: public PackIntTrunc <int8_t>
 {
 };
 
 template <>
-class CPackT <uint8_t>: public CPackIntTruncT <uint8_t>
+class Pack <uint8_t>: public PackIntTrunc <uint8_t>
 {
 };
 
 template <>
-class CPackT <int16_t>: public CPackIntTruncT <int16_t>
+class Pack <int16_t>: public PackIntTrunc <int16_t>
 {
 };
 
 template <>
-class CPackT <uint16_t>: public CPackIntTruncT <uint16_t>
+class Pack <uint16_t>: public PackIntTrunc <uint16_t>
 {
 };
 
@@ -96,7 +96,7 @@ class CPackT <uint16_t>: public CPackIntTruncT <uint16_t>
 // pack string directly into buffer
 
 template <typename T>
-class CPackStringT
+class PackStringBase
 {
 public:
 	axl_va_list
@@ -108,7 +108,7 @@ public:
 	{
 		T* string = AXL_VA_ARG (va, T*);
 
-		size_t length = string ? CStringDetailsT <T>::calcLength (string) : 0;			
+		size_t length = string ? StringDetailsBase <T>::calcLength (string) : 0;			
 		size_t stringSize = (length + 1) * sizeof (T);
 
 		*size = stringSize;
@@ -127,28 +127,31 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CPackStringT <char>    CPackString;
-typedef CPackStringT <wchar_t> CPackString_w;
+typedef PackStringBase <char>    PackString;
+typedef PackStringBase <wchar_t> PackString_w;
+typedef PackStringBase <utf8_t>  PackString_utf8;
+typedef PackStringBase <utf16_t> PackString_utf16;
+typedef PackStringBase <utf32_t> PackString_utf32;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CPackT <const char*>: public CPackStringT <char>
+class Pack <const char*>: public PackStringBase <char>
 {
 };
 
 template <>
-class CPackT <char*>: public CPackStringT <char>
+class Pack <char*>: public PackStringBase <char>
 {
 };
 
 template <>
-class CPackT <const wchar_t*>: public CPackStringT <wchar_t>
+class Pack <const wchar_t*>: public PackStringBase <wchar_t>
 {
 };
 
 template <>
-class CPackT <wchar_t*>: public CPackStringT <wchar_t>
+class Pack <wchar_t*>: public PackStringBase <wchar_t>
 {
 };
 
@@ -157,7 +160,7 @@ class CPackT <wchar_t*>: public CPackStringT <wchar_t>
 // general pointer
 
 template <typename T>
-class CPackT <T*>
+class Pack <T*>
 {
 public:
 	axl_va_list
@@ -189,9 +192,9 @@ public:
 
 template <
 	typename T,
-	typename TGetSize = rtl::CGetSizeT <T>
+	typename GetSize = rtl::GetSize <T>
 	>
-class CPackVsoPtrT
+class PackVsoPtr
 {
 public:
 	axl_va_list
@@ -203,7 +206,7 @@ public:
 	{
 		T* obj = AXL_VA_ARG (va, T*);
 
-		size_t objSize = obj ? TGetSize () (*obj) : sizeof (T);
+		size_t objSize = obj ? GetSize () (*obj) : sizeof (T);
 
 		*size = objSize;
 
@@ -223,7 +226,7 @@ public:
 
 // pack error last
 
-class CPackLastError
+class PackLastError
 {
 public:
 	axl_va_list
@@ -233,7 +236,7 @@ public:
 		axl_va_list va
 		)
 	{
-		err::CError error = err::getError ();
+		err::Error error = err::getError ();
 
 		*size = error->m_size;
 
@@ -249,12 +252,18 @@ public:
 // specialization for errors
 
 template <>
-class CPackT <err::TError*>: public CPackVsoPtrT <err::TError, err::CGetErrorSize>
+class Pack <err::ErrorData*>: public PackVsoPtr <
+	err::ErrorData, 
+	err::ErrorData::GetSize
+	>
 {
 };
 
 template <>
-class CPackT <const err::TError*>: public CPackVsoPtrT <err::TError, err::CGetErrorSize>
+class Pack <const err::ErrorData*>: public PackVsoPtr <
+	err::ErrorData, 
+	err::ErrorData::GetSize
+	>
 {
 };
 
@@ -262,7 +271,7 @@ class CPackT <const err::TError*>: public CPackVsoPtrT <err::TError, err::CGetEr
 
 // pack object referenced by (void* p, size_t Size) pair
 
-class CPackPtrSize
+class PackPtrSize
 {
 public:
 	axl_va_list
@@ -294,10 +303,10 @@ public:
 // compile-time sequencing
 
 template <
-	typename TPack1, 
-	typename TPack2
+	typename Pack1, 
+	typename Pack2
 	>
-class CPackSeqExT
+class PackSeqEx
 {
 public:
 	axl_va_list
@@ -312,13 +321,13 @@ public:
 
 		if (!p)
 		{
-			va = TPack1 () (NULL, &size1, va);
-			va = TPack2 () (NULL, &size2, va);
+			va = Pack1 () (NULL, &size1, va);
+			va = Pack2 () (NULL, &size2, va);
 		}
 		else
 		{
-			va = TPack1 () (p, &size1, va);
-			va = TPack2 () ((uchar_t*) p + size1, &size2, va);
+			va = Pack1 () (p, &size1, va);
+			va = Pack2 () ((uchar_t*) p + size1, &size2, va);
 		}
 
 		*size = size1 + size2;
@@ -331,60 +340,60 @@ public:
 //  helper typedefs for packing up to 6 elements
 
 template <
-	typename TPack1, 
-	typename TPack2
+	typename Pack1, 
+	typename Pack2
 	>
-class CPackSeqExT_2: public CPackSeqExT <TPack1, TPack2>
+class PackSeqEx_2: public PackSeqEx <Pack1, Pack2>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TPack1, 
-	typename TPack2, 
-	typename TPack3
+	typename Pack1, 
+	typename Pack2, 
+	typename Pack3
 	>
-class CPackSeqExT_3: public CPackSeqExT <CPackSeqExT <TPack1, TPack2>, TPack3>
+class PackSeqEx_3: public PackSeqEx <PackSeqEx <Pack1, Pack2>, Pack3>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TPack1, 
-	typename TPack2, 
-	typename TPack3, 
-	typename TPack4
+	typename Pack1, 
+	typename Pack2, 
+	typename Pack3, 
+	typename Pack4
 	>
-class CPackSeqExT_4: public CPackSeqExT <CPackSeqExT_3 <TPack1, TPack2, TPack3>, TPack4>
+class PackSeqEx_4: public PackSeqEx <PackSeqEx_3 <Pack1, Pack2, Pack3>, Pack4>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TPack1, 
-	typename TPack2, 
-	typename TPack3, 
-	typename TPack4, 
-	typename TPack5
+	typename Pack1, 
+	typename Pack2, 
+	typename Pack3, 
+	typename Pack4, 
+	typename Pack5
 	>
-class CPackSeqExT_5: public CPackSeqExT <CPackSeqExT_4 <TPack1, TPack2, TPack3, TPack4>, TPack5>
+class PackSeqEx_5: public PackSeqEx <PackSeqEx_4 <Pack1, Pack2, Pack3, Pack4>, Pack5>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TPack1, 
-	typename TPack2, 
-	typename TPack3, 
-	typename TPack4, 
-	typename TPack5, 
-	typename TPack6
+	typename Pack1, 
+	typename Pack2, 
+	typename Pack3, 
+	typename Pack4, 
+	typename Pack5, 
+	typename Pack6
 	>
-class CPackSeqExT_6: public CPackSeqExT <CPackSeqExT_5 <TPack1, TPack2, TPack3, TPack4, TPack5>, TPack6>
+class PackSeqEx_6: public PackSeqEx <PackSeqEx_5 <Pack1, Pack2, Pack3, Pack4, Pack5>, Pack6>
 {
 };
 
@@ -396,9 +405,9 @@ template <
 	typename T1, 
 	typename T2
 	>
-class CPackSeqT_2: public CPackSeqExT <
-	CPackT <T1>, 
-	CPackT <T2>
+class PackSeq_2: public PackSeqEx <
+	Pack <T1>, 
+	Pack <T2>
 	>
 {
 };
@@ -410,10 +419,10 @@ template <
 	typename T2, 
 	typename T3
 	>
-class CPackSeqT_3: public CPackSeqExT_3 <
-	CPackT <T1>, 
-	CPackT <T2>,
-	CPackT <T3>
+class PackSeq_3: public PackSeqEx_3 <
+	Pack <T1>, 
+	Pack <T2>,
+	Pack <T3>
 	>
 {
 };
@@ -426,11 +435,11 @@ template <
 	typename T3, 
 	typename T4
 	>
-class CPackSeqT_4: public CPackSeqExT_4 <
-	CPackT <T1>, 
-	CPackT <T2>,
-	CPackT <T3>,
-	CPackT <T4>
+class PackSeq_4: public PackSeqEx_4 <
+	Pack <T1>, 
+	Pack <T2>,
+	Pack <T3>,
+	Pack <T4>
 	>
 {
 };
@@ -444,12 +453,12 @@ template <
 	typename T4, 
 	typename T5
 	>
-class CPackSeqT_5: public CPackSeqExT_5 <
-	CPackT <T1>, 
-	CPackT <T2>,
-	CPackT <T3>,
-	CPackT <T4>,
-	CPackT <T5>
+class PackSeq_5: public PackSeqEx_5 <
+	Pack <T1>, 
+	Pack <T2>,
+	Pack <T3>,
+	Pack <T4>,
+	Pack <T5>
 	>
 {
 };
@@ -464,13 +473,13 @@ template <
 	typename T5, 
 	typename T6
 	>
-class CPackSeqT_6: public CPackSeqExT_6 <
-	CPackT <T1>, 
-	CPackT <T2>,
-	CPackT <T3>,
-	CPackT <T4>,
-	CPackT <T5>,
-	CPackT <T6>
+class PackSeq_6: public PackSeqEx_6 <
+	Pack <T1>, 
+	Pack <T2>,
+	Pack <T3>,
+	Pack <T4>,
+	Pack <T5>,
+	Pack <T6>
 	>
 {
 };
@@ -478,15 +487,15 @@ class CPackSeqT_6: public CPackSeqExT_6 <
 //.............................................................................
 
 template <typename T>
-ref::CPtrT <mem::TBlock> 
+ref::Ptr <mem::Block> 
 createPackage_va (axl_va_list va)
 {
 	size_t size = 0;
 	T () (NULL, &size, va);
 
-	typedef ref::CBoxT <mem::TBlock> CPackage;
+	typedef ref::Box <mem::Block> Package;
 
-	ref::CPtrT <CPackage> package = AXL_REF_NEW_EXTRA (CPackage, size);
+	ref::Ptr <Package> package = AXL_REF_NEW_EXTRA (Package, size);
 	package->m_p = package + 1;
 	package->m_size = size;
 	
@@ -498,7 +507,7 @@ createPackage_va (axl_va_list va)
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-ref::CPtrT <mem::TBlock> 
+ref::Ptr <mem::Block> 
 createPackage (
 	int unused,
 	...

@@ -9,8 +9,8 @@ namespace io {
 //.............................................................................
 
 void*
-CMapping::open (
-	CFile* file,
+Mapping::open (
+	File* file,
 	uint64_t offset,
 	size_t size,
 	uint_t flags
@@ -21,14 +21,14 @@ CMapping::open (
 	if (size == -1)
 		size = (size_t) (file->getSize () - offset);
 
-	g::TSystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
 
 	void* p;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t protection = (flags & EFileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
-	uint_t access = (flags & EFileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
+	uint_t protection = (flags & FileFlagKind_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
+	uint_t access = (flags & FileFlagKind_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
 	bool result = m_mapping.create (file->m_file, NULL, protection, offset + size);
 	if (!result)
@@ -41,7 +41,7 @@ CMapping::open (
 		return NULL;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int protection = (flags & EFileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
+	int protection = (flags & FileFlagKind_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
 	p = m_mapping.map (NULL, size, protection, MAP_SHARED, file->m_file, offset);
 	if (!p)
@@ -54,7 +54,7 @@ CMapping::open (
 }
 
 void*
-CMapping::open (
+Mapping::open (
 	const char* name,
 	size_t size,
 	uint_t flags
@@ -67,12 +67,12 @@ CMapping::open (
 	void* p;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t protection = (flags & EFileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
-	uint_t access = (flags & EFileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
+	uint_t protection = (flags & FileFlagKind_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
+	uint_t access = (flags & FileFlagKind_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
-	rtl::CString_w name_w = name;
+	rtl::String_w name_w = name;
 
-	bool result = (flags & EFileFlag_OpenExisting) ?
+	bool result = (flags & FileFlagKind_OpenExisting) ?
 		m_mapping.open (access, false, name_w):
 		m_mapping.create (INVALID_HANDLE_VALUE, NULL, protection, size, name_w);
 
@@ -86,10 +86,10 @@ CMapping::open (
 		return NULL;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int shmFlags = (flags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
-	int protection = (flags & EFileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
+	int shmFlags = (flags & FileFlagKind_ReadOnly) ? O_RDONLY : O_RDWR;
+	int protection = (flags & FileFlagKind_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
-	if (!(flags & EFileFlag_OpenExisting))
+	if (!(flags & FileFlagKind_OpenExisting))
 	{
 		shmFlags |= O_CREAT;
 		m_sharedMemoryName = name;
@@ -103,11 +103,11 @@ CMapping::open (
 	if (!p)
 	{
 		m_sharedMemory.close ();
-		psx::CSharedMemory::unlink (name);
+		psx::SharedMemory::unlink (name);
 		return NULL;
 	}
 
-	if (!(flags & EFileFlag_OpenExisting))
+	if (!(flags & FileFlagKind_OpenExisting))
 		m_sharedMemoryName = name;
 #endif
 
@@ -117,7 +117,7 @@ CMapping::open (
 }
 
 void
-CMapping::close ()
+Mapping::close ()
 {
 	if (!isOpen ())
 		return;
@@ -131,7 +131,7 @@ CMapping::close ()
 
 	if (!m_sharedMemoryName.isEmpty())
 	{
-		psx::CSharedMemory::unlink (m_sharedMemoryName);
+		psx::SharedMemory::unlink (m_sharedMemoryName);
 		m_sharedMemoryName.clear ();
 	}
 #endif

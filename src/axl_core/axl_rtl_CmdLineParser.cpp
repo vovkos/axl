@@ -8,10 +8,10 @@ namespace rtl {
 //.............................................................................
 
 size_t
-CCmdLineParserRoot::extractArg (
+CmdLineParserRoot::extractArg (
 	const char* p,
 	const char* end,
-	rtl::CString* arg
+	rtl::String* arg
 	)
 {
 	const char* p0 = p;
@@ -58,10 +58,10 @@ CCmdLineParserRoot::extractArg (
 }
 
 bool
-CCmdLineParserRoot::parseArg (
+CmdLineParserRoot::parseArg (
 	const char* p,
-	rtl::CString* switchName,
-	rtl::CString* value
+	rtl::String* switchName,
+	rtl::String* value
 	)
 {
 	if (*p != '-')
@@ -124,8 +124,8 @@ CCmdLineParserRoot::parseArg (
 
 //.............................................................................
 
-CString
-getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList)
+String
+getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 {
 	enum
 	{
@@ -138,16 +138,16 @@ getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList)
 
 	size_t maxSwitchLength = 0;
 
-	CIteratorT <TSwitchInfo> it = switchInfoList.getHead ();
+	Iterator <SwitchInfo> it = switchInfoList.getHead ();
 	for (; it; it++)
 	{
-		TSwitchInfo* switchInfo = *it;
+		SwitchInfo* switchInfo = *it;
 		if (!switchInfo->m_switch) // group
 			continue;
 
 		size_t switchLength = 0;
 
-		bool hasValue = (switchInfo->m_switch & ECmdLineSwitchFlag_HasValue) != 0;
+		bool hasValue = (switchInfo->m_switch & CmdLineSwitchFlagKind_HasValue) != 0;
 
 		size_t i = 0;
 		for (; i < countof (switchInfo->m_nameTable); i++)
@@ -185,13 +185,13 @@ getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList)
 
 	// generate string
 
-	CString string;
-	CString lineString;
+	String string;
+	String lineString;
 
 	it = switchInfoList.getHead ();
 	for (; it; it++)
 	{
-		TSwitchInfo* switchInfo = *it;
+		SwitchInfo* switchInfo = *it;
 		if (!switchInfo->m_switch) // group
 		{
 			if (!string.isEmpty ())
@@ -203,7 +203,7 @@ getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList)
 		{
 			lineString.copy (' ', indentSize);
 
-			bool hasValue = (switchInfo->m_switch & ECmdLineSwitchFlag_HasValue) != 0;
+			bool hasValue = (switchInfo->m_switch & CmdLineSwitchFlagKind_HasValue) != 0;
 
 			ASSERT (switchInfo->m_nameTable [0]);
 			if (switchInfo->m_nameTable [0] [1])

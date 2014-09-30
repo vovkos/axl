@@ -15,21 +15,21 @@ namespace io {
 
 //.............................................................................
 
-class CFileTransport: public CTransport
+class Fileransport: public Transport
 {
 protected:
-	CFile* m_transmitFile;
-	CFile* m_receiveFile;
+	File* m_transmitFile;
+	File* m_receiveFile;
 
 public:
-	CFileTransport ()
+	Fileransport ()
 	{
 		m_transmitFile = NULL;
 		m_receiveFile = NULL;
 	}
 
 	void
-	attach (CFile* file)
+	attach (File* file)
 	{
 		m_transmitFile = file;
 		m_receiveFile = file;
@@ -37,8 +37,8 @@ public:
 
 	void
 	attach (
-		CFile* transmitFile,
-		CFile* receiveFile
+		File* transmitFile,
+		File* receiveFile
 		)
 	{
 		m_transmitFile = transmitFile;

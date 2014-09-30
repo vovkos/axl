@@ -7,47 +7,47 @@ namespace io {
 //.............................................................................
 
 bool 
-CUsbContext::open ()
+UsbContext::open ()
 {
 	close ();
 
 	int result = libusb_init (&m_h);
-	return result == 0 ? true : err::fail (CUsbError ((int) result));
+	return result == 0 ? true : err::fail (UsbError ((int) result));
 }
 
 //.............................................................................
 
 size_t
-CUsbDeviceList::enumerateDevices (libusb_context* context)
+UsbDeviceList::enumerateDevices (libusb_context* context)
 {
 	close ();
 
 	ssize_t result = libusb_get_device_list (context, &m_h);
-	return result >= 0 ? result : err::fail <size_t> (-1, CUsbError ((int) result));
+	return result >= 0 ? result : err::fail <size_t> (-1, UsbError ((int) result));
 }
 
 //.............................................................................
 
 size_t
-CUsbDevice::getMaxPacketSize (uint_t endpoint)
+UsbDevice::getMaxPacketSize (uint_t endpoint)
 {
 	ASSERT (m_device);
 	
 	int result = libusb_get_max_packet_size (m_device, (uchar_t) endpoint);
-	return result >= 0 ? result : err::fail <size_t> (-1, CUsbError (result));
+	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
 size_t
-CUsbDevice::getMaxIsoPacketSize (uint_t endpoint)
+UsbDevice::getMaxIsoPacketSize (uint_t endpoint)
 {
 	ASSERT (m_device);
 	
 	int result = libusb_get_max_iso_packet_size (m_device, (uchar_t) endpoint);
-	return result >= 0 ? result : err::fail <size_t> (-1, CUsbError (result));
+	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
 void
-CUsbDevice::setDevice (libusb_device* device)
+UsbDevice::setDevice (libusb_device* device)
 {
 	if (device == m_device)
 		return;
@@ -64,7 +64,7 @@ CUsbDevice::setDevice (libusb_device* device)
 }
 
 void
-CUsbDevice::close ()
+UsbDevice::close ()
 {
 	if (!m_openHandle)
 		return;
@@ -74,18 +74,18 @@ CUsbDevice::close ()
 }
 
 bool
-CUsbDevice::open ()
+UsbDevice::open ()
 {
 	ASSERT (m_device);
 
 	close ();
 
 	int result = libusb_open (m_device, &m_openHandle);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::open (
+UsbDevice::open (
 	uint_t vendorId,
 	uint_t productId
 	)
@@ -93,48 +93,48 @@ CUsbDevice::open (
 	setDevice (NULL);
 
 	m_openHandle = libusb_open_device_with_vid_pid (NULL, (uint16_t) vendorId, (uint16_t) productId);
-	return m_openHandle ? true : err::fail (err::CError (err::EStatus_ObjectNameNotFound));
+	return m_openHandle ? true : err::fail (err::Error (err::StatusKind_ObjectNameNotFound));
 }
 
 int
-CUsbDevice::getConfiguration ()
+UsbDevice::getConfiguration ()
 {
 	ASSERT (m_openHandle);
 
 	int configuration;
 	int result = libusb_get_configuration (m_openHandle, &configuration);
-	return result == 0 ? configuration : err::fail <int> (-1, CUsbError (result));
+	return result == 0 ? configuration : err::fail <int> (-1, UsbError (result));
 }
 
 bool
-CUsbDevice::setConfiguration (int configuration)
+UsbDevice::setConfiguration (int configuration)
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_get_configuration (m_openHandle, &configuration);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::claimInterface (int interface)
+UsbDevice::claimInterface (int interface)
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_claim_interface (m_openHandle, interface);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::releaseInterface (int interface)
+UsbDevice::releaseInterface (int interface)
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_release_interface (m_openHandle, interface);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::setInterfaceAltSetting (
+UsbDevice::setInterfaceAltSetting (
 	int interface,
 	int altSetting
 	)
@@ -142,29 +142,29 @@ CUsbDevice::setInterfaceAltSetting (
 	ASSERT (m_openHandle);
 
 	int result = libusb_set_interface_alt_setting (m_openHandle, interface, altSetting);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::clearHalt (uint_t endpoint)
+UsbDevice::clearHalt (uint_t endpoint)
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_clear_halt (m_openHandle, (uchar_t) endpoint);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::resetDevice ()
+UsbDevice::resetDevice ()
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_reset_device (m_openHandle);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::isKernelDriverActive (int interface)
+UsbDevice::isKernelDriverActive (int interface)
 {
 	ASSERT (m_openHandle);
 
@@ -173,34 +173,34 @@ CUsbDevice::isKernelDriverActive (int interface)
 }
 
 bool
-CUsbDevice::attachKernelDriver (int interface)
+UsbDevice::attachKernelDriver (int interface)
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_attach_kernel_driver (m_openHandle, interface);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::detachKernelDriver (int interface)
+UsbDevice::detachKernelDriver (int interface)
 {
 	ASSERT (m_openHandle);
 
 	int result = libusb_detach_kernel_driver (m_openHandle, interface);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::getDesrciptor (
+UsbDevice::getDesrciptor (
 	libusb_descriptor_type type, 
 	size_t index,
-	rtl::CArrayT <char>* descriptor
+	rtl::Array <char>* descriptor
 	)
 {
 	ASSERT (m_openHandle);
 
 	size_t size = descriptor->getCount ();
-	size = size < EDef_BufferSize ? EDef_BufferSize : rtl::getMinPower2Ge (size);
+	size = size < DefKind_BufferSize ? DefKind_BufferSize : rtl::getMinPower2Ge (size);
 
 	descriptor->setCount (size);
 
@@ -221,7 +221,7 @@ CUsbDevice::getDesrciptor (
 		}
 
 		if (result != LIBUSB_ERROR_OVERFLOW)
-			return err::fail (CUsbError (result));
+			return err::fail (UsbError (result));
 		
 		size *= 2;
 		descriptor->setCount (size);
@@ -232,16 +232,16 @@ CUsbDevice::getDesrciptor (
 }
 
 bool
-CUsbDevice::getDeviceDescriptor (libusb_device_descriptor* descriptor)
+UsbDevice::getDeviceDescriptor (libusb_device_descriptor* descriptor)
 {
 	ASSERT (m_device);
 
 	int result = libusb_get_device_descriptor (m_device, descriptor);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::getConfigDescriptor (
+UsbDevice::getConfigDescriptor (
 	int configuration,
 	libusb_config_descriptor** descriptor
 	)
@@ -249,23 +249,23 @@ CUsbDevice::getConfigDescriptor (
 	ASSERT (m_device);
 
 	int result = libusb_get_config_descriptor (m_device, configuration, descriptor);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::getActiveConfigDescriptor (libusb_config_descriptor** descriptor)
+UsbDevice::getActiveConfigDescriptor (libusb_config_descriptor** descriptor)
 {
 	ASSERT (m_device);
 
 	int result = libusb_get_active_config_descriptor (m_device, descriptor);
-	return result == 0 ? true : err::fail (CUsbError (result));
+	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-CUsbDevice::getStringDesrciptor (
+UsbDevice::getStringDesrciptor (
 	size_t index,
 	uint_t langId,
-	rtl::CString* string
+	rtl::String* string
 	)
 {
 	ASSERT (m_openHandle);
@@ -273,9 +273,9 @@ CUsbDevice::getStringDesrciptor (
 	char* p = string->getBuffer ();
 	size_t length = string->getBufferLength ();
 
-	if (length < EDef_BufferSize)
+	if (length < DefKind_BufferSize)
 	{
-		length = EDef_BufferSize;
+		length = DefKind_BufferSize;
 		p = string->getBuffer (length - 1, false);
 	}
 
@@ -296,7 +296,7 @@ CUsbDevice::getStringDesrciptor (
 		}
 
 		if (result != LIBUSB_ERROR_OVERFLOW)
-			return err::fail (CUsbError (result));
+			return err::fail (UsbError (result));
 		
 		length *= 2;
 		p = string->getBuffer (length - 1, false);
@@ -307,9 +307,9 @@ CUsbDevice::getStringDesrciptor (
 }
 
 bool
-CUsbDevice::getStringDesrciptor (
+UsbDevice::getStringDesrciptor (
 	size_t index,
-	rtl::CString* string
+	rtl::String* string
 	)
 {
 	ASSERT (m_openHandle);
@@ -317,9 +317,9 @@ CUsbDevice::getStringDesrciptor (
 	char* p = string->getBuffer ();
 	size_t length = string->getBufferLength ();
 
-	if (length < EDef_BufferSize)
+	if (length < DefKind_BufferSize)
 	{
-		length = EDef_BufferSize;
+		length = DefKind_BufferSize;
 		p = string->getBuffer (length - 1, false);
 	}
 
@@ -339,7 +339,7 @@ CUsbDevice::getStringDesrciptor (
 		}
 
 		if (result != LIBUSB_ERROR_OVERFLOW)
-			return err::fail (CUsbError (result));
+			return err::fail (UsbError (result));
 		
 		length *= 2;
 		p = string->getBuffer (length - 1, false);
@@ -350,7 +350,7 @@ CUsbDevice::getStringDesrciptor (
 }
 
 size_t 
-CUsbDevice::controlTransfer (
+UsbDevice::controlTransfer (
 	uint_t requestType,
 	uint_t request,
 	uint_t value,
@@ -373,11 +373,11 @@ CUsbDevice::controlTransfer (
 		timeout != -1 ? timeout : 0
 		);
 
-	return result >= 0 ? result : err::fail <size_t> (-1, CUsbError (result));
+	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
 size_t 
-CUsbDevice::bulkTransfer (
+UsbDevice::bulkTransfer (
 	uint_t endpoint,
 	void* p,
 	size_t size,
@@ -396,11 +396,11 @@ CUsbDevice::bulkTransfer (
 		timeout != -1 ? timeout : 0
 		);
 
-	return result == 0 ? actualSize : err::fail <size_t> (-1, CUsbError (result));
+	return result == 0 ? actualSize : err::fail <size_t> (-1, UsbError (result));
 }
 
 size_t 
-CUsbDevice::interruptTransfer (
+UsbDevice::interruptTransfer (
 	uint_t endpoint,
 	void* p,
 	size_t size,
@@ -419,7 +419,7 @@ CUsbDevice::interruptTransfer (
 		timeout != -1 ? timeout : 0
 		);
 
-	return result == 0 ? actualSize : err::fail <size_t> (-1, CUsbError (result));
+	return result == 0 ? actualSize : err::fail <size_t> (-1, UsbError (result));
 
 }
 

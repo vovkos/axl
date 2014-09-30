@@ -17,73 +17,73 @@ namespace err {
 
 //.............................................................................
 
-class CErrorMgr
+class ErrorMgr
 {
 protected:
-	struct TThreadEntry
+	struct ThreadEntry
 	{
-		EErrorMode m_mode;
-		CError m_error;
+		ErrorModeKind m_mode;
+		Error m_error;
 	};
 
 protected:
-	mt::CLock m_lock;
+	mt::Lock m_lock;
 
 	size_t m_tlsSlot;
 
-	rtl::CHashTableMapT <
-		rtl::TGuid, 
-		CErrorProvider*, 
-		rtl::CHashDjb2T <rtl::TGuid>,
-		rtl::CCmpBinT <rtl::TGuid>
+	rtl::HashTableMap <
+		rtl::Guid, 
+		ErrorProvider*, 
+		rtl::HashDjb2 <rtl::Guid>,
+		rtl::CmpBin <rtl::Guid>
 		> m_providerMap;
 
 public:
-	CErrorMgr ();
+	ErrorMgr ();
 
 	void
 	registerProvider (
-		const rtl::TGuid& guid,
-		CErrorProvider* provider
+		const rtl::Guid& guid,
+		ErrorProvider* provider
 		);
 
-	CErrorProvider* 
-	findProvider (const rtl::TGuid& guid);
+	ErrorProvider* 
+	findProvider (const rtl::Guid& guid);
 
-	EErrorMode
+	ErrorModeKind
 	getErrorMode ()
 	{
-		TThreadEntry* entry = findThreadEntry ();
-		return entry ? entry->m_mode : EErrorMode_NoThrow;
+		ThreadEntry* entry = findThreadEntry ();
+		return entry ? entry->m_mode : ErrorModeKind_NoThrow;
 	}
 
-	EErrorMode
-	setErrorMode (EErrorMode mode);
+	ErrorModeKind
+	setErrorMode (ErrorModeKind mode);
 
-	CError
+	Error
 	getError ();
 
 	void
-	setError (const CError& error);
+	setError (const Error& error);
 
 protected:
-	TThreadEntry*
+	ThreadEntry*
 	findThreadEntry ()
 	{
-		return (TThreadEntry*) (void*) mt::getTlsMgr ()->getSlotValue (m_tlsSlot);
+		return (ThreadEntry*) (void*) mt::getTlsMgr ()->getSlotValue (m_tlsSlot);
 	}
 
-	TThreadEntry*
+	ThreadEntry*
 	getThreadEntry ();
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-CErrorMgr* 
+ErrorMgr* 
 getErrorMgr ()
 {
-	return rtl::getSingleton <CErrorMgr> ();
+	return rtl::getSingleton <ErrorMgr> ();
 }
 
 //.............................................................................

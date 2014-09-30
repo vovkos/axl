@@ -14,41 +14,41 @@ namespace rtl {
 //.............................................................................
 
 template <
-	typename THandle,
-	typename TClose	= CVoidT <THandle>,
-	typename TGetInvalidHandle = CZeroT <THandle>
+	typename T,
+	typename Close	= Void <T>,
+	typename GetInvalidHandle = Zero <T>
 	>
-class CHandleT
+class Handle
 {
 public:
-	typedef THandle H;
+	typedef T T;
 
 protected:
-	H m_h;
+	T m_h;
 
 public:
-	CHandleT ()
+	Handle ()
 	{
-		m_h = TGetInvalidHandle () ();
+		m_h = GetInvalidHandle () ();
 	}
 
-	CHandleT (H h)
+	Handle (T h)
 	{
 		m_h = h;
 	}
 
-	~CHandleT ()
+	~Handle ()
 	{
 		close ();
 	}
 
-	operator H () const
+	operator T () const
 	{
 		return m_h;
 	}
 
-	const CHandleT&
-	operator = (H h)
+	const Handle&
+	operator = (T h)
 	{
 		attach (h);
 		return *this;
@@ -57,7 +57,7 @@ public:
 	bool
 	isOpen () const
 	{
-		return m_h != TGetInvalidHandle () ();
+		return m_h != GetInvalidHandle () ();
 	}
 
 	void
@@ -65,27 +65,27 @@ public:
 	{
 		if (isOpen ())
 		{
-			TClose () (m_h);
-			m_h = TGetInvalidHandle () ();
+			Close () (m_h);
+			m_h = GetInvalidHandle () ();
 		}
 	}
 
 	void
-	attach (H h)
+	attach (T h)
 	{
 		close ();
 		m_h = h;
 	}
 
-	H
+	T
 	detach ()
 	{
-		H h = m_h;
-		m_h = TGetInvalidHandle () ();
+		T h = m_h;
+		m_h = GetInvalidHandle () ();
 		return h;
 	}
 
-	H*
+	T*
 	getHandlePtr ()
 	{
 		return &m_h;

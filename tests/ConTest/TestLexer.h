@@ -2,197 +2,197 @@
 
 //.............................................................................
 
-enum EToken
+enum TokenKind
 {
-	EToken_Eof = 0,
-	EToken_Error = -1,
-	EToken_Identifier = 256,
-	EToken_Integer,
-	EToken_Double,
-	EToken_Literal,
-	EToken_Comment,
-	EToken_Ne,
-	EToken_Le,
-	EToken_Ge,
+	TokenKind_Eof = 0,
+	TokenKind_Error = -1,
+	TokenKind_Identifier = 256,
+	TokenKind_Integer,
+	TokenKind_Double,
+	TokenKind_Literal,
+	TokenKind_Comment,
+	TokenKind_Ne,
+	TokenKind_Le,
+	TokenKind_Ge,
 
 	// keywords
 
-	EToken_Message,
+	TokenKind_Message,
 
-	EToken_STRING,
-	EToken_WSTRING,
-	EToken_BOOLEAN,
-	EToken_BYTE,
-	EToken_CHAR,
-	EToken_WORD,
-	EToken_SHORT,
-	EToken_DWORD,
-	EToken_LONG,
-	EToken_REAL,
-	EToken_ENUM,
-	EToken_STRUCT,
-	EToken_DOEVENTS,
-	EToken_CONST,
-	EToken_DIM,
-	EToken_AS,
-	EToken_END,
-	EToken_DECLARE,
-	EToken_FUNCTION,
-	EToken_SUB,
-	EToken_GOTO,
-	EToken_GOSUB,
-	EToken_RETURN,
-	EToken_SELECT,
-	EToken_CASE,
-	EToken_IF,
-	EToken_THEN,
-	EToken_ELSE,
-	EToken_FOR,
-	EToken_TO,
-	EToken_STEP,
-	EToken_NEXT,
-	EToken_EXIT,
-	EToken_WHILE,
-	EToken_WEND,
-	EToken_DO,
-	EToken_LOOP,
-	EToken_UNTIL,
-	EToken_BYREF,
-	EToken_BYVAL,
-	EToken_XOR,
-	EToken_OR,
-	EToken_AND,
-	EToken_NOT,
-	EToken_MOD,
-	EToken_OBJECT,
-	EToken_SYSCALL,
-	EToken_EVENT,
-	EToken_PROPERTY,
-	EToken_GET,
-	EToken_SET,
-	EToken_REF,
-	EToken_SIZEOF,
-	EToken_INCLUDE,
-	EToken_PUBLIC,
-	EToken_STATIC,
-	EToken_LIBRARY,
+	TokenKind_STRING,
+	TokenKind_WSTRING,
+	TokenKind_BOOLEAN,
+	TokenKind_BYTE,
+	TokenKind_CHAR,
+	TokenKind_WORD,
+	TokenKind_SHORT,
+	TokenKind_DWORD,
+	TokenKind_LONG,
+	TokenKind_REAL,
+	TokenKind_ENUM,
+	TokenKind_STRUCT,
+	TokenKind_DOEVENTS,
+	TokenKind_CONST,
+	TokenKind_DIM,
+	TokenKind_AS,
+	TokenKind_END,
+	TokenKind_DECLARE,
+	TokenKind_FUNCTION,
+	TokenKind_SUB,
+	TokenKind_GOTO,
+	TokenKind_GOSUB,
+	TokenKind_RETURN,
+	TokenKind_SELECT,
+	TokenKind_CASE,
+	TokenKind_IF,
+	TokenKind_THEN,
+	TokenKind_ELSE,
+	TokenKind_FOR,
+	TokenKind_TO,
+	TokenKind_STEP,
+	TokenKind_NEXT,
+	TokenKind_EXIT,
+	TokenKind_WHILE,
+	TokenKind_WEND,
+	TokenKind_DO,
+	TokenKind_LOOP,
+	TokenKind_UNTIL,
+	TokenKind_BYREF,
+	TokenKind_BYVAL,
+	TokenKind_XOR,
+	TokenKind_OR,
+	TokenKind_AND,
+	TokenKind_NOT,
+	TokenKind_MOD,
+	TokenKind_OBJECT,
+	TokenKind_SYSCALL,
+	TokenKind_EVENT,
+	TokenKind_PROPERTY,
+	TokenKind_GET,
+	TokenKind_SET,
+	TokenKind_REF,
+	TokenKind_SIZEOF,
+	TokenKind_INCLUDE,
+	TokenKind_PUBLIC,
+	TokenKind_STATIC,
+	TokenKind_LIBRARY,
 	
-	EToken_PPLINE,
+	TokenKind_PPLINE,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_PRS_BEGIN_TOKEN_NAME_MAP (CTokenName)
-	AXL_PRS_TOKEN_NAME (EToken_Eof,        "eof")
-	AXL_PRS_TOKEN_NAME (EToken_Error,      "error")
-	AXL_PRS_TOKEN_NAME (EToken_Identifier, "identifier")
-	AXL_PRS_TOKEN_NAME (EToken_Integer,    "integer-constant")
-	AXL_PRS_TOKEN_NAME (EToken_Double,     "double-constant")
-	AXL_PRS_TOKEN_NAME (EToken_Literal,    "string-literal")	
-	AXL_PRS_TOKEN_NAME (EToken_Comment,    "comment")
-	AXL_PRS_TOKEN_NAME (EToken_Ne,         "<>")
-	AXL_PRS_TOKEN_NAME (EToken_Le,         "<=")
-	AXL_PRS_TOKEN_NAME (EToken_Ge,         ">=")
-	AXL_PRS_TOKEN_NAME (EToken_Message,    "message")
+AXL_PRS_BEGIN_TOKEN_NAME_MAP (TokenName)
+	AXL_PRS_TOKEN_NAME (TokenKind_Eof,        "eof")
+	AXL_PRS_TOKEN_NAME (TokenKind_Error,      "error")
+	AXL_PRS_TOKEN_NAME (TokenKind_Identifier, "identifier")
+	AXL_PRS_TOKEN_NAME (TokenKind_Integer,    "integer-constant")
+	AXL_PRS_TOKEN_NAME (TokenKind_Double,     "double-constant")
+	AXL_PRS_TOKEN_NAME (TokenKind_Literal,    "string-literal")	
+	AXL_PRS_TOKEN_NAME (TokenKind_Comment,    "comment")
+	AXL_PRS_TOKEN_NAME (TokenKind_Ne,         "<>")
+	AXL_PRS_TOKEN_NAME (TokenKind_Le,         "<=")
+	AXL_PRS_TOKEN_NAME (TokenKind_Ge,         ">=")
+	AXL_PRS_TOKEN_NAME (TokenKind_Message,    "message")
 
-	AXL_PRS_TOKEN_NAME (EToken_STRING,     "string")
-	AXL_PRS_TOKEN_NAME (EToken_WSTRING,    "wstring")
-	AXL_PRS_TOKEN_NAME (EToken_BOOLEAN,    "boolean")
-	AXL_PRS_TOKEN_NAME (EToken_BYTE,       "byte")
-	AXL_PRS_TOKEN_NAME (EToken_CHAR,       "char")
-	AXL_PRS_TOKEN_NAME (EToken_WORD,       "word")
-	AXL_PRS_TOKEN_NAME (EToken_SHORT,      "short")
-	AXL_PRS_TOKEN_NAME (EToken_DWORD,      "dword")
-	AXL_PRS_TOKEN_NAME (EToken_LONG,       "long")
-	AXL_PRS_TOKEN_NAME (EToken_REAL,       "real")
-	AXL_PRS_TOKEN_NAME (EToken_ENUM,       "enum")
-	AXL_PRS_TOKEN_NAME (EToken_STRUCT,     "struct")
-	AXL_PRS_TOKEN_NAME (EToken_DOEVENTS,   "doevents")
-	AXL_PRS_TOKEN_NAME (EToken_CONST,      "const")
-	AXL_PRS_TOKEN_NAME (EToken_DIM,        "dim")
-	AXL_PRS_TOKEN_NAME (EToken_AS,         "as")
-	AXL_PRS_TOKEN_NAME (EToken_END,        "end")
-	AXL_PRS_TOKEN_NAME (EToken_DECLARE,    "declare")
-	AXL_PRS_TOKEN_NAME (EToken_FUNCTION,   "function")
-	AXL_PRS_TOKEN_NAME (EToken_SUB,        "sub")
-	AXL_PRS_TOKEN_NAME (EToken_GOTO,       "goto")
-	AXL_PRS_TOKEN_NAME (EToken_GOSUB,      "gosub")
-	AXL_PRS_TOKEN_NAME (EToken_RETURN,     "return")
-	AXL_PRS_TOKEN_NAME (EToken_SELECT,     "select")
-	AXL_PRS_TOKEN_NAME (EToken_CASE,       "case")
-	AXL_PRS_TOKEN_NAME (EToken_IF,         "if")
-	AXL_PRS_TOKEN_NAME (EToken_THEN,       "then")
-	AXL_PRS_TOKEN_NAME (EToken_ELSE,       "else")
-	AXL_PRS_TOKEN_NAME (EToken_FOR,        "for")
-	AXL_PRS_TOKEN_NAME (EToken_TO,         "to")
-	AXL_PRS_TOKEN_NAME (EToken_STEP,       "step")
-	AXL_PRS_TOKEN_NAME (EToken_NEXT,       "next")
-	AXL_PRS_TOKEN_NAME (EToken_EXIT,       "exit")
-	AXL_PRS_TOKEN_NAME (EToken_WHILE,      "while")
-	AXL_PRS_TOKEN_NAME (EToken_WEND,       "wend")
-	AXL_PRS_TOKEN_NAME (EToken_DO,         "do")
-	AXL_PRS_TOKEN_NAME (EToken_LOOP,       "loop")
-	AXL_PRS_TOKEN_NAME (EToken_UNTIL,      "until")
-	AXL_PRS_TOKEN_NAME (EToken_BYREF,      "byref")
-	AXL_PRS_TOKEN_NAME (EToken_BYVAL,      "byval")
-	AXL_PRS_TOKEN_NAME (EToken_XOR,        "xor")
-	AXL_PRS_TOKEN_NAME (EToken_OR,         "or")
-	AXL_PRS_TOKEN_NAME (EToken_AND,        "and")
-	AXL_PRS_TOKEN_NAME (EToken_NOT,        "not")
-	AXL_PRS_TOKEN_NAME (EToken_MOD,        "mod")
-	AXL_PRS_TOKEN_NAME (EToken_OBJECT,     "object")
-	AXL_PRS_TOKEN_NAME (EToken_SYSCALL,    "syscall")
-	AXL_PRS_TOKEN_NAME (EToken_EVENT,      "event")
-	AXL_PRS_TOKEN_NAME (EToken_PROPERTY,   "property")
-	AXL_PRS_TOKEN_NAME (EToken_GET,        "get")
-	AXL_PRS_TOKEN_NAME (EToken_SET,        "set")
-	AXL_PRS_TOKEN_NAME (EToken_REF,        "ref")
-	AXL_PRS_TOKEN_NAME (EToken_SIZEOF,     "sizeof")
-	AXL_PRS_TOKEN_NAME (EToken_INCLUDE,    "incldue")
-	AXL_PRS_TOKEN_NAME (EToken_PUBLIC,     "public")
-	AXL_PRS_TOKEN_NAME (EToken_STATIC,     "static")
-	AXL_PRS_TOKEN_NAME (EToken_LIBRARY,    "library")	
-	AXL_PRS_TOKEN_NAME (EToken_PPLINE,     "line")
+	AXL_PRS_TOKEN_NAME (TokenKind_STRING,     "string")
+	AXL_PRS_TOKEN_NAME (TokenKind_WSTRING,    "wstring")
+	AXL_PRS_TOKEN_NAME (TokenKind_BOOLEAN,    "boolean")
+	AXL_PRS_TOKEN_NAME (TokenKind_BYTE,       "byte")
+	AXL_PRS_TOKEN_NAME (TokenKind_CHAR,       "char")
+	AXL_PRS_TOKEN_NAME (TokenKind_WORD,       "word")
+	AXL_PRS_TOKEN_NAME (TokenKind_SHORT,      "short")
+	AXL_PRS_TOKEN_NAME (TokenKind_DWORD,      "dword")
+	AXL_PRS_TOKEN_NAME (TokenKind_LONG,       "long")
+	AXL_PRS_TOKEN_NAME (TokenKind_REAL,       "real")
+	AXL_PRS_TOKEN_NAME (TokenKind_ENUM,       "enum")
+	AXL_PRS_TOKEN_NAME (TokenKind_STRUCT,     "struct")
+	AXL_PRS_TOKEN_NAME (TokenKind_DOEVENTS,   "doevents")
+	AXL_PRS_TOKEN_NAME (TokenKind_CONST,      "const")
+	AXL_PRS_TOKEN_NAME (TokenKind_DIM,        "dim")
+	AXL_PRS_TOKEN_NAME (TokenKind_AS,         "as")
+	AXL_PRS_TOKEN_NAME (TokenKind_END,        "end")
+	AXL_PRS_TOKEN_NAME (TokenKind_DECLARE,    "declare")
+	AXL_PRS_TOKEN_NAME (TokenKind_FUNCTION,   "function")
+	AXL_PRS_TOKEN_NAME (TokenKind_SUB,        "sub")
+	AXL_PRS_TOKEN_NAME (TokenKind_GOTO,       "goto")
+	AXL_PRS_TOKEN_NAME (TokenKind_GOSUB,      "gosub")
+	AXL_PRS_TOKEN_NAME (TokenKind_RETURN,     "return")
+	AXL_PRS_TOKEN_NAME (TokenKind_SELECT,     "select")
+	AXL_PRS_TOKEN_NAME (TokenKind_CASE,       "case")
+	AXL_PRS_TOKEN_NAME (TokenKind_IF,         "if")
+	AXL_PRS_TOKEN_NAME (TokenKind_THEN,       "then")
+	AXL_PRS_TOKEN_NAME (TokenKind_ELSE,       "else")
+	AXL_PRS_TOKEN_NAME (TokenKind_FOR,        "for")
+	AXL_PRS_TOKEN_NAME (TokenKind_TO,         "to")
+	AXL_PRS_TOKEN_NAME (TokenKind_STEP,       "step")
+	AXL_PRS_TOKEN_NAME (TokenKind_NEXT,       "next")
+	AXL_PRS_TOKEN_NAME (TokenKind_EXIT,       "exit")
+	AXL_PRS_TOKEN_NAME (TokenKind_WHILE,      "while")
+	AXL_PRS_TOKEN_NAME (TokenKind_WEND,       "wend")
+	AXL_PRS_TOKEN_NAME (TokenKind_DO,         "do")
+	AXL_PRS_TOKEN_NAME (TokenKind_LOOP,       "loop")
+	AXL_PRS_TOKEN_NAME (TokenKind_UNTIL,      "until")
+	AXL_PRS_TOKEN_NAME (TokenKind_BYREF,      "byref")
+	AXL_PRS_TOKEN_NAME (TokenKind_BYVAL,      "byval")
+	AXL_PRS_TOKEN_NAME (TokenKind_XOR,        "xor")
+	AXL_PRS_TOKEN_NAME (TokenKind_OR,         "or")
+	AXL_PRS_TOKEN_NAME (TokenKind_AND,        "and")
+	AXL_PRS_TOKEN_NAME (TokenKind_NOT,        "not")
+	AXL_PRS_TOKEN_NAME (TokenKind_MOD,        "mod")
+	AXL_PRS_TOKEN_NAME (TokenKind_OBJECT,     "object")
+	AXL_PRS_TOKEN_NAME (TokenKind_SYSCALL,    "syscall")
+	AXL_PRS_TOKEN_NAME (TokenKind_EVENT,      "event")
+	AXL_PRS_TOKEN_NAME (TokenKind_PROPERTY,   "property")
+	AXL_PRS_TOKEN_NAME (TokenKind_GET,        "get")
+	AXL_PRS_TOKEN_NAME (TokenKind_SET,        "set")
+	AXL_PRS_TOKEN_NAME (TokenKind_REF,        "ref")
+	AXL_PRS_TOKEN_NAME (TokenKind_SIZEOF,     "sizeof")
+	AXL_PRS_TOKEN_NAME (TokenKind_INCLUDE,    "incldue")
+	AXL_PRS_TOKEN_NAME (TokenKind_PUBLIC,     "public")
+	AXL_PRS_TOKEN_NAME (TokenKind_STATIC,     "static")
+	AXL_PRS_TOKEN_NAME (TokenKind_LIBRARY,    "library")	
+	AXL_PRS_TOKEN_NAME (TokenKind_PPLINE,     "line")
 
 AXL_PRS_END_TOKEN_NAME_MAP ()
 
 //.............................................................................
 
-typedef axl::lex::CRagelTokenT <EToken, CTokenName> CToken;
+typedef axl::lex::RagelToken <TokenKind, TokenName> Token;
 
-class CLexer: public axl::lex::CRagelLexerT <CLexer, CToken>
+class Lexer: public axl::lex::RagelLexer <Lexer, Token>
 {
-	friend class axl::lex::CRagelLexerT <CLexer, CToken>;
+	friend class axl::lex::RagelLexer <Lexer, Token>;
 
 protected:
-	CToken*
+	Token*
 	createIntegerToken (
 		int begin, 
 		int base
 		)
 	{
-		CToken* token = createToken (EToken_Integer);
+		Token* token = createToken (TokenKind_Integer);
 		token->m_data.m_integer = strtoul(ts + begin, NULL, base);
 		return token;
 	}
 
-	CToken*
+	Token*
 	createDoubleToken ()
 	{
-		CToken* token = createToken (EToken_Double);
+		Token* token = createToken (TokenKind_Double);
 		token->m_data.m_double = strtod (ts, NULL);
 		return token;
 	}
 
-	CToken*
+	Token*
 	createStringToken(
 		int begin,
 		int end,
-		EToken token,
+		TokenKind token,
 		size_t channel = 0
 		)
 	{
-		CToken* token = createToken (token, channel);
+		Token* token = createToken (token, channel);
 		token->m_data.m_string.copy (ts + begin, token->m_pos.m_length - begin - end);
 		return token;
 	}
@@ -206,13 +206,13 @@ protected:
 			c >= 'A' && c <= 'F' ? 10 + c - 'A' : 0;
 	}
 
-	CToken*
+	Token*
 	createCharConstToken(
 		int begin,
 		int end	
 		)
 	{
-		CToken* token = createToken (EToken_Integer);
+		Token* token = createToken (TokenKind_Integer);
 		token->m_data.m_int64 = 0;
 
 		if (!token->m_pos.m_length)
@@ -231,10 +231,10 @@ protected:
 		return token;
 	}
 
-	CToken*
+	Token*
 	createIntegerConstToken (int value)
 	{
-		CToken* token = createToken (EToken_Integer);
+		Token* token = createToken (TokenKind_Integer);
 		token->m_data.m_integer = value;
 		return token;
 	}

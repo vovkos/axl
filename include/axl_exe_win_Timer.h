@@ -14,7 +14,7 @@ namespace win {
 
 //.............................................................................
 
-class CTimer: public CWaitableHandle
+class Timer: public WaitableHandle
 {
 public:
 	bool

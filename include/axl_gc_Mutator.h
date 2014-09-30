@@ -43,26 +43,26 @@ struct _axl_gc_TValue
 
 typedef struct _axl_gc_TValueEntry axl_gc_TValueEntry;
 
-struct _axl_gc_TValueEntry: rtl::TListLink
+struct _axl_gc_TValueEntry: rtl::ListLink
 {
 	axl_gc_TValue m_value;
 };
 
 //.............................................................................
 
-class CCollector;
+class Collector;
 
 [uuid ("13ebd5b0-a9b2-498f-8a18-4e03628e7603")]
 struct IMutator: obj::IRoot
 {
 	virtual 
 	void 
-	getRootSet (CCollector* collector) = 0;
+	getRootSet (Collector* collector) = 0;
 
 	virtual 
 	void 
 	traceValue (
-		CCollector* collector, 
+		Collector* collector, 
 		axl_gc_TValue* value
 		) = 0;
 

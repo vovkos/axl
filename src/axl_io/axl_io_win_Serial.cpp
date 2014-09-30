@@ -9,7 +9,7 @@ namespace win {
 //.............................................................................
 
 bool 
-CSerial::open (
+Serial::open (
 	const char* name,
 	uint_t flags
 	)
@@ -20,7 +20,7 @@ CSerial::open (
 		name += 4;
 	
 	char buffer [256];
-	rtl::CString_w deviceName (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w deviceName (ref::BufKind_Stack, buffer, sizeof (buffer));
 	deviceName.format (L"\\\\.\\%S", name);
 
 	m_h = ::CreateFileW (
@@ -36,7 +36,7 @@ CSerial::open (
 }
 
 dword_t
-CSerial::getStatusLines ()
+Serial::getStatusLines ()
 {
 	ASSERT (isOpen ());
 
@@ -50,7 +50,7 @@ CSerial::getStatusLines ()
 }
 
 dword_t
-CSerial::getWaitMask ()
+Serial::getWaitMask ()
 {
 	dword_t mask;
 
@@ -62,7 +62,7 @@ CSerial::getWaitMask ()
 }
 
 size_t
-CSerial::read (
+Serial::read (
 	void* p, 
 	size_t size 
 	)
@@ -73,7 +73,7 @@ CSerial::read (
 }
 
 size_t
-CSerial::write (
+Serial::write (
 	const void* p, 
 	size_t size
 	)

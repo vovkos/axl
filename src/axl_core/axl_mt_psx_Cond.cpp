@@ -11,7 +11,7 @@ namespace psx {
 //.............................................................................
 
 bool 
-CCond::wait (
+Cond::wait (
 	pthread_mutex_t* mutex,
 	uint_t timeout
 	)

@@ -16,59 +16,59 @@ namespace ref {
 // forward
 
 template <typename T>
-class CWeakPtrT;
+class WeakPtr;
 
 //.............................................................................
 
-enum EPtr
+enum PtrKind
 {
-	EPtr_Null = 0
+	PtrKind_Null = 0
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CPtrT
+class Ptr
 {
 	template <typename T2>
-	friend class CPtrT;
+	friend class Ptr;
 
 	template <typename T2>
-	friend class CWeakPtrT;
+	friend class WeakPtr;
 
 protected:
 	T* m_p;
-	CRefCount* m_refCount;
+	RefCount* m_refCount;
 
 public:
-	CPtrT ()
+	Ptr ()
 	{ 
 		m_p = NULL;
 		m_refCount = NULL; 
 	}
 
-	CPtrT (EPtr ptrKind)
+	Ptr (PtrKind ptrKind)
 	{ 
-		ASSERT (ptrKind == EPtr_Null);
+		ASSERT (ptrKind == PtrKind_Null);
 		m_p = NULL;
 		m_refCount = NULL; 
 	}
 
-	CPtrT (const CPtrT& src)
+	Ptr (const Ptr& src)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
-	CPtrT (const CPtrT <A>& src)
+	Ptr (const Ptr <A>& src)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
-	CPtrT (const CWeakPtrT <A>& src)
+	Ptr (const WeakPtr <A>& src)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		if (src.m_refCount && src.m_refCount->addRefByWeakPtr ())
@@ -76,22 +76,22 @@ public:
 	}
 
 	template <typename A>
-	CPtrT (A* p)
+	Ptr (A* p)
 	{
 		m_p = NULL, m_refCount = NULL;
 		copy (p, p);
 	}
 
-	CPtrT (
+	Ptr (
 		T* p, 
-		CRefCount* refCount
+		RefCount* refCount
 		)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		copy (p, refCount);
 	}
 
-	~CPtrT ()
+	~Ptr ()
 	{ 
 		clear (); 
 	}
@@ -108,8 +108,8 @@ public:
 		return m_p; 
 	}
 
-	CPtrT& 
-	operator = (const CPtrT& src)
+	Ptr& 
+	operator = (const Ptr& src)
 	{ 
 		copy (src.m_p, src.m_refCount);
 		return *this;
@@ -121,7 +121,7 @@ public:
 		return m_p;
 	}
 	
-	CRefCount* 
+	RefCount* 
 	getRefCount () const
 	{
 		return m_refCount;
@@ -130,7 +130,7 @@ public:
 	void 
 	copy (
 		T* p, 
-		CRefCount* refCount
+		RefCount* refCount
 		)
 	{
 		m_p = p;
@@ -150,7 +150,7 @@ public:
 	void 
 	attach (
 		T* p, 
-		CRefCount* refCount
+		RefCount* refCount
 		)
 	{
 		if (m_refCount)
@@ -163,7 +163,7 @@ public:
 	void 
 	detach (
 		T** pp_o = NULL, 
-		CRefCount** refCount_o = NULL
+		RefCount** refCount_o = NULL
 		)
 	{ 
 		if (pp_o)

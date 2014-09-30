@@ -16,7 +16,7 @@ namespace rtl {
 // compile-time type information
 
 template <typename T>
-class CTypeT
+class Type
 {
 public:
 	static
@@ -53,7 +53,7 @@ public:
 // specialization for void
 
 template <>
-class CTypeT <void>
+class Type <void>
 {
 public:
 	static

@@ -15,15 +15,15 @@ namespace ini {
 //.............................................................................
 
 template <typename T>
-class CParserT: protected CLexer
+class Parser: protected Lexer
 {
 public:
 	bool
-	parseFile (const rtl::CString& filePath)
+	parseFile (const rtl::String& filePath)
 	{
-		io::CSimpleMappedFile file;
+		io::SimpleMappedFile file;
 		return 
-			file.open (filePath, io::EFileFlag_ReadOnly) &&
+			file.open (filePath, io::FileFlagKind_ReadOnly) &&
 			parse (filePath, (const char*) file.p (), (size_t) file.getSize ());
 	}
 
@@ -38,34 +38,34 @@ public:
 
 	bool
 	parse (
-		const rtl::CString& filePath,
+		const rtl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)
 	{
 		bool result;
 
-		CLexer::create (filePath, source, length);
+		Lexer::create (filePath, source, length);
 
 		for (;;)
 		{
-			EScanResult scanResult = scanLine ();
+			ScanResultKind scanResult = scanLine ();
 			switch (scanResult)
 			{
-			case EScanResult_Error:
+			case ScanResultKind_Error:
 				return false;
 			
-			case EScanResult_Eof:
+			case ScanResultKind_Eof:
 				return static_cast <T*> (this)->finalize ();
 
-			case EScanResult_Section:
+			case ScanResultKind_Section:
 				result = static_cast <T*> (this)->onSection (m_sectionName);
 				if (!result)
 					return false;
 
 				break;
 
-			case EScanResult_KeyValue:
+			case ScanResultKind_KeyValue:
 				result = static_cast <T*> (this)->onKeyValue (m_keyName, m_value);
 				if (!result)
 					return false;

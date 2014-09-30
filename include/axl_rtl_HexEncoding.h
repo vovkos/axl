@@ -14,15 +14,15 @@ namespace rtl {
 
 //.............................................................................
 
-enum EHexEncode
+enum HexEncodeKind
 {
-	EHexEncode_UpperCase = 1,
-	EHexEncode_NoSpace   = 2,
+	HexEncodeKind_UpperCase = 1,
+	HexEncodeKind_NoSpace   = 2,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CHexEncoding
+class HexEncoding
 {
 public:
 	static 
@@ -54,21 +54,21 @@ public:
 	static
 	size_t
 	encode (
-		CString* string,
+		String* string,
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
 		);
 
 	static
-	CString
+	String
 	encode (
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
 		)
 	{
-		CString string;
+		String string;
 		encode (&string, p, size, flags);
 		return string;
 	}
@@ -76,19 +76,19 @@ public:
 	static
 	size_t
 	decode (
-		CArrayT <uchar_t>* buffer,
+		Array <uchar_t>* buffer,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	CArrayT <uchar_t>
+	Array <uchar_t>
 	decode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		CArrayT <uchar_t> buffer;
+		Array <uchar_t> buffer;
 		decode (&buffer, p, length);
 		return buffer;
 	}
@@ -96,16 +96,16 @@ public:
 	static
 	size_t
 	decode (
-		CArrayT <uchar_t>* buffer,
-		const CString& string
+		Array <uchar_t>* buffer,
+		const String& string
 		)
 	{
 		return decode (buffer, string, string.getLength ());
 	}
 
 	static
-	CArrayT <uchar_t>
-	decode (const CString& string)
+	Array <uchar_t>
+	decode (const String& string)
 	{
 		return decode (string, string.getLength ());
 	}

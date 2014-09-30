@@ -13,27 +13,27 @@ namespace io {
 
 //.............................................................................
 
-class CListenerSock
+class ListenerSock
 {
 public:
-	typedef exe::CArgT <ref::CPtrT <CConnectionSock> > COnAcceptArg;
+	typedef exe::Arg <ref::Ptr <ConnectionSock> > OnAcceptArg;
 
 public:
-	win::CSock m_sock;
+	win::Sock m_sock;
 
 protected:
-	ref::CPtrT <exe::CWorkerThread> m_workerThread;
-	mt::CEvent m_event;
+	ref::Ptr <exe::Workerhread> m_workerThread;
+	mt::Event m_event;
 	handle_t m_hWorkerThreadEvent;
-	exe::CFunction m_onAccept;
+	exe::Function m_onAccept;
 
 public:
-	CListenerSock ()
+	ListenerSock ()
 	{
 		m_hWorkerThreadEvent = NULL;
 	}
 
-	~CListenerSock ()
+	~ListenerSock ()
 	{
 		close ();
 	}
@@ -45,7 +45,7 @@ public:
 	}
 
 	bool
-	getLocalAddress (TSockAddrU* addr)
+	getLocalAddress (SockAddrU* addr)
 	{
 		SOCKADDR addr;
 		return 
@@ -55,8 +55,8 @@ public:
 
 	bool
 	open (
-		ESockProto protocol,
-		const TSockAddr* addr
+		SockProtoKind protocol,
+		const SockAddr* addr
 		);
 
 	void
@@ -65,7 +65,7 @@ public:
 	bool
 	listen (
 		size_t backLog,
-		const exe::CFunction& onAccept // void OnAccept (ref::CPtrT <CConnectionSocket> Socket)
+		const exe::Function& onAccept // void OnAccept (ref::CPtrT <CConnectionSocket> Socket)
 		);
 
 protected:
@@ -77,7 +77,7 @@ protected:
 	AXL_CDECL
 	listen_wt (
 		size_t backLog,
-		const exe::CFunction& onAccept
+		const exe::Function& onAccept
 		);
 
 	void

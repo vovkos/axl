@@ -9,15 +9,15 @@ namespace rtl {
 //.............................................................................
 
 bool
-TGuid::generate ()
+Guid::generate ()
 {
 	// not yet
-	memset (this, 0, sizeof (TGuid));
+	memset (this, 0, sizeof (Guid));
 	return false;
 }
 
 bool
-TGuid::parse (const char* string)
+Guid::parse (const char* string)
 {
 	const char* p = string;
 	char* end;
@@ -32,33 +32,33 @@ TGuid::parse (const char* string)
 
 	uint32_t a = (uint32_t) strtoul (p, &end, 16);
 	if (end != p + 8 || *end != '-')
-		return err::fail (err::EStatus_InvalidParameter);
+		return err::fail (err::StatusKind_InvalidParameter);
 
 	p = end + 1;
 
 	uint32_t b = (uint16_t) strtoul (p, &end, 16);
 	if (end != p + 4 || *end != '-')
-		return err::fail (err::EStatus_InvalidParameter);
+		return err::fail (err::StatusKind_InvalidParameter);
 
 	p = end + 1;
 
 	uint32_t c = (uint16_t) strtoul (p, &end, 16);
 	if (end != p + 4 || *end != '-')
-		return err::fail (err::EStatus_InvalidParameter);
+		return err::fail (err::StatusKind_InvalidParameter);
 
 	p = end + 1;
 
 	uint16_t d = (uint16_t) strtoul (p, &end, 16);
 	if (end != p + 4 || *end != '-')
-		return err::fail (err::EStatus_InvalidParameter);
+		return err::fail (err::StatusKind_InvalidParameter);
 
 	p = end + 1;
 
 	uint64_t e = _strtoui64 (p, &end, 16);
 	if (end != p + 12 || *end != terminatorChar)
-		return err::fail (err::EStatus_InvalidParameter);
+		return err::fail (err::StatusKind_InvalidParameter);
 
-	memset (this, 0, sizeof (TGuid));
+	memset (this, 0, sizeof (Guid));
 	m_data1 = a;
 	m_data2 = b;
 	m_data3 = c;
@@ -73,8 +73,8 @@ TGuid::parse (const char* string)
 	return true;
 }
 
-rtl::CString
-TGuid::getGuidString (uint_t flags) const
+rtl::String
+Guid::getGuidString (uint_t flags) const
 {
 	static const char* formatTable [2] [2] =
 	{
@@ -88,10 +88,10 @@ TGuid::getGuidString (uint_t flags) const
 		}
 	};
 
-	size_t i1 = (flags & EGuidStringFlag_CurlyBraces) ? 1 : 0;
-	size_t i2 = (flags & EGuidStringFlag_UpperCase) ? 1 : 0;
+	size_t i1 = (flags & GuidStringFlagKind_CurlyBraces) ? 1 : 0;
+	size_t i2 = (flags & GuidStringFlagKind_UpperCase) ? 1 : 0;
 
-	return rtl::CString::format_s (
+	return rtl::String::format_s (
 		formatTable [i1] [i2],
 		m_data1,
 		m_data2,

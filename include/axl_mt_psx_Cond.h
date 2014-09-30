@@ -14,18 +14,18 @@ namespace psx {
 
 //.............................................................................
 
-class CCond
+class Cond
 {
 protected:	
 	pthread_cond_t m_cond;
 	
 public:
-	CCond ()
+	Cond ()
 	{		
 		pthread_cond_init (&m_cond, NULL);
 	}
 
-	~CCond ()
+	~Cond ()
 	{
 		pthread_cond_destroy (&m_cond);
 	}
@@ -65,11 +65,11 @@ public:
 
 //.............................................................................
 
-class CCondMutexPair
+class CondMutexPair
 {
 protected:
-	CCond m_cond;
-	CMutex m_mutex;
+	Cond m_cond;
+	Mutex m_mutex;
 	
 public:
 	void

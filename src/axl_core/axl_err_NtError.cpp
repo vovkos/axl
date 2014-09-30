@@ -7,8 +7,8 @@ namespace err {
 
 //.............................................................................
 
-rtl::CString 
-CNtErrorProvider::getErrorDescription (NTSTATUS status)
+rtl::String 
+NtErrorProvider::getErrorDescription (NTSTATUS status)
 {
 	typedef dword_t (WINAPI* FRtlNtStatusToDosError) (NTSTATUS);
 	static FRtlNtStatusToDosError _pfRtlNtStatusToDosError = NULL;
@@ -20,26 +20,26 @@ CNtErrorProvider::getErrorDescription (NTSTATUS status)
 			_pfRtlNtStatusToDosError = (FRtlNtStatusToDosError) ::GetProcAddress (hNtDll, "RtlNtStatusToDosError");
 		
 		if (!_pfRtlNtStatusToDosError)
-			return rtl::CString::format_s ("ntstatus #%x", status);
+			return rtl::String::format_s ("ntstatus #%x", status);
 	}
 
 	dword_t winError = _pfRtlNtStatusToDosError (status);
 	if (winError == ERROR_MR_MID_NOT_FOUND)
-		return rtl::CString::format_s ("ntstatus #%x", status);
+		return rtl::String::format_s ("ntstatus #%x", status);
 
-	return CWinErrorProvider::getErrorDescription (winError);
+	return WinErrorProvider::getErrorDescription (winError);
 }
 
 //.............................................................................
 
-TError*
-CNtError::create (NTSTATUS status)
+ErrorData*
+NtError::create (NTSTATUS status)
 {
-	TError* error = getBuffer (sizeof (TError));
+	ErrorData* error = getBuffer (sizeof (ErrorData));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (TError);
+	error->m_size = sizeof (ErrorData);
 	error->m_guid = GUID_NtError;
 	error->m_code = status;
 	return error;

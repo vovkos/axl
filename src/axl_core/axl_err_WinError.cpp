@@ -6,8 +6,8 @@ namespace err {
 
 //.............................................................................
 
-rtl::CString 
-CWinErrorProvider::getErrorDescription (dword_t code)
+rtl::String 
+WinErrorProvider::getErrorDescription (dword_t code)
 {
 	wchar_t* message = NULL;
 	
@@ -25,9 +25,9 @@ CWinErrorProvider::getErrorDescription (dword_t code)
 		);
 
 	if (!message)
-		return rtl::CString::format_s ("winerror #%d", code);
+		return rtl::String::format_s ("winerror #%d", code);
 
-	rtl::CString description = message;
+	rtl::String description = message;
 	::LocalFree (message);
 	
 	return description; 
@@ -35,14 +35,14 @@ CWinErrorProvider::getErrorDescription (dword_t code)
 
 //.............................................................................
 
-TError*
-CWinError::create (dword_t code)
+ErrorData*
+WinError::create (dword_t code)
 {
-	TError* error = getBuffer (sizeof (TError));
+	ErrorData* error = getBuffer (sizeof (ErrorData));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (TError);
+	error->m_size = sizeof (ErrorData);
 	error->m_guid = GUID_WinError;
 	error->m_code = code;
 	return error;

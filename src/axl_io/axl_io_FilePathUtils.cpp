@@ -8,7 +8,7 @@ namespace io {
 
 //.............................................................................
 
-rtl::CString
+rtl::String
 getCurrentDir ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -17,7 +17,7 @@ getCurrentDir ()
 	return dir;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	char* p = get_current_dir_name ();
-	rtl::CString dir = p;
+	rtl::String dir = p;
 	free (p);
 	return dir;
 #endif
@@ -28,7 +28,7 @@ doesFileExist (const char* fileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 	dword_t attributes = ::GetFileAttributesW (fileName_w);
 	return attributes != INVALID_FILE_ATTRIBUTES;
@@ -50,7 +50,7 @@ bool
 ensureDirExists (const char* fileName)
 {
 	char buffer [256] = { 0 };
-	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
 	if (fileName_w.isEmpty () || isDir (fileName_w))
@@ -139,19 +139,19 @@ ensureDirExists (const char* fileName)
 
 #endif
 
-rtl::CString
+rtl::String
 getFullFilePath (const char* fileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
 	size_t length = ::GetFullPathNameW (fileName_w, 0, NULL, NULL);
 	if (!length)
 		return err::failWithLastSystemError (NULL);
 
-	rtl::CString_w filePath;
+	rtl::String_w filePath;
 	wchar_t* p = filePath.getBuffer (length);
 	::GetFullPathNameW (fileName_w, length, p, NULL);
 	return filePath;
@@ -162,12 +162,12 @@ getFullFilePath (const char* fileName)
 #endif
 }
 
-rtl::CString
+rtl::String
 getDir (const char* filePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::CString_w filePath_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	filePath_w = filePath;
 
 	wchar_t drive [4] = { 0 };
@@ -181,24 +181,24 @@ getDir (const char* filePath)
 		NULL, 0
 		);
 
-	rtl::CString string = drive;
+	rtl::String string = drive;
 	string.append (dir);
 	return string;
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	rtl::CString string = filePath;
+	rtl::String string = filePath;
 	dirname (string.getBuffer ());
 	string.updateLength ();
 	return string;
 #endif
 }
 
-rtl::CString
+rtl::String
 getFileName (const char* filePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::CString_w filePath_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	filePath_w = filePath;
 
 	wchar_t fileName [1024] = { 0 };
@@ -212,7 +212,7 @@ getFileName (const char* filePath)
 		extension, countof (extension) - 1
 		);
 
-	rtl::CString string = fileName;
+	rtl::String string = fileName;
 	string.append (extension);
 	return string;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
@@ -221,16 +221,16 @@ getFileName (const char* filePath)
 #endif
 }
 
-rtl::CString
+rtl::String
 getExtension (const char* filePath)
 {
 	const char *p = strchr (filePath, '.');
 	return p ? p + 1 : NULL;
 }
 
-rtl::CString
+rtl::String
 concatFilePath (
-	rtl::CString* filePath,
+	rtl::String* filePath,
 	const char* fileName
 	)
 {
@@ -254,15 +254,15 @@ concatFilePath (
 	return *filePath;
 }
 
-rtl::CString
+rtl::String
 findFilePath (
 	const char* fileName,
 	const char* firstDir,
-	const rtl::CBoxListT <rtl::CString>* dirList,
+	const rtl::BoxList <rtl::String>* dirList,
 	bool doFindInCurrentDir
 	)
 {
-	rtl::CString filePath;
+	rtl::String filePath;
 
 	if (firstDir)
 	{
@@ -277,7 +277,7 @@ findFilePath (
 
 	if (dirList)
 	{
-		rtl::CBoxIteratorT <rtl::CString> dir = dirList->getHead ();
+		rtl::BoxIterator <rtl::String> dir = dirList->getHead ();
 		for (; dir; dir++)
 		{
 			filePath.forceCopy (*dir);
@@ -287,7 +287,7 @@ findFilePath (
 		}
 	}
 
-	return rtl::CString ();
+	return rtl::String ();
 }
 
 //.............................................................................

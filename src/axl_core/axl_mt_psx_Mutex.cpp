@@ -9,7 +9,7 @@ namespace psx {
 //.............................................................................
 
 bool 
-CMutex::lock (uint_t timeout)
+Mutex::lock (uint_t timeout)
 {	
 	int result;
 	

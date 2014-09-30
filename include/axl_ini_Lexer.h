@@ -15,27 +15,27 @@ namespace ini {
 
 //.............................................................................
 
-class CLexer
+class Lexer
 {
 public:
-	enum EScanResult
+	enum ScanResultKind
 	{
-		EScanResult_Error = -1,
-		EScanResult_Eof   = 0,
-		EScanResult_Section,
-		EScanResult_KeyValue,
+		ScanResultKind_Error = -1,
+		ScanResultKind_Eof   = 0,
+		ScanResultKind_Section,
+		ScanResultKind_KeyValue,
 	};
 
 protected:
-	rtl::CString m_filePath;
+	rtl::String m_filePath;
 
 	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
 
-	rtl::CString m_sectionName;
-	rtl::CString m_keyName;
-	rtl::CString m_value;
+	rtl::String m_sectionName;
+	rtl::String m_keyName;
+	rtl::String m_value;
 
 	// ragel interface variables
 
@@ -48,15 +48,15 @@ protected:
 	int cs;
 
 protected: // should only be used as part of ini::CParser
-	CLexer ()
+	Lexer ()
 	{
 		reset ();
 	}
 
 	bool
 	create (
-		const rtl::CString& filePath,
-		const rtl::CString& source
+		const rtl::String& filePath,
+		const rtl::String& source
 		)
 	{
 		return create (filePath, source, source.getLength ());
@@ -64,7 +64,7 @@ protected: // should only be used as part of ini::CParser
 
 	bool
 	create (
-		const rtl::CString& filePath,
+		const rtl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)
@@ -143,18 +143,18 @@ protected: // should only be used as part of ini::CParser
 				m_value.copy (p, length);					
 
 				if (m_value [0] == '"' && m_value [length - 1] == '"')
-					m_value = rtl::CEscapeEncoding::decode (m_value.cc () + 1, length - 2);
+					m_value = rtl::EscapeEncoding::decode (m_value.cc () + 1, length - 2);
 			}	
 		}
 
 		stop ();
 	}
 
-	EScanResult
+	ScanResultKind
 	scanLine ()
 	{
 		if (p == eof) 
-			return EScanResult_Eof;
+			return ScanResultKind_Eof;
 
 		pe = eof;
 		m_sectionName.clear ();
@@ -166,12 +166,12 @@ protected: // should only be used as part of ini::CParser
 		{
 			err::setStringError ("invalid syntax");
 			err::pushSrcPosError (m_filePath, m_line, p - m_begin - m_lineOffset);
-			return EScanResult_Error;
+			return ScanResultKind_Error;
 		}
 		
 		return 
-			!m_sectionName.isEmpty () ? EScanResult_Section : 
-			!m_keyName.isEmpty () ? EScanResult_KeyValue : EScanResult_Eof;
+			!m_sectionName.isEmpty () ? ScanResultKind_Section : 
+			!m_keyName.isEmpty () ? ScanResultKind_KeyValue : ScanResultKind_Eof;
 	}
 
 	void
@@ -185,7 +185,7 @@ protected: // should only be used as part of ini::CParser
 	}
 
 	void
-	setLineCol (const lex::CLineCol& lineCol)
+	setLineCol (const lex::LineCol& lineCol)
 	{
 		setLineCol (lineCol.m_line, lineCol.m_col);
 	}

@@ -11,20 +11,20 @@
 namespace axl {
 namespace rtl {
 
-template <typename T> class CStringT;
-typedef CStringT <char> CString;
+template <typename T> class StringBase;
+typedef StringBase <char> String;
 
 //.............................................................................
 
-enum EGuidStringFlag
+enum GuidStringFlagKind
 {
-	EGuidStringFlag_UpperCase   = 0x01,
-	EGuidStringFlag_CurlyBraces = 0x02,
+	GuidStringFlagKind_UpperCase   = 0x01,
+	GuidStringFlagKind_CurlyBraces = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TGuid
+struct Guid
 {
 	union
 	{
@@ -50,25 +50,25 @@ struct TGuid
 	};
 
 	bool
-	operator == (const TGuid& guid) const
+	operator == (const Guid& guid) const
 	{
 		return isEqual (guid);
 	}
 
 	bool
-	operator != (const TGuid& guid) const
+	operator != (const Guid& guid) const
 	{
 		return !isEqual (guid);
 	}
 
 	int
-	cmp (const TGuid& guid) const
+	cmp (const Guid& guid) const
 	{
-		return memcmp (this, &guid, sizeof (TGuid));
+		return memcmp (this, &guid, sizeof (Guid));
 	}
 
 	bool
-	isEqual (const TGuid& guid) const
+	isEqual (const Guid& guid) const
 	{
 		return
 			m_long1 == guid.m_long1 &&
@@ -77,7 +77,7 @@ struct TGuid
 			m_long4 == guid.m_long4;
 	}
 
-	rtl::CString
+	rtl::String
 	getGuidString (uint_t flags = 0) const;
 
 	void
@@ -118,7 +118,7 @@ struct TGuid
 //.............................................................................
 
 inline
-TGuid
+Guid
 buildGuid (
 	uint32_t l,
 	uint16_t s1,
@@ -133,25 +133,25 @@ buildGuid (
 	uint8_t b8
 	)
 {
-	TGuid guid;
+	Guid guid;
 	guid.setup (l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8);
 	return guid;
 }
 
 inline
-TGuid
+Guid
 parseGuid (const char* string)
 {
-	TGuid guid;
+	Guid guid;
 	guid.parse (string);
 	return guid;
 }
 
 inline
-TGuid
+Guid
 generateGuid ()
 {
-	TGuid guid;
+	Guid guid;
 	guid.generate ();
 	return guid;
 }
@@ -164,7 +164,7 @@ generateGuid ()
 	{ { { l, s1, s2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } } } }
 
 #define AXL_RTL_DEFINE_GUID(n, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
-	extern AXL_SELECT_ANY const axl::rtl::TGuid n = \
+	extern AXL_SELECT_ANY const axl::rtl::Guid n = \
 		AXL_RTL_GUID_INITIALIZER (l, s1, s2, b1, b2,  b3,  b4,  b5,  b6,  b7,  b8)
 
 AXL_RTL_DEFINE_GUID (GUID_Null, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);

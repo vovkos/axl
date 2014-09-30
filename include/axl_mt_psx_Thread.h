@@ -14,18 +14,18 @@ namespace psx {
 
 //.............................................................................
 
-class CThreadAttr
+class ThreadAttr
 {
 protected:
 	pthread_attr_t m_attr;
 	
 public:
-	CThreadAttr ()
+	ThreadAttr ()
 	{
 		pthread_attr_init (&m_attr);
 	}
 
-	~CThreadAttr ()
+	~ThreadAttr ()
 	{
 		pthread_attr_destroy (&m_attr);
 	}
@@ -77,19 +77,19 @@ typedef void* (FThreadProc) (void* context);
 
 //.............................................................................
 
-class CThread
+class Thread
 {
 protected:
 	pthread_t m_threadId;
 	bool m_isOpen;
 	
 public:
-	CThread ()
+	Thread ()
 	{
 		m_isOpen = false;
 	}
 	
-	~CThread ()
+	~Thread ()
 	{
 		detach ();
 	}

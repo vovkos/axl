@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class CThread: public CWaitableHandle
+class Thread: public WaitableHandle
 {
 public:
 	bool 

@@ -22,11 +22,11 @@ AXL_RTL_DEFINE_GUID (
 
 //.............................................................................
 
-class CErrnoProvider: public CErrorProvider
+class ErrnoProvider: public ErrorProvider
 {
 public:
 	static
-	rtl::CString
+	rtl::String
 	getErrorDescription (int code)
 	{
 		char buffer [512] = { 0 };
@@ -39,8 +39,8 @@ public:
 	}
 
 	virtual
-	rtl::CString
-	getErrorDescription (const TError* error)
+	rtl::String
+	getErrorDescription (const ErrorData* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -48,29 +48,29 @@ public:
 
 //.............................................................................
 
-class CErrno: public CError
+class Errno: public Error
 {
 public:
-	CErrno ()
+	Errno ()
 	{
 	}
 
-	CErrno (int code)
+	Errno (int code)
 	{
 		create (code);
 	}
 
-	TError*
+	ErrorData*
 	create (int code);
 };
 
 //.............................................................................
 
 inline
-CError
+Error
 setErrno (int code)
 {
-	setError (CErrno (code));
+	setError (Errno (code));
 }
 
 //.............................................................................

@@ -6,7 +6,7 @@ namespace test_Packetizer {
 
 //.............................................................................
 
-class CMyPacketizer: public rtl::CPacketizerT <CMyPacketizer>
+class MyPacketizer: public rtl::Packetizer <MyPacketizer>
 {
 public:
 	void
@@ -24,7 +24,7 @@ run ()
 {
 	printf ("test_Packetizer::Run ()\n");
 
-	CMyPacketizer packetizer;
+	MyPacketizer packetizer;
 
 	char data [] = "papapaapak:\xf\0\0\0pizda ivanovna";
 
@@ -50,7 +50,7 @@ run ()
 		printf ("complete (%d, %d chunks).\n", i, j);
 	}
 	
-	rtl::CString s = "dsjsdljsdkl";
+	rtl::String s = "dsjsdljsdkl";
 	s.clear ();
 
 	printf ("done.\n");

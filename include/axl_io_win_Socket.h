@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class CCloseSocket
+class CloseSocket
 {
 public:
 	void
@@ -27,7 +27,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CSocket: public rtl::CHandleT <SOCKET, CCloseSocket, rtl::CMinusOneT <SOCKET> >
+class Socket: public rtl::Handle <SOCKET, CloseSocket, rtl::MinusOne <SOCKET> >
 {
 public:
 	bool

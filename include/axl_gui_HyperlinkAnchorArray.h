@@ -15,12 +15,12 @@ namespace gui {
 	
 //.............................................................................
 
-struct THyperlinkAnchor: rtl::TListLink
+struct HyperlinkAnchor: rtl::ListLink
 {
 	size_t m_offset;
-	rtl::CString m_hyperlink;
+	rtl::String m_hyperlink;
 
-	THyperlinkAnchor ()
+	HyperlinkAnchor ()
 	{
 		m_offset = 0;
 	}
@@ -28,11 +28,11 @@ struct THyperlinkAnchor: rtl::TListLink
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CHyperlinkAnchorArray
+class HyperlinkAnchorArray
 {
 protected:
-	rtl::CStdListT <THyperlinkAnchor> m_list;
-	rtl::CArrayT <THyperlinkAnchor*> m_array;
+	rtl::StdList <HyperlinkAnchor> m_list;
+	rtl::Array <HyperlinkAnchor*> m_array;
 
 public:
 	bool
@@ -47,13 +47,13 @@ public:
 		return m_list.getCount ();
 	}
 
-	rtl::CIteratorT <THyperlinkAnchor> 
+	rtl::Iterator <HyperlinkAnchor> 
 	getHead () const
 	{
 		return m_list.getHead ();
 	}
 
-	rtl::CIteratorT <THyperlinkAnchor> 
+	rtl::Iterator <HyperlinkAnchor> 
 	getTail () const
 	{
 		return m_list.getHead ();
@@ -66,17 +66,17 @@ public:
 		m_array.clear ();	
 	}
 
-	THyperlinkAnchor* 
+	HyperlinkAnchor* 
 	find (size_t offset) const;
 
-	THyperlinkAnchor* 
+	HyperlinkAnchor* 
 	openHyperlink (
 		size_t offset, 
 		const char* hyperlink, 
 		size_t length = -1
 		);
 
-	THyperlinkAnchor* 
+	HyperlinkAnchor* 
 	closeHyperlink (size_t offset)
 	{
 		return openHyperlink (offset, NULL, 0);

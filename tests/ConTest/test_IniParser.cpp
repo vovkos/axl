@@ -6,47 +6,47 @@ namespace test_IniParser {
 
 //.............................................................................
 
-class CMyParser: public ini::CParserT <CMyParser>
+class MyParser: public ini::Parser <MyParser>
 {
 protected:
-	enum ESection
+	enum SectionKind
 	{
-		ESection_Undefined,
-		ESection_Session,
-		ESection_Scripts,
+		SectionKind_Undefined,
+		SectionKind_Session,
+		SectionKind_Scripts,
 	};
 
-	enum EKey
+	enum KeyKind
 	{
-		EKey_Undefined,
-		EKey_Name,
-		EKey_Description,
-		EKey_Guid,
-		EKey_Icon,
-		EKey_LogRepresenterClass,
-		EKey_SessionClass,
+		KeyKind_Undefined,
+		KeyKind_Name,
+		KeyKind_Description,
+		KeyKind_Guid,
+		KeyKind_Icon,
+		KeyKind_LogRepresenterClass,
+		KeyKind_SessionClass,
 	};
 
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (CSectionNameMap, ESection)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session", ESection_Session)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("scripts", ESection_Scripts)
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (SectionNameMap, SectionKind)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session", SectionKind_Session)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("scripts", SectionKind_Scripts)
 	AXL_RTL_END_HASH_TABLE_MAP ()
 
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (CKeyNameMap, EKey)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("name", EKey_Name)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("description", EKey_Description)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("guid", EKey_Guid)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("icon", EKey_Icon)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session-class", EKey_SessionClass)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("log-representer-class", EKey_LogRepresenterClass)
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (KeyNameMap, KeyKind)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("name", KeyKind_Name)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("description", KeyKind_Description)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("guid", KeyKind_Guid)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("icon", KeyKind_Icon)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session-class", KeyKind_SessionClass)
+		AXL_RTL_HASH_TABLE_MAP_ENTRY ("log-representer-class", KeyKind_LogRepresenterClass)
 	AXL_RTL_END_HASH_TABLE_MAP ()
 
 public:
 	bool 
 	onSection (const char* name)
 	{
-		CSectionNameMap::CIterator it = CSectionNameMap::find (name);
-		ESection section = it ? it->m_value : ESection_Undefined;
+		SectionNameMap::Iterator it = SectionNameMap::find (name);
+		SectionKind section = it ? it->m_value : SectionKind_Undefined;
 		printf ("OnSection '%s'\n", name);
 		return true;
 	}
@@ -57,8 +57,8 @@ public:
 		const char* value
 		)
 	{
-		CKeyNameMap::CIterator it = CKeyNameMap::find (name);
-		EKey key = it ? it->m_value : EKey_Undefined;
+		KeyNameMap::Iterator it = KeyNameMap::find (name);
+		KeyKind key = it ? it->m_value : KeyKind_Undefined;
 		printf ("OnKeyValue '%s' = '%s'\n", name, value);
 		return true;
 	}
@@ -71,8 +71,8 @@ run ()
 
 	const char* filePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
 
-	io::CMappedFile file;
-	result = file.open (filePath, io::EFileFlag_ReadOnly);
+	io::MappedFile file;
+	result = file.open (filePath, io::FileFlagKind_ReadOnly);
 	if (!result)
 	{
 		printf ("error opening file: %s\n", err::getError ()->getDescription ().cc ());
@@ -82,7 +82,7 @@ run ()
 	const char* p = (const char*) file.view ();
 	uint64_t size = file.getSize ();
 
-	CMyParser parser;
+	MyParser parser;
 	result = parser.parse (filePath, p, (size_t) size);
 	if (!result)
 	{

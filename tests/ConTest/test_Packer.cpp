@@ -9,14 +9,14 @@ namespace test_Packer {
 void 
 run ()
 {
-	ref::CPtrT <exe::CArgBlock> argBlock = exe::createArgBlock <exe::CArgT <const char*> > (0, "hui govno i muravei");
+	ref::Ptr <exe::ArgBlock> argBlock = exe::createArgBlock <exe::Arg <const char*> > (0, "hui govno i muravei");
 
-	ref::CPtrT <mem::TBlock> package = rtl::formatPackage(
+	ref::Ptr <mem::Block> package = rtl::formatPackage(
 		"%s %d %s %d",
 		"hui", 10, "govno", 20
 		);
 
-	rtl::CUnpacker unpacker (package->m_p, package->m_size);
+	rtl::Unpacker unpacker (package->m_p, package->m_size);
 	
 	const char* s1;	
 	long l1;	

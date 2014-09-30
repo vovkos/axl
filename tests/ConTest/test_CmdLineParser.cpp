@@ -6,26 +6,26 @@ namespace test_CmdLineParser {
 
 //.............................................................................
 
-enum ESwitch
+enum SwitchKind
 {
-	ESwitch_Help,
-	ESwitch_SessionProvider,
-	ESwitch_SessionFile,
-	ESwitch_LogFile,
+	SwitchKind_Help,
+	SwitchKind_SessionProvider,
+	SwitchKind_SessionFile,
+	SwitchKind_LogFile,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE (CSwitchTable, ESwitch)
-	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_Help, "h", "help", NULL, "Display help")
-	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
-	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_SessionFile, "f", "session-file", "<file>", "Specify session file")
-	AXL_RTL_CMD_LINE_SWITCH_2 (ESwitch_LogFile, "l", "log-file", "<file>", "Specify log file")
+AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE (Switchable, SwitchKind)
+	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_Help, "h", "help", NULL, "Display help")
+	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
+	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
+	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
 AXL_RTL_END_CMD_LINE_SWITCH_TABLE ()
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMyParser: public rtl::CCmdLineParserT <CMyParser, CSwitchTable>
+class MyParser: public rtl::CmdLineParser <MyParser, Switchable>
 {
 public:
 	bool
@@ -37,7 +37,7 @@ public:
 
 	bool 
 	onSwitch (
-		ESwitch switch,
+		SwitchKind switch,
 		const char* value
 		)
 	{
@@ -59,7 +59,7 @@ run ()
 		"-l=serial_ssn.njlog",
 	};
 
-	CMyParser parser;
+	MyParser parser;
 	parser.parse ((int) countof (cmdLine), cmdLine);
 
 }

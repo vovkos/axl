@@ -27,13 +27,13 @@ buildLogFont (
 inline
 bool
 getLogFontFromFontDesc (
-	const TFontDesc& fontDesc,
+	const FontDesc& fontDesc,
 	LOGFONTW* logFont
 	)
 {
 	return buildLogFont (
 		logFont,
-		rtl::CString_w (fontDesc.m_faceName), 
+		rtl::String_w (fontDesc.m_faceName), 
 		fontDesc.m_pointSize, 
 		fontDesc.m_flags
 		);
@@ -48,19 +48,19 @@ modifyLogFont (
 bool
 getFontDescFromLogFont (
 	const LOGFONTW* logFont,
-	TFontDesc* fontDesc
+	FontDesc* fontDesc
 	);
 
 //.............................................................................
 
-class CGdiFont: 
-	public CFont,
-	public CGdiObjectHandleT <HFONT>
+class GdiFont: 
+	public Font,
+	public GdiObjectHandle <HFONT>
 {
-	friend class CGdiEngine;
+	friend class GdiEngine;
 
 public:
-	CGdiFont ();
+	GdiFont ();
 
 	bool
 	getLogFont (LOGFONTW* logFont);
@@ -70,21 +70,21 @@ public:
 	isMonospace ();
 
 	virtual
-	TSize
+	Size
 	calcTextSize_utf8 (
 		const utf8_t* text,
 		size_t length = -1
 		);
 
 	virtual
-	TSize
+	Size
 	calcTextSize_utf16 (
 		const utf16_t* text,
 		size_t length = -1
 		);
 
 	virtual
-	TSize
+	Size
 	calcTextSize_utf32 (
 		const utf32_t* text,
 		size_t length = -1
@@ -93,7 +93,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CFontTupleT <CGdiFont> CGdiFontTuple;
+typedef FontTuple <GdiFont> GdiFontuple;
 
 //.............................................................................
 

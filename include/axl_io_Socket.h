@@ -17,22 +17,22 @@ namespace io {
 
 //.............................................................................
 
-enum ESocketShutdown
+enum SocketShutdownKind
 {
-	ESocketShutdown_Recv,
-	ESocketShutdown_Send,
-	ESocketShutdown_All,
+	SocketShutdownKind_Recv,
+	SocketShutdownKind_Send,
+	SocketShutdownKind_All,
 };
 
 //.............................................................................
 
-class CSocket
+class Socket
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CSocket m_socket;
+	win::Socket m_socket;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CSocket m_socket;
+	psx::Socket m_socket;
 #endif
 
 public:
@@ -124,7 +124,7 @@ public:
 
 	bool
 	accept (
-		CSocket* socket,
+		Socket* socket,
 		sockaddr* addr = NULL
 		);
 
@@ -135,7 +135,7 @@ public:
 	}
 
 	bool
-	shutdown (ESocketShutdown shutdownKind = ESocketShutdown_All)
+	shutdown (SocketShutdownKind shutdownKind = SocketShutdownKind_All)
 	{
 		return m_socket.shutdown (shutdownKind);
 	}

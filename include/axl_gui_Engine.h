@@ -17,47 +17,47 @@
 namespace axl {
 namespace gui {
 
-class CWidget;
+class Widget;
 
 //.............................................................................
 
-enum EEngine
+enum EngineKind
 {
-	EEngine_Undefined = 0,
-	EEngine_Gdi,
-	EEngine_Qt,
-	EEngine_Gtk,
+	EngineKind_Undefined = 0,
+	EngineKind_Gdi,
+	EngineKind_Qt,
+	EngineKind_Gtk,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
-getEngineKindString (EEngine engineKind);
+getEngineKindString (EngineKind engineKind);
 
 //.............................................................................
 
-class CEngine
+class Engine
 {
 protected:
-	struct TSharedOffscreenCanvas
+	struct SharedOffscreenCanvas
 	{
-		TSize m_size;
-		ref::CPtrT <CCanvas> m_canvas;
+		Size m_size;
+		ref::Ptr <Canvas> m_canvas;
 	};
 
 protected:
-	EEngine m_engineKind;
-	ref::CPtrT <CFont> m_stdFontArray [EStdFont__Count];
-	ref::CPtrT <CCursor> m_stdCursorArray [EStdCursor__Count];
-	TSharedOffscreenCanvas m_sharedOffscreenCanvasArray [EFormFactor__Count];
+	EngineKind m_engineKind;
+	ref::Ptr <Font> m_stdFontArray [StdFontKind__Count];
+	ref::Ptr <Cursor> m_stdCursorArray [StdCursorKind__Count];
+	SharedOffscreenCanvas m_sharedOffscreenCanvasArray [FormFactorKind__Count];
 
 public:
-	CEngine ()
+	Engine ()
 	{
-		m_engineKind = EEngine_Undefined;
+		m_engineKind = EngineKind_Undefined;
 	}
 
-	EEngine
+	EngineKind
 	getEngineKind ()
 	{
 		return m_engineKind;
@@ -65,19 +65,19 @@ public:
 
 	// fonts
 
-	CFont*
-	getStdFont (EStdFont fontKind);
+	Font*
+	getStdFont (StdFontKind fontKind);
 
 	virtual
-	ref::CPtrT <CFont>
+	ref::Ptr <Font>
 	createFont (
 		const char* faceName,
 		size_t pointSize,
 		uint_t flags = 0
 		) = 0;
 
-	ref::CPtrT <CFont>
-	createFont (const TFontDesc& fontDesc)
+	ref::Ptr <Font>
+	createFont (const FontDesc& fontDesc)
 	{
 		return createFont (
 			fontDesc.m_faceName,
@@ -88,28 +88,28 @@ public:
 
 	// cursors
 
-	CCursor*
-	getStdCursor (EStdCursor cursorKind);
+	Cursor*
+	getStdCursor (StdCursorKind cursorKind);
 
 	// images
 
 	virtual
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage () = 0;
 
 	virtual
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage (
 		int width,
 		int height,
-		EPixelFormat pixelFormat,
+		PixelFormatKind pixelFormat,
 		const void* data,
 		bool isScreenCompatible = true
 		) = 0;
 
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage (
-		const TImageDesc& imageDesc,
+		const ImageDesc& imageDesc,
 		bool isScreenCompatible = true
 		)
 	{
@@ -125,14 +125,14 @@ public:
 	// offscreen canvas
 
 	virtual
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	createOffscreenCanvas (
 		int width,
 		int height
 		) = 0;
 
-	ref::CPtrT <CCanvas>
-	createOffscreenCanvas (const TSize& size)
+	ref::Ptr <Canvas>
+	createOffscreenCanvas (const Size& size)
 	{
 		return createOffscreenCanvas (
 			size.m_width,
@@ -140,14 +140,14 @@ public:
 			);
 	}
 
-	CCanvas*
+	Canvas*
 	getSharedOffscreenCanvas (
 		int width,
 		int height
 		);
 
-	CCanvas*
-	getSharedOffscreenCanvas (const TSize& size)
+	Canvas*
+	getSharedOffscreenCanvas (const Size& size)
 	{
 		return getSharedOffscreenCanvas (
 			size.m_width,
@@ -162,31 +162,31 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const rtl::CString& formatName) = 0;
+	registerClipboardFormat (const rtl::String& formatName) = 0;
 
 	virtual
 	bool
-	readClipboard (rtl::CString* string) = 0;
+	readClipboard (rtl::String* string) = 0;
 
 	virtual
 	bool
 	readClipboard (
 		uintptr_t format,
-		rtl::CArrayT <char>* data
+		rtl::Array <char>* data
 		) = 0;
 
-	rtl::CString
+	rtl::String
 	readClipboard ()
 	{
-		rtl::CString string;
+		rtl::String string;
 		readClipboard (&string);
 		return string;
 	}
 
-	rtl::CArrayT <char>
+	rtl::Array <char>
 	readClipboard (uintptr_t format)
 	{
-		rtl::CArrayT <char> data;
+		rtl::Array <char> data;
 		readClipboard (format, &data);
 		return data;
 	}
@@ -207,7 +207,7 @@ public:
 		) = 0;
 
 	bool
-	writeClipboard (const rtl::CString& string)
+	writeClipboard (const rtl::String& string)
 	{
 		return writeClipboard (string, string.getLength ());
 	}
@@ -215,7 +215,7 @@ public:
 	bool
 	writeClipboard (
 		uintptr_t format,
-		const rtl::CArrayT <char>& data
+		const rtl::Array <char>& data
 		)
 	{
 		return writeClipboard (format, data, data.getCount ());
@@ -230,8 +230,8 @@ public:
 	virtual
 	bool
 	showCaret (
-		CWidget* widget,
-		const TRect& rect
+		Widget* widget,
+		const Rect& rect
 		) = 0;
 
 	virtual
@@ -239,22 +239,22 @@ public:
 	hideCaret () = 0;
 
 protected:
-	friend class CFont;
+	friend class Font;
 
 	virtual
-	CFont*
+	Font*
 	getFontMod (
-		CFont* baseFont,
+		Font* baseFont,
 		uint_t flags
 		) = 0;
 
 	virtual
-	ref::CPtrT <CFont>
-	createStdFont (EStdFont fontKind) = 0;
+	ref::Ptr <Font>
+	createStdFont (StdFontKind fontKind) = 0;
 
 	virtual
-	ref::CPtrT <CCursor>
-	createStdCursor (EStdCursor cursorKind) = 0;
+	ref::Ptr <Cursor>
+	createStdCursor (StdCursorKind cursorKind) = 0;
 };
 
 //.............................................................................

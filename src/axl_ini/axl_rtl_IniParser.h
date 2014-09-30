@@ -13,30 +13,30 @@ namespace rtl {
 
 //.............................................................................
 
-class CIniParserRoot
+class IniParserRoot
 {
 protected:
-	enum EState 
+	enum StateKind 
 	{
-		EState_Space = 0,
-		EState_Comment,
-		EState_Section,
-		EState_Key,
-		EState_Value,
+		StateKind_Space = 0,
+		StateKind_Comment,
+		StateKind_Section,
+		StateKind_Key,
+		StateKind_Value,
 	};
 
-	enum ELine
+	enum LineKind
 	{
-		ELine_Empty,
-		ELine_Error,
-		ELine_Section,
-		ELine_KeyValue,
+		LineKind_Empty,
+		LineKind_Error,
+		LineKind_Section,
+		LineKind_KeyValue,
 	};
 
 	uint_t m_line;
 
 protected:
-	CIniParserRoot ()
+	IniParserRoot ()
 	{
 		m_line = 0;
 	}
@@ -45,9 +45,9 @@ protected:
 	parseLine (
 		const char* p,
 		size_t length,
-		ELine* lineKind,
-		rtl::CString* string1,
-		rtl::CString* string2,
+		LineKind* lineKind,
+		rtl::String* string1,
+		rtl::String* string2,
 		size_t* lineLength
 		);
 };
@@ -55,7 +55,7 @@ protected:
 //.............................................................................
 
 template <typename T>
-class CIniParserT: public CIniParserRoot
+class IniParser: public IniParserRoot
 {
 public:
 	bool
@@ -71,12 +71,12 @@ public:
 		const char* end = p + length;
 		m_line = 0;
 
-		rtl::CString string1;
-		rtl::CString string2;
+		rtl::String string1;
+		rtl::String string2;
 
 		for (; p < end; p++)
 		{
-			ELine lineKind;
+			LineKind lineKind;
 			size_t lineLength 
 
 			bool result = parseLine (p, end - p, &lineKind, &string1, &string2, &lineLength);
@@ -146,35 +146,35 @@ parseIniA(
 
 //.............................................................................
 
-class CIniParser
+class IniParser
 {
 protected:
-	struct TKeyHandler: axl::rtl::TListEntry
+	struct KeyHandler: axl::rtl::ListEntry
 	{
-		axl::rtl::CString m_keyName;
+		axl::rtl::String m_keyName;
 		FOnKeyValue m_pfnOnKeyValue;
 		void* m_context;
 	};
 
-	struct TSection: axl::rtl::TListEntry
+	struct Section: axl::rtl::ListEntry
 	{
-		axl::rtl::CString m_sectionName;
-		axl::rtl::CListT<TKeyHandler> m_keyHandlerList;
-		axl::rtl::CRbTree m_keyHandlerMap;
+		axl::rtl::String m_sectionName;
+		axl::rtl::List<KeyHandler> m_keyHandlerList;
+		axl::rtl::Rbree m_keyHandlerMap;
 		void* m_context;
 
-		TSection(): 
+		Section(): 
 			m_keyHandlerMap(axl_rtl_CmpStringI) 
 			{ m_context = NULL; }
 	};
 
 protected:
-	axl::rtl::CListT<TSection> m_sectionList;
-	axl::rtl::CRbTree m_sectionMap;
-	TSection* m_currentSection;
+	axl::rtl::List<Section> m_sectionList;
+	axl::rtl::Rbree m_sectionMap;
+	Section* m_currentSection;
 
 public:
-	CIniParser():
+	IniParser():
 		m_sectionMap(axl_rtl_CmpStringI) 
 		{ m_currentSection = NULL; }
 

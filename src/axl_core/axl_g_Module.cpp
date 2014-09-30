@@ -7,7 +7,7 @@ namespace g {
 
 //.............................................................................
 
-CModule::CModule ()
+Module::Module ()
 {	
 #ifdef _DEBUG
 #	ifdef _AXL_MODULE_TAG
@@ -35,11 +35,11 @@ CModule::CModule ()
 #endif	
 }
 
-CModule::~CModule ()
+Module::~Module ()
 {
 	while (!m_finalizerList.isEmpty ())
 	{
-		CFinalizerEntry* finalizerEntry = m_finalizerList.removeTail ();
+		FinalizerEntry* finalizerEntry = m_finalizerList.removeTail ();
 		finalizerEntry->m_finalizer->finalize ();
 		AXL_MEM_DELETE (finalizerEntry);
 	}
@@ -48,9 +48,9 @@ CModule::~CModule ()
 }
 
 bool 
-CModule::addFinalizer (const ref::CPtrT <CFinalizer>& finalizer)
+Module::addFinalizer (const ref::Ptr <Finalizer>& finalizer)
 {
-	CFinalizerEntry* finalizerEntry = AXL_MEM_NEW (CFinalizerEntry);
+	FinalizerEntry* finalizerEntry = AXL_MEM_NEW (FinalizerEntry);
 	finalizerEntry->m_finalizer = finalizer;
 
 	m_finalizerListLock.lock ();

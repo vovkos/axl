@@ -6,7 +6,7 @@ namespace rtl {
 
 //.............................................................................
 
-CBmhFind::CBmhFind ()
+BmhFind::BmhFind ()
 {
 	m_patternSize = 0;
 	m_incFindOffset = 0;
@@ -15,7 +15,7 @@ CBmhFind::CBmhFind ()
 }
 
 void
-CBmhFind::clear ()
+BmhFind::clear ()
 {
 	m_patternSize = 0;
 	m_incFindOffset = 0;
@@ -24,7 +24,7 @@ CBmhFind::clear ()
 }
 
 bool
-CBmhFind::setPattern (	
+BmhFind::setPattern (	
 	const void* p,
 	size_t size,
 	bool doMatchCase
@@ -53,7 +53,7 @@ CBmhFind::setPattern (
 }
 
 size_t 
-CBmhFind::find (
+BmhFind::find (
 	const void* _p,
 	size_t size
 	)
@@ -83,7 +83,7 @@ CBmhFind::find (
 }
 
 size_t
-CBmhFind::reverseFind (	
+BmhFind::reverseFind (	
 	const void* _p,
 	size_t size
 	)
@@ -109,7 +109,7 @@ CBmhFind::reverseFind (
 }
 
 size_t
-CBmhFind::incrementalFind (	
+BmhFind::incrementalFind (	
 	const void* _p,
 	size_t size
 	)
@@ -163,7 +163,7 @@ CBmhFind::incrementalFind (
 }
 
 size_t
-CBmhFind::reverseIncrementalFind (	
+BmhFind::reverseIncrementalFind (	
 	const void* _p,
 	size_t size
 	)
@@ -220,7 +220,7 @@ CBmhFind::reverseIncrementalFind (
 }
 
 void 
-CBmhFind::rebuildTables ()
+BmhFind::rebuildTables ()
 {
 	size_t i;
 	size_t m = m_patternSize - 1;
@@ -261,7 +261,7 @@ CBmhFind::rebuildTables ()
 // the following 4 helpers return offset of a mismatch or -1 if argument matches the pattern
 
 size_t
-CBmhFind::cmpPattern (uchar_t* _p)
+BmhFind::cmpPattern (uchar_t* _p)
 {
 	uchar_t* p1 = m_buffer + m_patternSize - 1; 
 	uchar_t* p2 = _p + m_patternSize - 1; 
@@ -283,7 +283,7 @@ CBmhFind::cmpPattern (uchar_t* _p)
 }
 
 size_t
-CBmhFind::reverseCmpPattern (uchar_t* _p)
+BmhFind::reverseCmpPattern (uchar_t* _p)
 {
 	uchar_t* p1 = m_buffer;
 	uchar_t* p2 = _p;
@@ -306,7 +306,7 @@ CBmhFind::reverseCmpPattern (uchar_t* _p)
 }
 
 size_t
-CBmhFind::incrementalCmpPattern (	
+BmhFind::incrementalCmpPattern (	
 	uchar_t* _p,
 	size_t i
 	)
@@ -349,7 +349,7 @@ CBmhFind::incrementalCmpPattern (
 }
 
 size_t
-CBmhFind::reverseIncrementalCmpPattern (	
+BmhFind::reverseIncrementalCmpPattern (	
 	uchar_t* _p,
 	size_t size,
 	size_t i
@@ -403,7 +403,7 @@ CBmhFind::reverseIncrementalCmpPattern (
 // the following 2 helpers are used to update the state of incremental-find tail
 
 void
-CBmhFind::updateIncrementalTail (	
+BmhFind::updateIncrementalTail (	
 	uchar_t* p,
 	size_t size,
 	size_t tailSize
@@ -446,7 +446,7 @@ CBmhFind::updateIncrementalTail (
 }
 
 void
-CBmhFind::updateReverseIncrementalTail (	
+BmhFind::updateReverseIncrementalTail (	
 	uchar_t* p,
 	size_t size,
 	size_t tailSize

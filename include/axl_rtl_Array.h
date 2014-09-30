@@ -16,7 +16,7 @@ namespace rtl {
 // general case: full cycle of construction, copy, destruction
 
 template <typename T>
-class CArrayDetailsT
+class ArrayDetails
 {
 public:
 	static 
@@ -116,7 +116,7 @@ public:
 // fast memory block operations for types that do not need ctor/dtor
 
 template <typename T>
-class CSimpleArrayDetailsT
+class SimpleArrayDetails
 {
 public:
 	static 
@@ -176,62 +176,62 @@ public:
 // specialization for simple types
 
 template <>
-class CArrayDetailsT <char>: public CSimpleArrayDetailsT <char>
+class ArrayDetails <char>: public SimpleArrayDetails <char>
 {
 };
 
 template <>
-class CArrayDetailsT <wchar_t>: public CSimpleArrayDetailsT <wchar_t>
+class ArrayDetails <wchar_t>: public SimpleArrayDetails <wchar_t>
 {
 };
 
 template <>
-class CArrayDetailsT <float>: public CSimpleArrayDetailsT <float>
+class ArrayDetails <float>: public SimpleArrayDetails <float>
 {
 };
 
 template <>
-class CArrayDetailsT <double>: public CSimpleArrayDetailsT <double>
+class ArrayDetails <double>: public SimpleArrayDetails <double>
 {
 };
 
 template <>
-class CArrayDetailsT <int8_t>: public CSimpleArrayDetailsT <int8_t>
+class ArrayDetails <int8_t>: public SimpleArrayDetails <int8_t>
 {
 };
 
 template <>
-class CArrayDetailsT <uint8_t>: public CSimpleArrayDetailsT <uint8_t>
+class ArrayDetails <uint8_t>: public SimpleArrayDetails <uint8_t>
 {
 };
 
 template <>
-class CArrayDetailsT <int16_t>: public CSimpleArrayDetailsT <int16_t>
+class ArrayDetails <int16_t>: public SimpleArrayDetails <int16_t>
 {
 };
 
 template <>
-class CArrayDetailsT <uint16_t>: public CSimpleArrayDetailsT <uint16_t>
+class ArrayDetails <uint16_t>: public SimpleArrayDetails <uint16_t>
 {
 };
 
 template <>
-class CArrayDetailsT <int32_t>: public CSimpleArrayDetailsT <int32_t>
+class ArrayDetails <int32_t>: public SimpleArrayDetails <int32_t>
 {
 };
 
 template <>
-class CArrayDetailsT <uint32_t>: public CSimpleArrayDetailsT <uint32_t>
+class ArrayDetails <uint32_t>: public SimpleArrayDetails <uint32_t>
 {
 };
 
 template <>
-class CArrayDetailsT <int64_t>: public CSimpleArrayDetailsT <int64_t>
+class ArrayDetails <int64_t>: public SimpleArrayDetails <int64_t>
 {
 };
 
 template <>
-class CArrayDetailsT <uint64_t>: public CSimpleArrayDetailsT <uint64_t>
+class ArrayDetails <uint64_t>: public SimpleArrayDetails <uint64_t>
 {
 };
 
@@ -240,7 +240,7 @@ class CArrayDetailsT <uint64_t>: public CSimpleArrayDetailsT <uint64_t>
 // specialization for pointers
 
 template <typename T>
-class CArrayDetailsT <T*>: public CSimpleArrayDetailsT <T*>
+class ArrayDetails <T*>: public SimpleArrayDetails <T*>
 {
 };
 
@@ -248,22 +248,22 @@ class CArrayDetailsT <T*>: public CSimpleArrayDetailsT <T*>
 
 template <
 	typename T,
-	typename TDetails = CArrayDetailsT <T>
+	typename Details = ArrayDetails <T>
 	>
-class CArrayT
+class Array
 {
 public:
-	typedef TDetails CDetails;
+	typedef Details Details;
 	
-	class CHdr: public ref::CRefCount
+	class Hdr: public ref::RefCount
 	{
 	public:
 		size_t m_maxCount;
 		size_t m_count;
 
-		~CHdr ()
+		~Hdr ()
 		{
-			CDetails::destruct ((T*) (this + 1), m_count);
+			Details::destruct ((T*) (this + 1), m_count);
 		}
 	};
 
@@ -271,24 +271,24 @@ protected:
 	T* m_p;
 
 public:
-	CArrayT ()
+	Array ()
 	{ 
 		m_p = NULL;
 	}
 
-	CArrayT (T e)
+	Array (T e)
 	{ 
 		m_p = NULL;
 		copy (&e, 1);
 	}
 
-	CArrayT (const CArrayT& src)
+	Array (const Array& src)
 	{   
 		m_p = NULL;
 		copy (src); 
 	}
 
-	CArrayT (
+	Array (
 		const T* p, 
 		size_t count
 		)
@@ -297,8 +297,8 @@ public:
 		copy (p, count); 
 	}
 
-	CArrayT (
-		ref::EBuf bufKind,
+	Array (
+		ref::BufKind bufKind,
 		void* p, 
 		size_t size
 		)
@@ -307,7 +307,7 @@ public:
 		setBuffer (bufKind, p, size);
 	}
 
-	~CArrayT ()
+	~Array ()
 	{
 		release ();
 	}
@@ -322,8 +322,8 @@ public:
 		return m_p; 
 	}
 
-	CArrayT& 
-	operator = (const CArrayT& src)
+	Array& 
+	operator = (const Array& src)
 	{ 
 		copy (src);
 		return *this;
@@ -407,7 +407,7 @@ public:
 	}
 
 	bool
-	copy (const CArrayT& src)
+	copy (const Array& src)
 	{ 
 		if (m_p == src.m_p)
 			return true;
@@ -447,7 +447,7 @@ public:
 		if (!result)
 			return false;
 
-		CDetails::copy (m_p, p, count);
+		Details::copy (m_p, p, count);
 		return true;
 	}
 
@@ -482,7 +482,7 @@ public:
 	}
 
 	T*
-	append (const CArrayT& src)
+	append (const Array& src)
 	{ 
 		return insert (-1, src, src.getCount ()); 
 	}
@@ -504,7 +504,7 @@ public:
 		T* dst = m_p + index;
 
 		if (count && index < oldCount)
-			CDetails::copy (dst + count, dst, oldCount - index);
+			Details::copy (dst + count, dst, oldCount - index);
 
 		return dst;
 	}
@@ -519,9 +519,9 @@ public:
 		T* dst = insertSpace (index, count);
 
 		if (p)
-			CDetails::copy (dst, p, count);
+			Details::copy (dst, p, count);
 		else
-			CDetails::clear (dst, count);
+			Details::clear (dst, count);
 
 		return dst;
 	}
@@ -556,7 +556,7 @@ public:
 	T* 
 	insert (
 		size_t index, 
-		const CArrayT& src
+		const Array& src
 		)
 	{ 
 		return insert (index, src, src.getCount ()); 
@@ -585,7 +585,7 @@ public:
 		size_t newCount = oldCount - count;
 
 		T* dst = m_p + index;
-		CDetails::copy (dst, dst + count, newCount - index);
+		Details::copy (dst, dst + count, newCount - index);
 
 		return setCount (newCount);
 	}
@@ -623,7 +623,7 @@ public:
 
 		if (indexDst + count > oldCount || indexSrc + count > oldCount)
 		{
-			err::setError (err::EStatus_InvalidParameter);
+			err::setError (err::StatusKind_InvalidParameter);
 			return false;
 		}
 
@@ -634,16 +634,16 @@ public:
 		T* dst = m_p + indexDst;
 		T* src = m_p + indexSrc;
 
-		CDetails::constructCopy (temp, src, count);
+		Details::constructCopy (temp, src, count);
 
 		if (indexSrc < indexDst)
-			CDetails::copy (src, src + count, indexDst - indexSrc);
+			Details::copy (src, src + count, indexDst - indexSrc);
 		else
-			CDetails::copy (dst + count, dst, indexSrc - indexDst);
+			Details::copy (dst + count, dst, indexSrc - indexDst);
 
-		CDetails::copy (dst, temp, count);
+		Details::copy (dst, temp, count);
 
-		CDetails::destruct (temp, count);
+		Details::destruct (temp, count);
 		AXL_MEM_FREE (temp);
 
 		return true;
@@ -692,7 +692,7 @@ public:
 		size_t maxCount = rtl::getMinPower2Ge (count);
 		size_t size = maxCount * sizeof (T);
 
-		ref::CPtrT<CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, size);
+		ref::Ptr<Hdr> newHdr = AXL_REF_NEW_EXTRA (Hdr, size);
 		if (!newHdr)
 			return false;
 
@@ -705,7 +705,7 @@ public:
 
 		if (oldCount)
 		{
-			CDetails::constructCopy (p, m_p, oldCount);
+			Details::constructCopy (p, m_p, oldCount);
 			getHdr ()->release ();
 		}
 
@@ -727,7 +727,7 @@ public:
 	bool 
 	setCount (size_t count)
 	{
-		CHdr* oldHdr = getHdr ();
+		Hdr* oldHdr = getHdr ();
 
 		if (oldHdr && oldHdr->getRefCount () == 1)
 		{
@@ -738,9 +738,9 @@ public:
 			{
 				size_t oldCount = oldHdr->m_count;
 				if (count > oldCount)
-					CDetails::construct (m_p + oldCount, count - oldCount);
+					Details::construct (m_p + oldCount, count - oldCount);
 				else
-					CDetails::destruct (m_p + count, oldCount - count);
+					Details::destruct (m_p + count, oldCount - count);
 
 				oldHdr->m_count = count;
 				return true;
@@ -759,7 +759,7 @@ public:
 			if (!result)
 				return false;
 
-			CDetails::construct (m_p, count);
+			Details::construct (m_p, count);
 			getHdr ()->m_count = count;
 			return true;
 		}
@@ -767,7 +767,7 @@ public:
 		size_t maxCount = rtl::getMinPower2Gt (count); // make a room
 		size_t size = maxCount * sizeof (T);
 
-		ref::CPtrT<CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, size);
+		ref::Ptr<Hdr> newHdr = AXL_REF_NEW_EXTRA (Hdr, size);
 		if (!newHdr)
 			return false;
 
@@ -778,12 +778,12 @@ public:
 
 		if (count <= oldHdr->m_count)
 		{
-			CDetails::constructCopy (p, m_p, count);
+			Details::constructCopy (p, m_p, count);
 		}
 		else
 		{
-			CDetails::constructCopy (p, m_p, oldHdr->m_count);
-			CDetails::construct (p + oldHdr->m_count, count - oldHdr->m_count);
+			Details::constructCopy (p, m_p, oldHdr->m_count);
+			Details::construct (p + oldHdr->m_count, count - oldHdr->m_count);
 		}
 		
 		oldHdr->release ();
@@ -802,19 +802,19 @@ public:
 
 	void
 	setBuffer (
-		ref::EBuf bufKind,
+		ref::BufKind bufKind,
 		void* p,
 		size_t size
 		)
 	{
-		ASSERT (size >= sizeof (CHdr) + sizeof (T));
+		ASSERT (size >= sizeof (Hdr) + sizeof (T));
 
-		CHdr* oldHdr = getHdr ();
+		Hdr* oldHdr = getHdr ();
 		
-		mem::FFree* pfFree = bufKind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
-		ref::CPtrT <CHdr> newHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
+		mem::FFree* pfFree = bufKind == ref::BufKind_Static ? NULL : (mem::FFree*) -1;
+		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, pfFree);
 		newHdr->m_count = 0;
-		newHdr->m_maxCount = (size - sizeof (CHdr)) / sizeof (T);
+		newHdr->m_maxCount = (size - sizeof (Hdr)) / sizeof (T);
 
 		if (oldHdr)
 			oldHdr->release ();
@@ -825,10 +825,10 @@ public:
 	}
 
 protected:
-	CHdr*
+	Hdr*
 	getHdr () const
 	{
-		return m_p ? (CHdr*) m_p - 1 : NULL;
+		return m_p ? (Hdr*) m_p - 1 : NULL;
 	}
 };
 

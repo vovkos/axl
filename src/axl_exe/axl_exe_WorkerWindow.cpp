@@ -7,8 +7,8 @@ namespace exe {
 
 //.............................................................................
 
-CWorkerWindow::EScheduleResult
-CWorkerWindow::scheduleV (
+WorkerWindow::ScheduleResultKind
+WorkerWindow::scheduleV (
 	exe::IFunction* function, 
 	axl_va_list va
 	)
@@ -18,7 +18,7 @@ CWorkerWindow::scheduleV (
 	if (m_threadId == ::GetCurrentThreadId ())
 	{
 		function->invokeV (va);
-		return EScheduleResult_Invoke;
+		return ScheduleResultKind_Invoke;
 	}
 
 	m_lock.lock ();
@@ -30,18 +30,18 @@ CWorkerWindow::scheduleV (
 
 	m_lock.unlock ();
 
-	return EScheduleResult_Pending;
+	return ScheduleResultKind_Pending;
 }
 
 LRESULT
-CWorkerWindow::onProcessInvokeList (
+WorkerWindow::onProcessInvokeList (
 	UINT msg,
 	WPARAM wParam,
 	LPARAM lParam,
 	bool* isHandled
 	)
 {
-	exe::CInvokeList invokeList;
+	exe::InvokeList invokeList;
 
 	m_lock.lock ();
 	invokeList.takeOver (&m_invokeList);

@@ -45,28 +45,28 @@ struct IFunction: obj::IRoot
 //.............................................................................
 
 template <
-	typename TCtxArg,
-	typename TParArg
+	typename CtxArg,
+	typename ParArg
 	>
-class CFunctionT: public IFunction
+class Function: public IFunction
 {
 public:
-	AXL_OBJ_CLASS_0 (CFunctionT, IFunction)
+	AXL_OBJ_CLASS_0 (Function, IFunction)
 
 protected:
 	void* m_pf;
-	ECallConv m_convention;
-	ref::CPtrT <CArgBlock> m_context;
+	CallConvKind m_convention;
+	ref::Ptr <ArgBlock> m_context;
 
 public:
-	CFunctionT ()
+	Function ()
 	{
 		m_pf = NULL;
-		m_convention = ECallConv_Cdecl;
+		m_convention = CallConvKind_Cdecl;
 	}
 
-	CFunctionT (
-		ECallConv convention,
+	Function (
+		CallConvKind convention,
 		void* pf,
 		...
 		)
@@ -75,7 +75,7 @@ public:
 		setupV (convention, pf, va);
 	}
 
-	CFunctionT (
+	Function (
 		void* pf,
 		...
 		)
@@ -86,14 +86,14 @@ public:
 
 	void
 	setupV (
-		ECallConv convention,
+		CallConvKind convention,
 		void* pf,
 		axl_va_list va
 		)
 	{
 		m_convention = convention;
 		m_pf = pf;
-		m_context = createArgBlockV <TCtxArg> (va);
+		m_context = createArgBlockV <CtxArg> (va);
 	}
 
 	void
@@ -102,12 +102,12 @@ public:
 		axl_va_list va
 		)
 	{
-		setupV (ECallConv_Cdecl, pf, va);
+		setupV (CallConvKind_Cdecl, pf, va);
 	}
 
 	void
 	setup (
-		ECallConv convention,
+		CallConvKind convention,
 		void* pf,
 		...
 		)
@@ -130,7 +130,7 @@ public:
 	IArgPacker* 
 	getArgPacker ()
 	{
-		return IArgPackerImplT <TParArg>::getSingleton ();
+		return IArgPackerImplT <ParArg>::getSingleton ();
 	}
 
 	virtual 
@@ -138,9 +138,9 @@ public:
 	invokeV (axl_va_list va)
 	{
 		size_t size;
-		TParArg () (NULL, &size, NULL, va);
+		ParArg () (NULL, &size, NULL, va);
 
-		mem::TBlock stack [2];
+		mem::Block stack [2];
 
 		if (m_context)
 			stack [0] = *m_context;

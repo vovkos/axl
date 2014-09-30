@@ -16,9 +16,9 @@ namespace rtl {
 //.............................................................................
 
 template <class T>
-class CDestructSingletonT: 
-	public g::CFinalizer,
-	public ref::CRefCount
+class DestructSingleton: 
+	public g::Finalizer,
+	public ref::RefCount
 {
 public:
 	T* m_p;
@@ -35,17 +35,17 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <class T>
-class CConstructSingletonT
+class ConstructSingleton
 {
 public: 
-	typedef CDestructSingletonT <T> CDestruct;
+	typedef DestructSingleton <T> Destruct;
 
 public:
 	void
 	operator () (void* p)
 	{
 		new (p) T;			
-		ref::CPtrT <CDestruct> destruct = AXL_REF_NEW (CDestruct);
+		ref::Ptr <Destruct> destruct = AXL_REF_NEW (Destruct);
 		destruct->m_p = (T*) p;
 		g::getModule ()->addFinalizer (destruct);
 	}
@@ -58,7 +58,7 @@ T*
 getSingleton (volatile int32_t* flag = NULL)
 {
 	static uchar_t _Buffer [sizeof (T)] = { 0 };
-	mt::callOnce (CConstructSingletonT <T> (), _Buffer, flag);
+	mt::callOnce (ConstructSingleton <T> (), _Buffer, flag);
 	return (T*) _Buffer;
 }
 

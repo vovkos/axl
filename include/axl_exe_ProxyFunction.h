@@ -14,19 +14,19 @@ namespace exe {
 
 //.............................................................................
 
-class CProxyFunction: public IFunction
+class ProxyFunction: public IFunction
 {
 public:
 	IScheduler* m_scheduler;
 	IFunction* m_function;
 
-	ref::CPtrT <void> m_keepAlive;
+	ref::Ptr <void> m_keepAlive;
 
 public:
-	CProxyFunction (
+	ProxyFunction (
 		IScheduler* scheduler = NULL,
 		IFunction* function = NULL,
-		ref::CPtrT <void> keepAlive = ref::CPtrT <void> ()
+		ref::Ptr <void> keepAlive = ref::Ptr <void> ()
 		)
 	{
 		m_function = function;
@@ -34,13 +34,13 @@ public:
 		m_keepAlive = keepAlive;
 	}
 
-	CProxyFunction (const CProxyFunction& src)
+	ProxyFunction (const ProxyFunction& src)
 	{
 		copy (src);
 	}
 
-	CProxyFunction& 
-	operator = (const CProxyFunction& src)
+	ProxyFunction& 
+	operator = (const ProxyFunction& src)
 	{
 		copy (src);
 		return *this;

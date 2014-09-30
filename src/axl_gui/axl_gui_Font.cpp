@@ -8,7 +8,7 @@ namespace gui {
 //.............................................................................
 
 const char* 
-getFontFlagString (EFontFlag flag)
+getFontFlagString (FontFlagKind flag)
 {
 	static const char* stringTable [] = 
 	{
@@ -36,7 +36,7 @@ parseFontFlagString (
 		if (end)
 			*end = NULL;
 
-		return EFontFlag_Transparent;
+		return FontFlagKind_Transparent;
 	}
 
 	uint_t flags = 0;
@@ -51,22 +51,22 @@ parseFontFlagString (
 		{
 		case 'b': 
 		case 'B':
-			mod = EFontFlag_Bold;
+			mod = FontFlagKind_Bold;
 			break;
 
 		case 'i': 
 		case 'I':
-			mod = EFontFlag_Italic;
+			mod = FontFlagKind_Italic;
 			break;
 
 		case 'u': 
 		case 'U':
-			mod = EFontFlag_Underline;
+			mod = FontFlagKind_Underline;
 			break;
 
 		case 's': 
 		case 'S':
-			mod = EFontFlag_Strikeout;
+			mod = FontFlagKind_Strikeout;
 			break;
 		}
 
@@ -86,7 +86,7 @@ parseFontFlagString (
 //.............................................................................
 
 void
-TFontDesc::setup (
+FontDesc::setup (
 	const char* faceName, 
 	size_t pointSize,
 	uint_t flags
@@ -104,10 +104,10 @@ TFontDesc::setup (
 
 //.............................................................................
 
-CFont*
-CFont::getFontMod (uint_t flags)
+Font*
+Font::getFontMod (uint_t flags)
 {
-	if (flags & EFontFlag_Transparent)
+	if (flags & FontFlagKind_Transparent)
 		return this;
 
 	flags &= (countof (m_tuple->m_fontModArray) - 1);
@@ -120,12 +120,12 @@ CFont::getFontMod (uint_t flags)
 //.............................................................................
 
 void
-TTextAttr::parse (
+TextAttr::parse (
 	const char* string,
 	const char** end
 	)
 {
-	TColorAttr::parse (string, &string);
+	ColorAttr::parse (string, &string);
 
 	while (isspace (*string))
 		string++;
@@ -138,13 +138,13 @@ TTextAttr::parse (
 }
 
 void
-TTextAttr::parseOverlay (
-	const TTextAttr& baseAttr,
+TextAttr::parseOverlay (
+	const TextAttr& baseAttr,
 	const char* string,
 	const char** end
 	)
 {
-	TTextAttr overlayAttr;
+	TextAttr overlayAttr;
 	overlayAttr.parse (string, end);
 	overlay (baseAttr, overlayAttr);
 }

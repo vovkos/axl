@@ -28,7 +28,7 @@ namespace exe {
 
 #pragma pack (push, 1)
 
-struct TThunk
+struct Thunk
 {
 #if (_AXL_CPU == AXL_CPU_X86)
 
@@ -54,7 +54,7 @@ struct TThunk
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-TThunk* 
+Thunk* 
 createThunk (
 	void* pf, 
 	void* context

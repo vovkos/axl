@@ -13,41 +13,41 @@ namespace rtl {
 
 //.............................................................................
 
-template <typename TKey>
-class CKeyT
+template <typename Key>
+class KeyNodeData
 {
 public:
-	TKey m_key;
+	Key m_key;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TKey, 
-	typename TValue
+	typename Key, 
+	typename Value
 	>
-class CKeyValueT: public CKeyT <TKey>
+class KeyValueNodeData: public KeyNodeData <Key>
 {
 public:
-	TValue m_value;
+	Value m_value;
 };  
 
 //.............................................................................
 
 template <
 	typename T,
-	typename TNodeData
+	typename NodeData
 	>
-class CBinTreeNodeBaseT: 
-	public rtl::TListLink,
-	public TNodeData
+class BinTreeNodeBase: 
+	public rtl::ListLink,
+	public NodeData
 {
 public:
 	T* m_parent;
 	T* m_left;
 	T* m_right;
 
-	CBinTreeNodeBaseT ()
+	BinTreeNodeBase ()
 	{
 		m_parent = NULL;
 		m_left = NULL;
@@ -68,38 +68,38 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum EBinTreeFindEx
+enum BinTreeFindExKind
 {
-	EBinTreeFindEx_Eq = 0,
-	EBinTreeFindEx_Lt,
-	EBinTreeFindEx_Le,
-	EBinTreeFindEx_Gt,
-	EBinTreeFindEx_Ge,
+	BinTreeFindExKind_Eq = 0,
+	BinTreeFindExKind_Lt,
+	BinTreeFindExKind_Le,
+	BinTreeFindExKind_Gt,
+	BinTreeFindExKind_Ge,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
-	typename TKey,
-	typename TCmp,
-	typename TNode
+	typename Key,
+	typename Cmp,
+	typename Node
 	>
-class CBinTreeBaseT
+class BinTreeBase
 {
 public:
-	typedef TKey CKey;
-	typedef TCmp CCmp;
-	typedef TNode CNode;
+	typedef Key Key;
+	typedef Cmp Cmp;
+	typedef Node Node;
 
-	typedef CIteratorT <CNode> CIterator;
+	typedef Iterator <Node> Iterator;
 
 protected:
-	CStdListT <CNode> m_nodeList;
-	CNode* m_root;
+	StdList <Node> m_nodeList;
+	Node* m_root;
 
 public:
-	CBinTreeBaseT ()
+	BinTreeBase ()
 	{ 
 		m_root = NULL; 
 	}
@@ -116,26 +116,26 @@ public:
 		return m_nodeList.getCount (); 
 	}
 
-	CIterator 
+	Iterator 
 	getHead () const
 	{ 
 		return m_nodeList.getHead (); 
 	}
 
-	CIterator 
+	Iterator 
 	getTail () const
 	{ 
 		return m_nodeList.getTail (); 
 	}
 
-	CIterator 
-	find (const CKey& key) const
+	Iterator 
+	find (const Key& key) const
 	{
-		CNode* node = m_root;
+		Node* node = m_root;
 
 		while (node) 
 		{
-			int cmp = CCmp () (key, node->m_key);
+			int cmp = Cmp () (key, node->m_key);
 			if (cmp == 0) 
 				return node;
 
@@ -145,14 +145,14 @@ public:
 		return NULL;
 	}
 
-	CIterator 
+	Iterator 
 	findEx (
-		const CKey& key,
-		EBinTreeFindEx findExKind
+		const Key& key,
+		BinTreeFindExKind findExKind
 		) const
 	{
-		CNode* node = m_root;
-		CNode* prevNode;
+		Node* node = m_root;
+		Node* prevNode;
 		int prevCmp;
 
 		if (isEmpty ())
@@ -160,7 +160,7 @@ public:
 
 		while (node) 
 		{
-			int cmp = CCmp () (key, node->m_key);			
+			int cmp = Cmp () (key, node->m_key);			
 			if (cmp == 0) 
 				break; // exact match
 
@@ -173,29 +173,29 @@ public:
 		ASSERT (node || prevNode);
 		switch (findExKind)
 		{
-		case EBinTreeFindEx_Lt:
-			return node ? node->m_left : prevCmp > 0 ? prevNode : CIterator (prevNode).getPrev ();
+		case BinTreeFindExKind_Lt:
+			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator (prevNode).getPrev ();
 
-		case EBinTreeFindEx_Le:
-			return node ? node : prevCmp > 0 ? prevNode : CIterator (prevNode).getPrev ();
+		case BinTreeFindExKind_Le:
+			return node ? node : prevCmp > 0 ? prevNode : Iterator (prevNode).getPrev ();
 
-		case EBinTreeFindEx_Gt:
-			return node ? node->m_right : prevCmp < 0 ? prevNode : CIterator (prevNode).getNext ();
+		case BinTreeFindExKind_Gt:
+			return node ? node->m_right : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
 
-		case EBinTreeFindEx_Ge:
-			return node ? node : prevCmp < 0 ? prevNode : CIterator (prevNode).getNext ();
+		case BinTreeFindExKind_Ge:
+			return node ? node : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
 		
-		case EBinTreeFindEx_Eq:
+		case BinTreeFindExKind_Eq:
 		default:
 			return node;
 		}		
 	}
 
-	CIterator 
-	visit (const CKey& key)
+	Iterator 
+	visit (const Key& key)
 	{
-		CNode* parent = NULL;
-		CNode* node = m_root;
+		Node* parent = NULL;
+		Node* node = m_root;
 
 		// find the place to insert
 
@@ -203,7 +203,7 @@ public:
 
 		while (node) 
 		{
-			cmp = CCmp () (key, node->m_key);
+			cmp = Cmp () (key, node->m_key);
 			if (cmp == 0) 
 				return node;
 
@@ -213,7 +213,7 @@ public:
 
 		// create and insert new node
 
-		node = AXL_MEM_NEW (CNode);
+		node = AXL_MEM_NEW (Node);
 		node->m_key = key;
 		node->m_parent = parent;
 		node->m_left = NULL;
@@ -240,13 +240,13 @@ public:
 	}
 
 	void 
-	erase (CIterator it)
+	erase (Iterator it)
 	{
-		CNode* node = *it;
+		Node* node = *it;
 
 		if (node->m_left && node->m_right) 
 		{
-			CNode* next = (CNode*) node->m_next;
+			Node* next = (Node*) node->m_next;
 			ASSERT (next == getLeftmostChild (node->m_right));
 			xcg (node, next);
 		}
@@ -256,9 +256,9 @@ public:
 	}
 
 	bool 
-	eraseByKey (const CKey& key)
+	eraseByKey (const Key& key)
 	{
-		CIterator it = find (key);
+		Iterator it = find (key);
 		if (!it)
 			return false;
 
@@ -274,8 +274,8 @@ public:
 	}
 
 protected:
-	CNode* 
-	getLeftmostChild (CNode* node)
+	Node* 
+	getLeftmostChild (Node* node)
 	{
 		while (node->m_left)
 			node = node->m_left;
@@ -283,8 +283,8 @@ protected:
 		return node;
 	}
 
-	CNode* 
-	getRightmostChild (CNode* node)
+	Node* 
+	getRightmostChild (Node* node)
 	{
 		while (node->m_right)
 			node = node->m_right;
@@ -294,13 +294,13 @@ protected:
 
 	void 
 	xcg (
-		CNode* node1, 
-		CNode* node2
+		Node* node1, 
+		Node* node2
 		)
 	{
-		CNode* oldParent = node1->m_parent;
-		CNode* oldLeft = node1->m_left;
-		CNode* oldRight = node1->m_right;
+		Node* oldParent = node1->m_parent;
+		Node* oldLeft = node1->m_left;
+		Node* oldRight = node1->m_right;
 
 		// special cases: direct parent-child relations
 
@@ -385,13 +385,13 @@ protected:
 		if (node2->m_right)
 			node2->m_right->m_parent = node2;
 
-		CNode::onXcg (node1, node2);
+		Node::onXcg (node1, node2);
 	}
 
-	CNode* 
-	replaceWithChild (CNode* node)
+	Node* 
+	replaceWithChild (Node* node)
 	{		
-		CNode* child = node->m_right ? node->m_right : node->m_left;
+		Node* child = node->m_right ? node->m_right : node->m_left;
 		 
 		if (!node->m_parent)
 		{
@@ -410,9 +410,9 @@ protected:
 	}
 
 	void 
-	rotateLeft (CNode* x)
+	rotateLeft (Node* x)
 	{
-		CNode* y = x->m_right;
+		Node* y = x->m_right;
 		ASSERT (y);
 
 		x->m_right = y->m_left;
@@ -434,9 +434,9 @@ protected:
 	}
 
 	void 
-	rotateRight (CNode* x)
+	rotateRight (Node* x)
 	{
-		CNode* y = x->m_left;
+		Node* y = x->m_left;
 		ASSERT (y);
 
 		x->m_left = y->m_right;
@@ -460,12 +460,12 @@ protected:
 	// overridables: tree rebalancing on insert/delete
 
 	void 
-	onInsert (CNode* node)
+	onInsert (Node* node)
 	{
 	}
 
 	void 
-	onErase (CNode* node)
+	onErase (Node* node)
 	{ 
 		replaceWithChild (node); 
 	}

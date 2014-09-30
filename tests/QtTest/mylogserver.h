@@ -9,7 +9,7 @@
 
 #ifdef _JANCY_REPRESENTER
 
-class stdLib: public jnc::CStdLib
+class stdLib: public jnc::StdLib
 {
 public:
 	stdLib ();
@@ -26,15 +26,15 @@ public:
 
 //.............................................................................
 
-class myLogServer: public log::CServer
+class myLogServer: public log::Server
 {
 protected:
 #ifdef _JANCY_REPRESENTER
-	jnc::CModule m_module;
-	jnc::CRuntime m_runtime;
+	jnc::Module m_module;
+	jnc::Runtime m_runtime;
 	stdLib m_stdlib;
 
-	log::CJancyRepresenter m_logRepresenter;
+	log::JancyRepresenter m_logRepresenter;
 #else
 	myLogRepresenter m_logRepresenter;
 #endif
@@ -43,7 +43,7 @@ protected:
 
 public:
 	bool start (
-		log::CClientPeer* client,
+		log::ClientPeer* client,
 		const char* logPacketFilePath,
 		const char* logMergeFilePath,
 		const char* logColorizerStateFilePath

@@ -6,17 +6,17 @@ namespace test_Finalize {
 
 //.............................................................................
 
-class CMyFinalizer: 
-	public ref::CRefCount,
-	public g::CFinalizer
+class MyFinalizer: 
+	public ref::RefCount,
+	public g::Finalizer
 {
 public:
-	CMyFinalizer ()
+	MyFinalizer ()
 	{
 		printf ("CMyFinalizer::CMyFinalizer (this = %x)\n", this);
 	}
 
-	~CMyFinalizer ()
+	~MyFinalizer ()
 	{
 		printf ("CMyFinalizer::~CMyFinalizer (this = %x)\n", this);
 	}
@@ -34,7 +34,7 @@ public:
 void
 run ()
 {
-	ref::CPtrT <CMyFinalizer> fin = AXL_REF_NEW (CMyFinalizer);
+	ref::Ptr <MyFinalizer> fin = AXL_REF_NEW (MyFinalizer);
 	g::getModule ()->addFinalizer (fin);
 }
 

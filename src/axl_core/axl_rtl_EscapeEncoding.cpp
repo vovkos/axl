@@ -8,7 +8,7 @@ namespace rtl {
 //.............................................................................
 
 char
-CEscapeEncoding::findEscapeChar (char x)
+EscapeEncoding::findEscapeChar (char x)
 {
 	switch (x)
 	{
@@ -42,7 +42,7 @@ CEscapeEncoding::findEscapeChar (char x)
 }
 
 char
-CEscapeEncoding::findEscapeReplaceChar (char x)
+EscapeEncoding::findEscapeReplaceChar (char x)
 {
 	switch (x)
 	{
@@ -76,15 +76,15 @@ CEscapeEncoding::findEscapeReplaceChar (char x)
 }
 
 size_t
-CEscapeEncoding::encode (
-	CString* string,
+EscapeEncoding::encode (
+	String* string,
 	const char* p, 
 	size_t length
 	)
 {
 
 	if (length == -1)
-		length = CStringDetails::calcLength (p);
+		length = StringDetails::calcLength (p);
 
 	const char* base = p;
 	const char* end = p + length;
@@ -106,8 +106,8 @@ CEscapeEncoding::encode (
 		else
 		{
 			escapeSequence [1] = 'x';
-			escapeSequence [2] = CHexEncoding::getHexChar_l (*p >> 4);
-			escapeSequence [3] = CHexEncoding::getHexChar_l (*p);
+			escapeSequence [2] = HexEncoding::getHexChar_l (*p >> 4);
+			escapeSequence [3] = HexEncoding::getHexChar_l (*p);
 			string->append (escapeSequence, 4);
 		}
 
@@ -120,23 +120,23 @@ CEscapeEncoding::encode (
 }
 
 size_t
-CEscapeEncoding::decode (
-	CString* string,
+EscapeEncoding::decode (
+	String* string,
 	const char* p, 
 	size_t length
 	)
 {
-	enum EState
+	enum StateKind
 	{
-		EState_Normal = 0,
-		EState_Escape,
-		EState_Hex
+		StateKind_Normal = 0,
+		StateKind_Escape,
+		StateKind_Hex
 	};
 
-	EState state = EState_Normal;	
+	StateKind state = StateKind_Normal;	
 
 	if (length == -1)
-		length = CStringDetails::calcLength (p);
+		length = StringDetails::calcLength (p);
 
 	char hexCodeString [4] = { 0 };
 	char* hexCodeEnd;
@@ -151,19 +151,19 @@ CEscapeEncoding::decode (
 	{
 		switch (state)
 		{
-		case EState_Normal:
+		case StateKind_Normal:
 			if (*p == '\\')
 			{
 				string->append (base, p - base);
-				state = EState_Escape;
+				state = StateKind_Escape;
 			}
 
 			break;
 
-		case EState_Escape:
+		case StateKind_Escape:
 			if (*p == 'x')
 			{
-				state = EState_Hex;
+				state = StateKind_Hex;
 				hexCodeLen = 0;
 				break;
 			}
@@ -179,10 +179,10 @@ CEscapeEncoding::decode (
 				base = p;
 			}
 
-			state = EState_Normal;
+			state = StateKind_Normal;
 			break;
 		
-		case EState_Hex:			
+		case StateKind_Hex:			
 			hexCodeString [hexCodeLen++] = *p;
 			if (hexCodeLen < 2)
 				break;
@@ -192,7 +192,7 @@ CEscapeEncoding::decode (
 				hexCode = '?';
 
 			string->append ((char const*) &hexCode, 1);
-			state = EState_Normal;
+			state = StateKind_Normal;
 			base = p + 1;
 			break;
 		}

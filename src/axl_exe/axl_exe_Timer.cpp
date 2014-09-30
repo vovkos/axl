@@ -8,7 +8,7 @@ namespace mt {
 //.............................................................................
 
 bool
-CTimer::setTimer (	
+Timer::setTimer (	
 	ulong_t timeout,
 	exe::IFunction* onTimer,
 	int flags
@@ -21,13 +21,13 @@ CTimer::setTimer (
 			return false;
 	}
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
-		CTimer*, 
+	return m_workerThread->syncSchedule <exe::ArgSeq_4 <
+		Timer*, 
 		ulong_t, 
 		exe::IFunction*, 
 		int > > (
 
-		pvoid_cast (&CTimer::setTimer_wt),
+		pvoid_cast (&Timer::setTimer_wt),
 		this, 
 		timeout, 
 		onTimer,
@@ -36,17 +36,17 @@ CTimer::setTimer (
 }
 
 void
-CTimer::cancel ()
+Timer::cancel ()
 {
 	if (m_workerThread)
-		m_workerThread->syncSchedule <exe::CArgT <CTimer*> > (
-		pvoid_cast (&CTimer::cancel_wt),
+		m_workerThread->syncSchedule <exe::Arg <Timer*> > (
+		pvoid_cast (&Timer::cancel_wt),
 		this
 		);
 }
 
 bool 
-CTimer::setTimer_wt (	
+Timer::setTimer_wt (	
 	ulong_t timeout,
 	exe::IFunction* onTimer,
 	int flags
@@ -56,13 +56,13 @@ CTimer::setTimer_wt (
 
 	if (!m_timer.isOpen ())
 	{
-		result = m_timer.create (NULL, (flags & ETimer_ManualReset) != 0, NULL);
+		result = m_timer.create (NULL, (flags & TimerKind_ManualReset) != 0, NULL);
 		if (!result)
 			return false;
 	}
 
 	uint64_t dueTime = int32x32To64(timeout, -10000);
-	ulong_t period = (flags & ETimer_Periodic) ? timeout : 0;
+	ulong_t period = (flags & TimerKind_Periodic) ? timeout : 0;
 
 	result = m_timer.setTimer (dueTime, period, timerProc, this);
 	if (!result)
@@ -73,23 +73,23 @@ CTimer::setTimer_wt (
 }
 
 void
-CTimer::cancel_wt ()
+Timer::cancel_wt ()
 {
 	if (m_timer.isOpen ())
 		m_timer.cancel ();
 
-	m_onTimer = ref::EPtr_Null;
+	m_onTimer = ref::PtrKind_Null;
 }
 
 VOID 
 CALLBACK
-CTimer::timerProc (
+Timer::timerProc (
 	LPVOID context,
 	DWORD timerLo,
 	DWORD timerHi
 	)
 {
-	CTimer* this = (CTimer*) context;
+	Timer* this = (Timer*) context;
 	
 	if (this->m_onTimer)
 		this->m_onTimer->invoke (0);

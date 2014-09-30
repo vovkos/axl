@@ -8,16 +8,16 @@ namespace lua {
 //.............................................................................
 
 void
-CStringTemplate::reset ()
+Stringemplate::reset ()
 {
 	m_luaState.create ();
 	m_lineCol.clear ();
 }
 
 bool
-CStringTemplate::process (
-	rtl::CString* output,
-	const rtl::CString& filePath,
+Stringemplate::process (
+	rtl::String* output,
+	const rtl::String& filePath,
 	const char* source,
 	size_t length
 	)
@@ -26,7 +26,7 @@ CStringTemplate::process (
 
 	output->clear ();
 
-	rtl::CString luaSource;
+	rtl::String luaSource;
 	result = extractLuaSource (&luaSource, filePath, source, length);
 	if (!result)
 		return false;
@@ -43,7 +43,7 @@ CStringTemplate::process (
 	if (!result)
 		return false;
 			
-	TEmitContext emitContext;
+	EmitContext emitContext;
 	emitContext.m_this = this;
 	emitContext.m_output = output;
 	emitContext.m_source = source;
@@ -63,46 +63,46 @@ CStringTemplate::process (
 
 bool 
 extractUserCode (
-	CLexer* lexer,
-	lex::CRagelTokenPos* endPos_o
+	Lexer* lexer,
+	lex::RagelokenPos* endPos_o
 	)
 {
-	const CToken* token = lexer->getToken ();
-	ASSERT (token->m_token == EToken_OpenCode || token->m_token == EToken_OpenData);
+	const Token* token = lexer->getToken ();
+	ASSERT (token->m_token == TokenKind_OpenCode || token->m_token == TokenKind_OpenData);
 
 	int openBracket;
 	int closeBracket;
-	ELexerMachine machine;
+	LexerMachineKind machine;
 
-	if (token->m_token == EToken_OpenData)
+	if (token->m_token == TokenKind_OpenData)
 	{
 		openBracket = '(';
 		closeBracket = ')';
-		machine = ELexerMachine_UserData;
+		machine = LexerMachineKind_UserData;
 	}
 	else
 	{
 		openBracket = '{';
 		closeBracket = '}';
-		machine = ELexerMachine_UserCode;
+		machine = LexerMachineKind_UserCode;
 	}
 
 	lexer->gotoState (
-		CLexer::getMachineState (machine), 
+		Lexer::getMachineState (machine), 
 		token, 
-		CLexer::EGotoState_EatToken
+		Lexer::GotoStateKind_EatToken
 		);
 
 	int level = 1;
 	for (;;)
 	{
 		token = lexer->getToken ();
-		if (token->m_token == EToken_Error)
+		if (token->m_token == TokenKind_Error)
 		{
 			err::setFormatStringError ("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 			return false;
 		}
-		else if (token->m_token == EToken_Eof)
+		else if (token->m_token == TokenKind_Eof)
 		{
 			err::setUnexpectedTokenError ("eof", "user-code");
 			return false;
@@ -124,39 +124,39 @@ extractUserCode (
 	*endPos_o = token->m_pos;
 
 	lexer->gotoState (
-		CLexer::getMachineState (ELexerMachine_Main), 
+		Lexer::getMachineState (LexerMachineKind_Main), 
 		token, 
-		CLexer::EGotoState_EatToken
+		Lexer::GotoStateKind_EatToken
 		);
 
 	return true;
 }
 
 bool
-CStringTemplate::extractLuaSource (
-	rtl::CString* luaSource,
-	const rtl::CString& filePath,
+Stringemplate::extractLuaSource (
+	rtl::String* luaSource,
+	const rtl::String& filePath,
 	const char* source,
 	size_t length
 	)
 {
 	bool result;
 
-	CLexer lexer;
+	Lexer lexer;
 	lexer.create (filePath, source, length);
 
 	luaSource->clear ();
 	
 	size_t offset = 0;
-	CToken::CPos pos;
+	Token::Pos pos;
 
 	int line = 0;
 
 	for (;;)
 	{
-		const CToken* token = lexer.getToken ();
+		const Token* token = lexer.getToken ();
 		
-		if (token->m_token == EToken_Error)
+		if (token->m_token == TokenKind_Error)
 		{
 			err::setFormatStringError ("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 			return false;
@@ -165,7 +165,7 @@ CStringTemplate::extractLuaSource (
 		if (token->m_pos.m_offset > offset)
 			luaSource->appendFormat ("Passthrough (%d, %d);", offset, token->m_pos.m_offset - offset);
 
-		if (token->m_token == EToken_Eof)
+		if (token->m_token == TokenKind_Eof)
 			return true;
 
 		if (token->m_pos.m_line > line)
@@ -175,13 +175,13 @@ CStringTemplate::extractLuaSource (
 
 		switch (token->m_token)
 		{
-		case EToken_Data:
+		case TokenKind_Data:
 			luaSource->appendFormat ("Emit (%s);", token->m_data.m_string.cc ()); // thanks a lot gcc
 			pos = token->m_pos;
 			lexer.nextToken ();
 			break;
 
-		case EToken_OpenCode:
+		case TokenKind_OpenCode:
 			result = extractUserCode (&lexer, &pos);
 			if (!result)
 				return false;
@@ -190,7 +190,7 @@ CStringTemplate::extractLuaSource (
 			luaSource->append (";");
 			break;
 
-		case EToken_OpenData:
+		case TokenKind_OpenData:
 			result = extractUserCode (&lexer, &pos);
 			if (!result)
 				return false;
@@ -210,7 +210,7 @@ CStringTemplate::extractLuaSource (
 }
 
 void
-CStringTemplate::countLineCol (
+Stringemplate::countLineCol (
 	const char* p,
 	size_t length
 	)
@@ -237,11 +237,11 @@ CStringTemplate::countLineCol (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
-CStringTemplate::getLine_lua (lua_State* h)
+Stringemplate::getLine_lua (lua_State* h)
 {
-	CLuaState luaState = h;
+	LuaState luaState = h;
 
-	CStringTemplate* self = (CStringTemplate*) luaState.getContext ();
+	Stringemplate* self = (Stringemplate*) luaState.getContext ();
 
 	luaState.pushInteger (self->m_lineCol.m_line);
 
@@ -250,11 +250,11 @@ CStringTemplate::getLine_lua (lua_State* h)
 }
 
 int 
-CStringTemplate::getCol_lua (lua_State* h)
+Stringemplate::getCol_lua (lua_State* h)
 {
-	CLuaState luaState = h;
+	LuaState luaState = h;
 
-	CStringTemplate* self = (CStringTemplate*) luaState.getContext ();
+	Stringemplate* self = (Stringemplate*) luaState.getContext ();
 
 	luaState.pushInteger (self->m_lineCol.m_col);
 
@@ -263,11 +263,11 @@ CStringTemplate::getCol_lua (lua_State* h)
 }
 
 int 
-CStringTemplate::emit_lua (lua_State* h)
+Stringemplate::emit_lua (lua_State* h)
 {
-	CLuaState luaState = h;
+	LuaState luaState = h;
 
-	TEmitContext* context = (TEmitContext*) luaState.getContext ();
+	EmitContext* context = (EmitContext*) luaState.getContext ();
 
 	size_t count = luaState.getTop ();
 	for (size_t i = 1; i <= count; i++)
@@ -282,11 +282,11 @@ CStringTemplate::emit_lua (lua_State* h)
 }
 
 int 
-CStringTemplate::passthrough_lua (lua_State* h)
+Stringemplate::passthrough_lua (lua_State* h)
 {
-	CLuaState luaState = h;
+	LuaState luaState = h;
 
-	TEmitContext* context = (TEmitContext*) luaState.getContext ();
+	EmitContext* context = (EmitContext*) luaState.getContext ();
 
 	size_t offset = luaState.getInteger (1);
 	size_t length = luaState.getInteger (2);

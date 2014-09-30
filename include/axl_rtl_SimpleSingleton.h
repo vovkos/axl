@@ -16,7 +16,7 @@ namespace rtl {
 // singleton that doesnt require destructor
 
 template <class T>
-class CConstructSimpleSingletonT
+class ConstructSimpleSingleton
 {
 public:
 	void
@@ -33,7 +33,7 @@ T*
 getSimpleSingleton (volatile int32_t* flag = NULL)
 {
 	static uchar_t _Buffer [sizeof (T)] = { 0 };	
-	mt::callOnce (CConstructSimpleSingletonT <T> (), _Buffer, flag);
+	mt::callOnce (ConstructSimpleSingleton <T> (), _Buffer, flag);
 	return (T*) _Buffer;
 }
 

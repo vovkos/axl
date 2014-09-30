@@ -7,7 +7,7 @@ namespace mem {
 
 //.............................................................................
 
-CTracker::CTracker ()
+Tracker::Tracker ()
 {
 	m_peakBlockCount = 0;
 	m_totalBlockCount = 0;
@@ -17,7 +17,7 @@ CTracker::CTracker ()
 }
 
 void
-CTracker::add (TBlockHdr* hdr)
+Tracker::add (BlockHdr* hdr)
 {
 	m_lock.lock ();
 
@@ -41,7 +41,7 @@ CTracker::add (TBlockHdr* hdr)
 }
 
 void
-CTracker::remove (TBlockHdr* hdr)
+Tracker::remove (BlockHdr* hdr)
 {
 	m_lock.lock ();
 
@@ -52,7 +52,7 @@ CTracker::remove (TBlockHdr* hdr)
 }
 
 void 
-CTracker::trace ()
+Tracker::trace ()
 {
 	m_lock.lock ();
 
@@ -83,10 +83,10 @@ CTracker::trace ()
 			m_blockList.getCount ()
 			);
 
-		rtl::CIteratorT <TBlockHdr> it = m_blockList.getHead ();
+		rtl::Iterator <BlockHdr> it = m_blockList.getHead ();
 		for (; it; it++)
 		{
-			TBlockHdr* blockHdr = *it;
+			BlockHdr* blockHdr = *it;
 
 			dbg::trace (
 				"    %s(%d): %s seq: #%d size: %d B\n",

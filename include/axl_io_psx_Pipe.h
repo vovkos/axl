@@ -14,11 +14,11 @@ namespace psx {
 
 //.............................................................................
 
-class CPipe
+class Pipe
 {
 public:
-	CFile m_readFile;
-	CFile m_writeFile;
+	File m_readFile;
+	File m_writeFile;
 
 public:
 	bool

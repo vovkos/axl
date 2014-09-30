@@ -14,7 +14,7 @@ namespace io {
 
 //.............................................................................
 
-rtl::CString
+rtl::String
 getCurrentDir ();
 
 bool
@@ -23,40 +23,40 @@ doesFileExist (const char* fileName);
 bool
 ensureDirExists (const char* fileName);
 
-rtl::CString
+rtl::String
 getFullFilePath (const char* fileName);
 
-rtl::CString
+rtl::String
 getDir (const char* filePath);
 
-rtl::CString
+rtl::String
 getFileName (const char* filePath);
 
-rtl::CString
+rtl::String
 getExtension (const char* filePath);
 
-rtl::CString
+rtl::String
 concatFilePath (
-	rtl::CString* filePath,
+	rtl::String* filePath,
 	const char* fileName
 	);
 
 inline
-rtl::CString
+rtl::String
 concatFilePath (
 	const char* dir,
 	const char* fileName
 	)
 {
-	rtl::CString filePath = dir;
+	rtl::String filePath = dir;
 	return concatFilePath (&filePath, fileName);
 }
 
-rtl::CString
+rtl::String
 findFilePath (
 	const char* fileName,
 	const char* firstDir,
-	const rtl::CBoxListT <rtl::CString>* dirList,
+	const rtl::BoxList <rtl::String>* dirList,
 	bool doFindInCurrentDir = true
 	);
 

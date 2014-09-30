@@ -37,7 +37,7 @@ getTimeZoneOffsetInMinutes (int timeZone)
 
 //.............................................................................
 
-struct TTime
+struct Time
 {
 	uint16_t m_year;
 	uint16_t m_month;
@@ -51,17 +51,17 @@ struct TTime
 	uint16_t m_nanoSecond;
 
 public:
-	TTime ()
+	Time ()
 	{
-		memset (this, 0, sizeof (TTime));
+		memset (this, 0, sizeof (Time));
 	}
 
-	TTime (uint64_t timestamp)
+	Time (uint64_t timestamp)
 	{
 		setTimestampImpl (timestamp, true, 0);
 	}
 
-	TTime (
+	Time (
 		uint64_t timestamp,
 		int timeZone
 		)
@@ -98,14 +98,14 @@ public:
 
 	size_t
 	format (
-		rtl::CString* string,
+		rtl::String* string,
 		const char* formatString = "%W %D %N %Y %h:%m:%s"
 		) const;
 
-	rtl::CString
+	rtl::String
 	format (const char* formatString = "%W %D %N %Y %h:%m:%s") const
 	{
-		rtl::CString string;
+		rtl::String string;
 		format (&string, formatString);
 		return string;
 	}

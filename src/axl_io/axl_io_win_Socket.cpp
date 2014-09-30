@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool
-CSocket::open (
+Socket::open (
 	int addressFamily,
 	int sockKind,
 	int protocol
@@ -20,7 +20,7 @@ CSocket::open (
 }
 
 int
-CSocket::getError ()
+Socket::getError ()
 {
 	int error;
 	getOption (SOL_SOCKET, SO_ERROR, &error, sizeof (int));
@@ -28,7 +28,7 @@ CSocket::getError ()
 }
 
 bool
-CSocket::setBlockingMode (bool isBlocking)
+Socket::setBlockingMode (bool isBlocking)
 {
 	ulong_t value = !isBlocking;
 	int result = ::ioctlsocket (m_h, FIONBIO, &value);
@@ -36,7 +36,7 @@ CSocket::setBlockingMode (bool isBlocking)
 }
 
 size_t
-CSocket::getIncomingDataSize ()
+Socket::getIncomingDataSize ()
 {
 	ulong_t value;
 	int result = ::ioctlsocket (m_h, FIONREAD, &value);
@@ -50,7 +50,7 @@ CSocket::getIncomingDataSize ()
 }
 
 bool
-CSocket::getAddress (sockaddr* addr)
+Socket::getAddress (sockaddr* addr)
 {
 	int size = sizeof (sockaddr);
 	int result = ::getsockname (m_h, addr, &size);
@@ -58,7 +58,7 @@ CSocket::getAddress (sockaddr* addr)
 }
 
 bool
-CSocket::getPeerAddress (sockaddr* addr)
+Socket::getPeerAddress (sockaddr* addr)
 {
 	int size = sizeof (sockaddr);
 	int result = ::getpeername (m_h, addr, &size);
@@ -66,7 +66,7 @@ CSocket::getPeerAddress (sockaddr* addr)
 }
 
 SOCKET
-CSocket::accept (sockaddr* addr)
+Socket::accept (sockaddr* addr)
 {
 	int size = sizeof (sockaddr);
 	SOCKET socket = ::accept (m_h, addr, &size);
@@ -74,7 +74,7 @@ CSocket::accept (sockaddr* addr)
 }
 
 size_t
-CSocket::recvFrom (
+Socket::recvFrom (
 	void* p,
 	size_t size,
 	sockaddr* addr
@@ -86,7 +86,7 @@ CSocket::recvFrom (
 }
 
 bool
-CSocket::completeAsyncRequest (
+Socket::completeAsyncRequest (
 	int result,
 	int pendingResult
 	)
@@ -105,7 +105,7 @@ CSocket::completeAsyncRequest (
 }
 
 bool
-CSocket::wsaOpen (
+Socket::wsaOpen (
 	int addressFamily,
 	int sockKind,
 	int protocol,
@@ -118,7 +118,7 @@ CSocket::wsaOpen (
 }
 
 SOCKET
-CSocket::wsaAccept (sockaddr* addr)
+Socket::wsaAccept (sockaddr* addr)
 {
 	int size = sizeof (sockaddr);
 	SOCKET s = ::WSAAccept (m_h, addr, addr ? &size : NULL, NULL, 0);
@@ -126,7 +126,7 @@ CSocket::wsaAccept (sockaddr* addr)
 }
 
 bool
-CSocket::wsaSend (
+Socket::wsaSend (
 	const void* p,
 	dword_t size,
 	WSAOVERLAPPED* overlapped,
@@ -144,7 +144,7 @@ CSocket::wsaSend (
 }
 
 bool
-CSocket::wsaRecv (
+Socket::wsaRecv (
 	void* p,
 	dword_t size,
 	WSAOVERLAPPED* overlapped,
@@ -165,7 +165,7 @@ CSocket::wsaRecv (
 }
 
 bool
-CSocket::wsaSendTo (
+Socket::wsaSendTo (
 	const void* p,
 	dword_t size,
 	const sockaddr* addr,
@@ -184,7 +184,7 @@ CSocket::wsaSendTo (
 }
 
 bool
-CSocket::wsaRecvFrom (
+Socket::wsaRecvFrom (
 	void* p,
 	dword_t size,
 	sockaddr* addr,

@@ -9,9 +9,9 @@ namespace test_Error {
 void 
 run ()
 {
-	err::CError error;
+	err::Error error;
 	
-	error.pack <rtl::CPackSeqT_4 <
+	error.pack <rtl::PackSeq_4 <
 		const char*,
 		int,
 		const char*,
@@ -22,7 +22,7 @@ run ()
 		"hui", 0xdead, "govno", 0xbeaf
 		);
 
-	err::CError error2;
+	err::Error error2;
 	error2.format (
 		rtl::GUID_Null, 
 		12345, 

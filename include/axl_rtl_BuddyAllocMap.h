@@ -14,30 +14,30 @@ namespace rtl {
 
 //.............................................................................
 
-class CBuddyAllocMap
+class BuddyAllocMap
 {
 protected:
-	struct TPage: TListLink
+	struct Page: ListLink
 	{
 		size_t m_map;
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	class CLevel
+	class Level
 	{
 	protected:
-		CAuxListT <TPage> m_availablePageList;
-		TPage* m_firstPage;
+		AuxList <Page> m_availablePageList;
+		Page* m_firstPage;
 
 	public:
-		TPage*
+		Page*
 		getFirstPage ()
 		{
 			return m_firstPage;
 		}
 
-		TPage*
+		Page*
 		getFirstAvailablePage ()
 		{
 			return *m_availablePageList.getHead ();
@@ -45,26 +45,26 @@ protected:
 
 		void
 		format (
-			TPage* page,
+			Page* page,
 			size_t count
 			);
 
 		void
 		setPageMap (
-			TPage* page,
+			Page* page,
 			size_t map
 			);
 
 		void
 		setBit (
-			TPage* page,
+			Page* page,
 			size_t bit,
 			bool value
 			);
 
 		void
 		setBitRange (
-			TPage* page,
+			Page* page,
 			size_t from,
 			size_t to,
 			bool value
@@ -72,8 +72,8 @@ protected:
 	};
 
 protected:
-	CArrayT <TPage> m_pageArray;
-	CArrayT <CLevel> m_levelArray;
+	Array <Page> m_pageArray;
+	Array <Level> m_levelArray;
 
 	size_t m_width;
 	size_t m_height;
@@ -83,7 +83,7 @@ protected:
 	size_t m_maxAllocSize;
 
 public:
-	CBuddyAllocMap ();
+	BuddyAllocMap ();
 
 	bool
 	create (
@@ -146,7 +146,7 @@ protected:
 	static
 	bool
 	getBit (
-		TPage* page,
+		Page* page,
 		size_t bit
 		)
 	{

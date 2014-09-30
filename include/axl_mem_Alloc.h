@@ -21,10 +21,10 @@ FFree (void* p);
 
 #ifdef _DEBUG
 
-class CStdAlloc
+class StdAlloc
 {
 public:
-	class CAlloc
+	class Alloc
 	{
 	public:
 		void* 
@@ -36,7 +36,7 @@ public:
 			);
 	};
 
-	class CFree
+	class Free
 	{
 	public:
 		void 
@@ -53,20 +53,20 @@ public:
 		int line
 		)
 	{
-		return CAlloc () (size, tag, filePath, line);
+		return Alloc () (size, tag, filePath, line);
 	}
 
 	static
 	void 
 	free (void* p)
 	{
-		return CFree () (p);
+		return Free () (p);
 	}
 };
 
 #else
 
-typedef CMalloc CStdAlloc;
+typedef Malloc StdAlloc;
 
 #endif
 
@@ -75,17 +75,17 @@ typedef CMalloc CStdAlloc;
 #ifdef _DEBUG
 
 #define AXL_MEM_ALLOC(size) \
-	axl::mem::CStdAlloc::alloc (size, "<buffer>", __FILE__, __LINE__)
+	axl::mem::StdAlloc::alloc (size, "<buffer>", __FILE__, __LINE__)
 
 #else
 
 #define AXL_MEM_ALLOC(size) \
-	axl::mem::CStdAlloc::alloc (size)
+	axl::mem::StdAlloc::alloc (size)
 
 #endif
 
 #define AXL_MEM_FREE(p) \
-	axl::mem::CStdAlloc::free (p)
+	axl::mem::StdAlloc::free (p)
 
 //.............................................................................
 

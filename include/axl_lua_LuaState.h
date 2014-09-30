@@ -16,7 +16,7 @@ namespace lua {
 
 //.............................................................................
 
-class CLuaClose
+class LuaClose
 {
 public:
 	void 
@@ -28,15 +28,15 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CLuaState: public rtl::CHandleT <lua_State*, CLuaClose>
+class LuaState: public rtl::Handle <lua_State*, LuaClose>
 {
 public:
-	CLuaState ()
+	LuaState ()
 	{
 		create ();
 	}
 
-	CLuaState (lua_State* h)
+	LuaState (lua_State* h)
 	{
 		attach (h);
 	}
@@ -331,10 +331,10 @@ public:
 		return value;
 	}
 
-	rtl::CString
+	rtl::String
 	popString ()
 	{
-		rtl::CString string = getString (-1);
+		rtl::String string = getString (-1);
 		pop ();
 		return string;
 	}

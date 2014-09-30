@@ -30,7 +30,7 @@ struct HEN_OVERWRITE_CHANGE_PARAMS: HEN_PARAMS
 
 //.............................................................................
 
-class CHexEditCtrl: public CWindowImpl<CHexEditCtrl>
+class HexEditCtrl: public WindowImpl<HexEditCtrl>
 {
 public:
 	enum CURSOR_POS_LOCATION
@@ -225,11 +225,11 @@ protected:
 	};
 
 #if (_AXL_VER >= 0x0200)
-	axl::obj::CDataT<UNDO_PARAMS> m_undoParams;
-	axl::rtl::CUndoRedo m_undoRedo;
+	axl::obj::Data<UNDO_PARAMS> m_undoParams;
+	axl::rtl::UndoRedo m_undoRedo;
 #else
-	axl::CDataT<UNDO_PARAMS> m_undoParams;
-	axl::CUndoRedo m_undoRedo;
+	axl::Data<UNDO_PARAMS> m_undoParams;
+	axl::UndoRedo m_undoRedo;
 #endif
 
 	// Boyer-Moore-Horspool find
@@ -239,8 +239,8 @@ protected:
 	BOOL m_bFindMatchCase;
 
 public:
-	CHexEditCtrl();
-	~CHexEditCtrl();
+	HexEditCtrl();
+	~HexEditCtrl();
 
 	COLOR_INFO& getStdColorBg()
 		{ return m_stdColorBg; }
@@ -257,7 +257,7 @@ public:
 	COLOR_INFO& getModifiedColor()
 		{ return m_modifiedColor; }
 
-	static ATL::CWndClassInfo& getWndClassInfo();
+	static ATL::WndClassInfo& getWndClassInfo();
 
 	BOOL setUpperCase(BOOL bUpperCase);
 
@@ -421,15 +421,15 @@ protected:
 	void endUndoableTransaction(SIZE_T nNewDataSize);
 
 #if (_AXL_VER >= 0x0200)
-	void undoImpl(axl::obj::TData* params);
-	void redoImpl(axl::obj::TData* params);
+	void undoImpl(axl::obj::Data* params);
+	void redoImpl(axl::obj::Data* params);
 #else
 	void undoImpl(AXL_PTR* params);
 	void redoImpl(AXL_PTR* params);
 #endif
 
 public:
-	BEGIN_MSG_MAP(CHexEditCtrl)
+	BEGIN_MSG_MAP(HexEditCtrl)
 		MESSAGE_HANDLER(WM_CREATE, onCreate)
 		MESSAGE_HANDLER(WM_GETDLGCODE, onGetDlgCode)
 		MESSAGE_HANDLER(WM_PAINT, onPaint)

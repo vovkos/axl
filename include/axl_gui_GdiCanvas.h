@@ -14,18 +14,18 @@ namespace gui {
 
 //.............................................................................
 
-class CScreenDc
+class ScreenDc
 {
 protected:
 	HDC m_hdc;
 
 public:
-	CScreenDc ()
+	ScreenDc ()
 	{
 		m_hdc = ::GetDC (NULL);
 	};
 
-	~CScreenDc ()
+	~ScreenDc ()
 	{
 		::ReleaseDC (NULL, m_hdc);
 	};
@@ -38,23 +38,23 @@ public:
 
 //.............................................................................
 
-class CGdiCanvas:
-	public CCanvas,
-	public rtl::CHandleT <HDC>
+class GdiCanvas:
+	public Canvas,
+	public rtl::Handle <HDC>
 {
-	friend class CGdiEngine;
-	friend class CGdiWidgetImpl;
+	friend class GdiEngine;
+	friend class GdiWidgetImpl;
 
 protected:
-	enum EDestruct
+	enum DestructKind
 	{
-		EDestruct_None = 0,
-		EDestruct_DeleteDc,
-		EDestruct_ReleaseDc
+		DestructKind_None = 0,
+		DestructKind_DeleteDc,
+		DestructKind_ReleaseDc
 	};
 
 protected:
-	EDestruct m_destructKind;
+	DestructKind m_destructKind;
 
 	HWND m_hWnd;
 	HDC m_hCompatibleDc;
@@ -63,9 +63,9 @@ protected:
 	HFONT m_hPrevFont;
 
 public:
-	CGdiCanvas ();
+	GdiCanvas ();
 
-	~CGdiCanvas ()
+	~GdiCanvas ()
 	{
 		release ();
 	}
@@ -74,7 +74,7 @@ public:
 	attach (
 		HDC hdc,
 		HWND hWnd,
-		EDestruct destructKind
+		DestructKind destructKind
 		);
 
 	virtual
@@ -140,7 +140,7 @@ public:
 	drawImage (
 		int x,
 		int y,
-		CImage* image,
+		Image* image,
 		int left,
 		int top,
 		int right,
@@ -150,7 +150,7 @@ public:
 	virtual
 	bool
 	copyRect (
-		CCanvas* srcCanvas,
+		Canvas* srcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,

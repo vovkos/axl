@@ -14,34 +14,34 @@ namespace gui {
 
 //.............................................................................
 
-enum EPixelFormat
+enum PixelFormatKind
 {
-	EPixelFormat_Rgba = 0,
-	EPixelFormat_Rgb,
+	PixelFormatKind_Rgba = 0,
+	PixelFormatKind_Rgb,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char* 
-getPixelFormatString (EPixelFormat pixelFormat);
+getPixelFormatString (PixelFormatKind pixelFormat);
 
 //.............................................................................
 
-struct TImageDesc
+struct ImageDesc
 {
-	TSize m_size;
-	EPixelFormat m_pixelFormat;
+	Size m_size;
+	PixelFormatKind m_pixelFormat;
 	void* m_data;
 
-	TImageDesc ()
+	ImageDesc ()
 	{
-		memset (this, 0, sizeof (TImageDesc));
+		memset (this, 0, sizeof (ImageDesc));
 	}
 
-	TImageDesc (
+	ImageDesc (
 		int width,
 		int height,
-		EPixelFormat pixelFormat,
+		PixelFormatKind pixelFormat,
 		void* data
 		)
 	{
@@ -51,9 +51,9 @@ struct TImageDesc
 		m_data = data;
 	}
 
-	TImageDesc (
-		const TSize& size,
-		EPixelFormat pixelFormat,
+	ImageDesc (
+		const Size& size,
+		PixelFormatKind pixelFormat,
 		void* data
 		)
 	{
@@ -65,13 +65,13 @@ struct TImageDesc
 
 //.............................................................................
 
-class CImage: public CGuiItem
+class Image: public GuiItem
 {
 protected:
-	TSize m_size;
+	Size m_size;
 
 public:
-	TSize
+	Size
 	getSize ()
 	{
 		return m_size;
@@ -92,7 +92,7 @@ public:
 	bool
 	getData (
 		void* data,
-		const TRect& rect
+		const Rect& rect
 		)
 	{
 		return getData (
@@ -107,7 +107,7 @@ public:
 	bool
 	getData (
 		void* data,
-		const TSize& size
+		const Size& size
 		)
 	{
 		return getData (

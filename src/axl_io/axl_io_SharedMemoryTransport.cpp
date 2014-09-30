@@ -8,7 +8,7 @@ namespace io {
 
 //.............................................................................
 
-CSharedMemoryTransportBase::CSharedMemoryTransportBase ()
+SharedMemoryransportBase::SharedMemoryransportBase ()
 {
 	m_flags = 0;
 	m_hdr = NULL;
@@ -18,7 +18,7 @@ CSharedMemoryTransportBase::CSharedMemoryTransportBase ()
 }
 
 bool
-CSharedMemoryTransportBase::open (
+SharedMemoryransportBase::open (
 	const char* fileName,
 	const char* readEventName,
 	const char* writeEventName,
@@ -27,26 +27,26 @@ CSharedMemoryTransportBase::open (
 {
 	close ();
 
-	uint_t fileFlags = io::EFileFlag_ShareWrite;
-	if (flags & ESharedMemoryTransportFlag_Create)
-		fileFlags |= io::EFileFlag_DeleteOnClose;
+	uint_t fileFlags = io::FileFlagKind_ShareWrite;
+	if (flags & SharedMemoryTransportFlagKind_Create)
+		fileFlags |= io::FileFlagKind_DeleteOnClose;
 
 	bool result = m_file.open (fileName, fileFlags);
 	if (!result)
 		return false;
 
-	result = ensureMappingSize (ESharedMemoryTransport_DefMappingSize);
+	result = ensureMappingSize (SharedMemoryTransportKind_DefMappingSize);
 	if (!result)
 	{
 		m_file.close ();
 		return false;
 	}
 
-	if (flags & ESharedMemoryTransportFlag_Create)
+	if (flags & SharedMemoryTransportFlagKind_Create)
 	{
-		m_hdr->m_signature = ESharedMemoryTransport_FileSignature;
+		m_hdr->m_signature = SharedMemoryTransportKind_FileSignature;
 		m_hdr->m_lock = 0;
-		m_hdr->m_state = ESharedMemoryTransportState_MasterConnected;
+		m_hdr->m_state = SharedMemoryTransportStateKind_MasterConnected;
 		m_hdr->m_readOffset = 0;
 		m_hdr->m_writeOffset = 0;
 		m_hdr->m_endOffset = 0;
@@ -54,8 +54,8 @@ CSharedMemoryTransportBase::open (
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 		result =
-			m_readEvent.create (NULL, false, false, rtl::CString_utf16 (readEventName)) &&
-			m_writeEvent.create (NULL, false, false, rtl::CString_utf16 (writeEventName));
+			m_readEvent.create (NULL, false, false, rtl::String_utf16 (readEventName)) &&
+			m_writeEvent.create (NULL, false, false, rtl::String_utf16 (writeEventName));
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 		result = m_readEvent.open (readEventName, O_CREAT);
 		if (result)
@@ -70,29 +70,29 @@ CSharedMemoryTransportBase::open (
 	}
 	else
 	{
-		if (m_hdr->m_signature != ESharedMemoryTransport_FileSignature)
+		if (m_hdr->m_signature != SharedMemoryTransportKind_FileSignature)
 		{
-			err::setError (err::EStatus_InvalidParameter);
+			err::setError (err::StatusKind_InvalidParameter);
 			return false;
 		}
 
 		mt::atomicLock (&m_hdr->m_lock);
 
-		if (m_hdr->m_state != ESharedMemoryTransportState_MasterConnected ||
+		if (m_hdr->m_state != SharedMemoryTransportStateKind_MasterConnected ||
 			m_hdr->m_readOffset != 0)
 		{
-			err::setError (err::EStatus_InvalidDeviceState);
+			err::setError (err::StatusKind_InvalidDeviceState);
 			return false;
 		}
 
-		m_hdr->m_state = ESharedMemoryTransportState_SlaveConnected;
+		m_hdr->m_state = SharedMemoryTransportStateKind_SlaveConnected;
 
 		mt::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 		result =
-			m_readEvent.open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (readEventName)) &&
-			m_writeEvent.open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (writeEventName));
+			m_readEvent.open (EVENT_ALL_ACCESS, false, rtl::String_utf16 (readEventName)) &&
+			m_writeEvent.open (EVENT_ALL_ACCESS, false, rtl::String_utf16 (writeEventName));
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 		result =
 			m_readEvent.open (readEventName, 0) &&
@@ -111,7 +111,7 @@ CSharedMemoryTransportBase::open (
 }
 
 void
-CSharedMemoryTransportBase::close ()
+SharedMemoryransportBase::close ()
 {
 	if (!isOpen ())
 		return;
@@ -129,23 +129,23 @@ CSharedMemoryTransportBase::close ()
 #if (_AXL_ENV == AXL_ENV_POSIX)
 	if (!m_readEventName.isEmpty ())
 	{
-		mt::psx::CSem::unlink (m_readEventName);
+		mt::psx::Sem::unlink (m_readEventName);
 		m_readEventName.clear ();
 	}
 
 	if (!m_writeEventName.isEmpty ())
 	{
-		mt::psx::CSem::unlink (m_writeEventName);
+		mt::psx::Sem::unlink (m_writeEventName);
 		m_writeEventName.clear ();
 	}
 #endif
 }
 
 void
-CSharedMemoryTransportBase::disconnect ()
+SharedMemoryransportBase::disconnect ()
 {
 	mt::atomicLock (&m_hdr->m_lock);
-	m_hdr->m_state = ESharedMemoryTransportState_Disconnected;
+	m_hdr->m_state = SharedMemoryTransportStateKind_Disconnected;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	m_readEvent.signal ();
@@ -159,7 +159,7 @@ CSharedMemoryTransportBase::disconnect ()
 }
 
 bool
-CSharedMemoryTransportBase::ensureMappingSize (size_t size)
+SharedMemoryransportBase::ensureMappingSize (size_t size)
 {
 	if (size <= m_mappingSize)
 		return true;
@@ -168,7 +168,7 @@ CSharedMemoryTransportBase::ensureMappingSize (size_t size)
 	if (!p)
 		return false;
 
-	m_hdr = (TSharedMemoryTransportHdr*) p;
+	m_hdr = (SharedMemoryransportHdr*) p;
 	m_data = (char*) (m_hdr + 1);
 	m_mappingSize = size;
 	return true;
@@ -176,16 +176,16 @@ CSharedMemoryTransportBase::ensureMappingSize (size_t size)
 
 //.............................................................................
 
-rtl::CArrayT <char>
-CSharedMemoryReader::read ()
+rtl::Array <char>
+SharedMemoryReader::read ()
 {
-	rtl::CArrayT <char> buffer;
+	rtl::Array <char> buffer;
 	read (&buffer);
 	return buffer;
 }
 
 size_t
-CSharedMemoryReader::read (rtl::CArrayT <char>* buffer)
+SharedMemoryReader::read (rtl::Array <char>* buffer)
 {
 	ASSERT (isOpen ());
 
@@ -195,17 +195,17 @@ CSharedMemoryReader::read (rtl::CArrayT <char>* buffer)
 
 	while (
 		!m_hdr->m_dataSize &&
-		m_hdr->m_state != ESharedMemoryTransportState_Disconnected)
+		m_hdr->m_state != SharedMemoryTransportStateKind_Disconnected)
 	{
 		mt::atomicUnlock (&m_hdr->m_lock);
 		m_writeEvent.wait ();
 		mt::atomicLock (&m_hdr->m_lock);
 	}
 
-	if (m_hdr->m_state == ESharedMemoryTransportState_Disconnected)
+	if (m_hdr->m_state == SharedMemoryTransportStateKind_Disconnected)
 	{
 		mt::atomicUnlock (&m_hdr->m_lock);
-		err::setError (err::EStatus_InvalidDeviceState);
+		err::setError (err::StatusKind_InvalidDeviceState);
 		return -1;
 	}
 
@@ -220,15 +220,15 @@ CSharedMemoryReader::read (rtl::CArrayT <char>* buffer)
 
 	size_t readSize = 0;
 
-	if (m_flags & ESharedMemoryTransportFlag_Message)
+	if (m_flags & SharedMemoryTransportFlagKind_Message)
 	{
-		TSharedMemoryTransportMessageHdr* msgHdr = (TSharedMemoryTransportMessageHdr*) (m_data + readOffset);
+		SharedMemoryransportMessageHdr* msgHdr = (SharedMemoryransportMessageHdr*) (m_data + readOffset);
 		readSize = msgHdr->m_size;
-		size_t readEndOffset = readOffset + sizeof (TSharedMemoryTransportMessageHdr) + msgHdr->m_size;
+		size_t readEndOffset = readOffset + sizeof (SharedMemoryransportMessageHdr) + msgHdr->m_size;
 
-		if (msgHdr->m_signature != ESharedMemoryTransport_MessageSignature || readEndOffset > endOffset)
+		if (msgHdr->m_signature != SharedMemoryTransportKind_MessageSignature || readEndOffset > endOffset)
 		{
-			err::setError (err::EStatus_InvalidParameter);
+			err::setError (err::StatusKind_InvalidParameter);
 			return -1;
 		}
 
@@ -281,7 +281,7 @@ CSharedMemoryReader::read (rtl::CArrayT <char>* buffer)
 //.............................................................................
 
 bool
-CSharedMemoryWriter::open (
+SharedMemoryWriter::open (
 	const char* fileName,
 	const char* readEventName,
 	const char* writeEventName,
@@ -291,11 +291,11 @@ CSharedMemoryWriter::open (
 {
 	close ();
 	m_sizeLimitHint = sizeLimitHint;
-	return CSharedMemoryTransportBase::open (fileName, readEventName, writeEventName, flags);
+	return SharedMemoryransportBase::open (fileName, readEventName, writeEventName, flags);
 }
 
 size_t
-CSharedMemoryWriter::write (
+SharedMemoryWriter::write (
 	const void* const* blockArray,
 	const size_t* sizeArray,
 	size_t count
@@ -313,10 +313,10 @@ CSharedMemoryWriter::write (
 
 	size_t writeSize = chainSize;
 
-	if (m_flags & ESharedMemoryTransportFlag_Message)
-		writeSize += sizeof (TSharedMemoryTransportMessageHdr);
+	if (m_flags & SharedMemoryTransportFlagKind_Message)
+		writeSize += sizeof (SharedMemoryransportMessageHdr);
 
-	mt::CScopeLock scopeLock (&m_writeLock); // ensure atomic write
+	mt::ScopeLock scopeLock (&m_writeLock); // ensure atomic write
 
 	mt::atomicLock (&m_hdr->m_lock);
 
@@ -325,7 +325,7 @@ CSharedMemoryWriter::write (
 	while (
 		m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize && // wrapped
 		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset &&
-		m_hdr->m_state != ESharedMemoryTransportState_Disconnected
+		m_hdr->m_state != SharedMemoryTransportStateKind_Disconnected
 		)
 	{
 		mt::atomicUnlock (&m_hdr->m_lock);
@@ -333,10 +333,10 @@ CSharedMemoryWriter::write (
 		mt::atomicLock (&m_hdr->m_lock);
 	}
 
-	if (m_hdr->m_state == ESharedMemoryTransportState_Disconnected)
+	if (m_hdr->m_state == SharedMemoryTransportStateKind_Disconnected)
 	{
 		mt::atomicUnlock (&m_hdr->m_lock);
-		err::setError (err::EStatus_InvalidDeviceState);
+		err::setError (err::StatusKind_InvalidDeviceState);
 		return -1;
 	}
 
@@ -350,10 +350,10 @@ CSharedMemoryWriter::write (
 
 	ensureOffsetMapped (writeEndOffset);
 
-	if (m_flags & ESharedMemoryTransportFlag_Message)
+	if (m_flags & SharedMemoryTransportFlagKind_Message)
 	{
-		TSharedMemoryTransportMessageHdr* msgHdr = (TSharedMemoryTransportMessageHdr*) (m_data + writeOffset);
-		msgHdr->m_signature = ESharedMemoryTransport_MessageSignature;
+		SharedMemoryransportMessageHdr* msgHdr = (SharedMemoryransportMessageHdr*) (m_data + writeOffset);
+		msgHdr->m_signature = SharedMemoryTransportKind_MessageSignature;
 		msgHdr->m_size = chainSize;
 		copyWriteChain (msgHdr + 1, blockArray, sizeArray, count);
 	}
@@ -387,7 +387,7 @@ CSharedMemoryWriter::write (
 }
 
 void
-CSharedMemoryWriter::copyWriteChain (
+SharedMemoryWriter::copyWriteChain (
 	void* _pDst,
 	const void* const* blockArray,
 	const size_t* sizeArray,

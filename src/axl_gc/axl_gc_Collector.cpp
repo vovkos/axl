@@ -11,8 +11,8 @@ namespace gc {
 
 bool
 appendValueListToArray (
-	rtl::CStdListT <axl_gc_TValueEntry>* list,
-	rtl::CArrayT <axl_gc_TValue>* array
+	rtl::StdList <axl_gc_TValueEntry>* list,
+	rtl::Array <axl_gc_TValue>* array
 	)
 {
 	if (list->isEmpty ())
@@ -22,7 +22,7 @@ appendValueListToArray (
 	if (!array->setCount (count + list->getCount ()))
 		return false;
 
-	rtl::CIteratorT <axl_gc_TValueEntry> it = list->getHead ();
+	rtl::Iterator <axl_gc_TValueEntry> it = list->getHead ();
 	axl_gc_TValue* value = *array + count;
 
 	for (; it; it++, value++)
@@ -33,12 +33,12 @@ appendValueListToArray (
 
 //.............................................................................
 
-CCollector::CCollector ():
-	m_idleEvent (mt::CEvent::EKind_Notification)
+Collector::Collector ():
+	m_idleEvent (mt::Event::KindKind_Notification)
 {
 	m_mutator = NULL;
 
-	m_state = EState_Idle;
+	m_state = StateKind_Idle;
 	m_terminateThread = false;
 
 	m_idleEvent.signal ();
@@ -59,7 +59,7 @@ CCollector::CCollector ():
 }
 
 bool
-CCollector::isInPool (const axl_gc_TValue* value)
+Collector::isInPool (const axl_gc_TValue* value)
 {
 	void* poolEnd = (uchar_t*) m_pool + m_poolSize;
 	if (value->m_p < m_pool || value->m_p >= poolEnd)
@@ -70,21 +70,21 @@ CCollector::isInPool (const axl_gc_TValue* value)
 }
 
 size_t
-CCollector::getClusterAddress (const axl_gc_TValue* value)
+Collector::getClusterAddress (const axl_gc_TValue* value)
 {
 	ASSERT (isInPool (value));
-	ASSERT (!(((uchar_t*) value->m_p - (uchar_t*) m_pool) & (EDef_ClusterSize - 1)));
-	return ((uchar_t*) value->m_p - (uchar_t*) m_pool) / EDef_ClusterSize;
+	ASSERT (!(((uchar_t*) value->m_p - (uchar_t*) m_pool) & (DefKind_ClusterSize - 1)));
+	return ((uchar_t*) value->m_p - (uchar_t*) m_pool) / DefKind_ClusterSize;
 }
 
 size_t
-CCollector::getClusterCount (const axl_gc_TValue* value)
+Collector::getClusterCount (const axl_gc_TValue* value)
 {
-	return (value->m_type.m_size + EDef_ClusterSize - 1) / EDef_ClusterSize;
+	return (value->m_type.m_size + DefKind_ClusterSize - 1) / DefKind_ClusterSize;
 }
 
 bool
-CCollector::create (
+Collector::create (
 	IMutator* mutator,
 	size_t width,
 	size_t height,
@@ -113,7 +113,7 @@ CCollector::create (
 	if (!result)
 		return false;
 
-	m_poolSize = clusterCount * EDef_ClusterSize;
+	m_poolSize = clusterCount * DefKind_ClusterSize;
 	m_pool = AXL_MEM_ALLOC (m_poolSize);
 	if (!m_pool)
 		return false;
@@ -121,7 +121,7 @@ CCollector::create (
 	m_mutator = mutator;
 	m_allocateMap = 0;
 	m_trigger = mulDiv ((int) clusterCount, triggerPercent, 100);
-	m_state = EState_Idle;
+	m_state = StateKind_Idle;
 	m_terminateThread = false;
 
 #ifdef _DEBUG
@@ -137,7 +137,7 @@ CCollector::create (
 }
 
 void
-CCollector::close ()
+Collector::close ()
 {
 	m_terminateThread = true;
 	m_wakeUpEvent.signal ();
@@ -171,7 +171,7 @@ CCollector::close ()
 }
 
 axl_gc_TValueEntry* 
-CCollector::allocateValueEntry ()
+Collector::allocateValueEntry ()
 {
 	return m_valueFreeList.isEmpty () ? 
 		m_valueFreeList.removeHead () :
@@ -179,34 +179,34 @@ CCollector::allocateValueEntry ()
 }
 
 void
-CCollector::startCycle_l () 
+Collector::startCycle_l () 
 {
-	ASSERT (m_state != EState_Mark);
-	m_state = EState_Mark;
+	ASSERT (m_state != StateKind_Mark);
+	m_state = StateKind_Mark;
 	m_wakeUpEvent.signal ();
 	m_idleEvent.reset ();
 }
 
 void*
-CCollector::tryAllocate_l (const axl_gc_TType* type)
+Collector::tryAllocate_l (const axl_gc_TType* type)
 {
 	axl_gc_TValue value;
 	
 	size_t address;
-	size_t clusterCount = (type->m_size + EDef_ClusterSize - 1) / EDef_ClusterSize;
+	size_t clusterCount = (type->m_size + DefKind_ClusterSize - 1) / DefKind_ClusterSize;
 
 	address = m_mapArray [m_allocateMap].allocate (clusterCount);
 	if (address == -1)
 	{
 		// failed allocation triggers a new collection cycle (if not yet)
 
-		if (m_state != EState_Mark)
+		if (m_state != StateKind_Mark)
 			startCycle_l ();
 
 		return NULL;
 	}
 
-	value.m_p = (uchar_t*) m_pool + address * EDef_ClusterSize;
+	value.m_p = (uchar_t*) m_pool + address * DefKind_ClusterSize;
 	value.m_type = *type;
 
 	memset (value.m_p, 0, type->m_size);
@@ -221,7 +221,7 @@ CCollector::tryAllocate_l (const axl_gc_TType* type)
 		m_destructList.insertTail (valueEntry);
 	}
 
-	if (m_state == EState_Mark) 
+	if (m_state == StateKind_Mark) 
 	{
 		axl_gc_TValueEntry* valueEntry = allocateValueEntry ();
 		valueEntry->m_value = value;
@@ -255,17 +255,17 @@ CCollector::tryAllocate_l (const axl_gc_TType* type)
 }
 
 void
-CCollector::collect ()
+Collector::collect ()
 {
 	m_lock.lock ();
-	if (m_state != EState_Mark)
+	if (m_state != StateKind_Mark)
 		startCycle_l ();
 	m_lock.unlock ();
 	m_idleEvent.wait ();
 }
 
 void*
-CCollector::allocate (const axl_gc_TType* type)
+Collector::allocate (const axl_gc_TType* type)
 {
 	void* p;
 
@@ -294,7 +294,7 @@ CCollector::allocate (const axl_gc_TType* type)
 
 	if (!p)
 	{
-		err::setError (err::EStatus_InsufficientResources);
+		err::setError (err::StatusKind_InsufficientResources);
 		return NULL;
 	}
 
@@ -302,7 +302,7 @@ CCollector::allocate (const axl_gc_TType* type)
 }
  
 void
-CCollector::onPointerAssign (axl_gc_TValue* target)
+Collector::onPointerAssign (axl_gc_TValue* target)
 {
 	axl_gc_TValueEntry* valueEntry;
 	bool_t isGreen;
@@ -324,7 +324,7 @@ CCollector::onPointerAssign (axl_gc_TValue* target)
 		::TlsSetValue (m_greenSlotTls, NULL);
 	}
 
-	if (m_state == EState_Mark)
+	if (m_state == StateKind_Mark)
 	{
 		size_t address = getClusterAddress (target); 
 
@@ -345,7 +345,7 @@ CCollector::onPointerAssign (axl_gc_TValue* target)
 }
 
 void
-CCollector::discardLastAllocate (axl_gc_TValue* value) // this is just for debug assert
+Collector::discardLastAllocate (axl_gc_TValue* value) // this is just for debug assert
 {
 	axl_gc_TValueEntry* valueEntry = (axl_gc_TValueEntry*) ::TlsGetValue (m_greenSlotTls);
 
@@ -369,12 +369,12 @@ CCollector::discardLastAllocate (axl_gc_TValue* value) // this is just for debug
 }
 
 bool
-CCollector::push (const axl_gc_TValue* value)
+Collector::push (const axl_gc_TValue* value)
 {
 	size_t address;
 	size_t clusterCount;
 
-	rtl::CArrayT <axl_gc_TValue>* currentTraceSet = getCurrentTraceSet ();
+	rtl::Array <axl_gc_TValue>* currentTraceSet = getCurrentTraceSet ();
 
 	if (!isInPool (value))
 		return false;
@@ -390,30 +390,30 @@ CCollector::push (const axl_gc_TValue* value)
 }
 
 bool
-CCollector::pushBulk (
+Collector::pushBulk (
 	const axl_gc_TValue* value,
 	size_t count
 	)
 {
-	rtl::CArrayT <axl_gc_TValue>* currentTraceSet = getCurrentTraceSet ();
+	rtl::Array <axl_gc_TValue>* currentTraceSet = getCurrentTraceSet ();
 	currentTraceSet->append (value, count);
 	return true;
 }
 
 void
-CCollector::getUnmarkedDestructors_l (
-	rtl::CBuddyAllocMap* blackMap,
-	rtl::CStdListT <axl_gc_TValueEntry>* list
+Collector::getUnmarkedDestructors_l (
+	rtl::BuddyAllocMap* blackMap,
+	rtl::StdList <axl_gc_TValueEntry>* list
 	)
 {
-	rtl::CIteratorT <axl_gc_TValueEntry> it = m_destructList.getHead ();
+	rtl::Iterator <axl_gc_TValueEntry> it = m_destructList.getHead ();
 	while (it)
 	{
-		rtl::CIteratorT <axl_gc_TValueEntry> next = it.getInc (1);
+		rtl::Iterator <axl_gc_TValueEntry> next = it.getInc (1);
 		
 		axl_gc_TValueEntry* valueEntry = *it;
 
-		size_t address = CCollector::getClusterAddress (&valueEntry->m_value);
+		size_t address = Collector::getClusterAddress (&valueEntry->m_value);
 		if (!blackMap->getBit (address))
 		{
 			m_destructList.remove (it);
@@ -424,27 +424,27 @@ CCollector::getUnmarkedDestructors_l (
 	}
 }
 
-rtl::CArrayT <axl_gc_TValue>*
-CCollector::flipTraceSet ()
+rtl::Array <axl_gc_TValue>*
+Collector::flipTraceSet ()
 {
-	rtl::CArrayT <axl_gc_TValue>* currentTraceSet;
+	rtl::Array <axl_gc_TValue>* currentTraceSet;
 
 	m_currentTraceSet = !m_currentTraceSet;
-	currentTraceSet = CCollector::getCurrentTraceSet ();
+	currentTraceSet = Collector::getCurrentTraceSet ();
 	currentTraceSet->clear ();
 	return currentTraceSet;
 }
 
-rtl::CArrayT <axl_gc_TValue>*
-CCollector::mark (rtl::CBuddyAllocMap* blackMap)
+rtl::Array <axl_gc_TValue>*
+Collector::mark (rtl::BuddyAllocMap* blackMap)
 {
-	rtl::CArrayT <axl_gc_TValue>* currentTraceSet = CCollector::getCurrentTraceSet ();
+	rtl::Array <axl_gc_TValue>* currentTraceSet = Collector::getCurrentTraceSet ();
 
 	size_t count = currentTraceSet->getCount ();
 	axl_gc_TValue* value = *currentTraceSet;
 	axl_gc_TValue* end = *currentTraceSet + count;
 
-	currentTraceSet = CCollector::flipTraceSet ();
+	currentTraceSet = Collector::flipTraceSet ();
 	currentTraceSet->reserve (count);
 
 	for (; value < end; value++)
@@ -452,10 +452,10 @@ CCollector::mark (rtl::CBuddyAllocMap* blackMap)
 		size_t address;
 		size_t clusterCount;
 
-		if (!CCollector::isInPool (value))
+		if (!Collector::isInPool (value))
 			continue;
 
-		address = CCollector::getClusterAddress (value);
+		address = Collector::getClusterAddress (value);
 		if (blackMap->getBit (address)) // already marked
 			continue;
 
@@ -469,16 +469,16 @@ CCollector::mark (rtl::CBuddyAllocMap* blackMap)
 	return currentTraceSet;
 }
 
-rtl::CArrayT <axl_gc_TValue>*
-CCollector::trace ()
+rtl::Array <axl_gc_TValue>*
+Collector::trace ()
 {
-	rtl::CArrayT <axl_gc_TValue>* currentTraceSet = CCollector::getCurrentTraceSet ();
+	rtl::Array <axl_gc_TValue>* currentTraceSet = Collector::getCurrentTraceSet ();
 
 	size_t count = currentTraceSet->getCount ();
 	axl_gc_TValue* value = *currentTraceSet;
 	axl_gc_TValue* end = *currentTraceSet + count;
 
-	currentTraceSet = CCollector::flipTraceSet ();
+	currentTraceSet = Collector::flipTraceSet ();
 
 	for (; value < end; value++)
 	{
@@ -490,12 +490,12 @@ CCollector::trace ()
 }
 
 void
-CCollector::cycle ()
+Collector::cycle ()
 {
-	rtl::CBuddyAllocMap* blackMap;
-	rtl::CArrayT <axl_gc_TValue>* currentTraceSet;
+	rtl::BuddyAllocMap* blackMap;
+	rtl::Array <axl_gc_TValue>* currentTraceSet;
 
-	ASSERT (m_state == EState_Mark); // otherwise why are we here?
+	ASSERT (m_state == StateKind_Mark); // otherwise why are we here?
 
 #ifdef _DEBUG
 	m_cycleCount++;
@@ -509,7 +509,7 @@ CCollector::cycle ()
 
 	// get root set 
 
-	currentTraceSet = CCollector::flipTraceSet ();
+	currentTraceSet = Collector::flipTraceSet ();
 	m_mutator->getRootSet (this);
 
 	// add green set (don't clear the list though: it should be cleared in OnPointerAssign ()
@@ -530,17 +530,17 @@ CCollector::cycle ()
 
 	for (;;)
 	{
-		CCollector::mark (blackMap);
-		CCollector::trace ();
+		Collector::mark (blackMap);
+		Collector::trace ();
 		
 		// add values marked gray by mutator and sync gray maps
 
-		currentTraceSet = CCollector::getCurrentTraceSet ();
+		currentTraceSet = Collector::getCurrentTraceSet ();
 
 		m_lock.lock ();
 		appendValueListToArray (&m_mutatorGrayList, currentTraceSet);
 		m_valueFreeList.insertListTail (&m_mutatorGrayList);
-		m_mutatorGrayMap.merge (m_collectorGrayMap, rtl::EBitOp_Or);
+		m_mutatorGrayMap.merge (m_collectorGrayMap, rtl::BitOpKind_Or);
 
 		if (currentTraceSet->isEmpty ())
 			break; // exit with lock held
@@ -550,17 +550,17 @@ CCollector::cycle ()
 
 	// we marked everything, finish the cycle
 
-	rtl::CStdListT <axl_gc_TValueEntry> destructList;
-	CCollector::getUnmarkedDestructors_l (blackMap, &destructList);
+	rtl::StdList <axl_gc_TValueEntry> destructList;
+	Collector::getUnmarkedDestructors_l (blackMap, &destructList);
 	m_mutatorGrayMap.clear ();
 	m_allocateMap = !m_allocateMap;
-	m_state = EState_Idle;
+	m_state = StateKind_Idle;
 	m_idleEvent.signal ();
 	m_lock.unlock ();
 
 	// destruct...
 
-	rtl::CIteratorT <axl_gc_TValueEntry> it = destructList.getHead ();
+	rtl::Iterator <axl_gc_TValueEntry> it = destructList.getHead ();
 	for (; it; it++)
 		m_mutator->destructValue (&it->m_value);
 
@@ -572,7 +572,7 @@ CCollector::cycle ()
 }
 
 ulong_t
-CCollector::threadProc ()
+Collector::threadProc ()
 {
 	m_thread.setPriority (THREAD_PRIORITY_LOWEST);
 

@@ -7,16 +7,16 @@ namespace err {
 
 //.............................................................................
 
-rtl::CString 
-CParseErrorProvider::getErrorDescription (const TError* error)
+rtl::String 
+ParseErrorProvider::getErrorDescription (const ErrorData* error)
 {
-	rtl::CUnpacker unpacker (error + 1, error->m_size - sizeof (TError));
+	rtl::Unpacker unpacker (error + 1, error->m_size - sizeof (ErrorData));
 
-	rtl::CString string;
+	rtl::String string;
 
 	switch (error->m_code)
 	{
-	case EParseError_SrcPos:
+	case ParseErrorKind_SrcPos:
 		{
 		const char* filePath;
 		int line;
@@ -30,11 +30,11 @@ CParseErrorProvider::getErrorDescription (const TError* error)
 		}
 		break; 
 
-	case EParseError_InvalidSyntax:
+	case ParseErrorKind_InvalidSyntax:
 		string = "syntax error";
 		break;
 
-	case EParseError_InvalidSyntaxIn:
+	case ParseErrorKind_InvalidSyntaxIn:
 		{
 		const char* location;
 		
@@ -43,7 +43,7 @@ CParseErrorProvider::getErrorDescription (const TError* error)
 		}
 		break;
 
-	case EParseError_ExpectedToken:
+	case ParseErrorKind_ExpectedToken:
 		{
 		const char* expectedToken;
 		const char* actualToken;
@@ -54,7 +54,7 @@ CParseErrorProvider::getErrorDescription (const TError* error)
 		}
 		break;
 
-	case EParseError_UnexpectedToken:
+	case ParseErrorKind_UnexpectedToken:
 		{
 		const char* token;
 		
@@ -63,7 +63,7 @@ CParseErrorProvider::getErrorDescription (const TError* error)
 		}
 		break;
 
-	case EParseError_UnexpectedTokenIn:
+	case ParseErrorKind_UnexpectedTokenIn:
 		{
 		const char* token;
 		const char* location;

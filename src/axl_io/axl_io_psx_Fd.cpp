@@ -9,7 +9,7 @@ namespace psx {
 //.............................................................................
 
 bool
-CFd::open (
+Fd::open (
 	const char* fileName,
 	uint_t openFlags,
 	mode_t mode
@@ -22,7 +22,7 @@ CFd::open (
 }
 
 bool
-CFd::setBlockingMode (bool isBlocking)
+Fd::setBlockingMode (bool isBlocking)
 {
 	int result = ::fcntl (m_h, F_GETFL, 0);
 	if (result == -1)
@@ -39,7 +39,7 @@ CFd::setBlockingMode (bool isBlocking)
 }
 
 size_t
-CFd::getIncomingDataSize ()
+Fd::getIncomingDataSize ()
 {
 	int value;
 	int result = ::ioctl (m_h, FIONREAD, &value);
@@ -53,7 +53,7 @@ CFd::getIncomingDataSize ()
 }
 
 size_t
-CFd::read (
+Fd::read (
 	void* p,
 	size_t size
 	) const
@@ -66,7 +66,7 @@ CFd::read (
 }
 
 size_t
-CFd::write (
+Fd::write (
 	const void* p,
 	size_t size
 	)

@@ -15,7 +15,7 @@ namespace io {
 
 //.............................................................................
 
-class CCloseUsbContext
+class CloseUsbContext
 {
 public:
 	void
@@ -27,10 +27,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUsbContext: public rtl::CHandleT <libusb_context*, CCloseUsbContext>
+class UsbContext: public rtl::Handle <libusb_context*, CloseUsbContext>
 {
 public:
-	CUsbContext ()
+	UsbContext ()
 	{
 		open ();
 	}
@@ -41,7 +41,7 @@ public:
 
 //.............................................................................
 
-class CFreeUsbDeviceList
+class FreeUsbDeviceList
 {
 public:
 	void
@@ -53,7 +53,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUsbDeviceList: public rtl::CHandleT <libusb_device**, CFreeUsbDeviceList>
+class UsbDeviceList: public rtl::Handle <libusb_device**, FreeUsbDeviceList>
 {
 public:
 	size_t
@@ -62,7 +62,7 @@ public:
 
 //.............................................................................
 
-class CFreeUsbConfigDescriptor
+class FreeUsbConfigDescriptor
 {
 public:
 	void
@@ -74,18 +74,18 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUsbConfigDescriptor: public rtl::CHandleT <libusb_config_descriptor*, CFreeUsbConfigDescriptor>
+class UsbConfigDescriptor: public rtl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor>
 {
 };
 
 //.............................................................................
 
-class CUsbDevice
+class UsbDevice
 {
 public:
-	enum EDef
+	enum DefKind
 	{
-		EDef_BufferSize = 256,
+		DefKind_BufferSize = 256,
 	};
 
 protected:
@@ -93,13 +93,13 @@ protected:
 	libusb_device_handle* m_openHandle;
 
 public:
-	CUsbDevice ()
+	UsbDevice ()
 	{
 		m_device = NULL;
 		m_openHandle = NULL;
 	}
 
-	~CUsbDevice ()
+	~UsbDevice ()
 	{
 		setDevice (NULL);
 	}
@@ -222,13 +222,13 @@ public:
 
 	// descriptors
 
-	rtl::CArrayT <char>
+	rtl::Array <char>
 	getDesrciptor (
 		libusb_descriptor_type type, 
 		size_t index
 		)
 	{
-		rtl::CArrayT <char> descriptor;
+		rtl::Array <char> descriptor;
 		getDesrciptor (type, index, &descriptor);
 		return descriptor;
 	}
@@ -237,7 +237,7 @@ public:
 	getDesrciptor (
 		libusb_descriptor_type type, 
 		size_t index,
-		rtl::CArrayT <char>* descriptor
+		rtl::Array <char>* descriptor
 		);
 
 	bool
@@ -252,13 +252,13 @@ public:
 	bool
 	getActiveConfigDescriptor (libusb_config_descriptor** descriptor);
 
-	rtl::CString 
+	rtl::String 
 	getStringDesrciptor (
 		size_t index,
 		uint_t langId
 		)
 	{
-		rtl::CString string;
+		rtl::String string;
 		getStringDesrciptor (index, langId, &string);
 		return string;
 	}
@@ -267,13 +267,13 @@ public:
 	getStringDesrciptor (
 		size_t index,
 		uint_t langId,
-		rtl::CString* string
+		rtl::String* string
 		);
 
-	rtl::CString 
+	rtl::String 
 	getStringDesrciptor (size_t index)
 	{
-		rtl::CString string;
+		rtl::String string;
 		getStringDesrciptor (index, &string);
 		return string;
 	}
@@ -281,7 +281,7 @@ public:
 	bool
 	getStringDesrciptor (
 		size_t index,
-		rtl::CString* string
+		rtl::String* string
 		);
 
 	// synchronous transfers

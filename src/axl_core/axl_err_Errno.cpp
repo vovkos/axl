@@ -6,14 +6,14 @@ namespace err {
 
 //.............................................................................
 
-TError*
-CErrno::create (int code)
+ErrorData*
+Errno::create (int code)
 {
-	TError* error = getBuffer (sizeof (TError));
+	ErrorData* error = getBuffer (sizeof (ErrorData));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (TError);
+	error->m_size = sizeof (ErrorData);
 	error->m_guid = GUID_Errno;
 	error->m_code = code;
 	return error;

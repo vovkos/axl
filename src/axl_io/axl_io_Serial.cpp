@@ -10,8 +10,8 @@ namespace io {
 #if (_AXL_ENV == AXL_ENV_WIN)
 
 bool
-CSerial::setSettings (
-	const TSerialSettings* settings,
+Serial::setSettings (
+	const SerialSettings* settings,
 	uint_t mask
 	)
 {
@@ -26,38 +26,38 @@ CSerial::setSettings (
 	dcb.fDsrSensitivity = FALSE;
 	dcb.fDtrControl = DTR_CONTROL_DISABLE;
 
-	if (mask & ESerialSetting_BaudRate)
+	if (mask & SerialSettingKind_BaudRate)
 		dcb.BaudRate = settings->m_baudRate;
 
-	if (mask & ESerialSetting_DataBits)
+	if (mask & SerialSettingKind_DataBits)
 		dcb.ByteSize = settings->m_dataBits;
 
-	if (mask & ESerialSetting_StopBits)
+	if (mask & SerialSettingKind_StopBits)
 		dcb.StopBits = settings->m_stopBits;
 
-	if (mask & ESerialSetting_Parity)
+	if (mask & SerialSettingKind_Parity)
 		dcb.fParity = settings->m_parity;
 
-	if (mask & ESerialSetting_FlowControl)
+	if (mask & SerialSettingKind_FlowControl)
 		switch (settings->m_flowControl)
 		{
-		case ESerialFlowControl_None:
+		case SerialFlowControlKind_None:
 			dcb.fOutxCtsFlow = FALSE;
 			dcb.fRtsControl = RTS_CONTROL_DISABLE;
 			break;
 
-		case ESerialFlowControl_RtsCts:
+		case SerialFlowControlKind_RtsCts:
 			dcb.fOutxCtsFlow = TRUE;
 			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
 			break;
 
-		case ESerialFlowControl_XonXoff:
+		case SerialFlowControlKind_XonXoff:
 			dcb.fOutX = TRUE;
 			dcb.fInX = TRUE;
 			break;
 		}
 
-	if (!(mask & ESerialSetting_ReadInterval))
+	if (!(mask & SerialSettingKind_ReadInterval))
 		return m_serial.setSettings (&dcb);
 
 	COMMTIMEOUTS timeouts = { 0 };
@@ -72,7 +72,7 @@ CSerial::setSettings (
 }
 
 bool
-CSerial::getSettings (TSerialSettings* settings)
+Serial::getSettings (SerialSettings* settings)
 {
 	DCB dcb;
 	dcb.DCBlength = sizeof (dcb);
@@ -83,30 +83,30 @@ CSerial::getSettings (TSerialSettings* settings)
 
 	settings->m_baudRate = dcb.BaudRate;
 	settings->m_dataBits = dcb.ByteSize;
-	settings->m_stopBits = (ESerialStopBits) dcb.StopBits;
-	settings->m_parity   = (ESerialParity) dcb.Parity;
+	settings->m_stopBits = (SerialStopBitsKind) dcb.StopBits;
+	settings->m_parity   = (SerialParityKind) dcb.Parity;
 
 	settings->m_flowControl =
-		dcb.fOutxCtsFlow && dcb.fRtsControl == RTS_CONTROL_HANDSHAKE ? ESerialFlowControl_RtsCts :
-		dcb.fOutX && dcb.fInX ? ESerialFlowControl_XonXoff : ESerialFlowControl_None;
+		dcb.fOutxCtsFlow && dcb.fRtsControl == RTS_CONTROL_HANDSHAKE ? SerialFlowControlKind_RtsCts :
+		dcb.fOutX && dcb.fInX ? SerialFlowControlKind_XonXoff : SerialFlowControlKind_None;
 
 	return true;
 }
 
 uint_t
-CSerial::getStatusLines ()
+Serial::getStatusLines ()
 {
 	uint_t lines = m_serial.getStatusLines ();
 	return lines != -1 ? (lines & 0xf0) >> 4 : -1;
 }
 
 size_t
-CSerial::read (
+Serial::read (
 	void* p,
 	size_t size
 	)
 {
-	mt::CEvent completionEvent;
+	mt::Event completionEvent;
 
 	OVERLAPPED overlapped = { 0 };
 	overlapped.hEvent = completionEvent.m_event;
@@ -127,12 +127,12 @@ CSerial::read (
 }
 
 size_t
-CSerial::write (
+Serial::write (
 	const void* p,
 	size_t size
 	)
 {
-	mt::CEvent completionEvent;
+	mt::Event completionEvent;
 
 	OVERLAPPED overlapped = { 0 };
 	overlapped.hEvent = completionEvent.m_event;
@@ -155,8 +155,8 @@ CSerial::write (
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 bool
-CSerial::setSettings (
-	const TSerialSettings* settings,
+Serial::setSettings (
+	const SerialSettings* settings,
 	uint_t mask
 	)
 {
@@ -165,7 +165,7 @@ CSerial::setSettings (
 	if (!result)
 		return false;
 
-	if (mask & ESerialSetting_BaudRate)
+	if (mask & SerialSettingKind_BaudRate)
 	{
 		speed_t speed;
 
@@ -224,7 +224,7 @@ CSerial::setSettings (
 		cfsetospeed (&attr, speed);
 	}
 
-	if (mask & ESerialSetting_DataBits)
+	if (mask & SerialSettingKind_DataBits)
 	{
 		attr.c_cflag &= ~CSIZE;
 
@@ -249,39 +249,39 @@ CSerial::setSettings (
 		}
 	}
 
-	if (mask & ESerialSetting_StopBits)
+	if (mask & SerialSettingKind_StopBits)
 	{
-		if (settings->m_stopBits == ESerialStopBits_2)
+		if (settings->m_stopBits == SerialStopBitsKind_2)
 			attr.c_cflag |= CSTOPB;
 		else
 			attr.c_cflag &= ~CSTOPB;
 	}
 
-	if (mask & ESerialSetting_Parity)
+	if (mask & SerialSettingKind_Parity)
 	{
 		attr.c_iflag &= ~(PARMRK | INPCK);
 		attr.c_iflag |= IGNPAR;
 
 		switch (settings->m_parity)
 		{
-		case ESerialParity_None:
+		case SerialParityKind_None:
 			attr.c_cflag &= ~PARENB;
 			break;
 
-		case ESerialParity_Odd:
+		case SerialParityKind_Odd:
 			attr.c_cflag |= PARENB | PARODD;
 			break;
 
-		case ESerialParity_Even:
+		case SerialParityKind_Even:
 			attr.c_cflag &= ~PARODD;
 			attr.c_cflag |= PARENB;
 			break;
 
-		case ESerialParity_Mark:
+		case SerialParityKind_Mark:
 			attr.c_cflag |= PARENB | CMSPAR | PARODD;
 			break;
 
-		case ESerialParity_Space:
+		case SerialParityKind_Space:
 			attr.c_cflag &= ~PARODD;
 			attr.c_cflag |= PARENB | CMSPAR;
 			break;
@@ -293,20 +293,20 @@ CSerial::setSettings (
 		}
 	}
 
-	if (mask & ESerialSetting_FlowControl)
+	if (mask & SerialSettingKind_FlowControl)
 		switch (settings->m_flowControl)
 		{
-		case ESerialFlowControl_RtsCts:
+		case SerialFlowControlKind_RtsCts:
 			attr.c_cflag |= CRTSCTS;
 			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 			break;
 
-		case ESerialFlowControl_XonXoff:
+		case SerialFlowControlKind_XonXoff:
 			attr.c_cflag &= ~CRTSCTS;
 			attr.c_iflag |= IXON | IXOFF | IXANY;
 			break;
 
-		case ESerialFlowControl_None:
+		case SerialFlowControlKind_None:
 		default:
 			attr.c_cflag &= ~CRTSCTS;
 			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
@@ -324,7 +324,7 @@ CSerial::setSettings (
 }
 
 bool
-CSerial::getSettings (TSerialSettings* settings)
+Serial::getSettings (SerialSettings* settings)
 {
 	termios attr;
 	bool result = m_serial.getAttr (&attr);
@@ -405,25 +405,25 @@ CSerial::getSettings (TSerialSettings* settings)
 	}
 
 	settings->m_stopBits = (attr.c_cflag & CSTOPB) ?
-		ESerialStopBits_2 :
-		ESerialStopBits_1;
+		SerialStopBitsKind_2 :
+		SerialStopBitsKind_1;
 
 	settings->m_parity =
 		(attr.c_cflag & PARENB) ?
 			(attr.c_cflag & CMSPAR)  ?
-				(attr.c_cflag & PARODD) ? ESerialParity_Odd : ESerialParity_Even :
-				(attr.c_cflag & PARODD) ? ESerialParity_Mark : ESerialParity_Space :
-		ESerialParity_None;
+				(attr.c_cflag & PARODD) ? SerialParityKind_Odd : SerialParityKind_Even :
+				(attr.c_cflag & PARODD) ? SerialParityKind_Mark : SerialParityKind_Space :
+		SerialParityKind_None;
 
 	settings->m_flowControl =
-		(attr.c_cflag & CRTSCTS) ? ESerialFlowControl_RtsCts :
-		(attr.c_iflag & (IXON | IXOFF)) ? ESerialFlowControl_XonXoff : ESerialFlowControl_None;
+		(attr.c_cflag & CRTSCTS) ? SerialFlowControlKind_RtsCts :
+		(attr.c_iflag & (IXON | IXOFF)) ? SerialFlowControlKind_XonXoff : SerialFlowControlKind_None;
 
 	return true;
 }
 
 uint_t
-CSerial::getStatusLines ()
+Serial::getStatusLines ()
 {
 	uint_t result = m_serial.getStatusLines ();
 	if (result == -1)
@@ -431,16 +431,16 @@ CSerial::getStatusLines ()
 
 	uint_t lines = 0;
 	if (result & TIOCM_CTS)
-		lines |= ESerialStatusLine_Cts;
+		lines |= SerialStatusLineKind_Cts;
 
 	if (result & TIOCM_DSR)
-		lines |= ESerialStatusLine_Dsr;
+		lines |= SerialStatusLineKind_Dsr;
 
 	if (result & TIOCM_RNG)
-		lines |= ESerialStatusLine_Ring;
+		lines |= SerialStatusLineKind_Ring;
 
 	if (result & TIOCM_CAR)
-		lines |= ESerialStatusLine_Dcd;
+		lines |= SerialStatusLineKind_Dcd;
 
 	return lines;
 }

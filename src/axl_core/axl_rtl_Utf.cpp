@@ -7,7 +7,7 @@ namespace rtl {
 //.............................................................................
 
 const char*
-getUtfKindString (EUtf utfKind)
+getUtfKindString (UtfKind utfKind)
 {
 	static const char* stringTable [] = 
 	{

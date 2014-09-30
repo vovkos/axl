@@ -7,9 +7,9 @@ namespace gui {
 
 //.............................................................................
 
-CQtCursor::CQtCursor ()
+QtCursor::QtCursor ()
 {
-	m_engine = CQtEngine::getSingleton ();
+	m_engine = QtEngine::getSingleton ();
 }
 
 //.............................................................................

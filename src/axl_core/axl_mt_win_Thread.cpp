@@ -9,7 +9,7 @@ namespace win {
 //.............................................................................
 
 bool 
-CThread::create (
+Thread::create (
 	SECURITY_ATTRIBUTES* secAttr,
 	size_t stackSize,
 	PTHREAD_START_ROUTINE pfThreadProc,

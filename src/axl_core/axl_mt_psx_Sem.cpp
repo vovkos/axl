@@ -9,7 +9,7 @@ namespace psx {
 //.............................................................................
 
 bool
-CSem::init (
+Sem::init (
 	bool isShared,
 	uint_t value
 	)
@@ -25,7 +25,7 @@ CSem::init (
 }
 
 bool
-CSem::open (
+Sem::open (
 	const char* name,
 	int flags,
 	mode_t mode,
@@ -39,7 +39,7 @@ CSem::open (
 }
 
 void
-CSem::close ()
+Sem::close ()
 {
 	if (!m_sem)
 		return;
@@ -53,7 +53,7 @@ CSem::close ()
 }
 
 bool
-CSem::wait (uint_t timeout)
+Sem::wait (uint_t timeout)
 {
 	int result;
 

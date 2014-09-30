@@ -14,21 +14,21 @@ namespace lua {
 
 //.............................................................................
 
-class CStringTemplate
+class Stringemplate
 {
 protected:
-	struct TEmitContext
+	struct EmitContext
 	{
-		CStringTemplate* m_this;
-		rtl::CString* m_output;
+		Stringemplate* m_this;
+		rtl::String* m_output;
 		const char* m_source;
 	};
 
 protected:
-	lex::CLineCol m_lineCol;
+	lex::LineCol m_lineCol;
 
 public:
-	CLuaState m_luaState;
+	LuaState m_luaState;
 	
 public:
 	void
@@ -36,8 +36,8 @@ public:
 
 	bool
 	process (
-		rtl::CString* output,
-		const rtl::CString& filePath,
+		rtl::String* output,
+		const rtl::String& filePath,
 		const char* source,
 		size_t length = -1
 		);
@@ -45,8 +45,8 @@ public:
 protected:
 	bool
 	extractLuaSource (
-		rtl::CString* luaSource,
-		const rtl::CString& filePath,
+		rtl::String* luaSource,
+		const rtl::String& filePath,
 		const char* source,
 		size_t length = -1
 		);

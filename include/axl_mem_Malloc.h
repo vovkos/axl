@@ -13,10 +13,10 @@ namespace mem {
 
 //.............................................................................
 
-class CMalloc
+class Malloc
 {
 public:
-	class CAlloc
+	class Alloc
 	{
 	public:
 		void* 
@@ -26,7 +26,7 @@ public:
 		}
 	};
 
-	class CFree
+	class Free
 	{
 	public:
 		void 
@@ -41,14 +41,14 @@ public:
 	void* 
 	alloc (size_t size)
 	{
-		return CAlloc () (size);
+		return Alloc () (size);
 	}
 
 	static
 	void 
 	free (void* p)
 	{
-		return CFree () (p);
+		return Free () (p);
 	}
 };
 

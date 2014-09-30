@@ -16,21 +16,21 @@ namespace rtl {
 //.............................................................................
 
 template <typename C>
-class CStringCacheT
+class StringCache
 {
 protected:
-	rtl::CBoxListT <rtl::CStringT <C> > m_symbolList;
-	rtl::CStringHashTableT <C> m_symbolMap;
+	rtl::BoxList <rtl::StringBase <C> > m_symbolList;
+	rtl::StringHashTable <C> m_symbolMap;
 	
 public:
 	const C*
 	getString (const C* p)
 	{
-		rtl::CHashTableIteratorT <const C*> it = m_symbolMap.find (p);
+		rtl::HashTableIterator <const C*> it = m_symbolMap.find (p);
 		if (it)
 			return it->m_key;
 
-		rtl::CStringT <C>& string = *m_symbolList.insertTail (p);
+		rtl::StringBase <C>& string = *m_symbolList.insertTail (p);
 		m_symbolMap.visit (string);
 		return string;
 	}
@@ -38,8 +38,8 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CStringCacheT <char>    CStringCache;
-typedef CStringCacheT <wchar_t> CStringCache_w;
+typedef StringCache <char>    StringCache;
+typedef StringCache <wchar_t> StringCache_w;
 
 //.............................................................................
 

@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 	
-class CNamedPipe: public g::win::CFileHandle
+class NamedPipe: public g::win::FileHandle
 {
 public:
 	bool 

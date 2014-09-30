@@ -14,7 +14,7 @@ namespace win {
 
 //.............................................................................
 
-class CSemaphore: public CWaitableHandle
+class Semaphore: public WaitableHandle
 {
 public:
 	bool 

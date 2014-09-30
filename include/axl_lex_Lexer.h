@@ -17,25 +17,25 @@ namespace lex {
 
 template <
 	typename T,
-	typename TToken
+	typename Token
 	>
-class CLexerT
+class Lexer
 {
 public:
-	typedef TToken CToken;
-	typedef typename TToken::EToken EToken;
-	typedef typename TToken::CPos CPos;
+	typedef Token Token;
+	typedef typename Token::TokenKind TokenKind;
+	typedef typename Token::Pos Pos;
 
 protected:
-	typedef rtl::CBoxListT <CToken, const CToken&> CTokenList;
-	typedef rtl::CBoxListEntryT <CToken> CTokenEntry;
+	typedef rtl::BoxList <Token, const Token&> TokenList;
+	typedef rtl::BoxListEntry <Token> TokenEntry;
 
 protected:
-	CTokenList m_tokenList;
-	CTokenList m_freeTokenList;
+	TokenList m_tokenList;
+	TokenList m_freeTokenList;
 	size_t m_channelMask;
 	
-	CPos m_lastTokenPos;
+	Pos m_lastTokenPos;
 
 public:
 	void
@@ -60,7 +60,7 @@ public:
 		m_channelMask = mask;
 	}	
 
-	const CToken*
+	const Token*
 	getChannelToken (
 		size_t channelMask, 
 		size_t index = 0
@@ -69,7 +69,7 @@ public:
 		channelMask |= 1; // ensure channel 0 is ALWAYS in the mask
 
 		size_t i = 0;
-		rtl::CBoxIteratorT <CToken> it = m_tokenList.getHead ();
+		rtl::BoxIterator <Token> it = m_tokenList.getHead ();
 
 		for (;;)
 		{
@@ -95,7 +95,7 @@ public:
 			
 			// ...nope, need to fetch more tokens
 
-			rtl::CBoxIteratorT <CToken> tail = m_tokenList.getTail ();
+			rtl::BoxIterator <Token> tail = m_tokenList.getTail ();
 
 			size_t oldCount = m_tokenList.getCount ();
 			do 
@@ -119,14 +119,14 @@ public:
 		{
 			while (!m_tokenList.isEmpty ())
 			{
-				rtl::CBoxIteratorT <CToken> it = m_tokenList.getHead ();
+				rtl::BoxIterator <Token> it = m_tokenList.getHead ();
 
 				if (it->m_token <= 0) // done! but don't remove it!
 					return;
 
 				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
 
-				CTokenEntry* entry = it.getEntry ();
+				TokenEntry* entry = it.getEntry ();
 				
 				m_tokenList.removeEntry (entry);
 				m_freeTokenList.insertHeadEntry (entry);
@@ -137,7 +137,7 @@ public:
 		}
 	}
 
-	const CToken*
+	const Token*
 	getToken (size_t index = 0)
 	{
 		return getChannelToken (m_channelMask, index);
@@ -155,12 +155,12 @@ protected:
 	{
 	}
 
-	CToken*
+	Token*
 	allocateToken ()
 	{
-		CTokenEntry* entry = !m_freeTokenList.isEmpty () ? 
+		TokenEntry* entry = !m_freeTokenList.isEmpty () ? 
 			m_freeTokenList.removeHeadEntry () :
-			AXL_MEM_NEW (CTokenEntry);
+			AXL_MEM_NEW (TokenEntry);
 
 		m_tokenList.insertTailEntry (entry);
 		return &entry->m_value;

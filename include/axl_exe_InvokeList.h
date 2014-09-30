@@ -19,18 +19,18 @@ struct IFunction;
 
 // most schedulers would maintain a list of pending invokations
 
-class CInvokeList
+class InvokeList
 {
 protected:
-	class CEntry: public rtl::TListLink
+	class Entry: public rtl::ListLink
 	{
 	public:
-		ref::CPtrT <CArgBlock> m_stack;
-		ref::CPtrT <IFunction> m_function;
+		ref::Ptr <ArgBlock> m_stack;
+		ref::Ptr <IFunction> m_function;
 	};
 
 protected:
-	rtl::CStdListT <CEntry> m_list;
+	rtl::StdList <Entry> m_list;
 
 public:
 	bool 
@@ -52,7 +52,7 @@ public:
 	}
 
 	void 
-	takeOver (CInvokeList* src)
+	takeOver (InvokeList* src)
 	{ 
 		m_list.takeOver (&src->m_list);
 	}

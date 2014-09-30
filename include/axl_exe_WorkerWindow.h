@@ -15,12 +15,12 @@ namespace exe {
 
 //.............................................................................
 
-class CWorkerWindow: 
-	public g::win::CWindowImplT <CWorkerWindow>,
+class WorkerWindow: 
+	public g::win::WindowImpl <WorkerWindow>,
 	public exe::IScheduler
 {
 public:
-	AXL_OBJ_CLASS_0 (CWorkerWindow, exe::IScheduler)
+	AXL_OBJ_CLASS_0 (WorkerWindow, exe::IScheduler)
 
 protected:
 	enum
@@ -28,12 +28,12 @@ protected:
 		WM_PROCESS_INVOKE_LIST = WM_USER + 1,
 	};
 
-	mt::CLock m_lock;
-	exe::CInvokeList m_invokeList;
+	mt::Lock m_lock;
+	exe::InvokeList m_invokeList;
 	ulong_t m_threadId;
 
 public:
-	CWorkerWindow ()
+	WorkerWindow ()
 	{
 		m_threadId = 0;
 	}
@@ -42,13 +42,13 @@ public:
 	create ()
 	{
 		m_threadId = ::GetCurrentThreadId ();
-		return CWindowImplT <CWorkerWindow>::create (NULL);
+		return WindowImpl <WorkerWindow>::create (NULL);
 	}
 
 	// IScheduler
 
 	virtual 
-	EScheduleResult
+	ScheduleResultKind
 	scheduleV (
 		exe::IFunction* function, 
 		axl_va_list va

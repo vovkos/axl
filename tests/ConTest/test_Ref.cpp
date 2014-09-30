@@ -6,34 +6,34 @@ namespace test_Ref {
 
 //.............................................................................
 
-class CMyClass
+class MyClass
 {
 public:
 	int m_x;
 	int m_y;
 
 public:
-	CMyClass ()
+	MyClass ()
 	{
 		printf ("CMyClass::CMyClass ()\n");
 		m_x = 0;
 		m_y = 0;
 	}
 
-	CMyClass (const CMyClass& src)
+	MyClass (const MyClass& src)
 	{
 		printf ("CMyClass::CMyClass (const CMyClass&)\n");
 		m_x = src.m_x;
 		m_y = src.m_y;
 	}
 
-	~CMyClass ()
+	~MyClass ()
 	{
 		printf ("CMyClass::~CMyClass ()\n");
 	}
 
-	CMyClass&
-	operator = (const CMyClass& src)
+	MyClass&
+	operator = (const MyClass& src)
 	{
 		printf ("CMyClass::operator = (const CMyClass&)\n");
 		m_x = src.m_x;
@@ -45,7 +45,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CDcbGetSize
+class DcbGetSize
 {
 public:
 	size_t 
@@ -60,37 +60,37 @@ public:
 void 
 run_Buf ()
 {
-	rtl::CString s;
+	rtl::String s;
 	s = "sdkjhasdljadljasdklj";
 	char x = s [10];
 
 	s.clear ();
 
-	rtl::CArrayT <uchar_t> arr;
+	rtl::Array <uchar_t> arr;
 	arr.setCount (10);
 
-	rtl::CArrayT <uchar_t> arr2 = arr;
+	rtl::Array <uchar_t> arr2 = arr;
 	arr2 [0] = 10;
 
-	ref::CBufT <DCB, CDcbGetSize> dcb;
+	ref::Buf <DCB, DcbGetSize> dcb;
 	dcb.getBuffer ();
 	dcb->DCBlength = 240;
 	dcb->BaudRate = 38400;
 
-	ref::CBufT <DCB, CDcbGetSize> dcb2 = dcb;
+	ref::Buf <DCB, DcbGetSize> dcb2 = dcb;
 	dcb2.getBuffer ();
 
-	CMyClass a;
+	MyClass a;
 	a.m_x = 1;
 	a.m_y = 2;
 
-	ref::CBufT <CMyClass> b1;
+	ref::Buf <MyClass> b1;
 	
 	b1 = a;
 	b1->m_x = 10;
 	b1->m_y = 20;
 
-	ref::CBufT <CMyClass> b2 = b1;
+	ref::Buf <MyClass> b2 = b1;
 
 	b1.getBuffer ();
 	b1.release ();
@@ -102,15 +102,15 @@ run_Buf ()
 
 //.............................................................................
 
-class CMyClass2: public ref::CRefCount
+class MyClass2: public ref::RefCount
 {
 public:
-	CMyClass2 ()
+	MyClass2 ()
 	{
 		printf ("CMyClass2::CMyClass2 ()\n");
 	}
 
-	~CMyClass2 ()
+	~MyClass2 ()
 	{
 		printf ("CMyClass2::CMyClass2 ()\n");
 	}
@@ -121,11 +121,11 @@ public:
 void
 run_WeakRef ()
 {
-	ref::CPtrT <CMyClass2> p = AXL_REF_NEW (CMyClass2);
+	ref::Ptr <MyClass2> p = AXL_REF_NEW (MyClass2);
 //	ref::CPtrT <CMyClass2> p2 = ref::GetPtrOrClone ((CMyClass2*) p);
 //	ref::CPtrT <CMyClass2> p3 = ref::Clone (p);
-	ref::CWeakPtrT <CMyClass2> w = p;
-	p = ref::EPtr_Null;
+	ref::WeakPtr <MyClass2> w = p;
+	p = ref::PtrKind_Null;
 	p = w;
 }
 
@@ -144,7 +144,7 @@ void tempFunc (T* p)
 {
 }
 
-class CMyClass3: public ref::CRefCount
+class MyClass3: public ref::RefCount
 {
 public:
 	int m_x;
@@ -155,9 +155,9 @@ public:
 void
 run_Clone ()
 {
-	ref::CPtrT <CMyClass3> a, b;
+	ref::Ptr <MyClass3> a, b;
 
-	a = AXL_REF_NEW (CMyClass3);
+	a = AXL_REF_NEW (MyClass3);
 	a->m_x = 10;
 
 	a->addRef ();
@@ -170,24 +170,24 @@ run_Clone ()
 
 struct IMyInterface
 {
-	virtual ref::CPtrT <IMyInterface> getChild (int i) = 0;
+	virtual ref::Ptr <IMyInterface> getChild (int i) = 0;
 	virtual void doSomething () = 0;
 	virtual void doSomethingElse () = 0;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMyClass4: public IMyInterface
+class MyClass4: public IMyInterface
 {
 public:
-	CMyClass4 ()
+	MyClass4 ()
 		{ printf ("CMyClass4::CMyClass4 ()\n"); }
 
-	~CMyClass4 ()
+	~MyClass4 ()
 		{ printf ("CMyClass4::~CMyClass4 ()\n"); }
 
-	ref::CPtrT <IMyInterface> getChild (int i)
-		{ return ref::EPtr_Null; }
+	ref::Ptr <IMyInterface> getChild (int i)
+		{ return ref::PtrKind_Null; }
 
 	virtual void doSomething ()
 		{ printf ("CMyClass4::DoSomething ()\n"); }
@@ -198,26 +198,26 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMyContainer: 
-	public ref::CRefCount,
+class MyContainer: 
+	public ref::RefCount,
 	public IMyInterface
 {
 public:
-	ref::CChildT <ref::CBoxT <CMyClass4> > m_child1;
-	ref::CChildT <ref::CBoxT <CMyClass4> > m_child2;
-	ref::CChildT <ref::CBoxT <CMyClass4> > m_child3;
+	ref::Child <ref::Box <MyClass4> > m_child1;
+	ref::Child <ref::Box <MyClass4> > m_child2;
+	ref::Child <ref::Box <MyClass4> > m_child3;
 
 public:
-	CMyContainer () :
+	MyContainer () :
 		m_child1 (this),
 		m_child2 (this),
 		m_child3 (this)
 		{ printf ("CMyContainer::CMyContainer ()\n"); }
 
-	~CMyContainer ()
+	~MyContainer ()
 		{ printf ("CMyContainer::~CMyContainer ()\n"); }
 
-	ref::CPtrT <IMyInterface> getChild (int i)
+	ref::Ptr <IMyInterface> getChild (int i)
 	{ 
 		switch (i)
 		{
@@ -231,7 +231,7 @@ public:
 			return &m_child3;
 
 		default:
-			return ref::EPtr_Null;
+			return ref::PtrKind_Null;
 		}
 	}
 
@@ -244,26 +244,26 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CMySuperContainer: 
-	public ref::CRefCount,
+class MySuperContainer: 
+	public ref::RefCount,
 	public IMyInterface
 {
 public:
-	ref::CChildT <CMyContainer> m_child1;
-	ref::CChildT <CMyContainer> m_child2;
-	ref::CChildT <ref::CBoxT <CMyClass4> > m_child3;
+	ref::Child <MyContainer> m_child1;
+	ref::Child <MyContainer> m_child2;
+	ref::Child <ref::Box <MyClass4> > m_child3;
 
 public:
-	CMySuperContainer () :
+	MySuperContainer () :
 		m_child1 (this),
 		m_child2 (this),
 		m_child3 (this)
 		{ printf ("CMySuperContainer::CMySuperContainer ()\n"); }
 
-	~CMySuperContainer ()
+	~MySuperContainer ()
 		{ printf ("CMySuperContainer::~CMySuperContainer ()\n"); }
 
-	ref::CPtrT <IMyInterface> getChild (int i)
+	ref::Ptr <IMyInterface> getChild (int i)
 	{ 
 		switch (i)
 		{
@@ -277,7 +277,7 @@ public:
 			return &m_child3;
 
 		default:
-			return ref::EPtr_Null;
+			return ref::PtrKind_Null;
 		}
 	}
 
@@ -293,11 +293,11 @@ public:
 void 
 run_Container () 
 {
-	ref::CPtrT <IMyInterface> p;
-	ref::CPtrT <IMyInterface> p2;
-	ref::CPtrT <IMyInterface> p3;
+	ref::Ptr <IMyInterface> p;
+	ref::Ptr <IMyInterface> p2;
+	ref::Ptr <IMyInterface> p3;
 
-	p = AXL_REF_NEW (CMySuperContainer);
+	p = AXL_REF_NEW (MySuperContainer);
 	p->doSomething ();
 	p->doSomethingElse ();
 
@@ -309,17 +309,17 @@ run_Container ()
 	p->getChild (2)->doSomething ();
 	p->getChild (2)->doSomethingElse (); 
 
-	p = ref::EPtr_Null;
+	p = ref::PtrKind_Null;
 
 	p2->doSomething ();
-	p2 = ref::EPtr_Null;
+	p2 = ref::PtrKind_Null;
 
-	p3 = AXL_REF_NEW (ref::CBoxT <CMyClass4>);
+	p3 = AXL_REF_NEW (ref::Box <MyClass4>);
 
-	ref::CWeakPtrT <IMyInterface> w = p3;
+	ref::WeakPtr <IMyInterface> w = p3;
 	p3->doSomethingElse ();	
 
-	p3 = ref::EPtr_Null;
+	p3 = ref::PtrKind_Null;
 
 	p = w;
 

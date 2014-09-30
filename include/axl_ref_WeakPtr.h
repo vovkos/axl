@@ -16,75 +16,75 @@ namespace ref {
 // forward
 
 template <typename T>
-class CPtrT;
+class Ptr;
 
 //.............................................................................
 
 // weak ptr
 
 template <typename T>
-class CWeakPtrT
+class WeakPtr
 {
 	template <typename T2>
-	friend class CPtrT;
+	friend class Ptr;
 
 	template <typename T2>
-	friend class CWeakPtrT;
+	friend class WeakPtr;
 
 protected:
 	T* m_p;
-	CRefCount* m_refCount;
+	RefCount* m_refCount;
 
 public:
-	CWeakPtrT (int i = 0)
+	WeakPtr (int i = 0)
 	{ 
 		m_p = NULL;
 		m_refCount = NULL; 
 	}
 
-	CWeakPtrT (const CWeakPtrT& src)
+	WeakPtr (const WeakPtr& src)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	CWeakPtrT (const CWeakPtrT <T2>& src)
+	WeakPtr (const WeakPtr <T2>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	CWeakPtrT (const CPtrT <T2>& src)
+	WeakPtr (const Ptr <T2>& src)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	CWeakPtrT (T2* p)
+	WeakPtr (T2* p)
 	{
 		m_p = NULL, m_refCount = NULL;
 		copy (p, p);
 	}
 
-	CWeakPtrT (
+	WeakPtr (
 		T* p, 
-		CRefCount* refCount
+		RefCount* refCount
 		)
 	{ 
 		m_p = NULL, m_refCount = NULL;
 		copy (p, refCount);
 	}
 
-	~CWeakPtrT ()
+	~WeakPtr ()
 	{ 
 		clear (); 
 	}
 
-	CWeakPtrT& 
-	operator = (const CWeakPtrT& src)
+	WeakPtr& 
+	operator = (const WeakPtr& src)
 	{ 
 		copy (src.m_p, src.m_refCount);
 		return *this;
@@ -93,7 +93,7 @@ public:
 	void 
 	copy (
 		T* p, 
-		CRefCount* refCount
+		RefCount* refCount
 		)
 	{
 		m_p = p;
@@ -113,7 +113,7 @@ public:
 	void 
 	attach (
 		T* p, 
-		CRefCount* refCount
+		RefCount* refCount
 		)
 	{
 		if (m_refCount)
@@ -126,7 +126,7 @@ public:
 	void 
 	detach (
 		T** pp_o = NULL, 
-		CRefCount** refCount_o = NULL
+		RefCount** refCount_o = NULL
 		)
 	{ 
 		if (pp_o)
@@ -149,7 +149,7 @@ public:
 		m_refCount = NULL;
 	}
 
-	CRefCount* 
+	RefCount* 
 	getRefCount () const
 	{
 		return m_refCount;

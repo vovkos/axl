@@ -9,9 +9,9 @@ namespace gui {
 //.............................................................................
 
 bool
-CQtCaret::show (
-	CWidget* widget,
-	const TRect& rect
+QtCaret::show (
+	Widget* widget,
+	const Rect& rect
 	)
 {
 	ASSERT (widget);
@@ -31,7 +31,7 @@ CQtCaret::show (
 }
 
 void
-CQtCaret::hide ()
+QtCaret::hide ()
 {
 	if (!m_widget)
 		return;
@@ -45,7 +45,7 @@ CQtCaret::hide ()
 }
 
 void
-CQtCaret::timerEvent  (QTimerEvent* e)
+QtCaret::timerEvent  (QTimerEvent* e)
 {
 	if (!m_widget)
 		return;
@@ -56,23 +56,23 @@ CQtCaret::timerEvent  (QTimerEvent* e)
 
 //.............................................................................
 
-CQtEngine*
+QtEngine*
 getQtEngineSingleton ()
 {
-	return CQtEngine::getSingleton ();
+	return QtEngine::getSingleton ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-ref::CPtrT <CFont>
-CQtEngine::createStdFont (EStdFont fontKind)
+ref::Ptr <Font>
+QtEngine::createStdFont (StdFontKind fontKind)
 {
 	switch (fontKind)
 	{
-	case EStdFont_Gui:
+	case StdFontKind_Gui:
 		return createFont (QApplication::font ());
 
-	case EStdFont_Monospace:
+	case StdFontKind_Monospace:
 		{
 		QFont qtFont ("Monospace", 10);
 		qtFont.setStyleHint (QFont::TypeWriter, QFont::NoFontMerging);
@@ -80,12 +80,12 @@ CQtEngine::createStdFont (EStdFont fontKind)
 		}
 
 	default:
-		return ref::EPtr_Null;
+		return ref::PtrKind_Null;
 	}
 }
 
 QFont
-CQtEngine::createQtFont (
+QtEngine::createQtFont (
 	const char* faceName,
 	size_t pointSize,
 	uint_t flags
@@ -93,66 +93,66 @@ CQtEngine::createQtFont (
 {
 	QString familyName = QString::fromUtf8 (faceName);
 
-	int weight = (flags & EFontFlag_Bold) ? QFont::Bold : QFont::Normal;
-	bool isItalic = (flags & EFontFlag_Italic) != 0;
+	int weight = (flags & FontFlagKind_Bold) ? QFont::Bold : QFont::Normal;
+	bool isItalic = (flags & FontFlagKind_Italic) != 0;
 
 	QFont qtFont (familyName, pointSize, weight, isItalic);
 
-	if (flags & EFontFlag_Underline)
+	if (flags & FontFlagKind_Underline)
 		qtFont.setUnderline (true);
 
-	if (flags & EFontFlag_Strikeout)
+	if (flags & FontFlagKind_Strikeout)
 		qtFont.setStrikeOut (true);
 
 	return qtFont;
 }
 
-ref::CPtrT <CFont>
-CQtEngine::createFont (const QFont& qtFont)
+ref::Ptr <Font>
+QtEngine::createFont (const QFont& qtFont)
 {
-	CQtFont* font = AXL_MEM_NEW (CQtFont);
+	QtFont* font = AXL_MEM_NEW (QtFont);
 	font->m_qtFont = qtFont;
 
 	getFontDescFromFontInfo (QFontInfo (qtFont), &font->m_fontDesc);
 
-	ref::CPtrT <CQtFontTuple> fontTuple = AXL_REF_NEW (CQtFontTuple);
+	ref::Ptr <QtFontuple> fontTuple = AXL_REF_NEW (QtFontuple);
 	fontTuple->m_baseFont = font;
 	fontTuple->m_fontModArray [font->m_fontDesc.m_flags] = font;
 
 	font->m_tuple = fontTuple;
 
-	return ref::CPtrT <CFont> (font, fontTuple);
+	return ref::Ptr <Font> (font, fontTuple);
 }
 
-CFont*
-CQtEngine::getFontMod (
-	CFont* _pBaseFont,
+Font*
+QtEngine::getFontMod (
+	Font* _pBaseFont,
 	uint_t flags
 	)
 {
 	ASSERT (_pBaseFont->getEngine () == this);
 
-	CQtFont* baseFont = (CQtFont*) _pBaseFont;
-	CQtFontTuple* fontTuple = (CQtFontTuple*) baseFont->m_tuple;
+	QtFont* baseFont = (QtFont*) _pBaseFont;
+	QtFontuple* fontTuple = (QtFontuple*) baseFont->m_tuple;
 
-	TFontDesc fontDesc = *baseFont->getFontDesc ();
+	FontDesc fontDesc = *baseFont->getFontDesc ();
 
-	CQtFont* font = AXL_MEM_NEW (CQtFont);
+	QtFont* font = AXL_MEM_NEW (QtFont);
 	font->m_fontDesc = fontDesc;
 	font->m_fontDesc.m_flags = flags;
 	font->m_qtFont = createQtFont (fontDesc.m_faceName, fontDesc.m_pointSize, flags);
 
-	ASSERT (!(flags & EFontFlag_Transparent) && flags < countof (fontTuple->m_fontModArray));
+	ASSERT (!(flags & FontFlagKind_Transparent) && flags < countof (fontTuple->m_fontModArray));
 	ASSERT (!fontTuple->m_fontModArray [flags]);
 
 	fontTuple->m_fontModArray [flags] = font;
 	return font;
 }
 
-ref::CPtrT <CCursor>
-CQtEngine::createStdCursor (EStdCursor cursorKind)
+ref::Ptr <Cursor>
+QtEngine::createStdCursor (StdCursorKind cursorKind)
 {
-	static Qt::CursorShape stdCursorShapeTable [EStdCursor__Count] =
+	static Qt::CursorShape stdCursorShapeTable [StdCursorKind__Count] =
 	{
 		Qt::ArrowCursor,         // EStdCursor_Arrow = 0,
 		Qt::WaitCursor,          // EStdCursor_Wait,
@@ -165,30 +165,30 @@ CQtEngine::createStdCursor (EStdCursor cursorKind)
 		Qt::SizeAllCursor,       // EStdCursor_SizeAll,
 	};
 
-	ASSERT (cursorKind < EStdCursor__Count);
+	ASSERT (cursorKind < StdCursorKind__Count);
 	return createCursor (stdCursorShapeTable [cursorKind]);
 }
 
-ref::CPtrT <CCursor>
-CQtEngine::createCursor (const QCursor& qtCursor)
+ref::Ptr <Cursor>
+QtEngine::createCursor (const QCursor& qtCursor)
 {
-	ref::CPtrT <CQtCursor> cursor = AXL_REF_NEW (ref::CBoxT <CQtCursor>);
+	ref::Ptr <QtCursor> cursor = AXL_REF_NEW (ref::Box <QtCursor>);
 	cursor->m_qtCursor = qtCursor;
 	return cursor;
 }
 
-ref::CPtrT <CImage>
-CQtEngine::createImage ()
+ref::Ptr <Image>
+QtEngine::createImage ()
 {
-	ref::CPtrT <CQtImage> image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	ref::Ptr <QtImage> image = AXL_REF_NEW (ref::Box <QtImage>);
 	return image;
 }
 
-ref::CPtrT <CImage>
-CQtEngine::createImage (
+ref::Ptr <Image>
+QtEngine::createImage (
 	int width,
 	int height,
-	EPixelFormat pixelFormat,
+	PixelFormatKind pixelFormat,
 	const void* data,
 	bool isScreenCompatible
 	)
@@ -197,11 +197,11 @@ CQtEngine::createImage (
 
 	switch (pixelFormat)
 	{
-	case EPixelFormat_Rgba:
+	case PixelFormatKind_Rgba:
 		bitCount = 32;
 		break;
 
-	case EPixelFormat_Rgb:
+	case PixelFormatKind_Rgb:
 		bitCount = 24;
 		break;
 
@@ -223,7 +223,7 @@ CQtEngine::createImage (
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::PtrKind_Null);
 	}
 	else
 	{
@@ -235,7 +235,7 @@ CQtEngine::createImage (
 		bitmapInfo.bmiHeader.biWidth = width;
 		bitmapInfo.bmiHeader.biHeight = height;
 
-		CScreenDc screenDc;
+		ScreenDc screenDc;
 
 		hBitmap = ::CreateCompatibleBitmap (
 			screenDc,
@@ -244,7 +244,7 @@ CQtEngine::createImage (
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::PtrKind_Null);
 
 		bool_t result = setDIBits (
 			screenDc,
@@ -257,27 +257,27 @@ CQtEngine::createImage (
 			);
 
 		if (!result)
-			return err::failWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::PtrKind_Null);
 	} */
 
-	ref::CPtrT <CQtImage> image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	ref::Ptr <QtImage> image = AXL_REF_NEW (ref::Box <QtImage>);
 	image->m_qtPixmap = qtPixmap;
 	return image;
 }
 
-ref::CPtrT <CCanvas>
-CQtEngine::createOffscreenCanvas (
+ref::Ptr <Canvas>
+QtEngine::createOffscreenCanvas (
 	int width,
 	int height
 	)
 {
-	return ref::EPtr_Null;
+	return ref::PtrKind_Null;
 }
 
 uintptr_t 
-CQtEngine::registerClipboardFormat (const rtl::CString& formatName)
+QtEngine::registerClipboardFormat (const rtl::String& formatName)
 {
-	rtl::CStringHashTableMapIteratorT <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
+	rtl::StringHashTableMapIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
 	if (it)
 		return it->m_value;
 
@@ -288,7 +288,7 @@ CQtEngine::registerClipboardFormat (const rtl::CString& formatName)
 }
 
 bool
-CQtEngine::readClipboard (rtl::CString* string)
+QtEngine::readClipboard (rtl::String* string)
 {
 	QClipboard* qtClipboard = QApplication::clipboard ();
 	QString qtString = qtClipboard->text ();
@@ -298,15 +298,15 @@ CQtEngine::readClipboard (rtl::CString* string)
 }
 
 bool
-CQtEngine::readClipboard (
+QtEngine::readClipboard (
 	uintptr_t format,
-	rtl::CArrayT <char>* data
+	rtl::Array <char>* data
 	)
 {
 	size_t count = m_clipboardFormatNameTable.getCount ();
 	if (format >= count)
 	{
-		err::setError (err::EStatus_InvalidParameter);
+		err::setError (err::StatusKind_InvalidParameter);
 		return false;
 	}
 
@@ -321,7 +321,7 @@ CQtEngine::readClipboard (
 }
 
 bool
-CQtEngine::writeClipboard (
+QtEngine::writeClipboard (
 	const char* string,
 	size_t length
 	)
@@ -335,7 +335,7 @@ CQtEngine::writeClipboard (
 }
 
 bool
-CQtEngine::writeClipboard (
+QtEngine::writeClipboard (
 	uintptr_t format,
 	const void* data,
 	size_t size
@@ -344,7 +344,7 @@ CQtEngine::writeClipboard (
 	size_t count = m_clipboardFormatNameTable.getCount ();
 	if (format >= count)
 	{
-		err::setError (err::EStatus_InvalidParameter);
+		err::setError (err::StatusKind_InvalidParameter);
 		return false;
 	}
 
@@ -358,7 +358,7 @@ CQtEngine::writeClipboard (
 }
 
 bool
-CQtEngine::commitClipboard ()
+QtEngine::commitClipboard ()
 {
 	if (!m_qtClipboardMimeData)
 		return false;

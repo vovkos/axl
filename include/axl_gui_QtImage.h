@@ -13,15 +13,15 @@ namespace gui {
 
 //.............................................................................
 
-class CQtImage: public CImage
+class QtImage: public Image
 {
-	friend class CQtEngine;
+	friend class QtEngine;
 
 public:
 	QPixmap m_qtPixmap;
 
 public:
-	CQtImage ();
+	QtImage ();
 
 	virtual
 	bool

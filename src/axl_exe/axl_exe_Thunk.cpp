@@ -9,17 +9,17 @@ namespace exe {
 
 #pragma AXL_TODO ("implement proper thunk allocator")
 
-TThunk* 
+Thunk* 
 createThunk (
 	void* pf,
 	void* context
 	)
 {
-	TThunk* thunk = (TThunk*) AXL_MEM_ALLOC (sizeof (TThunk));
+	Thunk* thunk = (Thunk*) AXL_MEM_ALLOC (sizeof (Thunk));
 
 #if (_AXL_CPU == AXL_CPU_X86)
 
-	static TThunk _Thunk = 
+	static Thunk _Thunk = 
 	{
 		0x042444c7, 0,  // mov		dword ptr [esp + 4], pContext
 		0xe9,       0   // jmp		pf
@@ -31,7 +31,7 @@ createThunk (
 
 #elif (_AXL_CPU == AXL_CPU_AMD64)
 
-	static TThunk _Thunk = 
+	static Thunk _Thunk = 
 	{
 		0xb948,     0,  // mov		rcx,	pContext
 		0xb848,     0,  // mov		rax,	pf
@@ -51,8 +51,8 @@ createThunk (
 	ulong_t oldProtect;
 	
 	bool_t result = 
-		virtualProtect (thunk, sizeof (TThunk), PAGE_EXECUTE_READWRITE, &oldProtect) &&
-		flushInstructionCache (getCurrentProcess (), thunk, sizeof (TThunk));
+		virtualProtect (thunk, sizeof (Thunk), PAGE_EXECUTE_READWRITE, &oldProtect) &&
+		flushInstructionCache (getCurrentProcess (), thunk, sizeof (Thunk));
 
 	if (!result)
 	{
@@ -62,7 +62,7 @@ createThunk (
 
 #elif _AXL_ENV == AXL_ENV_NT
 
-	zwFlushInstructionCache (zwCurrentProcess (), thunk, sizeof (TThunk));
+	zwFlushInstructionCache (zwCurrentProcess (), thunk, sizeof (Thunk));
 
 #endif
 

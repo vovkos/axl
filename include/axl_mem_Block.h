@@ -15,17 +15,17 @@ namespace mem {
 
 // memory block descriptor
 
-struct TBlock
+struct Block
 {
 	void* m_p;
 	size_t m_size;
 
-	TBlock ()
+	Block ()
 	{
 		setup (NULL, 0);
 	}
 
-	TBlock (
+	Block (
 		void* p, 
 		size_t size
 		)

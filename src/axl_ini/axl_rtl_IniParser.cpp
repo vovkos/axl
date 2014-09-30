@@ -7,11 +7,11 @@ namespace rtl {
 //.............................................................................
 
 bool
-CIniParserRoot::parseLine (
+IniParserRoot::parseLine (
 	const char* p0,
 	size_t length,
-	rtl::CString* name,
-	rtl::CString* value,
+	rtl::String* name,
+	rtl::String* value,
 	bool* isSection,
 	size_t* lineLength
 	)
@@ -21,8 +21,8 @@ CIniParserRoot::parseLine (
 	const char* p = p0;
 	const char* end = p + length;
 
-	EState state = EState_Space;
-	EState prevState = EState_Space;
+	StateKind state = StateKind_Space;
+	StateKind prevState = StateKind_Space;
 	
 	name->clear ();
 	value->clear ();
@@ -36,15 +36,15 @@ CIniParserRoot::parseLine (
 
 		switch (state)
 		{
-		case EState_Space:
+		case StateKind_Space:
 			switch (x)
 			{
 			case '\'': case '#': case ';':
-				state = EState_Comment;
+				state = StateKind_Comment;
 				break;
 
 			case '[':
-				state = EState_Section;
+				state = StateKind_Section;
 				name
 				break;
 
@@ -59,23 +59,23 @@ CIniParserRoot::parseLine (
 
 				p--; // re-read
 
-				if (prevState != EState_Space)
+				if (prevState != StateKind_Space)
 					state = prevState;
 				else
-					state = EState_Key, keyLine = line, keyName.clear();
+					state = StateKind_Key, keyLine = line, keyName.clear();
 			};
 
 			break;
 
-		case EState_Comment:
+		case StateKind_Comment:
 			if (x == '\n')
 				state = prevState, line++;
 			break;
 
-		case EState_Section:
+		case StateKind_Section:
 			if (x == '\n')
 			{
-				state = EState_Error; 
+				state = StateKind_Error; 
 				break;
 			}
 			else if (x != ']')
@@ -87,35 +87,35 @@ CIniParserRoot::parseLine (
 			if (pfnOnSection != NULL)
 				sectionContext = pfnOnSection(context, sectionName);
 
-			state = prevState = EState_Space;
+			state = prevState = StateKind_Space;
 			break;
 
-		case EState_Key:
+		case StateKind_Key:
 			if (x == '\n' || line != keyLine)
 			{
-				state = EState_Error;
+				state = StateKind_Error;
 				break;
 			}
 
 			if (isspace(x))
 			{
 				prevState = state;
-				state = EState_Space;
+				state = StateKind_Space;
 				break;
 			}
 
 			if (x != '=')
 				keyName += (char) x;
 			else
-				state = EState_Value, value.clear();
+				state = StateKind_Value, value.clear();
 
 			break;
 
-		case EState_Value:
+		case StateKind_Value:
 			if (x == '\n' || line != keyLine)
 			{
 				pfnOnKeyValue(context, sectionContext, sectionName, keyName, value);
-				state = prevState = EState_Space;
+				state = prevState = StateKind_Space;
 				p--;
 				break;
 			}
@@ -123,7 +123,7 @@ CIniParserRoot::parseLine (
 			if (value.isEmpty() && isspace(x))
 			{
 				prevState = state;
-				state = EState_Space;
+				state = StateKind_Space;
 				break;
 			}
 
@@ -134,7 +134,7 @@ CIniParserRoot::parseLine (
 
 	// if there was no \n on the last line
 
-	if (state == EState_Value)
+	if (state == StateKind_Value)
 		pfnOnKeyValue(context, sectionContext, sectionName, keyName, value);
 
 	return true;
@@ -145,7 +145,7 @@ CIniParserRoot::parseLine (
 
 namespace ini {
 
-struct EState { enum 
+struct StateKind { enum 
 {
 	error = -1,
 	space = 0,
@@ -176,17 +176,17 @@ ini::parseIniA(
 
 //.............................................................................
 
-void ini::CIniParser::setSection(const TCHAR* sectionName, void* context)
+void ini::IniParser::setSection(const TCHAR* sectionName, void* context)
 {
-	rtl::TBinTreeNode* node = m_sectionMap.find((intptr_t) sectionName);
+	rtl::BinreeNode* node = m_sectionMap.find((intptr_t) sectionName);
 	if (node)
 	{
-		m_currentSection = (TSection*) node->m_value;
+		m_currentSection = (Section*) node->m_value;
 		m_currentSection->m_context = context;
 		return;
 	}
 
-	m_currentSection = new TSection;
+	m_currentSection = new Section;
 	m_currentSection->m_sectionName = sectionName;
 	m_currentSection->m_context = context;
 	m_sectionList.insertTail(m_currentSection);
@@ -195,31 +195,31 @@ void ini::CIniParser::setSection(const TCHAR* sectionName, void* context)
 	node->m_value = (intptr_t) m_currentSection;
 }
 
-void ini::CIniParser::setKeyHandler(const TCHAR* keyName, FOnKeyValue pfnOnKeyValue, void* context)
+void ini::IniParser::setKeyHandler(const TCHAR* keyName, FOnKeyValue pfnOnKeyValue, void* context)
 {
-	rtl::TBinTreeNode* node;
+	rtl::BinreeNode* node;
 
 	if (!m_currentSection)
 	{
-		m_currentSection = new TSection;
+		m_currentSection = new Section;
 		m_sectionList.insertTail(m_currentSection);
 
 		node = m_sectionMap.goto(NULL);
 		node->m_value = (intptr_t) m_currentSection;
 	}
 
-	TKeyHandler* handler;
+	KeyHandler* handler;
 
 	node = m_sectionMap.find((intptr_t) keyName);
 	if (node)
 	{
-		handler = (TKeyHandler*) node->m_value;
+		handler = (KeyHandler*) node->m_value;
 		handler->m_pfnOnKeyValue = pfnOnKeyValue;
 		handler->m_context = context;
 		return;
 	}
 
-	handler = new TKeyHandler;
+	handler = new KeyHandler;
 	handler->m_keyName = keyName;
 	handler->m_pfnOnKeyValue = pfnOnKeyValue;
 	handler->m_context = context;
@@ -229,29 +229,29 @@ void ini::CIniParser::setKeyHandler(const TCHAR* keyName, FOnKeyValue pfnOnKeyVa
 	node->m_value = (intptr_t) handler;
 }
 
-void ini::CIniParser::clear()
+void ini::IniParser::clear()
 {
 	m_sectionList.clear();
 	m_sectionMap.clear();
 	m_currentSection = NULL;
 }
 
-bool ini::CIniParser::parse(const TCHAR* source, size_t length)
+bool ini::IniParser::parse(const TCHAR* source, size_t length)
 {
 	return ini::parseIni(source, length, _OnSection, _OnKeyValue, this);
 }
 
-void* ini::CIniParser::_OnSection(
+void* ini::IniParser::_OnSection(
 	void* context,
 	const TCHAR* sectionName
 	)
 {
-	CIniParser* this = (CIniParser*) context;
-	rtl::TBinTreeNode* node = this->m_sectionMap.find((intptr_t) sectionName);
-	return node ? (TSection*) node->m_value : NULL;
+	IniParser* this = (IniParser*) context;
+	rtl::BinreeNode* node = this->m_sectionMap.find((intptr_t) sectionName);
+	return node ? (Section*) node->m_value : NULL;
 }
 
-void ini::CIniParser::_OnKeyValue(
+void ini::IniParser::_OnKeyValue(
 	void* context,
 	void* sectionContext,
 	const TCHAR* sectionName,
@@ -259,14 +259,14 @@ void ini::CIniParser::_OnKeyValue(
 	const TCHAR* value
 	)
 {
-	CIniParser* this = (CIniParser*) context;
+	IniParser* this = (IniParser*) context;
 	
-	rtl::TBinTreeNode* node;
-	TSection* section;
+	rtl::BinreeNode* node;
+	Section* section;
 
 	if (sectionContext)
 	{
-		section = (TSection*) sectionContext;
+		section = (Section*) sectionContext;
 	}
 	else
 	{
@@ -274,14 +274,14 @@ void ini::CIniParser::_OnKeyValue(
 		if (!node)
 			return;
 
-		section = (TSection*) node->m_value;
+		section = (Section*) node->m_value;
 	}
 	
 	node = section->m_keyHandlerMap.find((intptr_t) keyName);
 	if (!node)
 		return;
 
-	TKeyHandler* handler = (TKeyHandler*) node->m_value;
+	KeyHandler* handler = (KeyHandler*) node->m_value;
 	return handler->m_pfnOnKeyValue(
 		handler->m_context, 
 		section->m_context,

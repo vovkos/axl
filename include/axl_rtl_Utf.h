@@ -13,19 +13,19 @@ namespace rtl {
 
 //.............................................................................
 
-enum EUtf
+enum UtfKind
 {
-	EUtf_Utf8 = 0,
-	EUtf_Utf16,
-	EUtf_Utf16_be,
-	EUtf_Utf32,
-	EUtf_Utf32_be,
+	UtfKind_Utf8 = 0,
+	UtfKind_Utf16,
+	UtfKind_Utf16_be,
+	UtfKind_Utf32,
+	UtfKind_Utf32_be,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
-getUtfKindString (EUtf utfKind);
+getUtfKindString (UtfKind utfKind);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -54,16 +54,16 @@ calcUtfCodePointCount (
 
 //.............................................................................
 
-class CUtf8
+class Utf8
 {
 public:
 	typedef utf8_t C;
 
 	static
-	EUtf
+	UtfKind
 	getUtfKind ()
 	{
-		return EUtf_Utf8;
+		return UtfKind_Utf8;
 	}
 
 	static
@@ -166,30 +166,30 @@ public:
 		size_t length
 		)
 	{
-		return calcUtfCodePointCount <CUtf8> (p, length);
+		return calcUtfCodePointCount <Utf8> (p, length);
 	}
 };
 
 //.............................................................................
 
-class CUtf16
+class Utf16
 {
 public:
 	typedef utf16_t C;
 
-	enum ESurrogate
+	enum SurrogateKind
 	{
-		ESurrogate_MinLead  = 0xd800,
-		ESurrogate_MaxLead  = 0xdbff,
-		ESurrogate_MinTrail = 0xdc00,
-		ESurrogate_MaxTrail = 0xdfff,
+		SurrogateKind_MinLead  = 0xd800,
+		SurrogateKind_MaxLead  = 0xdbff,
+		SurrogateKind_MinTrail = 0xdc00,
+		SurrogateKind_MaxTrail = 0xdfff,
 	};
 
 	static
-	EUtf
+	UtfKind
 	getUtfKind ()
 	{
-		return EUtf_Utf16;
+		return UtfKind_Utf16;
 	}
 
 	static
@@ -299,20 +299,20 @@ public:
 		size_t length
 		)
 	{
-		return calcUtfCodePointCount <CUtf16> (p, length);
+		return calcUtfCodePointCount <Utf16> (p, length);
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUtf16_be: public CUtf16
+class Utf16_be: public Utf16
 {
 public:
 	static
-	EUtf
+	UtfKind
 	getUtfKind ()
 	{
-		return EUtf_Utf16_be;
+		return UtfKind_Utf16_be;
 	}
 
 	static
@@ -362,22 +362,22 @@ public:
 		size_t length
 		)
 	{
-		return calcUtfCodePointCount <CUtf16_be> (p, length);
+		return calcUtfCodePointCount <Utf16_be> (p, length);
 	}
 };
 
 //.............................................................................
 
-class CUtf32
+class Utf32
 {
 public:
 	typedef utf32_t C;
 
 	static
-	EUtf
+	UtfKind
 	getUtfKind ()
 	{
-		return EUtf_Utf32;
+		return UtfKind_Utf32;
 	}
 
 	static
@@ -439,14 +439,14 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CUtf32_be: public CUtf32
+class Utf32_be: public Utf32
 {
 public:
 	static
-	EUtf
+	UtfKind
 	getUtfKind ()
 	{
-		return EUtf_Utf32_be;
+		return UtfKind_Utf32_be;
 	}
 
 	static
@@ -478,36 +478,36 @@ public:
 //.............................................................................
 
 template <
-	typename TDstEncoding,
-	typename TSrcEncoding
+	typename DstEncoding,
+	typename SrcEncoding
 	>
-class CUtfConvertT
+class UtfConvert
 {
 public:
-	typedef TDstEncoding CDstEncoding;
-	typedef TSrcEncoding CSrcEncoding;
-	typedef typename CDstEncoding::C CDstUnit;
-	typedef typename CSrcEncoding::C CSrcUnit;
+	typedef DstEncoding DstEncoding;
+	typedef SrcEncoding SrcEncoding;
+	typedef typename DstEncoding::C DstUnit;
+	typedef typename SrcEncoding::C SrcUnit;
 
 public:
 	static
 	size_t
 	calcRequiredLength (
-		const CSrcUnit* p,
+		const SrcUnit* p,
 		size_t length
 		)
 	{
-		const CSrcUnit* end = p + length;
+		const SrcUnit* end = p + length;
 
 		size_t resultLength = 0;
 		while (p < end)
 		{
-			size_t srcCodePointLength = CSrcEncoding::getDecodeCodePointLength (*p);
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*p);
 			if (p + srcCodePointLength > end)
 				break;
 
-			utf32_t x = CSrcEncoding::decodeCodePoint (p);
-			size_t dstCodePointLength = CDstEncoding::getEncodeCodePointLength (x);
+			utf32_t x = SrcEncoding::decodeCodePoint (p);
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 
 			resultLength += dstCodePointLength;
 			p += srcCodePointLength;
@@ -519,37 +519,37 @@ public:
 	static
 	void
 	convert (
-		CDstUnit* dst,
+		DstUnit* dst,
 		size_t dstLength,
-		const CSrcUnit* src,
+		const SrcUnit* src,
 		size_t srcLength,
 		size_t* takenDstLength_o = NULL,
 		size_t* takenSrcLength_o = NULL,
 		size_t* expectedSrcLength_o = NULL
 		)
 	{
-		CDstUnit* dst0 = dst;
-		CDstUnit* dstEnd = dst + dstLength;
-		const CSrcUnit* src0 = src;
-		const CSrcUnit* srcEnd = src + srcLength;
+		DstUnit* dst0 = dst;
+		DstUnit* dstEnd = dst + dstLength;
+		const SrcUnit* src0 = src;
+		const SrcUnit* srcEnd = src + srcLength;
 
 		size_t expectedSrcLength = 0;
 
 		while (src < srcEnd)
 		{
-			size_t srcCodePointLength = CSrcEncoding::getDecodeCodePointLength (*src);
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*src);
 			if (src + srcCodePointLength > srcEnd)
 			{
 				expectedSrcLength = srcCodePointLength;
 				break;
 			}
 
-			utf32_t x = CSrcEncoding::decodeCodePoint (src);
-			size_t dstCodePointLength = CDstEncoding::getEncodeCodePointLength (x);
+			utf32_t x = SrcEncoding::decodeCodePoint (src);
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 			if (dst + dstCodePointLength > dstEnd)
 				break;
 
-			CDstEncoding::encodeCodePoint (dst, x);
+			DstEncoding::encodeCodePoint (dst, x);
 
 			dst += dstCodePointLength;
 			src += srcCodePointLength;
@@ -568,27 +568,27 @@ public:
 
 //.............................................................................
 
-template <typename TSrcEncoding>
-class CUtfToAsciiConvertT
+template <typename SrcEncoding>
+class UtfToAsciiConvert
 {
 public:
-	typedef TSrcEncoding CSrcEncoding;
-	typedef typename CSrcEncoding::C CSrcUnit;
+	typedef SrcEncoding SrcEncoding;
+	typedef typename SrcEncoding::C SrcUnit;
 
 public:
 	static
 	size_t
 	calcRequiredLength (
-		const CSrcUnit* p,
+		const SrcUnit* p,
 		size_t length
 		)
 	{
-		const CSrcUnit* end = p + length;
+		const SrcUnit* end = p + length;
 
 		size_t resultLength = 0;
 		while (p < end)
 		{
-			size_t srcCodePointLength = CSrcEncoding::getDecodeCodePointLength (*p);
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*p);
 			if (p + srcCodePointLength > end)
 				break;
 
@@ -604,7 +604,7 @@ public:
 	convert (
 		char* dst,
 		size_t dstLength,
-		const CSrcUnit* src,
+		const SrcUnit* src,
 		size_t srcLength,
 		size_t* takenDstLength_o = NULL,
 		size_t* takenSrcLength_o = NULL,
@@ -613,21 +613,21 @@ public:
 	{
 		char* dst0 = dst;
 		char* dstEnd = dst + dstLength;
-		const CSrcUnit* src0 = src;
-		const CSrcUnit* srcEnd = src + srcLength;
+		const SrcUnit* src0 = src;
+		const SrcUnit* srcEnd = src + srcLength;
 
 		size_t expectedSrcLength = 0;
 
 		while (src < srcEnd && dst < dstEnd)
 		{
-			size_t srcCodePointLength = CSrcEncoding::getDecodeCodePointLength (*src);
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*src);
 			if (src + srcCodePointLength > srcEnd)
 			{
 				expectedSrcLength = srcCodePointLength;
 				break;
 			}
 
-			utf32_t x = CSrcEncoding::decodeCodePoint (src);
+			utf32_t x = SrcEncoding::decodeCodePoint (src);
 			*dst = (char) x;
 
 			dst++;
@@ -648,12 +648,12 @@ public:
 
 //.............................................................................
 
-template <typename TDstEncoding>
-class CAsciiToUtfConvertT
+template <typename DstEncoding>
+class AsciiToUtfConvert
 {
 public:
-	typedef TDstEncoding CDstEncoding;
-	typedef typename CDstEncoding::C CDstUnit;
+	typedef DstEncoding DstEncoding;
+	typedef typename DstEncoding::C DstUnit;
 
 public:
 	static
@@ -670,7 +670,7 @@ public:
 		{
 			utf32_t x = (uchar_t) *p; // don't propagate sign bit
 
-			size_t dstCodePointLength = CDstEncoding::getEncodeCodePointLength (x);
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 
 			resultLength += dstCodePointLength;
 			p++;
@@ -682,7 +682,7 @@ public:
 	static
 	void
 	convert (
-		CDstUnit* dst,
+		DstUnit* dst,
 		size_t dstLength,
 		const char* src,
 		size_t srcLength,
@@ -691,8 +691,8 @@ public:
 		size_t* expectedSrcLength_o = NULL
 		)
 	{
-		CDstUnit* dst0 = dst;
-		CDstUnit* dstEnd = dst + dstLength;
+		DstUnit* dst0 = dst;
+		DstUnit* dstEnd = dst + dstLength;
 		const char* src0 = src;
 		const char* srcEnd = src + srcLength;
 
@@ -700,11 +700,11 @@ public:
 		{
 			utf32_t x = (uchar_t) *src; // don't propagate sign bit
 
-			size_t dstCodePointLength = CDstEncoding::getEncodeCodePointLength (x);
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 			if (dst + dstCodePointLength > dstEnd)
 				break;
 
-			CDstEncoding::encodeCodePoint (dst, x);
+			DstEncoding::encodeCodePoint (dst, x);
 
 			dst += dstCodePointLength;
 			src++;

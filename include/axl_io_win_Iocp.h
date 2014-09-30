@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 	
-class CIocp: public g::win::CHandle
+class Iocp: public g::win::Handle
 {
 public:
 	bool 

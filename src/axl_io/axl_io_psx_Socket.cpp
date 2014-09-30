@@ -10,7 +10,7 @@ namespace psx {
 //.............................................................................
 
 bool
-CSocket::open (
+Socket::open (
 	int addressFamily,
 	int sockKind,
 	int protocol
@@ -22,7 +22,7 @@ CSocket::open (
 }
 
 int
-CSocket::getError ()
+Socket::getError ()
 {
 	int error = 0;
 	getOption (SOL_SOCKET, SO_ERROR, &error, sizeof (int));
@@ -30,7 +30,7 @@ CSocket::getError ()
 }
 
 bool
-CSocket::setBlockingMode (bool isBlocking)
+Socket::setBlockingMode (bool isBlocking)
 {
 	int value = !isBlocking;
 	int result = ::ioctl (m_h, FIONBIO, &value);
@@ -38,7 +38,7 @@ CSocket::setBlockingMode (bool isBlocking)
 }
 
 bool
-CSocket::getAddress (sockaddr* addr)
+Socket::getAddress (sockaddr* addr)
 {
 	socklen_t size = sizeof (sockaddr);
 	int result = ::getsockname (m_h, addr, &size);
@@ -46,7 +46,7 @@ CSocket::getAddress (sockaddr* addr)
 }
 
 bool
-CSocket::getPeerAddress (sockaddr* addr)
+Socket::getPeerAddress (sockaddr* addr)
 {
 	socklen_t size = sizeof (sockaddr);
 	int result = ::getpeername (m_h, addr, &size);
@@ -54,7 +54,7 @@ CSocket::getPeerAddress (sockaddr* addr)
 }
 
 bool
-CSocket::connect (const sockaddr* addr)
+Socket::connect (const sockaddr* addr)
 {
 	int result = ::connect (m_h, addr, sizeof (sockaddr));
 	if (result != -1)
@@ -70,7 +70,7 @@ CSocket::connect (const sockaddr* addr)
 }
 
 int
-CSocket::accept (sockaddr* addr)
+Socket::accept (sockaddr* addr)
 {
 	socklen_t size = sizeof (sockaddr);
 	int socket = ::accept (m_h, addr, &size);
@@ -78,7 +78,7 @@ CSocket::accept (sockaddr* addr)
 }
 
 size_t
-CSocket::recvFrom (
+Socket::recvFrom (
 	void* p,
 	size_t size,
 	sockaddr* addr

@@ -24,7 +24,7 @@ void myLogProxy::close ()
 	m_connectSocket = INVALID_SOCKET;
 }
 
-bool myLogProxy::listen (log::CPeer* target, int port)
+bool myLogProxy::listen (log::Peer* target, int port)
 {
 	int result;
 
@@ -50,7 +50,7 @@ bool myLogProxy::listen (log::CPeer* target, int port)
 	return m_socketThread.start ();
 }
 
-bool myLogProxy::connect (log::CPeer* target, int ip, int port)
+bool myLogProxy::connect (log::Peer* target, int ip, int port)
 {
 	int result;
 
@@ -73,7 +73,7 @@ bool myLogProxy::connect (log::CPeer* target, int ip, int port)
 	return m_socketThread.start ();
 }
 
-void myLogProxy::sendMsg (const log::TMsg* msg)
+void myLogProxy::sendMsg (const log::Msg* msg)
 {
 	ASSERT (m_connectSocket != INVALID_SOCKET);
 
@@ -84,8 +84,8 @@ void myLogProxy::sendMsg (const log::TMsg* msg)
 
 void myLogProxy::onPacket (const void* p, size_t size)
 {
-	log::TMsg* msg = (log::TMsg*) p;
-	ASSERT (size >= sizeof (log::TMsg) && size >= msg->m_msgSize);	
+	log::Msg* msg = (log::Msg*) p;
+	ASSERT (size >= sizeof (log::Msg) && size >= msg->m_msgSize);	
 
 	m_target->sendMsg (msg);
 }

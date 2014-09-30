@@ -14,29 +14,29 @@ namespace rtl {
 
 //.............................................................................
 
-enum ECharCodec
+enum CharCodecKind
 {
-	ECharCodec_Ascii = 0,
-	ECharCodec_Utf8,
-	ECharCodec_Utf16,
-	ECharCodec_Utf16_be,
-	ECharCodec_Utf32,
-	ECharCodec_Utf32_be,
+	CharCodecKind_Ascii = 0,
+	CharCodecKind_Utf8,
+	CharCodecKind_Utf16,
+	CharCodecKind_Utf16_be,
+	CharCodecKind_Utf32,
+	CharCodecKind_Utf32_be,
 
 	// later maybe add other important encodings
 
-	ECharCodec__Count,
+	CharCodecKind__Count,
 };
 
 //.............................................................................
 
-class CCharCodec
+class CharCodec
 {
 protected:
 	size_t m_unitSize;
 
 public:
-	CCharCodec ()
+	CharCodec ()
 	{
 		m_unitSize = 1;
 	}
@@ -49,38 +49,38 @@ public:
 
 	void
 	encodeFromUtf8 (
-		rtl::CArrayT <char>* buffer,
+		rtl::Array <char>* buffer,
 		const utf8_t* p,
 		size_t length
 		);
 
 	void
 	encodeFromUtf16 (
-		rtl::CArrayT <char>* buffer,
+		rtl::Array <char>* buffer,
 		const utf16_t* p,
 		size_t length
 		);
 
 	void
 	encodeFromUtf32 (
-		rtl::CArrayT <char>* buffer,
+		rtl::Array <char>* buffer,
 		const utf32_t* p,
 		size_t length
 		);
 
-	rtl::CArrayT <char>
+	rtl::Array <char>
 	encodeFromUtf8 (
 		const utf8_t* p,
 		size_t length
 		);
 
-	rtl::CArrayT <char>
+	rtl::Array <char>
 	encodeFromUtf16 (
 		const utf16_t* p,
 		size_t length
 		);
 
-	rtl::CArrayT <char>
+	rtl::Array <char>
 	encodeFromUtf32 (
 		const utf32_t* p,
 		size_t length
@@ -121,38 +121,38 @@ public:
 
 	void
 	decodeToUtf8 (
-		rtl::CArrayT <utf8_t>* buffer,
+		rtl::Array <utf8_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
 	void
 	decodeToUtf16 (
-		rtl::CArrayT <utf16_t>* buffer,
+		rtl::Array <utf16_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
 	void
 	decodeToUtf32 (
-		rtl::CArrayT <utf32_t>* buffer,
+		rtl::Array <utf32_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
-	rtl::CArrayT <utf8_t>
+	rtl::Array <utf8_t>
 	decodeToUtf8 (
 		const void* p,
 		size_t size
 		);
 
-	rtl::CArrayT <utf16_t>
+	rtl::Array <utf16_t>
 	decodeToUtf16 (
 		const void* p,
 		size_t size
 		);
 
-	rtl::CArrayT <utf32_t>
+	rtl::Array <utf32_t>
 	decodeToUtf32 (
 		const void* p,
 		size_t size
@@ -197,15 +197,15 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-CCharCodec*
-getCharCodec (ECharCodec codecKind);
+CharCodec*
+getCharCodec (CharCodecKind codecKind);
 
 //.............................................................................
 
-class CAsciiCodec: public CCharCodec
+class AsciiCodec: public CharCodec
 {
 public:
-	CAsciiCodec ()
+	AsciiCodec ()
 	{
 		m_unitSize = 1;
 	}
@@ -221,7 +221,7 @@ public:
 		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::CUtfToAsciiConvertT <rtl::CUtf8>::convert (
+		rtl::UtfToAsciiConvert <rtl::Utf8>::convert (
 			(char*) buffer,
 			bufferSize,
 			p,
@@ -242,7 +242,7 @@ public:
 		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::CUtfToAsciiConvertT <rtl::CUtf16>::convert (
+		rtl::UtfToAsciiConvert <rtl::Utf16>::convert (
 			(char*) buffer,
 			bufferSize,
 			p,
@@ -263,7 +263,7 @@ public:
 		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::CUtfToAsciiConvertT <rtl::CUtf32>::convert (
+		rtl::UtfToAsciiConvert <rtl::Utf32>::convert (
 			(char*) buffer,
 			bufferSize,
 			p,
@@ -285,7 +285,7 @@ public:
 		size_t* expectedSize_o
 		)
 	{
-		rtl::CAsciiToUtfConvertT <rtl::CUtf8>::convert (
+		rtl::AsciiToUtfConvert <rtl::Utf8>::convert (
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -308,7 +308,7 @@ public:
 		size_t* expectedSize_o = NULL
 		)
 	{
-		rtl::CAsciiToUtfConvertT <rtl::CUtf16>::convert (
+		rtl::AsciiToUtfConvert <rtl::Utf16>::convert (
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -331,7 +331,7 @@ public:
 		size_t* expectedSize_o = NULL
 		)
 	{
-		rtl::CAsciiToUtfConvertT <rtl::CUtf32>::convert (
+		rtl::AsciiToUtfConvert <rtl::Utf32>::convert (
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -346,13 +346,13 @@ public:
 //.............................................................................
 
 template <typename T>
-class CUtfCodecT: public CCharCodec
+class UtfCodec: public CharCodec
 {
 public:
 	typedef typename T::C C;
 
 public:
-	CUtfCodecT ()
+	UtfCodec ()
 	{
 		m_unitSize = sizeof (C);
 	}
@@ -371,7 +371,7 @@ public:
 		size_t bufferLength = bufferSize / sizeof (C);
 		size_t takenDstLength;
 
-		rtl::CUtfConvertT <T, rtl::CUtf8>::convert (
+		rtl::UtfConvert <T, rtl::Utf8>::convert (
 			(C*) buffer,
 			bufferLength,
 			p,
@@ -398,7 +398,7 @@ public:
 		size_t bufferLength = bufferSize / sizeof (C);
 		size_t takenDstLength;
 
-		rtl::CUtfConvertT <T, rtl::CUtf16>::convert (
+		rtl::UtfConvert <T, rtl::Utf16>::convert (
 			(C*) buffer,
 			bufferLength,
 			p,
@@ -425,7 +425,7 @@ public:
 		size_t bufferLength = bufferSize / sizeof (C);
 		size_t takenDstLength;
 
-		rtl::CUtfConvertT <T, rtl::CUtf32>::convert (
+		rtl::UtfConvert <T, rtl::Utf32>::convert (
 			(C*) buffer,
 			bufferLength,
 			p,
@@ -456,7 +456,7 @@ public:
 		size_t takenLength;
 		size_t expectedLength;
 
-		rtl::CUtfConvertT <rtl::CUtf8, T>::convert (
+		rtl::UtfConvert <rtl::Utf8, T>::convert (
 			buffer,
 			bufferLength,
 			(C*) p,
@@ -491,7 +491,7 @@ public:
 		size_t takenLength;
 		size_t expectedLength;
 
-		rtl::CUtfConvertT <rtl::CUtf16, T>::convert (
+		rtl::UtfConvert <rtl::Utf16, T>::convert (
 			buffer,
 			bufferLength,
 			(C*) p,
@@ -526,7 +526,7 @@ public:
 		size_t takenLength;
 		size_t expectedLength;
 
-		rtl::CUtfConvertT <rtl::CUtf32, T>::convert (
+		rtl::UtfConvert <rtl::Utf32, T>::convert (
 			buffer,
 			bufferLength,
 			(C*) p,
@@ -546,25 +546,25 @@ public:
 
 //.............................................................................
 
-class CCodePointDecoder
+class CodePointDecoder
 {
 protected:
-	CCharCodec* m_charCodec;
+	CharCodec* m_charCodec;
 
 	char m_accumulator [8];
 	size_t m_accumulatorCurrentSize;
 	size_t m_accumulatorExpectedSize;
 
 public:
-	CCodePointDecoder (
-		ECharCodec codecKind = ECharCodec_Utf8,
+	CodePointDecoder (
+		CharCodecKind codecKind = CharCodecKind_Utf8,
 		uint32_t state = 0
 		)
 	{
 		setup (codecKind, state);
 	}
 
-	CCharCodec*
+	CharCodec*
 	getCharCodec ()
 	{
 		return m_charCodec;
@@ -572,7 +572,7 @@ public:
 
 	void
 	setup (
-		ECharCodec codecKind,
+		CharCodecKind codecKind,
 		uint32_t state = 0
 		)
 	{
@@ -581,7 +581,7 @@ public:
 
 	void
 	setup (
-		CCharCodec* codec,
+		CharCodec* codec,
 		uint32_t state = 0
 		)
 	{

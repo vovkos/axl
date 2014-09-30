@@ -13,7 +13,7 @@ namespace rtl {
 
 //.............................................................................
 
-class CEscapeEncoding
+class EscapeEncoding
 {
 public:
 	static
@@ -27,19 +27,19 @@ public:
 	static
 	size_t
 	encode (
-		CString* string,
+		String* string,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	CString
+	String
 	encode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		CString string;
+		String string;
 		encode (&string, p, length);
 		return string;
 	}
@@ -47,16 +47,16 @@ public:
 	static
 	size_t
 	encode (
-		CString* dstString,
-		const CString& srcString
+		String* dstString,
+		const String& srcString
 		)
 	{
 		return encode (dstString, srcString, srcString.getLength ());
 	}
 
 	static
-	CString
-	encode (const CString& string)
+	String
+	encode (const String& string)
 	{
 		return encode (string, string.getLength ());
 	}
@@ -64,19 +64,19 @@ public:
 	static
 	size_t
 	decode (
-		CString* string,
+		String* string,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	CString
+	String
 	decode (		
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		CString string;
+		String string;
 		decode (&string, p, length);
 		return string;
 	}
@@ -84,16 +84,16 @@ public:
 	static
 	size_t
 	decode (
-		CString* dstString,
-		const CString& srcString
+		String* dstString,
+		const String& srcString
 		)
 	{
 		return decode (dstString, srcString, srcString.getLength ());
 	}
 
 	static
-	CString
-	decode (const CString& string)
+	String
+	decode (const String& string)
 	{
 		return decode (string, string.getLength ());
 	}

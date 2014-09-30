@@ -7,7 +7,7 @@ namespace mt {
 //.............................................................................
 
 bool
-CEvent::signal ()
+Event::signal ()
 {
 	m_mutex.lock ();
 
@@ -22,7 +22,7 @@ CEvent::signal ()
 }
 
 bool
-CEvent::reset ()
+Event::reset ()
 {
 	m_mutex.lock ();
 
@@ -39,7 +39,7 @@ CEvent::reset ()
 //.............................................................................
 
 bool
-CNotificationEvent::signal ()
+NotificationEvent::signal ()
 {
 	m_mutex.lock ();
 
@@ -52,7 +52,7 @@ CNotificationEvent::signal ()
 }
 
 bool
-CNotificationEvent::reset ()
+NotificationEvent::reset ()
 {
 	m_mutex.lock ();
 	m_state = false;
@@ -61,7 +61,7 @@ CNotificationEvent::reset ()
 }
 
 bool
-CNotificationEvent::wait (uint_t timeout)
+NotificationEvent::wait (uint_t timeout)
 {
 	m_mutex.lock ();
 	if (m_state)

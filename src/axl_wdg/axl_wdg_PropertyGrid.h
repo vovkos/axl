@@ -1050,7 +1050,7 @@ extern "C" {
 namespace axl {
 namespace win {
 
-struct EPropertyLine { enum
+struct PropertyLineKind { enum
 {
 	singlePane           = axl_win_EPropertyLine_SinglePane,
 	reArrangeable        = axl_win_EPropertyLine_ReArrangeable,
@@ -1069,7 +1069,7 @@ struct EPropertyLine { enum
 	separator            = axl_win_EPropertyLine_Separator
 };};
 
-struct EPropertyLineDelimiter { enum
+struct PropertyLineDelimiterKind { enum
 {
 	none        = axl_win_EPropertyLineDelimiter_None,
 	nameTop     = axl_win_EPropertyLineDelimiter_NameTop,
@@ -1084,21 +1084,21 @@ struct EPropertyLineDelimiter { enum
 	value       = axl_win_EPropertyLineDelimiter_Value,
 };};
 
-struct EPropertyOptionBoxType { enum
+struct PropertyOptionBoxTypeKind { enum
 {
 	none        = axl_win_EPropertyOptionBoxType_None,
 	checkBox    = axl_win_EPropertyOptionBoxType_CheckBox,
 	radioButton = axl_win_EPropertyOptionBoxType_RadioButton,
 };};
 
-struct EPropertyCheckState { enum
+struct PropertyCheckStateKind { enum
 {
 	unchecked    = axl_win_EPropertyCheckState_Unchecked,
 	checked      = axl_win_EPropertyCheckState_Checked,
 	state3       = axl_win_EPropertyCheckState_State3,
 };};
 
-struct EPropertyHitTest { enum
+struct PropertyHitTestKind { enum
 {
 	none      = axl_win_EPropertyHitTest_None,
 	indent    = axl_win_EPropertyHitTest_Indent,
@@ -1115,7 +1115,7 @@ struct EPropertyHitTest { enum
 	hyperlink = axl_win_EPropertyHitTest_Hyperlink,
 };};
 
-struct EPropertyNotify { enum
+struct PropertyNotifyKind { enum
 {
 	buttonClick    = axl_win_EPropertyNotify_ButtonClick,
 	optionBoxClick = axl_win_EPropertyNotify_OptionBoxClick,
@@ -1125,38 +1125,38 @@ struct EPropertyNotify { enum
 	expandCollapse = axl_win_EPropertyNotify_ExpandCollapse,
 };};
 
-typedef axl_win_TPropertyCtrl    TPropertyCtrl;
-typedef axl_win_TPropertyLine    TPropertyLine;
-typedef axl_win_TPropertyInPlace TPropertyInPlace;
-typedef axl_win_TPropertyHitTest TPropertyHitTest;
-typedef axl_win_TPropertyNotify  TPropertyNotify;
+typedef axl_win_TPropertyCtrl    PropertyCtrl;
+typedef axl_win_TPropertyLine    PropertyLine;
+typedef axl_win_TPropertyInPlace PropertyInPlace;
+typedef axl_win_TPropertyHitTest PropertyHitest;
+typedef axl_win_TPropertyNotify  PropertyNotify;
 
-class CPropertyCtrl: public TPropertyCtrl
+class PropertyCtrl: public PropertyCtrl
 {
 public:
-	CPropertyCtrl()
+	PropertyCtrl()
 		{ axl_win_TPropertyCtrl_Construct(this); }
 
-	~CPropertyCtrl()
+	~PropertyCtrl()
 		{ axl_win_TPropertyCtrl_Destruct(this); }
 };
 
-class CPropertyInPlace: public TPropertyInPlace
+class PropertyInPlace: public PropertyInPlace
 {
 public:
-	CPropertyInPlace(axl_obj_TAgent* agent)
+	PropertyInPlace(axl_obj_TAgent* agent)
 		{ axl_win_TPropertyInPlace_Construct(this, agent); }
 };
 
 template <class T>
-class CPropertyInPlaceT: public CPropertyInPlace
+class PropertyInPlace: public PropertyInPlace
 {
 public:
-	typedef CPropertyInPlaceT CBaseClass;
+	typedef PropertyInPlace BaseClass;
 
 public:
-	CPropertyInPlaceT(axl::obj::TAgent* agent):
-		CPropertyInPlace(agent)
+	PropertyInPlace(axl::obj::Agent* agent):
+		PropertyInPlace(agent)
 	{ 
 		m_pfLoad = _Load;
 		m_pfSave = _Save;

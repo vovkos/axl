@@ -7,7 +7,7 @@ namespace rtl {
 //.............................................................................
 
 axl_va_list
-CPackerSeq::pack_va (
+PackerSeq::pack_va (
 	void* _p,
 	size_t* size,
 	axl_va_list va
@@ -45,7 +45,7 @@ CPackerSeq::pack_va (
 }
 
 size_t
-CPackerSeq::appendFormat (const char* formatString)
+PackerSeq::appendFormat (const char* formatString)
 {
 	const char* pF = formatString;
 	
@@ -64,7 +64,7 @@ CPackerSeq::appendFormat (const char* formatString)
 		case 'u':
 		case 'x':
 		case 'X':
-			append <CPackT <int> > ();
+			append <Pack <int> > ();
 			break;
 
 		case 'e': 
@@ -72,51 +72,51 @@ CPackerSeq::appendFormat (const char* formatString)
 		case 'f':
 		case 'g':
 		case 'G':
-			append <CPackT <double> > ();
+			append <Pack <double> > ();
 			break;
 
 		case 'p':
-			append <CPackT <size_t> > ();
+			append <Pack <size_t> > ();
 			break;
 			
 		case 's': 
-			append <CPackString> ();
+			append <PackString> ();
 			break;
 
 		case 'c': 
-			append <CPackT <char> > ();
+			append <Pack <char> > ();
 			break;
 
 		case 'S': 
-			append <CPackString_w> ();
+			append <PackString_w> ();
 			break;
 
 		case 'C': 
-			append <CPackT <wchar_t> > ();
+			append <Pack <wchar_t> > ();
 			break;
 
 		case 'B':
-			append <CPackT <uint8_t> > ();
+			append <Pack <uint8_t> > ();
 			break;
 
 		case 'W':
-			append <CPackT <uint16_t> > ();
+			append <Pack <uint16_t> > ();
 			break;
 
 		case 'D':
-			append <CPackT <uint32_t> > ();
+			append <Pack <uint32_t> > ();
 			break;
 
 		case 'Z':
-			append <CPackT <size_t> > ();
+			append <Pack <size_t> > ();
 			break;
 
 		case 'P':
-			append <CPackPtrSize> ();
+			append <PackPtrSize> ();
 			break;
 
 		case 'R':
-			append <CPackLastError> ();
+			append <PackLastError> ();
 			break;
 		}
 	}
@@ -127,8 +127,8 @@ CPackerSeq::appendFormat (const char* formatString)
 //.............................................................................
 	
 size_t
-CPackage::append_va (
-	CPacker* packer,
+Package::append_va (
+	Packer* packer,
 	axl_va_list va
 	)
 {
@@ -149,7 +149,7 @@ CPackage::append_va (
 }
 
 size_t
-CPackage::append (
+Package::append (
 	const void* p,
 	size_t size
 	)

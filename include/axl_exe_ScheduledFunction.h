@@ -15,27 +15,27 @@ namespace exe {
 //.............................................................................
 
 template <
-	typename TCtxArg,
-	typename TParArg
+	typename CtxArg,
+	typename ParArg
 	>
-class CScheduledFunctionT: public IFunction
+class ScheduledFunction: public IFunction
 {
 public:
-	AXL_OBJ_CLASS_0 (CScheduledFunctionT, IFunction)
+	AXL_OBJ_CLASS_0 (ScheduledFunction, IFunction)
 
 protected:
-	typedef CFunctionT <TCtxArg, TParArg> CFunction;
+	typedef Function <CtxArg, ParArg> Function;
 
 	IScheduler* m_scheduler;
-	CFunction m_function;
+	Function m_function;
 
 public:
-	CScheduledFunctionT (IScheduler* scheduler = NULL)
+	ScheduledFunction (IScheduler* scheduler = NULL)
 	{
 		m_scheduler = scheduler;
 	}
 
-	CScheduledFunctionT (
+	ScheduledFunction (
 		IScheduler* scheduler,
 		int convention,
 		void* pf,
@@ -46,7 +46,7 @@ public:
 		setupV (scheduler, convention, pf, va);
 	}
 
-	CScheduledFunctionT (
+	ScheduledFunction (
 		IScheduler* scheduler,
 		void* pf,
 		...
@@ -59,7 +59,7 @@ public:
 	void
 	setupV (
 		IScheduler* scheduler,
-		ECallConv convention,
+		CallConvKind convention,
 		void* pf,
 		axl_va_list va
 		)
@@ -75,13 +75,13 @@ public:
 		axl_va_list va
 		)
 	{
-		setupV (scheduler, ECallConv_Cdecl, pf, va);
+		setupV (scheduler, CallConvKind_Cdecl, pf, va);
 	}
 
 	void
 	setup (
 		IScheduler* scheduler,
-		ECallConv convention,
+		CallConvKind convention,
 		void* pf,
 		...
 		)

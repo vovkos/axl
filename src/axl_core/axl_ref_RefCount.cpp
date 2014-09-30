@@ -9,7 +9,7 @@ namespace ref {
 
 //.............................................................................
 
-CRefCount::CRefCount () 
+RefCount::RefCount () 
 {
 	m_refCount = 0;
 	m_weakRefCount = 1;
@@ -19,7 +19,7 @@ CRefCount::CRefCount ()
 }
 
 void
-CRefCount::setTarget (
+RefCount::setTarget (
 	void* object,
 	mem::FFree* pfDestruct,
 	mem::FFree* pfFree
@@ -31,7 +31,7 @@ CRefCount::setTarget (
 }
 
 size_t
-CRefCount::release ()
+RefCount::release ()
 {
 	int32_t refCount = mt::atomicDec (&m_refCount);
 	 
@@ -50,7 +50,7 @@ CRefCount::release ()
 }
 
 size_t
-CRefCount::weakRelease ()
+RefCount::weakRelease ()
 {
 	int32_t refCount = mt::atomicDec (&m_weakRefCount);
 
@@ -61,7 +61,7 @@ CRefCount::weakRelease ()
 }
 
 size_t
-CRefCount::addRefByWeakPtr ()
+RefCount::addRefByWeakPtr ()
 { 
 	for (;;)
 	{

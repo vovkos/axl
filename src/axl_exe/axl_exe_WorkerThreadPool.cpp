@@ -8,14 +8,14 @@ namespace exe {
 
 //.............................................................................
 	
-CWorkerThreadPool::CThreadPin::CThreadPin ()
+WorkerhreadPool::ThreadPin::ThreadPin ()
 {
 	m_threadPool = NULL;
 	m_threadEntry = NULL;
 	m_reserveEventCount = 0;
 }
 
-CWorkerThreadPool::CThreadPin::~CThreadPin ()
+WorkerhreadPool::ThreadPin::~ThreadPin ()
 {
 	m_threadPool->m_lock.lock ();
 
@@ -32,23 +32,23 @@ CWorkerThreadPool::CThreadPin::~CThreadPin ()
 //.............................................................................
 
 bool 
-CWorkerThreadPool::start (size_t threadCount)
+WorkerhreadPool::start (size_t threadCount)
 {
 	ASSERT (m_threadList.isEmpty ());
 	return grow (threadCount);
 }
 
 bool 
-CWorkerThreadPool::grow (size_t threadCount)
+WorkerhreadPool::grow (size_t threadCount)
 {
 	if (threadCount == 0)
 		threadCount = g::getModule ()->getSystemInfo ()->m_processorCount;
 
-	rtl::CStdListT <TThreadEntry> threadList;
+	rtl::StdList <ThreadEntry> threadList;
 
 	for (size_t i = 0; i < threadCount; i++)
 	{
-		TThreadEntry* threadEntry = AXL_MEM_NEW (TThreadEntry);
+		ThreadEntry* threadEntry = AXL_MEM_NEW (ThreadEntry);
 		threadEntry->m_reserveEventCount = 0;
 		threadEntry->m_pinCount = 1;
 		threadList.insertTail (threadEntry);
@@ -65,14 +65,14 @@ CWorkerThreadPool::grow (size_t threadCount)
 }
 
 void 
-CWorkerThreadPool::stop (ulong_t timeout)
+WorkerhreadPool::stop (ulong_t timeout)
 {
 	m_lock.lock ();
 
-	rtl::CStdListT <TThreadEntry> threadList;
+	rtl::StdList <ThreadEntry> threadList;
 	threadList.takeOver (&m_threadList);
 
-	rtl::CIteratorT <TThreadEntry> it = threadList.getHead ();
+	rtl::Iterator <ThreadEntry> it = threadList.getHead ();
 	for (; it; it++)
 	{
 		it->m_pinCount--;
@@ -86,18 +86,18 @@ CWorkerThreadPool::stop (ulong_t timeout)
 
 	while (!threadList.isEmpty ())
 	{
-		TThreadEntry* threadEntry = threadList.removeHead ();
+		ThreadEntry* threadEntry = threadList.removeHead ();
 		threadEntry->m_thread.waitAndClose (timeout);
 		AXL_MEM_DELETE (threadEntry);
 	}
 }
 
-ref::CPtrT <CWorkerThread> 
-CWorkerThreadPool::getThread (size_t reserveEventCount)
+ref::Ptr <Workerhread> 
+WorkerhreadPool::getThread (size_t reserveEventCount)
 {
 	ASSERT (reserveEventCount <= MAXIMUM_WAIT_OBJECTS);
 
-	rtl::CIteratorT <TThreadEntry> it;
+	rtl::Iterator <ThreadEntry> it;
 
 	m_lock.lock ();
 
@@ -116,19 +116,19 @@ CWorkerThreadPool::getThread (size_t reserveEventCount)
 		if (i >= 2) // try 3 times, if fail each time probably wrong use
 		{
 			m_lock.unlock ();
-			return ref::EPtr_Null;
+			return ref::PtrKind_Null;
 		}
 
 		m_lock.unlock ();
 
 		bool result = grow ();
 		if (!result)
-			return ref::EPtr_Null;
+			return ref::PtrKind_Null;
 
 		m_lock.lock ();
 	}
 
-	TThreadEntry* threadEntry = *it;
+	ThreadEntry* threadEntry = *it;
 	threadEntry->m_reserveEventCount += reserveEventCount;
 	threadEntry->m_pinCount++;
 
@@ -140,12 +140,12 @@ CWorkerThreadPool::getThread (size_t reserveEventCount)
 
 	m_lock.unlock ();
 
-	ref::CPtrT <CThreadPin> threadPin = AXL_REF_NEW (CThreadPin);
+	ref::Ptr <ThreadPin> threadPin = AXL_REF_NEW (ThreadPin);
 	threadPin->m_threadPool = this;
 	threadPin->m_threadEntry = threadEntry;
 	threadPin->m_reserveEventCount = reserveEventCount;
 
-	return ref::CPtrT <CWorkerThread> (
+	return ref::Ptr <Workerhread> (
 		&threadEntry->m_thread, 
 		threadPin.getRefCount ()
 		);

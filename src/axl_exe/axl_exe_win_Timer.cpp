@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool
-CTimer::create (
+Timer::create (
 	SECURITY_ATTRIBUTES* secAttr,
 	bool isManualReset,
 	const tchar_t* name
@@ -21,7 +21,7 @@ CTimer::create (
 }
 
 bool
-CTimer::open (
+Timer::open (
 	ulong_t access,
 	bool doInheritHandle,
 	const tchar_t* name
@@ -34,7 +34,7 @@ CTimer::open (
 }
 
 bool 
-CTimer::setTimer (	
+Timer::setTimer (	
 	uint64_t _DueTime,
 	ulong_t period, 
 	PTIMERAPCROUTINE pfThreadProc,

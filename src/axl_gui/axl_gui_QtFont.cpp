@@ -10,7 +10,7 @@ namespace gui {
 bool
 getFontDescFromFontInfo (
 	const QFontInfo& fontInfo,
-	TFontDesc* fontDesc
+	FontDesc* fontDesc
 	)
 {
 	QString familyName = fontInfo.family ();
@@ -25,59 +25,59 @@ getFontDescFromFontInfo (
 	fontDesc->m_pointSize = fontInfo.pointSize ();
 	
 	if (fontInfo.weight () >= QFont::Bold)
-		fontDesc->m_flags |= EFontFlag_Bold;
+		fontDesc->m_flags |= FontFlagKind_Bold;
 	
 	if (fontInfo.italic ())
-		fontDesc->m_flags |= EFontFlag_Italic;
+		fontDesc->m_flags |= FontFlagKind_Italic;
 	
 	if (fontInfo.underline ())
-		fontDesc->m_flags |= EFontFlag_Underline;
+		fontDesc->m_flags |= FontFlagKind_Underline;
 
 	if (fontInfo.strikeOut ())
-		fontDesc->m_flags |= EFontFlag_Strikeout;
+		fontDesc->m_flags |= FontFlagKind_Strikeout;
 
 	return true;
 }
 
 //.............................................................................
 
-CQtFont::CQtFont ()
+QtFont::QtFont ()
 {
-	m_engine = CQtEngine::getSingleton ();
+	m_engine = QtEngine::getSingleton ();
 }
 
-TSize
-CQtFont::calcTextSize_qt (const QString& string)
+Size
+QtFont::calcTextSize_qt (const QString& string)
 {
 	QFontMetrics qtFontMetrics (m_qtFont);
 		
-	TSize size;
+	Size size;
 	size.m_width = qtFontMetrics.width (string);
 	size.m_height = qtFontMetrics.height ();
 	return size;
 }
 
-TSize
-CQtFont::calcTextSize_utf8 (
+Size
+QtFont::calcTextSize_utf8 (
 	const utf8_t* text,
 	size_t length
 	)
 {
 	char buffer [256];
-	rtl::CString_utf16 string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_qt (QString ((const QChar*) string.cc (), string.getLength ()));
 }
 
-TSize
-CQtFont::calcTextSize_utf32 (
+Size
+QtFont::calcTextSize_utf32 (
 	const utf32_t* text,
 	size_t length
 	)
 {
 	char buffer [256];
-	rtl::CString_utf16 string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_qt (QString ((const QChar*) string.cc (), string.getLength ()));

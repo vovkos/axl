@@ -15,28 +15,28 @@ namespace exe {
 
 //.............................................................................
 
-class CSynchronizer: public IScheduler
+class Synchronizer: public IScheduler
 {
 public:
-	AXL_OBJ_CLASS_0 (CSynchronizer, IScheduler)
+	AXL_OBJ_CLASS_0 (Synchronizer, IScheduler)
 
-	enum EFlags
+	enum FlagsKind
 	{
-		EFlags_AlwaysEnqueue = 1 // even if Schedule () is called in the same thread
+		FlagsKind_AlwaysEnqueue = 1 // even if Schedule () is called in the same thread
 	};
 
 protected:
-	mt::CLock m_lock;
-	CInvokeList m_invokeList;
+	mt::Lock m_lock;
+	InvokeList m_invokeList;
 
 	ulong_t m_invokeThreadId;
 	int m_flags;
 
 public:
-	CSynchronizer (int flags = 0);
+	Synchronizer (int flags = 0);
 
 	virtual 
-	EScheduleResult
+	ScheduleResultKind
 	scheduleV (
 		IFunction* function, 
 		axl_va_list va

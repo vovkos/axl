@@ -8,14 +8,14 @@ namespace lua {
 //.............................................................................
 
 bool
-CLuaState::create ()
+LuaState::create ()
 {
 	close ();
 
 	m_h = luaL_newstate ();
 	if (!m_h)
 	{
-		err::setError (err::EStatus_InsufficientResources);
+		err::setError (err::StatusKind_InsufficientResources);
 		return false;
 	}
 
@@ -23,20 +23,20 @@ CLuaState::create ()
 }
 
 bool
-CLuaState::complete (int result)
+LuaState::complete (int result)
 {
 	ASSERT (isOpen ());
 
 	if (result == LUA_OK)
 		return true;
 
-	rtl::CString message = popString ();
+	rtl::String message = popString ();
 	err::setStringError (message, message.getLength ());
 	return false;
 }
 
 bool
-CLuaState::load (
+LuaState::load (
 	const char* name,
 	const char* source,
 	size_t length
@@ -53,7 +53,7 @@ CLuaState::load (
 
 #ifdef _DEBUG
 void
-CLuaState::trace ()
+LuaState::trace ()
 {
 	int top = getTop ();
 

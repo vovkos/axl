@@ -15,63 +15,63 @@ namespace rtl {
 //.............................................................................
 
 template <typename C>
-class CStringHashTableT: public CHashTableT <
+class StringHashTable: public HashTable <
 	const C*,
-	rtl::CHashStringT <C>, 
-	rtl::CCmpStringT <C>
+	rtl::HashStringBase <C>, 
+	rtl::CmpStringBase <C>
 	>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CStringHashTableT <char>    CStringHashTable;
-typedef CStringHashTableT <wchar_t> CStringHashTable_w;
+typedef StringHashTable <char>    StringHashable;
+typedef StringHashTable <wchar_t> StringHashable_w;
 
-typedef CStringHashTable::CIterator   CStringHashTableIterator;
-typedef CStringHashTable_w::CIterator CStringHashTableIterator_w;
+typedef StringHashable::Iterator   StringHashableIterator;
+typedef StringHashable_w::Iterator StringHashableIterator_w;
 
 //.............................................................................
 
 template <
-	typename TValue,
+	typename Value,
 	typename C = char
 	>
-class CStringHashTableMapT: public CHashTableMapT <
+class StringHashTableMap: public HashTableMap <
 	const C*,
-	TValue,
-	rtl::CHashStringT <C>, 
-	rtl::CCmpStringT <C>
+	Value,
+	rtl::HashStringBase <C>, 
+	rtl::CmpStringBase <C>
 	>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename TValue>
-class CStringHashTableMapT_w: public CStringHashTableMapT <TValue, wchar_t>
+template <typename Value>
+class StringHashTableMap_w: public StringHashTableMap <Value, wchar_t>
 {
 };
 
 //.............................................................................
 
 template <
-	typename TValue,
+	typename Value,
 	typename C = char
 	>
-class CStringHashTableMapIteratorT: public CHashTableMapIteratorT <const C*, TValue>
+class StringHashTableMapIterator: public HashTableMapIterator <const C*, Value>
 {
 public:
-	CStringHashTableMapIteratorT ()
+	StringHashTableMapIterator ()
 	{ 
 	}
 
-	CStringHashTableMapIteratorT (const CIteratorT <typename CStringHashTableMapIteratorT::CEntry>& src)
+	StringHashTableMapIterator (const Iterator <typename StringHashTableMapIterator::Entry>& src)
 	{ 
 		this->m_p = src.getLink (); // thanks a lot gcc
 	}
 
-	CStringHashTableMapIteratorT (typename CStringHashTableMapIteratorT::CEntry* p)
+	StringHashTableMapIterator (typename StringHashTableMapIterator::Entry* p)
 	{ 
 		operator = (p); 
 	}
@@ -79,20 +79,20 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename TValue>
-class CStringHashTableMapIteratorT_w: public CStringHashTableMapIteratorT <TValue, wchar_t>
+template <typename Value>
+class StringHashTableMapIterator_w: public StringHashTableMapIterator <Value, wchar_t>
 {
 public:
-	CStringHashTableMapIteratorT_w ()
+	StringHashTableMapIterator_w ()
 	{ 
 	}
 
-	CStringHashTableMapIteratorT_w (const CIteratorT <typename CStringHashTableMapIteratorT_w::CEntry>& src)
+	StringHashTableMapIterator_w (const Iterator <typename StringHashTableMapIterator_w::Entry>& src)
 	{ 
 		this->m_p = src.getLink (); 
 	}
 
-	CStringHashTableMapIteratorT_w (typename CStringHashTableMapIteratorT_w::CEntry* p)
+	StringHashTableMapIterator_w (typename StringHashTableMapIterator_w::Entry* p)
 	{ 
 		operator = (p); 
 	}
@@ -100,16 +100,16 @@ public:
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING(class, TValue) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T (class, TValue, char)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING(class, Value) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T (class, Value, char)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T(class, TValue, C) \
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T(class, Value, C) \
 	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
 		class, \
 		const C*, \
-		TValue, \
-		rtl::CHashStringT <C>, \
-		rtl::CCmpStringT <C> \
+		Value, \
+		rtl::HashStringBase <C>, \
+		rtl::CmpStringBase <C> \
 		)
 
 //.............................................................................

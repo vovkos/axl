@@ -19,73 +19,73 @@ namespace gui {
 
 //.............................................................................
 
-class CGdiEngine: public CEngine
+class GdiEngine: public Engine
 {
 protected:
 	HWND m_hWndClipboardOwner;
 
 public:
-	CGdiEngine ()
+	GdiEngine ()
 	{
-		m_engineKind = EEngine_Gdi;
+		m_engineKind = EngineKind_Gdi;
 		m_hWndClipboardOwner = NULL;
 	}
 
-	~CGdiEngine ();
+	~GdiEngine ();
 
 	static
-	CGdiEngine*
+	GdiEngine*
 	getSingleton ()
 	{
-		return rtl::getSingleton <CGdiEngine> ();
+		return rtl::getSingleton <GdiEngine> ();
 	}
 
 	// fonts
 
-	CFont*
+	Font*
 	getDefaultGuiFont ();
 
 	virtual
-	CFont*
+	Font*
 	getDefaultMonospaceFont ();
 
 	virtual
-	ref::CPtrT <CFont>
+	ref::Ptr <Font>
 	createFont (
 		const char* faceName,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);
 
-	ref::CPtrT <CFont>
+	ref::Ptr <Font>
 	createStockFont (int stockFontKind);
 
-	ref::CPtrT <CFont>
+	ref::Ptr <Font>
 	createFont (HFONT hFont);
 
 	// cursors
 
-	ref::CPtrT <CCursor>
+	ref::Ptr <Cursor>
 	createStockCursor (LPCTSTR stockCursorRes);
 
 	// images
 
 	virtual
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage ();
 
 	virtual
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage (
 		int width,
 		int height,
-		EPixelFormat pixelFormat,
+		PixelFormatKind pixelFormat,
 		const void* data,
 		bool isScreenCompatible = true
 		);
 
 	virtual
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	createOffscreenCanvas (
 		int width,
 		int height
@@ -95,17 +95,17 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const rtl::CString& formatName);
+	registerClipboardFormat (const rtl::String& formatName);
 
 	virtual
 	bool
-	readClipboard (rtl::CString* string);
+	readClipboard (rtl::String* string);
 
 	virtual
 	bool
 	readClipboard (
 		uintptr_t format,
-		rtl::CArrayT <char>* data
+		rtl::Array <char>* data
 		);
 
 	virtual
@@ -135,8 +135,8 @@ public:
 	virtual
 	bool
 	showCaret (
-		CWidget* widget,
-		const TRect& rect
+		Widget* widget,
+		const Rect& rect
 		);
 
 	virtual
@@ -148,19 +148,19 @@ protected:
 	openClipboard ();
 
 	virtual
-	CFont*
+	Font*
 	getFontMod (
-		CFont* baseFont,
+		Font* baseFont,
 		uint_t flags
 		);
 
 	virtual
-	ref::CPtrT <CFont>
-	createStdFont (EStdFont fontKind);
+	ref::Ptr <Font>
+	createStdFont (StdFontKind fontKind);
 
 	virtual
-	ref::CPtrT <CCursor>
-	createStdCursor (EStdCursor cursorKind);
+	ref::Ptr <Cursor>
+	createStdCursor (StdCursorKind cursorKind);
 };
 
 //.............................................................................

@@ -17,7 +17,7 @@ namespace g {
 
 //.............................................................................
 	
-struct TSystemInfo
+struct SystemInfo
 {
 	size_t m_processorCount;
 	size_t m_pageSize;
@@ -26,7 +26,7 @@ struct TSystemInfo
 
 //.............................................................................
 
-class CFinalizer
+class Finalizer
 {
 public:
 	virtual 
@@ -36,13 +36,13 @@ public:
 
 //.............................................................................
 
-class CModule
+class Module
 {
 protected:
-	class CFinalizerEntry: public rtl::TListLink
+	class FinalizerEntry: public rtl::ListLink
 	{
 	public:
-		ref::CPtrT <CFinalizer> m_finalizer;
+		ref::Ptr <Finalizer> m_finalizer;
 	};
 
 protected:
@@ -54,19 +54,19 @@ protected:
 	HMODULE m_hModule;
 #endif
 	
-	TSystemInfo m_systemInfo;
+	SystemInfo m_systemInfo;
 
-	mem::CTracker m_memTracker;
+	mem::Tracker m_memTracker;
 
 	// finalizers
 	
-	mt::CLock m_finalizerListLock;
-	rtl::CStdListT <CFinalizerEntry> m_finalizerList;
+	mt::Lock m_finalizerListLock;
+	rtl::StdList <FinalizerEntry> m_finalizerList;
 
 public:
-	CModule ();
+	Module ();
 
-	~CModule ();
+	~Module ();
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	HMODULE 
@@ -76,29 +76,29 @@ public:
 	}
 #endif
 
-	TSystemInfo* 
+	SystemInfo* 
 	getSystemInfo ()
 	{
 		return &m_systemInfo;
 	}
 
-	mem::CTracker*
+	mem::Tracker*
 	getMemTracker ()
 	{
 		return &m_memTracker;
 	}
 
 	bool 
-	addFinalizer (const ref::CPtrT <CFinalizer>& finalizer);
+	addFinalizer (const ref::Ptr <Finalizer>& finalizer);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_SELECT_ANY 
-CModule g_module;
+Module g_module;
 
 inline
-CModule*
+Module*
 getModule ()
 {
 	return &g_module;

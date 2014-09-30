@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool 
-CNamedPipe::create (
+NamedPipe::create (
 	const wchar_t* name,
 	uint_t openMode,
 	uint_t pipeMode,
@@ -36,7 +36,7 @@ CNamedPipe::create (
 }
 
 bool 
-CNamedPipe::open (
+NamedPipe::open (
 	const wchar_t* name,
 	uint_t access,
 	uint_t flags

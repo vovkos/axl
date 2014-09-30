@@ -17,30 +17,30 @@ namespace io {
 
 //.............................................................................
 
-enum ESharedMemoryTransport
+enum SharedMemoryTransportKind
 {
-	ESharedMemoryTransport_FileSignature    = ':mhs',
-	ESharedMemoryTransport_MessageSignature = ':sm\n',
-	ESharedMemoryTransport_DefMappingSize   = 64 * 1024,   // 64 KB
-	ESharedMemoryTransport_DefSizeLimitHint = 1024 * 1024, // 1 MB
+	SharedMemoryTransportKind_FileSignature    = ':mhs',
+	SharedMemoryTransportKind_MessageSignature = ':sm\n',
+	SharedMemoryTransportKind_DefMappingSize   = 64 * 1024,   // 64 KB
+	SharedMemoryTransportKind_DefSizeLimitHint = 1024 * 1024, // 1 MB
 };
 
-enum ESharedMemoryTransportState
+enum SharedMemoryTransportStateKind
 {
-	ESharedMemoryTransportState_MasterConnected,
-	ESharedMemoryTransportState_SlaveConnected,
-	ESharedMemoryTransportState_Disconnected,
+	SharedMemoryTransportStateKind_MasterConnected,
+	SharedMemoryTransportStateKind_SlaveConnected,
+	SharedMemoryTransportStateKind_Disconnected,
 };
 
-enum ESharedMemoryTransportFlag
+enum SharedMemoryTransportFlagKind
 {
-	ESharedMemoryTransportFlag_Create  = 0x01,
-	ESharedMemoryTransportFlag_Message = 0x02,
+	SharedMemoryTransportFlagKind_Create  = 0x01,
+	SharedMemoryTransportFlagKind_Message = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct TSharedMemoryTransportHdr
+struct SharedMemoryransportHdr
 {
 	uint32_t m_signature;
 	int32_t m_lock;
@@ -52,7 +52,7 @@ struct TSharedMemoryTransportHdr
 	uint32_t m_padding;
 };
 
-struct TSharedMemoryTransportMessageHdr
+struct SharedMemoryransportMessageHdr
 {
 	uint32_t m_signature;
 	uint32_t m_size;
@@ -60,28 +60,28 @@ struct TSharedMemoryTransportMessageHdr
 
 //.............................................................................
 
-class CSharedMemoryTransportBase
+class SharedMemoryransportBase
 {
 protected:
 	uint_t m_flags;
-	CMappedFile m_file;
-	TSharedMemoryTransportHdr* m_hdr;
+	MappedFile m_file;
+	SharedMemoryransportHdr* m_hdr;
 	char* m_data;
 	size_t m_mappingSize;
 	int32_t m_pendingReqCount;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	mt::win::CEvent m_readEvent;
-	mt::win::CEvent m_writeEvent;
+	mt::win::Event m_readEvent;
+	mt::win::Event m_writeEvent;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	mt::psx::CSem m_readEvent;
-	mt::psx::CSem m_writeEvent;
-	rtl::CString m_readEventName;
-	rtl::CString m_writeEventName;
+	mt::psx::Sem m_readEvent;
+	mt::psx::Sem m_writeEvent;
+	rtl::String m_readEventName;
+	rtl::String m_writeEventName;
 #endif
 
 protected:
-	CSharedMemoryTransportBase ();
+	SharedMemoryransportBase ();
 
 public:
 	uint_t
@@ -117,34 +117,34 @@ protected:
 	bool
 	ensureOffsetMapped (size_t offset)
 	{
-		return ensureMappingSize (offset + sizeof (TSharedMemoryTransportHdr));
+		return ensureMappingSize (offset + sizeof (SharedMemoryransportHdr));
 	}
 };
 
 //.............................................................................
 
-class CSharedMemoryReader: public CSharedMemoryTransportBase
+class SharedMemoryReader: public SharedMemoryransportBase
 {
 public:
 	size_t
-	read (rtl::CArrayT <char>* buffer);
+	read (rtl::Array <char>* buffer);
 
-	rtl::CArrayT <char>
+	rtl::Array <char>
 	read ();
 };
 
 //.............................................................................
 
-class CSharedMemoryWriter: public CSharedMemoryTransportBase
+class SharedMemoryWriter: public SharedMemoryransportBase
 {
 protected:
 	size_t m_sizeLimitHint;
-	mt::CLock m_writeLock; // make write operations atomic
+	mt::Lock m_writeLock; // make write operations atomic
 
 public:
-	CSharedMemoryWriter ()
+	SharedMemoryWriter ()
 	{
-		m_sizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint;
+		m_sizeLimitHint = SharedMemoryTransportKind_DefSizeLimitHint;
 	}
 
 	bool
@@ -153,7 +153,7 @@ public:
 		const char* readEventName,
 		const char* writeEventName,
 		uint_t flags,
-		size_t sizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint
+		size_t sizeLimitHint = SharedMemoryTransportKind_DefSizeLimitHint
 		);
 
 	size_t

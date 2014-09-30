@@ -10,16 +10,16 @@ namespace mem {
 #ifdef _DEBUG
 
 void* 
-CStdAlloc::CAlloc::operator () (
+StdAlloc::Alloc::operator () (
 	size_t size,
 	const char* tag,
 	const char* filePath,
 	int line
 	)
 {
-	size_t fullSize = size + sizeof (CTracker::TBlockHdr);
+	size_t fullSize = size + sizeof (Tracker::BlockHdr);
 
-	CTracker::TBlockHdr* hdr = (CTracker::TBlockHdr*) CMalloc::alloc (fullSize);
+	Tracker::BlockHdr* hdr = (Tracker::BlockHdr*) Malloc::alloc (fullSize);
 	if (!hdr)
 		return NULL;
 
@@ -34,13 +34,13 @@ CStdAlloc::CAlloc::operator () (
 }
 
 void 
-CStdAlloc::CFree::operator () (void* p)
+StdAlloc::Free::operator () (void* p)
 {
-	CTracker::TBlockHdr* hdr = (CTracker::TBlockHdr*) p - 1;
+	Tracker::BlockHdr* hdr = (Tracker::BlockHdr*) p - 1;
 	
 	g::getModule ()->getMemTracker ()->remove (hdr);
 
-	CMalloc::free (hdr);
+	Malloc::free (hdr);
 }
 
 #endif

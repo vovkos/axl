@@ -9,7 +9,7 @@ namespace psx {
 //.............................................................................
 
 uint_t
-CSerial::getStatusLines () const
+Serial::getStatusLines () const
 {
 	int lines = 0;
 	int result = ioctl (m_h, TIOCMGET, &lines);
@@ -23,7 +23,7 @@ CSerial::getStatusLines () const
 }
 
 bool
-CSerial::setDtr (bool isSet)
+Serial::setDtr (bool isSet)
 {
 	int lines = TIOCM_DTR;
 	int result = ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
@@ -31,7 +31,7 @@ CSerial::setDtr (bool isSet)
 }
 
 bool
-CSerial::setRts (bool isSet)
+Serial::setRts (bool isSet)
 {
 	int lines = TIOCM_RTS;
 	int result = ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);

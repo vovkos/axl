@@ -29,7 +29,7 @@ buildLogFont (
 
 	logFont->lfCharSet = DEFAULT_CHARSET;
 	
-	CScreenDc screenDc;
+	ScreenDc screenDc;
 	::SetMapMode (screenDc, MM_TEXT);
 	logFont->lfHeight = -::MulDiv (pointSize, ::GetDeviceCaps (screenDc, LOGPIXELSY), 72);
 		
@@ -43,19 +43,19 @@ modifyLogFont (
 	uint_t flags
 	)
 {
-	logFont->lfWeight    = (flags & EFontFlag_Bold) ? FW_BOLD : FW_NORMAL;
-	logFont->lfItalic    = (flags & EFontFlag_Italic) != 0;
-	logFont->lfUnderline = (flags & EFontFlag_Underline) != 0;
-	logFont->lfStrikeOut = (flags & EFontFlag_Strikeout) != 0;
+	logFont->lfWeight    = (flags & FontFlagKind_Bold) ? FW_BOLD : FW_NORMAL;
+	logFont->lfItalic    = (flags & FontFlagKind_Italic) != 0;
+	logFont->lfUnderline = (flags & FontFlagKind_Underline) != 0;
+	logFont->lfStrikeOut = (flags & FontFlagKind_Strikeout) != 0;
 }
 
 bool
 getFontDescFromLogFont (
 	const LOGFONT* logFont,
-	TFontDesc* fontDesc
+	FontDesc* fontDesc
 	)
 {
-	memset (fontDesc, 0, sizeof (TFontDesc));
+	memset (fontDesc, 0, sizeof (FontDesc));
 
 	memcpy (
 		fontDesc->m_faceName, 
@@ -63,7 +63,7 @@ getFontDescFromLogFont (
 		(AXL_MIN (countof (logFont->lfFaceName), countof (fontDesc->m_faceName)) - 1) * sizeof (char)
 		);
 
-	CScreenDc screenDc;
+	ScreenDc screenDc;
 	::SetMapMode (screenDc, MM_TEXT);
 	
 	fontDesc->m_pointSize = 
@@ -71,57 +71,57 @@ getFontDescFromLogFont (
 		::MulDiv (-logFont->lfHeight, 72, ::GetDeviceCaps (screenDc, LOGPIXELSY));
 
 	if (logFont->lfWeight >= FW_BOLD)
-		fontDesc->m_flags |= EFontFlag_Bold;
+		fontDesc->m_flags |= FontFlagKind_Bold;
 
 	if (logFont->lfItalic)
-		fontDesc->m_flags |= EFontFlag_Italic;
+		fontDesc->m_flags |= FontFlagKind_Italic;
 
 	if (logFont->lfUnderline)
-		fontDesc->m_flags |= EFontFlag_Underline;
+		fontDesc->m_flags |= FontFlagKind_Underline;
 
 	if (logFont->lfStrikeOut)
-		fontDesc->m_flags |= EFontFlag_Strikeout;
+		fontDesc->m_flags |= FontFlagKind_Strikeout;
 
 	return true;
 }
 
 //.............................................................................
 
-CGdiFont::CGdiFont ()
+GdiFont::GdiFont ()
 {
-	m_engine = CGdiEngine::getSingleton ();
+	m_engine = GdiEngine::getSingleton ();
 }
 
 bool
-CGdiFont::getLogFont (LOGFONTW* logFont)
+GdiFont::getLogFont (LOGFONTW* logFont)
 {
 	bool_t result = ::GetObject (m_h, sizeof (LOGFONT), logFont);
 	return err::complete (result);
 }
 
 bool
-CGdiFont::isMonospace ()
+GdiFont::isMonospace ()
 {
 	LOGFONT logFont;
 	getLogFont (&logFont);
 	return logFont.lfPitchAndFamily == FIXED_PITCH;
 }
 
-TSize
-CGdiFont::calcTextSize_utf8 (
+Size
+GdiFont::calcTextSize_utf8 (
 	const utf8_t* text,
 	size_t length
 	)
 {
 	char buffer [256];
-	rtl::CString_w string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_utf16 (string, string.getLength ());
 }
 
-TSize
-CGdiFont::calcTextSize_utf16 (
+Size
+GdiFont::calcTextSize_utf16 (
 	const utf16_t* text,
 	size_t length
 	)
@@ -129,24 +129,24 @@ CGdiFont::calcTextSize_utf16 (
 	if (length == -1)
 		length = wcslen (text);
 
-	CScreenDc screenDc;
+	ScreenDc screenDc;
 	HFONT hOldFont = (HFONT) ::SelectObject (screenDc, m_h);
 
 	SIZE size;
 	::GetTextExtentPoint32W (screenDc, text, length, &size);
 	::SelectObject (screenDc, hOldFont);
 
-	return TSize (size.cx, size.cy);
+	return Size (size.cx, size.cy);
 }
 
-TSize
-CGdiFont::calcTextSize_utf32 (
+Size
+GdiFont::calcTextSize_utf32 (
 	const utf32_t* text,
 	size_t length
 	)
 {
 	char buffer [256];
-	rtl::CString_w string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_utf16 (string, string.getLength ());

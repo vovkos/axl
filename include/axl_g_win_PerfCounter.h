@@ -12,14 +12,14 @@ namespace win {
 
 //.............................................................................
 
-class CPerfCounter
+class PerfCounter
 {
 protected:
 	LARGE_INTEGER m_frequency;
 	LARGE_INTEGER m_startTime;
 
 public:
-	CPerfCounter ()
+	PerfCounter ()
 	{
 		start ();
 	}

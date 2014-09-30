@@ -15,10 +15,10 @@
 namespace axl {
 namespace gui {
 
-class CQtEngine;
+class QtEngine;
 class qtWidgetBase;
 
-CQtEngine*
+QtEngine*
 getQtEngineSingleton (); // thanks a lot gcc
 
 //.............................................................................
@@ -58,16 +58,16 @@ private:
 
 //.............................................................................
 
-class CQtWidgetImpl: public CWidget
+class QtWidgetImpl: public Widget
 {
 public:
 	// this class is needed to get access to protected members in CWidget
 	// also to put part of implementation into .cpp instead of having one huge CQtWidgetT <>
 
-	EMouseButton
+	MouseButtonKind
 	getMouseButtonFromQtButton (Qt::MouseButton qtButton)
 	{
-		return (EMouseButton) (qtButton & 0x7);
+		return (MouseButtonKind) (qtButton & 0x7);
 	}
 
 	uint_t
@@ -85,13 +85,13 @@ public:
 	void
 	onEvent (
 		QEvent* event,
-		EWidgetMsg msgKind
+		WidgetMsgKind msgKind
 		);
 
 	void
 	onMouseEvent (
 		QMouseEvent* event,
-		EWidgetMsg msgKind
+		WidgetMsgKind msgKind
 		);
 
 	void
@@ -100,7 +100,7 @@ public:
 	void
 	onKeyEvent (
 		QKeyEvent* event,
-		EWidgetMsg msgKind
+		WidgetMsgKind msgKind
 		);
 
 	void
@@ -128,12 +128,12 @@ class qtWidgetBase: public QAbstractScrollArea
 	Q_OBJECT
 
 protected:
-	CQtWidgetImpl* m_qtWidget;
+	QtWidgetImpl* m_qtWidget;
 	bool m_mouseMoveEventFlag;
 
 public:
 	qtWidgetBase (
-		CQtWidgetImpl* qtWidget,
+		QtWidgetImpl* qtWidget,
 		QWidget* parent
 		):
 		QAbstractScrollArea (parent)
@@ -151,11 +151,11 @@ public:
 	void
 	postThreadMsg (
 		uint_t code,
-		const ref::CPtrT <void>& params
+		const ref::Ptr <void>& params
 		)
 	{
-		TWidgetThreadMsg* msg = AXL_MEM_NEW (TWidgetThreadMsg);
-		msg->m_msgKind = EWidgetMsg_ThreadMsg;
+		WidgethreadMsg* msg = AXL_MEM_NEW (WidgethreadMsg);
+		msg->m_msgKind = WidgetMsgKind_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;
 
@@ -163,7 +163,7 @@ public:
 	}
 
 private slots:
-	void threadMsgSlot (TWidgetThreadMsg* msg)
+	void threadMsgSlot (WidgethreadMsg* msg)
 	{
 		bool isHandled = true;
 		m_qtWidget->processWidgetMsg (msg, &isHandled);
@@ -171,7 +171,7 @@ private slots:
 	}
 
 signals:
-	void threadMsgSignal (TWidgetThreadMsg* msg);
+	void threadMsgSignal (WidgethreadMsg* msg);
 
 public:
 	virtual
@@ -196,21 +196,21 @@ protected:
 	void
 	mousePressEvent (QMouseEvent* e)
 	{
-		m_qtWidget->onMouseEvent (e, EWidgetMsg_MouseButtonDown);
+		m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseButtonDown);
 	}
 
 	virtual
 	void
 	mouseReleaseEvent (QMouseEvent* e)
 	{
-		m_qtWidget->onMouseEvent (e, EWidgetMsg_MouseButtonUp);
+		m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseButtonUp);
 	}
 
 	virtual
 	void
 	mouseDoubleClickEvent (QMouseEvent* e)
 	{
-		m_qtWidget->onMouseEvent (e, EWidgetMsg_MouseButtonDoubleClick);
+		m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseButtonDoubleClick);
 	}
 
 	virtual
@@ -228,35 +228,35 @@ protected:
 	void
 	keyPressEvent (QKeyEvent* e)
 	{
-		m_qtWidget->onKeyEvent (e, EWidgetMsg_KeyDown);
+		m_qtWidget->onKeyEvent (e, WidgetMsgKind_KeyDown);
 	}
 
 	virtual
 	void
 	keyReleaseEvent (QKeyEvent* e)
 	{
-		m_qtWidget->onKeyEvent (e, EWidgetMsg_KeyUp);
+		m_qtWidget->onKeyEvent (e, WidgetMsgKind_KeyUp);
 	}
 
 	virtual
 	void
 	focusInEvent (QFocusEvent* e)
 	{
-		m_qtWidget->onEvent (e, EWidgetMsg_SetFocus);
+		m_qtWidget->onEvent (e, WidgetMsgKind_SetFocus);
 	}
 
 	virtual
 	void
 	focusOutEvent (QFocusEvent* e)
 	{
-		m_qtWidget->onEvent (e, EWidgetMsg_KillFocus);
+		m_qtWidget->onEvent (e, WidgetMsgKind_KillFocus);
 	}
 
 	virtual
 	void
 	leaveEvent (QEvent* e)
 	{
-		m_qtWidget->onEvent (e, EWidgetMsg_MouseLeave);
+		m_qtWidget->onEvent (e, WidgetMsgKind_MouseLeave);
 	}
 
 	virtual
@@ -278,7 +278,7 @@ protected:
 	void
 	closeEvent (QCloseEvent* e)
 	{
-		m_qtWidget->onEvent (e, EWidgetMsg_Close);
+		m_qtWidget->onEvent (e, WidgetMsgKind_Close);
 	}
 
 	virtual
@@ -298,9 +298,9 @@ protected:
 //.............................................................................
 
 template <typename T>
-class CQtWidgetT: public T
+class QtWidget: public T
 {
-	friend class CQtEngine;
+	friend class QtEngine;
 
 public:
 	qtWidgetBase* m_qtScrollArea;
@@ -308,7 +308,7 @@ public:
 	bool m_mouseMoveFlag;
 
 public:
-	CQtWidgetT (): T (getQtEngineSingleton ())
+	QtWidget (): T (getQtEngineSingleton ())
 	{
 		m_qtScrollArea = NULL;
 		m_qtWidget = NULL;
@@ -316,10 +316,10 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	getCanvas ()
 	{
-		ref::CPtrT <CQtCanvas> canvas = AXL_REF_NEW (ref::CBoxT <CQtCanvas>);
+		ref::Ptr <QtCanvas> canvas = AXL_REF_NEW (ref::Box <QtCanvas>);
 		canvas->attach (new QPainter (m_qtScrollArea->viewport ()));
 		return canvas;
 	}
@@ -358,10 +358,10 @@ public:
 
 	virtual
 	bool
-	setCursor (CCursor* cursor)
+	setCursor (Cursor* cursor)
 	{
-		ASSERT (cursor->getEngine ()->getEngineKind () == EEngine_Qt);
-		m_qtWidget->setCursor (((CQtCursor*) cursor)->m_qtCursor);
+		ASSERT (cursor->getEngine ()->getEngineKind () == EngineKind_Qt);
+		m_qtWidget->setCursor (((QtCursor*) cursor)->m_qtCursor);
 		this->m_cursor = cursor; // thanks a lot gcc
 		return true;
 	}
@@ -384,13 +384,13 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (EWidgetOrientation orientation)
+	updateScrollBar (WidgetOrientationKind orientation)
 	{
-		ASSERT (orientation < EWidgetOrientation__Count);
+		ASSERT (orientation < WidgetOrientationKind__Count);
 
-		const TWidgetScrollBar* scrollBar = &this->m_scrollBarArray [orientation];
+		const WidgetScrollBar* scrollBar = &this->m_scrollBarArray [orientation];
 
-		QScrollBar* qtScrollBar = orientation == EWidgetOrientation_Horizontal ?
+		QScrollBar* qtScrollBar = orientation == WidgetOrientationKind_Horizontal ?
 			m_qtScrollArea->horizontalScrollBar () :
 			m_qtScrollArea->verticalScrollBar ();
 
@@ -419,7 +419,7 @@ public:
 	void
 	postThreadMsg (
 		uint_t code,
-		const ref::CPtrT <void>& params
+		const ref::Ptr <void>& params
 		)
 	{
 		m_qtScrollArea->postThreadMsg (code, params);
@@ -432,11 +432,11 @@ template <typename T>
 class qtWidget: public qtWidgetBase
 {
 protected:
-	CQtWidgetT <T> m_widget;
+	QtWidget <T> m_widget;
 
 public:
 	qtWidget (QWidget* parent = 0):
-		qtWidgetBase ((CQtWidgetImpl*) (CWidget*) &m_widget, parent)
+		qtWidgetBase ((QtWidgetImpl*) (Widget*) &m_widget, parent)
 	{
 		m_widget.m_qtScrollArea = this;
 		m_widget.m_qtWidget = viewport ();

@@ -14,13 +14,13 @@ namespace gui {
 
 //.............................................................................
 
-enum EWm
+enum WmKind
 {
-	EWm_First = 0x0600, // WM_USER = 0x0400, reserve 512 codes just in case
-	EWm_ThreadMsg,
+	WmKind_First = 0x0600, // WM_USER = 0x0400, reserve 512 codes just in case
+	WmKind_ThreadMsg,
 };
 
-struct TNotify: NMHDR
+struct Notify: NMHDR
 {
 	void* param;
 };
@@ -29,9 +29,9 @@ struct TNotify: NMHDR
 
 inline
 int 
-getScrollBarFromOrientation (EWidgetOrientation orientation)
+getScrollBarFromOrientation (WidgetOrientationKind orientation)
 {
-	return orientation == EWidgetOrientation_Horizontal ? SB_HORZ : SB_VERT;
+	return orientation == WidgetOrientationKind_Horizontal ? SB_HORZ : SB_VERT;
 }
 
 void
@@ -45,7 +45,7 @@ buildScrollInfo (
 inline
 void
 getScrollInfoFromScrollBar (
-	const TWidgetScrollBar& scrollBar,	
+	const WidgetScrollBar& scrollBar,	
 	SCROLLINFO* scrollInfo
 	)
 {
@@ -54,7 +54,7 @@ getScrollInfoFromScrollBar (
 
 //.............................................................................
 
-class CGdiWidgetImpl: public CWidget
+class GdiWidgetImpl: public Widget
 {
 public:
 	// this class is needed to get access to protected members in CWidget 
@@ -70,16 +70,16 @@ public:
 		);
 
 	static
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	getCanvas (HWND hWnd);
 
 protected:
 	void
 	processWmMouse (
-		EWidgetMsg msgKind,
+		WidgetMsgKind msgKind,
 		int x,
 		int y,
-		EMouseButton button,
+		MouseButtonKind button,
 		bool* isHandled_o
 		);
 
@@ -92,7 +92,7 @@ protected:
 
 	void
 	processWmKey (
-		EWidgetMsg msgKind,
+		WidgetMsgKind msgKind,
 		int key,
 		bool* isHandled_o
 		);
@@ -106,7 +106,7 @@ protected:
 	void
 	processWmScroll (
 		HWND hWnd,
-		EWidgetOrientation orientation,
+		WidgetOrientationKind orientation,
 		int code,
 		bool* isHandled_o
 		);
@@ -127,15 +127,15 @@ protected:
 //.............................................................................
 
 template <typename T>
-class CGdiWidgetT: 
+class GdiWidget: 
 	public T,
-	public g::win::CWindowImplT <CGdiWidgetT <T> >
+	public g::win::WindowImpl <GdiWidget <T> >
 {
-	friend class CGdiEngine;
-	friend class g::win::CWindowImplT <CGdiWidgetT <T> >;
+	friend class GdiEngine;
+	friend class g::win::WindowImpl <GdiWidget <T> >;
 
 public:
-	CGdiWidgetT (): T (CGdiEngine::getSingleton ())
+	GdiWidget (): T (GdiEngine::getSingleton ())
 	{
 		m_baseTextAttr.m_foreColor = ::GetSysColor (COLOR_WINDOWTEXT);
 		m_baseTextAttr.m_backColor = ::GetSysColor (COLOR_WINDOW);
@@ -143,7 +143,7 @@ public:
 	}
 
 	virtual
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	getCanvas ()
 	{
 		return getGdiWidget ()->getCanvas (m_h);
@@ -188,10 +188,10 @@ public:
 
 	virtual
 	bool
-	setCursor (CCursor* cursor)
+	setCursor (Cursor* cursor)
 	{
-		ASSERT (cursor->getEngine ()->getEngineKind () == EEngine_Gdi);
-		::SetCursor (*(CCursor*) cursor);
+		ASSERT (cursor->getEngine ()->getEngineKind () == EngineKind_Gdi);
+		::SetCursor (*(Cursor*) cursor);
 		m_cursor = cursor;
 		return true;		
 	}
@@ -241,7 +241,7 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (EWidgetOrientation orientation)
+	updateScrollBar (WidgetOrientationKind orientation)
 	{
 		ASSERT (orientation < countof (m_scrollBarArray));
 
@@ -262,7 +262,7 @@ public:
 	{
 		HWND hWndParent = ::GetParent (m_h);
 
-		TNotify notify;
+		Notify notify;
 		notify.code = notifyCode;
 		notify.hwndFrom = m_h;
 		notify.idFrom = ::GetDlgCtrlID (m_h);
@@ -275,24 +275,24 @@ public:
 	void
 	postThreadMsg (
 		uint_t code,
-		const ref::CPtrT <void>& params
+		const ref::Ptr <void>& params
 		)
 	{
-		TWidgetThreadMsg* msg = AXL_MEM_NEW (TWidgetThreadMsg);
-		msg->m_msgKind = EWidgetMsg_ThreadMsg;
+		WidgethreadMsg* msg = AXL_MEM_NEW (WidgethreadMsg);
+		msg->m_msgKind = WidgetMsgKind_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;
 
-		bool_t result = ::PostMessageW (m_h, EWm_ThreadMsg, code, (LPARAM) msg);
+		bool_t result = ::PostMessageW (m_h, WmKind_ThreadMsg, code, (LPARAM) msg);
 		if (!result)
 			AXL_MEM_DELETE (msg);
 	}
 	
 protected:
-	CGdiWidgetImpl*
+	GdiWidgetImpl*
 	getGdiWidget ()
 	{
-		return (CGdiWidgetImpl*) (CWidget*) this;
+		return (GdiWidgetImpl*) (Widget*) this;
 	}
 	
 	LRESULT 

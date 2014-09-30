@@ -9,43 +9,43 @@ namespace err {
 //.............................................................................
 
 bool
-TError::isKind (
-	const rtl::TGuid& guid,
+ErrorData::isKind (
+	const rtl::Guid& guid,
 	uint_t code
 	) const
 {
-	const TError* error = this;
+	const ErrorData* error = this;
 
-	if (m_guid == rtl::GUID_Null && m_code == EStdError_Stack)
+	if (m_guid == rtl::GUID_Null && m_code == StdErrorKind_Stack)
 		error++;
 
 	return error->m_guid == guid && error->m_code == code;
 }
 
-rtl::CString
-TError::getDescription () const
+rtl::String
+ErrorData::getDescription () const
 {
-	CErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
+	ErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
 
 	return provider ?
 		provider->getErrorDescription (this) :
-		rtl::CString::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code); // thanks a lot gcc
+		rtl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code); // thanks a lot gcc
 }
 
 //.............................................................................
 
-rtl::CString
-CError::getDescription () const
+rtl::String
+Error::getDescription () const
 {
 	return m_p ?
 		m_p->getDescription () :
-		noError.getDescription ();
+		g_noError.getDescription ();
 }
 
-TError*
-CError::copy (const TError& src)
+ErrorData*
+Error::copy (const ErrorData& src)
 {
-	TError* error = getBuffer (src.m_size);
+	ErrorData* error = getBuffer (src.m_size);
 	if (!error)
 		return NULL;
 
@@ -53,8 +53,8 @@ CError::copy (const TError& src)
 	return error;
 }
 
-TError*
-CError::push (const TError& error)
+ErrorData*
+Error::push (const ErrorData& error)
 {
 	if (!m_p)
 		return copy (error);
@@ -62,64 +62,64 @@ CError::push (const TError& error)
 	size_t base = 0;
 	size_t baseSize = m_p->m_size;
 
-	if (m_p->isKind (GUID_StdError, EStdError_Stack))
+	if (m_p->isKind (GUID_StdError, StdErrorKind_Stack))
 	{
-		base += sizeof (TError);
-		baseSize -= sizeof (TError);
+		base += sizeof (ErrorData);
+		baseSize -= sizeof (ErrorData);
 	}
 
-	size_t size = sizeof (TError) + error.m_size + baseSize;
+	size_t size = sizeof (ErrorData) + error.m_size + baseSize;
 
 	getBuffer (size, true);
 	if (!m_p)
 		return NULL;
 
 	memmove (
-		(uchar_t*) m_p + sizeof (TError) + error.m_size,
+		(uchar_t*) m_p + sizeof (ErrorData) + error.m_size,
 		(uchar_t*) m_p + base,
 		baseSize
 		);
 
 	m_p->m_size = (uint32_t) size;
 	m_p->m_guid = GUID_StdError;
-	m_p->m_code = EStdError_Stack;
+	m_p->m_code = StdErrorKind_Stack;
 
 	memcpy (m_p + 1, &error, error.m_size);
 	return m_p;
 }
 
-TError*
-CError::createSimpleError (
-	const rtl::TGuid& guid,
+ErrorData*
+Error::createSimpleError (
+	const rtl::Guid& guid,
 	uint_t code
 	)
 {
-	getBuffer (sizeof (TError));
+	getBuffer (sizeof (ErrorData));
 	if (!m_p)
 		return NULL;
 
-	m_p->m_size = sizeof (TError);
+	m_p->m_size = sizeof (ErrorData);
 	m_p->m_guid = guid;
 	m_p->m_code = code;
 
 	return m_p;
 }
 
-TError*
-CError::format_va (
-	const rtl::TGuid& guid,
+ErrorData*
+Error::format_va (
+	const rtl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	rtl::CPackerSeq packer;
+	rtl::PackerSeq packer;
 	packer.format (formatString);
 
 	size_t packSize;
 	packer.pack_va (NULL, &packSize, va);
 
-	size_t size = sizeof (TError) + packSize;
+	size_t size = sizeof (ErrorData) + packSize;
 
 	getBuffer (size);
 	if (!m_p)
@@ -133,8 +133,8 @@ CError::format_va (
 	return m_p;
 }
 
-TError*
-CError::createStringError (
+ErrorData*
+Error::createStringError (
 	const char* p,
 	size_t length
 	)
@@ -142,15 +142,15 @@ CError::createStringError (
 	if (length == -1)
 		length = strlen (p);
 
-	size_t size = sizeof (TError) + length + 1;
+	size_t size = sizeof (ErrorData) + length + 1;
 
-	TError* error = getBuffer (size);
+	ErrorData* error = getBuffer (size);
 	if (!error)
 		return NULL;
 
 	error->m_size = (uint32_t) size;
 	error->m_guid = GUID_StdError;
-	error->m_code = EStdError_String;
+	error->m_code = StdErrorKind_String;
 
 	char* dst = (char*) (error + 1);
 
@@ -160,34 +160,34 @@ CError::createStringError (
 	return error;
 }
 
-TError*
-CError::formatStringError_va (
+ErrorData*
+Error::formatStringError_va (
 	const char* formatString,
 	axl_va_list va
 	)
 {
 	char buffer [256];
-	rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.format_va (formatString, va);
 	return createStringError (string, string.getLength ());
 }
 
 //.............................................................................
 
-EErrorMode
-setErrorMode (EErrorMode mode)
+ErrorModeKind
+setErrorMode (ErrorModeKind mode)
 {
 	return getErrorMgr ()->setErrorMode (mode);
 }
 
-CError
+Error
 getError ()
 {
 	return getErrorMgr ()->getError ();
 }
 
-CError
-setError (const CError& error)
+Error
+setError (const Error& error)
 {
 	getErrorMgr ()->setError (error);
 	return error;
@@ -195,48 +195,48 @@ setError (const CError& error)
 
 //.............................................................................
 
-rtl::CString
-CStdErrorProvider::getErrorDescription (const TError* error)
+rtl::String
+StdErrorProvider::getErrorDescription (const ErrorData* error)
 {
-	if (error->m_size < sizeof (TError))
-		return rtl::CString ();
+	if (error->m_size < sizeof (ErrorData))
+		return rtl::String ();
 
 	size_t length;
 
 	switch (error->m_code)
 	{
-	case EStdError_NoError:
+	case StdErrorKind_NoError:
 		return "no error";
 
-	case EStdError_String:
-		length = (error->m_size - sizeof (TError)) / sizeof (char);
-		return rtl::CString ((char*) (error + 1), length);
+	case StdErrorKind_String:
+		length = (error->m_size - sizeof (ErrorData)) / sizeof (char);
+		return rtl::String ((char*) (error + 1), length);
 
-	case EStdError_Stack:
+	case StdErrorKind_Stack:
 		return getStackErrorDescription (error);
 
 	default:
-		return rtl::CString::format_s ("error #%d");
+		return rtl::String::format_s ("error #%d");
 	}
 }
 
-rtl::CString
-CStdErrorProvider::getStackErrorDescription (const TError* error)
+rtl::String
+StdErrorProvider::getStackErrorDescription (const ErrorData* error)
 {
-	rtl::CString string;
+	rtl::String string;
 
 	void* end = (uchar_t*) error + (error->m_size);
-	const TError* p = error + 1;
+	const ErrorData* p = error + 1;
 
 	while (p < end)
 	{
-		ASSERT (p->m_size >= sizeof (TError));
+		ASSERT (p->m_size >= sizeof (ErrorData));
 
 		if (!string.isEmpty ())
 			string += ": ";
 
 		string += p->getDescription ();
-		p = (TError*) ((uchar_t*) p + p->m_size);
+		p = (ErrorData*) ((uchar_t*) p + p->m_size);
 	}
 
 	return string;

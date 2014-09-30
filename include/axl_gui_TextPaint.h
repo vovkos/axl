@@ -16,15 +16,15 @@ namespace gui {
 
 //.............................................................................
 
-class CTextPaint
+class TextPaint
 {
 protected:
-	CTextAttrAnchorArray m_selOverlay;
+	TextAttrAnchorArray m_selOverlay;
 	
 	// for bin-hex / bin-text
 	
-	rtl::CString m_stringBuffer; 
-	rtl::CArrayT <utf32_t> m_binTextBuffer; 
+	rtl::String m_stringBuffer; 
+	rtl::Array <utf32_t> m_binTextBuffer; 
 
 	const char* m_p;
 	const char* m_begin;
@@ -32,27 +32,27 @@ protected:
 	
 	// hyper text
 
-	const TTextAttrAnchor* m_attr;
-	const TTextAttrAnchor* m_attrBegin;
-	const TTextAttrAnchor* m_attrEnd;
+	const TextAttrAnchor* m_attr;
+	const TextAttrAnchor* m_attrBegin;
+	const TextAttrAnchor* m_attrEnd;
 
 public:
-	CCanvas* m_canvas;
-	TTextAttr m_selAttr;
+	Canvas* m_canvas;
+	TextAttr m_selAttr;
 	uint_t m_hexEncodingFlags;
 	char m_unprintableChar;
 
-	TPoint m_point;
+	Point m_point;
 	int m_top;
 	int m_bottom;
 
 public:
-	CTextPaint ()
+	TextPaint ()
 	{
 		init ();
 	}
 
-	CTextPaint (CCanvas* canvas)
+	TextPaint (Canvas* canvas)
 	{
 		init (canvas);
 	}
@@ -64,7 +64,7 @@ public:
 		return c >= 0x20 && iswprint (c);
 	}
 
-	TPoint
+	Point
 	getPoint ()
 	{
 		return m_point;
@@ -99,7 +99,7 @@ public:
 	// text
 
 	int
-	paintText (const rtl::CString& text)
+	paintText (const rtl::String& text)
 	{
 		return paintText_utf8 (text, text.getLength ());
 	}
@@ -129,8 +129,8 @@ public:
 
 	int
 	paintHyperText (
-		const CTextAttrAnchorArray* attrArray,
-		const rtl::CString& text
+		const TextAttrAnchorArray* attrArray,
+		const rtl::String& text
 		)
 	{
 		return paintHyperText_utf8 (attrArray, text, text.getLength ());
@@ -138,7 +138,7 @@ public:
 
 	int
 	paintHyperText (
-		const CTextAttrAnchorArray* attrArray,
+		const TextAttrAnchorArray* attrArray,
 		const char* text, 
 		size_t length = -1
 		)
@@ -148,14 +148,14 @@ public:
 
 	int
 	paintHyperText_utf8 (
-		const CTextAttrAnchorArray* attrArray,
+		const TextAttrAnchorArray* attrArray,
 		const utf8_t* text, 
 		size_t length = -1
 		);
 
 	int
 	paintHyperText_utf32 (
-		const CTextAttrAnchorArray* attrArray,
+		const TextAttrAnchorArray* attrArray,
 		const utf32_t* text, 
 		size_t length = -1
 		);
@@ -164,10 +164,10 @@ public:
 
 	int
 	paintSelHyperText (
-		const CTextAttrAnchorArray* attrArray, 
+		const TextAttrAnchorArray* attrArray, 
 		size_t selStart, 
 		size_t selEnd, 
-		const rtl::CString& text
+		const rtl::String& text
 		)
 	{
 		return paintSelHyperText_utf8 (attrArray, selStart, selEnd, text, text.getLength ());
@@ -175,7 +175,7 @@ public:
 
 	int
 	paintSelHyperText_utf8 (
-		const CTextAttrAnchorArray* attrArray, 
+		const TextAttrAnchorArray* attrArray, 
 		size_t selStart, 
 		size_t selEnd, 
 		const utf8_t* text, 
@@ -184,7 +184,7 @@ public:
 
 	int
 	paintSelHyperText_utf32 (
-		const CTextAttrAnchorArray* attrArray, 
+		const TextAttrAnchorArray* attrArray, 
 		size_t selStart, 
 		size_t selEnd, 
 		const utf32_t* text, 
@@ -201,14 +201,14 @@ public:
 
 	int
 	paintHyperBinHex (
-		const CTextAttrAnchorArray* attrArray,
+		const TextAttrAnchorArray* attrArray,
 		const void* p, 
 		size_t size
 		);
 
 	int
 	paintSelHyperBinHex (
-		const CTextAttrAnchorArray* attrArray, 
+		const TextAttrAnchorArray* attrArray, 
 		size_t selStart, 
 		size_t selEnd, 
 		const void* p, 
@@ -217,7 +217,7 @@ public:
 
 	int
 	paintHyperBinHex4BitCursor (
-		const CTextAttrAnchorArray* attrArray, 
+		const TextAttrAnchorArray* attrArray, 
 		size_t cursorPos, 
 		const void* p, 
 		size_t size
@@ -227,15 +227,15 @@ public:
 
 	int
 	paintBinText (
-		rtl::CCharCodec* codec,
+		rtl::CharCodec* codec,
 		const void* p, 
 		size_t size
 		);
 
 	int
 	paintHyperBinText (
-		rtl::CCharCodec* codec,
-		const CTextAttrAnchorArray* attrArray,
+		rtl::CharCodec* codec,
+		const TextAttrAnchorArray* attrArray,
 		const void* p, 
 		size_t size
 		);
@@ -243,8 +243,8 @@ public:
 
 	int
 	paintSelHyperBinText (
-		rtl::CCharCodec* codec,
-		const CTextAttrAnchorArray* attrArray, 
+		rtl::CharCodec* codec,
+		const TextAttrAnchorArray* attrArray, 
 		size_t selStart, 
 		size_t selEnd, 
 		const void* p, 
@@ -253,21 +253,21 @@ public:
 
 protected:
 	void
-	init (CCanvas* canvas = NULL);
+	init (Canvas* canvas = NULL);
 
-	TRect
+	Rect
 	calcTextRect_utf8 (
 		const utf8_t* text,
 		size_t length = -1
 		);
 
-	TRect
+	Rect
 	calcTextRect_utf32 (
 		const utf32_t* text,
 		size_t length = -1
 		);
 
-	TRect
+	Rect
 	calcTextRect (utf32_t c)
 	{
 		return calcTextRect_utf32 (&c, 1);
@@ -284,7 +284,7 @@ protected:
 
 	int
 	paintBinTextPart (
-		rtl::CCharCodec* codec,
+		rtl::CharCodec* codec,
 		size_t size
 		);
 };

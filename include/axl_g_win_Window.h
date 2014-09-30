@@ -17,7 +17,7 @@ namespace win {
 
 //.............................................................................
 
-class CWindow: public rtl::CHandleT <HWND>
+class Window: public rtl::Handle <HWND>
 {
 public:
 	// CWindowImplT <> overridables
@@ -190,21 +190,21 @@ const uint_t g_createWindowTls = ::TlsAlloc ();
 
 template <
 	class T, 
-	class B = CWindow
+	class B = Window
 	>
-class CWindowImplT: public B
+class WindowImpl: public B
 {
 protected:
-	enum EWindowState
+	enum WindowStateKind
 	{
-		EWindowState_Idle = 0,
-		EWindowState_Normal,
-		EWindowState_Internal,
-		EWindowState_Attached,
-		EWindowState_Subclassed
+		WindowStateKind_Idle = 0,
+		WindowStateKind_Normal,
+		WindowStateKind_Internal,
+		WindowStateKind_Attached,
+		WindowStateKind_Subclassed
 	};
 
-	class CRegisterWndClass
+	class RegisterWndClass
 	{
 	public:
 		void 
@@ -242,18 +242,18 @@ protected:
 
 	// subclass
 
-	exe::TThunk* m_subclassWindowThunk;
+	exe::Thunk* m_subclassWindowThunk;
 	WNDPROC m_pfOriginalWindowProc;
 
 public:
-	CWindowImplT ()
+	WindowImpl ()
 	{		
-		m_windowState = EWindowState_Idle;
+		m_windowState = WindowStateKind_Idle;
 		m_subclassWindowThunk = NULL;
 		m_pfOriginalWindowProc = NULL;
 	}
 
-	~CWindowImplT ()
+	~WindowImpl ()
 	{
 #ifndef _AXL_DISABLE_PREMATURE_WINDOW_DESTRUCTION_CHECK
 		ASSERT (!m_h);
@@ -282,7 +282,7 @@ public:
 	getWndClass ()
 	{
 		static WNDCLASS* wndClass = NULL;
-		mt::callOnce (CRegisterWndClass (), &wndClass);
+		mt::callOnce (RegisterWndClass (), &wndClass);
 		return wndClass;
 	}
 
@@ -292,7 +292,7 @@ public:
 		detach ();
 
 		m_h = hWnd;
-		m_windowState = EWindowState_Attached;
+		m_windowState = WindowStateKind_Attached;
 	}
 
 	HWND 
@@ -320,7 +320,7 @@ public:
 		if (!wndClass)
 			return false;
 
-		bool result = CWindow::create (
+		bool result = Window::create (
 			wndClass->lpszClassName, 
 			hWndParent, 
 			rect, 
@@ -346,7 +346,7 @@ public:
 			return false;
 
 		m_h = hWnd;
-		m_windowState = EWindowState_Subclassed;
+		m_windowState = WindowStateKind_Subclassed;
 		m_pfOriginalWindowProc = (WNDPROC) ::SetWindowLongPtr (hWnd, GWLP_WNDPROC, (LONG_PTR) m_subclassWindowThunk);	
 		return true;
 	}
@@ -355,7 +355,7 @@ public:
 	T* 
 	fromHandle (HWND hWnd)
 	{
-		return (T*) (CWindow*) ::GetWindowLongPtr (hWnd, 0);
+		return (T*) (Window*) ::GetWindowLongPtr (hWnd, 0);
 	}
 
 	LRESULT 
@@ -365,7 +365,7 @@ public:
 		LPARAM lParam
 		)
 	{
-		return m_windowState == EWindowState_Subclassed ? 
+		return m_windowState == WindowStateKind_Subclassed ? 
 			::CallWindowProc (m_pfOriginalWindowProc, m_h, msg, wParam, lParam) :
 			::DefWindowProc (m_h, msg, wParam, lParam);
 	}
@@ -380,17 +380,17 @@ protected:
 
 		switch (m_windowState)
 		{
-		case EWindowState_Idle:
+		case WindowStateKind_Idle:
 			return NULL;
 
-		case EWindowState_Attached:
+		case WindowStateKind_Attached:
 			break;
 
-		case EWindowState_Internal:
+		case WindowStateKind_Internal:
 			ASSERT (doDrop); // should only be called from _WindowProc::WM_NCDESTROY
 			break;
 
-		case EWindowState_Normal:
+		case WindowStateKind_Normal:
 			if (!doDrop)
 			{
 				pfPrev = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) ::defWindowProc);
@@ -400,7 +400,7 @@ protected:
 
 			break;
 
-		case EWindowState_Subclassed:
+		case WindowStateKind_Subclassed:
 			ASSERT (m_subclassWindowThunk);
 
 			if (!doDrop)
@@ -416,7 +416,7 @@ protected:
 		}
 
 		m_h = NULL;
-		m_windowState = EWindowState_Idle;
+		m_windowState = WindowStateKind_Idle;
 		return hWnd;
 	}
 
@@ -453,12 +453,12 @@ protected:
 			T* self = (T*) ::TlsGetValue (g_createWindowTls);
 			if (self)
 			{
-				self->m_windowState = EWindowState_Normal;
+				self->m_windowState = WindowStateKind_Normal;
 			}
 			else
 			{
 				self = AXL_MEM_NEW (T);
-				self->m_windowState = EWindowState_Internal;
+				self->m_windowState = WindowStateKind_Internal;
 			}
 
 			self->m_h = hWnd;
@@ -471,13 +471,13 @@ protected:
 		if (!self)
 			return ::DefWindowProc (hWnd, msg, wParam, lParam);
 
-		ASSERT (self->m_windowState == EWindowState_Normal || self->m_windowState == EWindowState_Internal);
+		ASSERT (self->m_windowState == WindowStateKind_Normal || self->m_windowState == WindowStateKind_Internal);
 
 		LRESULT result = self->processMessage (msg, wParam, lParam);
 
 		if (msg == WM_NCDESTROY)
 		{
-			bool doDelete = self->m_windowState == EWindowState_Internal;
+			bool doDelete = self->m_windowState == WindowStateKind_Internal;
 
 			self->detachEx (true);
 
@@ -498,7 +498,7 @@ protected:
 		LPARAM lParam
 		)
 	{
-		ASSERT (self->m_windowState == EWindowState_Subclassed);
+		ASSERT (self->m_windowState == WindowStateKind_Subclassed);
 
 		LRESULT result = self->processMessage (msg, wParam, lParam);
 

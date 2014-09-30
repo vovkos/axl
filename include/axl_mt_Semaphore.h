@@ -13,13 +13,13 @@ namespace mt {
 
 //.............................................................................
 
-class CSemaphore
+class Semaphore
 {
 public:
-	win::CSemaphore m_semaphore;
+	win::Semaphore m_semaphore;
 
 public:
-	CSemaphore (size_t initialCount = 0)
+	Semaphore (size_t initialCount = 0)
 	{
 		create (initialCount);
 	}
@@ -51,7 +51,7 @@ public:
 	bool
 	wait (uint_t timeout = -1)
 	{
-		return m_semaphore.wait (timeout) == win::EWaitResult_Object0;
+		return m_semaphore.wait (timeout) == win::WaitResultKind_Object0;
 	}
 };
 

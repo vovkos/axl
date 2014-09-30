@@ -20,15 +20,15 @@ namespace mt {
 
 //.............................................................................
 
-typedef ref::CPtrT <void> CTlsValue;
+typedef ref::Ptr <void> TlsValue;
 
-class CTlsMgr
+class TlsMgr
 {
 protected:
-	struct TPage
+	struct Page
 	{
-		rtl::CArrayT <rtl::CBoxListEntryT <CTlsValue>*> m_array;
-		rtl::CBoxListT <CTlsValue> m_valueList;
+		rtl::Array <rtl::BoxListEntry <TlsValue>*> m_array;
+		rtl::BoxList <TlsValue> m_valueList;
 	};
 
 protected:
@@ -42,9 +42,9 @@ protected:
 	int32_t m_slotCount;
 
 public:
-	CTlsMgr ();
+	TlsMgr ();
 
-	~CTlsMgr ();
+	~TlsMgr ();
 
 	size_t
 	createSlot ()
@@ -52,13 +52,13 @@ public:
 		return mt::atomicInc (&m_slotCount) - 1;
 	}
 
-	CTlsValue
+	TlsValue
 	getSlotValue (size_t slot);
 
-	CTlsValue
+	TlsValue
 	setSlotValue (
 		size_t slot,
-		const CTlsValue& value
+		const TlsValue& value
 		);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -73,30 +73,30 @@ public:
 #endif
 
 protected:
-	TPage*
+	Page*
 	getCurrentThreadPage ();
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	TPage*
+	Page*
 	findCurrentThreadPage ()
 	{
-		return (TPage*) ::TlsGetValue (m_tlsIdx);
+		return (Page*) ::TlsGetValue (m_tlsIdx);
 	}
 
 	void
-	setCurrentThreadPage (TPage* page)
+	setCurrentThreadPage (Page* page)
 	{
 		::TlsSetValue (m_tlsIdx, page);
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	TPage*
+	Page*
 	findCurrentThreadPage ()
 	{
-		return (TPage*) pthread_getspecific (m_tlsKey);
+		return (Page*) pthread_getspecific (m_tlsKey);
 	}
 
 	void
-	setCurrentThreadPage (TPage* page)
+	setCurrentThreadPage (Page* page)
 	{
 		pthread_setspecific (m_tlsKey, page);
 	}
@@ -106,7 +106,7 @@ protected:
 	tlsDestructor (void* p)
 	{
 		ASSERT (p);
-		AXL_MEM_DELETE ((TPage*) p);
+		AXL_MEM_DELETE ((Page*) p);
 	}
 #endif
 };
@@ -114,10 +114,10 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-CTlsMgr*
+TlsMgr*
 getTlsMgr ()
 {
-	return rtl::getSingleton <CTlsMgr> ();
+	return rtl::getSingleton <TlsMgr> ();
 }
 
 //.............................................................................

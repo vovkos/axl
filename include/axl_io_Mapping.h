@@ -20,23 +20,23 @@ namespace io {
 
 //.............................................................................
 
-class CMapping
+class Mapping
 {
 protected:
 	void* m_p;
 	size_t m_size;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CMapping m_mapping;
-	win::CMappedView m_view;
+	win::Mapping m_mapping;
+	win::MappedView m_view;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CMapping m_mapping;
-	psx::CSharedMemory m_sharedMemory;
-	rtl::CString m_sharedMemoryName;
+	psx::Mapping m_mapping;
+	psx::SharedMemory m_sharedMemory;
+	rtl::String m_sharedMemoryName;
 #endif
 
 public:
-	CMapping ()
+	Mapping ()
 	{
 		m_p = NULL;
 		m_size = 0;
@@ -67,7 +67,7 @@ public:
 
 	void*
 	open (
-		CFile* file,
+		File* file,
 		uint64_t offset,
 		size_t size,
 		uint_t flags = 0 // EFileFlag
@@ -75,7 +75,7 @@ public:
 
 	void*
 	open (
-		CFile* file,
+		File* file,
 		uint_t flags = 0 // EFileFlag
 		)
 	{

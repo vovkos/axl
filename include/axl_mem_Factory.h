@@ -15,14 +15,14 @@ namespace mem {
 
 template <
 	typename T,
-	typename TAlloc = CStdAlloc
+	typename Alloc = StdAlloc
 	>
-class CStdFactoryT
+class StdFactory
 {
 public:
-	typedef TAlloc CAlloc;
+	typedef Alloc Alloc;
 
-	class COperatorNew
+	class OperatorNew
 	{
 	public:
 #ifdef _DEBUG
@@ -35,7 +35,7 @@ public:
 		{
 			size_t size = sizeof (T) + extra;
 
-			void* p = TAlloc::alloc (size, typeid (T).name (), filePath, line);
+			void* p = Alloc::alloc (size, typeid (T).name (), filePath, line);
 			if (!p)
 				return NULL;
 
@@ -49,7 +49,7 @@ public:
 		{
 			size_t size = sizeof (T) + extra;
 
-			void* p = TAlloc::alloc (size);
+			void* p = Alloc::alloc (size);
 			if (!p)
 				return NULL;
 
@@ -60,14 +60,14 @@ public:
 #endif
 	};
 
-	class COperatorDelete
+	class OperatorDelete
 	{
 	public:
 		void 
 		operator () (T* p)
 		{
 			p->~T ();
-			TAlloc::free (p);
+			Alloc::free (p);
 		}
 	};
 
@@ -81,14 +81,14 @@ public:
 		size_t extra = 0
 		)
 	{
-		return COperatorNew () (filePath, line, extra);
+		return OperatorNew () (filePath, line, extra);
 	}
 #else
 	static
 	T* 
 	operatorNew (size_t extra = 0)
 	{
-		return COperatorNew () (extra);
+		return OperatorNew () (extra);
 	}
 #endif
 
@@ -96,17 +96,17 @@ public:
 	void 
 	operatorDelete (T* p)
 	{
-		return COperatorDelete () (p);
+		return OperatorDelete () (p);
 	}
 };
 
 //.............................................................................
 
 template <typename T>
-class CCppFactoryT
+class CppFactory
 {
 public:
-	class COperatorNew
+	class OperatorNew
 	{
 	public:
 		T* 
@@ -116,7 +116,7 @@ public:
 		}
 	};
 
-	class COperatorDelete
+	class OperatorDelete
 	{
 	public:
 		void 
@@ -131,14 +131,14 @@ public:
 	T* 
 	operatorNew (size_t extra = 0)
 	{
-		return COperatorNew () (extra);
+		return OperatorNew () (extra);
 	}
 
 	static
 	void 
 	operatorDelete (T* p)
 	{
-		return COperatorDelete () (p);
+		return OperatorDelete () (p);
 	}
 };
 
@@ -150,7 +150,7 @@ template <typename T>
 void
 stdOperatorDelete (T* p)
 {
-	typename CStdFactoryT <T>::COperatorDelete () (p);
+	typename StdFactory <T>::OperatorDelete () (p);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -159,7 +159,7 @@ template <typename T>
 void
 cppOperatorDelete (T* p)
 {
-	typename CCppFactoryT <T>::COperatorDelete () (p);
+	typename CppFactory <T>::OperatorDelete () (p);
 }
 
 //.............................................................................
@@ -167,18 +167,18 @@ cppOperatorDelete (T* p)
 #ifdef _DEBUG
 
 #define AXL_MEM_NEW(class) \
-	axl::mem::CStdFactoryT <class>::operatorNew (__FILE__, __LINE__)
+	axl::mem::StdFactory <class>::operatorNew (__FILE__, __LINE__)
 
 #define AXL_MEM_NEW_EXTRA(class, extra) \
-	axl::mem::CStdFactoryT <class>::operatorNew (__FILE__, __LINE__, extra)
+	axl::mem::StdFactory <class>::operatorNew (__FILE__, __LINE__, extra)
 
 #else
 
 #define AXL_MEM_NEW(class) \
-	axl::mem::CStdFactoryT <class>::operatorNew ()
+	axl::mem::StdFactory <class>::operatorNew ()
 
 #define AXL_MEM_NEW_EXTRA(class, extra) \
-	axl::mem::CStdFactoryT <class>::operatorNew (extra)
+	axl::mem::StdFactory <class>::operatorNew (extra)
 
 #endif
 

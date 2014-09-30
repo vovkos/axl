@@ -15,14 +15,14 @@ namespace psx {
 
 //.............................................................................
 
-class CSerial: public CFd
+class Serial: public Fd
 {
 public:
 	bool
 	open (const char* name)
 	{
 		return
-			CFd::open (name, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&
+			Fd::open (name, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&
 			setBlockingMode (true);
 	}
 

@@ -15,36 +15,36 @@ namespace gui {
 
 //.............................................................................
 
-class CHyperText
+class Hyperext
 {
 protected:
-	struct THyperlinkXMapEntry
+	struct HyperlinkXMapEntry
 	{
 		int m_x;
-		THyperlinkAnchor* m_anchor;
+		HyperlinkAnchor* m_anchor;
 	};
 
 protected:
-	rtl::CString m_source;
-	rtl::CString m_text;
-	CTextAttrAnchorArray m_attrArray;
-	CHyperlinkAnchorArray m_hyperlinkArray;
-	rtl::CArrayT <THyperlinkXMapEntry> m_hyperlinkXMap;
+	rtl::String m_source;
+	rtl::String m_text;
+	TextAttrAnchorArray m_attrArray;
+	HyperlinkAnchorArray m_hyperlinkArray;
+	rtl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
-	rtl::CString
+	rtl::String
 	getSource () const 
 	{
 		return m_source;
 	}
 
-	rtl::CString
+	rtl::String
 	getText () const 
 	{
 		return m_text;
 	}
 
-	const CTextAttrAnchorArray*
+	const TextAttrAnchorArray*
 	getAttrArray () const 
 	{
 		return &m_attrArray;
@@ -55,7 +55,7 @@ public:
 
 	size_t 
 	setHyperText (
-		const TTextAttr& baseAttr,
+		const TextAttr& baseAttr,
 		const char* text, 
 		size_t length = -1
 		)
@@ -70,7 +70,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return setHyperText (TTextAttr (), text, length);
+		return setHyperText (TextAttr (), text, length);
 	}
 
 	size_t 
@@ -95,7 +95,7 @@ public:
 
 	size_t 
 	appendHyperText (
-		const TTextAttr& baseAttr,
+		const TextAttr& baseAttr,
 		const char* text, 
 		size_t length = -1
 		);
@@ -106,7 +106,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return appendHyperText (TTextAttr (), text, length);
+		return appendHyperText (TextAttr (), text, length);
 	}
 
 	size_t 
@@ -124,16 +124,16 @@ public:
 	size_t
 	backspace (size_t backLength);
 
-	TSize
-	calcTextSize (CFont* font) const;
+	Size
+	calcTextSize (Font* font) const;
 
 	void 
-	calcHyperlinkXMap (CFont* font);
+	calcHyperlinkXMap (Font* font);
 
-	THyperlinkAnchor* 
+	HyperlinkAnchor* 
 	findHyperlinkByX (int x) const ;
 
-	THyperlinkAnchor* 
+	HyperlinkAnchor* 
 	findHyperlinkByOffset (size_t offset) const 
 	{
 		return m_hyperlinkArray.find (offset);

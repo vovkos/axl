@@ -16,13 +16,13 @@ namespace rtl {
 
 template <
 	typename T,
-	typename TAction
+	typename Action
 	>
 void
 loopArray (
 	T* p,
 	size_t count,
-	TAction action
+	Action action
 	)
 {
 	T* end = p + count;
@@ -32,13 +32,13 @@ loopArray (
 }
 
 template <
-	typename TIterator,
-	typename TAction
+	typename Iterator,
+	typename Action
 	>
 void
 loopIterator (
-	TIterator it,
-	TAction action
+	Iterator it,
+	Action action
 	)
 {
 	for (; it; it++)
@@ -49,15 +49,15 @@ loopIterator (
 
 template <
 	typename T,
-	typename TFilter,
-	typename TAction
+	typename Filter,
+	typename Action
 	>
 size_t
 filteredLoopArray (
 	T* p,
 	size_t count,
-	TFilter filter,
-	TAction action
+	Filter filter,
+	Action action
 	)
 {
 	T* end = p + count;
@@ -75,15 +75,15 @@ filteredLoopArray (
 }
 
 template <
-	typename TIterator,
-	typename TFilter,
-	typename TAction
+	typename Iterator,
+	typename Filter,
+	typename Action
 	>
 size_t
 filteredLoopIterator (
-	TIterator it,
-	TFilter filter,
-	TAction action
+	Iterator it,
+	Filter filter,
+	Action action
 	)
 {
 	size_t filterPassCount = 0;

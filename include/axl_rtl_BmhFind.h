@@ -19,10 +19,10 @@ namespace rtl {
 
 //.............................................................................
 
-class CBmhFind
+class BmhFind
 {
 protected:	
-	CArrayT <uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
+	Array <uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
 	size_t m_patternSize;
 	size_t m_incFindOffset;
 	size_t m_incFindTailSize; // IncrementalFind temporary storage size -- always < m_PatternSize
@@ -31,7 +31,7 @@ protected:
 	bool m_doMatchCase;
 
 public:
-	CBmhFind ();
+	BmhFind ();
 
 	void
 	clear ();

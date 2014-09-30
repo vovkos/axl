@@ -43,7 +43,7 @@ static void calcCharSize(SIZE* size, HFONT hFont, TCHAR char)
 
 //.............................................................................
 
-CHexEditCtrl::CHexEditCtrl() 
+HexEditCtrl::HexEditCtrl() 
 {
 	m_hUpdateRgn = createRectRgn(0, 0, 0, 0);
 	m_hDefaultFont = createPointFont(100, _T("Courier New"));
@@ -120,7 +120,7 @@ CHexEditCtrl::CHexEditCtrl()
 	m_bFindMatchCase = FALSE;
 }
 
-CHexEditCtrl::~CHexEditCtrl()
+HexEditCtrl::~HexEditCtrl()
 {
 	deleteObject(m_hDefaultFont);
 	deleteObject(m_hUpdateRgn);
@@ -129,9 +129,9 @@ CHexEditCtrl::~CHexEditCtrl()
 		free(m_data);
 }
 
-ATL::CWndClassInfo& CHexEditCtrl::getWndClassInfo()
+ATL::WndClassInfo& HexEditCtrl::getWndClassInfo()
 {
-	static ATL::CWndClassInfo wc =
+	static ATL::WndClassInfo wc =
 	{
 		{ 
 			sizeof(WNDCLASSEX), 
@@ -154,7 +154,7 @@ ATL::CWndClassInfo& CHexEditCtrl::getWndClassInfo()
 	return wc;
 }
 
-void CHexEditCtrl::showOnlyPrintableChars(BOOL bEnable)
+void HexEditCtrl::showOnlyPrintableChars(BOOL bEnable)
 {
 	if (m_bOnlyPrintableChars == bEnable)
 		return;
@@ -163,7 +163,7 @@ void CHexEditCtrl::showOnlyPrintableChars(BOOL bEnable)
 	invalidate();
 }
 
-void CHexEditCtrl::setOffsetWidth(BYTE width)
+void HexEditCtrl::setOffsetWidth(BYTE width)
 {
 	if (width > 8)
 		width = 8;
@@ -181,7 +181,7 @@ void CHexEditCtrl::setOffsetWidth(BYTE width)
 	invalidate();
 }
 
-void CHexEditCtrl::setReadOnly(BOOL bReadOnly)
+void HexEditCtrl::setReadOnly(BOOL bReadOnly)
 {
 	if (m_bReadOnly == bReadOnly)
 		return;
@@ -190,13 +190,13 @@ void CHexEditCtrl::setReadOnly(BOOL bReadOnly)
 	invalidate();
 }
 
-void CHexEditCtrl::setModified()
+void HexEditCtrl::setModified()
 {
 	m_bModified = TRUE;
 	notifyParent(HEN_DATA_CHANGE);
 }
 
-LRESULT CHexEditCtrl::notifyParent(UINT nCode, HEN_PARAMS* params)
+LRESULT HexEditCtrl::notifyParent(UINT nCode, HEN_PARAMS* params)
 {
 	HEN_PARAMS hdr;
 
@@ -213,7 +213,7 @@ LRESULT CHexEditCtrl::notifyParent(UINT nCode, HEN_PARAMS* params)
 	return sendMessage(hwndParent, WM_NOTIFY, (WPARAM) params->idFrom, (LPARAM) params);
 }
 
-SIZE_T CHexEditCtrl::getData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
+SIZE_T HexEditCtrl::getData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 {
 	if (nOffset >= m_nDataSize)
 		return 0;
@@ -231,7 +231,7 @@ SIZE_T CHexEditCtrl::getData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 	return nCopySize;
 }
 
-SIZE_T CHexEditCtrl::getSelectedData(PVOID pvBuffer, SIZE_T nBufferSize)
+SIZE_T HexEditCtrl::getSelectedData(PVOID pvBuffer, SIZE_T nBufferSize)
 {
 	SIZE_T nSelectedDataSize = getSelectedDataSize();
 
@@ -247,7 +247,7 @@ SIZE_T CHexEditCtrl::getSelectedData(PVOID pvBuffer, SIZE_T nBufferSize)
 	return nSelectedDataSize;
 }
 
-BOOL CHexEditCtrl::setData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
+BOOL HexEditCtrl::setData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 {
 	if (nOffset > m_nDataSize)
 		return FALSE;
@@ -270,7 +270,7 @@ BOOL CHexEditCtrl::setData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 	return TRUE;
 }
 
-BOOL CHexEditCtrl::setDataSize(SIZE_T nDataSize)
+BOOL HexEditCtrl::setDataSize(SIZE_T nDataSize)
 {
 	if (nDataSize < m_nDataSize)
 		return insertDeleteData(nDataSize, 0, m_nDataSize - nDataSize);
@@ -278,7 +278,7 @@ BOOL CHexEditCtrl::setDataSize(SIZE_T nDataSize)
 		return insertDeleteData(m_nDataSize, nDataSize - m_nDataSize, 0);
 }
 
-BOOL CHexEditCtrl::setFont(HFONT hFont)
+BOOL HexEditCtrl::setFont(HFONT hFont)
 {
 	HDC hdc = getDC();
 	HFONT hFontOld = (HFONT) selectObject(hdc, hFont);
@@ -295,14 +295,14 @@ BOOL CHexEditCtrl::setFont(HFONT hFont)
 	return TRUE;
 }
 
-BOOL CHexEditCtrl::setUpperCase(BOOL bUpperCase)
+BOOL HexEditCtrl::setUpperCase(BOOL bUpperCase)
 {
 	m_bUpperCase = bUpperCase;
 	invalidate();
 	return TRUE;
 }
 
-BOOL CHexEditCtrl::setBytesPerLine(int nBytesPerLine)
+BOOL HexEditCtrl::setBytesPerLine(int nBytesPerLine)
 {
 	if (!nBytesPerLine)
 	{
@@ -325,7 +325,7 @@ BOOL CHexEditCtrl::setBytesPerLine(int nBytesPerLine)
 	return TRUE;
 }
 
-void CHexEditCtrl::recalcColumns()
+void HexEditCtrl::recalcColumns()
 {
 	m_nHexCol = m_offsetWidth ? m_offsetWidth + 2 : 0;
 	m_nGapCol = m_nHexCol + m_nBytesPerLine * 3;
@@ -333,7 +333,7 @@ void CHexEditCtrl::recalcColumns()
 	m_nSpaceCol = m_nAsciiCol + m_nBytesPerLine;
 }
 
-void CHexEditCtrl::setBytesPerLineImpl(int nBytesPerLine)
+void HexEditCtrl::setBytesPerLineImpl(int nBytesPerLine)
 {
 	if (m_nBytesPerLine == nBytesPerLine)
 		return;
@@ -350,7 +350,7 @@ void CHexEditCtrl::setBytesPerLineImpl(int nBytesPerLine)
 	recalcLayout();
 }
 
-CHexEditCtrl::CURSOR_POS CHexEditCtrl::setCursorPos(CURSOR_POS pos, int flags)
+HexEditCtrl::CURSOR_POS HexEditCtrl::setCursorPos(CURSOR_POS pos, int flags)
 {
 	ensureVisible(pos);
 
@@ -419,7 +419,7 @@ CHexEditCtrl::CURSOR_POS CHexEditCtrl::setCursorPos(CURSOR_POS pos, int flags)
 	return pos;
 }
 
-BOOL CHexEditCtrl::isEqualCursorPos(CURSOR_POS& pos1, CURSOR_POS& pos2)
+BOOL HexEditCtrl::isEqualCursorPos(CURSOR_POS& pos1, CURSOR_POS& pos2)
 {
 	static BYTE _EqualityTable1[CURSOR_LOCATION_COUNT][CURSOR_LOCATION_COUNT] = 
 	{
@@ -452,7 +452,7 @@ BOOL CHexEditCtrl::isEqualCursorPos(CURSOR_POS& pos1, CURSOR_POS& pos2)
 		_EqualityTable2[pos2.m_location][pos1.m_location];
 }
 
-void CHexEditCtrl::setSelEnd(CURSOR_POS pos)
+void HexEditCtrl::setSelEnd(CURSOR_POS pos)
 {
 	SELECTION_INFO oldSelection = m_selection;
 
@@ -536,27 +536,27 @@ void CHexEditCtrl::setSelEnd(CURSOR_POS pos)
 	invalidateSelectionDiff(&m_selection, &oldSelection);
 }
 
-BOOL CHexEditCtrl::isDataSelected(SIZE_T nOffset)
+BOOL HexEditCtrl::isDataSelected(SIZE_T nOffset)
 { 
 	return 
 		nOffset >= m_selection.m_nStartOffset && 
 		nOffset < m_selection.m_nEndOffset; 
 }
 
-BOOL CHexEditCtrl::isGapSelected(SIZE_T nOffset)
+BOOL HexEditCtrl::isGapSelected(SIZE_T nOffset)
 {
 	return 
 		nOffset == m_selection.m_nStartOffset - 1 && m_selection.m_bLeadingGap ||
 		nOffset == m_selection.m_nEndOffset - 1 && m_selection.m_bTrailingGap;
 }
 
-void CHexEditCtrl::invalidateSelectionDiff(SELECTION_INFO* old, SELECTION_INFO* new)
+void HexEditCtrl::invalidateSelectionDiff(SELECTION_INFO* old, SELECTION_INFO* new)
 {
 	invalidateSelection(old);
 	invalidateSelection(new);
 }
 
-void CHexEditCtrl::invalidateSelection(SELECTION_INFO* sel)
+void HexEditCtrl::invalidateSelection(SELECTION_INFO* sel)
 {
 	if (sel->isEmpty())
 		return;
@@ -570,7 +570,7 @@ void CHexEditCtrl::invalidateSelection(SELECTION_INFO* sel)
 	invalidateRange(nOffsetFrom, nOffsetTo);
 }
 
-void CHexEditCtrl::invalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo)
+void HexEditCtrl::invalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo)
 {
 	int nLineFrom = (int) nOffsetFrom / m_nBytesPerLine;
 	int nLineTo = (int) nOffsetTo / m_nBytesPerLine;
@@ -590,7 +590,7 @@ void CHexEditCtrl::invalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo)
 	}
 }
 
-void CHexEditCtrl::invalidateOffset(SIZE_T nOffset)
+void HexEditCtrl::invalidateOffset(SIZE_T nOffset)
 {
 	int nLine = (int) nOffset / m_nBytesPerLine;
 	int nCol = (int) nOffset % m_nBytesPerLine;
@@ -599,7 +599,7 @@ void CHexEditCtrl::invalidateOffset(SIZE_T nOffset)
 	invalidateHelper(nLine, nCol + m_nAsciiCol, 1, 1);
 }
 
-void CHexEditCtrl::invalidateHelper(int nLine, int nCol, int nLineCount, int nColCount)
+void HexEditCtrl::invalidateHelper(int nLine, int nCol, int nLineCount, int nColCount)
 {
 	nLine -= m_nFirstVisibleLine;
 	nCol -= m_nFirstVisibleCol;
@@ -615,7 +615,7 @@ void CHexEditCtrl::invalidateHelper(int nLine, int nCol, int nLineCount, int nCo
 	invalidateRect(&rct);
 }
 
-void CHexEditCtrl::ensureVisible(CURSOR_POS pos)
+void HexEditCtrl::ensureVisible(CURSOR_POS pos)
 {
 	int nLine, nCol;
 	getCursorLineCol(pos, nLine, nCol, FALSE);
@@ -655,7 +655,7 @@ void CHexEditCtrl::ensureVisible(CURSOR_POS pos)
 		invalidate();
 }
 
-BOOL CHexEditCtrl::insertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDelete)
+BOOL HexEditCtrl::insertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDelete)
 {
 	ASSERT(nOffset <= m_nDataSize);
 	ASSERT(nOffset + nDelete <= m_nDataSize);
@@ -734,7 +734,7 @@ BOOL CHexEditCtrl::insertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDele
 	return TRUE;
 }
 
-void CHexEditCtrl::transitCursor(int nOffsetDelta, int newLocation, int flags)
+void HexEditCtrl::transitCursor(int nOffsetDelta, int newLocation, int flags)
 {
 	CURSOR_POS newPos;
 	newPos.m_nOffset = m_cursorPos.m_nOffset + nOffsetDelta;
@@ -745,7 +745,7 @@ void CHexEditCtrl::transitCursor(int nOffsetDelta, int newLocation, int flags)
 	setCursorPos(newPos, flags);
 }
 
-void CHexEditCtrl::killSelection()
+void HexEditCtrl::killSelection()
 {
 	SELECTION_INFO oldSelection = m_selection;
 
@@ -761,7 +761,7 @@ void CHexEditCtrl::killSelection()
 	invalidateSelection(&oldSelection);
 }
 
-void CHexEditCtrl::finalize4Bits()
+void HexEditCtrl::finalize4Bits()
 {
 	DATA* data = m_data + m_cursorPos.m_nOffset;
 	if (data < m_dataEnd && data->m_flags & DF_4_BITS)
@@ -771,14 +771,14 @@ void CHexEditCtrl::finalize4Bits()
 	}
 }
 
-BOOL CHexEditCtrl::setOverwriteMode(BOOL bOverwriteMode)
+BOOL HexEditCtrl::setOverwriteMode(BOOL bOverwriteMode)
 {
 	m_bOverwriteMode = bOverwriteMode;
 	updateCaret();
 	return TRUE;
 }
 
-CHexEditCtrl::CURSOR_POS CHexEditCtrl::cursorPosFromMousePos(POINT pt)
+HexEditCtrl::CURSOR_POS HexEditCtrl::cursorPosFromMousePos(POINT pt)
 {
 	int nLine = pt.y / m_charSize.cy;
 	int nCol = pt.x / m_charSize.cx;
@@ -824,7 +824,7 @@ CHexEditCtrl::CURSOR_POS CHexEditCtrl::cursorPosFromMousePos(POINT pt)
 	return pos;
 }
 
-void CHexEditCtrl::updateCaret()
+void HexEditCtrl::updateCaret()
 {
 	if (getFocus() != m_hWnd)
 		return;
@@ -838,7 +838,7 @@ void CHexEditCtrl::updateCaret()
 	}
 }
 
-void CHexEditCtrl::getCursorLineCol(CURSOR_POS pos, int& nLine, int& nCol, BOOL bAddExtra)
+void HexEditCtrl::getCursorLineCol(CURSOR_POS pos, int& nLine, int& nCol, BOOL bAddExtra)
 {
 	nLine = (int) pos.m_nOffset / m_nBytesPerLine;
 	nCol = (int) pos.m_nOffset % m_nBytesPerLine;
@@ -860,7 +860,7 @@ void CHexEditCtrl::getCursorLineCol(CURSOR_POS pos, int& nLine, int& nCol, BOOL 
 	}
 }
 
-void CHexEditCtrl::updateCaretPos()
+void HexEditCtrl::updateCaretPos()
 {
 	int nLine, nCol;
 
@@ -873,7 +873,7 @@ void CHexEditCtrl::updateCaretPos()
 		setCaretPos(nCol * m_charSize.cx, nLine * m_charSize.cy);
 }
 
-void CHexEditCtrl::clearModified()
+void HexEditCtrl::clearModified()
 {
 	DATA* data = m_data;
 	for (; data < m_dataEnd; data++)
@@ -883,7 +883,7 @@ void CHexEditCtrl::clearModified()
 	invalidate();
 }
 
-void CHexEditCtrl::paintRect(HDC hdc, RECT& rctUpdate)
+void HexEditCtrl::paintRect(HDC hdc, RECT& rctUpdate)
 {
 	RECT rct;
 	rct.left = rctUpdate.left - rctUpdate.left % m_charSize.cx;
@@ -1034,7 +1034,7 @@ void CHexEditCtrl::paintRect(HDC hdc, RECT& rctUpdate)
 	}
 }
 
-void CHexEditCtrl::applyColor(HDC hdc, COLOR_INFO* color, int prevColorFlags)
+void HexEditCtrl::applyColor(HDC hdc, COLOR_INFO* color, int prevColorFlags)
 {
 	if (!color)
 	{
@@ -1058,7 +1058,7 @@ void CHexEditCtrl::applyColor(HDC hdc, COLOR_INFO* color, int prevColorFlags)
 	}
 }
 
-CHexEditCtrl::COLOR_INFO CHexEditCtrl::getDataColor(DATA* data)
+HexEditCtrl::COLOR_INFO HexEditCtrl::getDataColor(DATA* data)
 {
 	if (!data)
 		return COLOR_INFO();
@@ -1079,7 +1079,7 @@ CHexEditCtrl::COLOR_INFO CHexEditCtrl::getDataColor(DATA* data)
 	return color;
 }
 
-CHAR CHexEditCtrl::getHexChar(BYTE data)
+CHAR HexEditCtrl::getHexChar(BYTE data)
 {
 	static CHAR _UpperCaseHexChars[] = "0123456789ABCDEF";
 	static CHAR _LowerCaseHexChars[] = "0123456789abcdef";
@@ -1089,7 +1089,7 @@ CHAR CHexEditCtrl::getHexChar(BYTE data)
 	return m_bUpperCase ? _UpperCaseHexChars[data] : _LowerCaseHexChars[data];
 }
 
-void CHexEditCtrl::paintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset)
+void HexEditCtrl::paintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset)
 {
 	rct.right = m_nHexCol * m_charSize.cx;
 	rct.bottom = rct.top + m_charSize.cy;
@@ -1126,7 +1126,7 @@ void CHexEditCtrl::paintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset)
 	setTextColor(hdc, oldColor);
 }
 
-void CHexEditCtrl::paintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
+void HexEditCtrl::paintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
 {
 
 	ASSERT(nColCount <= m_nBytesPerLine);
@@ -1227,13 +1227,13 @@ void CHexEditCtrl::paintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SI
 	applyColor(hdc, NULL, prevColorFlags);
 }
 
-void CHexEditCtrl::paintGap(HDC hdc, RECT rct, int nLineCount)
+void HexEditCtrl::paintGap(HDC hdc, RECT rct, int nLineCount)
 {
 	rct.bottom = rct.top + nLineCount * m_charSize.cy;
 	fastRectangle(hdc, rct);
 }
 
-void CHexEditCtrl::paintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
+void HexEditCtrl::paintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
 {
 	ASSERT(nColCount <= m_nBytesPerLine);
 
@@ -1278,7 +1278,7 @@ void CHexEditCtrl::paintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, 
 	applyColor(hdc, NULL, prevColorFlags);
 }
 
-void CHexEditCtrl::fixupFirstVisibleLineCol()
+void HexEditCtrl::fixupFirstVisibleLineCol()
 {
 	int nNewFirstVisibleLine = m_nFirstVisibleLine;
 	int nNewFirstVisibleCol = m_nFirstVisibleCol;
@@ -1305,7 +1305,7 @@ void CHexEditCtrl::fixupFirstVisibleLineCol()
 	}
 }
 
-void CHexEditCtrl::recalcScrollBars()
+void HexEditCtrl::recalcScrollBars()
 {
 	SCROLLINFO si = { sizeof(si) };
 	si.fMask = SIF_ALL;
@@ -1323,7 +1323,7 @@ void CHexEditCtrl::recalcScrollBars()
 	setScrollInfo(SB_HORZ, &si);
 }
 
-void CHexEditCtrl::recalcLayout()
+void HexEditCtrl::recalcLayout()
 {
 	RECT rctClient;
 	getClientRect(&rctClient);
@@ -1336,18 +1336,18 @@ void CHexEditCtrl::recalcLayout()
 	recalcScrollBars();
 }
 
-LRESULT CHexEditCtrl::onCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	setBytesPerLineImpl(8);
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onGetDlgCode(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onGetDlgCode(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	return DLGC_WANTTAB | DLGC_WANTARROWS | DLGC_WANTCHARS;
 }
 
-LRESULT CHexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	PAINTSTRUCT ps;
 	HDC hdc = beginPaint(&ps);
@@ -1385,7 +1385,7 @@ LRESULT CHexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 
 /*
 
-LRESULT CHexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	int nResult = getUpdateRgn(m_hUpdateRgn);
 
@@ -1456,20 +1456,20 @@ LRESULT CHexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 
 */
 
-LRESULT CHexEditCtrl::onSetFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onSetFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	updateCaret();
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onKillFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onKillFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	finalize4Bits();
 	destroyCaret();
 	return 0;
 }
 
-int CHexEditCtrl::autoAdjustBytesPerLine()
+int HexEditCtrl::autoAdjustBytesPerLine()
 {
 	static int _BytesPerLine[] = { 32, 16, 8, 4 };
 
@@ -1486,7 +1486,7 @@ int CHexEditCtrl::autoAdjustBytesPerLine()
 	return 2;
 }
 
-LRESULT CHexEditCtrl::onSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {	
 	recalcLayout();
 
@@ -1496,7 +1496,7 @@ LRESULT CHexEditCtrl::onSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	int nBar = nMsg == WM_VSCROLL ? SB_VERT : SB_HORZ;
 
@@ -1564,7 +1564,7 @@ LRESULT CHexEditCtrl::onScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	SHORT zDelta = HIWORD(wParam);
 
@@ -1590,7 +1590,7 @@ LRESULT CHexEditCtrl::onMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	POINT pt = { (SHORT) LOWORD(lParam), (SHORT) HIWORD(lParam) };
 	CURSOR_POS pos = cursorPosFromMousePos(pt);
@@ -1611,20 +1611,20 @@ LRESULT CHexEditCtrl::onLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onLButtonUp(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onLButtonUp(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_bDragging = FALSE;
 	releaseCapture();
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onCaptureChanged(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onCaptureChanged(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_bDragging = FALSE;
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (!m_bDragging)
 		return 0;
@@ -1648,7 +1648,7 @@ LRESULT CHexEditCtrl::onMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL&
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	BOOL bAlt = (getAsyncKeyState(VK_MENU) & 0x8000) != 0;
 
@@ -1671,7 +1671,7 @@ LRESULT CHexEditCtrl::onSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 	return 0;
 }
 
-LRESULT CHexEditCtrl::onKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	BOOL bShift = (getAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
 	BOOL bCtrl = (getAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
@@ -1741,7 +1741,7 @@ LRESULT CHexEditCtrl::onKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 	return 0;
 }
 
-void CHexEditCtrl::onKeyTab()
+void HexEditCtrl::onKeyTab()
 {
 	static BYTE _TransitionTable[] = 
 	{
@@ -1757,7 +1757,7 @@ void CHexEditCtrl::onKeyTab()
 	transitCursor(0, newLocation, MCF_KEEP_SELECTION);
 }
 
-void CHexEditCtrl::onKeyLeft(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyLeft(BOOL bShift, BOOL bCtrl)
 {
 	// begin of ASCII line -- special case
 	if (m_cursorPos.m_location == CURSOR_ASCII_0 && 
@@ -1785,7 +1785,7 @@ void CHexEditCtrl::onKeyLeft(BOOL bShift, BOOL bCtrl)
 	transitCursor(&transition, bShift ? MCF_SELECT : 0);
 }
 
-void CHexEditCtrl::onKeyRight(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyRight(BOOL bShift, BOOL bCtrl)
 {
 	// end of ASCII line -- special case
 	if (m_cursorPos.m_location == CURSOR_ASCII_1 && 
@@ -1824,19 +1824,19 @@ void CHexEditCtrl::onKeyRight(BOOL bShift, BOOL bCtrl)
 	transitCursor(&transition, bShift ? MCF_SELECT : 0);
 }
 
-void CHexEditCtrl::onKeyUp(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyUp(BOOL bShift, BOOL bCtrl)
 {
 	int flags = bShift ? MCF_SELECT : 0;
 	transitCursor(-m_nBytesPerLine, -1, flags);
 }
 
-void CHexEditCtrl::onKeyDown(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyDown(BOOL bShift, BOOL bCtrl)
 {
 	int flags = bShift ? MCF_SELECT : 0;
 	transitCursor(m_nBytesPerLine, -1, flags);
 }
 
-void CHexEditCtrl::onKeyPageUp(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyPageUp(BOOL bShift, BOOL bCtrl)
 {
 	int flags = bShift ? MCF_SELECT : 0;
 	
@@ -1855,7 +1855,7 @@ void CHexEditCtrl::onKeyPageUp(BOOL bShift, BOOL bCtrl)
 }
 
 
-void CHexEditCtrl::onKeyPageDown(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyPageDown(BOOL bShift, BOOL bCtrl)
 {
 	int flags = bShift ? MCF_SELECT : 0;
 	
@@ -1873,7 +1873,7 @@ void CHexEditCtrl::onKeyPageDown(BOOL bShift, BOOL bCtrl)
 	}
 }
 
-void CHexEditCtrl::onKeyHome(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyHome(BOOL bShift, BOOL bCtrl)
 {
 	int flags = bShift ? MCF_SELECT : 0;
 	int location = m_cursorPos.m_location >= CURSOR_ASCII_0 ? CURSOR_ASCII_0 : CURSOR_HEX_0;
@@ -1892,7 +1892,7 @@ void CHexEditCtrl::onKeyHome(BOOL bShift, BOOL bCtrl)
 	}
 }
 
-void CHexEditCtrl::onKeyEnd(BOOL bShift, BOOL bCtrl)
+void HexEditCtrl::onKeyEnd(BOOL bShift, BOOL bCtrl)
 {
 	int flags = bShift ? MCF_SELECT : 0;
 	int location = m_cursorPos.m_location >= CURSOR_ASCII_0 ? CURSOR_ASCII_1 : CURSOR_HEX_2;
@@ -1911,7 +1911,7 @@ void CHexEditCtrl::onKeyEnd(BOOL bShift, BOOL bCtrl)
 	}
 }
 
-void CHexEditCtrl::onKeyDelete()
+void HexEditCtrl::onKeyDelete()
 {
 	if (!m_selection.isEmpty())
 	{
@@ -2004,7 +2004,7 @@ void CHexEditCtrl::onKeyDelete()
 	}
 }
 
-void CHexEditCtrl::onKeyBackspace()
+void HexEditCtrl::onKeyBackspace()
 {
 	if (!m_selection.isEmpty())
 	{
@@ -2098,7 +2098,7 @@ static int getHex(CHAR ch)
 	return -1; // error
 }
 
-void CHexEditCtrl::modifyData(DATA* data, BYTE data, BOOL b4Bits)
+void HexEditCtrl::modifyData(DATA* data, BYTE data, BOOL b4Bits)
 {
 	data->m_data = data;
 	if (b4Bits)
@@ -2111,7 +2111,7 @@ void CHexEditCtrl::modifyData(DATA* data, BYTE data, BOOL b4Bits)
 	invalidateData(data);
 }
 
-void CHexEditCtrl::selectAll()
+void HexEditCtrl::selectAll()
 {
 	m_bSelecting = TRUE;
 	m_selStart.m_nOffset = 0;
@@ -2122,7 +2122,7 @@ void CHexEditCtrl::selectAll()
 	setCursorPos(pos, MCF_SELECT | MCF_FORCE);
 }
 
-LRESULT CHexEditCtrl::onChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT HexEditCtrl::onChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CHAR ch = (CHAR) wParam;
 
@@ -2334,7 +2334,7 @@ LRESULT CHexEditCtrl::onChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return 0;
 }
 
-BOOL CHexEditCtrl::replaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* data, SIZE_T nSize, BOOL bCursorToEnd)
+BOOL HexEditCtrl::replaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* data, SIZE_T nSize, BOOL bCursorToEnd)
 {	
 	BOOL bResult = insertDeleteData(nOffset, nSize, nDelete);
 	if (!bResult)
@@ -2365,9 +2365,9 @@ BOOL CHexEditCtrl::replaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* data, SIZE_
 }
 
 #if (_AXL_VER >= 0x0200)
-void CHexEditCtrl::undoImpl(axl::obj::TData* _pParams)
+void HexEditCtrl::undoImpl(axl::obj::Data* _pParams)
 #else
-void CHexEditCtrl::undoImpl(AXL_PTR* _pParams)
+void HexEditCtrl::undoImpl(AXL_PTR* _pParams)
 #endif
 {
 	UNDO_PARAMS* params = (UNDO_PARAMS*) _pParams->m_p;
@@ -2380,9 +2380,9 @@ void CHexEditCtrl::undoImpl(AXL_PTR* _pParams)
 }
 
 #if (_AXL_VER >= 0x0200)
-void CHexEditCtrl::redoImpl(axl::obj::TData* _pParams)
+void HexEditCtrl::redoImpl(axl::obj::Data* _pParams)
 #else
-void CHexEditCtrl::redoImpl(AXL_PTR* _pParams)
+void HexEditCtrl::redoImpl(AXL_PTR* _pParams)
 #endif
 {
 	UNDO_PARAMS* params = (UNDO_PARAMS*) _pParams->m_p;
@@ -2394,7 +2394,7 @@ void CHexEditCtrl::redoImpl(AXL_PTR* _pParams)
 	setCursorPos(params->m_newCursorPos);
 }
 
-void CHexEditCtrl::beginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize)
+void HexEditCtrl::beginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize)
 {
 	m_undoParams.create(_AXLTAG("replace_sel_undo"));
 	m_undoParams->m_nOffset = nOffset;
@@ -2407,7 +2407,7 @@ void CHexEditCtrl::beginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize)
 	}
 }
 
-void CHexEditCtrl::endUndoableTransaction(SIZE_T nNewDataSize)
+void HexEditCtrl::endUndoableTransaction(SIZE_T nNewDataSize)
 {
 	ASSERT(m_undoParams->m_nOffset != -1);
 
@@ -2422,18 +2422,18 @@ void CHexEditCtrl::endUndoableTransaction(SIZE_T nNewDataSize)
 	m_undoParams->m_newCursorPos = m_cursorPos;
 
 #if (_AXL_VER >= 0x0200)
-	axl::call::CSillyThisCallT<CHexEditCtrl> undo(this, &CHexEditCtrl::undoImpl, NULL);
-	axl::call::CSillyThisCallT<CHexEditCtrl> redo(this, &CHexEditCtrl::redoImpl, NULL);
+	axl::call::SillyThisCall<HexEditCtrl> undo(this, &HexEditCtrl::undoImpl, NULL);
+	axl::call::SillyThisCall<HexEditCtrl> redo(this, &HexEditCtrl::redoImpl, NULL);
 #else
-	axl::CSillyThisCallT<CHexEditCtrl> undo(this, &CHexEditCtrl::undoImpl, NULL);
-	axl::CSillyThisCallT<CHexEditCtrl> redo(this, &CHexEditCtrl::redoImpl, NULL);
+	axl::SillyThisCall<HexEditCtrl> undo(this, &HexEditCtrl::undoImpl, NULL);
+	axl::SillyThisCall<HexEditCtrl> redo(this, &HexEditCtrl::redoImpl, NULL);
 #endif
 
 	m_undoRedo.addUndoableAction(undo, redo, m_undoParams, m_undoParams->m_oldData.size() + m_undoParams->m_newData.size());
 	m_undoParams = NULL;
 }
 
-BOOL CHexEditCtrl::replaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEnd)
+BOOL HexEditCtrl::replaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEnd)
 { 
 	SIZE_T nOffset;
 	SIZE_T nDelete; 
@@ -2481,7 +2481,7 @@ BOOL CHexEditCtrl::replaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEn
 	return bResult;
 }
 
-void CHexEditCtrl::copy()
+void HexEditCtrl::copy()
 {
 	SIZE_T nSize = m_selection.m_nEndOffset - m_selection.m_nStartOffset;
 
@@ -2535,7 +2535,7 @@ void CHexEditCtrl::copy()
 	closeClipboard();
 }
 
-void CHexEditCtrl::cut()
+void HexEditCtrl::cut()
 {
 	if (m_selection.isEmpty())
 		return;
@@ -2596,7 +2596,7 @@ static SIZE_T scanHexString(
 	return nActualSize;
 }
 
-void CHexEditCtrl::paste()
+void HexEditCtrl::paste()
 {
 	BOOL bResult = openClipboard();
 	if (!bResult)
@@ -2650,7 +2650,7 @@ void CHexEditCtrl::paste()
 	closeClipboard();
 }
 
-void CHexEditCtrl::setFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase)
+void HexEditCtrl::setFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase)
 {
 	m_findPattern.resize(nSize);
 	memcpy(&m_findPattern.front(), p, nSize);
@@ -2695,7 +2695,7 @@ void CHexEditCtrl::setFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase)
 inline BOOL isMatchChar(BYTE b1, BYTE b2, BOOL bMatchCase)
 	{ return bMatchCase ? b1 == b2 : toupper(b1) == toupper(b2);}
 
-BOOL CHexEditCtrl::isMatch(DATA* data, BYTE* pattern, SIZE_T nSize, BOOL bMatchCase)
+BOOL HexEditCtrl::isMatch(DATA* data, BYTE* pattern, SIZE_T nSize, BOOL bMatchCase)
 {
 	BYTE* p = pattern;
 	BYTE* end = p + nSize;
@@ -2707,7 +2707,7 @@ BOOL CHexEditCtrl::isMatch(DATA* data, BYTE* pattern, SIZE_T nSize, BOOL bMatchC
 	return TRUE;
 }		
 
-void CHexEditCtrl::selectRange(SIZE_T nOffset, SIZE_T nSize, int flags)
+void HexEditCtrl::selectRange(SIZE_T nOffset, SIZE_T nSize, int flags)
 {
 	CURSOR_POS pos1, pos2;
 	pos1.m_nOffset = (long) nOffset;
@@ -2736,7 +2736,7 @@ void CHexEditCtrl::selectRange(SIZE_T nOffset, SIZE_T nSize, int flags)
 	}
 }
 
-BOOL CHexEditCtrl::findNext()
+BOOL HexEditCtrl::findNext()
 {
 	SIZE_T nSize = m_findPattern.size();
 	SIZE_T m = nSize - 1;
@@ -2767,7 +2767,7 @@ BOOL CHexEditCtrl::findNext()
 
 }
 
-BOOL CHexEditCtrl::findPrev()
+BOOL HexEditCtrl::findPrev()
 {
 	SIZE_T nSize = m_findPattern.size();
 	SIZE_T m = nSize - 1;

@@ -13,7 +13,7 @@ namespace io {
 
 //.............................................................................
 
-class CTransport
+class Transport
 {
 public:
 	virtual
@@ -35,17 +35,17 @@ public:
 
 //.............................................................................
 
-class CAsyncTransport: public CTransport
+class Asyncransport: public Transport
 {
-	typedef exe::CArgSeqExT_2 <exe::CArgObjPtrT <err::CError>, exe::CArgT <size_t> > COnSendCompleteArg;
-	typedef exe::CArgSeqExT_2 <exe::CArgObjPtrT <err::CError>, exe::CArgT <size_t> > COnRecvCompleteArg;
+	typedef exe::ArgSeqEx_2 <exe::ArgObjPtr <err::Error>, exe::Arg <size_t> > OnSendCompleteArg;
+	typedef exe::ArgSeqEx_2 <exe::ArgObjPtr <err::Error>, exe::Arg <size_t> > OnRecvCompleteArg;
 
 	virtual
 	bool
 	send (
 		const void* p,
 		size_t size,
-		const exe::CFunction& onComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
+		const exe::Function& onComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
 		) = 0;
 
 	virtual
@@ -53,7 +53,7 @@ class CAsyncTransport: public CTransport
 	recv (
 		void* p,
 		size_t size,
-		const exe::CFunction& onComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
+		const exe::Function& onComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
 		) = 0;
 
 	size_t

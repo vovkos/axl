@@ -14,10 +14,10 @@ namespace mem {
 
 //.............................................................................
 
-class CTracker
+class Tracker
 {
 public:
-	struct TBlockHdr: rtl::TListLink
+	struct BlockHdr: rtl::ListLink
 	{
 		size_t m_size;
 		size_t m_seqNum;
@@ -27,8 +27,8 @@ public:
 	};
 
 protected:
-	mt::CLock m_lock;
-	rtl::CAuxListT <TBlockHdr> m_blockList;
+	mt::Lock m_lock;
+	rtl::AuxList <BlockHdr> m_blockList;
 
 	size_t m_peakBlockCount;
 	size_t m_totalBlockCount;
@@ -37,13 +37,13 @@ protected:
 	size_t m_totalSize;
 
 public:
-	CTracker ();
+	Tracker ();
 
 	void
-	add (TBlockHdr* hdr);
+	add (BlockHdr* hdr);
 
 	void
-	remove (TBlockHdr* hdr);
+	remove (BlockHdr* hdr);
 
 	void 
 	trace ();

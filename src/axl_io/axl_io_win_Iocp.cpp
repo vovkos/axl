@@ -8,7 +8,7 @@ namespace win {
 //.............................................................................
 
 bool 
-CIocp::create (dword_t threadCount)
+Iocp::create (dword_t threadCount)
 {
 	close ();
 

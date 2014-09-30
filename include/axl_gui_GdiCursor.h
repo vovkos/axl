@@ -14,14 +14,14 @@ namespace gui {
 
 //.............................................................................
 
-class CGdiCursor: 
-	public CCursor,
-	public rtl::CHandleT <HCURSOR>
+class GdiCursor: 
+	public Cursor,
+	public rtl::Handle <HCURSOR>
 {
-	friend class CGdiEngine;
+	friend class GdiEngine;
 
 public:
-	CGdiCursor ();
+	GdiCursor ();
 };
 
 //.............................................................................

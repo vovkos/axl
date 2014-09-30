@@ -8,10 +8,10 @@ namespace io {
 //.............................................................................
 
 bool
-CDgramSock::open (
-	ESockProto protocol,
-	ESockAddr addrKind,
-	const TSockAddr* addr
+DgramSock::open (
+	SockProtoKind protocol,
+	SockAddrKind addrKind,
+	const SockAddr* addr
 	)
 {
 	close ();
@@ -40,36 +40,36 @@ CDgramSock::open (
 }
 
 void
-CDgramSock::close ()
+DgramSock::close ()
 {
 	if (!isOpen ())
 		return;
 
-	m_workerThread->syncSchedule <exe::CArgT <CDgramSock*> > (
-		pvoid_cast (&CDgramSock::close_wt),
+	m_workerThread->syncSchedule <exe::Arg <DgramSock*> > (
+		pvoid_cast (&DgramSock::close_wt),
 		this
 		);
 }
 
 bool 
-CDgramSock::sendTo (
+DgramSock::sendTo (
 	const void* p,
 	size_t size,
-	const TSockAddr* addr,
-	const exe::CFunction& onComplete
+	const SockAddr* addr,
+	const exe::Function& onComplete
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_5 <
-		CDgramSock*,
+	return m_workerThread->syncSchedule <exe::ArgSeq_5 <
+		DgramSock*,
 		void*,
 		size_t,
-		TSockAddr*,
+		SockAddr*,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CDgramSock::sendTo_wt),
+		pvoid_cast (&DgramSock::sendTo_wt),
 		this,
 		p,
 		size,
@@ -79,22 +79,22 @@ CDgramSock::sendTo (
 }
 
 bool 
-CDgramSock::recvFrom (
+DgramSock::recvFrom (
 	void* p,
 	size_t size,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
 	ASSERT (isOpen ());
 
-	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
-		CDgramSock*,
+	return m_workerThread->syncSchedule <exe::ArgSeq_4 <
+		DgramSock*,
 		void*,
 		size_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CDgramSock::recvFrom_wt),
+		pvoid_cast (&DgramSock::recvFrom_wt),
 		this,
 		p,
 		size,
@@ -104,13 +104,13 @@ CDgramSock::recvFrom (
 
 void 
 onSyncSendRecvComplete (
-	mt::CEvent* event,
-	err::CError* error,
-	TSockAddrU* addrFromBuf,
+	mt::Event* event,
+	err::Error* error,
+	SockAddrU* addrFromBuf,
 	size_t* actualSize,
 	
-	const err::CError& error,
-	const TSockAddrU* addrFrom,
+	const err::Error& error,
+	const SockAddrU* addrFrom,
 	size_t actualSize
 	)
 {
@@ -125,19 +125,19 @@ onSyncSendRecvComplete (
 }
 
 size_t 
-CDgramSock::syncSendTo (
+DgramSock::syncSendTo (
 	const void* p,
 	size_t size,
-	const TSockAddr* addr
+	const SockAddr* addr
 	)
 {
-	mt::CEvent event;
-	err::CError error;
+	mt::Event event;
+	err::Error error;
 	size_t actualSize;
 	
-	exe::CFunctionT <
-		exe::CArgSeqT_4 <mt::CEvent*, err::CError*, TSockAddrU*, size_t*>,
-		COnSendRecvCompleteArg
+	exe::Function <
+		exe::ArgSeq_4 <mt::Event*, err::Error*, SockAddrU*, size_t*>,
+		OnSendRecvCompleteArg
 		> onComplete (onSyncSendRecvComplete, &event, &error, NULL, &actualSize);
 
 	sendTo (p, size, addr, &onComplete);
@@ -153,19 +153,19 @@ CDgramSock::syncSendTo (
 }
 
 size_t
-CDgramSock::syncRecvFrom (
+DgramSock::syncRecvFrom (
 	void* p,
 	size_t size,
-	TSockAddrU* from
+	SockAddrU* from
 	)
 {
-	mt::CEvent event;
-	err::CError error;
+	mt::Event event;
+	err::Error error;
 	size_t actualSize;
 	
-	exe::CFunctionT <
-		exe::CArgSeqT_4 <mt::CEvent*, err::CError*, TSockAddrU*, size_t*>,
-		COnSendRecvCompleteArg
+	exe::Function <
+		exe::ArgSeq_4 <mt::Event*, err::Error*, SockAddrU*, size_t*>,
+		OnSendRecvCompleteArg
 		> onComplete (onSyncSendRecvComplete, &event, &error, from, &actualSize);
 
 	recvFrom (p, size, &onComplete);
@@ -181,25 +181,25 @@ CDgramSock::syncRecvFrom (
 }
 
 void
-CDgramSock::close_wt ()
+DgramSock::close_wt ()
 {
 	m_sock.close ();
 	
 	while (!m_sendRecvList.isEmpty ())
 		::SleepEx (0, true);
 
-	m_workerThread = ref::EPtr_Null;
+	m_workerThread = ref::PtrKind_Null;
 }
 
 bool
-CDgramSock::sendTo_wt (
+DgramSock::sendTo_wt (
 	const void* p,
 	size_t size,
-	const TSockAddr* addr,
-	const exe::CFunction& onComplete
+	const SockAddr* addr,
+	const exe::Function& onComplete
 	)
 {
-	TSendRecv* send = AXL_MEM_NEW (TSendRecv);
+	SendRecv* send = AXL_MEM_NEW (SendRecv);
 	send->m_sock = this;
 	send->m_onComplete = ref::getPtrOrClone (onComplete);
 	send->m_overlapped.hEvent = send;
@@ -216,13 +216,13 @@ CDgramSock::sendTo_wt (
 }
 
 bool
-CDgramSock::recvFrom_wt (
+DgramSock::recvFrom_wt (
 	void* p,
 	size_t size,
-	const exe::CFunction& onComplete
+	const exe::Function& onComplete
 	)
 {
-	TSendRecv* recv = AXL_MEM_NEW (TSendRecv);
+	SendRecv* recv = AXL_MEM_NEW (SendRecv);
 	recv->m_sock = this;
 	recv->m_onComplete = ref::getPtrOrClone (onComplete);
 	recv->m_overlapped.hEvent = recv;
@@ -244,9 +244,9 @@ CDgramSock::recvFrom_wt (
 }
 
 void
-CDgramSock::completeSendRecv_wt (
-	TSendRecv* sendRecv,
-	const err::CError& error,
+DgramSock::completeSendRecv_wt (
+	SendRecv* sendRecv,
+	const err::Error& error,
 	size_t actualSize
 	)
 {
@@ -256,7 +256,7 @@ CDgramSock::completeSendRecv_wt (
 	}
 	else
 	{
-		TSockAddrU address;
+		SockAddrU address;
 		address.fromWinSockAddr (&sendRecv->m_address);
 		sendRecv->m_onComplete->invoke (0, &error, &address, actualSize);
 	}

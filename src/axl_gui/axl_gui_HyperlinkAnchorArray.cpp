@@ -6,10 +6,10 @@ namespace gui {
 	
 //.............................................................................
 
-THyperlinkAnchor* 
-CHyperlinkAnchorArray::find (size_t offset) const
+HyperlinkAnchor* 
+HyperlinkAnchorArray::find (size_t offset) const
 {
-	THyperlinkAnchor* result = NULL;
+	HyperlinkAnchor* result = NULL;
 
 	size_t begin = 0;
 	size_t end = m_array.getCount ();
@@ -18,7 +18,7 @@ CHyperlinkAnchorArray::find (size_t offset) const
 	{
 		size_t mid = (begin + end) / 2;
 
-		THyperlinkAnchor* anchor = m_array [mid];
+		HyperlinkAnchor* anchor = m_array [mid];
 		if (anchor->m_offset == offset)
 			return anchor;
 
@@ -36,14 +36,14 @@ CHyperlinkAnchorArray::find (size_t offset) const
 	return result;
 }
 
-THyperlinkAnchor* 
-CHyperlinkAnchorArray::openHyperlink (
+HyperlinkAnchor* 
+HyperlinkAnchorArray::openHyperlink (
 	size_t offset,
 	const char* hyperlink,
 	size_t length
 	)
 {
-	THyperlinkAnchor* anchor;
+	HyperlinkAnchor* anchor;
 
 	size_t count = m_array.getCount ();
 	if (count)
@@ -57,7 +57,7 @@ CHyperlinkAnchorArray::openHyperlink (
 		{
 			if (count >= 2)
 			{
-				THyperlinkAnchor* prevAnchor = m_array [count - 2];
+				HyperlinkAnchor* prevAnchor = m_array [count - 2];
 				if (prevAnchor->m_hyperlink.cmp (hyperlink, length) == 0)
 				{
 					// remove last anchor to normalize array
@@ -80,7 +80,7 @@ CHyperlinkAnchorArray::openHyperlink (
 
 	// create new anchor
 
-	anchor = AXL_MEM_NEW (THyperlinkAnchor);
+	anchor = AXL_MEM_NEW (HyperlinkAnchor);
 	anchor->m_offset = offset;
 	anchor->m_hyperlink.copy (hyperlink, length);
 	m_list.insertTail (anchor);

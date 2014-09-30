@@ -8,7 +8,7 @@ namespace test_Window {
 
 /*
 
-class CMyWindow: public g::win::CWindowImplT <CMyWindow>
+class MyWindow: public g::win::WindowImpl <MyWindow>
 {
 public:
 	enum
@@ -19,12 +19,12 @@ public:
 	};
 
 public:
-	CMyWindow ()
+	MyWindow ()
 	{
 		printf ("CMyWindow::CMyWindow ()\n");
 	}
 
-	~CMyWindow ()
+	~MyWindow ()
 	{
 		printf ("CMyWindow::~CMyWindow ()\n");
 	}
@@ -78,17 +78,17 @@ void
 test4_wt (exe::IScheduler* mtScheduler, int a)
 {
 	printf ("Test4_wt: TID: %x, i: %d\n", getCurrentThreadId (), a);
-	mtScheduler->schedule <exe::CArgT <int> > (test4_mt, 600);
+	mtScheduler->schedule <exe::Arg <int> > (test4_mt, 600);
 }
 
 //.............................................................................
 
-class CMyAtlWindow: public CWindowImpl <CMyAtlWindow>
+class MyAtlWindow: public WindowImpl <MyAtlWindow>
 {
 public:
 	DECLARE_WND_SUPERCLASS ("MyEdit", "EDIT")
 
-	BEGIN_MSG_MAP (CMyAtlWindow)
+	BEGIN_MSG_MAP (MyAtlWindow)
 		MESSAGE_HANDLER (WM_CREATE, onCreate)
 		MESSAGE_HANDLER (WM_DESTROY, onDestroy)
 		MESSAGE_HANDLER (WM_MOVE, onMove)
@@ -124,21 +124,21 @@ run ()
 {
 	printf ("Test4: TID: %x\n", getCurrentThreadId ()); 
 
-	CMyWindow::register ();
+	MyWindow::register ();
 
 	//CMyAtlWindow Window3;
 	//Window3.Create (NULL, 0, "ATL:GOVNO", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 
-	CMyWindow window;
+	MyWindow window;
 	window.create (NULL, NULL, "HHHUI!", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 
-	exe::CWorkerWindow workerWindow;
+	exe::WorkerWindow workerWindow;
 	workerWindow.create ();
 
-	exe::CWorkerThread workerThread;
+	exe::Workerhread workerThread;
 	workerThread.start ();
 
-	workerThread.schedule <exe::CArgSeqT_2 < 
+	workerThread.schedule <exe::ArgSeq_2 < 
 		exe::IScheduler*,
 		int
 		> > (test4_wt, (exe::IScheduler*) &workerWindow, 300);

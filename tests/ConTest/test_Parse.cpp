@@ -16,8 +16,8 @@ run (const char* fileName)
 {
 	bool result;
 
-	io::CMappedFile file;
-	result = file.open (fileName, io::EFileFlag_ReadOnly);
+	io::MappedFile file;
+	result = file.open (fileName, io::FileFlagKind_ReadOnly);
 	if (!result)
 	{
 		printf ("%s\n", err::getError ()->getDescription ());
@@ -27,15 +27,15 @@ run (const char* fileName)
 	char* p = (char*) file.view ();
 	size_t size = (size_t) file.getSize ();
 
-	CLexer lexer;
-	CParser parser;
+	Lexer lexer;
+	Parser parser;
 
 	lexer.create (fileName, p, size);
 	parser.create ();
 
 	for (;;)
 	{
-		const CToken* token = lexer.getToken (); 
+		const Token* token = lexer.getToken (); 
 
 		result = parser.parseToken (token);
 		if (!result)

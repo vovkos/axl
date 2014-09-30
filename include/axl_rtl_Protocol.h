@@ -14,7 +14,7 @@ namespace rtl {
 //.............................................................................
 
 template <typename T>
-class CProtoPeerT
+class ProtoPeer
 {
 public:
 	void
@@ -53,7 +53,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CAbstractProtoPeer: public CProtoPeerT <CAbstractProtoPeer>
+class AbstractProtoPeer: public ProtoPeer <AbstractProtoPeer>
 {
 public:
 	virtual
@@ -67,7 +67,7 @@ public:
 
 //.............................................................................
 
-struct TProtoMsg
+struct ProtoMsg
 {
 	uint32_t m_code;
 };
@@ -75,7 +75,7 @@ struct TProtoMsg
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-struct TProtoMsgT_1: TProtoMsg
+struct ProtoMsg_1: ProtoMsg
 {
 	T m_arg1;
 };
@@ -86,7 +86,7 @@ template <
 	typename T1,
 	typename T2
 	>
-struct TProtoMsgT_2: TProtoMsg
+struct ProtoMsg_2: ProtoMsg
 {
 	T1 m_arg1;
 	T2 m_arg2;
@@ -99,7 +99,7 @@ template <
 	typename T2,
 	typename T3
 	>
-struct TProtoMsgT_3: TProtoMsg
+struct ProtoMsg_3: ProtoMsg
 {
 	T1 m_arg1;
 	T2 m_arg2;
@@ -114,7 +114,7 @@ template <
 	typename T3,
 	typename T4
 	>
-struct TProtoMsgT_4: TProtoMsg
+struct ProtoMsg_4: ProtoMsg
 {
 	T1 m_arg1;
 	T2 m_arg2;
@@ -130,7 +130,7 @@ struct TProtoMsgT_4: TProtoMsg
 	void \
 	sender () \
 	{ \
-		axl::rtl::TProtoMsg msg; \
+		axl::rtl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg (&msg, sizeof (msg)); \
 	}
@@ -140,7 +140,7 @@ struct TProtoMsgT_4: TProtoMsg
 	sender (const char* strArg) \
 	{ \
 		size_t length = strArg ? strlen (strArg) : 0; \
-		axl::rtl::TProtoMsg msg; \
+		axl::rtl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg (&msg, sizeof (msg), strArg, length); \
 	}
@@ -152,16 +152,16 @@ struct TProtoMsgT_4: TProtoMsg
 		size_t sizeArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsg msg; \
+		axl::rtl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg (&msg, sizeof (msg), ptrArg, sizeArg); \
 	}
 
 #define AXL_RTL_PROTO_SEND_FUNCTION_0_ERR(code, sender, errArg) \
 	void \
-	sender (const axl::err::TError* errArg) \
+	sender (const axl::err::ErrorData* errArg) \
 	{ \
-		axl::rtl::TProtoMsg msg; \
+		axl::rtl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
 	}
@@ -172,7 +172,7 @@ struct TProtoMsgT_4: TProtoMsg
 	void \
 	sender (T1 arg1) \
 	{ \
-		axl::rtl::TProtoMsgT_1 <T1> msg; \
+		axl::rtl::ProtoMsg_1 <T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		sendMsg (&msg, sizeof (msg)); \
@@ -186,7 +186,7 @@ struct TProtoMsgT_4: TProtoMsg
 		) \
 	{ \
 		size_t length = strArg ? strlen (strArg) : 0; \
-		axl::rtl::TProtoMsgT_1 <T1> msg; \
+		axl::rtl::ProtoMsg_1 <T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		sendMsg (&msg, sizeof (msg), strArg, length); \
@@ -200,7 +200,7 @@ struct TProtoMsgT_4: TProtoMsg
 		size_t sizeArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_1 <T1> msg; \
+		axl::rtl::ProtoMsg_1 <T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		sendMsg (&msg, sizeof (msg), ptrArg, sizeArg); \
@@ -210,10 +210,10 @@ struct TProtoMsgT_4: TProtoMsg
 	void \
 	sender ( \
 		T1 arg1, \
-		const axl::err::TError* errArg \
+		const axl::err::ErrorData* errArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_1 <T1> msg; \
+		axl::rtl::ProtoMsg_1 <T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
@@ -228,7 +228,7 @@ struct TProtoMsgT_4: TProtoMsg
 		T2 arg2 \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_2 <T1, T2> msg; \
+		axl::rtl::ProtoMsg_2 <T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -244,7 +244,7 @@ struct TProtoMsgT_4: TProtoMsg
 		) \
 	{ \
 		size_t length = strArg ? strlen (strArg) : 0; \
-		axl::rtl::TProtoMsgT_2 <T1, T2> msg; \
+		axl::rtl::ProtoMsg_2 <T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -260,7 +260,7 @@ struct TProtoMsgT_4: TProtoMsg
 		size_t sizeArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_2 <T1, T2> msg; \
+		axl::rtl::ProtoMsg_2 <T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -272,10 +272,10 @@ struct TProtoMsgT_4: TProtoMsg
 	sender ( \
 		T1 arg1, \
 		T2 arg2, \
-		const axl::err::TError* errArg \
+		const axl::err::ErrorData* errArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_2 <T1, T2> msg; \
+		axl::rtl::ProtoMsg_2 <T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -292,7 +292,7 @@ struct TProtoMsgT_4: TProtoMsg
 		T2 arg3 \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_3 <T1, T2, T3> msg; \
+		axl::rtl::ProtoMsg_3 <T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -310,7 +310,7 @@ struct TProtoMsgT_4: TProtoMsg
 		) \
 	{ \
 		size_t length = strArg ? strlen (strArg) : 0; \
-		axl::rtl::TProtoMsgT_3 <T1, T2, T3> msg; \
+		axl::rtl::ProtoMsg_3 <T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -328,7 +328,7 @@ struct TProtoMsgT_4: TProtoMsg
 		size_t sizeArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_3 <T1, T2, T3> msg; \
+		axl::rtl::ProtoMsg_3 <T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -342,10 +342,10 @@ struct TProtoMsgT_4: TProtoMsg
 		T1 arg1, \
 		T2 arg2, \
 		T3 arg3, \
-		const axl::err::TError* errArg \
+		const axl::err::ErrorData* errArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_3 <T1, T2, T3> msg; \
+		axl::rtl::ProtoMsg_3 <T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -364,7 +364,7 @@ struct TProtoMsgT_4: TProtoMsg
 		T4 arg4 \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> msg; \
+		axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -384,7 +384,7 @@ struct TProtoMsgT_4: TProtoMsg
 		) \
 	{ \
 		size_t length = strArg ? strlen (strArg) : 0; \
-		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> msg; \
+		axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -404,7 +404,7 @@ struct TProtoMsgT_4: TProtoMsg
 		size_t sizeArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> msg; \
+		axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -420,10 +420,10 @@ struct TProtoMsgT_4: TProtoMsg
 		T2 arg2, \
 		T3 arg3, \
 		T4 arg4, \
-		const axl::err::TError* errArg \
+		const axl::err::ErrorData* errArg \
 		) \
 	{ \
-		axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> msg; \
+		axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
@@ -442,9 +442,9 @@ struct TProtoMsgT_4: TProtoMsg
 		size_t size \
 		) \
 	{ \
-		if (size < sizeof (axl::rtl::TProtoMsg)) \
+		if (size < sizeof (axl::rtl::ProtoMsg)) \
 			return; \
-		axl::rtl::TProtoMsg* hdr = (axl::rtl::TProtoMsg*) p; \
+		axl::rtl::ProtoMsg* hdr = (axl::rtl::ProtoMsg*) p; \
 		switch (hdr->m_code) \
 		{ \
 
@@ -462,13 +462,13 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_0_STR(code, handler) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsg TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t length = size - sizeof (TMsg); \
+		size_t length = size - sizeof (Msg); \
 		char buffer [256]; \
-		axl::rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer)); \
+		axl::rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
 		string.copy ((char*) (msg + 1), length); \
 		handler (string); \
 		break; \
@@ -477,11 +477,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_0_PTR(code, handler) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsg TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t extraSize = size - sizeof (TMsg); \
+		size_t extraSize = size - sizeof (Msg); \
 		handler (msg + 1, extraSize); \
 		break; \
 		}
@@ -489,11 +489,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_0_ERR(code, handler) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsg TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		handler ((const axl::err::TError*) (msg + 1)); \
+		handler ((const axl::err::ErrorData*) (msg + 1)); \
 		break; \
 		}
 
@@ -502,9 +502,9 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_1(code, handler, T1) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_1 <T1> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
 		handler (msg->m_arg1); \
 		break; \
@@ -513,13 +513,13 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_1_STR(code, handler, T1) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_1 <T1> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t length = size - sizeof (TMsg); \
+		size_t length = size - sizeof (Msg); \
 		char buffer [256]; \
-		axl::rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer)); \
+		axl::rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
 		string.copy ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, string); \
 		break; \
@@ -528,11 +528,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_1_PTR(code, handler, T1) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_1 <T1> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t extraSize = size - sizeof (TMsg); \
+		size_t extraSize = size - sizeof (Msg); \
 		handler (msg->m_arg1, msg + 1, extraSize); \
 		break; \
 		}
@@ -540,11 +540,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_1_ERR(code, handler, T1) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_1 <T1> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_1 <T1> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		handler (msg->m_arg1, (const axl::err::TError*) (msg + 1)); \
+		handler (msg->m_arg1, (const axl::err::ErrorData*) (msg + 1)); \
 		break; \
 		}
 
@@ -553,9 +553,9 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_2(code, handler, T1, T2) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_2 <T1, T2> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
 		handler (msg->m_arg1, msg->m_arg2); \
 		break; \
@@ -564,13 +564,13 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_2_STR(code, handler, T1, T2) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_2 <T1, T2> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t length = size - sizeof (TMsg); \
+		size_t length = size - sizeof (Msg); \
 		char buffer [256]; \
-		axl::rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer)); \
+		axl::rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
 		string.copy ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, msg->m_arg2, string); \
 		break; \
@@ -579,11 +579,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_2_PTR(code, handler, T1, T2) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_2 <T1, T2> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t extraSize = size - sizeof (TMsg); \
+		size_t extraSize = size - sizeof (Msg); \
 		handler (msg->m_arg1, msg->m_arg2, msg + 1, extraSize); \
 		break; \
 		}
@@ -591,11 +591,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_2_ERR(code, handler, T1, T2) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_2 <T1, T2> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_2 <T1, T2> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		handler (msg->m_arg1, msg->m_arg2, (const axl::err::TError*) (msg + 1)); \
+		handler (msg->m_arg1, msg->m_arg2, (const axl::err::ErrorData*) (msg + 1)); \
 		break; \
 		}
 
@@ -604,9 +604,9 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_3(code, handler, T1, T2, T3) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_3 <T1, T2, T3> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3); \
 		break; \
@@ -615,13 +615,13 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_3_STR(code, handler, T1, T2, T3) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_3 <T1, T2, T3> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t length = size - sizeof (TMsg); \
+		size_t length = size - sizeof (Msg); \
 		char buffer [256]; \
-		axl::rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer)); \
+		axl::rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
 		string.copy ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, string); \
 		break; \
@@ -630,11 +630,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_3_PTR(code, handler, T1, T2, T3) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_3 <T1, T2, T3> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t extraSize = size - sizeof (TMsg); \
+		size_t extraSize = size - sizeof (Msg); \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg + 1, extraSize); \
 		break; \
 		}
@@ -642,12 +642,12 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_3_ERR(code, handler, T1, T2, T3) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_3 <T1, T2, T3> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_3 <T1, T2, T3> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t extraSize = size - sizeof (TMsg); \
-		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, (const axl::err::TError*) (msg + 1)); \
+		size_t extraSize = size - sizeof (Msg); \
+		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, (const axl::err::ErrorData*) (msg + 1)); \
 		break; \
 		}
 
@@ -656,9 +656,9 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_4(code, handler, T1, T2, T3, T4) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4); \
 		break; \
@@ -667,13 +667,13 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_4_STR(code, handler, T1, T2, T3, T4) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t length = size - sizeof (TMsg); \
+		size_t length = size - sizeof (Msg); \
 		char buffer [256]; \
-		axl::rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer)); \
+		axl::rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
 		string.copy ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, string); \
 		break; \
@@ -682,11 +682,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_4_PTR(code, handler, T1, T2, T3, T4) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		size_t extraSize = size - sizeof (TMsg); \
+		size_t extraSize = size - sizeof (Msg); \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, msg + 1, extraSize); \
 		break; \
 		}
@@ -694,11 +694,11 @@ struct TProtoMsgT_4: TProtoMsg
 #define AXL_RTL_PROTO_RECV_FUNCTION_4_ERR(code, handler, T1, T2, T3, T4) \
 	case code: \
 		{ \
-		typedef axl::rtl::TProtoMsgT_4 <T1, T2, T3, T4> TMsg; \
-		TMsg* msg = (TMsg*) p; \
-		if (size < sizeof (TMsg)) \
+		typedef axl::rtl::ProtoMsg_4 <T1, T2, T3, T4> Msg; \
+		Msg* msg = (Msg*) p; \
+		if (size < sizeof (Msg)) \
 			break; \
-		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, (const axl::err::TError*) (msg + 1)); \
+		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, (const axl::err::ErrorData*) (msg + 1)); \
 		break; \
 		}
 

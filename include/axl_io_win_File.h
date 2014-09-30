@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class CFile: public g::win::CFileHandle
+class File: public g::win::FileHandle
 {
 public:
 	bool

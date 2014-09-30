@@ -6,14 +6,14 @@ namespace io {
 
 //.............................................................................
 
-err::TError*
-CUsbError::create (int code)
+err::ErrorData*
+UsbError::create (int code)
 {
-	err::TError* error = getBuffer (sizeof (err::TError));
+	err::ErrorData* error = getBuffer (sizeof (err::ErrorData));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (err::TError);
+	error->m_size = sizeof (err::ErrorData);
 	error->m_guid = GUID_UsbError;
 	error->m_code = code;
 	return error;

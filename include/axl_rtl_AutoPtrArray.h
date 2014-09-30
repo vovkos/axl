@@ -17,9 +17,9 @@ namespace rtl {
 
 template <
 	typename T,
-	typename TDelete
+	typename Delete
 	>
-class CAutoPtrArrayDetailsT: public CSimpleArrayDetailsT <T*>
+class AutoPtrArrayDetails: public SimpleArrayDetails <T*>
 {
 public:
 	static 
@@ -32,7 +32,7 @@ public:
 		T** end = p + count;
 		for (; p < end; p++)
 			if (*p)
-				TDelete () (*p);
+				Delete () (*p);
 	}
 
 	static 
@@ -49,7 +49,7 @@ public:
 			for (; dst < end; dst++, src++)
 			{
 				if (*dst)
-					TDelete () (*dst);
+					Delete () (*dst);
 
 				*dst = *src;
 			}
@@ -67,7 +67,7 @@ public:
 				src--;
 
 				if (*dst)
-					TDelete () (*dst);
+					Delete () (*dst);
 
 				*dst = *src;
 			}
@@ -86,7 +86,7 @@ public:
 
 		for (; p < end; p++)
 			if (*p)
-				TDelete () (*p);
+				Delete () (*p);
 		
 		memset (begin, 0, count * sizeof (T)); 
 	}	
@@ -96,37 +96,37 @@ public:
 
 template <
 	typename T,
-	typename TDelete = mem::CStdFactoryT <T>::COperatorDelete
+	typename Delete = mem::StdFactory <T>::OperatorDelete
 	>
-class CAutoPtrArrayT: public rtl::CArrayT <T*, CAutoPtrArrayDetailsT <T, TDelete> >
+class AutoPtrArray: public rtl::Array <T*, AutoPtrArrayDetails <T, Delete> >
 {
 public:
-	typedef rtl::CArrayT <T*, CAutoPtrArrayDetailsT <T, TDelete> > CBaseType;
+	typedef rtl::Array <T*, AutoPtrArrayDetails <T, Delete> > Baseype;
 
 public:
-	CAutoPtrArrayT ()
+	AutoPtrArray ()
 	{ 
 	}
 
-	CAutoPtrArrayT (T* e):
-		CBaseType (e)
+	AutoPtrArray (T* e):
+		Baseype (e)
 	{
 	}
 
-	CAutoPtrArrayT (
+	AutoPtrArray (
 		T* const* p, 
 		size_t count
 		):
-		CBaseType (p, count)
+		Baseype (p, count)
 	{ 
 	}
 
-	CAutoPtrArrayT (
-		ref::EBuf bufKind,
+	AutoPtrArray (
+		ref::BufKind bufKind,
 		void* p, 
 		size_t size
 		):
-		CBaseType (bufKind, p, size)
+		Baseype (bufKind, p, size)
 	{
 	}
 
@@ -156,7 +156,7 @@ public:
 	}
 
 	void
-	takeOver (CAutoPtrArrayT* src)
+	takeOver (AutoPtrArray* src)
 	{
 		release ();
 		m_p = src;
@@ -169,13 +169,13 @@ public:
 		size_t count
 		)
 	{
-		return CBaseType::copy (p, count);
+		return Baseype::copy (p, count);
 	}
 
 	bool 
 	copy (T* e)
 	{
-		return CBaseType::copy (e);
+		return Baseype::copy (e);
 	}
 
 	T** 
@@ -184,13 +184,13 @@ public:
 		size_t count
 		)
 	{ 
-		return CBaseType::append (p, count);
+		return Baseype::append (p, count);
 	}
 
 	T**
 	append (T* e)
 	{ 
-		return CBaseType::append (e);
+		return Baseype::append (e);
 	}
 
 	T**
@@ -200,7 +200,7 @@ public:
 		size_t count
 		)
 	{
-		return CBaseType::insert (index, p, count);
+		return Baseype::insert (index, p, count);
 	}
 
 	T**
@@ -209,7 +209,7 @@ public:
 		T* e
 		)
 	{
-		return CBaseType::insert (index, e);
+		return Baseype::insert (index, e);
 	}
 
 	size_t
@@ -232,12 +232,12 @@ public:
 	}
 
 private:
-	CAutoPtrArrayT (const CAutoPtrArrayT& src)
+	AutoPtrArray (const AutoPtrArray& src)
 	{   
 	}
 
 	void
-	operator = (const CAutoPtrArrayT& src)
+	operator = (const AutoPtrArray& src)
 	{ 
 	}
 

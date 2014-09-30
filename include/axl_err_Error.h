@@ -12,8 +12,8 @@
 namespace axl {
 namespace rtl {
 
-template <typename T> class CStringT;
-typedef CStringT <char> CString;
+template <typename T> class StringBase;
+typedef StringBase <char> String;
 
 } // namespace rtl
 } // namespace axl
@@ -23,39 +23,39 @@ namespace err {
 
 //.............................................................................
 
-enum EErrorMode
+enum ErrorModeKind
 {
-	EErrorMode_NoThrow       = 0,
-	EErrorMode_CppException  = 1,
+	ErrorModeKind_NoThrow       = 0,
+	ErrorModeKind_CppException  = 1,
 
 	// these 2 are almost useless unless in C-style code without classes
 
-	EErrorMode_SehException  = 2,
-	EErrorMode_SetJmpLongJmp = 4,
+	ErrorModeKind_SehException  = 2,
+	ErrorModeKind_SetJmpLongJmp = 4,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-EErrorMode
+ErrorModeKind
 getErrorMode ();
 
-EErrorMode // returns previous one
-setErrorMode (EErrorMode mode);
+ErrorModeKind // returns previous one
+setErrorMode (ErrorModeKind mode);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CScopeErrorMode
+class ScopeErrorMode
 {
 protected:
-	EErrorMode m_oldMode;
+	ErrorModeKind m_oldMode;
 
 public:
-	CScopeErrorMode (EErrorMode mode)
+	ScopeErrorMode (ErrorModeKind mode)
 	{
 		m_oldMode = setErrorMode (mode);
 	}
 
-	~CScopeErrorMode ()
+	~ScopeErrorMode ()
 	{
 		setErrorMode (m_oldMode);
 	}
@@ -67,13 +67,13 @@ public:
 
 extern
 AXL_SELECT_ANY
-const rtl::TGuid GUID_StdError = rtl::GUID_Null;
+const rtl::Guid GUID_StdError = rtl::GUID_Null;
 
-enum EStdError
+enum StdErrorKind
 {
-	EStdError_NoError,
-	EStdError_String,
-	EStdError_Stack,
+	StdErrorKind_NoError,
+	StdErrorKind_String,
+	StdErrorKind_Stack,
 };
 
 //.............................................................................
@@ -82,50 +82,50 @@ enum EStdError
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-extern const rtl::TGuid GUID_WinError;
+extern const rtl::Guid GUID_WinError;
 
 #define GUID_SystemError GUID_WinError
 
-enum EStatus
+enum StatusKind
 {
-	EStatus_Success                  = ERROR_SUCCESS,
-	EStatus_Pending                  = ERROR_IO_PENDING,
-	EStatus_Cancelled                = ERROR_OPERATION_ABORTED,
-	EStatus_Unsuccessful             = ERROR_GEN_FAILURE,
-	EStatus_InsufficientResources    = ERROR_NO_SYSTEM_RESOURCES,
-	EStatus_NotImplemented           = ERROR_INVALID_FUNCTION,
-	EStatus_InvalidHandle            = ERROR_INVALID_HANDLE,
-	EStatus_AddressAlreadyExists     = ERROR_DUP_NAME,
-	EStatus_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	EStatus_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
-	EStatus_InvalidAddress           = ERROR_UNEXP_NET_ERR,
-	EStatus_AddressClosed            = ERROR_NETNAME_DELETED,
-	EStatus_BufferOverflow           = ERROR_MORE_DATA,
-	EStatus_InvalidParameter         = ERROR_INVALID_PARAMETER,
-	EStatus_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
-	EStatus_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
-	EStatus_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
-	EStatus_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
-	EStatus_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
-	EStatus_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
-	EStatus_ConnectionReset          = ERROR_NETNAME_DELETED,
-	EStatus_IoTimeout                = ERROR_SEM_TIMEOUT,
-	EStatus_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
-	EStatus_DataNotAccepted          = ERROR_INVALID_DATA,
-	EStatus_MoreProcessingRequired   = ERROR_MORE_DATA,
-	EStatus_InvalidDeviceState       = ERROR_BAD_COMMAND,
-	EStatus_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
-	EStatus_HostUnreachable          = ERROR_HOST_UNREACHABLE,
-	EStatus_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
-	EStatus_PortUnreachable          = ERROR_PORT_UNREACHABLE,
-	EStatus_InvalidDeviceRequest     = ERROR_INVALID_FUNCTION,
-	EStatus_RequestAborted           = ERROR_REQUEST_ABORTED,
-	EStatus_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
-	EStatus_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	EStatus_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
-	EStatus_AccessDenied             = ERROR_ACCESS_DENIED,
-	EStatus_SharingViolation         = ERROR_SHARING_VIOLATION,
-	EStatus_NoMoreEntries            = ERROR_NO_MORE_ITEMS,
+	StatusKind_Success                  = ERROR_SUCCESS,
+	StatusKind_Pending                  = ERROR_IO_PENDING,
+	StatusKind_Cancelled                = ERROR_OPERATION_ABORTED,
+	StatusKind_Unsuccessful             = ERROR_GEN_FAILURE,
+	StatusKind_InsufficientResources    = ERROR_NO_SYSTEM_RESOURCES,
+	StatusKind_NotImplemented           = ERROR_INVALID_FUNCTION,
+	StatusKind_InvalidHandle            = ERROR_INVALID_HANDLE,
+	StatusKind_AddressAlreadyExists     = ERROR_DUP_NAME,
+	StatusKind_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
+	StatusKind_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
+	StatusKind_InvalidAddress           = ERROR_UNEXP_NET_ERR,
+	StatusKind_AddressClosed            = ERROR_NETNAME_DELETED,
+	StatusKind_BufferOverflow           = ERROR_MORE_DATA,
+	StatusKind_InvalidParameter         = ERROR_INVALID_PARAMETER,
+	StatusKind_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
+	StatusKind_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
+	StatusKind_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
+	StatusKind_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
+	StatusKind_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
+	StatusKind_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
+	StatusKind_ConnectionReset          = ERROR_NETNAME_DELETED,
+	StatusKind_IoTimeout                = ERROR_SEM_TIMEOUT,
+	StatusKind_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
+	StatusKind_DataNotAccepted          = ERROR_INVALID_DATA,
+	StatusKind_MoreProcessingRequired   = ERROR_MORE_DATA,
+	StatusKind_InvalidDeviceState       = ERROR_BAD_COMMAND,
+	StatusKind_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
+	StatusKind_HostUnreachable          = ERROR_HOST_UNREACHABLE,
+	StatusKind_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
+	StatusKind_PortUnreachable          = ERROR_PORT_UNREACHABLE,
+	StatusKind_InvalidDeviceRequest     = ERROR_INVALID_FUNCTION,
+	StatusKind_RequestAborted           = ERROR_REQUEST_ABORTED,
+	StatusKind_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
+	StatusKind_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
+	StatusKind_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
+	StatusKind_AccessDenied             = ERROR_ACCESS_DENIED,
+	StatusKind_SharingViolation         = ERROR_SHARING_VIOLATION,
+	StatusKind_NoMoreEntries            = ERROR_NO_MORE_ITEMS,
 };
 
 inline
@@ -139,99 +139,99 @@ getLastSystemErrorCode ()
 
 #elif (_AXL_ENV == AXL_ENV_NT)
 
-extern const rtl::TGuid GUID_NtError;
+extern const rtl::Guid GUID_NtError;
 
 #define GUID_SystemError GUID_NtError
 
-enum EStatus
+enum StatusKind
 {
-	EStatus_Success                  = STATUS_SUCCESS,
-	EStatus_Pending                  = STATUS_PENDING,
-	EStatus_Cancelled                = STATUS_CANCELLED,
-	EStatus_Unsuccessful             = STATUS_UNSUCCESSFUL,
-	EStatus_InsufficientResources    = STATUS_INSUFFICIENT_RESOURCES,
-	EStatus_NotImplemented           = STATUS_NOT_IMPLEMENTED,
-	EStatus_InvalidHandle            = STATUS_INVALID_HANDLE,
-	EStatus_AddressAlreadyExists     = STATUS_ADDRESS_ALREADY_EXISTS,
-	EStatus_InvalidAddressComponent  = STATUS_INVALID_ADDRESS_COMPONENT,
-	EStatus_TooManyAddresses         = STATUS_TOO_MANY_ADDRESSES,
-	EStatus_InvalidAddress           = STATUS_INVALID_ADDRESS,
-	EStatus_AddressClosed            = STATUS_ADDRESS_CLOSED,
-	EStatus_BufferOverflow           = STATUS_BUFFER_OVERFLOW,
-	EStatus_InvalidParameter         = STATUS_INVALID_PARAMETER,
-	EStatus_ConnectionRefused        = STATUS_CONNECTION_REFUSED,
-	EStatus_ConnectionInvalid        = STATUS_CONNECTION_INVALID,
-	EStatus_AddressAlreadyAssociated = STATUS_ADDRESS_ALREADY_ASSOCIATED,
-	EStatus_AddressNotAssociated     = STATUS_ADDRESS_NOT_ASSOCIATED,
-	EStatus_ConnectionActive         = STATUS_CONNECTION_ACTIVE,
-	EStatus_ConnectionAborted        = STATUS_CONNECTION_ABORTED,
-	EStatus_ConnectionReset          = STATUS_CONNECTION_RESET,
-	EStatus_IoTimeout                = STATUS_IO_TIMEOUT,
-	EStatus_GracefulDisconnect       = STATUS_GRACEFUL_DISCONNECT,
-	EStatus_DataNotAccepted          = STATUS_DATA_NOT_ACCEPTED,
-	EStatus_MoreProcessingRequired   = STATUS_MORE_PROCESSING_REQUIRED,
-	EStatus_InvalidDeviceState       = STATUS_INVALID_DEVICE_STATE,
-	EStatus_NetworkUnreachable       = STATUS_NETWORK_UNREACHABLE,
-	EStatus_HostUnreachable          = STATUS_HOST_UNREACHABLE,
-	EStatus_ProtocolUnreachable      = STATUS_PROTOCOL_UNREACHABLE,
-	EStatus_PortUnreachable          = STATUS_PORT_UNREACHABLE,
-	EStatus_InvalidDeviceRequest     = STATUS_INVALID_DEVICE_REQUEST,
-	EStatus_RequestAborted           = STATUS_REQUEST_ABORTED,
-	EStatus_BufferTooSmall           = STATUS_BUFFER_TOO_SMALL,
-	EStatus_InvalidBufferSize        = STATUS_INVALID_BUFFER_SIZE,
-	EStatus_ObjectNameNotFound       = STATUS_OBJECT_NAME_NOT_FOUND,
-	EStatus_AccessDenied             = STATUS_ACCESS_DENIED,
-	EStatus_SharingViolation         = STATUS_SHARING_VIOLATION,
-	EStatus_NoMoreEntries            = STATUS_NO_MORE_ENTRIES,
+	StatusKind_Success                  = STATUS_SUCCESS,
+	StatusKind_Pending                  = STATUS_PENDING,
+	StatusKind_Cancelled                = STATUS_CANCELLED,
+	StatusKind_Unsuccessful             = STATUS_UNSUCCESSFUL,
+	StatusKind_InsufficientResources    = STATUS_INSUFFICIENT_RESOURCES,
+	StatusKind_NotImplemented           = STATUS_NOT_IMPLEMENTED,
+	StatusKind_InvalidHandle            = STATUS_INVALID_HANDLE,
+	StatusKind_AddressAlreadyExists     = STATUS_ADDRESS_ALREADY_EXISTS,
+	StatusKind_InvalidAddressComponent  = STATUS_INVALID_ADDRESS_COMPONENT,
+	StatusKind_TooManyAddresses         = STATUS_TOO_MANY_ADDRESSES,
+	StatusKind_InvalidAddress           = STATUS_INVALID_ADDRESS,
+	StatusKind_AddressClosed            = STATUS_ADDRESS_CLOSED,
+	StatusKind_BufferOverflow           = STATUS_BUFFER_OVERFLOW,
+	StatusKind_InvalidParameter         = STATUS_INVALID_PARAMETER,
+	StatusKind_ConnectionRefused        = STATUS_CONNECTION_REFUSED,
+	StatusKind_ConnectionInvalid        = STATUS_CONNECTION_INVALID,
+	StatusKind_AddressAlreadyAssociated = STATUS_ADDRESS_ALREADY_ASSOCIATED,
+	StatusKind_AddressNotAssociated     = STATUS_ADDRESS_NOT_ASSOCIATED,
+	StatusKind_ConnectionActive         = STATUS_CONNECTION_ACTIVE,
+	StatusKind_ConnectionAborted        = STATUS_CONNECTION_ABORTED,
+	StatusKind_ConnectionReset          = STATUS_CONNECTION_RESET,
+	StatusKind_IoTimeout                = STATUS_IO_TIMEOUT,
+	StatusKind_GracefulDisconnect       = STATUS_GRACEFUL_DISCONNECT,
+	StatusKind_DataNotAccepted          = STATUS_DATA_NOT_ACCEPTED,
+	StatusKind_MoreProcessingRequired   = STATUS_MORE_PROCESSING_REQUIRED,
+	StatusKind_InvalidDeviceState       = STATUS_INVALID_DEVICE_STATE,
+	StatusKind_NetworkUnreachable       = STATUS_NETWORK_UNREACHABLE,
+	StatusKind_HostUnreachable          = STATUS_HOST_UNREACHABLE,
+	StatusKind_ProtocolUnreachable      = STATUS_PROTOCOL_UNREACHABLE,
+	StatusKind_PortUnreachable          = STATUS_PORT_UNREACHABLE,
+	StatusKind_InvalidDeviceRequest     = STATUS_INVALID_DEVICE_REQUEST,
+	StatusKind_RequestAborted           = STATUS_REQUEST_ABORTED,
+	StatusKind_BufferTooSmall           = STATUS_BUFFER_TOO_SMALL,
+	StatusKind_InvalidBufferSize        = STATUS_INVALID_BUFFER_SIZE,
+	StatusKind_ObjectNameNotFound       = STATUS_OBJECT_NAME_NOT_FOUND,
+	StatusKind_AccessDenied             = STATUS_ACCESS_DENIED,
+	StatusKind_SharingViolation         = STATUS_SHARING_VIOLATION,
+	StatusKind_NoMoreEntries            = STATUS_NO_MORE_ENTRIES,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-extern const rtl::TGuid GUID_Errno;
+extern const rtl::Guid GUID_Errno;
 
 #define GUID_SystemError GUID_Errno
 
-enum EStatus
+enum StatusKind
 {
-	EStatus_Success                  = 0,
-	EStatus_Cancelled                = EINTR,
-	EStatus_Unsuccessful             = EIO,
-	EStatus_InsufficientResources    = ENOMEM,
-	EStatus_NotImplemented           = ENOSYS,
-	EStatus_InvalidHandle            = EBADF,
-	EStatus_AddressAlreadyExists     = EEXIST,
-/*	EStatus_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	EStatus_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
-	EStatus_InvalidAddress           = ERROR_UNEXP_NET_ERR,
-	EStatus_AddressClosed            = ERROR_NETNAME_DELETED,
-	EStatus_BufferOverflow           = ERROR_MORE_DATA,*/
-	EStatus_InvalidParameter         = EINVAL,
-/*	EStatus_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
-	EStatus_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
-	EStatus_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
-	EStatus_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
-	EStatus_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
-	EStatus_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
-	EStatus_ConnectionReset          = ERROR_NETNAME_DELETED,
-	EStatus_IoTimeout                = ERROR_SEM_TIMEOUT,
-	EStatus_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
-	EStatus_DataNotAccepted          = ERROR_INVALID_DATA,
-	EStatus_MoreProcessingRequired   = ERROR_MORE_DATA, */
-	EStatus_InvalidDeviceState       = EBUSY,
-/*	EStatus_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
-	EStatus_HostUnreachable          = ERROR_HOST_UNREACHABLE,
-	EStatus_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
-	EStatus_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
-	EStatus_InvalidDeviceRequest     = ENOSYS,
-/*	EStatus_RequestAborted           = ERROR_REQUEST_ABORTED,
-	EStatus_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
-	EStatus_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	EStatus_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
-	EStatus_AccessDenied             = ERROR_ACCESS_DENIED,
-	EStatus_SharingViolation         = ERROR_SHARING_VIOLATION,
-	EStatus_NoMoreEntries            = ERROR_NO_MORE_ITEMS, */
+	StatusKind_Success                  = 0,
+	StatusKind_Cancelled                = EINTR,
+	StatusKind_Unsuccessful             = EIO,
+	StatusKind_InsufficientResources    = ENOMEM,
+	StatusKind_NotImplemented           = ENOSYS,
+	StatusKind_InvalidHandle            = EBADF,
+	StatusKind_AddressAlreadyExists     = EEXIST,
+/*	StatusKind_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
+	StatusKind_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
+	StatusKind_InvalidAddress           = ERROR_UNEXP_NET_ERR,
+	StatusKind_AddressClosed            = ERROR_NETNAME_DELETED,
+	StatusKind_BufferOverflow           = ERROR_MORE_DATA,*/
+	StatusKind_InvalidParameter         = EINVAL,
+/*	StatusKind_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
+	StatusKind_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
+	StatusKind_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
+	StatusKind_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
+	StatusKind_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
+	StatusKind_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
+	StatusKind_ConnectionReset          = ERROR_NETNAME_DELETED,
+	StatusKind_IoTimeout                = ERROR_SEM_TIMEOUT,
+	StatusKind_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
+	StatusKind_DataNotAccepted          = ERROR_INVALID_DATA,
+	StatusKind_MoreProcessingRequired   = ERROR_MORE_DATA, */
+	StatusKind_InvalidDeviceState       = EBUSY,
+/*	StatusKind_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
+	StatusKind_HostUnreachable          = ERROR_HOST_UNREACHABLE,
+	StatusKind_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
+	StatusKind_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
+	StatusKind_InvalidDeviceRequest     = ENOSYS,
+/*	StatusKind_RequestAborted           = ERROR_REQUEST_ABORTED,
+	StatusKind_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
+	StatusKind_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
+	StatusKind_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
+	StatusKind_AccessDenied             = ERROR_ACCESS_DENIED,
+	StatusKind_SharingViolation         = ERROR_SHARING_VIOLATION,
+	StatusKind_NoMoreEntries            = ERROR_NO_MORE_ITEMS, */
 };
 
 inline
@@ -247,20 +247,31 @@ getLastSystemErrorCode ()
 
 // POD structure
 
-struct TError
+struct ErrorData
 {
+	class GetSize
+	{
+	public:
+		size_t
+		operator () (const ErrorData& x)
+		{
+			ASSERT (x.m_size >= sizeof (ErrorData));
+			return AXL_MAX (x.m_size, sizeof (ErrorData));
+		}
+	};
+
 	uint32_t m_size;
-	rtl::TGuid m_guid;
+	rtl::Guid m_guid;
 	uint32_t m_code;
 
 	// possibly followed by error data
 
-	rtl::CString
+	rtl::String
 	getDescription () const;
 
 	bool
 	isKind (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code
 		) const;
 };
@@ -269,44 +280,31 @@ struct TError
 
 extern
 AXL_SELECT_ANY
-const TError noError =
+const ErrorData g_noError =
 {
-	sizeof (TError),
+	sizeof (ErrorData),
 	GUID_StdError,
-	EStatus_Success,
+	StatusKind_Success,
 };
 
 //.............................................................................
 
-class CGetErrorSize
-{
-public:
-	size_t
-	operator () (const TError& x)
-	{
-		ASSERT (x.m_size >= sizeof (TError));
-		return AXL_MAX (x.m_size, sizeof (TError));
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 // ref-counted error buffer
 
-class CError: public ref::CBufT <TError, CGetErrorSize>
+class Error: public ref::Buf <ErrorData, ErrorData::GetSize>
 {
 public:
-	CError ()
+	Error ()
 	{
 	}
 
-	CError (const TError& src)
+	Error (const ErrorData& src)
 	{
 		copy (src);
 	}
 
-	CError (
-		ref::EBuf kind,
+	Error (
+		ref::BufKind kind,
 		void* p,
 		size_t size
 		)
@@ -314,12 +312,12 @@ public:
 		setBuffer (kind, p, size);
 	}
 
-	CError (
-		const rtl::TGuid& guid,
+	Error (
+		const rtl::Guid& guid,
 		uint_t code,
-		ref::EBuf kind = ref::EBuf_Stack,
-		TError* p = (TError*) _alloca (minBufSize),
-		size_t size = minBufSize
+		ref::BufKind kind = ref::BufKind_Stack,
+		ErrorData* p = (ErrorData*) _alloca (MinBufSize),
+		size_t size = MinBufSize
 		)
 	{
 		if (p)
@@ -328,11 +326,11 @@ public:
 		createSimpleError (guid, code);
 	}
 
-	CError (
+	Error (
 		uint_t code,
-		ref::EBuf kind = ref::EBuf_Stack,
-		TError* p = (TError*) _alloca (minBufSize),
-		size_t size = minBufSize
+		ref::BufKind kind = ref::BufKind_Stack,
+		ErrorData* p = (ErrorData*) _alloca (MinBufSize),
+		size_t size = MinBufSize
 		)
 	{
 		if (p)
@@ -343,36 +341,36 @@ public:
 
 	bool
 	isKind (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code
 		) const
 	{
 		return m_p && m_p->isKind (guid, code);
 	}
 
-	rtl::CString
+	rtl::String
 	getDescription () const;
 
-	TError*
-	copy (const TError& src);
+	ErrorData*
+	copy (const ErrorData& src);
 
-	TError*
-	push (const TError& error);
+	ErrorData*
+	push (const ErrorData& error);
 
 	// pack
 
-	template <typename TPack>
-	TError*
+	template <typename Pack>
+	ErrorData*
 	pack_va (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		axl_va_list va
 		)
 	{
 		size_t packSize;
-		TPack () (NULL, &packSize, va);
+		Pack () (NULL, &packSize, va);
 
-		size_t size = sizeof (TError) + packSize;
+		size_t size = sizeof (ErrorData) + packSize;
 		getBuffer (size);
 		if (!m_p)
 			return NULL;
@@ -381,63 +379,63 @@ public:
 		m_p->m_guid = guid;
 		m_p->m_code = code;
 
-		TPack () (m_p + 1, &packSize, va);
+		Pack () (m_p + 1, &packSize, va);
 		return m_p;
 	}
 
-	template <typename TPack>
-	TError*
+	template <typename Pack>
+	ErrorData*
 	pack (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		...
 		)
 	{
 		AXL_VA_DECL (va, code);
-		return pack_va <TPack> (guid, code, va);
+		return pack_va <Pack> (guid, code, va);
 	}
 
-	template <typename TPack>
-	TError*
+	template <typename Pack>
+	ErrorData*
 	pushPack_va (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		axl_va_list va
 		)
 	{
 		if (!m_p)
-			return pack_va <TPack> (guid, code, va);
+			return pack_va <Pack> (guid, code, va);
 
-		CError error;
-		error.pack_va <TPack> (guid, code, va);
+		Error error;
+		error.pack_va <Pack> (guid, code, va);
 		return push (*error);
 	}
 
-	template <typename TPack>
-	TError*
+	template <typename Pack>
+	ErrorData*
 	pushPack (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		...
 		)
 	{
 		AXL_VA_DECL (va, code);
-		return pushPack_va <TPack> (guid, code, va);
+		return pushPack_va <Pack> (guid, code, va);
 	}
 
 	// format
 
-	TError*
+	ErrorData*
 	format_va (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		axl_va_list va
 		);
 
-	TError*
+	ErrorData*
 	format (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		...
@@ -447,9 +445,9 @@ public:
 		return format_va (guid, code, formatString, va);
 	}
 
-	TError*
+	ErrorData*
 	pushFormat_va (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		axl_va_list va
@@ -458,14 +456,14 @@ public:
 		if (!m_p)
 			return format_va (guid, code, formatString, va);
 
-		CError error;
+		Error error;
 		error.format_va (guid, code, formatString, va);
 		return push (*error);
 	}
 
-	TError*
+	ErrorData*
 	pushFormat (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		...
@@ -477,29 +475,29 @@ public:
 
 	// simple error
 
-	TError*
+	ErrorData*
 	createSimpleError (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code
 		);
 
-	TError*
+	ErrorData*
 	pushSimpleError (
-		const rtl::TGuid& guid,
+		const rtl::Guid& guid,
 		uint_t code
 		)
 	{
 		if (!m_p)
 			return createSimpleError (guid, code);
 
-		CError error;
+		Error error;
 		error.createSimpleError (guid, code);
 		return push (*error);
 	}
 
 	// system error (push is irrelevant for system errors)
 
-	TError*
+	ErrorData*
 	createSystemError (uint_t code)
 	{
 		return createSimpleError (GUID_SystemError, code);
@@ -507,13 +505,13 @@ public:
 
 	// string error
 
-	TError*
+	ErrorData*
 	createStringError (
 		const char* p,
 		size_t length = -1
 		);
 
-	TError*
+	ErrorData*
 	pushStringError (
 		const char* p,
 		size_t length = -1
@@ -522,18 +520,18 @@ public:
 		if (!m_p)
 			return createStringError (p, length);
 
-		CError error;
+		Error error;
 		error.createStringError (p, length);
 		return push (*error);
 	}
 
-	TError*
+	ErrorData*
 	formatStringError_va (
 		const char* formatString,
 		axl_va_list va
 		);
 
-	TError*
+	ErrorData*
 	formatStringError (
 		const char* formatString,
 		...
@@ -543,7 +541,7 @@ public:
 		return formatStringError_va (formatString, va);
 	}
 
-	TError*
+	ErrorData*
 	pushFormatStringError_va (
 		const char* formatString,
 		axl_va_list va
@@ -552,13 +550,13 @@ public:
 		if (!m_p)
 			return formatStringError_va (formatString, va);
 
-		CError error;
+		Error error;
 		error.formatStringError_va (formatString, va);
 		return push (*error);
 	}
 
 
-	TError*
+	ErrorData*
 	pushFormatStringError (
 		const char* formatString,
 		...
@@ -573,17 +571,17 @@ public:
 
 // utility functions
 
-CError
+Error
 getError ();
 
-CError
-setError (const CError& error);
+Error
+setError (const Error& error);
 
 inline
-CError
-pushError (const CError& error)
+Error
+pushError (const Error& error)
 {
-	CError stack = getError ();
+	Error stack = getError ();
 	stack.push (*error);
 	return setError (stack);
 }
@@ -592,54 +590,54 @@ pushError (const CError& error)
 
 // pack
 
-template <typename TPack>
-CError
+template <typename Pack>
+Error
 setPackError_va (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	axl_va_list va
 	)
 {
-	CError error;
-	error.pack_va <TPack> (guid, code, va);
+	Error error;
+	error.pack_va <Pack> (guid, code, va);
 	return setError (error);
 }
 
-template <typename TPack>
-CError
+template <typename Pack>
+Error
 setPackError (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	...
 	)
 {
 	AXL_VA_DECL (va, code);
-	return setPackError_va <TPack> (guid, code, va);
+	return setPackError_va <Pack> (guid, code, va);
 }
 
-template <typename TPack>
-CError
+template <typename Pack>
+Error
 pushPackError_va (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	axl_va_list va
 	)
 {
-	CError error;
-	error.pack_va <TPack> (guid, code, va);
+	Error error;
+	error.pack_va <Pack> (guid, code, va);
 	return pushError (error);
 }
 
-template <typename TPack>
-CError
+template <typename Pack>
+Error
 pushPackError (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	...
 	)
 {
 	AXL_VA_DECL (va, code);
-	return pushPackError_va <TPack> (guid, code, va);
+	return pushPackError_va <Pack> (guid, code, va);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -647,23 +645,23 @@ pushPackError (
 // format
 
 inline
-CError
+Error
 setFormatError_va (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError error;
+	Error error;
 	error.format_va (guid, code, formatString, va);
 	return setError (error);
 }
 
 inline
-CError
+Error
 setFormatError (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	...
@@ -674,23 +672,23 @@ setFormatError (
 }
 
 inline
-CError
+Error
 pushFormatError_va (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError error;
+	Error error;
 	error.format_va (guid, code, formatString, va);
 	return pushError (error);
 }
 
 inline
-CError
+Error
 pushFormatError (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	...
@@ -706,23 +704,23 @@ pushFormatError (
 // simple error
 
 inline
-CError
+Error
 setError (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code
 	)
 {
-	return setError (CError (guid, code));
+	return setError (Error (guid, code));
 }
 
 inline
-CError
+Error
 pushError (
-	const rtl::TGuid& guid,
+	const rtl::Guid& guid,
 	uint_t code
 	)
 {
-	return pushError (CError (guid, code));
+	return pushError (Error (guid, code));
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -730,19 +728,19 @@ pushError (
 // string error
 
 inline
-CError
+Error
 createStringError (
 	const char* p,
 	size_t length = -1
 	)
 {
-	CError error;
+	Error error;
 	error.createStringError (p, length);
 	return error;
 }
 
 inline
-CError
+Error
 setStringError (
 	const char* p,
 	size_t length = -1
@@ -752,31 +750,31 @@ setStringError (
 }
 
 inline
-CError
+Error
 pushStringError (
 	const char* p,
 	size_t length = -1
 	)
 {
-	CError error;
+	Error error;
 	error.createStringError (p, -1);
 	return setError (error);
 }
 
 inline
-CError
+Error
 formatStringError_va (
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError error;
+	Error error;
 	error.formatStringError_va (formatString, va);
 	return error;
 }
 
 inline
-CError
+Error
 formatStringError (
 	const char* formatString,
 	...
@@ -787,7 +785,7 @@ formatStringError (
 }
 
 inline
-CError
+Error
 setFormatStringError_va (
 	const char* formatString,
 	axl_va_list va
@@ -797,7 +795,7 @@ setFormatStringError_va (
 }
 
 inline
-CError
+Error
 setFormatStringError (
 	const char* formatString,
 	...
@@ -808,19 +806,19 @@ setFormatStringError (
 }
 
 inline
-CError
+Error
 pushFormatStringError_va (
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError error;
+	Error error;
 	error.formatStringError_va (formatString, va);
 	return pushError (error);
 }
 
 inline
-CError
+Error
 pushFormatStringError (
 	const char* formatString,
 	...
@@ -838,7 +836,7 @@ template <typename T>
 T
 fail (
 	T failResult,
-	CError error
+	Error error
 	)
 {
 	setError (error);
@@ -847,13 +845,13 @@ fail (
 
 inline
 bool
-fail (CError error)
+fail (Error error)
 {
 	return fail <bool> (false, error);
 }
 
 inline
-CError
+Error
 setLastSystemError ()
 {
 	return setError (getLastSystemErrorCode ());
@@ -911,26 +909,26 @@ complete (int result)
 
 // providers
 
-class CErrorProvider
+class ErrorProvider
 {
 public:
 	virtual
-	rtl::CString
-	getErrorDescription (const TError* error) = 0;
+	rtl::String
+	getErrorDescription (const ErrorData* error) = 0;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CStdErrorProvider: public CErrorProvider
+class StdErrorProvider: public ErrorProvider
 {
 public:
 	virtual
-	rtl::CString
-	getErrorDescription (const TError* error);
+	rtl::String
+	getErrorDescription (const ErrorData* error);
 
 protected:
-	rtl::CString
-	getStackErrorDescription (const TError* error);
+	rtl::String
+	getStackErrorDescription (const ErrorData* error);
 };
 
 //.............................................................................

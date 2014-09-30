@@ -29,9 +29,9 @@ namespace ref {
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CRefCount
+class RefCount
 {
-	AXL_DISABLE_COPY (CRefCount)
+	AXL_DISABLE_COPY (RefCount)
 	
 protected:
 	volatile int32_t m_refCount;
@@ -42,9 +42,9 @@ protected:
 	mem::FFree* m_pfFree;
 
 public:
-	CRefCount ();
+	RefCount ();
 
-	~CRefCount ()
+	~RefCount ()
 	{ 
 		ASSERT (m_refCount == 0 && m_weakRefCount > 0);
 	}
@@ -111,8 +111,8 @@ public:
 //.............................................................................
 
 template <typename T>
-class CBoxT: 
-	public CRefCount,
+class Box: 
+	public RefCount,
 	public T
 {
 };

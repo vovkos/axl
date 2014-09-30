@@ -16,7 +16,7 @@ namespace rtl {
 // consts
 
 template <typename T>
-class CVoidT
+class Void
 {
 public:
 	void 
@@ -28,7 +28,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CTrueT
+class True
 {
 public:
 	T
@@ -41,7 +41,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CFalseT
+class False
 {
 public:
 	T
@@ -54,7 +54,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CZeroT
+class Zero
 {
 public:
 	T
@@ -67,7 +67,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CMinusOneT
+class MinusOne
 {
 public:
 	T
@@ -85,7 +85,7 @@ template <
 	typename A, 
 	typename B
 	>
-class CImplicitCastT
+class ImplicitCast
 {
 public:
 	B 
@@ -101,7 +101,7 @@ template <
 	typename A, 
 	typename B
 	>
-class CExplicitCastT
+class ExplicitCast
 {
 public:
 	B 
@@ -120,7 +120,7 @@ template <
 	typename B, 
 	size_t offset
 	>
-class COffsetT
+class Offset
 {
 public:
 	B* 
@@ -136,7 +136,7 @@ template <
 	typename C, 
 	typename B
 	>
-class COffsetOfClassT 
+class OffsetOfClass 
 {
 public:
 	size_t 
@@ -152,7 +152,7 @@ public:
 // construct / destruct
  
 template <typename T>
-class CConstructT
+class Construct
 {
 public:
 	void 
@@ -165,7 +165,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CDestructT
+class Destruct
 {
 public:
 	void 
@@ -180,7 +180,7 @@ public:
 // new / delete
 
 template <typename T>
-class CNewT
+class New
 {
 public:
 	void 
@@ -193,7 +193,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CDeleteT
+class Delete
 {
 public:
 	void 
@@ -206,7 +206,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CCppNewT
+class CppNew
 {
 public:
 	void 
@@ -219,7 +219,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CCppDeleteT
+class CppDelete
 {
 public:
 	void 
@@ -232,7 +232,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CReleaseT
+class Release
 {
 public:
 	void 
@@ -249,13 +249,13 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CMinusT
+class Minus
 {
 public:
 	T
-	operator () (TArg a) const
+	operator () (Arg a) const
 	{ 
 		return -a; 
 	}
@@ -263,13 +263,13 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CNotT
+class Not
 {
 public:
 	T
-	operator () (TArg a) const
+	operator () (Arg a) const
 	{ 
 		return ~a; 
 	}
@@ -277,15 +277,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CAddT
+class Add
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a + b; 
@@ -294,15 +294,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CSubT
+class Sub
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a - b; 
@@ -311,15 +311,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CMulT
+class Mul
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a * b; 
@@ -328,15 +328,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CDivT
+class Div
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a / b; 
@@ -345,15 +345,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CModT
+class Mod
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a % b; 
@@ -362,15 +362,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CShlT
+class Shl
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a << b; 
@@ -379,15 +379,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CShrT
+class Shr
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a >> b; 
@@ -396,15 +396,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CAndT
+class And
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a & b; 
@@ -413,15 +413,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CXorT
+class Xor
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a ^ b; 
@@ -430,15 +430,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class COrT
+class Or
 {
 public:
 	T
 	operator () (
-		TArg a,
-		TArg b
+		Arg a,
+		Arg b
 		) const
 	{ 
 		return a | b; 
@@ -447,15 +447,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CMinT
+class Min
 {
 public:
 	T
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{
 		return a < b ? a : b;
@@ -464,15 +464,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CMaxT
+class Max
 {
 public:
 	T
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{
 		return a > b ? a : b;
@@ -485,15 +485,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CEqT
+class Eq
 {
 public:
 	bool 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a == b; 
@@ -504,15 +504,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CNeT
+class Ne
 {
 public:
 	bool 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a != b; 
@@ -523,15 +523,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CLtT
+class Lt
 {
 public:
 	bool 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a < b; 
@@ -542,15 +542,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CGtT
+class Gt
 {
 public:
 	bool 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a > b; 
@@ -561,15 +561,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CLeT
+class Le
 {
 public:
 	bool 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a <= b; 
@@ -580,15 +580,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CGeT
+class Ge
 {
 public:
 	bool 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a >= b; 
@@ -601,15 +601,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CAssignT
+class Assign
 {
 public:
 	void
 	operator () (
 		T& a, 
-		TArg b
+		Arg b
 		) const
 	{ 
 		a = b;
@@ -619,20 +619,20 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TFunc,
+	typename Func,
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class COpAssignT
+class OpAssign
 {
 public:
 	void
 	operator () (
 		T& a, 
-		TArg b
+		Arg b
 		) const
 	{ 
-		a = TFunc () (a, b);
+		a = Func () (a, b);
 	}
 };
 
@@ -642,15 +642,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CCmpT
+class Cmp
 {
 public:
 	int 
 	operator () (
-		TArg a, 
-		TArg b
+		Arg a, 
+		Arg b
 		) const
 	{ 
 		return a < b ? -1 : a > b ? 1 : 0; 
@@ -660,7 +660,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CCmpBinT
+class CmpBin
 {
 public:
 	int 
@@ -676,19 +676,19 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CCmpStringT
+class CmpStringBase
 {
 };
 
 template <typename T>
-class CCmpStringT_i
+class CmpStringBase_i
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CCmpStringT <char>
+class CmpStringBase <char>
 {
 public:
 	int
@@ -704,7 +704,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CCmpStringT_i <char>
+class CmpStringBase_i <char>
 {
 public:
 	int
@@ -720,7 +720,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CCmpStringT <wchar_t>
+class CmpStringBase <wchar_t>
 {
 public:
 	int
@@ -736,7 +736,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CCmpStringT_i <wchar_t>
+class CmpStringBase_i <wchar_t>
 {
 public:
 	int
@@ -751,10 +751,10 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CCmpStringT <char>      CCmpString;
-typedef CCmpStringT <wchar_t>   CCmpString_w;
-typedef CCmpStringT_i <char>    CCmpString_i;
-typedef CCmpStringT_i <wchar_t> CCmpString_wi;
+typedef CmpStringBase <char>      CmpString;
+typedef CmpStringBase <wchar_t>   CmpString_w;
+typedef CmpStringBase_i <char>    CmpString_i;
+typedef CmpStringBase_i <wchar_t> CmpString_wi;
 
 //.............................................................................
 
@@ -775,7 +775,7 @@ crc16(
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CHashDjb2T
+class HashDjb2
 {
 public:
 	size_t 
@@ -788,7 +788,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CHashCrc16T
+class HashCrc16
 {
 public:
 	size_t 
@@ -801,7 +801,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CHashIdT
+class HashId
 {
 public:
 	size_t 
@@ -814,14 +814,14 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CHashStringT 
+class HashStringBase 
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CHashStringT <char>
+class HashStringBase <char>
 {
 public:
 	size_t 
@@ -834,7 +834,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CHashStringT <wchar_t>
+class HashStringBase <wchar_t>
 {
 public:
 	size_t 
@@ -846,15 +846,18 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CHashStringT <char>    CHashString;
-typedef CHashStringT <wchar_t> CHashString_w;
+typedef HashStringBase <char>    HashString;
+typedef HashStringBase <wchar_t> HashString_w;
+typedef HashStringBase <utf8_t>  HashString_utf8;
+typedef HashStringBase <utf16_t> HashString_utf16;
+typedef HashStringBase <utf32_t> HashString_utf32;
 
 //.............................................................................
 
 // size functors
 
 template <typename T>
-class CGetSizeT
+class GetSize
 {
 public:
 	size_t
@@ -869,52 +872,52 @@ public:
 // closure functors
 
 template <
-	typename TFunc,
-	typename TResult,
-	typename TArg,
-	typename TArgSave = TArg
+	typename Func,
+	typename Result,
+	typename Arg,
+	typename ArgSave = Arg
 	>
-class CBinClosureT_1 
+class BinClosure_1 
 {
 protected:
-	TArgSave m_a;
+	ArgSave m_a;
 	
 public:
-	CBinClosureT_1 (TArg a)
+	BinClosure_1 (Arg a)
 	{
 		m_a = a;
 	}
 
-	TResult
-	operator () (TArg b) const
+	Result
+	operator () (Arg b) const
 	{ 
-		return TFunc () (m_a, b); 
+		return Func () (m_a, b); 
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TFunc,
-	typename TResult,
-	typename TArg,
-	typename TArgSave = TArg
+	typename Func,
+	typename Result,
+	typename Arg,
+	typename ArgSave = Arg
 	>
-class CBinClosureT_2
+class BinClosure_2
 {
 protected:
-	TArgSave m_b;
+	ArgSave m_b;
 	
 public:
-	CBinClosureT_2 (TArg b)
+	BinClosure_2 (Arg b)
 	{
 		m_b = b;
 	}
 
-	TResult
-	operator () (TArg a) const
+	Result
+	operator () (Arg a) const
 	{ 
-		return TFunc () (a, m_b); 
+		return Func () (a, m_b); 
 	}
 };
 
@@ -922,15 +925,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CAssignClosureT_L
+class AssignClosure_L
 {
 protected:
 	T* m_p;
 	
 public:
-	CAssignClosureT_L (T& a)
+	AssignClosure_L (T& a)
 	{
 		m_p = &a;
 	}
@@ -946,15 +949,15 @@ public:
 
 template <
 	typename T,
-	typename TArg = T
+	typename Arg = T
 	>
-class CAssignClosureT_R
+class AssignClosure_R
 {
 protected:
 	T m_b;
 	
 public:
-	CAssignClosureT_R (TArg b)
+	AssignClosure_R (Arg b)
 	{
 		m_b = b;
 	}
@@ -983,7 +986,7 @@ swap (
 }
 
 template <typename T>
-class CSwapT
+class Swap
 {
 public:
 	void

@@ -14,17 +14,17 @@ namespace gui {
 
 //.............................................................................
 
-class CGdiImage: 
-	public CImage,
-	public CGdiObjectHandleT <HBITMAP>
+class GdiImage: 
+	public Image,
+	public GdiObjectHandle <HBITMAP>
 {
-	friend class CGdiEngine;
+	friend class GdiEngine;
 
 protected:
-	TSize m_size;
+	Size m_size;
 
 public:
-	CGdiImage ();
+	GdiImage ();
 
 	virtual
 	bool

@@ -26,7 +26,7 @@ struct IType
 protected:
 	size_t m_size;
 	const char* m_name;
-	const rtl::TGuid* m_guid;
+	const rtl::Guid* m_guid;
 	
 public:
 	size_t 
@@ -41,7 +41,7 @@ public:
 		return m_name;
 	}
 
-	const rtl::TGuid*
+	const rtl::Guid*
 	getGuid ()
 	{ 
 		return m_guid;
@@ -57,10 +57,10 @@ public:
 
 	virtual
 	size_t
-	getInterfaceOffset (const rtl::TGuid& guid) = 0;
+	getInterfaceOffset (const rtl::Guid& guid) = 0;
 
 	bool
-	hasInterface (const rtl::TGuid& guid)
+	hasInterface (const rtl::Guid& guid)
 	{
 		return getInterfaceOffset (guid) != -1;
 	}
@@ -97,7 +97,7 @@ struct IRoot
 	}
 	
 	void*
-	getInterface (const rtl::TGuid& guid)
+	getInterface (const rtl::Guid& guid)
 	{
 		IType* type;
 		void* p = getObject (&type);
@@ -111,23 +111,23 @@ struct IRoot
 // pointer to interface, queries interface when necessary
 
 template <typename I>
-class CPtrT
+class Ptr
 {
 protected:
 	I* m_p;
 
 public:
-	CPtrT ()
+	Ptr ()
 	{
 		m_p = NULL;
 	}
 
-	CPtrT (I* p)
+	Ptr (I* p)
 	{
 		m_p = p;
 	}
 
-	CPtrT (IRoot* p)
+	Ptr (IRoot* p)
 	{
 		m_p = (I*) p->getInterface (AXL_OBJ_GUIDOF (I));
 	}
@@ -150,31 +150,31 @@ template <typename T>
 class ITypeSimpleImplT: public IType
 {
 public:
-	typedef CTypeT <T> CType;
+	typedef Type <T> Type;
 
 	ITypeSimpleImplT ()
 	{
-		m_size = CType::getSize ();
-		m_name = CType::getName ();
+		m_size = Type::getSize ();
+		m_name = Type::getName ();
 	}
 
 	virtual
 	void
 	construct (void* p)
 	{
-		CType::construct (p);
+		Type::construct (p);
 	}
 
 	virtual
 	void
 	destruct (void* p)
 	{
-		CType::destruct (p);
+		Type::destruct (p);
 	}
 
 	virtual
 	size_t
-	getInterfaceOffset (const rtl::TGuid& guid)
+	getInterfaceOffset (const rtl::Guid& guid)
 	{
 		return -1;
 	}
@@ -200,7 +200,7 @@ public:
 
 	virtual
 	size_t
-	getInterfaceOffset (const rtl::TGuid& guid)
+	getInterfaceOffset (const rtl::Guid& guid)
 	{
 		return T::__GetInterfaceOffset (guid);
 	}
@@ -229,10 +229,10 @@ public:
 
 #define AXL_OBJ_GUID_TAG(l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
 	static \
-	const axl::rtl::TGuid* \
+	const axl::rtl::Guid* \
 	__GetGuid () \
 	{ \
-		static axl::rtl::TGuid guidTag = AXL_RTL_GUID_INITIALIZER(l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8); \
+		static axl::rtl::Guid guidTag = AXL_RTL_GUID_INITIALIZER(l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8); \
 		return &guidTag; \
 	}
 
@@ -240,7 +240,7 @@ public:
 
 #define AXL_OBJ_GUID_TAG_E(guid) \
 	static \
-	const axl::rtl::TGuid* \
+	const axl::rtl::Guid* \
 	__GetGuid () \
 	{ \
 		return &guid; \
@@ -257,18 +257,18 @@ public:
 	typedef class __CThisClass; \
 	static \
 	size_t \
-	__GetInterfaceOffset (const rtl::TGuid& guid) \
+	__GetInterfaceOffset (const rtl::Guid& guid) \
 	{
 
 #define AXL_OBJ_INTERFACE_ENTRY(I) \
 		if (guid == AXL_OBJ_GUIDOF (I)) \
-			return rtl::COffsetOfClassT <__CThisClass, I> () (); \
+			return rtl::OffsetOfClass <__CThisClass, I> () (); \
 
 #define AXL_OBJ_INTERFACE_CHAIN(B) \
 		{ \
 		size_t offset = B::__GetInterfaceOffset (guid); \
 		if (offset != -1) \
-			return rtl::COffsetOfClassT <__CThisClass, B> () () + offset; \
+			return rtl::OffsetOfClass <__CThisClass, B> () () + offset; \
 		}
 
 #define AXL_OBJ_END_INTERFACE_MAP() \

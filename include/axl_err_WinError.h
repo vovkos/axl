@@ -22,16 +22,16 @@ AXL_RTL_DEFINE_GUID (
 
 //.............................................................................
 
-class CWinErrorProvider: public CErrorProvider
+class WinErrorProvider: public ErrorProvider
 {
 public:
 	static
-	rtl::CString 
+	rtl::String 
 	getErrorDescription (dword_t code);
 
 	virtual 
-	rtl::CString 
-	getErrorDescription (const TError* error)
+	rtl::String 
+	getErrorDescription (const ErrorData* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -39,29 +39,29 @@ public:
 
 //.............................................................................
 
-class CWinError: public CError
+class WinError: public Error
 {
 public:
-	CWinError ()
+	WinError ()
 	{
 	}
 
-	CWinError (dword_t code)
+	WinError (dword_t code)
 	{
 		create (code);
 	}
 
-	TError* 
+	ErrorData* 
 	create (dword_t code);
 };
 
 //.............................................................................
 
 inline
-CError
+Error
 setWinError (dword_t code)
 {
-	setError (CWinError (code));
+	setError (WinError (code));
 }
 
 //.............................................................................

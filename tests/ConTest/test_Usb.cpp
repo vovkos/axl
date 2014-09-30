@@ -11,9 +11,9 @@ run ()
 {
 	bool result;
 
-	io::CUsbContext context;
+	io::UsbContext context;
 
-	io::CUsbDeviceList deviceList;
+	io::UsbDeviceList deviceList;
 	size_t count = deviceList.enumerateDevices (context);
 	if (count == -1)
 	{
@@ -21,13 +21,13 @@ run ()
 		return;
 	}
 
-	rtl::CString bufferString;
+	rtl::String bufferString;
 	bufferString.getBuffer (4096);
 
 	libusb_device** pp = deviceList;
 	for (; *pp; pp++)
 	{
-		io::CUsbDevice device;
+		io::UsbDevice device;
 		device.setDevice (*pp);
 
 		libusb_device_descriptor descriptor;

@@ -13,7 +13,7 @@ namespace gui {
 
 //.............................................................................
 
-class CDeleteGdiObject
+class DeleteGdiObject
 {
 public:
 	void
@@ -26,15 +26,15 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CGdiObjectHandleT: public rtl::CHandleT <T, CDeleteGdiObject>
+class GdiObjectHandle: public rtl::Handle <T, DeleteGdiObject>
 {
 public:
-	CGdiObjectHandleT ()
+	GdiObjectHandle ()
 	{
 	}
 
-	CGdiObjectHandleT (T h):
-		rtl::CHandleT <T, CDeleteGdiObject> (h)
+	GdiObjectHandle (T h):
+		rtl::Handle <T, DeleteGdiObject> (h)
 	{
 	}
 };

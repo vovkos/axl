@@ -9,14 +9,14 @@ namespace test_Scheduler {
 //.............................................................................
 
 
-class CTest
+class Test
 {
 public:
-	rtl::CString m_s;
-	rtl::CString m_s2;
-	rtl::CString m_s3;
+	rtl::String m_s;
+	rtl::String m_s2;
+	rtl::String m_s3;
 
-	CTest ()
+	Test ()
 	{
 		m_s = "hui!!!";
 		m_s2 = "hui!!!";
@@ -24,7 +24,7 @@ public:
 		printf ("CTest::CTest\n");
 	}
 
-	~CTest ()
+	~Test ()
 	{
 		printf ("CTest::~CTest\n");
 	}
@@ -32,15 +32,15 @@ public:
 
 //.............................................................................
 
-class CTest2
+class Test2
 {
 public:
-	CTest2 ()
+	Test2 ()
 	{
 		printf ("CTest2::CTest2\n");
 	}
 
-	~CTest2 ()
+	~Test2 ()
 	{
 		printf ("CTest2::~CTest2\n");
 	}
@@ -58,18 +58,18 @@ test (
 	printf ("Test: x = %d, y = %d, z = %d\n", x, y, z);
 }
 
-class CMyScheduler: public exe::IScheduler
+class MyScheduler: public exe::IScheduler
 {
 public:
 	virtual
-	EScheduleResult
+	ScheduleResultKind
 	schedule_va (
-		const exe::CFunction& function, 
+		const exe::Function& function, 
 		axl_va_list va
 		)
 	{
 		function->invoke_va (va);
-		return EScheduleResult_Invoke;
+		return ScheduleResultKind_Invoke;
 	}
 };
 
@@ -93,28 +93,28 @@ struct IInterfaceC: IInterfaceA
 void 
 run ()
 {
-	CTest* p;
+	Test* p;
 	
-	p = rtl::getSingleton <CTest> ();
-	p = rtl::getSingleton <CTest> ();
+	p = rtl::getSingleton <Test> ();
+	p = rtl::getSingleton <Test> ();
 	
-	CTest2* p2;
+	Test2* p2;
 	
-	p2 = rtl::getSingleton <CTest2> ();
-	p2 = rtl::getSingleton <CTest2> ();
+	p2 = rtl::getSingleton <Test2> ();
+	p2 = rtl::getSingleton <Test2> ();
 
-	ref::CPtrT<CTest> x = AXL_REF_NEW (ref::CBoxT <CTest>);
-	ref::CWeakPtrT<CTest> y = x;
+	ref::Ptr<Test> x = AXL_REF_NEW (ref::Box <Test>);
+	ref::WeakPtr<Test> y = x;
 	y.detach ();
 
-	CMyScheduler scheduler;
+	MyScheduler scheduler;
 
-	exe::CFunctionT <
-		exe::CArgSeqT_2 <
+	exe::Function <
+		exe::ArgSeq_2 <
 			int,
 			int 
 			>,
-		exe::CArgSeqT_3 <
+		exe::ArgSeq_3 <
 			int,
 			int,
 			int

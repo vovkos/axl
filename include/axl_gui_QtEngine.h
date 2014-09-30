@@ -20,15 +20,15 @@ namespace gui {
 
 //.............................................................................
 
-class CQtCaret: public QTimer
+class QtCaret: public QTimer
 {
 protected:
-	CWidget* m_widget;
+	Widget* m_widget;
 	bool m_isVisible;
-	TRect m_rect;
+	Rect m_rect;
 
 public:
-	CQtCaret ()
+	QtCaret ()
 	{
 		m_isVisible = false;
 		m_widget = NULL;
@@ -42,8 +42,8 @@ public:
 
 	bool
 	show (
-		CWidget* widget,
-		const TRect& rect
+		Widget* widget,
+		const Rect& rect
 		);
 
 	virtual
@@ -56,25 +56,25 @@ protected:
 
 //.............................................................................
 
-class CQtEngine: public CEngine
+class QtEngine: public Engine
 {
 protected:
-	ref::CPtrT <CFont> m_stdFontArray [EStdFont__Count];
-	ref::CPtrT <CCursor> m_stdCursorArray [EStdCursor__Count];
-	CQtCaret m_qtCaret;
+	ref::Ptr <Font> m_stdFontArray [StdFontKind__Count];
+	ref::Ptr <Cursor> m_stdCursorArray [StdCursorKind__Count];
+	QtCaret m_qtCaret;
 
-	rtl::CStringHashTableMapT <uintptr_t> m_clipboardFormatNameMap;
-	rtl::CArrayT <rtl::CString> m_clipboardFormatNameTable;
+	rtl::StringHashTableMap <uintptr_t> m_clipboardFormatNameMap;
+	rtl::Array <rtl::String> m_clipboardFormatNameTable;
 	QMimeData* m_qtClipboardMimeData;
 
 public:
-	CQtEngine ()
+	QtEngine ()
 	{
-		m_engineKind = EEngine_Qt;
+		m_engineKind = EngineKind_Qt;
 		m_qtClipboardMimeData = NULL;
 	}
 
-	~CQtEngine ()
+	~QtEngine ()
 	{
 		if (m_qtClipboardMimeData)
 			delete m_qtClipboardMimeData;
@@ -83,14 +83,14 @@ public:
 	// font
 
 	static
-	CQtEngine*
+	QtEngine*
 	getSingleton ()
 	{
-		return rtl::getSingleton <CQtEngine> ();
+		return rtl::getSingleton <QtEngine> ();
 	}
 
 	virtual
-	ref::CPtrT <CFont>
+	ref::Ptr <Font>
 	createFont (
 		const char* faceName,
 		size_t pointSize = 0,
@@ -100,32 +100,32 @@ public:
 		return createFont (createQtFont (faceName, pointSize, flags));
 	}
 
-	ref::CPtrT <CFont>
+	ref::Ptr <Font>
 	createFont (const QFont& qtFont);
 
 	// cursors
 
-	ref::CPtrT <CCursor>
+	ref::Ptr <Cursor>
 	createCursor (const QCursor& qtCursor);
 
 	// image
 
 	virtual
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage ();
 
 	virtual
-	ref::CPtrT <CImage>
+	ref::Ptr <Image>
 	createImage (
 		int width,
 		int height,
-		EPixelFormat pixelFormat,
+		PixelFormatKind pixelFormat,
 		const void* data,
 		bool isScreenCompatible = true
 		);
 
 	virtual
-	ref::CPtrT <CCanvas>
+	ref::Ptr <Canvas>
 	createOffscreenCanvas (
 		int width,
 		int height
@@ -135,17 +135,17 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const rtl::CString& formatName);
+	registerClipboardFormat (const rtl::String& formatName);
 
 	virtual
 	bool
-	readClipboard (rtl::CString* string);
+	readClipboard (rtl::String* string);
 
 	virtual
 	bool
 	readClipboard (
 		uintptr_t format,
-		rtl::CArrayT <char>* data
+		rtl::Array <char>* data
 		);
 
 	virtual
@@ -172,8 +172,8 @@ public:
 	virtual
 	bool
 	showCaret (
-		CWidget* widget,
-		const TRect& rect
+		Widget* widget,
+		const Rect& rect
 		)
 	{
 		return m_qtCaret.show (widget, rect);
@@ -205,19 +205,19 @@ protected:
 		);
 
 	virtual
-	CFont*
+	Font*
 	getFontMod (
-		CFont* baseFont,
+		Font* baseFont,
 		uint_t flags
 		);
 
 	virtual
-	ref::CPtrT <CFont>
-	createStdFont (EStdFont fontKind);
+	ref::Ptr <Font>
+	createStdFont (StdFontKind fontKind);
 
 	virtual
-	ref::CPtrT <CCursor>
-	createStdCursor (EStdCursor cursorKind);
+	ref::Ptr <Cursor>
+	createStdCursor (StdCursorKind cursorKind);
 };
 
 //.............................................................................

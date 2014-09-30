@@ -8,30 +8,30 @@ namespace win {
 
 //.............................................................................
 
-EWaitResult 
-CWaitableHandle::completeWait (dword_t result)
+WaitResultKind 
+WaitableHandle::completeWait (dword_t result)
 {
 	switch (result)
 	{
 	case WAIT_FAILED:
-		return err::failWithLastSystemError (EWaitResult_Fail);
+		return err::failWithLastSystemError (WaitResultKind_Fail);
 
 	case WAIT_TIMEOUT:
-		return EWaitResult_Timeout;
+		return WaitResultKind_Timeout;
 
 	case WAIT_IO_COMPLETION:
-		return EWaitResult_IoCompletion;
+		return WaitResultKind_IoCompletion;
 
 	default:
 		if (result >= WAIT_OBJECT_0 &&
 			result <= WAIT_OBJECT_0 + MAXIMUM_WAIT_OBJECTS
 			)
 		{
-			return (EWaitResult) (EWaitResult_Object0 + result - WAIT_OBJECT_0);
+			return (WaitResultKind) (WaitResultKind_Object0 + result - WAIT_OBJECT_0);
 		}
 
-		err::setError (err::EStatus_InvalidParameter);
-		return EWaitResult_Fail;
+		err::setError (err::StatusKind_InvalidParameter);
+		return WaitResultKind_Fail;
 	}
 }
 

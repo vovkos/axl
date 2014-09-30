@@ -8,14 +8,14 @@ namespace exe {
 
 //.............................................................................
 
-CSynchronizer::CSynchronizer (int flags)
+Synchronizer::Synchronizer (int flags)
 {
 	m_invokeThreadId = -1;
 	m_flags = flags;
 }
 
-CSynchronizer::EScheduleResult
-CSynchronizer::scheduleV (
+Synchronizer::ScheduleResultKind
+Synchronizer::scheduleV (
 	IFunction* function, 
 	axl_va_list va
 	)
@@ -25,12 +25,12 @@ CSynchronizer::scheduleV (
 	m_lock.lock ();
 
 	if (m_invokeThreadId != -1 &&
-		((m_flags & EFlags_AlwaysEnqueue) ||  m_invokeThreadId != currentThreadId))
+		((m_flags & FlagsKind_AlwaysEnqueue) ||  m_invokeThreadId != currentThreadId))
 	{
 		m_invokeList.addV (function, va);
 		m_lock.unlock ();
 		
-		return EScheduleResult_Pending;
+		return ScheduleResultKind_Pending;
 	}
 
 	m_invokeThreadId = currentThreadId;
@@ -41,7 +41,7 @@ CSynchronizer::scheduleV (
 	m_lock.lock ();
 	while (!m_invokeList.isEmpty ())
 	{
-		CInvokeList invokeList;
+		InvokeList invokeList;
 		invokeList.takeOver (&m_invokeList);
 		m_lock.unlock ();
 		
@@ -53,7 +53,7 @@ CSynchronizer::scheduleV (
 
 	m_lock.unlock ();
 
-	return EScheduleResult_Invoke;
+	return ScheduleResultKind_Invoke;
 }
 
 //.............................................................................

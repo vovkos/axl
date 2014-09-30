@@ -13,11 +13,11 @@ namespace rtl {
 
 //.............................................................................
 
-enum EBitOp
+enum BitOpKind
 {
-	EBitOp_Or = 0,
-	EBitOp_And,
-	EBitOp_Xor,
+	BitOpKind_Or = 0,
+	BitOpKind_And,
+	BitOpKind_Xor,
 };
 
 //.............................................................................
@@ -51,7 +51,7 @@ mergeBitMaps (
 	size_t* map,
 	const size_t* map2,
 	size_t pageCount,
-	EBitOp op
+	BitOpKind op
 	);
 
 inline
@@ -76,7 +76,7 @@ findBit (
 //.............................................................................
 
 template <size_t bitCount> 
-class CBitMapT
+class BitMap_n
 {
 public:
 	enum
@@ -88,12 +88,12 @@ protected:
 	size_t m_map [pageCount];
 
 public:
-	CBitMapT ()
+	BitMap_n ()
 	{
 		clear ();
 	}
 
-	CBitMapT (const CBitMapT& src)
+	BitMap_n (const BitMap_n& src)
 	{
 		copy (src);
 	}
@@ -105,13 +105,13 @@ public:
 	}
 
 	void
-	copy (const CBitMapT& src)
+	copy (const BitMap_n& src)
 	{
 		memcpy (m_map, src.m_map, sizeof (m_map));
 	}
 
 	int 
-	cmp (const CBitMapT& src)
+	cmp (const BitMap_n& src)
 	{
 		return memcmp (m_map, src.m_map, sizeof (m_map));
 	}
@@ -161,8 +161,8 @@ public:
 
 	bool
 	merge ( 
-		const CBitMapT& bitMap2,
-		EBitOp op
+		const BitMap_n& bitMap2,
+		BitOpKind op
 		)
 	{
 		return rtl::mergeBitMaps (m_map, bitMap2.m_map, pageCount, op);
@@ -186,13 +186,13 @@ public:
 
 //.............................................................................
 
-class CBitMap
+class BitMap
 {
 protected:
-	CArrayT <size_t> m_map;
+	Array <size_t> m_map;
 
 public:
-	CBitMap (size_t bitCount = 0)
+	BitMap (size_t bitCount = 0)
 	{
 		create (bitCount);
 	}
@@ -228,10 +228,10 @@ public:
 	}
 
 	void 
-	copy (const CBitMap& src);
+	copy (const BitMap& src);
 
 	int
-	cmp (const CBitMap& src);
+	cmp (const BitMap& src);
 	
 	bool 
 	create (size_t bitCount);
@@ -293,14 +293,14 @@ public:
 
 	bool 
 	merge (
-		const CBitMap& bitMap2, 
-		EBitOp op
+		const BitMap& bitMap2, 
+		BitOpKind op
 		);
 
 	bool 
 	mergeResize (
-		const CBitMap& bitMap2, 
-		EBitOp op
+		const BitMap& bitMap2, 
+		BitOpKind op
 		);
 
 	void 

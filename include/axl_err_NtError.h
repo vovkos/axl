@@ -28,16 +28,16 @@ AXL_RTL_DEFINE_GUID (
 
 //.............................................................................
 	
-class CNtErrorProvider: public CErrorProvider
+class NtErrorProvider: public ErrorProvider
 {
 public:
 	static
-	rtl::CString 
+	rtl::String 
 	getErrorDescription (NTSTATUS status);
 
 	virtual 
-	rtl::CString 
-	getErrorDescription (const TError* error)
+	rtl::String 
+	getErrorDescription (const ErrorData* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -45,29 +45,29 @@ public:
 
 //.............................................................................
 
-class CNtError: public CError
+class NtError: public Error
 {
 public:
-	CNtError ()
+	NtError ()
 	{
 	}
 
-	CNtError (NTSTATUS status)
+	NtError (NTSTATUS status)
 	{
 		create (status);
 	}
 
-	TError* 
+	ErrorData* 
 	create (NTSTATUS status);
 };
 
 //.............................................................................
 
 inline
-CError
+Error
 setNtError (NTSTATUS status)
 {
-	setError (CNtError (status));
+	setError (NtError (status));
 }
 
 //.............................................................................
